@@ -1,6 +1,8 @@
 precision lowp float;
 precision lowp int;
 
+#define OBJECT_SIZE 1
+
 attribute float mergedIndex;
 attribute float expiredFlag;
 attribute vec3 position;
@@ -23,9 +25,9 @@ varying vec4 vUVCoordinates;
 
 uniform float mergedFlag;
 uniform float time;
-uniform float timeArray[50];
+uniform float timeArray[OBJECT_SIZE];
 uniform mat4 modelViewMatrix;
-uniform mat4 modelViewMatrixArray[50];
+uniform mat4 modelViewMatrixArray[OBJECT_SIZE];
 uniform mat4 viewMatrix;
 uniform mat4 projectionMatrix;
 uniform mat3 parentMotionMatrix;

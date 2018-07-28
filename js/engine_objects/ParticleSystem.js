@@ -365,6 +365,7 @@ var ParticleSystem = function(copyPS, name, particles, x, y, z, vx, vy, vz, ax, 
       transparent: true,
       side: THREE.DoubleSide,
       uniforms:{
+        mergedFlag: new THREE.Uniform(-20.0),
         modelViewMatrix: new THREE.Uniform(new THREE.Matrix4()),
         projectionMatrix: new THREE.Uniform(new THREE.Matrix4()),
         viewMatrix: new THREE.Uniform(new THREE.Matrix4()),

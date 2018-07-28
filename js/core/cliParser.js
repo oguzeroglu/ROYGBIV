@@ -485,6 +485,10 @@ function parse(input){
             for (var objectName in objectTrails){
               objectTrails[objectName].destroy();
             }
+            for (var mergedParticleSystemName in mergedParticleSystems){
+              mergedParticleSystems[mergedParticleSystemName].destroy();
+            }
+
             for (var markedPointName in markedPoints){
               if (markedPoints[markedPointName].showAgainOnTheNextModeSwitch){
                 markedPoints[markedPointName].show();
@@ -495,6 +499,7 @@ function parse(input){
             particleSystemPool = new Object();
             particleSystemPools = new Object();
             objectTrails = new Object();
+            mergedParticleSystems = new Object();
             for (var objectName in objectGroups){
               var object = objectGroups[objectName];
               object.graphicsGroup.quaternion.copy(

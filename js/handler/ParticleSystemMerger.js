@@ -3,6 +3,8 @@ var ParticleSystemMerger = function(psObj, name){
   this.psObj = psObj;
   this.geometry = new THREE.BufferGeometry();
 
+  this.size = Object.keys(psObj).length;
+
   var texturesObj = new Object();
   var textureCount = 0;
   var textureMergerHash = "";
@@ -143,8 +145,12 @@ var ParticleSystemMerger = function(psObj, name){
   this.geometry.addAttribute('uvCoordinates', this.uvCoordinatesBufferAttribute);
   this.geometry.setDrawRange(0, len);
 
+  var vertexShader = ShaderContent.particleVertexShader.replace(
+    "#define OBJECT_SIZE 1", "#define OBJECT_SIZE "+this.size
+  );
+
   this.material = new THREE.RawShaderMaterial({
-    vertexShader: ShaderContent.particleVertexShader,
+    vertexShader: vertexShader,
     fragmentShader: ShaderContent.particleFragmentShader,
     vertexColors: THREE.VertexColors,
     transparent: true,
@@ -166,6 +172,15 @@ var ParticleSystemMerger = function(psObj, name){
   this.mesh = new THREE.Points(this.geometry, this.material);
   this.mesh.frustumCulled = false;
   previewScene.add(this.mesh);
+}
+
+ParticleSystemMerger.prototype.destroy = function(){
+  for (var psName in this.psObj){
+    this.psObj[psName].destroy();
+  }
+  previewScene.remove(this.mesh);
+  this.mesh.geometry.dispose();
+  this.mesh.material.dispose();
 }
 
 ParticleSystemMerger.prototype.update = function(){
