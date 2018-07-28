@@ -23,6 +23,7 @@ varying vec4 vUVCoordinates;
 
 uniform float mergedFlag;
 uniform float time;
+uniform float timeArray[50];
 uniform mat4 modelViewMatrix;
 uniform mat4 modelViewMatrixArray[50];
 uniform mat4 viewMatrix;
@@ -31,13 +32,13 @@ uniform mat3 parentMotionMatrix;
 uniform float dissapearCoef;
 uniform vec3 stopInfo;
 
-vec3 calculateColor(float time){
+vec3 calculateColor(float timeValue){
   float colorStep = targetColor[3];
   vec3 color = vec3(flags4[0], flags4[1], flags4[2]);
-  if (time < 0.0){
+  if (timeValue < 0.0){
     return color;
   }
-  if ((colorStep * time) >= 1.0){
+  if ((colorStep * timeValue) >= 1.0){
     return vec3(targetColor.x, targetColor.y, targetColor.z);
   }
   vec3 diff = vec3(
@@ -45,9 +46,9 @@ vec3 calculateColor(float time){
     (targetColor.g - color.g),
     (targetColor.b - color.g)
   );
-  float calculatedR = color.r + (colorStep * time * (diff.r));
-  float calculatedG = color.g + (colorStep * time * (diff.g));
-  float calculatedB = color.b + (colorStep * time * (diff.b));
+  float calculatedR = color.r + (colorStep * timeValue * (diff.r));
+  float calculatedG = color.g + (colorStep * timeValue * (diff.g));
+  float calculatedB = color.b + (colorStep * timeValue * (diff.b));
   return vec3(calculatedR, calculatedG, calculatedB);
 }
 
@@ -101,12 +102,17 @@ float isRecentlyRespawned(float timeNow){
 }
 
 float findRepeatTime(){
+  float selectedTime = time;
+  if (mergedFlag > 5.0){
+    int mi = int(mergedIndex);
+    selectedTime = timeArray[mi];
+  }
   float startTime = flags2[3];
   float respawnFlag = flags1[0];
   if (respawnFlag < 5.0){
     return startTime;
   }
-  float x = time;
+  float x = selectedTime;
   for (float i = 0.0; i<10000000.0; i += 0.0000000001){
     float recentlyRespawnedFlag = isRecentlyRespawned((x - startTime));
     if (recentlyRespawnedFlag > 5.0){
@@ -117,7 +123,7 @@ float findRepeatTime(){
       break;
     }
   }
-  return time;
+  return selectedTime;
 }
 
 void main(){
@@ -139,9 +145,11 @@ void main(){
   vec3 color = vec3(flags4[0], flags4[1], flags4[2]);
 
   mat4 selectedMVMatrix = modelViewMatrix;
+  float selectedTime = time;
   if (mergedFlag > 5.0){
     int mi = int(mergedIndex);
     selectedMVMatrix = modelViewMatrixArray[mi];
+    selectedTime = timeArray[mi];
   }
 
   float parentStoppedFlag = stopInfo[0];
@@ -155,8 +163,8 @@ void main(){
     }
   }
 
-  if (time >= startTime){
-    float timeOfThis = (time - startTime);
+  if (selectedTime >= startTime){
+    float timeOfThis = (selectedTime - startTime);
     if (respawnFlag > 5.0){
       if (lifetime > 0.0){
         timeOfThis = timeOfThis - (lifetime * floor(timeOfThis/lifetime));
@@ -177,7 +185,7 @@ void main(){
       chosenAcceleration = acceleration;
     }else{
       float trailTime = findRepeatTime();
-      float diff = time - trailTime;
+      float diff = selectedTime - trailTime;
       timeOfThis = trailTime - diff;
       chosenVelocity = parentVelocity;
       chosenAcceleration = parentAcceleration;
@@ -214,7 +222,7 @@ void main(){
       mvPosition = viewMatrix * vec4(newPosition, 1.0);
     }
 
-    gl_PointSize = (500.0 - (dissapearCoef * time)) * size / length(mvPosition.xyz);
+    gl_PointSize = (500.0 - (dissapearCoef * selectedTime)) * size / length(mvPosition.xyz);
     gl_Position = projectionMatrix * mvPosition;
 
   }
@@ -224,10 +232,10 @@ void main(){
   if (vCalculatedColor.a <= 0.01){
     vDiscardFlag = 10.0;
   }else{
-    if (time < startTime){
+    if (selectedTime < startTime){
       vDiscardFlag = 10.0;
     }else{
-      if (lifetime > 0.0 && time >= (lifetime + startTime) && respawnFlag < 5.0){
+      if (lifetime > 0.0 && selectedTime >= (lifetime + startTime) && respawnFlag < 5.0){
         vDiscardFlag = 10.0;
       }
     }

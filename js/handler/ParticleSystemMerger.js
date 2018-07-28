@@ -9,10 +9,11 @@ var ParticleSystemMerger = function(psObj, name){
   var len = 0;
   for (var psName in psObj){
     var ps = psObj[psName];
+    ps.psMerger = this;
     len += ps.particles.length;
     for (var textureName in ps.texturesObj){
       if (!texturesObj[textureName]){
-        textureMergerHash += textureName + "|";
+        textureMergerHash += textureName + PIPE;
       }
       texturesObj[textureName] = textures[textureName];
       textureCount ++;
@@ -28,6 +29,7 @@ var ParticleSystemMerger = function(psObj, name){
   }
 
   var mvMatrixArray = [];
+  var timeArray = [];
 
   this.mergedIndices = new Float32Array(len);
   this.positions = new Float32Array(len * 3);
@@ -52,6 +54,7 @@ var ParticleSystemMerger = function(psObj, name){
   for (var psName in psObj){
     var ps = psObj[psName];
     mvMatrixArray.push(ps.mesh.modelViewMatrix);
+    timeArray.push(ps.tick);
     previewScene.remove(ps.mesh);
     this.positions.set(ps.positions, offset1);
     this.rgbThresholds.set(ps.rgbThresholds, offset1);
@@ -151,7 +154,7 @@ var ParticleSystemMerger = function(psObj, name){
       modelViewMatrixArray: new THREE.Uniform(mvMatrixArray),
       projectionMatrix: new THREE.Uniform(new THREE.Matrix4()),
       viewMatrix: new THREE.Uniform(new THREE.Matrix4()),
-      time: new THREE.Uniform(0.0),
+      timeArray: new THREE.Uniform(timeArray),
       texture: new THREE.Uniform(texture),
       dissapearCoef: new THREE.Uniform(0.0),
       stopInfo: new THREE.Uniform(new THREE.Vector3(-10, -10, -10)),
@@ -166,13 +169,10 @@ var ParticleSystemMerger = function(psObj, name){
 }
 
 ParticleSystemMerger.prototype.update = function(){
-  this.material.uniforms.time.value += (1/60);
   this.material.uniforms.viewMatrix.value = camera.matrixWorldInverse;
   this.material.uniforms.projectionMatrix.value = camera.projectionMatrix;
   for (var psName in this.psObj){
     var ps = this.psObj[psName];
-    ps.mesh.updateMatrixWorld(true);
-    ps.mesh.modelViewMatrix.multiplyMatrices(camera.matrixWorldInverse, ps.mesh.matrixWorld);
-    this.material.uniforms.modelViewMatrixArray[ps.mergedIndex] = ps.mesh.modelViewMatrix;
+    ps.update();
   }
 }

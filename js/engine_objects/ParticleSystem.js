@@ -605,10 +605,18 @@ ParticleSystem.prototype.update = function(){
 
   this.tick += (1/60);
 
-  this.material.uniforms.time.value = this.tick;
-  this.material.uniforms.modelViewMatrix.value = this.mesh.modelViewMatrix;
-  this.material.uniforms.viewMatrix.value = camera.matrixWorldInverse;
-  this.material.uniforms.projectionMatrix.value = camera.projectionMatrix;
+  if (!this.psMerger){
+    this.material.uniforms.time.value = this.tick;
+    this.material.uniforms.modelViewMatrix.value = this.mesh.modelViewMatrix;
+    this.material.uniforms.viewMatrix.value = camera.matrixWorldInverse;
+    this.material.uniforms.projectionMatrix.value = camera.projectionMatrix;
+  }else{
+    this.mesh.updateMatrixWorld(true);
+    this.mesh.modelViewMatrix.multiplyMatrices(camera.matrixWorldInverse, this.mesh.matrixWorld);
+    this.psMerger.material.uniforms.modelViewMatrixArray.value[this.mergedIndex] = this.mesh.modelViewMatrix;
+    this.psMerger.material.uniforms.timeArray.value[this.mergedIndex] = this.tick;
+  }
+
 
   var vx = 0, vy = 0, vz = 0, ax = 0, ay = 0, az = 0;
 
