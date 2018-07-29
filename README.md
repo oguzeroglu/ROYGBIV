@@ -8,7 +8,7 @@ ROYGBIV is still under development. You can watch demo videos [here](https://www
 
 ## How to run?
 
-ROYGBIV works on browsers (preferably Chrome or Firefox). It works with a set of commands typed to its command line interface so a documentations will be provided when the project is finished. To install, follow these steps:
+ROYGBIV works on browsers (preferably Chrome or Firefox). It works with a set of commands typed to its command line interface so a documentation will be provided when the project is finished. To install, follow these steps:
 
 * Download or clone the repository.
 * If you don't have nodejs/npm download them.
