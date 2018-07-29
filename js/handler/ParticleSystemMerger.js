@@ -36,6 +36,8 @@ var ParticleSystemMerger = function(psObj, name){
   var timeArray = [];
   var motionMatrixArray = [];
   var hiddenArray = [];
+  var dissapearCoefArray = [];
+  var stopInfoArray = [];
 
   this.mergedIndices = new Float32Array(len);
   this.positions = new Float32Array(len * 3);
@@ -60,6 +62,8 @@ var ParticleSystemMerger = function(psObj, name){
   for (var psName in psObj){
     var ps = psObj[psName];
     mvMatrixArray.push(ps.mesh.modelViewMatrix);
+    dissapearCoefArray.push(ps.material.uniforms.dissapearCoef.value);
+    stopInfoArray.push(ps.material.uniforms.stopInfo.value);
     timeArray.push(ps.tick);
     if (ps.mesh.visible){
       hiddenArray.push(-20.0);
@@ -174,8 +178,8 @@ var ParticleSystemMerger = function(psObj, name){
       timeArray: new THREE.Uniform(timeArray),
       hiddenArray: new THREE.Uniform(hiddenArray),
       texture: new THREE.Uniform(texture),
-      dissapearCoef: new THREE.Uniform(0.0),
-      stopInfo: new THREE.Uniform(new THREE.Vector3(-10, -10, -10)),
+      dissapearCoefArray: new THREE.Uniform(dissapearCoefArray),
+      stopInfoArray: new THREE.Uniform(stopInfoArray),
       parentMotionMatrixArray: new THREE.Uniform(motionMatrixArray)
     }
   });

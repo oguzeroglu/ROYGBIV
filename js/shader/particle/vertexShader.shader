@@ -34,7 +34,9 @@ uniform mat4 projectionMatrix;
 uniform mat3 parentMotionMatrix;
 uniform mat3 parentMotionMatrixArray[OBJECT_SIZE];
 uniform float dissapearCoef;
+uniform float dissapearCoefArray[OBJECT_SIZE];
 uniform vec3 stopInfo;
+uniform vec3 stopInfoArray[OBJECT_SIZE];
 
 vec3 calculateColor(float timeValue){
   float colorStep = targetColor[3];
@@ -151,6 +153,8 @@ void main(){
   float skipFlag = -20.0;
   mat4 selectedMVMatrix = modelViewMatrix;
   float selectedTime = time;
+  float selectedDissapearCoef = dissapearCoef;
+  vec3 selectedStopInfo = stopInfo;
   if (mergedFlag > 5.0){
     int mi = int(mergedIndex);
     selectedMVMatrix = modelViewMatrixArray[mi];
@@ -161,11 +165,13 @@ void main(){
     if (hiddenArray[mi] > 0.0){
       skipFlag = 20.0;
     }
+    selectedDissapearCoef = dissapearCoefArray[mi];
+    selectedStopInfo = stopInfoArray[mi];
   }
 
-  float parentStoppedFlag = stopInfo[0];
-  float stopTime = stopInfo[1];
-  float newLifetime = stopInfo[2];
+  float parentStoppedFlag = selectedStopInfo[0];
+  float stopTime = selectedStopInfo[1];
+  float newLifetime = selectedStopInfo[2];
 
   if (parentStoppedFlag >= 5.0){
     respawnFlag = -10.0;
@@ -233,7 +239,7 @@ void main(){
       mvPosition = viewMatrix * vec4(newPosition, 1.0);
     }
 
-    gl_PointSize = (500.0 - (dissapearCoef * selectedTime)) * size / length(mvPosition.xyz);
+    gl_PointSize = (500.0 - (selectedDissapearCoef * selectedTime)) * size / length(mvPosition.xyz);
     gl_Position = projectionMatrix * mvPosition;
 
   }

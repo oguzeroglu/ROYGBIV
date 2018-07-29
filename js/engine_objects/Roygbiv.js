@@ -4918,28 +4918,30 @@ Roygbiv.prototype.startParticleSystem = function(configurations){
     particleSystem.material.uniforms.stopInfo.value.set(-10, -10, -10);
   }else{
     particleSystem.psMerger.material.uniforms.hiddenArray.value[particleSystem.mergedIndex] = (-20.0);
+    particleSystem.psMerger.material.uniforms.stopInfoArray.value[particleSystem.mergedIndex].set(-10, -10, -10);
   }
-  delete particleSystem.stoppedX;
-  delete particleSystem.stoppedY;
-  delete particleSystem.stoppedZ;
+  particleSystem.stoppedX = undefined;
+  particleSystem.stoppedY = undefined;
+  particleSystem.stoppedZ = undefined;
   particleSystem.stopped = false;
   if (!(typeof particleSystem.originalCheckForCollisions == UNDEFINED)){
     particleSystem.checkForCollisions = particleSystem.originalCheckForCollisions;
-    delete particleSystem.originalCheckForCollisions;
+    particleSystem.originalCheckForCollisions = undefined;
   }
   if (!(typeof particleSystem.originalLifetime == UNDEFINED)){
     particleSystem.lifetime = particleSystem.originalLifetime;
-    delete particleSystem.originalLifetime;
+    particleSystem.originalLifetime = undefined;
   }
   if (particleSystem.checkForCollisions && isPSCollisionWorkerEnabled()){
     workerHandler.notifyNewPSCreation(particleSystem);
   }
   particleSystem.mesh.visible = true;
-  particleSystem.material.uniforms.dissapearCoef.value = 0;
   if (!particleSystem.psMerger){
     particleSystems[particleSystem.name] = particleSystem;
+    particleSystem.material.uniforms.dissapearCoef.value = 0;
   }else{
     particleSystem.psMerger.notifyPSVisibilityChange(particleSystem, true);
+    particleSystem.psMerger.material.uniforms.dissapearCoefArray.value[particleSystem.mergedIndex] = 0;
   }
 }
 
@@ -5413,7 +5415,11 @@ Roygbiv.prototype.fadeAway = function(particleSystem, coefficient){
     throw new Error("fadeAway error: coefficient must be greater than zero.");
     return;
   }
-  particleSystem.material.uniforms.dissapearCoef.value = coefficient;
+  if (!particleSystem.psMerger){
+    particleSystem.material.uniforms.dissapearCoef.value = coefficient;
+  }else{
+    particleSystem.psMerger.material.uniforms.dissapearCoefArray.value[particleSystem.mergedIndex] = coefficient;
+  }
 }
 
 // LISTENER FUNCTIONS **********************************************************

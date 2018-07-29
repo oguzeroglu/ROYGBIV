@@ -493,7 +493,11 @@ ParticleSystem.prototype.stop = function(newLifetime){
   }
   this.originalCheckForCollisions = this.checkForCollisions;
   this.checkForCollisions = false;
-  this.material.uniforms.stopInfo.value.set(10.0, this.tick, newLifetime);
+  if (!this.psMerger){
+    this.material.uniforms.stopInfo.value.set(10.0, this.tick, newLifetime);
+  }else{
+    this.psMerger.material.uniforms.stopInfoArray.value[this.mergedIndex].set(10.0, this.tick, newLifetime);
+  }
   this.originalLifetime = this.lifetime;
   this.lifetime = (this.tick + newLifetime);
   this.stopped = true;
