@@ -710,6 +710,7 @@ ParticleSystem.prototype.update = function(){
       delete particleSystems[this.name];
     }else{
       this.psMerger.material.uniforms.hiddenArray.value[this.mergedIndex] = 20.0;
+      this.psMerger.notifyPSVisibilityChange(this, false);
     }
     this.mesh.visible = false;
     if (this.checkForCollisions && isPSCollisionWorkerEnabled()){

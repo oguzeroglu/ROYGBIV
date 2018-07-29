@@ -3,6 +3,8 @@ var ParticleSystemMerger = function(psObj, name){
   this.psObj = psObj;
   this.geometry = new THREE.BufferGeometry();
 
+  this.activePSMap = new Map();
+
   this.size = Object.keys(psObj).length;
 
   var texturesObj = new Object();
@@ -61,6 +63,7 @@ var ParticleSystemMerger = function(psObj, name){
     timeArray.push(ps.tick);
     if (ps.mesh.visible){
       hiddenArray.push(-20.0);
+      this.activePSMap.set(ps.name, ps);
     }else{
       hiddenArray.push(20.0);
     }
@@ -190,11 +193,20 @@ ParticleSystemMerger.prototype.destroy = function(){
   this.mesh.material.dispose();
 }
 
+ParticleSystemMerger.prototype.notifyPSVisibilityChange = function(ps, isVisible){
+  if (isVisible){
+    this.activePSMap.set(ps.name, ps);
+  }else{
+    this.activePSMap.delete(ps.name);
+  }
+}
+
+ParticleSystemMerger.prototype.updateObject = function(ps){
+  ps.update();
+}
+
 ParticleSystemMerger.prototype.update = function(){
   this.material.uniforms.viewMatrix.value = camera.matrixWorldInverse;
   this.material.uniforms.projectionMatrix.value = camera.projectionMatrix;
-  for (var psName in this.psObj){
-    var ps = this.psObj[psName];
-    ps.update();
-  }
+  this.activePSMap.forEach(this.updateObject);
 }

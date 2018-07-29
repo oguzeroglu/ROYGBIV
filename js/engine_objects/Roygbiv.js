@@ -4938,6 +4938,8 @@ Roygbiv.prototype.startParticleSystem = function(configurations){
   particleSystem.material.uniforms.dissapearCoef.value = 0;
   if (!particleSystem.psMerger){
     particleSystems[particleSystem.name] = particleSystem;
+  }else{
+    particleSystem.psMerger.notifyPSVisibilityChange(particleSystem, true);
   }
 }
 
@@ -4971,6 +4973,7 @@ Roygbiv.prototype.hideParticleSystem = function(particleSystem){
   }
   if (particleSystem.psMerger){
     particleSystem.psMerger.material.uniforms.hiddenArray.value[particleSystem.mergedIndex] = (20.0);
+    particleSystem.psMerger.notifyPSVisibilityChange(particleSystem, false);
   }
 }
 

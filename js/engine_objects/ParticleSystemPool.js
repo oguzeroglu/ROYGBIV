@@ -1,29 +1,29 @@
 var ParticleSystemPool = function(name){
   this.name = name;
   this.particleSystems = new Object();
-  this.availableParticleSystems = new Object();
+  this.availableParticleSystems = new Map();
 }
 
 ParticleSystemPool.prototype.add = function(particleSystem){
   this.particleSystems[particleSystem.name] = particleSystem;
   if (!particleSystem.mesh.visible){
-    this.availableParticleSystems[particleSystem.name] = particleSystem;
+    this.availableParticleSystems.set(particleSystem.name, particleSystem);
   }
   particleSystem.psPool = this.name;
 }
 
 ParticleSystemPool.prototype.get = function(){
-  for (var psName in this.availableParticleSystems){
-    var ps = this.availableParticleSystems[psName];
-    delete this.availableParticleSystems[psName];
-    return ps;
+  if (this.availableParticleSystems.size == 0){
+    return false;
   }
-  return false;
+  var ps = this.availableParticleSystems.values().next().value;
+  this.availableParticleSystems.delete(ps.name);
+  return ps;
 }
 
 ParticleSystemPool.prototype.remove = function(particleSystem){
   delete this.particleSystems[particleSystem.name];
-  delete this.availableParticleSystems[particleSystem.name];
+  this.availableParticleSystems.delete(particleSystem.name);
   delete particleSystem.psPool;
 }
 
@@ -31,12 +31,12 @@ ParticleSystemPool.prototype.destroy = function(){
   for (var psName in this.particleSystems){
     delete this.particleSystems[psName].psPool;
     delete this.particleSystems[psName];
-    delete this.availableParticleSystems[psName];
+    this.availableParticleSystems.delete(psName);
   }
   delete particleSystemPools[this.name];
   this.destroyed = true;
 }
 
 ParticleSystemPool.prototype.notifyPSAvailable = function(particleSystem){
-  this.availableParticleSystems[particleSystem.name] = particleSystem;
+  this.availableParticleSystems.set(particleSystem.name, particleSystem);
 }

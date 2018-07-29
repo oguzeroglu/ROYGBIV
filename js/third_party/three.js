@@ -17677,7 +17677,14 @@
 
 			id: count ++,
 
-			hash: '',
+			hash: {
+				stateID: -1,
+				directionalLength: -1,
+				pointLength: -1,
+				spotLength: -1,
+				rectAreaLength: -1,
+				shadowsLength: -1
+			},
 
 			ambient: [ 0, 0, 0 ],
 			directional: [],
@@ -17883,7 +17890,15 @@
 			state.point.length = pointLength;
 			state.hemi.length = hemiLength;
 
-			state.hash = state.id + ',' + directionalLength + ',' + pointLength + ',' + spotLength + ',' + rectAreaLength + ',' + hemiLength + ',' + shadows.length;
+			// OGUZ
+			//state.hash = state.id + ',' + directionalLength + ',' + pointLength + ',' + spotLength + ',' + rectAreaLength + ',' + hemiLength + ',' + shadows.length;
+			state.hash.stateID = state.id;
+			state.hash.directionalLength = directionalLength;
+			state.hash.pointLength = pointLength;
+			state.hash.spotLength = spotLength;
+			state.hash.rectAreaLength = rectAreaLength;
+			state.hash.hemiLength = hemiLength;
+			state.hash.shadowsLength = shadows.length;
 
 		}
 
@@ -21595,7 +21610,8 @@
 
 	function WebGLRenderer( parameters ) {
 
-		console.log( 'THREE.WebGLRenderer', REVISION );
+		// OGUZ
+		//console.log( 'THREE.WebGLRenderer', REVISION );
 
 		parameters = parameters || {};
 
@@ -23009,6 +23025,10 @@
 
 			var materialProperties = properties.get( material );
 
+			if (materialProperties.lightsHash === undefined){
+				materialProperties.lightsHash = {};
+			}
+
 			var lights = currentRenderState.state.lights;
 			var shadowsArray = currentRenderState.state.shadowsArray;
 
@@ -23030,7 +23050,13 @@
 				// changed glsl or parameters
 				releaseMaterialProgramReference( material );
 
-			} else if ( materialProperties.lightsHash !== lights.state.hash ) {
+			} else if ( materialProperties.lightsHash.stateID !== lights.state.hash.stateID ||
+			   materialProperties.lightsHash.directionalLength !== lights.state.hash.directionalLength ||
+			   materialProperties.lightsHash.pointLength !== lights.state.hash.pointLength ||
+			   materialProperties.lightsHash.spotLength !== lights.state.hash.spotLength ||
+			   materialProperties.lightsHash.rectAreaLength !== lights.state.hash.rectAreaLength ||
+			   materialProperties.lightsHash.hemiLength !== lights.state.hash.hemiLength ||
+			   materialProperties.lightsHash.shadowsLength !== lights.state.hash.shadowsLength ) {
 
 				properties.update( material, 'lightsHash', lights.state.hash );
 				programChange = false;
@@ -23130,7 +23156,14 @@
 
 			// store the light setup it was created for
 
-			materialProperties.lightsHash = lights.state.hash;
+			// OGUZ
+			materialProperties.lightsHash.stateID = lights.state.hash.stateID;
+			materialProperties.lightsHash.directionalLength = lights.state.hash.directionalLength;
+			materialProperties.lightsHash.pointLength = lights.state.hash.pointLength;
+			materialProperties.lightsHash.spotLength = lights.state.hash.spotLength;
+			materialProperties.lightsHash.rectAreaLength = lights.state.hash.rectAreaLength;
+			materialProperties.lightsHash.hemiLength = lights.state.hash.hemiLength;
+			materialProperties.lightsHash.shadowsLength = lights.state.hash.shadowsLength;
 
 			if ( material.lights ) {
 
@@ -23197,7 +23230,12 @@
 
 					material.needsUpdate = true;
 
-				} else if ( material.lights && materialProperties.lightsHash !== lights.state.hash ) {
+				} else if ( material.lights && (materialProperties.lightsHash.stateID !== lights.state.hash.stateID) ||
+			    ( materialProperties.lightsHash.directionalLength !== lights.state.hash.directionalLength) ||
+				  ( materialProperties.lightsHash.pointLength !== lights.state.hash.pointLength) ||
+				  ( materialProperties.lightsHash.spotLength !== lights.state.hash.spotLength) ||
+				  ( materialProperties.lightsHash.rectAreaLength !== lights.state.hash.rectAreaLength) ||
+				  ( materialProperties.lightsHash.shadowsLength !== lights.state.hash.shadowsLength)) {
 
 					material.needsUpdate = true;
 
