@@ -186,6 +186,9 @@ var ParticleSystemMerger = function(psObj, name){
   this.mesh = new THREE.Points(this.geometry, this.material);
   this.mesh.frustumCulled = false;
   previewScene.add(this.mesh);
+
+  this.clean();
+
 }
 
 ParticleSystemMerger.prototype.destroy = function(){
@@ -195,6 +198,37 @@ ParticleSystemMerger.prototype.destroy = function(){
   previewScene.remove(this.mesh);
   this.mesh.geometry.dispose();
   this.mesh.material.dispose();
+}
+
+ParticleSystemMerger.prototype.clean = function(){
+  for (var psName in this.psObj){
+    delete this.psObj[psName].expiredFlags;
+    delete this.psObj[psName].flags2;
+    delete this.psObj[psName].positions;
+    delete this.psObj[psName].rgbThresholds;
+    delete this.psObj[psName].velocities;
+    delete this.psObj[psName].accelerations;
+    delete this.psObj[psName].flags1;
+    delete this.psObj[psName].flags3;
+    delete this.psObj[psName].flags4;
+    delete this.psObj[psName].targetColors;
+    delete this.psObj[psName].angularQuaternions;
+    delete this.psObj[psName].uvCoordinates;
+    delete this.psObj[psName].positionBufferAttribute;
+    delete this.psObj[psName].rgbThresholdBufferAttribute;
+    delete this.psObj[psName].expiredFlagBufferAttribute;
+    delete this.psObj[psName].velocityBufferAttribute;
+    delete this.psObj[psName].accelerationBufferAttribute;
+    delete this.psObj[psName].targetColorBufferAttribute;
+    delete this.psObj[psName].flags1BufferAttribute;
+    delete this.psObj[psName].flags2BufferAttribute;
+    delete this.psObj[psName].flags3BufferAttribute;
+    delete this.psObj[psName].flags4BufferAttribute;
+    delete this.psObj[psName].angularQuaternionsBufferAttribute;
+    delete this.psObj[psName].uvCoordinatesBufferAttribute;
+    this.psObj[psName].mesh.geometry.dispose();
+    this.psObj[psName].mesh.material.dispose();
+  }
 }
 
 ParticleSystemMerger.prototype.notifyPSVisibilityChange = function(ps, isVisible){

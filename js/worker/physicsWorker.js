@@ -18,6 +18,7 @@ var dynamicObjectGroupPhysicsBodiesIndices = [];
 var physicsBodiesIDMap = new Object(); // key: ID, value: physics body
 var nameIDMap = new Object();          // key: ID, value: name
 var idIndexMap = new Object();         // key: ID, value: index
+var physicsBodiesWithCollisionRequests = new Object(); // key: name, value: true
 var initialized = false;
 
 var REUSABLE_VECTOR_1 = new CANNON.Vec3();
@@ -117,6 +118,10 @@ function parseMessage(msg){
     idIndexMap = new Object();
     initialized = false;
     console.log("[*] Physics worker stopped.");
+  }else if (msg.topic == "collisionRequest"){
+    physicsBodiesWithCollisionRequests[msg.content] = true;
+  }else if (msg.topic == "collisionRemoval"){
+    delete physicsBodiesWithCollisionRequests[msg.content];
   }
 }
 
@@ -139,6 +144,9 @@ function setEventListener(physicsBody){
   physicsBody.addEventListener(
     "collide",
     function(collisionEvent){
+      if (!physicsBodiesWithCollisionRequests[collisionEvent.body.roygbivName]){
+        return;
+      }
       REUSABLE_WORKER_MESSAGE.set(constants.physicsCollisionHappened);
       REUSABLE_WORKER_MESSAGE.id = collisionEvent.body.roygbivName;
       REUSABLE_WORKER_MESSAGE.forceY = collisionEvent.target.roygbivName;

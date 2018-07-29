@@ -156,13 +156,14 @@ function calculateFps (){
   }
   fps = frameCounter;
   frameCounter = 0;
-  if (!scriptEditorShowing){
+  if (!scriptEditorShowing && (fps != lastFPS)){
     if (mode == 0){
       $("#cliDivheader").text("ROYGBIV 3D Engine - CLI (Design mode) - "+fps+" FPS");
     }else if (mode == 1){
       $("#cliDivheader").text("ROYGBIV 3D Engine - CLI (Preview mode) - "+fps+" FPS");
     }
   }
+  lastFPS = fps;
 }
 
 function updatePhysicsTestObjectPositions(){

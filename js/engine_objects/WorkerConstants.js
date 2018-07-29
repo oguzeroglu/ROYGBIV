@@ -41,4 +41,6 @@ var WorkerConstants = function(){
   this.massChangeIndex = "massChangeIndex";
   this.psBinLoop = "psBinLoop";
   this.psCollided = "psCollided";
+  this.collisionRequest = "collisionRequest";
+  this.collisionRemoval = "collisionRemoval";
 }

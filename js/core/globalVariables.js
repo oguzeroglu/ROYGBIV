@@ -782,6 +782,7 @@ var MESSAGE_TYPE_BUFFER = 1;
 var UNDEFINED = "undefined";
 var PIPE = "|";
 var mergedTextureCache = new Object();
+var lastFPS = 0;
 
 // WORKER VARIABLES
 var WORKERS_SUPPORTED = (typeof(Worker) !== "undefined");

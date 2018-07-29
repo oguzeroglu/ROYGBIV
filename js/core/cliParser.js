@@ -267,6 +267,7 @@ function parse(input){
           return result;
         break;
         case 13: //switchView
+          lastFPS = 0;
           if (mode == 0){
             TOTAL_PARTICLE_SYSTEM_COUNT = 0;
             TOTAL_PARTICLE_COLLISION_LISTEN_COUNT = 0;

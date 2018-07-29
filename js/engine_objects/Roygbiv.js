@@ -5446,6 +5446,9 @@ Roygbiv.prototype.setCollisionListener = function(sourceObject, callbackFunction
   }
   if ((sourceObject instanceof AddedObject) || (sourceObject instanceof ObjectGroup)){
     collisionCallbackRequests[sourceObject.name] = callbackFunction;
+    if (isPhysicsWorkerEnabled()){
+      workerHandler.notifyPhysicsCollisionRequest(sourceObject);
+    }
   }else if (sourceObject instanceof Particle){
     if (sourceObject.parent && sourceObject.parent.isStopped){
       throw new Error("setCollisionListener error: Particle system is stopped.");
@@ -5540,6 +5543,9 @@ Roygbiv.prototype.removeCollisionListener = function(sourceObject){
   if (curCallbackRequest){
     if ((sourceObject instanceof AddedObject) || (sourceObject instanceof ObjectGroup)){
       delete collisionCallbackRequests[sourceObject.name];
+      if (isPhysicsWorkerEnabled()){
+        workerHandler.notifyPhysicsCollisionRemoval(sourceObject);
+      }
     }else if (sourceObject instanceof Particle){
       delete particleCollisionCallbackRequests[sourceObject.uuid];
       TOTAL_PARTICLE_COLLISION_LISTEN_COUNT --;

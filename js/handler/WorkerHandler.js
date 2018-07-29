@@ -842,3 +842,13 @@ WorkerHandler.prototype.notifyMassChange = function(object, mass){
   this.reusableWorkerMessage.pointY = type;
   this.postMessage(this.physicsWorker, this.reusableWorkerMessage);
 }
+
+WorkerHandler.prototype.notifyPhysicsCollisionRequest = function(object){
+  this.reusableWorkerMessage.set(this.constants.collisionRequest, object.name);
+  this.postMessage(this.physicsWorker, this.reusableWorkerMessage);
+}
+
+WorkerHandler.prototype.notifyPhysicsCollisionRemoval = function(object){
+  this.reusableWorkerMessage.set(this.constants.collisionRemoval, object.name);
+  this.postMessage(this.physicsWorker, this.reusableWorkerMessage);
+}
