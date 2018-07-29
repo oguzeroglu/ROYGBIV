@@ -729,7 +729,7 @@ ParticleSystem.prototype.update = function(){
     this.handleCollisions();
   }
 
-  if (isPSCollisionWorkerEnabled() && workerHandler.psTickArray.canPSSet){
+  if (isPSCollisionWorkerEnabled() && workerHandler.psTickArray && workerHandler.psTickArray.canPSSet){
     workerHandler.psTickArray[this.psCollisionWorkerIndex] = this.tick;
   }
 

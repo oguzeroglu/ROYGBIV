@@ -51,16 +51,12 @@ function render(){
 function handleWorkerMessages(){
   if (isPSCollisionWorkerEnabled()){
     if (workerHandler.psTickArray && workerHandler.psTickArray.canPSSet){
-      if (workerHandler.msgCtr == 0){
-        workerHandler.psTickArray.canPSSet = false;
-        workerHandler.psTickFunction();
-      }
+      workerHandler.psTickArray.canPSSet = false;
+      workerHandler.psTickFunction();
     }
     if (workerHandler.sendBinHandlerMessage_PS){
-      if (workerHandler.msgCtr == 1){
-        workerHandler.sendBinHandlerMessage_PS = false;
-        workerHandler.psBinHandlerLoopFunction();
-      }
+      workerHandler.sendBinHandlerMessage_PS = false;
+      workerHandler.psBinHandlerLoopFunction();
     }
   }
   if (isCollisionWorkerEnabled()){

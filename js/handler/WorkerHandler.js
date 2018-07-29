@@ -245,8 +245,8 @@ var WorkerHandler = function(){
     this.initParticleSystemsArray();
   }
   if (isPSCollisionWorkerEnabled()){
-    this.initPSCollisionWorker();
     this.initPSTickArray();
+    this.initPSCollisionWorker();
     this.psIndexPool = new Object();
     this.postMessage(this.psCollisionWorker, this.reusableWorkerMessage.set(
       this.constants.tick, new Float32Array(MAX_PARTICLE_SYSTEM_COUNT)
@@ -493,14 +493,6 @@ WorkerHandler.prototype.binHandlerLoop = function(isPS){
   }
   for (var objName in dynamicObjects){
     dynamicObjects[objName].updateCollisionWorkerInfo(selectedBBDescriptions);
-  }
-  var selectedLastCollisionSendTime = this.lastCollisionSendTime;
-  if (isPS){
-    selectedLastCollisionSendTime = this.lastPSCollisionSendtime;
-  }
-  var selectedTimeoutID = this.collisionTimeoutID;
-  if (isPS){
-    selectedTimeoutID = this.psCollisionTimeoutID;
   }
   for (var objName in dynamicObjectGroups){
     for (var childName in dynamicObjectGroups[objName].group){

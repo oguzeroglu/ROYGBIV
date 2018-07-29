@@ -4,6 +4,8 @@ importScripts("/js/handler/WorldBinHandler.js");
 importScripts("/js/engine_objects/ParticleSystem.js");
 importScripts("/js/engine_objects/WorkerConstants.js");
 
+var lastSendTime = undefined, lastBinLoopSendTime = undefined;
+var tickArray, binLoopArray;
 var emptyAry = [];
 var MESSAGE_TYPE_BASIC = 0;
 var MESSAGE_TYPE_BUFFER = 1;
@@ -98,9 +100,16 @@ self.onmessage = function(msg){
     var ary = parseBBDescriptions(content);
     post(REUSABLE_WORKER_MESSAGE.set(constants.psBinLoop, ary));
   }else if (topic == "binLoop"){
-    var ary = handleBinLoop(content);
-    post(REUSABLE_WORKER_MESSAGE.set(constants.psBinLoop, ary));
+    binLoopArray = handleBinLoop(content);
     handleCollisions();
+    var waitAmount = (1000 / 70);
+    if (!(lastBinLoopSendTime === undefined)){
+      waitAmount = ((1/60) * 1000) - (Date.now() - lastBinLoopSendTime);
+      if (waitAmount < 0){
+        waitAmount = 0;
+      }
+    }
+    setTimeout(sendBinLoopMessage, waitAmount);
   }else if (topic == "debug"){
     var binText = JSON.stringify(worldBinHandler.bin);
     post(REUSABLE_WORKER_MESSAGE.set(constants.debug, binText));
@@ -189,17 +198,34 @@ self.onmessage = function(msg){
   }else if (topic == "psDeletion"){
     delete particleSystems[content];
   }else if (topic == "tick"){
-      var ary = content;
+      tickArray = content;
       for (var index in particleSystems){
         var ps = particleSystems[index];
-        ps.tick = ary[ps.psCollisionWorkerIndex];
+        ps.tick = tickArray[ps.psCollisionWorkerIndex];
       }
-      post(REUSABLE_WORKER_MESSAGE.set(constants.tick, ary));
+      var waitAmount = (1000 / 70);
+      if (!(lastSendTime === undefined)){
+        waitAmount = ((1/60) * 1000) - (Date.now() - lastSendTime);
+        if (waitAmount < 0){
+          waitAmount = 0;
+        }
+      }
+      setTimeout(sendTickMsg, waitAmount);
   }else{
     if (topic != "particlePositionHistorySize"){
       console.error("psCollisionWorker error: "+topic+" not implemented.");
     }
   }
+}
+
+function sendBinLoopMessage(){
+  lastBinLoopSendTime = Date.now();
+  post(REUSABLE_WORKER_MESSAGE.set(constants.psBinLoop, binLoopArray));
+}
+
+function sendTickMsg(){
+  lastSendTime = Date.now();
+  post(REUSABLE_WORKER_MESSAGE.set(constants.tick, tickArray));
 }
 
 function handleCollisions(){
