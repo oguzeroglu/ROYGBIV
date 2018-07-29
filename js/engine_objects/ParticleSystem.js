@@ -152,7 +152,6 @@ var ParticleSystem = function(copyPS, name, particles, x, y, z, vx, vy, vz, ax, 
       }
 
       particle.parent = this;
-      particle.id = this.name+"////"+this.totalParticleCount;
       particle.index = this.totalParticleCount;
       this.totalParticleCount ++;
 
@@ -707,7 +706,11 @@ ParticleSystem.prototype.update = function(){
     if (this.expirationFunction){
       this.expirationFunction(this.name);
     }
-    delete particleSystems[this.name];
+    if (!this.psMerger){
+      delete particleSystems[this.name];
+    }else{
+      this.psMerger.material.uniforms.hiddenArray.value[this.mergedIndex] = 20.0;
+    }
     this.mesh.visible = false;
     if (this.checkForCollisions && isPSCollisionWorkerEnabled()){
       workerHandler.notifyPSDeletion(this.psCollisionWorkerIndex);

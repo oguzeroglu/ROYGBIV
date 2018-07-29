@@ -4862,9 +4862,16 @@ Roygbiv.prototype.startParticleSystem = function(configurations){
       particleSystem.velocity.y = particleSystem.vy;
       particleSystem.velocity.z = particleSystem.vz;
     }
-    particleSystem.material.uniforms.parentMotionMatrix.value.elements[3] = startVelocity.x;
-    particleSystem.material.uniforms.parentMotionMatrix.value.elements[4] = startVelocity.y;
-    particleSystem.material.uniforms.parentMotionMatrix.value.elements[5] = startVelocity.z;
+    if (!particleSystem.psMerger){
+      particleSystem.material.uniforms.parentMotionMatrix.value.elements[3] = startVelocity.x;
+      particleSystem.material.uniforms.parentMotionMatrix.value.elements[4] = startVelocity.y;
+      particleSystem.material.uniforms.parentMotionMatrix.value.elements[5] = startVelocity.z;
+    }else{
+      var matrix = particleSystem.psMerger.material.uniforms.parentMotionMatrixArray.value[particleSystem.mergedIndex];
+      matrix.elements[3] = startVelocity.x;
+      matrix.elements[4] = startVelocity.y;
+      matrix.elements[5] = startVelocity.z;
+    }
   }
   if (startAccelerationSet){
     particleSystem.ax = startAcceleration.x;
@@ -4877,9 +4884,16 @@ Roygbiv.prototype.startParticleSystem = function(configurations){
       particleSystem.acceleration.y = particleSystem.ay;
       particleSystem.acceleration.z = particleSystem.az;
     }
-    particleSystem.material.uniforms.parentMotionMatrix.value.elements[6] = startAcceleration.x;
-    particleSystem.material.uniforms.parentMotionMatrix.value.elements[7] = startAcceleration.y;
-    particleSystem.material.uniforms.parentMotionMatrix.value.elements[8] = startAcceleration.z;
+    if (!particleSystem.psMerger){
+      particleSystem.material.uniforms.parentMotionMatrix.value.elements[6] = startAcceleration.x;
+      particleSystem.material.uniforms.parentMotionMatrix.value.elements[7] = startAcceleration.y;
+      particleSystem.material.uniforms.parentMotionMatrix.value.elements[8] = startAcceleration.z;
+    }else{
+      var matrix = particleSystem.psMerger.material.uniforms.parentMotionMatrixArray.value[particleSystem.mergedIndex];
+      matrix.elements[6] = startAcceleration.x;
+      matrix.elements[7] = startAcceleration.y;
+      matrix.elements[8] = startAcceleration.z;
+    }
   }
   if (startQuaternionSet){
     particleSystem.mesh.quaternion.set(startQuaternion.x, startQuaternion.y, startQuaternion.z, startQuaternion.w);
@@ -4889,11 +4903,22 @@ Roygbiv.prototype.startParticleSystem = function(configurations){
     particleSystem.y = startPosition.y;
     particleSystem.z = startPosition.z;
     particleSystem.mesh.position.set(particleSystem.x, particleSystem.y, particleSystem.z);
-    particleSystem.material.uniforms.parentMotionMatrix.value.elements[0] = startPosition.x;
-    particleSystem.material.uniforms.parentMotionMatrix.value.elements[1] = startPosition.y;
-    particleSystem.material.uniforms.parentMotionMatrix.value.elements[2] = startPosition.z;
+    if (!particleSystem.psMerger){
+      particleSystem.material.uniforms.parentMotionMatrix.value.elements[0] = startPosition.x;
+      particleSystem.material.uniforms.parentMotionMatrix.value.elements[1] = startPosition.y;
+      particleSystem.material.uniforms.parentMotionMatrix.value.elements[2] = startPosition.z;
+    }else{
+      var matrix = particleSystem.psMerger.material.uniforms.parentMotionMatrixArray.value[particleSystem.mergedIndex];
+      matrix.elements[0] = startPosition.x;
+      matrix.elements[1] = startPosition.y;
+      matrix.elements[2] = startPosition.z;
+    }
   }
-  particleSystem.material.uniforms.stopInfo.value.set(-10, -10, -10);
+  if (!particleSystem.psMerger){
+    particleSystem.material.uniforms.stopInfo.value.set(-10, -10, -10);
+  }else{
+    particleSystem.psMerger.material.uniforms.hiddenArray.value[particleSystem.mergedIndex] = (-20.0);
+  }
   delete particleSystem.stoppedX;
   delete particleSystem.stoppedY;
   delete particleSystem.stoppedZ;
@@ -4911,7 +4936,9 @@ Roygbiv.prototype.startParticleSystem = function(configurations){
   }
   particleSystem.mesh.visible = true;
   particleSystem.material.uniforms.dissapearCoef.value = 0;
-  particleSystems[particleSystem.name] = particleSystem;
+  if (!particleSystem.psMerger){
+    particleSystems[particleSystem.name] = particleSystem;
+  }
 }
 
 // hideParticleSystem
@@ -4935,10 +4962,15 @@ Roygbiv.prototype.hideParticleSystem = function(particleSystem){
   particleSystem.tick = 0;
   particleSystem.motionMode = 0;
   particleSystem.mesh.visible = false;
-  delete particleSystems[particleSystems.name];
+  if (!particleSystem.psMerger){
+    delete particleSystems[particleSystems.name];
+  }
   if (!(typeof particleSystem.psPool == UNDEFINED)){
     var psPool = particleSystemPools[particleSystem.psPool];
     psPool.notifyPSAvailable(particleSystem);
+  }
+  if (particleSystem.psMerger){
+    particleSystem.psMerger.material.uniforms.hiddenArray.value[particleSystem.mergedIndex] = (20.0);
   }
 }
 

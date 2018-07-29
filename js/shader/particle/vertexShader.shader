@@ -28,9 +28,11 @@ uniform float time;
 uniform float timeArray[OBJECT_SIZE];
 uniform mat4 modelViewMatrix;
 uniform mat4 modelViewMatrixArray[OBJECT_SIZE];
+uniform float hiddenArray[OBJECT_SIZE];
 uniform mat4 viewMatrix;
 uniform mat4 projectionMatrix;
 uniform mat3 parentMotionMatrix;
+uniform mat3 parentMotionMatrixArray[OBJECT_SIZE];
 uniform float dissapearCoef;
 uniform vec3 stopInfo;
 
@@ -146,12 +148,19 @@ void main(){
   vec3 parentInitialPosition = parentMotionMatrix[0];
   vec3 color = vec3(flags4[0], flags4[1], flags4[2]);
 
+  float skipFlag = -20.0;
   mat4 selectedMVMatrix = modelViewMatrix;
   float selectedTime = time;
   if (mergedFlag > 5.0){
     int mi = int(mergedIndex);
     selectedMVMatrix = modelViewMatrixArray[mi];
     selectedTime = timeArray[mi];
+    parentVelocity = parentMotionMatrixArray[mi][1];
+    parentAcceleration = parentMotionMatrixArray[mi][2];
+    parentInitialPosition = parentMotionMatrixArray[mi][0];
+    if (hiddenArray[mi] > 0.0){
+      skipFlag = 20.0;
+    }
   }
 
   float parentStoppedFlag = stopInfo[0];
@@ -165,7 +174,7 @@ void main(){
     }
   }
 
-  if (selectedTime >= startTime){
+  if (selectedTime >= startTime && (skipFlag < 0.0)){
     float timeOfThis = (selectedTime - startTime);
     if (respawnFlag > 5.0){
       if (lifetime > 0.0){
@@ -229,19 +238,24 @@ void main(){
 
   }
 
-  vDiscardFlag = -10.0;
-  vDiscardFlag = expiredFlag;
-  if (vCalculatedColor.a <= 0.01){
-    vDiscardFlag = 10.0;
-  }else{
-    if (selectedTime < startTime){
+  if (skipFlag < 0.0){
+    vDiscardFlag = -10.0;
+    vDiscardFlag = expiredFlag;
+    if (vCalculatedColor.a <= 0.01){
       vDiscardFlag = 10.0;
     }else{
-      if (lifetime > 0.0 && selectedTime >= (lifetime + startTime) && respawnFlag < 5.0){
+      if (selectedTime < startTime){
         vDiscardFlag = 10.0;
+      }else{
+        if (lifetime > 0.0 && selectedTime >= (lifetime + startTime) && respawnFlag < 5.0){
+          vDiscardFlag = 10.0;
+        }
       }
     }
+  }else{
+    vDiscardFlag = 10.0;
   }
+
 
   vTextureFlag = flags2[2];
   vRgbThreshold = rgbThreshold;

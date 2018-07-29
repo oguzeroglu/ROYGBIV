@@ -17961,30 +17961,29 @@
 	function WebGLRenderStates() {
 
 		var renderStates = {};
-		var cache = new Object();
 
 		function get( scene, camera ) {
 
-			// OGUZ
-			var hash;
-			if (cache[scene.id]){
-				if (cache[scene.id][camera.id]){
-					hash = cache[scene.id][camera.id];
-				}else{
-					hash = scene.id + ',' + camera.id;
-					cache[scene.id][camera.id] = hash;
-				}
-			}else{
-				hash = scene.id + ',' + camera.id;
-				cache[scene.id] = new Object();
-				cache[scene.id][camera.id] = hash;
-			}
-			var renderState = renderStates[ hash ];
+			var renderState;
 
-			if ( renderState === undefined ) {
+			if ( renderStates[ scene.id ] === undefined ) {
 
 				renderState = new WebGLRenderState();
-				renderStates[ hash ] = renderState;
+				renderStates[ scene.id ] = {};
+				renderStates[ scene.id ][ camera.id ] = renderState;
+
+			} else {
+
+				if ( renderStates[ scene.id ][ camera.id ] === undefined ) {
+
+					renderState = new WebGLRenderState();
+					renderStates[ scene.id ][ camera.id ] = renderState;
+
+				} else {
+
+					renderState = renderStates[ scene.id ][ camera.id ];
+
+				}
 
 			}
 
