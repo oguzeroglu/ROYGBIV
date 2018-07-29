@@ -1,5 +1,7 @@
 var WorkerHandler = function(){
 
+  this.msgCtr = 0;
+
   this.psTickFunction = (
     function(workerHandlerContext){
       return function(){
@@ -247,8 +249,8 @@ var WorkerHandler = function(){
     this.initPSTickArray();
     this.psIndexPool = new Object();
     this.postMessage(this.psCollisionWorker, this.reusableWorkerMessage.set(
-      this.constants.tick, new Float32Array(MAX_PARTICLE_SYSTEM_COUNT
-    )));
+      this.constants.tick, new Float32Array(MAX_PARTICLE_SYSTEM_COUNT)
+    ));
   }
 
   console.log("[*] Workers initialized.");
@@ -269,14 +271,6 @@ WorkerHandler.prototype.postMessage = function(worker, message){
 WorkerHandler.prototype.handlePSTick = function(content){
   this.psTickArray= content;
   this.psTickArray.canPSSet = true;
-  var waitAmount = (1000 / 70);
-  if (!(typeof this.lastPSTickArraySendTime == UNDEFINED)){
-    waitAmount = ((1/60) * 1000) - (Date.now() - this.lastPSTickArraySendTime);
-    if (waitAmount < 0){
-      waitAmount = 0;
-    }
-  }
-  this.psTickArrayTimeoutID = setTimeout(this.psTickFunction, waitAmount);
 }
 
 WorkerHandler.prototype.initPSTickArray = function(){
@@ -347,14 +341,6 @@ WorkerHandler.prototype.testPSPositionQuery = function(index){
 WorkerHandler.prototype.handlePSArrayLoop = function(content){
   this.particleSystemsArray = content;
   this.particleSystemsArray.canParticleSet = true;
-  var waitAmount = (1000 / 70);
-  if (!(typeof this.lastPSArraySendTime == UNDEFINED)){
-    waitAmount = ((1/60) * 1000) - (Date.now() - this.lastPSArraySendTime);
-    if (waitAmount < 0){
-      waitAmount = 0;
-    }
-  }
-  this.psArrayTimeoutID = setTimeout(this.psArrayFunction, waitAmount);
 }
 
 WorkerHandler.prototype.notifyParticleSystemRemoval = function(index){
@@ -521,17 +507,10 @@ WorkerHandler.prototype.binHandlerLoop = function(isPS){
       dynamicObjectGroups[objName].group[childName].updateCollisionWorkerInfo(selectedBBDescriptions);
     }
   }
-  var waitAmount = (1000 / 70);
-  if (!(typeof selectedLastCollisionSendTime == UNDEFINED)){
-    waitAmount = ((1/60) * 1000) - (Date.now() - selectedLastCollisionSendTime);
-    if (waitAmount < 0){
-      waitAmount = 0;
-    }
-  }
   if (isPS){
-    selectedTimeoutID = setTimeout(this.psBinHandlerLoopFunction, waitAmount);
+    this.sendBinHandlerMessage_PS = true;
   }else{
-    selectedTimeoutID = setTimeout(this.binHandlerLoopFunction, waitAmount);
+    this.sendBinHandlerMessage = true;
   }
 }
 
@@ -666,14 +645,7 @@ WorkerHandler.prototype.handlePhysicsWorkerMessage = function(msg){
     object.previewGraphicsGroup.quaternion.set(quaternionX, quaternionY, quaternionZ, quaternionW);
     object.physicsBody.quaternion.set(quaternionX, quaternionY, quaternionZ, quaternionW);
   }
-  var waitAmount = (1000 / 70);
-  if (!(typeof this.lastSendTime == UNDEFINED)){
-    waitAmount = (physicsStepAmount * 1000) - (Date.now() - this.lastSendTime);
-    if (waitAmount < 0){
-      waitAmount = 0;
-    }
-  }
-  this.physicsTimeoutID = setTimeout(this.physicsWorkerFunction, waitAmount);
+  this.physicsWorkerFunction();
 }
 
 WorkerHandler.prototype.log = function(worker, msg){

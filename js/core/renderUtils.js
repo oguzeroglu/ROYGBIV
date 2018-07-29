@@ -34,6 +34,8 @@ function render(){
     if (physicsDebugMode){
       debugRenderer.update();
     }
+
+    handleWorkerMessages();
   }else{
     cameraOperationsDone = false;
     updateMarkedPointLabels();
@@ -44,6 +46,43 @@ function render(){
     previewSceneRendered = true;
   }
   frameCounter ++;
+}
+
+function handleWorkerMessages(){
+  if (isPSCollisionWorkerEnabled()){
+    if (workerHandler.psTickArray && workerHandler.psTickArray.canPSSet){
+      if (workerHandler.msgCtr == 0){
+        workerHandler.psTickArray.canPSSet = false;
+        workerHandler.psTickFunction();
+      }
+    }
+    if (workerHandler.sendBinHandlerMessage_PS){
+      if (workerHandler.msgCtr == 1){
+        workerHandler.sendBinHandlerMessage_PS = false;
+        workerHandler.psBinHandlerLoopFunction();
+      }
+    }
+  }
+  if (isCollisionWorkerEnabled()){
+    if (workerHandler.particleSystemsArray && workerHandler.particleSystemsArray.canParticleSet){
+      if (workerHandler.msgCtr == 0){
+        workerHandler.particleSystemsArray.canParticleSet = false;
+        workerHandler.psArrayFunction();
+      }
+    }
+    if (workerHandler.sendBinHandlerMessage){
+      if (workerHandler.msgCtr == 1){
+        workerHandler.sendBinHandlerMessage = false;
+        workerHandler.binHandlerLoopFunction();
+      }
+    }
+  }
+  if (workerHandler){
+    workerHandler.msgCtr ++;
+    if (workerHandler.msgCtr == 2){
+      workerHandler.msgCtr = 0;
+    }
+  }
 }
 
 function updateWorldBinHandler(){

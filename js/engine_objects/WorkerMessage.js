@@ -11,17 +11,5 @@ WorkerMessage.prototype.set = function(topic, content){
     this.type = MESSAGE_TYPE_BASIC;
   }
 
-  delete this.id;
-  delete this.forceX;
-  delete this.forceY;
-  delete this.forceZ;
-  delete this.pointX;
-  delete this.pointY;
-  delete this.pointZ;
-  delete this.qx;
-  delete this.qy;
-  delete this.qz;
-  delete this.qw;
-
   return this;
 }

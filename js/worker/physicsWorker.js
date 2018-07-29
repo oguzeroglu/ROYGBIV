@@ -2,6 +2,7 @@ importScripts("/js/third_party/cannon.min.js");
 importScripts("/js/engine_objects/WorkerMessage.js");
 importScripts("/js/engine_objects/WorkerConstants.js");
 
+var lastSendTime = undefined;
 var MESSAGE_TYPE_BASIC = 0;
 var MESSAGE_TYPE_BUFFER = 1;
 var transferableBufferArray = new Array(1);
@@ -58,12 +59,20 @@ function sendUpdates(){
   }
   if (dynamicPhysicsBodies.length > 0 || dynamicObjectGroupPhysicsBodies.length > 0){
     post(REUSABLE_WORKER_MESSAGE.set(constants.update, self.physicsInfoBuffer));
+    lastSendTime = Date.now();
   }
 }
 
 function iterate(){
   physicsWorld.step(physicsStepAmount);
-  sendUpdates();
+  var waitAmount = (1000 / 70);
+  if (!(lastSendTime === undefined)){
+    waitAmount = (physicsStepAmount * 1000) - (Date.now() - lastSendTime);
+    if (waitAmount < 0){
+      waitAmount = 0;
+    }
+  }
+  setTimeout(sendUpdates, waitAmount);
 }
 
 function parseMessage(msg){

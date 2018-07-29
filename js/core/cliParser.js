@@ -449,7 +449,7 @@ function parse(input){
               );
             }
 
-            if (isPhysicsWorkerEnabled() || isCollisionWorkerEnabled()){
+            if (isPhysicsWorkerEnabled() || isCollisionWorkerEnabled() || isPSCollisionWorkerEnabled()){
               workerHandler = new WorkerHandler();
               if (isPhysicsWorkerEnabled()){
                 workerHandler.startPhysicsWorkerIteration();
