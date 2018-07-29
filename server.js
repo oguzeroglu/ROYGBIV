@@ -14,7 +14,7 @@ app = express();
 
 app.get("/", function(req, res){
   console.log("[*] A new request received.");
-	res.sendFile(__dirname + "/mapCreator.html");
+	res.sendFile(__dirname + "/roygbiv.html");
 });
 
 app.use(express.static('./'));
