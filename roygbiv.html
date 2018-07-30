@@ -1,0 +1,182 @@
+<!doctype html>	
+<html>	
+   <head>	
+    <meta charset=utf-8>	
+    <title>ROYGBIV 3D Engine by Oğuz Eroğlu</title>	
+    <script src="/js/third_party/jquery-3.2.1.min.js"></script>	
+    <link rel="stylesheet" href="/css/font-awesome-4.7.0/css/font-awesome.min.css">	
+    <link rel="stylesheet" href="/css/jquery.terminal-1.11.3.min.css">	
+    <script src="/js/third_party/jquery.terminal-1.11.3.min.js"></script>	
+    <script src="/js/third_party/jquery.mousewheel-min.js"></script>	
+    <script src="/js/third_party/deep-diff-0.3.8.min.js"></script>	
+    <script src="/js/terminal/Text.js"></script>	
+    <script src="/js/terminal/Terminal.js"></script>	
+    <script src="/js/terminal/draggableCLI.js"></script>	
+    <script src="/js/third_party/three.js"></script>	
+    <script src="/js/third_party/TGALoader.js"></script>	
+    <script src="/js/third_party/cannon.min.js"></script>	
+    <script src="/js/third_party/CannonDebugRenderer.js"></script>	
+    <script src="/js/handler/UndoRedoHandler.js"></script>	
+    <script src="/js/handler/ShaderContent.js"></script>	
+    <script src="/js/core/globalVariables.js"></script>	
+    <script src="/js/engine_objects/Grid.js"></script>	
+    <script src="/js/engine_objects/GridSystem.js"></script>	
+    <script src="/js/engine_objects/WallCollection.js"></script>	
+    <script src="/js/engine_objects/CroppedGridSystem.js"></script>	
+    <script src="/js/engine_objects/AddedObject.js"></script>	
+    <script src="/js/core/renderUtils.js"></script>	
+    <script src="/js/core/cliParser.js"></script>	
+    <script src="/js/engine_objects/PhysicsTest.js"></script>	
+    <script src="/js/engine_objects/TexturePack.js"></script>	
+    <script src="/js/engine_objects/SkyBox.js"></script>	
+    <script src='/js/badtv/postprocessing/EffectComposer.js'></script>	
+    <script src='/js/badtv/postprocessing/RenderPass.js'></script>	
+    <script src='/js/badtv/postprocessing/ShaderPass.js'></script>	
+    <script src='/js/badtv/postprocessing/MaskPass.js'></script>	
+    <script src='/js/badtv/postprocessing/UnrealBloomPass.js'></script>	
+    <script src='/js/badtv/shaders/CopyShader.js'></script>	
+    <script src='/js/badtv/shaders/FilmShader.js'></script>	
+    <script src='/js/badtv/shaders/RGBShiftShader.js'></script>	
+    <script src='/js/badtv/shaders/BadTVShader.js'></script>	
+    <script src='/js/badtv/shaders/StaticShader.js'></script>	
+    <script src='/js/badtv/shaders/LuminosityHighPassShader.js'></script>	
+    <script src='/js/gui/dat.gui.min.js'></script>	
+    <script src="/js/core/init.js"></script>	
+    <script src="/js/engine_objects/State.js"></script>	
+    <script src="/js/handler/StateLoader.js"></script>	
+    <script src="/js/engine_objects/Script.js"></script>	
+    <script src="/js/engine_objects/ObjectGroup.js"></script>	
+    <script src="/js/engine_objects/MarkedPoint.js"></script>	
+    <script src="/js/engine_objects/ColorNames.js"></script>	
+    <script src="/js/terminal/CommandDescriptor.js"></script>	
+    <script src="/js/engine_objects/CollisionInfo.js"></script>	
+    <script src="/js/third_party/perlin.js"></script>	
+    <script src="/js/engine_objects/Particle.js"></script>	
+    <script src="/js/engine_objects/ParticleSystem.js"></script>	
+    <script src="/js/engine_objects/ObjectTrail.js"></script>	
+    <script src="/js/engine_objects/Rectangle.js"></script>	
+    <script src="/js/engine_objects/ParticleMaterial.js"></script>	
+    <script src="/js/handler/TimedChunk.js"></script>	
+    <script src="/js/handler/TextureMerger.js"></script>	
+    <script src="/js/engine_objects/WorkerMessage.js"></script>	
+    <script src="/js/handler/WorkerHandler.js"></script>	
+    <script src="/js/engine_objects/Roygbiv.js"></script>	
+    <script src="/js/handler/WorldBinHandler.js"></script>	
+    <script src="/js/engine_objects/ParticleSystemPool.js"></script>	
+    <script src="/js/engine_objects/WorkerConstants.js"></script>	
+    <script src="/js/third_party/BufferGeometryUtils.js"></script>	
+    <script src="/js/handler/ParticleSystemMerger.js"></script>	
+    <style>	
+		  body { margin: 0; position: fixed;}	
+			canvas {display: block;}	
+      @font-face {	
+        font-family: hack;	
+        src: url(/css/Hack-Bold.ttf);	
+      }	
+      .noselect {	
+        -webkit-touch-callout: none;	
+        -webkit-user-select: none;	
+        -khtml-user-select: none;	
+        -moz-user-select: none;	
+        -ms-user-select: none;	
+        user-select: none;	
+      }	
+      #cliDiv {	
+          position: absolute;	
+          z-index: 9;	
+          border: 1px solid lime;	
+          background-color: #000000;	
+          max-width: 1000px;	
+          opacity: 1;	
+      }	
+      #cliDivheader {	
+          padding: 10px;	
+          cursor: move;	
+          z-index: 10;	
+          background-color: lime;	
+          font-family: hack;	
+          border: 1px solid lime;	
+          font-size: 12px;	
+          color: black;	
+          opacity: 1;	
+      }	
+      #scriptCreatorDiv{	
+          display: none;	
+          font-family: hack;	
+          background-color: lime;	
+      }	
+      #scriptCreatorTextArea{	
+          font-size: 13px;	
+          font-family: hack;	
+          background-color: black;	
+          color: lime;	
+          overflow: scroll;	
+          max-width: 100%;	
+          max-height: 100%;	
+          padding: 3%;	
+          box-sizing: border-box;	
+      }	
+      #scriptCreatorTextArea:focus {	
+          outline: none !important;	
+          border:1px solid lime;	
+      }	
+      #scriptCreatorButtonsDiv{	
+        padding-bottom: 1%;	
+        padding-left: 1%;	
+        background-color: lime;	
+        z-index: 10;	
+      }	
+      .scriptCreatorButton{	
+          font-family: hack;	
+          font-weight: bold;	
+          color: black !important;	
+          font-size: 12px;	
+          padding: 5px 12.5px;	
+          border: 1px lime;	
+          background: lime;	
+      }	
+      .scriptCreatorButton:hover {	
+        color: lime !important;	
+        background: black;	
+      }	
+      .markedPoint {	
+        position: absolute;	
+        background: rgba(0,0,0,0.3);	
+        color: #82b600;	
+        font-family: hack;	
+        font-size:20px;	
+      }	
+      .cornerHelper {	
+        position: absolute;	
+        background: rgba(0,0,0,0.3);	
+        color: white;	
+        font-family: hack;	
+        font-size:15px;	
+      }	
+      .terminal, .cmd, .terminal, .cmd .prompt {	
+        color: lime;	
+        font-family: hack;	
+      }	
+		</style>	
+  </head>	
+   <body>	
+     <!-- IMAGE UPLOADER -->	
+    <input type="file" id="imageUploaderInput" style="display:none;" />	
+     <!-- LOAD -->	
+    <input type="file" id="loadInput" style="display:none;" />	
+     <!-- CLI -->	
+    <div id="cliDiv">	
+      <div id="cliDivheader" class = "noselect">ROYGBIV 3D Engine - CLI (Preview mode)</div>	
+      <div id="terminalDiv" class="terminal noselect"></div>	
+      <div id="scriptCreatorDiv">	
+        <textarea autofocus id="scriptCreatorTextArea" rows="8" cols="50" spellcheck="false"></textarea>	
+        <div id="scriptCreatorButtonsDiv">	
+          <button id="scriptCreatorCancelButton" class="scriptCreatorButton">CANCEL</script>	
+          <button id="scriptCreatorSaveButton" class="scriptCreatorButton">SAVE</script>	
+        </div>	
+      </div>	
+    </div>	
+     <!-- 3D CONTENT -->	
+    <canvas id="rendererCanvas"></canvas>	
+   </body>	
+ </html>
