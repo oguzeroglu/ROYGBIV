@@ -7,7 +7,6 @@ varying float vTextureFlag;
 varying vec3 vRgbThreshold;
 varying vec4 vUVCoordinates;
 
-uniform float time;
 uniform sampler2D texture;
 
 float discardDueToTextureColor;
