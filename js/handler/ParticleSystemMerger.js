@@ -84,6 +84,9 @@ var ParticleSystemMerger = function(psObj, name){
     this.angularQuaternions.set(ps.angularQuaternions, offset2);
     this.expiredFlags.set(ps.expiredFlags, offset3);
     this.flags2.set(ps.flags2, offset2);
+
+    ps.flags2Offset = offset2;
+
     for (var i = 0; i<ps.particles.length; i++){
       var particle = ps.particles[i];
       this.mergedIndices[ctr] = index;

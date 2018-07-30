@@ -540,13 +540,20 @@ ParticleSystem.prototype.removeParticle = function(particle){
 }
 
 ParticleSystem.prototype.rewindParticle = function(particle, delay){
+  var selectedGeometry;
   var sIndex = (particle.index * 4) + 3;
-  this.geometry.attributes.flags2.updateRange.push({
+  if (this.psMerger){
+    selectedGeometry = this.psMerger.geometry;
+    sIndex += this.flags2Offset;
+  }else{
+    selectedGeometry = this.geometry;
+  }
+  selectedGeometry.attributes.flags2.updateRange.push({
     offset: sIndex, count: 1
   });
   particle.startDelay = this.tick + delay;
-  this.geometry.attributes.flags2.array[sIndex] = particle.startDelay;
-  this.geometry.attributes.flags2.needsUpdate = true;
+  selectedGeometry.attributes.flags2.array[sIndex] = particle.startDelay;
+  selectedGeometry.attributes.flags2.needsUpdate = true;
   if (isCollisionWorkerEnabled()){
     workerHandler.notifyParticleStartDelayChange(particle);
   }
