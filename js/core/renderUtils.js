@@ -61,22 +61,12 @@ function handleWorkerMessages(){
   }
   if (isCollisionWorkerEnabled()){
     if (workerHandler.particleSystemsArray && workerHandler.particleSystemsArray.canParticleSet){
-      if (workerHandler.msgCtr == 0){
         workerHandler.particleSystemsArray.canParticleSet = false;
         workerHandler.psArrayFunction();
-      }
     }
     if (workerHandler.sendBinHandlerMessage){
-      if (workerHandler.msgCtr == 1){
-        workerHandler.sendBinHandlerMessage = false;
-        workerHandler.binHandlerLoopFunction();
-      }
-    }
-  }
-  if (workerHandler){
-    workerHandler.msgCtr ++;
-    if (workerHandler.msgCtr == 2){
-      workerHandler.msgCtr = 0;
+      workerHandler.sendBinHandlerMessage = false;
+      workerHandler.binHandlerLoopFunction();
     }
   }
 }

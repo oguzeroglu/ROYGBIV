@@ -4,6 +4,10 @@ importScripts("/js/engine_objects/WorkerMessage.js");
 importScripts("/js/engine_objects/Particle.js");
 importScripts("/js/engine_objects/WorkerConstants.js");
 
+var lastPSArraySendTime = undefined;
+var lastBinLoopSendTime = undefined;
+var psArrayToSend;
+var binLoopArrayToSend;
 var MESSAGE_TYPE_BASIC = 0;
 var MESSAGE_TYPE_BUFFER = 1;
 var transferableBufferArray = new Array(0);
@@ -108,8 +112,15 @@ self.onmessage = function(msg){
   }else if (msg.data.topic == "dynamicObjectGroupNotification"){
     dynamicObjectGroups[content] = true;
   }else if (msg.data.topic == "bbDescriptions"){
-    var ary = parseBBDescriptions(content);
-    post(REUSABLE_WORKER_MESSAGE.set(constants.binLoop, ary));
+    binLoopArrayToSend = parseBBDescriptions(content);
+    var waitAmount = (1000 / 70);
+    if (!(lastBinLoopSendTime === undefined)){
+      waitAmount = ((1/60) * 1000) - (Date.now() - lastBinLoopSendTime);
+      if (waitAmount < 0){
+        waitAmount = 0;
+      }
+    }
+    setTimeout(binLoopArraySendFunction, waitAmount);
   }else if (msg.data.topic == "worldLimits"){
     var splitted = content.split(",");
     var minX = parseFloat(splitted[0]), minY = parseFloat(splitted[1]), minZ = parseFloat(splitted[2]);
@@ -118,8 +129,15 @@ self.onmessage = function(msg){
   }else if (msg.data.topic == "binSize"){
     BIN_SIZE = parseFloat(content);
   }else if (msg.data.topic == "binLoop"){
-    var ary = handleBinLoop(content);
-    post(REUSABLE_WORKER_MESSAGE.set(constants.binLoop, ary));
+    binLoopArrayToSend = handleBinLoop(content);
+    var waitAmount = (1000 / 70);
+    if (!(lastBinLoopSendTime === undefined)){
+      waitAmount = ((1/60) * 1000) - (Date.now() - lastBinLoopSendTime);
+      if (waitAmount < 0){
+        waitAmount = 0;
+      }
+    }
+    setTimeout(binLoopArraySendFunction, waitAmount);
   }else if (msg.data.topic == "debug"){
     var binText = JSON.stringify(worldBinHandler.bin);
     post(REUSABLE_WORKER_MESSAGE.set(constants.debug, binText));
@@ -232,16 +250,16 @@ self.onmessage = function(msg){
         particle.handleCollisions(true);
       }
     }
-    post(ary);
-    if (particleCollisionInfoSendCount > 0){
-      post(REUSABLE_WORKER_MESSAGE.set(
-        constants.particleCollided, JSON.stringify(particleCollisionBuffer)
-      ));
-      particleCollisionInfoSendCount = 0;
-      for (var key in particleCollisionBuffer){
-        delete particleCollisionBuffer[key];
+
+    psArrayToSend = ary;
+    var waitAmount = (1000 / 70);
+    if (!(lastPSArraySendTime === undefined)){
+      waitAmount = ((1/60) * 1000) - (Date.now() - lastPSArraySendTime);
+      if (waitAmount < 0){
+        waitAmount = 0;
       }
     }
+    setTimeout(psArraySendFunction, waitAmount);
   }else if (msg.data.topic == "testPSPositionQuery"){
     var matrix = particleSystemMatrices[parseInt(content)];
     console.log(new THREE.Vector3().setFromMatrixPosition(matrix));
@@ -314,6 +332,23 @@ function post(message){
   }else if (message instanceof Float32Array){
     transferableBufferArray[0] = message.buffer;
     postMessage(message, transferableBufferArray);
+  }
+}
+
+function binLoopArraySendFunction(){
+  post(REUSABLE_WORKER_MESSAGE.set(constants.binLoop, binLoopArrayToSend));
+}
+
+function psArraySendFunction(){
+  post(psArrayToSend);
+  if (particleCollisionInfoSendCount > 0){
+    post(REUSABLE_WORKER_MESSAGE.set(
+      constants.particleCollided, JSON.stringify(particleCollisionBuffer)
+    ));
+    particleCollisionInfoSendCount = 0;
+    for (var key in particleCollisionBuffer){
+      delete particleCollisionBuffer[key];
+    }
   }
 }
 

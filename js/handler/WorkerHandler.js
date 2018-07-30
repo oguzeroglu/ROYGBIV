@@ -1,12 +1,9 @@
 var WorkerHandler = function(){
 
-  this.msgCtr = 0;
-
   this.psTickFunction = (
     function(workerHandlerContext){
       return function(){
         workerHandlerContext.psTickArray.canPSSet = false;
-        workerHandlerContext.lastPSTickArraySendTime = Date.now();
         workerHandlerContext.postMessage(
           workerHandlerContext.psCollisionWorker,
           workerHandlerContext.reusableWorkerMessage.set(
@@ -19,7 +16,6 @@ var WorkerHandler = function(){
   this.psArrayFunction = (
     function(workerHandlerContext){
       return function(){
-        workerHandlerContext.lastPSArraySendTime = Date.now();
         workerHandlerContext.postMessage(
           workerHandlerContext.collisionWorker,
           workerHandlerContext.particleSystemsArray
@@ -53,10 +49,8 @@ var WorkerHandler = function(){
   this.psBinHandlerLoopFunction = (
     function(workerHandlerContext){
       return function(){
-        var selectedLastCollisionSendTime = workerHandlerContext.lastPSCollisionSendtime;
         var selectedWorker = workerHandlerContext.psCollisionWorker;
         var selectedBBDescriptions = workerHandlerContext.objectPSBBDescriptions;
-        selectedLastCollisionSendTime = Date.now();
         workerHandlerContext.postMessage(
           selectedWorker,
           workerHandlerContext.reusableWorkerMessage.set(
@@ -70,10 +64,8 @@ var WorkerHandler = function(){
   this.binHandlerLoopFunction = (
     function(workerHandlerContext){
       return function(){
-        var selectedLastCollisionSendTime = workerHandlerContext.lastCollisionSendTime;
         var selectedWorker = workerHandlerContext.collisionWorker;
         var selectedBBDescriptions = workerHandlerContext.objectBBDescriptions;
-        selectedLastCollisionSendTime = Date.now();
         workerHandlerContext.postMessage(
           selectedWorker,
           workerHandlerContext.reusableWorkerMessage.set(
@@ -87,7 +79,6 @@ var WorkerHandler = function(){
   this.physicsWorkerFunction = (
     function(workerHandlerContext){
       return function(){
-        workerHandlerContext.lastSendTime = Date.now();
         workerHandlerContext.postMessage(
           workerHandlerContext.physicsWorker,
           workerHandlerContext.reusableWorkerMessage.set(
@@ -362,7 +353,6 @@ WorkerHandler.prototype.initParticleSystemsArray = function(){
   this.particleSystemsArray.fill(-1);
   this.availablePSIndices = new Array();
   this.currentPSIndex = 0;
-  this.lastPSArraySendTime = Date.now();
   this.postMessage(this.collisionWorker, this.particleSystemsArray);
 }
 
@@ -471,18 +461,10 @@ WorkerHandler.prototype.debugPSCollisionWorker = function(){
 }
 
 WorkerHandler.prototype.stopBinHandlerLoop = function(isPS){
-  var selectedTimeoutID = this.collisionTimeoutID;
-  if (isPS){
-    selectedTimeoutID = this.psCollisionTimeoutID;
-    if (!(typeof this.psCollisionArrayTimeoutID == UNDEFINED)){
-      clearTimeout(this.psCollisionArrayTimeoutID);
-    }
-  }
   var selectedWorker = this.collisionWorker;
   if (isPS){
     selectedWorker = this.psCollisionWorker;
   }
-  clearTimeout(selectedTimeoutID);
   selectedWorker.terminate();
 }
 
