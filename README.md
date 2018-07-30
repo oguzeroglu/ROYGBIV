@@ -1,6 +1,6 @@
 # ROYGBIV
 
-![](http://oguzeroglu.com/2ez411.gif) ![](http://oguzeroglu.com/roygbiv.gif)
+![](http://oguzeroglu.com/qY4P32.gif)
 
 ROYGBIV is a 3D game engine for the Web and on the Web. I named it after my favorite [Boards of Canada track](https://www.youtube.com/watch?v=W-GWjzw0GwQ).
 
@@ -23,3 +23,4 @@ ROYGBIV works on browsers (preferably Chrome or Firefox). It works with a set of
 
 ![](http://oguzeroglu.com/roygbivss2.png)
 ![](http://oguzeroglu.com/roygbivss1.png)
+![](http://oguzeroglu.com/roygbiv.gif)
