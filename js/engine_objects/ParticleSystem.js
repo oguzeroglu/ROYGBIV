@@ -477,6 +477,9 @@ ParticleSystem.prototype.destroy = function(){
     if (this.psPool){
       particleSystemPools[this.psPool].remove(this);
     }
+    if (this.psMerger){
+      this.psMerger.removePS(this);
+    }
   }
 }
 
@@ -525,11 +528,19 @@ ParticleSystem.prototype.setBlending = function(mode){
 }
 
 ParticleSystem.prototype.removeParticle = function(particle){
-  this.geometry.attributes.expiredFlag.updateRange.push({
-    offset: particle.index, count: 1
+  var selectedGeometry;
+  var selectedOffset = particle.index;
+  if (this.psMerger){
+    selectedOffset += this.expiredFlagOffset;
+    selectedGeometry = this.psMerger.geometry;
+  }else{
+    selectedGeometry = this.geometry;
+  }
+  selectedGeometry.attributes.expiredFlag.updateRange.push({
+    offset: selectedOffset, count: 1
   });
-  this.geometry.attributes.expiredFlag.array[particle.index] = 7;
-  this.geometry.attributes.expiredFlag.needsUpdate = true;
+  selectedGeometry.attributes.expiredFlag.array[particle.index] = 7;
+  selectedGeometry.attributes.expiredFlag.needsUpdate = true;
   particle.isExpired = true;
   if (particle.uuid){
     if (isCollisionWorkerEnabled()){

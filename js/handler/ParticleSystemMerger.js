@@ -86,6 +86,7 @@ var ParticleSystemMerger = function(psObj, name){
     this.flags2.set(ps.flags2, offset2);
 
     ps.flags2Offset = offset2;
+    ps.expiredFlagOffset = offset3;
 
     for (var i = 0; i<ps.particles.length; i++){
       var particle = ps.particles[i];
@@ -201,6 +202,7 @@ ParticleSystemMerger.prototype.destroy = function(){
   previewScene.remove(this.mesh);
   this.mesh.geometry.dispose();
   this.mesh.material.dispose();
+  delete mergedParticleSystems[this.name];
 }
 
 ParticleSystemMerger.prototype.clean = function(){
@@ -231,6 +233,16 @@ ParticleSystemMerger.prototype.clean = function(){
     delete this.psObj[psName].uvCoordinatesBufferAttribute;
     this.psObj[psName].mesh.geometry.dispose();
     this.psObj[psName].mesh.material.dispose();
+  }
+}
+
+ParticleSystemMerger.prototype.removePS = function(ps){
+  this.material.uniforms.hiddenArray.value[ps.mergedIndex] = (20.0);
+  this.activePSMap.delete(ps.name);
+  delete this.psObj[ps.name];
+  delete ps.mergedIndex;
+  if (Object.keys(this.psObj).length == 0){
+    this.destroy();
   }
 }
 
