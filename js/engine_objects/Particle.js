@@ -251,12 +251,7 @@ Particle.prototype.handleCollisions = function(fromWorker){
         continue;
       }
       if (intersectionPoint){
-        var collisionInfo = new CollisionInfo(
-          objName, intersectionPoint.x, intersectionPoint.y, intersectionPoint.z,
-          0, obj.previewMesh.quaternion.x, obj.previewMesh.quaternion.y, obj.previewMesh.quaternion.z,
-          obj.previewMesh.quaternion.w, INTERSECTION_NORMAL, this.parent.tick
-        );
-        this.fireCollisionCallback(collisionInfo);
+        this.fireCollisionCallback();
       }
     }else{
       var obj;
@@ -282,13 +277,7 @@ Particle.prototype.handleCollisions = function(fromWorker){
           }
         }
         if (intersectionPoint){
-          var collisionInfo = new CollisionInfo(
-            objName, intersectionPoint.x, intersectionPoint.y, intersectionPoint.z,
-            0, parent.previewGraphicsGroup.quaternion.x, parent.previewGraphicsGroup.quaternion.y,
-            parent.previewGraphicsGroup.quaternion.z, parent.previewGraphicsGroup.quaternion.w,
-            INTERSECTION_NORMAL, this.parent.tick
-          );
-          this.fireCollisionCallback(collisionInfo);
+          this.fireCollisionCallback();
           return;
         }
       }
