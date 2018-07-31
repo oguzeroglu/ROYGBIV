@@ -2,7 +2,7 @@
 
 ![](http://oguzeroglu.com/qY4P32.gif)
 
-ROYGBIV is a 3D game engine for the Web and on the Web. I named it after my favorite [Boards of Canada track](https://www.youtube.com/watch?v=W-GWjzw0GwQ).
+ROYGBIV is a 3D game engine for the Web. I named it after my favorite [Boards of Canada track](https://www.youtube.com/watch?v=W-GWjzw0GwQ).
 
 ## The current state of the project
 
