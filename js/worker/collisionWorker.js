@@ -13,8 +13,7 @@ var MESSAGE_TYPE_BUFFER = 1;
 var transferableBufferArray = new Array(0);
 var constants = new WorkerConstants();
 var REUSABLE_WORKER_MESSAGE = new WorkerMessage();
-var particleCollisionInfoSendCount = 0;
-var particleCollisionBuffer = new Object();
+var particleCollisionBuffer = new Map();
 var PARTICLE_POSITION_HISTORY_SIZE;
 var INTERSECTION_NORMAL = new THREE.Vector3();
 var REUSABLE_QUATERNION2 = new THREE.Quaternion();
@@ -27,6 +26,10 @@ var BIN_SIZE;
 var REUSABLE_MATRIX = new THREE.Matrix4();
 var REUSABLE_VECTOR = new THREE.Vector3();
 var REUSABLE_VECTOR2 = new THREE.Vector3();
+
+var cnIndex = 0;
+var collisionNotificationArray;
+var canCollisionNotificationArraySet = false;
 
 // key: index, value: particle count
 var particleSystemIndicesWithCollisionParticles = new Object();
@@ -320,6 +323,13 @@ self.onmessage = function(msg){
         particle.startDelay = stopTick;
       }
     }
+  }else if (msg.data.topic == "maxParticleCollisionCount"){
+    var MAX_PARTICLE_COLLISION_LISTEN_COUNT = parseInt(content);
+    collisionNotificationArray = new Uint16Array(MAX_PARTICLE_COLLISION_LISTEN_COUNT);
+    canCollisionNotificationArraySet = true;
+  }else if (msg.data.topic == "pcNotificationArray"){
+    collisionNotificationArray = content;
+    canCollisionNotificationArraySet = true;
   }
 }
 
@@ -339,39 +349,26 @@ function binLoopArraySendFunction(){
   post(REUSABLE_WORKER_MESSAGE.set(constants.binLoop, binLoopArrayToSend));
 }
 
+function particleCollisionBufferProcess(value, key){
+  collisionNotificationArray[cnIndex] = key;
+  cnIndex ++;
+}
+
 function psArraySendFunction(){
   post(psArrayToSend);
-  if (particleCollisionInfoSendCount > 0){
-    post(REUSABLE_WORKER_MESSAGE.set(
-      constants.particleCollided, JSON.stringify(particleCollisionBuffer)
-    ));
-    particleCollisionInfoSendCount = 0;
-    for (var key in particleCollisionBuffer){
-      delete particleCollisionBuffer[key];
+  cnIndex = 0;
+  if (canCollisionNotificationArraySet){
+    particleCollisionBuffer.forEach(particleCollisionBufferProcess);
+    if (cnIndex > 0){
+        post(REUSABLE_WORKER_MESSAGE.set(constants.pcNotificationArray, collisionNotificationArray));
+        canCollisionNotificationArraySet = false;
     }
+    particleCollisionBuffer.clear();
   }
 }
 
 function fireCollisionCallback(objName, particle, isObjectGroup){
-  var collisionInfo = new Object();
-  collisionInfo.parentName = particle.parent.name;
-  collisionInfo.index = particle.index;
-  collisionInfo.objName = objName;
-  collisionInfo.normalX = INTERSECTION_NORMAL.x;
-  collisionInfo.normalY = INTERSECTION_NORMAL.y;
-  collisionInfo.normalZ = INTERSECTION_NORMAL.z;
-  collisionInfo.pointX = REUSABLE_VECTOR2.x;
-  collisionInfo.pointY = REUSABLE_VECTOR2.y;
-  collisionInfo.pointZ = REUSABLE_VECTOR2.z;
-  collisionInfo.isObjectGroup = isObjectGroup;
-  collisionInfo.parentTick = particle.parent.tick;
-  particleCollisionBuffer[particle.uuid] = collisionInfo;
-  particleCollisionInfoSendCount ++;
-  if (particleCollisionInfoSendCount == 500){
-    post(REUSABLE_WORKER_MESSAGE.set(constants.particleCollided, JSON.stringify(particleCollisionBuffer)));
-    particleCollisionInfoSendCount = 0;
-    particleCollisionBuffer = new Object();
-  }
+  particleCollisionBuffer.set(particle.uuid, true);
 }
 
 function intersectsLine(objName, particle, childName){

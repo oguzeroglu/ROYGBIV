@@ -5476,7 +5476,7 @@ Roygbiv.prototype.setCollisionListener = function(sourceObject, callbackFunction
     if (!particleCollisionCallbackRequests[sourceObject.uuid]){
       incrCounter = true;
     }
-    particleCollisionCallbackRequests[sourceObject.uuid] = callbackFunction;
+    particleCollisionCallbackRequests[sourceObject.uuid] = callbackFunction.bind(sourceObject);
     if (incrCounter){
       TOTAL_PARTICLE_COLLISION_LISTEN_COUNT ++;
     }

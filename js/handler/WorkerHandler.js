@@ -153,36 +153,22 @@ var WorkerHandler = function(){
         var resultObj = JSON.parse(resultText);
       }else if (!event.data.topic){
         workerHandlerContext.handlePSArrayLoop(event.data);
-      }else if (event.data.topic == "particleCollided"){
-        var collisionObj = JSON.parse(event.data.content);
-        for (var uuid in collisionObj){
-          var curCollisionObj = collisionObj[uuid];
-          var ps = particleSystemPool[curCollisionObj.parentName];
-          if (!ps){
-            continue;
-          }
-          var particle = ps.particles[curCollisionObj.index];
-          var quatX, quatY, quatZ, quatW;
-          if (curCollisionObj.isObjectGroup){
-            var obj = objectGroups[curCollisionObj.objName];
-            quatX = obj.previewGraphicsGroup.quaternion.x;
-            quatY = obj.previewGraphicsGroup.quaternion.y;
-            quatZ = obj.previewGraphicsGroup.quaternion.z;
-            quatW = obj.previewGraphicsGroup.quaternion.w;
+      }else if (event.data.topic == "pcNotificationArray"){
+        var pcArray = event.data.content;
+        var iterate = true;
+        var pcIndex = 0;
+        while (iterate && pcIndex < MAX_PARTICLE_COLLISION_LISTEN_COUNT){
+          if (pcArray[pcIndex] > 0){
+            var particle = workerHandlerContext.collidableParticleMap.get(pcArray[pcIndex]);
+            particle.fireCollisionCallback();
           }else{
-            var obj = addedObjects[curCollisionObj.objName];
-            quatX = obj.previewMesh.quaternion.x;
-            quatY = obj.previewMesh.quaternion.y;
-            quatZ = obj.previewMesh.quaternion.z;
-            quatW = obj.previewMesh.quaternion.w;
+            iterate = false;
           }
-          REUSABLE_VECTOR.set(curCollisionObj.normalX, curCollisionObj.normalY, curCollisionObj.normalZ);
-          var collisionInfo = new CollisionInfo(
-            curCollisionObj.objName, curCollisionObj.pointX, curCollisionObj.pointY, curCollisionObj.pointZ,
-            0, quatX, quatY, quatZ, quatW, REUSABLE_VECTOR, curCollisionObj.parentTick
-          );
-          particle.fireCollisionCallback(collisionInfo);
+          pcIndex ++;
         }
+        workerHandlerContext.postMessage(workerHandlerContext.collisionWorker, workerHandlerContext.reusableWorkerMessage.set(
+          workerHandlerContext.constants.pcNotificationArray, pcArray
+        ));
       }
     };
   }
@@ -232,6 +218,7 @@ var WorkerHandler = function(){
     this.initPhysicsWorker();
   }
   if (isCollisionWorkerEnabled()){
+    this.collidableParticleMap = new Map();
     this.initCollisionWorker();
     this.initParticleSystemsArray();
   }
@@ -282,16 +269,16 @@ WorkerHandler.prototype.notifyNewPSCreation = function(ps){
   this.postMessage(this.psCollisionWorker, info);
 }
 
-WorkerHandler.prototype.calculatePSSegment = function(index){
-  return parseInt(index / 30);
-}
-
 WorkerHandler.prototype.generatePSIndex = function(){
   for (var index in this.psIndexPool){
     delete this.psIndexPool[index];
     return parseInt(index);
   }
   return (TOTAL_PARTICLE_SYSTEM_COUNT - 1);
+}
+
+WorkerHandler.prototype.calculatePSSegment = function(index){
+  return parseInt(index / 30);
 }
 
 WorkerHandler.prototype.initPSCollisionWorker = function(){
@@ -314,6 +301,7 @@ WorkerHandler.prototype.notifyParticleStartDelayChange = function(particle){
 WorkerHandler.prototype.notifyParticleCollisionListenerRemove = function(particle){
   this.particleRemoveBuffer[particle.uuid] = true;
   this.particleRemoveBufferSize ++;
+  this.collidableParticleMap.delete(particle.uuid);
 }
 
 WorkerHandler.prototype.notifyParticleCollisionListenerSet = function(particle){
@@ -321,6 +309,7 @@ WorkerHandler.prototype.notifyParticleCollisionListenerSet = function(particle){
   this.postMessage(this.collisionWorker, this.reusableWorkerMessage.set(
     this.constants.newParticle, particleInfo
   ));
+  this.collidableParticleMap.set(particle.uuid, particle);
 }
 
 WorkerHandler.prototype.testPSPositionQuery = function(index){
@@ -489,6 +478,13 @@ WorkerHandler.prototype.binHandlerLoop = function(isPS){
 }
 
 WorkerHandler.prototype.initCollisionWorker = function(isPS){
+
+  if (!isPS){
+    this.postMessage(this.collisionWorker, this.reusableWorkerMessage.set(
+      this.constants.maxParticleCollisionCount, MAX_PARTICLE_COLLISION_LISTEN_COUNT
+    ));
+  }
+
   var selectedWorker = this.collisionWorker;
   if (isPS){
     selectedWorker = this.psCollisionWorker;

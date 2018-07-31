@@ -40,7 +40,7 @@ Particle.prototype.setFromPseudoObject = function(pseudoObject){
   this.startDelay = pseudoObject.startDelay;
   this.trailFlag = pseudoObject.trailFlag;
   this.useWorldPositionFlag = pseudoObject.useWorldPositionFlag;
-  this.uuid = pseudoObject.uuid;
+  this.uuid = parseInt(pseudoObject.uuid);
   this.gpuVelocity = new THREE.Vector3(pseudoObject.vx, pseudoObject.vy, pseudoObject.vz);
   this.x = pseudoObject.x;
   this.y = pseudoObject.y;
@@ -190,13 +190,12 @@ Particle.prototype.getPosition = function(axis, targetVector){
   }
 }
 
-Particle.prototype.fireCollisionCallback = function(collisionInfo){
+Particle.prototype.fireCollisionCallback = function(){
   var request = particleCollisionCallbackRequests[this.uuid];
   if (!request){
     return;
   }
-  var boundFunc = request.bind(this);
-  boundFunc(collisionInfo);
+  request();
 }
 
 Particle.prototype.updatePositionHistory = function(){
@@ -298,15 +297,9 @@ Particle.prototype.handleCollisions = function(fromWorker){
   this.lastUpdatetime = performance.now() - timer1;
 }
 
-Particle.prototype.getUUID = function(){
-  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
-    var r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
-    return v.toString(16);
-  });
-}
 
 Particle.prototype.assignUUID = function(){
-  this.uuid = this.getUUID();
+  this.uuid = TOTAL_PARTICLE_COLLISION_LISTEN_COUNT;
 }
 
 // CONVERTED FROM THE GPU GLSL CODE
