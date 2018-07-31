@@ -5427,7 +5427,7 @@ Roygbiv.prototype.fadeAway = function(particleSystem, coefficient){
 // setCollisionListener
 //  Sets a collision listener for an object, glued object, particle or a particle system. Using
 //  this with loads of particles may cause performance issues if web worker usage is not enabled or supported.
-//  Callback function given as the second parameter is fired with a CollisionInfo instance when
+//  Callback function given as the second parameter is fired with a CollisionInfo instance (except for particle collisions) when
 //  the sourceObject is collided with other objects or glued objects of the scene.
 //  The additional timeOffset parameter can be used for particles/particle systems to
 //  pre-calculate future collisions. This can help to prevent visual errors of collisions
