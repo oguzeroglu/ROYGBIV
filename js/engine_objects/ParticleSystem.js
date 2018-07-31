@@ -51,7 +51,7 @@ var ParticleSystem = function(copyPS, name, particles, x, y, z, vx, vy, vz, ax, 
 
   this.updateFunction = updateFunction;
 
-  this.particlesWithCollisionCallbacks = new Object();
+  this.particlesWithCollisionCallbacks = new Map();
 
   this.gpuMotionUpdateBuffer = [];
 
@@ -254,7 +254,7 @@ var ParticleSystem = function(copyPS, name, particles, x, y, z, vx, vy, vz, ax, 
           TOTAL_PARTICLE_SYSTEMS_WITH_PARTICLE_COLLISIONS ++;
           this.hasParticleCollision = true;
         }
-        this.particlesWithCollisionCallbacks[particle.uuid] = particle;
+        this.particlesWithCollisionCallbacks.set(particle.uuid, particle);
         if (isCollisionWorkerEnabled()){
           if (!this.checkForCollisionBuffer){
             this.checkForCollisionBuffer = new Object();
@@ -446,9 +446,9 @@ ParticleSystem.prototype.assignCollisionWorkerIndex = function(){
 
 ParticleSystem.prototype.notifyParticleCollisionCallbackChange = function(particle){
   if (particle.checkForCollisions){
-    this.particlesWithCollisionCallbacks[particle.uuid] = particle;
+    this.particlesWithCollisionCallbacks.set(particle.uuid, particle);
   }else{
-    delete this.particlesWithCollisionCallbacks[particle.uuid];
+    this.particlesWithCollisionCallbacks.delete(particle.uuid);
   }
 }
 
@@ -508,18 +508,22 @@ ParticleSystem.prototype.stop = function(newLifetime){
   this.stoppedY = this.mesh.position.y;
   this.stoppedZ = this.mesh.position.z;
   if (isCollisionWorkerEnabled() && !(typeof this.collisionWorkerIndex == UNDEFINED)){
-    workerHandler.notifyParticleSystemStop(this, newLifetime, this.tick);
-  }else if(!isCollisionWorkerEnabled()){
-    for (var uuid in this.particlesWithCollisionCallbacks){
-      var particle = this.particlesWithCollisionCallbacks[uuid];
-      particle.stopLifetime = newLifetime;
-      particle.respawnSet = false;
-      particle.stopTick = this.tick;
-      particle.lifetime = newLifetime;
-      if (particle.startDelay > this.tick){
-        particle.startDelay = this.tick;
-      }
+    if (this.particlesWithCollisionCallbacks.size > 0){
+      workerHandler.notifyParticleSystemStop(this, newLifetime, this.tick);
     }
+  }else if(!isCollisionWorkerEnabled()){
+    this.particlesWithCollisionCallbacks.forEach(this.particleIterationStopFunc);
+  }
+}
+
+ParticleSystem.prototype.particleIterationStopFunc = function(value, key){
+  var particle = value;
+  particle.stopLifetime = newLifetime;
+  particle.respawnSet = false;
+  particle.stopTick = this.tick;
+  particle.lifetime = newLifetime;
+  if (particle.startDelay > this.tick){
+    particle.startDelay = this.tick;
   }
 }
 
@@ -546,7 +550,7 @@ ParticleSystem.prototype.removeParticle = function(particle){
     if (isCollisionWorkerEnabled()){
       workerHandler.notifyParticleCollisionListenerRemove(particle);
     }
-    delete this.particlesWithCollisionCallbacks[particle.uuid];
+    this.particlesWithCollisionCallbacks.delete(particle.uuid);
   }
 }
 
@@ -696,12 +700,7 @@ ParticleSystem.prototype.update = function(){
   }
 
   if (!isCollisionWorkerEnabled()){
-    for (var particleUUID in this.particlesWithCollisionCallbacks){
-      var particle = this.particlesWithCollisionCallbacks[particleUUID];
-      if (!particle.isExpired){
-        particle.handleCollisions();
-      }
-    }
+    this.particlesWithCollisionCallbacks.forEach(this.particleIterationCollisionFunc);
   }
 
   if (this.gpuMotionUpdateBuffer.length > 0){
@@ -751,6 +750,13 @@ ParticleSystem.prototype.update = function(){
     workerHandler.psTickArray[this.psCollisionWorkerIndex] = this.tick;
   }
 
+}
+
+ParticleSystem.prototype.particleIterationCollisionFunc = function(value){
+  var particle = value;
+  if (!particle.isExpired){
+    particle.handleCollisions();
+  }
 }
 
 ParticleSystem.prototype.partialGPUMotionBufferUpdate = function(firstIndex){

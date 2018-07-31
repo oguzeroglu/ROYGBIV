@@ -4743,7 +4743,7 @@ Roygbiv.prototype.createSnow = function(configurations){
     var particle = this.createParticle(particleConfigurations);
     if (rewindOnCollided){
       var roygbivContext = this;
-      this.setCollisionListener(particle, function(info){
+      this.setCollisionListener(particle, function(){
         roygbivContext.rewindParticle(this, Math.random());
       }, collisionTimeOffset);
     }
