@@ -6,9 +6,9 @@ importScripts("/js/engine_objects/WorkerConstants.js");
 
 // PS COLLISION ARRAY FORMAT
 // safetyBit - psID - objectID - x - y - z - fnX - fnY - fnZ - psTime - isObjectGroup
-var hasPSCollisionArrayOwnership = true;
-var psCollisionArray;
-var psCollisionArrayIndex = 0;
+var psCollisionArrays = new Array(10);
+var psCollisionArrayIndices = new Array(10);
+var maxPSCollisionArrayInd;
 
 var lastSendTime = undefined, lastBinLoopSendTime = undefined;
 var tickArray, binLoopArray;
@@ -107,11 +107,21 @@ self.onmessage = function(msg){
     post(REUSABLE_WORKER_MESSAGE.set(constants.psBinLoop, ary));
   }else if (topic == "binLoop"){
     binLoopArray = handleBinLoop(content);
+    var hasPSCollisionArrayOwnership = false;
+    for (var i = 0; i<psCollisionArrays.length; i++){
+      if (psCollisionArrays[i]){
+        hasPSCollisionArrayOwnership = true;
+        break;
+      }
+    }
     if (hasPSCollisionArrayOwnership){
       handleCollisions();
-      if (psCollisionArrayIndex > 0){
-        post(REUSABLE_WORKER_MESSAGE.set(constants.psCollisionNotification, psCollisionArray));
-        hasPSCollisionArrayOwnership = false;
+      for (var i = 0; i<psCollisionArrays.length; i++){
+        if(psCollisionArrayIndices[i] > 1){
+          post(REUSABLE_WORKER_MESSAGE.set(constants.psCollisionNotification, psCollisionArrays[i]));
+          psCollisionArrays[i] = false;
+          psCollisionArrayIndices[i] = 1;
+        }
       }
     }
     var waitAmount = (1000 / 70);
@@ -225,11 +235,16 @@ self.onmessage = function(msg){
       setTimeout(sendTickMsg, waitAmount);
   }else if (topic == "maxPSCount"){
     MAX_PARTICLE_SYSTEM_COUNT = parseInt(content);
-    psCollisionArray = new Float32Array(MAX_PARTICLE_SYSTEM_COUNT * 11);
+    for (var i = 0; i<10; i++){
+      psCollisionArrays[i] = new Float32Array(((MAX_PARTICLE_SYSTEM_COUNT * 11) / 10) + 1);
+      psCollisionArrays[i][0] = i;
+      psCollisionArrayIndices[i] = 1;
+    }
+    maxPSCollisionArrayInd = (MAX_PARTICLE_SYSTEM_COUNT * 11 / 10);
   }else if (topic == "psCollisionNotification"){
-    psCollisionArray = content;
-    hasPSCollisionArrayOwnership = true;
-    psCollisionArrayIndex = 0;
+    var ind = content[0];
+    psCollisionArrays[ind] = content;
+    psCollisionArrayIndices[ind] = 1;
   }else{
     if (topic != "particlePositionHistorySize"){
       console.error("psCollisionWorker error: "+topic+" not implemented.");
@@ -396,6 +411,16 @@ function parseBBDescriptions(content){
 
 function fireCollisionCallback(objName, ps, isObjectGroup, childName){
   // safetyBit - psID - objectID - x - y - z - fnX - fnY - fnZ - psTime - isObjectGroup
+  var curAryIndex = 0;
+  for (var i = 0; i< 10; i++){
+    var ind = psCollisionArrayIndices[i];
+    if (ind < maxPSCollisionArrayInd && psCollisionArrays[i]){
+      curAryIndex = i;
+      break;
+    }
+  }
+  var psCollisionArray = psCollisionArrays[curAryIndex];
+  var psCollisionArrayIndex = psCollisionArrayIndices[curAryIndex];
   psCollisionArray[psCollisionArrayIndex++] = 1;
   psCollisionArray[psCollisionArrayIndex++] = ps.psCollisionWorkerIndex;
   if (isObjectGroup){
@@ -415,6 +440,7 @@ function fireCollisionCallback(objName, ps, isObjectGroup, childName){
     isObjectGroupInd = 1;
   }
   psCollisionArray[psCollisionArrayIndex++] = isObjectGroupInd;
+  psCollisionArrayIndices[curAryIndex] = psCollisionArrayIndex;
 }
 
 function intersectsLine(objName, ps, childName){

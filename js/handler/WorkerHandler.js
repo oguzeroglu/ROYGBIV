@@ -194,7 +194,7 @@ var WorkerHandler = function(){
       }else if (event.data.topic == "psCollisionNotification"){
         var collisionArray = event.data.content;
         var iterate = true;
-        var caIndex = 0;
+        var caIndex = 1;
         while (iterate){
           var safetyBit = collisionArray[caIndex];
           if (safetyBit > 0){
