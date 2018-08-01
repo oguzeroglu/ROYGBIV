@@ -1,5 +1,9 @@
 var WorkerHandler = function(){
 
+  this.reusableCollisionInfo = new CollisionInfo();
+  this.objectIDMAp = new Map();
+  this.psIndexMap = new Map();
+
   this.psTickFunction = (
     function(workerHandlerContext){
       return function(){
@@ -108,7 +112,6 @@ var WorkerHandler = function(){
 
   this.psCollisionListenBuffer = new Object();
   this.psRemovalBuffer = new Object();
-  this.psIndexNameMap = new Object();
 
   this.particleStartDelayBuffer = new Object();
   this.particleRemoveBuffer = new Object();
@@ -186,30 +189,67 @@ var WorkerHandler = function(){
         workerHandlerContext.handlePsCollisionArrayLoop(event.data.content);
       }else if (event.data.topic == "tick"){
         workerHandlerContext.handlePSTick(event.data.content);
-      }else if (event.data.topic == "psCollided"){
-        var info = JSON.parse(event.data.content);
-        var qX, qY, qZ, qW;
-        if (info.isObjectGroup){
-          var obj = objectGroups[info.objName];
-          qX = obj.previewGraphicsGroup.quaternion.x;
-          qY = obj.previewGraphicsGroup.quaternion.y;
-          qZ = obj.previewGraphicsGroup.quaternion.z;
-          qW = obj.previewGraphicsGroup.quaternion.w;
-        }else{
-          var obj = addedObjects[info.objName];
-          qX = obj.previewMesh.quaternion.x;
-          qY = obj.previewMesh.quaternion.y;
-          qZ = obj.previewMesh.quaternion.z;
-          qW = obj.previewMesh.quaternion.w;
-        }
-        var collisionInfo = new CollisionInfo(
-          info.objName, info.pointX, info.pointY, info.pointZ, null, qX, qY, qZ, qW,
-          REUSABLE_VECTOR.set(info.normalX, info.normalY, info.normalZ), info.tick
-        );
-        var ps = particleSystemPool[info.psName];
-        ps.fireCollisionCallback(collisionInfo);
       }else if (event.data.topic == "psRemovalLoop"){
         workerHandlerContext.handlePSRemovalLoop(event.data.content);
+      }else if (event.data.topic == "psCollisionNotification"){
+        var collisionArray = event.data.content;
+        var iterate = true;
+        var caIndex = 0;
+        while (iterate){
+          var safetyBit = collisionArray[caIndex];
+          if (safetyBit > 0){
+            var psID = collisionArray[caIndex + 1];
+            var objID = collisionArray[caIndex + 2];
+            var x = collisionArray[caIndex + 3];
+            var y = collisionArray[caIndex + 4];
+            var z = collisionArray[caIndex + 5];
+            var fnX = collisionArray[caIndex + 6];
+            var fnY = collisionArray[caIndex + 7];
+            var fnZ = collisionArray[caIndex + 8];
+            var psTime = collisionArray[caIndex + 9];
+            var isObjectGroupInd = collisionArray[caIndex + 10];
+            collisionArray[caIndex] = 0
+            collisionArray[caIndex + 1] = 0;
+            collisionArray[caIndex + 2] = 0;
+            collisionArray[caIndex + 3] = 0;
+            collisionArray[caIndex + 4] = 0;
+            collisionArray[caIndex + 5] = 0;
+            collisionArray[caIndex + 6] = 0;
+            collisionArray[caIndex + 7] = 0;
+            collisionArray[caIndex + 8] = 0;
+            collisionArray[caIndex + 9] = 0;
+            collisionArray[caIndex + 10] = 0;
+            var objName = workerHandlerContext.objectIDMAp.get(objID);
+            var obj;
+            var qX = 0, qY = 0, qZ = 0, qW = 0;
+            if (isObjectGroupInd == 0){
+              obj = addedObjects[objName];
+              qX = obj.previewMesh.quaternion.x;
+              qY = obj.previewMesh.quaternion.y;
+              qZ = obj.previewMesh.quaternion.z;
+              qW = obj.previewMesh.quaternion.w;
+            }else{
+              obj = objectGroups[objName];
+              qX = obj.previewGraphicsGroup.quaternion.x;
+              qY = obj.previewGraphicsGroup.quaternion.y;
+              qZ = obj.previewGraphicsGroup.quaternion.z;
+              qW = obj.previewGraphicsGroup.quaternion.w;
+            }
+            var collisionInfo = workerHandlerContext.reusableCollisionInfo.set(
+              objName, x, y, z, null, qX, qY, qZ, qW, REUSABLE_VECTOR.set(fnX, fnY, fnZ), psTime
+            );
+            var ps = workerHandlerContext.psIndexMap.get(psID);
+            ps.fireCollisionCallback(collisionInfo);
+            caIndex += 11;
+          }else{
+            iterate = false;
+          }
+        }
+        workerHandlerContext.postMessage(
+          workerHandlerContext.psCollisionWorker, workerHandlerContext.reusableWorkerMessage.set(
+            workerHandlerContext.constants.psCollisionNotification, collisionArray
+          )
+        );
       }
     }
   }
@@ -267,6 +307,7 @@ WorkerHandler.prototype.notifyNewPSCreation = function(ps){
   info.type = MESSAGE_TYPE_BASIC;
   info.topic = this.constants.psCreation;
   this.postMessage(this.psCollisionWorker, info);
+  this.psIndexMap.set(ps.psCollisionWorkerIndex, ps);
 }
 
 WorkerHandler.prototype.generatePSIndex = function(){
@@ -282,6 +323,9 @@ WorkerHandler.prototype.calculatePSSegment = function(index){
 }
 
 WorkerHandler.prototype.initPSCollisionWorker = function(){
+  this.postMessage(this.psCollisionWorker, this.reusableWorkerMessage.set(
+    this.constants.maxPSCount, MAX_PARTICLE_SYSTEM_COUNT
+  ));
   this.initCollisionWorker(true);
 }
 
@@ -512,6 +556,7 @@ WorkerHandler.prototype.initCollisionWorker = function(isPS){
     this.postMessage(selectedWorker, this.reusableWorkerMessage.set(
       this.constants.objectIndex, objName+","+index)
     );
+    this.objectIDMAp.set(index, objName);
     if (addedObjects[objName].isDynamicObject){
       this.postMessage(selectedWorker, this.reusableWorkerMessage.set(
         this.constants.dynamicObjectNotification, objName
@@ -527,6 +572,7 @@ WorkerHandler.prototype.initCollisionWorker = function(isPS){
       this.postMessage(selectedWorker, this.reusableWorkerMessage.set(
         this.constants.objectIndex, objName+","+childName+","+index
       ));
+      this.objectIDMAp.set(index, objName);
       index += 20;
     }
     if (objectGroups[objName].isDynamicObject){

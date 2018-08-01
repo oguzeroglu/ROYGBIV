@@ -844,7 +844,10 @@ ParticleSystem.prototype.handleCollisions = function(fromWorker){
       if (!fromWorker){
         intersectionPoint = obj.intersectsLine(this.positionLine);
       }else{
-        intersectsLine(objName, this);
+        var res = intersectsLine(objName, this);
+        if (res){
+          return;
+        }
         continue;
       }
       if (intersectionPoint){
@@ -874,7 +877,7 @@ ParticleSystem.prototype.handleCollisions = function(fromWorker){
           var intersectionPoint = obj.intersectsLine(this.positionLine);
         }else{
           if (intersectsLine(objName, this, childName)){
-            continue;
+            return;
           }
         }
         if (intersectionPoint){

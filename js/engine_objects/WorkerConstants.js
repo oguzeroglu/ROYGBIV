@@ -45,4 +45,6 @@ var WorkerConstants = function(){
   this.collisionRemoval = "collisionRemoval";
   this.maxParticleCollisionCount = "maxParticleCollisionCount";
   this.pcNotificationArray = "pcNotificationArray";
+  this.maxPSCount = "maxPSCount";
+  this.psCollisionNotification = "psCollisionNotification";
 }

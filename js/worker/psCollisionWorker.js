@@ -4,6 +4,12 @@ importScripts("/js/handler/WorldBinHandler.js");
 importScripts("/js/engine_objects/ParticleSystem.js");
 importScripts("/js/engine_objects/WorkerConstants.js");
 
+// PS COLLISION ARRAY FORMAT
+// safetyBit - psID - objectID - x - y - z - fnX - fnY - fnZ - psTime - isObjectGroup
+var hasPSCollisionArrayOwnership = true;
+var psCollisionArray;
+var psCollisionArrayIndex = 0;
+
 var lastSendTime = undefined, lastBinLoopSendTime = undefined;
 var tickArray, binLoopArray;
 var emptyAry = [];
@@ -101,7 +107,13 @@ self.onmessage = function(msg){
     post(REUSABLE_WORKER_MESSAGE.set(constants.psBinLoop, ary));
   }else if (topic == "binLoop"){
     binLoopArray = handleBinLoop(content);
-    handleCollisions();
+    if (hasPSCollisionArrayOwnership){
+      handleCollisions();
+      if (psCollisionArrayIndex > 0){
+        post(REUSABLE_WORKER_MESSAGE.set(constants.psCollisionNotification, psCollisionArray));
+        hasPSCollisionArrayOwnership = false;
+      }
+    }
     var waitAmount = (1000 / 70);
     if (!(lastBinLoopSendTime === undefined)){
       waitAmount = ((1/60) * 1000) - (Date.now() - lastBinLoopSendTime);
@@ -211,6 +223,13 @@ self.onmessage = function(msg){
         }
       }
       setTimeout(sendTickMsg, waitAmount);
+  }else if (topic == "maxPSCount"){
+    MAX_PARTICLE_SYSTEM_COUNT = parseInt(content);
+    psCollisionArray = new Float32Array(MAX_PARTICLE_SYSTEM_COUNT * 11);
+  }else if (topic == "psCollisionNotification"){
+    psCollisionArray = content;
+    hasPSCollisionArrayOwnership = true;
+    psCollisionArrayIndex = 0;
   }else{
     if (topic != "particlePositionHistorySize"){
       console.error("psCollisionWorker error: "+topic+" not implemented.");
@@ -375,19 +394,27 @@ function parseBBDescriptions(content){
   return ary;
 }
 
-function fireCollisionCallback(objName, ps, isObjectGroup){
-  var collisionInfo = new Object();
-  collisionInfo.psName = ps.name;
-  collisionInfo.objName = objName;
-  collisionInfo.normalX = INTERSECTION_NORMAL.x;
-  collisionInfo.normalY = INTERSECTION_NORMAL.y;
-  collisionInfo.normalZ = INTERSECTION_NORMAL.z;
-  collisionInfo.pointX = REUSABLE_VECTOR2.x;
-  collisionInfo.pointY = REUSABLE_VECTOR2.y;
-  collisionInfo.pointZ = REUSABLE_VECTOR2.z;
-  collisionInfo.isObjectGroup = isObjectGroup;
-  collisionInfo.tick = ps.tick;
-  post(REUSABLE_WORKER_MESSAGE.set(constants.psCollided, JSON.stringify(collisionInfo)));
+function fireCollisionCallback(objName, ps, isObjectGroup, childName){
+  // safetyBit - psID - objectID - x - y - z - fnX - fnY - fnZ - psTime - isObjectGroup
+  psCollisionArray[psCollisionArrayIndex++] = 1;
+  psCollisionArray[psCollisionArrayIndex++] = ps.psCollisionWorkerIndex;
+  if (isObjectGroup){
+    psCollisionArray[psCollisionArrayIndex++] = objectGroupIndices[objName][childName];
+  }else{
+    psCollisionArray[psCollisionArrayIndex++] = addedObjectIndices[objName];
+  }
+  psCollisionArray[psCollisionArrayIndex++] = REUSABLE_VECTOR2.x;
+  psCollisionArray[psCollisionArrayIndex++] = REUSABLE_VECTOR2.y;
+  psCollisionArray[psCollisionArrayIndex++] = REUSABLE_VECTOR2.z;
+  psCollisionArray[psCollisionArrayIndex++] = INTERSECTION_NORMAL.x;
+  psCollisionArray[psCollisionArrayIndex++] = INTERSECTION_NORMAL.y;
+  psCollisionArray[psCollisionArrayIndex++] = INTERSECTION_NORMAL.z;
+  psCollisionArray[psCollisionArrayIndex++] = ps.tick;
+  var isObjectGroupInd = 0;
+  if (isObjectGroup){
+    isObjectGroupInd = 1;
+  }
+  psCollisionArray[psCollisionArrayIndex++] = isObjectGroupInd;
 }
 
 function intersectsLine(objName, ps, childName){
@@ -412,11 +439,11 @@ function intersectsLine(objName, ps, childName){
       var triangle2 = triangles[i+1];
       if (triangle1.containsPoint(REUSABLE_VECTOR2)){
         INTERSECTION_NORMAL.set(plane.normal.x, plane.normal.y, plane.normal.z);
-        fireCollisionCallback(objName, ps, isObjectGroup);
+        fireCollisionCallback(objName, ps, isObjectGroup, childName);
         return true;
       }else if (triangle2.containsPoint(REUSABLE_VECTOR2)){
         INTERSECTION_NORMAL.set(plane.normal.x, plane.normal.y, plane.normal.z);
-        fireCollisionCallback(objName, ps, isObjectGroup);
+        fireCollisionCallback(objName, ps, isObjectGroup, childName);
         return true;
       }
     }

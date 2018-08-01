@@ -1,4 +1,8 @@
 var CollisionInfo = function(targetObjectName, x, y, z, collisionImpact, quaternionX, quaternionY, quaternionZ, quaternionW, faceNormal, time){
+  this.set(targetObjectName, x, y, z, collisionImpact, quaternionX, quaternionY, quaternionZ, quaternionW, faceNormal, time);
+}
+
+CollisionInfo.prototype.set = function(targetObjectName, x, y, z, collisionImpact, quaternionX, quaternionY, quaternionZ, quaternionW, faceNormal, time){
   this.targetObjectName = targetObjectName;
   this.x = x;
   this.y = y;
@@ -23,4 +27,5 @@ var CollisionInfo = function(targetObjectName, x, y, z, collisionImpact, quatern
   if (!(typeof time == "undefined")){
     this.particleSystemTime = time;
   }
+  return this;
 }
