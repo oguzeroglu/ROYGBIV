@@ -103,7 +103,7 @@ ObjectGroup.prototype.glue = function(){
     var quatY = this.previewGraphicsGroup.quaternion.y;
     var quatZ = this.previewGraphicsGroup.quaternion.z;
     var quatW = this.previewGraphicsGroup.quaternion.w;
-    var collisionInfo = new CollisionInfo(
+    var collisionInfo = reusableCollisionInfo.set(
       targetObjectName,
       collisionPosition.x,
       collisionPosition.y,

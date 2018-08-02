@@ -64,7 +64,7 @@ var AddedObject = function(name, type, metaData, material, mesh,
     var quatY = this.previewMesh.quaternion.y;
     var quatZ = this.previewMesh.quaternion.z;
     var quatW = this.previewMesh.quaternion.w;
-    var collisionInfo = new CollisionInfo(
+    var collisionInfo = reusableCollisionInfo.set(
       targetObjectName,
       collisionPosition.x,
       collisionPosition.y,
