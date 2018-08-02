@@ -77,7 +77,7 @@ var AddedObject = function(name, type, metaData, material, mesh,
     );
     var curCollisionCallbackRequest = collisionCallbackRequests[this.name];
     if (curCollisionCallbackRequest){
-      curCollisionCallbackRequest.bind(this)(collisionInfo);
+      curCollisionCallbackRequest(collisionInfo);
     }
   };
 

@@ -2,6 +2,10 @@ importScripts("/js/third_party/cannon.min.js");
 importScripts("/js/engine_objects/WorkerMessage.js");
 importScripts("/js/engine_objects/WorkerConstants.js");
 
+var collisionNotificationArrayIndex = 0;
+var collisionNotificationArray;
+var hasCollisionNotificationArrayOwnership = true;
+
 var lastSendTime = undefined;
 var MESSAGE_TYPE_BASIC = 0;
 var MESSAGE_TYPE_BUFFER = 1;
@@ -18,6 +22,7 @@ var dynamicPhysicsBodiesIndices = [];
 var dynamicObjectGroupPhysicsBodiesIndices = [];
 var physicsBodiesIDMap = new Object(); // key: ID, value: physics body
 var nameIDMap = new Object();          // key: ID, value: name
+var idNameMap = new Object();          // key: name, value: id
 var idIndexMap = new Object();         // key: ID, value: index
 var physicsBodiesWithCollisionRequests = new Object(); // key: name, value: true
 var initialized = false;
@@ -60,6 +65,10 @@ function sendUpdates(){
   if (dynamicPhysicsBodies.length > 0 || dynamicObjectGroupPhysicsBodies.length > 0){
     post(REUSABLE_WORKER_MESSAGE.set(constants.update, self.physicsInfoBuffer));
     lastSendTime = Date.now();
+  }
+  if (collisionNotificationArray[0] > 0){
+    post(REUSABLE_WORKER_MESSAGE.set(constants.physicsCollisionHappened, collisionNotificationArray));
+    hasCollisionNotificationArrayOwnership = false;
   }
 }
 
@@ -110,6 +119,7 @@ function parseMessage(msg){
   }else if (msg.topic == "objectNameAndID"){
     var splitted = msg.content.split(",");
     nameIDMap[splitted[1]] = splitted[0];
+    idNameMap[splitted[0]] = splitted[1];
   }else if (msg.topic == "applyForce"){
     applyForce(msg);
   }else if (msg.topic == "sync"){
@@ -131,6 +141,15 @@ function parseMessage(msg){
     physicsBodiesWithCollisionRequests[msg.content] = true;
   }else if (msg.topic == "collisionRemoval"){
     delete physicsBodiesWithCollisionRequests[msg.content];
+  }else if (msg.topic == "maxObjectCollisionListenerCount"){
+    var maxObjectCollisionListenerCount = parseInt(msg.content);
+    // COLLISION NOTIFICATION ARRAY FORMAT:
+    // safetyBit, objID, targetObjID, x, y, z, impact, qX, qY, qZ, qW
+    collisionNotificationArray = new Float32Array(maxObjectCollisionListenerCount * 11);
+  }else if (msg.topic == "physicsCollisionHappened"){
+    collisionNotificationArray = msg.content;
+    hasCollisionNotificationArrayOwnership = true;
+    collisionNotificationArrayIndex = 0;
   }
 }
 
@@ -156,20 +175,34 @@ function setEventListener(physicsBody){
       if (!physicsBodiesWithCollisionRequests[collisionEvent.body.roygbivName]){
         return;
       }
-      REUSABLE_WORKER_MESSAGE.set(constants.physicsCollisionHappened);
-      REUSABLE_WORKER_MESSAGE.id = collisionEvent.body.roygbivName;
-      REUSABLE_WORKER_MESSAGE.forceY = collisionEvent.target.roygbivName;
-      REUSABLE_WORKER_MESSAGE.qx = collisionEvent.body.quaternion.x;
-      REUSABLE_WORKER_MESSAGE.qy = collisionEvent.body.quaternion.y;
-      REUSABLE_WORKER_MESSAGE.qz = collisionEvent.body.quaternion.z;
-      REUSABLE_WORKER_MESSAGE.qw = collisionEvent.body.quaternion.w;
+      if (!hasCollisionNotificationArrayOwnership){
+        return;
+      }
       var contact = collisionEvent.contact;
       var collisionImpact = contact.getImpactVelocityAlongNormal();
-      REUSABLE_WORKER_MESSAGE.pointX = (contact.bi.position.x) + (contact.ri.x);
-      REUSABLE_WORKER_MESSAGE.pointY = (contact.bi.position.y) + (contact.ri.y);
-      REUSABLE_WORKER_MESSAGE.pointZ = (contact.bi.position.z) + (contact.ri.z);
-      REUSABLE_WORKER_MESSAGE.forceX = collisionImpact;
-      post(REUSABLE_WORKER_MESSAGE);
+      var srcName = collisionEvent.body.roygbivName;
+      var destName = collisionEvent.target.roygbivName;
+      var srcID = idNameMap[srcName];
+      var destID = idNameMap[destName];
+      var pX = (contact.bi.position.x) + (contact.ri.x);
+      var pY = (contact.bi.position.y) + (contact.ri.y);
+      var pZ = (contact.bi.position.z) + (contact.ri.z);
+      var qX = collisionEvent.body.quaternion.x;
+      var qY = collisionEvent.body.quaternion.y;
+      var qZ = collisionEvent.body.quaternion.z;
+      var qW = collisionEvent.body.quaternion.w;
+      // safetyBit, objID, targetObjID, x, y, z, impact, qX, qY, qZ, qW
+      collisionNotificationArray[collisionNotificationArrayIndex++] = 1;
+      collisionNotificationArray[collisionNotificationArrayIndex++] = srcID;
+      collisionNotificationArray[collisionNotificationArrayIndex++] = destID;
+      collisionNotificationArray[collisionNotificationArrayIndex++] = pX;
+      collisionNotificationArray[collisionNotificationArrayIndex++] = pY;
+      collisionNotificationArray[collisionNotificationArrayIndex++] = pZ;
+      collisionNotificationArray[collisionNotificationArrayIndex++] = collisionImpact;
+      collisionNotificationArray[collisionNotificationArrayIndex++] = qX;
+      collisionNotificationArray[collisionNotificationArrayIndex++] = qY;
+      collisionNotificationArray[collisionNotificationArrayIndex++] = qZ;
+      collisionNotificationArray[collisionNotificationArrayIndex++] = qW;
     }
   );
 }

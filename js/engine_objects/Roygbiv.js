@@ -5445,10 +5445,15 @@ Roygbiv.prototype.setCollisionListener = function(sourceObject, callbackFunction
     return;
   }
   if ((sourceObject instanceof AddedObject) || (sourceObject instanceof ObjectGroup)){
-    collisionCallbackRequests[sourceObject.name] = callbackFunction;
+    if (TOTAL_OBJECT_COLLISION_LISTENER_COUNT >= MAX_OBJECT_COLLISION_LISTENER_COUNT){
+      throw new Error("setCollisionListener error: Cannot set collision listener for more than "+MAX_OBJECT_COLLISION_LISTENER_COUNT+" objects.");
+      return;
+    }
+    collisionCallbackRequests[sourceObject.name] = callbackFunction.bind(sourceObject);
     if (isPhysicsWorkerEnabled()){
       workerHandler.notifyPhysicsCollisionRequest(sourceObject);
     }
+    TOTAL_OBJECT_COLLISION_LISTENER_COUNT ++;
   }else if (sourceObject instanceof Particle){
     if (sourceObject.parent && sourceObject.parent.isStopped){
       throw new Error("setCollisionListener error: Particle system is stopped.");
@@ -5546,6 +5551,7 @@ Roygbiv.prototype.removeCollisionListener = function(sourceObject){
       if (isPhysicsWorkerEnabled()){
         workerHandler.notifyPhysicsCollisionRemoval(sourceObject);
       }
+      TOTAL_OBJECT_COLLISION_LISTENER_COUNT --;
     }else if (sourceObject instanceof Particle){
       delete particleCollisionCallbackRequests[sourceObject.uuid];
       TOTAL_PARTICLE_COLLISION_LISTEN_COUNT --;

@@ -784,6 +784,8 @@ var PIPE = "|";
 var mergedTextureCache = new Object();
 var lastFPS = 0;
 var reusableCollisionInfo = new CollisionInfo();
+var TOTAL_OBJECT_COLLISION_LISTENER_COUNT = 0;
+var MAX_OBJECT_COLLISION_LISTENER_COUNT = 50;
 
 // WORKER VARIABLES
 var WORKERS_SUPPORTED = (typeof(Worker) !== "undefined");

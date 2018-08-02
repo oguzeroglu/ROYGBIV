@@ -1,5 +1,6 @@
 var WorkerHandler = function(){
 
+  this.objectPhysicsIDMap = new Map();
   this.objectIDMAp = new Map();
   this.psIndexMap = new Map();
 
@@ -603,25 +604,47 @@ WorkerHandler.prototype.handleMassChangeIndexMessage = function(msg){
 }
 
 WorkerHandler.prototype.handlePhysicsCollisionMessage = function(msg){
-  var sourceName = msg.id;
-  var targetName = msg.forceY;
-  var collisionPositionX = msg.pointX;
-  var collisionPositionY = msg.pointY;
-  var collisionPositionZ = msg.pointZ;
-  var collisionImpact = msg.forceX;
-  var quaternionX = msg.qx;
-  var quaternionY = msg.qy;
-  var quaternionZ = msg.qz;
-  var quaternionW = msg.qw;
-  var curCollisionCallbackRequest = collisionCallbackRequests[sourceName];
-  if (curCollisionCallbackRequest){
-    var collisionInfo = new CollisionInfo(
-      targetName, collisionPositionX, collisionPositionY, collisionPositionZ,
-      collisionImpact, quaternionX, quaternionY, quaternionZ, quaternionW
-    );
-    var sourceObject = addedObjects[sourceName] || objectGroups[sourceName];
-    curCollisionCallbackRequest.bind(sourceObject)(collisionInfo);
+  var ary = msg.content;
+  var iterate = true;
+  var ci = 0;
+  while (iterate){
+    if (ary[ci] > 0){
+      var srcID = ary[ci+1];
+      var dstID = ary[ci+2];
+      var x = ary[ci+3];
+      var y = ary[ci+4];
+      var z = ary[ci+5];
+      var impact = ary[ci+6];
+      var qX = ary[ci+7];
+      var qY = ary[ci+8];
+      var qZ = ary[ci+9];
+      var qW = ary[ci+10];
+      var srcName = this.objectPhysicsIDMap.get(srcID);
+      var destName = this.objectPhysicsIDMap.get(dstID);
+      var curCollisionCallbackRequest = collisionCallbackRequests[srcName];
+      if (curCollisionCallbackRequest){
+          var collisionInfo = reusableCollisionInfo.set(destName, x, y, z, impact, qX, qY, qZ, qW);
+          curCollisionCallbackRequest(collisionInfo);
+      }
+      ary[ci] = 0;
+      ary[ci+1] = 0;
+      ary[ci+2] = 0;
+      ary[ci+3] = 0;
+      ary[ci+4] = 0;
+      ary[ci+5] = 0;
+      ary[ci+6] = 0;
+      ary[ci+7] = 0
+      ary[ci+8] = 0;
+      ary[ci+9] = 0;
+      ary[ci+10] = 0;
+    }else{
+      iterate = false;
+    }
+    ci += 11;
   }
+  this.postMessage(this.physicsWorker, this.reusableWorkerMessage.set(
+    this.constants.physicsCollisionHappened, ary
+  ));
 }
 
 WorkerHandler.prototype.handlePhysicsWorkerMessage = function(msg){
@@ -670,22 +693,40 @@ WorkerHandler.prototype.log = function(worker, msg){
 }
 
 WorkerHandler.prototype.initPhysicsWorker = function(){
-  var messages = [];
-  messages.push(new WorkerMessage("surfacePhysicalThickness", surfacePhysicalThickness));
-  messages.push(new WorkerMessage("physicsStepAmount", physicsStepAmount));
-  messages.push(new WorkerMessage("quatNormalizeSkip", quatNormalizeSkip));
-  messages.push(new WorkerMessage("quatNormalizeFast", quatNormalizeFast));
-  messages.push(new WorkerMessage("contactEquationStiffness", contactEquationStiffness));
-  messages.push(new WorkerMessage("contactEquationRelaxation", contactEquationRelaxation));
-  messages.push(new WorkerMessage("friction", friction));
-  messages.push(new WorkerMessage("iterations", physicsIterations));
-  messages.push(new WorkerMessage("tolerance", physicsTolerance));
-  messages.push(new WorkerMessage("gravityY", gravityY));
-
-  for (var i = 0; i<messages.length; i++){
-    this.postMessage(this.physicsWorker, messages[i]);
-  }
-
+  this.postMessage(
+    this.physicsWorker, this.reusableWorkerMessage.set("surfacePhysicalThickness", surfacePhysicalThickness)
+  );
+  this.postMessage(
+    this.physicsWorker, this.reusableWorkerMessage.set("physicsStepAmount", physicsStepAmount)
+  );
+  this.postMessage(
+    this.physicsWorker, this.reusableWorkerMessage.set("quatNormalizeSkip", quatNormalizeSkip)
+  );
+  this.postMessage(
+    this.physicsWorker, this.reusableWorkerMessage.set("quatNormalizeFast", quatNormalizeFast)
+  );
+  this.postMessage(
+    this.physicsWorker, this.reusableWorkerMessage.set("contactEquationStiffness", contactEquationStiffness)
+  );
+  this.postMessage(
+    this.physicsWorker, this.reusableWorkerMessage.set("contactEquationRelaxation", contactEquationRelaxation)
+  );
+  this.postMessage(
+    this.physicsWorker, this.reusableWorkerMessage.set("friction", friction)
+  );
+  this.postMessage(
+    this.physicsWorker, this.reusableWorkerMessage.set("iterations", physicsIterations)
+  );
+  this.postMessage(
+    this.physicsWorker, this.reusableWorkerMessage.set("tolerance", physicsTolerance)
+  );
+  this.postMessage(
+    this.physicsWorker, this.reusableWorkerMessage.set("gravityY", gravityY)
+  );
+  this.postMessage(
+    this.physicsWorker,
+    this.reusableWorkerMessage.set("maxObjectCollisionListenerCount", MAX_OBJECT_COLLISION_LISTENER_COUNT)
+  );
 }
 
 WorkerHandler.prototype.startPhysicsWorkerIteration = function(){
@@ -723,6 +764,7 @@ WorkerHandler.prototype.startPhysicsWorkerIteration = function(){
         (addedObjectName+","+addedObjects[addedObjectName].physicsBody.id)
       )
     );
+    this.objectPhysicsIDMap.set(addedObjects[addedObjectName].physicsBody.id, addedObjectName);
   }
   for (var objectGroupName in objectGroups){
     var objectGroup = objectGroups[objectGroupName];
@@ -744,6 +786,7 @@ WorkerHandler.prototype.startPhysicsWorkerIteration = function(){
         (objectGroupName+","+objectGroup.physicsBody.id)
       )
     );
+    this.objectPhysicsIDMap.set(objectGroup.physicsBody.id, objectGroupName);
   }
   this.postMessage(this.physicsWorker, this.reusableWorkerMessage.set(
     this.constants.addedObjectsLength, this.addedObjectsLength
