@@ -116,7 +116,7 @@ ObjectGroup.prototype.glue = function(){
     );
     var curCollisionCallbackRequest = collisionCallbackRequests[this.name];
     if (curCollisionCallbackRequest){
-      curCollisionCallbackRequest.bind(collisionInfo);
+      curCollisionCallbackRequest(collisionInfo);
     }
   };
 
