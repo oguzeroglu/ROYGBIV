@@ -881,7 +881,7 @@ ParticleSystem.prototype.handleCollisions = function(fromWorker){
           }
         }
         if (intersectionPoint){
-          var collisionInfo = new CollisionInfo(
+          var collisionInfo = reusableCollisionInfo.set(
             objName, intersectionPoint.x, intersectionPoint.y, intersectionPoint.z,
             0, parent.previewGraphicsGroup.quaternion.x, parent.previewGraphicsGroup.quaternion.y,
             parent.previewGraphicsGroup.quaternion.z, parent.previewGraphicsGroup.quaternion.w,

@@ -783,6 +783,7 @@ var UNDEFINED = "undefined";
 var PIPE = "|";
 var mergedTextureCache = new Object();
 var lastFPS = 0;
+var reusableCollisionInfo = new CollisionInfo();
 
 // WORKER VARIABLES
 var WORKERS_SUPPORTED = (typeof(Worker) !== "undefined");

@@ -1,6 +1,5 @@
 var WorkerHandler = function(){
 
-  this.reusableCollisionInfo = new CollisionInfo();
   this.objectIDMAp = new Map();
   this.psIndexMap = new Map();
 
@@ -235,7 +234,7 @@ var WorkerHandler = function(){
               qZ = obj.previewGraphicsGroup.quaternion.z;
               qW = obj.previewGraphicsGroup.quaternion.w;
             }
-            var collisionInfo = workerHandlerContext.reusableCollisionInfo.set(
+            var collisionInfo = reusableCollisionInfo.set(
               objName, x, y, z, null, qX, qY, qZ, qW, REUSABLE_VECTOR.set(fnX, fnY, fnZ), psTime
             );
             var ps = workerHandlerContext.psIndexMap.get(psID);
