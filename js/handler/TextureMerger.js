@@ -296,7 +296,10 @@ var TextureMerger = function(texturesObj){
 
   //this.debugImages(imgSize);
 
-  //this.mergedTexture = new THREE.CanvasTexture(this.canvas);
+  if (this.canvas.width > MAX_TEXTURE_SIZE || this.canvas.height > MAX_TEXTURE_SIZE){
+    throw new Error("TextureMerger error: Max texture size exceeded. (4096x4096)");
+    return;
+  }
 
   this.mergedTexture = new THREE.CanvasTexture(this.canvas);
   this.mergedTexture.generateMipmaps = false;
@@ -312,7 +315,6 @@ var TextureMerger = function(texturesObj){
   }
 
   //console.log("[*] Textures merged: "+explanationStr);
-
 }
 
 TextureMerger.prototype.insert = function(node, textureName, texturesObj){
