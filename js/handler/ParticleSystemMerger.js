@@ -1,18 +1,21 @@
 var ParticleSystemMerger = function(psObj, name){
   this.name = name;
-  this.psObj = psObj;
+  this.psObj = new Object();
+  for (var psName in psObj){
+    this.psObj[psName] = psObj[psName];
+  }
   this.geometry = new THREE.BufferGeometry();
 
   this.activePSMap = new Map();
 
-  this.size = Object.keys(psObj).length;
+  this.size = Object.keys(this.psObj).length;
 
   var texturesObj = new Object();
   var textureCount = 0;
   var textureMergerHash = "";
   var len = 0;
-  for (var psName in psObj){
-    var ps = psObj[psName];
+  for (var psName in this.psObj){
+    var ps = this.psObj[psName];
     ps.psMerger = this;
     len += ps.particles.length;
     for (var textureName in ps.texturesObj){
@@ -59,8 +62,8 @@ var ParticleSystemMerger = function(psObj, name){
   var ctr = 0;
   var index = 0;
   var uvCounter = 0;
-  for (var psName in psObj){
-    var ps = psObj[psName];
+  for (var psName in this.psObj){
+    var ps = this.psObj[psName];
     mvMatrixArray.push(ps.mesh.modelViewMatrix);
     dissapearCoefArray.push(ps.material.uniforms.dissapearCoef.value);
     stopInfoArray.push(ps.material.uniforms.stopInfo.value);
@@ -207,30 +210,30 @@ ParticleSystemMerger.prototype.destroy = function(){
 
 ParticleSystemMerger.prototype.clean = function(){
   for (var psName in this.psObj){
-    delete this.psObj[psName].expiredFlags;
-    delete this.psObj[psName].flags2;
-    delete this.psObj[psName].positions;
-    delete this.psObj[psName].rgbThresholds;
-    delete this.psObj[psName].velocities;
-    delete this.psObj[psName].accelerations;
-    delete this.psObj[psName].flags1;
-    delete this.psObj[psName].flags3;
-    delete this.psObj[psName].flags4;
-    delete this.psObj[psName].targetColors;
-    delete this.psObj[psName].angularQuaternions;
-    delete this.psObj[psName].uvCoordinates;
-    delete this.psObj[psName].positionBufferAttribute;
-    delete this.psObj[psName].rgbThresholdBufferAttribute;
-    delete this.psObj[psName].expiredFlagBufferAttribute;
-    delete this.psObj[psName].velocityBufferAttribute;
-    delete this.psObj[psName].accelerationBufferAttribute;
-    delete this.psObj[psName].targetColorBufferAttribute;
-    delete this.psObj[psName].flags1BufferAttribute;
-    delete this.psObj[psName].flags2BufferAttribute;
-    delete this.psObj[psName].flags3BufferAttribute;
-    delete this.psObj[psName].flags4BufferAttribute;
-    delete this.psObj[psName].angularQuaternionsBufferAttribute;
-    delete this.psObj[psName].uvCoordinatesBufferAttribute;
+    this.psObj[psName].expiredFlags = null;
+    this.psObj[psName].flags2 = null;
+    this.psObj[psName].positions = null;
+    this.psObj[psName].rgbThresholds = null;
+    this.psObj[psName].velocities = null;
+    this.psObj[psName].accelerations = null;
+    this.psObj[psName].flags1 = null;
+    this.psObj[psName].flags3 = null;
+    this.psObj[psName].flags4 = null;
+    this.psObj[psName].targetColors = null;
+    this.psObj[psName].angularQuaternions = null;
+    this.psObj[psName].uvCoordinates = null;
+    this.psObj[psName].positionBufferAttribute = null;
+    this.psObj[psName].rgbThresholdBufferAttribute = null;
+    this.psObj[psName].expiredFlagBufferAttribute = null;
+    this.psObj[psName].velocityBufferAttribute = null;
+    this.psObj[psName].accelerationBufferAttribute = null;
+    this.psObj[psName].targetColorBufferAttribute = null;
+    this.psObj[psName].flags1BufferAttribute = null;
+    this.psObj[psName].flags2BufferAttribute = null;
+    this.psObj[psName].flags3BufferAttribute = null;
+    this.psObj[psName].flags4BufferAttribute = null;
+    this.psObj[psName].angularQuaternionsBufferAttribute = null;
+    this.psObj[psName].uvCoordinatesBufferAttribute = null;
     this.psObj[psName].mesh.geometry.dispose();
     this.psObj[psName].mesh.material.dispose();
   }

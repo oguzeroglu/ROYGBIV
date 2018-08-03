@@ -101,7 +101,8 @@ var Roygbiv = function(){
     "copyParticleSystem",
     "setVector",
     "quaternion",
-    "fadeAway"
+    "fadeAway",
+    "mergeParticleSystems"
   ];
 
   this.globals = new Object();
@@ -5419,6 +5420,41 @@ Roygbiv.prototype.fadeAway = function(particleSystem, coefficient){
     particleSystem.material.uniforms.dissapearCoef.value = coefficient;
   }else{
     particleSystem.psMerger.material.uniforms.dissapearCoefArray.value[particleSystem.mergedIndex] = coefficient;
+  }
+}
+
+// mergeParticleSystems
+// Merges all created particle systems to improve render performance.
+Roygbiv.prototype.mergeParticleSystems = function(){
+  if (mode == 0){
+    return;
+  }
+  if (!MAX_VERTEX_UNIFORM_VECTORS){
+    throw new Error("mergeParticleSystems error: MAX_VERTEX_UNIFORM_VECTORS is not calcualted.");
+    return;
+  }
+  if (Object.keys(particleSystemPool).length < 2){
+    throw new Error("mergeParticleSystems error: Mininmum 2 particle systems must be created in order to merge.");
+    return;
+  }
+  var diff = parseInt(4096 / MAX_VERTEX_UNIFORM_VECTORS);
+  var chunkSize = parseInt(MAX_PS_COMPRESS_AMOUNT_4096 / diff);
+  var mergeObj = new Object();
+  var size = 0;
+  for (var psName in particleSystemPool){
+    var ps = particleSystemPool[psName];
+    mergeObj[psName] = ps;
+    size ++;
+    if (size == chunkSize){
+      new ParticleSystemMerger(mergeObj, TOTAL_MERGED_COUNT);
+      TOTAL_MERGED_COUNT ++;
+      mergeObj = new Object();
+      size = 0;
+    }
+  }
+  if (size > 1){
+    new ParticleSystemMerger(mergeObj, TOTAL_MERGED_COUNT);
+    TOTAL_MERGED_COUNT ++;
   }
 }
 

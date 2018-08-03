@@ -722,4 +722,5 @@ var Text = function(){
    this.ROYGBIV_SCRIPTING_API_SETVECTOR = "Set the x, y, z components of a vector.";
    this.ROYGBIV_SCRIPTING_API_QUATERNION = "Returns a new THREE.Quaternion instance.";
    this.ROYGBIV_SCRIPTING_API_FADEAWAY = "Makes the particles of given particle system smaller on each frame. Greater the coefficient, faster the particles fade away.\nThis can be used for smoke like particle systems to make them dissapear smoothly.";
+   this.ROYGBIV_SCRIPTING_API_MERGEPARTICLESYSTEMS = "Merges all created particle systems to improve render performance.";
 }
