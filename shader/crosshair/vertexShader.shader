@@ -4,8 +4,6 @@ precision lowp int;
 attribute vec4 color;
 attribute float size;
 
-uniform mat4 viewMatrix;
-
 varying vec4 vColor;
 
 void main(){

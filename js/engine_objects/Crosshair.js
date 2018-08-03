@@ -34,14 +34,14 @@ var Crosshair = function(configurations){
     transparent: true,
     side: THREE.DoubleSide,
     uniforms: {
-      viewMatrix: new THREE.Uniform(new THREE.Matrix4()),
-      time: 0.0
+      time: 0.0,
+      texture: new THREE.Uniform(texture)
     }
   });
   this.mesh = new THREE.Points(this.geometry, this.material);
   this.mesh.position.set(0, 0, 0);
   this.mesh.frustumCulled = false;
-  //this.mesh.visible = false;
+  this.mesh.visible = false;
 
   previewScene.add(this.mesh);
 }
