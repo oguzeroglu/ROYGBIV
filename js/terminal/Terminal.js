@@ -32,7 +32,7 @@ Terminal.prototype.init = function(){
 }
 
 Terminal.prototype.setStyle = function(){
-	cliInnerDiv.style.overflow = "scroll";
+	cliInnerDiv.style.overflow = "auto";
 	cliInnerDiv.style.maxHeight = "500px";
 
 }
