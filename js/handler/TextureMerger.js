@@ -297,7 +297,7 @@ var TextureMerger = function(texturesObj){
   //this.debugImages(imgSize);
 
   if (this.canvas.width > MAX_TEXTURE_SIZE || this.canvas.height > MAX_TEXTURE_SIZE){
-    throw new Error("TextureMerger error: Max texture size exceeded. (4096x4096)");
+    throw new Error("TextureMerger error: Max texture size exceeded. ("+MAX_TEXTURE_SIZE+"x"+MAX_TEXTURE_SIZE+")");
     return;
   }
 
