@@ -631,6 +631,10 @@ ParticleSystem.prototype.update = function(){
 
   this.tick += (1/60);
 
+  if (this.tick > MAX_PS_TIME){
+    this.tick = 0;
+  }
+
   if (!this.psMerger){
     this.material.uniforms.time.value = this.tick;
     this.material.uniforms.modelViewMatrix.value = this.mesh.modelViewMatrix;
