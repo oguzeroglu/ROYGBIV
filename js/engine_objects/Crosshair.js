@@ -1,16 +1,5 @@
 var Crosshair = function(configurations){
 
-  // TEST CONFIGURATIONS
-  configurations = {
-    name: "ch1",
-    texture: null,
-    colorR: 1,
-    colorG: 0,
-    colorB: 0,
-    alpha: 1,
-    size: 20
-  };
-
   var name = configurations.name;
   var texture = configurations.texture;
   var colorR = configurations.colorR;
