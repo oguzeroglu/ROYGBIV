@@ -5,6 +5,7 @@ var Crosshair = function(configurations){
   var colorB = configurations.colorB;
   var colorG = configurations.colorG;
   var alpha = configurations.alpha;
+  var size = configurations.size;
 
   this.colors = new Float32Array(4);
   this.colors[0] = colorR;

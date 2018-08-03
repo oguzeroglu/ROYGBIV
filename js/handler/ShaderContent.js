@@ -19,12 +19,12 @@ ShaderContent.prototype.load = function(){
   var crossHairVertexShaderRequest = new XMLHttpRequest();
   var crossHairFragmentShaderRequest = new XMLHttpRequest();
 
-  particleVertexShaderRequest.open('GET', "/js/shader/particle/vertexShader.shader");
-  particleFragmentShaderRequest.open('GET', "/js/shader/particle/fragmentShader.shader");
-  objectTrailVertexShaderRequest.open('GET', "/js/shader/object_trail/vertexShader.shader");
-  objectTrailFragmentShaderRequest.open('GET', "/js/shader/object_trail/fragmentShader.shader");
-  crossHairVertexShaderRequest.open('GET', "/js/shader/crosshair/vertexShader.shader");
-  crossHairFragmentShaderRequest.open('GET', "/js/shader/crosshair/fragmentShader.shader");
+  particleVertexShaderRequest.open('GET', "/shader/particle/vertexShader.shader");
+  particleFragmentShaderRequest.open('GET', "/shader/particle/fragmentShader.shader");
+  objectTrailVertexShaderRequest.open('GET', "/shader/object_trail/vertexShader.shader");
+  objectTrailFragmentShaderRequest.open('GET', "/shader/object_trail/fragmentShader.shader");
+  crossHairVertexShaderRequest.open('GET', "/shader/crosshair/vertexShader.shader");
+  crossHairFragmentShaderRequest.open('GET', "/shader/crosshair/fragmentShader.shader");
 
   var that = this;
   particleVertexShaderRequest.addEventListener("load", function(){
