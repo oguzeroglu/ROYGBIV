@@ -8,16 +8,22 @@ var Crosshair = function(configurations){
   var size = configurations.size;
 
   this.colors = new Float32Array(4);
+  this.size = new Float32Array(1);
   this.colors[0] = colorR;
   this.colors[1] = colorG;
   this.colors[2] = colorB;
   this.colors[3] = alpha;
+  this.size[0] = size;
+
 
   this.colorsBufferAttribute = new THREE.BufferAttribute(this.colors, 4);
+  this.sizeBufferAttribute = new THREE.BufferAttribute(this.size, 1);
   this.colorsBufferAttribute.setDynamic(false);
+  this.sizeBufferAttributes.setDynamic(false);
 
   this.geometry = new THREE.BufferGeometry();
   this.geometry.addAttribute("color", this.colorsBufferAttribute);
+  this.geometry.addAttribute("size", this.sizeBufferAttribute);
 
   this.material = new THREE.RawShaderMaterial({
     vertexShader: ShaderContent.crossHairVertexShader,
