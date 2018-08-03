@@ -320,7 +320,7 @@ window.onload = function() {
   windowLoaded = true;
   previewScene.fog = new THREE.Fog("black", FOG_OFF_NEAR, FOG_OFF_FAR);
   undoRedoHandler.push();
-
+  MAX_VERTEX_UNIFORM_VECTORS = renderer.context.getParameter(renderer.context.MAX_VERTEX_UNIFORM_VECTORS);
 };
 
 window.addEventListener("mousedown", function(e){
