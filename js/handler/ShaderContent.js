@@ -4,6 +4,8 @@ var ShaderContent = function(){
     this.particleFragmentShader = 0;
     this.objectTrailVertexShader = 0;
     this.objectTrailFragmentShader = 0;
+    this.crossHairVertexShader = 0;
+    this.crossHairFragmentShader = 0;
 
     this.load();
 
@@ -14,11 +16,15 @@ ShaderContent.prototype.load = function(){
   var particleFragmentShaderRequest = new XMLHttpRequest();
   var objectTrailVertexShaderRequest = new XMLHttpRequest();
   var objectTrailFragmentShaderRequest = new XMLHttpRequest();
+  var crossHairVertexShaderRequest = new XMLHttpRequest();
+  var crossHairFragmentShaderRequest = new XMLHttpRequest();
 
   particleVertexShaderRequest.open('GET', "/js/shader/particle/vertexShader.shader");
   particleFragmentShaderRequest.open('GET', "/js/shader/particle/fragmentShader.shader");
   objectTrailVertexShaderRequest.open('GET', "/js/shader/object_trail/vertexShader.shader");
   objectTrailFragmentShaderRequest.open('GET', "/js/shader/object_trail/fragmentShader.shader");
+  crossHairVertexShaderRequest.open('GET', "/js/shader/crosshair/vertexShader.shader");
+  crossHairFragmentShaderRequest.open('GET', "/js/shader/crosshair/fragmentShader.shader");
 
   var that = this;
   particleVertexShaderRequest.addEventListener("load", function(){
@@ -37,9 +43,20 @@ ShaderContent.prototype.load = function(){
     that.objectTrailFragmentShader = objectTrailFragmentShaderRequest.responseText;
     console.log("[*] Object trail fragment shader loaded.");
   });
+  crossHairVertexShaderRequest.addEventListener("load", function(){
+    that.crossHairVertexShader = crossHairVertexShaderRequest.responseText;
+    console.log("[*] Crosshair vertex shader loaded.");
+  });
+
+  crossHairFragmentShaderRequest.addEventListener("load", function(){
+    that.crossHairFragmentShader = crossHairFragmentShaderRequest.responseText;
+    console.log("[*] Crosshair fragment shader loaded.");
+  });
 
   particleVertexShaderRequest.send();
   particleFragmentShaderRequest.send();
   objectTrailVertexShaderRequest.send();
   objectTrailFragmentShaderRequest.send();
+  crossHairVertexShaderRequest.send();
+  crossHairFragmentShaderRequest.send();
 }
