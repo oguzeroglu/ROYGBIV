@@ -8,6 +8,7 @@ var Crosshair = function(configurations){
   var alpha = configurations.alpha;
   var size = configurations.size;
 
+  this.texture = texture;
   this.name = name;
 
   this.size = new Float32Array(1);
@@ -28,9 +29,9 @@ var Crosshair = function(configurations){
     transparent: true,
     side: THREE.DoubleSide,
     uniforms: {
-      time: 0.0,
       texture: new THREE.Uniform(texture),
-      color: new THREE.Uniform(new THREE.Vector4(colorR, colorG, colorB, alpha))
+      color: new THREE.Uniform(new THREE.Vector4(colorR, colorG, colorB, alpha)),
+      uvTransform: new THREE.Uniform(new THREE.Matrix3())
     }
   });
   this.mesh = new THREE.Points(this.geometry, this.material);
@@ -42,6 +43,21 @@ var Crosshair = function(configurations){
 
   crosshairs[this.name] = this;
 
+  this.texture.center.set(0.5, 0.5);
+  this.angularSpeed = 0;
+  this.rotationTime = 0;
+}
+
+Crosshair.prototype.update = function(){
+  this.rotationTime += (1/60);
+  if (this.rotationTime > MAX_PS_TIME){
+    this.rotationTime = 0;
+  }
+  if(this.angularSpeed != 0){
+    this.texture.rotation = (this.rotationTime * this.angularSpeed);
+    this.texture.updateMatrix();
+    this.material.uniforms.uvTransform.value.copy(this.texture.matrix);
+  }
 }
 
 Crosshair.prototype.destroy = function(){

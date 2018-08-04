@@ -258,6 +258,9 @@ var Text = function(){
   this.CENTERX_MUST_BE_A_NUMBER = "CenterX must be a number.";
   this.CENTERY_MUST_BE_A_NUMBER = "CenterY must be a number.";
   this.CENTERZ_MUST_BE_A_NUMBER = "CenterZ must be a number.";
+  this.PADDING_MUST_BE_A_NUMBER = "padding must be a number.";
+  this.PADDING_MUST_BE_POSITIVE = "padding must be greater than zero."
+  this.PADDING_ADDED_TO_TEXTURE = "Padding added to texture.";
   this.AXIS_MUST_BE_ONE_OF_XY_YZ_XZ = "Axis must be one of XZ, XY or YZ.";
   this.CLICKED_ON = "Clicked on: @@1";
   this.NO_OBJECT_SELECTED_FOR_TEXTURE_ADJUSTMENT = "No object selected for texture adjustment.";
@@ -732,4 +735,5 @@ var Text = function(){
    this.ROYGBIV_SCRIPTING_API_SELECTCROSSHAIR = "Selects a crosshair. Only the selected crosshair is visible on the screen.";
    this.ROYGBIV_SCRIPTING_API_CHANGECROSSHAIRCOLOR = "Changes the color of the selected crosshair.";
    this.ROYGBIV_SCRIPTING_API_HIDECROSSHAIR = "Destroys the selected crosshair. selectCrosshair function should be used after this function\nin order to put a crosshair on the screen.";
+   this.ROYGBIV_SCRIPTING_API_STARTCROSSHAIRROTATION = "Starts rotation effect of the selected crosshair.";
 }

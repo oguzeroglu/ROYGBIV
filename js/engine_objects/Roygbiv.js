@@ -107,7 +107,8 @@ var Roygbiv = function(){
     "createCrosshair",
     "selectCrosshair",
     "changeCrosshairColor",
-    "hideCrosshair"
+    "hideCrosshair",
+    "startCrosshairRotation"
   ];
 
   this.globals = new Object();
@@ -5593,6 +5594,28 @@ Roygbiv.prototype.hideCrosshair = function(){
     selectedCrosshair.mesh.visible = false;
     selectedCrosshair = 0;
   }
+}
+
+// startCrosshairRotation
+// Starts rotation effect of the selected crosshair.
+Roygbiv.prototype.startCrosshairRotation = function(angularSpeed){
+  if (mode == 0){
+    return;
+  }
+  if (!selectedCrosshair){
+    throw new Error("startCrosshairRotation error: No selected crosshair.");
+    return;
+  }
+  if (typeof angularSpeed == UNDEFINED){
+    throw new Error("startCrosshairRotation error: angularSpeed is not defined.");
+    return;
+  }
+  if (isNaN(angularSpeed)){
+    throw new Error("startCrosshairRotation error: angularSpeed is not a number.");
+    return;
+  }
+  selectedCrosshair.rotationTime = 0;
+  selectedCrosshair.angularSpeed = angularSpeed;
 }
 
 // LISTENER FUNCTIONS **********************************************************

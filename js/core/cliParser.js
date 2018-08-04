@@ -3779,7 +3779,8 @@ function parse(input){
           resizedTexture.fromUploadedImage = texture.fromUploadedImage;
           textures[newTextureName] = resizedTexture;
           textureCache[newTextureName] = resizedTexture.clone();
-          textureURLs[newTextureName] = textureURLs[textureName]
+          textureURLs[newTextureName] = textureURLs[textureName];
+          modifiedTextures[newTextureName] = resizedTexture.image.toDataURL();
           terminal.printInfo(Text.TEXTURE_RESCALED);
           undoRedoHandler.push();
           return true;
@@ -4107,7 +4108,7 @@ function parse(input){
           undoRedoHandler.push();
           return true;
         break;
-        case 118:
+        case 118: //printParticleCollisionWorkerMode
           var modeText = "";
           if (COLLISION_WORKER_ENABLED){
             modeText = Text.ENABLED;
@@ -4119,7 +4120,7 @@ function parse(input){
           ));
           return true;
         break;
-        case 119:
+        case 119: //particleSystemCollisionWorkerMode
           if (mode != 0){
             terminal.printError(Text.WORKS_ONLY_IN_DESIGN_MODE);
             return true;
@@ -4153,7 +4154,7 @@ function parse(input){
           undoRedoHandler.push();
           return true;
         break;
-        case 120:
+        case 120: //printParticleSystemCollisionWorkerMode
           var modeText = "";
           if (PS_COLLISION_WORKER_ENABLED){
             modeText = Text.ENABLED;
@@ -4163,7 +4164,7 @@ function parse(input){
           terminal.printInfo(Text.PARTICLE_SYSTEM_COLLISION_WORKER_MODE.replace(Text.PARAM1, modeText));
           return true;
         break;
-        case 121:
+        case 121: //logFrameDrops
           if (mode == 0){
             terminal.printError(Text.WORKS_ONLY_IN_PREVIEW_MODE);
             return true;
@@ -4177,6 +4178,54 @@ function parse(input){
           FRAME_DROP_COUNT = 0;
           terminal.printInfo(Text.FRAME_DROP_STARTED);
           console.log("[*] Frame rates are being recorded. Results will be printed after a minute.");
+          return true;
+        break;
+        case 122: //addPaddingToTexture
+          if (mode != 0){
+            terminal.printError(Text.WORKS_ONLY_IN_DESIGN_MODE);
+            return true;
+          }
+          var textureName = splitted[1];
+          var padding = parseFloat(splitted[2]);
+          var newTextureName = splitted[3];
+          var srcTexture = textures[textureName];
+          if (!srcTexture){
+            terminal.printError(Text.NO_SUCH_TEXTURE);
+            return true;
+          }
+          if (textures[newTextureName]){
+            terminal.printError(Text.TEXTURE_NAME_MUST_BE_UNIQUE);
+            return true;
+          }
+          if (isNaN(padding)){
+            terminal.printError(Text.PADDING_MUST_BE_A_NUMBER);
+            return true;
+          }
+          if (padding <= 0){
+            terminal.printError(Text.PADDING_MUST_BE_POSITIVE);
+            return true;
+          }
+          var srcWidth = srcTexture.image.width;
+          var srcHeight = srcTexture.image.height;
+          var newWidth = srcWidth + (2 * padding);
+          var newHeight = srcHeight + (2 * padding);
+          var tmpCanvas = document.createElement("canvas");
+          tmpCanvas.width = newWidth;
+          tmpCanvas.height = newHeight;
+          tmpCanvas.getContext("2d").drawImage(
+            srcTexture.image, 0, 0, srcWidth, srcHeight, padding, padding, srcWidth, srcHeight
+          );
+          var newTexture = new THREE.CanvasTexture(tmpCanvas);
+          newTexture.isLoaded = srcTexture.isLoaded;
+          newTexture.fromUploadedImage = srcTexture.fromUploadedImage;
+          textures[newTextureName] = newTexture;
+          textureCache[newTextureName] = newTexture.clone();
+          textureURLs[newTextureName] = textureURLs[textureName];
+          newTexture.paddingInfo = padding+","+srcWidth+","+srcHeight;
+          newTexture.hasPadding = true;
+          modifiedTextures[newTextureName] = tmpCanvas.toDataURL();
+          terminal.printInfo(Text.PADDING_ADDED_TO_TEXTURE);
+          undoRedoHandler.push();
           return true;
         break;
       }

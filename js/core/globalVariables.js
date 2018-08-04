@@ -127,7 +127,8 @@ var commandArgumentsExpectedCount = [
     0, //printParticleCollisionWorkerMode
     1, //particleSystemCollisionWorkerMode
     0, //printParticleSystemCollisionWorkerMode
-    0 //logFrameDrops
+    0, //logFrameDrops
+    3 // addPaddingToTexture
 ];
 var commandArgumentsExpectedExplanation = [
   "help", //help
@@ -241,17 +242,18 @@ var commandArgumentsExpectedExplanation = [
   "rescaleTexturePack texturePackName scale newTexturePackName", //rescaleTexturePack
   "destroyImage imageName", //destroyImage
   "setBlending objectName mode", //setBlending
-  "about",
+  "about", //about
   "resetKeyboardBuffer", //resetKeyboardBuffer
   "setWorldLimits minX minY minZ maxX maxY maxZ", //setWorldLimits
   "setBinSize size", //setBinSize
   "printWorldLimits", //printWorldLimits
   "printBinSize", //printBinSize
-  "particleCollisionWorkerMode on/off",
-  "printParticleCollisionWorkerMode",
-  "particleSystemCollisionWorkerMode on/off",
-  "printParticleSystemCollisionWorkerMode",
-  "logFrameDrops"
+  "particleCollisionWorkerMode on/off", //particleCollisionWorkerMode
+  "printParticleCollisionWorkerMode", //printParticleCollisionWorkerMode
+  "particleSystemCollisionWorkerMode on/off", //particleSystemCollisionWorkerMode
+  "printParticleSystemCollisionWorkerMode", //printParticleSystemCollisionWorkerMode
+  "logFrameDrops", //logFrameDrops
+  "addPaddingToTexture textureName padding newTextureName" // addPaddingToTexture
 ];
 var commands = [
   "help",
@@ -375,7 +377,8 @@ var commands = [
   "printParticleCollisionWorkerMode",
   "particleSystemCollisionWorkerMode",
   "printParticleSystemCollisionWorkerMode",
-  "logFrameDrops"
+  "logFrameDrops",
+  "addPaddingToTexture"
 ];
 var commandInfo = [
   "help: Prints command list.",
@@ -499,7 +502,8 @@ var commandInfo = [
   "printParticleCollisionWorkerMode: Prints if the particle collision web worker is enabled or not.",
   "particleSystemCollisionWorkerMode: Enables or disables the usage of web workers for particle system collision detection.",
   "printParticleSystemCollisionWorkerMode: Prints if the particle system collision web worker is enabled or not.",
-  "logFrameDrops: Records frame drops for a minute and prints exactly how many frames are missed within a minute to Javascript console."
+  "logFrameDrops: Records frame drops for a minute and prints exactly how many frames are missed within a minute to Javascript console.",
+  "addPaddingToTexture: Adds padding to a texture. This can be useful for crosshair rotations to prevent visual errors."
 ];
 var keyboardInfo = [
   "W/S : Translates the camera along Z axis.",
@@ -641,6 +645,7 @@ var textureURLs = new Object();
 var physicsTests = new Object();
 var wallCollections = new Object();
 var uploadedImages = new Object();
+var modifiedTextures = new Object();
 var lights = new Object();
 var light_previewScene = new Object();
 var pointLightRepresentations = new Object();

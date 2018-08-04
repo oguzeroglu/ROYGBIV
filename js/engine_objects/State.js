@@ -54,16 +54,21 @@ var State = function(){
     uploadedImageSizes[uploadedImageName] = size;
   }
   this.uploadedImageSizes = uploadedImageSizes;
-  // TEXTURE SIZES *************************************************
+  // TEXTURE SIZES AND PADDING *************************************
   var textureSizes = new Object();
+  var texturePaddings = new Object();
   for (var textureName in textures){
     if (textures[textureName].image){
       textureSizes[textureName] = new Object();
       textureSizes[textureName].width = textures[textureName].image.width;
       textureSizes[textureName].height = textures[textureName].image.height;
+      if (textures[textureName].hasPadding){
+        texturePaddings[textureName] = textures[textureName].paddingInfo;
+      }
     }
   }
   this.textureSizes = textureSizes;
+  this.texturePaddings = texturePaddings;
   // TEXTURES ******************************************************
   this.textures = JSON.parse(JSON.stringify(textures));
   // TEXTURE URLS **************************************************
@@ -80,6 +85,12 @@ var State = function(){
     uploadedImagesExport[imageName] = uploadedImages[imageName].src;
   }
   this.uploadedImages = uploadedImagesExport;
+  // MODIFIED TEXTURES *********************************************
+  var modifiedTexturesExport = new Object();
+  for (var textureName in modifiedTextures){
+    modifiedTexturesExport[textureName] = modifiedTextures[textureName];
+  }
+  this.modifiedTextures = modifiedTexturesExport;
   // LIGHTS ********************************************************
   var lightsExport = new Object();
   for (var lightName in lights){

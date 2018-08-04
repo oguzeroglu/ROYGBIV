@@ -18,6 +18,7 @@ function render(){
     }
     updateParticleSystems();
     updateObjectTrails();
+    updateCrosshair();
     shaderTime += 0.1;
     if (shaderTime > 10){
       shaderTime = 0;
@@ -46,6 +47,12 @@ function render(){
     previewSceneRendered = true;
   }
   frameCounter ++;
+}
+
+function updateCrosshair(){
+  if (selectedCrosshair && selectedCrosshair.angularSpeed != 0){
+    selectedCrosshair.update();
+  }
 }
 
 function handleWorkerMessages(){

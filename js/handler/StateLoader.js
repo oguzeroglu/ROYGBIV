@@ -2284,7 +2284,22 @@ StateLoader.prototype.load = function(undo){
       var repeatU = curTexture.repeat[0];
       var repeatV = curTexture.repeat[1];
       var textureURL = textureURLs[textureName];
-      if (uploadedImages[textureURL]){
+      if (obj.modifiedTextures[textureName]){
+        var img = new Image();
+        img.src = obj.modifiedTextures[textureName];
+        var texture = new THREE.Texture(img);
+        texture.repeat.set(repeatU, repeatV);
+        texture.offset.x = offsetX;
+        texture.offset.y = offsetY;
+        texture.isLoaded = true;
+        modifiedTextures[textureName] = obj.modifiedTextures[textureName];
+        var that = this;
+        texture.image.onload = function(){
+          textures[this.textureNameX] = this.textureX;
+          textureCache[this.textureNameX] = this.textureX.clone();
+          that.mapLoadedTexture(this.textureX, this.textureNameX);
+        }.bind({textureX: texture, textureNameX: textureName});
+      }else if (uploadedImages[textureURL]){
         var texture = new THREE.Texture(uploadedImages[textureURL]);
         texture.repeat.set(repeatU, repeatV);
         texture.offset.x = offsetX;
@@ -2333,6 +2348,7 @@ StateLoader.prototype.load = function(undo){
           function(textureData){
             var textureNameX = this.textureNameX;
             textures[textureNameX] = textureData;
+            var hasPadding = (obj.texturePaddings[textureNameX] !== undefined);
             if (obj.textureSizes && obj.textureSizes[textureNameX]){
               var size = obj.textureSizes[textureNameX];
               if (size.width != textureData.image.width || size.height != textureData.image.height){
@@ -3989,6 +4005,7 @@ StateLoader.prototype.resetProject = function(undo){
   physicsTests = new Object();
   wallCollections = new Object();
   uploadedImages = new Object();
+  modifiedTextures = new Object();
   lights = new Object();
   light_previewScene = new Object();
   pointLightRepresentations = new Object();

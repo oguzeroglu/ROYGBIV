@@ -529,6 +529,13 @@ var CommandDescriptor = function(){
   this.particleSystemCollisionWorkerMode.types = [];
   this.particleSystemCollisionWorkerMode.types.push(this.STATE_ON_OFF); // on/off
 
+  // addPaddingToTexture
+  this.addPaddingToTexture = new Object();
+  this.addPaddingToTexture.types = [];
+  this.addPaddingToTexture.types.push(this.TEXTURE_NAME); // textureName
+  this.addPaddingToTexture.types.push(this.UNKNOWN_INDICATOR); // padding
+  this.addPaddingToTexture.types.push(this.UNKNOWN_INDICATOR); // newTextureName
+
 };
 
 CommandDescriptor.prototype.test = function(){

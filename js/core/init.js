@@ -1625,3 +1625,13 @@ function printParticleSystemPerformances(){
     console.log(particleSystemName+": "+lastParticle.performance/1000+" secs.");
   }
 }
+
+// WARNING: FOR TEST PURPOSES - WORKS ONLY FOR CANVAS TEXTURES
+function debugTexture(textureName){
+  var texture = textures[textureName];
+  var context = texture.image.getContext("2d");
+  var newTab = window.open();
+  var img = new Image(texture.image.width, texture.image.height);
+  img.src = texture.image.toDataURL();
+  newTab.document.body.appendChild(img);
+}
