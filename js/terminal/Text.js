@@ -723,4 +723,13 @@ var Text = function(){
    this.ROYGBIV_SCRIPTING_API_QUATERNION = "Returns a new THREE.Quaternion instance.";
    this.ROYGBIV_SCRIPTING_API_FADEAWAY = "Makes the particles of given particle system smaller on each frame. Greater the coefficient, faster the particles fade away.\nThis can be used for smoke like particle systems to make them dissapear smoothly.";
    this.ROYGBIV_SCRIPTING_API_MERGEPARTICLESYSTEMS = "Merges all created particle systems to improve render performance.";
+   this.ROYGBIV_SCRIPTING_API_CREATECROSSHAIR = "Creates a new crosshair. Configurations are:\n"+
+                                                "name: The unique name of the crosshair. (mandatory)\n"+
+                                                "textureName: The texture name of the crosshair. (mandatory)\n"+
+                                                "colorName: The color name of the crosshair. (mandatory)\n"+
+                                                "alpha: The alpha value of the crosshair. (mandatory)\n"+
+                                                "size: The size of the crosshair. (mandatory)";
+   this.ROYGBIV_SCRIPTING_API_SELECTCROSSHAIR = "Selects a crosshair. Only the selected crosshair is visible on the screen.";
+   this.ROYGBIV_SCRIPTING_API_CHANGECROSSHAIRCOLOR = "Changes the color of the selected crosshair.";
+   this.ROYGBIV_SCRIPTING_API_HIDECROSSHAIR = "Destroys the selected crosshair. selectCrosshair function should be used after this function\nin order to put a crosshair on the screen.";
 }

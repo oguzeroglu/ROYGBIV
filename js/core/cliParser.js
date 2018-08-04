@@ -491,17 +491,25 @@ function parse(input){
               mergedParticleSystems[mergedParticleSystemName].destroy();
             }
 
+            for (var crosshairName in crosshairs){
+              crosshairs[crosshairName].destroy();
+            }
+
             for (var markedPointName in markedPoints){
               if (markedPoints[markedPointName].showAgainOnTheNextModeSwitch){
                 markedPoints[markedPointName].show();
                 markedPoints[markedPointName].showAgainOnTheNextModeSwitch = false;
               }
             }
+
             particleSystems = new Object();
             particleSystemPool = new Object();
             particleSystemPools = new Object();
             objectTrails = new Object();
             mergedParticleSystems = new Object();
+            crosshairs = new Object();
+            selectedCrosshair = 0;
+
             for (var objectName in objectGroups){
               var object = objectGroups[objectName];
               object.graphicsGroup.quaternion.copy(

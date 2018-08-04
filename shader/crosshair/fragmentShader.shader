@@ -2,9 +2,13 @@ precision lowp float;
 precision lowp int;
 
 uniform sampler2D texture;
-
-varying vec4 vColor;
+uniform vec4 color;
 
 void main(){
-  gl_FragColor = vColor * texture2D(texture, vec2(gl_PointCoord.x, 1.0 - gl_PointCoord.y));
+  vec4 textureColor = texture2D(texture, vec2(gl_PointCoord.x, 1.0 - gl_PointCoord.y));
+  if (textureColor.a < 0.5){
+    discard;
+  }else{
+    gl_FragColor = color * textureColor;
+  }
 }

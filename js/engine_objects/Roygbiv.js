@@ -9,6 +9,7 @@
 //  * Utility functions
 //  * Listener functions
 //  * Particle system functions
+//  * Crosshair functions
 var Roygbiv = function(){
   this.functionNames = [
     "getObject",
@@ -102,7 +103,11 @@ var Roygbiv = function(){
     "setVector",
     "quaternion",
     "fadeAway",
-    "mergeParticleSystems"
+    "mergeParticleSystems",
+    "createCrosshair",
+    "selectCrosshair",
+    "changeCrosshairColor",
+    "hideCrosshair"
   ];
 
   this.globals = new Object();
@@ -5455,6 +5460,138 @@ Roygbiv.prototype.mergeParticleSystems = function(){
   if (size > 1){
     new ParticleSystemMerger(mergeObj, TOTAL_MERGED_COUNT);
     TOTAL_MERGED_COUNT ++;
+  }
+}
+
+// CROSSHAIR FUNCTIONS *********************************************************
+
+// createCrosshair
+// Creates a new crosshair. Configurations are:
+// name: The unique name of the crosshair. (mandatory)
+// textureName: The texture name of the crosshair. (mandatory)
+// colorName: The color name of the crosshair. (mandatory)
+// alpha: The alpha value of the crosshair. (mandatory)
+// size: The size of the crosshair. (mandatory)
+Roygbiv.prototype.createCrosshair = function(configurations){
+  if (mode == 0){
+    return;
+  }
+  var name = configurations.name;
+  var textureName = configurations.textureName;
+  var colorName = configurations.colorName;
+  var alpha = configurations.alpha;
+  var size = configurations.size;
+
+  if (typeof name == UNDEFINED){
+    throw new Error("createCrosshair error: name is a mandatory configuration.");
+    return;
+  }
+  if (crosshairs[name]){
+    throw new Error("createCrosshair error: name must be unique.");
+    return;
+  }
+  if (typeof textureName == UNDEFINED){
+    throw new Error("createCrosshair error: textureName is a mandatory configuration.");
+    return;
+  }
+  var texture = textures[textureName];
+  if (typeof texture == UNDEFINED){
+    throw new Error("createCrosshair error: No such texture.");
+    return;
+  }
+  if (!(texture instanceof THREE.Texture)){
+    throw new Error("createCrosshair error: Texture not ready.");
+    return;
+  }
+  if (typeof alpha == UNDEFINED){
+    throw new Error("createCrosshair error: alpha is a mandatory configuration.");
+    return;
+  }
+  if (isNaN(alpha)){
+    throw new Error("createCrosshair error: Bad alpha parameter.");
+    return;
+  }
+  if (alpha < 0 || alpha > 1){
+    throw new Error("createCrosshair error: alpha must be between 0 and 1.");
+    return;
+  }
+  if (typeof size == UNDEFINED){
+    throw new Error("createCrosshair error: size is a mandatory configuration.");
+    return;
+  }
+  if (isNaN(size)){
+    throw new Error("createCrosshair error: Bad size parameter.");
+    return;
+  }
+  if (size <= 0){
+    throw new Error("createCrosshair error: size must be greater than zero.");
+    return;
+  }
+
+  var color = new THREE.Color(colorName);
+  new Crosshair({
+    name: name,
+    texture: texture,
+    colorR: color.r,
+    colorB: color.b,
+    colorG: color.g,
+    alpha: alpha,
+    size: size
+  });
+}
+
+// selectCrosshair
+// Selects a crosshair. Only the selected crosshair is visible on the screen.
+Roygbiv.prototype.selectCrosshair = function(crosshairName){
+  if (mode == 0){
+    return;
+  }
+  if (typeof crosshairName == UNDEFINED){
+    throw new Error("selectCrosshair error: crosshairName is not defined.");
+    return;
+  }
+  var crosshair = crosshairs[crosshairName];
+  if (!crosshair){
+    throw new Error("selectCrosshair error: No such crosshair.");
+    return;
+  }
+  if (selectedCrosshair){
+    selectedCrosshair.mesh.visible = false;
+  }
+  crosshair.mesh.visible = true;
+  selectedCrosshair = crosshair;
+}
+
+// changeCrosshairColor
+// Changes the color of the selected crosshair.
+Roygbiv.prototype.changeCrosshairColor = function(colorName){
+  if (mode == 0){
+    return;
+  }
+  if (typeof colorName == UNDEFINED){
+    throw new Error("changeCrosshairColor error: colorName is not defined.");
+    return;
+  }
+  if (!selectedCrosshair){
+    throw new Error("changeCrosshairColor error: No crosshair is selected.");
+    return;
+  }
+  REUSABLE_COLOR.set(colorName);
+  selectedCrosshair.material.uniforms.color.value.x = REUSABLE_COLOR.r;
+  selectedCrosshair.material.uniforms.color.value.y = REUSABLE_COLOR.g;
+  selectedCrosshair.material.uniforms.color.value.z = REUSABLE_COLOR.b;
+}
+
+// hideCrosshair
+// Destroys the selected crosshair. selectCrosshair function should be used after this function
+// in order to put a crosshair on the screen.
+Roygbiv.prototype.hideCrosshair = function(){
+  if (mode == 0){
+    return;
+  }
+  if (selectedCrosshair){
+    selectedCrosshair.mesh.visible = false;
+    selectedCrosshair = 0;
   }
 }
 

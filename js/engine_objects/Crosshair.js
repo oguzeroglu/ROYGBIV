@@ -8,22 +8,16 @@ var Crosshair = function(configurations){
   var alpha = configurations.alpha;
   var size = configurations.size;
 
-  this.colors = new Float32Array(4);
+  this.name = name;
+
   this.size = new Float32Array(1);
-  this.colors[0] = colorR;
-  this.colors[1] = colorG;
-  this.colors[2] = colorB;
-  this.colors[3] = alpha;
   this.size[0] = size;
 
 
-  this.colorsBufferAttribute = new THREE.BufferAttribute(this.colors, 4);
   this.sizeBufferAttribute = new THREE.BufferAttribute(this.size, 1);
-  this.colorsBufferAttribute.setDynamic(false);
   this.sizeBufferAttribute.setDynamic(false);
 
   this.geometry = new THREE.BufferGeometry();
-  this.geometry.addAttribute("color", this.colorsBufferAttribute);
   this.geometry.addAttribute("size", this.sizeBufferAttribute);
   this.geometry.setDrawRange(0, 1);
 
@@ -35,7 +29,8 @@ var Crosshair = function(configurations){
     side: THREE.DoubleSide,
     uniforms: {
       time: 0.0,
-      texture: new THREE.Uniform(texture)
+      texture: new THREE.Uniform(texture),
+      color: new THREE.Uniform(new THREE.Vector4(colorR, colorG, colorB, alpha))
     }
   });
   this.mesh = new THREE.Points(this.geometry, this.material);
@@ -44,8 +39,14 @@ var Crosshair = function(configurations){
   this.mesh.visible = false;
 
   previewScene.add(this.mesh);
+
+  crosshairs[this.name] = this;
+
 }
 
-Crosshair.prototype.update = function(){
-  this.material.uniforms.viewMatrix.value = camera.matrixWorldInverse;
+Crosshair.prototype.destroy = function(){
+  this.mesh.visible = false;
+  this.mesh.geometry.dispose();
+  this.mesh.material.dispose();
+  this.mesh = 0;
 }
