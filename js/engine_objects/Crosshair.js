@@ -60,6 +60,12 @@ Crosshair.prototype.update = function(){
   }
 }
 
+Crosshair.prototype.resetRotation = function(){
+  this.texture.rotation = 0;
+  this.texture.updateMatrix();
+  this.material.uniforms.uvTransform.value.copy(this.texture.matrix);
+}
+
 Crosshair.prototype.destroy = function(){
   this.mesh.visible = false;
   this.mesh.geometry.dispose();

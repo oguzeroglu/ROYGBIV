@@ -2288,6 +2288,7 @@ StateLoader.prototype.load = function(undo){
         var img = new Image();
         img.src = obj.modifiedTextures[textureName];
         var texture = new THREE.Texture(img);
+        texture.needsUpdate = true;
         texture.repeat.set(repeatU, repeatV);
         texture.offset.x = offsetX;
         texture.offset.y = offsetY;

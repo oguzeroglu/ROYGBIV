@@ -108,7 +108,9 @@ var Roygbiv = function(){
     "selectCrosshair",
     "changeCrosshairColor",
     "hideCrosshair",
-    "startCrosshairRotation"
+    "startCrosshairRotation",
+    "stopCrosshairRotation",
+    "pauseCrosshairRotation"
   ];
 
   this.globals = new Object();
@@ -5614,8 +5616,36 @@ Roygbiv.prototype.startCrosshairRotation = function(angularSpeed){
     throw new Error("startCrosshairRotation error: angularSpeed is not a number.");
     return;
   }
-  selectedCrosshair.rotationTime = 0;
   selectedCrosshair.angularSpeed = angularSpeed;
+}
+
+// stopCrosshairRotation
+// Stops rotation effect of the selected crosshair.
+Roygbiv.prototype.stopCrosshairRotation = function(){
+  if (mode == 0){
+    return;
+  }
+  if (!selectedCrosshair){
+    throw new Error("stopCrosshairRotation error: No selected crosshair.");
+    return;
+  }
+  selectedCrosshair.rotationTime = 0;
+  selectedCrosshair.angularSpeed = 0;
+  selectedCrosshair.resetRotation();
+}
+
+// pauseCrosshairRotation
+// Pauses rotation effect of the selected crosshair. startCrosshairRotation function
+// can be used to continue the rotation effect.
+Roygbiv.prototype.pauseCrosshairRotation = function(){
+  if (mode == 0){
+    return;
+  }
+  if (!selectedCrosshair){
+    throw new Error("pauseCrosshairRotation error: No selected crosshair.");
+    return;
+  }
+  selectedCrosshair.angularSpeed = 0;
 }
 
 // LISTENER FUNCTIONS **********************************************************

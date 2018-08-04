@@ -736,4 +736,6 @@ var Text = function(){
    this.ROYGBIV_SCRIPTING_API_CHANGECROSSHAIRCOLOR = "Changes the color of the selected crosshair.";
    this.ROYGBIV_SCRIPTING_API_HIDECROSSHAIR = "Destroys the selected crosshair. selectCrosshair function should be used after this function\nin order to put a crosshair on the screen.";
    this.ROYGBIV_SCRIPTING_API_STARTCROSSHAIRROTATION = "Starts rotation effect of the selected crosshair.";
+   this.ROYGBIV_SCRIPTING_API_STOPCROSSHAIRROTATION = "Stops rotation effect of the selected crosshair.";
+   this.ROYGBIV_SCRIPTING_API_PAUSECROSSHAIRROTATION = "Pauses rotation effect of the selected crosshair. startCrosshairRotation function can be used to continue the rotation effect.";
 }
