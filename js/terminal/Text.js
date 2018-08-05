@@ -54,6 +54,7 @@ var Text = function(){
   this.XTRANSLATION_MUST_BE_A_NUMBER = "xTranslation must be a number.";
   this.YTRANSLATION_MUST_BE_A_NUMBER = "yTranslation must be a number.";
   this.ZTRANSLATION_MUST_BE_A_NUMBER = "zTranslation must be a number.";
+  this.RADUIS_MUST_BE_A_NUMBER = "Radius must be a number.";
   this.SWITCHED_TO_PREVIEW_MODE = "Switched to preview mode.";
   this.SWITCHED_TO_DESIGN_MODE = "Switched to design mode.";
   this.NAME_RESERVED = "Name reserved.";

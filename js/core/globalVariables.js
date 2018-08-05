@@ -128,7 +128,8 @@ var commandArgumentsExpectedCount = [
     1, //particleSystemCollisionWorkerMode
     0, //printParticleSystemCollisionWorkerMode
     0, //logFrameDrops
-    3 // addPaddingToTexture
+    3, //addPaddingToTexture
+    3 //newSphere
 ];
 var commandArgumentsExpectedExplanation = [
   "help", //help
@@ -253,7 +254,8 @@ var commandArgumentsExpectedExplanation = [
   "particleSystemCollisionWorkerMode on/off", //particleSystemCollisionWorkerMode
   "printParticleSystemCollisionWorkerMode", //printParticleSystemCollisionWorkerMode
   "logFrameDrops", //logFrameDrops
-  "addPaddingToTexture textureName padding newTextureName" // addPaddingToTexture
+  "addPaddingToTexture textureName padding newTextureName", //addPaddingToTexture
+  "newSphere name material radius" //newSphere
 ];
 var commands = [
   "help",
@@ -378,7 +380,8 @@ var commands = [
   "particleSystemCollisionWorkerMode",
   "printParticleSystemCollisionWorkerMode",
   "logFrameDrops",
-  "addPaddingToTexture"
+  "addPaddingToTexture",
+  "newSphere"
 ];
 var commandInfo = [
   "help: Prints command list.",
@@ -503,7 +506,8 @@ var commandInfo = [
   "particleSystemCollisionWorkerMode: Enables or disables the usage of web workers for particle system collision detection.",
   "printParticleSystemCollisionWorkerMode: Prints if the particle system collision web worker is enabled or not.",
   "logFrameDrops: Records frame drops for a minute and prints exactly how many frames are missed within a minute to Javascript console.",
-  "addPaddingToTexture: Adds padding to a texture. This can be useful for crosshair rotations to prevent visual errors."
+  "addPaddingToTexture: Adds padding to a texture. This can be useful for crosshair rotations to prevent visual errors.",
+  "newSphere: Creates a new sphere."
 ];
 var keyboardInfo = [
   "W/S : Translates the camera along Z axis.",

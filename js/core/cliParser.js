@@ -4229,6 +4229,72 @@ function parse(input){
           undoRedoHandler.push();
           return true;
         break;
+        case 123: //newSphere
+          if (mode != 0){
+            terminal.printError(Text.WORKS_ONLY_IN_DESIGN_MODE);
+            return true;
+          }
+          var sphereName = splitted[1];
+          var materialName = splitted[2];
+          var radius = parseFloat(splitted[3]);
+
+          if (sphereName.indexOf(Text.COMMA) != -1){
+            terminal.printError(Text.INVALID_CHARACTER_IN_OBJECT_NAME);
+            return true;
+          }
+          if (sphereName.toUpperCase() == "NULL"){
+            sphereName = generateUniqueObjectName();
+          }
+          if (addedObjects[sphereName] || objectGroups[sphereName]){
+              terminal.printError(Text.NAME_MUST_BE_UNIQUE);
+              return true;
+          }
+          if (disabledObjectNames[sphereName]){
+            terminal.printError(Text.NAME_USED_IN_AN_OBJECT_GROUP);
+            return true;
+          }
+          var material = materials[materialName];
+          if (materialName.toUpperCase() != "NULL"){
+            if (!material){
+              terminal.printError(Text.NO_SUCH_MATERIAL);
+              return true;
+            }
+          }else{
+            if (defaultMaterialType == "BASIC"){
+              material = new THREE.MeshBasicMaterial({
+                color: "white",
+                side: THREE.DoubleSide,
+                wireframe: false
+              });
+              material.roygbivMaterialName = "NULL_BASIC";
+            }else if (defaultMaterialType == "PHONG"){
+              material = new THREE.MeshPhongMaterial({
+                color: "white",
+                side: THREE.DoubleSide,
+                wireframe: false
+              });
+              material.roygbivMaterialName = "NULL_PHONG";
+            }else if (defaultMaterialType == "LAMBERT"){
+              material = new THREE.MeshLambertMaterial({
+                color: "white",
+                side: THREE.DoubleSide,
+                wireframe: false
+              });
+              material.roygbivMaterialName = "NULL_LAMBERT";
+            }
+          }
+          if (isNaN(radius)){
+            terminal.printError(Text.RADIUS_MUST_BE_A_NUMBER);
+            return true;
+          }
+          if (radius <= 0){
+            terminal.printError(Text.MUST_BE_GREATER_THAN.replace(Text.PARAM1, "Radius").replace(
+              Text.PARAM2, "0"
+            ));
+          }
+
+          return true;
+        break;
       }
       return true;
     }catch(err){

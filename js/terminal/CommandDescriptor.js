@@ -536,6 +536,13 @@ var CommandDescriptor = function(){
   this.addPaddingToTexture.types.push(this.UNKNOWN_INDICATOR); // padding
   this.addPaddingToTexture.types.push(this.UNKNOWN_INDICATOR); // newTextureName
 
+  // newSphere
+  this.newSphere = new Object();
+  this.newSphere.types = [];
+  this.newSphere.types.push(this.UNKNOWN_INDICATOR); // name
+  this.newSphere.types.push(this.MATERIAL_NAME_WITH_NULL); // material
+  this.newSphere.types.push(this.UNKNOWN_INDICATOR); // radius
+
 };
 
 CommandDescriptor.prototype.test = function(){

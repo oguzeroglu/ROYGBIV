@@ -311,7 +311,6 @@ window.onload = function() {
   camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 10000 );
   camera.position.set(initialCameraX, initialCameraY, initialCameraZ);
   camera.rotation.order = 'YXZ';
-  camera.oldAspect = (window.innerWidth / window.innerHeight);
   camera.aspect = (window.innerWidth / window.innerHeight);
   renderer = new THREE.WebGLRenderer({ canvas: canvas});
   renderer.setSize( window.innerWidth, window.innerHeight );
