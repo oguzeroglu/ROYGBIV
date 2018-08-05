@@ -311,6 +311,8 @@ window.onload = function() {
   camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 10000 );
   camera.position.set(initialCameraX, initialCameraY, initialCameraZ);
   camera.rotation.order = 'YXZ';
+  camera.oldAspect = (window.innerWidth / window.innerHeight);
+  camera.aspect = (window.innerWidth / window.innerHeight);
   renderer = new THREE.WebGLRenderer({ canvas: canvas});
   renderer.setSize( window.innerWidth, window.innerHeight );
   initPhysics();
@@ -350,8 +352,10 @@ if (typeof InstallTrigger !== 'undefined') {
   window.addEventListener('wheel', mouseWheelEvent, false);
 }
 window.addEventListener('resize', function() {
-  if (renderer){
+  if (renderer && composer){
     renderer.setSize(window.innerWidth, window.innerHeight);
+    composer.setSize(window.innerWidth, window.innerHeight);
+    camera.oldAspect = camera.aspect;
     camera.aspect = window.innerWidth / window.innerHeight;
     camera.updateProjectionMatrix();
     console.log("[*] Renderer resized");
