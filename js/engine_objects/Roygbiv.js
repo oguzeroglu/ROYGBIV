@@ -110,7 +110,9 @@ var Roygbiv = function(){
     "hideCrosshair",
     "startCrosshairRotation",
     "stopCrosshairRotation",
-    "pauseCrosshairRotation"
+    "pauseCrosshairRotation",
+    "expandCrosshair",
+    "shrinkCrosshair"
   ];
 
   this.globals = new Object();
@@ -5646,6 +5648,80 @@ Roygbiv.prototype.pauseCrosshairRotation = function(){
     return;
   }
   selectedCrosshair.angularSpeed = 0;
+}
+
+// expandCrosshair
+// Expands a crosshair. This can be used while shooting or walking for fps games.
+// The crosshair expands by delta while its size is less than targetSize on each frame.
+// This function is designed to be called inside onmousedown or onkeydown like events.
+Roygbiv.prototype.expandCrosshair = function(targetSize, delta){
+  if (mode == 0){
+    return;
+  }
+  if (!selectedCrosshair){
+    throw new Error("expandCrosshair error: No selected crosshair.");
+    return;
+  }
+  if (typeof targetSize == UNDEFINED){
+    throw new Error("expandCrosshair error: targetSize is not defined.");
+    return;
+  }
+  if (isNaN(targetSize)){
+    throw new Error("expandCrosshair error: Bad targetSize parameter.");
+    return;
+  }
+  if (targetSize <= selectedCrosshair.sizeAmount){
+    throw new Error("expandCrosshair error: targetSize must not be less than the size of the crosshair.");
+    return;
+  }
+  if (typeof delta == UNDEFINED){
+    throw new Error("expandCrosshair error: delta is not defined.");
+    return;
+  }
+  if (isNaN(delta)){
+    throw new Error("expandCrosshair error: Bad delta parameter.");
+    return;
+  }
+  if (delta <= 0){
+    throw new Error("expandCrosshair error: delta must be greater than zero.");
+    return;
+  }
+  selectedCrosshair.expandTick = 0;
+  selectedCrosshair.expandTargetSize = targetSize;
+  selectedCrosshair.expandDelta = delta;
+  selectedCrosshair.expand = true;
+  selectedCrosshair.shrink = false;
+}
+
+// shrinkCrosshair
+// Shrinks a crosshair. This can be used after calling the expandCrosshair function.
+// The crosshair shrinks by delta while its size is greater than its initial size. This function
+// is designed to be called inside onmouseup or onkeyup like events.
+Roygbiv.prototype.shrinkCrosshair = function(delta){
+  if (mode == 0){
+    return;
+  }
+  if (typeof delta == UNDEFINED){
+    throw new Error("shrinkCrosshair error: delta is not defined.");
+    return;
+  }
+  if (isNaN(delta)){
+    throw new Error("shrinkCrosshair error: Bad delta parameter.");
+    return;
+  }
+  if (delta <= 0){
+    throw new Error("shrinkCrosshair error: delta must be greater than zero.");
+    return;
+  }
+  if (!selectedCrosshair){
+    throw new Error("shrinkCrosshair error: No selected crosshair.");
+    return;
+  }
+  selectedCrosshair.shrinkTick = 0;
+  selectedCrosshair.expandDelta = delta;
+  selectedCrosshair.material.uniforms.shrinkStartSize.value = selectedCrosshair.curSize;
+  selectedCrosshair.expand = false;
+  selectedCrosshair.shrink = true;
 }
 
 // LISTENER FUNCTIONS **********************************************************

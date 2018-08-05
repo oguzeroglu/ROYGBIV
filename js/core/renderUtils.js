@@ -50,7 +50,7 @@ function render(){
 }
 
 function updateCrosshair(){
-  if (selectedCrosshair && selectedCrosshair.angularSpeed != 0){
+  if (selectedCrosshair && (selectedCrosshair.angularSpeed != 0 || selectedCrosshair.expand || selectedCrosshair.shrink)){
     selectedCrosshair.update();
   }
 }
