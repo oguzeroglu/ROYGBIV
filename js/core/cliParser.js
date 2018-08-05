@@ -4287,12 +4287,36 @@ function parse(input){
             terminal.printError(Text.RADIUS_MUST_BE_A_NUMBER);
             return true;
           }
-          if (radius <= 0){
-            terminal.printError(Text.MUST_BE_GREATER_THAN.replace(Text.PARAM1, "Radius").replace(
-              Text.PARAM2, "0"
-            ));
+          if (radius == 0){
+            terminal.printError(Text.RADIUS_MUST_BE_DIFFERENT_THAN_ZERO);
+            return true;
           }
 
+          var gridSelectionSize = Object.keys(gridSelections).length;
+          if (gridSelectionSize != 1 && gridSelectionSize != 2){
+            terminal.printError(Text.MUST_HAVE_1_OR_2_GRIDS_SELECTED);
+            return true;
+          }
+
+          var selections = [];
+          for (var gridName in gridSelections){
+            selections.push(gridSelections[gridName]);
+          }
+
+          if (selections.length == 2){
+            var grid1 = selections[0];
+            var grid2 = selections[1];
+            if (grid1.parentName != grid2.parentName){
+              terminal.printError(Text.SELECTED_GRIDS_SAME_GRIDSYSTEM);
+              return true;
+            }
+          }
+
+          var gridSystemName = selections[0].parentName;
+          var gridSystem = gridSystems[gridSystemName];
+
+          gridSystem.newSphere(sphereName, material, radius, selections);
+          terminal.printInfo(Text.SPHERE_CREATED);
           return true;
         break;
       }

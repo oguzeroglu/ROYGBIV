@@ -982,3 +982,61 @@ GridSystem.prototype.newBox = function(selections, height, material, name){
   boxMesh.addedObject = addedObjectInstance;
 
 }
+
+GridSystem.prototype.newSphere = function(sphereName, material, radius, selections){
+
+  var sphereCenterX, sphereCenterY, sphereCenterZ;
+
+  if (this.axis == "XZ"){
+    if (selections.length == 1){
+      var grid = selections[0];
+      sphereCenterX = grid.centerX;
+      sphereCenterY = grid.centerY + radius;
+      sphereCenterZ = grid.centerZ;
+    }else if (selections.length == 2){
+      var grid1 = selections[0];
+      var grid2 = selections[1];
+      sphereCenterX = (grid1.centerX + grid2.centerX) / 2;
+      sphereCenterY = ((grid1.centerY + grid2.centerY) / 2) + radius;
+      sphereCenterZ = (grid1.centerZ + grid2.centerZ) / 2;
+    }
+  }else if (this.axis == "XY"){
+    if (selections.length == 1){
+      var grid = selections[0];
+      sphereCenterX = grid.centerX;
+      sphereCenterY = grid.centerY;
+      sphereCenterZ = grid.centerZ + radius;
+    }else if (selections.length == 2){
+      var grid1 = selections[0];
+      var grid2 = selections[1];
+      sphereCenterX = (grid1.centerX + grid2.centerX) / 2;
+      sphereCenterY = (grid1.centerY + grid2.centerY) / 2;
+      sphereCenterZ = ((grid1.centerZ + grid2.centerZ) / 2) + radius;
+    }
+  }else if (this.axis == "YZ"){
+    if (selections.length == 1){
+      var grid = selections[0];
+      sphereCenterX = grid.centerX + radius;
+      sphereCenterY = grid.centerY;
+      sphereCenterZ = grid.centerZ;
+    }else if (selections.length == 2){
+      var grid1 = selections[0];
+      var grid2 = selections[1];
+      sphereCenterX = ((grid1.centerX + grid2.centerX) / 2) + radius;
+      sphereCenterY = (grid1.centerY + grid2.centerY) / 2;
+      sphereCenterZ = (grid1.centerZ + grid2.centerZ) / 2;
+    }
+  }
+
+  if (this.isSuperposed){
+    sphereCenterY = sphereCenterY - superposeYOffset;
+  }
+
+  var sphereGeometry = new THREE.SphereGeometry(Math.abs(radius));
+  var sphereMesh = new THREE.Mesh(sphereGeometry, material);
+  sphereMesh.position.set(sphereCenterX, sphereCenterY, sphereCenterZ);
+  scene.add(sphereMesh);
+  var sphereClone = sphereMesh.clone();
+  previewScene.add(sphereClone);
+
+}
