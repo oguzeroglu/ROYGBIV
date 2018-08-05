@@ -764,6 +764,17 @@ StateLoader.prototype.handleTexturesDiff = function(){
   }
 }
 
+StateLoader.prototype.handleModifiedTexturesDiff = function(){
+  var diff = this.stateObj;
+  var kind = diff.kind;
+  var textureName = diff.path[1];
+  if (kind == "D"){
+    delete modifiedTextures[textureName];
+  }else if (kind == "N"){
+    modifiedTextures[textureName] = diff.rhs;
+  }
+}
+
 StateLoader.prototype.handleTextureURLsDiff = function(){
   var diff = this.stateObj;
   var kind = diff.kind;
@@ -2297,6 +2308,7 @@ StateLoader.prototype.load = function(undo){
         var that = this;
         texture.image.onload = function(){
           textures[this.textureNameX] = this.textureX;
+          this.textureX.needsUpdate = true;
           textureCache[this.textureNameX] = this.textureX.clone();
           that.mapLoadedTexture(this.textureX, this.textureNameX);
         }.bind({textureX: texture, textureNameX: textureName});
@@ -2335,6 +2347,7 @@ StateLoader.prototype.load = function(undo){
         }
         textures[textureName] = texture;
         textureCache[textureName] = texture.clone();
+        texture.needsUpdate = true;
         this.mapLoadedTexture(texture, textureName);
       }else{
         if (textureURL.toUpperCase().endsWith("TGA")){
@@ -2361,6 +2374,7 @@ StateLoader.prototype.load = function(undo){
                 textureData.needsUpdate = true;
               }
             }
+            textures[textureNameX].needsUpdate = true;
             textures[textureNameX].isLoaded = true;
             textures[textureNameX].repeat.set(this.repeatUU, this.repeatVV);
             textures[textureNameX].offset.x = this.offsetXX;

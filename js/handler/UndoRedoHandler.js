@@ -122,6 +122,8 @@ UndoRedoHandler.prototype.handleDiff = function(diff){
       new StateLoader(curDiff).handleParticleCollisionWorkerModeDiff();
     }else if (path[0] == "particleSystemCollisionWorkerMode"){
       new StateLoader(curDiff).handleParticleSystemCollisionWorkerModeDiff();
+    }else if (path[0] == "modifiedTextures"){
+      new StateLoader(curDiff).handleModifiedTexturesDiff();
     }
   }
 }

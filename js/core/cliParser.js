@@ -1136,6 +1136,7 @@ function parse(input){
           }
           delete textures[textureName];
           delete textureURLs[textureName];
+          delete modifiedTextures[textureName];
           terminal.printInfo(Text.TEXTURE_DESTROYED);
           undoRedoHandler.push();
           return true;
