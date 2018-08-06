@@ -1060,5 +1060,57 @@ GridSystem.prototype.newSphere = function(sphereName, material, radius, selectio
     selections[i].toggleSelect(false, false, false, true);
     delete gridSelections[selections[i].name];
   }
-  
+
+  var destroyedGrids = new Object();
+
+  if(selections.length == 1){
+    destroyedGrids[selections[0].name] = selections[0];
+  }else{
+    var grid1 = selections[0];
+    var grid2 = selections[1];
+    startRow = grid1.rowNumber;
+    if (grid2.rowNumber < grid1.rowNumber){
+      startRow = grid2.rowNumber;
+    }
+    startCol = grid1.colNumber;
+    if (grid2.colNumber < grid1.colNumber){
+      startCol = grid2.colNumber;
+    }
+    finalRow = grid1.rowNumber;
+    if (grid2.rowNumber > grid1.rowNumber){
+      finalRow = grid2.rowNumber;
+    }
+    finalCol = grid1.colNumber;
+    if (grid2.colNumber > grid1.colNumber){
+      finalCol = grid2.colNumber;
+    }
+    for (var row = startRow; row <= finalRow; row++){
+      for (var col = startCol; col <= finalCol; col++ ){
+        var grid = this.getGridByColRow(col, row);
+        if (grid){
+          destroyedGrids[grid.name] = grid;
+        }
+      }
+    }
+  }
+
+  var metaData = new Object();
+  metaData["radius"] = radius;
+  metaData["gridCount"] = selections.length;
+  metaData["grid1Name"] = selections[0].name;
+  if (selections.length == 2){
+    metaData["grid2Name"] = selections[1].name;
+  }
+  metaData["gridSystemName"] = this.name;
+  metaData["centerX"] = sphereMesh.position.x;
+  metaData["centerY"] = sphereMesh.position.y;
+  metaData["centerZ"] = sphereMesh.position.z;
+  metaData["gridSystemAxis"] = this.axis;
+
+  var addedObjectInstance = new AddedObject(sphereName, "sphere", metaData, material,
+                                    sphereMesh, sphereClone, spherePhysicsBody, destroyedGrids);
+  addedObjects[sphereName] = addedObjectInstance;
+
+  sphereMesh.addedObject = addedObjectInstance;
+
 }
