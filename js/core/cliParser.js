@@ -4317,6 +4317,7 @@ function parse(input){
 
           gridSystem.newSphere(sphereName, material, radius, selections);
           terminal.printInfo(Text.SPHERE_CREATED);
+          undoRedoHandler.push();
           return true;
         break;
       }

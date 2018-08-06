@@ -1624,6 +1624,39 @@ StateLoader.prototype.handleAddedObjectDiff = function(){
           rampPhysicsBody, new Object()
         );
         ramp.addedObject = addedObjectInstance;
+      }else if (type == "sphere"){
+        var radius = metaData["radius"];
+        var centerX = metaData["centerX"];
+        var centerY = metaData["centerY"];
+        var centerZ = metaData["centerZ"];
+        var spherePhysicsShape = new CANNON.Sphere(Math.abs(radius));
+        var spherePhysicsBody = new CANNON.Body({
+          mass: mass,
+          shape: spherePhysicsShape
+        });
+        var sphereMesh;
+        var sphereClone;
+        var axis = metaData["gridSystemAxis"];
+        sphereMesh = new THREE.Mesh(
+          new THREE.SphereGeometry(Math.abs(radius), widthSegments, heightSegments), material
+        );
+        sphereMesh.position.x = centerX;
+        sphereMesh.position.y = centerY;
+        sphereMesh.position.z = centerZ;
+        sphereClone = sphereMesh.clone();
+        scene.add(sphereMesh);
+        previewScene.add(sphereClone);
+        spherePhysicsBody.position.set(
+          sphereMesh.position.x,
+          sphereMesh.position.y,
+          sphereMesh.position.z
+        );
+        physicsWorld.add(spherePhysicsBody);
+        addedObjectInstance = new AddedObject(
+          addedObjectName, "sphere", metaData, material,
+          sphereMesh, sphereClone, spherePhysicsBody, destroyedGrids
+        );
+        sphereMesh.addedObject = addedObjectInstance;
       }
       addedObjectInstance.associatedTexturePack = curAddedObjectExport.associatedTexturePack;
       addedObjectInstance.metaData["widthSegments"] = widthSegments;
@@ -2202,6 +2235,39 @@ StateLoader.prototype.load = function(undo){
           rampPhysicsBody, new Object()
         );
         ramp.addedObject = addedObjectInstance;
+      }else if (type == "sphere"){
+        var radius = metaData["radius"];
+        var centerX = metaData["centerX"];
+        var centerY = metaData["centerY"];
+        var centerZ = metaData["centerZ"];
+        var spherePhysicsShape = new CANNON.Sphere(Math.abs(radius));
+        var spherePhysicsBody = new CANNON.Body({
+          mass: mass,
+          shape: spherePhysicsShape
+        });
+        var sphereMesh;
+        var sphereClone;
+        var axis = metaData["gridSystemAxis"];
+        sphereMesh = new THREE.Mesh(
+          new THREE.SphereGeometry(Math.abs(radius), widthSegments, heightSegments), material
+        );
+        sphereMesh.position.x = centerX;
+        sphereMesh.position.y = centerY;
+        sphereMesh.position.z = centerZ;
+        sphereClone = sphereMesh.clone();
+        scene.add(sphereMesh);
+        previewScene.add(sphereClone);
+        spherePhysicsBody.position.set(
+          sphereMesh.position.x,
+          sphereMesh.position.y,
+          sphereMesh.position.z
+        );
+        physicsWorld.add(spherePhysicsBody);
+        addedObjectInstance = new AddedObject(
+          addedObjectName, "sphere", metaData, material,
+          sphereMesh, sphereClone, spherePhysicsBody, destroyedGrids
+        );
+        sphereMesh.addedObject = addedObjectInstance;
       }
       addedObjectInstance.associatedTexturePack = curAddedObjectExport.associatedTexturePack;
       addedObjectInstance.metaData["widthSegments"] = widthSegments;
