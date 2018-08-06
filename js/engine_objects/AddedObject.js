@@ -359,6 +359,8 @@ AddedObject.prototype.rotate = function(axis, radians, fromScript){
     this.rotateBox(axis, radians, fromScript);
   }else if (this.type == "ramp"){
     this.rotateRamp(axis, radians, fromScript);
+  }else if (this.type == "sphere"){
+    this.rotateSphere(axis, radians, fromScript);
   }
 
   if (!fromScript){
@@ -434,6 +436,35 @@ AddedObject.prototype.setRampPhysicsAfterRotationAroundPoint = function(axis, ra
     tmp.rotateX(Math.PI / 2);
     physicsBody.quaternion.copy(tmp.quaternion);
     tmp = undefined;
+  }
+}
+
+AddedObject.prototype.rotateSphere = function(axis, radians, fromScript){
+  var mesh = this.mesh;
+  var previewMesh = this.previewMesh;
+  var physicsBody = this.physicsBody;
+  if (axis == "x"){
+    mesh.rotateOnWorldAxis(
+      THREE_AXIS_VECTOR_X,
+      radians
+    );
+  }else if (axis == "y"){
+    mesh.rotateOnWorldAxis(
+      THREE_AXIS_VECTOR_Y,
+      radians
+    );
+  }else if (axis == "z"){
+    mesh.rotateOnWorldAxis(
+      THREE_AXIS_VECTOR_Z,
+      radians
+    );
+  }
+  physicsBody.quaternion.copy(mesh.quaternion);
+  previewMesh.quaternion.copy(mesh.quaternion);
+  if (!fromScript){
+    physicsBody.initQuaternion.copy(
+      physicsBody.quaternion
+    );
   }
 }
 
@@ -893,6 +924,17 @@ AddedObject.prototype.segmentGeometry = function(isCustom, count, returnGeometry
         newGeometry = new THREE.BoxGeometry(boxSizeX, boxSizeY, boxSizeZ, count.width, count.height, count.depth);
       }
     }
+  }else if (this.type == "sphere"){
+    var radius = this.metaData["radius"];
+    if (!isCustom){
+      newGeometry = new THREE.SphereGeometry(Math.abs(radius), sphereWidthSegments, sphereHeightSegments);
+    }else{
+      if (!isNaN(count)){
+        newGeometry = new THREE.SphereGeometry(Math.abs(radius), count, count);
+      }else{
+        newGeometry = new THREE.SphereGeometry(Math.abs(radius), count.width, count.height);
+      }
+    }
   }
 
   if (returnGeometry){
@@ -924,8 +966,13 @@ AddedObject.prototype.segmentGeometry = function(isCustom, count, returnGeometry
       this.metaData["widthSegments"] = planeWidthSegments;
       this.metaData["heightSegments"] = planeHeightSegments;
     }else{
-      this.metaData["widthSegments"] = count;
-      this.metaData["heightSegments"] = count;
+      if (isNaN(count)){
+        this.metaData["widthSegments"] = count.width;
+        this.metaData["heightSegments"] = count.height;
+      }else{
+        this.metaData["widthSegments"] = count;
+        this.metaData["heightSegments"] = count;
+      }
     }
   }else if(this.type == "box"){
     if (!isCustom){
@@ -933,9 +980,28 @@ AddedObject.prototype.segmentGeometry = function(isCustom, count, returnGeometry
       this.metaData["heightSegments"] = boxHeightSegments;
       this.metaData["depthSegments"] = boxDepthSegments;
     }else{
-      this.metaData["widthSegments"] = count;
-      this.metaData["heightSegments"] = count;
-      this.metaData["depthSegments"] = count;
+      if (isNaN(count)){
+        this.metaData["widthSegments"] = count.width;
+        this.metaData["heightSegments"] = count.height;
+        this.metaData["depthSegments"] = count.depth;
+      }else{
+        this.metaData["widthSegments"] = count;
+        this.metaData["heightSegments"] = count;
+        this.metaData["depthSegments"] = count;
+      }
+    }
+  }else if (this.type == "sphere"){
+    if (!isCustom){
+      this.metaData["widthSegments"] = sphereWidthSegments;
+      this.metaData["heightSegments"] = sphereHeightSegments;
+    }else{
+      if (isNaN(count)){
+        this.metaData["widthSegments"] = count.width;
+        this.metaData["heightSegments"] = count.height;
+      }else{
+        this.metaData["widthSegments"] = count;
+        this.metaData["heightSegments"] = count;
+      }
     }
   }
 
