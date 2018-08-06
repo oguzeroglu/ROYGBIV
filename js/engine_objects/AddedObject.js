@@ -28,6 +28,9 @@ var AddedObject = function(name, type, metaData, material, mesh,
   this.metaData["heightSegments"] = 1;
   if (type == "box"){
     this.metaData["depthSegments"] = 1;
+  }else if (type == "sphere"){
+    this.metaData["widthSegments"] = 8;
+    this.metaData["heightSegments"] = 6;
   }
 
   this.metaData["textureRepeatU"] = 1;
@@ -1082,6 +1085,8 @@ AddedObject.prototype.preparePhysicsInfo = function(){
     type = 2;
   }else if (this.type == "box"){
     type = 3;
+  }else if (this.type == "sphere"){
+    type = 4;
   }
   var positionX = this.physicsBody.position.x;
   var positionY = this.physicsBody.position.y;
@@ -1112,6 +1117,9 @@ AddedObject.prototype.preparePhysicsInfo = function(){
     var fromEulerZ = this.metaData.fromEulerZ;
     physicsInfo += "," + rampWidth + "," +rampHeight + "," + fromEulerX
                        + "," + fromEulerY + "," + fromEulerZ;
+  }else if (this.type == "sphere"){
+    var sphereRadius = Math.abs(this.metaData.radius);
+    physicsInfo += "," + sphereRadius;
   }
   physicsInfo += "," + this.physicsBody.mass;
   physicsInfo += "," + this.physicsBody.id;

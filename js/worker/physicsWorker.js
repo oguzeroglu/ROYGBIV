@@ -231,6 +231,10 @@ function createObjects(){
       createObject(ary.subarray(i, i+13), i);
       createdObjectCount ++;
       i += 13;
+    }else if (type == 4){
+      createObject(ary.subarray(i, i+11), i);
+      createdObjectCount ++;
+      i += 11;
     }
   }
   while (i < ary.length){
@@ -312,6 +316,8 @@ function createObject(buffer, index, memberOfAGroup){
     type = "ramp";
   }else if (buffer[0] == 3){
     type = "box";
+  }else if (buffer[0] == 4){
+    type = "sphere";
   }
   var positionX = parseFloat(buffer[1]);
   var positionY = parseFloat(buffer[2]);
@@ -383,6 +389,19 @@ function createObject(buffer, index, memberOfAGroup){
     });
     physicsBody.mass = mass;
     physicsBody.quaternion.setFromEuler(fromEulerX, fromEulerY, fromEulerZ);
+  }else if (type == "sphere"){
+    var sphereRadius = parseFloat(buffer[8]);
+    mass = parseFloat(buffer[9]);
+    id = parseFloat(buffer[10]);
+    var spherePhysicsShape = new CANNON.Sphere(sphereRadius);
+    var physicsMaterial = new CANNON.Material();
+    physicsMaterial.friction = 1;
+    physicsBody = new CANNON.Body({
+      mass: mass,
+      shape: spherePhysicsShape,
+      material: physicsMaterial
+    });
+    physicsBody.mass = mass;
   }
   physicsBody.position.set(positionX, positionY, positionZ);
   if (type != "ramp"){
