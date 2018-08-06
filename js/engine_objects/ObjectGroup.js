@@ -185,7 +185,7 @@ ObjectGroup.prototype.detach = function(){
       physicsQuaternions[objectName].z,
       physicsQuaternions[objectName].w
     );
-    if (addedObject.type == "box" || addedObject.type == "ramp"){
+    if (addedObject.type == "box" || addedObject.type == "ramp" || addedObject.type == "sphere"){
       addedObject.metaData["centerX"] = worldPositions[objectName].x;
       addedObject.metaData["centerY"] = worldPositions[objectName].y;
       addedObject.metaData["centerZ"] = worldPositions[objectName].z;
