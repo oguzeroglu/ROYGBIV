@@ -232,6 +232,7 @@ function createObjects(){
       createdObjectCount ++;
       i += 13;
     }else if (type == 4){
+      // sphere: 11 indices
       createObject(ary.subarray(i, i+11), i);
       createdObjectCount ++;
       i += 11;
@@ -273,6 +274,11 @@ function createObjects(){
         children.push(childObject);
         createdChildrenCount ++;
         i += 13;
+      }else if (type == 4){
+        childObject = createObject(ary.subarray(i, i+11), i, true);
+        children.push(childObject);
+        createdChildrenCount ++;
+        i += 11;
       }
     }
     createObjectGroup(
