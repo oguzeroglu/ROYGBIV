@@ -1039,4 +1039,26 @@ GridSystem.prototype.newSphere = function(sphereName, material, radius, selectio
   var sphereClone = sphereMesh.clone();
   previewScene.add(sphereClone);
 
+  var spherePhysicsShape = new CANNON.Sphere(Math.abs(radius));
+  var physicsMaterial = new CANNON.Material();
+  physicsMaterial.friction = 1;
+
+  var spherePhysicsBody = new CANNON.Body({
+    mass: 0,
+    shape: spherePhysicsShape,
+    material: physicsMaterial
+  });
+  spherePhysicsBody.position.set(
+    sphereMesh.position.x,
+    sphereMesh.position.y,
+    sphereMesh.position.z
+  );
+
+  physicsWorld.add(spherePhysicsBody);
+
+  for (var i = 0; i<selections.length; i++){
+    selections[i].toggleSelect(false, false, false, true);
+    delete gridSelections[selections[i].name];
+  }
+  
 }
