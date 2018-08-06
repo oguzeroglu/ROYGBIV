@@ -338,7 +338,7 @@ AddedObject.prototype.translate = function(axis, amount, fromScript){
   physicsBody.position.copy(previewMesh.position);
 
   if (!fromScript){
-    if (this.type == "box" || this.type == "ramp"){
+    if (this.type == "box" || this.type == "ramp" || this.type == "sphere"){
       this.metaData["centerX"] = previewMesh.position.x;
       this.metaData["centerY"] = previewMesh.position.y;
       this.metaData["centerZ"] = previewMesh.position.z;

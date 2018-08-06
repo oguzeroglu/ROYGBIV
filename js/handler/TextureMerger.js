@@ -296,25 +296,32 @@ var TextureMerger = function(texturesObj){
 
   //this.debugImages(imgSize);
 
+  this.makeCanvasPowerOfTwo();
+
   if (this.canvas.width > MAX_TEXTURE_SIZE || this.canvas.height > MAX_TEXTURE_SIZE){
     throw new Error("TextureMerger error: Max texture size exceeded. ("+MAX_TEXTURE_SIZE+"x"+MAX_TEXTURE_SIZE+")");
     return;
   }
 
   this.mergedTexture = new THREE.CanvasTexture(this.canvas);
-  this.mergedTexture.generateMipmaps = false;
+  this.mergedTexture.generateMipmaps = true;
   this.mergedTexture.magFilter = THREE.NearestFilter;
   this.mergedTexture.minFilter = THREE.LinearFilter;
   this.mergedTexture.mapping = THREE.UVMapping;
-  this.mergedTexture.mipmaps[ 0 ] = this.canvas;
-  var scale = 0.5;
-  for (var i = 1; i<=7 ; i++){
-    this.mergedTexture.mipmaps[i] = this.rescale(this.canvas, scale);
-    //this.debugCanvas(this.mergedTexture.mipmaps[i]);
-    scale = scale / 2;
-  }
 
   //console.log("[*] Textures merged: "+explanationStr);
+}
+
+TextureMerger.prototype.makeCanvasPowerOfTwo = function(){
+  var oldWidth = this.canvas.width;
+  var oldHeight = this.canvas.height;
+  var newWidth = Math.pow(2, Math.round(Math.log(oldWidth) / Math.log(2)));
+  var newHeight = Math.pow(2, Math.round(Math.log(oldHeight) / Math.log(2)));
+  var newCanvas = document.createElement("canvas");
+  newCanvas.width = newWidth;
+  newCanvas.height = newHeight;
+  newCanvas.getContext("2d").drawImage(this.canvas, 0, 0, newWidth, newHeight);
+  this.canvas = newCanvas;
 }
 
 TextureMerger.prototype.insert = function(node, textureName, texturesObj){
