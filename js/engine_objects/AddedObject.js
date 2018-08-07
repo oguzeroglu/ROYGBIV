@@ -930,12 +930,17 @@ AddedObject.prototype.segmentGeometry = function(isCustom, count, returnGeometry
       newGeometry = new THREE.SphereGeometry(Math.abs(radius), sphereWidthSegments, sphereHeightSegments);
     }else{
       if (!isNaN(count)){
-        if (count == 1){
-          newGeometry = new THREE.SphereGeometry(Math.abs(radius), 8, 6);
-        }else{
-          newGeometry = new THREE.SphereGeometry(Math.abs(radius), count, count);
+        if (count < 8){
+          count = 8;
         }
+        newGeometry = new THREE.SphereGeometry(Math.abs(radius), count, count);
       }else{
+        if (count.width < 8){
+          count.width = 8;
+        }
+        if (count.height < 6){
+          count.height = 6;
+        }
         newGeometry = new THREE.SphereGeometry(Math.abs(radius), count.width, count.height);
       }
     }
