@@ -2487,6 +2487,10 @@ function parse(input){
             ));
             return true;
           }
+          if (addedObject.type == "sphere" && count < 8){
+            terminal.printError(Text.SPHERE_CAN_HAVE_MINIMUM_8_SEGMENTS);
+            return true;
+          }
           addedObject.segmentGeometry(true, count);
           terminal.printError(Text.OBJECT_SEGMENTED);
           undoRedoHandler.push();
