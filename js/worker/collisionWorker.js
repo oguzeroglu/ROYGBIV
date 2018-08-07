@@ -469,11 +469,13 @@ function parseBBDescriptions(content){
     REUSABLE_MATRIX.set(e11, e12, e13, e14, e21, e22, e23, e24, e31, e32, e33, e34, e41, e42, e43, e44);
     var pseudoGeom;
     if (type == 0){
-      pseudoGeom = new THREE.PlaneGeometry(size1, size2, 1, 1);
+      pseudoGeom = new THREE.PlaneGeometry(Math.abs(size1), Math.abs(size2), 1, 1);
     }else if (type == 1){
-      pseudoGeom = new THREE.PlaneGeometry(size1, size2, 1, 1);
+      pseudoGeom = new THREE.PlaneGeometry(Math.abs(size1), Math.abs(size2), 1, 1);
     }else if (type == 2){
-      pseudoGeom = new THREE.BoxGeometry(size1, size2, size3, 1, 1, 1);
+      pseudoGeom = new THREE.BoxGeometry(Math.abs(size1), Math.abs(size2), Math.abs(size3), 1, 1, 1);
+    }else if (type == 3){
+      pseudoGeom = new THREE.SphereGeometry(Math.abs(size1), 8, 6);
     }
     var objName = indicesObjectNames[i];
     objectFaces[objName] = pseudoGeom.faces;

@@ -1387,7 +1387,7 @@ AddedObject.prototype.updateCollisionWorkerInfo = function (typedArray){
 }
 
 AddedObject.prototype.generateCollisionWorkerInfo = function(index, typedArray){
-  // info[0] -> object type -> (0: surface, 1: ramp, 2: box)
+  // info[0] -> object type -> (0: surface, 1: ramp, 2: box, 3: sphere), 
   // info[1, 2, 3] -> object size info for pseudo geometry generation
   // info[4 - 19] -> object preview mesh matrix world elements
   this.collisionWorkerIndex = index;
@@ -1406,6 +1406,11 @@ AddedObject.prototype.generateCollisionWorkerInfo = function(index, typedArray){
     typedArray[index + 1] = this.metaData["boxSizeX"];
     typedArray[index + 2] = this.metaData["boxSizeY"];
     typedArray[index + 3] = this.metaData["boxSizeZ"];
+  }else if (this.type == "sphere"){
+    typedArray[index] = 3;
+    typedArray[index + 1] = this.metaData["radius"];
+    typedArray[index + 2] = 0;
+    typedArray[index + 3] = 0;
   }
   this.previewMesh.updateMatrixWorld();
   for (var i = 0; i<this.previewMesh.matrixWorld.elements.length; i++){
