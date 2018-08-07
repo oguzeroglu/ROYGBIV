@@ -930,7 +930,11 @@ AddedObject.prototype.segmentGeometry = function(isCustom, count, returnGeometry
       newGeometry = new THREE.SphereGeometry(Math.abs(radius), sphereWidthSegments, sphereHeightSegments);
     }else{
       if (!isNaN(count)){
-        newGeometry = new THREE.SphereGeometry(Math.abs(radius), count, count);
+        if (count == 1){
+          newGeometry = new THREE.SphereGeometry(Math.abs(radius), 8, 6);
+        }else{
+          newGeometry = new THREE.SphereGeometry(Math.abs(radius), count, count);
+        }
       }else{
         newGeometry = new THREE.SphereGeometry(Math.abs(radius), count.width, count.height);
       }
@@ -1023,16 +1027,19 @@ AddedObject.prototype.deSegmentGeometry = function(){
   if (this.type == "surface"){
     var width = this.metaData["width"];
     var height = this.metaData["height"];
-    newGeometry = new THREE.PlaneGeometry(width, height);
+    newGeometry = new THREE.PlaneGeometry(Math.abs(width), Math.abs(height));
   }else if (this.type == "ramp"){
     var rampWidth = this.metaData["rampWidth"];
     var rampHeight = this.metaData["rampHeight"];
-    newGeometry = new THREE.PlaneGeometry(rampWidth, rampHeight);
+    newGeometry = new THREE.PlaneGeometry(Math.abs(rampWidth), Math.abs(rampHeight));
   }else if (this.type == "box"){
     var boxSizeX = this.metaData["boxSizeX"];
     var boxSizeY = this.metaData["boxSizeY"];
     var boxSizeZ = this.metaData["boxSizeZ"];
-    newGeometry = new THREE.BoxGeometry(boxSizeX, boxSizeY, boxSizeZ);
+    newGeometry = new THREE.BoxGeometry(Math.abs(boxSizeX), Math.abs(boxSizeY), Math.abs(boxSizeZ));
+  }else if (this.type == "sphere"){
+    var radius = this.metaData["radius"];
+    newGeometry = new THREE.SphereGeometry(Math.abs(radius));
   }
 
   var newMesh = new THREE.Mesh(newGeometry, this.material);
@@ -1059,6 +1066,9 @@ AddedObject.prototype.deSegmentGeometry = function(){
   this.metaData["heightSegments"] = 1;
   if (this.type == "box"){
     this.metaData["depthSegments"] = 1;
+  }else if (this.type == "sphere"){
+    this.metaData["widthSegments"] = 8;
+    this.metaData["heightSegments"] = 6;
   }
 
   var faces = this.mesh.geometry.faces;
@@ -1387,7 +1397,7 @@ AddedObject.prototype.updateCollisionWorkerInfo = function (typedArray){
 }
 
 AddedObject.prototype.generateCollisionWorkerInfo = function(index, typedArray){
-  // info[0] -> object type -> (0: surface, 1: ramp, 2: box, 3: sphere), 
+  // info[0] -> object type -> (0: surface, 1: ramp, 2: box, 3: sphere),
   // info[1, 2, 3] -> object size info for pseudo geometry generation
   // info[4 - 19] -> object preview mesh matrix world elements
   this.collisionWorkerIndex = index;
