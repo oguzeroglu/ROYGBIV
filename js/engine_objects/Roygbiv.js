@@ -112,7 +112,8 @@ var Roygbiv = function(){
     "stopCrosshairRotation",
     "pauseCrosshairRotation",
     "expandCrosshair",
-    "shrinkCrosshair"
+    "shrinkCrosshair",
+    "setParticleSystemPosition"
   ];
 
   this.globals = new Object();
@@ -5468,6 +5469,69 @@ Roygbiv.prototype.mergeParticleSystems = function(){
   }
 }
 
+// setParticleSystemPosition
+// Sets the position of a particle system. This function is designed for
+// magic circle like particle systems which may follow players. This function
+// should not be used for particle systems with collision callbacks or particle systems
+// with defined motions in general.
+Roygbiv.prototype.setParticleSystemPosition = function(particleSystem, x, y, z){
+  if (mode == 0){
+    return;
+  }
+  if (typeof particleSystem == UNDEFINED){
+    throw new Error("setParticleSystemPosition error: particleSystem is not defined.");
+    return;
+  }
+  if (!(particleSystem instanceof ParticleSystem)){
+    throw new Error("setParticleSystemPosition error: Type not supported.");
+    return;
+  }
+  if (typeof x == UNDEFINED){
+    throw new Error("setParticleSystemPosition error: x is not defined.");
+    return;
+  }
+  if (typeof y == UNDEFINED){
+    throw new Error("setParticleSystemPosition error: y is not defined.");
+    return;
+  }
+  if (typeof z == UNDEFINED){
+    throw new Error("setParticleSystemPosition error: z is not defined.");
+    return;
+  }
+  if (isNaN(x)){
+    throw new Error("setParticleSystemPosition error: x is not a number.");
+    return;
+  }
+  if (isNaN(y)){
+    throw new Error("setParticleSystemPosition error: y is not a number.");
+    return;
+  }
+  if (isNaN(z)){
+    throw new Error("setParticleSystemPosition error: z is not a number.");
+    return;
+  }
+  if (particleSystem.checkForCollisions){
+    throw new Error("setParticleSystemPosition error: particleSystem has a collision callback attached. Cannot set position.");
+    return;
+  }
+  if (particleSystem.particlesWithCollisionCallbacks.size > 0){
+    throw new Error("setParticleSystemPosition error: particleSystem has a collidable particle. Cannot set position.");
+    return;
+  }
+  if (particleSystem.hasTrailedParticle){
+    throw new Error("setParticleSystemPosition error: particleSystem has a trailed particle. Cannot set position.");
+    return;
+  }
+  if (particleSystem.velocity.x != 0 || particleSystem.velocity.y != 0 || particleSystem.velocity.z != 0 ||
+          particleSystem.acceleration.x != 0 || particleSystem.acceleration.y != 0 || particleSystem.acceleration.z != 0){
+
+      throw new Error("setParticleSystemPosition error: particleSystem has a defined motion. Cannot set position.");
+      return;
+  }
+  particleSystem.mesh.position.set(x, y, z);
+  particleSystem.hasManualPositionSet = true;
+}
+
 // CROSSHAIR FUNCTIONS *********************************************************
 
 // createCrosshair
@@ -5768,6 +5832,10 @@ Roygbiv.prototype.setCollisionListener = function(sourceObject, callbackFunction
       }
     }
     if (sourceObject.parent){
+      if (sourceObject.parent.hasManualPositionSet){
+        throw new Error("setCollisionListener error: A position is set manually to the parent particle system. Cannot listen for collisions.");
+        return;
+      }
       if (!sourceObject.parent.hasParticleCollision){
         if (TOTAL_PARTICLE_SYSTEMS_WITH_PARTICLE_COLLISIONS >= MAX_PARTICLE_SYSTEMS_WITH_PARTICLE_COLLISIONS){
           throw new Error("setCollisionListener error: Maximum "+MAX_PARTICLE_SYSTEMS_WITH_PARTICLE_COLLISIONS+" can have collidable particles.");
@@ -5801,6 +5869,10 @@ Roygbiv.prototype.setCollisionListener = function(sourceObject, callbackFunction
       }
     }
   }else if (sourceObject instanceof ParticleSystem){
+    if (sourceObject.hasManualPositionSet){
+      throw new Error("setCollisionListener error: A position is set manually to the particle system. Cannot listen for collisions.");
+      return;
+    }
     var incrCounter = false;
     if (!particleSystemCollisionCallbackRequests[sourceObject.name]){
       if (TOTAL_PARTICLE_SYSTEM_COLLISION_LISTEN_COUNT >= MAX_PARTICLE_SYSTEM_COUNT){

@@ -109,6 +109,10 @@ var ParticleSystem = function(copyPS, name, particles, x, y, z, vx, vy, vz, ax, 
 
       particle.parent = this;
 
+      if (particle.trailMode){
+        this.hasTrailedParticle = true;
+      }
+
       var rgbFilterX = 0;
       var rgbFilterY = 0;
       var rgbFilterZ = 0;
