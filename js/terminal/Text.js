@@ -189,6 +189,7 @@ var Text = function(){
   this.COUNT_MUST_BE_GREATER_THAN_1 = "Count must be greater than 1.";
   this.OBJECT_SEGMENTED = "Object segmented.";
   this.RAMPS_DO_NOT_SUPPORT_THIS_FUNCTION = "Ramps do not support this function.";
+  this.SPHERES_DO_NOT_SUPPORT_THIS_FUNCTION = "Spheres do not support this function.";
   this.SURFACES_DO_NOT_SUPPORT_THIS_FUNCTION_UNLESS = "Surfaces do not support this function unless they are on XZ grid systems.";
   this.STATUS_MUST_BE_ONE_OF = "Status must be one of show or hide.";
   this.GUI_IS_ALREADY_HIDDEN = "GUI is already hidden.";

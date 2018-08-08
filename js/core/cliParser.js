@@ -2524,6 +2524,9 @@ function parse(input){
           if (object.type == "ramp"){
             terminal.printError(Text.RAMPS_DO_NOT_SUPPORT_THIS_FUNCTION);
             return true;
+          }else if (object.type == "sphere"){
+            terminal.printError(Text.SPHERES_DO_NOT_SUPPORT_THIS_FUNCTION);
+            return true;
           }
 
           var baseGridSystemName = object.metaData["gridSystemName"];

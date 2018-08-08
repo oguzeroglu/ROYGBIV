@@ -271,19 +271,19 @@ AddedObject.prototype.getTextureStack = function(){
 
 AddedObject.prototype.getPositionAtAxis = function(axis){
   if (axis.toLowerCase() == "x"){
-    if (this.type == "box" || this.type == "ramp"){
+    if (this.type == "box" || this.type == "ramp" || this.type == "sphere"){
       return parseInt(this.metaData["centerX"]);
     }else if (this.type == "surface"){
       return parseInt(this.metaData["positionX"]);
     }
   }else if (axis.toLowerCase() == "y"){
-    if (this.type == "box" || this.type == "ramp"){
+    if (this.type == "box" || this.type == "ramp" || this.type == "sphere"){
       return parseInt(this.metaData["centerY"]);
     }else if (this.type == "surface"){
       return parseInt(this.metaData["positionY"]);
     }
   }else if (axis.toLowerCase() == "z"){
-    if (this.type == "box" || this.type == "ramp"){
+    if (this.type == "box" || this.type == "ramp" || this.type == "sphere"){
       return parseInt(this.metaData["centerZ"]);
     }else if (this.type == "surface"){
       return parseInt(this.metaData["positionZ"]);
@@ -295,7 +295,7 @@ AddedObject.prototype.resetPosition = function(){
   var mesh = this.mesh;
   var previewMesh = this.previewMesh;
   var physicsBody = this.physicsBody;
-  if (this.type == "box" || this.type == "ramp"){
+  if (this.type == "box" || this.type == "ramp" || this.type == "sphere"){
     mesh.position.x = this.metaData["centerX"];
     mesh.position.y = this.metaData["centerY"];
     mesh.position.z = this.metaData["centerZ"];
@@ -383,6 +383,8 @@ AddedObject.prototype.setPhysicsAfterRotationAroundPoint = function(axis, radian
     this.setBoxPhysicsAfterRotationAroundPoint(axis, radians);
   }else if (this.type == "ramp"){
     this.setRampPhysicsAfterRotationAroundPoint(axis, radians);
+  }else if (this.type == "sphere"){
+    this.setSpherePhysicsAfterRotationAroundPoint(axis, radians);
   }
   this.physicsBody.position.copy(this.previewMesh.position);
 }
@@ -406,6 +408,12 @@ AddedObject.prototype.setSurfacePhysicsAfterRotationAroundPoint = function(axis,
     physicsBody.quaternion.copy(tmp.quaternion);
     tmp = undefined;
   }
+}
+
+AddedObject.prototype.setSpherePhysicsAfterRotationAroundPoint = function(axis, radians){
+  var previewMesh = this.previewMesh;
+  var physicsBody = this.physicsBody;
+  physicsBody.quaternion.copy(previewMesh.quaternion);
 }
 
 AddedObject.prototype.setBoxPhysicsAfterRotationAroundPoint = function(axis, radians){
