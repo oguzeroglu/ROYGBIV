@@ -5510,6 +5510,10 @@ Roygbiv.prototype.setParticleSystemPosition = function(particleSystem, x, y, z){
     throw new Error("setParticleSystemPosition error: z is not a number.");
     return;
   }
+  if (!particleSystem.mesh.visible){
+    throw new Error("setParticleSystemPosition error: particleSystem is not visible.");
+    return;
+  }
   if (particleSystem.checkForCollisions){
     throw new Error("setParticleSystemPosition error: particleSystem has a collision callback attached. Cannot set position.");
     return;
