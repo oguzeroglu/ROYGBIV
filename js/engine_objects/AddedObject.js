@@ -371,7 +371,7 @@ AddedObject.prototype.rotate = function(axis, radians, fromScript){
     }else if (axis == "z"){
       this.rotationZ += radians;
     }
-    this.initQuaternion = this.mesh.quaternion.clone();
+    this.initQuaternion.copy(this.mesh.quaternion);
   }
 
 }
@@ -396,17 +396,15 @@ AddedObject.prototype.setSurfacePhysicsAfterRotationAroundPoint = function(axis,
   if (gridSystemAxis == "XY"){
     physicsBody.quaternion.copy(previewMesh.quaternion);
   }else if (gridSystemAxis == "XZ"){
-    var tmp = previewMesh.clone();
-    tmp.quaternion.copy(previewMesh.quaternion);
-    tmp.rotateX(Math.PI / 2);
-    physicsBody.quaternion.copy(tmp.quaternion);
-    tmp = undefined;
+    REUSABLE_QUATERNION.copy(previewMesh.quaternion);
+    REUSABLE_QUATERNION2.setFromAxisAngle(THREE_AXIS_VECTOR_X, Math.PI / 2);
+    REUSABLE_QUATERNION.multiply(REUSABLE_QUATERNION2);
+    physicsBody.quaternion.copy(REUSABLE_QUATERNION);
   }else if (gridSystemAxis == "YZ"){
-    var tmp = previewMesh.clone();
-    tmp.quaternion.copy(previewMesh.quaternion);
-    tmp.rotateY(Math.PI / 2);
-    physicsBody.quaternion.copy(tmp.quaternion);
-    tmp = undefined;
+    REUSABLE_QUATERNION.copy(previewMesh.quaternion);
+    REUSABLE_QUATERNION2.setFromAxisAngle(THREE_AXIS_VECTOR_Y, Math.PI / 2);
+    REUSABLE_QUATERNION.multiply(REUSABLE_QUATERNION2);
+    physicsBody.quaternion.copy(REUSABLE_QUATERNION);
   }
 }
 
@@ -427,23 +425,20 @@ AddedObject.prototype.setRampPhysicsAfterRotationAroundPoint = function(axis, ra
   var physicsBody = this.physicsBody;
   var gridSystemAxis = this.metaData.gridSystemAxis;
   if (gridSystemAxis == "XY"){
-    var tmp = previewMesh.clone();
-    tmp.quaternion.copy(previewMesh.quaternion);
-    tmp.rotateX(Math.PI / 2);
-    physicsBody.quaternion.copy(tmp.quaternion);
-    tmp = undefined;
+    REUSABLE_QUATERNION.copy(previewMesh.quaternion);
+    REUSABLE_QUATERNION2.setFromAxisAngle(THREE_AXIS_VECTOR_X, Math.PI / 2);
+    REUSABLE_QUATERNION.multiply(REUSABLE_QUATERNION2);
+    physicsBody.quaternion.copy(REUSABLE_QUATERNION);
   }else if (gridSystemAxis == "XZ"){
-    var tmp = previewMesh.clone();
-    tmp.quaternion.copy(previewMesh.quaternion);
-    tmp.rotateX(Math.PI / 2);
-    physicsBody.quaternion.copy(tmp.quaternion);
-    tmp = undefined;
+    REUSABLE_QUATERNION.copy(previewMesh.quaternion);
+    REUSABLE_QUATERNION2.setFromAxisAngle(THREE_AXIS_VECTOR_X, Math.PI / 2);
+    REUSABLE_QUATERNION.multiply(REUSABLE_QUATERNION2);
+    physicsBody.quaternion.copy(REUSABLE_QUATERNION);
   }else if (gridSystemAxis == "YZ"){
-    var tmp = previewMesh.clone();
-    tmp.quaternion.copy(previewMesh.quaternion);
-    tmp.rotateX(Math.PI / 2);
-    physicsBody.quaternion.copy(tmp.quaternion);
-    tmp = undefined;
+    REUSABLE_QUATERNION.copy(previewMesh.quaternion);
+    REUSABLE_QUATERNION2.setFromAxisAngle(THREE_AXIS_VECTOR_X, Math.PI / 2);
+    REUSABLE_QUATERNION.multiply(REUSABLE_QUATERNION2);
+    physicsBody.quaternion.copy(REUSABLE_QUATERNION);
   }
 }
 
@@ -499,29 +494,26 @@ AddedObject.prototype.rotateRamp = function(axis, radians, fromScript){
   }
   previewMesh.quaternion.copy(mesh.quaternion);
   if (gridSystemAxis == "XY"){
-    var tmp = mesh.clone();
-    tmp.quaternion.copy(mesh.quaternion);
-    tmp.rotateX(Math.PI / 2);
-    physicsBody.quaternion.copy(tmp.quaternion);
-    tmp = undefined;
+    REUSABLE_QUATERNION.copy(mesh.quaternion);
+    REUSABLE_QUATERNION2.setFromAxisAngle(THREE_AXIS_VECTOR_X, Math.PI / 2);
+    REUSABLE_QUATERNION.multiply(REUSABLE_QUATERNION2);
+    physicsBody.quaternion.copy(REUSABLE_QUATERNION);
   }else if (gridSystemAxis == "XZ"){
-    var tmp = mesh.clone();
-    tmp.quaternion.copy(mesh.quaternion);
-    tmp.rotateX(Math.PI / 2);
-    physicsBody.quaternion.copy(tmp.quaternion);
-    tmp = undefined;
+    REUSABLE_QUATERNION.copy(mesh.quaternion);
+    REUSABLE_QUATERNION2.setFromAxisAngle(THREE_AXIS_VECTOR_X, Math.PI / 2);
+    REUSABLE_QUATERNION.multiply(REUSABLE_QUATERNION2);
+    physicsBody.quaternion.copy(REUSABLE_QUATERNION);
   }else if (gridSystemAxis == "YZ"){
-    var tmp = mesh.clone();
-    tmp.quaternion.copy(mesh.quaternion);
-    tmp.rotateX(Math.PI / 2);
-    physicsBody.quaternion.copy(tmp.quaternion);
-    tmp = undefined;
+    REUSABLE_QUATERNION.copy(mesh.quaternion);
+    REUSABLE_QUATERNION2.setFromAxisAngle(THREE_AXIS_VECTOR_X, Math.PI / 2);
+    REUSABLE_QUATERNION.multiply(REUSABLE_QUATERNION2);
+    physicsBody.quaternion.copy(REUSABLE_QUATERNION);
   }
   if (!fromScript){
     physicsBody.initQuaternion.copy(
       physicsBody.quaternion
     );
-    this.initQuaternion = this.mesh.quaternion.clone();
+    this.initQuaternion.copy(this.mesh.quaternion);
   }
 }
 
@@ -550,23 +542,21 @@ AddedObject.prototype.rotateSurface = function(axis, radians, fromScript){
   if (gridSystemAxis == "XY"){
     physicsBody.quaternion.copy(mesh.quaternion);
   }else if (gridSystemAxis == "XZ"){
-    var tmp = mesh.clone();
-    tmp.quaternion.copy(mesh.quaternion);
-    tmp.rotateX(Math.PI / 2);
-    physicsBody.quaternion.copy(tmp.quaternion);
-    tmp = undefined;
+    REUSABLE_QUATERNION.copy(mesh.quaternion);
+    REUSABLE_QUATERNION2.setFromAxisAngle(THREE_AXIS_VECTOR_X, Math.PI / 2);
+    REUSABLE_QUATERNION.multiply(REUSABLE_QUATERNION2);
+    physicsBody.quaternion.copy(REUSABLE_QUATERNION);
   }else if (gridSystemAxis == "YZ"){
-    var tmp = mesh.clone();
-    tmp.quaternion.copy(mesh.quaternion);
-    tmp.rotateY(Math.PI / 2);
-    physicsBody.quaternion.copy(tmp.quaternion);
-    tmp = undefined;
+    REUSABLE_QUATERNION.copy(mesh.quaternion);
+    REUSABLE_QUATERNION2.setFromAxisAngle(THREE_AXIS_VECTOR_Y, Math.PI / 2);
+    REUSABLE_QUATERNION.multiply(REUSABLE_QUATERNION2);
+    physicsBody.quaternion.copy(REUSABLE_QUATERNION);
   }
   if (!fromScript){
     physicsBody.initQuaternion.copy(
       physicsBody.quaternion
     );
-    this.initQuaternion = this.mesh.quaternion.clone();
+    this.initQuaternion.copy(this.mesh.quaternion);
   }
 }
 
