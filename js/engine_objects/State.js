@@ -152,10 +152,6 @@ var State = function(){
     scriptsExport[scriptName] = scripts[scriptName].export();
   }
   this.scripts = scriptsExport;
-  // FOG ***********************************************************
-  this.fogNear = previewScene.fog.near;
-  this.fogFar = previewScene.fog.far;
-  this.fogHexColor = previewScene.fog.color.getHex();
   // OBJECT GROUPS *************************************************
   var objectGroupsExport = new Object();
   for (var objectName in objectGroups){
@@ -206,4 +202,10 @@ var State = function(){
                      octreeMaxX+","+octreeMaxY+","+octreeMaxZ;
   // BIN SIZE ******************************************************
   this.binSize = BIN_SIZE;
+  // FOG ***********************************************************
+  this.fogObj = {
+    fogActive: fogActive,
+    fogColor: fogColor,
+    fogDensity: fogDensity
+  };
 }

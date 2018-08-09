@@ -104,12 +104,6 @@ UndoRedoHandler.prototype.handleDiff = function(diff){
       new StateLoader(curDiff).handleObjectGroupsDiff();
     }else if (path[0] == "scripts"){
       new StateLoader(curDiff).handleScriptsDiff();
-    }else if (path[0] == "fogNear"){
-      new StateLoader(curDiff).handleFogNearDiff();
-    }else if (path[0] == "fogFar"){
-      new StateLoader(curDiff).handleFogFarDiff();
-    }else if (path[0] == "fogHexColor"){
-      new StateLoader(curDiff).handleFogHexColorDiff();
     }else if (path[0] == "markedPointsExport"){
       new StateLoader(curDiff).handleMarkedPointsExport();
     }else if (path[0] == "physicsWorkerMode"){
@@ -124,6 +118,8 @@ UndoRedoHandler.prototype.handleDiff = function(diff){
       new StateLoader(curDiff).handleParticleSystemCollisionWorkerModeDiff();
     }else if (path[0] == "modifiedTextures"){
       new StateLoader(curDiff).handleModifiedTexturesDiff();
+    }else if (path[0] == "fogObj"){
+      new StateLoader(curDiff).handleFogObjDiff();
     }
   }
 }

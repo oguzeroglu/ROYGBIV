@@ -3,6 +3,22 @@ var StateLoader = function(stateObj){
   this.reason = "";
 }
 
+StateLoader.prototype.handleFogObjDiff = function(){
+  var diff = this.stateObj;
+  var kind = diff.kind;
+  if (diff.path.length == 2){
+    if (diff.kind == "E"){
+      if (diff.path[1] == "fogActive"){
+        fogActive = diff.rhs;
+      }else if (diff.path[1] == "fogColor"){
+        fogColor = diff.rhs;
+      } else if (diff.path[1] == "fogDensity"){
+        fogDensity = diff.rhs;
+      }
+    }
+  }
+}
+
 StateLoader.prototype.handleParticleSystemCollisionWorkerModeDiff = function(){
   var diff = this.stateObj;
   var kind = diff.kind;
@@ -110,36 +126,6 @@ StateLoader.prototype.handleMarkedPointsExport = function(){
           markedPoint.hide();
         }
       }
-    }
-  }
-}
-
-StateLoader.prototype.handleFogHexColorDiff = function(){
-  var diff = this.stateObj;
-  var kind = diff.kind;
-  if (diff.path.length == 1){
-    if (kind == "E"){
-      previewScene.fog.color = new THREE.Color(diff.rhs);
-    }
-  }
-}
-
-StateLoader.prototype.handleFogFarDiff = function(){
-  var diff = this.stateObj;
-  var kind = diff.kind;
-  if (diff.path.length == 1){
-    if (kind == "E"){
-      previewScene.fog.far = diff.rhs;
-    }
-  }
-}
-
-StateLoader.prototype.handleFogNearDiff = function(){
-  var diff = this.stateObj;
-  var kind = diff.kind;
-  if (diff.path.length == 1){
-    if (kind == "E"){
-      previewScene.fog.near = diff.rhs;
     }
   }
 }
@@ -2636,10 +2622,7 @@ StateLoader.prototype.load = function(undo){
         scripts[scriptName].localFilePath = curScriptExport.localFilePath;
       }
     }
-    // FOG *********************************************************
-    previewScene.fog.color = new THREE.Color(obj.fogHexColor);
-    previewScene.fog.near = obj.fogNear;
-    previewScene.fog.far = obj.fogFar;
+
     // OBJECT GROUPS ***********************************************
     for (var objectName in obj.objectGroups){
       var curObjectGroupExport = obj.objectGroups[objectName];
@@ -2709,6 +2692,11 @@ StateLoader.prototype.load = function(undo){
     LIMIT_BOUNDING_BOX = new THREE.Box3(lowerBound, upperBound);
     // BIN SIZE ****************************************************
     BIN_SIZE = parseInt(obj.binSize);
+    // FOG *********************************************************
+    var fogObj = obj.fogObj;
+    fogActive = fogObj.fogActive;
+    fogColor = fogObj.fogColor;
+    fogDensity = fogObj.fogDensity;
     // POST PROCESSING *********************************************
     scanlineCount = obj.scanlineCount;
     scanlineSIntensity = obj.scanlineSIntensity;
@@ -4097,6 +4085,12 @@ StateLoader.prototype.resetProject = function(undo){
   disabledObjectNames = new Object();
   markedPoints = new Object();
   anchorGrid = 0;
+
+  // FOG
+  fogActive = false;
+  fogColor = "black";
+  fogDensity = 0;
+
   if (!undo){
     mode = 0; // 0 -> DESIGN, 1-> PREVIEW
     this.oldPhysicsDebugMode = "NONE";
@@ -4109,8 +4103,6 @@ StateLoader.prototype.resetProject = function(undo){
   selectedLightName = 0;
   skyboxVisible = false;
   croppedGridSystemBuffer = 0;
-
-  previewScene.fog = new THREE.Fog("black", FOG_OFF_NEAR, FOG_OFF_FAR);
 
   scriptEditorShowing = false;
   objectSelectedByCommand = false;

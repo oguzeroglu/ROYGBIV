@@ -420,9 +420,8 @@ var CommandDescriptor = function(){
   // setFog
   this.setFog = new Object();
   this.setFog.types = [];
-  this.setFog.types.push(this.COLOR); //color
-  this.setFog.types.push(this.UNKNOWN_INDICATOR); //near
-  this.setFog.types.push(this.UNKNOWN_INDICATOR); //far
+  this.setFog.types.push(this.COLOR); //fogColor
+  this.setFog.types.push(this.UNKNOWN_INDICATOR); //fogDensity
 
   // glue
   this.glue = new Object();

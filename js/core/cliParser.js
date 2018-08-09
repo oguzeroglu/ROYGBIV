@@ -3306,28 +3306,21 @@ function parse(input){
           // DEPRECATED
         break;
         case 90: //setFog
-          var color = splitted[1];
-          var near = parseFloat(splitted[2]);
-          var far = parseFloat(splitted[3]);
-
-          if (isNaN(near)){
-            terminal.printError(Text.NEAR_MUST_BE_A_NUMBER);
+          var fogColorStr = splitted[1];
+          var fogDensityVal = parseFloat(splitted[2]);
+          if (isNaN(fogDensityVal)){
+            terminal.printError(Text.IS_NOT_A_NUMBER.replace(Text.PARAM1, "fogDensity"));
             return true;
           }
-          if (isNaN(far)){
-            terminal.printError(Text.FAR_MUST_BE_A_NUMBER);
-            return true;
-          }
-          previewScene.fog.color = new THREE.Color(color);
-          previewScene.fog.near = near;
-          previewScene.fog.far = far;
+          fogDensity = fogDensityVal;
+          fogColor = fogColorStr;
+          fogActive = true;
           terminal.printInfo(Text.FOG_SET);
           undoRedoHandler.push();
           return true;
         break;
         case 91: //removeFog
-          previewScene.fog.near = FOG_OFF_NEAR;
-          previewScene.fog.far = FOG_OFF_FAR;
+          fogActive = false;
           terminal.printInfo(Text.FOG_REMOVED);
           undoRedoHandler.push();
           return true;

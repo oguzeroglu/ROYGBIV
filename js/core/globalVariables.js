@@ -96,7 +96,7 @@ var commandArgumentsExpectedCount = [
     1, //editScript
     1, //destroyScript
     3, //translateObject
-    3, //setFog
+    2, //setFog
     0, //removeFog
     2, //glue
     1, //detach
@@ -222,7 +222,7 @@ var commandArgumentsExpectedExplanation = [
   "editScript name", //editScript
   "destroyScript name", //destroyScript
   "translateObject name axis amount", //translateObject
-  "setFog color near far", //setFog
+  "setFog fogColor fogDensity", //setFog
   "removeFog", //removeFog
   "glue newName objectName[1],objectName[2],...objectName[n]", //glue
   "detach name", //detach
@@ -638,6 +638,11 @@ var translateZAmount = 3;
 var translateXAmount = 3;
 var translateYAmount = 3;
 
+// FOG
+var fogActive = false;
+var fogColor = "black";
+var fogDensity = 0;
+
 // ENGINE VARIABLES
 var keyboardBuffer = new Object();
 var gridSystems = new Object();
@@ -737,8 +742,6 @@ var CANNON_AXIS_VECTOR_X = new CANNON.Vec3(1, 0, 0);
 var CANNON_AXIS_VECTOR_Y = new CANNON.Vec3(0, 1, 0);
 var CANNON_AXIS_VECTOR_Z = new CANNON.Vec3(0, 0, 1);
 var scriptEditorShowing = false;
-var FOG_OFF_NEAR = 0.1;
-var FOG_OFF_FAR = 0;
 var NO_BLENDING = THREE.NoBlending;
 var NORMAL_BLENDING = THREE.NormalBlending;
 var ADDITIVE_BLENDING = THREE.AdditiveBlending;

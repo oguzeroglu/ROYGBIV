@@ -319,7 +319,6 @@ window.onload = function() {
   render();
   fpsCounterIntervalID = setInterval(calculateFps, 1000);
   windowLoaded = true;
-  previewScene.fog = new THREE.Fog("black", FOG_OFF_NEAR, FOG_OFF_FAR);
   undoRedoHandler.push();
   MAX_VERTEX_UNIFORM_VECTORS = renderer.context.getParameter(renderer.context.MAX_VERTEX_UNIFORM_VECTORS);
 };
