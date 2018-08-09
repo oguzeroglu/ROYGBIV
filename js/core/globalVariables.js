@@ -642,6 +642,7 @@ var translateYAmount = 3;
 var fogActive = false;
 var fogColor = "black";
 var fogDensity = 0;
+var fogColorRGB = new THREE.Color(fogColor);
 
 // ENGINE VARIABLES
 var keyboardBuffer = new Object();

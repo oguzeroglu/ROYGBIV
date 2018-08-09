@@ -3312,9 +3312,16 @@ function parse(input){
             terminal.printError(Text.IS_NOT_A_NUMBER.replace(Text.PARAM1, "fogDensity"));
             return true;
           }
-          fogDensity = fogDensityVal;
+          if (fogDensityVal <= 0){
+            terminal.printError(Text.MUST_BE_GREATER_THAN.replace(
+              Text.PARAM1, "fogDensity").replace(Text.PARAM2, "0"
+            ));
+            return true;
+          }
+          fogDensity = fogDensityVal / 100;
           fogColor = fogColorStr;
           fogActive = true;
+          fogColorRGB = new THREE.Color(fogColor);
           terminal.printInfo(Text.FOG_SET);
           undoRedoHandler.push();
           return true;

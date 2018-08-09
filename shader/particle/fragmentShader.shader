@@ -1,6 +1,8 @@
 precision lowp float;
 precision lowp int;
 
+#define LOG2 1.442695
+
 varying vec4 vCalculatedColor;
 varying float vDiscardFlag;
 varying float vTextureFlag;
@@ -8,6 +10,7 @@ varying vec3 vRgbThreshold;
 varying vec4 vUVCoordinates;
 
 uniform sampler2D texture;
+uniform vec4 fogInfo;
 
 float discardDueToTextureColor;
 
@@ -39,5 +42,14 @@ void main(){
   gl_FragColor = getTexturedColor();
   if (discardDueToTextureColor > 5.0){
     discard;
+  }else if (fogInfo[0] >= -50.0){
+    float fogDensity = fogInfo[0];
+    float fogR = fogInfo[1];
+    float fogG = fogInfo[2];
+    float fogB = fogInfo[3];
+    float z = gl_FragCoord.z / gl_FragCoord.w;
+    float fogFactor = exp2(-fogDensity * fogDensity * z * z * LOG2);
+    fogFactor = clamp(fogFactor, 0.0, 1.0);
+    gl_FragColor = vec4(mix(vec3(fogR, fogG, fogB), gl_FragColor.rgb, fogFactor), gl_FragColor.a);
   }
 }

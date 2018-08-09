@@ -360,6 +360,13 @@ var ParticleSystem = function(copyPS, name, particles, x, y, z, vx, vy, vz, ax, 
     texture = new THREE.Texture();
   }
 
+  var fogInfo;
+  if (fogActive){
+    fogInfo = new THREE.Vector4(fogDensity, fogColorRGB.r, fogColorRGB.g, fogColorRGB.b);
+  }else{
+    fogInfo = new THREE.Vector4(-100.0, 0, 0, 0);
+  }
+
   if (!this.copyPS){
     this.material = new THREE.RawShaderMaterial({
       vertexShader: ShaderContent.particleVertexShader,
@@ -378,7 +385,8 @@ var ParticleSystem = function(copyPS, name, particles, x, y, z, vx, vy, vz, ax, 
         stopInfo: new THREE.Uniform(new THREE.Vector3(-10, -10, -10)),
         parentMotionMatrix: new THREE.Uniform(new THREE.Matrix3().fromArray([
           x, y, z, vx, vy, vz, ax, ay, az
-        ]))
+        ])),
+        fogInfo: new THREE.Uniform(fogInfo)
       }
     });
   }else{

@@ -12,6 +12,7 @@ StateLoader.prototype.handleFogObjDiff = function(){
         fogActive = diff.rhs;
       }else if (diff.path[1] == "fogColor"){
         fogColor = diff.rhs;
+        fogColorRGB = new THREE.Color(fogColor);
       } else if (diff.path[1] == "fogDensity"){
         fogDensity = diff.rhs;
       }
@@ -2697,6 +2698,7 @@ StateLoader.prototype.load = function(undo){
     fogActive = fogObj.fogActive;
     fogColor = fogObj.fogColor;
     fogDensity = fogObj.fogDensity;
+    fogColorRGB = new THREE.Color(fogColor);
     // POST PROCESSING *********************************************
     scanlineCount = obj.scanlineCount;
     scanlineSIntensity = obj.scanlineSIntensity;
@@ -4090,6 +4092,7 @@ StateLoader.prototype.resetProject = function(undo){
   fogActive = false;
   fogColor = "black";
   fogDensity = 0;
+  fogColorRGB = new THREE.Color(fogColor);
 
   if (!undo){
     mode = 0; // 0 -> DESIGN, 1-> PREVIEW
