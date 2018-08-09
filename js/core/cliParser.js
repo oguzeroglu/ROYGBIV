@@ -4335,6 +4335,16 @@ function parse(input){
           undoRedoHandler.push();
           return true;
         break;
+        case 124: //printFogInfo
+          if (fogActive){
+            terminal.printHeader(Text.FOG_INFO);
+            terminal.printInfo(Text.TREE2.replace(Text.PARAM1, "Fog color").replace(Text.PARAM2, fogColor), true);
+            terminal.printInfo(Text.TREE2.replace(Text.PARAM1, "Fog density").replace(Text.PARAM2, fogDensity * 100));
+          }else{
+            terminal.printInfo(Text.FOG_IS_NOT_SET);
+          }
+          return true;
+        break;
       }
       return true;
     }catch(err){

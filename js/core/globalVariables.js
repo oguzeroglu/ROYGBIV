@@ -129,7 +129,8 @@ var commandArgumentsExpectedCount = [
     0, //printParticleSystemCollisionWorkerMode
     0, //logFrameDrops
     3, //addPaddingToTexture
-    3 //newSphere
+    3, //newSphere
+    0 //printFogInfo
 ];
 var commandArgumentsExpectedExplanation = [
   "help", //help
@@ -255,7 +256,8 @@ var commandArgumentsExpectedExplanation = [
   "printParticleSystemCollisionWorkerMode", //printParticleSystemCollisionWorkerMode
   "logFrameDrops", //logFrameDrops
   "addPaddingToTexture textureName padding newTextureName", //addPaddingToTexture
-  "newSphere name material radius" //newSphere
+  "newSphere name material radius", //newSphere
+  "printFogInfo" //printFogInfo
 ];
 var commands = [
   "help",
@@ -381,7 +383,8 @@ var commands = [
   "printParticleSystemCollisionWorkerMode",
   "logFrameDrops",
   "addPaddingToTexture",
-  "newSphere"
+  "newSphere",
+  "printFogInfo"
 ];
 var commandInfo = [
   "help: Prints command list.",
@@ -507,7 +510,8 @@ var commandInfo = [
   "printParticleSystemCollisionWorkerMode: Prints if the particle system collision web worker is enabled or not.",
   "logFrameDrops: Records frame drops for a minute and prints exactly how many frames are missed within a minute to Javascript console.",
   "addPaddingToTexture: Adds padding to a texture. This can be useful for crosshair rotations to prevent visual errors.",
-  "newSphere: Creates a new sphere."
+  "newSphere: Creates a new sphere.",
+  "printFogInfo: Prints the fog info."
 ];
 var keyboardInfo = [
   "W/S : Translates the camera along Z axis.",
