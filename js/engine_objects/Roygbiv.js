@@ -2209,6 +2209,29 @@ Roygbiv.prototype.setParticleSystemRotation = function(particleSystem, axis, rad
     throw new Error("setParticleSystemRotation error: Bad parameters.");
     return;
   }
+  if (!particleSystem.mesh.visible){
+    throw new Error("setParticleSystemRotation error: particleSystem is not visible.");
+    return;
+  }
+  if (particleSystem.checkForCollisions){
+    throw new Error("setParticleSystemRotation error: particleSystem has a collision callback attached. Cannot set rotation.");
+    return;
+  }
+  if (particleSystem.particlesWithCollisionCallbacks.size > 0){
+    throw new Error("setParticleSystemRotation error: particleSystem has a collidable particle. Cannot set rotation.");
+    return;
+  }
+  if (particleSystem.hasTrailedParticle){
+    throw new Error("setParticleSystemRotation error: particleSystem has a trailed particle. Cannot set rotation.");
+    return;
+  }
+  if (particleSystem.velocity.x != 0 || particleSystem.velocity.y != 0 || particleSystem.velocity.z != 0 ||
+          particleSystem.acceleration.x != 0 || particleSystem.acceleration.y != 0 || particleSystem.acceleration.z != 0){
+
+      throw new Error("setParticleSystemRotation error: particleSystem has a defined motion. Cannot set rotation.");
+      return;
+  }
+
   if (axis == "x"){
     particleSystem.mesh.rotation.x = rad;
   }else if (axis == "y"){
@@ -2216,6 +2239,8 @@ Roygbiv.prototype.setParticleSystemRotation = function(particleSystem, axis, rad
   }else if (axis == "z"){
     particleSystem.mesh.rotation.z = rad;
   }
+
+  particleSystem.hasManualRotationSet = true;
 
 }
 
@@ -2237,7 +2262,32 @@ Roygbiv.prototype.setParticleSystemQuaternion = function(particleSystem, quatX, 
     throw new Error("setParticleSystemQuaternion error: Bad parameters.");
     return;
   }
+
+  if (!particleSystem.mesh.visible){
+    throw new Error("setParticleSystemQuaternion error: particleSystem is not visible.");
+    return;
+  }
+  if (particleSystem.checkForCollisions){
+    throw new Error("setParticleSystemQuaternion error: particleSystem has a collision callback attached. Cannot set quaternion.");
+    return;
+  }
+  if (particleSystem.particlesWithCollisionCallbacks.size > 0){
+    throw new Error("setParticleSystemQuaternion error: particleSystem has a collidable particle. Cannot set quaternion.");
+    return;
+  }
+  if (particleSystem.hasTrailedParticle){
+    throw new Error("setParticleSystemQuaternion error: particleSystem has a trailed particle. Cannot set quaternion.");
+    return;
+  }
+  if (particleSystem.velocity.x != 0 || particleSystem.velocity.y != 0 || particleSystem.velocity.z != 0 ||
+          particleSystem.acceleration.x != 0 || particleSystem.acceleration.y != 0 || particleSystem.acceleration.z != 0){
+
+      throw new Error("setParticleSystemQuaternion error: particleSystem has a defined motion. Cannot set quaternion.");
+      return;
+  }
+
   particleSystem.mesh.quaternion.set(quatX, quatY, quatZ, quatW);
+  particleSystem.hasManualQuaternionSet = true;
 }
 
 // kill
@@ -5840,6 +5890,14 @@ Roygbiv.prototype.setCollisionListener = function(sourceObject, callbackFunction
         throw new Error("setCollisionListener error: A position is set manually to the parent particle system. Cannot listen for collisions.");
         return;
       }
+      if (sourceObject.parent.hasManualRotationSet){
+        throw new Error("setCollisionListener error: A rotation is set manually to the parent particle system. Cannot listen for collisions.");
+        return;
+      }
+      if (sourceObject.parent.hasManualQuaternionSet){
+        throw new Error("setCollisionListener error: A quaternion is set manually to the parent particle system. Cannot listen for collisions.");
+        return;
+      }
       if (!sourceObject.parent.hasParticleCollision){
         if (TOTAL_PARTICLE_SYSTEMS_WITH_PARTICLE_COLLISIONS >= MAX_PARTICLE_SYSTEMS_WITH_PARTICLE_COLLISIONS){
           throw new Error("setCollisionListener error: Maximum "+MAX_PARTICLE_SYSTEMS_WITH_PARTICLE_COLLISIONS+" can have collidable particles.");
@@ -5875,6 +5933,14 @@ Roygbiv.prototype.setCollisionListener = function(sourceObject, callbackFunction
   }else if (sourceObject instanceof ParticleSystem){
     if (sourceObject.hasManualPositionSet){
       throw new Error("setCollisionListener error: A position is set manually to the particle system. Cannot listen for collisions.");
+      return;
+    }
+    if (sourceObject.hasManualRotationSet){
+      throw new Error("setCollisionListener error: A rotation is set manually to the particle system. Cannot listen for collisions.");
+      return;
+    }
+    if (sourceObject.hasManualQuaternionSet){
+      throw new Error("setCollisionListener error: A quaternion is set manually to the particle system. Cannot listen for collisions.");
       return;
     }
     var incrCounter = false;
