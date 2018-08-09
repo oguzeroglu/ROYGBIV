@@ -3306,6 +3306,10 @@ function parse(input){
           // DEPRECATED
         break;
         case 90: //setFog
+          if (mode != 0){
+            terminal.printError(Text.WORKS_ONLY_IN_DESIGN_MODE);
+            return true;
+          }
           var fogColorStr = splitted[1];
           var fogDensityVal = parseFloat(splitted[2]);
           if (isNaN(fogDensityVal)){
@@ -3327,6 +3331,10 @@ function parse(input){
           return true;
         break;
         case 91: //removeFog
+          if (mode != 0){
+            terminal.printError(Text.WORKS_ONLY_IN_DESIGN_MODE);
+            return true;
+          }
           fogActive = false;
           terminal.printInfo(Text.FOG_REMOVED);
           undoRedoHandler.push();
