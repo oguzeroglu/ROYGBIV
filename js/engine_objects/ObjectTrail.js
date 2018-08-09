@@ -387,6 +387,14 @@ var ObjectTrail = function(configurations){
     g = this.object.material.color.g;
     b = this.object.material.color.b;
   }
+
+  var fogInfo;
+  if (fogActive){
+    fogInfo = new THREE.Vector4(fogDensity, fogColorRGB.r, fogColorRGB.g, fogColorRGB.b);
+  }else{
+    fogInfo = new THREE.Vector4(-100.0, 0, 0, 0);
+  }
+
   this.material = new THREE.RawShaderMaterial({
     vertexShader: ShaderContent.objectTrailVertexShader,
     fragmentShader: ShaderContent.objectTrailFragmentShader,
@@ -401,7 +409,8 @@ var ObjectTrail = function(configurations){
       currentPosition: new THREE.Uniform(posit),
       currentQuaternion: new THREE.Uniform(quat),
       alpha: new THREE.Uniform(this.alpha),
-      texture: new THREE.Uniform(texture)
+      texture: new THREE.Uniform(texture),
+      fogInfo: new THREE.Uniform(fogInfo)
     }
   });
 
