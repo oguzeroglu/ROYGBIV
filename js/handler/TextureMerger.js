@@ -309,19 +309,8 @@ var TextureMerger = function(texturesObj){
   this.mergedTexture.minFilter = THREE.LinearFilter;
   this.mergedTexture.mapping = THREE.UVMapping;
 
+  //debugTexture(this.mergedTexture);
   //console.log("[*] Textures merged: "+explanationStr);
-}
-
-TextureMerger.prototype.makeCanvasPowerOfTwo = function(){
-  var oldWidth = this.canvas.width;
-  var oldHeight = this.canvas.height;
-  var newWidth = Math.pow(2, Math.round(Math.log(oldWidth) / Math.log(2)));
-  var newHeight = Math.pow(2, Math.round(Math.log(oldHeight) / Math.log(2)));
-  var newCanvas = document.createElement("canvas");
-  newCanvas.width = newWidth;
-  newCanvas.height = newHeight;
-  newCanvas.getContext("2d").drawImage(this.canvas, 0, 0, newWidth, newHeight);
-  this.canvas = newCanvas;
 }
 
 TextureMerger.prototype.insert = function(node, textureName, texturesObj){
@@ -410,6 +399,18 @@ TextureMerger.prototype.insert = function(node, textureName, texturesObj){
   }
 }
 
+TextureMerger.prototype.makeCanvasPowerOfTwo = function(){
+  var oldWidth = this.canvas.width;
+  var oldHeight = this.canvas.height;
+  var newWidth = Math.pow(2, Math.round(Math.log(oldWidth) / Math.log(2)));
+  var newHeight = Math.pow(2, Math.round(Math.log(oldHeight) / Math.log(2)));
+  var newCanvas = document.createElement("canvas");
+  newCanvas.width = newWidth;
+  newCanvas.height = newHeight;
+  newCanvas.getContext("2d").drawImage(this.canvas, 0, 0, newWidth, newHeight);
+  this.canvas = newCanvas;
+}
+
 TextureMerger.prototype.calculateImageSize = function(texturesObj){
   var width = 0;
   var height = 0;
@@ -421,9 +422,11 @@ TextureMerger.prototype.calculateImageSize = function(texturesObj){
     var y = this.textureOffsets[textureName].y;
     if (x + tw > width){
       width = x + tw;
+      width = Math.pow(2, Math.round(Math.log(width) / Math.log(2)));
     }
     if (y + th > height){
       height = y + th;
+      height = Math.pow(2, Math.round(Math.log(height) / Math.log(2)));
     }
   }
 

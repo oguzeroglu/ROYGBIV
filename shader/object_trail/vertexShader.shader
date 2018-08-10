@@ -9,6 +9,7 @@ attribute float quatIndex;
 attribute vec2 faceVertexUV;
 attribute vec2 faceVertexUVEmissive;
 attribute vec2 faceVertexUVHeight;
+attribute vec2 faceVertexUVAlpha;
 attribute vec2 displacementInfo;
 attribute float textureFlag;
 
@@ -24,6 +25,7 @@ uniform sampler2D texture;
 varying float vDiscardFlag;
 varying vec2 vFaceVertexUV;
 varying vec2 vFaceVertexUVEmissive;
+varying vec2 vFaceVertexUVAlpha;
 varying vec3 vColor;
 varying float vTextureFlag;
 
@@ -51,6 +53,7 @@ void main(){
   vDiscardFlag = -10.0;
   vFaceVertexUV = faceVertexUV;
   vFaceVertexUVEmissive = faceVertexUVEmissive;
+  vFaceVertexUVAlpha = faceVertexUVAlpha;
   vTextureFlag = textureFlag;
 
   int indexX = int(coordIndex);

@@ -2,10 +2,12 @@ precision lowp float;
 precision lowp int;
 
 #define LOG2 1.442695
+#define ALPHA_TEST 0.5
 
 varying float vDiscardFlag;
 varying vec2 vFaceVertexUV;
 varying vec2 vFaceVertexUVEmissive;
+varying vec2 vFaceVertexUVAlpha;
 varying vec3 vColor;
 varying float vTextureFlag;
 
@@ -28,6 +30,14 @@ void main(){
     gl_FragColor.a = alpha;
   }else{
     gl_FragColor = vec4(vColor.r, vColor.g, vColor.b, alpha);
+  }
+
+  if (vFaceVertexUVAlpha.x >= -5.0 && vFaceVertexUVAlpha.y >= -5.0){
+    float val = texture2D(texture, vec2(vFaceVertexUVAlpha.x, vFaceVertexUVAlpha.y)).g;
+    gl_FragColor.a *= val;
+    if (val <= ALPHA_TEST){
+      discard;
+    }
   }
 
   if (fogInfo[0] >= -50.0){
