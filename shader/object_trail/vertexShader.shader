@@ -84,14 +84,15 @@ void main(){
   vec3 displacedPosition = position;
   if (faceVertexUVHeight.x >= -5.0 && faceVertexUVHeight.y >= -5.0){
     vec4 displacementData = texture2D(texture, faceVertexUVHeight);
-    float displacement = (displacementInfo.x * displacementData.x) + displacementInfo.y;
-    displacedPosition = normal * displacement + position;
+    float displacementScale = displacementInfo.x;
+    float displacementBias = displacementInfo.y;
+    displacedPosition += normalize(normal) * (displacementData.x * displacementScale + displacementBias);
   }
 
   if (vDiscardFlag < 5.0){
     vec3 rotatedPos = applyQuaternionToVector(displacedPosition, quat);
     vec3 newPosition = coord + rotatedPos;
-    gl_Position = gl_Position = projectionMatrix * viewMatrix * vec4(newPosition, 1.0);
+    gl_Position = projectionMatrix * viewMatrix * vec4(newPosition, 1.0);
   }
 
 }

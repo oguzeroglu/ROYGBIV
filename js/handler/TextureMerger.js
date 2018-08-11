@@ -318,7 +318,7 @@ TextureMerger.prototype.insert = function(node, textureName, texturesObj){
   var tw = texture.image.width;
   var th = texture.image.height;
   if (node.upperNode){
-    var minArea = (this.maxWidth * this.textureCount * this.maxHeight * this.textureCount);
+    var minArea = ((this.maxWidth * this.textureCount) + (this.maxHeight * this.textureCount));
     var minAreaNode = 0;
     var inserted = false;
     for (var i = 0; i<this.allNodes.length; i++){
@@ -326,8 +326,8 @@ TextureMerger.prototype.insert = function(node, textureName, texturesObj){
       if (!curNode.textureName && curNode.rectangle.fits(texture)){
         this.textureOffsets[textureName] = {x: curNode.rectangle.x, y: curNode.rectangle.y};
         var calculatedSize = this.calculateImageSize(texturesObj);
-        var calculatedArea = calculatedSize.width * calculatedSize.height;
-        if (calculatedArea < minArea){
+        var calculatedArea = calculatedSize.width + calculatedSize.height;
+        if (calculatedArea < minArea && calculatedSize.width < MAX_TEXTURE_SIZE && calculatedSize.height < MAX_TEXTURE_SIZE){
           var overlaps = false;
           for (var tName in this.textureOffsets){
             if (tName == textureName){
@@ -399,16 +399,23 @@ TextureMerger.prototype.insert = function(node, textureName, texturesObj){
   }
 }
 
-TextureMerger.prototype.makeCanvasPowerOfTwo = function(){
-  var oldWidth = this.canvas.width;
-  var oldHeight = this.canvas.height;
+TextureMerger.prototype.makeCanvasPowerOfTwo = function(canvas){
+  var setCanvas = false;
+  if (!canvas){
+    canvas = this.canvas;
+    setCanvas = true;
+  }
+  var oldWidth = canvas.width;
+  var oldHeight = canvas.height;
   var newWidth = Math.pow(2, Math.round(Math.log(oldWidth) / Math.log(2)));
   var newHeight = Math.pow(2, Math.round(Math.log(oldHeight) / Math.log(2)));
   var newCanvas = document.createElement("canvas");
   newCanvas.width = newWidth;
   newCanvas.height = newHeight;
-  newCanvas.getContext("2d").drawImage(this.canvas, 0, 0, newWidth, newHeight);
-  this.canvas = newCanvas;
+  newCanvas.getContext("2d").drawImage(canvas, 0, 0, newWidth, newHeight);
+  if (setCanvas){
+    this.canvas = newCanvas;
+  }
 }
 
 TextureMerger.prototype.calculateImageSize = function(texturesObj){
@@ -422,11 +429,9 @@ TextureMerger.prototype.calculateImageSize = function(texturesObj){
     var y = this.textureOffsets[textureName].y;
     if (x + tw > width){
       width = x + tw;
-      width = Math.pow(2, Math.round(Math.log(width) / Math.log(2)));
     }
     if (y + th > height){
       height = y + th;
-      height = Math.pow(2, Math.round(Math.log(height) / Math.log(2)));
     }
   }
 

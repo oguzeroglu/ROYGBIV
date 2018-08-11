@@ -134,6 +134,7 @@ var ObjectTrail = function(configurations){
   var objColors = [];
   var objTextureFlags = [];
   var objDisplacementInfos = [];
+
   for (var i = 0; i < faces.length; i++){
     var face = faces[i];
     var a = face.a;
