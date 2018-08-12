@@ -135,7 +135,6 @@ AddedObject.prototype.export = function(){
   var alphaMap = this.material.alphaMap;
   var aoMap = this.material.aoMap;
   var emissiveMap = this.material.emissiveMap;
-  var envMap = this.material.envMap;
   var normalMap = this.material.normalMap;
   var specularMap = this.material.specularMap;
   var displacementMap = this.material.displacementMap;
@@ -157,10 +156,6 @@ AddedObject.prototype.export = function(){
   if (emissiveMap){
     exportObject["emissiveRoygbivTexturePackName"] = this.material.emissiveMap.roygbivTexturePackName;
     exportObject["emissiveRoygbivTextureName"] = this.material.emissiveMap.roygbivTextureName;
-  }
-  if (envMap){
-    exportObject["envRoygbivTexturePackName"] = this.material.envMap.roygbivTexturePackName;
-    exportObject["envRoygbivTextureName"] = this.material.envMap.roygbivTextureName;
   }
   if (normalMap){
     exportObject["normalRoygbivTexturePackName"] = this.material.normalMap.roygbivTexturePackName;
@@ -253,9 +248,6 @@ AddedObject.prototype.getTextureStack = function(){
   }
   if (this.material.emissiveMap){
     texturesStack.push(this.material.emissiveMap);
-  }
-  if (this.material.envMap){
-    texturesStack.push(this.material.envMap);
   }
   if (this.material.normalMap){
     texturesStack.push(this.material.normalMap);
@@ -631,9 +623,6 @@ AddedObject.prototype.dispose = function(){
   if (this.material.emissiveMap){
     this.material.emissiveMap.dispose();
   }
-  if (this.material.envMap){
-    this.material.envMap.dispose();
-  }
   if (this.material.normalMap){
     this.material.normalMap.dispose();
   }
@@ -667,10 +656,6 @@ AddedObject.prototype.mapTexturePack = function(texturePack, fromScript){
     if (this.material.emissiveMap && this.material.emissiveMap.roygbivTextureName){
       this.oldEmissiveMap = this.material.emissiveMap.clone();
       this.oldEmissiveMapName = this.material.emissiveMap.roygbivTextureName;
-    }
-    if (this.material.envMap && this.material.envMap.roygbivTextureName){
-      this.oldEnvMap = this.material.envMap.clone();
-      this.oldEnvMapName = this.material.envMap.roygbivTextureName;
     }
     if (this.material.normalMap && this.material.normalMap.roygbivTextureName){
       this.oldNormalMap = this.material.normalMap.clone();
@@ -769,14 +754,6 @@ AddedObject.prototype.mapTexturePack = function(texturePack, fromScript){
       this.material.emissiveMap.needsUpdate = true;
     }
   }
-  if (texturePack.hasEnvironment){
-    this.material.envMap = texturePack.environmentTexture.clone();
-    if (!fromScript){
-      this.material.envMap.roygbivTexturePackName = texturePack.name;
-      this.material.envMap.roygbivTextureName = 0;
-    }
-    this.material.envMap.needsUpdate = true;
-  }
   if (texturePack.hasNormal){
     if (!this.material.isMeshBasicMaterial){
       this.material.normalMap = texturePack.normalTexture.clone();
@@ -838,11 +815,6 @@ AddedObject.prototype.resetTexturePackAfterAnimation = function(){
     this.material.aoMap.needsUpdate = true;
     this.material.aoMap.roygbivTextureName = this.oldAoMapName;
     this.oldAoMap = 0;
-  }
-  if (this.oldEnvMap){
-    this.material.envMap = this.oldEnvMap.clone();
-    this.material.envMap.needsUpdate = true;
-    this.material.envMap.roygbivTextureName = this.oldEnvMapName;
   }
   if (this.oldAlphaMap){
     this.material.alphaMap = this.oldAlphaMap.clone();
@@ -1090,7 +1062,6 @@ AddedObject.prototype.resetMaps = function(resetAssociatedTexturePack){
   this.material.alphaMap = undefined;
   this.material.aoMap = undefined;
   this.material.emissiveMap = undefined;
-  this.material.envMap = undefined;
   this.material.normalMap = undefined;
   this.material.specularMap = undefined;
   this.material.displacementMap = undefined;
@@ -1109,7 +1080,6 @@ AddedObject.prototype.isTextured = function(){
     this.material.alphaMap ||
     this.material.aoMap ||
     this.material.emissiveMap ||
-    this.material.envMap ||
     this.material.normalMap ||
     this.material.specularMap ||
     this.material.displacementMap
@@ -1130,9 +1100,6 @@ AddedObject.prototype.adjustTextureRepeat = function(repeatU, repeatV){
   }
   if (this.material.emissiveMap){
     this.material.emissiveMap.repeat.set(repeatU, repeatV);
-  }
-  if (this.material.envMap){
-    this.material.envMap.repeat.set(repeatU, repeatV);
   }
   if (this.material.normalMap){
     this.material.normalMap.repeat.set(repeatU, repeatV);

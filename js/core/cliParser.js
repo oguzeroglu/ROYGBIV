@@ -1799,50 +1799,7 @@ function parse(input){
           undoRedoHandler.push();
         break;
         case 44: //mapEnvironment
-          var textureName = splitted[1];
-          var objectName = splitted[2];
-          var texture = textures[textureName];
-          if (mode != 0){
-            terminal.printError(Text.WORKS_ONLY_IN_DESIGN_MODE);
-            return true;
-          }
-          if (objectGroups[objectName]){
-            terminal.printError(Text.GLUED_OBJECTS_DO_NOT_SUPPORT_THIS_FUNCTION);
-            return true;
-          }
-          if (!texture){
-            terminal.printError(Text.NO_SUCH_TEXTURE);
-            return true;
-          }
-          if (!texture || !texture.isLoaded){
-            terminal.printError(Text.TEXTURE_NOT_READY);
-            return true;
-          }
-          var addedObject = addedObjects[objectName];
-          if (!addedObject){
-            terminal.printError(Text.NO_SUCH_OBJECT);
-            return true;
-          }
-
-          var cloneTexture = texture.clone();
-          cloneTexture.fromUploadedImage = texture.fromUploadedImage;
-
-          cloneTexture.roygbivTextureName = textureName;
-          cloneTexture.roygbivTexturePackName = 0;
-
-          addedObject.mesh.material.envMap = cloneTexture;
-          addedObject.previewMesh.material.envMap = cloneTexture;
-
-          cloneTexture.wrapS = THREE.RepeatWrapping;
-          cloneTexture.wrapT = THREE.RepeatWrapping;
-
-          cloneTexture.needsUpdate = true;
-
-          addedObject.mesh.material.needsUpdate = true;
-          addedObject.previewMesh.material.needsUpdate = true;
-          addedObject.resetAssociatedTexturePack();
-          terminal.printInfo(Text.ENVIRONMENT_TEXTURE_MAPPED);
-          undoRedoHandler.push();
+          // DEPRECATED
         break;
         case 45: //mapAmbientOcculsion
           var textureName = splitted[1];
@@ -3850,14 +3807,6 @@ function parse(input){
             var wEmissive = refTexturePack.emissiveTexture.image.width;
             var hEmissive = refTexturePack.emissiveTexture.image.height;
             if (wEmissive * scale < 1 || hEmissive * scale < 1){
-              terminal.printError(Text.TEXTURE_SIZE_TOO_SMALL);
-              return true;
-            }
-          }
-          if (refTexturePack.hasEnvironment){
-            var wEnvironment = refTexturePack.environmentTexture.image.width;
-            var hEnvironment = refTexturePack.environmentTexture.image.height;
-            if (wEnvironment * scale < 1 || hEnvironment * scale < 1){
               terminal.printError(Text.TEXTURE_SIZE_TOO_SMALL);
               return true;
             }

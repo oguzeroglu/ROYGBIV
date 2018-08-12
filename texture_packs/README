@@ -1,0 +1,15 @@
+This folder holds the Texture Packs, do NOT delete this folder.
+
+Each Texture Pack is a directory containing different type of maps/textures
+for the same object. Use (Note that * is the extension of each image file):
+
+diffuse.* -> For diffuse maps
+alpha.* -> For alpha maps (black: invisible, white: visible)
+ao.* -> For ambient occulsion maps
+emissive.* -> For emissive maps
+normal.* -> For normal maps
+specular.* -> For specular maps
+height.* -> For height/displacement maps
+
+You can load Texture Packs using the command:
+  "newTexturePack name directory fileExtension"

@@ -10,7 +10,6 @@ var TexturePack = function(name, directoryName, fileExtension, mapCallback, isPr
   this.hasAlpha = false;
   this.hasAO = false;
   this.hasEmissive = false;
-  this.hasEnvironment = false;
   this.hasNormal = false;
   this.hasSpecular = false;
   this.hasHeight = false;
@@ -23,7 +22,6 @@ var TexturePack = function(name, directoryName, fileExtension, mapCallback, isPr
   this.alphaFilePath = texturePackRootDirectory+directoryName+"/"+"alpha."+fileExtension.toLowerCase();
   this.aoFilePath = texturePackRootDirectory+directoryName+"/"+"ao."+fileExtension.toLowerCase();
   this.emissiveFilePath = texturePackRootDirectory+directoryName+"/"+"emissive."+fileExtension.toLowerCase();
-  this.environmentFilePath = texturePackRootDirectory+directoryName+"/"+"environment."+fileExtension.toLowerCase();
   this.normalFilePath = texturePackRootDirectory+directoryName+"/"+"normal."+fileExtension.toLowerCase();
   this.specularFilePath = texturePackRootDirectory+directoryName+"/"+"specular."+fileExtension.toLowerCase();
   this.heightFilePath = texturePackRootDirectory+directoryName+"/"+"height."+fileExtension.toLowerCase();
@@ -33,7 +31,6 @@ var TexturePack = function(name, directoryName, fileExtension, mapCallback, isPr
     this.alphaLoader = new THREE.TGALoader();
     this.aoLoader = new THREE.TGALoader();
     this.emissiveLoader = new THREE.TGALoader();
-    this.environmentLoader = new THREE.TGALoader();
     this.normalLoader = new THREE.TGALoader();
     this.specularLoader = new THREE.TGALoader();
     this.heightLoader = new THREE.TGALoader();
@@ -42,7 +39,6 @@ var TexturePack = function(name, directoryName, fileExtension, mapCallback, isPr
     this.alphaLoader = new THREE.TextureLoader();
     this.aoLoader = new THREE.TextureLoader();
     this.emissiveLoader = new THREE.TextureLoader();
-    this.environmentLoader = new THREE.TextureLoader();
     this.normalLoader = new THREE.TextureLoader();
     this.specularLoader = new THREE.TextureLoader();
     this.heightLoader = new THREE.TextureLoader();
@@ -52,7 +48,6 @@ var TexturePack = function(name, directoryName, fileExtension, mapCallback, isPr
   this.alphaCanMapFlag = false;
   this.aoCanMapFlag = false;
   this.emissiveCanMapFlag = false;
-  this.environmentCanMapFlag = false;
   this.normalCanMapFlag = false;
   this.specularCanMapFlag = false;
   this.heightCanMapFlag = false;
@@ -80,10 +75,6 @@ var TexturePack = function(name, directoryName, fileExtension, mapCallback, isPr
       this.emissiveTexture = refTexturePack.emissiveTexture.clone();
       this.hasEmissive = true;
     }
-    if (refTexturePack.hasEnvironment){
-      this.environmentTexture = refTexturePack.environmentTexture.clone();
-      this.hasEnvironment = true;
-    }
     if (refTexturePack.hasNormal){
       this.normalTexture = refTexturePack.normalTexture.clone();
       this.hasNormal = true;
@@ -109,7 +100,6 @@ TexturePack.prototype.export = function(){
   exportObject.hasAlpha = this.hasAlpha;
   exportObject.hasAO = this.hasAO;
   exportObject.hasEmissive = this.hasEmissive;
-  exportObject.hasEnvironment = this.hasEnvironment;
   exportObject.hasNormal = this.hasNormal;
   exportObject.hasSpecular = this.hasSpecular;
   exportObject.hasHeight = this.hasHeight;
@@ -117,7 +107,6 @@ TexturePack.prototype.export = function(){
   exportObject.alphaFilePath = this.alphaFilePath;
   exportObject.aoFilePath = this.aoFilePath;
   exportObject.emissiveFilePath = this.emissiveFilePath;
-  exportObject.environmentFilePath = this.environmentFilePath;
   exportObject.normalFilePath = this.normalFilePath;
   exportObject.specularFilePath = this.specularFilePath;
   exportObject.heightFilePath = this.heightFilePath;
@@ -145,7 +134,6 @@ TexturePack.prototype.readyCallback = function(){
       this.alphaCanMapFlag ||
       this.aoCanMapFlag ||
       this.emissiveCanMapFlag ||
-      this.environmentCanMapFlag ||
       this.normalCanMapFlag ||
       this.specularCanMapFlag ||
       this.heightCanMapFlag) &&
@@ -216,15 +204,6 @@ TexturePack.prototype.mapEmissive = function(that, textureData){
   that.emissiveTexture.wrapT = THREE.RepeatWrapping;
   that.hasEmissive = true;
   that.emissiveCanMapFlag = true;
-  that.refreshMap();
-}
-
-TexturePack.prototype.mapEnvironment = function(that, textureData){
-  that.environmentTexture = textureData;
-  that.environmentTexture.wrapS = THREE.RepeatWrapping;
-  that.environmentTexture.wrapT = THREE.RepeatWrapping;
-  that.hasEnvironment = true;
-  that.environmentCanMapFlag = true;
   that.refreshMap();
 }
 
@@ -336,32 +315,6 @@ TexturePack.prototype.loadTextures = function(){
       texturePacks[this.name] = this;
     }
   }
-  //ENVIRONMENT
-  var environmentTextureCached = environmentTextureCache[this.name];
-  if (!environmentTextureCached){
-    this.environmentLoader.load(this.environmentFilePath,
-      function(textureData){
-        if (that.scaleFactor){
-          textureData.image = that.rescaleTextureImage(textureData, that.scaleFactor);
-        }
-        that.mapEnvironment(that, textureData);
-      },
-      function(xhr){
-
-      },
-      function(xhr){
-        environmentTextureCache[that.name] = CACHE_NOT_PRESENT;
-        that.hasEnvironment = false;
-        that.environmentCanMapFlag = true;
-        that.refreshMap();
-      }
-    );
-  }else{
-    if (environmentTextureCached != CACHE_NOT_PRESENT){
-      this.mapEnvironment(this, environmentTextureCached);
-      texturePacks[this.name] = this;
-    }
-  }
   //NORMAL
   var normalTextureCached = normalTextureCache[this.name];
   if (!normalTextureCached){
@@ -448,7 +401,6 @@ TexturePack.prototype.printInfo = function(){
   var alphaSizeText = "";
   var ambientOcculsionSizeText = "";
   var emissiveSizeText = "";
-  var environmentSizeText = "";
   var normalSizeText = "";
   var specularSizeText = "";
   var heightSizeText = "";
@@ -466,10 +418,6 @@ TexturePack.prototype.printInfo = function(){
   if (this.hasEmissive){
     var img = this.emissiveTexture.image;
     emissiveSizeText = " ["+img.width+"x"+img.height+"]";
-  }
-  if (this.hasEnvironment){
-    var img = this.environmentTexture.image;
-    environmentSizeText = " ["+img.width+"x"+img.height+"]";
   }
   if (this.hasNormal){
     var img = this.normalTexture.image;
@@ -506,9 +454,6 @@ TexturePack.prototype.printInfo = function(){
   terminal.printInfo(Text.TEXTUREPACK_INFO_TREE_EMISSIVE.replace(
     Text.PARAM1, this.emissiveFilePath
   ), true);
-  terminal.printInfo(Text.TEXTUREPACK_INFO_TREE_ENVIRONMENT.replace(
-    Text.PARAM1, this.environmentFilePath
-  ), true);
   terminal.printInfo(Text.TEXTUREPACK_INFO_TREE_NORMAL.replace(
     Text.PARAM1, this.normalFilePath
   ), true);
@@ -531,9 +476,6 @@ TexturePack.prototype.printInfo = function(){
   terminal.printInfo(Text.TEXTUREPACK_INFO_TREE_EMISSIVE.replace(
     Text.PARAM1, this.hasEmissive + emissiveSizeText
   ), true);
-  terminal.printInfo(Text.TEXTUREPACK_INFO_TREE_ENVIRONMENT.replace(
-    Text.PARAM1, this.hasEnvironment + environmentSizeText
-  ), true);
   terminal.printInfo(Text.TEXTUREPACK_INFO_TREE_NORMAL.replace(
     Text.PARAM1, this.hasNormal + normalSizeText
   ), true);
@@ -551,7 +493,6 @@ TexturePack.prototype.isUsable = function(){
     this.hasAlpha ||
     this.hasAO ||
     this.hasEmissive ||
-    this.hasEnvironment ||
     this.hasNormal ||
     this.hasSpecular ||
     this.hasHeight
@@ -566,7 +507,6 @@ TexturePack.prototype.refresh = function(){
   delete specularTextureCache[this.name];
   delete alphaTextureCache[this.name];
   delete emissiveTextureCache[this.name];
-  delete environmentTextureCache[this.name];
   this.loadTextures();
 }
 
@@ -606,10 +546,6 @@ TexturePack.prototype.rescale = function(scale){
   if (this.hasEmissive){
     this.emissiveTexture.image = this.rescaleTextureImage(this.emissiveTexture, scale);
     this.emissiveTexture.needsUpdate = true;
-  }
-  if (this.hasEnvironment){
-    this.environmentTexture.image = this.rescaleTextureImage(this.environmentTexture, scale);
-    this.environmentTexture.needsUpdate = true;
   }
   if (this.hasNormal){
     this.normalTexture.image = this.rescaleTextureImage(this.normalTexture, scale);

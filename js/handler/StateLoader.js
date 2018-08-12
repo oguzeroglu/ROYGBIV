@@ -72,7 +72,6 @@ StateLoader.prototype.resetRoygbivTextureNames = function(obj){
   obj.alphaRoygbivTextureName = 0;
   obj.aoRoygbivTextureName = 0;
   obj.emissiveRoygbivTextureName = 0;
-  obj.envRoygbivTextureName = 0;
   obj.normalRoygbivTextureName = 0;
   obj.specularRoygbivTextureName = 0;
   obj.displacementRoygbivTextureName = 0;
@@ -1129,20 +1128,6 @@ StateLoader.prototype.handleAddedObjectDiff = function(){
           addedObject.displacementRoygbivTexturePackName = diff.rhs;
         }
       }
-    }else if (diff.path[2] == "envRoygbivTexturePackName"){
-      if (kind == "D"){
-        var addedObject = addedObjects[diff.path[1]];
-        if (addedObject){
-          addedObject.envRoygbivTexturePackName = 0;
-          addedObject.material.envMap = null;
-          addedObject.material.needsUpdate = true;
-        }
-      }else if (kind == "N"){
-        var addedObject = addedObjects[diff.path[1]];
-        if (addedObject){
-          addedObject.envRoygbivTexturePackName = diff.rhs;
-        }
-      }
     }else if (diff.path[2] == "emissiveRoygbivTexturePackName"){
         if (kind == "D"){
           var addedObject = addedObjects[diff.path[1]];
@@ -1291,26 +1276,6 @@ StateLoader.prototype.handleAddedObjectDiff = function(){
           if (addedObject){
             this.resetRoygbivTextureNames(addedObject);
             addedObject.emissiveRoygbivTextureName = rhs;
-            this.mapTextureToSingleObject(addedObject, true);
-          }
-        }
-      }
-    }else if (diff.path[2] == "envRoygbivTextureName"){
-      if (kind == "D"){
-        if (lhs != 0){
-          var addedObject = addedObjects[diff.path[1]];
-          if (addedObject){
-            this.resetRoygbivTextureNames(addedObject);
-            addedObject.material.envMap = null;
-            addedObject.material.needsUpdate = true;
-          }
-        }
-      }else if (kind == "N" || kind == "E"){
-        if (rhs != 0){
-          var addedObject = addedObjects[diff.path[1]];
-          if (addedObject){
-            this.resetRoygbivTextureNames(addedObject);
-            addedObject.envRoygbivTextureName = rhs;
             this.mapTextureToSingleObject(addedObject, true);
           }
         }
@@ -2849,7 +2814,6 @@ StateLoader.prototype.mapTextureToSingleObject = function(diff, exported){
     var alphaRoygbivTextureName;
     var aoRoygbivTextureName;
     var emissiveRoygbivTextureName;
-    var envRoygbivTextureName;
     var normalRoygbivTextureName;
     var specularRoygbivTextureName;
     var displacementRoygbivTextureName;
@@ -2861,7 +2825,6 @@ StateLoader.prototype.mapTextureToSingleObject = function(diff, exported){
       alphaRoygbivTextureName = curAddedObjectExport.alphaRoygbivTextureName;
       aoRoygbivTextureName = curAddedObjectExport.aoRoygbivTextureName;
       emissiveRoygbivTextureName = curAddedObjectExport.emissiveRoygbivTextureName;
-      envRoygbivTextureName = curAddedObjectExport.envRoygbivTextureName;
       normalRoygbivTextureName = curAddedObjectExport.normalRoygbivTextureName;
       specularRoygbivTextureName = curAddedObjectExport.specularRoygbivTextureName;
       displacementRoygbivTextureName = curAddedObjectExport.displacementRoygbivTextureName;
@@ -2872,7 +2835,6 @@ StateLoader.prototype.mapTextureToSingleObject = function(diff, exported){
       alphaRoygbivTextureName = diff.alphaRoygbivTextureName;
       aoRoygbivTextureName = diff.aoRoygbivTextureName;
       emissiveRoygbivTextureName = diff.emissiveRoygbivTextureName;
-      envRoygbivTextureName = diff.envRoygbivTextureName;
       normalRoygbivTextureName = diff.normalRoygbivTextureName;
       specularRoygbivTextureName = diff.specularRoygbivTextureName;
       displacementRoygbivTextureName = diff.displacementRoygbivTextureName;
@@ -3042,43 +3004,6 @@ StateLoader.prototype.mapTextureToSingleObject = function(diff, exported){
         material.needsUpdate = true;
       }
     }
-    if (envRoygbivTextureName){
-      if (textureName == envRoygbivTextureName){
-        var repeatU = curAddedObjectExport["textureRepeatU"];
-        var repeatV = curAddedObjectExport["textureRepeatV"];
-
-        var cloneTexture = texture.clone();
-        cloneTexture.fromUploadedImage = texture.fromUploadedImage;
-        cloneTexture.roygbivTextureName = textureName;
-        cloneTexture.roygbivTexturePackName = 0;
-        material.envMap = cloneTexture;
-
-        cloneTexture.wrapS = THREE.RepeatWrapping;
-        cloneTexture.wrapT = THREE.RepeatWrapping;
-        if (repeatU){
-          cloneTexture.repeat.x = repeatU;
-        }
-        if (repeatV){
-          cloneTexture.repeat.y = repeatV;
-        }
-
-        var mirrorT = metaData["mirrorT"];
-        var mirrorS = metaData["mirrorS"];
-        if (mirrorT){
-          if (mirrorT == "ON"){
-            cloneTexture.wrapT = THREE.MirroredRepeatWrapping;
-          }
-        }
-        if (mirrorS){
-          if (mirrorS == "ON"){
-            cloneTexture.wrapS = THREE.MirroredRepeatWrapping;
-          }
-        }
-
-        cloneTexture.needsUpdate = true;
-        material.needsUpdate = true;
-      }
-    }
     if (normalRoygbivTextureName){
       if (textureName == normalRoygbivTextureName){
         var repeatU = curAddedObjectExport["textureRepeatU"];
@@ -3214,7 +3139,6 @@ StateLoader.prototype.mapTexturePackToSingleObject = function(diff){
     var alphaRoygbivTexturePackName;
     var aoRoygbivTexturePackName;
     var emissiveRoygbivTexturePackName;
-    var envRoygbivTexturePackName;
     var normalRoygbivTexturePackName;
     var specularRoygbivTexturePackName;
     var displacementRoygbivTexturePackName;
@@ -3223,7 +3147,6 @@ StateLoader.prototype.mapTexturePackToSingleObject = function(diff){
     alphaRoygbivTexturePackName = addedObjectExport["alphaRoygbivTexturePackName"];
     aoRoygbivTexturePackName = addedObjectExport["aoRoygbivTexturePackName"];
     emissiveRoygbivTexturePackName = addedObjectExport["emissiveRoygbivTexturePackName"];
-    envRoygbivTexturePackName = addedObjectExport["envRoygbivTexturePackName"];
     normalRoygbivTexturePackName = addedObjectExport["normalRoygbivTexturePackName"];
     specularRoygbivTexturePackName = addedObjectExport["specularRoygbivTexturePackName"];
     displacementRoygbivTexturePackName = addedObjectExport["displacementRoygbivTexturePackName"];
@@ -3330,23 +3253,6 @@ StateLoader.prototype.mapTexturePackToSingleObject = function(diff){
         }
       }
     }
-    if (envRoygbivTexturePackName){
-      if (envRoygbivTexturePackName == texturePackName){
-        if (texturePack.hasEnvironment){
-          material.envMap = texturePack.environmentTexture.clone();
-          material.envMap.roygbivTexturePackName = texturePackName;
-          material.envMap.roygbivTextureName = 0;
-          if (textureRepeatU){
-            material.envMap.repeat.x = textureRepeatU;
-          }
-          if (textureRepeatV){
-            material.envMap.repeat.y = textureRepeatV;
-          }
-          material.needsUpdate = true;
-          material.envMap.needsUpdate = true;
-        }
-      }
-    }
     if (normalRoygbivTexturePackName){
       if (normalRoygbivTexturePackName == texturePackName){
         if (texturePack.hasNormal){
@@ -3427,7 +3333,6 @@ StateLoader.prototype.mapLoadedTexturePack = function(texturePackName, exportObj
     var alphaRoygbivTexturePackName;
     var aoRoygbivTexturePackName;
     var emissiveRoygbivTexturePackName;
-    var envRoygbivTexturePackName;
     var normalRoygbivTexturePackName;
     var specularRoygbivTexturePackName;
     var displacementRoygbivTexturePackName;
@@ -3436,7 +3341,6 @@ StateLoader.prototype.mapLoadedTexturePack = function(texturePackName, exportObj
     alphaRoygbivTexturePackName = addedObjectExport["alphaRoygbivTexturePackName"];
     aoRoygbivTexturePackName = addedObjectExport["aoRoygbivTexturePackName"];
     emissiveRoygbivTexturePackName = addedObjectExport["emissiveRoygbivTexturePackName"];
-    envRoygbivTexturePackName = addedObjectExport["envRoygbivTexturePackName"];
     normalRoygbivTexturePackName = addedObjectExport["normalRoygbivTexturePackName"];
     specularRoygbivTexturePackName = addedObjectExport["specularRoygbivTexturePackName"];
     displacementRoygbivTexturePackName = addedObjectExport["displacementRoygbivTexturePackName"];
@@ -3560,23 +3464,6 @@ StateLoader.prototype.mapLoadedTexturePack = function(texturePackName, exportObj
         }
       }
     }
-    if (envRoygbivTexturePackName){
-      if (envRoygbivTexturePackName == texturePackName){
-        if (texturePack.hasEnvironment){
-          material.envMap = texturePack.environmentTexture.clone();
-          material.envMap.roygbivTexturePackName = texturePackName;
-          material.envMap.roygbivTextureName = 0;
-          if (textureRepeatU){
-            material.envMap.repeat.x = textureRepeatU;
-          }
-          if (textureRepeatV){
-            material.envMap.repeat.y = textureRepeatV;
-          }
-          material.needsUpdate = true;
-          material.envMap.needsUpdate = true;
-        }
-      }
-    }
     if (normalRoygbivTexturePackName){
       if (normalRoygbivTexturePackName == texturePackName){
         if (texturePack.hasNormal){
@@ -3676,7 +3563,6 @@ StateLoader.prototype.mapLoadedTexture = function(texture, textureName){
     var alphaRoygbivTextureName = curAddedObjectExport.alphaRoygbivTextureName;
     var aoRoygbivTextureName = curAddedObjectExport.aoRoygbivTextureName;
     var emissiveRoygbivTextureName = curAddedObjectExport.emissiveRoygbivTextureName;
-    var envRoygbivTextureName = curAddedObjectExport.envRoygbivTextureName;
     var normalRoygbivTextureName = curAddedObjectExport.normalRoygbivTextureName;
     var specularRoygbivTextureName = curAddedObjectExport.specularRoygbivTextureName;
     var displacementRoygbivTextureName = curAddedObjectExport.displacementRoygbivTextureName;
@@ -3818,43 +3704,6 @@ StateLoader.prototype.mapLoadedTexture = function(texture, textureName){
         cloneTexture.roygbivTextureName = textureName;
         cloneTexture.roygbivTexturePackName = 0;
         material.emissiveMap = cloneTexture;
-
-        cloneTexture.wrapS = THREE.RepeatWrapping;
-        cloneTexture.wrapT = THREE.RepeatWrapping;
-        if (repeatU){
-          cloneTexture.repeat.x = repeatU;
-        }
-        if (repeatV){
-          cloneTexture.repeat.y = repeatV;
-        }
-
-        var mirrorT = metaData["mirrorT"];
-        var mirrorS = metaData["mirrorS"];
-        if (mirrorT){
-          if (mirrorT == "ON"){
-            cloneTexture.wrapT = THREE.MirroredRepeatWrapping;
-          }
-        }
-        if (mirrorS){
-          if (mirrorS == "ON"){
-            cloneTexture.wrapS = THREE.MirroredRepeatWrapping;
-          }
-        }
-
-        cloneTexture.needsUpdate = true;
-        material.needsUpdate = true;
-      }
-    }
-    if (envRoygbivTextureName){
-      if (textureName == envRoygbivTextureName){
-        var repeatU = curAddedObjectExport["textureRepeatU"];
-        var repeatV = curAddedObjectExport["textureRepeatV"];
-
-        var cloneTexture = texture.clone();
-        cloneTexture.fromUploadedImage = texture.fromUploadedImage;
-        cloneTexture.roygbivTextureName = textureName;
-        cloneTexture.roygbivTexturePackName = 0;
-        material.envMap = cloneTexture;
 
         cloneTexture.wrapS = THREE.RepeatWrapping;
         cloneTexture.wrapT = THREE.RepeatWrapping;
@@ -4135,7 +3984,6 @@ StateLoader.prototype.resetProject = function(undo){
     specularTextureCache = new Object();
     alphaTextureCache = new Object();
     emissiveTextureCache = new Object();
-    environmentTextureCache = new Object();
     skyboxCache = new Object();
   }
 
