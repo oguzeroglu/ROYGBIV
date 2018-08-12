@@ -2,20 +2,14 @@ var ObjectTrail = function(configurations){
   this.object = configurations.object;
   this.alpha = configurations.alpha;
 
+  var hasDisplacement = false;
+
   var geometry;
   if (this.object instanceof AddedObject){
-    var displacementInfo = new THREE.Vector2(0, 0);
-    if (this.object.material instanceof THREE.MeshPhongMaterial){
-      if (this.object.material.displacementMap){
-        displacementInfo.x = this.object.material.displacementScale;
-        displacementInfo.y = this.object.material.displacementBias;
-      }
-    }
     geometry = this.object.previewMesh.geometry;
     var color = this.object.material.color;
     for (var i = 0; i<this.object.previewMesh.geometry.faces.length; i++){
       this.object.previewMesh.geometry.faces[i].vertexColors.push(color, color, color);
-      this.object.previewMesh.geometry.faces[i].displacementInfo = displacementInfo;
     }
     this.isAddedObject = true;
   }else if (this.object instanceof ObjectGroup){
@@ -24,23 +18,14 @@ var ObjectTrail = function(configurations){
     var lastIndex = 0;
     for (var objectName in this.object.group){
       var childObj = this.object.group[objectName];
-      var displacementInfo = new THREE.Vector2(0, 0);
-      if (childObj.material instanceof THREE.MeshPhongMaterial){
-        if (childObj.material.displacementMap){
-          displacementInfo.x = childObj.material.displacementScale;
-          displacementInfo.y = childObj.material.displacementBias;
-        }
-      }
       for (var i = 0; i<childObj.previewMesh.geometry.faces.length; i++){
         var color = childObj.material.color;
         childObj.previewMesh.geometry.faces[i].vertexColors.push(color, color, color);
-        childObj.previewMesh.geometry.faces[i].displacementInfo = displacementInfo;
       }
       childObj.previewMesh.updateMatrix();
       geometry.merge(childObj.previewMesh.geometry, childObj.previewMesh.matrix);
       for (var i2 = lastIndex; i2<geometry.faces.length; i2++){
         geometry.faces[i2].roygbivObjectName = objectName;
-        geometry.faces[i2].displacementInfo = displacementInfo;
       }
       lastIndex = geometry.faces.length;
     }
@@ -62,8 +47,7 @@ var ObjectTrail = function(configurations){
     }
     if ((this.object.material instanceof THREE.MeshPhongMaterial)){
       if (this.object.material.displacementMap){
-        textureCount ++;
-        texturesObject[this.object.name+",height"] = this.object.material.displacementMap;
+        hasDisplacement = true;
       }
     }
     if (this.object.material.alphaMap){
@@ -93,8 +77,7 @@ var ObjectTrail = function(configurations){
       }
       if (obj.material instanceof THREE.MeshPhongMaterial){
         if (obj.material.displacementMap){
-          texturesObj[objectName+",height"] = obj.material.displacementMap;
-          textureCount ++;
+          hasDisplacement = true;
         }
       }
       if (obj.material.alphaMap){
@@ -112,6 +95,23 @@ var ObjectTrail = function(configurations){
   var vertices = geometry.vertices;
   var faceVertexUVs = geometry.faceVertexUvs;
 
+  if (hasDisplacement){
+    if (this.isAddedObject){
+      this.displacedPositions = new DisplacementCalculator(this.object).displacedPositions;
+    }else{
+        this.displacedPositions = new Object();
+        this.displacedPositionCounters = new Object();
+        for (var objName in this.object.group){
+          var child = this.object.group[objName];
+          child.previewMesh.updateMatrix();
+          this.displacedPositions[objName] = new DisplacementCalculator(
+            child, child.previewMesh.matrix
+          ).displacedPositions;
+          this.displacedPositionCounters[objName] = 0;
+        }
+    }
+  }
+
   this.geometry = new THREE.BufferGeometry();
   this.positions = new Float32Array(faces.length * 3 * 3 * 60 * OBJECT_TRAIL_MAX_TIME_IN_SECS);
   this.colors = new Float32Array(faces.length * 3 * 3 * 60 * OBJECT_TRAIL_MAX_TIME_IN_SECS);
@@ -120,20 +120,18 @@ var ObjectTrail = function(configurations){
   this.quatIndices = new Float32Array(faces.length * 3 * 60 * OBJECT_TRAIL_MAX_TIME_IN_SECS);
   this.faceVertexUVs = new Float32Array(faces.length * 3 * 2 * 60 * OBJECT_TRAIL_MAX_TIME_IN_SECS);
   this.faceVertexUVsEmissive = new Float32Array(faces.length * 3 * 2 * 60 * OBJECT_TRAIL_MAX_TIME_IN_SECS);
-  this.faceVertexUVsHeight = new Float32Array(faces.length * 3 * 2 * 60 * OBJECT_TRAIL_MAX_TIME_IN_SECS);
   this.faceVertexUVsAlpha = new Float32Array(faces.length * 3 * 2 * 60 * OBJECT_TRAIL_MAX_TIME_IN_SECS);
-  this.displacementInfo = new Float32Array(faces.length * 3 * 2 * 60 * OBJECT_TRAIL_MAX_TIME_IN_SECS);
   this.textureFlags = new Float32Array(faces.length * 3 * 60 * OBJECT_TRAIL_MAX_TIME_IN_SECS);
 
   var objPositions = [];
   var objNormals = [];
   var objUVs = [];
   var objUVsEmissive = [];
-  var objUVsHeight = [];
   var objUVsAlpha = [];
   var objColors = [];
   var objTextureFlags = [];
-  var objDisplacementInfos = [];
+
+  var iDisplaced = 0;
 
   for (var i = 0; i < faces.length; i++){
     var face = faces[i];
@@ -143,9 +141,32 @@ var ObjectTrail = function(configurations){
     var vertex1 = vertices[a];
     var vertex2 = vertices[b];
     var vertex3 = vertices[c];
-    objPositions.push(vertex1);
-    objPositions.push(vertex2);
-    objPositions.push(vertex3);
+    if (!hasDisplacement){
+      objPositions.push(vertex1);
+      objPositions.push(vertex2);
+      objPositions.push(vertex3);
+    }else{
+      if (this.isAddedObject){
+        objPositions.push(this.displacedPositions[iDisplaced ++]);
+        objPositions.push(this.displacedPositions[iDisplaced ++]);
+        objPositions.push(this.displacedPositions[iDisplaced ++]);
+      }else{
+        var childName = face.roygbivObjectName;
+        var childObj = this.object.group[childName];
+        if ((childObj.material instanceof THREE.MeshPhongMaterial) && childObj.material.displacementMap){
+          var displacedChldPositions = this.displacedPositions[childName];
+          var iDisplacedCtr = this.displacedPositionCounters[childName];
+          objPositions.push(displacedChldPositions[iDisplacedCtr ++]);
+          objPositions.push(displacedChldPositions[iDisplacedCtr ++]);
+          objPositions.push(displacedChldPositions[iDisplacedCtr ++]);
+          this.displacedPositionCounters[childName] = iDisplacedCtr;
+        }else{
+          objPositions.push(vertex1);
+          objPositions.push(vertex2);
+          objPositions.push(vertex3);
+        }
+      }
+    }
     var curFaceVertexUV = faceVertexUVs[0][i];
     var vUVary = [];
     var vUVary2 = [];
@@ -155,7 +176,6 @@ var ObjectTrail = function(configurations){
     if (this.textureMerger && !this.isAddedObject){
       var rangeDiffuse = this.textureMerger.ranges[face.roygbivObjectName+",diffuse"];
       var rangeEmissive = this.textureMerger.ranges[face.roygbivObjectName+",emissive"];
-      var rangeHeight = this.textureMerger.ranges[face.roygbivObjectName+",height"];
       var rangeAlpha = this.textureMerger.ranges[face.roygbivObjectName+",alpha"];
       for (var ix = 0; ix<3; ix++){
         var vuv = curFaceVertexUV[ix];
@@ -172,11 +192,6 @@ var ObjectTrail = function(configurations){
           isTextured = true;
           vUVary2[ix].x = (vuv.x) / (1) * (rangeEmissive.endU - rangeEmissive.startU) + rangeEmissive.startU;
           vUVary2[ix].y = (vuv.y) / (1) * (rangeEmissive.startV - rangeEmissive.endV) + rangeEmissive.endV;
-        }
-        if (rangeHeight){
-          isTextured = true;
-          vUVary3[ix].x = (vuv.x) / (1) * (rangeHeight.endU - rangeHeight.startU) + rangeHeight.startU;
-          vUVary3[ix].y = (vuv.y) / (1) * (rangeHeight.startV - rangeHeight.endV) + rangeHeight.endV;
         }
         if (rangeAlpha){
           isTextured = true;
@@ -187,7 +202,6 @@ var ObjectTrail = function(configurations){
     }else if (this.textureMerger && this.isAddedObject){
       var rangeDiffuse = this.textureMerger.ranges[face.roygbivObjectName+",diffuse"];
       var rangeEmissive = this.textureMerger.ranges[face.roygbivObjectName+",emissive"];
-      var rangeHeight = this.textureMerger.ranges[face.roygbivObjectName+",height"];
       var rangeAlpha = this.textureMerger.ranges[face.roygbivObjectName+",alpha"];
       for (var ix = 0; ix<3; ix++){
         var vuv = curFaceVertexUV[ix];
@@ -204,11 +218,6 @@ var ObjectTrail = function(configurations){
           isTextured = true;
           vUVary2[ix].x = (vuv.x) / (1) * (rangeEmissive.endU - rangeEmissive.startU) + rangeEmissive.startU;
           vUVary2[ix].y = (vuv.y) / (1) * (rangeEmissive.startV - rangeEmissive.endV) + rangeEmissive.endV;
-        }
-        if (rangeHeight){
-          isTextured = true;
-          vUVary3[ix].x = (vuv.x) / (1) * (rangeHeight.endU - rangeHeight.startU) + rangeHeight.startU;
-          vUVary3[ix].y = (vuv.y) / (1) * (rangeHeight.startV - rangeHeight.endV) + rangeHeight.endV;
         }
         if (rangeAlpha){
           isTextured = true;
@@ -232,12 +241,6 @@ var ObjectTrail = function(configurations){
             if (this.object.material.emissiveMap){
               isTextured = true;
             }
-          }else{
-            if (this.object.material instanceof THREE.MeshPhongMaterial){
-              if (this.object.material.displacementMap){
-                isTextured = true;
-              }
-            }
           }
         }
       }else{
@@ -249,12 +252,6 @@ var ObjectTrail = function(configurations){
             if (obj.material.emissiveMap){
               isTextured = true;
             }
-          }else{
-            if (obj.material instanceof THREE.MeshPhongMaterial){
-              if (obj.material.displacementMap){
-                isTextured = true;
-              }
-            }
           }
         }
       }
@@ -265,15 +262,9 @@ var ObjectTrail = function(configurations){
     objUVsEmissive.push(vUVary2[0]);
     objUVsEmissive.push(vUVary2[1]);
     objUVsEmissive.push(vUVary2[2]);
-    objUVsHeight.push(vUVary3[0]);
-    objUVsHeight.push(vUVary3[1]);
-    objUVsHeight.push(vUVary3[2]);
     objUVsAlpha.push(vUVary4[0]);
     objUVsAlpha.push(vUVary4[1]);
     objUVsAlpha.push(vUVary4[2]);
-    objDisplacementInfos.push(face.displacementInfo);
-    objDisplacementInfos.push(face.displacementInfo);
-    objDisplacementInfos.push(face.displacementInfo);
     objNormals.push(face.normal);
     objNormals.push(face.normal);
     objNormals.push(face.normal);
@@ -322,12 +313,8 @@ var ObjectTrail = function(configurations){
     this.faceVertexUVs[i7++] = objUVs[i8].y;
     this.faceVertexUVsEmissive[i11++] = objUVsEmissive[i8].x;
     this.faceVertexUVsEmissive[i11++] = objUVsEmissive[i8].y;
-    this.faceVertexUVsHeight[i12++] = objUVsHeight[i8].x;
-    this.faceVertexUVsHeight[i12++] = objUVsHeight[i8].y;
     this.faceVertexUVsAlpha[i15++] = objUVsAlpha[i8].x;
     this.faceVertexUVsAlpha[i15++] = objUVsAlpha[i8].y;
-    this.displacementInfo[i13++] = objDisplacementInfos[i8].x;
-    this.displacementInfo[i13++] = objDisplacementInfos[i8].y;
     this.coordIndices[i] = i4;
     this.quatIndices[i] = i6;
     this.textureFlags[i] = objTextureFlags[i10];
@@ -364,9 +351,7 @@ var ObjectTrail = function(configurations){
   this.quatIndicesBufferAttribute = new THREE.BufferAttribute(this.quatIndices, 1);
   this.faceVertexUVsBufferAttribute = new THREE.BufferAttribute(this.faceVertexUVs, 2);
   this.faceVertexUVsEmissiveBufferAttribute = new THREE.BufferAttribute(this.faceVertexUVsEmissive, 2);
-  this.faceVertexUVsHeightBufferAttribute = new THREE.BufferAttribute(this.faceVertexUVsHeight, 2);
   this.faceVertexUVsAlphaBufferAttribute = new THREE.BufferAttribute(this.faceVertexUVsAlpha, 2);
-  this.displacementInfoBufferAttribute = new THREE.BufferAttribute(this.displacementInfo, 2);
   this.textureFlagsBufferAttribute = new THREE.BufferAttribute(this.textureFlags, 1);
 
   this.positionBufferAttribute.setDynamic(false);
@@ -376,9 +361,7 @@ var ObjectTrail = function(configurations){
   this.quatIndicesBufferAttribute.setDynamic(false);
   this.faceVertexUVsBufferAttribute.setDynamic(false);
   this.faceVertexUVsEmissiveBufferAttribute.setDynamic(false);
-  this.faceVertexUVsHeightBufferAttribute.setDynamic(false);
   this.faceVertexUVsAlphaBufferAttribute.setDynamic(false);
-  this.displacementInfoBufferAttribute.setDynamic(false);
   this.textureFlagsBufferAttribute.setDynamic(false);
 
   this.geometry.addAttribute('position', this.positionBufferAttribute);
@@ -388,9 +371,7 @@ var ObjectTrail = function(configurations){
   this.geometry.addAttribute('quatIndex', this.quatIndicesBufferAttribute);
   this.geometry.addAttribute('faceVertexUV', this.faceVertexUVsBufferAttribute);
   this.geometry.addAttribute('faceVertexUVEmissive', this.faceVertexUVsEmissiveBufferAttribute);
-  this.geometry.addAttribute('faceVertexUVHeight', this.faceVertexUVsHeightBufferAttribute);
   this.geometry.addAttribute('faceVertexUVAlpha', this.faceVertexUVsAlphaBufferAttribute);
-  this.geometry.addAttribute('displacementInfo', this.displacementInfoBufferAttribute);
   this.geometry.addAttribute('textureFlag', this.textureFlagsBufferAttribute);
 
   var objectCoordinates = new Array(60 * OBJECT_TRAIL_MAX_TIME_IN_SECS * 3);

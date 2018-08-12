@@ -8,7 +8,7 @@ var ShaderContent = function(){
     this.crossHairFragmentShader = 0;
 
     this.load();
-
+    
 }
 
 ShaderContent.prototype.load = function(){
@@ -47,7 +47,6 @@ ShaderContent.prototype.load = function(){
     that.crossHairVertexShader = crossHairVertexShaderRequest.responseText;
     console.log("[*] Crosshair vertex shader loaded.");
   });
-
   crossHairFragmentShaderRequest.addEventListener("load", function(){
     that.crossHairFragmentShader = crossHairFragmentShaderRequest.responseText;
     console.log("[*] Crosshair fragment shader loaded.");
@@ -59,4 +58,5 @@ ShaderContent.prototype.load = function(){
   objectTrailFragmentShaderRequest.send();
   crossHairVertexShaderRequest.send();
   crossHairFragmentShaderRequest.send();
+
 }

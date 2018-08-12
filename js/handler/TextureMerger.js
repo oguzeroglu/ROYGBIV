@@ -305,10 +305,7 @@ var TextureMerger = function(texturesObj){
 
   this.mergedTexture = new THREE.CanvasTexture(this.canvas);
   this.mergedTexture.generateMipmaps = true;
-  this.mergedTexture.magFilter = THREE.NearestFilter;
-  this.mergedTexture.minFilter = THREE.LinearFilter;
-  this.mergedTexture.mapping = THREE.UVMapping;
-
+  this.mergedTexture.needsUpdate = true;
   //debugTexture(this.mergedTexture);
   //console.log("[*] Textures merged: "+explanationStr);
 }

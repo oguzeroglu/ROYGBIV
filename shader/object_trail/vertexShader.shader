@@ -8,9 +8,7 @@ attribute float coordIndex;
 attribute float quatIndex;
 attribute vec2 faceVertexUV;
 attribute vec2 faceVertexUVEmissive;
-attribute vec2 faceVertexUVHeight;
 attribute vec2 faceVertexUVAlpha;
-attribute vec2 displacementInfo;
 attribute float textureFlag;
 
 uniform mat4 viewMatrix;
@@ -81,16 +79,8 @@ void main(){
     }
   }
 
-  vec3 displacedPosition = position;
-  if (faceVertexUVHeight.x >= -5.0 && faceVertexUVHeight.y >= -5.0){
-    vec4 displacementData = texture2D(texture, faceVertexUVHeight);
-    float displacementScale = displacementInfo.x;
-    float displacementBias = displacementInfo.y;
-    displacedPosition += normalize(normal) * (displacementData.x * displacementScale + displacementBias);
-  }
-
   if (vDiscardFlag < 5.0){
-    vec3 rotatedPos = applyQuaternionToVector(displacedPosition, quat);
+    vec3 rotatedPos = applyQuaternionToVector(position, quat);
     vec3 newPosition = coord + rotatedPos;
     gl_Position = projectionMatrix * viewMatrix * vec4(newPosition, 1.0);
   }

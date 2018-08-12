@@ -1640,3 +1640,12 @@ function debugTexture(textureName){
   img.src = texture.image.toDataURL();
   newTab.document.body.appendChild(img);
 }
+
+// WARNING: FOR TEST PURPOSES
+function debugCanvas(dbgCanvas){
+  var context = dbgCanvas.getContext("2d");
+  var newTab = window.open();
+  var img = new Image(dbgCanvas.width, dbgCanvas.height);
+  img.src = dbgCanvas.toDataURL();
+  newTab.document.body.appendChild(img);
+}
