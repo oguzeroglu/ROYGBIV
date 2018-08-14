@@ -861,7 +861,9 @@ var omMassController;
 var omTextureOffsetXController;
 var omTextureOffsetYController;
 var omOpacityController;
+var omAOIntensityController;
 var omShininessController;
+var omEmissiveIntensityController;
 var omDisplacementScaleController;
 var omDisplacementBiasController;
 var objectManipulationParameters = {
@@ -873,7 +875,9 @@ var objectManipulationParameters = {
   "Texture offset x": 0.0,
   "Texture offset y": 0.0,
   "Opacity": 1.0,
+  "AO intensity": 0.0,
   "Shininess": 0.0,
+  "Emissive int.": 0.0,
   "Disp. scale": 0.0,
   "Disp. bias": 0.0
 };

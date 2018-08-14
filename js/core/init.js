@@ -115,12 +115,27 @@ window.onload = function() {
   }).onFinishChange(function(value){
     undoRedoHandler.push();
   }).listen();
+  omAOIntensityController = datGuiObjectManipulation.add(objectManipulationParameters, "AO intensity").min(0).max(10).step(0.1).onChange(function(val){
+    var material = selectedAddedObject.material;
+    material.aoMapIntensity = val;
+  }).onFinishChange(function(value){
+    undoRedoHandler.push();
+  }).listen();
   omShininessController = datGuiObjectManipulation.add(objectManipulationParameters, "Shininess").min(0).max(100).step(0.01).onChange(function(val){
     var material = selectedAddedObject.material;
     if (material.isMeshPhongMaterial){
       material.shininess = val;
       material.needsUpdate = true;
       selectedAddedObject.initShininessSet = false;
+    }
+  }).onFinishChange(function(value){
+    undoRedoHandler.push();
+  }).listen();
+  omEmissiveIntensityController = datGuiObjectManipulation.add(objectManipulationParameters, "Emissive int.").min(0).max(100).step(0.01).onChange(function(val){
+    var material = selectedAddedObject.material;
+    if (material.isMeshPhongMaterial){
+      material.emissiveIntensity = val;
+      material.needsUpdate = true;
     }
   }).onFinishChange(function(value){
     undoRedoHandler.push();
@@ -1016,6 +1031,7 @@ function enableAllOMControllers(){
   enableOMControler(omTextureOffsetYController);
   enableOMControler(omOpacityController);
   enableOMControler(omShininessController);
+  enableOMControler(omEmissiveIntensityController);
   enableOMControler(omDisplacementScaleController);
   enableOMControler(omDisplacementBiasController);
 }
@@ -1039,6 +1055,7 @@ function afterObjectSelection(){
       objectManipulationParameters["Rotate y"] = 0;
       objectManipulationParameters["Rotate z"] = 0;
       objectManipulationParameters["Opacity"] = obj.material.opacity;
+      objectManipulationParameters["AO intensity"] = obj.material.aoMapIntensity;
       if (!obj.material.map){
         disableOMController(omTextureOffsetXController);
         disableOMController(omTextureOffsetYController);
@@ -1048,10 +1065,12 @@ function afterObjectSelection(){
       }
       if (!obj.material.isMeshPhongMaterial){
         disableOMController(omShininessController);
+        disableOMController(omEmissiveIntensityController);
         disableOMController(omDisplacementScaleController);
         disableOMController(omDisplacementBiasController);
       }else{
         objectManipulationParameters["Shininess"] = obj.material.shininess;
+        objectManipulationParameters["Emissive int."] = obj.material.emissiveIntensity;
         if (obj.material.displacementMap){
           objectManipulationParameters["Disp. scale"] = obj.material.displacementScale;
           objectManipulationParameters["Disp. bias"] = obj.material.displacementBias;
@@ -1073,8 +1092,10 @@ function afterObjectSelection(){
       disableOMController(omTextureOffsetXController);
       disableOMController(omTextureOffsetYController);
       disableOMController(omShininessController);
+      disableOMController(omEmissiveIntensityController);
       disableOMController(omDisplacementScaleController);
       disableOMController(omDisplacementBiasController);
+      disableOMController(omAOIntensityController);
     }
     objectManipulationParameters["Mass"] = obj.physicsBody.mass;
     omMassController.updateDisplay();

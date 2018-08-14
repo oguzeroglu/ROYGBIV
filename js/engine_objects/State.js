@@ -18,8 +18,10 @@ var State = function(){
     var curMaterial = materials[materialName];
     var colorHexString = curMaterial.color.toArray();
     var opacity = curMaterial.opacity;
+    var aoMapIntensity = curMaterial.aoMapIntensity;
     curMaterialExport["colorHexString"] = colorHexString;
     curMaterialExport["opacity"] = opacity;
+    curMaterialExport["aoMapIntensity"] = aoMapIntensity;
     curMaterialExport["textColor"] = curMaterial.textColor;
     if (curMaterial.isMeshBasicMaterial){
       curMaterialExport["materialType"] = "BASIC";
@@ -28,7 +30,9 @@ var State = function(){
     }else if (curMaterial.isMeshPhongMaterial){
       curMaterialExport["materialType"] = "PHONG";
       var shininess = curMaterial.shininess;
+      var emissiveIntensity = curMaterial.emissiveIntensity;
       curMaterialExport["shininess"] = shininess;
+      curMaterialExport["emissiveIntensity"] = emissiveIntensity;
     }else if (curMaterial.isMeshLambertMaterial){
       curMaterialExport["materialType"] = "LAMBERT";
     }

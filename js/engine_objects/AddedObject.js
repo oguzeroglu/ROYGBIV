@@ -127,8 +127,10 @@ AddedObject.prototype.export = function(){
   }
 
   exportObject["opacity"] = this.material.opacity;
+  exportObject["aoMapIntensity"] = this.material.aoMapIntensity;
   if (this.material.isMeshPhongMaterial){
     exportObject["shininess"] = this.material.shininess;
+    exportObject["emissiveIntensity"] = this.material.emissiveIntensity;
   }
 
   var diffuseMap = this.material.map;

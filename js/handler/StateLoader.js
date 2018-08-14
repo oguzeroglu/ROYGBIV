@@ -891,6 +891,14 @@ StateLoader.prototype.handleAddedObjectDiff = function(){
           addedObject.material.needsUpdate = true;
         }
       }
+    }else if (diff.path[2] == "emissiveIntensity"){
+      if (kind == "E"){
+        var addedObject = addedObjects[diff.path[1]];
+        if (addedObject){
+          addedObject.material.emissiveIntensity = diff.rhs;
+          addedObject.material.needsUpdate = true;
+        }
+      }
     }else if (diff.path[2] == "opacity"){
       if (kind == "E"){
         var newVal = diff.rhs;
@@ -898,6 +906,15 @@ StateLoader.prototype.handleAddedObjectDiff = function(){
         if (addedObject){
           addedObject.material.transparent = true;
           addedObject.material.opacity = newVal;
+          addedObject.material.needsUpdate = true;
+        }
+      }
+    }else if (diff.path[2] == "aoMapIntensity"){
+      if (kind == "E"){
+        var newVal = diff.rhs;
+        var addedObject = addedObjects[diff.path[1]];
+        if (addedObject){
+          addedObject.material.aoMapIntensity = newVal;
           addedObject.material.needsUpdate = true;
         }
       }
@@ -1387,6 +1404,7 @@ StateLoader.prototype.handleAddedObjectDiff = function(){
           material.roygbivMaterialName = roygbivMaterialName;
           material.transparent = true;
           material.opacity = curAddedObjectExport.opacity;
+          material.aoMapIntensity = curAddedObjectExport.aoMapIntensity;
           material.needsUpdate = true;
         }else if (roygbivMaterialName == "NULL_PHONG"){
           material = new THREE.MeshPhongMaterial({
@@ -1397,7 +1415,9 @@ StateLoader.prototype.handleAddedObjectDiff = function(){
           material.roygbivMaterialName = roygbivMaterialName;
           material.transparent = true;
           material.opacity = curAddedObjectExport.opacity;
+          material.aoMapIntensity = curAddedObjectExport.aoMapIntensity;
           material.shininess = curAddedObjectExport.shininess;
+          material.emissiveIntensity = curAddedObjectExport.emissiveIntensity;
           material.needsUpdate = true;
         }else if (roygbivMaterialName == "NULL_LAMBERT"){
           material = new THREE.MeshLambertMaterial({
@@ -1408,6 +1428,7 @@ StateLoader.prototype.handleAddedObjectDiff = function(){
           material.roygbivMaterialName = roygbivMaterialName;
           material.transparent = true;
           material.opacity = curAddedObjectExport.opacity;
+          material.aoMapIntensity = curAddedObjectExport.aoMapIntensity;
           material.needsUpdate = true;
         }else{
           material = new THREE.MeshBasicMaterial({color: "white", side: THREE.DoubleSide});
@@ -1676,6 +1697,7 @@ StateLoader.prototype.handleMaterialDiff = function(){
       var material;
       var color = rhs.textColor;
       var opacity = rhs.opacity;
+      var aoMapIntensity = rhs.aoMapIntensity;
       if (rhs.materialType == "BASIC"){
         var isWireFramed = rhs.isWireFramed;
         material = new THREE.MeshBasicMaterial(
@@ -1684,18 +1706,22 @@ StateLoader.prototype.handleMaterialDiff = function(){
             side: THREE.DoubleSide,
             transparent: true,
             opacity: opacity,
-            wireframe: isWireFramed
+            wireframe: isWireFramed,
+            aoMapIntensity: aoMapIntensity
           }
         );
       }else if (rhs.materialType == "PHONG"){
         var shininess = rhs.shininess;
+        var emissiveIntensity = rhs.emissiveIntensity;
         material = new THREE.MeshPhongMaterial(
           {
             color: color,
             side: THREE.DoubleSide,
             transparent: true,
             opacity: opacity,
-            shininess: shininess
+            shininess: shininess,
+            emissiveIntensity: emissiveIntensity,
+            aoMapIntensity: aoMapIntensity
           }
         );
       }else if (rhs.materialType == "LAMBERT"){
@@ -1704,7 +1730,8 @@ StateLoader.prototype.handleMaterialDiff = function(){
             color: color,
             side: THREE.DoubleSide,
             transparent: true,
-            opacity: opacity
+            opacity: opacity,
+            aoMapIntensity: aoMapIntensity
           }
         );
       }
@@ -1910,6 +1937,7 @@ StateLoader.prototype.load = function(undo){
       var curMaterialExport = materialsExport[materialName];
       var color = curMaterialExport.textColor;
       var opacity = curMaterialExport.opacity;
+      var aoMapIntensity = curMaterialExport.aoMapIntensity;
       if (curMaterialExport.materialType == "BASIC"){
         var isWireFramed = curMaterialExport.isWireFramed;
         material = new THREE.MeshBasicMaterial(
@@ -1918,18 +1946,22 @@ StateLoader.prototype.load = function(undo){
             side: THREE.DoubleSide,
             transparent: true,
             opacity: opacity,
+            aoMapIntensity: aoMapIntensity,
             wireframe: isWireFramed
           }
         );
       }else if (curMaterialExport.materialType == "PHONG"){
         var shininess = curMaterialExport.shininess;
+        var emissiveIntensity = curMaterialExport.emissiveIntensity;
         material = new THREE.MeshPhongMaterial(
           {
             color: color,
             side: THREE.DoubleSide,
             transparent: true,
             opacity: opacity,
-            shininess: shininess
+            aoMapIntensity: aoMapIntensity,
+            shininess: shininess,
+            emissiveIntensity: emissiveIntensity
           }
         );
       }else if (curMaterialExport.materialType == "LAMBERT"){
@@ -1938,7 +1970,8 @@ StateLoader.prototype.load = function(undo){
             color: color,
             side: THREE.DoubleSide,
             transparent: true,
-            opacity: opacity
+            opacity: opacity,
+            aoMapIntensity: aoMapIntensity
           }
         );
       }
@@ -1998,6 +2031,7 @@ StateLoader.prototype.load = function(undo){
           material.roygbivMaterialName = roygbivMaterialName;
           material.transparent = true;
           material.opacity = curAddedObjectExport.opacity;
+          material.aoMapIntensity = curAddedObjectExport.aoMapIntensity;
           material.needsUpdate = true;
         }else if (roygbivMaterialName == "NULL_PHONG"){
           material = new THREE.MeshPhongMaterial({
@@ -2008,7 +2042,9 @@ StateLoader.prototype.load = function(undo){
           material.roygbivMaterialName = roygbivMaterialName;
           material.transparent = true;
           material.opacity = curAddedObjectExport.opacity;
+          material.aoMapIntensity = curAddedObjectExport.aoMapIntensity;
           material.shininess = curAddedObjectExport.shininess;
+          material.emissiveIntensity = curAddedObjectExport.emissiveIntensity;
           material.needsUpdate = true;
         }else if (roygbivMaterialName == "NULL_LAMBERT"){
           material = new THREE.MeshLambertMaterial({
@@ -2019,6 +2055,7 @@ StateLoader.prototype.load = function(undo){
           material.roygbivMaterialName = roygbivMaterialName;
           material.transparent = true;
           material.opacity = curAddedObjectExport.opacity;
+          material.aoMapIntensity = curAddedObjectExport.aoMapIntensity;
           material.needsUpdate = true;
         }else{
           material = new THREE.MeshBasicMaterial({color: "white", side: THREE.DoubleSide});
