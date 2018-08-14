@@ -73,35 +73,73 @@ window.onload = function() {
     terminal.clear();
     parseCommand("setMass "+obj.name+" "+val);
   });
-  omTextureOffsetXController = datGuiObjectManipulation.add(objectManipulationParameters, "Texture offset x").min(-20).max(20).step(0.01).onChange(function(val){
-
+  omTextureOffsetXController = datGuiObjectManipulation.add(objectManipulationParameters, "Texture offset x").min(-2).max(2).step(0.001).onChange(function(val){
+    var texture = selectedAddedObject.material.map;
+    texture.offset.x = val;
+    texture.initOffsetXSet = false;
+    for (var objectName in addedObjects){
+      addedObjects[objectName].mesh.material.needsUpdate = true;
+      addedObjects[objectName].previewMesh.material.needsUpdate = true;
+    }
   }).onFinishChange(function(value){
-
+    undoRedoHandler.push();
   }).listen();
-  omTextureOffsetYController = datGuiObjectManipulation.add(objectManipulationParameters, "Texture offset y").min(-20).max(20).step(0.01).onChange(function(val){
-
+  omTextureOffsetYController = datGuiObjectManipulation.add(objectManipulationParameters, "Texture offset y").min(-2).max(2).step(0.001).onChange(function(val){
+    var texture = selectedAddedObject.material.map;
+    texture.offset.y = val;
+    texture.initOffsetYSet = false;
+    for (var objectName in addedObjects){
+      addedObjects[objectName].mesh.material.needsUpdate = true;
+      addedObjects[objectName].previewMesh.material.needsUpdate = true;
+    }
   }).onFinishChange(function(value){
-
+    undoRedoHandler.push();
   }).listen();
   omOpacityController = datGuiObjectManipulation.add(objectManipulationParameters, "Opacity").min(0).max(1).step(0.01).onChange(function(val){
-
+    if (selectedObjectGroup && !selectedAddedObject){
+      for (var childObjName in selectedObjectGroup.group){
+        var childObj = selectedObjectGroup.group[childObjName];
+        childObj.material.transparent = true;
+        childObj.material.opacity = val;
+        childObj.initOpacitySet = false;
+        childObj.initOpacity = childObj.opacity;
+      }
+      return;
+    }else if (selectedAddedObject){
+      var material = selectedAddedObject.material;
+      material.transparent = true;
+      material.opacity = val;
+      selectedAddedObject.initOpacitySet = false;
+      selectedAddedObject.initOpacity = selectedAddedObject.opacity;
+    }
   }).onFinishChange(function(value){
-
+    undoRedoHandler.push();
   }).listen();
   omShininessController = datGuiObjectManipulation.add(objectManipulationParameters, "Shininess").min(0).max(100).step(0.01).onChange(function(val){
-
+    var material = selectedAddedObject.material;
+    if (material.isMeshPhongMaterial){
+      material.shininess = val;
+      material.needsUpdate = true;
+      selectedAddedObject.initShininessSet = false;
+    }
   }).onFinishChange(function(value){
-
+    undoRedoHandler.push();
   }).listen();
-  omDisplacementScaleController = datGuiObjectManipulation.add(objectManipulationParameters, "Disp. scale").min(-10000).max(10000).step(0.01).onChange(function(val){
-
+  omDisplacementScaleController = datGuiObjectManipulation.add(objectManipulationParameters, "Disp. scale").min(-50).max(50).step(0.1).onChange(function(val){
+    var material = selectedAddedObject.material;
+    material.displacementScale = val;
+    material.needsUpdate = true;
+    selectedAddedObject.initDisplacementScaleSet = false;
   }).onFinishChange(function(value){
-
+    undoRedoHandler.push();
   }).listen();
-  omDisplacementBiasController = datGuiObjectManipulation.add(objectManipulationParameters, "Disp. bias").min(-10000).max(10000).step(0.01).onChange(function(val){
-
+  omDisplacementBiasController = datGuiObjectManipulation.add(objectManipulationParameters, "Disp. bias").min(-50).max(50).step(0.1).onChange(function(val){
+    var material = selectedAddedObject.material;
+    material.displacementBias = val;
+    material.needsUpdate = true;
+    selectedAddedObject.initDisplacementBiasSet = false;
   }).onFinishChange(function(value){
-
+    undoRedoHandler.push();
   }).listen();
 
   function omGUIRotateEvent(axis, val){
@@ -1095,6 +1133,7 @@ function afterObjectSelection(){
     return;
   }
   if (selectedAddedObject || selectedObjectGroup){
+    selectedLightName = 0;
     $(datGuiObjectManipulation.domElement).attr("hidden", false);
     enableAllOMControllers();
     var obj = selectedAddedObject;
@@ -1111,6 +1150,9 @@ function afterObjectSelection(){
       if (!obj.material.map){
         disableOMController(omTextureOffsetXController);
         disableOMController(omTextureOffsetYController);
+      }else{
+        objectManipulationParameters["Texture offset x"] = obj.material.map.offset.x;
+        objectManipulationParameters["Texture offset y"] = obj.material.map.offset.y;
       }
       if (!obj.material.isMeshPhongMaterial){
         disableOMController(omShininessController);

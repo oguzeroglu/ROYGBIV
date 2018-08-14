@@ -1,11 +1,9 @@
 function parseCommand(userInput){
-
   var result = parse(userInput);
-
   if (!result){
     terminal.printError(Text.COMMAND_NOT_FOUND);
   }
-
+  afterObjectSelection();
 }
 
 function parse(input){
@@ -964,7 +962,6 @@ function parse(input){
             objectGroup.destroy();
             delete objectGroups[objectName];
           }
-          afterObjectSelection();
           terminal.printInfo(Text.OBJECT_DESTROYED);
           undoRedoHandler.push();
           return true;
@@ -1985,6 +1982,8 @@ function parse(input){
           terminal.printInfo(Text.SELECTED_LIGHT.replace(
             Text.PARAM1, lightName
           ));
+          selectedAddedObject = 0;
+          selectedObjectGroup = 0;
           return true;
         break;
         case 51: //destroyLight
@@ -3005,7 +3004,6 @@ function parse(input){
           terminal.printInfo(Text.OBJECT_SELECTED.replace(
               Text.PARAM1, name
           ));
-          afterObjectSelection();
           return true;
         break;
         case 81: //setMass
