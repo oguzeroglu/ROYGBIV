@@ -464,13 +464,14 @@ function parse(input){
             }
 
             ROYGBIV.globals = new Object();
-
+            $(datGuiObjectManipulation.domElement).attr("hidden", true);
             terminal.printInfo(Text.SWITCHED_TO_PREVIEW_MODE);
             $("#cliDivheader").text("ROYGBIV 3D Engine - CLI (Preview mode)");
             mode = 1;
           }else if (mode == 1){
             mode = 0;
             $(datGui.domElement).attr("hidden", true);
+            $(datGuiObjectManipulation.domElement).attr("hidden", true);
             terminal.printInfo(Text.SWITCHED_TO_DESIGN_MODE);
             $("#cliDivheader").text("ROYGBIV 3D Engine - CLI (Design mode)");
             if (LOG_FRAME_DROP_ON){
@@ -963,6 +964,7 @@ function parse(input){
             objectGroup.destroy();
             delete objectGroups[objectName];
           }
+          afterObjectSelection();
           terminal.printInfo(Text.OBJECT_DESTROYED);
           undoRedoHandler.push();
           return true;
@@ -2993,14 +2995,17 @@ function parse(input){
           if (objSelection){
             selectedAddedObject = objSelection;
             selectedObjectGroup = 0;
+            camera.lookAt(objSelection.mesh.position);
           }else if (objGroupSelection){
             selectedObjectGroup = objGroupSelection;
             selectedAddedObject = 0;
+            camera.lookAt(objGroupSelection.graphicsGroup.position);
           }
           objectSelectedByCommand = true;
           terminal.printInfo(Text.OBJECT_SELECTED.replace(
               Text.PARAM1, name
           ));
+          afterObjectSelection();
           return true;
         break;
         case 81: //setMass
@@ -3031,10 +3036,18 @@ function parse(input){
             if (mode == 1 && mass > 0){
               dynamicObjects[addedObject.name] = addedObject;
             }
+            if (selectedAddedObject && selectedAddedObject.name == addedObject.name){
+              objectManipulationParameters["Mass"] = addedObject.physicsBody.mass;
+              omMassController.updateDisplay();
+            }
           }else if (grouppedObject){
             grouppedObject.setMass(mass);
             if (mode == 1 && mass > 0){
               dynamicObjectGroups[grouppedObject.name] = grouppedObject;
+            }
+            if (selectedObjectGroup && selectedObjectGroup.name == grouppedObject.name){
+              objectManipulationParameters["Mass"] = grouppedObject.physicsBody.mass;
+              omMassController.updateDisplay();
             }
           }
           terminal.printInfo(Text.MASS_SET);
@@ -3363,6 +3376,7 @@ function parse(input){
             objectGroup.glue();
             objectGroups[groupName] = objectGroup;
             terminal.printInfo(Text.OBJECTS_GLUED_TOGETHER);
+            $(datGuiObjectManipulation.domElement).attr("hidden", true);
             undoRedoHandler.push();
             return true;
           }catch(err){

@@ -17,6 +17,7 @@ window.onload = function() {
   }
   cliDiv.addEventListener("click", function(){
     cliFocused = true;
+    omGUIFocused = false;
   });
   terminalDiv.addEventListener("mousewheel", function(e){
     e.preventDefault();
@@ -50,6 +51,81 @@ window.onload = function() {
 
   // COLOR NAMES
   ColorNames = new ColorNames();
+
+  // DAT GUI OBJECT MANIPULATION
+  datGuiObjectManipulation = new dat.GUI();
+  omObjController = datGuiObjectManipulation.add(objectManipulationParameters, "Object").listen();
+  disableOMController(omObjController, true);
+  omRotationXController = datGuiObjectManipulation.add(objectManipulationParameters, "Rotate x").onChange(function(val){
+    omGUIRotateEvent("x", val);
+  });
+  omRotationYController = datGuiObjectManipulation.add(objectManipulationParameters, "Rotate y").onChange(function(val){
+    omGUIRotateEvent("y", val);
+  });
+  omRotationZController = datGuiObjectManipulation.add(objectManipulationParameters, "Rotate z").onChange(function(val){
+    omGUIRotateEvent("z", val);
+  });
+  omMassController = datGuiObjectManipulation.add(objectManipulationParameters, "Mass").onChange(function(val){
+    var obj = selectedAddedObject;
+    if (!obj){
+      obj = selectedObjectGroup;
+    }
+    terminal.clear();
+    parseCommand("setMass "+obj.name+" "+val);
+  });
+  omTextureOffsetXController = datGuiObjectManipulation.add(objectManipulationParameters, "Texture offset x").min(-20).max(20).step(0.01).onChange(function(val){
+
+  }).onFinishChange(function(value){
+
+  }).listen();
+  omTextureOffsetYController = datGuiObjectManipulation.add(objectManipulationParameters, "Texture offset y").min(-20).max(20).step(0.01).onChange(function(val){
+
+  }).onFinishChange(function(value){
+
+  }).listen();
+  omOpacityController = datGuiObjectManipulation.add(objectManipulationParameters, "Opacity").min(0).max(1).step(0.01).onChange(function(val){
+
+  }).onFinishChange(function(value){
+
+  }).listen();
+  omShininessController = datGuiObjectManipulation.add(objectManipulationParameters, "Shininess").min(0).max(100).step(0.01).onChange(function(val){
+
+  }).onFinishChange(function(value){
+
+  }).listen();
+  omDisplacementScaleController = datGuiObjectManipulation.add(objectManipulationParameters, "Disp. scale").min(-10000).max(10000).step(0.01).onChange(function(val){
+
+  }).onFinishChange(function(value){
+
+  }).listen();
+  omDisplacementBiasController = datGuiObjectManipulation.add(objectManipulationParameters, "Disp. bias").min(-10000).max(10000).step(0.01).onChange(function(val){
+
+  }).onFinishChange(function(value){
+
+  }).listen();
+
+  function omGUIRotateEvent(axis, val){
+    var obj = selectedAddedObject;
+    if (!obj){
+      obj = selectedObjectGroup;
+    }
+    terminal.clear();
+    parseCommand("rotateObject "+obj.name+" "+axis+" "+val);
+    if (axis == "x"){
+      objectManipulationParameters["Rotate x"] = 0;
+      omRotationXController.updateDisplay();
+    }else if (axis == "y"){
+      objectManipulationParameters["Rotate y"] = 0;
+      omRotationYController.updateDisplay();
+    }else if (axis == "z"){
+      objectManipulationParameters["Rotate z"] = 0;
+      omRotationZController.updateDisplay();
+    }
+  }
+
+  datGuiObjectManipulation.domElement.addEventListener("mousedown", function(e){
+    omGUIFocused = true;
+  });
 
   // DAT GUI
   datGui = new dat.GUI();
@@ -115,6 +191,7 @@ window.onload = function() {
   });
 
   $(datGui.domElement).attr("hidden", true);
+  $(datGuiObjectManipulation.domElement).attr("hidden", true);
 
   // IMAGE UPLOADER
   imageUploaderInput = $("#imageUploaderInput");
@@ -124,6 +201,7 @@ window.onload = function() {
   canvas = document.getElementById("rendererCanvas");
   canvas.addEventListener("click", function(event){
     cliFocused = false;
+    omGUIFocused = false;
     if (windowLoaded){
        var mouse = new THREE.Vector2();
        var raycaster = new THREE.Raycaster();
@@ -153,6 +231,7 @@ window.onload = function() {
              selectedAddedObject = object.addedObject;
              objectSelectedByCommand = false;
              selectedObjectGroup = 0;
+             afterObjectSelection();
            }else if (object.objectGroupName){
              var faceName = objectGroups[object.objectGroupName].getFaceNameFromNormal(intersects[0].face.normal);
              //coordStr += " [face: "+faceName+"]";
@@ -163,10 +242,12 @@ window.onload = function() {
              selectedObjectGroup = objectGroups[object.objectGroupName];
              objectSelectedByCommand = false;
              selectedAddedObject = 0;
+             afterObjectSelection();
            }
          }else if (object.isPointLightRepresentation){
            selectedAddedObject = 0;
            selectedObjectGroup = 0;
+           afterObjectSelection();
            var lightName = object.lightName;
            if (lightName){
              selectedLightName = lightName;
@@ -195,7 +276,9 @@ window.onload = function() {
                  ));
                  copyToClipboard(addedObject.name)
                  selectedAddedObject = addedObject;
+                 selectedObjectGroup = 0;
                  objectSelectedByCommand = false;
+                 afterObjectSelection();
                }else if (selectedGrid.destroyedObjectGroup){
                  var objectGroup = objectGroups[selectedGrid.destroyedObjectGroup];
                  terminal.clear();
@@ -211,6 +294,7 @@ window.onload = function() {
                  copyToClipboard(objectGroup.name);
                  selectedAddedObject = 0;
                  selectedObjectGroup = objectGroup;
+                 afterObjectSelection();
                }else{
                  selectedGrid.toggleSelect(false, true);
               }
@@ -228,7 +312,9 @@ window.onload = function() {
                   ));
                   copyToClipboard(object2.addedObject.name);
                   selectedAddedObject = object2.addedObject;
+                  selectedObjectGroup = 0;
                   objectSelectedByCommand = false;
+                  afterObjectSelection();
                 }
               }
             }else{
@@ -256,6 +342,8 @@ window.onload = function() {
                        copyToClipboard(addedObject.name);
                        objectSelectedByCommand = false;
                        selectedAddedObject = addedObject;
+                       selectedObjectGroup = 0;
+                       afterObjectSelection();
                      }else if (selectedGrid.destroyedObjectGroup){
                        var objectGroup = objectGroups[selectedGrid.destroyedObjectGroup];
                        terminal.clear();
@@ -271,6 +359,7 @@ window.onload = function() {
                        copyToClipboard(objectGroup.name);
                        selectedAddedObject = 0;
                        selectedObjectGroup = objectGroup;
+                       afterObjectSelection();
                      }else{
                        selectedGrid.toggleSelect(false, true);
                      }
@@ -287,6 +376,8 @@ window.onload = function() {
        }else{
          if (!objectSelectedByCommand){
            selectedAddedObject = 0;
+           selectedObjectGroup = 0;
+           afterObjectSelection();
          }
        }
     }
@@ -330,7 +421,7 @@ window.addEventListener("mouseup", function(e){
   mouseDown --;
 });
 window.addEventListener('mousemove', function (e) {
-  if (cliIsBeingDragged){
+  if (cliIsBeingDragged || omGUIFocused){
     return;
   }
   if (!windowLoaded){
@@ -364,7 +455,7 @@ window.addEventListener('keydown', function(event){
     return;
   }
 
-  if (cliFocused){
+  if (cliFocused || omGUIFocused){
     return;
   }
 
@@ -450,6 +541,7 @@ window.addEventListener('keydown', function(event){
             terminal.printInfo(Text.OBJECT_DESTROYED);
             undoRedoHandler.push();
           }
+          afterObjectSelection();
         break;
         case 86: //V
           keyboardBuffer["v"] = true;
@@ -502,7 +594,7 @@ window.addEventListener('keyup', function(event){
     return;
   }
 
-  if (cliFocused){
+  if (cliFocused || omGUIFocused){
     return;
   }
 
@@ -970,6 +1062,90 @@ function heightMapBiasAdjustmentStateSaveDecision(){
 function saveState(){
   for (var i = 0; i<stateSaveDecisionFunctions.length; i++){
     stateSaveDecisionFunctions[i]();
+  }
+}
+
+function disableOMController(controller, noOpacityAdjustment){
+  controller.domElement.style.pointerEvents = "none";
+  if (!noOpacityAdjustment){
+    controller.domElement.style.opacity = .5;
+  }
+}
+
+function enableOMControler(controller){
+  controller.domElement.style.pointerEvents = "";
+  controller.domElement.style.opacity = 1;
+}
+
+function enableAllOMControllers(){
+  enableOMControler(omRotationXController);
+  enableOMControler(omRotationYController);
+  enableOMControler(omRotationZController);
+  enableOMControler(omMassController);
+  enableOMControler(omTextureOffsetXController);
+  enableOMControler(omTextureOffsetYController);
+  enableOMControler(omOpacityController);
+  enableOMControler(omShininessController);
+  enableOMControler(omDisplacementScaleController);
+  enableOMControler(omDisplacementBiasController);
+}
+
+function afterObjectSelection(){
+  if (mode != 0){
+    return;
+  }
+  if (selectedAddedObject || selectedObjectGroup){
+    $(datGuiObjectManipulation.domElement).attr("hidden", false);
+    enableAllOMControllers();
+    var obj = selectedAddedObject;
+    if (!obj){
+      obj = selectedObjectGroup;
+    }
+    omGUIlastObjectName = obj.name;
+    objectManipulationParameters["Object"] = obj.name;
+    if (obj instanceof AddedObject){
+      objectManipulationParameters["Rotate x"] = 0;
+      objectManipulationParameters["Rotate y"] = 0;
+      objectManipulationParameters["Rotate z"] = 0;
+      objectManipulationParameters["Opacity"] = obj.material.opacity;
+      if (!obj.material.map){
+        disableOMController(omTextureOffsetXController);
+        disableOMController(omTextureOffsetYController);
+      }
+      if (!obj.material.isMeshPhongMaterial){
+        disableOMController(omShininessController);
+        disableOMController(omDisplacementScaleController);
+        disableOMController(omDisplacementBiasController);
+      }else{
+        objectManipulationParameters["Shininess"] = obj.material.shininess;
+        if (obj.material.displacementMap){
+          objectManipulationParameters["Disp. scale"] = obj.material.displacementScale;
+          objectManipulationParameters["Disp. bias"] = obj.material.displacementBias;
+        }else{
+          disableOMController(omDisplacementScaleController);
+          disableOMController(omDisplacementBiasController);
+        }
+      }
+    }else if (obj instanceof ObjectGroup){
+      var childObj;
+      for (var childName in obj.group){
+        childObj = obj.group[childName];
+        break;
+      }
+      objectManipulationParameters["Rotate x"] = 0;
+      objectManipulationParameters["Rotate y"] = 0;
+      objectManipulationParameters["Rotate z"] = 0;
+      objectManipulationParameters["Opacity"] = childObj.material.opacity;
+      disableOMController(omTextureOffsetXController);
+      disableOMController(omTextureOffsetYController);
+      disableOMController(omShininessController);
+      disableOMController(omDisplacementScaleController);
+      disableOMController(omDisplacementBiasController);
+    }
+    objectManipulationParameters["Mass"] = obj.physicsBody.mass;
+    omMassController.updateDisplay();
+  }else{
+    $(datGuiObjectManipulation.domElement).attr("hidden", true);
   }
 }
 

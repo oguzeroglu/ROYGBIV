@@ -2258,15 +2258,29 @@ StateLoader.prototype.load = function(undo){
         var rotationX = curAddedObjectExport.rotationX;
         var rotationY = curAddedObjectExport.rotationY;
         var rotationZ = curAddedObjectExport.rotationZ;
-        if (rotationX != 0){
-          addedObjectInstance.rotate("x", rotationX);
-        }
-        if (rotationY != 0){
-          addedObjectInstance.rotate("y", rotationY);
-        }
-        if (rotationZ != 0){
-          addedObjectInstance.rotate("z", rotationZ);
-        }
+        addedObjectInstance.rotationX = rotationX;
+        addedObjectInstance.rotationY = rotationY;
+        addedObjectInstance.rotationZ = rotationZ;
+        addedObjectInstance.mesh.quaternion.set(
+          curAddedObjectExport.quaternionX,
+          curAddedObjectExport.quaternionY,
+          curAddedObjectExport.quaternionZ,
+          curAddedObjectExport.quaternionW
+        );
+        addedObjectInstance.previewMesh.quaternion.set(
+          curAddedObjectExport.quaternionX,
+          curAddedObjectExport.quaternionY,
+          curAddedObjectExport.quaternionZ,
+          curAddedObjectExport.quaternionW
+        );
+        addedObjectInstance.physicsBody.quaternion.set(
+          curAddedObjectExport.pQuaternionX,
+          curAddedObjectExport.pQuaternionY,
+          curAddedObjectExport.pQuaternionZ,
+          curAddedObjectExport.pQuaternionW
+        );
+        addedObjectInstance.initQuaternion.copy(addedObjectInstance.mesh.quaternion);
+        addedObjectInstance.physicsBody.initQuaternion.copy(addedObjectInstance.physicsBody.quaternion);
       }
 
       if (curAddedObjectExport.blendingMode == "NO_BLENDING"){
@@ -3989,6 +4003,7 @@ StateLoader.prototype.resetProject = function(undo){
 
   initBadTV();
   $(datGui.domElement).attr("hidden", true);
+  $(datGuiObjectManipulation.domElement).attr("hidden", true);
   $("#cliDivheader").text("ROYGBIV Scene Creator - CLI (Design mode)");
 
   LIMIT_BOUNDING_BOX = new THREE.Box3(new THREE.Vector3(-4000, -4000, -4000), new THREE.Vector3(4000, 4000, 4000));

@@ -176,6 +176,15 @@ AddedObject.prototype.export = function(){
   exportObject.rotationY = this.rotationY;
   exportObject.rotationZ = this.rotationZ;
 
+  exportObject.quaternionX = this.previewMesh.quaternion.x;
+  exportObject.quaternionY = this.previewMesh.quaternion.y;
+  exportObject.quaternionZ = this.previewMesh.quaternion.z;
+  exportObject.quaternionW = this.previewMesh.quaternion.w;
+  exportObject.pQuaternionX = this.physicsBody.quaternion.x;
+  exportObject.pQuaternionY = this.physicsBody.quaternion.y;
+  exportObject.pQuaternionZ = this.physicsBody.quaternion.z;
+  exportObject.pQuaternionW = this.physicsBody.quaternion.w;
+
   if (this.recentlyDetached){
     exportObject.recentlyDetached = true;
     exportObject.worldQuaternionX = this.worldQuaternionX;
@@ -514,6 +523,7 @@ AddedObject.prototype.rotateSurface = function(axis, radians, fromScript){
   var previewMesh = this.previewMesh;
   var physicsBody = this.physicsBody;
   var gridSystemAxis = this.metaData.gridSystemAxis;
+
   if (axis == "x"){
     mesh.rotateOnWorldAxis(
       THREE_AXIS_VECTOR_X,

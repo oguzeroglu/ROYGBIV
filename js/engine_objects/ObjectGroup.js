@@ -297,6 +297,13 @@ ObjectGroup.prototype.rotate = function(axis, radian, fromScript){
     this.physicsBody.initQuaternion.copy(
       this.physicsBody.quaternion
     );
+    if (axis == "x"){
+      this.rotationX += radian;
+    }else if (axis == "y"){
+      this.rotationY += radian;
+    }else if (axis == "z"){
+      this.rotationZ += radian;
+    }
   }
 
 }

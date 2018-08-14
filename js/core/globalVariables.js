@@ -574,6 +574,7 @@ var loadInput;
 // WINDOW
 var windowLoaded;
 var cliFocused = true;
+var omGUIFocused = false;
 var cliIsBeingDragged = false;
 var requestID;
 var mouseDown = 0;
@@ -832,6 +833,8 @@ var ROYGBIV;
 
 // DAT GUI
 var datGui;
+var datGuiObjectManipulation;
+var omGUIlastObjectName = "";
 
 var postprocessingParameters = {
   "Scanlines_count": scanlineCount,
@@ -854,4 +857,29 @@ var postprocessingParameters = {
   "Bad TV": badTvOn,
   "Static": staticOn,
   "Bloom": bloomOn
+};
+
+var omObjController;
+var omRotationXController;
+var omRotationYController;
+var omRotationZController;
+var omMassController;
+var omTextureOffsetXController;
+var omTextureOffsetYController;
+var omOpacityController;
+var omShininessController;
+var omDisplacementScaleController;
+var omDisplacementBiasController;
+var objectManipulationParameters = {
+  "Object": "objectName",
+  "Rotate x": 0.0,
+  "Rotate y": 0.0,
+  "Rotate z": 0.0,
+  "Mass": 0.0,
+  "Texture offset x": 0.0,
+  "Texture offset y": 0.0,
+  "Opacity": 1.0,
+  "Shininess": 0.0,
+  "Disp. scale": 0.0,
+  "Disp. bias": 0.0
 };
