@@ -136,6 +136,8 @@ window.onload = function() {
     if (material.isMeshPhongMaterial){
       material.emissiveIntensity = val;
       material.needsUpdate = true;
+      selectedAddedObject.initEmissiveIntensitySet = false;
+      selectedAddedObject.initEmissiveIntensity = material.emissiveIntensity;
     }
   }).onFinishChange(function(value){
     undoRedoHandler.push();

@@ -748,4 +748,5 @@ var Text = function(){
    this.ROYGBIV_SCRIPTING_API_EXPANDCROSSHAIR = "Expands a crosshair. This can be used while shooting or walking for fps games. The crosshair expands by delta while\nits size is less than targetSize on each frame. This function is designed to be called inside onmousedown or onkeydown like events.";
    this.ROYGBIV_SCRIPTING_API_SHRINKCROSSHAIR = "Shrinks a crosshair. This can be used after calling the expandCrosshair function. The crosshair shrinks by delta while its size is\ngreater than its initial size. This function is designed to be called inside onmouseup or onkeyup like events.";
    this.ROYGBIV_SCRIPTING_API_SETPARTICLESYSTEMPOSITION = "Sets the position of a particle system. This function is designed for magic circle like particle systems which may follow players.\nThis function should not be used for particle systems with collision callbacks or particle systems with defined motions in general.";
+   this.ROYGBIV_SCRIPTING_API_EMISSIVEINTENSITY = "Modifies the emissive intensity of given object by given amount.";
 }

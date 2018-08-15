@@ -360,6 +360,12 @@ function parse(input){
                   if (childObject.initShininessSet){
                     childObject.material.shininess = childObject.initShininess;
                     childObject.material.needsUpdate = true;
+                    childObject.initShininessSet = false;
+                  }
+                  if (childObject.initEmissiveIntensitySet){
+                    childObject.material.emissiveIntensity = childObject.initEmissiveIntensity;
+                    childObject.material.needsUpdate = true;
+                    childObject.initEmissiveIntensitySet = false;
                   }
                 }
               }
@@ -430,6 +436,12 @@ function parse(input){
                 if (object.initShininessSet){
                   object.material.shininess = object.initShininess;
                   object.material.needsUpdate = true;
+                  object.initShininessSet = false;
+                }
+                if (object.initEmissiveIntensitySet){
+                  object.material.emissiveIntensity = object.initEmissiveIntensity;
+                  object.material.needsUpdate = true;
+                  object.initEmissiveIntensitySet = false;
                 }
               }
 
@@ -560,6 +572,12 @@ function parse(input){
                   if (childObject.initShininessSet){
                     childObject.material.shininess = childObject.initShininess;
                     childObject.material.needsUpdate = true;
+                    childObject.initShininessSet = false;
+                  }
+                  if (childObject.initEmissiveIntensitySet){
+                    childObject.material.emissiveIntensity = childObject.initEmissiveIntensity;
+                    childObject.material.needsUpdate = true;
+                    childObject.initEmissiveIntensitySet = false;
                   }
                 }
               }
@@ -626,6 +644,12 @@ function parse(input){
                 if (object.initShininessSet){
                   object.material.shininess = object.initShininess;
                   object.material.needsUpdate = true;
+                  object.initShininessSet = false;
+                }
+                if (object.initEmissiveIntensitySet){
+                  object.material.emissiveIntensity = object.initEmissiveIntensity;
+                  object.material.needsUpdate = true;
+                  object.initEmissiveIntensitySet = false;
                 }
               }
 

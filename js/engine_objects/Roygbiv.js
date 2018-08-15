@@ -113,7 +113,8 @@ var Roygbiv = function(){
     "pauseCrosshairRotation",
     "expandCrosshair",
     "shrinkCrosshair",
-    "setParticleSystemPosition"
+    "setParticleSystemPosition",
+    "emissiveIntensity"
   ];
 
   this.globals = new Object();
@@ -1559,6 +1560,35 @@ Roygbiv.prototype.heightMapBias = function(object, delta){
   }
   object.material.displacementBias += delta;
   object.material.needsUpdate = true;
+}
+
+// emissiveIntensity
+// Modifies the emissive intensity of given object by given amount
+Roygbiv.prototype.emissiveIntensity = function(object, delta){
+  if (mode == 0){
+    return;
+  }
+  if (typeof object == UNDEFINED){
+    throw new Error("emissiveIntensity error: object is not defined.");
+    return;
+  }
+  if (!(object instanceof AddedObject)){
+    throw new Error("emissiveIntensity error: Type not supported.");
+    return;
+  }
+  if (typeof delta == UNDEFINED){
+    throw new Error("emissiveIntensity error: delta is not defined.");
+    return;
+  }
+  if (isNaN(delta)){
+    throw new Error("emissiveIntensity error: delta is not a number.");
+    return;
+  }
+  if (!object.initEmissiveIntensitySet){
+    object.initEmissiveIntensity = object.material.emissiveIntensity;
+    object.initEmissiveIntensitySet = true;
+  }
+  object.material.emissiveIntensity += delta;
 }
 
 // PARTICLE SYSTEM FUNCTIONS ***************************************************
