@@ -411,9 +411,6 @@ Terminal.prototype.autocomplete = function(command){
 				if ("PHONG".startsWith(curEntry.toUpperCase())){
 					possibilities.push("PHONG");
 				}
-				if ("LAMBERT".startsWith(curEntry.toUpperCase())){
-					possibilities.push("LAMBERT");
-				}
 				helpString = "[Types]: ";
 			break;
 			case commandDescriptor.LIGHT_NAME:

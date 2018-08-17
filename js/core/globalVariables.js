@@ -180,7 +180,7 @@ var commandArgumentsExpectedExplanation = [
   "mapEnvironment textureName objectName", //mapEnvironment
   "mapAmbientOcculsion textureName objectName", //mapAmbientOcculsion
   "mapAlpha textureName objectName", //mapAlpha
-  "setDefaultMaterial basic/phong/lambert", //setDefaultMaterial"
+  "setDefaultMaterial basic/phong", //setDefaultMaterial"
   "newAmbientLight name color", //newAmbientLight
   "printLights", //printLights
   "selectLight name", //selectLight
@@ -434,7 +434,7 @@ var commandInfo = [
   "mapEnvironment: Sets an environment map of an object.",
   "mapAmbientOcculsion: Sets an ambient occulsion map of an object.",
   "mapAlpha: Sets an alpha map of an object.",
-  "setDefaultMaterial: Sets the type of the default material (basic/phong/lambert).",
+  "setDefaultMaterial: Sets the type of the default material (basic/phong).",
   "newAmbientLight: Creates a new ambient light.",
   "printLights: Prints created lights.",
   "selectLight: Selects a created light.",
@@ -537,6 +537,7 @@ var deprecatedCommandIndices = [
   38, //destroySelectedGrids -> Deprecated due to architectural changes during development. Grids are no longer rendered as seperate objects due to performance issues.
   39, //remakeGridSystem -> Deprecated due to architectural changes during development. Since grids are no longer destroyable, this command has no use case anymore.
   44, //mapEnvironment -> Deprecated due to lack of use cases of environment maps in the ROYGBIV engine. Will implement mirror materials for better visual effects.
+  55, //newLambertMaterial -> Deprecated due to lack of uses cases. Phong is fine for light affected objects.
   89, //translateObject -> Deprecated due to architectural conflicts. Objects can only be translated using animations. Instead of translating the object in the design mode, a new grid system should be created at the specific position. Every object should be associated with certain grids.
   105 //printPerformance -> Deprecated because calling performance.now() multiple times on each render is costly.
 ];
@@ -706,7 +707,7 @@ var sphereHeightSegments = 10;
 var lightPositionDeltaX = 0.5;
 var lightPositionDeltaY = 0.5;
 var lightPositionDeltaZ = 0.5;
-var defaultMaterialType = "BASIC"; //BASIC / PHONG / LAMBERT
+var defaultMaterialType = "BASIC"; //BASIC / PHONG
 var texturePackRootDirectory = "/texture_packs/";
 var skyBoxRootDirectory = "/skybox/";
 var dataPrefix = "text/json;charset=utf-8,";

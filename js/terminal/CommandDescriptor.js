@@ -219,7 +219,7 @@ var CommandDescriptor = function(){
   // setDefaultMaterial
   this.setDefaultMaterial = new Object();
   this.setDefaultMaterial.types = [];
-  this.setDefaultMaterial.types.push(this.DEFAULT_MATERIAL_TYPE); //basic-phong-lambert
+  this.setDefaultMaterial.types.push(this.DEFAULT_MATERIAL_TYPE); //basic-phong
 
   // newAmbientLight
   this.newAmbientLight = new Object();

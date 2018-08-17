@@ -698,7 +698,7 @@ function parse(input){
             terminal.printError(Text.WORKS_ONLY_IN_DESIGN_MODE);
             return true;
           }
-          if (name == "NULL_BASIC" || name == "NULL_PHONG" || name == "NULL_LAMBERT"){
+          if (name == "NULL_BASIC" || name == "NULL_PHONG"){
             terminal.printError(Text.NAME_RESERVED);
             return true;
           }
@@ -754,12 +754,6 @@ function parse(input){
               ), options);
             }else if (material.isMeshPhongMaterial){
               terminal.printInfo(Text.PHONG_MATERIAL_INFO_TREE.replace(
-                Text.PARAM1, name
-              ).replace(
-                Text.PARAM2, material.textColor
-              ), options);
-            }else if (material.isMeshLambertMaterial){
-              terminal.printInfo(Text.LAMBER_MATERIAL_INFO_TREE.replace(
                 Text.PARAM1, name
               ).replace(
                 Text.PARAM2, material.textColor
@@ -847,13 +841,6 @@ function parse(input){
                 wireframe: false
               });
               selectedMaterial.roygbivMaterialName = "NULL_PHONG";
-            }else if (defaultMaterialType == "LAMBERT"){
-              selectedMaterial = new THREE.MeshLambertMaterial({
-                color: "white",
-                side: THREE.DoubleSide,
-                wireframe: false
-              });
-              selectedMaterial.roygbivMaterialName = "NULL_LAMBERT";
             }
           }
           var objectName = splitted[1];
@@ -952,8 +939,6 @@ function parse(input){
             materialText = "PHONG";
           }else if (object.material.isMeshBasicMaterial){
             materialText = "BASIC";
-          }else if  (object.material.isMeshLambertMaterial){
-            materialText = "LAMBERT";
           }
           terminal.printInfo(Text.TREE2.replace(
             Text.PARAM1, Text.TEXTURE_PACK
@@ -1343,13 +1328,6 @@ function parse(input){
                 wireframe: false
               });
               material.roygbivMaterialName = "NULL_PHONG";
-            }else if (defaultMaterialType == "LAMBERT"){
-              material = new THREE.MeshLambertMaterial({
-                color: white,
-                side: THREE.DoubleSide,
-                wireframe: false
-              });
-              material.roygbivMaterialName = "NULL_LAMBERT";
             }
           }
           if (axis != "x" && axis != "z" && axis != "y"){
@@ -1518,13 +1496,6 @@ function parse(input){
                 wireframe: false
               });
               material.roygbivMaterialName = "NULL_PHONG";
-            }else if (defaultMaterialType == "LAMBERT"){
-              material = new THREE.MeshLambertMaterial({
-                color: "white",
-                side: THREE.DoubleSide,
-                wireframe: false
-              });
-              material.roygbivMaterialName = "NULL_LAMBERT";
             }
           }
 
@@ -1926,8 +1897,7 @@ function parse(input){
             return true;
           }
           var materialType = splitted[1].toUpperCase();
-          if (materialType != "BASIC" && materialType != "PHONG" &&
-                                                materialType != "LAMBERT"){
+          if (materialType != "BASIC" && materialType != "PHONG"){
             terminal.printError(Text.DEFAULT_MATERIAL_TYPE_MUST_BE);
             return true;
           }
@@ -2048,7 +2018,7 @@ function parse(input){
             terminal.printError(Text.WORKS_ONLY_IN_DESIGN_MODE);
             return true;
           }
-          if (name == "NULL_BASIC" || name == "NULL_PHONG" || name == "NULL_LAMBERT"){
+          if (name == "NULL_BASIC" || name == "NULL_PHONG"){
             terminal.printError(Text.NAME_RESERVED);
             return true;
           }
@@ -2176,31 +2146,7 @@ function parse(input){
           undoRedoHandler.push();
         break;
         case 55: //newLambertMaterial
-          var name = splitted[1];
-          var materialColor = splitted[2];
-          if (mode != 0){
-            terminal.printError(Text.WORKS_ONLY_IN_DESIGN_MODE);
-            return true;
-          }
-          if (name == "NULL_BASIC" || name == "NULL_PHONG" || name == "NULL_LAMBERT"){
-            terminal.printError(Text.NAME_RESERVED);
-            return true;
-          }
-          if (materials[name]){
-            terminal.printError(Text.NAME_MUST_BE_UNIQUE);
-            return true;
-          }
-          var lambertMaterial = new THREE.MeshLambertMaterial({
-            color: materialColor,
-            side: THREE.DoubleSide,
-            wireframe: false
-          });
-          lambertMaterial.textColor = materialColor;
-          lambertMaterial.roygbivMaterialName = name;
-          materials[name] = lambertMaterial;
-          terminal.printInfo(Text.MATERIAL_CREATED);
-          undoRedoHandler.push();
-          return true;
+          //DEPRECATED
         break;
         case 56: //newTexturePack
           var name = splitted[1];
@@ -4274,13 +4220,6 @@ function parse(input){
                 wireframe: false
               });
               material.roygbivMaterialName = "NULL_PHONG";
-            }else if (defaultMaterialType == "LAMBERT"){
-              material = new THREE.MeshLambertMaterial({
-                color: "white",
-                side: THREE.DoubleSide,
-                wireframe: false
-              });
-              material.roygbivMaterialName = "NULL_LAMBERT";
             }
           }
           if (isNaN(radius)){

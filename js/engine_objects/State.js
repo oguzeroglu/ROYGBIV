@@ -33,8 +33,6 @@ var State = function(){
       var emissiveIntensity = curMaterial.emissiveIntensity;
       curMaterialExport["shininess"] = shininess;
       curMaterialExport["emissiveIntensity"] = emissiveIntensity;
-    }else if (curMaterial.isMeshLambertMaterial){
-      curMaterialExport["materialType"] = "LAMBERT";
     }
     curMaterialExport.roygbivMaterialName = curMaterial.roygbivMaterialName;
     materialsExport[materialName] = curMaterialExport;
