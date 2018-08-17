@@ -1354,7 +1354,6 @@ Roygbiv.prototype.opacity = function(object, delta){
     object.material.opacity = 1;
   }
 
-  object.material.needsUpdate = true;
 }
 
 // shininess
@@ -1385,7 +1384,6 @@ Roygbiv.prototype.shininess = function(object, delta){
     object.initShininessSet = true;
   }
   object.material.shininess += delta;
-  object.material.needsUpdate = true;
 }
 
 // textureOffsetX
@@ -1406,19 +1404,26 @@ Roygbiv.prototype.textureOffsetX = function(object, dx){
     throw new Error("textureOffsetX error: Type not supported.");
     return;
   }
-  var texture = object.material.map;
+  var texture;
+  if (object.material.map){
+    texture = object.material.map;
+  }else if (object.material.normalMap){
+    texture = object.material.normalMap;
+  }else if (object.material.specularMap){
+    texture = object.material.specularMap;
+  }else if (object.material.alphaMap){
+    texture = object.material.alphaMap;
+  }else if (object.material.emissiveMap){
+    texture = object.material.emissiveMap;
+  }else if (object.material.displacementMap){
+    texture = object.material.displacementMap;
+  }
   if (texture){
     if (!texture.initOffsetXSet){
       texture.initOffsetX = texture.offset.x;
       texture.initOffsetXSet = true;
     }
     texture.offset.x += dx;
-  }
-  if (object.material.displacementMap){
-    object.material.displacementMap.x += dx;
-  }
-  if (texture || object.material.displacementMap){
-    object.material.needsUpdate = true;
   }
 }
 
@@ -1440,19 +1445,26 @@ Roygbiv.prototype.textureOffsetY = function(object, dy){
     throw new Error("textureOffsetY error: Type not supported.");
     return;
   }
-  var texture = object.material.map;
+  var texture;
+  if (object.material.map){
+    texture = object.material.map;
+  }else if (object.material.normalMap){
+    texture = object.material.normalMap;
+  }else if (object.material.specularMap){
+    texture = object.material.specularMap;
+  }else if (object.material.alphaMap){
+    texture = object.material.alphaMap;
+  }else if (object.material.emissiveMap){
+    texture = object.material.emissiveMap;
+  }else if (object.material.displacementMap){
+    texture = object.material.displacementMap;
+  }
   if (texture){
     if (!texture.initOffsetYSet){
       texture.initOffsetY = texture.offset.y;
       texture.initOffsetYSet = true;
     }
     texture.offset.y += dy;
-  }
-  if (object.material.displacementMap){
-    object.material.displacementMap.y += dy;
-  }
-  if (texture || object.material.displacementMap){
-    object.material.needsUpdate = true;
   }
 }
 
@@ -1478,7 +1490,20 @@ Roygbiv.prototype.textureOffset = function(object, dx, dy){
     throw new Error("textureOffset error: Type not supported.");
     return;
   }
-  var texture = object.material.map;
+  var texture;
+  if (object.material.map){
+    texture = object.material.map;
+  }else if (object.material.normalMap){
+    texture = object.material.normalMap;
+  }else if (object.material.specularMap){
+    texture = object.material.specularMap;
+  }else if (object.material.alphaMap){
+    texture = object.material.alphaMap;
+  }else if (object.material.emissiveMap){
+    texture = object.material.emissiveMap;
+  }else if (object.material.displacementMap){
+    texture = object.material.displacementMap;
+  }
   if (texture){
     if (!texture.initOffsetXSet){
       texture.initOffsetX = texture.offset.x;
@@ -1491,17 +1516,10 @@ Roygbiv.prototype.textureOffset = function(object, dx, dy){
     texture.offset.x += dx;
     texture.offset.y += dy;
   }
-  if (object.material.displacementMap){
-    object.material.displacementMap.x += dx;
-    object.material.displacementMap.y += dy;
-  }
-  if (texture || object.material.displacementMap){
-    object.material.needsUpdate = true;
-  }
 }
 
 // heightMapScale
-//  Modifies the height map scale of an object. Only the object that have Phong
+//  Modifies the height map scale of an object. Only the objects that have Phong
 //  materials can have height maps.
 Roygbiv.prototype.heightMapScale = function(object, delta){
   if (mode == 0){
@@ -1528,7 +1546,6 @@ Roygbiv.prototype.heightMapScale = function(object, delta){
     object.initDisplacementScaleSet = true;
   }
   object.material.displacementScale += delta;
-  object.material.needsUpdate = true;
 }
 
 // heightMapBias
@@ -1559,7 +1576,6 @@ Roygbiv.prototype.heightMapBias = function(object, delta){
     object.initDisplacementBiasSet = true;
   }
   object.material.displacementBias += delta;
-  object.material.needsUpdate = true;
 }
 
 // emissiveIntensity
