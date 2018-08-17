@@ -652,7 +652,6 @@ var materials = new Object();
 var addedObjects = new Object();
 var textures = new Object();
 var textureURLs = new Object();
-var physicsTests = new Object();
 var wallCollections = new Object();
 var uploadedImages = new Object();
 var modifiedTextures = new Object();
