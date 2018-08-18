@@ -620,7 +620,8 @@ var Text = function(){
                                                    "updateFunction: The update function of the particle system that is executed on each frame render. (optional)";
   this.ROYGBIV_SCRIPTING_API_CREATEOBJECTTRAIL = "Creates an object trail effect based on following configurations:\n"+
                                                   "object: The object or object group to which the trail effect is added. (mandatory)\n"+
-                                                  "alpha: The alpha value of trails between [0,1]. (mandatory)";
+                                                  "alpha: The alpha value of trails between [0,1]. (mandatory)\n"+
+                                                  "maxTimeInSeconds: Maximum trail time in seconds. The default value is 0.25 (optional)";
   this.ROYGBIV_SCRIPTING_API_DESTROYOBJECTTRAIL = "Destroys the trail effect of an object created using the createObjectTrail function.";
   this.ROYGBIV_SCRIPTING_API_GENERATEPARTICLESYSTEMNAME = "Generates a unique name for a particle system.";
   this.ROYGBIV_SCRIPTING_API_REWINDPARTICLE = "Rewinds a particle and restarts its motion. Particles using this functionality must have respawn = true and\nlifetime != 0 as configuration. The additional delay parameter may be used to delay the rewind process in seconds.";

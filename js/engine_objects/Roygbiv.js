@@ -4083,6 +4083,7 @@ Roygbiv.prototype.createDynamicTrail = function(configurations){
 // Creates an object trail effect based on following configurations:
 // object: The object or object group to which the trail effect is added. (mandatory)
 // alpha: The alpha value of trails between [0,1]. (mandatory)
+// maxTimeInSeconds: Maximum trail time in seconds. The default value is 0.25 (optional)
 Roygbiv.prototype.createObjectTrail = function(configurations){
   if (mode == 0){
     return;
@@ -4116,6 +4117,20 @@ Roygbiv.prototype.createObjectTrail = function(configurations){
   if (objectTrails[object.name]){
     throw new Error("createObjectTrail error: A trail is already added to object.");
     return;
+  }
+  if (!(typeof configurations.maxTimeInSeconds == UNDEFINED)){
+    if (isNaN(configurations.maxTimeInSeconds)){
+      throw new Error("createObjectTrail error: maxTimeInSeconds is not a number.");
+      return;
+    }
+    if (configurations.maxTimeInSeconds <= 0){
+      throw new Error("createObjectTrail error: maxTimeInSeconds must be greater than zero.");
+      return;
+    }
+    if (configurations.maxTimeInSeconds > 1){
+      throw new Error("createObjectTrail error: maxTimeInSeconds must not be greater than zero.");
+      return;
+    }
   }
   new ObjectTrail(configurations);
   return;

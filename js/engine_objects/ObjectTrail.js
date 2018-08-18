@@ -2,6 +2,12 @@ var ObjectTrail = function(configurations){
   this.object = configurations.object;
   this.alpha = configurations.alpha;
 
+  var OBJECT_TRAIL_MAX_TIME_IN_SECS = OBJECT_TRAIL_MAX_TIME_IN_SECS_DEFAULT;
+  if (!(typeof configurations.maxTimeInSeconds == UNDEFINED)){
+    OBJECT_TRAIL_MAX_TIME_IN_SECS = configurations.maxTimeInSeconds;
+  }
+  this.OBJECT_TRAIL_MAX_TIME_IN_SECS = OBJECT_TRAIL_MAX_TIME_IN_SECS;
+
   var hasDisplacement = false;
 
   var geometry;
@@ -382,8 +388,11 @@ var ObjectTrail = function(configurations){
   this.geometry.addAttribute('faceVertexUVAlpha', this.faceVertexUVsAlphaBufferAttribute);
   this.geometry.addAttribute('textureFlag', this.textureFlagsBufferAttribute);
 
-  var objectCoordinates = new Array(60 * OBJECT_TRAIL_MAX_TIME_IN_SECS * 3);
-  var objectQuaternions = new Array(60 * OBJECT_TRAIL_MAX_TIME_IN_SECS * 4);
+  var objectCoordinateSize = parseInt(60 * OBJECT_TRAIL_MAX_TIME_IN_SECS * 3);
+  var objectQuaternionSize = parseInt(60 * OBJECT_TRAIL_MAX_TIME_IN_SECS * 4);
+
+  var objectCoordinates = new Array(objectCoordinateSize);
+  var objectQuaternions = new Array(objectQuaternionSize);
   var i2 = 0;
   var i3 = 0;
 
@@ -410,8 +419,14 @@ var ObjectTrail = function(configurations){
     fogInfo = new THREE.Vector4(-100.0, 0, 0, 0);
   }
 
+  var vertexShaderCode = ShaderContent.objectTrailVertexShader.replace(
+    "#define OBJECT_COORDINATE_SIZE 1", "#define OBJECT_COORDINATE_SIZE "+objectCoordinateSize
+  ).replace(
+    "#define OBJECT_QUATERNION_SIZE 1", "#define OBJECT_QUATERNION_SIZE "+objectQuaternionSize
+  );
+
   this.material = new THREE.RawShaderMaterial({
-    vertexShader: ShaderContent.objectTrailVertexShader,
+    vertexShader: vertexShaderCode,
     fragmentShader: ShaderContent.objectTrailFragmentShader,
     transparent: true,
     vertexColors: THREE.VertexColors,
@@ -455,6 +470,7 @@ ObjectTrail.prototype.start = function(){
 }
 
 ObjectTrail.prototype.update = function(){
+  var OBJECT_TRAIL_MAX_TIME_IN_SECS = this.OBJECT_TRAIL_MAX_TIME_IN_SECS;
   this.material.uniforms.viewMatrix.value = camera.matrixWorldInverse;
   this.material.uniforms.projectionMatrix.value = camera.projectionMatrix;
   var posit, quat;

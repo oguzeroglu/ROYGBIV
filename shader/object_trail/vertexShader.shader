@@ -1,6 +1,9 @@
 precision lowp float;
 precision lowp int;
 
+#define OBJECT_COORDINATE_SIZE 1
+#define OBJECT_QUATERNION_SIZE 1
+
 attribute vec3 position;
 attribute vec3 color;
 attribute vec3 normal;
@@ -13,8 +16,8 @@ attribute float textureFlag;
 
 uniform mat4 viewMatrix;
 uniform mat4 projectionMatrix;
-uniform float objectCoordinates[45];
-uniform float objectQuaternions[60];
+uniform float objectCoordinates[OBJECT_COORDINATE_SIZE];
+uniform float objectQuaternions[OBJECT_QUATERNION_SIZE];
 uniform vec3 currentPosition;
 uniform vec4 currentQuaternion;
 uniform float alpha;
