@@ -4142,6 +4142,7 @@ Roygbiv.prototype.destroyObjectTrail = function(object){
   }
   objectTrail.destroy();
   delete objectTrails[object.name];
+  delete activeObjectTrails[object.name];
   return;
 }
 
