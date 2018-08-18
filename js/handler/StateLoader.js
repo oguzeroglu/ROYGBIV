@@ -2870,21 +2870,21 @@ StateLoader.prototype.mapTextureToSingleObject = function(diff, exported){
         cloneTexture.wrapS = THREE.RepeatWrapping;
         cloneTexture.wrapT = THREE.RepeatWrapping;
 
-        if (repeatU){
+        if (!(typeof repeatU == UNDEFINED)){
           cloneTexture.repeat.x = repeatU;
         }
-        if (repeatV){
+        if (!(typeof repeatV == UNDEFINED)){
           cloneTexture.repeat.y = repeatV;
         }
 
         var mirrorT = metaData["mirrorT"];
         var mirrorS = metaData["mirrorS"];
-        if (mirrorT){
+        if (!(typeof mirrorT == UNDEFINED)){
           if (mirrorT == "ON"){
             cloneTexture.wrapT = THREE.MirroredRepeatWrapping;
           }
         }
-        if (mirrorS){
+        if (!(typeof mirrorS == UNDEFINED)){
           if (mirrorS == "ON"){
             cloneTexture.wrapS = THREE.MirroredRepeatWrapping;
           }
@@ -2892,10 +2892,10 @@ StateLoader.prototype.mapTextureToSingleObject = function(diff, exported){
 
         var textureOffsetX = curAddedObjectExport["textureOffsetX"];
         var textureOffsetY = curAddedObjectExport["textureOffsetY"];
-        if (textureOffsetX){
+        if (!(typeof textureOffsetX == UNDEFINED)){
           cloneTexture.offset.x = textureOffsetX;
         }
-        if (textureOffsetY){
+        if (!(typeof textureOffsetY == UNDEFINED)){
           cloneTexture.offset.y = textureOffsetY;
         }
 
@@ -2918,21 +2918,21 @@ StateLoader.prototype.mapTextureToSingleObject = function(diff, exported){
 
         cloneTexture.wrapS = THREE.RepeatWrapping;
         cloneTexture.wrapT = THREE.RepeatWrapping;
-        if (repeatU){
+        if (!(typeof repeatU == UNDEFINED)){
           cloneTexture.repeat.x = repeatU;
         }
-        if (repeatV){
+        if (!(typeof repeatV == UNDEFINED)){
           cloneTexture.repeat.y = repeatV;
         }
 
         var mirrorT = metaData["mirrorT"];
         var mirrorS = metaData["mirrorS"];
-        if (mirrorT){
+        if (!(typeof mirrorT == UNDEFINED)){
           if (mirrorT == "ON"){
             cloneTexture.wrapT = THREE.MirroredRepeatWrapping;
           }
         }
-        if (mirrorS){
+        if (!(typeof mirrorS == UNDEFINED)){
           if (mirrorS == "ON"){
             cloneTexture.wrapS = THREE.MirroredRepeatWrapping;
           }
@@ -2957,21 +2957,21 @@ StateLoader.prototype.mapTextureToSingleObject = function(diff, exported){
 
         cloneTexture.wrapS = THREE.RepeatWrapping;
         cloneTexture.wrapT = THREE.RepeatWrapping;
-        if (repeatU){
+        if (!(typeof repeatU == UNDEFINED)){
           cloneTexture.repeat.x = repeatU;
         }
-        if (repeatV){
+        if (!(typeof repeatV == UNDEFINED)){
           cloneTexture.repeat.y = repeatV;
         }
 
         var mirrorT = metaData["mirrorT"];
         var mirrorS = metaData["mirrorS"];
-        if (mirrorT){
+        if (!(typeof mirrorT == UNDEFINED)){
           if (mirrorT == "ON"){
             cloneTexture.wrapT = THREE.MirroredRepeatWrapping;
           }
         }
-        if (mirrorS){
+        if (!(typeof mirrorS == UNDEFINED)){
           if (mirrorS == "ON"){
             cloneTexture.wrapS = THREE.MirroredRepeatWrapping;
           }
@@ -2995,21 +2995,21 @@ StateLoader.prototype.mapTextureToSingleObject = function(diff, exported){
 
         cloneTexture.wrapS = THREE.RepeatWrapping;
         cloneTexture.wrapT = THREE.RepeatWrapping;
-        if (repeatU){
+        if (!(typeof repeatU == UNDEFINED)){
           cloneTexture.repeat.x = repeatU;
         }
-        if (repeatV){
+        if (!(typeof repeatV == UNDEFINED)){
           cloneTexture.repeat.y = repeatV;
         }
 
         var mirrorT = metaData["mirrorT"];
         var mirrorS = metaData["mirrorS"];
-        if (mirrorT){
+        if (!(typeof mirrorT == UNDEFINED)){
           if (mirrorT == "ON"){
             cloneTexture.wrapT = THREE.MirroredRepeatWrapping;
           }
         }
-        if (mirrorS){
+        if (!(typeof mirrorS == UNDEFINED)){
           if (mirrorS == "ON"){
             cloneTexture.wrapS = THREE.MirroredRepeatWrapping;
           }
@@ -3031,21 +3031,21 @@ StateLoader.prototype.mapTextureToSingleObject = function(diff, exported){
 
         cloneTexture.wrapS = THREE.RepeatWrapping;
         cloneTexture.wrapT = THREE.RepeatWrapping;
-        if (repeatU){
+        if (!(typeof repeatU == UNDEFINED)){
           cloneTexture.repeat.x = repeatU;
         }
-        if (repeatV){
+        if (!(typeof repeatV == UNDEFINED)){
           cloneTexture.repeat.y = repeatV;
         }
 
         var mirrorT = metaData["mirrorT"];
         var mirrorS = metaData["mirrorS"];
-        if (mirrorT){
+        if (!(typeof mirrorT == UNDEFINED)){
           if (mirrorT == "ON"){
             cloneTexture.wrapT = THREE.MirroredRepeatWrapping;
           }
         }
-        if (mirrorS){
+        if (!(typeof mirrorS == UNDEFINED)){
           if (mirrorS == "ON"){
             cloneTexture.wrapS = THREE.MirroredRepeatWrapping;
           }
@@ -3068,21 +3068,21 @@ StateLoader.prototype.mapTextureToSingleObject = function(diff, exported){
 
         cloneTexture.wrapS = THREE.RepeatWrapping;
         cloneTexture.wrapT = THREE.RepeatWrapping;
-        if (repeatU){
+        if (!(typeof repeatU == UNDEFINED)){
           cloneTexture.repeat.x = repeatU;
         }
-        if (repeatV){
+        if (!(typeof repeatV == UNDEFINED)){
           cloneTexture.repeat.y = repeatV;
         }
 
         var mirrorT = metaData["mirrorT"];
         var mirrorS = metaData["mirrorS"];
-        if (mirrorT){
+        if (!(typeof mirrorT == UNDEFINED)){
           if (mirrorT == "ON"){
             cloneTexture.wrapT = THREE.MirroredRepeatWrapping;
           }
         }
-        if (mirrorS){
+        if (!(typeof mirrorS == UNDEFINED)){
           if (mirrorS == "ON"){
             cloneTexture.wrapS = THREE.MirroredRepeatWrapping;
           }
@@ -3102,10 +3102,10 @@ StateLoader.prototype.mapTextureToSingleObject = function(diff, exported){
         cloneTexture.roygbivTextureName = textureName;
         cloneTexture.roygbivTexturePackName = 0;
 
-        if (displacementScale){
+        if (!(typeof displacementScale == UNDEFINED)){
           material.displacementScale = displacementScale;
         }
-        if (displacementBias){
+        if (!(typeof displacementBias == UNDEFINED)){
           material.displacementBias = displacementBias;
         }
 
@@ -3113,21 +3113,21 @@ StateLoader.prototype.mapTextureToSingleObject = function(diff, exported){
 
         cloneTexture.wrapS = THREE.RepeatWrapping;
         cloneTexture.wrapT = THREE.RepeatWrapping;
-        if (repeatU){
+        if (!(typeof repeatU == UNDEFINED)){
           cloneTexture.repeat.x = repeatU;
         }
-        if (repeatV){
+        if (!(typeof repeatV == UNDEFINED)){
           cloneTexture.repeat.y = repeatV;
         }
 
         var mirrorT = metaData["mirrorT"];
         var mirrorS = metaData["mirrorS"];
-        if (mirrorT){
+        if (!(typeof mirrorT == UNDEFINED)){
           if (mirrorT == "ON"){
             cloneTexture.wrapT = THREE.MirroredRepeatWrapping;
           }
         }
-        if (mirrorS){
+        if (!(typeof mirrorS == UNDEFINED)){
           if (mirrorS == "ON"){
             cloneTexture.wrapS = THREE.MirroredRepeatWrapping;
           }
@@ -3167,28 +3167,28 @@ StateLoader.prototype.mapTexturePackToSingleObject = function(diff){
     displacementRoygbivTexturePackName = addedObjectExport["displacementRoygbivTexturePackName"];
 
     var textureRepeatU, textureRepeatV;
-    if (addedObjectExport["textureRepeatU"]){
+    if (!(typeof addedObjectExport["textureRepeatU"] == UNDEFINED)){
       textureRepeatU = addedObjectExport["textureRepeatU"];
       addedObject.metaData["textureRepeatU"] = textureRepeatU;
     }
-    if (addedObjectExport["textureRepeatV"]){
+    if (!(typeof addedObjectExport["textureRepeatV"] == UNDEFINED)){
       textureRepeatV = addedObjectExport["textureRepeatV"];
       addedObject.metaData["textureRepeatV"] = textureRepeatV;
     }
 
     var textureOffsetX, textureOffsetY;
-    if (addedObjectExport.textureOffsetX){
+    if (!(typeof addedObjectExport.textureOffsetX == UNDEFINED)){
       textureOffsetX = addedObjectExport.textureOffsetX;
     }
-    if (addedObjectExport.textureOffsetY){
+    if (!(typeof addedObjectExport.textureOffsetY == UNDEFINED)){
       textureOffsetY = addedObjectExport.textureOffsetY;
     }
 
     var displacementScale, displacementBias;
-    if (addedObjectExport.displacementScale){
+    if (!(typeof addedObjectExport.displacementScale == UNDEFINED)){
       displacementScale = addedObjectExport.displacementScale;
     }
-    if (addedObjectExport.displacementBias){
+    if (!(typeof addedObjectExport.displacementBias == UNDEFINED)){
       displacementBias = addedObjectExport.displacementBias;
     }
     if (diffuseRoygbivTexturePackName){
@@ -3197,16 +3197,16 @@ StateLoader.prototype.mapTexturePackToSingleObject = function(diff){
           material.map = texturePack.diffuseTexture.clone();
           material.map.roygbivTexturePackName = texturePackName;
           material.map.roygbivTextureName = 0;
-          if (textureOffsetX){
+          if (!(typeof textureOffsetX == UNDEFINED)){
             material.map.offset.x = textureOffsetX;
           }
-          if (textureOffsetY){
+          if (!(typeof textureOffsetY == UNDEFINED)){
             material.map.offset.y = textureOffsetY;
           }
-          if (textureRepeatU){
+          if (!(typeof textureRepeatU == UNDEFINED)){
             material.map.repeat.x = textureRepeatU;
           }
-          if (textureRepeatV){
+          if (!(typeof textureRepeatV == UNDEFINED)){
             material.map.repeat.y = textureRepeatV;
           }
           material.needsUpdate = true;
@@ -3222,10 +3222,10 @@ StateLoader.prototype.mapTexturePackToSingleObject = function(diff){
           material.alphaMap.roygbivTextureName = 0;
           material.transparent = false;
           material.alphaTest = 0.5;
-          if (textureRepeatU){
+          if (!(typeof textureRepeatU == UNDEFINED)){
             material.alphaMap.repeat.x = textureRepeatU;
           }
-          if (textureRepeatV){
+          if (!(typeof textureRepeatV == UNDEFINED)){
             material.alphaMap.repeat.y = textureRepeatV;
           }
           material.needsUpdate = true;
@@ -3239,10 +3239,10 @@ StateLoader.prototype.mapTexturePackToSingleObject = function(diff){
           material.aoMap = texturePack.aoTexture.clone();
           material.aoMap.roygbivTexturePackName = texturePackName;
           material.aoMap.roygbivTextureName = 0;
-          if (textureRepeatU){
+          if (!(typeof textureRepeatU == UNDEFINED)){
             material.aoMap.repeat.x = textureRepeatU;
           }
-          if (textureRepeatV){
+          if (!(typeof textureRepeatV == UNDEFINED)){
             material.aoMap.repeat.y = textureRepeatV;
           }
           material.needsUpdate = true;
@@ -3257,10 +3257,10 @@ StateLoader.prototype.mapTexturePackToSingleObject = function(diff){
           material.emissiveMap = texturePack.emissiveTexture.clone();
           material.emissiveMap.roygbivTexturePackName = texturePackName;
           material.emissiveMap.roygbivTextureName = 0;
-          if (textureRepeatU){
+          if (!(typeof textureRepeatU == UNDEFINED)){
             material.emissiveMap.repeat.x = textureRepeatU;
           }
-          if (textureRepeatV){
+          if (!(typeof textureRepeatV == UNDEFINED)){
             material.emissiveMap.repeat.y = textureRepeatV;
           }
           material.needsUpdate = true;
@@ -3274,10 +3274,10 @@ StateLoader.prototype.mapTexturePackToSingleObject = function(diff){
           material.normalMap = texturePack.normalTexture.clone();
           material.normalMap.roygbivTexturePackName = texturePackName;
           material.normalMap.roygbivTextureName = 0;
-          if (textureRepeatU){
+          if (!(typeof textureRepeatU == UNDEFINED)){
             material.normalMap.repeat.x = textureRepeatU;
           }
-          if (textureRepeatV){
+          if (!(typeof textureRepeatV == UNDEFINED)){
             material.normalMap.repeat.y = textureRepeatV;
           }
           material.needsUpdate = true;
@@ -3291,10 +3291,10 @@ StateLoader.prototype.mapTexturePackToSingleObject = function(diff){
           material.specularMap = texturePack.specularTexture.clone();
           material.specularMap.roygbivTexturePackName = texturePackName;
           material.specularMap.roygbivTextureName = 0;
-          if (textureRepeatU){
+          if (!(typeof textureRepeatU == UNDEFINED)){
             material.specularMap.repeat.x = textureRepeatU;
           }
-          if (textureRepeatV){
+          if (!(typeof textureRepeatV == UNDEFINED)){
             material.specularMap.repeat.y = textureRepeatV;
           }
           material.needsUpdate = true;
@@ -3308,16 +3308,16 @@ StateLoader.prototype.mapTexturePackToSingleObject = function(diff){
           material.displacementMap = texturePack.heightTexture.clone();
           material.displacementMap.roygbivTexturePackName = texturePackName;
           material.displacementMap.roygbivTextureName = 0;
-          if (textureRepeatU){
+          if (!(typeof textureRepeatU == UNDEFINED)){
             material.displacementMap.repeat.x = textureRepeatU;
           }
-          if (textureRepeatV){
+          if (!(typeof textureRepeatV == UNDEFINED)){
             material.displacementMap.repeat.y = textureRepeatV;
           }
-          if (displacementScale){
+          if (!(typeof displacementScale == UNDEFINED)){
             material.displacementScale = displacementScale;
           }
-          if (displacementBias){
+          if (!(typeof displacementBias == UNDEFINED)){
             material.displacementBias = displacementBias;
           }
           material.needsUpdate = true;
@@ -3361,45 +3361,45 @@ StateLoader.prototype.mapLoadedTexturePack = function(texturePackName, exportObj
     displacementRoygbivTexturePackName = addedObjectExport["displacementRoygbivTexturePackName"];
 
     var textureRepeatU, textureRepeatV;
-    if (addedObjectExport["textureRepeatU"]){
+    if (!(typeof addedObjectExport["textureRepeatU"] == UNDEFINED)){
       textureRepeatU = addedObjectExport["textureRepeatU"];
       addedObject.metaData["textureRepeatU"] = textureRepeatU;
     }
-    if (addedObjectExport["textureRepeatV"]){
+    if (!(typeof addedObjectExport["textureRepeatV"] == UNDEFINED)){
       textureRepeatV = addedObjectExport["textureRepeatV"];
       addedObject.metaData["textureRepeatV"] = textureRepeatV;
     }
 
     var mirrorS = false;
     var mirrorT = false;
-    if (addedObjectExport.metaData.mirrorS){
+    if (!(typeof addedObjectExport.metaData.mirrorS == UNDEFINED)){
       if (addedObjectExport.metaData.mirrorS == "ON"){
         mirrorS = true;
       }
     }
-    if (addedObjectExport.metaData.mirrorT){
+    if (!(typeof addedObjectExport.metaData.mirrorT == UNDEFINED)){
       if (addedObjectExport.metaData.mirrorT == "ON"){
         mirrorT = true;
       }
     }
 
     var textureOffsetX, textureOffsetY;
-    if (addedObjectExport.textureOffsetX){
+    if (!(typeof addedObjectExport.textureOffsetX == UNDEFINED)){
       textureOffsetX = addedObjectExport.textureOffsetX;
     }else{
       textureOffsetX = 0;
     }
-    if (addedObjectExport.textureOffsetY){
+    if (!(typeof addedObjectExport.textureOffsetY == UNDEFINED)){
       textureOffsetY = addedObjectExport.textureOffsetY;
     }else{
       textureOffsetY = 0;
     }
 
     var displacementScale, displacementBias;
-    if (addedObjectExport.displacementScale){
+    if (!(typeof addedObjectExport.displacementScale == UNDEFINED)){
       displacementScale = addedObjectExport.displacementScale;
     }
-    if (addedObjectExport.displacementBias){
+    if (!(typeof addedObjectExport.displacementBias == UNDEFINED)){
       displacementBias = addedObjectExport.displacementBias;
     }
     if (diffuseRoygbivTexturePackName){
@@ -3408,16 +3408,16 @@ StateLoader.prototype.mapLoadedTexturePack = function(texturePackName, exportObj
           material.map = texturePack.diffuseTexture.clone();
           material.map.roygbivTexturePackName = texturePackName;
           material.map.roygbivTextureName = 0;
-          if (textureOffsetX){
+          if (!(typeof textureOffsetX == UNDEFINED)){
             material.map.offset.x = textureOffsetX;
           }
-          if (textureOffsetY){
+          if (!(typeof textureOffsetY == UNDEFINED)){
             material.map.offset.y = textureOffsetY;
           }
-          if (textureRepeatU){
+          if (!(typeof textureRepeatU == UNDEFINED)){
             material.map.repeat.x = textureRepeatU;
           }
-          if (textureRepeatV){
+          if (!(typeof textureRepeatV == UNDEFINED)){
             material.map.repeat.y = textureRepeatV;
           }
           material.needsUpdate = true;
@@ -3433,10 +3433,10 @@ StateLoader.prototype.mapLoadedTexturePack = function(texturePackName, exportObj
           material.alphaMap.roygbivTextureName = 0;
           material.transparent = false;
           material.alphaTest = 0.5;
-          if (textureRepeatU){
+          if (!(typeof textureRepeatU == UNDEFINED)){
             material.alphaMap.repeat.x = textureRepeatU;
           }
-          if (textureRepeatV){
+          if (!(typeof textureRepeatV == UNDEFINED)){
             material.alphaMap.repeat.y = textureRepeatV;
           }
           material.needsUpdate = true;
@@ -3450,10 +3450,10 @@ StateLoader.prototype.mapLoadedTexturePack = function(texturePackName, exportObj
           material.aoMap = texturePack.aoTexture.clone();
           material.aoMap.roygbivTexturePackName = texturePackName;
           material.aoMap.roygbivTextureName = 0;
-          if (textureRepeatU){
+          if (!(typeof textureRepeatU == UNDEFINED)){
             material.aoMap.repeat.x = textureRepeatU;
           }
-          if (textureRepeatV){
+          if (!(typeof textureRepeatV == UNDEFINED)){
             material.aoMap.repeat.y = textureRepeatV;
           }
           material.needsUpdate = true;
@@ -3468,10 +3468,10 @@ StateLoader.prototype.mapLoadedTexturePack = function(texturePackName, exportObj
           material.emissiveMap = texturePack.emissiveTexture.clone();
           material.emissiveMap.roygbivTexturePackName = texturePackName;
           material.emissiveMap.roygbivTextureName = 0;
-          if (textureRepeatU){
+          if (!(typeof textureRepeatU == UNDEFINED)){
             material.emissiveMap.repeat.x = textureRepeatU;
           }
-          if (textureRepeatV){
+          if (!(typeof textureRepeatV == UNDEFINED)){
             material.emissiveMap.repeat.y = textureRepeatV;
           }
           material.needsUpdate = true;
@@ -3485,10 +3485,10 @@ StateLoader.prototype.mapLoadedTexturePack = function(texturePackName, exportObj
           material.normalMap = texturePack.normalTexture.clone();
           material.normalMap.roygbivTexturePackName = texturePackName;
           material.normalMap.roygbivTextureName = 0;
-          if (textureRepeatU){
+          if (!(typeof textureRepeatU == UNDEFINED)){
             material.normalMap.repeat.x = textureRepeatU;
           }
-          if (textureRepeatV){
+          if (!(typeof textureRepeatV == UNDEFINED)){
             material.normalMap.repeat.y = textureRepeatV;
           }
           material.needsUpdate = true;
@@ -3502,10 +3502,10 @@ StateLoader.prototype.mapLoadedTexturePack = function(texturePackName, exportObj
           material.specularMap = texturePack.specularTexture.clone();
           material.specularMap.roygbivTexturePackName = texturePackName;
           material.specularMap.roygbivTextureName = 0;
-          if (textureRepeatU){
+          if (!(typeof textureRepeatU == UNDEFINED)){
             material.specularMap.repeat.x = textureRepeatU;
           }
-          if (textureRepeatV){
+          if (!(typeof textureRepeatV == UNDEFINED)){
             material.specularMap.repeat.y = textureRepeatV;
           }
           material.needsUpdate = true;
@@ -3519,16 +3519,16 @@ StateLoader.prototype.mapLoadedTexturePack = function(texturePackName, exportObj
           material.displacementMap = texturePack.heightTexture.clone();
           material.displacementMap.roygbivTexturePackName = texturePackName;
           material.displacementMap.roygbivTextureName = 0;
-          if (textureRepeatU){
+          if (!(typeof textureRepeatU == UNDEFINED)){
             material.displacementMap.repeat.x = textureRepeatU;
           }
-          if (textureRepeatV){
+          if (!(typeof textureRepeatV == UNDEFINED)){
             material.displacementMap.repeat.y = textureRepeatV;
           }
-          if (displacementScale){
+          if (!(typeof displacementScale == UNDEFINED)){
             material.displacementScale = displacementScale;
           }
-          if (displacementBias){
+          if (!(typeof displacementBias == UNDEFINED)){
             material.displacementBias = displacementBias;
           }
           material.needsUpdate = true;
@@ -3597,21 +3597,21 @@ StateLoader.prototype.mapLoadedTexture = function(texture, textureName){
         cloneTexture.wrapS = THREE.RepeatWrapping;
         cloneTexture.wrapT = THREE.RepeatWrapping;
 
-        if (repeatU){
+        if (!(typeof repeatU == UNDEFINED)){
           cloneTexture.repeat.x = repeatU;
         }
-        if (repeatV){
+        if (!(typeof repeatV == UNDEFINED)){
           cloneTexture.repeat.y = repeatV;
         }
 
         var mirrorT = metaData["mirrorT"];
         var mirrorS = metaData["mirrorS"];
-        if (mirrorT){
+        if (!(typeof mirrorT == UNDEFINED)){
           if (mirrorT == "ON"){
             cloneTexture.wrapT = THREE.MirroredRepeatWrapping;
           }
         }
-        if (mirrorS){
+        if (!(typeof mirrorS == UNDEFINED)){
           if (mirrorS == "ON"){
             cloneTexture.wrapS = THREE.MirroredRepeatWrapping;
           }
@@ -3619,10 +3619,10 @@ StateLoader.prototype.mapLoadedTexture = function(texture, textureName){
 
         var textureOffsetX = curAddedObjectExport["textureOffsetX"];
         var textureOffsetY = curAddedObjectExport["textureOffsetY"];
-        if (textureOffsetX){
+        if (!(typeof textureOffsetX == UNDEFINED)){
           cloneTexture.offset.x = textureOffsetX;
         }
-        if (textureOffsetY){
+        if (!(typeof textureOffsetY == UNDEFINED)){
           cloneTexture.offset.y = textureOffsetY;
         }
 
@@ -3645,21 +3645,21 @@ StateLoader.prototype.mapLoadedTexture = function(texture, textureName){
 
         cloneTexture.wrapS = THREE.RepeatWrapping;
         cloneTexture.wrapT = THREE.RepeatWrapping;
-        if (repeatU){
+        if (!(typeof repeatU == UNDEFINED)){
           cloneTexture.repeat.x = repeatU;
         }
-        if (repeatV){
+        if (!(typeof repeatV == UNDEFINED)){
           cloneTexture.repeat.y = repeatV;
         }
 
         var mirrorT = metaData["mirrorT"];
         var mirrorS = metaData["mirrorS"];
-        if (mirrorT){
+        if (!(typeof mirrorT == UNDEFINED)){
           if (mirrorT == "ON"){
             cloneTexture.wrapT = THREE.MirroredRepeatWrapping;
           }
         }
-        if (mirrorS){
+        if (!(typeof mirrorS == UNDEFINED)){
           if (mirrorS == "ON"){
             cloneTexture.wrapS = THREE.MirroredRepeatWrapping;
           }
@@ -3684,21 +3684,21 @@ StateLoader.prototype.mapLoadedTexture = function(texture, textureName){
 
         cloneTexture.wrapS = THREE.RepeatWrapping;
         cloneTexture.wrapT = THREE.RepeatWrapping;
-        if (repeatU){
+        if (!(typeof repeatU == UNDEFINED)){
           cloneTexture.repeat.x = repeatU;
         }
-        if (repeatV){
+        if (!(typeof repeatV == UNDEFINED)){
           cloneTexture.repeat.y = repeatV;
         }
 
         var mirrorT = metaData["mirrorT"];
         var mirrorS = metaData["mirrorS"];
-        if (mirrorT){
+        if (!(typeof mirrorT == UNDEFINED)){
           if (mirrorT == "ON"){
             cloneTexture.wrapT = THREE.MirroredRepeatWrapping;
           }
         }
-        if (mirrorS){
+        if (!(typeof mirrorS == UNDEFINED)){
           if (mirrorS == "ON"){
             cloneTexture.wrapS = THREE.MirroredRepeatWrapping;
           }
@@ -3722,21 +3722,21 @@ StateLoader.prototype.mapLoadedTexture = function(texture, textureName){
 
         cloneTexture.wrapS = THREE.RepeatWrapping;
         cloneTexture.wrapT = THREE.RepeatWrapping;
-        if (repeatU){
+        if (!(typeof repeatU == UNDEFINED)){
           cloneTexture.repeat.x = repeatU;
         }
-        if (repeatV){
+        if (!(typeof repeatV == UNDEFINED)){
           cloneTexture.repeat.y = repeatV;
         }
 
         var mirrorT = metaData["mirrorT"];
         var mirrorS = metaData["mirrorS"];
-        if (mirrorT){
+        if (!(typeof mirrorT == UNDEFINED)){
           if (mirrorT == "ON"){
             cloneTexture.wrapT = THREE.MirroredRepeatWrapping;
           }
         }
-        if (mirrorS){
+        if (!(typeof mirrorS == UNDEFINED)){
           if (mirrorS == "ON"){
             cloneTexture.wrapS = THREE.MirroredRepeatWrapping;
           }
@@ -3758,21 +3758,21 @@ StateLoader.prototype.mapLoadedTexture = function(texture, textureName){
 
         cloneTexture.wrapS = THREE.RepeatWrapping;
         cloneTexture.wrapT = THREE.RepeatWrapping;
-        if (repeatU){
+        if (!(typeof repeatU == UNDEFINED)){
           cloneTexture.repeat.x = repeatU;
         }
-        if (repeatV){
+        if (!(typeof repeatV == UNDEFINED)){
           cloneTexture.repeat.y = repeatV;
         }
 
         var mirrorT = metaData["mirrorT"];
         var mirrorS = metaData["mirrorS"];
-        if (mirrorT){
+        if (!(typeof mirrorT == UNDEFINED)){
           if (mirrorT == "ON"){
             cloneTexture.wrapT = THREE.MirroredRepeatWrapping;
           }
         }
-        if (mirrorS){
+        if (!(typeof mirrorS == UNDEFINED)){
           if (mirrorS == "ON"){
             cloneTexture.wrapS = THREE.MirroredRepeatWrapping;
           }
@@ -3795,21 +3795,21 @@ StateLoader.prototype.mapLoadedTexture = function(texture, textureName){
 
         cloneTexture.wrapS = THREE.RepeatWrapping;
         cloneTexture.wrapT = THREE.RepeatWrapping;
-        if (repeatU){
+        if (!(typeof repeatU == UNDEFINED)){
           cloneTexture.repeat.x = repeatU;
         }
-        if (repeatV){
+        if (!(typeof repeatV == UNDEFINED)){
           cloneTexture.repeat.y = repeatV;
         }
 
         var mirrorT = metaData["mirrorT"];
         var mirrorS = metaData["mirrorS"];
-        if (mirrorT){
+        if (!(typeof mirrorT == UNDEFINED)){
           if (mirrorT == "ON"){
             cloneTexture.wrapT = THREE.MirroredRepeatWrapping;
           }
         }
-        if (mirrorS){
+        if (!(typeof mirrorS == UNDEFINED)){
           if (mirrorS == "ON"){
             cloneTexture.wrapS = THREE.MirroredRepeatWrapping;
           }
@@ -3829,10 +3829,10 @@ StateLoader.prototype.mapLoadedTexture = function(texture, textureName){
         cloneTexture.roygbivTextureName = textureName;
         cloneTexture.roygbivTexturePackName = 0;
 
-        if (displacementScale){
+        if (!(typeof displacementScale == UNDEFINED)){
           material.displacementScale = displacementScale;
         }
-        if (displacementBias){
+        if (!(typeof displacementBias == UNDEFINED)){
           material.displacementBias = displacementBias;
         }
 
@@ -3840,21 +3840,21 @@ StateLoader.prototype.mapLoadedTexture = function(texture, textureName){
 
         cloneTexture.wrapS = THREE.RepeatWrapping;
         cloneTexture.wrapT = THREE.RepeatWrapping;
-        if (repeatU){
+        if (!(typeof repeatU == UNDEFINED)){
           cloneTexture.repeat.x = repeatU;
         }
-        if (repeatV){
+        if (!(typeof repeatV == UNDEFINED)){
           cloneTexture.repeat.y = repeatV;
         }
 
         var mirrorT = metaData["mirrorT"];
         var mirrorS = metaData["mirrorS"];
-        if (mirrorT){
+        if (!(typeof mirrorT == UNDEFINED)){
           if (mirrorT == "ON"){
             cloneTexture.wrapT = THREE.MirroredRepeatWrapping;
           }
         }
-        if (mirrorS){
+        if (!(typeof mirrorS == UNDEFINED)){
           if (mirrorS == "ON"){
             cloneTexture.wrapS = THREE.MirroredRepeatWrapping;
           }
