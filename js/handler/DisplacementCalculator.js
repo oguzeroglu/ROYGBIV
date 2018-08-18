@@ -70,11 +70,20 @@ var DisplacementCalculator = function(obj, worldMatrix){
     }
   }
 
+  if (obj.material.map){
+    var offsetX = obj.material.map.offset.x;
+    var offsetY = obj.material.map.offset.y;
+    obj.material.displacementMap.offset.set(offsetX, offsetY);
+  }
+
+  obj.material.displacementMap.updateMatrix();
+
   var displacedPositions = [];
   for (var i = 0; i<objPositions.length; i++){
     var position = objPositions[i];
     var normal = objNormals[i];
     var uv = objUVs[i];
+    uv.applyMatrix3(obj.material.displacementMap.matrix);
     var u = ((Math.abs(uv.x) * heightMapWidth) % heightMapWidth) | 0;
     var v = ((Math.abs(uv.y) * heightMapHeight) % heightMapHeight) | 0;
     var pos = (u + v * heightMapWidth) * 4;
