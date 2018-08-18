@@ -3353,6 +3353,8 @@ function parse(input){
             objectGroups[groupName] = objectGroup;
             terminal.printInfo(Text.OBJECTS_GLUED_TOGETHER);
             $(datGuiObjectManipulation.domElement).attr("hidden", true);
+            selectedAddedObject = 0;
+            selectedObjectGroup = 0;
             undoRedoHandler.push();
             return true;
           }catch(err){
@@ -3376,6 +3378,8 @@ function parse(input){
           delete objectGroups[name];
           terminal.printInfo(Text.OBJECT_DETACHED);
           undoRedoHandler.push();
+          selectedObjectGroup = 0;
+          selectedAddedObject = 0;
           return true;
         break;
         case 94: //mark

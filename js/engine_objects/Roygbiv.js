@@ -4131,6 +4131,10 @@ Roygbiv.prototype.createObjectTrail = function(configurations){
       throw new Error("createObjectTrail error: maxTimeInSeconds must not be greater than zero.");
       return;
     }
+    if (configurations.maxTimeInSeconds < (1/60)){
+      throw new Error("createObjectTrail error: maxTimeInSeconds must not be less than 0.01666666666 (1/60).");
+      return;
+    }
   }
   new ObjectTrail(configurations);
   return;

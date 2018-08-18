@@ -13,6 +13,7 @@ attribute vec2 faceVertexUV;
 attribute vec2 faceVertexUVEmissive;
 attribute vec2 faceVertexUVAlpha;
 attribute float textureFlag;
+attribute float emissiveIntensity;
 
 uniform mat4 viewMatrix;
 uniform mat4 projectionMatrix;
@@ -29,6 +30,7 @@ varying vec2 vFaceVertexUVEmissive;
 varying vec2 vFaceVertexUVAlpha;
 varying vec3 vColor;
 varying float vTextureFlag;
+varying float vEmissiveIntensity;
 
 vec3 applyQuaternionToVector(vec3 vector, vec4 quaternion){
   float x = vector.x;
@@ -56,6 +58,7 @@ void main(){
   vFaceVertexUVEmissive = faceVertexUVEmissive;
   vFaceVertexUVAlpha = faceVertexUVAlpha;
   vTextureFlag = textureFlag;
+  vEmissiveIntensity = emissiveIntensity;
 
   int indexX = int(coordIndex);
   int indexY = indexX + 1;

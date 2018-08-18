@@ -16,24 +16,34 @@ var ObjectTrail = function(configurations){
     var color = this.object.material.color;
     for (var i = 0; i<this.object.previewMesh.geometry.faces.length; i++){
       this.object.previewMesh.geometry.faces[i].vertexColors.push(color, color, color);
+      if (this.object.material.isMeshPhongMaterial){
+        this.object.previewMesh.geometry.faces[i].faceEmissiveIntensity = this.object.material.emissiveIntensity;
+      }else{
+        this.object.previewMesh.geometry.faces[i].faceEmissiveIntensity = 0;
+      }
     }
     this.isAddedObject = true;
   }else if (this.object instanceof ObjectGroup){
     this.isAddedObject = false;
     geometry = new THREE.Geometry();
-    var lastIndex = 0;
+    var miMap = new Object();
+    var mi = 0;
     for (var objectName in this.object.group){
       var childObj = this.object.group[objectName];
+      miMap[mi] = childObj.name;
       for (var i = 0; i<childObj.previewMesh.geometry.faces.length; i++){
         var color = childObj.material.color;
         childObj.previewMesh.geometry.faces[i].vertexColors.push(color, color, color);
+        childObj.previewMesh.geometry.faces[i].materialIndex = mi;
       }
+      mi++;
       childObj.previewMesh.updateMatrix();
       geometry.merge(childObj.previewMesh.geometry, childObj.previewMesh.matrix);
-      for (var i2 = lastIndex; i2<geometry.faces.length; i2++){
-        geometry.faces[i2].roygbivObjectName = objectName;
-      }
-      lastIndex = geometry.faces.length;
+    }
+    for (var i = 0; i<geometry.faces.length; i++){
+      var mi = geometry.faces[i].materialIndex;
+      var objName = miMap[mi];
+      geometry.faces[i].roygbivObjectName = objName;
     }
   }
 
@@ -129,6 +139,7 @@ var ObjectTrail = function(configurations){
   this.geometry = new THREE.BufferGeometry();
   this.positions = new Float32Array(faces.length * 3 * 3 * 60 * OBJECT_TRAIL_MAX_TIME_IN_SECS);
   this.colors = new Float32Array(faces.length * 3 * 3 * 60 * OBJECT_TRAIL_MAX_TIME_IN_SECS);
+  this.emissiveIntensities = new Float32Array(faces.length * 3 * 60 * OBJECT_TRAIL_MAX_TIME_IN_SECS);
   this.normals = new Float32Array(faces.length * 3 * 3 * 60 * OBJECT_TRAIL_MAX_TIME_IN_SECS);
   this.coordIndices = new Float32Array(faces.length * 3 * 60 * OBJECT_TRAIL_MAX_TIME_IN_SECS);
   this.quatIndices = new Float32Array(faces.length * 3 * 60 * OBJECT_TRAIL_MAX_TIME_IN_SECS);
@@ -143,6 +154,7 @@ var ObjectTrail = function(configurations){
   var objUVsEmissive = [];
   var objUVsAlpha = [];
   var objColors = [];
+  var objEmissiveIntensities = [];
   var objTextureFlags = [];
 
   var iDisplaced = 0;
@@ -288,6 +300,23 @@ var ObjectTrail = function(configurations){
     objColors.push(curVertexColors[1]);
     objColors.push(curVertexColors[2]);
 
+    if (this.isAddedObject){
+      objEmissiveIntensities.push(face.faceEmissiveIntensity);
+      objEmissiveIntensities.push(face.faceEmissiveIntensity);
+      objEmissiveIntensities.push(face.faceEmissiveIntensity);
+    }else{
+      var childObj = this.object.group[face.roygbivObjectName];
+      if (childObj.material.isMeshPhongMaterial){
+        objEmissiveIntensities.push(childObj.material.emissiveIntensity);
+        objEmissiveIntensities.push(childObj.material.emissiveIntensity);
+        objEmissiveIntensities.push(childObj.material.emissiveIntensity);
+      }else{
+        objEmissiveIntensities.push(0);
+        objEmissiveIntensities.push(0);
+        objEmissiveIntensities.push(0);
+      }
+    }
+
     if (isTextured){
       objTextureFlags.push(20.0);
       objTextureFlags.push(20.0);
@@ -313,6 +342,7 @@ var ObjectTrail = function(configurations){
   var i13 = 0;
   var i14 = 0;
   var i15 = 0;
+  var i16 = 0;
   for (var i = 0; i<faces.length * OBJECT_TRAIL_MAX_TIME_IN_SECS * 3 * 60; i++){
     this.positions[i2++] = objPositions[i3].x;
     this.positions[i2++] = objPositions[i3].y;
@@ -332,6 +362,7 @@ var ObjectTrail = function(configurations){
     this.coordIndices[i] = i4;
     this.quatIndices[i] = i6;
     this.textureFlags[i] = objTextureFlags[i10];
+    this.emissiveIntensities[i] = objEmissiveIntensities[i16];
     i3++;
     if (i3 >= objPositions.length){
       i3 = 0;
@@ -343,6 +374,10 @@ var ObjectTrail = function(configurations){
     i10++;
     if (i10 >= objTextureFlags.length){
       i10 = 0;
+    }
+    i16++;
+    if (i16 >= objEmissiveIntensities.length){
+      i16 = 0;
     }
     i5 ++;
     if (i5 == objPositions.length){
@@ -360,6 +395,7 @@ var ObjectTrail = function(configurations){
 
   this.positionBufferAttribute = new THREE.BufferAttribute(this.positions, 3);
   this.colorBufferAttribute = new THREE.BufferAttribute(this.colors, 3);
+  this.emissiveIntensityBufferAttribute = new THREE.BufferAttribute(this.emissiveIntensities, 1);
   this.normalBufferAttribute = new THREE.BufferAttribute(this.normals, 3);
   this.coordIndicesBufferAttribute = new THREE.BufferAttribute(this.coordIndices, 1);
   this.quatIndicesBufferAttribute = new THREE.BufferAttribute(this.quatIndices, 1);
@@ -370,6 +406,7 @@ var ObjectTrail = function(configurations){
 
   this.positionBufferAttribute.setDynamic(false);
   this.colorBufferAttribute.setDynamic(false);
+  this.emissiveIntensityBufferAttribute.setDynamic(false);
   this.normalBufferAttribute.setDynamic(false);
   this.coordIndicesBufferAttribute.setDynamic(false);
   this.quatIndicesBufferAttribute.setDynamic(false);
@@ -380,6 +417,7 @@ var ObjectTrail = function(configurations){
 
   this.geometry.addAttribute('position', this.positionBufferAttribute);
   this.geometry.addAttribute('color', this.colorBufferAttribute);
+  this.geometry.addAttribute('emissiveIntensity', this.emissiveIntensityBufferAttribute);
   this.geometry.addAttribute('normal', this.normalBufferAttribute);
   this.geometry.addAttribute('coordIndex', this.coordIndicesBufferAttribute);
   this.geometry.addAttribute('quatIndex', this.quatIndicesBufferAttribute);

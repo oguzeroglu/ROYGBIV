@@ -322,7 +322,7 @@ TextureMerger.prototype.insert = function(node, textureName, texturesObj){
         this.textureOffsets[textureName] = {x: curNode.rectangle.x, y: curNode.rectangle.y};
         var calculatedSize = this.calculateImageSize(texturesObj);
         var calculatedArea = calculatedSize.width + calculatedSize.height;
-        if (calculatedArea < minArea && calculatedSize.width < MAX_TEXTURE_SIZE && calculatedSize.height < MAX_TEXTURE_SIZE){
+        if (calculatedArea < minArea && calculatedSize.width <= MAX_TEXTURE_SIZE && calculatedSize.height <= MAX_TEXTURE_SIZE){
           var overlaps = false;
           for (var tName in this.textureOffsets){
             if (tName == textureName){
@@ -370,7 +370,7 @@ TextureMerger.prototype.insert = function(node, textureName, texturesObj){
         this.insert(node, newTextureName, texturesObj);
       }
     }else{
-      console.error("TextureMerger error: Texture not inserted: "+textureName);
+      console.error("TextureMerger error: Texture not inserted: "+textureName+". Try to use smaller textures.");
     }
   }else{
     // First node

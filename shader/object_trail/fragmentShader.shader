@@ -10,6 +10,7 @@ varying vec2 vFaceVertexUVEmissive;
 varying vec2 vFaceVertexUVAlpha;
 varying vec3 vColor;
 varying float vTextureFlag;
+varying float vEmissiveIntensity;
 
 uniform sampler2D texture;
 uniform float alpha;
@@ -21,12 +22,14 @@ void main(){
   }
   if (vTextureFlag > 5.0){
     vec4 textureColor = texture2D(texture, vec2(vFaceVertexUV.x, vFaceVertexUV.y));
-    vec4 emissiveColor = vec4(0.0, 0.0, 0.0, 0.0);
+    vec3 totalEmissiveRadiance = vec3(0.0, 0.0, 0.0);
     if (vFaceVertexUVEmissive.x >= -5.0 && vFaceVertexUVEmissive.y >= -5.0){
-      emissiveColor = texture2D(texture, vec2(vFaceVertexUVEmissive.x, vFaceVertexUVEmissive.y));
+      vec4 emissiveColor = texture2D(texture, vec2(vFaceVertexUVEmissive.x, vFaceVertexUVEmissive.y));
+      totalEmissiveRadiance = vec3(vEmissiveIntensity, vEmissiveIntensity, vEmissiveIntensity);
+      totalEmissiveRadiance *= emissiveColor.rgb;
     }
     gl_FragColor = vec4(vColor.r, vColor.g, vColor.b, alpha) * textureColor;
-    gl_FragColor += emissiveColor;
+    gl_FragColor += vec4(totalEmissiveRadiance, 0.0);
     gl_FragColor.a = alpha;
   }else{
     gl_FragColor = vec4(vColor.r, vColor.g, vColor.b, alpha);
