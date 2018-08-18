@@ -42,6 +42,10 @@ var ObjectTrail = function(configurations){
     if (!(this.object.material instanceof THREE.MeshBasicMaterial)){
       if (this.object.material.emissiveMap){
         textureCount ++;
+        if (this.object.material.map){
+          this.object.material.emissiveMap.offset.copy(this.object.material.map.offset);
+          this.object.material.emissiveMap.updateMatrix();
+        }
         texturesObject[this.object.name+",emissive"] = this.object.material.emissiveMap;
       }
     }
@@ -52,6 +56,10 @@ var ObjectTrail = function(configurations){
     }
     if (this.object.material.alphaMap){
       textureCount ++;
+      if (this.object.material.map){
+        this.object.material.alphaMap.offset.copy(this.object.material.map.offset);
+        this.object.material.alphaMap.updateMatrix();
+      }
       texturesObject[this.object.name+",alpha"] = this.object.material.alphaMap;
     }
     if (textureCount > 0){

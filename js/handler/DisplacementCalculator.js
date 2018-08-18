@@ -73,6 +73,14 @@ var DisplacementCalculator = function(obj, worldMatrix){
   if (obj.material.map){
     var offsetX = obj.material.map.offset.x;
     var offsetY = obj.material.map.offset.y;
+    while (offsetX < 0){
+      offsetX += 100;
+    }
+    while (offsetY < 0){
+      offsetY += 100;
+    }
+    offsetX = offsetX - Math.floor(offsetX);
+    offsetY = offsetY - Math.floor(offsetY);
     obj.material.displacementMap.offset.set(offsetX, offsetY);
   }
 

@@ -85,16 +85,14 @@ var TextureMerger = function(texturesObj){
         }
       }
     }
-    if (ofX > 0){
-      ofX = ofX - Math.floor(ofX);
-    }else{
-      ofX = ofX + Math.floor(Math.abs(ofX));
+    while (ofX < 0){
+      ofX = ofX + 100;
     }
-    if (ofY > 0){
-      ofY = ofY - Math.floor(ofY);
-    }else{
-      ofY = ofY + Math.floor(Math.abs(ofY));
+    while (ofY < 0){
+      ofY = ofY + 100;
     }
+    ofX = ofX - Math.floor(ofX);
+    ofY = ofY - Math.floor(ofY);
     var isCustomCanvas = false;
     if ((ofX != 0 || ofY != 0)){
       var cnvs = document.createElement("canvas");
