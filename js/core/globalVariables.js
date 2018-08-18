@@ -570,6 +570,7 @@ var loadInput;
 var windowLoaded;
 var cliFocused = true;
 var omGUIFocused = false;
+var lightsGUIFocused = false;
 var cliIsBeingDragged = false;
 var requestID;
 var mouseDown = 0;
@@ -828,6 +829,7 @@ var ROYGBIV;
 // DAT GUI
 var datGui;
 var datGuiObjectManipulation;
+var datGuiLights;
 var omGUIlastObjectName = "";
 
 var postprocessingParameters = {
@@ -880,4 +882,17 @@ var objectManipulationParameters = {
   "Emissive int.": 0.0,
   "Disp. scale": 0.0,
   "Disp. bias": 0.0
+};
+
+var lightNameController;
+var lightsOffsetXController;
+var lightsOffsetYController;
+var lightsOffsetZController;
+var lightsIntensityController;
+var lightsParameters = {
+  "Light": "lightName",
+  "Offset x": 0.0,
+  "Offset y": 0.0,
+  "Offset z": 0.0,
+  "Intensity": 0.0
 };

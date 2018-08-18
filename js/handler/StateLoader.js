@@ -2447,6 +2447,12 @@ StateLoader.prototype.load = function(undo){
         pointLightClone.position.x = curLightExport.positionX;
         pointLightClone.position.y = curLightExport.positionY;
         pointLightClone.position.z = curLightExport.positionZ;
+        pointLight.initialPositionX = curLightExport.initialPositionX;
+        pointLight.initialPositionY = curLightExport.initialPositionY;
+        pointLight.initialPositionZ = curLightExport.initialPositionZ;
+        pointLightClone.initialPositionX = curLightExport.initialPositionX;
+        pointLightClone.initialPositionY = curLightExport.initialPositionY;
+        pointLightClone.initialPositionZ = curLightExport.initialPositionZ;
         pointLight.intensity = lightIntensity;
         pointLightClone.intensity = lightIntensity;
         lights[lightName] = pointLight;
@@ -3881,10 +3887,6 @@ StateLoader.prototype.resetProject = function(undo){
 
   for (var grouppedObjectName in objectGroups){
     objectGroups[grouppedObjectName].destroy();
-  }
-
-  for (var physicsTestName in physicsTests){
-    physicsTests[physicsTestName].endTest();
   }
 
   for (var lightName in lights){

@@ -1978,6 +1978,7 @@ function parse(input){
           ));
           selectedAddedObject = 0;
           selectedObjectGroup = 0;
+          afterObjectSelection();
           return true;
         break;
         case 51: //destroyLight
@@ -2634,6 +2635,13 @@ function parse(input){
 
           lights[name] = pointLight;
           light_previewScene[name] = pointLightClone;
+
+          pointLight.initialPositionX = pointLight.position.x;
+          pointLight.initialPositionY = pointLight.position.y;
+          pointLight.initialPositionZ = pointLight.position.z;
+          pointLightClone.initialPositionX = pointLightClone.position.x;
+          pointLightClone.initialPositionY = pointLightClone.position.y;
+          pointLightClone.initialPositionZ = pointLightClone.position.z;
 
           scene.add(pointLight);
           previewScene.add(pointLightClone);

@@ -108,6 +108,9 @@ var State = function(){
       curLightExport["positionX"] = light.position.x;
       curLightExport["positionY"] = light.position.y;
       curLightExport["positionZ"] = light.position.z;
+      curLightExport["initialPositionX"] = light.initialPositionX;
+      curLightExport["initialPositionY"] = light.initialPositionY;
+      curLightExport["initialPositionZ"] = light.initialPositionZ;
     }
     lightsExport[lightName] = curLightExport;
   }
