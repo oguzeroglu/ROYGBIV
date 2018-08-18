@@ -335,7 +335,6 @@ window.onload = function() {
              terminal.printInfo(Text.CLICKED_ON.replace(
                Text.PARAM1, object.addedObject.name + coordStr
              ));
-             copyToClipboard(object.addedObject.name);
              selectedAddedObject = object.addedObject;
              objectSelectedByCommand = false;
              selectedObjectGroup = 0;
@@ -346,7 +345,6 @@ window.onload = function() {
              terminal.printInfo(Text.CLICKED_ON.replace(
                Text.PARAM1, object.objectGroupName+coordStr
              ));
-             copyToClipboard(object.objectGroupName);
              selectedObjectGroup = objectGroups[object.objectGroupName];
              objectSelectedByCommand = false;
              selectedAddedObject = 0;
@@ -382,7 +380,6 @@ window.onload = function() {
                  terminal.printInfo(Text.CLICKED_ON.replace(
                    Text.PARAM1, addedObject.name+coordStr
                  ));
-                 copyToClipboard(addedObject.name)
                  selectedAddedObject = addedObject;
                  selectedObjectGroup = 0;
                  objectSelectedByCommand = false;
@@ -399,7 +396,6 @@ window.onload = function() {
                  terminal.printInfo(Text.CLICKED_ON.replace(
                    Text.PARAM1, objectGroup.name+coordStr
                  ));
-                 copyToClipboard(objectGroup.name);
                  selectedAddedObject = 0;
                  selectedObjectGroup = objectGroup;
                  afterObjectSelection();
@@ -418,7 +414,6 @@ window.onload = function() {
                   terminal.printInfo(Text.CLICKED_ON.replace(
                     Text.PARAM1, object2.addedObject.name+coordStr
                   ));
-                  copyToClipboard(object2.addedObject.name);
                   selectedAddedObject = object2.addedObject;
                   selectedObjectGroup = 0;
                   objectSelectedByCommand = false;
@@ -447,7 +442,6 @@ window.onload = function() {
                        terminal.printInfo(Text.CLICKED_ON.replace(
                          Text.PARAM1, addedObject.name+coordStr
                        ));
-                       copyToClipboard(addedObject.name);
                        objectSelectedByCommand = false;
                        selectedAddedObject = addedObject;
                        selectedObjectGroup = 0;
@@ -464,7 +458,6 @@ window.onload = function() {
                        terminal.printInfo(Text.CLICKED_ON.replace(
                          Text.PARAM1, objectGroup.name+coordStr
                        ));
-                       copyToClipboard(objectGroup.name);
                        selectedAddedObject = 0;
                        selectedObjectGroup = objectGroup;
                        afterObjectSelection();
@@ -491,12 +484,6 @@ window.onload = function() {
        }
     }
   });
-
-  // STATE SAVE DECISION FUNCTIONS
-  stateSaveDecisionFunctions = [
-    lightIntensityAdjustmentStateSaveDecision,
-    lightPositionAdjustmentStateSaveDecision,
-  ];
 
   // INITIALIZE THREE.JS SCENE AND RENDERER
   scene = new THREE.Scene();
@@ -603,24 +590,6 @@ window.addEventListener('keydown', function(event){
         case 67: //C
           keyboardBuffer["c"] = true;
         break;
-        case 84: //T
-          keyboardBuffer["t"] = true;
-        break;
-        case 89: //Y
-          keyboardBuffer["y"] = true;
-        break;
-        case 71: //G
-          keyboardBuffer["g"] = true;
-        break;
-        case 72: //H
-          keyboardBuffer["h"] = true;
-        break;
-        case 79: //O
-          keyboardBuffer["o"] = true;
-        break;
-        case 80: //P
-          keyboardBuffer["p"] = true;
-        break;
         case 8: //BACKSPACE
           //FIREFOX GO BACK FIX
           if (selectedAddedObject && !cliFocused){
@@ -647,49 +616,6 @@ window.addEventListener('keydown', function(event){
           }
           afterObjectSelection();
         break;
-        case 86: //V
-          keyboardBuffer["v"] = true;
-        break;
-        case 66: //B
-          keyboardBuffer["b"] = true;
-        break;
-        case 78: //N
-          keyboardBuffer["n"] = true;
-        break;
-        case 77: //M
-          keyboardBuffer["m"] = true;
-        break;
-        case 75: //K
-          keyboardBuffer["k"] = true;
-        break;
-        case 76: //L
-          keyboardBuffer["l"] = true;
-        break;
-        case 85: //U
-          keyboardBuffer["u"] = true;
-        break;
-        case 73: //I
-          keyboardBuffer["i"] = true;
-        break;
-        case 49: //1
-          keyboardBuffer["1"] = true;
-        break;
-        case 50: //2
-          keyboardBuffer["2"] = true;
-        break;
-        case 51: //3
-          keyboardBuffer["3"] = true;
-        break;
-        case 52: //4
-          keyboardBuffer["4"] = true;
-        break;
-        case 53: //5
-          keyboardBuffer["5"] = true;
-        break;
-        case 54: //6
-          keyboardBuffer["6"] = true;
-        break;
-
   }
 
 });
@@ -749,66 +675,6 @@ window.addEventListener('keyup', function(event){
         break;
         case 67: //C
           keyboardBuffer["c"] = false;
-        break;
-        case 84: //T
-          keyboardBuffer["t"] = false;
-        break;
-        case 89: //Y
-          keyboardBuffer["y"] = false;
-        break;
-        case 71: //G
-          keyboardBuffer["g"] = false;
-        break;
-        case 72: //H
-          keyboardBuffer["h"] = false;
-        break;
-        case 79: //O
-          keyboardBuffer["o"] = false;
-        break;
-        case 80: //P
-          keyboardBuffer["p"] = false;
-        break;
-        case 86: //V
-          keyboardBuffer["v"] = false;
-        break;
-        case 66: //B
-          keyboardBuffer["b"] = false;
-        break;
-        case 78: //N
-          keyboardBuffer["n"] = false;
-        break;
-        case 77: //M
-          keyboardBuffer["m"] = false;
-        break;
-        case 75: //K
-          keyboardBuffer["k"] = false;
-        break;
-        case 76: //L
-          keyboardBuffer["l"] = false;
-        break;
-        case 85: //U
-          keyboardBuffer["u"] = false;
-        break;
-        case 73: //I
-          keyboardBuffer["i"] = false;
-        break;
-        case 49: //1
-          keyboardBuffer["1"] = false;
-        break;
-        case 50: //2
-          keyboardBuffer["2"] = false;
-        break;
-        case 51: //3
-          keyboardBuffer["3"] = false;
-        break;
-        case 52: //4
-          keyboardBuffer["4"] = false;
-        break;
-        case 53: //5
-          keyboardBuffer["5"] = false;
-        break;
-        case 54: //6
-          keyboardBuffer["6"] = false;
         break;
   }
 
@@ -1016,56 +882,6 @@ function isPSCollisionWorkerEnabled(){
   return (WORKERS_SUPPORTED && PS_COLLISION_WORKER_ENABLED);
 }
 
-function lightIntensityAdjustmentStateSaveDecision(){
-  if (selectedLightName){
-    var light = lights[selectedLightName];
-    if (!light){
-      return;
-    }
-    var result = keyboardBuffer["v"] || keyboardBuffer["b"];
-    if (result){
-      if (!light.intensityAdjustmentInitiated){
-        light.intensityAdjustmentInitiated = true;
-      }
-    }else{
-      if (light.intensityAdjustmentInitiated){
-        light.intensityAdjustmentInitiated = false;
-        undoRedoHandler.push();
-      }
-    }
-  }
-}
-
-function lightPositionAdjustmentStateSaveDecision(){
-  if (selectedLightName){
-    var light = lights[selectedLightName];
-    if (!light){
-      return;
-    }
-    if (light.isPointLight || light.isDirectionalLight){
-      var result = keyboardBuffer["1"] || keyboardBuffer["2"] ||
-                   keyboardBuffer["3"] || keyboardBuffer["4"] ||
-                   keyboardBuffer["5"] || keyboardBuffer["6"];
-      if (result){
-        if (!light.positionAdjustmentInitiated){
-          light.positionAdjustmentInitiated = true;
-        }
-      }else{
-        if (light.positionAdjustmentInitiated){
-          light.positionAdjustmentInitiated = false;
-          undoRedoHandler.push();
-        }
-      }
-    }
-  }
-}
-
-function saveState(){
-  for (var i = 0; i<stateSaveDecisionFunctions.length; i++){
-    stateSaveDecisionFunctions[i]();
-  }
-}
-
 function disableController(controller, noOpacityAdjustment){
   controller.domElement.style.pointerEvents = "none";
   if (!noOpacityAdjustment){
@@ -1192,11 +1008,6 @@ function afterObjectSelection(){
 }
 
 function processKeyboardBuffer(){
-
-  if (mode == 0){
-    saveState();
-  }
-
   if (keyboardBuffer["left"]){
     camera.rotation.y += rotationYDelta;
   }
@@ -1232,196 +1043,6 @@ function processKeyboardBuffer(){
   }
   if (keyboardBuffer["c"]){
     camera.rotation.z -= rotationZDelta;
-  }
-  if (keyboardBuffer["v"]){
-    if (mode != 0){
-      return;
-    }
-    if (selectedLightName){
-      var light = lights[selectedLightName];
-      var light_preview = light_previewScene[selectedLightName];
-      if (light.intensity > 0){
-        light.intensity = light.intensity - lightIntensityDelta;
-        light_preview.intensity = light.intensity;
-        refreshMaterials();
-        terminal.clear();
-        terminal.printInfo(Text.LIGHT_INTENSITY_ADJUSTED);
-      }
-    }else{
-      terminal.clear();
-      terminal.printError(Text.NO_LIGHTS_SELECTED);
-    }
-  }
-  if (keyboardBuffer["b"]){
-    if (mode != 0){
-      return;
-    }
-    if (selectedLightName){
-      var light = lights[selectedLightName];
-      var light_preview = light_previewScene[selectedLightName];
-      if (light.intensity < 1){
-        light.intensity = light.intensity + lightIntensityDelta;
-        light_preview.intensity = light.intensity;
-        refreshMaterials();
-        terminal.clear();
-        terminal.printInfo(Text.LIGHT_INTENSITY_ADJUSTED);
-      }
-    }else{
-      terminal.clear();
-      terminal.printError(Text.NO_LIGHTS_SELECTED);
-    }
-  }
-  if (keyboardBuffer["1"]){
-    if (mode != 0){
-      return;
-    }
-    if (selectedLightName){
-      var light = lights[selectedLightName];
-      var previewLight = light_previewScene[selectedLightName];
-      var lightRepresentation = pointLightRepresentations[selectedLightName];
-      if (light.isPointLight || light.isDirectionalLight){
-        light.position.x = light.position.x - lightPositionDeltaX;
-        previewLight.position.x = light.position.x;
-        lightRepresentation.position.x = light.position.x;
-        terminal.clear();
-        terminal.printInfo(Text.LIGHT_POSITION_ADJUSTED);
-      }else{
-        terminal.clear();
-        terminal.printError(Text.AMBIENT_LIGHTS_HAVE_NO_POSITION);
-      }
-    }else{
-      terminal.clear();
-      terminal.printError(Text.NO_LIGHTS_SELECTED);
-    }
-  }
-  if (keyboardBuffer["2"]){
-    if (mode != 0){
-      return;
-    }
-    if (selectedLightName){
-      var light = lights[selectedLightName];
-      var previewLight = light_previewScene[selectedLightName];
-      var lightRepresentation = pointLightRepresentations[selectedLightName];
-      if (light.isPointLight || light.isDirectionalLight){
-        light.position.x = light.position.x + lightPositionDeltaX;
-        previewLight.position.x = light.position.x;
-        lightRepresentation.position.x = light.position.x;
-        terminal.clear();
-        terminal.printInfo(Text.LIGHT_POSITION_ADJUSTED);
-      }else{
-        terminal.clear();
-        terminal.printError(Text.AMBIENT_LIGHTS_HAVE_NO_POSITION);
-      }
-    }else{
-      terminal.clear();
-      terminal.printError(Text.NO_LIGHTS_SELECTED);
-    }
-  }
-  if (keyboardBuffer["3"]){
-    if (mode != 0){
-      return ;
-    }
-    if (selectedLightName){
-      var light = lights[selectedLightName];
-      var previewLight = light_previewScene[selectedLightName];
-      var lightRepresentation = pointLightRepresentations[selectedLightName];
-      if (light.isPointLight || light.isDirectionalLight){
-        light.position.y = light.position.y - lightPositionDeltaY;
-        previewLight.position.y = light.position.y;
-        lightRepresentation.position.y = light.position.y;
-        terminal.clear();
-        terminal.printInfo(Text.LIGHT_POSITION_ADJUSTED);
-      }else{
-        terminal.clear();
-        terminal.printError(Text.AMBIENT_LIGHTS_HAVE_NO_POSITION);
-      }
-    }else{
-      terminal.clear();
-      terminal.printError(Text.NO_LIGHTS_SELECTED);
-    }
-  }
-  if (keyboardBuffer["4"]){
-    if (mode != 0){
-      return ;
-    }
-    if (selectedLightName){
-      var light = lights[selectedLightName];
-      var previewLight = light_previewScene[selectedLightName];
-      var lightRepresentation = pointLightRepresentations[selectedLightName];
-      if (light.isPointLight || light.isDirectionalLight){
-        light.position.y = light.position.y + lightPositionDeltaY;
-        previewLight.position.y = light.position.y;
-        lightRepresentation.position.y = light.position.y;
-        terminal.clear();
-        terminal.printInfo(Text.LIGHT_POSITION_ADJUSTED);
-      }else{
-        terminal.clear();
-        terminal.printError(Text.AMBIENT_LIGHTS_HAVE_NO_POSITION);
-      }
-    }else{
-      terminal.clear();
-      terminal.printError(Text.NO_LIGHTS_SELECTED);
-    }
-  }
-  if (keyboardBuffer["5"]){
-    if (mode != 0){
-      return ;
-    }
-    if (selectedLightName){
-      var light = lights[selectedLightName];
-      var previewLight = light_previewScene[selectedLightName];
-      var lightRepresentation = pointLightRepresentations[selectedLightName];
-      if (light.isPointLight || light.isDirectionalLight){
-        light.position.z = light.position.z - lightPositionDeltaZ;
-        previewLight.position.z = light.position.z;
-        lightRepresentation.position.z = light.position.z;
-        terminal.clear();
-        terminal.printInfo(Text.LIGHT_POSITION_ADJUSTED);
-      }else{
-        terminal.clear();
-        terminal.printError(Text.AMBIENT_LIGHTS_HAVE_NO_POSITION);
-      }
-    }else{
-      terminal.clear();
-      terminal.printError(Text.NO_LIGHTS_SELECTED);
-    }
-  }
-  if (keyboardBuffer["6"]){
-    if (mode != 0){
-      return ;
-    }
-    if (selectedLightName){
-      var light = lights[selectedLightName];
-      var previewLight = light_previewScene[selectedLightName];
-      var lightRepresentation = pointLightRepresentations[selectedLightName];
-      if (light.isPointLight || light.isDirectionalLight){
-        light.position.z = light.position.z + lightPositionDeltaZ;
-        previewLight.position.z = light.position.z;
-        lightRepresentation.position.z = light.position.z;
-        terminal.clear();
-        terminal.printInfo(Text.LIGHT_POSITION_ADJUSTED);
-      }else{
-        terminal.clear();
-        terminal.printError(Text.AMBIENT_LIGHTS_HAVE_NO_POSITION);
-      }
-    }else{
-      terminal.clear();
-      terminal.printError(Text.NO_LIGHTS_SELECTED);
-    }
-  }
-
-}
-
-function copyToClipboard(str){
-  try{
-    var elem = document.createElement('textarea');
-    elem.value = str;
-    document.body.appendChild(elem);
-    elem.select();
-    document.execCommand('copy');
-    document.body.removeChild(elem);
-  }catch(err){
-    // CLIPBOARD COPY NOT SUPPORTED
   }
 }
 

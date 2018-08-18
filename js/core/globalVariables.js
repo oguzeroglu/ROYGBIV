@@ -521,10 +521,6 @@ var keyboardInfo = [
   "E/Q : Translates the camera on axis Y.",
   "Z/C: Rotates the camera around axis Z.",
   "Backspace: Destroys selected object.",
-  "V/B: Light intensity adjustment.",
-  "1/2: Light position adjustment on the axis X.",
-  "3/4: Light position adjustment on the axis Y.",
-  "5/6: Light position adjustment on the axis Z.",
   ". : Shows corner coordinates of selected grids."
 ];
 
@@ -724,7 +720,6 @@ var gridCounter = 0;
 var MAX_GRIDS_ALLOWED = 1000000;
 var MIN_CELLSIZE_ALLOWED = 5;
 var undoRedoHandler = new UndoRedoHandler();
-var stateSaveDecisionFunctions = [];
 var diffuseTextureCache = new Object();
 var heightTextureCache = new Object();
 var ambientOcculsionTextureCache = new Object();
