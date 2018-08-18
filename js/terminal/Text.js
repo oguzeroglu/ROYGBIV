@@ -621,7 +621,7 @@ var Text = function(){
   this.ROYGBIV_SCRIPTING_API_CREATEOBJECTTRAIL = "Creates an object trail effect based on following configurations:\n"+
                                                   "object: The object or object group to which the trail effect is added. (mandatory)\n"+
                                                   "alpha: The alpha value of trails between [0,1]. (mandatory)";
-  this.ROYGBIV_SCRIPTING_API_STOPOBJECTTRAIL = "Stops the trail effect of an object created using the createObjectTrail function.";
+  this.ROYGBIV_SCRIPTING_API_DESTROYOBJECTTRAIL = "Destroys the trail effect of an object created using the createObjectTrail function.";
   this.ROYGBIV_SCRIPTING_API_GENERATEPARTICLESYSTEMNAME = "Generates a unique name for a particle system.";
   this.ROYGBIV_SCRIPTING_API_REWINDPARTICLE = "Rewinds a particle and restarts its motion. Particles using this functionality must have respawn = true and\nlifetime != 0 as configuration. The additional delay parameter may be used to delay the rewind process in seconds.";
   this.ROYGBIV_SCRIPTING_API_CREATELASER = "Creates a laser like particle system. Configurations are:\n"+
@@ -749,4 +749,6 @@ var Text = function(){
    this.ROYGBIV_SCRIPTING_API_SHRINKCROSSHAIR = "Shrinks a crosshair. This can be used after calling the expandCrosshair function. The crosshair shrinks by delta while its size is\ngreater than its initial size. This function is designed to be called inside onmouseup or onkeyup like events.";
    this.ROYGBIV_SCRIPTING_API_SETPARTICLESYSTEMPOSITION = "Sets the position of a particle system. This function is designed for magic circle like particle systems which may follow players.\nThis function should not be used for particle systems with collision callbacks or particle systems with defined motions in general.";
    this.ROYGBIV_SCRIPTING_API_EMISSIVEINTENSITY = "Modifies the emissive intensity of given object by given amount.";
+   this.ROYGBIV_SCRIPTING_API_STARTOBJECTTRAIL = "Starts the trail effect of an object create with createObjectTrail command.";
+   this.ROYGBIV_SCRIPTING_API_STOPOBJECTTRAIL = "Stops the trail effect of an object. The effect can be restarted using the startObjectTrail command.";
 }

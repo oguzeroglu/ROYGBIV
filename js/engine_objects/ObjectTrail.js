@@ -395,15 +395,6 @@ var ObjectTrail = function(configurations){
     posit = this.object.previewGraphicsGroup.position;
     quat = this.object.previewGraphicsGroup.quaternion;
   }
-  for (var i = 0; i<60 * OBJECT_TRAIL_MAX_TIME_IN_SECS; i++){
-    objectCoordinates[i2++] = posit.x;
-    objectCoordinates[i2++] = posit.y;
-    objectCoordinates[i2++] = posit.z;
-    objectQuaternions[i3++] = quat.x;
-    objectQuaternions[i3++] = quat.y;
-    objectQuaternions[i3++] = quat.z;
-    objectQuaternions[i3++] = quat.w;
-  }
 
   var r = 1, g = 1, b = 1;
   if (this.isAddedObject){
@@ -444,12 +435,23 @@ var ObjectTrail = function(configurations){
     this.mesh = new THREE.Mesh(this.geometry, this.material);
   }
   this.mesh.frustumCulled = false;
+  this.mesh.visible = false;
   previewScene.add(this.mesh);
   objectTrails[this.object.name] = this;
 
   this.objectCoordinateCounter = 0;
   this.objectQuaternionCounter = 0;
 
+}
+
+ObjectTrail.prototype.stop = function(){
+  this.mesh.visible = false;
+  delete activeObjectTrails[this.object.name];
+}
+
+ObjectTrail.prototype.start = function(){
+  this.mesh.visible = true;
+  activeObjectTrails[this.object.name] = this;
 }
 
 ObjectTrail.prototype.update = function(){

@@ -671,6 +671,7 @@ var mergedParticleSystems = new Object();
 var particleSystemPool = new Object();
 var particleSystemPools = new Object();
 var objectTrails = new Object();
+var activeObjectTrails = new Object();
 var dynamicObjects = new Object();
 var dynamicObjectGroups = new Object();
 var addedObjectsInsideGroups = new Object();

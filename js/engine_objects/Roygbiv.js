@@ -80,7 +80,7 @@ var Roygbiv = function(){
     "createCircularExplosion",
     "createDynamicTrail",
     "createObjectTrail",
-    "stopObjectTrail",
+    "destroyObjectTrail",
     "generateParticleSystemName",
     "rewindParticle",
     "createLaser",
@@ -114,7 +114,9 @@ var Roygbiv = function(){
     "expandCrosshair",
     "shrinkCrosshair",
     "setParticleSystemPosition",
-    "emissiveIntensity"
+    "emissiveIntensity",
+    "startObjectTrail",
+    "stopObjectTrail"
   ];
 
   this.globals = new Object();
@@ -4119,23 +4121,27 @@ Roygbiv.prototype.createObjectTrail = function(configurations){
   return;
 }
 
-// stopObjectTrail
-// Stops the trail effect of an object created using the createObjectTrail function.
-Roygbiv.prototype.stopObjectTrail = function(objectName){
+// destroyObjectTrail
+// Destroys the trail effect of an object created using the createObjectTrail function.
+Roygbiv.prototype.destroyObjectTrail = function(object){
   if (mode == 0){
     return;
   }
-  if (typeof objectName == UNDEFINED){
-    throw new Error("stopObjectTrail error: objectName is not defined.");
+  if (typeof object == UNDEFINED){
+    throw new Error("destroyObjectTrail error: object is not defined.");
     return;
   }
-  var objectTrail = objectTrails[objectName];
+  if (!(object instanceof AddedObject) && !(object instanceof ObjectGroup)){
+    throw new Error("destroyObjectTrail error: Type not supported.");
+    return;
+  }
+  var objectTrail = objectTrails[object.name];
   if (!objectTrail){
-    throw new Error("stopObjectTrail error: No trail effect is added to object.");
+    throw new Error("destroyObjectTrail error: No trail effect is added to object.");
     return;
   }
   objectTrail.destroy();
-  delete objectTrails[objectName];
+  delete objectTrails[object.name];
   return;
 }
 
@@ -5630,6 +5636,50 @@ Roygbiv.prototype.setParticleSystemPosition = function(particleSystem, x, y, z){
   }
   particleSystem.mesh.position.set(x, y, z);
   particleSystem.hasManualPositionSet = true;
+}
+
+// startObjectTrail
+// Starts the trail effect of an object create with createObjectTrail command.
+Roygbiv.prototype.startObjectTrail = function(object){
+  if (mode == 0){
+    return;
+  }
+  if (typeof object == UNDEFINED){
+    throw new Error("startObjectTrail error: object is not defined.");
+    return;
+  }
+  if (!(object instanceof AddedObject) && !(object instanceof ObjectGroup)){
+    throw new Error("startObjectTrail error: Type not supported.");
+    return;
+  }
+  var objectTrail = objectTrails[object.name];
+  if (!objectTrail){
+    throw new Error("startObjectTrail error: No trail attached to object.");
+    return;
+  }
+  objectTrail.start();
+}
+
+// stopObjectTrail
+// Stops the trail effect of an object. The effect can be restarted using the startObjectTrail command.
+Roygbiv.prototype.stopObjectTrail = function(object){
+  if (mode == 0){
+    return;
+  }
+  if (typeof object == UNDEFINED){
+    throw new Error("stopObjectTrail error: object is not defined.");
+    return;
+  }
+  if (!(object instanceof AddedObject) && !(object instanceof ObjectGroup)){
+    throw new Error("stopObjectTrail error: Type not supported.");
+    return;
+  }
+  var objectTrail = objectTrails[object.name];
+  if (!objectTrail){
+    throw new Error("stopObjectTrail error: No trail attached to object.");
+    return;
+  }
+  objectTrail.stop();
 }
 
 // CROSSHAIR FUNCTIONS *********************************************************
