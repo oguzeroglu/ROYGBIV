@@ -7,11 +7,7 @@ var DisplacementCalculator = function(obj, worldMatrix){
   var heightMapHeight = obj.material.displacementMap.image.height;
   tmpCanvas.width = heightMapWidth;
   tmpCanvas.height = heightMapHeight;
-  //tmpContext.save();
-  tmpContext.scale(1, -1);
-  tmpContext.translate(0, -1 * heightMapHeight);
   tmpContext.drawImage(obj.material.displacementMap.image, 0, 0);
-  //tmpContext.restore();
   var displacementBuffer = tmpContext.getImageData(0, 0, heightMapWidth, heightMapHeight).data;
 
   var normalMatrix = 0;
@@ -91,7 +87,7 @@ var DisplacementCalculator = function(obj, worldMatrix){
     var position = objPositions[i];
     var normal = objNormals[i];
     var uv = objUVs[i];
-    uv.applyMatrix3(obj.material.displacementMap.matrix);
+    obj.material.displacementMap.transformUv(uv);
     var u = ((Math.abs(uv.x) * heightMapWidth) % heightMapWidth) | 0;
     var v = ((Math.abs(uv.y) * heightMapHeight) % heightMapHeight) | 0;
     var pos = (u + v * heightMapWidth) * 4;

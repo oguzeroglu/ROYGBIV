@@ -127,6 +127,9 @@ var ObjectTrail = function(configurations){
         this.displacedPositionCounters = new Object();
         for (var objName in this.object.group){
           var child = this.object.group[objName];
+          if (!child.material.displacementMap){
+            continue;
+          }
           child.previewMesh.updateMatrix();
           this.displacedPositions[objName] = new DisplacementCalculator(
             child, child.previewMesh.matrix
