@@ -308,8 +308,38 @@ var TextureMerger = function(texturesObj){
   //console.log("[*] Textures merged: "+explanationStr);
 }
 
+TextureMerger.prototype.isTextureAlreadyInserted = function(textureName, texturesObj){
+  var texture = texturesObj[textureName];
+  var img = texture.image.toDataURL();
+  for (var tName in texturesObj){
+    if (tName == textureName){
+      continue;
+    }
+    var txt = texturesObj[tName];
+    var tImg = txt.image.toDataURL();
+    if (img == tImg && (txt.offset.x == texture.offset.x) && (txt.offset.y == texture.offset.y)
+                && (txt.offset.z == texture.offset.z) && (txt.repeat.x == texture.repeat.x)
+                && (txt.repeat.y == texture.repeat.y) && (txt.flipX == texture.flipX) && (txt.flipY == texture.flipY)
+                && (txt.wrapS == texture.wrapS) && (txt.wrapT == texture.wrapT)){
+      if (this.textureOffsets[tName]){
+        return this.textureOffsets[tName];
+      }
+    }
+  }
+  return false;
+}
+
 TextureMerger.prototype.insert = function(node, textureName, texturesObj){
   var texture = texturesObj[textureName];
+  var res = this.isTextureAlreadyInserted(textureName, texturesObj);
+  if (res){
+    this.textureOffsets[textureName] = res;
+    var newTextureName = this.findNextTexture(texturesObj);
+    if (!(newTextureName == null)){
+      this.insert(node, newTextureName, texturesObj);
+    }
+    return;
+  }
   var tw = texture.image.width;
   var th = texture.image.height;
   if (node.upperNode){
