@@ -181,11 +181,11 @@ GridSystem.prototype.draw = function(){
 
   var boundingPlaneGeometry;
   if (this.axis == "XZ" || this.axis == "XY"){
-    boundingPlaneGeometry = new THREE.PlaneGeometry(
+    boundingPlaneGeometry = new THREE.PlaneBufferGeometry(
       this.sizeX, this.sizeZ
     );
   }else if (this.axis == "YZ"){
-    boundingPlaneGeometry = new THREE.PlaneGeometry(
+    boundingPlaneGeometry = new THREE.PlaneBufferGeometry(
       this.sizeZ, this.sizeX
     );
   }
@@ -462,7 +462,7 @@ GridSystem.prototype.newSurface = function(name, grid1, grid2, material){
   }
   var height = (Math.abs(grid1.rowNumber - grid2.rowNumber) + 1) * this.cellSize;
   var width = (Math.abs(grid1.colNumber - grid2.colNumber ) + 1) * this.cellSize;
-  var geometry = new THREE.PlaneGeometry(width, height);
+  var geometry = new THREE.PlaneBufferGeometry(width, height);
   var surface = new THREE.Mesh(geometry, material);
 
   if (this.axis == "XZ"){
@@ -638,7 +638,7 @@ GridSystem.prototype.newRamp = function(anchorGrid, otherGrid, axis, height, mat
     rowDif = (Math.abs(anchorGrid.rowNumber - otherGrid.rowNumber) + 1) * this.cellSize;
     rampHeight = Math.sqrt((rowDif * rowDif) + (height * height));
   }
-  var geometry = new THREE.PlaneGeometry(rampWidth, rampHeight);
+  var geometry = new THREE.PlaneBufferGeometry(rampWidth, rampHeight);
   var ramp = new THREE.Mesh(geometry, material);
 
   ramp.position.x = centerX;
@@ -888,7 +888,7 @@ GridSystem.prototype.newBox = function(selections, height, material, name){
   }
 
 
-  var boxGeometry = new THREE.BoxGeometry(boxSizeX, boxSizeY, boxSizeZ);
+  var boxGeometry = new THREE.BoxBufferGeometry(boxSizeX, boxSizeY, boxSizeZ);
   var boxMesh = new THREE.Mesh(boxGeometry, material);
 
   boxMesh.position.x = boxCenterX;
@@ -1032,7 +1032,7 @@ GridSystem.prototype.newSphere = function(sphereName, material, radius, selectio
     sphereCenterY = sphereCenterY - superposeYOffset;
   }
 
-  var sphereGeometry = new THREE.SphereGeometry(Math.abs(radius));
+  var sphereGeometry = new THREE.SphereBufferGeometry(Math.abs(radius));
   var sphereMesh = new THREE.Mesh(sphereGeometry, material);
   sphereMesh.position.set(sphereCenterX, sphereCenterY, sphereCenterZ);
   scene.add(sphereMesh);

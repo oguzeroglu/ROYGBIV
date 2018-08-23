@@ -2402,10 +2402,6 @@ function parse(input){
             terminal.printError(Text.COUNT_MUST_BE_A_NUMBER);
             return true;
           }
-          if (!addedObject.material.isMeshPhongMaterial){
-            terminal.printError(Text.OBJECT_MUST_HAVE_A_PHONG_MATERIAL);
-            return true;
-          }
           if (count < 1){
             terminal.printError(Text.COUNT_MUST_BE_GREATER_THAN_1);
             return true;

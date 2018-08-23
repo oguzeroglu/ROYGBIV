@@ -1,23 +1,35 @@
-var DisplacementCalculator = function(obj, worldMatrix){
+var DisplacementCalculator = function(){
+
+}
+
+DisplacementCalculator.prototype.getDisplacementBuffer = function(texture){
   var tmpCanvas = document.createElement("canvas");
   var tmpContext = tmpCanvas.getContext("2d");
+  var heightMapWidth = texture.image.width;
+  var heightMapHeight = texture.image.height;
+  tmpCanvas.width = heightMapWidth;
+  tmpCanvas.height = heightMapHeight;
+  tmpContext.drawImage(texture.image, 0, 0);
+  return tmpContext.getImageData(0, 0, heightMapWidth, heightMapHeight).data;
+}
+
+DisplacementCalculator.prototype.getDisplacedPositions = function(obj, worldMatrix){
   var displacementBias = obj.material.displacementBias;
   var displacementScale = obj.material.displacementScale;
   var heightMapWidth = obj.material.displacementMap.image.width;
   var heightMapHeight = obj.material.displacementMap.image.height;
-  tmpCanvas.width = heightMapWidth;
-  tmpCanvas.height = heightMapHeight;
-  tmpContext.drawImage(obj.material.displacementMap.image, 0, 0);
-  var displacementBuffer = tmpContext.getImageData(0, 0, heightMapWidth, heightMapHeight).data;
+  var displacementBuffer = this.getDisplacementBuffer(obj.material.displacementMap)
 
   var normalMatrix = 0;
   if (worldMatrix){
     normalMatrix = new THREE.Matrix3().getNormalMatrix(worldMatrix);
   }
 
-  var faces = obj.previewMesh.geometry.faces;
-  var vertices = obj.previewMesh.geometry.vertices;
-  var faceVertexUVs = obj.previewMesh.geometry.faceVertexUvs;
+  var geom = obj.getNormalGeometry();
+
+  var faces = geom.faces;
+  var vertices = geom.vertices;
+  var faceVertexUVs = geom.faceVertexUvs;
   var objPositions = [];
   var objUVs = [];
   var objNormals = [];
@@ -100,5 +112,5 @@ var DisplacementCalculator = function(obj, worldMatrix){
     displacedPositions.push(newPosition);
   }
 
-  this.displacedPositions = displacedPositions;
+  return displacedPositions;
 }

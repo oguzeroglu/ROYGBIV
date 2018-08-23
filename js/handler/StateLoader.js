@@ -1458,7 +1458,7 @@ StateLoader.prototype.handleAddedObjectDiff = function(){
         var boxClone;
         var axis = metaData["gridSystemAxis"];
         boxMesh = new THREE.Mesh(
-          new THREE.BoxGeometry(
+          new THREE.BoxBufferGeometry(
             boxSizeX, boxSizeY, boxSizeZ,
             widthSegments, heightSegments, depthSegments
           ),
@@ -1496,7 +1496,7 @@ StateLoader.prototype.handleAddedObjectDiff = function(){
         var physicsShapeParameterZ = metaData["physicsShapeParameterZ"];
 
         var surface = new THREE.Mesh(
-          new THREE.PlaneGeometry(width, height, widthSegments, heightSegments),
+          new THREE.PlaneBufferGeometry(width, height, widthSegments, heightSegments),
           material
         );
 
@@ -1545,7 +1545,7 @@ StateLoader.prototype.handleAddedObjectDiff = function(){
         var fromEulerY = metaData["fromEulerY"];
         var fromEulerZ = metaData["fromEulerZ"];
         var ramp = new THREE.Mesh(
-          new THREE.PlaneGeometry(rampWidth, rampHeight, widthSegments, heightSegments),
+          new THREE.PlaneBufferGeometry(rampWidth, rampHeight, widthSegments, heightSegments),
           material
         );
         ramp.position.x = centerX;
@@ -1600,7 +1600,7 @@ StateLoader.prototype.handleAddedObjectDiff = function(){
         var sphereClone;
         var axis = metaData["gridSystemAxis"];
         sphereMesh = new THREE.Mesh(
-          new THREE.SphereGeometry(Math.abs(radius), widthSegments, heightSegments), material
+          new THREE.SphereBufferGeometry(Math.abs(radius), widthSegments, heightSegments), material
         );
         sphereMesh.position.x = centerX;
         sphereMesh.position.y = centerY;
@@ -2054,7 +2054,7 @@ StateLoader.prototype.load = function(undo){
         var boxClone;
         var axis = metaData["gridSystemAxis"];
         boxMesh = new THREE.Mesh(
-          new THREE.BoxGeometry(
+          new THREE.BoxBufferGeometry(
             boxSizeX, boxSizeY, boxSizeZ,
             widthSegments, heightSegments, depthSegments
           ),
@@ -2092,7 +2092,7 @@ StateLoader.prototype.load = function(undo){
         var physicsShapeParameterZ = metaData["physicsShapeParameterZ"];
 
         var surface = new THREE.Mesh(
-          new THREE.PlaneGeometry(width, height, widthSegments, heightSegments),
+          new THREE.PlaneBufferGeometry(width, height, widthSegments, heightSegments),
           material
         );
 
@@ -2141,7 +2141,7 @@ StateLoader.prototype.load = function(undo){
         var fromEulerY = metaData["fromEulerY"];
         var fromEulerZ = metaData["fromEulerZ"];
         var ramp = new THREE.Mesh(
-          new THREE.PlaneGeometry(rampWidth, rampHeight, widthSegments, heightSegments),
+          new THREE.PlaneBufferGeometry(rampWidth, rampHeight, widthSegments, heightSegments),
           material
         );
         ramp.position.x = centerX;
@@ -2196,7 +2196,7 @@ StateLoader.prototype.load = function(undo){
         var sphereClone;
         var axis = metaData["gridSystemAxis"];
         sphereMesh = new THREE.Mesh(
-          new THREE.SphereGeometry(Math.abs(radius), widthSegments, heightSegments), material
+          new THREE.SphereBufferGeometry(Math.abs(radius), widthSegments, heightSegments), material
         );
         sphereMesh.position.x = centerX;
         sphereMesh.position.y = centerY;

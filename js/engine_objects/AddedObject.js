@@ -17,12 +17,6 @@ var AddedObject = function(name, type, metaData, material, mesh,
     }
   }
 
-  var faces = this.mesh.geometry.faces;
-  var previewFaces = this.previewMesh.geometry.faces;
-  for (var i = 0; i<faces.length; i++){
-    faces[i].roygbivObjectName = name;
-    previewFaces[i].roygbivObjectName = name;
-  }
 
   this.metaData["widthSegments"] = 1;
   this.metaData["heightSegments"] = 1;
@@ -873,24 +867,40 @@ AddedObject.prototype.segmentGeometry = function(isCustom, count, returnGeometry
     var width = this.metaData["width"];
     var height = this.metaData["height"];
     if (!isCustom){
-      newGeometry = new THREE.PlaneGeometry(width, height, planeWidthSegments, planeHeightSegments);
+      newGeometry = new THREE.PlaneBufferGeometry(width, height, planeWidthSegments, planeHeightSegments);
     }else{
       if (!isNaN(count)){
-        newGeometry = new THREE.PlaneGeometry(width, height, count, count);
+        if (returnGeometry){
+          newGeometry = new THREE.PlaneGeometry(width, height, count, count);
+        }else{
+          newGeometry = new THREE.PlaneBufferGeometry(width, height, count, count);
+        }
       }else{
-        newGeometry = new THREE.PlaneGeometry(width, height, count.width, count.height);
+        if (returnGeometry){
+          newGeometry = new THREE.PlaneGeometry(width, height, count.width, count.height);
+        }else{
+          newGeometry = new THREE.PlaneBufferGeometry(width, height, count.width, count.height);
+        }
       }
     }
   }else if (this.type == "ramp"){
     var rampWidth = this.metaData["rampWidth"];
     var rampHeight = this.metaData["rampHeight"];
     if (!isCustom){
-      newGeometry = new THREE.PlaneGeometry(rampWidth, rampHeight, planeWidthSegments, planeHeightSegments);
+      newGeometry = new THREE.PlaneBufferGeometry(rampWidth, rampHeight, planeWidthSegments, planeHeightSegments);
     }else{
       if (!isNaN(count)){
-        newGeometry = new THREE.PlaneGeometry(rampWidth, rampHeight, count, count);
+        if (returnGeometry){
+          newGeometry = new THREE.PlaneGeometry(rampWidth, rampHeight, count, count);
+        }else{
+          newGeometry = new THREE.PlaneBufferGeometry(rampWidth, rampHeight, count, count);
+        }
       }else{
-        newGeometry = new THREE.PlaneGeometry(rampWidth, rampHeight, count.width, count.height);
+        if (returnGeometry){
+          newGeometry = new THREE.PlaneGeometry(rampWidth, rampHeight, count.width, count.height);
+        }else{
+          newGeometry = new THREE.PlaneBufferGeometry(rampWidth, rampHeight, count.width, count.height);
+        }
       }
     }
   }else if (this.type == "box"){
@@ -898,24 +908,36 @@ AddedObject.prototype.segmentGeometry = function(isCustom, count, returnGeometry
     var boxSizeY = this.metaData["boxSizeY"];
     var boxSizeZ = this.metaData["boxSizeZ"];
     if (!isCustom){
-      newGeometry = new THREE.BoxGeometry(boxSizeX, boxSizeY, boxSizeZ, boxWidthSegments, boxHeightSegments, boxDepthSegments);
+      newGeometry = new THREE.BoxBufferGeometry(boxSizeX, boxSizeY, boxSizeZ, boxWidthSegments, boxHeightSegments, boxDepthSegments);
     }else{
       if (!isNaN(count)){
-        newGeometry = new THREE.BoxGeometry(boxSizeX, boxSizeY, boxSizeZ, count, count, count);
+        if (returnGeometry){
+          newGeometry = new THREE.BoxGeometry(boxSizeX, boxSizeY, boxSizeZ, count, count, count);
+        }else{
+          newGeometry = new THREE.BoxBufferGeometry(boxSizeX, boxSizeY, boxSizeZ, count, count, count);
+        }
       }else{
-        newGeometry = new THREE.BoxGeometry(boxSizeX, boxSizeY, boxSizeZ, count.width, count.height, count.depth);
+        if (returnGeometry){
+          newGeometry = new THREE.BoxGeometry(boxSizeX, boxSizeY, boxSizeZ, count.width, count.height, count.depth);
+        }else{
+          newGeometry = new THREE.BoxBufferGeometry(boxSizeX, boxSizeY, boxSizeZ, count.width, count.height, count.depth);
+        }
       }
     }
   }else if (this.type == "sphere"){
     var radius = this.metaData["radius"];
     if (!isCustom){
-      newGeometry = new THREE.SphereGeometry(Math.abs(radius), sphereWidthSegments, sphereHeightSegments);
+      newGeometry = new THREE.SphereBufferGeometry(Math.abs(radius), sphereWidthSegments, sphereHeightSegments);
     }else{
       if (!isNaN(count)){
         if (count < 8){
           count = 8;
         }
-        newGeometry = new THREE.SphereGeometry(Math.abs(radius), count, count);
+        if (returnGeometry){
+          newGeometry = new THREE.SphereGeometry(Math.abs(radius), count, count);
+        }else{
+          newGeometry = new THREE.SphereBufferGeometry(Math.abs(radius), count, count);
+        }
       }else{
         if (count.width < 8){
           count.width = 8;
@@ -923,7 +945,11 @@ AddedObject.prototype.segmentGeometry = function(isCustom, count, returnGeometry
         if (count.height < 6){
           count.height = 6;
         }
-        newGeometry = new THREE.SphereGeometry(Math.abs(radius), count.width, count.height);
+        if (returnGeometry){
+          newGeometry = new THREE.SphereGeometry(Math.abs(radius), count.width, count.height);
+        }else{
+          newGeometry = new THREE.SphereBufferGeometry(Math.abs(radius), count.width, count.height);
+        }
       }
     }
   }
@@ -996,13 +1022,6 @@ AddedObject.prototype.segmentGeometry = function(isCustom, count, returnGeometry
     }
   }
 
-  var faces = this.mesh.geometry.faces;
-  var previewFaces = this.previewMesh.geometry.faces;
-  for (var i = 0; i<faces.length; i++){
-    faces[i].roygbivObjectName = this.name;
-    previewFaces[i].roygbivObjectName = this.name;
-  }
-
   if (!isCustom){
     console.log("[*]Segmented for optimization.");
   }
@@ -1014,19 +1033,19 @@ AddedObject.prototype.deSegmentGeometry = function(){
   if (this.type == "surface"){
     var width = this.metaData["width"];
     var height = this.metaData["height"];
-    newGeometry = new THREE.PlaneGeometry(Math.abs(width), Math.abs(height));
+    newGeometry = new THREE.PlaneBufferGeometry(Math.abs(width), Math.abs(height));
   }else if (this.type == "ramp"){
     var rampWidth = this.metaData["rampWidth"];
     var rampHeight = this.metaData["rampHeight"];
-    newGeometry = new THREE.PlaneGeometry(Math.abs(rampWidth), Math.abs(rampHeight));
+    newGeometry = new THREE.PlaneBufferGeometry(Math.abs(rampWidth), Math.abs(rampHeight));
   }else if (this.type == "box"){
     var boxSizeX = this.metaData["boxSizeX"];
     var boxSizeY = this.metaData["boxSizeY"];
     var boxSizeZ = this.metaData["boxSizeZ"];
-    newGeometry = new THREE.BoxGeometry(Math.abs(boxSizeX), Math.abs(boxSizeY), Math.abs(boxSizeZ));
+    newGeometry = new THREE.BoxBufferGeometry(Math.abs(boxSizeX), Math.abs(boxSizeY), Math.abs(boxSizeZ));
   }else if (this.type == "sphere"){
     var radius = this.metaData["radius"];
-    newGeometry = new THREE.SphereGeometry(Math.abs(radius));
+    newGeometry = new THREE.SphereBufferGeometry(Math.abs(radius));
   }
 
   var newMesh = new THREE.Mesh(newGeometry, this.material);
@@ -1056,13 +1075,6 @@ AddedObject.prototype.deSegmentGeometry = function(){
   }else if (this.type == "sphere"){
     this.metaData["widthSegments"] = 8;
     this.metaData["heightSegments"] = 6;
-  }
-
-  var faces = this.mesh.geometry.faces;
-  var previewFaces = this.previewMesh.geometry.faces;
-  for (var i = 0; i<faces.length; i++){
-    faces[i].roygbivObjectName = this.name;
-    previewFaces[i].roygbivObjectName = this.name;
   }
 
   console.log("[*]Desegmented for optimization.");
@@ -1416,4 +1428,17 @@ AddedObject.prototype.visualiseBoudingBoxes = function(selectedScene){
     var color = new THREE.Color(ColorNames.generateRandomColor());
     selectedScene.add(new THREE.Box3Helper(this.boundingBoxes[i], color));
   }
+}
+
+AddedObject.prototype.getNormalGeometry = function(){
+  var count = new Object();
+  if (this.type == "surface" || this.type == "ramp" || this.type == "sphere"){
+    count.width = this.metaData["widthSegments"];
+    count.height = this.metaData["heightSegments"];
+  }else if (this.type == "box"){
+    count.width = this.metaData["widthSegments"];
+    count.height = this.metaData["heightSegments"];
+    count.depth = this.metaData["depthSegments"];
+  }
+  return this.segmentGeometry(true, count, true);
 }

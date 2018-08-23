@@ -12,14 +12,15 @@ var ObjectTrail = function(configurations){
 
   var geometry;
   if (this.object instanceof AddedObject){
-    geometry = this.object.previewMesh.geometry;
+    geometry = this.object.getNormalGeometry();
     var color = this.object.material.color;
-    for (var i = 0; i<this.object.previewMesh.geometry.faces.length; i++){
-      this.object.previewMesh.geometry.faces[i].vertexColors.push(color, color, color);
+    for (var i = 0; i<geometry.faces.length; i++){
+      geometry.faces[i].roygbivObjectName = this.object.name;
+      geometry.faces[i].vertexColors.push(color, color, color);
       if (this.object.material.isMeshPhongMaterial){
-        this.object.previewMesh.geometry.faces[i].faceEmissiveIntensity = this.object.material.emissiveIntensity;
+        geometry.faces[i].faceEmissiveIntensity = this.object.material.emissiveIntensity;
       }else{
-        this.object.previewMesh.geometry.faces[i].faceEmissiveIntensity = 0;
+        geometry.faces[i].faceEmissiveIntensity = 0;
       }
     }
     this.isAddedObject = true;
@@ -31,14 +32,15 @@ var ObjectTrail = function(configurations){
     for (var objectName in this.object.group){
       var childObj = this.object.group[objectName];
       miMap[mi] = childObj.name;
-      for (var i = 0; i<childObj.previewMesh.geometry.faces.length; i++){
+      var childGeom = childObj.getNormalGeometry();
+      for (var i = 0; i<childGeom.faces.length; i++){
         var color = childObj.material.color;
-        childObj.previewMesh.geometry.faces[i].vertexColors.push(color, color, color);
-        childObj.previewMesh.geometry.faces[i].materialIndex = mi;
+        childGeom.faces[i].vertexColors.push(color, color, color);
+        childGeom.faces[i].materialIndex = mi;
       }
       mi++;
       childObj.previewMesh.updateMatrix();
-      geometry.merge(childObj.previewMesh.geometry, childObj.previewMesh.matrix);
+      geometry.merge(childGeom, childObj.previewMesh.matrix);
     }
     for (var i = 0; i<geometry.faces.length; i++){
       var mi = geometry.faces[i].materialIndex;
@@ -121,7 +123,7 @@ var ObjectTrail = function(configurations){
 
   if (hasDisplacement){
     if (this.isAddedObject){
-      this.displacedPositions = new DisplacementCalculator(this.object).displacedPositions;
+      this.displacedPositions = new DisplacementCalculator().getDisplacedPositions(this.object);
     }else{
         this.displacedPositions = new Object();
         this.displacedPositionCounters = new Object();
@@ -131,9 +133,9 @@ var ObjectTrail = function(configurations){
             continue;
           }
           child.previewMesh.updateMatrix();
-          this.displacedPositions[objName] = new DisplacementCalculator(
+          this.displacedPositions[objName] = new DisplacementCalculator().getDisplacedPositions(
             child, child.previewMesh.matrix
-          ).displacedPositions;
+          );
           this.displacedPositionCounters[objName] = 0;
         }
     }
