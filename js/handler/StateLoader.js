@@ -866,7 +866,23 @@ StateLoader.prototype.handleAddedObjectDiff = function(){
       }
     }
   }else if (diff.path.length == 3){
-    if (diff.path[2] == "blendingMode"){
+    if (diff.path[2] == "manualDisplacementInfo"){
+      var addedObject = addedObjects[diff.path[1]];
+      if (addedObject){
+        if (kind == "D"){
+          addedObject.undoDisplacement();
+        }else if (kind == "N" || kind == "E"){
+          var infos = diff.rhs.split(PIPE);
+          var tName = infos[0];
+          var dispScale = parseFloat(infos[1]);
+          var dispBias = parseFloat(infos[2]);
+          var txt = textures[tName];
+          if (txt && (txt instanceof THREE.Texture)){
+            addedObject.applyDisplacementMap(txt, tName, dispScale, dispBias);
+          }
+        }
+      }
+    }else if (diff.path[2] == "blendingMode"){
       var addedObject = addedObjects[diff.path[1]];
       if (addedObject){
         if (kind == "E"){
@@ -2223,6 +2239,13 @@ StateLoader.prototype.load = function(undo){
       addedObjectInstance.isDynamicObject = isDynamicObject;
       addedObjectInstance.mass = mass;
 
+      addedObjectInstance.metaData["manualDisplacementMap"] = metaData["manualDisplacementMap"];
+      addedObjectInstance.metaData["manualDisplacementScale"] = metaData["manualDisplacementScale"];
+      addedObjectInstance.metaData["manualDisplacementBias"] = metaData["manualDisplacementBias"];
+      if (!(typeof addedObjectInstance.metaData["manualDisplacementMap"] == UNDEFINED)){
+        manualDisplacementQueue[addedObjectName] = addedObjectInstance;
+      }
+
       if (!curAddedObjectExport.fromObjectGroup){
 
         if (curAddedObjectExport.recentlyDetached){
@@ -3558,6 +3581,17 @@ StateLoader.prototype.mapLoadedTexturePack = function(texturePackName, exportObj
 }
 
 StateLoader.prototype.mapLoadedTexture = function(texture, textureName){
+  var manualDisplacementQueueRemoveNames = [];
+  for (var objName in manualDisplacementQueue){
+    var obj = manualDisplacementQueue[objName];
+    if (obj.metaData.manualDisplacementMap == textureName){
+      obj.applyDisplacementMap(texture, textureName);
+      manualDisplacementQueueRemoveNames.push(objName);
+    }
+  }
+  for (var i = 0; i<manualDisplacementQueueRemoveNames.length; i++){
+    delete manualDisplacementQueue[manualDisplacementQueueRemoveNames[i]];
+  }
   var addedObjectsExport = this.stateObj.addedObjects;
   for (var objectGroupName in objectGroups){
     var group = objectGroups[objectGroupName].group;
@@ -3946,6 +3980,7 @@ StateLoader.prototype.resetProject = function(undo){
   objectGroups = new Object();
   disabledObjectNames = new Object();
   markedPoints = new Object();
+  manualDisplacementQueue = new Object();
   anchorGrid = 0;
 
   // FOG

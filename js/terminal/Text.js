@@ -385,6 +385,7 @@ var Text = function(){
   this.MAX = "Max";
   this.FRAME_DROP_ALREADY = "There is already a frame-drop recording process working.";
   this.FRAME_DROP_STARTED = "Frame-drop recording started.";
+  this.DISPLACEMENT_MAP_APPLIED = "Displacement map applied.";
   this.ROYGBIV_SCRIPTING_API_GETOBJECT = "Returns the object or glued object having the name given as the parameter, or zero if no such object or glued object is found.";
   this.ROYGBIV_SCRIPTING_API_GETPARTICLESYSTEM = "Returns the particle system having the name given as the parameter, or zero if no such particle system is found.";
   this.ROYGBIV_SCRIPTING_API_GETCHILDOBJECT = "Returns a child object having the name given as the second parameter of a glued object given as the first parameter,\nor zero if no such object is found.";

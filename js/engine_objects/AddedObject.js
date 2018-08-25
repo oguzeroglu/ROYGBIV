@@ -199,6 +199,15 @@ AddedObject.prototype.export = function(){
     exportObject.blendingMode = "NORMAL_BLENDING";
   }
 
+  var manualDisplacementMap = this.metaData["manualDisplacementMap"];
+  var manualDisplacementScale = this.metaData["manualDisplacementScale"];
+  var manualDisplacementBias = this.metaData["manualDisplacementBias"];
+  if (!(typeof manualDisplacementMap == UNDEFINED) && !(typeof manualDisplacementScale == UNDEFINED)
+          && !(typeof manualDisplacementBias == UNDEFINED)){
+      exportObject.manualDisplacementInfo = manualDisplacementMap+
+                      PIPE+manualDisplacementScale+PIPE+manualDisplacementBias;
+  }
+
   return exportObject;
 }
 
@@ -1022,6 +1031,16 @@ AddedObject.prototype.segmentGeometry = function(isCustom, count, returnGeometry
     }
   }
 
+  var manualDisplacementMap = this.metaData["manualDisplacementMap"];
+  var manualDisplacementScale = this.metaData["manualDisplacementScale"];
+  var manualDisplacementBias = this.metaData["manualDisplacementBias"];
+  if (!(typeof manualDisplacementMap == UNDEFINED) && !(typeof manualDisplacementScale == UNDEFINED) && !(typeof manualDisplacementBias == UNDEFINED)){
+    var dispTexture = textures[manualDisplacementMap];
+    if (dispTexture && (dispTexture instanceof THREE.Texture)){
+      this.applyDisplacementMap(dispTexture, manualDisplacementMap, manualDisplacementScale, manualDisplacementBias);
+    }
+  }
+
   if (!isCustom){
     console.log("[*]Segmented for optimization.");
   }
@@ -1441,4 +1460,31 @@ AddedObject.prototype.getNormalGeometry = function(){
     count.depth = this.metaData["depthSegments"];
   }
   return this.segmentGeometry(true, count, true);
+}
+
+AddedObject.prototype.applyDisplacementMap = function(map, mapName, scale, bias){
+  if (typeof scale == UNDEFINED){
+    scale = this.metaData["manualDisplacementScale"];
+  }
+  if (typeof bias == UNDEFINED){
+    bias = this.metaData["manualDisplacementBias"];
+  }
+  this.undoDisplacement();
+  new DisplacementCalculator().applyDisplacementMap(this, map, scale, bias);
+  this.metaData["manualDisplacementMap"] = mapName;
+  this.metaData["manualDisplacementScale"] = scale;
+  this.metaData["manualDisplacementBias"] = bias;
+}
+
+AddedObject.prototype.undoDisplacement = function(){
+  delete this.metaData["manualDisplacementMap"];
+  delete this.metaData["manualDisplacementScale"];
+  delete this.metaData["manualDisplacementBias"];
+  var segmentObj = new Object();
+  segmentObj.width = this.metaData["widthSegments"];
+  segmentObj.height = this.metaData["heightSegments"];
+  if (this.tpye == "box"){
+    segmentObj.depth = this.metaData["depthSegments"];
+  }
+  this.segmentGeometry(true, segmentObj);
 }

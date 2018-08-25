@@ -130,7 +130,8 @@ var commandArgumentsExpectedCount = [
     0, //logFrameDrops
     3, //addPaddingToTexture
     3, //newSphere
-    0 //printFogInfo
+    0, //printFogInfo
+    4 //applyDisplacementMap
 ];
 var commandArgumentsExpectedExplanation = [
   "help", //help
@@ -257,7 +258,8 @@ var commandArgumentsExpectedExplanation = [
   "logFrameDrops", //logFrameDrops
   "addPaddingToTexture textureName padding newTextureName", //addPaddingToTexture
   "newSphere name material radius", //newSphere
-  "printFogInfo" //printFogInfo
+  "printFogInfo", //printFogInfo
+  "applyDisplacementMap objectName textureName scale bias" //applyDisplacementMap
 ];
 var commands = [
   "help",
@@ -384,7 +386,8 @@ var commands = [
   "logFrameDrops",
   "addPaddingToTexture",
   "newSphere",
-  "printFogInfo"
+  "printFogInfo",
+  "applyDisplacementMap"
 ];
 var commandInfo = [
   "help: Prints command list.",
@@ -511,7 +514,8 @@ var commandInfo = [
   "logFrameDrops: Records frame drops for a minute and prints exactly how many frames are missed within a minute to Javascript console.",
   "addPaddingToTexture: Adds padding to a texture. This can be useful for crosshair rotations to prevent visual errors.",
   "newSphere: Creates a new sphere.",
-  "printFogInfo: Prints the fog info."
+  "printFogInfo: Prints the fog info.",
+  "applyDisplacementMap: Applies a displacement map to an object and modifies its geometry."
 ];
 var keyboardInfo = [
   "W/S : Translates the camera on axis Z.",
@@ -730,6 +734,7 @@ var alphaTextureCache = new Object();
 var emissiveTextureCache = new Object();
 var skyboxCache = new Object();
 var textureCache = new Object();
+var manualDisplacementQueue = new Object();
 var CACHE_NOT_PRESENT = "CACHE_NOT_PRESENT";
 var objectSelectedByCommand = false;
 var THREE_AXIS_VECTOR_X = new THREE.Vector3(1, 0, 0);
@@ -750,6 +755,7 @@ var REUSABLE_VECTOR = new THREE.Vector3();
 var REUSABLE_VECTOR_2 = new THREE.Vector3();
 var REUSABLE_VECTOR_3 = new THREE.Vector3();
 var REUSABLE_VECTOR_4 = new THREE.Vector3();
+var REUSABLE_2_VECTOR = new THREE.Vector2();
 var REUSABLE_CANNON_VECTOR = new CANNON.Vec3();
 var REUSABLE_CANNON_VECTOR_2 = new CANNON.Vec3();
 var REUSABLE_MATRIX_3 = new THREE.Matrix3();

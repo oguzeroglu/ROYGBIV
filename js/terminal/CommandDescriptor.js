@@ -542,6 +542,14 @@ var CommandDescriptor = function(){
   this.newSphere.types.push(this.MATERIAL_NAME_WITH_NULL); // material
   this.newSphere.types.push(this.UNKNOWN_INDICATOR); // radius
 
+  // applyDisplacementMap
+  this.applyDisplacementMap = new Object();
+  this.applyDisplacementMap.types = [];
+  this.applyDisplacementMap.types.push(this.OBJECT_NAME); // objectName
+  this.applyDisplacementMap.types.push(this.TEXTURE_NAME); // textureName
+  this.applyDisplacementMap.types.push(this.UNKNOWN_INDICATOR); // scale
+  this.applyDisplacementMap.types.push(this.UNKNOWN_INDICATOR); // bias
+
 };
 
 CommandDescriptor.prototype.test = function(){

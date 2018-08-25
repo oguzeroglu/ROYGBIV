@@ -13,6 +13,43 @@ DisplacementCalculator.prototype.getDisplacementBuffer = function(texture){
   return tmpContext.getImageData(0, 0, heightMapWidth, heightMapHeight).data;
 }
 
+DisplacementCalculator.prototype.applyDisplacementMap = function(object, texture, scale, bias){
+  texture.updateMatrix();
+  var heightMapWidth = texture.image.width;
+  var heightMapHeight = texture.image.height;
+  var displacementBuffer = this.getDisplacementBuffer(texture);
+  var geometry = object.mesh.geometry;
+  var positions = geometry.attributes.position.array;
+  var normals = geometry.attributes.normal.array;
+  var uvs = geometry.attributes.uv.array;
+  var iterate = true;
+  var i = 0, i2 = 0;
+  while (iterate){
+    var normalX = normals[i];
+    var normalY = normals[i+1];
+    var normalZ = normals[i+2];
+    var uvX = uvs[i2];
+    var uvY = uvs[i2+1];
+    texture.transformUv(REUSABLE_2_VECTOR.set(uvX, uvY));
+    uvX = REUSABLE_2_VECTOR.x;
+    uvY = REUSABLE_2_VECTOR.y;
+    var u = ((Math.abs(uvX) * heightMapWidth) % heightMapWidth) | 0;
+    var v = ((Math.abs(uvY) * heightMapHeight) % heightMapHeight) | 0;
+    var pos = (u + v * heightMapWidth) * 4;
+    var r = displacementBuffer[pos] / 255.0;
+    var normalizedNormal = REUSABLE_VECTOR.set(normalX, normalY, normalZ).normalize();
+    positions[i] += normalizedNormal.x * (r * scale + bias);
+    positions[i+1] += normalizedNormal.y * (r * scale + bias);
+    positions[i+2] += normalizedNormal.z * (r * scale + bias);
+    i += 3;
+    i2 += 2;
+    if (i >= positions.length){
+      iterate = false;
+    }
+  }
+  geometry.attributes.position.needsUpdate = true;
+}
+
 DisplacementCalculator.prototype.getDisplacedPositions = function(obj, worldMatrix){
   var displacementBias = obj.material.displacementBias;
   var displacementScale = obj.material.displacementScale;
