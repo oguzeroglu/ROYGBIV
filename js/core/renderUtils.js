@@ -10,7 +10,6 @@ function render(){
     if (!isPhysicsWorkerEnabled()){
       physicsWorld.step(physicsStepAmount);
       updateDynamicObjectPositions();
-      updatePhysicsTestObjectPositions();
     }
     runScripts();
     if (worldBinHandler){
@@ -196,18 +195,6 @@ function calculateFps (){
     }
   }
   lastFPS = fps;
-}
-
-function updatePhysicsTestObjectPositions(){
-  for (var key in physicsTests){
-    var test = physicsTests[key];
-    if (test.status == "RUNNING"){
-      var mesh = test.mesh;
-      var physicsBody = test.physicsBody;
-      mesh.position.copy(physicsBody.position);
-      mesh.quaternion.copy(physicsBody.quaternion);
-    }
-  }
 }
 
 function refreshMaterials(){

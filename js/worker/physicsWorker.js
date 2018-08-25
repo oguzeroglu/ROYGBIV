@@ -150,6 +150,9 @@ function parseMessage(msg){
     collisionNotificationArray = msg.content;
     hasCollisionNotificationArrayOwnership = true;
     collisionNotificationArrayIndex = 0;
+  }else if (msg.topic == "objectVelocityChange"){
+    var phyBody = physicsBodiesIDMap[msg.id];
+    phyBody.velocity.set(msg.pointX, msg.pointY, msg.pointZ);
   }
 }
 

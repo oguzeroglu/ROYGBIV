@@ -116,7 +116,8 @@ var Roygbiv = function(){
     "setParticleSystemPosition",
     "emissiveIntensity",
     "startObjectTrail",
-    "stopObjectTrail"
+    "stopObjectTrail",
+    "setObjectVelocity"
   ];
 
   this.globals = new Object();
@@ -1607,6 +1608,39 @@ Roygbiv.prototype.emissiveIntensity = function(object, delta){
     object.initEmissiveIntensitySet = true;
   }
   object.material.emissiveIntensity += delta;
+}
+
+// setObjectVelocity
+//  Sets the velocity of an object or a glued object. The object must be a dynamic object
+//  (mass > 0) in order to have a velocity.
+Roygbiv.prototype.setObjectVelocity = function(object, velocityVector){
+  if (mode == 0){
+    return;
+  }
+  if (typeof object == UNDEFINED){
+    throw new Error("setObjectVelocity error: object is not defined.");
+    return;
+  }
+  if (!(object instanceof AddedObject) && !(object instanceof ObjectGroup)){
+    throw new Error("setObjectVelocity error: Type not supported.");
+    return;
+  }
+  if (!object.isDynamicObject){
+    throw new Error("setObjectVelocity error: Object must have a mass greater than zero.");
+    return;
+  }
+  if (typeof velocityVector == UNDEFINED){
+    throw new Error("setObjectVelocity error: velocityVector is not defined.");
+    return;
+  }
+  if (isNaN(velocityVector.x) || isNaN(velocityVector.y) || isNaN(velocityVector.z)){
+    throw new Error("setObjectVelocity error: Bad velocityVector parameter.");
+    return;
+  }
+  object.physicsBody.velocity.set(velocityVector.x, velocityVector.y, velocityVector.z);
+  if (isPhysicsWorkerEnabled()){
+    workerHandler.notifyPhysicsVelocity(object);
+  }
 }
 
 // PARTICLE SYSTEM FUNCTIONS ***************************************************

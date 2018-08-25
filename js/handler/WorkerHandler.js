@@ -882,3 +882,12 @@ WorkerHandler.prototype.notifyPhysicsCollisionRemoval = function(object){
   this.reusableWorkerMessage.set(this.constants.collisionRemoval, object.name);
   this.postMessage(this.physicsWorker, this.reusableWorkerMessage);
 }
+
+WorkerHandler.prototype.notifyPhysicsVelocity = function(object){
+  this.reusableWorkerMessage.set(this.constants.objectVelocityChange);
+  this.reusableWorkerMessage.id = object.physicsBody.id;
+  this.reusableWorkerMessage.pointX = object.physicsBody.velocity.x;
+  this.reusableWorkerMessage.pointY = object.physicsBody.velocity.y;
+  this.reusableWorkerMessage.pointZ = object.physicsBody.velocity.z;
+  this.postMessage(this.physicsWorker, this.reusableWorkerMessage);
+}

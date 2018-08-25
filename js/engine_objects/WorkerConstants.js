@@ -47,4 +47,5 @@ var WorkerConstants = function(){
   this.pcNotificationArray = "pcNotificationArray";
   this.maxPSCount = "maxPSCount";
   this.psCollisionNotification = "psCollisionNotification";
+  this.objectVelocityChange = "objectVelocityChange";
 }
