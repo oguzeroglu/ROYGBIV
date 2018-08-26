@@ -208,6 +208,12 @@ AddedObject.prototype.export = function(){
                       PIPE+manualDisplacementScale+PIPE+manualDisplacementBias;
   }
 
+  if (this.metaData.isSlippery){
+    exportObject.isSlippery = true;
+  }else{
+    exportObject.isSlippery = false;
+  }
+
   return exportObject;
 }
 

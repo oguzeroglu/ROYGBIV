@@ -4317,6 +4317,59 @@ function parse(input){
           undoRedoHandler.push();
           return true;
         break;
+        case 126: //setSlipperiness
+          if (mode != 0){
+            terminal.printError(Text.WORKS_ONLY_IN_DESIGN_MODE);
+            return true;
+          }
+          var objName = splitted[1];
+          var onOff = splitted[2].toUpperCase();
+          var obj = addedObjects[objName];
+          if (!obj){
+            obj = objectGroups[objName];
+            if (!obj){
+              terminal.printError(Text.NO_SUCH_OBJECT);
+              return true;
+            }
+          }
+          if (onOff != "ON" && onOff != "OFF"){
+            terminal.printError(Text.SLIPPERINESS_STATE_MUST_BE_ON_OR_OFF);
+            return true;
+          }
+          var slipperinessState = true;
+          if (onOff == "OFF"){
+            slipperinessState = false;
+          }
+          if (obj instanceof AddedObject){
+            if (slipperinessState){
+              if (obj.metaData.isSlippery){
+                terminal.printError(Text.OBJECT_IS_ALREADY_SLIPPERY);
+                return true;
+              }
+            }else{
+              if (!obj.metaData.isSlippery){
+                terminal.printError(Text.OBJECT_IS_ALREADY_NOT_SLIPPERY);
+                return true;
+              }
+            }
+          }else if (obj instanceof ObjectGroup){
+            if (slipperinessState){
+              if (obj.isSlippery){
+                terminal.printError(Text.OBJECT_IS_ALREADY_SLIPPERY);
+                return true;
+              }
+            }else{
+              if (!obj.isSlippery){
+                terminal.printError(Text.OBJECT_IS_ALREADY_NOT_SLIPPERY);
+                return true;
+              }
+            }
+          }
+          obj.setSlippery(slipperinessState);
+          terminal.printError(Text.SLIPPERINESS_ADJUSTED);
+          undoRedoHandler.push();
+          return true;
+        break;
       }
       return true;
     }catch(err){

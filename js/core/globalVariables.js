@@ -131,7 +131,8 @@ var commandArgumentsExpectedCount = [
     3, //addPaddingToTexture
     3, //newSphere
     0, //printFogInfo
-    4 //applyDisplacementMap
+    4, //applyDisplacementMap
+    2 //setSlipperiness
 ];
 var commandArgumentsExpectedExplanation = [
   "help", //help
@@ -259,7 +260,8 @@ var commandArgumentsExpectedExplanation = [
   "addPaddingToTexture textureName padding newTextureName", //addPaddingToTexture
   "newSphere name material radius", //newSphere
   "printFogInfo", //printFogInfo
-  "applyDisplacementMap objectName textureName scale bias" //applyDisplacementMap
+  "applyDisplacementMap objectName textureName scale bias", //applyDisplacementMap
+  "setSlipperiness objectName on/off"
 ];
 var commands = [
   "help",
@@ -387,7 +389,8 @@ var commands = [
   "addPaddingToTexture",
   "newSphere",
   "printFogInfo",
-  "applyDisplacementMap"
+  "applyDisplacementMap",
+  "setSlipperiness"
 ];
 var commandInfo = [
   "help: Prints command list.",
@@ -515,7 +518,8 @@ var commandInfo = [
   "addPaddingToTexture: Adds padding to a texture. This can be useful for crosshair rotations to prevent visual errors.",
   "newSphere: Creates a new sphere.",
   "printFogInfo: Prints the fog info.",
-  "applyDisplacementMap: Applies a displacement map to an object and modifies its geometry."
+  "applyDisplacementMap: Applies a displacement map to an object and modifies its geometry.",
+  "setSlipperiness: Sets the slipperiness of an object."
 ];
 var keyboardInfo = [
   "W/S : Translates the camera on axis Z.",

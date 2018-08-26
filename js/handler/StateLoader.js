@@ -206,7 +206,18 @@ StateLoader.prototype.handleObjectGroupsDiff = function(){
       objectGroupInstance.isDynamicObject = isDynamicObject;
     }
   }else if (diff.path.length == 3){
-    if (diff.path[2] == "quaternionW"){
+    if (diff.path[2] == "isSlippery"){
+      if (kind == "E"){
+        var objectGroup = objectGroups[diff.path[1]];
+        if (objectGroup){
+          if (diff.rhs){
+            objectGroup.setSlippery(true);
+          }else{
+            objectGroup.setSlippery(false);
+          }
+        }
+      }
+    }else if (diff.path[2] == "quaternionW"){
       if (kind == "E"){
         var objectGroup = objectGroups[diff.path[1]];
         if (objectGroup){
@@ -866,7 +877,18 @@ StateLoader.prototype.handleAddedObjectDiff = function(){
       }
     }
   }else if (diff.path.length == 3){
-    if (diff.path[2] == "manualDisplacementInfo"){
+    if (diff.path[2] == "isSlippery"){
+      var addedObject = addedObjects[diff.path[1]];
+      if (addedObject){
+        if (kind == "E"){
+          if (diff.rhs){
+            addedObject.setSlippery(true);
+          }else{
+            addedObject.setSlippery(false);
+          }
+        }
+      }
+    }else if (diff.path[2] == "manualDisplacementInfo"){
       var addedObject = addedObjects[diff.path[1]];
       if (addedObject){
         if (kind == "D"){
@@ -2332,6 +2354,12 @@ StateLoader.prototype.load = function(undo){
         addedObjectInstance.setBlending(NORMAL_BLENDING);
       }
 
+      if (curAddedObjectExport.isSlippery){
+        addedObjectInstance.setSlippery(true);
+      }else{
+        addedObjectInstance.setSlippery(false);
+      }
+
       addedObjects[addedObjectName] = addedObjectInstance;
 
     }
@@ -2671,6 +2699,11 @@ StateLoader.prototype.load = function(undo){
       var isDynamicObject = false;
       if (curObjectGroupExport.isDynamicObject){
         isDynamicObject = curObjectGroupExport.isDynamicObject;
+      }
+      if (curObjectGroupExport.isSlippery){
+        objectGroupInstance.setSlippery(true);
+      }else{
+        objectGroupInstance.setSlippery(false);
       }
       objectGroupInstance.isDynamicObject = isDynamicObject;
     }

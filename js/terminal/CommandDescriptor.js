@@ -550,6 +550,12 @@ var CommandDescriptor = function(){
   this.applyDisplacementMap.types.push(this.UNKNOWN_INDICATOR); // scale
   this.applyDisplacementMap.types.push(this.UNKNOWN_INDICATOR); // bias
 
+  // setSlipperiness
+  this.setSlipperiness = new Object();
+  this.setSlipperiness.types = [];
+  this.setSlipperiness.types.push(this.OBJECT_NAME); // objectName
+  this.setSlipperiness.types.push(this.STATE_ON_OFF); // on/off
+
 };
 
 CommandDescriptor.prototype.test = function(){

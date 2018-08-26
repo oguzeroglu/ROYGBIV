@@ -374,6 +374,12 @@ ObjectGroup.prototype.export = function(){
     exportObj.isDynamicObject = this.isDynamicObject;
   }
 
+  if (this.isSlippery){
+    exportObj.isSlippery = true;
+  }else{
+    exportObj.isSlippery = false;
+  }
+
   exportObj.quaternionX = this.initQuaternion.x;
   exportObj.quaternionY = this.initQuaternion.y;
   exportObj.quaternionZ = this.initQuaternion.z;
