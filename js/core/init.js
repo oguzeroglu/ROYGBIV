@@ -118,6 +118,18 @@ window.onload = function() {
     terminal.clear();
     parseCommand("setMass "+obj.name+" "+val);
   });
+  omSlipperyController = datGuiObjectManipulation.add(objectManipulationParameters, "Slippery").onChange(function(val){
+    var obj = selectedAddedObject;
+    if (!obj){
+      obj = selectedObjectGroup;
+    }
+    terminal.clear();
+    if (val){
+      parseCommand("setSlipperiness "+obj.name+" on");
+    }else{
+      parseCommand("setSlipperiness "+obj.name+" off");
+    }
+  }).listen();
   omTextureOffsetXController = datGuiObjectManipulation.add(objectManipulationParameters, "Texture offset x").min(-2).max(2).step(0.001).onChange(function(val){
     var texture = selectedAddedObject.material.map;
     texture.offset.x = val;
@@ -905,6 +917,7 @@ function enableAllOMControllers(){
   enableController(omRotationYController);
   enableController(omRotationZController);
   enableController(omMassController);
+  enableController(omSlipperyController);
   enableController(omTextureOffsetXController);
   enableController(omTextureOffsetYController);
   enableController(omOpacityController);
@@ -958,6 +971,11 @@ function afterObjectSelection(){
       objectManipulationParameters["Rotate z"] = 0;
       objectManipulationParameters["Opacity"] = obj.material.opacity;
       objectManipulationParameters["AO intensity"] = obj.material.aoMapIntensity;
+      if (obj.metaData.isSlippery){
+        objectManipulationParameters["Slippery"] = true;
+      }else{
+        objectManipulationParameters["Slippery"] = false;
+      }
       if (!obj.material.map){
         disableController(omTextureOffsetXController);
         disableController(omTextureOffsetYController);
@@ -991,6 +1009,11 @@ function afterObjectSelection(){
       objectManipulationParameters["Rotate y"] = 0;
       objectManipulationParameters["Rotate z"] = 0;
       objectManipulationParameters["Opacity"] = childObj.material.opacity;
+      if (obj.isSlippery){
+        objectManipulationParameters["Slippery"] = true;
+      }else{
+        objectManipulationParameters["Slippery"] = false;
+      }
       disableController(omTextureOffsetXController);
       disableController(omTextureOffsetYController);
       disableController(omShininessController);
