@@ -556,7 +556,6 @@ GridSystem.prototype.newSurface = function(name, grid1, grid2, material){
     physicsShapeParameters["z"]
   ));
   var physicsMaterial = new CANNON.Material();
-  physicsMaterial.friction = 1;
   var surfacePhysicsBody = new CANNON.Body({
     mass: 0,
     shape: surfacePhysicsShape,
@@ -726,7 +725,6 @@ GridSystem.prototype.newRamp = function(anchorGrid, otherGrid, axis, height, mat
   ));
 
   var physicsMaterial = new CANNON.Material();
-  physicsMaterial.friction = 1;
 
   var rampPhysicsBody = new CANNON.Body({
     mass: 0,
@@ -906,7 +904,6 @@ GridSystem.prototype.newBox = function(selections, height, material, name){
   ));
 
   var physicsMaterial = new CANNON.Material();
-  physicsMaterial.friction = 1;
 
   var boxPhysicsBody = new CANNON.Body({
     mass: 0,
@@ -1041,7 +1038,6 @@ GridSystem.prototype.newSphere = function(sphereName, material, radius, selectio
 
   var spherePhysicsShape = new CANNON.Sphere(Math.abs(radius));
   var physicsMaterial = new CANNON.Material();
-  physicsMaterial.friction = 1;
 
   var spherePhysicsBody = new CANNON.Body({
     mass: 0,

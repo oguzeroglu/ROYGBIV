@@ -1488,3 +1488,54 @@ AddedObject.prototype.undoDisplacement = function(){
   }
   this.segmentGeometry(true, segmentObj);
 }
+
+AddedObject.prototype.setSlippery = function(isSlippery){
+  if (isSlippery){
+    if (!isPhysicsWorkerEnabled()){
+      this.setFriction(0);
+    }
+    this.metaData["isSlippery"] = true;
+  }else{
+    if (!isPhysicsWorkerEnabled()){
+      this.setFriction(friction);
+    }
+    this.metaData["isSlippery"] = false;
+  }
+}
+
+AddedObject.prototype.setFriction = function(val){
+  var physicsMaterial = this.physicsBody.material;
+  for (var objName in addedObjects){
+    if (objName == this.name){
+      continue;
+    }
+    var otherMaterial = addedObjects[objName].physicsBody.material;
+    var contact = physicsWorld.getContactMaterial(physicsMaterial, otherMaterial);
+    if (contact){
+      contact.friction = val;
+    }else{
+      contact = new CANNON.ContactMaterial(physicsMaterial,otherMaterial, {
+        friction: val,
+        restitution: 0.3,
+        contactEquationStiffness: 1e8,
+        contactEquationRelaxation: 3
+      });
+      physicsWorld.addContactMaterial(contact);
+    }
+  }
+  for (var objName in objectGroups){
+    var otherMaterial = objectGroups[objName].physicsBody.material;
+    var contact = physicsWorld.getContactMaterial(physicsMaterial, otherMaterial);
+    if (contact){
+      contact.friction = val;
+    }else{
+      contact = new CANNON.ContactMaterial(physicsMaterial, otherMaterial, {
+        friction: val,
+        restitution: 0.3,
+        contactEquationStiffness: 1e8,
+        contactEquationRelaxation: 3
+      });
+      physicsBody.addContactMaterial(contact);
+    }
+  }
+}

@@ -25,6 +25,7 @@ var nameIDMap = new Object();          // key: ID, value: name
 var idNameMap = new Object();          // key: name, value: id
 var idIndexMap = new Object();         // key: ID, value: index
 var physicsBodiesWithCollisionRequests = new Object(); // key: name, value: true
+var slipperyBodyIDs = new Object(); // key: ID, value: true
 var initialized = false;
 
 var REUSABLE_VECTOR_1 = new CANNON.Vec3();
@@ -153,6 +154,9 @@ function parseMessage(msg){
   }else if (msg.topic == "objectVelocityChange"){
     var phyBody = physicsBodiesIDMap[msg.id];
     phyBody.velocity.set(msg.pointX, msg.pointY, msg.pointZ);
+  }else if (msg.topic == "slipperyNotification"){
+    var slipperyObjectID = idNameMap[msg.content];
+    slipperyBodyIDs[slipperyObjectID] = true;
   }
 }
 
@@ -296,7 +300,6 @@ function createObjectGroup(children, index, px, py, pz, qx, qy, qz, qw, mass, id
     px, py, pz
   );
   var physicsMaterial = new CANNON.Material();
-  physicsMaterial.friction = 1;
   var physicsBody = new CANNON.Body({mass: mass, material: physicsMaterial});
   physicsBody.position = referenceVector;
   for (var i = 0; i<children.length; i++){
@@ -350,7 +353,6 @@ function createObject(buffer, index, memberOfAGroup){
       physicsShapeParameterZ
     ));
     var physicsMaterial = new CANNON.Material();
-    physicsMaterial.friction = 1;
     physicsBody = new CANNON.Body({
       mass: mass,
       shape: surfacePhysicsShape,
@@ -369,7 +371,6 @@ function createObject(buffer, index, memberOfAGroup){
       boxSizeZ / 2
     ));
     var physicsMaterial = new CANNON.Material();
-    physicsMaterial.friction = 1;
     physicsBody = new CANNON.Body({
       mass: mass,
       shape: boxPhysicsShape,
@@ -390,7 +391,6 @@ function createObject(buffer, index, memberOfAGroup){
       rampHeight/2
     ));
     var physicsMaterial = new CANNON.Material();
-    physicsMaterial.friction = 1;
     physicsBody = new CANNON.Body({
       mass: mass,
       shape: rampPhysicsShape,
@@ -404,7 +404,6 @@ function createObject(buffer, index, memberOfAGroup){
     id = parseFloat(buffer[10]);
     var spherePhysicsShape = new CANNON.Sphere(sphereRadius);
     var physicsMaterial = new CANNON.Material();
-    physicsMaterial.friction = 1;
     physicsBody = new CANNON.Body({
       mass: mass,
       shape: spherePhysicsShape,
@@ -490,12 +489,42 @@ function processMassChange(msg){
   }
 }
 
+function makeSlippery(objID){
+  var body = physicsBodiesIDMap[objID];
+  var physicsMaterial = body.material;
+  for (var id in physicsBodiesIDMap){
+    if (parseInt(objID) == parseInt(id)){
+      continue;
+    }
+    var otherMaterial = physicsBodiesIDMap[id].material;
+    var contact = physicsWorld.getContactMaterial(physicsMaterial, otherMaterial);
+    if (contact){
+      contact.friction = 0;
+    }else{
+      contact = new CANNON.ContactMaterial(physicsMaterial,otherMaterial, {
+        friction: 0,
+        restitution: 0.3,
+        contactEquationStiffness: 1e8,
+        contactEquationRelaxation: 3
+      });
+      physicsWorld.addContactMaterial(contact);
+    }
+  }
+}
+
+function createSlipperyContacts(){
+  for (var objID in slipperyBodyIDs){
+    makeSlippery(objID);
+  }
+}
+
 self.onmessage = function(msg){
   if (msg.data.topic == "physicsInfo"){
     var ary = msg.data.content;
     self.physicsInfoBuffer = ary;
     if (!initialized){
       createObjects();
+      createSlipperyContacts();
       initialized = true;
     }
     iterate();

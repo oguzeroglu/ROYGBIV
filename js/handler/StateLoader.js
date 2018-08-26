@@ -1466,9 +1466,11 @@ StateLoader.prototype.handleAddedObjectDiff = function(){
           boxSizeY / 2,
           boxSizeZ / 2
         ));
+        var physicsMaterial = new CANNON.Material();
         var boxPhysicsBody = new CANNON.Body({
           mass: mass,
-          shape: boxPhysicsShape
+          shape: boxPhysicsShape,
+          material: physicsMaterial
         });
         var boxMesh;
         var boxClone;
@@ -1534,9 +1536,12 @@ StateLoader.prototype.handleAddedObjectDiff = function(){
             physicsShapeParameterZ
         ));
 
+        var physicsMaterial = new CANNON.Material();
+
         var surfacePhysicsBody = new CANNON.Body({
           mass: mass,
-          shape: surfacePhysicsShape
+          shape: surfacePhysicsShape,
+          material: physicsMaterial
         });
         surfacePhysicsBody.position.set(
           positionX,
@@ -1578,9 +1583,12 @@ StateLoader.prototype.handleAddedObjectDiff = function(){
           surfacePhysicalThickness,
           rampHeight/2
         ));
+
+        var physicsMaterial = new CANNON.Material();
         var rampPhysicsBody = new CANNON.Body({
           mass: mass,
-          shape: rampPhysicsShape
+          shape: rampPhysicsShape,
+          material: physicsMaterial
         });
         rampPhysicsBody.position.set(
           ramp.position.x,
@@ -1608,9 +1616,11 @@ StateLoader.prototype.handleAddedObjectDiff = function(){
         var centerY = metaData["centerY"];
         var centerZ = metaData["centerZ"];
         var spherePhysicsShape = new CANNON.Sphere(Math.abs(radius));
+        var physicsMaterial = new CANNON.Material();
         var spherePhysicsBody = new CANNON.Body({
           mass: mass,
-          shape: spherePhysicsShape
+          shape: spherePhysicsShape,
+          material: physicsMaterial
         });
         var sphereMesh;
         var sphereClone;
@@ -2062,9 +2072,11 @@ StateLoader.prototype.load = function(undo){
           boxSizeY / 2,
           boxSizeZ / 2
         ));
+        var physicsMaterial = new CANNON.Material();
         var boxPhysicsBody = new CANNON.Body({
           mass: mass,
-          shape: boxPhysicsShape
+          shape: boxPhysicsShape,
+          material: physicsMaterial
         });
         var boxMesh;
         var boxClone;
@@ -2130,9 +2142,11 @@ StateLoader.prototype.load = function(undo){
             physicsShapeParameterZ
         ));
 
+        var physicsMaterial = new CANNON.Material();
         var surfacePhysicsBody = new CANNON.Body({
           mass: mass,
-          shape: surfacePhysicsShape
+          shape: surfacePhysicsShape,
+          material: physicsMaterial
         });
         surfacePhysicsBody.position.set(
           positionX,
@@ -2174,9 +2188,12 @@ StateLoader.prototype.load = function(undo){
           surfacePhysicalThickness,
           rampHeight/2
         ));
+
+        var physicsMaterial = new CANNON.Material();
         var rampPhysicsBody = new CANNON.Body({
           mass: mass,
-          shape: rampPhysicsShape
+          shape: rampPhysicsShape,
+          material: physicsMaterial
         });
         rampPhysicsBody.position.set(
           ramp.position.x,
@@ -2204,9 +2221,11 @@ StateLoader.prototype.load = function(undo){
         var centerY = metaData["centerY"];
         var centerZ = metaData["centerZ"];
         var spherePhysicsShape = new CANNON.Sphere(Math.abs(radius));
+        var physicsMaterial = new CANNON.Material();
         var spherePhysicsBody = new CANNON.Body({
           mass: mass,
-          shape: spherePhysicsShape
+          shape: spherePhysicsShape,
+          material: physicsMaterial
         });
         var sphereMesh;
         var sphereClone;

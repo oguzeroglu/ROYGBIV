@@ -25,6 +25,7 @@ var WorkerConstants = function(){
   this.binSize = "binSize";
   this.objectIndex = "objectIndex";
   this.dynamicObjectNotification = "dynamicObjectNotification";
+  this.slipperyNotification = "slipperyNotification";
   this.dynamicObjectGroupNotification = "dynamicObjectGroupNotification";
   this.bbDescriptions = "bbDescriptions";
   this.physicsInfo = "physicsInfo";

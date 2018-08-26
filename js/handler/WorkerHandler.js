@@ -764,6 +764,13 @@ WorkerHandler.prototype.startPhysicsWorkerIteration = function(){
         (addedObjectName+","+addedObjects[addedObjectName].physicsBody.id)
       )
     );
+    if (addedObjects[addedObjectName].metaData["isSlippery"]){
+      this.postMessage(
+        this.physicsWorker, this.reusableWorkerMessage.set(
+          this.constants.slipperyNotification, addedObjectName
+        )
+      );
+    }
     this.objectPhysicsIDMap.set(addedObjects[addedObjectName].physicsBody.id, addedObjectName);
   }
   for (var objectGroupName in objectGroups){
@@ -786,6 +793,13 @@ WorkerHandler.prototype.startPhysicsWorkerIteration = function(){
         (objectGroupName+","+objectGroup.physicsBody.id)
       )
     );
+    if (objectGroup.isSlippery){
+      this.postMessage(
+        this.physicsWorker, this.reusableWorkerMessage.set(
+          this.constants.slipperyNotification, objectGroupName
+        )
+      );
+    }
     this.objectPhysicsIDMap.set(objectGroup.physicsBody.id, objectGroupName);
   }
   this.postMessage(this.physicsWorker, this.reusableWorkerMessage.set(

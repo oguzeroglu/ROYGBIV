@@ -16,7 +16,6 @@ var ObjectGroup = function(name, group){
 ObjectGroup.prototype.glue = function(){
   var group = this.group;
   var physicsMaterial = new CANNON.Material();
-  physicsMaterial.friction = 1;
   var physicsBody = new CANNON.Body({mass: 0, material: physicsMaterial});
   var centerPosition = this.getInitialCenter();
   var graphicsGroup = new THREE.Group();
@@ -501,5 +500,56 @@ ObjectGroup.prototype.generateBoundingBoxes = function(){
 ObjectGroup.prototype.visualiseBoudingBoxes = function(selectedScene){
   for (var objName in this.group){
     this.group[objName].visualiseBoudingBoxes(selectedScene);
+  }
+}
+
+ObjectGroup.prototype.setSlippery = function(isSlippery){
+  if (isSlippery){
+    if (!isPhysicsWorkerEnabled()){
+      this.setFriction(0);
+    }
+    this.isSlippery = true;
+  }else{
+    if (!isPhysicsWorkerEnabled()){
+      this.setFriction(friction);
+    }
+    this.isSlippery = false;
+  }
+}
+
+ObjectGroup.prototype.setFriction = function(val){
+  var physicsMaterial = this.physicsBody.material;
+  for (var objName in addedObjects){
+    var otherMaterial = addedObjects[objName].physicsBody.material;
+    var contact = physicsWorld.getContactMaterial(physicsMaterial, otherMaterial);
+    if (contact){
+      contact.friction = val;
+    }else{
+      contact = new CANNON.ContactMaterial(physicsMaterial,otherMaterial, {
+        friction: val,
+        restitution: 0.3,
+        contactEquationStiffness: 1e8,
+        contactEquationRelaxation: 3
+      });
+      physicsWorld.addContactMaterial(contact);
+    }
+  }
+  for (var objName in objectGroups){
+    if (objName == this.name){
+      continue;
+    }
+    var otherMaterial = objectGroups[objName].physicsBody.material;
+    var contact = physicsWorld.getContactMaterial(physicsMaterial, otherMaterial);
+    if (contact){
+      contact.friction = val;
+    }else{
+      contact = new CANNON.ContactMaterial(physicsMaterial, otherMaterial, {
+        friction: val,
+        restitution: 0.3,
+        contactEquationStiffness: 1e8,
+        contactEquationRelaxation: 3
+      });
+      physicsBody.addContactMaterial(contact);
+    }
   }
 }
