@@ -753,4 +753,5 @@ var Text = function(){
    this.ROYGBIV_SCRIPTING_API_EMISSIVEINTENSITY = "Modifies the emissive intensity of given object by given amount.";
    this.ROYGBIV_SCRIPTING_API_STARTOBJECTTRAIL = "Starts the trail effect of an object create with createObjectTrail command.";
    this.ROYGBIV_SCRIPTING_API_STOPOBJECTTRAIL = "Stops the trail effect of an object. The effect can be restarted using the startObjectTrail command.";
+   this.ROYGBIV_SCRIPTING_API_SETOBJECTVELOCITY = "Sets the velocity of an object or a glued object. The object must be a dynamic object (mass > 0) in order to have a velocity.";
 }
