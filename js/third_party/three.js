@@ -14669,6 +14669,9 @@
 
 		function getMaxPrecision( precision ) {
 
+			// OGUZ
+			return 'lowp';
+
 			if ( precision === 'highp' ) {
 
 				if ( gl.getShaderPrecisionFormat( gl.VERTEX_SHADER, gl.HIGH_FLOAT ).precision > 0 &&
@@ -14702,7 +14705,8 @@
 
 		if ( maxPrecision !== precision ) {
 
-			console.warn( 'THREE.WebGLRenderer:', precision, 'not supported, using', maxPrecision, 'instead.' );
+			// OGUZ
+			//console.warn( 'THREE.WebGLRenderer:', precision, 'not supported, using', maxPrecision, 'instead.' );
 			precision = maxPrecision;
 
 		}
