@@ -2706,6 +2706,8 @@ StateLoader.prototype.load = function(undo){
         objectGroupInstance.setSlippery(false);
       }
       objectGroupInstance.isDynamicObject = isDynamicObject;
+      objectGroupInstance.isBasicMaterial = curObjectGroupExport.isBasicMaterial;
+      objectGroupInstance.isPhongMaterial = curObjectGroupExport.isPhongMaterial;
     }
     // MARKED PONTS ************************************************
     for (var markedPointName in obj.markedPointsExport){

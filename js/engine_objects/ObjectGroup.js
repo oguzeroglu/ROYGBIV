@@ -384,6 +384,10 @@ ObjectGroup.prototype.export = function(){
   exportObj.quaternionY = this.initQuaternion.y;
   exportObj.quaternionZ = this.initQuaternion.z;
   exportObj.quaternionW = this.initQuaternion.w;
+
+  exportObj.isBasicMaterial = this.isBasicMaterial;
+  exportObj.isPhongMaterial = this.isPhongMaterial;
+
   return exportObj;
 }
 

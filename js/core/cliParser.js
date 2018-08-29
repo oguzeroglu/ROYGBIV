@@ -3347,10 +3347,36 @@ function parse(input){
               group[objectNamesArray[i]] = object;
             }
 
+            var materialUsed = 0;
+            for (var objName in group){
+              if (!materialUsed){
+                if (group[objName].material instanceof THREE.MeshBasicMaterial){
+                  materialUsed = 1;
+                }else if (group[objName].material instanceof THREE.MeshPhongMaterial){
+                  materialUsed = 2;
+                }
+              }else{
+                if (materialUsed == 1 && (group[objName].material instanceof THREE.MeshPhongMaterial)){
+                  terminal.printError(Text.CANNOT_GLUE_OBJECTS_WITH_DIFFERENT_MATERIAL_TYPES);
+                  return true;
+                }else if (materialUsed == 2 && (group[objName].material instanceof THREE.MeshBasicMaterial)){
+                  terminal.printError(Text.CANNOT_GLUE_OBJECTS_WITH_DIFFERENT_MATERIAL_TYPES);
+                  return true;
+                }
+              }
+            }
+
             var objectGroup = new ObjectGroup(
               groupName,
               group
             );
+            if (materialUsed == 1){
+              objectGroup.isBasicMaterial = true;
+              objectGroup.isPhongMaterial = false;
+            }else if (materialUsed == 2){
+              objectGroup.isPhongMaterial = true;
+              objectGroup.isBasicMaterial = false;
+            }
             objectGroup.glue();
             objectGroups[groupName] = objectGroup;
             terminal.printInfo(Text.OBJECTS_GLUED_TOGETHER);

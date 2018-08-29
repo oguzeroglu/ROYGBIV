@@ -252,6 +252,7 @@ var Text = function(){
   this.FOG_SET = "Fog set. Fogs are visible only in the preview mode.";
   this.FOG_INFO = "Fog info"
   this.FOG_REMOVED = "Fog removed from the scene.";
+  this.CANNOT_GLUE_OBJECTS_WITH_DIFFERENT_MATERIAL_TYPES = "Cannot glue objects with different material types.";
   this.MUST_GLUE_AT_LEAST_2_OBJECTS = "Must glue at least 2 objects.";
   this.OBJECT_NR_DOES_NOT_EXIST = "Object #@@1 does not exist.";
   this.OBJECT_IN_MOTION = "Object #@@1 is in motion. Use switchView command first to reset the animation.";
