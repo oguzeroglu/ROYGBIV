@@ -965,9 +965,15 @@ function parse(input){
             return true;
           }
           if (object){
+            if (selectedAddedObject && selectedAddedObject.name == objectName){
+              selectedAddedObject = 0;
+            }
             object.destroy();
             delete addedObjects[objectName];
           }else if (objectGroup){
+            if (selectedObjectGroup && selectedObjectGroup.name == objectName){
+              selectedObjectGroup = 0;
+            }
             objectGroup.destroy();
             delete objectGroups[objectName];
           }
