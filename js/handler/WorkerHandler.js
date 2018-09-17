@@ -230,10 +230,10 @@ var WorkerHandler = function(){
               qW = obj.previewMesh.quaternion.w;
             }else{
               obj = objectGroups[objName];
-              qX = obj.previewGraphicsGroup.quaternion.x;
-              qY = obj.previewGraphicsGroup.quaternion.y;
-              qZ = obj.previewGraphicsGroup.quaternion.z;
-              qW = obj.previewGraphicsGroup.quaternion.w;
+              qX = obj.previewMesh.quaternion.x;
+              qY = obj.previewMesh.quaternion.y;
+              qZ = obj.previewMesh.quaternion.z;
+              qW = obj.previewMesh.quaternion.w;
             }
             var collisionInfo = reusableCollisionInfo.set(
               objName, x, y, z, null, qX, qY, qZ, qW, REUSABLE_VECTOR.set(fnX, fnY, fnZ), psTime
@@ -411,14 +411,18 @@ WorkerHandler.prototype.updateObject = function(object, isPS){
       this.constants.updateObject, ary
     ));
   }else if (object instanceof ObjectGroup){
+    object.previewGraphicsGroup.position.copy(object.previewMesh.position);
+    object.previewGraphicsGroup.quaternion.copy(object.previewMesh.quaternion);
     object.previewGraphicsGroup.updateMatrixWorld();
+    object.previewGraphicsGroup.updateMatrix();
     var childCount = Object.keys(object.group).length;
-    var ary = new Float32Array(childCount * (object.previewGraphicsGroup.matrixWorld.elements.length + 1));
+    var ary = new Float32Array(childCount * (object.previewMesh.matrixWorld.elements.length + 1));
     var totalIndex = 0;
     for (var childName in object.group){
       var childObj = object.group[childName];
-      ary[totalIndex] = childObj.collisionWorkerIndex;;
+      ary[totalIndex] = childObj.collisionWorkerIndex;
       totalIndex ++;
+      childObj.previewMesh.updateMatrix();
       childObj.previewMesh.updateMatrixWorld();
       for (var i = 0; i<childObj.previewMesh.matrixWorld.elements.length; i++){
         ary[totalIndex] = childObj.previewMesh.matrixWorld.elements[i];
@@ -565,7 +569,7 @@ WorkerHandler.prototype.initCollisionWorker = function(isPS){
     index += 20;
   }
   for (var objName in objectGroups){
-    objectGroups[objName].previewGraphicsGroup.updateMatrixWorld();
+    objectGroups[objName].previewGraphicsGroup.updateMatrix();
     var group = objectGroups[objName].group;
     for (var childName in group){
       group[childName].generateCollisionWorkerInfo(index, objectBBDescriptions);
@@ -678,10 +682,12 @@ WorkerHandler.prototype.handlePhysicsWorkerMessage = function(msg){
     var quaternionZ = ary[index + 7];
     var quaternionW = ary[index + 8];
     var object = this.dynamicObjectGroups[i];
-    object.previewGraphicsGroup.position.set(positionX, positionY, positionZ);
+    object.previewMesh.position.set(positionX, positionY, positionZ);
     object.physicsBody.position.set(positionX, positionY, positionZ);
-    object.previewGraphicsGroup.quaternion.set(quaternionX, quaternionY, quaternionZ, quaternionW);
+    object.previewMesh.quaternion.set(quaternionX, quaternionY, quaternionZ, quaternionW);
     object.physicsBody.quaternion.set(quaternionX, quaternionY, quaternionZ, quaternionW);
+    object.previewGraphicsGroup.position.copy(object.previewMesh.position);
+    object.previewGraphicsGroup.quaternion.copy(object.previewMesh.quaternion);
   }
   this.physicsWorkerFunction();
 }

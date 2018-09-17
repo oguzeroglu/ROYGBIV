@@ -463,8 +463,7 @@ GridSystem.prototype.newSurface = function(name, grid1, grid2, material){
   var height = (Math.abs(grid1.rowNumber - grid2.rowNumber) + 1) * this.cellSize;
   var width = (Math.abs(grid1.colNumber - grid2.colNumber ) + 1) * this.cellSize;
   var geometry = new THREE.PlaneBufferGeometry(width, height);
-  var surface = new THREE.Mesh(geometry, material);
-
+  var surface = new MeshGenerator(geometry, material).generateMesh();
   if (this.axis == "XZ"){
 
     surface.position.x = (grid1.centerX + grid2.centerX) / 2;
@@ -591,7 +590,7 @@ GridSystem.prototype.newSurface = function(name, grid1, grid2, material){
   addedObjects[name] = addedObjectInstance;
 
   surface.addedObject = addedObjectInstance;
-
+  addedObjectInstance.updateMVMatrix();
 }
 
 GridSystem.prototype.newRamp = function(anchorGrid, otherGrid, axis, height, material, name){
@@ -638,7 +637,7 @@ GridSystem.prototype.newRamp = function(anchorGrid, otherGrid, axis, height, mat
     rampHeight = Math.sqrt((rowDif * rowDif) + (height * height));
   }
   var geometry = new THREE.PlaneBufferGeometry(rampWidth, rampHeight);
-  var ramp = new THREE.Mesh(geometry, material);
+  var ramp = new MeshGenerator(geometry, material).generateMesh();
 
   ramp.position.x = centerX;
   ramp.position.y = centerY;
@@ -815,13 +814,11 @@ GridSystem.prototype.newRamp = function(anchorGrid, otherGrid, axis, height, mat
   addedObjects[name] = addedObjectInstance;
 
   ramp.addedObject = addedObjectInstance;
-
+  addedObjectInstance.updateMVMatrix();
   anchorGrid.toggleSelect(false, false, false, true);
   otherGrid.toggleSelect(false, false, false, true);
   delete gridSelections[anchorGrid.name];
   delete gridSelections[otherGrid.name];
-
-  terminal.printInfo(Text.RAMP_CREATED);
 
 }
 
@@ -887,7 +884,7 @@ GridSystem.prototype.newBox = function(selections, height, material, name){
 
 
   var boxGeometry = new THREE.BoxBufferGeometry(boxSizeX, boxSizeY, boxSizeZ);
-  var boxMesh = new THREE.Mesh(boxGeometry, material);
+  var boxMesh = new MeshGenerator(boxGeometry, material).generateMesh();
 
   boxMesh.position.x = boxCenterX;
   boxMesh.position.y = boxCenterY;
@@ -977,7 +974,7 @@ GridSystem.prototype.newBox = function(selections, height, material, name){
   addedObjects[name] = addedObjectInstance;
 
   boxMesh.addedObject = addedObjectInstance;
-
+  addedObjectInstance.updateMVMatrix();
 }
 
 GridSystem.prototype.newSphere = function(sphereName, material, radius, selections){
@@ -1030,7 +1027,7 @@ GridSystem.prototype.newSphere = function(sphereName, material, radius, selectio
   }
 
   var sphereGeometry = new THREE.SphereBufferGeometry(Math.abs(radius));
-  var sphereMesh = new THREE.Mesh(sphereGeometry, material);
+  var sphereMesh = new MeshGenerator(sphereGeometry, material).generateMesh();
   sphereMesh.position.set(sphereCenterX, sphereCenterY, sphereCenterZ);
   scene.add(sphereMesh);
   var sphereClone = sphereMesh.clone();
@@ -1108,5 +1105,5 @@ GridSystem.prototype.newSphere = function(sphereName, material, radius, selectio
   addedObjects[sphereName] = addedObjectInstance;
 
   sphereMesh.addedObject = addedObjectInstance;
-
+  addedObjectInstance.updateMVMatrix();
 }

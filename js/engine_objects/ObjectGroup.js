@@ -11,6 +11,274 @@ var ObjectGroup = function(name, group){
 
   this.childObjectsByName = new Object();
 
+  this.totalVertexCount = 0;
+
+}
+
+ObjectGroup.prototype.getChildUV = function(addedObject, textureType, originalUV){
+  var range = this.textureMerger.ranges[addedObject.name + "," + textureType];
+  return new THREE.Vector2(
+    (originalUV.x / (1) * (range.endU - range.startU) + range.startU),
+    (originalUV.y / (1) * (range.startV - range.endV) + range.endV)
+  );
+}
+
+ObjectGroup.prototype.handleTextures = function(){
+  var texturesObj = new Object();
+  var hasTexture = false;
+  for (var objName in this.group){
+    var addedObject = this.group[objName];
+    if (addedObject.hasDiffuseMap()){
+      hasTexture = true;
+      var tName = addedObject.name + ",diffuse";
+      texturesObj[tName] = addedObject.mesh.material.uniforms.diffuseMap.value;
+    }
+    if (addedObject.hasAlphaMap()){
+      hasTexture = true;
+      var tName = addedObject.name + ",alpha";
+      texturesObj[tName] = addedObject.mesh.material.uniforms.alphaMap.value;
+    }
+    if (addedObject.hasAOMap()){
+      hasTexture = true;
+      var tName = addedObject.name + ",ao";
+      texturesObj[tName] = addedObject.mesh.material.uniforms.aoMap.value;
+    }
+    if (addedObject.hasEmissiveMap()){
+      hasTexture = true;
+      var tName = addedObject.name + ",emissive";
+      texturesObj[tName] = addedObject.mesh.material.uniforms.emissiveMap.value;
+    }
+  }
+  if (hasTexture){
+    this.textureMerger = new TextureMerger(texturesObj);
+  }
+}
+
+ObjectGroup.prototype.handleDisplacement = function(normalGeometry, childObj){
+  if (!childObj.hasDisplacementMap()){
+    return;
+  }
+  var displacementTexture = childObj.mesh.material.uniforms.displacementMap.value;
+  var scale = childObj.mesh.material.uniforms.displacementInfo.value.x;
+  var bias = childObj.mesh.material.uniforms.displacementInfo.value.y;
+  if (childObj.hasDiffuseMap()){
+    var offsetX = childObj.mesh.material.uniforms.diffuseMap.value.offset.x;
+    var offsetY = childObj.mesh.material.uniforms.diffuseMap.value.offset.y;
+    while (offsetX < 0){
+      offsetX += 100;
+    }
+    while (offsetY < 0){
+      offsetY += 100;
+    }
+    offsetX = offsetX - Math.floor(offsetX);
+    offsetY = offsetY - Math.floor(offsetY);
+    displacementTexture.offset.set(offsetX, offsetY);
+  }
+  displacementTexture.updateMatrix();
+  new DisplacementCalculator().applyDisplacementMapToNormalGeometry(
+    normalGeometry, displacementTexture, scale, bias
+  );
+}
+
+ObjectGroup.prototype.merge = function(){
+
+  this.handleTextures();
+
+  this.geometry = new THREE.BufferGeometry();
+  var pseudoGeometry = new THREE.Geometry();
+
+  var miMap = new Object();
+  var mi = 0;
+  for (var childName in this.group){
+    var childObj = this.group[childName];
+    var childGeom = childObj.getNormalGeometry();
+    this.handleDisplacement(childGeom, childObj);
+    miMap[mi] = childObj.name;
+    for (var i = 0; i<childGeom.faces.length; i++){
+      var color = childObj.mesh.material.uniforms.color.value;
+      childGeom.faces[i].vertexColors.push(color, color, color);
+      childGeom.faces[i].materialIndex = mi;
+    }
+    mi++;
+    childObj.mesh.updateMatrix();
+    pseudoGeometry.merge(childGeom, childObj.mesh.matrix);
+  }
+
+  var faces = pseudoGeometry.faces;
+  var vertices = pseudoGeometry.vertices;
+  var faceVertexUVs = pseudoGeometry.faceVertexUvs[0];
+  var positions = new Float32Array(faces.length * 3 * 3);
+  var colors = new Float32Array(faces.length * 3 * 3);
+  var alphas = new Float32Array(faces.length * 3);
+  var emissiveIntensities = new Float32Array(faces.length * 3);
+  var aoIntensities = new Float32Array(faces.length * 3);
+  var diffuseUVs = new Float32Array(faces.length * 3 * 2);
+  var emissiveUVs = new Float32Array(faces.length * 3 * 2);
+  var alphaUVs = new Float32Array(faces.length * 3 * 2);
+  var aoUVs = new Float32Array(faces.length * 3 * 2);
+  var positionsIndex = 0;
+  var colorIndex = 0;
+  var alphaIndex = 0;
+  var emissiveIntensityIndex = 0;
+  var aoIntensityIndex = 0;
+  var diffuseUVIndex = 0;
+  var emissiveUVIndex = 0;
+  var alphaUVIndex = 0;
+  var aoUVIndex = 0;
+  for (var i = 0; i<faces.length; i++){
+    var face = faces[i];
+    var addedObject = addedObjects[miMap[face.materialIndex]];
+    var a = face.a;
+    var b = face.b;
+    var c = face.c;
+    var vertex1 = vertices[a];
+    var vertex2 = vertices[b];
+    var vertex3 = vertices[c];
+    var color1 = face.vertexColors[0];
+    var color2 = face.vertexColors[1];
+    var color3 = face.vertexColors[2];
+    // POSITIONS
+    positions[positionsIndex ++] = vertex1.x;
+    positions[positionsIndex ++] = vertex1.y;
+    positions[positionsIndex ++] = vertex1.z;
+    positions[positionsIndex ++] = vertex2.x;
+    positions[positionsIndex ++] = vertex2.y;
+    positions[positionsIndex ++] = vertex2.z;
+    positions[positionsIndex ++] = vertex3.x;
+    positions[positionsIndex ++] = vertex3.y;
+    positions[positionsIndex ++] = vertex3.z;
+    // COLORS
+    colors[colorIndex ++] = color1.r;
+    colors[colorIndex ++] = color1.g;
+    colors[colorIndex ++] = color1.b;
+    colors[colorIndex ++] = color2.r;
+    colors[colorIndex ++] = color2.g;
+    colors[colorIndex ++] = color2.b;
+    colors[colorIndex ++] = color3.r;
+    colors[colorIndex ++] = color3.g;
+    colors[colorIndex ++] = color3.b;
+    // ALPHA
+    var alpha = addedObject.mesh.material.uniforms.alpha.value;
+    alphas[alphaIndex ++] = alpha;
+    alphas[alphaIndex ++] = alpha;
+    alphas[alphaIndex ++] = alpha;
+    // EMISSIVE INTENSITY
+    var emissiveIntensity = addedObject.mesh.material.uniforms.emissiveIntensity.value;
+    emissiveIntensities[emissiveIntensityIndex ++] = emissiveIntensity;
+    emissiveIntensities[emissiveIntensityIndex ++] = emissiveIntensity;
+    emissiveIntensities[emissiveIntensityIndex ++] = emissiveIntensity;
+    // AO INTENSITY
+    var aoIntensity = addedObject.mesh.material.uniforms.aoIntensity.value;
+    aoIntensities[aoIntensityIndex ++] = aoIntensity;
+    aoIntensities[aoIntensityIndex ++] = aoIntensity;
+    aoIntensities[aoIntensityIndex ++] = aoIntensity;
+    // DIFFUSE UVS
+    if (addedObject.hasDiffuseMap()){
+      var uv1 = this.getChildUV(addedObject, "diffuse", faceVertexUVs[i][0]);
+      var uv2 = this.getChildUV(addedObject, "diffuse", faceVertexUVs[i][1]);
+      var uv3 = this.getChildUV(addedObject, "diffuse", faceVertexUVs[i][2]);
+      diffuseUVs[diffuseUVIndex ++] = uv1.x;
+      diffuseUVs[diffuseUVIndex ++] = uv1.y;
+      diffuseUVs[diffuseUVIndex ++] = uv2.x;
+      diffuseUVs[diffuseUVIndex ++] = uv2.y;
+      diffuseUVs[diffuseUVIndex ++] = uv3.x;
+      diffuseUVs[diffuseUVIndex ++] = uv3.y;
+    }else{
+      diffuseUVs[diffuseUVIndex ++] = -100;
+      diffuseUVs[diffuseUVIndex ++] = -100;
+      diffuseUVs[diffuseUVIndex ++] = -100;
+      diffuseUVs[diffuseUVIndex ++] = -100;
+      diffuseUVs[diffuseUVIndex ++] = -100;
+      diffuseUVs[diffuseUVIndex ++] = -100;
+    }
+    // EMISSIVE UVS
+    if (addedObject.hasEmissiveMap()){
+      var uv1 = this.getChildUV(addedObject, "emissive", faceVertexUVs[i][0]);
+      var uv2 = this.getChildUV(addedObject, "emissive", faceVertexUVs[i][1]);
+      var uv3 = this.getChildUV(addedObject, "emissive", faceVertexUVs[i][2]);
+      emissiveUVs[emissiveUVIndex ++] = uv1.x;
+      emissiveUVs[emissiveUVIndex ++] = uv1.y;
+      emissiveUVs[emissiveUVIndex ++] = uv2.x;
+      emissiveUVs[emissiveUVIndex ++] = uv2.y;
+      emissiveUVs[emissiveUVIndex ++] = uv3.x;
+      emissiveUVs[emissiveUVIndex ++] = uv3.y;
+    }else{
+      emissiveUVs[emissiveUVIndex ++] = -100;
+      emissiveUVs[emissiveUVIndex ++] = -100;
+      emissiveUVs[emissiveUVIndex ++] = -100;
+      emissiveUVs[emissiveUVIndex ++] = -100;
+      emissiveUVs[emissiveUVIndex ++] = -100;
+      emissiveUVs[emissiveUVIndex ++] = -100;
+    }
+    // ALPHA UVS
+    if (addedObject.hasAlphaMap()){
+      var uv1 = this.getChildUV(addedObject, "alpha", faceVertexUVs[i][0]);
+      var uv2 = this.getChildUV(addedObject, "alpha", faceVertexUVs[i][1]);
+      var uv3 = this.getChildUV(addedObject, "alpha", faceVertexUVs[i][2]);
+      alphaUVs[alphaUVIndex ++] = uv1.x;
+      alphaUVs[alphaUVIndex ++] = uv1.y;
+      alphaUVs[alphaUVIndex ++] = uv2.x;
+      alphaUVs[alphaUVIndex ++] = uv2.y;
+      alphaUVs[alphaUVIndex ++] = uv3.x;
+      alphaUVs[alphaUVIndex ++] = uv3.y;
+    }else{
+      alphaUVs[alphaUVIndex ++] = -100;
+      alphaUVs[alphaUVIndex ++] = -100;
+      alphaUVs[alphaUVIndex ++] = -100;
+      alphaUVs[alphaUVIndex ++] = -100;
+      alphaUVs[alphaUVIndex ++] = -100;
+      alphaUVs[alphaUVIndex ++] = -100;
+    }
+    // AO UVS
+    if (addedObject.hasAOMap()){
+      var uv1 = this.getChildUV(addedObject, "ao", faceVertexUVs[i][0]);
+      var uv2 = this.getChildUV(addedObject, "ao", faceVertexUVs[i][1]);
+      var uv3 = this.getChildUV(addedObject, "ao", faceVertexUVs[i][2]);
+      aoUVs[aoUVIndex ++] = uv1.x;
+      aoUVs[aoUVIndex ++] = uv1.y;
+      aoUVs[aoUVIndex ++] = uv2.x;
+      aoUVs[aoUVIndex ++] = uv2.y;
+      aoUVs[aoUVIndex ++] = uv3.x;
+      aoUVs[aoUVIndex ++] = uv3.y;
+    }else{
+      aoUVs[aoUVIndex ++] = -100;
+      aoUVs[aoUVIndex ++] = -100;
+      aoUVs[aoUVIndex ++] = -100;
+      aoUVs[aoUVIndex ++] = -100;
+      aoUVs[aoUVIndex ++] = -100;
+      aoUVs[aoUVIndex ++] = -100;
+    }
+
+  }
+
+  var positionsBufferAttribute = new THREE.BufferAttribute(positions, 3);
+  var colorsBufferAttribute = new THREE.BufferAttribute(colors, 3);
+  var alphasBufferAttribute = new THREE.BufferAttribute(alphas, 1);
+  var emissiveIntensitiesBufferAttribute = new THREE.BufferAttribute(emissiveIntensities, 1);
+  var aoIntensitiesBufferAttribute = new THREE.BufferAttribute(aoIntensities, 1);
+  var diffuseUVsBufferAttribute = new THREE.BufferAttribute(diffuseUVs, 2);
+  var emissiveUVsBufferAttribute = new THREE.BufferAttribute(emissiveUVs, 2);
+  var alphaUVsBufferAttribute = new THREE.BufferAttribute(alphaUVs, 2);
+  var aoUVsBufferAttribute = new THREE.BufferAttribute(aoUVs, 2);
+  positionsBufferAttribute.setDynamic(false);
+  colorsBufferAttribute.setDynamic(false);
+  alphasBufferAttribute.setDynamic(false);
+  emissiveIntensitiesBufferAttribute.setDynamic(false);
+  aoIntensitiesBufferAttribute.setDynamic(false);
+  diffuseUVsBufferAttribute.setDynamic(false);
+  emissiveUVsBufferAttribute.setDynamic(false);
+  alphaUVsBufferAttribute.setDynamic(false);
+  aoUVsBufferAttribute.setDynamic(false);
+  this.geometry.addAttribute('position', positionsBufferAttribute);
+  this.geometry.addAttribute('color', colorsBufferAttribute);
+  this.geometry.addAttribute('alpha', alphasBufferAttribute);
+  this.geometry.addAttribute('emissiveIntensity', emissiveIntensitiesBufferAttribute);
+  this.geometry.addAttribute('aoIntensity', aoIntensitiesBufferAttribute);
+  this.geometry.addAttribute('diffuseUV', diffuseUVsBufferAttribute);
+  this.geometry.addAttribute('emissiveUV', emissiveUVsBufferAttribute);
+  this.geometry.addAttribute('alphaUV', alphaUVsBufferAttribute);
+  this.geometry.addAttribute('aoUV', aoUVsBufferAttribute);
+
 }
 
 ObjectGroup.prototype.glue = function(){
@@ -38,10 +306,10 @@ ObjectGroup.prototype.glue = function(){
 
   for (var objectName in group){
     var addedObject = group[objectName];
-    // DESTROY PARTS ***********************************************
-    addedObject.destroy();
-    delete addedObjects[objectName];
-    disabledObjectNames[objectName] = 1;
+    if (selectedAddedObject && selectedAddedObject.name == objectName){
+      selectedAddedObject = 0;
+    }
+    this.totalVertexCount += addedObject.mesh.geometry.attributes.position.count;
     // GLUE PHYSICS ************************************************
     var shape = addedObject.physicsBody.shapes[0];
     physicsBody.addShape(shape, addedObject.physicsBody.position.vsub(referenceVector), addedObject.physicsBody.quaternion);
@@ -74,13 +342,27 @@ ObjectGroup.prototype.glue = function(){
 
   physicsBody.addedObject = this;
 
-  scene.add(graphicsGroup);
-  previewScene.add(previewGraphicsGroup);
+  this.merge();
+  this.destroyParts();
+  this.mesh = new MeshGenerator(this.geometry).generateMergedMesh(graphicsGroup, this.textureMerger);
+  this.previewMesh= this.mesh.clone();
+  this.mesh.objectGroupName = this.name;
+  this.previewMesh.objectGroupName = this.name;
+  scene.add(this.mesh);
+  previewScene.add(this.previewMesh);
   physicsWorld.addBody(physicsBody);
 
-  this.physicsBody = physicsBody;
   this.graphicsGroup = graphicsGroup;
   this.previewGraphicsGroup = previewGraphicsGroup;
+
+  this.graphicsGroup.position.copy(this.mesh.position);
+  this.graphicsGroup.quaternion.copy(this.mesh.quaternion);
+  this.previewGraphicsGroup.position.copy(this.previewMesh.position);
+  this.previewGraphicsGroup.quaternion.copy(this.previewMesh.quaternion);
+  this.graphicsGroup.updateMatrix();
+  this.previewGraphicsGroup.updateMatrix();
+
+  this.physicsBody = physicsBody;
   this.initQuaternion = this.previewGraphicsGroup.quaternion.clone();
 
   this.collisionCallbackFunction = function(collisionEvent){
@@ -98,10 +380,10 @@ ObjectGroup.prototype.glue = function(){
     collisionPosition.x = contact.bi.position.x + contact.ri.x;
     collisionPosition.y = contact.bi.position.y + contact.ri.y;
     collisionPosition.z = contact.bi.position.z + contact.ri.z;
-    var quatX = this.previewGraphicsGroup.quaternion.x;
-    var quatY = this.previewGraphicsGroup.quaternion.y;
-    var quatZ = this.previewGraphicsGroup.quaternion.z;
-    var quatW = this.previewGraphicsGroup.quaternion.w;
+    var quatX = this.previewMesh.quaternion.x;
+    var quatY = this.previewMesh.quaternion.y;
+    var quatZ = this.previewMesh.quaternion.z;
+    var quatW = this.previewMesh.quaternion.w;
     var collisionInfo = reusableCollisionInfo.set(
       targetObjectName,
       collisionPosition.x,
@@ -127,7 +409,25 @@ ObjectGroup.prototype.glue = function(){
   this.gridSystemName = this.group[Object.keys(this.group)[0]].metaData.gridSystemName;
 }
 
+ObjectGroup.prototype.destroyParts = function(){
+  for (var objName in this.group){
+    var addedObject = addedObjects[objName];
+    addedObject.destroy();
+    delete addedObjects[objName];
+    disabledObjectNames[objName] = 1;
+  }
+}
+
 ObjectGroup.prototype.detach = function(){
+  if (selectedObjectGroup && selectedObjectGroup.name == this.name){
+    selectedObjectGroup = 0;
+  }
+  this.graphicsGroup.position.copy(this.mesh.position);
+  this.graphicsGroup.quaternion.copy(this.mesh.quaternion);
+  this.previewGraphicsGroup.position.copy(this.previewMesh.position);
+  this.previewGraphicsGroup.quaternion.copy(this.previewMesh.quaternion);
+  this.graphicsGroup.updateMatrixWorld();
+  this.previewGraphicsGroup.updateMatrixWorld();
   var worldQuaternions = new Object();
   var worldPositions = new Object();
   var previewSceneWorldPositions = new Object();
@@ -145,7 +445,14 @@ ObjectGroup.prototype.detach = function(){
       this.group[objectName].previewMesh.getWorldPosition(REUSABLE_VECTOR);
       worldPositions[objectName] = REUSABLE_VECTOR.clone();
     }
-    physicsQuaternions[objectName] = this.physicsBody.initQuaternion;
+    if (this.physicsBody.initQuaternion instanceof THREE.Quaternion){
+      this.physicsBody.initQuaternion = new CANNON.Quaternion().copy(this.physicsBody.initQuaternion);
+    }
+    if (this.group[objectName].type != "ramp"){
+      physicsQuaternions[objectName] = this.physicsBody.initQuaternion.mult(this.group[objectName].physicsBody.initQuaternion);
+    }else{
+      physicsQuaternions[objectName] = this.physicsBody.initQuaternion;
+    }
   }
   for (var i = this.graphicsGroup.children.length -1; i>=0; i--){
     this.graphicsGroup.remove(this.graphicsGroup.children[i]);
@@ -249,50 +556,60 @@ ObjectGroup.prototype.setQuaternion = function(axis, val){
     this.physicsBody.quaternion.x = val;
     this.initQuaternion.x = val;
     this.physicsBody.initQuaternion.x = val;
+    this.mesh.quaternion.x = val;
+    this.previewMesh.quaternion.x = val;
   }else if (axis == "y"){
     this.graphicsGroup.quaternion.y = val;
     this.previewGraphicsGroup.quaternion.y = val;
     this.physicsBody.quaternion.y = val;
     this.initQuaternion.y = val;
     this.physicsBody.initQuaternion.y = val;
+    this.mesh.quaternion.y = val;
+    this.previewMesh.quaternion.y = val;
   }else if (axis == "z"){
     this.graphicsGroup.quaternion.z = val;
     this.previewGraphicsGroup.quaternion.z = val;
     this.physicsBody.quaternion.z = val;
     this.initQuaternion.z = val;
     this.physicsBody.initQuaternion.z = val;
+    this.mesh.quaternion.z = val;
+    this.previewMesh.quaternion.z = val;
   }else if (axis == "w"){
     this.graphicsGroup.quaternion.w = val;
     this.previewGraphicsGroup.quaternion.w = val;
     this.physicsBody.quaternion.w = val;
     this.initQuaternion.w = val;
     this.physicsBody.initQuaternion.w = val;
+    this.mesh.quaternion.w = val;
+    this.previewMesh.quaternion.w = val;
   }
 }
 
 ObjectGroup.prototype.rotate = function(axis, radian, fromScript){
   if (axis == "x"){
-    this.graphicsGroup.rotateOnWorldAxis(
+    this.mesh.rotateOnWorldAxis(
       THREE_AXIS_VECTOR_X,
       radian
     );
   }else if (axis == "y"){
-    this.graphicsGroup.rotateOnWorldAxis(
+    this.mesh.rotateOnWorldAxis(
       THREE_AXIS_VECTOR_Y,
       radian
     );
   }else if (axis == "z"){
-    this.graphicsGroup.rotateOnWorldAxis(
+    this.mesh.rotateOnWorldAxis(
       THREE_AXIS_VECTOR_Z,
       radian
     );
   }
 
-  this.previewGraphicsGroup.quaternion.copy(this.graphicsGroup.quaternion);
-  this.physicsBody.quaternion.copy(this.graphicsGroup.quaternion);
+  this.previewMesh.quaternion.copy(this.mesh.quaternion);
+  this.physicsBody.quaternion.copy(this.mesh.quaternion);
+  this.graphicsGroup.quaternion.copy(this.mesh.quaternion);
+  this.previewGraphicsGroup.quaternion.copy(this.mesh.quaternion);
 
   if (!fromScript){
-    this.initQuaternion = this.graphicsGroup.quaternion.clone();
+    this.initQuaternion = this.mesh.quaternion.clone();
     this.physicsBody.initQuaternion.copy(
       this.physicsBody.quaternion
     );
@@ -308,7 +625,7 @@ ObjectGroup.prototype.rotate = function(axis, radian, fromScript){
 }
 
 ObjectGroup.prototype.translate = function(axis, amount, fromScript){
-  var previewMesh = this.previewGraphicsGroup;
+  var previewMesh = this.previewMesh;
   var physicsBody = this.physicsBody;
   var x = previewMesh.position.x;
   var y = previewMesh.position.y;
@@ -333,16 +650,20 @@ ObjectGroup.prototype.translate = function(axis, amount, fromScript){
     );
   }
   physicsBody.position.copy(previewMesh.position);
-
+  this.previewGraphicsGroup.position.copy(previewMesh.position);
 }
 
 ObjectGroup.prototype.resetPosition = function(){
-  this.previewGraphicsGroup.position.copy(this.graphicsGroup.position);
+  this.previewMesh.position.copy(this.mesh.position);
+  this.previewGraphicsGroup.position.copy(this.previewMesh);
 }
 
 ObjectGroup.prototype.destroy = function(){
-  scene.remove(this.graphicsGroup);
-  previewScene.remove(this.previewGraphicsGroup);
+  if (selectedObjectGroup && selectedObjectGroup.name == this.name){
+    selectedObjectGroup = 0;
+  }
+  scene.remove(this.mesh);
+  previewScene.remove(this.previewMesh);
   physicsWorld.remove(this.physicsBody);
   for (var name in this.group){
     var childObj= this.group[name];
@@ -356,6 +677,8 @@ ObjectGroup.prototype.destroy = function(){
     delete disabledObjectNames[name];
   }
   objectSelectedByCommand = false;
+  this.mesh.material.dispose();
+  this.mesh.geometry.dispose();
 }
 
 ObjectGroup.prototype.export = function(){
@@ -501,6 +824,9 @@ ObjectGroup.prototype.updateBoundingBoxes = function(){
 
 ObjectGroup.prototype.generateBoundingBoxes = function(){
   this.boundingBoxes = [];
+  this.previewMesh.updateMatrixWorld();
+  this.previewGraphicsGroup.position.copy(this.previewMesh.position);
+  this.previewGraphicsGroup.quaternion.copy(this.previewMesh.quaternion);
   this.previewGraphicsGroup.updateMatrixWorld();
   for (var objName in this.group){
     this.group[objName].generateBoundingBoxes(this.boundingBoxes);

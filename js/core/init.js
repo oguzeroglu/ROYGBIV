@@ -1,5 +1,4 @@
 window.onload = function() {
-  console.log("[*] Window loaded");
   // DRAGABLE CLI
   var cliDiv = document.getElementById("cliDiv");
   var terminalDiv = document.getElementById("terminalDiv");
@@ -92,7 +91,6 @@ window.onload = function() {
     var lightPreviewScene = light_previewScene[selectedLightName];
     light.intensity = val;
     lightPreviewScene.intensity = val;
-    refreshMaterials();
   }).onFinishChange(function(val){
     undoRedoHandler.push();
   }).listen();
@@ -131,24 +129,18 @@ window.onload = function() {
     }
   }).listen();
   omTextureOffsetXController = datGuiObjectManipulation.add(objectManipulationParameters, "Texture offset x").min(-2).max(2).step(0.001).onChange(function(val){
-    var texture = selectedAddedObject.material.map;
+    var texture = selectedAddedObject.mesh.material.uniforms.diffuseMap.value;
     texture.offset.x = val;
     texture.initOffsetXSet = false;
-    for (var objectName in addedObjects){
-      addedObjects[objectName].mesh.material.needsUpdate = true;
-      addedObjects[objectName].previewMesh.material.needsUpdate = true;
-    }
+    texture.updateMatrix();
   }).onFinishChange(function(value){
     undoRedoHandler.push();
   }).listen();
   omTextureOffsetYController = datGuiObjectManipulation.add(objectManipulationParameters, "Texture offset y").min(-2).max(2).step(0.001).onChange(function(val){
-    var texture = selectedAddedObject.material.map;
+    var texture = selectedAddedObject.mesh.material.uniforms.diffuseMap.value;
     texture.offset.y = val;
     texture.initOffsetYSet = false;
-    for (var objectName in addedObjects){
-      addedObjects[objectName].mesh.material.needsUpdate = true;
-      addedObjects[objectName].previewMesh.material.needsUpdate = true;
-    }
+    texture.updateMatrix();
   }).onFinishChange(function(value){
     undoRedoHandler.push();
   }).listen();
@@ -163,9 +155,7 @@ window.onload = function() {
       }
       return;
     }else if (selectedAddedObject){
-      var material = selectedAddedObject.material;
-      material.transparent = true;
-      material.opacity = val;
+      selectedAddedObject.updateOpacity(val);
       selectedAddedObject.initOpacitySet = false;
       selectedAddedObject.initOpacity = selectedAddedObject.opacity;
     }
@@ -173,8 +163,7 @@ window.onload = function() {
     undoRedoHandler.push();
   }).listen();
   omAOIntensityController = datGuiObjectManipulation.add(objectManipulationParameters, "AO intensity").min(0).max(10).step(0.1).onChange(function(val){
-    var material = selectedAddedObject.material;
-    material.aoMapIntensity = val;
+    selectedAddedObject.mesh.material.uniforms.aoIntensity.value = val;
   }).onFinishChange(function(value){
     undoRedoHandler.push();
   }).listen();
@@ -189,28 +178,21 @@ window.onload = function() {
     undoRedoHandler.push();
   }).listen();
   omEmissiveIntensityController = datGuiObjectManipulation.add(objectManipulationParameters, "Emissive int.").min(0).max(100).step(0.01).onChange(function(val){
-    var material = selectedAddedObject.material;
-    if (material.isMeshPhongMaterial){
-      material.emissiveIntensity = val;
-      material.needsUpdate = true;
-      selectedAddedObject.initEmissiveIntensitySet = false;
-      selectedAddedObject.initEmissiveIntensity = material.emissiveIntensity;
-    }
+    var material = selectedAddedObject.mesh.material;
+    material.uniforms.emissiveIntensity.value = val;
+    selectedAddedObject.initEmissiveIntensitySet = false;
+    selectedAddedObject.initEmissiveIntensity = val;
   }).onFinishChange(function(value){
     undoRedoHandler.push();
   }).listen();
   omDisplacementScaleController = datGuiObjectManipulation.add(objectManipulationParameters, "Disp. scale").min(-50).max(50).step(0.1).onChange(function(val){
-    var material = selectedAddedObject.material;
-    material.displacementScale = val;
-    material.needsUpdate = true;
+    selectedAddedObject.mesh.material.uniforms.displacementInfo.value.x = val;
     selectedAddedObject.initDisplacementScaleSet = false;
   }).onFinishChange(function(value){
     undoRedoHandler.push();
   }).listen();
   omDisplacementBiasController = datGuiObjectManipulation.add(objectManipulationParameters, "Disp. bias").min(-50).max(50).step(0.1).onChange(function(val){
-    var material = selectedAddedObject.material;
-    material.displacementBias = val;
-    material.needsUpdate = true;
+    selectedAddedObject.mesh.material.uniforms.displacementInfo.value.y = val;
     selectedAddedObject.initDisplacementBiasSet = false;
   }).onFinishChange(function(value){
     undoRedoHandler.push();
@@ -506,7 +488,7 @@ window.onload = function() {
   camera.position.set(initialCameraX, initialCameraY, initialCameraZ);
   camera.rotation.order = 'YXZ';
   camera.aspect = (window.innerWidth / window.innerHeight);
-  renderer = new THREE.WebGLRenderer({ canvas: canvas});
+  renderer = new THREE.WebGLRenderer({canvas: canvas});
   renderer.setSize( window.innerWidth, window.innerHeight );
   initPhysics();
   initBadTV();
@@ -515,6 +497,7 @@ window.onload = function() {
   windowLoaded = true;
   undoRedoHandler.push();
   MAX_VERTEX_UNIFORM_VECTORS = renderer.context.getParameter(renderer.context.MAX_VERTEX_UNIFORM_VECTORS);
+  VERTEX_SHADER_TEXTURE_FETCH_SUPPORTED = (renderer.context.getParameter(renderer.context.MAX_VERTEX_TEXTURE_IMAGE_UNITS) > 0);
 };
 
 window.addEventListener("mousedown", function(e){
@@ -550,7 +533,6 @@ window.addEventListener('resize', function() {
     camera.oldAspect = camera.aspect;
     camera.aspect = window.innerWidth / window.innerHeight;
     camera.updateProjectionMatrix();
-    console.log("[*] Renderer resized");
   }
 });
 window.addEventListener('keydown', function(event){
@@ -925,6 +907,7 @@ function enableAllOMControllers(){
   enableController(omEmissiveIntensityController);
   enableController(omDisplacementScaleController);
   enableController(omDisplacementBiasController);
+  enableController(omAOIntensityController);
 }
 
 function afterLightSelection(){
@@ -969,46 +952,46 @@ function afterObjectSelection(){
       objectManipulationParameters["Rotate x"] = 0;
       objectManipulationParameters["Rotate y"] = 0;
       objectManipulationParameters["Rotate z"] = 0;
-      objectManipulationParameters["Opacity"] = obj.material.opacity;
-      objectManipulationParameters["AO intensity"] = obj.material.aoMapIntensity;
+      objectManipulationParameters["Opacity"] = obj.mesh.material.uniforms.alpha.value;
       if (obj.metaData.isSlippery){
         objectManipulationParameters["Slippery"] = true;
       }else{
         objectManipulationParameters["Slippery"] = false;
       }
-      if (!obj.material.map){
+      if (obj.hasDisplacementMap()){
+        objectManipulationParameters["Disp. scale"] = obj.mesh.material.uniforms.displacementInfo.value.x;
+        objectManipulationParameters["Disp. bias"] = obj.mesh.material.uniforms.displacementInfo.value.y;
+      }else{
+        disableController(omDisplacementScaleController);
+        disableController(omDisplacementBiasController);
+      }
+      if (!obj.hasDiffuseMap()){
         disableController(omTextureOffsetXController);
         disableController(omTextureOffsetYController);
       }else{
-        objectManipulationParameters["Texture offset x"] = obj.material.map.offset.x;
-        objectManipulationParameters["Texture offset y"] = obj.material.map.offset.y;
+        objectManipulationParameters["Texture offset x"] = obj.mesh.material.uniforms.diffuseMap.value.offset.x;
+        objectManipulationParameters["Texture offset y"] = obj.mesh.material.uniforms.diffuseMap.value.offset.y;
+      }
+      if (!obj.hasAOMap()){
+        disableController(omAOIntensityController);
+      }else{
+        objectManipulationParameters["AO intensity"] = obj.mesh.material.uniforms.aoIntensity.value;
+      }
+      if (!obj.hasEmissiveMap()){
+        disableController(omEmissiveIntensityController);
+      }else{
+        objectManipulationParameters["Emissive int."] = obj.mesh.material.uniforms.emissiveIntensity.value;
       }
       if (!obj.material.isMeshPhongMaterial){
         disableController(omShininessController);
-        disableController(omEmissiveIntensityController);
-        disableController(omDisplacementScaleController);
-        disableController(omDisplacementBiasController);
       }else{
         objectManipulationParameters["Shininess"] = obj.material.shininess;
         objectManipulationParameters["Emissive int."] = obj.material.emissiveIntensity;
-        if (obj.material.displacementMap){
-          objectManipulationParameters["Disp. scale"] = obj.material.displacementScale;
-          objectManipulationParameters["Disp. bias"] = obj.material.displacementBias;
-        }else{
-          disableController(omDisplacementScaleController);
-          disableController(omDisplacementBiasController);
-        }
       }
     }else if (obj instanceof ObjectGroup){
-      var childObj;
-      for (var childName in obj.group){
-        childObj = obj.group[childName];
-        break;
-      }
       objectManipulationParameters["Rotate x"] = 0;
       objectManipulationParameters["Rotate y"] = 0;
       objectManipulationParameters["Rotate z"] = 0;
-      objectManipulationParameters["Opacity"] = childObj.material.opacity;
       if (obj.isSlippery){
         objectManipulationParameters["Slippery"] = true;
       }else{
@@ -1021,6 +1004,7 @@ function afterObjectSelection(){
       disableController(omDisplacementScaleController);
       disableController(omDisplacementBiasController);
       disableController(omAOIntensityController);
+      disableController(omOpacityController);
     }
     objectManipulationParameters["Mass"] = obj.physicsBody.mass;
     omMassController.updateDisplay();
@@ -1092,12 +1076,26 @@ function generateRandomBoxes(gridSystemName){
   var gridSystem = gridSystems[gridSystemName];
   for (var gridNumber in gridSystem.grids){
     var grid = gridSystem.grids[gridNumber];
+    grid.toggleSelect(false, false, false, false);
     var height = Math.random() * 100;
     var name = "randomGeneratedBox_"+gridSystemName+"_"+gridNumber;
     var color = ColorNames.generateRandomColor();
-    var material = new THREE.MeshBasicMaterial({color: color});
+    var material = new BasicMaterial({
+      color: color,
+      name: "null"
+    });
     gridSystem.newBox([grid], height, material, name);
   }
+}
+
+// WARNING: FOR TEST PURPOSES
+function mergeAllAddedObjects(){
+  var objNames = "";
+  for (var addedObjectName in addedObjects){
+    objNames += addedObjectName + ",";
+  }
+  objNames = objNames.substring(0, objNames.length - 1);
+  parseCommand("glue glue_test_1 "+objNames);
 }
 
 // WARNING: FOR TEST PURPOSES

@@ -17,8 +17,8 @@ var ObjectTrail = function(configurations){
     for (var i = 0; i<geometry.faces.length; i++){
       geometry.faces[i].roygbivObjectName = this.object.name;
       geometry.faces[i].vertexColors.push(color, color, color);
-      if (this.object.material.isMeshPhongMaterial){
-        geometry.faces[i].faceEmissiveIntensity = this.object.material.emissiveIntensity;
+      if (this.object.hasEmissiveMap()){
+        geometry.faces[i].faceEmissiveIntensity = this.object.mesh.material.uniforms.emissiveIntensity.value;
       }else{
         geometry.faces[i].faceEmissiveIntensity = 0;
       }
@@ -46,75 +46,59 @@ var ObjectTrail = function(configurations){
       var mi = geometry.faces[i].materialIndex;
       var objName = miMap[mi];
       geometry.faces[i].roygbivObjectName = objName;
+      var childObj = this.object.group[objName];
+      if (childObj.hasEmissiveMap()){
+        geometry.faces[i].faceEmissiveIntensity = childObj.mesh.material.uniforms.emissiveIntensity.value;
+      }else{
+        geometry.faces[i].faceEmissiveIntensity = 0;
+      }
     }
   }
 
   var texture = new THREE.Texture();
+  var tmpObjectsHolder = new Object();
   if (this.isAddedObject){
-    var textureCount = 0;
-    var texturesObject = new Object();
-    if (this.object.material.map){
-      textureCount ++;
-      texturesObject[this.object.name+",diffuse"] = this.object.material.map;
-    }
-    if (!(this.object.material instanceof THREE.MeshBasicMaterial)){
-      if (this.object.material.emissiveMap){
-        textureCount ++;
-        if (this.object.material.map){
-          this.object.material.emissiveMap.offset.copy(this.object.material.map.offset);
-          this.object.material.emissiveMap.updateMatrix();
-        }
-        texturesObject[this.object.name+",emissive"] = this.object.material.emissiveMap;
-      }
-    }
-    if ((this.object.material instanceof THREE.MeshPhongMaterial)){
-      if (this.object.material.displacementMap){
-        hasDisplacement = true;
-      }
-    }
-    if (this.object.material.alphaMap){
-      textureCount ++;
-      if (this.object.material.map){
-        this.object.material.alphaMap.offset.copy(this.object.material.map.offset);
-        this.object.material.alphaMap.updateMatrix();
-      }
-      texturesObject[this.object.name+",alpha"] = this.object.material.alphaMap;
-    }
-    if (textureCount > 0){
-      this.textureMerger = new TextureMerger(texturesObject);
-      texture = this.textureMerger.mergedTexture;
-    }
+    tmpObjectsHolder[this.object.name] = this.object;
   }else{
-    var textureCount = 0;
-    var texturesObj = new Object();
-    var txt;
-    for (var objectName in this.object.group){
-      var obj = this.object.group[objectName];
-      if (obj.material.map){
-        txt = obj.material.map;
-        texturesObj[objectName+",diffuse"] = obj.material.map;
-        textureCount ++;
-      }
-      if (!(obj.material instanceof THREE.MeshBasicMaterial)){
-        if (obj.material.emissiveMap){
-          texturesObj[objectName+",emissive"] = obj.material.emissiveMap;
-          textureCount ++;
-        }
-      }
-      if (obj.material instanceof THREE.MeshPhongMaterial){
-        if (obj.material.displacementMap){
-          hasDisplacement = true;
-        }
-      }
-      if (obj.material.alphaMap){
-        texturesObj[objectName+",alpha"] = obj.material.alphaMap;
-        textureCount ++;
-      }
+    for (var objName in this.object.group){
+      tmpObjectsHolder[objName] = this.object.group[objName];
     }
-    if (textureCount > 0){
-      this.textureMerger = new TextureMerger(texturesObj);
-      texture = this.textureMerger.mergedTexture;
+  }
+  var textureCount = 0;
+  var texturesObject = new Object();
+  for (var objName in tmpObjectsHolder){
+    var tmpObj = tmpObjectsHolder[objName];
+    if (tmpObj.hasDiffuseMap()){
+      textureCount ++;
+      texturesObject[objName+",diffuse"] = tmpObj.mesh.material.uniforms.diffuseMap.value;
     }
+    if (tmpObj.hasEmissiveMap()){
+      textureCount ++;
+      if (tmpObj.hasDiffuseMap()){
+        tmpObj.mesh.material.uniforms.emissiveMap.value.offset.copy(
+          tmpObj.mesh.material.uniforms.diffuseMap.value.offset
+        );
+        tmpObj.mesh.material.uniforms.emissiveMap.value.updateMatrix();
+      }
+      texturesObject[objName+",emissive"] = tmpObj.mesh.material.uniforms.emissiveMap.value;
+    }
+    if (tmpObj.hasDisplacementMap()){
+      hasDisplacement = true;
+    }
+    if (tmpObj.hasAlphaMap()){
+      textureCount ++;
+      if (tmpObj.hasDiffuseMap()){
+        tmpObj.mesh.material.uniforms.alphaMap.value.offset.copy(
+          tmpObj.mesh.material.uniforms.diffuseMap.value.offset
+        );
+        tmpObj.mesh.material.uniforms.alphaMap.value.updateMatrix();
+      }
+      texturesObject[objName+",alpha"] = tmpObj.mesh.material.uniforms.alphaMap.value;
+    }
+  }
+  if (textureCount > 0){
+    this.textureMerger = new TextureMerger(texturesObject);
+    texture = this.textureMerger.mergedTexture;
   }
 
   var faces = geometry.faces;
@@ -129,7 +113,7 @@ var ObjectTrail = function(configurations){
         this.displacedPositionCounters = new Object();
         for (var objName in this.object.group){
           var child = this.object.group[objName];
-          if (!child.material.displacementMap){
+          if (!child.hasDisplacementMap()){
             continue;
           }
           child.previewMesh.updateMatrix();
@@ -184,7 +168,7 @@ var ObjectTrail = function(configurations){
       }else{
         var childName = face.roygbivObjectName;
         var childObj = this.object.group[childName];
-        if ((childObj.material instanceof THREE.MeshPhongMaterial) && childObj.material.displacementMap){
+        if (childObj.hasDisplacementMap()){
           var displacedChldPositions = this.displacedPositions[childName];
           var iDisplacedCtr = this.displacedPositionCounters[childName];
           objPositions.push(displacedChldPositions[iDisplacedCtr ++]);
@@ -265,13 +249,11 @@ var ObjectTrail = function(configurations){
         vUVary4.push(new THREE.Vector2(-20, -20));
       }
       if (this.isAddedObject){
-        if (this.object.material.map){
+        if (this.object.hasDiffuseMap()){
           isTextured = true;
         }else{
-          if (!(this.object.material instanceof THREE.MeshBasicMaterial)){
-            if (this.object.material.emissiveMap){
-              isTextured = true;
-            }
+          if (this.object.hasEmissiveMap()){
+            isTextured = true;
           }
         }
       }else{
@@ -279,7 +261,7 @@ var ObjectTrail = function(configurations){
         if (obj.material.map){
           isTextured = true;
         }else{
-          if (!(obj.material instanceof THREE.MeshBasicMaterial)){
+          if (!(obj.hasBasicMaterial)){
             if (obj.material.emissiveMap){
               isTextured = true;
             }
@@ -305,22 +287,9 @@ var ObjectTrail = function(configurations){
     objColors.push(curVertexColors[1]);
     objColors.push(curVertexColors[2]);
 
-    if (this.isAddedObject){
-      objEmissiveIntensities.push(face.faceEmissiveIntensity);
-      objEmissiveIntensities.push(face.faceEmissiveIntensity);
-      objEmissiveIntensities.push(face.faceEmissiveIntensity);
-    }else{
-      var childObj = this.object.group[face.roygbivObjectName];
-      if (childObj.material.isMeshPhongMaterial){
-        objEmissiveIntensities.push(childObj.material.emissiveIntensity);
-        objEmissiveIntensities.push(childObj.material.emissiveIntensity);
-        objEmissiveIntensities.push(childObj.material.emissiveIntensity);
-      }else{
-        objEmissiveIntensities.push(0);
-        objEmissiveIntensities.push(0);
-        objEmissiveIntensities.push(0);
-      }
-    }
+    objEmissiveIntensities.push(face.faceEmissiveIntensity);
+    objEmissiveIntensities.push(face.faceEmissiveIntensity);
+    objEmissiveIntensities.push(face.faceEmissiveIntensity);
 
     if (isTextured){
       objTextureFlags.push(20.0);
@@ -487,7 +456,7 @@ var ObjectTrail = function(configurations){
     }
   });
 
-  if (this.object.material instanceof THREE.MeshBasicMaterial && this.object.material.wireframe){
+  if (this.object.hasWireframeMaterial){
     this.mesh = new THREE.Line(this.geometry, this.material);
   }else{
     this.mesh = new THREE.Mesh(this.geometry, this.material);
@@ -521,8 +490,8 @@ ObjectTrail.prototype.update = function(){
     posit = this.object.previewMesh.position;
     quat = this.object.previewMesh.quaternion;
   }else{
-    posit = this.object.previewGraphicsGroup.position;
-    quat = this.object.previewGraphicsGroup.quaternion;
+    posit = this.object.previewMesh.position;
+    quat = this.object.previewMesh.quaternion;
   }
   this.material.uniforms.objectCoordinates.value[this.objectCoordinateCounter++] = posit.x;
   this.material.uniforms.objectCoordinates.value[this.objectCoordinateCounter++] = posit.y;

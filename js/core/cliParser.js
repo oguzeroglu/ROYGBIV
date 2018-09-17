@@ -323,55 +323,13 @@ function parse(input){
               object.previewGraphicsGroup.quaternion.copy(
                 object.initQuaternion
               );
+              object.previewMesh.quaternion.copy(
+                object.initQuaternion
+              );
               object.resetPosition();
-              for (var childObjectName in object.group){
-                var childObject = object.group[childObjectName];
-                if (childObject.material.map){
-                  if (childObject.material.map.initOffsetXSet){
-                    childObject.material.map.offset.x = childObject.material.map.initOffsetX;
-                    childObject.material.needsUpdate = true;
-                    childObject.material.map.initOffsetXSet = false;
-                  }
-                  if (childObject.material.displacementMap){
-                    if (childObject.initDisplacementScaleSet){
-                      childObject.material.displacementScale = childObject.initDisplacementScale;
-                      childObject.material.needsUpdate = true;
-                      childObject.initDisplacementScaleSet = false;
-                    }
-                    if (childObject.initDisplacementBiasSet){
-                      childObject.material.displacementBias = childObject.initDisplacementBias;
-                      childObject.material.needsUpdate = true;
-                      childObject.initDisplacementBiasSet = false;
-                    }
-                  }
-                  if (childObject.material.map.initOffsetYSet){
-                    childObject.material.map.offset.y = childObject.material.map.initOffsetY;
-                    childObject.material.needsUpdate = true;
-                    childObject.material.map.initOffsetYSet = false;
-                  }
-                }
-                if (childObject.initOpacitySet){
-                  childObject.material.transparent = true;
-                  childObject.material.opacity = childObject.initOpacity;
-                  childObject.material.needsUpdate = true;
-                  childObject.initOpacitySet = false;
-                }
-                if (childObject.material.isMeshPhongMaterial){
-                  if (childObject.initShininessSet){
-                    childObject.material.shininess = childObject.initShininess;
-                    childObject.material.needsUpdate = true;
-                    childObject.initShininessSet = false;
-                  }
-                  if (childObject.initEmissiveIntensitySet){
-                    childObject.material.emissiveIntensity = childObject.initEmissiveIntensity;
-                    childObject.material.needsUpdate = true;
-                    childObject.initEmissiveIntensitySet = false;
-                  }
-                }
-              }
 
               if (!object.isVisibleOnThePreviewScene()){
-                object.previewGraphicsGroup.visible = true;
+                object.previewMesh.visible = true;
                 physicsWorld.addBody(object.physicsBody);
               }
 
@@ -402,46 +360,41 @@ function parse(input){
                 object.initQuaternion
               );
               object.resetPosition();
-              if (object.material.map){
-                if (object.material.map.initOffsetXSet){
-                  object.material.map.offset.x = object.material.map.initOffsetX;
-                  object.material.needsUpdate = true;
-                  object.material.map.initOffsetXSet = false;
+              if (object.hasDiffuseMap()){
+                if (object.mesh.material.uniforms.diffuseMap.value.initOffsetXSet){
+                  object.mesh.material.uniforms.diffuseMap.value.offset.x = object.mesh.material.uniforms.diffuseMap.value.initOffsetX;
+                  object.mesh.material.uniforms.diffuseMap.value.updateMatrix();
+                  object.mesh.material.uniforms.diffuseMap.value.initOffsetXSet = false;
                 }
-                if (object.material.map.initOffsetYSet){
-                  object.material.map.offset.y = object.material.map.initOffsetY;
-                  object.material.needsUpdate = true;
-                  object.material.map.initOffsetYSet = false;
+                if (object.mesh.material.uniforms.diffuseMap.value.initOffsetYSet){
+                  object.mesh.material.uniforms.diffuseMap.value.offset.y = object.mesh.material.uniforms.diffuseMap.value.initOffsetY;
+                  object.mesh.material.uniforms.diffuseMap.value.updateMatrix();
+                  object.mesh.material.uniforms.diffuseMap.value.initOffsetYSet = false;
                 }
               }
-              if (object.material.displacementMap){
+              if (object.hasDisplacementMap()){
                 if (object.initDisplacementScaleSet){
-                  object.material.displacementScale = object.initDisplacementScale;
-                  object.material.needsUpdate = true;
+                  object.mesh.material.uniforms.displacementInfo.value.x = object.initDisplacementScale;
                   object.initDisplacementScaleSet = false;
                 }
                 if (object.initDisplacementBiasSet){
-                  object.material.displacementBias = object.initDisplacementBias;
-                  object.material.needsUpdate = true;
+                  object.mesh.material.uniforms.displacementInfo.value.y = object.initDisplacementBias;
                   object.initDisplacementBiasSet = false;
                 }
               }
               if (object.initOpacitySet){
-                object.material.transparent = true;
-                object.material.opacity = object.initOpacity;
-                object.material.needsUpdate = true;
+                object.updateOpacity(object.initOpacity);
                 object.initOpacitySet = false;
+              }
+              if (object.initEmissiveIntensitySet){
+                object.mesh.material.uniforms.emissiveIntensity.value = object.initEmissiveIntensity;
+                object.initEmissiveIntensitySet = false;
               }
               if (object.material.isMeshPhongMaterial){
                 if (object.initShininessSet){
                   object.material.shininess = object.initShininess;
                   object.material.needsUpdate = true;
                   object.initShininessSet = false;
-                }
-                if (object.initEmissiveIntensitySet){
-                  object.material.emissiveIntensity = object.initEmissiveIntensity;
-                  object.material.needsUpdate = true;
-                  object.initEmissiveIntensitySet = false;
                 }
               }
 
@@ -471,6 +424,12 @@ function parse(input){
               worldBinHandler = new WorldBinHandler();
             }else{
               worldBinHandler = 0;
+            }
+
+            if (fogActive){
+              GLOBAL_FOG_UNIFORM.value.set(fogDensity, fogColorRGB.r, fogColorRGB.g, fogColorRGB.b);
+            }else{
+              GLOBAL_FOG_UNIFORM.value.set(-100.0, 0, 0, 0);
             }
 
             ROYGBIV.globals = new Object();
@@ -523,9 +482,8 @@ function parse(input){
 
             for (var objectName in objectGroups){
               var object = objectGroups[objectName];
-              object.graphicsGroup.quaternion.copy(
-                object.initQuaternion
-              );
+              object.graphicsGroup.quaternion.copy(object.initQuaternion);
+              object.mesh.quaternion.copy(object.initQuaternion);
               object.resetPosition();
 
               if (!(typeof object.originalMass == "undefined")){
@@ -534,52 +492,6 @@ function parse(input){
                   delete dynamicObjectGroups[object.name];
                 }
                 delete object.originalMass;
-              }
-
-              for (var childObjectName in object.group){
-                var childObject = object.group[childObjectName];
-                if (childObject.material.map){
-                  if (childObject.material.map.initOffsetXSet){
-                    childObject.material.map.offset.x = childObject.material.map.initOffsetX;
-                    childObject.material.needsUpdate = true;
-                    childObject.material.map.initOffsetXSet = false;
-                  }
-                  if (childObject.material.map.initOffsetYSet){
-                    childObject.material.map.offset.y = childObject.material.map.initOffsetY;
-                    childObject.material.needsUpdate = true;
-                    childObject.material.map.initOffsetYSet = false;
-                  }
-                }
-                if (childObject.material.displacementMap){
-                  if (childObject.initDisplacementScaleSet){
-                    childObject.material.displacementScale = childObject.initDisplacementScale;
-                    childObject.material.needsUpdate = true;
-                    childObject.initDisplacementScaleSet = false;
-                  }
-                  if (childObject.initDisplacementBiasSet){
-                    childObject.material.displacementBias = childObject.initDisplacementBias;
-                    childObject.material.needsUpdate = true;
-                    childObject.initDisplacementBiasSet = false;
-                  }
-                }
-                if (childObject.initOpacitySet){
-                  childObject.material.transparent = true;
-                  childObject.material.opacity = childObject.initOpacity;
-                  childObject.material.needsUpdate = true;
-                  childObject.initOpacitySet = false;
-                }
-                if (childObject.material.isMeshPhongMaterial){
-                  if (childObject.initShininessSet){
-                    childObject.material.shininess = childObject.initShininess;
-                    childObject.material.needsUpdate = true;
-                    childObject.initShininessSet = false;
-                  }
-                  if (childObject.initEmissiveIntensitySet){
-                    childObject.material.emissiveIntensity = childObject.initEmissiveIntensity;
-                    childObject.material.needsUpdate = true;
-                    childObject.initEmissiveIntensitySet = false;
-                  }
-                }
               }
             }
             for (var objectName in addedObjects){
@@ -610,46 +522,41 @@ function parse(input){
                 object.resetTexturePackAfterAnimation();
               }
 
-              if (object.material.map){
-                if (object.material.map.initOffsetXSet){
-                  object.material.map.offset.x = object.material.map.initOffsetX;
-                  object.material.needsUpdate = true;
-                  object.material.map.initOffsetXSet = false;
+              if (object.hasDiffuseMap()){
+                if (object.mesh.material.uniforms.diffuseMap.value.initOffsetXSet){
+                  object.mesh.material.uniforms.diffuseMap.value.offset.x = object.mesh.material.uniforms.diffuseMap.value.initOffsetX;
+                  object.mesh.material.uniforms.diffuseMap.value.updateMatrix();
+                  object.mesh.material.uniforms.diffuseMap.value.initOffsetXSet = false;
                 }
-                if (object.material.map.initOffsetYSet){
-                  object.material.map.offset.y = object.material.map.initOffsetY;
-                  object.material.needsUpdate = true;
-                  object.material.map.initOffsetYSet = false;
+                if (object.mesh.material.uniforms.diffuseMap.value.initOffsetYSet){
+                  object.mesh.material.uniforms.diffuseMap.value.offset.y = object.mesh.material.uniforms.diffuseMap.value.initOffsetY;
+                  object.mesh.material.uniforms.diffuseMap.value.updateMatrix();
+                  object.mesh.material.uniforms.diffuseMap.value.initOffsetYSet = false;
                 }
               }
-              if (object.material.displacementMap){
+              if (object.hasDisplacementMap()){
                 if (object.initDisplacementScaleSet){
-                  object.material.displacementScale = object.initDisplacementScale;
-                  object.material.needsUpdate = true;
+                  object.mesh.material.uniforms.displacementInfo.value.x = object.initDisplacementScale;
                   object.initDisplacementScaleSet = false;
                 }
                 if (object.initDisplacementBiasSet){
-                  object.material.displacementBias = object.initDisplacementBias;
-                  object.material.needsUpdate = true;
+                  object.mesh.material.uniforms.displacementInfo.value.y = object.initDisplacementBias;
                   object.initDisplacementBiasSet = false;
                 }
               }
               if (object.initOpacitySet){
-                object.material.transparent = true;
-                object.material.opacity = object.initOpacity;
-                object.material.needsUpdate = true;
+                object.updateOpacity(object.initOpacity);
                 object.initOpacitySet = false;
+              }
+              if (object.initEmissiveIntensitySet){
+                object.mesh.material.uniforms.emissiveIntensity.value = object.initEmissiveIntensity;
+                object.initEmissiveIntensitySet = false;
               }
               if (object.material.isMeshPhongMaterial){
                 if (object.initShininessSet){
                   object.material.shininess = object.initShininess;
                   object.material.needsUpdate = true;
                   object.initShininessSet = false;
-                }
-                if (object.initEmissiveIntensitySet){
-                  object.material.emissiveIntensity = object.initEmissiveIntensity;
-                  object.material.needsUpdate = true;
-                  object.initEmissiveIntensitySet = false;
                 }
               }
 
@@ -686,6 +593,8 @@ function parse(input){
               workerHandler.stopBinHandlerLoop(true);
             }
 
+            GLOBAL_FOG_UNIFORM.value.set(-100.0, 0, 0, 0);
+
           }
           initBadTV();
           return true;
@@ -693,7 +602,6 @@ function parse(input){
         case 14: //newBasicMaterial
           var name = splitted[1];
           var color = splitted[2];
-          var isWireFramed = splitted[3];
           if (mode != 0){
             terminal.printError(Text.WORKS_ONLY_IN_DESIGN_MODE);
             return true;
@@ -707,21 +615,11 @@ function parse(input){
             terminal.printError(Text.MATERIAL_NAME_MUST_BE_UNIQUE);
             return true;
           }
-          if (isWireFramed != "true" && isWireFramed != "false"){
-            terminal.printError(Text.ISWIREFRAMED_MUST_BE_TRUE_OR_FALSE);
-            return true;
-          }
-          var isWireFrameBool = false;
-          if (isWireFramed == "true"){
-            isWireFrameBool = true;
-          }
-          var basicMaterial = new THREE.MeshBasicMaterial({
+          var basicMaterial = new BasicMaterial({
+            name: name,
             color: color,
-            side: THREE.DoubleSide,
-            wireframe: isWireFrameBool
-          });
-          basicMaterial.textColor = color;
-          basicMaterial.roygbivMaterialName = name;
+            alpha: 1
+          })
           materials[name] = basicMaterial;
           terminal.printInfo(Text.MATERIAL_CREATED);
           undoRedoHandler.push();
@@ -740,17 +638,11 @@ function parse(input){
               options = false;
             }
             var material = materials[name];
-            if (material.isMeshBasicMaterial){
-              var wireFramedStr = "(is not wireframed)";
-              if (material.wireframe){
-                wireFramedStr = "(is wireframed)";
-              }
+            if (material instanceof BasicMaterial){
               terminal.printInfo(Text.BASIC_MATERIAL_INFO_TREE.replace(
                 Text.PARAM1, name
               ).replace(
                 Text.PARAM2, material.textColor
-              ).replace(
-                Text.PARAM3, wireFramedStr
               ), options);
             }else if (material.isMeshPhongMaterial){
               terminal.printInfo(Text.PHONG_MATERIAL_INFO_TREE.replace(
@@ -828,12 +720,11 @@ function parse(input){
             }
           }else{
             if (defaultMaterialType == "BASIC"){
-              selectedMaterial = new THREE.MeshBasicMaterial({
+              selectedMaterial = new BasicMaterial({
+                name: "NULL_BASIC",
                 color: "white",
-                side: THREE.DoubleSide,
-                wireframe: false
+                alpha: 1
               });
-              selectedMaterial.roygbivMaterialName = "NULL_BASIC";
             }else if (defaultMaterialType == "PHONG"){
               selectedMaterial = new THREE.MeshPhongMaterial({
                 color: "white",
@@ -937,7 +828,7 @@ function parse(input){
           var materialText;
           if (object.material.isMeshPhongMaterial){
             materialText = "PHONG";
-          }else if (object.material.isMeshBasicMaterial){
+          }else if (object.hasBasicMaterial){
             materialText = "BASIC";
           }
           terminal.printInfo(Text.TREE2.replace(
@@ -1187,8 +1078,7 @@ function parse(input){
           cloneTexture.roygbivTextureName = textureName;
           cloneTexture.roygbivTexturePackName = 0;
 
-          addedObject.mesh.material.map = cloneTexture;
-          addedObject.previewMesh.material.map = cloneTexture;
+          addedObject.mapDiffuse(cloneTexture);
 
           cloneTexture.needsUpdate = true;
 
@@ -1198,8 +1088,6 @@ function parse(input){
           cloneTexture.wrapS = THREE.RepeatWrapping;
           cloneTexture.wrapT = THREE.RepeatWrapping;
 
-          addedObject.mesh.material.needsUpdate = true;
-          addedObject.previewMesh.material.needsUpdate = true;
           addedObject.resetAssociatedTexturePack();
           terminal.printInfo(Text.TEXTURE_MAPPED);
           undoRedoHandler.push();
@@ -1321,12 +1209,11 @@ function parse(input){
             }
           }else{
             if (defaultMaterialType == "BASIC"){
-              material = new THREE.MeshBasicMaterial({
+              material = new BasicMaterial({
+                name: "NULL_BASIC",
                 color: "white",
-                side: THREE.DoubleSide,
-                wireframe: false
+                alpha: 1
               });
-              material.roygbivMaterialName = "NULL_BASIC";
             }else if (defaultMaterialType == "PHONG"){
               material = new THREE.MeshPhongMaterial({
                 color: "white",
@@ -1382,9 +1269,9 @@ function parse(input){
             terminal.printError(Text.AXIS_MUST_BE_Y_OR_Z);
             return true;
           }
-
           gridSystem.newRamp(anchorGrid, otherGrid, axis, parseInt(height), material, name);
           anchorGrid = 0;
+          terminal.printInfo(Text.RAMP_CREATED);
           undoRedoHandler.push();
         break;
         case 31: //setAnchor
@@ -1489,12 +1376,11 @@ function parse(input){
             }
           }else{
             if (defaultMaterialType == "BASIC"){
-              material = new THREE.MeshBasicMaterial({
+              material = new BasicMaterial({
+                name: "NULL_BASIC",
                 color: "white",
-                side: THREE.DoubleSide,
-                wireframe: false
+                alpha: 1
               });
-              material.roygbivMaterialName = "NULL_BASIC";
             }else if (defaultMaterialType == "PHONG"){
               material = new THREE.MeshPhongMaterial({
                 color: "white",
@@ -1778,6 +1664,11 @@ function parse(input){
             return true;
           }
 
+          if (addedObject.hasBasicMaterial){
+            terminal.printError(Text.SPECULAR_MAPS_ARE_NOT_SUPPORTED);
+            return true;
+          }
+
           var cloneTexture = texture.clone();
           cloneTexture.fromUploadedImage = texture.fromUploadedImage;
 
@@ -1833,16 +1724,13 @@ function parse(input){
           cloneTexture.roygbivTextureName = textureName;
           cloneTexture.roygbivTexturePackName = 0;
 
-          addedObject.mesh.material.aoMap = cloneTexture;
-          addedObject.previewMesh.material.aoMap = cloneTexture;
-
           cloneTexture.wrapS = THREE.RepeatWrapping;
           cloneTexture.wrapT = THREE.RepeatWrapping;
 
+          addedObject.mapAO(cloneTexture);
+
           cloneTexture.needsUpdate = true;
 
-          addedObject.mesh.material.needsUpdate = true;
-          addedObject.previewMesh.material.needsUpdate = true;
           addedObject.resetAssociatedTexturePack();
           terminal.printInfo(Text.AMBIENT_OCCULSION_TEXTURE_MAPPED);
           undoRedoHandler.push();
@@ -1879,20 +1767,13 @@ function parse(input){
           cloneTexture.roygbivTextureName = textureName;
           cloneTexture.roygbivTexturePackName = 0;
 
-          addedObject.mesh.material.alpaMap = cloneTexture;
-          addedObject.previewMesh.material.alphaMap = cloneTexture;
+          addedObject.mapAlpha(cloneTexture);
 
           cloneTexture.wrapS = THREE.RepeatWrapping;
           cloneTexture.wrapT = THREE.RepeatWrapping;
 
           cloneTexture.needsUpdate = true;
 
-          addedObject.mesh.material.transparent = false;
-          addedObject.previewMesh.material.transparent = false;
-          addedObject.mesh.material.alphaTest = 0.5;
-          addedObject.previewMesh.material.alphaTest = 0.5;
-          addedObject.mesh.material.needsUpdate = true;
-          addedObject.previewMesh.material.needsUpdate = true;
           addedObject.resetAssociatedTexturePack();
           terminal.printInfo(Text.ALPHA_TEXTURE_MAPPED);
           undoRedoHandler.push();
@@ -2073,7 +1954,7 @@ function parse(input){
             return true;
           }
 
-          if (addedObject.mesh.material.isMeshBasicMaterial){
+          if (addedObject.hasBasicMaterial){
             terminal.printError(Text.NORMAL_MAPS_ARE_NOT_SUPPROTED);
             return true;
           }
@@ -2124,30 +2005,19 @@ function parse(input){
             return true;
           }
 
-          if (addedObject.mesh.material.isMeshBasicMaterial){
-            terminal.printError(Text.EMISSIVE_MAPS_ARE_NOT_SUPPORTED);
-            return true;
-          }
-
-          addedObject.mesh.material.emissive = new THREE.Color( 0xffffff );
-          addedObject.previewMesh.material.emissive = new THREE.Color( 0xffffff );
-
           var cloneTexture = texture.clone();
           cloneTexture.fromUploadedImage = texture.fromUploadedImage;
 
           cloneTexture.roygbivTextureName = textureName;
           cloneTexture.roygbivTexturePackName = 0;
 
-          addedObject.mesh.material.emissiveMap = cloneTexture;
-          addedObject.previewMesh.material.emissiveMap = cloneTexture;
-
           cloneTexture.wrapS = THREE.RepeatWrapping;
           cloneTexture.wrapT = THREE.RepeatWrapping;
 
+          addedObject.mapEmissive(cloneTexture);
+
           cloneTexture.needsUpdate = true;
 
-          addedObject.mesh.material.needsUpdate = true;
-          addedObject.previewMesh.material.needsUpdate = true;
           addedObject.resetAssociatedTexturePack();
           terminal.printInfo(Text.EMISSIVE_TEXTURE_MAPPED);
           undoRedoHandler.push();
@@ -2334,11 +2204,6 @@ function parse(input){
             return true;
           }
 
-          if (!addedObject.mesh.material.isMeshPhongMaterial){
-            terminal.printError(Text.HEIGHT_MAPS_ARE_SUPPORTED_ONLY_BY);
-            return true;
-          }
-
           if (addedObject.metaData["widthSegments"] == 1){
             addedObject.segmentGeometry(false, undefined);
           }
@@ -2349,16 +2214,12 @@ function parse(input){
           cloneTexture.roygbivTextureName = textureName;
           cloneTexture.roygbivTexturePackName = 0;
 
-          addedObject.mesh.material.displacementMap = cloneTexture;
-          addedObject.previewMesh.material.displacementMap = cloneTexture;
-
           cloneTexture.wrapS = THREE.RepeatWrapping;
           cloneTexture.wrapT = THREE.RepeatWrapping;
 
+          addedObject.mapDisplacement(cloneTexture);
           cloneTexture.needsUpdate = true;
 
-          addedObject.mesh.material.needsUpdate = true;
-          addedObject.previewMesh.material.needsUpdate = true;
           addedObject.resetAssociatedTexturePack();
           terminal.printInfo(Text.HEIGHT_TEXTURE_MAPPED);
           undoRedoHandler.push();
@@ -2947,6 +2808,7 @@ function parse(input){
           }else{
             terminal.printInfo(Text.OK);
           }
+          afterObjectSelection();
           return true;
         break;
         case 79: //redo
@@ -2961,6 +2823,7 @@ function parse(input){
           }else{
             terminal.printInfo(Text.OK);
           }
+          afterObjectSelection();
           return true;
         break;
         case 80: //selectObject
@@ -3315,25 +3178,32 @@ function parse(input){
               terminal.printError(Text.MUST_GLUE_AT_LEAST_2_OBJECTS);
               return true;
             }
-            var detachedObjectGroups = new Object();
+
             for (var i = 0; i<objectNamesArray.length; i++){
               var object = addedObjects[objectNamesArray[i]];
               if (!object){
-                var gluedObject = objectGroups[objectNamesArray[i]];
-                if (gluedObject){
-                  detachedObjectGroups[gluedObject.name] = gluedObject;
-                  gluedObject.detach();
-                  delete objectGroups[gluedObject.name];
-                  for (var gluedObjectName in gluedObject.group){
-                    group[gluedObjectName] = gluedObject.group[gluedObjectName];
-                  }
-                  continue;
-                }else{
+                object = objectGroups[objectNamesArray[i]];
+                if (!object){
                   terminal.printError(Text.OBJECT_NR_DOES_NOT_EXIST.replace(
                     Text.PARAM1, (i+1)
                   ));
                   return true;
                 }
+              }
+            }
+
+            var detachedObjectGroups = new Object();
+            for (var i = 0; i<objectNamesArray.length; i++){
+              var object = addedObjects[objectNamesArray[i]];
+              if (!object){
+                var gluedObject = objectGroups[objectNamesArray[i]];
+                detachedObjectGroups[gluedObject.name] = gluedObject;
+                gluedObject.detach();
+                delete objectGroups[gluedObject.name];
+                for (var gluedObjectName in gluedObject.group){
+                  group[gluedObjectName] = gluedObject.group[gluedObjectName];
+                }
+                continue;
               }else{
                 if (object.physicsBody.velocity.x != 0 || object.physicsBody.velocity.y != 0 ||
                     object.physicsBody.velocity.z != 0){
@@ -3350,7 +3220,7 @@ function parse(input){
             var materialUsed = 0;
             for (var objName in group){
               if (!materialUsed){
-                if (group[objName].material instanceof THREE.MeshBasicMaterial){
+                if (group[objName].hasBasicMaterial){
                   materialUsed = 1;
                 }else if (group[objName].material instanceof THREE.MeshPhongMaterial){
                   materialUsed = 2;
@@ -3359,7 +3229,7 @@ function parse(input){
                 if (materialUsed == 1 && (group[objName].material instanceof THREE.MeshPhongMaterial)){
                   terminal.printError(Text.CANNOT_GLUE_OBJECTS_WITH_DIFFERENT_MATERIAL_TYPES);
                   return true;
-                }else if (materialUsed == 2 && (group[objName].material instanceof THREE.MeshBasicMaterial)){
+                }else if (materialUsed == 2 && (group[objName].hasBasicMaterial)){
                   terminal.printError(Text.CANNOT_GLUE_OBJECTS_WITH_DIFFERENT_MATERIAL_TYPES);
                   return true;
                 }
@@ -4247,12 +4117,11 @@ function parse(input){
             }
           }else{
             if (defaultMaterialType == "BASIC"){
-              material = new THREE.MeshBasicMaterial({
+              material = new BasicMaterial({
+                name: "NULL_BASIC",
                 color: "white",
-                side: THREE.DoubleSide,
-                wireframe: false
+                alpha: 1
               });
-              material.roygbivMaterialName = "NULL_BASIC";
             }else if (defaultMaterialType == "PHONG"){
               material = new THREE.MeshPhongMaterial({
                 color: "white",

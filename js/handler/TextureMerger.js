@@ -2,6 +2,25 @@ var TextureMerger = function(texturesObj){
   if (!texturesObj){
     return;
   }
+
+  for (var textureName in texturesObj){
+
+  }
+
+  this.dataURLs = new Object();
+  for (var textureName in texturesObj){
+    var txt = texturesObj[textureName];
+    if (typeof txt.image.toDataURL == UNDEFINED){
+      var tmpCanvas = document.createElement("canvas");
+      tmpCanvas.width = txt.image.naturalWidth;
+      tmpCanvas.height = txt.image.naturalHeight;
+      tmpCanvas.getContext('2d').drawImage(txt.image, 0, 0);
+      this.dataURLs[textureName] = tmpCanvas.toDataURL();
+    }else{
+      this.dataURLs[textureName] = txt.image.toDataURL();
+    }
+  }
+
   this.canvas = document.createElement("canvas");
 
   this.textureCount = 0;
@@ -310,13 +329,13 @@ var TextureMerger = function(texturesObj){
 
 TextureMerger.prototype.isTextureAlreadyInserted = function(textureName, texturesObj){
   var texture = texturesObj[textureName];
-  var img = texture.image.toDataURL();
+  var img = this.dataURLs[textureName];
   for (var tName in texturesObj){
     if (tName == textureName){
       continue;
     }
     var txt = texturesObj[tName];
-    var tImg = txt.image.toDataURL();
+    var tImg = this.dataURLs[tName];
     if (img == tImg && (txt.offset.x == texture.offset.x) && (txt.offset.y == texture.offset.y)
                 && (txt.offset.z == texture.offset.z) && (txt.repeat.x == texture.repeat.x)
                 && (txt.repeat.y == texture.repeat.y) && (txt.flipX == texture.flipX) && (txt.flipY == texture.flipY)

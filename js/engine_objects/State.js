@@ -23,10 +23,8 @@ var State = function(){
     curMaterialExport["opacity"] = opacity;
     curMaterialExport["aoMapIntensity"] = aoMapIntensity;
     curMaterialExport["textColor"] = curMaterial.textColor;
-    if (curMaterial.isMeshBasicMaterial){
+    if (curMaterial instanceof BasicMaterial){
       curMaterialExport["materialType"] = "BASIC";
-      var isWireFramed = curMaterial.wireframe;
-      curMaterialExport["isWireFramed"] = isWireFramed;
     }else if (curMaterial.isMeshPhongMaterial){
       curMaterialExport["materialType"] = "PHONG";
       var shininess = curMaterial.shininess;
@@ -59,7 +57,9 @@ var State = function(){
   // TEXTURE SIZES AND PADDING *************************************
   var textureSizes = new Object();
   var texturePaddings = new Object();
+  this.totalTextureCount = 0;
   for (var textureName in textures){
+    this.totalTextureCount ++;
     if (textures[textureName].image){
       textureSizes[textureName] = new Object();
       textureSizes[textureName].width = textures[textureName].image.width;
@@ -130,7 +130,9 @@ var State = function(){
   this.pointLightRepresentations = pointLightRepresentationsExport;
   // TEXTURE PACKS *************************************************
   var texturePacksExport = new Object();
+  this.totalTexturePackCount = 0;
   for (var texturePackName in texturePacks){
+    this.totalTexturePackCount ++;
     texturePacksExport[texturePackName] = texturePacks[texturePackName].export();
   }
   this.texturePacks = texturePacksExport;

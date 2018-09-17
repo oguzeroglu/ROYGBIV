@@ -6,6 +6,9 @@ var TexturePack = function(name, directoryName, fileExtension, mapCallback, isPr
   this.scaleFactor = scaleFactor;
   this.refTexturePackName = refTexturePackName;
 
+  this.maxAttemptCount = 7;
+  this.totalLoadedCount = 0;
+
   this.hasDiffuse = false;
   this.hasAlpha = false;
   this.hasAO = false;
@@ -130,15 +133,9 @@ TexturePack.prototype.destroy = function(){
 }
 
 TexturePack.prototype.readyCallback = function(){
-  if ((this.diffuseCanMapFlag ||
-      this.alphaCanMapFlag ||
-      this.aoCanMapFlag ||
-      this.emissiveCanMapFlag ||
-      this.normalCanMapFlag ||
-      this.specularCanMapFlag ||
-      this.heightCanMapFlag) &&
-      this.mapCallback){
-        this.mapCallback();
+  this.totalLoadedCount ++;
+  if (this.maxAttemptCount == this.totalLoadedCount && this.mapCallback){
+    this.mapCallback();
   }
 }
 

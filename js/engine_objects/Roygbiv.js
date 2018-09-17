@@ -233,6 +233,7 @@ Roygbiv.prototype.getPosition = function(object, targetVector, axis){
     if (axis){
       if (object.parentObjectName){
         var parentObject = objectGroups[object.parentObjectName];
+        parentObject.previewGraphicsGroup.updateMatrix();
         var child = parentObject.previewGraphicsGroup.children[object.indexInParent];
         child.getWorldPosition(REUSABLE_VECTOR);
         var worldPosition = REUSABLE_VECTOR;
@@ -254,6 +255,7 @@ Roygbiv.prototype.getPosition = function(object, targetVector, axis){
     }else{
       if (object.parentObjectName){
         var parentObject = objectGroups[object.parentObjectName];
+        parentObject.previewGraphicsGroup.updateMatrix();
         var child = parentObject.previewGraphicsGroup.children[object.indexInParent];
         child.getWorldPosition(REUSABLE_VECTOR);
         var worldPosition = REUSABLE_VECTOR;
@@ -263,9 +265,7 @@ Roygbiv.prototype.getPosition = function(object, targetVector, axis){
           targetVector.z = worldPosition.z;
           return targetVector;
         }else{
-          return this.vector(
-            worldPosition.x, worldPosition.y, worldPosition.z
-          );
+          return this.vector(worldPosition.x, worldPosition.y, worldPosition.z);
         }
       }
       if (targetVector){
@@ -456,7 +456,7 @@ Roygbiv.prototype.getOpacity = function(object){
     throw new Error("getOpacity error: Type not supported.");
     return;
   }
-  return object.material.opacity;
+  return object.previewMesh.material.uniforms.alpha.value;
 }
 
 // getShininess
@@ -496,11 +496,11 @@ Roygbiv.prototype.getHeightMapScale = function(object){
     throw new Error("getHeightMapScale error: Type not supported.");
     return;
   }
-  if (!object.material.displacementMap){
+  if (!object.hasDisplacementMap()){
     throw new Error("getHeightMapScale error: No height texture mapped to the object.");
     return;
   }
-  return object.material.displacementScale;
+  return object.mesh.material.uniforms.displacementInfo.value.x;
 }
 
 // getHeightMapBias
@@ -518,11 +518,11 @@ Roygbiv.prototype.getHeightMapBias = function(object){
     throw new Error("getHeightMapBias error: Type not supported.");
     return;
   }
-  if (!object.material.displacementMap){
+  if (!object.hasDisplacementMap()){
     throw new Error("getHeightMapBias error: No height texture mapped to the object.");
     return;
   }
-  return object.material.displacementBias;
+  return object.mesh.material.uniforms.displacementInfo.value.y;
 }
 
 // getMarkedPosition
@@ -1217,7 +1217,8 @@ Roygbiv.prototype.translate = function(object, axis, amount){
     throw new Error("translate error: Object not defined.");
     return;
   }
-  if (axis.toLowerCase() != "x" && axis.toLowerCase() != "y" && axis.toLowerCase() != "z"){
+  axis = axis.toLowerCase();
+  if (axis != "x" && axis!= "y" && axis != "z"){
     throw new Error("translate error: Axis must be one of x, y, or z.");
     return;
   }
@@ -1291,6 +1292,10 @@ Roygbiv.prototype.mapTexturePack = function(object, texturePackName){
     throw new Error("mapTexturePack error: Type not supported.");
     return;
   }
+  if (!addedObjects[object.name]){
+    throw new Error("mapTexturePack error: Cannot map texture packs to child objects.");
+    return;
+  }
 
   var texturePack = texturePacks[texturePackName];
   if (!texturePack){
@@ -1343,18 +1348,22 @@ Roygbiv.prototype.opacity = function(object, delta){
     throw new Error("opacity error: Type not supported.");
     return;
   }
+  if (!addedObjects[object.name]){
+    throw new Error("opacity error: Cannot set opacity to child objects.");
+    return;
+  }
   if (!object.initOpacitySet){
-    object.initOpacity = object.material.opacity;
+    object.initOpacity = object.previewMesh.material.uniforms.alpha.value;
     object.initOpacitySet = true;
   }
-  object.material.transparent = true;
-  object.material.opacity += delta;
 
-  if (object.material.opacity < 0){
-    object.material.opacity = 0;
+  object.incrementOpacity(delta);
+
+  if (object.previewMesh.material.uniforms.alpha.value < 0){
+    object.updateOpacity(0);
   }
-  if (object.material.opacity > 1){
-    object.material.opacity = 1;
+  if (object.previewMesh.material.uniforms.alpha.value > 1){
+    object.updateOpacity(1);
   }
 
 }
@@ -1376,6 +1385,10 @@ Roygbiv.prototype.shininess = function(object, delta){
   }
   if (!(object instanceof AddedObject)){
     throw new Error("shininess error: Type not supported.");
+    return;
+  }
+  if (!addedObjects[object.name]){
+    throw new Error("shininess error: Cannot set shininess to child objects.");
     return;
   }
   if (!object.material.isMeshPhongMaterial){
@@ -1407,19 +1420,13 @@ Roygbiv.prototype.textureOffsetX = function(object, dx){
     throw new Error("textureOffsetX error: Type not supported.");
     return;
   }
+  if (!addedObjects[object.name]){
+    throw new Error("textureOffsetX error: Cannot set texture offset to child objects.");
+    return;
+  }
   var texture;
-  if (object.material.map){
-    texture = object.material.map;
-  }else if (object.material.normalMap){
-    texture = object.material.normalMap;
-  }else if (object.material.specularMap){
-    texture = object.material.specularMap;
-  }else if (object.material.alphaMap){
-    texture = object.material.alphaMap;
-  }else if (object.material.emissiveMap){
-    texture = object.material.emissiveMap;
-  }else if (object.material.displacementMap){
-    texture = object.material.displacementMap;
+  if (object.hasDiffuseMap()){
+    texture = object.mesh.material.uniforms.diffuseMap.value;
   }
   if (texture){
     if (!texture.initOffsetXSet){
@@ -1427,6 +1434,7 @@ Roygbiv.prototype.textureOffsetX = function(object, dx){
       texture.initOffsetXSet = true;
     }
     texture.offset.x += dx;
+    texture.updateMatrix();
   }
 }
 
@@ -1448,19 +1456,13 @@ Roygbiv.prototype.textureOffsetY = function(object, dy){
     throw new Error("textureOffsetY error: Type not supported.");
     return;
   }
+  if (!addedObjects[object.name]){
+    throw new Error("textureOffsetY error: Cannot set texture offset of child objects.");
+    return;
+  }
   var texture;
-  if (object.material.map){
-    texture = object.material.map;
-  }else if (object.material.normalMap){
-    texture = object.material.normalMap;
-  }else if (object.material.specularMap){
-    texture = object.material.specularMap;
-  }else if (object.material.alphaMap){
-    texture = object.material.alphaMap;
-  }else if (object.material.emissiveMap){
-    texture = object.material.emissiveMap;
-  }else if (object.material.displacementMap){
-    texture = object.material.displacementMap;
+  if (object.hasDiffuseMap()){
+    texture = object.mesh.material.uniforms.diffuseMap.value;
   }
   if (texture){
     if (!texture.initOffsetYSet){
@@ -1468,6 +1470,7 @@ Roygbiv.prototype.textureOffsetY = function(object, dy){
       texture.initOffsetYSet = true;
     }
     texture.offset.y += dy;
+    texture.updateMatrix();
   }
 }
 
@@ -1493,19 +1496,13 @@ Roygbiv.prototype.textureOffset = function(object, dx, dy){
     throw new Error("textureOffset error: Type not supported.");
     return;
   }
+  if (!addedObjects[object.name]){
+    throw new Error("textureOffset error: Cannot set texture offset to child objects.");
+    return;
+  }
   var texture;
-  if (object.material.map){
-    texture = object.material.map;
-  }else if (object.material.normalMap){
-    texture = object.material.normalMap;
-  }else if (object.material.specularMap){
-    texture = object.material.specularMap;
-  }else if (object.material.alphaMap){
-    texture = object.material.alphaMap;
-  }else if (object.material.emissiveMap){
-    texture = object.material.emissiveMap;
-  }else if (object.material.displacementMap){
-    texture = object.material.displacementMap;
+  if (object.hasDiffuseMap()){
+    texture = object.mesh.material.uniforms.diffuseMap.value;
   }
   if (texture){
     if (!texture.initOffsetXSet){
@@ -1518,6 +1515,7 @@ Roygbiv.prototype.textureOffset = function(object, dx, dy){
     }
     texture.offset.x += dx;
     texture.offset.y += dy;
+    texture.updateMatrix();
   }
 }
 
@@ -1540,15 +1538,19 @@ Roygbiv.prototype.heightMapScale = function(object, delta){
     throw new Error("heightMapScale error: Type not supported.");
     return;
   }
-  if (!object.material.displacementMap){
+  if (!addedObjects[object.name]){
+    throw new Error("heightMapScale error: Cannot set height map scale to child objects.");
+    return;
+  }
+  if (!object.hasDisplacementMap()){
     throw new Error("heightMapScale error: No height texture mapped to object.");
     return;
   }
   if (!object.initDisplacementScaleSet){
-    object.initDisplacementScale = object.material.displacementScale;
+    object.initDisplacementScale = object.mesh.material.uniforms.displacementInfo.value.x;
     object.initDisplacementScaleSet = true;
   }
-  object.material.displacementScale += delta;
+  object.mesh.material.uniforms.displacementInfo.value.x += delta;
 }
 
 // heightMapBias
@@ -1570,15 +1572,19 @@ Roygbiv.prototype.heightMapBias = function(object, delta){
     throw new Error("heightMapBias error: Type not supported.");
     return;
   }
-  if (!object.material.displacementMap){
+  if (!addedObjects[object.name]){
+    throw new Error("heightMapBias error: Cannot set height map bias to child objects.");
+    return;
+  }
+  if (!object.hasDisplacementMap()){
     throw new Error("heightMapBias error: No height texture mapped to object.");
     return;
   }
   if (!object.initDisplacementBiasSet){
-    object.initDisplacementBias = object.material.displacementBias;
+    object.initDisplacementBias = object.mesh.material.uniforms.displacementInfo.value.y;
     object.initDisplacementBiasSet = true;
   }
-  object.material.displacementBias += delta;
+  object.mesh.material.uniforms.displacementInfo.value.y += delta;
 }
 
 // emissiveIntensity
@@ -1595,6 +1601,10 @@ Roygbiv.prototype.emissiveIntensity = function(object, delta){
     throw new Error("emissiveIntensity error: Type not supported.");
     return;
   }
+  if (!addedObjects[object.name]){
+    throw new Error("emissiveIntensity error: Cannot set emissive intensity to child objects.");
+    return;
+  }
   if (typeof delta == UNDEFINED){
     throw new Error("emissiveIntensity error: delta is not defined.");
     return;
@@ -1604,10 +1614,10 @@ Roygbiv.prototype.emissiveIntensity = function(object, delta){
     return;
   }
   if (!object.initEmissiveIntensitySet){
-    object.initEmissiveIntensity = object.material.emissiveIntensity;
+    object.initEmissiveIntensity = object.mesh.material.uniforms.emissiveIntensity.value;
     object.initEmissiveIntensitySet = true;
   }
-  object.material.emissiveIntensity += delta;
+  object.mesh.material.uniforms.emissiveIntensity.value += delta;
 }
 
 // setObjectVelocity
@@ -1623,6 +1633,10 @@ Roygbiv.prototype.setObjectVelocity = function(object, velocityVector){
   }
   if (!(object instanceof AddedObject) && !(object instanceof ObjectGroup)){
     throw new Error("setObjectVelocity error: Type not supported.");
+    return;
+  }
+  if ((object instanceof AddedObject) && !addedObjects[object.name]){
+    throw new Error("setObjectVelocity error: Cannot set velocity to child objects. Use parent object instead.");
     return;
   }
   if (!object.isDynamicObject){
@@ -4137,6 +4151,10 @@ Roygbiv.prototype.createObjectTrail = function(configurations){
     throw new Error("createObjectTrail error: Bad object parameter.");
     return;
   }
+  if ((object instanceof AddedObject) && (!addedObjects[object.name])){
+    throw new Error("createObjectTrail error: Cannot create object trails for child objects. Use parent object instead.");
+    return;
+  }
   if (typeof alpha == UNDEFINED){
     throw new Error("createObjectTrail error: alpha is a mandatory configuration.");
     return;
@@ -4665,7 +4683,7 @@ Roygbiv.prototype.createWaterfall = function(configurations){
   particleSystemConfigurations.lifetime = 0;
   var waterfall = this.createParticleSystem(particleSystemConfigurations);
   var quat = this.computeQuaternionFromVectors(this.vector(0, 0, 1), normal);
-  this.setParticleSystemQuaternion(waterfall, quat.x, quat.y, quat.z, quat.w);
+  waterfall.mesh.quaternion.set(quat.x, quat.y, quat.z, quat.w);
   return waterfall;
 }
 
@@ -4925,7 +4943,7 @@ Roygbiv.prototype.createSnow = function(configurations){
   particleSystemConfigurations.updateFunction = updateFunction;
   var snow = this.createParticleSystem(particleSystemConfigurations);
   var quat = this.computeQuaternionFromVectors(this.vector(0, -1, 0), normal);
-  this.setParticleSystemQuaternion(snow, quat.x, quat.y, quat.z, quat.w);
+  snow.mesh.quaternion.set(quat.x, quat.y, quat.z, quat.w);
   return snow;
 }
 
@@ -5485,7 +5503,7 @@ Roygbiv.prototype.createConfettiExplosion = function(configurations){
   });
   if (normalSet){
     var quat = this.computeQuaternionFromVectors(this.vector(0, 1, 0), normal);
-    this.setParticleSystemQuaternion(ps, quat.x, quat.y, quat.z, quat.w);
+    ps.mesh.quaternion.set(quat.x, quat.y, quat.z, quat.w);
   }
   return ps;
 

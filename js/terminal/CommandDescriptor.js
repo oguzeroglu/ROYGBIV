@@ -72,7 +72,6 @@ var CommandDescriptor = function(){
   this.newBasicMaterial.types = [];
   this.newBasicMaterial.types.push(this.UNKNOWN_INDICATOR); //name
   this.newBasicMaterial.types.push(this.COLOR); //color
-  this.newBasicMaterial.types.push(this.BOOLEAN); //isWireFramed
 
   // destroyMaterial
   this.destroyMaterial = new Object();

@@ -9,7 +9,7 @@ function render(){
   if (mode == 1){
     if (!isPhysicsWorkerEnabled()){
       physicsWorld.step(physicsStepAmount);
-      updateDynamicObjectPositions();
+      updateDynamicObjects();
     }
     runScripts();
     if (worldBinHandler){
@@ -47,6 +47,7 @@ function render(){
   }
   frameCounter ++;
 }
+
 
 function updateCrosshair(){
   if (selectedCrosshair && (selectedCrosshair.angularSpeed != 0 || selectedCrosshair.expand || selectedCrosshair.shrink)){
@@ -139,7 +140,7 @@ function updateGridCornerHelpers(){
   }
 }
 
-function updateDynamicObjectPositions(){
+function updateDynamicObjects(){
   for (var objectName in dynamicObjects){
     var object = addedObjects[objectName];
     var previewMesh = object.previewMesh;
@@ -152,10 +153,13 @@ function updateDynamicObjectPositions(){
   }
   for (var grouppedObjectName in dynamicObjectGroups){
     var grouppedObject = objectGroups[grouppedObjectName];
-    var previewMesh = grouppedObject.previewGraphicsGroup;
+    var previewMesh = grouppedObject.previewMesh;
+    var previewGraphicsGroup = grouppedObject.previewGraphicsGroup;
     var physicsBody = grouppedObject.physicsBody;
     previewMesh.position.copy(physicsBody.position);
     previewMesh.quaternion.copy(physicsBody.quaternion);
+    previewGraphicsGroup.position.copy(previewMesh.position);
+    previewGraphicsGroup.quaternion.copy(previewMesh.quaternion);
   }
 }
 
@@ -195,21 +199,6 @@ function calculateFps (){
     }
   }
   lastFPS = fps;
-}
-
-function refreshMaterials(){
-  for (var objectName in addedObjects){
-    var addedObject = addedObjects[objectName];
-    addedObject.mesh.material.needsUpdate = true;
-    addedObject.previewMesh.material.needsUpdate = true;
-  }
-  for (var objectName in objectGroups){
-    var objectGroup = objectGroups[objectName];
-    for (var i = 0; i<objectGroup.graphicsGroup.children.length; i++){
-      objectGroup.graphicsGroup.children[i].material.needsUpdate = true;
-      objectGroup.previewGraphicsGroup.children[i].material.needsUpdate = true;
-    }
-  }
 }
 
 function handleSkybox(){

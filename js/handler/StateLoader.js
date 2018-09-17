@@ -1,6 +1,8 @@
 var StateLoader = function(stateObj){
   this.stateObj = stateObj;
   this.reason = "";
+  this.totalLoadedTextureCount = 0;
+  this.totalLoadedTexturePackCount = 0;
 }
 
 StateLoader.prototype.handleFogObjDiff = function(){
@@ -194,6 +196,8 @@ StateLoader.prototype.handleObjectGroupsDiff = function(){
         curObjectGroupExport.quaternionX, curObjectGroupExport.quaternionY,
         curObjectGroupExport.quaternionZ, curObjectGroupExport.quaternionW
       );
+      objectGroupInstance.mesh.quaternion.copy(objectGroupInstance.initQuaternion.clone());
+      objectGroupInstance.previewMesh.quaternion.copy(objectGroupInstance.initQuaternion.clone());
       objectGroupInstance.graphicsGroup.quaternion.copy(objectGroupInstance.initQuaternion.clone());
       objectGroupInstance.previewGraphicsGroup.quaternion.copy(objectGroupInstance.initQuaternion.clone());
       objectGroupInstance.physicsBody.quaternion.copy(objectGroupInstance.graphicsGroup.quaternion);
@@ -933,8 +937,7 @@ StateLoader.prototype.handleAddedObjectDiff = function(){
       if (kind == "E"){
         var addedObject = addedObjects[diff.path[1]];
         if (addedObject){
-          addedObject.material.emissiveIntensity = diff.rhs;
-          addedObject.material.needsUpdate = true;
+          addedObject.mesh.material.uniforms.emissiveIntensity.value = diff.rhs;
         }
       }
     }else if (diff.path[2] == "opacity"){
@@ -942,9 +945,7 @@ StateLoader.prototype.handleAddedObjectDiff = function(){
         var newVal = diff.rhs;
         var addedObject = addedObjects[diff.path[1]];
         if (addedObject){
-          addedObject.material.transparent = true;
-          addedObject.material.opacity = newVal;
-          addedObject.material.needsUpdate = true;
+          addedObject.updateOpacity(newVal);
         }
       }
     }else if (diff.path[2] == "aoMapIntensity"){
@@ -952,8 +953,7 @@ StateLoader.prototype.handleAddedObjectDiff = function(){
         var newVal = diff.rhs;
         var addedObject = addedObjects[diff.path[1]];
         if (addedObject){
-          addedObject.material.aoMapIntensity = newVal;
-          addedObject.material.needsUpdate = true;
+          addedObject.mesh.material.uniforms.aoIntensity.value = newVal;
         }
       }
     }else if (diff.path[2] == "rotationZ"){
@@ -1012,11 +1012,8 @@ StateLoader.prototype.handleAddedObjectDiff = function(){
       if (kind == "N" || kind == "E"){
         var addedObject = addedObjects[diff.path[1]];
         if (addedObject){
-          if (addedObject.material.isMeshPhongMaterial){
-            if (addedObject.material.displacementMap){
-              addedObject.material.displacementBias = parseFloat(diff.rhs);
-              addedObject.material.needsUpdate = true;
-            }
+          if (addedObject.hasDisplacementMap()){
+            addedObject.mesh.material.uniforms.displacementInfo.value.y = parseFloat(diff.rhs);
           }
         }
       }else if (kind == "D"){
@@ -1029,11 +1026,8 @@ StateLoader.prototype.handleAddedObjectDiff = function(){
       if (kind == "N" || kind == "E"){
         var addedObject = addedObjects[diff.path[1]];
         if (addedObject){
-          if (addedObject.material.isMeshPhongMaterial){
-            if (addedObject.material.displacementMap){
-              addedObject.material.displacementScale = parseFloat(diff.rhs);
-              addedObject.material.needsUpdate = true;
-            }
+          if (addedObject.hasDisplacementMap()){
+            addedObject.mesh.material.uniforms.displacementInfo.value.x = parseFloat(diff.rhs);
           }
         }
       }else if (kind == "D"){
@@ -1090,9 +1084,9 @@ StateLoader.prototype.handleAddedObjectDiff = function(){
         var addedObject = addedObjects[diff.path[1]];
         if (addedObject){
           addedObject.adjustTextureOffsetYOnTexturePackMap = diff.rhs;
-          if (addedObject.material.map){
-            addedObject.material.map.offset.y = diff.rhs;
-            addedObject.material.needsUpdate = true;
+          if (addedObject.hasDiffuseMap()){
+            addedObject.mesh.material.uniforms.diffuseMap.value.offset.y = diff.rhs;
+            addedObject.mesh.material.uniforms.diffuseMap.value.updateMatrix();
           }
         }
       }else if (kind == "N"){
@@ -1101,13 +1095,12 @@ StateLoader.prototype.handleAddedObjectDiff = function(){
           addedObject.textureOffsetY_TMP = diff.rhs;
           if (typeof addedObject.textureOffsetX_TMP != "undefined"){
             setTimeout(function(){
-              if (addedObject.material.map){
-                addedObject.material.map.offset.x = addedObject.textureOffsetX_TMP;
-                addedObject.material.map.offset.y = addedObject.textureOffsetY_TMP;
+              if (addedObject.hasDiffuseMap()){
+                addedObject.mesh.material.uniforms.diffuseMap.value.offset.x = addedObject.textureOffsetX_TMP;
+                addedObject.mesh.material.uniforms.diffuseMap.value.offset.y = addedObject.textureOffsetY_TMP;
+                addedObject.mesh.material.uniforms.diffuseMap.value.updateMatrix();
                 delete addedObject.textureOffsetX_TMP;
                 delete addedObject.textureOffsetY_TMP;
-                addedObject.material.needsUpdate = true;
-                addedObject.material.map.needsUpdate = true;
               }
             });
           }
@@ -1118,9 +1111,9 @@ StateLoader.prototype.handleAddedObjectDiff = function(){
         var addedObject = addedObjects[diff.path[1]];
         if (addedObject){
           addedObject.adjustTextureOffsetXOnTexturePackMap = diff.rhs;
-          if (addedObject.material.map){
-            addedObject.material.map.offset.x = diff.rhs;
-            addedObject.material.needsUpdate = true;
+          if (addedObject.hasDiffuseMap()){
+            addedObject.mesh.material.uniforms.diffuseMap.value.offset.x = diff.rhs;
+            addedObject.mesh.material.uniforms.diffuseMap.value.updateMatrix();
           }
         }
       }else if (kind == "N"){
@@ -1129,13 +1122,12 @@ StateLoader.prototype.handleAddedObjectDiff = function(){
           addedObject.textureOffsetX_TMP = diff.rhs;
           if (typeof addedObject.textureOffsetY_TMP != "undefined"){
             setTimeout(function(){
-              if (addedObject.material.map){
-                addedObject.material.map.offsetX = addedObject.textureOffsetX_TMP;
-                addedObject.material.map.offsetY = addedObject.textureOffsetY_TMP;
+              if (addedObject.hasDiffuseMap()){
+                addedObject.mesh.material.uniforms.diffuseMap.value.offset.x = addedObject.textureOffsetX_TMP;
+                addedObject.mesh.material.uniforms.diffuseMap.value.offset.y = addedObject.textureOffsetY_TMP;
+                addedObject.mesh.material.uniforms.diffuseMap.value.updateMatrix();
                 delete addedObject.textureOffsetX_TMP;
                 delete addedObject.textureOffsetY_TMP;
-                addedObject.material.needsUpdate = true;
-                addedObject.material.map.needsUpdate = true;
               }
             });
           }
@@ -1174,8 +1166,7 @@ StateLoader.prototype.handleAddedObjectDiff = function(){
         var addedObject = addedObjects[diff.path[1]];
         if (addedObject){
           addedObject.displacementRoygbivTexturePackName = 0;
-          addedObject.material.displacementMap = null;
-          addedObject.material.needsUpdate = true;
+          addedObject.unMapDisplacement();
         }
       }else if (kind == "N"){
         var addedObject = addedObjects[diff.path[1]];
@@ -1188,8 +1179,7 @@ StateLoader.prototype.handleAddedObjectDiff = function(){
           var addedObject = addedObjects[diff.path[1]];
           if (addedObject){
             addedObject.emissiveRoygbivTexturePackName = 0;
-            addedObject.material.emissiveMap = null;
-            addedObject.material.needsUpdate = true;
+            addedObject.unMapEmissive();
           }
         }else if (kind == "N"){
           var addedObject = addedObjects[diff.path[1]];
@@ -1202,8 +1192,7 @@ StateLoader.prototype.handleAddedObjectDiff = function(){
         var addedObject = addedObjects[diff.path[1]];
         if (addedObject){
           addedObject.aoRoygbivTexturePackName = 0;
-          addedObject.material.aoMap = null;
-          addedObject.material.needsUpdate = true;
+          addedObject.unMapAO();
         }
       }else if (kind == "N"){
         var addedObject = addedObjects[diff.path[1]];
@@ -1216,8 +1205,7 @@ StateLoader.prototype.handleAddedObjectDiff = function(){
         var addedObject = addedObjects[diff.path[1]];
         if (addedObject){
           addedObject.alphaRoygbivTexturePackName = 0;
-          addedObject.material.alphaMap = null;
-          addedObject.material.needsUpdate = true;
+          addedObject.unMapAlpha();
         }
       }else if (kind == "N"){
         var addedObject = addedObjects[diff.path[1]];
@@ -1230,8 +1218,7 @@ StateLoader.prototype.handleAddedObjectDiff = function(){
         var addedObject = addedObjects[diff.path[1]];
         if (addedObject){
           addedObject.diffuseRoygbivTexturePackName = 0;
-          addedObject.material.map = null;
-          addedObject.material.needsUpdate = true;
+          addedObject.unMapDiffuse();
         }
       }else if (kind == "N"){
         var addedObject = addedObjects[diff.path[1]];
@@ -1258,8 +1245,7 @@ StateLoader.prototype.handleAddedObjectDiff = function(){
           var addedObject = addedObjects[diff.path[1]];
           if (addedObject){
             this.resetRoygbivTextureNames(addedObject);
-            addedObject.material.map = null;
-            addedObject.material.needsUpdate = true;
+            addedObject.unMapDiffuse();
           }
         }
       }else if (kind == "N" || kind == "E"){
@@ -1267,6 +1253,7 @@ StateLoader.prototype.handleAddedObjectDiff = function(){
           var addedObject = addedObjects[diff.path[1]];
           if (addedObject){
             this.resetRoygbivTextureNames(0);
+            addedObject.unMapDiffuse();
             addedObject.diffuseRoygbivTextureName = rhs;
             this.mapTextureToSingleObject(addedObject, true);
           }
@@ -1278,10 +1265,7 @@ StateLoader.prototype.handleAddedObjectDiff = function(){
           var addedObject = addedObjects[diff.path[1]];
           if (addedObject){
             this.resetRoygbivTextureNames(addedObject);
-            addedObject.material.alphaMap = null;
-            addedObject.material.transparent = false;
-            addedObject.material.alphaTest = 0;
-            addedObject.material.needsUpdate = true;
+            addedObject.unMapAlpha();
           }
         }
       }else if (kind == "N" || kind == "E"){
@@ -1289,6 +1273,7 @@ StateLoader.prototype.handleAddedObjectDiff = function(){
           var addedObject = addedObjects[diff.path[1]];
           if (addedObject){
             this.resetRoygbivTextureNames(addedObject);
+            addedObject.unMapAlpha();
             addedObject.alphaRoygbivTextureName = rhs;
             this.mapTextureToSingleObject(addedObject, true);
           }
@@ -1300,8 +1285,7 @@ StateLoader.prototype.handleAddedObjectDiff = function(){
           var addedObject = addedObjects[diff.path[1]];
           if (addedObject){
             this.resetRoygbivTextureNames(addedObject);
-            addedObject.material.aoMap = null;
-            addedObject.material.needsUpdate = true;
+            addedObject.unMapAO();
           }
         }
       }else if (kind == "N" || kind == "E"){
@@ -1309,6 +1293,7 @@ StateLoader.prototype.handleAddedObjectDiff = function(){
           var addedObject = addedObjects[diff.path[1]];
           if (addedObject){
             this.resetRoygbivTextureNames(addedObject);
+            addedObject.unMapAO();
             addedObject.aoRoygbivTextureName = rhs;
             this.mapTextureToSingleObject(addedObject, true);
           }
@@ -1320,9 +1305,7 @@ StateLoader.prototype.handleAddedObjectDiff = function(){
           var addedObject = addedObjects[diff.path[1]];
           if (addedObject){
             this.resetRoygbivTextureNames(addedObject);
-            addedObject.material.emissiveMap = null;
-            addedObject.material.emissive = new THREE.Color( 0x000000 );
-            addedObject.material.needsUpdate = true;
+            addedObject.unMapEmissive();
           }
         }
       }else if (kind == "N" || kind == "E"){
@@ -1341,8 +1324,7 @@ StateLoader.prototype.handleAddedObjectDiff = function(){
           var addedObject = addedObjects[diff.path[1]];
           if (addedObject){
             this.resetRoygbivTextureNames(addedObject);
-            addedObject.material.displacementMap = null;
-            addedObject.material.needsUpdate = true;
+            addedObject.unMapDisplacement();
           }
         }
       }else if (kind == "N" || kind == "E"){
@@ -1350,6 +1332,7 @@ StateLoader.prototype.handleAddedObjectDiff = function(){
           var addedObject = addedObjects[diff.path[1]];
           if (addedObject){
             this.resetRoygbivTextureNames(addedObject);
+            addedObject.unMapDisplacement();
             addedObject.displacementRoygbivTextureName = rhs;
             this.mapTextureToSingleObject(addedObject, true);
           }
@@ -1434,16 +1417,13 @@ StateLoader.prototype.handleAddedObjectDiff = function(){
       var material = materials[roygbivMaterialName];
       if (!material){
         if (roygbivMaterialName == "NULL_BASIC"){
-          material = new THREE.MeshBasicMaterial({
+          material = new BasicMaterial({
+            name: "NULL_BASIC",
             color: "white",
-            side: THREE.DoubleSide,
-            wireframe: false
+            alpha: curAddedObjectExport.opacity,
+            aoMapIntensity: curAddedObjectExport.aoMapIntensity,
+            emissiveIntensity: curAddedObjectExport.emissiveIntensity
           });
-          material.roygbivMaterialName = roygbivMaterialName;
-          material.transparent = true;
-          material.opacity = curAddedObjectExport.opacity;
-          material.aoMapIntensity = curAddedObjectExport.aoMapIntensity;
-          material.needsUpdate = true;
         }else if (roygbivMaterialName == "NULL_PHONG"){
           material = new THREE.MeshPhongMaterial({
             color: "white",
@@ -1457,9 +1437,6 @@ StateLoader.prototype.handleAddedObjectDiff = function(){
           material.shininess = curAddedObjectExport.shininess;
           material.emissiveIntensity = curAddedObjectExport.emissiveIntensity;
           material.needsUpdate = true;
-        }else{
-          material = new THREE.MeshBasicMaterial({color: "white", side: THREE.DoubleSide});
-          material.roygbivMaterialName = roygbivMaterialName;
         }
       }
 
@@ -1497,13 +1474,13 @@ StateLoader.prototype.handleAddedObjectDiff = function(){
         var boxMesh;
         var boxClone;
         var axis = metaData["gridSystemAxis"];
-        boxMesh = new THREE.Mesh(
+        boxMesh = new MeshGenerator(
           new THREE.BoxBufferGeometry(
             boxSizeX, boxSizeY, boxSizeZ,
             widthSegments, heightSegments, depthSegments
           ),
           material
-        );
+        ).generateMesh();
         boxMesh.position.x = centerX;
         boxMesh.position.y = centerY;
         boxMesh.position.z = centerZ;
@@ -1535,10 +1512,10 @@ StateLoader.prototype.handleAddedObjectDiff = function(){
         var physicsShapeParameterY = metaData["physicsShapeParameterY"];
         var physicsShapeParameterZ = metaData["physicsShapeParameterZ"];
 
-        var surface = new THREE.Mesh(
+        var surface = new MeshGenerator(
           new THREE.PlaneBufferGeometry(width, height, widthSegments, heightSegments),
           material
-        );
+        ).generateMesh();
 
         surface.position.x = positionX;
         surface.position.y = positionY;
@@ -1587,10 +1564,10 @@ StateLoader.prototype.handleAddedObjectDiff = function(){
         var fromEulerX = metaData["fromEulerX"];
         var fromEulerY = metaData["fromEulerY"];
         var fromEulerZ = metaData["fromEulerZ"];
-        var ramp = new THREE.Mesh(
+        var ramp = new MeshGenerator(
           new THREE.PlaneBufferGeometry(rampWidth, rampHeight, widthSegments, heightSegments),
           material
-        );
+        ).generateMesh();
         ramp.position.x = centerX;
         ramp.position.y = centerY;
         ramp.position.z = centerZ;
@@ -1647,9 +1624,9 @@ StateLoader.prototype.handleAddedObjectDiff = function(){
         var sphereMesh;
         var sphereClone;
         var axis = metaData["gridSystemAxis"];
-        sphereMesh = new THREE.Mesh(
+        sphereMesh = new MeshGenerator(
           new THREE.SphereBufferGeometry(Math.abs(radius), widthSegments, heightSegments), material
-        );
+        ).generateMesh();
         sphereMesh.position.x = centerX;
         sphereMesh.position.y = centerY;
         sphereMesh.position.z = centerZ;
@@ -1736,14 +1713,11 @@ StateLoader.prototype.handleMaterialDiff = function(){
       var opacity = rhs.opacity;
       var aoMapIntensity = rhs.aoMapIntensity;
       if (rhs.materialType == "BASIC"){
-        var isWireFramed = rhs.isWireFramed;
-        material = new THREE.MeshBasicMaterial(
+        material = new BasicMaterial(
           {
+            name: rhs.roygbivMaterialName,
             color: color,
-            side: THREE.DoubleSide,
-            transparent: true,
-            opacity: opacity,
-            wireframe: isWireFramed,
+            alpha: opacity,
             aoMapIntensity: aoMapIntensity
           }
         );
@@ -1966,15 +1940,12 @@ StateLoader.prototype.load = function(undo){
       var opacity = curMaterialExport.opacity;
       var aoMapIntensity = curMaterialExport.aoMapIntensity;
       if (curMaterialExport.materialType == "BASIC"){
-        var isWireFramed = curMaterialExport.isWireFramed;
-        material = new THREE.MeshBasicMaterial(
+        material = new BasicMaterial(
           {
+            name: curMaterialExport.roygbivMaterialName,
             color: color,
-            side: THREE.DoubleSide,
-            transparent: true,
-            opacity: opacity,
-            aoMapIntensity: aoMapIntensity,
-            wireframe: isWireFramed
+            alpha: opacity,
+            aoMapIntensity: aoMapIntensity
           }
         );
       }else if (curMaterialExport.materialType == "PHONG"){
@@ -2040,16 +2011,13 @@ StateLoader.prototype.load = function(undo){
       var material = materials[roygbivMaterialName];
       if (!material){
         if (roygbivMaterialName == "NULL_BASIC"){
-          material = new THREE.MeshBasicMaterial({
+          material = new BasicMaterial({
+            name: roygbivMaterialName,
             color: "white",
-            side: THREE.DoubleSide,
-            wireframe: false
+            alpha: curAddedObjectExport.opacity,
+            aoMapIntensity: curAddedObjectExport.aoMapIntensity,
+            emissiveIntensity: curAddedObjectExport.emissiveIntensity
           });
-          material.roygbivMaterialName = roygbivMaterialName;
-          material.transparent = true;
-          material.opacity = curAddedObjectExport.opacity;
-          material.aoMapIntensity = curAddedObjectExport.aoMapIntensity;
-          material.needsUpdate = true;
         }else if (roygbivMaterialName == "NULL_PHONG"){
           material = new THREE.MeshPhongMaterial({
             color: "white",
@@ -2063,9 +2031,6 @@ StateLoader.prototype.load = function(undo){
           material.shininess = curAddedObjectExport.shininess;
           material.emissiveIntensity = curAddedObjectExport.emissiveIntensity;
           material.needsUpdate = true;
-        }else{
-          material = new THREE.MeshBasicMaterial({color: "white", side: THREE.DoubleSide});
-          material.roygbivMaterialName = roygbivMaterialName;
         }
       }
 
@@ -2103,13 +2068,13 @@ StateLoader.prototype.load = function(undo){
         var boxMesh;
         var boxClone;
         var axis = metaData["gridSystemAxis"];
-        boxMesh = new THREE.Mesh(
+        boxMesh = new MeshGenerator(
           new THREE.BoxBufferGeometry(
             boxSizeX, boxSizeY, boxSizeZ,
             widthSegments, heightSegments, depthSegments
           ),
           material
-        );
+        ).generateMesh();
         boxMesh.position.x = centerX;
         boxMesh.position.y = centerY;
         boxMesh.position.z = centerZ;
@@ -2141,10 +2106,10 @@ StateLoader.prototype.load = function(undo){
         var physicsShapeParameterY = metaData["physicsShapeParameterY"];
         var physicsShapeParameterZ = metaData["physicsShapeParameterZ"];
 
-        var surface = new THREE.Mesh(
+        var surface = new MeshGenerator(
           new THREE.PlaneBufferGeometry(width, height, widthSegments, heightSegments),
           material
-        );
+        ).generateMesh();
 
         surface.position.x = positionX;
         surface.position.y = positionY;
@@ -2192,10 +2157,10 @@ StateLoader.prototype.load = function(undo){
         var fromEulerX = metaData["fromEulerX"];
         var fromEulerY = metaData["fromEulerY"];
         var fromEulerZ = metaData["fromEulerZ"];
-        var ramp = new THREE.Mesh(
+        var ramp = new MeshGenerator(
           new THREE.PlaneBufferGeometry(rampWidth, rampHeight, widthSegments, heightSegments),
           material
-        );
+        ).generateMesh();
         ramp.position.x = centerX;
         ramp.position.y = centerY;
         ramp.position.z = centerZ;
@@ -2252,9 +2217,9 @@ StateLoader.prototype.load = function(undo){
         var sphereMesh;
         var sphereClone;
         var axis = metaData["gridSystemAxis"];
-        sphereMesh = new THREE.Mesh(
+        sphereMesh = new MeshGenerator(
           new THREE.SphereBufferGeometry(Math.abs(radius), widthSegments, heightSegments), material
-        );
+        ).generateMesh();
         sphereMesh.position.x = centerX;
         sphereMesh.position.y = centerY;
         sphereMesh.position.z = centerZ;
@@ -2360,6 +2325,9 @@ StateLoader.prototype.load = function(undo){
         addedObjectInstance.setSlippery(false);
       }
 
+      addedObjectInstance.mesh.material.uniforms.emissiveIntensity.value = curAddedObjectExport.emissiveIntensity;
+      addedObjectInstance.mesh.material.uniforms.aoIntensity.value = curAddedObjectExport.aoMapIntensity;
+
       addedObjects[addedObjectName] = addedObjectInstance;
 
     }
@@ -2384,6 +2352,8 @@ StateLoader.prototype.load = function(undo){
       var curTexture = uploadedTextures[textureName];
       if (curTexture == 1 || curTexture == 2 || curTexture == 3){
         textures[textureName] = curTexture;
+        this.totalLoadedTextureCount ++;
+        this.createObjectGroupsAfterLoadedTextures();
         textureCache[textureName] = curTexture;
         continue;
       }
@@ -2405,9 +2375,11 @@ StateLoader.prototype.load = function(undo){
         var that = this;
         texture.image.onload = function(){
           textures[this.textureNameX] = this.textureX;
+          that.totalLoadedTextureCount ++;
           this.textureX.needsUpdate = true;
           textureCache[this.textureNameX] = this.textureX.clone();
           that.mapLoadedTexture(this.textureX, this.textureNameX);
+          that.createObjectGroupsAfterLoadedTextures();
         }.bind({textureX: texture, textureNameX: textureName});
       }else if (uploadedImages[textureURL]){
         var texture = new THREE.Texture(uploadedImages[textureURL]);
@@ -2416,6 +2388,7 @@ StateLoader.prototype.load = function(undo){
         texture.offset.y = offsetY;
         texture.isLoaded = true;
         texture.fromUploadedImage = true;
+        var skip = false;
         if (texture.image.width && texture.image.height){
           if (obj.textureSizes && obj.textureSizes[textureName]){
             var imgW = texture.image.width;
@@ -2436,16 +2409,23 @@ StateLoader.prototype.load = function(undo){
                 this.textureX.image = tmpCanvas;
                 this.textureX.needsUpdate = true;
                 textures[this.textureNameX] = this.textureX;
+                that.totalLoadedTextureCount ++;
                 textureCache[this.textureNameX] = this.textureX.clone();
                 that.mapLoadedTexture(this.textureX, this.textureNameX);
+                that.createObjectGroupsAfterLoadedTextures();
               }.bind({textureX: texture, textureNameX: textureName})
+              skip = true;
             }
           }
         }
-        textures[textureName] = texture;
-        textureCache[textureName] = texture.clone();
-        texture.needsUpdate = true;
-        this.mapLoadedTexture(texture, textureName);
+        if (!skip){
+          textures[textureName] = texture;
+          that.totalLoadedTextureCount ++;
+          textureCache[textureName] = texture.clone();
+          texture.needsUpdate = true;
+          this.mapLoadedTexture(texture, textureName);
+          this.createObjectGroupsAfterLoadedTextures();
+        }
       }else{
         if (textureURL.toUpperCase().endsWith("TGA")){
           this.loaders[textureName] = new THREE.TGALoader();
@@ -2459,6 +2439,7 @@ StateLoader.prototype.load = function(undo){
           function(textureData){
             var textureNameX = this.textureNameX;
             textures[textureNameX] = textureData;
+            that.totalLoadedTextureCount ++;
             var hasPadding = (obj.texturePaddings[textureNameX] !== undefined);
             if (obj.textureSizes && obj.textureSizes[textureNameX]){
               var size = obj.textureSizes[textureNameX];
@@ -2478,12 +2459,17 @@ StateLoader.prototype.load = function(undo){
             textures[textureNameX].offset.y = this.offsetYY;
             textureCache[textureNameX] = textureData.clone();
             that.mapLoadedTexture(textures[textureNameX], textureNameX);
+            that.createObjectGroupsAfterLoadedTextures();
           }.bind({textureNameX: textureName, offsetXX: offsetX, offsetYY: offsetY, repeatUU: repeatU, repeatVV: repeatV}), function(xhr){
             textureCache[this.textureNameX] = 2;
             textures[this.textureNameX] = 2;
+            that.totalLoadedTextureCount ++;
+            that.createObjectGroupsAfterLoadedTextures();
           }.bind({textureNameX: textureName}), function(xhr){
             textureCache[this.textureNameX] = 3;
             textures[this.textureNameX] = 3;
+            that.totalLoadedTextureCount ++;
+            that.createObjectGroupsAfterLoadedTextures();
           }.bind({textureNameX: textureName})
         );
       }
@@ -2553,7 +2539,9 @@ StateLoader.prototype.load = function(undo){
         curTexturePackExport.directoryName,
         curTexturePackExport.fileExtension,
         function(){
+          this.that.totalLoadedTexturePackCount ++;
           this.that.mapLoadedTexturePack(this.texturePackName, this.objj);
+          this.that.createObjectGroupsAfterLoadedTextures();
         }.bind({texturePackName: texturePackName, that: this, objj: obj, scaleFactorX: scaleFactor}),
         true,
         null,
@@ -2675,40 +2663,8 @@ StateLoader.prototype.load = function(undo){
     }
 
     // OBJECT GROUPS ***********************************************
-    for (var objectName in obj.objectGroups){
-      var curObjectGroupExport = obj.objectGroups[objectName];
-      var group = new Object();
-      for (var name in curObjectGroupExport.group){
-        group[name] = addedObjects[name];
-      }
-      var objectGroupInstance = new ObjectGroup(objectName, group);
-      objectGroups[objectName] = objectGroupInstance;
-      objectGroupInstance.glue();
-      if (curObjectGroupExport.mass){
-        objectGroupInstance.setMass(curObjectGroupExport.mass);
-      }
-      objectGroupInstance.initQuaternion = new THREE.Quaternion(
-        curObjectGroupExport.quaternionX, curObjectGroupExport.quaternionY,
-        curObjectGroupExport.quaternionZ, curObjectGroupExport.quaternionW
-      );
-      objectGroupInstance.graphicsGroup.quaternion.copy(objectGroupInstance.initQuaternion.clone());
-      objectGroupInstance.previewGraphicsGroup.quaternion.copy(objectGroupInstance.initQuaternion.clone());
-      objectGroupInstance.physicsBody.quaternion.copy(objectGroupInstance.graphicsGroup.quaternion);
-      objectGroupInstance.physicsBody.initQuaternion = objectGroupInstance.graphicsGroup.quaternion;
+    // NOT HERE -> createObjectGroupsAfterLoadedTextures
 
-      var isDynamicObject = false;
-      if (curObjectGroupExport.isDynamicObject){
-        isDynamicObject = curObjectGroupExport.isDynamicObject;
-      }
-      if (curObjectGroupExport.isSlippery){
-        objectGroupInstance.setSlippery(true);
-      }else{
-        objectGroupInstance.setSlippery(false);
-      }
-      objectGroupInstance.isDynamicObject = isDynamicObject;
-      objectGroupInstance.isBasicMaterial = curObjectGroupExport.isBasicMaterial;
-      objectGroupInstance.isPhongMaterial = curObjectGroupExport.isPhongMaterial;
-    }
     // MARKED PONTS ************************************************
     for (var markedPointName in obj.markedPointsExport){
       var curMarkedPointExport = obj.markedPointsExport[markedPointName];
@@ -2881,6 +2837,56 @@ StateLoader.prototype.load = function(undo){
   }
 }
 
+StateLoader.prototype.createObjectGroupsAfterLoadedTextures = function(){
+  var obj = this.stateObj;
+  if (parseInt(this.totalLoadedTextureCount) < parseInt(obj.totalTextureCount) ||
+           parseInt(this.totalLoadedTexturePackCount) < parseInt(obj.totalTexturePackCount)){
+      return;
+  }
+
+  for (var objectName in obj.objectGroups){
+    var curObjectGroupExport = obj.objectGroups[objectName];
+    var group = new Object();
+    for (var name in curObjectGroupExport.group){
+      group[name] = addedObjects[name];
+    }
+    var objectGroupInstance = new ObjectGroup(objectName, group);
+    objectGroups[objectName] = objectGroupInstance;
+    objectGroupInstance.glue();
+    if (curObjectGroupExport.mass){
+      objectGroupInstance.setMass(curObjectGroupExport.mass);
+    }
+    objectGroupInstance.initQuaternion = new THREE.Quaternion(
+      curObjectGroupExport.quaternionX, curObjectGroupExport.quaternionY,
+      curObjectGroupExport.quaternionZ, curObjectGroupExport.quaternionW
+    );
+    objectGroupInstance.mesh.quaternion.copy(objectGroupInstance.initQuaternion.clone());
+    objectGroupInstance.previewMesh.quaternion.copy(objectGroupInstance.initQuaternion.clone());
+    objectGroupInstance.graphicsGroup.quaternion.copy(objectGroupInstance.initQuaternion.clone());
+    objectGroupInstance.previewGraphicsGroup.quaternion.copy(objectGroupInstance.initQuaternion.clone());
+    objectGroupInstance.physicsBody.quaternion.copy(objectGroupInstance.graphicsGroup.quaternion);
+    objectGroupInstance.physicsBody.initQuaternion = new CANNON.Quaternion().copy(
+      objectGroupInstance.graphicsGroup.quaternion
+    );
+
+    var isDynamicObject = false;
+    if (curObjectGroupExport.isDynamicObject){
+      isDynamicObject = curObjectGroupExport.isDynamicObject;
+    }
+    if (curObjectGroupExport.isSlippery){
+      objectGroupInstance.setSlippery(true);
+    }else{
+      objectGroupInstance.setSlippery(false);
+    }
+    objectGroupInstance.isDynamicObject = isDynamicObject;
+    objectGroupInstance.isBasicMaterial = curObjectGroupExport.isBasicMaterial;
+    objectGroupInstance.isPhongMaterial = curObjectGroupExport.isPhongMaterial;
+  }
+
+  undoRedoHandler.push();
+
+}
+
 StateLoader.prototype.mapTextureToSingleObject = function(diff, exported){
   for (var textureName in textures){
     var addedObjectName;
@@ -2899,6 +2905,7 @@ StateLoader.prototype.mapTextureToSingleObject = function(diff, exported){
     if (!curAddedObjectExport){
       break;
     }
+    var objInstance = addedObjects[addedObjectName];
     var material = addedObjects[addedObjectName].material;
     var metaData = addedObjects[addedObjectName].metaData;
 
@@ -2976,9 +2983,8 @@ StateLoader.prototype.mapTextureToSingleObject = function(diff, exported){
           cloneTexture.offset.y = textureOffsetY;
         }
 
-        material.map = cloneTexture;
+        objInstance.mapDiffuse(cloneTexture);
         cloneTexture.needsUpdate = true;
-        material.needsUpdate = true;
       }
     }
     if (alphaRoygbivTextureName){
@@ -2991,8 +2997,6 @@ StateLoader.prototype.mapTextureToSingleObject = function(diff, exported){
         cloneTexture.roygbivTextureName = textureName;
         cloneTexture.roygbivTexturePackName = 0;
 
-        material.alphaMap = cloneTexture;
-
         cloneTexture.wrapS = THREE.RepeatWrapping;
         cloneTexture.wrapT = THREE.RepeatWrapping;
         if (!(typeof repeatU == UNDEFINED)){
@@ -3015,10 +3019,8 @@ StateLoader.prototype.mapTextureToSingleObject = function(diff, exported){
           }
         }
 
+        objInstance.mapAlpha(cloneTexture);
         cloneTexture.needsUpdate = true;
-        material.transparent = true;
-        material.alphaTest = 0.5;
-        material.needsUpdate = true;
       }
     }
     if (aoRoygbivTextureName){
@@ -3030,7 +3032,6 @@ StateLoader.prototype.mapTextureToSingleObject = function(diff, exported){
         cloneTexture.fromUploadedImage = texture.fromUploadedImage;
         cloneTexture.roygbivTextureName = textureName;
         cloneTexture.roygbivTexturePackName = 0;
-        material.aoMap = cloneTexture;
 
         cloneTexture.wrapS = THREE.RepeatWrapping;
         cloneTexture.wrapT = THREE.RepeatWrapping;
@@ -3054,8 +3055,8 @@ StateLoader.prototype.mapTextureToSingleObject = function(diff, exported){
           }
         }
 
+        objInstance.mapAO(cloneTexture);
         cloneTexture.needsUpdate = true;
-        material.needsUpdate = true;
       }
     }
     if (emissiveRoygbivTextureName){
@@ -3064,11 +3065,10 @@ StateLoader.prototype.mapTextureToSingleObject = function(diff, exported){
         var repeatV = curAddedObjectExport["textureRepeatV"];
 
         var cloneTexture = texture.clone();
-        material.emissive = new THREE.Color( 0xffffff );
         cloneTexture.fromUploadedImage = texture.fromUploadedImage;
         cloneTexture.roygbivTextureName = textureName;
         cloneTexture.roygbivTexturePackName = 0;
-        material.emissiveMap = cloneTexture;
+
 
         cloneTexture.wrapS = THREE.RepeatWrapping;
         cloneTexture.wrapT = THREE.RepeatWrapping;
@@ -3092,8 +3092,8 @@ StateLoader.prototype.mapTextureToSingleObject = function(diff, exported){
           }
         }
 
+        objInstance.mapEmissive(cloneTexture);
         cloneTexture.needsUpdate = true;
-        material.needsUpdate = true;
       }
     }
     if (normalRoygbivTextureName){
@@ -3186,8 +3186,6 @@ StateLoader.prototype.mapTextureToSingleObject = function(diff, exported){
           material.displacementBias = displacementBias;
         }
 
-        material.displacementMap = cloneTexture;
-
         cloneTexture.wrapS = THREE.RepeatWrapping;
         cloneTexture.wrapT = THREE.RepeatWrapping;
         if (!(typeof repeatU == UNDEFINED)){
@@ -3210,8 +3208,8 @@ StateLoader.prototype.mapTextureToSingleObject = function(diff, exported){
           }
         }
 
+        objInstance.mapDisplacement(cloneTexture);
         cloneTexture.needsUpdate = true;
-        material.needsUpdate = true;
       }
     }
   }
@@ -3221,7 +3219,7 @@ StateLoader.prototype.mapTexturePackToSingleObject = function(diff){
   for (var texturePackName in texturePacks){
     var texturePack = texturePacks[texturePackName];
     var addedObject = addedObjects[diff.path[1]];
-    var material = addedObject.material;
+    var material = addedObject.mesh.material;
 
     var addedObjectExport = diff.rhs;
     if (!addedObjectExport){
@@ -3271,77 +3269,70 @@ StateLoader.prototype.mapTexturePackToSingleObject = function(diff){
     if (diffuseRoygbivTexturePackName){
       if (diffuseRoygbivTexturePackName == texturePackName){
         if (texturePack.hasDiffuse){
-          material.map = texturePack.diffuseTexture.clone();
-          material.map.roygbivTexturePackName = texturePackName;
-          material.map.roygbivTextureName = 0;
+          addedObject.mapDiffuse(texturePack.diffuseTexture.clone());
+          material.uniforms.diffuseMap.value.roygbivTexturePackName = texturePackName;
+          material.uniforms.diffuseMap.value.roygbivTextureName = 0;
           if (!(typeof textureOffsetX == UNDEFINED)){
-            material.map.offset.x = textureOffsetX;
+            material.uniforms.diffuseMap.value.offset.x = textureOffsetX;
           }
           if (!(typeof textureOffsetY == UNDEFINED)){
-            material.map.offset.y = textureOffsetY;
+            material.uniforms.diffuseMap.value.offset.y = textureOffsetY;
           }
           if (!(typeof textureRepeatU == UNDEFINED)){
-            material.map.repeat.x = textureRepeatU;
+            material.uniforms.diffuseMap.value.repeat.x = textureRepeatU;
           }
           if (!(typeof textureRepeatV == UNDEFINED)){
-            material.map.repeat.y = textureRepeatV;
+            material.uniforms.diffuseMap.value.repeat.y = textureRepeatV;
           }
-          material.needsUpdate = true;
-          material.map.needsUpdate = true;
+          material.uniforms.diffuseMap.value.needsUpdate = true;
         }
       }
     }
     if (alphaRoygbivTexturePackName){
       if (alphaRoygbivTexturePackName == texturePackName){
         if (texturePack.hasAlpha){
-          material.alphaMap = texturePack.alphaTexture.clone();
-          material.alphaMap.roygbivTexturePackName = texturePackName;
-          material.alphaMap.roygbivTextureName = 0;
-          material.transparent = false;
-          material.alphaTest = 0.5;
+          addedObject.mapAlpha(texturePack.alphaTexture.clone());
+          material.uniforms.alphaMap.value.roygbivTexturePackName = texturePackName;
+          material.uniforms.alphaMap.value.roygbivTextureName = 0;
           if (!(typeof textureRepeatU == UNDEFINED)){
-            material.alphaMap.repeat.x = textureRepeatU;
+            material.uniforms.alphaMap.value.repeat.x = textureRepeatU;
           }
           if (!(typeof textureRepeatV == UNDEFINED)){
-            material.alphaMap.repeat.y = textureRepeatV;
+            material.uniforms.alphaMap.value.repeat.y = textureRepeatV;
           }
-          material.needsUpdate = true;
-          material.alphaMap.needsUpdate = true;
+          material.uniforms.alphaMap.value.needsUpdate = true;
         }
       }
     }
     if (aoRoygbivTexturePackName){
       if (aoRoygbivTexturePackName == texturePackName){
         if (texturePack.hasAO){
-          material.aoMap = texturePack.aoTexture.clone();
-          material.aoMap.roygbivTexturePackName = texturePackName;
-          material.aoMap.roygbivTextureName = 0;
+          addedObject.mapAO(texturePack.aoTexture.clone());
+          material.uniforms.aoMap.value.roygbivTexturePackName = texturePackName;
+          material.uniforms.aoMap.value.roygbivTextureName = 0;
           if (!(typeof textureRepeatU == UNDEFINED)){
-            material.aoMap.repeat.x = textureRepeatU;
+            material.uniforms.aoMap.value.repeat.x = textureRepeatU;
           }
           if (!(typeof textureRepeatV == UNDEFINED)){
-            material.aoMap.repeat.y = textureRepeatV;
+            material.uniforms.aoMap.value.repeat.y = textureRepeatV;
           }
-          material.needsUpdate = true;
-          material.aoMap.needsUpdate = true;
+          material.uniforms.aoMap.value.needsUpdate = true;
         }
       }
     }
     if (emissiveRoygbivTexturePackName){
       if (emissiveRoygbivTexturePackName == texturePackName){
         if (texturePack.hasEmissive){
-          material.emissive = new THREE.Color(0xffffff);
-          material.emissiveMap = texturePack.emissiveTexture.clone();
-          material.emissiveMap.roygbivTexturePackName = texturePackName;
-          material.emissiveMap.roygbivTextureName = 0;
+          addedObject.mapEmissive(texturePack.emissiveTexture.clone());
+          material.uniforms.emissiveMap.value.roygbivTexturePackName = texturePackName;
+          material.uniforms.emissiveMap.value.roygbivTextureName = 0;
           if (!(typeof textureRepeatU == UNDEFINED)){
-            material.emissiveMap.repeat.x = textureRepeatU;
+            material.uniforms.emissiveMap.value.repeat.x = textureRepeatU;
           }
           if (!(typeof textureRepeatV == UNDEFINED)){
-            material.emissiveMap.repeat.y = textureRepeatV;
+            material.uniforms.emissiveMap.value.repeat.y = textureRepeatV;
           }
-          material.needsUpdate = true;
-          material.emissiveMap.needsUpdate = true;
+          material.uniforms.emissiveMap.value.needsUpdate = true;
         }
       }
     }
@@ -3382,23 +3373,22 @@ StateLoader.prototype.mapTexturePackToSingleObject = function(diff){
     if (displacementRoygbivTexturePackName){
       if (displacementRoygbivTexturePackName == texturePackName){
         if (texturePack.hasHeight){
-          material.displacementMap = texturePack.heightTexture.clone();
-          material.displacementMap.roygbivTexturePackName = texturePackName;
-          material.displacementMap.roygbivTextureName = 0;
+          addedObject.mapDisplacement(texturePack.heightTexture.clone());
+          material.uniforms.displacementMap.value.roygbivTexturePackName = texturePackName;
+          material.uniforms.displacementMap.value.roygbivTextureName = 0;
           if (!(typeof textureRepeatU == UNDEFINED)){
-            material.displacementMap.repeat.x = textureRepeatU;
+            material.uniforms.displacementMap.value.repeat.x = textureRepeatU;
           }
           if (!(typeof textureRepeatV == UNDEFINED)){
-            material.displacementMap.repeat.y = textureRepeatV;
+            material.uniforms.displacementMap.value.repeat.y = textureRepeatV;
           }
           if (!(typeof displacementScale == UNDEFINED)){
-            material.displacementScale = displacementScale;
+            material.uniforms.displacementInfo.value.x = displacementScale;
           }
           if (!(typeof displacementBias == UNDEFINED)){
-            material.displacementBias = displacementBias;
+            material.uniforms.displacementInfo.value.y = displacementBias;
           }
-          material.needsUpdate = true;
-          material.displacementMap.needsUpdate = true;
+          material.uniforms.displacementMap.value.needsUpdate = true;
         }
       }
     }
@@ -3415,7 +3405,7 @@ StateLoader.prototype.mapLoadedTexturePack = function(texturePackName, exportObj
   }
   for (var addedObjectName in addedObjects){
     var addedObject = addedObjects[addedObjectName];
-    var material = addedObject.material;
+    var material = addedObject.mesh.material;
 
     var addedObjectExport = exportObj.addedObjects[addedObjectName];
     if (!addedObjectExport){
@@ -3482,77 +3472,74 @@ StateLoader.prototype.mapLoadedTexturePack = function(texturePackName, exportObj
     if (diffuseRoygbivTexturePackName){
       if (diffuseRoygbivTexturePackName == texturePackName){
         if (texturePack.hasDiffuse){
-          material.map = texturePack.diffuseTexture.clone();
-          material.map.roygbivTexturePackName = texturePackName;
-          material.map.roygbivTextureName = 0;
+          addedObject.mapDiffuse(texturePack.diffuseTexture.clone());
+          material.uniforms.diffuseMap.value.roygbivTexturePackName = texturePackName;
+          material.uniforms.diffuseMap.value.roygbivTextureName = 0;
           if (!(typeof textureOffsetX == UNDEFINED)){
-            material.map.offset.x = textureOffsetX;
+            material.uniforms.diffuseMap.value.offset.x = textureOffsetX;
           }
           if (!(typeof textureOffsetY == UNDEFINED)){
-            material.map.offset.y = textureOffsetY;
+            material.uniforms.diffuseMap.value.offset.y = textureOffsetY;
           }
           if (!(typeof textureRepeatU == UNDEFINED)){
-            material.map.repeat.x = textureRepeatU;
+            material.uniforms.diffuseMap.value.repeat.x = textureRepeatU;
           }
           if (!(typeof textureRepeatV == UNDEFINED)){
-            material.map.repeat.y = textureRepeatV;
+            material.uniforms.diffuseMap.value.repeat.y = textureRepeatV;
           }
-          material.needsUpdate = true;
-          material.map.needsUpdate = true;
+          material.uniforms.diffuseMap.value.needsUpdate = true;
+          material.uniforms.diffuseMap.value.updateMatrix();
         }
       }
     }
     if (alphaRoygbivTexturePackName){
       if (alphaRoygbivTexturePackName == texturePackName){
         if (texturePack.hasAlpha){
-          material.alphaMap = texturePack.alphaTexture.clone();
-          material.alphaMap.roygbivTexturePackName = texturePackName;
-          material.alphaMap.roygbivTextureName = 0;
-          material.transparent = false;
-          material.alphaTest = 0.5;
+          addedObject.mapAlpha(texturePack.alphaTexture.clone());
+          material.uniforms.alphaMap.value.roygbivTexturePackName = texturePackName;
+          material.uniforms.alphaMap.value.roygbivTextureName = 0;
           if (!(typeof textureRepeatU == UNDEFINED)){
-            material.alphaMap.repeat.x = textureRepeatU;
+            material.uniforms.alphaMap.value.repeat.x = textureRepeatU;
           }
           if (!(typeof textureRepeatV == UNDEFINED)){
-            material.alphaMap.repeat.y = textureRepeatV;
+            material.uniforms.alphaMap.value.repeat.y = textureRepeatV;
           }
-          material.needsUpdate = true;
-          material.alphaMap.needsUpdate = true;
+          material.uniforms.alphaMap.value.needsUpdate = true;
+          material.uniforms.alphaMap.value.updateMatrix();
         }
       }
     }
     if (aoRoygbivTexturePackName){
       if (aoRoygbivTexturePackName == texturePackName){
         if (texturePack.hasAO){
-          material.aoMap = texturePack.aoTexture.clone();
-          material.aoMap.roygbivTexturePackName = texturePackName;
-          material.aoMap.roygbivTextureName = 0;
+          addedObject.mapAO(texturePack.aoTexture.clone());
+          material.uniforms.aoMap.value.roygbivTexturePackName = texturePackName;
+          material.uniforms.aoMap.value.roygbivTextureName = 0;
           if (!(typeof textureRepeatU == UNDEFINED)){
-            material.aoMap.repeat.x = textureRepeatU;
+            material.uniforms.aoMap.value.repeat.x = textureRepeatU;
           }
           if (!(typeof textureRepeatV == UNDEFINED)){
-            material.aoMap.repeat.y = textureRepeatV;
+            material.uniforms.aoMap.value.repeat.y = textureRepeatV;
           }
-          material.needsUpdate = true;
-          material.aoMap.needsUpdate = true;
+          material.uniforms.aoMap.value.needsUpdate = true;
+          material.uniforms.aoMap.value.updateMatrix();
         }
       }
     }
     if (emissiveRoygbivTexturePackName){
       if (emissiveRoygbivTexturePackName == texturePackName){
         if (texturePack.hasEmissive){
-          material.emissive = new THREE.Color(0xffffff);
-          material.emissiveMap = texturePack.emissiveTexture.clone();
-          material.emissiveMap.roygbivTexturePackName = texturePackName;
-          material.emissiveMap.roygbivTextureName = 0;
+          addedObject.mapEmissive(texturePack.emissiveTexture.clone());
+          material.uniforms.emissiveMap.value.roygbivTexturePackName = texturePackName;
+          material.uniforms.emissiveMap.value.roygbivTextureName = 0;
           if (!(typeof textureRepeatU == UNDEFINED)){
-            material.emissiveMap.repeat.x = textureRepeatU;
+            material.uniforms.emissiveMap.value.repeat.x = textureRepeatU;
           }
           if (!(typeof textureRepeatV == UNDEFINED)){
-            material.emissiveMap.repeat.y = textureRepeatV;
+            material.uniforms.emissiveMap.value.repeat.y = textureRepeatV;
           }
-          material.needsUpdate = true;
-          material.emissiveMap.needsUpdate = true;
+          material.uniforms.emissiveMap.value.needsUpdate = true;
+          material.uniforms.emissiveMap.value.updateMatrix();
         }
       }
     }
@@ -3593,23 +3580,23 @@ StateLoader.prototype.mapLoadedTexturePack = function(texturePackName, exportObj
     if (displacementRoygbivTexturePackName){
       if (displacementRoygbivTexturePackName == texturePackName){
         if (texturePack.hasHeight){
-          material.displacementMap = texturePack.heightTexture.clone();
-          material.displacementMap.roygbivTexturePackName = texturePackName;
-          material.displacementMap.roygbivTextureName = 0;
+          addedObject.mapDisplacement(texturePack.heightTexture.clone());
+          material.uniforms.displacementMap.value.roygbivTexturePackName = texturePackName;
+          material.uniforms.displacementMap.value.roygbivTextureName = 0;
           if (!(typeof textureRepeatU == UNDEFINED)){
-            material.displacementMap.repeat.x = textureRepeatU;
+            material.uniforms.displacementMap.value.repeat.x = textureRepeatU;
           }
           if (!(typeof textureRepeatV == UNDEFINED)){
-            material.displacementMap.repeat.y = textureRepeatV;
+            material.uniforms.displacementMap.value.repeat.y = textureRepeatV;
           }
           if (!(typeof displacementScale == UNDEFINED)){
-            material.displacementScale = displacementScale;
+            material.uniforms.displacementInfo.value.x = displacementScale;
           }
           if (!(typeof displacementBias == UNDEFINED)){
-            material.displacementBias = displacementBias;
+            material.uniforms.displacementInfo.value.y = displacementBias;
           }
-          material.needsUpdate = true;
-          material.displacementMap.needsUpdate = true;
+          material.uniforms.displacementMap.value.needsUpdate = true;
+          material.uniforms.displacementMap.value.updateMatrix();
         }
       }
     }
@@ -3659,6 +3646,7 @@ StateLoader.prototype.mapLoadedTexture = function(texture, textureName){
     if (!curAddedObjectExport){
       break;
     }
+    var objInstance = addedObjects[addedObjectName];
     var material = addedObjects[addedObjectName].material;
     var metaData = addedObjects[addedObjectName].metaData;
 
@@ -3714,9 +3702,8 @@ StateLoader.prototype.mapLoadedTexture = function(texture, textureName){
           cloneTexture.offset.y = textureOffsetY;
         }
 
-        material.map = cloneTexture;
+        objInstance.mapDiffuse(cloneTexture);
         cloneTexture.needsUpdate = true;
-        material.needsUpdate = true;
       }
     }
     if (alphaRoygbivTextureName){
@@ -3729,8 +3716,6 @@ StateLoader.prototype.mapLoadedTexture = function(texture, textureName){
         cloneTexture.roygbivTextureName = textureName;
         cloneTexture.roygbivTexturePackName = 0;
 
-        material.alphaMap = cloneTexture;
-
         cloneTexture.wrapS = THREE.RepeatWrapping;
         cloneTexture.wrapT = THREE.RepeatWrapping;
         if (!(typeof repeatU == UNDEFINED)){
@@ -3753,10 +3738,8 @@ StateLoader.prototype.mapLoadedTexture = function(texture, textureName){
           }
         }
 
+        objInstance.mapAlpha(cloneTexture);
         cloneTexture.needsUpdate = true;
-        material.transparent = true;
-        material.alphaTest = 0.5;
-        material.needsUpdate = true;
       }
     }
     if (aoRoygbivTextureName){
@@ -3768,7 +3751,6 @@ StateLoader.prototype.mapLoadedTexture = function(texture, textureName){
         cloneTexture.fromUploadedImage = texture.fromUploadedImage;
         cloneTexture.roygbivTextureName = textureName;
         cloneTexture.roygbivTexturePackName = 0;
-        material.aoMap = cloneTexture;
 
         cloneTexture.wrapS = THREE.RepeatWrapping;
         cloneTexture.wrapT = THREE.RepeatWrapping;
@@ -3792,8 +3774,8 @@ StateLoader.prototype.mapLoadedTexture = function(texture, textureName){
           }
         }
 
+        objInstance.mapAO(cloneTexture);
         cloneTexture.needsUpdate = true;
-        material.needsUpdate = true;
       }
     }
     if (emissiveRoygbivTextureName){
@@ -3802,11 +3784,9 @@ StateLoader.prototype.mapLoadedTexture = function(texture, textureName){
         var repeatV = curAddedObjectExport["textureRepeatV"];
 
         var cloneTexture = texture.clone();
-        material.emissive = new THREE.Color( 0xffffff );
         cloneTexture.fromUploadedImage = texture.fromUploadedImage;
         cloneTexture.roygbivTextureName = textureName;
         cloneTexture.roygbivTexturePackName = 0;
-        material.emissiveMap = cloneTexture;
 
         cloneTexture.wrapS = THREE.RepeatWrapping;
         cloneTexture.wrapT = THREE.RepeatWrapping;
@@ -3830,8 +3810,8 @@ StateLoader.prototype.mapLoadedTexture = function(texture, textureName){
           }
         }
 
+        objInstance.mapEmissive(cloneTexture);
         cloneTexture.needsUpdate = true;
-        material.needsUpdate = true;
       }
     }
     if (normalRoygbivTextureName){
@@ -3918,13 +3898,11 @@ StateLoader.prototype.mapLoadedTexture = function(texture, textureName){
         cloneTexture.roygbivTexturePackName = 0;
 
         if (!(typeof displacementScale == UNDEFINED)){
-          material.displacementScale = displacementScale;
+          objInstance.mesh.material.uniforms.displacementInfo.value.x = displacementScale;
         }
         if (!(typeof displacementBias == UNDEFINED)){
-          material.displacementBias = displacementBias;
+          objInstance.mesh.material.uniforms.displacementInfo.value.y = displacementBias;
         }
-
-        material.displacementMap = cloneTexture;
 
         cloneTexture.wrapS = THREE.RepeatWrapping;
         cloneTexture.wrapT = THREE.RepeatWrapping;
@@ -3948,8 +3926,8 @@ StateLoader.prototype.mapLoadedTexture = function(texture, textureName){
           }
         }
 
+        objInstance.mapDisplacement(cloneTexture);
         cloneTexture.needsUpdate = true;
-        material.needsUpdate = true;
       }
     }
   }

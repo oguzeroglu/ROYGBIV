@@ -50,12 +50,64 @@ DisplacementCalculator.prototype.applyDisplacementMap = function(object, texture
   geometry.attributes.position.needsUpdate = true;
 }
 
+DisplacementCalculator.prototype.applyDisplacementMapToNormalGeometry = function(normalGeometry, texture, scale, bias){
+
+  var heightMapWidth = texture.image.width;
+  var heightMapHeight = texture.image.height;
+  var displacementBuffer = this.getDisplacementBuffer(texture);
+
+  var faces = normalGeometry.faces;
+  var vertices = normalGeometry.vertices;
+  var faceVertexUVs = normalGeometry.faceVertexUvs;
+  var objPositions = [];
+  var objUVs = [];
+  var objNormals = [];
+  for (var i = 0; i<faces.length ; i++){
+    var face = faces[i];
+    var a = face.a;
+    var b = face.b;
+    var c = face.c;
+    var vertex1 = vertices[a];
+    var vertex2 = vertices[b];
+    var vertex3 = vertices[c];
+    objPositions.push(vertex1);
+    objPositions.push(vertex2);
+    objPositions.push(vertex3);
+    objNormals.push(face.normal.clone());
+    objNormals.push(face.normal.clone());
+    objNormals.push(face.normal.clone());
+    var curFaceVertexUV = faceVertexUVs[0][i];
+    for (var ix = 0; ix<3; ix++){
+      var vuv = curFaceVertexUV[ix];
+      objUVs.push(new THREE.Vector2(vuv.x, vuv.y));
+    }
+  }
+  for (var i = 0; i<objPositions.length; i++){
+    var position = objPositions[i];
+    if (position.displaced){
+      continue;
+    }
+    var normal = objNormals[i];
+    var uv = objUVs[i];
+    texture.transformUv(uv);
+    var u = ((Math.abs(uv.x) * heightMapWidth) % heightMapWidth) | 0;
+    var v = ((Math.abs(uv.y) * heightMapHeight) % heightMapHeight) | 0;
+    var pos = (u + v * heightMapWidth) * 4;
+    var r = displacementBuffer[pos] / 255.0;
+    var normalizedNormal = normal.normalize();
+    position.x += normalizedNormal.x * (r * scale + bias);
+    position.y += normalizedNormal.y * (r * scale + bias);
+    position.z += normalizedNormal.z * (r * scale + bias);
+    position.displaced = true;
+  }
+}
+
 DisplacementCalculator.prototype.getDisplacedPositions = function(obj, worldMatrix){
-  var displacementBias = obj.material.displacementBias;
-  var displacementScale = obj.material.displacementScale;
-  var heightMapWidth = obj.material.displacementMap.image.width;
-  var heightMapHeight = obj.material.displacementMap.image.height;
-  var displacementBuffer = this.getDisplacementBuffer(obj.material.displacementMap)
+  var displacementBias = obj.mesh.material.uniforms.displacementInfo.value.y;
+  var displacementScale = obj.mesh.material.uniforms.displacementInfo.value.x;
+  var heightMapWidth = obj.mesh.material.uniforms.displacementMap.value.image.width;
+  var heightMapHeight = obj.mesh.material.uniforms.displacementMap.value.image.height;
+  var displacementBuffer = this.getDisplacementBuffer(obj.mesh.material.uniforms.displacementMap.value);
 
   var normalMatrix = 0;
   if (worldMatrix){
@@ -115,9 +167,9 @@ DisplacementCalculator.prototype.getDisplacedPositions = function(obj, worldMatr
     }
   }
 
-  if (obj.material.map){
-    var offsetX = obj.material.map.offset.x;
-    var offsetY = obj.material.map.offset.y;
+  if (obj.hasDiffuseMap()){
+    var offsetX = obj.mesh.material.uniforms.diffuseMap.value.offset.x;
+    var offsetY = obj.mesh.material.uniforms.diffuseMap.value.offset.y;
     while (offsetX < 0){
       offsetX += 100;
     }
@@ -126,17 +178,17 @@ DisplacementCalculator.prototype.getDisplacedPositions = function(obj, worldMatr
     }
     offsetX = offsetX - Math.floor(offsetX);
     offsetY = offsetY - Math.floor(offsetY);
-    obj.material.displacementMap.offset.set(offsetX, offsetY);
+    obj.mesh.material.uniforms.displacementMap.value.offset.set(offsetX, offsetY);
   }
 
-  obj.material.displacementMap.updateMatrix();
+  obj.mesh.material.uniforms.displacementMap.value.updateMatrix();
 
   var displacedPositions = [];
   for (var i = 0; i<objPositions.length; i++){
     var position = objPositions[i];
     var normal = objNormals[i];
     var uv = objUVs[i];
-    obj.material.displacementMap.transformUv(uv);
+    obj.mesh.material.uniforms.displacementMap.value.transformUv(uv);
     var u = ((Math.abs(uv.x) * heightMapWidth) % heightMapWidth) | 0;
     var v = ((Math.abs(uv.y) * heightMapHeight) % heightMapHeight) | 0;
     var pos = (u + v * heightMapWidth) * 4;

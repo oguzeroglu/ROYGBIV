@@ -20,7 +20,7 @@ var commandArgumentsExpectedCount = [
     0, //cropGridSystem
     6, //pasteCroppedGridSystem
     0, //switchView
-    3, //newBasicMaterial
+    2, //newBasicMaterial
     0, //printMaterials
     1, //destroyMaterial
     2, //newSurface
@@ -149,7 +149,7 @@ var commandArgumentsExpectedExplanation = [
   "cropGridSystem", // cropGridSystem
   "pasteCroppedGridSystem name xTranslation yTranslation zTranslation outlineColor cellSize", //pasteCroppedGridSystem
   "switchView", //switchView
-  "newBasicMaterial name color isWireFramed", //newBasicMaterial
+  "newBasicMaterial name color", //newBasicMaterial
   "printMaterials", //printMaterials
   "destroyMaterial name", //destroyMaterial
   "newSurface name material", //newSurface
@@ -407,7 +407,7 @@ var commandInfo = [
   "cropGridSystem: Crops selected part of a grid system.",
   "pasteCroppedGridSystem: Draws a cropped grid system.",
   "switchView: Switches between views (design/preview).",
-  "newBasicMaterial: Creates a new Basic Material.",
+  "newBasicMaterial: Creates a new basic material.",
   "printMaterials: Prints created materials.",
   "destroyMaterial: Destroys a material.",
   "newSurface: Creates a new surface.",
@@ -814,6 +814,8 @@ var MAX_TEXTURE_SIZE = 4096;
 var MAX_PS_TIME = 100000;
 var crosshairs = new Object();
 var selectedCrosshair;
+var GLOBAL_FOG_UNIFORM = new THREE.Uniform(new THREE.Vector4(-100.0, 0, 0, 0));
+var VERTEX_SHADER_TEXTURE_FETCH_SUPPORTED;
 
 // WORKER VARIABLES
 var WORKERS_SUPPORTED = (typeof(Worker) !== "undefined");
