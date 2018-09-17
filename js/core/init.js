@@ -589,20 +589,19 @@ window.addEventListener('keydown', function(event){
           if (selectedAddedObject && !cliFocused){
             event.preventDefault();
           }
-
           if (mode == 1){
             return;
           }
           if (selectedAddedObject){
-            selectedAddedObject.destroy();
             delete addedObjects[selectedAddedObject.name];
+            selectedAddedObject.destroy();
             terminal.clear();
             terminal.printInfo(Text.OBJECT_DESTROYED);
             selectedAddedObject = 0;
             undoRedoHandler.push();
           }else if (selectedObjectGroup){
-            selectedObjectGroup.destroy();
             delete objectGroups[selectedObjectGroup.name];
+            selectedObjectGroup.destroy();
             selectedObjectGroup = 0;
             terminal.clear();
             terminal.printInfo(Text.OBJECT_DESTROYED);

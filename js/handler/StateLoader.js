@@ -167,7 +167,7 @@ StateLoader.prototype.handleObjectGroupsDiff = function(){
     if (kind == "D"){
       var objectGroup = objectGroups[diff.path[1]];
       if (objectGroup){
-        objectGroup.destroy();
+        objectGroup.destroy(true);
         delete objectGroups[diff.path[1]];
       }
     }else if (kind == "N"){
@@ -2463,8 +2463,6 @@ StateLoader.prototype.load = function(undo){
           }.bind({textureNameX: textureName, offsetXX: offsetX, offsetYY: offsetY, repeatUU: repeatU, repeatVV: repeatV}), function(xhr){
             textureCache[this.textureNameX] = 2;
             textures[this.textureNameX] = 2;
-            that.totalLoadedTextureCount ++;
-            that.createObjectGroupsAfterLoadedTextures();
           }.bind({textureNameX: textureName}), function(xhr){
             textureCache[this.textureNameX] = 3;
             textures[this.textureNameX] = 3;
@@ -2829,6 +2827,10 @@ StateLoader.prototype.load = function(undo){
       }
     }
 
+    if (!this.hasTextures && !this.hasTexturePacks){
+      this.createObjectGroupsAfterLoadedTextures();
+    }
+
     return true;
   }catch (err){
     throw err;
@@ -2884,6 +2886,11 @@ StateLoader.prototype.createObjectGroupsAfterLoadedTextures = function(){
   }
 
   undoRedoHandler.push();
+
+  canvas.style.visibility = "";
+  terminal.enable();
+  terminal.clear();
+  terminal.printInfo(Text.PROJECT_LOADED);
 
 }
 

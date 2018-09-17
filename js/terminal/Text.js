@@ -226,6 +226,7 @@ var Text = function(){
   this.CHOOSE_A_FILE_TO_UPLOAD = "Dialog opened. Choose a file to upload.";
   this.LOADING_FILE = "Loading file.";
   this.PROJECT_LOADED = "Project loaded.";
+  this.LOADING_PROJECT = "Loading project.";
   this.PROJECT_FAILED_TO_LOAD = "Project failed to load: @@1";
   this.NOTHING_TO_UNDO = "Nothing to undo.";
   this.OK = "Ok.";

@@ -419,7 +419,7 @@ TextureMerger.prototype.insert = function(node, textureName, texturesObj){
         this.insert(node, newTextureName, texturesObj);
       }
     }else{
-      console.error("TextureMerger error: Texture not inserted: "+textureName+". Try to use smaller textures.");
+      throw new Error("Error: Try to use smaller textures.");
     }
   }else{
     // First node

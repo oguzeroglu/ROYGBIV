@@ -356,7 +356,7 @@ AddedObject.prototype.getTextureStack = function(){
   if (this.hasAOMap()){
     texturesStack.push(this.mesh.material.uniforms.aoMap.value);
   }
-  if (this.hasEmissive()){
+  if (this.hasEmissiveMap()){
     texturesStack.push(this.mesh.material.uniforms.emissiveMap.value);
   }
   if (this.material.normalMap){

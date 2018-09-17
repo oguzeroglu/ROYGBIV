@@ -129,6 +129,27 @@ TexturePack.prototype.destroy = function(){
       addedObject.resetAssociatedTexturePack();
     }
   }
+  if (this.hasDiffuse){
+    this.diffuseTexture.dispose();
+  }
+  if (this.hasAlpha){
+    this.alphaTexture.dispose();
+  }
+  if (this.hasAO){
+    this.aoTexture.dispose();
+  }
+  if (this.hasEmissive){
+    this.emissiveTexture.dispose();
+  }
+  if (this.hasNormal){
+    this.normalTexture.dispose();
+  }
+  if (this.hasSpecular){
+    this.specularTexture.dispose();
+  }
+  if (this.hasHeight){
+    this.heightTexture.dispose();
+  }
   delete texturePacks[this.name];
 }
 

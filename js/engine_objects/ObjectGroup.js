@@ -36,16 +36,34 @@ ObjectGroup.prototype.handleTextures = function(){
     if (addedObject.hasAlphaMap()){
       hasTexture = true;
       var tName = addedObject.name + ",alpha";
+      if (addedObject.hasDiffuseMap()){
+        addedObject.mesh.material.uniforms.alphaMap.value.offset.copy(
+          addedObject.mesh.material.uniforms.diffuseMap.value.offset
+        );
+        addedObject.mesh.material.uniforms.alphaMap.value.updateMatrix();
+      }
       texturesObj[tName] = addedObject.mesh.material.uniforms.alphaMap.value;
     }
     if (addedObject.hasAOMap()){
       hasTexture = true;
       var tName = addedObject.name + ",ao";
+      if (addedObject.hasDiffuseMap()){
+        addedObject.mesh.material.uniforms.aoMap.value.offset.copy(
+          addedObject.mesh.material.uniforms.diffuseMap.value.offset
+        );
+        addedObject.mesh.material.uniforms.aoMap.value.updateMatrix();
+      }
       texturesObj[tName] = addedObject.mesh.material.uniforms.aoMap.value;
     }
     if (addedObject.hasEmissiveMap()){
       hasTexture = true;
       var tName = addedObject.name + ",emissive";
+      if (addedObject.hasDiffuseMap()){
+        addedObject.mesh.material.uniforms.emissiveMap.value.offset.copy(
+          addedObject.mesh.material.uniforms.diffuseMap.value.offset
+        );
+        addedObject.mesh.material.uniforms.emissiveMap.value.updateMatrix();
+      }
       texturesObj[tName] = addedObject.mesh.material.uniforms.emissiveMap.value;
     }
   }
@@ -82,7 +100,9 @@ ObjectGroup.prototype.handleDisplacement = function(normalGeometry, childObj){
 
 ObjectGroup.prototype.merge = function(){
 
-  this.handleTextures();
+  if (!this.textureMerger){
+    this.handleTextures();
+  }
 
   this.geometry = new THREE.BufferGeometry();
   var pseudoGeometry = new THREE.Geometry();
@@ -658,7 +678,7 @@ ObjectGroup.prototype.resetPosition = function(){
   this.previewGraphicsGroup.position.copy(this.previewMesh);
 }
 
-ObjectGroup.prototype.destroy = function(){
+ObjectGroup.prototype.destroy = function(isUndo){
   if (selectedObjectGroup && selectedObjectGroup.name == this.name){
     selectedObjectGroup = 0;
   }
@@ -669,7 +689,11 @@ ObjectGroup.prototype.destroy = function(){
     var childObj= this.group[name];
     if (childObj.destroyedGrids){
       for (var gridName in childObj.destroyedGrids){
-        delete childObj.destroyedGrids[gridName].destroyedAddedObject;
+        if (!isUndo){
+          delete childObj.destroyedGrids[gridName].destroyedAddedObject;
+        }else{
+          childObj.destroyedGrids[gridName].destroyedAddedObject = childObj.name;
+        }
         delete childObj.destroyedGrids[gridName].destroyedObjectGroup;
       }
     }

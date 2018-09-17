@@ -1039,6 +1039,7 @@ function parse(input){
               }
             }
           }
+          textures[textureName].dispose();
           delete textures[textureName];
           delete textureURLs[textureName];
           delete modifiedTextures[textureName];
@@ -2777,9 +2778,12 @@ function parse(input){
                   var loadedState = JSON.parse(data);
                   var stateLoader = new StateLoader(loadedState);
                   var result = stateLoader.load();
-                  terminal.clear();
                   if (result){
-                    terminal.printInfo(Text.PROJECT_LOADED);
+                    if (stateLoader.hasTextures || stateLoader.hasTexturePacks){
+                      terminal.printInfo(Text.LOADING_PROJECT);
+                      canvas.style.visibility = "hidden";
+                      terminal.disable();
+                    }
                   }else{
                     terminal.printError(Text.PROJECT_FAILED_TO_LOAD.replace(
                       Text.PARAM1, stateLoader.reason
@@ -3198,8 +3202,6 @@ function parse(input){
               if (!object){
                 var gluedObject = objectGroups[objectNamesArray[i]];
                 detachedObjectGroups[gluedObject.name] = gluedObject;
-                gluedObject.detach();
-                delete objectGroups[gluedObject.name];
                 for (var gluedObjectName in gluedObject.group){
                   group[gluedObjectName] = gluedObject.group[gluedObjectName];
                 }
@@ -3240,6 +3242,20 @@ function parse(input){
               groupName,
               group
             );
+
+            try{
+              objectGroup.handleTextures();
+            }catch (textureMergerErr){
+              terminal.printError(textureMergerErr.message);
+              return true;
+            }
+
+            for (var objGroupName in detachedObjectGroups){
+              var gluedObject = detachedObjectGroups[objGroupName];
+              gluedObject.detach();
+              delete objectGroups[gluedObject.name];
+            }
+
             if (materialUsed == 1){
               objectGroup.isBasicMaterial = true;
               objectGroup.isPhongMaterial = false;

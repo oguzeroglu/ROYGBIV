@@ -29,6 +29,18 @@ Terminal.prototype.init = function(){
 		}, options
 	);
 	this.setStyle();
+	this.prompt = document.getElementsByClassName("prompt")[0];
+	this.cursor = document.getElementsByClassName("cursor-line")[0];
+}
+
+Terminal.prototype.enable = function(){
+	this.prompt.style.visibility = "";
+	this.cursor.style.visibility = "";
+}
+
+Terminal.prototype.disable = function(){
+	this.prompt.style.visibility = "hidden";
+	this.cursor.style.visibility = "hidden";
 }
 
 Terminal.prototype.setStyle = function(){
