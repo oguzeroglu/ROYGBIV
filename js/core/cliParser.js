@@ -4312,6 +4312,10 @@ function parse(input){
             terminal.printError(Text.IS_NOT_POWER_OF_TWO.replace(Text.PARAM1, "height"));
             return true;
           }
+          if (width > MAX_TEXTURE_SIZE){
+            terminal.printError(Text.TEXTURE_SIZE_CANNOT_EXCEED);
+            return true;
+          }
           projectAtlasSize.width = width;
           projectAtlasSize.height = height;
           terminal.printInfo(Text.ATLAS_TEXTURE_SIZE_SET);
