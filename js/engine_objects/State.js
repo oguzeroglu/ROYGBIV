@@ -165,7 +165,7 @@ var State = function(){
     objectGroupsExport[objectName] = objectGroups[objectName].export();
   }
   this.objectGroups = objectGroupsExport;
-  // MARKED POINTS
+  // MARKED POINTS *************************************************
   var markedPointsExport = new Object();
   for (var markedPointName in markedPoints){
     markedPointsExport[markedPointName] = markedPoints[markedPointName].export();
@@ -214,5 +214,10 @@ var State = function(){
     fogActive: fogActive,
     fogColor: fogColor,
     fogDensity: fogDensity
+  };
+  // ATLAS TEXTURE SIZE *********************************************
+  this.projectAtlasSize = {
+    width: projectAtlasSize.width,
+    height: projectAtlasSize.height
   };
 }

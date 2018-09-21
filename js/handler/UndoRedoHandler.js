@@ -120,6 +120,8 @@ UndoRedoHandler.prototype.handleDiff = function(diff){
       new StateLoader(curDiff).handleModifiedTexturesDiff();
     }else if (path[0] == "fogObj"){
       new StateLoader(curDiff).handleFogObjDiff();
+    }else if (path[0] == "projectAtlasSize"){
+      new StateLoader(curDiff).handleProjectAtlasSizeDiff();
     }
   }
 }

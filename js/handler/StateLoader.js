@@ -5,6 +5,20 @@ var StateLoader = function(stateObj){
   this.totalLoadedTexturePackCount = 0;
 }
 
+StateLoader.prototype.handleProjectAtlasSizeDiff = function(){
+  var diff = this.stateObj;
+  var kind = diff.kind;
+  if (diff.path.length == 2){
+    if (kind == "E"){
+      if (diff.path[1] == "width"){
+        projectAtlasSize.width = diff.rhs;
+      }else if (diff.path[1] == "height"){
+        projectAtlasSize.height = diff.rhs;
+      }
+    }
+  }
+}
+
 StateLoader.prototype.handleFogObjDiff = function(){
   var diff = this.stateObj;
   var kind = diff.kind;
@@ -1653,32 +1667,6 @@ StateLoader.prototype.handleAddedObjectDiff = function(){
       addedObjectInstance.mass = mass;
 
       if (!curAddedObjectExport.fromObjectGroup){
-
-        if (curAddedObjectExport.recentlyDetached){
-          var quaternionX = curAddedObjectExport.worldQuaternionX;
-          var quaternionY = curAddedObjectExport.worldQuaternionY;
-          var quaternionZ = curAddedObjectExport.worldQuaternionZ;
-          var quaternionW = curAddedObjectExport.worldQuaternionW;
-          var physicsQuaternionX = curAddedObjectExport.physicsQuaternionX;
-          var physicsQuaternionY = curAddedObjectExport.physicsQuaternionY;
-          var physicsQuaternionZ = curAddedObjectExport.physicsQuaternionZ;
-          var physicsQuaternionW = curAddedObjectExport.physicsQuaternionW;
-          addedObjectInstance.mesh.quaternion.set(quaternionX, quaternionY, quaternionZ, quaternionW);
-          addedObjectInstance.previewMesh.quaternion.set(quaternionX, quaternionY, quaternionZ, quaternionW);
-          addedObjectInstance.physicsBody.quaternion.set(physicsQuaternionX, physicsQuaternionY, physicsQuaternionZ, physicsQuaternionW);
-          addedObjectInstance.physicsBody.initQuaternion.copy(addedObjectInstance.physicsBody.quaternion);
-          addedObjectInstance.initQuaternion = addedObjectInstance.mesh.quaternion.clone();
-          addedObjectInstance.recentlyDetached = true;
-          addedObjectInstance.worldQuaternionX = quaternionX;
-          addedObjectInstance.worldQuaternionY = quaternionY;
-          addedObjectInstance.worldQuaternionZ = quaternionZ;
-          addedObjectInstance.worldQuaternionW = quaternionW;
-          addedObjectInstance.physicsQuaternionX = physicsQuaternionX;
-          addedObjectInstance.physicsQuaternionY = physicsQuaternionY;
-          addedObjectInstance.physicsQuaternionZ = physicsQuaternionZ;
-          addedObjectInstance.physicsQuaternionW = physicsQuaternionW;
-        }
-
         var rotationX = curAddedObjectExport.rotationX;
         var rotationY = curAddedObjectExport.rotationY;
         var rotationZ = curAddedObjectExport.rotationZ;
@@ -2254,31 +2242,6 @@ StateLoader.prototype.load = function(undo){
 
       if (!curAddedObjectExport.fromObjectGroup){
 
-        if (curAddedObjectExport.recentlyDetached){
-          var quaternionX = curAddedObjectExport.worldQuaternionX;
-          var quaternionY = curAddedObjectExport.worldQuaternionY;
-          var quaternionZ = curAddedObjectExport.worldQuaternionZ;
-          var quaternionW = curAddedObjectExport.worldQuaternionW;
-          var physicsQuaternionX = curAddedObjectExport.physicsQuaternionX;
-          var physicsQuaternionY = curAddedObjectExport.physicsQuaternionY;
-          var physicsQuaternionZ = curAddedObjectExport.physicsQuaternionZ;
-          var physicsQuaternionW = curAddedObjectExport.physicsQuaternionW;
-          addedObjectInstance.mesh.quaternion.set(quaternionX, quaternionY, quaternionZ, quaternionW);
-          addedObjectInstance.previewMesh.quaternion.set(quaternionX, quaternionY, quaternionZ, quaternionW);
-          addedObjectInstance.physicsBody.quaternion.set(physicsQuaternionX, physicsQuaternionY, physicsQuaternionZ, physicsQuaternionW);
-          addedObjectInstance.physicsBody.initQuaternion.copy(addedObjectInstance.physicsBody.quaternion);
-          addedObjectInstance.initQuaternion = addedObjectInstance.mesh.quaternion.clone();
-          addedObjectInstance.recentlyDetached = true;
-          addedObjectInstance.worldQuaternionX = quaternionX;
-          addedObjectInstance.worldQuaternionY = quaternionY;
-          addedObjectInstance.worldQuaternionZ = quaternionZ;
-          addedObjectInstance.worldQuaternionW = quaternionW;
-          addedObjectInstance.physicsQuaternionX = physicsQuaternionX;
-          addedObjectInstance.physicsQuaternionY = physicsQuaternionY;
-          addedObjectInstance.physicsQuaternionZ = physicsQuaternionZ;
-          addedObjectInstance.physicsQuaternionW = physicsQuaternionW;
-        }
-
         var rotationX = curAddedObjectExport.rotationX;
         var rotationY = curAddedObjectExport.rotationY;
         var rotationZ = curAddedObjectExport.rotationZ;
@@ -2305,6 +2268,25 @@ StateLoader.prototype.load = function(undo){
         );
         addedObjectInstance.initQuaternion.copy(addedObjectInstance.mesh.quaternion);
         addedObjectInstance.physicsBody.initQuaternion.copy(addedObjectInstance.physicsBody.quaternion);
+      }else{
+        addedObjectInstance.mesh.quaternion.set(
+          curAddedObjectExport.quaternionX,
+          curAddedObjectExport.quaternionY,
+          curAddedObjectExport.quaternionZ,
+          curAddedObjectExport.quaternionW
+        );
+        addedObjectInstance.previewMesh.quaternion.set(
+          curAddedObjectExport.quaternionX,
+          curAddedObjectExport.quaternionY,
+          curAddedObjectExport.quaternionZ,
+          curAddedObjectExport.quaternionW
+        );
+        addedObjectInstance.physicsBody.quaternion.set(
+          curAddedObjectExport.pQuaternionX,
+          curAddedObjectExport.pQuaternionY,
+          curAddedObjectExport.pQuaternionZ,
+          curAddedObjectExport.pQuaternionW
+        );
       }
 
       if (curAddedObjectExport.blendingMode == "NO_BLENDING"){
@@ -2329,6 +2311,10 @@ StateLoader.prototype.load = function(undo){
       addedObjectInstance.mesh.material.uniforms.aoIntensity.value = curAddedObjectExport.aoMapIntensity;
 
       addedObjects[addedObjectName] = addedObjectInstance;
+
+      addedObjectInstance.rotationX = curAddedObjectExport.rotationX;
+      addedObjectInstance.rotationY = curAddedObjectExport.rotationY;
+      addedObjectInstance.rotationZ = curAddedObjectExport.rotationZ;
 
     }
     // TEXTURE URLS ************************************************
@@ -2710,6 +2696,11 @@ StateLoader.prototype.load = function(undo){
     fogColor = fogObj.fogColor;
     fogDensity = fogObj.fogDensity;
     fogColorRGB = new THREE.Color(fogColor);
+    // ATLAS TEXTURE SIZE ******************************************
+    projectAtlasSize = {
+      width: obj.projectAtlasSize.width,
+      height: obj.projectAtlasSize.height
+    };
     // POST PROCESSING *********************************************
     scanlineCount = obj.scanlineCount;
     scanlineSIntensity = obj.scanlineSIntensity;

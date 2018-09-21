@@ -4283,8 +4283,49 @@ function parse(input){
             }
           }
           obj.setSlippery(slipperinessState);
-          terminal.printError(Text.SLIPPERINESS_ADJUSTED);
+          terminal.printInfo(Text.SLIPPERINESS_ADJUSTED);
           undoRedoHandler.push();
+          return true;
+        break;
+        case 127: //setAtlasTextureSize
+          if (mode != 0){
+            terminal.printError(Text.WORKS_ONLY_IN_DESIGN_MODE);
+            return true;
+          }
+          var width = parseInt(splitted[1]);
+          var height = parseInt(splitted[2]);
+          if (isNaN(width)){
+            terminal.printError(Text.IS_NOT_A_NUMBER.replace(Text.PARAM1, "width"));
+            return true;
+          }
+          if (isNaN(height)){
+            terminal.printError(Text.IS_NOT_A_NUMBER.replace(Text.PARAM1, "height"));
+            return true;
+          }
+          var isWidthPowerOfTwo = width && (width & (width - 1)) == 0;
+          var isHeightPowerOfTwo = height && (height & (height - 1)) == 0;
+          if (!isWidthPowerOfTwo){
+            terminal.printError(Text.IS_NOT_POWER_OF_TWO.replace(Text.PARAM1, "width"));
+            return true;
+          }
+          if (!isHeightPowerOfTwo){
+            terminal.printError(Text.IS_NOT_POWER_OF_TWO.replace(Text.PARAM1, "height"));
+            return true;
+          }
+          projectAtlasSize.width = width;
+          projectAtlasSize.height = height;
+          terminal.printInfo(Text.ATLAS_TEXTURE_SIZE_SET);
+          undoRedoHandler.push();
+          return true;
+        break;
+        case 128: // printAtlasTextureSize
+          if (!projectAtlasSize.width || !projectAtlasSize.height){
+            terminal.printError(Text.ATLAS_TEXTURE_SIZE_NOT_SET);
+          }else{
+            terminal.printHeader(Text.ATLAS_TEXTURE_SIZE);
+            terminal.printInfo(Text.TREE2.replace(Text.PARAM1, "Width").replace(Text.PARAM2, projectAtlasSize.width), true);
+            terminal.printInfo(Text.TREE2.replace(Text.PARAM1, "Height").replace(Text.PARAM2, projectAtlasSize.height));
+          }
           return true;
         break;
       }

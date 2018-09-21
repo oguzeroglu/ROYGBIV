@@ -132,7 +132,9 @@ var commandArgumentsExpectedCount = [
     3, //newSphere
     0, //printFogInfo
     4, //applyDisplacementMap
-    2 //setSlipperiness
+    2, //setSlipperiness
+    2, //setAtlasTextureSize
+    0 //printAtlasTextureSize
 ];
 var commandArgumentsExpectedExplanation = [
   "help", //help
@@ -261,7 +263,9 @@ var commandArgumentsExpectedExplanation = [
   "newSphere name material radius", //newSphere
   "printFogInfo", //printFogInfo
   "applyDisplacementMap objectName textureName scale bias", //applyDisplacementMap
-  "setSlipperiness objectName on/off"
+  "setSlipperiness objectName on/off", //setSlipperiness
+  "setAtlasTextureSize width height", //setAtlasTextureSize
+  "printAtlasTextureSize" //printAtlasTextureSize
 ];
 var commands = [
   "help",
@@ -390,7 +394,9 @@ var commands = [
   "newSphere",
   "printFogInfo",
   "applyDisplacementMap",
-  "setSlipperiness"
+  "setSlipperiness",
+  "setAtlasTextureSize",
+  "printAtlasTextureSize"
 ];
 var commandInfo = [
   "help: Prints command list.",
@@ -519,7 +525,9 @@ var commandInfo = [
   "newSphere: Creates a new sphere.",
   "printFogInfo: Prints the fog info.",
   "applyDisplacementMap: Applies a displacement map to an object and modifies its geometry.",
-  "setSlipperiness: Sets the slipperiness of an object."
+  "setSlipperiness: Sets the slipperiness of an object.",
+  "setAtlasTextureSize: Sets the size of each texture/texture pack when creating object groups.",
+  "printAtlasTextureSize: Prints the atlas texture size set with setAtlasTextureSize command."
 ];
 var keyboardInfo = [
   "W/S : Translates the camera on axis Z.",
@@ -816,6 +824,7 @@ var crosshairs = new Object();
 var selectedCrosshair;
 var GLOBAL_FOG_UNIFORM = new THREE.Uniform(new THREE.Vector4(-100.0, 0, 0, 0));
 var VERTEX_SHADER_TEXTURE_FETCH_SUPPORTED;
+var projectAtlasSize = new Object(); // width, height
 
 // WORKER VARIABLES
 var WORKERS_SUPPORTED = (typeof(Worker) !== "undefined");

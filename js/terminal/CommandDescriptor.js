@@ -555,6 +555,12 @@ var CommandDescriptor = function(){
   this.setSlipperiness.types.push(this.OBJECT_NAME); // objectName
   this.setSlipperiness.types.push(this.STATE_ON_OFF); // on/off
 
+  // setAtlasTextureSize
+  this.setAtlasTextureSize = new Object();
+  this.setAtlasTextureSize.types = [];
+  this.setAtlasTextureSize.types.push(this.UNKNOWN_INDICATOR); // width
+  this.setAtlasTextureSize.types.push(this.UNKNOWN_INDICATOR); // height
+
 };
 
 CommandDescriptor.prototype.test = function(){

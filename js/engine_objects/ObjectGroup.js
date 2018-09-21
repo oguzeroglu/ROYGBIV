@@ -15,6 +15,26 @@ var ObjectGroup = function(name, group){
 
 }
 
+ObjectGroup.prototype.handleAtlasSize = function(texture){
+  if (!projectAtlasSize.width || ! projectAtlasSize.height){
+    return texture;
+  }
+  var newWidth = projectAtlasSize.width;
+  var newHeight = projectAtlasSize.height;
+  var sourceWidth = texture.image.width;
+  var sourceHeight = texture.image.height;
+  var tmpCanvas = document.createElement("canvas");
+  tmpCanvas.width = newWidth;
+  tmpCanvas.height = newHeight;
+  var tmpContext = tmpCanvas.getContext("2d");
+  tmpContext.drawImage(
+    texture.image, 0, 0, sourceWidth, sourceHeight, 0, 0, newWidth, newHeight
+  );
+  var txt = new THREE.CanvasTexture(tmpCanvas);
+  txt.needsUpdate = true;
+  return txt;
+}
+
 ObjectGroup.prototype.getChildUV = function(addedObject, textureType, originalUV){
   var range = this.textureMerger.ranges[addedObject.name + "," + textureType];
   return new THREE.Vector2(
@@ -31,7 +51,7 @@ ObjectGroup.prototype.handleTextures = function(){
     if (addedObject.hasDiffuseMap()){
       hasTexture = true;
       var tName = addedObject.name + ",diffuse";
-      texturesObj[tName] = addedObject.mesh.material.uniforms.diffuseMap.value;
+      texturesObj[tName] = this.handleAtlasSize(addedObject.mesh.material.uniforms.diffuseMap.value);
     }
     if (addedObject.hasAlphaMap()){
       hasTexture = true;
@@ -42,7 +62,7 @@ ObjectGroup.prototype.handleTextures = function(){
         );
         addedObject.mesh.material.uniforms.alphaMap.value.updateMatrix();
       }
-      texturesObj[tName] = addedObject.mesh.material.uniforms.alphaMap.value;
+      texturesObj[tName] = this.handleAtlasSize(addedObject.mesh.material.uniforms.alphaMap.value);
     }
     if (addedObject.hasAOMap()){
       hasTexture = true;
@@ -53,7 +73,7 @@ ObjectGroup.prototype.handleTextures = function(){
         );
         addedObject.mesh.material.uniforms.aoMap.value.updateMatrix();
       }
-      texturesObj[tName] = addedObject.mesh.material.uniforms.aoMap.value;
+      texturesObj[tName] = this.handleAtlasSize(addedObject.mesh.material.uniforms.aoMap.value);
     }
     if (addedObject.hasEmissiveMap()){
       hasTexture = true;
@@ -64,7 +84,7 @@ ObjectGroup.prototype.handleTextures = function(){
         );
         addedObject.mesh.material.uniforms.emissiveMap.value.updateMatrix();
       }
-      texturesObj[tName] = addedObject.mesh.material.uniforms.emissiveMap.value;
+      texturesObj[tName] = this.handleAtlasSize(addedObject.mesh.material.uniforms.emissiveMap.value);
     }
   }
   if (hasTexture){
@@ -329,6 +349,8 @@ ObjectGroup.prototype.glue = function(){
     if (selectedAddedObject && selectedAddedObject.name == objectName){
       selectedAddedObject = 0;
     }
+    addedObject.setAttachedProperties();
+
     this.totalVertexCount += addedObject.mesh.geometry.attributes.position.count;
     // GLUE PHYSICS ************************************************
     var shape = addedObject.physicsBody.shapes[0];
@@ -468,10 +490,20 @@ ObjectGroup.prototype.detach = function(){
     if (this.physicsBody.initQuaternion instanceof THREE.Quaternion){
       this.physicsBody.initQuaternion = new CANNON.Quaternion().copy(this.physicsBody.initQuaternion);
     }
-    if (this.group[objectName].type != "ramp"){
-      physicsQuaternions[objectName] = this.physicsBody.initQuaternion.mult(this.group[objectName].physicsBody.initQuaternion);
+    if (this.physicsBody.initQuaternion.x == 0 && this.physicsBody.initQuaternion.y == 0 &&
+              this.physicsBody.initQuaternion.z == 0 && this.physicsBody.initQuaternion.w == 1){
+        if (this.group[objectName].type != "ramp"){
+          physicsQuaternions[objectName] = this.group[objectName].physicsBody.initQuaternion;
+        }else{
+          physicsQuaternions[objectName] = this.physicsBody.initQuaternion;
+        }
     }else{
-      physicsQuaternions[objectName] = this.physicsBody.initQuaternion;
+      if (this.group[objectName].type != "ramp"){
+        var cloneQuaternion = new CANNON.Quaternion().copy(this.physicsBody.initQuaternion);
+        physicsQuaternions[objectName] = cloneQuaternion.mult(this.group[objectName].physicsBody.initQuaternion);
+      }else{
+        physicsQuaternions[objectName] = this.physicsBody.initQuaternion;
+      }
     }
   }
   for (var i = this.graphicsGroup.children.length -1; i>=0; i--){
@@ -480,9 +512,10 @@ ObjectGroup.prototype.detach = function(){
   for (var i = this.previewGraphicsGroup.children.length -1; i>=0; i--){
     this.previewGraphicsGroup.remove(this.previewGraphicsGroup.children[i]);
   }
-  this.destroy();
+  this.destroy(true);
   for (var objectName in this.group){
     var addedObject = this.group[objectName];
+
     physicsWorld.add(addedObject.physicsBody);
     scene.add(addedObject.mesh);
     previewScene.add(addedObject.previewMesh);
@@ -493,79 +526,56 @@ ObjectGroup.prototype.detach = function(){
     addedObject.previewMesh.addedObject = addedObject;
 
     addedObjects[objectName] = addedObject;
-    addedObject.mesh.position.copy(worldPositions[objectName]);
-    addedObject.previewMesh.position.copy(worldPositions[objectName]);
-    addedObject.mesh.quaternion.copy(worldQuaternions[objectName]);
-    addedObject.previewMesh.quaternion.copy(worldQuaternions[objectName]);
-    addedObject.initQuaternion = worldQuaternions[objectName].clone();
-    addedObject.physicsBody.position.copy(worldPositions[objectName]);
-    addedObject.physicsBody.quaternion.copy(physicsQuaternions[objectName]);
-    addedObject.physicsBody.initPosition = new CANNON.Vec3(
-      worldPositions[objectName].x,
-      worldPositions[objectName].y,
-      worldPositions[objectName].z
-    );
-    addedObject.physicsBody.initQuaternion = new CANNON.Quaternion(
-      physicsQuaternions[objectName].x,
-      physicsQuaternions[objectName].y,
-      physicsQuaternions[objectName].z,
-      physicsQuaternions[objectName].w
-    );
-    if (addedObject.type == "box" || addedObject.type == "ramp" || addedObject.type == "sphere"){
-      addedObject.metaData["centerX"] = worldPositions[objectName].x;
-      addedObject.metaData["centerY"] = worldPositions[objectName].y;
-      addedObject.metaData["centerZ"] = worldPositions[objectName].z;
-    }else if (addedObject.type == "surface"){
-      addedObject.metaData["positionX"] = worldPositions[objectName].x;
-      addedObject.metaData["positionY"] = worldPositions[objectName].y;
-      addedObject.metaData["positionZ"] = worldPositions[objectName].z;
-    }
-
-    addedObject.recentlyDetached = true;
-    addedObject.worldQuaternionX = worldQuaternions[objectName].x;
-    addedObject.worldQuaternionY = worldQuaternions[objectName].y;
-    addedObject.worldQuaternionZ = worldQuaternions[objectName].z;
-    addedObject.worldQuaternionW = worldQuaternions[objectName].w;
-    addedObject.physicsQuaternionX = physicsQuaternions[objectName].x;
-    addedObject.physicsQuaternionY = physicsQuaternions[objectName].y;
-    addedObject.physicsQuaternionZ = physicsQuaternions[objectName].z;
-    addedObject.physicsQuaternionW = physicsQuaternions[objectName].w;
-
-
-    if (addedObject.type == "ramp"){
-      var rotation = new CANNON.Quaternion(
-        addedObject.physicsBody.quaternion.x,
-        addedObject.physicsBody.quaternion.y,
-        addedObject.physicsBody.quaternion.z,
-        addedObject.physicsBody.quaternion.w
-      );
-      var rotation2 = new CANNON.Quaternion();
-      rotation2.setFromEuler(
-        addedObject.metaData.fromEulerX,
-        addedObject.metaData.fromEulerY,
-        addedObject.metaData.fromEulerZ
-      );
-      addedObject.physicsBody.quaternion = rotation.mult(rotation2);
-      addedObject.physicsBody.initQuaternion.copy(addedObject.physicsBody.quaternion);
-      addedObject.physicsQuaternionX = addedObject.physicsBody.quaternion.x;
-      addedObject.physicsQuaternionY = addedObject.physicsBody.quaternion.y;
-      addedObject.physicsQuaternionZ = addedObject.physicsBody.quaternion.z;
-      addedObject.physicsQuaternionW = addedObject.physicsBody.quaternion.w;
-    }
 
     if (addedObject.destroyedGrids){
       for (var gridName in addedObject.destroyedGrids){
         addedObject.destroyedGrids[gridName].destroyedAddedObject = addedObject.name;
       }
     }
-
     delete addedObject.parentObjectName;
     delete addedObjectsInsideGroups[addedObject.name];
     delete addedObject.indexInParent;
 
+    addedObject.mesh.position.set(
+      addedObject.positionXWhenAttached,
+      addedObject.positionYWhenAttached,
+      addedObject.positionZWhenAttached
+    );
+    addedObject.previewMesh.position.copy(addedObject.mesh.position);
+    addedObject.physicsBody.position.set(
+      addedObject.positionXWhenAttached,
+      addedObject.positionYWhenAttached,
+      addedObject.positionZWhenAttached
+    );
+    addedObject.physicsBody.initPosition.copy(addedObject.physicsBody.position);
+    addedObject.mesh.quaternion.set(
+      addedObject.qxWhenAttached,
+      addedObject.qyWhenAttached,
+      addedObject.qzWhenAttached,
+      addedObject.qwWhenAttached
+    );
+    addedObject.previewMesh.quaternion.copy(addedObject.mesh.quaternion);
+    addedObject.physicsBody.quaternion.set(
+      addedObject.pqxWhenAttached,
+      addedObject.pqyWhenAttached,
+      addedObject.pqzWhenAttached,
+      addedObject.pqwWhenAttached
+    );
+    addedObject.physicsBody.initQuaternion.copy(addedObject.physicsBody.quaternion);
+
+    delete addedObject.positionXWhenAttached;
+    delete addedObject.positionYWhenAttached;
+    delete addedObject.positionZWhenAttached;
+    delete addedObject.qxWhenAttached;
+    delete addedObject.qyWhenAttached;
+    delete addedObjects.qzWhenAttached;
+    delete addedObject.qwWhenAttached;
+    delete addedObject.pqxWhenAttached;
+    delete addedObject.pqyWhenAttached;
+    delete addedObject.pqzWhenAttached;
+    delete addedObject.pqwWhenAttached;
+
   }
-  worldQuaternions = 0;
-  worldPositions = 0;
 
 }
 

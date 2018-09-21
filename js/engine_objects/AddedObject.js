@@ -175,25 +175,27 @@ AddedObject.prototype.export = function(){
   exportObject.rotationY = this.rotationY;
   exportObject.rotationZ = this.rotationZ;
 
-  exportObject.quaternionX = this.previewMesh.quaternion.x;
-  exportObject.quaternionY = this.previewMesh.quaternion.y;
-  exportObject.quaternionZ = this.previewMesh.quaternion.z;
-  exportObject.quaternionW = this.previewMesh.quaternion.w;
-  exportObject.pQuaternionX = this.physicsBody.quaternion.x;
-  exportObject.pQuaternionY = this.physicsBody.quaternion.y;
-  exportObject.pQuaternionZ = this.physicsBody.quaternion.z;
-  exportObject.pQuaternionW = this.physicsBody.quaternion.w;
-
-  if (this.recentlyDetached){
-    exportObject.recentlyDetached = true;
-    exportObject.worldQuaternionX = this.worldQuaternionX;
-    exportObject.worldQuaternionY = this.worldQuaternionY;
-    exportObject.worldQuaternionZ = this.worldQuaternionZ;
-    exportObject.worldQuaternionW = this.worldQuaternionW;
-    exportObject.physicsQuaternionX = this.physicsQuaternionX;
-    exportObject.physicsQuaternionY = this.physicsQuaternionY;
-    exportObject.physicsQuaternionZ = this.physicsQuaternionZ;
-    exportObject.physicsQuaternionW = this.physicsQuaternionW;
+  if (!this.parentObjectName){
+    exportObject.quaternionX = this.previewMesh.quaternion.x;
+    exportObject.quaternionY = this.previewMesh.quaternion.y;
+    exportObject.quaternionZ = this.previewMesh.quaternion.z;
+    exportObject.quaternionW = this.previewMesh.quaternion.w;
+    exportObject.pQuaternionX = this.physicsBody.quaternion.x;
+    exportObject.pQuaternionY = this.physicsBody.quaternion.y;
+    exportObject.pQuaternionZ = this.physicsBody.quaternion.z;
+    exportObject.pQuaternionW = this.physicsBody.quaternion.w;
+  }else{
+    exportObject.quaternionX = this.qxWhenAttached;
+    exportObject.quaternionY = this.qyWhenAttached;
+    exportObject.quaternionZ = this.qzWhenAttached;
+    exportObject.quaternionW = this.qwWhenAttached;
+    exportObject.pQuaternionX = this.pqxWhenAttached;
+    exportObject.pQuaternionY = this.pqyWhenAttached;
+    exportObject.pQuaternionZ = this.pqzWhenAttached;
+    exportObject.pQuaternionW = this.pqwWhenAttached;
+    exportObject.positionXWhenAttached = this.positionXWhenAttached;
+    exportObject.positionYWhenAttached = this.positionYWhenAttached;
+    exportObject.positionZWhenAttached = this.positionZWhenAttached;
   }
 
   if (!(typeof this.blendingMode == "undefined")){
@@ -218,6 +220,20 @@ AddedObject.prototype.export = function(){
   }
 
   return exportObject;
+}
+
+AddedObject.prototype.setAttachedProperties = function(){
+  this.qxWhenAttached = this.previewMesh.quaternion.x;
+  this.qyWhenAttached = this.previewMesh.quaternion.y;
+  this.qzWhenAttached = this.previewMesh.quaternion.z;
+  this.qwWhenAttached = this.previewMesh.quaternion.w;
+  this.pqxWhenAttached = this.physicsBody.quaternion.x;
+  this.pqyWhenAttached = this.physicsBody.quaternion.y;
+  this.pqzWhenAttached = this.physicsBody.quaternion.z;
+  this.pqwWhenAttached = this.physicsBody.quaternion.w;
+  this.positionXWhenAttached = this.previewMesh.position.x;
+  this.positionYWhenAttached = this.previewMesh.position.y;
+  this.positionZWhenAttached = this.previewMesh.position.z;
 }
 
 AddedObject.prototype.hasEmissiveMap = function(){
@@ -689,6 +705,21 @@ AddedObject.prototype.rotateBox = function(axis, radians, fromScript){
     physicsBody.initQuaternion.copy(
       physicsBody.quaternion
     );
+  }
+}
+
+AddedObject.prototype.setCannonQuaternionFromTHREE = function(){
+  this.physicsBody.quaternion.copy(this.mesh.quaternion);
+  if (this.type == "ramp" || this.type == "surface"){
+    if (this.gridSystemAxis == "XZ" || this.gridSystemAxis == "XY" || this.gridSystemAxis == "YZ"){
+      if (!(this.type == "surface" && (this.gridSystemAxis == "XY" || this.gridSystemAxis == "YZ"))){
+        this.physicsBody.rotation.y += (Math.PI / 2);
+      }else{
+        if (this.type == "surface" && this.gridSystemAxis == "YZ"){
+          previewMesh.rotation.y -= (Math.PI / 2);
+        }
+      }
+    }
   }
 }
 
