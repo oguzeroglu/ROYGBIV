@@ -21,6 +21,12 @@ var AddedObject = function(name, type, metaData, material, mesh,
     }
   }
 
+  var baseGridSystemName = this.metaData["gridSystemName"];
+  var baseGridSystem = gridSystems[baseGridSystemName];
+  if (baseGridSystem && !(this.metaData["baseGridSystemAxis"])){
+    this.metaData["baseGridSystemAxis"] = baseGridSystem.axis.toUpperCase();
+  }
+
   this.metaData["widthSegments"] = 1;
   this.metaData["heightSegments"] = 1;
   if (type == "box"){
@@ -109,13 +115,6 @@ AddedObject.prototype.export = function(){
   exportObject["metaData"] = Object.assign({}, this.metaData);
   exportObject["associatedTexturePack"] = this.associatedTexturePack;
 
-  if (this.mesh.material.uniforms.diffuseMap.value){
-    exportObject["textureOffsetX"] = this.mesh.material.uniforms.diffuseMap.value.offset.x;
-    exportObject["textureOffsetY"] = this.mesh.material.uniforms.diffuseMap.value.offset.y;
-    exportObject["textureRepeatU"] = this.mesh.material.uniforms.diffuseMap.value.repeat.x;
-    exportObject["textureRepeatV"] = this.mesh.material.uniforms.diffuseMap.value.repeat.y;
-  }
-
   if (this.mass){
     exportObject["mass"] = this.mass;
   }
@@ -143,6 +142,8 @@ AddedObject.prototype.export = function(){
     exportObject["diffuseRoygbivTextureName"] =  diffuseMap.roygbivTextureName;
     exportObject["textureOffsetX"] = diffuseMap.offset.x;
     exportObject["textureOffsetY"] = diffuseMap.offset.y;
+    exportObject["textureRepeatU"] = diffuseMap.repeat.x;
+    exportObject["textureRepeatV"] = diffuseMap.repeat.y;
   }
   if (this.hasAlphaMap()){
     exportObject["alphaRoygbivTexturePackName"] = alphaMap.roygbivTexturePackName;
@@ -1252,8 +1253,16 @@ AddedObject.prototype.isTextured = function(){
 }
 
 AddedObject.prototype.adjustTextureRepeat = function(repeatU, repeatV){
-  this.metaData["textureRepeatU"] = repeatU;
-  this.metaData["textureRepeatV"] = repeatV;
+  if (repeatU){
+    this.metaData["textureRepeatU"] = repeatU;
+  }else{
+    repeatU = this.metaData["textureRepeatU"];
+  }
+  if (repeatV){
+    this.metaData["textureRepeatV"] = repeatV;
+  }else{
+    repeatV = this.metaData["textureRepeatV"];
+  }
   if (this.hasDiffuseMap()){
     this.mesh.material.uniforms.diffuseMap.value.repeat.set(repeatU, repeatV);
     this.mesh.material.uniforms.diffuseMap.value.updateMatrix();

@@ -693,21 +693,32 @@ function parse(input){
             terminal.printError(Text.WORKS_ONLY_IN_DESIGN_MODE);
             return;
           }
-          var gridSelectionSize = Object.keys(gridSelections).length;
-          if (gridSelectionSize != 2 && gridSelectionSize != 1){
-            terminal.printError(Text.MUST_HAVE_1_OR_2_GRIDS_SELECTED);
+
+          if (!(splitted[1].indexOf("*") == -1)){
+            new JobHandler(splitted).handle();
             return true;
           }
-          var selectedGrid1 = gridSelections[Object.keys(gridSelections)[0]];
-          var selectedGrid2 = undefined;
-          if (gridSelectionSize == 2){
-            selectedGrid2 = gridSelections[Object.keys(gridSelections)[1]];
-          }
-          if (gridSelectionSize == 2){
-            if (selectedGrid1.parentName != selectedGrid2.parentName){
-              terminal.printError(Text.SELECTED_GRIDS_SAME_GRIDSYSTEM);
+
+          var selectedGrid1, selectedGrid2;
+          if (!jobHandlerSelectedGrid){
+            var gridSelectionSize = Object.keys(gridSelections).length;
+            if (gridSelectionSize != 2 && gridSelectionSize != 1){
+              terminal.printError(Text.MUST_HAVE_1_OR_2_GRIDS_SELECTED);
               return true;
             }
+            selectedGrid1 = gridSelections[Object.keys(gridSelections)[0]];
+            selectedGrid2 = undefined;
+            if (gridSelectionSize == 2){
+              selectedGrid2 = gridSelections[Object.keys(gridSelections)[1]];
+            }
+            if (gridSelectionSize == 2){
+              if (selectedGrid1.parentName != selectedGrid2.parentName){
+                terminal.printError(Text.SELECTED_GRIDS_SAME_GRIDSYSTEM);
+                return true;
+              }
+            }
+          }else{
+            selectedGrid1 = jobHandlerSelectedGrid;
           }
 
           var selectedGridSystemName = selectedGrid1.parentName;
@@ -751,8 +762,10 @@ function parse(input){
             return true;
           }
           gridSystems[selectedGridSystemName].newSurface(objectName, selectedGrid1, selectedGrid2, selectedMaterial);
-          terminal.printInfo(Text.OBJECT_ADDED);
-          undoRedoHandler.push();
+          if (!jobHandlerWorking){
+            terminal.printInfo(Text.OBJECT_ADDED);
+            undoRedoHandler.push();
+          }
           return true;
         break;
         case 18: //printObjects
@@ -1344,6 +1357,12 @@ function parse(input){
         break;
         case 34: //newBox
           var name = splitted[1];
+
+          if (!(name.indexOf("*") == -1)){
+            new JobHandler(splitted).handle();
+            return true;
+          }
+
           if (name.toUpperCase() == "NULL"){
             name = generateUniqueObjectName();
           }
@@ -1392,10 +1411,12 @@ function parse(input){
             }
           }
 
-          var gridSelectionSize = Object.keys(gridSelections).length;
-          if (gridSelectionSize != 1 && gridSelectionSize != 2){
-            terminal.printError(Text.MUST_HAVE_1_OR_2_GRIDS_SELECTED);
-            return true;
+          if (!jobHandlerWorking){
+            var gridSelectionSize = Object.keys(gridSelections).length;
+            if (gridSelectionSize != 1 && gridSelectionSize != 2){
+              terminal.printError(Text.MUST_HAVE_1_OR_2_GRIDS_SELECTED);
+              return true;
+            }
           }
 
           height = parseInt(height);
@@ -1405,8 +1426,12 @@ function parse(input){
           }
 
           var selections = [];
-          for (var gridName in gridSelections){
-            selections.push(gridSelections[gridName]);
+          if (!jobHandlerWorking){
+            for (var gridName in gridSelections){
+              selections.push(gridSelections[gridName]);
+            }
+          }else{
+            selections.push(jobHandlerSelectedGrid);
           }
 
           if (selections.length == 2){
@@ -1422,8 +1447,10 @@ function parse(input){
           var gridSystem = gridSystems[gridSystemName];
 
           gridSystem.newBox(selections, height, material, name);
-          terminal.printInfo(Text.BOX_CREATED);
-          undoRedoHandler.push();
+          if (!jobHandlerWorking){
+            terminal.printInfo(Text.BOX_CREATED);
+            undoRedoHandler.push();
+          }
           return true;
         break;
         case 35: //newWallCollection
@@ -2322,9 +2349,8 @@ function parse(input){
             return true;
           }
 
-          var baseGridSystemName = object.metaData["gridSystemName"];
-          var baseGridSystem = gridSystems[baseGridSystemName];
-          if (baseGridSystem.axis != "XZ"){
+          var baseGridSystemNameAxis = object.metaData["baseGridSystemAxis"];
+          if (baseGridSystemNameAxis != "XZ"){
             if (object.type == "surface"){
               terminal.printError(Text.SURFACES_DO_NOT_SUPPORT_THIS_FUNCTION_UNLESS);
               return true;
@@ -4107,6 +4133,10 @@ function parse(input){
             return true;
           }
           var sphereName = splitted[1];
+          if (!(sphereName.indexOf("*") == -1)){
+            new JobHandler(splitted).handle();
+            return true;
+          }
           var materialName = splitted[2];
           var radius = parseFloat(splitted[3]);
 
@@ -4156,15 +4186,21 @@ function parse(input){
             return true;
           }
 
-          var gridSelectionSize = Object.keys(gridSelections).length;
-          if (gridSelectionSize != 1 && gridSelectionSize != 2){
-            terminal.printError(Text.MUST_HAVE_1_OR_2_GRIDS_SELECTED);
-            return true;
+          if (!jobHandlerWorking){
+            var gridSelectionSize = Object.keys(gridSelections).length;
+            if (gridSelectionSize != 1 && gridSelectionSize != 2){
+              terminal.printError(Text.MUST_HAVE_1_OR_2_GRIDS_SELECTED);
+              return true;
+            }
           }
 
           var selections = [];
-          for (var gridName in gridSelections){
-            selections.push(gridSelections[gridName]);
+          if (!jobHandlerWorking){
+            for (var gridName in gridSelections){
+              selections.push(gridSelections[gridName]);
+            }
+          }else{
+            selections.push(jobHandlerSelectedGrid);
           }
 
           if (selections.length == 2){
@@ -4180,8 +4216,10 @@ function parse(input){
           var gridSystem = gridSystems[gridSystemName];
 
           gridSystem.newSphere(sphereName, material, radius, selections);
-          terminal.printInfo(Text.SPHERE_CREATED);
-          undoRedoHandler.push();
+          if (!jobHandlerWorking){
+            terminal.printInfo(Text.SPHERE_CREATED);
+            undoRedoHandler.push();
+          }
           return true;
         break;
         case 124: //printFogInfo

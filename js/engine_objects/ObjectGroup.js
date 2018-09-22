@@ -31,6 +31,8 @@ ObjectGroup.prototype.handleAtlasSize = function(texture){
     texture.image, 0, 0, sourceWidth, sourceHeight, 0, 0, newWidth, newHeight
   );
   var txt = new THREE.CanvasTexture(tmpCanvas);
+  txt.repeat.copy(texture.repeat);
+  txt.offset.copy(texture.offset);
   txt.needsUpdate = true;
   return txt;
 }
@@ -821,27 +823,7 @@ ObjectGroup.prototype.getFaceInfos = function(){
 }
 
 ObjectGroup.prototype.getFaceNameFromNormal = function(normal){
-  var axisText = "";
-  if (normal.x == 0 && normal.y == 0 && normal.z == 1){
-    axisText = "+Z";
-  }
-  if (normal.x == 0 && normal.y == 0 && normal.z == -1){
-    axisText = "-Z";
-  }
-  if (normal.x == 0 && normal.y == 1 && normal.z == 0){
-    axisText = "+Y";
-  }
-  if (normal.x == 0 && normal.y == -1 && normal.z == 0){
-    axisText = "-Y";
-  }
-  if (normal.x == 1 && normal.y == 0 && normal.z == 0){
-    axisText = "+X";
-  }
-  if (normal.x == -1 && normal.y == 0 && normal.z == 0){
-    axisText = "-X";
-  }
-  var key = axisText;
-  return key;
+
 }
 
 ObjectGroup.prototype.setBlending = function(blendingMode){

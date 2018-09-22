@@ -825,6 +825,10 @@ var selectedCrosshair;
 var GLOBAL_FOG_UNIFORM = new THREE.Uniform(new THREE.Vector4(-100.0, 0, 0, 0));
 var VERTEX_SHADER_TEXTURE_FETCH_SUPPORTED;
 var projectAtlasSize = new Object(); // width, height
+var mouse = new THREE.Vector2();
+var raycaster = new THREE.Raycaster();
+var jobHandlerSelectedGrid = 0;
+var jobHandlerWorking = false;
 
 // WORKER VARIABLES
 var WORKERS_SUPPORTED = (typeof(Worker) !== "undefined");

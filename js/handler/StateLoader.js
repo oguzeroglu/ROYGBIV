@@ -867,14 +867,8 @@ StateLoader.prototype.handleAddedObjectDiff = function(){
       if (kind == "E"){
         var addedObject = addedObjects[diff.path[1]];
         if (addedObject){
-          if (typeof addedObject.textureRepeatVBuffer == "undefined"){
-            addedObject.textureRepeatUBuffer = rhs;
-          }else{
-            if (addedObject.isTextured()){
-              addedObject.adjustTextureRepeat(rhs, addedObject.textureRepeatVBuffer);
-              delete addedObject.textureRepeatVBuffer;
-              delete addedObject.textureRepeatUBuffer;
-            }
+          if (addedObject.isTextured()){
+            addedObject.adjustTextureRepeat(rhs, 0);
           }
         }
       }
@@ -882,14 +876,8 @@ StateLoader.prototype.handleAddedObjectDiff = function(){
       if (kind == "E"){
         var addedObject = addedObjects[diff.path[1]];
         if (addedObject){
-          if (typeof addedObject.textureRepeatUBuffer == "undefined"){
-            addedObject.textureRepeatVBuffer = rhs;
-          }else{
-            if (addedObject.isTextured()){
-              addedObject.adjustTextureRepeat(addedObject.textureRepeatUBuffer, rhs);
-              delete addedObject.textureRepeatUBuffer;
-              delete addedObject.textureRepeatVBuffer;
-            }
+          if (addedObject.isTextured()){
+            addedObject.adjustTextureRepeat(0, rhs);
           }
         }
       }
