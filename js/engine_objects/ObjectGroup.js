@@ -747,6 +747,12 @@ ObjectGroup.prototype.export = function(){
   exportObj.isBasicMaterial = this.isBasicMaterial;
   exportObj.isPhongMaterial = this.isPhongMaterial;
 
+  if (!(typeof this.blendingMode == "undefined")){
+    exportObj.blendingMode = this.blendingMode;
+  }else{
+    exportObj.blendingMode = "NORMAL_BLENDING";
+  }
+
   return exportObj;
 }
 
@@ -826,9 +832,18 @@ ObjectGroup.prototype.getFaceNameFromNormal = function(normal){
 
 }
 
-ObjectGroup.prototype.setBlending = function(blendingMode){
-  for (var objName in this.group){
-    this.group[objName].setBlending(blendingMode);
+ObjectGroup.prototype.setBlending = function(blendingModeInt){
+  this.mesh.material.blending = blendingModeInt;
+  if (blendingModeInt == NO_BLENDING){
+    this.blendingMode = "NO_BLENDING";
+  }else if (blendingModeInt == NORMAL_BLENDING){
+    this.blendingMode = "NORMAL_BLENDING";
+  }else if (blendingModeInt == ADDITIVE_BLENDING){
+    this.blendingMode = "ADDITIVE_BLENDING";
+  }else if (blendingModeInt == SUBTRACTIVE_BLENDING){
+    this.blendingMode = "SUBTRACTIVE_BLENDING";
+  }else if (blendingModeInt == MULTIPLY_BLENDING){
+    this.blendingMode = "MULTIPLY_BLENDING";
   }
 }
 

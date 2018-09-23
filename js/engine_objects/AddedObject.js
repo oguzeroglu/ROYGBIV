@@ -1252,6 +1252,30 @@ AddedObject.prototype.isTextured = function(){
   );
 }
 
+AddedObject.prototype.refreshTextueMatrix = function(){
+  if (this.hasDiffuseMap()){
+    this.mesh.material.uniforms.diffuseMap.value.updateMatrix();
+  }
+  if (this.hasAlphaMap()){
+    this.mesh.material.uniforms.alphaMap.value.updateMatrix();
+  }
+  if (this.hasAOMap()){
+    this.mesh.material.uniforms.aoMap.value.updateMatrix();
+  }
+  if (this.hasEmissiveMap()){
+    this.mesh.material.uniforms.emissiveMap.value.updateMatrix();
+  }
+  if (this.material.normalMap){
+
+  }
+  if (this.material.specularMap){
+
+  }
+  if (this.hasDisplacementMap()){
+    this.mesh.material.uniforms.displacementMap.value.updateMatrix();
+  }
+}
+
 AddedObject.prototype.adjustTextureRepeat = function(repeatU, repeatV){
   if (repeatU){
     this.metaData["textureRepeatU"] = repeatU;
@@ -1404,7 +1428,7 @@ AddedObject.prototype.isTexturePackUsed = function(texturePackName){
 }
 
 AddedObject.prototype.setBlending = function(blendingModeInt){
-  this.material.blending = blendingModeInt;
+  this.mesh.material.blending = blendingModeInt;
   if (blendingModeInt == NO_BLENDING){
     this.blendingMode = "NO_BLENDING";
   }else if (blendingModeInt == NORMAL_BLENDING){

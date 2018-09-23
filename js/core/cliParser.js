@@ -144,12 +144,19 @@ function parse(input){
             return true;
           }
 
+          if (!(name.indexOf("*") == -1)){
+            new JobHandler(splitted).handle();
+            return true;
+          }
+
           if (!gridSystems[name]){
             terminal.printError(Text.NO_SUCH_GRID_SYSTEM);
           }else{
             gridSystems[name].destroy();
-            terminal.printInfo(Text.GRID_SYSTEM_DESTROYED);
-            undoRedoHandler.push();
+            if (!jobHandlerWorking){
+              terminal.printInfo(Text.GRID_SYSTEM_DESTROYED);
+              undoRedoHandler.push();
+            }
           }
         break;
         case 7: //printKeyboardInfo
@@ -662,6 +669,10 @@ function parse(input){
             terminal.printError(Text.WORKS_ONLY_IN_DESIGN_MODE);
             return true;
           }
+          if (!(name.indexOf("*") == -1)){
+            new JobHandler(splitted).handle();
+            return true;
+          }
           if (!materials[name]){
             terminal.printError(Text.NO_SUCH_MATERIAL);
             return true;
@@ -684,8 +695,10 @@ function parse(input){
             }
           }
           delete materials[name];
-          terminal.printInfo(Text.MATERIAL_DESTROYED);
-          undoRedoHandler.push();
+          if (!jobHandlerWorking){
+            terminal.printInfo(Text.MATERIAL_DESTROYED);
+            undoRedoHandler.push();
+          }
           return true;
         break;
         case 17: //newSurface
@@ -864,6 +877,10 @@ function parse(input){
             terminal.printError(Text.WORKS_ONLY_IN_DESIGN_MODE);
             return true;
           }
+          if (!(objectName.indexOf("*") == -1)){
+            new JobHandler(splitted).handle();
+            return true;
+          }
           if (!object && !objectGroup){
             terminal.printError(Text.NO_SUCH_OBJECT);
             return true;
@@ -881,8 +898,10 @@ function parse(input){
             objectGroup.destroy();
             delete objectGroups[objectName];
           }
-          terminal.printInfo(Text.OBJECT_DESTROYED);
-          undoRedoHandler.push();
+          if (!jobHandlerWorking){
+            terminal.printInfo(Text.OBJECT_DESTROYED);
+            undoRedoHandler.push();
+          }
           return true;
         break;
         case 21: //newTexture
@@ -1030,6 +1049,10 @@ function parse(input){
             terminal.printError(Text.WORKS_ONLY_IN_DESIGN_MODE);
             return true;
           }
+          if (!(textureName.indexOf("*") == -1)){
+            new JobHandler(splitted).handle();
+            return true;
+          }
           if (!texture){
             terminal.printError(Text.NO_SUCH_TEXTURE);
             return true;
@@ -1056,8 +1079,10 @@ function parse(input){
           delete textures[textureName];
           delete textureURLs[textureName];
           delete modifiedTextures[textureName];
-          terminal.printInfo(Text.TEXTURE_DESTROYED);
-          undoRedoHandler.push();
+          if (!jobHandlerWorking){
+            terminal.printInfo(Text.TEXTURE_DESTROYED);
+            undoRedoHandler.push();
+          }
           return true;
         break;
         case 24: //mapTexture
@@ -1066,6 +1091,10 @@ function parse(input){
           var texture = textures[textureName];
           if (mode != 0){
             terminal.printError(Text.WORKS_ONLY_IN_DESIGN_MODE);
+            return true;
+          }
+          if (!(objectName.indexOf("*") == -1)){
+            new JobHandler(splitted).handle();
             return true;
           }
           if (!texture){
@@ -1103,8 +1132,10 @@ function parse(input){
           cloneTexture.wrapT = THREE.RepeatWrapping;
 
           addedObject.resetAssociatedTexturePack();
-          terminal.printInfo(Text.TEXTURE_MAPPED);
-          undoRedoHandler.push();
+          if (!jobHandlerWorking){
+            terminal.printInfo(Text.TEXTURE_MAPPED);
+            undoRedoHandler.push();
+          }
         break;
         case 25: //adjustTextureRepeat
           var objectName = splitted[1];
@@ -1116,6 +1147,12 @@ function parse(input){
             terminal.printError(Text.WORKS_ONLY_IN_DESIGN_MODE);
             return true;
           }
+
+          if (!(objectName.indexOf("*") == -1)){
+            new JobHandler(splitted).handle();
+            return true;
+          }
+
           if (objectGroups[objectName]){
             terminal.printError(Text.GLUED_OBJECTS_DO_NOT_SUPPORT_THIS_FUNCTION);
             return true;
@@ -1150,9 +1187,10 @@ function parse(input){
             terminal.printError(Text.NO_TEXTURE_MAPPED_TO_OBJECT);
             return true;
           }
-
-          terminal.printError(Text.REPEAT_AMOUNT_MODIFIED);
-          undoRedoHandler.push();
+          if (!jobHandlerWorking){
+            terminal.printError(Text.REPEAT_AMOUNT_MODIFIED);
+            undoRedoHandler.push();
+          }
           return true;
         break;
         case 26: //newPhysicsBoxTest
@@ -1321,6 +1359,10 @@ function parse(input){
             terminal.printError(Text.WORKS_ONLY_IN_DESIGN_MODE);
             return true;
           }
+          if (!(objectName.indexOf("*") == -1)){
+            new JobHandler(splitted).handle();
+            return true;
+          }
           if (objectGroups[objectName]){
             terminal.printError(Text.GLUED_OBJECTS_DO_NOT_SUPPORT_THIS_FUNCTION);
             return true;
@@ -1347,12 +1389,14 @@ function parse(input){
 
           addedObject.handleMirror(axis, property);
 
-          terminal.printInfo(Text.MIRRORED_REPEAT_SET.replace(
-            Text.PARAM1, property
-          ).replace(
-            Text.PARAM2, axis
-          ));
-          undoRedoHandler.push();
+          if (!jobHandlerWorking){
+            terminal.printInfo(Text.MIRRORED_REPEAT_SET.replace(
+              Text.PARAM1, property
+            ).replace(
+              Text.PARAM2, axis
+            ));
+            undoRedoHandler.push();
+          }
           return true;
         break;
         case 34: //newBox
@@ -1575,11 +1619,17 @@ function parse(input){
             terminal.printError(Text.WORKS_ONLY_IN_DESIGN_MODE);
             return true;
           }
+          if (!(name.indexOf("*") == -1)){
+            new JobHandler(splitted).handle();
+            return true;
+          }
           var wallCollection = wallCollections[name];
           if (wallCollection){
             wallCollection.destroy();
-            terminal.printInfo(Text.WALL_COLLECTION_DESTROYED);
-            undoRedoHandler.push();
+            if (!jobHandlerWorking){
+              terminal.printInfo(Text.WALL_COLLECTION_DESTROYED);
+              undoRedoHandler.push();
+            }
           }else{
             terminal.printError(Text.NO_SUCH_WALL_COLLECTION);
           }
@@ -1674,6 +1724,10 @@ function parse(input){
             terminal.printError(Text.WORKS_ONLY_IN_DESIGN_MODE);
             return true;
           }
+          if (!(objectName.indexOf("*") == -1)){
+            new JobHandler(splitted).handle();
+            return true;
+          }
           if (objectGroups[objectName]){
             terminal.printError(Text.GLUED_OBJECTS_DO_NOT_SUPPORT_THIS_FUNCTION);
             return true;
@@ -1714,8 +1768,10 @@ function parse(input){
           addedObject.mesh.material.needsUpdate = true;
           addedObject.previewMesh.material.needsUpdate = true;
           addedObject.resetAssociatedTexturePack();
-          terminal.printInfo(Text.SPECULAR_TEXTURE_MAPPED);
-          undoRedoHandler.push();
+          if (!jobHandlerWorking){
+            terminal.printInfo(Text.SPECULAR_TEXTURE_MAPPED);
+            undoRedoHandler.push();
+          }
         break;
         case 44: //mapEnvironment
           // DEPRECATED
@@ -1726,6 +1782,10 @@ function parse(input){
           var texture = textures[textureName];
           if (mode != 0){
             terminal.printError(Text.WORKS_ONLY_IN_DESIGN_MODE);
+            return true;
+          }
+          if (!(objectName.indexOf("*") == -1)){
+            new JobHandler(splitted).handle();
             return true;
           }
           if (objectGroups[objectName]){
@@ -1760,8 +1820,10 @@ function parse(input){
           cloneTexture.needsUpdate = true;
 
           addedObject.resetAssociatedTexturePack();
-          terminal.printInfo(Text.AMBIENT_OCCULSION_TEXTURE_MAPPED);
-          undoRedoHandler.push();
+          if (!jobHandlerWorking){
+            terminal.printInfo(Text.AMBIENT_OCCULSION_TEXTURE_MAPPED);
+            undoRedoHandler.push();
+          }
         break;
         case 46: //mapAlpha
           var textureName = splitted[1];
@@ -1769,6 +1831,10 @@ function parse(input){
           var texture = textures[textureName];
           if (mode != 0){
             terminal.printError(Text.WORKS_ONLY_IN_DESIGN_MODE);
+            return true;
+          }
+          if (!(objectName.indexOf("*") == -1)){
+            new JobHandler(splitted).handle();
             return true;
           }
           if (objectGroups[objectName]){
@@ -1803,8 +1869,10 @@ function parse(input){
           cloneTexture.needsUpdate = true;
 
           addedObject.resetAssociatedTexturePack();
-          terminal.printInfo(Text.ALPHA_TEXTURE_MAPPED);
-          undoRedoHandler.push();
+          if (!jobHandlerWorking){
+            terminal.printInfo(Text.ALPHA_TEXTURE_MAPPED);
+            undoRedoHandler.push();
+          }
         break;
         case 47: //setDefaultMaterial
           if (mode != 0){
@@ -1904,6 +1972,10 @@ function parse(input){
             terminal.printError(Text.WORKS_ONLY_IN_DESIGN_MODE);
             return true;
           }
+          if (!(lightName.indexOf("*") == -1)){
+            new JobHandler(splitted).handle();
+            return true;
+          }
           if (!light){
             terminal.printError(Text.NO_SUCH_LIGHT);
             return true;
@@ -1923,8 +1995,10 @@ function parse(input){
           delete lights[lightName];
           delete light_previewScene[lightName];
           selectedLightName = 0;
-          terminal.printError(Text.LIGHT_DESTROYED);
-          undoRedoHandler.push();
+          if (!jobHandlerWorking){
+            terminal.printError(Text.LIGHT_DESTROYED);
+            undoRedoHandler.push();
+          }
           return true;
         break;
         case 52: //newPhongMaterial
@@ -1962,6 +2036,10 @@ function parse(input){
           var texture = textures[textureName];
           if (mode != 0){
             terminal.printError(Text.WORKS_ONLY_IN_DESIGN_MODE);
+            return true;
+          }
+          if (!(objectName.indexOf("*") == -1)){
+            new JobHandler(splitted).handle();
             return true;
           }
           if (objectGroups[objectName]){
@@ -2004,8 +2082,10 @@ function parse(input){
           addedObject.mesh.material.needsUpdate = true;
           addedObject.previewMesh.material.needsUpdate = true;
           addedObject.resetAssociatedTexturePack();
-          undoRedoHandler.push();
-          terminal.printInfo(Text.NORMAL_TEXTURE_MAPPED);
+          if (!jobHandlerWorking){
+            undoRedoHandler.push();
+            terminal.printInfo(Text.NORMAL_TEXTURE_MAPPED);
+          }
         break;
         case 54: //mapEmissive
           var textureName = splitted[1];
@@ -2013,6 +2093,10 @@ function parse(input){
           var texture = textures[textureName];
           if (mode != 0){
             terminal.printError(Text.WORKS_ONLY_IN_DESIGN_MODE);
+            return true;
+          }
+          if (!(objectName.indexOf("*") == -1)){
+            new JobHandler(splitted).handle();
             return true;
           }
           if (objectGroups[objectName]){
@@ -2047,8 +2131,10 @@ function parse(input){
           cloneTexture.needsUpdate = true;
 
           addedObject.resetAssociatedTexturePack();
-          terminal.printInfo(Text.EMISSIVE_TEXTURE_MAPPED);
-          undoRedoHandler.push();
+          if (!jobHandlerWorking){
+            terminal.printInfo(Text.EMISSIVE_TEXTURE_MAPPED);
+            undoRedoHandler.push();
+          }
         break;
         case 55: //newLambertMaterial
           //DEPRECATED
@@ -2121,12 +2207,16 @@ function parse(input){
         case 59: //mapTexturePack
           var texturePackName = splitted[1];
           var objectName = splitted[2];
-
           var texturePack = texturePacks[texturePackName];
           var addedObject = addedObjects[objectName];
 
           if (mode != 0){
             terminal.printError(Text.WORKS_ONLY_IN_DESIGN_MODE);
+            return true;
+          }
+
+          if (!(objectName.indexOf("*") == -1)){
+            new JobHandler(splitted).handle();
             return true;
           }
 
@@ -2151,8 +2241,10 @@ function parse(input){
           }
 
           addedObject.mapTexturePack(texturePack);
-          terminal.printInfo(Text.TEXTURE_PACK_MAPPED);
-          undoRedoHandler.push();
+          if (!jobHandlerWorking){
+            terminal.printInfo(Text.TEXTURE_PACK_MAPPED);
+            undoRedoHandler.push();
+          }
           return true;
         break;
         case 60: //destroyTexturePack
@@ -2163,7 +2255,10 @@ function parse(input){
             terminal.printError(Text.WORKS_ONLY_IN_DESIGN_MODE);
             return true;
           }
-
+          if (!(name.indexOf("*") == -1)){
+            new JobHandler(splitted).handle();
+            return true;
+          }
           if (!texturePack){
             terminal.printError(Text.NO_SUCH_TEXTURE_PACK);
             return true;
@@ -2187,8 +2282,10 @@ function parse(input){
             }
           }
           texturePack.destroy();
-          terminal.printInfo(Text.TEXTURE_PACK_DESTROYED);
-          undoRedoHandler.push();
+          if (!jobHandlerWorking){
+            terminal.printInfo(Text.TEXTURE_PACK_DESTROYED);
+            undoRedoHandler.push();
+          }
           return true;
         break;
         case 61: //refreshTexturePack
@@ -2198,12 +2295,18 @@ function parse(input){
             terminal.printError(Text.WORKS_ONLY_IN_DESIGN_MODE);
             return true;
           }
+          if (!(name.indexOf("*") == -1)){
+            new JobHandler(splitted).handle();
+            return true;
+          }
           if (!texturePack){
             terminal.printError(Text.NO_SUCH_TEXTURE_PACK);
             return true;
           }
           texturePack.refresh();
-          terminal.printInfo(Text.TEXTURE_PACK_REFRESHED);
+          if (!jobHandlerWorking){
+            terminal.printInfo(Text.TEXTURE_PACK_REFRESHED);
+          }
           return true;
         break;
         case 62: //mapHeight
@@ -2212,6 +2315,10 @@ function parse(input){
           var texture = textures[textureName];
           if (mode != 0){
             terminal.printError(Text.WORKS_ONLY_IN_DESIGN_MODE);
+            return true;
+          }
+          if (!(objectName.indexOf("*") == -1)){
+            new JobHandler(splitted).handle();
             return true;
           }
           if (objectGroups[objectName]){
@@ -2249,14 +2356,20 @@ function parse(input){
           cloneTexture.needsUpdate = true;
 
           addedObject.resetAssociatedTexturePack();
-          terminal.printInfo(Text.HEIGHT_TEXTURE_MAPPED);
-          undoRedoHandler.push();
+          if (!jobHandlerWorking){
+            terminal.printInfo(Text.HEIGHT_TEXTURE_MAPPED);
+            undoRedoHandler.push();
+          }
         break;
         case 63: //resetMaps
           var name = splitted[1];
           var addedObject = addedObjects[name];
           if (mode != 0){
             terminal.printError(Text.WORKS_ONLY_IN_DESIGN_MODE);
+            return true;
+          }
+          if (!(name.indexOf("*") == -1)){
+            new JobHandler(splitted).handle();
             return true;
           }
           if (objectGroups[name]){
@@ -2273,8 +2386,10 @@ function parse(input){
               addedObject.deSegmentGeometry();
             }
           }
-          terminal.printInfo(Text.MAPS_RESET);
-          undoRedoHandler.push();
+          if (!jobHandlerWorking){
+            terminal.printInfo(Text.MAPS_RESET);
+            undoRedoHandler.push();
+          }
           return true;
         break;
         case 64: //segmentObject
@@ -2283,6 +2398,10 @@ function parse(input){
           var addedObject = addedObjects[name];
           if (mode != 0){
             terminal.printError(Text.WORKS_ONLY_IN_DESIGN_MODE);
+            return true;
+          }
+          if (!(name.indexOf("*") == -1)){
+            new JobHandler(splitted).handle();
             return true;
           }
           if (objectGroups[name]){
@@ -2312,8 +2431,10 @@ function parse(input){
             return true;
           }
           addedObject.segmentGeometry(true, count);
-          terminal.printError(Text.OBJECT_SEGMENTED);
-          undoRedoHandler.push();
+          if (!jobHandlerWorking){
+            terminal.printError(Text.OBJECT_SEGMENTED);
+            undoRedoHandler.push();
+          }
           return true;
         break;
         case 65: //superposeGridSystem
@@ -2475,6 +2596,11 @@ function parse(input){
             return true;
           }
 
+          if (!(name.indexOf("*") == -1)){
+            new JobHandler(splitted).handle();
+            return true;
+          }
+
           if (lights[name]){
             terminal.printError(Text.NAME_MUST_BE_UNIQUE);
             return true;
@@ -2495,15 +2621,23 @@ function parse(input){
             return true;
           }
 
-          if (Object.keys(gridSelections).length != 1){
-            terminal.printError(Text.MUST_HAVE_ONE_GRID_SELECTED);
-            return true;
+          var selectedGrid;
+          if (!jobHandlerWorking){
+            if (Object.keys(gridSelections).length != 1){
+              terminal.printError(Text.MUST_HAVE_ONE_GRID_SELECTED);
+              return true;
+            }
+            selectedGrid = gridSelections[Object.keys(gridSelections)[0]];
+          }else{
+            selectedGrid = jobHandlerSelectedGrid;
           }
 
-          var selectedGrid = gridSelections[Object.keys(gridSelections)[0]];
-
           selectedGrid.toggleSelect(false, false, false, true);
-          delete gridSelections[Object.keys(gridSelections)[0]];
+          if (!jobHandlerWorking){
+            delete gridSelections[Object.keys(gridSelections)[0]];
+          }else{
+            delete gridSelections[selectedGrid.name];
+          }
 
           var lightPositionX = selectedGrid.centerX + offsetX;
           var lightPositionY = selectedGrid.centerY + offsetY;
@@ -2551,8 +2685,10 @@ function parse(input){
           pointLightRepresentation.lightName = name;
           pointLightRepresentation.isPointLightRepresentation = true;
 
-          terminal.printError(Text.LIGHT_ADDED);
-          undoRedoHandler.push();
+          if (!jobHandlerWorking){
+            terminal.printError(Text.LIGHT_ADDED);
+            undoRedoHandler.push();
+          }
           return true;
         break;
         case 69: //newSkybox
@@ -2683,13 +2819,19 @@ function parse(input){
             terminal.printError(Text.WORKS_ONLY_IN_DESIGN_MODE);
             return true;
           }
+          if (!(name.indexOf("*") == -1)){
+            new JobHandler(splitted).handle();
+            return true;
+          }
           if (!skybox){
             terminal.printError(Text.NO_SUCH_SKYBOX);
             return true;
           }
           delete skyBoxes[name];
-          terminal.printInfo(Text.SKYBOX_DESTROYED);
-          undoRedoHandler.push();
+          if (!jobHandlerWorking){
+            terminal.printInfo(Text.SKYBOX_DESTROYED);
+            undoRedoHandler.push();
+          }
           return true;
         break;
         case 74: //skybox
@@ -2889,7 +3031,10 @@ function parse(input){
             terminal.printError(Text.WORKS_ONLY_IN_DESIGN_MODE);
             return true;
           }
-
+          if (!(name.indexOf("*") == -1)){
+            new JobHandler(splitted).handle();
+            return true;
+          }
           if (!addedObject && !grouppedObject){
             terminal.printError(Text.NO_SUCH_OBJECT);
             return true;
@@ -2921,8 +3066,10 @@ function parse(input){
               omMassController.updateDisplay();
             }
           }
-          terminal.printInfo(Text.MASS_SET);
-          undoRedoHandler.push();
+          if (!jobHandlerWorking){
+            terminal.printInfo(Text.MASS_SET);
+            undoRedoHandler.push();
+          }
           return true;
         break;
         case 82: //rotateObject
@@ -2931,6 +3078,10 @@ function parse(input){
           var radian;
           if (mode != 0){
             terminal.printError(Text.WORKS_ONLY_IN_DESIGN_MODE);
+            return true;
+          }
+          if (!(name.indexOf("*") == -1)){
+            new JobHandler(splitted).handle();
             return true;
           }
           try{
@@ -2959,8 +3110,10 @@ function parse(input){
           }else if (objectGroup){
             objectGroup.rotate(axis, radian);
           }
-          terminal.printInfo(Text.OBJECT_ROTATED);
-          undoRedoHandler.push();
+          if (!jobHandlerWorking){
+            terminal.printInfo(Text.OBJECT_ROTATED);
+            undoRedoHandler.push();
+          }
           return true;
         break;
         case 83: //newScript
@@ -3008,6 +3161,10 @@ function parse(input){
             terminal.printError(Text.WORKS_ONLY_IN_PREVIEW_MODE);
             return true;
           }
+          if (!(name.indexOf("*") == -1)){
+            new JobHandler(splitted).handle(true);
+            return true;
+          }
           var script = scripts[name];
           if (!script){
             terminal.printError(Text.NO_SUCH_SCRIPT);
@@ -3029,7 +3186,9 @@ function parse(input){
           }else{
             script2.start();
           }
-          terminal.printInfo(Text.SCRIPT_STARTED_RUNNING);
+          if (!jobHandlerWorking){
+            terminal.printInfo(Text.SCRIPT_STARTED_RUNNING);
+          }
           scripts[name] = script2;
           return true;
         break;
@@ -3037,6 +3196,10 @@ function parse(input){
           var name = splitted[1];
           if (mode == 0){
             terminal.printError(Text.WORKS_ONLY_IN_PREVIEW_MODE);
+            return true;
+          }
+          if (!(name.indexOf("*") == -1)){
+            new JobHandler(splitted).handle(true);
             return true;
           }
           var script = scripts[name];
@@ -3049,7 +3212,9 @@ function parse(input){
             return true;
           }
           script.stop();
-          terminal.printInfo(Text.SCRIPT_STOPPED);
+          if (!jobHandlerWorking){
+            terminal.printInfo(Text.SCRIPT_STOPPED);
+          }
         break;
         case 86: //printScripts
           var count = 0;
@@ -3134,13 +3299,23 @@ function parse(input){
         break;
         case 88: //destroyScript
           var name = splitted[1];
+          if (mode == 1){
+            terminal.printError(Text.WORKS_ONLY_IN_DESIGN_MODE);
+            return true;
+          }
+          if (!(name.indexOf("*") == -1)){
+            new JobHandler(splitted).handle();
+            return true;
+          }
           if (!scripts[name]){
             terminal.printError(Text.NO_SUCH_SCRIPT);
             return true;
           }
           delete scripts[name];
-          terminal.printInfo(Text.SCRIPT_DESTROYED);
-          undoRedoHandler.push();
+          if (!jobHandlerWorking){
+            terminal.printInfo(Text.SCRIPT_DESTROYED);
+            undoRedoHandler.push();
+          }
           return true;
         break;
         case 89: //translateObject
@@ -3203,8 +3378,26 @@ function parse(input){
           }
           try{
             var objectNamesArray = objects.split(",");
+            for (var i = 0; i<objectNamesArray.length; i++){
+              if (!(objectNamesArray[i].indexOf("*") == -1)){
+                var tmpPrefix = objectNamesArray[i].split("*")[0];
+                for (var addedObjName in addedObjects){
+                  if (addedObjName.startsWith(tmpPrefix)){
+                    objectNamesArray.push(addedObjName);
+                  }
+                }
+                for (var objGroupName in objectGroups){
+                  if (objGroupName.startsWith(tmpPrefix)){
+                    objectNamesArray.push(objGroupName);
+                  }
+                }
+              }
+            }
+            objectNamesArray = objectNamesArray.filter(function(item, pos) {
+              return (objectNamesArray.indexOf(item) == pos && (item.indexOf("*") == -1));
+            });
             var group = new Object();
-            if (objectNamesArray.length == 1){
+            if (objectNamesArray.length < 2){
               terminal.printError(Text.MUST_GLUE_AT_LEAST_2_OBJECTS);
               return true;
             }
@@ -3309,6 +3502,10 @@ function parse(input){
             terminal.printError(Text.WORKS_ONLY_IN_DESIGN_MODE);
             return true;
           }
+          if (!(name.indexOf("*") == -1)){
+            new JobHandler(splitted).handle();
+            return true;
+          }
           var objectGroup = objectGroups[name];
           if (!objectGroup){
             terminal.printError(Text.NO_SUCH_OBJECT);
@@ -3316,8 +3513,10 @@ function parse(input){
           }
           objectGroup.detach();
           delete objectGroups[name];
-          terminal.printInfo(Text.OBJECT_DETACHED);
-          undoRedoHandler.push();
+          if (!jobHandlerWorking){
+            terminal.printInfo(Text.OBJECT_DETACHED);
+            undoRedoHandler.push();
+          }
           selectedObjectGroup = 0;
           selectedAddedObject = 0;
           return true;
@@ -3329,6 +3528,10 @@ function parse(input){
           var offsetZ = parseInt(splitted[4]);
           if (mode != 0){
             terminal.printError(Text.WORKS_ONLY_IN_DESIGN_MODE);
+            return true;
+          }
+          if (!(name.indexOf("*") == -1)){
+            new JobHandler(splitted).handle();
             return true;
           }
           if (markedPoints[name]){
@@ -3351,12 +3554,19 @@ function parse(input){
             terminal.printError(Text.NAME_CANNOT_BE_EMPTY);
             return true;
           }
-          var gridSelectionSize = Object.keys(gridSelections).length;
-          if (gridSelectionSize != 1){
-            terminal.printError(Text.MUST_HAVE_ONE_GRID_SELECTED);
-            return true;
+          if (!jobHandlerWorking){
+            var gridSelectionSize = Object.keys(gridSelections).length;
+            if (gridSelectionSize != 1){
+              terminal.printError(Text.MUST_HAVE_ONE_GRID_SELECTED);
+              return true;
+            }
           }
-          var selectedGrid = gridSelections[Object.keys(gridSelections)[0]];
+          var selectedGrid;
+          if (!jobHandlerWorking){
+            selectedGrid = gridSelections[Object.keys(gridSelections)[0]];
+          }else{
+            selectedGrid = jobHandlerSelectedGrid;
+          }
           var centerX = selectedGrid.centerX + offsetX;
           var centerY = selectedGrid.centerY + offsetY;
           var centerZ = selectedGrid.centerZ + offsetZ;
@@ -3365,14 +3575,20 @@ function parse(input){
           );
           markedPoint.renderToScreen();
           markedPoints[name] = markedPoint;
-          terminal.printInfo(Text.POINT_MARKED);
           selectedGrid.toggleSelect(false, false, false, true);
-          undoRedoHandler.push();
+          if (!jobHandlerWorking){
+            terminal.printInfo(Text.POINT_MARKED);
+            undoRedoHandler.push();
+          }
         break;
         case 95: //unmark
           var name = splitted[1];
           if (mode != 0){
             terminal.printError(Text.WORKS_ONLY_IN_DESIGN_MODE);
+            return true;
+          }
+          if (!(name.indexOf("*") == -1)){
+            new JobHandler(splitted).handle();
             return true;
           }
           var markedPoint = markedPoints[name];
@@ -3382,8 +3598,10 @@ function parse(input){
           }
           markedPoint.destroy();
           delete markedPoints[name];
-          terminal.printError(Text.POINT_UNMARKED);
-          undoRedoHandler.push();
+          if (!jobHandlerWorking){
+            terminal.printError(Text.POINT_UNMARKED);
+            undoRedoHandler.push();
+          }
           return true;
         break;
         case 96: //printMarkedPoints
@@ -3441,13 +3659,19 @@ function parse(input){
             terminal.printError(Text.WORKS_ONLY_IN_DESIGN_MODE);
             return true;
           }
+          if (!(scriptName.indexOf("*") == -1)){
+            new JobHandler(splitted).handle();
+            return true;
+          }
           if (!script){
             terminal.printError(Text.NO_SUCH_SCRIPT);
             return true;
           }
           script.runAutomatically = true;
-          terminal.printInfo(Text.OK);
-          undoRedoHandler.push();
+          if (!jobHandlerWorking){
+            terminal.printInfo(Text.OK);
+            undoRedoHandler.push();
+          }
           return true;
         break;
         case 99: //uploadScript
@@ -3494,13 +3718,19 @@ function parse(input){
             terminal.printError(Text.WORKS_ONLY_IN_DESIGN_MODE);
             return true;
           }
+          if (!(scriptName.indexOf("*") == -1)){
+            new JobHandler(splitted).handle();
+            return true;
+          }
           if (!script){
             terminal.printError(Text.NO_SUCH_SCRIPT);
             return true;
           }
           script.runAutomatically = false;
-          terminal.printInfo(Text.OK);
-          undoRedoHandler.push();
+          if (!jobHandlerWorking){
+            terminal.printInfo(Text.OK);
+            undoRedoHandler.push();
+          }
           return true;
         break;
         case 101: //physicsWorkerMode
@@ -3646,6 +3876,7 @@ function parse(input){
             terminal.printError(Text.WORKS_ONLY_IN_DESIGN_MODE);
             return true;
           }
+
           if (newTextureName.indexOf(PIPE) != -1){
             terminal.printError(Text.TEXTURE_NAME_NOT_VALID);
             return true;
@@ -3788,6 +4019,10 @@ function parse(input){
             terminal.printError(Text.WORKS_ONLY_IN_DESIGN_MODE);
             return true;
           }
+          if (!(imgName.indexOf("*") == -1)){
+            new JobHandler(splitted).handle();
+            return true;
+          }
           if (!uploadedImages[imgName]){
             terminal.printError(Text.NO_SUCH_IMAGE);
             return true;
@@ -3799,8 +4034,10 @@ function parse(input){
             }
           }
           delete uploadedImages[imgName];
-          terminal.printInfo(Text.IMAGE_DESTROYED);
-          undoRedoHandler.push();
+          if (!jobHandlerWorking){
+            terminal.printInfo(Text.IMAGE_DESTROYED);
+            undoRedoHandler.push();
+          }
           return true;
         break;
         case 110: //setBlending
@@ -3809,6 +4046,10 @@ function parse(input){
             return true;
           }
           var objectName = splitted[1];
+          if (!(objectName.indexOf("*") == -1)){
+            new JobHandler(splitted).handle();
+            return true;
+          }
           var blendingMode = splitted[2].toUpperCase();
           var obj = addedObjects[objectName];
           if (!obj){
@@ -3836,8 +4077,10 @@ function parse(input){
           if (obj instanceof AddedObject || obj instanceof ObjectGroup){
             obj.setBlending(blendingModeInt);
           }
-          terminal.printInfo(Text.BLENDING_MODE_SET_TO.replace(Text.PARAM1, blendingMode));
-          undoRedoHandler.push();
+          if (!jobHandlerWorking){
+            terminal.printInfo(Text.BLENDING_MODE_SET_TO.replace(Text.PARAM1, blendingMode));
+            undoRedoHandler.push();
+          }
           return true;
         break;
         case 111: //about
@@ -4238,6 +4481,10 @@ function parse(input){
             return true;
           }
           var objName = splitted[1];
+          if (!(objName.indexOf("*") == -1)){
+            new JobHandler(splitted).handle();
+            return true;
+          }
           var txtName = splitted[2];
           var scale = parseFloat(splitted[3]);
           var bias = parseFloat(splitted[4]);
@@ -4268,8 +4515,10 @@ function parse(input){
             return true;
           }
           obj.applyDisplacementMap(dispTexture, txtName, scale, bias);
-          terminal.printInfo(Text.DISPLACEMENT_MAP_APPLIED);
-          undoRedoHandler.push();
+          if (!jobHandlerWorking){
+            terminal.printInfo(Text.DISPLACEMENT_MAP_APPLIED);
+            undoRedoHandler.push();
+          }
           return true;
         break;
         case 126: //setSlipperiness
@@ -4278,6 +4527,10 @@ function parse(input){
             return true;
           }
           var objName = splitted[1];
+          if (!(objName.indexOf("*") == -1)){
+            new JobHandler(splitted).handle();
+            return true;
+          }
           var onOff = splitted[2].toUpperCase();
           var obj = addedObjects[objName];
           if (!obj){
@@ -4321,8 +4574,10 @@ function parse(input){
             }
           }
           obj.setSlippery(slipperinessState);
-          terminal.printInfo(Text.SLIPPERINESS_ADJUSTED);
-          undoRedoHandler.push();
+          if (!jobHandlerWorking){
+            terminal.printInfo(Text.SLIPPERINESS_ADJUSTED);
+            undoRedoHandler.push();
+          }
           return true;
         break;
         case 127: //setAtlasTextureSize

@@ -224,7 +224,25 @@ StateLoader.prototype.handleObjectGroupsDiff = function(){
       objectGroupInstance.isDynamicObject = isDynamicObject;
     }
   }else if (diff.path.length == 3){
-    if (diff.path[2] == "isSlippery"){
+    if (diff.path[2] == "blendingMode"){
+      if (kind == "E"){
+        var objectGroup = objectGroups[diff.path[1]];
+        if (objectGroup){
+          var blendingVal = diff.rhs;
+          if (blendingVal == "NO_BLENDING"){
+            objectGroup.setBlending(NO_BLENDING);
+          }else if (blendingVal == "NORMAL_BLENDING"){
+            objectGroup.setBlending(NORMAL_BLENDING);
+          }else if (blendingVal == "ADDITIVE_BLENDING"){
+            objectGroup.setBlending(ADDITIVE_BLENDING);
+          }else if (blendingVal == "MULTIPLY_BLENDING"){
+            objectGroup.setBlending(MULTIPLY_BLENDING);
+          }else if (blendingVal == "SUBTRACTIVE_BLENDING"){
+            objectGroup.setBlending(SUBTRACTIVE_BLENDING);
+          }
+        }
+      }
+    }else if (diff.path[2] == "isSlippery"){
       if (kind == "E"){
         var objectGroup = objectGroups[diff.path[1]];
         if (objectGroup){
@@ -1672,6 +1690,7 @@ StateLoader.prototype.handleAddedObjectDiff = function(){
       addedObjects[addedObjectName] = addedObjectInstance;
       this.mapTexturePackToSingleObject(diff);
       this.mapTextureToSingleObject(diff);
+      addedObjectInstance.refreshTextueMatrix();
     }
   }
 }
@@ -2862,6 +2881,19 @@ StateLoader.prototype.createObjectGroupsAfterLoadedTextures = function(){
     objectGroupInstance.isDynamicObject = isDynamicObject;
     objectGroupInstance.isBasicMaterial = curObjectGroupExport.isBasicMaterial;
     objectGroupInstance.isPhongMaterial = curObjectGroupExport.isPhongMaterial;
+
+    if (curObjectGroupExport.blendingMode == "NO_BLENDING"){
+      objectGroupInstance.setBlending(NO_BLENDING);
+    }else if (curObjectGroupExport.blendingMode == "ADDITIVE_BLENDING"){
+      objectGroupInstance.setBlending(ADDITIVE_BLENDING);
+    }else if (curObjectGroupExport.blendingMode == "SUBTRACTIVE_BLENDING"){
+      objectGroupInstance.setBlending(SUBTRACTIVE_BLENDING);
+    }else if (curObjectGroupExport.blendingMode == "MULTIPLY_BLENDING"){
+      objectGroupInstance.setBlending(MULTIPLY_BLENDING);
+    }else if (curObjectGroupExport.blending == "NORMAL_BLENDING"){
+      objectGroupInstance.setBlending(NORMAL_BLENDING);
+    }
+
   }
 
   undoRedoHandler.push();
