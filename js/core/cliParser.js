@@ -206,7 +206,33 @@ function parse(input){
           }
         break;
         case 10: //selectAllGrids
-          // DEPRECATED
+          if (mode != 0){
+            terminal.printError(Text.WORKS_ONLY_IN_DESIGN_MODE);
+            return true;
+          }
+          var gsName = splitted[1];
+          if (!(gsName.indexOf("*") == -1)){
+            new JobHandler(splitted).handle();
+            return true;
+          }
+          var gs = gridSystems[gsName];
+          if (!gs){
+            terminal.printError(Text.NO_SUCH_GRID_SYSTEM);
+            return true;
+          }
+          var ctr = 0;
+          for (var gridNum in gs.grids){
+            var grid = gs.grids[gridNum];
+            if (!grid.selected){
+              ctr ++;
+              grid.toggleSelect(false, false, false, true);
+            }
+          }
+          if (!jobHandlerWorking){
+            terminal.printInfo(Text.X_GRIDS_SELECTED.replace(Text.PARAM1, ctr));
+            undoRedoHandler.push();
+          }
+          return true;
         break;
         case 11: //cropGridSystem
           if (mode != 0){
@@ -4624,6 +4650,47 @@ function parse(input){
             terminal.printInfo(Text.TREE2.replace(Text.PARAM1, "Height").replace(Text.PARAM2, projectAtlasSize.height));
           }
           return true;
+        break;
+        case 129: // sync
+          if (mode != 0){
+            terminal.printError(Text.WORKS_ONLY_IN_DESIGN_MODE);
+            return true;
+          }
+          var sourceObjectName = splitted[1];
+          var targetObjectName = splitted[2];
+          var sourceObject = addedObjects[sourceObjectName];
+          var targetObject = addedObjects[targetObjectName];
+          if (!(targetObjectName.indexOf("*") == -1)){
+            new JobHandler(splitted).handle();
+            return true;
+          }
+          if (!sourceObject){
+            if (objectGroups[sourceObjectName]){
+              terminal.printError(Text.GLUED_OBJECTS_DO_NOT_SUPPORT_THIS_FUNCTION);
+              return true;
+            }
+            terminal.printError(Text.SOURCE_OBJECT_NOT_DEFINED);
+            return true;
+          }
+          if (!targetObject){
+            if (objectGroups[targetObjectName]){
+              terminal.printError(Text.GLUED_OBJECTS_DO_NOT_SUPPORT_THIS_FUNCTION);
+              return true;
+            }
+            terminal.printError(Text.TARGET_OBJECT_NOT_DEFINED);
+            return true;
+          }
+          if (sourceObject.name == targetObject.name){
+            terminal.printError(Text.SOURCE_AND_TARGET_OBJECTS_ARE_THE_SAME);
+            return true;
+          }
+          targetObject.syncProperties(sourceObject);
+          if (!jobHandlerWorking){
+            terminal.printInfo(Text.OBJECTS_SYNCED);
+            undoRedoHandler.push();
+          }
+          return true;
+
         break;
       }
       return true;

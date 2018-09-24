@@ -223,6 +223,38 @@ AddedObject.prototype.export = function(){
   return exportObject;
 }
 
+AddedObject.prototype.syncProperties = function(refObject){
+  // TEXTURE OFFSETS
+  if (refObject.hasDiffuseMap() && this.hasDiffuseMap()){
+    var refTexture = refObject.mesh.material.uniforms.diffuseMap.value;
+    var srcTexture = this.mesh.material.uniforms.diffuseMap.value;
+    srcTexture.offset.x = refTexture.offset.x;
+    srcTexture.offset.y = refTexture.offset.y;
+    srcTexture.initOffsetXSet = false;
+    srcTexture.updateMatrix();
+  }
+  // OPACITY
+  var refOpacity = refObject.mesh.material.uniforms.alpha.value;
+  this.updateOpacity(refOpacity);
+  this.initOpacitySet = false;
+  // AO INTENSITY
+  var refAOIntensity = refObject.mesh.material.uniforms.aoIntensity.value;
+  this.mesh.material.uniforms.aoIntensity.value = refAOIntensity
+  // EMISSIVE INTENSITY
+  var refMaterial = refObject.mesh.material;
+  var refEmissiveIntensity = refMaterial.uniforms.emissiveIntensity.value;
+  this.mesh.material.uniforms.emissiveIntensity.value = refEmissiveIntensity;
+  this.initEmissiveIntensitySet = false;
+  this.initEmissiveIntensity = refEmissiveIntensity;
+  // DISPLACEMENT
+  var refDispX = refObject.mesh.material.uniforms.displacementInfo.value.x;
+  var refDispY = refObject.mesh.material.uniforms.displacementInfo.value.y;
+  this.mesh.material.uniforms.displacementInfo.value.x = refDispX;
+  this.mesh.material.uniforms.displacementInfo.value.y = refDispY;
+  this.initDisplacementScaleSet = false;
+  this.initDisplacementBiasSet = false;
+}
+
 AddedObject.prototype.setAttachedProperties = function(){
   this.qxWhenAttached = this.previewMesh.quaternion.x;
   this.qyWhenAttached = this.previewMesh.quaternion.y;

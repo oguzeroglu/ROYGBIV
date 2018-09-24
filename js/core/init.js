@@ -1126,3 +1126,14 @@ function debugCanvas(dbgCanvas){
   img.src = dbgCanvas.toDataURL();
   newTab.document.body.appendChild(img);
 }
+
+// WARNING: FOR TEST PURPOSES
+function clearChildrenMesh(objectGroup){
+  for (var childName in objectGroup.group){
+    var child = objectGroup.group[childName];
+    child.mesh.geometry.dispose();
+    child.previewMesh.geometry.dispose();
+    delete child.mesh.geometry;
+    delete child.previewMesh.geometry;
+  }
+}

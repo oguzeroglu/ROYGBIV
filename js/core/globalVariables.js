@@ -134,7 +134,8 @@ var commandArgumentsExpectedCount = [
     4, //applyDisplacementMap
     2, //setSlipperiness
     2, //setAtlasTextureSize
-    0 //printAtlasTextureSize
+    0, //printAtlasTextureSize
+    2 //sync
 ];
 var commandArgumentsExpectedExplanation = [
   "help", //help
@@ -265,7 +266,8 @@ var commandArgumentsExpectedExplanation = [
   "applyDisplacementMap objectName textureName scale bias", //applyDisplacementMap
   "setSlipperiness objectName on/off", //setSlipperiness
   "setAtlasTextureSize width height", //setAtlasTextureSize
-  "printAtlasTextureSize" //printAtlasTextureSize
+  "printAtlasTextureSize", //printAtlasTextureSize
+  "sync sourceObject targetObject" //sync
 ];
 var commands = [
   "help",
@@ -396,7 +398,8 @@ var commands = [
   "applyDisplacementMap",
   "setSlipperiness",
   "setAtlasTextureSize",
-  "printAtlasTextureSize"
+  "printAtlasTextureSize",
+  "sync"
 ];
 var commandInfo = [
   "help: Prints command list.",
@@ -527,7 +530,8 @@ var commandInfo = [
   "applyDisplacementMap: Applies a displacement map to an object and modifies its geometry.",
   "setSlipperiness: Sets the slipperiness of an object.",
   "setAtlasTextureSize: Sets the size of each texture/texture pack when creating object groups.",
-  "printAtlasTextureSize: Prints the atlas texture size set with setAtlasTextureSize command."
+  "printAtlasTextureSize: Prints the atlas texture size set with setAtlasTextureSize command.",
+  "sync: Sets the material properties of the target object according to the source object."
 ];
 var keyboardInfo = [
   "W/S : Translates the camera on axis Z.",
@@ -541,7 +545,6 @@ var keyboardInfo = [
 ];
 
 var deprecatedCommandIndices = [
-  10, //selectAllGrids -> Deprecated due to possible performance issues on big grid systems, also given the fact that it has not any use case, this command makes no sense at all.
   26, //newPhysicsBoxTest -> Deprecated due to lack of use cases. This command is implemented to test if the physics bodies fit the meshes. After the implementation of switchPhysicsDebugMode, this command is no longer needed.
   27, //newPhysicsSphereTest -> Deprecated due to lack of use cases. This command is implemented to test if the physics bodies fit the meshes. After the implementation of switchPhysicsDebugMode, this command is no longer needed.
   28, //printPhysicsTests -> Since box and sphere physics tests are deprecated, this command is no longer needed.

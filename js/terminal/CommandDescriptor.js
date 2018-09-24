@@ -561,6 +561,12 @@ var CommandDescriptor = function(){
   this.setAtlasTextureSize.types.push(this.UNKNOWN_INDICATOR); // width
   this.setAtlasTextureSize.types.push(this.UNKNOWN_INDICATOR); // height
 
+  // sync
+  this.sync = new Object();
+  this.sync.types = [];
+  this.sync.types.push(this.OBJECT_NAME); // sourceObject
+  this.sync.types.push(this.OBJECT_NAME); // targetObject
+
 };
 
 CommandDescriptor.prototype.test = function(){

@@ -313,15 +313,16 @@ var TextureMerger = function(texturesObj){
 
   //this.debugImages(imgSize);
 
-  this.makeCanvasPowerOfTwo();
-
   if (this.canvas.width > MAX_TEXTURE_SIZE || this.canvas.height > MAX_TEXTURE_SIZE){
     throw new Error("TextureMerger error: Max texture size exceeded. ("+MAX_TEXTURE_SIZE+"x"+MAX_TEXTURE_SIZE+")");
     return;
   }
 
   this.mergedTexture = new THREE.CanvasTexture(this.canvas);
-  this.mergedTexture.generateMipmaps = true;
+  this.mergedTexture.wrapS = THREE.ClampToEdgeWrapping;
+  this.mergedTexture.wrapT = THREE.ClampToEdgeWrapping;
+  this.mergedTexture.minFilter = THREE.NearestFilter;
+  this.mergedTexture.magFilter = THREE.NearestFilter;
   this.mergedTexture.needsUpdate = true;
   //debugTexture(this.mergedTexture);
   //console.log("[*] Textures merged: "+explanationStr);

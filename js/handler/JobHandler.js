@@ -88,6 +88,10 @@ JobHandler.prototype.handle = function(previewModeCommand){
       this.handleApplyDisplacementMapCommand();
     }else if (this.splitted[0] == "setSlipperiness"){
       this.handleSetSlipperinessCommand();
+    }else if (this.splitted[0] == "sync"){
+      this.handleSyncCommand();
+    }else if (this.splitted[0] == "selectAllGrids"){
+      this.handleSelectAllGridsCommand();
     }
     if (this.undoRedoPush){
       undoRedoHandler.push();
@@ -96,6 +100,44 @@ JobHandler.prototype.handle = function(previewModeCommand){
     console.error(err);
   }
   jobHandlerWorking = false;
+}
+
+JobHandler.prototype.handleSelectAllGridsCommand = function(){
+  var gsNamePrefix = this.splitted[1].split("*")[0];
+  var ctr = 0;
+  for (var gsName in gridSystems){
+    if (gsName.startsWith(gsNamePrefix)){
+      parseCommand(
+        "selectAllGrids "+gsName
+      );
+      ctr ++;
+    }
+  }
+  if (ctr == 0){
+    terminal.printError(Text.NO_GRID_SYSTEM_FOUND);
+    this.undoRedoPush = false;
+  }else{
+    terminal.printInfo(Text.DESTROYED_X_GRID_SYTEMS.replace(Text.PARAM1, ctr));
+  }
+}
+
+JobHandler.prototype.handleSyncCommand = function(){
+  var objNamePrefix = this.splitted[2].split("*")[0];
+  var ctr = 0;
+  for (var objName in addedObjects){
+    if (objName.startsWith(objNamePrefix)){
+      parseCommand(
+        "sync "+this.splitted[1]+" "+objName
+      );
+      ctr ++;
+    }
+  }
+  if (ctr == 0){
+    terminal.printError(Text.NO_OBJECT_FOUND);
+    this.undoRedoPush = false;
+  }else{
+    terminal.printInfo(Text.COMMAND_EXECUTED_FOR_X_OBJECTS.replace(Text.PARAM1, ctr));
+  }
 }
 
 JobHandler.prototype.handleSetSlipperinessCommand = function(){
