@@ -462,7 +462,18 @@ GridSystem.prototype.newSurface = function(name, grid1, grid2, material){
   }
   var height = (Math.abs(grid1.rowNumber - grid2.rowNumber) + 1) * this.cellSize;
   var width = (Math.abs(grid1.colNumber - grid2.colNumber ) + 1) * this.cellSize;
-  var geometry = new THREE.PlaneBufferGeometry(width, height);
+  var geomKey = (
+    "PlaneBufferGeometry" + PIPE +
+    width + PIPE + height + PIPE +
+    "undefined" + PIPE + "undefined"
+  );
+  var geometry;
+  if (geometryCache[geomKey]){
+    geometry = geometryCache[geomKey];
+  }else{
+    geometry = new THREE.PlaneBufferGeometry(width, height);
+    geometryCache[geomKey] = geometry;
+  }
   var surface = new MeshGenerator(geometry, material).generateMesh();
   if (this.axis == "XZ"){
 
@@ -529,7 +540,11 @@ GridSystem.prototype.newSurface = function(name, grid1, grid2, material){
 
   scene.add(surface);
 
-  var surfaceClone = surface.clone();
+  var surfaceClone = new THREE.Mesh(
+    surface.geometry, surface.material
+  );
+  surfaceClone.position.copy(surface.position);
+  surfaceClone.quaternion.copy(surface.quaternion);
   previewScene.add(surfaceClone);
 
   var surfacePhysicsShape;
@@ -636,7 +651,17 @@ GridSystem.prototype.newRamp = function(anchorGrid, otherGrid, axis, height, mat
     rowDif = (Math.abs(anchorGrid.rowNumber - otherGrid.rowNumber) + 1) * this.cellSize;
     rampHeight = Math.sqrt((rowDif * rowDif) + (height * height));
   }
-  var geometry = new THREE.PlaneBufferGeometry(rampWidth, rampHeight);
+  var geometry;
+  var geomKey = (
+    "PlaneBufferGeometry" + PIPE +
+    rampWidth + PIPE + rampHeight + PIPE +
+    "undefined" + PIPE + "undefined"
+  );
+  geometry = geometryCache[geomKey];
+  if (!geometry){
+    geometry = new THREE.PlaneBufferGeometry(rampWidth, rampHeight);
+    geometryCache[geomKey] = geometry;
+  }
   var ramp = new MeshGenerator(geometry, material).generateMesh();
 
   ramp.position.x = centerX;
@@ -714,7 +739,10 @@ GridSystem.prototype.newRamp = function(anchorGrid, otherGrid, axis, height, mat
   }
 
   scene.add(ramp);
-  var rampClone = ramp.clone();
+  var rampClone = new THREE.Mesh(ramp.geometry, ramp.material);
+  rampClone.position.copy(ramp.position);
+  rampClone.quaternion.copy(ramp.quaternion);
+  rampClone.rotation.copy(ramp.rotation);
   previewScene.add(rampClone);
 
   var rampPhysicsShape = new CANNON.Box(new CANNON.Vec3(
@@ -882,8 +910,16 @@ GridSystem.prototype.newBox = function(selections, height, material, name){
     boxCenterY = boxCenterY - superposeYOffset;
   }
 
-
-  var boxGeometry = new THREE.BoxBufferGeometry(boxSizeX, boxSizeY, boxSizeZ);
+  var geomKey = (
+    "BoxBufferGeometry" + PIPE +
+    boxSizeX + PIPE + boxSizeY + PIPE + boxSizeZ + PIPE +
+    "undefined" + PIPE + "undefined"
+  );
+  var boxGeometry = geometryCache[geomKey];
+  if (!boxGeometry){
+    boxGeometry = new THREE.BoxBufferGeometry(boxSizeX, boxSizeY, boxSizeZ);
+    geometryCache[geomKey] = boxGeometry;
+  }
   var boxMesh = new MeshGenerator(boxGeometry, material).generateMesh();
 
   boxMesh.position.x = boxCenterX;
@@ -891,7 +927,10 @@ GridSystem.prototype.newBox = function(selections, height, material, name){
   boxMesh.position.z = boxCenterZ;
 
   scene.add(boxMesh);
-  var boxClone = boxMesh.clone();
+  var boxClone = new THREE.Mesh(boxMesh.geometry, boxMesh.material);
+  boxClone.position.copy(boxMesh.position);
+  boxClone.quaternion.copy(boxMesh.quaternion);
+  boxClone.rotation.copy(boxMesh.rotation);
   previewScene.add(boxClone);
 
   var boxPhysicsShape = new CANNON.Box(new CANNON.Vec3(
@@ -1025,12 +1064,23 @@ GridSystem.prototype.newSphere = function(sphereName, material, radius, selectio
   if (this.isSuperposed){
     sphereCenterY = sphereCenterY - superposeYOffset;
   }
-
-  var sphereGeometry = new THREE.SphereBufferGeometry(Math.abs(radius));
+  var geomKey = (
+    "SphereBufferGeometry" + PIPE +
+    Math.abs(radius)+ PIPE +
+    "undefined" + PIPE + "undefined"
+  );
+  var sphereGeometry = geometryCache[geomKey];
+  if (!sphereGeometry){
+    sphereGeometry = new THREE.SphereBufferGeometry(Math.abs(radius));
+    geometryCache[geomKey] = sphereGeometry;
+  }
   var sphereMesh = new MeshGenerator(sphereGeometry, material).generateMesh();
   sphereMesh.position.set(sphereCenterX, sphereCenterY, sphereCenterZ);
   scene.add(sphereMesh);
-  var sphereClone = sphereMesh.clone();
+  var sphereClone = new THREE.Mesh(sphereMesh.geometry, sphereMesh.material);
+  sphereClone.position.copy(sphereMesh.position);
+  sphereClone.quaternion.copy(sphereMesh.quaternion);
+  sphereClone.rotation.copy(sphereMesh.rotation);
   previewScene.add(sphereClone);
 
   var spherePhysicsShape = new CANNON.Sphere(Math.abs(radius));

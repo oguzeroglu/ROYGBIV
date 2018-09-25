@@ -64,7 +64,17 @@ Grid.prototype.makeMesh = function(size, startX, startY, startZ){
     transparent: true,
     opacity:0.8
   });
-  this.geometry = new THREE.PlaneGeometry(size, size);
+  var geomKey = (
+    "PlaneGeometry" + PIPE +
+    size + PIPE + size + PIPE +
+    "undefined" + PIPE + "undefined"
+  );
+  this.geometry = geometryCache[geomKey];
+  if (!this.geometry){
+    console.log("A");
+    this.geometry = new THREE.PlaneGeometry(size, size);
+    geometryCache[geomKey] = this.geometry;
+  }
   this.mesh = new THREE.Mesh(this.geometry, this.material);
   this.mesh.gridSystemName = this.parentName;
   if (this.axis == "XZ"){

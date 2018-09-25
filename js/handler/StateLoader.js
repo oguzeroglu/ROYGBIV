@@ -1494,17 +1494,27 @@ StateLoader.prototype.handleAddedObjectDiff = function(){
         var boxMesh;
         var boxClone;
         var axis = metaData["gridSystemAxis"];
-        boxMesh = new MeshGenerator(
-          new THREE.BoxBufferGeometry(
+        var geomKey = (
+          "BoxBufferGeometry" + PIPE +
+          boxSizeX + PIPE + boxSizeY + PIPE + boxSizeZ + PIPE +
+          widthSegments + PIPE + heightSegments + PIPE + depthSegments
+        );
+        var geom = geometryCache[geomKey];
+        if (!geom){
+          geom = new THREE.BoxBufferGeometry(
             boxSizeX, boxSizeY, boxSizeZ,
             widthSegments, heightSegments, depthSegments
-          ),
-          material
-        ).generateMesh();
+          );
+          geometryCache[geomKey] = geom;
+        }
+        boxMesh = new MeshGenerator(geom, material).generateMesh();
         boxMesh.position.x = centerX;
         boxMesh.position.y = centerY;
         boxMesh.position.z = centerZ;
-        boxClone = boxMesh.clone();
+        boxClone = new THREE.Mesh(boxMesh.geometry, boxMesh.material);
+        boxClone.position.copy(boxMesh.position);
+        boxClone.quaternion.copy(boxMesh.quaternion);
+        boxClone.rotation.copy(boxMesh.rotation);
         scene.add(boxMesh);
         previewScene.add(boxClone);
         boxPhysicsBody.position.set(
@@ -1532,10 +1542,17 @@ StateLoader.prototype.handleAddedObjectDiff = function(){
         var physicsShapeParameterY = metaData["physicsShapeParameterY"];
         var physicsShapeParameterZ = metaData["physicsShapeParameterZ"];
 
-        var surface = new MeshGenerator(
-          new THREE.PlaneBufferGeometry(width, height, widthSegments, heightSegments),
-          material
-        ).generateMesh();
+        var geomKey = (
+          "PlaneBufferGeometry" + PIPE +
+          width + PIPE + height + PIPE +
+          widthSegments + PIPE + heightSegments
+        );
+        var geom = geometryCache[geomKey];
+        if (!geom){
+          geom = new THREE.PlaneBufferGeometry(width, height, widthSegments, heightSegments);
+          geometryCache[geomKey] = geom;
+        }
+        var surface = new MeshGenerator(geom, material).generateMesh();
 
         surface.position.x = positionX;
         surface.position.y = positionY;
@@ -1545,7 +1562,10 @@ StateLoader.prototype.handleAddedObjectDiff = function(){
         surface.quaternion.z = quaternionZ;
         surface.quaternion.w = quaternionW;
 
-        var surfaceClone = surface.clone();
+        var surfaceClone = new THREE.Mesh(surface.geometry, surface.material);
+        surfaceClone.position.copy(surface.position);
+        surfaceClone.quaternion.copy(surface.quaternion);
+        surfaceClone.rotation.copy(surface.rotation);
         scene.add(surface);
         previewScene.add(surfaceClone);
 
@@ -1584,10 +1604,18 @@ StateLoader.prototype.handleAddedObjectDiff = function(){
         var fromEulerX = metaData["fromEulerX"];
         var fromEulerY = metaData["fromEulerY"];
         var fromEulerZ = metaData["fromEulerZ"];
-        var ramp = new MeshGenerator(
-          new THREE.PlaneBufferGeometry(rampWidth, rampHeight, widthSegments, heightSegments),
-          material
-        ).generateMesh();
+
+        var geomKey = (
+          "PlaneBufferGeometry" + PIPE +
+          rampWidth + PIPE + rampHeight + PIPE +
+          widthSegments + PIPE + heightSegments
+        );
+        var geom = geometryCache[geomKey];
+        if (!geom){
+          geom = new THREE.PlaneBufferGeometry(rampWidth, rampHeight, widthSegments, heightSegments);
+          geometryCache[geomKey] = geom;
+        }
+        var ramp = new MeshGenerator(geom, material).generateMesh();
         ramp.position.x = centerX;
         ramp.position.y = centerY;
         ramp.position.z = centerZ;
@@ -1596,7 +1624,10 @@ StateLoader.prototype.handleAddedObjectDiff = function(){
         ramp.quaternion.z = quaternionZ;
         ramp.quaternion.w = quaternionW;
 
-        var rampClone = ramp.clone();
+        var rampClone = new THREE.Mesh(ramp.geometry, ramp.material);
+        rampClone.position.copy(ramp.position);
+        rampClone.quaternion.copy(ramp.quaternion);
+        rampClone.rotation.copy(ramp.rotation);
         var rampPhysicsShape = new CANNON.Box(new CANNON.Vec3(
           rampWidth/2,
           surfacePhysicalThickness,
@@ -1644,13 +1675,24 @@ StateLoader.prototype.handleAddedObjectDiff = function(){
         var sphereMesh;
         var sphereClone;
         var axis = metaData["gridSystemAxis"];
-        sphereMesh = new MeshGenerator(
-          new THREE.SphereBufferGeometry(Math.abs(radius), widthSegments, heightSegments), material
-        ).generateMesh();
+        var geomKey = (
+          "SphereBufferGeometry" + PIPE +
+          Math.abs(radius) + PIPE +
+          widthSegments + PIPE + heightSegments
+        );
+        var geom = geometryCache[geomKey];
+        if (!geom){
+          geom = new THREE.SphereBufferGeometry(Math.abs(radius), widthSegments, heightSegments);
+          geometryCache[geomKey] = geom;
+        }
+        sphereMesh = new MeshGenerator(geom, material).generateMesh();
         sphereMesh.position.x = centerX;
         sphereMesh.position.y = centerY;
         sphereMesh.position.z = centerZ;
-        sphereClone = sphereMesh.clone();
+        sphereClone = new THREE.Mesh(sphereMesh.geometry, sphereMesh.material);
+        sphereClone.position.copy(sphereMesh.position);
+        sphereClone.quaternion.copy(sphereMesh.quaternion);
+        sphereClone.rotation.copy(sphereMesh.rotation);
         scene.add(sphereMesh);
         previewScene.add(sphereClone);
         spherePhysicsBody.position.set(
@@ -2063,17 +2105,27 @@ StateLoader.prototype.load = function(undo){
         var boxMesh;
         var boxClone;
         var axis = metaData["gridSystemAxis"];
-        boxMesh = new MeshGenerator(
-          new THREE.BoxBufferGeometry(
+        var geomKey = (
+          "BoxBufferGeometry" + PIPE +
+          boxSizeX + PIPE + boxSizeY + PIPE + boxSizeZ + PIPE +
+          widthSegments + PIPE + heightSegments + PIPE + depthSegments
+        );
+        var geom = geometryCache[geomKey];
+        if (!geom){
+          geom = new THREE.BoxBufferGeometry(
             boxSizeX, boxSizeY, boxSizeZ,
             widthSegments, heightSegments, depthSegments
-          ),
-          material
-        ).generateMesh();
+          );
+          geometryCache[geomKey] = geom;
+        }
+        boxMesh = new MeshGenerator(geom, material).generateMesh();
         boxMesh.position.x = centerX;
         boxMesh.position.y = centerY;
         boxMesh.position.z = centerZ;
-        boxClone = boxMesh.clone();
+        boxClone = new THREE.Mesh(boxMesh.geometry, boxMesh.material);
+        boxClone.position.copy(boxMesh.position);
+        boxClone.quaternion.copy(boxMesh.quaternion);
+        boxClone.rotation.copy(boxMesh.rotation);
         scene.add(boxMesh);
         previewScene.add(boxClone);
         boxPhysicsBody.position.set(
@@ -2101,10 +2153,17 @@ StateLoader.prototype.load = function(undo){
         var physicsShapeParameterY = metaData["physicsShapeParameterY"];
         var physicsShapeParameterZ = metaData["physicsShapeParameterZ"];
 
-        var surface = new MeshGenerator(
-          new THREE.PlaneBufferGeometry(width, height, widthSegments, heightSegments),
-          material
-        ).generateMesh();
+        var geomKey = (
+          "PlaneBufferGeometry" + PIPE +
+          width + PIPE + height + PIPE +
+          widthSegments + PIPE + heightSegments
+        );
+        var geom = geometryCache[geomKey];
+        if (!geom){
+          geom = new THREE.PlaneBufferGeometry(width, height, widthSegments, heightSegments);
+          geometryCache[geomKey] = geom;
+        }
+        var surface = new MeshGenerator(geom, material).generateMesh();
 
         surface.position.x = positionX;
         surface.position.y = positionY;
@@ -2114,7 +2173,10 @@ StateLoader.prototype.load = function(undo){
         surface.quaternion.z = quaternionZ;
         surface.quaternion.w = quaternionW;
 
-        var surfaceClone = surface.clone();
+        var surfaceClone = new THREE.Mesh(surface.geometry, surface.material);
+        surfaceClone.position.copy(surface.position);
+        surfaceClone.quaternion.copy(surface.quaternion);
+        surfaceClone.rotation.copy(surface.rotation);
         scene.add(surface);
         previewScene.add(surfaceClone);
 
@@ -2152,10 +2214,18 @@ StateLoader.prototype.load = function(undo){
         var fromEulerX = metaData["fromEulerX"];
         var fromEulerY = metaData["fromEulerY"];
         var fromEulerZ = metaData["fromEulerZ"];
-        var ramp = new MeshGenerator(
-          new THREE.PlaneBufferGeometry(rampWidth, rampHeight, widthSegments, heightSegments),
-          material
-        ).generateMesh();
+
+        var geomKey = (
+          "PlaneBufferGeometry" + PIPE +
+          rampWidth + PIPE + rampHeight + PIPE +
+          widthSegments + PIPE + heightSegments
+        );
+        var geom = geometryCache[geomKey];
+        if (!geom){
+          geom = new THREE.PlaneBufferGeometry(rampWidth, rampHeight, widthSegments, heightSegments);
+          geometryCache[geomKey] = geom;
+        }
+        var ramp = new MeshGenerator(geom, material).generateMesh();
         ramp.position.x = centerX;
         ramp.position.y = centerY;
         ramp.position.z = centerZ;
@@ -2164,7 +2234,10 @@ StateLoader.prototype.load = function(undo){
         ramp.quaternion.z = quaternionZ;
         ramp.quaternion.w = quaternionW;
 
-        var rampClone = ramp.clone();
+        var rampClone = new THREE.Mesh(ramp.geometry, ramp.material);
+        rampClone.position.copy(ramp.position);
+        rampClone.quaternion.copy(ramp.quaternion);
+        rampClone.rotation.copy(ramp.rotation);
         var rampPhysicsShape = new CANNON.Box(new CANNON.Vec3(
           rampWidth/2,
           surfacePhysicalThickness,
@@ -2212,13 +2285,24 @@ StateLoader.prototype.load = function(undo){
         var sphereMesh;
         var sphereClone;
         var axis = metaData["gridSystemAxis"];
-        sphereMesh = new MeshGenerator(
-          new THREE.SphereBufferGeometry(Math.abs(radius), widthSegments, heightSegments), material
-        ).generateMesh();
+        var geomKey = (
+          "SphereBufferGeometry" + PIPE +
+          Math.abs(radius) + PIPE +
+          widthSegments + PIPE + heightSegments
+        );
+        var geom = geometryCache[geomKey];
+        if (!geom){
+          geom = new THREE.SphereBufferGeometry(Math.abs(radius), widthSegments, heightSegments);
+          geometryCache[geomKey] = geom;
+        }
+        sphereMesh = new MeshGenerator(geom, material).generateMesh();
         sphereMesh.position.x = centerX;
         sphereMesh.position.y = centerY;
         sphereMesh.position.z = centerZ;
-        sphereClone = sphereMesh.clone();
+        sphereClone = new THREE.Mesh(sphereMesh.geometry, sphereMesh.material);
+        sphereClone.position.copy(sphereMesh.position);
+        sphereClone.quaternion.copy(sphereMesh.quaternion);
+        sphereClone.rotation.copy(sphereMesh.rotation);
         scene.add(sphereMesh);
         previewScene.add(sphereClone);
         spherePhysicsBody.position.set(

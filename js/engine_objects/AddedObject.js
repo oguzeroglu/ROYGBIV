@@ -814,8 +814,6 @@ AddedObject.prototype.dispose = function(){
   }
 
   this.mesh.material.dispose();
-  this.mesh.geometry.dispose();
-  this.previewMesh.geometry.dispose();
 }
 
 AddedObject.prototype.mapTexturePack = function(texturePack, fromScript){
@@ -1041,19 +1039,64 @@ AddedObject.prototype.segmentGeometry = function(isCustom, count, returnGeometry
     var width = this.metaData["width"];
     var height = this.metaData["height"];
     if (!isCustom){
-      newGeometry = new THREE.PlaneBufferGeometry(width, height, planeWidthSegments, planeHeightSegments);
+      var geomKey = (
+        "PlaneBufferGeometry" + PIPE +
+        width + PIPE + height + PIPE +
+        planeWidthSegments + PIPE + planeHeightSegments
+      );
+      newGeometry = geometryCache[geomKey];
+      if (!newGeometry){
+        newGeometry = new THREE.PlaneBufferGeometry(width, height, planeWidthSegments, planeHeightSegments);
+        geometryCache[geomKey] = newGeometry;
+      }
     }else{
       if (!isNaN(count)){
         if (returnGeometry){
-          newGeometry = new THREE.PlaneGeometry(width, height, count, count);
+          var geomKey = (
+            "PlaneGeometry" + PIPE +
+            width + PIPE + height + PIPE +
+            count + PIPE + count
+          );
+          newGeometry = geometryCache[geomKey];
+          if (!newGeometry){
+            newGeometry = new THREE.PlaneGeometry(width, height, count, count);
+            geometryCache[geomKey] = newGeometry;
+          }
         }else{
-          newGeometry = new THREE.PlaneBufferGeometry(width, height, count, count);
+          var geomKey = (
+            "PlaneBufferGeometry" + PIPE +
+            width + PIPE + height + PIPE +
+            count + PIPE + count
+          );
+          newGeometry = geometryCache[geomKey];
+          if (!newGeometry){
+            newGeometry = new THREE.PlaneBufferGeometry(width, height, count, count);
+            geometryCache[geomKey] = newGeometry;
+          }
         }
       }else{
         if (returnGeometry){
-          newGeometry = new THREE.PlaneGeometry(width, height, count.width, count.height);
+          var geomKey = (
+            "PlaneGeometry" + PIPE +
+            width + PIPE + height + PIPE +
+            count.width + PIPE + count.height
+          );
+          newGeometry = geometryCache[geomKey];
+          if (!newGeometry){
+            newGeometry = new THREE.PlaneGeometry(width, height, count.width, count.height);
+            geometryCache[geomKey] = newGeometry;
+          }
         }else{
-          newGeometry = new THREE.PlaneBufferGeometry(width, height, count.width, count.height);
+          var geomKey = (
+            "PlaneBufferGeometry" + PIPE +
+            width + PIPE + height + PIPE +
+            count.width + PIPE + count.height
+          );
+          newGeometry = geometryCache[geomKey];
+          if (!newGeometry){
+            newGeometry = new THREE.PlaneBufferGeometry(width, height, count.width, count.height);
+            geometryCache[geomKey] = newGeometry;
+          }
         }
       }
     }
@@ -1061,19 +1104,64 @@ AddedObject.prototype.segmentGeometry = function(isCustom, count, returnGeometry
     var rampWidth = this.metaData["rampWidth"];
     var rampHeight = this.metaData["rampHeight"];
     if (!isCustom){
-      newGeometry = new THREE.PlaneBufferGeometry(rampWidth, rampHeight, planeWidthSegments, planeHeightSegments);
+      var geomKey = (
+        "PlaneBufferGeometry" + PIPE +
+        rampWidth + PIPE + rampHeight + PIPE +
+        planeWidthSegments + PIPE + planeHeightSegments
+      );
+      newGeometry = geometryCache[geomKey];
+      if (!newGeometry){
+        newGeometry = new THREE.PlaneBufferGeometry(rampWidth, rampHeight, planeWidthSegments, planeHeightSegments);
+        geometryCache[geomKey] = newGeometry;
+      }
     }else{
       if (!isNaN(count)){
         if (returnGeometry){
-          newGeometry = new THREE.PlaneGeometry(rampWidth, rampHeight, count, count);
+          var geomKey = (
+            "PlaneGeometry" + PIPE +
+            rampWidth + PIPE + rampHeight + PIPE +
+            count + PIPE + count
+          );
+          newGeometry = geometryCache[geomKey];
+          if (!newGeometry){
+            newGeometry = new THREE.PlaneGeometry(rampWidth, rampHeight, count, count);
+            geometryCache[geomKey] = newGeometry;
+          }
         }else{
-          newGeometry = new THREE.PlaneBufferGeometry(rampWidth, rampHeight, count, count);
+          var geomKey = (
+            "PlaneBufferGeometry" + PIPE +
+            rampWidth + PIPE + rampHeight + PIPE +
+            count + PIPE + count
+          );
+          newGeometry = geometryCache[geomKey];
+          if (!newGeometry){
+            newGeometry = new THREE.PlaneBufferGeometry(rampWidth, rampHeight, count, count);
+            geometryCache[geomKey] = newGeometry;
+          }
         }
       }else{
         if (returnGeometry){
-          newGeometry = new THREE.PlaneGeometry(rampWidth, rampHeight, count.width, count.height);
+          var geomKey = (
+            "PlaneGeometry" + PIPE +
+            rampWidth + PIPE + rampHeight + PIPE +
+            count.width + PIPE + count.height
+          );
+          newGeometry = geometryCache[geomKey]
+          if (!newGeometry){
+            newGeometry = new THREE.PlaneGeometry(rampWidth, rampHeight, count.width, count.height);
+            geometryCache[geomKey] = newGeometry;
+          }
         }else{
-          newGeometry = new THREE.PlaneBufferGeometry(rampWidth, rampHeight, count.width, count.height);
+          var geomKey = (
+            "PlaneBufferGeometry" + PIPE +
+            rampWidth + PIPE + rampHeight + PIPE +
+            count.width + PIPE + count.height
+          );
+          newGeometry = geometryCache[geomKey];
+          if (!newGeometry){
+            newGeometry = new THREE.PlaneBufferGeometry(rampWidth, rampHeight, count.width, count.height);
+            geometryCache[geomKey] = newGeometry;
+          }
         }
       }
     }
@@ -1082,35 +1170,107 @@ AddedObject.prototype.segmentGeometry = function(isCustom, count, returnGeometry
     var boxSizeY = this.metaData["boxSizeY"];
     var boxSizeZ = this.metaData["boxSizeZ"];
     if (!isCustom){
-      newGeometry = new THREE.BoxBufferGeometry(boxSizeX, boxSizeY, boxSizeZ, boxWidthSegments, boxHeightSegments, boxDepthSegments);
+      var geomKey = (
+        "BoxBufferGeometry" + PIPE +
+        boxSizeX + PIPE + boxSizeY + PIPE + boxSizeZ + PIPE +
+        boxWidthSegments + PIPE + boxHeightSegments + PIPE +boxDepthSegments
+      );
+      newGeometry = geometryCache[geomKey];
+      if (!newGeometry){
+        newGeometry = new THREE.BoxBufferGeometry(boxSizeX, boxSizeY, boxSizeZ, boxWidthSegments, boxHeightSegments, boxDepthSegments);
+        geometryCache[geomKey] = newGeometry;
+      }
     }else{
       if (!isNaN(count)){
         if (returnGeometry){
-          newGeometry = new THREE.BoxGeometry(boxSizeX, boxSizeY, boxSizeZ, count, count, count);
+          var geomKey = (
+            "BoxGeometry" + PIPE +
+            boxSizeX + PIPE + boxSizeY + PIPE + boxSizeZ + PIPE +
+            count + PIPE + count + PIPE + count
+          );
+          newGeometry = geometryCache[geomKey];
+          if (!newGeometry){
+            newGeometry = new THREE.BoxGeometry(boxSizeX, boxSizeY, boxSizeZ, count, count, count);
+            geometryCache[geomKey] = newGeometry;
+          }
         }else{
-          newGeometry = new THREE.BoxBufferGeometry(boxSizeX, boxSizeY, boxSizeZ, count, count, count);
+          var geomKey = (
+            "BoxBufferGeometry" + PIPE +
+            boxSizeX + PIPE + boxSizeY + PIPE + boxSizeZ + PIPE +
+            count + PIPE + count + PIPE + count
+          );
+          newGeometry = geometryCache[geomKey];
+          if (!newGeometry){
+            newGeometry = new THREE.BoxBufferGeometry(boxSizeX, boxSizeY, boxSizeZ, count, count, count);
+            geometryCache[geomKey] = newGeometry;
+          }
         }
       }else{
         if (returnGeometry){
-          newGeometry = new THREE.BoxGeometry(boxSizeX, boxSizeY, boxSizeZ, count.width, count.height, count.depth);
+          var geomKey = (
+            "BoxGeometry" + PIPE +
+            boxSizeX + PIPE + boxSizeY + PIPE + boxSizeZ + PIPE +
+            count.width + PIPE + count.height + PIPE + count.depth
+          );
+          newGeometry = geometryCache[geomKey];
+          if (!newGeometry){
+            newGeometry = new THREE.BoxGeometry(boxSizeX, boxSizeY, boxSizeZ, count.width, count.height, count.depth);
+            geometryCache[geomKey] = newGeometry;
+          }
         }else{
-          newGeometry = new THREE.BoxBufferGeometry(boxSizeX, boxSizeY, boxSizeZ, count.width, count.height, count.depth);
+          var geomKey = (
+            "BoxBufferGeometry" + PIPE +
+            boxSizeX + PIPE + boxSizeY + PIPE + boxSizeZ + PIPE +
+            count.width + PIPE + count.height + PIPE + count.depth
+          );
+          newGeometry = geometryCache[geomKey];
+          if (!newGeometry){
+            newGeometry = new THREE.BoxBufferGeometry(boxSizeX, boxSizeY, boxSizeZ, count.width, count.height, count.depth);
+            geometryCache[geomKey] = newGeometry;
+          }
         }
       }
     }
   }else if (this.type == "sphere"){
     var radius = this.metaData["radius"];
     if (!isCustom){
-      newGeometry = new THREE.SphereBufferGeometry(Math.abs(radius), sphereWidthSegments, sphereHeightSegments);
+      var geomKey = (
+        "SphereBufferGeometry" + PIPE +
+        Math.abs(radius) + PIPE +
+        sphereWidthSegments + PIPE + sphereHeightSegments
+      );
+      newGeometry = geometryCache[geomKey];
+      if (!newGeometry){
+        newGeometry = new THREE.SphereBufferGeometry(Math.abs(radius), sphereWidthSegments, sphereHeightSegments);
+        geometryCache[geomKey] = newGeometry;
+      }
     }else{
       if (!isNaN(count)){
         if (count < 8){
           count = 8;
         }
         if (returnGeometry){
-          newGeometry = new THREE.SphereGeometry(Math.abs(radius), count, count);
+          var geomKey = (
+            "SphereGeometry" + PIPE +
+            Math.abs(radius) + PIPE +
+            count + PIPE + count
+          );
+          newGeometry = geometryCache[geomKey];
+          if (!newGeometry){
+            newGeometry = new THREE.SphereGeometry(Math.abs(radius), count, count);
+            geometryCache[geomKey] = newGeometry;
+          }
         }else{
-          newGeometry = new THREE.SphereBufferGeometry(Math.abs(radius), count, count);
+          var geomKey = (
+            "SphereBufferGeometry" + PIPE +
+            Math.abs(radius) + PIPE +
+            count + PIPE + count
+          );
+          newGeometry = geometryCache[geomKey];
+          if (!newGeometry){
+            newGeometry = new THREE.SphereBufferGeometry(Math.abs(radius), count, count);
+            geometryCache[geomKey] = newGeometry;
+          }
         }
       }else{
         if (count.width < 8){
@@ -1120,9 +1280,27 @@ AddedObject.prototype.segmentGeometry = function(isCustom, count, returnGeometry
           count.height = 6;
         }
         if (returnGeometry){
-          newGeometry = new THREE.SphereGeometry(Math.abs(radius), count.width, count.height);
+          var geomKey = (
+            "SphereGeometry" + PIPE +
+            Math.abs(radius) + PIPE +
+            count.width + PIPE + count.height
+          );
+          newGeometry = geometryCache[geomKey];
+          if (!newGeometry){
+            newGeometry = new THREE.SphereGeometry(Math.abs(radius), count.width, count.height);
+            geometryCache[geomKey] = newGeometry;
+          }
         }else{
-          newGeometry = new THREE.SphereBufferGeometry(Math.abs(radius), count.width, count.height);
+          var geomKey = (
+            "SphereBufferGeometry" + PIPE +
+            Math.abs(radius) + PIPE +
+            count.width + PIPE + count.height
+          );
+          newGeometry = geometryCache[geomKey];
+          if (!newGeometry){
+            newGeometry = new THREE.SphereBufferGeometry(Math.abs(radius), count.width, count.height);
+            geometryCache[geomKey] = newGeometry;
+          }
         }
       }
     }
@@ -1144,7 +1322,10 @@ AddedObject.prototype.segmentGeometry = function(isCustom, count, returnGeometry
   previewScene.remove(this.previewMesh);
 
   this.mesh = newMesh;
-  this.previewMesh = newMesh.clone();
+  this.previewMesh = new THREE.Mesh(newMesh.geometry, newMesh.material);
+  this.previewMesh.position.copy(this.mesh.position);
+  this.previewMesh.quaternion.copy(this.mesh.quaternion);
+  this.previewMesh.rotation.copy(this.mesh.rotation);
 
   this.mesh.addedObject = this;
   this.previewMesh.addedObject = this;

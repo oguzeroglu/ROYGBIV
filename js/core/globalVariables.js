@@ -832,6 +832,7 @@ var mouse = new THREE.Vector2();
 var raycaster = new THREE.Raycaster();
 var jobHandlerSelectedGrid = 0;
 var jobHandlerWorking = false;
+var geometryCache = new Object();
 
 // WORKER VARIABLES
 var WORKERS_SUPPORTED = (typeof(Worker) !== "undefined");
