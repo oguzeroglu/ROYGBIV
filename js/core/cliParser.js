@@ -3483,6 +3483,15 @@ function parse(input){
               }
             }
 
+            var ctr = 0;
+            for (var objName in group){
+              ctr += group[objName].mesh.geometry.attributes.position.array.length;
+              if (ctr >= 50000 * 3){
+                terminal.printError(Text.OBJECTS_HAVE_TOO_MANY_FACES);
+                return true;
+              }
+            }
+
             var objectGroup = new ObjectGroup(
               groupName,
               group

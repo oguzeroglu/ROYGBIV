@@ -71,7 +71,6 @@ Grid.prototype.makeMesh = function(size, startX, startY, startZ){
   );
   this.geometry = geometryCache[geomKey];
   if (!this.geometry){
-    console.log("A");
     this.geometry = new THREE.PlaneGeometry(size, size);
     geometryCache[geomKey] = this.geometry;
   }

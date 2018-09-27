@@ -12,6 +12,7 @@ var ObjectGroup = function(name, group){
   this.childObjectsByName = new Object();
 
   this.totalVertexCount = 0;
+  this.skippedVertexCount = 0;
 
 }
 
@@ -45,52 +46,88 @@ ObjectGroup.prototype.getChildUV = function(addedObject, textureType, originalUV
   );
 }
 
-ObjectGroup.prototype.handleTextures = function(){
-  var texturesObj = new Object();
-  var hasTexture = false;
-  for (var objName in this.group){
-    var addedObject = this.group[objName];
-    if (addedObject.hasDiffuseMap()){
-      hasTexture = true;
-      var tName = addedObject.name + ",diffuse";
-      texturesObj[tName] = this.handleAtlasSize(addedObject.mesh.material.uniforms.diffuseMap.value);
-    }
-    if (addedObject.hasAlphaMap()){
-      hasTexture = true;
-      var tName = addedObject.name + ",alpha";
-      if (addedObject.hasDiffuseMap()){
-        addedObject.mesh.material.uniforms.alphaMap.value.offset.copy(
-          addedObject.mesh.material.uniforms.diffuseMap.value.offset
-        );
-        addedObject.mesh.material.uniforms.alphaMap.value.updateMatrix();
-      }
-      texturesObj[tName] = this.handleAtlasSize(addedObject.mesh.material.uniforms.alphaMap.value);
-    }
-    if (addedObject.hasAOMap()){
-      hasTexture = true;
-      var tName = addedObject.name + ",ao";
-      if (addedObject.hasDiffuseMap()){
-        addedObject.mesh.material.uniforms.aoMap.value.offset.copy(
-          addedObject.mesh.material.uniforms.diffuseMap.value.offset
-        );
-        addedObject.mesh.material.uniforms.aoMap.value.updateMatrix();
-      }
-      texturesObj[tName] = this.handleAtlasSize(addedObject.mesh.material.uniforms.aoMap.value);
-    }
-    if (addedObject.hasEmissiveMap()){
-      hasTexture = true;
-      var tName = addedObject.name + ",emissive";
-      if (addedObject.hasDiffuseMap()){
-        addedObject.mesh.material.uniforms.emissiveMap.value.offset.copy(
-          addedObject.mesh.material.uniforms.diffuseMap.value.offset
-        );
-        addedObject.mesh.material.uniforms.emissiveMap.value.updateMatrix();
-      }
-      texturesObj[tName] = this.handleAtlasSize(addedObject.mesh.material.uniforms.emissiveMap.value);
-    }
+ObjectGroup.prototype.textureCompare = function(txt1, txt2){
+  if (txt1.roygbivTextureName != txt2.roygbivTextureName){
+    return false;
   }
-  if (hasTexture){
-    this.textureMerger = new TextureMerger(texturesObj);
+  if (txt1.offset.x != txt2.offset.x || txt1.offset.y != txt2.offset.y){
+    return false;
+  }
+  if (txt1.repeat.x != txt2.repeat.x || txt1.repeat.y != txt2.repeat.y){
+    return false;
+  }
+  if (txt1.flipX != txt2.flipX || txt1.flipY != txt2.flipY){
+    return false;
+  }
+  if (txt1.wrapS != txt2.wrapS || txt1.wrapT != txt2.wrapT){
+    return false;
+  }
+  return true;
+}
+
+ObjectGroup.prototype.handleTextures = function(){
+  this.diffuseTexture = 0;
+  this.emissiveTexture = 0;
+  this.alphaTexture = 0;
+  this.aoTexture = 0;
+  this.textureMatrix = 0;
+  var totalTextureCount = 0;
+  for (var objName in this.group){
+    var obj = this.group[objName];
+    if (obj.hasDiffuseMap()){
+      var txt = obj.mesh.material.uniforms.diffuseMap.value;
+      if (!this.diffuseTexture){
+        this.diffuseTexture = txt;
+        this.textureMatrix = txt.matrix;
+      }else{
+        if (!this.textureCompare(this.diffuseTexture, txt)){
+          throw new Error("Cannot merge objects with different texture properties.");
+          return;
+        }
+      }
+    }
+    if (obj.hasEmissiveMap()){
+      var txt = obj.mesh.material.uniforms.emissiveMap.value;
+      if (!this.emissiveTexture){
+        this.emissiveTexture = txt;
+        if (!this.textureMatrix){
+          this.textureMatrix = txt.matrix;
+        }
+      }else{
+        if (!this.textureCompare(this.emissiveTexture, txt)){
+          throw new Error("Cannot merge objects with different texture properties.");
+          return;
+        }
+      }
+    }
+    if (obj.hasAlphaMap()){
+      var txt = obj.mesh.material.uniforms.alphaMap.value;
+      if (!this.alphaTexture){
+        this.alphaTexture = txt;
+        if (!this.textureMatrix){
+          this.textureMatrix = txt.matrix;
+        }
+      }else{
+        if (!this.textureCompare(this.alphaTexture, txt)){
+          throw new Error("Cannot merge objects with different texture properties.");
+          return;
+        }
+      }
+    }
+    if (obj.hasAOMap()){
+      var txt = obj.mesh.material.uniforms.aoMap.value;
+      if (!this.aoTexture){
+        this.aoTexture = txt;
+        if (!this.textureMatrix){
+          this.textureMatrix = txt.matrix;
+        }
+      }else{
+        if (!this.textureCompare(this.aoTexture, txt)){
+          throw new Error("Cannot merge objects with different texture properties.");
+          return;
+        }
+      }
+    }
   }
 }
 
@@ -137,8 +174,6 @@ ObjectGroup.prototype.merge = function(){
     this.handleDisplacement(childGeom, childObj);
     miMap[mi] = childObj.name;
     for (var i = 0; i<childGeom.faces.length; i++){
-      var color = childObj.mesh.material.uniforms.color.value;
-      childGeom.faces[i].vertexColors.push(color, color, color);
       childGeom.faces[i].materialIndex = mi;
     }
     mi++;
@@ -146,180 +181,258 @@ ObjectGroup.prototype.merge = function(){
     pseudoGeometry.merge(childGeom, childObj.mesh.matrix);
   }
 
+  var indexCache = new Object();
+
+  var max = 0;
   var faces = pseudoGeometry.faces;
+  for (var i = 0; i<faces.length; i++){
+    var face = faces[i];
+    var a = face.a;
+    var b = face.b;
+    var c = face.c;
+    if (a > max){
+      max = a;
+    }
+    if (b > max){
+      max = b;
+    }
+    if (c > max){
+      max = c;
+    }
+  }
+
+  var indices = [];
   var vertices = pseudoGeometry.vertices;
   var faceVertexUVs = pseudoGeometry.faceVertexUvs[0];
-  var positions = new Float32Array(faces.length * 3 * 3);
-  var colors = new Float32Array(faces.length * 3 * 3);
-  var alphas = new Float32Array(faces.length * 3);
-  var emissiveIntensities = new Float32Array(faces.length * 3);
-  var aoIntensities = new Float32Array(faces.length * 3);
-  var diffuseUVs = new Float32Array(faces.length * 3 * 2);
-  var emissiveUVs = new Float32Array(faces.length * 3 * 2);
-  var alphaUVs = new Float32Array(faces.length * 3 * 2);
-  var aoUVs = new Float32Array(faces.length * 3 * 2);
-  var positionsIndex = 0;
-  var colorIndex = 0;
-  var alphaIndex = 0;
-  var emissiveIntensityIndex = 0;
-  var aoIntensityIndex = 0;
-  var diffuseUVIndex = 0;
-  var emissiveUVIndex = 0;
-  var alphaUVIndex = 0;
-  var aoUVIndex = 0;
+  var positions = new Array((max + 1) * 3);
+  var colors = new Array((max + 1) * 3);
+  var uvs = new Array((max + 1) * 2);
+  var alphas = new Array(max + 1);
+  var emissiveIntensities = new Array(max + 1);
+  var aoIntensities = new Array(max + 1);
+  var textureInfos = new Array((max + 1) * 4);
   for (var i = 0; i<faces.length; i++){
     var face = faces[i];
     var addedObject = addedObjects[miMap[face.materialIndex]];
     var a = face.a;
     var b = face.b;
     var c = face.c;
+
+    indices.push(a);
+    indices.push(b);
+    indices.push(c);
+
+    var aSkipped = false;
+    var bSkipped = false;
+    var cSkipped = false;
+    if (indexCache[a]){
+      aSkipped = true;
+      this.skippedVertexCount ++;
+    }else{
+      indexCache[a] = true;
+    }
+    if (indexCache[b]){
+      bSkipped = true;
+      this.skippedVertexCount ++;
+    }else{
+      indexCache[b] = true;
+    }
+    if (indexCache[c]){
+      cSkipped = true;
+      this.skippedVertexCount ++;
+    }else{
+      indexCache[c] = true;
+    }
+
     var vertex1 = vertices[a];
     var vertex2 = vertices[b];
     var vertex3 = vertices[c];
-    var color1 = face.vertexColors[0];
-    var color2 = face.vertexColors[1];
-    var color3 = face.vertexColors[2];
+    var color = addedObject.material.color;
+    var uv1 = faceVertexUVs[i][0];
+    var uv2 = faceVertexUVs[i][1];
+    var uv3 = faceVertexUVs[i][2];
     // POSITIONS
-    positions[positionsIndex ++] = vertex1.x;
-    positions[positionsIndex ++] = vertex1.y;
-    positions[positionsIndex ++] = vertex1.z;
-    positions[positionsIndex ++] = vertex2.x;
-    positions[positionsIndex ++] = vertex2.y;
-    positions[positionsIndex ++] = vertex2.z;
-    positions[positionsIndex ++] = vertex3.x;
-    positions[positionsIndex ++] = vertex3.y;
-    positions[positionsIndex ++] = vertex3.z;
+    if (!aSkipped){
+      positions[3 * a] = vertex1.x;
+      positions[(3 * a)+1] = vertex1.y;
+      positions[(3 * a)+2] = vertex1.z;
+    }
+    if (!bSkipped){
+      positions[3 * b] = vertex2.x;
+      positions[(3 * b)+1] = vertex2.y;
+      positions[(3 * b)+2] = vertex2.z;
+    }
+    if (!cSkipped){
+      positions[3 * c] = vertex3.x;
+      positions[(3 * c)+1] = vertex3.y;
+      positions[(3 * c)+2] = vertex3.z;
+    }
     // COLORS
-    colors[colorIndex ++] = color1.r;
-    colors[colorIndex ++] = color1.g;
-    colors[colorIndex ++] = color1.b;
-    colors[colorIndex ++] = color2.r;
-    colors[colorIndex ++] = color2.g;
-    colors[colorIndex ++] = color2.b;
-    colors[colorIndex ++] = color3.r;
-    colors[colorIndex ++] = color3.g;
-    colors[colorIndex ++] = color3.b;
+    if (!aSkipped){
+      colors[3 * a] = color.r;
+      colors[(3 * a)+1] = color.g;
+      colors[(3 * a)+2] = color.b;
+    }
+    if (!bSkipped){
+      colors[3 * b] = color.r;
+      colors[(3 * b)+1] = color.g;
+      colors[(3 * b)+2] = color.b;
+    }
+    if (!cSkipped){
+      colors[3 * c] = color.r;
+      colors[(3 * c)+1] = color.g;
+      colors[(3 * c)+2] = color.b;
+    }
+    // UV
+    if (!aSkipped){
+      uvs[2 * a] = uv1.x;
+      uvs[(2 * a) + 1] = uv1.y;
+    }
+    if (!bSkipped){
+      uvs[2 * b] = uv2.x;
+      uvs[(2 * b) + 1] = uv2.y;
+    }
+    if (!cSkipped){
+      uvs[2 * c] = uv3.x;
+      uvs[(2 * c) + 1] = uv3.y;
+    }
     // ALPHA
     var alpha = addedObject.mesh.material.uniforms.alpha.value;
-    alphas[alphaIndex ++] = alpha;
-    alphas[alphaIndex ++] = alpha;
-    alphas[alphaIndex ++] = alpha;
+    if (!aSkipped){
+      alphas[a] = alpha;
+    }
+    if (!bSkipped){
+      alphas[b] = alpha;
+    }
+    if (!cSkipped){
+      alphas[c] = alpha;
+    }
     // EMISSIVE INTENSITY
     var emissiveIntensity = addedObject.mesh.material.uniforms.emissiveIntensity.value;
-    emissiveIntensities[emissiveIntensityIndex ++] = emissiveIntensity;
-    emissiveIntensities[emissiveIntensityIndex ++] = emissiveIntensity;
-    emissiveIntensities[emissiveIntensityIndex ++] = emissiveIntensity;
+    if (!aSkipped){
+      emissiveIntensities[a] = emissiveIntensity;
+    }
+    if (!bSkipped){
+      emissiveIntensities[b] = emissiveIntensity;
+    }
+    if (!cSkipped){
+      emissiveIntensities[c] = emissiveIntensity;
+    }
     // AO INTENSITY
     var aoIntensity = addedObject.mesh.material.uniforms.aoIntensity.value;
-    aoIntensities[aoIntensityIndex ++] = aoIntensity;
-    aoIntensities[aoIntensityIndex ++] = aoIntensity;
-    aoIntensities[aoIntensityIndex ++] = aoIntensity;
-    // DIFFUSE UVS
-    if (addedObject.hasDiffuseMap()){
-      var uv1 = this.getChildUV(addedObject, "diffuse", faceVertexUVs[i][0]);
-      var uv2 = this.getChildUV(addedObject, "diffuse", faceVertexUVs[i][1]);
-      var uv3 = this.getChildUV(addedObject, "diffuse", faceVertexUVs[i][2]);
-      diffuseUVs[diffuseUVIndex ++] = uv1.x;
-      diffuseUVs[diffuseUVIndex ++] = uv1.y;
-      diffuseUVs[diffuseUVIndex ++] = uv2.x;
-      diffuseUVs[diffuseUVIndex ++] = uv2.y;
-      diffuseUVs[diffuseUVIndex ++] = uv3.x;
-      diffuseUVs[diffuseUVIndex ++] = uv3.y;
-    }else{
-      diffuseUVs[diffuseUVIndex ++] = -100;
-      diffuseUVs[diffuseUVIndex ++] = -100;
-      diffuseUVs[diffuseUVIndex ++] = -100;
-      diffuseUVs[diffuseUVIndex ++] = -100;
-      diffuseUVs[diffuseUVIndex ++] = -100;
-      diffuseUVs[diffuseUVIndex ++] = -100;
+    if (!aSkipped){
+      aoIntensities[a] = aoIntensity;
     }
-    // EMISSIVE UVS
-    if (addedObject.hasEmissiveMap()){
-      var uv1 = this.getChildUV(addedObject, "emissive", faceVertexUVs[i][0]);
-      var uv2 = this.getChildUV(addedObject, "emissive", faceVertexUVs[i][1]);
-      var uv3 = this.getChildUV(addedObject, "emissive", faceVertexUVs[i][2]);
-      emissiveUVs[emissiveUVIndex ++] = uv1.x;
-      emissiveUVs[emissiveUVIndex ++] = uv1.y;
-      emissiveUVs[emissiveUVIndex ++] = uv2.x;
-      emissiveUVs[emissiveUVIndex ++] = uv2.y;
-      emissiveUVs[emissiveUVIndex ++] = uv3.x;
-      emissiveUVs[emissiveUVIndex ++] = uv3.y;
-    }else{
-      emissiveUVs[emissiveUVIndex ++] = -100;
-      emissiveUVs[emissiveUVIndex ++] = -100;
-      emissiveUVs[emissiveUVIndex ++] = -100;
-      emissiveUVs[emissiveUVIndex ++] = -100;
-      emissiveUVs[emissiveUVIndex ++] = -100;
-      emissiveUVs[emissiveUVIndex ++] = -100;
+    if (!bSkipped){
+      aoIntensities[b] = aoIntensity;
     }
-    // ALPHA UVS
-    if (addedObject.hasAlphaMap()){
-      var uv1 = this.getChildUV(addedObject, "alpha", faceVertexUVs[i][0]);
-      var uv2 = this.getChildUV(addedObject, "alpha", faceVertexUVs[i][1]);
-      var uv3 = this.getChildUV(addedObject, "alpha", faceVertexUVs[i][2]);
-      alphaUVs[alphaUVIndex ++] = uv1.x;
-      alphaUVs[alphaUVIndex ++] = uv1.y;
-      alphaUVs[alphaUVIndex ++] = uv2.x;
-      alphaUVs[alphaUVIndex ++] = uv2.y;
-      alphaUVs[alphaUVIndex ++] = uv3.x;
-      alphaUVs[alphaUVIndex ++] = uv3.y;
-    }else{
-      alphaUVs[alphaUVIndex ++] = -100;
-      alphaUVs[alphaUVIndex ++] = -100;
-      alphaUVs[alphaUVIndex ++] = -100;
-      alphaUVs[alphaUVIndex ++] = -100;
-      alphaUVs[alphaUVIndex ++] = -100;
-      alphaUVs[alphaUVIndex ++] = -100;
+    if (!cSkipped){
+      aoIntensities[c] = aoIntensity;
     }
-    // AO UVS
-    if (addedObject.hasAOMap()){
-      var uv1 = this.getChildUV(addedObject, "ao", faceVertexUVs[i][0]);
-      var uv2 = this.getChildUV(addedObject, "ao", faceVertexUVs[i][1]);
-      var uv3 = this.getChildUV(addedObject, "ao", faceVertexUVs[i][2]);
-      aoUVs[aoUVIndex ++] = uv1.x;
-      aoUVs[aoUVIndex ++] = uv1.y;
-      aoUVs[aoUVIndex ++] = uv2.x;
-      aoUVs[aoUVIndex ++] = uv2.y;
-      aoUVs[aoUVIndex ++] = uv3.x;
-      aoUVs[aoUVIndex ++] = uv3.y;
-    }else{
-      aoUVs[aoUVIndex ++] = -100;
-      aoUVs[aoUVIndex ++] = -100;
-      aoUVs[aoUVIndex ++] = -100;
-      aoUVs[aoUVIndex ++] = -100;
-      aoUVs[aoUVIndex ++] = -100;
-      aoUVs[aoUVIndex ++] = -100;
+    // TEXTURE INFOS
+    if (!aSkipped){
+      if (addedObject.hasDiffuseMap()){
+        textureInfos[(4 * a)] = 10;
+      }else{
+        textureInfos[(4 * a)] = -10;
+      }
+      if (addedObject.hasEmissiveMap()){
+        textureInfos[(4 * a) + 1] = 10;
+      }else{
+        textureInfos[(4 * a) + 1] = -10;
+      }
+      if (addedObject.hasAlphaMap()){
+        textureInfos[(4 * a) + 2] = 10;
+      }else{
+        textureInfos[(4 * a) + 2] = -10;
+      }
+      if (addedObject.hasAOMap()){
+        textureInfos[(4 * a) + 3] = 10;
+      }else{
+        textureInfos[(4 * a) + 3] = -10;
+      }
     }
-
+    if (!bSkipped){
+      if (addedObject.hasDiffuseMap()){
+        textureInfos[(4 * b)] = 10;
+      }else{
+        textureInfos[(4 * b)] = -10;
+      }
+      if (addedObject.hasEmissiveMap()){
+        textureInfos[(4 * b) + 1] = 10;
+      }else{
+        textureInfos[(4 * b) + 1] = -10;
+      }
+      if (addedObject.hasAlphaMap()){
+        textureInfos[(4 * b) + 2] = 10;
+      }else{
+        textureInfos[(4 * b) + 2] = -10;
+      }
+      if (addedObject.hasAOMap()){
+        textureInfos[(4 * b) + 3] = 10;
+      }else{
+        textureInfos[(4 * b) + 3] = -10;
+      }
+    }
+    if (!cSkipped){
+      if (addedObject.hasDiffuseMap()){
+        textureInfos[(4 * c)] = 10;
+      }else{
+        textureInfos[(4 * c)] = -10;
+      }
+      if (addedObject.hasEmissiveMap()){
+        textureInfos[(4 * c) + 1] = 10;
+      }else{
+        textureInfos[(4 * c) + 1] = -10;
+      }
+      if (addedObject.hasAlphaMap()){
+        textureInfos[(4 * c) + 2] = 10;
+      }else{
+        textureInfos[(4 * c) + 2] = -10;
+      }
+      if (addedObject.hasAOMap()){
+        textureInfos[(4 * c) + 3] = 10;
+      }else{
+        textureInfos[(4 * c) + 3] = -10;
+      }
+    }
   }
 
-  var positionsBufferAttribute = new THREE.BufferAttribute(positions, 3);
-  var colorsBufferAttribute = new THREE.BufferAttribute(colors, 3);
-  var alphasBufferAttribute = new THREE.BufferAttribute(alphas, 1);
-  var emissiveIntensitiesBufferAttribute = new THREE.BufferAttribute(emissiveIntensities, 1);
-  var aoIntensitiesBufferAttribute = new THREE.BufferAttribute(aoIntensities, 1);
-  var diffuseUVsBufferAttribute = new THREE.BufferAttribute(diffuseUVs, 2);
-  var emissiveUVsBufferAttribute = new THREE.BufferAttribute(emissiveUVs, 2);
-  var alphaUVsBufferAttribute = new THREE.BufferAttribute(alphaUVs, 2);
-  var aoUVsBufferAttribute = new THREE.BufferAttribute(aoUVs, 2);
+  var indicesTypedArray = new Uint16Array(indices);
+  var positionsTypedArray = new Float32Array(positions);
+  var colorsTypedArray = new Float32Array(colors);
+  var uvsTypedArray = new Float32Array(uvs);
+  var alphasTypedArray = new Float32Array(alphas);
+  var emissiveIntensitiesTypedArray = new Float32Array(emissiveIntensities);
+  var aoIntensitiesTypedArray = new Float32Array(aoIntensities);
+  var textureInfosTypedArray = new Int8Array(textureInfos);
+
+  var indicesBufferAttribute = new THREE.BufferAttribute(indicesTypedArray, 1);
+  var positionsBufferAttribute = new THREE.BufferAttribute(positionsTypedArray, 3);
+  var colorsBufferAttribute = new THREE.BufferAttribute(colorsTypedArray, 3);
+  var uvsBufferAttribute = new THREE.BufferAttribute(uvsTypedArray, 2);
+  var alphasBufferAttribute = new THREE.BufferAttribute(alphasTypedArray, 1);
+  var emissiveIntensitiesBufferAttribute = new THREE.BufferAttribute(emissiveIntensitiesTypedArray, 1);
+  var aoIntensitiesBufferAttribute = new THREE.BufferAttribute(aoIntensitiesTypedArray, 1);
+  var textureInfosBufferAttribute = new THREE.BufferAttribute(textureInfosTypedArray, 4);
+  indicesBufferAttribute.setDynamic(false);
   positionsBufferAttribute.setDynamic(false);
   colorsBufferAttribute.setDynamic(false);
+  uvsBufferAttribute.setDynamic(false);
   alphasBufferAttribute.setDynamic(false);
   emissiveIntensitiesBufferAttribute.setDynamic(false);
   aoIntensitiesBufferAttribute.setDynamic(false);
-  diffuseUVsBufferAttribute.setDynamic(false);
-  emissiveUVsBufferAttribute.setDynamic(false);
-  alphaUVsBufferAttribute.setDynamic(false);
-  aoUVsBufferAttribute.setDynamic(false);
+  textureInfosBufferAttribute.setDynamic(false);
+  this.geometry.setIndex(indicesBufferAttribute);
   this.geometry.addAttribute('position', positionsBufferAttribute);
   this.geometry.addAttribute('color', colorsBufferAttribute);
+  this.geometry.addAttribute('uv', uvsBufferAttribute);
   this.geometry.addAttribute('alpha', alphasBufferAttribute);
   this.geometry.addAttribute('emissiveIntensity', emissiveIntensitiesBufferAttribute);
   this.geometry.addAttribute('aoIntensity', aoIntensitiesBufferAttribute);
-  this.geometry.addAttribute('diffuseUV', diffuseUVsBufferAttribute);
-  this.geometry.addAttribute('emissiveUV', emissiveUVsBufferAttribute);
-  this.geometry.addAttribute('alphaUV', alphaUVsBufferAttribute);
-  this.geometry.addAttribute('aoUV', aoUVsBufferAttribute);
+  this.geometry.addAttribute('textureInfo', textureInfosBufferAttribute);
+
+  pseudoGeometry = null;
 
 }
 
@@ -388,8 +501,11 @@ ObjectGroup.prototype.glue = function(){
 
   this.merge();
   this.destroyParts();
-  this.mesh = new MeshGenerator(this.geometry).generateMergedMesh(graphicsGroup, this.textureMerger);
-  this.previewMesh= this.mesh.clone();
+  this.mesh = new MeshGenerator(this.geometry).generateMergedMesh(graphicsGroup, this);
+  this.previewMesh= new THREE.Mesh(this.mesh.geometry, this.mesh.material);
+  this.previewMesh.position.copy(this.mesh.position);
+  this.previewMesh.quaternion.copy(this.mesh.quaternion);
+  this.previewMesh.rotation.copy(this.mesh.rotation);
   this.mesh.objectGroupName = this.name;
   this.previewMesh.objectGroupName = this.name;
   scene.add(this.mesh);

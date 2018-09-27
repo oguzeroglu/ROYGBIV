@@ -833,6 +833,7 @@ var raycaster = new THREE.Raycaster();
 var jobHandlerSelectedGrid = 0;
 var jobHandlerWorking = false;
 var geometryCache = new Object();
+var MAX_TEXTURE_COUNT = 8;
 
 // WORKER VARIABLES
 var WORKERS_SUPPORTED = (typeof(Worker) !== "undefined");

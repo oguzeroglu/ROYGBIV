@@ -9,12 +9,26 @@ MeshGenerator.prototype.generateMesh = function(){
   }
 }
 
-MeshGenerator.prototype.generateMergedMesh = function(graphicsGroup, textureMerger){
-  var textureUniform
-  if (textureMerger){
-    textureUniform = new THREE.Uniform(textureMerger.mergedTexture);
-  }else{
-    textureUniform = new THREE.Uniform(new THREE.Texture());
+MeshGenerator.prototype.generateMergedMesh = function(graphicsGroup, objectGroup){
+  var diffuseTexture = objectGroup.diffuseTexture;
+  var emissiveTexture = objectGroup.emissiveTexture;
+  var alphaTexture = objectGroup.alphaTexture;
+  var aoTexture = objectGroup.aoTexture;
+  var textureMatrix = objectGroup.textureMatrix;
+  if (!diffuseTexture){
+    diffuseTexture = new THREE.Texture();
+  }
+  if (!emissiveTexture){
+    emissiveTexture = new THREE.Texture();
+  }
+  if (!alphaTexture){
+    alphaTexture = new THREE.Texture();
+  }
+  if (!aoTexture){
+    aoTexture = new THREE.Texture();
+  }
+  if (!textureMatrix){
+    textureMatrix = new THREE.Matrix3();
   }
   var material = new THREE.RawShaderMaterial({
     vertexShader: ShaderContent.mergedBasicMaterialVertexShader,
@@ -25,7 +39,11 @@ MeshGenerator.prototype.generateMergedMesh = function(graphicsGroup, textureMerg
     uniforms: {
       projectionMatrix: new THREE.Uniform(new THREE.Matrix4()),
       modelViewMatrix: new THREE.Uniform(new THREE.Matrix4()),
-      texture: textureUniform,
+      diffuseMap: new THREE.Uniform(diffuseTexture),
+      emissiveMap: new THREE.Uniform(emissiveTexture),
+      alphaMap: new THREE.Uniform(alphaTexture),
+      aoMap: new THREE.Uniform(aoTexture),
+      textureMatrix: new THREE.Uniform(textureMatrix),
       fogInfo: GLOBAL_FOG_UNIFORM
     }
   });

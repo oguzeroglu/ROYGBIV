@@ -4,47 +4,48 @@ precision lowp int;
 #define ALPHA_TEST 0.5
 #define LOG2 1.442695
 
+uniform sampler2D diffuseMap;
+uniform sampler2D emissiveMap;
+uniform sampler2D alphaMap;
+uniform sampler2D aoMap;
 uniform vec4 fogInfo;
-uniform sampler2D texture;
 
-varying float hasDiffuseFlag;
-varying float hasEmissiveFlag;
-varying float hasAlphaFlag;
-varying float hasAOFlag;
-varying float vAlpha;
 varying float vEmissiveIntensity;
 varying float vAOIntensity;
-varying vec2 vDiffuseUV;
-varying vec2 vEmissiveUV;
-varying vec2 vAlphaUV;
-varying vec2 vAOUV;
+varying float vAlpha;
 varying vec3 vColor;
+varying vec2 vUV;
+
+varying float hasDiffuseMap;
+varying float hasEmissiveMap;
+varying float hasAlphaMap;
+varying float hasAOMap;
 
 void main(){
 
   vec4 diffuseColor = vec4(1.0, 1.0, 1.0, 1.0);
 
-  if (hasDiffuseFlag > 0.0){
-    diffuseColor = texture2D(texture, vDiffuseUV);
+  if (hasDiffuseMap > 0.0){
+    diffuseColor = texture2D(diffuseMap, vUV);
   }
 
   gl_FragColor = vec4(vColor, vAlpha) * diffuseColor;
 
-  if (hasAlphaFlag > 0.0){
-    float val = texture2D(texture, vAlphaUV).g;
+  if (hasAlphaMap > 0.0){
+    float val = texture2D(alphaMap, vUV).g;
     gl_FragColor.a *= val;
     if (val <= ALPHA_TEST){
       discard;
     }
   }
 
-  if (hasAOFlag > 0.0){
-    float ao = (texture2D(texture, vAOUV).r - 1.0) * vAOIntensity + 1.0;
+  if (hasAOMap > 0.0){
+    float ao = (texture2D(aoMap, vUV).r - 1.0) * vAOIntensity + 1.0;
     gl_FragColor.rgb *= ao;
   }
 
-  if (hasEmissiveFlag > 0.0){
-    vec4 emissiveColor = texture2D(texture, vEmissiveUV);
+  if (hasEmissiveMap > 0.0){
+    vec4 emissiveColor = texture2D(emissiveMap, vUV);
     vec3 totalEmissiveRadiance = vec3(vEmissiveIntensity, vEmissiveIntensity, vEmissiveIntensity);
     totalEmissiveRadiance *= emissiveColor.rgb;
     gl_FragColor.rgb += totalEmissiveRadiance;
