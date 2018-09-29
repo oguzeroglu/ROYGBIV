@@ -111,7 +111,7 @@ JobHandler.prototype.handleSelectAllGridsCommand = function(){
   }
   if (ctr == 0){
     terminal.printError(Text.NO_GRID_SYSTEM_FOUND);
-    this.undoRedoPush = false;
+
   }else{
     terminal.printInfo(Text.DESTROYED_X_GRID_SYTEMS.replace(Text.PARAM1, ctr));
   }
@@ -130,7 +130,7 @@ JobHandler.prototype.handleSyncCommand = function(){
   }
   if (ctr == 0){
     terminal.printError(Text.NO_OBJECT_FOUND);
-    this.undoRedoPush = false;
+
   }else{
     terminal.printInfo(Text.COMMAND_EXECUTED_FOR_X_OBJECTS.replace(Text.PARAM1, ctr));
   }
@@ -156,7 +156,7 @@ JobHandler.prototype.handleSetSlipperinessCommand = function(){
     }
   }
   if (ctr == 0){
-    this.undoRedoPush = false;
+
     terminal.printError(Text.NO_OBJECT_FOUND);
   }else{
     terminal.printInfo(Text.COMMAND_EXECUTED_FOR_X_OBJECTS.replace(Text.PARAM1, ctr));
@@ -175,7 +175,7 @@ JobHandler.prototype.handleApplyDisplacementMapCommand = function(){
     }
   }
   if (ctr == 0){
-    this.undoRedoPush = false;
+
     terminal.printError(Text.NO_OBJECT_FOUND);
   }else{
     terminal.printInfo(Text.COMMAND_EXECUTED_FOR_X_OBJECTS.replace(Text.PARAM1, ctr));
@@ -202,7 +202,7 @@ JobHandler.prototype.handleSetBlendingCommand = function(){
     }
   }
   if (ctr == 0){
-    this.undoRedoPush = false;
+
     terminal.printError(Text.NO_OBJECT_FOUND);
   }else{
     terminal.printInfo(Text.COMMAND_EXECUTED_FOR_X_OBJECTS.replace(Text.PARAM1, ctr));
@@ -221,7 +221,7 @@ JobHandler.prototype.handleDestroyImageCommand = function(){
     }
   }
   if (ctr == 0){
-    this.undoRedoPush = false;
+
     terminal.printError(Text.NO_IMAGES_FOUND);
   }else{
     terminal.printInfo(Text.COMMAND_EXECUTED_FOR_X_IMAGES.replace(Text.PARAM1, ctr));
@@ -241,7 +241,7 @@ JobHandler.prototype.handleRunManuallyCommand = function(){
   }
   if (ctr == 0){
     terminal.printError(Text.NO_SCRIPTS_FOUND);
-    this.undoRedoPush = false;
+
   }else{
     terminal.printInfo(Text.COMMAND_EXECUTED_FOR_X_SCRIPTS.replace(Text.PARAM1, ctr));
   }
@@ -260,7 +260,7 @@ JobHandler.prototype.handleRunAutomaticallyCommand = function(){
   }
   if (ctr == 0){
     terminal.printError(Text.NO_SCRIPTS_FOUND);
-    this.undoRedoPush = false;
+
   }else{
     terminal.printInfo(Text.COMMAND_EXECUTED_FOR_X_SCRIPTS.replace(Text.PARAM1, ctr));
   }
@@ -278,7 +278,7 @@ JobHandler.prototype.handleUnmarkCommand = function(){
     }
   }
   if (ctr == 0){
-    this.undoRedoPush = false;
+
     terminal.printError(Text.NO_MARKED_POINTS_FOUND);
   }else{
     terminal.printInfo(Text.COMMAND_EXECUTED_FOR_X_MARKED_POINTS.replace(Text.PARAM1, ctr));
@@ -300,7 +300,7 @@ JobHandler.prototype.handleMarkCommand = function(){
     terminal.printInfo(Text.MARKED_X_POINTS.replace(Text.PARAM1, ctr));
   }else{
     terminal.printError(Text.MUST_HAVE_ONE_GRID_SELECTED);
-    this.undoRedoPush = false;
+
   }
 }
 
@@ -316,7 +316,7 @@ JobHandler.prototype.handleDetachCommand = function(){
     }
   }
   if (ctr == 0){
-    this.undoRedoPush = false;
+
     terminal.printError(Text.NO_OBJECT_FOUND);
   }else{
     terminal.printError(Text.COMMAND_EXECUTED_FOR_X_OBJECTS.replace(Text.PARAM1, ctr));
@@ -336,14 +336,14 @@ JobHandler.prototype.handleDestroyScriptCommand = function(){
   }
   if (ctr == 0){
     terminal.printError(Text.NO_SCRIPTS_FOUND);
-    this.undoRedoPush = false;
+
   }else{
     terminal.printInfo(Text.COMMAND_EXECUTED_FOR_X_SCRIPTS.replace(Text.PARAM1, ctr));
   }
 }
 
 JobHandler.prototype.handleStopScriptCommand = function(){
-  this.undoRedoPush = false;
+
   var scriptNamePrefix = this.splitted[1].split("*")[0];
   var ctr = 0;
   for (var scriptName in scripts){
@@ -362,7 +362,7 @@ JobHandler.prototype.handleStopScriptCommand = function(){
 }
 
 JobHandler.prototype.handleRunScriptCommand = function(){
-  this.undoRedoPush = false;
+
   var scriptNamePrefix = this.splitted[1].split("*")[0];
   var ctr = 0;
   for (var scriptName in scripts){
@@ -401,7 +401,7 @@ JobHandler.prototype.handleRotateObjectCommand = function(){
   }
   if (ctr == 0){
     terminal.printError(Text.NO_OBJECT_FOUND);
-    this.undoRedoPush = false;
+
   }else{
     terminal.printInfo(Text.COMMAND_EXECUTED_FOR_X_OBJECTS.replace(Text.PARAM1, ctr));
   }
@@ -428,7 +428,7 @@ JobHandler.prototype.handleSetMassCommand = function(){
   }
   if (ctr == 0){
     terminal.printError(Text.NO_OBJECT_FOUND);
-    this.undoRedoPush = false;
+
   }else{
     terminal.printInfo(Text.COMMAND_EXECUTED_FOR_X_OBJECTS.replace(Text.PARAM1, ctr));
   }
@@ -447,7 +447,7 @@ JobHandler.prototype.handleDestroySkyboxCommand = function(){
   }
   if (ctr == 0){
     terminal.printError(Text.NO_SKYBOX_FOUND);
-    this.undoRedoPush = false;
+
   }else{
     terminal.printInfo(Text.COMMAND_EXECUTED_FOR_X_SKYBOXES.replace(Text.PARAM1, ctr));
   }
@@ -469,7 +469,7 @@ JobHandler.prototype.handleNewPointLightCommnand = function(){
     terminal.printInfo(Text.CREATED_X_POINT_LIGHTS.replace(Text.PARAM1, ctr));
   }else{
     terminal.printError(Text.MUST_HAVE_AT_LEAST_ONE_GRID_SELECTED);
-    this.undoRedoPush = false;
+
   }
 }
 
@@ -485,7 +485,7 @@ JobHandler.prototype.handleSegmentObjectCommand = function(){
     }
   }
   if (ctr == 0){
-    this.undoRedoPush = false;
+
     terminal.printError(Text.NO_OBJECT_FOUND);
   }else{
     terminal.printInfo(Text.COMMAND_EXECUTED_FOR_X_OBJECTS.replace(Text.PARAM1, ctr));
@@ -504,7 +504,7 @@ JobHandler.prototype.handleResetMapsCommand = function(){
     }
   }
   if (ctr == 0){
-    this.undoRedoPush = false;
+
     terminal.printError(Text.NO_OBJECT_FOUND);
   }else{
     terminal.printInfo(Text.COMMAND_EXECUTED_FOR_X_OBJECTS.replace(Text.PARAM1, ctr));
@@ -523,7 +523,7 @@ JobHandler.prototype.handleMapHeightCommand = function(){
     }
   }
   if (ctr == 0){
-    this.undoRedoPush = false;
+
     terminal.printError(Text.NO_OBJECT_FOUND);
   }else{
     terminal.printInfo(Text.COMMAND_EXECUTED_FOR_X_OBJECTS.replace(Text.PARAM1, ctr));
@@ -531,7 +531,7 @@ JobHandler.prototype.handleMapHeightCommand = function(){
 }
 
 JobHandler.prototype.handleRefreshTexturePackCommand = function(){
-  this.undoRedoPush = false;
+
   var texturePackNamePrefix = this.splitted[1].split("*")[0];
   var ctr = 0;
   for (var texturePackName in texturePacks){
@@ -562,7 +562,7 @@ JobHandler.prototype.handleDestroyTexturePackCommand = function(){
   }
   if (ctr == 0){
     terminal.printError(Text.NO_TEXTURE_PACK_FOUND);
-    this.undoRedoPush = false;
+
   }else{
     terminal.printInfo(Text.COMMAND_EXECUTED_FOR_X_TEXTURE_PACKS.replace(Text.PARAM1, ctr));
   }
@@ -580,7 +580,7 @@ JobHandler.prototype.handleMapEmissiveCommand = function(){
     }
   }
   if (ctr == 0){
-    this.undoRedoPush = false;
+
     terminal.printError(Text.NO_OBJECT_FOUND);
   }else{
     terminal.printInfo(Text.COMMAND_EXECUTED_FOR_X_OBJECTS.replace(Text.PARAM1, ctr));
@@ -599,7 +599,7 @@ JobHandler.prototype.handleMapNormalCommand = function(){
     }
   }
   if (ctr == 0){
-    this.undoRedoPush = false;
+
     terminal.printError(Text.NO_OBJECT_FOUND);
   }else{
     terminal.printInfo(Text.COMMAND_EXECUTED_FOR_X_OBJECTS.replace(Text.PARAM1, ctr));
@@ -619,7 +619,7 @@ JobHandler.prototype.handleDestroyLightCommand = function(){
   }
   if (ctr == 0){
     terminal.printError(Text.NO_LIGHT_FOUND);
-    this.undoRedoPush = false;
+
   }else{
     terminal.printInfo(Text.COMMAND_EXECUTED_FOR_X_LIGHTS.replace(Text.PARAM1, ctr));
   }
@@ -637,7 +637,7 @@ JobHandler.prototype.handleMapAlphaCommand = function(){
     }
   }
   if (ctr == 0){
-    this.undoRedoPush = false;
+
     terminal.printError(Text.NO_OBJECT_FOUND);
   }else{
     terminal.printInfo(Text.COMMAND_EXECUTED_FOR_X_OBJECTS.replace(Text.PARAM1, ctr));
@@ -656,7 +656,7 @@ JobHandler.prototype.handleMapAmbientOcculsionCommand = function(){
     }
   }
   if (ctr == 0){
-    this.undoRedoPush = false;
+
     terminal.printError(Text.NO_OBJECT_FOUND);
   }else{
     terminal.printInfo(Text.COMMAND_EXECUTED_FOR_X_OBJECTS.replace(Text.PARAM1, ctr));
@@ -675,7 +675,7 @@ JobHandler.prototype.handleMapSpecularCommand = function(){
     }
   }
   if (ctr == 0){
-    this.undoRedoPush = false;
+
     terminal.printError(Text.NO_OBJECT_FOUND);
   }else{
     terminal.printInfo(Text.COMMAND_EXECUTED_FOR_X_OBJECTS.replace(Text.PARAM1, ctr));
@@ -694,7 +694,7 @@ JobHandler.prototype.handleDestroyWallCollectionCommand = function(){
     }
   }
   if (ctr == 0){
-    this.undoRedoPush = false;
+
     terminal.printError(Text.NO_WALL_COLLECTION_FOUND);
   }else{
     terminal.printInfo(Text.COMMAND_EXECUTED_FOR_X_WALL_COLLECTIONS.replace(Text.PARAM1, ctr));
@@ -713,7 +713,7 @@ JobHandler.prototype.handleMirrorCommand = function(){
     }
   }
   if (ctr == 0){
-    this.undoRedoPush = false;
+
     terminal.printError(Text.NO_OBJECT_FOUND);
   }else{
     terminal.printInfo(Text.COMMAND_EXECUTED_FOR_X_OBJECTS.replace(Text.PARAM1, ctr));
@@ -732,7 +732,7 @@ JobHandler.prototype.handleAdjustTextureRepeatCommand = function(){
     }
   }
   if (ctr == 0){
-    this.undoRedoPush = false;
+
     terminal.printError(Text.NO_OBJECT_FOUND);
   }else{
     terminal.printInfo(Text.COMMAND_EXECUTED_FOR_X_OBJECTS.replace(Text.PARAM1, ctr));
@@ -751,7 +751,7 @@ JobHandler.prototype.handleMapTextureCommand = function(){
     }
   }
   if (ctr == 0){
-    this.undoRedoPush = false;
+
     terminal.printError(Text.NO_OBJECT_FOUND);
   }else{
     terminal.printInfo(Text.COMMAND_EXECUTED_FOR_X_OBJECTS.replace(Text.PARAM1, ctr));
@@ -770,7 +770,7 @@ JobHandler.prototype.handleDestroyTextureCommand = function(){
     }
   }
   if (ctr == 0){
-    this.undoRedoPush = false;
+
     terminal.printError(Text.NO_TEXTURE_FOUND);
   }else{
     terminal.printInfo(Text.DESTROYED_X_TEXTURES.replace(Text.PARAM1, ctr));
@@ -797,7 +797,7 @@ JobHandler.prototype.handleDestroyObjectCommand = function(){
     }
   }
   if (ctr == 0){
-    this.undoRedoPush = false;
+
     terminal.printError(Text.NO_OBJECT_FOUND);
   }else{
     terminal.printInfo(Text.COMMAND_EXECUTED_FOR_X_OBJECTS.replace(Text.PARAM1, ctr));
@@ -817,7 +817,7 @@ JobHandler.prototype.handleDestroyMaterialCommand = function(){
   }
   if (ctr == 0){
     terminal.printError(Text.NO_MATERIAL_FOUND);
-    this.undoRedoPush = false;
+
   }else{
     terminal.printInfo(Text.DESTROYED_X_MATERIALS.replace(Text.PARAM1, ctr));
   }
@@ -837,7 +837,7 @@ JobHandler.prototype.handleDestroyGridSystemCommand = function(){
 
   if (ctr == 0){
     terminal.printError(Text.NO_GRID_SYSTEM_FOUND);
-    this.undoRedoPush = false;
+
   }else{
     terminal.printInfo(Text.DESTROYED_X_GRID_SYTEMS.replace(Text.PARAM1, ctr));
   }
@@ -857,7 +857,7 @@ JobHandler.prototype.handleMapTexturePackCommand = function(){
   }
   if (ctr == 0){
     terminal.printError(Text.NO_OBJECT_FOUND);
-    this.undoRedoPush = false;
+
   }else{
     terminal.printInfo(Text.TEXTURE_PACK_MAPPED_TO_X_OBJECTS.replace(Text.PARAM1, ctr));
   }
@@ -878,7 +878,7 @@ JobHandler.prototype.handleNewSphereCommand = function(){
     terminal.printInfo(Text.CREATED_X_SPHERES.replace(Text.PARAM1, ctr));
   }else{
     terminal.printError(Text.MUST_HAVE_AT_LEAST_ONE_GRID_SELECTED);
-    this.undoRedoPush = false;
+
   }
 }
 
@@ -897,7 +897,7 @@ JobHandler.prototype.handleNewBoxCommand = function(){
     terminal.printInfo(Text.CREATED_X_BOXES.replace(Text.PARAM1, ctr));
   }else{
     terminal.printError(Text.MUST_HAVE_AT_LEAST_ONE_GRID_SELECTED);
-    this.undoRedoPush = false;
+
   }
 }
 
@@ -916,6 +916,6 @@ JobHandler.prototype.handleNewSurfaceCommand = function(){
     terminal.printInfo(Text.CREATED_X_SURFACES.replace(Text.PARAM1, ctr));
   }else{
     terminal.printError(Text.MUST_HAVE_AT_LEAST_ONE_GRID_SELECTED);
-    this.undoRedoPush = false;
+
   }
 }

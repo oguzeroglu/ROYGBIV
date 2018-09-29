@@ -979,9 +979,9 @@ function parse(input){
           if (!found){
             var loader;
             if (textureUrl.toUpperCase().endsWith("TGA")){
-              loader = new THREE.TGALoader();
+              loader = tgaLoader;
             }else{
-              loader = new THREE.TextureLoader();
+              loader = textureLoader;
             }
             loader.load(textureUrl,
               function (textureData){

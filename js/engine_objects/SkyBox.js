@@ -25,19 +25,9 @@ var SkyBox = function(name, directoryName, fileExtension, callback){
   var cachedData = skyboxCache[this.name];
 
   if (this.fileExtension.toUpperCase() == "TGA" && !cachedData){
-    this.backLoader = new THREE.TGALoader();
-    this.downLoader = new THREE.TGALoader();
-    this.frontLoader = new THREE.TGALoader();
-    this.leftLoader = new THREE.TGALoader();
-    this.rightLoader = new THREE.TGALoader();
-    this.upLoader = new THREE.TGALoader();
+    this.loader = tgaLoader;
   }else if (!cachedData){
-    this.backLoader = new THREE.TextureLoader();
-    this.downLoader = new THREE.TextureLoader();
-    this.frontLoader = new THREE.TextureLoader();
-    this.leftLoader = new THREE.TextureLoader();
-    this.rightLoader = new THREE.TextureLoader();
-    this.upLoader = new THREE.TextureLoader();
+    this.loader = textureLoader;
   }
 
   if (!cachedData){
@@ -86,7 +76,7 @@ SkyBox.prototype.loadTextures = function(){
   var that = this;
 
   //BACK
-  this.backLoader.load(this.backFilePath,
+  this.loader.load(this.backFilePath,
     function(textureData){
       that.backTexture = textureData;
       that.hasBack = true;
@@ -102,7 +92,7 @@ SkyBox.prototype.loadTextures = function(){
     }
   );
   //DOWN
-  this.downLoader.load(this.downFilePath,
+  this.loader.load(this.downFilePath,
     function(textureData){
       that.downTexture = textureData;
       that.hasDown = true;
@@ -118,7 +108,7 @@ SkyBox.prototype.loadTextures = function(){
     }
   );
   //FRONT
-  this.frontLoader.load(this.frontFilePath,
+  this.loader.load(this.frontFilePath,
     function(textureData){
       that.frontTexture = textureData;
       that.hasFront = true;
@@ -134,7 +124,7 @@ SkyBox.prototype.loadTextures = function(){
     }
   );
   //LEFT
-  this.leftLoader.load(this.leftFilePath,
+  this.loader.load(this.leftFilePath,
     function(textureData){
       that.leftTexture = textureData;
       that.hasLeft = true;
@@ -150,7 +140,7 @@ SkyBox.prototype.loadTextures = function(){
     }
   );
   //RIGHT
-  this.rightLoader.load(this.rightFilePath,
+  this.loader.load(this.rightFilePath,
     function(textureData){
       that.rightTexture = textureData;
       that.hasRight = true;
@@ -166,7 +156,7 @@ SkyBox.prototype.loadTextures = function(){
     }
   );
   //UP
-  this.upLoader.load(this.upFilePath,
+  this.loader.load(this.upFilePath,
     function(textureData){
       that.upTexture = textureData;
       that.hasUp = true;

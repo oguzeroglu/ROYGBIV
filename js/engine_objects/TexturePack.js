@@ -30,21 +30,9 @@ var TexturePack = function(name, directoryName, fileExtension, mapCallback, isPr
   this.heightFilePath = texturePackRootDirectory+directoryName+"/"+"height."+fileExtension.toLowerCase();
 
   if (fileExtension.toUpperCase() == "TGA"){
-    this.diffuseLoader = new THREE.TGALoader();
-    this.alphaLoader = new THREE.TGALoader();
-    this.aoLoader = new THREE.TGALoader();
-    this.emissiveLoader = new THREE.TGALoader();
-    this.normalLoader = new THREE.TGALoader();
-    this.specularLoader = new THREE.TGALoader();
-    this.heightLoader = new THREE.TGALoader();
+    this.loader = tgaLoader;
   }else{
-    this.diffuseLoader = new THREE.TextureLoader();
-    this.alphaLoader = new THREE.TextureLoader();
-    this.aoLoader = new THREE.TextureLoader();
-    this.emissiveLoader = new THREE.TextureLoader();
-    this.normalLoader = new THREE.TextureLoader();
-    this.specularLoader = new THREE.TextureLoader();
-    this.heightLoader = new THREE.TextureLoader();
+    this.loader = textureLoader;
   }
 
   this.diffuseCanMapFlag = false;
@@ -232,7 +220,7 @@ TexturePack.prototype.loadTextures = function(){
   //DIFFUSE
   var diffuseTextureCached = diffuseTextureCache[this.name];
   if (!diffuseTextureCached || (diffuseTextureCached && diffuseTextureCached == CACHE_NOT_PRESENT)){
-    this.diffuseLoader.load(this.diffuseFilePath,
+    this.loader.load(this.diffuseFilePath,
       function(textureData){
         if (that.scaleFactor){
           textureData.image = that.rescaleTextureImage(textureData, that.scaleFactor);
@@ -258,7 +246,7 @@ TexturePack.prototype.loadTextures = function(){
   //ALPHA
   var alphaTextureCached = alphaTextureCache[this.name];
   if (!alphaTextureCached || (alphaTextureCached && alphaTextureCached == CACHE_NOT_PRESENT)){
-    this.alphaLoader.load(this.alphaFilePath,
+    this.loader.load(this.alphaFilePath,
       function(textureData){
         if (that.scaleFactor){
           textureData.image = that.rescaleTextureImage(textureData, that.scaleFactor);
@@ -284,7 +272,7 @@ TexturePack.prototype.loadTextures = function(){
   //AO
   var ambientOcculsionTextureCached = ambientOcculsionTextureCache[this.name];
   if (!ambientOcculsionTextureCached || (ambientOcculsionTextureCached && ambientOcculsionTextureCached == CACHE_NOT_PRESENT)){
-    this.aoLoader.load(this.aoFilePath,
+    this.loader.load(this.aoFilePath,
       function(textureData){
         if (that.scaleFactor){
           textureData.image = that.rescaleTextureImage(textureData, that.scaleFactor);
@@ -310,7 +298,7 @@ TexturePack.prototype.loadTextures = function(){
   //EMISSIVE
   var emissiveTextureCached = emissiveTextureCache[this.name];
   if (!emissiveTextureCached || (emissiveTextureCached && emissiveTextureCached == CACHE_NOT_PRESENT)){
-    this.emissiveLoader.load(this.emissiveFilePath,
+    this.loader.load(this.emissiveFilePath,
       function(textureData){
         if (that.scaleFactor){
           textureData.image = that.rescaleTextureImage(textureData, that.scaleFactor);
@@ -336,7 +324,7 @@ TexturePack.prototype.loadTextures = function(){
   //NORMAL
   var normalTextureCached = normalTextureCache[this.name];
   if (!normalTextureCached || (normalTextureCached && normalTextureCached == CACHE_NOT_PRESENT)){
-    this.normalLoader.load(this.normalFilePath,
+    this.loader.load(this.normalFilePath,
       function(textureData){
         if (that.scaleFactor){
           textureData.image = that.rescaleTextureImage(textureData, that.scaleFactor);
@@ -362,7 +350,7 @@ TexturePack.prototype.loadTextures = function(){
   //SPECULAR
   var specularTextureCached = specularTextureCache[this.name];
   if (!specularTextureCached || (specularTextureCached && specularTextureCached == CACHE_NOT_PRESENT)){
-    this.specularLoader.load(this.specularFilePath,
+    this.loader.load(this.specularFilePath,
       function(textureData){
         if (that.scaleFactor){
           textureData.image = that.rescaleTextureImage(textureData, that.scaleFactor);
@@ -388,7 +376,7 @@ TexturePack.prototype.loadTextures = function(){
   //HEIGHT
   var heightTextureCached = heightTextureCache[this.name];
   if (!heightTextureCached || (heightTextureCached && heightTextureCached == CACHE_NOT_PRESENT)){
-    this.heightLoader.load(this.heightFilePath,
+    this.loader.load(this.heightFilePath,
       function(textureData){
         if (that.scaleFactor){
           textureData.image = that.rescaleTextureImage(textureData, that.scaleFactor);

@@ -601,6 +601,8 @@ var camera;
 var canvas;
 var sceneBackgroundColor = 0x000000 ;
 var previewSceneBackgroundColor = 0x000000;
+var textureLoader = new THREE.TextureLoader();
+var tgaLoader = new THREE.TGALoader();
 
 // PHYSICS
 var debugRenderer;
