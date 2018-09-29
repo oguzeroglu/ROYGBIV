@@ -79,9 +79,6 @@ function parse(input){
           name = name.replace(/_/g, "-");
 
           var result =  processNewGridSystemCommand(name, sizeX, sizeZ, centerX, centerY, centerZ, color, cellSize, axis, false, false);
-          if (gridSystems[name]){
-            undoRedoHandler.push();
-          }
           return result;
         break;
         case 2: //printCameraPosition
@@ -155,7 +152,6 @@ function parse(input){
             gridSystems[name].destroy();
             if (!jobHandlerWorking){
               terminal.printInfo(Text.GRID_SYSTEM_DESTROYED);
-              undoRedoHandler.push();
             }
           }
         break;
@@ -201,9 +197,6 @@ function parse(input){
             count ++;
           }
           terminal.printInfo(Text.GRIDS_RESET.replace(Text.PARAM1, count));
-          if (count > 0){
-            undoRedoHandler.push();
-          }
         break;
         case 10: //selectAllGrids
           if (mode != 0){
@@ -230,7 +223,6 @@ function parse(input){
           }
           if (!jobHandlerWorking){
             terminal.printInfo(Text.X_GRIDS_SELECTED.replace(Text.PARAM1, ctr));
-            undoRedoHandler.push();
           }
           return true;
         break;
@@ -252,7 +244,6 @@ function parse(input){
           }
           var selectedGridSystemName = selectedGrid1.parentName;
           gridSystems[selectedGridSystemName].crop(selectedGrid1, selectedGrid2);
-          undoRedoHandler.push();
         break;
         case 12: //pasteCroppedGridSystem
           if (mode != 0){
@@ -292,9 +283,6 @@ function parse(input){
           name = name.replace(/_/g, "-");
 
           var result = processNewGridSystemCommand(name, croppedGridSystem.sizeX, croppedGridSystem.sizeZ, croppedGridSystem.centerX, croppedGridSystem.centerY, croppedGridSystem.centerZ, outlineColor, cellSize, croppedGridSystem.axis, false, false);
-          if (gridSystems[name]){
-            undoRedoHandler.push();
-          }
           return result;
         break;
         case 13: //switchView
@@ -655,7 +643,6 @@ function parse(input){
           })
           materials[name] = basicMaterial;
           terminal.printInfo(Text.MATERIAL_CREATED);
-          undoRedoHandler.push();
           return true;
         break;
         case 15: //printMaterials
@@ -723,7 +710,6 @@ function parse(input){
           delete materials[name];
           if (!jobHandlerWorking){
             terminal.printInfo(Text.MATERIAL_DESTROYED);
-            undoRedoHandler.push();
           }
           return true;
         break;
@@ -803,7 +789,6 @@ function parse(input){
           gridSystems[selectedGridSystemName].newSurface(objectName, selectedGrid1, selectedGrid2, selectedMaterial);
           if (!jobHandlerWorking){
             terminal.printInfo(Text.OBJECT_ADDED);
-            undoRedoHandler.push();
           }
           return true;
         break;
@@ -926,7 +911,6 @@ function parse(input){
           }
           if (!jobHandlerWorking){
             terminal.printInfo(Text.OBJECT_DESTROYED);
-            undoRedoHandler.push();
           }
           return true;
         break;
@@ -970,7 +954,6 @@ function parse(input){
             texture.isLoaded = true;
             texture.fromUploadedImage = true;
             terminal.printInfo(Text.TEXTURE_CREATED);
-            undoRedoHandler.push();
             return true;
           }
 
@@ -1009,7 +992,6 @@ function parse(input){
                 texture.isLoaded = true;
                 textures[textureName] = texture;
                 textureCache[textureName] = texture.clone();
-                undoRedoHandler.push();
               },
               function (xhr){
                 textures[textureName] = 2;
@@ -1018,14 +1000,12 @@ function parse(input){
               function (xhr){
                 textures[textureName] =  3;
                 textureCache[textureName] = 3;
-                undoRedoHandler.push();
               }
             );
             textures[textureName] = 1;
             textureCache[textureName] = 1;
           }else{
             terminal.printInfo(Text.TEXTURE_CLONED);
-            undoRedoHandler.push();
           }
           terminal.printInfo(Text.TEXTURE_CREATED);
         break;
@@ -1107,7 +1087,6 @@ function parse(input){
           delete modifiedTextures[textureName];
           if (!jobHandlerWorking){
             terminal.printInfo(Text.TEXTURE_DESTROYED);
-            undoRedoHandler.push();
           }
           return true;
         break;
@@ -1160,7 +1139,6 @@ function parse(input){
           addedObject.resetAssociatedTexturePack();
           if (!jobHandlerWorking){
             terminal.printInfo(Text.TEXTURE_MAPPED);
-            undoRedoHandler.push();
           }
         break;
         case 25: //adjustTextureRepeat
@@ -1215,7 +1193,6 @@ function parse(input){
           }
           if (!jobHandlerWorking){
             terminal.printError(Text.REPEAT_AMOUNT_MODIFIED);
-            undoRedoHandler.push();
           }
           return true;
         break;
@@ -1350,7 +1327,6 @@ function parse(input){
           gridSystem.newRamp(anchorGrid, otherGrid, axis, parseInt(height), material, name);
           anchorGrid = 0;
           terminal.printInfo(Text.RAMP_CREATED);
-          undoRedoHandler.push();
         break;
         case 31: //setAnchor
 
@@ -1368,7 +1344,6 @@ function parse(input){
             terminal.printInfo(Text.ANCHOR_SET.replace(
               Text.PARAM1, gridName
             ));
-            undoRedoHandler.push();
           }
           return true;
         break;
@@ -1421,7 +1396,6 @@ function parse(input){
             ).replace(
               Text.PARAM2, axis
             ));
-            undoRedoHandler.push();
           }
           return true;
         break;
@@ -1519,7 +1493,6 @@ function parse(input){
           gridSystem.newBox(selections, height, material, name);
           if (!jobHandlerWorking){
             terminal.printInfo(Text.BOX_CREATED);
-            undoRedoHandler.push();
           }
           return true;
         break;
@@ -1615,7 +1588,6 @@ function parse(input){
             gridSelections[gridName].toggleSelect(false, false, false, true);
           }
           terminal.printInfo(Text.WALL_COLLECTION_CREATED);
-          undoRedoHandler.push();
         break;
         case 36: //printWallCollections
           var count = 0;
@@ -1654,7 +1626,6 @@ function parse(input){
             wallCollection.destroy();
             if (!jobHandlerWorking){
               terminal.printInfo(Text.WALL_COLLECTION_DESTROYED);
-              undoRedoHandler.push();
             }
           }else{
             terminal.printError(Text.NO_SUCH_WALL_COLLECTION);
@@ -1711,7 +1682,6 @@ function parse(input){
                   terminal.printInfo(Text.IMAGE_CREATED.replace(
                     Text.PARAM1, name
                   ));
-                  undoRedoHandler.push();
                 };
                 fileReader.readAsDataURL(files[0]);
               }else{
@@ -1796,7 +1766,6 @@ function parse(input){
           addedObject.resetAssociatedTexturePack();
           if (!jobHandlerWorking){
             terminal.printInfo(Text.SPECULAR_TEXTURE_MAPPED);
-            undoRedoHandler.push();
           }
         break;
         case 44: //mapEnvironment
@@ -1848,7 +1817,6 @@ function parse(input){
           addedObject.resetAssociatedTexturePack();
           if (!jobHandlerWorking){
             terminal.printInfo(Text.AMBIENT_OCCULSION_TEXTURE_MAPPED);
-            undoRedoHandler.push();
           }
         break;
         case 46: //mapAlpha
@@ -1897,7 +1865,6 @@ function parse(input){
           addedObject.resetAssociatedTexturePack();
           if (!jobHandlerWorking){
             terminal.printInfo(Text.ALPHA_TEXTURE_MAPPED);
-            undoRedoHandler.push();
           }
         break;
         case 47: //setDefaultMaterial
@@ -1914,7 +1881,6 @@ function parse(input){
           terminal.printInfo(Text.DEFAULT_MATERIAL_TYPE_SET_TO.replace(
             Text.PARAM1, defaultMaterialType
           ));
-          undoRedoHandler.push();
           return true;
         break;
         case 48: //newAmbientLight
@@ -1942,7 +1908,6 @@ function parse(input){
             addedObject.previewMesh.material.needsUpdate = true;
           }
           terminal.printInfo(Text.AMBIENT_LIGHT_CREATED);
-          undoRedoHandler.push();
           return true;
         break;
         case 49: //printLights
@@ -2023,7 +1988,6 @@ function parse(input){
           selectedLightName = 0;
           if (!jobHandlerWorking){
             terminal.printError(Text.LIGHT_DESTROYED);
-            undoRedoHandler.push();
           }
           return true;
         break;
@@ -2053,7 +2017,6 @@ function parse(input){
           phongMaterial.roygbivMaterialName = name;
           materials[name] = phongMaterial;
           terminal.printInfo(Text.MATERIAL_CREATED);
-          undoRedoHandler.push();
           return true;
         break;
         case 53: //mapNormal
@@ -2109,7 +2072,6 @@ function parse(input){
           addedObject.previewMesh.material.needsUpdate = true;
           addedObject.resetAssociatedTexturePack();
           if (!jobHandlerWorking){
-            undoRedoHandler.push();
             terminal.printInfo(Text.NORMAL_TEXTURE_MAPPED);
           }
         break;
@@ -2159,7 +2121,6 @@ function parse(input){
           addedObject.resetAssociatedTexturePack();
           if (!jobHandlerWorking){
             terminal.printInfo(Text.EMISSIVE_TEXTURE_MAPPED);
-            undoRedoHandler.push();
           }
         break;
         case 55: //newLambertMaterial
@@ -2197,7 +2158,6 @@ function parse(input){
           );
           texturePacks[name] = texturePack;
           terminal.printInfo(Text.TEXTURE_PACK_CREATED);
-          undoRedoHandler.push();
           return true;
         break;
         case 57: //printTexturePacks
@@ -2269,7 +2229,6 @@ function parse(input){
           addedObject.mapTexturePack(texturePack);
           if (!jobHandlerWorking){
             terminal.printInfo(Text.TEXTURE_PACK_MAPPED);
-            undoRedoHandler.push();
           }
           return true;
         break;
@@ -2310,7 +2269,6 @@ function parse(input){
           texturePack.destroy();
           if (!jobHandlerWorking){
             terminal.printInfo(Text.TEXTURE_PACK_DESTROYED);
-            undoRedoHandler.push();
           }
           return true;
         break;
@@ -2384,7 +2342,6 @@ function parse(input){
           addedObject.resetAssociatedTexturePack();
           if (!jobHandlerWorking){
             terminal.printInfo(Text.HEIGHT_TEXTURE_MAPPED);
-            undoRedoHandler.push();
           }
         break;
         case 63: //resetMaps
@@ -2407,14 +2364,8 @@ function parse(input){
             return true;
           }
           addedObject.resetMaps(true);
-          if (addedObject.material.isMeshPhongMaterial){
-            if (addedObject.metaData["widthSegments"] != 1){
-              addedObject.deSegmentGeometry();
-            }
-          }
           if (!jobHandlerWorking){
             terminal.printInfo(Text.MAPS_RESET);
-            undoRedoHandler.push();
           }
           return true;
         break;
@@ -2459,7 +2410,6 @@ function parse(input){
           addedObject.segmentGeometry(true, count);
           if (!jobHandlerWorking){
             terminal.printError(Text.OBJECT_SEGMENTED);
-            undoRedoHandler.push();
           }
           return true;
         break;
@@ -2526,9 +2476,6 @@ function parse(input){
           gridSystemName = gridSystemName.replace(/_/g, "-");
 
           processNewGridSystemCommand(gridSystemName, sizeX, sizeZ, centerX, centerY, centerZ, outlineColor, cellSize, "XZ", true, false);
-          if (gridSystems[gridSystemName]){
-            undoRedoHandler.push();
-          }
         break;
         case 66: //postProcessing
           if (mode != 1){
@@ -2602,9 +2549,7 @@ function parse(input){
             false,
             selectedGrid
           );
-          if (gridSystems[name]){
-            undoRedoHandler.push();
-          }else{
+          if (!gridSystems[name]){
             delete parentGridSystem.slicedGrids[selectedGrid.name];
             delete selectedGrid.sliced;
             delete selectedGrid.slicedGridSystemName;
@@ -2713,7 +2658,6 @@ function parse(input){
 
           if (!jobHandlerWorking){
             terminal.printError(Text.LIGHT_ADDED);
-            undoRedoHandler.push();
           }
           return true;
         break;
@@ -2749,7 +2693,6 @@ function parse(input){
           );
           skyBoxes[name] = skyBox;
           terminal.printInfo(Text.SKYBOX_CREATED);
-          undoRedoHandler.push();
           return true;
         break;
         case 70: //printSkyboxes
@@ -2836,7 +2779,6 @@ function parse(input){
           skyboxVisible = true;
           mappedSkyboxName = name;
           terminal.printInfo(Text.SKYBOX_MAPPED);
-          undoRedoHandler.push();
         break;
         case 73: //destroySkybox
           var name = splitted[1];
@@ -2856,7 +2798,6 @@ function parse(input){
           delete skyBoxes[name];
           if (!jobHandlerWorking){
             terminal.printInfo(Text.SKYBOX_DESTROYED);
-            undoRedoHandler.push();
           }
           return true;
         break;
@@ -2893,7 +2834,6 @@ function parse(input){
             skyboxVisible = true;
             terminal.printInfo(Text.SKYBOX_SHOWN);
           }
-          undoRedoHandler.push();
           return true;
         break;
         case 75: //scaleSkybox
@@ -2921,7 +2861,6 @@ function parse(input){
           skyboxPreviewMesh.scale.y = amount;
           skyboxPreviewMesh.scale.z = amount;
           terminal.printInfo(Text.SKYBOX_SCALE_ADJUSTED);
-          undoRedoHandler.push();
           return true;
         break;
         case 76: //save
@@ -2995,34 +2934,10 @@ function parse(input){
           terminal.printInfo(Text.CHOOSE_A_FILE_TO_UPLOAD);
         break;
         case 78: //undo
-          if (mode != 0){
-            terminal.printError(Text.WORKS_ONLY_IN_DESIGN_MODE);
-            return true;
-          }
-          var result = undoRedoHandler.undo();
-          terminal.clear();
-          if (!result){
-            terminal.printError(Text.NOTHING_TO_UNDO);
-          }else{
-            terminal.printInfo(Text.OK);
-          }
-          afterObjectSelection();
-          return true;
+          // DEPRECATED
         break;
         case 79: //redo
-          if (mode != 0){
-            terminal.printError(Text.WORKS_ONLY_IN_DESIGN_MODE);
-            return true;
-          }
-          var result = undoRedoHandler.redo();
-          terminal.clear();
-          if (!result){
-            terminal.printError(Text.NOTHING_TO_REDO);
-          }else{
-            terminal.printInfo(Text.OK);
-          }
-          afterObjectSelection();
-          return true;
+          // DEPRECATED
         break;
         case 80: //selectObject
           var name = splitted[1];
@@ -3094,7 +3009,6 @@ function parse(input){
           }
           if (!jobHandlerWorking){
             terminal.printInfo(Text.MASS_SET);
-            undoRedoHandler.push();
           }
           return true;
         break;
@@ -3138,7 +3052,6 @@ function parse(input){
           }
           if (!jobHandlerWorking){
             terminal.printInfo(Text.OBJECT_ROTATED);
-            undoRedoHandler.push();
           }
           return true;
         break;
@@ -3176,7 +3089,6 @@ function parse(input){
             terminal.clear();
             terminal.printError(Text.SCRIPT_CREATED);
             scriptCreatorTextArea.value = "";
-            undoRedoHandler.push();
           }.bind({name: name});
           scriptCreatorTextArea.focus();
           return true;
@@ -3318,7 +3230,6 @@ function parse(input){
             terminal.clear();
             terminal.printInfo(Text.SCRIPT_MODIFIED);
             scriptCreatorTextArea.value = "";
-            undoRedoHandler.push();
           }.bind({name: name, runAutomatically: runAutomatically, localFilePath: localFilePath});
           scriptCreatorTextArea.focus();
           return true;
@@ -3340,7 +3251,6 @@ function parse(input){
           delete scripts[name];
           if (!jobHandlerWorking){
             terminal.printInfo(Text.SCRIPT_DESTROYED);
-            undoRedoHandler.push();
           }
           return true;
         break;
@@ -3369,7 +3279,6 @@ function parse(input){
           fogActive = true;
           fogColorRGB = new THREE.Color(fogColor);
           terminal.printInfo(Text.FOG_SET);
-          undoRedoHandler.push();
           return true;
         break;
         case 91: //removeFog
@@ -3379,7 +3288,6 @@ function parse(input){
           }
           fogActive = false;
           terminal.printInfo(Text.FOG_REMOVED);
-          undoRedoHandler.push();
           return true;
         break;
         case 92: //glue
@@ -3523,7 +3431,6 @@ function parse(input){
             $(datGuiObjectManipulation.domElement).attr("hidden", true);
             selectedAddedObject = 0;
             selectedObjectGroup = 0;
-            undoRedoHandler.push();
             return true;
           }catch(err){
             terminal.printError(Text.INVALID_SYNTAX);
@@ -3550,7 +3457,6 @@ function parse(input){
           delete objectGroups[name];
           if (!jobHandlerWorking){
             terminal.printInfo(Text.OBJECT_DETACHED);
-            undoRedoHandler.push();
           }
           selectedObjectGroup = 0;
           selectedAddedObject = 0;
@@ -3613,7 +3519,6 @@ function parse(input){
           selectedGrid.toggleSelect(false, false, false, true);
           if (!jobHandlerWorking){
             terminal.printInfo(Text.POINT_MARKED);
-            undoRedoHandler.push();
           }
         break;
         case 95: //unmark
@@ -3635,7 +3540,6 @@ function parse(input){
           delete markedPoints[name];
           if (!jobHandlerWorking){
             terminal.printError(Text.POINT_UNMARKED);
-            undoRedoHandler.push();
           }
           return true;
         break;
@@ -3684,7 +3588,6 @@ function parse(input){
             return true;
           }
           terminal.printInfo(Text.MARKED_POINTS_TOGGLED);
-          undoRedoHandler.push();
           return true;
         break;
         case 98: //runAutomatically
@@ -3705,7 +3608,6 @@ function parse(input){
           script.runAutomatically = true;
           if (!jobHandlerWorking){
             terminal.printInfo(Text.OK);
-            undoRedoHandler.push();
           }
           return true;
         break;
@@ -3764,7 +3666,6 @@ function parse(input){
           script.runAutomatically = false;
           if (!jobHandlerWorking){
             terminal.printInfo(Text.OK);
-            undoRedoHandler.push();
           }
           return true;
         break;
@@ -3801,7 +3702,6 @@ function parse(input){
               Text.PARAM1, Text.DISABLED
             ));
           }
-          undoRedoHandler.push();
           return true;
         break;
         case 102: //printPhysicsWorkerMode
@@ -3955,7 +3855,6 @@ function parse(input){
           textureURLs[newTextureName] = textureURLs[textureName];
           modifiedTextures[newTextureName] = resizedTexture.image.toDataURL();
           terminal.printInfo(Text.TEXTURE_RESCALED);
-          undoRedoHandler.push();
           return true;
         break;
         case 108: //rescaleTexturePack
@@ -4045,7 +3944,6 @@ function parse(input){
           texturePacks[newTexturePackName] = rescaledTexturePack;
           rescaledTexturePack.refTexturePackName = refTexturePack.name;
           terminal.printInfo(Text.TEXTURE_PACK_RESCALED);
-          undoRedoHandler.push();
           return true;
         break;
         case 109: //destroyImage
@@ -4071,7 +3969,6 @@ function parse(input){
           delete uploadedImages[imgName];
           if (!jobHandlerWorking){
             terminal.printInfo(Text.IMAGE_DESTROYED);
-            undoRedoHandler.push();
           }
           return true;
         break;
@@ -4114,7 +4011,6 @@ function parse(input){
           }
           if (!jobHandlerWorking){
             terminal.printInfo(Text.BLENDING_MODE_SET_TO.replace(Text.PARAM1, blendingMode));
-            undoRedoHandler.push();
           }
           return true;
         break;
@@ -4188,7 +4084,6 @@ function parse(input){
           var upperBound = new THREE.Vector3(maxX, maxY, maxZ);
           LIMIT_BOUNDING_BOX = new THREE.Box3(lowerBound, upperBound);
           terminal.printInfo(Text.OCTREE_LIMIT_SET);
-          undoRedoHandler.push();
           return true;
         break;
         case 114: //setBinSize
@@ -4221,7 +4116,6 @@ function parse(input){
           }
           BIN_SIZE = binSize;
           terminal.printInfo(Text.BIN_SIZE_SET);
-          undoRedoHandler.push();
           return true;
         break;
         case 115: //printWorldLimits
@@ -4282,7 +4176,6 @@ function parse(input){
             modeText = Text.DISABLED;
           }
           terminal.printInfo(Text.PARTICLE_COLLISION_WORKER_MODE.replace(Text.PARAM1, modeText));
-          undoRedoHandler.push();
           return true;
         break;
         case 118: //printParticleCollisionWorkerMode
@@ -4328,7 +4221,6 @@ function parse(input){
             modeText = Text.DISABLED;
           }
           terminal.printInfo(Text.PARTICLE_SYSTEM_COLLISION_WORKER_MODE.replace(Text.PARAM1, modeText));
-          undoRedoHandler.push();
           return true;
         break;
         case 120: //printParticleSystemCollisionWorkerMode
@@ -4402,7 +4294,6 @@ function parse(input){
           newTexture.hasPadding = true;
           modifiedTextures[newTextureName] = tmpCanvas.toDataURL();
           terminal.printInfo(Text.PADDING_ADDED_TO_TEXTURE);
-          undoRedoHandler.push();
           return true;
         break;
         case 123: //newSphere
@@ -4496,7 +4387,6 @@ function parse(input){
           gridSystem.newSphere(sphereName, material, radius, selections);
           if (!jobHandlerWorking){
             terminal.printInfo(Text.SPHERE_CREATED);
-            undoRedoHandler.push();
           }
           return true;
         break;
@@ -4568,44 +4458,11 @@ function parse(input){
           obj.setSlippery(slipperinessState);
           if (!jobHandlerWorking){
             terminal.printInfo(Text.SLIPPERINESS_ADJUSTED);
-            undoRedoHandler.push();
           }
           return true;
         break;
         case 127: //setAtlasTextureSize
-          if (mode != 0){
-            terminal.printError(Text.WORKS_ONLY_IN_DESIGN_MODE);
-            return true;
-          }
-          var width = parseInt(splitted[1]);
-          var height = parseInt(splitted[2]);
-          if (isNaN(width)){
-            terminal.printError(Text.IS_NOT_A_NUMBER.replace(Text.PARAM1, "width"));
-            return true;
-          }
-          if (isNaN(height)){
-            terminal.printError(Text.IS_NOT_A_NUMBER.replace(Text.PARAM1, "height"));
-            return true;
-          }
-          var isWidthPowerOfTwo = width && (width & (width - 1)) == 0;
-          var isHeightPowerOfTwo = height && (height & (height - 1)) == 0;
-          if (!isWidthPowerOfTwo){
-            terminal.printError(Text.IS_NOT_POWER_OF_TWO.replace(Text.PARAM1, "width"));
-            return true;
-          }
-          if (!isHeightPowerOfTwo){
-            terminal.printError(Text.IS_NOT_POWER_OF_TWO.replace(Text.PARAM1, "height"));
-            return true;
-          }
-          if (width > MAX_TEXTURE_SIZE){
-            terminal.printError(Text.TEXTURE_SIZE_CANNOT_EXCEED);
-            return true;
-          }
-          projectAtlasSize.width = width;
-          projectAtlasSize.height = height;
-          terminal.printInfo(Text.ATLAS_TEXTURE_SIZE_SET);
-          undoRedoHandler.push();
-          return true;
+          // DEPRECATED
         break;
         case 128: // printAtlasTextureSize
           if (!projectAtlasSize.width || !projectAtlasSize.height){
@@ -4653,7 +4510,6 @@ function parse(input){
           targetObject.syncProperties(sourceObject);
           if (!jobHandlerWorking){
             terminal.printInfo(Text.OBJECTS_SYNCED);
-            undoRedoHandler.push();
           }
           return true;
 

@@ -788,7 +788,7 @@ StateLoader.prototype.handleTexturesDiff = function(){
         if (texture == 1 || texture == 2 || texture == 3){
           textures[textureName] = texture;
         }else{
-          textures[textureName] = texture.clone();
+          textures[textureName] = texture;
           textures[textureName].needsUpdate = true;
           textures[textureName].isLoaded = true;
         }
@@ -2454,7 +2454,7 @@ StateLoader.prototype.load = function(undo){
           textures[this.textureNameX] = this.textureX;
           that.totalLoadedTextureCount ++;
           this.textureX.needsUpdate = true;
-          textureCache[this.textureNameX] = this.textureX.clone();
+          textureCache[this.textureNameX] = this.textureX;
           that.mapLoadedTexture(this.textureX, this.textureNameX);
           that.createObjectGroupsAfterLoadedTextures();
         }.bind({textureX: texture, textureNameX: textureName});
@@ -2487,7 +2487,7 @@ StateLoader.prototype.load = function(undo){
                 this.textureX.needsUpdate = true;
                 textures[this.textureNameX] = this.textureX;
                 that.totalLoadedTextureCount ++;
-                textureCache[this.textureNameX] = this.textureX.clone();
+                textureCache[this.textureNameX] = this.textureX;
                 that.mapLoadedTexture(this.textureX, this.textureNameX);
                 that.createObjectGroupsAfterLoadedTextures();
               }.bind({textureX: texture, textureNameX: textureName})
@@ -2498,7 +2498,7 @@ StateLoader.prototype.load = function(undo){
         if (!skip){
           textures[textureName] = texture;
           that.totalLoadedTextureCount ++;
-          textureCache[textureName] = texture.clone();
+          textureCache[textureName] = texture;
           texture.needsUpdate = true;
           this.mapLoadedTexture(texture, textureName);
           this.createObjectGroupsAfterLoadedTextures();
@@ -2534,7 +2534,7 @@ StateLoader.prototype.load = function(undo){
             textures[textureNameX].repeat.set(this.repeatUU, this.repeatVV);
             textures[textureNameX].offset.x = this.offsetXX;
             textures[textureNameX].offset.y = this.offsetYY;
-            textureCache[textureNameX] = textureData.clone();
+            textureCache[textureNameX] = textureData;
             that.mapLoadedTexture(textures[textureNameX], textureNameX);
             that.createObjectGroupsAfterLoadedTextures();
           }.bind({textureNameX: textureName, offsetXX: offsetX, offsetYY: offsetY, repeatUU: repeatU, repeatVV: repeatV}), function(xhr){
@@ -2898,10 +2898,6 @@ StateLoader.prototype.load = function(undo){
     });
     $(datGui.domElement).attr("hidden", true);
 
-    if (!this.hasTextures && !this.hasTexturePacks && !undo){
-      undoRedoHandler.push();
-    }
-
     if (this.oldPhysicsDebugMode){
       if (this.oldPhysicsDebugMode != "NONE"){
         debugRenderer = new THREE.CannonDebugRenderer(previewScene, physicsWorld);
@@ -2980,8 +2976,6 @@ StateLoader.prototype.createObjectGroupsAfterLoadedTextures = function(){
 
   }
 
-  undoRedoHandler.push();
-
   canvas.style.visibility = "";
   terminal.enable();
   terminal.clear();
@@ -3048,7 +3042,7 @@ StateLoader.prototype.mapTextureToSingleObject = function(diff, exported){
       if (textureName == diffuseRoygbivTextureName){
         var repeatU = curAddedObjectExport["textureRepeatU"];
         var repeatV = curAddedObjectExport["textureRepeatV"];
-        var cloneTexture = texture.clone();
+        var cloneTexture = texture;
         cloneTexture.fromUploadedImage = texture.fromUploadedImage;
         cloneTexture.roygbivTextureName = textureName;
         cloneTexture.roygbivTexturePackName = 0;
@@ -3094,7 +3088,7 @@ StateLoader.prototype.mapTextureToSingleObject = function(diff, exported){
         var repeatU = curAddedObjectExport["textureRepeatU"];
         var repeatV = curAddedObjectExport["textureRepeatV"];
 
-        var cloneTexture = texture.clone();
+        var cloneTexture = texture;
         cloneTexture.fromUploadedImage = texture.fromUploadedImage;
         cloneTexture.roygbivTextureName = textureName;
         cloneTexture.roygbivTexturePackName = 0;
@@ -3130,7 +3124,7 @@ StateLoader.prototype.mapTextureToSingleObject = function(diff, exported){
         var repeatU = curAddedObjectExport["textureRepeatU"];
         var repeatV = curAddedObjectExport["textureRepeatV"];
 
-        var cloneTexture = texture.clone();
+        var cloneTexture = texture;
         cloneTexture.fromUploadedImage = texture.fromUploadedImage;
         cloneTexture.roygbivTextureName = textureName;
         cloneTexture.roygbivTexturePackName = 0;
@@ -3166,7 +3160,7 @@ StateLoader.prototype.mapTextureToSingleObject = function(diff, exported){
         var repeatU = curAddedObjectExport["textureRepeatU"];
         var repeatV = curAddedObjectExport["textureRepeatV"];
 
-        var cloneTexture = texture.clone();
+        var cloneTexture = texture;
         cloneTexture.fromUploadedImage = texture.fromUploadedImage;
         cloneTexture.roygbivTextureName = textureName;
         cloneTexture.roygbivTexturePackName = 0;
@@ -3202,7 +3196,7 @@ StateLoader.prototype.mapTextureToSingleObject = function(diff, exported){
       if (textureName == normalRoygbivTextureName){
         var repeatU = curAddedObjectExport["textureRepeatU"];
         var repeatV = curAddedObjectExport["textureRepeatV"];
-        var cloneTexture = texture.clone();
+        var cloneTexture = texture;
         cloneTexture.fromUploadedImage = texture.fromUploadedImage;
         cloneTexture.roygbivTextureName = textureName;
         cloneTexture.roygbivTexturePackName = 0;
@@ -3239,7 +3233,7 @@ StateLoader.prototype.mapTextureToSingleObject = function(diff, exported){
         var repeatU = curAddedObjectExport["textureRepeatU"];
         var repeatV = curAddedObjectExport["textureRepeatV"];
 
-        var cloneTexture = texture.clone();
+        var cloneTexture = texture;
         cloneTexture.fromUploadedImage = texture.fromUploadedImage;
         cloneTexture.roygbivTextureName = textureName;
         cloneTexture.roygbivTexturePackName = 0;
@@ -3276,7 +3270,7 @@ StateLoader.prototype.mapTextureToSingleObject = function(diff, exported){
         var repeatU = curAddedObjectExport["textureRepeatU"];
         var repeatV = curAddedObjectExport["textureRepeatV"];
 
-        var cloneTexture = texture.clone();
+        var cloneTexture = texture;
         cloneTexture.fromUploadedImage = texture.fromUploadedImage;
         cloneTexture.roygbivTextureName = textureName;
         cloneTexture.roygbivTexturePackName = 0;
@@ -3371,7 +3365,7 @@ StateLoader.prototype.mapTexturePackToSingleObject = function(diff){
     if (diffuseRoygbivTexturePackName){
       if (diffuseRoygbivTexturePackName == texturePackName){
         if (texturePack.hasDiffuse){
-          addedObject.mapDiffuse(texturePack.diffuseTexture.clone());
+          addedObject.mapDiffuse(texturePack.diffuseTexture);
           material.uniforms.diffuseMap.value.roygbivTexturePackName = texturePackName;
           material.uniforms.diffuseMap.value.roygbivTextureName = 0;
           if (!(typeof textureOffsetX == UNDEFINED)){
@@ -3393,7 +3387,7 @@ StateLoader.prototype.mapTexturePackToSingleObject = function(diff){
     if (alphaRoygbivTexturePackName){
       if (alphaRoygbivTexturePackName == texturePackName){
         if (texturePack.hasAlpha){
-          addedObject.mapAlpha(texturePack.alphaTexture.clone());
+          addedObject.mapAlpha(texturePack.alphaTexture);
           material.uniforms.alphaMap.value.roygbivTexturePackName = texturePackName;
           material.uniforms.alphaMap.value.roygbivTextureName = 0;
           if (!(typeof textureRepeatU == UNDEFINED)){
@@ -3409,7 +3403,7 @@ StateLoader.prototype.mapTexturePackToSingleObject = function(diff){
     if (aoRoygbivTexturePackName){
       if (aoRoygbivTexturePackName == texturePackName){
         if (texturePack.hasAO){
-          addedObject.mapAO(texturePack.aoTexture.clone());
+          addedObject.mapAO(texturePack.aoTexture);
           material.uniforms.aoMap.value.roygbivTexturePackName = texturePackName;
           material.uniforms.aoMap.value.roygbivTextureName = 0;
           if (!(typeof textureRepeatU == UNDEFINED)){
@@ -3425,7 +3419,7 @@ StateLoader.prototype.mapTexturePackToSingleObject = function(diff){
     if (emissiveRoygbivTexturePackName){
       if (emissiveRoygbivTexturePackName == texturePackName){
         if (texturePack.hasEmissive){
-          addedObject.mapEmissive(texturePack.emissiveTexture.clone());
+          addedObject.mapEmissive(texturePack.emissiveTexture);
           material.uniforms.emissiveMap.value.roygbivTexturePackName = texturePackName;
           material.uniforms.emissiveMap.value.roygbivTextureName = 0;
           if (!(typeof textureRepeatU == UNDEFINED)){
@@ -3441,7 +3435,7 @@ StateLoader.prototype.mapTexturePackToSingleObject = function(diff){
     if (normalRoygbivTexturePackName){
       if (normalRoygbivTexturePackName == texturePackName){
         if (texturePack.hasNormal){
-          material.normalMap = texturePack.normalTexture.clone();
+          material.normalMap = texturePack.normalTexture;
           material.normalMap.roygbivTexturePackName = texturePackName;
           material.normalMap.roygbivTextureName = 0;
           if (!(typeof textureRepeatU == UNDEFINED)){
@@ -3458,7 +3452,7 @@ StateLoader.prototype.mapTexturePackToSingleObject = function(diff){
     if (specularRoygbivTexturePackName){
       if (specularRoygbivTexturePackName == texturePackName){
         if (texturePack.hasSpecular){
-          material.specularMap = texturePack.specularTexture.clone();
+          material.specularMap = texturePack.specularTexture;
           material.specularMap.roygbivTexturePackName = texturePackName;
           material.specularMap.roygbivTextureName = 0;
           if (!(typeof textureRepeatU == UNDEFINED)){
@@ -3475,7 +3469,7 @@ StateLoader.prototype.mapTexturePackToSingleObject = function(diff){
     if (displacementRoygbivTexturePackName){
       if (displacementRoygbivTexturePackName == texturePackName){
         if (texturePack.hasHeight){
-          addedObject.mapDisplacement(texturePack.heightTexture.clone());
+          addedObject.mapDisplacement(texturePack.heightTexture);
           material.uniforms.displacementMap.value.roygbivTexturePackName = texturePackName;
           material.uniforms.displacementMap.value.roygbivTextureName = 0;
           if (!(typeof textureRepeatU == UNDEFINED)){
@@ -3574,7 +3568,7 @@ StateLoader.prototype.mapLoadedTexturePack = function(texturePackName, exportObj
     if (diffuseRoygbivTexturePackName){
       if (diffuseRoygbivTexturePackName == texturePackName){
         if (texturePack.hasDiffuse){
-          addedObject.mapDiffuse(texturePack.diffuseTexture.clone());
+          addedObject.mapDiffuse(texturePack.diffuseTexture);
           material.uniforms.diffuseMap.value.roygbivTexturePackName = texturePackName;
           material.uniforms.diffuseMap.value.roygbivTextureName = 0;
           if (!(typeof textureOffsetX == UNDEFINED)){
@@ -3597,7 +3591,7 @@ StateLoader.prototype.mapLoadedTexturePack = function(texturePackName, exportObj
     if (alphaRoygbivTexturePackName){
       if (alphaRoygbivTexturePackName == texturePackName){
         if (texturePack.hasAlpha){
-          addedObject.mapAlpha(texturePack.alphaTexture.clone());
+          addedObject.mapAlpha(texturePack.alphaTexture);
           material.uniforms.alphaMap.value.roygbivTexturePackName = texturePackName;
           material.uniforms.alphaMap.value.roygbivTextureName = 0;
           if (!(typeof textureRepeatU == UNDEFINED)){
@@ -3614,7 +3608,7 @@ StateLoader.prototype.mapLoadedTexturePack = function(texturePackName, exportObj
     if (aoRoygbivTexturePackName){
       if (aoRoygbivTexturePackName == texturePackName){
         if (texturePack.hasAO){
-          addedObject.mapAO(texturePack.aoTexture.clone());
+          addedObject.mapAO(texturePack.aoTexture);
           material.uniforms.aoMap.value.roygbivTexturePackName = texturePackName;
           material.uniforms.aoMap.value.roygbivTextureName = 0;
           if (!(typeof textureRepeatU == UNDEFINED)){
@@ -3631,7 +3625,7 @@ StateLoader.prototype.mapLoadedTexturePack = function(texturePackName, exportObj
     if (emissiveRoygbivTexturePackName){
       if (emissiveRoygbivTexturePackName == texturePackName){
         if (texturePack.hasEmissive){
-          addedObject.mapEmissive(texturePack.emissiveTexture.clone());
+          addedObject.mapEmissive(texturePack.emissiveTexture);
           material.uniforms.emissiveMap.value.roygbivTexturePackName = texturePackName;
           material.uniforms.emissiveMap.value.roygbivTextureName = 0;
           if (!(typeof textureRepeatU == UNDEFINED)){
@@ -3648,7 +3642,7 @@ StateLoader.prototype.mapLoadedTexturePack = function(texturePackName, exportObj
     if (normalRoygbivTexturePackName){
       if (normalRoygbivTexturePackName == texturePackName){
         if (texturePack.hasNormal){
-          material.normalMap = texturePack.normalTexture.clone();
+          material.normalMap = texturePack.normalTexture;
           material.normalMap.roygbivTexturePackName = texturePackName;
           material.normalMap.roygbivTextureName = 0;
           if (!(typeof textureRepeatU == UNDEFINED)){
@@ -3665,7 +3659,7 @@ StateLoader.prototype.mapLoadedTexturePack = function(texturePackName, exportObj
     if (specularRoygbivTexturePackName){
       if (specularRoygbivTexturePackName == texturePackName){
         if (texturePack.hasSpecular){
-          material.specularMap = texturePack.specularTexture.clone();
+          material.specularMap = texturePack.specularTexture;
           material.specularMap.roygbivTexturePackName = texturePackName;
           material.specularMap.roygbivTextureName = 0;
           if (!(typeof textureRepeatU == UNDEFINED)){
@@ -3682,7 +3676,7 @@ StateLoader.prototype.mapLoadedTexturePack = function(texturePackName, exportObj
     if (displacementRoygbivTexturePackName){
       if (displacementRoygbivTexturePackName == texturePackName){
         if (texturePack.hasHeight){
-          addedObject.mapDisplacement(texturePack.heightTexture.clone());
+          addedObject.mapDisplacement(texturePack.heightTexture);
           material.uniforms.displacementMap.value.roygbivTexturePackName = texturePackName;
           material.uniforms.displacementMap.value.roygbivTextureName = 0;
           if (!(typeof textureRepeatU == UNDEFINED)){
@@ -3717,9 +3711,6 @@ StateLoader.prototype.mapLoadedTexturePack = function(texturePackName, exportObj
     for (var objectName in group){
       delete addedObjects[objectName];
     }
-  }
-  if (!this.isUndo){
-    undoRedoHandler.push();
   }
 }
 
@@ -3767,7 +3758,7 @@ StateLoader.prototype.mapLoadedTexture = function(texture, textureName){
       if (textureName == diffuseRoygbivTextureName){
         var repeatU = curAddedObjectExport["textureRepeatU"];
         var repeatV = curAddedObjectExport["textureRepeatV"];
-        var cloneTexture = texture.clone();
+        var cloneTexture = texture;
         cloneTexture.fromUploadedImage = texture.fromUploadedImage;
         cloneTexture.roygbivTextureName = textureName;
         cloneTexture.roygbivTexturePackName = 0;
@@ -3813,7 +3804,7 @@ StateLoader.prototype.mapLoadedTexture = function(texture, textureName){
         var repeatU = curAddedObjectExport["textureRepeatU"];
         var repeatV = curAddedObjectExport["textureRepeatV"];
 
-        var cloneTexture = texture.clone();
+        var cloneTexture = texture;
         cloneTexture.fromUploadedImage = texture.fromUploadedImage;
         cloneTexture.roygbivTextureName = textureName;
         cloneTexture.roygbivTexturePackName = 0;
@@ -3849,7 +3840,7 @@ StateLoader.prototype.mapLoadedTexture = function(texture, textureName){
         var repeatU = curAddedObjectExport["textureRepeatU"];
         var repeatV = curAddedObjectExport["textureRepeatV"];
 
-        var cloneTexture = texture.clone();
+        var cloneTexture = texture;
         cloneTexture.fromUploadedImage = texture.fromUploadedImage;
         cloneTexture.roygbivTextureName = textureName;
         cloneTexture.roygbivTexturePackName = 0;
@@ -3885,7 +3876,7 @@ StateLoader.prototype.mapLoadedTexture = function(texture, textureName){
         var repeatU = curAddedObjectExport["textureRepeatU"];
         var repeatV = curAddedObjectExport["textureRepeatV"];
 
-        var cloneTexture = texture.clone();
+        var cloneTexture = texture;
         cloneTexture.fromUploadedImage = texture.fromUploadedImage;
         cloneTexture.roygbivTextureName = textureName;
         cloneTexture.roygbivTexturePackName = 0;
@@ -3920,7 +3911,7 @@ StateLoader.prototype.mapLoadedTexture = function(texture, textureName){
       if (textureName == normalRoygbivTextureName){
         var repeatU = curAddedObjectExport["textureRepeatU"];
         var repeatV = curAddedObjectExport["textureRepeatV"];
-        var cloneTexture = texture.clone();
+        var cloneTexture = texture;
         cloneTexture.fromUploadedImage = texture.fromUploadedImage;
         cloneTexture.roygbivTextureName = textureName;
         cloneTexture.roygbivTexturePackName = 0;
@@ -3957,7 +3948,7 @@ StateLoader.prototype.mapLoadedTexture = function(texture, textureName){
         var repeatU = curAddedObjectExport["textureRepeatU"];
         var repeatV = curAddedObjectExport["textureRepeatV"];
 
-        var cloneTexture = texture.clone();
+        var cloneTexture = texture;
         cloneTexture.fromUploadedImage = texture.fromUploadedImage;
         cloneTexture.roygbivTextureName = textureName;
         cloneTexture.roygbivTexturePackName = 0;
@@ -3994,7 +3985,7 @@ StateLoader.prototype.mapLoadedTexture = function(texture, textureName){
         var repeatU = curAddedObjectExport["textureRepeatU"];
         var repeatV = curAddedObjectExport["textureRepeatV"];
 
-        var cloneTexture = texture.clone();
+        var cloneTexture = texture;
         cloneTexture.fromUploadedImage = texture.fromUploadedImage;
         cloneTexture.roygbivTextureName = textureName;
         cloneTexture.roygbivTexturePackName = 0;
@@ -4038,9 +4029,6 @@ StateLoader.prototype.mapLoadedTexture = function(texture, textureName){
     for (var objectName in group){
       delete addedObjects[objectName];
     }
-  }
-  if (!this.hasTexturePacks && !this.isUndo){
-    undoRedoHandler.push();
   }
 }
 
@@ -4091,9 +4079,6 @@ StateLoader.prototype.resetProject = function(undo){
     markedPoints[markedPointName].destroy();
   }
 
-  if (!undo){
-    undoRedoHandler = new UndoRedoHandler();
-  }
   keyboardBuffer = new Object();
   gridSystems = new Object();
   gridSelections = new Object();

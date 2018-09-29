@@ -1,6 +1,5 @@
 var JobHandler = function(splitted){
   this.splitted = splitted;
-  this.undoRedoPush = true;
 }
 
 JobHandler.prototype.handle = function(previewModeCommand){
@@ -92,9 +91,6 @@ JobHandler.prototype.handle = function(previewModeCommand){
       this.handleSyncCommand();
     }else if (this.splitted[0] == "selectAllGrids"){
       this.handleSelectAllGridsCommand();
-    }
-    if (this.undoRedoPush){
-      undoRedoHandler.push();
     }
   }catch (err){
     console.error(err);

@@ -821,19 +821,19 @@ AddedObject.prototype.mapTexturePack = function(texturePack, fromScript){
   if (fromScript && !this.texturePackSetWithScript){
     this.texturePackSetWithScript = true;
     if (this.hasDiffuseMap() && this.mesh.material.uniforms.diffuseMap.value.roygbivTextureName){
-      this.oldMap = this.mesh.material.uniforms.diffuseMap.value.clone();
+      this.oldMap = this.mesh.material.uniforms.diffuseMap.value;
       this.oldMapName = this.mesh.material.uniforms.diffuseMap.value.roygbivTextureName;
     }
     if (this.hasAlphaMap() && this.mesh.material.uniforms.alphaMap.value.roygbivTextureName){
-      this.oldAlphaMap = this.mesh.material.uniforms.alphaMap.value.clone();
+      this.oldAlphaMap = this.mesh.material.uniforms.alphaMap.value;
       this.oldAlphaMapName = this.mesh.material.uniforms.alphaMap.value.roygbivTextureName;
     }
     if (this.hasAOMap() && this.mesh.material.uniforms.aoMap.value.roygbivTextureName){
-      this.oldAoMap = this.mesh.material.uniforms.aoMap.value.clone();
+      this.oldAoMap = this.mesh.material.uniforms.aoMap.value;
       this.oldAoMapName = this.mesh.material.uniforms.aoMap.value.roygbivTextureName;
     }
     if (this.hasEmissiveMap() && this.mesh.material.uniforms.emissiveMap.value.roygbivTextureName){
-      this.oldEmissiveMap = this.mesh.material.uniforms.emissiveMap.value.clone();
+      this.oldEmissiveMap = this.mesh.material.uniforms.emissiveMap.value;
       this.oldEmissiveMapName = this.mesh.material.uniforms.emissiveMap.value.roygbivTextureName;
     }
     if (this.material.normalMap && this.material.normalMap.roygbivTextureName){
@@ -845,7 +845,7 @@ AddedObject.prototype.mapTexturePack = function(texturePack, fromScript){
       this.oldSpecularMapName = this.material.specularMap.roygbivTextureName;
     }
     if (this.hasDisplacementMap() && this.mesh.material.uniforms.displacementMap.value.roygbivTextureName){
-      this.oldDisplacementMap = this.mesh.material.uniforms.displacementMap.value.clone();
+      this.oldDisplacementMap = this.mesh.material.uniforms.displacementMap.value;
       this.oldDisplacementMapName = this.mesh.material.uniforms.displacementMap.value.roygbivTextureName;
     }
 
@@ -859,36 +859,8 @@ AddedObject.prototype.mapTexturePack = function(texturePack, fromScript){
 
   this.resetMaps();
 
-  if (texturePack.hasHeight){
-    if (!this.mesh.geometry.parameters.widthSegments || !this.mesh.geometry.parameters.heightSegments){
-      this.segmentGeometry(false, undefined);
-    }
-  }
-
-  if (this.mesh.geometry.parameters.widthSegments || this.mesh.geometry.parameters.heightSegments || this.mesh.geometry.parameters.depthSegments){
-    if (!texturePack.hasHeight){
-      this.deSegmentGeometry();
-    }
-  }
-
-  for (var addedObjectName in addedObjects){
-    var addedObject = addedObjects[addedObjectName];
-    if (addedObject.mesh.material.uuid == this.mesh.material.uuid && addedObject.name != this.name){
-      if (texturePack.hasHeight){
-        if (!addedObject.mesh.geometry.parameters.widthSegments || !addedObject.mesh.geometry.parameters.heightSegments){
-          addedObject.segmentGeometry(false, undefined);
-        }
-      }
-      if (addedObject.mesh.geometry.parameters.widthSegments || addedObject.mesh.geometry.parameters.heightSegments || addedObject.mesh.geometry.parameters.depthSegments){
-        if (!texturePack.hasHeight){
-          addedObject.deSegmentGeometry();
-        }
-      }
-    }
-  }
-
   if (texturePack.hasDiffuse){
-    this.mapDiffuse(texturePack.diffuseTexture.clone());
+    this.mapDiffuse(texturePack.diffuseTexture);
     if  (!fromScript){
       this.mesh.material.uniforms.diffuseMap.value.roygbivTexturePackName = texturePack.name;
       this.mesh.material.uniforms.diffuseMap.value.roygbivTextureName = 0;
@@ -904,7 +876,7 @@ AddedObject.prototype.mapTexturePack = function(texturePack, fromScript){
     this.mesh.material.uniforms.diffuseMap.value.needsUpdate = true;
   }
   if (texturePack.hasAlpha){
-    this.mapAlpha(texturePack.alphaTexture.clone());
+    this.mapAlpha(texturePack.alphaTexture);
     if (!fromScript){
       this.mesh.material.uniforms.alphaMap.value.roygbivTexturePackName = texturePack.name;
       this.mesh.material.uniforms.alphaMap.value.roygbivTextureName = 0;
@@ -912,7 +884,7 @@ AddedObject.prototype.mapTexturePack = function(texturePack, fromScript){
     this.mesh.material.uniforms.alphaMap.value.needsUpdate = true;
   }
   if (texturePack.hasAO){
-    this.mapAO(texturePack.aoTexture.clone());
+    this.mapAO(texturePack.aoTexture);
     if (!fromScript){
       this.mesh.material.uniforms.aoMap.value.roygbivTexturePackName = texturePack.name;
       this.mesh.material.uniforms.aoMap.value.roygbivTextureName = 0;
@@ -920,7 +892,7 @@ AddedObject.prototype.mapTexturePack = function(texturePack, fromScript){
     this.mesh.material.uniforms.aoMap.value.needsUpdate = true;
   }
   if (texturePack.hasEmissive){
-    this.mapEmissive(texturePack.emissiveTexture.clone());
+    this.mapEmissive(texturePack.emissiveTexture);
     if (!fromScript){
       this.mesh.material.uniforms.emissiveMap.value.roygbivTexturePackName = texturePack.name;
       this.mesh.material.uniforms.emissiveMap.value.roygbivTextureName = 0;
@@ -948,7 +920,7 @@ AddedObject.prototype.mapTexturePack = function(texturePack, fromScript){
     }
   }
   if (texturePack.hasHeight){
-    this.mapDisplacement(texturePack.heightTexture.clone());
+    this.mapDisplacement(texturePack.heightTexture);
     if (!fromScript){
       this.mesh.material.uniforms.displacementMap.value.roygbivTexturePackName = texturePack.name;
       this.mesh.material.uniforms.displacementMap.value.roygbivTextureName = 0;
@@ -976,45 +948,45 @@ AddedObject.prototype.resetTexturePackAfterAnimation = function(){
     );
   }
   if (this.oldMap){
-    var cloneMap = this.oldMap.clone();
+    var cloneMap = this.oldMap;
     cloneMap.needsUpdate = true;
     cloneMap.roygbivTextureName = this.oldMapName;
     this.oldMap = 0;
     this.mapDiffuse(cloneMap);
   }
   if (this.oldAoMap){
-    var cloneMap = this.oldAoMap.clone();
+    var cloneMap = this.oldAoMap;
     cloneMap.needsUpdate = true;
     cloneMap.roygbivTextureName = this.oldAoMapName;
     this.oldAoMap = 0;
     this.mapAO(cloneMap);
   }
   if (this.oldAlphaMap){
-    var cloneMap = this.oldAlphaMap.clone();
+    var cloneMap = this.oldAlphaMap;
     cloneMap.needsUpdate = true;
     cloneMap.roygbivTextureName = this.oldAlphaMapName;
     this.oldAlphaMap = 0;
     this.mapAlpha(cloneMap);
   }
   if (this.oldNormalMap){
-    this.material.normalMap = this.oldNormalMap.clone();
+    this.material.normalMap = this.oldNormalMap;
     this.material.normalMap.needsUpdate = true;
     this.material.normalMap.roygbivTextureName = this.oldNormalMapName;
   }
   if (this.oldSpecularMap){
-    this.material.specularMap = this.oldSpecularMap.clone();
+    this.material.specularMap = this.oldSpecularMap;
     this.material.specularMap.needsUpdate = true;
     this.material.specularMap.roygbivTextureName = this.oldSpecularMapName;
   }
   if (this.oldEmissiveMap){
-    var cloneMap = this.oldEmissiveMap.clone();
+    var cloneMap = this.oldEmissiveMap;
     cloneMap.needsUpdate = true;
     cloneMap.roygbivTextureName = this.oldEmissiveMapName;
     this.oldEmissiveMap = 0;
     this.mapEmissive(cloneMap);
   }
   if (this.oldDisplacementMap){
-    var cloneMap = this.oldDisplacementMap.clone();
+    var cloneMap = this.oldDisplacementMap;
     cloneMap.needsUpdate = true;
     cloneMap.roygbivTextureName = this.oldDisplacementMapName;
     this.oldDisplacementMap = 0;
@@ -1385,57 +1357,6 @@ AddedObject.prototype.segmentGeometry = function(isCustom, count, returnGeometry
     if (dispTexture && (dispTexture instanceof THREE.Texture)){
       this.applyDisplacementMap(dispTexture, manualDisplacementMap, manualDisplacementScale, manualDisplacementBias);
     }
-  }
-
-}
-
-AddedObject.prototype.deSegmentGeometry = function(){
-  var newGometry;
-  if (this.type == "surface"){
-    var width = this.metaData["width"];
-    var height = this.metaData["height"];
-    newGeometry = new THREE.PlaneBufferGeometry(Math.abs(width), Math.abs(height));
-  }else if (this.type == "ramp"){
-    var rampWidth = this.metaData["rampWidth"];
-    var rampHeight = this.metaData["rampHeight"];
-    newGeometry = new THREE.PlaneBufferGeometry(Math.abs(rampWidth), Math.abs(rampHeight));
-  }else if (this.type == "box"){
-    var boxSizeX = this.metaData["boxSizeX"];
-    var boxSizeY = this.metaData["boxSizeY"];
-    var boxSizeZ = this.metaData["boxSizeZ"];
-    newGeometry = new THREE.BoxBufferGeometry(Math.abs(boxSizeX), Math.abs(boxSizeY), Math.abs(boxSizeZ));
-  }else if (this.type == "sphere"){
-    var radius = this.metaData["radius"];
-    newGeometry = new THREE.SphereBufferGeometry(Math.abs(radius));
-  }
-
-  var newMesh = new THREE.Mesh(newGeometry, this.mesh.material);
-  newMesh.position.x = this.mesh.position.x;
-  newMesh.position.y = this.mesh.position.y;
-  newMesh.position.z = this.mesh.position.z;
-  newMesh.rotation.x = this.mesh.rotation.x;
-  newMesh.rotation.y = this.mesh.rotation.y;
-  newMesh.rotation.z = this.mesh.rotation.z;
-
-  scene.remove(this.mesh);
-  previewScene.remove(this.previewMesh);
-
-  this.mesh = newMesh;
-  this.previewMesh = newMesh.clone();
-
-  this.mesh.addedObject = this;
-  this.previewMesh.addedObject = this;
-
-  scene.add(this.mesh);
-  previewScene.add(this.previewMesh);
-
-  this.metaData["widthSegments"] = 1;
-  this.metaData["heightSegments"] = 1;
-  if (this.type == "box"){
-    this.metaData["depthSegments"] = 1;
-  }else if (this.type == "sphere"){
-    this.metaData["widthSegments"] = 8;
-    this.metaData["heightSegments"] = 6;
   }
 
 }

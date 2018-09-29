@@ -191,9 +191,6 @@ Grid.prototype.toggleSelect = function(sliced, printInfo, fromStateLoader, allAt
     }
     terminal.printInfo(info);
   }
-  if (!fromStateLoader && !allAtOnce){
-    undoRedoHandler.push();
-  }
 }
 
 Grid.prototype.showCornerPoints = function(){

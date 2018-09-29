@@ -553,9 +553,12 @@ var deprecatedCommandIndices = [
   39, //remakeGridSystem -> Deprecated due to architectural changes during development. Since grids are no longer destroyable, this command has no use case anymore.
   44, //mapEnvironment -> Deprecated due to lack of use cases of environment maps in the ROYGBIV engine. Will implement mirror materials for better visual effects.
   55, //newLambertMaterial -> Deprecated due to lack of uses cases. Phong is fine for light affected objects.
+  78, //undo -> Deprecated because causes memory issues for big projects.
+  79, //redo -> Deprecated because causes memory issues for big projects.
   89, //translateObject -> Deprecated due to architectural conflicts. Objects can only be translated using animations. Instead of translating the object in the design mode, a new grid system should be created at the specific position. Every object should be associated with certain grids.
   105, //printPerformance -> Deprecated because calling performance.now() multiple times on each render is costly.
   125, //applyDisplacementMap -> Deprecated because causes problems with geometry caching.
+  127 // setAtlasTextureSize -> Deprecated because has no use cases after deprecation of TextureMerger class
 ];
 
 if (commandInfo.length != commands.length){
@@ -740,7 +743,6 @@ var fpsCounterIntervalID;
 var gridCounter = 0;
 var MAX_GRIDS_ALLOWED = 1000000;
 var MIN_CELLSIZE_ALLOWED = 5;
-var undoRedoHandler = new UndoRedoHandler();
 var diffuseTextureCache = new Object();
 var heightTextureCache = new Object();
 var ambientOcculsionTextureCache = new Object();

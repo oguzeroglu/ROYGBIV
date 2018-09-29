@@ -64,7 +64,7 @@ window.onload = function() {
     plRep.position.x = pl.position.x;
     plPreviewScene.position.copy(pl.position);
   }).onFinishChange(function(val){
-    undoRedoHandler.push();
+
   }).listen();
   lightsOffsetYController = datGuiLights.add(lightsParameters, "Offset y").min(-50).max(50).step(0.1).onChange(function(val){
     var pl = lights[selectedLightName];
@@ -74,7 +74,7 @@ window.onload = function() {
     plRep.position.y = pl.position.y;
     plPreviewScene.position.copy(pl.position);
   }).onFinishChange(function(val){
-    undoRedoHandler.push();
+
   }).listen();
   lightsOffsetZController = datGuiLights.add(lightsParameters, "Offset z").min(-50).max(50).step(0.1).onChange(function(val){
     var pl = lights[selectedLightName];
@@ -84,7 +84,7 @@ window.onload = function() {
     plRep.position.z = pl.position.z;
     plPreviewScene.position.copy(pl.position);
   }).onFinishChange(function(val){
-    undoRedoHandler.push();
+
   }).listen();
   lightsIntensityController = datGuiLights.add(lightsParameters, "Intensity").min(0.0).max(1.0).step(0.01).onChange(function(val){
     var light = lights[selectedLightName];
@@ -92,7 +92,7 @@ window.onload = function() {
     light.intensity = val;
     lightPreviewScene.intensity = val;
   }).onFinishChange(function(val){
-    undoRedoHandler.push();
+
   }).listen();
 
   // DAT GUI OBJECT MANIPULATION
@@ -134,7 +134,7 @@ window.onload = function() {
     texture.initOffsetXSet = false;
     texture.updateMatrix();
   }).onFinishChange(function(value){
-    undoRedoHandler.push();
+
   }).listen();
   omTextureOffsetYController = datGuiObjectManipulation.add(objectManipulationParameters, "Texture offset y").min(-2).max(2).step(0.001).onChange(function(val){
     var texture = selectedAddedObject.mesh.material.uniforms.diffuseMap.value;
@@ -142,7 +142,7 @@ window.onload = function() {
     texture.initOffsetYSet = false;
     texture.updateMatrix();
   }).onFinishChange(function(value){
-    undoRedoHandler.push();
+
   }).listen();
   omOpacityController = datGuiObjectManipulation.add(objectManipulationParameters, "Opacity").min(0).max(1).step(0.01).onChange(function(val){
     if (selectedObjectGroup && !selectedAddedObject){
@@ -160,12 +160,12 @@ window.onload = function() {
       selectedAddedObject.initOpacity = selectedAddedObject.opacity;
     }
   }).onFinishChange(function(value){
-    undoRedoHandler.push();
+
   }).listen();
   omAOIntensityController = datGuiObjectManipulation.add(objectManipulationParameters, "AO intensity").min(0).max(10).step(0.1).onChange(function(val){
     selectedAddedObject.mesh.material.uniforms.aoIntensity.value = val;
   }).onFinishChange(function(value){
-    undoRedoHandler.push();
+
   }).listen();
   omShininessController = datGuiObjectManipulation.add(objectManipulationParameters, "Shininess").min(0).max(100).step(0.01).onChange(function(val){
     var material = selectedAddedObject.material;
@@ -175,7 +175,7 @@ window.onload = function() {
       selectedAddedObject.initShininessSet = false;
     }
   }).onFinishChange(function(value){
-    undoRedoHandler.push();
+
   }).listen();
   omEmissiveIntensityController = datGuiObjectManipulation.add(objectManipulationParameters, "Emissive int.").min(0).max(100).step(0.01).onChange(function(val){
     var material = selectedAddedObject.mesh.material;
@@ -183,19 +183,19 @@ window.onload = function() {
     selectedAddedObject.initEmissiveIntensitySet = false;
     selectedAddedObject.initEmissiveIntensity = val;
   }).onFinishChange(function(value){
-    undoRedoHandler.push();
+
   }).listen();
   omDisplacementScaleController = datGuiObjectManipulation.add(objectManipulationParameters, "Disp. scale").min(-50).max(50).step(0.1).onChange(function(val){
     selectedAddedObject.mesh.material.uniforms.displacementInfo.value.x = val;
     selectedAddedObject.initDisplacementScaleSet = false;
   }).onFinishChange(function(value){
-    undoRedoHandler.push();
+
   }).listen();
   omDisplacementBiasController = datGuiObjectManipulation.add(objectManipulationParameters, "Disp. bias").min(-50).max(50).step(0.1).onChange(function(val){
     selectedAddedObject.mesh.material.uniforms.displacementInfo.value.y = val;
     selectedAddedObject.initDisplacementBiasSet = false;
   }).onFinishChange(function(value){
-    undoRedoHandler.push();
+
   }).listen();
 
   function omGUIRotateEvent(axis, val){
@@ -493,7 +493,6 @@ window.onload = function() {
   render();
   fpsCounterIntervalID = setInterval(calculateFps, 1000);
   windowLoaded = true;
-  undoRedoHandler.push();
   MAX_VERTEX_UNIFORM_VECTORS = renderer.context.getParameter(renderer.context.MAX_VERTEX_UNIFORM_VECTORS);
   VERTEX_SHADER_TEXTURE_FETCH_SUPPORTED = (renderer.context.getParameter(renderer.context.MAX_VERTEX_TEXTURE_IMAGE_UNITS) > 0);
 };
@@ -596,14 +595,12 @@ window.addEventListener('keydown', function(event){
             terminal.clear();
             terminal.printInfo(Text.OBJECT_DESTROYED);
             selectedAddedObject = 0;
-            undoRedoHandler.push();
           }else if (selectedObjectGroup){
             delete objectGroups[selectedObjectGroup.name];
             selectedObjectGroup.destroy();
             selectedObjectGroup = 0;
             terminal.clear();
             terminal.printInfo(Text.OBJECT_DESTROYED);
-            undoRedoHandler.push();
           }
           afterObjectSelection();
         break;
