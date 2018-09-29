@@ -753,7 +753,6 @@ var specularTextureCache = new Object();
 var alphaTextureCache = new Object();
 var emissiveTextureCache = new Object();
 var skyboxCache = new Object();
-var textureCache = new Object();
 var manualDisplacementQueue = new Object();
 var CACHE_NOT_PRESENT = "CACHE_NOT_PRESENT";
 var objectSelectedByCommand = false;

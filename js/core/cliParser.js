@@ -950,7 +950,6 @@ function parse(input){
             texture.needsUpdate = true;
             textures[textureName] = texture;
             textureURLs[textureName] = fileName;
-            textureCache[textureName] = texture.clone();
             texture.isLoaded = true;
             texture.fromUploadedImage = true;
             terminal.printInfo(Text.TEXTURE_CREATED);
@@ -964,13 +963,12 @@ function parse(input){
             if (textureURLs[textureNameX] == textureUrl){
               if (textures[textureNameX] && textures[textureNameX].isLoaded){
                 found = true;
-                texture = textures[textureNameX].clone();
+                texture = textures[textureNameX];
                 texture.wrapS = THREE.RepeatWrapping;
                 texture.wrapT = THREE.RepeatWrapping;
                 texture.repeat.set( repeatU, repeatV );
                 texture.needsUpdate = true;
                 textures[textureName] = texture;
-                textureCache[textureName] = texture.clone();
                 texture.isLoaded = true;
               }
             }
@@ -991,19 +989,15 @@ function parse(input){
                 texture.repeat.set( repeatU, repeatV );
                 texture.isLoaded = true;
                 textures[textureName] = texture;
-                textureCache[textureName] = texture.clone();
               },
               function (xhr){
                 textures[textureName] = 2;
-                textureCache[textureName] = 2;
               },
               function (xhr){
                 textures[textureName] =  3;
-                textureCache[textureName] = 3;
               }
             );
             textures[textureName] = 1;
-            textureCache[textureName] = 1;
           }else{
             terminal.printInfo(Text.TEXTURE_CLONED);
           }
@@ -1120,7 +1114,7 @@ function parse(input){
             return true;
           }
 
-          var cloneTexture = texture.clone();
+          var cloneTexture = texture;
           cloneTexture.fromUploadedImage = texture.fromUploadedImage;
 
           cloneTexture.roygbivTextureName = textureName;
@@ -1747,7 +1741,7 @@ function parse(input){
             return true;
           }
 
-          var cloneTexture = texture.clone();
+          var cloneTexture = texture;
           cloneTexture.fromUploadedImage = texture.fromUploadedImage;
 
           cloneTexture.roygbivTextureName = textureName;
@@ -1801,7 +1795,7 @@ function parse(input){
             return true;
           }
 
-          var cloneTexture = texture.clone();
+          var cloneTexture = texture;
           cloneTexture.fromUploadedImage = texture.fromUploadedImage;
 
           cloneTexture.roygbivTextureName = textureName;
@@ -1849,7 +1843,7 @@ function parse(input){
             return true;
           }
 
-          var cloneTexture = texture.clone();
+          var cloneTexture = texture;
           cloneTexture.fromUploadedImage = texture.fromUploadedImage;
 
           cloneTexture.roygbivTextureName = textureName;
@@ -2054,7 +2048,7 @@ function parse(input){
             return true;
           }
 
-          var cloneTexture = texture.clone();
+          var cloneTexture = texture;
           cloneTexture.fromUploadedImage = texture.fromUploadedImage;
 
           cloneTexture.roygbivTextureName = textureName;
@@ -2105,7 +2099,7 @@ function parse(input){
             return true;
           }
 
-          var cloneTexture = texture.clone();
+          var cloneTexture = texture;
           cloneTexture.fromUploadedImage = texture.fromUploadedImage;
 
           cloneTexture.roygbivTextureName = textureName;
@@ -2327,7 +2321,7 @@ function parse(input){
             addedObject.segmentGeometry(false, undefined);
           }
 
-          var cloneTexture = texture.clone();
+          var cloneTexture = texture;
           cloneTexture.fromUploadedImage = texture.fromUploadedImage;
 
           cloneTexture.roygbivTextureName = textureName;
@@ -3851,7 +3845,6 @@ function parse(input){
           resizedTexture.isLoaded = texture.isLoaded;
           resizedTexture.fromUploadedImage = texture.fromUploadedImage;
           textures[newTextureName] = resizedTexture;
-          textureCache[newTextureName] = resizedTexture.clone();
           textureURLs[newTextureName] = textureURLs[textureName];
           modifiedTextures[newTextureName] = resizedTexture.image.toDataURL();
           terminal.printInfo(Text.TEXTURE_RESCALED);
@@ -4288,7 +4281,6 @@ function parse(input){
           newTexture.isLoaded = srcTexture.isLoaded;
           newTexture.fromUploadedImage = srcTexture.fromUploadedImage;
           textures[newTextureName] = newTexture;
-          textureCache[newTextureName] = newTexture.clone();
           textureURLs[newTextureName] = textureURLs[textureName];
           newTexture.paddingInfo = padding+","+srcWidth+","+srcHeight;
           newTexture.hasPadding = true;

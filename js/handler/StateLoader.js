@@ -536,7 +536,6 @@ StateLoader.prototype.load = function(undo){
         textures[textureName] = curTexture;
         this.totalLoadedTextureCount ++;
         this.createObjectGroupsAfterLoadedTextures();
-        textureCache[textureName] = curTexture;
         continue;
       }
       var offsetX = curTexture.offset[0];
@@ -559,7 +558,6 @@ StateLoader.prototype.load = function(undo){
           textures[this.textureNameX] = this.textureX;
           that.totalLoadedTextureCount ++;
           this.textureX.needsUpdate = true;
-          textureCache[this.textureNameX] = this.textureX;
           that.mapLoadedTexture(this.textureX, this.textureNameX);
           that.createObjectGroupsAfterLoadedTextures();
         }.bind({textureX: texture, textureNameX: textureName});
@@ -592,7 +590,6 @@ StateLoader.prototype.load = function(undo){
                 this.textureX.needsUpdate = true;
                 textures[this.textureNameX] = this.textureX;
                 that.totalLoadedTextureCount ++;
-                textureCache[this.textureNameX] = this.textureX;
                 that.mapLoadedTexture(this.textureX, this.textureNameX);
                 that.createObjectGroupsAfterLoadedTextures();
               }.bind({textureX: texture, textureNameX: textureName})
@@ -603,7 +600,6 @@ StateLoader.prototype.load = function(undo){
         if (!skip){
           textures[textureName] = texture;
           that.totalLoadedTextureCount ++;
-          textureCache[textureName] = texture;
           texture.needsUpdate = true;
           this.mapLoadedTexture(texture, textureName);
           this.createObjectGroupsAfterLoadedTextures();
@@ -615,7 +611,6 @@ StateLoader.prototype.load = function(undo){
           this.loaders[textureName] = textureLoader;
         }
         textures[textureName] = 1;
-        textureCache[textureName] = 1;
         var that = this;
         this.loaders[textureName].load(textureURL,
           function(textureData){
@@ -639,14 +634,11 @@ StateLoader.prototype.load = function(undo){
             textures[textureNameX].repeat.set(this.repeatUU, this.repeatVV);
             textures[textureNameX].offset.x = this.offsetXX;
             textures[textureNameX].offset.y = this.offsetYY;
-            textureCache[textureNameX] = textureData;
             that.mapLoadedTexture(textures[textureNameX], textureNameX);
             that.createObjectGroupsAfterLoadedTextures();
           }.bind({textureNameX: textureName, offsetXX: offsetX, offsetYY: offsetY, repeatUU: repeatU, repeatVV: repeatV}), function(xhr){
-            textureCache[this.textureNameX] = 2;
             textures[this.textureNameX] = 2;
           }.bind({textureNameX: textureName}), function(xhr){
-            textureCache[this.textureNameX] = 3;
             textures[this.textureNameX] = 3;
             that.totalLoadedTextureCount ++;
             that.createObjectGroupsAfterLoadedTextures();
