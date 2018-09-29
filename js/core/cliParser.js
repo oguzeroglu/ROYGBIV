@@ -4511,50 +4511,7 @@ function parse(input){
           return true;
         break;
         case 125: //applyDisplacementMap
-          if (mode != 0){
-            terminal.printError(Text.WORKS_ONLY_IN_DESIGN_MODE);
-            return true;
-          }
-          var objName = splitted[1];
-          if (!(objName.indexOf("*") == -1)){
-            new JobHandler(splitted).handle();
-            return true;
-          }
-          var txtName = splitted[2];
-          var scale = parseFloat(splitted[3]);
-          var bias = parseFloat(splitted[4]);
-          var obj = addedObjects[objName];
-          if (!obj){
-            if (objectGroups[objName]){
-              terminal.printError(Text.GLUED_OBJECTS_DO_NOT_SUPPORT_THIS_FUNCTION);
-              return true;
-            }
-            terminal.printError(Text.NO_SUCH_OBJECT);
-            return true;
-          }
-          var dispTexture = textures[txtName];
-          if (typeof dispTexture == UNDEFINED){
-            terminal.printError(Text.NO_SUCH_TEXTURE);
-            return true;
-          }
-          if (!(dispTexture instanceof THREE.Texture)){
-            terminal.printError(Text.TEXTURE_NOT_READY);
-            return true;
-          }
-          if (isNaN(scale)){
-            terminal.printError(Text.IS_NOT_A_NUMBER.replace(Text.PARAM1, "scale"));
-            return true;
-          }
-          if (isNaN(bias)){
-            terminal.printError(Text.IS_NOT_A_NUMBER.replace(Text.PARAM1, "bias"));
-            return true;
-          }
-          obj.applyDisplacementMap(dispTexture, txtName, scale, bias);
-          if (!jobHandlerWorking){
-            terminal.printInfo(Text.DISPLACEMENT_MAP_APPLIED);
-            undoRedoHandler.push();
-          }
-          return true;
+          // DEPRECATED
         break;
         case 126: //setSlipperiness
           if (mode != 0){

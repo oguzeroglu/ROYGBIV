@@ -5,13 +5,17 @@ attribute float alpha;
 attribute float emissiveIntensity;
 attribute float aoIntensity;
 attribute vec3 position;
+attribute vec3 normal;
 attribute vec3 color;
 attribute vec2 uv;
+attribute vec2 displacementInfo;
 attribute vec4 textureInfo;
 
 uniform mat3 textureMatrix;
 uniform mat4 projectionMatrix;
 uniform mat4 modelViewMatrix;
+
+uniform sampler2D displacementMap;
 
 varying float vAlpha;
 varying float vEmissiveIntensity;
@@ -49,5 +53,11 @@ void main(){
     hasAOMap = 10.0;
   }
 
-  gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+  vec3 transformedPosition = position;
+  if (displacementInfo.x > -60.0 && displacementInfo.y > -60.0){
+    vec3 objNormal = normalize(normal);
+    transformedPosition += objNormal * (texture2D(displacementMap, vUV).r * displacementInfo.x + displacementInfo.y);
+  }
+
+  gl_Position = projectionMatrix * modelViewMatrix * vec4(transformedPosition, 1.0);
 }

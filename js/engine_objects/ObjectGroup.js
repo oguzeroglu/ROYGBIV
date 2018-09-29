@@ -50,6 +50,9 @@ ObjectGroup.prototype.textureCompare = function(txt1, txt2){
   if (txt1.roygbivTextureName != txt2.roygbivTextureName){
     return false;
   }
+  if (txt1.roygbivTexturePackName != txt2.roygbivTexturePackName){
+    return false;
+  }
   if (txt1.offset.x != txt2.offset.x || txt1.offset.y != txt2.offset.y){
     return false;
   }
@@ -128,33 +131,21 @@ ObjectGroup.prototype.handleTextures = function(){
         }
       }
     }
-  }
-}
-
-ObjectGroup.prototype.handleDisplacement = function(normalGeometry, childObj){
-  if (!childObj.hasDisplacementMap()){
-    return;
-  }
-  var displacementTexture = childObj.mesh.material.uniforms.displacementMap.value;
-  var scale = childObj.mesh.material.uniforms.displacementInfo.value.x;
-  var bias = childObj.mesh.material.uniforms.displacementInfo.value.y;
-  if (childObj.hasDiffuseMap()){
-    var offsetX = childObj.mesh.material.uniforms.diffuseMap.value.offset.x;
-    var offsetY = childObj.mesh.material.uniforms.diffuseMap.value.offset.y;
-    while (offsetX < 0){
-      offsetX += 100;
+    if (obj.hasDisplacementMap()){
+      var txt = obj.mesh.material.uniforms.displacementMap.value;
+      if (!this.displacementTexture){
+        this.displacementTexture = txt;
+        if (!this.textureMatrix){
+          this.textureMatrix = txt.matrix;
+        }
+      }else{
+        if (!this.textureCompare(this.displacementTexture, txt)){
+          throw new Error("Cannot merge objects with different texture properties.");
+          return;
+        }
+      }
     }
-    while (offsetY < 0){
-      offsetY += 100;
-    }
-    offsetX = offsetX - Math.floor(offsetX);
-    offsetY = offsetY - Math.floor(offsetY);
-    displacementTexture.offset.set(offsetX, offsetY);
   }
-  displacementTexture.updateMatrix();
-  new DisplacementCalculator().applyDisplacementMapToNormalGeometry(
-    normalGeometry, displacementTexture, scale, bias
-  );
 }
 
 ObjectGroup.prototype.merge = function(){
@@ -171,7 +162,6 @@ ObjectGroup.prototype.merge = function(){
   for (var childName in this.group){
     var childObj = this.group[childName];
     var childGeom = childObj.getNormalGeometry();
-    this.handleDisplacement(childGeom, childObj);
     miMap[mi] = childObj.name;
     for (var i = 0; i<childGeom.faces.length; i++){
       childGeom.faces[i].materialIndex = mi;
@@ -205,11 +195,13 @@ ObjectGroup.prototype.merge = function(){
   var vertices = pseudoGeometry.vertices;
   var faceVertexUVs = pseudoGeometry.faceVertexUvs[0];
   var positions = new Array((max + 1) * 3);
+  var normals = new Array((max + 1) * 3);
   var colors = new Array((max + 1) * 3);
   var uvs = new Array((max + 1) * 2);
   var alphas = new Array(max + 1);
   var emissiveIntensities = new Array(max + 1);
   var aoIntensities = new Array(max + 1);
+  var displacementInfos = new Array((max + 1) * 2);
   var textureInfos = new Array((max + 1) * 4);
   for (var i = 0; i<faces.length; i++){
     var face = faces[i];
@@ -247,6 +239,7 @@ ObjectGroup.prototype.merge = function(){
     var vertex1 = vertices[a];
     var vertex2 = vertices[b];
     var vertex3 = vertices[c];
+    var normal = face.normal;
     var color = addedObject.material.color;
     var uv1 = faceVertexUVs[i][0];
     var uv2 = faceVertexUVs[i][1];
@@ -266,6 +259,21 @@ ObjectGroup.prototype.merge = function(){
       positions[3 * c] = vertex3.x;
       positions[(3 * c)+1] = vertex3.y;
       positions[(3 * c)+2] = vertex3.z;
+    }
+    if (!aSkipped){
+      normals[3 * a] = normal.x;
+      normals[(3 * a) + 1] = normal.y;
+      normals[(3 * a) + 2] = normal.z;
+    }
+    if (!bSkipped){
+      normals[3 * b] = normal.x;
+      normals[(3 * b) + 1] = normal.y;
+      normals[(3 * b) + 2] = normal.z;
+    }
+    if (!cSkipped){
+      normals[3 * c] = normal.x;
+      normals[(3 * c) + 1] = normal.y;
+      normals[(3 * c) + 2] = normal.z;
     }
     // COLORS
     if (!aSkipped){
@@ -295,6 +303,34 @@ ObjectGroup.prototype.merge = function(){
     if (!cSkipped){
       uvs[2 * c] = uv3.x;
       uvs[(2 * c) + 1] = uv3.y;
+    }
+    // DISPLACEMENT INFOS
+    if (!aSkipped){
+      if (addedObject.hasDisplacementMap()){
+        displacementInfos[2 * a] = addedObject.mesh.material.uniforms.displacementInfo.value.x;
+        displacementInfos[(2 * a) + 1] = addedObject.mesh.material.uniforms.displacementInfo.value.y;
+      }else{
+        displacementInfos[2 * a] = -100;
+        displacementInfos[(2 * a) + 1] = -100;
+      }
+    }
+    if (!bSkipped){
+      if (addedObject.hasDisplacementMap()){
+        displacementInfos[2 * b] = addedObject.mesh.material.uniforms.displacementInfo.value.x;
+        displacementInfos[(2 * b) + 1] = addedObject.mesh.material.uniforms.displacementInfo.value.y;
+      }else{
+        displacementInfos[2 * b] = -100;
+        displacementInfos[(2 * b) + 1] = -100;
+      }
+    }
+    if (!cSkipped){
+      if (addedObject.hasDisplacementMap()){
+        displacementInfos[2 * c] = addedObject.mesh.material.uniforms.displacementInfo.value.x;
+        displacementInfos[(2 * c) + 1] = addedObject.mesh.material.uniforms.displacementInfo.value.y;
+      }else{
+        displacementInfos[2 * c] = -100;
+        displacementInfos[(2 * c) + 1] = -100;
+      }
     }
     // ALPHA
     var alpha = addedObject.mesh.material.uniforms.alpha.value;
@@ -400,8 +436,10 @@ ObjectGroup.prototype.merge = function(){
 
   var indicesTypedArray = new Uint16Array(indices);
   var positionsTypedArray = new Float32Array(positions);
+  var normalsTypedArray = new Float32Array(normals);
   var colorsTypedArray = new Float32Array(colors);
   var uvsTypedArray = new Float32Array(uvs);
+  var displacementInfosTypedArray = new Float32Array(displacementInfos);
   var alphasTypedArray = new Float32Array(alphas);
   var emissiveIntensitiesTypedArray = new Float32Array(emissiveIntensities);
   var aoIntensitiesTypedArray = new Float32Array(aoIntensities);
@@ -409,24 +447,30 @@ ObjectGroup.prototype.merge = function(){
 
   var indicesBufferAttribute = new THREE.BufferAttribute(indicesTypedArray, 1);
   var positionsBufferAttribute = new THREE.BufferAttribute(positionsTypedArray, 3);
+  var normalsBufferAttribute = new THREE.BufferAttribute(normalsTypedArray, 3);
   var colorsBufferAttribute = new THREE.BufferAttribute(colorsTypedArray, 3);
   var uvsBufferAttribute = new THREE.BufferAttribute(uvsTypedArray, 2);
+  var displacementInfosBufferAttribute = new THREE.BufferAttribute(displacementInfosTypedArray, 2);
   var alphasBufferAttribute = new THREE.BufferAttribute(alphasTypedArray, 1);
   var emissiveIntensitiesBufferAttribute = new THREE.BufferAttribute(emissiveIntensitiesTypedArray, 1);
   var aoIntensitiesBufferAttribute = new THREE.BufferAttribute(aoIntensitiesTypedArray, 1);
   var textureInfosBufferAttribute = new THREE.BufferAttribute(textureInfosTypedArray, 4);
   indicesBufferAttribute.setDynamic(false);
   positionsBufferAttribute.setDynamic(false);
+  normalsBufferAttribute.setDynamic(false);
   colorsBufferAttribute.setDynamic(false);
   uvsBufferAttribute.setDynamic(false);
+  displacementInfosBufferAttribute.setDynamic(false);
   alphasBufferAttribute.setDynamic(false);
   emissiveIntensitiesBufferAttribute.setDynamic(false);
   aoIntensitiesBufferAttribute.setDynamic(false);
   textureInfosBufferAttribute.setDynamic(false);
   this.geometry.setIndex(indicesBufferAttribute);
   this.geometry.addAttribute('position', positionsBufferAttribute);
+  this.geometry.addAttribute('normal', normalsBufferAttribute);
   this.geometry.addAttribute('color', colorsBufferAttribute);
   this.geometry.addAttribute('uv', uvsBufferAttribute);
+  this.geometry.addAttribute('displacementInfo', displacementInfosBufferAttribute);
   this.geometry.addAttribute('alpha', alphasBufferAttribute);
   this.geometry.addAttribute('emissiveIntensity', emissiveIntensitiesBufferAttribute);
   this.geometry.addAttribute('aoIntensity', aoIntensitiesBufferAttribute);

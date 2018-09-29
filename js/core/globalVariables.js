@@ -554,7 +554,8 @@ var deprecatedCommandIndices = [
   44, //mapEnvironment -> Deprecated due to lack of use cases of environment maps in the ROYGBIV engine. Will implement mirror materials for better visual effects.
   55, //newLambertMaterial -> Deprecated due to lack of uses cases. Phong is fine for light affected objects.
   89, //translateObject -> Deprecated due to architectural conflicts. Objects can only be translated using animations. Instead of translating the object in the design mode, a new grid system should be created at the specific position. Every object should be associated with certain grids.
-  105 //printPerformance -> Deprecated because calling performance.now() multiple times on each render is costly.
+  105, //printPerformance -> Deprecated because calling performance.now() multiple times on each render is costly.
+  125, //applyDisplacementMap -> Deprecated because causes problems with geometry caching.
 ];
 
 if (commandInfo.length != commands.length){

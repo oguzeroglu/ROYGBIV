@@ -14,6 +14,7 @@ MeshGenerator.prototype.generateMergedMesh = function(graphicsGroup, objectGroup
   var emissiveTexture = objectGroup.emissiveTexture;
   var alphaTexture = objectGroup.alphaTexture;
   var aoTexture = objectGroup.aoTexture;
+  var displacementTexture = objectGroup.displacementTexture;
   var textureMatrix = objectGroup.textureMatrix;
   if (!diffuseTexture){
     diffuseTexture = new THREE.Texture();
@@ -26,6 +27,9 @@ MeshGenerator.prototype.generateMergedMesh = function(graphicsGroup, objectGroup
   }
   if (!aoTexture){
     aoTexture = new THREE.Texture();
+  }
+  if (!displacementTexture){
+    displacementTexture = new THREE.Texture();
   }
   if (!textureMatrix){
     textureMatrix = new THREE.Matrix3();
@@ -43,6 +47,7 @@ MeshGenerator.prototype.generateMergedMesh = function(graphicsGroup, objectGroup
       emissiveMap: new THREE.Uniform(emissiveTexture),
       alphaMap: new THREE.Uniform(alphaTexture),
       aoMap: new THREE.Uniform(aoTexture),
+      displacementMap: new THREE.Uniform(displacementTexture),
       textureMatrix: new THREE.Uniform(textureMatrix),
       fogInfo: GLOBAL_FOG_UNIFORM
     }
