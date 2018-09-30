@@ -223,6 +223,17 @@ AddedObject.prototype.export = function(){
   return exportObject;
 }
 
+AddedObject.prototype.handleRenderSide = function(val){
+  this.metaData["renderSide"] = val;
+  if (val == 0){
+    this.mesh.material.side = THREE.DoubleSide;
+  }else if (val == 1){
+    this.mesh.material.side = THREE.FrontSide;
+  }else if (val == 2){
+    this.mesh.material.side = THREE.BackSide;
+  }
+}
+
 AddedObject.prototype.isSlicable = function(){
   if (this.type != "surface"){
     return false;

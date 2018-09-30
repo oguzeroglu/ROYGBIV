@@ -16,6 +16,17 @@ var ObjectGroup = function(name, group){
 
 }
 
+ObjectGroup.prototype.handleRenderSide = function(val){
+  this.renderSide = val;
+  if (val == 0){
+    this.mesh.material.side = THREE.DoubleSide;
+  }else if (val == 1){
+    this.mesh.material.side = THREE.FrontSide;
+  }else if (val == 2){
+    this.mesh.material.side = THREE.BackSide;
+  }
+}
+
 ObjectGroup.prototype.handleAtlasSize = function(texture){
   if (!projectAtlasSize.width || ! projectAtlasSize.height){
     return texture;
@@ -911,6 +922,10 @@ ObjectGroup.prototype.export = function(){
     exportObj.blendingMode = this.blendingMode;
   }else{
     exportObj.blendingMode = "NORMAL_BLENDING";
+  }
+
+  if (this.renderSide){
+    exportObj.renderSide = this.renderSide;
   }
 
   return exportObj;

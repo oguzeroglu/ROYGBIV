@@ -515,6 +515,9 @@ StateLoader.prototype.load = function(undo){
        if (addedObjectInstance.metaData.slicedType){
          addedObjectInstance.sliceSurfaceInHalf(addedObjectInstance.metaData.slicedType);
        }
+       if (addedObjectInstance.metaData.renderSide){
+         addedObjectInstance.handleRenderSide(addedObjectInstance.metaData.renderSide);
+       }
 
     }
     // TEXTURE URLS ************************************************
@@ -1073,6 +1076,10 @@ StateLoader.prototype.createObjectGroupsAfterLoadedTextures = function(){
       objectGroupInstance.setBlending(MULTIPLY_BLENDING);
     }else if (curObjectGroupExport.blending == "NORMAL_BLENDING"){
       objectGroupInstance.setBlending(NORMAL_BLENDING);
+    }
+
+    if (curObjectGroupExport.renderSide){
+      objectGroupInstance.handleRenderSide(curObjectGroupExport.renderSide);
     }
 
   }

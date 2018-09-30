@@ -128,6 +128,21 @@ window.onload = function() {
       parseCommand("setSlipperiness "+obj.name+" off");
     }
   }).listen();
+  omSideController = datGuiObjectManipulation.add(objectManipulationParameters, "Side", [
+    "Both", "Front", "Back"
+  ]).onChange(function(val){
+    var pseudoVal = 0;
+    if (val == "Front"){
+      pseudoVal = 1;
+    }else if (val == "Back"){
+      pseudoVal = 2;
+    }
+    if (selectedAddedObject){
+      selectedAddedObject.handleRenderSide(pseudoVal);
+    }else if (selectedObjectGroup){
+      selectedObjectGroup.handleRenderSide(pseudoVal);
+    }
+  }).listen();
   omHideHalfController = datGuiObjectManipulation.add(objectManipulationParameters, "Hide half", [
     "None", "Part 1", "Part 2", "Part 3", "Part 4"
   ]).onChange(function(val){
@@ -919,6 +934,7 @@ function enableAllOMControllers(){
   enableController(omDisplacementBiasController);
   enableController(omAOIntensityController);
   enableController(omHideHalfController);
+  enableController(omSideController);
 }
 
 function afterLightSelection(){
@@ -1009,6 +1025,14 @@ function afterObjectSelection(){
           objectManipulationParameters["Hide half"] = "None";
         }
       }
+      objectManipulationParameters["Side"] = "Both";
+      if (obj.metaData.renderSide){
+        if (obj.metaData.renderSide == 1){
+          objectManipulationParameters["Side"] = "Front";
+        }else if (obj.metaData.renderSide == 2){
+          objectManipulationParameters["Side"] = "Back";
+        }
+      }
     }else if (obj instanceof ObjectGroup){
       objectManipulationParameters["Rotate x"] = 0;
       objectManipulationParameters["Rotate y"] = 0;
@@ -1026,6 +1050,15 @@ function afterObjectSelection(){
       disableController(omDisplacementBiasController);
       disableController(omAOIntensityController);
       disableController(omOpacityController);
+      
+      objectManipulationParameters["Side"] = "Both";
+      if (obj.renderSide){
+        if (obj.renderSide == 1){
+          objectManipulationParameters["Side"] = "Front";
+        }else if (obj.renderSide == 2){
+          objectManipulationParameters["Side"] = "Back";
+        }
+      }
     }
     objectManipulationParameters["Mass"] = obj.physicsBody.mass;
     omMassController.updateDisplay();
