@@ -17,25 +17,35 @@ MeshGenerator.prototype.generateMergedMesh = function(graphicsGroup, objectGroup
   var displacementTexture = objectGroup.displacementTexture;
   var textureMatrix = objectGroup.textureMatrix;
   if (!diffuseTexture){
-    diffuseTexture = new THREE.Texture();
+    diffuseTexture = nullTexture;
   }
   if (!emissiveTexture){
-    emissiveTexture = new THREE.Texture();
+    emissiveTexture = nullTexture;
   }
   if (!alphaTexture){
-    alphaTexture = new THREE.Texture();
+    alphaTexture = nullTexture;
   }
   if (!aoTexture){
-    aoTexture = new THREE.Texture();
+    aoTexture = nullTexture;
   }
   if (!displacementTexture){
-    displacementTexture = new THREE.Texture();
+    displacementTexture = nullTexture;
   }
   if (!textureMatrix){
     textureMatrix = new THREE.Matrix3();
   }
+
+  var vertexShader = ShaderContent.mergedBasicMaterialVertexShader;
+  if (!VERTEX_SHADER_TEXTURE_FETCH_SUPPORTED){
+    vertexShader = vertexShader.replace(
+      "vec3 objNormal = normalize(normal);", ""
+    ).replace(
+      "transformedPosition += objNormal * (texture2D(displacementMap, vUV).r * displacementInfo.x + displacementInfo.y);", ""
+    );
+  }
+
   var material = new THREE.RawShaderMaterial({
-    vertexShader: ShaderContent.mergedBasicMaterialVertexShader,
+    vertexShader: vertexShader,
     fragmentShader: ShaderContent.mergedBasicMaterialFragmentShader,
     vertexColors: THREE.VertexColors,
     transparent: true,
@@ -89,11 +99,11 @@ MeshGenerator.prototype.generateBasicMesh = function(){
       displacementInfo: new THREE.Uniform(new THREE.Vector2()),
       textureFlags: new THREE.Uniform(textureFlags),
       textureFlags2: new THREE.Uniform(textureFlags2),
-      diffuseMap: new THREE.Uniform(new THREE.Texture()),
-      alphaMap: new THREE.Uniform(new THREE.Texture()),
-      aoMap: new THREE.Uniform(new THREE.Texture()),
-      displacementMap: new THREE.Uniform(new THREE.Texture()),
-      emissiveMap: new THREE.Uniform(new THREE.Texture()),
+      diffuseMap: new THREE.Uniform(nullTexture),
+      alphaMap: new THREE.Uniform(nullTexture),
+      aoMap: new THREE.Uniform(nullTexture),
+      displacementMap: new THREE.Uniform(nullTexture),
+      emissiveMap: new THREE.Uniform(nullTexture),
       textureMatrix: new THREE.Uniform(new THREE.Matrix3())
     }
   });

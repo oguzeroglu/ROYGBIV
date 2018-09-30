@@ -526,6 +526,7 @@ window.onload = function() {
   windowLoaded = true;
   MAX_VERTEX_UNIFORM_VECTORS = renderer.context.getParameter(renderer.context.MAX_VERTEX_UNIFORM_VECTORS);
   VERTEX_SHADER_TEXTURE_FETCH_SUPPORTED = (renderer.context.getParameter(renderer.context.MAX_VERTEX_TEXTURE_IMAGE_UNITS) > 0);
+  DDS_SUPPORTED = (!(renderer.context.getExtension("WEBGL_compressed_texture_s3tc") == null));
 };
 
 window.addEventListener("mousedown", function(e){
@@ -1050,7 +1051,7 @@ function afterObjectSelection(){
       disableController(omDisplacementBiasController);
       disableController(omAOIntensityController);
       disableController(omOpacityController);
-      
+
       objectManipulationParameters["Side"] = "Both";
       if (obj.renderSide){
         if (obj.renderSide == 1){
