@@ -128,6 +128,21 @@ window.onload = function() {
       parseCommand("setSlipperiness "+obj.name+" off");
     }
   }).listen();
+  omHideHalfController = datGuiObjectManipulation.add(objectManipulationParameters, "Hide half", [
+    "None", "Part 1", "Part 2", "Part 3", "Part 4"
+  ]).onChange(function(val){
+    if (val == "None"){
+      selectedAddedObject.sliceSurfaceInHalf(4);
+    }else if (val == "Part 1"){
+      selectedAddedObject.sliceSurfaceInHalf(0);
+    }else if (val == "Part 2"){
+      selectedAddedObject.sliceSurfaceInHalf(1);
+    }else if (val == "Part 3"){
+      selectedAddedObject.sliceSurfaceInHalf(2);
+    }else if (val == "Part 4"){
+      selectedAddedObject.sliceSurfaceInHalf(3);
+    }
+  }).listen();
   omTextureOffsetXController = datGuiObjectManipulation.add(objectManipulationParameters, "Texture offset x").min(-2).max(2).step(0.001).onChange(function(val){
     var texture = selectedAddedObject.mesh.material.uniforms.diffuseMap.value;
     texture.offset.x = val;
@@ -301,6 +316,7 @@ window.onload = function() {
   // 3D CANVAS
   canvas = document.getElementById("rendererCanvas");
   canvas.addEventListener("click", function(event){
+    mouseDown = 0;
     cliFocused = false;
     omGUIFocused = false;
     lightsGUIFocused = false;
@@ -902,6 +918,7 @@ function enableAllOMControllers(){
   enableController(omDisplacementScaleController);
   enableController(omDisplacementBiasController);
   enableController(omAOIntensityController);
+  enableController(omHideHalfController);
 }
 
 function afterLightSelection(){
@@ -981,6 +998,16 @@ function afterObjectSelection(){
       }else{
         objectManipulationParameters["Shininess"] = obj.material.shininess;
         objectManipulationParameters["Emissive int."] = obj.material.emissiveIntensity;
+      }
+      if (!obj.isSlicable()){
+        objectManipulationParameters["Hide half"] = "None";
+        disableController(omHideHalfController);
+      }else{
+        if (obj.metaData.slicedType){
+          objectManipulationParameters["Hide half"] = "Part "+(obj.metaData.slicedType + 1)
+        }else{
+          objectManipulationParameters["Hide half"] = "None";
+        }
       }
     }else if (obj instanceof ObjectGroup){
       objectManipulationParameters["Rotate x"] = 0;

@@ -223,6 +223,86 @@ AddedObject.prototype.export = function(){
   return exportObject;
 }
 
+AddedObject.prototype.isSlicable = function(){
+  if (this.type != "surface"){
+    return false;
+  }
+  if (this.metaData.widthSegments == 1 && this.metaData.heightSegments == 1){
+    return true;
+  }
+  return false;
+}
+
+AddedObject.prototype.sliceSurfaceInHalf = function(type){
+  var geomKey = (
+    "PlaneBufferGeometry" + PIPE +
+    this.metaData.width + PIPE + this.metaData.height + PIPE +
+    this.metaData.widthSegments + PIPE + this.metaData.heightSegments
+  );
+  var originalGeometry = geometryCache[geomKey];
+  var normals = [], positions = [], uvs = [0, 0, 1, 1, 0, 1];
+  var subIndices;
+  var indices = originalGeometry.index.array;
+  if (type == 0){
+    subIndices = [indices[0], indices[1], indices[2]];
+  }else if (type == 1){
+    subIndices = [indices[3], indices[4], indices[5]];
+  }else if (type == 2){
+    subIndices = [indices[1], indices[4], indices[0]];
+  }else if (type == 3){
+    subIndices = [indices[2], indices[4], indices[0]]
+  }
+
+  var newGeometry;
+
+  if (type == 0 || type == 1 || type == 2 || type == 3){
+    this.metaData.slicedType = type;
+    for (var i = 0; i<subIndices.length; i++){
+      for (var i2 = 0; i2<3; i2++){
+        positions.push(originalGeometry.attributes.position.array[
+          (3 * subIndices[i]) + i2
+        ]);
+        normals.push(originalGeometry.attributes.normal.array[
+          (3 * subIndices[i]) + i2
+        ]);
+        //uvs.push(originalGeometry.attributes.uv.array[
+        //  (2 * subIndices[i]) + i2
+        //]);
+      }
+    }
+
+    var newGeometryKey = (
+      "SlicedPlaneBufferGeometry" + PIPE +
+      this.metaData.width + PIPE + this.metaData.height + PIPE + type
+    );
+    newGeometry = geometryCache[newGeometryKey];
+    if (!newGeometry){
+      newGeometry = new THREE.BufferGeometry();
+      newGeometry.addAttribute("position", new THREE.BufferAttribute(new Float32Array(positions), 3));
+      newGeometry.addAttribute("normal", new THREE.BufferAttribute(new Float32Array(normals), 3));
+      newGeometry.addAttribute("uv", new THREE.BufferAttribute(new Float32Array(uvs), 2));
+      geometryCache[newGeometryKey] = newGeometry;
+    }
+  }else{
+    delete this.metaData.slicedType;
+    newGeometry = originalGeometry;
+  }
+  scene.remove(this.mesh);
+  previewScene.remove(this.previewMesh);
+  var newMesh = new THREE.Mesh(newGeometry, this.mesh.material);
+  var newPreviewMesh = new THREE.Mesh(newGeometry, this.mesh.material);
+  newMesh.position.copy(this.mesh.position);
+  newMesh.quaternion.copy(this.mesh.quaternion);
+  newPreviewMesh.position.copy(this.previewMesh.position);
+  newPreviewMesh.quaternion.copy(this.previewMesh.quaternion);
+  newMesh.addedObject = this;
+  newPreviewMesh.addedObject = this;
+  this.mesh = newMesh;
+  this.previewMesh = newPreviewMesh;
+  scene.add(this.mesh);
+  previewScene.add(this.previewMesh);
+}
+
 AddedObject.prototype.syncProperties = function(refObject){
   // TEXTURE OFFSETS
   if (refObject.hasDiffuseMap() && this.hasDiffuseMap()){

@@ -512,6 +512,10 @@ StateLoader.prototype.load = function(undo){
       addedObjectInstance.rotationY = curAddedObjectExport.rotationY;
       addedObjectInstance.rotationZ = curAddedObjectExport.rotationZ;
 
+       if (addedObjectInstance.metaData.slicedType){
+         addedObjectInstance.sliceSurfaceInHalf(addedObjectInstance.metaData.slicedType);
+       }
+
     }
     // TEXTURE URLS ************************************************
     textureURLs = Object.assign({}, obj.textureURLs);
@@ -2256,6 +2260,8 @@ StateLoader.prototype.resetProject = function(undo){
 
   LIMIT_BOUNDING_BOX = new THREE.Box3(new THREE.Vector3(-4000, -4000, -4000), new THREE.Vector3(4000, 4000, 4000));
   BIN_SIZE = 50;
+
+  geometryCache = new Object();
 
   previewSceneRendered = false;
 

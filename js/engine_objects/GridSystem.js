@@ -181,13 +181,31 @@ GridSystem.prototype.draw = function(){
 
   var boundingPlaneGeometry;
   if (this.axis == "XZ" || this.axis == "XY"){
-    boundingPlaneGeometry = new THREE.PlaneBufferGeometry(
-      this.sizeX, this.sizeZ
+    var geomKey = (
+      "PlaneBufferGeometry" + PIPE +
+      this.sizeX + PIPE + this.sizeZ + PIPE +
+      "1" + PIPE + "1"
     );
+    boundingPlaneGeometry = geometryCache[geomKey];
+    if (!boundingPlaneGeometry){
+      boundingPlaneGeometry = new THREE.PlaneBufferGeometry(
+        this.sizeX, this.sizeZ
+      );
+      geometryCache[geomKey] = boundingPlaneGeometry;
+    }
   }else if (this.axis == "YZ"){
-    boundingPlaneGeometry = new THREE.PlaneBufferGeometry(
-      this.sizeZ, this.sizeX
+    var geomKey = (
+      "PlaneBufferGeometry" + PIPE +
+      this.sizeZ + PIPE + this.sizeX + PIPE +
+      "1" + PIPE + "1"
     );
+    boundingPlaneGeometry = geometryCache[geomKey];
+    if (!boundingPlaneGeometry){
+      boundingPlaneGeometry = new THREE.PlaneBufferGeometry(
+        this.sizeZ, this.sizeX
+      );
+      geometryCache[geomKey] = boundingPlaneGeometry;
+    }
   }
 
   var boundingPlaneMaterial = new THREE.MeshBasicMaterial({
@@ -465,7 +483,7 @@ GridSystem.prototype.newSurface = function(name, grid1, grid2, material){
   var geomKey = (
     "PlaneBufferGeometry" + PIPE +
     width + PIPE + height + PIPE +
-    "undefined" + PIPE + "undefined"
+    "1" + PIPE + "1"
   );
   var geometry;
   if (geometryCache[geomKey]){
@@ -655,7 +673,7 @@ GridSystem.prototype.newRamp = function(anchorGrid, otherGrid, axis, height, mat
   var geomKey = (
     "PlaneBufferGeometry" + PIPE +
     rampWidth + PIPE + rampHeight + PIPE +
-    "undefined" + PIPE + "undefined"
+    "1" + PIPE + "1"
   );
   geometry = geometryCache[geomKey];
   if (!geometry){
@@ -913,7 +931,7 @@ GridSystem.prototype.newBox = function(selections, height, material, name){
   var geomKey = (
     "BoxBufferGeometry" + PIPE +
     boxSizeX + PIPE + boxSizeY + PIPE + boxSizeZ + PIPE +
-    "undefined" + PIPE + "undefined"
+    "1" + PIPE + "1" + PIPE + "1"
   );
   var boxGeometry = geometryCache[geomKey];
   if (!boxGeometry){
@@ -1067,7 +1085,7 @@ GridSystem.prototype.newSphere = function(sphereName, material, radius, selectio
   var geomKey = (
     "SphereBufferGeometry" + PIPE +
     Math.abs(radius)+ PIPE +
-    "undefined" + PIPE + "undefined"
+    "8" + PIPE + "6"
   );
   var sphereGeometry = geometryCache[geomKey];
   if (!sphereGeometry){
