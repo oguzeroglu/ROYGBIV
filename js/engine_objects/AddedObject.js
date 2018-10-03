@@ -276,9 +276,6 @@ AddedObject.prototype.sliceSurfaceInHalf = function(type){
         normals.push(originalGeometry.attributes.normal.array[
           (3 * subIndices[i]) + i2
         ]);
-        //uvs.push(originalGeometry.attributes.uv.array[
-        //  (2 * subIndices[i]) + i2
-        //]);
       }
     }
 
@@ -1833,6 +1830,15 @@ AddedObject.prototype.visualiseBoudingBoxes = function(selectedScene){
 }
 
 AddedObject.prototype.getNormalGeometry = function(){
+  if (!(typeof this.metaData.slicedType == UNDEFINED)){
+    var geomKey = "SLICED_NORMAL_GEOMETRY_"+this.metaData.slicedType;
+    if (geometryCache[geomKey]){
+      return geometryCache[geomKey];
+    }
+    var geom = new THREE.Geometry().fromBufferGeometry(this.mesh.geometry);
+    geometryCache[geomKey] = geom;
+    return geom;
+  }
   var count = new Object();
   if (this.type == "surface" || this.type == "ramp" || this.type == "sphere"){
     count.width = this.metaData["widthSegments"];
