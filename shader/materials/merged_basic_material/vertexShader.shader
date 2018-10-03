@@ -32,7 +32,7 @@ void main(){
 
   vColor = color;
   vAlpha = alpha;
-  vUV = (textureMatrix * vec3(uv, 1.0)).xy;;
+  vUV = (textureMatrix * vec3(uv, 1.0)).xy;
   vEmissiveIntensity = emissiveIntensity;
   vAOIntensity = aoIntensity;
 

@@ -49,14 +49,6 @@ ObjectGroup.prototype.handleAtlasSize = function(texture){
   return txt;
 }
 
-ObjectGroup.prototype.getChildUV = function(addedObject, textureType, originalUV){
-  var range = this.textureMerger.ranges[addedObject.name + "," + textureType];
-  return new THREE.Vector2(
-    (originalUV.x / (1) * (range.endU - range.startU) + range.startU),
-    (originalUV.y / (1) * (range.startV - range.endV) + range.endV)
-  );
-}
-
 ObjectGroup.prototype.textureCompare = function(txt1, txt2){
   if (txt1.roygbivTextureName != txt2.roygbivTextureName){
     return false;

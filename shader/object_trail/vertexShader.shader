@@ -10,11 +10,11 @@ attribute vec3 normal;
 attribute float coordIndex;
 attribute float quatIndex;
 attribute vec2 faceVertexUV;
-attribute vec2 faceVertexUVEmissive;
-attribute vec2 faceVertexUVAlpha;
-attribute float textureFlag;
+attribute vec2 displacementInfo;
+attribute vec3 textureFlags;
 attribute float emissiveIntensity;
 
+uniform mat3 textureMatrix;
 uniform mat4 viewMatrix;
 uniform mat4 projectionMatrix;
 uniform float objectCoordinates[OBJECT_COORDINATE_SIZE];
@@ -22,14 +22,12 @@ uniform float objectQuaternions[OBJECT_QUATERNION_SIZE];
 uniform vec3 currentPosition;
 uniform vec4 currentQuaternion;
 uniform float alpha;
-uniform sampler2D texture;
+uniform sampler2D displacementMap;
 
 varying float vDiscardFlag;
 varying vec2 vFaceVertexUV;
-varying vec2 vFaceVertexUVEmissive;
-varying vec2 vFaceVertexUVAlpha;
 varying vec3 vColor;
-varying float vTextureFlag;
+varying vec3 vTextureFlags;
 varying float vEmissiveIntensity;
 
 vec3 applyQuaternionToVector(vec3 vector, vec4 quaternion){
@@ -54,10 +52,8 @@ void main(){
 
   vColor = color;
   vDiscardFlag = -10.0;
-  vFaceVertexUV = faceVertexUV;
-  vFaceVertexUVEmissive = faceVertexUVEmissive;
-  vFaceVertexUVAlpha = faceVertexUVAlpha;
-  vTextureFlag = textureFlag;
+  vFaceVertexUV = (textureMatrix * vec3(faceVertexUV, 1.0)).xy;
+  vTextureFlags = textureFlags;
   vEmissiveIntensity = emissiveIntensity;
 
   int indexX = int(coordIndex);
@@ -81,12 +77,17 @@ void main(){
     float qDiffZ = quat.z - currentQuaternion.z;
     float qDiffW = quat.w - currentQuaternion.w;
     if (qDiffX < 0.005 && qDiffY < 0.005 && qDiffZ < 0.005 && qDiffW < 0.005){
-      vDiscardFlag = 10.0;
+      //vDiscardFlag = 10.0;
     }
   }
 
   if (vDiscardFlag < 5.0){
-    vec3 rotatedPos = applyQuaternionToVector(position, quat);
+    vec3 transformedPosition = position;
+    if (displacementInfo.x > -60.0 && displacementInfo.y > -60.0){
+      vec3 objNormal = normalize(normal);
+      transformedPosition += objNormal * (texture2D(displacementMap, vFaceVertexUV).r * displacementInfo.x + displacementInfo.y);
+    }
+    vec3 rotatedPos = applyQuaternionToVector(transformedPosition, quat);
     vec3 newPosition = coord + rotatedPos;
     gl_Position = projectionMatrix * viewMatrix * vec4(newPosition, 1.0);
   }

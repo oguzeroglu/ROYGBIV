@@ -6,13 +6,13 @@ precision lowp int;
 
 varying float vDiscardFlag;
 varying vec2 vFaceVertexUV;
-varying vec2 vFaceVertexUVEmissive;
-varying vec2 vFaceVertexUVAlpha;
 varying vec3 vColor;
-varying float vTextureFlag;
+varying vec3 vTextureFlags;
 varying float vEmissiveIntensity;
 
-uniform sampler2D texture;
+uniform sampler2D diffuseMap;
+uniform sampler2D emissiveMap;
+uniform sampler2D alphaMap;
 uniform float alpha;
 uniform vec4 fogInfo;
 
@@ -20,27 +20,31 @@ void main(){
   if (vDiscardFlag >= 5.0){
     discard;
   }
-  if (vTextureFlag > 5.0){
-    vec4 textureColor = texture2D(texture, vec2(vFaceVertexUV.x, vFaceVertexUV.y));
-    vec3 totalEmissiveRadiance = vec3(0.0, 0.0, 0.0);
-    if (vFaceVertexUVEmissive.x >= -5.0 && vFaceVertexUVEmissive.y >= -5.0){
-      vec4 emissiveColor = texture2D(texture, vec2(vFaceVertexUVEmissive.x, vFaceVertexUVEmissive.y));
-      totalEmissiveRadiance = vec3(vEmissiveIntensity, vEmissiveIntensity, vEmissiveIntensity);
-      totalEmissiveRadiance *= emissiveColor.rgb;
-    }
-    gl_FragColor = vec4(vColor.r, vColor.g, vColor.b, alpha) * textureColor;
-    gl_FragColor += vec4(totalEmissiveRadiance, 0.0);
-    gl_FragColor.a = alpha;
-  }else{
-    gl_FragColor = vec4(vColor.r, vColor.g, vColor.b, alpha);
+
+  float hasDiffuse  = vTextureFlags[0];
+  float hasEmissive = vTextureFlags[1];
+  float hasAlpha    = vTextureFlags[2];
+
+  vec4 diffuseColor = vec4(1.0, 1.0, 1.0, 1.0);
+  if (hasDiffuse > 0.0){
+    diffuseColor = texture2D(diffuseMap, vFaceVertexUV);
   }
 
-  if (vFaceVertexUVAlpha.x >= -5.0 && vFaceVertexUVAlpha.y >= -5.0){
-    float val = texture2D(texture, vec2(vFaceVertexUVAlpha.x, vFaceVertexUVAlpha.y)).g;
+  gl_FragColor = vec4(vColor, alpha) * diffuseColor;
+
+  if (hasAlpha > 0.0){
+    float val = texture2D(alphaMap, vFaceVertexUV).g;
     gl_FragColor.a *= val;
     if (val <= ALPHA_TEST){
       discard;
     }
+  }
+
+  if (hasEmissive > 0.0){
+    vec4 emissiveColor = texture2D(emissiveMap, vFaceVertexUV);
+    vec3 totalEmissiveRadiance = vec3(vEmissiveIntensity, vEmissiveIntensity, vEmissiveIntensity);
+    totalEmissiveRadiance *= emissiveColor.rgb;
+    gl_FragColor.rgb += totalEmissiveRadiance;
   }
 
   if (fogInfo[0] >= -50.0){

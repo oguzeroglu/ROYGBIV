@@ -16,11 +16,6 @@ var WorldBinHandler = function(fromWorker){
       }
     }
   }
-  if (!fromWorker){
-    console.log("[*] WorldBinHandler initialized.");
-  }else{
-    console.log("[*] WorldBinHandler initialized from worker.");
-  }
 }
 
 WorldBinHandler.prototype.deleteObjectFromBin = function(binInfo, objName){

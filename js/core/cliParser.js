@@ -1075,7 +1075,9 @@ function parse(input){
               }
             }
           }
-          textures[textureName].dispose();
+          if (textures[textureName] instanceof THREE.Texture){
+            textures[textureName].dispose();
+          }
           delete textures[textureName];
           delete textureURLs[textureName];
           delete modifiedTextures[textureName];

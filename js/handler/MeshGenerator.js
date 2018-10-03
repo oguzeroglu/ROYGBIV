@@ -9,6 +9,46 @@ MeshGenerator.prototype.generateMesh = function(){
   }
 }
 
+MeshGenerator.prototype.generateObjectTrail = function(
+  trail, objectCoordinateSize, objectQuaternionSize, posit, quat, objectCoordinates, objectQuaternions){
+  var vertexShaderCode = ShaderContent.objectTrailVertexShader.replace(
+    "#define OBJECT_COORDINATE_SIZE 1", "#define OBJECT_COORDINATE_SIZE "+objectCoordinateSize
+  ).replace(
+    "#define OBJECT_QUATERNION_SIZE 1", "#define OBJECT_QUATERNION_SIZE "+objectQuaternionSize
+  );
+  if (!VERTEX_SHADER_TEXTURE_FETCH_SUPPORTED){
+    vertexShaderCode = vertexShaderCode.replace(
+      "vec3 objNormal = normalize(normal);", ""
+    ).replace(
+      "transformedPosition += objNormal * (texture2D(displacementMap, vFaceVertexUV).r * displacementInfo.x + displacementInfo.y);", ""
+    );
+  }
+  var material = new THREE.RawShaderMaterial({
+    vertexShader: vertexShaderCode,
+    fragmentShader: ShaderContent.objectTrailFragmentShader,
+    transparent: true,
+    vertexColors: THREE.VertexColors,
+    side: THREE.DoubleSide,
+    uniforms: {
+      projectionMatrix: new THREE.Uniform(new THREE.Matrix4()),
+      viewMatrix: new THREE.Uniform(new THREE.Matrix4()),
+      objectCoordinates: new THREE.Uniform(objectCoordinates),
+      objectQuaternions: new THREE.Uniform(objectQuaternions),
+      currentPosition: new THREE.Uniform(posit),
+      currentQuaternion: new THREE.Uniform(quat),
+      alpha: new THREE.Uniform(trail.alpha),
+      diffuseMap: new THREE.Uniform(trail.diffuseTexture),
+      emissiveMap: new THREE.Uniform(trail.emissiveTexture),
+      alphaMap: new THREE.Uniform(trail.alphaTexture),
+      displacementMap: new THREE.Uniform(trail.displacementTexture),
+      textureMatrix: new THREE.Uniform(trail.textureMatrix),
+      fogInfo: GLOBAL_FOG_UNIFORM
+    }
+  });
+  var mesh = new THREE.Mesh(this.geometry, material);
+  return mesh;
+}
+
 MeshGenerator.prototype.generateMergedMesh = function(graphicsGroup, objectGroup){
   var diffuseTexture = objectGroup.diffuseTexture;
   var emissiveTexture = objectGroup.emissiveTexture;
