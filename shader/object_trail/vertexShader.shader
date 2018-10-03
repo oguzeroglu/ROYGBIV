@@ -77,7 +77,7 @@ void main(){
     float qDiffZ = quat.z - currentQuaternion.z;
     float qDiffW = quat.w - currentQuaternion.w;
     if (qDiffX < 0.005 && qDiffY < 0.005 && qDiffZ < 0.005 && qDiffW < 0.005){
-      //vDiscardFlag = 10.0;
+      vDiscardFlag = 10.0;
     }
   }
 
