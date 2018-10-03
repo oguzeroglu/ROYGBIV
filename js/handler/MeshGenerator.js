@@ -49,6 +49,26 @@ MeshGenerator.prototype.generateObjectTrail = function(
   return mesh;
 }
 
+MeshGenerator.prototype.generateInstancedMesh = function(graphicsGroup, objectGroup){
+  var material = new THREE.RawShaderMaterial({
+    vertexShader: ShaderContent.instancedBasicMaterialVertexShader,
+    fragmentShader: ShaderContent.instancedBasicMaterialFragmentShader,
+    vertexColors: THREE.VertexColors,
+    transparent: true,
+    side: THREE.DoubleSide,
+    uniforms: {
+      projectionMatrix: new THREE.Uniform(new THREE.Matrix4()),
+      modelViewMatrix: new THREE.Uniform(new THREE.Matrix4()),
+      fogInfo: GLOBAL_FOG_UNIFORM
+    }
+  });
+  var mesh = new THREE.Mesh(this.geometry, material);
+  mesh.position.copy(graphicsGroup.position);
+  material.uniforms.projectionMatrix.value = camera.projectionMatrix;
+  material.uniforms.modelViewMatrix.value = mesh.modelViewMatrix;
+  return mesh;
+}
+
 MeshGenerator.prototype.generateMergedMesh = function(graphicsGroup, objectGroup){
   var diffuseTexture = objectGroup.diffuseTexture;
   var emissiveTexture = objectGroup.emissiveTexture;

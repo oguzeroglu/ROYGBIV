@@ -10,6 +10,8 @@ var ShaderContent = function(){
     this.basicMaterialFragmentShader = 0;
     this.mergedBasicMaterialVertexShader = 0;
     this.mergedBasicMaterialFragmentShader = 0;
+    this.instancedBasicMaterialVertexShader = 0;
+    this.instancedBasicMaterialFragmentShader = 0;
 
     this.load();
 
@@ -26,6 +28,8 @@ ShaderContent.prototype.load = function(){
   var basicMaterialFragmentShaderRequest = new XMLHttpRequest();
   var mergedBasicMaterialVertexShaderRequest = new XMLHttpRequest();
   var mergedBasicMaterialFragmentShaderRequest = new XMLHttpRequest();
+  var instancedBasicMaterialVertexShaderRequest = new XMLHttpRequest();
+  var instancedBasicMaterialFragmentShaderRequest = new XMLHttpRequest();
 
   particleVertexShaderRequest.open('GET', "/shader/particle/vertexShader.shader");
   particleFragmentShaderRequest.open('GET', "/shader/particle/fragmentShader.shader");
@@ -37,6 +41,8 @@ ShaderContent.prototype.load = function(){
   basicMaterialFragmentShaderRequest.open('GET', "/shader/materials/basic_material/fragmentShader.shader");
   mergedBasicMaterialVertexShaderRequest.open('GET', "/shader/materials/merged_basic_material/vertexShader.shader");
   mergedBasicMaterialFragmentShaderRequest.open('GET', "/shader/materials/merged_basic_material/fragmentShader.shader");
+  instancedBasicMaterialVertexShaderRequest.open('GET', "/shader/materials/instanced_basic_material/vertexShader.shader");
+  instancedBasicMaterialFragmentShaderRequest.open('GET', "/shader/materials/instanced_basic_material/fragmentShader.shader");
 
   var that = this;
   particleVertexShaderRequest.addEventListener("load", function(){
@@ -69,6 +75,12 @@ ShaderContent.prototype.load = function(){
   mergedBasicMaterialFragmentShaderRequest.addEventListener("load", function(){
     that.mergedBasicMaterialFragmentShader = mergedBasicMaterialFragmentShaderRequest.responseText;
   });
+  instancedBasicMaterialVertexShaderRequest.addEventListener("load", function(){
+    that.instancedBasicMaterialVertexShader = instancedBasicMaterialVertexShaderRequest.responseText;
+  });
+  instancedBasicMaterialFragmentShaderRequest.addEventListener("load", function(){
+    that.instancedBasicMaterialFragmentShader = instancedBasicMaterialFragmentShaderRequest.responseText;
+  });
 
   particleVertexShaderRequest.send();
   particleFragmentShaderRequest.send();
@@ -80,5 +92,7 @@ ShaderContent.prototype.load = function(){
   basicMaterialFragmentShaderRequest.send();
   mergedBasicMaterialVertexShaderRequest.send();
   mergedBasicMaterialFragmentShaderRequest.send();
+  instancedBasicMaterialVertexShaderRequest.send();
+  instancedBasicMaterialFragmentShaderRequest.send();
 
 }

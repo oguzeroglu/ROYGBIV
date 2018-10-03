@@ -16,6 +16,21 @@ var ObjectGroup = function(name, group){
 
 }
 
+ObjectGroup.prototype.areGeometriesIdentical = function(){
+  var uuid = 0;
+  for (var objName in this.group){
+    var obj = this.group[objName];
+    if (!uuid){
+      uuid = this.group[objName].mesh.geometry.uuid;
+    }else{
+      if (uuid != this.group[objName].mesh.geometry.uuid){
+        return false;
+      }
+    }
+  }
+  return true;
+}
+
 ObjectGroup.prototype.handleRenderSide = function(val){
   this.renderSide = val;
   if (val == 0){
@@ -159,10 +174,61 @@ ObjectGroup.prototype.push = function(array, value, index, isIndexed){
   }
 }
 
+ObjectGroup.prototype.mergeInstanced = function(){
+  this.isInstanced = true;
+  var refGeometry;
+  for (var objName in this.group){
+    refGeometry = this.group[objName].mesh.geometry;
+    break;
+  }
+  this.geometry = new THREE.InstancedBufferGeometry();
+
+  this.geometry.setIndex(refGeometry.index);
+
+  var positionOffsets = [], quaternions = [];
+  var count = 0;
+  for (var objName in this.group){
+    var obj = this.group[objName];
+    positionOffsets.push(obj.mesh.position.x);
+    positionOffsets.push(obj.mesh.position.y);
+    positionOffsets.push(obj.mesh.position.z);
+    quaternions.push(obj.mesh.quaternion.x);
+    quaternions.push(obj.mesh.quaternion.y);
+    quaternions.push(obj.mesh.quaternion.z);
+    quaternions.push(obj.mesh.quaternion.w);
+    count ++;
+  }
+
+  this.geometry.maxInstancedCount = count;
+
+  var positionOffsetBufferAttribute = new THREE.InstancedBufferAttribute(
+    new Float32Array(positionOffsets), 3
+  );
+  var quaternionsBufferAttribute = new THREE.InstancedBufferAttribute(
+    new Float32Array(quaternions), 4
+  );
+
+  positionOffsetBufferAttribute.setDynamic(false);
+  quaternionsBufferAttribute.setDynamic(false);
+
+  this.geometry.addAttribute("positionOffset", positionOffsetBufferAttribute);
+  this.geometry.addAttribute("quaternion", quaternionsBufferAttribute);
+  this.geometry.addAttribute("position", refGeometry.attributes.position);
+  this.geometry.addAttribute("normal", refGeometry.attributes.normal);
+
+  console.log(this.geometry);
+
+}
+
 ObjectGroup.prototype.merge = function(){
 
   if (!this.textureMerger){
     this.handleTextures();
+  }
+
+  if (this.areGeometriesIdentical()){
+    this.mergeInstanced();
+    return;
   }
 
   this.geometry = new THREE.BufferGeometry();
@@ -615,7 +681,12 @@ ObjectGroup.prototype.glue = function(){
 
   this.merge();
   this.destroyParts();
-  this.mesh = new MeshGenerator(this.geometry).generateMergedMesh(graphicsGroup, this);
+  var meshGenerator = new MeshGenerator(this.geometry);
+  if (!this.isInstanced){
+    this.mesh = meshGenerator.generateMergedMesh(graphicsGroup, this);
+  }else{
+    this.mesh = meshGenerator.generateInstancedMesh(graphicsGroup, this);
+  }
   this.previewMesh= new THREE.Mesh(this.mesh.geometry, this.mesh.material);
   this.previewMesh.position.copy(this.mesh.position);
   this.previewMesh.quaternion.copy(this.mesh.quaternion);
