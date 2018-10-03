@@ -1052,6 +1052,7 @@ function afterObjectSelection(){
       disableController(omDisplacementBiasController);
       disableController(omAOIntensityController);
       disableController(omOpacityController);
+      disableController(omHideHalfController);
 
       objectManipulationParameters["Side"] = "Both";
       if (obj.renderSide){

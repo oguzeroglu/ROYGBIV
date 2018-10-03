@@ -151,6 +151,14 @@ ObjectGroup.prototype.handleTextures = function(){
   }
 }
 
+ObjectGroup.prototype.push = function(array, value, index, isIndexed){
+  if (!isIndexed){
+    array.push(value);
+  }else{
+    array[index] = value;
+  }
+}
+
 ObjectGroup.prototype.merge = function(){
 
   if (!this.textureMerger){
@@ -160,10 +168,15 @@ ObjectGroup.prototype.merge = function(){
   this.geometry = new THREE.BufferGeometry();
   var pseudoGeometry = new THREE.Geometry();
 
+  var isIndexed = true;
+
   var miMap = new Object();
   var mi = 0;
   for (var childName in this.group){
     var childObj = this.group[childName];
+    if (childObj.type == "box" || childObj.type == "sphere"){
+      isIndexed = false;
+    }
     var childGeom = childObj.getNormalGeometry();
     miMap[mi] = childObj.name;
     for (var i = 0; i<childGeom.faces.length; i++){
@@ -174,38 +187,56 @@ ObjectGroup.prototype.merge = function(){
     pseudoGeometry.merge(childGeom, childObj.mesh.matrix);
   }
 
-  var indexCache = new Object();
 
   var max = 0;
+  var indexCache;
   var faces = pseudoGeometry.faces;
-  for (var i = 0; i<faces.length; i++){
-    var face = faces[i];
-    var a = face.a;
-    var b = face.b;
-    var c = face.c;
-    if (a > max){
-      max = a;
-    }
-    if (b > max){
-      max = b;
-    }
-    if (c > max){
-      max = c;
+  var indexCache;
+  if (isIndexed){
+    indexCache = new Object();
+    for (var i = 0; i<faces.length; i++){
+      var face = faces[i];
+      var a = face.a;
+      var b = face.b;
+      var c = face.c;
+      if (a > max){
+        max = a;
+      }
+      if (b > max){
+        max = b;
+      }
+      if (c > max){
+        max = c;
+      }
     }
   }
 
   var indices = [];
   var vertices = pseudoGeometry.vertices;
   var faceVertexUVs = pseudoGeometry.faceVertexUvs[0];
-  var positions = new Array((max + 1) * 3);
-  var normals = new Array((max + 1) * 3);
-  var colors = new Array((max + 1) * 3);
-  var uvs = new Array((max + 1) * 2);
-  var alphas = new Array(max + 1);
-  var emissiveIntensities = new Array(max + 1);
-  var aoIntensities = new Array(max + 1);
-  var displacementInfos = new Array((max + 1) * 2);
-  var textureInfos = new Array((max + 1) * 4);
+  var positions, normals, colors, uvs, alphas, emissiveIntensities, aoIntensities,
+            displacementInfos, textureInfos;
+  if (max > 0){
+    positions = new Array((max + 1) * 3);
+    normals = new Array((max + 1) * 3);
+    colors = new Array((max + 1) * 3);
+    uvs = new Array((max + 1) * 2);
+    alphas = new Array(max + 1);
+    emissiveIntensities = new Array(max + 1);
+    aoIntensities = new Array(max + 1);
+    displacementInfos = new Array((max + 1) * 2);
+    textureInfos = new Array((max + 1) * 4);
+  }else{
+    positions = [];
+    normals = [];
+    colors = [];
+    uvs = [];
+    alphas = [];
+    emissiveIntensities = [];
+    aoIntensities = [];
+    displacementInfos = [];
+    textureInfos = [];
+  }
   for (var i = 0; i<faces.length; i++){
     var face = faces[i];
     var addedObject = addedObjects[miMap[face.materialIndex]];
@@ -213,30 +244,31 @@ ObjectGroup.prototype.merge = function(){
     var b = face.b;
     var c = face.c;
 
-    indices.push(a);
-    indices.push(b);
-    indices.push(c);
-
     var aSkipped = false;
     var bSkipped = false;
     var cSkipped = false;
-    if (indexCache[a]){
-      aSkipped = true;
-      this.skippedVertexCount ++;
-    }else{
-      indexCache[a] = true;
-    }
-    if (indexCache[b]){
-      bSkipped = true;
-      this.skippedVertexCount ++;
-    }else{
-      indexCache[b] = true;
-    }
-    if (indexCache[c]){
-      cSkipped = true;
-      this.skippedVertexCount ++;
-    }else{
-      indexCache[c] = true;
+    if (isIndexed){
+      indices.push(a);
+      indices.push(b);
+      indices.push(c);
+      if (indexCache[a]){
+        aSkipped = true;
+        this.skippedVertexCount ++;
+      }else{
+        indexCache[a] = true;
+      }
+      if (indexCache[b]){
+        bSkipped = true;
+        this.skippedVertexCount ++;
+      }else{
+        indexCache[b] = true;
+      }
+      if (indexCache[c]){
+        cSkipped = true;
+        this.skippedVertexCount ++;
+      }else{
+        indexCache[c] = true;
+      }
     }
 
     var vertex1 = vertices[a];
@@ -249,195 +281,224 @@ ObjectGroup.prototype.merge = function(){
     var uv3 = faceVertexUVs[i][2];
     // POSITIONS
     if (!aSkipped){
-      positions[3 * a] = vertex1.x;
-      positions[(3 * a)+1] = vertex1.y;
-      positions[(3 * a)+2] = vertex1.z;
+      this.push(positions, vertex1.x, (3*a), isIndexed);
+      this.push(positions, vertex1.y, ((3*a) + 1), isIndexed);
+      this.push(positions, vertex1.z, ((3*a) + 2), isIndexed);
     }
     if (!bSkipped){
-      positions[3 * b] = vertex2.x;
-      positions[(3 * b)+1] = vertex2.y;
-      positions[(3 * b)+2] = vertex2.z;
+      this.push(positions, vertex2.x, (3*b), isIndexed);
+      this.push(positions, vertex2.y, ((3*b) + 1), isIndexed);
+      this.push(positions, vertex2.z, ((3*b) + 2), isIndexed);
     }
     if (!cSkipped){
-      positions[3 * c] = vertex3.x;
-      positions[(3 * c)+1] = vertex3.y;
-      positions[(3 * c)+2] = vertex3.z;
+      this.push(positions, vertex3.x, (3*c), isIndexed);
+      this.push(positions, vertex3.y, ((3*c) + 1), isIndexed);
+      this.push(positions, vertex3.z, ((3*c) + 2), isIndexed);
     }
     if (!aSkipped){
-      normals[3 * a] = normal.x;
-      normals[(3 * a) + 1] = normal.y;
-      normals[(3 * a) + 2] = normal.z;
+      this.push(normals, normal.x, (3*a), isIndexed);
+      this.push(normals, normal.y, ((3*a) + 1), isIndexed);
+      this.push(normals, normal.z, ((3*a) + 2), isIndexed);
     }
     if (!bSkipped){
-      normals[3 * b] = normal.x;
-      normals[(3 * b) + 1] = normal.y;
-      normals[(3 * b) + 2] = normal.z;
+      this.push(normals, normal.x, (3*b), isIndexed);
+      this.push(normals, normal.y, ((3*b) + 1), isIndexed);
+      this.push(normals, normal.z, ((3*b) + 2), isIndexed);
     }
     if (!cSkipped){
-      normals[3 * c] = normal.x;
-      normals[(3 * c) + 1] = normal.y;
-      normals[(3 * c) + 2] = normal.z;
+      this.push(normals, normal.x, (3*c), isIndexed);
+      this.push(normals, normal.y, ((3*c) + 1), isIndexed);
+      this.push(normals, normal.z, ((3*c) + 2), isIndexed);
     }
     // COLORS
     if (!aSkipped){
-      colors[3 * a] = color.r;
-      colors[(3 * a)+1] = color.g;
-      colors[(3 * a)+2] = color.b;
+      this.push(colors, color.r, (3*a), isIndexed);
+      this.push(colors, color.g, ((3*a) + 1), isIndexed);
+      this.push(colors, color.b, ((3*a) + 2), isIndexed);
     }
     if (!bSkipped){
-      colors[3 * b] = color.r;
-      colors[(3 * b)+1] = color.g;
-      colors[(3 * b)+2] = color.b;
+      this.push(colors, color.r, (3*b), isIndexed);
+      this.push(colors, color.g, ((3*b) + 1), isIndexed);
+      this.push(colors, color.b, ((3*b) + 2), isIndexed);
     }
     if (!cSkipped){
-      colors[3 * c] = color.r;
-      colors[(3 * c)+1] = color.g;
-      colors[(3 * c)+2] = color.b;
+      this.push(colors, color.r, (3*c), isIndexed);
+      this.push(colors, color.g, ((3*c) + 1), isIndexed);
+      this.push(colors, color.b, ((3*c) + 2), isIndexed);
     }
     // UV
     if (!aSkipped){
-      uvs[2 * a] = uv1.x;
-      uvs[(2 * a) + 1] = uv1.y;
+      this.push(uvs, uv1.x, (2*a), isIndexed);
+      this.push(uvs, uv1.y, ((2*a) + 1), isIndexed);
     }
     if (!bSkipped){
-      uvs[2 * b] = uv2.x;
-      uvs[(2 * b) + 1] = uv2.y;
+      this.push(uvs, uv2.x, (2*b), isIndexed);
+      this.push(uvs, uv2.y, ((2*b) + 1), isIndexed);
     }
     if (!cSkipped){
-      uvs[2 * c] = uv3.x;
-      uvs[(2 * c) + 1] = uv3.y;
+      this.push(uvs, uv3.x, (2*c), isIndexed);
+      this.push(uvs, uv3.y, ((2*c) + 1), isIndexed);
     }
     // DISPLACEMENT INFOS
     if (!aSkipped){
       if (addedObject.hasDisplacementMap()){
-        displacementInfos[2 * a] = addedObject.mesh.material.uniforms.displacementInfo.value.x;
-        displacementInfos[(2 * a) + 1] = addedObject.mesh.material.uniforms.displacementInfo.value.y;
+        this.push(
+          displacementInfos,
+          addedObject.mesh.material.uniforms.displacementInfo.value.x,
+          (2*a),
+          isIndexed
+        );
+        this.push(
+          displacementInfos,
+          addedObject.mesh.material.uniforms.displacementInfo.value.y,
+          ((2*a) + 1),
+          isIndexed
+        );
       }else{
-        displacementInfos[2 * a] = -100;
-        displacementInfos[(2 * a) + 1] = -100;
+        this.push(displacementInfos, -100, (2*a), isIndexed);
+        this.push(displacementInfos, -100, ((2*a) + 1), isIndexed);
       }
     }
     if (!bSkipped){
       if (addedObject.hasDisplacementMap()){
-        displacementInfos[2 * b] = addedObject.mesh.material.uniforms.displacementInfo.value.x;
-        displacementInfos[(2 * b) + 1] = addedObject.mesh.material.uniforms.displacementInfo.value.y;
+        this.push(
+          displacementInfos,
+          addedObject.mesh.material.uniforms.displacementInfo.value.x,
+          (2*b),
+          isIndexed
+        );
+        this.push(
+          displacementInfos,
+          addedObject.mesh.material.uniforms.displacementInfo.value.y,
+          ((2*b) + 1),
+          isIndexed
+        );
       }else{
-        displacementInfos[2 * b] = -100;
-        displacementInfos[(2 * b) + 1] = -100;
+        this.push(displacementInfos, -100, (2*b), isIndexed);
+        this.push(displacementInfos, -100, ((2*b) + 1), isIndexed);
       }
     }
     if (!cSkipped){
       if (addedObject.hasDisplacementMap()){
-        displacementInfos[2 * c] = addedObject.mesh.material.uniforms.displacementInfo.value.x;
-        displacementInfos[(2 * c) + 1] = addedObject.mesh.material.uniforms.displacementInfo.value.y;
+        this.push(
+          displacementInfos,
+          addedObject.mesh.material.uniforms.displacementInfo.value.x,
+          (2*c),
+          isIndexed
+        );
+        this.push(
+          displacementInfos,
+          addedObject.mesh.material.uniforms.displacementInfo.value.y,
+          ((2*c) + 1),
+          isIndexed
+        );
       }else{
-        displacementInfos[2 * c] = -100;
-        displacementInfos[(2 * c) + 1] = -100;
+        this.push(displacementInfos, -100, (2*c), isIndexed);
+        this.push(displacementInfos, -100, ((2*c) + 1), isIndexed);
       }
     }
     // ALPHA
     var alpha = addedObject.mesh.material.uniforms.alpha.value;
     if (!aSkipped){
-      alphas[a] = alpha;
+      this.push(alphas, alpha, a, isIndexed);
     }
     if (!bSkipped){
-      alphas[b] = alpha;
+      this.push(alphas, alpha, b, isIndexed);
     }
     if (!cSkipped){
-      alphas[c] = alpha;
+      this.push(alphas, alpha, c, isIndexed);
     }
     // EMISSIVE INTENSITY
     var emissiveIntensity = addedObject.mesh.material.uniforms.emissiveIntensity.value;
     if (!aSkipped){
-      emissiveIntensities[a] = emissiveIntensity;
+      this.push(emissiveIntensities, emissiveIntensity, a, isIndexed);
     }
     if (!bSkipped){
-      emissiveIntensities[b] = emissiveIntensity;
+      this.push(emissiveIntensities, emissiveIntensity, b, isIndexed);
     }
     if (!cSkipped){
-      emissiveIntensities[c] = emissiveIntensity;
+      this.push(emissiveIntensities, emissiveIntensity, c, isIndexed);
     }
     // AO INTENSITY
     var aoIntensity = addedObject.mesh.material.uniforms.aoIntensity.value;
     if (!aSkipped){
-      aoIntensities[a] = aoIntensity;
+      this.push(aoIntensities, aoIntensity, a, isIndexed);
     }
     if (!bSkipped){
-      aoIntensities[b] = aoIntensity;
+      this.push(aoIntensities, aoIntensity, b, isIndexed);
     }
     if (!cSkipped){
-      aoIntensities[c] = aoIntensity;
+      this.push(aoIntensities, aoIntensity, c, isIndexed);
     }
     // TEXTURE INFOS
     if (!aSkipped){
       if (addedObject.hasDiffuseMap()){
-        textureInfos[(4 * a)] = 10;
+        this.push(textureInfos, 10, (4*a), isIndexed);
       }else{
-        textureInfos[(4 * a)] = -10;
+        this.push(textureInfos, -10, (4*a), isIndexed);
       }
       if (addedObject.hasEmissiveMap()){
-        textureInfos[(4 * a) + 1] = 10;
+        this.push(textureInfos, 10, ((4*a) + 1), isIndexed);
       }else{
-        textureInfos[(4 * a) + 1] = -10;
+        this.push(textureInfos, -10, ((4*a) + 1), isIndexed);
       }
       if (addedObject.hasAlphaMap()){
-        textureInfos[(4 * a) + 2] = 10;
+        this.push(textureInfos, 10, ((4*a) + 2), isIndexed);
       }else{
-        textureInfos[(4 * a) + 2] = -10;
+        this.push(textureInfos, -10, ((4*a) + 2), isIndexed);
       }
       if (addedObject.hasAOMap()){
-        textureInfos[(4 * a) + 3] = 10;
+        this.push(textureInfos, 10, ((4*a) + 3), isIndexed);
       }else{
-        textureInfos[(4 * a) + 3] = -10;
+        this.push(textureInfos, -10, ((4*a) + 3), isIndexed);
       }
     }
     if (!bSkipped){
       if (addedObject.hasDiffuseMap()){
-        textureInfos[(4 * b)] = 10;
+        this.push(textureInfos, 10, (4*b), isIndexed);
       }else{
-        textureInfos[(4 * b)] = -10;
+        this.push(textureInfos, -10, (4*b), isIndexed);
       }
       if (addedObject.hasEmissiveMap()){
-        textureInfos[(4 * b) + 1] = 10;
+        this.push(textureInfos, 10, ((4*b) + 1), isIndexed);
       }else{
-        textureInfos[(4 * b) + 1] = -10;
+        this.push(textureInfos, -10, ((4*b) + 1), isIndexed);
       }
       if (addedObject.hasAlphaMap()){
-        textureInfos[(4 * b) + 2] = 10;
+        this.push(textureInfos, 10, ((4*b) + 2), isIndexed);
       }else{
-        textureInfos[(4 * b) + 2] = -10;
+        this.push(textureInfos, -10, ((4*b) + 2), isIndexed);
       }
       if (addedObject.hasAOMap()){
-        textureInfos[(4 * b) + 3] = 10;
+        this.push(textureInfos, 10, ((4*b) + 3), isIndexed);
       }else{
-        textureInfos[(4 * b) + 3] = -10;
+        this.push(textureInfos, -10, ((4*b) + 3), isIndexed);
       }
     }
     if (!cSkipped){
       if (addedObject.hasDiffuseMap()){
-        textureInfos[(4 * c)] = 10;
+        this.push(textureInfos, 10, (4*c), isIndexed);
       }else{
-        textureInfos[(4 * c)] = -10;
+        this.push(textureInfos, -10, (4*c), isIndexed);
       }
       if (addedObject.hasEmissiveMap()){
-        textureInfos[(4 * c) + 1] = 10;
+        this.push(textureInfos, 10, ((4*c) + 1), isIndexed);
       }else{
-        textureInfos[(4 * c) + 1] = -10;
+        this.push(textureInfos, -10, ((4*c) + 1), isIndexed);
       }
       if (addedObject.hasAlphaMap()){
-        textureInfos[(4 * c) + 2] = 10;
+        this.push(textureInfos, 10, ((4*c) + 2), isIndexed);
       }else{
-        textureInfos[(4 * c) + 2] = -10;
+        this.push(textureInfos, -10, ((4*c) + 2), isIndexed);
       }
       if (addedObject.hasAOMap()){
-        textureInfos[(4 * c) + 3] = 10;
+        this.push(textureInfos, 10, ((4*c) + 3), isIndexed);
       }else{
-        textureInfos[(4 * c) + 3] = -10;
+        this.push(textureInfos, -10, ((4*c) + 3), isIndexed);
       }
     }
   }
 
-  var indicesTypedArray = new Uint16Array(indices);
   var positionsTypedArray = new Float32Array(positions);
   var normalsTypedArray = new Float32Array(normals);
   var colorsTypedArray = new Float32Array(colors);
@@ -448,7 +509,6 @@ ObjectGroup.prototype.merge = function(){
   var aoIntensitiesTypedArray = new Float32Array(aoIntensities);
   var textureInfosTypedArray = new Int8Array(textureInfos);
 
-  var indicesBufferAttribute = new THREE.BufferAttribute(indicesTypedArray, 1);
   var positionsBufferAttribute = new THREE.BufferAttribute(positionsTypedArray, 3);
   var normalsBufferAttribute = new THREE.BufferAttribute(normalsTypedArray, 3);
   var colorsBufferAttribute = new THREE.BufferAttribute(colorsTypedArray, 3);
@@ -458,7 +518,7 @@ ObjectGroup.prototype.merge = function(){
   var emissiveIntensitiesBufferAttribute = new THREE.BufferAttribute(emissiveIntensitiesTypedArray, 1);
   var aoIntensitiesBufferAttribute = new THREE.BufferAttribute(aoIntensitiesTypedArray, 1);
   var textureInfosBufferAttribute = new THREE.BufferAttribute(textureInfosTypedArray, 4);
-  indicesBufferAttribute.setDynamic(false);
+
   positionsBufferAttribute.setDynamic(false);
   normalsBufferAttribute.setDynamic(false);
   colorsBufferAttribute.setDynamic(false);
@@ -468,7 +528,14 @@ ObjectGroup.prototype.merge = function(){
   emissiveIntensitiesBufferAttribute.setDynamic(false);
   aoIntensitiesBufferAttribute.setDynamic(false);
   textureInfosBufferAttribute.setDynamic(false);
-  this.geometry.setIndex(indicesBufferAttribute);
+
+  if (isIndexed){
+    var indicesTypedArray = new Uint16Array(indices);
+    var indicesBufferAttribute = new THREE.BufferAttribute(indicesTypedArray, 1);
+    indicesBufferAttribute.setDynamic(false);
+    this.geometry.setIndex(indicesBufferAttribute);
+  }
+
   this.geometry.addAttribute('position', positionsBufferAttribute);
   this.geometry.addAttribute('normal', normalsBufferAttribute);
   this.geometry.addAttribute('color', colorsBufferAttribute);
