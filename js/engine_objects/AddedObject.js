@@ -1007,7 +1007,7 @@ AddedObject.prototype.mapTexturePack = function(texturePack, fromScript){
       this.material.specularMap.needsUpdate = true;
     }
   }
-  if (texturePack.hasHeight){
+  if (texturePack.hasHeight && VERTEX_SHADER_TEXTURE_FETCH_SUPPORTED){
     this.mapDisplacement(texturePack.heightTexture);
     if (!fromScript){
       this.mesh.material.uniforms.displacementMap.value.roygbivTexturePackName = texturePack.name;

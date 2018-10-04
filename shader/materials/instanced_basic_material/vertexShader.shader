@@ -1,13 +1,34 @@
 precision lowp float;
 precision lowp int;
 
+attribute float alpha;
+attribute float emissiveIntensity;
+attribute float aoIntensity;
+attribute vec2 uv;
+attribute vec2 displacementInfo;
+attribute vec3 color;
 attribute vec3 position;
 attribute vec3 positionOffset;
 attribute vec3 normal;
 attribute vec4 quaternion;
+attribute vec4 textureInfo;
 
+uniform mat3 textureMatrix;
 uniform mat4 modelViewMatrix;
 uniform mat4 projectionMatrix;
+
+uniform sampler2D displacementMap;
+
+varying float vAlpha;
+varying float vEmissiveIntensity;
+varying float vAOIntensity;
+varying vec2 vUV;
+varying vec3 vColor;
+
+varying float hasDiffuseMap;
+varying float hasEmissiveMap;
+varying float hasAlphaMap;
+varying float hasAOMap;
 
 vec3 applyQuaternionToVector(vec3 vector, vec4 quaternion){
   float x = vector.x;
@@ -29,7 +50,35 @@ vec3 applyQuaternionToVector(vec3 vector, vec4 quaternion){
 
 void main(){
 
-  vec3 transformedPosition = applyQuaternionToVector(position, quaternion) + positionOffset;
+  vAlpha = alpha;
+  vColor = color;
+  vUV = (textureMatrix * vec3(uv, 1.0)).xy;
+  vEmissiveIntensity = emissiveIntensity;
+  vAOIntensity = aoIntensity;
+
+  hasDiffuseMap = -10.0;
+  hasEmissiveMap = -10.0;
+  hasAlphaMap = -10.0;
+  hasAOMap = -10.0;
+  if (textureInfo[0] > 0.0){
+    hasDiffuseMap = 10.0;
+  }
+  if (textureInfo[1] > 0.0){
+    hasEmissiveMap = 10.0;
+  }
+  if (textureInfo[2] > 0.0){
+    hasAlphaMap = 10.0;
+  }
+  if (textureInfo[3] > 0.0){
+    hasAOMap = 10.0;
+  }
+
+  vec3 transformedPosition = position;
+  if (displacementInfo.x > -60.0 && displacementInfo.y > -60.0){
+    vec3 objNormal = normalize(normal);
+    transformedPosition += objNormal * (texture2D(displacementMap, vUV).r * displacementInfo.x + displacementInfo.y);
+  }
+  transformedPosition = applyQuaternionToVector(transformedPosition, quaternion) + positionOffset;
 
   gl_Position = projectionMatrix * modelViewMatrix * vec4(transformedPosition, 1.0);
 

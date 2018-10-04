@@ -50,8 +50,40 @@ MeshGenerator.prototype.generateObjectTrail = function(
 }
 
 MeshGenerator.prototype.generateInstancedMesh = function(graphicsGroup, objectGroup){
+  var diffuseTexture = objectGroup.diffuseTexture;
+  var emissiveTexture = objectGroup.emissiveTexture;
+  var alphaTexture = objectGroup.alphaTexture;
+  var aoTexture = objectGroup.aoTexture;
+  var displacementTexture = objectGroup.displacementTexture;
+  var textureMatrix = objectGroup.textureMatrix;
+  if (!diffuseTexture){
+    diffuseTexture = nullTexture;
+  }
+  if (!emissiveTexture){
+    emissiveTexture = nullTexture;
+  }
+  if (!alphaTexture){
+    alphaTexture = nullTexture;
+  }
+  if (!aoTexture){
+    aoTexture = nullTexture;
+  }
+  if (!displacementTexture){
+    displacementTexture = nullTexture;
+  }
+  if (!textureMatrix){
+    textureMatrix = new THREE.Matrix3();
+  }
+  var vertexShader = ShaderContent.instancedBasicMaterialVertexShader;
+  if (!VERTEX_SHADER_TEXTURE_FETCH_SUPPORTED){
+    vertexShader = vertexShader.replace(
+      "vec3 objNormal = normalize(normal);", ""
+    ).replace(
+      "transformedPosition += objNormal * (texture2D(displacementMap, vUV).r * displacementInfo.x + displacementInfo.y);", ""
+    );
+  }
   var material = new THREE.RawShaderMaterial({
-    vertexShader: ShaderContent.instancedBasicMaterialVertexShader,
+    vertexShader: vertexShader,
     fragmentShader: ShaderContent.instancedBasicMaterialFragmentShader,
     vertexColors: THREE.VertexColors,
     transparent: true,
@@ -59,6 +91,12 @@ MeshGenerator.prototype.generateInstancedMesh = function(graphicsGroup, objectGr
     uniforms: {
       projectionMatrix: new THREE.Uniform(new THREE.Matrix4()),
       modelViewMatrix: new THREE.Uniform(new THREE.Matrix4()),
+      diffuseMap: new THREE.Uniform(diffuseTexture),
+      emissiveMap: new THREE.Uniform(emissiveTexture),
+      alphaMap: new THREE.Uniform(alphaTexture),
+      aoMap: new THREE.Uniform(aoTexture),
+      displacementMap: new THREE.Uniform(displacementTexture),
+      textureMatrix: new THREE.Uniform(textureMatrix),
       fogInfo: GLOBAL_FOG_UNIFORM
     }
   });

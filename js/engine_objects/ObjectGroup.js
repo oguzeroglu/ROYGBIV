@@ -185,7 +185,8 @@ ObjectGroup.prototype.mergeInstanced = function(){
 
   this.geometry.setIndex(refGeometry.index);
 
-  var positionOffsets = [], quaternions = [];
+  var positionOffsets = [], quaternions = [], alphas = [], colors = [], textureInfos = [],
+      emissiveIntensities = [], aoIntensities = [], displacementInfos = [];
   var count = 0;
   for (var objName in this.group){
     var obj = this.group[objName];
@@ -196,6 +197,39 @@ ObjectGroup.prototype.mergeInstanced = function(){
     quaternions.push(obj.mesh.quaternion.y);
     quaternions.push(obj.mesh.quaternion.z);
     quaternions.push(obj.mesh.quaternion.w);
+    alphas.push(obj.mesh.material.uniforms.alpha.value);
+    colors.push(obj.material.color.r);
+    colors.push(obj.material.color.g);
+    colors.push(obj.material.color.b);
+    emissiveIntensities.push(obj.mesh.material.uniforms.emissiveIntensity.value);
+    aoIntensities.push(obj.mesh.material.uniforms.aoIntensity.value);
+    if (obj.hasDiffuseMap()){
+      textureInfos.push(10);
+    }else{
+      textureInfos.push(-10);
+    }
+    if (obj.hasEmissiveMap()){
+      textureInfos.push(10);
+    }else{
+      textureInfos.push(-10);
+    }
+    if (obj.hasAlphaMap()){
+      textureInfos.push(10);
+    }else{
+      textureInfos.push(-10);
+    }
+    if (obj.hasAOMap()){
+      textureInfos.push(10);
+    }else{
+      textureInfos.push(-10);
+    }
+    if (obj.hasDisplacementMap()){
+      displacementInfos.push(obj.mesh.material.uniforms.displacementInfo.value.x);
+      displacementInfos.push(obj.mesh.material.uniforms.displacementInfo.value.y);
+    }else{
+      displacementInfos.push(-100);
+      displacementInfos.push(-100);
+    }
     count ++;
   }
 
@@ -207,16 +241,45 @@ ObjectGroup.prototype.mergeInstanced = function(){
   var quaternionsBufferAttribute = new THREE.InstancedBufferAttribute(
     new Float32Array(quaternions), 4
   );
+  var alphaBufferAttribute = new THREE.InstancedBufferAttribute(
+    new Float32Array(alphas), 1
+  );
+  var colorBufferAttribute = new THREE.InstancedBufferAttribute(
+    new Float32Array(colors) , 3
+  );
+  var textureInfoBufferAttribute = new THREE.InstancedBufferAttribute(
+    new Int16Array(textureInfos), 4
+  );
+  var emissiveIntensityBufferAttribute = new THREE.InstancedBufferAttribute(
+    new Float32Array(emissiveIntensities), 1
+  );
+  var aoIntensityBufferAttribute = new THREE.InstancedBufferAttribute(
+    new Float32Array(aoIntensities), 1
+  );
+  var displacementInfoBufferAttribute = new THREE.InstancedBufferAttribute(
+    new Float32Array(displacementInfos), 2
+  );
 
   positionOffsetBufferAttribute.setDynamic(false);
   quaternionsBufferAttribute.setDynamic(false);
+  alphaBufferAttribute.setDynamic(false);
+  colorBufferAttribute.setDynamic(false);
+  textureInfoBufferAttribute.setDynamic(false);
+  emissiveIntensityBufferAttribute.setDynamic(false);
+  aoIntensityBufferAttribute.setDynamic(false);
+  displacementInfoBufferAttribute.setDynamic(false);
 
   this.geometry.addAttribute("positionOffset", positionOffsetBufferAttribute);
   this.geometry.addAttribute("quaternion", quaternionsBufferAttribute);
+  this.geometry.addAttribute("alpha", alphaBufferAttribute);
+  this.geometry.addAttribute("color", colorBufferAttribute);
+  this.geometry.addAttribute("textureInfo", textureInfoBufferAttribute);
+  this.geometry.addAttribute("emissiveIntensity", emissiveIntensityBufferAttribute);
+  this.geometry.addAttribute("aoIntensity", aoIntensityBufferAttribute);
+  this.geometry.addAttribute("displacementInfo", displacementInfoBufferAttribute);
   this.geometry.addAttribute("position", refGeometry.attributes.position);
   this.geometry.addAttribute("normal", refGeometry.attributes.normal);
-
-  console.log(this.geometry);
+  this.geometry.addAttribute("uv", refGeometry.attributes.uv);
 
 }
 
