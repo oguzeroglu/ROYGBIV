@@ -14955,12 +14955,6 @@
 
 				}
 
-				if ( extension === null ) {
-
-					console.warn( 'THREE.WebGLRenderer: ' + name + ' extension not supported.' );
-
-				}
-
 				extensions[ name ] = extension;
 
 				return extension;

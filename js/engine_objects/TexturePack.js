@@ -29,7 +29,9 @@ var TexturePack = function(name, directoryName, fileExtension, mapCallback, isPr
   this.specularFilePath = texturePackRootDirectory+directoryName+"/"+"specular."+fileExtension.toLowerCase();
   this.heightFilePath = texturePackRootDirectory+directoryName+"/"+"height."+fileExtension.toLowerCase();
 
-  if (fileExtension.toUpperCase() == "TGA"){
+  if (fileExtension.toUpperCase() == "DDS"){
+    this.loader = ddsLoader;
+  }else if (fileExtension.toUpperCase() == "TGA"){
     this.loader = tgaLoader;
   }else{
     this.loader = textureLoader;

@@ -976,7 +976,9 @@ function parse(input){
           textureURLs[textureName] = textureUrl;
           if (!found){
             var loader;
-            if (textureUrl.toUpperCase().endsWith("TGA")){
+            if (textureUrl.toUpperCase().endsWith("DDS")){
+              loader = ddsLoader;
+            }else if (textureUrl.toUpperCase().endsWith("TGA")){
               loader = tgaLoader;
             }else{
               loader = textureLoader;
@@ -2728,13 +2730,9 @@ function parse(input){
             terminal.printError(Text.WORKS_ONLY_IN_DESIGN_MODE);
             return true;
           }
-
           if (!skybox){
             terminal.printError(Text.NO_SUCH_SKYBOX);
             return true;
-          }
-          if (skyboxCache[name]){
-            skybox = skyboxCache[name];
           }
           if (!skybox.isUsable()){
             terminal.printError(Text.SKYBOX_NOT_USABLE);

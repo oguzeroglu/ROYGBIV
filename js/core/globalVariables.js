@@ -603,6 +603,7 @@ var sceneBackgroundColor = 0x000000 ;
 var previewSceneBackgroundColor = 0x000000;
 var textureLoader = new THREE.TextureLoader();
 var tgaLoader = new THREE.TGALoader();
+var ddsLoader = new THREE.DDSLoader();
 
 // PHYSICS
 var debugRenderer;
@@ -752,7 +753,6 @@ var normalTextureCache = new Object();
 var specularTextureCache = new Object();
 var alphaTextureCache = new Object();
 var emissiveTextureCache = new Object();
-var skyboxCache = new Object();
 var manualDisplacementQueue = new Object();
 var CACHE_NOT_PRESENT = "CACHE_NOT_PRESENT";
 var objectSelectedByCommand = false;

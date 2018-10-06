@@ -612,7 +612,9 @@ StateLoader.prototype.load = function(undo){
           this.createObjectGroupsAfterLoadedTextures();
         }
       }else{
-        if (textureURL.toUpperCase().endsWith("TGA")){
+        if (textureURL.toUpperCase().endsWith("DDS")){
+          this.loaders[textureName] = ddsLoader;
+        }else if (textureURL.toUpperCase().endsWith("TGA")){
           this.loaders[textureName] = tgaLoader;
         }else{
           this.loaders[textureName] = textureLoader;
@@ -2257,7 +2259,6 @@ StateLoader.prototype.resetProject = function(undo){
     specularTextureCache = new Object();
     alphaTextureCache = new Object();
     emissiveTextureCache = new Object();
-    skyboxCache = new Object();
   }
 
   initBadTV();

@@ -22,33 +22,15 @@ var SkyBox = function(name, directoryName, fileExtension, callback){
   this.rightFilePath = skyBoxRootDirectory+directoryName+"/"+"right."+fileExtension;
   this.upFilePath = skyBoxRootDirectory+directoryName+"/"+"up."+fileExtension;
 
-  var cachedData = skyboxCache[this.name];
-
-  if (this.fileExtension.toUpperCase() == "TGA" && !cachedData){
+  if (this.fileExtension.toUpperCase() == "DDS"){
+    this.loader = ddsLoader;
+  }else if (this.fileExtension.toUpperCase() == "TGA"){
     this.loader = tgaLoader;
-  }else if (!cachedData){
+  }else{
     this.loader = textureLoader;
   }
 
-  if (!cachedData){
-    this.loadTextures();
-  }else{
-    this.backTexture = cachedData.backTexture;
-    this.downTexture = cachedData.downTexture;
-    this.frontTexture = cachedData.frontTexture;
-    this.leftTexture = cachedData.leftTexture;
-    this.rightTexture = cachedData.rightTexture;
-    this.upTexture = cachedData.upTexture;
-    this.hasBack = cachedData.hasBack;
-    this.hasDown = cachedData.hasDown;
-    this.hasFront = cachedData.hasFront;
-    this.hasLeft = cachedData.hasLeft;
-    this.hasRight = cachedData.hasRight;
-    this.hasUp = cachedData.hasUp;
-    skyBoxes[this.name] = this;
-    this.callbackCheck();
-  }
-
+  this.loadTextures();
 }
 
 SkyBox.prototype.export = function(){
@@ -171,7 +153,6 @@ SkyBox.prototype.loadTextures = function(){
       that.callbackCheck();
     }
   );
-  skyboxCache[this.name] = this;
 }
 
 SkyBox.prototype.isUsable = function(){
