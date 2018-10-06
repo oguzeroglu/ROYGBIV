@@ -613,7 +613,16 @@ StateLoader.prototype.load = function(undo){
         }
       }else{
         if (textureURL.toUpperCase().endsWith("DDS")){
-          this.loaders[textureName] = ddsLoader;
+          if (!DDS_SUPPORTED){
+            textureURL = textureURL.replace(
+              ".dds", compressedTextureFallbackFormat
+            ).replace(
+              ".DDS", compressedTextureFallbackFormat
+            );
+            this.loaders[textureName] = textureLoader;
+          }else{
+            this.loaders[textureName] = ddsLoader;
+          }
         }else if (textureURL.toUpperCase().endsWith("TGA")){
           this.loaders[textureName] = tgaLoader;
         }else{
@@ -629,13 +638,15 @@ StateLoader.prototype.load = function(undo){
             var hasPadding = (obj.texturePaddings[textureNameX] !== undefined);
             if (obj.textureSizes && obj.textureSizes[textureNameX]){
               var size = obj.textureSizes[textureNameX];
-              if (size.width != textureData.image.width || size.height != textureData.image.height){
-                var tmpCanvas = document.createElement("canvas");
-                tmpCanvas.width = size.width;
-                tmpCanvas.height = size.height;
-                tmpCanvas.getContext("2d").drawImage(textureData.image, 0, 0, textureData.image.width, textureData.image.height, 0, 0, size.width, size.height);
-                textureData.image = tmpCanvas;
-                textureData.needsUpdate = true;
+              if (!this.isCompressed){
+                if (size.width != textureData.image.width || size.height != textureData.image.height){
+                  var tmpCanvas = document.createElement("canvas");
+                  tmpCanvas.width = size.width;
+                  tmpCanvas.height = size.height;
+                  tmpCanvas.getContext("2d").drawImage(textureData.image, 0, 0, textureData.image.width, textureData.image.height, 0, 0, size.width, size.height);
+                  textureData.image = tmpCanvas;
+                  textureData.needsUpdate = true;
+                }
               }
             }
             textures[textureNameX].needsUpdate = true;
@@ -645,7 +656,9 @@ StateLoader.prototype.load = function(undo){
             textures[textureNameX].offset.y = this.offsetYY;
             that.mapLoadedTexture(textures[textureNameX], textureNameX);
             that.createObjectGroupsAfterLoadedTextures();
-          }.bind({textureNameX: textureName, offsetXX: offsetX, offsetYY: offsetY, repeatUU: repeatU, repeatVV: repeatV}), function(xhr){
+          }.bind({textureNameX: textureName, offsetXX: offsetX, offsetYY: offsetY, repeatUU: repeatU, repeatVV: repeatV, isCompressed: (
+            this.loaders[textureName] instanceof THREE.DDSLoader
+          )}), function(xhr){
             textures[this.textureNameX] = 2;
           }.bind({textureNameX: textureName}), function(xhr){
             textures[this.textureNameX] = 3;

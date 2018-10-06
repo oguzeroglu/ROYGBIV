@@ -1,6 +1,14 @@
 var TexturePack = function(name, directoryName, fileExtension, mapCallback, isPreLoaded, refTexturePack, scaleFactor, refTexturePackName){
   this.directoryName = directoryName;
   this.name = name;
+
+
+  if (!DDS_SUPPORTED){
+    if (fileExtension.toUpperCase() == "DDS"){
+      fileExtension = compressedTextureFallbackFormat.replace(".", "");
+    }
+  }
+
   this.fileExtension = fileExtension;
 
   this.scaleFactor = scaleFactor;

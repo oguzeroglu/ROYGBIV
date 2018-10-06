@@ -90,6 +90,7 @@ var Text = function(){
   this.REPEATU_MUST_BE_A_NUMBER = "repeatU must be a number.";
   this.REPEATV_MUST_BE_A_NUMBER = "repeatV must be a number.";
   this.TEXTURE_CREATED = "Texture created.";
+  this.TEXTURE_CREATED_DDS_SUPPORT_ISSUE = "DDS textures are not supported in this device. Used "+compressedTextureFallbackFormat+" format instead.";
   this.TEXTURE_CLONED = "Texture cloned for optimization.";
   this.TREE_TEXTURE = "|____@@1 @@2 -> @@3"
   this.THERE_ARE_NO_TEXTURES = "There are no textures.";

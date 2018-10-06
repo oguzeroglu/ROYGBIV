@@ -959,6 +959,7 @@ function parse(input){
           var textureUrl = "/textures/"+fileName;
           var texture;
           var found = false;
+          var compressionSupportIssue = false;
           for (var textureNameX in textureURLs){
             if (textureURLs[textureNameX] == textureUrl){
               if (textures[textureNameX] && textures[textureNameX].isLoaded){
@@ -977,7 +978,17 @@ function parse(input){
           if (!found){
             var loader;
             if (textureUrl.toUpperCase().endsWith("DDS")){
-              loader = ddsLoader;
+              if (!DDS_SUPPORTED){
+                textureUrl = textureUrl.replace(
+                  ".dds", compressedTextureFallbackFormat
+                ).replace(
+                  ".DDS", compressedTextureFallbackFormat
+                );
+                loader = textureLoader;
+                compressionSupportIssue = true;
+              }else{
+                loader = ddsLoader;
+              }
             }else if (textureUrl.toUpperCase().endsWith("TGA")){
               loader = tgaLoader;
             }else{
@@ -1003,7 +1014,11 @@ function parse(input){
           }else{
             terminal.printInfo(Text.TEXTURE_CLONED);
           }
-          terminal.printInfo(Text.TEXTURE_CREATED);
+          if (!compressionSupportIssue){
+            terminal.printInfo(Text.TEXTURE_CREATED);
+          }else {
+            terminal.printInfo(Text.TEXTURE_CREATED_DDS_SUPPORT_ISSUE);
+          }
         break;
         case 22: //printTextures
           var count = 0;
@@ -2155,7 +2170,11 @@ function parse(input){
             fileExtension
           );
           texturePacks[name] = texturePack;
-          terminal.printInfo(Text.TEXTURE_PACK_CREATED);
+          if (!DDS_SUPPORTED && fileExtension.toUpperCase() == "DDS"){
+            terminal.printInfo(Text.TEXTURE_CREATED_DDS_SUPPORT_ISSUE);
+          }else{
+            terminal.printInfo(Text.TEXTURE_PACK_CREATED);
+          }
           return true;
         break;
         case 57: //printTexturePacks
@@ -2690,7 +2709,11 @@ function parse(input){
             fileExtension
           );
           skyBoxes[name] = skyBox;
-          terminal.printInfo(Text.SKYBOX_CREATED);
+          if (!DDS_SUPPORTED && fileExtension.toUpperCase() == "DDS"){
+            terminal.printInfo(Text.TEXTURE_CREATED_DDS_SUPPORT_ISSUE);
+          }else{
+            terminal.printInfo(Text.SKYBOX_CREATED);
+          }
           return true;
         break;
         case 70: //printSkyboxes

@@ -2,6 +2,13 @@ var SkyBox = function(name, directoryName, fileExtension, callback){
 
   this.name = name;
   this.directoryName = directoryName;
+
+  if (!DDS_SUPPORTED){
+    if (fileExtension.toUpperCase() == "DDS"){
+      fileExtension = compressedTextureFallbackFormat.replace(".", "");
+    }
+  }
+
   this.fileExtension = fileExtension;
 
   this.hasBack = false;
