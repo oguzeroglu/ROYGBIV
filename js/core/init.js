@@ -1127,6 +1127,15 @@ function mouseWheelEvent(e) {
   }
 }
 
+function rescale(canvas, scale){
+  var resizedCanvas = document.createElement("canvas");
+  resizedCanvas.width = canvas.width * scale;
+  resizedCanvas.height = canvas.height * scale;
+  var resizedContext = resizedCanvas.getContext("2d");
+  resizedContext.drawImage(canvas, 0, 0, canvas.width, canvas.height, 0, 0, resizedCanvas.width, resizedCanvas.height);
+  return resizedCanvas;
+}
+
 //******************************************************************
 // WARNING: FOR TEST PURPOSES
 function generateRandomBoxes(gridSystemName){

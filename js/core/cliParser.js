@@ -3845,6 +3845,10 @@ function parse(input){
               return true;
             }
           }
+          if (texture instanceof THREE.CompressedTexture){
+            terminal.printError(Text.COMPRESSED_TEXTURES_DO_NOT_SUPPORT);
+            return true;
+          }
           if (!(typeof textures[newTextureName] == "undefined")){
             terminal.printError(Text.TEXTURE_NAME_MUST_BE_UNIQUE);
             return true;
@@ -3862,7 +3866,7 @@ function parse(input){
           stdCanvas.height = texture.image.height;
           var stdContext = stdCanvas.getContext("2d");
           stdContext.drawImage(texture.image, 0, 0, stdCanvas.width, stdCanvas.height);
-          var resizedCanvas = new TextureMerger().rescale(stdCanvas, scale);
+          var resizedCanvas = rescale(stdCanvas, scale);
           var resizedTexture = new THREE.CanvasTexture(resizedCanvas);
           resizedTexture.wrapS = texture.wrapS;
           resizedTexture.wrapT = texture.wrapT;
@@ -3896,6 +3900,10 @@ function parse(input){
             return true;
           }
           var refTexturePack = texturePacks[texturePackName];
+          if (refTexturePack.fileExtension.toUpperCase() == "DDS"){
+            terminal.printError(Text.COMPRESSED_TEXTURES_DO_NOT_SUPPORT);
+            return true;
+          }
           if (refTexturePack.hasDiffuse){
             var wDiffuse = refTexturePack.diffuseTexture.image.width;
             var hDiffuse = refTexturePack.diffuseTexture.image.height;
@@ -4278,6 +4286,10 @@ function parse(input){
           var srcTexture = textures[textureName];
           if (!srcTexture){
             terminal.printError(Text.NO_SUCH_TEXTURE);
+            return true;
+          }
+          if (srcTexture instanceof THREE.CompressedTexture){
+            terminal.printError(Text.COMPRESSED_TEXTURES_DO_NOT_SUPPORT);
             return true;
           }
           if (textures[newTextureName]){
