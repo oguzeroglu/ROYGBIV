@@ -6,6 +6,10 @@ function render(){
 
   handleSkybox();
 
+  if (physicsDebugMode){
+    debugRenderer.update();
+  }
+
   if (mode == 1){
     if (!isPhysicsWorkerEnabled()){
       physicsWorld.step(physicsStepAmount);
@@ -31,10 +35,6 @@ function render(){
     if (staticOn){
       staticPass.uniforms[ 'time' ].value =  shaderTime;
     }
-    if (physicsDebugMode){
-      debugRenderer.update();
-    }
-
     handleWorkerMessages();
   }else{
     cameraOperationsDone = false;
@@ -143,35 +143,30 @@ function updateGridCornerHelpers(){
 function updateDynamicObjects(){
   for (var objectName in dynamicObjects){
     var object = addedObjects[objectName];
-    var previewMesh = object.previewMesh;
     var physicsBody = object.physicsBody;
     var axis = object.metaData.axis;
     var gridSystemAxis = object.metaData.gridSystemAxis;
     var type = object.type;
-    previewMesh.position.copy(physicsBody.position);
-    setTHREEQuaternionFromCANNON(previewMesh, physicsBody, axis, type, gridSystemAxis);
+    object.mesh.position.copy(physicsBody.position);
+    setTHREEQuaternionFromCANNON(object.mesh, physicsBody, axis, type, gridSystemAxis);
   }
   for (var grouppedObjectName in dynamicObjectGroups){
     var grouppedObject = objectGroups[grouppedObjectName];
-    var previewMesh = grouppedObject.previewMesh;
-    var previewGraphicsGroup = grouppedObject.previewGraphicsGroup;
     var physicsBody = grouppedObject.physicsBody;
-    previewMesh.position.copy(physicsBody.position);
-    previewMesh.quaternion.copy(physicsBody.quaternion);
-    previewGraphicsGroup.position.copy(previewMesh.position);
-    previewGraphicsGroup.quaternion.copy(previewMesh.quaternion);
+    grouppedObject.mesh.position.copy(physicsBody.position);
+    grouppedObject.mesh.quaternion.copy(physicsBody.quaternion);
   }
 }
 
-function setTHREEQuaternionFromCANNON(previewMesh, physicsBody, axis, type, gridSystemAxis){
-  previewMesh.quaternion.copy(physicsBody.quaternion);
+function setTHREEQuaternionFromCANNON(mesh, physicsBody, axis, type, gridSystemAxis){
+  mesh.quaternion.copy(physicsBody.quaternion);
   if (type == "ramp" || type == "surface"){
     if (gridSystemAxis == "XZ" || gridSystemAxis == "XY" || gridSystemAxis == "YZ"){
       if (!(type == "surface" && (gridSystemAxis == "XY" || gridSystemAxis == "YZ"))){
-        previewMesh.rotateX(Math.PI / 2);
+        mesh.rotateX(Math.PI / 2);
       }else{
         if (type == "surface" && gridSystemAxis == "YZ"){
-          previewMesh.rotateY(Math.PI / 2);
+          mesh.rotateY(Math.PI / 2);
         }
       }
     }
@@ -202,12 +197,7 @@ function calculateFps (){
 }
 
 function handleSkybox(){
-  if (skyboxMesh && skyboxPreviewMesh){
-    skyboxMesh.position.x = camera.position.x;
-    skyboxMesh.position.y = camera.position.y;
-    skyboxMesh.position.z = camera.position.z;
-    skyboxPreviewMesh.position.x = camera.position.x;
-    skyboxPreviewMesh.position.y = camera.position.y;
-    skyboxPreviewMesh.position.z = camera.position.z;
+  if (skyboxMesh){
+    skyboxMesh.position.copy(camera.position);
   }
 }

@@ -75,7 +75,7 @@ var ParticleSystemMerger = function(psObj, name){
       hiddenArray.push(20.0);
     }
     motionMatrixArray.push(new THREE.Matrix3());
-    previewScene.remove(ps.mesh);
+    scene.remove(ps.mesh);
     this.positions.set(ps.positions, offset1);
     this.rgbThresholds.set(ps.rgbThresholds, offset1);
     this.velocities.set(ps.velocities, offset1);
@@ -200,7 +200,7 @@ var ParticleSystemMerger = function(psObj, name){
   });
   this.mesh = new THREE.Points(this.geometry, this.material);
   this.mesh.frustumCulled = false;
-  previewScene.add(this.mesh);
+  scene.add(this.mesh);
 
   this.clean();
 
@@ -210,7 +210,7 @@ ParticleSystemMerger.prototype.destroy = function(){
   for (var psName in this.psObj){
     this.psObj[psName].destroy();
   }
-  previewScene.remove(this.mesh);
+  scene.remove(this.mesh);
   this.mesh.geometry.dispose();
   this.mesh.material.dispose();
   delete mergedParticleSystems[this.name];

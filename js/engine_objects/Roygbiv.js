@@ -195,14 +195,7 @@ Roygbiv.prototype.getRandomColor = function(){
 //  Returns the light having the name given as parameter or zero if no such
 //  light is found.
 Roygbiv.prototype.getLight = function(name){
-  if (mode == 0){
-    return;
-  }
-  var light = light_previewScene[name];
-  if (light){
-    return light;
-  }
-  return 0;
+
 }
 
 // getPosition
@@ -233,8 +226,8 @@ Roygbiv.prototype.getPosition = function(object, targetVector, axis){
     if (axis){
       if (object.parentObjectName){
         var parentObject = objectGroups[object.parentObjectName];
-        parentObject.previewGraphicsGroup.updateMatrix();
-        var child = parentObject.previewGraphicsGroup.children[object.indexInParent];
+        parentObject.graphicsGroup.updateMatrix();
+        var child = parentObject.graphicsGroup.children[object.indexInParent];
         child.getWorldPosition(REUSABLE_VECTOR);
         var worldPosition = REUSABLE_VECTOR;
         if (axis.toLowerCase() == "x"){
@@ -246,17 +239,17 @@ Roygbiv.prototype.getPosition = function(object, targetVector, axis){
         }
       }
       if (axis.toLowerCase() == "x"){
-        return object.previewMesh.position.x;
+        return object.mesh.position.x;
       }else if (axis.toLowerCase() == "y"){
-        return object.previewMesh.position.y;
+        return object.mesh.position.y;
       }else if (axis.toLowerCase() == "z"){
-        return object.previewMesh.position.z;
+        return object.mesh.position.z;
       }
     }else{
       if (object.parentObjectName){
         var parentObject = objectGroups[object.parentObjectName];
-        parentObject.previewGraphicsGroup.updateMatrix();
-        var child = parentObject.previewGraphicsGroup.children[object.indexInParent];
+        parentObject.graphicsGroup.updateMatrix();
+        var child = parentObject.graphicsGroup.children[object.indexInParent];
         child.getWorldPosition(REUSABLE_VECTOR);
         var worldPosition = REUSABLE_VECTOR;
         if (targetVector){
@@ -269,15 +262,15 @@ Roygbiv.prototype.getPosition = function(object, targetVector, axis){
         }
       }
       if (targetVector){
-        targetVector.x = object.previewMesh.position.x;
-        targetVector.y = object.previewMesh.position.y;
-        targetVector.z = object.previewMesh.position.z;
+        targetVector.x = object.mesh.position.x;
+        targetVector.y = object.mesh.position.y;
+        targetVector.z = object.mesh.position.z;
         return targetVector;
       }else{
         return this.vector(
-          object.previewMesh.position.x,
-          object.previewMesh.position.y,
-          object.previewMesh.position.z
+          object.mesh.position.x,
+          object.mesh.position.y,
+          object.mesh.position.z
         );
       }
     }
@@ -307,23 +300,23 @@ Roygbiv.prototype.getPosition = function(object, targetVector, axis){
   }else if (object instanceof ObjectGroup){
     if (axis){
       if (axis.toLowerCase() == "x"){
-        return object.previewGraphicsGroup.position.x;
+        return object.graphicsGroup.position.x;
       }else if (axis.toLowerCase() == "y"){
-        return object.previewGraphicsGroup.position.y;
+        return object.graphicsGroup.position.y;
       }else if (axis.toLowerCase() == "z"){
-        return object.previewGraphicsGroup.position.z;
+        return object.graphicsGroup.position.z;
       }
     }else{
       if (targetVector){
-        targetVector.x = object.previewGraphicsGroup.position.x;
-        targetVector.y = object.previewGraphicsGroup.position.y;
-        targetVector.z = object.previewGraphicsGroup.position.z;
+        targetVector.x = object.graphicsGroup.position.x;
+        targetVector.y = object.graphicsGroup.position.y;
+        targetVector.z = object.graphicsGroup.position.z;
         return targetVector;
       }else{
         return this.vector(
-          object.previewGraphicsGroup.position.x,
-          object.previewGraphicsGroup.position.y,
-          object.previewGraphicsGroup.position.z
+          object.graphicsGroup.position.x,
+          object.graphicsGroup.position.y,
+          object.graphicsGroup.position.z
         );
       }
     }
@@ -377,32 +370,32 @@ Roygbiv.prototype.getRotation = function(object, axis){
   if (object instanceof AddedObject){
     if (typeof axis == UNDEFINED){
       return this.vector(
-        object.previewMesh.rotation.x,
-        object.previewMesh.rotation.y,
-        object.previewMesh.rotation.z
+        object.mesh.rotation.x,
+        object.mesh.rotation.y,
+        object.mesh.rotation.z
       );
     }
     if (axis.toLowerCase() == "x"){
-      return object.previewMesh.rotation.x;
+      return object.mesh.rotation.x;
     }else if (axis.toLowerCase() == "y"){
-      return object.previewMesh.rotation.y;
+      return object.mesh.rotation.y;
     }else if (axis.toLowerCase() == "z"){
-      return object.previewMesh.rotation.z;
+      return object.mesh.rotation.z;
     }
   }else if (object instanceof ObjectGroup){
     if (typeof axis == UNDEFINED){
       return this.vector(
-        object.previewGraphicsGroup.rotation.x,
-        object.previewGraphicsGroup.rotation.y,
-        object.previewGraphicsGroup.rotation.z,
+        object.graphicsGroup.rotation.x,
+        object.graphicsGroup.rotation.y,
+        object.graphicsGroup.rotation.z,
       );
     }
     if (axis.toLowerCase() == "x"){
-      return object.previewGraphicsGroup.rotation.x;
+      return object.graphicsGroup.rotation.x;
     }else if (axis.toLowerCase() == "y"){
-      return object.previewGraphicsGroup.rotation.y;
+      return object.graphicsGroup.rotation.y;
     }else if (axis.toLowerCase() == "z"){
-      return object.previewGraphicsGroup.rotation.z;
+      return object.graphicsGroup.rotation.z;
     }
   }else if (object instanceof ParticleSystem){
     if (typeof axis == UNDEFINED){
@@ -456,7 +449,7 @@ Roygbiv.prototype.getOpacity = function(object){
     throw new Error("getOpacity error: Type not supported.");
     return;
   }
-  return object.previewMesh.material.uniforms.alpha.value;
+  return object.mesh.material.uniforms.alpha.value;
 }
 
 // getShininess
@@ -717,7 +710,7 @@ Roygbiv.prototype.hide = function(object){
       return;
     }
     if (object.isVisibleOnThePreviewScene()){
-      object.previewMesh.visible = false;
+      object.mesh.visible = false;
       // The reason we use delayed execution here is that
       // during the collision callback, cannon.js crashes if a body
       // is removed. It is safe to remove the bodies after the
@@ -742,7 +735,7 @@ Roygbiv.prototype.hide = function(object){
     }
   }else if (object instanceof ObjectGroup){
     if (object.isVisibleOnThePreviewScene()){
-      object.previewGraphicsGroup.visible = false;
+      object.graphicsGroup.visible = false;
       setTimeout(function(){
         physicsWorld.removeBody(object.physicsBody);
         if (isPhysicsWorkerEnabled()){
@@ -784,7 +777,7 @@ Roygbiv.prototype.show = function(object){
       return;
     }
     if (!object.isVisibleOnThePreviewScene()){
-      object.previewMesh.visible = true;
+      object.mesh.visible = true;
       setTimeout(function(){
         physicsWorld.addBody(object.physicsBody);
         if (isPhysicsWorkerEnabled()){
@@ -805,7 +798,7 @@ Roygbiv.prototype.show = function(object){
     }
   }else if (object instanceof ObjectGroup){
     if (!object.isVisibleOnThePreviewScene()){
-      object.previewGraphicsGroup.visible = true;
+      object.graphicsGroup.visible = true;
       setTimeout(function(){
         physicsWorld.addBody(object.physicsBody);
         if (isPhysicsWorkerEnabled()){
@@ -990,9 +983,9 @@ Roygbiv.prototype.rotateAroundXYZ = function(object, x, y, z, radians, axis){
         return;
       }
     }
-    mesh = object.previewMesh;
+    mesh = object.mesh;
   }else if (object instanceof ObjectGroup){
-    mesh = object.previewGraphicsGroup;
+    mesh = object.graphicsGroup;
   }else if (object.isPointLight){
     mesh = object;
   }else{
@@ -1080,7 +1073,7 @@ Roygbiv.prototype.setPosition = function(obj, x, y, z){
       }
     }
 
-    obj.previewMesh.position.set(x, y, z);
+    obj.mesh.position.set(x, y, z);
     obj.physicsBody.position.set(x, y, z);
     if (isPhysicsWorkerEnabled()){
       workerHandler.syncPhysics(obj);
@@ -1100,7 +1093,7 @@ Roygbiv.prototype.setPosition = function(obj, x, y, z){
       throw new Error("setPosition error: Object is not visible.");
       return;
     }
-    obj.previewGraphicsGroup.position.set(x, y, z);
+    obj.graphicsGroup.position.set(x, y, z);
     obj.physicsBody.position.set(x, y, z);
     if (isPhysicsWorkerEnabled()){
       workerHandler.syncPhysics(obj);
@@ -1353,16 +1346,16 @@ Roygbiv.prototype.opacity = function(object, delta){
     return;
   }
   if (!object.initOpacitySet){
-    object.initOpacity = object.previewMesh.material.uniforms.alpha.value;
+    object.initOpacity = object.mesh.material.uniforms.alpha.value;
     object.initOpacitySet = true;
   }
 
   object.incrementOpacity(delta);
 
-  if (object.previewMesh.material.uniforms.alpha.value < 0){
+  if (object.mesh.material.uniforms.alpha.value < 0){
     object.updateOpacity(0);
   }
-  if (object.previewMesh.material.uniforms.alpha.value > 1){
+  if (object.mesh.material.uniforms.alpha.value > 1){
     object.updateOpacity(1);
   }
 

@@ -16,6 +16,51 @@ var ObjectGroup = function(name, group){
 
 }
 
+ObjectGroup.prototype.loadState = function(){
+  this.physicsBody.position.set(
+    this.state.physicsPX, this.state.physicsPY, this.state.physicsPZ
+  );
+  this.physicsBody.quaternion.set(
+    this.state.physicsQX, this.state.physicsQY, this.state.physicsQZ, this.state.physicsQW
+  );
+  this.physicsBody.angularVelocity.set(
+    this.state.physicsAVX, this.state.physicsAVY, this.state.physicsAVZ
+  );
+  this.physicsBody.velocity.set(
+    this.state.physicsVX, this.state.physicsVY, this.state.physicsVZ
+  );
+  this.mesh.position.set(
+    this.state.positionX, this.state.positionY, this.state.positionZ
+  );
+  this.mesh.quaternion.set(
+    this.state.quaternionX, this.state.quaternionY, this.state.quaternionZ, this.state.quaternionW
+  );
+}
+
+ObjectGroup.prototype.saveState = function(){
+  this.state = new Object();
+  this.state.physicsPX = this.physicsBody.position.x;
+  this.state.physicsPY = this.physicsBody.position.y;
+  this.state.physicsPZ = this.physicsBody.position.z;
+  this.state.physicsQX = this.physicsBody.quaternion.x;
+  this.state.physicsQY = this.physicsBody.quaternion.y;
+  this.state.physicsQZ = this.physicsBody.quaternion.z;
+  this.state.physicsQW = this.physicsBody.quaternion.w;
+  this.state.physicsAVX = this.physicsBody.angularVelocity.x;
+  this.state.physicsAVY = this.physicsBody.angularVelocity.y;
+  this.state.physicsAVZ = this.physicsBody.angularVelocity.z;
+  this.state.physicsVX = this.physicsBody.velocity.x;
+  this.state.physicsVY = this.physicsBody.velocity.y;
+  this.state.physicsVZ = this.physicsBody.velocity.z;
+  this.state.positionX = this.mesh.position.x;
+  this.state.positionY = this.mesh.position.y;
+  this.state.positionZ = this.mesh.position.z;
+  this.state.quaternionX = this.mesh.quaternion.x;
+  this.state.quaternionY = this.mesh.quaternion.y;
+  this.state.quaternionZ = this.mesh.quaternion.z;
+  this.state.quaternionW = this.mesh.quaternion.w;
+}
+
 ObjectGroup.prototype.areGeometriesIdentical = function(){
   var uuid = 0;
   for (var objName in this.group){
@@ -685,7 +730,6 @@ ObjectGroup.prototype.glue = function(){
   var physicsBody = new CANNON.Body({mass: 0, material: physicsMaterial});
   var centerPosition = this.getInitialCenter();
   var graphicsGroup = new THREE.Group();
-  var previewGraphicsGroup = new THREE.Group();
   var centerX = centerPosition.x;
   var centerY = centerPosition.y;
   var centerZ = centerPosition.z;
@@ -698,7 +742,6 @@ ObjectGroup.prototype.glue = function(){
 
   physicsBody.position = referenceVector;
   graphicsGroup.position.copy(physicsBody.position);
-  previewGraphicsGroup.position.copy(physicsBody.position);
 
   var gridSystemNamesMap = new Object();
 
@@ -715,14 +758,10 @@ ObjectGroup.prototype.glue = function(){
     physicsBody.addShape(shape, addedObject.physicsBody.position.vsub(referenceVector), addedObject.physicsBody.quaternion);
     // GLUE GRAPHICS ***********************************************
     addedObject.mesh.position.sub(referenceVectorTHREE);
-    addedObject.previewMesh.position.sub(referenceVectorTHREE);
     graphicsGroup.add(addedObject.mesh);
-    previewGraphicsGroup.add(addedObject.previewMesh);
     // PREPARE GRAPHICS FOR CLICK EVENTS ***************************
     addedObject.mesh.addedObject = 0;
-    addedObject.previewMesh.addedObject = 0;
     addedObject.mesh.objectGroupName = this.name;
-    addedObject.previewMesh.objectGroupName = this.name;
     // TO MANAGE CLICK EVENTS
     if (addedObject.destroyedGrids){
       for (var gridName in addedObject.destroyedGrids){
@@ -735,7 +774,7 @@ ObjectGroup.prototype.glue = function(){
     // THESE ARE NECESSARY FOR BVHANDLER
     gridSystemNamesMap[addedObject.metaData.gridSystemName] = true;
     addedObjectsInsideGroups[addedObject.name] = addedObject;
-    addedObject.indexInParent = previewGraphicsGroup.children.length - 1;
+    addedObject.indexInParent = graphicsGroup.children.length - 1;
   }
 
   this.gridSystemNames = Object.keys(gridSystemNamesMap);
@@ -750,28 +789,19 @@ ObjectGroup.prototype.glue = function(){
   }else{
     this.mesh = meshGenerator.generateInstancedMesh(graphicsGroup, this);
   }
-  this.previewMesh= new THREE.Mesh(this.mesh.geometry, this.mesh.material);
-  this.previewMesh.position.copy(this.mesh.position);
-  this.previewMesh.quaternion.copy(this.mesh.quaternion);
-  this.previewMesh.rotation.copy(this.mesh.rotation);
+
   this.mesh.objectGroupName = this.name;
-  this.previewMesh.objectGroupName = this.name;
   scene.add(this.mesh);
-  previewScene.add(this.previewMesh);
   physicsWorld.addBody(physicsBody);
 
   this.graphicsGroup = graphicsGroup;
-  this.previewGraphicsGroup = previewGraphicsGroup;
 
   this.graphicsGroup.position.copy(this.mesh.position);
   this.graphicsGroup.quaternion.copy(this.mesh.quaternion);
-  this.previewGraphicsGroup.position.copy(this.previewMesh.position);
-  this.previewGraphicsGroup.quaternion.copy(this.previewMesh.quaternion);
   this.graphicsGroup.updateMatrix();
-  this.previewGraphicsGroup.updateMatrix();
 
   this.physicsBody = physicsBody;
-  this.initQuaternion = this.previewGraphicsGroup.quaternion.clone();
+  this.initQuaternion = this.graphicsGroup.quaternion.clone();
 
   this.collisionCallbackFunction = function(collisionEvent){
     if (!collisionEvent.body.addedObject || !this.isVisibleOnThePreviewScene()){
@@ -788,10 +818,10 @@ ObjectGroup.prototype.glue = function(){
     collisionPosition.x = contact.bi.position.x + contact.ri.x;
     collisionPosition.y = contact.bi.position.y + contact.ri.y;
     collisionPosition.z = contact.bi.position.z + contact.ri.z;
-    var quatX = this.previewMesh.quaternion.x;
-    var quatY = this.previewMesh.quaternion.y;
-    var quatZ = this.previewMesh.quaternion.z;
-    var quatW = this.previewMesh.quaternion.w;
+    var quatX = this.mesh.quaternion.x;
+    var quatY = this.mesh.quaternion.y;
+    var quatZ = this.mesh.quaternion.z;
+    var quatW = this.mesh.quaternion.w;
     var collisionInfo = reusableCollisionInfo.set(
       targetObjectName,
       collisionPosition.x,
@@ -832,10 +862,7 @@ ObjectGroup.prototype.detach = function(){
   }
   this.graphicsGroup.position.copy(this.mesh.position);
   this.graphicsGroup.quaternion.copy(this.mesh.quaternion);
-  this.previewGraphicsGroup.position.copy(this.previewMesh.position);
-  this.previewGraphicsGroup.quaternion.copy(this.previewMesh.quaternion);
   this.graphicsGroup.updateMatrixWorld();
-  this.previewGraphicsGroup.updateMatrixWorld();
   var worldQuaternions = new Object();
   var worldPositions = new Object();
   var previewSceneWorldPositions = new Object();
@@ -848,9 +875,9 @@ ObjectGroup.prototype.detach = function(){
       this.group[objectName].mesh.getWorldPosition(REUSABLE_VECTOR);
       worldPositions[objectName] = REUSABLE_VECTOR.clone();
     }else if (mode == 1){
-      this.group[objectName].previewMesh.getWorldQuaternion(REUSABLE_QUATERNION);
+      this.group[objectName].mesh.getWorldQuaternion(REUSABLE_QUATERNION);
       worldQuaternions[objectName] = REUSABLE_QUATERNION.clone();
-      this.group[objectName].previewMesh.getWorldPosition(REUSABLE_VECTOR);
+      this.group[objectName].mesh.getWorldPosition(REUSABLE_VECTOR);
       worldPositions[objectName] = REUSABLE_VECTOR.clone();
     }
     if (this.physicsBody.initQuaternion instanceof THREE.Quaternion){
@@ -875,21 +902,16 @@ ObjectGroup.prototype.detach = function(){
   for (var i = this.graphicsGroup.children.length -1; i>=0; i--){
     this.graphicsGroup.remove(this.graphicsGroup.children[i]);
   }
-  for (var i = this.previewGraphicsGroup.children.length -1; i>=0; i--){
-    this.previewGraphicsGroup.remove(this.previewGraphicsGroup.children[i]);
-  }
+
   this.destroy(true);
   for (var objectName in this.group){
     var addedObject = this.group[objectName];
 
     physicsWorld.add(addedObject.physicsBody);
     scene.add(addedObject.mesh);
-    previewScene.add(addedObject.previewMesh);
 
     addedObject.mesh.objectGroupName = 0;
-    addedObject.previewMesh.objectGroupName = 0;
     addedObject.mesh.addedObject = addedObject;
-    addedObject.previewMesh.addedObject = addedObject;
 
     addedObjects[objectName] = addedObject;
 
@@ -907,7 +929,6 @@ ObjectGroup.prototype.detach = function(){
       addedObject.positionYWhenAttached,
       addedObject.positionZWhenAttached
     );
-    addedObject.previewMesh.position.copy(addedObject.mesh.position);
     addedObject.physicsBody.position.set(
       addedObject.positionXWhenAttached,
       addedObject.positionYWhenAttached,
@@ -920,7 +941,6 @@ ObjectGroup.prototype.detach = function(){
       addedObject.qzWhenAttached,
       addedObject.qwWhenAttached
     );
-    addedObject.previewMesh.quaternion.copy(addedObject.mesh.quaternion);
     addedObject.physicsBody.quaternion.set(
       addedObject.pqxWhenAttached,
       addedObject.pqyWhenAttached,
@@ -948,36 +968,29 @@ ObjectGroup.prototype.detach = function(){
 ObjectGroup.prototype.setQuaternion = function(axis, val){
   if (axis == "x"){
     this.graphicsGroup.quaternion.x = val;
-    this.previewGraphicsGroup.quaternion.x = val;
     this.physicsBody.quaternion.x = val;
     this.initQuaternion.x = val;
     this.physicsBody.initQuaternion.x = val;
     this.mesh.quaternion.x = val;
-    this.previewMesh.quaternion.x = val;
   }else if (axis == "y"){
     this.graphicsGroup.quaternion.y = val;
-    this.previewGraphicsGroup.quaternion.y = val;
+
     this.physicsBody.quaternion.y = val;
     this.initQuaternion.y = val;
     this.physicsBody.initQuaternion.y = val;
     this.mesh.quaternion.y = val;
-    this.previewMesh.quaternion.y = val;
   }else if (axis == "z"){
     this.graphicsGroup.quaternion.z = val;
-    this.previewGraphicsGroup.quaternion.z = val;
     this.physicsBody.quaternion.z = val;
     this.initQuaternion.z = val;
     this.physicsBody.initQuaternion.z = val;
     this.mesh.quaternion.z = val;
-    this.previewMesh.quaternion.z = val;
   }else if (axis == "w"){
     this.graphicsGroup.quaternion.w = val;
-    this.previewGraphicsGroup.quaternion.w = val;
     this.physicsBody.quaternion.w = val;
     this.initQuaternion.w = val;
     this.physicsBody.initQuaternion.w = val;
     this.mesh.quaternion.w = val;
-    this.previewMesh.quaternion.w = val;
   }
 }
 
@@ -999,10 +1012,8 @@ ObjectGroup.prototype.rotate = function(axis, radian, fromScript){
     );
   }
 
-  this.previewMesh.quaternion.copy(this.mesh.quaternion);
   this.physicsBody.quaternion.copy(this.mesh.quaternion);
   this.graphicsGroup.quaternion.copy(this.mesh.quaternion);
-  this.previewGraphicsGroup.quaternion.copy(this.mesh.quaternion);
 
   if (!fromScript){
     this.initQuaternion = this.mesh.quaternion.clone();
@@ -1021,37 +1032,35 @@ ObjectGroup.prototype.rotate = function(axis, radian, fromScript){
 }
 
 ObjectGroup.prototype.translate = function(axis, amount, fromScript){
-  var previewMesh = this.previewMesh;
   var physicsBody = this.physicsBody;
-  var x = previewMesh.position.x;
-  var y = previewMesh.position.y;
-  var z = previewMesh.position.z;
+  var x = this.mesh.position.x;
+  var y = this.mesh.position.y;
+  var z = this.mesh.position.z;
   if (axis == "x"){
-    previewMesh.position.set(
+    this.mesh.position.set(
       x + amount,
       y,
       z
     );
   }else if (axis == "y"){
-    previewMesh.position.set(
+    this.mesh.position.set(
       x,
       y + amount,
       z
     );
   }else if (axis == "z"){
-    previewMesh.position.set(
+    this.mesh.position.set(
       x,
       y,
       z + amount
     );
   }
-  physicsBody.position.copy(previewMesh.position);
-  this.previewGraphicsGroup.position.copy(previewMesh.position);
+  physicsBody.position.copy(this.mesh.position);
+  this.graphicsGroup.position.copy(this.mesh.position);
 }
 
 ObjectGroup.prototype.resetPosition = function(){
-  this.previewMesh.position.copy(this.mesh.position);
-  this.previewGraphicsGroup.position.copy(this.previewMesh);
+
 }
 
 ObjectGroup.prototype.destroy = function(isUndo){
@@ -1059,7 +1068,6 @@ ObjectGroup.prototype.destroy = function(isUndo){
     selectedObjectGroup = 0;
   }
   scene.remove(this.mesh);
-  previewScene.remove(this.previewMesh);
   physicsWorld.remove(this.physicsBody);
   for (var name in this.group){
     var childObj= this.group[name];
@@ -1223,10 +1231,10 @@ ObjectGroup.prototype.updateBoundingBoxes = function(){
 
 ObjectGroup.prototype.generateBoundingBoxes = function(){
   this.boundingBoxes = [];
-  this.previewMesh.updateMatrixWorld();
-  this.previewGraphicsGroup.position.copy(this.previewMesh.position);
-  this.previewGraphicsGroup.quaternion.copy(this.previewMesh.quaternion);
-  this.previewGraphicsGroup.updateMatrixWorld();
+  this.mesh.updateMatrixWorld();
+  this.graphicsGroup.position.copy(this.mesh.position);
+  this.graphicsGroup.quaternion.copy(this.mesh.quaternion);
+  this.graphicsGroup.updateMatrixWorld();
   for (var objName in this.group){
     this.group[objName].generateBoundingBoxes(this.boundingBoxes);
   }

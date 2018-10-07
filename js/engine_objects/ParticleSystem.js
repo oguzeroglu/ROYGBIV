@@ -398,7 +398,7 @@ var ParticleSystem = function(copyPS, name, particles, x, y, z, vx, vy, vz, ax, 
   this.mesh.frustumCulled = false;
   this.mesh.visible = false;
 
-  previewScene.add(this.mesh);
+  scene.add(this.mesh);
   particleSystemPool[name] = this;
   if (isCollisionWorkerEnabled()){
       this.assignCollisionWorkerIndex();
@@ -466,7 +466,7 @@ ParticleSystem.prototype.notifyParticleCollisionCallbackChange = function(partic
 
 ParticleSystem.prototype.destroy = function(){
   if (this.mesh){
-    previewScene.remove(this.mesh);
+    scene.remove(this.mesh);
     this.mesh.geometry.dispose();
     this.mesh.material.dispose();
     this.mesh = 0;
@@ -869,8 +869,8 @@ ParticleSystem.prototype.handleCollisions = function(fromWorker){
       if (intersectionPoint){
         var collisionInfo = new CollisionInfo(
           objName, intersectionPoint.x, intersectionPoint.y, intersectionPoint.z,
-          0, obj.previewMesh.quaternion.x, obj.previewMesh.quaternion.y, obj.previewMesh.quaternion.z,
-          obj.previewMesh.quaternion.w, INTERSECTION_NORMAL, this.tick
+          0, obj.mesh.quaternion.x, obj.mesh.quaternion.y, obj.mesh.quaternion.z,
+          obj.mesh.quaternion.w, INTERSECTION_NORMAL, this.tick
         );
         this.fireCollisionCallback(collisionInfo);
       }
@@ -899,8 +899,8 @@ ParticleSystem.prototype.handleCollisions = function(fromWorker){
         if (intersectionPoint){
           var collisionInfo = reusableCollisionInfo.set(
             objName, intersectionPoint.x, intersectionPoint.y, intersectionPoint.z,
-            0, parent.previewGraphicsGroup.quaternion.x, parent.previewGraphicsGroup.quaternion.y,
-            parent.previewGraphicsGroup.quaternion.z, parent.previewGraphicsGroup.quaternion.w,
+            0, parent.graphicsGroup.quaternion.x, parent.graphicsGroup.quaternion.y,
+            parent.graphicsGroup.quaternion.z, parent.graphicsGroup.quaternion.w,
             INTERSECTION_NORMAL, this.tick
           );
           this.fireCollisionCallback(collisionInfo);

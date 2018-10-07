@@ -227,12 +227,7 @@ StateLoader.prototype.load = function(undo){
         boxMesh.position.x = centerX;
         boxMesh.position.y = centerY;
         boxMesh.position.z = centerZ;
-        boxClone = new THREE.Mesh(boxMesh.geometry, boxMesh.material);
-        boxClone.position.copy(boxMesh.position);
-        boxClone.quaternion.copy(boxMesh.quaternion);
-        boxClone.rotation.copy(boxMesh.rotation);
         scene.add(boxMesh);
-        previewScene.add(boxClone);
         boxPhysicsBody.position.set(
           boxMesh.position.x,
           boxMesh.position.y,
@@ -241,7 +236,7 @@ StateLoader.prototype.load = function(undo){
         physicsWorld.add(boxPhysicsBody);
         addedObjectInstance = new AddedObject(
           addedObjectName, "box", metaData, material,
-          boxMesh, boxClone, boxPhysicsBody, destroyedGrids
+          boxMesh, boxPhysicsBody, destroyedGrids
         );
         boxMesh.addedObject = addedObjectInstance;
       }else if (type == "surface"){
@@ -278,12 +273,7 @@ StateLoader.prototype.load = function(undo){
         surface.quaternion.z = quaternionZ;
         surface.quaternion.w = quaternionW;
 
-        var surfaceClone = new THREE.Mesh(surface.geometry, surface.material);
-        surfaceClone.position.copy(surface.position);
-        surfaceClone.quaternion.copy(surface.quaternion);
-        surfaceClone.rotation.copy(surface.rotation);
         scene.add(surface);
-        previewScene.add(surfaceClone);
 
         var surfacePhysicsShape = new CANNON.Box(new CANNON.Vec3(
             physicsShapeParameterX,
@@ -304,7 +294,7 @@ StateLoader.prototype.load = function(undo){
         );
         physicsWorld.add(surfacePhysicsBody);
         addedObjectInstance = new AddedObject(addedObjectName, "surface", metaData, material,
-                                    surface, surfaceClone, surfacePhysicsBody, destroyedGrids);
+                                    surface, surfacePhysicsBody, destroyedGrids);
         surface.addedObject = addedObjectInstance;
       }else if (type == "ramp"){
         var rampHeight = metaData["rampHeight"];
@@ -339,10 +329,6 @@ StateLoader.prototype.load = function(undo){
         ramp.quaternion.z = quaternionZ;
         ramp.quaternion.w = quaternionW;
 
-        var rampClone = new THREE.Mesh(ramp.geometry, ramp.material);
-        rampClone.position.copy(ramp.position);
-        rampClone.quaternion.copy(ramp.quaternion);
-        rampClone.rotation.copy(ramp.rotation);
         var rampPhysicsShape = new CANNON.Box(new CANNON.Vec3(
           rampWidth/2,
           surfacePhysicalThickness,
@@ -368,10 +354,9 @@ StateLoader.prototype.load = function(undo){
           );
         }
         scene.add(ramp);
-        previewScene.add(rampClone);
         physicsWorld.add(rampPhysicsBody);
         addedObjectInstance = new AddedObject(
-          addedObjectName, "ramp", metaData, material, ramp, rampClone,
+          addedObjectName, "ramp", metaData, material, ramp,
           rampPhysicsBody, new Object()
         );
         ramp.addedObject = addedObjectInstance;
@@ -404,12 +389,7 @@ StateLoader.prototype.load = function(undo){
         sphereMesh.position.x = centerX;
         sphereMesh.position.y = centerY;
         sphereMesh.position.z = centerZ;
-        sphereClone = new THREE.Mesh(sphereMesh.geometry, sphereMesh.material);
-        sphereClone.position.copy(sphereMesh.position);
-        sphereClone.quaternion.copy(sphereMesh.quaternion);
-        sphereClone.rotation.copy(sphereMesh.rotation);
         scene.add(sphereMesh);
-        previewScene.add(sphereClone);
         spherePhysicsBody.position.set(
           sphereMesh.position.x,
           sphereMesh.position.y,
@@ -418,7 +398,7 @@ StateLoader.prototype.load = function(undo){
         physicsWorld.add(spherePhysicsBody);
         addedObjectInstance = new AddedObject(
           addedObjectName, "sphere", metaData, material,
-          sphereMesh, sphereClone, spherePhysicsBody, destroyedGrids
+          sphereMesh, spherePhysicsBody, destroyedGrids
         );
         sphereMesh.addedObject = addedObjectInstance;
       }
@@ -450,12 +430,6 @@ StateLoader.prototype.load = function(undo){
           curAddedObjectExport.quaternionZ,
           curAddedObjectExport.quaternionW
         );
-        addedObjectInstance.previewMesh.quaternion.set(
-          curAddedObjectExport.quaternionX,
-          curAddedObjectExport.quaternionY,
-          curAddedObjectExport.quaternionZ,
-          curAddedObjectExport.quaternionW
-        );
         addedObjectInstance.physicsBody.quaternion.set(
           curAddedObjectExport.pQuaternionX,
           curAddedObjectExport.pQuaternionY,
@@ -466,12 +440,6 @@ StateLoader.prototype.load = function(undo){
         addedObjectInstance.physicsBody.initQuaternion.copy(addedObjectInstance.physicsBody.quaternion);
       }else{
         addedObjectInstance.mesh.quaternion.set(
-          curAddedObjectExport.quaternionX,
-          curAddedObjectExport.quaternionY,
-          curAddedObjectExport.quaternionZ,
-          curAddedObjectExport.quaternionW
-        );
-        addedObjectInstance.previewMesh.quaternion.set(
           curAddedObjectExport.quaternionX,
           curAddedObjectExport.quaternionY,
           curAddedObjectExport.quaternionZ,
@@ -669,59 +637,6 @@ StateLoader.prototype.load = function(undo){
       }
       this.hasTextures = true;
     }
-    // LIGHTS - LIGHT_PREVIEWSCENE - POINT LIGHT REPRESENTATIONS ***
-    var lightsExport = obj.lights;
-    for (var lightName in lightsExport){
-      var curLightExport = lightsExport[lightName];
-      var lightColor = curLightExport["colorTextVal"];
-      var lightIntensity = curLightExport.intensity;
-      if (curLightExport.type == "AMBIENT"){
-        var light = new THREE.AmbientLight(lightColor);
-        var previewSceneLight = light.clone();
-        light.intensity = lightIntensity;
-        previewSceneLight.intensity = lightIntensity;
-        scene.add(light);
-        previewScene.add(previewSceneLight);
-        lights[lightName] = light;
-        light_previewScene[lightName] = previewSceneLight;
-        light.colorTextVal = lightColor;
-        previewSceneLight.colorTextVal = lightColor;
-      }else if (curLightExport.type == "POINT"){
-        var pointLight = new THREE.PointLight(lightColor);
-        var pointLightClone = pointLight.clone();
-        pointLight.colorTextVal = lightColor
-        pointLightClone.colorTextVal = lightColor;
-        pointLight.position.x = curLightExport.positionX;
-        pointLight.position.y = curLightExport.positionY;
-        pointLight.position.z = curLightExport.positionZ;
-        pointLightClone.position.x = curLightExport.positionX;
-        pointLightClone.position.y = curLightExport.positionY;
-        pointLightClone.position.z = curLightExport.positionZ;
-        pointLight.initialPositionX = curLightExport.initialPositionX;
-        pointLight.initialPositionY = curLightExport.initialPositionY;
-        pointLight.initialPositionZ = curLightExport.initialPositionZ;
-        pointLightClone.initialPositionX = curLightExport.initialPositionX;
-        pointLightClone.initialPositionY = curLightExport.initialPositionY;
-        pointLightClone.initialPositionZ = curLightExport.initialPositionZ;
-        pointLight.intensity = lightIntensity;
-        pointLightClone.intensity = lightIntensity;
-        lights[lightName] = pointLight;
-        light_previewScene[lightName] = pointLightClone;
-        scene.add(pointLight);
-        previewScene.add(pointLightClone);
-        var pointLightRepresentation = new THREE.Mesh(
-          new THREE.SphereGeometry(5),
-          new THREE.MeshBasicMaterial({color: lightColor})
-        );
-        pointLightRepresentation.position.x = curLightExport.positionX;
-        pointLightRepresentation.position.y = curLightExport.positionY;
-        pointLightRepresentation.position.z = curLightExport.positionZ;
-        scene.add(pointLightRepresentation);
-        pointLightRepresentations[lightName] = pointLightRepresentation;
-        pointLightRepresentation.lightName = lightName;
-        pointLightRepresentation.isPointLightRepresentation = true;
-      }
-    }
     // TEXTURE PACKS ***********************************************
     var texturePacksExport = obj.texturePacks;
     for (var texturePackName in texturePacksExport){
@@ -787,25 +702,17 @@ StateLoader.prototype.load = function(undo){
               if (skyboxMesh){
                 scene.remove(skyboxMesh);
               }
-              if (skyboxPreviewMesh){
-                previewScene.remove(skyboxPreviewMesh);
-              }
               var skyGeometry = new THREE.CubeGeometry(
                 skyboxDistance, skyboxDistance, skyboxDistance
               );
               skyboxMesh = new THREE.Mesh( skyGeometry, materialArray );
-              skyboxPreviewMesh = skyboxMesh.clone();
               if (skyboxVisible){
                 scene.add(skyboxMesh);
-                previewScene.add(skyboxPreviewMesh);
               }
               if (this.skyBoxScale){
                 skyboxMesh.scale.x = this.skyBoxScale;
                 skyboxMesh.scale.y = this.skyBoxScale;
                 skyboxMesh.scale.z = this.skyBoxScale;
-                skyboxPreviewMesh.scale.x = this.skyBoxScale;
-                skyboxPreviewMesh.scale.y = this.skyBoxScale;
-                skyboxPreviewMesh.scale.z = this.skyBoxScale;
               }
             }
           }.bind({skyboxName: skyboxName, skyBoxScale: skyBoxScale})
@@ -1019,7 +926,7 @@ StateLoader.prototype.load = function(undo){
 
     if (this.oldPhysicsDebugMode){
       if (this.oldPhysicsDebugMode != "NONE"){
-        debugRenderer = new THREE.CannonDebugRenderer(previewScene, physicsWorld);
+        debugRenderer = new THREE.CannonDebugRenderer(scene, physicsWorld);
         physicsDebugMode = this.oldPhysicsDebugMode;
       }
     }
@@ -1060,9 +967,7 @@ StateLoader.prototype.createObjectGroupsAfterLoadedTextures = function(){
       curObjectGroupExport.quaternionZ, curObjectGroupExport.quaternionW
     );
     objectGroupInstance.mesh.quaternion.copy(objectGroupInstance.initQuaternion.clone());
-    objectGroupInstance.previewMesh.quaternion.copy(objectGroupInstance.initQuaternion.clone());
     objectGroupInstance.graphicsGroup.quaternion.copy(objectGroupInstance.initQuaternion.clone());
-    objectGroupInstance.previewGraphicsGroup.quaternion.copy(objectGroupInstance.initQuaternion.clone());
     objectGroupInstance.physicsBody.quaternion.copy(objectGroupInstance.graphicsGroup.quaternion);
     objectGroupInstance.physicsBody.initQuaternion = new CANNON.Quaternion().copy(
       objectGroupInstance.graphicsGroup.quaternion
@@ -2168,23 +2073,8 @@ StateLoader.prototype.resetProject = function(undo){
     objectGroups[grouppedObjectName].destroy();
   }
 
-  for (var lightName in lights){
-    scene.remove(lights[lightName]);
-  }
-
-  for (var lightName in light_previewScene){
-    previewScene.remove(light_previewScene[lightName]);
-  }
-
-  for (var lightName in pointLightRepresentations){
-    scene.remove(pointLightRepresentations[lightName]);
-  }
-
   if (skyboxMesh){
     scene.remove(skyboxMesh);
-  }
-  if (skyboxPreviewMesh){
-    previewScene.remove(skyboxPreviewMesh);
   }
 
   if (!undo){
@@ -2214,7 +2104,6 @@ StateLoader.prototype.resetProject = function(undo){
   uploadedImages = new Object();
   modifiedTextures = new Object();
   lights = new Object();
-  light_previewScene = new Object();
   pointLightRepresentations = new Object();
   texturePacks = new Object();
   skyBoxes = new Object();
@@ -2253,7 +2142,7 @@ StateLoader.prototype.resetProject = function(undo){
 
   // PHYSICS DEBUG MODE
   var objectsToRemove = [];
-  var children = previewScene.children;
+  var children = scene.children;
   for (var i = 0; i<children.length; i++){
     var child = children[i];
     if (child.forDebugPurposes){
@@ -2261,7 +2150,7 @@ StateLoader.prototype.resetProject = function(undo){
     }
   }
   for (var i = 0; i<objectsToRemove.length; i++){
-    previewScene.remove(objectsToRemove[i]);
+    scene.remove(objectsToRemove[i]);
   }
 
   if (!undo){

@@ -93,41 +93,6 @@ var State = function(){
     modifiedTexturesExport[textureName] = modifiedTextures[textureName];
   }
   this.modifiedTextures = modifiedTexturesExport;
-  // LIGHTS ********************************************************
-  var lightsExport = new Object();
-  for (var lightName in lights){
-    var curLightExport = new Object();
-    var light = lights[lightName];
-    curLightExport["color"] = light.color.toArray(); // load via setRGB(ary[0], ary[1], ary[2])
-    curLightExport["intensity"] = light.intensity;
-    curLightExport["colorTextVal"] = light.colorTextVal;
-    if (light.isAmbientLight){
-      curLightExport["type"] = "AMBIENT";
-    }else if (light.isPointLight){
-      curLightExport["type"] = "POINT";
-      curLightExport["positionX"] = light.position.x;
-      curLightExport["positionY"] = light.position.y;
-      curLightExport["positionZ"] = light.position.z;
-      curLightExport["initialPositionX"] = light.initialPositionX;
-      curLightExport["initialPositionY"] = light.initialPositionY;
-      curLightExport["initialPositionZ"] = light.initialPositionZ;
-    }
-    lightsExport[lightName] = curLightExport;
-  }
-  this.lights = lightsExport;
-  // LIGHT_PREVIEWSCENE ********************************************
-  this.light_previewScene = JSON.parse(JSON.stringify(lightsExport));
-  // POINTLIGHT REPRESENTATIONS ************************************
-  var pointLightRepresentationsExport = new Object();
-  for (var lightName in pointLightRepresentations){
-    var curRepresentation = new Object();
-    var mesh = pointLightRepresentations[lightName];
-    curRepresentation["positionX"] = mesh.position.x;
-    curRepresentation["positionY"] = mesh.position.y;
-    curRepresentation["positionZ"] = mesh.position.z;
-    pointLightRepresentationsExport[lightName] = curRepresentation;
-  }
-  this.pointLightRepresentations = pointLightRepresentationsExport;
   // TEXTURE PACKS *************************************************
   var texturePacksExport = new Object();
   this.totalTexturePackCount = 0;

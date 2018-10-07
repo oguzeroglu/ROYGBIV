@@ -42,7 +42,7 @@ var Crosshair = function(configurations){
   this.mesh.frustumCulled = false;
   this.mesh.visible = false;
 
-  previewScene.add(this.mesh);
+  scene.add(this.mesh);
 
   crosshairs[this.name] = this;
 

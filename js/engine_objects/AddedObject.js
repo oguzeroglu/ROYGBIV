@@ -1,11 +1,9 @@
-var AddedObject = function(name, type, metaData, material, mesh,
-                              previewMesh, physicsBody, destroyedGrids){
+var AddedObject = function(name, type, metaData, material, mesh, physicsBody, destroyedGrids){
   this.name = name;
   this.type = type;
   this.metaData = metaData;
   this.material = material;
   this.mesh = mesh;
-  this.previewMesh = previewMesh;
   this.physicsBody = physicsBody;
   this.destroyedGrids = destroyedGrids;
 
@@ -41,8 +39,6 @@ var AddedObject = function(name, type, metaData, material, mesh,
 
   this.associatedTexturePack = 0;
 
-  this.previewMesh.addedObject = this;
-
   objectSelectedByCommand = false;
 
   this.rotationX = 0;
@@ -66,10 +62,10 @@ var AddedObject = function(name, type, metaData, material, mesh,
     collisionPosition.x = contact.bi.position.x + contact.ri.x;
     collisionPosition.y = contact.bi.position.y + contact.ri.y;
     collisionPosition.z = contact.bi.position.z + contact.ri.z;
-    var quatX = this.previewMesh.quaternion.x;
-    var quatY = this.previewMesh.quaternion.y;
-    var quatZ = this.previewMesh.quaternion.z;
-    var quatW = this.previewMesh.quaternion.w;
+    var quatX = this.mesh.quaternion.x;
+    var quatY = this.mesh.quaternion.y;
+    var quatZ = this.mesh.quaternion.z;
+    var quatW = this.mesh.quaternion.w;
     var collisionInfo = reusableCollisionInfo.set(
       targetObjectName,
       collisionPosition.x,
@@ -177,10 +173,10 @@ AddedObject.prototype.export = function(){
   exportObject.rotationZ = this.rotationZ;
 
   if (!this.parentObjectName){
-    exportObject.quaternionX = this.previewMesh.quaternion.x;
-    exportObject.quaternionY = this.previewMesh.quaternion.y;
-    exportObject.quaternionZ = this.previewMesh.quaternion.z;
-    exportObject.quaternionW = this.previewMesh.quaternion.w;
+    exportObject.quaternionX = this.mesh.quaternion.x;
+    exportObject.quaternionY = this.mesh.quaternion.y;
+    exportObject.quaternionZ = this.mesh.quaternion.z;
+    exportObject.quaternionW = this.mesh.quaternion.w;
     exportObject.pQuaternionX = this.physicsBody.quaternion.x;
     exportObject.pQuaternionY = this.physicsBody.quaternion.y;
     exportObject.pQuaternionZ = this.physicsBody.quaternion.z;
@@ -221,6 +217,51 @@ AddedObject.prototype.export = function(){
   }
 
   return exportObject;
+}
+
+AddedObject.prototype.loadState = function(){
+  this.physicsBody.position.set(
+    this.state.physicsPX, this.state.physicsPY, this.state.physicsPZ
+  );
+  this.physicsBody.quaternion.set(
+    this.state.physicsQX, this.state.physicsQY, this.state.physicsQZ, this.state.physicsQW
+  );
+  this.physicsBody.angularVelocity.set(
+    this.state.physicsAVX, this.state.physicsAVY, this.state.physicsAVZ
+  );
+  this.physicsBody.velocity.set(
+    this.state.physicsVX, this.state.physicsVY, this.state.physicsVZ
+  );
+  this.mesh.position.set(
+    this.state.positionX, this.state.positionY, this.state.positionZ
+  );
+  this.mesh.quaternion.set(
+    this.state.quaternionX, this.state.quaternionY, this.state.quaternionZ, this.state.quaternionW
+  );
+}
+
+AddedObject.prototype.saveState = function(){
+  this.state = new Object();
+  this.state.physicsPX = this.physicsBody.position.x;
+  this.state.physicsPY = this.physicsBody.position.y;
+  this.state.physicsPZ = this.physicsBody.position.z;
+  this.state.physicsQX = this.physicsBody.quaternion.x;
+  this.state.physicsQY = this.physicsBody.quaternion.y;
+  this.state.physicsQZ = this.physicsBody.quaternion.z;
+  this.state.physicsQW = this.physicsBody.quaternion.w;
+  this.state.physicsAVX = this.physicsBody.angularVelocity.x;
+  this.state.physicsAVY = this.physicsBody.angularVelocity.y;
+  this.state.physicsAVZ = this.physicsBody.angularVelocity.z;
+  this.state.physicsVX = this.physicsBody.velocity.x;
+  this.state.physicsVY = this.physicsBody.velocity.y;
+  this.state.physicsVZ = this.physicsBody.velocity.z;
+  this.state.positionX = this.mesh.position.x;
+  this.state.positionY = this.mesh.position.y;
+  this.state.positionZ = this.mesh.position.z;
+  this.state.quaternionX = this.mesh.quaternion.x;
+  this.state.quaternionY = this.mesh.quaternion.y;
+  this.state.quaternionZ = this.mesh.quaternion.z;
+  this.state.quaternionW = this.mesh.quaternion.w;
 }
 
 AddedObject.prototype.handleRenderSide = function(val){
@@ -296,19 +337,12 @@ AddedObject.prototype.sliceSurfaceInHalf = function(type){
     newGeometry = originalGeometry;
   }
   scene.remove(this.mesh);
-  previewScene.remove(this.previewMesh);
   var newMesh = new THREE.Mesh(newGeometry, this.mesh.material);
-  var newPreviewMesh = new THREE.Mesh(newGeometry, this.mesh.material);
   newMesh.position.copy(this.mesh.position);
   newMesh.quaternion.copy(this.mesh.quaternion);
-  newPreviewMesh.position.copy(this.previewMesh.position);
-  newPreviewMesh.quaternion.copy(this.previewMesh.quaternion);
   newMesh.addedObject = this;
-  newPreviewMesh.addedObject = this;
   this.mesh = newMesh;
-  this.previewMesh = newPreviewMesh;
   scene.add(this.mesh);
-  previewScene.add(this.previewMesh);
 }
 
 AddedObject.prototype.syncProperties = function(refObject){
@@ -344,17 +378,17 @@ AddedObject.prototype.syncProperties = function(refObject){
 }
 
 AddedObject.prototype.setAttachedProperties = function(){
-  this.qxWhenAttached = this.previewMesh.quaternion.x;
-  this.qyWhenAttached = this.previewMesh.quaternion.y;
-  this.qzWhenAttached = this.previewMesh.quaternion.z;
-  this.qwWhenAttached = this.previewMesh.quaternion.w;
+  this.qxWhenAttached = this.mesh.quaternion.x;
+  this.qyWhenAttached = this.mesh.quaternion.y;
+  this.qzWhenAttached = this.mesh.quaternion.z;
+  this.qwWhenAttached = this.mesh.quaternion.w;
   this.pqxWhenAttached = this.physicsBody.quaternion.x;
   this.pqyWhenAttached = this.physicsBody.quaternion.y;
   this.pqzWhenAttached = this.physicsBody.quaternion.z;
   this.pqwWhenAttached = this.physicsBody.quaternion.w;
-  this.positionXWhenAttached = this.previewMesh.position.x;
-  this.positionYWhenAttached = this.previewMesh.position.y;
-  this.positionZWhenAttached = this.previewMesh.position.z;
+  this.positionXWhenAttached = this.mesh.position.x;
+  this.positionYWhenAttached = this.mesh.position.y;
+  this.positionZWhenAttached = this.mesh.position.z;
 }
 
 AddedObject.prototype.hasEmissiveMap = function(){
@@ -532,7 +566,6 @@ AddedObject.prototype.getPositionAtAxis = function(axis){
 
 AddedObject.prototype.resetPosition = function(){
   var mesh = this.mesh;
-  var previewMesh = this.previewMesh;
   var physicsBody = this.physicsBody;
   if (this.type == "box" || this.type == "ramp" || this.type == "sphere"){
     mesh.position.x = this.metaData["centerX"];
@@ -544,47 +577,45 @@ AddedObject.prototype.resetPosition = function(){
     mesh.position.z = this.metaData["positionZ"];
   }
 
-  previewMesh.position.copy(mesh.position);
   physicsBody.position.copy(mesh.position);
 }
 
 AddedObject.prototype.translate = function(axis, amount, fromScript){
-  var previewMesh = this.previewMesh;
   var physicsBody = this.physicsBody;
-  var x = previewMesh.position.x;
-  var y = previewMesh.position.y;
-  var z = previewMesh.position.z;
+  var x = this.mesh.position.x;
+  var y = this.mesh.position.y;
+  var z = this.mesh.position.z;
   if (axis == "x"){
-    previewMesh.position.set(
+    this.mesh.position.set(
       x + amount,
       y,
       z
     );
   }else if (axis == "y"){
-    previewMesh.position.set(
+    this.mesh.position.set(
       x,
       y + amount,
       z
     );
   }else if (axis == "z"){
-    previewMesh.position.set(
+    this.mesh.position.set(
       x,
       y,
       z + amount
     );
   }
 
-  physicsBody.position.copy(previewMesh.position);
+  physicsBody.position.copy(this.mesh.position);
 
   if (!fromScript){
     if (this.type == "box" || this.type == "ramp" || this.type == "sphere"){
-      this.metaData["centerX"] = previewMesh.position.x;
-      this.metaData["centerY"] = previewMesh.position.y;
-      this.metaData["centerZ"] = previewMesh.position.z;
+      this.metaData["centerX"] = this.mesh.position.x;
+      this.metaData["centerY"] = this.mesh.position.y;
+      this.metaData["centerZ"] = this.mesh.position.z;
     }else if (this.type == "surface"){
-      this.metaData["positionX"] = previewMesh.position.x;
-      this.metaData["positionY"] = previewMesh.position.y;
-      this.metaData["positionZ"] = previewMesh.position.z;
+      this.metaData["positionX"] = this.mesh.position.x;
+      this.metaData["positionY"] = this.mesh.position.y;
+      this.metaData["positionZ"] = this.mesh.position.z;
     }
   }
 
@@ -625,22 +656,21 @@ AddedObject.prototype.setPhysicsAfterRotationAroundPoint = function(axis, radian
   }else if (this.type == "sphere"){
     this.setSpherePhysicsAfterRotationAroundPoint(axis, radians);
   }
-  this.physicsBody.position.copy(this.previewMesh.position);
+  this.physicsBody.position.copy(this.mesh.position);
 }
 
 AddedObject.prototype.setSurfacePhysicsAfterRotationAroundPoint = function(axis, radians){
-  var previewMesh = this.previewMesh;
   var physicsBody = this.physicsBody;
   var gridSystemAxis = this.metaData.gridSystemAxis;
   if (gridSystemAxis == "XY"){
-    physicsBody.quaternion.copy(previewMesh.quaternion);
+    physicsBody.quaternion.copy(this.mesh.quaternion);
   }else if (gridSystemAxis == "XZ"){
-    REUSABLE_QUATERNION.copy(previewMesh.quaternion);
+    REUSABLE_QUATERNION.copy(this.mesh.quaternion);
     REUSABLE_QUATERNION2.setFromAxisAngle(THREE_AXIS_VECTOR_X, Math.PI / 2);
     REUSABLE_QUATERNION.multiply(REUSABLE_QUATERNION2);
     physicsBody.quaternion.copy(REUSABLE_QUATERNION);
   }else if (gridSystemAxis == "YZ"){
-    REUSABLE_QUATERNION.copy(previewMesh.quaternion);
+    REUSABLE_QUATERNION.copy(this.mesh.quaternion);
     REUSABLE_QUATERNION2.setFromAxisAngle(THREE_AXIS_VECTOR_Y, Math.PI / 2);
     REUSABLE_QUATERNION.multiply(REUSABLE_QUATERNION2);
     physicsBody.quaternion.copy(REUSABLE_QUATERNION);
@@ -648,33 +678,30 @@ AddedObject.prototype.setSurfacePhysicsAfterRotationAroundPoint = function(axis,
 }
 
 AddedObject.prototype.setSpherePhysicsAfterRotationAroundPoint = function(axis, radians){
-  var previewMesh = this.previewMesh;
   var physicsBody = this.physicsBody;
-  physicsBody.quaternion.copy(previewMesh.quaternion);
+  physicsBody.quaternion.copy(this.mesh.quaternion);
 }
 
 AddedObject.prototype.setBoxPhysicsAfterRotationAroundPoint = function(axis, radians){
-  var previewMesh = this.previewMesh;
   var physicsBody = this.physicsBody;
-  physicsBody.quaternion.copy(previewMesh.quaternion);
+  physicsBody.quaternion.copy(this.mesh.quaternion);
 }
 
 AddedObject.prototype.setRampPhysicsAfterRotationAroundPoint = function(axis, radians){
-  var previewMesh = this.previewMesh;
   var physicsBody = this.physicsBody;
   var gridSystemAxis = this.metaData.gridSystemAxis;
   if (gridSystemAxis == "XY"){
-    REUSABLE_QUATERNION.copy(previewMesh.quaternion);
+    REUSABLE_QUATERNION.copy(this.mesh.quaternion);
     REUSABLE_QUATERNION2.setFromAxisAngle(THREE_AXIS_VECTOR_X, Math.PI / 2);
     REUSABLE_QUATERNION.multiply(REUSABLE_QUATERNION2);
     physicsBody.quaternion.copy(REUSABLE_QUATERNION);
   }else if (gridSystemAxis == "XZ"){
-    REUSABLE_QUATERNION.copy(previewMesh.quaternion);
+    REUSABLE_QUATERNION.copy(this.mesh.quaternion);
     REUSABLE_QUATERNION2.setFromAxisAngle(THREE_AXIS_VECTOR_X, Math.PI / 2);
     REUSABLE_QUATERNION.multiply(REUSABLE_QUATERNION2);
     physicsBody.quaternion.copy(REUSABLE_QUATERNION);
   }else if (gridSystemAxis == "YZ"){
-    REUSABLE_QUATERNION.copy(previewMesh.quaternion);
+    REUSABLE_QUATERNION.copy(this.mesh.quaternion);
     REUSABLE_QUATERNION2.setFromAxisAngle(THREE_AXIS_VECTOR_X, Math.PI / 2);
     REUSABLE_QUATERNION.multiply(REUSABLE_QUATERNION2);
     physicsBody.quaternion.copy(REUSABLE_QUATERNION);
@@ -683,7 +710,6 @@ AddedObject.prototype.setRampPhysicsAfterRotationAroundPoint = function(axis, ra
 
 AddedObject.prototype.rotateSphere = function(axis, radians, fromScript){
   var mesh = this.mesh;
-  var previewMesh = this.previewMesh;
   var physicsBody = this.physicsBody;
   if (axis == "x"){
     mesh.rotateOnWorldAxis(
@@ -702,7 +728,6 @@ AddedObject.prototype.rotateSphere = function(axis, radians, fromScript){
     );
   }
   physicsBody.quaternion.copy(mesh.quaternion);
-  previewMesh.quaternion.copy(mesh.quaternion);
   if (!fromScript){
     physicsBody.initQuaternion.copy(
       physicsBody.quaternion
@@ -712,7 +737,6 @@ AddedObject.prototype.rotateSphere = function(axis, radians, fromScript){
 
 AddedObject.prototype.rotateRamp = function(axis, radians, fromScript){
   var mesh = this.mesh;
-  var previewMesh = this.previewMesh;
   var physicsBody = this.physicsBody;
   var gridSystemAxis = this.metaData.gridSystemAxis;
   if (axis == "x"){
@@ -731,7 +755,6 @@ AddedObject.prototype.rotateRamp = function(axis, radians, fromScript){
       radians
     );
   }
-  previewMesh.quaternion.copy(mesh.quaternion);
   if (gridSystemAxis == "XY"){
     REUSABLE_QUATERNION.copy(mesh.quaternion);
     REUSABLE_QUATERNION2.setFromAxisAngle(THREE_AXIS_VECTOR_X, Math.PI / 2);
@@ -758,7 +781,6 @@ AddedObject.prototype.rotateRamp = function(axis, radians, fromScript){
 
 AddedObject.prototype.rotateSurface = function(axis, radians, fromScript){
   var mesh = this.mesh;
-  var previewMesh = this.previewMesh;
   var physicsBody = this.physicsBody;
   var gridSystemAxis = this.metaData.gridSystemAxis;
 
@@ -778,7 +800,6 @@ AddedObject.prototype.rotateSurface = function(axis, radians, fromScript){
       radians
     );
   }
-  previewMesh.quaternion.copy(mesh.quaternion);
   if (gridSystemAxis == "XY"){
     physicsBody.quaternion.copy(mesh.quaternion);
   }else if (gridSystemAxis == "XZ"){
@@ -802,7 +823,6 @@ AddedObject.prototype.rotateSurface = function(axis, radians, fromScript){
 
 AddedObject.prototype.rotateBox = function(axis, radians, fromScript){
   var mesh = this.mesh;
-  var previewMesh = this.previewMesh;
   var physicsBody = this.physicsBody;
   if (axis == "x"){
     mesh.rotateOnWorldAxis(
@@ -821,7 +841,6 @@ AddedObject.prototype.rotateBox = function(axis, radians, fromScript){
     );
   }
   physicsBody.quaternion.copy(mesh.quaternion);
-  previewMesh.quaternion.copy(mesh.quaternion);
   if (!fromScript){
     physicsBody.initQuaternion.copy(
       physicsBody.quaternion
@@ -837,7 +856,7 @@ AddedObject.prototype.setCannonQuaternionFromTHREE = function(){
         this.physicsBody.rotation.y += (Math.PI / 2);
       }else{
         if (this.type == "surface" && this.gridSystemAxis == "YZ"){
-          previewMesh.rotation.y -= (Math.PI / 2);
+          this.mesh.rotation.y -= (Math.PI / 2);
         }
       }
     }
@@ -863,7 +882,6 @@ AddedObject.prototype.destroy = function(){
     selectedAddedObject = 0;
   }
   scene.remove(this.mesh);
-  previewScene.remove(this.previewMesh);
   physicsWorld.remove(this.physicsBody);
   if (this.destroyedGrids){
     for (var gridName in this.destroyedGrids){
@@ -1379,19 +1397,9 @@ AddedObject.prototype.segmentGeometry = function(isCustom, count, returnGeometry
   newMesh.rotation.z = this.mesh.rotation.z;
 
   scene.remove(this.mesh);
-  previewScene.remove(this.previewMesh);
-
   this.mesh = newMesh;
-  this.previewMesh = new THREE.Mesh(newMesh.geometry, newMesh.material);
-  this.previewMesh.position.copy(this.mesh.position);
-  this.previewMesh.quaternion.copy(this.mesh.quaternion);
-  this.previewMesh.rotation.copy(this.mesh.rotation);
-
   this.mesh.addedObject = this;
-  this.previewMesh.addedObject = this;
-
   scene.add(this.mesh);
-  previewScene.add(this.previewMesh);
 
   if (this.type == "surface" || this.type == "ramp"){
     if (!isCustom){
@@ -1722,7 +1730,7 @@ AddedObject.prototype.updateBoundingBoxes = function(parentAry){
   for (var i = 0; i<this.vertices.length; i++){
     var vertex = this.vertices[i];
     this.reusableVec3.set(vertex.x, vertex.y, vertex.z);
-    this.reusableVec3.applyMatrix4(this.previewMesh.matrixWorld);
+    this.reusableVec3.applyMatrix4(this.mesh.matrixWorld);
     bb.expandByPoint(this.reusableVec3);
     this.transformedVertices[i].set(
       this.reusableVec3.x, this.reusableVec3.y, this.reusableVec3.z
@@ -1756,11 +1764,11 @@ AddedObject.prototype.generateBoundingBoxes = function(parentAry){
     parentAry.push(bb);
     this.parentBoundingBoxIndex = (parentAry.length - 1);
   }
-  this.previewMesh.updateMatrixWorld();
+  this.mesh.updateMatrixWorld();
   this.transformedVertices = [];
   for (var i = 0; i<this.vertices.length; i++){
     var vertex = this.vertices[i].clone();
-    vertex.applyMatrix4(this.previewMesh.matrixWorld);
+    vertex.applyMatrix4(this.mesh.matrixWorld);
     bb.expandByPoint(vertex);
     this.transformedVertices.push(vertex);
   }
@@ -1784,8 +1792,8 @@ AddedObject.prototype.generateBoundingBoxes = function(parentAry){
 
 AddedObject.prototype.updateCollisionWorkerInfo = function (typedArray){
   var index = this.collisionWorkerIndex;
-  for (var i = 0; i<this.previewMesh.matrixWorld.elements.length; i++){
-    typedArray[index + 4 + i] = this.previewMesh.matrixWorld.elements[i];
+  for (var i = 0; i<this.mesh.matrixWorld.elements.length; i++){
+    typedArray[index + 4 + i] = this.mesh.matrixWorld.elements[i];
   }
 }
 
@@ -1815,9 +1823,9 @@ AddedObject.prototype.generateCollisionWorkerInfo = function(index, typedArray){
     typedArray[index + 2] = 0;
     typedArray[index + 3] = 0;
   }
-  this.previewMesh.updateMatrixWorld();
-  for (var i = 0; i<this.previewMesh.matrixWorld.elements.length; i++){
-    typedArray[index + 4 + i] = this.previewMesh.matrixWorld.elements[i];
+  this.mesh.updateMatrixWorld();
+  for (var i = 0; i<this.mesh.matrixWorld.elements.length; i++){
+    typedArray[index + 4 + i] = this.mesh.matrixWorld.elements[i];
   }
 }
 

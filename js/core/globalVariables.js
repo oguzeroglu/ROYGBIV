@@ -596,11 +596,10 @@ var mouseDown = 0;
 
 // THREE.JS VARIABLES
 var renderer;
-var scene, previewScene;
+var scene;
 var camera;
 var canvas;
 var sceneBackgroundColor = 0x000000 ;
-var previewSceneBackgroundColor = 0x000000;
 var textureLoader = new THREE.TextureLoader();
 var tgaLoader = new THREE.TGALoader();
 var ddsLoader = new THREE.DDSLoader();
@@ -680,7 +679,6 @@ var wallCollections = new Object();
 var uploadedImages = new Object();
 var modifiedTextures = new Object();
 var lights = new Object();
-var light_previewScene = new Object();
 var pointLightRepresentations = new Object();
 var texturePacks = new Object();
 var skyBoxes = new Object();
@@ -784,7 +782,6 @@ var REUSABLE_QUATERNION2 = new THREE.Quaternion();
 var REUSABLE_COLOR = new THREE.Color();
 var MAX_VERTICES_ALLOWED_IN_A_PARTICLE_SYSTEM = 1000000;
 var tempSlicedGridExport;
-var previewSceneRendered = false;
 var ALPHA_VARIATION_MODE_NORMAL = 0;
 var ALPHA_VARIATION_MODE_SIN = 1;
 var ALPHA_VARIATION_MODE_COS = 2;

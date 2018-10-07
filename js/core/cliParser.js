@@ -293,6 +293,14 @@ function parse(input){
             TOTAL_PARTICLE_COLLISION_LISTEN_COUNT = 0;
             TOTAL_PARTICLE_SYSTEM_COLLISION_LISTEN_COUNT = 0;
             TOTAL_PARTICLE_SYSTEMS_WITH_PARTICLE_COLLISIONS = 0;
+            for (var gsName in gridSystems){
+              scene.remove(gridSystems[gsName].gridSystemRepresentation);
+              scene.remove(gridSystems[gsName].boundingPlane);
+            }
+            for (var gridName in gridSelections){
+              scene.remove(gridSelections[gridName].mesh);
+              scene.remove(gridSelections[gridName].dot);
+            }
             scriptsToRun = new Object();
             for (var gridName in gridSelections){
               var grid = gridSelections[gridName];
@@ -326,35 +334,10 @@ function parse(input){
               if (object.binInfo){
                 object.binInfo = new Object();
               }
+              object.saveState();
               if (object.isDynamicObject){
                 dynamicObjectGroups[objectName] = object;
               }
-              object.physicsBody.position.copy(
-                object.physicsBody.initPosition
-              );
-              object.physicsBody.quaternion.copy(
-                object.physicsBody.initQuaternion
-              );
-              object.physicsBody.velocity.copy(
-                object.physicsBody.initVelocity
-              );
-              object.physicsBody.angularVelocity.copy(
-                object.physicsBody.initAngularVelocity
-              );
-              object.previewGraphicsGroup.quaternion.copy(
-                object.initQuaternion
-              );
-              object.previewMesh.quaternion.copy(
-                object.initQuaternion
-              );
-              object.resetPosition();
-
-              if (!object.isVisibleOnThePreviewScene()){
-                object.previewMesh.visible = true;
-                physicsWorld.addBody(object.physicsBody);
-              }
-
-              delete object.isHidden;
 
             }
             for (var objectName in addedObjects){
@@ -365,22 +348,7 @@ function parse(input){
               if (object.isDynamicObject){
                 dynamicObjects[objectName] = object;
               }
-              object.physicsBody.position.copy(
-                object.physicsBody.initPosition
-              );
-              object.physicsBody.quaternion.copy(
-                object.physicsBody.initQuaternion
-              );
-              object.physicsBody.velocity.copy(
-                object.physicsBody.initVelocity
-              );
-              object.physicsBody.angularVelocity.copy(
-                object.physicsBody.initAngularVelocity
-              );
-              object.previewMesh.quaternion.copy(
-                object.initQuaternion
-              );
-              object.resetPosition();
+              object.saveState();
               if (object.hasDiffuseMap()){
                 if (object.mesh.material.uniforms.diffuseMap.value.initOffsetXSet){
                   object.mesh.material.uniforms.diffuseMap.value.offset.x = object.mesh.material.uniforms.diffuseMap.value.initOffsetX;
@@ -418,20 +386,6 @@ function parse(input){
                   object.initShininessSet = false;
                 }
               }
-
-              if (!object.isVisibleOnThePreviewScene()){
-                object.previewMesh.visible = true;
-                physicsWorld.addBody(object.physicsBody);
-              }
-
-              delete object.isHidden;
-
-            }
-            for (var lightName in light_previewScene){
-              light_previewScene[lightName].intensity = lights[lightName].intensity;
-              light_previewScene[lightName].position.copy(
-                lights[lightName].position
-              );
             }
 
             if (isPhysicsWorkerEnabled() || isCollisionWorkerEnabled() || isPSCollisionWorkerEnabled()){
@@ -468,6 +422,14 @@ function parse(input){
               console.log("[*] Frame-drop recording process stopped.");
               LOG_FRAME_DROP_ON = false;
             }
+            for (var gsName in gridSystems){
+              scene.add(gridSystems[gsName].gridSystemRepresentation);
+              scene.add(gridSystems[gsName].boundingPlane);
+            }
+            for (var gridName in gridSelections){
+              scene.add(gridSelections[gridName].mesh);
+              scene.add(gridSelections[gridName].dot);
+            }
             collisionCallbackRequests = new Object();
             particleCollisionCallbackRequests = new Object();
             particleSystemCollisionCallbackRequests = new Object();
@@ -503,9 +465,8 @@ function parse(input){
 
             for (var objectName in objectGroups){
               var object = objectGroups[objectName];
-              object.graphicsGroup.quaternion.copy(object.initQuaternion);
-              object.mesh.quaternion.copy(object.initQuaternion);
-              object.resetPosition();
+
+              object.loadState();
 
               if (!(typeof object.originalMass == "undefined")){
                 object.setMass(object.originalMass);
@@ -518,30 +479,12 @@ function parse(input){
             for (var objectName in addedObjects){
               var object = addedObjects[objectName];
 
-              object.mesh.quaternion.copy(
-                object.initQuaternion
-              );
-              object.physicsBody.position.copy(
-                object.physicsBody.initPosition
-              );
-              object.physicsBody.quaternion.copy(
-                object.physicsBody.initQuaternion
-              );
-              object.physicsBody.velocity.copy(
-                object.physicsBody.initVelocity
-              );
-              object.physicsBody.angularVelocity.copy(
-                object.physicsBody.initAngularVelocity
-              );
-              object.previewMesh.quaternion.copy(
-                object.initQuaternion
-              );
-              object.resetPosition();
-
               if (object.texturePackSetWithScript){
                 object.texturePackSetWithScript = false;
                 object.resetTexturePackAfterAnimation();
               }
+
+              object.loadState();
 
               if (object.hasDiffuseMap()){
                 if (object.mesh.material.uniforms.diffuseMap.value.initOffsetXSet){
@@ -572,13 +515,6 @@ function parse(input){
               if (object.initEmissiveIntensitySet){
                 object.mesh.material.uniforms.emissiveIntensity.value = object.initEmissiveIntensity;
                 object.initEmissiveIntensitySet = false;
-              }
-              if (object.material.isMeshPhongMaterial){
-                if (object.initShininessSet){
-                  object.material.shininess = object.initShininess;
-                  object.material.needsUpdate = true;
-                  object.initShininessSet = false;
-                }
               }
 
               if (!(typeof object.originalMass == "undefined")){
@@ -1224,11 +1160,11 @@ function parse(input){
         case 29: //switchPhysicsDebugMode
           physicsDebugMode = !physicsDebugMode;
           if (physicsDebugMode){
-            debugRenderer = new THREE.CannonDebugRenderer(previewScene, physicsWorld);
+            debugRenderer = new THREE.CannonDebugRenderer(scene, physicsWorld);
             terminal.printInfo(Text.PHYSICS_DEBUG_MODE_ON);
           }else{
             var objectsToRemove = [];
-            var children = previewScene.children;
+            var children = scene.children;
             for (var i = 0; i<children.length; i++){
               var child = children[i];
               if (child.forDebugPurposes){
@@ -1236,7 +1172,7 @@ function parse(input){
               }
             }
             for (var i = 0; i<objectsToRemove.length; i++){
-              previewScene.remove(objectsToRemove[i]);
+              scene.remove(objectsToRemove[i]);
             }
             terminal.printInfo(Text.PHYSICS_DEBUG_MODE_OFF);
           }
@@ -1726,60 +1662,7 @@ function parse(input){
           return true;
         break;
         case 43: //mapSpecular
-          var textureName = splitted[1];
-          var objectName = splitted[2];
-          var texture = textures[textureName];
-          if (mode != 0){
-            terminal.printError(Text.WORKS_ONLY_IN_DESIGN_MODE);
-            return true;
-          }
-          if (!(objectName.indexOf("*") == -1)){
-            new JobHandler(splitted).handle();
-            return true;
-          }
-          if (objectGroups[objectName]){
-            terminal.printError(Text.GLUED_OBJECTS_DO_NOT_SUPPORT_THIS_FUNCTION);
-            return true;
-          }
-          if (!texture){
-            terminal.printError(Text.NO_SUCH_TEXTURE);
-            return true;
-          }
-          if (!texture || !texture.isLoaded){
-            terminal.printError(Text.TEXTURE_NOT_READY);
-            return true;
-          }
-          var addedObject = addedObjects[objectName];
-          if (!addedObject){
-            terminal.printError(Text.NO_SUCH_OBJECT);
-            return true;
-          }
 
-          if (addedObject.hasBasicMaterial){
-            terminal.printError(Text.SPECULAR_MAPS_ARE_NOT_SUPPORTED);
-            return true;
-          }
-
-          var cloneTexture = texture;
-          cloneTexture.fromUploadedImage = texture.fromUploadedImage;
-
-          cloneTexture.roygbivTextureName = textureName;
-          cloneTexture.roygbivTexturePackName = 0;
-
-          addedObject.mesh.material.specularMap = cloneTexture;
-          addedObject.previewMesh.material.specularMap = cloneTexture;
-
-          cloneTexture.wrapS = THREE.RepeatWrapping;
-          cloneTexture.wrapT = THREE.RepeatWrapping;
-
-          cloneTexture.needsUpdate = true;
-
-          addedObject.mesh.material.needsUpdate = true;
-          addedObject.previewMesh.material.needsUpdate = true;
-          addedObject.resetAssociatedTexturePack();
-          if (!jobHandlerWorking){
-            terminal.printInfo(Text.SPECULAR_TEXTURE_MAPPED);
-          }
         break;
         case 44: //mapEnvironment
           // DEPRECATED
@@ -1897,31 +1780,7 @@ function parse(input){
           return true;
         break;
         case 48: //newAmbientLight
-          var name = splitted[1];
-          var lightColor = splitted[2];
-          if (mode != 0){
-            terminal.printError(Text.WORKS_ONLY_IN_DESIGN_MODE);
-            return true;
-          }
-          if (lights[name]){
-            terminal.printError(Text.NAME_MUST_BE_UNIQUE);
-            return true;
-          }
-          var light = new THREE.AmbientLight(lightColor);
-          var previewSceneLight = light.clone();
-          scene.add(light);
-          previewScene.add(previewSceneLight);
-          lights[name] = light;
-          light_previewScene[name] = previewSceneLight;
-          light.colorTextVal = lightColor;
-          previewSceneLight.colorTextVal = lightColor;
-          for (var objectName in addedObjects){
-            var addedObject = addedObjects[objectName];
-            addedObject.mesh.material.needsUpdate = true;
-            addedObject.previewMesh.material.needsUpdate = true;
-          }
-          terminal.printInfo(Text.AMBIENT_LIGHT_CREATED);
-          return true;
+
         break;
         case 49: //printLights
           var count = 0;
@@ -1971,7 +1830,6 @@ function parse(input){
         case 51: //destroyLight
           var lightName = splitted[1];
           var light = lights[lightName];
-          var light_preview = light_previewScene[lightName];
           if (mode != 0){
             terminal.printError(Text.WORKS_ONLY_IN_DESIGN_MODE);
             return true;
@@ -1985,11 +1843,9 @@ function parse(input){
             return true;
           }
           scene.remove(light);
-          previewScene.remove(light_preview);
           for (var objectName in addedObjects){
             var addedObject = addedObjects[objectName];
             addedObject.mesh.material.needsUpdate = true;
-            addedObject.previewMesh.material.needsUpdate = true;
           }
 
           if (light.isPointLight){
@@ -1997,7 +1853,6 @@ function parse(input){
             delete pointLightRepresentations[lightName];
           }
           delete lights[lightName];
-          delete light_previewScene[lightName];
           selectedLightName = 0;
           if (!jobHandlerWorking){
             terminal.printError(Text.LIGHT_DESTROYED);
@@ -2005,88 +1860,10 @@ function parse(input){
           return true;
         break;
         case 52: //newPhongMaterial
-          var name = splitted[1];
-          var materialColor = splitted[2];
-          if (mode != 0){
-            terminal.printError(Text.WORKS_ONLY_IN_DESIGN_MODE);
-            return true;
-          }
-          if (name == "NULL_BASIC" || name == "NULL_PHONG"){
-            terminal.printError(Text.NAME_RESERVED);
-            return true;
-          }
 
-          if (materials[name]){
-            terminal.printError(Text.NAME_MUST_BE_UNIQUE);
-            return true;
-          }
-
-          var phongMaterial = new THREE.MeshPhongMaterial({
-            color: materialColor,
-            side: THREE.DoubleSide,
-            wireframe: false
-          });
-          phongMaterial.textColor = materialColor;
-          phongMaterial.roygbivMaterialName = name;
-          materials[name] = phongMaterial;
-          terminal.printInfo(Text.MATERIAL_CREATED);
-          return true;
         break;
         case 53: //mapNormal
-          var textureName = splitted[1];
-          var objectName = splitted[2];
-          var texture = textures[textureName];
-          if (mode != 0){
-            terminal.printError(Text.WORKS_ONLY_IN_DESIGN_MODE);
-            return true;
-          }
-          if (!(objectName.indexOf("*") == -1)){
-            new JobHandler(splitted).handle();
-            return true;
-          }
-          if (objectGroups[objectName]){
-            terminal.printError(Text.GLUED_OBJECTS_DO_NOT_SUPPORT_THIS_FUNCTION);
-            return true;
-          }
-          if (!texture){
-            terminal.printError(Text.NO_SUCH_TEXTURE);
-            return true;
-          }
-          if (!texture || !texture.isLoaded){
-            terminal.printError(Text.TEXTURE_NOT_READY);
-            return true;
-          }
-          var addedObject = addedObjects[objectName];
-          if (!addedObject){
-            terminal.printError(Text.NO_SUCH_OBJECT);
-            return true;
-          }
 
-          if (addedObject.hasBasicMaterial){
-            terminal.printError(Text.NORMAL_MAPS_ARE_NOT_SUPPROTED);
-            return true;
-          }
-
-          var cloneTexture = texture;
-          cloneTexture.fromUploadedImage = texture.fromUploadedImage;
-
-          cloneTexture.roygbivTextureName = textureName;
-          cloneTexture.roygbivTexturePackName = 0;
-
-          addedObject.mesh.material.normalMap = cloneTexture;
-          addedObject.previewMesh.material.normalMap = cloneTexture;
-
-          cloneTexture.wrapS = THREE.RepeatWrapping;
-          cloneTexture.wrapT = THREE.RepeatWrapping;
-
-          cloneTexture.needsUpdate = true;
-
-          addedObject.mesh.material.needsUpdate = true;
-          addedObject.previewMesh.material.needsUpdate = true;
-          addedObject.resetAssociatedTexturePack();
-          if (!jobHandlerWorking){
-            terminal.printInfo(Text.NORMAL_TEXTURE_MAPPED);
-          }
         break;
         case 54: //mapEmissive
           var textureName = splitted[1];
@@ -2573,110 +2350,7 @@ function parse(input){
           }
         break;
         case 68: //newPointLight
-          var name = splitted[1];
-          var color = splitted[2];
-          var offsetX = parseInt(splitted[3]);
-          var offsetY = parseInt(splitted[4]);
-          var offsetZ = parseInt(splitted[5]);
 
-          if (mode != 0){
-            terminal.printError(Text.WORKS_ONLY_IN_DESIGN_MODE);
-            return true;
-          }
-
-          if (!(name.indexOf("*") == -1)){
-            new JobHandler(splitted).handle();
-            return true;
-          }
-
-          if (lights[name]){
-            terminal.printError(Text.NAME_MUST_BE_UNIQUE);
-            return true;
-          }
-
-          if (isNaN(offsetX)){
-            terminal.printError(Text.OFFSETX_MUST_BE_A_NUMBER);
-            return true;
-          }
-
-          if (isNaN(offsetY)){
-            terminal.printError(Text.OFFSETY_MUST_BE_A_NUMBER);
-            return true;
-          }
-
-          if (isNaN(offsetZ)){
-            terminal.printError(Text.OFFSETZ_MUST_BE_A_NUMBER);
-            return true;
-          }
-
-          var selectedGrid;
-          if (!jobHandlerWorking){
-            if (Object.keys(gridSelections).length != 1){
-              terminal.printError(Text.MUST_HAVE_ONE_GRID_SELECTED);
-              return true;
-            }
-            selectedGrid = gridSelections[Object.keys(gridSelections)[0]];
-          }else{
-            selectedGrid = jobHandlerSelectedGrid;
-          }
-
-          selectedGrid.toggleSelect(false, false, false, true);
-          if (!jobHandlerWorking){
-            delete gridSelections[Object.keys(gridSelections)[0]];
-          }else{
-            delete gridSelections[selectedGrid.name];
-          }
-
-          var lightPositionX = selectedGrid.centerX + offsetX;
-          var lightPositionY = selectedGrid.centerY + offsetY;
-          var lightPositionZ = selectedGrid.centerZ + offsetZ;
-
-          var pointLight = new THREE.PointLight(color);
-          var pointLightClone = pointLight.clone();
-
-          pointLight.colorTextVal = color;
-          pointLightClone.colorTextVal = color;
-
-          pointLight.position.x = lightPositionX;
-          pointLight.position.y = lightPositionY;
-          pointLight.position.z = lightPositionZ;
-
-          pointLightClone.position.x = lightPositionX;
-          pointLightClone.position.y = lightPositionY;
-          pointLightClone.position.z = lightPositionZ;
-
-          lights[name] = pointLight;
-          light_previewScene[name] = pointLightClone;
-
-          pointLight.initialPositionX = pointLight.position.x;
-          pointLight.initialPositionY = pointLight.position.y;
-          pointLight.initialPositionZ = pointLight.position.z;
-          pointLightClone.initialPositionX = pointLightClone.position.x;
-          pointLightClone.initialPositionY = pointLightClone.position.y;
-          pointLightClone.initialPositionZ = pointLightClone.position.z;
-
-          scene.add(pointLight);
-          previewScene.add(pointLightClone);
-
-          var pointLightRepresentation = new THREE.Mesh(
-            new THREE.SphereGeometry(5),
-            new THREE.MeshBasicMaterial({color: color})
-          );
-
-          pointLightRepresentation.position.x = lightPositionX;
-          pointLightRepresentation.position.y = lightPositionY;
-          pointLightRepresentation.position.z = lightPositionZ;
-
-          scene.add(pointLightRepresentation);
-          pointLightRepresentations[name] = pointLightRepresentation;
-
-          pointLightRepresentation.lightName = name;
-          pointLightRepresentation.isPointLightRepresentation = true;
-
-          if (!jobHandlerWorking){
-            terminal.printError(Text.LIGHT_ADDED);
-          }
-          return true;
         break;
         case 69: //newSkybox
           var name = splitted[1];
@@ -2782,17 +2456,12 @@ function parse(input){
           if (skyboxMesh){
             scene.remove(skyboxMesh);
           }
-          if (skyboxPreviewMesh){
-            previewScene.remove(skyboxPreviewMesh);
-          }
 
           var skyGeometry = new THREE.CubeGeometry(
             skyboxDistance, skyboxDistance, skyboxDistance
           );
-          skyboxMesh = new THREE.Mesh( skyGeometry, materialArray );
-          skyboxPreviewMesh = skyboxMesh.clone();
+          skyboxMesh = new THREE.Mesh(skyGeometry, materialArray);
           scene.add(skyboxMesh);
-          previewScene.add(skyboxPreviewMesh);
           skyboxVisible = true;
           mappedSkyboxName = name;
           terminal.printInfo(Text.SKYBOX_MAPPED);
@@ -2838,7 +2507,6 @@ function parse(input){
               return true;
             }
             scene.remove(skyboxMesh);
-            previewScene.remove(skyboxPreviewMesh);
             skyboxVisible = false;
             terminal.printInfo(Text.SKYBOX_HIDDEN);
           }else{
@@ -2847,7 +2515,6 @@ function parse(input){
               return true;
             }
             scene.add(skyboxMesh);
-            previewScene.add(skyboxPreviewMesh);
             skyboxVisible = true;
             terminal.printInfo(Text.SKYBOX_SHOWN);
           }
@@ -2859,7 +2526,7 @@ function parse(input){
             terminal.printError(Text.WORKS_ONLY_IN_DESIGN_MODE);
             return true;
           }
-          if (!skyboxMesh || !skyboxPreviewMesh){
+          if (!skyboxMesh){
             terminal.printError(Text.SKYBOX_NOT_DEFINED);
             return true;
           }
@@ -2874,9 +2541,6 @@ function parse(input){
           skyboxMesh.scale.x = amount;
           skyboxMesh.scale.y = amount;
           skyboxMesh.scale.z = amount;
-          skyboxPreviewMesh.scale.x = amount;
-          skyboxPreviewMesh.scale.y = amount;
-          skyboxPreviewMesh.scale.z = amount;
           terminal.printInfo(Text.SKYBOX_SCALE_ADJUSTED);
           return true;
         break;

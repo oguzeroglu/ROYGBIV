@@ -63,7 +63,7 @@ WorldBinHandler.prototype.updateObject = function(obj){
         }
       }
     }
-    obj.previewMesh.updateMatrixWorld();
+    obj.mesh.updateMatrixWorld();
     obj.updateBoundingBoxes();
     for (var i = 0; i<obj.boundingBoxes.length; i++){
       this.insert(obj.boundingBoxes[i], obj.name);
@@ -89,7 +89,7 @@ WorldBinHandler.prototype.updateObject = function(obj){
         }
       }
     }
-    obj.previewGraphicsGroup.updateMatrixWorld();
+    obj.graphicsGroup.updateMatrixWorld();
     obj.updateBoundingBoxes();
     for (var i = 0; i<obj.boundingBoxes.length; i++){
       this.insert(obj.boundingBoxes[i], obj.boundingBoxes[i].roygbivObjectName, obj.name);

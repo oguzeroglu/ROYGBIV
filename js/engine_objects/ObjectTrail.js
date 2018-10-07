@@ -35,8 +35,8 @@ var ObjectTrail = function(configurations){
         childGeom.faces[i].materialIndex = mi;
       }
       mi++;
-      childObj.previewMesh.updateMatrix();
-      geometry.merge(childGeom, childObj.previewMesh.matrix);
+      childObj.mesh.updateMatrix();
+      geometry.merge(childGeom, childObj.mesh.matrix);
     }
     for (var i = 0; i<geometry.faces.length; i++){
       var mi = geometry.faces[i].materialIndex;
@@ -255,11 +255,11 @@ var ObjectTrail = function(configurations){
 
   var posit, quat;
   if (this.isAddedObject){
-    posit = this.object.previewMesh.position;
-    quat = this.object.previewMesh.quaternion;
+    posit = this.object.mesh.position;
+    quat = this.object.mesh.quaternion;
   }else{
-    posit = this.object.previewGraphicsGroup.position;
-    quat = this.object.previewGraphicsGroup.quaternion;
+    posit = this.object.graphicsGroup.position;
+    quat = this.object.graphicsGroup.quaternion;
   }
 
   this.mesh = new MeshGenerator(geometry).generateObjectTrail(
@@ -269,7 +269,7 @@ var ObjectTrail = function(configurations){
 
   this.mesh.frustumCulled = false;
   this.mesh.visible = false;
-  previewScene.add(this.mesh);
+  scene.add(this.mesh);
   objectTrails[this.object.name] = this;
 
   this.objectCoordinateCounter = 0;
@@ -293,11 +293,11 @@ ObjectTrail.prototype.update = function(){
   this.mesh.material.uniforms.projectionMatrix.value = camera.projectionMatrix;
   var posit, quat;
   if (this.isAddedObject){
-    posit = this.object.previewMesh.position;
-    quat = this.object.previewMesh.quaternion;
+    posit = this.object.mesh.position;
+    quat = this.object.mesh.quaternion;
   }else{
-    posit = this.object.previewMesh.position;
-    quat = this.object.previewMesh.quaternion;
+    posit = this.object.mesh.position;
+    quat = this.object.mesh.quaternion;
   }
   this.mesh.material.uniforms.objectCoordinates.value[this.objectCoordinateCounter++] = posit.x;
   this.mesh.material.uniforms.objectCoordinates.value[this.objectCoordinateCounter++] = posit.y;
@@ -318,7 +318,7 @@ ObjectTrail.prototype.update = function(){
 
 ObjectTrail.prototype.destroy = function(){
   if (this.mesh){
-    previewScene.remove(this.mesh);
+    scene.remove(this.mesh);
     this.mesh.geometry.dispose();
     this.mesh.material.dispose();
     this.mesh = 0;

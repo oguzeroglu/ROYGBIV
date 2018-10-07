@@ -150,7 +150,7 @@ var WorkerHandler = function(){
       }else if (event.data.topic == "debug"){
         var binText = event.data.content;
         var binObj = JSON.parse(binText);
-        new WorldBinHandler(true).visualize(previewScene, binObj);
+        new WorldBinHandler(true).visualize(scene, binObj);
       }else if (event.data.topic == "testQuery"){
         var resultText = event.data.content;
         var resultObj = JSON.parse(resultText);
@@ -184,7 +184,7 @@ var WorkerHandler = function(){
       }else if (event.data.topic == "debug"){
         var binText = event.data.content;
         var binObj = JSON.parse(binText);
-        new WorldBinHandler(true).visualize(previewScene, binObj);
+        new WorldBinHandler(true).visualize(scene, binObj);
       }else if (event.data.topic == "psCollisionArrayLoop"){
         workerHandlerContext.handlePsCollisionArrayLoop(event.data.content);
       }else if (event.data.topic == "tick"){
@@ -224,16 +224,16 @@ var WorkerHandler = function(){
             var qX = 0, qY = 0, qZ = 0, qW = 0;
             if (isObjectGroupInd == 0){
               obj = addedObjects[objName];
-              qX = obj.previewMesh.quaternion.x;
-              qY = obj.previewMesh.quaternion.y;
-              qZ = obj.previewMesh.quaternion.z;
-              qW = obj.previewMesh.quaternion.w;
+              qX = obj.mesh.quaternion.x;
+              qY = obj.mesh.quaternion.y;
+              qZ = obj.mesh.quaternion.z;
+              qW = obj.mesh.quaternion.w;
             }else{
               obj = objectGroups[objName];
-              qX = obj.previewMesh.quaternion.x;
-              qY = obj.previewMesh.quaternion.y;
-              qZ = obj.previewMesh.quaternion.z;
-              qW = obj.previewMesh.quaternion.w;
+              qX = obj.mesh.quaternion.x;
+              qY = obj.mesh.quaternion.y;
+              qZ = obj.mesh.quaternion.z;
+              qW = obj.mesh.quaternion.w;
             }
             var collisionInfo = reusableCollisionInfo.set(
               objName, x, y, z, null, qX, qY, qZ, qW, REUSABLE_VECTOR.set(fnX, fnY, fnZ), psTime
@@ -401,31 +401,31 @@ WorkerHandler.prototype.updateObject = function(object, isPS){
     selectedWorker = this.psCollisionWorker;
   }
   if (object instanceof AddedObject){
-    object.previewMesh.updateMatrixWorld();
-    var ary = new Float32Array(object.previewMesh.matrixWorld.elements.length + 1);
+    object.mesh.updateMatrixWorld();
+    var ary = new Float32Array(object.mesh.matrixWorld.elements.length + 1);
     ary[0] = object.collisionWorkerIndex;
-    for (var i = 0; i<object.previewMesh.matrixWorld.elements.length; i++){
-      ary[i + 1] = object.previewMesh.matrixWorld.elements[i];
+    for (var i = 0; i<object.mesh.matrixWorld.elements.length; i++){
+      ary[i + 1] = object.mesh.matrixWorld.elements[i];
     }
     this.postMessage(selectedWorker, this.reusableWorkerMessage.set(
       this.constants.updateObject, ary
     ));
   }else if (object instanceof ObjectGroup){
-    object.previewGraphicsGroup.position.copy(object.previewMesh.position);
-    object.previewGraphicsGroup.quaternion.copy(object.previewMesh.quaternion);
-    object.previewGraphicsGroup.updateMatrixWorld();
-    object.previewGraphicsGroup.updateMatrix();
+    object.graphicsGroup.position.copy(object.mesh.position);
+    object.graphicsGroup.quaternion.copy(object.mesh.quaternion);
+    object.graphicsGroup.updateMatrixWorld();
+    object.graphicsGroup.updateMatrix();
     var childCount = Object.keys(object.group).length;
-    var ary = new Float32Array(childCount * (object.previewMesh.matrixWorld.elements.length + 1));
+    var ary = new Float32Array(childCount * (object.mesh.matrixWorld.elements.length + 1));
     var totalIndex = 0;
     for (var childName in object.group){
       var childObj = object.group[childName];
       ary[totalIndex] = childObj.collisionWorkerIndex;
       totalIndex ++;
-      childObj.previewMesh.updateMatrix();
-      childObj.previewMesh.updateMatrixWorld();
-      for (var i = 0; i<childObj.previewMesh.matrixWorld.elements.length; i++){
-        ary[totalIndex] = childObj.previewMesh.matrixWorld.elements[i];
+      childObj.mesh.updateMatrix();
+      childObj.mesh.updateMatrixWorld();
+      for (var i = 0; i<childObj.mesh.matrixWorld.elements.length; i++){
+        ary[totalIndex] = childObj.mesh.matrixWorld.elements[i];
         totalIndex ++;
       }
     }
@@ -569,7 +569,7 @@ WorkerHandler.prototype.initCollisionWorker = function(isPS){
     index += 20;
   }
   for (var objName in objectGroups){
-    objectGroups[objName].previewGraphicsGroup.updateMatrix();
+    objectGroups[objName].graphicsGroup.updateMatrix();
     var group = objectGroups[objName].group;
     for (var childName in group){
       group[childName].generateCollisionWorkerInfo(index, objectBBDescriptions);
@@ -664,11 +664,11 @@ WorkerHandler.prototype.handlePhysicsWorkerMessage = function(msg){
     var quaternionZ = ary[index + 6];
     var quaternionW = ary[index + 7];
     var object = this.dynamicObjects[i];
-    object.previewMesh.position.set(positionX, positionY, positionZ);
+    object.mesh.position.set(positionX, positionY, positionZ);
     object.physicsBody.position.set(positionX, positionY, positionZ);
     object.physicsBody.quaternion.set(quaternionX, quaternionY, quaternionZ, quaternionW);
     setTHREEQuaternionFromCANNON(
-      object.previewMesh, object.physicsBody, object.metaData.axis,
+      object.mesh, object.physicsBody, object.metaData.axis,
       object.type, object.metaData.gridSystemAxis
     );
   }
@@ -682,12 +682,12 @@ WorkerHandler.prototype.handlePhysicsWorkerMessage = function(msg){
     var quaternionZ = ary[index + 7];
     var quaternionW = ary[index + 8];
     var object = this.dynamicObjectGroups[i];
-    object.previewMesh.position.set(positionX, positionY, positionZ);
+    object.mesh.position.set(positionX, positionY, positionZ);
     object.physicsBody.position.set(positionX, positionY, positionZ);
-    object.previewMesh.quaternion.set(quaternionX, quaternionY, quaternionZ, quaternionW);
+    object.mesh.quaternion.set(quaternionX, quaternionY, quaternionZ, quaternionW);
     object.physicsBody.quaternion.set(quaternionX, quaternionY, quaternionZ, quaternionW);
-    object.previewGraphicsGroup.position.copy(object.previewMesh.position);
-    object.previewGraphicsGroup.quaternion.copy(object.previewMesh.quaternion);
+    object.graphicsGroup.position.copy(object.mesh.position);
+    object.graphicsGroup.quaternion.copy(object.mesh.quaternion);
   }
   this.physicsWorkerFunction();
 }

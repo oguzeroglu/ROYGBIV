@@ -59,38 +59,30 @@ window.onload = function() {
   lightsOffsetXController = datGuiLights.add(lightsParameters, "Offset x").min(-50).max(50).step(0.1).onChange(function(val){
     var pl = lights[selectedLightName];
     var plRep = pointLightRepresentations[selectedLightName];
-    var plPreviewScene = light_previewScene[selectedLightName];
     pl.position.x = pl.initialPositionX + val;
     plRep.position.x = pl.position.x;
-    plPreviewScene.position.copy(pl.position);
   }).onFinishChange(function(val){
 
   }).listen();
   lightsOffsetYController = datGuiLights.add(lightsParameters, "Offset y").min(-50).max(50).step(0.1).onChange(function(val){
     var pl = lights[selectedLightName];
     var plRep = pointLightRepresentations[selectedLightName];
-    var plPreviewScene = light_previewScene[selectedLightName];
     pl.position.y = pl.initialPositionY + val;
     plRep.position.y = pl.position.y;
-    plPreviewScene.position.copy(pl.position);
   }).onFinishChange(function(val){
 
   }).listen();
   lightsOffsetZController = datGuiLights.add(lightsParameters, "Offset z").min(-50).max(50).step(0.1).onChange(function(val){
     var pl = lights[selectedLightName];
     var plRep = pointLightRepresentations[selectedLightName];
-    var plPreviewScene = light_previewScene[selectedLightName];
     pl.position.z = pl.initialPositionZ + val;
     plRep.position.z = pl.position.z;
-    plPreviewScene.position.copy(pl.position);
   }).onFinishChange(function(val){
 
   }).listen();
   lightsIntensityController = datGuiLights.add(lightsParameters, "Intensity").min(0.0).max(1.0).step(0.01).onChange(function(val){
     var light = lights[selectedLightName];
-    var lightPreviewScene = light_previewScene[selectedLightName];
     light.intensity = val;
-    lightPreviewScene.intensity = val;
   }).onFinishChange(function(val){
 
   }).listen();
@@ -337,15 +329,11 @@ window.onload = function() {
     lightsGUIFocused = false;
     if (windowLoaded){
        var rect = renderer.domElement.getBoundingClientRect();
-       mouse.x = ( ( event.clientX - rect.left ) / rect.width ) * 2 - 1;
-       mouse.y = - ( ( event.clientY - rect.top ) / rect.height ) * 2 + 1;
+       mouse.x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
+       mouse.y = - ((event.clientY - rect.top) / rect.height) * 2 + 1;
        raycaster.setFromCamera( mouse, camera );
        var intersects;
-       if (mode == 0){
-         intersects = raycaster.intersectObjects( scene.children, true );
-       }else{
-         intersects = raycaster.intersectObjects( previewScene.children, true );
-       }
+       intersects = raycaster.intersectObjects(scene.children, true);
        if (intersects.length > 0){
          var object = intersects[0].object;
          if (object.addedObject || object.objectGroupName){
@@ -510,8 +498,7 @@ window.onload = function() {
 
   // INITIALIZE THREE.JS SCENE AND RENDERER
   scene = new THREE.Scene();
-  previewScene = new THREE.Scene();
-  debugRenderer = new THREE.CannonDebugRenderer(previewScene, physicsWorld);
+  debugRenderer = new THREE.CannonDebugRenderer(scene, physicsWorld);
   scene.background = new THREE.Color(sceneBackgroundColor);
   camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 10000 );
   camera.position.set(initialCameraX, initialCameraY, initialCameraZ);
@@ -702,11 +689,7 @@ window.addEventListener('keyup', function(event){
 });
 
  function initBadTV(){
-   if (mode == 0){
-     renderPass = new THREE.RenderPass( scene, camera );
-   }else{
-     renderPass = new THREE.RenderPass( previewScene, camera );
-   }
+   renderPass = new THREE.RenderPass(scene, camera);
    if (mode == 1){
     badTVPass = new THREE.ShaderPass( THREE.BadTVShader );
     rgbPass = new THREE.ShaderPass( THREE.RGBShiftShader );
@@ -1201,8 +1184,6 @@ function clearChildrenMesh(objectGroup){
   for (var childName in objectGroup.group){
     var child = objectGroup.group[childName];
     child.mesh.geometry.dispose();
-    child.previewMesh.geometry.dispose();
     delete child.mesh.geometry;
-    delete child.previewMesh.geometry;
   }
 }

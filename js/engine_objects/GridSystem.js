@@ -558,15 +558,7 @@ GridSystem.prototype.newSurface = function(name, grid1, grid2, material){
 
   scene.add(surface);
 
-  var surfaceClone = new THREE.Mesh(
-    surface.geometry, surface.material
-  );
-  surfaceClone.position.copy(surface.position);
-  surfaceClone.quaternion.copy(surface.quaternion);
-  previewScene.add(surfaceClone);
-
   var surfacePhysicsShape;
-
   var physicsShapeParameters = new Object();
 
   if (this.axis == "XZ"){
@@ -619,7 +611,7 @@ GridSystem.prototype.newSurface = function(name, grid1, grid2, material){
   metaData["physicsShapeParameterZ"] = physicsShapeParameters["z"];
 
   var addedObjectInstance = new AddedObject(name, "surface", metaData, material,
-                                    surface, surfaceClone, surfacePhysicsBody, destroyedGrids);
+                                    surface, surfacePhysicsBody, destroyedGrids);
   addedObjects[name] = addedObjectInstance;
 
   surface.addedObject = addedObjectInstance;
@@ -757,11 +749,6 @@ GridSystem.prototype.newRamp = function(anchorGrid, otherGrid, axis, height, mat
   }
 
   scene.add(ramp);
-  var rampClone = new THREE.Mesh(ramp.geometry, ramp.material);
-  rampClone.position.copy(ramp.position);
-  rampClone.quaternion.copy(ramp.quaternion);
-  rampClone.rotation.copy(ramp.rotation);
-  previewScene.add(rampClone);
 
   var rampPhysicsShape = new CANNON.Box(new CANNON.Vec3(
     rampWidth/2,
@@ -856,7 +843,7 @@ GridSystem.prototype.newRamp = function(anchorGrid, otherGrid, axis, height, mat
   metaData["fromEulerZ"] = fromEuler["z"];
 
   var addedObjectInstance = new AddedObject(name, "ramp", metaData, material,
-                                    ramp, rampClone, rampPhysicsBody, new Object());
+                                    ramp, rampPhysicsBody, new Object());
   addedObjects[name] = addedObjectInstance;
 
   ramp.addedObject = addedObjectInstance;
@@ -945,11 +932,6 @@ GridSystem.prototype.newBox = function(selections, height, material, name){
   boxMesh.position.z = boxCenterZ;
 
   scene.add(boxMesh);
-  var boxClone = new THREE.Mesh(boxMesh.geometry, boxMesh.material);
-  boxClone.position.copy(boxMesh.position);
-  boxClone.quaternion.copy(boxMesh.quaternion);
-  boxClone.rotation.copy(boxMesh.rotation);
-  previewScene.add(boxClone);
 
   var boxPhysicsShape = new CANNON.Box(new CANNON.Vec3(
     boxSizeX / 2,
@@ -1027,7 +1009,7 @@ GridSystem.prototype.newBox = function(selections, height, material, name){
   metaData["gridSystemAxis"] = this.axis;
 
   var addedObjectInstance = new AddedObject(name, "box", metaData, material,
-                                    boxMesh, boxClone, boxPhysicsBody, destroyedGrids);
+                                    boxMesh, boxPhysicsBody, destroyedGrids);
   addedObjects[name] = addedObjectInstance;
 
   boxMesh.addedObject = addedObjectInstance;
@@ -1095,11 +1077,6 @@ GridSystem.prototype.newSphere = function(sphereName, material, radius, selectio
   var sphereMesh = new MeshGenerator(sphereGeometry, material).generateMesh();
   sphereMesh.position.set(sphereCenterX, sphereCenterY, sphereCenterZ);
   scene.add(sphereMesh);
-  var sphereClone = new THREE.Mesh(sphereMesh.geometry, sphereMesh.material);
-  sphereClone.position.copy(sphereMesh.position);
-  sphereClone.quaternion.copy(sphereMesh.quaternion);
-  sphereClone.rotation.copy(sphereMesh.rotation);
-  previewScene.add(sphereClone);
 
   var spherePhysicsShape = new CANNON.Sphere(Math.abs(radius));
   var physicsMaterial = new CANNON.Material();
@@ -1169,7 +1146,7 @@ GridSystem.prototype.newSphere = function(sphereName, material, radius, selectio
   metaData["gridSystemAxis"] = this.axis;
 
   var addedObjectInstance = new AddedObject(sphereName, "sphere", metaData, material,
-                                    sphereMesh, sphereClone, spherePhysicsBody, destroyedGrids);
+                                    sphereMesh, spherePhysicsBody, destroyedGrids);
   addedObjects[sphereName] = addedObjectInstance;
 
   sphereMesh.addedObject = addedObjectInstance;
