@@ -135,7 +135,8 @@ var commandArgumentsExpectedCount = [
     2, //setSlipperiness
     2, //setAtlasTextureSize
     0, //printAtlasTextureSize
-    2 //sync
+    2, //sync
+    2 //newArea
 ];
 var commandArgumentsExpectedExplanation = [
   "help", //help
@@ -267,7 +268,8 @@ var commandArgumentsExpectedExplanation = [
   "setSlipperiness objectName on/off", //setSlipperiness
   "setAtlasTextureSize width height", //setAtlasTextureSize
   "printAtlasTextureSize", //printAtlasTextureSize
-  "sync sourceObject targetObject" //sync
+  "sync sourceObject targetObject", //sync
+  "newArea areaName height"
 ];
 var commands = [
   "help",
@@ -399,7 +401,8 @@ var commands = [
   "setSlipperiness",
   "setAtlasTextureSize",
   "printAtlasTextureSize",
-  "sync"
+  "sync",
+  "newArea"
 ];
 var commandInfo = [
   "help: Prints command list.",
@@ -515,8 +518,8 @@ var commandInfo = [
   "setBlending: Sets the blending mode of an object. Mode can be one of NO_BLENDING, NORMAL_BLENDING, ADDITIVE_BLENDING, SUBTRACTIVE_BLENDING,\n  MULTIPLY_BLENDING.",
   "about: Prints info about this engine.",
   "resetKeyboardBuffer: Resets the keyboard buffer.",
-  "setWorldLimits: Sets the limits of the scene. Objects outside of this limit will be ignored for collisions with particles/particle systems.",
-  "setBinSize: Sets the size of the bin. Bins are imaginary cubes that split the scene into segments to help particle/particle system\n  collision detections.Larger the size worse the performance but better the collision detection performs for fast particles.",
+  "setWorldLimits: Sets the limits of the scene. Objects outside of this limit will be ignored for collisions with particles/particle systems\n  and area calculations.",
+  "setBinSize: Sets the size of the bin. Bins are imaginary cubes that split the scene into segments to help particle/particle system\n  collision detections and area calculations.Larger the size worse the performance but better the collision detection performs\n  for fast particles.",
   "printWorldLimits: Prints the limit info of the world. Objects outside of this limit will be ignored for collisions with particles/particle systems.",
   "printBinSize: Prints the size of the bin. Bins are imaginary cubes that split the scene into segments to help particle collision detections.",
   "particleCollisionWorkerMode: Enables or disables the usage of web workers for particle collision detection.",
@@ -531,7 +534,8 @@ var commandInfo = [
   "setSlipperiness: Sets the slipperiness of an object.",
   "setAtlasTextureSize: Sets the size of each texture/texture pack when creating object groups.",
   "printAtlasTextureSize: Prints the atlas texture size set with setAtlasTextureSize command.",
-  "sync: Sets the material properties of the target object according to the source object."
+  "sync: Sets the material properties of the target object according to the source object.",
+  "newArea: Creates a new area."
 ];
 var keyboardInfo = [
   "W/S : Translates the camera on axis Z.",
@@ -558,7 +562,8 @@ var deprecatedCommandIndices = [
   89, //translateObject -> Deprecated due to architectural conflicts. Objects can only be translated using animations. Instead of translating the object in the design mode, a new grid system should be created at the specific position. Every object should be associated with certain grids.
   105, //printPerformance -> Deprecated because calling performance.now() multiple times on each render is costly.
   125, //applyDisplacementMap -> Deprecated because causes problems with geometry caching.
-  127 // setAtlasTextureSize -> Deprecated because has no use cases after deprecation of TextureMerger class
+  127, //setAtlasTextureSize -> Deprecated because has no use cases after deprecation of TextureMerger class
+  128 //printAtlasTextureSize -> Deprecated due to same reasons as setAtlasTextureSize
 ];
 
 if (commandInfo.length != commands.length){
@@ -829,7 +834,6 @@ var selectedCrosshair;
 var GLOBAL_FOG_UNIFORM = new THREE.Uniform(new THREE.Vector4(-100.0, 0, 0, 0));
 var VERTEX_SHADER_TEXTURE_FETCH_SUPPORTED;
 var DDS_SUPPORTED;
-var projectAtlasSize = new Object(); // width, height
 var mouse = new THREE.Vector2();
 var raycaster = new THREE.Raycaster();
 var jobHandlerSelectedGrid = 0;
@@ -838,6 +842,11 @@ var geometryCache = new Object();
 var MAX_TEXTURE_COUNT = 8;
 var nullTexture = new THREE.Texture();
 var compressedTextureFallbackFormat = ".png";
+var areaBinHandler;
+var areas = new Object();
+var areasVisible = true;
+var markedPointsVisible = true;
+var frustum = new THREE.Frustum();
 
 // WORKER VARIABLES
 var WORKERS_SUPPORTED = (typeof(Worker) !== "undefined");

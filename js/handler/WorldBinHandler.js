@@ -259,6 +259,50 @@ WorldBinHandler.prototype.devisualize = function(selectedScene){
   this.visualObjects = [];
 }
 
+WorldBinHandler.prototype.queryArea = function(point){
+  var x = point.x;
+  var y = point.y;
+  var z = point.z;
+  var rX = Math.round(x / BIN_SIZE) * BIN_SIZE;
+  var rY = Math.round(y / BIN_SIZE) * BIN_SIZE;
+  var rZ = Math.round(z / BIN_SIZE) * BIN_SIZE;
+  var minX, maxX;
+  if (rX <= x){
+    minX = rX;
+    maxX = rX + BIN_SIZE;
+  }else{
+    maxX = rX;
+    minX = rX - BIN_SIZE;
+  }
+  var minY, maxY;
+  if (rY <= y){
+    minY = rY;
+    maxY = rY + BIN_SIZE;
+  }else{
+    maxY = rY;
+    minY = rY - BIN_SIZE;
+  }
+  var minZ, maxZ;
+  if (rZ <= z){
+    minZ = rZ;
+    maxZ = rZ + BIN_SIZE;
+  }else{
+    maxZ = rZ;
+    minZ = rZ - BIN_SIZE;
+  }
+  if (this.bin[minX] && this.bin[minX][minY]){
+    var res = this.bin[minX][minY][minZ];
+    if (res){
+      for (var areaName in res){
+        var area = areas[areaName];
+        if (area.boundingBox.containsPoint(point)){
+          return areaName;
+        }
+      }
+    }
+  }
+}
+
 WorldBinHandler.prototype.query = function(point){
   var performance1 = performance.now();
   var x = point.x;

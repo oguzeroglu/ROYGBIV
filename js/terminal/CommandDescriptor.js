@@ -567,6 +567,12 @@ var CommandDescriptor = function(){
   this.sync.types.push(this.OBJECT_NAME); // sourceObject
   this.sync.types.push(this.OBJECT_NAME); // targetObject
 
+  // newArea
+  this.newArea = new Object();
+  this.newArea.types = [];
+  this.newArea.types.push(this.UNKNOWN_INDICATOR); // name
+  this.newArea.types.push(this.UNKNOWN_INDICATOR); // height
+
 };
 
 CommandDescriptor.prototype.test = function(){

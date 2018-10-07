@@ -52,6 +52,9 @@ window.onload = function() {
   // COLOR NAMES
   ColorNames = new ColorNames();
 
+  // AREA BIN HANDLER
+  areaBinHandler = new WorldBinHandler(true);
+
   // DAT GUI LIGHTS
   datGuiLights = new dat.GUI();
   lightNameController = datGuiLights.add(lightsParameters, "Light").listen();
@@ -334,6 +337,14 @@ window.onload = function() {
        raycaster.setFromCamera( mouse, camera );
        var intersects;
        intersects = raycaster.intersectObjects(scene.children, true);
+       var newIntersects = [];
+       for (var i = 0; i<intersects.length; i++){
+         var obj = intersects[i].object;
+         if (!(obj instanceof THREE.Box3Helper)){
+           newIntersects.push(intersects[i]);
+         }
+       }
+       intersects = newIntersects;
        if (intersects.length > 0){
          var object = intersects[0].object;
          if (object.addedObject || object.objectGroupName){

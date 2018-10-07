@@ -764,9 +764,10 @@ StateLoader.prototype.load = function(undo){
     }
 
     // OBJECT GROUPS ***********************************************
-    // NOT HERE -> createObjectGroupsAfterLoadedTextures
+    // NOT HERE -> SEE: createObjectGroupsAfterLoadedTextures
 
     // MARKED PONTS ************************************************
+    markedPointsVisible = false;
     for (var markedPointName in obj.markedPointsExport){
       var curMarkedPointExport = obj.markedPointsExport[markedPointName];
       var markedPoint = new MarkedPoint(
@@ -776,6 +777,7 @@ StateLoader.prototype.load = function(undo){
         curMarkedPointExport["z"]
       );
       if (!curMarkedPointExport.isHidden && mode == 0){
+        markedPointsVisible = true;
         markedPoint.renderToScreen();
       }else{
         markedPoint.isHidden = true;
@@ -813,11 +815,23 @@ StateLoader.prototype.load = function(undo){
     fogColor = fogObj.fogColor;
     fogDensity = fogObj.fogDensity;
     fogColorRGB = new THREE.Color(fogColor);
-    // ATLAS TEXTURE SIZE ******************************************
-    projectAtlasSize = {
-      width: obj.projectAtlasSize.width,
-      height: obj.projectAtlasSize.height
-    };
+    // AREAS *******************************************************
+    var areasVisible = obj.areasVisible;
+    for (var areaName in obj.areas){
+      var curAreaExport = obj.areas[areaName];
+      areas[areaName] = new Area(
+        areaName,
+        new THREE.Box3(
+          new THREE.Vector3(curAreaExport.bbMinX, curAreaExport.bbMinY, curAreaExport.bbMinZ),
+          new THREE.Vector3(curAreaExport.bbMaxX, curAreaExport.bbMaxY, curAreaExport.bbMaxZ)
+        ),
+        gridSystems[curAreaExport.gridSystemName]
+      );
+      areaBinHandler.insert(areas[areaName].boundingBox, areaName);
+      if (areasVisible){
+        areas[areaName].renderToScreen();
+      }
+    }
     // POST PROCESSING *********************************************
     scanlineCount = obj.scanlineCount;
     scanlineSIntensity = obj.scanlineSIntensity;
@@ -2091,6 +2105,9 @@ StateLoader.prototype.resetProject = function(undo){
   for (var markedPointName in markedPoints){
     markedPoints[markedPointName].destroy();
   }
+  for (var areaName in areas){
+    areas[areaName].destroy();
+  }
 
   keyboardBuffer = new Object();
   gridSystems = new Object();
@@ -2111,8 +2128,11 @@ StateLoader.prototype.resetProject = function(undo){
   objectGroups = new Object();
   disabledObjectNames = new Object();
   markedPoints = new Object();
+  areas = new Object();
+  areaBinHandler = new WorldBinHandler(true);
   manualDisplacementQueue = new Object();
   anchorGrid = 0;
+  areasVisible = true;
 
   // FOG
   fogActive = false;

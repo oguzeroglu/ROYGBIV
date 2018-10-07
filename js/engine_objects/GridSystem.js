@@ -474,6 +474,82 @@ GridSystem.prototype.crop = function(grid1, grid2){
   terminal.printInfo(Text.GS_CROPPED);
 }
 
+GridSystem.prototype.newArea = function(name, height, selections){
+  var boxCenterX, boxCenterY, boxCenterZ, boxSizeX, boxSizeY, boxSizeZ;
+  if (selections.length == 1){
+    var grid = selections[0];
+    boxCenterX = grid.centerX;
+    boxCenterZ = grid.centerZ;
+    boxSizeX = this.cellSize;
+    boxSizeZ = this.cellSize;
+  }else{
+    var grid1 = selections[0];
+    var grid2 = selections[1];
+    boxCenterX = (grid1.centerX + grid2.centerX) / 2;
+    boxCenterZ = (grid1.centerZ + grid2.centerZ) / 2;
+    boxSizeX = (Math.abs(grid1.colNumber - grid2.colNumber) + 1) * this.cellSize;
+    boxSizeZ = (Math.abs(grid1.rowNumber - grid2.rowNumber) + 1) * this.cellSize;
+  }
+
+  boxCenterY = this.centerY + (height / 2);
+  boxSizeY = Math.abs(height);
+
+  if (this.axis == "XY"){
+    var tmp = boxSizeY;
+    boxSizeY = boxSizeZ;
+    boxSizeZ = tmp;
+    boxCenterZ = this.centerZ + (height / 2);
+    if (selections.length == 1){
+        var grid = selections[0];
+        boxCenterY = grid.centerY;
+    }else{
+      var grid1 = selections[0];
+      var grid2 = selections[1];
+      boxCenterY = (grid1.centerY + grid2.centerY) / 2;
+    }
+  }else if (this.axis == "YZ"){
+    var oldX = boxSizeX;
+    var oldY = boxSizeY;
+    var oldZ = boxSizeZ;
+    boxSizeZ = oldX;
+    boxSizeX = oldY;
+    boxSizeY = oldZ;
+    if (selections.length == 1){
+      var grid = selections[0];
+      boxCenterY = grid.centerY;
+      boxCenterZ = grid.centerZ;
+      boxCenterX = grid.centerX + (height / 2);
+    }else{
+      var grid1 = selections[0];
+      var grid2 = selections[1];
+      boxCenterY = (grid1.centerY + grid2.centerY) / 2;
+      boxCenterZ = (grid1.centerZ + grid2.centerZ) / 2;
+      boxCenterX = grid1.centerX + (height / 2);
+    }
+  }
+
+  if (this.isSuperposed){
+    boxCenterY = boxCenterY - superposeYOffset;
+  }
+
+  var boundingBox = new THREE.Box3().setFromCenterAndSize(
+    new THREE.Vector3(boxCenterX, boxCenterY, boxCenterZ),
+    new THREE.Vector3(boxSizeX, boxSizeY, boxSizeZ)
+  );
+
+  areas[name] = new Area(name, boundingBox, this);
+  if (areasVisible){
+    areas[name].renderToScreen();
+  }
+
+  for (var i = 0; i<selections.length; i++){
+    selections[i].toggleSelect(false, false, false, true);
+  }
+
+  areaBinHandler.insert(boundingBox, name);
+
+}
+
 GridSystem.prototype.newSurface = function(name, grid1, grid2, material){
   if (!grid2){
     grid2 = grid1;

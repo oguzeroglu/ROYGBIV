@@ -87,28 +87,6 @@ ObjectGroup.prototype.handleRenderSide = function(val){
   }
 }
 
-ObjectGroup.prototype.handleAtlasSize = function(texture){
-  if (!projectAtlasSize.width || ! projectAtlasSize.height){
-    return texture;
-  }
-  var newWidth = projectAtlasSize.width;
-  var newHeight = projectAtlasSize.height;
-  var sourceWidth = texture.image.width;
-  var sourceHeight = texture.image.height;
-  var tmpCanvas = document.createElement("canvas");
-  tmpCanvas.width = newWidth;
-  tmpCanvas.height = newHeight;
-  var tmpContext = tmpCanvas.getContext("2d");
-  tmpContext.drawImage(
-    texture.image, 0, 0, sourceWidth, sourceHeight, 0, 0, newWidth, newHeight
-  );
-  var txt = new THREE.CanvasTexture(tmpCanvas);
-  txt.repeat.copy(texture.repeat);
-  txt.offset.copy(texture.offset);
-  txt.needsUpdate = true;
-  return txt;
-}
-
 ObjectGroup.prototype.textureCompare = function(txt1, txt2){
   if (txt1.roygbivTextureName != txt2.roygbivTextureName){
     return false;

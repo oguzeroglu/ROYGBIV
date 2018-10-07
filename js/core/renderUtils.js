@@ -38,7 +38,12 @@ function render(){
     handleWorkerMessages();
   }else{
     cameraOperationsDone = false;
-    updateMarkedPointLabels();
+    if (areasVisible){
+      updateAreaLabels();
+    }
+    if (markedPointsVisible){
+      updateMarkedPointLabels();
+    }
     updateGridCornerHelpers();
   }
   composer.render(0.1);
@@ -106,6 +111,19 @@ function updateObjectTrails(){
 function runScripts(){
   for (var scriptName in scriptsToRun){
     scripts[scriptName].execute();
+  }
+}
+
+function updateAreaLabels(){
+  for (var areaName in areas){
+    if (!cameraOperationsDone){
+      camera.updateMatrix();
+      camera.updateMatrixWorld();
+      camera.matrixWorldInverse.getInverse(camera.matrixWorld);
+      cameraOperationsDone = true;
+    }
+    var area = areas[areaName];
+    area.update();
   }
 }
 

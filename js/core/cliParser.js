@@ -313,6 +313,11 @@ function parse(input){
             for (var markedPointName in markedPoints){
               markedPoints[markedPointName].hide(true);
             }
+            if (areasVisible){
+              for (var areaName in areas){
+                areas[areaName].hide();
+              }
+            }
             for (var scriptName in scripts){
               var script = scripts[scriptName];
               if (script.runAutomatically){
@@ -452,6 +457,12 @@ function parse(input){
               if (markedPoints[markedPointName].showAgainOnTheNextModeSwitch){
                 markedPoints[markedPointName].show();
                 markedPoints[markedPointName].showAgainOnTheNextModeSwitch = false;
+              }
+            }
+
+            if (areasVisible){
+              for (var areaName in areas){
+                areas[areaName].renderToScreen();
               }
             }
 
@@ -3270,6 +3281,7 @@ function parse(input){
             terminal.printError(Text.NO_MARKED_POINTS);
             return true;
           }
+          markedPointsVisible = !markedPointsVisible;
           terminal.printInfo(Text.MARKED_POINTS_TOGGLED);
           return true;
         break;
@@ -3805,6 +3817,10 @@ function parse(input){
             return true;
           }
           BIN_SIZE = binSize;
+          areaBinHandler = new WorldBinHandler(true);
+          for (var areaName in areas){
+            areaBinHandler.insert(areas[areaName].boundingBox, areaName);
+          }
           terminal.printInfo(Text.BIN_SIZE_SET);
           return true;
         break;
@@ -4158,14 +4174,7 @@ function parse(input){
           // DEPRECATED
         break;
         case 128: // printAtlasTextureSize
-          if (!projectAtlasSize.width || !projectAtlasSize.height){
-            terminal.printError(Text.ATLAS_TEXTURE_SIZE_NOT_SET);
-          }else{
-            terminal.printHeader(Text.ATLAS_TEXTURE_SIZE);
-            terminal.printInfo(Text.TREE2.replace(Text.PARAM1, "Width").replace(Text.PARAM2, projectAtlasSize.width), true);
-            terminal.printInfo(Text.TREE2.replace(Text.PARAM1, "Height").replace(Text.PARAM2, projectAtlasSize.height));
-          }
-          return true;
+          // DEPRECATED
         break;
         case 129: // sync
           if (mode != 0){
@@ -4205,7 +4214,42 @@ function parse(input){
             terminal.printInfo(Text.OBJECTS_SYNCED);
           }
           return true;
-
+        break;
+        case 130: //newArea
+          if (mode != 0){
+            terminal.printError(Text.WORKS_ONLY_IN_DESIGN_MODE);
+            return true;
+          }
+          var areaName = splitted[1];
+          var height = parseFloat(splitted[2]);
+          if (areas[areaName]){
+            terminal.printError(Text.NAME_MUST_BE_UNIQUE);
+            return true;
+          }
+          if (isNaN(height)){
+            terminal.printError(Text.IS_NOT_A_NUMBER.replace(Text.PARAM1, "height"));
+            return true;
+          }
+          var selections = [];
+          var gs;
+          for (var gridName in gridSelections){
+            if (typeof gs == UNDEFINED){
+              gs = gridSelections[gridName].parentName;
+            }else{
+              if (gs != gridSelections[gridName].parentName){
+                terminal.printError(Text.SELECTED_GRIDS_SAME_GRIDSYSTEM);
+                return true;
+              }
+            }
+            selections.push(gridSelections[gridName]);
+          }
+          if (selections.length == 0 || selections.length > 2){
+            terminal.printError(Text.MUST_HAVE_1_OR_2_GRIDS_SELECTED);
+            return true;
+          }
+          var result = gridSystems[gs].newArea(areaName, height, selections);
+          terminal.printInfo(Text.AREA_CREATED);
+          return true;
         break;
       }
       return true;

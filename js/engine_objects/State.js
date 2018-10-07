@@ -180,9 +180,10 @@ var State = function(){
     fogColor: fogColor,
     fogDensity: fogDensity
   };
-  // ATLAS TEXTURE SIZE *********************************************
-  this.projectAtlasSize = {
-    width: projectAtlasSize.width,
-    height: projectAtlasSize.height
-  };
+  // AREAS *********************************************************
+  this.areasVisible = areasVisible;
+  this.areas = new Object();
+  for (var areaName in areas){
+    this.areas[areaName] = areas[areaName].export();
+  }
 }

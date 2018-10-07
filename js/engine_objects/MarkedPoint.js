@@ -8,7 +8,6 @@ var MarkedPoint = function(name, x, y, z){
   this.object3D.position.copy(this.vector3D);
   this.vector2D = this.get2DVector();
   this.isHidden = false;
-  this.frustum = new THREE.Frustum();
 }
 
 MarkedPoint.prototype.renderToScreen = function(){
@@ -23,7 +22,7 @@ MarkedPoint.prototype.renderToScreen = function(){
   this.markerSpan.style.color = "#20C20E";
   this.markerIcon = document.createElement("i");
   this.markerIcon.className="fa fa-map-marker";
-  this.markerSpan.innerHTML = " "+this.name;
+  this.markerSpan.innerHTML = " "+this.name+" ";
   this.markerSpan.appendChild(this.markerIcon);
   this.innerDiv.appendChild(this.markerSpan);
   this.div.appendChild(this.innerDiv);
@@ -41,8 +40,8 @@ MarkedPoint.prototype.update = function(){
 }
 
 MarkedPoint.prototype.isObjectInFrustum = function(){
-  this.frustum.setFromMatrix(REUSABLE_MATRIX_4.multiplyMatrices(camera.projectionMatrix, camera.matrixWorldInverse));
-  return this.frustum.containsPoint(this.object3D.position);
+  frustum.setFromMatrix(REUSABLE_MATRIX_4.multiplyMatrices(camera.projectionMatrix, camera.matrixWorldInverse));
+  return frustum.containsPoint(this.object3D.position);
 }
 
 MarkedPoint.prototype.export = function(){
