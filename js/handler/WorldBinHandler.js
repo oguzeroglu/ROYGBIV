@@ -469,9 +469,14 @@ WorldBinHandler.prototype.insert = function(boundingBox, objName, parentName){
           this.bin[x][y][z][parentName] = new Object();
           this.bin[x][y][z][parentName][objName] = true;
         }
-        var obj = addedObjects[objName];
-        if (!obj){
-          obj = objectGroups[parentName];
+        var obj;
+        if (!this.isAreaBinHandler){
+          obj = addedObjects[objName];
+          if (!obj){
+            obj = objectGroups[parentName];
+          }
+        }else{
+          obj = areas[objName];
         }
         if (obj){
           if (!obj.binInfo){

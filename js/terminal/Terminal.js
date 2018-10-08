@@ -551,6 +551,14 @@ Terminal.prototype.autocomplete = function(command){
 				}
 				helpString = "[Name]: Use NULL to generate a random name.";
 			break;
+			case commandDescriptor.AREA_NAME:
+				for (var areaName in areas){
+					if (areaName.startsWith(curEntry)){
+						possibilities.push(areaName);
+					}
+				}
+				helpString = "[Area names]: ";
+			break;
 		}
 
 		//  **********************************************************

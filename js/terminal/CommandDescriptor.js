@@ -27,7 +27,8 @@ var CommandDescriptor = function(){
   this.MARKED_POINT_NAME        =   24;
   this.API_FUNCTION_NAME        =   25;
   this.BLENDING_MODE            =   26;
-  this.OBJECT_CREATION_NAME    =    27;
+  this.OBJECT_CREATION_NAME     =   27;
+  this.AREA_NAME                =   28;
 
   // newGridSystem
   this.newGridSystem = new Object();
@@ -572,6 +573,11 @@ var CommandDescriptor = function(){
   this.newArea.types = [];
   this.newArea.types.push(this.UNKNOWN_INDICATOR); // name
   this.newArea.types.push(this.UNKNOWN_INDICATOR); // height
+
+  // destroyArea
+  this.destroyArea = new Object();
+  this.destroyArea.types = [];
+  this.destroyArea.types.push(this.AREA_NAME); // name
 
 };
 

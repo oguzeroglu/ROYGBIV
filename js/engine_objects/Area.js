@@ -26,15 +26,16 @@ Area.prototype.destroy = function(){
   if (this.helper){
     if (areasVisible){
       scene.remove(this.helper);
-      this.helper.geometry.dispose();
-      this.helper.material.dispose();
     }
+    this.helper.geometry.dispose();
+    this.helper.material.dispose();
   }
   if (this.div){
     if (areasVisible){
       document.getElementsByTagName("body")[0].removeChild(this.div);
     }
   }
+  areaBinHandler.deleteObjectFromBin(this.binInfo, this.name);
 }
 
 Area.prototype.renderToScreen = function(){

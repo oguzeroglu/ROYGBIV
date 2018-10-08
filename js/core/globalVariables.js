@@ -137,7 +137,8 @@ var commandArgumentsExpectedCount = [
     0, //printAtlasTextureSize
     2, //sync
     2, //newArea
-    0 //toggleAreas
+    0, //toggleAreas
+    1 //destroyArea
 ];
 var commandArgumentsExpectedExplanation = [
   "help", //help
@@ -271,7 +272,8 @@ var commandArgumentsExpectedExplanation = [
   "printAtlasTextureSize", //printAtlasTextureSize
   "sync sourceObject targetObject", //sync
   "newArea areaName height", //newArea
-  "toggleAreas" //toggleAreas
+  "toggleAreas", //toggleAreas
+  "destroyArea areaName" //destroyArea
 ];
 var commands = [
   "help",
@@ -405,7 +407,8 @@ var commands = [
   "printAtlasTextureSize",
   "sync",
   "newArea",
-  "toggleAreas"
+  "toggleAreas",
+  "destroyArea"
 ];
 var commandInfo = [
   "help: Prints command list.",
@@ -539,7 +542,8 @@ var commandInfo = [
   "printAtlasTextureSize: Prints the atlas texture size set with setAtlasTextureSize command.",
   "sync: Sets the material properties of the target object according to the source object.",
   "newArea: Creates a new area.",
-  "toggleAreas: Show/hides the areas."
+  "toggleAreas: Show/hides the areas.",
+  "destroyArea: Destroys an area."
 ];
 var keyboardInfo = [
   "W/S : Translates the camera on axis Z.",

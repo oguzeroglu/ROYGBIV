@@ -3818,6 +3818,7 @@ function parse(input){
           }
           BIN_SIZE = binSize;
           areaBinHandler = new WorldBinHandler(true);
+          areaBinHandler.isAreaBinHandler = true;
           for (var areaName in areas){
             areaBinHandler.insert(areas[areaName].boundingBox, areaName);
           }
@@ -4226,6 +4227,10 @@ function parse(input){
             terminal.printError(Text.NAME_MUST_BE_UNIQUE);
             return true;
           }
+          if (areaName.toLowerCase() == "default"){
+            terminal.printError(Text.NAME_RESERVED);
+            return true;
+          }
           if (isNaN(height)){
             terminal.printError(Text.IS_NOT_A_NUMBER.replace(Text.PARAM1, "height"));
             return true;
@@ -4268,6 +4273,22 @@ function parse(input){
             }
             terminal.printInfo(Text.AREAS_ARE_INVISIBLE);
           }
+          return true;
+        break;
+        case 132: //destroyArea
+          if (mode != 0){
+            terminal.printError(Text.WORKS_ONLY_IN_DESIGN_MODE);
+            return true;
+          }
+          var name = splitted[1];
+          var area = areas[name];
+          if (!area){
+            terminal.printError(Text.NO_SUCH_AREA);
+            return true;
+          }
+          area.destroy();
+          delete areas[area.name];
+          terminal.printInfo(Text.AREA_DESTROYED);
           return true;
         break;
       }

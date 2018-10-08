@@ -2130,6 +2130,7 @@ StateLoader.prototype.resetProject = function(undo){
   markedPoints = new Object();
   areas = new Object();
   areaBinHandler = new WorldBinHandler(true);
+  areaBinHandler.isAreaBinHandler = true;
   manualDisplacementQueue = new Object();
   anchorGrid = 0;
   areasVisible = true;

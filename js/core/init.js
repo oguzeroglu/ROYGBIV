@@ -54,6 +54,7 @@ window.onload = function() {
 
   // AREA BIN HANDLER
   areaBinHandler = new WorldBinHandler(true);
+  areaBinHandler.isAreaBinHandler = true;
 
   // DAT GUI LIGHTS
   datGuiLights = new dat.GUI();
