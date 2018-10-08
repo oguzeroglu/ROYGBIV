@@ -537,7 +537,7 @@ GridSystem.prototype.newArea = function(name, height, selections){
     new THREE.Vector3(boxSizeX, boxSizeY, boxSizeZ)
   );
 
-  areas[name] = new Area(name, boundingBox, this);
+  areas[name] = new Area(name, boundingBox, this.outlineColor);
   if (areasVisible){
     areas[name].renderToScreen();
   }

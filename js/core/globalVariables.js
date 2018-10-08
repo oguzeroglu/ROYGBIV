@@ -136,7 +136,8 @@ var commandArgumentsExpectedCount = [
     2, //setAtlasTextureSize
     0, //printAtlasTextureSize
     2, //sync
-    2 //newArea
+    2, //newArea
+    0 //toggleAreas
 ];
 var commandArgumentsExpectedExplanation = [
   "help", //help
@@ -241,7 +242,7 @@ var commandArgumentsExpectedExplanation = [
   "uploadScript scriptName filePath", //uploadScript
   "runManually scriptName", //runManually
   "physicsWorkerMode on/off", //physicsWorkerMode
-  "printPhysicsWorkerMode",
+  "printPhysicsWorkerMode", //printPhysicsWorkerMode
   "explain functionName", //explain
   "printScriptingFunctions", //printScriptingFunctions
   "printPerformance", //printPerformance
@@ -269,7 +270,8 @@ var commandArgumentsExpectedExplanation = [
   "setAtlasTextureSize width height", //setAtlasTextureSize
   "printAtlasTextureSize", //printAtlasTextureSize
   "sync sourceObject targetObject", //sync
-  "newArea areaName height"
+  "newArea areaName height", //newArea
+  "toggleAreas" //toggleAreas
 ];
 var commands = [
   "help",
@@ -402,7 +404,8 @@ var commands = [
   "setAtlasTextureSize",
   "printAtlasTextureSize",
   "sync",
-  "newArea"
+  "newArea",
+  "toggleAreas"
 ];
 var commandInfo = [
   "help: Prints command list.",
@@ -535,7 +538,8 @@ var commandInfo = [
   "setAtlasTextureSize: Sets the size of each texture/texture pack when creating object groups.",
   "printAtlasTextureSize: Prints the atlas texture size set with setAtlasTextureSize command.",
   "sync: Sets the material properties of the target object according to the source object.",
-  "newArea: Creates a new area."
+  "newArea: Creates a new area.",
+  "toggleAreas: Show/hides the areas."
 ];
 var keyboardInfo = [
   "W/S : Translates the camera on axis Z.",

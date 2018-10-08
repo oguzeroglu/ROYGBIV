@@ -816,7 +816,7 @@ StateLoader.prototype.load = function(undo){
     fogDensity = fogObj.fogDensity;
     fogColorRGB = new THREE.Color(fogColor);
     // AREAS *******************************************************
-    var areasVisible = obj.areasVisible;
+    areasVisible = obj.areasVisible;
     for (var areaName in obj.areas){
       var curAreaExport = obj.areas[areaName];
       areas[areaName] = new Area(
@@ -825,7 +825,7 @@ StateLoader.prototype.load = function(undo){
           new THREE.Vector3(curAreaExport.bbMinX, curAreaExport.bbMinY, curAreaExport.bbMinZ),
           new THREE.Vector3(curAreaExport.bbMaxX, curAreaExport.bbMaxY, curAreaExport.bbMaxZ)
         ),
-        gridSystems[curAreaExport.gridSystemName]
+        curAreaExport.color
       );
       areaBinHandler.insert(areas[areaName].boundingBox, areaName);
       if (areasVisible){

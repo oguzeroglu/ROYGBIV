@@ -1,7 +1,7 @@
-var Area = function(name, boundingBox, gridSystem){
+var Area = function(name, boundingBox, color){
   this.name = name;
   this.boundingBox = boundingBox;
-  this.parentGridSystem = gridSystem;
+  this.color = color;
   this.center = new THREE.Vector3();
   this.boundingBox.getCenter(this.center);
   this.object3D = new THREE.Object3D();
@@ -18,7 +18,7 @@ Area.prototype.export = function(){
   exportObject.bbMaxX = this.boundingBox.max.x;
   exportObject.bbMaxY = this.boundingBox.max.y;
   exportObject.bbMaxZ = this.boundingBox.max.z;
-  exportObject.gridSystemName = this.parentGridSystem.name;
+  exportObject.color = this.color;
   return exportObject;
 }
 
@@ -39,7 +39,7 @@ Area.prototype.destroy = function(){
 
 Area.prototype.renderToScreen = function(){
   if (!this.helper){
-    var color = new THREE.Color(this.parentGridSystem.outlineColor);
+    var color = new THREE.Color(this.color);
     this.helper = new THREE.Box3Helper(this.boundingBox, color);
   }
   scene.add(this.helper);

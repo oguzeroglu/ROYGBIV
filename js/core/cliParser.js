@@ -4251,6 +4251,25 @@ function parse(input){
           terminal.printInfo(Text.AREA_CREATED);
           return true;
         break;
+        case 131: //toggleAreas
+          if (mode != 0){
+            terminal.printError(Text.WORKS_ONLY_IN_DESIGN_MODE);
+            return true;
+          }
+          areasVisible = !areasVisible;
+          if (areasVisible){
+            for (var areaName in areas){
+              areas[areaName].renderToScreen();
+            }
+            terminal.printInfo(Text.AREAS_ARE_VISIBLE);
+          }else{
+            for (var areaName in areas){
+              areas[areaName].hide();
+            }
+            terminal.printInfo(Text.AREAS_ARE_INVISIBLE);
+          }
+          return true;
+        break;
       }
       return true;
     }catch(err){
