@@ -2134,6 +2134,8 @@ StateLoader.prototype.resetProject = function(undo){
   manualDisplacementQueue = new Object();
   anchorGrid = 0;
   areasVisible = true;
+  areaConfigurationsVisible = false;
+  areaConfigurationsHandler = new AreaConfigurationsHandler();
 
   // FOG
   fogActive = false;

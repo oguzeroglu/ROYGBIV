@@ -138,7 +138,8 @@ var commandArgumentsExpectedCount = [
     2, //sync
     2, //newArea
     0, //toggleAreas
-    1 //destroyArea
+    1, //destroyArea
+    1 //areaConfigurations
 ];
 var commandArgumentsExpectedExplanation = [
   "help", //help
@@ -273,7 +274,8 @@ var commandArgumentsExpectedExplanation = [
   "sync sourceObject targetObject", //sync
   "newArea areaName height", //newArea
   "toggleAreas", //toggleAreas
-  "destroyArea areaName" //destroyArea
+  "destroyArea areaName", //destroyArea
+  "areaConfigurations show/hide"
 ];
 var commands = [
   "help",
@@ -408,7 +410,8 @@ var commands = [
   "sync",
   "newArea",
   "toggleAreas",
-  "destroyArea"
+  "destroyArea",
+  "areaConfigurations"
 ];
 var commandInfo = [
   "help: Prints command list.",
@@ -543,7 +546,8 @@ var commandInfo = [
   "sync: Sets the material properties of the target object according to the source object.",
   "newArea: Creates a new area.",
   "toggleAreas: Show/hides the areas.",
-  "destroyArea: Destroys an area."
+  "destroyArea: Destroys an area.",
+  "areaConfigurations: Show/hides the area configuration window."
 ];
 var keyboardInfo = [
   "W/S : Translates the camera on axis Z.",
@@ -853,6 +857,8 @@ var compressedTextureFallbackFormat = ".png";
 var areaBinHandler;
 var areas = new Object();
 var areasVisible = true;
+var areaConfigurationsVisible = false;
+var areaConfigurationsHandler;
 var markedPointsVisible = true;
 var frustum = new THREE.Frustum();
 
@@ -877,6 +883,7 @@ var ROYGBIV;
 var datGui;
 var datGuiObjectManipulation;
 var datGuiLights;
+var datGuiAreaConfigurations;
 var omGUIlastObjectName = "";
 
 var postprocessingParameters = {

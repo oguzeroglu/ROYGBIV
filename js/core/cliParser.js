@@ -4291,6 +4291,40 @@ function parse(input){
           terminal.printInfo(Text.AREA_DESTROYED);
           return true;
         break;
+        case 133: //areaConfigurations
+          if (mode != 0){
+            terminal.printError(Text.WORKS_ONLY_IN_DESIGN_MODE);
+            return true;
+          }
+          var acMode = splitted[1].toLowerCase();
+          if (acMode != "show" && acMode != "hide"){
+            terminal.printError(Text.STATUS_MUST_BE_ONE_OF);
+            return true;
+          }
+          var count = 0;
+          for (var areaName in areas){
+            count ++;
+          }
+          if (count == 0){
+            terminal.printError(Text.NO_AREAS_CREATED);
+            return true;
+          }
+          if (acMode == "show"){
+            if (areaConfigurationsVisible){
+              terminal.printError(Text.AREA_CONFIGURATION_WINDOW_IS_ALREADY_VISIBLE);
+              return true;
+            }
+            areaConfigurationsHandler.show();
+          }else if (acMode == "hide"){
+            if (!areaConfigurationsVisible){
+              terminal.printError(Text.AREA_CONFIGURATION_WINDOW_IS_ALREADY_HIDDEN);
+              return true;
+            }
+            $(datGuiAreaConfigurations.domElement).attr("hidden", true);
+          }
+          areaConfigurationsVisible = ! areaConfigurationsVisible;
+          terminal.printInfo(Text.OK);
+        break;
       }
       return true;
     }catch(err){

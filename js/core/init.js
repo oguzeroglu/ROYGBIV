@@ -56,6 +56,9 @@ window.onload = function() {
   areaBinHandler = new WorldBinHandler(true);
   areaBinHandler.isAreaBinHandler = true;
 
+  // AREA CONFIGURATIONS HANDLER
+  areaConfigurationsHandler = new AreaConfigurationsHandler();
+
   // DAT GUI LIGHTS
   datGuiLights = new dat.GUI();
   lightNameController = datGuiLights.add(lightsParameters, "Light").listen();

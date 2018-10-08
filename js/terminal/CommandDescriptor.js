@@ -577,7 +577,12 @@ var CommandDescriptor = function(){
   // destroyArea
   this.destroyArea = new Object();
   this.destroyArea.types = [];
-  this.destroyArea.types.push(this.AREA_NAME); // name
+  this.destroyArea.types.push(this.AREA_NAME); // areaName
+
+  // areaConfiguration
+  this.areaConfigurations = new Object();
+  this.areaConfigurations.types = [];
+  this.areaConfigurations.types.push(this.HIDE_SHOW); // show/hide
 
 };
 
