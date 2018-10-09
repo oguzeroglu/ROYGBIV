@@ -861,6 +861,9 @@ var areaConfigurationsVisible = false;
 var areaConfigurationsHandler;
 var markedPointsVisible = true;
 var frustum = new THREE.Frustum();
+var SIDE_BOTH = "Both";
+var SIDE_FRONT = "Front";
+var SIDE_BACK = "Back";
 
 // WORKER VARIABLES
 var WORKERS_SUPPORTED = (typeof(Worker) !== "undefined");

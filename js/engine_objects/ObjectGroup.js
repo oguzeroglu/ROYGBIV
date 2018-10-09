@@ -16,6 +16,27 @@ var ObjectGroup = function(name, group){
 
 }
 
+ObjectGroup.prototype.getSideInArea = function(areaName){
+  if (this.areaSideConfigurations){
+    if (!(typeof this.areaSideConfigurations[areaName] == UNDEFINED)){
+      return this.areaSideConfigurations[areaName];
+    }
+  }
+  if (this.defaultSide){
+    return this.defaultSide;
+  }
+  return SIDE_BOTH;
+}
+
+ObjectGroup.prototype.getVisibilityInArea = function(areaName){
+  if (this.areaVisibilityConfigurations){
+    if (!(typeof this.areaVisibilityConfigurations[areaName] == UNDEFINED)){
+      return this.areaVisibilityConfigurations[areaName];
+    }
+  }
+  return true;
+}
+
 ObjectGroup.prototype.loadState = function(){
   this.physicsBody.position.set(
     this.state.physicsPX, this.state.physicsPY, this.state.physicsPZ
@@ -80,10 +101,13 @@ ObjectGroup.prototype.handleRenderSide = function(val){
   this.renderSide = val;
   if (val == 0){
     this.mesh.material.side = THREE.DoubleSide;
+    this.defaultSide = SIDE_BOTH;
   }else if (val == 1){
     this.mesh.material.side = THREE.FrontSide;
+    this.defaultSide = SIDE_FRONT;
   }else if (val == 2){
     this.mesh.material.side = THREE.BackSide;
+    this.defaultSide = SIDE_BACK;
   }
 }
 

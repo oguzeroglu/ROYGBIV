@@ -4304,9 +4304,23 @@ function parse(input){
           var count = 0;
           for (var areaName in areas){
             count ++;
+            break;
           }
           if (count == 0){
             terminal.printError(Text.NO_AREAS_CREATED);
+            return true;
+          }
+          count = 0;
+          for (var objName in addedObjects){
+            count ++;
+            break;
+          }
+          for (var objName in objectGroups){
+            count ++;
+            break;
+          }
+          if (count == 0){
+            terminal.printError(Text.NO_OBJECT_ADDED_TO_THE_SCENE);
             return true;
           }
           if (acMode == "show"){
