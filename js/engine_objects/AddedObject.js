@@ -231,6 +231,13 @@ AddedObject.prototype.getSideInArea = function(areaName){
   return SIDE_BOTH;
 }
 
+AddedObject.prototype.setSideInArea = function(areaName, side){
+  if (!this.areaSideConfigurations){
+    this.areaSideConfigurations = new Object();
+  }
+  this.areaSideConfigurations[areaName] = side;
+}
+
 AddedObject.prototype.getVisibilityInArea = function(areaName){
   if (this.areaVisibilityConfigurations){
     if (!(typeof this.areaVisibilityConfigurations[areaName] == UNDEFINED)){
@@ -238,6 +245,13 @@ AddedObject.prototype.getVisibilityInArea = function(areaName){
     }
   }
   return true;
+}
+
+AddedObject.prototype.setVisibilityInArea = function(areaName, isVisible){
+  if (!this.areaVisibilityConfigurations){
+    this.areaVisibilityConfigurations = new Object();
+  }
+  this.areaVisibilityConfigurations[areaName] = isVisible;
 }
 
 AddedObject.prototype.loadState = function(){

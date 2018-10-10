@@ -28,6 +28,13 @@ ObjectGroup.prototype.getSideInArea = function(areaName){
   return SIDE_BOTH;
 }
 
+ObjectGroup.prototype.setSideInArea = function(areaName, side){
+  if (!this.areaSideConfigurations){
+    this.areaSideConfigurations = new Object();
+  }
+  this.areaSideConfigurations[areaName] = side;
+}
+
 ObjectGroup.prototype.getVisibilityInArea = function(areaName){
   if (this.areaVisibilityConfigurations){
     if (!(typeof this.areaVisibilityConfigurations[areaName] == UNDEFINED)){
@@ -35,6 +42,13 @@ ObjectGroup.prototype.getVisibilityInArea = function(areaName){
     }
   }
   return true;
+}
+
+ObjectGroup.prototype.setVisibilityInArea = function(areaName, isVisible){
+  if (!this.areaVisibilityConfigurations){
+    this.areaVisibilityConfigurations = new Object();
+  }
+  this.areaVisibilityConfigurations[areaName] = isVisible;
 }
 
 ObjectGroup.prototype.loadState = function(){

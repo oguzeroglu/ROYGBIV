@@ -66,10 +66,10 @@ AreaConfigurationsHandler.prototype.addSubFolder = function(areaName, folder){
     var visibilityController = objFolder.add(this.visibilityConfigurations[areaName][objName], "Visible");
     var sideController = objFolder.add(this.sideConfigurations[areaName][objName], "Side", this.sideAry);
     visibilityController.onChange(function(val){
-
+      this.object.setVisibilityInArea(this.areaName, val);
     }.bind({object: addedObjects[objName], areaName: areaName}));
     sideController.onChange(function(val){
-
+      this.object.setSideInArea(this.areaName, val);
     }.bind({object: addedObjects[objName], areaName: areaName}));
   }
   for (var objName in objectGroups){
@@ -77,10 +77,10 @@ AreaConfigurationsHandler.prototype.addSubFolder = function(areaName, folder){
     var visibilityController = objFolder.add(this.visibilityConfigurations[areaName][objName], "Visible");
     var sideController = objFolder.add(this.sideConfigurations[areaName][objName], "Side", this.sideAry);
     visibilityController.onChange(function(val){
-
+      this.object.setVisibilityInArea(this.areaName, val);
     }.bind({object: objectGroups[objName], areaName: areaName}));
     sideController.onChange(function(val){
-
+      this.object.setSideInArea(this.areaName, val);
     }.bind({object: objectGroups[objName], areaName: areaName}));
   }
 }
