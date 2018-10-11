@@ -487,6 +487,9 @@ StateLoader.prototype.load = function(undo){
          addedObjectInstance.handleRenderSide(addedObjectInstance.metaData.renderSide);
        }
 
+       addedObjectInstance.areaVisibilityConfigurations = curAddedObjectExport.areaVisibilityConfigurations;
+       addedObjectInstance.areaSideConfigurations = curAddedObjectExport.areaSideConfigurations;
+
     }
     // TEXTURE URLS ************************************************
     textureURLs = Object.assign({}, obj.textureURLs);
@@ -1011,6 +1014,9 @@ StateLoader.prototype.createObjectGroupsAfterLoadedTextures = function(){
     }else if (curObjectGroupExport.blending == "NORMAL_BLENDING"){
       objectGroupInstance.setBlending(NORMAL_BLENDING);
     }
+
+    objectGroupInstance.areaVisibilityConfigurations = curObjectGroupExport.areaVisibilityConfigurations;
+    objectGroupInstance.areaSideConfigurations = curObjectGroupExport.areaSideConfigurations;
 
     if (curObjectGroupExport.renderSide){
       objectGroupInstance.handleRenderSide(curObjectGroupExport.renderSide);

@@ -216,6 +216,13 @@ AddedObject.prototype.export = function(){
     exportObject.isSlippery = false;
   }
 
+  if (this.areaVisibilityConfigurations){
+    exportObject.areaVisibilityConfigurations = this.areaVisibilityConfigurations;
+  }
+  if (this.areaSideConfigurations){
+    exportObject.areaSideConfigurations = this.areaSideConfigurations;
+  }
+
   return exportObject;
 }
 

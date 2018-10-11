@@ -1145,6 +1145,13 @@ ObjectGroup.prototype.export = function(){
     exportObj.renderSide = this.renderSide;
   }
 
+  if (this.areaVisibilityConfigurations){
+    exportObj.areaVisibilityConfigurations = this.areaVisibilityConfigurations;
+  }
+  if (this.areaSideConfigurations){
+    exportObj.areaSideConfigurations = this.areaSideConfigurations;
+  }
+
   return exportObj;
 }
 

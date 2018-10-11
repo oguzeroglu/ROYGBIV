@@ -36,6 +36,30 @@ Area.prototype.destroy = function(){
     }
   }
   areaBinHandler.deleteObjectFromBin(this.binInfo, this.name);
+  for (var objName in addedObjects){
+    if (addedObjects[objName].areaVisibilityConfigurations){
+      if (addedObjects[objName].areaVisibilityConfigurations[this.name]){
+        delete addedObjects[objName].areaVisibilityConfigurations[this.name];
+      }
+      if (addedObjects[objName].areaSideConfigurations){
+        if (addedObjects[objName].areaSideConfigurations[this.name]){
+          delete addedObjects[objName].areaSideConfigurations[this.name];
+        }
+      }
+    }
+  }
+  for (var objName in objectGroups){
+    if (objectGroups[objName].areaVisibilityConfigurations){
+      if (objectGroups[objName].areaVisibilityConfigurations[this.name]){
+        delete objectGroups[objName].areaVisibilityConfigurations[this.name];
+      }
+    }
+    if (objectGroups[objName].areaSideConfigurations){
+      if (objectGroups[objName].areaSideConfigurations[this.name]){
+        delete objectGroups[objName].areaSideConfigurations[this.name];
+      }
+    }
+  }
 }
 
 Area.prototype.renderToScreen = function(){
