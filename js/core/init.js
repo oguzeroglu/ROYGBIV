@@ -630,12 +630,20 @@ window.addEventListener('keydown', function(event){
             terminal.clear();
             terminal.printInfo(Text.OBJECT_DESTROYED);
             selectedAddedObject = 0;
+            if (areaConfigurationsVisible){
+              $(datGuiAreaConfigurations.domElement).attr("hidden", true);
+              areaConfigurationsVisible = false;
+            }
           }else if (selectedObjectGroup){
             delete objectGroups[selectedObjectGroup.name];
             selectedObjectGroup.destroy();
             selectedObjectGroup = 0;
             terminal.clear();
             terminal.printInfo(Text.OBJECT_DESTROYED);
+            if (areaConfigurationsVisible){
+              $(datGuiAreaConfigurations.domElement).attr("hidden", true);
+              areaConfigurationsVisible = false;
+            }
           }
           afterObjectSelection();
         break;

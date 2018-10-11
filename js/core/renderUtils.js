@@ -3,8 +3,8 @@ function render(){
   requestID = requestAnimationFrame(render);
 
   processKeyboardBuffer();
-
   handleSkybox();
+  areaConfigurationsHandler.handle();
 
   if (physicsDebugMode){
     debugRenderer.update();

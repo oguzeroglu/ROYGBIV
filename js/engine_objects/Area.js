@@ -38,11 +38,11 @@ Area.prototype.destroy = function(){
   areaBinHandler.deleteObjectFromBin(this.binInfo, this.name);
   for (var objName in addedObjects){
     if (addedObjects[objName].areaVisibilityConfigurations){
-      if (addedObjects[objName].areaVisibilityConfigurations[this.name]){
+      if (!(typeof addedObjects[objName].areaVisibilityConfigurations[this.name] == UNDEFINED)){
         delete addedObjects[objName].areaVisibilityConfigurations[this.name];
       }
       if (addedObjects[objName].areaSideConfigurations){
-        if (addedObjects[objName].areaSideConfigurations[this.name]){
+        if (!(typeof addedObjects[objName].areaSideConfigurations[this.name] == UNDEFINED)){
           delete addedObjects[objName].areaSideConfigurations[this.name];
         }
       }
@@ -50,12 +50,12 @@ Area.prototype.destroy = function(){
   }
   for (var objName in objectGroups){
     if (objectGroups[objName].areaVisibilityConfigurations){
-      if (objectGroups[objName].areaVisibilityConfigurations[this.name]){
+      if (!(typeof objectGroups[objName].areaVisibilityConfigurations[this.name] == UNDEFINED)){
         delete objectGroups[objName].areaVisibilityConfigurations[this.name];
       }
     }
     if (objectGroups[objName].areaSideConfigurations){
-      if (objectGroups[objName].areaSideConfigurations[this.name]){
+      if (!(typeof objectGroups[objName].areaSideConfigurations[this.name] == UNDEFINED)){
         delete objectGroups[objName].areaSideConfigurations[this.name];
       }
     }

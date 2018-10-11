@@ -737,6 +737,10 @@ function parse(input){
           if (!jobHandlerWorking){
             terminal.printInfo(Text.OBJECT_ADDED);
           }
+          if (areaConfigurationsVisible){
+            $(datGuiAreaConfigurations.domElement).attr("hidden", true);
+            areaConfigurationsVisible = false;
+          }
           return true;
         break;
         case 18: //printObjects
@@ -858,6 +862,10 @@ function parse(input){
           }
           if (!jobHandlerWorking){
             terminal.printInfo(Text.OBJECT_DESTROYED);
+          }
+          if (areaConfigurationsVisible){
+            $(datGuiAreaConfigurations.domElement).attr("hidden", true);
+            areaConfigurationsVisible = false;
           }
           return true;
         break;
@@ -1189,12 +1197,10 @@ function parse(input){
           }
         break;
         case 30: //newRamp
-
           if (mode != 0){
             terminal.printError(Text.WORKS_ONLY_IN_DESIGN_MODE);
             return true;
           }
-
           var name = splitted[1];
           if (name.toUpperCase() == "NULL"){
             name = generateUniqueObjectName();
@@ -1287,6 +1293,10 @@ function parse(input){
           gridSystem.newRamp(anchorGrid, otherGrid, axis, parseInt(height), material, name);
           anchorGrid = 0;
           terminal.printInfo(Text.RAMP_CREATED);
+          if (areaConfigurationsVisible){
+            $(datGuiAreaConfigurations.domElement).attr("hidden", true);
+            areaConfigurationsVisible = false;
+          }
         break;
         case 31: //setAnchor
 
@@ -1453,6 +1463,10 @@ function parse(input){
           gridSystem.newBox(selections, height, material, name);
           if (!jobHandlerWorking){
             terminal.printInfo(Text.BOX_CREATED);
+          }
+          if (areaConfigurationsVisible){
+            $(datGuiAreaConfigurations.domElement).attr("hidden", true);
+            areaConfigurationsVisible = false;
           }
           return true;
         break;
@@ -3125,6 +3139,10 @@ function parse(input){
             $(datGuiObjectManipulation.domElement).attr("hidden", true);
             selectedAddedObject = 0;
             selectedObjectGroup = 0;
+            if (areaConfigurationsVisible){
+              $(datGuiAreaConfigurations.domElement).attr("hidden", true);
+              areaConfigurationsVisible = false;
+            }
             return true;
           }catch(err){
             terminal.printError(Text.INVALID_SYNTAX);
@@ -3154,6 +3172,10 @@ function parse(input){
           }
           selectedObjectGroup = 0;
           selectedAddedObject = 0;
+          if (areaConfigurationsVisible){
+            $(datGuiAreaConfigurations.domElement).attr("hidden", true);
+            areaConfigurationsVisible = false;
+          }
           return true;
         break;
         case 94: //mark
@@ -4098,6 +4120,10 @@ function parse(input){
           if (!jobHandlerWorking){
             terminal.printInfo(Text.SPHERE_CREATED);
           }
+          if (areaConfigurationsVisible){
+            $(datGuiAreaConfigurations.domElement).attr("hidden", true);
+            areaConfigurationsVisible = false;
+          }
           return true;
         break;
         case 124: //printFogInfo
@@ -4254,6 +4280,10 @@ function parse(input){
           }
           var result = gridSystems[gs].newArea(areaName, height, selections);
           terminal.printInfo(Text.AREA_CREATED);
+          if (areaConfigurationsVisible){
+            $(datGuiAreaConfigurations.domElement).attr("hidden", true);
+            areaConfigurationsVisible = false;
+          }
           return true;
         break;
         case 131: //toggleAreas
@@ -4289,6 +4319,10 @@ function parse(input){
           area.destroy();
           delete areas[area.name];
           terminal.printInfo(Text.AREA_DESTROYED);
+          if (areaConfigurationsVisible){
+            $(datGuiAreaConfigurations.domElement).attr("hidden", true);
+            areaConfigurationsVisible = false;
+          }
           return true;
         break;
         case 133: //areaConfigurations
