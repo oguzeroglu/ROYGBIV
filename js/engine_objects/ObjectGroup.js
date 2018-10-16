@@ -804,6 +804,7 @@ ObjectGroup.prototype.glue = function(){
     this.mesh = meshGenerator.generateMergedMesh(graphicsGroup, this);
   }else{
     this.mesh = meshGenerator.generateInstancedMesh(graphicsGroup, this);
+    this.mesh.frustumCulled = false;
   }
 
   this.mesh.objectGroupName = this.name;
