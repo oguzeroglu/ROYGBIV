@@ -845,6 +845,8 @@ var MAX_PS_TIME = 100000;
 var crosshairs = new Object();
 var selectedCrosshair;
 var GLOBAL_FOG_UNIFORM = new THREE.Uniform(new THREE.Vector4(-100.0, 0, 0, 0));
+var GLOBAL_PROJECTION_UNIFORM = new THREE.Uniform(new THREE.Vector3());
+var GLOBAL_VIEW_UNIFORM = new THREE.Uniform(new THREE.Matrix4());
 var VERTEX_SHADER_TEXTURE_FETCH_SUPPORTED;
 var DDS_SUPPORTED;
 var mouse = new THREE.Vector2();

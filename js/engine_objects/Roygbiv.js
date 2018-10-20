@@ -216,7 +216,7 @@ Roygbiv.prototype.getPosition = function(object, targetVector, axis){
       return;
     }
   }
-  if (!(typeof targetVector == UNDEFINED)){
+  if (!(typeof targetVector == UNDEFINED) && !(targetVector == null)){
     if (isNaN(targetVector.x) || isNaN(targetVector.y) || isNaN(targetVector.z)){
       throw new Error("getPosition error: Bad targetVector parameter.");
       return;
@@ -300,23 +300,23 @@ Roygbiv.prototype.getPosition = function(object, targetVector, axis){
   }else if (object instanceof ObjectGroup){
     if (axis){
       if (axis.toLowerCase() == "x"){
-        return object.graphicsGroup.position.x;
+        return object.mesh.position.x;
       }else if (axis.toLowerCase() == "y"){
-        return object.graphicsGroup.position.y;
+        return object.mesh.position.y;
       }else if (axis.toLowerCase() == "z"){
-        return object.graphicsGroup.position.z;
+        return object.mesh.position.z;
       }
     }else{
       if (targetVector){
-        targetVector.x = object.graphicsGroup.position.x;
-        targetVector.y = object.graphicsGroup.position.y;
-        targetVector.z = object.graphicsGroup.position.z;
+        targetVector.x = object.mesh.position.x;
+        targetVector.y = object.mesh.position.y;
+        targetVector.z = object.mesh.position.z;
         return targetVector;
       }else{
         return this.vector(
-          object.graphicsGroup.position.x,
-          object.graphicsGroup.position.y,
-          object.graphicsGroup.position.z
+          object.mesh.position.x,
+          object.mesh.position.y,
+          object.mesh.position.z
         );
       }
     }

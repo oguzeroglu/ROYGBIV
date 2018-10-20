@@ -377,8 +377,8 @@ var ParticleSystem = function(copyPS, name, particles, x, y, z, vx, vy, vz, ax, 
       uniforms:{
         mergedFlag: new THREE.Uniform(-20.0),
         modelViewMatrix: new THREE.Uniform(new THREE.Matrix4()),
-        projectionMatrix: new THREE.Uniform(new THREE.Matrix4()),
-        viewMatrix: new THREE.Uniform(new THREE.Matrix4()),
+        projectionMatrix: GLOBAL_PROJECTION_UNIFORM,
+        viewMatrix: GLOBAL_VIEW_UNIFORM,
         time: new THREE.Uniform(0.0),
         texture: new THREE.Uniform(texture),
         dissapearCoef: new THREE.Uniform(0.0),
@@ -650,8 +650,6 @@ ParticleSystem.prototype.update = function(){
   if (!this.psMerger){
     this.material.uniforms.time.value = this.tick;
     this.material.uniforms.modelViewMatrix.value = this.mesh.modelViewMatrix;
-    this.material.uniforms.viewMatrix.value = camera.matrixWorldInverse;
-    this.material.uniforms.projectionMatrix.value = camera.projectionMatrix;
   }else{
     this.mesh.updateMatrixWorld(true);
     this.mesh.modelViewMatrix.multiplyMatrices(camera.matrixWorldInverse, this.mesh.matrixWorld);

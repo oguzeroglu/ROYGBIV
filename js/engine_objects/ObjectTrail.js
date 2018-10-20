@@ -289,8 +289,6 @@ ObjectTrail.prototype.start = function(){
 
 ObjectTrail.prototype.update = function(){
   var OBJECT_TRAIL_MAX_TIME_IN_SECS = this.OBJECT_TRAIL_MAX_TIME_IN_SECS;
-  this.mesh.material.uniforms.viewMatrix.value = camera.matrixWorldInverse;
-  this.mesh.material.uniforms.projectionMatrix.value = camera.projectionMatrix;
   var posit, quat;
   if (this.isAddedObject){
     posit = this.object.mesh.position;

@@ -30,8 +30,8 @@ MeshGenerator.prototype.generateObjectTrail = function(
     vertexColors: THREE.VertexColors,
     side: THREE.DoubleSide,
     uniforms: {
-      projectionMatrix: new THREE.Uniform(new THREE.Matrix4()),
-      viewMatrix: new THREE.Uniform(new THREE.Matrix4()),
+      projectionMatrix: GLOBAL_PROJECTION_UNIFORM,
+      viewMatrix: GLOBAL_VIEW_UNIFORM,
       objectCoordinates: new THREE.Uniform(objectCoordinates),
       objectQuaternions: new THREE.Uniform(objectQuaternions),
       currentPosition: new THREE.Uniform(posit),
@@ -89,7 +89,7 @@ MeshGenerator.prototype.generateInstancedMesh = function(graphicsGroup, objectGr
     transparent: true,
     side: THREE.DoubleSide,
     uniforms: {
-      projectionMatrix: new THREE.Uniform(new THREE.Matrix4()),
+      projectionMatrix: GLOBAL_PROJECTION_UNIFORM,
       modelViewMatrix: new THREE.Uniform(new THREE.Matrix4()),
       diffuseMap: new THREE.Uniform(diffuseTexture),
       emissiveMap: new THREE.Uniform(emissiveTexture),
@@ -102,7 +102,6 @@ MeshGenerator.prototype.generateInstancedMesh = function(graphicsGroup, objectGr
   });
   var mesh = new THREE.Mesh(this.geometry, material);
   mesh.position.copy(graphicsGroup.position);
-  material.uniforms.projectionMatrix.value = camera.projectionMatrix;
   material.uniforms.modelViewMatrix.value = mesh.modelViewMatrix;
   return mesh;
 }
@@ -149,7 +148,7 @@ MeshGenerator.prototype.generateMergedMesh = function(graphicsGroup, objectGroup
     transparent: true,
     side: THREE.DoubleSide,
     uniforms: {
-      projectionMatrix: new THREE.Uniform(new THREE.Matrix4()),
+      projectionMatrix: GLOBAL_PROJECTION_UNIFORM,
       modelViewMatrix: new THREE.Uniform(new THREE.Matrix4()),
       diffuseMap: new THREE.Uniform(diffuseTexture),
       emissiveMap: new THREE.Uniform(emissiveTexture),
@@ -162,7 +161,6 @@ MeshGenerator.prototype.generateMergedMesh = function(graphicsGroup, objectGroup
   });
   var mesh = new THREE.Mesh(this.geometry, material);
   mesh.position.copy(graphicsGroup.position);
-  material.uniforms.projectionMatrix.value = camera.projectionMatrix;
   material.uniforms.modelViewMatrix.value = mesh.modelViewMatrix;
   return mesh;
 }
@@ -187,7 +185,7 @@ MeshGenerator.prototype.generateBasicMesh = function(){
     transparent: true,
     side: THREE.DoubleSide,
     uniforms:{
-      projectionMatrix: new THREE.Uniform(new THREE.Matrix4()),
+      projectionMatrix: GLOBAL_PROJECTION_UNIFORM,
       modelViewMatrix: new THREE.Uniform(new THREE.Matrix4()),
       color: new THREE.Uniform(this.material.color),
       alpha: new THREE.Uniform(this.material.alpha),
@@ -207,6 +205,5 @@ MeshGenerator.prototype.generateBasicMesh = function(){
   });
   var mesh = new THREE.Mesh(this.geometry, material);
   material.uniforms.modelViewMatrix.value = mesh.modelViewMatrix;
-  material.uniforms.projectionMatrix.value = camera.projectionMatrix;
   return mesh;
 }

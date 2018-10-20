@@ -416,7 +416,7 @@ window.onload = function() {
                  selectedObjectGroup = 0;
                  objectSelectedByCommand = false;
                  afterObjectSelection();
-               }else if (selectedGrid.destroyedObjectGroup){
+               }else if (selectedGrid.destroyedObjectGroup && !(keyboardBuffer["shift"])){
                  var objectGroup = objectGroups[selectedGrid.destroyedObjectGroup];
                  terminal.clear();
                  var point = intersects[0].point;
@@ -525,6 +525,8 @@ window.onload = function() {
   camera.position.set(initialCameraX, initialCameraY, initialCameraZ);
   camera.rotation.order = 'YXZ';
   camera.aspect = (window.innerWidth / window.innerHeight);
+  GLOBAL_PROJECTION_UNIFORM.value = camera.projectionMatrix;
+  GLOBAL_VIEW_UNIFORM.value = camera.matrixWorldInverse;
   renderer = new THREE.WebGLRenderer({canvas: canvas});
   renderer.setSize( window.innerWidth, window.innerHeight );
   initPhysics();

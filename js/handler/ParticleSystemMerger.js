@@ -187,8 +187,8 @@ var ParticleSystemMerger = function(psObj, name){
     uniforms:{
       mergedFlag: new THREE.Uniform(20.0),
       modelViewMatrixArray: new THREE.Uniform(mvMatrixArray),
-      projectionMatrix: new THREE.Uniform(new THREE.Matrix4()),
-      viewMatrix: new THREE.Uniform(new THREE.Matrix4()),
+      projectionMatrix: GLOBAL_PROJECTION_UNIFORM,
+      viewMatrix: GLOBAL_VIEW_UNIFORM,
       timeArray: new THREE.Uniform(timeArray),
       hiddenArray: new THREE.Uniform(hiddenArray),
       texture: new THREE.Uniform(texture),
@@ -270,7 +270,5 @@ ParticleSystemMerger.prototype.updateObject = function(ps){
 }
 
 ParticleSystemMerger.prototype.update = function(){
-  this.material.uniforms.viewMatrix.value = camera.matrixWorldInverse;
-  this.material.uniforms.projectionMatrix.value = camera.projectionMatrix;
   this.activePSMap.forEach(this.updateObject);
 }
