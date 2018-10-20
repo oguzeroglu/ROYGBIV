@@ -345,7 +345,13 @@ window.onload = function() {
        for (var i = 0; i<intersects.length; i++){
          var obj = intersects[i].object;
          if (!(obj instanceof THREE.Box3Helper)){
-           newIntersects.push(intersects[i]);
+           if (!keyboardBuffer["shift"]){
+             newIntersects.push(intersects[i]);
+           }else{
+             if (obj.gridSystemName){
+               newIntersects.push(intersects[i]);
+             }
+           }
          }
        }
        intersects = newIntersects;
@@ -394,7 +400,7 @@ window.onload = function() {
            var selectedGrid = gridSystem.getGridFromPoint(point);
            if (selectedGrid){
              if (!selectedGrid.sliced){
-               if (selectedGrid.destroyedAddedObject){
+               if (selectedGrid.destroyedAddedObject && !(keyboardBuffer["shift"])){
                  var addedObject = addedObjects[selectedGrid.destroyedAddedObject];
                  terminal.clear();
                  var point = intersects[0].point;
@@ -456,7 +462,7 @@ window.onload = function() {
                  selectedGrid = gridSystem.getGridFromPoint(point);
                  if (selectedGrid){
                    if (!selectedGrid.sliced){
-                     if (selectedGrid.destroyedAddedObject){
+                     if (selectedGrid.destroyedAddedObject && !(keyboardBuffer["shift"])){
                        var addedObject = addedObjects[selectedGrid.destroyedAddedObject];
                        terminal.clear();
                        var point = intersects[0].point;
@@ -580,6 +586,17 @@ window.addEventListener('keydown', function(event){
         case 190: //PERIOD
           keyboardBuffer["period"] = true;
         break;
+        case 16: //SHIFT
+          if (mode == 0){
+            keyboardBuffer["shift"] = true;
+            for (var objName in addedObjects){
+              addedObjects[objName].mesh.visible = false;
+            }
+            for (var objName in objectGroups){
+              objectGroups[objName].mesh.visible = false;
+            }
+          }
+        break;
         case 65: //A
           keyboardBuffer["a"] = true;
         break;
@@ -668,6 +685,17 @@ window.addEventListener('keyup', function(event){
               for (var i = 0; i<grid.divs.length; i++){
                 grid.divs[i].style.visibility = "hidden";
               }
+            }
+          }
+        break;
+        case 16: //SHIFT
+          keyboardBuffer["shift"] = false;
+          if (mode == 0){
+            for (var objName in addedObjects){
+              addedObjects[objName].mesh.visible = true;
+            }
+            for (var objName in objectGroups){
+              objectGroups[objName].mesh.visible = true;
             }
           }
         break;

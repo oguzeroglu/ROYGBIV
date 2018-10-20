@@ -557,7 +557,8 @@ var keyboardInfo = [
   "E/Q : Translates the camera on axis Y.",
   "Z/C: Rotates the camera around axis Z.",
   "Backspace: Destroys selected object.",
-  ". : Shows corner coordinates of selected grids."
+  ". : Shows corner coordinates of selected grids.",
+  "SHIFT: Activates grid selection mode."
 ];
 
 var deprecatedCommandIndices = [
