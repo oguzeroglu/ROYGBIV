@@ -1,6 +1,6 @@
 # ROYGBIV
 
-![](http://oguzeroglu.com/qY4P32.gif)
+![](/screen_shots/shooting.gif?raw=true)
 
 ROYGBIV is a 3D game engine for the Web. I named it after my favorite [Boards of Canada track](https://www.youtube.com/watch?v=W-GWjzw0GwQ).
 
@@ -16,11 +16,11 @@ ROYGBIV works on browsers (preferably Chrome or Firefox). It works with a set of
 * If you don't have nodejs/npm download them.
 * Go inside the repository (where server.js is), using the command line run **npm install express** if you don't have the nodejs express module
 * Run **node server** to start the server. You should see something like this:
-![](http://oguzeroglu.com/serverscreen.png)
+![](/screen_shots/server.png?raw=true)
 * Using your favorite browser, go to page **localhost:8085**
 
 ## Screenshots
 
-![](http://oguzeroglu.com/roygbivss2.png)
-![](http://oguzeroglu.com/roygbivss1.png)
-![](http://oguzeroglu.com/roygbiv.gif)
+![](/screen_shots/lava.png?raw=true)
+![](/screen_shots/scifi.png?raw=true)
+![](/screen_shots/roygbiv.gif?raw=true)
