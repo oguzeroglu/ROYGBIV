@@ -45,7 +45,7 @@ MeshGenerator.prototype.generateObjectTrail = function(
       objectQuaternions: new THREE.Uniform(objectQuaternions),
       currentPosition: new THREE.Uniform(posit),
       currentQuaternion: new THREE.Uniform(quat),
-      alpha: new THREE.Unifor(trail.alpha),
+      alpha: new THREE.Uniform(trail.alpha),
       diffuseMap: this.getTextureUniform(trail.diffuseTexture),
       emissiveMap: this.getTextureUniform(trail.emissiveTexture),
       alphaMap: this.getTextureUniform(trail.alphaTexture),
