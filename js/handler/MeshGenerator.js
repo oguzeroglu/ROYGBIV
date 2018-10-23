@@ -3,6 +3,15 @@ var MeshGenerator = function(geometry, material){
   this.material = material;
 }
 
+MeshGenerator.prototype.getTextureUniform = function(texture){
+  if (textureUniformCache[texture.uuid]){
+    return textureUniformCache[texture.uuid];
+  }
+  var uniform = new THREE.Uniform(texture);
+  textureUniformCache[texture.uuid] = uniform;
+  return uniform;
+}
+
 MeshGenerator.prototype.generateMesh = function(){
   if (this.material instanceof BasicMaterial){
     return this.generateBasicMesh();
@@ -36,11 +45,11 @@ MeshGenerator.prototype.generateObjectTrail = function(
       objectQuaternions: new THREE.Uniform(objectQuaternions),
       currentPosition: new THREE.Uniform(posit),
       currentQuaternion: new THREE.Uniform(quat),
-      alpha: new THREE.Uniform(trail.alpha),
-      diffuseMap: new THREE.Uniform(trail.diffuseTexture),
-      emissiveMap: new THREE.Uniform(trail.emissiveTexture),
-      alphaMap: new THREE.Uniform(trail.alphaTexture),
-      displacementMap: new THREE.Uniform(trail.displacementTexture),
+      alpha: new THREE.Unifor(trail.alpha),
+      diffuseMap: this.getTextureUniform(trail.diffuseTexture),
+      emissiveMap: this.getTextureUniform(trail.emissiveTexture),
+      alphaMap: this.getTextureUniform(trail.alphaTexture),
+      displacementMap: this.getTextureUniform(trail.displacementTexture),
       textureMatrix: new THREE.Uniform(trail.textureMatrix),
       fogInfo: GLOBAL_FOG_UNIFORM
     }
@@ -91,11 +100,11 @@ MeshGenerator.prototype.generateInstancedMesh = function(graphicsGroup, objectGr
     uniforms: {
       projectionMatrix: GLOBAL_PROJECTION_UNIFORM,
       modelViewMatrix: new THREE.Uniform(new THREE.Matrix4()),
-      diffuseMap: new THREE.Uniform(diffuseTexture),
-      emissiveMap: new THREE.Uniform(emissiveTexture),
-      alphaMap: new THREE.Uniform(alphaTexture),
-      aoMap: new THREE.Uniform(aoTexture),
-      displacementMap: new THREE.Uniform(displacementTexture),
+      diffuseMap: this.getTextureUniform(diffuseTexture),
+      emissiveMap: this.getTextureUniform(emissiveTexture),
+      alphaMap: this.getTextureUniform(alphaTexture),
+      aoMap: this.getTextureUniform(aoTexture),
+      displacementMap: this.getTextureUniform(displacementTexture),
       textureMatrix: new THREE.Uniform(textureMatrix),
       fogInfo: GLOBAL_FOG_UNIFORM
     }
@@ -150,11 +159,11 @@ MeshGenerator.prototype.generateMergedMesh = function(graphicsGroup, objectGroup
     uniforms: {
       projectionMatrix: GLOBAL_PROJECTION_UNIFORM,
       modelViewMatrix: new THREE.Uniform(new THREE.Matrix4()),
-      diffuseMap: new THREE.Uniform(diffuseTexture),
-      emissiveMap: new THREE.Uniform(emissiveTexture),
-      alphaMap: new THREE.Uniform(alphaTexture),
-      aoMap: new THREE.Uniform(aoTexture),
-      displacementMap: new THREE.Uniform(displacementTexture),
+      diffuseMap: this.getTextureUniform(diffuseTexture),
+      emissiveMap: this.getTextureUniform(emissiveTexture),
+      alphaMap: this.getTextureUniform(alphaTexture),
+      aoMap: this.getTextureUniform(aoTexture),
+      displacementMap: this.getTextureUniform(displacementTexture),
       textureMatrix: new THREE.Uniform(textureMatrix),
       fogInfo: GLOBAL_FOG_UNIFORM
     }
@@ -195,11 +204,11 @@ MeshGenerator.prototype.generateBasicMesh = function(){
       displacementInfo: new THREE.Uniform(new THREE.Vector2()),
       textureFlags: new THREE.Uniform(textureFlags),
       textureFlags2: new THREE.Uniform(textureFlags2),
-      diffuseMap: new THREE.Uniform(nullTexture),
-      alphaMap: new THREE.Uniform(nullTexture),
-      aoMap: new THREE.Uniform(nullTexture),
-      displacementMap: new THREE.Uniform(nullTexture),
-      emissiveMap: new THREE.Uniform(nullTexture),
+      diffuseMap: this.getTextureUniform(nullTexture),
+      alphaMap: this.getTextureUniform(nullTexture),
+      aoMap: this.getTextureUniform(nullTexture),
+      displacementMap: this.getTextureUniform(nullTexture),
+      emissiveMap: this.getTextureUniform(nullTexture),
       textureMatrix: new THREE.Uniform(new THREE.Matrix3())
     }
   });

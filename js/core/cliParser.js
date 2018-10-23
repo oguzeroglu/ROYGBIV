@@ -1253,8 +1253,9 @@ function parse(input){
             terminal.printError(Text.HEIGHT_MUST_BE_A_NUMBER);
             return true;
           }
-          if (Object.keys(gridSelections).length != 2){
-            terminal.printError(Text.MUST_HAVE_TWO_GRIDS_SELECTED);
+          var selectedGridCount = Object.keys(gridSelections).length;
+          if (selectedGridCount != 1 && selectedGridCount != 2){
+            terminal.printError(Text.MUST_HAVE_ONETWO_GRIDS_SELECTED);
             return true;
           }
           if (!anchorGrid){
@@ -1264,6 +1265,9 @@ function parse(input){
           var gridNames = [];
           for (var gridName in gridSelections){
             gridNames.push(gridName);
+            if (selectedGridCount == 1){
+              gridNames.push(gridName);
+            }
           }
           var grid1 = gridSelections[gridNames[0]];
           var grid2 = gridSelections[gridNames[1]];

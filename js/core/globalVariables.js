@@ -867,6 +867,7 @@ var frustum = new THREE.Frustum();
 var SIDE_BOTH = "Both";
 var SIDE_FRONT = "Front";
 var SIDE_BACK = "Back";
+var textureUniformCache = new Object();
 
 // WORKER VARIABLES
 var WORKERS_SUPPORTED = (typeof(Worker) !== "undefined");

@@ -436,17 +436,26 @@ AddedObject.prototype.setAttachedProperties = function(){
   this.positionZWhenAttached = this.mesh.position.z;
 }
 
+AddedObject.prototype.getTextureUniform = function(texture){
+  if (textureUniformCache[texture.uuid]){
+    return textureUniformCache[texture.uuid];
+  }
+  var uniform = new THREE.Uniform(texture);
+  textureUniformCache[texture.uuid] = uniform;
+  return uniform;
+}
+
 AddedObject.prototype.hasEmissiveMap = function(){
   return (this.mesh.material.uniforms.textureFlags2.value.x > 0);
 }
 
 AddedObject.prototype.unMapEmissive = function(){
-  this.mesh.material.uniforms.emissiveMap.value = null;
+  this.mesh.material.uniforms.emissiveMap = this.getTextureUniform(nullTexture);
   this.mesh.material.uniforms.textureFlags2.value.x = -10;
 }
 
 AddedObject.prototype.mapEmissive = function(emissiveMap){
-  this.mesh.material.uniforms.emissiveMap.value = emissiveMap;
+  this.mesh.material.uniforms.emissiveMap = this.getTextureUniform(emissiveMap);
   this.mesh.material.uniforms.textureFlags2.value.x = 10;
 }
 
@@ -455,7 +464,7 @@ AddedObject.prototype.hasDisplacementMap = function(){
 }
 
 AddedObject.prototype.unMapDisplacement = function(){
-  this.mesh.material.uniforms.displacementMap.value = null;
+  this.mesh.material.uniforms.displacementMap = this.getTextureUniform(nullTexture);
   this.mesh.material.uniforms.textureFlags.value.w = -10;
 }
 
@@ -464,7 +473,7 @@ AddedObject.prototype.mapDisplacement = function(displacementTexture){
     console.error("Displacement mapping is not supported for this device. Use applyDisplacementMap command instead.");
     return;
   }
-  this.mesh.material.uniforms.displacementMap.value = displacementTexture;
+  this.mesh.material.uniforms.displacementMap = this.getTextureUniform(displacementTexture);
   this.mesh.material.uniforms.textureFlags.value.w = 10;
 }
 
@@ -473,12 +482,12 @@ AddedObject.prototype.hasAOMap = function(){
 }
 
 AddedObject.prototype.unMapAO = function(){
-  this.mesh.material.uniforms.aoMap.value = null;
+  this.mesh.material.uniforms.aoMap = this.getTextureUniform(nullTexture);
   this.mesh.material.uniforms.textureFlags.value.z = -10;
 }
 
 AddedObject.prototype.mapAO = function(aoTexture){
-  this.mesh.material.uniforms.aoMap.value = aoTexture;
+  this.mesh.material.uniforms.aoMap = this.getTextureUniform(aoTexture);
   this.mesh.material.uniforms.textureFlags.value.z = 10;
 }
 
@@ -487,12 +496,12 @@ AddedObject.prototype.hasAlphaMap = function(){
 }
 
 AddedObject.prototype.unMapAlpha = function(){
-  this.mesh.material.uniforms.alphaMap.value = null;
+  this.mesh.material.uniforms.alphaMap = this.getTextureUniform(nullTexture);
   this.mesh.material.uniforms.textureFlags.value.y = -10;
 }
 
 AddedObject.prototype.mapAlpha = function(alphaTexture){
-  this.mesh.material.uniforms.alphaMap.value = alphaTexture;
+  this.mesh.material.uniforms.alphaMap = this.getTextureUniform(alphaTexture);
   this.mesh.material.uniforms.textureFlags.value.y = 10;
 }
 
@@ -501,12 +510,12 @@ AddedObject.prototype.hasDiffuseMap = function(){
 }
 
 AddedObject.prototype.unMapDiffuse = function(){
-  this.mesh.material.uniforms.diffuseMap.value = null;
+  this.mesh.material.uniforms.diffuseMap = this.getTextureUniform(nullTexture);
   this.mesh.material.uniforms.textureFlags.value.x = -10;
 }
 
 AddedObject.prototype.mapDiffuse = function(diffuseTexture){
-  this.mesh.material.uniforms.diffuseMap.value = diffuseTexture;
+  this.mesh.material.uniforms.diffuseMap = this.getTextureUniform(diffuseTexture);
   this.mesh.material.uniforms.textureFlags.value.x = 10;
   diffuseTexture.updateMatrix();
   this.mesh.material.uniforms.textureMatrix.value = diffuseTexture.matrix;

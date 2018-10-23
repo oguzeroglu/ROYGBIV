@@ -2142,6 +2142,7 @@ StateLoader.prototype.resetProject = function(undo){
   areasVisible = true;
   areaConfigurationsVisible = false;
   areaConfigurationsHandler = new AreaConfigurationsHandler();
+  textureUniformCache = new Object();
 
   // FOG
   fogActive = false;

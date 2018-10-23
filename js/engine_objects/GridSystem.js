@@ -925,7 +925,9 @@ GridSystem.prototype.newRamp = function(anchorGrid, otherGrid, axis, height, mat
   ramp.addedObject = addedObjectInstance;
   addedObjectInstance.updateMVMatrix();
   anchorGrid.toggleSelect(false, false, false, true);
-  otherGrid.toggleSelect(false, false, false, true);
+  if (otherGrid.selected){
+    otherGrid.toggleSelect(false, false, false, true);
+  }
   delete gridSelections[anchorGrid.name];
   delete gridSelections[otherGrid.name];
 
