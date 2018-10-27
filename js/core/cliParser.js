@@ -293,6 +293,7 @@ function parse(input){
             TOTAL_PARTICLE_COLLISION_LISTEN_COUNT = 0;
             TOTAL_PARTICLE_SYSTEM_COLLISION_LISTEN_COUNT = 0;
             TOTAL_PARTICLE_SYSTEMS_WITH_PARTICLE_COLLISIONS = 0;
+
             for (var gsName in gridSystems){
               scene.remove(gridSystems[gsName].gridSystemRepresentation);
               scene.remove(gridSystems[gsName].boundingPlane);
@@ -4394,6 +4395,37 @@ function parse(input){
           screenResolution = resolutionParam;
           renderer.setPixelRatio(screenResolution);
           terminal.printInfo(Text.RESOLUTION_SET);
+          return true;
+        break;
+        case 135: //configureArea
+          if (mode != 0){
+            terminal.printError(Text.WORKS_ONLY_IN_DESIGN_MODE);
+            return true;
+          }
+          var areaName = splitted[1];
+          if (!areas[areaName] && areaName.toLowerCase() != "default"){
+            terminal.printError(Text.NO_SUCH_AREA);
+            return true;
+          }
+          var count = 0;
+          for (var objName in addedObjects){
+            count ++;
+            break;
+          }
+          for (var objName in objectGroups){
+            count ++;
+            break;
+          }
+          if (count == 0){
+            terminal.printError(Text.NO_OBJECT_ADDED_TO_THE_SCENE);
+            return true;
+          }
+          if (areaConfigurationsVisible){
+            $(datGuiAreaConfigurations.domElement).attr("hidden", true);
+          }
+          areaConfigurationsHandler.show(areaName);
+          areaConfigurationsVisible = true;
+          terminal.printInfo(Text.OK);
           return true;
         break;
       }

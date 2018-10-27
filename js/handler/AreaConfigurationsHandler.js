@@ -89,10 +89,17 @@ AreaConfigurationsHandler.prototype.applyConfigurations = function(){
   }
 }
 
-AreaConfigurationsHandler.prototype.generateConfigurations = function(){
+AreaConfigurationsHandler.prototype.generateConfigurations = function(singleAreaName){
   this.visibilityConfigurations = new Object();
   this.sideConfigurations = new Object();
-  for (var areaName in areas){
+  var pseudoAreas = areas;
+  if (singleAreaName){
+    pseudoAreas = new Object();
+    if (singleAreaName.toLowerCase() != "default"){
+      pseudoAreas[singleAreaName] = areas[singleAreaName];
+    }
+  }
+  for (var areaName in pseudoAreas){
     this.visibilityConfigurations[areaName] = new Object();
     this.sideConfigurations[areaName] = new Object();
     for (var objName in addedObjects){
@@ -114,37 +121,49 @@ AreaConfigurationsHandler.prototype.generateConfigurations = function(){
       };
     }
   }
-  this.visibilityConfigurations["default"] = new Object();
-  this.sideConfigurations["default"] = new Object();
-  for (var objName in addedObjects){
-    var obj = addedObjects[objName];
-    this.visibilityConfigurations["default"][objName] = {
-      "Visible": obj.getVisibilityInArea("default")
-    };
-    this.sideConfigurations["default"][objName] = {
-      "Side": obj.getSideInArea("default")
-    };
-  }
-  for (var objName in objectGroups){
-    var obj = objectGroups[objName];
-    this.visibilityConfigurations["default"][objName] = {
-      "Visible": obj.getVisibilityInArea("default")
-    };
-    this.sideConfigurations["default"][objName] = {
-      "Side": obj.getSideInArea("default")
-    };
+
+  if (!singleAreaName || (singleAreaName && singleAreaName.toLowerCase() == "default")){
+    this.visibilityConfigurations["default"] = new Object();
+    this.sideConfigurations["default"] = new Object();
+    for (var objName in addedObjects){
+      var obj = addedObjects[objName];
+      this.visibilityConfigurations["default"][objName] = {
+        "Visible": obj.getVisibilityInArea("default")
+      };
+      this.sideConfigurations["default"][objName] = {
+        "Side": obj.getSideInArea("default")
+      };
+    }
+    for (var objName in objectGroups){
+      var obj = objectGroups[objName];
+      this.visibilityConfigurations["default"][objName] = {
+        "Visible": obj.getVisibilityInArea("default")
+      };
+      this.sideConfigurations["default"][objName] = {
+        "Side": obj.getSideInArea("default")
+      };
+    }
   }
 }
 
-AreaConfigurationsHandler.prototype.show = function(){
-  this.generateConfigurations();
+AreaConfigurationsHandler.prototype.show = function(singleAreaName){
+  this.generateConfigurations(singleAreaName);
   datGuiAreaConfigurations = new dat.GUI();
-  for (var areaName in areas){
+  var pseudoAreas = areas;
+  if (singleAreaName){
+    pseudoAreas = new Object();
+    if (singleAreaName.toLowerCase() != "default"){
+      pseudoAreas[singleAreaName] = areas[singleAreaName];
+    }
+  }
+  for (var areaName in pseudoAreas){
     var areaFolder = datGuiAreaConfigurations.addFolder(areaName);
     this.addSubFolder(areaName, areaFolder);
   }
-  var defaultFolder = datGuiAreaConfigurations.addFolder("default");
-  this.addSubFolder("default", defaultFolder);
+  if (!singleAreaName || (singleAreaName && singleAreaName.toLowerCase() == "default")){
+    var defaultFolder = datGuiAreaConfigurations.addFolder("default");
+    this.addSubFolder("default", defaultFolder);
+  }
 }
 
 AreaConfigurationsHandler.prototype.addSubFolder = function(areaName, folder){

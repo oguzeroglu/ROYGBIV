@@ -29,6 +29,7 @@ var CommandDescriptor = function(){
   this.BLENDING_MODE            =   26;
   this.OBJECT_CREATION_NAME     =   27;
   this.AREA_NAME                =   28;
+  this.AREA_NAME_WITH_DEFAULT   =   29;
 
   // newGridSystem
   this.newGridSystem = new Object();
@@ -584,9 +585,15 @@ var CommandDescriptor = function(){
   this.areaConfigurations.types = [];
   this.areaConfigurations.types.push(this.HIDE_SHOW); // show/hide
 
+  // setResolution
   this.setResolution = new Object();
   this.setResolution.types = [];
   this.setResolution.types.push(this.UNKNOWN_INDICATOR); // resolution
+
+  // configureArea
+  this.configureArea = new Object();
+  this.configureArea.types = [];
+  this.configureArea.types.push(this.AREA_NAME_WITH_DEFAULT); // areaName
 
 };
 
