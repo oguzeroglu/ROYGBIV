@@ -4377,6 +4377,25 @@ function parse(input){
           areaConfigurationsVisible = ! areaConfigurationsVisible;
           terminal.printInfo(Text.OK);
         break;
+        case 134: //setResolution
+          if (mode != 0){
+            terminal.printError(Text.WORKS_ONLY_IN_DESIGN_MODE);
+            return true;
+          }
+          var resolutionParam = parseFloat(splitted[1]);
+          if (isNaN(resolutionParam)){
+            terminal.printError(Text.IS_NOT_A_NUMBER.replace(Text.PARAM1, "resolution"));
+            return true;
+          }
+          if (resolutionParam <= 0 || resolutionParam > 1){
+            terminal.printError(Text.RESOLUTION_MUST_BE_BETWEEN);
+            return true;
+          }
+          screenResolution = resolutionParam;
+          renderer.setPixelRatio(screenResolution);
+          terminal.printInfo(Text.RESOLUTION_SET);
+          return true;
+        break;
       }
       return true;
     }catch(err){

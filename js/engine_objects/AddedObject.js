@@ -526,7 +526,7 @@ AddedObject.prototype.incrementOpacity = function(val){
 }
 
 AddedObject.prototype.updateOpacity = function(val){
-  this.mesh.material.uniforms.alpha.value = val;
+  this.mesh.material.uniforms.alpha = new THREE.Uniform(val);
 }
 
 AddedObject.prototype.updateMVMatrix = function(){

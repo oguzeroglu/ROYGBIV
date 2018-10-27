@@ -584,6 +584,10 @@ var CommandDescriptor = function(){
   this.areaConfigurations.types = [];
   this.areaConfigurations.types.push(this.HIDE_SHOW); // show/hide
 
+  this.setResolution = new Object();
+  this.setResolution.types = [];
+  this.setResolution.types.push(this.UNKNOWN_INDICATOR); // resolution
+
 };
 
 CommandDescriptor.prototype.test = function(){

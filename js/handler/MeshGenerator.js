@@ -3,6 +3,24 @@ var MeshGenerator = function(geometry, material){
   this.material = material;
 }
 
+MeshGenerator.prototype.getAOIntensityUniform = function(intensity){
+  if (aoIntensityUniformCache[intensity]){
+    return aoIntensityUniformCache[intensity];
+  }
+  var uniform = new THREE.Uniform(intensity);
+  aoIntensityUniformCache[intensity] = uniform;
+  return uniform;
+}
+
+MeshGenerator.prototype.getAlphaUniform = function(alpha){
+  if (alphaUniformCache[alpha]){
+    return alphaUniformCache[alpha];
+  }
+  var uniform = new THREE.Uniform(alpha);
+  alphaUniformCache[alpha] = uniform;
+  return uniform;
+}
+
 MeshGenerator.prototype.getTextureUniform = function(texture){
   if (textureUniformCache[texture.uuid]){
     return textureUniformCache[texture.uuid];
@@ -45,7 +63,7 @@ MeshGenerator.prototype.generateObjectTrail = function(
       objectQuaternions: new THREE.Uniform(objectQuaternions),
       currentPosition: new THREE.Uniform(posit),
       currentQuaternion: new THREE.Uniform(quat),
-      alpha: new THREE.Uniform(trail.alpha),
+      alpha: this.getAlphaUniform(trail.alpha),
       diffuseMap: this.getTextureUniform(trail.diffuseTexture),
       emissiveMap: this.getTextureUniform(trail.emissiveTexture),
       alphaMap: this.getTextureUniform(trail.alphaTexture),
@@ -197,9 +215,9 @@ MeshGenerator.prototype.generateBasicMesh = function(){
       projectionMatrix: GLOBAL_PROJECTION_UNIFORM,
       modelViewMatrix: new THREE.Uniform(new THREE.Matrix4()),
       color: new THREE.Uniform(this.material.color),
-      alpha: new THREE.Uniform(this.material.alpha),
+      alpha: this.getAlphaUniform(this.material.alpha),
       fogInfo: GLOBAL_FOG_UNIFORM,
-      aoIntensity: new THREE.Uniform(this.material.aoMapIntensity),
+      aoIntensity: this.getAOIntensityUniform(this.material.aoMapIntensity),
       emissiveIntensity: new THREE.Uniform(this.material.emissiveIntensity),
       displacementInfo: new THREE.Uniform(new THREE.Vector2()),
       textureFlags: new THREE.Uniform(textureFlags),

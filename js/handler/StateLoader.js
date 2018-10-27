@@ -835,6 +835,9 @@ StateLoader.prototype.load = function(undo){
         areas[areaName].renderToScreen();
       }
     }
+    // RESOLUTION **************************************************
+    screenResolution = obj.screenResolution;
+    renderer.setPixelRatio(screenResolution);
     // POST PROCESSING *********************************************
     scanlineCount = obj.scanlineCount;
     scanlineSIntensity = obj.scanlineSIntensity;
@@ -2143,6 +2146,9 @@ StateLoader.prototype.resetProject = function(undo){
   areaConfigurationsVisible = false;
   areaConfigurationsHandler = new AreaConfigurationsHandler();
   textureUniformCache = new Object();
+  alphaUniformCache = new Object();
+  aoIntensityUniformCache = new Object();
+  screenResolution = 1;
 
   // FOG
   fogActive = false;

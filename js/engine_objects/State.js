@@ -186,4 +186,6 @@ var State = function(){
   for (var areaName in areas){
     this.areas[areaName] = areas[areaName].export();
   }
+  // RESOLUTION ****************************************************
+  this.screenResolution = screenResolution;
 }

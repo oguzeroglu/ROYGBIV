@@ -192,7 +192,7 @@ window.onload = function() {
 
   }).listen();
   omAOIntensityController = datGuiObjectManipulation.add(objectManipulationParameters, "AO intensity").min(0).max(10).step(0.1).onChange(function(val){
-    selectedAddedObject.mesh.material.uniforms.aoIntensity.value = val;
+    selectedAddedObject.mesh.material.uniforms.aoIntensity = new THREE.Uniform(val);
   }).onFinishChange(function(value){
 
   }).listen();

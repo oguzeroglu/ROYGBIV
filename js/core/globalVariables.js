@@ -139,7 +139,8 @@ var commandArgumentsExpectedCount = [
     2, //newArea
     0, //toggleAreas
     1, //destroyArea
-    1 //areaConfigurations
+    1, //areaConfigurations
+    1 //setResolution
 ];
 var commandArgumentsExpectedExplanation = [
   "help", //help
@@ -275,7 +276,8 @@ var commandArgumentsExpectedExplanation = [
   "newArea areaName height", //newArea
   "toggleAreas", //toggleAreas
   "destroyArea areaName", //destroyArea
-  "areaConfigurations show/hide"
+  "areaConfigurations show/hide", //areaConfigurations
+  "setResolution resolution" //setResolution
 ];
 var commands = [
   "help",
@@ -411,7 +413,8 @@ var commands = [
   "newArea",
   "toggleAreas",
   "destroyArea",
-  "areaConfigurations"
+  "areaConfigurations",
+  "setResolution"
 ];
 var commandInfo = [
   "help: Prints command list.",
@@ -547,7 +550,8 @@ var commandInfo = [
   "newArea: Creates a new area.",
   "toggleAreas: Show/hides the areas.",
   "destroyArea: Destroys an area.",
-  "areaConfigurations: Show/hides the area configuration window."
+  "areaConfigurations: Show/hides the area configuration window.",
+  "setResolution: Sets the screen resolution."
 ];
 var keyboardInfo = [
   "W/S : Translates the camera on axis Z.",
@@ -868,6 +872,9 @@ var SIDE_BOTH = "Both";
 var SIDE_FRONT = "Front";
 var SIDE_BACK = "Back";
 var textureUniformCache = new Object();
+var alphaUniformCache = new Object();
+var aoIntensityUniformCache = new Object();
+var screenResolution = 1;
 
 // WORKER VARIABLES
 var WORKERS_SUPPORTED = (typeof(Worker) !== "undefined");
