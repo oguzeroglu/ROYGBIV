@@ -618,7 +618,6 @@ var omGUIFocused = false;
 var lightsGUIFocused = false;
 var cliIsBeingDragged = false;
 var requestID;
-var mouseDown = 0;
 
 // THREE.JS VARIABLES
 var renderer;

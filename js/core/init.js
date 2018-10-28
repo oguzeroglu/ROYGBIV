@@ -330,7 +330,6 @@ window.onload = function() {
   // 3D CANVAS
   canvas = document.getElementById("rendererCanvas");
   canvas.addEventListener("click", function(event){
-    mouseDown = 0;
     cliFocused = false;
     omGUIFocused = false;
     lightsGUIFocused = false;
@@ -540,27 +539,6 @@ window.onload = function() {
   nullTexture.isNullTexture = true;
 };
 
-window.addEventListener("mousedown", function(e){
-  mouseDown ++;
-});
-window.addEventListener("mouseup", function(e){
-  mouseDown --;
-});
-window.addEventListener('mousemove', function (e) {
-  if (cliIsBeingDragged || omGUIFocused || lightsGUIFocused){
-    return;
-  }
-  if (!windowLoaded){
-    return;
-  }
-  if (!mouseDown){
-    return;
-  }
-  var movementX = e.movementX;
-  var movementY = e.movementY;
-  camera.rotation.y -= movementX / 400;
-  camera.rotation.x -= movementY / 400;
-});
 window.addEventListener('mousewheel', mouseWheelEvent, false);
 if (typeof InstallTrigger !== 'undefined') {
   // M O Z I L L A
