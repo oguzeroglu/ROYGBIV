@@ -91,11 +91,70 @@ JobHandler.prototype.handle = function(previewModeCommand){
       this.handleSyncCommand();
     }else if (this.splitted[0] == "selectAllGrids"){
       this.handleSelectAllGridsCommand();
+    }else if (this.splitted[0] == "newAreaConfiguration"){
+      this.handleNewAreaConfigurationCommand();
     }
   }catch (err){
     console.error(err);
   }
   jobHandlerWorking = false;
+}
+
+JobHandler.prototype.handleNewAreaConfigurationCommand = function(){
+  var objNamePrefix = this.splitted[2].split("*")[0];
+  var areaNamePrefix = this.splitted[1].split("*")[0];
+  var areaCount = 0, objCount = 0;
+  for (var areaName in areas){
+    areaCount ++;
+    if (areaName.startsWith(areaNamePrefix)){
+      for (var objName in addedObjects){
+        if (objName.startsWith(objNamePrefix)){
+          parseCommand(
+            "newAreaConfiguration "+areaName+" "+objName+" "+this.splitted[3]+" "+this.splitted[4]
+          );
+          objCount ++;
+        }
+      }
+      for (var objName in objectGroups){
+        if (objName.startsWith(objNamePrefix)){
+          parseCommand(
+            "newAreaConfiguration "+areaName+" "+objName+" "+this.splitted[3]+" "+this.splitted[4]
+          );
+          objCount ++;
+        }
+      }
+    }
+  }
+  if ("default".startsWith(areaNamePrefix)){
+    areaCount ++;
+    for (var objName in addedObjects){
+      if (objName.startsWith(objNamePrefix)){
+        parseCommand(
+          "newAreaConfiguration default"+" "+objName+" "+this.splitted[3]+" "+this.splitted[4]
+        );
+        objCount ++;
+      }
+    }
+    for (var objName in objectGroups){
+      if (objName.startsWith(objNamePrefix)){
+        parseCommand(
+          "newAreaConfiguration default"+" "+objName+" "+this.splitted[3]+" "+this.splitted[4]
+        );
+        objCount ++;
+      }
+    }
+  }
+  if (areaCount == 0){
+    terminal.printError(Text.NO_AREAS_FOUND);
+  }else if (objCount == 0){
+    terminal.printError(Text.NO_OBJECT_FOUND);
+  }else{
+    terminal.printInfo(Text.COMMAND_EXECUTED_FOR_X_AREAS_AND_X_OBJECTS.replace(
+      Text.PARAM1, areaCount
+    ).replace(
+      Text.PARAM2, objCount
+    ));
+  }
 }
 
 JobHandler.prototype.handleSelectAllGridsCommand = function(){

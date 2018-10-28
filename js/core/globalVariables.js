@@ -141,7 +141,8 @@ var commandArgumentsExpectedCount = [
     1, //destroyArea
     1, //areaConfigurations
     1, //setResolution
-    1 //configureArea
+    1, //configureArea
+    4 //newAreaConfiguration
 ];
 var commandArgumentsExpectedExplanation = [
   "help", //help
@@ -279,7 +280,8 @@ var commandArgumentsExpectedExplanation = [
   "destroyArea areaName", //destroyArea
   "areaConfigurations show/hide", //areaConfigurations
   "setResolution resolution", //setResolution
-  "configureArea areaName" //configureArea
+  "configureArea areaName", //configureArea
+  "newAreaConfiguration areaName objectName isVisible sides" //newAreaConfiguration
 ];
 var commands = [
   "help",
@@ -417,7 +419,8 @@ var commands = [
   "destroyArea",
   "areaConfigurations",
   "setResolution",
-  "configureArea"
+  "configureArea",
+  "newAreaConfiguration"
 ];
 var commandInfo = [
   "help: Prints command list.",
@@ -555,7 +558,8 @@ var commandInfo = [
   "destroyArea: Destroys an area.",
   "areaConfigurations: Show/hides the area configuration window.",
   "setResolution: Sets the screen resolution.",
-  "configureArea: Shows the area configuration window for a certain area."
+  "configureArea: Shows the area configuration window for a certain area.",
+  "newAreaConfiguration: Creates a new area configuration for an area and object."
 ];
 var keyboardInfo = [
   "W/S : Translates the camera on axis Z.",

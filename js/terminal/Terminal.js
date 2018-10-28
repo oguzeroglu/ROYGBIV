@@ -560,15 +560,27 @@ Terminal.prototype.autocomplete = function(command){
 				helpString = "[Area names]: ";
 			break;
 			case commandDescriptor.AREA_NAME_WITH_DEFAULT:
-			for (var areaName in areas){
-				if (areaName.startsWith(curEntry)){
-					possibilities.push(areaName);
+				for (var areaName in areas){
+					if (areaName.startsWith(curEntry)){
+						possibilities.push(areaName);
+					}
 				}
-			}
-			if ("default".startsWith(curEntry.toLowerCase())){
-				possibilities.push("default");
-			}
-			helpString = "[Area names]: ";
+				if ("default".startsWith(curEntry.toLowerCase())){
+					possibilities.push("default");
+				}
+				helpString = "[Area names]: ";
+			break;
+			case commandDescriptor.RENDER_SIDE:
+				if ("both".startsWith(curEntry.toLowerCase())){
+					possibilities.push("both");
+				}
+				if ("back".startsWith(curEntry.toLowerCase())){
+					possibilities.push("back");
+				}
+				if ("front".startsWith(curEntry.toLowerCase())){
+					possibilities.push("front");
+				}
+				helpString = "[Sides]: ";
 			break;
 		}
 

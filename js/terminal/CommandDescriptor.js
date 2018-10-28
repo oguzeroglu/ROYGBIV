@@ -30,6 +30,7 @@ var CommandDescriptor = function(){
   this.OBJECT_CREATION_NAME     =   27;
   this.AREA_NAME                =   28;
   this.AREA_NAME_WITH_DEFAULT   =   29;
+  this.RENDER_SIDE              =   30;
 
   // newGridSystem
   this.newGridSystem = new Object();
@@ -594,6 +595,14 @@ var CommandDescriptor = function(){
   this.configureArea = new Object();
   this.configureArea.types = [];
   this.configureArea.types.push(this.AREA_NAME_WITH_DEFAULT); // areaName
+
+  // newAreaConfiguration
+  this.newAreaConfiguration = new Object();
+  this.newAreaConfiguration.types = [];
+  this.newAreaConfiguration.types.push(this.AREA_NAME_WITH_DEFAULT); // areaName
+  this.newAreaConfiguration.types.push(this.OBJECT_NAME); // objectName
+  this.newAreaConfiguration.types.push(this.BOOLEAN); // isVisible
+  this.newAreaConfiguration.types.push(this.RENDER_SIDE); // sides
 
 };
 

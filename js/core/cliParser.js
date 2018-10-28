@@ -4428,6 +4428,54 @@ function parse(input){
           terminal.printInfo(Text.OK);
           return true;
         break;
+        case 136: //newAreaConfiguration
+          if (mode != 0){
+            terminal.printError(Text.WORKS_ONLY_IN_DESIGN_MODE);
+            return true;
+          }
+          var areaName = splitted[1];
+          var objName = splitted[2];
+          var isVisible = splitted[3].toLowerCase();
+          var sides = splitted[4].toLowerCase();
+          if (areaName.indexOf("*") != -1 || objName.indexOf("*") != -1){
+            new JobHandler(splitted).handle();
+            return true;
+          }
+          var area = areas[areaName];
+          if (!area && areaName != "default"){
+            terminal.printError(Text.NO_SUCH_AREA);
+            return true;
+          }
+          var obj = addedObjects[objName];
+          if (!obj){
+            obj = objectGroups[objName];
+            if (!obj){
+              terminal.printError(Text.NO_SUCH_OBJECT);
+              return true;
+            }
+          }
+          if (isVisible != "true" && isVisible != "false"){
+            terminal.printError(Text.ISVISIBLE_MUST_BE_TRUE_OR_FALSE);
+            return true;
+          }
+          if (sides != "both" && sides != "front" && sides != "back"){
+            terminal.printError(Text.SIDES_MUST_BE_BOTH_FRONT_OR_BACK);
+            return true;
+          }
+          obj.setVisibilityInArea(areaName, (isVisible == "true"));
+          if (SIDE_BOTH.toLowerCase() == sides){
+            obj.setSideInArea(areaName, SIDE_BOTH);
+          }else if (SIDE_BACK.toLowerCase() == sides){
+            obj.setSideInArea(areaName, SIDE_BACK);
+          }else if (SIDE_FRONT.toLowerCase() == sides){
+            obj.setSideInArea(areaName, SIDE_FRONT);
+          }
+          delete areaConfigurationsHandler.currentArea;
+          if (!jobHandlerWorking){
+            terminal.printInfo(Text.CONFIGURATION_CREATED);
+          }
+          return true;
+        break;
       }
       return true;
     }catch(err){
