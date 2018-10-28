@@ -397,6 +397,9 @@ window.onload = function() {
            var gridSystem = gridSystems[object.gridSystemName];
            var point = intersects[0].point;
            var selectedGrid = gridSystem.getGridFromPoint(point);
+           if (selectedGrid.sliced && !selectedGrid.slicedGridSystemName){
+             selectedGrid.sliced = false;
+           }
            if (selectedGrid){
              if (!selectedGrid.sliced){
                if (selectedGrid.destroyedAddedObject && !(keyboardBuffer["shift"])){
