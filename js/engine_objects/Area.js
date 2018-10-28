@@ -95,8 +95,8 @@ Area.prototype.renderDivToScreen = function(){
 
 Area.prototype.get2DVector = function(){
   var vector = REUSABLE_VECTOR;
-  var widthHalf = 0.5 * renderer.context.canvas.width;
-  var heightHalf = 0.5 * renderer.context.canvas.height;
+  var widthHalf = 0.5 * renderer.context.canvas.width / renderer.getPixelRatio();
+  var heightHalf = 0.5 * renderer.context.canvas.height / renderer.getPixelRatio();
   this.object3D.updateMatrixWorld();
   vector.setFromMatrixPosition(this.object3D.matrixWorld);
   vector.project(camera);

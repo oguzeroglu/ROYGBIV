@@ -207,8 +207,8 @@ Grid.prototype.showCornerPoints = function(){
 
 Grid.prototype.get2DVector = function(object3D){
   var vector = REUSABLE_VECTOR;
-  var widthHalf = 0.5 * renderer.context.canvas.width;
-  var heightHalf = 0.5 * renderer.context.canvas.height;
+  var widthHalf = 0.5 * renderer.context.canvas.width / renderer.getPixelRatio();
+  var heightHalf = 0.5 * renderer.context.canvas.height / renderer.getPixelRatio();
   object3D.updateMatrixWorld();
   vector.setFromMatrixPosition(object3D.matrixWorld);
   vector.project(camera);
