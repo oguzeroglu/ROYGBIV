@@ -149,10 +149,8 @@ JobHandler.prototype.handleNewAreaConfigurationCommand = function(){
   }else if (objCount == 0){
     terminal.printError(Text.NO_OBJECT_FOUND);
   }else{
-    terminal.printInfo(Text.COMMAND_EXECUTED_FOR_X_AREAS_AND_X_OBJECTS.replace(
+    terminal.printInfo(Text.COMMAND_EXECUTED_FOR_X_AREAS.replace(
       Text.PARAM1, areaCount
-    ).replace(
-      Text.PARAM2, objCount
     ));
   }
 }
