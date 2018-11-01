@@ -22923,8 +22923,10 @@
 			var children = object.children;
 
 			for ( var i = 0, l = children.length; i < l; i ++ ) {
-
-				projectObject( children[ i ], camera, sortObjects );
+				var child = children[i];
+				if (child.visible){
+					projectObject( child, camera, sortObjects );
+				}
 
 			}
 
