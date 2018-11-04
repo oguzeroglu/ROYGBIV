@@ -22,5 +22,4 @@ ROYGBIV works on browsers (preferably Chrome or Firefox). It works with a set of
 ## Screenshots
 
 ![](/screen_shots/scifi2.png?raw=true)
-![](/screen_shots/scifi.png?raw=true)
 ![](/screen_shots/roygbiv.gif?raw=true)
