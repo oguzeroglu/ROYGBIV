@@ -17508,8 +17508,17 @@
 
 			}
 
-			( material.transparent === true ? transparent : opaque ).push( renderItem );
-
+			if (object.addedObject){
+				if (object.addedObject.mesh.material.uniforms.alpha.value == 1){
+					opaque.push(renderItem);
+					object.addedObject.listedAsOpaque = true;
+				}else{
+					transparent.push(renderItem);
+					object.addedObject.listedAsOpaque = false;
+				}
+			}else{
+				( material.transparent === true ? transparent : opaque ).push( renderItem );
+			}
 			renderItemsIndex ++;
 
 		}
