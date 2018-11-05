@@ -14,6 +14,16 @@ var ObjectGroup = function(name, group){
   this.totalVertexCount = 0;
   this.skippedVertexCount = 0;
 
+  this.isTransparent = false;
+  for (var objName in this.group){
+    var obj = this.group[objName];
+    var isObjTransparent = (obj.mesh.material.uniforms.alpha.value < 1);
+    if (isObjTransparent){
+      this.isTransparent = true;
+      break;
+    }
+  }
+
 }
 
 ObjectGroup.prototype.applyAreaConfiguration = function(areaName){

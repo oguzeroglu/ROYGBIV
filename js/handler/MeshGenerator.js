@@ -113,7 +113,7 @@ MeshGenerator.prototype.generateInstancedMesh = function(graphicsGroup, objectGr
     vertexShader: vertexShader,
     fragmentShader: ShaderContent.instancedBasicMaterialFragmentShader,
     vertexColors: THREE.VertexColors,
-    transparent: true,
+    transparent: objectGroup.isTransparent,
     side: THREE.DoubleSide,
     uniforms: {
       projectionMatrix: GLOBAL_PROJECTION_UNIFORM,
@@ -172,7 +172,7 @@ MeshGenerator.prototype.generateMergedMesh = function(graphicsGroup, objectGroup
     vertexShader: vertexShader,
     fragmentShader: ShaderContent.mergedBasicMaterialFragmentShader,
     vertexColors: THREE.VertexColors,
-    transparent: true,
+    transparent: objectGroup.isTransparent,
     side: THREE.DoubleSide,
     uniforms: {
       projectionMatrix: GLOBAL_PROJECTION_UNIFORM,
