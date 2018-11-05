@@ -16,6 +16,41 @@ var ObjectGroup = function(name, group){
 
 }
 
+ObjectGroup.prototype.applyAreaConfiguration = function(areaName){
+  if (this.areaVisibilityConfigurations){
+    var configurations = this.areaVisibilityConfigurations[areaName];
+    if (!(typeof configurations == UNDEFINED)){
+      this.mesh.visible = configurations;
+    }else{
+      this.mesh.visible = true;
+    }
+  }
+  if (this.areaSideConfigurations){
+    var configurations = this.areaSideConfigurations[areaName];
+    if (!(typeof configurations == UNDEFINED)){
+      if (configurations == SIDE_BOTH){
+        this.mesh.material.side = THREE.DoubleSide;
+      }else if (configurations == SIDE_FRONT){
+        this.mesh.material.side = THREE.FrontSide;
+      }else if (configurations == SIDE_BACK){
+        this.mesh.material.side = THREE.BackSide;
+      }
+    }else{
+      if (this.defaultSide){
+        if (this.defaultSide == SIDE_BOTH){
+          this.mesh.material.side = THREE.DoubleSide;
+        }else if (this.defaultSide == SIDE_FRONT){
+          this.mesh.material.side = THREE.FrontSide;
+        }else if (this.defaultSide == SIDE_BACK){
+          this.mesh.material.side = THREE.BackSide;
+        }
+      }else{
+        this.mesh.material.side = THREE.DoubleSide;
+      }
+    }
+  }
+}
+
 ObjectGroup.prototype.getSideInArea = function(areaName){
   if (this.areaSideConfigurations){
     if (!(typeof this.areaSideConfigurations[areaName] == UNDEFINED)){

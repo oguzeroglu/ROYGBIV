@@ -22924,6 +22924,15 @@
 
 			for ( var i = 0, l = children.length; i < l; i ++ ) {
 				var child = children[i];
+				if (window.areaConfigurationsHandler.updateNeeded){
+					if (child.addedObject){
+						child.addedObject.applyAreaConfiguration(window.areaConfigurationsHandler.currentArea);
+					}
+					if (child.objectGroupName){
+						var objGroup = window.objectGroups[child.objectGroupName];
+						objGroup.applyAreaConfiguration(window.areaConfigurationsHandler.currentArea);
+					}
+				}
 				if (child.visible){
 					projectObject( child, camera, sortObjects );
 				}
