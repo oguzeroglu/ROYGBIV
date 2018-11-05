@@ -10,10 +10,14 @@ AreaConfigurationsHandler.prototype.handle = function(){
     if (result != this.currentArea){
       this.currentArea = result;
       this.updateNeeded = true;
+    }else{
+      this.updateNeeded = false;
     }
   }else if (this.currentArea != this.areaDefault){
     this.currentArea = this.areaDefault;
     this.updateNeeded = true;
+  }else{
+    this.updateNeeded = false;
   }
 }
 
