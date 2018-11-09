@@ -46,7 +46,7 @@ RayCaster.prototype.findIntersections = function(clickEvent){
           }
           intersectionPoint = obj.intersectsLine(REUSABLE_LINE);
           if (intersectionPoint){
-            var objVector = (REUSABLE_VECTOR.set(0, 0, 1)).applyQuaternion(obj.mesh.quaternion);
+            var objVector = (REUSABLE_VECTOR_3.set(0, 0, 1)).applyQuaternion(obj.mesh.quaternion);
             var cameraVector = (REUSABLE_VECTOR_2.set(0, 0, -1)).applyQuaternion(camera.quaternion);
             var isFront = false;
             if (objVector.angleTo(cameraVector) > Math.PI/2){
@@ -82,7 +82,7 @@ RayCaster.prototype.findIntersections = function(clickEvent){
             if (obj){
               intersectionPoint = obj.intersectsLine(REUSABLE_LINE);
               if (intersectionPoint){
-                var objVector = (REUSABLE_VECTOR.set(0, 0, 1)).applyQuaternion(obj.mesh.quaternion);
+                var objVector = (REUSABLE_VECTOR_3.set(0, 0, 1)).applyQuaternion(obj.mesh.quaternion);
                 var cameraVector = (REUSABLE_VECTOR_2.set(0, 0, -1)).applyQuaternion(camera.quaternion);
                 var isFront = false;
                 if (objVector.angleTo(cameraVector) > Math.PI/2){
