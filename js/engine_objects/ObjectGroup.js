@@ -836,6 +836,7 @@ ObjectGroup.prototype.glue = function(){
     gridSystemNamesMap[addedObject.metaData.gridSystemName] = true;
     addedObjectsInsideGroups[addedObject.name] = addedObject;
     addedObject.indexInParent = graphicsGroup.children.length - 1;
+
   }
 
   this.gridSystemNames = Object.keys(gridSystemNamesMap);
@@ -1025,6 +1026,8 @@ ObjectGroup.prototype.detach = function(){
 
   }
 
+  rayCaster.refresh();
+
 }
 
 ObjectGroup.prototype.setQuaternion = function(axis, val){
@@ -1091,6 +1094,8 @@ ObjectGroup.prototype.rotate = function(axis, radian, fromScript){
     }
   }
 
+  rayCaster.updateObject(this);
+
 }
 
 ObjectGroup.prototype.translate = function(axis, amount, fromScript){
@@ -1119,6 +1124,9 @@ ObjectGroup.prototype.translate = function(axis, amount, fromScript){
   }
   physicsBody.position.copy(this.mesh.position);
   this.graphicsGroup.position.copy(this.mesh.position);
+
+  rayCaster.updateObject(this);
+
 }
 
 ObjectGroup.prototype.resetPosition = function(){
@@ -1149,6 +1157,9 @@ ObjectGroup.prototype.destroy = function(isUndo){
   objectSelectedByCommand = false;
   this.mesh.material.dispose();
   this.mesh.geometry.dispose();
+
+  rayCaster.refresh();
+
 }
 
 ObjectGroup.prototype.export = function(){
@@ -1293,6 +1304,7 @@ ObjectGroup.prototype.setBlending = function(blendingModeInt){
 }
 
 ObjectGroup.prototype.updateBoundingBoxes = function(){
+  this.graphicsGroup.updateMatrixWorld();
   for (var objName in this.group){
     this.group[objName].updateBoundingBoxes(this.boundingBoxes);
   }

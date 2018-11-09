@@ -254,9 +254,51 @@ GridSystem.prototype.draw = function(){
   this.boundingPlane.gridSystemName = this.name;
   this.gridSystemRepresentation.gridSystemName = this.name;
 
+  this.boundingBox = new THREE.Box3().setFromObject(this.boundingPlane);
+  this.trianglePlanes = [];
+  this.triangles = [];
+  var pseudoGeom = new THREE.Geometry().fromBufferGeometry(boundingPlaneGeometry);
+  var transformedVertices = [];
+  for (var i = 0; i<pseudoGeom.vertices.length; i++){
+    var vertex = pseudoGeom.vertices[i].clone();
+    vertex.applyMatrix4(this.boundingPlane.matrixWorld);
+    transformedVertices.push(vertex);
+  }
+  for (var i = 0; i<pseudoGeom.faces.length; i++){
+    var face = pseudoGeom.faces[i];
+    var a = face.a;
+    var b = face.b;
+    var c = face.c;
+    var triangle = new THREE.Triangle(
+      transformedVertices[a], transformedVertices[b], transformedVertices[c]
+    );
+    this.triangles.push(triangle);
+    var plane = new THREE.Plane();
+    triangle.getPlane(plane);
+    this.trianglePlanes.push(plane);
+  }
+
   scene.add(this.gridSystemRepresentation);
   scene.add(this.boundingPlane);
 
+}
+
+GridSystem.prototype.intersectsLine = function(line){
+  for (var i = 0; i< this.trianglePlanes.length; i+=2){
+    var plane = this.trianglePlanes[i];
+    if (plane.intersectLine(line, REUSABLE_VECTOR)){
+      var triangle1 = this.triangles[i];
+      var triangle2 = this.triangles[i+1];
+      if (triangle1.containsPoint(REUSABLE_VECTOR)){
+        INTERSECTION_NORMAL.set(plane.normal.x, plane.normal.y, plane.normal.z);
+        return REUSABLE_VECTOR;
+      }else if (triangle2.containsPoint(REUSABLE_VECTOR)){
+        INTERSECTION_NORMAL.set(plane.normal.x, plane.normal.y, plane.normal.z);
+        return REUSABLE_VECTOR;
+      }
+    }
+  }
+  return false;
 }
 
 GridSystem.prototype.getDistanceBetweenPointAndGrid = function(grid, point){
@@ -433,6 +475,9 @@ GridSystem.prototype.destroy = function(){
   }
   delete gridSystems[this.name];
   gridCounter = gridCounter - this.totalGridCount;
+
+  rayCaster.refresh();
+
 }
 
 GridSystem.prototype.selectAllGrids = function(){

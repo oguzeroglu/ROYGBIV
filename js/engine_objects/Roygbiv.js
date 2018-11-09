@@ -722,6 +722,7 @@ Roygbiv.prototype.hide = function(object){
         }
       });
       object.isHidden = true;
+      rayCaster.binHandler.hide(object);
       if (worldBinHandler){
         worldBinHandler.hide(object);
       }else{
@@ -735,7 +736,7 @@ Roygbiv.prototype.hide = function(object){
     }
   }else if (object instanceof ObjectGroup){
     if (object.isVisibleOnThePreviewScene()){
-      object.graphicsGroup.visible = false;
+      object.mesh.visible = false;
       setTimeout(function(){
         physicsWorld.removeBody(object.physicsBody);
         if (isPhysicsWorkerEnabled()){
@@ -743,6 +744,7 @@ Roygbiv.prototype.hide = function(object){
         }
       });
       object.isHidden = true;
+      rayCaster.binHandler.hide(object);
       if (worldBinHandler){
         worldBinHandler.hide(object);
       }else{
@@ -785,6 +787,7 @@ Roygbiv.prototype.show = function(object){
         }
       });
       object.isHidden = false;
+      rayCaster.binHandler.show(object);
       if (worldBinHandler){
         worldBinHandler.show(object);
       }else{
@@ -798,7 +801,7 @@ Roygbiv.prototype.show = function(object){
     }
   }else if (object instanceof ObjectGroup){
     if (!object.isVisibleOnThePreviewScene()){
-      object.graphicsGroup.visible = true;
+      object.mesh.visible = true;
       setTimeout(function(){
         physicsWorld.addBody(object.physicsBody);
         if (isPhysicsWorkerEnabled()){
@@ -806,6 +809,7 @@ Roygbiv.prototype.show = function(object){
         }
       });
       object.isHidden = false;
+      rayCaster.binHandler.show(object);
       if (worldBinHandler){
         worldBinHandler.show(object);
       }else{

@@ -708,6 +708,8 @@ AddedObject.prototype.translate = function(axis, amount, fromScript){
     }
   }
 
+  rayCaster.updateObject(this);
+
 }
 
 AddedObject.prototype.rotate = function(axis, radians, fromScript){
@@ -732,6 +734,8 @@ AddedObject.prototype.rotate = function(axis, radians, fromScript){
     }
     this.initQuaternion.copy(this.mesh.quaternion);
   }
+
+  rayCaster.updateObject(this);
 
 }
 
@@ -980,6 +984,8 @@ AddedObject.prototype.destroy = function(){
   objectSelectedByCommand = false;
 
   this.dispose();
+
+  rayCaster.refresh();
 
 }
 

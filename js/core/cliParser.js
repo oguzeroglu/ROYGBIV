@@ -418,6 +418,7 @@ function parse(input){
             terminal.printInfo(Text.SWITCHED_TO_PREVIEW_MODE);
             $("#cliDivheader").text("ROYGBIV 3D Engine - CLI (Preview mode)");
             mode = 1;
+            rayCaster.refresh();
           }else if (mode == 1){
             mode = 0;
             $(datGui.domElement).attr("hidden", true);
@@ -487,6 +488,12 @@ function parse(input){
                 }
                 delete object.originalMass;
               }
+
+              if (object.isHidden){
+                object.mesh.visible = true;
+                object.isHidden = false;
+              }
+
             }
             for (var objectName in addedObjects){
               var object = addedObjects[objectName];
@@ -494,6 +501,11 @@ function parse(input){
               if (object.texturePackSetWithScript){
                 object.texturePackSetWithScript = false;
                 object.resetTexturePackAfterAnimation();
+              }
+
+              if (object.isHidden){
+                object.mesh.visible = true;
+                object.isHidden = false;
               }
 
               object.loadState();
@@ -566,6 +578,7 @@ function parse(input){
 
           }
           initBadTV();
+          rayCaster.refresh();
           return true;
         break;
         case 14: //newBasicMaterial
@@ -722,7 +735,7 @@ function parse(input){
           if (objectName.toUpperCase() == "NULL"){
             objectName = generateUniqueObjectName();
           }
-          if (addedObjects[objectName] || objectGroups[objectName]){
+          if (addedObjects[objectName] || objectGroups[objectName] || gridSystems[name]){
             terminal.printError(Text.NAME_MUST_BE_UNIQUE);
             return true;
           }
@@ -742,6 +755,7 @@ function parse(input){
             $(datGuiAreaConfigurations.domElement).attr("hidden", true);
             areaConfigurationsVisible = false;
           }
+          rayCaster.refresh();
           return true;
         break;
         case 18: //printObjects
@@ -1216,7 +1230,7 @@ function parse(input){
             return true;
           }
 
-          if (addedObjects[name] || objectGroups[name]){
+          if (addedObjects[name] || objectGroups[name] || gridSystems[name]){
             terminal.printError(Text.NAME_MUST_BE_UNIQUE);
             return true;
           }
@@ -1302,6 +1316,8 @@ function parse(input){
             $(datGuiAreaConfigurations.domElement).attr("hidden", true);
             areaConfigurationsVisible = false;
           }
+          rayCaster.refresh();
+          return true;
         break;
         case 31: //setAnchor
 
@@ -1398,7 +1414,7 @@ function parse(input){
             return true;
           }
 
-          if (addedObjects[name] || objectGroups[name]){
+          if (addedObjects[name] || objectGroups[name] || gridSystems[name]){
             terminal.printError(Text.NAME_MUST_BE_UNIQUE);
             return true;
           }
@@ -1473,6 +1489,7 @@ function parse(input){
             $(datGuiAreaConfigurations.domElement).attr("hidden", true);
             areaConfigurationsVisible = false;
           }
+          rayCaster.refresh();
           return true;
         break;
         case 35: //newWallCollection
@@ -1490,6 +1507,13 @@ function parse(input){
           if (wallCollections[name]){
             terminal.printError(Text.NAME_MUST_BE_UNIQUE);
             return true;
+          }
+          for (var objName in objectGroups){
+            for (var childName in objectGroups[objName].group){
+              if (childName == name){
+                terminal.printError(Text.NAME_MUST_BE_UNIQUE);
+              }
+            }
           }
 
           var gridSelectionSize = Object.keys(gridSelections).length;
@@ -1527,7 +1551,7 @@ function parse(input){
           }
 
           for (var i = 0; i<sideNames.length; i++){
-            if (gridSystems[sideNames[i]]){
+            if (gridSystems[sideNames[i]] || addedObjects[sideNames[i]] || objectGroups[sideNames[i]]){
               terminal.printInfo(Text.AN_ERROR_HAPPENED_CHOOSE_ANOTHER_NAME);
               return true;
             }
@@ -1566,6 +1590,7 @@ function parse(input){
           for (var gridName in gridSelections){
             gridSelections[gridName].toggleSelect(false, false, false, true);
           }
+          rayCaster.refresh();
           terminal.printInfo(Text.WALL_COLLECTION_CREATED);
         break;
         case 36: //printWallCollections
@@ -3017,7 +3042,7 @@ function parse(input){
             terminal.printError(Text.WORKS_ONLY_IN_DESIGN_MODE);
             return true;
           }
-          if (addedObjects[groupName] || objectGroups[groupName]){
+          if (addedObjects[groupName] || objectGroups[groupName] || gridSystems[name]){
             terminal.printError(Text.NAME_MUST_BE_UNIQUE);
             return true;
           }
@@ -3148,6 +3173,7 @@ function parse(input){
               $(datGuiAreaConfigurations.domElement).attr("hidden", true);
               areaConfigurationsVisible = false;
             }
+            rayCaster.refresh();
             return true;
           }catch(err){
             terminal.printError(Text.INVALID_SYNTAX);
@@ -4053,7 +4079,7 @@ function parse(input){
           if (sphereName.toUpperCase() == "NULL"){
             sphereName = generateUniqueObjectName();
           }
-          if (addedObjects[sphereName] || objectGroups[sphereName]){
+          if (addedObjects[sphereName] || objectGroups[sphereName] || gridSystems[name]){
               terminal.printError(Text.NAME_MUST_BE_UNIQUE);
               return true;
           }
@@ -4129,6 +4155,7 @@ function parse(input){
             $(datGuiAreaConfigurations.domElement).attr("hidden", true);
             areaConfigurationsVisible = false;
           }
+          rayCaster.refresh();
           return true;
         break;
         case 124: //printFogInfo
@@ -4509,6 +4536,17 @@ function generateUniqueObjectName(){
 }
 
 function processNewGridSystemCommand(name, sizeX, sizeZ, centerX, centerY, centerZ, outlineColor, cellSize, axis, isSuperposed, slicedGrid){
+  if (addedObjects[name] || objectGroups[name]){
+    terminal.printError(Text.NAME_MUST_BE_UNIQUE);
+    return true;
+  }
+  for (var objName in objectGroups){
+    for (var childName in objectGroups[objName].group){
+      if (childName == name){
+        terminal.printError(Text.NAME_MUST_BE_UNIQUE);
+      }
+    }
+  }
   sizeX = parseInt(sizeX);
   if (isNaN(sizeX)){
     terminal.printError(Text.SIZEX_MUST_BE_A_NUMBER);
@@ -4558,6 +4596,8 @@ function processNewGridSystemCommand(name, sizeX, sizeZ, centerX, centerY, cente
     slicedGrid.toggleSelect(true, false, false, true);
     slicedGrid.slicedGridSystemName = name;
   }
+
+  rayCaster.refresh();
 
   return true;
 }

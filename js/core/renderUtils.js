@@ -19,6 +19,7 @@ function render(){
     if (worldBinHandler){
       updateWorldBinHandler();
     }
+    updateRaycaster();
     updateParticleSystems();
     updateObjectTrails();
     updateCrosshair();
@@ -81,6 +82,10 @@ function handleWorkerMessages(){
       workerHandler.binHandlerLoopFunction();
     }
   }
+}
+
+function updateRaycaster(){
+  rayCaster.binHandler.update();
 }
 
 function updateWorldBinHandler(){

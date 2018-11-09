@@ -1,6 +1,6 @@
-var WorldBinHandler = function(fromWorker){
+var WorldBinHandler = function(isCustom){
   this.bin = new Object();
-  if (!fromWorker){
+  if (!isCustom){
     for (var objName in addedObjects){
       var object = addedObjects[objName];
       object.generateBoundingBoxes();
@@ -46,17 +46,19 @@ WorldBinHandler.prototype.updateObject = function(obj){
     for (var x in obj.binInfo){
       for (var y in obj.binInfo[x]){
         for (var z in obj.binInfo[x][y]){
-          delete this.bin[x][y][z][obj.name];
-          delete obj.binInfo[x][y][z];
-          if (Object.keys(this.bin[x][y][z]).length == 0){
-            delete this.bin[x][y][z];
+          if (this.bin[x] && this.bin[x][y] && this.bin[x][y][z]){
+            delete this.bin[x][y][z][obj.name];
             delete obj.binInfo[x][y][z];
-            if (Object.keys(this.bin[x][y]).length == 0){
-              delete this.bin[x][y];
-              delete obj.binInfo[x][y];
-              if (Object.keys(this.bin[x]).length == 0){
-                delete this.bin[x];
-                delete obj.binInfo[x];
+            if (Object.keys(this.bin[x][y][z]).length == 0){
+              delete this.bin[x][y][z];
+              delete obj.binInfo[x][y][z];
+              if (Object.keys(this.bin[x][y]).length == 0){
+                delete this.bin[x][y];
+                delete obj.binInfo[x][y];
+                if (Object.keys(this.bin[x]).length == 0){
+                  delete this.bin[x];
+                  delete obj.binInfo[x];
+                }
               }
             }
           }
@@ -72,22 +74,27 @@ WorldBinHandler.prototype.updateObject = function(obj){
     for (var x in obj.binInfo){
       for (var y in obj.binInfo[x]){
         for (var z in obj.binInfo[x][y]){
-          delete this.bin[x][y][z][obj.name];
-          delete obj.binInfo[x][y][z];
-          if (Object.keys(this.bin[x][y][z]).length == 0){
-            delete this.bin[x][y][z];
+          if (this.bin[x] && this.bin[x][y] && this.bin[x][y][z]){
+            delete this.bin[x][y][z][obj.name];
             delete obj.binInfo[x][y][z];
-            if (Object.keys(this.bin[x][y]).length == 0){
-              delete this.bin[x][y];
-              delete obj.binInfo[x][y];
-              if (Object.keys(this.bin[x]).length == 0){
-                delete this.bin[x];
-                delete obj.binInfo[x];
+            if (Object.keys(this.bin[x][y][z]).length == 0){
+              delete this.bin[x][y][z];
+              delete obj.binInfo[x][y][z];
+              if (Object.keys(this.bin[x][y]).length == 0){
+                delete this.bin[x][y];
+                delete obj.binInfo[x][y];
+                if (Object.keys(this.bin[x]).length == 0){
+                  delete this.bin[x];
+                  delete obj.binInfo[x];
+                }
               }
             }
           }
         }
       }
+    }
+    if (!obj.boundingBoxes){
+      obj.generateBoundingBoxes();
     }
     obj.graphicsGroup.updateMatrixWorld();
     obj.updateBoundingBoxes();
@@ -358,6 +365,8 @@ WorldBinHandler.prototype.query = function(point){
                 for (var childObjName in res[objName]){
                   results[objName][childObjName] = 5;
                 }
+              }else if (gridSystems[objName]){
+                results[objName] = 10;
               }
             }
           }

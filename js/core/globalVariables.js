@@ -860,8 +860,6 @@ var GLOBAL_PROJECTION_UNIFORM = new THREE.Uniform(new THREE.Vector3());
 var GLOBAL_VIEW_UNIFORM = new THREE.Uniform(new THREE.Matrix4());
 var VERTEX_SHADER_TEXTURE_FETCH_SUPPORTED;
 var DDS_SUPPORTED;
-var mouse = new THREE.Vector2();
-var raycaster = new THREE.Raycaster();
 var jobHandlerSelectedGrid = 0;
 var jobHandlerWorking = false;
 var geometryCache = new Object();
@@ -882,6 +880,10 @@ var textureUniformCache = new Object();
 var alphaUniformCache = new Object();
 var aoIntensityUniformCache = new Object();
 var screenResolution = 1;
+var rayCaster;
+var intersectionPoint = 0;
+var intersectionObject = 0;
+var projectLoaded = true;
 
 // WORKER VARIABLES
 var WORKERS_SUPPORTED = (typeof(Worker) !== "undefined");

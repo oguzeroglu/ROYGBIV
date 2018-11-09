@@ -59,6 +59,9 @@ window.onload = function() {
   // AREA CONFIGURATIONS HANDLER
   areaConfigurationsHandler = new AreaConfigurationsHandler();
 
+  // RAYCASTER
+  rayCaster = new RayCaster();
+
   // DAT GUI LIGHTS
   datGuiLights = new dat.GUI();
   lightNameController = datGuiLights.add(lightsParameters, "Light").listen();
@@ -334,68 +337,40 @@ window.onload = function() {
     omGUIFocused = false;
     lightsGUIFocused = false;
     if (windowLoaded){
-       var rect = renderer.domElement.getBoundingClientRect();
-       mouse.x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
-       mouse.y = - ((event.clientY - rect.top) / rect.height) * 2 + 1;
-       raycaster.setFromCamera( mouse, camera );
-       var intersects;
-       intersects = raycaster.intersectObjects(scene.children, true);
-       var newIntersects = [];
-       for (var i = 0; i<intersects.length; i++){
-         var obj = intersects[i].object;
-         if (!(obj instanceof THREE.Box3Helper)){
-           if (!keyboardBuffer["shift"]){
-             newIntersects.push(intersects[i]);
-           }else{
-             if (obj.gridSystemName){
-               newIntersects.push(intersects[i]);
-             }
-           }
+      intersectionPoint = 0, intersectionObject = 0;
+       rayCaster.findIntersections(event);
+       if (intersectionPoint){
+         var object = addedObjects[intersectionObject];
+         if (!object){
+           object = objectGroups[intersectionObject];
          }
-       }
-       intersects = newIntersects;
-       if (intersects.length > 0){
-         var object = intersects[0].object;
-         if (object.addedObject || object.objectGroupName){
+         if (!object){
+           object = gridSystems[intersectionObject];
+         }
+         if (object instanceof AddedObject || object instanceof ObjectGroup){
            terminal.clear();
-           var point = intersects[0].point;
+           var point = intersectionPoint;
            var coordStr = " ("+point.x.toFixed(2)+", "+point.y.toFixed(2)+", "+point.z.toFixed(2)+")";
-           if (object.addedObject){
-             var faceName = object.addedObject.getFaceNameFromNormal(intersects[0].face.normal);
-             //coordStr += " [face: "+faceName+"]";
+           if (object instanceof AddedObject){
              terminal.printInfo(Text.CLICKED_ON.replace(
-               Text.PARAM1, object.addedObject.name + coordStr
+               Text.PARAM1, object.name + coordStr
              ));
-             selectedAddedObject = object.addedObject;
+             selectedAddedObject = object;
              objectSelectedByCommand = false;
              selectedObjectGroup = 0;
              afterObjectSelection();
-           }else if (object.objectGroupName){
-             var faceName = objectGroups[object.objectGroupName].getFaceNameFromNormal(intersects[0].face.normal);
-             //coordStr += " [face: "+faceName+"]";
+           }else if (object instanceof ObjectGroup){
              terminal.printInfo(Text.CLICKED_ON.replace(
-               Text.PARAM1, object.objectGroupName+coordStr
+               Text.PARAM1, object.name+coordStr
              ));
-             selectedObjectGroup = objectGroups[object.objectGroupName];
+             selectedObjectGroup = object;
              objectSelectedByCommand = false;
              selectedAddedObject = 0;
              afterObjectSelection();
            }
-         }else if (object.isPointLightRepresentation){
-           selectedAddedObject = 0;
-           selectedObjectGroup = 0;
-           var lightName = object.lightName;
-           if (lightName){
-             selectedLightName = lightName;
-             terminal.clear();
-             terminal.printInfo(Text.SELECTED_LIGHT.replace(
-               Text.PARAM1, lightName
-             ));
-           }
-           afterObjectSelection();
-         }else if (object.gridSystemName){
-           var gridSystem = gridSystems[object.gridSystemName];
-           var point = intersects[0].point;
+         } else if (object instanceof GridSystem){
+           var gridSystem = object;
+           var point = intersectionPoint;
            var selectedGrid = gridSystem.getGridFromPoint(point);
            if (selectedGrid.sliced && !selectedGrid.slicedGridSystemName){
              selectedGrid.sliced = false;
@@ -405,12 +380,8 @@ window.onload = function() {
                if (selectedGrid.destroyedAddedObject && !(keyboardBuffer["shift"])){
                  var addedObject = addedObjects[selectedGrid.destroyedAddedObject];
                  terminal.clear();
-                 var point = intersects[0].point;
+                 var point = intersectionPoint;
                  var coordStr = " ("+point.x.toFixed(2)+", "+point.y.toFixed(2)+", "+point.z.toFixed(2)+")";
-                 if (intersects[0].face){
-                   var faceName = addedObject.getFaceNameFromNormal(intersects[0].face.normal);
-                   //coordStr += " [face: "+faceName+"]";
-                 }
                  terminal.printInfo(Text.CLICKED_ON.replace(
                    Text.PARAM1, addedObject.name+coordStr
                  ));
@@ -421,12 +392,8 @@ window.onload = function() {
                }else if (selectedGrid.destroyedObjectGroup && !(keyboardBuffer["shift"])){
                  var objectGroup = objectGroups[selectedGrid.destroyedObjectGroup];
                  terminal.clear();
-                 var point = intersects[0].point;
+                 var point = intersectionPoint;
                  var coordStr = " ("+point.x.toFixed(2)+", "+point.y.toFixed(2)+", "+point.z.toFixed(2)+")";
-                 if (intersects[0].face && intersects[0].face.normal){
-                    var faceName = objectGroup.getFaceNameFromNormal(intersects[0].face.normal);
-                    //coordStr += " [face: "+faceName+"]";
-                 }
                  terminal.printInfo(Text.CLICKED_ON.replace(
                    Text.PARAM1, objectGroup.name+coordStr
                  ));
@@ -436,76 +403,7 @@ window.onload = function() {
                }else{
                  selectedGrid.toggleSelect(false, true);
               }
-            }else if (object.forDebugPurposes){
-              if (intersects[1]){
-                var object2 = intersects[1].object;
-                if (object2.addedObject){
-                  terminal.clear();
-                  var point = intersects[1].point;
-                  var coordStr = " ("+point.x.toFixed(2)+", "+point.y.toFixed(2)+", "+point.z.toFixed(2)+")";
-                  var faceName = object2.addedObject.getFaceNameFromNormal(intersects[1].face.normal);
-                  //coordStr += " [face: "+faceName+"]";
-                  terminal.printInfo(Text.CLICKED_ON.replace(
-                    Text.PARAM1, object2.addedObject.name+coordStr
-                  ));
-                  selectedAddedObject = object2.addedObject;
-                  selectedObjectGroup = 0;
-                  objectSelectedByCommand = false;
-                  afterObjectSelection();
-                }
-              }
-            }else{
-               var i = 1;
-               var recursiveName = selectedGrid.slicedGridSystemName;
-               var found = false;
-               while (intersects[i] && !found){
-                 gridSystem = gridSystems[recursiveName];
-                 point = intersects[i].point;
-                 selectedGrid = gridSystem.getGridFromPoint(point);
-                 if (selectedGrid){
-                   if (!selectedGrid.sliced){
-                     if (selectedGrid.destroyedAddedObject && !(keyboardBuffer["shift"])){
-                       var addedObject = addedObjects[selectedGrid.destroyedAddedObject];
-                       terminal.clear();
-                       var point = intersects[0].point;
-                       var coordStr = " ("+point.x.toFixed(2)+", "+point.y.toFixed(2)+", "+point.z.toFixed(2)+")";
-                       if (intersects[i].face){
-                         var faceName = addedObject.getFaceNameFromNormal(intersects[i].face.normal);
-                         //coordStr += " [face: "+faceName+"]";
-                       }
-                       terminal.printInfo(Text.CLICKED_ON.replace(
-                         Text.PARAM1, addedObject.name+coordStr
-                       ));
-                       objectSelectedByCommand = false;
-                       selectedAddedObject = addedObject;
-                       selectedObjectGroup = 0;
-                       afterObjectSelection();
-                     }else if (selectedGrid.destroyedObjectGroup){
-                       var objectGroup = objectGroups[selectedGrid.destroyedObjectGroup];
-                       terminal.clear();
-                       var point = intersects[0].point;
-                       var coordStr = " ("+point.x.toFixed(2)+", "+point.y.toFixed(2)+", "+point.z.toFixed(2)+")";
-                       if (intersects[0].face && intersects[i].face.normal){
-                          var faceName = objectGroup.getFaceNameFromNormal(intersects[i].face.normal);
-                          //coordStr += " [face: "+faceName+"]";
-                       }
-                       terminal.printInfo(Text.CLICKED_ON.replace(
-                         Text.PARAM1, objectGroup.name+coordStr
-                       ));
-                       selectedAddedObject = 0;
-                       selectedObjectGroup = objectGroup;
-                       afterObjectSelection();
-                     }else{
-                       selectedGrid.toggleSelect(false, true);
-                     }
-                     found = true;
-                   }else{
-                     recursiveName = selectedGrid.slicedGridSystemName;
-                     i++;
-                   }
-                 }
-               }
-             }
+            }
            }
          }
        }else{

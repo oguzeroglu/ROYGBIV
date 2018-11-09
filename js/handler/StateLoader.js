@@ -8,6 +8,8 @@ var StateLoader = function(stateObj){
 StateLoader.prototype.load = function(undo){
   try{
 
+    projectLoaded = false;
+
     if (undo){
       this.resetProject(true);
     }else{
@@ -957,6 +959,7 @@ StateLoader.prototype.load = function(undo){
 
     return true;
   }catch (err){
+    projectLoaded = true;
     throw err;
     this.reason = err;
     return false;
@@ -1027,11 +1030,12 @@ StateLoader.prototype.createObjectGroupsAfterLoadedTextures = function(){
 
   }
 
+  projectLoaded = true;
+  rayCaster.refresh();
   canvas.style.visibility = "";
   terminal.enable();
   terminal.clear();
   terminal.printInfo(Text.PROJECT_LOADED);
-
 }
 
 StateLoader.prototype.mapTextureToSingleObject = function(diff, exported){
@@ -2139,6 +2143,7 @@ StateLoader.prototype.resetProject = function(undo){
   markedPoints = new Object();
   areas = new Object();
   areaBinHandler = new WorldBinHandler(true);
+  rayCaster = new RayCaster();
   areaBinHandler.isAreaBinHandler = true;
   manualDisplacementQueue = new Object();
   anchorGrid = 0;
