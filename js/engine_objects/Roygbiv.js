@@ -117,7 +117,9 @@ var Roygbiv = function(){
     "emissiveIntensity",
     "startObjectTrail",
     "stopObjectTrail",
-    "setObjectVelocity"
+    "setObjectVelocity",
+    "setClickListener",
+    "removeClickListener"
   ];
 
   this.globals = new Object();
@@ -6193,6 +6195,49 @@ Roygbiv.prototype.removeExpireListener = function(sourceObject){
     return;
   }
   delete sourceObject.expirationFunction;
+}
+
+// setClickListener
+// Sets a click listener for an object or an object group. The callbackFunction is executed
+// with x, y, z coordinates of the clicked point.
+Roygbiv.prototype.setClickListener = function(sourceObject, callbackFunction){
+  if (mode == 0){
+    return;
+  }
+  if (sourceObject == UNDEFINED){
+    throw new Error("setClickListener error: sourceObject is not defined.");
+    return;
+  }
+  if (callbackFunction == UNDEFINED){
+    throw new Error("setClickListener error: callbackFunction is not defined.");
+    return;
+  }
+  if (!(sourceObject instanceof AddedObject) && !(sourceObject instanceof ObjectGroup)){
+    throw new Error("setClickListener error: Type not supported.");
+    return;
+  }
+  if (!(callbackFunction instanceof Function)){
+    throw new Error("setClickListener error: callbackFunction is not a function.");
+    return;
+  }
+  sourceObject.clickCallbackFunction = callbackFunction;
+}
+
+// removeClickListener
+// Removes the click listener of an object or an object group.
+Roygbiv.prototype.removeClickListener = function(sourceObject){
+  if (mode == 0){
+    return;
+  }
+  if (sourceObject == UNDEFINED){
+    throw new Error("removeClickListener error: sourceObject is not defined.");
+    return;
+  }
+  if (!(sourceObject instanceof AddedObject) && !(sourceObject instanceof ObjectGroup)){
+    throw new Error("removeClickListener error: Type not supported.");
+    return;
+  }
+  delete sourceObject.clickCallbackFunction;
 }
 
 // UTILITY FUNCTIONS ***********************************************************

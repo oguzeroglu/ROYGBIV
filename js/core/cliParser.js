@@ -475,6 +475,8 @@ function parse(input){
 
               object.loadState();
 
+              delete object.clickCallbackFunction;
+
               if (!(typeof object.originalMass == "undefined")){
                 object.setMass(object.originalMass);
                 if (object.originalMass == 0){
@@ -491,6 +493,8 @@ function parse(input){
             }
             for (var objectName in addedObjects){
               var object = addedObjects[objectName];
+
+              delete object.clickCallbackFunction;
 
               if (object.texturePackSetWithScript){
                 object.texturePackSetWithScript = false;

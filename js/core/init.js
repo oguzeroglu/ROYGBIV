@@ -359,6 +359,9 @@ window.onload = function() {
              objectSelectedByCommand = false;
              selectedObjectGroup = 0;
              afterObjectSelection();
+             if (object.clickCallbackFunction){
+               object.clickCallbackFunction(point.x, point.y, point.z);
+             }
            }else if (object instanceof ObjectGroup){
              terminal.printInfo(Text.CLICKED_ON.replace(
                Text.PARAM1, object.name+coordStr
@@ -367,6 +370,9 @@ window.onload = function() {
              objectSelectedByCommand = false;
              selectedAddedObject = 0;
              afterObjectSelection();
+             if (object.clickCallbackFunction){
+               object.clickCallbackFunction(point.x, point.y, point.z);
+             }
            }
          } else if (object instanceof GridSystem){
            var gridSystem = object;
@@ -389,6 +395,9 @@ window.onload = function() {
                  selectedObjectGroup = 0;
                  objectSelectedByCommand = false;
                  afterObjectSelection();
+                 if (addedObject.clickCallbackFunction){
+                   addedObject.clickCallbackFunction(point.x, point.y, point.z);
+                 }
                }else if (selectedGrid.destroyedObjectGroup && !(keyboardBuffer["shift"])){
                  var objectGroup = objectGroups[selectedGrid.destroyedObjectGroup];
                  terminal.clear();
@@ -400,6 +409,9 @@ window.onload = function() {
                  selectedAddedObject = 0;
                  selectedObjectGroup = objectGroup;
                  afterObjectSelection();
+                 if (objectGroup.clickCallbackFunction){
+                   objectGroup.clickCallbackFunction(point.x, point.y, point.z);
+                 }
                }else{
                  selectedGrid.toggleSelect(false, true);
               }
