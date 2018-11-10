@@ -823,10 +823,18 @@ ParticleSystem.prototype.handleCollisions = function(fromWorker){
   var results;
   var pseudoPosition;
   if (this.collisionTimeOffset == 0){
-    results = worldBinHandler.query(this.mesh.position);
+    if (fromWorker){
+      results = worldBinHandler.query(this.mesh.position);
+    }else{
+      results = rayCaster.binHandler.query(this.mesh.position);
+    }
   }else{
     pseudoPosition = this.calculatePseudoPosition(fromWorker);
-    results = worldBinHandler.query(pseudoPosition);
+    if (fromWorker){
+      results = worldBinHandler.query(pseudoPosition);
+    }else{
+      results = rayCaster.binHandler.query(pseudoPosition);
+    }
   }
   if (this.positionHistoryCounter == 0){
     var end = this.positionLine.end;

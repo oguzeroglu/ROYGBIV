@@ -16,9 +16,6 @@ function render(){
       updateDynamicObjects();
     }
     runScripts();
-    if (worldBinHandler){
-      updateWorldBinHandler();
-    }
     updateRaycaster();
     updateParticleSystems();
     updateObjectTrails();
@@ -86,10 +83,6 @@ function handleWorkerMessages(){
 
 function updateRaycaster(){
   rayCaster.binHandler.update();
-}
-
-function updateWorldBinHandler(){
-  worldBinHandler.update();
 }
 
 function updateParticleSystems(){

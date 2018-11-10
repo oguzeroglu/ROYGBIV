@@ -723,15 +723,11 @@ Roygbiv.prototype.hide = function(object){
       });
       object.isHidden = true;
       rayCaster.binHandler.hide(object);
-      if (worldBinHandler){
-        worldBinHandler.hide(object);
-      }else{
-        if (isCollisionWorkerEnabled()){
-          workerHandler.notifyBinHide(object);
-        }
-        if (isPSCollisionWorkerEnabled()){
-          workerHandler.notifyBinHide(object, true);
-        }
+      if (isCollisionWorkerEnabled()){
+        workerHandler.notifyBinHide(object);
+      }
+      if (isPSCollisionWorkerEnabled()){
+        workerHandler.notifyBinHide(object, true);
       }
     }
   }else if (object instanceof ObjectGroup){
@@ -745,15 +741,11 @@ Roygbiv.prototype.hide = function(object){
       });
       object.isHidden = true;
       rayCaster.binHandler.hide(object);
-      if (worldBinHandler){
-        worldBinHandler.hide(object);
-      }else{
-        if (isCollisionWorkerEnabled()){
-          workerHandler.notifyBinHide(object);
-        }
-        if (isPSCollisionWorkerEnabled()){
-          workerHandler.notifyBinHide(object, true);
-        }
+      if (isCollisionWorkerEnabled()){
+        workerHandler.notifyBinHide(object);
+      }
+      if (isPSCollisionWorkerEnabled()){
+        workerHandler.notifyBinHide(object, true);
       }
     }
   }else{
@@ -788,15 +780,11 @@ Roygbiv.prototype.show = function(object){
       });
       object.isHidden = false;
       rayCaster.binHandler.show(object);
-      if (worldBinHandler){
-        worldBinHandler.show(object);
-      }else{
-        if (isCollisionWorkerEnabled()){
-          workerHandler.notifyBinShow(object);
-        }
-        if (isPSCollisionWorkerEnabled()){
-          workerHandler.notifyBinShow(object, true);
-        }
+      if (isCollisionWorkerEnabled()){
+        workerHandler.notifyBinShow(object);
+      }
+      if (isPSCollisionWorkerEnabled()){
+        workerHandler.notifyBinShow(object, true);
       }
     }
   }else if (object instanceof ObjectGroup){
@@ -810,15 +798,11 @@ Roygbiv.prototype.show = function(object){
       });
       object.isHidden = false;
       rayCaster.binHandler.show(object);
-      if (worldBinHandler){
-        worldBinHandler.show(object);
-      }else{
-        if (isCollisionWorkerEnabled()){
-          workerHandler.notifyBinShow(object);
-        }
-        if (isPSCollisionWorkerEnabled()){
-          workerHandler.notifyBinShow(object, true);
-        }
+      if (isCollisionWorkerEnabled()){
+        workerHandler.notifyBinShow(object);
+      }
+      if (isPSCollisionWorkerEnabled()){
+        workerHandler.notifyBinShow(object, true);
       }
     }
   }else{
@@ -921,15 +905,11 @@ Roygbiv.prototype.rotate = function(object, axis, radians){
   if (isPhysicsWorkerEnabled() && !(object instanceof ParticleSystem)){
     workerHandler.syncPhysics(object);
   }
-  if (isObject && worldBinHandler){
-    worldBinHandler.updateObject(object);
-  }else if (isObject){
-    if (isCollisionWorkerEnabled()){
-      workerHandler.updateObject(object);
-    }
-    if (isPSCollisionWorkerEnabled()){
-      workerHandler.updateObject(object, true);
-    }
+  if (isCollisionWorkerEnabled()){
+    workerHandler.updateObject(object);
+  }
+  if (isPSCollisionWorkerEnabled()){
+    workerHandler.updateObject(object, true);
   }
 }
 
@@ -989,7 +969,7 @@ Roygbiv.prototype.rotateAroundXYZ = function(object, x, y, z, radians, axis){
     }
     mesh = object.mesh;
   }else if (object instanceof ObjectGroup){
-    mesh = object.graphicsGroup;
+    mesh = object.mesh;
   }else if (object.isPointLight){
     mesh = object;
   }else{
@@ -1008,32 +988,26 @@ Roygbiv.prototype.rotateAroundXYZ = function(object, x, y, z, radians, axis){
     if (isPhysicsWorkerEnabled()){
       workerHandler.syncPhysics(object);
     }
-    if (worldBinHandler){
-      worldBinHandler.updateObject(object);
-    }else{
-      if (isCollisionWorkerEnabled()){
-        workerHandler.updateObject(object);
-      }
-      if (isPSCollisionWorkerEnabled()){
-        workerHandler.updateObject(object, true);
-      }
+    if (isCollisionWorkerEnabled()){
+      workerHandler.updateObject(object);
     }
+    if (isPSCollisionWorkerEnabled()){
+      workerHandler.updateObject(object, true);
+    }
+    rayCaster.updateObject(object);
   }else if (object instanceof ObjectGroup){
     object.physicsBody.quaternion.copy(mesh.quaternion);
     object.physicsBody.position.copy(mesh.position);
     if (isPhysicsWorkerEnabled()){
       workerHandler.syncPhysics(object);
     }
-    if (worldBinHandler){
-      worldBinHandler.updateObject(object);
-    }else{
-      if (isCollisionWorkerEnabled()){
-        workerHandler.updateObject(object);
-      }
-      if (isPSCollisionWorkerEnabled()){
-        workerHandler.updateObject(object, true);
-      }
+    if (isCollisionWorkerEnabled()){
+      workerHandler.updateObject(object);
     }
+    if (isPSCollisionWorkerEnabled()){
+      workerHandler.updateObject(object, true);
+    }
+    rayCaster.updateObject(object);
   }
 }
 
@@ -1082,36 +1056,31 @@ Roygbiv.prototype.setPosition = function(obj, x, y, z){
     if (isPhysicsWorkerEnabled()){
       workerHandler.syncPhysics(obj);
     }
-    if (worldBinHandler){
-      worldBinHandler.updateObject(obj);
-    }else{
-      if (isCollisionWorkerEnabled()){
-        workerHandler.updateObject(obj);
-      }
-      if (isPSCollisionWorkerEnabled()){
-        workerHandler.updateObject(obj, true);
-      }
+    if (isCollisionWorkerEnabled()){
+      workerHandler.updateObject(obj);
     }
+    if (isPSCollisionWorkerEnabled()){
+      workerHandler.updateObject(obj, true);
+    }
+    rayCaster.updateObject(obj);
   }else if (obj instanceof ObjectGroup){
     if (obj.isHidden){
       throw new Error("setPosition error: Object is not visible.");
       return;
     }
+    obj.mesh.position.set(x, y, z);
     obj.graphicsGroup.position.set(x, y, z);
     obj.physicsBody.position.set(x, y, z);
     if (isPhysicsWorkerEnabled()){
       workerHandler.syncPhysics(obj);
     }
-    if (worldBinHandler){
-      worldBinHandler.updateObject(obj);
-    }else{
-      if (isCollisionWorkerEnabled()){
-        workerHandler.updateObject(obj);
-      }
-      if (isPSCollisionWorkerEnabled()){
-        workerHandler.updateObject(obj, true);
-      }
+    if (isCollisionWorkerEnabled()){
+      workerHandler.updateObject(obj);
     }
+    if (isPSCollisionWorkerEnabled()){
+      workerHandler.updateObject(obj, true);
+    }
+    rayCaster.updateObject(obj);
   }else if (obj.isPointLight){
     obj.position.set(x, y, z);
   }else{
@@ -1235,30 +1204,22 @@ Roygbiv.prototype.translate = function(object, axis, amount){
     if (isPhysicsWorkerEnabled()){
       workerHandler.syncPhysics(object);
     }
-    if (worldBinHandler){
-      worldBinHandler.updateObject(object);
-    }else{
-      if (isCollisionWorkerEnabled()){
-        workerHandler.updateObject(object);
-      }
-      if (isPSCollisionWorkerEnabled()){
-        workerHandler.updateObject(object, true);
-      }
+    if (isCollisionWorkerEnabled()){
+      workerHandler.updateObject(object);
+    }
+    if (isPSCollisionWorkerEnabled()){
+      workerHandler.updateObject(object, true);
     }
   }else if (object instanceof ObjectGroup){
     object.translate(axis, amount, true);
     if (isPhysicsWorkerEnabled()){
       workerHandler.syncPhysics(object);
     }
-    if (worldBinHandler){
-      worldBinHandler.updateObject(object);
-    }else{
-      if (isCollisionWorkerEnabled()){
-        workerHandler.updateObject(object);
-      }
-      if (isPSCollisionWorkerEnabled()){
-        workerHandler.updateObject(object, true);
-      }
+    if (isCollisionWorkerEnabled()){
+      workerHandler.updateObject(object);
+    }
+    if (isPSCollisionWorkerEnabled()){
+      workerHandler.updateObject(object, true);
     }
   }else if (object.isPointLight){
     if (axis.toLowerCase() == "x"){

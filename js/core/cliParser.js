@@ -401,12 +401,6 @@ function parse(input){
               }
             }
 
-            if (!isCollisionWorkerEnabled() || !isPSCollisionWorkerEnabled()){
-              worldBinHandler = new WorldBinHandler();
-            }else{
-              worldBinHandler = 0;
-            }
-
             if (fogActive){
               GLOBAL_FOG_UNIFORM.value.set(fogDensity, fogColorRGB.r, fogColorRGB.g, fogColorRGB.b);
             }else{

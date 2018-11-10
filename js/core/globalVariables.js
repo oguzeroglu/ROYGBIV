@@ -821,7 +821,6 @@ var cameraOperationsDone = false;
 var LIMIT_BOUNDING_BOX = new THREE.Box3(new THREE.Vector3(-4000, -4000, -4000), new THREE.Vector3(4000, 4000, 4000));
 var DEFAULT_OBJECT_OCTREE_SEGMENTS = 2;
 var DEFAULT_OCTREE_MAX_DEPTH = 8;
-var worldBinHandler;
 var BIN_SIZE = 50;
 var INTERSECTION_NORMAL = new THREE.Vector3();
 var MAX_PARTICLE_SYSTEM_COUNT = 1000; // MUST BE DIVISIBLE BY 10

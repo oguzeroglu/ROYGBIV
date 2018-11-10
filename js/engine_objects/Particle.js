@@ -234,7 +234,12 @@ Particle.prototype.handleCollisions = function(fromWorker){
   if (rIndex < 0){
     rIndex = PARTICLE_POSITION_HISTORY_SIZE - 1;
   }
-  var results = worldBinHandler.query(this.positionHistoryArray[rIndex]);
+  var results;
+  if (fromWorker){
+    results = worldBinHandler.query(this.positionHistoryArray[rIndex]);
+  }else{
+    results = rayCaster.binHandler.query(this.positionHistoryArray[rIndex]);
+  }
   for (var objName in results){
     var result = results[objName];
     if (result == 5){
