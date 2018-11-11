@@ -226,6 +226,20 @@ AddedObject.prototype.export = function(){
   return exportObject;
 }
 
+AddedObject.prototype.forceColor = function(r, g, b, a){
+  if (a < 0){
+    a = 0;
+  }
+  if (a > 1){
+    a = 1;
+  }
+  this.mesh.material.uniforms.forcedColor.value.set(a, r, g, b);
+}
+
+AddedObject.prototype.resetColor = function(){
+  this.mesh.material.uniforms.forcedColor.value.set(-50, 0, 0, 0);
+}
+
 AddedObject.prototype.applyAreaConfiguration = function(areaName){
   if (this.areaVisibilityConfigurations){
     var configurations = this.areaVisibilityConfigurations[areaName];

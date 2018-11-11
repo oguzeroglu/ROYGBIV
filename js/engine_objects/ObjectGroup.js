@@ -26,6 +26,24 @@ var ObjectGroup = function(name, group){
 
 }
 
+ObjectGroup.prototype.forceColor = function(r, g, b, a){
+  if (a < 0){
+    a = 0;
+  }
+  if (a > 1){
+    a = 1;
+  }
+  this.mesh.material.uniforms.forcedColor.value.set(a, r, g, b);
+  if (a < 1){
+    this.mesh.material.transparent = true;
+  }
+}
+
+ObjectGroup.prototype.resetColor = function(){
+  this.mesh.material.uniforms.forcedColor.value.set(-50, 0, 0, 0);
+  this.mesh.material.transparent = this.isTransparent;
+}
+
 ObjectGroup.prototype.applyAreaConfiguration = function(areaName){
   if (this.areaVisibilityConfigurations){
     var configurations = this.areaVisibilityConfigurations[areaName];

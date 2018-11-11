@@ -1,4 +1,4 @@
-var Area = function(name, boundingBox, color){
+var Area = function(name, boundingBox, color, gridSize){
   this.name = name;
   this.boundingBox = boundingBox;
   this.color = color;
@@ -7,6 +7,7 @@ var Area = function(name, boundingBox, color){
   this.object3D = new THREE.Object3D();
   this.object3D.position.copy(this.center);
   this.vector2D = this.get2DVector();
+  this.gridSize = gridSize;
 }
 
 Area.prototype.export = function(){
@@ -19,6 +20,7 @@ Area.prototype.export = function(){
   exportObject.bbMaxY = this.boundingBox.max.y;
   exportObject.bbMaxZ = this.boundingBox.max.z;
   exportObject.color = this.color;
+  exportObject.gridSize = this.gridSize;
   return exportObject;
 }
 

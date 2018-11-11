@@ -13,6 +13,7 @@ varying float hasAOFlag;
 varying float hasEmissiveFlag;
 
 uniform vec4 fogInfo;
+uniform vec4 forcedColor;
 uniform mat3 textureMatrix;
 uniform sampler2D diffuseMap;
 uniform sampler2D alphaMap;
@@ -23,6 +24,11 @@ uniform float emissiveIntensity;
 
 
 void main(){
+
+  if (forcedColor.x >= -10.0){
+    gl_FragColor = vec4(forcedColor.y, forcedColor.z, forcedColor.w, forcedColor.x);
+    return;
+  }
 
   vec2 transformedUV = vUV;
 

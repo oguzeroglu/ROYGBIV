@@ -17509,12 +17509,22 @@
 			}
 
 			if (object.addedObject){
-				if (object.addedObject.mesh.material.uniforms.alpha.value == 1){
-					opaque.push(renderItem);
-					object.addedObject.listedAsOpaque = true;
+				if (object.addedObject.mesh.material.uniforms.forcedColor.value.x == -50){
+					if (object.addedObject.mesh.material.uniforms.alpha.value == 1){
+						opaque.push(renderItem);
+						object.addedObject.listedAsOpaque = true;
+					}else{
+						transparent.push(renderItem);
+						object.addedObject.listedAsOpaque = false;
+					}
 				}else{
-					transparent.push(renderItem);
-					object.addedObject.listedAsOpaque = false;
+					if (object.addedObject.mesh.material.uniforms.forcedColor.value.x == 1){
+						opaque.push(renderItem);
+						object.addedObject.listedAsOpaque = true;
+					}else{
+						transparent.push(renderItem);
+						object.addedObject.listedAsOpaque = false;
+					}
 				}
 			}else{
 				( material.transparent === true ? transparent : opaque ).push( renderItem );

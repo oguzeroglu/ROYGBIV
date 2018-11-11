@@ -801,6 +801,7 @@ var REUSABLE_VECTOR = new THREE.Vector3();
 var REUSABLE_VECTOR_2 = new THREE.Vector3();
 var REUSABLE_VECTOR_3 = new THREE.Vector3();
 var REUSABLE_VECTOR_4 = new THREE.Vector3();
+var REUSABLE_VECTOR_5 = new THREE.Vector3();
 var REUSABLE_2_VECTOR = new THREE.Vector2();
 var REUSABLE_CANNON_VECTOR = new CANNON.Vec3();
 var REUSABLE_CANNON_VECTOR_2 = new CANNON.Vec3();
@@ -883,6 +884,7 @@ var rayCaster;
 var intersectionPoint = 0;
 var intersectionObject = 0;
 var projectLoaded = true;
+var stopAreaConfigurationsHandler = false;
 
 // WORKER VARIABLES
 var WORKERS_SUPPORTED = (typeof(Worker) !== "undefined");

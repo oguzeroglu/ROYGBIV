@@ -4,7 +4,9 @@ function render(){
 
   processKeyboardBuffer();
   handleSkybox();
-  areaConfigurationsHandler.handle();
+  if (!stopAreaConfigurationsHandler){
+    areaConfigurationsHandler.handle();
+  }
 
   if (physicsDebugMode){
     debugRenderer.update();

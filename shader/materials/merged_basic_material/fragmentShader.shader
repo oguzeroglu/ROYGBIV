@@ -9,6 +9,7 @@ uniform sampler2D emissiveMap;
 uniform sampler2D alphaMap;
 uniform sampler2D aoMap;
 uniform vec4 fogInfo;
+uniform vec4 forcedColor;
 
 varying float vEmissiveIntensity;
 varying float vAOIntensity;
@@ -22,6 +23,11 @@ varying float hasAlphaMap;
 varying float hasAOMap;
 
 void main(){
+
+  if (forcedColor.x >= -10.0){
+    gl_FragColor = vec4(forcedColor.y, forcedColor.z, forcedColor.w, forcedColor.x);
+    return;
+  }
 
   vec4 diffuseColor = vec4(1.0, 1.0, 1.0, 1.0);
 

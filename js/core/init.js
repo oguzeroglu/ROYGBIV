@@ -337,8 +337,12 @@ window.onload = function() {
     omGUIFocused = false;
     lightsGUIFocused = false;
     if (windowLoaded){
-      intersectionPoint = 0, intersectionObject = 0;
-       rayCaster.findIntersections(event);
+      var rect = renderer.domElement.getBoundingClientRect();
+      var coordX = ((event.clientX - rect.left) / rect.width) * 2 - 1;
+      var coordY = - ((event.clientY - rect.top) / rect.height) * 2 + 1;
+      REUSABLE_VECTOR.setFromMatrixPosition(camera.matrixWorld);
+      REUSABLE_VECTOR_2.set(coordX, coordY, 0.5).unproject(camera).sub(REUSABLE_VECTOR).normalize();
+       rayCaster.findIntersections(REUSABLE_VECTOR, REUSABLE_VECTOR_2, (mode == 0));
        if (intersectionPoint){
          var object = addedObjects[intersectionObject];
          if (!object){

@@ -4293,6 +4293,7 @@ function parse(input){
           }
           var selections = [];
           var gs;
+          var gridSize;
           for (var gridName in gridSelections){
             if (typeof gs == UNDEFINED){
               gs = gridSelections[gridName].parentName;
@@ -4303,9 +4304,14 @@ function parse(input){
               }
             }
             selections.push(gridSelections[gridName]);
+            gridSize = gridSelections[gridName].size;
           }
           if (selections.length == 0 || selections.length > 2){
             terminal.printError(Text.MUST_HAVE_1_OR_2_GRIDS_SELECTED);
+            return true;
+          }
+          if (height % gridSize != 0){
+            terminal.printError(Text.AREA_HEIGHT_MUST_BE_DIVISABLE);
             return true;
           }
           var result = gridSystems[gs].newArea(areaName, height, selections);

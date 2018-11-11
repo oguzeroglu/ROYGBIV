@@ -135,3 +135,65 @@ AreaConfigurationsHandler.prototype.addSubFolder = function(areaName, folder){
     }.bind({object: objectGroups[objName], areaName: areaName}));
   }
 }
+
+AreaConfigurationsHandler.prototype.sphericalDistribution = function(radius){
+  REUSABLE_VECTOR.set(
+    Math.random() - 0.5,
+    Math.random() - 0.5,
+    Math.random() - 0.5
+  );
+  REUSABLE_VECTOR.normalize();
+  REUSABLE_VECTOR.multiplyScalar(radius);
+  return REUSABLE_VECTOR;
+}
+
+AreaConfigurationsHandler.prototype.getRandomPointInsideArea = function(area){
+  var x = Math.random() * (area.boundingBox.max.x - area.boundingBox.min.x) + area.boundingBox.min.x;
+  var y = Math.random() * (area.boundingBox.max.y - area.boundingBox.min.y) + area.boundingBox.min.y;
+  var z = Math.random() * (area.boundingBox.max.z - area.boundingBox.min.z) + area.boundingBox.min.z;
+  REUSABLE_VECTOR.set(x, y, z);
+  return REUSABLE_VECTOR;
+}
+
+AreaConfigurationsHandler.prototype.autoConfigureArea = function(areaName){
+  var area = areas[areaName];
+  for (var objName in addedObjects){
+    addedObjects[objName].setVisibilityInArea(areaName, false);
+    if (!addedObjects[objName].defaultSide){
+      addedObjects[objName].setSideInArea(areaName, SIDE_BOTH);
+    }else{
+      addedObjects[objName].setSideInArea(areaName, addedObjects[objName].defaultSide);
+    }
+  }
+  for (var objName in objectGroups){
+    objectGroups[objName].setVisibilityInArea(areaName, false);
+    if (!objectGroups[objName].defaultSide){
+      objectGroups[objName].setSideInArea(areaName, SIDE_BOTH);
+    }else{
+      objectGroups[objName].setSideInArea(areaName, objectGroups[objName].defaultSide);
+    }
+  }
+  var visibleObjects = new Object();
+  for (var i2 = 0; i2<200; i2++){
+    var pointInsideArea = this.getRandomPointInsideArea(area);
+    REUSABLE_VECTOR_5.set(pointInsideArea.x, pointInsideArea.y, pointInsideArea.z);
+    for (var i = 0; i<200; i++){
+      var vec = this.sphericalDistribution(1);
+      REUSABLE_VECTOR_4.set(vec.x , vec.y, vec.z);
+      rayCaster.findIntersections(REUSABLE_VECTOR_5, REUSABLE_VECTOR_4, false);
+      if (intersectionPoint){
+        visibleObjects[intersectionObject] = true;
+      }
+    }
+  }
+  delete this.currentArea;
+  for (var objName in visibleObjects){
+    var obj = addedObjects[objName];
+    if (!obj){
+      obj = objectGroups[objName];
+    }
+    if (obj){
+      obj.setVisibilityInArea(areaName, true);
+    }
+  }
+}

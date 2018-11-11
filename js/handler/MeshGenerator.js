@@ -124,7 +124,8 @@ MeshGenerator.prototype.generateInstancedMesh = function(graphicsGroup, objectGr
       aoMap: this.getTextureUniform(aoTexture),
       displacementMap: this.getTextureUniform(displacementTexture),
       textureMatrix: new THREE.Uniform(textureMatrix),
-      fogInfo: GLOBAL_FOG_UNIFORM
+      fogInfo: GLOBAL_FOG_UNIFORM,
+      forcedColor: new THREE.Uniform(new THREE.Vector4(-50, 0, 0, 0))
     }
   });
   var mesh = new THREE.Mesh(this.geometry, material);
@@ -183,7 +184,8 @@ MeshGenerator.prototype.generateMergedMesh = function(graphicsGroup, objectGroup
       aoMap: this.getTextureUniform(aoTexture),
       displacementMap: this.getTextureUniform(displacementTexture),
       textureMatrix: new THREE.Uniform(textureMatrix),
-      fogInfo: GLOBAL_FOG_UNIFORM
+      fogInfo: GLOBAL_FOG_UNIFORM,
+      forcedColor: new THREE.Uniform(new THREE.Vector4(-50, 0, 0, 0))
     }
   });
   var mesh = new THREE.Mesh(this.geometry, material);
@@ -227,7 +229,8 @@ MeshGenerator.prototype.generateBasicMesh = function(){
       aoMap: this.getTextureUniform(nullTexture),
       displacementMap: this.getTextureUniform(nullTexture),
       emissiveMap: this.getTextureUniform(nullTexture),
-      textureMatrix: new THREE.Uniform(new THREE.Matrix3())
+      textureMatrix: new THREE.Uniform(new THREE.Matrix3()),
+      forcedColor: new THREE.Uniform(new THREE.Vector4(-50, 0, 0, 0))
     }
   });
   var mesh = new THREE.Mesh(this.geometry, material);

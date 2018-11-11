@@ -830,7 +830,8 @@ StateLoader.prototype.load = function(undo){
           new THREE.Vector3(curAreaExport.bbMinX, curAreaExport.bbMinY, curAreaExport.bbMinZ),
           new THREE.Vector3(curAreaExport.bbMaxX, curAreaExport.bbMaxY, curAreaExport.bbMaxZ)
         ),
-        curAreaExport.color
+        curAreaExport.color,
+        curAreaExport.gridSize
       );
       areaBinHandler.insert(areas[areaName].boundingBox, areaName);
       if (areasVisible){
@@ -2154,6 +2155,7 @@ StateLoader.prototype.resetProject = function(undo){
   alphaUniformCache = new Object();
   aoIntensityUniformCache = new Object();
   screenResolution = 1;
+  stopAreaConfigurationsHandler = false;
 
   // FOG
   fogActive = false;
