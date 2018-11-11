@@ -4310,10 +4310,6 @@ function parse(input){
             terminal.printError(Text.MUST_HAVE_1_OR_2_GRIDS_SELECTED);
             return true;
           }
-          if (height % gridSize != 0){
-            terminal.printError(Text.AREA_HEIGHT_MUST_BE_DIVISABLE);
-            return true;
-          }
           var result = gridSystems[gs].newArea(areaName, height, selections);
           terminal.printInfo(Text.AREA_CREATED);
           if (areaConfigurationsVisible){
