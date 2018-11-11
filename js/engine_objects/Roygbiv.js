@@ -119,7 +119,9 @@ var Roygbiv = function(){
     "stopObjectTrail",
     "setObjectVelocity",
     "setClickListener",
-    "removeClickListener"
+    "removeClickListener",
+    "setObjectColor",
+    "resetObjectColor"
   ];
 
   this.globals = new Object();
@@ -1615,6 +1617,53 @@ Roygbiv.prototype.setObjectVelocity = function(object, velocityVector){
   if (isPhysicsWorkerEnabled()){
     workerHandler.notifyPhysicsVelocity(object);
   }
+}
+
+// setObjectColor
+// Modifies the color and alpha value of an object or an object group.
+Roygbiv.prototype.setObjectColor = function(object, colorName, alpha){
+  if (mode == 0){
+    return;
+  }
+  if (typeof object == UNDEFINED){
+    throw new Error("setObjectColor error: object is not defined.");
+    return;
+  }
+  if (!(object instanceof AddedObject) && !(object instanceof ObjectGroup)){
+    throw new Error("setObjectColor error: Type not supported.");
+    return;
+  }
+  if (typeof colorName == UNDEFINED){
+    throw new Error("setObjectColor error: colorName is not defined.");
+    return;
+  }
+  if (typeof alpha == UNDEFINED){
+    alpha = 1;
+  }else{
+    if (isNaN(alpha)){
+      throw new Error("setObjectColor error: alpha is not a number.");
+      return;
+    }
+  }
+  REUSABLE_COLOR.set(colorName);
+  object.forceColor(REUSABLE_COLOR.r, REUSABLE_COLOR.g, REUSABLE_COLOR.b, alpha);
+}
+
+// resetObjectColor
+// Resets the color and alpha value of an object or an object group.
+Roygbiv.prototype.resetObjectColor = function(object){
+  if (mode == 0){
+    return;
+  }
+  if (typeof object == UNDEFINED){
+    throw new Error("resetObjectColor error: object is not defined.");
+    return;
+  }
+  if (!(object instanceof AddedObject) && !(object instanceof ObjectGroup)){
+    throw new Error("resetObjectColor error: Type not supported.");
+    return;
+  }
+  object.resetColor();
 }
 
 // PARTICLE SYSTEM FUNCTIONS ***************************************************

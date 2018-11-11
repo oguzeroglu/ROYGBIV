@@ -474,6 +474,7 @@ function parse(input){
               var object = objectGroups[objectName];
 
               object.loadState();
+              object.resetColor();
 
               delete object.clickCallbackFunction;
 
@@ -495,6 +496,8 @@ function parse(input){
               var object = addedObjects[objectName];
 
               delete object.clickCallbackFunction;
+
+              object.resetColor();
 
               if (object.texturePackSetWithScript){
                 object.texturePackSetWithScript = false;
