@@ -143,7 +143,9 @@ var commandArgumentsExpectedCount = [
     1, //setResolution
     1, //configureArea
     4, //newAreaConfiguration
-    1 //autoConfigureArea
+    1, //autoConfigureArea
+    0, //stopAreaConfigurations
+    0 //startAreaConfigurations
 ];
 var commandArgumentsExpectedExplanation = [
   "help", //help
@@ -283,7 +285,9 @@ var commandArgumentsExpectedExplanation = [
   "setResolution resolution", //setResolution
   "configureArea areaName", //configureArea
   "newAreaConfiguration areaName objectName isVisible sides", //newAreaConfiguration
-  "autoConfigureArea areaName" //autoConfigureArea
+  "autoConfigureArea areaName", //autoConfigureArea
+  "stopAreaConfigurations", //stopAreaConfigurations
+  "startAreaConfigurations" //startAreaConfigurations
 ];
 var commands = [
   "help",
@@ -423,7 +427,9 @@ var commands = [
   "setResolution",
   "configureArea",
   "newAreaConfiguration",
-  "autoConfigureArea"
+  "autoConfigureArea",
+  "stopAreaConfigurations",
+  "startAreaConfigurations"
 ];
 var commandInfo = [
   "help: Prints command list.",
@@ -563,7 +569,9 @@ var commandInfo = [
   "setResolution: Sets the screen resolution.",
   "configureArea: Shows the area configuration window for a certain area.",
   "newAreaConfiguration: Creates a new area configuration for an area and object.",
-  "autoConfigureArea: Automatically configures an area using ray tests. Manual corrections may be necesary after using this command."
+  "autoConfigureArea: Automatically configures an area using ray tests. Manual corrections may be necesary after using this command.",
+  "stopAreaConfigurations: Stops area configurations handling.",
+  "startAreaConfigurations: Starts area configurations handling."
 ];
 var keyboardInfo = [
   "W/S : Translates the camera on axis Z.",
