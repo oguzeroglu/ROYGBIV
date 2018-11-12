@@ -604,6 +604,11 @@ var CommandDescriptor = function(){
   this.newAreaConfiguration.types.push(this.BOOLEAN); // isVisible
   this.newAreaConfiguration.types.push(this.RENDER_SIDE); // sides
 
+  // autoConfigureArea
+  this.autoConfigureArea = new Object();
+  this.autoConfigureArea.types = [];
+  this.autoConfigureArea.types.push(this.AREA_NAME); // areaName
+
 };
 
 CommandDescriptor.prototype.test = function(){

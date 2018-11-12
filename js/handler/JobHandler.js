@@ -8,6 +8,8 @@ JobHandler.prototype.handle = function(previewModeCommand){
     return;
   }
   jobHandlerWorking = true;
+  jobHandlerInternalCounter = 0;
+  jobHandlerInternalMaxExecutionCount = 0;
   try{
     if (this.splitted[0] == "newSurface"){
       this.handleNewSurfaceCommand();
@@ -93,11 +95,43 @@ JobHandler.prototype.handle = function(previewModeCommand){
       this.handleSelectAllGridsCommand();
     }else if (this.splitted[0] == "newAreaConfiguration"){
       this.handleNewAreaConfigurationCommand();
+    }else if (this.splitted[0] == "autoConfigureArea"){
+      this.handleAutoConfigureAreaCommand();
     }
   }catch (err){
     console.error(err);
   }
-  jobHandlerWorking = false;
+  // because async
+  if (this.splitted[0] != "autoConfigureArea"){
+    jobHandlerWorking = false;
+  }
+}
+
+JobHandler.prototype.handleAutoConfigureAreaCommand = function(){
+  var areaNamePrefix = this.splitted[1].split("*")[0];
+  var areaCount = 0;
+  terminal.printInfo(Text.CONFIGURING_AREAS);
+  canvas.style.visibility = "hidden";
+  terminal.disable();
+  setTimeout(function(){
+    for (var areaName in areas){
+      if (areaName.startsWith(areaNamePrefix)){
+        areaCount ++;
+      }
+    }
+    jobHandlerInternalMaxExecutionCount = areaCount;
+    for (var areaName in areas){
+      if (areaName.startsWith(areaNamePrefix)){
+        parseCommand(
+          "autoConfigureArea "+areaName
+        );
+      }
+    }
+    if (areaCount == 0){
+      jobHandlerWorking = false;
+      terminal.printError(Text.NO_AREAS_FOUND);
+    }
+  });
 }
 
 JobHandler.prototype.handleNewAreaConfigurationCommand = function(){

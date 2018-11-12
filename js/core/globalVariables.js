@@ -142,7 +142,8 @@ var commandArgumentsExpectedCount = [
     1, //areaConfigurations
     1, //setResolution
     1, //configureArea
-    4 //newAreaConfiguration
+    4, //newAreaConfiguration
+    1 //autoConfigureArea
 ];
 var commandArgumentsExpectedExplanation = [
   "help", //help
@@ -281,7 +282,8 @@ var commandArgumentsExpectedExplanation = [
   "areaConfigurations show/hide", //areaConfigurations
   "setResolution resolution", //setResolution
   "configureArea areaName", //configureArea
-  "newAreaConfiguration areaName objectName isVisible sides" //newAreaConfiguration
+  "newAreaConfiguration areaName objectName isVisible sides", //newAreaConfiguration
+  "autoConfigureArea areaName" //autoConfigureArea
 ];
 var commands = [
   "help",
@@ -420,7 +422,8 @@ var commands = [
   "areaConfigurations",
   "setResolution",
   "configureArea",
-  "newAreaConfiguration"
+  "newAreaConfiguration",
+  "autoConfigureArea"
 ];
 var commandInfo = [
   "help: Prints command list.",
@@ -559,7 +562,8 @@ var commandInfo = [
   "areaConfigurations: Show/hides the area configuration window.",
   "setResolution: Sets the screen resolution.",
   "configureArea: Shows the area configuration window for a certain area.",
-  "newAreaConfiguration: Creates a new area configuration for an area and object."
+  "newAreaConfiguration: Creates a new area configuration for an area and object.",
+  "autoConfigureArea: Automatically configures an area using ray tests. Manual corrections may be necesary after using this command."
 ];
 var keyboardInfo = [
   "W/S : Translates the camera on axis Z.",
@@ -885,6 +889,8 @@ var intersectionPoint = 0;
 var intersectionObject = 0;
 var projectLoaded = true;
 var stopAreaConfigurationsHandler = false;
+var jobHandlerInternalCounter = 0;
+var jobHandlerInternalMaxExecutionCount = 0;
 
 // WORKER VARIABLES
 var WORKERS_SUPPORTED = (typeof(Worker) !== "undefined");

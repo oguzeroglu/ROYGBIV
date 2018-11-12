@@ -38,15 +38,8 @@ RayCaster.prototype.findIntersections = function(from, direction, intersectGridS
           if (!(mode == 0 && keyboardBuffer["shift"])){
             intersectionPoint = obj.intersectsLine(REUSABLE_LINE);
             if (intersectionPoint){
-              var objVector = (REUSABLE_VECTOR_3.set(0, 0, 1)).applyQuaternion(obj.mesh.quaternion);
-              var isFront = false;
-              if (objVector.angleTo(this.origin) > Math.PI/2){
-                isFront = true;
-              }
-              if (!(isFront && obj.mesh.material.side == THREE.BackSide)){
-                intersectionObject = objName;
-                return;
-              }
+              intersectionObject = objName;
+              return;
             }
           }
         }
@@ -72,15 +65,8 @@ RayCaster.prototype.findIntersections = function(from, direction, intersectGridS
               if (obj){
                 intersectionPoint = obj.intersectsLine(REUSABLE_LINE);
                 if (intersectionPoint){
-                  var objVector = (REUSABLE_VECTOR_3.set(0, 0, 1)).applyQuaternion(obj.mesh.quaternion);
-                  var isFront = false;
-                  if (objVector.angleTo(this.origin) > Math.PI/2){
-                    isFront = true;
-                  }
-                  if (!(isFront && parent.mesh.material.side == THREE.BackSide)){
-                    intersectionObject = objName;
-                    return;
-                  }
+                  intersectionObject = objName;
+                  return;
                 }
               }
             }

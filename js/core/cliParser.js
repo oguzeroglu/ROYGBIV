@@ -4506,6 +4506,45 @@ function parse(input){
           }
           return true;
         break;
+        case 137: //autoConfigureArea
+          if (mode != 0){
+            terminal.printError(Text.WORKS_ONLY_IN_DESIGN_MODE);
+            return true;
+          }
+          var areaName = splitted[1];
+          if (areaName.indexOf("*") != -1){
+            new JobHandler(splitted).handle();
+            return true;
+          }
+          if (!areas[areaName]){
+            terminal.printError(Text.NO_SUCH_AREA);
+            return true;
+          }
+          if (!jobHandlerWorking){
+            terminal.printInfo(Text.CONFIGURING_AREA);
+            canvas.style.visibility = "hidden";
+            terminal.disable();
+          }
+          setTimeout(function(){
+            areaConfigurationsHandler.autoConfigureArea(areaName);
+            if (!jobHandlerWorking){
+              canvas.style.visibility = "";
+              terminal.enable();
+              terminal.clear();
+              terminal.printInfo(Text.AREA_CONFIGURED);
+            }else{
+              jobHandlerInternalCounter ++;
+              if (jobHandlerInternalCounter == jobHandlerInternalMaxExecutionCount){
+                canvas.style.visibility = "";
+                terminal.enable();
+                terminal.clear();
+                terminal.printInfo(Text.AREAS_CONFIGURED);
+                jobHandlerWorking = false;
+              }
+            }
+          })
+          return true;
+        break;
       }
       return true;
     }catch(err){
