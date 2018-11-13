@@ -4567,7 +4567,7 @@ function parse(input){
             stopAreaConfigurationsHandler = false;
             terminal.printInfo(Text.AREA_CONFIGURATIONS_ARE_STARTED);
           }else{
-            terminal.printError(Text.AREA_CONFIGURATIONS_ARE_ALREAYDY_STARTED);
+            terminal.printError(Text.AREA_CONFIGURATIONS_ARE_ALREADY_STARTED);
           }
           return true;
         break;
