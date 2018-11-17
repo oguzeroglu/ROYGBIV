@@ -417,6 +417,8 @@ function parse(input){
               LOG_FRAME_DROP_ON = false;
             }
             screenClickCallbackFunction = 0;
+            screenMouseDownCallbackFunction = 0;
+            screenMouseUpCallbackFunction = 0;
             for (var gsName in gridSystems){
               scene.add(gridSystems[gsName].gridSystemRepresentation);
               scene.add(gridSystems[gsName].boundingPlane);

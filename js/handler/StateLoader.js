@@ -2153,6 +2153,8 @@ StateLoader.prototype.resetProject = function(undo){
   screenResolution = 1;
   stopAreaConfigurationsHandler = false;
   screenClickCallbackFunction = 0;
+  screenMouseDownCallbackFunction = 0;
+  screenMouseUpCallbackFunction = 0;
 
   // FOG
   fogActive = false;
