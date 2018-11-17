@@ -17,6 +17,8 @@ var ParticleSystem = function(copyPS, name, particles, x, y, z, vx, vy, vz, ax, 
 
   this.vx = vx, this.vy = vy, this.vz = vz, this.ax = ax, this.ay = ay, this.az = az;
 
+  var textureMerged = 0;
+
   var texturesObj = new Object();
   var textureCount = 0;
   var mergedTextureHash = "";
@@ -32,11 +34,10 @@ var ParticleSystem = function(copyPS, name, particles, x, y, z, vx, vy, vz, ax, 
   this.texturesObj = texturesObj;
 
   if (textureCount > 0 && !mergedTextureCache[mergedTextureHash]){
-    var textureMerger = new TextureMerger(texturesObj);
-    this.textureMerger = textureMerger;
+    textureMerger = new TextureMerger(texturesObj);
     mergedTextureCache[mergedTextureHash] = textureMerger;
   }else if (textureCount > 0 && mergedTextureCache[mergedTextureHash]){
-    this.textureMerger = mergedTextureCache[mergedTextureHash];
+    textureMerger = mergedTextureCache[mergedTextureHash];
   }
 
   this.performanceCounter1 = 0;
@@ -164,7 +165,7 @@ var ParticleSystem = function(copyPS, name, particles, x, y, z, vx, vy, vz, ax, 
       this.expiredFlags[i] = 0;
       if (particle.material.texture){
         this.flags2[i6++] = 10;
-        var range = this.textureMerger.ranges[particle.material.texture];
+        var range = textureMerger.ranges[particle.material.texture];
         this.uvCoordinates[i10++] = range.startU;
         this.uvCoordinates[i10++] = range.startV;
         this.uvCoordinates[i10++] = range.endU;
@@ -354,10 +355,10 @@ var ParticleSystem = function(copyPS, name, particles, x, y, z, vx, vy, vz, ax, 
   }
 
   var texture;
-  if (this.textureMerger){
-    texture = this.textureMerger.mergedTexture;
+  if (textureMerger){
+    texture = textureMerger.mergedTexture;
   }else{
-    texture = new THREE.Texture();
+    texture = nullTexture;
   }
 
   var fogInfo;

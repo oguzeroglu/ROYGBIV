@@ -1730,6 +1730,10 @@ Roygbiv.prototype.createParticleMaterial = function(configurations){
       throw new Error("createParticleMaterial error: Texture not ready.");
       return;
     }
+    if (texture instanceof THREE.CompressedTexture){
+      throw new Error("createParticleMaterial error: Compressed textures are not supported for particle systems.");
+      return;
+    }
   }
   if (!(typeof rgbFilter == UNDEFINED)){
     if (isNaN(rgbFilter.x) || isNaN(rgbFilter.y) || isNaN(rgbFilter.z)){

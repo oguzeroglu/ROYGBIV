@@ -444,7 +444,7 @@ window.onload = function() {
   GLOBAL_PROJECTION_UNIFORM.value = camera.projectionMatrix;
   GLOBAL_VIEW_UNIFORM.value = camera.matrixWorldInverse;
   renderer = new THREE.WebGLRenderer({canvas: canvas});
-  renderer.setSize( window.innerWidth, window.innerHeight );
+  renderer.setSize(window.innerWidth, window.innerHeight);
   initPhysics();
   initBadTV();
   render();

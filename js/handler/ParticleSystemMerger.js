@@ -27,12 +27,13 @@ var ParticleSystemMerger = function(psObj, name){
     }
   }
 
+  var textureMerger = 0;
+
   if (textureCount > 0 && !(mergedTextureCache[textureMergerHash])){
-    var textureMerger = new TextureMerger(texturesObj);
-    this.textureMerger = textureMerger;
+    textureMerger = new TextureMerger(texturesObj);
     mergedTextureCache[textureMergerHash] = textureMerger;
   }else if (textureCount > 0 && mergedTextureCache[textureMergerHash]){
-    this.textureMerger = mergedTextureCache[textureMergerHash];
+    textureMerger = mergedTextureCache[textureMergerHash];
   }
 
   var mvMatrixArray = [];
@@ -96,12 +97,13 @@ var ParticleSystemMerger = function(psObj, name){
       this.mergedIndices[ctr] = index;
       ctr ++;
       if (particle.material.texture){
-        var range = this.textureMerger.ranges[particle.material.texture];
+        var range = textureMerger.ranges[particle.material.texture];
         this.uvCoordinates[uvCounter++] = range.startU;
         this.uvCoordinates[uvCounter++] = range.startV;
         this.uvCoordinates[uvCounter++] = range.endU;
         this.uvCoordinates[uvCounter++] = range.endV;
       }else{
+        this.uvCoordinates[uvCounter++] = -10;
         this.uvCoordinates[uvCounter++] = -10;
         this.uvCoordinates[uvCounter++] = -10;
         this.uvCoordinates[uvCounter++] = -10;
@@ -118,10 +120,10 @@ var ParticleSystemMerger = function(psObj, name){
 
 
   var texture;
-  if (this.textureMerger){
-    texture = this.textureMerger.mergedTexture;
+  if (textureMerger){
+    texture = textureMerger.mergedTexture;
   }else{
-    texture = new THREE.Texture();
+    texture = nullTexture;
   }
 
   this.mergedIndicesBufferAttribute = new THREE.BufferAttribute(this.mergedIndices, 1);
