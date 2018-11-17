@@ -808,7 +808,7 @@ ParticleSystem.prototype.handleCollisions = function(fromWorker){
         continue;
       }
       if (intersectionPoint){
-        var collisionInfo = new CollisionInfo(
+        var collisionInfo = reusableCollisionInfo.set(
           objName, intersectionPoint.x, intersectionPoint.y, intersectionPoint.z,
           0, obj.mesh.quaternion.x, obj.mesh.quaternion.y, obj.mesh.quaternion.z,
           obj.mesh.quaternion.w, INTERSECTION_NORMAL, this.tick
@@ -840,8 +840,8 @@ ParticleSystem.prototype.handleCollisions = function(fromWorker){
         if (intersectionPoint){
           var collisionInfo = reusableCollisionInfo.set(
             objName, intersectionPoint.x, intersectionPoint.y, intersectionPoint.z,
-            0, parent.graphicsGroup.quaternion.x, parent.graphicsGroup.quaternion.y,
-            parent.graphicsGroup.quaternion.z, parent.graphicsGroup.quaternion.w,
+            0, parent.mesh.quaternion.x, parent.mesh.quaternion.y,
+            parent.mesh.quaternion.z, parent.mesh.quaternion.w,
             INTERSECTION_NORMAL, this.tick
           );
           this.fireCollisionCallback(collisionInfo);

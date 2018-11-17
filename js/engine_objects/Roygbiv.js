@@ -123,7 +123,11 @@ var Roygbiv = function(){
     "setObjectColor",
     "resetObjectColor",
     "setScreenClickListener",
-    "removeScreenClickListener"
+    "removeScreenClickListener",
+    "setScreenMouseDownListener",
+    "removeScreenMouseDownListener",
+    "setScreenMouseUpListener",
+    "removeScreenMouseUpListener"
   ];
 
   this.globals = new Object();
@@ -6167,6 +6171,58 @@ Roygbiv.prototype.removeScreenClickListener = function(){
     return;
   }
   screenClickCallbackFunction = 0;
+}
+
+// setScreenMouseDownListener
+// Sets a mouse down listener for screen.
+Roygbiv.prototype.setScreenMouseDownListener = function(callbackFunction){
+  if (mode == 0){
+    return;
+  }
+  if (typeof callbackFunction == UNDEFINED){
+    throw new Error("setScreenMouseDownListener error: callbackFunction is not defined.");
+    return;
+  }
+  if (!(callbackFunction instanceof Function)){
+    throw new Error("setScreenMouseDownListener error: callbackFunction is not a function.");
+    return;
+  }
+  screenMouseDownCallbackFunction = callbackFunction;
+}
+
+// removeScreenMouseDownListener
+// Removes the mouse down listener of screen.
+Roygbiv.prototype.removeScreenMouseDownListener = function(){
+  if (mode == 0){
+    return;
+  }
+  screenMouseDownCallbackFunction = 0;
+}
+
+// setScreenMouseUpListener
+// Sets mouse up listener for screen.
+Roygbiv.prototype.setScreenMouseUpListener = function(callbackFunction){
+  if (mode == 0){
+    return;
+  }
+  if (typeof callbackFunction == UNDEFINED){
+    throw new Error("setScreenMouseUpListener error: callbackFunction is not defined.");
+    return;
+  }
+  if (!(callbackFunction instanceof Function)){
+    throw new Error("setScreenMouseUpListener error: callbackFunction is not a function.");
+    return;
+  }
+  screenMouseUpCallbackFunction = callbackFunction;
+}
+
+// removeScreenMouseUpListener
+// Removes mouse up listener for screen.
+Roygbiv.prototype.removeScreenMouseUpListener = function(){
+  if (mode == 0){
+    return;
+  }
+  screenMouseUpCallbackFunction = 0;
 }
 
 // UTILITY FUNCTIONS ***********************************************************

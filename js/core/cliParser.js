@@ -416,6 +416,7 @@ function parse(input){
               console.log("[*] Frame-drop recording process stopped.");
               LOG_FRAME_DROP_ON = false;
             }
+            screenClickCallbackFunction = 0;
             for (var gsName in gridSystems){
               scene.add(gridSystems[gsName].gridSystemRepresentation);
               scene.add(gridSystems[gsName].boundingPlane);

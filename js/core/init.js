@@ -436,6 +436,23 @@ window.onload = function() {
     }
   });
 
+  canvas.addEventListener("mousedown", function(event){
+    if (mode == 1 && screenMouseDownCallbackFunction){
+      var rect = renderer.domElement.getBoundingClientRect();
+      var coordX = ((event.clientX - rect.left) / rect.width) * 2 - 1;
+      var coordY = - ((event.clientY - rect.top) / rect.height) * 2 + 1;
+      screenMouseDownCallbackFunction(coordX, coordY);
+    }
+  });
+  canvas.addEventListener("mouseup", function(event){
+    if (mode == 1 && screenMouseUpCallbackFunction){
+      var rect = renderer.domElement.getBoundingClientRect();
+      var coordX = ((event.clientX - rect.left) / rect.width) * 2 - 1;
+      var coordY = - ((event.clientY - rect.top) / rect.height) * 2 + 1;
+      screenMouseUpCallbackFunction(coordX, coordY);
+    }
+  });
+
   // INITIALIZE THREE.JS SCENE AND RENDERER
   scene = new THREE.Scene();
   debugRenderer = new THREE.CannonDebugRenderer(scene, physicsWorld);
