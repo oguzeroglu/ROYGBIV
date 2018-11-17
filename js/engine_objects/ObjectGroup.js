@@ -409,9 +409,7 @@ ObjectGroup.prototype.mergeInstanced = function(){
 
 ObjectGroup.prototype.merge = function(){
 
-  if (!this.textureMerger){
-    this.handleTextures();
-  }
+  this.handleTextures();
 
   if (this.areGeometriesIdentical()){
     this.mergeInstanced();
