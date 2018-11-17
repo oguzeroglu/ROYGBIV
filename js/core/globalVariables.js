@@ -909,7 +909,6 @@ var PS_COLLISION_WORKER_PATH = "/js/worker/psCollisionWorker.js";
 var PHYSICS_WORKER_ENABLED = true;
 var COLLISION_WORKER_ENABLED = true;
 var PS_COLLISION_WORKER_ENABLED = true;
-var workerHandler;
 
 // TEXT POOL
 var Text = new Text();

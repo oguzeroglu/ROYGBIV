@@ -2041,7 +2041,7 @@ AddedObject.prototype.setFriction = function(val){
         contactEquationStiffness: 1e8,
         contactEquationRelaxation: 3
       });
-      physicsBody.addContactMaterial(contact);
+      physicsWorld.addContactMaterial(contact);
     }
   }
 }

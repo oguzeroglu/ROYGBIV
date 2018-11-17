@@ -823,15 +823,18 @@ window.addEventListener('keyup', function(event){
  }
 
 function isPhysicsWorkerEnabled(){
-  return (WORKERS_SUPPORTED && PHYSICS_WORKER_ENABLED);
+  return false;
+  //return (WORKERS_SUPPORTED && PHYSICS_WORKER_ENABLED);
 }
 
 function isCollisionWorkerEnabled(){
-  return (WORKERS_SUPPORTED && COLLISION_WORKER_ENABLED);
+  return false;
+  //return (WORKERS_SUPPORTED && COLLISION_WORKER_ENABLED);
 }
 
 function isPSCollisionWorkerEnabled(){
-  return (WORKERS_SUPPORTED && PS_COLLISION_WORKER_ENABLED);
+  return false;
+  //return (WORKERS_SUPPORTED && PS_COLLISION_WORKER_ENABLED);
 }
 
 function disableController(controller, noOpacityAdjustment){

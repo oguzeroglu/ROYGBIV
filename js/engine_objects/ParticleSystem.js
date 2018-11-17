@@ -401,14 +401,6 @@ var ParticleSystem = function(copyPS, name, particles, x, y, z, vx, vy, vz, ax, 
 
   scene.add(this.mesh);
   particleSystemPool[name] = this;
-  if (isCollisionWorkerEnabled()){
-      this.assignCollisionWorkerIndex();
-      if (this.checkForCollisionBuffer){
-        for (var particleUUID in this.checkForCollisionBuffer){
-          workerHandler.notifyParticleCollisionListenerSet(this.checkForCollisionBuffer[particleUUID]);
-        }
-      }
-  }
 
 }
 
@@ -445,18 +437,6 @@ ParticleSystem.prototype.generateNewPSInfo = function(){
          this.vx+","+this.vy+","+this.vz+","+this.ax+","+this.ay+","+this.az;
 }
 
-ParticleSystem.prototype.assignCollisionWorkerIndex = function(){
-  for (var index in workerHandler.availablePSIndices){
-    this.collisionWorkerIndex = parseInt(index);
-    delete workerHandler.availablePSIndices[index];
-    workerHandler.notifyNewParticleSystem(this);
-    return;
-  }
-  this.collisionWorkerIndex = workerHandler.currentPSIndex;
-  workerHandler.currentPSIndex += 17;
-  workerHandler.notifyNewParticleSystem(this);
-}
-
 ParticleSystem.prototype.notifyParticleCollisionCallbackChange = function(particle){
   if (particle.checkForCollisions){
     this.particlesWithCollisionCallbacks.set(particle.uuid, particle);
@@ -473,19 +453,10 @@ ParticleSystem.prototype.destroy = function(){
     this.mesh = 0;
     this.particles = 0;
     this.destroyed = true;
-    if (isCollisionWorkerEnabled()){
-      workerHandler.notifyParticleSystemRemoval(this.collisionWorkerIndex);
-    }
     if (particleSystemCollisionCallbackRequests[this.name]){
       TOTAL_PARTICLE_SYSTEM_COLLISION_LISTEN_COUNT --;
     }
     delete particleSystemCollisionCallbackRequests[this.name];
-    if (isPSCollisionWorkerEnabled()){
-      workerHandler.psIndexPool[this.psCollisionWorkerIndex] = true;
-      if (this.checkForCollisions){
-        workerHandler.notifyPSDeletion(this.psCollisionWorkerIndex);
-      }
-    }
     this.checkForCollisions = false;
     if (this.psPool){
       particleSystemPools[this.psPool].remove(this);
@@ -503,10 +474,6 @@ ParticleSystem.prototype.stop = function(newLifetime){
   this.acceleration.x = 0;
   this.acceleration.y = 0;
   this.acceleration.z = 0;
-  if (this.checkForCollisions && isPSCollisionWorkerEnabled()){
-    workerHandler.notifyPSDeletion(this.psCollisionWorkerIndex);
-    TOTAL_PARTICLE_SYSTEM_COLLISION_LISTEN_COUNT --;
-  }
   this.originalCheckForCollisions = this.checkForCollisions;
   this.checkForCollisions = false;
   if (!this.psMerger){
@@ -520,11 +487,7 @@ ParticleSystem.prototype.stop = function(newLifetime){
   this.stoppedX = this.mesh.position.x;
   this.stoppedY = this.mesh.position.y;
   this.stoppedZ = this.mesh.position.z;
-  if (isCollisionWorkerEnabled() && !(typeof this.collisionWorkerIndex == UNDEFINED)){
-    if (this.particlesWithCollisionCallbacks.size > 0){
-      workerHandler.notifyParticleSystemStop(this, newLifetime, this.tick);
-    }
-  }else if(!isCollisionWorkerEnabled()){
+  if(!isCollisionWorkerEnabled()){
     this.particlesWithCollisionCallbacks.forEach(this.particleIterationStopFunc);
   }
 }
@@ -560,9 +523,6 @@ ParticleSystem.prototype.removeParticle = function(particle){
   selectedGeometry.attributes.expiredFlag.needsUpdate = true;
   particle.isExpired = true;
   if (particle.uuid){
-    if (isCollisionWorkerEnabled()){
-      workerHandler.notifyParticleCollisionListenerRemove(particle);
-    }
     this.particlesWithCollisionCallbacks.delete(particle.uuid);
   }
 }
@@ -582,9 +542,6 @@ ParticleSystem.prototype.rewindParticle = function(particle, delay){
   particle.startDelay = this.tick + delay;
   selectedGeometry.attributes.flags2.array[sIndex] = particle.startDelay;
   selectedGeometry.attributes.flags2.needsUpdate = true;
-  if (isCollisionWorkerEnabled()){
-    workerHandler.notifyParticleStartDelayChange(particle);
-  }
 }
 
 ParticleSystem.prototype.calculatePseudoPosition = function(fromWorker){
@@ -730,14 +687,6 @@ ParticleSystem.prototype.update = function(){
     this.gpuMotionUpdateBuffer = [];
   }
 
-  if (isCollisionWorkerEnabled() && this.mesh && this.mesh.visible && workerHandler.particleSystemsArray.canParticleSet){
-    var cwOffset = this.collisionWorkerIndex;
-    workerHandler.particleSystemsArray[cwOffset] = this.tick;
-    for (var i = 0; i<16; i++){
-      workerHandler.particleSystemsArray[i + cwOffset + 1] = this.mesh.matrixWorld.elements[i];
-    }
-  }
-
   if (this.tick >= this.lifetime && this.lifetime > 0){
     if (this.expirationFunction){
       this.expirationFunction(this.name);
@@ -749,9 +698,6 @@ ParticleSystem.prototype.update = function(){
       this.psMerger.notifyPSVisibilityChange(this, false);
     }
     this.mesh.visible = false;
-    if (this.checkForCollisions && isPSCollisionWorkerEnabled()){
-      workerHandler.notifyPSDeletion(this.psCollisionWorkerIndex);
-    }
     if (!(typeof this.psPool == UNDEFINED)){
       particleSystemPools[this.psPool].notifyPSAvailable(this);
     }
@@ -760,11 +706,6 @@ ParticleSystem.prototype.update = function(){
   if (this.checkForCollisions && !isPSCollisionWorkerEnabled() && this.mesh && this.mesh.visible){
     this.handleCollisions();
   }
-
-  if (isPSCollisionWorkerEnabled() && workerHandler.psTickArray && workerHandler.psTickArray.canPSSet){
-    workerHandler.psTickArray[this.psCollisionWorkerIndex] = this.tick;
-  }
-
 }
 
 ParticleSystem.prototype.particleIterationCollisionFunc = function(value){

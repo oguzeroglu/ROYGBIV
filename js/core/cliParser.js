@@ -394,13 +394,6 @@ function parse(input){
               }
             }
 
-            if (isPhysicsWorkerEnabled() || isCollisionWorkerEnabled() || isPSCollisionWorkerEnabled()){
-              workerHandler = new WorkerHandler();
-              if (isPhysicsWorkerEnabled()){
-                workerHandler.startPhysicsWorkerIteration();
-              }
-            }
-
             if (fogActive){
               GLOBAL_FOG_UNIFORM.value.set(fogDensity, fogColorRGB.r, fogColorRGB.g, fogColorRGB.b);
             }else{
@@ -565,16 +558,6 @@ function parse(input){
               scripts[scriptName].runAutomatically = newScripts[scriptName].runAutomatically;
             }
             newScripts = undefined;
-            if (isPhysicsWorkerEnabled()){
-              workerHandler.stopPhysicsWorkerIteration();
-            }
-            if (isCollisionWorkerEnabled()){
-              workerHandler.stopBinHandlerLoop();
-            }
-            if (isPSCollisionWorkerEnabled()){
-              workerHandler.stopBinHandlerLoop(true);
-            }
-
             GLOBAL_FOG_UNIFORM.value.set(-100.0, 0, 0, 0);
 
           }

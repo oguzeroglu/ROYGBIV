@@ -721,36 +721,18 @@ Roygbiv.prototype.hide = function(object){
       // physics iteration.
       setTimeout(function(){
         physicsWorld.removeBody(object.physicsBody);
-        if (isPhysicsWorkerEnabled()){
-          workerHandler.hideObjectPhysics(object.physicsBody.id);
-        }
       });
       object.isHidden = true;
       rayCaster.binHandler.hide(object);
-      if (isCollisionWorkerEnabled()){
-        workerHandler.notifyBinHide(object);
-      }
-      if (isPSCollisionWorkerEnabled()){
-        workerHandler.notifyBinHide(object, true);
-      }
     }
   }else if (object instanceof ObjectGroup){
     if (object.isVisibleOnThePreviewScene()){
       object.mesh.visible = false;
       setTimeout(function(){
         physicsWorld.removeBody(object.physicsBody);
-        if (isPhysicsWorkerEnabled()){
-          workerHandler.hideObjectPhysics(object.physicsBody.id);
-        }
       });
       object.isHidden = true;
       rayCaster.binHandler.hide(object);
-      if (isCollisionWorkerEnabled()){
-        workerHandler.notifyBinHide(object);
-      }
-      if (isPSCollisionWorkerEnabled()){
-        workerHandler.notifyBinHide(object, true);
-      }
     }
   }else{
     throw new Error("hide error: Unsupported type.");
@@ -778,36 +760,18 @@ Roygbiv.prototype.show = function(object){
       object.mesh.visible = true;
       setTimeout(function(){
         physicsWorld.addBody(object.physicsBody);
-        if (isPhysicsWorkerEnabled()){
-          workerHandler.showObjectPhysics(object.physicsBody.id);
-        }
       });
       object.isHidden = false;
       rayCaster.binHandler.show(object);
-      if (isCollisionWorkerEnabled()){
-        workerHandler.notifyBinShow(object);
-      }
-      if (isPSCollisionWorkerEnabled()){
-        workerHandler.notifyBinShow(object, true);
-      }
     }
   }else if (object instanceof ObjectGroup){
     if (!object.isVisibleOnThePreviewScene()){
       object.mesh.visible = true;
       setTimeout(function(){
         physicsWorld.addBody(object.physicsBody);
-        if (isPhysicsWorkerEnabled()){
-          workerHandler.showObjectPhysics(object.physicsBody.id);
-        }
       });
       object.isHidden = false;
       rayCaster.binHandler.show(object);
-      if (isCollisionWorkerEnabled()){
-        workerHandler.notifyBinShow(object);
-      }
-      if (isPSCollisionWorkerEnabled()){
-        workerHandler.notifyBinShow(object, true);
-      }
     }
   }else{
     throw new Error("show error: Unsupported type.");
@@ -844,9 +808,7 @@ Roygbiv.prototype.applyForce = function(object, force, point){
   if (typeof point.x == UNDEFINED || typeof point.y == UNDEFINED || typeof point.z == UNDEFINED){
     throw new Error("applyForce error: point is not a vector.");
   }
-  if (isPhysicsWorkerEnabled()){
-    workerHandler.applyForceToObject(object, force, point);
-  }else{
+  if (!isPhysicsWorkerEnabled()){
     REUSABLE_CANNON_VECTOR.set(force.x, force.y, force.z);
     REUSABLE_CANNON_VECTOR_2.set(point.x, point.y, point.z);
     object.physicsBody.applyImpulse(
@@ -906,15 +868,6 @@ Roygbiv.prototype.rotate = function(object, axis, radians){
     }
   }
   object.rotate(axis, radians, true);
-  if (isPhysicsWorkerEnabled() && !(object instanceof ParticleSystem)){
-    workerHandler.syncPhysics(object);
-  }
-  if (isCollisionWorkerEnabled()){
-    workerHandler.updateObject(object);
-  }
-  if (isPSCollisionWorkerEnabled()){
-    workerHandler.updateObject(object, true);
-  }
 }
 
 // rotateAroundXYZ
@@ -989,28 +942,10 @@ Roygbiv.prototype.rotateAroundXYZ = function(object, x, y, z, radians, axis){
   mesh.rotateOnAxis(axisVector, radians);
   if (object instanceof AddedObject){
     object.setPhysicsAfterRotationAroundPoint(axis, radians);
-    if (isPhysicsWorkerEnabled()){
-      workerHandler.syncPhysics(object);
-    }
-    if (isCollisionWorkerEnabled()){
-      workerHandler.updateObject(object);
-    }
-    if (isPSCollisionWorkerEnabled()){
-      workerHandler.updateObject(object, true);
-    }
     rayCaster.updateObject(object);
   }else if (object instanceof ObjectGroup){
     object.physicsBody.quaternion.copy(mesh.quaternion);
     object.physicsBody.position.copy(mesh.position);
-    if (isPhysicsWorkerEnabled()){
-      workerHandler.syncPhysics(object);
-    }
-    if (isCollisionWorkerEnabled()){
-      workerHandler.updateObject(object);
-    }
-    if (isPSCollisionWorkerEnabled()){
-      workerHandler.updateObject(object, true);
-    }
     rayCaster.updateObject(object);
   }
 }
@@ -1057,15 +992,6 @@ Roygbiv.prototype.setPosition = function(obj, x, y, z){
 
     obj.mesh.position.set(x, y, z);
     obj.physicsBody.position.set(x, y, z);
-    if (isPhysicsWorkerEnabled()){
-      workerHandler.syncPhysics(obj);
-    }
-    if (isCollisionWorkerEnabled()){
-      workerHandler.updateObject(obj);
-    }
-    if (isPSCollisionWorkerEnabled()){
-      workerHandler.updateObject(obj, true);
-    }
     rayCaster.updateObject(obj);
   }else if (obj instanceof ObjectGroup){
     if (obj.isHidden){
@@ -1075,15 +1001,6 @@ Roygbiv.prototype.setPosition = function(obj, x, y, z){
     obj.mesh.position.set(x, y, z);
     obj.graphicsGroup.position.set(x, y, z);
     obj.physicsBody.position.set(x, y, z);
-    if (isPhysicsWorkerEnabled()){
-      workerHandler.syncPhysics(obj);
-    }
-    if (isCollisionWorkerEnabled()){
-      workerHandler.updateObject(obj);
-    }
-    if (isPSCollisionWorkerEnabled()){
-      workerHandler.updateObject(obj, true);
-    }
     rayCaster.updateObject(obj);
   }else if (obj.isPointLight){
     obj.position.set(x, y, z);
@@ -1152,15 +1069,6 @@ Roygbiv.prototype.setMass = function(object, mass){
     object.mass = 0;
   }
   object.setMass(mass);
-  if (isPhysicsWorkerEnabled()){
-    workerHandler.notifyMassChange(object, mass);
-  }
-  if (isCollisionWorkerEnabled()){
-    workerHandler.notifyCollisionMassChange(object, mass);
-  }
-  if (isPSCollisionWorkerEnabled()){
-    workerHandler.notifyCollisionMassChange(object, mass, true);
-  }
   if (object instanceof AddedObject){
     if (mass > 0){
       dynamicObjects[object.name] = object;
@@ -1205,26 +1113,8 @@ Roygbiv.prototype.translate = function(object, axis, amount){
       }
     }
     object.translate(axis, amount, true);
-    if (isPhysicsWorkerEnabled()){
-      workerHandler.syncPhysics(object);
-    }
-    if (isCollisionWorkerEnabled()){
-      workerHandler.updateObject(object);
-    }
-    if (isPSCollisionWorkerEnabled()){
-      workerHandler.updateObject(object, true);
-    }
   }else if (object instanceof ObjectGroup){
     object.translate(axis, amount, true);
-    if (isPhysicsWorkerEnabled()){
-      workerHandler.syncPhysics(object);
-    }
-    if (isCollisionWorkerEnabled()){
-      workerHandler.updateObject(object);
-    }
-    if (isPSCollisionWorkerEnabled()){
-      workerHandler.updateObject(object, true);
-    }
   }else if (object.isPointLight){
     if (axis.toLowerCase() == "x"){
       object.position.x += amount;
@@ -1614,9 +1504,6 @@ Roygbiv.prototype.setObjectVelocity = function(object, velocityVector){
     return;
   }
   object.physicsBody.velocity.set(velocityVector.x, velocityVector.y, velocityVector.z);
-  if (isPhysicsWorkerEnabled()){
-    workerHandler.notifyPhysicsVelocity(object);
-  }
 }
 
 // setObjectColor
@@ -2223,13 +2110,6 @@ Roygbiv.prototype.createParticleSystem = function(configurations){
   particleSystem.initialAngle = initialAngle;
 
   TOTAL_PARTICLE_SYSTEM_COUNT ++;
-
-  if (isPSCollisionWorkerEnabled()){
-    particleSystem.psCollisionWorkerIndex = workerHandler.generatePSIndex();
-    particleSystem.psCollisionWorkerSegment = workerHandler.calculatePSSegment(
-      particleSystem.psCollisionWorkerIndex
-    );
-  }
 
   return particleSystem;
 }
@@ -5131,9 +5011,6 @@ Roygbiv.prototype.startParticleSystem = function(configurations){
     particleSystem.lifetime = particleSystem.originalLifetime;
     particleSystem.originalLifetime = undefined;
   }
-  if (particleSystem.checkForCollisions && isPSCollisionWorkerEnabled()){
-    workerHandler.notifyNewPSCreation(particleSystem);
-  }
   particleSystem.mesh.visible = true;
   if (!particleSystem.psMerger){
     particleSystems[particleSystem.name] = particleSystem;
@@ -5158,9 +5035,6 @@ Roygbiv.prototype.hideParticleSystem = function(particleSystem){
   if (!(particleSystem instanceof ParticleSystem)){
     throw new Error("hideParticleSystem error: Type not supported.");
     return;
-  }
-  if (particleSystem.checkForCollisions && isPSCollisionWorkerEnabled()){
-    workerHandler.notifyPSDeletion(particleSystem.psCollisionWorkerIndex);
   }
   particleSystem.tick = 0;
   particleSystem.motionMode = 0;
@@ -5574,13 +5448,6 @@ Roygbiv.prototype.copyParticleSystem = function(particleSystem, newParticleSyste
   copyParticleSystem.initialAngle = particleSystem.initialAngle;
 
   TOTAL_PARTICLE_SYSTEM_COUNT ++;
-
-  if (isPSCollisionWorkerEnabled()){
-    copyParticleSystem.psCollisionWorkerIndex = workerHandler.generatePSIndex();
-    copyParticleSystem.psCollisionWorkerSegment = workerHandler.calculatePSSegment(
-      copyParticleSystem.psCollisionWorkerIndex
-    );
-  }
 
   return copyParticleSystem;
 
@@ -6051,9 +5918,6 @@ Roygbiv.prototype.setCollisionListener = function(sourceObject, callbackFunction
       return;
     }
     collisionCallbackRequests[sourceObject.name] = callbackFunction.bind(sourceObject);
-    if (isPhysicsWorkerEnabled()){
-      workerHandler.notifyPhysicsCollisionRequest(sourceObject);
-    }
     TOTAL_OBJECT_COLLISION_LISTENER_COUNT ++;
   }else if (sourceObject instanceof Particle){
     if (sourceObject.parent && sourceObject.parent.isStopped){
@@ -6106,11 +5970,6 @@ Roygbiv.prototype.setCollisionListener = function(sourceObject, callbackFunction
       sourceObject.parent.hasParticleCollision = true;
       sourceObject.parent.notifyParticleCollisionCallbackChange(sourceObject);
     }
-    if (isCollisionWorkerEnabled()){
-      if (sourceObject.parent){
-        workerHandler.notifyParticleCollisionListenerSet(sourceObject);
-      }
-    }
   }else if (sourceObject instanceof ParticleSystem){
     if (sourceObject.hasManualPositionSet){
       throw new Error("setCollisionListener error: A position is set manually to the particle system. Cannot listen for collisions.");
@@ -6139,9 +5998,6 @@ Roygbiv.prototype.setCollisionListener = function(sourceObject, callbackFunction
     }
     if (incrCounter){
       TOTAL_PARTICLE_SYSTEM_COLLISION_LISTEN_COUNT ++;
-    }
-    if (isPSCollisionWorkerEnabled() && sourceObject.mesh.visible){
-      workerHandler.notifyNewPSCreation(sourceObject);
     }
   }
 }
@@ -6173,9 +6029,6 @@ Roygbiv.prototype.removeCollisionListener = function(sourceObject){
   if (curCallbackRequest){
     if ((sourceObject instanceof AddedObject) || (sourceObject instanceof ObjectGroup)){
       delete collisionCallbackRequests[sourceObject.name];
-      if (isPhysicsWorkerEnabled()){
-        workerHandler.notifyPhysicsCollisionRemoval(sourceObject);
-      }
       TOTAL_OBJECT_COLLISION_LISTENER_COUNT --;
     }else if (sourceObject instanceof Particle){
       delete particleCollisionCallbackRequests[sourceObject.uuid];
@@ -6184,16 +6037,10 @@ Roygbiv.prototype.removeCollisionListener = function(sourceObject){
       if (sourceObject.parent){
         sourceObject.parent.notifyParticleCollisionCallbackChange(sourceObject);
       }
-      if (isCollisionWorkerEnabled()){
-        workerHandler.notifyParticleCollisionListenerRemove(sourceObject);
-      }
     }else if (sourceObject instanceof ParticleSystem){
       TOTAL_PARTICLE_SYSTEM_COLLISION_LISTEN_COUNT --;
       delete particleSystemCollisionCallbackRequests[sourceObject.name];
       sourceObject.checkForCollisions = false;
-      if (isPSCollisionWorkerEnabled()){
-        workerHandler.notifyPSDeletion(sourceObject.psCollisionWorkerIndex);
-      }
     }
   }
 }

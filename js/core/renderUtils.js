@@ -35,7 +35,6 @@ function render(){
     if (staticOn){
       staticPass.uniforms[ 'time' ].value =  shaderTime;
     }
-    handleWorkerMessages();
   }else{
     cameraOperationsDone = false;
     if (areasVisible){
@@ -57,29 +56,6 @@ function render(){
 function updateCrosshair(){
   if (selectedCrosshair && (selectedCrosshair.angularSpeed != 0 || selectedCrosshair.expand || selectedCrosshair.shrink)){
     selectedCrosshair.update();
-  }
-}
-
-function handleWorkerMessages(){
-  if (isPSCollisionWorkerEnabled()){
-    if (workerHandler.psTickArray && workerHandler.psTickArray.canPSSet){
-      workerHandler.psTickArray.canPSSet = false;
-      workerHandler.psTickFunction();
-    }
-    if (workerHandler.sendBinHandlerMessage_PS){
-      workerHandler.sendBinHandlerMessage_PS = false;
-      workerHandler.psBinHandlerLoopFunction();
-    }
-  }
-  if (isCollisionWorkerEnabled()){
-    if (workerHandler.particleSystemsArray && workerHandler.particleSystemsArray.canParticleSet){
-        workerHandler.particleSystemsArray.canParticleSet = false;
-        workerHandler.psArrayFunction();
-    }
-    if (workerHandler.sendBinHandlerMessage){
-      workerHandler.sendBinHandlerMessage = false;
-      workerHandler.binHandlerLoopFunction();
-    }
   }
 }
 
