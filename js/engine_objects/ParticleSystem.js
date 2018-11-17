@@ -361,13 +361,6 @@ var ParticleSystem = function(copyPS, name, particles, x, y, z, vx, vy, vz, ax, 
     texture = nullTexture;
   }
 
-  var fogInfo;
-  if (fogActive){
-    fogInfo = new THREE.Vector4(fogDensity, fogColorRGB.r, fogColorRGB.g, fogColorRGB.b);
-  }else{
-    fogInfo = new THREE.Vector4(-100.0, 0, 0, 0);
-  }
-
   if (!this.copyPS){
     this.material = new THREE.RawShaderMaterial({
       vertexShader: ShaderContent.particleVertexShader,
@@ -376,7 +369,7 @@ var ParticleSystem = function(copyPS, name, particles, x, y, z, vx, vy, vz, ax, 
       transparent: true,
       side: THREE.DoubleSide,
       uniforms:{
-        mergedFlag: new THREE.Uniform(-20.0),
+        mergedFlag: GLOBAL_PS_NOT_MERGED_UNIFORM,
         modelViewMatrix: new THREE.Uniform(new THREE.Matrix4()),
         projectionMatrix: GLOBAL_PROJECTION_UNIFORM,
         viewMatrix: GLOBAL_VIEW_UNIFORM,
@@ -387,7 +380,7 @@ var ParticleSystem = function(copyPS, name, particles, x, y, z, vx, vy, vz, ax, 
         parentMotionMatrix: new THREE.Uniform(new THREE.Matrix3().fromArray([
           x, y, z, vx, vy, vz, ax, ay, az
         ])),
-        fogInfo: new THREE.Uniform(fogInfo)
+        fogInfo: GLOBAL_FOG_UNIFORM
       }
     });
   }else{

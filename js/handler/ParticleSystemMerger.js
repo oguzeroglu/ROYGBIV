@@ -173,13 +173,6 @@ var ParticleSystemMerger = function(psObj, name){
     "#define OBJECT_SIZE 1", "#define OBJECT_SIZE "+this.size
   );
 
-  var fogInfo;
-  if (fogActive){
-    fogInfo = new THREE.Vector4(fogDensity, fogColorRGB.r, fogColorRGB.g, fogColorRGB.b);
-  }else{
-    fogInfo = new THREE.Vector4(-100.0, 0, 0, 0);
-  }
-
   this.material = new THREE.RawShaderMaterial({
     vertexShader: vertexShader,
     fragmentShader: ShaderContent.particleFragmentShader,
@@ -187,7 +180,7 @@ var ParticleSystemMerger = function(psObj, name){
     transparent: true,
     side: THREE.DoubleSide,
     uniforms:{
-      mergedFlag: new THREE.Uniform(20.0),
+      mergedFlag: GLOBAL_PS_MERGED_UNIFORM,
       modelViewMatrixArray: new THREE.Uniform(mvMatrixArray),
       projectionMatrix: GLOBAL_PROJECTION_UNIFORM,
       viewMatrix: GLOBAL_VIEW_UNIFORM,
@@ -197,7 +190,7 @@ var ParticleSystemMerger = function(psObj, name){
       dissapearCoefArray: new THREE.Uniform(dissapearCoefArray),
       stopInfoArray: new THREE.Uniform(stopInfoArray),
       parentMotionMatrixArray: new THREE.Uniform(motionMatrixArray),
-      fogInfo: new THREE.Uniform(fogInfo)
+      fogInfo: GLOBAL_FOG_UNIFORM
     }
   });
   this.mesh = new THREE.Points(this.geometry, this.material);
