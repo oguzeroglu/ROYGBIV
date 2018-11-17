@@ -17,7 +17,7 @@ var ParticleSystem = function(copyPS, name, particles, x, y, z, vx, vy, vz, ax, 
 
   this.vx = vx, this.vy = vy, this.vz = vz, this.ax = ax, this.ay = ay, this.az = az;
 
-  var textureMerged = 0;
+  var textureMerger = 0;
 
   var texturesObj = new Object();
   var textureCount = 0;
