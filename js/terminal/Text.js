@@ -831,8 +831,10 @@ var Text = function(){
    this.ROYGBIV_SCRIPTING_API_STARTOBJECTTRAIL = "Starts the trail effect of an object create with createObjectTrail command.";
    this.ROYGBIV_SCRIPTING_API_STOPOBJECTTRAIL = "Stops the trail effect of an object. The effect can be restarted using the startObjectTrail command.";
    this.ROYGBIV_SCRIPTING_API_SETOBJECTVELOCITY = "Sets the velocity of an object or a glued object. The object must be a dynamic object (mass > 0) in order to have a velocity.";
-   this.ROYGBIV_SCRIPTING_API_SETCLICKLISTENER = "Sets a click listener for an object or an object group. The callbackFunction is executed with\nx, y, z coordinates of the clicked point.";
-   this.ROYGBIV_SCRIPTING_API_REMOVECLICKLISTENER = "Removes the click listener of an object or an object group.";
+   this.ROYGBIV_SCRIPTING_API_SETOBJECTCLICKLISTENER = "Sets a click listener for an object or an object group. The callbackFunction is executed with\nx, y, z coordinates of the clicked point.";
+   this.ROYGBIV_SCRIPTING_API_REMOVEOBJECTCLICKLISTENER = "Removes the click listener of an object or an object group.";
    this.ROYGBIV_SCRIPTING_API_SETOBJECTCOLOR = "Modifies the color and alpha value of an object or an object group.";
    this.ROYGBIV_SCRIPTING_API_RESETOBJECTCOLOR = "Resets the color and alpha value of an object or an object group.";
+   this.ROYGBIV_SCRIPTING_API_SETSCREENCLICKLISTENER = "Sets a click listener for the screen. The callbackFunction is executed with x, y coordinates when clicked on the screen.";
+   this.ROYGBIV_SCRIPTING_API_REMOVESCREENCLICKLISTENER = "Removes the click listener of screen.";
 }

@@ -118,10 +118,12 @@ var Roygbiv = function(){
     "startObjectTrail",
     "stopObjectTrail",
     "setObjectVelocity",
-    "setClickListener",
-    "removeClickListener",
+    "setObjectClickListener",
+    "removeObjectClickListener",
     "setObjectColor",
-    "resetObjectColor"
+    "resetObjectColor",
+    "setScreenClickListener",
+    "removeScreenClickListener"
   ];
 
   this.globals = new Object();
@@ -6097,10 +6099,10 @@ Roygbiv.prototype.removeExpireListener = function(sourceObject){
   delete sourceObject.expirationFunction;
 }
 
-// setClickListener
+// setObjectClickListener
 // Sets a click listener for an object or an object group. The callbackFunction is executed
 // with x, y, z coordinates of the clicked point.
-Roygbiv.prototype.setClickListener = function(sourceObject, callbackFunction){
+Roygbiv.prototype.setObjectClickListener = function(sourceObject, callbackFunction){
   if (mode == 0){
     return;
   }
@@ -6123,9 +6125,9 @@ Roygbiv.prototype.setClickListener = function(sourceObject, callbackFunction){
   sourceObject.clickCallbackFunction = callbackFunction;
 }
 
-// removeClickListener
+// removeObjectClickListener
 // Removes the click listener of an object or an object group.
-Roygbiv.prototype.removeClickListener = function(sourceObject){
+Roygbiv.prototype.removeObjectClickListener = function(sourceObject){
   if (mode == 0){
     return;
   }
@@ -6138,6 +6140,33 @@ Roygbiv.prototype.removeClickListener = function(sourceObject){
     return;
   }
   delete sourceObject.clickCallbackFunction;
+}
+
+// setScreenClickListener
+// Sets a click listener for the screen. The callbackFunction is
+// executed with x, y coordinates when clicked on the screen.
+Roygbiv.prototype.setScreenClickListener = function(callbackFunction){
+  if (mode == 0){
+    return;
+  }
+  if (typeof callbackFunction == UNDEFINED){
+    throw new Error("setScreenClickListener error: callbackFunction is not defined.");
+    return;
+  }
+  if (!(callbackFunction instanceof Function)){
+    throw new Error("setScreenClickListener error: callbackFunction is not a function.");
+    return;
+  }
+  screenClickCallbackFunction = callbackFunction;
+}
+
+// removeScreenClickListener
+// Removes the click listener of screen.
+Roygbiv.prototype.removeScreenClickListener = function(){
+  if (mode == 0){
+    return;
+  }
+  screenClickCallbackFunction = 0;
 }
 
 // UTILITY FUNCTIONS ***********************************************************

@@ -901,6 +901,7 @@ var projectLoaded = true;
 var stopAreaConfigurationsHandler = false;
 var jobHandlerInternalCounter = 0;
 var jobHandlerInternalMaxExecutionCount = 0;
+var screenClickCallbackFunction = 0;
 
 // WORKER VARIABLES
 var WORKERS_SUPPORTED = (typeof(Worker) !== "undefined");

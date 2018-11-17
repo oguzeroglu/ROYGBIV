@@ -469,8 +469,6 @@ StateLoader.prototype.load = function(undo){
 
       if (curAddedObjectExport.isSlippery){
         addedObjectInstance.setSlippery(true);
-      }else{
-        //addedObjectInstance.setSlippery(false);
       }
 
       addedObjectInstance.mesh.material.uniforms.emissiveIntensity.value = curAddedObjectExport.emissiveIntensity;
@@ -1003,8 +1001,6 @@ StateLoader.prototype.createObjectGroupsAfterLoadedTextures = function(){
     }
     if (curObjectGroupExport.isSlippery){
       objectGroupInstance.setSlippery(true);
-    }else{
-      //objectGroupInstance.setSlippery(false);
     }
     objectGroupInstance.isDynamicObject = isDynamicObject;
     objectGroupInstance.isBasicMaterial = curObjectGroupExport.isBasicMaterial;
@@ -2156,6 +2152,7 @@ StateLoader.prototype.resetProject = function(undo){
   aoIntensityUniformCache = new Object();
   screenResolution = 1;
   stopAreaConfigurationsHandler = false;
+  screenClickCallbackFunction = 0;
 
   // FOG
   fogActive = false;

@@ -340,6 +340,9 @@ window.onload = function() {
       var rect = renderer.domElement.getBoundingClientRect();
       var coordX = ((event.clientX - rect.left) / rect.width) * 2 - 1;
       var coordY = - ((event.clientY - rect.top) / rect.height) * 2 + 1;
+      if (mode == 1 && screenClickCallbackFunction){
+        screenClickCallbackFunction(coordX, coordY);
+      }
       REUSABLE_VECTOR.setFromMatrixPosition(camera.matrixWorld);
       REUSABLE_VECTOR_2.set(coordX, coordY, 0.5).unproject(camera).sub(REUSABLE_VECTOR).normalize();
        rayCaster.findIntersections(REUSABLE_VECTOR, REUSABLE_VECTOR_2, (mode == 0));
