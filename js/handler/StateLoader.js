@@ -2155,6 +2155,8 @@ StateLoader.prototype.resetProject = function(undo){
   screenClickCallbackFunction = 0;
   screenMouseDownCallbackFunction = 0;
   screenMouseUpCallbackFunction = 0;
+  screenMouseMoveCallbackFunction = 0;
+  boundingClientRect = renderer.domElement.getBoundingClientRect();
 
   // FOG
   fogActive = false;

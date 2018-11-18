@@ -837,8 +837,10 @@ var Text = function(){
    this.ROYGBIV_SCRIPTING_API_RESETOBJECTCOLOR = "Resets the color and alpha value of an object or an object group.";
    this.ROYGBIV_SCRIPTING_API_SETSCREENCLICKLISTENER = "Sets a click listener for the screen. The callbackFunction is executed with x, y coordinates when clicked on the screen.";
    this.ROYGBIV_SCRIPTING_API_REMOVESCREENCLICKLISTENER = "Removes the click listener of screen.";
-   this.ROYGBIV_SCRIPTING_API_SETSCREENMOUSEDOWNLISTENER = "Sets a mouse down listener for screen.";
+   this.ROYGBIV_SCRIPTING_API_SETSCREENMOUSEDOWNLISTENER = "Sets a mouse down listener for screen. The callbackFunction is executed with x, y coordinates when mouse-downed on the screen.";
    this.ROYGBIV_SCRIPTING_API_REMOVESCREENMOUSEDOWNLISTENER = "Removes the mouse down listener of screen.";
-   this.ROYGBIV_SCRIPTING_API_SETSCREENMOUSEUPLISTENER = "Sets mouse up listener for screen.";
+   this.ROYGBIV_SCRIPTING_API_SETSCREENMOUSEUPLISTENER = "Sets mouse up listener for screen. The callbackFunction is executed with x, y coordinates when mouse-upped on the screen.";
    this.ROYGBIV_SCRIPTING_API_REMOVESCREENMOUSEUPLISTENER = "Removes mouse up listener for screen.";
+   this.ROYGBIV_SCRIPTING_API_SETSCREENMOUSEMOVELISTENER = "Sets mouse move listener for screen. The callbackFunction is executed with x, y coordinates when mouse moves on the screen.";
+   this.ROYGBIV_SCRIPTING_API_REMOVESCREENMOUSEMOVELISTENER = "Removes mouse move listener for screen.";
 }

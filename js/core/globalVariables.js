@@ -634,6 +634,7 @@ var omGUIFocused = false;
 var lightsGUIFocused = false;
 var cliIsBeingDragged = false;
 var requestID;
+var boundingClientRect;
 
 // THREE.JS VARIABLES
 var renderer;
@@ -904,6 +905,7 @@ var jobHandlerInternalMaxExecutionCount = 0;
 var screenClickCallbackFunction = 0;
 var screenMouseDownCallbackFunction = 0;
 var screenMouseUpCallbackFunction = 0;
+var screenMouseMoveCallbackFunction = 0;
 
 // WORKER VARIABLES
 var WORKERS_SUPPORTED = (typeof(Worker) !== "undefined");

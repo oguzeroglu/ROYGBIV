@@ -127,7 +127,9 @@ var Roygbiv = function(){
     "setScreenMouseDownListener",
     "removeScreenMouseDownListener",
     "setScreenMouseUpListener",
-    "removeScreenMouseUpListener"
+    "removeScreenMouseUpListener",
+    "setScreenMouseMoveListener",
+    "removeScreenMouseMoveListener"
   ];
 
   this.globals = new Object();
@@ -6174,7 +6176,8 @@ Roygbiv.prototype.removeScreenClickListener = function(){
 }
 
 // setScreenMouseDownListener
-// Sets a mouse down listener for screen.
+// Sets a mouse down listener for screen. The callbackFunction is
+// executed with x, y coordinates when mouse-downed on the screen.
 Roygbiv.prototype.setScreenMouseDownListener = function(callbackFunction){
   if (mode == 0){
     return;
@@ -6200,7 +6203,8 @@ Roygbiv.prototype.removeScreenMouseDownListener = function(){
 }
 
 // setScreenMouseUpListener
-// Sets mouse up listener for screen.
+// Sets mouse up listener for screen. The callbackFunction is
+// executed with x, y coordinates when mouse-upped on the screen.
 Roygbiv.prototype.setScreenMouseUpListener = function(callbackFunction){
   if (mode == 0){
     return;
@@ -6223,6 +6227,33 @@ Roygbiv.prototype.removeScreenMouseUpListener = function(){
     return;
   }
   screenMouseUpCallbackFunction = 0;
+}
+
+// setScreenMouseMoveListener
+// Sets mouse move listener for screen. The callbackFunction is
+// executed with x, y coordinates when mouse moves on the screen.
+Roygbiv.prototype.setScreenMouseMoveListener = function(callbackFunction){
+  if (mode == 0){
+    return;
+  }
+  if (typeof callbackFunction == UNDEFINED){
+    throw new Error("setScreenMouseMoveListener error: callbackFunction is not defined.");
+    return;
+  }
+  if (!(callbackFunction instanceof Function)){
+    throw new Error("setScreenMouseMoveListener error: callbackFunction is not a function.");
+    return;
+  }
+  screenMouseMoveCallbackFunction = callbackFunction;
+}
+
+// removeScreenMouseMoveListener
+// Removes mouse move listener for screen.
+Roygbiv.prototype.removeScreenMouseMoveListener = function(){
+  if (mode == 0){
+    return;
+  }
+  screenMouseMoveCallbackFunction = 0;
 }
 
 // UTILITY FUNCTIONS ***********************************************************

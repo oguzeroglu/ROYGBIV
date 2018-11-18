@@ -337,7 +337,7 @@ window.onload = function() {
     omGUIFocused = false;
     lightsGUIFocused = false;
     if (windowLoaded){
-      var rect = renderer.domElement.getBoundingClientRect();
+      var rect = boundingClientRect;
       var coordX = ((event.clientX - rect.left) / rect.width) * 2 - 1;
       var coordY = - ((event.clientY - rect.top) / rect.height) * 2 + 1;
       if (mode == 1 && screenClickCallbackFunction){
@@ -438,7 +438,7 @@ window.onload = function() {
 
   canvas.addEventListener("mousedown", function(event){
     if (mode == 1 && screenMouseDownCallbackFunction){
-      var rect = renderer.domElement.getBoundingClientRect();
+      var rect = boundingClientRect;
       var coordX = ((event.clientX - rect.left) / rect.width) * 2 - 1;
       var coordY = - ((event.clientY - rect.top) / rect.height) * 2 + 1;
       screenMouseDownCallbackFunction(coordX, coordY);
@@ -446,10 +446,18 @@ window.onload = function() {
   });
   canvas.addEventListener("mouseup", function(event){
     if (mode == 1 && screenMouseUpCallbackFunction){
-      var rect = renderer.domElement.getBoundingClientRect();
+      var rect = boundingClientRect;
       var coordX = ((event.clientX - rect.left) / rect.width) * 2 - 1;
       var coordY = - ((event.clientY - rect.top) / rect.height) * 2 + 1;
       screenMouseUpCallbackFunction(coordX, coordY);
+    }
+  });
+  canvas.addEventListener("mousemove", function(event){
+    if (mode == 1 && screenMouseMoveCallbackFunction){
+      var rect = boundingClientRect;
+      var coordX = ((event.clientX - rect.left) / rect.width) * 2 - 1;
+      var coordY = - ((event.clientY - rect.top) / rect.height) * 2 + 1;
+      screenMouseMoveCallbackFunction(coordX, coordY);
     }
   });
 
@@ -465,6 +473,7 @@ window.onload = function() {
   GLOBAL_VIEW_UNIFORM.value = camera.matrixWorldInverse;
   renderer = new THREE.WebGLRenderer({canvas: canvas});
   renderer.setSize(window.innerWidth, window.innerHeight);
+  boundingClientRect = renderer.domElement.getBoundingClientRect();
   initPhysics();
   initBadTV();
   render();
@@ -483,6 +492,7 @@ if (typeof InstallTrigger !== 'undefined') {
 }
 window.addEventListener('resize', function() {
   if (renderer && composer){
+    boundingClientRect = renderer.domElement.getBoundingClientRect();
     renderer.setSize(window.innerWidth, window.innerHeight);
     composer.setSize(window.innerWidth, window.innerHeight);
     camera.oldAspect = camera.aspect;
