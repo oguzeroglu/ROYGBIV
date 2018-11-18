@@ -841,6 +841,10 @@ var Text = function(){
    this.ROYGBIV_SCRIPTING_API_REMOVESCREENMOUSEDOWNLISTENER = "Removes the mouse down listener of screen.";
    this.ROYGBIV_SCRIPTING_API_SETSCREENMOUSEUPLISTENER = "Sets mouse up listener for screen. The callbackFunction is executed with x, y coordinates when mouse-upped on the screen.";
    this.ROYGBIV_SCRIPTING_API_REMOVESCREENMOUSEUPLISTENER = "Removes mouse up listener for screen.";
-   this.ROYGBIV_SCRIPTING_API_SETSCREENMOUSEMOVELISTENER = "Sets mouse move listener for screen. The callbackFunction is executed with x, y coordinates when mouse moves on the screen.";
+   this.ROYGBIV_SCRIPTING_API_SETSCREENMOUSEMOVELISTENER = "Sets mouse move listener for screen. The callbackFunction is executed with x, y coordinates and dX, dY values when\nmouse moves on the screen.";
    this.ROYGBIV_SCRIPTING_API_REMOVESCREENMOUSEMOVELISTENER = "Removes mouse move listener for screen.";
+   this.ROYGBIV_SCRIPTING_API_REQUESTPOINTERLOCK = "Requests pointer lock from window on the next click.";
+   this.ROYGBIV_SCRIPTING_API_CONVERTEULERTODEGREES = "Returns the degree equivalent of an Euler angle.";
+   this.ROYGBIV_SCRIPTING_API_SETSCREENPOINTERLOCKCHANGELISTENER = "Sets a callback function for Pointer Lock API status changes. The callbackFunction is executed with isPointerLocked parameter.";
+   this.ROYGBIV_SCRIPTING_API_REMOVESCREENPOINTERLOCKCHANGELISTENER = "Removes the Pointer Lock change listener for the screen.";
 }

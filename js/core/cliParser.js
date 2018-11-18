@@ -420,6 +420,8 @@ function parse(input){
             screenMouseDownCallbackFunction = 0;
             screenMouseUpCallbackFunction = 0;
             screenMouseMoveCallbackFunction = 0;
+            screenPointerLockChangedCallbackFunction = 0;
+            pointerLockRequested = false;
             for (var gsName in gridSystems){
               scene.add(gridSystems[gsName].gridSystemRepresentation);
               scene.add(gridSystems[gsName].boundingPlane);

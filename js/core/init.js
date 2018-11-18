@@ -45,6 +45,10 @@ window.onload = function() {
     }
   }
 
+  pointerLockSupported = 'pointerLockElement' in document ||
+                         'mozPointerLockElement' in document ||
+                         'webkitPointerLockElement' in document;
+
   // COMMAND DESCRIPTOR
   commandDescriptor = new CommandDescriptor();
   commandDescriptor.test();
@@ -332,6 +336,30 @@ window.onload = function() {
   loadInput = $("#loadInput");
   // 3D CANVAS
   canvas = document.getElementById("rendererCanvas");
+  canvas.requestPointerLock = canvas.requestPointerLock ||
+                              canvas.mozRequestPointerLock ||
+                              canvas.webkitRequestPointerLock;
+  var pointerLockChangeFunction = 0;
+  if ("onpointerlockchange" in document){
+    pointerLockChangeFunction = "pointerlockchange";
+  }else if ("onmozpointerlockchange" in document){
+    pointerLockChangeFunction = "mozpointerlockchange";
+  }else if ("onwebkitpointerlockchange" in document){
+    pointerLockChangeFunction = "webkitpointerlockchange";
+  }
+  if (pointerLockChangeFunction){
+    document.addEventListener(pointerLockChangeFunction, function(event){
+      if (mode == 1 && screenPointerLockChangedCallbackFunction){
+        if (document.pointerLockElement == canvas ||
+              document.mozPointerLockElement == canvas ||
+                document.webkitPointerLockElement == canvas){
+          screenPointerLockChangedCallbackFunction(true);
+        }else{
+          screenPointerLockChangedCallbackFunction(false);
+        }
+      }
+    });
+  }
   canvas.addEventListener("click", function(event){
     cliFocused = false;
     omGUIFocused = false;
@@ -342,6 +370,10 @@ window.onload = function() {
       var coordY = - ((event.clientY - rect.top) / rect.height) * 2 + 1;
       if (mode == 1 && screenClickCallbackFunction){
         screenClickCallbackFunction(coordX, coordY);
+      }
+      if (mode == 1 && pointerLockSupported && pointerLockRequested){
+        canvas.requestPointerLock();
+        pointerLockRequested = false;
       }
       REUSABLE_VECTOR.setFromMatrixPosition(camera.matrixWorld);
       REUSABLE_VECTOR_2.set(coordX, coordY, 0.5).unproject(camera).sub(REUSABLE_VECTOR).normalize();
@@ -457,7 +489,11 @@ window.onload = function() {
       var rect = boundingClientRect;
       var coordX = ((event.clientX - rect.left) / rect.width) * 2 - 1;
       var coordY = - ((event.clientY - rect.top) / rect.height) * 2 + 1;
-      screenMouseMoveCallbackFunction(coordX, coordY);
+      var movementX = event.movementX || event.mozMovementX ||
+                      event.webkitMovementX || 0;
+      var movementY = event.movementY || event.mozMovementY ||
+                      event.webkitMovementY || 0;
+      screenMouseMoveCallbackFunction(coordX, coordY, movementX, movementY);
     }
   });
 

@@ -129,7 +129,11 @@ var Roygbiv = function(){
     "setScreenMouseUpListener",
     "removeScreenMouseUpListener",
     "setScreenMouseMoveListener",
-    "removeScreenMouseMoveListener"
+    "removeScreenMouseMoveListener",
+    "requestPointerLock",
+    "convertEulerToDegrees",
+    "setScreenPointerLockChangeListener",
+    "removeScreenPointerLockChangeListener"
   ];
 
   this.globals = new Object();
@@ -6231,7 +6235,7 @@ Roygbiv.prototype.removeScreenMouseUpListener = function(){
 
 // setScreenMouseMoveListener
 // Sets mouse move listener for screen. The callbackFunction is
-// executed with x, y coordinates when mouse moves on the screen.
+// executed with x, y coordinates and dX, dY values when mouse moves on the screen.
 Roygbiv.prototype.setScreenMouseMoveListener = function(callbackFunction){
   if (mode == 0){
     return;
@@ -6254,6 +6258,33 @@ Roygbiv.prototype.removeScreenMouseMoveListener = function(){
     return;
   }
   screenMouseMoveCallbackFunction = 0;
+}
+
+// setScreenPointerLockChangeListener
+// Sets a callback function for Pointer Lock API status changes. The callbackFunction
+// is executed with isPointerLocked parameter.
+Roygbiv.prototype.setScreenPointerLockChangeListener = function(callbackFunction){
+  if (mode == 0){
+    return;
+  }
+  if (typeof callbackFunction == UNDEFINED){
+    throw new Error("setScreenPointerLockChangeListener error: callbackFunction is not defined.");
+    return;
+  }
+  if (!(callbackFunction instanceof Function)){
+    throw new Error("setScreenPointerLockChangeListener error: callbackFunction is not a function.");
+    return;
+  }
+  screenPointerLockChangedCallbackFunction = callbackFunction;
+}
+
+// removeScreenPointerLockChangeListener
+// Removes the Pointer Lock change listener for the screen.
+Roygbiv.prototype.removeScreenPointerLockChangeListener = function(){
+  if (mode == 0){
+    return;
+  }
+  screenPointerLockChangedCallbackFunction = 0;
 }
 
 // UTILITY FUNCTIONS ***********************************************************
@@ -6780,4 +6811,30 @@ Roygbiv.prototype.setVector = function(vector, x, y, z){
 // Returns a new THREE.Quaternion instance.
 Roygbiv.prototype.quaternion = function(){
   return new THREE.Quaternion();
+}
+
+// requestPointerLock
+// Requests pointer lock from window on the next click.
+Roygbiv.prototype.requestPointerLock = function(){
+  if (mode == 0){
+    return;
+  }
+  if (!pointerLockSupported){
+    throw new Error("requestPointerLock error: Pointer Lock API is not supported by this browser.");
+    return;
+  }
+  pointerLockRequested = true;
+}
+
+// convertEulerToDegrees
+// Returns the degree equivalent of an Euler angle.
+Roygbiv.prototype.convertEulerToDegrees = function(eulerAngle){
+  if (mode == 0){
+    return;
+  }
+  if (typeof eulerAngle == UNDEFINED){
+    throw new Error("convertEulerToDegrees error: eulerAngle is not defined.");
+    return;
+  }
+  return ((eulerAngle * 180) / Math.PI);
 }

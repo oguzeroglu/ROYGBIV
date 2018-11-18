@@ -635,6 +635,7 @@ var lightsGUIFocused = false;
 var cliIsBeingDragged = false;
 var requestID;
 var boundingClientRect;
+var pointerLockSupported = false;
 
 // THREE.JS VARIABLES
 var renderer;
@@ -645,6 +646,7 @@ var sceneBackgroundColor = 0x000000 ;
 var textureLoader = new THREE.TextureLoader();
 var tgaLoader = new THREE.TGALoader();
 var ddsLoader = new THREE.DDSLoader();
+var pointerLockRequested = false;
 
 // PHYSICS
 var debugRenderer;
@@ -906,6 +908,7 @@ var screenClickCallbackFunction = 0;
 var screenMouseDownCallbackFunction = 0;
 var screenMouseUpCallbackFunction = 0;
 var screenMouseMoveCallbackFunction = 0;
+var screenPointerLockChangedCallbackFunction = 0;
 
 // WORKER VARIABLES
 var WORKERS_SUPPORTED = (typeof(Worker) !== "undefined");
