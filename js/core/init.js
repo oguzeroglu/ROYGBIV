@@ -741,10 +741,13 @@ window.addEventListener('keyup', function(event){
     }
     if (bloomOn){
       composer.addPass( bloomPass );
+      bloomPass.renderToScreen = true;
     }
    }
-	 composer.addPass( copyPass );
-	 copyPass.renderToScreen = true;
+   if (!(mode == 1 && bloomOn)){
+	    composer.addPass( copyPass );
+	    copyPass.renderToScreen = true;
+   }
    setBadTVParams();
  }
 

@@ -133,7 +133,11 @@ var Roygbiv = function(){
     "requestPointerLock",
     "convertEulerToDegrees",
     "setScreenPointerLockChangeListener",
-    "removeScreenPointerLockChangeListener"
+    "removeScreenPointerLockChangeListener",
+    "setParticleSystemPoolConsumedListener",
+    "removeParticleSystemPoolConsumedListener",
+    "setParticleSystemPoolAvailableListener",
+    "removeParticleSystemPoolAvailableListener"
   ];
 
   this.globals = new Object();
@@ -6285,6 +6289,92 @@ Roygbiv.prototype.removeScreenPointerLockChangeListener = function(){
     return;
   }
   screenPointerLockChangedCallbackFunction = 0;
+}
+
+// setParticleSystemPoolConsumedListener
+// Sets a listener for particle system pool consumption. The callbackFunction is
+// executed wheren there is no available particle system left inside the pool.
+Roygbiv.prototype.setParticleSystemPoolConsumedListener = function(psPool, callbackFunction){
+  if (mode == 0){
+    return;
+  }
+  if (typeof psPool == UNDEFINED){
+    throw new Error("setParticleSystemPoolConsumedListener error: psPool is not defined.");
+    return;
+  }
+  if (typeof callbackFunction == UNDEFINED){
+    throw new Error("setParticleSystemPoolConsumedListener error: callbackFunction is not defined.");
+    return;
+  }
+  if (!(psPool instanceof ParticleSystemPool)){
+    throw new Error("setParticleSystemPoolConsumedListener error: psPool is not a ParticleSystemPool.");
+    return;
+  }
+  if (!(callbackFunction instanceof Function)){
+    throw new Error("setParticleSystemPoolConsumedListener error: callbackFunction is not a function.");
+    return;
+  }
+  psPool.consumedCallback = callbackFunction;
+}
+
+// removeParticleSystemPoolConsumedListener
+// Removes the consumption listener of a particle system pool.
+Roygbiv.prototype.removeParticleSystemPoolConsumedListener = function(psPool){
+  if (mode == 0){
+    return;
+  }
+  if (typeof psPool == UNDEFINED){
+    throw new Error("removeParticleSystemPoolConsumedListener error: psPool is not defined.");
+    return;
+  }
+  if (!(psPool instanceof ParticleSystemPool)){
+    throw new Error("removeParticleSystemPoolConsumedListener error: psPool is not a ParticleSystemPool.");
+    return;
+  }
+  psPool.consumedCallback = 0;
+}
+
+// setParticleSystemPoolAvailableListener
+// Sets an availability listener for a particle system pool. The callbackFunction is executed
+// when there is at least one available particle system inside the pool again.
+Roygbiv.prototype.setParticleSystemPoolAvailableListener = function(psPool, callbackFunction){
+  if (mode == 0){
+    return;
+  }
+  if (typeof psPool == UNDEFINED){
+    throw new Error("setParticleSystemPoolAvailableListener error: psPool is not defined.");
+    return;
+  }
+  if (typeof callbackFunction == UNDEFINED){
+    throw new Error("setParticleSystemPoolAvailableListener error: callbackFunction is not defined.");
+    return;
+  }
+  if (!(psPool instanceof ParticleSystemPool)){
+    throw new Error("setParticleSystemPoolAvailableListener error: psPool is not a ParticleSystemPool.");
+    return;
+  }
+  if (!(callbackFunction instanceof Function)){
+    throw new Error("setParticleSystemPoolAvailableListener error: callbackFunction is not a function.");
+    return;
+  }
+  psPool.availableCallback = callbackFunction;
+}
+
+// removeParticleSystemPoolAvailableListener
+// Removes the availablity listener for a particle system pool.
+Roygbiv.prototype.removeParticleSystemPoolAvailableListener = function(psPool){
+  if (mode == 0){
+    return;
+  }
+  if (typeof psPool == UNDEFINED){
+    throw new Error("removeParticleSystemPoolAvailableListener error: psPool is not defined.");
+    return;
+  }
+  if (!(psPool instanceof ParticleSystemPool)){
+    throw new Error("removeParticleSystemPoolAvailableListener error: psPool is not a ParticleSystemPool.");
+    return;
+  }
+  psPool.availableCallback = 0;
 }
 
 // UTILITY FUNCTIONS ***********************************************************

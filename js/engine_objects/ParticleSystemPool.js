@@ -18,6 +18,9 @@ ParticleSystemPool.prototype.get = function(){
   }
   var ps = this.availableParticleSystems.values().next().value;
   this.availableParticleSystems.delete(ps.name);
+  if (this.consumedCallback && this.availableParticleSystems.size == 0){
+    this.consumedCallback();
+  }
   return ps;
 }
 
@@ -39,4 +42,7 @@ ParticleSystemPool.prototype.destroy = function(){
 
 ParticleSystemPool.prototype.notifyPSAvailable = function(particleSystem){
   this.availableParticleSystems.set(particleSystem.name, particleSystem);
+  if (this.availableCallback && this.availableParticleSystems.size == 1){
+    this.availableCallback();
+  }
 }

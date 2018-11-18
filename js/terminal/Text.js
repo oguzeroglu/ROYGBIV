@@ -847,4 +847,8 @@ var Text = function(){
    this.ROYGBIV_SCRIPTING_API_CONVERTEULERTODEGREES = "Returns the degree equivalent of an Euler angle.";
    this.ROYGBIV_SCRIPTING_API_SETSCREENPOINTERLOCKCHANGELISTENER = "Sets a callback function for Pointer Lock API status changes. The callbackFunction is executed with isPointerLocked parameter.";
    this.ROYGBIV_SCRIPTING_API_REMOVESCREENPOINTERLOCKCHANGELISTENER = "Removes the Pointer Lock change listener for the screen.";
+   this.ROYGBIV_SCRIPTING_API_SETPARTICLESYSTEMPOOLCONSUMEDLISTENER = "Sets a listener for particle system pool consumption. The callbackFunction is executed wheren there is no available\nparticle system left inside the pool.";
+   this.ROYGBIV_SCRIPTING_API_REMOVEPARTICLESYSTEMPOOLCONSUMEDLISTENER = "Removes the consumption listener of a particle system pool.";
+   this.ROYGBIV_SCRIPTING_API_SETPARTICLESYSTEMPOOLAVAILABLELISTENER = "Sets an availability listener for a particle system pool. The callbackFunction is executed when there is at least\none available particle system inside the pool again.";
+   this.ROYGBIV_SCRIPTING_API_REMOVEPARTICLESYSTEMPOOLAVAILABLELISTENER = "Removes the availablity listener for a particle system pool.";
 }
