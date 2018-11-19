@@ -729,6 +729,10 @@ Roygbiv.prototype.hide = function(object){
       throw new Error("hide error: Cannot hide a child object. Use the parent object instead.");
       return;
     }
+    if (!object.isChangeable){
+      throw new Error("hide error: Object is not marked is changeable.");
+      return;
+    }
     if (object.isVisibleOnThePreviewScene()){
       object.mesh.visible = false;
       // The reason we use delayed execution here is that
@@ -742,6 +746,10 @@ Roygbiv.prototype.hide = function(object){
       rayCaster.binHandler.hide(object);
     }
   }else if (object instanceof ObjectGroup){
+    if (!object.isChangeable){
+      throw new Error("hide error: object is not marked as changeable.");
+      return;
+    }
     if (object.isVisibleOnThePreviewScene()){
       object.mesh.visible = false;
       setTimeout(function(){
@@ -772,6 +780,10 @@ Roygbiv.prototype.show = function(object){
       throw new Error("show error: Cannot show a child object. Use the parent object instead.");
       return;
     }
+    if (!object.isChangeable){
+      throw new Error("show error: object is not marked as changeable.");
+      return;
+    }
     if (!object.isVisibleOnThePreviewScene()){
       object.mesh.visible = true;
       setTimeout(function(){
@@ -781,6 +793,10 @@ Roygbiv.prototype.show = function(object){
       rayCaster.binHandler.show(object);
     }
   }else if (object instanceof ObjectGroup){
+    if (!object.isChangeable){
+      throw new Error("show error: object is not marked as changeable.");
+      return;
+    }
     if (!object.isVisibleOnThePreviewScene()){
       object.mesh.visible = true;
       setTimeout(function(){
@@ -807,6 +823,10 @@ Roygbiv.prototype.applyForce = function(object, force, point){
   }
   if (!(object instanceof AddedObject) && !(object instanceof ObjectGroup)){
     throw new Error("applyForce error: object type is not supported.");
+    return;
+  }
+  if (!object.isDynamicObject){
+    throw new Error("applyForce error: object is not dynamic.");
     return;
   }
   if (!force){
@@ -859,7 +879,6 @@ Roygbiv.prototype.rotate = function(object, axis, radians){
     throw new Error("rotate error: Type not supported.");
     return;
   }
-
   var isObject = false;
   if ((object instanceof AddedObject) || (object instanceof ObjectGroup)){
     isObject = true;
@@ -868,7 +887,6 @@ Roygbiv.prototype.rotate = function(object, axis, radians){
       return;
     }
   }
-
   if (object instanceof AddedObject && object.parentObjectName){
     var parentObject = objectGroups[object.parentObjectName];
     if (parentObject){
@@ -880,6 +898,12 @@ Roygbiv.prototype.rotate = function(object, axis, radians){
         radians,
         axis
       );
+      return;
+    }
+  }
+  if ((object instanceof AddedObject) || (object instanceof ObjectGroup)){
+    if (!object.isChangeable){
+      throw new Error("rotate error: object is not marked as changeable.");
       return;
     }
   }
@@ -940,8 +964,16 @@ Roygbiv.prototype.rotateAroundXYZ = function(object, x, y, z, radians, axis){
         return;
       }
     }
+    if (!object.isChangeable){
+      throw new Error("rotateAroundXYZ error: object is not marked as changeable.");
+      return;
+    }
     mesh = object.mesh;
   }else if (object instanceof ObjectGroup){
+    if (!object.isChangeable){
+      throw new Error("rotateAroundXYZ error: object is not marked as changeable.");
+      return;
+    }
     mesh = object.mesh;
   }else if (object.isPointLight){
     mesh = object;
@@ -1005,13 +1037,20 @@ Roygbiv.prototype.setPosition = function(obj, x, y, z){
         return;
       }
     }
-
+    if (!obj.isChangeable){
+      throw new Error("setPosition error: object is not marked as changeable.");
+      return;
+    }
     obj.mesh.position.set(x, y, z);
     obj.physicsBody.position.set(x, y, z);
     rayCaster.updateObject(obj);
   }else if (obj instanceof ObjectGroup){
     if (obj.isHidden){
       throw new Error("setPosition error: Object is not visible.");
+      return;
+    }
+    if (!obj.isChangeable){
+      throw new Error("setPosition error: object is not marked as changeable.");
       return;
     }
     obj.mesh.position.set(x, y, z);
@@ -1073,6 +1112,10 @@ Roygbiv.prototype.setMass = function(object, mass){
     throw new Error("setMass error: Unsupported type.");
     return;
   }
+  if (!object.isChangeable){
+    throw new Error("setMass error: object is not marked as changeable.");
+    return;
+  }
   if ((object instanceof AddedObject) && !(addedObjects[object.name])){
     throw new Error("setMass error: Cannot set mass of child objects. Use the parent object instead.");
     return;
@@ -1128,8 +1171,16 @@ Roygbiv.prototype.translate = function(object, axis, amount){
         return;
       }
     }
+    if (!object.isChangeable){
+      throw new Error("translate error: object is not marked as changeable.");
+      return;
+    }
     object.translate(axis, amount, true);
   }else if (object instanceof ObjectGroup){
+    if (!object.isChangeable){
+      throw new Error("translate error: object is not marked as changeable.");
+      return;
+    }
     object.translate(axis, amount, true);
   }else if (object.isPointLight){
     if (axis.toLowerCase() == "x"){
@@ -1501,6 +1552,10 @@ Roygbiv.prototype.setObjectVelocity = function(object, velocityVector){
   }
   if (!(object instanceof AddedObject) && !(object instanceof ObjectGroup)){
     throw new Error("setObjectVelocity error: Type not supported.");
+    return;
+  }
+  if (!object.isChangeable){
+    throw new Error("setObjectVelocity error: object is not marked as changeable.");
     return;
   }
   if ((object instanceof AddedObject) && !addedObjects[object.name]){
