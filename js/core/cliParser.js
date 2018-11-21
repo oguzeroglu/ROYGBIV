@@ -338,7 +338,7 @@ function parse(input){
             for (var objectName in objectGroups){
               var object = objectGroups[objectName];
               if (object.binInfo){
-                object.binInfo = new Object();
+                object.binInfo = new Map();
               }
               object.saveState();
               if (object.isDynamicObject){
@@ -349,7 +349,7 @@ function parse(input){
             for (var objectName in addedObjects){
               var object = addedObjects[objectName];
               if (object.binInfo){
-                object.binInfo = new Object();
+                object.binInfo = new Map();
               }
               if (object.isDynamicObject){
                 dynamicObjects[objectName] = object;

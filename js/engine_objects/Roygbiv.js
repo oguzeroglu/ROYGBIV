@@ -730,7 +730,7 @@ Roygbiv.prototype.hide = function(object){
       return;
     }
     if (!object.isChangeable){
-      throw new Error("hide error: Object is not marked is changeable.");
+      throw new Error("hide error: Object is not marked as changeable.");
       return;
     }
     if (object.isVisibleOnThePreviewScene()){
