@@ -225,7 +225,7 @@ WorldBinHandler.prototype.query = function(point){
                 if (!results[objName]){
                   results[objName] = new Object();
                 }
-                for (var childObjName in res[objName]){
+                for (var childObjName of res.get(objName).keys()){
                   results[objName][childObjName] = 5;
                 }
               }else if (gridSystems[objName]){
