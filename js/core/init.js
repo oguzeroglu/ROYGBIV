@@ -528,12 +528,12 @@ if (typeof InstallTrigger !== 'undefined') {
 }
 window.addEventListener('resize', function() {
   if (renderer && composer){
-    boundingClientRect = renderer.domElement.getBoundingClientRect();
     renderer.setSize(window.innerWidth, window.innerHeight);
     composer.setSize(window.innerWidth, window.innerHeight);
     camera.oldAspect = camera.aspect;
     camera.aspect = window.innerWidth / window.innerHeight;
     camera.updateProjectionMatrix();
+    boundingClientRect = renderer.domElement.getBoundingClientRect();
   }
 });
 window.addEventListener('keydown', function(event){
