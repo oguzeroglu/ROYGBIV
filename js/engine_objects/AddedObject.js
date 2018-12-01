@@ -1998,7 +1998,7 @@ AddedObject.prototype.visualiseBoudingBoxes = function(selectedScene){
 
 AddedObject.prototype.getNormalGeometry = function(){
   if (!(typeof this.metaData.slicedType == UNDEFINED)){
-    var geomKey = "SLICED_NORMAL_GEOMETRY_"+this.metaData.slicedType;
+    var geomKey = "SLICED_NORMAL_GEOMETRY_"+this.type+"_"+this.metaData.slicedType;
     if (geometryCache[geomKey]){
       return geometryCache[geomKey];
     }
