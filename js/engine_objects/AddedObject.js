@@ -418,7 +418,6 @@ AddedObject.prototype.sliceInHalf = function(type){
         geometryCache[geomKey] = newGeometry;
       }else{
         newGeometry = cachedGeom;
-        console.log("CACHED");
       }
     }else{
       var originalGeomKey = (
