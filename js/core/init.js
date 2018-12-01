@@ -153,15 +153,15 @@ window.onload = function() {
     "None", "Part 1", "Part 2", "Part 3", "Part 4"
   ]).onChange(function(val){
     if (val == "None"){
-      selectedAddedObject.sliceSurfaceInHalf(4);
+      selectedAddedObject.sliceInHalf(4);
     }else if (val == "Part 1"){
-      selectedAddedObject.sliceSurfaceInHalf(0);
+      selectedAddedObject.sliceInHalf(0);
     }else if (val == "Part 2"){
-      selectedAddedObject.sliceSurfaceInHalf(1);
+      selectedAddedObject.sliceInHalf(1);
     }else if (val == "Part 3"){
-      selectedAddedObject.sliceSurfaceInHalf(2);
+      selectedAddedObject.sliceInHalf(2);
     }else if (val == "Part 4"){
-      selectedAddedObject.sliceSurfaceInHalf(3);
+      selectedAddedObject.sliceInHalf(3);
     }
   }).listen();
   omTextureOffsetXController = datGuiObjectManipulation.add(objectManipulationParameters, "Texture offset x").min(-2).max(2).step(0.001).onChange(function(val){

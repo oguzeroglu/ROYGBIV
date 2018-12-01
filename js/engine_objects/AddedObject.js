@@ -370,6 +370,9 @@ AddedObject.prototype.handleRenderSide = function(val){
 }
 
 AddedObject.prototype.isSlicable = function(){
+  if (this.type == "sphere"){
+    return true;
+  }
   if (this.type != "surface"){
     return false;
   }
@@ -379,57 +382,104 @@ AddedObject.prototype.isSlicable = function(){
   return false;
 }
 
-AddedObject.prototype.sliceSurfaceInHalf = function(type){
-  var geomKey = (
-    "PlaneBufferGeometry" + PIPE +
-    this.metaData.width + PIPE + this.metaData.height + PIPE +
-    this.metaData.widthSegments + PIPE + this.metaData.heightSegments
-  );
-  var originalGeometry = geometryCache[geomKey];
-  var normals = [], positions = [], uvs = [0, 0, 1, 1, 0, 1];
-  var subIndices;
-  var indices = originalGeometry.index.array;
-  if (type == 0){
-    subIndices = [indices[0], indices[1], indices[2]];
-  }else if (type == 1){
-    subIndices = [indices[3], indices[4], indices[5]];
-  }else if (type == 2){
-    subIndices = [indices[1], indices[4], indices[0]];
-  }else if (type == 3){
-    subIndices = [indices[2], indices[4], indices[0]]
+AddedObject.prototype.sliceInHalf = function(type){
+  if (!this.isSlicable()){
+    return;
   }
-
   var newGeometry;
-
-  if (type == 0 || type == 1 || type == 2 || type == 3){
-    this.metaData.slicedType = type;
-    for (var i = 0; i<subIndices.length; i++){
-      for (var i2 = 0; i2<3; i2++){
-        positions.push(originalGeometry.attributes.position.array[
-          (3 * subIndices[i]) + i2
-        ]);
-        normals.push(originalGeometry.attributes.normal.array[
-          (3 * subIndices[i]) + i2
-        ]);
+  if (this.type == "sphere"){
+    if (type == 0 || type == 1 || type == 2 || type == 3){
+      var geomKey = (
+        "SphereBufferGeometry" + PIPE +
+        Math.abs(this.metaData.radius) + PIPE +
+        this.metaData.widthSegments + PIPE + this.metaData.heightSegments + PIPE +
+        "SLICED" + PIPE + type
+      );
+      var cachedGeom = geometryCache[geomKey];
+      this.metaData.slicedType = type;
+      if (!cachedGeom){
+        if (type == 0){
+          newGeometry = new THREE.SphereBufferGeometry(
+            this.metaData.radius, this.metaData.widthSegments,
+            this.metaData.heightSegments, 0, 2 * Math.PI, 0, 0.5 * Math.PI);
+        }else if (type == 1){
+          newGeometry = new THREE.SphereBufferGeometry(
+            this.metaData.radius, this.metaData.widthSegments,
+            this.metaData.heightSegments, 0, Math.PI, 0, Math.PI);
+        }else if (type == 2){
+          newGeometry = new THREE.SphereBufferGeometry(
+            this.metaData.radius, this.metaData.widthSegments,
+            this.metaData.heightSegments, 0, 2 * Math.PI, Math.PI/2, Math.PI);
+        }else if (type == 3){
+          newGeometry = new THREE.SphereBufferGeometry(
+            this.metaData.radius, this.metaData.widthSegments,
+            this.metaData.heightSegments, Math.PI, Math.PI, 0, Math.PI);
+        }
+        geometryCache[geomKey] = newGeometry;
+      }else{
+        newGeometry = cachedGeom;
+        console.log("CACHED");
       }
+    }else{
+      var originalGeomKey = (
+        "SphereBufferGeometry" + PIPE +
+        Math.abs(this.metaData.radius) + PIPE +
+        this.metaData.widthSegments + PIPE + this.metaData.heightSegments
+      );
+      newGeometry = geometryCache[originalGeomKey];
+      delete this.metaData.slicedType;
+    }
+  }else if (this.type == "surface"){
+    var geomKey = (
+      "PlaneBufferGeometry" + PIPE +
+      this.metaData.width + PIPE + this.metaData.height + PIPE +
+      this.metaData.widthSegments + PIPE + this.metaData.heightSegments
+    );
+    var originalGeometry = geometryCache[geomKey];
+    var normals = [], positions = [], uvs = [0, 0, 1, 1, 0, 1];
+    var subIndices;
+    var indices = originalGeometry.index.array;
+    if (type == 0){
+      subIndices = [indices[0], indices[1], indices[2]];
+    }else if (type == 1){
+      subIndices = [indices[3], indices[4], indices[5]];
+    }else if (type == 2){
+      subIndices = [indices[1], indices[4], indices[0]];
+    }else if (type == 3){
+      subIndices = [indices[2], indices[4], indices[0]]
     }
 
-    var newGeometryKey = (
-      "SlicedPlaneBufferGeometry" + PIPE +
-      this.metaData.width + PIPE + this.metaData.height + PIPE + type
-    );
-    newGeometry = geometryCache[newGeometryKey];
-    if (!newGeometry){
-      newGeometry = new THREE.BufferGeometry();
-      newGeometry.addAttribute("position", new THREE.BufferAttribute(new Float32Array(positions), 3));
-      newGeometry.addAttribute("normal", new THREE.BufferAttribute(new Float32Array(normals), 3));
-      newGeometry.addAttribute("uv", new THREE.BufferAttribute(new Float32Array(uvs), 2));
-      geometryCache[newGeometryKey] = newGeometry;
+    if (type == 0 || type == 1 || type == 2 || type == 3){
+      this.metaData.slicedType = type;
+      for (var i = 0; i<subIndices.length; i++){
+        for (var i2 = 0; i2<3; i2++){
+          positions.push(originalGeometry.attributes.position.array[
+            (3 * subIndices[i]) + i2
+          ]);
+          normals.push(originalGeometry.attributes.normal.array[
+            (3 * subIndices[i]) + i2
+          ]);
+        }
+      }
+
+      var newGeometryKey = (
+        "SlicedPlaneBufferGeometry" + PIPE +
+        this.metaData.width + PIPE + this.metaData.height + PIPE + type
+      );
+      newGeometry = geometryCache[newGeometryKey];
+      if (!newGeometry){
+        newGeometry = new THREE.BufferGeometry();
+        newGeometry.addAttribute("position", new THREE.BufferAttribute(new Float32Array(positions), 3));
+        newGeometry.addAttribute("normal", new THREE.BufferAttribute(new Float32Array(normals), 3));
+        newGeometry.addAttribute("uv", new THREE.BufferAttribute(new Float32Array(uvs), 2));
+        geometryCache[newGeometryKey] = newGeometry;
+      }
+    }else{
+      delete this.metaData.slicedType;
+      newGeometry = originalGeometry;
     }
-  }else{
-    delete this.metaData.slicedType;
-    newGeometry = originalGeometry;
   }
+
   scene.remove(this.mesh);
   var newMesh = new THREE.Mesh(newGeometry, this.mesh.material);
   newMesh.position.copy(this.mesh.position);
@@ -437,6 +487,7 @@ AddedObject.prototype.sliceSurfaceInHalf = function(type){
   newMesh.addedObject = this;
   this.mesh = newMesh;
   scene.add(this.mesh);
+
 }
 
 AddedObject.prototype.syncProperties = function(refObject){
