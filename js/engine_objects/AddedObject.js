@@ -409,7 +409,7 @@ AddedObject.prototype.sliceInHalf = function(type){
         }else if (type == 2){
           newGeometry = new THREE.SphereBufferGeometry(
             this.metaData.radius, this.metaData.widthSegments,
-            this.metaData.heightSegments, 0, 2 * Math.PI, Math.PI/2, Math.PI);
+            this.metaData.heightSegments, 0, 2 * Math.PI, Math.PI / 2, 0.5 * Math.PI);
         }else if (type == 3){
           newGeometry = new THREE.SphereBufferGeometry(
             this.metaData.radius, this.metaData.widthSegments,
