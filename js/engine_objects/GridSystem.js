@@ -1275,3 +1275,158 @@ GridSystem.prototype.newSphere = function(sphereName, material, radius, selectio
   sphereMesh.addedObject = addedObjectInstance;
   addedObjectInstance.updateMVMatrix();
 }
+
+GridSystem.prototype.newCylinder = function(cylinderName, material, topRadius, bottomRadius, height, isOpenEnded, selections){
+  var cylinderCenterX, cylinderCenterY, cylinderCenterZ;
+  if (this.axis == "XZ"){
+    if (selections.length == 1){
+      var grid = selections[0];
+      cylinderCenterX = grid.centerX;
+      cylinderCenterY = grid.centerY + (height/2);
+      cylinderCenterZ = grid.centerZ;
+    }else if (selections.length == 2){
+      var grid1 = selections[0];
+      var grid2 = selections[1];
+      cylinderCenterX = (grid1.centerX + grid2.centerX) / 2;
+      cylinderCenterY = ((grid1.centerY + grid2.centerY) / 2) + (height/2);
+      cylinderCenterZ = (grid1.centerZ + grid2.centerZ) / 2;
+    }
+  }else if (this.axis == "XY"){
+    if (selections.length == 1){
+      var grid = selections[0];
+      cylinderCenterX = grid.centerX;
+      cylinderCenterY = grid.centerY;
+      cylinderCenterZ = grid.centerZ + (height/2);
+    }else if (selections.length == 2){
+      var grid1 = selections[0];
+      var grid2 = selections[1];
+      cylinderCenterX = (grid1.centerX + grid2.centerX) / 2;
+      cylinderCenterY = (grid1.centerY + grid2.centerY) / 2;
+      cylinderCenterZ = ((grid1.centerZ + grid2.centerZ) / 2) + (height/2);
+    }
+  }else if (this.axis == "YZ"){
+    if (selections.length == 1){
+      var grid = selections[0];
+      cylinderCenterX = grid.centerX + (height/2);
+      cylinderCenterY = grid.centerY;
+      cylinderCenterZ = grid.centerZ;
+    }else if (selections.length == 2){
+      var grid1 = selections[0];
+      var grid2 = selections[1];
+      cylinderCenterX = ((grid1.centerX + grid2.centerX) / 2) + (height/2);
+      cylinderCenterY = (grid1.centerY + grid2.centerY) / 2;
+      cylinderCenterZ = (grid1.centerZ + grid2.centerZ) / 2;
+    }
+  }
+  if (this.isSuperposed){
+    cylinderCenterY = cylinderCenterY - superposeYOffset;
+  }
+  var geomKey = "CylinderBufferGeometry" + PIPE + height + PIPE + topRadius + PIPE +
+                                         bottomRadius + PIPE + 8 + PIPE + 1 + PIPE + isOpenEnded;
+  var cylinderGeometry = geometryCache[geomKey];
+  if (!cylinderGeometry){
+    cylinderGeometry = new THREE.CylinderBufferGeometry(topRadius, bottomRadius, height, 8, 1, isOpenEnded);
+    geometryCache[geomKey] = cylinderGeometry;
+  }
+  var cylinderMesh = new MeshGenerator(cylinderGeometry, material).generateMesh();
+  cylinderMesh.position.set(cylinderCenterX, cylinderCenterY, cylinderCenterZ);
+  scene.add(cylinderMesh);
+  var cylinderPhysicsShape = new CANNON.Cylinder(topRadius, bottomRadius, Math.abs(height), 8);
+  if (this.axis == "XZ"){
+    var quat = new CANNON.Quaternion();
+    var coef = 1;
+    if (height < 0){
+      coef = -1;
+    }
+    quat.setFromAxisAngle(new CANNON.Vec3(1, 0, 0), -Math.PI/2 * coef);
+    var translation = new CANNON.Vec3(0, 0, 0);
+    cylinderPhysicsShape.transformAllPoints(translation,quat);
+  }else if (this.axis == "XY"){
+    cylinderMesh.rotateX(Math.PI/2);
+    if (height < 0){
+      var quat = new CANNON.Quaternion();
+      quat.setFromAxisAngle(new CANNON.Vec3(0, 1, 0), -Math.PI);
+      var translation = new CANNON.Vec3(0, 0, 0);
+      cylinderPhysicsShape.transformAllPoints(translation,quat);
+    }
+  }else if (this.axis == "YZ"){
+    cylinderMesh.rotateZ(-Math.PI/2);
+    var quat = new CANNON.Quaternion();
+    var coef = 1;
+    if (height < 0){
+      coef = -1;
+    }
+    quat.setFromAxisAngle(new CANNON.Vec3(0, 1, 0), coef * Math.PI/2);
+    var translation = new CANNON.Vec3(0, 0, 0);
+    cylinderPhysicsShape.transformAllPoints(translation,quat);
+  }
+  var physicsMaterial = new CANNON.Material();
+  var cylinderPhysicsBody = new CANNON.Body({
+    mass: 0,
+    shape: cylinderPhysicsShape,
+    material: physicsMaterial
+  });
+  cylinderPhysicsBody.position.set(
+    cylinderMesh.position.x,
+    cylinderMesh.position.y,
+    cylinderMesh.position.z
+  );
+  physicsWorld.add(cylinderPhysicsBody);
+  for (var i = 0; i<selections.length; i++){
+    selections[i].toggleSelect(false, false, false, true);
+    delete gridSelections[selections[i].name];
+  }
+  var destroyedGrids = new Object();
+  if(selections.length == 1){
+    destroyedGrids[selections[0].name] = selections[0];
+  }else{
+    var grid1 = selections[0];
+    var grid2 = selections[1];
+    startRow = grid1.rowNumber;
+    if (grid2.rowNumber < grid1.rowNumber){
+      startRow = grid2.rowNumber;
+    }
+    startCol = grid1.colNumber;
+    if (grid2.colNumber < grid1.colNumber){
+      startCol = grid2.colNumber;
+    }
+    finalRow = grid1.rowNumber;
+    if (grid2.rowNumber > grid1.rowNumber){
+      finalRow = grid2.rowNumber;
+    }
+    finalCol = grid1.colNumber;
+    if (grid2.colNumber > grid1.colNumber){
+      finalCol = grid2.colNumber;
+    }
+    for (var row = startRow; row <= finalRow; row++){
+      for (var col = startCol; col <= finalCol; col++ ){
+        var grid = this.getGridByColRow(col, row);
+        if (grid){
+          destroyedGrids[grid.name] = grid;
+        }
+      }
+    }
+  }
+  var metaData = new Object();
+  metaData["height"] = height;
+  metaData["topRadius"] = topRadius;
+  metaData["bottomRadius"] = bottomRadius;
+  metaData["isOpenEnded"] = isOpenEnded;
+  metaData["gridCount"] = selections.length;
+  metaData["grid1Name"] = selections[0].name;
+  if (selections.length == 2){
+    metaData["grid2Name"] = selections[1].name;
+  }
+  metaData["gridSystemName"] = this.name;
+  metaData["centerX"] = cylinderMesh.position.x;
+  metaData["centerY"] = cylinderMesh.position.y;
+  metaData["centerZ"] = cylinderMesh.position.z;
+  metaData["gridSystemAxis"] = this.axis;
+
+  var addedObjectInstance = new AddedObject(cylinderName, "cylinder", metaData, material,
+                                    cylinderMesh, cylinderPhysicsBody, destroyedGrids);
+  addedObjects[cylinderName] = addedObjectInstance;
+
+  cylinderMesh.addedObject = addedObjectInstance;
+  addedObjectInstance.updateMVMatrix();
+}

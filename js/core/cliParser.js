@@ -725,7 +725,7 @@ function parse(input){
           if (objectName.toUpperCase() == "NULL"){
             objectName = generateUniqueObjectName();
           }
-          if (addedObjects[objectName] || objectGroups[objectName] || gridSystems[name]){
+          if (addedObjects[objectName] || objectGroups[objectName] || gridSystems[objectName]){
             terminal.printError(Text.NAME_MUST_BE_UNIQUE);
             return true;
           }
@@ -4069,7 +4069,7 @@ function parse(input){
           if (sphereName.toUpperCase() == "NULL"){
             sphereName = generateUniqueObjectName();
           }
-          if (addedObjects[sphereName] || objectGroups[sphereName] || gridSystems[name]){
+          if (addedObjects[sphereName] || objectGroups[sphereName] || gridSystems[sphereName]){
               terminal.printError(Text.NAME_MUST_BE_UNIQUE);
               return true;
           }
@@ -4558,6 +4558,111 @@ function parse(input){
           }else{
             terminal.printError(Text.AREA_CONFIGURATIONS_ARE_ALREADY_STARTED);
           }
+          return true;
+        break;
+        case 140: //newCylinder
+          if (mode != 0){
+            terminal.printError(Text.WORKS_ONLY_IN_DESIGN_MODE);
+            return true;
+          }
+          var cylinderName = splitted[1];
+          var materialName = splitted[2];
+          var topRadius = parseFloat(splitted[3]);
+          var bottomRadius = parseFloat(splitted[4]);
+          var cylinderHeight = parseFloat(splitted[5]);
+          var isOpenEnded = splitted[6].toLowerCase();
+          if (cylinderName.indexOf(Text.COMMA) != -1){
+            terminal.printError(Text.INVALID_CHARACTER_IN_OBJECT_NAME);
+            return true;
+          }
+          if (cylinderName.toUpperCase() == "NULL"){
+            cylinderName = generateUniqueObjectName();
+          }
+          if (addedObjects[cylinderName] || objectGroups[cylinderName] || gridSystems[cylinderName]){
+              terminal.printError(Text.NAME_MUST_BE_UNIQUE);
+              return true;
+          }
+          if (disabledObjectNames[cylinderName]){
+            terminal.printError(Text.NAME_USED_IN_AN_OBJECT_GROUP);
+            return true;
+          }
+          var material = materials[materialName];
+          if (materialName.toUpperCase() != "NULL"){
+            if (!material){
+              terminal.printError(Text.NO_SUCH_MATERIAL);
+              return true;
+            }
+          }else{
+            if (defaultMaterialType == "BASIC"){
+              material = new BasicMaterial({
+                name: "NULL_BASIC",
+                color: "white",
+                alpha: 1
+              });
+            }else if (defaultMaterialType == "PHONG"){
+              material = new THREE.MeshPhongMaterial({
+                color: "white",
+                side: THREE.DoubleSide,
+                wireframe: false
+              });
+              material.roygbivMaterialName = "NULL_PHONG";
+            }
+          }
+          if (isNaN(topRadius)){
+            terminal.printError(Text.IS_NOT_A_NUMBER.replace(Text.PARAM1, "topRadius"));
+            return true;
+          }
+          if (isNaN(bottomRadius)){
+            terminal.printError(Text.IS_NOT_A_NUMBER.replace(Text.PARAM1, "bottomRadius"));
+            return true;
+          }
+          if (isNaN(cylinderHeight)){
+            terminal.printError(Text.IS_NOT_A_NUMBER.replace(Text.PARAM1, "height"));
+            return true;
+          }
+          if (isOpenEnded != "true" && isOpenEnded != "false"){
+            terminal.printError(Text.ISOPENENDED_MUST_BE_TRUE_OR_FALSE);
+            return true;
+          }
+          isOpenEnded = (isOpenEnded == "true");
+          if (!jobHandlerWorking){
+            var gridSelectionSize = Object.keys(gridSelections).length;
+            if (gridSelectionSize != 1 && gridSelectionSize != 2){
+              terminal.printError(Text.MUST_HAVE_1_OR_2_GRIDS_SELECTED);
+              return true;
+            }
+          }
+          var selections = [];
+          if (!jobHandlerWorking){
+            for (var gridName in gridSelections){
+              selections.push(gridSelections[gridName]);
+            }
+          }else{
+            selections.push(jobHandlerSelectedGrid);
+          }
+
+          if (selections.length == 2){
+            var grid1 = selections[0];
+            var grid2 = selections[1];
+            if (grid1.parentName != grid2.parentName){
+              terminal.printError(Text.SELECTED_GRIDS_SAME_GRIDSYSTEM);
+              return true;
+            }
+          }
+          var gridSystemName = selections[0].parentName;
+          var gridSystem = gridSystems[gridSystemName];
+          gridSystem.newCylinder(
+            cylinderName, material, topRadius, bottomRadius,
+            cylinderHeight, isOpenEnded, selections
+          );
+          if (!jobHandlerWorking){
+            terminal.printInfo(Text.CYLINDER_CREATED);
+          }
+          if (areaConfigurationsVisible){
+            $(datGuiAreaConfigurations.domElement).attr("hidden", true);
+            areaConfigurationsVisible = false;
+          }
+          rayCaster.refresh();
           return true;
         break;
       }

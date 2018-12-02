@@ -609,6 +609,16 @@ var CommandDescriptor = function(){
   this.autoConfigureArea.types = [];
   this.autoConfigureArea.types.push(this.AREA_NAME); // areaName
 
+  // newCylinder
+  this.newCylinder = new Object();
+  this.newCylinder.types = [];
+  this.newCylinder.types.push(this.UNKNOWN_INDICATOR); // name
+  this.newCylinder.types.push(this.MATERIAL_NAME_WITH_NULL); // materialName
+  this.newCylinder.types.push(this.UNKNOWN_INDICATOR); // topRadius
+  this.newCylinder.types.push(this.UNKNOWN_INDICATOR); // bottomRadius
+  this.newCylinder.types.push(this.UNKNOWN_INDICATOR); // height
+  this.newCylinder.types.push(this.BOOLEAN); // isOpenEnded
+
 };
 
 CommandDescriptor.prototype.test = function(){

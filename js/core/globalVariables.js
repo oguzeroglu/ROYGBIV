@@ -145,7 +145,8 @@ var commandArgumentsExpectedCount = [
     4, //newAreaConfiguration
     1, //autoConfigureArea
     0, //stopAreaConfigurations
-    0 //startAreaConfigurations
+    0, //startAreaConfigurations
+    6 //newCylinder
 ];
 var commandArgumentsExpectedExplanation = [
   "help", //help
@@ -287,7 +288,8 @@ var commandArgumentsExpectedExplanation = [
   "newAreaConfiguration areaName objectName isVisible sides", //newAreaConfiguration
   "autoConfigureArea areaName", //autoConfigureArea
   "stopAreaConfigurations", //stopAreaConfigurations
-  "startAreaConfigurations" //startAreaConfigurations
+  "startAreaConfigurations", //startAreaConfigurations
+  "newCylinder name materialName topRadius bottomRadius height isOpenEnded" //newCylinder
 ];
 var commands = [
   "help",
@@ -429,7 +431,8 @@ var commands = [
   "newAreaConfiguration",
   "autoConfigureArea",
   "stopAreaConfigurations",
-  "startAreaConfigurations"
+  "startAreaConfigurations",
+  "newCylinder"
 ];
 var commandInfo = [
   "help: Prints command list.",
@@ -571,7 +574,8 @@ var commandInfo = [
   "newAreaConfiguration: Creates a new area configuration for an area and object.",
   "autoConfigureArea: Automatically configures an area using ray tests. Manual corrections may be necesary after using this command.",
   "stopAreaConfigurations: Stops area configurations handling.",
-  "startAreaConfigurations: Starts area configurations handling."
+  "startAreaConfigurations: Starts area configurations handling.",
+  "newCylinder: Creates a new cylinder."
 ];
 var keyboardInfo = [
   "W/S : Translates the camera on axis Z.",
@@ -770,6 +774,8 @@ var boxHeightSegments = 10;
 var boxDepthSegments = 10;
 var sphereWidthSegments = 10;
 var sphereHeightSegments = 10;
+var cylinderWidthSegments = 10;
+var cylinderHeightSegments = 10;
 var lightPositionDeltaX = 0.5;
 var lightPositionDeltaY = 0.5;
 var lightPositionDeltaZ = 0.5;
@@ -804,6 +810,9 @@ var THREE_AXIS_VECTOR_Z = new THREE.Vector3(0, 0, 1);
 var CANNON_AXIS_VECTOR_X = new CANNON.Vec3(1, 0, 0);
 var CANNON_AXIS_VECTOR_Y = new CANNON.Vec3(0, 1, 0);
 var CANNON_AXIS_VECTOR_Z = new CANNON.Vec3(0, 0, 1);
+var CANNON_ZERO_VECTOR = new CANNON.Vec3(0, 0, 0);
+var REUSABLE_CANNON_QUATERNION = new CANNON.Quaternion();
+var REUSABLE_CANNON_QUATERNION_2 = new CANNON.Quaternion();
 var scriptEditorShowing = false;
 var NO_BLENDING = THREE.NoBlending;
 var NORMAL_BLENDING = THREE.NormalBlending;

@@ -1269,41 +1269,6 @@ ObjectGroup.prototype.isVisibleOnThePreviewScene = function(){
   return !(this.isHidden);
 }
 
-ObjectGroup.prototype.preparePhysicsInfo = function(){
-  var info = "";
-  var childrenCount = Object.keys(this.group).length;
-  var id = this.physicsBody.id;
-  var mass = this.physicsBody.mass;
-  var positionX = this.physicsBody.position.x;
-  var positionY = this.physicsBody.position.y;
-  var positionZ = this.physicsBody.position.z;
-  var quaternionX = this.physicsBody.quaternion.x;
-  var quaternionY = this.physicsBody.quaternion.y;
-  var quaternionZ = this.physicsBody.quaternion.z;
-  var quaternionW = this.physicsBody.quaternion.w;
-  info = childrenCount + "," + id + "," + mass + "," + positionX + "," + positionY
-                       + "," + positionZ + "," + quaternionX
-                       + "," + quaternionY + "," + quaternionZ
-                       + "," + quaternionW;
-  for (var objectName in this.group){
-    var object = this.group[objectName];
-    info += "," + object.preparePhysicsInfo();
-  }
-  return info;
-}
-
-ObjectGroup.prototype.getFaceNormals = function(){
-
-}
-
-ObjectGroup.prototype.getFaceInfos = function(){
-
-}
-
-ObjectGroup.prototype.getFaceNameFromNormal = function(normal){
-
-}
-
 ObjectGroup.prototype.setBlending = function(blendingModeInt){
   this.mesh.material.blending = blendingModeInt;
   if (blendingModeInt == NO_BLENDING){

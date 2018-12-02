@@ -786,6 +786,8 @@ AddedObject.prototype.rotate = function(axis, radians, fromScript){
     this.rotateRamp(axis, radians, fromScript);
   }else if (this.type == "sphere"){
     this.rotateSphere(axis, radians, fromScript);
+  }else if (this.type == "cylinder"){
+    this.rotateCylinder(axis, radians, fromScript);
   }
 
   if (!fromScript){
@@ -885,6 +887,34 @@ AddedObject.prototype.rotateSphere = function(axis, radians, fromScript){
     );
   }
   physicsBody.quaternion.copy(mesh.quaternion);
+  if (!fromScript){
+    physicsBody.initQuaternion.copy(
+      physicsBody.quaternion
+    );
+  }
+}
+
+AddedObject.prototype.rotateCylinder = function(axis, radians, fromScript){
+  var mesh = this.mesh;
+  var physicsBody = this.physicsBody;
+  var gridSystemAxis = this.metaData.gridSystemAxis;
+  if (axis == "x"){
+    mesh.rotateOnWorldAxis(
+      THREE_AXIS_VECTOR_X,
+      radians
+    );
+  }else if (axis == "y"){
+    mesh.rotateOnWorldAxis(
+      THREE_AXIS_VECTOR_Y,
+      radians
+    );
+  }else if (axis == "z"){
+    mesh.rotateOnWorldAxis(
+      THREE_AXIS_VECTOR_Z,
+      radians
+    );
+  }
+  this.rotatePhysicsBody(axis, radians);
   if (!fromScript){
     physicsBody.initQuaternion.copy(
       physicsBody.quaternion
@@ -1003,6 +1033,18 @@ AddedObject.prototype.rotateBox = function(axis, radians, fromScript){
       physicsBody.quaternion
     );
   }
+}
+
+AddedObject.prototype.rotatePhysicsBody = function(axis, radians){
+  if (axis.toLowerCase() == "x"){
+    REUSABLE_CANNON_QUATERNION.setFromAxisAngle(CANNON_AXIS_VECTOR_X, radians);
+  }else if (axis.toLowerCase() == "y"){
+    REUSABLE_CANNON_QUATERNION.setFromAxisAngle(CANNON_AXIS_VECTOR_Y, radians);
+  }else if (axis.toLowerCase() == "z"){
+    REUSABLE_CANNON_QUATERNION.setFromAxisAngle(CANNON_AXIS_VECTOR_Z, radians);
+  }
+  REUSABLE_CANNON_QUATERNION.mult(this.physicsBody.quaternion, REUSABLE_CANNON_QUATERNION_2);
+  this.physicsBody.quaternion.copy(REUSABLE_CANNON_QUATERNION_2);
 }
 
 AddedObject.prototype.setCannonQuaternionFromTHREE = function(){
@@ -1541,6 +1583,87 @@ AddedObject.prototype.segmentGeometry = function(isCustom, count, returnGeometry
         }
       }
     }
+  }else if (this.type == "cylinder"){
+    var height = this.metaData["height"];
+    var topRadius = this.metaData["topRadius"];
+    var bottomRadius = this.metaData["bottomRadius"];
+    var isOpenEnded = this.metaData["isOpenEnded"];
+    if (!isCustom){
+      var geomKey = (
+        "CylinderBufferGeometry" + PIPE + height + PIPE + topRadius + PIPE + bottomRadius + PIPE +
+        cylinderWidthSegments + PIPE + cylinderHeightSegments + PIPE + isOpenEnded
+      );
+      newGeometry = geometryCache[geomKey];
+      if (!newGeometry){
+        newGeometry = new THREE.CylinderBufferGeometry(
+          topRadius, bottomRadius, height, cylinderWidthSegments, cylinderHeightSegments, isOpenEnded
+        );
+        geometryCache[geomKey] = newGeometry;
+      }
+    }else{
+      if (!isNaN(count)){
+        if (count < 8){
+          count = 8;
+        }
+        if (returnGeometry){
+          var geomKey = (
+            "CylinderGeometry" + PIPE + height + PIPE + topRadius + PIPE + bottomRadius + PIPE +
+            count + PIPE + count + PIPE + isOpenEnded
+          );
+          newGeometry = geometryCache[geomKey];
+          if (!newGeometry){
+            newGeometry = new THREE.CylinderGeometry(
+              topRadius, bottomRadius, height, count, count, isOpenEnded
+            );
+            geometryCache[geomKey] = newGeometry;
+          }
+        }else{
+          var geomKey = (
+            "CylinderBufferGeometry" + PIPE + height + PIPE + topRadius + PIPE + bottomRadius + PIPE +
+            count + PIPE + count + PIPE + isOpenEnded
+          );
+          newGeometry = geometryCache[geomKey];
+          if (!newGeometry){
+            newGeometry = new THREE.CylinderBufferGeometry(
+              topRadius, bottomRadius, height, count, count, isOpenEnded
+            );
+            geometryCache[geomKey] = newGeometry;
+          }
+        }
+      }else{
+        if (count.width < 8){
+          count.width = 8;
+        }
+        if (count.height < 1){
+          count.height = 1;
+        }
+        if (returnGeometry){
+          var geomKey = (
+            "CylinderGeometry" + PIPE + height + PIPE + topRadius + PIPE + bottomRadius + PIPE +
+            count.width + PIPE + count.height + PIPE + isOpenEnded
+          );
+          newGeometry = geometryCache[geomKey];
+          if (!newGeometry){
+            newGeometry = new THREE.CylinderGeometry(
+              topRadius, bottomRadius, height, count.width, count.height, isOpenEnded
+            );
+            geometryCache[geomKey] = newGeometry;
+          }
+        }else{
+          var geomKey = (
+            "CylinderBufferGeometry" + PIPE + height + PIPE + topRadius + PIPE + bottomRadius + PIPE +
+            count.width + PIPE + count.height + PIPE + isOpenEnded
+          );
+          newGeometry = geometryCache[geomKey];
+          if (!newGeometry){
+            newGeometry = new THREE.CylinderBufferGeometry(
+              topRadius, bottomRadius, height, count.width, count.height, isOpenEnded
+            );
+            geometryCache[geomKey] = newGeometry;
+          }
+        }
+      }
+    }
   }
 
   if (returnGeometry){
@@ -1593,6 +1716,19 @@ AddedObject.prototype.segmentGeometry = function(isCustom, count, returnGeometry
     if (!isCustom){
       this.metaData["widthSegments"] = sphereWidthSegments;
       this.metaData["heightSegments"] = sphereHeightSegments;
+    }else{
+      if (isNaN(count)){
+        this.metaData["widthSegments"] = count.width;
+        this.metaData["heightSegments"] = count.height;
+      }else{
+        this.metaData["widthSegments"] = count;
+        this.metaData["heightSegments"] = count;
+      }
+    }
+  }else if (this.type == "cylinder"){
+    if (!isCustom){
+      this.metaData["widthSegments"] = cylinderWidthSegments;
+      this.metaData["heightSegments"] = cylinderHeightSegments;
     }else{
       if (isNaN(count)){
         this.metaData["widthSegments"] = count.width;
@@ -1711,87 +1847,6 @@ AddedObject.prototype.isVisibleOnThePreviewScene = function(parentName){
   }else{
     return objectGroups[parentName].isVisibleOnThePreviewScene();
   }
-}
-
-AddedObject.prototype.preparePhysicsInfo = function(){
-  var type = 0;
-  if (this.type == "surface"){
-    type = 1;
-  }else if (this.type == "ramp"){
-    type = 2;
-  }else if (this.type == "box"){
-    type = 3;
-  }else if (this.type == "sphere"){
-    type = 4;
-  }
-  var positionX = this.physicsBody.position.x;
-  var positionY = this.physicsBody.position.y;
-  var positionZ = this.physicsBody.position.z;
-  var quaternionX = this.physicsBody.quaternion.x;
-  var quaternionY = this.physicsBody.quaternion.y;
-  var quaternionZ = this.physicsBody.quaternion.z;
-  var quaternionW = this.physicsBody.quaternion.w;
-  var physicsInfo = type + "," +positionX + "," + positionY + "," + positionZ + ","
-                               + quaternionX + "," + quaternionY + ","
-                               + quaternionZ + "," + quaternionW;
-  if (this.type == "surface"){
-    var physicsShapeParameterX = this.metaData.physicsShapeParameterX;
-    var physicsShapeParameterY = this.metaData.physicsShapeParameterY;
-    var physicsShapeParameterZ = this.metaData.physicsShapeParameterZ;
-    physicsInfo += "," + physicsShapeParameterX + "," + physicsShapeParameterY
-                       + "," + physicsShapeParameterZ;
-  }else if (this.type == "box"){
-    var boxSizeX = this.metaData.boxSizeX;
-    var boxSizeY = this.metaData.boxSizeY;
-    var boxSizeZ = this.metaData.boxSizeZ;
-    physicsInfo += "," + boxSizeX + "," + boxSizeY + "," + boxSizeZ;
-  }else if (this.type == "ramp"){
-    var rampWidth = this.metaData.rampWidth;
-    var rampHeight = this.metaData.rampHeight;
-    var fromEulerX = this.metaData.fromEulerX;
-    var fromEulerY = this.metaData.fromEulerY;
-    var fromEulerZ = this.metaData.fromEulerZ;
-    physicsInfo += "," + rampWidth + "," +rampHeight + "," + fromEulerX
-                       + "," + fromEulerY + "," + fromEulerZ;
-  }else if (this.type == "sphere"){
-    var sphereRadius = Math.abs(this.metaData.radius);
-    physicsInfo += "," + sphereRadius;
-  }
-  physicsInfo += "," + this.physicsBody.mass;
-  physicsInfo += "," + this.physicsBody.id;
-  return physicsInfo;
-}
-
-AddedObject.prototype.getFaceNormals = function(ary){
-
-}
-
-AddedObject.prototype.getFaceInfos = function(obj){
-
-}
-
-AddedObject.prototype.getFaceNameFromNormal = function(normal){
-  var axisText = "";
-  if (normal.x == 0 && normal.y == 0 && normal.z == 1){
-    axisText = "+Z";
-  }
-  if (normal.x == 0 && normal.y == 0 && normal.z == -1){
-    axisText = "-Z";
-  }
-  if (normal.x == 0 && normal.y == 1 && normal.z == 0){
-    axisText = "+Y";
-  }
-  if (normal.x == 0 && normal.y == -1 && normal.z == 0){
-    axisText = "-Y";
-  }
-  if (normal.x == 1 && normal.y == 0 && normal.z == 0){
-    axisText = "+X";
-  }
-  if (normal.x == -1 && normal.y == 0 && normal.z == 0){
-    axisText = "-X";
-  }
-  var key = axisText;
-  return key;
 }
 
 AddedObject.prototype.isTextureUsed = function(textureName){
