@@ -32,6 +32,8 @@ var AddedObject = function(name, type, metaData, material, mesh, physicsBody, de
   }else if (type == "sphere"){
     this.metaData["widthSegments"] = 8;
     this.metaData["heightSegments"] = 6;
+  }else if (type == "cylinder"){
+    this.metaData["widthSegments"] = 8;
   }
 
   this.metaData["textureRepeatU"] = 1;

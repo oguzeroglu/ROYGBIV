@@ -164,6 +164,12 @@ function setTHREEQuaternionFromCANNON(mesh, physicsBody, axis, type, gridSystemA
         }
       }
     }
+  }else if (type == "cylinder"){
+    if (gridSystemAxis == "YZ"){
+      mesh.rotateZ(Math.PI / 2);
+    }else if (gridSystemAxis == "XY"){
+      mesh.rotateX(Math.PI / 2);
+    }
   }
 }
 

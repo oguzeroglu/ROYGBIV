@@ -183,9 +183,17 @@ StateLoader.prototype.load = function(undo){
       var depthSegments = metaData["depthSegments"];
       if (!widthSegments){
         widthSegments = 1;
+        if (type == "cylinder"){
+          widthSegments = 8;
+        }else if (type == "sphere"){
+          widthSegments = 8;
+        }
       }
       if (!heightSegments){
         heightSegments = 1;
+        if (type == "sphere"){
+          widthSegments = 6;
+        }
       }
       if (!depthSegments){
         depthSegments = 1;
@@ -403,6 +411,40 @@ StateLoader.prototype.load = function(undo){
           sphereMesh, spherePhysicsBody, destroyedGrids
         );
         sphereMesh.addedObject = addedObjectInstance;
+      }else if (type == "cylinder"){
+        var cylinderHeight = metaData["height"];
+        var topRadius = metaData["topRadius"];
+        var bottomRadius = metaData["bottomRadius"];
+        var isOpenEnded = metaData["isOpenEnded"];
+        var geomKey = "CylinderBufferGeometry" + PIPE + cylinderHeight + PIPE + topRadius + PIPE +
+                      bottomRadius + PIPE + widthSegments + PIPE + heightSegments + PIPE + isOpenEnded;
+        var cylinderGeometry = geometryCache[geomKey];
+        if (!cylinderGeometry){
+          cylinderGeometry = new THREE.CylinderBufferGeometry(
+            topRadius, bottomRadius, cylinderHeight, widthSegments, heightSegments, isOpenEnded
+          );
+          geometryCache[geomKey] = cylinderGeometry;
+        }
+        var cylinderMesh = new MeshGenerator(cylinderGeometry, material).generateMesh();
+        var centerX = metaData["centerX"];
+        var centerY = metaData["centerY"];
+        var centerZ = metaData["centerZ"];
+        cylinderMesh.position.set(centerX, centerY, centerZ);
+        scene.add(cylinderMesh);
+        var physicsMaterial = new CANNON.Material();
+        var cylinderPhysicsShape = new CANNON.Cylinder(topRadius, bottomRadius, Math.abs(cylinderHeight), 8);
+        var cylinderPhysicsBody = new CANNON.Body({
+          mass: mass,
+          shape: cylinderPhysicsShape,
+          material: physicsMaterial
+        });
+        cylinderPhysicsBody.position.set(centerX, centerY, centerZ);
+        physicsWorld.add(cylinderPhysicsBody);
+        addedObjectInstance = new AddedObject(
+          addedObjectName, "cylinder", metaData, material,
+          cylinderMesh, cylinderPhysicsBody, destroyedGrids
+        );
+        cylinderMesh.addedObject = addedObjectInstance;
       }
       addedObjectInstance.associatedTexturePack = curAddedObjectExport.associatedTexturePack;
       addedObjectInstance.metaData["widthSegments"] = widthSegments;
