@@ -699,19 +699,19 @@ AddedObject.prototype.getTextureStack = function(){
 
 AddedObject.prototype.getPositionAtAxis = function(axis){
   if (axis.toLowerCase() == "x"){
-    if (this.type == "box" || this.type == "ramp" || this.type == "sphere"){
+    if (this.type == "box" || this.type == "ramp" || this.type == "sphere" || this.type == "cylinder"){
       return parseInt(this.metaData["centerX"]);
     }else if (this.type == "surface"){
       return parseInt(this.metaData["positionX"]);
     }
   }else if (axis.toLowerCase() == "y"){
-    if (this.type == "box" || this.type == "ramp" || this.type == "sphere"){
+    if (this.type == "box" || this.type == "ramp" || this.type == "sphere" || this.type == "cylinder"){
       return parseInt(this.metaData["centerY"]);
     }else if (this.type == "surface"){
       return parseInt(this.metaData["positionY"]);
     }
   }else if (axis.toLowerCase() == "z"){
-    if (this.type == "box" || this.type == "ramp" || this.type == "sphere"){
+    if (this.type == "box" || this.type == "ramp" || this.type == "sphere" || this.type == "cylinder"){
       return parseInt(this.metaData["centerZ"]);
     }else if (this.type == "surface"){
       return parseInt(this.metaData["positionZ"]);
@@ -722,7 +722,7 @@ AddedObject.prototype.getPositionAtAxis = function(axis){
 AddedObject.prototype.resetPosition = function(){
   var mesh = this.mesh;
   var physicsBody = this.physicsBody;
-  if (this.type == "box" || this.type == "ramp" || this.type == "sphere"){
+  if (this.type == "box" || this.type == "ramp" || this.type == "sphere" || this.type == "cylinder"){
     mesh.position.x = this.metaData["centerX"];
     mesh.position.y = this.metaData["centerY"];
     mesh.position.z = this.metaData["centerZ"];
@@ -763,7 +763,7 @@ AddedObject.prototype.translate = function(axis, amount, fromScript){
   physicsBody.position.copy(this.mesh.position);
 
   if (!fromScript){
-    if (this.type == "box" || this.type == "ramp" || this.type == "sphere"){
+    if (this.type == "box" || this.type == "ramp" || this.type == "sphere" || this.type == "cylinder"){
       this.metaData["centerX"] = this.mesh.position.x;
       this.metaData["centerY"] = this.mesh.position.y;
       this.metaData["centerZ"] = this.mesh.position.z;
@@ -816,6 +816,8 @@ AddedObject.prototype.setPhysicsAfterRotationAroundPoint = function(axis, radian
     this.setRampPhysicsAfterRotationAroundPoint(axis, radians);
   }else if (this.type == "sphere"){
     this.setSpherePhysicsAfterRotationAroundPoint(axis, radians);
+  }else if (this.type == "cylinder"){
+    this.setCylinderPhysicsAfterRotationAroundPoint(axis, radians);
   }
   this.physicsBody.position.copy(this.mesh.position);
 }
@@ -833,6 +835,24 @@ AddedObject.prototype.setSurfacePhysicsAfterRotationAroundPoint = function(axis,
   }else if (gridSystemAxis == "YZ"){
     REUSABLE_QUATERNION.copy(this.mesh.quaternion);
     REUSABLE_QUATERNION2.setFromAxisAngle(THREE_AXIS_VECTOR_Y, Math.PI / 2);
+    REUSABLE_QUATERNION.multiply(REUSABLE_QUATERNION2);
+    physicsBody.quaternion.copy(REUSABLE_QUATERNION);
+  }
+}
+
+AddedObject.prototype.setCylinderPhysicsAfterRotationAroundPoint = function(axis, radians){
+  var physicsBody = this.physicsBody;
+  var gridSystemAxis = this.metaData.gridSystemAxis;
+  if (gridSystemAxis == "XZ"){
+    physicsBody.quaternion.copy(this.mesh.quaternion);
+  }else if (gridSystemAxis == "XY"){
+    REUSABLE_QUATERNION.copy(this.mesh.quaternion);
+    REUSABLE_QUATERNION2.setFromAxisAngle(THREE_AXIS_VECTOR_X, -Math.PI/2);
+    REUSABLE_QUATERNION.multiply(REUSABLE_QUATERNION2);
+    physicsBody.quaternion.copy(REUSABLE_QUATERNION);
+  }else if (gridSystemAxis == "YZ"){
+    REUSABLE_QUATERNION.copy(this.mesh.quaternion);
+    REUSABLE_QUATERNION2.setFromAxisAngle(THREE_AXIS_VECTOR_Z, Math.PI/2);
     REUSABLE_QUATERNION.multiply(REUSABLE_QUATERNION2);
     physicsBody.quaternion.copy(REUSABLE_QUATERNION);
   }

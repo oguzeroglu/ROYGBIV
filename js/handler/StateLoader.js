@@ -433,6 +433,34 @@ StateLoader.prototype.load = function(undo){
         scene.add(cylinderMesh);
         var physicsMaterial = new CANNON.Material();
         var cylinderPhysicsShape = new CANNON.Cylinder(topRadius, bottomRadius, Math.abs(cylinderHeight), 8);
+        if (metaData.gridSystemAxis == "XZ"){
+          var quat = new CANNON.Quaternion();
+          var coef = 1;
+          if (height < 0){
+            coef = -1;
+          }
+          quat.setFromAxisAngle(new CANNON.Vec3(1, 0, 0), -Math.PI/2 * coef);
+          var translation = new CANNON.Vec3(0, 0, 0);
+          cylinderPhysicsShape.transformAllPoints(translation,quat);
+        }else if (metaData.gridSystemAxis == "XY"){
+          cylinderMesh.rotateX(Math.PI/2);
+          if (height < 0){
+            var quat = new CANNON.Quaternion();
+            quat.setFromAxisAngle(new CANNON.Vec3(0, 1, 0), -Math.PI);
+            var translation = new CANNON.Vec3(0, 0, 0);
+            cylinderPhysicsShape.transformAllPoints(translation,quat);
+          }
+        }else if (metaData.gridSystemAxis == "YZ"){
+          cylinderMesh.rotateZ(-Math.PI/2);
+          var quat = new CANNON.Quaternion();
+          var coef = 1;
+          if (height < 0){
+            coef = -1;
+          }
+          quat.setFromAxisAngle(new CANNON.Vec3(0, 1, 0), coef * Math.PI/2);
+          var translation = new CANNON.Vec3(0, 0, 0);
+          cylinderPhysicsShape.transformAllPoints(translation,quat);
+        }
         var cylinderPhysicsBody = new CANNON.Body({
           mass: mass,
           shape: cylinderPhysicsShape,
