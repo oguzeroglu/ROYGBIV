@@ -801,7 +801,6 @@ var normalTextureCache = new Object();
 var specularTextureCache = new Object();
 var alphaTextureCache = new Object();
 var emissiveTextureCache = new Object();
-var manualDisplacementQueue = new Object();
 var CACHE_NOT_PRESENT = "CACHE_NOT_PRESENT";
 var objectSelectedByCommand = false;
 var THREE_AXIS_VECTOR_X = new THREE.Vector3(1, 0, 0);

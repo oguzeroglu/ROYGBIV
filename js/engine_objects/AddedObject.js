@@ -2026,45 +2026,6 @@ AddedObject.prototype.generateBoundingBoxes = function(parentAry){
   this.pseudoFaces = pseudoGeometry.faces;
 }
 
-AddedObject.prototype.updateCollisionWorkerInfo = function (typedArray){
-  var index = this.collisionWorkerIndex;
-  for (var i = 0; i<this.mesh.matrixWorld.elements.length; i++){
-    typedArray[index + 4 + i] = this.mesh.matrixWorld.elements[i];
-  }
-}
-
-AddedObject.prototype.generateCollisionWorkerInfo = function(index, typedArray){
-  // info[0] -> object type -> (0: surface, 1: ramp, 2: box, 3: sphere),
-  // info[1, 2, 3] -> object size info for pseudo geometry generation
-  // info[4 - 19] -> object preview mesh matrix world elements
-  this.collisionWorkerIndex = index;
-  if (this.type == "surface"){
-    typedArray[index] = 0;
-    typedArray[index + 1] = this.metaData["width"];
-    typedArray[index + 2] = this.metaData["height"];
-    typedArray[index + 3] = 0;
-  }else if (this.type == "ramp"){
-    typedArray[index] = 1;
-    typedArray[index + 1] = this.metaData["rampWidth"];
-    typedArray[index + 2] = this.metaData["rampHeight"];
-    typedArray[index + 3] = 0;
-  }else if (this.type == "box"){
-    typedArray[index] = 2;
-    typedArray[index + 1] = this.metaData["boxSizeX"];
-    typedArray[index + 2] = this.metaData["boxSizeY"];
-    typedArray[index + 3] = this.metaData["boxSizeZ"];
-  }else if (this.type == "sphere"){
-    typedArray[index] = 3;
-    typedArray[index + 1] = this.metaData["radius"];
-    typedArray[index + 2] = 0;
-    typedArray[index + 3] = 0;
-  }
-  this.mesh.updateMatrixWorld();
-  for (var i = 0; i<this.mesh.matrixWorld.elements.length; i++){
-    typedArray[index + 4 + i] = this.mesh.matrixWorld.elements[i];
-  }
-}
-
 AddedObject.prototype.visualiseBoudingBoxes = function(selectedScene){
   for (var i = 0; i<this.boundingBoxes.length; i++){
     this.correctBoundingBox(this.boundingBoxes[i]);
@@ -2084,7 +2045,7 @@ AddedObject.prototype.getNormalGeometry = function(){
     return geom;
   }
   var count = new Object();
-  if (this.type == "surface" || this.type == "ramp" || this.type == "sphere"){
+  if (this.type == "surface" || this.type == "ramp" || this.type == "sphere" || this.type == "cylinder"){
     count.width = this.metaData["widthSegments"];
     count.height = this.metaData["heightSegments"];
   }else if (this.type == "box"){
@@ -2093,33 +2054,6 @@ AddedObject.prototype.getNormalGeometry = function(){
     count.depth = this.metaData["depthSegments"];
   }
   return this.segmentGeometry(true, count, true);
-}
-
-AddedObject.prototype.applyDisplacementMap = function(map, mapName, scale, bias){
-  if (typeof scale == UNDEFINED){
-    scale = this.metaData["manualDisplacementScale"];
-  }
-  if (typeof bias == UNDEFINED){
-    bias = this.metaData["manualDisplacementBias"];
-  }
-  this.undoDisplacement();
-  new DisplacementCalculator().applyDisplacementMap(this, map, scale, bias);
-  this.metaData["manualDisplacementMap"] = mapName;
-  this.metaData["manualDisplacementScale"] = scale;
-  this.metaData["manualDisplacementBias"] = bias;
-}
-
-AddedObject.prototype.undoDisplacement = function(){
-  delete this.metaData["manualDisplacementMap"];
-  delete this.metaData["manualDisplacementScale"];
-  delete this.metaData["manualDisplacementBias"];
-  var segmentObj = new Object();
-  segmentObj.width = this.metaData["widthSegments"];
-  segmentObj.height = this.metaData["heightSegments"];
-  if (this.tpye == "box"){
-    segmentObj.depth = this.metaData["depthSegments"];
-  }
-  this.segmentGeometry(true, segmentObj);
 }
 
 AddedObject.prototype.setSlippery = function(isSlippery){
