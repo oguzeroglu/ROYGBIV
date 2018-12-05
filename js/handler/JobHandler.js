@@ -97,6 +97,8 @@ JobHandler.prototype.handle = function(previewModeCommand){
       this.handleNewAreaConfigurationCommand();
     }else if (this.splitted[0] == "autoConfigureArea"){
       this.handleAutoConfigureAreaCommand();
+    }else if (this.splitted[0] == "newCylinder"){
+      this.handleNewCylinderCommand();
     }
   }catch (err){
     console.error(err);
@@ -104,6 +106,25 @@ JobHandler.prototype.handle = function(previewModeCommand){
   // because async
   if (this.splitted[0] != "autoConfigureArea"){
     jobHandlerWorking = false;
+  }
+}
+
+JobHandler.prototype.handleNewCylinderCommand = function(){
+  var objNamePrefix = this.splitted[1].split("*")[0];
+  var ctr = 0;
+  for (var gridName in gridSelections){
+    jobHandlerSelectedGrid = gridSelections[gridName];
+    parseCommand(
+      "newCylinder "+objNamePrefix+"_"+ctr+" "+this.splitted[2]+" "+this.splitted[3]+" "+
+                      this.splitted[4]+" "+this.splitted[5]+" "+this.splitted[6]
+    );
+    ctr ++;
+  }
+  jobHandlerSelectedGrid = 0;
+  if (ctr != 0){
+    terminal.printInfo(Text.CREATED_X_CYLINDERS.replace(Text.PARAM1, ctr));
+  }else{
+    terminal.printError(Text.MUST_HAVE_AT_LEAST_ONE_GRID_SELECTED);
   }
 }
 

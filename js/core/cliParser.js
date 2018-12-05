@@ -4566,6 +4566,10 @@ function parse(input){
             return true;
           }
           var cylinderName = splitted[1];
+          if (!(cylinderName.indexOf("*") == -1)){
+            new JobHandler(splitted).handle();
+            return true;
+          }
           var materialName = splitted[2];
           var topRadius = parseFloat(splitted[3]);
           var bottomRadius = parseFloat(splitted[4]);
