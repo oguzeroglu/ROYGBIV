@@ -543,7 +543,7 @@ StateLoader.prototype.load = function(undo){
       addedObjectInstance.rotationY = curAddedObjectExport.rotationY;
       addedObjectInstance.rotationZ = curAddedObjectExport.rotationZ;
 
-       if (addedObjectInstance.metaData.slicedType){
+       if (!(typeof addedObjectInstance.metaData.slicedType == UNDEFINED)){
          addedObjectInstance.sliceInHalf(addedObjectInstance.metaData.slicedType);
        }
        if (addedObjectInstance.metaData.renderSide){

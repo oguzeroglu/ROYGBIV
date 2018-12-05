@@ -1024,7 +1024,7 @@ function afterObjectSelection(){
         objectManipulationParameters["Hide half"] = "None";
         disableController(omHideHalfController);
       }else{
-        if (obj.metaData.slicedType){
+        if (!(typeof obj.metaData.slicedType == UNDEFINED)){
           objectManipulationParameters["Hide half"] = "Part "+(obj.metaData.slicedType + 1)
         }else{
           objectManipulationParameters["Hide half"] = "None";
