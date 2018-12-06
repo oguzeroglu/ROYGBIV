@@ -1360,34 +1360,54 @@ GridSystem.prototype.newCylinder = function(cylinderName, material, topRadius, b
   var cylinderMesh = new MeshGenerator(cylinderGeometry, material).generateMesh();
   cylinderMesh.position.set(cylinderCenterX, cylinderCenterY, cylinderCenterZ);
   scene.add(cylinderMesh);
-  var cylinderPhysicsShape = new CANNON.Cylinder(topRadius, bottomRadius, Math.abs(height), 8);
+  var cylinderPhysicsShape;
+  var physicsShapeKey = "CYLINDER" + PIPE + topRadius + PIPE + bottomRadius + PIPE +
+                                            Math.abs(height) + PIPE + 8 + PIPE +
+                                            this.axis;
+  cylinderPhysicsShape = physicsShapeCache[physicsShapeKey];
+  var cached = false;
+  if (!cylinderPhysicsShape){
+      cylinderPhysicsShape = new CANNON.Cylinder(topRadius, bottomRadius, Math.abs(height), 8);
+      physicsShapeCache[physicsShapeKey] = cylinderPhysicsShape;
+  }else{
+    cached = true;
+  }
+  cylinderPhysicsShape.topRadius = topRadius;
+  cylinderPhysicsShape.bottomRadius = bottomRadius;
+  cylinderPhysicsShape.height = Math.abs(height);
   if (this.axis == "XZ"){
-    var quat = new CANNON.Quaternion();
-    var coef = 1;
-    if (height < 0){
-      coef = -1;
-    }
-    quat.setFromAxisAngle(new CANNON.Vec3(1, 0, 0), -Math.PI/2 * coef);
-    var translation = new CANNON.Vec3(0, 0, 0);
-    cylinderPhysicsShape.transformAllPoints(translation,quat);
-  }else if (this.axis == "XY"){
-    cylinderMesh.rotateX(Math.PI/2);
-    if (height < 0){
+    if (!cached){
       var quat = new CANNON.Quaternion();
-      quat.setFromAxisAngle(new CANNON.Vec3(0, 1, 0), -Math.PI);
+      var coef = 1;
+      if (height < 0){
+        coef = -1;
+      }
+      quat.setFromAxisAngle(new CANNON.Vec3(1, 0, 0), -Math.PI/2 * coef);
       var translation = new CANNON.Vec3(0, 0, 0);
       cylinderPhysicsShape.transformAllPoints(translation,quat);
     }
+  }else if (this.axis == "XY"){
+    cylinderMesh.rotateX(Math.PI/2);
+    if (!cached){
+      if (height < 0){
+        var quat = new CANNON.Quaternion();
+        quat.setFromAxisAngle(new CANNON.Vec3(0, 1, 0), -Math.PI);
+        var translation = new CANNON.Vec3(0, 0, 0);
+        cylinderPhysicsShape.transformAllPoints(translation,quat);
+      }
+    }
   }else if (this.axis == "YZ"){
     cylinderMesh.rotateZ(-Math.PI/2);
-    var quat = new CANNON.Quaternion();
-    var coef = 1;
-    if (height < 0){
-      coef = -1;
+    if (!cached){
+      var quat = new CANNON.Quaternion();
+      var coef = 1;
+      if (height < 0){
+        coef = -1;
+      }
+      quat.setFromAxisAngle(new CANNON.Vec3(0, 1, 0), coef * Math.PI/2);
+      var translation = new CANNON.Vec3(0, 0, 0);
+      cylinderPhysicsShape.transformAllPoints(translation,quat);
     }
-    quat.setFromAxisAngle(new CANNON.Vec3(0, 1, 0), coef * Math.PI/2);
-    var translation = new CANNON.Vec3(0, 0, 0);
-    cylinderPhysicsShape.transformAllPoints(translation,quat);
   }
   var physicsMaterial = new CANNON.Material();
   var cylinderPhysicsBody = new CANNON.Body({

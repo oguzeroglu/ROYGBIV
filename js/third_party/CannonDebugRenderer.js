@@ -96,7 +96,7 @@ THREE.CannonDebugRenderer.prototype = {
             (geo instanceof THREE.SphereGeometry && shape instanceof CANNON.Sphere) ||
             (geo instanceof THREE.BoxGeometry && shape instanceof CANNON.Box) ||
             (geo instanceof THREE.PlaneGeometry && shape instanceof CANNON.Plane) ||
-            (geo.id === shape.geometryId && shape instanceof CANNON.ConvexPolyhedron) ||
+            (shape instanceof CANNON.ConvexPolyhedron) ||
             (geo.id === shape.geometryId && shape instanceof CANNON.Trimesh) ||
             (geo.id === shape.geometryId && shape instanceof CANNON.Heightfield)
         );
@@ -123,7 +123,6 @@ THREE.CannonDebugRenderer.prototype = {
         case CANNON.Shape.types.CONVEXPOLYHEDRON:
             // Create mesh
             var geo = new THREE.Geometry();
-
             // Add vertices
             for (var i = 0; i < shape.vertices.length; i++) {
                 var v = shape.vertices[i];
@@ -145,7 +144,7 @@ THREE.CannonDebugRenderer.prototype = {
             geo.computeFaceNormals();
 
             mesh = new THREE.Mesh(geo, material);
-            shape.geometryId = geo.id;
+            //shape.geometryId = geo.id;
             break;
 
         case CANNON.Shape.types.TRIMESH:
