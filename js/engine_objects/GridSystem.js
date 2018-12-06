@@ -1224,7 +1224,13 @@ GridSystem.prototype.newSphere = function(sphereName, material, radius, selectio
   sphereMesh.position.set(sphereCenterX, sphereCenterY, sphereCenterZ);
   scene.add(sphereMesh);
 
-  var spherePhysicsShape = new CANNON.Sphere(Math.abs(radius));
+  var spherePhysicsShape;
+  var physicsShapeKey = "SPHERE" + PIPE + radius;
+  spherePhysicsShape = physicsShapeCache[physicsShapeKey];
+  if (!spherePhysicsShape){
+    spherePhysicsShape = new CANNON.Sphere(Math.abs(radius));
+    physicsShapeCache[physicsShapeKey] = spherePhysicsShape;
+  }
   var physicsMaterial = new CANNON.Material();
 
   var spherePhysicsBody = new CANNON.Body({

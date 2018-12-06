@@ -399,7 +399,13 @@ StateLoader.prototype.load = function(undo){
         var centerX = metaData["centerX"];
         var centerY = metaData["centerY"];
         var centerZ = metaData["centerZ"];
-        var spherePhysicsShape = new CANNON.Sphere(Math.abs(radius));
+        var spherePhysicsShape;
+        var physicsShapeKey = "SPHERE" + PIPE + radius;
+        spherePhysicsShape = physicsShapeCache[physicsShapeKey];
+        if (!spherePhysicsShape){
+          spherePhysicsShape = new CANNON.Sphere(Math.abs(radius));
+          physicsShapeCache[physicsShapeKey] = spherePhysicsShape;
+        }
         var physicsMaterial = new CANNON.Material();
         var spherePhysicsBody = new CANNON.Body({
           mass: mass,
