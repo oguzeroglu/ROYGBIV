@@ -695,11 +695,18 @@ GridSystem.prototype.newSurface = function(name, grid1, grid2, material){
     physicsShapeParameters["x"] = surfacePhysicalThickness;
     physicsShapeParameters["y"] = height/2;
   }
-  surfacePhysicsShape = new CANNON.Box(new CANNON.Vec3(
-    physicsShapeParameters["x"],
-    physicsShapeParameters["y"],
-    physicsShapeParameters["z"]
-  ));
+  var physicsShapeKey = "BOX" + PIPE + physicsShapeParameters["x"] + PIPE +
+                                       physicsShapeParameters["y"] + PIPE +
+                                       physicsShapeParameters["z"];
+  surfacePhysicsShape = physicsShapeCache[physicsShapeKey];
+  if (!surfacePhysicsShape){
+    surfacePhysicsShape = new CANNON.Box(new CANNON.Vec3(
+      physicsShapeParameters["x"],
+      physicsShapeParameters["y"],
+      physicsShapeParameters["z"]
+    ));
+    physicsShapeCache[physicsShapeKey] = surfacePhysicsShape;
+  }
   var physicsMaterial = new CANNON.Material();
   var surfacePhysicsBody = new CANNON.Body({
     mass: 0,
@@ -871,11 +878,19 @@ GridSystem.prototype.newRamp = function(anchorGrid, otherGrid, axis, height, mat
 
   scene.add(ramp);
 
-  var rampPhysicsShape = new CANNON.Box(new CANNON.Vec3(
-    rampWidth/2,
-    surfacePhysicalThickness,
-    rampHeight/2
-  ));
+  var rampPhysicsShape;
+  var physicsShapeKey = "BOX" + PIPE + (rampWidth/2) + PIPE +
+                                       (surfacePhysicalThickness) + PIPE +
+                                       (rampHeight/2);
+  rampPhysicsShape = physicsShapeCache[physicsShapeKey];
+  if (!rampPhysicsShape){
+    rampPhysicsShape = new CANNON.Box(new CANNON.Vec3(
+      rampWidth/2,
+      surfacePhysicalThickness,
+      rampHeight/2
+    ));
+    physicsShapeCache[physicsShapeKey] = rampPhysicsShape;
+  }
 
   var physicsMaterial = new CANNON.Material();
 
@@ -1056,11 +1071,19 @@ GridSystem.prototype.newBox = function(selections, height, material, name){
 
   scene.add(boxMesh);
 
-  var boxPhysicsShape = new CANNON.Box(new CANNON.Vec3(
-    boxSizeX / 2,
-    boxSizeY / 2,
-    boxSizeZ / 2
-  ));
+  var boxPhysicsShape;
+  var physicsShapeKey = "BOX" + PIPE + (boxSizeX / 2) + PIPE +
+                                       (boxSizeY / 2) + PIPE +
+                                       (boxSizeZ / 2);
+  boxPhysicsShape = physicsShapeCache[physicsShapeKey];
+  if (!boxPhysicsShape){
+    boxPhysicsShape = new CANNON.Box(new CANNON.Vec3(
+      boxSizeX / 2,
+      boxSizeY / 2,
+      boxSizeZ / 2
+    ));
+    physicsShapeCache[physicsShapeKey] = boxPhysicsShape;
+  }
 
   var physicsMaterial = new CANNON.Material();
 

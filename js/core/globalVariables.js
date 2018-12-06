@@ -888,6 +888,7 @@ var DDS_SUPPORTED;
 var jobHandlerSelectedGrid = 0;
 var jobHandlerWorking = false;
 var geometryCache = new Object();
+var physicsShapeCache = new Object();
 var MAX_TEXTURE_COUNT = 8;
 var nullTexture = new THREE.Texture();
 var compressedTextureFallbackFormat = ".png";

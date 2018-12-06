@@ -206,11 +206,19 @@ StateLoader.prototype.load = function(undo){
         var centerX = metaData["centerX"];
         var centerY = metaData["centerY"];
         var centerZ = metaData["centerZ"];
-        var boxPhysicsShape = new CANNON.Box(new CANNON.Vec3(
-          boxSizeX / 2,
-          boxSizeY / 2,
-          boxSizeZ / 2
-        ));
+        var boxPhysicsShape;
+        var physicsShapeKey = "BOX" + PIPE + (boxSizeX / 2) + PIPE +
+                                             (boxSizeY / 2) + PIPE +
+                                             (boxSizeZ / 2);
+        boxPhysicsShape = physicsShapeCache[physicsShapeKey];
+        if (!boxPhysicsShape){
+          boxPhysicsShape = new CANNON.Box(new CANNON.Vec3(
+            boxSizeX / 2,
+            boxSizeY / 2,
+            boxSizeZ / 2
+          ));
+          physicsShapeCache[physicsShapeKey] = boxPhysicsShape;
+        }
         var physicsMaterial = new CANNON.Material();
         var boxPhysicsBody = new CANNON.Body({
           mass: mass,
@@ -285,11 +293,19 @@ StateLoader.prototype.load = function(undo){
 
         scene.add(surface);
 
-        var surfacePhysicsShape = new CANNON.Box(new CANNON.Vec3(
-            physicsShapeParameterX,
-            physicsShapeParameterY,
-            physicsShapeParameterZ
-        ));
+        var surfacePhysicsShape;
+        var physicsShapeKey = "BOX" + PIPE + physicsShapeParameterX + PIPE +
+                                             physicsShapeParameterY+ PIPE +
+                                             physicsShapeParameterZ;
+        surfacePhysicsShape = physicsShapeCache[physicsShapeKey];
+        if (!surfacePhysicsShape){
+          surfacePhysicsShape = new CANNON.Box(new CANNON.Vec3(
+              physicsShapeParameterX,
+              physicsShapeParameterY,
+              physicsShapeParameterZ
+          ));
+          physicsShapeCache[physicsShapeKey] = surfacePhysicsShape;
+        }
 
         var physicsMaterial = new CANNON.Material();
         var surfacePhysicsBody = new CANNON.Body({
@@ -339,11 +355,19 @@ StateLoader.prototype.load = function(undo){
         ramp.quaternion.z = quaternionZ;
         ramp.quaternion.w = quaternionW;
 
-        var rampPhysicsShape = new CANNON.Box(new CANNON.Vec3(
-          rampWidth/2,
-          surfacePhysicalThickness,
-          rampHeight/2
-        ));
+        var rampPhysicsShape;
+        var physicsShapeKey = "BOX" + PIPE + (rampWidth / 2) + PIPE +
+                                             (surfacePhysicalThickness) + PIPE +
+                                             (rampHeight / 2);
+        rampPhysicsShape = physicsShapeCache[physicsShapeKey];
+        if (!rampPhysicsShape){
+          rampPhysicsShape = new CANNON.Box(new CANNON.Vec3(
+            rampWidth/2,
+            surfacePhysicalThickness,
+            rampHeight/2
+          ));
+          physicsShapeCache[physicsShapeKey] = rampPhysicsShape;
+        }
 
         var physicsMaterial = new CANNON.Material();
         var rampPhysicsBody = new CANNON.Body({
@@ -2269,6 +2293,7 @@ StateLoader.prototype.resetProject = function(undo){
   BIN_SIZE = 50;
 
   geometryCache = new Object();
+  physicsShapeCache = new Object();
 
   previewSceneRendered = false;
 
