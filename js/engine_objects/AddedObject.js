@@ -571,7 +571,7 @@ AddedObject.prototype.unMapDisplacement = function(){
 
 AddedObject.prototype.mapDisplacement = function(displacementTexture){
   if (!VERTEX_SHADER_TEXTURE_FETCH_SUPPORTED){
-    console.error("Displacement mapping is not supported for this device. Use applyDisplacementMap command instead.");
+    console.error("Displacement mapping is not supported for this device.");
     return;
   }
   this.mesh.material.uniforms.displacementMap = this.getTextureUniform(displacementTexture);
@@ -1622,6 +1622,7 @@ AddedObject.prototype.segmentGeometry = function(isCustom, count, returnGeometry
         );
         geometryCache[geomKey] = newGeometry;
       }
+      this.modifyCylinderPhysicsAfterSegmentChange(cylinderWidthSegments);
     }else{
       if (!isNaN(count)){
         if (count < 8){
@@ -1651,6 +1652,7 @@ AddedObject.prototype.segmentGeometry = function(isCustom, count, returnGeometry
             );
             geometryCache[geomKey] = newGeometry;
           }
+          this.modifyCylinderPhysicsAfterSegmentChange(count);
         }
       }else{
         if (count.width < 8){
@@ -1683,6 +1685,7 @@ AddedObject.prototype.segmentGeometry = function(isCustom, count, returnGeometry
             );
             geometryCache[geomKey] = newGeometry;
           }
+          this.modifyCylinderPhysicsAfterSegmentChange(count.width);
         }
       }
     }
@@ -1772,6 +1775,66 @@ AddedObject.prototype.segmentGeometry = function(isCustom, count, returnGeometry
     }
   }
 
+}
+
+AddedObject.prototype.modifyCylinderPhysicsAfterSegmentChange = function(radialSegments){
+  physicsWorld.remove(this.physicsBody);
+  var topRadius = this.metaData.topRadius;
+  var bottomRadius = this.metaData.bottomRadius;
+  var height = this.metaData.height;
+  var oldPosition = this.physicsBody.position.clone();
+  var oldQuaternion = this.physicsBody.quaternion.clone();
+  var physicsShapeKey = "CYLINDER" + PIPE + topRadius + PIPE + bottomRadius + PIPE +
+                                            Math.abs(height) + PIPE + radialSegments + PIPE +
+                                            this.metaData.gridSystemAxis;
+  var newPhysicsShape = physicsShapeCache[physicsShapeKey];
+  var cached = false;
+  if (!newPhysicsShape){
+    newPhysicsShape = new CANNON.Cylinder(
+      this.metaData.topRadius, this.metaData.bottomRadius, Math.abs(this.metaData.height), parseInt(radialSegments)
+    );
+    physicsShapeCache[physicsShapeKey] = newPhysicsShape;
+  }else{
+    cached = true;
+  }
+  if (!cached){
+    if (this.axis == "XZ"){
+      var quat = new CANNON.Quaternion();
+      var coef = 1;
+      if (height < 0){
+        coef = -1;
+      }
+      quat.setFromAxisAngle(new CANNON.Vec3(1, 0, 0), -Math.PI/2 * coef);
+      var translation = new CANNON.Vec3(0, 0, 0);
+      newPhysicsShape.transformAllPoints(translation,quat);
+    }else if (this.axis == "XY"){
+      if (height < 0){
+        var quat = new CANNON.Quaternion();
+        quat.setFromAxisAngle(new CANNON.Vec3(0, 1, 0), -Math.PI);
+        var translation = new CANNON.Vec3(0, 0, 0);
+        newPhysicsShape.transformAllPoints(translation,quat);
+      }
+    }else if (this.axis == "YZ"){
+      var quat = new CANNON.Quaternion();
+      var coef = 1;
+      if (height < 0){
+        coef = -1;
+      }
+      quat.setFromAxisAngle(new CANNON.Vec3(0, 1, 0), coef * Math.PI/2);
+      var translation = new CANNON.Vec3(0, 0, 0);
+      newPhysicsShape.transformAllPoints(translation,quat);
+    }
+  }
+  var physicsMaterial = this.physicsBody.material;
+  var mass = this.physicsBody.mass;
+  this.physicsBody = new CANNON.Body({
+    mass: mass,
+    shape: newPhysicsShape,
+    material: physicsMaterial
+  });
+  this.physicsBody.position.copy(oldPosition);
+  this.physicsBody.quaternion.copy(oldQuaternion);
+  physicsWorld.add(this.physicsBody);
 }
 
 AddedObject.prototype.resetMaps = function(resetAssociatedTexturePack){

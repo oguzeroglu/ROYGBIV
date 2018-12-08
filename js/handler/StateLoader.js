@@ -464,12 +464,12 @@ StateLoader.prototype.load = function(undo){
         var physicsMaterial = new CANNON.Material();
         var cylinderPhysicsShape;
         var physicsShapeKey = "CYLINDER" + PIPE + topRadius + PIPE + bottomRadius + PIPE +
-                                                  Math.abs(cylinderHeight) + PIPE + 8 + PIPE +
+                                                  Math.abs(cylinderHeight) + PIPE + widthSegments + PIPE +
                                                   metaData.gridSystemAxis;
         var cached = false;
         cylinderPhysicsShape = physicsShapeCache[physicsShapeKey];
         if (!cylinderPhysicsShape){
-          cylinderPhysicsShape = new CANNON.Cylinder(topRadius, bottomRadius, Math.abs(cylinderHeight), 8);
+          cylinderPhysicsShape = new CANNON.Cylinder(topRadius, bottomRadius, Math.abs(cylinderHeight), widthSegments);
           physicsShapeCache[physicsShapeKey] = cylinderPhysicsShape;
         }else{
           cached = true;
