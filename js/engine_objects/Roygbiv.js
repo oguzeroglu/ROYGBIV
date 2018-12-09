@@ -138,7 +138,8 @@ var Roygbiv = function(){
     "removeParticleSystemPoolConsumedListener",
     "setParticleSystemPoolAvailableListener",
     "removeParticleSystemPoolAvailableListener",
-    "disableDefaultControls"
+    "disableDefaultControls",
+    "isKeyPressed"
   ];
 
   this.globals = new Object();
@@ -7001,4 +7002,18 @@ Roygbiv.prototype.disableDefaultControls = function(isDisabled){
     return;
   }
   defaultCameraControlsDisabled = isDisabled;
+}
+
+// isKeyPressed
+// Returns whether the given key is pressed or not. See the keyCodeToChar
+// variable for possible key names.
+Roygbiv.prototype.isKeyPressed = function(key){
+  if (mode == 0){
+    return;
+  }
+  if (typeof key == UNDEFINED){
+    throw new Error("isKeyPressed error: key is not defined.");
+    return;
+  }
+  return keyboardBuffer[key];
 }
