@@ -856,4 +856,7 @@ var Text = function(){
    this.ROYGBIV_SCRIPTING_API_REMOVEPARTICLESYSTEMPOOLAVAILABLELISTENER = "Removes the availablity listener for a particle system pool.";
    this.ROYGBIV_SCRIPTING_API_DISABLEDEFAULTCONTROLS = "Disables or enables the default WASD camera controls. This function can be used before implementing manual camera controls.";
    this.ROYGBIV_SCRIPTING_API_ISKEYPRESSED = "Returns whether the given key is pressed or not. See the keyCodeToChar variable for possible key names.";
+   this.ROYGBIV_SCRIPTING_API_SETCAMERAPOSITION = "Sets the position of the camera.";
+   this.ROYGBIV_SCRIPTING_API_LOOKAT = "Makes the camera look at specific position.";
+   this.ROYGBIV_SCRIPTING_API_APPLYAXISANGLE = "Rotates the vector around an axis by given angle.";
 }

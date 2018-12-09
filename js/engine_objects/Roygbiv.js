@@ -139,7 +139,10 @@ var Roygbiv = function(){
     "setParticleSystemPoolAvailableListener",
     "removeParticleSystemPoolAvailableListener",
     "disableDefaultControls",
-    "isKeyPressed"
+    "isKeyPressed",
+    "setCameraPosition",
+    "lookAt",
+    "applyAxisAngle"
   ];
 
   this.globals = new Object();
@@ -1544,7 +1547,7 @@ Roygbiv.prototype.emissiveIntensity = function(object, delta){
 // setObjectVelocity
 //  Sets the velocity of an object or a glued object. The object must be a dynamic object
 //  (mass > 0) in order to have a velocity.
-Roygbiv.prototype.setObjectVelocity = function(object, velocityVector){
+Roygbiv.prototype.setObjectVelocity = function(object, velocityVector, axis){
   if (mode == 0){
     return;
   }
@@ -1574,6 +1577,20 @@ Roygbiv.prototype.setObjectVelocity = function(object, velocityVector){
   }
   if (isNaN(velocityVector.x) || isNaN(velocityVector.y) || isNaN(velocityVector.z)){
     throw new Error("setObjectVelocity error: Bad velocityVector parameter.");
+    return;
+  }
+  if (!(typeof axis == UNDEFINED)){
+    if (axis != "X" && axis != "x" && axis != "y" && axis != "Y" && axis != "z" && axis != "Z"){
+      throw new Error("setObjectVelocity error: Bad axis parameter.");
+      return;
+    }
+    if (axis == "x" || axis == "X"){
+      object.physicsBody.velocity.x = velocityVector.x;
+    }else if (axis == "y" || axis == "Y"){
+      object.physicsBody.velocity.y = velocityVector.y;
+    }else if (axis == "z" || axis == "Z"){
+      object.physicsBody.velocity.z = velocityVector.z;
+    }
     return;
   }
   object.physicsBody.velocity.set(velocityVector.x, velocityVector.y, velocityVector.z);
@@ -6494,7 +6511,7 @@ Roygbiv.prototype.distance = function(vec1, vec2){
 
 // sub
 //  Returns the substraction of two vectors.
-Roygbiv.prototype.sub = function(vec1, vec2){
+Roygbiv.prototype.sub = function(vec1, vec2, targetVector){
   if (mode == 0){
     return;
   }
@@ -6513,6 +6530,16 @@ Roygbiv.prototype.sub = function(vec1, vec2){
   if (isNaN(vec2.x) || isNaN(vec2.y) || isNaN(vec2.z)){
     throw new Error("sub error: vec2 is not a vector.");
     return;
+  }
+  if (!(typeof targetVector == UNDEFINED)){
+    if (isNaN(targetVector.x) || isNaN(targetVector.y) || isNaN(targetVector.z)){
+      throw new Error("sub error: Bad targetVector parameter.");
+      return;
+    }
+    targetVector.x = vec1.x - vec2.x;
+    targetVector.y = vec1.y - vec2.y;
+    targetVector.z = vec1.z - vec2.z;
+    return targetVector;
   }
   var obj = new Object();
   obj.x = vec1.x - vec2.x;
@@ -6553,7 +6580,7 @@ Roygbiv.prototype.add = function(vec1, vec2){
 // moveTowards
 //  Moves vec1 towards vec2 by given amount and returns the new position of vec1.
 //  Amount = 1 means that vec1 goes all the way towards vec2.
-Roygbiv.prototype.moveTowards = function(vec1, vec2, amount){
+Roygbiv.prototype.moveTowards = function(vec1, vec2, amount, targetVector){
   if (mode == 0){
     return;
   }
@@ -6580,6 +6607,16 @@ Roygbiv.prototype.moveTowards = function(vec1, vec2, amount){
   if (isNaN(amount)){
     throw new Error("moveTowards error: amount is not a number.");
     return;
+  }
+  if (!(typeof targetVector == UNDEFINED)){
+    if (isNaN(targetVector.x) || isNaN(targetVector.y) || isNaN(targetVector.z)){
+      throw new Error("moveTowards error: Bad targetVector parameter.");
+    }
+    var diff = this.sub(vec2, vec1, targetVector);
+    targetVector.x = vec1.x + (amount * diff.x);
+    targetVector.y = vec1.y + (amount * diff.y);
+    targetVector.z = vec1.z + (amount * diff.z);
+    return targetVector;
   }
   var diff = this.sub(vec2, vec1);
   var newVec = this.vector(0, 0, 0);
@@ -7016,4 +7053,116 @@ Roygbiv.prototype.isKeyPressed = function(key){
     return;
   }
   return keyboardBuffer[key];
+}
+
+// setCameraPosition
+// Sets the position of the camera.
+Roygbiv.prototype.setCameraPosition = function(x, y, z){
+  if (mode == 0){
+    return;
+  }
+  if (typeof x == UNDEFINED){
+    throw new Error("setCameraPosition error: x is not defined.");
+    return;
+  }
+  if (typeof y == UNDEFINED){
+    throw new Error("setCameraPosition error: y is not defined.");
+    return;
+  }
+  if (typeof z == UNDEFINED){
+    throw new Error("setCameraPosition error: z is not defined.");
+    return;
+  }
+  if (isNaN(x)){
+    throw new Error("setCameraPosition error: x is not a number.");
+    return;
+  }
+  if (isNaN(y)){
+    throw new Error("setCameraPosition error: y is not a number.");
+    return;
+  }
+  if (isNaN(z)){
+    throw new Error("setCameraPosition error: z is not a number.");
+    return;
+  }
+  camera.position.set(x, y, z);
+}
+
+// lookAt
+// Makes the camera look at specific position.
+Roygbiv.prototype.lookAt = function(x, y, z){
+  if (mode == 0){
+    return;
+  }
+  if (typeof x == UNDEFINED){
+    throw new Error("lookAt error: x is not defined.");
+    return;
+  }
+  if (typeof y == UNDEFINED){
+    throw new Error("lookAt error: y is not defined.");
+    return;
+  }
+  if (typeof z == UNDEFINED){
+    throw new Error("lookAt error: z is not defined.");
+    return;
+  }
+  if (isNaN(x)){
+    throw new Error("lookAt error: x is not a number.");
+    return;
+  }
+  if (isNaN(y)){
+    throw new Error("lookAt error: y is not a number.");
+    return;
+  }
+  if (isNaN(z)){
+    throw new Error("lookAt error: z is not a number.");
+    return;
+  }
+  camera.lookAt(x, y, z);
+}
+
+// applyAxisAngle
+// Rotates the vector around an axis by given angle.
+Roygbiv.prototype.applyAxisAngle = function(vector, axisVector, angle, targetVector){
+  if (mode == 0){
+    return;
+  }
+  if (typeof vector == UNDEFINED){
+    throw new Error("applyAxisAngle error: vector is not defined.");
+    return;
+  }
+  if (typeof axisVector == UNDEFINED){
+    throw new Error("applyAxisAngle error: axisVector is not defined.");
+    return;
+  }
+  if (typeof angle == UNDEFINED){
+    throw new Error("applyAxisAngle error: angle is not defined.");
+    return;
+  }
+  if (isNaN(vector.x) || isNaN(vector.y) || isNaN(vector.z)){
+    throw new Error("applyAxisAngle error: Bad vector parameter.");
+    return;
+  }
+  if (isNaN(axisVector.x) || isNaN(axisVector.y) || isNaN(axisVector.z)){
+    throw new Error("applyAxisAngle error: Bad axisVector parameter.");
+    return;
+  }
+  if (isNaN(angle)){
+    throw new Error("applyAxisAngle error: Bad angle parameter.");
+    return;
+  }
+  REUSABLE_VECTOR.set(vector.x, vector.y, vector.z);
+  REUSABLE_VECTOR_2.set(axisVector.x, axisVector.y, axisVector.z);
+  REUSABLE_VECTOR.applyAxisAngle(REUSABLE_VECTOR_2, angle);
+  if (!(typeof targetVector == UNDEFINED)){
+    if (isNaN(targetVector.x) || isNaN(targetVector.y) || isNaN(targetVector.z)){
+      throw new Error("applyAxisAngle errorİ Bad targetVector parameter.");
+      return;
+    }
+    targetVector.x = REUSABLE_VECTOR.x;
+    targetVector.y = REUSABLE_VECTOR.y;
+    targetVector.z = REUSABLE_VECTOR.z;
+    return targetVector;
+  }
+  return this.vector(REUSABLE_VECTOR.x, REUSABLE_VECTOR.y, REUSABLE_VECTOR.z);
 }
