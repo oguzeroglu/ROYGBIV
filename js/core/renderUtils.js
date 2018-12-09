@@ -119,7 +119,7 @@ function updateMarkedPointLabels(){
 }
 
 function updateGridCornerHelpers(){
-  if (!keyboardBuffer["period"]){
+  if (!keyboardBuffer["."]){
     return;
   }
   for (var gridName in gridSelections){

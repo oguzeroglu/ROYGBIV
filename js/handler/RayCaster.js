@@ -35,7 +35,7 @@ RayCaster.prototype.findIntersections = function(from, direction, intersectGridS
       if (result == 5){
         var obj = addedObjects[objName];
         if (obj){
-          if (!(mode == 0 && keyboardBuffer["shift"])){
+          if (!(mode == 0 && keyboardBuffer["Shift"])){
             intersectionPoint = obj.intersectsLine(REUSABLE_LINE);
             if (intersectionPoint){
               intersectionObject = objName;
@@ -57,7 +57,7 @@ RayCaster.prototype.findIntersections = function(from, direction, intersectGridS
           }
         }
       }else{
-        if (!(mode == 0 && keyboardBuffer["shift"])){
+        if (!(mode == 0 && keyboardBuffer["Shift"])){
           var parent = objectGroups[objName];
           if (parent){
             for (var childName in result){

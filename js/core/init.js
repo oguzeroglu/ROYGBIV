@@ -422,7 +422,7 @@ window.onload = function() {
            }
            if (selectedGrid){
              if (!selectedGrid.sliced){
-               if (selectedGrid.destroyedAddedObject && !(keyboardBuffer["shift"])){
+               if (selectedGrid.destroyedAddedObject && !(keyboardBuffer["Shift"])){
                  var addedObject = addedObjects[selectedGrid.destroyedAddedObject];
                  terminal.clear();
                  var point = intersectionPoint;
@@ -437,7 +437,7 @@ window.onload = function() {
                  if (addedObject.clickCallbackFunction){
                    addedObject.clickCallbackFunction(point.x, point.y, point.z);
                  }
-               }else if (selectedGrid.destroyedObjectGroup && !(keyboardBuffer["shift"])){
+               }else if (selectedGrid.destroyedObjectGroup && !(keyboardBuffer["Shift"])){
                  var objectGroup = objectGroups[selectedGrid.destroyedObjectGroup];
                  terminal.clear();
                  var point = intersectionPoint;
@@ -545,88 +545,52 @@ window.addEventListener('keydown', function(event){
     return;
   }
 
+  if (keyCodeToChar[event.keyCode]){
+    keyboardBuffer[keyCodeToChar[event.keyCode]] = true;
+  }
+
   switch(event.keyCode){
-        case 190: //PERIOD
-          keyboardBuffer["period"] = true;
-        break;
-        case 16: //SHIFT
-          if (mode == 0){
-            keyboardBuffer["shift"] = true;
-            for (var objName in addedObjects){
-              addedObjects[objName].mesh.visible = false;
-            }
-            for (var objName in objectGroups){
-              objectGroups[objName].mesh.visible = false;
-            }
-          }
-        break;
-        case 65: //A
-          keyboardBuffer["a"] = true;
-        break;
-        case 68: //D
-          keyboardBuffer["d"] = true;
-        break;
-        case 87: //W
-          keyboardBuffer["w"] = true;
-        break;
-        case 83: //S
-          keyboardBuffer["s"] = true;
-        break;
-        case 37: //LEFT ARROW
-          keyboardBuffer["left"] = true;
-        break;
-        case 39: //RIGHT ARROW
-          keyboardBuffer["right"] = true;
-        break;
-        case 38: //UP ARROW
-          keyboardBuffer["up"] = true;
-        break;
-        case 40: //DOWN ARROW
-          keyboardBuffer["down"] = true;
-        break;
-        case 81: //Q
-          keyboardBuffer["q"] = true;
-        break;
-        case 69: //E
-          keyboardBuffer["e"] = true;
-        break;
-        case 90: //Z
-          keyboardBuffer["z"] = true;
-        break;
-        case 67: //C
-          keyboardBuffer["c"] = true;
-        break;
-        case 8: //BACKSPACE
-          //FIREFOX GO BACK FIX
-          if (selectedAddedObject && !cliFocused){
-            event.preventDefault();
-          }
-          if (mode == 1){
-            return;
-          }
-          if (selectedAddedObject){
-            delete addedObjects[selectedAddedObject.name];
-            selectedAddedObject.destroy();
-            terminal.clear();
-            terminal.printInfo(Text.OBJECT_DESTROYED);
-            selectedAddedObject = 0;
-            if (areaConfigurationsVisible){
-              $(datGuiAreaConfigurations.domElement).attr("hidden", true);
-              areaConfigurationsVisible = false;
-            }
-          }else if (selectedObjectGroup){
-            delete objectGroups[selectedObjectGroup.name];
-            selectedObjectGroup.destroy();
-            selectedObjectGroup = 0;
-            terminal.clear();
-            terminal.printInfo(Text.OBJECT_DESTROYED);
-            if (areaConfigurationsVisible){
-              $(datGuiAreaConfigurations.domElement).attr("hidden", true);
-              areaConfigurationsVisible = false;
-            }
-          }
-          afterObjectSelection();
-        break;
+    case 16: //SHIFT
+      if (mode == 0){
+        for (var objName in addedObjects){
+          addedObjects[objName].mesh.visible = false;
+        }
+        for (var objName in objectGroups){
+          objectGroups[objName].mesh.visible = false;
+        }
+      }
+    break;
+    case 8: //BACKSPACE
+      //FIREFOX GO BACK FIX
+      if (selectedAddedObject && !cliFocused){
+        event.preventDefault();
+      }
+      if (mode == 1){
+        return;
+      }
+      if (selectedAddedObject){
+        delete addedObjects[selectedAddedObject.name];
+        selectedAddedObject.destroy();
+        terminal.clear();
+        terminal.printInfo(Text.OBJECT_DESTROYED);
+        selectedAddedObject = 0;
+        if (areaConfigurationsVisible){
+          $(datGuiAreaConfigurations.domElement).attr("hidden", true);
+          areaConfigurationsVisible = false;
+        }
+      }else if (selectedObjectGroup){
+        delete objectGroups[selectedObjectGroup.name];
+        selectedObjectGroup.destroy();
+        selectedObjectGroup = 0;
+        terminal.clear();
+        terminal.printInfo(Text.OBJECT_DESTROYED);
+        if (areaConfigurationsVisible){
+          $(datGuiAreaConfigurations.domElement).attr("hidden", true);
+          areaConfigurationsVisible = false;
+        }
+      }
+      afterObjectSelection();
+    break;
   }
 
 });
@@ -634,70 +598,33 @@ window.addEventListener('keyup', function(event){
   if (!windowLoaded){
     return;
   }
-
   if (cliFocused || omGUIFocused || lightsGUIFocused){
     return;
   }
-
+  if (keyCodeToChar[event.keyCode]){
+    keyboardBuffer[keyCodeToChar[event.keyCode]] = false;
+  }
   switch(event.keyCode){
-        case 190: //PERIOD
-          keyboardBuffer["period"] = false;
-          for (var gridName in gridSelections){
-            var grid = gridSelections[gridName];
-            if (grid.divs){
-              for (var i = 0; i<grid.divs.length; i++){
-                grid.divs[i].style.visibility = "hidden";
-              }
-            }
+    case 190: //PERIOD
+      for (var gridName in gridSelections){
+        var grid = gridSelections[gridName];
+        if (grid.divs){
+          for (var i = 0; i<grid.divs.length; i++){
+            grid.divs[i].style.visibility = "hidden";
           }
-        break;
-        case 16: //SHIFT
-          keyboardBuffer["shift"] = false;
-          if (mode == 0){
-            for (var objName in addedObjects){
-              addedObjects[objName].mesh.visible = true;
-            }
-            for (var objName in objectGroups){
-              objectGroups[objName].mesh.visible = true;
-            }
-          }
-        break;
-        case 65: //A
-          keyboardBuffer["a"] = false;
-        break;
-        case 68: //D
-          keyboardBuffer["d"] = false;
-        break;
-        case 87: //W
-          keyboardBuffer["w"] = false;
-        break;
-        case 83: //S
-          keyboardBuffer["s"] = false;
-        break;
-        case 37: //LEFT ARROW
-          keyboardBuffer["left"] = false;
-        break;
-        case 39: //RIGHT ARROW
-          keyboardBuffer["right"] = false;
-        break;
-        case 38: //UP ARROW
-          keyboardBuffer["up"] = false;
-        break;
-        case 40: //DOWN ARROW
-          keyboardBuffer["down"] = false;
-        break;
-        case 81: //Q
-          keyboardBuffer["q"] = false;
-        break;
-        case 69: //E
-          keyboardBuffer["e"] = false;
-        break;
-        case 90: //Z
-          keyboardBuffer["z"] = false;
-        break;
-        case 67: //C
-          keyboardBuffer["c"] = false;
-        break;
+        }
+      }
+    break;
+    case 16: //SHIFT
+      if (mode == 0){
+        for (var objName in addedObjects){
+          addedObjects[objName].mesh.visible = true;
+        }
+        for (var objName in objectGroups){
+          objectGroups[objName].mesh.visible = true;
+        }
+      }
+    break;
   }
 
 });
@@ -1075,40 +1002,40 @@ function afterObjectSelection(){
 }
 
 function processKeyboardBuffer(){
-  if (keyboardBuffer["left"]){
+  if (keyboardBuffer["Left"]){
     camera.rotation.y += rotationYDelta;
   }
-  if (keyboardBuffer["right"]){
+  if (keyboardBuffer["Right"]){
     camera.rotation.y -= rotationYDelta;
   }
-  if (keyboardBuffer["up"]){
+  if (keyboardBuffer["Up"]){
     camera.rotation.x += rotationXDelta;
   }
-  if (keyboardBuffer["down"]){
+  if (keyboardBuffer["Down"]){
     camera.rotation.x -= rotationXDelta;
   }
-  if (keyboardBuffer["w"]){
+  if (keyboardBuffer["W"]){
     camera.translateZ(-1 * translateZAmount);
   }
-  if (keyboardBuffer["s"]){
+  if (keyboardBuffer["S"]){
     camera.translateZ(translateZAmount);
   }
-  if (keyboardBuffer["d"]){
+  if (keyboardBuffer["D"]){
     camera.translateX(translateXAmount);
   }
-  if (keyboardBuffer["a"]){
+  if (keyboardBuffer["A"]){
     camera.translateX(-1 * translateXAmount);
   }
-  if (keyboardBuffer["e"]){
+  if (keyboardBuffer["E"]){
     camera.translateY(-1 * translateYAmount);
   }
-  if (keyboardBuffer["q"]){
+  if (keyboardBuffer["Q"]){
     camera.translateY(translateYAmount);
   }
-  if (keyboardBuffer["z"]){
+  if (keyboardBuffer["Z"]){
     camera.rotation.z += rotationZDelta;
   }
-  if (keyboardBuffer["c"]){
+  if (keyboardBuffer["C"]){
     camera.rotation.z -= rotationZDelta;
   }
 }
