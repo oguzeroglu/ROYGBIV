@@ -854,4 +854,5 @@ var Text = function(){
    this.ROYGBIV_SCRIPTING_API_REMOVEPARTICLESYSTEMPOOLCONSUMEDLISTENER = "Removes the consumption listener of a particle system pool.";
    this.ROYGBIV_SCRIPTING_API_SETPARTICLESYSTEMPOOLAVAILABLELISTENER = "Sets an availability listener for a particle system pool. The callbackFunction is executed when there is at least\none available particle system inside the pool again.";
    this.ROYGBIV_SCRIPTING_API_REMOVEPARTICLESYSTEMPOOLAVAILABLELISTENER = "Removes the availablity listener for a particle system pool.";
+   this.ROYGBIV_SCRIPTING_API_DISABLEDEFAULTCONTROLS = "Disables or enables the default WASD camera controls. This function can be used before implementing manual camera controls.";
 }

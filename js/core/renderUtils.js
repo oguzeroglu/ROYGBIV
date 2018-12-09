@@ -2,7 +2,9 @@ function render(){
 
   requestID = requestAnimationFrame(render);
 
-  processKeyboardBuffer();
+  if (!(mode == 1 && defaultCameraControlsDisabled)){
+    processKeyboardBuffer();
+  }
   handleSkybox();
   if (!stopAreaConfigurationsHandler){
     areaConfigurationsHandler.handle();

@@ -918,6 +918,7 @@ var screenMouseDownCallbackFunction = 0;
 var screenMouseUpCallbackFunction = 0;
 var screenMouseMoveCallbackFunction = 0;
 var screenPointerLockChangedCallbackFunction = 0;
+var defaultCameraControlsDisabled = false;
 
 // WORKER VARIABLES
 var WORKERS_SUPPORTED = (typeof(Worker) !== "undefined");

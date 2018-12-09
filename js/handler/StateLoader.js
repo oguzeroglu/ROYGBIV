@@ -2257,6 +2257,7 @@ StateLoader.prototype.resetProject = function(undo){
   screenPointerLockChangedCallbackFunction = 0;
   boundingClientRect = renderer.domElement.getBoundingClientRect();
   pointerLockRequested = false;
+  defaultCameraControlsDisabled = false;
 
   // FOG
   fogActive = false;

@@ -137,7 +137,8 @@ var Roygbiv = function(){
     "setParticleSystemPoolConsumedListener",
     "removeParticleSystemPoolConsumedListener",
     "setParticleSystemPoolAvailableListener",
-    "removeParticleSystemPoolAvailableListener"
+    "removeParticleSystemPoolAvailableListener",
+    "disableDefaultControls"
   ];
 
   this.globals = new Object();
@@ -6982,4 +6983,22 @@ Roygbiv.prototype.convertEulerToDegrees = function(eulerAngle){
     return;
   }
   return ((eulerAngle * 180) / Math.PI);
+}
+
+// disableDefaultControls
+// Disables or enables the default WASD camera controls. This function can be used
+// before implementing manual camera controls.
+Roygbiv.prototype.disableDefaultControls = function(isDisabled){
+  if (mode == 0){
+    return;
+  }
+  if (typeof isDisabled == UNDEFINED){
+    throw new Error("disableDefaultControls error: isDisabled is not defined.");
+    return;
+  }
+  if (!(typeof isDisabled == "boolean")){
+    throw new Error("disableDefaultControls error: isDisabled is not a boolean.");
+    return;
+  }
+  defaultCameraControlsDisabled = isDisabled;
 }

@@ -1042,6 +1042,9 @@ function processKeyboardBuffer(){
 
 function mouseWheelEvent(e) {
   e.preventDefault();
+  if (mode == 1 && defaultCameraControlsDisabled){
+    return;
+  }
   if (!windowLoaded){
     return;
   }
