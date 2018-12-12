@@ -438,6 +438,7 @@ ObjectGroup.prototype.merge = function(){
     pseudoGeometry.merge(childGeom, childObj.mesh.matrix);
   }
 
+  this.isIndexed = isIndexed;
 
   var max = 0;
   var indexCache;
@@ -525,7 +526,10 @@ ObjectGroup.prototype.merge = function(){
     var vertex1 = vertices[a];
     var vertex2 = vertices[b];
     var vertex3 = vertices[c];
-    var normal = face.normal;
+    var vertexNormals = face.vertexNormals;
+    var vertexNormal1 = vertexNormals[0];
+    var vertexNormal2 = vertexNormals[1];
+    var vertexNormal3 = vertexNormals[2];
     var color = addedObject.material.color;
     var uv1 = faceVertexUVs[i][0];
     var uv2 = faceVertexUVs[i][1];
@@ -547,19 +551,19 @@ ObjectGroup.prototype.merge = function(){
       this.push(positions, vertex3.z, ((3*c) + 2), isIndexed);
     }
     if (!aSkipped){
-      this.push(normals, normal.x, (3*a), isIndexed);
-      this.push(normals, normal.y, ((3*a) + 1), isIndexed);
-      this.push(normals, normal.z, ((3*a) + 2), isIndexed);
+      this.push(normals, vertexNormal1.x, (3*a), isIndexed);
+      this.push(normals, vertexNormal1.y, ((3*a) + 1), isIndexed);
+      this.push(normals, vertexNormal1.z, ((3*a) + 2), isIndexed);
     }
     if (!bSkipped){
-      this.push(normals, normal.x, (3*b), isIndexed);
-      this.push(normals, normal.y, ((3*b) + 1), isIndexed);
-      this.push(normals, normal.z, ((3*b) + 2), isIndexed);
+      this.push(normals, vertexNormal2.x, (3*b), isIndexed);
+      this.push(normals, vertexNormal2.y, ((3*b) + 1), isIndexed);
+      this.push(normals, vertexNormal2.z, ((3*b) + 2), isIndexed);
     }
     if (!cSkipped){
-      this.push(normals, normal.x, (3*c), isIndexed);
-      this.push(normals, normal.y, ((3*c) + 1), isIndexed);
-      this.push(normals, normal.z, ((3*c) + 2), isIndexed);
+      this.push(normals, vertexNormal3.x, (3*c), isIndexed);
+      this.push(normals, vertexNormal3.y, ((3*c) + 1), isIndexed);
+      this.push(normals, vertexNormal3.z, ((3*c) + 2), isIndexed);
     }
     // COLORS
     if (!aSkipped){
