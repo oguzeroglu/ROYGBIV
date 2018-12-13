@@ -425,7 +425,7 @@ ObjectGroup.prototype.merge = function(){
   var mi = 0;
   for (var childName in this.group){
     var childObj = this.group[childName];
-    if (childObj.type == "box" || childObj.type == "sphere"){
+    if (childObj.type == "box" || childObj.type == "sphere" || childObj.type == "cylinder"){
       isIndexed = false;
     }
     var childGeom = childObj.getNormalGeometry();
