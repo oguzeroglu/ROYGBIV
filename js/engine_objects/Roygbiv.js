@@ -143,7 +143,8 @@ var Roygbiv = function(){
     "setCameraPosition",
     "lookAt",
     "applyAxisAngle",
-    "trackObjectPosition"
+    "trackObjectPosition",
+    "untrackObjectPosition"
   ];
 
   this.globals = new Object();
@@ -7205,4 +7206,22 @@ Roygbiv.prototype.trackObjectPosition = function(sourceObject, targetObject){
   sourceObject.trackedObject = targetObject;
   targetObject.isTracked = true;
   trackingObjects[sourceObject.name] = sourceObject;
+}
+
+// untrackObjectPosition
+// Stops tracking an objects position for an object.
+Roygbiv.prototype.untrackObjectPosition = function(sourceObject){
+  if (mode == 0){
+    return;
+  }
+  if (typeof sourceObject == UNDEFINED){
+    throw new Error("untrackObjectPosition error: sourceObject is not defined.");
+    return;
+  }
+  if (!(sourceObject instanceof AddedObject || sourceObject instanceof ObjectGroup)){
+    throw new Error("untrackObjectPosition error: sourceObject type not supported.");
+    return;
+  }
+  delete sourceObject.trackedObject;
+  delete trackingObjects[sourceObject.name];
 }

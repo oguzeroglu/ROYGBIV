@@ -860,4 +860,5 @@ var Text = function(){
    this.ROYGBIV_SCRIPTING_API_LOOKAT = "Makes the camera look at specific position.";
    this.ROYGBIV_SCRIPTING_API_APPLYAXISANGLE = "Rotates the vector around an axis by given angle.";
    this.ROYGBIV_SCRIPTING_API_TRACKOBJECTPOSITION = "Makes sourceObject keep its relative position to targetObject.";
+   this.ROYGBIV_SCRIPTING_API_UNTRACKOBJECTPOSITION = "Stops tracking an objects position for an object.";
 }
