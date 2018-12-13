@@ -142,7 +142,8 @@ var Roygbiv = function(){
     "isKeyPressed",
     "setCameraPosition",
     "lookAt",
-    "applyAxisAngle"
+    "applyAxisAngle",
+    "trackObjectPosition"
   ];
 
   this.globals = new Object();
@@ -7165,4 +7166,43 @@ Roygbiv.prototype.applyAxisAngle = function(vector, axisVector, angle, targetVec
     return targetVector;
   }
   return this.vector(REUSABLE_VECTOR.x, REUSABLE_VECTOR.y, REUSABLE_VECTOR.z);
+}
+
+// trackObjectPosition
+// Makes sourceObject keep its relative position to targetObject.
+Roygbiv.prototype.trackObjectPosition = function(sourceObject, targetObject){
+  if (mode == 0){
+    return;
+  }
+  if (typeof sourceObject == UNDEFINED){
+    throw new Error("trackObjectPosition error: sourceObject is not defined.");
+    return;
+  }
+  if (typeof targetObject == UNDEFINED){
+    throw new Error("trackObjectPosition error: targetObject is not defined.");
+    return;
+  }
+  if (!(sourceObject instanceof AddedObject || sourceObject instanceof ObjectGroup)){
+    throw new Error("trackObjectPosition error: sourceObject type not supported.");
+    return;
+  }
+  if (!(targetObject instanceof AddedObject || targetObject instanceof ObjectGroup)){
+    throw new Error("trackObjectPosition error: targetObject type not supported.");
+    return;
+  }
+  if (!targetObject.isDynamicObject){
+    throw new Error("trackObjectPosition error: targetObject is not a dynamic object.");
+    return;
+  }
+  if (sourceObject.isDynamicObject){
+    throw new Error("trackObjectPosition error: sourceObject is a dynamic object.");
+    return;
+  }
+  if (!sourceObject.isChangeable){
+    throw new Error("trackObjectPosition error: sourceObject is not marked as changeable.");
+    return;
+  }
+  sourceObject.trackedObject = targetObject;
+  targetObject.isTracked = true;
+  trackingObjects[sourceObject.name] = sourceObject;
 }

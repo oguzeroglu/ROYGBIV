@@ -18,6 +18,7 @@ function render(){
     if (!isPhysicsWorkerEnabled()){
       physicsWorld.step(physicsStepAmount);
       updateDynamicObjects();
+      updateTrackingObjects();
     }
     runScripts();
     updateRaycaster();
@@ -136,6 +137,22 @@ function updateGridCornerHelpers(){
   }
 }
 
+function updateTrackingObjects(){
+  for (var objName in trackingObjects){
+    var obj = addedObjects[objName];
+    if (!obj){
+      obj = objectGroups[objName];
+    }
+    obj.mesh.position.set(
+      obj.mesh.position.x + obj.trackedObject.dx,
+      obj.mesh.position.y + obj.trackedObject.dy,
+      obj.mesh.position.z + obj.trackedObject.dz
+    );
+    obj.physicsBody.position.copy(obj.mesh.position);
+    rayCaster.updateObject(obj);
+  }
+}
+
 function updateDynamicObjects(){
   for (var objectName in dynamicObjects){
     var object = addedObjects[objectName];
@@ -143,12 +160,22 @@ function updateDynamicObjects(){
     var axis = object.metaData.axis;
     var gridSystemAxis = object.metaData.gridSystemAxis;
     var type = object.type;
+    if (object.isTracked){
+      object.dx = physicsBody.position.x - object.mesh.position.x;
+      object.dy = physicsBody.position.y - object.mesh.position.y;
+      object.dz = physicsBody.position.z - object.mesh.position.z;
+    }
     object.mesh.position.copy(physicsBody.position);
     setTHREEQuaternionFromCANNON(object.mesh, physicsBody, axis, type, gridSystemAxis);
   }
   for (var grouppedObjectName in dynamicObjectGroups){
     var grouppedObject = objectGroups[grouppedObjectName];
     var physicsBody = grouppedObject.physicsBody;
+    if (grouppedObject.isTracked){
+      grouppedObject.dx = physicsBody.position.x - grouppedObject.mesh.position.x;
+      grouppedObject.dy = physicsBody.position.y - grouppedObject.mesh.position.y;
+      grouppedObject.dz = physicsBody.position.z - grouppedObject.mesh.position.z;
+    }
     grouppedObject.mesh.position.copy(physicsBody.position);
     grouppedObject.mesh.quaternion.copy(physicsBody.quaternion);
   }

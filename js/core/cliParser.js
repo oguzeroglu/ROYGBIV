@@ -567,6 +567,7 @@ function parse(input){
             GLOBAL_FOG_UNIFORM.value.set(-100.0, 0, 0, 0);
 
           }
+          trackingObjects = new Object();
           defaultCameraControlsDisabled = false;
           initBadTV();
           rayCaster.refresh();

@@ -747,6 +747,7 @@ var activeObjectTrails = new Object();
 var dynamicObjects = new Object();
 var dynamicObjectGroups = new Object();
 var addedObjectsInsideGroups = new Object();
+var trackingObjects = new Object();
 var ShaderContent = new ShaderContent();
 var commandDescriptor;
 var ColorNames;
