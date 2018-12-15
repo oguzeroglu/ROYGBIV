@@ -7191,6 +7191,10 @@ Roygbiv.prototype.trackObjectPosition = function(sourceObject, targetObject){
     throw new Error("trackObjectPosition error: targetObject type not supported.");
     return;
   }
+  if (targetObject.parentObjectName || sourceObject.parentObjectName){
+    throw new Error("trackObjectPosition error: Child objects do not support this function.");
+    return;
+  }
   if (!targetObject.isDynamicObject){
     throw new Error("trackObjectPosition error: targetObject is not a dynamic object.");
     return;
