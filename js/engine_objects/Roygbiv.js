@@ -926,8 +926,9 @@ Roygbiv.prototype.rotate = function(object, axis, radians){
 // rotateAroundXYZ
 //  Rotates an object, a glued object or a point light around the given (x, y, z)
 //  Unlike the rotate function, the positions of the objects can change when rotated
-//  using this function.
-Roygbiv.prototype.rotateAroundXYZ = function(object, x, y, z, radians, axis){
+//  using this function. If the optional skipLocalRotation flag is set, the object is
+//  not rotated in its local axis system.
+Roygbiv.prototype.rotateAroundXYZ = function(object, x, y, z, radians, axis, skipLocalRotation){
   if (mode == 0){
     return;
   }
@@ -951,9 +952,17 @@ Roygbiv.prototype.rotateAroundXYZ = function(object, x, y, z, radians, axis){
     throw new Error("rotateAroundXYZ error: Radian value is not a number.");
     return;
   }
+  if (typeof axis == UNDEFINED){
+    throw new Error("rotateAroundXYZ error: axis is not defined.");
+  }
   if (axis.toLowerCase() != "x" && axis.toLowerCase() != "y" && axis.toLowerCase() != "z"){
     throw new Error("rotateAroundXYZ error: Axis must be one of x,y or z");
     return;
+  }
+  if (!(typeof skipLocalRotation == UNDEFINED)){
+    if (!(typeof skipLocalRotation == "boolean")){
+      throw new Error("rotateAroundXYZ error: skipLocalRotation must be a boolean.");
+    }
   }
   var axisVector;
   if (axis.toLowerCase() == "x"){
@@ -972,7 +981,8 @@ Roygbiv.prototype.rotateAroundXYZ = function(object, x, y, z, radians, axis){
           parentObject,
           x, y, z,
           radians,
-          axis
+          axis,
+          skipLocalRotation
         );
         return;
       }
@@ -1000,7 +1010,9 @@ Roygbiv.prototype.rotateAroundXYZ = function(object, x, y, z, radians, axis){
   mesh.position.applyAxisAngle(axisVector, radians);
   mesh.position.add(point);
   mesh.parent.worldToLocal(mesh.position);
-  mesh.rotateOnAxis(axisVector, radians);
+  if (!skipLocalRotation){
+    mesh.rotateOnAxis(axisVector, radians);
+  }
   if (object instanceof AddedObject){
     object.setPhysicsAfterRotationAroundPoint(axis, radians);
     rayCaster.updateObject(object);
