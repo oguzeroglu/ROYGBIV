@@ -253,7 +253,10 @@ Roygbiv.prototype.getPosition = function(object, targetVector, axis){
     if (axis){
       if (object.parentObjectName){
         var parentObject = objectGroups[object.parentObjectName];
+        parentObject.graphicsGroup.position.copy(parentObject.mesh.position);
+        parentObject.graphicsGroup.quaternion.copy(parentObject.mesh.quaternion);
         parentObject.graphicsGroup.updateMatrix();
+        parentObject.graphicsGroup.updateMatrixWorld();
         var child = parentObject.graphicsGroup.children[object.indexInParent];
         child.getWorldPosition(REUSABLE_VECTOR);
         var worldPosition = REUSABLE_VECTOR;
@@ -275,7 +278,10 @@ Roygbiv.prototype.getPosition = function(object, targetVector, axis){
     }else{
       if (object.parentObjectName){
         var parentObject = objectGroups[object.parentObjectName];
+        parentObject.graphicsGroup.position.copy(parentObject.mesh.position);
+        parentObject.graphicsGroup.quaternion.copy(parentObject.mesh.quaternion);
         parentObject.graphicsGroup.updateMatrix();
+        parentObject.graphicsGroup.updateMatrixWorld();
         var child = parentObject.graphicsGroup.children[object.indexInParent];
         child.getWorldPosition(REUSABLE_VECTOR);
         var worldPosition = REUSABLE_VECTOR;
