@@ -600,6 +600,21 @@ StateLoader.prototype.load = function(undo){
        addedObjectInstance.areaVisibilityConfigurations = curAddedObjectExport.areaVisibilityConfigurations;
        addedObjectInstance.areaSideConfigurations = curAddedObjectExport.areaSideConfigurations;
 
+       if (curAddedObjectExport.hasPivot){
+         var pivot = addedObjectInstance.makePivot(
+           curAddedObjectExport.pivotOffsetX,
+           curAddedObjectExport.pivotOffsetY,
+           curAddedObjectExport.pivotOffsetZ
+         );
+         addedObjectInstance.pivotObject = pivot;
+         addedObjectInstance.pivotOffsetX = curAddedObjectExport.pivotOffsetX;
+         addedObjectInstance.pivotOffsetY = curAddedObjectExport.pivotOffsetY;
+         addedObjectInstance.pivotOffsetZ = curAddedObjectExport.pivotOffsetZ;
+         addedObjectInstance.mesh.position.set(
+           curAddedObjectExport.positionX, curAddedObjectExport.positionY, curAddedObjectExport.positionZ
+         );
+         addedObjectInstance.physicsBody.position.copy(addedObjectInstance.mesh.position);
+       }
     }
     // TEXTURE URLS ************************************************
     textureURLs = Object.assign({}, obj.textureURLs);
@@ -1133,6 +1148,22 @@ StateLoader.prototype.createObjectGroupsAfterLoadedTextures = function(){
 
     if (curObjectGroupExport.renderSide){
       objectGroupInstance.handleRenderSide(curObjectGroupExport.renderSide);
+    }
+
+    if (curObjectGroupExport.hasPivot){
+      var pivot = objectGroupInstance.makePivot(
+        curObjectGroupExport.pivotOffsetX,
+        curObjectGroupExport.pivotOffsetY,
+        curObjectGroupExport.pivotOffsetZ
+      );
+      objectGroupInstance.pivotObject = pivot;
+      objectGroupInstance.pivotOffsetX = curObjectGroupExport.pivotOffsetX;
+      objectGroupInstance.pivotOffsetY = curObjectGroupExport.pivotOffsetY;
+      objectGroupInstance.pivotOffsetZ = curObjectGroupExport.pivotOffsetZ;
+      objectGroupInstance.mesh.position.set(
+        curObjectGroupExport.positionX, curObjectGroupExport.positionY, curObjectGroupExport.positionZ
+      );
+      objectGroupInstance.physicsBody.position.copy(objectGroupInstance.mesh.position);
     }
 
   }

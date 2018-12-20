@@ -225,6 +225,30 @@ AddedObject.prototype.export = function(){
     exportObject.areaSideConfigurations = this.areaSideConfigurations;
   }
 
+  if (this.pivotObject){
+    exportObject.hasPivot = true;
+    exportObject.pivotOffsetX = this.pivotOffsetX;
+    exportObject.pivotOffsetY = this.pivotOffsetY;
+    exportObject.pivotOffsetZ = this.pivotOffsetZ;
+    exportObject.positionX = this.mesh.position.x;
+    exportObject.positionY = this.mesh.position.y;
+    exportObject.positionZ = this.mesh.position.z;
+    if (this.parentObjectName){
+      var objGroup = objectGroups[this.parentObjectName];
+      if (parent){
+        objGroup.graphicsGroup.position.copy(objGroup.mesh.position);
+        objGroup.graphicsGroup.quaternion.copy(objGroup.mesh.quaternion);
+        objGroup.graphicsGroup.updateMatrix();
+        objGroup.graphicsGroup.updateMatrixWorld();
+        var child = objGroup.graphicsGroup.children[this.indexInParent];
+        child.getWorldPosition(REUSABLE_VECTOR);
+        exportObject.positionX = REUSABLE_VECTOR.x;
+        exportObject.positionY = REUSABLE_VECTOR.y;
+        exportObject.positionZ = REUSABLE_VECTOR.z;
+      }
+    }
+  }
+
   return exportObject;
 }
 
@@ -331,6 +355,12 @@ AddedObject.prototype.loadState = function(){
   this.mesh.quaternion.set(
     this.state.quaternionX, this.state.quaternionY, this.state.quaternionZ, this.state.quaternionW
   );
+  if (this.originalPivotObject){
+    this.pivotObject = this.originalPivotObject;
+    this.pivotOffsetX = this.originalPivotOffsetX;
+    this.pivotOffsetY = this.originalPivotOffsetY;
+    this.pivotOffsetZ = this.originalPivotOffsetZ;
+  }
 }
 
 AddedObject.prototype.saveState = function(){
@@ -355,6 +385,12 @@ AddedObject.prototype.saveState = function(){
   this.state.quaternionY = this.mesh.quaternion.y;
   this.state.quaternionZ = this.mesh.quaternion.z;
   this.state.quaternionW = this.mesh.quaternion.w;
+  if (this.pivotObject){
+    this.originalPivotObject = this.pivotObject;
+    this.originalPivotOffsetX = this.pivotOffsetX;
+    this.originalPivotOffsetY = this.pivotOffsetY;
+    this.originalPivotOffsetZ = this.pivotOffsetZ;
+  }
 }
 
 AddedObject.prototype.handleRenderSide = function(val){
@@ -2168,4 +2204,63 @@ AddedObject.prototype.setFriction = function(val){
       physicsWorld.addContactMaterial(contact);
     }
   }
+}
+
+AddedObject.prototype.makePivot = function(offsetX, offsetY, offsetZ){
+  var obj = this;
+  var pseudoMesh = new THREE.Mesh(obj.mesh.geometry, obj.mesh.material);
+  pseudoMesh.position.copy(obj.mesh.position);
+  pseudoMesh.quaternion.copy(obj.mesh.quaternion);
+  var pivot = new THREE.Object3D();
+  pivot.add(pseudoMesh);
+  pivot.position.set(
+    pseudoMesh.position.x + offsetX,
+    pseudoMesh.position.y + offsetY,
+    pseudoMesh.position.z + offsetZ
+  );
+  pseudoMesh.position.x = -offsetX;
+  pseudoMesh.position.y = -offsetY;
+  pseudoMesh.position.z = -offsetZ;
+  pivot.pseudoMesh = pseudoMesh;
+  pivot.offsetX = offsetX;
+  pivot.offsetY = offsetY;
+  pivot.offsetZ = offsetZ;
+  pivot.rotation.order = 'YXZ';
+  pivot.sourceObject = this;
+  return pivot;
+}
+
+AddedObject.prototype.rotateAroundPivotObject = function(axis, radians){
+  if (!this.pivotObject){
+    return;
+  }
+  this.updatePivot();
+  this.pivotObject.updateMatrix();
+  this.pivotObject.updateMatrixWorld();
+  if (axis == "x"){
+    this.pivotObject.rotation.x += radians;
+  }else if (axis == "y"){
+    this.pivotObject.rotation.y += radians;
+  }else if (axis == "z"){
+    this.pivotObject.rotation.z += radians;
+  }
+  this.pivotObject.updateMatrix();
+  this.pivotObject.updateMatrixWorld();
+  this.pivotObject.pseudoMesh.updateMatrix();
+  this.pivotObject.pseudoMesh.updateMatrixWorld();
+  this.pivotObject.pseudoMesh.matrixWorld.decompose(REUSABLE_VECTOR, REUSABLE_QUATERNION, REUSABLE_VECTOR_2);
+  this.mesh.position.copy(REUSABLE_VECTOR);
+  this.mesh.quaternion.copy(REUSABLE_QUATERNION);
+  this.setPhysicsAfterRotationAroundPoint(axis, radians);
+  rayCaster.updateObject(this);
+}
+
+AddedObject.prototype.updatePivot = function(){
+  if (!this.pivotObject){
+    return;
+  }
+  this.pivotObject.position.copy(this.mesh.position);
+  this.pivotObject.translateX(this.pivotOffsetX);
+  this.pivotObject.translateY(this.pivotOffsetY);
+  this.pivotObject.translateZ(this.pivotOffsetZ);
 }

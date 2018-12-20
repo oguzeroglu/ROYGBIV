@@ -133,6 +133,12 @@ ObjectGroup.prototype.loadState = function(){
   this.mesh.quaternion.set(
     this.state.quaternionX, this.state.quaternionY, this.state.quaternionZ, this.state.quaternionW
   );
+  if (this.originalPivotObject){
+    this.pivotObject = this.originalPivotObject;
+    this.pivotOffsetX = this.originalPivotOffsetX;
+    this.pivotOffsetY = this.originalPivotOffsetY;
+    this.pivotOffsetZ = this.originalPivotOffsetZ;
+  }
 }
 
 ObjectGroup.prototype.saveState = function(){
@@ -157,6 +163,12 @@ ObjectGroup.prototype.saveState = function(){
   this.state.quaternionY = this.mesh.quaternion.y;
   this.state.quaternionZ = this.mesh.quaternion.z;
   this.state.quaternionW = this.mesh.quaternion.w;
+  if (this.pivotObject){
+    this.originalPivotObject = this.pivotObject;
+    this.originalPivotOffsetX = this.pivotOffsetX;
+    this.originalPivotOffsetY = this.pivotOffsetY;
+    this.originalPivotOffsetZ = this.pivotOffsetZ;
+  }
 }
 
 ObjectGroup.prototype.areGeometriesIdentical = function(){
@@ -1229,6 +1241,20 @@ ObjectGroup.prototype.export = function(){
     exportObj.areaSideConfigurations = this.areaSideConfigurations;
   }
 
+  if (this.pivotObject){
+    exportObj.hasPivot = true;
+    exportObj.pivotOffsetX = this.pivotOffsetX;
+    exportObj.pivotOffsetY = this.pivotOffsetY;
+    exportObj.pivotOffsetZ = this.pivotOffsetZ;
+    exportObj.positionX = this.mesh.position.x;
+    exportObj.positionY = this.mesh.position.y;
+    exportObj.positionZ = this.mesh.position.z;
+    exportObj.quaternionX = this.mesh.quaternion.x;
+    exportObj.quaternionY = this.mesh.quaternion.y;
+    exportObj.quaternionZ = this.mesh.quaternion.z;
+    exportObj.quaternionW = this.mesh.quaternion.w;
+  }
+
   return exportObj;
 }
 
@@ -1361,4 +1387,64 @@ ObjectGroup.prototype.setFriction = function(val){
       physicsWorld.addContactMaterial(contact);
     }
   }
+}
+
+ObjectGroup.prototype.makePivot = function(offsetX, offsetY, offsetZ){
+  var obj = this;
+  var pseudoMesh = new THREE.Mesh(obj.mesh.geometry, obj.mesh.material);
+  pseudoMesh.position.copy(obj.mesh.position);
+  pseudoMesh.quaternion.copy(obj.mesh.quaternion);
+  var pivot = new THREE.Object3D();
+  pivot.add(pseudoMesh);
+  pivot.position.set(
+    pseudoMesh.position.x + offsetX,
+    pseudoMesh.position.y + offsetY,
+    pseudoMesh.position.z + offsetZ
+  );
+  pseudoMesh.position.x = -offsetX;
+  pseudoMesh.position.y = -offsetY;
+  pseudoMesh.position.z = -offsetZ;
+  pivot.pseudoMesh = pseudoMesh;
+  pivot.offsetX = offsetX;
+  pivot.offsetY = offsetY;
+  pivot.offsetZ = offsetZ;
+  pivot.rotation.order = 'YXZ';
+  pivot.sourceObject = this;
+  return pivot;
+}
+
+ObjectGroup.prototype.rotateAroundPivotObject = function(axis, radians){
+  if (!this.pivotObject){
+    return;
+  }
+  this.updatePivot();
+  this.pivotObject.updateMatrix();
+  this.pivotObject.updateMatrixWorld();
+  if (axis == "x"){
+    this.pivotObject.rotation.x += radians;
+  }else if (axis == "y"){
+    this.pivotObject.rotation.y += radians;
+  }else if (axis == "z"){
+    this.pivotObject.rotation.z += radians;
+  }
+  this.pivotObject.updateMatrix();
+  this.pivotObject.updateMatrixWorld();
+  this.pivotObject.pseudoMesh.updateMatrix();
+  this.pivotObject.pseudoMesh.updateMatrixWorld();
+  this.pivotObject.pseudoMesh.matrixWorld.decompose(REUSABLE_VECTOR, REUSABLE_QUATERNION, REUSABLE_VECTOR_2);
+  this.mesh.position.copy(REUSABLE_VECTOR);
+  this.mesh.quaternion.copy(REUSABLE_QUATERNION);
+  this.physicsBody.quaternion.copy(this.mesh.quaternion);
+  this.physicsBody.position.copy(this.mesh.position);
+  rayCaster.updateObject(this);
+}
+
+ObjectGroup.prototype.updatePivot = function(){
+  if (!this.pivotObject){
+    return;
+  }
+  this.pivotObject.position.copy(this.mesh.position);
+  this.pivotObject.translateX(this.pivotOffsetX);
+  this.pivotObject.translateY(this.pivotOffsetY);
+  this.pivotObject.translateZ(this.pivotOffsetZ);
 }

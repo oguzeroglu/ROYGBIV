@@ -146,7 +146,9 @@ var commandArgumentsExpectedCount = [
     1, //autoConfigureArea
     0, //stopAreaConfigurations
     0, //startAreaConfigurations
-    6 //newCylinder
+    6, //newCylinder
+    4, //setRotationPivot
+    2 //printChildPosition
 ];
 var commandArgumentsExpectedExplanation = [
   "help", //help
@@ -289,7 +291,9 @@ var commandArgumentsExpectedExplanation = [
   "autoConfigureArea areaName", //autoConfigureArea
   "stopAreaConfigurations", //stopAreaConfigurations
   "startAreaConfigurations", //startAreaConfigurations
-  "newCylinder name materialName topRadius bottomRadius height isOpenEnded" //newCylinder
+  "newCylinder name materialName topRadius bottomRadius height isOpenEnded", //newCylinder
+  "setRotationPivot objectName offsetX offsetY offsetZ", //setRotationPivot
+  "printChildPosition objectName childObjectName" //printChildPosition
 ];
 var commands = [
   "help",
@@ -432,7 +436,9 @@ var commands = [
   "autoConfigureArea",
   "stopAreaConfigurations",
   "startAreaConfigurations",
-  "newCylinder"
+  "newCylinder",
+  "setRotationPivot",
+  "printChildPosition"
 ];
 var commandInfo = [
   "help: Prints command list.",
@@ -575,7 +581,9 @@ var commandInfo = [
   "autoConfigureArea: Automatically configures an area using ray tests. Manual corrections may be necesary after using this command.",
   "stopAreaConfigurations: Stops area configurations handling.",
   "startAreaConfigurations: Starts area configurations handling.",
-  "newCylinder: Creates a new cylinder."
+  "newCylinder: Creates a new cylinder.",
+  "setRotationPivot: Defines a pivot point of rotation for an object in its local axis system.",
+  "printChildPosition: Prints the world position of a child object of an object group."
 ];
 var keyboardInfo = [
   "W/S : Translates the camera on axis Z.",

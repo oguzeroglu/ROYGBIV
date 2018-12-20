@@ -766,6 +766,12 @@ function parse(input){
               Text.PARAM1, addedObject.type
             ).replace(
               Text.PARAM2, objectName
+            ).replace(
+              Text.PARAM3, addedObject.mesh.position.x
+            ).replace(
+              Text.PARAM4, addedObject.mesh.position.y
+            ).replace(
+              Text.PARAM5, addedObject.mesh.position.z
             ), options);
           }
           for (var objectName in objectGroups){
@@ -784,6 +790,12 @@ function parse(input){
               Text.PARAM1, objectName
             ).replace(
               Text.PARAM2, childStr
+            ).replace(
+              Text.PARAM3, grouppedObject.mesh.position.x
+            ).replace(
+              Text.PARAM4, grouppedObject.mesh.position.y
+            ).replace(
+              Text.PARAM5, grouppedObject.mesh.position.z
             ), options);
           }
           if (objectCount == 0){
@@ -2774,9 +2786,17 @@ function parse(input){
             return true;
           }
           if (addedObject){
-            addedObject.rotate(axis, radian);
+            if (addedObject.pivotObject){
+              addedObject.rotateAroundPivotObject(axis, radian);
+            }else{
+              addedObject.rotate(axis, radian);
+            }
           }else if (objectGroup){
-            objectGroup.rotate(axis, radian);
+            if (objectGroup.pivotObject){
+              objectGroup.rotateAroundPivotObject(axis, radian);
+            }else{
+              objectGroup.rotate(axis, radian);
+            }
           }
           if (!jobHandlerWorking){
             terminal.printInfo(Text.OBJECT_ROTATED);
@@ -4669,6 +4689,68 @@ function parse(input){
             areaConfigurationsVisible = false;
           }
           rayCaster.refresh();
+          return true;
+        break;
+        case 141: // setRotationPivot
+          if (mode != 0){
+            terminal.printError(Text.WORKS_ONLY_IN_DESIGN_MODE);
+            return true;
+          }
+          var objName = splitted[1];
+          var offsetX = parseFloat(splitted[2]);
+          var offsetY = parseFloat(splitted[3]);
+          var offsetZ = parseFloat(splitted[4]);
+          var obj = addedObjects[objName];
+          if (!obj){
+            obj = objectGroups[objName];
+            if (!obj){
+              terminal.printError(Text.NO_SUCH_OBJECT);
+              return true;
+            }
+          }
+          if (isNaN(offsetX)){
+            terminal.printError(Text.IS_NOT_A_NUMBER.replace(Text.PARAM1, "offsetX"));
+            return true;
+          }
+          if (isNaN(offsetY)){
+            terminal.printError(Text.IS_NOT_A_NUMBER.replace(Text.PARAM1, "offsetY"));
+            return true;
+          }
+          if (isNaN(offsetZ)){
+            terminal.printError(Text.IS_NOT_A_NUMBER.replace(Text.PARAM1, "offsetZ"));
+            return true;
+          }
+          var pivot = obj.makePivot(offsetX, offsetY, offsetZ);
+          obj.pivotObject = pivot;
+          obj.pivotOffsetX = offsetX;
+          obj.pivotOffsetY = offsetY;
+          obj.pivotOffsetZ = offsetZ;
+          terminal.printInfo(Text.PIVOT_SET);
+          return true;
+        break;
+        case 142: //printChildPosition
+          var objName = splitted[1];
+          var childObjName = splitted[2];
+          var objGroup = objectGroups[objName];
+          if (!objGroup){
+            terminal.printError(Text.NO_SUCH_OBJECT_GROUP);
+            return true;
+          }
+          var childObj = objGroup.group[childObjName];
+          if (!childObj){
+            terminal.printError(Text.NO_SUCH_CHILD_OBJECT_IN_THE_GROUP);
+            return true;
+          }
+          objGroup.graphicsGroup.position.copy(objGroup.mesh.position);
+          objGroup.graphicsGroup.quaternion.copy(objGroup.mesh.quaternion);
+          objGroup.graphicsGroup.updateMatrix();
+          objGroup.graphicsGroup.updateMatrixWorld();
+          var child = objGroup.graphicsGroup.children[childObj.indexInParent];
+          child.getWorldPosition(REUSABLE_VECTOR);
+          terminal.printHeader(Text.CHILD_OBJECT_POSITION.replace(Text.PARAM1, objGroup.name));
+          terminal.printInfo(Text.TREE2.replace(Text.PARAM1, "x").replace(Text.PARAM2, REUSABLE_VECTOR.x), true);
+          terminal.printInfo(Text.TREE2.replace(Text.PARAM1, "y").replace(Text.PARAM2, REUSABLE_VECTOR.y), true);
+          terminal.printInfo(Text.TREE2.replace(Text.PARAM1, "z").replace(Text.PARAM2, REUSABLE_VECTOR.z));
           return true;
         break;
       }

@@ -582,6 +582,19 @@ Terminal.prototype.autocomplete = function(command){
 				}
 				helpString = "[Sides]: ";
 			break;
+			case commandDescriptor.CHILD_OBJECT_NAME:
+				if (commandSplitted && commandSplitted.length == 3){
+					var objectGroup = objectGroups[commandSplitted[1]];
+					if (objectGroup){
+						for (var childObjName in objectGroup.group){
+							if (childObjName.toLowerCase().startsWith(curEntry.toLowerCase())){
+								possibilities.push(childObjName);
+							}
+						}
+					}
+				}
+				helpString = "[Children]: ";
+			break;
 		}
 
 		//  **********************************************************

@@ -31,6 +31,7 @@ var CommandDescriptor = function(){
   this.AREA_NAME                =   28;
   this.AREA_NAME_WITH_DEFAULT   =   29;
   this.RENDER_SIDE              =   30;
+  this.CHILD_OBJECT_NAME        =   31;
 
   // newGridSystem
   this.newGridSystem = new Object();
@@ -618,6 +619,20 @@ var CommandDescriptor = function(){
   this.newCylinder.types.push(this.UNKNOWN_INDICATOR); // bottomRadius
   this.newCylinder.types.push(this.UNKNOWN_INDICATOR); // height
   this.newCylinder.types.push(this.BOOLEAN); // isOpenEnded
+
+  // setRotationPivot
+  this.setRotationPivot = new Object();
+  this.setRotationPivot.types = [];
+  this.setRotationPivot.types.push(this.OBJECT_NAME); // objectName
+  this.setRotationPivot.types.push(this.UNKNOWN_INDICATOR); // offsetX
+  this.setRotationPivot.types.push(this.UNKNOWN_INDICATOR); // offsetY
+  this.setRotationPivot.types.push(this.UNKNOWN_INDICATOR); // offsetZ
+
+  // printChildPosition
+  this.printChildPosition = new Object();
+  this.printChildPosition.types = [];
+  this.printChildPosition.types.push(this.GLUED_OBJECT_NAME); // objectName
+  this.printChildPosition.types.push(this.CHILD_OBJECT_NAME); // childObjName
 
 };
 

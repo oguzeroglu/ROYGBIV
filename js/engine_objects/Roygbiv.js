@@ -144,7 +144,9 @@ var Roygbiv = function(){
     "lookAt",
     "applyAxisAngle",
     "trackObjectPosition",
-    "untrackObjectPosition"
+    "untrackObjectPosition",
+    "createRotationPivot",
+    "setRotationPivot"
   ];
 
   this.globals = new Object();
@@ -880,7 +882,12 @@ Roygbiv.prototype.rotate = function(object, axis, radians){
     throw new Error("rotate error: Object undefined.");
     return;
   }
-  if (axis.toLowerCase() != "x" && axis.toLowerCase() != "y" && axis.toLowerCase() != "z"){
+  if (typeof axis == "UNDEFINED"){
+    throw new Error("rotate error: axis is not defined.");
+    return;
+  }
+  axis = axis.toLowerCase();
+  if (axis != "x" && axis != "y" && axis != "z"){
     throw new Error("rotate error: Axis must be one of x, y, or z.");
     return;
   }
@@ -919,6 +926,10 @@ Roygbiv.prototype.rotate = function(object, axis, radians){
       throw new Error("rotate error: object is not marked as changeable.");
       return;
     }
+  }
+  if (object.pivotObject){
+    object.rotateAroundPivotObject(axis, radians);
+    return;
   }
   object.rotate(axis, radians, true);
 }
@@ -1661,6 +1672,27 @@ Roygbiv.prototype.resetObjectColor = function(object){
     return;
   }
   object.resetColor();
+}
+
+// setRotationPivot
+// Sets a rotation pivot for an object created with createRotationPivot API.
+Roygbiv.prototype.setRotationPivot = function(rotationPivot){
+  if (mode == 0){
+    return;
+  }
+  if (typeof rotationPivot == UNDEFINED){
+    throw new Error("setRotationPivot error: rotationPivot is not defined.");
+    return;
+  }
+  if (!(rotationPivot instanceof THREE.Object3D)){
+    throw new Error("setRotationPivot error: Bad rotationPivot type.");
+    return;
+  }
+  var sourceObject = rotationPivot.sourceObject;
+  sourceObject.pivotObject = rotationPivot;
+  sourceObject.pivotOffsetX = rotationPivot.offsetX;
+  sourceObject.pivotOffsetY = rotationPivot.offsetY;
+  sourceObject.pivotOffsetZ = rotationPivot.offsetZ;
 }
 
 // PARTICLE SYSTEM FUNCTIONS ***************************************************
@@ -7246,4 +7278,35 @@ Roygbiv.prototype.untrackObjectPosition = function(sourceObject){
   }
   delete sourceObject.trackedObject;
   delete trackingObjects[sourceObject.name];
+}
+
+// createRotationPivot
+// Creates and returns a rotation pivot for an object. This function is not
+// optimized for the runtime. Use this function before setRotationPivot API on
+// initialization.
+Roygbiv.prototype.createRotationPivot = function(sourceObject, offsetX, offsetY, offsetZ){
+  if (mode == 0){
+    return;
+  }
+  if (typeof sourceObject == UNDEFINED){
+    throw new Error("createRotationPivot error: sourceObject is not defined.");
+    return;
+  }
+  if (!(sourceObject instanceof AddedObject || sourceObject instanceof ObjectGroup)){
+    throw new Error("createRotationPivot error: Unsupported type.");
+    return;
+  }
+  if (isNaN(offsetX)){
+    throw new Error("createRotationPivot error: offsetX is not a number.");
+    return;
+  }
+  if (isNaN(offsetY)){
+    throw new Error("createRotationPivot error: offsetY is not a number.");
+    return;
+  }
+  if (isNaN(offsetZ)){
+    throw new Error("createRotationPivot error: offsetZ is not a number.");
+    return;
+  }
+  return sourceObject.makePivot(offsetX, offsetY, offsetZ);
 }
