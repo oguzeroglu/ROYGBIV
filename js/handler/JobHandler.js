@@ -99,6 +99,10 @@ JobHandler.prototype.handle = function(previewModeCommand){
       this.handleAutoConfigureAreaCommand();
     }else if (this.splitted[0] == "newCylinder"){
       this.handleNewCylinderCommand();
+    }else if (this.splitted[0] == "setRotationPivot"){
+      this.handleSetRotationPivotCommand();
+    }else if (this.splitted[0] == "unsetRotationPivot"){
+      this.handleUnsetRotationPivotCommand();
     }
   }catch (err){
     console.error(err);
@@ -106,6 +110,50 @@ JobHandler.prototype.handle = function(previewModeCommand){
   // because async
   if (this.splitted[0] != "autoConfigureArea"){
     jobHandlerWorking = false;
+  }
+}
+
+JobHandler.prototype.handleUnsetRotationPivotCommand = function(){
+  var objNamePrefix = this.splitted[1].split("*")[0];
+  var ctr = 0;
+  for (var objName in addedObjects){
+    if (objName.startsWith(objNamePrefix)){
+      parseCommand("unsetRotationPivot "+objName);
+      ctr ++;
+    }
+  }
+  for (var objName in objectGroups){
+    if (objName.startsWith(objNamePrefix)){
+      parseCommand("unsetRotationPivot "+objName);
+      ctr ++;
+    }
+  }
+  if (ctr == 0){
+    terminal.printError(Text.NO_OBJECT_FOUND);
+  }else{
+    terminal.printInfo(Text.COMMAND_EXECUTED_FOR_X_OBJECTS.replace(Text.PARAM1, ctr));
+  }
+}
+
+JobHandler.prototype.handleSetRotationPivotCommand = function(){
+  var objNamePrefix = this.splitted[1].split("*")[0];
+  var ctr = 0;
+  for (var objName in addedObjects){
+    if (objName.startsWith(objNamePrefix)){
+      parseCommand("setRotationPivot "+objName+" "+this.splitted[2]+" "+this.splitted[3]+" "+this.splitted[4]);
+      ctr ++;
+    }
+  }
+  for (var objName in objectGroups){
+    if (objName.startsWith(objNamePrefix)){
+      parseCommand("setRotationPivot "+objName+" "+this.splitted[2]+" "+this.splitted[3]+" "+this.splitted[4]);
+      ctr ++;
+    }
+  }
+  if (ctr == 0){
+    terminal.printError(Text.NO_OBJECT_FOUND);
+  }else{
+    terminal.printInfo(Text.COMMAND_EXECUTED_FOR_X_OBJECTS.replace(Text.PARAM1, ctr));
   }
 }
 

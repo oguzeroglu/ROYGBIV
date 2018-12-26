@@ -4697,6 +4697,10 @@ function parse(input){
             return true;
           }
           var objName = splitted[1];
+          if (!(objName.indexOf("*") == -1)){
+            new JobHandler(splitted).handle();
+            return true;
+          }
           var offsetX = parseFloat(splitted[2]);
           var offsetY = parseFloat(splitted[3]);
           var offsetZ = parseFloat(splitted[4]);
@@ -4726,7 +4730,9 @@ function parse(input){
           obj.pivotOffsetY = offsetY;
           obj.pivotOffsetZ = offsetZ;
           obj.pivotRemoved = false;
-          terminal.printInfo(Text.PIVOT_SET);
+          if (!jobHandlerWorking){
+            terminal.printInfo(Text.PIVOT_SET);
+          }
           return true;
         break;
         case 142: //printChildPosition
@@ -4760,6 +4766,10 @@ function parse(input){
             return true;
           }
           var objName = splitted[1];
+          if (!(objName.indexOf("*") == -1)){
+            new JobHandler(splitted).handle();
+            return true;
+          }
           var obj = addedObjects[objName];
           if (!obj){
             obj = objectGroups[objName];
@@ -4777,7 +4787,9 @@ function parse(input){
           delete obj.pivotOffsetY;
           delete obj.pivotOffsetZ;
           obj.pivotRemoved = true;
-          terminal.printInfo(Text.PIVOT_UNSET);
+          if (!jobHandlerWorking){
+            terminal.printInfo(Text.PIVOT_UNSET);
+          }
           return true;
         break;
       }
