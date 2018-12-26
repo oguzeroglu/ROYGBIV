@@ -1242,6 +1242,15 @@ ObjectGroup.prototype.export = function(){
     exportObj.quaternionY = this.mesh.quaternion.y;
     exportObj.quaternionZ = this.mesh.quaternion.z;
     exportObj.quaternionW = this.mesh.quaternion.w;
+  }else if (this.pivotRemoved){
+    exportObj.pivotRemoved = true;
+    exportObj.positionX = this.mesh.position.x;
+    exportObj.positionY = this.mesh.position.y;
+    exportObj.positionZ = this.mesh.position.z;
+    exportObj.quaternionX = this.mesh.quaternion.x;
+    exportObj.quaternionY = this.mesh.quaternion.y;
+    exportObj.quaternionZ = this.mesh.quaternion.z;
+    exportObj.quaternionW = this.mesh.quaternion.w;    
   }
 
   return exportObj;

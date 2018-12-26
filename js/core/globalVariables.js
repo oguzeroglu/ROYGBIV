@@ -148,7 +148,8 @@ var commandArgumentsExpectedCount = [
     0, //startAreaConfigurations
     6, //newCylinder
     4, //setRotationPivot
-    2 //printChildPosition
+    2, //printChildPosition
+    1 //unsetRotationPivot
 ];
 var commandArgumentsExpectedExplanation = [
   "help", //help
@@ -293,7 +294,8 @@ var commandArgumentsExpectedExplanation = [
   "startAreaConfigurations", //startAreaConfigurations
   "newCylinder name materialName topRadius bottomRadius height isOpenEnded", //newCylinder
   "setRotationPivot objectName offsetX offsetY offsetZ", //setRotationPivot
-  "printChildPosition objectName childObjectName" //printChildPosition
+  "printChildPosition objectName childObjectName", //printChildPosition
+  "unsetRotationPivot objectName" //unsetRotationPivot
 ];
 var commands = [
   "help",
@@ -438,7 +440,8 @@ var commands = [
   "startAreaConfigurations",
   "newCylinder",
   "setRotationPivot",
-  "printChildPosition"
+  "printChildPosition",
+  "unsetRotationPivot"
 ];
 var commandInfo = [
   "help: Prints command list.",
@@ -583,7 +586,8 @@ var commandInfo = [
   "startAreaConfigurations: Starts area configurations handling.",
   "newCylinder: Creates a new cylinder.",
   "setRotationPivot: Defines a pivot point of rotation for an object in its local axis system.",
-  "printChildPosition: Prints the world position of a child object of an object group."
+  "printChildPosition: Prints the world position of a child object of an object group.",
+  "unsetRotationPivot: Unsets the rotation pivot point of an object set by using setRotationPivot command."
 ];
 var keyboardInfo = [
   "W/S : Translates the camera on axis Z.",

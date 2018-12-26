@@ -614,6 +614,12 @@ StateLoader.prototype.load = function(undo){
            curAddedObjectExport.positionX, curAddedObjectExport.positionY, curAddedObjectExport.positionZ
          );
          addedObjectInstance.physicsBody.position.copy(addedObjectInstance.mesh.position);
+       }else if (curAddedObjectExport.pivotRemoved){
+         addedObjectInstance.mesh.position.set(
+           curAddedObjectExport.positionX, curAddedObjectExport.positionY, curAddedObjectExport.positionZ
+         );
+         addedObjectInstance.physicsBody.position.copy(addedObjectInstance.mesh.position);
+         addedObjectInstance.pivotRemoved = true;
        }
     }
     // TEXTURE URLS ************************************************
@@ -1164,6 +1170,11 @@ StateLoader.prototype.createObjectGroupsAfterLoadedTextures = function(){
         curObjectGroupExport.positionX, curObjectGroupExport.positionY, curObjectGroupExport.positionZ
       );
       objectGroupInstance.physicsBody.position.copy(objectGroupInstance.mesh.position);
+    }else if (curObjectGroupExport.pivotRemoved){
+      objectGroupInstance.mesh.position.set(
+        curObjectGroupExport.positionX, curObjectGroupExport.positionY, curObjectGroupExport.positionZ
+      );
+      objectGroupInstance.physicsBody.position.copy(objectGroupInstance.mesh.position);      
     }
 
   }

@@ -241,6 +241,19 @@ AddedObject.prototype.export = function(){
         exportObject.positionZ = this.physicsBody.position.z;
       }
     }
+  }else if (this.pivotRemoved){
+    exportObject.pivotRemoved = true;
+    exportObject.positionX = this.mesh.position.x;
+    exportObject.positionY = this.mesh.position.y;
+    exportObject.positionZ = this.mesh.position.z;
+    if (this.parentObjectName){
+      var objGroup = objectGroups[this.parentObjectName];
+      if (objGroup){
+        exportObject.positionX = this.physicsBody.position.x;
+        exportObject.positionY = this.physicsBody.position.y;
+        exportObject.positionZ = this.physicsBody.position.z;
+      }
+    }
   }
 
   return exportObject;

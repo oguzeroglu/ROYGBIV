@@ -4725,6 +4725,7 @@ function parse(input){
           obj.pivotOffsetX = offsetX;
           obj.pivotOffsetY = offsetY;
           obj.pivotOffsetZ = offsetZ;
+          obj.pivotRemoved = false;
           terminal.printInfo(Text.PIVOT_SET);
           return true;
         break;
@@ -4751,6 +4752,32 @@ function parse(input){
           terminal.printInfo(Text.TREE2.replace(Text.PARAM1, "x").replace(Text.PARAM2, REUSABLE_VECTOR.x), true);
           terminal.printInfo(Text.TREE2.replace(Text.PARAM1, "y").replace(Text.PARAM2, REUSABLE_VECTOR.y), true);
           terminal.printInfo(Text.TREE2.replace(Text.PARAM1, "z").replace(Text.PARAM2, REUSABLE_VECTOR.z));
+          return true;
+        break;
+        case 143: //unsetRotationPivot
+          if (mode != 0){
+            terminal.printError(Text.WORKS_ONLY_IN_DESIGN_MODE);
+            return true;
+          }
+          var objName = splitted[1];
+          var obj = addedObjects[objName];
+          if (!obj){
+            obj = objectGroups[objName];
+            if (!obj){
+              terminal.printError(Text.NO_SUCH_OBJECT);
+              return true;
+            }
+          }
+          if (!obj.pivotObject){
+            terminal.printError(Text.OBJECT_DOES_NOT_HAVE_A_PIVOT);
+            return true;
+          }
+          delete obj.pivotObject;
+          delete obj.pivotOffsetX;
+          delete obj.pivotOffsetY;
+          delete obj.pivotOffsetZ;
+          obj.pivotRemoved = true;
+          terminal.printInfo(Text.PIVOT_UNSET);
           return true;
         break;
       }

@@ -634,6 +634,11 @@ var CommandDescriptor = function(){
   this.printChildPosition.types.push(this.GLUED_OBJECT_NAME); // objectName
   this.printChildPosition.types.push(this.CHILD_OBJECT_NAME); // childObjName
 
+  // unsetRotationPivot
+  this.unsetRotationPivot = new Object();
+  this.unsetRotationPivot.types = [];
+  this.unsetRotationPivot.types.push(this.OBJECT_NAME); // objectName
+
 };
 
 CommandDescriptor.prototype.test = function(){
