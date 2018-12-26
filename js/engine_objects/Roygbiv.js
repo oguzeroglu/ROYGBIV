@@ -144,7 +144,8 @@ var Roygbiv = function(){
     "trackObjectPosition",
     "untrackObjectPosition",
     "createRotationPivot",
-    "setRotationPivot"
+    "setRotationPivot",
+    "unsetRotationPivot"
   ];
 
   this.globals = new Object();
@@ -1655,6 +1656,30 @@ Roygbiv.prototype.setRotationPivot = function(rotationPivot){
   sourceObject.pivotOffsetX = rotationPivot.offsetX;
   sourceObject.pivotOffsetY = rotationPivot.offsetY;
   sourceObject.pivotOffsetZ = rotationPivot.offsetZ;
+}
+
+// unsetRotationPivot
+// Unsets a rotation pivot point for an object set with setRotationPivot API.
+Roygbiv.prototype.unsetRotationPivot = function(object){
+  if (mode == 0){
+    return;
+  }
+  if (typeof object == UNDEFINED){
+    throw new Error("unsetRotationPivot error: object is not defined.");
+    return;
+  }
+  if (!((object instanceof AddedObject) || (object instanceof ObjectGroup))){
+    throw new Error("unsetRotationPivot error: Type not supported.");
+    return;
+  }
+  if (!object.pivotObject){
+    throw new Error("unsetRotationPivot error: Object does not have a pivot point.");
+    return;
+  }
+  delete object.pivotObject;
+  delete object.pivotOffsetX;
+  delete object.pivotOffsetY;
+  delete object.pivotOffsetZ;
 }
 
 // PARTICLE SYSTEM FUNCTIONS ***************************************************

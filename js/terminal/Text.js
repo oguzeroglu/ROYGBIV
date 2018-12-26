@@ -868,4 +868,5 @@ var Text = function(){
    this.ROYGBIV_SCRIPTING_API_UNTRACKOBJECTPOSITION = "Stops tracking an objects position for an object.";
    this.ROYGBIV_SCRIPTING_API_CREATEROTATIONPIVOT = "Creates and returns a rotation pivot for an object. This function is not optimized for the runtime. Use this function before\nsetRotationPivot API on initialization.";
    this.ROYGBIV_SCRIPTING_API_SETROTATIONPIVOT = "Sets a rotation pivot for an object created with createRotationPivot API.";
+   this.ROYGBIV_SCRIPTING_API_UNSETROTATIONPIVOT = "Unsets a rotation pivot point for an object set with setRotationPivot API.";
 }
