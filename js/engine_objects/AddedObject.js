@@ -235,16 +235,10 @@ AddedObject.prototype.export = function(){
     exportObject.positionZ = this.mesh.position.z;
     if (this.parentObjectName){
       var objGroup = objectGroups[this.parentObjectName];
-      if (parent){
-        objGroup.graphicsGroup.position.copy(objGroup.mesh.position);
-        objGroup.graphicsGroup.quaternion.copy(objGroup.mesh.quaternion);
-        objGroup.graphicsGroup.updateMatrix();
-        objGroup.graphicsGroup.updateMatrixWorld();
-        var child = objGroup.graphicsGroup.children[this.indexInParent];
-        child.getWorldPosition(REUSABLE_VECTOR);
-        exportObject.positionX = REUSABLE_VECTOR.x;
-        exportObject.positionY = REUSABLE_VECTOR.y;
-        exportObject.positionZ = REUSABLE_VECTOR.z;
+      if (objGroup){
+        exportObject.positionX = this.physicsBody.position.x;
+        exportObject.positionY = this.physicsBody.position.y;
+        exportObject.positionZ = this.physicsBody.position.z;
       }
     }
   }
