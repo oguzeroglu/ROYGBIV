@@ -349,6 +349,12 @@ AddedObject.prototype.loadState = function(){
   this.mesh.quaternion.set(
     this.state.quaternionX, this.state.quaternionY, this.state.quaternionZ, this.state.quaternionW
   );
+  if (this.pivotObject){
+    delete this.pivotObject;
+    delete this.pivotOffsetX;
+    delete this.pivotOffsetY;
+    delete this.pivotOffsetZ;
+  }
   if (this.originalPivotObject){
     this.pivotObject = this.originalPivotObject;
     this.pivotOffsetX = this.originalPivotOffsetX;
