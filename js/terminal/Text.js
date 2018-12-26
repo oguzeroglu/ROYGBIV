@@ -620,10 +620,8 @@ var Text = function(){
                                             "alphaVariation: If set, the alpha value of particles would change according to the formula: sin(alphaVariation * t) (optional)";
   this.ROYGBIV_SCRIPTING_API_SETEXPIRELISTENER = "Sets an expiration listener for a particle system. The parameter callbackFunction is executed when sourceObject is expired.\nThe name of the particle system is passed to the callbackFunction as a parameter.";
   this.ROYGBIV_SCRIPTING_API_REMOVEEXPIRELISTENER = "Removes the expiration listener function of a particle system.";
-  this.ROYGBIV_SCRIPTING_API_GETFACENORMALS = "Returns an array of face normal vectors of an object or a glued object.";
   this.ROYGBIV_SCRIPTING_API_NORMALIZEVECTOR = "Normalizes the vector given in the parameter. Note that this function modifies directly the parameter and returns nothing.";
   this.ROYGBIV_SCRIPTING_API_COMPUTEQUATERNIONFROMVECTORS = "Returns the quaternion between two vectors.";
-  this.ROYGBIV_SCRIPTING_API_GETFACEINFOS = "Returns a map that contains face information of an object or a glued object. Each key of the map has\n\"[object name]_[axis]\" as the format. Each value of the map is an object that has center and normal information.\nThe [axis] field inside the key may be +X, -X, +Y, -Y, +Z or -Z.";
   this.ROYGBIV_SCRIPTING_API_CIRCULARDISTRIBUTION = "Returns a random point sampled around an imaginary circle with given radius and given quaternion in 3D space.\nIf no quaternion is specified the circle is sampled on the XY plane.";
   this.ROYGBIV_SCRIPTING_API_MULTIPLYSCALAR = "Multiplies a vector by a scalar.";
   this.ROYGBIV_SCRIPTING_API_CREATEFIREEXPLOSION = "Returns a fire explosion particle system. The configurations are:\n"+

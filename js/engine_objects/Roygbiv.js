@@ -69,10 +69,8 @@ var Roygbiv = function(){
     "createPlasma",
     "setExpireListener",
     "removeExpireListener",
-    "getFaceNormals",
     "normalizeVector",
     "computeQuaternionFromVectors",
-    "getFaceInfos",
     "circularDistribution",
     "multiplyScalar",
     "createFireExplosion",
@@ -569,42 +567,6 @@ Roygbiv.prototype.getMarkedPosition = function(markedPointName){
     return;
   }
   return this.vector(markedPoint.x, markedPoint.y, markedPoint.z);
-}
-
-// getFaceNormals
-//  Returns an array of face normal vectors of an object or a glued object.
-Roygbiv.prototype.getFaceNormals = function(object){
-  if (mode == 0){
-    return;
-  }
-  if (typeof object == UNDEFINED){
-    throw new Error("getFaceNormals error: object is not defined.");
-    return;
-  }
-  if (!(object instanceof AddedObject) && !(object instanceof ObjectGroup)){
-    throw new Error("getFaceNormals error: Unsupported type.");
-    return;
-  }
-  return object.getFaceNormals();
-}
-
-// getFaceInfos
-//  Returns a map that contains face information of an object or a glued object.
-//  Each key of the map has "[object name]_[axis]" as the format. Each value of the map
-//  is an object that has center and normal information. The [axis] field inside the
-//  key may be +X, -X, +Y, -Y, +Z or -Z.
-Roygbiv.prototype.getFaceInfos = function(object){
-  if (mode == 0){
-    return;
-  }
-  if (typeof object == UNDEFINED){
-    throw new Error("getFaceInfos error: object is not defined.");
-    return;
-  }
-  if (!(object instanceof AddedObject) && !(object instanceof ObjectGroup)){
-    throw new Error("getFaceInfos error: Type not supported.");
-  }
-  return object.getFaceInfos();
 }
 
 // getParticleSystemVelocityAtTime

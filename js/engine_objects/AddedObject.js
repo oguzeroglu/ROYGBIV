@@ -773,45 +773,15 @@ AddedObject.prototype.resetPosition = function(){
 
 AddedObject.prototype.translate = function(axis, amount, fromScript){
   var physicsBody = this.physicsBody;
-  var x = this.mesh.position.x;
-  var y = this.mesh.position.y;
-  var z = this.mesh.position.z;
   if (axis == "x"){
-    this.mesh.position.set(
-      x + amount,
-      y,
-      z
-    );
+    this.mesh.translateX(amount);
   }else if (axis == "y"){
-    this.mesh.position.set(
-      x,
-      y + amount,
-      z
-    );
+    this.mesh.translateY(amount);
   }else if (axis == "z"){
-    this.mesh.position.set(
-      x,
-      y,
-      z + amount
-    );
+    this.mesh.translateZ(amount);
   }
-
   physicsBody.position.copy(this.mesh.position);
-
-  if (!fromScript){
-    if (this.type == "box" || this.type == "ramp" || this.type == "sphere" || this.type == "cylinder"){
-      this.metaData["centerX"] = this.mesh.position.x;
-      this.metaData["centerY"] = this.mesh.position.y;
-      this.metaData["centerZ"] = this.mesh.position.z;
-    }else if (this.type == "surface"){
-      this.metaData["positionX"] = this.mesh.position.x;
-      this.metaData["positionY"] = this.mesh.position.y;
-      this.metaData["positionZ"] = this.mesh.position.z;
-    }
-  }
-
   rayCaster.updateObject(this);
-
 }
 
 AddedObject.prototype.rotate = function(axis, radians, fromScript){
