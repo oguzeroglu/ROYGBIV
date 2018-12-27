@@ -717,6 +717,9 @@ Roygbiv.prototype.hide = function(object, keepPhysics){
       throw new Error("hide error: Cannot hide a child object. Use the parent object instead.");
       return;
     }
+    if (keepPhysicsValue && object.noMass){
+      throw new Error("hide error: Object has no mass. Cannot keep mass.");
+    }
     if (!object.isChangeable){
       throw new Error("hide error: Object is not marked as changeable.");
       return;
@@ -728,10 +731,12 @@ Roygbiv.prototype.hide = function(object, keepPhysics){
       // is removed. It is safe to remove the bodies after the
       // physics iteration.
       if (!keepPhysicsValue){
-        setTimeout(function(){
-          physicsWorld.removeBody(object.physicsBody);
-          object.physicsKeptWhenHidden = false;
-        });
+        if (!object.noMass){
+          setTimeout(function(){
+            physicsWorld.removeBody(object.physicsBody);
+            object.physicsKeptWhenHidden = false;
+          });
+        }
       }else{
         object.physicsKeptWhenHidden = true;
       }
@@ -739,6 +744,9 @@ Roygbiv.prototype.hide = function(object, keepPhysics){
       rayCaster.binHandler.hide(object);
     }
   }else if (object instanceof ObjectGroup){
+    if (keepPhysicsValue && object.noMass){
+      throw new Error("hide error: Object has no mass. Cannot keep mass.");
+    }
     if (!object.isChangeable){
       throw new Error("hide error: object is not marked as changeable.");
       return;
@@ -746,10 +754,12 @@ Roygbiv.prototype.hide = function(object, keepPhysics){
     if (object.isVisibleOnThePreviewScene()){
       object.mesh.visible = false;
       if (!keepPhysicsValue){
-        setTimeout(function(){
-          physicsWorld.removeBody(object.physicsBody);
-          object.physicsKeptWhenHidden = false;
-        });
+        if (!object.noMass){
+          setTimeout(function(){
+            physicsWorld.removeBody(object.physicsBody);
+            object.physicsKeptWhenHidden = false;
+          });
+        }
       }else{
         object.physicsKeptWhenHidden = true;
       }
@@ -785,9 +795,11 @@ Roygbiv.prototype.show = function(object){
     if (!object.isVisibleOnThePreviewScene()){
       object.mesh.visible = true;
       if (!object.physicsKeptWhenHidden){
-        setTimeout(function(){
-          physicsWorld.addBody(object.physicsBody);
-        });
+        if (!object.noMass){
+          setTimeout(function(){
+            physicsWorld.addBody(object.physicsBody);
+          });
+        }
       }
       object.isHidden = false;
       rayCaster.binHandler.show(object);
@@ -800,9 +812,11 @@ Roygbiv.prototype.show = function(object){
     if (!object.isVisibleOnThePreviewScene()){
       object.mesh.visible = true;
       if (!object.physicsKeptWhenHidden){
-        setTimeout(function(){
-          physicsWorld.addBody(object.physicsBody);
-        });
+        if (!object.noMass){
+          setTimeout(function(){
+            physicsWorld.addBody(object.physicsBody);
+          });
+        }
       }
       object.isHidden = false;
       rayCaster.binHandler.show(object);

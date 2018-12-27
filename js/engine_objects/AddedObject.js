@@ -1813,12 +1813,14 @@ AddedObject.prototype.segmentGeometry = function(isCustom, count, returnGeometry
 }
 
 AddedObject.prototype.modifyCylinderPhysicsAfterSegmentChange = function(radialSegments){
-  physicsWorld.remove(this.physicsBody);
   var topRadius = this.metaData.topRadius;
   var bottomRadius = this.metaData.bottomRadius;
   var height = this.metaData.height;
   var oldPosition = this.physicsBody.position.clone();
   var oldQuaternion = this.physicsBody.quaternion.clone();
+  if (!this.noMass){
+    physicsWorld.remove(this.physicsBody);
+  }
   var physicsShapeKey = "CYLINDER" + PIPE + topRadius + PIPE + bottomRadius + PIPE +
                                             Math.abs(height) + PIPE + radialSegments + PIPE +
                                             this.metaData.gridSystemAxis;
@@ -1833,7 +1835,7 @@ AddedObject.prototype.modifyCylinderPhysicsAfterSegmentChange = function(radialS
     cached = true;
   }
   if (!cached){
-    if (this.axis == "XZ"){
+    if (this.metaData.gridSystemAxis == "XZ"){
       var quat = new CANNON.Quaternion();
       var coef = 1;
       if (height < 0){
@@ -1842,14 +1844,14 @@ AddedObject.prototype.modifyCylinderPhysicsAfterSegmentChange = function(radialS
       quat.setFromAxisAngle(new CANNON.Vec3(1, 0, 0), -Math.PI/2 * coef);
       var translation = new CANNON.Vec3(0, 0, 0);
       newPhysicsShape.transformAllPoints(translation,quat);
-    }else if (this.axis == "XY"){
+    }else if (this.metaData.gridSystemAxis == "XY"){
       if (height < 0){
         var quat = new CANNON.Quaternion();
         quat.setFromAxisAngle(new CANNON.Vec3(0, 1, 0), -Math.PI);
         var translation = new CANNON.Vec3(0, 0, 0);
         newPhysicsShape.transformAllPoints(translation,quat);
       }
-    }else if (this.axis == "YZ"){
+    }else if (this.metaData.gridSystemAxis == "YZ"){
       var quat = new CANNON.Quaternion();
       var coef = 1;
       if (height < 0){
@@ -1869,7 +1871,9 @@ AddedObject.prototype.modifyCylinderPhysicsAfterSegmentChange = function(radialS
   });
   this.physicsBody.position.copy(oldPosition);
   this.physicsBody.quaternion.copy(oldQuaternion);
-  physicsWorld.add(this.physicsBody);
+  if (!this.noMass){
+    physicsWorld.add(this.physicsBody);
+  }
 }
 
 AddedObject.prototype.resetMaps = function(resetAssociatedTexturePack){
