@@ -224,6 +224,12 @@ AddedObject.prototype.export = function(){
     exportObject.isChangeable = false;
   }
 
+  if (this.noMass){
+    exportObject.noMass = true;
+  }else{
+    exportObject.noMass = false;
+  }
+
   if (this.areaVisibilityConfigurations){
     exportObject.areaVisibilityConfigurations = this.areaVisibilityConfigurations;
   }

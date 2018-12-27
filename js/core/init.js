@@ -147,6 +147,24 @@ window.onload = function() {
       terminal.printInfo(Text.OBJECT_MARKED_AS.replace(Text.PARAM1, "unchangeable"));
     }
   }).listen();
+  omHasMassController = datGuiObjectManipulation.add(objectManipulationParameters, "Has mass").onChange(function(val){
+    var obj = selectedAddedObject;
+    if (!obj){
+      obj = selectedObjectGroup;
+    }
+    terminal.clear();
+    obj.noMass = !val;
+    if (val){
+      physicsWorld.add(obj.physicsBody);
+      enableController(omMassController);
+      terminal.printInfo(Text.PHYSICS_ENABLED);
+    }else{
+      physicsWorld.remove(obj.physicsBody);
+      disableController(omMassController);
+      terminal.printInfo(Text.PHYSICS_DISABLED);
+    }
+    omMassController.updateDisplay();
+  }).listen();
   omSideController = datGuiObjectManipulation.add(objectManipulationParameters, "Side", [
     "Both", "Front", "Back"
   ]).onChange(function(val){
@@ -871,6 +889,7 @@ function enableAllOMControllers(){
   enableController(omMassController);
   enableController(omSlipperyController);
   enableController(omChangeableController);
+  enableController(omHasMassController);
   enableController(omTextureOffsetXController);
   enableController(omTextureOffsetYController);
   enableController(omOpacityController);
@@ -1018,6 +1037,10 @@ function afterObjectSelection(){
       }
     }
     objectManipulationParameters["Mass"] = obj.physicsBody.mass;
+    if (obj.noMass){
+      disableController(omMassController);
+    }
+    objectManipulationParameters["Has mass"] = !obj.noMass;
     omMassController.updateDisplay();
   }else{
     $(datGuiObjectManipulation.domElement).attr("hidden", true);

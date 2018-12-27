@@ -583,6 +583,11 @@ StateLoader.prototype.load = function(undo){
 
       addedObjectInstance.isChangeable = curAddedObjectExport.isChangeable;
 
+      if (curAddedObjectExport.noMass){
+        addedObjectInstance.noMass = true;
+        physicsWorld.remove(addedObjectInstance.physicsBody);
+      }
+
       addedObjectInstance.mesh.material.uniforms.emissiveIntensity.value = curAddedObjectExport.emissiveIntensity;
       addedObjectInstance.mesh.material.uniforms.aoIntensity.value = curAddedObjectExport.aoMapIntensity;
 
@@ -1137,6 +1142,11 @@ StateLoader.prototype.createObjectGroupsAfterLoadedTextures = function(){
     }
 
     objectGroupInstance.isChangeable = curObjectGroupExport.isChangeable;
+
+    if (curObjectGroupExport.noMass){
+      objectGroupInstance.noMass = true;
+      physicsWorld.remove(objectGroupInstance.physicsBody);
+    }
 
     objectGroupInstance.isDynamicObject = isDynamicObject;
     objectGroupInstance.isBasicMaterial = curObjectGroupExport.isBasicMaterial;

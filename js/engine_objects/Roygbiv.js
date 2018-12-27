@@ -803,6 +803,10 @@ Roygbiv.prototype.applyForce = function(object, force, point){
     throw new Error("applyForce error: object type is not supported.");
     return;
   }
+  if (object.noMass){
+    throw new Error("applyForce error: object does not have a mass.");
+    return;
+  }
   if (!object.isDynamicObject){
     throw new Error("applyForce error: object is not dynamic.");
     return;
@@ -1113,6 +1117,10 @@ Roygbiv.prototype.setMass = function(object, mass){
   }
   if (!object.isChangeable){
     throw new Error("setMass error: object is not marked as changeable.");
+    return;
+  }
+  if (object.noMass){
+    throw new Error("setMass error: object has no mass property.");
     return;
   }
   if ((object instanceof AddedObject) && !(addedObjects[object.name])){

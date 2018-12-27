@@ -853,8 +853,10 @@ ObjectGroup.prototype.glue = function(){
 
     this.totalVertexCount += addedObject.mesh.geometry.attributes.position.count;
     // GLUE PHYSICS ************************************************
-    var shape = addedObject.physicsBody.shapes[0];
-    physicsBody.addShape(shape, addedObject.physicsBody.position.vsub(referenceVector), addedObject.physicsBody.quaternion);
+    if (!addedObject.noMass){
+      var shape = addedObject.physicsBody.shapes[0];
+      physicsBody.addShape(shape, addedObject.physicsBody.position.vsub(referenceVector), addedObject.physicsBody.quaternion);
+    }
     // GLUE GRAPHICS ***********************************************
     addedObject.mesh.position.sub(referenceVectorTHREE);
     graphicsGroup.add(addedObject.mesh);
@@ -1008,7 +1010,9 @@ ObjectGroup.prototype.detach = function(){
   for (var objectName in this.group){
     var addedObject = this.group[objectName];
 
-    physicsWorld.add(addedObject.physicsBody);
+    if (!addedObject.noMass){
+      physicsWorld.add(addedObject.physicsBody);
+    }
     scene.add(addedObject.mesh);
 
     addedObject.mesh.objectGroupName = 0;
@@ -1209,6 +1213,12 @@ ObjectGroup.prototype.export = function(){
     exportObj.isChangeable = true;
   }else{
     exportObj.isChangeable = false;
+  }
+
+  if (this.noMass){
+    exportObj.noMass = true;
+  }else{
+    exportObj.noMass = false;
   }
 
   exportObj.quaternionX = this.initQuaternion.x;

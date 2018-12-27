@@ -341,7 +341,7 @@ function parse(input){
                 object.binInfo = new Map();
               }
               object.saveState();
-              if (object.isDynamicObject){
+              if (object.isDynamicObject && !object.noMass){
                 dynamicObjectGroups[objectName] = object;
               }
 
@@ -351,7 +351,7 @@ function parse(input){
               if (object.binInfo){
                 object.binInfo = new Map();
               }
-              if (object.isDynamicObject){
+              if (object.isDynamicObject && !object.noMass){
                 dynamicObjects[objectName] = object;
               }
               object.saveState();
