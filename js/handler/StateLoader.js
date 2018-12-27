@@ -581,6 +581,8 @@ StateLoader.prototype.load = function(undo){
         addedObjectInstance.setSlippery(true);
       }
 
+      addedObjectInstance.isChangeable = curAddedObjectExport.isChangeable;
+
       addedObjectInstance.mesh.material.uniforms.emissiveIntensity.value = curAddedObjectExport.emissiveIntensity;
       addedObjectInstance.mesh.material.uniforms.aoIntensity.value = curAddedObjectExport.aoMapIntensity;
 
@@ -1133,6 +1135,9 @@ StateLoader.prototype.createObjectGroupsAfterLoadedTextures = function(){
     if (curObjectGroupExport.isSlippery){
       objectGroupInstance.setSlippery(true);
     }
+
+    objectGroupInstance.isChangeable = curObjectGroupExport.isChangeable;
+
     objectGroupInstance.isDynamicObject = isDynamicObject;
     objectGroupInstance.isBasicMaterial = curObjectGroupExport.isBasicMaterial;
     objectGroupInstance.isPhongMaterial = curObjectGroupExport.isPhongMaterial;
@@ -1174,7 +1179,7 @@ StateLoader.prototype.createObjectGroupsAfterLoadedTextures = function(){
       objectGroupInstance.mesh.position.set(
         curObjectGroupExport.positionX, curObjectGroupExport.positionY, curObjectGroupExport.positionZ
       );
-      objectGroupInstance.physicsBody.position.copy(objectGroupInstance.mesh.position);      
+      objectGroupInstance.physicsBody.position.copy(objectGroupInstance.mesh.position);
     }
 
   }

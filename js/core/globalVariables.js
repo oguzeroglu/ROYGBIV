@@ -985,6 +985,7 @@ var omRotationYController;
 var omRotationZController;
 var omMassController;
 var omSlipperyController;
+var omChangeableController;
 var omSideController;
 var omHideHalfController;
 var omTextureOffsetXController;
@@ -1002,6 +1003,7 @@ var objectManipulationParameters = {
   "Rotate z": 0.0,
   "Mass": 0.0,
   "Slippery": false,
+  "Changeable": false,
   "Side": "Both",
   "Hide half": "None",
   "Texture offset x": 0.0,

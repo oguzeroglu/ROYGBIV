@@ -1205,6 +1205,12 @@ ObjectGroup.prototype.export = function(){
     exportObj.isSlippery = false;
   }
 
+  if (this.isChangeable){
+    exportObj.isChangeable = true;
+  }else{
+    exportObj.isChangeable = false;
+  }
+
   exportObj.quaternionX = this.initQuaternion.x;
   exportObj.quaternionY = this.initQuaternion.y;
   exportObj.quaternionZ = this.initQuaternion.z;
@@ -1250,7 +1256,7 @@ ObjectGroup.prototype.export = function(){
     exportObj.quaternionX = this.mesh.quaternion.x;
     exportObj.quaternionY = this.mesh.quaternion.y;
     exportObj.quaternionZ = this.mesh.quaternion.z;
-    exportObj.quaternionW = this.mesh.quaternion.w;    
+    exportObj.quaternionW = this.mesh.quaternion.w;
   }
 
   return exportObj;

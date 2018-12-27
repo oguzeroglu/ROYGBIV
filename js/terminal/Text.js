@@ -147,6 +147,7 @@ var Text = function(){
   this.POSITION_X_MUST_BE_A_NUMBER = "PositionX must be a number.";
   this.POSITION_Y_MUST_BE_A_NUMBER = "PositionY must be a number.";
   this.POSITION_Z_MUST_BE_A_NUMBER = "PositionZ must be a number.";
+  this.OBJECT_MARKED_AS = "Object marked as @@1.";
   this.A_NEW_BOX_TEST_STARTED = "A new box test started.";
   this.RADIUS_MUST_BE_A_NUMBER = "Radius must be a number.";
   this.A_NEW_SPHERE_TEST_STARTED = "A new sphere test started.";

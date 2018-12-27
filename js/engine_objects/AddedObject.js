@@ -218,6 +218,12 @@ AddedObject.prototype.export = function(){
     exportObject.isSlippery = false;
   }
 
+  if (this.isChangeable){
+    exportObject.isChangeable = true;
+  }else{
+    exportObject.isChangeable = false;
+  }
+
   if (this.areaVisibilityConfigurations){
     exportObject.areaVisibilityConfigurations = this.areaVisibilityConfigurations;
   }

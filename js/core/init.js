@@ -134,6 +134,19 @@ window.onload = function() {
       parseCommand("setSlipperiness "+obj.name+" off");
     }
   }).listen();
+  omChangeableController = datGuiObjectManipulation.add(objectManipulationParameters, "Changeable").onChange(function(val){
+    var obj = selectedAddedObject;
+    if (!obj){
+      obj = selectedObjectGroup;
+    }
+    terminal.clear();
+    obj.isChangeable = val;
+    if (obj.isChangeable){
+      terminal.printInfo(Text.OBJECT_MARKED_AS.replace(Text.PARAM1, "changeable"));
+    }else{
+      terminal.printInfo(Text.OBJECT_MARKED_AS.replace(Text.PARAM1, "unchangeable"));
+    }
+  }).listen();
   omSideController = datGuiObjectManipulation.add(objectManipulationParameters, "Side", [
     "Both", "Front", "Back"
   ]).onChange(function(val){
@@ -857,6 +870,7 @@ function enableAllOMControllers(){
   enableController(omRotationZController);
   enableController(omMassController);
   enableController(omSlipperyController);
+  enableController(omChangeableController);
   enableController(omTextureOffsetXController);
   enableController(omTextureOffsetYController);
   enableController(omOpacityController);
@@ -917,6 +931,11 @@ function afterObjectSelection(){
       }else{
         objectManipulationParameters["Slippery"] = false;
       }
+      if (obj.isChangeable){
+        objectManipulationParameters["Changeable"] = true;
+      }else{
+        objectManipulationParameters["Changeable"] = false;
+      }
       if (obj.hasDisplacementMap()){
         objectManipulationParameters["Disp. scale"] = obj.mesh.material.uniforms.displacementInfo.value.x;
         objectManipulationParameters["Disp. bias"] = obj.mesh.material.uniforms.displacementInfo.value.y;
@@ -973,6 +992,11 @@ function afterObjectSelection(){
         objectManipulationParameters["Slippery"] = true;
       }else{
         objectManipulationParameters["Slippery"] = false;
+      }
+      if (obj.isChangeable){
+        objectManipulationParameters["Changeable"] = true;
+      }else{
+        objectManipulationParameters["Changeable"] = false;
       }
       disableController(omTextureOffsetXController);
       disableController(omTextureOffsetYController);
