@@ -2729,6 +2729,10 @@ function parse(input){
             return true;
           }
           if (addedObject){
+            if (addedObject.noMass){
+              terminal.printError(Text.OBJECT_HAS_NO_MASS);
+              return true;
+            }
             addedObject.setMass(mass);
             if (mode == 1 && mass > 0){
               dynamicObjects[addedObject.name] = addedObject;
@@ -2738,6 +2742,10 @@ function parse(input){
               omMassController.updateDisplay();
             }
           }else if (grouppedObject){
+            if (grouppedObject.noMass){
+              terminal.printError(Text.OBJECT_HAS_NO_MASS);
+              return true;
+            }
             grouppedObject.setMass(mass);
             if (mode == 1 && mass > 0){
               dynamicObjectGroups[grouppedObject.name] = grouppedObject;

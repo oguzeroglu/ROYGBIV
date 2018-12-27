@@ -114,6 +114,7 @@ var Text = function(){
   this.CREATED_X_SPHERES = "Command executed for @@1 spheres.";
   this.CREATED_X_CYLINDERS = "Command executed for @@1 cylinders.";
   this.DESTROYED_X_TEXTURES = "Command executed for @@1 textures.";
+  this.OBJECT_HAS_NO_MASS = "Object does not have a mass.";
   this.NO_IMAGES_FOUND = "No images found.";
   this.COMMAND_EXECUTED_FOR_X_IMAGES = "Command executed for @@1 images.";
   this.NO_TEXTURE_FOUND = "No texture found.";

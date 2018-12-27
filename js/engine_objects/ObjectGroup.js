@@ -844,6 +844,7 @@ ObjectGroup.prototype.glue = function(){
 
   var gridSystemNamesMap = new Object();
 
+  var hasAnyPhysicsShape = false;
   for (var objectName in group){
     var addedObject = group[objectName];
     if (selectedAddedObject && selectedAddedObject.name == objectName){
@@ -856,6 +857,7 @@ ObjectGroup.prototype.glue = function(){
     if (!addedObject.noMass){
       var shape = addedObject.physicsBody.shapes[0];
       physicsBody.addShape(shape, addedObject.physicsBody.position.vsub(referenceVector), addedObject.physicsBody.quaternion);
+      hasAnyPhysicsShape = true;
     }
     // GLUE GRAPHICS ***********************************************
     addedObject.mesh.position.sub(referenceVectorTHREE);
@@ -895,7 +897,12 @@ ObjectGroup.prototype.glue = function(){
 
   this.mesh.objectGroupName = this.name;
   scene.add(this.mesh);
-  physicsWorld.addBody(physicsBody);
+  if (hasAnyPhysicsShape){
+    physicsWorld.addBody(physicsBody);
+  }else{
+    this.noMass = true;
+    this.cannotSetMass = true;
+  }
 
   this.graphicsGroup = graphicsGroup;
 

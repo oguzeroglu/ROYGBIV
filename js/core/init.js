@@ -151,6 +151,10 @@ window.onload = function() {
     var obj = selectedAddedObject;
     if (!obj){
       obj = selectedObjectGroup;
+      if (obj.cannotSetMass){
+        objectManipulationParameters["Has mass"] = false;
+        return;
+      }
     }
     terminal.clear();
     obj.noMass = !val;
@@ -1026,6 +1030,9 @@ function afterObjectSelection(){
       disableController(omAOIntensityController);
       disableController(omOpacityController);
       disableController(omHideHalfController);
+      if (obj.cannotSetMass){
+        disableController(omHasMassController);
+      }
 
       objectManipulationParameters["Side"] = "Both";
       if (obj.renderSide){
