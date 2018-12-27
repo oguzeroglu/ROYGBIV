@@ -1143,7 +1143,9 @@ ObjectGroup.prototype.rotate = function(axis, radian, fromScript){
     }
   }
 
-  rayCaster.updateObject(this);
+  if (this.mesh.visible){
+    rayCaster.updateObject(this);
+  }
 
 }
 
@@ -1158,7 +1160,9 @@ ObjectGroup.prototype.translate = function(axis, amount, fromScript){
   }
   physicsBody.position.copy(this.mesh.position);
   this.graphicsGroup.position.copy(this.mesh.position);
-  rayCaster.updateObject(this);
+  if (this.mesh.visible){
+    rayCaster.updateObject(this);
+  }
 }
 
 ObjectGroup.prototype.resetPosition = function(){
@@ -1457,7 +1461,9 @@ ObjectGroup.prototype.rotateAroundPivotObject = function(axis, radians){
   this.mesh.quaternion.copy(REUSABLE_QUATERNION);
   this.physicsBody.quaternion.copy(this.mesh.quaternion);
   this.physicsBody.position.copy(this.mesh.position);
-  rayCaster.updateObject(this);
+  if (this.mesh.visible){
+    rayCaster.updateObject(this);
+  }
 }
 
 ObjectGroup.prototype.updatePivot = function(){

@@ -806,7 +806,9 @@ AddedObject.prototype.translate = function(axis, amount, fromScript){
     this.mesh.translateZ(amount);
   }
   physicsBody.position.copy(this.mesh.position);
-  rayCaster.updateObject(this);
+  if (this.mesh.visible){
+    rayCaster.updateObject(this);
+  }
 }
 
 AddedObject.prototype.rotate = function(axis, radians, fromScript){
@@ -834,7 +836,9 @@ AddedObject.prototype.rotate = function(axis, radians, fromScript){
     this.initQuaternion.copy(this.mesh.quaternion);
   }
 
-  rayCaster.updateObject(this);
+  if (this.mesh.visible){
+    rayCaster.updateObject(this);
+  }
 
 }
 
@@ -2247,7 +2251,9 @@ AddedObject.prototype.rotateAroundPivotObject = function(axis, radians){
   this.mesh.position.copy(REUSABLE_VECTOR);
   this.mesh.quaternion.copy(REUSABLE_QUATERNION);
   this.setPhysicsAfterRotationAroundPoint(axis, radians);
-  rayCaster.updateObject(this);
+  if (this.mesh.visible){
+    rayCaster.updateObject(this);
+  }
 }
 
 AddedObject.prototype.updatePivot = function(){

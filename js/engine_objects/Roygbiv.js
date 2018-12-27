@@ -693,10 +693,20 @@ Roygbiv.prototype.getParticleSystemFromPool = function(pool){
 
 // hide
 //  Hides an object or a glued object, removes it from the scene. Does nothing
-//  if the object is already hidden.
-Roygbiv.prototype.hide = function(object){
+//  if the object is already hidden. The additional keepPhysics parameter can
+//  be used in order to hide only the graphical representation of the object
+//  but keep its physicsal body. The default value of keepPhysics is false.
+Roygbiv.prototype.hide = function(object, keepPhysics){
   if (mode == 0){
     return;
+  }
+  var keepPhysicsValue = false;
+  if (!(typeof keepPhysics == UNDEFINED)){
+    if (!(typeof keepPhysics == "boolean")){
+      throw new Error("hide error: Bad keepPhysics parameter.");
+      return;
+    }
+    keepPhysicsValue = keepPhysics;
   }
   if (!object){
     throw new Error("hide error: object is not defined.");
@@ -717,9 +727,14 @@ Roygbiv.prototype.hide = function(object){
       // during the collision callback, cannon.js crashes if a body
       // is removed. It is safe to remove the bodies after the
       // physics iteration.
-      setTimeout(function(){
-        physicsWorld.removeBody(object.physicsBody);
-      });
+      if (!keepPhysicsValue){
+        setTimeout(function(){
+          physicsWorld.removeBody(object.physicsBody);
+          object.physicsKeptWhenHidden = false;
+        });
+      }else{
+        object.physicsKeptWhenHidden = true;
+      }
       object.isHidden = true;
       rayCaster.binHandler.hide(object);
     }
@@ -730,9 +745,14 @@ Roygbiv.prototype.hide = function(object){
     }
     if (object.isVisibleOnThePreviewScene()){
       object.mesh.visible = false;
-      setTimeout(function(){
-        physicsWorld.removeBody(object.physicsBody);
-      });
+      if (!keepPhysicsValue){
+        setTimeout(function(){
+          physicsWorld.removeBody(object.physicsBody);
+          object.physicsKeptWhenHidden = false;
+        });
+      }else{
+        object.physicsKeptWhenHidden = true;
+      }
       object.isHidden = true;
       rayCaster.binHandler.hide(object);
     }
@@ -764,9 +784,11 @@ Roygbiv.prototype.show = function(object){
     }
     if (!object.isVisibleOnThePreviewScene()){
       object.mesh.visible = true;
-      setTimeout(function(){
-        physicsWorld.addBody(object.physicsBody);
-      });
+      if (!object.physicsKeptWhenHidden){
+        setTimeout(function(){
+          physicsWorld.addBody(object.physicsBody);
+        });
+      }
       object.isHidden = false;
       rayCaster.binHandler.show(object);
     }
@@ -777,9 +799,11 @@ Roygbiv.prototype.show = function(object){
     }
     if (!object.isVisibleOnThePreviewScene()){
       object.mesh.visible = true;
-      setTimeout(function(){
-        physicsWorld.addBody(object.physicsBody);
-      });
+      if (!object.physicsKeptWhenHidden){
+        setTimeout(function(){
+          physicsWorld.addBody(object.physicsBody);
+        });
+      }
       object.isHidden = false;
       rayCaster.binHandler.show(object);
     }
@@ -869,10 +893,6 @@ Roygbiv.prototype.rotate = function(object, axis, radians){
   var isObject = false;
   if ((object instanceof AddedObject) || (object instanceof ObjectGroup)){
     isObject = true;
-    if (object.isHidden){
-      throw new Error("rotate error: Object is not visible.");
-      return;
-    }
   }
   if (object instanceof AddedObject && object.parentObjectName){
     var parentObject = objectGroups[object.parentObjectName];
@@ -993,11 +1013,15 @@ Roygbiv.prototype.rotateAroundXYZ = function(object, x, y, z, radians, axis, ski
   }
   if (object instanceof AddedObject){
     object.setPhysicsAfterRotationAroundPoint(axis, radians);
-    rayCaster.updateObject(object);
+    if (object.mesh.visible){
+      rayCaster.updateObject(object);
+    }
   }else if (object instanceof ObjectGroup){
     object.physicsBody.quaternion.copy(mesh.quaternion);
     object.physicsBody.position.copy(mesh.position);
-    rayCaster.updateObject(object);
+    if (object.mesh.visible){
+      rayCaster.updateObject(object);
+    }
   }
 }
 
@@ -1025,11 +1049,6 @@ Roygbiv.prototype.setPosition = function(obj, x, y, z){
     return;
   }
   if (obj instanceof AddedObject){
-    if (obj.isHidden){
-      throw new Error("setPosition error: Object is not visible.");
-      return;
-    }
-
     if (obj.parentObjectName){
       var objGroup = objectGroups[obj.parentObjectName];
       if (objGroup){
@@ -1046,12 +1065,10 @@ Roygbiv.prototype.setPosition = function(obj, x, y, z){
     }
     obj.mesh.position.set(x, y, z);
     obj.physicsBody.position.set(x, y, z);
-    rayCaster.updateObject(obj);
-  }else if (obj instanceof ObjectGroup){
-    if (obj.isHidden){
-      throw new Error("setPosition error: Object is not visible.");
-      return;
+    if (obj.mesh.visible){
+      rayCaster.updateObject(obj);
     }
+  }else if (obj instanceof ObjectGroup){
     if (!obj.isChangeable){
       throw new Error("setPosition error: object is not marked as changeable.");
       return;
@@ -1059,7 +1076,9 @@ Roygbiv.prototype.setPosition = function(obj, x, y, z){
     obj.mesh.position.set(x, y, z);
     obj.graphicsGroup.position.set(x, y, z);
     obj.physicsBody.position.set(x, y, z);
-    rayCaster.updateObject(obj);
+    if (obj.mesh.visible){
+      rayCaster.updateObject(obj);
+    }
   }else if (obj.isPointLight){
     obj.position.set(x, y, z);
   }else{

@@ -149,7 +149,9 @@ function updateTrackingObjects(){
       obj.mesh.position.z + obj.trackedObject.dz
     );
     obj.physicsBody.position.copy(obj.mesh.position);
-    rayCaster.updateObject(obj);
+    if (obj.mesh.visible){
+      rayCaster.updateObject(obj);
+    }
   }
 }
 
