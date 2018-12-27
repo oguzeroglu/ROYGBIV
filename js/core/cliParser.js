@@ -488,6 +488,9 @@ function parse(input){
               if (object.isHidden){
                 object.mesh.visible = true;
                 object.isHidden = false;
+                if (!object.physicsKeptWhenHidden){
+                  physicsWorld.add(object.physicsBody);
+                }
               }
 
             }
@@ -506,6 +509,9 @@ function parse(input){
               if (object.isHidden){
                 object.mesh.visible = true;
                 object.isHidden = false;
+                if (!object.physicsKeptWhenHidden){
+                  physicsWorld.add(object.physicsBody);
+                }
               }
 
               object.loadState();
