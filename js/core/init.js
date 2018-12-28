@@ -395,6 +395,19 @@ window.onload = function() {
       }
     });
   }
+  canvas.onfullscreenchange = function(event){
+    if (document.fullscreenElement == canvas){
+      onFullScreen = true;
+      if (mode == 1 && screenFullScreenChangeCallbackFunction){
+        screenFullScreenChangeCallbackFunction(true);
+      }
+    }else{
+      onFullScreen = false;
+      if (mode == 1 && screenFullScreenChangeCallbackFunction){
+        screenFullScreenChangeCallbackFunction(false);
+      }
+    }
+  }
   canvas.addEventListener("click", function(event){
     cliFocused = false;
     omGUIFocused = false;
@@ -409,6 +422,18 @@ window.onload = function() {
       if (mode == 1 && pointerLockSupported && pointerLockRequested){
         canvas.requestPointerLock();
         pointerLockRequested = false;
+      }
+      if (mode == 1 && fullScreenRequested){
+        if (canvas.requestFullscreen){
+          canvas.requestFullscreen();
+        } else if (canvas.mozRequestFullScreen){
+          canvas.mozRequestFullScreen();
+        } else if (canvas.webkitRequestFullscreen){
+          canvas.webkitRequestFullscreen();
+        } else if (canvas.msRequestFullscreen){
+          canvas.msRequestFullscreen();
+        }
+        fullScreenRequested = false;
       }
       if (mode == 1 && defaultCameraControlsDisabled){
         return;

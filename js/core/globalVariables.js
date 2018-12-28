@@ -653,6 +653,7 @@ var requestID;
 var boundingClientRect;
 var pointerLockSupported = false;
 var defaultAspect = 1.9174434087882823;
+var onFullScreen = false;
 
 // THREE.JS VARIABLES
 var renderer;
@@ -664,6 +665,7 @@ var textureLoader = new THREE.TextureLoader();
 var tgaLoader = new THREE.TGALoader();
 var ddsLoader = new THREE.DDSLoader();
 var pointerLockRequested = false;
+var fullScreenRequested = false;
 
 // PHYSICS
 var debugRenderer;
@@ -937,6 +939,7 @@ var screenMouseDownCallbackFunction = 0;
 var screenMouseUpCallbackFunction = 0;
 var screenMouseMoveCallbackFunction = 0;
 var screenPointerLockChangedCallbackFunction = 0;
+var screenFullScreenChangeCallbackFunction = 0;
 var defaultCameraControlsDisabled = false;
 
 // WORKER VARIABLES

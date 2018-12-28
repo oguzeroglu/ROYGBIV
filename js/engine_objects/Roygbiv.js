@@ -147,7 +147,10 @@ var Roygbiv = function(){
     "setRotationPivot",
     "unsetRotationPivot",
     "rotateCamera",
-    "translateCamera"
+    "translateCamera",
+    "requestFullScreen",
+    "setFullScreenChangeCallbackFunction",
+    "removeFullScreenChangeCallbackFunction"
   ];
 
   this.globals = new Object();
@@ -6538,6 +6541,33 @@ Roygbiv.prototype.removeParticleSystemPoolAvailableListener = function(psPool){
   psPool.availableCallback = 0;
 }
 
+// setFullScreenChangeCallbackFunction
+// Sets a callback function for fullscreen change API. The callbackFunction is executed
+// with isFullScreenOn boolean parameter when the fullscreen status is changed.
+Roygbiv.prototype.setFullScreenChangeCallbackFunction = function(callbackFunction){
+  if (mode == 0){
+    return;
+  }
+  if (typeof callbackFunction == UNDEFINED){
+    throw new Error("setFullScreenChangeCallbackFunction error: callbackFunction is not defined.");
+    return;
+  }
+  if (!(callbackFunction instanceof Function)){
+    throw new Error("setFullScreenChangeCallbackFunction error: callbackFunction is not a function.");
+    return;
+  }
+  screenFullScreenChangeCallbackFunction = callbackFunction;
+}
+
+// removeFullScreenChangeCallbackFunction
+// Removes the fullscreen change listener.
+Roygbiv.prototype.removeFullScreenChangeCallbackFunction = function(){
+  if (mode == 0){
+    return;
+  }
+  screenFullScreenChangeCallbackFunction = 0;
+}
+
 // UTILITY FUNCTIONS ***********************************************************
 
 // vector
@@ -7408,4 +7438,17 @@ Roygbiv.prototype.translateCamera = function(axis, amount){
   }else if (axis == "z"){
     camera.translateZ(amount * defaultAspect / camera.aspect);
   }
+}
+
+// requestFullScreen
+// Goes to full screen mode. on the next mouse click. Does nothing if the screen is
+// already in full screen mode.
+Roygbiv.prototype.requestFullScreen = function(){
+  if (mode == 0){
+    return;
+  }
+  if (onFullScreen){
+    return;
+  }
+  fullScreenRequested = true;
 }

@@ -875,4 +875,7 @@ var Text = function(){
    this.ROYGBIV_SCRIPTING_API_UNSETROTATIONPIVOT = "Unsets a rotation pivot point for an object set with setRotationPivot API.";
    this.ROYGBIV_SCRIPTING_API_ROTATECAMERA = "Rotates the camera around its axis by given radians.";
    this.ROYGBIV_SCRIPTING_API_TRANSLATECAMERA = "Translates the camera along given axis by given amount.";
+   this.ROYGBIV_SCRIPTING_API_REQUESTFULLSCREEN = "Goes to full screen mode. on the next mouse click. Does nothing if the screen is already in full screen mode.";
+   this.ROYGBIV_SCRIPTING_API_SETFULLSCREENCHANGECALLBACKFUNCTION = "Sets a callback function for fullscreen change API. The callbackFunction is executed with isFullScreenOn\nboolean parameter when the fullscreen status is changed.";
+   this.ROYGBIV_SCRIPTING_API_REMOVEFULLSCREENCHANGECALLBACKFUNCTION = "Removes the fullscreen change listener.";
 }
