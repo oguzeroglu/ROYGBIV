@@ -873,4 +873,6 @@ var Text = function(){
    this.ROYGBIV_SCRIPTING_API_CREATEROTATIONPIVOT = "Creates and returns a rotation pivot for an object. This function is not optimized for the runtime. Use this function before\nsetRotationPivot API on initialization.";
    this.ROYGBIV_SCRIPTING_API_SETROTATIONPIVOT = "Sets a rotation pivot for an object created with createRotationPivot API.";
    this.ROYGBIV_SCRIPTING_API_UNSETROTATIONPIVOT = "Unsets a rotation pivot point for an object set with setRotationPivot API.";
+   this.ROYGBIV_SCRIPTING_API_ROTATECAMERA = "Rotates the camera around its axis by given radians.";
+   this.ROYGBIV_SCRIPTING_API_TRANSLATECAMERA = "Translates the camera along given axis by given amount.";
 }

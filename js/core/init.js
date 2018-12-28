@@ -410,6 +410,9 @@ window.onload = function() {
         canvas.requestPointerLock();
         pointerLockRequested = false;
       }
+      if (mode == 1 && defaultCameraControlsDisabled){
+        return;
+      }
       REUSABLE_VECTOR.setFromMatrixPosition(camera.matrixWorld);
       REUSABLE_VECTOR_2.set(coordX, coordY, 0.5).unproject(camera).sub(REUSABLE_VECTOR).normalize();
        rayCaster.findIntersections(REUSABLE_VECTOR, REUSABLE_VECTOR_2, (mode == 0));
@@ -1069,22 +1072,22 @@ function processKeyboardBuffer(){
     camera.rotation.x -= rotationXDelta;
   }
   if (keyboardBuffer["W"]){
-    camera.translateZ(-1 * translateZAmount);
+    camera.translateZ(-1 * translateZAmount * defaultAspect / camera.aspect);
   }
   if (keyboardBuffer["S"]){
-    camera.translateZ(translateZAmount);
+    camera.translateZ(translateZAmount * defaultAspect / camera.aspect);
   }
   if (keyboardBuffer["D"]){
-    camera.translateX(translateXAmount);
+    camera.translateX(translateXAmount * defaultAspect / camera.aspect);
   }
   if (keyboardBuffer["A"]){
-    camera.translateX(-1 * translateXAmount);
+    camera.translateX(-1 * translateXAmount * defaultAspect / camera.aspect);
   }
   if (keyboardBuffer["E"]){
-    camera.translateY(-1 * translateYAmount);
+    camera.translateY(-1 * translateYAmount * defaultAspect / camera.aspect);
   }
   if (keyboardBuffer["Q"]){
-    camera.translateY(translateYAmount);
+    camera.translateY(translateYAmount * defaultAspect / camera.aspect);
   }
   if (keyboardBuffer["Z"]){
     camera.rotation.z += rotationZDelta;
@@ -1092,6 +1095,15 @@ function processKeyboardBuffer(){
   if (keyboardBuffer["C"]){
     camera.rotation.z -= rotationZDelta;
   }
+}
+
+function processCameraRotationBuffer(){
+  camera.rotation.x += cameraRotationBuffer.x;
+  camera.rotation.y += cameraRotationBuffer.y;
+  camera.rotation.z += cameraRotationBuffer.z;
+  cameraRotationBuffer.x = 0;
+  cameraRotationBuffer.y = 0;
+  cameraRotationBuffer.z = 0;
 }
 
 function mouseWheelEvent(e) {
@@ -1108,9 +1120,9 @@ function mouseWheelEvent(e) {
     return;
   }
   if (Math.abs(deltaX) < Math.abs(deltaY)){
-    camera.translateZ(deltaY);
+    camera.translateZ(deltaY * defaultAspect / camera.aspect);
   }else{
-    camera.translateX(deltaX);
+    camera.translateX(deltaX * defaultAspect / camera.aspect);
   }
 }
 

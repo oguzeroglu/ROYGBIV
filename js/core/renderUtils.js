@@ -20,6 +20,7 @@ function render(){
       updateDynamicObjects();
       updateTrackingObjects();
     }
+    processCameraRotationBuffer();
     runScripts();
     updateRaycaster();
     updateParticleSystems();

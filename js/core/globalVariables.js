@@ -652,6 +652,7 @@ var cliIsBeingDragged = false;
 var requestID;
 var boundingClientRect;
 var pointerLockSupported = false;
+var defaultAspect = 1.9174434087882823;
 
 // THREE.JS VARIABLES
 var renderer;
@@ -729,6 +730,11 @@ var fogColorRGB = new THREE.Color(fogColor);
 
 // ENGINE VARIABLES
 var keyboardBuffer = new Object();
+var cameraRotationBuffer = {
+  "x": 0,
+  "y":0,
+  "z": 0
+}
 var gridSystems = new Object();
 var gridSelections = new Object();
 var materials = new Object();

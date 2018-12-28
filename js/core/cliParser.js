@@ -293,7 +293,9 @@ function parse(input){
             TOTAL_PARTICLE_COLLISION_LISTEN_COUNT = 0;
             TOTAL_PARTICLE_SYSTEM_COLLISION_LISTEN_COUNT = 0;
             TOTAL_PARTICLE_SYSTEMS_WITH_PARTICLE_COLLISIONS = 0;
-
+            camera.position.set(initialCameraX, initialCameraY, initialCameraZ);
+            camera.rotation.order = 'YXZ';
+            camera.rotation.set(0, 0, 0);
             for (var gsName in gridSystems){
               scene.remove(gridSystems[gsName].gridSystemRepresentation);
               scene.remove(gridSystems[gsName].boundingPlane);
@@ -416,6 +418,9 @@ function parse(input){
               console.log("[*] Frame-drop recording process stopped.");
               LOG_FRAME_DROP_ON = false;
             }
+            camera.position.set(initialCameraX, initialCameraY, initialCameraZ);
+            camera.rotation.order = 'YXZ';
+            camera.rotation.set(0, 0, 0);
             screenClickCallbackFunction = 0;
             screenMouseDownCallbackFunction = 0;
             screenMouseUpCallbackFunction = 0;

@@ -145,7 +145,9 @@ var Roygbiv = function(){
     "untrackObjectPosition",
     "createRotationPivot",
     "setRotationPivot",
-    "unsetRotationPivot"
+    "unsetRotationPivot",
+    "rotateCamera",
+    "translateCamera"
   ];
 
   this.globals = new Object();
@@ -1693,6 +1695,11 @@ Roygbiv.prototype.setRotationPivot = function(rotationPivot){
     return;
   }
   var sourceObject = rotationPivot.sourceObject;
+  if (sourceObject.pivotObject){
+    rotationPivot.position.copy(sourceObject.pivotObject.position);
+    rotationPivot.quaternion.copy(sourceObject.pivotObject.quaternion);
+    rotationPivot.rotation.copy(sourceObject.pivotObject.rotation);
+  }
   sourceObject.pivotObject = rotationPivot;
   sourceObject.pivotOffsetX = rotationPivot.offsetX;
   sourceObject.pivotOffsetY = rotationPivot.offsetY;
@@ -7337,4 +7344,68 @@ Roygbiv.prototype.createRotationPivot = function(sourceObject, offsetX, offsetY,
     return;
   }
   return sourceObject.makePivot(offsetX, offsetY, offsetZ);
+}
+
+// rotateCamera
+// Rotates the camera around its axis by given radians.
+Roygbiv.prototype.rotateCamera = function(axis, radians){
+  if (mode == 0){
+    return;
+  }
+  if (typeof axis == UNDEFINED){
+    throw new Error("rotateCamera error: axis is not defined.");
+    return;
+  }
+  if (typeof radians == UNDEFINED){
+    throw new Error("rotateCamera error: radians is not defined.");
+    return;
+  }
+  axis = axis.toLowerCase();
+  if (axis != "x" && axis != "y" && axis != "z"){
+    throw new Error("rotateCamera error: axis must be x, y or z.");
+    return;
+  }
+  if (isNaN(radians)){
+    throw new Error("rotateCamera error: radians is not a number.");
+    return;
+  }
+  if (axis == "x"){
+    cameraRotationBuffer.x += radians;
+  }else if (axis == "y"){
+    cameraRotationBuffer.y += radians;
+  }else if (axis == "z"){
+    cameraRotationBuffer.z += radians;
+  }
+}
+
+// translateCamera
+// Translates the camera along given axis by given amount.
+Roygbiv.prototype.translateCamera = function(axis, amount){
+  if (mode == 0){
+    return;
+  }
+  if (typeof axis == UNDEFINED){
+    throw new Error("translateCamera error: axis is not defined.");
+    return;
+  }
+  if (typeof amount == UNDEFINED){
+    throw new Error("translateCamera error: amount is not defined.");
+    return;
+  }
+  axis = axis.toLowerCase();
+  if (axis != "x" && axis != "y" && axis != "z"){
+    throw new Error("translateCamera error: axis must be x, y or z.");
+    return;
+  }
+  if (isNaN(amount)){
+    throw new Error("translateCamera error: amount is not a number.");
+    return;
+  }
+  if (axis == "x"){
+    camera.translateX(amount * defaultAspect / camera.aspect);
+  }else if (axis == "y"){
+    camera.translateY(amount * defaultAspect / camera.aspect);
+  }else if (axis == "z"){
+    camera.translateZ(amount * defaultAspect / camera.aspect);
+  }
 }
