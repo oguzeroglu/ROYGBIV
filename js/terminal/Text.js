@@ -879,4 +879,7 @@ var Text = function(){
    this.ROYGBIV_SCRIPTING_API_REQUESTFULLSCREEN = "Goes to full screen mode. on the next mouse click. Does nothing if the screen is already in full screen mode.";
    this.ROYGBIV_SCRIPTING_API_SETFULLSCREENCHANGECALLBACKFUNCTION = "Sets a callback function for fullscreen change API. The callbackFunction is executed with isFullScreenOn\nboolean parameter when the fullscreen status is changed.";
    this.ROYGBIV_SCRIPTING_API_REMOVEFULLSCREENCHANGECALLBACKFUNCTION = "Removes the fullscreen change listener.";
+   this.ROYGBIV_SCRIPTING_API_ISMOUSEDOWN = "Returns true if the mouse is pressed, false otherwise.";
+   this.ROYGBIV_SCRIPTING_API_CREATEINITIALIZEDPARTICLESYSTEMPOOL = "Creates a particle system pool and fills it with poolSize copies of refParticleSystem.";
+   this.ROYGBIV_SCRIPTING_API_INTERSECTIONTEST = "Finds the first intersected object on a ray. The targetResultObject is filled with .x, .y, .z and .objectName parameters\nin case of an intersection. If there's no detected intersection the .objectName is set to null.";
 }

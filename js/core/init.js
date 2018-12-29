@@ -541,6 +541,7 @@ window.onload = function() {
       var coordY = - ((event.clientY - rect.top) / rect.height) * 2 + 1;
       screenMouseDownCallbackFunction(coordX, coordY);
     }
+    isMouseDown = true;
   });
   canvas.addEventListener("mouseup", function(event){
     if (mode == 1 && screenMouseUpCallbackFunction){
@@ -549,6 +550,7 @@ window.onload = function() {
       var coordY = - ((event.clientY - rect.top) / rect.height) * 2 + 1;
       screenMouseUpCallbackFunction(coordX, coordY);
     }
+    isMouseDown = false;
   });
   canvas.addEventListener("mousemove", function(event){
     if (mode == 1 && screenMouseMoveCallbackFunction){

@@ -150,7 +150,10 @@ var Roygbiv = function(){
     "translateCamera",
     "requestFullScreen",
     "setFullScreenChangeCallbackFunction",
-    "removeFullScreenChangeCallbackFunction"
+    "removeFullScreenChangeCallbackFunction",
+    "isMouseDown",
+    "createInitializedParticleSystemPool",
+    "intersectionTest"
   ];
 
   this.globals = new Object();
@@ -5814,6 +5817,48 @@ Roygbiv.prototype.stopObjectTrail = function(object){
   objectTrail.stop();
 }
 
+// createInitializedParticleSystemPool
+// Creates a particle system pool and fills it with poolSize copies of refParticleSystem.
+Roygbiv.prototype.createInitializedParticleSystemPool = function(poolName, refParticleSystem, poolSize){
+  if (mode == 0){
+    return;
+  }
+  if (typeof refParticleSystem == UNDEFINED){
+    throw new Error("createInitializedParticleSystemPool error: refParticleSystem is not defined.");
+    return;
+  }
+  if (!(refParticleSystem instanceof ParticleSystem)){
+    throw new Error("createInitializedParticleSystemPool error: refParticleSystem is not a ParticleSystem.");
+    return;
+  }
+  if (typeof poolName == UNDEFINED){
+    throw new Error("createInitializedParticleSystemPool error: poolName is not defined.");
+    return;
+  }
+  if (particleSystemPools[poolName]){
+    throw new Error("createInitializedParticleSystemPool error: poolName must be unique.");
+    return;
+  }
+  if (typeof poolSize == UNDEFINED){
+    throw new Error("createInitializedParticleSystemPool error: poolSize is not defined.");
+    return;
+  }
+  if (isNaN(poolSize)){
+    throw new Error("createInitializedParticleSystemPool error: poolSize is not a number.");
+    return;
+  }
+  if (poolSize <= 1){
+    throw new Error("createInitializedParticleSystemPool error: poolSize must be greater than 1.");
+    return;
+  }
+  var pool = this.createParticleSystemPool(poolName);
+  this.addParticleSystemToPool(pool, refParticleSystem);
+  for (var i = 0; i<poolSize - 1; i++){
+    this.addParticleSystemToPool(pool, this.copyParticleSystem(refParticleSystem, this.generateParticleSystemName()));
+  }
+  return pool;
+}
+
 // CROSSHAIR FUNCTIONS *********************************************************
 
 // createCrosshair
@@ -7447,4 +7492,61 @@ Roygbiv.prototype.requestFullScreen = function(){
     return;
   }
   fullScreenRequested = true;
+}
+
+// isMouseDown
+// Returns true if the mouse is pressed, false otherwise.
+Roygbiv.prototype.isMouseDown = function(){
+  if (mode == 0){
+    return;
+  }
+  return isMouseDown;
+}
+
+// intersectionTest
+// Finds the first intersected object on a ray. The targetResultObject is filled with
+// .x, .y, .z and .objectName parameters in case of an intersection. If there's no detected
+// intersection the .objectName is set to null.
+Roygbiv.prototype.intersectionTest = function(fromVector, directionVector, targetResultObject){
+  if (mode == 0){
+    return;
+  }
+  if (typeof fromVector == UNDEFINED){
+    throw new Error("intersectionTest error: fromVector is not defined.");
+    return;
+  }
+  if (isNaN(fromVector.x) || isNaN(fromVector.y) || isNaN(fromVector.z)){
+    throw new Error("intersectionTest error: fromVector is not a vector.");
+    return;
+  }
+  if (typeof directionVector == UNDEFINED){
+    throw new Error("intersectionTest error: directionVector is not defined.");
+    return;
+  }
+  if (isNaN(directionVector.x) || isNaN(directionVector.y) || isNaN(directionVector.z)){
+    throw new Error("intersectionTest error: directionVector is not a vector.");
+    return;
+  }
+  if (typeof targetResultObject == UNDEFINED){
+    throw new Error("intersectionTest error: targetResultObject is not defined.");
+    return;
+  }
+  if (!(targetResultObject instanceof Object)){
+    throw new Error("intersectionTest error: targetResultObject is not an object.");
+    return;
+  }
+  REUSABLE_VECTOR.set(fromVector.x, fromVector.y, fromVector.z);
+  REUSABLE_VECTOR_2.set(directionVector.x, directionVector.y, directionVector.z).normalize();
+  rayCaster.findIntersections(REUSABLE_VECTOR, REUSABLE_VECTOR_2, false);
+  if (intersectionPoint){
+    targetResultObject.x = intersectionPoint.x;
+    targetResultObject.y = intersectionPoint.y;
+    targetResultObject.z = intersectionPoint.z;
+    targetResultObject.objectName = intersectionObject;
+  }else{
+    targetResultObject.x = 0;
+    targetResultObject.y = 0;
+    targetResultObject.z = 0;
+    targetResultObject.objectName = null;
+  }
 }

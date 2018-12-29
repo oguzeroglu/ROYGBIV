@@ -2,6 +2,7 @@ var RayCaster = function(){
   this.binHandler = new WorldBinHandler();
   this.origin = new THREE.Vector3();
   this.direction = new THREE.Vector3();
+  this.oldPosition = new THREE.Vector3();
 }
 
 RayCaster.prototype.refresh = function(){
@@ -25,7 +26,7 @@ RayCaster.prototype.findIntersections = function(from, direction, intersectGridS
   intersectionPoint = 0, intersectionObject = 0;
   this.origin.copy(from);
   this.direction.copy(direction);
-  this.oldPosition = new THREE.Vector3().copy(this.origin);
+  this.oldPosition.copy(this.origin);
   var iterate = true;
   while (iterate){
     REUSABLE_LINE.set(this.oldPosition, this.origin);

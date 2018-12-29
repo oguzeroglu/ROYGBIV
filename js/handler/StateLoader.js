@@ -2322,6 +2322,7 @@ StateLoader.prototype.resetProject = function(undo){
   pointerLockRequested = false;
   fullScreenRequested = false;
   defaultCameraControlsDisabled = false;
+  isMouseDown = false;
   modeSwitcher = new ModeSwitcher();
 
   // FOG

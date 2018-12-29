@@ -942,6 +942,7 @@ var screenPointerLockChangedCallbackFunction = 0;
 var screenFullScreenChangeCallbackFunction = 0;
 var defaultCameraControlsDisabled = false;
 var modeSwitcher;
+var isMouseDown = false;
 
 // WORKER VARIABLES
 var WORKERS_SUPPORTED = (typeof(Worker) !== "undefined");
