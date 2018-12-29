@@ -900,6 +900,7 @@ StateLoader.prototype.load = function(undo){
         scripts[scriptName].runAutomatically = false;
       }
       if (curScriptExport.localFilePath){
+        modeSwitcher.totalScriptsToLoad ++;
         scripts[scriptName].localFilePath = curScriptExport.localFilePath;
       }
     }
@@ -2315,9 +2316,13 @@ StateLoader.prototype.resetProject = function(undo){
   screenMouseUpCallbackFunction = 0;
   screenMouseMoveCallbackFunction = 0;
   screenPointerLockChangedCallbackFunction = 0;
+  screenFullScreenChangeCallbackFunction = 0;
+
   boundingClientRect = renderer.domElement.getBoundingClientRect();
   pointerLockRequested = false;
+  fullScreenRequested = false;
   defaultCameraControlsDisabled = false;
+  modeSwitcher = new ModeSwitcher();
 
   // FOG
   fogActive = false;

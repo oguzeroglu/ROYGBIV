@@ -66,6 +66,9 @@ window.onload = function() {
   // RAYCASTER
   rayCaster = new RayCaster();
 
+  // MODE SWITCHER
+  modeSwitcher = new ModeSwitcher();
+
   // DAT GUI LIGHTS
   datGuiLights = new dat.GUI();
   lightNameController = datGuiLights.add(lightsParameters, "Light").listen();

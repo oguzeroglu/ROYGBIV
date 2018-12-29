@@ -32,7 +32,7 @@ Script.prototype.execute = function(){
   this.lastExecutionPerformance = this.counter2 - this.counter1;
 }
 
-Script.prototype.reloadAndStart = function(){
+Script.prototype.reload = function(onSuccess, onLoadError, onCompilationError){
   if (this.localFilePath){
     var that = this;
     $.ajax({
@@ -47,16 +47,13 @@ Script.prototype.reloadAndStart = function(){
         try{
           that.func = new Function(that.script);
         }catch (err){
-          terminal.clear();
-          terminal.printError(Text.INVALID_SCRIPT
-            .replace(Text.PARAM1, err.message)
-            .replace(Text.PARAM2, that.name));
+          onCompilationError(that.name, err.message);
           return;
         }
-        that.start();
+        onSuccess(that.name);
       }
     }).fail(function(){
-      terminal.printError(Text.AN_UNEXPECTED_ERROR_HAPPENED);
+      onLoadError(that.name, that.localFilePath);
     });
     return;
   }

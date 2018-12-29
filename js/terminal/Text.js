@@ -281,6 +281,7 @@ var Text = function(){
   this.LOADING_FILE = "Loading file.";
   this.PROJECT_LOADED = "Project loaded.";
   this.LOADING_PROJECT = "Loading project.";
+  this.LOADING_SCRIPTS = "Loading scripts.";
   this.CONFIGURING_AREA = "Configuring area.";
   this.CONFIGURING_AREAS = "Configuring areas.";
   this.AREA_CONFIGURED = "Area configured. Please check the area for manual corrections.";

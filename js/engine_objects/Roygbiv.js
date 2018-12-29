@@ -6915,11 +6915,7 @@ Roygbiv.prototype.runScript = function(name, parameters){
       script[key] = parameters[key];
     }
   }
-  if (script.localFilePath){
-    script.reloadAndStart();
-  }else{
-    script.start();
-  }
+  script.start();
 }
 
 // isRunning
