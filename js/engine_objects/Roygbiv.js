@@ -6929,7 +6929,7 @@ Roygbiv.prototype.isRunning = function(name){
     throw new Error("isRunning error: Script is undefined.");
     return;
   }
-  return script.status == "STARTED";
+  return script.status == SCRIPT_STATUS_STARTED;
 }
 
 // normalizeVector
