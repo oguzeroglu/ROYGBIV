@@ -1340,6 +1340,8 @@ ObjectGroup.prototype.setBlending = function(blendingModeInt){
 }
 
 ObjectGroup.prototype.updateBoundingBoxes = function(){
+  this.graphicsGroup.position.copy(this.mesh.position);
+  this.graphicsGroup.quaternion.copy(this.mesh.quaternion);
   this.graphicsGroup.updateMatrixWorld();
   for (var objName in this.group){
     this.group[objName].updateBoundingBoxes(this.boundingBoxes);
