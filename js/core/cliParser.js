@@ -2765,6 +2765,10 @@ function parse(input){
         break;
         case 92: //glue
           var groupName = splitted[1];
+          if (!groupName){
+            terminal.printError(Text.INVALID_CHARACTER_IN_OBJECT_NAME);
+            return true;
+          }
           if (groupName.toUpperCase() == "NULL"){
             groupName = generateUniqueObjectName();
           }

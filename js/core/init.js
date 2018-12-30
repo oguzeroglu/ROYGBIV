@@ -460,6 +460,14 @@ window.onload = function() {
              terminal.printInfo(Text.CLICKED_ON.replace(
                Text.PARAM1, object.name + coordStr
              ));
+             if (mode == 0){
+               if (selectedAddedObject){
+                 selectedAddedObject.mesh.remove(axesHelper);
+               }
+               if (selectedObjectGroup){
+                 selectedObjectGroup.mesh.remove(axesHelper);
+               }
+             }
              selectedAddedObject = object;
              objectSelectedByCommand = false;
              selectedObjectGroup = 0;
@@ -471,6 +479,14 @@ window.onload = function() {
              terminal.printInfo(Text.CLICKED_ON.replace(
                Text.PARAM1, object.name+coordStr
              ));
+             if (mode == 0){
+               if (selectedAddedObject){
+                 selectedAddedObject.mesh.remove(axesHelper);
+               }
+               if (selectedObjectGroup){
+                 selectedObjectGroup.mesh.remove(axesHelper);
+               }
+             }
              selectedObjectGroup = object;
              objectSelectedByCommand = false;
              selectedAddedObject = 0;
@@ -496,6 +512,14 @@ window.onload = function() {
                  terminal.printInfo(Text.CLICKED_ON.replace(
                    Text.PARAM1, addedObject.name+coordStr
                  ));
+                 if (mode == 0){
+                   if (selectedAddedObject){
+                     selectedAddedObject.mesh.remove(axesHelper);
+                   }
+                   if (selectedObjectGroup){
+                     selectedObjectGroup.mesh.remove(axesHelper);
+                   }
+                 }
                  selectedAddedObject = addedObject;
                  selectedObjectGroup = 0;
                  objectSelectedByCommand = false;
@@ -511,6 +535,14 @@ window.onload = function() {
                  terminal.printInfo(Text.CLICKED_ON.replace(
                    Text.PARAM1, objectGroup.name+coordStr
                  ));
+                 if (mode == 0){
+                   if (selectedAddedObject){
+                     selectedAddedObject.mesh.remove(axesHelper);
+                   }
+                   if (selectedObjectGroup){
+                     selectedObjectGroup.mesh.remove(axesHelper);
+                   }
+                 }
                  selectedAddedObject = 0;
                  selectedObjectGroup = objectGroup;
                  afterObjectSelection();
@@ -1040,6 +1072,7 @@ function afterObjectSelection(){
           objectManipulationParameters["Side"] = "Back";
         }
       }
+      obj.mesh.add(axesHelper);
     }else if (obj instanceof ObjectGroup){
       objectManipulationParameters["Rotate x"] = 0;
       objectManipulationParameters["Rotate y"] = 0;
@@ -1075,6 +1108,7 @@ function afterObjectSelection(){
           objectManipulationParameters["Side"] = "Back";
         }
       }
+      obj.mesh.add(axesHelper);
     }
     objectManipulationParameters["Mass"] = obj.physicsBody.mass;
     if (obj.noMass){
@@ -1084,6 +1118,12 @@ function afterObjectSelection(){
     omMassController.updateDisplay();
   }else{
     $(datGuiObjectManipulation.domElement).attr("hidden", true);
+    for (objName in addedObjects){
+      addedObjects[objName].mesh.remove(axesHelper);
+    }
+    for (objName in objectGroups){
+      objectGroups[objName].mesh.remove(axesHelper);
+    }
   }
   afterLightSelection();
 }

@@ -664,6 +664,7 @@ var sceneBackgroundColor = 0x000000 ;
 var textureLoader = new THREE.TextureLoader();
 var tgaLoader = new THREE.TGALoader();
 var ddsLoader = new THREE.DDSLoader();
+var axesHelper = new THREE.AxesHelper(20000);
 var pointerLockRequested = false;
 var fullScreenRequested = false;
 
@@ -846,6 +847,8 @@ var REUSABLE_VECTOR_2 = new THREE.Vector3();
 var REUSABLE_VECTOR_3 = new THREE.Vector3();
 var REUSABLE_VECTOR_4 = new THREE.Vector3();
 var REUSABLE_VECTOR_5 = new THREE.Vector3();
+var REUSABLE_VECTOR_6 = new THREE.Vector3();
+var REUSABLE_VECTOR_7 = new THREE.Vector3();
 var REUSABLE_2_VECTOR = new THREE.Vector2();
 var REUSABLE_CANNON_VECTOR = new CANNON.Vec3();
 var REUSABLE_CANNON_VECTOR_2 = new CANNON.Vec3();

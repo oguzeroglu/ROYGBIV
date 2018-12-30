@@ -39,7 +39,6 @@ var Roygbiv = function(){
     "translate",
     "getPosition",
     "mapTexturePack",
-    "getRotation",
     "intensity",
     "getIntensity",
     "opacity",
@@ -153,7 +152,8 @@ var Roygbiv = function(){
     "removeFullScreenChangeCallbackFunction",
     "isMouseDown",
     "createInitializedParticleSystemPool",
-    "intersectionTest"
+    "intersectionTest",
+    "getEndPoint"
   ];
 
   this.globals = new Object();
@@ -387,75 +387,6 @@ Roygbiv.prototype.getPosition = function(object, targetVector, axis){
     }
   }else{
     throw new Error("getPosition error: Object type not supported.");
-    return;
-  }
-}
-
-// getRotation
-//  Returns the rotation of given object, glued object or particle system. If an axis
-//  is specified (x, y or z) only the rotation around the specified axis is returned,
-//  a vector containing (x, y, z) rotations is returned otherwise.
-Roygbiv.prototype.getRotation = function(object, axis){
-  if (mode == 0){
-    return;
-  }
-  if (!object){
-    throw new Error("getRotation error: Object is not defined.");
-    return;
-  }
-  if (!(typeof axis == UNDEFINED)){
-    if (axis.toLowerCase() != "x" && axis.toLowerCase() != "y" && axis.toLowerCase() != "z"){
-      throw new Error("getRotation error: Axis must be one of x, y, or z");
-      return;
-    }
-  }
-  if (object instanceof AddedObject){
-    if (typeof axis == UNDEFINED){
-      return this.vector(
-        object.mesh.rotation.x,
-        object.mesh.rotation.y,
-        object.mesh.rotation.z
-      );
-    }
-    if (axis.toLowerCase() == "x"){
-      return object.mesh.rotation.x;
-    }else if (axis.toLowerCase() == "y"){
-      return object.mesh.rotation.y;
-    }else if (axis.toLowerCase() == "z"){
-      return object.mesh.rotation.z;
-    }
-  }else if (object instanceof ObjectGroup){
-    if (typeof axis == UNDEFINED){
-      return this.vector(
-        object.graphicsGroup.rotation.x,
-        object.graphicsGroup.rotation.y,
-        object.graphicsGroup.rotation.z,
-      );
-    }
-    if (axis.toLowerCase() == "x"){
-      return object.graphicsGroup.rotation.x;
-    }else if (axis.toLowerCase() == "y"){
-      return object.graphicsGroup.rotation.y;
-    }else if (axis.toLowerCase() == "z"){
-      return object.graphicsGroup.rotation.z;
-    }
-  }else if (object instanceof ParticleSystem){
-    if (typeof axis == UNDEFINED){
-      return this.vector(
-        object.mesh.rotation.x,
-        object.mesh.rotation.y,
-        object.mesh.rotation.z
-      );
-    }
-    if (axis.toLowerCase() == "x"){
-      return object.mesh.rotation.x;
-    }else if (axis.toLowerCase() == "y"){
-      return object.mesh.rotation.y;
-    }else if (axis.toLowerCase() == "z"){
-      return object.mesh.rotation.z;
-    }
-  }else{
-    throw new Error("getRotation error: Type not supported.");
     return;
   }
 }
@@ -695,6 +626,48 @@ Roygbiv.prototype.getParticleSystemFromPool = function(pool){
     return;
   }
   return pool.get();
+}
+
+// getEndPoint
+// Gets an end point of an object. The axis may be +x,-x,+y,-y,+z or -z. Note that
+// object groups do not support this function but child objects do. This function
+// may be useful in cases where for example a particle system needs to be started
+// from the tip point of an object.
+Roygbiv.prototype.getEndPoint = function(object, axis, targetVector){
+  if (mode == 0){
+    return;
+  }
+  if (typeof object == UNDEFINED){
+    throw new Error("getEndPoint error: object is not defined.");
+    return;
+  }
+  if (!(object instanceof AddedObject)){
+    throw new Error("getEndPoint error: object is not an AddedObject.");
+    return;
+  }
+  if (typeof axis == UNDEFINED){
+    throw new Error("getEndPoint error: axis is not defined.");
+    return;
+  }
+  if (typeof targetVector == UNDEFINED){
+    throw new Error("getEndPoint error: targetVector is not defined.");
+    return;
+  }
+  if (isNaN(targetVector.x) || isNaN(targetVector.y) || isNaN(targetVector.z)){
+    throw new Error("getEndPoint error: targetVector is not a vector.");
+    return;
+  }
+  axis = axis.toLowerCase();
+  if (axis == "+x" || axis == "-x" || axis == "+y" || axis == "-y" || axis == "+z" || axis == "-z"){
+    var endPoint = object.getEndPoint(axis);
+    targetVector.x = endPoint.x;
+    targetVector.y = endPoint.y;
+    targetVector.z = endPoint.z;
+    return targetVector;
+  }else{
+    throw new Error("getEndPoint error: Invalid axis.");
+    return;
+  }
 }
 
 // OBJECT MANIPULATION FUNCTIONS ***********************************************

@@ -505,7 +505,6 @@ var Text = function(){
   this.ROYGBIV_SCRIPTING_API_TRANSLATE = "Translates an object, glued object or point light on the given axis by the given amount.\nAxis must be one of x, y or z.";
   this.ROYGBIV_SCRIPTING_API_GETPOSITION = "Returns the (x, y, z) coordinates of an object, glued object, point light or a particle system.\nIf a specific axis is specified, only the position on the specified axis is returned.";
   this.ROYGBIV_SCRIPTING_API_MAPTEXTUREPACK = "Maps a texture pack of given name to an object. Calling this function repeatedly may cause performance issues.";
-  this.ROYGBIV_SCRIPTING_API_GETROTATION = "Returns the rotation of given object, glued object or particle system. If an axis is specified (x, y or z) only the rotation around the\nspecified axis is returned, a vector containing (x, y, z) rotations is returned otherwise.";
   this.ROYGBIV_SCRIPTING_API_INTENSITY = "Increases/decreases the intensity of given ambient light or point light.";
   this.ROYGBIV_SCRIPTING_API_GETINTENSITY = "Returns the intensity of given ambient light or point light.";
   this.ROYGBIV_SCRIPTING_API_OPACITY = "Increases/decreases the opacity of given object.";
@@ -882,4 +881,5 @@ var Text = function(){
    this.ROYGBIV_SCRIPTING_API_ISMOUSEDOWN = "Returns true if the mouse is pressed, false otherwise.";
    this.ROYGBIV_SCRIPTING_API_CREATEINITIALIZEDPARTICLESYSTEMPOOL = "Creates a particle system pool and fills it with poolSize copies of refParticleSystem.";
    this.ROYGBIV_SCRIPTING_API_INTERSECTIONTEST = "Finds the first intersected object on a ray. The targetResultObject is filled with .x, .y, .z and .objectName parameters\nin case of an intersection. If there's no detected intersection the .objectName is set to null.";
+   this.ROYGBIV_SCRIPTING_API_GETENDPOINT = "Gets an end point of an object. The axis may be +x,-x,+y,-y,+z or -z. Note that object groups do not support this function\nbut child objects do. This function may be useful in cases where for example a particle system needs to be started from\nthe tip point of an object.";
 }

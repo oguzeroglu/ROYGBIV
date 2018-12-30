@@ -110,6 +110,7 @@ ModeSwitcher.prototype.switchFromDesignToPreview = function(){
   dynamicObjectGroups = new Object();
   for (var objectName in objectGroups){
     var object = objectGroups[objectName];
+    object.mesh.remove(axesHelper);
     if (object.binInfo){
       object.binInfo = new Map();
     }
@@ -121,6 +122,7 @@ ModeSwitcher.prototype.switchFromDesignToPreview = function(){
   }
   for (var objectName in addedObjects){
     var object = addedObjects[objectName];
+    object.mesh.remove(axesHelper);
     if (object.binInfo){
       object.binInfo = new Map();
     }

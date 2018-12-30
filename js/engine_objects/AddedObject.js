@@ -2269,3 +2269,105 @@ AddedObject.prototype.updatePivot = function(){
   this.pivotObject.translateY(this.pivotOffsetY);
   this.pivotObject.translateZ(this.pivotOffsetZ);
 }
+
+AddedObject.prototype.getEndPoint = function(axis){
+  var translationAmount = 0;
+  if (axis == "+x"){
+    REUSABLE_VECTOR_6.set(1, 0, 0);
+    if (this.type == "surface"){
+      translationAmount = this.metaData.width / 2;
+    }else if (this.type == "ramp"){
+      translationAmount = this.metaData.rampWidth / 2;
+    }else if (this.type == "box"){
+      translationAmount = this.metaData.boxSizeX / 2;
+    }else if (this.type == "sphere"){
+      translationAmount = this.metaData.radius;
+    }else if (this.type == "cylinder"){
+      translationAmount = (this.metaData.topRadius + this.metaData.bottomRadius) / 2;
+    }
+  }else if (axis == "-x"){
+    REUSABLE_VECTOR_6.set(-1, 0, 0);
+    if (this.type == "surface"){
+      translationAmount = this.metaData.width / 2;
+    }else if (this.type == "ramp"){
+      translationAmount = this.metaData.rampWidth / 2;
+    }else if (this.type == "box"){
+      translationAmount = this.metaData.boxSizeX / 2;
+    }else if (this.type == "sphere"){
+      translationAmount = this.metaData.radius;
+    }else if (this.type == "cylinder"){
+      translationAmount = (this.metaData.topRadius + this.metaData.bottomRadius) / 2;
+    }
+  }else if (axis == "+y"){
+    REUSABLE_VECTOR_6.set(0, 1, 0);
+    if (this.type == "surface"){
+      translationAmount = this.metaData.height / 2;
+    }else if (this.type == "ramp"){
+      translationAmount = this.metaData.rampHeight / 2;
+    }else if (this.type == "box"){
+      translationAmount = this.metaData.boxSizeY / 2;
+    }else if (this.type == "sphere"){
+      translationAmount = this.metaData.radius;
+    }else if (this.type == "cylinder"){
+      translationAmount = this.metaData.height / 2;
+    }
+  }else if (axis == "-y"){
+    REUSABLE_VECTOR_6.set(0, -1, 0);
+    if (this.type == "surface"){
+      translationAmount = this.metaData.height / 2;
+    }else if (this.type == "ramp"){
+      translationAmount = this.metaData.rampHeight / 2;
+    }else if (this.type == "box"){
+      translationAmount = this.metaData.boxSizeY / 2;
+    }else if (this.type == "sphere"){
+      translationAmount = this.metaData.radius;
+    }else if (this.type == "cylinder"){
+      translationAmount = this.metaData.height / 2;
+    }
+  }else if (axis == "+z"){
+    REUSABLE_VECTOR_6.set(0, 0, 1);
+    if (this.type == "surface"){
+      translationAmount = 0;
+    }else if (this.type == "ramp"){
+      translationAmount = 0;
+    }else if (this.type == "box"){
+      translationAmount = this.metaData.boxSizeZ / 2;
+    }else if (this.type == "sphere"){
+      translationAmount = this.metaData.radius;
+    }else if (this.type == "cylinder"){
+      translationAmount = (this.metaData.topRadius + this.metaData.bottomRadius) / 2;
+    }
+  }else if (axis == "-z"){
+    REUSABLE_VECTOR_6.set(0, 0, -1);
+    if (this.type == "surface"){
+      translationAmount = 0;
+    }else if (this.type == "ramp"){
+      translationAmount = 0;
+    }else if (this.type == "box"){
+      translationAmount = this.metaData.boxSizeZ / 2;
+    }else if (this.type == "sphere"){
+      translationAmount = this.metaData.radius;
+    }else if (this.type == "cylinder"){
+      translationAmount = (this.metaData.topRadius + this.metaData.bottomRadius) / 2;
+    }
+  }
+  var quaternion, position;
+  if (this.parentObjectName){
+    var parentObject = objectGroups[this.parentObjectName];
+    parentObject.graphicsGroup.position.copy(parentObject.mesh.position);
+    parentObject.graphicsGroup.quaternion.copy(parentObject.mesh.quaternion);
+    parentObject.graphicsGroup.updateMatrix();
+    parentObject.graphicsGroup.updateMatrixWorld();
+    var child = parentObject.graphicsGroup.children[this.indexInParent];
+    child.getWorldPosition(REUSABLE_VECTOR_7);
+    child.getWorldQuaternion(REUSABLE_QUATERNION);
+    position = REUSABLE_VECTOR_7;
+    quaternion = REUSABLE_QUATERNION;
+  }else{
+    quaternion = this.mesh.quaternion;
+    position = REUSABLE_VECTOR_7.copy(this.mesh.position);
+  }
+  REUSABLE_VECTOR_6.applyQuaternion(quaternion);
+  position.add(REUSABLE_VECTOR_6.multiplyScalar(translationAmount));
+  return position;
+}
