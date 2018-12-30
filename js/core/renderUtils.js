@@ -141,8 +141,10 @@ function updateGridCornerHelpers(){
 function updateTrackingObjects(){
   for (var objName in trackingObjects){
     var obj = addedObjects[objName];
+    var isObjectGroup = false;
     if (!obj){
       obj = objectGroups[objName];
+      isObjectGroup = true;
     }
     obj.mesh.position.set(
       obj.mesh.position.x + obj.trackedObject.dx,
@@ -150,6 +152,10 @@ function updateTrackingObjects(){
       obj.mesh.position.z + obj.trackedObject.dz
     );
     obj.physicsBody.position.copy(obj.mesh.position);
+    if (isObjectGroup){
+      obj.graphicsGroup.position.copy(obj.mesh.position);
+      obj.graphicsGroup.quaternion.copy(obj.mesh.quaternion);
+    }
     if (obj.mesh.visible){
       rayCaster.updateObject(obj);
     }
