@@ -50,7 +50,7 @@ RayCaster.prototype.findIntersections = function(from, direction, intersectGridS
           intersectionPoint = gs.intersectsLine(REUSABLE_LINE);
           if (intersectionPoint){
             var selectedGrid = gs.getGridFromPoint(intersectionPoint);
-            if (!selectedGrid.sliced){
+            if (!(selectedGrid.sliced && gridSystems[selectedGrid.slicedGridSystemName])){
               intersectionObject = objName;
               return;
             }
