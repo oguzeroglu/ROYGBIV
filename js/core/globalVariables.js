@@ -149,7 +149,8 @@ var commandArgumentsExpectedCount = [
     6, //newCylinder
     4, //setRotationPivot
     2, //printChildPosition
-    1 //unsetRotationPivot
+    1, //unsetRotationPivot
+    6 //copyObject
 ];
 var commandArgumentsExpectedExplanation = [
   "help", //help
@@ -295,7 +296,8 @@ var commandArgumentsExpectedExplanation = [
   "newCylinder name materialName topRadius bottomRadius height isOpenEnded", //newCylinder
   "setRotationPivot objectName offsetX offsetY offsetZ", //setRotationPivot
   "printChildPosition objectName childObjectName", //printChildPosition
-  "unsetRotationPivot objectName" //unsetRotationPivot
+  "unsetRotationPivot objectName", //unsetRotationPivot
+  "copyObject sourceName targetName offsetX offsetY offsetZ isHardCopy" //copyObject
 ];
 var commands = [
   "help",
@@ -441,7 +443,8 @@ var commands = [
   "newCylinder",
   "setRotationPivot",
   "printChildPosition",
-  "unsetRotationPivot"
+  "unsetRotationPivot",
+  "copyObject"
 ];
 var commandInfo = [
   "help: Prints command list.",
@@ -587,7 +590,8 @@ var commandInfo = [
   "newCylinder: Creates a new cylinder.",
   "setRotationPivot: Defines a pivot point of rotation for an object in its local axis system.",
   "printChildPosition: Prints the world position of a child object of an object group.",
-  "unsetRotationPivot: Unsets the rotation pivot point of an object set by using setRotationPivot command."
+  "unsetRotationPivot: Unsets the rotation pivot point of an object set by using setRotationPivot command.",
+  "copyObject: Creates a clone of an object."
 ];
 var keyboardInfo = [
   "W/S : Translates the camera on axis Z.",

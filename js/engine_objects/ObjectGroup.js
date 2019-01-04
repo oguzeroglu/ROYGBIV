@@ -960,9 +960,11 @@ ObjectGroup.prototype.glue = function(){
 ObjectGroup.prototype.destroyParts = function(){
   for (var objName in this.group){
     var addedObject = addedObjects[objName];
-    addedObject.destroy();
-    delete addedObjects[objName];
-    disabledObjectNames[objName] = 1;
+    if (addedObject){
+      addedObject.destroy();
+      delete addedObjects[objName];
+      disabledObjectNames[objName] = 1;
+    }
   }
 }
 
@@ -1476,4 +1478,68 @@ ObjectGroup.prototype.updatePivot = function(){
   this.pivotObject.translateX(this.pivotOffsetX);
   this.pivotObject.translateY(this.pivotOffsetY);
   this.pivotObject.translateZ(this.pivotOffsetZ);
+}
+
+ObjectGroup.prototype.copy = function(name, isHardCopy, copyPosition, gridSystem, fromScript){
+  var positionBeforeDetached = this.mesh.position.clone();
+  var quaternionBeforeDetached = this.mesh.quaternion.clone();
+  var physicsPositionBeforeDetached = this.physicsBody.position.clone();
+  var physicsQuaternionBeforeDetached = this.physicsBody.quaternion.clone();
+  var initQuaternionBeforeDetached = this.initQuaternion.clone();
+  this.detach();
+  var newGroup = new Object();
+  for (var objName in this.group){
+    this.group[objName].skipToggleGrid = true;
+    var copiedChild = this.group[objName].copy(
+      generateUniqueObjectName(), isHardCopy, REUSABLE_VECTOR.set(0, 0, 0), gridSystem, fromScript
+    );
+    copiedChild.mesh.position.copy(this.group[objName].mesh.position);
+    copiedChild.mesh.quaternion.copy(this.group[objName].mesh.quaternion);
+    copiedChild.physicsBody.position.copy(this.group[objName].physicsBody.position);
+    copiedChild.physicsBody.quaternion.copy(this.group[objName].physicsBody.quaternion);
+    copiedChild.metaData["positionX"] = copiedChild.mesh.position.x;
+    copiedChild.metaData["positionY"] = copiedChild.mesh.position.y;
+    copiedChild.metaData["positionZ"] = copiedChild.mesh.position.z;
+    copiedChild.metaData["centerX"] = copiedChild.mesh.position.x;
+    copiedChild.metaData["centerY"] = copiedChild.mesh.position.y;
+    copiedChild.metaData["centerZ"] = copiedChild.mesh.position.z;
+    newGroup[copiedChild.name] = copiedChild;
+    addedObjects[copiedChild.name] = copiedChild;
+    this.group[objName].skipToggleGrid = false;
+  }
+  var newObjGroup = new ObjectGroup(name, newGroup);
+  newObjGroup.handleTextures();
+  newObjGroup.glue();
+  newObjGroup.mesh.position.copy(copyPosition);
+  newObjGroup.physicsBody.position.copy(copyPosition);
+  newObjGroup.mesh.quaternion.copy(quaternionBeforeDetached);
+  newObjGroup.physicsBody.quaternion.copy(physicsQuaternionBeforeDetached);
+  newObjGroup.graphicsGroup.position.copy(newObjGroup.mesh.position);
+  newObjGroup.graphicsGroup.quaternion.copy(newObjGroup.mesh.quaternion);
+  this.glue();
+  newObjGroup.isBasicMaterial = this.isBasicMaterial;
+  newObjGroup.isPhongMaterial = this.isPhongMaterial;
+  this.physicsBody.position.copy(physicsPositionBeforeDetached);
+  this.physicsBody.quaternion.copy(physicsQuaternionBeforeDetached);
+  this.mesh.position.copy(positionBeforeDetached);
+  this.mesh.quaternion.copy(quaternionBeforeDetached);
+  var dx = newObjGroup.mesh.position.x - this.mesh.position.x;
+  var dy = newObjGroup.mesh.position.y - this.mesh.position.y;
+  var dz = newObjGroup.mesh.position.z - this.mesh.position.z;
+  for (var objName in newObjGroup.group){
+    newObjGroup.group[objName].positionXWhenAttached += dx;
+    newObjGroup.group[objName].positionYWhenAttached += dy;
+    newObjGroup.group[objName].positionZWhenAttached += dz;
+    newObjGroup.group[objName].metaData["positionX"] += dx;
+    newObjGroup.group[objName].metaData["positionY"] += dy;
+    newObjGroup.group[objName].metaData["positionZ"] += dz;
+    newObjGroup.group[objName].metaData["centerX"] += dx;
+    newObjGroup.group[objName].metaData["centerY"] += dy;
+    newObjGroup.group[objName].metaData["centerZ"] += dz;
+  }
+  newObjGroup.graphicsGroup.position.copy(newObjGroup.mesh.position);
+  newObjGroup.graphicsGroup.quaternion.copy(newObjGroup.mesh.quaternion);
+  this.initQuaternion.copy(initQuaternionBeforeDetached);
+  newObjGroup.initQuaternion.copy(initQuaternionBeforeDetached);
+  return newObjGroup;
 }

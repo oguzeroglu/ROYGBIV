@@ -2371,3 +2371,145 @@ AddedObject.prototype.getEndPoint = function(axis){
   position.add(REUSABLE_VECTOR_6.multiplyScalar(translationAmount));
   return position;
 }
+
+AddedObject.prototype.copy = function(name, isHardCopy, copyPosition, gridSystem, fromScript){
+  var copyMesh;
+  if (isHardCopy){
+    copyMesh = new MeshGenerator(this.mesh.geometry, this.material).generateMesh();
+  }else{
+    copyMesh = new THREE.Mesh(this.mesh.geometry, this.mesh.material);
+  }
+  var copyPhysicsbody = new CANNON.Body({
+    mass: 0,
+    shape: this.physicsBody.shapes[0],
+    material: new CANNON.Material()
+  });
+  copyMesh.position.copy(copyPosition);
+  copyPhysicsbody.position.copy(copyPosition);
+  copyMesh.quaternion.copy(this.mesh.quaternion);
+  copyPhysicsbody.quaternion.copy(this.physicsBody.quaternion);
+  var copyMetaData = Object.assign({}, this.metaData);
+
+  var startRow, finalRow, startCol, finalCol;
+  var destroyedGrids = new Object();
+  var grid1 = 0, grid2 = 0;
+  for (var gridName in gridSelections){
+    if (!grid1){
+      grid1 = gridSelections[gridName];
+    }else{
+      grid2 = gridSelections[gridName];
+    }
+  }
+  if (!grid2){
+    grid2 = grid1;
+  }
+  if (!this.skipToggleGrid){
+    grid1.toggleSelect(false, false, false, true);
+    if (grid1.name != grid2.name){
+      grid2.toggleSelect(false, false, false, true);
+    }
+    delete gridSelections[grid1.name];
+    delete gridSelections[grid2.name];
+  }
+  startRow = grid1.rowNumber;
+  if (grid2.rowNumber < grid1.rowNumber){
+    startRow = grid2.rowNumber;
+  }
+  startCol = grid1.colNumber;
+  if (grid2.colNumber < grid1.colNumber){
+    startCol = grid2.colNumber;
+  }
+  finalRow = grid1.rowNumber;
+  if (grid2.rowNumber > grid1.rowNumber){
+    finalRow = grid2.rowNumber;
+  }
+  finalCol = grid1.colNumber;
+  if (grid2.colNumber > grid1.colNumber){
+    finalCol = grid2.colNumber;
+  }
+  for (var row = startRow; row <= finalRow; row++){
+    for (var col = startCol; col <= finalCol; col++ ){
+      var grid = gridSystem.getGridByColRow(col, row);
+      if (grid){
+        destroyedGrids[grid.name] = grid;
+      }
+    }
+  }
+  var copyInstance = new AddedObject(
+    name, this.type, copyMetaData, this.material, copyMesh, copyPhysicsbody, destroyedGrids
+  );
+  copyMesh.addedObject = copyInstance;
+  copyInstance.updateMVMatrix();
+  copyInstance.isCopied = true;
+  copyInstance.copiedWithScript = fromScript;
+  copyInstance.metaData["grid1Name"] = grid1.name;
+  copyInstance.metaData["grid2Name"] = grid2.name;
+  copyInstance.metaData["positionX"] = copyMesh.position.x;
+  copyInstance.metaData["positionY"] = copyMesh.position.y;
+  copyInstance.metaData["positionZ"] = copyMesh.position.z;
+  copyInstance.metaData["quaternionX"] = copyMesh.quaternion.x;
+  copyInstance.metaData["quaternionY"] = copyMesh.quaternion.y;
+  copyInstance.metaData["quaternionZ"] = copyMesh.quaternion.z;
+  copyInstance.metaData["quaternionW"] = copyMesh.quaternion.w;
+  copyInstance.metaData["widthSegments"] = this.metaData["widthSegments"];
+  copyInstance.metaData["heightSegments"] = this.metaData["heightSegments"];
+  copyInstance.metaData["depthSegments"] = this.metaData["depthSegments"];
+
+  copyInstance.rotationX = this.rotationX;
+  copyInstance.rotationY = this.rotationY;
+  copyInstance.rotationZ = this.rotationZ;
+  if (this.physicsBody.mass != 0){
+    copyInstance.setMass(this.physicsBody.mass);
+  }
+  copyInstance.noMass = this.noMass;
+  copyInstance.isChangeable = this.isChangeable;
+  if (this.metaData["isSlippery"]){
+    copyInstance.setSlippery(true);
+  }
+  if (!(typeof this.metaData["renderSide"] == UNDEFINED)){
+    copyInstance.handleRenderSide(this.metaData["renderSide"]);
+  }
+  if (!(typeof this.metaData.slicedType == UNDEFINED)){
+    copyInstance.sliceInHalf(this.metaData.slicedType);
+  }
+
+  if (isHardCopy){
+    if (this.material instanceof BasicMaterial){
+      if (this.hasDiffuseMap()){
+        copyInstance.mapDiffuse(this.mesh.material.uniforms.diffuseMap.value);
+      }
+      if (this.hasAlphaMap()){
+        copyInstance.mapAlpha(this.mesh.material.uniforms.alphaMap.value);
+      }
+      if (this.hasAOMap()){
+        copyInstance.mapAO(this.mesh.material.uniforms.aoMap.value);
+      }
+      if (this.hasDisplacementMap()){
+        copyInstance.mapDisplacement(this.mesh.material.uniforms.displacementMap.value);
+      }
+      if (this.hasEmissiveMap()){
+        copyInstance.mapEmissive(this.mesh.material.uniforms.emissiveMap.value);
+      }
+    }
+    copyInstance.updateOpacity(this.mesh.material.uniforms.alpha.value);
+    copyInstance.mesh.material.uniforms.aoIntensity.value =
+                      this.mesh.material.uniforms.aoIntensity.value;
+    copyInstance.mesh.material.uniforms.emissiveIntensity.value =
+                      this.mesh.material.uniforms.emissiveIntensity.value;
+    copyInstance.mesh.material.uniforms.displacementInfo.value.x =
+                      this.mesh.material.uniforms.displacementInfo.value.x;
+    copyInstance.mesh.material.uniforms.displacementInfo.value.y =
+                      this.mesh.material.uniforms.displacementInfo.value.y;
+  }
+
+  if (this.pivotObject){
+    var pivot = copyInstance.makePivot(this.pivotOffsetX, this.pivotOffsetY, this.pivotOffsetZ);
+    copyInstance.pivotObject = pivot;
+    copyInstance.pivotOffsetX = this.pivotOffsetX;
+    copyInstance.pivotOffsetY = this.pivotOffsetY;
+    copyInstance.pivotOffsetZ = this.pivotOffsetZ;
+    copyInstance.pivotRemoved = false;
+  }
+
+  return copyInstance;
+}

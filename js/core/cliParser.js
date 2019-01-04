@@ -4522,6 +4522,105 @@ function parse(input){
           }
           return true;
         break;
+        case 144: //copyObject
+          if (mode != 0){
+            terminal.printError(Text.WORKS_ONLY_IN_DESIGN_MODE);
+            return true;
+          }
+          var sourceName = splitted[1];
+          var targetName = splitted[2];
+          var offsetX = parseFloat(splitted[3]);
+          var offsetY = parseFloat(splitted[4]);
+          var offsetZ = parseFloat(splitted[5]);
+          var isHardCopy = splitted[6].toLowerCase();
+          if (targetName.toUpperCase() == "NULL"){
+            targetName = generateUniqueObjectName();
+          }
+          if (targetName.indexOf(Text.COMMA) != -1){
+            terminal.printError(Text.INVALID_CHARACTER_IN_OBJECT_NAME);
+            return true;
+          }
+          if (addedObjects[targetName] || objectGroups[targetName] || gridSystems[targetName]){
+            terminal.printError(Text.NAME_MUST_BE_UNIQUE);
+            return true;
+          }
+          if (disabledObjectNames[targetName]){
+            terminal.printError(Text.NAME_USED_IN_AN_OBJECT_GROUP);
+            return true;
+          }
+          if (!(addedObjects[sourceName] || objectGroups[sourceName])){
+            terminal.printError(Text.NO_SUCH_OBJECT);
+            return true;
+          }
+          if (isNaN(offsetX)){
+            terminal.printError(Text.IS_NOT_A_NUMBER.replace(Text.PARAM1, "offsetX"));
+            return true;
+          }
+          if (isNaN(offsetY)){
+            terminal.printError(Text.IS_NOT_A_NUMBER.replace(Text.PARAM1, "offsetY"));
+            return true;
+          }
+          if (isNaN(offsetZ)){
+            terminal.printError(Text.IS_NOT_A_NUMBER.replace(Text.PARAM1, "offsetZ"));
+            return true;
+          }
+          var isHardCopyBoolean;
+          if (isHardCopy == "true"){
+            isHardCopyBoolean = true;
+          }else if (isHardCopy == "false"){
+            isHardCopyBoolean = false;
+          }else{
+            terminal.printError(Text.ISHARDCOPY_MUST_BE_TRUE_OR_FALSE);
+            return true;
+          }
+          var copyPosition = new THREE.Vector3(0, 0, 0);
+          var gridSelectionSize = Object.keys(gridSelections).length;
+          if (gridSelectionSize != 1 && gridSelectionSize != 2){
+            terminal.printError(Text.MUST_HAVE_1_OR_2_GRIDS_SELECTED);
+            return true;
+          }
+          var ct = 0;
+          var gsName = false;
+          for (var gridName in gridSelections){
+            if (!gsName){
+              gsName = gridSelections[gridName].parentName;
+            }else{
+              if (gsName != gridSelections[gridName].parentName){
+                terminal.printError(Text.SELECTED_GRIDS_SAME_GRIDSYSTEM);
+                return true;
+              }
+            }
+            ct ++;
+            copyPosition.x += gridSelections[gridName].centerX;
+            copyPosition.y += gridSelections[gridName].centerY;
+            copyPosition.z += gridSelections[gridName].centerZ;
+          }
+          var gs = gridSystems[gsName];
+          copyPosition.x = (copyPosition.x / ct) + offsetX;
+          copyPosition.y = (copyPosition.y / ct) + offsetY;
+          copyPosition.z = (copyPosition.z / ct) + offsetZ;
+          var sourceObj = addedObjects[sourceName];
+          if (!sourceObj){
+            sourceObj = objectGroups[sourceName];
+          }
+          var copiedObj = sourceObj.copy(targetName, isHardCopyBoolean, copyPosition, gs, false);
+          scene.add(copiedObj.mesh);
+          if (!copiedObj.noMass){
+            physicsWorld.add(copiedObj.physicsBody);
+          }
+          if (sourceObj instanceof AddedObject){
+            addedObjects[targetName] = copiedObj;
+          }else{
+            objectGroups[targetName] = copiedObj;
+            for (var gridName in gridSelections){
+              gridSelections[gridName].toggleSelect(false, false, false, true);
+            }
+            gridSelections = new Object();
+          }
+          rayCaster.refresh();
+          terminal.printInfo(Text.OBJECT_COPIED);
+          return true;
+        break;
       }
       return true;
     }catch(err){

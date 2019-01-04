@@ -639,6 +639,16 @@ var CommandDescriptor = function(){
   this.unsetRotationPivot.types = [];
   this.unsetRotationPivot.types.push(this.OBJECT_NAME); // objectName
 
+  // copyObject
+  this.copyObject = new Object();
+  this.copyObject.types = [];
+  this.copyObject.types.push(this.OBJECT_NAME); // sourceName
+  this.copyObject.types.push(this.OBJECT_CREATION_NAME); // targetName
+  this.copyObject.types.push(this.UNKNOWN_INDICATOR); // offsetX
+  this.copyObject.types.push(this.UNKNOWN_INDICATOR); // offsetY
+  this.copyObject.types.push(this.UNKNOWN_INDICATOR); // offsetZ
+  this.copyObject.types.push(this.BOOLEAN); // isHardCopy
+
 };
 
 CommandDescriptor.prototype.test = function(){

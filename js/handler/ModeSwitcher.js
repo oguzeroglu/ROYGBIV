@@ -68,9 +68,6 @@ ModeSwitcher.prototype.switchFromDesignToPreview = function(){
   TOTAL_PARTICLE_COLLISION_LISTEN_COUNT = 0;
   TOTAL_PARTICLE_SYSTEM_COLLISION_LISTEN_COUNT = 0;
   TOTAL_PARTICLE_SYSTEMS_WITH_PARTICLE_COLLISIONS = 0;
-  camera.position.set(initialCameraX, initialCameraY, initialCameraZ);
-  camera.rotation.order = 'YXZ';
-  camera.rotation.set(0, 0, 0);
   for (var gsName in gridSystems){
     scene.remove(gridSystems[gsName].gridSystemRepresentation);
     scene.remove(gridSystems[gsName].boundingPlane);
