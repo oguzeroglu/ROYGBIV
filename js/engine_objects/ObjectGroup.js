@@ -1486,6 +1486,10 @@ ObjectGroup.prototype.copy = function(name, isHardCopy, copyPosition, gridSystem
   var physicsPositionBeforeDetached = this.physicsBody.position.clone();
   var physicsQuaternionBeforeDetached = this.physicsBody.quaternion.clone();
   var initQuaternionBeforeDetached = this.initQuaternion.clone();
+  var massWhenDetached = this.physicsBody.mass;
+  var noMass = this.noMass;
+  var slippery = this.isSlippery;
+  var isChangeable = this.isChangeable;
   this.detach();
   var newGroup = new Object();
   for (var objName in this.group){
@@ -1537,9 +1541,26 @@ ObjectGroup.prototype.copy = function(name, isHardCopy, copyPosition, gridSystem
     newObjGroup.group[objName].metaData["centerY"] += dy;
     newObjGroup.group[objName].metaData["centerZ"] += dz;
   }
+  this.isChangeable = isChangeable;
+  newObjGroup.isChangeable = isChangeable;
+  if (slippery){
+    this.setSlippery(slippery);
+    newObjGroup.setSlippery(slippery);
+  }
+  this.noMass = noMass;
+  newObjGroup.noMass = noMass;
+  if (noMass){
+    physicsWorld.remove(this.physicsBody);
+    physicsWorld.remove(newObjGroup.physicsBody);
+  }
   newObjGroup.graphicsGroup.position.copy(newObjGroup.mesh.position);
   newObjGroup.graphicsGroup.quaternion.copy(newObjGroup.mesh.quaternion);
   this.initQuaternion.copy(initQuaternionBeforeDetached);
   newObjGroup.initQuaternion.copy(initQuaternionBeforeDetached);
+  this.setMass(massWhenDetached);
+  newObjGroup.cannotSetMass = this.cannotSetMass;
+  if (this.physicsBody.mass != 0){
+    newObjGroup.setMass(this.physicsBody.mass);
+  }
   return newObjGroup;
 }

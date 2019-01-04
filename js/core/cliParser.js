@@ -4605,7 +4605,7 @@ function parse(input){
           }
           var copiedObj = sourceObj.copy(targetName, isHardCopyBoolean, copyPosition, gs, false);
           scene.add(copiedObj.mesh);
-          if (!copiedObj.noMass){
+          if (!copiedObj.noMass && (copiedObj instanceof AddedObject)){
             physicsWorld.add(copiedObj.physicsBody);
           }
           if (sourceObj instanceof AddedObject){
