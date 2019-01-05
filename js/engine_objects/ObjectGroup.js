@@ -1352,6 +1352,21 @@ ObjectGroup.prototype.setBlending = function(blendingModeInt){
   }
 }
 
+ObjectGroup.prototype.getBlendingText = function(){
+  var blendingModeInt = this.mesh.material.blending;
+  if (blendingModeInt == NO_BLENDING){
+    return "None";
+  }else if (blendingModeInt == NORMAL_BLENDING){
+    return "Normal";
+  }else if (blendingModeInt == ADDITIVE_BLENDING){
+    return "Additive";
+  }else if (blendingModeInt == SUBTRACTIVE_BLENDING){
+    return "Subtractive";
+  }else if (blendingModeInt == MULTIPLY_BLENDING){
+    return "Multiply";
+  }
+}
+
 ObjectGroup.prototype.updateBoundingBoxes = function(){
   this.graphicsGroup.position.copy(this.mesh.position);
   this.graphicsGroup.quaternion.copy(this.mesh.quaternion);

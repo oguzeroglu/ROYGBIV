@@ -202,6 +202,31 @@ window.onload = function() {
       selectedAddedObject.sliceInHalf(3);
     }
   }).listen();
+  omBlendingController = datGuiObjectManipulation.add(objectManipulationParameters, "Blending", [
+    "None", "Normal", "Additive", "Subtractive", "Multiply"
+  ]).onChange(function(val){
+    var obj = selectedAddedObject;
+    if (!obj){
+      obj = selectedObjectGroup;
+    }
+    if (obj instanceof AddedObject){
+      enableController(omOpacityController);
+    }
+    if (val == "None"){
+      obj.setBlending(NO_BLENDING);
+      if (obj instanceof AddedObject){
+        disableController(omOpacityController);
+      }
+    }else if (val == "Normal"){
+      obj.setBlending(NORMAL_BLENDING);
+    }else if (val == "Additive"){
+      obj.setBlending(ADDITIVE_BLENDING);
+    }else if (val == "Subtractive"){
+      obj.setBlending(SUBTRACTIVE_BLENDING);
+    }else if (val == "Multiply"){
+      obj.setBlending(MULTIPLY_BLENDING);
+    }
+  }).listen();
   omTextureOffsetXController = datGuiObjectManipulation.add(objectManipulationParameters, "Texture offset x").min(-2).max(2).step(0.001).onChange(function(val){
     var texture = selectedAddedObject.mesh.material.uniforms.diffuseMap.value;
     texture.offset.x = val;
@@ -968,6 +993,7 @@ function enableAllOMControllers(){
   enableController(omDisplacementBiasController);
   enableController(omAOIntensityController);
   enableController(omHideHalfController);
+  enableController(omBlendingController);
   enableController(omSideController);
 }
 
@@ -1072,6 +1098,9 @@ function afterObjectSelection(){
           objectManipulationParameters["Side"] = "Back";
         }
       }
+      if (obj.mesh.material.blending == NO_BLENDING){
+        disableController(omOpacityController);
+      }
       obj.mesh.add(axesHelper);
     }else if (obj instanceof ObjectGroup){
       objectManipulationParameters["Rotate x"] = 0;
@@ -1115,6 +1144,7 @@ function afterObjectSelection(){
       disableController(omMassController);
     }
     objectManipulationParameters["Has mass"] = !obj.noMass;
+    objectManipulationParameters["Blending"] = obj.getBlendingText();
     omMassController.updateDisplay();
   }else{
     $(datGuiObjectManipulation.domElement).attr("hidden", true);

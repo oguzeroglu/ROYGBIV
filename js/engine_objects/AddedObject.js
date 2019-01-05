@@ -2021,6 +2021,21 @@ AddedObject.prototype.setBlending = function(blendingModeInt){
   }
 }
 
+AddedObject.prototype.getBlendingText = function(){
+  var blendingModeInt = this.mesh.material.blending;
+  if (blendingModeInt == NO_BLENDING){
+    return "None";
+  }else if (blendingModeInt == NORMAL_BLENDING){
+    return "Normal";
+  }else if (blendingModeInt == ADDITIVE_BLENDING){
+    return "Additive";
+  }else if (blendingModeInt == SUBTRACTIVE_BLENDING){
+    return "Subtractive";
+  }else if (blendingModeInt == MULTIPLY_BLENDING){
+    return "Multiply";
+  }
+}
+
 AddedObject.prototype.intersectsBox = function(box){
   for (var i = 0; i< this.trianglePlanes.length; i+=2){
     var plane = this.trianglePlanes[i];

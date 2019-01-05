@@ -1007,6 +1007,7 @@ var omChangeableController;
 var omHasMassController;
 var omSideController;
 var omHideHalfController;
+var omBlendingController;
 var omTextureOffsetXController;
 var omTextureOffsetYController;
 var omOpacityController;
@@ -1026,6 +1027,7 @@ var objectManipulationParameters = {
   "Has mass": true,
   "Side": "Both",
   "Hide half": "None",
+  "Blending": "None",
   "Texture offset x": 0.0,
   "Texture offset y": 0.0,
   "Opacity": 1.0,
