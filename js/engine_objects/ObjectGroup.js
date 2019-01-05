@@ -1620,5 +1620,7 @@ ObjectGroup.prototype.copy = function(name, isHardCopy, copyPosition, gridSystem
     newObjGroup.pivotRemoved = false;
   }
 
+  newObjGroup.createdWithScript = fromScript;
+
   return newObjGroup;
 }

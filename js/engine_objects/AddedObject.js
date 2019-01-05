@@ -2424,48 +2424,50 @@ AddedObject.prototype.copy = function(name, isHardCopy, copyPosition, gridSystem
   copyPhysicsbody.quaternion.copy(this.physicsBody.quaternion);
   var copyMetaData = Object.assign({}, this.metaData);
 
-  var startRow, finalRow, startCol, finalCol;
   var destroyedGrids = new Object();
-  var grid1 = 0, grid2 = 0;
-  for (var gridName in gridSelections){
-    if (!grid1){
-      grid1 = gridSelections[gridName];
-    }else{
-      grid2 = gridSelections[gridName];
+  if (!fromScript){
+    var startRow, finalRow, startCol, finalCol;
+    var grid1 = 0, grid2 = 0;
+    for (var gridName in gridSelections){
+      if (!grid1){
+        grid1 = gridSelections[gridName];
+      }else{
+        grid2 = gridSelections[gridName];
+      }
     }
-  }
-  if (!grid2){
-    grid2 = grid1;
-  }
-  if (!this.skipToggleGrid){
-    grid1.toggleSelect(false, false, false, true);
-    if (grid1.name != grid2.name){
-      grid2.toggleSelect(false, false, false, true);
+    if (!grid2){
+      grid2 = grid1;
     }
-    delete gridSelections[grid1.name];
-    delete gridSelections[grid2.name];
-  }
-  startRow = grid1.rowNumber;
-  if (grid2.rowNumber < grid1.rowNumber){
-    startRow = grid2.rowNumber;
-  }
-  startCol = grid1.colNumber;
-  if (grid2.colNumber < grid1.colNumber){
-    startCol = grid2.colNumber;
-  }
-  finalRow = grid1.rowNumber;
-  if (grid2.rowNumber > grid1.rowNumber){
-    finalRow = grid2.rowNumber;
-  }
-  finalCol = grid1.colNumber;
-  if (grid2.colNumber > grid1.colNumber){
-    finalCol = grid2.colNumber;
-  }
-  for (var row = startRow; row <= finalRow; row++){
-    for (var col = startCol; col <= finalCol; col++ ){
-      var grid = gridSystem.getGridByColRow(col, row);
-      if (grid){
-        destroyedGrids[grid.name] = grid;
+    if (!this.skipToggleGrid){
+      grid1.toggleSelect(false, false, false, true);
+      if (grid1.name != grid2.name){
+        grid2.toggleSelect(false, false, false, true);
+      }
+      delete gridSelections[grid1.name];
+      delete gridSelections[grid2.name];
+    }
+    startRow = grid1.rowNumber;
+    if (grid2.rowNumber < grid1.rowNumber){
+      startRow = grid2.rowNumber;
+    }
+    startCol = grid1.colNumber;
+    if (grid2.colNumber < grid1.colNumber){
+      startCol = grid2.colNumber;
+    }
+    finalRow = grid1.rowNumber;
+    if (grid2.rowNumber > grid1.rowNumber){
+      finalRow = grid2.rowNumber;
+    }
+    finalCol = grid1.colNumber;
+    if (grid2.colNumber > grid1.colNumber){
+      finalCol = grid2.colNumber;
+    }
+    for (var row = startRow; row <= finalRow; row++){
+      for (var col = startCol; col <= finalCol; col++ ){
+        var grid = gridSystem.getGridByColRow(col, row);
+        if (grid){
+          destroyedGrids[grid.name] = grid;
+        }
       }
     }
   }
@@ -2476,8 +2478,10 @@ AddedObject.prototype.copy = function(name, isHardCopy, copyPosition, gridSystem
   copyInstance.updateMVMatrix();
   copyInstance.isCopied = true;
   copyInstance.copiedWithScript = fromScript;
-  copyInstance.metaData["grid1Name"] = grid1.name;
-  copyInstance.metaData["grid2Name"] = grid2.name;
+  if (!fromScript){
+    copyInstance.metaData["grid1Name"] = grid1.name;
+    copyInstance.metaData["grid2Name"] = grid2.name;
+  }
   copyInstance.metaData["positionX"] = copyMesh.position.x;
   copyInstance.metaData["positionY"] = copyMesh.position.y;
   copyInstance.metaData["positionZ"] = copyMesh.position.z;
@@ -2553,6 +2557,8 @@ AddedObject.prototype.copy = function(name, isHardCopy, copyPosition, gridSystem
   if (!isHardCopy){
     copyInstance.softCopyParentName = this.name;
   }
+
+  copyInstance.createdWithScript = fromScript;
 
   return copyInstance;
 }
