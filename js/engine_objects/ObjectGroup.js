@@ -1603,5 +1603,14 @@ ObjectGroup.prototype.copy = function(name, isHardCopy, copyPosition, gridSystem
     newObjGroup.softCopyParentName = this.name;
   }
 
+  if (this.pivotObject){
+    var pivot = newObjGroup.makePivot(this.pivotOffsetX, this.pivotOffsetY, this.pivotOffsetZ);
+    newObjGroup.pivotObject = pivot;
+    newObjGroup.pivotOffsetX = this.pivotOffsetX;
+    newObjGroup.pivotOffsetY = this.pivotOffsetY;
+    newObjGroup.pivotOffsetZ = this.pivotOffsetZ;
+    newObjGroup.pivotRemoved = false;
+  }
+
   return newObjGroup;
 }

@@ -1131,7 +1131,6 @@ function parse(input){
           }
           var materialName = splitted[2];
           var height = splitted[3];
-
           if (name.indexOf(Text.COMMA) != -1){
             terminal.printError(Text.INVALID_CHARACTER_IN_OBJECT_NAME);
             return true;
@@ -1191,7 +1190,10 @@ function parse(input){
             terminal.printError(Text.HEIGHT_MUST_BE_A_NUMBER);
             return true;
           }
-
+          if (height == 0){
+            terminal.printError(Text.HEIGHT_CANNOT_BE_0);
+            return true;
+          }
           var selections = [];
           if (!jobHandlerWorking){
             for (var gridName in gridSelections){
@@ -4398,6 +4400,14 @@ function parse(input){
           }
           if (isNaN(cylinderHeight)){
             terminal.printError(Text.IS_NOT_A_NUMBER.replace(Text.PARAM1, "height"));
+            return true;
+          }
+          if (topRadius == 0 && bottomRadius == 0){
+            terminal.printError(Text.BOTH_BOTTOM_RADIUS_AND_TOP_RADIUS);
+            return true;
+          }
+          if (cylinderHeight == 0){
+            terminal.printError(Text.HEIGHT_CANNOT_BE_0);
             return true;
           }
           if (isOpenEnded != "true" && isOpenEnded != "false"){

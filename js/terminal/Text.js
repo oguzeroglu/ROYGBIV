@@ -58,6 +58,7 @@ var Text = function(){
   this.ZTRANSLATION_MUST_BE_A_NUMBER = "zTranslation must be a number.";
   this.RADUIS_MUST_BE_A_NUMBER = "Radius must be a number.";
   this.RADIUS_MUST_BE_DIFFERENT_THAN_ZERO = "Radius must be different than zero.";
+  this.BOTH_BOTTOM_RADIUS_AND_TOP_RADIUS = "Both bottom radius and top radius cannot be zero.";
   this.SPHERE_CREATED = "Sphere created.";
   this.CYLINDER_CREATED = "Cylinder created.";
   this.SWITCHED_TO_PREVIEW_MODE = "Switched to preview mode.";
