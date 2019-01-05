@@ -4563,6 +4563,10 @@ function parse(input){
           }
           var sourceName = splitted[1];
           var targetName = splitted[2];
+          if (!(targetName.indexOf("*") == -1)){
+            new JobHandler(splitted).handle();
+            return true;
+          }
           var offsetX = parseFloat(splitted[3]);
           var offsetY = parseFloat(splitted[4]);
           var offsetZ = parseFloat(splitted[5]);
@@ -4612,26 +4616,39 @@ function parse(input){
             return true;
           }
           var copyPosition = new THREE.Vector3(0, 0, 0);
-          var gridSelectionSize = Object.keys(gridSelections).length;
-          if (gridSelectionSize != 1 && gridSelectionSize != 2){
-            terminal.printError(Text.MUST_HAVE_1_OR_2_GRIDS_SELECTED);
-            return true;
+          var gridSelectionSize;
+          if (!jobHandlerWorking){
+            if (gridSelectionSize != 1 && gridSelectionSize != 2){
+              terminal.printError(Text.MUST_HAVE_1_OR_2_GRIDS_SELECTED);
+              return true;
+            }
+            gridSelectionSize = Object.keys(gridSelections).length;
+          }else{
+            gridSelectionSize = 1;
           }
           var ct = 0;
           var gsName = false;
-          for (var gridName in gridSelections){
-            if (!gsName){
-              gsName = gridSelections[gridName].parentName;
-            }else{
-              if (gsName != gridSelections[gridName].parentName){
-                terminal.printError(Text.SELECTED_GRIDS_SAME_GRIDSYSTEM);
-                return true;
+          if (!jobHandlerWorking){
+            for (var gridName in gridSelections){
+              if (!gsName){
+                gsName = gridSelections[gridName].parentName;
+              }else{
+                if (gsName != gridSelections[gridName].parentName){
+                  terminal.printError(Text.SELECTED_GRIDS_SAME_GRIDSYSTEM);
+                  return true;
+                }
               }
+              ct ++;
+              copyPosition.x += gridSelections[gridName].centerX;
+              copyPosition.y += gridSelections[gridName].centerY;
+              copyPosition.z += gridSelections[gridName].centerZ;
             }
-            ct ++;
-            copyPosition.x += gridSelections[gridName].centerX;
-            copyPosition.y += gridSelections[gridName].centerY;
-            copyPosition.z += gridSelections[gridName].centerZ;
+          }else{
+            gsName = jobHandlerSelectedGrid.parentName;
+            ct = 1;
+            copyPosition.x += jobHandlerSelectedGrid.centerX;
+            copyPosition.y += jobHandlerSelectedGrid.centerY;
+            copyPosition.z += jobHandlerSelectedGrid.centerZ;
           }
           var gs = gridSystems[gsName];
           copyPosition.x = (copyPosition.x / ct) + offsetX;
@@ -4650,13 +4667,17 @@ function parse(input){
             addedObjects[targetName] = copiedObj;
           }else{
             objectGroups[targetName] = copiedObj;
-            for (var gridName in gridSelections){
-              gridSelections[gridName].toggleSelect(false, false, false, true);
+            if (!jobHandlerWorking){
+              for (var gridName in gridSelections){
+                gridSelections[gridName].toggleSelect(false, false, false, true);
+              }
+              gridSelections = new Object();
             }
-            gridSelections = new Object();
           }
           rayCaster.refresh();
-          terminal.printInfo(Text.OBJECT_COPIED);
+          if (!jobHandlerWorking){
+            terminal.printInfo(Text.OBJECT_COPIED);
+          }
           return true;
         break;
       }

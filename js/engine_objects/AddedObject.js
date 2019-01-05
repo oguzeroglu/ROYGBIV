@@ -2425,7 +2425,7 @@ AddedObject.prototype.copy = function(name, isHardCopy, copyPosition, gridSystem
   var copyMetaData = Object.assign({}, this.metaData);
 
   var destroyedGrids = new Object();
-  if (!fromScript){
+  if (!fromScript && !jobHandlerWorking){
     var startRow, finalRow, startCol, finalCol;
     var grid1 = 0, grid2 = 0;
     for (var gridName in gridSelections){
@@ -2471,6 +2471,9 @@ AddedObject.prototype.copy = function(name, isHardCopy, copyPosition, gridSystem
       }
     }
   }
+  if (jobHandlerWorking){
+    destroyedGrids[jobHandlerSelectedGrid.name] = jobHandlerSelectedGrid;
+  }
   var copyInstance = new AddedObject(
     name, this.type, copyMetaData, this.material, copyMesh, copyPhysicsbody, destroyedGrids
   );
@@ -2478,9 +2481,13 @@ AddedObject.prototype.copy = function(name, isHardCopy, copyPosition, gridSystem
   copyInstance.updateMVMatrix();
   copyInstance.isCopied = true;
   copyInstance.copiedWithScript = fromScript;
-  if (!fromScript){
+  if (!fromScript && !jobHandlerWorking){
     copyInstance.metaData["grid1Name"] = grid1.name;
     copyInstance.metaData["grid2Name"] = grid2.name;
+  }
+  if (jobHandlerWorking){
+    copyInstance.metaData["grid1Name"] = jobHandlerSelectedGrid.name;
+    copyInstance.metaData["grid2Name"] = jobHandlerSelectedGrid.name;
   }
   copyInstance.metaData["positionX"] = copyMesh.position.x;
   copyInstance.metaData["positionY"] = copyMesh.position.y;

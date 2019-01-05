@@ -103,6 +103,8 @@ JobHandler.prototype.handle = function(previewModeCommand){
       this.handleSetRotationPivotCommand();
     }else if (this.splitted[0] == "unsetRotationPivot"){
       this.handleUnsetRotationPivotCommand();
+    }else if (this.splitted[0] == "copyObject"){
+      this.handleCopyObjectCommand();
     }
   }catch (err){
     console.error(err);
@@ -111,6 +113,29 @@ JobHandler.prototype.handle = function(previewModeCommand){
   if (this.splitted[0] != "autoConfigureArea"){
     jobHandlerWorking = false;
   }
+}
+
+JobHandler.prototype.handleCopyObjectCommand = function(){
+  var objNamePrefix = this.splitted[2].split("*")[0];
+  var ctr = 0;
+  for (var gridName in gridSelections){
+    jobHandlerSelectedGrid = gridSelections[gridName];
+    parseCommand(
+      "copyObject "+this.splitted[1]+" "+objNamePrefix+"_"+ctr+" "+this.splitted[3]+" "+
+                          this.splitted[4]+" "+this.splitted[5]+" "+this.splitted[6]
+    );
+    ctr ++;
+  }
+  jobHandlerSelectedGrid = 0;
+  if (ctr != 0){
+    terminal.printInfo(Text.CREATED_X_COPIES.replace(Text.PARAM1, ctr));
+  }else{
+    terminal.printError(Text.MUST_HAVE_AT_LEAST_ONE_GRID_SELECTED);
+  }
+  for (var gridName in gridSelections){
+    gridSelections[gridName].toggleSelect(false, false, false, true);
+  }
+  gridSelections = new Object();
 }
 
 JobHandler.prototype.handleUnsetRotationPivotCommand = function(){
