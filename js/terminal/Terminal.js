@@ -78,7 +78,7 @@ Terminal.prototype.handleAboutCommand = function(){
 	terminal.printHeader(Text.VERSION);
 	terminal.printInfo(Text.TREE.replace(Text.PARAM1, ROYGBIV_ENGINE_VERSION));
 	terminal.printHeader(Text.CODER);
-	terminal.printInfo(Text.TREE.replace(Text.PARAM1, "Oğuz Eroğlu - oguzeroglu.com"));
+	terminal.printInfo(Text.TREE.replace(Text.PARAM1, "Oğuz Eroğlu - github.com/oguzeroglu"));
 }
 
 Terminal.prototype.print = function(text, options){

@@ -1242,10 +1242,17 @@ ObjectGroup.prototype.export = function(){
   exportObj.isBasicMaterial = this.isBasicMaterial;
   exportObj.isPhongMaterial = this.isPhongMaterial;
 
-  if (!(typeof this.blendingMode == "undefined")){
-    exportObj.blendingMode = this.blendingMode;
-  }else{
+  var blendingModeInt = this.mesh.material.blending;
+  if (blendingModeInt == NO_BLENDING){
+    exportObj.blendingMode = "NO_BLENDING";
+  }else if (blendingModeInt == NORMAL_BLENDING){
     exportObj.blendingMode = "NORMAL_BLENDING";
+  }else if (blendingModeInt == ADDITIVE_BLENDING){
+    exportObj.blendingMode = "ADDITIVE_BLENDING";
+  }else if (blendingModeInt == SUBTRACTIVE_BLENDING){
+    exportObj.blendingMode = "SUBTRACTIVE_BLENDING";
+  }else if (blendingModeInt == MULTIPLY_BLENDING){
+    exportObj.blendingMode = "MULTIPLY_BLENDING";
   }
 
   if (this.renderSide){
@@ -1280,6 +1287,10 @@ ObjectGroup.prototype.export = function(){
     exportObj.quaternionY = this.mesh.quaternion.y;
     exportObj.quaternionZ = this.mesh.quaternion.z;
     exportObj.quaternionW = this.mesh.quaternion.w;
+  }
+
+  if (this.softCopyParentName){
+    exportObj.softCopyParentName = this.softCopyParentName;
   }
 
   return exportObj;
@@ -1490,6 +1501,8 @@ ObjectGroup.prototype.copy = function(name, isHardCopy, copyPosition, gridSystem
   var noMass = this.noMass;
   var slippery = this.isSlippery;
   var isChangeable = this.isChangeable;
+  var renderSide = this.renderSide;
+  var blending = this.mesh.material.blending;
   this.detach();
   var newGroup = new Object();
   for (var objName in this.group){
@@ -1562,5 +1575,18 @@ ObjectGroup.prototype.copy = function(name, isHardCopy, copyPosition, gridSystem
   if (this.physicsBody.mass != 0){
     newObjGroup.setMass(this.physicsBody.mass);
   }
+  if (!(typeof renderSide == UNDEFINED)){
+    this.handleRenderSide(renderSide);
+    newObjGroup.handleRenderSide(renderSide);
+  }
+
+  this.setBlending(blending);
+  newObjGroup.setBlending(this.mesh.material.blending);
+
+  if (!isHardCopy){
+    newObjGroup.mesh.material = this.mesh.material;
+    newObjGroup.softCopyParentName = this.name;
+  }
+
   return newObjGroup;
 }

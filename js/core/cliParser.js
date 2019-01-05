@@ -447,6 +447,10 @@ function parse(input){
             terminal.printError(Text.NAME_MUST_BE_UNIQUE);
             return true;
           }
+          if (isNameUsedAsSoftCopyParentName(objectName)){
+            terminal.printError(Text.NAME_USED_AS_A_REFERENCE);
+            return true;
+          }
           if (disabledObjectNames[objectName]){
             terminal.printError(Text.NAME_USED_IN_AN_OBJECT_GROUP);
             return true;
@@ -551,7 +555,7 @@ function parse(input){
           var materialText;
           if (object.material.isMeshPhongMaterial){
             materialText = "PHONG";
-          }else if (object.hasBasicMaterial){
+          }else if (object.material instanceof BasicMaterial){
             materialText = "BASIC";
           }
           terminal.printInfo(Text.TREE2.replace(
@@ -954,6 +958,10 @@ function parse(input){
             terminal.printError(Text.NAME_MUST_BE_UNIQUE);
             return true;
           }
+          if (isNameUsedAsSoftCopyParentName(name)){
+            terminal.printError(Text.NAME_USED_AS_A_REFERENCE);
+            return true;
+          }
           if (disabledObjectNames[name]){
             terminal.printError(Text.NAME_USED_IN_AN_OBJECT_GROUP);
             return true;
@@ -1136,6 +1144,10 @@ function parse(input){
 
           if (addedObjects[name] || objectGroups[name] || gridSystems[name]){
             terminal.printError(Text.NAME_MUST_BE_UNIQUE);
+            return true;
+          }
+          if (isNameUsedAsSoftCopyParentName(name)){
+            terminal.printError(Text.NAME_USED_AS_A_REFERENCE);
             return true;
           }
           if (disabledObjectNames[name]){
@@ -2787,6 +2799,10 @@ function parse(input){
             terminal.printError(Text.NAME_MUST_BE_UNIQUE);
             return true;
           }
+          if (isNameUsedAsSoftCopyParentName(groupName)){
+            terminal.printError(Text.NAME_USED_AS_A_REFERENCE);
+            return true;
+          }
           try{
             var objectNamesArray = objects.split(",");
             for (var i = 0; i<objectNamesArray.length; i++){
@@ -3825,6 +3841,10 @@ function parse(input){
               terminal.printError(Text.NAME_MUST_BE_UNIQUE);
               return true;
           }
+          if (isNameUsedAsSoftCopyParentName(sphereName)){
+            terminal.printError(Text.NAME_USED_AS_A_REFERENCE);
+            return true;
+          }
           if (disabledObjectNames[sphereName]){
             terminal.printError(Text.NAME_USED_IN_AN_OBJECT_GROUP);
             return true;
@@ -4338,6 +4358,10 @@ function parse(input){
               terminal.printError(Text.NAME_MUST_BE_UNIQUE);
               return true;
           }
+          if (isNameUsedAsSoftCopyParentName(cylinderName)){
+            terminal.printError(Text.NAME_USED_AS_A_REFERENCE);
+            return true;
+          }
           if (disabledObjectNames[cylinderName]){
             terminal.printError(Text.NAME_USED_IN_AN_OBJECT_GROUP);
             return true;
@@ -4544,6 +4568,10 @@ function parse(input){
             terminal.printError(Text.NAME_MUST_BE_UNIQUE);
             return true;
           }
+          if (isNameUsedAsSoftCopyParentName(targetName)){
+            terminal.printError(Text.NAME_USED_AS_A_REFERENCE);
+            return true;
+          }
           if (disabledObjectNames[targetName]){
             terminal.printError(Text.NAME_USED_IN_AN_OBJECT_GROUP);
             return true;
@@ -4651,6 +4679,20 @@ function generateUniqueObjectName(){
     }
   }
   return generatedName;
+}
+
+function isNameUsedAsSoftCopyParentName(name){
+  for (var objName in addedObjects){
+    if (addedObjects[objName].softCopyParentName && addedObjects[objName].softCopyParentName == name){
+      return true;
+    }
+  }
+  for (var objName in objectGroups){
+    if (objectGroups[objName].softCopyParentName && objectGroups[objName].softCopyParentName == name){
+      return true;
+    }
+  }
+  return false;
 }
 
 function processNewGridSystemCommand(name, sizeX, sizeZ, centerX, centerY, centerZ, outlineColor, cellSize, axis, isSuperposed, slicedGrid){

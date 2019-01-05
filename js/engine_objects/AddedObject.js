@@ -93,6 +93,7 @@ var AddedObject = function(name, type, metaData, material, mesh, physicsBody, de
   this.reusableVec3 = new THREE.Vector3();
   this.reusableVec3_2 = new THREE.Vector3();
   this.reusableVec3_3 = new THREE.Vector3();
+
 }
 
 AddedObject.prototype.export = function(){
@@ -197,10 +198,17 @@ AddedObject.prototype.export = function(){
     exportObject.positionZWhenAttached = this.positionZWhenAttached;
   }
 
-  if (!(typeof this.blendingMode == "undefined")){
-    exportObject.blendingMode = this.blendingMode;
-  }else{
+  var blendingModeInt = this.mesh.material.blending;
+  if (blendingModeInt == NO_BLENDING){
+    exportObject.blendingMode = "NO_BLENDING";
+  }else if (blendingModeInt == NORMAL_BLENDING){
     exportObject.blendingMode = "NORMAL_BLENDING";
+  }else if (blendingModeInt == ADDITIVE_BLENDING){
+    exportObject.blendingMode = "ADDITIVE_BLENDING";
+  }else if (blendingModeInt == SUBTRACTIVE_BLENDING){
+    exportObject.blendingMode = "SUBTRACTIVE_BLENDING";
+  }else if (blendingModeInt == MULTIPLY_BLENDING){
+    exportObject.blendingMode = "MULTIPLY_BLENDING";
   }
 
   var manualDisplacementMap = this.metaData["manualDisplacementMap"];
@@ -266,6 +274,10 @@ AddedObject.prototype.export = function(){
         exportObject.positionZ = this.physicsBody.position.z;
       }
     }
+  }
+
+  if (this.softCopyParentName){
+    exportObject.softCopyParentName = this.softCopyParentName;
   }
 
   return exportObject;
@@ -1298,7 +1310,6 @@ AddedObject.prototype.mapTexturePack = function(texturePack, fromScript){
       this.textureRepeatVOnTexturePackMap
     );
   }
-
   if (!fromScript){
     this.associatedTexturePack = texturePack.name;
   }
@@ -2447,6 +2458,9 @@ AddedObject.prototype.copy = function(name, isHardCopy, copyPosition, gridSystem
   copyInstance.metaData["positionX"] = copyMesh.position.x;
   copyInstance.metaData["positionY"] = copyMesh.position.y;
   copyInstance.metaData["positionZ"] = copyMesh.position.z;
+  copyInstance.metaData["centerX"] = copyMesh.position.x;
+  copyInstance.metaData["centerY"] = copyMesh.position.y;
+  copyInstance.metaData["centerZ"] = copyMesh.position.z;
   copyInstance.metaData["quaternionX"] = copyMesh.quaternion.x;
   copyInstance.metaData["quaternionY"] = copyMesh.quaternion.y;
   copyInstance.metaData["quaternionZ"] = copyMesh.quaternion.z;
@@ -2509,6 +2523,12 @@ AddedObject.prototype.copy = function(name, isHardCopy, copyPosition, gridSystem
     copyInstance.pivotOffsetY = this.pivotOffsetY;
     copyInstance.pivotOffsetZ = this.pivotOffsetZ;
     copyInstance.pivotRemoved = false;
+  }
+
+  copyInstance.setBlending(this.mesh.material.blending);
+
+  if (!isHardCopy){
+    copyInstance.softCopyParentName = this.name;
   }
 
   return copyInstance;

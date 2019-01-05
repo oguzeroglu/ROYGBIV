@@ -588,6 +588,10 @@ StateLoader.prototype.load = function(undo){
         physicsWorld.remove(addedObjectInstance.physicsBody);
       }
 
+      if (curAddedObjectExport.softCopyParentName){
+        addedObjectInstance.softCopyParentName = curAddedObjectExport.softCopyParentName;
+      }
+
       addedObjectInstance.mesh.material.uniforms.emissiveIntensity.value = curAddedObjectExport.emissiveIntensity;
       addedObjectInstance.mesh.material.uniforms.aoIntensity.value = curAddedObjectExport.aoMapIntensity;
 
@@ -628,6 +632,23 @@ StateLoader.prototype.load = function(undo){
          addedObjectInstance.physicsBody.position.copy(addedObjectInstance.mesh.position);
          addedObjectInstance.pivotRemoved = true;
        }
+    }
+    for (var objName in addedObjects){
+      if (addedObjects[objName].softCopyParentName){
+        var softCopyParent = addedObjects[addedObjects[objName].softCopyParentName];
+        if (softCopyParent){
+          addedObjects[objName].mesh.material = softCopyParent.mesh.material;
+        }else{
+          for (var objName2 in addedObjects){
+            if (objName2 != objName){
+              if (addedObjects[objName2].softCopyParentName &&
+                addedObjects[objName2].softCopyParentName == addedObjects[objName].softCopyParentName){
+                addedObjects[objName].mesh.material = addedObjects[objName2].mesh.material;
+              }
+            }
+          }
+        }
+      }
     }
     // TEXTURE URLS ************************************************
     textureURLs = Object.assign({}, obj.textureURLs);
@@ -1193,6 +1214,28 @@ StateLoader.prototype.createObjectGroupsAfterLoadedTextures = function(){
       objectGroupInstance.physicsBody.position.copy(objectGroupInstance.mesh.position);
     }
 
+    if (curObjectGroupExport.softCopyParentName){
+      objectGroupInstance.softCopyParentName = curObjectGroupExport.softCopyParentName;
+    }
+
+  }
+
+  for (var objName in objectGroups){
+    if (objectGroups[objName].softCopyParentName){
+      var softCopyParent = objectGroups[objectGroups[objName].softCopyParentName];
+      if (softCopyParent){
+        objectGroups[objName].mesh.material = softCopyParent.mesh.material;
+      }else{
+        for (var objName2 in objectGroups){
+          if (objName2 != objName){
+            if (objectGroups[objName2].softCopyParentName &&
+              objectGroups[objName2].softCopyParentName == objectGroups[objName].softCopyParentName){
+              objectGroups[objName].mesh.material = objectGroups[objName2].mesh.material;
+            }
+          }
+        }
+      }
+    }
   }
 
   projectLoaded = true;

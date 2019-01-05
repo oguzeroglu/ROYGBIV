@@ -81,6 +81,7 @@ var Text = function(){
   this.MATERIAL_DESTROYED = "Material destroyed.";
   this.MUST_HAVE_1_OR_2_GRIDS_SELECTED = "Must have 1 or 2 grids selected.";
   this.NAME_MUST_BE_UNIQUE = "Name must be unique.";
+  this.NAME_USED_AS_A_REFERENCE = "Name used as a copy reference name in an object. Cannot use this name.";
   this.NAME_USED_IN_AN_OBJECT_GROUP = "Name used in an object group.";
   this.OBJECT_ADDED = "Object added.";
   this.X_GRIDS_SELECTED = "@@1 grids selected.";
