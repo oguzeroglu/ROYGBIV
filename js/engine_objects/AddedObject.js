@@ -253,6 +253,14 @@ AddedObject.prototype.export = function(){
     exportObject.positionX = this.mesh.position.x;
     exportObject.positionY = this.mesh.position.y;
     exportObject.positionZ = this.mesh.position.z;
+    exportObject.pivotQX = this.pivotObject.quaternion.x;
+    exportObject.pivotQY = this.pivotObject.quaternion.y;
+    exportObject.pivotQZ = this.pivotObject.quaternion.z;
+    exportObject.pivotQW = this.pivotObject.quaternion.w;
+    exportObject.insidePivotQX = this.pivotObject.children[0].quaternion.x;
+    exportObject.insidePivotQY = this.pivotObject.children[0].quaternion.y;
+    exportObject.insidePivotQZ = this.pivotObject.children[0].quaternion.z;
+    exportObject.insidePivotQW = this.pivotObject.children[0].quaternion.w;
     if (this.parentObjectName){
       var objGroup = objectGroups[this.parentObjectName];
       if (objGroup){

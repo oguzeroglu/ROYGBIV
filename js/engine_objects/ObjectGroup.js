@@ -1278,6 +1278,14 @@ ObjectGroup.prototype.export = function(){
     exportObj.quaternionY = this.mesh.quaternion.y;
     exportObj.quaternionZ = this.mesh.quaternion.z;
     exportObj.quaternionW = this.mesh.quaternion.w;
+    exportObj.pivotQX = this.pivotObject.quaternion.x;
+    exportObj.pivotQY = this.pivotObject.quaternion.y;
+    exportObj.pivotQZ = this.pivotObject.quaternion.z;
+    exportObj.pivotQW = this.pivotObject.quaternion.w;
+    exportObj.insidePivotQX = this.pivotObject.children[0].quaternion.x;
+    exportObj.insidePivotQY = this.pivotObject.children[0].quaternion.y;
+    exportObj.insidePivotQZ = this.pivotObject.children[0].quaternion.z;
+    exportObj.insidePivotQW = this.pivotObject.children[0].quaternion.w;
   }else if (this.pivotRemoved){
     exportObj.pivotRemoved = true;
     exportObj.positionX = this.mesh.position.x;

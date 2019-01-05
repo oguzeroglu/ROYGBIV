@@ -617,6 +617,14 @@ StateLoader.prototype.load = function(undo){
            curAddedObjectExport.pivotOffsetY,
            curAddedObjectExport.pivotOffsetZ
          );
+         pivot.quaternion.set(
+           curAddedObjectExport.pivotQX, curAddedObjectExport.pivotQY,
+           curAddedObjectExport.pivotQZ, curAddedObjectExport.pivotQW
+         );
+         pivot.children[0].quaternion.set(
+           curAddedObjectExport.insidePivotQX, curAddedObjectExport.insidePivotQY,
+           curAddedObjectExport.insidePivotQZ, curAddedObjectExport.insidePivotQW
+         );
          addedObjectInstance.pivotObject = pivot;
          addedObjectInstance.pivotOffsetX = curAddedObjectExport.pivotOffsetX;
          addedObjectInstance.pivotOffsetY = curAddedObjectExport.pivotOffsetY;
@@ -1198,6 +1206,14 @@ StateLoader.prototype.createObjectGroupsAfterLoadedTextures = function(){
         curObjectGroupExport.pivotOffsetX,
         curObjectGroupExport.pivotOffsetY,
         curObjectGroupExport.pivotOffsetZ
+      );
+      pivot.quaternion.set(
+        curObjectGroupExport.pivotQX, curObjectGroupExport.pivotQY,
+        curObjectGroupExport.pivotQZ, curObjectGroupExport.pivotQW
+      );
+      pivot.children[0].quaternion.set(
+        curObjectGroupExport.insidePivotQX, curObjectGroupExport.insidePivotQY,
+        curObjectGroupExport.insidePivotQZ, curObjectGroupExport.insidePivotQW
       );
       objectGroupInstance.pivotObject = pivot;
       objectGroupInstance.pivotOffsetX = curObjectGroupExport.pivotOffsetX;
