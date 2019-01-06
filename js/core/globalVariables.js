@@ -810,8 +810,8 @@ var lightPositionDeltaX = 0.5;
 var lightPositionDeltaY = 0.5;
 var lightPositionDeltaZ = 0.5;
 var defaultMaterialType = "BASIC"; //BASIC / PHONG
-var texturePackRootDirectory = "/texture_packs/";
-var skyBoxRootDirectory = "/skybox/";
+var texturePackRootDirectory = "texture_packs/";
+var skyBoxRootDirectory = "skybox/";
 var dataPrefix = "text/json;charset=utf-8,";
 var skyboxDistance = 4000;
 var skyboxMesh;

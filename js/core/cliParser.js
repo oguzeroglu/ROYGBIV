@@ -650,7 +650,7 @@ function parse(input){
             return true;
           }
 
-          var textureUrl = "/textures/"+fileName;
+          var textureUrl = "textures/"+fileName;
           var texture;
           var found = false;
           var compressionSupportIssue = false;
