@@ -955,6 +955,7 @@ var defaultCameraControlsDisabled = false;
 var modeSwitcher;
 var isMouseDown = false;
 var isDeployment = false;
+var loadedScriptsCounter = 0;
 
 // WORKER VARIABLES
 var WORKERS_SUPPORTED = (typeof(Worker) !== "undefined");

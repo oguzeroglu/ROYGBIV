@@ -4685,10 +4685,6 @@ function parse(input){
             terminal.printError(Text.WORKS_ONLY_IN_DESIGN_MODE);
             return true;
           }
-          terminal.clear();
-          terminal.printInfo(Text.BUILDING_PROJECT);
-          canvas.style.visibility = "hidden";
-          terminal.disable();
           var projectName = splitted[1];
           var author = splitted[2];
           while (projectName.includes("/")){
@@ -4697,25 +4693,40 @@ function parse(input){
           while (author.includes("/")){
             author = author.replace("/", " ");
           }
-          var xhr = new XMLHttpRequest();
-          xhr.open("POST", "/build", true);
-          xhr.setRequestHeader("Content-type", "application/json");
-          xhr.onreadystatechange = function () {
-            if (xhr.readyState == 4 && xhr.status == 200){
-              terminal.clear();
-              var json = JSON.parse(xhr.responseText);
-              if (json.error){
-                terminal.printError(json.error);
-              }else{
-                terminal.printInfo(Text.PROJECT_BUILDED.replace(Text.PARAM1, json.path));
-                window.open("http://localhost:8085/deploy/"+projectName+"/application.html", '_blank');
+          if (modeSwitcher.totalScriptsToLoad > 0){
+            loadedScriptsCounter = 0;
+            terminal.clear();
+            terminal.printInfo(Text.LOADING_SCRIPTS);
+            canvas.style.visibility = "hidden";
+            terminal.disable();
+            for (var scriptName in scripts){
+              var script = scripts[scriptName];
+              if (script.localFilePath){
+                script.reload(
+                  function(scriptName){
+                    loadedScriptsCounter ++;
+                    if (loadedScriptsCounter == modeSwitcher.totalScriptsToLoad){
+                      build(projectName, author);
+                    }
+                  },
+                  function(scriptName, filePath){
+                    modeSwitcher.enableTerminal();
+                    terminal.printError(Text.FAILED_TO_LOAD_SCRIPT.replace(
+                      Text.PARAM1, scriptName
+                    ).replace(
+                      Text.PARAM2, filePath
+                    ));
+                  },
+                  function(scriptName, errorMessage){
+                    modeSwitcher.enableTerminal();
+                    terminal.printError(Text.INVALID_SCRIPT.replace(Text.PARAM1, errorMessage).replace(Text.PARAM2, scriptName));
+                  }
+                );
               }
-              canvas.style.visibility = "";
-              terminal.enable();
             }
+          }else{
+            build(projectName, author);
           }
-          var data = JSON.stringify(new State(projectName, author));
-          xhr.send(data);
           return true;
         break;
       }
@@ -4726,6 +4737,32 @@ function parse(input){
       return true;
     }
 
+}
+
+function build(projectName, author){
+  terminal.clear();
+  terminal.printInfo(Text.BUILDING_PROJECT);
+  canvas.style.visibility = "hidden";
+  terminal.disable();
+  var xhr = new XMLHttpRequest();
+  xhr.open("POST", "/build", true);
+  xhr.setRequestHeader("Content-type", "application/json");
+  xhr.onreadystatechange = function () {
+    if (xhr.readyState == 4 && xhr.status == 200){
+      terminal.clear();
+      var json = JSON.parse(xhr.responseText);
+      if (json.error){
+        terminal.printError(json.error);
+      }else{
+        terminal.printInfo(Text.PROJECT_BUILDED.replace(Text.PARAM1, json.path));
+        window.open("http://localhost:8085/deploy/"+projectName+"/application.html", '_blank');
+      }
+      canvas.style.visibility = "";
+      terminal.enable();
+    }
+  }
+  var data = JSON.stringify(new State(projectName, author));
+  xhr.send(data);
 }
 
 function generateUniqueObjectName(){
