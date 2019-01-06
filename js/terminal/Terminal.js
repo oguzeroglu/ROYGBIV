@@ -31,6 +31,10 @@ Terminal.prototype.init = function(){
 	this.setStyle();
 	this.prompt = document.getElementsByClassName("prompt")[0];
 	this.cursor = document.getElementsByClassName("cursor-line")[0];
+	this.clear();
+	this.printInfo(Text.LOADING_SHADERS);
+	canvas.style.visibility = "hidden";
+	this.disable();
 }
 
 Terminal.prototype.enable = function(){

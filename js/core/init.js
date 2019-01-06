@@ -31,7 +31,6 @@ window.onload = function() {
     });
   }
   dragElement(cliDiv);
-  terminal.init();
 
   // SCRIPTING UTILITY FUNCTIONS
   ROYGBIV = new Roygbiv();
@@ -644,6 +643,10 @@ window.onload = function() {
   VERTEX_SHADER_TEXTURE_FETCH_SUPPORTED = (renderer.context.getParameter(renderer.context.MAX_VERTEX_TEXTURE_IMAGE_UNITS) > 0);
   DDS_SUPPORTED = (!(renderer.context.getExtension("WEBGL_compressed_texture_s3tc") == null));
   nullTexture.isNullTexture = true;
+
+  terminal.init();
+  ShaderContent = new ShaderContent();
+
 };
 
 window.addEventListener('mousewheel', mouseWheelEvent, false);

@@ -286,6 +286,7 @@ var Text = function(){
   this.LOADING_FILE = "Loading file.";
   this.BUILDING_PROJECT = "Building project.";
   this.PROJECT_LOADED = "Project loaded.";
+  this.LOADING_SHADERS = "Loading shaders.";
   this.LOADING_PROJECT = "Loading project.";
   this.LOADING_SCRIPTS = "Loading scripts.";
   this.CONFIGURING_AREA = "Configuring area.";

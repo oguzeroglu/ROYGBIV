@@ -777,7 +777,7 @@ var dynamicObjects = new Object();
 var dynamicObjectGroups = new Object();
 var addedObjectsInsideGroups = new Object();
 var trackingObjects = new Object();
-var ShaderContent = new ShaderContent();
+var ShaderContent;
 var commandDescriptor;
 var ColorNames;
 var anchorGrid = 0;
