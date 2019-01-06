@@ -6,12 +6,14 @@ window.onload = function() {
   scriptCreatorCancelButton = document.getElementById("scriptCreatorCancelButton");
   scriptCreatorSaveButton = document.getElementById("scriptCreatorSaveButton");
   scriptCreatorTextArea = document.getElementById("scriptCreatorTextArea");
-  scriptCreatorTextArea.onkeydown = function(e){
-    if(e.keyCode==9 || e.which==9){
-      e.preventDefault();
-      var s = this.selectionStart;
-      this.value = this.value.substring(0,this.selectionStart) + "\t" + this.value.substring(this.selectionEnd);
-      this.selectionEnd = s+1;
+  if (!isDeployment){
+    scriptCreatorTextArea.onkeydown = function(e){
+      if(e.keyCode==9 || e.which==9){
+        e.preventDefault();
+        var s = this.selectionStart;
+        this.value = this.value.substring(0,this.selectionStart) + "\t" + this.value.substring(this.selectionEnd);
+        this.selectionEnd = s+1;
+      }
     }
   }
   cliDiv.addEventListener("click", function(){

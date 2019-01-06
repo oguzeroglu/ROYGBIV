@@ -1,7 +1,10 @@
-var State = function(projectName){
-  // PROJECT NAME **************************************************
+var State = function(projectName, author){
+  // PROJECT INFOS *************************************************
   if (!(typeof projectName == UNDEFINED)){
     this.projectName = projectName;
+  }
+  if (!(typeof author == UNDEFINED)){
+    this.author = author;
   }
   // DATE **********************************************************
   this.date = new Date();

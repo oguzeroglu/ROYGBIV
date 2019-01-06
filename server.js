@@ -30,14 +30,21 @@ app.get("/", function(req, res){
 app.post("/build", function(req, res){
   console.log("[*] Building "+req.body.projectName);
   res.setHeader('Content-Type', 'application/json');
-  if (!generateDeployDirectory(req.body.projectName, req.body)){
-    res.send(JSON.stringify({ "error": "A project with the same name alreay exists under deploy folder."}));
+  try{
+    if (!generateDeployDirectory(req.body.projectName, req.body)){
+      res.send(JSON.stringify({ "error": "A project with the same name alreay exists under deploy folder."}));
+      return;
+    }
+    var engineScriptsConcatted = readEngineScripts(JSON.stringify(req.body));
+    fs.writeFileSync("deploy/"+req.body.projectName+"/js/roygbiv.js", engineScriptsConcatted);
+    fs.writeFileSync("deploy/"+req.body.projectName+"/js/application.json", JSON.stringify(req.body));
+    copyAssets(req.body);
+  }catch (err){
+    console.log("[*] Error building project: "+err.message);
+    res.send(JSON.stringify({"error": "Build error: "+err.message}));
     return;
   }
-  var engineScriptsConcatted = readEngineScripts(JSON.stringify(req.body));
-  fs.writeFileSync("deploy/"+req.body.projectName+"/js/roygbiv.js", engineScriptsConcatted);
-  fs.writeFileSync("deploy/"+req.body.projectName+"/js/application.json", JSON.stringify(req.body));
-  copyAssets(req.body);
+  res.send(JSON.stringify({"path": __dirname+"/deploy/"+req.body.projectName+"/"}));
 });
 
 function copyAssets(application){
@@ -45,6 +52,18 @@ function copyAssets(application){
   fs.writeFileSync("deploy/"+application.projectName+"/css/font-awesome.min.css", faCssContent);
   var jqueryTerminalCssContent = fs.readFileSync("css/jquery.terminal-1.11.3.min.css", "utf8");
   fs.writeFileSync("deploy/"+application.projectName+"/css/jquery.terminal-1.11.3.min.css", jqueryTerminalCssContent);
+  copyFileSync("css/Hack-Bold.ttf", "deploy/"+application.projectName+"/css/");
+  var htmlContent = fs.readFileSync("template/application.html", "utf8");
+  htmlContent = htmlContent.replace(
+    "@@1", application.projectName
+  ).replace(
+    "@@2", application.projectName
+  ).replace(
+    "@@3", application.author
+  );
+  fs.writeFileSync("deploy/"+application.projectName+"/application.html", htmlContent);
+  var readmeContent = fs.readFileSync("template/README", "utf8");
+  fs.writeFileSync("deploy/"+application.projectName+"/README", readmeContent);
   for (var textureName in application.textureURLs){
     var splitted = application.textureURLs[textureName].split("/");
     var textureFileName = splitted[splitted.length -1];

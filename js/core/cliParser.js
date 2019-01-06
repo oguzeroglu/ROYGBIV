@@ -4690,6 +4690,13 @@ function parse(input){
           canvas.style.visibility = "hidden";
           terminal.disable();
           var projectName = splitted[1];
+          var author = splitted[2];
+          while (projectName.includes("/")){
+            projectName = projectName.replace("/", " ");
+          }
+          while (author.includes("/")){
+            author = author.replace("/", " ");
+          }
           var xhr = new XMLHttpRequest();
           xhr.open("POST", "/build", true);
           xhr.setRequestHeader("Content-type", "application/json");
@@ -4700,13 +4707,14 @@ function parse(input){
               if (json.error){
                 terminal.printError(json.error);
               }else{
-
+                terminal.printInfo(Text.PROJECT_BUILDED.replace(Text.PARAM1, json.path));
+                window.open("http://localhost:8085/deploy/"+projectName+"/application.html", '_blank');
               }
               canvas.style.visibility = "";
               terminal.enable();
             }
           }
-          var data = JSON.stringify(new State(projectName));
+          var data = JSON.stringify(new State(projectName, author));
           xhr.send(data);
           return true;
         break;

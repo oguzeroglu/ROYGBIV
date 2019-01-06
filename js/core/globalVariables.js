@@ -151,7 +151,7 @@ var commandArgumentsExpectedCount = [
     2, //printChildPosition
     1, //unsetRotationPivot
     6, //copyObject
-    1 //build
+    2 //build
 ];
 var commandArgumentsExpectedExplanation = [
   "help", //help
@@ -299,7 +299,7 @@ var commandArgumentsExpectedExplanation = [
   "printChildPosition objectName childObjectName", //printChildPosition
   "unsetRotationPivot objectName", //unsetRotationPivot
   "copyObject sourceName targetName offsetX offsetY offsetZ isHardCopy", //copyObject
-  "build projectName" //build
+  "build projectName author" //build
 ];
 var commands = [
   "help",

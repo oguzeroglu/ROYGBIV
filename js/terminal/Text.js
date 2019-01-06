@@ -337,6 +337,7 @@ var Text = function(){
   this.POINT_UNMARKED = "Point unmarked.";
   this.NO_MARKED_POINTS = "No marked points.";
   this.NO_MARKED_POINTS_FOUND = "No marked points found.";
+  this.PROJECT_BUILDED = "Project builded. Deployment folder is: @@1";
   this.MARKED_POINTS = "Marked points";
   this.TREE_POINT = "|____ @@1: (@@2, @@3, @@4)";
   this.MARKED_POINTS_TOGGLED = "Marked points toggled.";

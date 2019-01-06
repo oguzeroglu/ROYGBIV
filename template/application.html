@@ -1,0 +1,54 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset=utf-8>
+    <title>@@1</title>
+    <link rel="stylesheet" href="css/font-awesome.min.css">
+    <link rel="stylesheet" href="css/jquery.terminal-1.11.3.min.css">
+    <script src="js/roygbiv.js"></script>
+    <style>
+      body { margin: 0; position: fixed;}
+      canvas {display: block;}
+      @font-face {
+        font-family: hack;
+        src: url(/css/Hack-Bold.ttf);
+      }
+      .noselect {
+        -webkit-touch-callout: none;
+        -webkit-user-select: none;
+        -khtml-user-select: none;
+        -moz-user-select: none;
+        -ms-user-select: none;
+        user-select: none;
+      }
+      #cliDiv {
+          position: absolute;
+          z-index: 9;
+          background-color: #000000;
+          opacity: 1;
+      }
+      #cliDivheader {
+          padding: 10px;
+          cursor: move;
+          z-index: 10;
+          font-family: hack;
+          font-size: 13px;
+          color: lime;
+          opacity: 1;
+      }
+      .terminal, .cmd, .terminal, .cmd .prompt {
+        color: lime;
+        font-family: hack;
+      }
+    </style>
+  </head>
+  <body style="background-color:black;">
+    <!-- CLI -->
+   <div id="cliDiv">
+     <div id="cliDivheader" class = "noselect">@@2 by @@3</div>
+     <div id="terminalDiv" class="terminal noselect"></div>
+   </div>
+    <!-- 3D CONTENT -->
+   <canvas id="rendererCanvas"></canvas>
+  </body>
+</html>
