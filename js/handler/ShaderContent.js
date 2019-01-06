@@ -58,7 +58,6 @@ ShaderContent.prototype.load = function(){
   mergedBasicMaterialFragmentShaderRequest.open('GET', "./shader/materials/merged_basic_material/fragmentShader.shader");
   instancedBasicMaterialVertexShaderRequest.open('GET', "./shader/materials/instanced_basic_material/vertexShader.shader");
   instancedBasicMaterialFragmentShaderRequest.open('GET', "./shader/materials/instanced_basic_material/fragmentShader.shader");
-  console.log("IT WORKS")
   var that = this;
   particleVertexShaderRequest.addEventListener("load", function(){
     that.particleVertexShader = particleVertexShaderRequest.responseText;
