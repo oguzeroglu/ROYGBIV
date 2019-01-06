@@ -119,8 +119,8 @@ Terminal.prototype.printFunctionArguments = function(commandIndex){
 		);
 		return;
 	}
-	var arguments = commandArgumentsExpectedExplanation[commandIndex];
-	var argumentsSplitted = arguments.split(" ");
+	var args = commandArgumentsExpectedExplanation[commandIndex];
+	var argumentsSplitted = args.split(" ");
 	terminal.print(
 		Text.ARGUMENTS_EXPECTED.replace(
 			Text.PARAM1, expectedCount

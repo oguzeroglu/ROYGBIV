@@ -1,4 +1,8 @@
-var State = function(){
+var State = function(projectName){
+  // PROJECT NAME **************************************************
+  if (!(typeof projectName == UNDEFINED)){
+    this.projectName = projectName;
+  }
   // DATE **********************************************************
   this.date = new Date();
   // GRID SYSTEMS **************************************************

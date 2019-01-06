@@ -672,4 +672,4 @@ CommandDescriptor.prototype.test = function(){
       }
     }
   }
-}
+};

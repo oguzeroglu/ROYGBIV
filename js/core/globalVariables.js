@@ -150,7 +150,8 @@ var commandArgumentsExpectedCount = [
     4, //setRotationPivot
     2, //printChildPosition
     1, //unsetRotationPivot
-    6 //copyObject
+    6, //copyObject
+    1 //build
 ];
 var commandArgumentsExpectedExplanation = [
   "help", //help
@@ -297,7 +298,8 @@ var commandArgumentsExpectedExplanation = [
   "setRotationPivot objectName offsetX offsetY offsetZ", //setRotationPivot
   "printChildPosition objectName childObjectName", //printChildPosition
   "unsetRotationPivot objectName", //unsetRotationPivot
-  "copyObject sourceName targetName offsetX offsetY offsetZ isHardCopy" //copyObject
+  "copyObject sourceName targetName offsetX offsetY offsetZ isHardCopy", //copyObject
+  "build projectName" //build
 ];
 var commands = [
   "help",
@@ -444,7 +446,8 @@ var commands = [
   "setRotationPivot",
   "printChildPosition",
   "unsetRotationPivot",
-  "copyObject"
+  "copyObject",
+  "build"
 ];
 var commandInfo = [
   "help: Prints command list.",
@@ -591,7 +594,8 @@ var commandInfo = [
   "setRotationPivot: Defines a pivot point of rotation for an object in its local axis system.",
   "printChildPosition: Prints the world position of a child object of an object group.",
   "unsetRotationPivot: Unsets the rotation pivot point of an object set by using setRotationPivot command.",
-  "copyObject: Creates a clone of an object."
+  "copyObject: Creates a clone of an object.",
+  "build: Builds the project for release."
 ];
 var keyboardInfo = [
   "W/S : Translates the camera on axis Z.",
@@ -950,6 +954,7 @@ var screenFullScreenChangeCallbackFunction = 0;
 var defaultCameraControlsDisabled = false;
 var modeSwitcher;
 var isMouseDown = false;
+var isDeployment = false;
 
 // WORKER VARIABLES
 var WORKERS_SUPPORTED = (typeof(Worker) !== "undefined");

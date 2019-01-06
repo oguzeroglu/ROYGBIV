@@ -284,6 +284,7 @@ var Text = function(){
   this.DOWNLOAD_PROCESS_INITIATED = "Download process initiated.";
   this.CHOOSE_A_FILE_TO_UPLOAD = "Dialog opened. Choose a file to upload.";
   this.LOADING_FILE = "Loading file.";
+  this.BUILDING_PROJECT = "Building project.";
   this.PROJECT_LOADED = "Project loaded.";
   this.LOADING_PROJECT = "Loading project.";
   this.LOADING_SCRIPTS = "Loading scripts.";

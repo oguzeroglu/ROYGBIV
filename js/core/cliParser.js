@@ -2347,7 +2347,7 @@ function parse(input){
           anchor.href = url;
           if (typeof InstallTrigger !== 'undefined') {
             // F I R E F O X
-            anchor.dispatchEvent(new MouseEvent(`click`, {
+            anchor.dispatchEvent(new MouseEvent("click", {
               bubbles: true, cancelable: true, view: window
             }));
           }else{
@@ -4678,6 +4678,36 @@ function parse(input){
           if (!jobHandlerWorking){
             terminal.printInfo(Text.OBJECT_COPIED);
           }
+          return true;
+        break;
+        case 145: //build
+          if (mode != 0){
+            terminal.printError(Text.WORKS_ONLY_IN_DESIGN_MODE);
+            return true;
+          }
+          terminal.clear();
+          terminal.printInfo(Text.BUILDING_PROJECT);
+          canvas.style.visibility = "hidden";
+          terminal.disable();
+          var projectName = splitted[1];
+          var xhr = new XMLHttpRequest();
+          xhr.open("POST", "/build", true);
+          xhr.setRequestHeader("Content-type", "application/json");
+          xhr.onreadystatechange = function () {
+            if (xhr.readyState == 4 && xhr.status == 200){
+              terminal.clear();
+              var json = JSON.parse(xhr.responseText);
+              if (json.error){
+                terminal.printError(json.error);
+              }else{
+
+              }
+              canvas.style.visibility = "";
+              terminal.enable();
+            }
+          }
+          var data = JSON.stringify(new State(projectName));
+          xhr.send(data);
           return true;
         break;
       }
