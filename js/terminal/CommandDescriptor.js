@@ -649,6 +649,12 @@ var CommandDescriptor = function(){
   this.copyObject.types.push(this.UNKNOWN_INDICATOR); // offsetZ
   this.copyObject.types.push(this.BOOLEAN); // isHardCopy
 
+  // build
+  this.build = new Object();
+  this.build.types = [];
+  this.build.types.push(this.UNKNOWN_INDICATOR); // projectName
+  this.build.types.push(this.UNKNOWN_INDICATOR); // author
+
 };
 
 CommandDescriptor.prototype.test = function(){

@@ -648,7 +648,13 @@ window.onload = function() {
 
   terminal.init();
   ShaderContent = new ShaderContent();
-
+  if (isDeployment){
+    console.log(
+      "%c "+Text.BANNERL1+"\n"+Text.BANNERL2+"\n"+Text.BANNERL3+"\n"+
+      Text.BANNERL4+"\n"+Text.BANNERL5 +"\n"+"by Oğuz Eroğlu - github.com/oguzeroglu",
+      "background: black; color: lime"
+    );
+  }
 };
 
 window.addEventListener('mousewheel', mouseWheelEvent, false);
