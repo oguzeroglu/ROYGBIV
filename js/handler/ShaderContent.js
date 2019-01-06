@@ -46,18 +46,18 @@ ShaderContent.prototype.load = function(){
   var instancedBasicMaterialVertexShaderRequest = new XMLHttpRequest();
   var instancedBasicMaterialFragmentShaderRequest = new XMLHttpRequest();
 
-  particleVertexShaderRequest.open('GET', "/shader/particle/vertexShader.shader");
-  particleFragmentShaderRequest.open('GET', "/shader/particle/fragmentShader.shader");
-  objectTrailVertexShaderRequest.open('GET', "/shader/object_trail/vertexShader.shader");
-  objectTrailFragmentShaderRequest.open('GET', "/shader/object_trail/fragmentShader.shader");
-  crossHairVertexShaderRequest.open('GET', "/shader/crosshair/vertexShader.shader");
-  crossHairFragmentShaderRequest.open('GET', "/shader/crosshair/fragmentShader.shader");
-  basicMaterialVertexShaderRequest.open('GET', "/shader/materials/basic_material/vertexShader.shader");
-  basicMaterialFragmentShaderRequest.open('GET', "/shader/materials/basic_material/fragmentShader.shader");
-  mergedBasicMaterialVertexShaderRequest.open('GET', "/shader/materials/merged_basic_material/vertexShader.shader");
-  mergedBasicMaterialFragmentShaderRequest.open('GET', "/shader/materials/merged_basic_material/fragmentShader.shader");
-  instancedBasicMaterialVertexShaderRequest.open('GET', "/shader/materials/instanced_basic_material/vertexShader.shader");
-  instancedBasicMaterialFragmentShaderRequest.open('GET', "/shader/materials/instanced_basic_material/fragmentShader.shader");
+  particleVertexShaderRequest.open('GET', "/ROYGBIV/shader/particle/vertexShader.shader");
+  particleFragmentShaderRequest.open('GET', "/ROYGBIV/shader/particle/fragmentShader.shader");
+  objectTrailVertexShaderRequest.open('GET', "/ROYGBIV/shader/object_trail/vertexShader.shader");
+  objectTrailFragmentShaderRequest.open('GET', "/ROYGBIV/shader/object_trail/fragmentShader.shader");
+  crossHairVertexShaderRequest.open('GET', "/ROYGBIV/shader/crosshair/vertexShader.shader");
+  crossHairFragmentShaderRequest.open('GET', "/ROYGBIV/shader/crosshair/fragmentShader.shader");
+  basicMaterialVertexShaderRequest.open('GET', "/ROYGBIV/shader/materials/basic_material/vertexShader.shader");
+  basicMaterialFragmentShaderRequest.open('GET', "/ROYGBIV/shader/materials/basic_material/fragmentShader.shader");
+  mergedBasicMaterialVertexShaderRequest.open('GET', "/ROYGBIV/shader/materials/merged_basic_material/vertexShader.shader");
+  mergedBasicMaterialFragmentShaderRequest.open('GET', "/ROYGBIV/shader/materials/merged_basic_material/fragmentShader.shader");
+  instancedBasicMaterialVertexShaderRequest.open('GET', "/ROYGBIV/shader/materials/instanced_basic_material/vertexShader.shader");
+  instancedBasicMaterialFragmentShaderRequest.open('GET', "/ROYGBIV/shader/materials/instanced_basic_material/fragmentShader.shader");
 
   var that = this;
   particleVertexShaderRequest.addEventListener("load", function(){
