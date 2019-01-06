@@ -17,10 +17,15 @@ var ShaderContent = function(){
     this.currentLoadCount = 0;
 
     this.allShadersReadyCallback = function(){
-      canvas.style.visibility = "";
-      terminal.enable();
-      terminal.clear();
-      terminal.print("Type help for list of commands.");
+      if (!isDeployment){
+        canvas.style.visibility = "";
+        terminal.enable();
+        terminal.clear();
+        terminal.print("Type help for list of commands.");
+      }else{
+        terminal.printInfo("Shaders loaded.");
+        startDeployment();
+      }
     }
 
     this.load();

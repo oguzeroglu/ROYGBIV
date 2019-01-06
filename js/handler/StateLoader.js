@@ -928,7 +928,7 @@ StateLoader.prototype.load = function(undo){
       }else{
         scripts[scriptName].runAutomatically = false;
       }
-      if (curScriptExport.localFilePath){
+      if (curScriptExport.localFilePath && !isDeployment){
         modeSwitcher.totalScriptsToLoad ++;
         scripts[scriptName].localFilePath = curScriptExport.localFilePath;
       }
@@ -1257,9 +1257,16 @@ StateLoader.prototype.createObjectGroupsAfterLoadedTextures = function(){
   projectLoaded = true;
   rayCaster.refresh();
   canvas.style.visibility = "";
-  terminal.enable();
-  terminal.clear();
-  terminal.printInfo(Text.PROJECT_LOADED);
+  if (!isDeployment){
+    terminal.enable();
+    terminal.clear();
+    terminal.printInfo(Text.PROJECT_LOADED);
+  }else{
+    terminal.disable();
+    terminalDiv.style.display = "none";
+    cliDivheader.style.display = "none";
+    modeSwitcher.switchMode();
+  }
 }
 
 StateLoader.prototype.mapTextureToSingleObject = function(diff, exported){

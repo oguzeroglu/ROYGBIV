@@ -66,23 +66,31 @@ Terminal.prototype.printError = function(text){
 }
 
 Terminal.prototype.printInfo = function(text, noNewLine){
+	var colorText = "yellow";
 	if (!noNewLine){
-		this.print(text, {color: "yellow"});
+		this.print(text, {color: colorText});
 	}else{
-		this.print(text, {color: "yellow", noNewLine: true});
+		this.print(text, {color: colorText, noNewLine: true});
 	}
 }
 
 Terminal.prototype.handleAboutCommand = function(){
+	if (isDeployment){
+		this.print("Powered by", {color: "lime", noNewLine: true});
+	}
 	this.print(Text.BANNERL1, {color: "lime", noNewLine: true});
 	this.print(Text.BANNERL2, {color: "lime", noNewLine: true});
 	this.print(Text.BANNERL3, {color: "lime", noNewLine: true});
 	this.print(Text.BANNERL4, {color: "lime", noNewLine: true});
 	this.print(Text.BANNERL5, {color: "lime", noNewLine: false});
-	terminal.printHeader(Text.VERSION);
-	terminal.printInfo(Text.TREE.replace(Text.PARAM1, ROYGBIV_ENGINE_VERSION));
-	terminal.printHeader(Text.CODER);
-	terminal.printInfo(Text.TREE.replace(Text.PARAM1, "Oğuz Eroğlu - github.com/oguzeroglu"));
+	if (!isDeployment){
+		terminal.printHeader(Text.VERSION);
+		terminal.printInfo(Text.TREE.replace(Text.PARAM1, ROYGBIV_ENGINE_VERSION));
+		terminal.printHeader(Text.CODER);
+		terminal.printInfo(Text.TREE.replace(Text.PARAM1, "Oğuz Eroğlu - github.com/oguzeroglu"));
+	}else{
+		this.print("by Oğuz Eroğlu - github.com/oguzeroglu", {color: "lime", noNewLine: false});
+	}
 }
 
 Terminal.prototype.print = function(text, options){

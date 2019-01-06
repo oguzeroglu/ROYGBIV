@@ -1,6 +1,7 @@
 window.onload = function() {
   // DRAGABLE CLI
   var cliDiv = document.getElementById("cliDiv");
+  var cliDivheader = document.getElementById("cliDivheader");
   var terminalDiv = document.getElementById("terminalDiv");
   scriptCreatorDiv = document.getElementById("scriptCreatorDiv");
   scriptCreatorCancelButton = document.getElementById("scriptCreatorCancelButton");
@@ -1244,6 +1245,34 @@ function rescale(canvas, scale){
   var resizedContext = resizedCanvas.getContext("2d");
   resizedContext.drawImage(canvas, 0, 0, canvas.width, canvas.height, 0, 0, resizedCanvas.width, resizedCanvas.height);
   return resizedCanvas;
+}
+
+// DEPLOYMENT
+function startDeployment(){
+  terminal.clear();
+  terminal.handleAboutCommand();
+  $.getJSON("js/application.json").done(function(data){
+    terminal.printInfo("Initializing.");
+    var stateLoader = new StateLoader(data);
+    var result = stateLoader.load();
+    if (result){
+      if (stateLoader.hasTextures || stateLoader.hasTexturePacks){
+        terminal.printInfo("Loading textures.");
+      }else{
+        terminal.disable();
+        terminalDiv.style.display = "none";
+        cliDivheader.style.display = "none";
+        modeSwitcher.switchMode();
+      }
+    }else{
+      terminal.printError(Text.PROJECT_FAILED_TO_LOAD.replace(
+        Text.PARAM1, stateLoader.reason
+      ));
+    }
+  }).fail(function(jqxhr, textStatus, error){
+    terminal.printError("Application cannot be loaded.");
+  });
+  terminal.printInfo("Loading application.");
 }
 
 //******************************************************************
