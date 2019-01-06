@@ -138,7 +138,7 @@ function readEngineScripts(){
   for (var i = 0; i<htmlContentSplitted.length; i++){
     if (htmlContentSplitted[i].includes("<script")){
       var scriptPath = extractFirstText(htmlContentSplitted[i]);
-      var scriptContent = fs.readFileSync(__dirname + scriptPath, "utf8");
+      var scriptContent = fs.readFileSync(scriptPath, "utf8");
       if (scriptPath.includes("globalVariables.js")){
         scriptContent = scriptContent.replace("var isDeployment = false;", "var isDeployment = true;");
         console.log("[*] isDeployment flag injected into globalVariables.");
