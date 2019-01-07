@@ -5,7 +5,7 @@ var Terminal = function(){
 		prompt: "ROYGBIV> ",
 		wrap: true,
 		keydown: function(e){
-			if (e.keyCode == 9){
+			if (e.keyCode == 9 && !isDeployment){
 				try{
 					var command = this.jqueryContext.get_command();
 					this.autocomplete(command);
@@ -24,8 +24,19 @@ Terminal.prototype.init = function(){
 	var options = this.options;
 	this.jqueryContext.terminal(
 		function(userInput){
-			this.clear();
-			parseCommand(userInput);
+			if (isDeployment){
+				if (terminalTextInputCallbackFunction){
+					terminalTextInputCallbackFunction(userInput);
+				}
+			}else{
+				if (!terminalTextInputCallbackFunction || userInput == "switchView"){
+					this.clear();
+				}
+				parseCommand(userInput);
+				if (terminalTextInputCallbackFunction){
+					terminalTextInputCallbackFunction(userInput);
+				}
+			}
 		}, options
 	);
 	this.setStyle();
@@ -40,11 +51,13 @@ Terminal.prototype.init = function(){
 Terminal.prototype.enable = function(){
 	this.prompt.style.visibility = "";
 	this.cursor.style.visibility = "";
+	this.isDisabled = false;
 }
 
 Terminal.prototype.disable = function(){
 	this.prompt.style.visibility = "hidden";
 	this.cursor.style.visibility = "hidden";
+	this.isDisabled = true;
 }
 
 Terminal.prototype.setStyle = function(){
@@ -74,8 +87,15 @@ Terminal.prototype.printInfo = function(text, noNewLine){
 	}
 }
 
+Terminal.prototype.printFromScript = function(text, color){
+	var colorText = color;
+	this.print(text, {color: colorText, noNewLine: true});
+}
+
 Terminal.prototype.handleAboutCommand = function(){
 	if (isDeployment){
+		this.printInfo("Project name: "+projectName);
+		this.printInfo("Author: "+author);
 		this.print("Powered by", {color: "lime", noNewLine: true});
 	}
 	this.print(Text.BANNERL1, {color: "lime", noNewLine: true});

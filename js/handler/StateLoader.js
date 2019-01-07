@@ -1274,7 +1274,6 @@ StateLoader.prototype.createObjectGroupsAfterLoadedTextures = function(){
   }else{
     terminal.disable();
     terminalDiv.style.display = "none";
-    cliDivheader.style.display = "none";
     modeSwitcher.switchMode();
   }
 }
@@ -2393,6 +2392,7 @@ StateLoader.prototype.resetProject = function(undo){
   screenMouseMoveCallbackFunction = 0;
   screenPointerLockChangedCallbackFunction = 0;
   screenFullScreenChangeCallbackFunction = 0;
+  terminalTextInputCallbackFunction = 0;
 
   boundingClientRect = renderer.domElement.getBoundingClientRect();
   pointerLockRequested = false;

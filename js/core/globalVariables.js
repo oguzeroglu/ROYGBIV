@@ -606,7 +606,8 @@ var keyboardInfo = [
   "Z/C: Rotates the camera around axis Z.",
   "Backspace: Destroys selected object.",
   ". : Shows corner coordinates of selected grids.",
-  "SHIFT: Activates grid selection mode."
+  "SHIFT: Activates grid selection mode.",
+  "TE: Opens the ROYGBIV terminal if closed."
 ];
 
 var deprecatedCommandIndices = [
@@ -951,9 +952,12 @@ var screenMouseUpCallbackFunction = 0;
 var screenMouseMoveCallbackFunction = 0;
 var screenPointerLockChangedCallbackFunction = 0;
 var screenFullScreenChangeCallbackFunction = 0;
+var terminalTextInputCallbackFunction = 0;
 var defaultCameraControlsDisabled = false;
 var modeSwitcher;
 var isMouseDown = false;
+var projectName = "@@1";
+var author = "@@2";
 var isDeployment = false;
 var loadedScriptsCounter = 0;
 var isMobile = /Mobi|Android/i.test(navigator.userAgent);

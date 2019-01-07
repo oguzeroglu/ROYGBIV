@@ -154,7 +154,13 @@ var Roygbiv = function(){
     "createInitializedParticleSystemPool",
     "intersectionTest",
     "getEndPoint",
-    "isMobile"
+    "isMobile",
+    "terminal",
+    "terminalPrompt",
+    "printToTerminal",
+    "clearTerminal",
+    "setTextInputCallbackFunction",
+    "removeTextInputCallbackFunction"
   ];
 
   this.globals = new Object();
@@ -6587,6 +6593,33 @@ Roygbiv.prototype.removeFullScreenChangeCallbackFunction = function(){
   screenFullScreenChangeCallbackFunction = 0;
 }
 
+// setTextInputCallbackFunction
+// Sets a callback function for ROYGBIV terminal text input. The callbackFunction
+// is executed with the text parameter.
+Roygbiv.prototype.setTextInputCallbackFunction = function(callbackFunction){
+  if (mode == 0){
+    return;
+  }
+  if (typeof callbackFunction == UNDEFINED){
+    throw new Error("setTextInputCallbackFunction error: callbackFunction is not defined.");
+    return;
+  }
+  if (!(callbackFunction instanceof Function)){
+    throw new Error("setTextInputCallbackFunction error: callbackFunction is not a function.");
+    return;
+  }
+  terminalTextInputCallbackFunction = callbackFunction;
+}
+
+// removeTextInputCallbackFunction
+// Removes the callback function for ROYGBIV terminal text input.
+Roygbiv.prototype.removeTextInputCallbackFunction = function(){
+  if (mode == 0){
+    return;
+  }
+  terminalTextInputCallbackFunction = 0;
+}
+
 // UTILITY FUNCTIONS ***********************************************************
 
 // vector
@@ -7532,4 +7565,81 @@ Roygbiv.prototype.isMobile = function(){
     return;
   }
   return isMobile;
+}
+
+// terminal
+// Shows or hides the ROYGBIV terminal.
+Roygbiv.prototype.terminal = function(isVisible){
+  if (mode == 0){
+    return;
+  }
+  if (typeof isVisible == UNDEFINED){
+    throw new Error("terminal error: isVisible is not defined.");
+    return;
+  }
+  if (!(typeof isVisible == "boolean")){
+    throw new Error("terminal error: isVisible is not a boolean.");
+    return;
+  }
+  if (isVisible){
+    terminal.enable();
+    terminalDiv.style.display = "";
+    if (!isDeployment){
+      cliDivheader.style.display = "";
+    }
+  }else{
+    terminal.disable();
+    terminalDiv.style.display = "none";
+    if (!isDeployment){
+      cliDivheader.style.display = "none";
+    }
+  }
+}
+
+// terminalPrompt
+// Enables or disables the prompt of the terminal. Does nothing if the terminal
+// is already enabled/disabled.
+Roygbiv.prototype.terminalPrompt = function(isEnabled){
+  if (mode == 0){
+    return;
+  }
+  if (typeof isEnabled == UNDEFINED){
+    throw new Error("terminalPrompt error: isEnabled is not defined.");
+    return;
+  }
+  if (!(typeof isEnabled == "boolean")){
+    throw new Error("terminalPrompt error: isEnabled is not a boolean.");
+    return;
+  }
+  if (isEnabled && terminal.isDisabled){
+    terminal.enable();
+  }else if (!isEnabled && !terminal.isDisabled){
+    terminal.disable();
+  }
+}
+
+// printToTerminal
+// Prints a text to the ROYGBIV terminal.
+Roygbiv.prototype.printToTerminal = function(text, colorName){
+  if (mode == 0){
+    return;
+  }
+  if (typeof text == UNDEFINED){
+    throw new Error("printToTerminal error: text is not defined.");
+    return;
+  }
+  if (typeof colorName == UNDEFINED){
+    throw new Error("printToTerminal error: colorName is not defined.");
+    return;
+  }
+  terminal.printFromScript(text, colorName);
+}
+
+// clearTerminal
+// Clears the ROYGBIV terminal.
+Roygbiv.prototype.clearTerminal = function(){
+  if (mode == 0){
+    return;
+  }
+  terminal.clear();
 }

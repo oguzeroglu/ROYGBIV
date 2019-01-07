@@ -35,7 +35,7 @@ app.post("/build", function(req, res){
       res.send(JSON.stringify({ "error": "A project with the same name alreay exists under deploy folder."}));
       return;
     }
-    var engineScriptsConcatted = readEngineScripts(JSON.stringify(req.body));
+    var engineScriptsConcatted = readEngineScripts(req.body.projectName, req.body.author);
     fs.writeFileSync("deploy/"+req.body.projectName+"/js/roygbiv.js", engineScriptsConcatted);
     fs.writeFileSync("deploy/"+req.body.projectName+"/js/application.json", JSON.stringify(req.body));
     copyAssets(req.body);
@@ -56,10 +56,6 @@ function copyAssets(application){
   var htmlContent = fs.readFileSync("template/application.html", "utf8");
   htmlContent = htmlContent.replace(
     "@@1", application.projectName
-  ).replace(
-    "@@2", application.projectName
-  ).replace(
-    "@@3", application.author
   );
   fs.writeFileSync("deploy/"+application.projectName+"/application.html", htmlContent);
   var readmeContent = fs.readFileSync("template/README", "utf8");
@@ -131,7 +127,7 @@ function generateDeployDirectory(projectName, application){
   return true;
 }
 
-function readEngineScripts(){
+function readEngineScripts(projectName, author){
   var content = "";
   var htmlContent = fs.readFileSync("roygbiv.html", "utf8");
   var htmlContentSplitted = htmlContent.split("\n");
@@ -141,6 +137,8 @@ function readEngineScripts(){
       var scriptContent = fs.readFileSync(scriptPath, "utf8");
       if (scriptPath.includes("globalVariables.js")){
         scriptContent = scriptContent.replace("var isDeployment = false;", "var isDeployment = true;");
+        scriptContent = scriptContent.replace("var projectName = \"@@1\"", "var projectName = \""+projectName+"\"");
+        scriptContent = scriptContent.replace("var author = \"@@2\"", "var author = \""+author+"\"");
         console.log("[*] isDeployment flag injected into globalVariables.");
       }
       content += scriptContent +"\n";

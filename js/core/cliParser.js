@@ -1,6 +1,6 @@
 function parseCommand(userInput){
   var result = parse(userInput);
-  if (!result){
+  if (!result && !(mode == 1 && terminalTextInputCallbackFunction)){
     terminal.printError(Text.COMMAND_NOT_FOUND);
   }
   afterObjectSelection();

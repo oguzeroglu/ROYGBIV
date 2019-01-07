@@ -686,6 +686,14 @@ window.addEventListener('keydown', function(event){
     keyboardBuffer[keyCodeToChar[event.keyCode]] = true;
   }
 
+  if (mode == 1 && !isDeployment && keyboardBuffer["E"] && keyboardBuffer["T"] && (terminalDiv.style.display == "none" || terminal.isDisabled)){
+    terminal.enable();
+    terminalDiv.style.display = "";
+    if (!isDeployment){
+      cliDivheader.style.display = "";
+    }
+  }
+
   switch(event.keyCode){
     case 16: //SHIFT
       if (mode == 0){
@@ -1256,13 +1264,11 @@ function startDeployment(){
     var stateLoader = new StateLoader(data);
     var result = stateLoader.load();
     if (result){
-      if (stateLoader.hasTextures || stateLoader.hasTexturePacks){
+      if (stateLoader.hasTextures || stateLoader.hasTexturePacks || stateLoader.hasSkyboxes){
         terminal.printInfo("Loading textures.");
       }else{
         terminal.disable();
         terminalDiv.style.display = "none";
-        cliDivheader.style.display = "none";
-        modeSwitcher.switchMode();
       }
     }else{
       terminal.printError(Text.PROJECT_FAILED_TO_LOAD.replace(
