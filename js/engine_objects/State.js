@@ -112,7 +112,9 @@ var State = function(projectName, author){
   this.mappedSkyboxName = mappedSkyboxName;
   this.skyboxVisible = skyboxVisible;
   var skyBoxExport = new Object();
+  this.totalSkyboxCount = 0;
   for (var skyBoxName in skyBoxes){
+    this.totalSkyboxCount ++;
     skyBoxExport[skyBoxName] = skyBoxes[skyBoxName].export();
   }
   this.skyBoxes = skyBoxExport;

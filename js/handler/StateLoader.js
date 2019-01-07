@@ -3,6 +3,7 @@ var StateLoader = function(stateObj){
   this.reason = "";
   this.totalLoadedTextureCount = 0;
   this.totalLoadedTexturePackCount = 0;
+  this.totalLoadedSkyboxCount = 0;
 }
 
 StateLoader.prototype.load = function(undo){
@@ -835,14 +836,20 @@ StateLoader.prototype.load = function(undo){
     var skyboxExports = obj.skyBoxes;
     skyboxVisible = obj.skyboxVisible;
     mappedSkyboxName = obj.mappedSkyboxName;
+    var that = this;
     for (var skyboxName in skyboxExports){
+      this.hasSkyboxes = true;
       var skyboxExport = skyboxExports[skyboxName];
       var skybox;
       if (!mappedSkyboxName){
         skybox = new SkyBox(
           skyboxExport.name,
           skyboxExport.directoryName,
-          skyboxExport.fileExtension
+          skyboxExport.fileExtension,
+          function(){
+            that.totalLoadedSkyboxCount ++;
+            that.createObjectGroupsAfterLoadedTextures();
+          }
         );
       }else{
         skybox = new SkyBox(
@@ -850,6 +857,7 @@ StateLoader.prototype.load = function(undo){
           skyboxExport.directoryName,
           skyboxExport.fileExtension,
           function(){
+            that.totalLoadedSkyboxCount ++;
             if (this.skyboxName == mappedSkyboxName){
               var skybox = skyBoxes[this.skyboxName];
               var materialArray = [];
@@ -885,6 +893,7 @@ StateLoader.prototype.load = function(undo){
                 skyboxMesh.scale.z = this.skyBoxScale;
               }
             }
+            that.createObjectGroupsAfterLoadedTextures();
           }.bind({skyboxName: skyboxName, skyBoxScale: skyBoxScale})
         );
       }
@@ -1120,7 +1129,7 @@ StateLoader.prototype.load = function(undo){
       }
     }
 
-    if (!this.hasTextures && !this.hasTexturePacks){
+    if (!this.hasTextures && !this.hasTexturePacks && !this.hasSkyboxes){
       this.createObjectGroupsAfterLoadedTextures();
     }
 
@@ -1136,7 +1145,8 @@ StateLoader.prototype.load = function(undo){
 StateLoader.prototype.createObjectGroupsAfterLoadedTextures = function(){
   var obj = this.stateObj;
   if (parseInt(this.totalLoadedTextureCount) < parseInt(obj.totalTextureCount) ||
-           parseInt(this.totalLoadedTexturePackCount) < parseInt(obj.totalTexturePackCount)){
+           parseInt(this.totalLoadedTexturePackCount) < parseInt(obj.totalTexturePackCount) ||
+                parseInt(this.totalLoadedSkyboxCount) < parseInt(obj.totalSkyboxCount)){
       return;
   }
 

@@ -2380,7 +2380,7 @@ function parse(input){
                   var stateLoader = new StateLoader(loadedState);
                   var result = stateLoader.load();
                   if (result){
-                    if (stateLoader.hasTextures || stateLoader.hasTexturePacks){
+                    if (stateLoader.hasTextures || stateLoader.hasTexturePacks || stateLoader.hasSkyboxes){
                       terminal.printInfo(Text.LOADING_PROJECT);
                       canvas.style.visibility = "hidden";
                       terminal.disable();
