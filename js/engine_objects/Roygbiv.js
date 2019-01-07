@@ -153,7 +153,8 @@ var Roygbiv = function(){
     "isMouseDown",
     "createInitializedParticleSystemPool",
     "intersectionTest",
-    "getEndPoint"
+    "getEndPoint",
+    "isMobile"
   ];
 
   this.globals = new Object();
@@ -7522,4 +7523,13 @@ Roygbiv.prototype.intersectionTest = function(fromVector, directionVector, targe
     targetResultObject.z = 0;
     targetResultObject.objectName = null;
   }
+}
+
+// isMobile
+// Returns if the current client is a mobile client.
+Roygbiv.prototype.isMobile = function(){
+  if (mode == 0){
+    return;
+  }
+  return isMobile;
 }
