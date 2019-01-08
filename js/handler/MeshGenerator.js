@@ -237,3 +237,26 @@ MeshGenerator.prototype.generateBasicMesh = function(){
   material.uniforms.modelViewMatrix.value = mesh.modelViewMatrix;
   return mesh;
 }
+
+MeshGenerator.prototype.generateSkybox = function(skybox){
+  var material = new THREE.RawShaderMaterial({
+    vertexShader: ShaderContent.skyboxVertexShader,
+    fragmentShader: ShaderContent.skyboxFragmentShader,
+    vertexColors: THREE.VertexColors,
+    transparent: false,
+    side: THREE.DoubleSide,
+    uniforms: {
+      projectionMatrix: GLOBAL_PROJECTION_UNIFORM,
+      modelViewMatrix: new THREE.Uniform(new THREE.Matrix4()),
+      rightTexture: this.getTextureUniform(skybox.rightTexture),
+      leftTexture: this.getTextureUniform(skybox.leftTexture),
+      topTexture: this.getTextureUniform(skybox.upTexture),
+      bottomTexture: this.getTextureUniform(skybox.downTexture),
+      behindTexture: this.getTextureUniform(skybox.backTexture),
+      frontTexture: this.getTextureUniform(skybox.frontTexture)
+    }
+  });
+  var mesh = new THREE.Mesh(this.geometry, material);
+  material.uniforms.modelViewMatrix.value = mesh.modelViewMatrix;
+  return mesh;
+}

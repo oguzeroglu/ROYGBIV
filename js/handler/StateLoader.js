@@ -860,30 +860,24 @@ StateLoader.prototype.load = function(undo){
             that.totalLoadedSkyboxCount ++;
             if (this.skyboxName == mappedSkyboxName){
               var skybox = skyBoxes[this.skyboxName];
-              var materialArray = [];
-              var skyboxTextures = [
-                skybox.leftTexture,
-                skybox.rightTexture,
-                skybox.upTexture,
-                skybox.downTexture,
-                skybox.frontTexture,
-                skybox.backTexture
-              ];
-              for (var i = 0; i<skyboxTextures.length; i++){
-                materialArray.push(new THREE.MeshBasicMaterial(
-                  {
-                    map: skyboxTextures[i],
-                    side: THREE.BackSide
-                  }
-                ));
-              }
               if (skyboxMesh){
                 scene.remove(skyboxMesh);
+              }else{
+                var skyboxBufferGeometry = new THREE.BoxBufferGeometry(skyboxDistance, skyboxDistance, skyboxDistance);
+                var faceIndices = new Float32Array(72);
+                var mi = 1;
+                var y = 0;
+                for (var i = 0; i<72; i+= 12){
+                  for (var i2 = 0; i2<12; i2 ++){
+                    faceIndices[y++] = mi;
+                  }
+                  mi += 15;
+                }
+                var materialIndicesBufferAttribute = new THREE.BufferAttribute(faceIndices, 3);
+                materialIndicesBufferAttribute.setDynamic(false);
+                skyboxBufferGeometry.addAttribute("materialIndex", materialIndicesBufferAttribute);
+                skyboxMesh = new MeshGenerator(skyboxBufferGeometry, null).generateSkybox(skybox);
               }
-              var skyGeometry = new THREE.CubeGeometry(
-                skyboxDistance, skyboxDistance, skyboxDistance
-              );
-              skyboxMesh = new THREE.Mesh( skyGeometry, materialArray );
               if (skyboxVisible){
                 scene.add(skyboxMesh);
               }

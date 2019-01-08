@@ -12,8 +12,10 @@ var ShaderContent = function(){
     this.mergedBasicMaterialFragmentShader = 0;
     this.instancedBasicMaterialVertexShader = 0;
     this.instancedBasicMaterialFragmentShader = 0;
+    this.skyboxVertexShader = 0;
+    this.skyboxFragmentShader = 0;
 
-    this.totalLoadCount = 12;
+    this.totalLoadCount = 14;
     this.currentLoadCount = 0;
 
     this.allShadersReadyCallback = function(){
@@ -45,6 +47,8 @@ ShaderContent.prototype.load = function(){
   var mergedBasicMaterialFragmentShaderRequest = new XMLHttpRequest();
   var instancedBasicMaterialVertexShaderRequest = new XMLHttpRequest();
   var instancedBasicMaterialFragmentShaderRequest = new XMLHttpRequest();
+  var skyboxVertexShaderRequest = new XMLHttpRequest();
+  var skyboxFragmentShaderRequest = new XMLHttpRequest();
 
   particleVertexShaderRequest.open('GET', "./shader/particle/vertexShader.shader");
   particleFragmentShaderRequest.open('GET', "./shader/particle/fragmentShader.shader");
@@ -58,6 +62,8 @@ ShaderContent.prototype.load = function(){
   mergedBasicMaterialFragmentShaderRequest.open('GET', "./shader/materials/merged_basic_material/fragmentShader.shader");
   instancedBasicMaterialVertexShaderRequest.open('GET', "./shader/materials/instanced_basic_material/vertexShader.shader");
   instancedBasicMaterialFragmentShaderRequest.open('GET', "./shader/materials/instanced_basic_material/fragmentShader.shader");
+  skyboxVertexShaderRequest.open('GET', "./shader/skybox/vertexShader.shader");
+  skyboxFragmentShaderRequest.open('GET', "./shader/skybox/fragmentShader.shader");
   var that = this;
   particleVertexShaderRequest.addEventListener("load", function(){
     that.particleVertexShader = particleVertexShaderRequest.responseText;
@@ -143,6 +149,20 @@ ShaderContent.prototype.load = function(){
       that.allShadersReadyCallback();
     }
   });
+  skyboxVertexShaderRequest.addEventListener("load", function(){
+    that.skyboxVertexShader = skyboxVertexShaderRequest.responseText;
+    that.currentLoadCount ++;
+    if (that.currentLoadCount == that.totalLoadCount){
+      that.allShadersReadyCallback();
+    }
+  });
+  skyboxFragmentShaderRequest.addEventListener("load", function(){
+    that.skyboxFragmentShader = skyboxFragmentShaderRequest.responseText;
+    that.currentLoadCount ++;
+    if (that.currentLoadCount == that.totalLoadCount){
+      that.allShadersReadyCallback();
+    }
+  });
 
   particleVertexShaderRequest.send();
   particleFragmentShaderRequest.send();
@@ -156,5 +176,7 @@ ShaderContent.prototype.load = function(){
   mergedBasicMaterialFragmentShaderRequest.send();
   instancedBasicMaterialVertexShaderRequest.send();
   instancedBasicMaterialFragmentShaderRequest.send();
+  skyboxVertexShaderRequest.send();
+  skyboxFragmentShaderRequest.send();
 
 }
