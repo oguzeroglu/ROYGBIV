@@ -171,7 +171,9 @@ ModeSwitcher.prototype.switchFromDesignToPreview = function(){
     GLOBAL_FOG_UNIFORM.value.set(-100.0, 0, 0, 0);
   }
   ROYGBIV.globals = new Object();
-  $(datGuiObjectManipulation.domElement).attr("hidden", true);
+  if (!isDeployment){
+    $(datGuiObjectManipulation.domElement).attr("hidden", true);
+  }
   terminal.printInfo(Text.SWITCHED_TO_PREVIEW_MODE);
   $("#cliDivheader").text("ROYGBIV 3D Engine - CLI (Preview mode)");
   mode = 1;
@@ -181,8 +183,10 @@ ModeSwitcher.prototype.switchFromDesignToPreview = function(){
 
 ModeSwitcher.prototype.switchFromPreviewToDesign = function(){
   mode = 0;
-  $(datGui.domElement).attr("hidden", true);
-  $(datGuiObjectManipulation.domElement).attr("hidden", true);
+  if (!isDeployment){
+    $(datGui.domElement).attr("hidden", true);
+    $(datGuiObjectManipulation.domElement).attr("hidden", true);
+  }
   terminal.printInfo(Text.SWITCHED_TO_DESIGN_MODE);
   $("#cliDivheader").text("ROYGBIV 3D Engine - CLI (Design mode)");
   if (LOG_FRAME_DROP_ON){

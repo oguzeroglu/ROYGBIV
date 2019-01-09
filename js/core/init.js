@@ -71,344 +71,378 @@ window.onload = function() {
   // MODE SWITCHER
   modeSwitcher = new ModeSwitcher();
 
-  // DAT GUI SKYBOX
-  datGuiSkybox = new dat.GUI();
-  skyboxNameController = datGuiSkybox.add(skyboxParameters, "Name").listen();
-  disableController(skyboxNameController, true);
-  skyboxAlphaController = datGuiSkybox.add(skyboxParameters, "Alpha").min(0).max(1).step(0.01).onChange(function(val){
-    skyboxMesh.material.uniforms.alpha.value = val;
-    skyBoxes[mappedSkyboxName].alpha = val;
-  }).listen();
-  skyboxColorController = datGuiSkybox.addColor(skyboxParameters, "Color").onChange(function(val){
-    skyboxMesh.material.uniforms.color.value.set(val);
-    skyBoxes[mappedSkyboxName].color = val;
-  }).listen();
+  if (!isDeployment){
+    // DAT GUI SKYBOX
+    datGuiSkybox = new dat.GUI();
+    skyboxNameController = datGuiSkybox.add(skyboxParameters, "Name").listen();
+    disableController(skyboxNameController, true);
+    skyboxAlphaController = datGuiSkybox.add(skyboxParameters, "Alpha").min(0).max(1).step(0.01).onChange(function(val){
+      skyboxMesh.material.uniforms.alpha.value = val;
+      skyBoxes[mappedSkyboxName].alpha = val;
+    }).listen();
+    skyboxColorController = datGuiSkybox.addColor(skyboxParameters, "Color").onChange(function(val){
+      skyboxMesh.material.uniforms.color.value.set(val);
+      skyBoxes[mappedSkyboxName].color = val;
+    }).listen();
+    // DAT GUI LIGHTS
+    datGuiLights = new dat.GUI();
+    lightNameController = datGuiLights.add(lightsParameters, "Light").listen();
+    disableController(lightNameController, true);
+    lightsOffsetXController = datGuiLights.add(lightsParameters, "Offset x").min(-50).max(50).step(0.1).onChange(function(val){
+      var pl = lights[selectedLightName];
+      var plRep = pointLightRepresentations[selectedLightName];
+      pl.position.x = pl.initialPositionX + val;
+      plRep.position.x = pl.position.x;
+    }).onFinishChange(function(val){
 
+    }).listen();
+    lightsOffsetYController = datGuiLights.add(lightsParameters, "Offset y").min(-50).max(50).step(0.1).onChange(function(val){
+      var pl = lights[selectedLightName];
+      var plRep = pointLightRepresentations[selectedLightName];
+      pl.position.y = pl.initialPositionY + val;
+      plRep.position.y = pl.position.y;
+    }).onFinishChange(function(val){
 
-  // DAT GUI LIGHTS
-  datGuiLights = new dat.GUI();
-  lightNameController = datGuiLights.add(lightsParameters, "Light").listen();
-  disableController(lightNameController, true);
-  lightsOffsetXController = datGuiLights.add(lightsParameters, "Offset x").min(-50).max(50).step(0.1).onChange(function(val){
-    var pl = lights[selectedLightName];
-    var plRep = pointLightRepresentations[selectedLightName];
-    pl.position.x = pl.initialPositionX + val;
-    plRep.position.x = pl.position.x;
-  }).onFinishChange(function(val){
+    }).listen();
+    lightsOffsetZController = datGuiLights.add(lightsParameters, "Offset z").min(-50).max(50).step(0.1).onChange(function(val){
+      var pl = lights[selectedLightName];
+      var plRep = pointLightRepresentations[selectedLightName];
+      pl.position.z = pl.initialPositionZ + val;
+      plRep.position.z = pl.position.z;
+    }).onFinishChange(function(val){
 
-  }).listen();
-  lightsOffsetYController = datGuiLights.add(lightsParameters, "Offset y").min(-50).max(50).step(0.1).onChange(function(val){
-    var pl = lights[selectedLightName];
-    var plRep = pointLightRepresentations[selectedLightName];
-    pl.position.y = pl.initialPositionY + val;
-    plRep.position.y = pl.position.y;
-  }).onFinishChange(function(val){
+    }).listen();
+    lightsIntensityController = datGuiLights.add(lightsParameters, "Intensity").min(0.0).max(1.0).step(0.01).onChange(function(val){
+      var light = lights[selectedLightName];
+      light.intensity = val;
+    }).onFinishChange(function(val){
 
-  }).listen();
-  lightsOffsetZController = datGuiLights.add(lightsParameters, "Offset z").min(-50).max(50).step(0.1).onChange(function(val){
-    var pl = lights[selectedLightName];
-    var plRep = pointLightRepresentations[selectedLightName];
-    pl.position.z = pl.initialPositionZ + val;
-    plRep.position.z = pl.position.z;
-  }).onFinishChange(function(val){
-
-  }).listen();
-  lightsIntensityController = datGuiLights.add(lightsParameters, "Intensity").min(0.0).max(1.0).step(0.01).onChange(function(val){
-    var light = lights[selectedLightName];
-    light.intensity = val;
-  }).onFinishChange(function(val){
-
-  }).listen();
-
-  // DAT GUI OBJECT MANIPULATION
-  datGuiObjectManipulation = new dat.GUI();
-  omObjController = datGuiObjectManipulation.add(objectManipulationParameters, "Object").listen();
-  disableController(omObjController, true);
-  omRotationXController = datGuiObjectManipulation.add(objectManipulationParameters, "Rotate x").onChange(function(val){
-    omGUIRotateEvent("x", val);
-  });
-  omRotationYController = datGuiObjectManipulation.add(objectManipulationParameters, "Rotate y").onChange(function(val){
-    omGUIRotateEvent("y", val);
-  });
-  omRotationZController = datGuiObjectManipulation.add(objectManipulationParameters, "Rotate z").onChange(function(val){
-    omGUIRotateEvent("z", val);
-  });
-  omMassController = datGuiObjectManipulation.add(objectManipulationParameters, "Mass").onChange(function(val){
-    var obj = selectedAddedObject;
-    if (!obj){
-      obj = selectedObjectGroup;
-    }
-    terminal.clear();
-    parseCommand("setMass "+obj.name+" "+val);
-  });
-  omSlipperyController = datGuiObjectManipulation.add(objectManipulationParameters, "Slippery").onChange(function(val){
-    var obj = selectedAddedObject;
-    if (!obj){
-      obj = selectedObjectGroup;
-    }
-    terminal.clear();
-    if (val){
-      parseCommand("setSlipperiness "+obj.name+" on");
-    }else{
-      parseCommand("setSlipperiness "+obj.name+" off");
-    }
-  }).listen();
-  omChangeableController = datGuiObjectManipulation.add(objectManipulationParameters, "Changeable").onChange(function(val){
-    var obj = selectedAddedObject;
-    if (!obj){
-      obj = selectedObjectGroup;
-    }
-    terminal.clear();
-    obj.isChangeable = val;
-    if (obj.isChangeable){
-      terminal.printInfo(Text.OBJECT_MARKED_AS.replace(Text.PARAM1, "changeable"));
-    }else{
-      terminal.printInfo(Text.OBJECT_MARKED_AS.replace(Text.PARAM1, "unchangeable"));
-    }
-  }).listen();
-  omHasMassController = datGuiObjectManipulation.add(objectManipulationParameters, "Has mass").onChange(function(val){
-    var obj = selectedAddedObject;
-    if (!obj){
-      obj = selectedObjectGroup;
-      if (obj.cannotSetMass){
-        objectManipulationParameters["Has mass"] = false;
-        return;
+    }).listen();
+    // DAT GUI OBJECT MANIPULATION
+    datGuiObjectManipulation = new dat.GUI();
+    omObjController = datGuiObjectManipulation.add(objectManipulationParameters, "Object").listen();
+    disableController(omObjController, true);
+    omRotationXController = datGuiObjectManipulation.add(objectManipulationParameters, "Rotate x").onChange(function(val){
+      omGUIRotateEvent("x", val);
+    });
+    omRotationYController = datGuiObjectManipulation.add(objectManipulationParameters, "Rotate y").onChange(function(val){
+      omGUIRotateEvent("y", val);
+    });
+    omRotationZController = datGuiObjectManipulation.add(objectManipulationParameters, "Rotate z").onChange(function(val){
+      omGUIRotateEvent("z", val);
+    });
+    omMassController = datGuiObjectManipulation.add(objectManipulationParameters, "Mass").onChange(function(val){
+      var obj = selectedAddedObject;
+      if (!obj){
+        obj = selectedObjectGroup;
       }
-    }
-    terminal.clear();
-    obj.noMass = !val;
-    if (val){
-      physicsWorld.add(obj.physicsBody);
-      enableController(omMassController);
-      terminal.printInfo(Text.PHYSICS_ENABLED);
-    }else{
-      physicsWorld.remove(obj.physicsBody);
-      disableController(omMassController);
-      terminal.printInfo(Text.PHYSICS_DISABLED);
-    }
-    omMassController.updateDisplay();
-  }).listen();
-  omSideController = datGuiObjectManipulation.add(objectManipulationParameters, "Side", [
-    "Both", "Front", "Back"
-  ]).onChange(function(val){
-    var pseudoVal = 0;
-    if (val == "Front"){
-      pseudoVal = 1;
-    }else if (val == "Back"){
-      pseudoVal = 2;
-    }
-    if (selectedAddedObject){
-      selectedAddedObject.handleRenderSide(pseudoVal);
-    }else if (selectedObjectGroup){
-      selectedObjectGroup.handleRenderSide(pseudoVal);
-    }
-  }).listen();
-  omHideHalfController = datGuiObjectManipulation.add(objectManipulationParameters, "Hide half", [
-    "None", "Part 1", "Part 2", "Part 3", "Part 4"
-  ]).onChange(function(val){
-    if (val == "None"){
-      selectedAddedObject.sliceInHalf(4);
-    }else if (val == "Part 1"){
-      selectedAddedObject.sliceInHalf(0);
-    }else if (val == "Part 2"){
-      selectedAddedObject.sliceInHalf(1);
-    }else if (val == "Part 3"){
-      selectedAddedObject.sliceInHalf(2);
-    }else if (val == "Part 4"){
-      selectedAddedObject.sliceInHalf(3);
-    }
-  }).listen();
-  omBlendingController = datGuiObjectManipulation.add(objectManipulationParameters, "Blending", [
-    "None", "Normal", "Additive", "Subtractive", "Multiply"
-  ]).onChange(function(val){
-    var obj = selectedAddedObject;
-    if (!obj){
-      obj = selectedObjectGroup;
-    }
-    if (obj instanceof AddedObject){
-      enableController(omOpacityController);
-    }
-    if (val == "None"){
-      obj.setBlending(NO_BLENDING);
+      terminal.clear();
+      parseCommand("setMass "+obj.name+" "+val);
+    });
+    omSlipperyController = datGuiObjectManipulation.add(objectManipulationParameters, "Slippery").onChange(function(val){
+      var obj = selectedAddedObject;
+      if (!obj){
+        obj = selectedObjectGroup;
+      }
+      terminal.clear();
+      if (val){
+        parseCommand("setSlipperiness "+obj.name+" on");
+      }else{
+        parseCommand("setSlipperiness "+obj.name+" off");
+      }
+    }).listen();
+    omChangeableController = datGuiObjectManipulation.add(objectManipulationParameters, "Changeable").onChange(function(val){
+      var obj = selectedAddedObject;
+      if (!obj){
+        obj = selectedObjectGroup;
+      }
+      terminal.clear();
+      obj.isChangeable = val;
+      if (obj.isChangeable){
+        terminal.printInfo(Text.OBJECT_MARKED_AS.replace(Text.PARAM1, "changeable"));
+      }else{
+        terminal.printInfo(Text.OBJECT_MARKED_AS.replace(Text.PARAM1, "unchangeable"));
+      }
+    }).listen();
+    omHasMassController = datGuiObjectManipulation.add(objectManipulationParameters, "Has mass").onChange(function(val){
+      var obj = selectedAddedObject;
+      if (!obj){
+        obj = selectedObjectGroup;
+        if (obj.cannotSetMass){
+          objectManipulationParameters["Has mass"] = false;
+          return;
+        }
+      }
+      terminal.clear();
+      obj.noMass = !val;
+      if (val){
+        physicsWorld.add(obj.physicsBody);
+        enableController(omMassController);
+        terminal.printInfo(Text.PHYSICS_ENABLED);
+      }else{
+        physicsWorld.remove(obj.physicsBody);
+        disableController(omMassController);
+        terminal.printInfo(Text.PHYSICS_DISABLED);
+      }
+      omMassController.updateDisplay();
+    }).listen();
+    omSideController = datGuiObjectManipulation.add(objectManipulationParameters, "Side", [
+      "Both", "Front", "Back"
+    ]).onChange(function(val){
+      var pseudoVal = 0;
+      if (val == "Front"){
+        pseudoVal = 1;
+      }else if (val == "Back"){
+        pseudoVal = 2;
+      }
+      if (selectedAddedObject){
+        selectedAddedObject.handleRenderSide(pseudoVal);
+      }else if (selectedObjectGroup){
+        selectedObjectGroup.handleRenderSide(pseudoVal);
+      }
+    }).listen();
+    omHideHalfController = datGuiObjectManipulation.add(objectManipulationParameters, "Hide half", [
+      "None", "Part 1", "Part 2", "Part 3", "Part 4"
+    ]).onChange(function(val){
+      if (val == "None"){
+        selectedAddedObject.sliceInHalf(4);
+      }else if (val == "Part 1"){
+        selectedAddedObject.sliceInHalf(0);
+      }else if (val == "Part 2"){
+        selectedAddedObject.sliceInHalf(1);
+      }else if (val == "Part 3"){
+        selectedAddedObject.sliceInHalf(2);
+      }else if (val == "Part 4"){
+        selectedAddedObject.sliceInHalf(3);
+      }
+    }).listen();
+    omBlendingController = datGuiObjectManipulation.add(objectManipulationParameters, "Blending", [
+      "None", "Normal", "Additive", "Subtractive", "Multiply"
+    ]).onChange(function(val){
+      var obj = selectedAddedObject;
+      if (!obj){
+        obj = selectedObjectGroup;
+      }
       if (obj instanceof AddedObject){
-        disableController(omOpacityController);
+        enableController(omOpacityController);
       }
-    }else if (val == "Normal"){
-      obj.setBlending(NORMAL_BLENDING);
-    }else if (val == "Additive"){
-      obj.setBlending(ADDITIVE_BLENDING);
-    }else if (val == "Subtractive"){
-      obj.setBlending(SUBTRACTIVE_BLENDING);
-    }else if (val == "Multiply"){
-      obj.setBlending(MULTIPLY_BLENDING);
-    }
-  }).listen();
-  omTextureOffsetXController = datGuiObjectManipulation.add(objectManipulationParameters, "Texture offset x").min(-2).max(2).step(0.001).onChange(function(val){
-    var texture = selectedAddedObject.mesh.material.uniforms.diffuseMap.value;
-    texture.offset.x = val;
-    texture.initOffsetXSet = false;
-    texture.updateMatrix();
-  }).onFinishChange(function(value){
-
-  }).listen();
-  omTextureOffsetYController = datGuiObjectManipulation.add(objectManipulationParameters, "Texture offset y").min(-2).max(2).step(0.001).onChange(function(val){
-    var texture = selectedAddedObject.mesh.material.uniforms.diffuseMap.value;
-    texture.offset.y = val;
-    texture.initOffsetYSet = false;
-    texture.updateMatrix();
-  }).onFinishChange(function(value){
-
-  }).listen();
-  omOpacityController = datGuiObjectManipulation.add(objectManipulationParameters, "Opacity").min(0).max(1).step(0.01).onChange(function(val){
-    if (selectedObjectGroup && !selectedAddedObject){
-      for (var childObjName in selectedObjectGroup.group){
-        var childObj = selectedObjectGroup.group[childObjName];
-        childObj.material.transparent = true;
-        childObj.material.opacity = val;
-        childObj.initOpacitySet = false;
-        childObj.initOpacity = childObj.opacity;
+      if (val == "None"){
+        obj.setBlending(NO_BLENDING);
+        if (obj instanceof AddedObject){
+          disableController(omOpacityController);
+        }
+      }else if (val == "Normal"){
+        obj.setBlending(NORMAL_BLENDING);
+      }else if (val == "Additive"){
+        obj.setBlending(ADDITIVE_BLENDING);
+      }else if (val == "Subtractive"){
+        obj.setBlending(SUBTRACTIVE_BLENDING);
+      }else if (val == "Multiply"){
+        obj.setBlending(MULTIPLY_BLENDING);
       }
-      return;
-    }else if (selectedAddedObject){
-      selectedAddedObject.updateOpacity(val);
-      selectedAddedObject.initOpacitySet = false;
-      selectedAddedObject.initOpacity = selectedAddedObject.opacity;
+    }).listen();
+    omTextureOffsetXController = datGuiObjectManipulation.add(objectManipulationParameters, "Texture offset x").min(-2).max(2).step(0.001).onChange(function(val){
+      var texture = selectedAddedObject.mesh.material.uniforms.diffuseMap.value;
+      texture.offset.x = val;
+      texture.initOffsetXSet = false;
+      texture.updateMatrix();
+    }).onFinishChange(function(value){
+
+    }).listen();
+    omTextureOffsetYController = datGuiObjectManipulation.add(objectManipulationParameters, "Texture offset y").min(-2).max(2).step(0.001).onChange(function(val){
+      var texture = selectedAddedObject.mesh.material.uniforms.diffuseMap.value;
+      texture.offset.y = val;
+      texture.initOffsetYSet = false;
+      texture.updateMatrix();
+    }).onFinishChange(function(value){
+
+    }).listen();
+    omOpacityController = datGuiObjectManipulation.add(objectManipulationParameters, "Opacity").min(0).max(1).step(0.01).onChange(function(val){
+      if (selectedObjectGroup && !selectedAddedObject){
+        for (var childObjName in selectedObjectGroup.group){
+          var childObj = selectedObjectGroup.group[childObjName];
+          childObj.material.transparent = true;
+          childObj.material.opacity = val;
+          childObj.initOpacitySet = false;
+          childObj.initOpacity = childObj.opacity;
+        }
+        return;
+      }else if (selectedAddedObject){
+        selectedAddedObject.updateOpacity(val);
+        selectedAddedObject.initOpacitySet = false;
+        selectedAddedObject.initOpacity = selectedAddedObject.opacity;
+      }
+    }).onFinishChange(function(value){
+
+    }).listen();
+    omAOIntensityController = datGuiObjectManipulation.add(objectManipulationParameters, "AO intensity").min(0).max(10).step(0.1).onChange(function(val){
+      selectedAddedObject.mesh.material.uniforms.aoIntensity = new THREE.Uniform(val);
+    }).onFinishChange(function(value){
+
+    }).listen();
+    omShininessController = datGuiObjectManipulation.add(objectManipulationParameters, "Shininess").min(0).max(100).step(0.01).onChange(function(val){
+      var material = selectedAddedObject.material;
+      if (material.isMeshPhongMaterial){
+        material.shininess = val;
+        material.needsUpdate = true;
+        selectedAddedObject.initShininessSet = false;
+      }
+    }).onFinishChange(function(value){
+
+    }).listen();
+    omEmissiveIntensityController = datGuiObjectManipulation.add(objectManipulationParameters, "Emissive int.").min(0).max(100).step(0.01).onChange(function(val){
+      var material = selectedAddedObject.mesh.material;
+      material.uniforms.emissiveIntensity.value = val;
+      selectedAddedObject.initEmissiveIntensitySet = false;
+      selectedAddedObject.initEmissiveIntensity = val;
+    }).onFinishChange(function(value){
+
+    }).listen();
+    omDisplacementScaleController = datGuiObjectManipulation.add(objectManipulationParameters, "Disp. scale").min(-50).max(50).step(0.1).onChange(function(val){
+      selectedAddedObject.mesh.material.uniforms.displacementInfo.value.x = val;
+      selectedAddedObject.initDisplacementScaleSet = false;
+    }).onFinishChange(function(value){
+
+    }).listen();
+    omDisplacementBiasController = datGuiObjectManipulation.add(objectManipulationParameters, "Disp. bias").min(-50).max(50).step(0.1).onChange(function(val){
+      selectedAddedObject.mesh.material.uniforms.displacementInfo.value.y = val;
+      selectedAddedObject.initDisplacementBiasSet = false;
+    }).onFinishChange(function(value){
+
+    }).listen();
+
+    function omGUIRotateEvent(axis, val){
+      var obj = selectedAddedObject;
+      if (!obj){
+        obj = selectedObjectGroup;
+      }
+      terminal.clear();
+      parseCommand("rotateObject "+obj.name+" "+axis+" "+val);
+      if (axis == "x"){
+        objectManipulationParameters["Rotate x"] = 0;
+        omRotationXController.updateDisplay();
+      }else if (axis == "y"){
+        objectManipulationParameters["Rotate y"] = 0;
+        omRotationYController.updateDisplay();
+      }else if (axis == "z"){
+        objectManipulationParameters["Rotate z"] = 0;
+        omRotationZController.updateDisplay();
+      }
     }
-  }).onFinishChange(function(value){
+    datGuiObjectManipulation.domElement.addEventListener("mousedown", function(e){
+      omGUIFocused = true;
+      lightsGUIFocused = false;
+    });
+    datGuiLights.domElement.addEventListener("mousedown", function(e){
+      lightsGUIFocused = true;
+      omGUIFocused = false;
+    });
 
-  }).listen();
-  omAOIntensityController = datGuiObjectManipulation.add(objectManipulationParameters, "AO intensity").min(0).max(10).step(0.1).onChange(function(val){
-    selectedAddedObject.mesh.material.uniforms.aoIntensity = new THREE.Uniform(val);
-  }).onFinishChange(function(value){
-
-  }).listen();
-  omShininessController = datGuiObjectManipulation.add(objectManipulationParameters, "Shininess").min(0).max(100).step(0.01).onChange(function(val){
-    var material = selectedAddedObject.material;
-    if (material.isMeshPhongMaterial){
-      material.shininess = val;
-      material.needsUpdate = true;
-      selectedAddedObject.initShininessSet = false;
+    // DAT GUI
+    datGui = new dat.GUI();
+    datGui.add(postprocessingParameters, "Scanlines_count").min(0).max(1000).step(1).onChange(function(val){
+      adjustPostProcessing(0, val);
+    });
+    datGui.add(postprocessingParameters, "Scanlines_sIntensity").min(0.0).max(2.0).step(0.1).onChange(function(val){
+      adjustPostProcessing(1, val);
+    });
+    datGui.add(postprocessingParameters, "Scanlines_nIntensity").min(0.0).max(2.0).step(0.1).onChange(function(val){
+      adjustPostProcessing(2, val);
+    });
+    datGui.add(postprocessingParameters, "Static_amount").min(0.0).max(1.0).step(0.01).onChange(function(val){
+      adjustPostProcessing(3, val);
+    });
+    datGui.add(postprocessingParameters, "Static_size").min(0.0).max(100.0).step(1.0).onChange(function(val){
+      adjustPostProcessing(4, val);
+    });
+    datGui.add(postprocessingParameters, "RGBShift_amount").min(0.0).max(0.1).step(0.01).onChange(function(val){
+      adjustPostProcessing(5, val);
+    });
+    datGui.add(postprocessingParameters, "RGBShift_angle").min(0.0).max(2.0).step(0.1).onChange(function(val){
+      adjustPostProcessing(6, val);
+    });
+    datGui.add(postprocessingParameters, "BadTV_thickDistort").min(0.1).max(20).step(0.1).onChange(function(val){
+      adjustPostProcessing(7, val);
+    });
+    datGui.add(postprocessingParameters, "BadTV_fineDistort").min(0.1).max(20).step(0.1).onChange(function(val){
+      adjustPostProcessing(8, val);
+    });
+    datGui.add(postprocessingParameters, "BadTV_distortSpeed").min(0.0).max(1.0).step(0.01).onChange(function(val){
+      adjustPostProcessing(9, val);
+    });
+    datGui.add(postprocessingParameters, "BadTV_rollSpeed").min(0.0).max(1.0).step(0.01).onChange(function(val){
+      adjustPostProcessing(10, val);
+    });
+    datGui.add(postprocessingParameters, "Bloom_strength").min(0.0).max(3.0).step(0.01).onChange(function(val){
+      adjustPostProcessing(11, val);
+    });
+    datGui.add(postprocessingParameters, "Bloom_radius").min(0.0).max(1.0).step(0.01).onChange(function(val){
+      adjustPostProcessing(12, val);
+    });
+    datGui.add(postprocessingParameters, "Bloom_threshhold").min(0.0).max(1.0).step(0.01).onChange(function(val){
+      adjustPostProcessing(13, val);
+    });
+    datGui.add(postprocessingParameters, "Bloom_resolution_scale").min(0.1).max(1.0).step(0.001).onChange(function(val){
+      adjustPostProcessing(19, val);
+    });
+    datGui.add(postprocessingParameters, "Scanlines").onChange(function(val){
+      adjustPostProcessing(14, val);
+    });
+    datGui.add(postprocessingParameters, "RGB").onChange(function(val){
+      adjustPostProcessing(15, val);
+    });
+    datGui.add(postprocessingParameters, "Bad TV").onChange(function(val){
+      adjustPostProcessing(16, val);
+    });
+    datGui.add(postprocessingParameters, "Bloom").onChange(function(val){
+      adjustPostProcessing(17, val);
+    });
+    datGui.add(postprocessingParameters, "Static").onChange(function(val){
+      adjustPostProcessing(18, val);
+    });
+    $(datGui.domElement).attr("hidden", true);
+    $(datGuiObjectManipulation.domElement).attr("hidden", true);
+    $(datGuiLights.domElement).attr("hidden", true);
+    $(datGuiSkybox.domElement).attr("hidden", true);
+    function disableController(controller, noOpacityAdjustment){
+      controller.domElement.style.pointerEvents = "none";
+      if (!noOpacityAdjustment){
+        controller.domElement.style.opacity = .5;
+      }
     }
-  }).onFinishChange(function(value){
 
-  }).listen();
-  omEmissiveIntensityController = datGuiObjectManipulation.add(objectManipulationParameters, "Emissive int.").min(0).max(100).step(0.01).onChange(function(val){
-    var material = selectedAddedObject.mesh.material;
-    material.uniforms.emissiveIntensity.value = val;
-    selectedAddedObject.initEmissiveIntensitySet = false;
-    selectedAddedObject.initEmissiveIntensity = val;
-  }).onFinishChange(function(value){
-
-  }).listen();
-  omDisplacementScaleController = datGuiObjectManipulation.add(objectManipulationParameters, "Disp. scale").min(-50).max(50).step(0.1).onChange(function(val){
-    selectedAddedObject.mesh.material.uniforms.displacementInfo.value.x = val;
-    selectedAddedObject.initDisplacementScaleSet = false;
-  }).onFinishChange(function(value){
-
-  }).listen();
-  omDisplacementBiasController = datGuiObjectManipulation.add(objectManipulationParameters, "Disp. bias").min(-50).max(50).step(0.1).onChange(function(val){
-    selectedAddedObject.mesh.material.uniforms.displacementInfo.value.y = val;
-    selectedAddedObject.initDisplacementBiasSet = false;
-  }).onFinishChange(function(value){
-
-  }).listen();
-
-  function omGUIRotateEvent(axis, val){
-    var obj = selectedAddedObject;
-    if (!obj){
-      obj = selectedObjectGroup;
+    function enableController(controller){
+      controller.domElement.style.pointerEvents = "";
+      controller.domElement.style.opacity = 1;
     }
-    terminal.clear();
-    parseCommand("rotateObject "+obj.name+" "+axis+" "+val);
-    if (axis == "x"){
-      objectManipulationParameters["Rotate x"] = 0;
-      omRotationXController.updateDisplay();
-    }else if (axis == "y"){
-      objectManipulationParameters["Rotate y"] = 0;
-      omRotationYController.updateDisplay();
-    }else if (axis == "z"){
-      objectManipulationParameters["Rotate z"] = 0;
-      omRotationZController.updateDisplay();
+
+    function enableAllLightsControllers(){
+      enableController(lightsOffsetXController);
+      enableController(lightsOffsetYController);
+      enableController(lightsOffsetZController);
+    }
+
+    function enableAllOMControllers(){
+      enableController(omRotationXController);
+      enableController(omRotationYController);
+      enableController(omRotationZController);
+      enableController(omMassController);
+      enableController(omSlipperyController);
+      enableController(omChangeableController);
+      enableController(omHasMassController);
+      enableController(omTextureOffsetXController);
+      enableController(omTextureOffsetYController);
+      enableController(omOpacityController);
+      enableController(omShininessController);
+      enableController(omEmissiveIntensityController);
+      enableController(omDisplacementScaleController);
+      enableController(omDisplacementBiasController);
+      enableController(omAOIntensityController);
+      enableController(omHideHalfController);
+      enableController(omBlendingController);
+      enableController(omSideController);
     }
   }
-
-  datGuiObjectManipulation.domElement.addEventListener("mousedown", function(e){
-    omGUIFocused = true;
-    lightsGUIFocused = false;
-  });
-
-  datGuiLights.domElement.addEventListener("mousedown", function(e){
-    lightsGUIFocused = true;
-    omGUIFocused = false;
-  });
-
-  // DAT GUI
-  datGui = new dat.GUI();
-  datGui.add(postprocessingParameters, "Scanlines_count").min(0).max(1000).step(1).onChange(function(val){
-    adjustPostProcessing(0, val);
-  });
-  datGui.add(postprocessingParameters, "Scanlines_sIntensity").min(0.0).max(2.0).step(0.1).onChange(function(val){
-    adjustPostProcessing(1, val);
-  });
-  datGui.add(postprocessingParameters, "Scanlines_nIntensity").min(0.0).max(2.0).step(0.1).onChange(function(val){
-    adjustPostProcessing(2, val);
-  });
-  datGui.add(postprocessingParameters, "Static_amount").min(0.0).max(1.0).step(0.01).onChange(function(val){
-    adjustPostProcessing(3, val);
-  });
-  datGui.add(postprocessingParameters, "Static_size").min(0.0).max(100.0).step(1.0).onChange(function(val){
-    adjustPostProcessing(4, val);
-  });
-  datGui.add(postprocessingParameters, "RGBShift_amount").min(0.0).max(0.1).step(0.01).onChange(function(val){
-    adjustPostProcessing(5, val);
-  });
-  datGui.add(postprocessingParameters, "RGBShift_angle").min(0.0).max(2.0).step(0.1).onChange(function(val){
-    adjustPostProcessing(6, val);
-  });
-  datGui.add(postprocessingParameters, "BadTV_thickDistort").min(0.1).max(20).step(0.1).onChange(function(val){
-    adjustPostProcessing(7, val);
-  });
-  datGui.add(postprocessingParameters, "BadTV_fineDistort").min(0.1).max(20).step(0.1).onChange(function(val){
-    adjustPostProcessing(8, val);
-  });
-  datGui.add(postprocessingParameters, "BadTV_distortSpeed").min(0.0).max(1.0).step(0.01).onChange(function(val){
-    adjustPostProcessing(9, val);
-  });
-  datGui.add(postprocessingParameters, "BadTV_rollSpeed").min(0.0).max(1.0).step(0.01).onChange(function(val){
-    adjustPostProcessing(10, val);
-  });
-  datGui.add(postprocessingParameters, "Bloom_strength").min(0.0).max(3.0).step(0.01).onChange(function(val){
-    adjustPostProcessing(11, val);
-  });
-  datGui.add(postprocessingParameters, "Bloom_radius").min(0.0).max(1.0).step(0.01).onChange(function(val){
-    adjustPostProcessing(12, val);
-  });
-  datGui.add(postprocessingParameters, "Bloom_threshhold").min(0.0).max(1.0).step(0.01).onChange(function(val){
-    adjustPostProcessing(13, val);
-  });
-  datGui.add(postprocessingParameters, "Bloom_resolution_scale").min(0.1).max(1.0).step(0.001).onChange(function(val){
-    adjustPostProcessing(19, val);
-  });
-  datGui.add(postprocessingParameters, "Scanlines").onChange(function(val){
-    adjustPostProcessing(14, val);
-  });
-  datGui.add(postprocessingParameters, "RGB").onChange(function(val){
-    adjustPostProcessing(15, val);
-  });
-  datGui.add(postprocessingParameters, "Bad TV").onChange(function(val){
-    adjustPostProcessing(16, val);
-  });
-  datGui.add(postprocessingParameters, "Bloom").onChange(function(val){
-    adjustPostProcessing(17, val);
-  });
-  datGui.add(postprocessingParameters, "Static").onChange(function(val){
-    adjustPostProcessing(18, val);
-  });
-
-  $(datGui.domElement).attr("hidden", true);
-  $(datGuiObjectManipulation.domElement).attr("hidden", true);
-  $(datGuiLights.domElement).attr("hidden", true);
-  $(datGuiSkybox.domElement).attr("hidden", true);
 
   // IMAGE UPLOADER
   imageUploaderInput = $("#imageUploaderInput");
@@ -991,45 +1025,6 @@ function isCollisionWorkerEnabled(){
 function isPSCollisionWorkerEnabled(){
   return false;
   //return (WORKERS_SUPPORTED && PS_COLLISION_WORKER_ENABLED);
-}
-
-function disableController(controller, noOpacityAdjustment){
-  controller.domElement.style.pointerEvents = "none";
-  if (!noOpacityAdjustment){
-    controller.domElement.style.opacity = .5;
-  }
-}
-
-function enableController(controller){
-  controller.domElement.style.pointerEvents = "";
-  controller.domElement.style.opacity = 1;
-}
-
-function enableAllLightsControllers(){
-  enableController(lightsOffsetXController);
-  enableController(lightsOffsetYController);
-  enableController(lightsOffsetZController);
-}
-
-function enableAllOMControllers(){
-  enableController(omRotationXController);
-  enableController(omRotationYController);
-  enableController(omRotationZController);
-  enableController(omMassController);
-  enableController(omSlipperyController);
-  enableController(omChangeableController);
-  enableController(omHasMassController);
-  enableController(omTextureOffsetXController);
-  enableController(omTextureOffsetYController);
-  enableController(omOpacityController);
-  enableController(omShininessController);
-  enableController(omEmissiveIntensityController);
-  enableController(omDisplacementScaleController);
-  enableController(omDisplacementBiasController);
-  enableController(omAOIntensityController);
-  enableController(omHideHalfController);
-  enableController(omBlendingController);
-  enableController(omSideController);
 }
 
 function afterLightSelection(){
