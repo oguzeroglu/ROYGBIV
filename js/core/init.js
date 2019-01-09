@@ -311,24 +311,6 @@ window.onload = function() {
 
     }).listen();
 
-    function omGUIRotateEvent(axis, val){
-      var obj = selectedAddedObject;
-      if (!obj){
-        obj = selectedObjectGroup;
-      }
-      terminal.clear();
-      parseCommand("rotateObject "+obj.name+" "+axis+" "+val);
-      if (axis == "x"){
-        objectManipulationParameters["Rotate x"] = 0;
-        omRotationXController.updateDisplay();
-      }else if (axis == "y"){
-        objectManipulationParameters["Rotate y"] = 0;
-        omRotationYController.updateDisplay();
-      }else if (axis == "z"){
-        objectManipulationParameters["Rotate z"] = 0;
-        omRotationZController.updateDisplay();
-      }
-    }
     datGuiObjectManipulation.domElement.addEventListener("mousedown", function(e){
       omGUIFocused = true;
       lightsGUIFocused = false;
@@ -404,44 +386,6 @@ window.onload = function() {
     $(datGuiObjectManipulation.domElement).attr("hidden", true);
     $(datGuiLights.domElement).attr("hidden", true);
     $(datGuiSkybox.domElement).attr("hidden", true);
-    function disableController(controller, noOpacityAdjustment){
-      controller.domElement.style.pointerEvents = "none";
-      if (!noOpacityAdjustment){
-        controller.domElement.style.opacity = .5;
-      }
-    }
-
-    function enableController(controller){
-      controller.domElement.style.pointerEvents = "";
-      controller.domElement.style.opacity = 1;
-    }
-
-    function enableAllLightsControllers(){
-      enableController(lightsOffsetXController);
-      enableController(lightsOffsetYController);
-      enableController(lightsOffsetZController);
-    }
-
-    function enableAllOMControllers(){
-      enableController(omRotationXController);
-      enableController(omRotationYController);
-      enableController(omRotationZController);
-      enableController(omMassController);
-      enableController(omSlipperyController);
-      enableController(omChangeableController);
-      enableController(omHasMassController);
-      enableController(omTextureOffsetXController);
-      enableController(omTextureOffsetYController);
-      enableController(omOpacityController);
-      enableController(omShininessController);
-      enableController(omEmissiveIntensityController);
-      enableController(omDisplacementScaleController);
-      enableController(omDisplacementBiasController);
-      enableController(omAOIntensityController);
-      enableController(omHideHalfController);
-      enableController(omBlendingController);
-      enableController(omSideController);
-    }
   }
 
   // IMAGE UPLOADER
@@ -1010,6 +954,64 @@ window.addEventListener('keyup', function(event){
    composer.addPass( copyPass );
 	 copyPass.renderToScreen = true;
    setBadTVParams();
+ }
+
+ function omGUIRotateEvent(axis, val){
+   var obj = selectedAddedObject;
+   if (!obj){
+     obj = selectedObjectGroup;
+   }
+   terminal.clear();
+   parseCommand("rotateObject "+obj.name+" "+axis+" "+val);
+   if (axis == "x"){
+     objectManipulationParameters["Rotate x"] = 0;
+     omRotationXController.updateDisplay();
+   }else if (axis == "y"){
+     objectManipulationParameters["Rotate y"] = 0;
+     omRotationYController.updateDisplay();
+   }else if (axis == "z"){
+     objectManipulationParameters["Rotate z"] = 0;
+     omRotationZController.updateDisplay();
+   }
+ }
+
+ function disableController(controller, noOpacityAdjustment){
+   controller.domElement.style.pointerEvents = "none";
+   if (!noOpacityAdjustment){
+     controller.domElement.style.opacity = .5;
+   }
+ }
+
+ function enableController(controller){
+   controller.domElement.style.pointerEvents = "";
+   controller.domElement.style.opacity = 1;
+ }
+
+ function enableAllLightsControllers(){
+   enableController(lightsOffsetXController);
+   enableController(lightsOffsetYController);
+   enableController(lightsOffsetZController);
+ }
+
+ function enableAllOMControllers(){
+   enableController(omRotationXController);
+   enableController(omRotationYController);
+   enableController(omRotationZController);
+   enableController(omMassController);
+   enableController(omSlipperyController);
+   enableController(omChangeableController);
+   enableController(omHasMassController);
+   enableController(omTextureOffsetXController);
+   enableController(omTextureOffsetYController);
+   enableController(omOpacityController);
+   enableController(omShininessController);
+   enableController(omEmissiveIntensityController);
+   enableController(omDisplacementScaleController);
+   enableController(omDisplacementBiasController);
+   enableController(omAOIntensityController);
+   enableController(omHideHalfController);
+   enableController(omBlendingController);
+   enableController(omSideController);
  }
 
 function isPhysicsWorkerEnabled(){

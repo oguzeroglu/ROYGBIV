@@ -248,12 +248,7 @@ MeshGenerator.prototype.generateSkybox = function(skybox){
     uniforms: {
       projectionMatrix: GLOBAL_PROJECTION_UNIFORM,
       modelViewMatrix: new THREE.Uniform(new THREE.Matrix4()),
-      rightTexture: this.getTextureUniform(skybox.rightTexture),
-      leftTexture: this.getTextureUniform(skybox.leftTexture),
-      topTexture: this.getTextureUniform(skybox.upTexture),
-      bottomTexture: this.getTextureUniform(skybox.downTexture),
-      behindTexture: this.getTextureUniform(skybox.backTexture),
-      frontTexture: this.getTextureUniform(skybox.frontTexture),
+      cubeTexture: new THREE.Uniform(skybox.cubeTexture),
       color: new THREE.Uniform(new THREE.Color("white")),
       alpha: new THREE.Uniform(1.0)
     }

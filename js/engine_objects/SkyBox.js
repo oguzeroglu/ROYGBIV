@@ -179,8 +179,16 @@ SkyBox.prototype.isUsable = function(){
 }
 
 SkyBox.prototype.callbackCheck = function(){
-  if (this.isUsable() && this.callback){
-    this.callback();
+  if (this.isUsable()){
+    this.cubeTexture = new THREE.CubeTexture([
+      this.rightTexture.image, this.leftTexture.image,
+      this.upTexture.image, this.downTexture.image,
+      this.frontTexture.image, this.backTexture.image
+    ]);
+    this.cubeTexture.needsUpdate = true;
+    if (this.callback){
+      this.callback();
+    }
   }
 }
 

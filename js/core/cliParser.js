@@ -2221,28 +2221,20 @@ function parse(input){
             return true;
           }
           if (!skyboxMesh){
-            var skyboxBufferGeometry = new THREE.BoxBufferGeometry(skyboxDistance, skyboxDistance, skyboxDistance);
-            var faceIndices = new Float32Array(72);
-            var mi = 1;
-            var y = 0;
-            for (var i = 0; i<72; i+= 12){
-              for (var i2 = 0; i2<12; i2 ++){
-                faceIndices[y++] = mi;
-              }
-              mi += 15;
+            var geomKey = (
+              "BoxBufferGeometry" + PIPE +
+              skyboxDistance + PIPE + skyboxDistance + PIPE + skyboxDistance + PIPE +
+              "1" + PIPE + "1" + PIPE + "1"
+            );
+            var skyboxBufferGeometry = geometryCache[geomKey];
+            if (!skyboxBufferGeometry){
+              skyboxBufferGeometry = new THREE.BoxBufferGeometry(skyboxDistance, skyboxDistance, skyboxDistance);
+              geometryCache[geomKey] = skyboxBufferGeometry;
             }
-            var materialIndicesBufferAttribute = new THREE.BufferAttribute(faceIndices, 3);
-            materialIndicesBufferAttribute.setDynamic(false);
-            skyboxBufferGeometry.addAttribute("materialIndex", materialIndicesBufferAttribute);
             skyboxMesh = new MeshGenerator(skyboxBufferGeometry, null).generateSkybox(skybox);
           }else{
             var meshGenerator = new MeshGenerator();
-            skyboxMesh.material.uniforms.rightTexture = meshGenerator.getTextureUniform(skybox.rightTexture);
-            skyboxMesh.material.uniforms.leftTexture = meshGenerator.getTextureUniform(skybox.leftTexture);
-            skyboxMesh.material.uniforms.topTexture = meshGenerator.getTextureUniform(skybox.upTexture);
-            skyboxMesh.material.uniforms.bottomTexture = meshGenerator.getTextureUniform(skybox.downTexture);
-            skyboxMesh.material.uniforms.behindTexture = meshGenerator.getTextureUniform(skybox.backTexture);
-            skyboxMesh.material.uniforms.frontTexture = meshGenerator.getTextureUniform(skybox.frontTexture);
+            skyboxMesh.material.uniforms.cubeTexture.value = skybox.cubeTexture;
             skyboxMesh.material.uniforms.alpha.value = skybox.alpha;
             skyboxMesh.material.uniforms.color.value.set(skybox.color);
           }
