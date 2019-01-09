@@ -1,8 +1,6 @@
 precision lowp float;
 precision lowp int;
 
-#define LOG2 1.442695
-
 varying float vMaterialIndex;
 varying vec2 vUV;
 
