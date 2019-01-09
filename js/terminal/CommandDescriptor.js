@@ -655,6 +655,11 @@ var CommandDescriptor = function(){
   this.build.types.push(this.UNKNOWN_INDICATOR); // projectName
   this.build.types.push(this.UNKNOWN_INDICATOR); // author
 
+  // skyboxConfigurations
+  this.skyboxConfigurations = new Object();
+  this.skyboxConfigurations.types = [];
+  this.skyboxConfigurations.types.push(this.HIDE_SHOW); // hide/show
+
 };
 
 CommandDescriptor.prototype.test = function(){

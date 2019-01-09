@@ -846,6 +846,8 @@ StateLoader.prototype.load = function(undo){
           skyboxExport.name,
           skyboxExport.directoryName,
           skyboxExport.fileExtension,
+          skyboxExport.alpha,
+          skyboxExport.color,
           function(){
             that.totalLoadedSkyboxCount ++;
             that.createObjectGroupsAfterLoadedTextures();
@@ -856,6 +858,8 @@ StateLoader.prototype.load = function(undo){
           skyboxExport.name,
           skyboxExport.directoryName,
           skyboxExport.fileExtension,
+          skyboxExport.alpha,
+          skyboxExport.color,
           function(){
             that.totalLoadedSkyboxCount ++;
             if (this.skyboxName == mappedSkyboxName){
@@ -2379,6 +2383,7 @@ StateLoader.prototype.resetProject = function(undo){
   dynamicObjectGroups = new Object();
   trackingObjects = new Object();
   screenResolution = 1;
+  skyboxConfigurationsVisible = false;
   stopAreaConfigurationsHandler = false;
   screenClickCallbackFunction = 0;
   screenMouseDownCallbackFunction = 0;
@@ -2447,6 +2452,7 @@ StateLoader.prototype.resetProject = function(undo){
   initBadTV();
   $(datGui.domElement).attr("hidden", true);
   $(datGuiObjectManipulation.domElement).attr("hidden", true);
+  $(datGuiSkybox).attr("hidden", true);
   if (!isDeployment){
     $("#cliDivheader").text("ROYGBIV Scene Creator - CLI (Design mode)");
   }

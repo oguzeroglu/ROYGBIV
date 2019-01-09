@@ -243,7 +243,7 @@ MeshGenerator.prototype.generateSkybox = function(skybox){
     vertexShader: ShaderContent.skyboxVertexShader,
     fragmentShader: ShaderContent.skyboxFragmentShader,
     vertexColors: THREE.VertexColors,
-    transparent: false,
+    transparent: true,
     side: THREE.DoubleSide,
     uniforms: {
       projectionMatrix: GLOBAL_PROJECTION_UNIFORM,
@@ -253,7 +253,9 @@ MeshGenerator.prototype.generateSkybox = function(skybox){
       topTexture: this.getTextureUniform(skybox.upTexture),
       bottomTexture: this.getTextureUniform(skybox.downTexture),
       behindTexture: this.getTextureUniform(skybox.backTexture),
-      frontTexture: this.getTextureUniform(skybox.frontTexture)
+      frontTexture: this.getTextureUniform(skybox.frontTexture),
+      color: new THREE.Uniform(new THREE.Color("white")),
+      alpha: new THREE.Uniform(1.0)
     }
   });
   var mesh = new THREE.Mesh(this.geometry, material);

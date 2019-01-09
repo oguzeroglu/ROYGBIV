@@ -2166,11 +2166,7 @@ function parse(input){
             return true;
           }
 
-          var skyBox = new SkyBox(
-            name,
-            directoryName,
-            fileExtension
-          );
+          var skyBox = new SkyBox(name, directoryName, fileExtension, 1, "#ffffff");
           skyBoxes[name] = skyBox;
           if (!DDS_SUPPORTED && fileExtension.toUpperCase() == "DDS"){
             terminal.printInfo(Text.TEXTURE_CREATED_DDS_SUPPORT_ISSUE);
@@ -2247,10 +2243,17 @@ function parse(input){
             skyboxMesh.material.uniforms.bottomTexture = meshGenerator.getTextureUniform(skybox.downTexture);
             skyboxMesh.material.uniforms.behindTexture = meshGenerator.getTextureUniform(skybox.backTexture);
             skyboxMesh.material.uniforms.frontTexture = meshGenerator.getTextureUniform(skybox.frontTexture);
+            skyboxMesh.material.uniforms.alpha.value = skybox.alpha;
+            skyboxMesh.material.uniforms.color.value.set(skybox.color);
           }
           scene.add(skyboxMesh);
           skyboxVisible = true;
           mappedSkyboxName = name;
+          if (skyboxParameters){
+            skyboxParameters["Name"] = mappedSkyboxName;
+            skyboxParameters["Alpha"] = skyboxMesh.material.uniforms.alpha.value;
+            skyboxParameters["Color"] = "#" + skyboxMesh.material.uniforms.color.value.getHexString();
+          }
           terminal.printError(Text.SKYBOX_MAPPED);
           return true;
         break;
@@ -4725,6 +4728,36 @@ function parse(input){
             }
           }else{
             build(projectName, author);
+          }
+          return true;
+        break;
+        case 146: //skyboxConfigurations
+          var parameter = splitted[1].toLowerCase();
+          if (!mappedSkyboxName){
+            terminal.printError(Text.NO_SKYBOX_MAPPED);
+            return true;
+          }
+          if (parameter == "show"){
+            if (skyboxConfigurationsVisible){
+              terminal.printError(Text.GUI_IS_ALREADY_VISIBLE);
+              return true;
+            }
+            $(datGuiSkybox.domElement).attr("hidden", false);
+            skyboxConfigurationsVisible = true;
+            skyboxParameters["Name"] = mappedSkyboxName;
+            skyboxParameters["Alpha"] = skyboxMesh.material.uniforms.alpha.value;
+            skyboxParameters["Color"] = "#" + skyboxMesh.material.uniforms.color.value.getHexString();
+            terminal.printInfo(Text.GUI_OPENED);
+          }else if (parameter == "hide"){
+            if (!skyboxConfigurationsVisible){
+              terminal.printError(Text.GUI_IS_ALREADY_HIDDEN);
+              return true;
+            }
+            $(datGuiSkybox.domElement).attr("hidden", true);
+            skyboxConfigurationsVisible = false;
+            terminal.printInfo(Text.GUI_CLOSED);
+          }else{
+            terminal.printError(Text.STATUS_MUST_BE_ONE_OF);
           }
           return true;
         break;

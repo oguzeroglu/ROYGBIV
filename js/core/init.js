@@ -71,6 +71,20 @@ window.onload = function() {
   // MODE SWITCHER
   modeSwitcher = new ModeSwitcher();
 
+  // DAT GUI SKYBOX
+  datGuiSkybox = new dat.GUI();
+  skyboxNameController = datGuiSkybox.add(skyboxParameters, "Name").listen();
+  disableController(skyboxNameController, true);
+  skyboxAlphaController = datGuiSkybox.add(skyboxParameters, "Alpha").min(0).max(1).step(0.01).onChange(function(val){
+    skyboxMesh.material.uniforms.alpha.value = val;
+    skyBoxes[mappedSkyboxName].alpha = val;
+  }).listen();
+  skyboxColorController = datGuiSkybox.addColor(skyboxParameters, "Color").onChange(function(val){
+    skyboxMesh.material.uniforms.color.value.set(val);
+    skyBoxes[mappedSkyboxName].color = val;
+  }).listen();
+
+
   // DAT GUI LIGHTS
   datGuiLights = new dat.GUI();
   lightNameController = datGuiLights.add(lightsParameters, "Light").listen();
@@ -394,6 +408,7 @@ window.onload = function() {
   $(datGui.domElement).attr("hidden", true);
   $(datGuiObjectManipulation.domElement).attr("hidden", true);
   $(datGuiLights.domElement).attr("hidden", true);
+  $(datGuiSkybox.domElement).attr("hidden", true);
 
   // IMAGE UPLOADER
   imageUploaderInput = $("#imageUploaderInput");

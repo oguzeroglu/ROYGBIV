@@ -151,7 +151,8 @@ var commandArgumentsExpectedCount = [
     2, //printChildPosition
     1, //unsetRotationPivot
     6, //copyObject
-    2 //build
+    2, //build
+    1 //skyboxConfigurations
 ];
 var commandArgumentsExpectedExplanation = [
   "help", //help
@@ -299,7 +300,8 @@ var commandArgumentsExpectedExplanation = [
   "printChildPosition objectName childObjectName", //printChildPosition
   "unsetRotationPivot objectName", //unsetRotationPivot
   "copyObject sourceName targetName offsetX offsetY offsetZ isHardCopy", //copyObject
-  "build projectName author" //build
+  "build projectName author", //build
+  "skyboxConfigurations show/hide" //skyboxConfigurations
 ];
 var commands = [
   "help",
@@ -447,7 +449,8 @@ var commands = [
   "printChildPosition",
   "unsetRotationPivot",
   "copyObject",
-  "build"
+  "build",
+  "skyboxConfigurations"
 ];
 var commandInfo = [
   "help: Prints command list.",
@@ -595,7 +598,8 @@ var commandInfo = [
   "printChildPosition: Prints the world position of a child object of an object group.",
   "unsetRotationPivot: Unsets the rotation pivot point of an object set by using setRotationPivot command.",
   "copyObject: Creates a clone of an object.",
-  "build: Builds the project for release."
+  "build: Builds the project for release.",
+  "skyboxConfigurations: Shows/hide the skybox configuration GUI."
 ];
 var keyboardInfo = [
   "W/S : Translates the camera on axis Z.",
@@ -818,6 +822,7 @@ var skyboxDistance = 4000;
 var skyboxMesh;
 var skyboxPreviewMesh;
 var skyboxVisible = false;
+var skyboxConfigurationsVisible = false;
 var mappedSkyboxName = 0;
 var frameCounter = 0;
 var fps = 0;
@@ -983,6 +988,7 @@ var datGui;
 var datGuiObjectManipulation;
 var datGuiLights;
 var datGuiAreaConfigurations;
+var datGuiSkybox;
 var omGUIlastObjectName = "";
 
 var postprocessingParameters = {
@@ -1061,6 +1067,15 @@ var lightsParameters = {
   "Offset z": 0.0,
   "Intensity": 0.0
 };
+
+var skyboxNameController;
+var skyboxAlphaController;
+var skyboxColorController;
+var skyboxParameters = {
+  "Name": "skyboxName",
+  "Alpha": 0.0,
+  "Color": "#ffffff"
+}
 
 // KEYCODE TO STRING MAP
 keyCodeToChar = {
