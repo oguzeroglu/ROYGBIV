@@ -186,6 +186,8 @@ ModeSwitcher.prototype.switchFromPreviewToDesign = function(){
   if (!isDeployment){
     $(datGui.domElement).attr("hidden", true);
     $(datGuiObjectManipulation.domElement).attr("hidden", true);
+    $(datGuiFog.domElement).attr("hidden", true);
+    fogConfigurationsVisible = false;
   }
   terminal.printInfo(Text.SWITCHED_TO_DESIGN_MODE);
   $("#cliDivheader").text("ROYGBIV 3D Engine - CLI (Design mode)");

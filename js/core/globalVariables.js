@@ -152,7 +152,8 @@ var commandArgumentsExpectedCount = [
     1, //unsetRotationPivot
     6, //copyObject
     2, //build
-    1 //skyboxConfigurations
+    1, //skyboxConfigurations
+    1 //fogConfigurations
 ];
 var commandArgumentsExpectedExplanation = [
   "help", //help
@@ -301,7 +302,8 @@ var commandArgumentsExpectedExplanation = [
   "unsetRotationPivot objectName", //unsetRotationPivot
   "copyObject sourceName targetName offsetX offsetY offsetZ isHardCopy", //copyObject
   "build projectName author", //build
-  "skyboxConfigurations show/hide" //skyboxConfigurations
+  "skyboxConfigurations show/hide", //skyboxConfigurations
+  "fogConfigurations show/hide"
 ];
 var commands = [
   "help",
@@ -450,7 +452,8 @@ var commands = [
   "unsetRotationPivot",
   "copyObject",
   "build",
-  "skyboxConfigurations"
+  "skyboxConfigurations",
+  "fogConfigurations"
 ];
 var commandInfo = [
   "help: Prints command list.",
@@ -599,7 +602,8 @@ var commandInfo = [
   "unsetRotationPivot: Unsets the rotation pivot point of an object set by using setRotationPivot command.",
   "copyObject: Creates a clone of an object.",
   "build: Builds the project for release.",
-  "skyboxConfigurations: Shows/hide the skybox configuration GUI."
+  "skyboxConfigurations: Shows/hides the skybox configuration GUI.",
+  "fogConfigurations: Shows/hides the fog configuration GUI."
 ];
 var keyboardInfo = [
   "W/S : Translates the camera on axis Z.",
@@ -823,6 +827,7 @@ var skyboxMesh;
 var skyboxPreviewMesh;
 var skyboxVisible = false;
 var skyboxConfigurationsVisible = false;
+var fogConfigurationsVisible = false;
 var mappedSkyboxName = 0;
 var frameCounter = 0;
 var fps = 0;
@@ -989,6 +994,7 @@ var datGuiObjectManipulation;
 var datGuiLights;
 var datGuiAreaConfigurations;
 var datGuiSkybox;
+var datGuiFog;
 var omGUIlastObjectName = "";
 
 var postprocessingParameters = {
@@ -1075,7 +1081,14 @@ var skyboxParameters = {
   "Name": "skyboxName",
   "Alpha": 0.0,
   "Color": "#ffffff"
-}
+};
+
+var fogDensityController;
+var fogColorController;
+var fogParameters = {
+  "Density": 0.0,
+  "Color": "#ffffff"
+};
 
 // KEYCODE TO STRING MAP
 keyCodeToChar = {

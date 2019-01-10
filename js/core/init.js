@@ -72,6 +72,16 @@ window.onload = function() {
   modeSwitcher = new ModeSwitcher();
 
   if (!isDeployment){
+    // DAT GUI FOG
+    datGuiFog = new dat.GUI();
+    fogDensityController = datGuiFog.add(fogParameters, "Density").min(0).max(1).step(0.01).onChange(function(val){
+      fogDensity = val / 100;
+      GLOBAL_FOG_UNIFORM.value.set(fogDensity, fogColorRGB.r, fogColorRGB.g, fogColorRGB.b);
+    }).listen();
+    fogColorController = datGuiFog.addColor(fogParameters, "Color").onChange(function(val){
+      fogColorRGB.set(val);
+      GLOBAL_FOG_UNIFORM.value.set(fogDensity, fogColorRGB.r, fogColorRGB.g, fogColorRGB.b);
+    }).listen();
     // DAT GUI SKYBOX
     datGuiSkybox = new dat.GUI();
     skyboxNameController = datGuiSkybox.add(skyboxParameters, "Name").listen();
@@ -386,6 +396,7 @@ window.onload = function() {
     $(datGuiObjectManipulation.domElement).attr("hidden", true);
     $(datGuiLights.domElement).attr("hidden", true);
     $(datGuiSkybox.domElement).attr("hidden", true);
+    $(datGuiFog.domElement).attr("hidden", true);
   }
 
   // IMAGE UPLOADER

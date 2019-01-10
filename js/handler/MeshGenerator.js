@@ -244,7 +244,7 @@ MeshGenerator.prototype.generateSkybox = function(skybox){
     fragmentShader: ShaderContent.skyboxFragmentShader,
     vertexColors: THREE.VertexColors,
     transparent: true,
-    side: THREE.DoubleSide,
+    side: THREE.BackSide,
     uniforms: {
       projectionMatrix: GLOBAL_PROJECTION_UNIFORM,
       modelViewMatrix: new THREE.Uniform(new THREE.Matrix4()),

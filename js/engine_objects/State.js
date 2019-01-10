@@ -189,6 +189,11 @@ var State = function(projectName, author){
     fogColor: fogColor,
     fogDensity: fogDensity
   };
+  if (fogActive){
+    this.fogObj.r = fogColorRGB.r;
+    this.fogObj.g = fogColorRGB.g;
+    this.fogObj.b = fogColorRGB.b;
+  }
   // AREAS *********************************************************
   this.areasVisible = areasVisible;
   this.areas = new Object();

@@ -660,6 +660,11 @@ var CommandDescriptor = function(){
   this.skyboxConfigurations.types = [];
   this.skyboxConfigurations.types.push(this.HIDE_SHOW); // hide/show
 
+  // fogConfigurations
+  this.fogConfigurations = new Object();
+  this.fogConfigurations.types = [];
+  this.fogConfigurations.types.push(this.HIDE_SHOW); // hide/show
+
 };
 
 CommandDescriptor.prototype.test = function(){

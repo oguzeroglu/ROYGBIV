@@ -4729,6 +4729,10 @@ function parse(input){
             terminal.printError(Text.NO_SKYBOX_MAPPED);
             return true;
           }
+          if (!skyboxVisible){
+            terminal.printError(Text.SKYBOX_NOT_VISIBLE);
+            return true;
+          }
           if (parameter == "show"){
             if (skyboxConfigurationsVisible){
               terminal.printError(Text.GUI_IS_ALREADY_VISIBLE);
@@ -4752,6 +4756,39 @@ function parse(input){
             terminal.printError(Text.STATUS_MUST_BE_ONE_OF);
           }
           return true;
+        break;
+        case 147: //fogConfigurations
+          if (mode != 1){
+            terminal.printError(Text.WORKS_ONLY_IN_PREVIEW_MODE);
+            return true;
+          }
+          if (!fogActive){
+            terminal.printError(Text.NO_FOG_SET);
+            return true;
+          }
+          var fogConfigurationMode = splitted[1].toLowerCase();
+          if (fogConfigurationMode == "show"){
+            if (fogConfigurationsVisible){
+              terminal.printError(Text.GUI_IS_ALREADY_VISIBLE);
+              return true;
+            }
+            $(datGuiFog.domElement).attr("hidden", false);
+            fogParameters["Color"] = "#"+fogColorRGB.getHexString();
+            fogParameters["Density"] = fogDensity * 100;
+            fogConfigurationsVisible = true;
+            terminal.printInfo(Text.GUI_OPENED);
+          }else if (fogConfigurationMode == "hide"){
+            if (!fogConfigurationsVisible){
+              terminal.printError(Text.GUI_IS_ALREADY_HIDDEN);
+              return true;
+            }
+            $(datGuiFog.domElement).attr("hidden", true);
+            fogConfigurationsVisible = false;
+            terminal.printInfo(Text.GUI_CLOSED);
+          }else{
+            terminal.printError(Text.STATUS_MUST_BE_ONE_OF);
+            return true;
+          }
         break;
       }
       return true;

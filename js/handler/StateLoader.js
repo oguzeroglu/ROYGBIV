@@ -990,6 +990,9 @@ StateLoader.prototype.load = function(undo){
     fogColor = fogObj.fogColor;
     fogDensity = fogObj.fogDensity;
     fogColorRGB = new THREE.Color(fogColor);
+    if (fogActive){
+      fogColorRGB.setRGB(fogObj.r, fogObj.g, fogObj.b);
+    }
     // AREAS *******************************************************
     areasVisible = obj.areasVisible;
     for (var areaName in obj.areas){
@@ -2383,6 +2386,7 @@ StateLoader.prototype.resetProject = function(undo){
   trackingObjects = new Object();
   screenResolution = 1;
   skyboxConfigurationsVisible = false;
+  fogConfigurationsVisible = false;
   stopAreaConfigurationsHandler = false;
   screenClickCallbackFunction = 0;
   screenMouseDownCallbackFunction = 0;
@@ -2452,7 +2456,8 @@ StateLoader.prototype.resetProject = function(undo){
   if (!isDeployment){
     $(datGui.domElement).attr("hidden", true);
     $(datGuiObjectManipulation.domElement).attr("hidden", true);
-    $(datGuiSkybox).attr("hidden", true);
+    $(datGuiSkybox.domElement).attr("hidden", true);
+    $(datGuiFog.domElement).attr("hidden", true);
     $("#cliDivheader").text("ROYGBIV Scene Creator - CLI (Design mode)");
   }
 

@@ -272,6 +272,7 @@ var Text = function(){
   this.SKYBOX_MAPPED = "Skybox mapped.";
   this.SKYBOX_DESTROYED = "Skybox destroyed.";
   this.NO_SKYBOX_MAPPED = "No skybox mapped. Use mapSkybox command first.";
+  this.NO_FOG_SET = "No fog set. Use setFog command first.";
   this.SKYBOX_NOT_VISIBLE = "Skybox not visible.";
   this.SKYBOX_HIDDEN = "Skybox hidden.";
   this.SKYBOX_ALREADY_VISIBLE = "Skybox already visible.";
