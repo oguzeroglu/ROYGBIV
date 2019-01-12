@@ -4621,11 +4621,11 @@ function parse(input){
           var copyPosition = new THREE.Vector3(0, 0, 0);
           var gridSelectionSize;
           if (!jobHandlerWorking){
+            gridSelectionSize = Object.keys(gridSelections).length;
             if (gridSelectionSize != 1 && gridSelectionSize != 2){
               terminal.printError(Text.MUST_HAVE_1_OR_2_GRIDS_SELECTED);
               return true;
             }
-            gridSelectionSize = Object.keys(gridSelections).length;
           }else{
             gridSelectionSize = 1;
           }
