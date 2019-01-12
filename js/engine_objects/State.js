@@ -187,7 +187,8 @@ var State = function(projectName, author){
   this.fogObj = {
     fogActive: fogActive,
     fogColor: fogColor,
-    fogDensity: fogDensity
+    fogDensity: fogDensity,
+    blendWithSkybox: fogBlendWithSkybox
   };
   if (fogActive){
     this.fogObj.r = fogColorRGB.r;

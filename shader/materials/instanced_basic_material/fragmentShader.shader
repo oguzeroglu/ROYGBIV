@@ -4,10 +4,12 @@ precision lowp int;
 #define ALPHA_TEST 0.5
 #define LOG2 1.442695
 
+uniform vec3 cameraPosition;
 uniform sampler2D diffuseMap;
 uniform sampler2D emissiveMap;
 uniform sampler2D alphaMap;
 uniform sampler2D aoMap;
+uniform samplerCube cubeTexture;
 uniform vec4 fogInfo;
 uniform vec4 forcedColor;
 
@@ -16,6 +18,7 @@ varying float vEmissiveIntensity;
 varying float vAOIntensity;
 varying vec2 vUV;
 varying vec3 vColor;
+varying vec3 vWorldPosition;
 
 varying float hasDiffuseMap;
 varying float hasEmissiveMap;
@@ -57,7 +60,7 @@ void main(){
     gl_FragColor.rgb += totalEmissiveRadiance;
   }
 
-  if (fogInfo[0] >= -50.0){
+  if (fogInfo[0] >= 0.0){
     float fogDensity = fogInfo[0];
     float fogR = fogInfo[1];
     float fogG = fogInfo[2];
@@ -66,6 +69,13 @@ void main(){
     float fogFactor = exp2(-fogDensity * fogDensity * z * z * LOG2);
     fogFactor = clamp(fogFactor, 0.0, 1.0);
     gl_FragColor = vec4(mix(vec3(fogR, fogG, fogB), gl_FragColor.rgb, fogFactor), gl_FragColor.a);
+  }else if (fogInfo[0] < 0.0 && fogInfo[0] > -50.0){
+    vec3 coord = normalize(vWorldPosition - cameraPosition);
+    vec4 cubeTextureColor = textureCube(cubeTexture, coord) * vec4(fogInfo[1], fogInfo[2], fogInfo[3], 1.0);
+    float fogDensity = -fogInfo[0];
+    float z = gl_FragCoord.z / gl_FragCoord.w;
+    float fogFactor = exp2(-fogDensity * fogDensity * z * z * LOG2);
+    gl_FragColor = vec4(mix(cubeTextureColor.rgb, gl_FragColor.rgb, fogFactor), gl_FragColor.a);
   }
 
 }

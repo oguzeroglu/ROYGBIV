@@ -59,6 +59,8 @@ MeshGenerator.prototype.generateObjectTrail = function(
     uniforms: {
       projectionMatrix: GLOBAL_PROJECTION_UNIFORM,
       viewMatrix: GLOBAL_VIEW_UNIFORM,
+      worldMatrix: new THREE.Uniform(new THREE.Matrix4()),
+      cameraPosition: GLOBAL_CAMERA_POSITION_UNIFORM,
       objectCoordinates: new THREE.Uniform(objectCoordinates),
       objectQuaternions: new THREE.Uniform(objectQuaternions),
       currentPosition: new THREE.Uniform(posit),
@@ -69,10 +71,12 @@ MeshGenerator.prototype.generateObjectTrail = function(
       alphaMap: this.getTextureUniform(trail.alphaTexture),
       displacementMap: this.getTextureUniform(trail.displacementTexture),
       textureMatrix: new THREE.Uniform(trail.textureMatrix),
-      fogInfo: GLOBAL_FOG_UNIFORM
+      fogInfo: GLOBAL_FOG_UNIFORM,
+      cubeTexture: GLOBAL_CUBE_TEXTURE_UNIFORM
     }
   });
   var mesh = new THREE.Mesh(this.geometry, material);
+  material.uniforms.worldMatrix.value = mesh.matrixWorld;
   return mesh;
 }
 
@@ -118,6 +122,8 @@ MeshGenerator.prototype.generateInstancedMesh = function(graphicsGroup, objectGr
     uniforms: {
       projectionMatrix: GLOBAL_PROJECTION_UNIFORM,
       modelViewMatrix: new THREE.Uniform(new THREE.Matrix4()),
+      worldMatrix: new THREE.Uniform(new THREE.Matrix4()),
+      cameraPosition: GLOBAL_CAMERA_POSITION_UNIFORM,
       diffuseMap: this.getTextureUniform(diffuseTexture),
       emissiveMap: this.getTextureUniform(emissiveTexture),
       alphaMap: this.getTextureUniform(alphaTexture),
@@ -125,12 +131,14 @@ MeshGenerator.prototype.generateInstancedMesh = function(graphicsGroup, objectGr
       displacementMap: this.getTextureUniform(displacementTexture),
       textureMatrix: new THREE.Uniform(textureMatrix),
       fogInfo: GLOBAL_FOG_UNIFORM,
-      forcedColor: new THREE.Uniform(new THREE.Vector4(-50, 0, 0, 0))
+      forcedColor: new THREE.Uniform(new THREE.Vector4(-50, 0, 0, 0)),
+      cubeTexture: GLOBAL_CUBE_TEXTURE_UNIFORM
     }
   });
   var mesh = new THREE.Mesh(this.geometry, material);
   mesh.position.copy(graphicsGroup.position);
   material.uniforms.modelViewMatrix.value = mesh.modelViewMatrix;
+  material.uniforms.worldMatrix.value = mesh.matrixWorld;
   return mesh;
 }
 
@@ -178,6 +186,8 @@ MeshGenerator.prototype.generateMergedMesh = function(graphicsGroup, objectGroup
     uniforms: {
       projectionMatrix: GLOBAL_PROJECTION_UNIFORM,
       modelViewMatrix: new THREE.Uniform(new THREE.Matrix4()),
+      worldMatrix: new THREE.Uniform(new THREE.Matrix4()),
+      cameraPosition: GLOBAL_CAMERA_POSITION_UNIFORM,
       diffuseMap: this.getTextureUniform(diffuseTexture),
       emissiveMap: this.getTextureUniform(emissiveTexture),
       alphaMap: this.getTextureUniform(alphaTexture),
@@ -185,12 +195,14 @@ MeshGenerator.prototype.generateMergedMesh = function(graphicsGroup, objectGroup
       displacementMap: this.getTextureUniform(displacementTexture),
       textureMatrix: new THREE.Uniform(textureMatrix),
       fogInfo: GLOBAL_FOG_UNIFORM,
-      forcedColor: new THREE.Uniform(new THREE.Vector4(-50, 0, 0, 0))
+      forcedColor: new THREE.Uniform(new THREE.Vector4(-50, 0, 0, 0)),
+      cubeTexture: GLOBAL_CUBE_TEXTURE_UNIFORM
     }
   });
   var mesh = new THREE.Mesh(this.geometry, material);
   mesh.position.copy(graphicsGroup.position);
   material.uniforms.modelViewMatrix.value = mesh.modelViewMatrix;
+  material.uniforms.worldMatrix.value = mesh.matrixWorld;
   return mesh;
 }
 
@@ -216,6 +228,8 @@ MeshGenerator.prototype.generateBasicMesh = function(){
     uniforms:{
       projectionMatrix: GLOBAL_PROJECTION_UNIFORM,
       modelViewMatrix: new THREE.Uniform(new THREE.Matrix4()),
+      worldMatrix: new THREE.Uniform(new THREE.Matrix4()),
+      cameraPosition: GLOBAL_CAMERA_POSITION_UNIFORM,
       color: new THREE.Uniform(this.material.color),
       alpha: this.getAlphaUniform(this.material.alpha),
       fogInfo: GLOBAL_FOG_UNIFORM,
@@ -230,15 +244,18 @@ MeshGenerator.prototype.generateBasicMesh = function(){
       displacementMap: this.getTextureUniform(nullTexture),
       emissiveMap: this.getTextureUniform(nullTexture),
       textureMatrix: new THREE.Uniform(new THREE.Matrix3()),
-      forcedColor: new THREE.Uniform(new THREE.Vector4(-50, 0, 0, 0))
+      forcedColor: new THREE.Uniform(new THREE.Vector4(-50, 0, 0, 0)),
+      cubeTexture: GLOBAL_CUBE_TEXTURE_UNIFORM
     }
   });
   var mesh = new THREE.Mesh(this.geometry, material);
   material.uniforms.modelViewMatrix.value = mesh.modelViewMatrix;
+  material.uniforms.worldMatrix.value = mesh.matrixWorld;
   return mesh;
 }
 
 MeshGenerator.prototype.generateSkybox = function(skybox){
+  GLOBAL_CUBE_TEXTURE_UNIFORM = new THREE.Uniform(skybox.cubeTexture);
   var material = new THREE.RawShaderMaterial({
     vertexShader: ShaderContent.skyboxVertexShader,
     fragmentShader: ShaderContent.skyboxFragmentShader,
@@ -248,9 +265,9 @@ MeshGenerator.prototype.generateSkybox = function(skybox){
     uniforms: {
       projectionMatrix: GLOBAL_PROJECTION_UNIFORM,
       modelViewMatrix: new THREE.Uniform(new THREE.Matrix4()),
-      cubeTexture: new THREE.Uniform(skybox.cubeTexture),
-      color: new THREE.Uniform(new THREE.Color("white")),
-      alpha: new THREE.Uniform(1.0)
+      cubeTexture: GLOBAL_CUBE_TEXTURE_UNIFORM,
+      color: new THREE.Uniform(new THREE.Color(skybox.color)),
+      alpha: GLOBAL_SKYBOX_ALPHA_UNIFORM
     }
   });
   var mesh = new THREE.Mesh(this.geometry, material);

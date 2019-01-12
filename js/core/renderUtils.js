@@ -2,6 +2,8 @@ function render(){
 
   requestID = requestAnimationFrame(render);
 
+  GLOBAL_CAMERA_POSITION_UNIFORM.value.copy(camera.position);
+
   if (!(mode == 1 && defaultCameraControlsDisabled)){
     processKeyboardBuffer();
   }

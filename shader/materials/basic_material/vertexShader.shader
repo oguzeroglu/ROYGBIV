@@ -9,12 +9,14 @@ uniform sampler2D displacementMap;
 uniform mat3 textureMatrix;
 uniform mat4 projectionMatrix;
 uniform mat4 modelViewMatrix;
+uniform mat4 worldMatrix;
 uniform vec2 displacementInfo;
 uniform vec3 color;
 uniform vec4 textureFlags;
 uniform vec4 textureFlags2;
 uniform float alpha;
 
+varying vec3 vWorldPosition;
 varying vec3 vColor;
 varying float vAlpha;
 varying vec2 vUV;
@@ -36,6 +38,7 @@ void main(){
   vColor = color;
   vAlpha = alpha;
   vUV = (textureMatrix * vec3(uv, 1.0)).xy;
+  vWorldPosition = (worldMatrix * vec4(position, 1.0)).xyz;
 
   vec3 transformedPosition = position;
   if (hasDisplacementFlag > 0.0){

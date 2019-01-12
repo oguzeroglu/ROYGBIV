@@ -210,8 +210,8 @@ GridSystem.prototype.draw = function(){
 
   var boundingPlaneMaterial = new THREE.MeshBasicMaterial({
     color: 'black',
-    transparent:true,
-    opacity:0.5,
+    transparent: true,
+    opacity: 0.5,
     side: THREE.DoubleSide,
     polygonOffset: true,
     polygonOffsetFactor: 1.0,

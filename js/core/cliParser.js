@@ -2246,6 +2246,7 @@ function parse(input){
             skyboxParameters["Alpha"] = skyboxMesh.material.uniforms.alpha.value;
             skyboxParameters["Color"] = "#" + skyboxMesh.material.uniforms.color.value.getHexString();
           }
+          skyboxMesh.renderOrder = -1;
           terminal.printError(Text.SKYBOX_MAPPED);
           return true;
         break;
@@ -2263,6 +2264,11 @@ function parse(input){
           if (!skybox){
             terminal.printError(Text.NO_SUCH_SKYBOX);
             return true;
+          }
+          if (name == mappedSkyboxName){
+            scene.remove(skyboxMesh);
+            skyboxVisible = false;
+            fogBlendWithSkybox = false;
           }
           delete skyBoxes[name];
           if (!jobHandlerWorking){
@@ -2291,6 +2297,7 @@ function parse(input){
             }
             scene.remove(skyboxMesh);
             skyboxVisible = false;
+            fogBlendWithSkybox = false;
             terminal.printInfo(Text.SKYBOX_HIDDEN);
           }else{
             if (skyboxVisible){
@@ -2768,7 +2775,9 @@ function parse(input){
             return true;
           }
           fogActive = false;
+          fogBlendWithSkybox = false;
           terminal.printInfo(Text.FOG_REMOVED);
+          afterObjectSelection();
           return true;
         break;
         case 92: //glue
@@ -4775,6 +4784,18 @@ function parse(input){
             $(datGuiFog.domElement).attr("hidden", false);
             fogParameters["Color"] = "#"+fogColorRGB.getHexString();
             fogParameters["Density"] = fogDensity * 100;
+            fogParameters["Blend skybox"] = fogBlendWithSkybox;
+            if (!skyboxVisible){
+              enableController(fogColorController);
+              disableController(fogBlendWithSkyboxController);
+            }else{
+              if (fogBlendWithSkybox){
+                disableController(fogColorController);
+              }else{
+                enableController(fogColorController);
+              }
+              enableController(fogBlendWithSkyboxController);
+            }
             fogConfigurationsVisible = true;
             terminal.printInfo(Text.GUI_OPENED);
           }else if (fogConfigurationMode == "hide"){

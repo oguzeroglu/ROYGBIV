@@ -167,6 +167,14 @@ ModeSwitcher.prototype.switchFromDesignToPreview = function(){
   }
   if (fogActive){
     GLOBAL_FOG_UNIFORM.value.set(fogDensity, fogColorRGB.r, fogColorRGB.g, fogColorRGB.b);
+    if (fogBlendWithSkybox){
+      GLOBAL_FOG_UNIFORM.value.set(
+        -fogDensity,
+        skyboxMesh.material.uniforms.color.value.r,
+        skyboxMesh.material.uniforms.color.value.g,
+        skyboxMesh.material.uniforms.color.value.b
+      );
+    }
   }else{
     GLOBAL_FOG_UNIFORM.value.set(-100.0, 0, 0, 0);
   }

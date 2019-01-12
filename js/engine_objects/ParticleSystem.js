@@ -372,6 +372,8 @@ var ParticleSystem = function(copyPS, name, particles, x, y, z, vx, vy, vz, ax, 
         mergedFlag: GLOBAL_PS_NOT_MERGED_UNIFORM,
         modelViewMatrix: new THREE.Uniform(new THREE.Matrix4()),
         projectionMatrix: GLOBAL_PROJECTION_UNIFORM,
+        cameraPosition: GLOBAL_CAMERA_POSITION_UNIFORM,
+        worldMatrix: new THREE.Uniform(new THREE.Matrix4()),
         viewMatrix: GLOBAL_VIEW_UNIFORM,
         time: new THREE.Uniform(0.0),
         texture: new THREE.Uniform(texture),
@@ -380,11 +382,18 @@ var ParticleSystem = function(copyPS, name, particles, x, y, z, vx, vy, vz, ax, 
         parentMotionMatrix: new THREE.Uniform(new THREE.Matrix3().fromArray([
           x, y, z, vx, vy, vz, ax, ay, az
         ])),
-        fogInfo: GLOBAL_FOG_UNIFORM
+        fogInfo: GLOBAL_FOG_UNIFORM,
+        cubeTexture: GLOBAL_CUBE_TEXTURE_UNIFORM
       }
     });
   }else{
     this.material = this.copyPS.material.clone();
+    this.material.uniforms.projectionMatrix = GLOBAL_PROJECTION_UNIFORM;
+    this.material.uniforms.cameraPosition = GLOBAL_CAMERA_POSITION_UNIFORM;
+    this.material.uniforms.viewMatrix = GLOBAL_VIEW_UNIFORM;
+    this.material.uniforms.fogInfo = GLOBAL_FOG_UNIFORM;
+    this.material.uniforms.cubeTexture = GLOBAL_CUBE_TEXTURE_UNIFORM;
+    this.material.uniforms.skyboxAlpha = GLOBAL_SKYBOX_ALPHA_UNIFORM;
   }
 
   this.mesh = new THREE.Points(this.geometry, this.material);
@@ -601,6 +610,7 @@ ParticleSystem.prototype.update = function(){
   if (!this.psMerger){
     this.material.uniforms.time.value = this.tick;
     this.material.uniforms.modelViewMatrix.value = this.mesh.modelViewMatrix;
+    this.material.uniforms.worldMatrix.value = this.mesh.matrixWorld;
   }else{
     this.mesh.updateMatrixWorld(true);
     this.mesh.modelViewMatrix.multiplyMatrices(camera.matrixWorldInverse, this.mesh.matrixWorld);

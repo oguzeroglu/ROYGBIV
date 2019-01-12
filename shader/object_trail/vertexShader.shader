@@ -17,6 +17,7 @@ attribute float emissiveIntensity;
 uniform mat3 textureMatrix;
 uniform mat4 viewMatrix;
 uniform mat4 projectionMatrix;
+uniform mat4 worldMatrix;
 uniform float objectCoordinates[OBJECT_COORDINATE_SIZE];
 uniform float objectQuaternions[OBJECT_QUATERNION_SIZE];
 uniform vec3 currentPosition;
@@ -28,6 +29,7 @@ varying float vDiscardFlag;
 varying vec2 vFaceVertexUV;
 varying vec3 vColor;
 varying vec3 vTextureFlags;
+varying vec3 vWorldPosition;
 varying float vEmissiveIntensity;
 
 vec3 applyQuaternionToVector(vec3 vector, vec4 quaternion){
@@ -55,6 +57,7 @@ void main(){
   vFaceVertexUV = (textureMatrix * vec3(faceVertexUV, 1.0)).xy;
   vTextureFlags = textureFlags;
   vEmissiveIntensity = emissiveIntensity;
+  vWorldPosition = (worldMatrix * vec4(position, 1.0)).xyz;
 
   int indexX = int(coordIndex);
   int indexY = indexX + 1;

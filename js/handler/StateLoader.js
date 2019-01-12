@@ -878,6 +878,7 @@ StateLoader.prototype.load = function(undo){
                   geometryCache[geomKey] = skyboxBufferGeometry;
                 }
                 skyboxMesh = new MeshGenerator(skyboxBufferGeometry, null).generateSkybox(skybox);
+                skyboxMesh.renderOrder = -1;
               }
               if (skyboxVisible){
                 scene.add(skyboxMesh);
@@ -990,6 +991,7 @@ StateLoader.prototype.load = function(undo){
     fogColor = fogObj.fogColor;
     fogDensity = fogObj.fogDensity;
     fogColorRGB = new THREE.Color(fogColor);
+    fogBlendWithSkybox = fogObj.blendWithSkybox;
     if (fogActive){
       fogColorRGB.setRGB(fogObj.r, fogObj.g, fogObj.b);
     }
@@ -1262,6 +1264,15 @@ StateLoader.prototype.createObjectGroupsAfterLoadedTextures = function(){
         }
       }
     }
+  }
+
+  if (fogBlendWithSkybox){
+    GLOBAL_FOG_UNIFORM.value.set(
+      -fogDensity,
+      skyboxMesh.material.uniforms.color.value.r,
+      skyboxMesh.material.uniforms.color.value.g,
+      skyboxMesh.material.uniforms.color.value.b
+    );
   }
 
   projectLoaded = true;
@@ -2408,6 +2419,7 @@ StateLoader.prototype.resetProject = function(undo){
   fogColor = "black";
   fogDensity = 0;
   fogColorRGB = new THREE.Color(fogColor);
+  fogBlendWithSkybox = false;
 
   if (!undo){
     mode = 0; // 0 -> DESIGN, 1-> PREVIEW

@@ -303,7 +303,7 @@ var commandArgumentsExpectedExplanation = [
   "copyObject sourceName targetName offsetX offsetY offsetZ isHardCopy", //copyObject
   "build projectName author", //build
   "skyboxConfigurations show/hide", //skyboxConfigurations
-  "fogConfigurations show/hide"
+  "fogConfigurations show/hide" //fogConfigurations
 ];
 var commands = [
   "help",
@@ -747,6 +747,7 @@ var fogActive = false;
 var fogColor = "black";
 var fogDensity = 0;
 var fogColorRGB = new THREE.Color(fogColor);
+var fogBlendWithSkybox = false;
 
 // ENGINE VARIABLES
 var keyboardBuffer = new Object();
@@ -926,6 +927,9 @@ var GLOBAL_PROJECTION_UNIFORM = new THREE.Uniform(new THREE.Vector3());
 var GLOBAL_VIEW_UNIFORM = new THREE.Uniform(new THREE.Matrix4());
 var GLOBAL_PS_MERGED_UNIFORM = new THREE.Uniform(20.0);
 var GLOBAL_PS_NOT_MERGED_UNIFORM = new THREE.Uniform(-20.0);
+var GLOBAL_CAMERA_POSITION_UNIFORM = new THREE.Uniform(new THREE.Vector3());
+var GLOBAL_CUBE_TEXTURE_UNIFORM = new THREE.Uniform(new THREE.CubeTexture());
+var GLOBAL_SKYBOX_ALPHA_UNIFORM = new THREE.Uniform(1.0);
 var VERTEX_SHADER_TEXTURE_FETCH_SUPPORTED;
 var DDS_SUPPORTED;
 var jobHandlerSelectedGrid = 0;
@@ -1075,19 +1079,19 @@ var lightsParameters = {
 };
 
 var skyboxNameController;
-var skyboxAlphaController;
 var skyboxColorController;
 var skyboxParameters = {
   "Name": "skyboxName",
-  "Alpha": 0.0,
   "Color": "#ffffff"
 };
 
 var fogDensityController;
 var fogColorController;
+var fogBlendWithSkyboxController;
 var fogParameters = {
   "Density": 0.0,
-  "Color": "#ffffff"
+  "Color": "#ffffff",
+  "Blend skybox": false
 };
 
 // KEYCODE TO STRING MAP

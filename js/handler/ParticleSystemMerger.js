@@ -37,6 +37,7 @@ var ParticleSystemMerger = function(psObj, name){
   }
 
   var mvMatrixArray = [];
+  var worldMatrixArray = [];
   var timeArray = [];
   var motionMatrixArray = [];
   var hiddenArray = [];
@@ -66,6 +67,7 @@ var ParticleSystemMerger = function(psObj, name){
   for (var psName in this.psObj){
     var ps = this.psObj[psName];
     mvMatrixArray.push(ps.mesh.modelViewMatrix);
+    worldMatrixArray.push(ps.mesh.matrixWorld);
     dissapearCoefArray.push(ps.material.uniforms.dissapearCoef.value);
     stopInfoArray.push(ps.material.uniforms.stopInfo.value);
     timeArray.push(ps.tick);
@@ -182,6 +184,8 @@ var ParticleSystemMerger = function(psObj, name){
     uniforms:{
       mergedFlag: GLOBAL_PS_MERGED_UNIFORM,
       modelViewMatrixArray: new THREE.Uniform(mvMatrixArray),
+      worldMatrixArray: new THREE.Uniform(worldMatrixArray),
+      cameraPosition: GLOBAL_CAMERA_POSITION_UNIFORM,
       projectionMatrix: GLOBAL_PROJECTION_UNIFORM,
       viewMatrix: GLOBAL_VIEW_UNIFORM,
       timeArray: new THREE.Uniform(timeArray),
@@ -190,7 +194,8 @@ var ParticleSystemMerger = function(psObj, name){
       dissapearCoefArray: new THREE.Uniform(dissapearCoefArray),
       stopInfoArray: new THREE.Uniform(stopInfoArray),
       parentMotionMatrixArray: new THREE.Uniform(motionMatrixArray),
-      fogInfo: GLOBAL_FOG_UNIFORM
+      fogInfo: GLOBAL_FOG_UNIFORM,
+      cubeTexture: GLOBAL_CUBE_TEXTURE_UNIFORM
     }
   });
   this.mesh = new THREE.Points(this.geometry, this.material);

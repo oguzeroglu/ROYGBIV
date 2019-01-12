@@ -76,23 +76,56 @@ window.onload = function() {
     datGuiFog = new dat.GUI();
     fogDensityController = datGuiFog.add(fogParameters, "Density").min(0).max(1).step(0.01).onChange(function(val){
       fogDensity = val / 100;
-      GLOBAL_FOG_UNIFORM.value.set(fogDensity, fogColorRGB.r, fogColorRGB.g, fogColorRGB.b);
+      if (!fogBlendWithSkybox){
+        GLOBAL_FOG_UNIFORM.value.set(fogDensity, fogColorRGB.r, fogColorRGB.g, fogColorRGB.b);
+      }else{
+        GLOBAL_FOG_UNIFORM.value.set(
+          -fogDensity,
+          skyboxMesh.material.uniforms.color.value.r,
+          skyboxMesh.material.uniforms.color.value.g,
+          skyboxMesh.material.uniforms.color.value.b
+        );
+      }
     }).listen();
     fogColorController = datGuiFog.addColor(fogParameters, "Color").onChange(function(val){
       fogColorRGB.set(val);
       GLOBAL_FOG_UNIFORM.value.set(fogDensity, fogColorRGB.r, fogColorRGB.g, fogColorRGB.b);
     }).listen();
+    fogBlendWithSkyboxController = datGuiFog.add(fogParameters, "Blend skybox").onChange(function(val){
+      if (!skyboxVisible){
+        fogParameters["Blend skybox"] = false;
+        return;
+      }
+      if (val){
+        fogBlendWithSkybox = true;
+        GLOBAL_FOG_UNIFORM.value.set(
+          -fogDensity,
+          skyboxMesh.material.uniforms.color.value.r,
+          skyboxMesh.material.uniforms.color.value.g,
+          skyboxMesh.material.uniforms.color.value.b
+        );
+        disableController(fogColorController);
+      }else{
+        fogBlendWithSkybox = false;
+        GLOBAL_FOG_UNIFORM.value.set(fogDensity, fogColorRGB.r, fogColorRGB.g, fogColorRGB.b);
+        enableController(fogColorController);
+      }
+    }).listen();
     // DAT GUI SKYBOX
     datGuiSkybox = new dat.GUI();
     skyboxNameController = datGuiSkybox.add(skyboxParameters, "Name").listen();
     disableController(skyboxNameController, true);
-    skyboxAlphaController = datGuiSkybox.add(skyboxParameters, "Alpha").min(0).max(1).step(0.01).onChange(function(val){
-      skyboxMesh.material.uniforms.alpha.value = val;
-      skyBoxes[mappedSkyboxName].alpha = val;
-    }).listen();
     skyboxColorController = datGuiSkybox.addColor(skyboxParameters, "Color").onChange(function(val){
       skyboxMesh.material.uniforms.color.value.set(val);
       skyBoxes[mappedSkyboxName].color = val;
+      if (fogBlendWithSkybox){
+        GLOBAL_FOG_UNIFORM.value.set(
+          -fogDensity,
+          skyboxMesh.material.uniforms.color.value.r,
+          skyboxMesh.material.uniforms.color.value.g,
+          skyboxMesh.material.uniforms.color.value.b
+        );
+      }
     }).listen();
     // DAT GUI LIGHTS
     datGuiLights = new dat.GUI();

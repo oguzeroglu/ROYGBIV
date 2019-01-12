@@ -21,6 +21,7 @@ varying vec4 vCalculatedColor;
 varying float vDiscardFlag;
 varying float vTextureFlag;
 varying vec3 vRgbThreshold;
+varying vec3 vWorldPosition;
 varying vec4 vUVCoordinates;
 
 uniform float mergedFlag;
@@ -28,6 +29,8 @@ uniform float time;
 uniform float timeArray[OBJECT_SIZE];
 uniform mat4 modelViewMatrix;
 uniform mat4 modelViewMatrixArray[OBJECT_SIZE];
+uniform mat4 worldMatrix;
+uniform mat4 worldMatrixArray[OBJECT_SIZE];
 uniform float hiddenArray[OBJECT_SIZE];
 uniform mat4 viewMatrix;
 uniform mat4 projectionMatrix;
@@ -152,12 +155,14 @@ void main(){
 
   float skipFlag = -20.0;
   mat4 selectedMVMatrix = modelViewMatrix;
+  mat4 selectedWorldMatrix = worldMatrix;
   float selectedTime = time;
   float selectedDissapearCoef = dissapearCoef;
   vec3 selectedStopInfo = stopInfo;
   if (mergedFlag > 5.0){
     int mi = int(mergedIndex);
     selectedMVMatrix = modelViewMatrixArray[mi];
+    selectedWorldMatrix = worldMatrixArray[mi];
     selectedTime = timeArray[mi];
     parentVelocity = parentMotionMatrixArray[mi][1];
     parentAcceleration = parentMotionMatrixArray[mi][2];
@@ -223,6 +228,8 @@ void main(){
     }else if (motionMode > 0.0 && useWorldPositionFlag < 5.0){
       newPosition = position + (chosenVelocity * timeOfThis) + (0.5 * timeOfThis * timeOfThis * chosenAcceleration);
     }
+
+    vWorldPosition = (selectedWorldMatrix * vec4(newPosition, 1.0)).xyz;
 
     if (useWorldPositionFlag < 5.0){
       mvPosition = selectedMVMatrix * vec4(newPosition, 1.0);

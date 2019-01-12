@@ -14,13 +14,14 @@ attribute vec4 textureInfo;
 uniform mat3 textureMatrix;
 uniform mat4 projectionMatrix;
 uniform mat4 modelViewMatrix;
-
+uniform mat4 worldMatrix;
 uniform sampler2D displacementMap;
 
 varying float vAlpha;
 varying float vEmissiveIntensity;
 varying float vAOIntensity;
 varying vec3 vColor;
+varying vec3 vWorldPosition;
 varying vec2 vUV;
 
 varying float hasDiffuseMap;
@@ -35,6 +36,7 @@ void main(){
   vUV = (textureMatrix * vec3(uv, 1.0)).xy;
   vEmissiveIntensity = emissiveIntensity;
   vAOIntensity = aoIntensity;
+  vWorldPosition = (worldMatrix * vec4(position, 1.0)).xyz;
 
   hasDiffuseMap = -10.0;
   hasEmissiveMap = -10.0;
