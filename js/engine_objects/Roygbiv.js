@@ -863,7 +863,7 @@ Roygbiv.prototype.applyForce = function(object, force, point){
 }
 
 // rotate
-//  Rotates an object or a glued object around a given axis by given radians.
+//  Rotates an object or a glued object around a given world axis by given radians.
 //  The parameter axis must be one of x, y or z. Objects are rotated around
 //  their own centers, so their positions do not change when rotated using this
 //  function.
@@ -7396,7 +7396,8 @@ Roygbiv.prototype.untrackObjectPosition = function(sourceObject){
 // createRotationPivot
 // Creates and returns a rotation pivot for an object. This function is not
 // optimized for the runtime. Use this function before setRotationPivot API on
-// initialization.
+// initialization. Instead of ROYGBIV.rotate API that works on world axes, this
+// function may be used with 0 offset parameters to achieve local rotation for objects.
 Roygbiv.prototype.createRotationPivot = function(sourceObject, offsetX, offsetY, offsetZ){
   if (mode == 0){
     return;
