@@ -172,9 +172,12 @@ function updateDynamicObjects(){
     var gridSystemAxis = object.metaData.gridSystemAxis;
     var type = object.type;
     if (object.isTracked){
-      object.dx = physicsBody.position.x - object.mesh.position.x;
-      object.dy = physicsBody.position.y - object.mesh.position.y;
-      object.dz = physicsBody.position.z - object.mesh.position.z;
+      object.dx = physicsBody.position.x - object.oldPX;
+      object.dy = physicsBody.position.y - object.oldPY;
+      object.dz = physicsBody.position.z - object.oldPZ;
+      object.oldPX = physicsBody.position.x;
+      object.oldPY = physicsBody.position.y;
+      object.oldPZ = physicsBody.position.z;
     }
     object.mesh.position.copy(physicsBody.position);
     setTHREEQuaternionFromCANNON(object.mesh, physicsBody, axis, type, gridSystemAxis);
@@ -183,9 +186,12 @@ function updateDynamicObjects(){
     var grouppedObject = objectGroups[grouppedObjectName];
     var physicsBody = grouppedObject.physicsBody;
     if (grouppedObject.isTracked){
-      grouppedObject.dx = physicsBody.position.x - grouppedObject.mesh.position.x;
-      grouppedObject.dy = physicsBody.position.y - grouppedObject.mesh.position.y;
-      grouppedObject.dz = physicsBody.position.z - grouppedObject.mesh.position.z;
+      grouppedObject.dx = physicsBody.position.x - grouppedObject.oldPX;
+      grouppedObject.dy = physicsBody.position.y - grouppedObject.oldPY;
+      grouppedObject.dz = physicsBody.position.z - grouppedObject.oldPZ;
+      grouppedObject.oldPX = physicsBody.position.x;
+      grouppedObject.oldPY = physicsBody.position.y;
+      grouppedObject.oldPZ = physicsBody.position.z;
     }
     grouppedObject.mesh.position.copy(physicsBody.position);
     grouppedObject.mesh.quaternion.copy(physicsBody.quaternion);

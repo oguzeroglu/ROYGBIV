@@ -7373,6 +7373,9 @@ Roygbiv.prototype.trackObjectPosition = function(sourceObject, targetObject){
   sourceObject.trackedObject = targetObject;
   targetObject.isTracked = true;
   trackingObjects[sourceObject.name] = sourceObject;
+  targetObject.oldPX = targetObject.physicsBody.position.x;
+  targetObject.oldPY = targetObject.physicsBody.position.y;
+  targetObject.oldPZ = targetObject.physicsBody.position.z;
 }
 
 // untrackObjectPosition
