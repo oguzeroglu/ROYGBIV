@@ -899,4 +899,5 @@ var Text = function(){
    this.ROYGBIV_SCRIPTING_API_CLEARTERMINAL = "Clears the ROYGBIV terminal.";
    this.ROYGBIV_SCRIPTING_API_SETTEXTINPUTCALLBACKFUNCTION = "Sets a callback function for ROYGBIV terminal text input. The callbackFunction is executed with the text parameter.";
    this.ROYGBIV_SCRIPTING_API_REMOVETEXTINPUTCALLBACKFUNCTION = "Removes the callback function for ROYGBIV terminal text input.";
+   this.ROYGBIV_SCRIPTING_API_LERP = "Linearly interpolate between vector1 and vector2. The result is vector1 if amount = 0 and vector2 if amount = 1.";
 }

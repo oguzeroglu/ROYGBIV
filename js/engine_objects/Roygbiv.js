@@ -160,7 +160,8 @@ var Roygbiv = function(){
     "printToTerminal",
     "clearTerminal",
     "setTextInputCallbackFunction",
-    "removeTextInputCallbackFunction"
+    "removeTextInputCallbackFunction",
+    "lerp"
   ];
 
   this.globals = new Object();
@@ -7646,4 +7647,56 @@ Roygbiv.prototype.clearTerminal = function(){
     return;
   }
   terminal.clear();
+}
+
+// lerp
+// Linearly interpolate between vector1 and vector2. The result is vector1 if
+// amount = 0 and vector2 if amount = 1.
+Roygbiv.prototype.lerp = function(vector1, vector2, amount, targetVector){
+  if (mode == 0){
+    return;
+  }
+  if (typeof vector1 == UNDEFINED){
+    throw new Error("lerp error: vector1 is not defined.");
+    return;
+  }
+  if (typeof vector2 == UNDEFINED){
+    throw new Error("lerp error: vector2 is not defined.");
+    return;
+  }
+  if (typeof amount == UNDEFINED){
+    throw new Error("lerp error: amount is not defined.");
+    return;
+  }
+  if (typeof targetVector == UNDEFINED){
+    throw new Error("lerp error: targetVector is not defined.");
+    return;
+  }
+  if (isNaN(vector1.x) || isNaN(vector1.y) || isNaN(vector1.z)){
+    throw new Error("lerp error: vector1 is not a vector.");
+    return;
+  }
+  if (isNaN(vector2.x) || isNaN(vector2.y) || isNaN(vector2.z)){
+    throw new Error("lerp error: vector2 is not a vector.");
+    return;
+  }
+  if (isNaN(targetVector.x) || isNaN(targetVector.y) || isNaN(targetVector.z)){
+    throw new Error("lerp error: targetVector is not a vector.");
+    return;
+  }
+  if (isNaN(amount)){
+    throw new Error("lerp error: amount is not a number.");
+    return;
+  }
+  if (amount < 0 || amount > 1){
+    throw new Error("lerp error: amount must be between [0,1].");
+    return;
+  }
+  REUSABLE_VECTOR.set(vector1.x, vector1.y, vector1.z);
+  REUSABLE_VECTOR_2.set(vector2.x, vector2.y, vector2.z);
+  REUSABLE_VECTOR.lerp(REUSABLE_VECTOR_2, amount);
+  targetVector.x = REUSABLE_VECTOR.x;
+  targetVector.y = REUSABLE_VECTOR.y;
+  targetVector.z = REUSABLE_VECTOR.z;
+  return targetVector;
 }
