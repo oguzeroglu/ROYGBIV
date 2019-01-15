@@ -502,9 +502,7 @@ window.onload = function() {
         }
         fullScreenRequested = false;
       }
-      if (mode == 1 && defaultCameraControlsDisabled){
-        return;
-      }
+
       REUSABLE_VECTOR.setFromMatrixPosition(camera.matrixWorld);
       REUSABLE_VECTOR_2.set(coordX, coordY, 0.5).unproject(camera).sub(REUSABLE_VECTOR).normalize();
        rayCaster.findIntersections(REUSABLE_VECTOR, REUSABLE_VECTOR_2, (mode == 0));
@@ -517,13 +515,17 @@ window.onload = function() {
            object = gridSystems[intersectionObject];
          }
          if (object instanceof AddedObject || object instanceof ObjectGroup){
-           terminal.clear();
+           if (!defaultCameraControlsDisabled && !isDeployment){
+             terminal.clear();
+           }
            var point = intersectionPoint;
            var coordStr = " ("+point.x.toFixed(2)+", "+point.y.toFixed(2)+", "+point.z.toFixed(2)+")";
            if (object instanceof AddedObject){
-             terminal.printInfo(Text.CLICKED_ON.replace(
-               Text.PARAM1, object.name + coordStr
-             ));
+             if (!defaultCameraControlsDisabled && !isDeployment){
+               terminal.printInfo(Text.CLICKED_ON.replace(
+                 Text.PARAM1, object.name + coordStr
+               ));
+             }
              if (mode == 0){
                if (selectedAddedObject){
                  selectedAddedObject.mesh.remove(axesHelper);
@@ -540,9 +542,11 @@ window.onload = function() {
                object.clickCallbackFunction(point.x, point.y, point.z);
              }
            }else if (object instanceof ObjectGroup){
-             terminal.printInfo(Text.CLICKED_ON.replace(
-               Text.PARAM1, object.name+coordStr
-             ));
+             if (!defaultCameraControlsDisabled && !isDeployment){
+               terminal.printInfo(Text.CLICKED_ON.replace(
+                 Text.PARAM1, object.name+coordStr
+               ));
+             }
              if (mode == 0){
                if (selectedAddedObject){
                  selectedAddedObject.mesh.remove(axesHelper);
