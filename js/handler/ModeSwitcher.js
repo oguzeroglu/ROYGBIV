@@ -157,6 +157,10 @@ ModeSwitcher.prototype.switchFromDesignToPreview = function(){
       object.mesh.material.uniforms.emissiveIntensity.value = object.initEmissiveIntensity;
       object.initEmissiveIntensitySet = false;
     }
+    if (object.initEmissiveColorSet){
+      object.mesh.material.uniforms.emissiveColor.value.set(object.initEmissiveColor);
+      object.initEmissiveColorSet = false;
+    }
     if (object.material.isMeshPhongMaterial){
       if (object.initShininessSet){
         object.material.shininess = object.initShininess;
@@ -339,7 +343,10 @@ ModeSwitcher.prototype.switchFromPreviewToDesign = function(){
       object.mesh.material.uniforms.emissiveIntensity.value = object.initEmissiveIntensity;
       object.initEmissiveIntensitySet = false;
     }
-
+    if (object.initEmissiveColorSet){
+      object.mesh.material.uniforms.emissiveColor.value.set(object.initEmissiveColor);
+      object.initEmissiveColorSet = false;
+    }
     if (!(typeof object.originalMass == "undefined")){
       object.setMass(object.originalMass);
       if (object.originalMass == 0){

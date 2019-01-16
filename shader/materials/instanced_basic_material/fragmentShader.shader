@@ -19,6 +19,7 @@ varying float vAOIntensity;
 varying vec2 vUV;
 varying vec3 vColor;
 varying vec3 vWorldPosition;
+varying vec3 vEmissiveColor;
 
 varying float hasDiffuseMap;
 varying float hasEmissiveMap;
@@ -54,9 +55,9 @@ void main(){
   }
 
   if (hasEmissiveMap > 0.0){
-    vec4 emissiveColor = texture2D(emissiveMap, vUV);
-    vec3 totalEmissiveRadiance = vec3(vEmissiveIntensity, vEmissiveIntensity, vEmissiveIntensity);
-    totalEmissiveRadiance *= emissiveColor.rgb;
+    vec4 eColor = texture2D(emissiveMap, vUV);
+    vec3 totalEmissiveRadiance = vec3(vEmissiveIntensity, vEmissiveIntensity, vEmissiveIntensity) * vEmissiveColor;
+    totalEmissiveRadiance *= eColor.rgb;
     gl_FragColor.rgb += totalEmissiveRadiance;
   }
 

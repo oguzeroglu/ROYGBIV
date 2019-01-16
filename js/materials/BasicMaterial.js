@@ -22,4 +22,10 @@ var BasicMaterial = function(parameters){
   }else{
     this.emissiveIntensity = parameters.emissiveIntensity;
   }
+  // emissiveColor
+  if (typeof parameters.emissiveColor == UNDEFINED){
+    this.emissiveColor = "#ffffff";
+  }else{
+    this.emissiveColor = parameters.emissiveColor;
+  }
 }

@@ -328,7 +328,7 @@ ObjectGroup.prototype.mergeInstanced = function(){
   this.geometry.setIndex(refGeometry.index);
 
   var positionOffsets = [], quaternions = [], alphas = [], colors = [], textureInfos = [],
-      emissiveIntensities = [], aoIntensities = [], displacementInfos = [];
+      emissiveIntensities = [], emissiveColors = [], aoIntensities = [], displacementInfos = [];
   var count = 0;
   for (var objName in this.group){
     var obj = this.group[objName];
@@ -344,6 +344,9 @@ ObjectGroup.prototype.mergeInstanced = function(){
     colors.push(obj.material.color.g);
     colors.push(obj.material.color.b);
     emissiveIntensities.push(obj.mesh.material.uniforms.emissiveIntensity.value);
+    emissiveColors.push(obj.mesh.material.uniforms.emissiveColor.value.r);
+    emissiveColors.push(obj.mesh.material.uniforms.emissiveColor.value.g);
+    emissiveColors.push(obj.mesh.material.uniforms.emissiveColor.value.b);
     aoIntensities.push(obj.mesh.material.uniforms.aoIntensity.value);
     if (obj.hasDiffuseMap()){
       textureInfos.push(10);
@@ -395,6 +398,9 @@ ObjectGroup.prototype.mergeInstanced = function(){
   var emissiveIntensityBufferAttribute = new THREE.InstancedBufferAttribute(
     new Float32Array(emissiveIntensities), 1
   );
+  var emissiveColorBufferAttribute = new THREE.InstancedBufferAttribute(
+    new Float32Array(emissiveColors), 3
+  );
   var aoIntensityBufferAttribute = new THREE.InstancedBufferAttribute(
     new Float32Array(aoIntensities), 1
   );
@@ -408,6 +414,7 @@ ObjectGroup.prototype.mergeInstanced = function(){
   colorBufferAttribute.setDynamic(false);
   textureInfoBufferAttribute.setDynamic(false);
   emissiveIntensityBufferAttribute.setDynamic(false);
+  emissiveColorBufferAttribute.setDynamic(false);
   aoIntensityBufferAttribute.setDynamic(false);
   displacementInfoBufferAttribute.setDynamic(false);
 
@@ -417,6 +424,7 @@ ObjectGroup.prototype.mergeInstanced = function(){
   this.geometry.addAttribute("color", colorBufferAttribute);
   this.geometry.addAttribute("textureInfo", textureInfoBufferAttribute);
   this.geometry.addAttribute("emissiveIntensity", emissiveIntensityBufferAttribute);
+  this.geometry.addAttribute("emissiveColor", emissiveColorBufferAttribute);
   this.geometry.addAttribute("aoIntensity", aoIntensityBufferAttribute);
   this.geometry.addAttribute("displacementInfo", displacementInfoBufferAttribute);
   this.geometry.addAttribute("position", refGeometry.attributes.position);
@@ -484,7 +492,7 @@ ObjectGroup.prototype.merge = function(){
   var indices = [];
   var vertices = pseudoGeometry.vertices;
   var faceVertexUVs = pseudoGeometry.faceVertexUvs[0];
-  var positions, normals, colors, uvs, alphas, emissiveIntensities, aoIntensities,
+  var positions, normals, colors, uvs, alphas, emissiveIntensities, emissiveColors, aoIntensities,
             displacementInfos, textureInfos;
   if (max > 0){
     positions = new Array((max + 1) * 3);
@@ -493,6 +501,7 @@ ObjectGroup.prototype.merge = function(){
     uvs = new Array((max + 1) * 2);
     alphas = new Array(max + 1);
     emissiveIntensities = new Array(max + 1);
+    emissiveColors = new Array((max + 1) * 3);
     aoIntensities = new Array(max + 1);
     displacementInfos = new Array((max + 1) * 2);
     textureInfos = new Array((max + 1) * 4);
@@ -503,6 +512,7 @@ ObjectGroup.prototype.merge = function(){
     uvs = [];
     alphas = [];
     emissiveIntensities = [];
+    emissiveColors = [];
     aoIntensities = [];
     displacementInfos = [];
     textureInfos = [];
@@ -692,6 +702,23 @@ ObjectGroup.prototype.merge = function(){
     if (!cSkipped){
       this.push(emissiveIntensities, emissiveIntensity, c, isIndexed);
     }
+    // EMISSIVE COLOR
+    var emissiveColor = addedObject.mesh.material.uniforms.emissiveColor.value;
+    if (!aSkipped){
+      this.push(emissiveColors, emissiveColor.r, (3*a), isIndexed);
+      this.push(emissiveColors, emissiveColor.g, ((3*a) + 1), isIndexed);
+      this.push(emissiveColors, emissiveColor.b, ((3*a) + 2), isIndexed);
+    }
+    if (!bSkipped){
+      this.push(emissiveColors, emissiveColor.r, (3*b), isIndexed);
+      this.push(emissiveColors, emissiveColor.g, ((3*b) + 1), isIndexed);
+      this.push(emissiveColors, emissiveColor.b, ((3*b) + 2), isIndexed);
+    }
+    if (!cSkipped){
+      this.push(emissiveColors, emissiveColor.r, (3*c), isIndexed);
+      this.push(emissiveColors, emissiveColor.g, ((3*c) + 1), isIndexed);
+      this.push(emissiveColors, emissiveColor.b, ((3*c) + 2), isIndexed);
+    }
     // AO INTENSITY
     var aoIntensity = addedObject.mesh.material.uniforms.aoIntensity.value;
     if (!aSkipped){
@@ -779,6 +806,7 @@ ObjectGroup.prototype.merge = function(){
   var displacementInfosTypedArray = new Float32Array(displacementInfos);
   var alphasTypedArray = new Float32Array(alphas);
   var emissiveIntensitiesTypedArray = new Float32Array(emissiveIntensities);
+  var emissiveColorsTypedArray = new Float32Array(emissiveColors);
   var aoIntensitiesTypedArray = new Float32Array(aoIntensities);
   var textureInfosTypedArray = new Int8Array(textureInfos);
 
@@ -789,6 +817,7 @@ ObjectGroup.prototype.merge = function(){
   var displacementInfosBufferAttribute = new THREE.BufferAttribute(displacementInfosTypedArray, 2);
   var alphasBufferAttribute = new THREE.BufferAttribute(alphasTypedArray, 1);
   var emissiveIntensitiesBufferAttribute = new THREE.BufferAttribute(emissiveIntensitiesTypedArray, 1);
+  var emissiveColorsBufferAttribute = new THREE.BufferAttribute(emissiveColorsTypedArray, 3);
   var aoIntensitiesBufferAttribute = new THREE.BufferAttribute(aoIntensitiesTypedArray, 1);
   var textureInfosBufferAttribute = new THREE.BufferAttribute(textureInfosTypedArray, 4);
 
@@ -799,6 +828,7 @@ ObjectGroup.prototype.merge = function(){
   displacementInfosBufferAttribute.setDynamic(false);
   alphasBufferAttribute.setDynamic(false);
   emissiveIntensitiesBufferAttribute.setDynamic(false);
+  emissiveColorsBufferAttribute.setDynamic(false);
   aoIntensitiesBufferAttribute.setDynamic(false);
   textureInfosBufferAttribute.setDynamic(false);
 
@@ -816,6 +846,7 @@ ObjectGroup.prototype.merge = function(){
   this.geometry.addAttribute('displacementInfo', displacementInfosBufferAttribute);
   this.geometry.addAttribute('alpha', alphasBufferAttribute);
   this.geometry.addAttribute('emissiveIntensity', emissiveIntensitiesBufferAttribute);
+  this.geometry.addAttribute('emissiveColor', emissiveColorsBufferAttribute);
   this.geometry.addAttribute('aoIntensity', aoIntensitiesBufferAttribute);
   this.geometry.addAttribute('textureInfo', textureInfosBufferAttribute);
 

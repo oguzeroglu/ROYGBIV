@@ -284,6 +284,14 @@ window.onload = function() {
         obj.setBlending(MULTIPLY_BLENDING);
       }
     }).listen();
+    omEmissiveColorController = datGuiObjectManipulation.addColor(objectManipulationParameters, "Emissive col.").onChange(function(val){
+      var material = selectedAddedObject.mesh.material;
+      material.uniforms.emissiveColor.value.set(val);
+      selectedAddedObject.initEmissiveColorSet = false;
+      selectedAddedObject.initEmissiveColor = val;
+    }).onFinishChange(function(value){
+
+    }).listen();
     omTextureOffsetXController = datGuiObjectManipulation.add(objectManipulationParameters, "Texture offset x").min(-2).max(2).step(0.001).onChange(function(val){
       var texture = selectedAddedObject.mesh.material.uniforms.diffuseMap.value;
       texture.offset.x = val;
@@ -1054,6 +1062,7 @@ window.addEventListener('keyup', function(event){
    enableController(omOpacityController);
    enableController(omShininessController);
    enableController(omEmissiveIntensityController);
+   enableController(omEmissiveColorController);
    enableController(omDisplacementScaleController);
    enableController(omDisplacementBiasController);
    enableController(omAOIntensityController);
@@ -1151,8 +1160,10 @@ function afterObjectSelection(){
       }
       if (!obj.hasEmissiveMap()){
         disableController(omEmissiveIntensityController);
+        disableController(omEmissiveColorController);
       }else{
         objectManipulationParameters["Emissive int."] = obj.mesh.material.uniforms.emissiveIntensity.value;
+        objectManipulationParameters["Emissive col."] = "#"+obj.mesh.material.uniforms.emissiveColor.value.getHexString();
       }
       if (!obj.material.isMeshPhongMaterial){
         disableController(omShininessController);
@@ -1200,6 +1211,7 @@ function afterObjectSelection(){
       disableController(omTextureOffsetYController);
       disableController(omShininessController);
       disableController(omEmissiveIntensityController);
+      disableController(omEmissiveColorController);
       disableController(omDisplacementScaleController);
       disableController(omDisplacementBiasController);
       disableController(omAOIntensityController);

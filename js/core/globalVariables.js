@@ -1041,6 +1041,7 @@ var omOpacityController;
 var omAOIntensityController;
 var omShininessController;
 var omEmissiveIntensityController;
+var omEmissiveColorController;
 var omDisplacementScaleController;
 var omDisplacementBiasController;
 var objectManipulationParameters = {
@@ -1061,6 +1062,7 @@ var objectManipulationParameters = {
   "AO intensity": 0.0,
   "Shininess": 0.0,
   "Emissive int.": 0.0,
+  "Emissive col.": "#ffffff",
   "Disp. scale": 0.0,
   "Disp. bias": 0.0
 };

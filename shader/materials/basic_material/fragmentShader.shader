@@ -14,6 +14,7 @@ varying float hasEmissiveFlag;
 varying vec3 vWorldPosition;
 
 uniform vec3 cameraPosition;
+uniform vec3 emissiveColor;
 uniform vec4 fogInfo;
 uniform vec4 forcedColor;
 uniform mat3 textureMatrix;
@@ -56,9 +57,9 @@ void main(){
   }
 
   if (hasEmissiveFlag > 0.0){
-    vec4 emissiveColor = texture2D(emissiveMap, transformedUV);
-    vec3 totalEmissiveRadiance = vec3(emissiveIntensity, emissiveIntensity, emissiveIntensity);
-    totalEmissiveRadiance *= emissiveColor.rgb;
+    vec4 eColor = texture2D(emissiveMap, transformedUV);
+    vec3 totalEmissiveRadiance = vec3(emissiveIntensity, emissiveIntensity, emissiveIntensity) * emissiveColor;
+    totalEmissiveRadiance *= eColor.rgb;
     gl_FragColor.rgb += totalEmissiveRadiance;
   }
 

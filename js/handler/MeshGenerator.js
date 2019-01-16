@@ -244,6 +244,7 @@ MeshGenerator.prototype.generateBasicMesh = function(){
       displacementMap: this.getTextureUniform(nullTexture),
       emissiveMap: this.getTextureUniform(nullTexture),
       textureMatrix: new THREE.Uniform(new THREE.Matrix3()),
+      emissiveColor: new THREE.Uniform(new THREE.Color(this.material.emissiveColor)),
       forcedColor: new THREE.Uniform(new THREE.Vector4(-50, 0, 0, 0)),
       cubeTexture: GLOBAL_CUBE_TEXTURE_UNIFORM
     }

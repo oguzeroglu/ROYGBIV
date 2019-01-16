@@ -7,6 +7,7 @@ attribute float aoIntensity;
 attribute vec3 position;
 attribute vec3 normal;
 attribute vec3 color;
+attribute vec3 emissiveColor;
 attribute vec2 uv;
 attribute vec2 displacementInfo;
 attribute vec4 textureInfo;
@@ -22,6 +23,7 @@ varying float vEmissiveIntensity;
 varying float vAOIntensity;
 varying vec3 vColor;
 varying vec3 vWorldPosition;
+varying vec3 vEmissiveColor;
 varying vec2 vUV;
 
 varying float hasDiffuseMap;
@@ -37,6 +39,7 @@ void main(){
   vEmissiveIntensity = emissiveIntensity;
   vAOIntensity = aoIntensity;
   vWorldPosition = (worldMatrix * vec4(position, 1.0)).xyz;
+  vEmissiveColor = emissiveColor;
 
   hasDiffuseMap = -10.0;
   hasEmissiveMap = -10.0;

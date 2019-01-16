@@ -124,6 +124,7 @@ AddedObject.prototype.export = function(){
   exportObject["opacity"] = this.mesh.material.uniforms.alpha.value;
   exportObject["aoMapIntensity"] = this.mesh.material.uniforms.aoIntensity.value;
   exportObject["emissiveIntensity"] = this.mesh.material.uniforms.emissiveIntensity.value;
+  exportObject["emissiveColor"] = "#"+this.mesh.material.uniforms.emissiveColor.value.getHexString();
   if (this.material.isMeshPhongMaterial){
     exportObject["shininess"] = this.material.shininess;
   }

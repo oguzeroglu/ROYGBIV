@@ -161,7 +161,8 @@ StateLoader.prototype.load = function(undo){
             color: "white",
             alpha: curAddedObjectExport.opacity,
             aoMapIntensity: curAddedObjectExport.aoMapIntensity,
-            emissiveIntensity: curAddedObjectExport.emissiveIntensity
+            emissiveIntensity: curAddedObjectExport.emissiveIntensity,
+            emissiveColor: curAddedObjectExport.emissiveColor
           });
         }else if (roygbivMaterialName == "NULL_PHONG"){
           material = new THREE.MeshPhongMaterial({
@@ -594,6 +595,7 @@ StateLoader.prototype.load = function(undo){
       }
 
       addedObjectInstance.mesh.material.uniforms.emissiveIntensity.value = curAddedObjectExport.emissiveIntensity;
+      addedObjectInstance.mesh.material.uniforms.emissiveColor.value.set(curAddedObjectExport.emissiveColor);
       addedObjectInstance.mesh.material.uniforms.aoIntensity.value = curAddedObjectExport.aoMapIntensity;
 
       addedObjects[addedObjectName] = addedObjectInstance;
