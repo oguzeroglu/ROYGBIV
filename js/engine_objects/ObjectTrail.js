@@ -16,8 +16,10 @@ var ObjectTrail = function(configurations){
       geometry.faces[i].roygbivObjectName = this.object.name;
       if (this.object.hasEmissiveMap()){
         geometry.faces[i].faceEmissiveIntensity = this.object.mesh.material.uniforms.emissiveIntensity.value;
+        geometry.faces[i].faceEmissiveColor = this.object.mesh.material.uniforms.emissiveColor.value;
       }else{
         geometry.faces[i].faceEmissiveIntensity = 0;
+        geometry.faces[i].faceEmissiveColor = WHITE_COLOR;
       }
     }
     this.isAddedObject = true;
@@ -45,8 +47,10 @@ var ObjectTrail = function(configurations){
       var childObj = this.object.group[objName];
       if (childObj.hasEmissiveMap()){
         geometry.faces[i].faceEmissiveIntensity = childObj.mesh.material.uniforms.emissiveIntensity.value;
+        geometry.faces[i].faceEmissiveColor = childObj.mesh.material.uniforms.emissiveColor.value;
       }else{
         geometry.faces[i].faceEmissiveIntensity = 0;
+        geometry.faces[i].faceEmissiveColor = WHITE_COLOR;
       }
     }
   }
@@ -67,6 +71,7 @@ var ObjectTrail = function(configurations){
   var positionsTypedArray = new Float32Array(faces.length * 3 * 3 * 60 * OBJECT_TRAIL_MAX_TIME_IN_SECS);
   var colorsTypedArray = new Float32Array(faces.length * 3 * 3 * 60 * OBJECT_TRAIL_MAX_TIME_IN_SECS);
   var emissiveIntensitiesTypedArray = new Float32Array(faces.length * 3 * 60 * OBJECT_TRAIL_MAX_TIME_IN_SECS);
+  var emissiveColorsTypedArray = new Float32Array(faces.length * 3 * 3 * 60 * OBJECT_TRAIL_MAX_TIME_IN_SECS);
   var normalsTypedArray = new Float32Array(faces.length * 3 * 3 * 60 * OBJECT_TRAIL_MAX_TIME_IN_SECS);
   var coordIndicesTypedArray = new Float32Array(faces.length * 3 * 60 * OBJECT_TRAIL_MAX_TIME_IN_SECS);
   var quatIndicesTypedArray = new Float32Array(faces.length * 3 * 60 * OBJECT_TRAIL_MAX_TIME_IN_SECS);
@@ -79,6 +84,7 @@ var ObjectTrail = function(configurations){
   var objUVs = [];
   var objColors = [];
   var objEmissiveIntensities = [];
+  var objEmissiveColors = [];
   var objTextureFlags = [];
   var objDisplacementInfos = [];
 
@@ -135,6 +141,10 @@ var ObjectTrail = function(configurations){
     objEmissiveIntensities.push(face.faceEmissiveIntensity);
     objEmissiveIntensities.push(face.faceEmissiveIntensity);
 
+    objEmissiveColors.push(face.faceEmissiveColor);
+    objEmissiveColors.push(face.faceEmissiveColor);
+    objEmissiveColors.push(face.faceEmissiveColor);
+
     var textureFlagsVec = new THREE.Vector3();
     if (obj.hasDiffuseMap()){
       textureFlagsVec.x = 20;
@@ -169,6 +179,7 @@ var ObjectTrail = function(configurations){
   var i11 = 0;
   var i12 = 0;
   var i13 = 0;
+  var i14 = 0;
   for (var i = 0; i<faces.length * OBJECT_TRAIL_MAX_TIME_IN_SECS * 3 * 60; i++){
     positionsTypedArray[i2++] = objPositions[i3].x;
     positionsTypedArray[i2++] = objPositions[i3].y;
@@ -189,6 +200,9 @@ var ObjectTrail = function(configurations){
     textureFlagsTypedArray[i12++] = objTextureFlags[i3].y;
     textureFlagsTypedArray[i12++] = objTextureFlags[i3].z;
     emissiveIntensitiesTypedArray[i] = objEmissiveIntensities[i11];
+    emissiveColorsTypedArray[i14++] = objEmissiveColors[i3].r;
+    emissiveColorsTypedArray[i14++] = objEmissiveColors[i3].g;
+    emissiveColorsTypedArray[i14++] = objEmissiveColors[i3].b;
     i3++;
     if (i3 >= objPositions.length){
       i3 = 0;
@@ -218,6 +232,7 @@ var ObjectTrail = function(configurations){
   var positionBufferAttribute = new THREE.BufferAttribute(positionsTypedArray, 3);
   var colorBufferAttribute = new THREE.BufferAttribute(colorsTypedArray, 3);
   var emissiveIntensityBufferAttribute = new THREE.BufferAttribute(emissiveIntensitiesTypedArray, 1);
+  var emissiveColorsBufferAttribute = new THREE.BufferAttribute(emissiveColorsTypedArray, 3);
   var normalBufferAttribute = new THREE.BufferAttribute(normalsTypedArray, 3);
   var coordIndicesBufferAttribute = new THREE.BufferAttribute(coordIndicesTypedArray, 1);
   var quatIndicesBufferAttribute = new THREE.BufferAttribute(quatIndicesTypedArray, 1);
@@ -228,6 +243,7 @@ var ObjectTrail = function(configurations){
   positionBufferAttribute.setDynamic(false);
   colorBufferAttribute.setDynamic(false);
   emissiveIntensityBufferAttribute.setDynamic(false);
+  emissiveColorsBufferAttribute.setDynamic(false);
   normalBufferAttribute.setDynamic(false);
   coordIndicesBufferAttribute.setDynamic(false);
   quatIndicesBufferAttribute.setDynamic(false);
@@ -238,6 +254,7 @@ var ObjectTrail = function(configurations){
   geometry.addAttribute('position', positionBufferAttribute);
   geometry.addAttribute('color', colorBufferAttribute);
   geometry.addAttribute('emissiveIntensity', emissiveIntensityBufferAttribute);
+  geometry.addAttribute('emissiveColor', emissiveColorsBufferAttribute);
   geometry.addAttribute('normal', normalBufferAttribute);
   geometry.addAttribute('coordIndex', coordIndicesBufferAttribute);
   geometry.addAttribute('quatIndex', quatIndicesBufferAttribute);

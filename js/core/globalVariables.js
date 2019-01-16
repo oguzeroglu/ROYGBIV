@@ -975,6 +975,7 @@ var author = "@@2";
 var isDeployment = false;
 var loadedScriptsCounter = 0;
 var isMobile = /Mobi|Android/i.test(navigator.userAgent);
+var WHITE_COLOR = new THREE.Color("white");
 
 // WORKER VARIABLES
 var WORKERS_SUPPORTED = (typeof(Worker) !== "undefined");

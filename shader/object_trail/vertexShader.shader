@@ -12,6 +12,7 @@ attribute float quatIndex;
 attribute vec2 faceVertexUV;
 attribute vec2 displacementInfo;
 attribute vec3 textureFlags;
+attribute vec3 emissiveColor;
 attribute float emissiveIntensity;
 
 uniform mat3 textureMatrix;
@@ -30,6 +31,7 @@ varying vec2 vFaceVertexUV;
 varying vec3 vColor;
 varying vec3 vTextureFlags;
 varying vec3 vWorldPosition;
+varying vec3 vEmissiveColor;
 varying float vEmissiveIntensity;
 
 vec3 applyQuaternionToVector(vec3 vector, vec4 quaternion){
@@ -58,6 +60,7 @@ void main(){
   vTextureFlags = textureFlags;
   vEmissiveIntensity = emissiveIntensity;
   vWorldPosition = (worldMatrix * vec4(position, 1.0)).xyz;
+  vEmissiveColor = emissiveColor;
 
   int indexX = int(coordIndex);
   int indexY = indexX + 1;
