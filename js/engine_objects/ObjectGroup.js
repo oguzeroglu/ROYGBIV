@@ -1198,10 +1198,6 @@ ObjectGroup.prototype.translate = function(axis, amount, fromScript){
   }
 }
 
-ObjectGroup.prototype.resetPosition = function(){
-
-}
-
 ObjectGroup.prototype.destroy = function(isUndo){
   if (selectedObjectGroup && selectedObjectGroup.name == this.name){
     selectedObjectGroup = 0;
@@ -1659,7 +1655,7 @@ ObjectGroup.prototype.copy = function(name, isHardCopy, copyPosition, gridSystem
 }
 
 ObjectGroup.prototype.updateOpacity = function(val){
-  this.mesh.material.uniforms.totalAlpha = new THREE.Uniform(val);
+  this.mesh.material.uniforms.totalAlpha.value = val;
   if (val != 1){
     this.mesh.material.transparent = true;
   }else{

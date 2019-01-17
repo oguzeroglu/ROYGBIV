@@ -12,15 +12,6 @@ MeshGenerator.prototype.getAOIntensityUniform = function(intensity){
   return uniform;
 }
 
-MeshGenerator.prototype.getAlphaUniform = function(alpha){
-  if (alphaUniformCache[alpha]){
-    return alphaUniformCache[alpha];
-  }
-  var uniform = new THREE.Uniform(alpha);
-  alphaUniformCache[alpha] = uniform;
-  return uniform;
-}
-
 MeshGenerator.prototype.getTextureUniform = function(texture){
   if (textureUniformCache[texture.uuid]){
     return textureUniformCache[texture.uuid];
@@ -65,7 +56,7 @@ MeshGenerator.prototype.generateObjectTrail = function(
       objectQuaternions: new THREE.Uniform(objectQuaternions),
       currentPosition: new THREE.Uniform(posit),
       currentQuaternion: new THREE.Uniform(quat),
-      alpha: this.getAlphaUniform(trail.alpha),
+      alpha: new THREE.Uniform(trail.alpha),
       diffuseMap: this.getTextureUniform(trail.diffuseTexture),
       emissiveMap: this.getTextureUniform(trail.emissiveTexture),
       alphaMap: this.getTextureUniform(trail.alphaTexture),
@@ -124,7 +115,7 @@ MeshGenerator.prototype.generateInstancedMesh = function(graphicsGroup, objectGr
       modelViewMatrix: new THREE.Uniform(new THREE.Matrix4()),
       worldMatrix: new THREE.Uniform(new THREE.Matrix4()),
       cameraPosition: GLOBAL_CAMERA_POSITION_UNIFORM,
-      totalAlpha: this.getAlphaUniform(1),
+      totalAlpha: new THREE.Uniform(1),
       diffuseMap: this.getTextureUniform(diffuseTexture),
       emissiveMap: this.getTextureUniform(emissiveTexture),
       alphaMap: this.getTextureUniform(alphaTexture),
@@ -189,7 +180,7 @@ MeshGenerator.prototype.generateMergedMesh = function(graphicsGroup, objectGroup
       modelViewMatrix: new THREE.Uniform(new THREE.Matrix4()),
       worldMatrix: new THREE.Uniform(new THREE.Matrix4()),
       cameraPosition: GLOBAL_CAMERA_POSITION_UNIFORM,
-      totalAlpha: this.getAlphaUniform(1),
+      totalAlpha: new THREE.Uniform(1),
       diffuseMap: this.getTextureUniform(diffuseTexture),
       emissiveMap: this.getTextureUniform(emissiveTexture),
       alphaMap: this.getTextureUniform(alphaTexture),
@@ -233,7 +224,7 @@ MeshGenerator.prototype.generateBasicMesh = function(){
       worldMatrix: new THREE.Uniform(new THREE.Matrix4()),
       cameraPosition: GLOBAL_CAMERA_POSITION_UNIFORM,
       color: new THREE.Uniform(this.material.color),
-      alpha: this.getAlphaUniform(this.material.alpha),
+      alpha: new THREE.Uniform(this.material.alpha),
       fogInfo: GLOBAL_FOG_UNIFORM,
       aoIntensity: this.getAOIntensityUniform(this.material.aoMapIntensity),
       emissiveIntensity: new THREE.Uniform(this.material.emissiveIntensity),

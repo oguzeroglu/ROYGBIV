@@ -43,8 +43,6 @@ var Roygbiv = function(){
     "getIntensity",
     "opacity",
     "getOpacity",
-    "shininess",
-    "getShininess",
     "textureOffsetX",
     "textureOffsetY",
     "textureOffset",
@@ -426,33 +424,16 @@ Roygbiv.prototype.getOpacity = function(object){
     throw new Error("getOpacity error: Object is undefined.");
     return;
   }
-  if (!(object instanceof AddedObject)){
+  var isAddedObject = (object instanceof AddedObject);
+  var isObjectGroup = (object instanceof ObjectGroup);
+  if (!(isAddedObject || isObjectGroup)){
     throw new Error("getOpacity error: Type not supported.");
     return;
   }
-  return object.mesh.material.uniforms.alpha.value;
-}
-
-// getShininess
-//  Returns the shininess of an object. Only the objects who have Phong materials
-//  have shininess property.
-Roygbiv.prototype.getShininess = function(object){
-  if (mode == 0){
-    return;
+  if (isAddedObject){
+    return object.mesh.material.uniforms.alpha.value;
   }
-  if (!object){
-    throw new Error("getShininess error: Object is not defined.");
-    return;
-  }
-  if (!(object instanceof AddedObject)){
-    throw new Error("getShininess error: Type not supported.");
-    return;
-  }
-  if (!object.material.isMeshPhongMaterial){
-    throw new Error("getShininess error: Only phong materials have shininess property.");
-    return;
-  }
-  return object.material.shininess;
+  return object.mesh.material.uniforms.totalAlpha.value;
 }
 
 // getHeightMapScale
@@ -1328,40 +1309,6 @@ Roygbiv.prototype.opacity = function(object, delta){
     }
   }
 
-}
-
-// shininess
-//  Increases/decreases the opacity of given object. Only the objects that have
-//  Phong materials have shininess property.
-Roygbiv.prototype.shininess = function(object, delta){
-  if (mode == 0){
-    return;
-  }
-  if(!object){
-    throw new Error("shininess error: Object is not defined.");
-    return;
-  }
-  if (isNaN(delta)){
-    throw new Error("shininess error: Delta is not a number.");
-    return;
-  }
-  if (!(object instanceof AddedObject)){
-    throw new Error("shininess error: Type not supported.");
-    return;
-  }
-  if (!addedObjects[object.name]){
-    throw new Error("shininess error: Cannot set shininess to child objects.");
-    return;
-  }
-  if (!object.material.isMeshPhongMaterial){
-    throw new Error("shininess error: Only phong materials have shininess property.");
-    return;
-  }
-  if (!object.initShininessSet){
-    object.initShininess = object.material.shininess;
-    object.initShininessSet = true;
-  }
-  object.material.shininess += delta;
 }
 
 // textureOffsetX
