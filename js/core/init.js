@@ -326,16 +326,6 @@ window.onload = function() {
     }).onFinishChange(function(value){
 
     }).listen();
-    omShininessController = datGuiObjectManipulation.add(objectManipulationParameters, "Shininess").min(0).max(100).step(0.01).onChange(function(val){
-      var material = selectedAddedObject.material;
-      if (material.isMeshPhongMaterial){
-        material.shininess = val;
-        material.needsUpdate = true;
-        selectedAddedObject.initShininessSet = false;
-      }
-    }).onFinishChange(function(value){
-
-    }).listen();
     omEmissiveIntensityController = datGuiObjectManipulation.add(objectManipulationParameters, "Emissive int.").min(0).max(100).step(0.01).onChange(function(val){
       var material = selectedAddedObject.mesh.material;
       material.uniforms.emissiveIntensity.value = val;
@@ -1055,7 +1045,6 @@ window.addEventListener('keyup', function(event){
    enableController(omTextureOffsetXController);
    enableController(omTextureOffsetYController);
    enableController(omOpacityController);
-   enableController(omShininessController);
    enableController(omEmissiveIntensityController);
    enableController(omEmissiveColorController);
    enableController(omDisplacementScaleController);
@@ -1160,12 +1149,6 @@ function afterObjectSelection(){
         objectManipulationParameters["Emissive int."] = obj.mesh.material.uniforms.emissiveIntensity.value;
         objectManipulationParameters["Emissive col."] = "#"+obj.mesh.material.uniforms.emissiveColor.value.getHexString();
       }
-      if (!obj.material.isMeshPhongMaterial){
-        disableController(omShininessController);
-      }else{
-        objectManipulationParameters["Shininess"] = obj.material.shininess;
-        objectManipulationParameters["Emissive int."] = obj.material.emissiveIntensity;
-      }
       if (!obj.isSlicable()){
         objectManipulationParameters["Hide half"] = "None";
         disableController(omHideHalfController);
@@ -1205,7 +1188,6 @@ function afterObjectSelection(){
       objectManipulationParameters["Opacity"] = obj.mesh.material.uniforms.totalAlpha.value;
       disableController(omTextureOffsetXController);
       disableController(omTextureOffsetYController);
-      disableController(omShininessController);
       disableController(omEmissiveIntensityController);
       disableController(omEmissiveColorController);
       disableController(omDisplacementScaleController);
@@ -1232,6 +1214,9 @@ function afterObjectSelection(){
     }
     objectManipulationParameters["Has mass"] = !obj.noMass;
     objectManipulationParameters["Blending"] = obj.getBlendingText();
+    if (obj.mesh.material.blending == NO_BLENDING){
+      disableController(omOpacityController);
+    }
     omMassController.updateDisplay();
   }else{
     $(datGuiObjectManipulation.domElement).attr("hidden", true);
