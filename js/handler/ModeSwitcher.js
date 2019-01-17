@@ -115,7 +115,10 @@ ModeSwitcher.prototype.switchFromDesignToPreview = function(){
     if (object.isDynamicObject && !object.noMass){
       dynamicObjectGroups[objectName] = object;
     }
-
+    if (object.initOpacitySet){
+      object.updateOpacity(object.initOpacity);
+      object.initOpacitySet = false;
+    }
   }
   for (var objectName in addedObjects){
     var object = addedObjects[objectName];
@@ -288,6 +291,11 @@ ModeSwitcher.prototype.switchFromPreviewToDesign = function(){
       if (!object.physicsKeptWhenHidden && !object.noMass){
         physicsWorld.add(object.physicsBody);
       }
+    }
+
+    if (object.initOpacitySet){
+      object.updateOpacity(object.initOpacity);
+      object.initOpacitySet = false;
     }
 
   }

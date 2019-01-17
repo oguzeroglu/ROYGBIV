@@ -266,12 +266,12 @@ window.onload = function() {
       if (!obj){
         obj = selectedObjectGroup;
       }
-      if (obj instanceof AddedObject){
+      if (obj instanceof AddedObject || obj instanceof ObjectGroup){
         enableController(omOpacityController);
       }
       if (val == "None"){
         obj.setBlending(NO_BLENDING);
-        if (obj instanceof AddedObject){
+        if (obj instanceof AddedObject || obj instanceof ObjectGroup){
           disableController(omOpacityController);
         }
       }else if (val == "Normal"){
@@ -310,14 +310,9 @@ window.onload = function() {
     }).listen();
     omOpacityController = datGuiObjectManipulation.add(objectManipulationParameters, "Opacity").min(0).max(1).step(0.01).onChange(function(val){
       if (selectedObjectGroup && !selectedAddedObject){
-        for (var childObjName in selectedObjectGroup.group){
-          var childObj = selectedObjectGroup.group[childObjName];
-          childObj.material.transparent = true;
-          childObj.material.opacity = val;
-          childObj.initOpacitySet = false;
-          childObj.initOpacity = childObj.opacity;
-        }
-        return;
+        selectedObjectGroup.updateOpacity(val);
+        selectedObjectGroup.initOpacitySet = false;
+        selectedObjectGroup.initOpacity = selectedObjectGroup.opacity;
       }else if (selectedAddedObject){
         selectedAddedObject.updateOpacity(val);
         selectedAddedObject.initOpacitySet = false;
@@ -1207,6 +1202,7 @@ function afterObjectSelection(){
       }else{
         objectManipulationParameters["Changeable"] = false;
       }
+      objectManipulationParameters["Opacity"] = obj.mesh.material.uniforms.totalAlpha.value;
       disableController(omTextureOffsetXController);
       disableController(omTextureOffsetYController);
       disableController(omShininessController);
@@ -1215,7 +1211,6 @@ function afterObjectSelection(){
       disableController(omDisplacementScaleController);
       disableController(omDisplacementBiasController);
       disableController(omAOIntensityController);
-      disableController(omOpacityController);
       disableController(omHideHalfController);
       if (obj.cannotSetMass){
         disableController(omHasMassController);

@@ -1248,6 +1248,8 @@ StateLoader.prototype.createObjectGroupsAfterLoadedTextures = function(){
       objectGroupInstance.softCopyParentName = curObjectGroupExport.softCopyParentName;
     }
 
+    objectGroupInstance.updateOpacity(curObjectGroupExport.totalAlpha);
+
   }
 
   for (var objName in objectGroups){

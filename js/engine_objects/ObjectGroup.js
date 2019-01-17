@@ -1332,6 +1332,8 @@ ObjectGroup.prototype.export = function(){
     exportObj.softCopyParentName = this.softCopyParentName;
   }
 
+  exportObj.totalAlpha = this.mesh.material.uniforms.totalAlpha.value;
+
   return exportObj;
 }
 
@@ -1654,4 +1656,21 @@ ObjectGroup.prototype.copy = function(name, isHardCopy, copyPosition, gridSystem
   newObjGroup.createdWithScript = fromScript;
 
   return newObjGroup;
+}
+
+ObjectGroup.prototype.updateOpacity = function(val){
+  this.mesh.material.uniforms.totalAlpha = new THREE.Uniform(val);
+  if (val != 1){
+    this.mesh.material.transparent = true;
+  }else{
+    this.mesh.material.transparent = this.isTransparent;
+  }
+}
+ObjectGroup.prototype.incrementOpacity = function(val){
+  this.mesh.material.uniforms.totalAlpha.value += val;
+  if (this.mesh.material.uniforms.totalAlpha.value != 1){
+    this.mesh.material.transparent = true;
+  }else{
+    this.mesh.material.transparent = this.isTransparent;
+  }
 }

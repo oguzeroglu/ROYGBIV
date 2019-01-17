@@ -1292,26 +1292,40 @@ Roygbiv.prototype.opacity = function(object, delta){
     throw new Error("opacity error: Delta is not a number.");
     return;
   }
-  if (!(object instanceof AddedObject)){
+  var isAddedObject = (object instanceof AddedObject);
+  var isObjectGroup = (object instanceof ObjectGroup);
+  if (!((isAddedObject) || (isObjectGroup))){
     throw new Error("opacity error: Type not supported.");
     return;
   }
-  if (!addedObjects[object.name]){
+  if (object.parentObjectName){
     throw new Error("opacity error: Cannot set opacity to child objects.");
     return;
   }
-  if (!object.initOpacitySet){
+  if (!object.initOpacitySet && (isAddedObject)){
     object.initOpacity = object.mesh.material.uniforms.alpha.value;
+    object.initOpacitySet = true;
+  }else if (!object.initOpacitySet && (isObjectGroup)){
+    object.initOpacity = object.mesh.material.uniforms.totalAlpha.value;
     object.initOpacitySet = true;
   }
 
   object.incrementOpacity(delta);
 
-  if (object.mesh.material.uniforms.alpha.value < 0){
-    object.updateOpacity(0);
-  }
-  if (object.mesh.material.uniforms.alpha.value > 1){
-    object.updateOpacity(1);
+  if (isAddedObject){
+    if (object.mesh.material.uniforms.alpha.value < 0){
+      object.updateOpacity(0);
+    }
+    if (object.mesh.material.uniforms.alpha.value > 1){
+      object.updateOpacity(1);
+    }
+  }else if (isObjectGroup){
+    if (object.mesh.material.uniforms.totalAlpha.value < 0){
+      object.updateOpacity(0);
+    }
+    if (object.mesh.material.uniforms.totalAlpha.value > 1){
+      object.updateOpacity(1);
+    }
   }
 
 }

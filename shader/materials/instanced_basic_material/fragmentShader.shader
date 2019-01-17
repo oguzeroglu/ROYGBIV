@@ -4,6 +4,7 @@ precision lowp int;
 #define ALPHA_TEST 0.5
 #define LOG2 1.442695
 
+uniform float totalAlpha;
 uniform vec3 cameraPosition;
 uniform sampler2D diffuseMap;
 uniform sampler2D emissiveMap;
@@ -78,5 +79,7 @@ void main(){
     float fogFactor = exp2(-fogDensity * fogDensity * z * z * LOG2);
     gl_FragColor = vec4(mix(cubeTextureColor.rgb, gl_FragColor.rgb, fogFactor), gl_FragColor.a);
   }
+
+  gl_FragColor.a *= totalAlpha;
 
 }
