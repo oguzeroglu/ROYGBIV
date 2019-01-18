@@ -335,10 +335,17 @@ window.onload = function() {
 
     }).listen();
     omEmissiveIntensityController = datGuiObjectManipulation.add(objectManipulationParameters, "Emissive int.").min(0).max(100).step(0.01).onChange(function(val){
-      var material = selectedAddedObject.mesh.material;
-      material.uniforms.emissiveIntensity.value = val;
-      selectedAddedObject.initEmissiveIntensitySet = false;
-      selectedAddedObject.initEmissiveIntensity = val;
+      if (selectedAddedObject && !selectedObjectGroup){
+        var material = selectedAddedObject.mesh.material;
+        material.uniforms.emissiveIntensity.value = val;
+        selectedAddedObject.initEmissiveIntensitySet = false;
+        selectedAddedObject.initEmissiveIntensity = val;
+      }else if (selectedObjectGroup && !selectedAddedObject){
+        var material = selectedObjectGroup.mesh.material;
+        material.uniforms.totalEmissiveIntensity.value = val;
+        selectedObjectGroup.initEmissiveIntensitySet = false;
+        selectedObjectGroup.initEmissiveIntensity = val;
+      }
     }).onFinishChange(function(value){
 
     }).listen();
@@ -1195,10 +1202,13 @@ function afterObjectSelection(){
       }
       objectManipulationParameters["Opacity"] = obj.mesh.material.uniforms.totalAlpha.value;
       var hasAOMap = false;
+      var hasEmissiveMap = false;
       for (var childObjName in obj.group){
         if (obj.group[childObjName].hasAOMap()){
           hasAOMap = true;
-          break;
+        }
+        if (obj.group[childObjName].hasEmissiveMap()){
+          hasEmissiveMap = true;
         }
       }
       if (!hasAOMap){
@@ -1206,9 +1216,13 @@ function afterObjectSelection(){
       }else{
         objectManipulationParameters["AO intensity"] = obj.mesh.material.uniforms.totalAOIntensity.value;
       }
+      if (!hasEmissiveMap){
+        disableController(omEmissiveIntensityController);
+      }else{
+        objectManipulationParameters["Emissive int."] = obj.mesh.material.uniforms.totalEmissiveIntensity.value;
+      }
       disableController(omTextureOffsetXController);
       disableController(omTextureOffsetYController);
-      disableController(omEmissiveIntensityController);
       disableController(omEmissiveColorController);
       disableController(omDisplacementScaleController);
       disableController(omDisplacementBiasController);

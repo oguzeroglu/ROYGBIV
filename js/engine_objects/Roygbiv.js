@@ -1397,11 +1397,13 @@ Roygbiv.prototype.emissiveIntensity = function(object, delta){
     throw new Error("emissiveIntensity error: object is not defined.");
     return;
   }
-  if (!(object instanceof AddedObject)){
+  var isAddedObject = (object instanceof AddedObject);
+  var isObjectGroup = (object instanceof ObjectGroup);
+  if (!(isAddedObject || isObjectGroup)){
     throw new Error("emissiveIntensity error: Type not supported.");
     return;
   }
-  if (!addedObjects[object.name]){
+  if (object.parentObjectName){
     throw new Error("emissiveIntensity error: Cannot set emissive intensity to child objects.");
     return;
   }
@@ -1413,11 +1415,31 @@ Roygbiv.prototype.emissiveIntensity = function(object, delta){
     throw new Error("emissiveIntensity error: delta is not a number.");
     return;
   }
-  if (!object.initEmissiveIntensitySet){
-    object.initEmissiveIntensity = object.mesh.material.uniforms.emissiveIntensity.value;
-    object.initEmissiveIntensitySet = true;
+  if (isAddedObject){
+    if (!object.initEmissiveIntensitySet){
+      object.initEmissiveIntensity = object.mesh.material.uniforms.emissiveIntensity.value;
+      object.initEmissiveIntensitySet = true;
+    }
+    object.mesh.material.uniforms.emissiveIntensity.value += delta;
+    if (object.mesh.material.uniforms.emissiveIntensity.value < 0){
+      objet.mesh.material.uniforms.emissiveIntensity.value = 0;
+    }
+    if (object.mesh.material.uniforms.emissiveIntensity.value > 100){
+      object.mesh.material.uniforms.emissiveIntensity.value = 100;
+    }
+  }else{
+    if (!object.initEmissiveIntensitySet){
+      object.initEmissiveIntensity = object.mesh.material.uniforms.totalEmissiveIntensity.value;
+      object.initEmissiveIntensitySet = true;
+    }
+    object.mesh.material.uniforms.totalEmissiveIntensity.value += delta;
+    if (object.mesh.material.uniforms.totalEmissiveIntensity.value < 0){
+      object.mesh.material.uniforms.totalEmissiveIntensity.value = 0;
+    }
+    if (object.mesh.material.uniforms.totalEmissiveIntensity.value > 100){
+      object.mesh.material.uniforms.totalEmissiveIntensity.value = 100;
+    }
   }
-  object.mesh.material.uniforms.emissiveIntensity.value += delta;
 }
 
 // setObjectVelocity

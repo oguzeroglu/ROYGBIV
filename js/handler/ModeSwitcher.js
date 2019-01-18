@@ -123,6 +123,10 @@ ModeSwitcher.prototype.switchFromDesignToPreview = function(){
       object.mesh.material.uniforms.totalAOIntensity.value = object.initAOIntensity;
       object.initAOIntensitySet = false;
     }
+    if (object.initEmissiveIntensitySet){
+      object.mesh.material.uniforms.totalEmissiveIntensity.value = object.initEmissiveIntensity;
+      object.initEmissiveIntensitySet = false;
+    }
   }
   for (var objectName in addedObjects){
     var object = addedObjects[objectName];
@@ -308,6 +312,10 @@ ModeSwitcher.prototype.switchFromPreviewToDesign = function(){
     if (object.initAOIntensitySet){
       object.mesh.material.uniforms.totalAOIntensity.value = object.initAOIntensity;
       object.initAOIntensitySet = false;
+    }
+    if (object.initEmissiveIntensitySet){
+      object.mesh.material.uniforms.totalEmissiveIntensity.value = object.initEmissiveIntensity;
+      object.initEmissiveIntensitySet = false;
     }
 
   }
