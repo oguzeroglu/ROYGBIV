@@ -18,7 +18,6 @@ var Roygbiv = function(){
     "getRandomColor",
     "hide",
     "show",
-    "getLight",
     "vector",
     "distance",
     "sub",
@@ -32,15 +31,12 @@ var Roygbiv = function(){
     "rotateAroundXYZ",
     "setPosition",
     "color",
-    "toggleLight",
     "setMass",
     "runScript",
     "isRunning",
     "translate",
     "getPosition",
     "mapTexturePack",
-    "intensity",
-    "getIntensity",
     "opacity",
     "getOpacity",
     "textureOffsetX",
@@ -234,17 +230,9 @@ Roygbiv.prototype.getRandomColor = function(){
   return ColorNames.generateRandomColor();
 }
 
-// getLight
-//  Returns the light having the name given as parameter or zero if no such
-//  light is found.
-Roygbiv.prototype.getLight = function(name){
-
-}
-
 // getPosition
-//  Returns the (x, y, z) coordinates of an object, glued object, point light
-//  or a particle system. If a specific axis is specified, only the position
-//  on the specified axis is returned.
+//  Returns the (x, y, z) coordinates of an object, glued object or a particle system.
+//  If a specific axis is specified, only the position on the specified axis is returned.
 Roygbiv.prototype.getPosition = function(object, targetVector, axis){
   if (mode == 0){
     return;
@@ -323,29 +311,6 @@ Roygbiv.prototype.getPosition = function(object, targetVector, axis){
         );
       }
     }
-  }else if (object.isPointLight){
-    if (axis){
-      if (axis.toLowerCase() == "x"){
-        return object.position.x;
-      }else if (axis.toLowerCase() == "y"){
-        return object.position.y;
-      }else if (axis.toLowerCase() == "z"){
-        return object.position.z;
-      }
-    }else{
-      if (targetVector){
-        targetVector.x = object.position.x;
-        targetVector.y = object.position.y;
-        targetVector.z = object.position.z;
-        return targetVector;
-      }else{
-        return this.vector(
-          object.position.x,
-          object.position.y,
-          object.position.z
-        );
-      }
-    }
   }else if (object instanceof ObjectGroup){
     if (axis){
       if (axis.toLowerCase() == "x"){
@@ -396,23 +361,6 @@ Roygbiv.prototype.getPosition = function(object, targetVector, axis){
     throw new Error("getPosition error: Object type not supported.");
     return;
   }
-}
-
-// getIntensity
-//  Returns the intensity of given ambient light or point light.
-Roygbiv.prototype.getIntensity = function(light){
-  if (mode == 0){
-    return;
-  }
-  if (!light){
-    throw new Error("getIntensity error: Light is not defined.");
-    return;
-  }
-  if (!light.isAmbientLight && !light.isPointLight){
-    throw new Error("getIntensity error: Type not supported.");
-    return;
-  }
-  return light.intensity;
 }
 
 // getOpacity
@@ -907,7 +855,7 @@ Roygbiv.prototype.rotate = function(object, axis, radians){
 }
 
 // rotateAroundXYZ
-//  Rotates an object, a glued object or a point light around the given (x, y, z)
+//  Rotates an object or a glued object around the given (x, y, z)
 //  Unlike the rotate function, the positions of the objects can change when rotated
 //  using this function. If the optional skipLocalRotation flag is set, the object is
 //  not rotated in its local axis system.
@@ -981,8 +929,6 @@ Roygbiv.prototype.rotateAroundXYZ = function(object, x, y, z, radians, axis, ski
       return;
     }
     mesh = object.mesh;
-  }else if (object.isPointLight){
-    mesh = object;
   }else{
     throw new Error("rotateAroundXYZ error: Type not supported.");
     return;
@@ -1011,8 +957,7 @@ Roygbiv.prototype.rotateAroundXYZ = function(object, x, y, z, radians, axis, ski
 }
 
 // setPosition
-//  Puts an object, glued object or point light to
-//  the specified (x, y, z) coordinate.
+//  Puts an object or glued object to the specified (x, y, z) coordinate.
 Roygbiv.prototype.setPosition = function(obj, x, y, z){
   if (mode == 0){
     return;
@@ -1064,35 +1009,9 @@ Roygbiv.prototype.setPosition = function(obj, x, y, z){
     if (obj.mesh.visible){
       rayCaster.updateObject(obj);
     }
-  }else if (obj.isPointLight){
-    obj.position.set(x, y, z);
   }else{
     throw new Error("setPosition error: Type not supported.");
     return;
-  }
-}
-
-// toggleLight
-//  Turns on/off a light.
-Roygbiv.prototype.toggleLight = function(light){
-  if (mode == 0){
-    return;
-  }
-  if (!light){
-    throw new Error("toggleLight error: Parameter is undefined.");
-    return;
-  }
-  if (!light.isPointLight && !light.isAmbientLight){
-    throw new Error("toggleLight error: Parameter is not a light object.");
-    return;
-  }
-  if (!light.turnedOff){
-    light.oldIntensity = light.intensity;
-    light.intensity = 0;
-    light.turnedOff = true;
-  }else{
-    light.intensity = light.oldIntensity;
-    light.turnedOff = false;
   }
 }
 
@@ -1155,8 +1074,8 @@ Roygbiv.prototype.setMass = function(object, mass){
 }
 
 // translate
-//  Translates an object, glued object or point light on
-//  the given axis by the given amount. Axis must be one of x, y or z.
+//  Translates an object or glued object on the given axis by the given amount.
+//  Axis must be one of x, y or z.
 Roygbiv.prototype.translate = function(object, axis, amount){
   if (mode == 0){
     return;
@@ -1193,14 +1112,6 @@ Roygbiv.prototype.translate = function(object, axis, amount){
       return;
     }
     object.translate(axis, amount, true);
-  }else if (object.isPointLight){
-    if (axis.toLowerCase() == "x"){
-      object.position.x += amount;
-    }else if (axis.toLowerCase() == "y"){
-      object.position.y += amount;
-    }else if (axis.toLowerCase() == "z"){
-      object.position.z += amount;
-    }
   }else {
     throw new Error("translate error: Type not supported.");
     return;
@@ -1237,27 +1148,6 @@ Roygbiv.prototype.mapTexturePack = function(object, texturePackName){
     return;
   }
   object.mapTexturePack(texturePack, true);
-}
-
-// intensity
-//  Increases/decreases the intensity of given ambient light or point light.
-Roygbiv.prototype.intensity = function(light, delta){
-  if (mode == 0){
-    return;
-  }
-  if (!light){
-    throw new Error("intensity error: Light is not defined.");
-    return;
-  }
-  if (isNaN(delta)){
-    throw new Error("intensity error: Delta is not a number.");
-    return;
-  }
-  if (!light.isAmbientLight && !light.isPointLight){
-    throw new Error("intensity error: Type not supported.");
-    return;
-  }
-  light.intensity += delta;
 }
 
 // opacity

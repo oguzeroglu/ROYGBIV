@@ -494,7 +494,6 @@ var Text = function(){
   this.ROYGBIV_SCRIPTING_API_GETRANDOMCOLOR = "Returns the HTML name of a random color.";
   this.ROYGBIV_SCRIPTING_API_HIDE = "Hides an object or a glued object, removes it from the scene. Does nothing if the object is already hidden.\nThe additional keepPhysics parameter can be used in order to hide only the graphical representation of the object but\nkeep its physicsal body. The default value of keepPhysics is false.";
   this.ROYGBIV_SCRIPTING_API_SHOW = "Makes a hidden object or glued object visible. Does nothing if the object is already visible.";
-  this.ROYGBIV_SCRIPTING_API_GETLIGHT = "Returns the light having the name given as parameter or zero if no such light is found.";
   this.ROYGBIV_SCRIPTING_API_VECTOR = "Creates a new vector from x, y and z coordinates.";
   this.ROYGBIV_SCRIPTING_API_DISTANCE = "Returns the distance between two vectors.";
   this.ROYGBIV_SCRIPTING_API_SUB = "Returns the substraction of two vectors.";
@@ -505,18 +504,15 @@ var Text = function(){
   this.ROYGBIV_SCRIPTING_API_BOXDISTRIBUTION = "Returns a vector sampled on a face of a box centered at (0, 0, 0).\nThe size of the boxis specified with the parameters sizeX, sizeY and sizeZ.\nThe optional parameter [side] can be used to generate the point on a specific face.\nside = 1 -> UP\nside = 2 -> DOWN\nside = 3 -> FRONT\nside = 4 -> BACK\nside = 5 -> RIGHT\nside = 6 -> LEFT";
   this.ROYGBIV_SCRIPTING_API_APPLYFORCE = "Applies a physical force to an object or a glued object from a given point.";
   this.ROYGBIV_SCRIPTING_API_ROTATE = "Rotates an object or a glued object around a given world axis by given radians. The parameter axis must be one of x, y or z.\nObjects are rotated around their own centers, so their positions do not change when rotated using this function.";
-  this.ROYGBIV_SCRIPTING_API_ROTATEAROUNDXYZ = "Rotates an object, a glued object or a point light around the given (x, y, z). Unlike the rotate function,\nthe positions of the objects can change when rotated using this function. If the optional skipLocalRotation flag is set,\nthe object is not rotated in its local axis system.";
-  this.ROYGBIV_SCRIPTING_API_SETPOSITION = "Puts an object, glued object or point light to the specified (x, y, z) coordinate.";
+  this.ROYGBIV_SCRIPTING_API_ROTATEAROUNDXYZ = "Rotates an object or a glued object around the given (x, y, z). Unlike the rotate function, the positions of the objects\ncan change when rotated using this function. If the optional skipLocalRotation flag is set, the object is not rotated in\nits local axis system.";
+  this.ROYGBIV_SCRIPTING_API_SETPOSITION = "Puts an object or glued object to the specified (x, y, z) coordinate.";
   this.ROYGBIV_SCRIPTING_API_COLOR = "Creates a new color object from the given HTML color name.";
-  this.ROYGBIV_SCRIPTING_API_TOGGLELIGHT = "Turns on/off a light.";
   this.ROYGBIV_SCRIPTING_API_SETMASS = "Sets the mass property of an object or a glued object. Objects are considered dynamic if and only if their mass is greater than zero.";
   this.ROYGBIV_SCRIPTING_API_RUNSCRIPT = "Starts a script of the given name. If parameters are provided, they may be reached using this.[parameterName]\nwithin the newly started script.";
   this.ROYGBIV_SCRIPTING_API_ISRUNNING = "Returns whether a script of the given name is running or not.";
-  this.ROYGBIV_SCRIPTING_API_TRANSLATE = "Translates an object, glued object or point light on the given axis by the given amount.\nAxis must be one of x, y or z.";
-  this.ROYGBIV_SCRIPTING_API_GETPOSITION = "Returns the (x, y, z) coordinates of an object, glued object, point light or a particle system.\nIf a specific axis is specified, only the position on the specified axis is returned.";
+  this.ROYGBIV_SCRIPTING_API_TRANSLATE = "Translates an object or glued object on the given axis by the given amount.\nAxis must be one of x, y or z.";
+  this.ROYGBIV_SCRIPTING_API_GETPOSITION = "Returns the (x, y, z) coordinates of an object, glued object or a particle system.\nIf a specific axis is specified, only the position on the specified axis is returned.";
   this.ROYGBIV_SCRIPTING_API_MAPTEXTUREPACK = "Maps a texture pack of given name to an object. Calling this function repeatedly may cause performance issues.";
-  this.ROYGBIV_SCRIPTING_API_INTENSITY = "Increases/decreases the intensity of given ambient light or point light.";
-  this.ROYGBIV_SCRIPTING_API_GETINTENSITY = "Returns the intensity of given ambient light or point light.";
   this.ROYGBIV_SCRIPTING_API_OPACITY = "Increases/decreases the opacity of given object.";
   this.ROYGBIV_SCRIPTING_API_GETOPACITY = "Returns the opacity of given object.";
   this.ROYGBIV_SCRIPTING_API_TEXTUREOFFSETX = "Adjusts the x coordinate of texture offset of given object.";
@@ -898,4 +894,5 @@ var Text = function(){
    this.ROYGBIV_SCRIPTING_API_SETTEXTINPUTCALLBACKFUNCTION = "Sets a callback function for ROYGBIV terminal text input. The callbackFunction is executed with the text parameter.";
    this.ROYGBIV_SCRIPTING_API_REMOVETEXTINPUTCALLBACKFUNCTION = "Removes the callback function for ROYGBIV terminal text input.";
    this.ROYGBIV_SCRIPTING_API_LERP = "Linearly interpolate between vector1 and vector2. The result is vector1 if amount = 0 and vector2 if amount = 1.";
+   this.ROYGBIV_SCRIPTING_API_AOINTENSITY = "Modifies the AO intensity of an object by given amount.";
 }
