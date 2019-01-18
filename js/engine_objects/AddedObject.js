@@ -590,6 +590,8 @@ AddedObject.prototype.syncProperties = function(refObject){
   // AO INTENSITY
   var refAOIntensity = refObject.mesh.material.uniforms.aoIntensity.value;
   this.mesh.material.uniforms.aoIntensity.value = refAOIntensity
+  this.initAOIntensitySet = false;
+  this.initAOIntensity = refAOIntensity;
   // EMISSIVE INTENSITY
   var refMaterial = refObject.mesh.material;
   var refEmissiveIntensity = refMaterial.uniforms.emissiveIntensity.value;

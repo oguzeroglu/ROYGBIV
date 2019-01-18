@@ -159,7 +159,8 @@ var Roygbiv = function(){
     "clearTerminal",
     "setTextInputCallbackFunction",
     "removeTextInputCallbackFunction",
-    "lerp"
+    "lerp",
+    "aoIntensity"
   ];
 
   this.globals = new Object();
@@ -1676,6 +1677,61 @@ Roygbiv.prototype.unsetRotationPivot = function(object){
   delete object.pivotOffsetX;
   delete object.pivotOffsetY;
   delete object.pivotOffsetZ;
+}
+
+// aoIntensity
+// Modifies the AO intensity of an object by given amount.
+Roygbiv.prototype.aoIntensity = function(object, amount){
+  if (mode == 0){
+    return;
+  }
+  if (typeof object == UNDEFINED){
+    throw new Error("aoIntensity error: object is not defined.");
+    return;
+  }
+  var isAddedObject = (object instanceof AddedObject);
+  var isObjectGroup = (object instanceof ObjectGroup);
+  if (!(isAddedObject || isObjectGroup)){
+    throw new Error("aoIntensity error: Type not supported.");
+    return;
+  }
+  if (object.parentObjectName){
+    throw new Error("aoIntensity error: Child objects do not support this function.");
+    return;
+  }
+  if (typeof amount == UNDEFINED){
+    throw new Error("aoIntensity error: amount is not defined.");
+    return;
+  }
+  if (isNaN(amount)){
+    throw new Error("aoIntensity error: amount is not a number.");
+    return;
+  }
+  if (isAddedObject){
+    if (!object.initAOIntensitySet){
+      object.initAOIntensity = object.mesh.material.uniforms.aoIntensity.value;
+      object.initAOIntensitySet = true;
+    }
+    object.mesh.material.uniforms.aoIntensity.value += amount;
+    if (object.mesh.material.uniforms.aoIntensity.value < 0){
+      object.mesh.material.uniforms.aoIntensity.value = 0;
+    }
+    if (object.mesh.material.uniforms.aoIntensity.value > 10){
+      object.mesh.material.uniforms.aoIntensity.value = 10;
+    }
+  }else{
+    if (!object.initAOIntensitySet){
+      object.initAOIntensity = object.mesh.material.uniforms.totalAOIntensity.value;
+      object.initAOIntensitySet = true;
+    }
+    object.mesh.material.uniforms.totalAOIntensity.value += amount;
+    if (object.mesh.material.uniforms.totalAOIntensity.value < 0){
+      object.mesh.material.uniforms.totalAOIntensity.value = 0;
+    }
+    if (object.mesh.material.uniforms.totalAOIntensity.value > 10){
+      object.mesh.material.uniforms.totalAOIntensity.value = 10;
+    }
+  }
 }
 
 // PARTICLE SYSTEM FUNCTIONS ***************************************************
