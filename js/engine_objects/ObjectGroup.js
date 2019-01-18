@@ -1329,6 +1329,7 @@ ObjectGroup.prototype.export = function(){
   }
 
   exportObj.totalAlpha = this.mesh.material.uniforms.totalAlpha.value;
+  exportObj.totalAOIntensity = this.mesh.material.uniforms.totalAOIntensity.value;
 
   return exportObj;
 }

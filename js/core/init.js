@@ -322,7 +322,11 @@ window.onload = function() {
 
     }).listen();
     omAOIntensityController = datGuiObjectManipulation.add(objectManipulationParameters, "AO intensity").min(0).max(10).step(0.1).onChange(function(val){
-      selectedAddedObject.mesh.material.uniforms.aoIntensity = new THREE.Uniform(val);
+      if (selectedAddedObject && !selectedObjectGroup){
+        selectedAddedObject.mesh.material.uniforms.aoIntensity.value = val;
+      }else if (selectedObjectGroup && !selectedAddedObject){
+        selectedObjectGroup.mesh.material.uniforms.totalAOIntensity.value = val;
+      }
     }).onFinishChange(function(value){
 
     }).listen();
@@ -1186,13 +1190,24 @@ function afterObjectSelection(){
         objectManipulationParameters["Changeable"] = false;
       }
       objectManipulationParameters["Opacity"] = obj.mesh.material.uniforms.totalAlpha.value;
+      var hasAOMap = false;
+      for (var childObjName in obj.group){
+        if (obj.group[childObjName].hasAOMap()){
+          hasAOMap = true;
+          break;
+        }
+      }
+      if (!hasAOMap){
+        disableController(omAOIntensityController);
+      }else{
+        objectManipulationParameters["AO intensity"] = obj.mesh.material.uniforms.totalAOIntensity.value;
+      }
       disableController(omTextureOffsetXController);
       disableController(omTextureOffsetYController);
       disableController(omEmissiveIntensityController);
       disableController(omEmissiveColorController);
       disableController(omDisplacementScaleController);
       disableController(omDisplacementBiasController);
-      disableController(omAOIntensityController);
       disableController(omHideHalfController);
       if (obj.cannotSetMass){
         disableController(omHasMassController);

@@ -5,6 +5,7 @@ precision lowp int;
 #define LOG2 1.442695
 
 uniform float totalAlpha;
+uniform float totalAOIntensity;
 uniform sampler2D diffuseMap;
 uniform sampler2D emissiveMap;
 uniform sampler2D alphaMap;
@@ -51,7 +52,8 @@ void main(){
   }
 
   if (hasAOMap > 0.0){
-    float ao = (texture2D(aoMap, vUV).r - 1.0) * vAOIntensity + 1.0;
+    float aoIntensityCoef = vAOIntensity * totalAOIntensity;
+    float ao = (texture2D(aoMap, vUV).r - 1.0) * aoIntensityCoef + 1.0;
     gl_FragColor.rgb *= ao;
   }
 

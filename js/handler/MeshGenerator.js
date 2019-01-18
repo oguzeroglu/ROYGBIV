@@ -3,15 +3,6 @@ var MeshGenerator = function(geometry, material){
   this.material = material;
 }
 
-MeshGenerator.prototype.getAOIntensityUniform = function(intensity){
-  if (aoIntensityUniformCache[intensity]){
-    return aoIntensityUniformCache[intensity];
-  }
-  var uniform = new THREE.Uniform(intensity);
-  aoIntensityUniformCache[intensity] = uniform;
-  return uniform;
-}
-
 MeshGenerator.prototype.getTextureUniform = function(texture){
   if (textureUniformCache[texture.uuid]){
     return textureUniformCache[texture.uuid];
@@ -116,6 +107,7 @@ MeshGenerator.prototype.generateInstancedMesh = function(graphicsGroup, objectGr
       worldMatrix: new THREE.Uniform(new THREE.Matrix4()),
       cameraPosition: GLOBAL_CAMERA_POSITION_UNIFORM,
       totalAlpha: new THREE.Uniform(1),
+      totalAOIntensity: new THREE.Uniform(1),
       diffuseMap: this.getTextureUniform(diffuseTexture),
       emissiveMap: this.getTextureUniform(emissiveTexture),
       alphaMap: this.getTextureUniform(alphaTexture),
@@ -181,6 +173,7 @@ MeshGenerator.prototype.generateMergedMesh = function(graphicsGroup, objectGroup
       worldMatrix: new THREE.Uniform(new THREE.Matrix4()),
       cameraPosition: GLOBAL_CAMERA_POSITION_UNIFORM,
       totalAlpha: new THREE.Uniform(1),
+      totalAOIntensity: new THREE.Uniform(1),
       diffuseMap: this.getTextureUniform(diffuseTexture),
       emissiveMap: this.getTextureUniform(emissiveTexture),
       alphaMap: this.getTextureUniform(alphaTexture),
@@ -226,7 +219,7 @@ MeshGenerator.prototype.generateBasicMesh = function(){
       color: new THREE.Uniform(this.material.color),
       alpha: new THREE.Uniform(this.material.alpha),
       fogInfo: GLOBAL_FOG_UNIFORM,
-      aoIntensity: this.getAOIntensityUniform(this.material.aoMapIntensity),
+      aoIntensity: new THREE.Uniform(this.material.aoMapIntensity),
       emissiveIntensity: new THREE.Uniform(this.material.emissiveIntensity),
       displacementInfo: new THREE.Uniform(new THREE.Vector2()),
       textureFlags: new THREE.Uniform(textureFlags),

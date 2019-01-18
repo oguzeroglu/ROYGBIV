@@ -950,7 +950,6 @@ var SIDE_BOTH = "Both";
 var SIDE_FRONT = "Front";
 var SIDE_BACK = "Back";
 var textureUniformCache = new Object();
-var aoIntensityUniformCache = new Object();
 var screenResolution = 1;
 var rayCaster;
 var intersectionPoint = 0;

@@ -1249,6 +1249,7 @@ StateLoader.prototype.createObjectGroupsAfterLoadedTextures = function(){
     }
 
     objectGroupInstance.updateOpacity(curObjectGroupExport.totalAlpha);
+    objectGroupInstance.mesh.material.uniforms.totalAOIntensity.value = curObjectGroupExport.totalAOIntensity;
 
   }
 
@@ -2394,7 +2395,6 @@ StateLoader.prototype.resetProject = function(undo){
   areaConfigurationsVisible = false;
   areaConfigurationsHandler = new AreaConfigurationsHandler();
   textureUniformCache = new Object();
-  aoIntensityUniformCache = new Object();
   dynamicObjects = new Object();
   dynamicObjectGroups = new Object();
   trackingObjects = new Object();
