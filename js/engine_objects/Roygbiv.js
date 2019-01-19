@@ -157,7 +157,8 @@ var Roygbiv = function(){
     "removeTextInputCallbackFunction",
     "lerp",
     "aoIntensity",
-    "emissiveColor"
+    "emissiveColor",
+    "resetObjectVelocity"
   ];
 
   this.globals = new Object();
@@ -1679,6 +1680,36 @@ Roygbiv.prototype.emissiveColor = function(object, colorText){
     }
     object.mesh.material.uniforms.totalEmissiveColor.value.set(colorText);
   }
+}
+
+// resetObjectVelocity
+// Resets the velocity and angular velocity of an object.
+Roygbiv.prototype.resetObjectVelocity = function(object){
+  if (mode == 0){
+    return;
+  }
+  if (typeof object == UNDEFINED){
+    throw new Error("resetObjectVelocity error: object is not defined.");
+    return;
+  }
+  if (!(object.isAddedObject || object.isObjectGroup)){
+    throw new Error("resetObjectVelocity error: Type not supported.");
+    return;
+  }
+  if (!object.isChangeable){
+    throw new Error("resetObjectVelocity error: object is not marked as changeable.");
+    return;
+  }
+  if (object.parentObjectName){
+    throw new Error("resetObjectVelocity error: Cannot set velocity to child objects. Use parent object instead.");
+    return;
+  }
+  if (!object.isDynamicObject){
+    throw new Error("resetObjectVelocity error: Object must have a mass greater than zero.");
+    return;
+  }
+  object.physicsBody.velocity.set(0, 0, 0);
+  object.physicsBody.angularVelocity.set(0, 0, 0);
 }
 
 // PARTICLE SYSTEM FUNCTIONS ***************************************************
