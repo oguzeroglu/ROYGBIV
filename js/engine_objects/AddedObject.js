@@ -568,7 +568,7 @@ AddedObject.prototype.sliceInHalf = function(type){
   newMesh.addedObject = this;
   this.mesh = newMesh;
   scene.add(this.mesh);
-
+  this.generateBoundingBoxes();
 }
 
 AddedObject.prototype.syncProperties = function(refObject){
@@ -2074,10 +2074,10 @@ AddedObject.prototype.intersectsLine = function(line){
     if (plane.intersectLine(line, REUSABLE_VECTOR)){
       var triangle1 = this.triangles[i];
       var triangle2 = this.triangles[i+1];
-      if (triangle1.containsPoint(REUSABLE_VECTOR)){
+      if (triangle1 && triangle1.containsPoint(REUSABLE_VECTOR)){
         INTERSECTION_NORMAL.set(plane.normal.x, plane.normal.y, plane.normal.z);
         return REUSABLE_VECTOR;
-      }else if (triangle2.containsPoint(REUSABLE_VECTOR)){
+      }else if (triangle2 && triangle2.containsPoint(REUSABLE_VECTOR)){
         INTERSECTION_NORMAL.set(plane.normal.x, plane.normal.y, plane.normal.z);
         return REUSABLE_VECTOR;
       }
@@ -2133,7 +2133,12 @@ AddedObject.prototype.updateBoundingBoxes = function(parentAry){
 }
 
 AddedObject.prototype.generateBoundingBoxes = function(parentAry){
-  var pseudoGeometry = this.segmentGeometry(true, 1, true);
+  var pseudoGeometry;
+  if (typeof this.metaData.slicedType == UNDEFINED){
+    pseudoGeometry = this.segmentGeometry(true, 1, true);
+  }else{
+    pseudoGeometry = new THREE.Geometry().fromBufferGeometry(this.mesh.geometry);
+  }
   this.vertices = pseudoGeometry.vertices;
   var bb = new THREE.Box3();
   bb.roygbivObjectName = this.name;

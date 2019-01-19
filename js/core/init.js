@@ -258,6 +258,7 @@ window.onload = function() {
       }else if (val == "Part 4"){
         selectedAddedObject.sliceInHalf(3);
       }
+      rayCaster.updateObject(selectedAddedObject);
     }).listen();
     omBlendingController = datGuiObjectManipulation.add(objectManipulationParameters, "Blending", [
       "None", "Normal", "Additive", "Subtractive", "Multiply"
