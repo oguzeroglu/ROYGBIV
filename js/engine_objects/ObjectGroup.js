@@ -946,7 +946,7 @@ ObjectGroup.prototype.glue = function(){
   this.initQuaternion = this.graphicsGroup.quaternion.clone();
 
   this.collisionCallbackFunction = function(collisionEvent){
-    if (!collisionEvent.body.addedObject || !this.isVisibleOnThePreviewScene()){
+    if (!collisionEvent.body.addedObject || (!this.isVisibleOnThePreviewScene() && !this.physicsKeptWhenHidden)){
       return;
     }
     if (isPhysicsWorkerEnabled()){

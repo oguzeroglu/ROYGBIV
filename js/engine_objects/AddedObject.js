@@ -51,7 +51,7 @@ var AddedObject = function(name, type, metaData, material, mesh, physicsBody, de
   this.initQuaternion = this.mesh.quaternion.clone();
 
   this.collisionCallbackFunction = function(collisionEvent){
-    if (!collisionEvent.body.addedObject || !this.isVisibleOnThePreviewScene()){
+    if (!collisionEvent.body.addedObject || (!this.isVisibleOnThePreviewScene() && !this.physicsKeptWhenHidden)){
       return;
     }
     if (isPhysicsWorkerEnabled()){
