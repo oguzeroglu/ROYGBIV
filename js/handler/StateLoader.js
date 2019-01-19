@@ -20,6 +20,8 @@ StateLoader.prototype.load = function(undo){
     this.isUndo = undo;
 
     var obj = this.stateObj;
+    // NO MOBILE ***************************************************
+    NO_MOBILE = obj.noMobile;
     // GRID SYSTEMS ************************************************
     var gridSystemsExport = obj.gridSystems;
     for (var gridSystemName in gridSystemsExport){
@@ -2411,6 +2413,7 @@ StateLoader.prototype.resetProject = function(undo){
   screenPointerLockChangedCallbackFunction = 0;
   screenFullScreenChangeCallbackFunction = 0;
   terminalTextInputCallbackFunction = 0;
+  NO_MOBILE = false;
 
   boundingClientRect = renderer.domElement.getBoundingClientRect();
   pointerLockRequested = false;

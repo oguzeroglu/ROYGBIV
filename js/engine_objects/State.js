@@ -6,6 +6,7 @@ var State = function(projectName, author){
   if (!(typeof author == UNDEFINED)){
     this.author = author;
   }
+  this.noMobile = NO_MOBILE;
   // DATE **********************************************************
   this.date = new Date();
   // GRID SYSTEMS **************************************************

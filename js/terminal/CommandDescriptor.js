@@ -665,6 +665,11 @@ var CommandDescriptor = function(){
   this.fogConfigurations.types = [];
   this.fogConfigurations.types.push(this.HIDE_SHOW); // hide/show
 
+  // noMobile
+  this.noMobile = new Object();
+  this.noMobile.types = [];
+  this.noMobile.types.push(this.STATE_ON_OFF); // on/off
+
 };
 
 CommandDescriptor.prototype.test = function(){

@@ -153,7 +153,8 @@ var commandArgumentsExpectedCount = [
     6, //copyObject
     2, //build
     1, //skyboxConfigurations
-    1 //fogConfigurations
+    1, //fogConfigurations
+    1  //noMobile
 ];
 var commandArgumentsExpectedExplanation = [
   "help", //help
@@ -303,7 +304,8 @@ var commandArgumentsExpectedExplanation = [
   "copyObject sourceName targetName offsetX offsetY offsetZ isHardCopy", //copyObject
   "build projectName author", //build
   "skyboxConfigurations show/hide", //skyboxConfigurations
-  "fogConfigurations show/hide" //fogConfigurations
+  "fogConfigurations show/hide", //fogConfigurations
+  "noMobile on/off" //noMobile
 ];
 var commands = [
   "help",
@@ -453,7 +455,8 @@ var commands = [
   "copyObject",
   "build",
   "skyboxConfigurations",
-  "fogConfigurations"
+  "fogConfigurations",
+  "noMobile"
 ];
 var commandInfo = [
   "help: Prints command list.",
@@ -603,7 +606,8 @@ var commandInfo = [
   "copyObject: Creates a clone of an object.",
   "build: Builds the project for release.",
   "skyboxConfigurations: Shows/hides the skybox configuration GUI.",
-  "fogConfigurations: Shows/hides the fog configuration GUI."
+  "fogConfigurations: Shows/hides the fog configuration GUI.",
+  "noMobile: Prevents the application from loading and alerts a warning message in deployment mode for mobile devices if used with on parameter."
 ];
 var keyboardInfo = [
   "W/S : Translates the camera on axis Z.",
@@ -974,6 +978,7 @@ var isDeployment = false;
 var loadedScriptsCounter = 0;
 var isMobile = /Mobi|Android/i.test(navigator.userAgent);
 var WHITE_COLOR = new THREE.Color("white");
+var NO_MOBILE = false;
 
 // WORKER VARIABLES
 var WORKERS_SUPPORTED = (typeof(Worker) !== "undefined");

@@ -1352,6 +1352,12 @@ function rescale(canvas, scale){
 
 // DEPLOYMENT
 function startDeployment(){
+  if (NO_MOBILE && isMobile){
+    terminal.clear();
+    terminal.handleAboutCommand();
+    terminal.printError("[!] This application does not support mobile devices. Please run this with a non mobile device.");
+    return;
+  }
   terminal.clear();
   terminal.handleAboutCommand();
   $.getJSON("js/application.json").done(function(data){

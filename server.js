@@ -35,7 +35,7 @@ app.post("/build", function(req, res){
       res.send(JSON.stringify({ "error": "A project with the same name alreay exists under deploy folder."}));
       return;
     }
-    var engineScriptsConcatted = readEngineScripts(req.body.projectName, req.body.author);
+    var engineScriptsConcatted = readEngineScripts(req.body.projectName, req.body.author, req.body.noMobile);
     fs.writeFileSync("deploy/"+req.body.projectName+"/js/roygbiv.js", engineScriptsConcatted);
     fs.writeFileSync("deploy/"+req.body.projectName+"/js/application.json", JSON.stringify(req.body));
     copyAssets(req.body);
@@ -127,7 +127,7 @@ function generateDeployDirectory(projectName, application){
   return true;
 }
 
-function readEngineScripts(projectName, author){
+function readEngineScripts(projectName, author, noMobile){
   var content = "";
   var htmlContent = fs.readFileSync("roygbiv.html", "utf8");
   var htmlContentSplitted = htmlContent.split("\n");
@@ -139,7 +139,15 @@ function readEngineScripts(projectName, author){
         scriptContent = scriptContent.replace("var isDeployment = false;", "var isDeployment = true;");
         scriptContent = scriptContent.replace("var projectName = \"@@1\"", "var projectName = \""+projectName+"\"");
         scriptContent = scriptContent.replace("var author = \"@@2\"", "var author = \""+author+"\"");
+        if (noMobile){
+          scriptContent = scriptContent.replace("var NO_MOBILE = false;", "var NO_MOBILE = true;");
+          console.log("[*] NO_MOBILE is: "+noMobile);
+        }
         console.log("[*] isDeployment flag injected into globalVariables.");
+      }
+      if (scriptPath.includes("cliParser.js")){
+        console.log("[*] Skipping cliParser");
+        continue;
       }
       content += scriptContent +"\n";
     }
