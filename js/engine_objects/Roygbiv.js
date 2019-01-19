@@ -159,7 +159,8 @@ var Roygbiv = function(){
     "aoIntensity",
     "emissiveColor",
     "resetObjectVelocity",
-    "setFPSDropCallbackFunction"
+    "setFPSDropCallbackFunction",
+    "removeFPSDropCallbackFunction"
   ];
 
   this.globals = new Object();
@@ -6634,6 +6635,15 @@ Roygbiv.prototype.setFPSDropCallbackFunction = function(callbackFunction){
     return;
   }
   fpsDropCallbackFunction = callbackFunction;
+}
+
+// removeFPSDropCallbackFunction
+// Removes the callback function for FPS drops.
+Roygbiv.prototype.removeFPSDropCallbackFunction = function(){
+  if (mode == 0){
+    return;
+  }
+  fpsDropCallbackFunction = 0;
 }
 
 // UTILITY FUNCTIONS ***********************************************************

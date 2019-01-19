@@ -901,4 +901,5 @@ var Text = function(){
    this.ROYGBIV_SCRIPTING_API_EMISSIVECOLOR = "Sets the emissive color of an object to a given value.";
    this.ROYGBIV_SCRIPTING_API_RESETOBJECTVELOCITY = "Resets the velocity and angular velocity of an object.";
    this.ROYGBIV_SCRIPTING_API_SETFPSDROPCALLBACKFUNCTION = "Sets a callback function for FPS drops. The callbackFunction is executed with dropAmount parameter if the FPS is\nless than 60 for given second. The dropAmount is calculated using this formula: (60 - [current_fps])";
+   this.ROYGBIV_SCRIPTING_API_REMOVEFPSDROPCALLBACKFUNCTION = "Removes the callback function for FPS drops.";
 }
