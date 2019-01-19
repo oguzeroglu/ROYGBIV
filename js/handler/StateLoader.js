@@ -1251,6 +1251,7 @@ StateLoader.prototype.createObjectGroupsAfterLoadedTextures = function(){
     objectGroupInstance.updateOpacity(curObjectGroupExport.totalAlpha);
     objectGroupInstance.mesh.material.uniforms.totalAOIntensity.value = curObjectGroupExport.totalAOIntensity;
     objectGroupInstance.mesh.material.uniforms.totalEmissiveIntensity.value = curObjectGroupExport.totalEmissiveIntensity;
+    objectGroupInstance.mesh.material.uniforms.totalEmissiveColor.value.set(curObjectGroupExport.totalEmissiveColor);
 
   }
 

@@ -285,10 +285,18 @@ window.onload = function() {
       }
     }).listen();
     omEmissiveColorController = datGuiObjectManipulation.addColor(objectManipulationParameters, "Emissive col.").onChange(function(val){
-      var material = selectedAddedObject.mesh.material;
-      material.uniforms.emissiveColor.value.set(val);
-      selectedAddedObject.initEmissiveColorSet = false;
-      selectedAddedObject.initEmissiveColor = val;
+      if (selectedAddedObject && !selectedObjectGroup){
+        var material = selectedAddedObject.mesh.material;
+        material.uniforms.emissiveColor.value.set(val);
+        selectedAddedObject.initEmissiveColorSet = false;
+        selectedAddedObject.initEmissiveColor = val;
+      }else if (selectedObjectGroup && !selectedAddedObject){
+        var material = selectedObjectGroup.mesh.material;
+        material.uniforms.totalEmissiveColor.value.set(val);
+        selectedObjectGroup.initEmissiveColorSet = false;
+        selectedObjectGroup.initEmissiveColor = val;
+      }
+
     }).onFinishChange(function(value){
 
     }).listen();
@@ -1218,12 +1226,13 @@ function afterObjectSelection(){
       }
       if (!hasEmissiveMap){
         disableController(omEmissiveIntensityController);
+        disableController(omEmissiveColorController);
       }else{
         objectManipulationParameters["Emissive int."] = obj.mesh.material.uniforms.totalEmissiveIntensity.value;
+        objectManipulationParameters["Emissive col."] = "#"+obj.mesh.material.uniforms.totalEmissiveColor.value.getHexString();
       }
       disableController(omTextureOffsetXController);
       disableController(omTextureOffsetYController);
-      disableController(omEmissiveColorController);
       disableController(omDisplacementScaleController);
       disableController(omDisplacementBiasController);
       disableController(omHideHalfController);

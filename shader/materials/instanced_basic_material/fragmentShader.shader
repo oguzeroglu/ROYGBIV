@@ -8,6 +8,7 @@ uniform float totalAlpha;
 uniform float totalAOIntensity;
 uniform float totalEmissiveIntensity;
 uniform vec3 cameraPosition;
+uniform vec3 totalEmissiveColor;
 uniform sampler2D diffuseMap;
 uniform sampler2D emissiveMap;
 uniform sampler2D alphaMap;
@@ -61,7 +62,7 @@ void main(){
   if (hasEmissiveMap > 0.0){
     vec4 eColor = texture2D(emissiveMap, vUV);
     float ei = vEmissiveIntensity * totalEmissiveIntensity;
-    vec3 totalEmissiveRadiance = vec3(ei, ei, ei) * vEmissiveColor;
+    vec3 totalEmissiveRadiance = vec3(ei, ei, ei) * vEmissiveColor * totalEmissiveColor;
     totalEmissiveRadiance *= eColor.rgb;
     gl_FragColor.rgb += totalEmissiveRadiance;
   }
