@@ -895,4 +895,5 @@ var Text = function(){
    this.ROYGBIV_SCRIPTING_API_REMOVETEXTINPUTCALLBACKFUNCTION = "Removes the callback function for ROYGBIV terminal text input.";
    this.ROYGBIV_SCRIPTING_API_LERP = "Linearly interpolate between vector1 and vector2. The result is vector1 if amount = 0 and vector2 if amount = 1.";
    this.ROYGBIV_SCRIPTING_API_AOINTENSITY = "Modifies the AO intensity of an object by given amount.";
+   this.ROYGBIV_SCRIPTING_API_EMISSIVECOLOR = "Sets the emissive color of an object to a given value.";
 }

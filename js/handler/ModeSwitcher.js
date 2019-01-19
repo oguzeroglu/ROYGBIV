@@ -127,6 +127,10 @@ ModeSwitcher.prototype.switchFromDesignToPreview = function(){
       object.mesh.material.uniforms.totalEmissiveIntensity.value = object.initEmissiveIntensity;
       object.initEmissiveIntensitySet = false;
     }
+    if (object.initEmissiveColorSet){
+      object.mesh.material.uniforms.totalEmissiveColor.value.set("#"+object.initEmissiveColor);
+      object.initEmissiveColorSet = false;
+    }
   }
   for (var objectName in addedObjects){
     var object = addedObjects[objectName];
@@ -173,7 +177,7 @@ ModeSwitcher.prototype.switchFromDesignToPreview = function(){
       object.initAOIntensitySet = false;
     }
     if (object.initEmissiveColorSet){
-      object.mesh.material.uniforms.emissiveColor.value.set(object.initEmissiveColor);
+      object.mesh.material.uniforms.emissiveColor.value.set("#"+object.initEmissiveColor);
       object.initEmissiveColorSet = false;
     }
     if (object.material.isMeshPhongMaterial){
@@ -317,7 +321,10 @@ ModeSwitcher.prototype.switchFromPreviewToDesign = function(){
       object.mesh.material.uniforms.totalEmissiveIntensity.value = object.initEmissiveIntensity;
       object.initEmissiveIntensitySet = false;
     }
-
+    if (object.initEmissiveColorSet){
+      object.mesh.material.uniforms.totalEmissiveColor.value.set("#"+object.initEmissiveColor);
+      object.initEmissiveColorSet = false;
+    }
   }
   for (var objectName in addedObjects){
     var object = addedObjects[objectName];
@@ -376,7 +383,7 @@ ModeSwitcher.prototype.switchFromPreviewToDesign = function(){
       object.initEmissiveIntensitySet = false;
     }
     if (object.initEmissiveColorSet){
-      object.mesh.material.uniforms.emissiveColor.value.set(object.initEmissiveColor);
+      object.mesh.material.uniforms.emissiveColor.value.set("#"+object.initEmissiveColor);
       object.initEmissiveColorSet = false;
     }
     if (!(typeof object.originalMass == "undefined")){

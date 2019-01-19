@@ -156,7 +156,8 @@ var Roygbiv = function(){
     "setTextInputCallbackFunction",
     "removeTextInputCallbackFunction",
     "lerp",
-    "aoIntensity"
+    "aoIntensity",
+    "emissiveColor"
   ];
 
   this.globals = new Object();
@@ -1643,6 +1644,40 @@ Roygbiv.prototype.aoIntensity = function(object, amount){
     if (object.mesh.material.uniforms.totalAOIntensity.value > 10){
       object.mesh.material.uniforms.totalAOIntensity.value = 10;
     }
+  }
+}
+
+// emissiveColor
+// Sets the emissive color of an object to a given value.
+Roygbiv.prototype.emissiveColor = function(object, colorText){
+  if (mode == 0){
+    return;
+  }
+  if (typeof object == UNDEFINED){
+
+  }
+  var isAddedObject = (object instanceof AddedObject);
+  var isObjectGroup = (object instanceof ObjectGroup);
+  if (!(isAddedObject || isObjectGroup)){
+    throw new Error("emissiveColor error: Type not supported.");
+    return;
+  }
+  if (typeof colorText == UNDEFINED){
+    throw new Error("emissiveColor error: colorText is not defined.");
+    return;
+  }
+  if (isAddedObject){
+    if (!object.initEmissiveColorSet){
+      object.initEmissiveColor = object.mesh.material.uniforms.emissiveColor.value.getHexString();
+      object.initEmissiveColorSet = true;
+    }
+    object.mesh.material.uniforms.emissiveColor.value.set(colorText);
+  }else{
+    if (!object.initEmissiveColorSet){
+      object.initEmissiveColor = object.mesh.material.uniforms.totalEmissiveColor.value.getHexString();
+      object.initEmissiveColorSet = true;
+    }
+    object.mesh.material.uniforms.totalEmissiveColor.value.set(colorText);
   }
 }
 
