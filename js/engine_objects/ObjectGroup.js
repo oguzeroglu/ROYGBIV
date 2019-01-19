@@ -1559,6 +1559,11 @@ ObjectGroup.prototype.copy = function(name, isHardCopy, copyPosition, gridSystem
   var isChangeable = this.isChangeable;
   var renderSide = this.renderSide;
   var blending = this.mesh.material.blending;
+  var totalAlphaBeforeDetached = this.mesh.material.uniforms.totalAlpha.value;
+  var totalAOIntensityBeforeDetached = this.mesh.material.uniforms.totalAOIntensity.value;
+  var totalEmissiveIntensityBeforeDetached = this.mesh.material.uniforms.totalEmissiveIntensity.value;
+  var totalEmissiveColorBeforeDetached = this.mesh.material.uniforms.totalEmissiveColor.value;
+  var isTransparentBeforeDetached = this.mesh.material.transparent;
   this.detach();
   var newGroup = new Object();
   for (var objName in this.group){
@@ -1639,9 +1644,21 @@ ObjectGroup.prototype.copy = function(name, isHardCopy, copyPosition, gridSystem
   this.setBlending(blending);
   newObjGroup.setBlending(this.mesh.material.blending);
 
+  this.mesh.material.transparent = isTransparentBeforeDetached;
+  newObjGroup.mesh.material.transparent = isTransparentBeforeDetached;
+  this.mesh.material.uniforms.totalAlpha.value = totalAlphaBeforeDetached;
+  this.mesh.material.uniforms.totalAOIntensity.value = totalAOIntensityBeforeDetached;
+  this.mesh.material.uniforms.totalEmissiveIntensity.value = totalEmissiveIntensityBeforeDetached;
+  this.mesh.material.uniforms.totalEmissiveColor.value = totalEmissiveColorBeforeDetached;
+
   if (!isHardCopy){
     newObjGroup.mesh.material = this.mesh.material;
     newObjGroup.softCopyParentName = this.name;
+  }else{
+    newObjGroup.mesh.material.uniforms.totalAlpha.value = this.mesh.material.uniforms.totalAlpha.value;
+    newObjGroup.mesh.material.uniforms.totalAOIntensity.value = this.mesh.material.uniforms.totalAOIntensity.value;
+    newObjGroup.mesh.material.uniforms.totalEmissiveIntensity.value = this.mesh.material.uniforms.totalEmissiveIntensity.value;
+    newObjGroup.mesh.material.uniforms.totalEmissiveColor.value = new THREE.Color().copy(this.mesh.material.uniforms.totalEmissiveColor.value);
   }
 
   if (this.pivotObject){

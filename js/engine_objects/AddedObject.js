@@ -596,6 +596,11 @@ AddedObject.prototype.syncProperties = function(refObject){
   this.mesh.material.uniforms.emissiveIntensity.value = refEmissiveIntensity;
   this.initEmissiveIntensitySet = false;
   this.initEmissiveIntensity = refEmissiveIntensity;
+  // EMISSIVE COLOR
+  var refEmissiveColor = refMaterial.uniforms.emissiveColor.value;
+  this.mesh.material.uniforms.emissiveColor.value.copy(refEmissiveColor);
+  this.initEmissiveColorSet = false;
+  this.initEmissiveColor = "#" + refEmissiveColor.getHexString();
   // DISPLACEMENT
   var refDispX = refObject.mesh.material.uniforms.displacementInfo.value.x;
   var refDispY = refObject.mesh.material.uniforms.displacementInfo.value.y;
@@ -2549,6 +2554,9 @@ AddedObject.prototype.copy = function(name, isHardCopy, copyPosition, gridSystem
                       this.mesh.material.uniforms.displacementInfo.value.x;
     copyInstance.mesh.material.uniforms.displacementInfo.value.y =
                       this.mesh.material.uniforms.displacementInfo.value.y;
+    copyInstance.mesh.material.uniforms.emissiveColor.value = new THREE.Color().copy(
+                      this.mesh.material.uniforms.emissiveColor.value
+    );
   }
 
   if (this.pivotObject){
