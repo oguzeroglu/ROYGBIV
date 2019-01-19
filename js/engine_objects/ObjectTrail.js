@@ -46,7 +46,7 @@ var ObjectTrail = function(configurations){
       geometry.faces[i].roygbivObjectName = objName;
       var childObj = this.object.group[objName];
       if (childObj.hasEmissiveMap()){
-        geometry.faces[i].faceEmissiveIntensity = childObj.mesh.material.uniforms.emissiveIntensity.value;
+        geometry.faces[i].faceEmissiveIntensity = childObj.mesh.material.uniforms.emissiveIntensity.value * this.object.mesh.material.uniforms.totalEmissiveIntensity.value;
         geometry.faces[i].faceEmissiveColor = childObj.mesh.material.uniforms.emissiveColor.value;
       }else{
         geometry.faces[i].faceEmissiveIntensity = 0;
