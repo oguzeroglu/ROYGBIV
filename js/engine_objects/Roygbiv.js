@@ -158,7 +158,8 @@ var Roygbiv = function(){
     "lerp",
     "aoIntensity",
     "emissiveColor",
-    "resetObjectVelocity"
+    "resetObjectVelocity",
+    "setFPSDropCallbackFunction"
   ];
 
   this.globals = new Object();
@@ -6614,6 +6615,25 @@ Roygbiv.prototype.removeTextInputCallbackFunction = function(){
     return;
   }
   terminalTextInputCallbackFunction = 0;
+}
+
+// setFPSDropCallbackFunction
+// Sets a callback function for FPS drops. The callbackFunction is executed
+// with dropAmount parameter if the FPS is less than 60 for given second. The
+// dropAmount is calculated using this formula: (60 - [current_fps])
+Roygbiv.prototype.setFPSDropCallbackFunction = function(callbackFunction){
+  if (mode == 0){
+    return;
+  }
+  if (typeof callbackFunction == UNDEFINED){
+    throw new Error("setFPSDropCallbackFunction error: callbackFunction is not defined.");
+    return;
+  }
+  if (!(callbackFunction instanceof Function)){
+    throw new Error("setFPSDropCallbackFunction error: callbackFunction is not a function.");
+    return;
+  }
+  fpsDropCallbackFunction = callbackFunction;
 }
 
 // UTILITY FUNCTIONS ***********************************************************

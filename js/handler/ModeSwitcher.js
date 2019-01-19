@@ -236,6 +236,7 @@ ModeSwitcher.prototype.switchFromPreviewToDesign = function(){
   screenPointerLockChangedCallbackFunction = 0;
   screenFullScreenChangeCallbackFunction = 0;
   terminalTextInputCallbackFunction = 0;
+  fpsDropCallbackFunction = 0;
   pointerLockRequested = false;
   fullScreenRequested = false;
   for (var gsName in gridSystems){

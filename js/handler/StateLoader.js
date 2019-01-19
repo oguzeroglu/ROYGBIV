@@ -2413,6 +2413,7 @@ StateLoader.prototype.resetProject = function(undo){
   screenPointerLockChangedCallbackFunction = 0;
   screenFullScreenChangeCallbackFunction = 0;
   terminalTextInputCallbackFunction = 0;
+  fpsDropCallbackFunction = 0;
   NO_MOBILE = false;
 
   boundingClientRect = renderer.domElement.getBoundingClientRect();

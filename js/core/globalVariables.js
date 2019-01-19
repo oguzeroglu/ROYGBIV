@@ -968,6 +968,7 @@ var screenMouseUpCallbackFunction = 0;
 var screenMouseMoveCallbackFunction = 0;
 var screenPointerLockChangedCallbackFunction = 0;
 var screenFullScreenChangeCallbackFunction = 0;
+var fpsDropCallbackFunction = 0;
 var terminalTextInputCallbackFunction = 0;
 var defaultCameraControlsDisabled = false;
 var modeSwitcher;
