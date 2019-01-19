@@ -1,4 +1,5 @@
 var ObjectGroup = function(name, group){
+  this.isObjectGroup = true;
   this.name = name;
   this.group = group;
   objectSelectedByCommand = false;

@@ -1,4 +1,5 @@
 var AddedObject = function(name, type, metaData, material, mesh, physicsBody, destroyedGrids){
+  this.isAddedObject = true;
   this.name = name;
   this.type = type;
   this.metaData = metaData;

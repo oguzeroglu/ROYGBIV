@@ -1,4 +1,5 @@
 var ParticleMaterial = function(configurations){
+  this.isParticleMaterial = true;
   this.color = configurations.color;
   this.targetColor = configurations.targetColor;
   this.texture = configurations.textureName;

@@ -211,7 +211,7 @@ Roygbiv.prototype.getChildObject = function(gluedObject, childObjectName){
     throw new Error("getChildObject error: glued object is undefined.");
     return;
   }
-  if (!(gluedObject instanceof ObjectGroup)){
+  if (!(gluedObject.isObjectGroup)){
     throw new Error("getChildObject error: Type not supported.");
     return;
   }
@@ -254,7 +254,7 @@ Roygbiv.prototype.getPosition = function(object, targetVector, axis){
       return;
     }
   }
-  if (object instanceof AddedObject){
+  if (object.isAddedObject){
     if (axis){
       if (object.parentObjectName){
         var parentObject = objectGroups[object.parentObjectName];
@@ -312,7 +312,7 @@ Roygbiv.prototype.getPosition = function(object, targetVector, axis){
         );
       }
     }
-  }else if (object instanceof ObjectGroup){
+  }else if (object.isObjectGroup){
     if (axis){
       if (axis.toLowerCase() == "x"){
         return object.mesh.position.x;
@@ -335,7 +335,7 @@ Roygbiv.prototype.getPosition = function(object, targetVector, axis){
         );
       }
     }
-  }else if (object instanceof ParticleSystem){
+  }else if (object.isParticleSystem){
     if (axis){
       if (axis.toLowerCase() == "x"){
         return object.mesh.position.x;
@@ -374,8 +374,8 @@ Roygbiv.prototype.getOpacity = function(object){
     throw new Error("getOpacity error: Object is undefined.");
     return;
   }
-  var isAddedObject = (object instanceof AddedObject);
-  var isObjectGroup = (object instanceof ObjectGroup);
+  var isAddedObject = (object.isAddedObject);
+  var isObjectGroup = (object.isObjectGroup);
   if (!(isAddedObject || isObjectGroup)){
     throw new Error("getOpacity error: Type not supported.");
     return;
@@ -397,7 +397,7 @@ Roygbiv.prototype.getHeightMapScale = function(object){
     throw new Error("getHeightMapScale error: Object is not defined.");
     return;
   }
-  if (!(object instanceof AddedObject)){
+  if (!(object.isAddedObject)){
     throw new Error("getHeightMapScale error: Type not supported.");
     return;
   }
@@ -419,7 +419,7 @@ Roygbiv.prototype.getHeightMapBias = function(object){
     throw new Error("getHeightMapBias error: Object is not defined.");
     return;
   }
-  if (!(object instanceof AddedObject)){
+  if (!(object.isAddedObject)){
     throw new Error("getHeightMapBias error: Type not supported.");
     return;
   }
@@ -460,7 +460,7 @@ Roygbiv.prototype.getParticleSystemVelocityAtTime = function(particleSystem, tim
     throw new Error("getParticleSystemVelocityAtTime error: particleSystem is not defined.");
     return;
   }
-  if (!(particleSystem instanceof ParticleSystem)){
+  if (!(particleSystem.isParticleSystem)){
     throw new Error("getParticleSystemVelocityAtTime error: Unsupported particleSystem type.");
     return;
   }
@@ -556,7 +556,7 @@ Roygbiv.prototype.getParticleSystemFromPool = function(pool){
     throw new Error("getParticleSystemFromPool error: pool is not defined.");
     return;
   }
-  if (!(pool instanceof ParticleSystemPool)){
+  if (!(pool.isParticleSystemPool)){
     throw new Error("getParticleSystemFromPool error: Type not supported.");
     return;
   }
@@ -580,7 +580,7 @@ Roygbiv.prototype.getEndPoint = function(object, axis, targetVector){
     throw new Error("getEndPoint error: object is not defined.");
     return;
   }
-  if (!(object instanceof AddedObject)){
+  if (!(object.isAddedObject)){
     throw new Error("getEndPoint error: object is not an AddedObject.");
     return;
   }
@@ -632,7 +632,7 @@ Roygbiv.prototype.hide = function(object, keepPhysics){
     throw new Error("hide error: object is not defined.");
     return;
   }
-  if (object instanceof AddedObject){
+  if (object.isAddedObject){
     if (!addedObjects[object.name]){
       throw new Error("hide error: Cannot hide a child object. Use the parent object instead.");
       return;
@@ -663,7 +663,7 @@ Roygbiv.prototype.hide = function(object, keepPhysics){
       object.isHidden = true;
       rayCaster.binHandler.hide(object);
     }
-  }else if (object instanceof ObjectGroup){
+  }else if (object.isObjectGroup){
     if (keepPhysicsValue && object.noMass){
       throw new Error("hide error: Object has no mass. Cannot keep mass.");
     }
@@ -703,7 +703,7 @@ Roygbiv.prototype.show = function(object){
     throw new Error("show error: object is not defined.");
     return;
   }
-  if (object instanceof AddedObject){
+  if (object.isAddedObject){
     if (!addedObjects[object.name]){
       throw new Error("show error: Cannot show a child object. Use the parent object instead.");
       return;
@@ -724,7 +724,7 @@ Roygbiv.prototype.show = function(object){
       object.isHidden = false;
       rayCaster.binHandler.show(object);
     }
-  }else if (object instanceof ObjectGroup){
+  }else if (object.isObjectGroup){
     if (!object.isChangeable){
       throw new Error("show error: object is not marked as changeable.");
       return;
@@ -757,7 +757,7 @@ Roygbiv.prototype.applyForce = function(object, force, point){
     throw new Error("applyForce error: object is not defined.");
     return;
   }
-  if (!(object instanceof AddedObject) && !(object instanceof ObjectGroup)){
+  if (!(object.isAddedObject) && !(object.isObjectGroup)){
     throw new Error("applyForce error: object type is not supported.");
     return;
   }
@@ -820,15 +820,15 @@ Roygbiv.prototype.rotate = function(object, axis, radians){
     throw new Error("rotate error: Radians value is not a number.");
     return;
   }
-  if (!(object instanceof AddedObject) && !(object instanceof ObjectGroup) && !(object instanceof ParticleSystem)){
+  if (!(object.isAddedObject) && !(object.isObjectGroup) && !(object.isParticleSystem)){
     throw new Error("rotate error: Type not supported.");
     return;
   }
   var isObject = false;
-  if ((object instanceof AddedObject) || (object instanceof ObjectGroup)){
+  if ((object.isAddedObject) || (object.isObjectGroup)){
     isObject = true;
   }
-  if (object instanceof AddedObject && object.parentObjectName){
+  if (object.isAddedObject && object.parentObjectName){
     var parentObject = objectGroups[object.parentObjectName];
     if (parentObject){
       this.rotateAroundXYZ(
@@ -842,7 +842,7 @@ Roygbiv.prototype.rotate = function(object, axis, radians){
       return;
     }
   }
-  if ((object instanceof AddedObject) || (object instanceof ObjectGroup)){
+  if ((object.isAddedObject) || (object.isObjectGroup)){
     if (!object.isChangeable){
       throw new Error("rotate error: object is not marked as changeable.");
       return;
@@ -905,7 +905,7 @@ Roygbiv.prototype.rotateAroundXYZ = function(object, x, y, z, radians, axis, ski
     axisVector = THREE_AXIS_VECTOR_Z;
   }
   var mesh;
-  if (object instanceof AddedObject){
+  if (object.isAddedObject){
     if (object.parentObjectName){
       var parentObject = objectGroups[object.parentObjectName];
       if (parentObject){
@@ -924,7 +924,7 @@ Roygbiv.prototype.rotateAroundXYZ = function(object, x, y, z, radians, axis, ski
       return;
     }
     mesh = object.mesh;
-  }else if (object instanceof ObjectGroup){
+  }else if (object.isObjectGroup){
     if (!object.isChangeable){
       throw new Error("rotateAroundXYZ error: object is not marked as changeable.");
       return;
@@ -943,12 +943,12 @@ Roygbiv.prototype.rotateAroundXYZ = function(object, x, y, z, radians, axis, ski
   if (!skipLocalRotation){
     mesh.rotateOnAxis(axisVector, radians);
   }
-  if (object instanceof AddedObject){
+  if (object.isAddedObject){
     object.setPhysicsAfterRotationAroundPoint(axis, radians);
     if (object.mesh.visible){
       rayCaster.updateObject(object);
     }
-  }else if (object instanceof ObjectGroup){
+  }else if (object.isObjectGroup){
     object.physicsBody.quaternion.copy(mesh.quaternion);
     object.physicsBody.position.copy(mesh.position);
     if (object.mesh.visible){
@@ -979,7 +979,7 @@ Roygbiv.prototype.setPosition = function(obj, x, y, z){
     throw new Error("setPosition error: Z is not a number.");
     return;
   }
-  if (obj instanceof AddedObject){
+  if (obj.isAddedObject){
     if (obj.parentObjectName){
       var objGroup = objectGroups[obj.parentObjectName];
       if (objGroup){
@@ -999,7 +999,7 @@ Roygbiv.prototype.setPosition = function(obj, x, y, z){
     if (obj.mesh.visible){
       rayCaster.updateObject(obj);
     }
-  }else if (obj instanceof ObjectGroup){
+  }else if (obj.isObjectGroup){
     if (!obj.isChangeable){
       throw new Error("setPosition error: object is not marked as changeable.");
       return;
@@ -1035,7 +1035,7 @@ Roygbiv.prototype.setMass = function(object, mass){
     throw new Error("setMass error: mass is not a number.");
     return;
   }
-  if (!(object instanceof AddedObject) && !(object instanceof ObjectGroup)){
+  if (!(object.isAddedObject) && !(object.isObjectGroup)){
     throw new Error("setMass error: Unsupported type.");
     return;
   }
@@ -1047,7 +1047,7 @@ Roygbiv.prototype.setMass = function(object, mass){
     throw new Error("setMass error: object has no mass property.");
     return;
   }
-  if ((object instanceof AddedObject) && !(addedObjects[object.name])){
+  if ((object.isAddedObject) && !(addedObjects[object.name])){
     throw new Error("setMass error: Cannot set mass of child objects. Use the parent object instead.");
     return;
   }
@@ -1059,13 +1059,13 @@ Roygbiv.prototype.setMass = function(object, mass){
     object.mass = 0;
   }
   object.setMass(mass);
-  if (object instanceof AddedObject){
+  if (object.isAddedObject){
     if (mass > 0){
       dynamicObjects[object.name] = object;
     }else{
       delete dynamicObjects[object.name];
     }
-  }else if (object instanceof ObjectGroup){
+  }else if (object.isObjectGroup){
     if (mass > 0){
       dynamicObjectGroups[object.name] = object;
     }else{
@@ -1094,7 +1094,7 @@ Roygbiv.prototype.translate = function(object, axis, amount){
     throw new Error("translate error: Amount is not a number.");
     return;
   }
-  if (object instanceof AddedObject){
+  if (object.isAddedObject){
     if (object.parentObjectName){
       var parentObject = objectGroups[object.parentObjectName];
       if (parentObject){
@@ -1107,7 +1107,7 @@ Roygbiv.prototype.translate = function(object, axis, amount){
       return;
     }
     object.translate(axis, amount, true);
-  }else if (object instanceof ObjectGroup){
+  }else if (object.isObjectGroup){
     if (!object.isChangeable){
       throw new Error("translate error: object is not marked as changeable.");
       return;
@@ -1130,7 +1130,7 @@ Roygbiv.prototype.mapTexturePack = function(object, texturePackName){
     throw new Error("mapTexturePack error: Object is undefined.");
     return;
   }
-  if (!(object instanceof AddedObject)){
+  if (!(object.isAddedObject)){
     throw new Error("mapTexturePack error: Type not supported.");
     return;
   }
@@ -1165,8 +1165,8 @@ Roygbiv.prototype.opacity = function(object, delta){
     throw new Error("opacity error: Delta is not a number.");
     return;
   }
-  var isAddedObject = (object instanceof AddedObject);
-  var isObjectGroup = (object instanceof ObjectGroup);
+  var isAddedObject = (object.isAddedObject);
+  var isObjectGroup = (object.isObjectGroup);
   if (!((isAddedObject) || (isObjectGroup))){
     throw new Error("opacity error: Type not supported.");
     return;
@@ -1217,7 +1217,7 @@ Roygbiv.prototype.textureOffsetX = function(object, dx){
     throw new Error("textureOffsetX error: dx is not a number.");
     return;
   }
-  if (!(object instanceof AddedObject)){
+  if (!(object.isAddedObject)){
     throw new Error("textureOffsetX error: Type not supported.");
     return;
   }
@@ -1253,7 +1253,7 @@ Roygbiv.prototype.textureOffsetY = function(object, dy){
     throw new Error("textureOffsetY error: dy is not a number.");
     return;
   }
-  if (!(object instanceof AddedObject)){
+  if (!(object.isAddedObject)){
     throw new Error("textureOffsetY error: Type not supported.");
     return;
   }
@@ -1293,7 +1293,7 @@ Roygbiv.prototype.textureOffset = function(object, dx, dy){
     throw new Error("textureOffset error: dy is not a number.");
     return;
   }
-  if (!(object instanceof AddedObject)){
+  if (!(object.isAddedObject)){
     throw new Error("textureOffset error: Type not supported.");
     return;
   }
@@ -1335,7 +1335,7 @@ Roygbiv.prototype.heightMapScale = function(object, delta){
     throw new Error("heightMapScale error: Delta is not a number.");
     return;
   }
-  if (!(object instanceof AddedObject)){
+  if (!(object.isAddedObject)){
     throw new Error("heightMapScale error: Type not supported.");
     return;
   }
@@ -1369,7 +1369,7 @@ Roygbiv.prototype.heightMapBias = function(object, delta){
     throw new Error("heightMapBias error: Delta is not a number.");
     return;
   }
-  if (!(object instanceof AddedObject)){
+  if (!(object.isAddedObject)){
     throw new Error("heightMapBias error: Type not supported.");
     return;
   }
@@ -1398,8 +1398,8 @@ Roygbiv.prototype.emissiveIntensity = function(object, delta){
     throw new Error("emissiveIntensity error: object is not defined.");
     return;
   }
-  var isAddedObject = (object instanceof AddedObject);
-  var isObjectGroup = (object instanceof ObjectGroup);
+  var isAddedObject = (object.isAddedObject);
+  var isObjectGroup = (object.isObjectGroup);
   if (!(isAddedObject || isObjectGroup)){
     throw new Error("emissiveIntensity error: Type not supported.");
     return;
@@ -1454,7 +1454,7 @@ Roygbiv.prototype.setObjectVelocity = function(object, velocityVector, axis){
     throw new Error("setObjectVelocity error: object is not defined.");
     return;
   }
-  if (!(object instanceof AddedObject) && !(object instanceof ObjectGroup)){
+  if (!(object.isAddedObject) && !(object.isObjectGroup)){
     throw new Error("setObjectVelocity error: Type not supported.");
     return;
   }
@@ -1462,7 +1462,7 @@ Roygbiv.prototype.setObjectVelocity = function(object, velocityVector, axis){
     throw new Error("setObjectVelocity error: object is not marked as changeable.");
     return;
   }
-  if ((object instanceof AddedObject) && !addedObjects[object.name]){
+  if ((object.isAddedObject) && !addedObjects[object.name]){
     throw new Error("setObjectVelocity error: Cannot set velocity to child objects. Use parent object instead.");
     return;
   }
@@ -1505,7 +1505,7 @@ Roygbiv.prototype.setObjectColor = function(object, colorName, alpha){
     throw new Error("setObjectColor error: object is not defined.");
     return;
   }
-  if (!(object instanceof AddedObject) && !(object instanceof ObjectGroup)){
+  if (!(object.isAddedObject) && !(object.isObjectGroup)){
     throw new Error("setObjectColor error: Type not supported.");
     return;
   }
@@ -1535,7 +1535,7 @@ Roygbiv.prototype.resetObjectColor = function(object){
     throw new Error("resetObjectColor error: object is not defined.");
     return;
   }
-  if (!(object instanceof AddedObject) && !(object instanceof ObjectGroup)){
+  if (!(object.isAddedObject) && !(object.isObjectGroup)){
     throw new Error("resetObjectColor error: Type not supported.");
     return;
   }
@@ -1552,7 +1552,7 @@ Roygbiv.prototype.setRotationPivot = function(rotationPivot){
     throw new Error("setRotationPivot error: rotationPivot is not defined.");
     return;
   }
-  if (!(rotationPivot instanceof THREE.Object3D)){
+  if (!(rotationPivot.isObject3D)){
     throw new Error("setRotationPivot error: Bad rotationPivot type.");
     return;
   }
@@ -1578,7 +1578,7 @@ Roygbiv.prototype.unsetRotationPivot = function(object){
     throw new Error("unsetRotationPivot error: object is not defined.");
     return;
   }
-  if (!((object instanceof AddedObject) || (object instanceof ObjectGroup))){
+  if (!((object.isAddedObject) || (object.isObjectGroup))){
     throw new Error("unsetRotationPivot error: Type not supported.");
     return;
   }
@@ -1602,8 +1602,8 @@ Roygbiv.prototype.aoIntensity = function(object, amount){
     throw new Error("aoIntensity error: object is not defined.");
     return;
   }
-  var isAddedObject = (object instanceof AddedObject);
-  var isObjectGroup = (object instanceof ObjectGroup);
+  var isAddedObject = (object.isAddedObject);
+  var isObjectGroup = (object.isObjectGroup);
   if (!(isAddedObject || isObjectGroup)){
     throw new Error("aoIntensity error: Type not supported.");
     return;
@@ -1656,8 +1656,8 @@ Roygbiv.prototype.emissiveColor = function(object, colorText){
   if (typeof object == UNDEFINED){
 
   }
-  var isAddedObject = (object instanceof AddedObject);
-  var isObjectGroup = (object instanceof ObjectGroup);
+  var isAddedObject = (object.isAddedObject);
+  var isObjectGroup = (object.isObjectGroup);
   if (!(isAddedObject || isObjectGroup)){
     throw new Error("emissiveColor error: Type not supported.");
     return;
@@ -1868,7 +1868,7 @@ Roygbiv.prototype.createParticle = function(configurations){
     throw new Error("createParticle error: material is a mandatory parameter.");
     return;
   }
-  if (!(material instanceof ParticleMaterial)){
+  if (!(material.isParticleMaterial)){
     throw new Error("createParticle error: Material type not supported.");
     return;
   }
@@ -2264,7 +2264,7 @@ Roygbiv.prototype.scale = function(object, scaleVector){
     throw new Error("scale error: object is undefined.");
     return;
   }
-  if (!(object instanceof ParticleSystem)){
+  if (!(object.isParticleSystem)){
     throw new Error("scale error: Type not supported.");
     return;
   }
@@ -2288,7 +2288,7 @@ Roygbiv.prototype.setBlending = function(particleSystem, mode){
     throw new Error("setBlending error: mode is not defined.");
     return;
   }
-  if (!(particleSystem instanceof ParticleSystem)){
+  if (!(particleSystem.isParticleSystem)){
     throw new Error("setBlending error: Unsupported type.");
     return;
   }
@@ -2371,7 +2371,7 @@ Roygbiv.prototype.setParticleSystemQuaternion = function(particleSystem, quatX, 
     throw new Error("setParticleSystemQuaternion error: particleSystem is not defined.");
     return;
   }
-  if (!(particleSystem instanceof ParticleSystem)){
+  if (!(particleSystem.isParticleSystem)){
     throw new Error("setParticleSystemQuaternion error: Unsupported type.");
     return;
   }
@@ -2417,11 +2417,11 @@ Roygbiv.prototype.kill = function(object){
     throw new Error("kill error: object is not defined.");
     return;
   }
-  if (!(object instanceof Particle) && !(object instanceof ParticleSystem)){
+  if (!(object.isParticle) && !(object.isParticleSystem)){
     throw new Error("kill error: Unsupported type.");
     return;
   }
-  if (object instanceof Particle){
+  if (object.isParticle){
     object.isExpired = true;
     if (object.parent){
       object.parent.removeParticle(object);
@@ -2433,7 +2433,7 @@ Roygbiv.prototype.kill = function(object){
         TOTAL_PARTICLE_SYSTEM_COUNT --;
       }
     }
-  }else if (object instanceof ParticleSystem){
+  }else if (object.isParticleSystem){
     object.destroy();
     delete particleSystems[object.name];
     delete particleSystemPool[object.name];
@@ -4168,11 +4168,11 @@ Roygbiv.prototype.createObjectTrail = function(configurations){
     throw new Error("createObjectTrail error: No such object.");
     return;
   }
-  if (!(object instanceof AddedObject) && !(object instanceof ObjectGroup)){
+  if (!(object.isAddedObject) && !(object.isObjectGroup)){
     throw new Error("createObjectTrail error: Bad object parameter.");
     return;
   }
-  if ((object instanceof AddedObject) && (!addedObjects[object.name])){
+  if ((object.isAddedObject) && (!addedObjects[object.name])){
     throw new Error("createObjectTrail error: Cannot create object trails for child objects. Use parent object instead.");
     return;
   }
@@ -4223,7 +4223,7 @@ Roygbiv.prototype.destroyObjectTrail = function(object){
     throw new Error("destroyObjectTrail error: object is not defined.");
     return;
   }
-  if (!(object instanceof AddedObject) && !(object instanceof ObjectGroup)){
+  if (!(object.isAddedObject) && !(object.isObjectGroup)){
     throw new Error("destroyObjectTrail error: Type not supported.");
     return;
   }
@@ -4267,7 +4267,7 @@ Roygbiv.prototype.rewindParticle = function(particle, delay){
     throw new Error("rewindParticle error: particle is not defined.");
     return;
   }
-  if (!(particle instanceof Particle)){
+  if (!(particle.isParticle)){
     throw new Error("rewindParticle error: Bad particle parameter.");
     return;
   }
@@ -4982,7 +4982,7 @@ Roygbiv.prototype.stopParticleSystem = function(particleSystem, stopDuration){
     throw new Error("stopParticleSystem error: particleSystem is not defined.");
     return;
   }
-  if (!(particleSystem instanceof ParticleSystem)){
+  if (!(particleSystem.isParticleSystem)){
     throw new Error("stopParticleSystem error: Type not supported.");
     return;
   }
@@ -5022,7 +5022,7 @@ Roygbiv.prototype.startParticleSystem = function(configurations){
     throw new Error("startParticleSystem error: particleSystem is a mandatory configuration.");
     return;
   }
-  if (!(particleSystem instanceof ParticleSystem)){
+  if (!(particleSystem.isParticleSystem)){
     throw new Error("startParticleSystem error: Type not supported.");
     return;
   }
@@ -5160,7 +5160,7 @@ Roygbiv.prototype.hideParticleSystem = function(particleSystem){
     throw new Error("hideParticleSystem error: particleSystem is not defined.");
     return;
   }
-  if (!(particleSystem instanceof ParticleSystem)){
+  if (!(particleSystem.isParticleSystem)){
     throw new Error("hideParticleSystem error: Type not supported.");
     return;
   }
@@ -5216,11 +5216,11 @@ Roygbiv.prototype.addParticleSystemToPool = function(pool, particleSystem){
     throw new Error("addParticleSystemToPool error: particleSystem is not defined.");
     return;
   }
-  if (!(pool instanceof ParticleSystemPool)){
+  if (!(pool.isParticleSystemPool)){
     throw new Error("addParticleSystemToPool error: Pool type not supoorted.");
     return;
   }
-  if (!(particleSystem instanceof ParticleSystem)){
+  if (!(particleSystem.isParticleSystem)){
     throw new Error("addParticleSystemToPool error: Particle system type not supported.");
     return;
   }
@@ -5241,7 +5241,7 @@ Roygbiv.prototype.removeParticleSystemFromPool = function(particleSystem){
     throw new Error("removeParticleSystemFromPool error: particleSystem is not defined.");
     return;
   }
-  if (!(particleSystem instanceof ParticleSystem)){
+  if (!(particleSystem.isParticleSystem)){
     throw new Error("removeParticleSystemFromPool error: Type not supported.");
     return;
   }
@@ -5263,7 +5263,7 @@ Roygbiv.prototype.destroyParticleSystemPool = function(pool){
     throw new Error("destroyParticleSystemPool error: pool is not defined.");
     return;
   }
-  if (!(pool instanceof ParticleSystemPool)){
+  if (!(pool.isParticleSystemPool)){
     throw new Error("destroyParticleSystemPool error: Type not supported.");
     return;
   }
@@ -5541,7 +5541,7 @@ Roygbiv.prototype.copyParticleSystem = function(particleSystem, newParticleSyste
     throw new Error("copyParticleSystem error: particleSystem is not defined.");
     return;
   }
-  if (!(particleSystem instanceof ParticleSystem)){
+  if (!(particleSystem.isParticleSystem)){
     throw new Error("copyParticleSystem error: Type not supported.");
     return;
   }
@@ -5593,7 +5593,7 @@ Roygbiv.prototype.fadeAway = function(particleSystem, coefficient){
     throw new Error("fadeAway error: particleSystem is not defined.");
     return;
   }
-  if (!(particleSystem instanceof ParticleSystem)){
+  if (!(particleSystem.isParticleSystem)){
     throw new Error("fadeAway error: Type not supported.");
     return;
   }
@@ -5664,7 +5664,7 @@ Roygbiv.prototype.setParticleSystemPosition = function(particleSystem, x, y, z){
     throw new Error("setParticleSystemPosition error: particleSystem is not defined.");
     return;
   }
-  if (!(particleSystem instanceof ParticleSystem)){
+  if (!(particleSystem.isParticleSystem)){
     throw new Error("setParticleSystemPosition error: Type not supported.");
     return;
   }
@@ -5728,7 +5728,7 @@ Roygbiv.prototype.startObjectTrail = function(object){
     throw new Error("startObjectTrail error: object is not defined.");
     return;
   }
-  if (!(object instanceof AddedObject) && !(object instanceof ObjectGroup)){
+  if (!(object.isAddedObject) && !(object.isObjectGroup)){
     throw new Error("startObjectTrail error: Type not supported.");
     return;
   }
@@ -5750,7 +5750,7 @@ Roygbiv.prototype.stopObjectTrail = function(object){
     throw new Error("stopObjectTrail error: object is not defined.");
     return;
   }
-  if (!(object instanceof AddedObject) && !(object instanceof ObjectGroup)){
+  if (!(object.isAddedObject) && !(object.isObjectGroup)){
     throw new Error("stopObjectTrail error: Type not supported.");
     return;
   }
@@ -5772,7 +5772,7 @@ Roygbiv.prototype.createInitializedParticleSystemPool = function(poolName, refPa
     throw new Error("createInitializedParticleSystemPool error: refParticleSystem is not defined.");
     return;
   }
-  if (!(refParticleSystem instanceof ParticleSystem)){
+  if (!(refParticleSystem.isParticleSystem)){
     throw new Error("createInitializedParticleSystemPool error: refParticleSystem is not a ParticleSystem.");
     return;
   }
@@ -6078,18 +6078,18 @@ Roygbiv.prototype.setCollisionListener = function(sourceObject, callbackFunction
     throw new Error("setCollisionListener error: sourceObject is not defined.");
     return;
   }
-  if (!(sourceObject instanceof AddedObject) && !(sourceObject instanceof ObjectGroup) && !(sourceObject instanceof Particle) && !(sourceObject instanceof ParticleSystem)){
+  if (!(sourceObject.isAddedObject) && !(sourceObject.isObjectGroup) && !(sourceObject.isParticle) && !(sourceObject.isParticleSystem)){
     throw new Error("setCollisionListener error: Type not supported.");
     return;
   }
-  if ((sourceObject instanceof AddedObject) || (sourceObject instanceof ObjectGroup)){
+  if ((sourceObject.isAddedObject) || (sourceObject.isObjectGroup)){
     if (TOTAL_OBJECT_COLLISION_LISTENER_COUNT >= MAX_OBJECT_COLLISION_LISTENER_COUNT){
       throw new Error("setCollisionListener error: Cannot set collision listener for more than "+MAX_OBJECT_COLLISION_LISTENER_COUNT+" objects.");
       return;
     }
     collisionCallbackRequests[sourceObject.name] = callbackFunction.bind(sourceObject);
     TOTAL_OBJECT_COLLISION_LISTENER_COUNT ++;
-  }else if (sourceObject instanceof Particle){
+  }else if (sourceObject.isParticle){
     if (sourceObject.parent && sourceObject.parent.isStopped){
       throw new Error("setCollisionListener error: Particle system is stopped.");
       return;
@@ -6140,7 +6140,7 @@ Roygbiv.prototype.setCollisionListener = function(sourceObject, callbackFunction
       sourceObject.parent.hasParticleCollision = true;
       sourceObject.parent.notifyParticleCollisionCallbackChange(sourceObject);
     }
-  }else if (sourceObject instanceof ParticleSystem){
+  }else if (sourceObject.isParticleSystem){
     if (sourceObject.hasManualPositionSet){
       throw new Error("setCollisionListener error: A position is set manually to the particle system. Cannot listen for collisions.");
       return;
@@ -6184,30 +6184,30 @@ Roygbiv.prototype.removeCollisionListener = function(sourceObject){
     throw new Error("removeCollisionListener error: sourceObject is not defined.");
     return;
   }
-  if (!(sourceObject instanceof AddedObject) && !(sourceObject instanceof ObjectGroup) && !(sourceObject instanceof Particle) && !(sourceObject instanceof ParticleSystem)){
+  if (!(sourceObject.isAddedObject) && !(sourceObject.isObjectGroup) && !(sourceObject.isParticle) && !(sourceObject.isParticleSystem)){
     throw new Error("removeCollisionListener error: Type not supported.");
     return;
   }
   var curCallbackRequest;
-  if ((sourceObject instanceof AddedObject) || (sourceObject instanceof ObjectGroup)){
+  if ((sourceObject.isAddedObject) || (sourceObject.isObjectGroup)){
     curCallbackRequest = collisionCallbackRequests[sourceObject.name];
-  }else if (sourceObject instanceof Particle){
+  }else if (sourceObject.isParticle){
     curCallbackRequest = particleCollisionCallbackRequests[sourceObject.uuid];
-  }else if (sourceObject instanceof ParticleSystem){
+  }else if (sourceObject.isParticleSystem){
     curCallbackRequest = particleSystemCollisionCallbackRequests[sourceObject.name];
   }
   if (curCallbackRequest){
-    if ((sourceObject instanceof AddedObject) || (sourceObject instanceof ObjectGroup)){
+    if ((sourceObject.isAddedObject) || (sourceObject.isObjectGroup)){
       delete collisionCallbackRequests[sourceObject.name];
       TOTAL_OBJECT_COLLISION_LISTENER_COUNT --;
-    }else if (sourceObject instanceof Particle){
+    }else if (sourceObject.isParticle){
       delete particleCollisionCallbackRequests[sourceObject.uuid];
       TOTAL_PARTICLE_COLLISION_LISTEN_COUNT --;
       sourceObject.checkForCollisions = false;
       if (sourceObject.parent){
         sourceObject.parent.notifyParticleCollisionCallbackChange(sourceObject);
       }
-    }else if (sourceObject instanceof ParticleSystem){
+    }else if (sourceObject.isParticleSystem){
       TOTAL_PARTICLE_SYSTEM_COLLISION_LISTEN_COUNT --;
       delete particleSystemCollisionCallbackRequests[sourceObject.name];
       sourceObject.checkForCollisions = false;
@@ -6227,7 +6227,7 @@ Roygbiv.prototype.setExpireListener = function(sourceObject, callbackFunction){
     throw new Error("setExpireListener error: sourceObject is not defined.");
     return;
   }
-  if (!(sourceObject instanceof ParticleSystem)){
+  if (!(sourceObject.isParticleSystem)){
     throw new Error("setExpireListener error: sourceObject is not a particle system.");
     return;
   }
@@ -6256,7 +6256,7 @@ Roygbiv.prototype.removeExpireListener = function(sourceObject){
     throw new Error("removeExpireListener error: sourceObject is not defined.");
     return;
   }
-  if (!(sourceObject instanceof ParticleSystem)){
+  if (!(sourceObject.isParticleSystem)){
     throw new Error("removeExpireListener error: sourceObject is not a particle system.");
     return;
   }
@@ -6282,7 +6282,7 @@ Roygbiv.prototype.setObjectClickListener = function(sourceObject, callbackFuncti
     throw new Error("setClickListener error: callbackFunction is not defined.");
     return;
   }
-  if (!(sourceObject instanceof AddedObject) && !(sourceObject instanceof ObjectGroup)){
+  if (!(sourceObject.isAddedObject) && !(sourceObject.isObjectGroup)){
     throw new Error("setClickListener error: Type not supported.");
     return;
   }
@@ -6303,7 +6303,7 @@ Roygbiv.prototype.removeObjectClickListener = function(sourceObject){
     throw new Error("removeClickListener error: sourceObject is not defined.");
     return;
   }
-  if (!(sourceObject instanceof AddedObject) && !(sourceObject instanceof ObjectGroup)){
+  if (!(sourceObject.isAddedObject) && !(sourceObject.isObjectGroup)){
     throw new Error("removeClickListener error: Type not supported.");
     return;
   }
@@ -6460,7 +6460,7 @@ Roygbiv.prototype.setParticleSystemPoolConsumedListener = function(psPool, callb
     throw new Error("setParticleSystemPoolConsumedListener error: callbackFunction is not defined.");
     return;
   }
-  if (!(psPool instanceof ParticleSystemPool)){
+  if (!(psPool.isParticleSystemPool)){
     throw new Error("setParticleSystemPoolConsumedListener error: psPool is not a ParticleSystemPool.");
     return;
   }
@@ -6481,7 +6481,7 @@ Roygbiv.prototype.removeParticleSystemPoolConsumedListener = function(psPool){
     throw new Error("removeParticleSystemPoolConsumedListener error: psPool is not defined.");
     return;
   }
-  if (!(psPool instanceof ParticleSystemPool)){
+  if (!(psPool.isParticleSystemPool)){
     throw new Error("removeParticleSystemPoolConsumedListener error: psPool is not a ParticleSystemPool.");
     return;
   }
@@ -6503,7 +6503,7 @@ Roygbiv.prototype.setParticleSystemPoolAvailableListener = function(psPool, call
     throw new Error("setParticleSystemPoolAvailableListener error: callbackFunction is not defined.");
     return;
   }
-  if (!(psPool instanceof ParticleSystemPool)){
+  if (!(psPool.isParticleSystemPool)){
     throw new Error("setParticleSystemPoolAvailableListener error: psPool is not a ParticleSystemPool.");
     return;
   }
@@ -6524,7 +6524,7 @@ Roygbiv.prototype.removeParticleSystemPoolAvailableListener = function(psPool){
     throw new Error("removeParticleSystemPoolAvailableListener error: psPool is not defined.");
     return;
   }
-  if (!(psPool instanceof ParticleSystemPool)){
+  if (!(psPool.isParticleSystemPool)){
     throw new Error("removeParticleSystemPoolAvailableListener error: psPool is not a ParticleSystemPool.");
     return;
   }
@@ -7311,11 +7311,11 @@ Roygbiv.prototype.trackObjectPosition = function(sourceObject, targetObject){
     throw new Error("trackObjectPosition error: targetObject is not defined.");
     return;
   }
-  if (!(sourceObject instanceof AddedObject || sourceObject instanceof ObjectGroup)){
+  if (!(sourceObject.isAddedObject || sourceObject.isObjectGroup)){
     throw new Error("trackObjectPosition error: sourceObject type not supported.");
     return;
   }
-  if (!(targetObject instanceof AddedObject || targetObject instanceof ObjectGroup)){
+  if (!(targetObject.isAddedObject || targetObject.isObjectGroup)){
     throw new Error("trackObjectPosition error: targetObject type not supported.");
     return;
   }
@@ -7353,7 +7353,7 @@ Roygbiv.prototype.untrackObjectPosition = function(sourceObject){
     throw new Error("untrackObjectPosition error: sourceObject is not defined.");
     return;
   }
-  if (!(sourceObject instanceof AddedObject || sourceObject instanceof ObjectGroup)){
+  if (!(sourceObject.isAddedObject || sourceObject.isObjectGroup)){
     throw new Error("untrackObjectPosition error: sourceObject type not supported.");
     return;
   }
@@ -7374,7 +7374,7 @@ Roygbiv.prototype.createRotationPivot = function(sourceObject, offsetX, offsetY,
     throw new Error("createRotationPivot error: sourceObject is not defined.");
     return;
   }
-  if (!(sourceObject instanceof AddedObject || sourceObject instanceof ObjectGroup)){
+  if (!(sourceObject.isAddedObject || sourceObject.isObjectGroup)){
     throw new Error("createRotationPivot error: Unsupported type.");
     return;
   }
@@ -7505,10 +7505,6 @@ Roygbiv.prototype.intersectionTest = function(fromVector, directionVector, targe
   }
   if (typeof targetResultObject == UNDEFINED){
     throw new Error("intersectionTest error: targetResultObject is not defined.");
-    return;
-  }
-  if (!(targetResultObject instanceof Object)){
-    throw new Error("intersectionTest error: targetResultObject is not an object.");
     return;
   }
   REUSABLE_VECTOR.set(fromVector.x, fromVector.y, fromVector.z);

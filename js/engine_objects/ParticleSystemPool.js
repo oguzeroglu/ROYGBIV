@@ -1,4 +1,5 @@
 var ParticleSystemPool = function(name){
+  this.isParticleSystemPool = true;
   this.name = name;
   this.particleSystems = new Object();
   this.availableParticleSystems = new Map();

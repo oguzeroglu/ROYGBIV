@@ -1,5 +1,7 @@
 var ParticleSystem = function(copyPS, name, particles, x, y, z, vx, vy, vz, ax, ay, az, motionMode, updateFunction, fromWorker){
 
+  this.isParticleSystem = true;
+
   this.collisionWorkerInfo = new Object();
   this.copyPS = copyPS;
 

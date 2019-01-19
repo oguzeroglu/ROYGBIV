@@ -1,4 +1,5 @@
 var Particle = function(x, y, z, material, lifetime){
+  this.isParticle = true;
   this.x = x;
   this.y = y;
   this.z = z;
