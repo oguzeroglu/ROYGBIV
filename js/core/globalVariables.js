@@ -969,6 +969,7 @@ var screenMouseMoveCallbackFunction = 0;
 var screenPointerLockChangedCallbackFunction = 0;
 var screenFullScreenChangeCallbackFunction = 0;
 var fpsDropCallbackFunction = 0;
+var performanceDropCallbackFunction = 0;
 var terminalTextInputCallbackFunction = 0;
 var defaultCameraControlsDisabled = false;
 var modeSwitcher;
@@ -980,6 +981,9 @@ var loadedScriptsCounter = 0;
 var isMobile = /Mobi|Android/i.test(navigator.userAgent);
 var WHITE_COLOR = new THREE.Color("white");
 var NO_MOBILE = false;
+var performanceDropMinFPS = 0;
+var performanceDropSeconds = 0;
+var performanceDropCounter = 0;
 
 // WORKER VARIABLES
 var WORKERS_SUPPORTED = (typeof(Worker) !== "undefined");

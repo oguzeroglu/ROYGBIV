@@ -232,8 +232,22 @@ function calculateFps (){
   }
   fps = frameCounter;
   frameCounter = 0;
-  if (fpsDropCallbackFunction && fps < 60){
+  if (mode == 1 && fpsDropCallbackFunction && fps < 60){
     fpsDropCallbackFunction(60 - fps);
+  }
+  if (mode == 1 && performanceDropCallbackFunction){
+    if (fps < performanceDropMinFPS){
+      performanceDropCounter ++;
+      if (performanceDropCounter == performanceDropSeconds){
+        performanceDropCallbackFunction();
+        performanceDropCounter = 0;
+        performanceDropMinFPS = 0;
+        performanceDropSeconds = 0;
+        performanceDropCallbackFunction = 0;
+      }
+    }else{
+      performanceDropCounter = 0;
+    }
   }
   if (!isDeployment && !scriptEditorShowing && (fps != lastFPS)){
     if (mode == 0){

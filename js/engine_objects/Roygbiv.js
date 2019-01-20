@@ -160,7 +160,9 @@ var Roygbiv = function(){
     "emissiveColor",
     "resetObjectVelocity",
     "setFPSDropCallbackFunction",
-    "removeFPSDropCallbackFunction"
+    "removeFPSDropCallbackFunction",
+    "setPerformanceDropCallbackFunction",
+    "removePerformanceDropCallbackFunction"
   ];
 
   this.globals = new Object();
@@ -6644,6 +6646,62 @@ Roygbiv.prototype.removeFPSDropCallbackFunction = function(){
     return;
   }
   fpsDropCallbackFunction = 0;
+}
+
+// setPerformanceDropCallbackFunction
+// Sets a callback function for performance drops. The callbackFunction is executed
+// if the FPS is under [minFPS] for [seconds] seconds. The callbackFunction is automatically
+// removed after the execution, so use this function again if needed after the execution
+// of the callbackFunction.
+Roygbiv.prototype.setPerformanceDropCallbackFunction = function(minFPS, seconds, callbackFunction){
+  if (mode == 0){
+    return;
+  }
+  if (typeof minFPS == UNDEFINED){
+    throw new Error("setPerformanceDropCallbackFunction error: minFPS is not defined.");
+    return;
+  }
+  if (isNaN(minFPS)){
+    throw new Error("setPerformanceDropCallbackFunction error: minFPS is not a number.");
+    return;
+  }
+  if (!(minFPS > 0 && minFPS <= 60)){
+    throw new Error("setPerformanceDropCallbackFunction error: minFPS must be between (0,60]");
+    return;
+  }
+  if (typeof seconds == UNDEFINED){
+    throw new Error("setPerformanceDropCallbackFunction error: seconds is not defined.");
+    return;
+  }
+  if (isNaN(seconds)){
+    throw new Error("setPerformanceDropCallbackFunction error: seconds is not a number.");
+    return;
+  }
+  if (seconds <= 0){
+    throw new Error("setPerformanceDropCallbackFunction error: seconds must be greater than zero.");
+    return;
+  }
+  if (typeof callbackFunction == UNDEFINED){
+    throw new Error("setPerformanceDropCallbackFunction error: callbackFunction is not defined.");
+    return;
+  }
+  if (!(callbackFunction instanceof Function)){
+    throw new Error("setPerformanceDropCallbackFunction error: callbackFunction is not a function.");
+    return;
+  }
+  performanceDropCallbackFunction = callbackFunction;
+  performanceDropMinFPS = minFPS;
+  performanceDropSeconds = seconds;
+  performanceDropCounter = 0;
+}
+
+// removePerformanceDropCallbackFunction
+// Removes the callback function for performance drops.
+Roygbiv.prototype.removePerformanceDropCallbackFunction = function(){
+  if (mode == 0){
+    return;
+  }
+  performanceDropCallbackFunction = 0;
 }
 
 // UTILITY FUNCTIONS ***********************************************************
