@@ -7673,11 +7673,19 @@ Roygbiv.prototype.terminal = function(isVisible){
     if (!isDeployment){
       cliDivheader.style.display = "";
     }
+    if (isDeployment){
+      var diff = canvas.clientWidth - terminalDiv.clientWidth;
+      canvas.oldWidth = canvas.style.width;
+      canvas.style.width = diff + "px";
+    }
   }else{
     terminal.disable();
     terminalDiv.style.display = "none";
     if (!isDeployment){
       cliDivheader.style.display = "none";
+    }
+    if (isDeployment && canvas.oldWidth){
+      canvas.style.width = canvas.oldWidth;
     }
   }
 }
