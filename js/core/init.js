@@ -384,19 +384,24 @@ window.onload = function() {
     datGui = new dat.GUI();
     datGui.add(postprocessingParameters, "Bloom_strength").min(0.0).max(3.0).step(0.01).onChange(function(val){
       adjustPostProcessing(1, val);
-    });
+      originalBloomConfigurations.bloomStrength = val;
+    }).listen();
     datGui.add(postprocessingParameters, "Bloom_radius").min(0.0).max(1.0).step(0.01).onChange(function(val){
       adjustPostProcessing(2, val);
-    });
+      originalBloomConfigurations.bloomRadius = val;
+    }).listen();
     datGui.add(postprocessingParameters, "Bloom_threshhold").min(0.0).max(1.0).step(0.01).onChange(function(val){
       adjustPostProcessing(3, val);
-    });
+      originalBloomConfigurations.bloomThreshold = val;
+    }).listen();
     datGui.add(postprocessingParameters, "Bloom_resolution_scale").min(0.1).max(1.0).step(0.001).onChange(function(val){
       adjustPostProcessing(4, val);
-    });
+      originalBloomConfigurations.bloomResolutionScale = val;
+    }).listen();
     datGui.add(postprocessingParameters, "Bloom").onChange(function(val){
       adjustPostProcessing(5, val);
-    });
+      originalBloomConfigurations.bloomOn = val;
+    }).listen();
     $(datGui.domElement).attr("hidden", true);
     $(datGuiObjectManipulation.domElement).attr("hidden", true);
     $(datGuiLights.domElement).attr("hidden", true);
@@ -801,7 +806,7 @@ window.addEventListener('keyup', function(event){
     );
    }
    copyPass = new THREE.ShaderPass( THREE.CopyShader );
-   setBadTVParams();
+   setPostProcessingParams();
    composer = new THREE.EffectComposer(renderer);
    composer.addPass( renderPass );
    if (mode == 1){
@@ -814,10 +819,10 @@ window.addEventListener('keyup', function(event){
 	    composer.addPass( copyPass );
 	    copyPass.renderToScreen = true;
    }
-   setBadTVParams();
+   setPostProcessingParams();
  }
 
- function setBadTVParams(){
+ function setPostProcessingParams(){
    if (mode == 1){
     if (bloomOn){
       bloomPass.strength = bloomStrength;
@@ -870,18 +875,28 @@ window.addEventListener('keyup', function(event){
      case 5: //Bloom
       bloomOn = val;
      break;
+     case -1: //from script
+      if(!isDeployment){
+        console.log("DSF");
+        postprocessingParameters["Bloom_strength"] = bloomStrength;
+        postprocessingParameters["Bloom_radius"] = bloomRadius;
+        postprocessingParameters["Bloom_threshhold"] = bloomThreshold;
+        postprocessingParameters["Bloom_resolution_scale"] = bloomResolutionScale;
+        postprocessingParameters["Bloom"] = bloomOn;
+      }
+     break;
    }
-   composer = new THREE.EffectComposer( renderer );
-   composer.addPass( renderPass );
+   composer = new THREE.EffectComposer(renderer);
+   composer.addPass(renderPass);
    if (bloomOn){
-     composer.addPass( bloomPass );
+     composer.addPass(bloomPass);
      bloomPass.renderToScreen = true;
    }
    if (!(mode == 1 && bloomOn)){
-	    composer.addPass( copyPass );
+	    composer.addPass(copyPass);
 	    copyPass.renderToScreen = true;
    }
-   setBadTVParams();
+   setPostProcessingParams();
  }
 
  function omGUIRotateEvent(axis, val){

@@ -162,7 +162,9 @@ var Roygbiv = function(){
     "setFPSDropCallbackFunction",
     "removeFPSDropCallbackFunction",
     "setPerformanceDropCallbackFunction",
-    "removePerformanceDropCallbackFunction"
+    "removePerformanceDropCallbackFunction",
+    "setBloom",
+    "unsetBloom"
   ];
 
   this.globals = new Object();
@@ -7778,4 +7780,88 @@ Roygbiv.prototype.lerp = function(vector1, vector2, amount, targetVector){
   targetVector.y = REUSABLE_VECTOR.y;
   targetVector.z = REUSABLE_VECTOR.z;
   return targetVector;
+}
+
+// setBloom
+// Sets the Bloom effect properties of the scene. Parameters are:
+// strength (optional): The bloom strength between [0, 3]
+// radius (optional): The bloom radius between [0, 1]
+// threshold (optional): The bloom threshold between [0, 1]
+// resolutionScale (optional): The bloom resolution scale between [0.1, 1]
+Roygbiv.prototype.setBloom = function(params){
+  if (mode == 0){
+    return;
+  }
+  var hasStrength = false, hasRadius = false, hasThreshold = false, hasResolutionScale = false;
+  if (!(typeof params.strength == UNDEFINED)){
+    hasStrength = true;
+    if (isNaN(params.strength)){
+      throw new Error("setBloom error: strength parameter is not a number.");
+      return;
+    }
+    if (params.strength < 0 || params.strength > 3){
+      throw new Error("setBloom error: strength parameter must be between [0, 3].");
+      return;
+    }
+  }
+  if (!(typeof params.radius == UNDEFINED)){
+    hasRadius = true;
+    if (isNaN(params.radius)){
+      throw new Error("setBloom error: radius parameter is not a number.");
+      return;
+    }
+    if (params.radius < 0 || params.radius > 1){
+      throw new Error("setBloom error: radius parameter must be between [0, 1].");
+      return;
+    }
+  }
+  if (!(typeof params.threshold == UNDEFINED)){
+    hasThreshold = true;
+    if (isNaN(params.threshold)){
+      throw new Error("setBloom error: threshold parameter is not a number.");
+      return;
+    }
+    if (params.threshold < 0 || params.threshold > 1){
+      throw new Error("setBloom error: threshold parameter must be between [0, 1].");
+      return;
+    }
+  }
+  if (!(typeof params.resolutionScale == UNDEFINED)){
+    hasResolutionScale = true;
+    if (isNaN(params.resolutionScale)){
+      throw new Error("setBloom error: resolutionScale parameter is not a number.");
+      return;
+    }
+    if (params.resolutionScale < 0.1 || params.resolutionScale > 1){
+      throw new Error("setBloom error: resolutionScale parameter must be between [0.1, 1].");
+      return;
+    }
+  }
+  bloomOn = true;
+  if (hasStrength){
+    bloomStrength = params.strength;
+  }
+  if (hasRadius){
+    bloomRadius = params.radius;
+  }
+  if (hasThreshold){
+    bloomThreshold = params.threshold;
+  }
+  if (hasResolutionScale){
+    adjustPostProcessing(4, params.resolutionScale);
+  }else{
+    adjustPostProcessing(-1, null);
+  }
+}
+
+// unsetBloom
+// Unsets the Bloom effect.
+Roygbiv.prototype.unsetBloom = function(){
+  if (mode == 0){
+    return;
+  }
+  adjustPostProcessing(5, false);
+  if (!isDeployment){
+    postprocessingParameters["Bloom"] = false;
+  }
 }

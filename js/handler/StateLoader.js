@@ -2343,6 +2343,7 @@ StateLoader.prototype.resetProject = function(undo){
   performanceDropMinFPS = 0;
   performanceDropSeconds = 0;
   performanceDropCounter = 0;
+  originalBloomConfigurations = new Object();
   NO_MOBILE = false;
 
   boundingClientRect = renderer.domElement.getBoundingClientRect();

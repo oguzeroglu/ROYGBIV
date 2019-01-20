@@ -714,6 +714,7 @@ var bloomRadius = 0; // 0 - 1
 var bloomThreshold = 1; // 0 - 1
 var bloomResolutionScale = 1; // 0.1 - 1
 var bloomOn = false;
+var originalBloomConfigurations = new Object();
 
 // CAMERA CONFIGURATIONS
 var initialCameraX = 0;

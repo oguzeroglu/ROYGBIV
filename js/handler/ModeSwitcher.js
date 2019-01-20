@@ -68,6 +68,16 @@ ModeSwitcher.prototype.switchFromDesignToPreview = function(){
   TOTAL_PARTICLE_COLLISION_LISTEN_COUNT = 0;
   TOTAL_PARTICLE_SYSTEM_COLLISION_LISTEN_COUNT = 0;
   TOTAL_PARTICLE_SYSTEMS_WITH_PARTICLE_COLLISIONS = 0;
+  originalBloomConfigurations.bloomStrength = bloomStrength;
+  originalBloomConfigurations.bloomRadius = bloomRadius;
+  originalBloomConfigurations.bloomThreshold = bloomThreshold;
+  originalBloomConfigurations.bloomResolutionScale = bloomResolutionScale;
+  originalBloomConfigurations.bloomOn = bloomOn;
+  postprocessingParameters["Bloom_strength"] = bloomStrength;
+  postprocessingParameters["Bloom_radius"] = bloomRadius;
+  postprocessingParameters["Bloom_threshhold"] = bloomThreshold;
+  postprocessingParameters["Bloom_resolution_scale"] = bloomResolutionScale;
+  postprocessingParameters["Bloom"] = bloomOn;
   for (var gsName in gridSystems){
     scene.remove(gridSystems[gsName].gridSystemRepresentation);
     scene.remove(gridSystems[gsName].boundingPlane);
@@ -226,6 +236,12 @@ ModeSwitcher.prototype.switchFromPreviewToDesign = function(){
     console.log("[*] Frame-drop recording process stopped.");
     LOG_FRAME_DROP_ON = false;
   }
+  bloomStrength = originalBloomConfigurations.bloomStrength;
+  bloomRadius = originalBloomConfigurations.bloomRadius;
+  bloomThreshold = originalBloomConfigurations.bloomThreshold;
+  bloomResolutionScale = originalBloomConfigurations.bloomResolutionScale;
+  bloomOn = originalBloomConfigurations.bloomOn;
+  originalBloomConfigurations = new Object();
   camera.position.set(initialCameraX, initialCameraY, initialCameraZ);
   camera.rotation.order = 'YXZ';
   camera.rotation.set(0, 0, 0);
