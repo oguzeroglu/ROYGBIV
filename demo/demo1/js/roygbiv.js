@@ -945,6 +945,12 @@ var Text = function(){
    this.ROYGBIV_SCRIPTING_API_AOINTENSITY = "Modifies the AO intensity of an object by given amount.";
    this.ROYGBIV_SCRIPTING_API_EMISSIVECOLOR = "Sets the emissive color of an object to a given value.";
    this.ROYGBIV_SCRIPTING_API_RESETOBJECTVELOCITY = "Resets the velocity and angular velocity of an object.";
+   this.ROYGBIV_SCRIPTING_API_SETFPSDROPCALLBACKFUNCTION = "Sets a callback function for FPS drops. The callbackFunction is executed with dropAmount parameter if the FPS is\nless than 60 for given second. The dropAmount is calculated using this formula: (60 - [current_fps])";
+   this.ROYGBIV_SCRIPTING_API_REMOVEFPSDROPCALLBACKFUNCTION = "Removes the callback function for FPS drops.";
+   this.ROYGBIV_SCRIPTING_API_SETPERFORMANCEDROPCALLBACKFUNCTION = "Sets a callback function for performance drops. The callbackFunction is executed if the FPS is under [minFPS] for [seconds] seconds.\nThe callbackFunction is automatically removed after the execution, so use this function again if needed after\nthe execution of the callbackFunction.";
+   this.ROYGBIV_SCRIPTING_API_REMOVEPERFORMANCEDROPCALLBACKFUNCTION = "Removes the callback function for performance drops.";
+   this.ROYGBIV_SCRIPTING_API_SETBLOOM = "Sets the Bloom effect properties of the scene. Parameters are:\nstrength (optional): The bloom strength between [0, 3]\nradius (optional): The bloom radius between [0, 1]\nthreshold (optional): The bloom threshold between [0, 1]\nresolutionScale (optional): The bloom resolution scale between [0.1, 1]";
+   this.ROYGBIV_SCRIPTING_API_UNSETBLOOM = "Unsets the Bloom effect.";
 }
 
 var Terminal = function(){
@@ -3684,34 +3690,15 @@ var surfacePhysicalThickness = 1;
 
 // POST PROCESSING
 var renderPass;
-var badTVPass;
-var rgbPass;
-var filmPass;
-var staticPass;
 var copyPass;
 var composer;
 var bloomPass;
-var shaderTime = 0;
-var scanlineCount = 800; // 0 -1000 / Scanlines - count
-var scanlineSIntensity = 0.9; // 0 - 2 / Scanlines - sIntensity
-var scanlineNIntensity = 0.4; // 0 - 2 / Scanlines - nIntensity
-var staticAmount = 0; //0 - 1 / Static - amount
-var staticSize = 4; // 0 - 100 / Static - size
-var rgbAmount = 0.0022; // 0 - 0.1 / RGB Shift - amount
-var rgbAngle = 0; // 0 - 2 / RGB Shift Angle
-var badtvThick = 0.1; // 0.1 - 20 / Bad TV - Thick Distort
-var badtvFine = 0.1; // 0.1 - 20 / Bad TV - Fine Distort
-var badtvDistortSpeed = 0; // 0 - 1 / Bad TV - Distort Speed
-var badtvRollSpeed = 0; // 0 - 1 / Bad TV - Roll Speed
 var bloomStrength = 0.4; // 0 - 3
 var bloomRadius = 0; // 0 - 1
 var bloomThreshold = 1; // 0 - 1
 var bloomResolutionScale = 1; // 0.1 - 1
-var scanlineOn = false;
-var rgbOn = false;
-var badTvOn = false;
 var bloomOn = false;
-var staticOn = false;
+var originalBloomConfigurations = new Object();
 
 // CAMERA CONFIGURATIONS
 var initialCameraX = 0;
@@ -3946,6 +3933,8 @@ var screenMouseUpCallbackFunction = 0;
 var screenMouseMoveCallbackFunction = 0;
 var screenPointerLockChangedCallbackFunction = 0;
 var screenFullScreenChangeCallbackFunction = 0;
+var fpsDropCallbackFunction = 0;
+var performanceDropCallbackFunction = 0;
 var terminalTextInputCallbackFunction = 0;
 var defaultCameraControlsDisabled = false;
 var modeSwitcher;
@@ -3956,7 +3945,10 @@ var isDeployment = true;
 var loadedScriptsCounter = 0;
 var isMobile = /Mobi|Android/i.test(navigator.userAgent);
 var WHITE_COLOR = new THREE.Color("white");
-var NO_MOBILE = true;
+var NO_MOBILE = false;
+var performanceDropMinFPS = 0;
+var performanceDropSeconds = 0;
+var performanceDropCounter = 0;
 
 // WORKER VARIABLES
 var WORKERS_SUPPORTED = (typeof(Worker) !== "undefined");
@@ -3984,25 +3976,10 @@ var datGuiFog;
 var omGUIlastObjectName = "";
 
 var postprocessingParameters = {
-  "Scanlines_count": scanlineCount,
-  "Scanlines_sIntensity": scanlineSIntensity,
-  "Scanlines_nIntensity": scanlineNIntensity,
-  "Static_amount": staticAmount,
-  "Static_size": staticSize,
-  "RGBShift_amount": rgbAmount,
-  "RGBShift_angle": rgbAngle,
-  "BadTV_thickDistort": badtvThick,
-  "BadTV_fineDistort": badtvFine,
-  "BadTV_distortSpeed": badtvDistortSpeed,
-  "BadTV_rollSpeed": badtvRollSpeed,
   "Bloom_strength": bloomStrength,
   "Bloom_radius": bloomRadius,
   "Bloom_threshhold": bloomThreshold,
   "Bloom_resolution_scale": bloomResolutionScale,
-  "Scanlines": scanlineOn,
-  "RGB": rgbOn,
-  "Bad TV": badTvOn,
-  "Static": staticOn,
   "Bloom": bloomOn
 };
 
@@ -8765,19 +8742,6 @@ function render(){
     updateParticleSystems();
     updateObjectTrails();
     updateCrosshair();
-    shaderTime += 0.1;
-    if (shaderTime > 10){
-      shaderTime = 0;
-    }
-    if (badTvOn){
-      badTVPass.uniforms[ 'time' ].value =  shaderTime;
-    }
-    if (scanlineOn){
-      filmPass.uniforms[ 'time' ].value =  shaderTime;
-    }
-    if (staticOn){
-      staticPass.uniforms[ 'time' ].value =  shaderTime;
-    }
   }else{
     cameraOperationsDone = false;
     if (areasVisible){
@@ -8969,6 +8933,23 @@ function calculateFps (){
   }
   fps = frameCounter;
   frameCounter = 0;
+  if (mode == 1 && fpsDropCallbackFunction && fps < 60){
+    fpsDropCallbackFunction(60 - fps);
+  }
+  if (mode == 1 && performanceDropCallbackFunction){
+    if (fps < performanceDropMinFPS){
+      performanceDropCounter ++;
+      if (performanceDropCounter == performanceDropSeconds){
+        performanceDropCallbackFunction();
+        performanceDropCounter = 0;
+        performanceDropMinFPS = 0;
+        performanceDropSeconds = 0;
+        performanceDropCallbackFunction = 0;
+      }
+    }else{
+      performanceDropCounter = 0;
+    }
+  }
   if (!isDeployment && !scriptEditorShowing && (fps != lastFPS)){
     if (mode == 0){
       $("#cliDivheader").text("ROYGBIV 3D Engine - CLI (Design mode) - "+fps+" FPS");
@@ -10630,391 +10611,6 @@ THREE.CopyShader = {
 };
 
 /**
- * @author alteredq / http://alteredqualia.com/
- *
- * Film grain & scanlines shader
- *
- * - ported from HLSL to WebGL / GLSL
- * http://www.truevision3d.com/forums/showcase/staticnoise_colorblackwhite_scanline_shaders-t18698.0.html
- *
- * Screen Space Static Postprocessor
- *
- * Produces an analogue noise overlay similar to a film grain / TV static
- *
- * Original implementation and noise algorithm
- * Pat 'Hawthorne' Shearon
- *
- * Optimized scanlines + noise version with intensity scaling
- * Georg 'Leviathan' Steinrohder
- *
- * This version is provided under a Creative Commons Attribution 3.0 License
- * http://creativecommons.org/licenses/by/3.0/
- */
-
-THREE.FilmShader = {
-
-	uniforms: {
-
-		"tDiffuse":   { type: "t", value: null },
-		"time":       { type: "f", value: 0.0 },
-		"nIntensity": { type: "f", value: 0.5 },
-		"sIntensity": { type: "f", value: 0.05 },
-		"sCount":     { type: "f", value: 4096 },
-		"grayscale":  { type: "i", value: 1 }
-
-	},
-
-	vertexShader: [
-
-		"varying vec2 vUv;",
-
-		"void main() {",
-
-			"vUv = uv;",
-			"gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );",
-
-		"}"
-
-	].join( "\n" ),
-
-	fragmentShader: [
-
-		// control parameter
-		"uniform float time;",
-
-		"uniform bool grayscale;",
-
-		// noise effect intensity value (0 = no effect, 1 = full effect)
-		"uniform float nIntensity;",
-
-		// scanlines effect intensity value (0 = no effect, 1 = full effect)
-		"uniform float sIntensity;",
-
-		// scanlines effect count value (0 = no effect, 4096 = full effect)
-		"uniform float sCount;",
-
-		"uniform sampler2D tDiffuse;",
-
-		"varying vec2 vUv;",
-
-		"void main() {",
-
-			// sample the source
-			"vec4 cTextureScreen = texture2D( tDiffuse, vUv );",
-
-			// make some noise
-			"float x = vUv.x * vUv.y * time *  1000.0;",
-			"x = mod( x, 13.0 ) * mod( x, 123.0 );",
-			"float dx = mod( x, 0.01 );",
-
-			// add noise
-			"vec3 cResult = cTextureScreen.rgb + cTextureScreen.rgb * clamp( 0.1 + dx * 100.0, 0.0, 1.0 );",
-
-			// get us a sine and cosine
-			"vec2 sc = vec2( sin( vUv.y * sCount ), cos( vUv.y * sCount ) );",
-
-			// add scanlines
-			"cResult += cTextureScreen.rgb * vec3( sc.x, sc.y, sc.x ) * sIntensity;",
-
-			// interpolate between source and result by intensity
-			"cResult = cTextureScreen.rgb + clamp( nIntensity, 0.0,1.0 ) * ( cResult - cTextureScreen.rgb );",
-
-			// convert to grayscale if desired
-			"if( grayscale ) {",
-
-				"cResult = vec3( cResult.r * 0.3 + cResult.g * 0.59 + cResult.b * 0.11 );",
-
-			"}",
-
-			"gl_FragColor =  vec4( cResult, cTextureScreen.a );",
-
-		"}"
-
-	].join( "\n" )
-
-};
-
-/**
- * @author felixturner / http://airtight.cc/
- *
- * RGB Shift Shader
- * Shifts red and blue channels from center in opposite directions
- * Ported from http://kriss.cx/tom/2009/05/rgb-shift/
- * by Tom Butterworth / http://kriss.cx/tom/
- *
- * amount: shift distance (1 is width of input)
- * angle: shift angle in radians
- */
-
-THREE.RGBShiftShader = {
-
-	uniforms: {
-
-		"tDiffuse": { type: "t", value: null },
-		"amount":   { type: "f", value: 0.005 },
-		"angle":    { type: "f", value: 0.0 }
-
-	},
-
-	vertexShader: [
-
-		"varying vec2 vUv;",
-
-		"void main() {",
-
-			"vUv = uv;",
-			"gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );",
-
-		"}"
-
-	].join( "\n" ),
-
-	fragmentShader: [
-
-		"uniform sampler2D tDiffuse;",
-		"uniform float amount;",
-		"uniform float angle;",
-
-		"varying vec2 vUv;",
-
-		"void main() {",
-
-			"vec2 offset = amount * vec2( cos(angle), sin(angle));",
-			"vec4 cr = texture2D(tDiffuse, vUv + offset);",
-			"vec4 cga = texture2D(tDiffuse, vUv);",
-			"vec4 cb = texture2D(tDiffuse, vUv - offset);",
-			"gl_FragColor = vec4(cr.r, cga.g, cb.b, cga.a);",
-
-		"}"
-
-	].join( "\n" )
-
-};
-
-/**
- * @author Felix Turner / www.airtight.cc / @felixturner
- *
- * Bad TV Shader
- * Simulates a bad TV via horizontal distortion and vertical roll
- * Uses Ashima WebGl Noise: https://github.com/ashima/webgl-noise
- *
- * Uniforms:
- * time: steadily increasing float passed in
- * distortion: amount of thick distortion
- * distortion2: amount of fine grain distortion
- * speed: distortion vertical travel speed
- * rollSpeed: vertical roll speed
- * 
- * The MIT License
- * 
- * Copyright (c) Felix Turner
- * 
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- * 
- * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
- * 
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
- * THE SOFTWARE.
- * 
- */
-
-THREE.BadTVShader = {
-	uniforms: {
-		"tDiffuse": 	{ type: "t", value: null },
-		"time": 		{ type: "f", value: 0.0 },
-		"distortion":   { type: "f", value: 3.0 },
-		"distortion2":  { type: "f", value: 5.0 },
-		"speed":     	{ type: "f", value: 0.2 },
-		"rollSpeed":    { type: "f", value: 0.1 },
-	},
-
-	vertexShader: [
-		"varying vec2 vUv;",
-		"void main() {",
-		"vUv = uv;",
-		"gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );",
-		"}"
-
-	].join("\n"),
-
-	fragmentShader: [
-
-		"uniform sampler2D tDiffuse;",
-		"uniform float time;",
-		"uniform float distortion;",
-		"uniform float distortion2;",
-		"uniform float speed;",
-		"uniform float rollSpeed;",
-		"varying vec2 vUv;",
-		
-		// Start Ashima 2D Simplex Noise
-
-		"vec3 mod289(vec3 x) {",
-		"  return x - floor(x * (1.0 / 289.0)) * 289.0;",
-		"}",
-
-		"vec2 mod289(vec2 x) {",
-		"  return x - floor(x * (1.0 / 289.0)) * 289.0;",
-		"}",
-
-		"vec3 permute(vec3 x) {",
-		"  return mod289(((x*34.0)+1.0)*x);",
-		"}",
-
-		"float snoise(vec2 v)",
-		"  {",
-		"  const vec4 C = vec4(0.211324865405187,  // (3.0-sqrt(3.0))/6.0",
-		"                      0.366025403784439,  // 0.5*(sqrt(3.0)-1.0)",
-		"                     -0.577350269189626,  // -1.0 + 2.0 * C.x",
-		"                      0.024390243902439); // 1.0 / 41.0",
-		"  vec2 i  = floor(v + dot(v, C.yy) );",
-		"  vec2 x0 = v -   i + dot(i, C.xx);",
-
-		"  vec2 i1;",
-		"  i1 = (x0.x > x0.y) ? vec2(1.0, 0.0) : vec2(0.0, 1.0);",
-		"  vec4 x12 = x0.xyxy + C.xxzz;",
-		" x12.xy -= i1;",
-
-		"  i = mod289(i); // Avoid truncation effects in permutation",
-		"  vec3 p = permute( permute( i.y + vec3(0.0, i1.y, 1.0 ))",
-		"		+ i.x + vec3(0.0, i1.x, 1.0 ));",
-
-		"  vec3 m = max(0.5 - vec3(dot(x0,x0), dot(x12.xy,x12.xy), dot(x12.zw,x12.zw)), 0.0);",
-		"  m = m*m ;",
-		"  m = m*m ;",
-
-		"  vec3 x = 2.0 * fract(p * C.www) - 1.0;",
-		"  vec3 h = abs(x) - 0.5;",
-		"  vec3 ox = floor(x + 0.5);",
-		"  vec3 a0 = x - ox;",
-
-		"  m *= 1.79284291400159 - 0.85373472095314 * ( a0*a0 + h*h );",
-
-		"  vec3 g;",
-		"  g.x  = a0.x  * x0.x  + h.x  * x0.y;",
-		"  g.yz = a0.yz * x12.xz + h.yz * x12.yw;",
-		"  return 130.0 * dot(m, g);",
-		"}",
-
-		// End Ashima 2D Simplex Noise
-
-		"void main() {",
-
-			"vec2 p = vUv;",
-			"float ty = time*speed;",
-			"float yt = p.y - ty;",
-			//smooth distortion
-			"float offset = snoise(vec2(yt*3.0,0.0))*0.2;",
-			// boost distortion
-			"offset = offset*distortion * offset*distortion * offset;",
-			//add fine grain distortion
-			"offset += snoise(vec2(yt*50.0,0.0))*distortion2*0.001;",
-			//combine distortion on X with roll on Y
-			"gl_FragColor = texture2D(tDiffuse,  vec2(fract(p.x + offset),fract(p.y-time*rollSpeed) ));",
-
-		"}"
-
-	].join("\n")
-
-};
-
-/**
- * @author Felix Turner / www.airtight.cc / @felixturner
- *
- * Static effect. Additively blended digital noise.
- *
- * amount - amount of noise to add (0 - 1)
- * size - size of noise grains (pixels)
- *
- * The MIT License
- * 
- * Copyright (c) 2014 Felix Turner
- * 
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- * 
- * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
- * 
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
- * THE SOFTWARE.
- * 
- */
-
-THREE.StaticShader = {
-
-	uniforms: {
-
-		"tDiffuse": { type: "t", value: null },
-		"time":     { type: "f", value: 0.0 },
-		"amount":   { type: "f", value: 0.5 },
-		"size":     { type: "f", value: 4.0 }
-	},
-
-	vertexShader: [
-
-	"varying vec2 vUv;",
-
-	"void main() {",
-
-		"vUv = uv;",
-		"gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );",
-
-	"}"
-
-	].join("\n"),
-
-	fragmentShader: [
-
-	"uniform sampler2D tDiffuse;",
-	"uniform float time;",
-	"uniform float amount;",
-	"uniform float size;",
-
-	"varying vec2 vUv;",
-
-	"float rand(vec2 co){",
-		"return fract(sin(dot(co.xy ,vec2(12.9898,78.233))) * 43758.5453);",
-	"}",
-
-	"void main() {",
-		"vec2 p = vUv;",
-		"vec4 color = texture2D(tDiffuse, p);",
-		"float xs = floor(gl_FragCoord.x / size);",
-		"float ys = floor(gl_FragCoord.y / size);",
-		"vec4 snow = vec4(rand(vec2(xs * time,ys * time))*amount);",
-
-		//"gl_FragColor = color + amount * ( snow - color );", //interpolate
-
-		"gl_FragColor = color+ snow;", //additive
-
-	"}"
-
-	].join("\n")
-
-};
-
-/**
  * @author bhouston / http://clara.io/
  *
  * Luminosity
@@ -11477,66 +11073,26 @@ window.onload = function() {
 
     // DAT GUI
     datGui = new dat.GUI();
-    datGui.add(postprocessingParameters, "Scanlines_count").min(0).max(1000).step(1).onChange(function(val){
-      adjustPostProcessing(0, val);
-    });
-    datGui.add(postprocessingParameters, "Scanlines_sIntensity").min(0.0).max(2.0).step(0.1).onChange(function(val){
-      adjustPostProcessing(1, val);
-    });
-    datGui.add(postprocessingParameters, "Scanlines_nIntensity").min(0.0).max(2.0).step(0.1).onChange(function(val){
-      adjustPostProcessing(2, val);
-    });
-    datGui.add(postprocessingParameters, "Static_amount").min(0.0).max(1.0).step(0.01).onChange(function(val){
-      adjustPostProcessing(3, val);
-    });
-    datGui.add(postprocessingParameters, "Static_size").min(0.0).max(100.0).step(1.0).onChange(function(val){
-      adjustPostProcessing(4, val);
-    });
-    datGui.add(postprocessingParameters, "RGBShift_amount").min(0.0).max(0.1).step(0.01).onChange(function(val){
-      adjustPostProcessing(5, val);
-    });
-    datGui.add(postprocessingParameters, "RGBShift_angle").min(0.0).max(2.0).step(0.1).onChange(function(val){
-      adjustPostProcessing(6, val);
-    });
-    datGui.add(postprocessingParameters, "BadTV_thickDistort").min(0.1).max(20).step(0.1).onChange(function(val){
-      adjustPostProcessing(7, val);
-    });
-    datGui.add(postprocessingParameters, "BadTV_fineDistort").min(0.1).max(20).step(0.1).onChange(function(val){
-      adjustPostProcessing(8, val);
-    });
-    datGui.add(postprocessingParameters, "BadTV_distortSpeed").min(0.0).max(1.0).step(0.01).onChange(function(val){
-      adjustPostProcessing(9, val);
-    });
-    datGui.add(postprocessingParameters, "BadTV_rollSpeed").min(0.0).max(1.0).step(0.01).onChange(function(val){
-      adjustPostProcessing(10, val);
-    });
     datGui.add(postprocessingParameters, "Bloom_strength").min(0.0).max(3.0).step(0.01).onChange(function(val){
-      adjustPostProcessing(11, val);
-    });
+      adjustPostProcessing(1, val);
+      originalBloomConfigurations.bloomStrength = val;
+    }).listen();
     datGui.add(postprocessingParameters, "Bloom_radius").min(0.0).max(1.0).step(0.01).onChange(function(val){
-      adjustPostProcessing(12, val);
-    });
+      adjustPostProcessing(2, val);
+      originalBloomConfigurations.bloomRadius = val;
+    }).listen();
     datGui.add(postprocessingParameters, "Bloom_threshhold").min(0.0).max(1.0).step(0.01).onChange(function(val){
-      adjustPostProcessing(13, val);
-    });
+      adjustPostProcessing(3, val);
+      originalBloomConfigurations.bloomThreshold = val;
+    }).listen();
     datGui.add(postprocessingParameters, "Bloom_resolution_scale").min(0.1).max(1.0).step(0.001).onChange(function(val){
-      adjustPostProcessing(19, val);
-    });
-    datGui.add(postprocessingParameters, "Scanlines").onChange(function(val){
-      adjustPostProcessing(14, val);
-    });
-    datGui.add(postprocessingParameters, "RGB").onChange(function(val){
-      adjustPostProcessing(15, val);
-    });
-    datGui.add(postprocessingParameters, "Bad TV").onChange(function(val){
-      adjustPostProcessing(16, val);
-    });
+      adjustPostProcessing(4, val);
+      originalBloomConfigurations.bloomResolutionScale = val;
+    }).listen();
     datGui.add(postprocessingParameters, "Bloom").onChange(function(val){
-      adjustPostProcessing(17, val);
-    });
-    datGui.add(postprocessingParameters, "Static").onChange(function(val){
-      adjustPostProcessing(18, val);
-    });
+      adjustPostProcessing(5, val);
+      originalBloomConfigurations.bloomOn = val;
+    }).listen();
     $(datGui.domElement).attr("hidden", true);
     $(datGuiObjectManipulation.domElement).attr("hidden", true);
     $(datGuiLights.domElement).attr("hidden", true);
@@ -11930,10 +11486,6 @@ window.addEventListener('keyup', function(event){
  function initBadTV(){
    renderPass = new THREE.RenderPass(scene, camera);
    if (mode == 1){
-    badTVPass = new THREE.ShaderPass( THREE.BadTVShader );
-    rgbPass = new THREE.ShaderPass( THREE.RGBShiftShader );
-    filmPass = new THREE.ShaderPass( THREE.FilmShader );
-    staticPass = new THREE.ShaderPass( THREE.StaticShader );
     bloomPass = new THREE.UnrealBloomPass(
       new THREE.Vector2(
         window.innerWidth * bloomResolutionScale,
@@ -11945,25 +11497,10 @@ window.addEventListener('keyup', function(event){
     );
    }
    copyPass = new THREE.ShaderPass( THREE.CopyShader );
-   if (mode == 1){
-     filmPass.uniforms.grayscale.value = 0;
-   }
-   setBadTVParams();
+   setPostProcessingParams();
    composer = new THREE.EffectComposer(renderer);
    composer.addPass( renderPass );
    if (mode == 1){
-    if (scanlineOn){
-      composer.addPass( filmPass );
-    }
-    if (badTvOn){
-      composer.addPass( badTVPass );
-    }
-    if (rgbOn){
-      composer.addPass( rgbPass );
-    }
-    if (staticOn){
-      composer.addPass( staticPass );
-    }
     if (bloomOn){
       composer.addPass( bloomPass );
       bloomPass.renderToScreen = true;
@@ -11973,30 +11510,11 @@ window.addEventListener('keyup', function(event){
 	    composer.addPass( copyPass );
 	    copyPass.renderToScreen = true;
    }
-   setBadTVParams();
+   setPostProcessingParams();
  }
 
- function setBadTVParams(){
+ function setPostProcessingParams(){
    if (mode == 1){
-    if (badTvOn){
-      badTVPass.uniforms[ 'distortion' ].value = badtvThick;
-      badTVPass.uniforms[ 'distortion2' ].value = badtvFine;
-      badTVPass.uniforms[ 'speed' ].value = badtvDistortSpeed
-      badTVPass.uniforms[ 'rollSpeed' ].value = badtvRollSpeed;
-    }
-    if (staticOn){
-      staticPass.uniforms[ 'amount' ].value = staticAmount;
-      staticPass.uniforms[ 'size' ].value = staticSize;
-    }
-    if (rgbOn){
-      rgbPass.uniforms[ 'angle' ].value = rgbAngle * Math.PI;
-      rgbPass.uniforms[ 'amount' ].value = rgbAmount;
-    }
-    if (scanlineOn){
-      filmPass.uniforms[ 'sCount' ].value = scanlineCount;
-      filmPass.uniforms[ 'sIntensity' ].value = scanlineSIntensity;
-      filmPass.uniforms[ 'nIntensity' ].value = scanlineNIntensity;
-    }
     if (bloomOn){
       bloomPass.strength = bloomStrength;
       bloomPass.radius = bloomRadius;
@@ -12024,64 +11542,16 @@ window.addEventListener('keyup', function(event){
 
  function adjustPostProcessing(variableIndex, val){
    switch(variableIndex){
-     case 0: //Scanlines_count
-      scanlineCount = val;
-     break;
-     case 1: //Scanlines_sIntensity
-      scanlineSIntensity = val;
-     break;
-     case 2: //Scanlines_nIntensity
-      scanlineNIntensity = val;
-     break;
-     case 3: //Static_amount
-      staticAmount = val;
-     break;
-     case 4: //Static_size
-      staticSize = val;
-     break;
-     case 5: //RGBShift_amount
-      rgbAmount = val;
-     break;
-     case 6: //RGBShift_angle
-      rgbAngle = val;
-     break;
-     case 7: //BadTV_thickDistort
-      badtvThick = val;
-     break;
-     case 8: //BadTV_fineDistort
-      badtvFine = val;
-     break;
-     case 9: //BadTV_distortSpeed
-      badtvDistortSpeed = val;
-     break;
-     case 10: //BadTV_rollSpeed
-      badtvRollSpeed = val;
-     break;
-     case 11: //bloomStrength
+     case 1: //bloomStrength
       bloomStrength = val;
      break;
-     case 12: //Bloom_radius
+     case 2: //Bloom_radius
       bloomRadius = val;
      break;
-     case 13: //Bloom_threshhold
+     case 3: //Bloom_threshhold
       bloomThreshold = val;
      break;
-     case 14: //Scanlines
-      scanlineOn = val;
-     break;
-     case 15: //RGB
-      rgbOn = val;
-     break;
-     case 16: //Bad TV
-      badTvOn = val;
-     break;
-     case 17: //Bloom
-      bloomOn = val;
-     break;
-     case 18: //Static
-      staticOn = val;
-     break;
-     case 19: //Bloom_resolution_scale
+     case 4: //Bloom_resolution_scale
       bloomResolutionScale = val;
       bloomPass = new THREE.UnrealBloomPass(
         new THREE.Vector2(
@@ -12093,27 +11563,31 @@ window.addEventListener('keyup', function(event){
         bloomThreshold
       );
      break;
+     case 5: //Bloom
+      bloomOn = val;
+     break;
+     case -1: //from script
+      if(!isDeployment){
+        console.log("DSF");
+        postprocessingParameters["Bloom_strength"] = bloomStrength;
+        postprocessingParameters["Bloom_radius"] = bloomRadius;
+        postprocessingParameters["Bloom_threshhold"] = bloomThreshold;
+        postprocessingParameters["Bloom_resolution_scale"] = bloomResolutionScale;
+        postprocessingParameters["Bloom"] = bloomOn;
+      }
+     break;
    }
-   composer = new THREE.EffectComposer( renderer );
-   composer.addPass( renderPass );
-   if (scanlineOn){
-     composer.addPass( filmPass );
-   }
-   if (badTvOn){
-     composer.addPass( badTVPass );
-   }
-   if (rgbOn){
-     composer.addPass( rgbPass );
-   }
-   if (staticOn){
-     composer.addPass( staticPass );
-   }
+   composer = new THREE.EffectComposer(renderer);
+   composer.addPass(renderPass);
    if (bloomOn){
-   composer.addPass( bloomPass );
+     composer.addPass(bloomPass);
+     bloomPass.renderToScreen = true;
    }
-   composer.addPass( copyPass );
-	 copyPass.renderToScreen = true;
-   setBadTVParams();
+   if (!(mode == 1 && bloomOn)){
+	    composer.addPass(copyPass);
+	    copyPass.renderToScreen = true;
+   }
+   setPostProcessingParams();
  }
 
  function omGUIRotateEvent(axis, val){
@@ -12695,25 +12169,10 @@ var State = function(projectName, author){
   }
   this.markedPointsExport = markedPointsExport;
   // POST PROCESSING ***********************************************
-  this.scanlineCount = scanlineCount;
-  this.scanlineSIntensity = scanlineSIntensity;
-  this.scanlineNIntensity = scanlineNIntensity;
-  this.staticAmount = staticAmount;
-  this.staticSize = staticSize;
-  this.rgbAmount = rgbAmount;
-  this.rgbAngle = rgbAngle;
-  this.badtvThick = badtvThick;
-  this.badtvFine = badtvFine;
-  this.badtvDistortSpeed = badtvDistortSpeed;
-  this.badtvRollSpeed = badtvRollSpeed;
   this.bloomStrength = bloomStrength;
   this.bloomRadius = bloomRadius;
   this.bloomThreshold = bloomThreshold;
   this.bloomResolutionScale = bloomResolutionScale;
-  this.scanlineOn = scanlineOn;
-  this.rgbOn = rgbOn;
-  this.badTvOn = badTvOn;
-  this.staticOn = staticOn;
   this.bloomOn = bloomOn;
   // PHYSICS WORKER MODE *******************************************
   this.physicsWorkerMode = PHYSICS_WORKER_ENABLED;
@@ -13777,109 +13236,34 @@ StateLoader.prototype.load = function(undo){
     screenResolution = obj.screenResolution;
     renderer.setPixelRatio(screenResolution);
     // POST PROCESSING *********************************************
-    scanlineCount = obj.scanlineCount;
-    scanlineSIntensity = obj.scanlineSIntensity;
-    scanlineNIntensity = obj.scanlineNIntensity;
-    staticAmount = obj.staticAmount;
-    staticSize = obj.staticSize;
-    rgbAmount = obj.rgbAmount;
-    rgbAngle = obj.rgbAngle;
-    badtvThick = obj.badtvThick;
-    badtvFine = obj.badtvFine;
-    badtvDistortSpeed = obj.badtvDistortSpeed ;
-    badtvRollSpeed = obj.badtvRollSpeed;
     bloomStrength = obj.bloomStrength;
     bloomRadius = obj.bloomRadius;
     bloomThreshold = obj.bloomThreshold;
     bloomResolutionScale = obj.bloomResolutionScale;
-    scanlineOn = obj.scanlineOn;
-    rgbOn = obj.rgbOn;
-    badTvOn = obj.badTvOn;
-    staticOn = obj.staticOn;
     bloomOn = obj.bloomOn;
     if (!isDeployment){
       postprocessingParameters = {
-        "Scanlines_count": scanlineCount,
-        "Scanlines_sIntensity": scanlineSIntensity,
-        "Scanlines_nIntensity": scanlineNIntensity,
-        "Static_amount": staticAmount,
-        "Static_size": staticSize,
-        "RGBShift_amount": rgbAmount,
-        "RGBShift_angle": rgbAngle,
-        "BadTV_thickDistort": badtvThick,
-        "BadTV_fineDistort": badtvFine,
-        "BadTV_distortSpeed": badtvDistortSpeed,
-        "BadTV_rollSpeed": badtvRollSpeed,
         "Bloom_strength": bloomStrength,
         "Bloom_radius": bloomRadius,
         "Bloom_threshhold": bloomThreshold,
         "Bloom_resolution_scale": bloomResolutionScale,
-        "Scanlines": scanlineOn,
-        "RGB": rgbOn,
-        "Bad TV": badTvOn,
-        "Static": staticOn,
         "Bloom": bloomOn
       };
       datGui = new dat.GUI();
-      datGui.add(postprocessingParameters, "Scanlines_count").min(0).max(1000).step(1).onChange(function(val){
-        adjustPostProcessing(0, val);
-      });
-      datGui.add(postprocessingParameters, "Scanlines_sIntensity").min(0.0).max(2.0).step(0.1).onChange(function(val){
+      datGui.add(postprocessingParameters, "Bloom_strength").min(0.0).max(3.0).step(0.01).onChange(function(val){
         adjustPostProcessing(1, val);
       });
-      datGui.add(postprocessingParameters, "Scanlines_nIntensity").min(0.0).max(2.0).step(0.1).onChange(function(val){
+      datGui.add(postprocessingParameters, "Bloom_radius").min(0.0).max(1.0).step(0.01).onChange(function(val){
         adjustPostProcessing(2, val);
       });
-      datGui.add(postprocessingParameters, "Static_amount").min(0.0).max(1.0).step(0.01).onChange(function(val){
+      datGui.add(postprocessingParameters, "Bloom_threshhold").min(0.0).max(1.0).step(0.01).onChange(function(val){
         adjustPostProcessing(3, val);
       });
-      datGui.add(postprocessingParameters, "Static_size").min(0.0).max(100.0).step(1.0).onChange(function(val){
+      datGui.add(postprocessingParameters, "Bloom_resolution_scale").min(0.1).max(1.0).step(0.001).onChange(function(val){
         adjustPostProcessing(4, val);
       });
-      datGui.add(postprocessingParameters, "RGBShift_amount").min(0.0).max(0.1).step(0.01).onChange(function(val){
-        adjustPostProcessing(5, val);
-      });
-      datGui.add(postprocessingParameters, "RGBShift_angle").min(0.0).max(2.0).step(0.1).onChange(function(val){
-        adjustPostProcessing(6, val);
-      });
-      datGui.add(postprocessingParameters, "BadTV_thickDistort").min(0.1).max(20).step(0.1).onChange(function(val){
-        adjustPostProcessing(7, val);
-      });
-      datGui.add(postprocessingParameters, "BadTV_fineDistort").min(0.1).max(20).step(0.1).onChange(function(val){
-        adjustPostProcessing(8, val);
-      });
-      datGui.add(postprocessingParameters, "BadTV_distortSpeed").min(0.0).max(1.0).step(0.01).onChange(function(val){
-        adjustPostProcessing(9, val);
-      });
-      datGui.add(postprocessingParameters, "BadTV_rollSpeed").min(0.0).max(1.0).step(0.01).onChange(function(val){
-        adjustPostProcessing(10, val);
-      });
-      datGui.add(postprocessingParameters, "Bloom_strength").min(0.0).max(3.0).step(0.01).onChange(function(val){
-        adjustPostProcessing(11, val);
-      });
-      datGui.add(postprocessingParameters, "Bloom_radius").min(0.0).max(1.0).step(0.01).onChange(function(val){
-        adjustPostProcessing(12, val);
-      });
-      datGui.add(postprocessingParameters, "Bloom_threshhold").min(0.0).max(1.0).step(0.01).onChange(function(val){
-        adjustPostProcessing(13, val);
-      });
-      datGui.add(postprocessingParameters, "Bloom_resolution_scale").min(0.1).max(1.0).step(0.001).onChange(function(val){
-        adjustPostProcessing(19, val);
-      });
-      datGui.add(postprocessingParameters, "Scanlines").onChange(function(val){
-        adjustPostProcessing(14, val);
-      });
-      datGui.add(postprocessingParameters, "RGB").onChange(function(val){
-        adjustPostProcessing(15, val);
-      });
-      datGui.add(postprocessingParameters, "Bad TV").onChange(function(val){
-        adjustPostProcessing(16, val);
-      });
       datGui.add(postprocessingParameters, "Bloom").onChange(function(val){
-        adjustPostProcessing(17, val);
-      });
-      datGui.add(postprocessingParameters, "Static").onChange(function(val){
-        adjustPostProcessing(18, val);
+        adjustPostProcessing(5, val);
       });
       $(datGui.domElement).attr("hidden", true);
     }
@@ -15169,6 +14553,12 @@ StateLoader.prototype.resetProject = function(undo){
   screenPointerLockChangedCallbackFunction = 0;
   screenFullScreenChangeCallbackFunction = 0;
   terminalTextInputCallbackFunction = 0;
+  fpsDropCallbackFunction = 0;
+  performanceDropCallbackFunction = 0;
+  performanceDropMinFPS = 0;
+  performanceDropSeconds = 0;
+  performanceDropCounter = 0;
+  originalBloomConfigurations = new Object();
   NO_MOBILE = false;
 
   boundingClientRect = renderer.domElement.getBoundingClientRect();
@@ -20077,7 +19467,13 @@ var Roygbiv = function(){
     "lerp",
     "aoIntensity",
     "emissiveColor",
-    "resetObjectVelocity"
+    "resetObjectVelocity",
+    "setFPSDropCallbackFunction",
+    "removeFPSDropCallbackFunction",
+    "setPerformanceDropCallbackFunction",
+    "removePerformanceDropCallbackFunction",
+    "setBloom",
+    "unsetBloom"
   ];
 
   this.globals = new Object();
@@ -26535,6 +25931,90 @@ Roygbiv.prototype.removeTextInputCallbackFunction = function(){
   terminalTextInputCallbackFunction = 0;
 }
 
+// setFPSDropCallbackFunction
+// Sets a callback function for FPS drops. The callbackFunction is executed
+// with dropAmount parameter if the FPS is less than 60 for given second. The
+// dropAmount is calculated using this formula: (60 - [current_fps])
+Roygbiv.prototype.setFPSDropCallbackFunction = function(callbackFunction){
+  if (mode == 0){
+    return;
+  }
+  if (typeof callbackFunction == UNDEFINED){
+    throw new Error("setFPSDropCallbackFunction error: callbackFunction is not defined.");
+    return;
+  }
+  if (!(callbackFunction instanceof Function)){
+    throw new Error("setFPSDropCallbackFunction error: callbackFunction is not a function.");
+    return;
+  }
+  fpsDropCallbackFunction = callbackFunction;
+}
+
+// removeFPSDropCallbackFunction
+// Removes the callback function for FPS drops.
+Roygbiv.prototype.removeFPSDropCallbackFunction = function(){
+  if (mode == 0){
+    return;
+  }
+  fpsDropCallbackFunction = 0;
+}
+
+// setPerformanceDropCallbackFunction
+// Sets a callback function for performance drops. The callbackFunction is executed
+// if the FPS is under [minFPS] for [seconds] seconds. The callbackFunction is automatically
+// removed after the execution, so use this function again if needed after the execution
+// of the callbackFunction.
+Roygbiv.prototype.setPerformanceDropCallbackFunction = function(minFPS, seconds, callbackFunction){
+  if (mode == 0){
+    return;
+  }
+  if (typeof minFPS == UNDEFINED){
+    throw new Error("setPerformanceDropCallbackFunction error: minFPS is not defined.");
+    return;
+  }
+  if (isNaN(minFPS)){
+    throw new Error("setPerformanceDropCallbackFunction error: minFPS is not a number.");
+    return;
+  }
+  if (!(minFPS > 0 && minFPS <= 60)){
+    throw new Error("setPerformanceDropCallbackFunction error: minFPS must be between (0,60]");
+    return;
+  }
+  if (typeof seconds == UNDEFINED){
+    throw new Error("setPerformanceDropCallbackFunction error: seconds is not defined.");
+    return;
+  }
+  if (isNaN(seconds)){
+    throw new Error("setPerformanceDropCallbackFunction error: seconds is not a number.");
+    return;
+  }
+  if (seconds <= 0){
+    throw new Error("setPerformanceDropCallbackFunction error: seconds must be greater than zero.");
+    return;
+  }
+  if (typeof callbackFunction == UNDEFINED){
+    throw new Error("setPerformanceDropCallbackFunction error: callbackFunction is not defined.");
+    return;
+  }
+  if (!(callbackFunction instanceof Function)){
+    throw new Error("setPerformanceDropCallbackFunction error: callbackFunction is not a function.");
+    return;
+  }
+  performanceDropCallbackFunction = callbackFunction;
+  performanceDropMinFPS = minFPS;
+  performanceDropSeconds = seconds;
+  performanceDropCounter = 0;
+}
+
+// removePerformanceDropCallbackFunction
+// Removes the callback function for performance drops.
+Roygbiv.prototype.removePerformanceDropCallbackFunction = function(){
+  if (mode == 0){
+    return;
+  }
+  performanceDropCallbackFunction = 0;
+}
+
 // UTILITY FUNCTIONS ***********************************************************
 
 // vector
@@ -27609,6 +27089,90 @@ Roygbiv.prototype.lerp = function(vector1, vector2, amount, targetVector){
   targetVector.y = REUSABLE_VECTOR.y;
   targetVector.z = REUSABLE_VECTOR.z;
   return targetVector;
+}
+
+// setBloom
+// Sets the Bloom effect properties of the scene. Parameters are:
+// strength (optional): The bloom strength between [0, 3]
+// radius (optional): The bloom radius between [0, 1]
+// threshold (optional): The bloom threshold between [0, 1]
+// resolutionScale (optional): The bloom resolution scale between [0.1, 1]
+Roygbiv.prototype.setBloom = function(params){
+  if (mode == 0){
+    return;
+  }
+  var hasStrength = false, hasRadius = false, hasThreshold = false, hasResolutionScale = false;
+  if (!(typeof params.strength == UNDEFINED)){
+    hasStrength = true;
+    if (isNaN(params.strength)){
+      throw new Error("setBloom error: strength parameter is not a number.");
+      return;
+    }
+    if (params.strength < 0 || params.strength > 3){
+      throw new Error("setBloom error: strength parameter must be between [0, 3].");
+      return;
+    }
+  }
+  if (!(typeof params.radius == UNDEFINED)){
+    hasRadius = true;
+    if (isNaN(params.radius)){
+      throw new Error("setBloom error: radius parameter is not a number.");
+      return;
+    }
+    if (params.radius < 0 || params.radius > 1){
+      throw new Error("setBloom error: radius parameter must be between [0, 1].");
+      return;
+    }
+  }
+  if (!(typeof params.threshold == UNDEFINED)){
+    hasThreshold = true;
+    if (isNaN(params.threshold)){
+      throw new Error("setBloom error: threshold parameter is not a number.");
+      return;
+    }
+    if (params.threshold < 0 || params.threshold > 1){
+      throw new Error("setBloom error: threshold parameter must be between [0, 1].");
+      return;
+    }
+  }
+  if (!(typeof params.resolutionScale == UNDEFINED)){
+    hasResolutionScale = true;
+    if (isNaN(params.resolutionScale)){
+      throw new Error("setBloom error: resolutionScale parameter is not a number.");
+      return;
+    }
+    if (params.resolutionScale < 0.1 || params.resolutionScale > 1){
+      throw new Error("setBloom error: resolutionScale parameter must be between [0.1, 1].");
+      return;
+    }
+  }
+  bloomOn = true;
+  if (hasStrength){
+    bloomStrength = params.strength;
+  }
+  if (hasRadius){
+    bloomRadius = params.radius;
+  }
+  if (hasThreshold){
+    bloomThreshold = params.threshold;
+  }
+  if (hasResolutionScale){
+    adjustPostProcessing(4, params.resolutionScale);
+  }else{
+    adjustPostProcessing(-1, null);
+  }
+}
+
+// unsetBloom
+// Unsets the Bloom effect.
+Roygbiv.prototype.unsetBloom = function(){
+  if (mode == 0){
+    return;
+  }
+  adjustPostProcessing(5, false);
+  if (!isDeployment){
+    postprocessingParameters["Bloom"] = false;
+  }
 }
 
 var WorldBinHandler = function(isCustom){
@@ -30846,6 +30410,16 @@ ModeSwitcher.prototype.switchFromDesignToPreview = function(){
   TOTAL_PARTICLE_COLLISION_LISTEN_COUNT = 0;
   TOTAL_PARTICLE_SYSTEM_COLLISION_LISTEN_COUNT = 0;
   TOTAL_PARTICLE_SYSTEMS_WITH_PARTICLE_COLLISIONS = 0;
+  originalBloomConfigurations.bloomStrength = bloomStrength;
+  originalBloomConfigurations.bloomRadius = bloomRadius;
+  originalBloomConfigurations.bloomThreshold = bloomThreshold;
+  originalBloomConfigurations.bloomResolutionScale = bloomResolutionScale;
+  originalBloomConfigurations.bloomOn = bloomOn;
+  postprocessingParameters["Bloom_strength"] = bloomStrength;
+  postprocessingParameters["Bloom_radius"] = bloomRadius;
+  postprocessingParameters["Bloom_threshhold"] = bloomThreshold;
+  postprocessingParameters["Bloom_resolution_scale"] = bloomResolutionScale;
+  postprocessingParameters["Bloom"] = bloomOn;
   for (var gsName in gridSystems){
     scene.remove(gridSystems[gsName].gridSystemRepresentation);
     scene.remove(gridSystems[gsName].boundingPlane);
@@ -31004,6 +30578,12 @@ ModeSwitcher.prototype.switchFromPreviewToDesign = function(){
     console.log("[*] Frame-drop recording process stopped.");
     LOG_FRAME_DROP_ON = false;
   }
+  bloomStrength = originalBloomConfigurations.bloomStrength;
+  bloomRadius = originalBloomConfigurations.bloomRadius;
+  bloomThreshold = originalBloomConfigurations.bloomThreshold;
+  bloomResolutionScale = originalBloomConfigurations.bloomResolutionScale;
+  bloomOn = originalBloomConfigurations.bloomOn;
+  originalBloomConfigurations = new Object();
   camera.position.set(initialCameraX, initialCameraY, initialCameraZ);
   camera.rotation.order = 'YXZ';
   camera.rotation.set(0, 0, 0);
@@ -31014,6 +30594,11 @@ ModeSwitcher.prototype.switchFromPreviewToDesign = function(){
   screenPointerLockChangedCallbackFunction = 0;
   screenFullScreenChangeCallbackFunction = 0;
   terminalTextInputCallbackFunction = 0;
+  fpsDropCallbackFunction = 0;
+  performanceDropCallbackFunction = 0;
+  performanceDropMinFPS = 0;
+  performanceDropSeconds = 0;
+  performanceDropCounter = 0;
   pointerLockRequested = false;
   fullScreenRequested = false;
   for (var gsName in gridSystems){
