@@ -147,25 +147,10 @@ var State = function(projectName, author){
   }
   this.markedPointsExport = markedPointsExport;
   // POST PROCESSING ***********************************************
-  this.scanlineCount = scanlineCount;
-  this.scanlineSIntensity = scanlineSIntensity;
-  this.scanlineNIntensity = scanlineNIntensity;
-  this.staticAmount = staticAmount;
-  this.staticSize = staticSize;
-  this.rgbAmount = rgbAmount;
-  this.rgbAngle = rgbAngle;
-  this.badtvThick = badtvThick;
-  this.badtvFine = badtvFine;
-  this.badtvDistortSpeed = badtvDistortSpeed;
-  this.badtvRollSpeed = badtvRollSpeed;
   this.bloomStrength = bloomStrength;
   this.bloomRadius = bloomRadius;
   this.bloomThreshold = bloomThreshold;
   this.bloomResolutionScale = bloomResolutionScale;
-  this.scanlineOn = scanlineOn;
-  this.rgbOn = rgbOn;
-  this.badTvOn = badTvOn;
-  this.staticOn = staticOn;
   this.bloomOn = bloomOn;
   // PHYSICS WORKER MODE *******************************************
   this.physicsWorkerMode = PHYSICS_WORKER_ENABLED;

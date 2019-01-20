@@ -706,34 +706,14 @@ var surfacePhysicalThickness = 1;
 
 // POST PROCESSING
 var renderPass;
-var badTVPass;
-var rgbPass;
-var filmPass;
-var staticPass;
 var copyPass;
 var composer;
 var bloomPass;
-var shaderTime = 0;
-var scanlineCount = 800; // 0 -1000 / Scanlines - count
-var scanlineSIntensity = 0.9; // 0 - 2 / Scanlines - sIntensity
-var scanlineNIntensity = 0.4; // 0 - 2 / Scanlines - nIntensity
-var staticAmount = 0; //0 - 1 / Static - amount
-var staticSize = 4; // 0 - 100 / Static - size
-var rgbAmount = 0.0022; // 0 - 0.1 / RGB Shift - amount
-var rgbAngle = 0; // 0 - 2 / RGB Shift Angle
-var badtvThick = 0.1; // 0.1 - 20 / Bad TV - Thick Distort
-var badtvFine = 0.1; // 0.1 - 20 / Bad TV - Fine Distort
-var badtvDistortSpeed = 0; // 0 - 1 / Bad TV - Distort Speed
-var badtvRollSpeed = 0; // 0 - 1 / Bad TV - Roll Speed
 var bloomStrength = 0.4; // 0 - 3
 var bloomRadius = 0; // 0 - 1
 var bloomThreshold = 1; // 0 - 1
 var bloomResolutionScale = 1; // 0.1 - 1
-var scanlineOn = false;
-var rgbOn = false;
-var badTvOn = false;
 var bloomOn = false;
-var staticOn = false;
 
 // CAMERA CONFIGURATIONS
 var initialCameraX = 0;
@@ -1011,25 +991,10 @@ var datGuiFog;
 var omGUIlastObjectName = "";
 
 var postprocessingParameters = {
-  "Scanlines_count": scanlineCount,
-  "Scanlines_sIntensity": scanlineSIntensity,
-  "Scanlines_nIntensity": scanlineNIntensity,
-  "Static_amount": staticAmount,
-  "Static_size": staticSize,
-  "RGBShift_amount": rgbAmount,
-  "RGBShift_angle": rgbAngle,
-  "BadTV_thickDistort": badtvThick,
-  "BadTV_fineDistort": badtvFine,
-  "BadTV_distortSpeed": badtvDistortSpeed,
-  "BadTV_rollSpeed": badtvRollSpeed,
   "Bloom_strength": bloomStrength,
   "Bloom_radius": bloomRadius,
   "Bloom_threshhold": bloomThreshold,
   "Bloom_resolution_scale": bloomResolutionScale,
-  "Scanlines": scanlineOn,
-  "RGB": rgbOn,
-  "Bad TV": badTvOn,
-  "Static": staticOn,
   "Bloom": bloomOn
 };
 

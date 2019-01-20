@@ -1021,109 +1021,34 @@ StateLoader.prototype.load = function(undo){
     screenResolution = obj.screenResolution;
     renderer.setPixelRatio(screenResolution);
     // POST PROCESSING *********************************************
-    scanlineCount = obj.scanlineCount;
-    scanlineSIntensity = obj.scanlineSIntensity;
-    scanlineNIntensity = obj.scanlineNIntensity;
-    staticAmount = obj.staticAmount;
-    staticSize = obj.staticSize;
-    rgbAmount = obj.rgbAmount;
-    rgbAngle = obj.rgbAngle;
-    badtvThick = obj.badtvThick;
-    badtvFine = obj.badtvFine;
-    badtvDistortSpeed = obj.badtvDistortSpeed ;
-    badtvRollSpeed = obj.badtvRollSpeed;
     bloomStrength = obj.bloomStrength;
     bloomRadius = obj.bloomRadius;
     bloomThreshold = obj.bloomThreshold;
     bloomResolutionScale = obj.bloomResolutionScale;
-    scanlineOn = obj.scanlineOn;
-    rgbOn = obj.rgbOn;
-    badTvOn = obj.badTvOn;
-    staticOn = obj.staticOn;
     bloomOn = obj.bloomOn;
     if (!isDeployment){
       postprocessingParameters = {
-        "Scanlines_count": scanlineCount,
-        "Scanlines_sIntensity": scanlineSIntensity,
-        "Scanlines_nIntensity": scanlineNIntensity,
-        "Static_amount": staticAmount,
-        "Static_size": staticSize,
-        "RGBShift_amount": rgbAmount,
-        "RGBShift_angle": rgbAngle,
-        "BadTV_thickDistort": badtvThick,
-        "BadTV_fineDistort": badtvFine,
-        "BadTV_distortSpeed": badtvDistortSpeed,
-        "BadTV_rollSpeed": badtvRollSpeed,
         "Bloom_strength": bloomStrength,
         "Bloom_radius": bloomRadius,
         "Bloom_threshhold": bloomThreshold,
         "Bloom_resolution_scale": bloomResolutionScale,
-        "Scanlines": scanlineOn,
-        "RGB": rgbOn,
-        "Bad TV": badTvOn,
-        "Static": staticOn,
         "Bloom": bloomOn
       };
       datGui = new dat.GUI();
-      datGui.add(postprocessingParameters, "Scanlines_count").min(0).max(1000).step(1).onChange(function(val){
-        adjustPostProcessing(0, val);
-      });
-      datGui.add(postprocessingParameters, "Scanlines_sIntensity").min(0.0).max(2.0).step(0.1).onChange(function(val){
+      datGui.add(postprocessingParameters, "Bloom_strength").min(0.0).max(3.0).step(0.01).onChange(function(val){
         adjustPostProcessing(1, val);
       });
-      datGui.add(postprocessingParameters, "Scanlines_nIntensity").min(0.0).max(2.0).step(0.1).onChange(function(val){
+      datGui.add(postprocessingParameters, "Bloom_radius").min(0.0).max(1.0).step(0.01).onChange(function(val){
         adjustPostProcessing(2, val);
       });
-      datGui.add(postprocessingParameters, "Static_amount").min(0.0).max(1.0).step(0.01).onChange(function(val){
+      datGui.add(postprocessingParameters, "Bloom_threshhold").min(0.0).max(1.0).step(0.01).onChange(function(val){
         adjustPostProcessing(3, val);
       });
-      datGui.add(postprocessingParameters, "Static_size").min(0.0).max(100.0).step(1.0).onChange(function(val){
+      datGui.add(postprocessingParameters, "Bloom_resolution_scale").min(0.1).max(1.0).step(0.001).onChange(function(val){
         adjustPostProcessing(4, val);
       });
-      datGui.add(postprocessingParameters, "RGBShift_amount").min(0.0).max(0.1).step(0.01).onChange(function(val){
-        adjustPostProcessing(5, val);
-      });
-      datGui.add(postprocessingParameters, "RGBShift_angle").min(0.0).max(2.0).step(0.1).onChange(function(val){
-        adjustPostProcessing(6, val);
-      });
-      datGui.add(postprocessingParameters, "BadTV_thickDistort").min(0.1).max(20).step(0.1).onChange(function(val){
-        adjustPostProcessing(7, val);
-      });
-      datGui.add(postprocessingParameters, "BadTV_fineDistort").min(0.1).max(20).step(0.1).onChange(function(val){
-        adjustPostProcessing(8, val);
-      });
-      datGui.add(postprocessingParameters, "BadTV_distortSpeed").min(0.0).max(1.0).step(0.01).onChange(function(val){
-        adjustPostProcessing(9, val);
-      });
-      datGui.add(postprocessingParameters, "BadTV_rollSpeed").min(0.0).max(1.0).step(0.01).onChange(function(val){
-        adjustPostProcessing(10, val);
-      });
-      datGui.add(postprocessingParameters, "Bloom_strength").min(0.0).max(3.0).step(0.01).onChange(function(val){
-        adjustPostProcessing(11, val);
-      });
-      datGui.add(postprocessingParameters, "Bloom_radius").min(0.0).max(1.0).step(0.01).onChange(function(val){
-        adjustPostProcessing(12, val);
-      });
-      datGui.add(postprocessingParameters, "Bloom_threshhold").min(0.0).max(1.0).step(0.01).onChange(function(val){
-        adjustPostProcessing(13, val);
-      });
-      datGui.add(postprocessingParameters, "Bloom_resolution_scale").min(0.1).max(1.0).step(0.001).onChange(function(val){
-        adjustPostProcessing(19, val);
-      });
-      datGui.add(postprocessingParameters, "Scanlines").onChange(function(val){
-        adjustPostProcessing(14, val);
-      });
-      datGui.add(postprocessingParameters, "RGB").onChange(function(val){
-        adjustPostProcessing(15, val);
-      });
-      datGui.add(postprocessingParameters, "Bad TV").onChange(function(val){
-        adjustPostProcessing(16, val);
-      });
       datGui.add(postprocessingParameters, "Bloom").onChange(function(val){
-        adjustPostProcessing(17, val);
-      });
-      datGui.add(postprocessingParameters, "Static").onChange(function(val){
-        adjustPostProcessing(18, val);
+        adjustPostProcessing(5, val);
       });
       $(datGui.domElement).attr("hidden", true);
     }

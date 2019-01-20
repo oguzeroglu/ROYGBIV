@@ -28,19 +28,6 @@ function render(){
     updateParticleSystems();
     updateObjectTrails();
     updateCrosshair();
-    shaderTime += 0.1;
-    if (shaderTime > 10){
-      shaderTime = 0;
-    }
-    if (badTvOn){
-      badTVPass.uniforms[ 'time' ].value =  shaderTime;
-    }
-    if (scanlineOn){
-      filmPass.uniforms[ 'time' ].value =  shaderTime;
-    }
-    if (staticOn){
-      staticPass.uniforms[ 'time' ].value =  shaderTime;
-    }
   }else{
     cameraOperationsDone = false;
     if (areasVisible){

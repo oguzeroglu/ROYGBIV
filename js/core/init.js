@@ -382,65 +382,20 @@ window.onload = function() {
 
     // DAT GUI
     datGui = new dat.GUI();
-    datGui.add(postprocessingParameters, "Scanlines_count").min(0).max(1000).step(1).onChange(function(val){
-      adjustPostProcessing(0, val);
-    });
-    datGui.add(postprocessingParameters, "Scanlines_sIntensity").min(0.0).max(2.0).step(0.1).onChange(function(val){
+    datGui.add(postprocessingParameters, "Bloom_strength").min(0.0).max(3.0).step(0.01).onChange(function(val){
       adjustPostProcessing(1, val);
     });
-    datGui.add(postprocessingParameters, "Scanlines_nIntensity").min(0.0).max(2.0).step(0.1).onChange(function(val){
+    datGui.add(postprocessingParameters, "Bloom_radius").min(0.0).max(1.0).step(0.01).onChange(function(val){
       adjustPostProcessing(2, val);
     });
-    datGui.add(postprocessingParameters, "Static_amount").min(0.0).max(1.0).step(0.01).onChange(function(val){
+    datGui.add(postprocessingParameters, "Bloom_threshhold").min(0.0).max(1.0).step(0.01).onChange(function(val){
       adjustPostProcessing(3, val);
     });
-    datGui.add(postprocessingParameters, "Static_size").min(0.0).max(100.0).step(1.0).onChange(function(val){
+    datGui.add(postprocessingParameters, "Bloom_resolution_scale").min(0.1).max(1.0).step(0.001).onChange(function(val){
       adjustPostProcessing(4, val);
     });
-    datGui.add(postprocessingParameters, "RGBShift_amount").min(0.0).max(0.1).step(0.01).onChange(function(val){
-      adjustPostProcessing(5, val);
-    });
-    datGui.add(postprocessingParameters, "RGBShift_angle").min(0.0).max(2.0).step(0.1).onChange(function(val){
-      adjustPostProcessing(6, val);
-    });
-    datGui.add(postprocessingParameters, "BadTV_thickDistort").min(0.1).max(20).step(0.1).onChange(function(val){
-      adjustPostProcessing(7, val);
-    });
-    datGui.add(postprocessingParameters, "BadTV_fineDistort").min(0.1).max(20).step(0.1).onChange(function(val){
-      adjustPostProcessing(8, val);
-    });
-    datGui.add(postprocessingParameters, "BadTV_distortSpeed").min(0.0).max(1.0).step(0.01).onChange(function(val){
-      adjustPostProcessing(9, val);
-    });
-    datGui.add(postprocessingParameters, "BadTV_rollSpeed").min(0.0).max(1.0).step(0.01).onChange(function(val){
-      adjustPostProcessing(10, val);
-    });
-    datGui.add(postprocessingParameters, "Bloom_strength").min(0.0).max(3.0).step(0.01).onChange(function(val){
-      adjustPostProcessing(11, val);
-    });
-    datGui.add(postprocessingParameters, "Bloom_radius").min(0.0).max(1.0).step(0.01).onChange(function(val){
-      adjustPostProcessing(12, val);
-    });
-    datGui.add(postprocessingParameters, "Bloom_threshhold").min(0.0).max(1.0).step(0.01).onChange(function(val){
-      adjustPostProcessing(13, val);
-    });
-    datGui.add(postprocessingParameters, "Bloom_resolution_scale").min(0.1).max(1.0).step(0.001).onChange(function(val){
-      adjustPostProcessing(19, val);
-    });
-    datGui.add(postprocessingParameters, "Scanlines").onChange(function(val){
-      adjustPostProcessing(14, val);
-    });
-    datGui.add(postprocessingParameters, "RGB").onChange(function(val){
-      adjustPostProcessing(15, val);
-    });
-    datGui.add(postprocessingParameters, "Bad TV").onChange(function(val){
-      adjustPostProcessing(16, val);
-    });
     datGui.add(postprocessingParameters, "Bloom").onChange(function(val){
-      adjustPostProcessing(17, val);
-    });
-    datGui.add(postprocessingParameters, "Static").onChange(function(val){
-      adjustPostProcessing(18, val);
+      adjustPostProcessing(5, val);
     });
     $(datGui.domElement).attr("hidden", true);
     $(datGuiObjectManipulation.domElement).attr("hidden", true);
@@ -835,10 +790,6 @@ window.addEventListener('keyup', function(event){
  function initBadTV(){
    renderPass = new THREE.RenderPass(scene, camera);
    if (mode == 1){
-    badTVPass = new THREE.ShaderPass( THREE.BadTVShader );
-    rgbPass = new THREE.ShaderPass( THREE.RGBShiftShader );
-    filmPass = new THREE.ShaderPass( THREE.FilmShader );
-    staticPass = new THREE.ShaderPass( THREE.StaticShader );
     bloomPass = new THREE.UnrealBloomPass(
       new THREE.Vector2(
         window.innerWidth * bloomResolutionScale,
@@ -850,25 +801,10 @@ window.addEventListener('keyup', function(event){
     );
    }
    copyPass = new THREE.ShaderPass( THREE.CopyShader );
-   if (mode == 1){
-     filmPass.uniforms.grayscale.value = 0;
-   }
    setBadTVParams();
    composer = new THREE.EffectComposer(renderer);
    composer.addPass( renderPass );
    if (mode == 1){
-    if (scanlineOn){
-      composer.addPass( filmPass );
-    }
-    if (badTvOn){
-      composer.addPass( badTVPass );
-    }
-    if (rgbOn){
-      composer.addPass( rgbPass );
-    }
-    if (staticOn){
-      composer.addPass( staticPass );
-    }
     if (bloomOn){
       composer.addPass( bloomPass );
       bloomPass.renderToScreen = true;
@@ -883,25 +819,6 @@ window.addEventListener('keyup', function(event){
 
  function setBadTVParams(){
    if (mode == 1){
-    if (badTvOn){
-      badTVPass.uniforms[ 'distortion' ].value = badtvThick;
-      badTVPass.uniforms[ 'distortion2' ].value = badtvFine;
-      badTVPass.uniforms[ 'speed' ].value = badtvDistortSpeed
-      badTVPass.uniforms[ 'rollSpeed' ].value = badtvRollSpeed;
-    }
-    if (staticOn){
-      staticPass.uniforms[ 'amount' ].value = staticAmount;
-      staticPass.uniforms[ 'size' ].value = staticSize;
-    }
-    if (rgbOn){
-      rgbPass.uniforms[ 'angle' ].value = rgbAngle * Math.PI;
-      rgbPass.uniforms[ 'amount' ].value = rgbAmount;
-    }
-    if (scanlineOn){
-      filmPass.uniforms[ 'sCount' ].value = scanlineCount;
-      filmPass.uniforms[ 'sIntensity' ].value = scanlineSIntensity;
-      filmPass.uniforms[ 'nIntensity' ].value = scanlineNIntensity;
-    }
     if (bloomOn){
       bloomPass.strength = bloomStrength;
       bloomPass.radius = bloomRadius;
@@ -929,64 +846,16 @@ window.addEventListener('keyup', function(event){
 
  function adjustPostProcessing(variableIndex, val){
    switch(variableIndex){
-     case 0: //Scanlines_count
-      scanlineCount = val;
-     break;
-     case 1: //Scanlines_sIntensity
-      scanlineSIntensity = val;
-     break;
-     case 2: //Scanlines_nIntensity
-      scanlineNIntensity = val;
-     break;
-     case 3: //Static_amount
-      staticAmount = val;
-     break;
-     case 4: //Static_size
-      staticSize = val;
-     break;
-     case 5: //RGBShift_amount
-      rgbAmount = val;
-     break;
-     case 6: //RGBShift_angle
-      rgbAngle = val;
-     break;
-     case 7: //BadTV_thickDistort
-      badtvThick = val;
-     break;
-     case 8: //BadTV_fineDistort
-      badtvFine = val;
-     break;
-     case 9: //BadTV_distortSpeed
-      badtvDistortSpeed = val;
-     break;
-     case 10: //BadTV_rollSpeed
-      badtvRollSpeed = val;
-     break;
-     case 11: //bloomStrength
+     case 1: //bloomStrength
       bloomStrength = val;
      break;
-     case 12: //Bloom_radius
+     case 2: //Bloom_radius
       bloomRadius = val;
      break;
-     case 13: //Bloom_threshhold
+     case 3: //Bloom_threshhold
       bloomThreshold = val;
      break;
-     case 14: //Scanlines
-      scanlineOn = val;
-     break;
-     case 15: //RGB
-      rgbOn = val;
-     break;
-     case 16: //Bad TV
-      badTvOn = val;
-     break;
-     case 17: //Bloom
-      bloomOn = val;
-     break;
-     case 18: //Static
-      staticOn = val;
-     break;
-     case 19: //Bloom_resolution_scale
+     case 4: //Bloom_resolution_scale
       bloomResolutionScale = val;
       bloomPass = new THREE.UnrealBloomPass(
         new THREE.Vector2(
@@ -998,26 +867,20 @@ window.addEventListener('keyup', function(event){
         bloomThreshold
       );
      break;
+     case 5: //Bloom
+      bloomOn = val;
+     break;
    }
    composer = new THREE.EffectComposer( renderer );
    composer.addPass( renderPass );
-   if (scanlineOn){
-     composer.addPass( filmPass );
-   }
-   if (badTvOn){
-     composer.addPass( badTVPass );
-   }
-   if (rgbOn){
-     composer.addPass( rgbPass );
-   }
-   if (staticOn){
-     composer.addPass( staticPass );
-   }
    if (bloomOn){
-   composer.addPass( bloomPass );
+     composer.addPass( bloomPass );
+     bloomPass.renderToScreen = true;
    }
-   composer.addPass( copyPass );
-	 copyPass.renderToScreen = true;
+   if (!(mode == 1 && bloomOn)){
+	    composer.addPass( copyPass );
+	    copyPass.renderToScreen = true;
+   }
    setBadTVParams();
  }
 
