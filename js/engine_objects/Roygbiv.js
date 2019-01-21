@@ -164,7 +164,8 @@ var Roygbiv = function(){
     "setPerformanceDropCallbackFunction",
     "removePerformanceDropCallbackFunction",
     "setBloom",
-    "unsetBloom"
+    "unsetBloom",
+    "getViewport"
   ];
 
   this.globals = new Object();
@@ -614,6 +615,16 @@ Roygbiv.prototype.getEndPoint = function(object, axis, targetVector){
     throw new Error("getEndPoint error: Invalid axis.");
     return;
   }
+}
+
+// getViewport
+// Returns the current viewport object having startX, startY, width and height parameters.
+// Do not modify the values of the returned object.
+Roygbiv.prototype.getViewport = function(){
+  if (mode == 0){
+    return;
+  }
+  return currentViewport;
 }
 
 // OBJECT MANIPULATION FUNCTIONS ***********************************************

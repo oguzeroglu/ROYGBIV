@@ -22,6 +22,13 @@ StateLoader.prototype.load = function(undo){
     var obj = this.stateObj;
     // NO MOBILE ***************************************************
     NO_MOBILE = obj.noMobile;
+    // VIEWPORT ****************************************************
+    if (!(typeof obj.viewportMaxWidth == UNDEFINED)){
+      viewportMaxWidth = obj.viewportMaxWidth;
+    }
+    if (!(typeof obj.viewportMaxHeight == UNDEFINED)){
+      viewportMaxHeight = obj.viewportMaxHeight;
+    }
     // GRID SYSTEMS ************************************************
     var gridSystemsExport = obj.gridSystems;
     for (var gridSystemName in gridSystemsExport){
@@ -2296,6 +2303,9 @@ StateLoader.prototype.resetProject = function(undo){
     areas[areaName].destroy();
   }
 
+  viewportMaxWidth = 0;
+  viewportMaxHeight = 0;
+  currentViewport = new Object();
   keyboardBuffer = new Object();
   gridSystems = new Object();
   gridSelections = new Object();

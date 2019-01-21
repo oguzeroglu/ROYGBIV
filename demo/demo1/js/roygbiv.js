@@ -532,6 +532,7 @@ var Text = function(){
   this.AREA_INTERSECTS_WITH_OTHER_AREAS = "Area collapses with other areas.";
   this.NO_SUCH_AREA = "No such area.";
   this.AREA_DESTROYED = "Area destroyed.";
+  this.MAX_VIEWPORT_SET = "Max viewport set. Viewport changes can be observed in preview mode.";
   this.FRAME_DROP_ALREADY = "There is already a frame-drop recording process working.";
   this.FRAME_DROP_STARTED = "Frame-drop recording started.";
   this.DISPLACEMENT_MAP_APPLIED = "Displacement map applied.";
@@ -951,6 +952,7 @@ var Text = function(){
    this.ROYGBIV_SCRIPTING_API_REMOVEPERFORMANCEDROPCALLBACKFUNCTION = "Removes the callback function for performance drops.";
    this.ROYGBIV_SCRIPTING_API_SETBLOOM = "Sets the Bloom effect properties of the scene. Parameters are:\nstrength (optional): The bloom strength between [0, 3]\nradius (optional): The bloom radius between [0, 1]\nthreshold (optional): The bloom threshold between [0, 1]\nresolutionScale (optional): The bloom resolution scale between [0.1, 1]";
    this.ROYGBIV_SCRIPTING_API_UNSETBLOOM = "Unsets the Bloom effect.";
+   this.ROYGBIV_SCRIPTING_API_GETVIEWPORT = "Returns the current viewport object having startX, startY, width and height parameters.\nDo not modify the values of the returned object.";
 }
 
 var Terminal = function(){
@@ -3138,7 +3140,8 @@ var commandArgumentsExpectedCount = [
     2, //build
     1, //skyboxConfigurations
     1, //fogConfigurations
-    1  //noMobile
+    1, //noMobile
+    2 //setMaxViewport
 ];
 var commandArgumentsExpectedExplanation = [
   "help", //help
@@ -3289,7 +3292,8 @@ var commandArgumentsExpectedExplanation = [
   "build projectName author", //build
   "skyboxConfigurations show/hide", //skyboxConfigurations
   "fogConfigurations show/hide", //fogConfigurations
-  "noMobile on/off" //noMobile
+  "noMobile on/off", //noMobile
+  "setMaxViewport widthInPx heightInPx" //setMaxViewport
 ];
 var commands = [
   "help",
@@ -3440,7 +3444,8 @@ var commands = [
   "build",
   "skyboxConfigurations",
   "fogConfigurations",
-  "noMobile"
+  "noMobile",
+  "setMaxViewport"
 ];
 var commandInfo = [
   "help: Prints command list.",
@@ -3591,7 +3596,8 @@ var commandInfo = [
   "build: Builds the project for release.",
   "skyboxConfigurations: Shows/hides the skybox configuration GUI.",
   "fogConfigurations: Shows/hides the fog configuration GUI.",
-  "noMobile: Prevents the application from loading and alerts a warning message in deployment mode for mobile devices if used with on parameter."
+  "noMobile: Prevents the application from loading and alerts a warning message in deployment mode for mobile devices if used with on parameter.",
+  "setMaxViewport: Sets the maximum viewport of the renderer. Use 0 or a negative number for unlimited width/height."
 ];
 var keyboardInfo = [
   "W/S : Translates the camera on axis Z.",
@@ -3672,6 +3678,9 @@ var ddsLoader = new THREE.DDSLoader();
 var axesHelper = new THREE.AxesHelper(20000);
 var pointerLockRequested = false;
 var fullScreenRequested = false;
+var viewportMaxWidth = 0;
+var viewportMaxHeight = 0;
+var currentViewport = new Object();
 
 // PHYSICS
 var debugRenderer;
@@ -11390,6 +11399,9 @@ window.addEventListener('resize', function() {
         }
       }
     }
+    if (mode == 1){
+      handleViewport();
+    }
   }
 });
 window.addEventListener('keydown', function(event){
@@ -11928,6 +11940,33 @@ function rescale(canvas, scale){
   return resizedCanvas;
 }
 
+function handleViewport(){
+  var curViewport = renderer.getCurrentViewport();
+  var newViewportX = 0;
+  var newViewportY = 0;
+  var newViewportZ = canvas.width;
+  var newViewportW = canvas.height;
+  if (viewportMaxWidth > 0){
+    if (curViewport.z > viewportMaxWidth){
+      var diff = curViewport.z - viewportMaxWidth;
+      newViewportX = diff/2;
+      newViewportZ = viewportMaxWidth;
+    }
+  }
+  if (viewportMaxHeight > 0){
+    if (curViewport.w > viewportMaxHeight){
+      var diff = curViewport.w - viewportMaxHeight;
+      newViewportY = diff/2;
+      newViewportW = viewportMaxHeight;
+    }
+  }
+  renderer.setViewport(newViewportX, newViewportY, newViewportZ, newViewportW);
+  currentViewport.startX = newViewportX;
+  currentViewport.startY = newViewportY;
+  currentViewport.width = newViewportZ;
+  currentViewport.height = newViewportW;
+}
+
 // DEPLOYMENT
 function startDeployment(){
   if (NO_MOBILE && isMobile){
@@ -12040,6 +12079,9 @@ var State = function(projectName, author){
   this.noMobile = NO_MOBILE;
   // DATE **********************************************************
   this.date = new Date();
+  // VIEWPORT ******************************************************
+  this.viewportMaxWidth = viewportMaxWidth;
+  this.viewportMaxHeight = viewportMaxHeight;
   // GRID SYSTEMS **************************************************
   var gridSystemsExport = new Object();
   for (var gridSystemName in gridSystems){
@@ -12246,6 +12288,13 @@ StateLoader.prototype.load = function(undo){
     var obj = this.stateObj;
     // NO MOBILE ***************************************************
     NO_MOBILE = obj.noMobile;
+    // VIEWPORT ****************************************************
+    if (!(typeof obj.viewportMaxWidth == UNDEFINED)){
+      viewportMaxWidth = obj.viewportMaxWidth;
+    }
+    if (!(typeof obj.viewportMaxHeight == UNDEFINED)){
+      viewportMaxHeight = obj.viewportMaxHeight;
+    }
     // GRID SYSTEMS ************************************************
     var gridSystemsExport = obj.gridSystems;
     for (var gridSystemName in gridSystemsExport){
@@ -14520,6 +14569,9 @@ StateLoader.prototype.resetProject = function(undo){
     areas[areaName].destroy();
   }
 
+  viewportMaxWidth = 0;
+  viewportMaxHeight = 0;
+  currentViewport = new Object();
   keyboardBuffer = new Object();
   gridSystems = new Object();
   gridSelections = new Object();
@@ -17366,6 +17418,12 @@ var CommandDescriptor = function(){
   this.noMobile.types = [];
   this.noMobile.types.push(this.STATE_ON_OFF); // on/off
 
+  // setMaxViewport
+  this.setMaxViewport = new Object();
+  this.setMaxViewport.types = [];
+  this.setMaxViewport.types.push(this.UNKNOWN_INDICATOR); // widthInPx
+  this.setMaxViewport.types.push(this.UNKNOWN_INDICATOR); // heightInPx
+
 };
 
 CommandDescriptor.prototype.test = function(){
@@ -19482,7 +19540,8 @@ var Roygbiv = function(){
     "setPerformanceDropCallbackFunction",
     "removePerformanceDropCallbackFunction",
     "setBloom",
-    "unsetBloom"
+    "unsetBloom",
+    "getViewport"
   ];
 
   this.globals = new Object();
@@ -19932,6 +19991,16 @@ Roygbiv.prototype.getEndPoint = function(object, axis, targetVector){
     throw new Error("getEndPoint error: Invalid axis.");
     return;
   }
+}
+
+// getViewport
+// Returns the current viewport object having startX, startY, width and height parameters.
+// Do not modify the values of the returned object.
+Roygbiv.prototype.getViewport = function(){
+  if (mode == 0){
+    return;
+  }
+  return currentViewport;
 }
 
 // OBJECT MANIPULATION FUNCTIONS ***********************************************
@@ -30581,6 +30650,7 @@ ModeSwitcher.prototype.switchFromDesignToPreview = function(){
   $("#cliDivheader").text("ROYGBIV 3D Engine - CLI (Preview mode)");
   mode = 1;
   rayCaster.refresh();
+  handleViewport();
   this.commonSwitchFunctions();
 }
 
@@ -30793,6 +30863,7 @@ ModeSwitcher.prototype.switchFromPreviewToDesign = function(){
   }
   newScripts = undefined;
   GLOBAL_FOG_UNIFORM.value.set(-100.0, 0, 0, 0);
+  renderer.setViewport(0, 0, canvas.width, canvas.height);
   this.commonSwitchFunctions();
 }
 

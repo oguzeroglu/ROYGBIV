@@ -4837,6 +4837,34 @@ function parse(input){
           terminal.printError(Text.PARAMETER_MUST_BE_ON_OFF);
           return true;
         break;
+        case 149: //setMaxViewport
+          if (mode != 0){
+            terminal.printError(Text.WORKS_ONLY_IN_DESIGN_MODE);
+            return true;
+          }
+          var width = parseFloat(splitted[1]);
+          var height = parseFloat(splitted[2]);
+          if (isNaN(width)){
+            terminal.printError(Text.IS_NOT_A_NUMBER.replace(Text.PARAM1, "width"));
+            return true;
+          }
+          if (isNaN(height)){
+            terminal.printError(Text.IS_NOT_A_NUMBER.replace(Text.PARAM1, "height"));
+            return true;
+          }
+          if (width <= 0){
+            viewportMaxWidth = 0;
+          }else{
+            viewportMaxWidth = width;
+          }
+          if (height <= 0){
+            viewportMaxHeight = 0;
+          }else{
+            viewportMaxHeight = height;
+          }
+          terminal.printInfo(Text.MAX_VIEWPORT_SET);
+          return true;
+        break;
       }
       return true;
     }catch(err){

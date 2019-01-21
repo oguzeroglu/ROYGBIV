@@ -699,6 +699,9 @@ window.addEventListener('resize', function() {
         }
       }
     }
+    if (mode == 1){
+      handleViewport();
+    }
   }
 });
 window.addEventListener('keydown', function(event){
@@ -1235,6 +1238,33 @@ function rescale(canvas, scale){
   var resizedContext = resizedCanvas.getContext("2d");
   resizedContext.drawImage(canvas, 0, 0, canvas.width, canvas.height, 0, 0, resizedCanvas.width, resizedCanvas.height);
   return resizedCanvas;
+}
+
+function handleViewport(){
+  var curViewport = renderer.getCurrentViewport();
+  var newViewportX = 0;
+  var newViewportY = 0;
+  var newViewportZ = canvas.width;
+  var newViewportW = canvas.height;
+  if (viewportMaxWidth > 0){
+    if (curViewport.z > viewportMaxWidth){
+      var diff = curViewport.z - viewportMaxWidth;
+      newViewportX = diff/2;
+      newViewportZ = viewportMaxWidth;
+    }
+  }
+  if (viewportMaxHeight > 0){
+    if (curViewport.w > viewportMaxHeight){
+      var diff = curViewport.w - viewportMaxHeight;
+      newViewportY = diff/2;
+      newViewportW = viewportMaxHeight;
+    }
+  }
+  renderer.setViewport(newViewportX, newViewportY, newViewportZ, newViewportW);
+  currentViewport.startX = newViewportX;
+  currentViewport.startY = newViewportY;
+  currentViewport.width = newViewportZ;
+  currentViewport.height = newViewportW;
 }
 
 // DEPLOYMENT

@@ -9,6 +9,9 @@ var State = function(projectName, author){
   this.noMobile = NO_MOBILE;
   // DATE **********************************************************
   this.date = new Date();
+  // VIEWPORT ******************************************************
+  this.viewportMaxWidth = viewportMaxWidth;
+  this.viewportMaxHeight = viewportMaxHeight;
   // GRID SYSTEMS **************************************************
   var gridSystemsExport = new Object();
   for (var gridSystemName in gridSystems){

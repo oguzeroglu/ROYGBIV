@@ -670,6 +670,12 @@ var CommandDescriptor = function(){
   this.noMobile.types = [];
   this.noMobile.types.push(this.STATE_ON_OFF); // on/off
 
+  // setMaxViewport
+  this.setMaxViewport = new Object();
+  this.setMaxViewport.types = [];
+  this.setMaxViewport.types.push(this.UNKNOWN_INDICATOR); // widthInPx
+  this.setMaxViewport.types.push(this.UNKNOWN_INDICATOR); // heightInPx
+
 };
 
 CommandDescriptor.prototype.test = function(){

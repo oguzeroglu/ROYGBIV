@@ -219,6 +219,7 @@ ModeSwitcher.prototype.switchFromDesignToPreview = function(){
   $("#cliDivheader").text("ROYGBIV 3D Engine - CLI (Preview mode)");
   mode = 1;
   rayCaster.refresh();
+  handleViewport();
   this.commonSwitchFunctions();
 }
 
@@ -431,5 +432,6 @@ ModeSwitcher.prototype.switchFromPreviewToDesign = function(){
   }
   newScripts = undefined;
   GLOBAL_FOG_UNIFORM.value.set(-100.0, 0, 0, 0);
+  renderer.setViewport(0, 0, canvas.width, canvas.height);
   this.commonSwitchFunctions();
 }

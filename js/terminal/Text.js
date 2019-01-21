@@ -487,6 +487,7 @@ var Text = function(){
   this.AREA_INTERSECTS_WITH_OTHER_AREAS = "Area collapses with other areas.";
   this.NO_SUCH_AREA = "No such area.";
   this.AREA_DESTROYED = "Area destroyed.";
+  this.MAX_VIEWPORT_SET = "Max viewport set. Viewport changes can be observed in preview mode.";
   this.FRAME_DROP_ALREADY = "There is already a frame-drop recording process working.";
   this.FRAME_DROP_STARTED = "Frame-drop recording started.";
   this.DISPLACEMENT_MAP_APPLIED = "Displacement map applied.";
@@ -906,4 +907,5 @@ var Text = function(){
    this.ROYGBIV_SCRIPTING_API_REMOVEPERFORMANCEDROPCALLBACKFUNCTION = "Removes the callback function for performance drops.";
    this.ROYGBIV_SCRIPTING_API_SETBLOOM = "Sets the Bloom effect properties of the scene. Parameters are:\nstrength (optional): The bloom strength between [0, 3]\nradius (optional): The bloom radius between [0, 1]\nthreshold (optional): The bloom threshold between [0, 1]\nresolutionScale (optional): The bloom resolution scale between [0.1, 1]";
    this.ROYGBIV_SCRIPTING_API_UNSETBLOOM = "Unsets the Bloom effect.";
+   this.ROYGBIV_SCRIPTING_API_GETVIEWPORT = "Returns the current viewport object having startX, startY, width and height parameters.\nDo not modify the values of the returned object.";
 }

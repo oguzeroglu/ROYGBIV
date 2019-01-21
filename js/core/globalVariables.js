@@ -154,7 +154,8 @@ var commandArgumentsExpectedCount = [
     2, //build
     1, //skyboxConfigurations
     1, //fogConfigurations
-    1  //noMobile
+    1, //noMobile
+    2 //setMaxViewport
 ];
 var commandArgumentsExpectedExplanation = [
   "help", //help
@@ -305,7 +306,8 @@ var commandArgumentsExpectedExplanation = [
   "build projectName author", //build
   "skyboxConfigurations show/hide", //skyboxConfigurations
   "fogConfigurations show/hide", //fogConfigurations
-  "noMobile on/off" //noMobile
+  "noMobile on/off", //noMobile
+  "setMaxViewport widthInPx heightInPx" //setMaxViewport
 ];
 var commands = [
   "help",
@@ -456,7 +458,8 @@ var commands = [
   "build",
   "skyboxConfigurations",
   "fogConfigurations",
-  "noMobile"
+  "noMobile",
+  "setMaxViewport"
 ];
 var commandInfo = [
   "help: Prints command list.",
@@ -607,7 +610,8 @@ var commandInfo = [
   "build: Builds the project for release.",
   "skyboxConfigurations: Shows/hides the skybox configuration GUI.",
   "fogConfigurations: Shows/hides the fog configuration GUI.",
-  "noMobile: Prevents the application from loading and alerts a warning message in deployment mode for mobile devices if used with on parameter."
+  "noMobile: Prevents the application from loading and alerts a warning message in deployment mode for mobile devices if used with on parameter.",
+  "setMaxViewport: Sets the maximum viewport of the renderer. Use 0 or a negative number for unlimited width/height."
 ];
 var keyboardInfo = [
   "W/S : Translates the camera on axis Z.",
@@ -688,6 +692,9 @@ var ddsLoader = new THREE.DDSLoader();
 var axesHelper = new THREE.AxesHelper(20000);
 var pointerLockRequested = false;
 var fullScreenRequested = false;
+var viewportMaxWidth = 0;
+var viewportMaxHeight = 0;
+var currentViewport = new Object();
 
 // PHYSICS
 var debugRenderer;
