@@ -689,6 +689,13 @@ window.addEventListener('resize', function() {
     camera.aspect = window.innerWidth / window.innerHeight;
     camera.updateProjectionMatrix();
     boundingClientRect = renderer.domElement.getBoundingClientRect();
+    if (isDeployment){
+      canvas.oldWidth = canvas.style.width;
+      if (terminal.isMadeVisible){
+        ROYGBIV.terminal(false);
+        ROYGBIV.terminal(true);
+      }
+    }
   }
 });
 window.addEventListener('keydown', function(event){
@@ -877,7 +884,6 @@ window.addEventListener('keyup', function(event){
      break;
      case -1: //from script
       if(!isDeployment){
-        console.log("DSF");
         postprocessingParameters["Bloom_strength"] = bloomStrength;
         postprocessingParameters["Bloom_radius"] = bloomRadius;
         postprocessingParameters["Bloom_threshhold"] = bloomThreshold;

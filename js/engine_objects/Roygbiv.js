@@ -7678,6 +7678,7 @@ Roygbiv.prototype.terminal = function(isVisible){
       canvas.oldWidth = canvas.style.width;
       canvas.style.width = diff + "px";
     }
+    terminal.isMadeVisible = true;
   }else{
     terminal.disable();
     terminalDiv.style.display = "none";
@@ -7687,6 +7688,7 @@ Roygbiv.prototype.terminal = function(isVisible){
     if (isDeployment && canvas.oldWidth){
       canvas.style.width = canvas.oldWidth;
     }
+    terminal.isMadeVisible = false;
   }
 }
 

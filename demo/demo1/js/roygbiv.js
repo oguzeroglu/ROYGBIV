@@ -11380,6 +11380,13 @@ window.addEventListener('resize', function() {
     camera.aspect = window.innerWidth / window.innerHeight;
     camera.updateProjectionMatrix();
     boundingClientRect = renderer.domElement.getBoundingClientRect();
+    if (isDeployment){
+      canvas.oldWidth = canvas.style.width;
+      if (terminal.isMadeVisible){
+        ROYGBIV.terminal(false);
+        ROYGBIV.terminal(true);
+      }
+    }
   }
 });
 window.addEventListener('keydown', function(event){
@@ -26987,6 +26994,7 @@ Roygbiv.prototype.terminal = function(isVisible){
       canvas.oldWidth = canvas.style.width;
       canvas.style.width = diff + "px";
     }
+    terminal.isMadeVisible = true;
   }else{
     terminal.disable();
     terminalDiv.style.display = "none";
@@ -26996,6 +27004,7 @@ Roygbiv.prototype.terminal = function(isVisible){
     if (isDeployment && canvas.oldWidth){
       canvas.style.width = canvas.oldWidth;
     }
+    terminal.isMadeVisible = false;
   }
 }
 
