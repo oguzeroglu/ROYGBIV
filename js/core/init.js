@@ -452,6 +452,23 @@ window.onload = function() {
       }
     }
   }
+  var hiddenText, visibilityChange;
+  if (!(typeof document.hidden == UNDEFINED)){
+    hiddenText = "hidden";
+    visibilityChange = "visibilitychange";
+  }else if (!(typeof document.mozHidden == UNDEFINED)){
+    hiddenText = "mozHidden";
+    visibilityChange = "mozvisibilitychange";
+  }else if (!(typeof document.msHidden == UNDEFINED)){
+    hiddenText = "msHidden";
+    visibilityChange = "msvisibilitychange";
+  }else if (!(typeof document.webkitHidden == UNDEFINED)){
+    hiddenText = "webkitHidden";
+    visibilityChange = "webkitvisibilitychange";
+  }
+  document.addEventListener(visibilityChange, function(){
+    isScreenVisible = !(document[hiddenText]);
+  }, false);
   canvas.addEventListener("click", function(event){
     cliFocused = false;
     omGUIFocused = false;

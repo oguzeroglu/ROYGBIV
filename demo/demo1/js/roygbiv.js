@@ -3665,6 +3665,7 @@ var boundingClientRect;
 var pointerLockSupported = false;
 var defaultAspect = 1.9174434087882823;
 var onFullScreen = false;
+var isScreenVisible = true;
 
 // THREE.JS VARIABLES
 var renderer;
@@ -8930,6 +8931,9 @@ function setTHREEQuaternionFromCANNON(mesh, physicsBody, axis, type, gridSystemA
 }
 
 function calculateFps (){
+  if (!isScreenVisible){
+    return;
+  }
   if (LOG_FRAME_DROP_ON){
     if (frameCounter < 60){
       FRAME_DROP_COUNT += 60 - frameCounter;
@@ -11152,6 +11156,23 @@ window.onload = function() {
       }
     }
   }
+  var hiddenText, visibilityChange;
+  if (!(typeof document.hidden == UNDEFINED)){
+    hiddenText = "hidden";
+    visibilityChange = "visibilitychange";
+  }else if (!(typeof document.mozHidden == UNDEFINED)){
+    hiddenText = "mozHidden";
+    visibilityChange = "mozvisibilitychange";
+  }else if (!(typeof document.msHidden == UNDEFINED)){
+    hiddenText = "msHidden";
+    visibilityChange = "msvisibilitychange";
+  }else if (!(typeof document.webkitHidden == UNDEFINED)){
+    hiddenText = "webkitHidden";
+    visibilityChange = "webkitvisibilitychange";
+  }
+  document.addEventListener(visibilityChange, function(){
+    isScreenVisible = !(document[hiddenText]);
+  }, false);
   canvas.addEventListener("click", function(event){
     cliFocused = false;
     omGUIFocused = false;
@@ -14569,6 +14590,7 @@ StateLoader.prototype.resetProject = function(undo){
     areas[areaName].destroy();
   }
 
+  isScreenVisible = true;
   viewportMaxWidth = 0;
   viewportMaxHeight = 0;
   currentViewport = new Object();

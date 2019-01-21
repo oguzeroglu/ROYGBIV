@@ -207,6 +207,9 @@ function setTHREEQuaternionFromCANNON(mesh, physicsBody, axis, type, gridSystemA
 }
 
 function calculateFps (){
+  if (!isScreenVisible){
+    return;
+  }
   if (LOG_FRAME_DROP_ON){
     if (frameCounter < 60){
       FRAME_DROP_COUNT += 60 - frameCounter;

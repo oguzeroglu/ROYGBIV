@@ -679,6 +679,7 @@ var boundingClientRect;
 var pointerLockSupported = false;
 var defaultAspect = 1.9174434087882823;
 var onFullScreen = false;
+var isScreenVisible = true;
 
 // THREE.JS VARIABLES
 var renderer;

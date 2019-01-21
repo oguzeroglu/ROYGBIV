@@ -2303,6 +2303,7 @@ StateLoader.prototype.resetProject = function(undo){
     areas[areaName].destroy();
   }
 
+  isScreenVisible = true;
   viewportMaxWidth = 0;
   viewportMaxHeight = 0;
   currentViewport = new Object();
