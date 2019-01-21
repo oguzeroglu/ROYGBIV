@@ -694,6 +694,9 @@ window.addEventListener('resize', function() {
       if (terminal.isMadeVisible){
         ROYGBIV.terminal(false);
         ROYGBIV.terminal(true);
+        if (!terminal.terminalPromptEnabled){
+          ROYGBIV.terminalPrompt(false);
+        }
       }
     }
   }

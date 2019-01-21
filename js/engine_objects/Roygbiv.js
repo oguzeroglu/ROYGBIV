@@ -7712,6 +7712,7 @@ Roygbiv.prototype.terminalPrompt = function(isEnabled){
   }else if (!isEnabled && !terminal.isDisabled){
     terminal.disable();
   }
+  terminal.terminalPromptEnabled = isEnabled;
 }
 
 // printToTerminal

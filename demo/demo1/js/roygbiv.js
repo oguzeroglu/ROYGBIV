@@ -11385,6 +11385,9 @@ window.addEventListener('resize', function() {
       if (terminal.isMadeVisible){
         ROYGBIV.terminal(false);
         ROYGBIV.terminal(true);
+        if (!terminal.terminalPromptEnabled){
+          ROYGBIV.terminalPrompt(false);
+        }
       }
     }
   }
@@ -11575,7 +11578,6 @@ window.addEventListener('keyup', function(event){
      break;
      case -1: //from script
       if(!isDeployment){
-        console.log("DSF");
         postprocessingParameters["Bloom_strength"] = bloomStrength;
         postprocessingParameters["Bloom_radius"] = bloomRadius;
         postprocessingParameters["Bloom_threshhold"] = bloomThreshold;
@@ -27028,6 +27030,7 @@ Roygbiv.prototype.terminalPrompt = function(isEnabled){
   }else if (!isEnabled && !terminal.isDisabled){
     terminal.disable();
   }
+  terminal.terminalPromptEnabled = isEnabled;
 }
 
 // printToTerminal
