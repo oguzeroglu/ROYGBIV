@@ -56,12 +56,17 @@ ModeSwitcher.prototype.switchMode = function(){
 }
 
 ModeSwitcher.prototype.commonSwitchFunctions = function(){
+  var oldIsPaused = isPaused;
+  isPaused = false;
   maxInactiveTime = 0;
   inactiveCounter = 0;
   trackingObjects = new Object();
   defaultCameraControlsDisabled = false;
   initBadTV();
   rayCaster.refresh();
+  if (oldIsPaused){
+    render();
+  }
 }
 
 ModeSwitcher.prototype.switchFromDesignToPreview = function(){

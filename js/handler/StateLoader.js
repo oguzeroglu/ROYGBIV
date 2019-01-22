@@ -2303,6 +2303,7 @@ StateLoader.prototype.resetProject = function(undo){
     areas[areaName].destroy();
   }
 
+  isPaused = false;
   maxInactiveTime = 0;
   inactiveCounter = 0;
   isScreenVisible = true;

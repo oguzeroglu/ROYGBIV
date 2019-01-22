@@ -501,7 +501,9 @@ window.onload = function() {
         }
         fullScreenRequested = false;
       }
-
+      if (mode == 1 && isPaused){
+        return;
+      }
       REUSABLE_VECTOR.setFromMatrixPosition(camera.matrixWorld);
       REUSABLE_VECTOR_2.set(coordX, coordY, 0.5).unproject(camera).sub(REUSABLE_VECTOR).normalize();
        rayCaster.findIntersections(REUSABLE_VECTOR, REUSABLE_VECTOR_2, (mode == 0));
@@ -751,7 +753,9 @@ window.addEventListener('keydown', function(event){
       cliDivheader.style.display = "";
     }
   }
-
+  if (mode == 1 && isPaused){
+    return;
+  }
   switch(event.keyCode){
     case 16: //SHIFT
       if (mode == 0){
@@ -808,6 +812,9 @@ window.addEventListener('keyup', function(event){
   }
   if (keyCodeToChar[event.keyCode]){
     keyboardBuffer[keyCodeToChar[event.keyCode]] = false;
+  }
+  if (mode == 1 && isPaused){
+    return;
   }
   switch(event.keyCode){
     case 190: //PERIOD
@@ -1241,6 +1248,9 @@ function processCameraRotationBuffer(){
 }
 
 function mouseWheelEvent(e) {
+  if (mode == 1 && isPaused){
+    return;
+  }
   e.preventDefault();
   if (mode == 1 && defaultCameraControlsDisabled){
     return;

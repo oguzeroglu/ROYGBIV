@@ -976,6 +976,7 @@ var NO_MOBILE = false;
 var performanceDropMinFPS = 0;
 var performanceDropSeconds = 0;
 var performanceDropCounter = 0;
+var isPaused = false;
 
 // WORKER VARIABLES
 var WORKERS_SUPPORTED = (typeof(Worker) !== "undefined");

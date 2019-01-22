@@ -1,6 +1,10 @@
 function render(){
 
-  requestID = requestAnimationFrame(render);
+  if (!(mode == 1 && isPaused)){
+    requestID = requestAnimationFrame(render);
+  }else{
+    return;
+  }
 
   GLOBAL_CAMERA_POSITION_UNIFORM.value.copy(camera.position);
 
@@ -207,6 +211,9 @@ function setTHREEQuaternionFromCANNON(mesh, physicsBody, axis, type, gridSystemA
 }
 
 function calculateFps (){
+  if (mode == 1 && isPaused){
+    return;
+  }
   if (maxInactiveTime > 0 && userInactivityCallbackFunction){
     if (inactiveCounter >= maxInactiveTime){
       userInactivityCallbackFunction();

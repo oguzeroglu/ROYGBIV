@@ -953,6 +953,9 @@ var Text = function(){
    this.ROYGBIV_SCRIPTING_API_SETBLOOM = "Sets the Bloom effect properties of the scene. Parameters are:\nstrength (optional): The bloom strength between [0, 3]\nradius (optional): The bloom radius between [0, 1]\nthreshold (optional): The bloom threshold between [0, 1]\nresolutionScale (optional): The bloom resolution scale between [0.1, 1]";
    this.ROYGBIV_SCRIPTING_API_UNSETBLOOM = "Unsets the Bloom effect.";
    this.ROYGBIV_SCRIPTING_API_GETVIEWPORT = "Returns the current viewport object having startX, startY, width and height parameters.\nDo not modify the values of the returned object.";
+   this.ROYGBIV_SCRIPTING_API_SETUSERINACTIVITYCALLBACKFUNCTION = "Sets a callback function for user inactivity. The callbackFunction is executed if the user does not move or press the mouse or\npress a key for more than maxTimeInSeconds seconds. The callbackFunction is reset after the execution so use this function again\nto create a new inactivity listener.";
+   this.ROYGBIV_SCRIPTING_API_REMOVEUSERINACTIVITYCALLBACKFUNCTION = "Removes the user inactivity callback function.";
+   this.ROYGBIV_SCRIPTING_API_PAUSE = "Pauses/unpauses rendering. Note that once the rendering is paused the scripts also pause so in order to unpause the rendering,\nuse callback functions such as ROYGBIV.setScreenClickListener or ROYGBIV.setScreenPointerLockChangeListener.";
 }
 
 var Terminal = function(){
@@ -3666,6 +3669,8 @@ var pointerLockSupported = false;
 var defaultAspect = 1.9174434087882823;
 var onFullScreen = false;
 var isScreenVisible = true;
+var inactiveCounter = 0;
+var maxInactiveTime = 0;
 
 // THREE.JS VARIABLES
 var renderer;
@@ -3943,6 +3948,7 @@ var screenMouseUpCallbackFunction = 0;
 var screenMouseMoveCallbackFunction = 0;
 var screenPointerLockChangedCallbackFunction = 0;
 var screenFullScreenChangeCallbackFunction = 0;
+var userInactivityCallbackFunction = 0;
 var fpsDropCallbackFunction = 0;
 var performanceDropCallbackFunction = 0;
 var terminalTextInputCallbackFunction = 0;
@@ -3959,6 +3965,7 @@ var NO_MOBILE = true;
 var performanceDropMinFPS = 0;
 var performanceDropSeconds = 0;
 var performanceDropCounter = 0;
+var isPaused = false;
 
 // WORKER VARIABLES
 var WORKERS_SUPPORTED = (typeof(Worker) !== "undefined");
@@ -8724,7 +8731,11 @@ AddedObject.prototype.copy = function(name, isHardCopy, copyPosition, gridSystem
 
 function render(){
 
-  requestID = requestAnimationFrame(render);
+  if (!(mode == 1 && isPaused)){
+    requestID = requestAnimationFrame(render);
+  }else{
+    return;
+  }
 
   GLOBAL_CAMERA_POSITION_UNIFORM.value.copy(camera.position);
 
@@ -8931,6 +8942,18 @@ function setTHREEQuaternionFromCANNON(mesh, physicsBody, axis, type, gridSystemA
 }
 
 function calculateFps (){
+  if (mode == 1 && isPaused){
+    return;
+  }
+  if (maxInactiveTime > 0 && userInactivityCallbackFunction){
+    if (inactiveCounter >= maxInactiveTime){
+      userInactivityCallbackFunction();
+      userInactivityCallbackFunction = 0;
+      maxInactiveTime = 0;
+      inactiveCounter = 0;
+    }
+    inactiveCounter ++;
+  }
   if (!isScreenVisible){
     return;
   }
@@ -10725,6 +10748,10 @@ window.onload = function() {
     cliFocused = true;
     omGUIFocused = false;
     lightsGUIFocused = false;
+    inactiveCounter = 0;
+  });
+  cliDiv.addEventListener("mousemove", function(event){
+    inactiveCounter = 0;
   });
   terminalDiv.addEventListener("mousewheel", function(e){
     e.preventDefault();
@@ -11174,6 +11201,7 @@ window.onload = function() {
     isScreenVisible = !(document[hiddenText]);
   }, false);
   canvas.addEventListener("click", function(event){
+    inactiveCounter = 0;
     cliFocused = false;
     omGUIFocused = false;
     lightsGUIFocused = false;
@@ -11200,7 +11228,9 @@ window.onload = function() {
         }
         fullScreenRequested = false;
       }
-
+      if (mode == 1 && isPaused){
+        return;
+      }
       REUSABLE_VECTOR.setFromMatrixPosition(camera.matrixWorld);
       REUSABLE_VECTOR_2.set(coordX, coordY, 0.5).unproject(camera).sub(REUSABLE_VECTOR).normalize();
        rayCaster.findIntersections(REUSABLE_VECTOR, REUSABLE_VECTOR_2, (mode == 0));
@@ -11333,6 +11363,7 @@ window.onload = function() {
   });
 
   canvas.addEventListener("mousedown", function(event){
+    inactiveCounter = 0;
     if (mode == 1 && screenMouseDownCallbackFunction){
       var rect = boundingClientRect;
       var coordX = ((event.clientX - rect.left) / rect.width) * 2 - 1;
@@ -11342,6 +11373,7 @@ window.onload = function() {
     isMouseDown = true;
   });
   canvas.addEventListener("mouseup", function(event){
+    inactiveCounter = 0;
     if (mode == 1 && screenMouseUpCallbackFunction){
       var rect = boundingClientRect;
       var coordX = ((event.clientX - rect.left) / rect.width) * 2 - 1;
@@ -11351,6 +11383,7 @@ window.onload = function() {
     isMouseDown = false;
   });
   canvas.addEventListener("mousemove", function(event){
+    inactiveCounter = 0;
     if (mode == 1 && screenMouseMoveCallbackFunction){
       var rect = boundingClientRect;
       var coordX = ((event.clientX - rect.left) / rect.width) * 2 - 1;
@@ -11426,6 +11459,8 @@ window.addEventListener('resize', function() {
   }
 });
 window.addEventListener('keydown', function(event){
+  inactiveCounter = 0;
+
   if (!windowLoaded){
     return;
   }
@@ -11445,7 +11480,9 @@ window.addEventListener('keydown', function(event){
       cliDivheader.style.display = "";
     }
   }
-
+  if (mode == 1 && isPaused){
+    return;
+  }
   switch(event.keyCode){
     case 16: //SHIFT
       if (mode == 0){
@@ -11492,6 +11529,8 @@ window.addEventListener('keydown', function(event){
 
 });
 window.addEventListener('keyup', function(event){
+  inactiveCounter = 0;
+
   if (!windowLoaded){
     return;
   }
@@ -11500,6 +11539,9 @@ window.addEventListener('keyup', function(event){
   }
   if (keyCodeToChar[event.keyCode]){
     keyboardBuffer[keyCodeToChar[event.keyCode]] = false;
+  }
+  if (mode == 1 && isPaused){
+    return;
   }
   switch(event.keyCode){
     case 190: //PERIOD
@@ -11933,6 +11975,9 @@ function processCameraRotationBuffer(){
 }
 
 function mouseWheelEvent(e) {
+  if (mode == 1 && isPaused){
+    return;
+  }
   e.preventDefault();
   if (mode == 1 && defaultCameraControlsDisabled){
     return;
@@ -14590,6 +14635,9 @@ StateLoader.prototype.resetProject = function(undo){
     areas[areaName].destroy();
   }
 
+  isPaused = false;
+  maxInactiveTime = 0;
+  inactiveCounter = 0;
   isScreenVisible = true;
   viewportMaxWidth = 0;
   viewportMaxHeight = 0;
@@ -14638,6 +14686,7 @@ StateLoader.prototype.resetProject = function(undo){
   terminalTextInputCallbackFunction = 0;
   fpsDropCallbackFunction = 0;
   performanceDropCallbackFunction = 0;
+  userInactivityCallbackFunction = 0;
   performanceDropMinFPS = 0;
   performanceDropSeconds = 0;
   performanceDropCounter = 0;
@@ -19563,7 +19612,10 @@ var Roygbiv = function(){
     "removePerformanceDropCallbackFunction",
     "setBloom",
     "unsetBloom",
-    "getViewport"
+    "getViewport",
+    "setUserInactivityCallbackFunction",
+    "removeUserInactivityCallbackFunction",
+    "pause"
   ];
 
   this.globals = new Object();
@@ -26115,6 +26167,51 @@ Roygbiv.prototype.removePerformanceDropCallbackFunction = function(){
   performanceDropCallbackFunction = 0;
 }
 
+// setUserInactivityCallbackFunction
+// Sets a callback function for user inactivity. The callbackFunction is executed
+// if the user does not move or press the mouse or press a key for more than maxTimeInSeconds seconds.
+// The callbackFunction is reset after the execution so use this function again to create a new
+// inactivity listener.
+Roygbiv.prototype.setUserInactivityCallbackFunction = function(maxTimeInSeconds, callbackFunction){
+  if (mode == 0){
+    return;
+  }
+  if (typeof maxTimeInSeconds == UNDEFINED){
+    throw new Error("setUserInactivityCallbackFunction error: maxTimeInSeconds is not defined.");
+    return;
+  }
+  if (isNaN(maxTimeInSeconds)){
+    throw new Error("setUserInactivityCallbackFunction error: maxTimeInSeconds is not a number.");
+    return;
+  }
+  if (maxTimeInSeconds <= 0){
+    throw new Error("setUserInactivityCallbackFunction error: maxTimeInSeconds must be greater than zero.");
+    return;
+  }
+  if (typeof callbackFunction == UNDEFINED){
+    throw new Error("setUserInactivityCallbackFunction error: callbackFunction is not defined.");
+    return;
+  }
+  if (!(callbackFunction instanceof Function)){
+    throw new Error("setUserInactivityCallbackFunction error: callbackFunction is not a function.");
+    return;
+  }
+  inactiveCounter = 0;
+  maxInactiveTime = maxTimeInSeconds;
+  userInactivityCallbackFunction = callbackFunction;
+}
+
+// removeUserInactivityCallbackFunction
+// Removes the user inactivity callback function.
+Roygbiv.prototype.removeUserInactivityCallbackFunction = function(){
+  if (mode == 0){
+    return;
+  }
+  inactiveCounter = 0;
+  userInactivityCallbackFunction = 0;
+  maxInactiveTime = 0;
+}
+
 // UTILITY FUNCTIONS ***********************************************************
 
 // vector
@@ -27283,6 +27380,29 @@ Roygbiv.prototype.unsetBloom = function(){
   adjustPostProcessing(5, false);
   if (!isDeployment){
     postprocessingParameters["Bloom"] = false;
+  }
+}
+
+// pause
+// Pauses/unpauses rendering. Note that once the rendering is paused the scripts
+// also pause so in order to unpause the rendering, use callback functions such
+// as ROYGBIV.setScreenClickListener or ROYGBIV.setScreenPointerLockChangeListener.
+Roygbiv.prototype.pause = function(paused){
+  if (mode == 0){
+    return;
+  }
+  if (typeof paused == UNDEFINED){
+    throw new Error("pause error: paused is not defined.");
+    return;
+  }
+  if (!(typeof paused == "boolean")){
+    throw new Error("pause error: paused is not a boolean.");
+    return;
+  }
+  var oldIsPaused = isPaused;
+  isPaused = paused;
+  if (!paused && oldIsPaused){
+    render();
   }
 }
 
@@ -30509,10 +30629,17 @@ ModeSwitcher.prototype.switchMode = function(){
 }
 
 ModeSwitcher.prototype.commonSwitchFunctions = function(){
+  var oldIsPaused = isPaused;
+  isPaused = false;
+  maxInactiveTime = 0;
+  inactiveCounter = 0;
   trackingObjects = new Object();
   defaultCameraControlsDisabled = false;
   initBadTV();
   rayCaster.refresh();
+  if (oldIsPaused){
+    render();
+  }
 }
 
 ModeSwitcher.prototype.switchFromDesignToPreview = function(){
@@ -30708,6 +30835,7 @@ ModeSwitcher.prototype.switchFromPreviewToDesign = function(){
   terminalTextInputCallbackFunction = 0;
   fpsDropCallbackFunction = 0;
   performanceDropCallbackFunction = 0;
+  userInactivityCallbackFunction = 0;
   performanceDropMinFPS = 0;
   performanceDropSeconds = 0;
   performanceDropCounter = 0;

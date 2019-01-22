@@ -910,4 +910,5 @@ var Text = function(){
    this.ROYGBIV_SCRIPTING_API_GETVIEWPORT = "Returns the current viewport object having startX, startY, width and height parameters.\nDo not modify the values of the returned object.";
    this.ROYGBIV_SCRIPTING_API_SETUSERINACTIVITYCALLBACKFUNCTION = "Sets a callback function for user inactivity. The callbackFunction is executed if the user does not move or press the mouse or\npress a key for more than maxTimeInSeconds seconds. The callbackFunction is reset after the execution so use this function again\nto create a new inactivity listener.";
    this.ROYGBIV_SCRIPTING_API_REMOVEUSERINACTIVITYCALLBACKFUNCTION = "Removes the user inactivity callback function.";
+   this.ROYGBIV_SCRIPTING_API_PAUSE = "Pauses/unpauses rendering. Note that once the rendering is paused the scripts also pause so in order to unpause the rendering,\nuse callback functions such as ROYGBIV.setScreenClickListener or ROYGBIV.setScreenPointerLockChangeListener.";
 }

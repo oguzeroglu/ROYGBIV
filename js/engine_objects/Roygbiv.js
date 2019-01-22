@@ -167,7 +167,8 @@ var Roygbiv = function(){
     "unsetBloom",
     "getViewport",
     "setUserInactivityCallbackFunction",
-    "removeUserInactivityCallbackFunction"
+    "removeUserInactivityCallbackFunction",
+    "pause"
   ];
 
   this.globals = new Object();
@@ -7932,5 +7933,28 @@ Roygbiv.prototype.unsetBloom = function(){
   adjustPostProcessing(5, false);
   if (!isDeployment){
     postprocessingParameters["Bloom"] = false;
+  }
+}
+
+// pause
+// Pauses/unpauses rendering. Note that once the rendering is paused the scripts
+// also pause so in order to unpause the rendering, use callback functions such
+// as ROYGBIV.setScreenClickListener or ROYGBIV.setScreenPointerLockChangeListener.
+Roygbiv.prototype.pause = function(paused){
+  if (mode == 0){
+    return;
+  }
+  if (typeof paused == UNDEFINED){
+    throw new Error("pause error: paused is not defined.");
+    return;
+  }
+  if (!(typeof paused == "boolean")){
+    throw new Error("pause error: paused is not a boolean.");
+    return;
+  }
+  var oldIsPaused = isPaused;
+  isPaused = paused;
+  if (!paused && oldIsPaused){
+    render();
   }
 }
