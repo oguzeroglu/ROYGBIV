@@ -1304,6 +1304,11 @@ function handleViewport(){
   currentViewport.startY = newViewportY;
   currentViewport.width = newViewportZ;
   currentViewport.height = newViewportW;
+
+  camera.oldAspect = camera.aspect;
+  camera.aspect = currentViewport.width / currentViewport.height;
+  camera.updateProjectionMatrix();
+
 }
 
 // DEPLOYMENT

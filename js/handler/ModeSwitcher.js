@@ -238,6 +238,9 @@ ModeSwitcher.prototype.switchFromPreviewToDesign = function(){
     $(datGuiFog.domElement).attr("hidden", true);
     fogConfigurationsVisible = false;
   }
+  camera.oldAspect = camera.aspect;
+  camera.aspect = window.innerWidth / window.innerHeight;
+  camera.updateProjectionMatrix();
   terminal.printInfo(Text.SWITCHED_TO_DESIGN_MODE);
   $("#cliDivheader").text("ROYGBIV 3D Engine - CLI (Design mode)");
   if (LOG_FRAME_DROP_ON){
@@ -441,5 +444,6 @@ ModeSwitcher.prototype.switchFromPreviewToDesign = function(){
   newScripts = undefined;
   GLOBAL_FOG_UNIFORM.value.set(-100.0, 0, 0, 0);
   renderer.setViewport(0, 0, canvas.width, canvas.height);
+
   this.commonSwitchFunctions();
 }
