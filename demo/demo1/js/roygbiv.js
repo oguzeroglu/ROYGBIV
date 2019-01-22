@@ -14642,7 +14642,7 @@ StateLoader.prototype.resetProject = function(undo){
   performanceDropSeconds = 0;
   performanceDropCounter = 0;
   originalBloomConfigurations = new Object();
-  NO_MOBILE = false;
+  NO_MOBILE = true;
 
   boundingClientRect = renderer.domElement.getBoundingClientRect();
   pointerLockRequested = false;
