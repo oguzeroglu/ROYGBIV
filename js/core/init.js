@@ -21,6 +21,10 @@ window.onload = function() {
     cliFocused = true;
     omGUIFocused = false;
     lightsGUIFocused = false;
+    inactiveCounter = 0;
+  });
+  cliDiv.addEventListener("mousemove", function(event){
+    inactiveCounter = 0;
   });
   terminalDiv.addEventListener("mousewheel", function(e){
     e.preventDefault();
@@ -470,6 +474,7 @@ window.onload = function() {
     isScreenVisible = !(document[hiddenText]);
   }, false);
   canvas.addEventListener("click", function(event){
+    inactiveCounter = 0;
     cliFocused = false;
     omGUIFocused = false;
     lightsGUIFocused = false;
@@ -629,6 +634,7 @@ window.onload = function() {
   });
 
   canvas.addEventListener("mousedown", function(event){
+    inactiveCounter = 0;
     if (mode == 1 && screenMouseDownCallbackFunction){
       var rect = boundingClientRect;
       var coordX = ((event.clientX - rect.left) / rect.width) * 2 - 1;
@@ -638,6 +644,7 @@ window.onload = function() {
     isMouseDown = true;
   });
   canvas.addEventListener("mouseup", function(event){
+    inactiveCounter = 0;
     if (mode == 1 && screenMouseUpCallbackFunction){
       var rect = boundingClientRect;
       var coordX = ((event.clientX - rect.left) / rect.width) * 2 - 1;
@@ -647,6 +654,7 @@ window.onload = function() {
     isMouseDown = false;
   });
   canvas.addEventListener("mousemove", function(event){
+    inactiveCounter = 0;
     if (mode == 1 && screenMouseMoveCallbackFunction){
       var rect = boundingClientRect;
       var coordX = ((event.clientX - rect.left) / rect.width) * 2 - 1;
@@ -722,6 +730,8 @@ window.addEventListener('resize', function() {
   }
 });
 window.addEventListener('keydown', function(event){
+  inactiveCounter = 0;
+
   if (!windowLoaded){
     return;
   }
@@ -788,6 +798,8 @@ window.addEventListener('keydown', function(event){
 
 });
 window.addEventListener('keyup', function(event){
+  inactiveCounter = 0;
+
   if (!windowLoaded){
     return;
   }

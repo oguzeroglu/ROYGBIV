@@ -2303,6 +2303,8 @@ StateLoader.prototype.resetProject = function(undo){
     areas[areaName].destroy();
   }
 
+  maxInactiveTime = 0;
+  inactiveCounter = 0;
   isScreenVisible = true;
   viewportMaxWidth = 0;
   viewportMaxHeight = 0;
@@ -2351,6 +2353,7 @@ StateLoader.prototype.resetProject = function(undo){
   terminalTextInputCallbackFunction = 0;
   fpsDropCallbackFunction = 0;
   performanceDropCallbackFunction = 0;
+  userInactivityCallbackFunction = 0;
   performanceDropMinFPS = 0;
   performanceDropSeconds = 0;
   performanceDropCounter = 0;

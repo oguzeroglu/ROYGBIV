@@ -165,7 +165,9 @@ var Roygbiv = function(){
     "removePerformanceDropCallbackFunction",
     "setBloom",
     "unsetBloom",
-    "getViewport"
+    "getViewport",
+    "setUserInactivityCallbackFunction",
+    "removeUserInactivityCallbackFunction"
   ];
 
   this.globals = new Object();
@@ -6715,6 +6717,51 @@ Roygbiv.prototype.removePerformanceDropCallbackFunction = function(){
     return;
   }
   performanceDropCallbackFunction = 0;
+}
+
+// setUserInactivityCallbackFunction
+// Sets a callback function for user inactivity. The callbackFunction is executed
+// if the user does not move or press the mouse or press a key for more than maxTimeInSeconds seconds.
+// The callbackFunction is reset after the execution so use this function again to create a new
+// inactivity listener.
+Roygbiv.prototype.setUserInactivityCallbackFunction = function(maxTimeInSeconds, callbackFunction){
+  if (mode == 0){
+    return;
+  }
+  if (typeof maxTimeInSeconds == UNDEFINED){
+    throw new Error("setUserInactivityCallbackFunction error: maxTimeInSeconds is not defined.");
+    return;
+  }
+  if (isNaN(maxTimeInSeconds)){
+    throw new Error("setUserInactivityCallbackFunction error: maxTimeInSeconds is not a number.");
+    return;
+  }
+  if (maxTimeInSeconds <= 0){
+    throw new Error("setUserInactivityCallbackFunction error: maxTimeInSeconds must be greater than zero.");
+    return;
+  }
+  if (typeof callbackFunction == UNDEFINED){
+    throw new Error("setUserInactivityCallbackFunction error: callbackFunction is not defined.");
+    return;
+  }
+  if (!(callbackFunction instanceof Function)){
+    throw new Error("setUserInactivityCallbackFunction error: callbackFunction is not a function.");
+    return;
+  }
+  inactiveCounter = 0;
+  maxInactiveTime = maxTimeInSeconds;
+  userInactivityCallbackFunction = callbackFunction;
+}
+
+// removeUserInactivityCallbackFunction
+// Removes the user inactivity callback function.
+Roygbiv.prototype.removeUserInactivityCallbackFunction = function(){
+  if (mode == 0){
+    return;
+  }
+  inactiveCounter = 0;
+  userInactivityCallbackFunction = 0;
+  maxInactiveTime = 0;
 }
 
 // UTILITY FUNCTIONS ***********************************************************

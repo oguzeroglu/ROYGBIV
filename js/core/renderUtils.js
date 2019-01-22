@@ -207,6 +207,15 @@ function setTHREEQuaternionFromCANNON(mesh, physicsBody, axis, type, gridSystemA
 }
 
 function calculateFps (){
+  if (maxInactiveTime > 0 && userInactivityCallbackFunction){
+    if (inactiveCounter >= maxInactiveTime){
+      userInactivityCallbackFunction();
+      userInactivityCallbackFunction = 0;
+      maxInactiveTime = 0;
+      inactiveCounter = 0;
+    }
+    inactiveCounter ++;
+  }
   if (!isScreenVisible){
     return;
   }

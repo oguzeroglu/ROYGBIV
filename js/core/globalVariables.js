@@ -680,6 +680,8 @@ var pointerLockSupported = false;
 var defaultAspect = 1.9174434087882823;
 var onFullScreen = false;
 var isScreenVisible = true;
+var inactiveCounter = 0;
+var maxInactiveTime = 0;
 
 // THREE.JS VARIABLES
 var renderer;
@@ -957,6 +959,7 @@ var screenMouseUpCallbackFunction = 0;
 var screenMouseMoveCallbackFunction = 0;
 var screenPointerLockChangedCallbackFunction = 0;
 var screenFullScreenChangeCallbackFunction = 0;
+var userInactivityCallbackFunction = 0;
 var fpsDropCallbackFunction = 0;
 var performanceDropCallbackFunction = 0;
 var terminalTextInputCallbackFunction = 0;

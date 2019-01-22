@@ -56,6 +56,8 @@ ModeSwitcher.prototype.switchMode = function(){
 }
 
 ModeSwitcher.prototype.commonSwitchFunctions = function(){
+  maxInactiveTime = 0;
+  inactiveCounter = 0;
   trackingObjects = new Object();
   defaultCameraControlsDisabled = false;
   initBadTV();
@@ -255,6 +257,7 @@ ModeSwitcher.prototype.switchFromPreviewToDesign = function(){
   terminalTextInputCallbackFunction = 0;
   fpsDropCallbackFunction = 0;
   performanceDropCallbackFunction = 0;
+  userInactivityCallbackFunction = 0;
   performanceDropMinFPS = 0;
   performanceDropSeconds = 0;
   performanceDropCounter = 0;
