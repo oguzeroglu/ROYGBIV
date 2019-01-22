@@ -3955,7 +3955,7 @@ var isDeployment = true;
 var loadedScriptsCounter = 0;
 var isMobile = /Mobi|Android/i.test(navigator.userAgent);
 var WHITE_COLOR = new THREE.Color("white");
-var NO_MOBILE = false;
+var NO_MOBILE = true;
 var performanceDropMinFPS = 0;
 var performanceDropSeconds = 0;
 var performanceDropCounter = 0;
@@ -14642,7 +14642,7 @@ StateLoader.prototype.resetProject = function(undo){
   performanceDropSeconds = 0;
   performanceDropCounter = 0;
   originalBloomConfigurations = new Object();
-  NO_MOBILE = true;
+  NO_MOBILE = false;
 
   boundingClientRect = renderer.domElement.getBoundingClientRect();
   pointerLockRequested = false;
