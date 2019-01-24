@@ -1281,6 +1281,22 @@ function rescale(canvas, scale){
 
 function handleViewport(){
   var curViewport = renderer.getCurrentViewport();
+  if (mode == 1 && fixedAspect > 0){
+    var result = getMaxWidthHeightGivenAspect(canvas.width, canvas.height, fixedAspect);
+    var newViewportX = (canvas.width - result.width) / 2;
+    var newViewportY = (canvas.height - result.height) / 2;
+    var newViewportZ = result.width;
+    var newViewportW = result.height;
+    renderer.setViewport(newViewportX, newViewportY, newViewportZ, newViewportW);
+    currentViewport.startX = newViewportX;
+    currentViewport.startY = newViewportY;
+    currentViewport.width = newViewportZ;
+    currentViewport.height = newViewportW;
+    camera.oldAspect = camera.aspect;
+    camera.aspect = fixedAspect;
+    camera.updateProjectionMatrix();
+    return;
+  }
   var newViewportX = 0;
   var newViewportY = 0;
   var newViewportZ = canvas.width;
@@ -1309,6 +1325,148 @@ function handleViewport(){
   camera.aspect = currentViewport.width / currentViewport.height;
   camera.updateProjectionMatrix();
 
+}
+
+function getMaxWidthHeightGivenAspect(currentWidth, currentHeight, givenAspect){
+  if ((currentWidth/givenAspect) <= currentHeight){
+    return {width: currentWidth, height: currentWidth/givenAspect}
+  }
+  var step = 0.1;
+  for (var width = currentWidth; width>0; width-=0.1){
+     if (width/givenAspect <= currentHeight){
+       return {width: width, height: width/givenAspect};
+     }
+  }
+  return {width: currentWidth, height: currentHeight};
+}
+
+function build(projectName, author){
+  terminal.clear();
+  terminal.printInfo(Text.BUILDING_PROJECT);
+  canvas.style.visibility = "hidden";
+  terminal.disable();
+  var xhr = new XMLHttpRequest();
+  xhr.open("POST", "/build", true);
+  xhr.setRequestHeader("Content-type", "application/json");
+  xhr.onreadystatechange = function () {
+    if (xhr.readyState == 4 && xhr.status == 200){
+      terminal.clear();
+      var json = JSON.parse(xhr.responseText);
+      if (json.error){
+        terminal.printError(json.error);
+      }else{
+        terminal.printInfo(Text.PROJECT_BUILDED.replace(Text.PARAM1, json.path));
+        window.open("http://localhost:8085/deploy/"+projectName+"/application.html", '_blank');
+      }
+      canvas.style.visibility = "";
+      terminal.enable();
+    }
+  }
+  var data = JSON.stringify(new State(projectName, author));
+  xhr.send(data);
+}
+
+function generateUniqueObjectName(){
+  var generatedName = (Date.now().toString(36) + Math.random().toString(36).substr(2, 5)).toUpperCase();
+  var nameFound = true;
+  while (nameFound){
+    var nameInAddedObjects = !(typeof addedObjects[generatedName] == "undefined");
+    var nameInGluedObjects = !(typeof objectGroups[generatedName] == "undefined");
+    var nameInChildObjects = false;
+    for (var gluedObjectName in objectGroups){
+      var group = objectGroups[gluedObjectName].group;
+      if (!(typeof group[generatedName] == "undefined")){
+        nameInChildObjects = true;
+      }
+    }
+    nameFound = (nameInAddedObjects || nameInGluedObjects || nameInChildObjects);
+    if (nameFound){
+      console.error("[*] Object name generation collision happened: "+generatedName);
+      generatedName = (Date.now().toString(36) + Math.random().toString(36).substr(2, 5)).toUpperCase();
+    }
+  }
+  return generatedName;
+}
+
+function isNameUsedAsSoftCopyParentName(name){
+  for (var objName in addedObjects){
+    if (addedObjects[objName].softCopyParentName && addedObjects[objName].softCopyParentName == name){
+      return true;
+    }
+  }
+  for (var objName in objectGroups){
+    if (objectGroups[objName].softCopyParentName && objectGroups[objName].softCopyParentName == name){
+      return true;
+    }
+  }
+  return false;
+}
+
+function processNewGridSystemCommand(name, sizeX, sizeZ, centerX, centerY, centerZ, outlineColor, cellSize, axis, isSuperposed, slicedGrid){
+  if (addedObjects[name] || objectGroups[name]){
+    terminal.printError(Text.NAME_MUST_BE_UNIQUE);
+    return true;
+  }
+  for (var objName in objectGroups){
+    for (var childName in objectGroups[objName].group){
+      if (childName == name){
+        terminal.printError(Text.NAME_MUST_BE_UNIQUE);
+      }
+    }
+  }
+  sizeX = parseInt(sizeX);
+  if (isNaN(sizeX)){
+    terminal.printError(Text.SIZEX_MUST_BE_A_NUMBER);
+    return true;
+  }
+  sizeZ = parseInt(sizeZ);
+  if (isNaN(sizeZ)){
+    terminal.printError(Text.SIZEZ_MUST_BE_A_NUMBER);
+    return true;
+  }
+  centerX = parseInt(centerX);
+  if (isNaN(centerX)){
+    terminal.printError(Text.CENTERX_MUST_BE_A_NUMBER);
+    return true;
+  }
+  centerY = parseInt(centerY);
+  if (isNaN(centerY)){
+    terminal.printError(Text.CENTERY_MUST_BE_A_NUMBER);
+    return true;
+  }
+  centerZ = parseInt(centerZ);
+  if (isNaN(centerZ)){
+    terminal.printError(Text.CENTERZ_MUST_BE_A_NUMBER);
+    return true;
+  }
+  cellSize = parseInt(cellSize);
+  if (isNaN(cellSize)){
+    terminal.printError(Text.CELLSIZE_MUST_BE_A_NUMBER);
+    return true;
+  }
+  if (!axis){
+    terminal.printError(Text.AXIS_MUST_BE_ONE_OF_XY_YZ_XZ);
+    return true;
+  }
+  if (axis.toUpperCase() != "XZ" && axis.toUpperCase() != "XY" && axis.toUpperCase() != "YZ"){
+    terminal.printError(Text.AXIS_MUST_BE_ONE_OF_XY_YZ_XZ);
+    return true;
+  }
+  var gsObject = new GridSystem(name, parseInt(sizeX), parseInt(sizeZ),
+          parseInt(centerX), parseInt(centerY), parseInt(centerZ),
+                            outlineColor, parseInt(cellSize), axis.toUpperCase());
+
+  gsObject.isSuperposed = isSuperposed;
+
+  if (slicedGrid){
+    gsObject.slicedGrid = slicedGrid;
+    slicedGrid.toggleSelect(true, false, false, true);
+    slicedGrid.slicedGridSystemName = name;
+  }
+
+  rayCaster.refresh();
+
+  return true;
 }
 
 // DEPLOYMENT

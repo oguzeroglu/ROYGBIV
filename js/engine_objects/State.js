@@ -12,6 +12,7 @@ var State = function(projectName, author){
   // VIEWPORT ******************************************************
   this.viewportMaxWidth = viewportMaxWidth;
   this.viewportMaxHeight = viewportMaxHeight;
+  this.fixedAspect = fixedAspect;
   // GRID SYSTEMS **************************************************
   var gridSystemsExport = new Object();
   for (var gridSystemName in gridSystems){

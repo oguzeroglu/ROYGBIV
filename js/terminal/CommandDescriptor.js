@@ -676,6 +676,11 @@ var CommandDescriptor = function(){
   this.setMaxViewport.types.push(this.UNKNOWN_INDICATOR); // widthInPx
   this.setMaxViewport.types.push(this.UNKNOWN_INDICATOR); // heightInPx
 
+  // keepAspect
+  this.keepAspect = new Object();
+  this.keepAspect.types = [];
+  this.keepAspect.types.push(this.UNKNOWN_INDICATOR); // ratio
+
 };
 
 CommandDescriptor.prototype.test = function(){

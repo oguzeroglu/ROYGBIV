@@ -29,6 +29,9 @@ StateLoader.prototype.load = function(undo){
     if (!(typeof obj.viewportMaxHeight == UNDEFINED)){
       viewportMaxHeight = obj.viewportMaxHeight;
     }
+    if (!(typeof obj.fixedAspect == UNDEFINED)){
+      fixedAspect = obj.fixedAspect;
+    }
     // GRID SYSTEMS ************************************************
     var gridSystemsExport = obj.gridSystems;
     for (var gridSystemName in gridSystemsExport){
@@ -2360,6 +2363,7 @@ StateLoader.prototype.resetProject = function(undo){
   performanceDropCounter = 0;
   originalBloomConfigurations = new Object();
   NO_MOBILE = false;
+  fixedAspect = 0;
 
   boundingClientRect = renderer.domElement.getBoundingClientRect();
   pointerLockRequested = false;

@@ -155,7 +155,8 @@ var commandArgumentsExpectedCount = [
     1, //skyboxConfigurations
     1, //fogConfigurations
     1, //noMobile
-    2 //setMaxViewport
+    2, //setMaxViewport
+    1 //keepAspect
 ];
 var commandArgumentsExpectedExplanation = [
   "help", //help
@@ -307,7 +308,8 @@ var commandArgumentsExpectedExplanation = [
   "skyboxConfigurations show/hide", //skyboxConfigurations
   "fogConfigurations show/hide", //fogConfigurations
   "noMobile on/off", //noMobile
-  "setMaxViewport widthInPx heightInPx" //setMaxViewport
+  "setMaxViewport widthInPx heightInPx", //setMaxViewport
+  "keepAspect ratio" //keepAspect
 ];
 var commands = [
   "help",
@@ -459,7 +461,8 @@ var commands = [
   "skyboxConfigurations",
   "fogConfigurations",
   "noMobile",
-  "setMaxViewport"
+  "setMaxViewport",
+  "keepAspect"
 ];
 var commandInfo = [
   "help: Prints command list.",
@@ -611,7 +614,8 @@ var commandInfo = [
   "skyboxConfigurations: Shows/hides the skybox configuration GUI.",
   "fogConfigurations: Shows/hides the fog configuration GUI.",
   "noMobile: Prevents the application from loading and alerts a warning message in deployment mode for mobile devices if used with on parameter.",
-  "setMaxViewport: Sets the maximum viewport of the renderer. Use 0 or a negative number for unlimited width/height."
+  "setMaxViewport: Sets the maximum viewport of the renderer. Use 0 or a negative number for unlimited width/height.",
+  "keepAspect: Modifies the renderer aspect in the browser of the client in a way where width/height = ratio. If ratio<0 the aspect is not kept."
 ];
 var keyboardInfo = [
   "W/S : Translates the camera on axis Z.",
@@ -698,6 +702,7 @@ var fullScreenRequested = false;
 var viewportMaxWidth = 0;
 var viewportMaxHeight = 0;
 var currentViewport = new Object();
+var fixedAspect = 0;
 
 // PHYSICS
 var debugRenderer;
