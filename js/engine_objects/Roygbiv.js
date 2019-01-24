@@ -6138,6 +6138,10 @@ Roygbiv.prototype.setCollisionListener = function(sourceObject, callbackFunction
       throw new Error("setCollisionListener error: Cannot set collision listener for more than "+MAX_OBJECT_COLLISION_LISTENER_COUNT+" objects.");
       return;
     }
+    if (sourceObject.noMass){
+      throw new Error("setCollisionListener error: Object has no mass.");
+      return;
+    }
     collisionCallbackRequests[sourceObject.name] = callbackFunction.bind(sourceObject);
     TOTAL_OBJECT_COLLISION_LISTENER_COUNT ++;
   }else if (sourceObject.isParticle){
