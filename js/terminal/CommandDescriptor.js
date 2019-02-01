@@ -681,6 +681,12 @@ var CommandDescriptor = function(){
   this.keepAspect.types = [];
   this.keepAspect.types.push(this.UNKNOWN_INDICATOR); // ratio
 
+  // newFont
+  this.newFont = new Object();
+  this.newFont.types = [];
+  this.newFont.types.push(this.UNKNOWN_INDICATOR); // fontName
+  this.newFont.types.push(this.UNKNOWN_INDICATOR); // path
+
 };
 
 CommandDescriptor.prototype.test = function(){

@@ -156,7 +156,8 @@ var commandArgumentsExpectedCount = [
     1, //fogConfigurations
     1, //noMobile
     2, //setMaxViewport
-    1 //keepAspect
+    1, //keepAspect
+    2 //newFont
 ];
 var commandArgumentsExpectedExplanation = [
   "help", //help
@@ -309,7 +310,8 @@ var commandArgumentsExpectedExplanation = [
   "fogConfigurations show/hide", //fogConfigurations
   "noMobile on/off", //noMobile
   "setMaxViewport widthInPx heightInPx", //setMaxViewport
-  "keepAspect ratio" //keepAspect
+  "keepAspect ratio", //keepAspect
+  "newFont fontName path" //newFont
 ];
 var commands = [
   "help",
@@ -462,7 +464,8 @@ var commands = [
   "fogConfigurations",
   "noMobile",
   "setMaxViewport",
-  "keepAspect"
+  "keepAspect",
+  "newFont"
 ];
 var commandInfo = [
   "help: Prints command list.",
@@ -615,7 +618,8 @@ var commandInfo = [
   "fogConfigurations: Shows/hides the fog configuration GUI.",
   "noMobile: Prevents the application from loading and alerts a warning message in deployment mode for mobile devices if used with on parameter.",
   "setMaxViewport: Sets the maximum viewport of the renderer. Use 0 or a negative number for unlimited width/height.",
-  "keepAspect: Modifies the renderer aspect in the browser of the client in a way where width/height = ratio. If ratio<0 the aspect is not kept."
+  "keepAspect: Modifies the renderer aspect in the browser of the client in a way where width/height = ratio. If ratio<0 the aspect is not kept.",
+  "newFont: Creates a new font."
 ];
 var keyboardInfo = [
   "W/S : Translates the camera on axis Z.",
@@ -982,6 +986,7 @@ var performanceDropMinFPS = 0;
 var performanceDropSeconds = 0;
 var performanceDropCounter = 0;
 var isPaused = false;
+var fonts = new Object();
 
 // WORKER VARIABLES
 var WORKERS_SUPPORTED = (typeof(Worker) !== "undefined");
@@ -1100,3 +1105,17 @@ keyCodeToChar = {
   183:"My Calculator",186:";",187:"=",188:",",189:"-",190:".",191:"/",192:"`",
   219:"[",220:"\\",221:"]",222:"'"
 };
+
+// SUPPORTED FONT ATLAS CHARACTERS
+var supportedFontAtlasChars = [
+  "!", "\"", "#", "$", "%", "&", "\'", "(", ")", "*", "+", ",", "-", ".", "/",
+  "0", "1", "2", "3", "4", "5", "6", "7", "8", "9", ":", ";", "<", "=", ">", "?",
+  "@", "A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O",
+  "P", "R", "S", "T", "U", "V", "W", "X", "Y", "Z", "[", "\\", "]", "^", "_", "`",
+  "a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o", "p",
+  "r", "s", "t", "u", "v", "w", "x", "y", "z", "{", "|", "}", "~"
+];
+var supportedFontCharMap = new Object();
+for (var i = 0; i<supportedFontAtlasChars.length; i++){
+  supportedFontCharMap[supportedFontAtlasChars[i]] = true;
+}

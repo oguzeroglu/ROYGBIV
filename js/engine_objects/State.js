@@ -193,4 +193,11 @@ var State = function(projectName, author){
   }
   // RESOLUTION ****************************************************
   this.screenResolution = screenResolution;
+  // FONTS *********************************************************
+  this.fonts = new Object();
+  this.totalFontCount = 0;
+  for (var fontName in fonts){
+    this.totalFontCount ++;
+    this.fonts[fontName] = fonts[fontName].export();
+  }
 }

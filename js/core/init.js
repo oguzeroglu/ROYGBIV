@@ -56,8 +56,10 @@ window.onload = function() {
                          'webkitPointerLockElement' in document;
 
   // COMMAND DESCRIPTOR
-  commandDescriptor = new CommandDescriptor();
-  commandDescriptor.test();
+  if (!isDeployment){
+    commandDescriptor = new CommandDescriptor();
+    commandDescriptor.test();
+  }
 
   // COLOR NAMES
   ColorNames = new ColorNames();

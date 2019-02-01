@@ -4,6 +4,7 @@ var StateLoader = function(stateObj){
   this.totalLoadedTextureCount = 0;
   this.totalLoadedTexturePackCount = 0;
   this.totalLoadedSkyboxCount = 0;
+  this.totalLoadedFontCount = 0;
 }
 
 StateLoader.prototype.load = function(undo){
@@ -695,7 +696,7 @@ StateLoader.prototype.load = function(undo){
       if (curTexture == 1 || curTexture == 2 || curTexture == 3){
         textures[textureName] = curTexture;
         this.totalLoadedTextureCount ++;
-        this.createObjectGroupsAfterLoadedTextures();
+        this.createObjectGroupsAfterLoadedAssets();
         continue;
       }
       var offsetX = curTexture.offset[0];
@@ -719,7 +720,7 @@ StateLoader.prototype.load = function(undo){
           that.totalLoadedTextureCount ++;
           this.textureX.needsUpdate = true;
           that.mapLoadedTexture(this.textureX, this.textureNameX);
-          that.createObjectGroupsAfterLoadedTextures();
+          that.createObjectGroupsAfterLoadedAssets();
         }.bind({textureX: texture, textureNameX: textureName});
       }else if (uploadedImages[textureURL]){
         var texture = new THREE.Texture(uploadedImages[textureURL]);
@@ -751,7 +752,7 @@ StateLoader.prototype.load = function(undo){
                 textures[this.textureNameX] = this.textureX;
                 that.totalLoadedTextureCount ++;
                 that.mapLoadedTexture(this.textureX, this.textureNameX);
-                that.createObjectGroupsAfterLoadedTextures();
+                that.createObjectGroupsAfterLoadedAssets();
               }.bind({textureX: texture, textureNameX: textureName})
               skip = true;
             }
@@ -762,7 +763,7 @@ StateLoader.prototype.load = function(undo){
           that.totalLoadedTextureCount ++;
           texture.needsUpdate = true;
           this.mapLoadedTexture(texture, textureName);
-          this.createObjectGroupsAfterLoadedTextures();
+          this.createObjectGroupsAfterLoadedAssets();
         }
       }else{
         if (textureURL.toUpperCase().endsWith("DDS")){
@@ -808,7 +809,7 @@ StateLoader.prototype.load = function(undo){
             textures[textureNameX].offset.x = this.offsetXX;
             textures[textureNameX].offset.y = this.offsetYY;
             that.mapLoadedTexture(textures[textureNameX], textureNameX);
-            that.createObjectGroupsAfterLoadedTextures();
+            that.createObjectGroupsAfterLoadedAssets();
           }.bind({textureNameX: textureName, offsetXX: offsetX, offsetYY: offsetY, repeatUU: repeatU, repeatVV: repeatV, isCompressed: (
             this.loaders[textureName] instanceof THREE.DDSLoader
           )}), function(xhr){
@@ -816,7 +817,7 @@ StateLoader.prototype.load = function(undo){
           }.bind({textureNameX: textureName}), function(xhr){
             textures[this.textureNameX] = 3;
             that.totalLoadedTextureCount ++;
-            that.createObjectGroupsAfterLoadedTextures();
+            that.createObjectGroupsAfterLoadedAssets();
           }.bind({textureNameX: textureName})
         );
       }
@@ -835,7 +836,7 @@ StateLoader.prototype.load = function(undo){
         function(){
           this.that.totalLoadedTexturePackCount ++;
           this.that.mapLoadedTexturePack(this.texturePackName, this.objj);
-          this.that.createObjectGroupsAfterLoadedTextures();
+          this.that.createObjectGroupsAfterLoadedAssets();
         }.bind({texturePackName: texturePackName, that: this, objj: obj, scaleFactorX: scaleFactor}),
         true,
         null,
@@ -864,7 +865,7 @@ StateLoader.prototype.load = function(undo){
           skyboxExport.color,
           function(){
             that.totalLoadedSkyboxCount ++;
-            that.createObjectGroupsAfterLoadedTextures();
+            that.createObjectGroupsAfterLoadedAssets();
           }
         );
       }else{
@@ -903,7 +904,7 @@ StateLoader.prototype.load = function(undo){
                 skyboxMesh.scale.z = this.skyBoxScale;
               }
             }
-            that.createObjectGroupsAfterLoadedTextures();
+            that.createObjectGroupsAfterLoadedAssets();
           }.bind({skyboxName: skyboxName, skyBoxScale: skyBoxScale})
         );
       }
@@ -954,7 +955,7 @@ StateLoader.prototype.load = function(undo){
     }
 
     // OBJECT GROUPS ***********************************************
-    // NOT HERE -> SEE: createObjectGroupsAfterLoadedTextures
+    // NOT HERE -> SEE: createObjectGroupsAfterLoadedAssets
 
     // MARKED PONTS ************************************************
     markedPointsVisible = false;
@@ -1030,6 +1031,21 @@ StateLoader.prototype.load = function(undo){
     // RESOLUTION **************************************************
     screenResolution = obj.screenResolution;
     renderer.setPixelRatio(screenResolution);
+    // FONTS *******************************************************
+    this.hasFonts = false;
+    var that = this;
+    for (var fontName in obj.fonts){
+      this.hasFonts = true;
+      var curFontExport = obj.fonts[fontName];
+      var font = new Font(curFontExport.name, curFontExport.path, function(fontInstance){
+        fonts[fontInstance.name] = fontInstance;
+        that.totalLoadedFontCount ++;
+        that.createObjectGroupsAfterLoadedAssets();
+      }, function(fontName){
+        console.error("Error loading font: "+fontName);
+      });
+      font.load();
+    }
     // POST PROCESSING *********************************************
     bloomStrength = obj.bloomStrength;
     bloomRadius = obj.bloomRadius;
@@ -1070,8 +1086,8 @@ StateLoader.prototype.load = function(undo){
       }
     }
 
-    if (!this.hasTextures && !this.hasTexturePacks && !this.hasSkyboxes){
-      this.createObjectGroupsAfterLoadedTextures();
+    if (!this.hasTextures && !this.hasTexturePacks && !this.hasSkyboxes && this.hasFonts){
+      this.createObjectGroupsAfterLoadedAssets();
     }
 
     return true;
@@ -1083,11 +1099,12 @@ StateLoader.prototype.load = function(undo){
   }
 }
 
-StateLoader.prototype.createObjectGroupsAfterLoadedTextures = function(){
+StateLoader.prototype.createObjectGroupsAfterLoadedAssets = function(){
   var obj = this.stateObj;
   if (parseInt(this.totalLoadedTextureCount) < parseInt(obj.totalTextureCount) ||
            parseInt(this.totalLoadedTexturePackCount) < parseInt(obj.totalTexturePackCount) ||
-                parseInt(this.totalLoadedSkyboxCount) < parseInt(obj.totalSkyboxCount)){
+                parseInt(this.totalLoadedSkyboxCount) < parseInt(obj.totalSkyboxCount) ||
+                      parseInt(this.totalLoadedFontCount) < parseInt(obj.totalFontCount)){
       return;
   }
 
@@ -2362,6 +2379,7 @@ StateLoader.prototype.resetProject = function(undo){
   performanceDropSeconds = 0;
   performanceDropCounter = 0;
   originalBloomConfigurations = new Object();
+  fonts = new Object();
   NO_MOBILE = false;
   fixedAspect = 0;
 

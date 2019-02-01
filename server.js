@@ -148,6 +148,9 @@ function readEngineScripts(projectName, author, noMobile){
       if (scriptPath.includes("cliParser.js")){
         console.log("[*] Skipping cliParser");
         continue;
+      }else if (scriptPath.includes("CommandDescriptor.js")){
+        console.log("[*] Skipping CommandDescriptor");
+        continue;
       }
       content += scriptContent +"\n";
     }

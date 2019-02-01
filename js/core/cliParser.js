@@ -4884,6 +4884,35 @@ function parse(input){
           terminal.printInfo(Text.ASPECT_FIXED.replace(Text.PARAM1, fixedAspect));
           return true;
         break;
+        case 151: //newFont
+          if (mode != 0){
+            terminal.printError(Text.WORKS_ONLY_IN_DESIGN_MODE);
+            return true;
+          }
+          var fontName = splitted[1];
+          var fontPath = "fonts/"+splitted[2];
+          if (fonts[fontName]){
+            terminal.printError(Text.FONT_NAME_MUST_BE_UNIQUE);
+            return true;
+          }
+          var fontObject = new Font(fontName, fontPath, function(){
+            canvas.style.visibility = "";
+            terminal.enable();
+            terminal.clear();
+            terminal.printInfo(Text.FONT_CREATED);
+            fonts[fontName] = fontObject;
+          }, function(){
+            canvas.style.visibility = "";
+            terminal.enable();
+            terminal.clear();
+            terminal.printInfo(Text.ERROR_CREATING_FONT.replace(Text.PARAM1, fontPath));
+          });
+          fontObject.load();
+          terminal.printInfo(Text.LOADING_FONT);
+          canvas.style.visibility = "hidden";
+          terminal.disable();
+          return true;
+        break;
       }
       return true;
     }catch(err){

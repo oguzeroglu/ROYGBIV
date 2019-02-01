@@ -156,5 +156,5 @@ var ColorNames = function(){
 }
 
 ColorNames.prototype.generateRandomColor = function(){
-  return this.colorNames[Math.floor(Math.random() * this.colorNames.length)]; 
-}
+  return this.colorNames[Math.floor(Math.random() * this.colorNames.length)];
+};
