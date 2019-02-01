@@ -90,6 +90,25 @@ function copyAssets(application){
       }
     });
   }
+  for (var fontName in application.fonts){
+    var dirName = "fonts/"+application.fonts[fontName].path;
+    fs.readdirSync("fonts").forEach(file => {
+      var dirFileName = file.split(".")[0];
+      var dirFileExtension = file.split(".")[1];
+      if (dirFileExtension){
+        dirFileExtension = dirFileExtension.toLowerCase();
+      }
+      var fileName = application.fonts[fontName].path.split("/")[1].split(".")[0];
+      var fileExtension = application.fonts[fontName].path.split("/")[1].split(".")[1];
+      if (fileExtension){
+        fileExtension = fileExtension.toLowerCase();
+      }
+      if (dirFileExtension == fileExtension && dirFileName == fileName){
+        copyFileSync(application.fonts[fontName].path, "deploy/"+application.projectName+"/fonts/");
+        console.log("[*] Copied a font: "+application.fonts[fontName].path);
+      }
+    });
+  }
 }
 
 function generateDeployDirectory(projectName, application){
@@ -106,6 +125,7 @@ function generateDeployDirectory(projectName, application){
   var hasTextures = (Object.keys(application.textureURLs).length != 0);
   var hasTexturePacks = (Object.keys(application.texturePacks).length != 0);
   var hasSkyBoxes = (Object.keys(application.skyBoxes).length != 0);
+  var hasFonts = (Object.keys(application.fonts).length != 0);
   if (hasTextures){
     fs.mkdirSync("deploy/"+projectName+"/textures");
     console.log("[*] Project has textures to load.");
@@ -123,6 +143,12 @@ function generateDeployDirectory(projectName, application){
     console.log("[*] Project has skyboxes to load.");
   }else{
     console.log("[*] Project has no skyboxes to load.");
+  }
+  if (hasFonts){
+    fs.mkdirSync("deploy/"+projectName+"/fonts");
+    console.log("[*] Project has fonts to load.");
+  }else{
+    console.log("[*] Project has no fonts to load.")
   }
   return true;
 }
