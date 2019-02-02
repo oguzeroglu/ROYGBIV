@@ -157,7 +157,9 @@ var commandArgumentsExpectedCount = [
     1, //noMobile
     2, //setMaxViewport
     1, //keepAspect
-    2 //newFont
+    2, //newFont
+    1, //destroyFont
+    0 //printFonts
 ];
 var commandArgumentsExpectedExplanation = [
   "help", //help
@@ -311,7 +313,9 @@ var commandArgumentsExpectedExplanation = [
   "noMobile on/off", //noMobile
   "setMaxViewport widthInPx heightInPx", //setMaxViewport
   "keepAspect ratio", //keepAspect
-  "newFont fontName path" //newFont
+  "newFont fontName path", //newFont
+  "destroyFont fontName", //destroyFont
+  "printFonts" //printFonts
 ];
 var commands = [
   "help",
@@ -465,7 +469,9 @@ var commands = [
   "noMobile",
   "setMaxViewport",
   "keepAspect",
-  "newFont"
+  "newFont",
+  "destroyFont",
+  "printFonts"
 ];
 var commandInfo = [
   "help: Prints command list.",
@@ -619,7 +625,9 @@ var commandInfo = [
   "noMobile: Prevents the application from loading and alerts a warning message in deployment mode for mobile devices if used with on parameter.",
   "setMaxViewport: Sets the maximum viewport of the renderer. Use 0 or a negative number for unlimited width/height.",
   "keepAspect: Modifies the renderer aspect in the browser of the client in a way where width/height = ratio. If ratio<0 the aspect is not kept.",
-  "newFont: Creates a new font."
+  "newFont: Creates a new font.",
+  "destroyFont: Destroys a font.",
+  "printFonts: Prints all created fonts."
 ];
 var keyboardInfo = [
   "W/S : Translates the camera on axis Z.",

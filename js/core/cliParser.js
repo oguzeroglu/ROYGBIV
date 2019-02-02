@@ -4913,6 +4913,36 @@ function parse(input){
           terminal.disable();
           return true;
         break;
+        case 152: //destroyFont
+          if (mode != 0){
+            terminal.printError(Text.WORKS_ONLY_IN_DESIGN_MODE);
+            return true;
+          }
+          var fontName = splitted[1];
+          var fontToRemove = fonts[fontName];
+          if (!fontToRemove){
+            terminal.printError(Text.NO_SUCH_FONT);
+            return true;
+          }
+          fontToRemove.destroy();
+          terminal.printInfo(Text.FONT_DESTROYED);
+          return true;
+        break;
+        case 153: //printFonts
+          var totalCount = Object.keys(fonts).length;
+          var curCount = 0;
+          terminal.printHeader(Text.FONTS);
+          for (var fontName in fonts){
+            curCount ++;
+            var opt = !(curCount == totalCount);
+            var curFont = fonts[fontName];
+            terminal.printInfo(Text.TREE2.replace(Text.PARAM1, fontName).replace(Text.PARAM2, curFont.path), opt);
+          }
+          if (curCount == 0){
+            terminal.printError(Text.NO_FONTS);
+          }
+          return true;
+        break;
       }
       return true;
     }catch(err){

@@ -24,6 +24,14 @@ Font.prototype.export = function(){
   return exportObject;
 }
 
+Font.prototype.destroy = function(){
+  if (this.textureMerger){
+    this.textureMerger.mergedTexture.dispose();
+  }
+  this.textureMerger = null;
+  delete fonts[this.name];
+}
+
 Font.prototype.generateFontTexture = function(){
   var canvasSize = 64;
   var textureObjects = new Object();

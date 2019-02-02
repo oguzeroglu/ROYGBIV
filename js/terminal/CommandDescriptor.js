@@ -32,6 +32,7 @@ var CommandDescriptor = function(){
   this.AREA_NAME_WITH_DEFAULT   =   29;
   this.RENDER_SIDE              =   30;
   this.CHILD_OBJECT_NAME        =   31;
+  this.FONT_NAME                =   32;
 
   // newGridSystem
   this.newGridSystem = new Object();
@@ -686,6 +687,11 @@ var CommandDescriptor = function(){
   this.newFont.types = [];
   this.newFont.types.push(this.UNKNOWN_INDICATOR); // fontName
   this.newFont.types.push(this.UNKNOWN_INDICATOR); // path
+
+  // destroyFont
+  this.destroyFont = new Object();
+  this.destroyFont.types = [];
+  this.destroyFont.types.push(this.FONT_NAME); // fontName
 
 };
 
