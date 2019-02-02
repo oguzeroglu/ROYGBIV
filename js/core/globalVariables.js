@@ -940,6 +940,7 @@ var GLOBAL_VIEW_UNIFORM = new THREE.Uniform(new THREE.Matrix4());
 var GLOBAL_PS_MERGED_UNIFORM = new THREE.Uniform(20.0);
 var GLOBAL_PS_NOT_MERGED_UNIFORM = new THREE.Uniform(-20.0);
 var GLOBAL_CAMERA_POSITION_UNIFORM = new THREE.Uniform(new THREE.Vector3());
+var GLOBAL_CAMERA_QUATERNION_UNIFORM = new THREE.Uniform(new THREE.Quaternion());
 var GLOBAL_CUBE_TEXTURE_UNIFORM = new THREE.Uniform(new THREE.CubeTexture());
 var GLOBAL_SKYBOX_ALPHA_UNIFORM = new THREE.Uniform(1.0);
 var VERTEX_SHADER_TEXTURE_FETCH_SUPPORTED;
@@ -995,6 +996,9 @@ var performanceDropSeconds = 0;
 var performanceDropCounter = 0;
 var isPaused = false;
 var fonts = new Object();
+var MAX_TEXT_CHAR_COUNT = 64;
+var DEFAULT_OFFSET_BETWEEN_CHARS = 20;
+var DEFAULT_OFFSET_BETWEEN_LINES = 20;
 
 // WORKER VARIABLES
 var WORKERS_SUPPORTED = (typeof(Worker) !== "undefined");

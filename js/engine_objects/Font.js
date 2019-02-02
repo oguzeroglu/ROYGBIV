@@ -53,11 +53,15 @@ Font.prototype.generateFontTexture = function(){
     tmpCanvas.width = canvasSize;
     tmpCanvas.height = canvasSize;
     ctx = tmpCanvas.getContext("2d");
-    ctx.textBaseline = "bottom";
+    ctx.textBaseline = "middle";
+    ctx.textAlign='center';
     ctx.font = fontSize + "px "+this.name;
     var textWidth = ctx.measureText(supportedFontAtlasChars[i]).width;
     ctx.fillStyle = "#ffffff";
-    ctx.fillText(supportedFontAtlasChars[i] , (tmpCanvas.width/2) - (textWidth/2), canvasSize);
+    ctx.translate(canvasSize/2, canvasSize/2);
+    ctx.rotate(Math.PI);
+    ctx.scale(-1, 1);
+    ctx.fillText(supportedFontAtlasChars[i] , 0, 0);
     var canvasTexture = new THREE.CanvasTexture(tmpCanvas);
     textureObjects[supportedFontAtlasChars[i]] = canvasTexture;
   }
