@@ -1362,10 +1362,6 @@ function handleViewport(){
       newViewportW = viewportMaxHeight;
     }
   }
-  console.log(newViewportX);
-  console.log(newViewportY);
-  console.log(newViewportZ);
-  console.log(newViewportW);
   renderer.setViewport(newViewportX, newViewportY, newViewportZ, newViewportW);
   currentViewport.startX = newViewportX;
   currentViewport.startY = newViewportY;
