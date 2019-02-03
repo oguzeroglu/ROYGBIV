@@ -740,6 +740,25 @@ window.addEventListener('resize', function() {
     if (mode == 1){
       handleViewport();
     }
+    if (mode == 0){
+      for (var areaName in areas){
+        if (areas[areaName].text){
+          areas[areaName].text.handleResize();
+        }
+      }
+      for (var pointName in markedPoints){
+        if (markedPoints[pointName].text){
+          markedPoints[pointName].text.handleResize();
+        }
+      }
+      for (var gridName in gridSelections){
+        if (gridSelections[gridName].texts){
+          for (var i = 0; i<gridSelections[gridName].texts.length; i++){
+            gridSelections[gridName].texts[i].handleResize();
+          }
+        }
+      }
+    }
   }
 });
 window.addEventListener('keydown', function(event){

@@ -156,3 +156,8 @@ AddedText.prototype.removeBackground = function(){
 AddedText.prototype.setCharSize = function(value){
   this.material.uniforms.charSize.value = value;
 }
+
+AddedText.prototype.handleResize = function(){
+  this.setMarginBetweenChars(this.refOffsetBetweenChars * window.innerWidth / this.refInnerWidth);
+  this.setCharSize(this.refCharSize * window.innerHeight / this.refInnerHeight);
+}

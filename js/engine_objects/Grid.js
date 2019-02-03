@@ -206,9 +206,14 @@ Grid.prototype.renderCornerHelpers = function(){
     }
     var text = "(@@1, @@2, @@3)".replace("@@1", x).replace("@@2", y).replace("@@3", z);
     var addedText = new AddedText(
-      defaultFont, text, new THREE.Vector3().copy(vertex), ORANGE_COLOR, 1, 10
+      defaultFont, text, new THREE.Vector3().copy(vertex), ORANGE_COLOR, 1, 6
     );
-    addedText.setMarginBetweenChars(3);
+    addedText.setMarginBetweenChars(2.5);
+    addedText.refInnerWidth = 1440;
+    addedText.refInnerHeight = 569;
+    addedText.refCharSize = 6;
+    addedText.refOffsetBetweenChars = 2.5;
+    addedText.handleResize();
     this.texts.push(addedText);
   }
 }

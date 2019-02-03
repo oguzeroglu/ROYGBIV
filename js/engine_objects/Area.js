@@ -62,8 +62,13 @@ Area.prototype.renderToScreen = function(){
     this.helper = new THREE.Box3Helper(this.boundingBox, color);
   }
   if(!this.text){
-    this.text = new AddedText(defaultFont, this.name, this.center, color, 1, 10);
-    this.text.setMarginBetweenChars(3);
+    this.text = new AddedText(defaultFont, this.name, this.center, color, 1, 15);
+    this.text.setMarginBetweenChars(7);
+    this.text.refInnerWidth = 1440;
+    this.text.refInnerHeight = 569;
+    this.text.refCharSize = 15;
+    this.text.refOffsetBetweenChars = 7;
+    this.text.handleResize();
   }else{
     scene.add(this.text.mesh);
   }

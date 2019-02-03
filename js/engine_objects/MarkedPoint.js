@@ -4,8 +4,13 @@ var MarkedPoint = function(name, x, y, z){
   this.y = y;
   this.z = z;
   var txt = "@@1 (@@2, @@3, @@4)".replace("@@1", name).replace("@@2", x).replace("@@3", y).replace("@@4", z);
-  this.text = new AddedText(defaultFont, txt, new THREE.Vector3(x, y, z), LIME_COLOR, 1, 10);
-  this.text.setMarginBetweenChars(3);
+  this.text = new AddedText(defaultFont, txt, new THREE.Vector3(x, y, z), LIME_COLOR, 1, 15);
+  this.text.setMarginBetweenChars(7);
+  this.text.refInnerWidth = 1440;
+  this.text.refInnerHeight = 569;
+  this.text.refCharSize = 15;
+  this.text.refOffsetBetweenChars = 7;
+  this.text.handleResize();
   this.isHidden = false;
 }
 
