@@ -46,6 +46,7 @@ var AddedText = function(font, text, position, color, alpha, characterSize){
       alpha: new THREE.Uniform(alpha),
       backgroundColor: new THREE.Uniform(WHITE_COLOR),
       backgroundAlpha: new THREE.Uniform(0.0),
+      hasBackgroundColorFlag: new THREE.Uniform(-500.0),
       uvRanges: new THREE.Uniform(uvsArray),
       glyphTexture: this.getGlyphUniform(),
       xOffsets: new THREE.Uniform(xOffsetsArray),
@@ -145,6 +146,11 @@ AddedText.prototype.setAlpha = function(alpha){
 AddedText.prototype.setBackground = function(backgroundColorString, backgroundAlpha){
   this.material.uniforms.backgroundColor.value.set(backgroundColorString);
   this.material.uniforms.backgroundAlpha.value = backgroundAlpha;
+  this.material.uniforms.hasBackgroundColorFlag.value = 500;
+}
+
+AddedText.prototype.removeBackground = function(){
+  this.material.uniforms.hasBackgroundColorFlag.value = -500;
 }
 
 AddedText.prototype.setCharSize = function(value){
