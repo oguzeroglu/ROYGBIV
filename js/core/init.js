@@ -1324,6 +1324,10 @@ function rescale(canvas, scale){
 
 function handleViewport(){
   var curViewport = renderer.getCurrentViewport();
+  if (screenResolution != 1){
+    curViewport.z = curViewport.z / screenResolution;
+    curViewport.w = curViewport.w / screenResolution;
+  }
   if (mode == 1 && fixedAspect > 0){
     var result = getMaxWidthHeightGivenAspect(canvas.width / screenResolution, canvas.height / screenResolution, fixedAspect);
     var newViewportX = ((canvas.width / screenResolution) - result.width) / 2;
@@ -1358,6 +1362,10 @@ function handleViewport(){
       newViewportW = viewportMaxHeight;
     }
   }
+  console.log(newViewportX);
+  console.log(newViewportY);
+  console.log(newViewportZ);
+  console.log(newViewportW);
   renderer.setViewport(newViewportX, newViewportY, newViewportZ, newViewportW);
   currentViewport.startX = newViewportX;
   currentViewport.startY = newViewportY;
