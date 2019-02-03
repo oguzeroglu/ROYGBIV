@@ -489,9 +489,16 @@ window.onload = function() {
     omGUIFocused = false;
     lightsGUIFocused = false;
     if (windowLoaded){
-      var rect = boundingClientRect;
-      var coordX = ((event.clientX - rect.left) / rect.width) * 2 - 1;
-      var coordY = - ((event.clientY - rect.top) / rect.height) * 2 + 1;
+      var rect = renderer.getCurrentViewport();
+      var rectX = rect.x, rectY = rect.y, rectZ = rect.z, rectW = rect.w;
+      if (screenResolution != 1){
+        rectX = rectX / screenResolution;
+        rectY = rectY / screenResolution;
+        rectZ = rectZ / screenResolution;
+        rectW = rectW / screenResolution;
+      }
+      var coordX = ((event.clientX - rectX) / rectZ) * 2 - 1;
+      var coordY = - ((event.clientY - rectY) / rectW) * 2 + 1;
       if (mode == 1 && screenClickCallbackFunction){
         screenClickCallbackFunction(coordX, coordY);
       }
@@ -512,6 +519,9 @@ window.onload = function() {
         fullScreenRequested = false;
       }
       if (mode == 1 && isPaused){
+        return;
+      }
+      if (event.clientX < rectX || event.clientX > rectX + rectZ || event.clientY < rectY || event.clientY > rectY + rectW){
         return;
       }
       REUSABLE_VECTOR.setFromMatrixPosition(camera.matrixWorld);
