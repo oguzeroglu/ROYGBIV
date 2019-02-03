@@ -971,7 +971,7 @@ StateLoader.prototype.load = function(undo){
         markedPointsVisible = true;
         markedPoint.renderToScreen();
       }else{
-        markedPoint.isHidden = true;
+        markedPoint.hide();
       }
       markedPoint.showAgainOnTheNextModeSwitch = curMarkedPointExport.showAgainOnTheNextModeSwitch;
       if (mode == 0){
@@ -1086,7 +1086,7 @@ StateLoader.prototype.load = function(undo){
       }
     }
 
-    if (!this.hasTextures && !this.hasTexturePacks && !this.hasSkyboxes && this.hasFonts){
+    if (!this.hasTextures && !this.hasTexturePacks && !this.hasSkyboxes && !this.hasFonts){
       this.createObjectGroupsAfterLoadedAssets();
     }
 
@@ -1227,15 +1227,6 @@ StateLoader.prototype.createObjectGroupsAfterLoadedAssets = function(){
     }
   }
 
-  if (fogBlendWithSkybox){
-    GLOBAL_FOG_UNIFORM.value.set(
-      -fogDensity,
-      skyboxMesh.material.uniforms.color.value.r,
-      skyboxMesh.material.uniforms.color.value.g,
-      skyboxMesh.material.uniforms.color.value.b
-    );
-  }
-
   projectLoaded = true;
   rayCaster.refresh();
   canvas.style.visibility = "";
@@ -1247,6 +1238,10 @@ StateLoader.prototype.createObjectGroupsAfterLoadedAssets = function(){
     terminal.disable();
     terminalDiv.style.display = "none";
     modeSwitcher.switchMode();
+    if (screenResolution != 1){
+      canvas.style.oldPosition = canvas.style.position;
+      canvas.style.position = "absolute";
+    }
   }
 }
 
@@ -2396,6 +2391,7 @@ StateLoader.prototype.resetProject = function(undo){
   fogDensity = 0;
   fogColorRGB = new THREE.Color(fogColor);
   fogBlendWithSkybox = false;
+  GLOBAL_FOG_UNIFORM.value.set(-100.0, 0, 0, 0);
 
   if (!undo){
     mode = 0; // 0 -> DESIGN, 1-> PREVIEW

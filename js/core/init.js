@@ -56,13 +56,12 @@ window.onload = function() {
                          'webkitPointerLockElement' in document;
 
   // DEFAULT FONT
-  if (!isDeployment){
-    document.fonts.forEach(function(font){
-      if (font.family == "hack"){
-        defaultFont = new Font(null, null, null, null, font);
-      }
-    });
-  }
+  document.fonts.forEach(function(font){
+    if (font.family == "hack"){
+      defaultFont = new Font(null, null, null, null, font);
+    }
+  });
+
 
   // COMMAND DESCRIPTOR
   if (!isDeployment){
@@ -691,6 +690,7 @@ window.onload = function() {
   GLOBAL_PROJECTION_UNIFORM.value = camera.projectionMatrix;
   GLOBAL_VIEW_UNIFORM.value = camera.matrixWorldInverse;
   renderer = new THREE.WebGLRenderer({canvas: canvas});
+  renderer.setPixelRatio(window.devicePixelRatio);
   renderer.setSize(window.innerWidth, window.innerHeight);
   boundingClientRect = renderer.domElement.getBoundingClientRect();
   initPhysics();
@@ -719,48 +719,7 @@ if (typeof InstallTrigger !== 'undefined') {
   // M O Z I L L A
   window.addEventListener('wheel', mouseWheelEvent, false);
 }
-window.addEventListener('resize', function() {
-  if (renderer && composer){
-    renderer.setSize(window.innerWidth, window.innerHeight);
-    composer.setSize(window.innerWidth, window.innerHeight);
-    camera.oldAspect = camera.aspect;
-    camera.aspect = window.innerWidth / window.innerHeight;
-    camera.updateProjectionMatrix();
-    boundingClientRect = renderer.domElement.getBoundingClientRect();
-    if (isDeployment){
-      canvas.oldWidth = canvas.style.width;
-      if (terminal.isMadeVisible){
-        ROYGBIV.terminal(false);
-        ROYGBIV.terminal(true);
-        if (!terminal.terminalPromptEnabled){
-          ROYGBIV.terminalPrompt(false);
-        }
-      }
-    }
-    if (mode == 1){
-      handleViewport();
-    }
-    if (mode == 0){
-      for (var areaName in areas){
-        if (areas[areaName].text){
-          areas[areaName].text.handleResize();
-        }
-      }
-      for (var pointName in markedPoints){
-        if (markedPoints[pointName].text){
-          markedPoints[pointName].text.handleResize();
-        }
-      }
-      for (var gridName in gridSelections){
-        if (gridSelections[gridName].texts){
-          for (var i = 0; i<gridSelections[gridName].texts.length; i++){
-            gridSelections[gridName].texts[i].handleResize();
-          }
-        }
-      }
-    }
-  }
-});
+window.addEventListener('resize', resizeFunction);
 window.addEventListener('keydown', function(event){
   inactiveCounter = 0;
 
@@ -1240,6 +1199,49 @@ function afterObjectSelection(){
   afterLightSelection();
 }
 
+function resizeFunction(){
+  if (renderer && composer){
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    composer.setSize(window.innerWidth, window.innerHeight);
+    camera.oldAspect = camera.aspect;
+    camera.aspect = window.innerWidth / window.innerHeight;
+    camera.updateProjectionMatrix();
+    boundingClientRect = renderer.domElement.getBoundingClientRect();
+    if (isDeployment){
+      canvas.oldWidth = (canvas.width / screenResolution) + 'px';
+      if (terminal.isMadeVisible){
+        ROYGBIV.terminal(false);
+        ROYGBIV.terminal(true);
+        if (!terminal.terminalPromptEnabled){
+          ROYGBIV.terminalPrompt(false);
+        }
+      }
+    }
+    if (mode == 1){
+      handleViewport();
+    }
+    if (mode == 0){
+      for (var areaName in areas){
+        if (areas[areaName].text){
+          areas[areaName].text.handleResize();
+        }
+      }
+      for (var pointName in markedPoints){
+        if (markedPoints[pointName].text){
+          markedPoints[pointName].text.handleResize();
+        }
+      }
+      for (var gridName in gridSelections){
+        if (gridSelections[gridName].texts){
+          for (var i = 0; i<gridSelections[gridName].texts.length; i++){
+            gridSelections[gridName].texts[i].handleResize();
+          }
+        }
+      }
+    }
+  }
+}
+
 function processKeyboardBuffer(){
   if (keyboardBuffer["Left"]){
     camera.rotation.y += rotationYDelta;
@@ -1323,9 +1325,9 @@ function rescale(canvas, scale){
 function handleViewport(){
   var curViewport = renderer.getCurrentViewport();
   if (mode == 1 && fixedAspect > 0){
-    var result = getMaxWidthHeightGivenAspect(canvas.width, canvas.height, fixedAspect);
-    var newViewportX = (canvas.width - result.width) / 2;
-    var newViewportY = (canvas.height - result.height) / 2;
+    var result = getMaxWidthHeightGivenAspect(canvas.width / screenResolution, canvas.height / screenResolution, fixedAspect);
+    var newViewportX = ((canvas.width / screenResolution) - result.width) / 2;
+    var newViewportY = ((canvas.height / screenResolution) - result.height) / 2;
     var newViewportZ = result.width;
     var newViewportW = result.height;
     renderer.setViewport(newViewportX, newViewportY, newViewportZ, newViewportW);
@@ -1340,8 +1342,8 @@ function handleViewport(){
   }
   var newViewportX = 0;
   var newViewportY = 0;
-  var newViewportZ = canvas.width;
-  var newViewportW = canvas.height;
+  var newViewportZ = canvas.width / screenResolution;
+  var newViewportW = canvas.height / screenResolution;
   if (viewportMaxWidth > 0){
     if (curViewport.z > viewportMaxWidth){
       var diff = curViewport.z - viewportMaxWidth;
@@ -1525,8 +1527,8 @@ function startDeployment(){
     var stateLoader = new StateLoader(data);
     var result = stateLoader.load();
     if (result){
-      if (stateLoader.hasTextures || stateLoader.hasTexturePacks || stateLoader.hasSkyboxes){
-        terminal.printInfo("Loading textures.");
+      if (stateLoader.hasTextures || stateLoader.hasTexturePacks || stateLoader.hasSkyboxes || stateLoader.hasFonts){
+        terminal.printInfo("Loading assets.");
       }else{
         terminal.disable();
         terminalDiv.style.display = "none";

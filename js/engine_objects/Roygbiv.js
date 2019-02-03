@@ -7738,10 +7738,13 @@ Roygbiv.prototype.terminal = function(isVisible){
     }
     if (isDeployment){
       var diff = canvas.clientWidth - terminalDiv.clientWidth;
-      canvas.oldWidth = canvas.style.width;
+      canvas.oldWidth = (canvas.width / screenResolution) + 'px';
       canvas.style.width = diff + "px";
     }
     terminal.isMadeVisible = true;
+    if (isDeployment && screenResolution != 1){
+      canvas.style.left = terminalDiv.offsetWidth + "px";
+    }
   }else{
     terminal.disable();
     terminalDiv.style.display = "none";
@@ -7752,6 +7755,9 @@ Roygbiv.prototype.terminal = function(isVisible){
       canvas.style.width = canvas.oldWidth;
     }
     terminal.isMadeVisible = false;
+    if (isDeployment && screenResolution != 1){
+      canvas.style.left = "0px";
+    }
   }
 }
 

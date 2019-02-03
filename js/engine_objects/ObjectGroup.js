@@ -1418,6 +1418,9 @@ ObjectGroup.prototype.updateBoundingBoxes = function(){
 }
 
 ObjectGroup.prototype.generateBoundingBoxes = function(){
+  if (!this.mesh){
+    return;
+  }
   this.boundingBoxes = [];
   this.mesh.updateMatrixWorld();
   this.graphicsGroup.position.copy(this.mesh.position);
