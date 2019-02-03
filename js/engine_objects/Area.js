@@ -4,9 +4,6 @@ var Area = function(name, boundingBox, color, gridSize){
   this.color = color;
   this.center = new THREE.Vector3();
   this.boundingBox.getCenter(this.center);
-  this.object3D = new THREE.Object3D();
-  this.object3D.position.copy(this.center);
-  this.vector2D = this.get2DVector();
   this.gridSize = gridSize;
 }
 
@@ -31,11 +28,6 @@ Area.prototype.destroy = function(){
     }
     this.helper.geometry.dispose();
     this.helper.material.dispose();
-  }
-  if (this.div){
-    if (areasVisible){
-      document.getElementsByTagName("body")[0].removeChild(this.div);
-    }
   }
   areaBinHandler.deleteObjectFromBin(this.binInfo, this.name);
   for (var objName in addedObjects){
@@ -69,64 +61,16 @@ Area.prototype.renderToScreen = function(){
     var color = new THREE.Color(this.color);
     this.helper = new THREE.Box3Helper(this.boundingBox, color);
   }
+  if(!this.text){
+    this.text = new AddedText(defaultFont, this.name, this.center, color, 1, 10);
+    this.text.setMarginBetweenChars(3);
+  }else{
+    scene.add(this.text.mesh);
+  }
   scene.add(this.helper);
-  this.renderDivToScreen();
-}
-
-Area.prototype.renderDivToScreen = function(){
-  if (!this.div){
-    this.div = document.createElement("div");
-    this.div.className = "markedPoint noselect";
-    this.div.style.left = this.vector2D.x + "px";
-    this.div.style.top = this.vector2D.y + "px";
-    this.div.style.visibility = "visible";
-    document.getElementsByTagName("body")[0].appendChild(this.div);
-    this.innerDiv = document.createElement("div");
-    this.markerSpan = document.createElement("span");
-    this.markerSpan.style.color = "#20C20E";
-    this.markerIcon = document.createElement("i");
-    this.markerIcon.className="fa fa-map-marker";
-    this.markerSpan.innerHTML = " "+this.name+" ";
-    this.markerSpan.appendChild(this.markerIcon);
-    this.innerDiv.appendChild(this.markerSpan);
-    this.div.appendChild(this.innerDiv);
-  }else{
-    document.getElementsByTagName("body")[0].appendChild(this.div);
-  }
-}
-
-Area.prototype.get2DVector = function(){
-  var vector = REUSABLE_VECTOR;
-  var widthHalf = 0.5 * renderer.context.canvas.width / renderer.getPixelRatio();
-  var heightHalf = 0.5 * renderer.context.canvas.height / renderer.getPixelRatio();
-  this.object3D.updateMatrixWorld();
-  vector.setFromMatrixPosition(this.object3D.matrixWorld);
-  vector.project(camera);
-  vector.x = ( vector.x * widthHalf ) + widthHalf;
-  vector.y = - ( vector.y * heightHalf ) + heightHalf;
-  var object2D = new Object();
-  object2D.x = vector.x;
-  object2D.y = vector.y;
-  return object2D;
-}
-
-Area.prototype.update = function(){
-  if (this.isObjectInFrustum()){
-    this.div.style.visibility = "visible";
-    this.vector2D = this.get2DVector();
-    this.div.style.left = this.vector2D.x + 'px';
-    this.div.style.top = this.vector2D.y + 'px';
-  }else{
-    this.div.style.visibility = "hidden";
-  }
 }
 
 Area.prototype.hide = function(){
-  document.getElementsByTagName("body")[0].removeChild(this.div);
   scene.remove(this.helper);
-}
-
-Area.prototype.isObjectInFrustum = function(){
-  frustum.setFromMatrix(REUSABLE_MATRIX_4.multiplyMatrices(camera.projectionMatrix, camera.matrixWorldInverse));
-  return frustum.containsPoint(this.object3D.position);
+  scene.remove(this.text.mesh);
 }

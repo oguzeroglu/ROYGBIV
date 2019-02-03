@@ -55,6 +55,15 @@ window.onload = function() {
                          'mozPointerLockElement' in document ||
                          'webkitPointerLockElement' in document;
 
+  // DEFAULT FONT
+  if (!isDeployment){
+    document.fonts.forEach(function(font){
+      if (font.family == "hack"){
+        defaultFont = new Font(null, null, null, null, font);
+      }
+    });
+  }
+
   // COMMAND DESCRIPTOR
   if (!isDeployment){
     commandDescriptor = new CommandDescriptor();
@@ -748,6 +757,12 @@ window.addEventListener('keydown', function(event){
     keyboardBuffer[keyCodeToChar[event.keyCode]] = true;
   }
 
+  if (mode == 0 && keyboardBuffer["."]){
+    for (var gridName in gridSelections){
+      gridSelections[gridName].renderCornerHelpers();
+    }
+  }
+
   if (mode == 1 && !isDeployment && keyboardBuffer["E"] && keyboardBuffer["T"] && (terminalDiv.style.display == "none" || terminal.isDisabled)){
     terminal.enable();
     terminalDiv.style.display = "";
@@ -814,6 +829,11 @@ window.addEventListener('keyup', function(event){
   }
   if (keyCodeToChar[event.keyCode]){
     keyboardBuffer[keyCodeToChar[event.keyCode]] = false;
+    if (mode == 0 && keyCodeToChar[event.keyCode] == "."){
+      for (var gridName in gridSelections){
+        gridSelections[gridName].removeCornerHelpers();
+      }
+    }
   }
   if (mode == 1 && isPaused){
     return;

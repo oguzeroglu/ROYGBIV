@@ -148,6 +148,13 @@ var GridSystem = function(name, sizeX, sizeZ, centerX, centerY, centerZ,
 
   this.draw();
 
+  this.boundingBox = new THREE.Box3().setFromObject(this.boundingPlane);
+  if (!LIMIT_BOUNDING_BOX.containsBox(this.boundingBox)){
+    this.destroy();
+    terminal.printError(Text.GRID_SYSTEM_IS_OUT_OF);
+    return;
+  }
+
   gridSystems[name] = this;
 
   gridCounter = gridCounter + totalGridCount;
@@ -220,11 +227,13 @@ GridSystem.prototype.draw = function(){
   var boundingPlane = new THREE.Mesh(
     boundingPlaneGeometry, boundingPlaneMaterial
   );
+  boundingPlane.renderOrder = 10;
 
   geometry.center();
   var gridSystemRepresentation = new THREE.LineSegments(
     geometry, material
   );
+  gridSystemRepresentation.renderOrder = 10;
 
   gridSystemRepresentation.position.set(
     this.centerX,

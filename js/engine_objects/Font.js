@@ -1,9 +1,14 @@
-var Font = function(name, path, onLoaded, onError){
+var Font = function(name, path, onLoaded, onError, customFontFace){
   this.name = name;
   this.path = path;
   this.onLoaded = onLoaded;
   this.onError = onError;
-  this.fontFace = new FontFace(name, "url("+path+")");
+  if (!customFontFace){
+    this.fontFace = new FontFace(name, "url("+path+")");
+  }else{
+    this.fontFace = customFontFace
+    this.generateFontTexture();
+  }
 }
 
 Font.prototype.load = function(){

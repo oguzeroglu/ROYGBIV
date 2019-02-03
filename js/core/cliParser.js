@@ -213,6 +213,10 @@ function parse(input){
             terminal.printError(Text.NO_SUCH_GRID_SYSTEM);
             return true;
           }
+          if (Object.keys(gs.grids).length > 100){
+            terminal.printError(Text.TOO_MANY_GRIDS);
+            return true;
+          }
           var ctr = 0;
           for (var gridNum in gs.grids){
             var grid = gs.grids[gridNum];
@@ -3020,11 +3024,20 @@ function parse(input){
           var centerX = selectedGrid.centerX + offsetX;
           var centerY = selectedGrid.centerY + offsetY;
           var centerZ = selectedGrid.centerZ + offsetZ;
+          var txt = "@@1 (@@2, @@3, @@4)".replace("@@1", name).replace("@@2", centerX).replace("@@3", centerY).replace("@@4", centerZ);
+          var diff = txt.length - name.length;
+          if (txt.length > MAX_TEXT_CHAR_COUNT){
+            terminal.printError(Text.NAME_CANNOT_EXCEED_X_CHARS.replace(Text.PARAM1, MAX_TEXT_CHAR_COUNT - diff));
+            return true;
+          }
+          var lenDif = txt.length - name.length;
           var markedPoint = new MarkedPoint(
             name, centerX, centerY, centerZ
           );
-          markedPoint.renderToScreen();
           markedPoints[name] = markedPoint;
+          if (!markedPointsVisible){
+            markedPoint.hide();
+          }
           selectedGrid.toggleSelect(false, false, false, true);
           if (!jobHandlerWorking){
             terminal.printInfo(Text.POINT_MARKED);
@@ -4054,6 +4067,10 @@ function parse(input){
           }
           if (areaName.toLowerCase() == "default"){
             terminal.printError(Text.NAME_RESERVED);
+            return true;
+          }
+          if (areaName.length > MAX_TEXT_CHAR_COUNT){
+            terminal.printError(Text.NAME_CANNOT_EXCEED_X_CHARS.replace(Text.PARAM1, MAX_TEXT_CHAR_COUNT));
             return true;
           }
           if (isNaN(height)){

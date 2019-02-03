@@ -35,13 +35,6 @@ function render(){
     updateCrosshair();
   }else{
     cameraOperationsDone = false;
-    if (areasVisible){
-      updateAreaLabels();
-    }
-    if (markedPointsVisible){
-      updateMarkedPointLabels();
-    }
-    updateGridCornerHelpers();
   }
   composer.render(0.1);
   if (mode == 1){
@@ -85,50 +78,6 @@ function updateObjectTrails(){
 function runScripts(){
   for (var scriptName in scriptsToRun){
     scripts[scriptName].execute();
-  }
-}
-
-function updateAreaLabels(){
-  for (var areaName in areas){
-    if (!cameraOperationsDone){
-      camera.updateMatrix();
-      camera.updateMatrixWorld();
-      camera.matrixWorldInverse.getInverse(camera.matrixWorld);
-      cameraOperationsDone = true;
-    }
-    var area = areas[areaName];
-    area.update();
-  }
-}
-
-function updateMarkedPointLabels(){
-  for (var markedPointName in markedPoints){
-    if (!cameraOperationsDone){
-      camera.updateMatrix();
-      camera.updateMatrixWorld();
-      camera.matrixWorldInverse.getInverse(camera.matrixWorld);
-      cameraOperationsDone = true;
-    }
-    var markedPoint = markedPoints[markedPointName];
-    if (!markedPoint.isHidden){
-      markedPoint.update();
-    }
-  }
-}
-
-function updateGridCornerHelpers(){
-  if (!keyboardBuffer["."]){
-    return;
-  }
-  for (var gridName in gridSelections){
-    if (!cameraOperationsDone){
-      camera.updateMatrix();
-      camera.updateMatrixWorld();
-      camera.matrixWorldInverse.getInverse(camera.matrixWorld);
-      cameraOperationsDone = true;
-    }
-    var grid = gridSelections[gridName];
-    grid.updateCornerHelpers();
   }
 }
 

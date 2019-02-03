@@ -59,6 +59,12 @@ var AddedText = function(font, text, position, color, alpha, characterSize){
   this.material.uniforms.modelViewMatrix.value = this.mesh.modelViewMatrix;
 }
 
+AddedText.prototype.destroy = function(){
+  scene.remove(this.mesh);
+  this.material.dispose();
+  this.geometry.dispose();
+}
+
 AddedText.prototype.constructText = function(){
   var xOffset = 0;
   var yOffset = 0;

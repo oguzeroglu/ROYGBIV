@@ -122,6 +122,7 @@ MeshGenerator.prototype.generateInstancedMesh = function(graphicsGroup, objectGr
     }
   });
   var mesh = new THREE.Mesh(this.geometry, material);
+  mesh.renderOrder = 10;
   mesh.position.copy(graphicsGroup.position);
   material.uniforms.modelViewMatrix.value = mesh.modelViewMatrix;
   material.uniforms.worldMatrix.value = mesh.matrixWorld;
@@ -190,6 +191,7 @@ MeshGenerator.prototype.generateMergedMesh = function(graphicsGroup, objectGroup
     }
   });
   var mesh = new THREE.Mesh(this.geometry, material);
+  mesh.renderOrder = 10;
   mesh.position.copy(graphicsGroup.position);
   material.uniforms.modelViewMatrix.value = mesh.modelViewMatrix;
   material.uniforms.worldMatrix.value = mesh.matrixWorld;
@@ -240,6 +242,7 @@ MeshGenerator.prototype.generateBasicMesh = function(){
     }
   });
   var mesh = new THREE.Mesh(this.geometry, material);
+  mesh.renderOrder = 10;
   material.uniforms.modelViewMatrix.value = mesh.modelViewMatrix;
   material.uniforms.worldMatrix.value = mesh.matrixWorld;
   return mesh;

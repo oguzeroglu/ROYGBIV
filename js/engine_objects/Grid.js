@@ -75,6 +75,7 @@ Grid.prototype.makeMesh = function(size, startX, startY, startZ){
     geometryCache[geomKey] = this.geometry;
   }
   this.mesh = new THREE.Mesh(this.geometry, this.material);
+  this.mesh.renderOrder = 10;
   this.mesh.gridSystemName = this.parentName;
   if (this.axis == "XZ"){
 
@@ -108,6 +109,7 @@ Grid.prototype.makeMesh = function(size, startX, startY, startZ){
   this.centerDotGeometry.vertices.push(new THREE.Vector3(this.centerX, this.centerY, this.centerZ));
   this.centerDotMaterial = new THREE.PointsMaterial( { color: this.dotColor, size: 4, sizeAttenuation: false } );
   this.dot = new THREE.Points( this.centerDotGeometry, this.centerDotMaterial);
+  this.dot.renderOrder = 10;
   this.dot.gridSystemName = this.parentName;
 
   this.vertices = [];
@@ -163,9 +165,6 @@ Grid.prototype.toggleSelect = function(sliced, printInfo, fromStateLoader, allAt
     scene.remove(this.mesh);
     scene.remove(this.dot);
     delete gridSelections[this.name];
-    for (var i = 0; i<this.divs.length; i++){
-      this.divs[i].style.visibility = "hidden";
-    }
   }else{
     if (!this.mesh){
       this.makeMesh(this.size, this.startX, this.startY, this.startZ);
@@ -173,9 +172,6 @@ Grid.prototype.toggleSelect = function(sliced, printInfo, fromStateLoader, allAt
     scene.add(this.mesh);
     scene.add(this.dot);
     gridSelections[this.name] = this;
-    if (!this.divs){
-      this.showCornerPoints();
-    }
   }
   this.selected = ! this.selected;
   if (sliced){
@@ -193,79 +189,38 @@ Grid.prototype.toggleSelect = function(sliced, printInfo, fromStateLoader, allAt
   }
 }
 
-Grid.prototype.showCornerPoints = function(){
-  for (var i = 0; i < this.vertices.length; i++){
+Grid.prototype.renderCornerHelpers = function(){
+  if (this.texts){
+    return;
+  }
+  this.texts = [];
+  for (var i = 0; i<this.vertices.length; i++){
     var vertex = this.vertices[i];
-    var vector3D = new THREE.Vector3(vertex.x, vertex.y, vertex.z);
-    var object3D = new THREE.Object3D();
-    object3D.position.copy(vector3D);
-    var coords2D = this.get2DVector(object3D);
-    this.renderCornerHelper(coords2D, vector3D);
-    this.object3D = object3D;
-  }
-}
-
-Grid.prototype.get2DVector = function(object3D){
-  var vector = REUSABLE_VECTOR;
-  var widthHalf = 0.5 * renderer.context.canvas.width / renderer.getPixelRatio();
-  var heightHalf = 0.5 * renderer.context.canvas.height / renderer.getPixelRatio();
-  object3D.updateMatrixWorld();
-  vector.setFromMatrixPosition(object3D.matrixWorld);
-  vector.project(camera);
-  vector.x = ( vector.x * widthHalf ) + widthHalf;
-  vector.y = - ( vector.y * heightHalf ) + heightHalf;
-  var object2D = new Object();
-  object2D.x = vector.x;
-  object2D.y = vector.y;
-  return object2D;
-}
-
-Grid.prototype.renderCornerHelper = function(vector2D, vector3D){
-  var div = document.createElement("div");
-  div.className = "cornerHelper noselect";
-  div.style.left = vector2D.x + "px";
-  div.style.top = vector2D.y + "px";
-  div.style.visibility = "hidden";
-  document.getElementsByTagName("body")[0].appendChild(div);
-  var innerDiv = document.createElement("div");
-  var markerSpan = document.createElement("span");
-  markerSpan.style.color = "#ffa500";
-  markerSpan.style.opacity = 0.8;
-  if (this.axis == "XZ"){
-    markerSpan.innerHTML = "("+vector3D.x+","+this.centerY+","+vector3D.z+")";
-  }else if (this.axis == "XY"){
-    markerSpan.innerHTML = "("+vector3D.x+","+vector3D.y+","+this.centerZ+")";
-  }else if (this.axis == "YZ"){
-    markerSpan.innerHTML = "("+this.centerX+","+vector3D.y+","+vector3D.z+")";
-  }
-  innerDiv.appendChild(markerSpan);
-  div.appendChild(innerDiv);
-  if (!this.divs){
-    this.divs = [];
-    this.vector3Ds = [];
-  }
-  this.divs.push(div);
-  this.vector3Ds.push(vector3D);
-}
-
-Grid.prototype.updateCornerHelpers = function(){
-  for (var i = 0; i<this.divs.length; i++){
-    var div = this.divs[i];
-    var vector3D = this.vector3Ds[i];
-    var object3D = this.object3D;
-    if (!object3D){
-      object3D = new THREE.Object3D();
+    var x = vertex.x, y = vertex.y, z = vertex.z;
+    if (this.axis == "XZ"){
+      y = 0;
+    }else if (this.axis == "YZ"){
+      x = 0;
+    }else if (this.axis == "XY"){
+      z = 0;
     }
-    object3D.position.copy(vector3D);
-    if (this.isObjectInFrustum(object3D)){
-      var vector2D = this.get2DVector(object3D);
-      div.style.left = vector2D.x + 'px';
-      div.style.top = vector2D.y + 'px';
-      div.style.visibility = "visible";
-    }else{
-      div.style.visibility = "hidden";
-    }
+    var text = "(@@1, @@2, @@3)".replace("@@1", x).replace("@@2", y).replace("@@3", z);
+    var addedText = new AddedText(
+      defaultFont, text, new THREE.Vector3().copy(vertex), ORANGE_COLOR, 1, 10
+    );
+    addedText.setMarginBetweenChars(3);
+    this.texts.push(addedText);
   }
+}
+
+Grid.prototype.removeCornerHelpers = function(){
+  if (!this.texts){
+    return;
+  }
+  for (var i = 0; i<this.texts.length; i++){
+    this.texts[i].destroy();
+  }
+  this.texts = 0;
 }
 
 Grid.prototype.isObjectInFrustum = function(object3D){

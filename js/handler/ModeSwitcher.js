@@ -90,18 +90,11 @@ ModeSwitcher.prototype.switchFromDesignToPreview = function(){
     scene.remove(gridSystems[gsName].boundingPlane);
   }
   for (var gridName in gridSelections){
+    gridSelections[gridName].removeCornerHelpers();
     scene.remove(gridSelections[gridName].mesh);
     scene.remove(gridSelections[gridName].dot);
   }
   scriptsToRun = new Object();
-  for (var gridName in gridSelections){
-    var grid = gridSelections[gridName];
-    if (grid.divs){
-      for (var i = 0; i<grid.divs.length; i++){
-        grid.divs[i].style.visibility = "hidden";
-      }
-    }
-  }
   for (var markedPointName in markedPoints){
     markedPoints[markedPointName].hide(true);
   }

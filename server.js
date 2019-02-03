@@ -48,8 +48,6 @@ app.post("/build", function(req, res){
 });
 
 function copyAssets(application){
-  var faCssContent = fs.readFileSync("css/font-awesome-4.7.0/css/font-awesome.min.css", "utf8");
-  fs.writeFileSync("deploy/"+application.projectName+"/css/font-awesome.min.css", faCssContent);
   var jqueryTerminalCssContent = fs.readFileSync("css/jquery.terminal-1.11.3.min.css", "utf8");
   fs.writeFileSync("deploy/"+application.projectName+"/css/jquery.terminal-1.11.3.min.css", jqueryTerminalCssContent);
   copyFileSync("css/Hack-Bold.ttf", "deploy/"+application.projectName+"/css/");
