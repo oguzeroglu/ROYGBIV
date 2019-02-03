@@ -1334,9 +1334,13 @@ function rescale(canvas, scale){
 
 function handleViewport(){
   var curViewport = renderer.getCurrentViewport();
+  var cvx = curViewport.x;
+  var cvy = curViewport.y;
+  var cvz = curViewport.z;
+  var cvw = curViewport.w;
   if (screenResolution != 1){
-    curViewport.z = curViewport.z / screenResolution;
-    curViewport.w = curViewport.w / screenResolution;
+    cvz = cvz / screenResolution;
+    cvw = cvw / screenResolution;
   }
   if (mode == 1 && fixedAspect > 0){
     var result = getMaxWidthHeightGivenAspect(canvas.width / screenResolution, canvas.height / screenResolution, fixedAspect);
@@ -1359,15 +1363,15 @@ function handleViewport(){
   var newViewportZ = canvas.width / screenResolution;
   var newViewportW = canvas.height / screenResolution;
   if (viewportMaxWidth > 0){
-    if (curViewport.z > viewportMaxWidth){
-      var diff = curViewport.z - viewportMaxWidth;
+    if (cvz > viewportMaxWidth){
+      var diff = cvz - viewportMaxWidth;
       newViewportX = diff/2;
       newViewportZ = viewportMaxWidth;
     }
   }
   if (viewportMaxHeight > 0){
-    if (curViewport.w > viewportMaxHeight){
-      var diff = curViewport.w - viewportMaxHeight;
+    if (cvw > viewportMaxHeight){
+      var diff = cvw - viewportMaxHeight;
       newViewportY = diff/2;
       newViewportW = viewportMaxHeight;
     }
