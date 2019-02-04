@@ -158,6 +158,5 @@ AddedText.prototype.setCharSize = function(value){
 }
 
 AddedText.prototype.handleResize = function(){
-  this.setMarginBetweenChars(this.refOffsetBetweenChars * window.innerWidth / this.refInnerWidth);
-  this.setCharSize(this.refCharSize * window.innerHeight / this.refInnerHeight);
+  this.setCharSize(this.refCharSize * (window.innerHeight/this.refInnerHeight));
 }
