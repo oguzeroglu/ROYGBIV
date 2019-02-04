@@ -62,6 +62,7 @@ StateLoader.prototype.load = function(undo){
         gs.grids[gridNumber].slicedGridSystemName = slicedGridSystemNamesExport[i];
       }
       gs.isSuperposed = isSuperposed;
+      gs.markedPointNames = exportObject.markedPointNames;
     }
     for (var gridSystemName in gridSystems){
       var grids = gridSystems[gridSystemName].grids;
@@ -965,11 +966,14 @@ StateLoader.prototype.load = function(undo){
         markedPointName,
         curMarkedPointExport["x"],
         curMarkedPointExport["y"],
-        curMarkedPointExport["z"]
+        curMarkedPointExport["z"],
+        curMarkedPointExport["fromX"],
+        curMarkedPointExport["fromY"],
+        curMarkedPointExport["fromZ"],
+        curMarkedPointExport["gridDestroyed"]
       );
       if (!curMarkedPointExport.isHidden && mode == 0){
         markedPointsVisible = true;
-        markedPoint.renderToScreen();
       }else{
         markedPoint.hide();
       }

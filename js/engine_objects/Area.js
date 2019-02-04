@@ -57,6 +57,9 @@ Area.prototype.destroy = function(){
 }
 
 Area.prototype.renderToScreen = function(){
+  if (isDeployment){
+    return;
+  }
   if (!this.helper){
     var color = new THREE.Color(this.color);
     this.helper = new THREE.Box3Helper(this.boundingBox, color);
@@ -74,6 +77,10 @@ Area.prototype.renderToScreen = function(){
 }
 
 Area.prototype.hide = function(){
-  scene.remove(this.helper);
-  scene.remove(this.text.mesh);
+  if (this.helper){
+    scene.remove(this.helper);
+  }
+  if (this.text){
+    scene.remove(this.text.mesh);
+  }
 }

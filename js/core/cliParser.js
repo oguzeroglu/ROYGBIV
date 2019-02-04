@@ -3032,9 +3032,17 @@ function parse(input){
           }
           var lenDif = txt.length - name.length;
           var markedPoint = new MarkedPoint(
-            name, centerX, centerY, centerZ
+            name, centerX, centerY, centerZ,
+            selectedGrid.centerX, selectedGrid.centerY, selectedGrid.centerZ, false
           );
           markedPoints[name] = markedPoint;
+          var gs = gridSystems[selectedGrid.parentName];
+          if (gs){
+            if (!gs.markedPointNames){
+              gs.markedPointNames = [];
+            }
+            gs.markedPointNames.push(name);
+          }
           if (!markedPointsVisible){
             markedPoint.hide();
           }

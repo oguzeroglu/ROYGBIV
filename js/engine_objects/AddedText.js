@@ -44,7 +44,7 @@ var AddedText = function(font, text, position, color, alpha, characterSize){
       charSize: new THREE.Uniform(characterSize),
       color: new THREE.Uniform(color),
       alpha: new THREE.Uniform(alpha),
-      backgroundColor: new THREE.Uniform(WHITE_COLOR),
+      backgroundColor: new THREE.Uniform(new THREE.Color("white")),
       backgroundAlpha: new THREE.Uniform(0.0),
       hasBackgroundColorFlag: new THREE.Uniform(-500.0),
       uvRanges: new THREE.Uniform(uvsArray),

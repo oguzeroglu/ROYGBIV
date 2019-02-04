@@ -411,6 +411,12 @@ GridSystem.prototype.export = function(){
   exportObject.selectedGridsExport = selectedGridsExport;
   exportObject.slicedGridsExport = slicedGridsExport;
   exportObject.slicedGridSystemNamesExport = slicedGridSystemNamesExport;
+  if (this.markedPointNames){
+    exportObject.markedPointNames = [];
+    for (var i = 0; i<this.markedPointNames.length; i++){
+      exportObject.markedPointNames.push(this.markedPointNames[i]);
+    }
+  }
   return exportObject;
 }
 
@@ -484,6 +490,17 @@ GridSystem.prototype.destroy = function(){
   }
   delete gridSystems[this.name];
   gridCounter = gridCounter - this.totalGridCount;
+
+  if (this.markedPointNames){
+    for (var i = 0; i<this.markedPointNames.length; i++){
+      var markedPoint = markedPoints[this.markedPointNames[i]];
+      if (markedPoint){
+        markedPoint.gridDestroyed = true;
+        scene.remove(markedPoint.line);
+        delete markedPoint.line;
+      }
+    }
+  }
 
   rayCaster.refresh();
 
