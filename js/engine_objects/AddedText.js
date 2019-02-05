@@ -53,6 +53,8 @@ var AddedText = function(font, text, position, color, alpha, characterSize){
       yOffsets: new THREE.Uniform(yOffsetsArray)
     }
   });
+  this.topLeft = new THREE.Vector3(position.x, position.y, position.z);
+  this.bottomRight = new THREE.Vector3();
   this.constructText();
   this.handleUVUniform();
   this.mesh = new THREE.Points(this.geometry, this.material);
@@ -60,6 +62,8 @@ var AddedText = function(font, text, position, color, alpha, characterSize){
   this.mesh.frustumCulled = false;
   scene.add(this.mesh);
   this.material.uniforms.modelViewMatrix.value = this.mesh.modelViewMatrix;
+
+  this.tmpObj = {};
 }
 
 AddedText.prototype.destroy = function(){
@@ -73,9 +77,17 @@ AddedText.prototype.constructText = function(){
   var yOffset = 0;
   var xOffsets = this.material.uniforms.xOffsets.value;
   var yOffsets = this.material.uniforms.yOffsets.value;
+  var xMax = 0;
+  var yMin = 0;
   for (var i = 0; i<this.strlen; i++){
     xOffsets[i] = xOffset;
     yOffsets[i] = yOffset;
+    if (xOffset > xMax){
+      xMax = xOffset;
+    }
+    if (yOffset < yMin){
+      yMin = yOffset;
+    }
     if (this.text.charAt(i) == "\n"){
       yOffset -= this.offsetBetweenLines;
       xOffset = 0;
@@ -83,6 +95,9 @@ AddedText.prototype.constructText = function(){
       xOffset += this.offsetBetweenChars;
     }
   }
+  this.bottomRight.x = this.position.x + xMax;
+  this.bottomRight.y = this.position.y + yMin;
+  this.bottomRight.z = this.position.z - 1;
 }
 
 AddedText.prototype.getGlyphUniform = function(){
@@ -159,4 +174,34 @@ AddedText.prototype.setCharSize = function(value){
 
 AddedText.prototype.handleResize = function(){
   this.setCharSize(this.refCharSize * (window.innerHeight/this.refInnerHeight));
+}
+
+AddedText.prototype.calculateCharSize = function(){
+  var currentViewport = renderer.getCurrentViewport();
+  REUSABLE_VECTOR.copy(this.mesh.position);
+  REUSABLE_VECTOR.applyQuaternion(this.mesh.quaternion);
+  REUSABLE_VECTOR.applyMatrix4(this.mesh.modelViewMatrix);
+  var pointSizePixels =  500 * this.characterSize / REUSABLE_VECTOR.length();
+  var verticalFOV = THREE.Math.degToRad(camera.fov);
+  var height = 2 * Math.tan(verticalFOV / 2) * this.position.distanceTo(camera.position);
+  var width = height * camera.aspect;
+  var w = width * pointSizePixels /currentViewport.z;
+  var h = height * pointSizePixels / currentViewport.w;
+  this.tmpObj.width = w;
+  this.tmpObj.height = h;
+  return this.tmpObj;
+}
+
+AddedText.prototype.handleBoundingBox = function(){
+  if (!this.boundingBox){
+    this.boundingBox = new THREE.Box3();
+    var cSize = this.calculateCharSize();
+    this.topLeft.x -= cSize.width / 2;
+    this.topLeft.y += cSize.height / 2;
+    this.bottomRight.x += cSize.width / 2;
+    this.bottomRight.y -= cSize.height / 2;
+    this.boundingBox.expandByPoint(this.topLeft);
+    this.boundingBox.expandByPoint(this.bottomRight);
+  }
+  scene.add(new THREE.Box3Helper(this.boundingBox));
 }
