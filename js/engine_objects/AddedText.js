@@ -64,6 +64,8 @@ var AddedText = function(font, text, position, color, alpha, characterSize){
   this.material.uniforms.modelViewMatrix.value = this.mesh.modelViewMatrix;
 
   this.tmpObj = {};
+  this.line = new THREE.Line3();
+  this.matrix4 = new THREE.Matrix4();
 }
 
 AddedText.prototype.destroy = function(){
@@ -195,13 +197,19 @@ AddedText.prototype.calculateCharSize = function(){
 AddedText.prototype.handleBoundingBox = function(){
   if (!this.boundingBox){
     this.boundingBox = new THREE.Box3();
-    var cSize = this.calculateCharSize();
-    this.topLeft.x -= cSize.width / 2;
-    this.topLeft.y += cSize.height / 2;
-    this.bottomRight.x += cSize.width / 2;
-    this.bottomRight.y -= cSize.height / 2;
-    this.boundingBox.expandByPoint(this.topLeft);
-    this.boundingBox.expandByPoint(this.bottomRight);
+  }else{
+    this.boundingBox.makeEmpty();
   }
-  scene.add(new THREE.Box3Helper(this.boundingBox));
+  var cSize = this.calculateCharSize();
+  REUSABLE_VECTOR.copy(this.topLeft)
+  REUSABLE_VECTOR_2.copy(this.bottomRight);
+  REUSABLE_VECTOR.x -= cSize.width / 2;
+  REUSABLE_VECTOR.y += cSize.height / 2;
+  REUSABLE_VECTOR_2.x += cSize.width / 2;
+  REUSABLE_VECTOR_2.y -= cSize.height / 2;
+  this.line.set(REUSABLE_VECTOR, REUSABLE_VECTOR_2);
+  this.matrix4.compose(REUSABLE_VECTOR_3.set(0, 0, 0), camera.quaternion, this.mesh.scale);
+  this.line.applyMatrix4(this.matrix4);
+  this.boundingBox.expandByPoint(this.line.start);
+  this.boundingBox.expandByPoint(this.line.end);
 }

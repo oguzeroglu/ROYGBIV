@@ -159,7 +159,8 @@ var commandArgumentsExpectedCount = [
     1, //keepAspect
     2, //newFont
     1, //destroyFont
-    0 //printFonts
+    0, //printFonts
+    6 //newText
 ];
 var commandArgumentsExpectedExplanation = [
   "help", //help
@@ -315,7 +316,8 @@ var commandArgumentsExpectedExplanation = [
   "keepAspect ratio", //keepAspect
   "newFont fontName path", //newFont
   "destroyFont fontName", //destroyFont
-  "printFonts" //printFonts
+  "printFonts", //printFonts
+  "newText textName fontName maxCharacterLength offsetX offsetY offsetZ" //newText
 ];
 var commands = [
   "help",
@@ -471,7 +473,8 @@ var commands = [
   "keepAspect",
   "newFont",
   "destroyFont",
-  "printFonts"
+  "printFonts",
+  "newText"
 ];
 var commandInfo = [
   "help: Prints command list.",
@@ -627,7 +630,8 @@ var commandInfo = [
   "keepAspect: Modifies the renderer aspect in the browser of the client in a way where width/height = ratio. If ratio<0 the aspect is not kept.",
   "newFont: Creates a new font.",
   "destroyFont: Destroys a font.",
-  "printFonts: Prints all created fonts."
+  "printFonts: Prints all created fonts.",
+  "newText: Allocates a new text object."
 ];
 var keyboardInfo = [
   "W/S : Translates the camera on axis Z.",
@@ -772,6 +776,7 @@ var gridSystems = new Object();
 var gridSelections = new Object();
 var materials = new Object();
 var addedObjects = new Object();
+var addedTexts = new Object();
 var textures = new Object();
 var textureURLs = new Object();
 var wallCollections = new Object();

@@ -15,6 +15,10 @@ RayCaster.prototype.refresh = function(){
       var gridSystem = gridSystems[gsName];
       this.binHandler.insert(gridSystem.boundingBox, gridSystem.name);
     }
+    for (var txtName in addedTexts){
+      var addedText = addedTexts[txtName];
+      this.binHandler.insert(addedText.boundingBox, txtName);
+    }
   }
 }
 
@@ -57,6 +61,8 @@ RayCaster.prototype.findIntersections = function(from, direction, intersectGridS
             intersectionPoint = 0;
           }
         }
+      }else if (result == 20){
+        
       }else{
         if (!(mode == 0 && keyboardBuffer["Shift"])){
           var parent = objectGroups[objName];

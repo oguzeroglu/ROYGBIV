@@ -4968,6 +4968,88 @@ function parse(input){
           }
           return true;
         break;
+        case 154: //newText
+          if (mode != 0){
+            terminal.printError(Text.WORKS_ONLY_IN_DESIGN_MODE);
+            return true;
+          }
+          var textName = splitted[1];
+          var fontName = splitted[2];
+          var maxCharacterLength = parseInt(splitted[3]);
+          var offsetX = parseFloat(splitted[4]);
+          var offsetY = parseFloat(splitted[5]);
+          var offsetZ = parseFloat(splitted[6]);
+          if (addedTexts[textName]){
+            terminal.printError(Text.NAME_MUST_BE_UNIQUE);
+            return true;
+          }
+          if (addedObjects[textName] || objectGroups[textName] || gridSystems[textName]){
+            terminal.printError(Text.NAME_MUST_BE_UNIQUE);
+            return true;
+          }
+          for (var objName in objectGroups){
+            for (var childName in objectGroups[objName].group){
+              if (childName == textName){
+                terminal.printError(Text.NAME_MUST_BE_UNIQUE);
+              }
+            }
+          }
+          var selectedFont = fonts[fontName];
+          if (!selectedFont){
+            terminal.printError(Text.NO_SUCH_FONT);
+            return true;
+          }
+          if (isNaN(maxCharacterLength)){
+            terminal.printError(Text.IS_NOT_A_NUMBER.replace(Text.PARAM1, "maxCharacterLength"));
+            return true;
+          }
+          if (maxCharacterLength <= 0 || maxCharacterLength > MAX_TEXT_CHAR_COUNT){
+            terminal.printError(Text.MAX_CHAR_SIZE_MUST_BE_BETWEEN.replace(Text.PARAM1, MAX_TEXT_CHAR_COUNT));
+            return true;
+          }
+          if (isNaN(offsetX)){
+            terminal.printError(Text.IS_NOT_A_NUMBER.replace(Text.PARAM1, "offsetX"));
+            return true;
+          }
+          if (isNaN(offsetY)){
+            terminal.printError(Text.IS_NOT_A_NUMBER.replace(Text.PARAM1, "offsetY"));
+            return true;
+          }
+          if (isNaN(offsetZ)){
+            terminal.printError(Text.IS_NOT_A_NUMBER.replace(Text.PARAM1, "offsetZ"));
+            return true;
+          }
+          var txt = "";
+          for (var i = 0; i<maxCharacterLength; i++){
+            txt += "x";
+          }
+          var selectionSize = Object.keys(gridSelections).length;
+          if (selectionSize != 1 && selectionSize != 2){
+            terminal.printError(Text.MUST_HAVE_1_OR_2_GRIDS_SELECTED);
+            return true;
+          }
+          var textCoord = new THREE.Vector3(0, 0, 0);
+          for (var gridName in gridSelections){
+            var sgrid = gridSelections[gridName];
+            textCoord.x += sgrid.centerX;
+            textCoord.y += sgrid.centerY;
+            textCoord.z += sgrid.centerZ;
+          }
+          textCoord.x += offsetX;
+          textCoord.y += offsetY;
+          textCoord.z += offsetZ;
+          textCoord.x = textCoord.x / selectionSize;
+          textCoord.y = textCoord.y / selectionSize;
+          textCoord.z = textCoord.z / selectionSize;
+          var addedText = new AddedText(selectedFont, txt, textCoord, new THREE.Color("white"), 1, 20);
+          addedTexts[textName] = addedText;
+          addedText.refCharSize = 20;
+          addedText.refInnerHeight = window.innerHeight;
+          addedText.handleBoundingBox();
+          rayCaster.refresh();
+          terminal.printInfo(Text.TEXT_ALLOCATED);
+          return true;
+        break;
       }
       return true;
     }catch(err){

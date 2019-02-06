@@ -2334,6 +2334,7 @@ StateLoader.prototype.resetProject = function(undo){
   gridSelections = new Object();
   materials = new Object();
   addedObjects = new Object();
+  addedTexts = new Object();
   textures = new Object();
   textureURLs = new Object();
   physicsTests = new Object();

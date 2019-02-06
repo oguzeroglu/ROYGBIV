@@ -34,6 +34,7 @@ function render(){
     updateObjectTrails();
     updateCrosshair();
   }else{
+    updateAddedTexts();
     cameraOperationsDone = false;
   }
   composer.render(0.1);
@@ -43,6 +44,12 @@ function render(){
   frameCounter ++;
 }
 
+
+function updateAddedTexts(){
+  for (var addedTextName in addedTexts){
+    addedTexts[addedTextName].handleBoundingBox();
+  }
+}
 
 function updateCrosshair(){
   if (selectedCrosshair && (selectedCrosshair.angularSpeed != 0 || selectedCrosshair.expand || selectedCrosshair.shrink)){

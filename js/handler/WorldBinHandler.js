@@ -236,6 +236,8 @@ WorldBinHandler.prototype.query = function(point){
                 }
               }else if (gridSystems[objName]){
                 results[objName] = 10;
+              }else if (addedTexts[objName]){
+                results[objName] = 20;
               }
             }
           }

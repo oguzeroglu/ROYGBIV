@@ -693,6 +693,16 @@ var CommandDescriptor = function(){
   this.destroyFont.types = [];
   this.destroyFont.types.push(this.FONT_NAME); // fontName
 
+  // newText
+  this.newText = new Object();
+  this.newText.types = [];
+  this.newText.types.push(this.UNKNOWN_INDICATOR); // textName
+  this.newText.types.push(this.FONT_NAME); // fontName
+  this.newText.types.push(this.UNKNOWN_INDICATOR); // maxCharacterLength
+  this.newText.types.push(this.UNKNOWN_INDICATOR); // offsetX
+  this.newText.types.push(this.UNKNOWN_INDICATOR); // offsetY
+  this.newText.types.push(this.UNKNOWN_INDICATOR); // offsetZ
+
 };
 
 CommandDescriptor.prototype.test = function(){
