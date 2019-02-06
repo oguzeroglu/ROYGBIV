@@ -76,8 +76,11 @@ var Text = function(){
   this.CAMERA_POSITION = "Camera position: (@@1, @@2, @@3)";
   this.CAMERA_DIRECTION = "Camera direction: (@@1, @@2, @@3)";
   this.NO_GRIDSYSTEMS = "There are no GridSystems.";
+  this.NO_FONTS = "There are no created fonts.";
   this.GRIDSYSTEMS = "Grid systems";
   this.NO_SUCH_GRID_SYSTEM = "No such grid system.";
+  this.GRID_SYSTEM_IS_OUT_OF = "Grid system is out of world limits. Use setWorldLimits command to increase the limit.";
+  this.NO_SUCH_FONT = "No such font.";
   this.TREE_NAME = "|____Name: @@1";
   this.TREE_SIZEX = "|____SizeX: @@1";
   this.TREE_SIZEZ = "|____SizeZ: @@1";
@@ -90,6 +93,7 @@ var Text = function(){
   this.TREE_CELL_COUNT = "|____Cell Count: @@1";
   this.TREE_AXIS = "|____Axis: @@1";
   this.GRID_SYSTEM_DESTROYED = "Grid system destroyed.";
+  this.FONT_DESTROYED = "Font destroyed.";
   this.CONTROLS = "Control Info";
   this.SELECTED_GRIDS = "Selected grids";
   this.NONE_OF_THE_GRIDS_ARE_SELECTED = "None of the grids are selected.";
@@ -127,6 +131,7 @@ var Text = function(){
   this.MATERIAL_DESTROYED = "Material destroyed.";
   this.MUST_HAVE_1_OR_2_GRIDS_SELECTED = "Must have 1 or 2 grids selected.";
   this.NAME_MUST_BE_UNIQUE = "Name must be unique.";
+  this.FONT_NAME_MUST_BE_UNIQUE = "Font name must be unique.";
   this.NAME_USED_AS_A_REFERENCE = "Name used as a copy reference name in an object. Cannot use this name.";
   this.NAME_USED_IN_AN_OBJECT_GROUP = "Name used in an object group.";
   this.OBJECT_ADDED = "Object added.";
@@ -135,6 +140,7 @@ var Text = function(){
   this.OBJECT_GROUP_INFO_TREE = "|____[glued]: @@1 (@@2) (@@3, @@4, @@5)";
   this.NO_OBJECT_ADDED_TO_THE_SCENE = "No objects added to scene.";
   this.OBJECTS = "Objects";
+  this.FONTS = "Fonts";
   this.NO_SUCH_OBJECT = "No such object.";
   this.NO_SUCH_OBJECT_GROUP = "No such object group.";
   this.NO_SUCH_CHILD_OBJECT_IN_THE_GROUP = "No such child object in the group.";
@@ -158,6 +164,7 @@ var Text = function(){
   this.STATUS_ERROR = "(ERROR)";
   this.STATUS_LOADED = "(LOADED)";
   this.TEXTURES = "Textures";
+  this.NAME_CANNOT_EXCEED_X_CHARS = "Name cannot exceed @@1 characters.";
   this.CREATED_X_SURFACES = "Command executed for @@1 surfaces.";
   this.CREATED_X_BOXES = "Command executed for @@1 boxes.";
   this.CREATED_X_COPIES = "Command executed for @@1 copies.";
@@ -226,6 +233,7 @@ var Text = function(){
   this.AXIS_MUST_BE_ONE_OF_S_T = "Axis must be one of s, t or st.";
   this.OBJECT_IS_ALREADY_SLIPPERY = "Object is already slippery.";
   this.SLIPPERINESS_ADJUSTED = "Slipperiness adjusted.";
+  this.TEXT_ALLOCATED = "Text allocated.";
   this.OBJECT_IS_ALREADY_NOT_SLIPPERY = "Slipperiness is already off for the object.";
   this.SLIPPERINESS_STATE_MUST_BE_ON_OR_OFF = "Slipperiness state must be on or off."
   this.MIRROR_STATE_MUST_BE_ON_OR_OFF = "Mirror state must be on or off.";
@@ -248,6 +256,7 @@ var Text = function(){
   this.NO_FILE_SELECTED_OPERATION_CANCELLED = "No file selected, operation canceled.";
   this.IMAGES = "Images";
   this.OBJECTS_HAVE_TOO_MANY_FACES = "Objects have too many faces. Cannot glue.";
+  this.TOO_MANY_GRIDS = "Too many grids.";
   this.NO_UPLOADED_IMAGES = "No uploaded images.";
   this.SPECULAR_TEXTURE_MAPPED = "Specular texture mapped.";
   this.ENVIRONMENT_TEXTURE_MAPPED = "Environment texture mapped";
@@ -332,9 +341,12 @@ var Text = function(){
   this.LOADING_FILE = "Loading file.";
   this.BUILDING_PROJECT = "Building project.";
   this.PROJECT_LOADED = "Project loaded.";
+  this.FONT_CREATED = "Font created.";
+  this.ERROR_CREATING_FONT = "An error happened creating font. Make sure @@1 exists.";
   this.LOADING_SHADERS = "Loading shaders.";
   this.LOADING_PROJECT = "Loading project.";
   this.LOADING_SCRIPTS = "Loading scripts.";
+  this.LOADING_FONT = "Loading font.";
   this.CONFIGURING_AREA = "Configuring area.";
   this.CONFIGURING_AREAS = "Configuring areas.";
   this.AREA_CONFIGURED = "Area configured. Please check the area for manual corrections.";
@@ -506,6 +518,7 @@ var Text = function(){
   this.IMAGE_DESTROYED = "Image destroyed.";
   this.IMAGE_USED_IN_TEXTURE = "Image used in texture [@@1]. Cannot delete.";
   this.RESOLUTION_MUST_BE_BETWEEN = "Resolution must be between ]0,1]";
+  this.MAX_CHAR_SIZE_MUST_BE_BETWEEN = "maxCharacterSize must be between [1,@@1].";
   this.BLENDING_MODE_SET_TO = "Blending mode set to @@1.";
   this.KEYBOARD_BUFFER_RESET = "Keyboard buffer reset.";
   this.BLENDING_MODE_MUST_BE_ONE_OF = "Blending mode should be one of NO_BLENDING, NORMAL_BLENDING, ADDITIVE_BLENDING, SUBTRACTIVE_BLENDING and MULTIPLY_BLENDING.";
@@ -1588,6 +1601,14 @@ Terminal.prototype.autocomplete = function(command){
 					}
 				}
 				helpString = "[Children]: ";
+			break;
+			case commandDescriptor.FONT_NAME:
+				for (var fontName in fonts){
+					if (fontName.startsWith(curEntry)){
+						possibilities.push(fontName);
+					}
+				}
+				helpString = "[Fonts]: ";
 			break;
 		}
 
@@ -2790,8 +2811,10 @@ var ShaderContent = function(){
     this.instancedBasicMaterialFragmentShader = 0;
     this.skyboxVertexShader = 0;
     this.skyboxFragmentShader = 0;
+    this.textVertexShader = 0;
+    this.textFragmentShader = 0;
 
-    this.totalLoadCount = 14;
+    this.totalLoadCount = 16;
     this.currentLoadCount = 0;
 
     this.allShadersReadyCallback = function(){
@@ -2825,6 +2848,8 @@ ShaderContent.prototype.load = function(){
   var instancedBasicMaterialFragmentShaderRequest = new XMLHttpRequest();
   var skyboxVertexShaderRequest = new XMLHttpRequest();
   var skyboxFragmentShaderRequest = new XMLHttpRequest();
+  var textVertexShaderRequest = new XMLHttpRequest();
+  var textFragmentShaderRequest = new XMLHttpRequest();
 
   particleVertexShaderRequest.open('GET', "./shader/particle/vertexShader.shader");
   particleFragmentShaderRequest.open('GET', "./shader/particle/fragmentShader.shader");
@@ -2840,6 +2865,9 @@ ShaderContent.prototype.load = function(){
   instancedBasicMaterialFragmentShaderRequest.open('GET', "./shader/materials/instanced_basic_material/fragmentShader.shader");
   skyboxVertexShaderRequest.open('GET', "./shader/skybox/vertexShader.shader");
   skyboxFragmentShaderRequest.open('GET', "./shader/skybox/fragmentShader.shader");
+  textVertexShaderRequest.open('GET', "./shader/text/vertexShader.shader");
+  textFragmentShaderRequest.open('GET', "./shader/text/fragmentShader.shader");
+
   var that = this;
   particleVertexShaderRequest.addEventListener("load", function(){
     that.particleVertexShader = particleVertexShaderRequest.responseText;
@@ -2939,6 +2967,20 @@ ShaderContent.prototype.load = function(){
       that.allShadersReadyCallback();
     }
   });
+  textVertexShaderRequest.addEventListener("load", function(){
+    that.textVertexShader = textVertexShaderRequest.responseText;
+    that.currentLoadCount ++;
+    if (that.currentLoadCount == that.totalLoadCount){
+      that.allShadersReadyCallback();
+    }
+  });
+  textFragmentShaderRequest.addEventListener("load", function(){
+    that.textFragmentShader = textFragmentShaderRequest.responseText;
+    that.currentLoadCount ++;
+    if (that.currentLoadCount == that.totalLoadCount){
+      that.allShadersReadyCallback();
+    }
+  });
 
   particleVertexShaderRequest.send();
   particleFragmentShaderRequest.send();
@@ -2954,6 +2996,8 @@ ShaderContent.prototype.load = function(){
   instancedBasicMaterialFragmentShaderRequest.send();
   skyboxVertexShaderRequest.send();
   skyboxFragmentShaderRequest.send();
+  textVertexShaderRequest.send();
+  textFragmentShaderRequest.send();
 
 }
 
@@ -3147,7 +3191,11 @@ var commandArgumentsExpectedCount = [
     1, //fogConfigurations
     1, //noMobile
     2, //setMaxViewport
-    1 //keepAspect
+    1, //keepAspect
+    2, //newFont
+    1, //destroyFont
+    0, //printFonts
+    6 //newText
 ];
 var commandArgumentsExpectedExplanation = [
   "help", //help
@@ -3300,7 +3348,11 @@ var commandArgumentsExpectedExplanation = [
   "fogConfigurations show/hide", //fogConfigurations
   "noMobile on/off", //noMobile
   "setMaxViewport widthInPx heightInPx", //setMaxViewport
-  "keepAspect ratio" //keepAspect
+  "keepAspect ratio", //keepAspect
+  "newFont fontName path", //newFont
+  "destroyFont fontName", //destroyFont
+  "printFonts", //printFonts
+  "newText textName fontName maxCharacterLength offsetX offsetY offsetZ" //newText
 ];
 var commands = [
   "help",
@@ -3453,7 +3505,11 @@ var commands = [
   "fogConfigurations",
   "noMobile",
   "setMaxViewport",
-  "keepAspect"
+  "keepAspect",
+  "newFont",
+  "destroyFont",
+  "printFonts",
+  "newText"
 ];
 var commandInfo = [
   "help: Prints command list.",
@@ -3606,7 +3662,11 @@ var commandInfo = [
   "fogConfigurations: Shows/hides the fog configuration GUI.",
   "noMobile: Prevents the application from loading and alerts a warning message in deployment mode for mobile devices if used with on parameter.",
   "setMaxViewport: Sets the maximum viewport of the renderer. Use 0 or a negative number for unlimited width/height.",
-  "keepAspect: Modifies the renderer aspect in the browser of the client in a way where width/height = ratio. If ratio<0 the aspect is not kept."
+  "keepAspect: Modifies the renderer aspect in the browser of the client in a way where width/height = ratio. If ratio<0 the aspect is not kept.",
+  "newFont: Creates a new font.",
+  "destroyFont: Destroys a font.",
+  "printFonts: Prints all created fonts.",
+  "newText: Allocates a new text object."
 ];
 var keyboardInfo = [
   "W/S : Translates the camera on axis Z.",
@@ -3751,6 +3811,7 @@ var gridSystems = new Object();
 var gridSelections = new Object();
 var materials = new Object();
 var addedObjects = new Object();
+var addedTexts = new Object();
 var textures = new Object();
 var textureURLs = new Object();
 var wallCollections = new Object();
@@ -3919,6 +3980,7 @@ var GLOBAL_VIEW_UNIFORM = new THREE.Uniform(new THREE.Matrix4());
 var GLOBAL_PS_MERGED_UNIFORM = new THREE.Uniform(20.0);
 var GLOBAL_PS_NOT_MERGED_UNIFORM = new THREE.Uniform(-20.0);
 var GLOBAL_CAMERA_POSITION_UNIFORM = new THREE.Uniform(new THREE.Vector3());
+var GLOBAL_CAMERA_QUATERNION_UNIFORM = new THREE.Uniform(new THREE.Quaternion());
 var GLOBAL_CUBE_TEXTURE_UNIFORM = new THREE.Uniform(new THREE.CubeTexture());
 var GLOBAL_SKYBOX_ALPHA_UNIFORM = new THREE.Uniform(1.0);
 var VERTEX_SHADER_TEXTURE_FETCH_SUPPORTED;
@@ -3968,11 +4030,18 @@ var isDeployment = true;
 var loadedScriptsCounter = 0;
 var isMobile = /Mobi|Android/i.test(navigator.userAgent);
 var WHITE_COLOR = new THREE.Color("white");
+var LIME_COLOR = new THREE.Color("lime");
+var ORANGE_COLOR = new THREE.Color("orange");
 var NO_MOBILE = true;
 var performanceDropMinFPS = 0;
 var performanceDropSeconds = 0;
 var performanceDropCounter = 0;
 var isPaused = false;
+var defaultFont;
+var fonts = new Object();
+var MAX_TEXT_CHAR_COUNT = 64;
+var DEFAULT_OFFSET_BETWEEN_CHARS = 20;
+var DEFAULT_OFFSET_BETWEEN_LINES = 20;
 
 // WORKER VARIABLES
 var WORKERS_SUPPORTED = (typeof(Worker) !== "undefined");
@@ -4092,6 +4161,20 @@ keyCodeToChar = {
   219:"[",220:"\\",221:"]",222:"'"
 };
 
+// SUPPORTED FONT ATLAS CHARACTERS
+var supportedFontAtlasChars = [
+  "!", "\"", "#", "$", "%", "&", "\'", "(", ")", "*", "+", ",", "-", ".", "/",
+  "0", "1", "2", "3", "4", "5", "6", "7", "8", "9", ":", ";", "<", "=", ">", "?",
+  "@", "A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O",
+  "P", "R", "S", "T", "U", "V", "W", "X", "Y", "Z", "[", "\\", "]", "^", "_", "`",
+  "a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o", "p",
+  "r", "s", "t", "u", "v", "w", "x", "y", "z", "{", "|", "}", "~"
+];
+var supportedFontCharMap = new Object();
+for (var i = 0; i<supportedFontAtlasChars.length; i++){
+  supportedFontCharMap[supportedFontAtlasChars[i]] = true;
+}
+
 /*
   CONSTRUCTOR PARAMETERS
     name -> name of this grid.
@@ -4169,6 +4252,7 @@ Grid.prototype.makeMesh = function(size, startX, startY, startZ){
     geometryCache[geomKey] = this.geometry;
   }
   this.mesh = new THREE.Mesh(this.geometry, this.material);
+  this.mesh.renderOrder = 10;
   this.mesh.gridSystemName = this.parentName;
   if (this.axis == "XZ"){
 
@@ -4202,6 +4286,7 @@ Grid.prototype.makeMesh = function(size, startX, startY, startZ){
   this.centerDotGeometry.vertices.push(new THREE.Vector3(this.centerX, this.centerY, this.centerZ));
   this.centerDotMaterial = new THREE.PointsMaterial( { color: this.dotColor, size: 4, sizeAttenuation: false } );
   this.dot = new THREE.Points( this.centerDotGeometry, this.centerDotMaterial);
+  this.dot.renderOrder = 10;
   this.dot.gridSystemName = this.parentName;
 
   this.vertices = [];
@@ -4257,9 +4342,6 @@ Grid.prototype.toggleSelect = function(sliced, printInfo, fromStateLoader, allAt
     scene.remove(this.mesh);
     scene.remove(this.dot);
     delete gridSelections[this.name];
-    for (var i = 0; i<this.divs.length; i++){
-      this.divs[i].style.visibility = "hidden";
-    }
   }else{
     if (!this.mesh){
       this.makeMesh(this.size, this.startX, this.startY, this.startZ);
@@ -4267,9 +4349,6 @@ Grid.prototype.toggleSelect = function(sliced, printInfo, fromStateLoader, allAt
     scene.add(this.mesh);
     scene.add(this.dot);
     gridSelections[this.name] = this;
-    if (!this.divs){
-      this.showCornerPoints();
-    }
   }
   this.selected = ! this.selected;
   if (sliced){
@@ -4287,79 +4366,41 @@ Grid.prototype.toggleSelect = function(sliced, printInfo, fromStateLoader, allAt
   }
 }
 
-Grid.prototype.showCornerPoints = function(){
-  for (var i = 0; i < this.vertices.length; i++){
+Grid.prototype.renderCornerHelpers = function(){
+  if (this.texts){
+    return;
+  }
+  this.texts = [];
+  for (var i = 0; i<this.vertices.length; i++){
     var vertex = this.vertices[i];
-    var vector3D = new THREE.Vector3(vertex.x, vertex.y, vertex.z);
-    var object3D = new THREE.Object3D();
-    object3D.position.copy(vector3D);
-    var coords2D = this.get2DVector(object3D);
-    this.renderCornerHelper(coords2D, vector3D);
-    this.object3D = object3D;
-  }
-}
-
-Grid.prototype.get2DVector = function(object3D){
-  var vector = REUSABLE_VECTOR;
-  var widthHalf = 0.5 * renderer.context.canvas.width / renderer.getPixelRatio();
-  var heightHalf = 0.5 * renderer.context.canvas.height / renderer.getPixelRatio();
-  object3D.updateMatrixWorld();
-  vector.setFromMatrixPosition(object3D.matrixWorld);
-  vector.project(camera);
-  vector.x = ( vector.x * widthHalf ) + widthHalf;
-  vector.y = - ( vector.y * heightHalf ) + heightHalf;
-  var object2D = new Object();
-  object2D.x = vector.x;
-  object2D.y = vector.y;
-  return object2D;
-}
-
-Grid.prototype.renderCornerHelper = function(vector2D, vector3D){
-  var div = document.createElement("div");
-  div.className = "cornerHelper noselect";
-  div.style.left = vector2D.x + "px";
-  div.style.top = vector2D.y + "px";
-  div.style.visibility = "hidden";
-  document.getElementsByTagName("body")[0].appendChild(div);
-  var innerDiv = document.createElement("div");
-  var markerSpan = document.createElement("span");
-  markerSpan.style.color = "#ffa500";
-  markerSpan.style.opacity = 0.8;
-  if (this.axis == "XZ"){
-    markerSpan.innerHTML = "("+vector3D.x+","+this.centerY+","+vector3D.z+")";
-  }else if (this.axis == "XY"){
-    markerSpan.innerHTML = "("+vector3D.x+","+vector3D.y+","+this.centerZ+")";
-  }else if (this.axis == "YZ"){
-    markerSpan.innerHTML = "("+this.centerX+","+vector3D.y+","+vector3D.z+")";
-  }
-  innerDiv.appendChild(markerSpan);
-  div.appendChild(innerDiv);
-  if (!this.divs){
-    this.divs = [];
-    this.vector3Ds = [];
-  }
-  this.divs.push(div);
-  this.vector3Ds.push(vector3D);
-}
-
-Grid.prototype.updateCornerHelpers = function(){
-  for (var i = 0; i<this.divs.length; i++){
-    var div = this.divs[i];
-    var vector3D = this.vector3Ds[i];
-    var object3D = this.object3D;
-    if (!object3D){
-      object3D = new THREE.Object3D();
+    var x = vertex.x, y = vertex.y, z = vertex.z;
+    if (this.axis == "XZ"){
+      y = 0;
+    }else if (this.axis == "YZ"){
+      x = 0;
+    }else if (this.axis == "XY"){
+      z = 0;
     }
-    object3D.position.copy(vector3D);
-    if (this.isObjectInFrustum(object3D)){
-      var vector2D = this.get2DVector(object3D);
-      div.style.left = vector2D.x + 'px';
-      div.style.top = vector2D.y + 'px';
-      div.style.visibility = "visible";
-    }else{
-      div.style.visibility = "hidden";
-    }
+    var text = "(@@1, @@2, @@3)".replace("@@1", x).replace("@@2", y).replace("@@3", z);
+    var addedText = new AddedText(
+      defaultFont, text, new THREE.Vector3().copy(vertex), ORANGE_COLOR, 1, 6
+    );
+    addedText.setMarginBetweenChars(2.5);
+    addedText.refInnerHeight = 569;
+    addedText.refCharSize = 6;
+    addedText.handleResize();
+    this.texts.push(addedText);
   }
+}
+
+Grid.prototype.removeCornerHelpers = function(){
+  if (!this.texts){
+    return;
+  }
+  for (var i = 0; i<this.texts.length; i++){
+    this.texts[i].destroy();
+  }
+  this.texts = 0;
 }
 
 Grid.prototype.isObjectInFrustum = function(object3D){
@@ -4517,6 +4558,13 @@ var GridSystem = function(name, sizeX, sizeZ, centerX, centerY, centerZ,
 
   this.draw();
 
+  this.boundingBox = new THREE.Box3().setFromObject(this.boundingPlane);
+  if (!LIMIT_BOUNDING_BOX.containsBox(this.boundingBox)){
+    this.destroy();
+    terminal.printError(Text.GRID_SYSTEM_IS_OUT_OF);
+    return;
+  }
+
   gridSystems[name] = this;
 
   gridCounter = gridCounter + totalGridCount;
@@ -4589,11 +4637,13 @@ GridSystem.prototype.draw = function(){
   var boundingPlane = new THREE.Mesh(
     boundingPlaneGeometry, boundingPlaneMaterial
   );
+  boundingPlane.renderOrder = 10;
 
   geometry.center();
   var gridSystemRepresentation = new THREE.LineSegments(
     geometry, material
   );
+  gridSystemRepresentation.renderOrder = 10;
 
   gridSystemRepresentation.position.set(
     this.centerX,
@@ -4771,6 +4821,12 @@ GridSystem.prototype.export = function(){
   exportObject.selectedGridsExport = selectedGridsExport;
   exportObject.slicedGridsExport = slicedGridsExport;
   exportObject.slicedGridSystemNamesExport = slicedGridSystemNamesExport;
+  if (this.markedPointNames){
+    exportObject.markedPointNames = [];
+    for (var i = 0; i<this.markedPointNames.length; i++){
+      exportObject.markedPointNames.push(this.markedPointNames[i]);
+    }
+  }
   return exportObject;
 }
 
@@ -4844,6 +4900,17 @@ GridSystem.prototype.destroy = function(){
   }
   delete gridSystems[this.name];
   gridCounter = gridCounter - this.totalGridCount;
+
+  if (this.markedPointNames){
+    for (var i = 0; i<this.markedPointNames.length; i++){
+      var markedPoint = markedPoints[this.markedPointNames[i]];
+      if (markedPoint){
+        markedPoint.gridDestroyed = true;
+        scene.remove(markedPoint.line);
+        delete markedPoint.line;
+      }
+    }
+  }
 
   rayCaster.refresh();
 
@@ -8745,6 +8812,7 @@ function render(){
   }
 
   GLOBAL_CAMERA_POSITION_UNIFORM.value.copy(camera.position);
+  GLOBAL_CAMERA_QUATERNION_UNIFORM.value.copy(camera.quaternion);
 
   if (!(mode == 1 && defaultCameraControlsDisabled)){
     processKeyboardBuffer();
@@ -8771,14 +8839,8 @@ function render(){
     updateObjectTrails();
     updateCrosshair();
   }else{
+    updateAddedTexts();
     cameraOperationsDone = false;
-    if (areasVisible){
-      updateAreaLabels();
-    }
-    if (markedPointsVisible){
-      updateMarkedPointLabels();
-    }
-    updateGridCornerHelpers();
   }
   composer.render(0.1);
   if (mode == 1){
@@ -8787,6 +8849,12 @@ function render(){
   frameCounter ++;
 }
 
+
+function updateAddedTexts(){
+  for (var addedTextName in addedTexts){
+    addedTexts[addedTextName].handleBoundingBox();
+  }
+}
 
 function updateCrosshair(){
   if (selectedCrosshair && (selectedCrosshair.angularSpeed != 0 || selectedCrosshair.expand || selectedCrosshair.shrink)){
@@ -8822,50 +8890,6 @@ function updateObjectTrails(){
 function runScripts(){
   for (var scriptName in scriptsToRun){
     scripts[scriptName].execute();
-  }
-}
-
-function updateAreaLabels(){
-  for (var areaName in areas){
-    if (!cameraOperationsDone){
-      camera.updateMatrix();
-      camera.updateMatrixWorld();
-      camera.matrixWorldInverse.getInverse(camera.matrixWorld);
-      cameraOperationsDone = true;
-    }
-    var area = areas[areaName];
-    area.update();
-  }
-}
-
-function updateMarkedPointLabels(){
-  for (var markedPointName in markedPoints){
-    if (!cameraOperationsDone){
-      camera.updateMatrix();
-      camera.updateMatrixWorld();
-      camera.matrixWorldInverse.getInverse(camera.matrixWorld);
-      cameraOperationsDone = true;
-    }
-    var markedPoint = markedPoints[markedPointName];
-    if (!markedPoint.isHidden){
-      markedPoint.update();
-    }
-  }
-}
-
-function updateGridCornerHelpers(){
-  if (!keyboardBuffer["."]){
-    return;
-  }
-  for (var gridName in gridSelections){
-    if (!cameraOperationsDone){
-      camera.updateMatrix();
-      camera.updateMatrixWorld();
-      camera.matrixWorldInverse.getInverse(camera.matrixWorld);
-      cameraOperationsDone = true;
-    }
-    var grid = gridSelections[gridName];
-    grid.updateCornerHelpers();
   }
 }
 
@@ -10789,9 +10813,19 @@ window.onload = function() {
                          'mozPointerLockElement' in document ||
                          'webkitPointerLockElement' in document;
 
+  // DEFAULT FONT
+  document.fonts.forEach(function(font){
+    if (font.family == "hack"){
+      defaultFont = new Font(null, null, null, null, font);
+    }
+  });
+
+
   // COMMAND DESCRIPTOR
-  commandDescriptor = new CommandDescriptor();
-  commandDescriptor.test();
+  if (!isDeployment){
+    commandDescriptor = new CommandDescriptor();
+    commandDescriptor.test();
+  }
 
   // COLOR NAMES
   ColorNames = new ColorNames();
@@ -11213,9 +11247,16 @@ window.onload = function() {
     omGUIFocused = false;
     lightsGUIFocused = false;
     if (windowLoaded){
-      var rect = boundingClientRect;
-      var coordX = ((event.clientX - rect.left) / rect.width) * 2 - 1;
-      var coordY = - ((event.clientY - rect.top) / rect.height) * 2 + 1;
+      var rect = renderer.getCurrentViewport();
+      var rectX = rect.x, rectY = rect.y, rectZ = rect.z, rectW = rect.w;
+      if (screenResolution != 1){
+        rectX = rectX / screenResolution;
+        rectY = rectY / screenResolution;
+        rectZ = rectZ / screenResolution;
+        rectW = rectW / screenResolution;
+      }
+      var coordX = ((event.clientX - rectX) / rectZ) * 2 - 1;
+      var coordY = - ((event.clientY - rectY) / rectW) * 2 + 1;
       if (mode == 1 && screenClickCallbackFunction){
         screenClickCallbackFunction(coordX, coordY);
       }
@@ -11236,6 +11277,9 @@ window.onload = function() {
         fullScreenRequested = false;
       }
       if (mode == 1 && isPaused){
+        return;
+      }
+      if (event.clientX < rectX || event.clientX > rectX + rectZ || event.clientY < rectY || event.clientY > rectY + rectW){
         return;
       }
       REUSABLE_VECTOR.setFromMatrixPosition(camera.matrixWorld);
@@ -11414,6 +11458,13 @@ window.onload = function() {
   GLOBAL_PROJECTION_UNIFORM.value = camera.projectionMatrix;
   GLOBAL_VIEW_UNIFORM.value = camera.matrixWorldInverse;
   renderer = new THREE.WebGLRenderer({canvas: canvas});
+  if (window.devicePixelRatio > 1){
+    screenResolution = 1;
+    renderer.setPixelRatio(1);
+  }else{
+    renderer.setPixelRatio(window.devicePixelRatio);
+    screenResolution = window.devicePixelRatio;
+  }
   renderer.setSize(window.innerWidth, window.innerHeight);
   boundingClientRect = renderer.domElement.getBoundingClientRect();
   initPhysics();
@@ -11442,29 +11493,7 @@ if (typeof InstallTrigger !== 'undefined') {
   // M O Z I L L A
   window.addEventListener('wheel', mouseWheelEvent, false);
 }
-window.addEventListener('resize', function() {
-  if (renderer && composer){
-    renderer.setSize(window.innerWidth, window.innerHeight);
-    composer.setSize(window.innerWidth, window.innerHeight);
-    camera.oldAspect = camera.aspect;
-    camera.aspect = window.innerWidth / window.innerHeight;
-    camera.updateProjectionMatrix();
-    boundingClientRect = renderer.domElement.getBoundingClientRect();
-    if (isDeployment){
-      canvas.oldWidth = canvas.style.width;
-      if (terminal.isMadeVisible){
-        ROYGBIV.terminal(false);
-        ROYGBIV.terminal(true);
-        if (!terminal.terminalPromptEnabled){
-          ROYGBIV.terminalPrompt(false);
-        }
-      }
-    }
-    if (mode == 1){
-      handleViewport();
-    }
-  }
-});
+window.addEventListener('resize', resizeFunction);
 window.addEventListener('keydown', function(event){
   inactiveCounter = 0;
 
@@ -11478,6 +11507,12 @@ window.addEventListener('keydown', function(event){
 
   if (keyCodeToChar[event.keyCode]){
     keyboardBuffer[keyCodeToChar[event.keyCode]] = true;
+  }
+
+  if (mode == 0 && keyboardBuffer["."]){
+    for (var gridName in gridSelections){
+      gridSelections[gridName].renderCornerHelpers();
+    }
   }
 
   if (mode == 1 && !isDeployment && keyboardBuffer["E"] && keyboardBuffer["T"] && (terminalDiv.style.display == "none" || terminal.isDisabled)){
@@ -11546,6 +11581,11 @@ window.addEventListener('keyup', function(event){
   }
   if (keyCodeToChar[event.keyCode]){
     keyboardBuffer[keyCodeToChar[event.keyCode]] = false;
+    if (mode == 0 && keyCodeToChar[event.keyCode] == "."){
+      for (var gridName in gridSelections){
+        gridSelections[gridName].removeCornerHelpers();
+      }
+    }
   }
   if (mode == 1 && isPaused){
     return;
@@ -11591,6 +11631,7 @@ window.addEventListener('keyup', function(event){
    copyPass = new THREE.ShaderPass( THREE.CopyShader );
    setPostProcessingParams();
    composer = new THREE.EffectComposer(renderer);
+   composer.setSize(renderer.getCurrentViewport().z / screenResolution, renderer.getCurrentViewport().w / screenResolution);
    composer.addPass( renderPass );
    if (mode == 1){
     if (bloomOn){
@@ -11669,6 +11710,7 @@ window.addEventListener('keyup', function(event){
      break;
    }
    composer = new THREE.EffectComposer(renderer);
+   composer.setSize(renderer.getCurrentViewport().z / screenResolution, renderer.getCurrentViewport().w / screenResolution);
    composer.addPass(renderPass);
    if (bloomOn){
      composer.addPass(bloomPass);
@@ -11933,6 +11975,49 @@ function afterObjectSelection(){
   afterLightSelection();
 }
 
+function resizeFunction(){
+  if (renderer && composer){
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    composer.setSize(window.innerWidth, window.innerHeight);
+    camera.oldAspect = camera.aspect;
+    camera.aspect = window.innerWidth / window.innerHeight;
+    camera.updateProjectionMatrix();
+    boundingClientRect = renderer.domElement.getBoundingClientRect();
+    if (isDeployment){
+      canvas.oldWidth = (canvas.width / screenResolution) + 'px';
+      if (terminal.isMadeVisible){
+        ROYGBIV.terminal(false);
+        ROYGBIV.terminal(true);
+        if (!terminal.terminalPromptEnabled){
+          ROYGBIV.terminalPrompt(false);
+        }
+      }
+    }
+    if (mode == 1){
+      handleViewport();
+    }
+    if (mode == 0){
+      for (var areaName in areas){
+        if (areas[areaName].text){
+          areas[areaName].text.handleResize();
+        }
+      }
+      for (var pointName in markedPoints){
+        if (markedPoints[pointName].text){
+          markedPoints[pointName].text.handleResize();
+        }
+      }
+      for (var gridName in gridSelections){
+        if (gridSelections[gridName].texts){
+          for (var i = 0; i<gridSelections[gridName].texts.length; i++){
+            gridSelections[gridName].texts[i].handleResize();
+          }
+        }
+      }
+    }
+  }
+}
+
 function processKeyboardBuffer(){
   if (keyboardBuffer["Left"]){
     camera.rotation.y += rotationYDelta;
@@ -12015,13 +12100,22 @@ function rescale(canvas, scale){
 
 function handleViewport(){
   var curViewport = renderer.getCurrentViewport();
+  var cvx = curViewport.x;
+  var cvy = curViewport.y;
+  var cvz = curViewport.z;
+  var cvw = curViewport.w;
+  if (screenResolution != 1){
+    cvz = cvz / screenResolution;
+    cvw = cvw / screenResolution;
+  }
   if (mode == 1 && fixedAspect > 0){
-    var result = getMaxWidthHeightGivenAspect(canvas.width, canvas.height, fixedAspect);
-    var newViewportX = (canvas.width - result.width) / 2;
-    var newViewportY = (canvas.height - result.height) / 2;
+    var result = getMaxWidthHeightGivenAspect(canvas.width / screenResolution, canvas.height / screenResolution, fixedAspect);
+    var newViewportX = ((canvas.width / screenResolution) - result.width) / 2;
+    var newViewportY = ((canvas.height / screenResolution) - result.height) / 2;
     var newViewportZ = result.width;
     var newViewportW = result.height;
     renderer.setViewport(newViewportX, newViewportY, newViewportZ, newViewportW);
+    composer.setSize(newViewportZ, newViewportW);
     currentViewport.startX = newViewportX;
     currentViewport.startY = newViewportY;
     currentViewport.width = newViewportZ;
@@ -12033,23 +12127,24 @@ function handleViewport(){
   }
   var newViewportX = 0;
   var newViewportY = 0;
-  var newViewportZ = canvas.width;
-  var newViewportW = canvas.height;
+  var newViewportZ = canvas.width / screenResolution;
+  var newViewportW = canvas.height / screenResolution;
   if (viewportMaxWidth > 0){
-    if (curViewport.z > viewportMaxWidth){
-      var diff = curViewport.z - viewportMaxWidth;
+    if (cvz > viewportMaxWidth){
+      var diff = cvz - viewportMaxWidth;
       newViewportX = diff/2;
       newViewportZ = viewportMaxWidth;
     }
   }
   if (viewportMaxHeight > 0){
-    if (curViewport.w > viewportMaxHeight){
-      var diff = curViewport.w - viewportMaxHeight;
+    if (cvw > viewportMaxHeight){
+      var diff = cvw - viewportMaxHeight;
       newViewportY = diff/2;
       newViewportW = viewportMaxHeight;
     }
   }
   renderer.setViewport(newViewportX, newViewportY, newViewportZ, newViewportW);
+  composer.setSize(newViewportZ, newViewportW);
   currentViewport.startX = newViewportX;
   currentViewport.startY = newViewportY;
   currentViewport.width = newViewportZ;
@@ -12218,8 +12313,8 @@ function startDeployment(){
     var stateLoader = new StateLoader(data);
     var result = stateLoader.load();
     if (result){
-      if (stateLoader.hasTextures || stateLoader.hasTexturePacks || stateLoader.hasSkyboxes){
-        terminal.printInfo("Loading textures.");
+      if (stateLoader.hasTextures || stateLoader.hasTexturePacks || stateLoader.hasSkyboxes || stateLoader.hasFonts){
+        terminal.printInfo("Loading assets.");
       }else{
         terminal.disable();
         terminalDiv.style.display = "none";
@@ -12499,6 +12594,13 @@ var State = function(projectName, author){
   }
   // RESOLUTION ****************************************************
   this.screenResolution = screenResolution;
+  // FONTS *********************************************************
+  this.fonts = new Object();
+  this.totalFontCount = 0;
+  for (var fontName in fonts){
+    this.totalFontCount ++;
+    this.fonts[fontName] = fonts[fontName].export();
+  }
 }
 
 var StateLoader = function(stateObj){
@@ -12507,6 +12609,7 @@ var StateLoader = function(stateObj){
   this.totalLoadedTextureCount = 0;
   this.totalLoadedTexturePackCount = 0;
   this.totalLoadedSkyboxCount = 0;
+  this.totalLoadedFontCount = 0;
 }
 
 StateLoader.prototype.load = function(undo){
@@ -12564,6 +12667,7 @@ StateLoader.prototype.load = function(undo){
         gs.grids[gridNumber].slicedGridSystemName = slicedGridSystemNamesExport[i];
       }
       gs.isSuperposed = isSuperposed;
+      gs.markedPointNames = exportObject.markedPointNames;
     }
     for (var gridSystemName in gridSystems){
       var grids = gridSystems[gridSystemName].grids;
@@ -13198,7 +13302,7 @@ StateLoader.prototype.load = function(undo){
       if (curTexture == 1 || curTexture == 2 || curTexture == 3){
         textures[textureName] = curTexture;
         this.totalLoadedTextureCount ++;
-        this.createObjectGroupsAfterLoadedTextures();
+        this.createObjectGroupsAfterLoadedAssets();
         continue;
       }
       var offsetX = curTexture.offset[0];
@@ -13222,7 +13326,7 @@ StateLoader.prototype.load = function(undo){
           that.totalLoadedTextureCount ++;
           this.textureX.needsUpdate = true;
           that.mapLoadedTexture(this.textureX, this.textureNameX);
-          that.createObjectGroupsAfterLoadedTextures();
+          that.createObjectGroupsAfterLoadedAssets();
         }.bind({textureX: texture, textureNameX: textureName});
       }else if (uploadedImages[textureURL]){
         var texture = new THREE.Texture(uploadedImages[textureURL]);
@@ -13254,7 +13358,7 @@ StateLoader.prototype.load = function(undo){
                 textures[this.textureNameX] = this.textureX;
                 that.totalLoadedTextureCount ++;
                 that.mapLoadedTexture(this.textureX, this.textureNameX);
-                that.createObjectGroupsAfterLoadedTextures();
+                that.createObjectGroupsAfterLoadedAssets();
               }.bind({textureX: texture, textureNameX: textureName})
               skip = true;
             }
@@ -13265,7 +13369,7 @@ StateLoader.prototype.load = function(undo){
           that.totalLoadedTextureCount ++;
           texture.needsUpdate = true;
           this.mapLoadedTexture(texture, textureName);
-          this.createObjectGroupsAfterLoadedTextures();
+          this.createObjectGroupsAfterLoadedAssets();
         }
       }else{
         if (textureURL.toUpperCase().endsWith("DDS")){
@@ -13311,7 +13415,7 @@ StateLoader.prototype.load = function(undo){
             textures[textureNameX].offset.x = this.offsetXX;
             textures[textureNameX].offset.y = this.offsetYY;
             that.mapLoadedTexture(textures[textureNameX], textureNameX);
-            that.createObjectGroupsAfterLoadedTextures();
+            that.createObjectGroupsAfterLoadedAssets();
           }.bind({textureNameX: textureName, offsetXX: offsetX, offsetYY: offsetY, repeatUU: repeatU, repeatVV: repeatV, isCompressed: (
             this.loaders[textureName] instanceof THREE.DDSLoader
           )}), function(xhr){
@@ -13319,7 +13423,7 @@ StateLoader.prototype.load = function(undo){
           }.bind({textureNameX: textureName}), function(xhr){
             textures[this.textureNameX] = 3;
             that.totalLoadedTextureCount ++;
-            that.createObjectGroupsAfterLoadedTextures();
+            that.createObjectGroupsAfterLoadedAssets();
           }.bind({textureNameX: textureName})
         );
       }
@@ -13338,7 +13442,7 @@ StateLoader.prototype.load = function(undo){
         function(){
           this.that.totalLoadedTexturePackCount ++;
           this.that.mapLoadedTexturePack(this.texturePackName, this.objj);
-          this.that.createObjectGroupsAfterLoadedTextures();
+          this.that.createObjectGroupsAfterLoadedAssets();
         }.bind({texturePackName: texturePackName, that: this, objj: obj, scaleFactorX: scaleFactor}),
         true,
         null,
@@ -13367,7 +13471,7 @@ StateLoader.prototype.load = function(undo){
           skyboxExport.color,
           function(){
             that.totalLoadedSkyboxCount ++;
-            that.createObjectGroupsAfterLoadedTextures();
+            that.createObjectGroupsAfterLoadedAssets();
           }
         );
       }else{
@@ -13406,7 +13510,7 @@ StateLoader.prototype.load = function(undo){
                 skyboxMesh.scale.z = this.skyBoxScale;
               }
             }
-            that.createObjectGroupsAfterLoadedTextures();
+            that.createObjectGroupsAfterLoadedAssets();
           }.bind({skyboxName: skyboxName, skyBoxScale: skyBoxScale})
         );
       }
@@ -13457,7 +13561,7 @@ StateLoader.prototype.load = function(undo){
     }
 
     // OBJECT GROUPS ***********************************************
-    // NOT HERE -> SEE: createObjectGroupsAfterLoadedTextures
+    // NOT HERE -> SEE: createObjectGroupsAfterLoadedAssets
 
     // MARKED PONTS ************************************************
     markedPointsVisible = false;
@@ -13467,13 +13571,16 @@ StateLoader.prototype.load = function(undo){
         markedPointName,
         curMarkedPointExport["x"],
         curMarkedPointExport["y"],
-        curMarkedPointExport["z"]
+        curMarkedPointExport["z"],
+        curMarkedPointExport["fromX"],
+        curMarkedPointExport["fromY"],
+        curMarkedPointExport["fromZ"],
+        curMarkedPointExport["gridDestroyed"]
       );
       if (!curMarkedPointExport.isHidden && mode == 0){
         markedPointsVisible = true;
-        markedPoint.renderToScreen();
       }else{
-        markedPoint.isHidden = true;
+        markedPoint.hide();
       }
       markedPoint.showAgainOnTheNextModeSwitch = curMarkedPointExport.showAgainOnTheNextModeSwitch;
       if (mode == 0){
@@ -13533,6 +13640,21 @@ StateLoader.prototype.load = function(undo){
     // RESOLUTION **************************************************
     screenResolution = obj.screenResolution;
     renderer.setPixelRatio(screenResolution);
+    // FONTS *******************************************************
+    this.hasFonts = false;
+    var that = this;
+    for (var fontName in obj.fonts){
+      this.hasFonts = true;
+      var curFontExport = obj.fonts[fontName];
+      var font = new Font(curFontExport.name, curFontExport.path, function(fontInstance){
+        fonts[fontInstance.name] = fontInstance;
+        that.totalLoadedFontCount ++;
+        that.createObjectGroupsAfterLoadedAssets();
+      }, function(fontName){
+        console.error("Error loading font: "+fontName);
+      });
+      font.load();
+    }
     // POST PROCESSING *********************************************
     bloomStrength = obj.bloomStrength;
     bloomRadius = obj.bloomRadius;
@@ -13573,8 +13695,8 @@ StateLoader.prototype.load = function(undo){
       }
     }
 
-    if (!this.hasTextures && !this.hasTexturePacks && !this.hasSkyboxes){
-      this.createObjectGroupsAfterLoadedTextures();
+    if (!this.hasTextures && !this.hasTexturePacks && !this.hasSkyboxes && !this.hasFonts){
+      this.createObjectGroupsAfterLoadedAssets();
     }
 
     return true;
@@ -13586,11 +13708,12 @@ StateLoader.prototype.load = function(undo){
   }
 }
 
-StateLoader.prototype.createObjectGroupsAfterLoadedTextures = function(){
+StateLoader.prototype.createObjectGroupsAfterLoadedAssets = function(){
   var obj = this.stateObj;
   if (parseInt(this.totalLoadedTextureCount) < parseInt(obj.totalTextureCount) ||
            parseInt(this.totalLoadedTexturePackCount) < parseInt(obj.totalTexturePackCount) ||
-                parseInt(this.totalLoadedSkyboxCount) < parseInt(obj.totalSkyboxCount)){
+                parseInt(this.totalLoadedSkyboxCount) < parseInt(obj.totalSkyboxCount) ||
+                      parseInt(this.totalLoadedFontCount) < parseInt(obj.totalFontCount)){
       return;
   }
 
@@ -13713,15 +13836,6 @@ StateLoader.prototype.createObjectGroupsAfterLoadedTextures = function(){
     }
   }
 
-  if (fogBlendWithSkybox){
-    GLOBAL_FOG_UNIFORM.value.set(
-      -fogDensity,
-      skyboxMesh.material.uniforms.color.value.r,
-      skyboxMesh.material.uniforms.color.value.g,
-      skyboxMesh.material.uniforms.color.value.b
-    );
-  }
-
   projectLoaded = true;
   rayCaster.refresh();
   canvas.style.visibility = "";
@@ -13733,6 +13847,10 @@ StateLoader.prototype.createObjectGroupsAfterLoadedTextures = function(){
     terminal.disable();
     terminalDiv.style.display = "none";
     modeSwitcher.switchMode();
+    if (screenResolution != 1){
+      canvas.style.oldPosition = canvas.style.position;
+      canvas.style.position = "absolute";
+    }
   }
 }
 
@@ -14821,6 +14939,7 @@ StateLoader.prototype.resetProject = function(undo){
   gridSelections = new Object();
   materials = new Object();
   addedObjects = new Object();
+  addedTexts = new Object();
   textures = new Object();
   textureURLs = new Object();
   physicsTests = new Object();
@@ -14865,6 +14984,7 @@ StateLoader.prototype.resetProject = function(undo){
   performanceDropSeconds = 0;
   performanceDropCounter = 0;
   originalBloomConfigurations = new Object();
+  fonts = new Object();
   NO_MOBILE = false;
   fixedAspect = 0;
 
@@ -14881,6 +15001,7 @@ StateLoader.prototype.resetProject = function(undo){
   fogDensity = 0;
   fogColorRGB = new THREE.Color(fogColor);
   fogBlendWithSkybox = false;
+  GLOBAL_FOG_UNIFORM.value.set(-100.0, 0, 0, 0);
 
   if (!undo){
     mode = 0; // 0 -> DESIGN, 1-> PREVIEW
@@ -16455,6 +16576,9 @@ ObjectGroup.prototype.updateBoundingBoxes = function(){
 }
 
 ObjectGroup.prototype.generateBoundingBoxes = function(){
+  if (!this.mesh){
+    return;
+  }
   this.boundingBoxes = [];
   this.mesh.updateMatrixWorld();
   this.graphicsGroup.position.copy(this.mesh.position);
@@ -16729,50 +16853,36 @@ ObjectGroup.prototype.incrementOpacity = function(val){
   }
 }
 
-var MarkedPoint = function(name, x, y, z){
+var MarkedPoint = function(name, x, y, z, fromX, fromY, fromZ, gridDestroyed){
   this.name = name;
   this.x = x;
   this.y = y;
   this.z = z;
-  this.vector3D = new THREE.Vector3(x, y, z);
-  this.object3D = new THREE.Object3D();
-  this.object3D.position.copy(this.vector3D);
-  this.vector2D = this.get2DVector();
-  this.isHidden = false;
-}
-
-MarkedPoint.prototype.renderToScreen = function(){
-  this.div = document.createElement("div");
-  this.div.className = "markedPoint noselect";
-  this.div.style.left = this.vector2D.x + "px";
-  this.div.style.top = this.vector2D.y + "px";
-  this.div.style.visibility = "visible";
-  document.getElementsByTagName("body")[0].appendChild(this.div);
-  this.innerDiv = document.createElement("div");
-  this.markerSpan = document.createElement("span");
-  this.markerSpan.style.color = "#20C20E";
-  this.markerIcon = document.createElement("i");
-  this.markerIcon.className="fa fa-map-marker";
-  this.markerSpan.innerHTML = " "+this.name+" ";
-  this.markerSpan.appendChild(this.markerIcon);
-  this.innerDiv.appendChild(this.markerSpan);
-  this.div.appendChild(this.innerDiv);
-}
-
-MarkedPoint.prototype.update = function(){
-  if (this.isObjectInFrustum()){
-    this.div.style.visibility = "visible";
-    this.vector2D = this.get2DVector();
-    this.div.style.left = this.vector2D.x + 'px';
-    this.div.style.top = this.vector2D.y + 'px';
-  }else{
-    this.div.style.visibility = "hidden";
+  this.fromX = fromX;
+  this.fromY = fromY;
+  this.fromZ = fromZ;
+  this.gridDestroyed = gridDestroyed;
+  if (!isDeployment){
+    var txt = "@@1 (@@2, @@3, @@4)".replace("@@1", name).replace("@@2", x).replace("@@3", y).replace("@@4", z);
+    this.text = new AddedText(defaultFont, txt, new THREE.Vector3(x, y, z), new THREE.Color("yellow"), 1, 15);
+    this.text.setBackground("magenta", 1);
+    this.text.setMarginBetweenChars(7);
+    this.text.refInnerHeight = 569;
+    this.text.refCharSize = 15;
+    this.text.handleResize();
+    if (!gridDestroyed){
+      var lineMaterial = new THREE.LineBasicMaterial({
+    	 color: "lime"
+      });
+      var lineGeometry = new THREE.Geometry();
+      lineGeometry.vertices.push(new THREE.Vector3(fromX, fromY, fromZ));
+      lineGeometry.vertices.push(new THREE.Vector3((fromX + x) / 2, (fromY + y) / 2, (fromZ + z) / 2));
+      lineGeometry.vertices.push(new THREE.Vector3(x, y, z));
+      this.line = new THREE.Line(lineGeometry, lineMaterial);
+      scene.add(this.line);
+    }
   }
-}
-
-MarkedPoint.prototype.isObjectInFrustum = function(){
-  frustum.setFromMatrix(REUSABLE_MATRIX_4.multiplyMatrices(camera.projectionMatrix, camera.matrixWorldInverse));
-  return frustum.containsPoint(this.object3D.position);
+  this.isHidden = false;
 }
 
 MarkedPoint.prototype.export = function(){
@@ -16781,6 +16891,10 @@ MarkedPoint.prototype.export = function(){
   exportObj.x = this.x;
   exportObj.y = this.y;
   exportObj.z = this.z;
+  exportObj.fromX = this.fromX;
+  exportObj.fromY = this.fromY;
+  exportObj.fromZ = this.fromZ;
+  exportObj.gridDestroyed = this.gridDestroyed;
   exportObj.isHidden = this.isHidden;
   if (this.showAgainOnTheNextModeSwitch){
     exportObj.isHidden = false;
@@ -16793,7 +16907,7 @@ MarkedPoint.prototype.export = function(){
 
 MarkedPoint.prototype.destroy = function(){
   if (!this.isHidden){
-    document.getElementsByTagName("body")[0].removeChild(this.div);
+    this.text.destroy();
   }
 }
 
@@ -16801,7 +16915,12 @@ MarkedPoint.prototype.hide = function(showAgainOnTheNextModeSwitch){
   if (this.isHidden){
     return;
   }
-  document.getElementsByTagName("body")[0].removeChild(this.div);
+  if (this.text){
+    this.text.mesh.visible = false;
+  }
+  if (this.line){
+    this.line.visible = false;
+  }
   this.isHidden = true;
   if (showAgainOnTheNextModeSwitch){
     this.showAgainOnTheNextModeSwitch = true;
@@ -16812,23 +16931,13 @@ MarkedPoint.prototype.show = function(){
   if (!this.isHidden){
     return;
   }
-  this.renderToScreen();
+  if (this.text){
+    this.text.mesh.visible = true;
+  }
+  if (this.line){
+    this.line.visible = true;
+  }
   this.isHidden = false;
-}
-
-MarkedPoint.prototype.get2DVector = function(){
-  var vector = REUSABLE_VECTOR;
-  var widthHalf = 0.5 * renderer.context.canvas.width / renderer.getPixelRatio();
-  var heightHalf = 0.5 * renderer.context.canvas.height / renderer.getPixelRatio();
-  this.object3D.updateMatrixWorld();
-  vector.setFromMatrixPosition(this.object3D.matrixWorld);
-  vector.project(camera);
-  vector.x = ( vector.x * widthHalf ) + widthHalf;
-  vector.y = - ( vector.y * heightHalf ) + heightHalf;
-  var object2D = new Object();
-  object2D.x = vector.x;
-  object2D.y = vector.y;
-  return object2D;
 }
 
 var ColorNames = function(){
@@ -16989,715 +17098,7 @@ var ColorNames = function(){
 }
 
 ColorNames.prototype.generateRandomColor = function(){
-  return this.colorNames[Math.floor(Math.random() * this.colorNames.length)]; 
-}
-
-var CommandDescriptor = function(){
-
-  this.UNKNOWN_INDICATOR        =   0;
-  this.GRID_SYSTEM_AXIS         =   1;
-  this.GRID_SYSTEM_NAME         =   2;
-  this.COLOR                    =   3;
-  this.BOOLEAN                  =   4;
-  this.MATERIAL_NAME            =   5;
-  this.MATERIAL_NAME_WITH_NULL  =   6;
-  this.OBJECT_NAME              =   7;
-  this.UPLOADED_IMAGE_NAME      =   8;
-  this.TEXTURE_NAME             =   9;
-  this.OBJECT_AXIS              =   10;
-  this.PHYSICS_TEST_INDEX       =   11;
-  this.STATE_ON_OFF             =   12;
-  this.S_T_ST                   =   13;
-  this.WALL_COLLECTION_NAME     =   14;
-  this.DEFAULT_MATERIAL_TYPE    =   15;
-  this.LIGHT_NAME               =   16;
-  this.FILE_EXTENSION           =   17;
-  this.TEXTURE_PACK_NAME        =   18;
-  this.HIDE_SHOW                =   19;
-  this.SKYBOX_NAME              =   20;
-  this.SCRIPT_NAME              =   21;
-  this.ANY_OBJECT               =   22;
-  this.GLUED_OBJECT_NAME        =   23;
-  this.MARKED_POINT_NAME        =   24;
-  this.API_FUNCTION_NAME        =   25;
-  this.BLENDING_MODE            =   26;
-  this.OBJECT_CREATION_NAME     =   27;
-  this.AREA_NAME                =   28;
-  this.AREA_NAME_WITH_DEFAULT   =   29;
-  this.RENDER_SIDE              =   30;
-  this.CHILD_OBJECT_NAME        =   31;
-
-  // newGridSystem
-  this.newGridSystem = new Object();
-  this.newGridSystem.types = [];
-  this.newGridSystem.types.push(this.UNKNOWN_INDICATOR); //name
-  this.newGridSystem.types.push(this.UNKNOWN_INDICATOR); //sizeX
-  this.newGridSystem.types.push(this.UNKNOWN_INDICATOR); //sizeZ
-  this.newGridSystem.types.push(this.UNKNOWN_INDICATOR); //centerX
-  this.newGridSystem.types.push(this.UNKNOWN_INDICATOR); //centerY
-  this.newGridSystem.types.push(this.UNKNOWN_INDICATOR); //centerZ
-  this.newGridSystem.types.push(this.COLOR);             //color
-  this.newGridSystem.types.push(this.UNKNOWN_INDICATOR); //cellSize
-  this.newGridSystem.types.push(this.GRID_SYSTEM_AXIS); //axis
-
-  // printGridSystemInfo
-  this.printGridSystemInfo = new Object();
-  this.printGridSystemInfo.types = [];
-  this.printGridSystemInfo.types.push(this.GRID_SYSTEM_NAME); //name
-
-  // destroyGridSystem
-  this.destroyGridSystem = new Object();
-  this.destroyGridSystem.types = [];
-  this.destroyGridSystem.types.push(this.GRID_SYSTEM_NAME); //name
-
-  // selectAllGrids --> DEPRECATED
-  this.selectAllGrids = new Object();
-  this.selectAllGrids.types = [];
-  this.selectAllGrids.types.push(this.GRID_SYSTEM_NAME); //name
-
-  // pasteCroppedGridSystem
-  this.pasteCroppedGridSystem = new Object();
-  this.pasteCroppedGridSystem.types = [];
-  this.pasteCroppedGridSystem.types.push(this.UNKNOWN_INDICATOR); //name
-  this.pasteCroppedGridSystem.types.push(this.UNKNOWN_INDICATOR); //xTranslation
-  this.pasteCroppedGridSystem.types.push(this.UNKNOWN_INDICATOR); //yTranslation
-  this.pasteCroppedGridSystem.types.push(this.UNKNOWN_INDICATOR); //zTranslation
-  this.pasteCroppedGridSystem.types.push(this.COLOR); //outlineColor
-  this.pasteCroppedGridSystem.types.push(this.UNKNOWN_INDICATOR); //cellSize
-
-  // newBasicMaterial
-  this.newBasicMaterial = new Object();
-  this.newBasicMaterial.types = [];
-  this.newBasicMaterial.types.push(this.UNKNOWN_INDICATOR); //name
-  this.newBasicMaterial.types.push(this.COLOR); //color
-
-  // destroyMaterial
-  this.destroyMaterial = new Object();
-  this.destroyMaterial.types = [];
-  this.destroyMaterial.types.push(this.MATERIAL_NAME); //name
-
-  // newSurface
-  this.newSurface = new Object();
-  this.newSurface.types = [];
-  this.newSurface.types.push(this.OBJECT_CREATION_NAME); //name
-  this.newSurface.types.push(this.MATERIAL_NAME_WITH_NULL); //material
-
-  // printMetaData
-  this.printMetaData = new Object();
-  this.printMetaData.types = [];
-  this.printMetaData.types.push(this.OBJECT_NAME); //name
-
-  // destroyObject
-  this.destroyObject = new Object();
-  this.destroyObject.types = [];
-  this.destroyObject.types.push(this.OBJECT_NAME); //name
-
-  // newTexture
-  this.newTexture = new Object();
-  this.newTexture.types = [];
-  this.newTexture.types.push(this.UNKNOWN_INDICATOR); //name
-  this.newTexture.types.push(this.UPLOADED_IMAGE_NAME); //fileName
-  this.newTexture.types.push(this.UNKNOWN_INDICATOR); //repeatU
-  this.newTexture.types.push(this.UNKNOWN_INDICATOR); //repeatV
-
-  // destroyTexture
-  this.destroyTexture = new Object();
-  this.destroyTexture.types = [];
-  this.destroyTexture.types.push(this.TEXTURE_NAME); //name
-
-  // mapTexture
-  this.mapTexture = new Object();
-  this.mapTexture.types = [];
-  this.mapTexture.types.push(this.TEXTURE_NAME); //textureName
-  this.mapTexture.types.push(this.OBJECT_NAME); // objectName
-
-  // adjustTextureRepeat
-  this.adjustTextureRepeat = new Object();
-  this.adjustTextureRepeat.types = [];
-  this.adjustTextureRepeat.types.push(this.OBJECT_NAME); //objectName
-  this.adjustTextureRepeat.types.push(this.UNKNOWN_INDICATOR); //repeatU
-  this.adjustTextureRepeat.types.push(this.UNKNOWN_INDICATOR); //repeatV
-
-  // newPhysicsBoxTest
-  this.newPhysicsBoxTest = new Object();
-  this.newPhysicsBoxTest.types = [];
-  this.newPhysicsBoxTest.types.push(this.UNKNOWN_INDICATOR); //duration
-  this.newPhysicsBoxTest.types.push(this.UNKNOWN_INDICATOR); //sizeX
-  this.newPhysicsBoxTest.types.push(this.UNKNOWN_INDICATOR); //sizeY
-  this.newPhysicsBoxTest.types.push(this.UNKNOWN_INDICATOR); //sizeZ
-  this.newPhysicsBoxTest.types.push(this.UNKNOWN_INDICATOR); //mass
-  this.newPhysicsBoxTest.types.push(this.UNKNOWN_INDICATOR); //positionX
-  this.newPhysicsBoxTest.types.push(this.UNKNOWN_INDICATOR); //positionY
-  this.newPhysicsBoxTest.types.push(this.UNKNOWN_INDICATOR); //positionZ
-
-  // newPhysicsSphereTest
-  this.newPhysicsSphereTest = new Object();
-  this.newPhysicsSphereTest.types = [];
-  this.newPhysicsSphereTest.types.push(this.UNKNOWN_INDICATOR); //duration
-  this.newPhysicsSphereTest.types.push(this.UNKNOWN_INDICATOR); //radius
-  this.newPhysicsSphereTest.types.push(this.UNKNOWN_INDICATOR); //mass
-  this.newPhysicsSphereTest.types.push(this.UNKNOWN_INDICATOR); //positionX
-  this.newPhysicsSphereTest.types.push(this.UNKNOWN_INDICATOR); //positionY
-  this.newPhysicsSphereTest.types.push(this.UNKNOWN_INDICATOR); //positionZ
-
-  // newRamp
-  this.newRamp = new Object();
-  this.newRamp.types = [];
-  this.newRamp.types.push(this.OBJECT_CREATION_NAME); //name
-  this.newRamp.types.push(this.MATERIAL_NAME_WITH_NULL); //material
-  this.newRamp.types.push(this.OBJECT_AXIS); //axis
-  this.newRamp.types.push(this.UNKNOWN_INDICATOR); //height
-
-  // restartPhysicsTest
-  this.restartPhysicsTest = new Object();
-  this.restartPhysicsTest.types = [];
-  this.restartPhysicsTest.types.push(this.PHYSICS_TEST_INDEX); //physicsTestIndex
-
-  // mirror
-  this.mirror = new Object();
-  this.mirror.types = [];
-  this.mirror.types.push(this.OBJECT_NAME); //objectName
-  this.mirror.types.push(this.STATE_ON_OFF); //on-off
-  this.mirror.types.push(this.S_T_ST); //s-t-st
-
-  // newBox
-  this.newBox = new Object();
-  this.newBox.types = [];
-  this.newBox.types.push(this.OBJECT_CREATION_NAME); //name
-  this.newBox.types.push(this.MATERIAL_NAME_WITH_NULL); //material
-  this.newBox.types.push(this.UNKNOWN_INDICATOR); //height
-
-  // newWallCollection
-  this.newWallCollection = new Object();
-  this.newWallCollection.types = [];
-  this.newWallCollection.types.push(this.UNKNOWN_INDICATOR); //name
-  this.newWallCollection.types.push(this.UNKNOWN_INDICATOR); //height
-  this.newWallCollection.types.push(this.COLOR); //outlineColor
-
-  // destroyWallCollection
-  this.destroyWallCollection = new Object();
-  this.destroyWallCollection.types = [];
-  this.destroyWallCollection.types.push(this.WALL_COLLECTION_NAME); //name
-
-  // remakeGridSystem --> DEPRECATED
-  this.remakeGridSystem = new Object();
-  this.remakeGridSystem.types = [];
-  this.remakeGridSystem.types.push(this.GRID_SYSTEM_NAME); //name
-
-  // uploadImage
-  this.uploadImage = new Object();
-  this.uploadImage.types = [];
-  this.uploadImage.types.push(this.UNKNOWN_INDICATOR); //name
-
-  // mapSpecular
-  this.mapSpecular = new Object();
-  this.mapSpecular.types = [];
-  this.mapSpecular.types.push(this.TEXTURE_NAME); //textureName
-  this.mapSpecular.types.push(this.OBJECT_NAME); //objectName
-
-  // mapEnvironment
-  this.mapEnvironment = new Object();
-  this.mapEnvironment.types = [];
-  this.mapEnvironment.types.push(this.TEXTURE_NAME); //textureName
-  this.mapEnvironment.types.push(this.OBJECT_NAME); //objectName
-
-  // mapAmbientOcculsion
-  this.mapAmbientOcculsion = new Object();
-  this.mapAmbientOcculsion.types = [];
-  this.mapAmbientOcculsion.types.push(this.TEXTURE_NAME); //textureName
-  this.mapAmbientOcculsion.types.push(this.OBJECT_NAME); //objectName
-
-  // mapAlpha
-  this.mapAlpha = new Object();
-  this.mapAlpha.types = [];
-  this.mapAlpha.types.push(this.TEXTURE_NAME); //textureName
-  this.mapAlpha.types.push(this.OBJECT_NAME); //objectName
-
-  // setDefaultMaterial
-  this.setDefaultMaterial = new Object();
-  this.setDefaultMaterial.types = [];
-  this.setDefaultMaterial.types.push(this.DEFAULT_MATERIAL_TYPE); //basic-phong
-
-  // newAmbientLight
-  this.newAmbientLight = new Object();
-  this.newAmbientLight.types = [];
-  this.newAmbientLight.types.push(this.UNKNOWN_INDICATOR); //name
-  this.newAmbientLight.types.push(this.COLOR); //color
-
-  // selectLight
-  this.selectLight = new Object();
-  this.selectLight.types = [];
-  this.selectLight.types.push(this.LIGHT_NAME); //name
-
-  // destroyLight
-  this.destroyLight = new Object();
-  this.destroyLight.types = [];
-  this.destroyLight.types.push(this.LIGHT_NAME); //name
-
-  // newPhongMaterial
-  this.newPhongMaterial = new Object();
-  this.newPhongMaterial.types = [];
-  this.newPhongMaterial.types.push(this.UNKNOWN_INDICATOR); //name
-  this.newPhongMaterial.types.push(this.COLOR); //color
-
-  // mapNormal
-  this.mapNormal = new Object();
-  this.mapNormal.types = [];
-  this.mapNormal.types.push(this.TEXTURE_NAME); //textureName
-  this.mapNormal.types.push(this.OBJECT_NAME); //objectName
-
-  // mapEmissive
-  this.mapEmissive = new Object();
-  this.mapEmissive.types = [];
-  this.mapEmissive.types.push(this.TEXTURE_NAME); //textureName
-  this.mapEmissive.types.push(this.OBJECT_NAME); //objectName
-
-  // newLambertMaterial
-  this.newLambertMaterial = new Object();
-  this.newLambertMaterial.types = [];
-  this.newLambertMaterial.types.push(this.UNKNOWN_INDICATOR); //name
-  this.newLambertMaterial.types.push(this.COLOR); //color
-
-  // newTexturePack
-  this.newTexturePack = new Object();
-  this.newTexturePack.types = [];
-  this.newTexturePack.types.push(this.UNKNOWN_INDICATOR); //name
-  this.newTexturePack.types.push(this.UNKNOWN_INDICATOR); //directoryName
-  this.newTexturePack.types.push(this.FILE_EXTENSION); //fileExtension
-
-  // printTexturePackInfo
-  this.printTexturePackInfo = new Object();
-  this.printTexturePackInfo.types = [];
-  this.printTexturePackInfo.types.push(this.TEXTURE_PACK_NAME); //name
-
-  // mapTexturePack
-  this.mapTexturePack = new Object();
-  this.mapTexturePack.types = [];
-  this.mapTexturePack.types.push(this.TEXTURE_PACK_NAME); //texturePackName
-  this.mapTexturePack.types.push(this.OBJECT_NAME); //objectName
-
-  // destroyTexturePack
-  this.destroyTexturePack = new Object();
-  this.destroyTexturePack.types = [];
-  this.destroyTexturePack.types.push(this.TEXTURE_PACK_NAME); //name
-
-  // refreshTexturePack
-  this.refreshTexturePack = new Object();
-  this.refreshTexturePack.types = [];
-  this.refreshTexturePack.types.push(this.TEXTURE_PACK_NAME); //name
-
-  // mapHeight
-  this.mapHeight = new Object();
-  this.mapHeight.types = [];
-  this.mapHeight.types.push(this.TEXTURE_NAME); //textureName
-  this.mapHeight.types.push(this.OBJECT_NAME); //objectName
-
-  // resetMaps
-  this.resetMaps = new Object();
-  this.resetMaps.types = [];
-  this.resetMaps.types.push(this.OBJECT_NAME); //objectName
-
-  // segmentObject
-  this.segmentObject = new Object();
-  this.segmentObject.types = [];
-  this.segmentObject.types.push(this.OBJECT_NAME); //name
-  this.segmentObject.types.push(this.UNKNOWN_INDICATOR); //count
-
-  // superposeGridSystem
-  this.superposeGridSystem = new Object();
-  this.superposeGridSystem.types = [];
-  this.superposeGridSystem.types.push(this.GRID_SYSTEM_NAME); //gridSystemName
-  this.superposeGridSystem.types.push(this.COLOR); //outlineColor
-  this.superposeGridSystem.types.push(this.UNKNOWN_INDICATOR); //cellSize
-  this.superposeGridSystem.types.push(this.OBJECT_NAME); //objectName
-
-  // postProcessing
-  this.postProcessing = new Object();
-  this.postProcessing.types = [];
-  this.postProcessing.types.push(this.HIDE_SHOW); //hide/show
-
-  // sliceGrid
-  this.sliceGrid = new Object();
-  this.sliceGrid.types = [];
-  this.sliceGrid.types.push(this.UNKNOWN_INDICATOR); //newName
-  this.sliceGrid.types.push(this.UNKNOWN_INDICATOR); //cellSize
-  this.sliceGrid.types.push(this.COLOR); //outlineColor
-
-  // newPointLight
-  this.newPointLight = new Object();
-  this.newPointLight.types = [];
-  this.newPointLight.types.push(this.UNKNOWN_INDICATOR); //name
-  this.newPointLight.types.push(this.COLOR); //color
-  this.newPointLight.types.push(this.UNKNOWN_INDICATOR); //offsetX
-  this.newPointLight.types.push(this.UNKNOWN_INDICATOR); //offsetY
-  this.newPointLight.types.push(this.UNKNOWN_INDICATOR); //offsetZ
-
-  // newSkybox
-  this.newSkybox = new Object();
-  this.newSkybox.types = [];
-  this.newSkybox.types.push(this.UNKNOWN_INDICATOR); //name
-  this.newSkybox.types.push(this.UNKNOWN_INDICATOR); //directory
-  this.newSkybox.types.push(this.FILE_EXTENSION); //fileExtension
-
-  // printSkyboxInfo
-  this.printSkyboxInfo = new Object();
-  this.printSkyboxInfo.types = [];
-  this.printSkyboxInfo.types.push(this.SKYBOX_NAME); //name
-
-  // mapSkybox
-  this.mapSkybox = new Object();
-  this.mapSkybox.types = [];
-  this.mapSkybox.types.push(this.SKYBOX_NAME); //name
-
-  // destroySkybox
-  this.destroySkybox = new Object();
-  this.destroySkybox.types = [];
-  this.destroySkybox.types.push(this.SKYBOX_NAME); //name
-
-  // skybox
-  this.skybox = new Object();
-  this.skybox.types = [];
-  this.skybox.types.push(this.HIDE_SHOW); //hide/show
-
-  // scaleSkybox
-  this.scaleSkybox = new Object();
-  this.scaleSkybox.types = [];
-  this.scaleSkybox.types.push(this.UNKNOWN_INDICATOR); //amount
-
-  // selectObject
-  this.selectObject = new Object();
-  this.selectObject.types = [];
-  this.selectObject.types.push(this.OBJECT_NAME); //name
-
-  // setMass
-  this.setMass = new Object();
-  this.setMass.types = [];
-  this.setMass.types.push(this.OBJECT_NAME); //name
-  this.setMass.types.push(this.UNKNOWN_INDICATOR); //mass
-
-  // rotateObject
-  this.rotateObject = new Object();
-  this.rotateObject.types = [];
-  this.rotateObject.types.push(this.OBJECT_NAME); //name
-  this.rotateObject.types.push(this.OBJECT_AXIS); //axis
-  this.rotateObject.types.push(this.UNKNOWN_INDICATOR); //radian
-
-  // newScript
-  this.newScript = new Object();
-  this.newScript.types = [];
-  this.newScript.types.push(this.UNKNOWN_INDICATOR); //name
-
-  // runScript
-  this.runScript = new Object();
-  this.runScript.types = [];
-  this.runScript.types.push(this.SCRIPT_NAME); //name
-
-  // stopScript
-  this.stopScript = new Object();
-  this.stopScript.types = [];
-  this.stopScript.types.push(this.SCRIPT_NAME); //name
-
-  // editScript
-  this.editScript = new Object();
-  this.editScript.types = [];
-  this.editScript.types.push(this.SCRIPT_NAME); //name
-
-  // destroyScript
-  this.destroyScript = new Object();
-  this.destroyScript.types = [];
-  this.destroyScript.types.push(this.SCRIPT_NAME); //nane
-
-  // translateObject --> DEPRECATED
-  this.translateObject = new Object();
-  this.translateObject.types = [];
-  this.translateObject.types.push(this.OBJECT_NAME); //name
-  this.translateObject.types.push(this.OBJECT_AXIS); //axis
-  this.translateObject.types.push(this.UNKNOWN_INDICATOR); //amount
-
-  // setFog
-  this.setFog = new Object();
-  this.setFog.types = [];
-  this.setFog.types.push(this.COLOR); //fogColor
-  this.setFog.types.push(this.UNKNOWN_INDICATOR); //fogDensity
-
-  // glue
-  this.glue = new Object();
-  this.glue.types = [];
-  this.glue.types.push(this.OBJECT_CREATION_NAME); //newName
-  this.glue.types.push(this.ANY_OBJECT); //objectName[1],objectName[2],...objectName[n]
-
-  // detach
-  this.detach = new Object();
-  this.detach.types = [];
-  this.detach.types.push(this.GLUED_OBJECT_NAME); //detach
-
-  // mark
-  this.mark = new Object();
-  this.mark.types = [];
-  this.mark.types.push(this.UNKNOWN_INDICATOR); //name
-  this.mark.types.push(this.UNKNOWN_INDICATOR); //offsetX
-  this.mark.types.push(this.UNKNOWN_INDICATOR); //offsetY
-  this.mark.types.push(this.UNKNOWN_INDICATOR); //offsetZ
-
-  // unmark
-  this.unmark = new Object();
-  this.unmark.types = [];
-  this.unmark.types.push(this.MARKED_POINT_NAME); //name
-
-  // runAutomatically
-  this.runAutomatically = new Object();
-  this.runAutomatically.types = [];
-  this.runAutomatically.types.push(this.SCRIPT_NAME); //scriptName
-
-  // uploadScript
-  this.uploadScript = new Object();
-  this.uploadScript.types = [];
-  this.uploadScript.types.push(this.UNKNOWN_INDICATOR); //scriptName
-  this.uploadScript.types.push(this.UNKNOWN_INDICATOR); //filePath
-
-  // runManually
-  this.runManually = new Object();
-  this.runManually.types = [];
-  this.runManually.types.push(this.SCRIPT_NAME); //scriptName
-
-  // physicsWorkerMode
-  this.physicsWorkerMode = new Object();
-  this.physicsWorkerMode.types = [];
-  this.physicsWorkerMode.types.push(this.STATE_ON_OFF); //state
-
-  // explain
-  this.explain = new Object();
-  this.explain.types = [];
-  this.explain.types.push(this.API_FUNCTION_NAME); //functionName
-
-  // search
-  this.search = new Object();
-  this.search.types = [];
-  this.search.types.push(this.UNKNOWN_INDICATOR); //textToSearch
-
-  // rescaleTexture
-  this.rescaleTexture = new Object();
-  this.rescaleTexture.types = [];
-  this.rescaleTexture.types.push(this.TEXTURE_NAME); //textureName
-  this.rescaleTexture.types.push(this.UNKNOWN_INDICATOR); //scale
-  this.rescaleTexture.types.push(this.UNKNOWN_INDICATOR); //newTextureName
-
-  // rescaleTexturePack
-  this.rescaleTexturePack = new Object();
-  this.rescaleTexturePack.types = [];
-  this.rescaleTexturePack.types.push(this.TEXTURE_PACK_NAME); //texturePackName
-  this.rescaleTexturePack.types.push(this.UNKNOWN_INDICATOR); //scale
-  this.rescaleTexturePack.types.push(this.UNKNOWN_INDICATOR); //newTexturePackName
-
-  // destroyImage
-  this.destroyImage = new Object();
-  this.destroyImage.types = [];
-  this.destroyImage.types.push(this.UPLOADED_IMAGE_NAME); //imageName
-
-  // setBlending
-  this.setBlending = new Object();
-  this.setBlending.types = [];
-  this.setBlending.types.push(this.OBJECT_NAME); //objectName
-  this.setBlending.types.push(this.BLENDING_MODE); //mode
-
-  // setWorldLimits
-  this.setWorldLimits = new Object();
-  this.setWorldLimits.types = [];
-  this.setWorldLimits.types.push(this.UNKNOWN_INDICATOR); //minX
-  this.setWorldLimits.types.push(this.UNKNOWN_INDICATOR); //minY
-  this.setWorldLimits.types.push(this.UNKNOWN_INDICATOR); //minZ
-  this.setWorldLimits.types.push(this.UNKNOWN_INDICATOR); //maxX
-  this.setWorldLimits.types.push(this.UNKNOWN_INDICATOR); //maxY
-  this.setWorldLimits.types.push(this.UNKNOWN_INDICATOR); //maxZ
-
-  // setBinSize
-  this.setBinSize = new Object();
-  this.setBinSize.types = [];
-  this.setBinSize.types.push(this.UNKNOWN_INDICATOR); //size
-
-  // particleCollisionWorkerMode
-  this.particleCollisionWorkerMode = new Object();
-  this.particleCollisionWorkerMode.types = [];
-  this.particleCollisionWorkerMode.types.push(this.STATE_ON_OFF); // on/off
-
-  // particleSystemCollisionWorkerMode
-  this.particleSystemCollisionWorkerMode = new Object();
-  this.particleSystemCollisionWorkerMode.types = [];
-  this.particleSystemCollisionWorkerMode.types.push(this.STATE_ON_OFF); // on/off
-
-  // addPaddingToTexture
-  this.addPaddingToTexture = new Object();
-  this.addPaddingToTexture.types = [];
-  this.addPaddingToTexture.types.push(this.TEXTURE_NAME); // textureName
-  this.addPaddingToTexture.types.push(this.UNKNOWN_INDICATOR); // padding
-  this.addPaddingToTexture.types.push(this.UNKNOWN_INDICATOR); // newTextureName
-
-  // newSphere
-  this.newSphere = new Object();
-  this.newSphere.types = [];
-  this.newSphere.types.push(this.UNKNOWN_INDICATOR); // name
-  this.newSphere.types.push(this.MATERIAL_NAME_WITH_NULL); // material
-  this.newSphere.types.push(this.UNKNOWN_INDICATOR); // radius
-
-  // applyDisplacementMap
-  this.applyDisplacementMap = new Object();
-  this.applyDisplacementMap.types = [];
-  this.applyDisplacementMap.types.push(this.OBJECT_NAME); // objectName
-  this.applyDisplacementMap.types.push(this.TEXTURE_NAME); // textureName
-  this.applyDisplacementMap.types.push(this.UNKNOWN_INDICATOR); // scale
-  this.applyDisplacementMap.types.push(this.UNKNOWN_INDICATOR); // bias
-
-  // setSlipperiness
-  this.setSlipperiness = new Object();
-  this.setSlipperiness.types = [];
-  this.setSlipperiness.types.push(this.OBJECT_NAME); // objectName
-  this.setSlipperiness.types.push(this.STATE_ON_OFF); // on/off
-
-  // setAtlasTextureSize
-  this.setAtlasTextureSize = new Object();
-  this.setAtlasTextureSize.types = [];
-  this.setAtlasTextureSize.types.push(this.UNKNOWN_INDICATOR); // width
-  this.setAtlasTextureSize.types.push(this.UNKNOWN_INDICATOR); // height
-
-  // sync
-  this.sync = new Object();
-  this.sync.types = [];
-  this.sync.types.push(this.OBJECT_NAME); // sourceObject
-  this.sync.types.push(this.OBJECT_NAME); // targetObject
-
-  // newArea
-  this.newArea = new Object();
-  this.newArea.types = [];
-  this.newArea.types.push(this.UNKNOWN_INDICATOR); // name
-  this.newArea.types.push(this.UNKNOWN_INDICATOR); // height
-
-  // destroyArea
-  this.destroyArea = new Object();
-  this.destroyArea.types = [];
-  this.destroyArea.types.push(this.AREA_NAME); // areaName
-
-  // areaConfiguration
-  this.areaConfigurations = new Object();
-  this.areaConfigurations.types = [];
-  this.areaConfigurations.types.push(this.HIDE_SHOW); // show/hide
-
-  // setResolution
-  this.setResolution = new Object();
-  this.setResolution.types = [];
-  this.setResolution.types.push(this.UNKNOWN_INDICATOR); // resolution
-
-  // configureArea
-  this.configureArea = new Object();
-  this.configureArea.types = [];
-  this.configureArea.types.push(this.AREA_NAME_WITH_DEFAULT); // areaName
-
-  // newAreaConfiguration
-  this.newAreaConfiguration = new Object();
-  this.newAreaConfiguration.types = [];
-  this.newAreaConfiguration.types.push(this.AREA_NAME_WITH_DEFAULT); // areaName
-  this.newAreaConfiguration.types.push(this.OBJECT_NAME); // objectName
-  this.newAreaConfiguration.types.push(this.BOOLEAN); // isVisible
-  this.newAreaConfiguration.types.push(this.RENDER_SIDE); // sides
-
-  // autoConfigureArea
-  this.autoConfigureArea = new Object();
-  this.autoConfigureArea.types = [];
-  this.autoConfigureArea.types.push(this.AREA_NAME); // areaName
-
-  // newCylinder
-  this.newCylinder = new Object();
-  this.newCylinder.types = [];
-  this.newCylinder.types.push(this.UNKNOWN_INDICATOR); // name
-  this.newCylinder.types.push(this.MATERIAL_NAME_WITH_NULL); // materialName
-  this.newCylinder.types.push(this.UNKNOWN_INDICATOR); // topRadius
-  this.newCylinder.types.push(this.UNKNOWN_INDICATOR); // bottomRadius
-  this.newCylinder.types.push(this.UNKNOWN_INDICATOR); // height
-  this.newCylinder.types.push(this.BOOLEAN); // isOpenEnded
-
-  // setRotationPivot
-  this.setRotationPivot = new Object();
-  this.setRotationPivot.types = [];
-  this.setRotationPivot.types.push(this.OBJECT_NAME); // objectName
-  this.setRotationPivot.types.push(this.UNKNOWN_INDICATOR); // offsetX
-  this.setRotationPivot.types.push(this.UNKNOWN_INDICATOR); // offsetY
-  this.setRotationPivot.types.push(this.UNKNOWN_INDICATOR); // offsetZ
-
-  // printChildPosition
-  this.printChildPosition = new Object();
-  this.printChildPosition.types = [];
-  this.printChildPosition.types.push(this.GLUED_OBJECT_NAME); // objectName
-  this.printChildPosition.types.push(this.CHILD_OBJECT_NAME); // childObjName
-
-  // unsetRotationPivot
-  this.unsetRotationPivot = new Object();
-  this.unsetRotationPivot.types = [];
-  this.unsetRotationPivot.types.push(this.OBJECT_NAME); // objectName
-
-  // copyObject
-  this.copyObject = new Object();
-  this.copyObject.types = [];
-  this.copyObject.types.push(this.OBJECT_NAME); // sourceName
-  this.copyObject.types.push(this.OBJECT_CREATION_NAME); // targetName
-  this.copyObject.types.push(this.UNKNOWN_INDICATOR); // offsetX
-  this.copyObject.types.push(this.UNKNOWN_INDICATOR); // offsetY
-  this.copyObject.types.push(this.UNKNOWN_INDICATOR); // offsetZ
-  this.copyObject.types.push(this.BOOLEAN); // isHardCopy
-
-  // build
-  this.build = new Object();
-  this.build.types = [];
-  this.build.types.push(this.UNKNOWN_INDICATOR); // projectName
-  this.build.types.push(this.UNKNOWN_INDICATOR); // author
-
-  // skyboxConfigurations
-  this.skyboxConfigurations = new Object();
-  this.skyboxConfigurations.types = [];
-  this.skyboxConfigurations.types.push(this.HIDE_SHOW); // hide/show
-
-  // fogConfigurations
-  this.fogConfigurations = new Object();
-  this.fogConfigurations.types = [];
-  this.fogConfigurations.types.push(this.HIDE_SHOW); // hide/show
-
-  // noMobile
-  this.noMobile = new Object();
-  this.noMobile.types = [];
-  this.noMobile.types.push(this.STATE_ON_OFF); // on/off
-
-  // setMaxViewport
-  this.setMaxViewport = new Object();
-  this.setMaxViewport.types = [];
-  this.setMaxViewport.types.push(this.UNKNOWN_INDICATOR); // widthInPx
-  this.setMaxViewport.types.push(this.UNKNOWN_INDICATOR); // heightInPx
-
-  // keepAspect
-  this.keepAspect = new Object();
-  this.keepAspect.types = [];
-  this.keepAspect.types.push(this.UNKNOWN_INDICATOR); // ratio
-
-};
-
-CommandDescriptor.prototype.test = function(){
-  for (var i = 0; i<commands.length; i++){
-    var curCommand = commands[i];
-    var curDescriptor = this[curCommand];
-    if (!curDescriptor && commandArgumentsExpectedCount[i] > 0){
-      console.error("CommandDescriptor error: "+curCommand+" not implemented.");
-      return;
-    }
-    if (curDescriptor){
-      var curTypes = curDescriptor.types;
-      if (!curTypes){
-        console.error("CommandDescriptor error: "+curCommand+" has no type.");
-        return;
-      }else{
-        if (curTypes.length != commandArgumentsExpectedCount[i]){
-          console.error("CommandDescriptor error: "+curCommand+" types size mismatch.");
-          return;
-        }
-      }
-    }
-  }
+  return this.colorNames[Math.floor(Math.random() * this.colorNames.length)];
 };
 
 /*
@@ -27365,10 +26766,13 @@ Roygbiv.prototype.terminal = function(isVisible){
     }
     if (isDeployment){
       var diff = canvas.clientWidth - terminalDiv.clientWidth;
-      canvas.oldWidth = canvas.style.width;
+      canvas.oldWidth = (canvas.width / screenResolution) + 'px';
       canvas.style.width = diff + "px";
     }
     terminal.isMadeVisible = true;
+    if (isDeployment && screenResolution != 1){
+      canvas.style.left = terminalDiv.offsetWidth + "px";
+    }
   }else{
     terminal.disable();
     terminalDiv.style.display = "none";
@@ -27379,6 +26783,9 @@ Roygbiv.prototype.terminal = function(isVisible){
       canvas.style.width = canvas.oldWidth;
     }
     terminal.isMadeVisible = false;
+    if (isDeployment && screenResolution != 1){
+      canvas.style.left = "0px";
+    }
   }
 }
 
@@ -27596,6 +27003,9 @@ var WorldBinHandler = function(isCustom){
     for (var objName in addedObjects){
       var object = addedObjects[objName];
       object.generateBoundingBoxes();
+      if (!object.boundingBoxes){
+        continue;
+      }
       for (var i = 0; i<object.boundingBoxes.length; i++){
         this.insert(object.boundingBoxes[i], objName);
       }
@@ -27603,6 +27013,9 @@ var WorldBinHandler = function(isCustom){
     for (var objName in objectGroups){
       var object = objectGroups[objName];
       object.generateBoundingBoxes();
+      if (!object.boundingBoxes){
+        continue;
+      }
       for (var i = 0; i<object.boundingBoxes.length; i++){
         this.insert(object.boundingBoxes[i], object.boundingBoxes[i].roygbivObjectName, objName);
       }
@@ -27822,6 +27235,8 @@ WorldBinHandler.prototype.query = function(point){
                 }
               }else if (gridSystems[objName]){
                 results[objName] = 10;
+              }else if (addedTexts[objName]){
+                results[objName] = 20;
               }
             }
           }
@@ -28544,6 +27959,7 @@ MeshGenerator.prototype.generateInstancedMesh = function(graphicsGroup, objectGr
     }
   });
   var mesh = new THREE.Mesh(this.geometry, material);
+  mesh.renderOrder = 10;
   mesh.position.copy(graphicsGroup.position);
   material.uniforms.modelViewMatrix.value = mesh.modelViewMatrix;
   material.uniforms.worldMatrix.value = mesh.matrixWorld;
@@ -28612,6 +28028,7 @@ MeshGenerator.prototype.generateMergedMesh = function(graphicsGroup, objectGroup
     }
   });
   var mesh = new THREE.Mesh(this.geometry, material);
+  mesh.renderOrder = 10;
   mesh.position.copy(graphicsGroup.position);
   material.uniforms.modelViewMatrix.value = mesh.modelViewMatrix;
   material.uniforms.worldMatrix.value = mesh.matrixWorld;
@@ -28662,6 +28079,7 @@ MeshGenerator.prototype.generateBasicMesh = function(){
     }
   });
   var mesh = new THREE.Mesh(this.geometry, material);
+  mesh.renderOrder = 10;
   material.uniforms.modelViewMatrix.value = mesh.modelViewMatrix;
   material.uniforms.worldMatrix.value = mesh.matrixWorld;
   return mesh;
@@ -29801,9 +29219,6 @@ var Area = function(name, boundingBox, color, gridSize){
   this.color = color;
   this.center = new THREE.Vector3();
   this.boundingBox.getCenter(this.center);
-  this.object3D = new THREE.Object3D();
-  this.object3D.position.copy(this.center);
-  this.vector2D = this.get2DVector();
   this.gridSize = gridSize;
 }
 
@@ -29828,11 +29243,6 @@ Area.prototype.destroy = function(){
     }
     this.helper.geometry.dispose();
     this.helper.material.dispose();
-  }
-  if (this.div){
-    if (areasVisible){
-      document.getElementsByTagName("body")[0].removeChild(this.div);
-    }
   }
   areaBinHandler.deleteObjectFromBin(this.binInfo, this.name);
   for (var objName in addedObjects){
@@ -29862,70 +29272,323 @@ Area.prototype.destroy = function(){
 }
 
 Area.prototype.renderToScreen = function(){
+  if (isDeployment){
+    return;
+  }
   if (!this.helper){
     var color = new THREE.Color(this.color);
     this.helper = new THREE.Box3Helper(this.boundingBox, color);
   }
+  if(!this.text){
+    this.text = new AddedText(defaultFont, this.name, this.center, color, 1, 15);
+    this.text.setMarginBetweenChars(7);
+    this.text.refInnerHeight = 569;
+    this.text.refCharSize = 15;
+    this.text.handleResize();
+  }else{
+    scene.add(this.text.mesh);
+  }
   scene.add(this.helper);
-  this.renderDivToScreen();
-}
-
-Area.prototype.renderDivToScreen = function(){
-  if (!this.div){
-    this.div = document.createElement("div");
-    this.div.className = "markedPoint noselect";
-    this.div.style.left = this.vector2D.x + "px";
-    this.div.style.top = this.vector2D.y + "px";
-    this.div.style.visibility = "visible";
-    document.getElementsByTagName("body")[0].appendChild(this.div);
-    this.innerDiv = document.createElement("div");
-    this.markerSpan = document.createElement("span");
-    this.markerSpan.style.color = "#20C20E";
-    this.markerIcon = document.createElement("i");
-    this.markerIcon.className="fa fa-map-marker";
-    this.markerSpan.innerHTML = " "+this.name+" ";
-    this.markerSpan.appendChild(this.markerIcon);
-    this.innerDiv.appendChild(this.markerSpan);
-    this.div.appendChild(this.innerDiv);
-  }else{
-    document.getElementsByTagName("body")[0].appendChild(this.div);
-  }
-}
-
-Area.prototype.get2DVector = function(){
-  var vector = REUSABLE_VECTOR;
-  var widthHalf = 0.5 * renderer.context.canvas.width / renderer.getPixelRatio();
-  var heightHalf = 0.5 * renderer.context.canvas.height / renderer.getPixelRatio();
-  this.object3D.updateMatrixWorld();
-  vector.setFromMatrixPosition(this.object3D.matrixWorld);
-  vector.project(camera);
-  vector.x = ( vector.x * widthHalf ) + widthHalf;
-  vector.y = - ( vector.y * heightHalf ) + heightHalf;
-  var object2D = new Object();
-  object2D.x = vector.x;
-  object2D.y = vector.y;
-  return object2D;
-}
-
-Area.prototype.update = function(){
-  if (this.isObjectInFrustum()){
-    this.div.style.visibility = "visible";
-    this.vector2D = this.get2DVector();
-    this.div.style.left = this.vector2D.x + 'px';
-    this.div.style.top = this.vector2D.y + 'px';
-  }else{
-    this.div.style.visibility = "hidden";
-  }
 }
 
 Area.prototype.hide = function(){
-  document.getElementsByTagName("body")[0].removeChild(this.div);
-  scene.remove(this.helper);
+  if (this.helper){
+    scene.remove(this.helper);
+  }
+  if (this.text){
+    scene.remove(this.text.mesh);
+  }
 }
 
-Area.prototype.isObjectInFrustum = function(){
-  frustum.setFromMatrix(REUSABLE_MATRIX_4.multiplyMatrices(camera.projectionMatrix, camera.matrixWorldInverse));
-  return frustum.containsPoint(this.object3D.position);
+var Font = function(name, path, onLoaded, onError, customFontFace){
+  this.name = name;
+  this.path = path;
+  this.onLoaded = onLoaded;
+  this.onError = onError;
+  if (!customFontFace){
+    this.fontFace = new FontFace(name, "url("+path+")");
+  }else{
+    this.fontFace = customFontFace
+    this.generateFontTexture();
+  }
+}
+
+Font.prototype.load = function(){
+  var that = this;
+  this.fontFace.load().then(function(loadedFace) {
+  	document.fonts.add(loadedFace);
+    that.generateFontTexture();
+    that.onLoaded(that);
+  }).catch(function(error) {
+    that.onError(that.name);
+  });
+}
+
+Font.prototype.export = function(){
+  var exportObject = new Object();
+  exportObject.name = this.name;
+  exportObject.path = this.path;
+  return exportObject;
+}
+
+Font.prototype.destroy = function(){
+  if (this.textureMerger){
+    this.textureMerger.mergedTexture.dispose();
+  }
+  this.textureMerger = null;
+  delete fonts[this.name];
+}
+
+Font.prototype.generateFontTexture = function(){
+  var canvasSize = 64;
+  var textureObjects = new Object();
+  var tmpCanvas = document.createElement("canvas");
+  var ctx = tmpCanvas.getContext("2d");
+  var fontSize = 60;
+  for (var i = 0; i<supportedFontAtlasChars.length; i++){
+    ctx.textBaseline = "bottom";
+    ctx.font = fontSize + "px "+this.name;
+    var textWidth = ctx.measureText(supportedFontAtlasChars[i]).width;
+    while (textWidth > canvasSize){
+      fontSize-=15;
+      ctx.font = fontSize + "px "+this.name;
+      textWidth = ctx.measureText(supportedFontAtlasChars[i]).width;
+    }
+  }
+  for (var i = 0; i<supportedFontAtlasChars.length; i++){
+    tmpCanvas = document.createElement("canvas");
+    tmpCanvas.width = canvasSize;
+    tmpCanvas.height = canvasSize;
+    ctx = tmpCanvas.getContext("2d");
+    ctx.textBaseline = "middle";
+    ctx.textAlign='center';
+    ctx.font = fontSize + "px "+this.name;
+    var textWidth = ctx.measureText(supportedFontAtlasChars[i]).width;
+    ctx.fillStyle = "#ffffff";
+    ctx.translate(canvasSize/2, canvasSize/2);
+    ctx.rotate(Math.PI);
+    ctx.scale(-1, 1);
+    ctx.fillText(supportedFontAtlasChars[i] , 0, 0);
+    var canvasTexture = new THREE.CanvasTexture(tmpCanvas);
+    textureObjects[supportedFontAtlasChars[i]] = canvasTexture;
+  }
+  this.textureMerger = new TextureMerger(textureObjects);
+}
+
+var AddedText = function(font, text, position, color, alpha, characterSize){
+  this.font = font;
+  this.text = text;
+  this.position = position;
+  this.color = color;
+  this.alpha = alpha;
+  this.characterSize = characterSize;
+  this.geometry = new THREE.BufferGeometry();
+  var strlen = text.length;
+  this.strlen = strlen;
+
+  var charIndices = new Float32Array(strlen);
+  for (var i = 0; i<strlen; i++){
+    charIndices[i] = i;
+  }
+  this.charIndices = charIndices;
+  this.offsetBetweenLines = DEFAULT_OFFSET_BETWEEN_LINES;
+  this.offsetBetweenChars = DEFAULT_OFFSET_BETWEEN_CHARS;
+
+  var charIndicesBufferAttribute = new THREE.BufferAttribute(charIndices, 1);
+  charIndicesBufferAttribute.setDynamic(false);
+  this.geometry.addAttribute('charIndex', charIndicesBufferAttribute);
+  this.geometry.setDrawRange(0, strlen);
+
+  var xOffsetsArray = [];
+  var yOffsetsArray = [];
+  var uvsArray = [];
+  for (var i = 0; i<strlen; i++){
+    xOffsetsArray.push(0);
+    yOffsetsArray.push(0);
+    uvsArray.push(new THREE.Vector4());
+  }
+
+  this.material = new THREE.RawShaderMaterial({
+    vertexShader: ShaderContent.textVertexShader.replace("#define STR_LEN 1", "#define STR_LEN "+strlen),
+    fragmentShader: ShaderContent.textFragmentShader,
+    vertexColors: THREE.VertexColors,
+    transparent: true,
+    side: THREE.DoubleSide,
+    uniforms: {
+      modelViewMatrix: new THREE.Uniform(new THREE.Matrix4()),
+      projectionMatrix: GLOBAL_PROJECTION_UNIFORM,
+      cameraQuaternion: GLOBAL_CAMERA_QUATERNION_UNIFORM,
+      charSize: new THREE.Uniform(characterSize),
+      color: new THREE.Uniform(color),
+      alpha: new THREE.Uniform(alpha),
+      backgroundColor: new THREE.Uniform(new THREE.Color("white")),
+      backgroundAlpha: new THREE.Uniform(0.0),
+      hasBackgroundColorFlag: new THREE.Uniform(-500.0),
+      uvRanges: new THREE.Uniform(uvsArray),
+      glyphTexture: this.getGlyphUniform(),
+      xOffsets: new THREE.Uniform(xOffsetsArray),
+      yOffsets: new THREE.Uniform(yOffsetsArray)
+    }
+  });
+  this.topLeft = new THREE.Vector3(position.x, position.y, position.z);
+  this.bottomRight = new THREE.Vector3();
+  this.constructText();
+  this.handleUVUniform();
+  this.mesh = new THREE.Points(this.geometry, this.material);
+  this.mesh.position.copy(position);
+  this.mesh.frustumCulled = false;
+  scene.add(this.mesh);
+  this.material.uniforms.modelViewMatrix.value = this.mesh.modelViewMatrix;
+
+  this.tmpObj = {};
+  this.line = new THREE.Line3();
+  this.matrix4 = new THREE.Matrix4();
+}
+
+AddedText.prototype.destroy = function(){
+  scene.remove(this.mesh);
+  this.material.dispose();
+  this.geometry.dispose();
+}
+
+AddedText.prototype.constructText = function(){
+  var xOffset = 0;
+  var yOffset = 0;
+  var xOffsets = this.material.uniforms.xOffsets.value;
+  var yOffsets = this.material.uniforms.yOffsets.value;
+  var xMax = 0;
+  var yMin = 0;
+  for (var i = 0; i<this.strlen; i++){
+    xOffsets[i] = xOffset;
+    yOffsets[i] = yOffset;
+    if (xOffset > xMax){
+      xMax = xOffset;
+    }
+    if (yOffset < yMin){
+      yMin = yOffset;
+    }
+    if (this.text.charAt(i) == "\n"){
+      yOffset -= this.offsetBetweenLines;
+      xOffset = 0;
+    }else{
+      xOffset += this.offsetBetweenChars;
+    }
+  }
+  this.bottomRight.x = this.position.x + xMax;
+  this.bottomRight.y = this.position.y + yMin;
+  this.bottomRight.z = this.position.z - 1;
+}
+
+AddedText.prototype.getGlyphUniform = function(){
+  var uuid = this.font.textureMerger.mergedTexture.uuid;
+  if (textureUniformCache[uuid]){
+    return textureUniformCache[uuid];
+  }
+  var glyphUniform = new THREE.Uniform(this.font.textureMerger.mergedTexture);
+  textureUniformCache[uuid] = glyphUniform;
+  return glyphUniform;
+}
+
+AddedText.prototype.handleUVUniform = function(){
+  var uvRangesArray = this.material.uniforms.uvRanges.value;
+  for (var i = 0; i<this.strlen; i++){
+    var curChar = this.text.charAt(i);
+    var curRange = this.font.textureMerger.ranges[curChar];
+    if (curRange){
+      uvRangesArray[i].set(
+        curRange.startU, curRange.endU, curRange.startV, curRange.endV
+      );
+    }else{
+      uvRangesArray[i].set(-500, -500, -500, -500);
+    }
+  }
+}
+
+AddedText.prototype.setMarginBetweenChars = function(value){
+  this.offsetBetweenChars = value;
+  this.constructText();
+}
+
+AddedText.prototype.setMarginBetweenLines = function(value){
+  this.offsetBetweenLines = value;
+  this.constructText();
+}
+
+AddedText.prototype.setText = function(newText){
+  if (newText.length > this.strlen){
+    throw new Error("The length of the next text exceeds the length of the old text.");
+    return;
+  }
+  this.text = newText;
+  this.constructText();
+  this.handleUVUniform();
+}
+
+AddedText.prototype.setColor = function(colorString){
+  this.material.uniforms.color.value.set(colorString);
+}
+
+AddedText.prototype.setAlpha = function(alpha){
+  if (alpha > 1){
+    alpha = 1;
+  }else if (alpha < 0){
+    alpha = 0;
+  }
+  this.material.uniforms.alpha.value = alpha;
+}
+
+AddedText.prototype.setBackground = function(backgroundColorString, backgroundAlpha){
+  this.material.uniforms.backgroundColor.value.set(backgroundColorString);
+  this.material.uniforms.backgroundAlpha.value = backgroundAlpha;
+  this.material.uniforms.hasBackgroundColorFlag.value = 500;
+}
+
+AddedText.prototype.removeBackground = function(){
+  this.material.uniforms.hasBackgroundColorFlag.value = -500;
+}
+
+AddedText.prototype.setCharSize = function(value){
+  this.material.uniforms.charSize.value = value;
+}
+
+AddedText.prototype.handleResize = function(){
+  this.setCharSize(this.refCharSize * ((renderer.getCurrentViewport().w / screenResolution)/this.refInnerHeight));
+}
+
+AddedText.prototype.calculateCharSize = function(){
+  var currentViewport = renderer.getCurrentViewport();
+  REUSABLE_VECTOR.copy(this.mesh.position);
+  REUSABLE_VECTOR.applyQuaternion(this.mesh.quaternion);
+  REUSABLE_VECTOR.applyMatrix4(this.mesh.modelViewMatrix);
+  var pointSizePixels =  500 * this.characterSize / REUSABLE_VECTOR.length();
+  var verticalFOV = THREE.Math.degToRad(camera.fov);
+  var height = 2 * Math.tan(verticalFOV / 2) * this.position.distanceTo(camera.position);
+  var width = height * camera.aspect;
+  var w = width * pointSizePixels /currentViewport.z;
+  var h = height * pointSizePixels / currentViewport.w;
+  this.tmpObj.width = w;
+  this.tmpObj.height = h;
+  return this.tmpObj;
+}
+
+AddedText.prototype.handleBoundingBox = function(){
+  if (!this.boundingBox){
+    this.boundingBox = new THREE.Box3();
+  }else{
+    this.boundingBox.makeEmpty();
+  }
+  var cSize = this.calculateCharSize();
+  REUSABLE_VECTOR.copy(this.topLeft)
+  REUSABLE_VECTOR_2.copy(this.bottomRight);
+  REUSABLE_VECTOR.x -= cSize.width / 2;
+  REUSABLE_VECTOR.y += cSize.height / 2;
+  REUSABLE_VECTOR_2.x += cSize.width / 2;
+  REUSABLE_VECTOR_2.y -= cSize.height / 2;
+  this.line.set(REUSABLE_VECTOR, REUSABLE_VECTOR_2);
+  this.matrix4.compose(REUSABLE_VECTOR_3.set(0, 0, 0), camera.quaternion, this.mesh.scale);
+  this.line.applyMatrix4(this.matrix4);
+  this.boundingBox.expandByPoint(this.line.start);
+  this.boundingBox.expandByPoint(this.line.end);
 }
 
 var AreaConfigurationsHandler = function(){
@@ -30145,6 +29808,10 @@ RayCaster.prototype.refresh = function(){
       var gridSystem = gridSystems[gsName];
       this.binHandler.insert(gridSystem.boundingBox, gridSystem.name);
     }
+    for (var txtName in addedTexts){
+      var addedText = addedTexts[txtName];
+      this.binHandler.insert(addedText.boundingBox, txtName);
+    }
   }
 }
 
@@ -30187,6 +29854,8 @@ RayCaster.prototype.findIntersections = function(from, direction, intersectGridS
             intersectionPoint = 0;
           }
         }
+      }else if (result == 20){
+        
       }else{
         if (!(mode == 0 && keyboardBuffer["Shift"])){
           var parent = objectGroups[objName];
@@ -30847,18 +30516,11 @@ ModeSwitcher.prototype.switchFromDesignToPreview = function(){
     scene.remove(gridSystems[gsName].boundingPlane);
   }
   for (var gridName in gridSelections){
+    gridSelections[gridName].removeCornerHelpers();
     scene.remove(gridSelections[gridName].mesh);
     scene.remove(gridSelections[gridName].dot);
   }
   scriptsToRun = new Object();
-  for (var gridName in gridSelections){
-    var grid = gridSelections[gridName];
-    if (grid.divs){
-      for (var i = 0; i<grid.divs.length; i++){
-        grid.divs[i].style.visibility = "hidden";
-      }
-    }
-  }
   for (var markedPointName in markedPoints){
     markedPoints[markedPointName].hide(true);
   }
@@ -30983,8 +30645,8 @@ ModeSwitcher.prototype.switchFromDesignToPreview = function(){
   $("#cliDivheader").text("ROYGBIV 3D Engine - CLI (Preview mode)");
   mode = 1;
   rayCaster.refresh();
-  handleViewport();
   this.commonSwitchFunctions();
+  handleViewport();
 }
 
 ModeSwitcher.prototype.switchFromPreviewToDesign = function(){
@@ -31200,7 +30862,7 @@ ModeSwitcher.prototype.switchFromPreviewToDesign = function(){
   }
   newScripts = undefined;
   GLOBAL_FOG_UNIFORM.value.set(-100.0, 0, 0, 0);
-  renderer.setViewport(0, 0, canvas.width, canvas.height);
+  renderer.setViewport(0, 0, canvas.width / screenResolution, canvas.height / screenResolution);
 
   this.commonSwitchFunctions();
 }
