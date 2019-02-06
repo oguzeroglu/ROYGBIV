@@ -873,6 +873,7 @@ window.addEventListener('keyup', function(event){
    copyPass = new THREE.ShaderPass( THREE.CopyShader );
    setPostProcessingParams();
    composer = new THREE.EffectComposer(renderer);
+   composer.setSize(renderer.getCurrentViewport().z / screenResolution, renderer.getCurrentViewport().w / screenResolution);
    composer.addPass( renderPass );
    if (mode == 1){
     if (bloomOn){
@@ -951,6 +952,7 @@ window.addEventListener('keyup', function(event){
      break;
    }
    composer = new THREE.EffectComposer(renderer);
+   composer.setSize(renderer.getCurrentViewport().z / screenResolution, renderer.getCurrentViewport().w / screenResolution);
    composer.addPass(renderPass);
    if (bloomOn){
      composer.addPass(bloomPass);
@@ -1355,6 +1357,7 @@ function handleViewport(){
     var newViewportZ = result.width;
     var newViewportW = result.height;
     renderer.setViewport(newViewportX, newViewportY, newViewportZ, newViewportW);
+    composer.setSize(newViewportZ, newViewportW);
     currentViewport.startX = newViewportX;
     currentViewport.startY = newViewportY;
     currentViewport.width = newViewportZ;
@@ -1383,6 +1386,7 @@ function handleViewport(){
     }
   }
   renderer.setViewport(newViewportX, newViewportY, newViewportZ, newViewportW);
+  composer.setSize(newViewportZ, newViewportW);
   currentViewport.startX = newViewportX;
   currentViewport.startY = newViewportY;
   currentViewport.width = newViewportZ;
