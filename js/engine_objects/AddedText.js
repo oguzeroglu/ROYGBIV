@@ -173,7 +173,7 @@ AddedText.prototype.setCharSize = function(value){
 }
 
 AddedText.prototype.handleResize = function(){
-  this.setCharSize(this.refCharSize * (window.innerHeight/this.refInnerHeight));
+  this.setCharSize(this.refCharSize * ((renderer.getCurrentViewport().w / screenResolution)/this.refInnerHeight));
 }
 
 AddedText.prototype.calculateCharSize = function(){
