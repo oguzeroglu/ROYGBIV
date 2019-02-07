@@ -647,7 +647,7 @@ window.onload = function() {
             }
            }
          }else if (object.isAddedText){
-           console.log("HO");
+           
          }
        }else{
          if (!objectSelectedByCommand){
