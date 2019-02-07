@@ -62,7 +62,14 @@ RayCaster.prototype.findIntersections = function(from, direction, intersectGridS
           }
         }
       }else if (result == 20){
-        
+        var addedText = addedTexts[objName];
+        if (addedText && addedText.plane){
+          intersectionPoint = addedText.intersectsLine(REUSABLE_LINE);
+          if (intersectionPoint){
+            intersectionObject = objName;
+            return;
+          }
+        }
       }else{
         if (!(mode == 0 && keyboardBuffer["Shift"])){
           var parent = objectGroups[objName];

@@ -5041,12 +5041,17 @@ function parse(input){
           textCoord.x = textCoord.x / selectionSize;
           textCoord.y = textCoord.y / selectionSize;
           textCoord.z = textCoord.z / selectionSize;
-          var addedText = new AddedText(selectedFont, txt, textCoord, new THREE.Color("white"), 1, 20);
+          var addedText = new AddedText(
+            textName, selectedFont, txt, textCoord, new THREE.Color("white"), 1, 20
+          );
           addedTexts[textName] = addedText;
           addedText.refCharSize = 20;
           addedText.refInnerHeight = window.innerHeight;
           addedText.handleBoundingBox();
           rayCaster.refresh();
+          for (var gridName in gridSelections){
+            gridSelections[gridName].toggleSelect(false, false, false, true);
+          }
           terminal.printInfo(Text.TEXT_ALLOCATED);
           return true;
         break;

@@ -535,13 +535,16 @@ window.onload = function() {
          if (!object){
            object = gridSystems[intersectionObject];
          }
-         if (object instanceof AddedObject || object instanceof ObjectGroup){
+         if (!object){
+           object = addedTexts[intersectionObject];
+         }
+         if (object.isAddedObject || object.isObjectGroup){
            if (!defaultCameraControlsDisabled && !isDeployment){
              terminal.clear();
            }
            var point = intersectionPoint;
            var coordStr = " ("+point.x.toFixed(2)+", "+point.y.toFixed(2)+", "+point.z.toFixed(2)+")";
-           if (object instanceof AddedObject){
+           if (object.isAddedObject){
              if (!defaultCameraControlsDisabled && !isDeployment){
                terminal.printInfo(Text.CLICKED_ON.replace(
                  Text.PARAM1, object.name + coordStr
@@ -562,7 +565,7 @@ window.onload = function() {
              if (object.clickCallbackFunction){
                object.clickCallbackFunction(point.x, point.y, point.z);
              }
-           }else if (object instanceof ObjectGroup){
+           }else if (object.isObjectGroup){
              if (!defaultCameraControlsDisabled && !isDeployment){
                terminal.printInfo(Text.CLICKED_ON.replace(
                  Text.PARAM1, object.name+coordStr
@@ -584,7 +587,7 @@ window.onload = function() {
                object.clickCallbackFunction(point.x, point.y, point.z);
              }
            }
-         } else if (object instanceof GridSystem){
+         } else if (object.isGridSystem){
            var gridSystem = object;
            var point = intersectionPoint;
            var selectedGrid = gridSystem.getGridFromPoint(point);
@@ -643,6 +646,8 @@ window.onload = function() {
               }
             }
            }
+         }else if (object.isAddedText){
+           console.log("HO");
          }
        }else{
          if (!objectSelectedByCommand){

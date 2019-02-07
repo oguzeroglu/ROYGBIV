@@ -1,4 +1,8 @@
 /*
+  note from the future:
+  this is the first engine obj class of the engine so I was motivated about
+  writing comments and stuff like below.
+
   CONSTRUCTOR PARAMETERS
     name -> name of this grid system, must be unique.
     sizeX -> size along the x axis
@@ -14,6 +18,9 @@
 */
 var GridSystem = function(name, sizeX, sizeZ, centerX, centerY, centerZ,
                                               outlineColor, cellSize, axis){
+
+  this.isGridSystem = true;
+  
   // size negativity/zero check
   if (sizeX<=0 || sizeZ <=0){
     terminal.printError(Text.GS_CREATION_ERROR_1);

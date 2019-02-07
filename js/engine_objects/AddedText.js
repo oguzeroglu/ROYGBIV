@@ -1,4 +1,6 @@
-var AddedText = function(font, text, position, color, alpha, characterSize){
+var AddedText = function(name, font, text, position, color, alpha, characterSize){
+  this.isAddedText = true;
+  this.name = name;
   this.font = font;
   this.text = text;
   this.position = position;
@@ -53,8 +55,10 @@ var AddedText = function(font, text, position, color, alpha, characterSize){
       yOffsets: new THREE.Uniform(yOffsetsArray)
     }
   });
-  this.topLeft = new THREE.Vector3(position.x, position.y, position.z);
+  this.topLeft = new THREE.Vector3(0, 0, 0);
   this.bottomRight = new THREE.Vector3();
+  this.bottomLeft = new THREE.Vector3();
+  this.topRight = new THREE.Vector3();
   this.constructText();
   this.handleUVUniform();
   this.mesh = new THREE.Points(this.geometry, this.material);
@@ -64,8 +68,6 @@ var AddedText = function(font, text, position, color, alpha, characterSize){
   this.material.uniforms.modelViewMatrix.value = this.mesh.modelViewMatrix;
 
   this.tmpObj = {};
-  this.line = new THREE.Line3();
-  this.matrix4 = new THREE.Matrix4();
 }
 
 AddedText.prototype.destroy = function(){
@@ -97,9 +99,13 @@ AddedText.prototype.constructText = function(){
       xOffset += this.offsetBetweenChars;
     }
   }
-  this.bottomRight.x = this.position.x + xMax;
-  this.bottomRight.y = this.position.y + yMin;
-  this.bottomRight.z = this.position.z - 1;
+  this.bottomRight.x = xMax;
+  this.bottomRight.y = yMin;
+  this.bottomRight.z = -1;
+  this.bottomLeft.x = 0;
+  this.bottomLeft.y = yMin;
+  this.topRight.x = xMax;
+  this.topRight.y = 0;
 }
 
 AddedText.prototype.getGlyphUniform = function(){
@@ -194,9 +200,21 @@ AddedText.prototype.calculateCharSize = function(){
   return this.tmpObj;
 }
 
+AddedText.prototype.intersectsLine = function(line){
+  if (this.plane.intersectLine(line, REUSABLE_VECTOR)){
+    if (this.triangles[0].containsPoint(REUSABLE_VECTOR) || this.triangles[1].containsPoint(REUSABLE_VECTOR)){
+      return REUSABLE_VECTOR;
+    }
+  }
+  return false;
+}
+
 AddedText.prototype.handleBoundingBox = function(){
   if (!this.boundingBox){
     this.boundingBox = new THREE.Box3();
+    this.bbHelper = new THREE.Box3Helper(this.boundingBox);
+    this.plane = new THREE.Plane();
+    this.triangles = [new THREE.Triangle(), new THREE.Triangle()];
   }else{
     this.boundingBox.makeEmpty();
   }
@@ -207,9 +225,37 @@ AddedText.prototype.handleBoundingBox = function(){
   REUSABLE_VECTOR.y += cSize.height / 2;
   REUSABLE_VECTOR_2.x += cSize.width / 2;
   REUSABLE_VECTOR_2.y -= cSize.height / 2;
-  this.line.set(REUSABLE_VECTOR, REUSABLE_VECTOR_2);
-  this.matrix4.compose(REUSABLE_VECTOR_3.set(0, 0, 0), camera.quaternion, this.mesh.scale);
-  this.line.applyMatrix4(this.matrix4);
-  this.boundingBox.expandByPoint(this.line.start);
-  this.boundingBox.expandByPoint(this.line.end);
+  REUSABLE_VECTOR_2.applyQuaternion(camera.quaternion);
+  REUSABLE_VECTOR.applyQuaternion(camera.quaternion);
+  REUSABLE_VECTOR.add(this.position);
+  REUSABLE_VECTOR_2.add(this.position);
+  this.boundingBox.expandByPoint(REUSABLE_VECTOR);
+  this.boundingBox.expandByPoint(REUSABLE_VECTOR_2);
+
+  REUSABLE_VECTOR.copy(this.topLeft)
+  REUSABLE_VECTOR_2.copy(this.bottomRight);
+  REUSABLE_VECTOR_3.copy(this.topRight);
+  REUSABLE_VECTOR_4.copy(this.bottomLeft);
+  REUSABLE_VECTOR.x -= cSize.width / 2;
+  REUSABLE_VECTOR.y += cSize.height / 2;
+  REUSABLE_VECTOR_2.x += cSize.width / 2;
+  REUSABLE_VECTOR_2.y -= cSize.height / 2;
+  REUSABLE_VECTOR_3.x += cSize.width / 2;
+  REUSABLE_VECTOR_3.y += cSize.height / 2;
+  REUSABLE_VECTOR_4.x -= cSize.width / 2;
+  REUSABLE_VECTOR_4.y -= cSize.height / 2;
+
+  REUSABLE_VECTOR.applyQuaternion(camera.quaternion);
+  REUSABLE_VECTOR_2.applyQuaternion(camera.quaternion);
+  REUSABLE_VECTOR_3.applyQuaternion(camera.quaternion);
+  REUSABLE_VECTOR_4.applyQuaternion(camera.quaternion);
+
+  REUSABLE_VECTOR.add(this.position);
+  REUSABLE_VECTOR_2.add(this.position);
+  REUSABLE_VECTOR_3.add(this.position);
+  REUSABLE_VECTOR_4.add(this.position);
+
+  this.plane.setFromCoplanarPoints(REUSABLE_VECTOR, REUSABLE_VECTOR_2, REUSABLE_VECTOR_3);
+  this.triangles[0].set(REUSABLE_VECTOR, REUSABLE_VECTOR_2, REUSABLE_VECTOR_3);
+  this.triangles[1].set(REUSABLE_VECTOR, REUSABLE_VECTOR_2, REUSABLE_VECTOR_4);
 }

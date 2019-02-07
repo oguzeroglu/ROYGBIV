@@ -49,15 +49,15 @@ WorldBinHandler.prototype.deleteObjectFromBin = function(binInfo, objName){
 }
 
 WorldBinHandler.prototype.updateObject = function(obj){
-  if (obj instanceof AddedObject){
-    this.deleteObjectFromBin(obj.binInfo, obj);
+  if (obj.isAddedObject){
+    this.deleteObjectFromBin(obj.binInfo, obj.name);
     obj.mesh.updateMatrixWorld();
     obj.updateBoundingBoxes();
     for (var i = 0; i<obj.boundingBoxes.length; i++){
       this.insert(obj.boundingBoxes[i], obj.name);
     }
-  }else if (obj instanceof ObjectGroup){
-    this.deleteObjectFromBin(obj.binInfo, obj);
+  }else if (obj.isObjectGroup){
+    this.deleteObjectFromBin(obj.binInfo, obj.name);
     if (!obj.boundingBoxes){
       obj.generateBoundingBoxes();
     }
@@ -66,15 +66,21 @@ WorldBinHandler.prototype.updateObject = function(obj){
     for (var i = 0; i<obj.boundingBoxes.length; i++){
       this.insert(obj.boundingBoxes[i], obj.boundingBoxes[i].roygbivObjectName, obj.name);
     }
+  }else if (obj.isAddedText){
+    this.deleteObjectFromBin(obj.binInfo, obj.name);
+    if (!obj.boundingBox){
+      obj.handleBoundingBox();
+    }
+    this.insert(obj.boundingBox, obj.name);
   }
 }
 
 WorldBinHandler.prototype.show = function(obj){
-  if (obj instanceof AddedObject){
+  if (obj.isAddedObject){
     for (var i = 0; i<obj.boundingBoxes.length; i++){
       this.insert(obj.boundingBoxes[i], obj.name);
     }
-  }else if (obj instanceof ObjectGroup){
+  }else if (obj.isObjectGroup){
     for (var i = 0; i<obj.boundingBoxes.length; i++){
       this.insert(obj.boundingBoxes[i], obj.boundingBoxes[i].roygbivObjectName, obj.name);
     }
@@ -353,6 +359,9 @@ WorldBinHandler.prototype.insert = function(boundingBox, objName, parentName){
           obj = addedObjects[objName];
           if (!obj){
             obj = objectGroups[parentName];
+          }
+          if (!obj){
+            obj = addedTexts[objName];
           }
         }else{
           obj = areas[objName];

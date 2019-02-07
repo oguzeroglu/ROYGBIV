@@ -47,7 +47,9 @@ function render(){
 
 function updateAddedTexts(){
   for (var addedTextName in addedTexts){
-    addedTexts[addedTextName].handleBoundingBox();
+    var addedText = addedTexts[addedTextName];
+    addedText.handleBoundingBox();
+    rayCaster.updateObject(addedText);
   }
 }
 
