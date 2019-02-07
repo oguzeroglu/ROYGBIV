@@ -9,7 +9,7 @@ var MarkedPoint = function(name, x, y, z, fromX, fromY, fromZ, gridDestroyed){
   this.gridDestroyed = gridDestroyed;
   if (!isDeployment){
     var txt = "@@1 (@@2, @@3, @@4)".replace("@@1", name).replace("@@2", x).replace("@@3", y).replace("@@4", z);
-    this.text = new AddedText(defaultFont, txt, new THREE.Vector3(x, y, z), new THREE.Color("yellow"), 1, 15);
+    this.text = new AddedText(null, defaultFont, txt, new THREE.Vector3(x, y, z), new THREE.Color("yellow"), 1, 15);
     this.text.setBackground("magenta", 1);
     this.text.setMarginBetweenChars(7);
     this.text.refInnerHeight = 569;
