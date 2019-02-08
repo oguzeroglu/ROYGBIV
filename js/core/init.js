@@ -40,13 +40,15 @@ window.onload = function() {
 
   // SCRIPTING UTILITY FUNCTIONS
   ROYGBIV = new Roygbiv();
-  var roygbivScriptingAPIMethodCount = (Object.keys(Roygbiv.prototype).length);
-  if (roygbivScriptingAPIMethodCount != ROYGBIV.functionNames.length){
-    console.error("[*] Scripting API error: Some methods are missing in functionNames list.");
-  }
-  for (var i = 0; i<ROYGBIV.functionNames.length; i++){
-    if (!Text[Text.ROYGBIV_SCRIPTING_API_PREFIX+ROYGBIV.functionNames[i].toUpperCase()]){
-      console.error("[*] Scripting API error: "+ROYGBIV.functionNames[i]+" explanation is not present.");
+  if (!isDeployment){
+    var roygbivScriptingAPIMethodCount = (Object.keys(Roygbiv.prototype).length);
+    if (roygbivScriptingAPIMethodCount != ROYGBIV.functionNames.length){
+      console.error("[*] Scripting API error: Some methods are missing in functionNames list.");
+    }
+    for (var i = 0; i<ROYGBIV.functionNames.length; i++){
+      if (!Text[Text.ROYGBIV_SCRIPTING_API_PREFIX+ROYGBIV.functionNames[i].toUpperCase()]){
+        console.error("[*] Scripting API error: "+ROYGBIV.functionNames[i]+" explanation is not present.");
+      }
     }
   }
 
@@ -691,8 +693,8 @@ window.onload = function() {
   ShaderContent = new ShaderContent();
   if (isDeployment){
     console.log(
-      "%c "+Text.BANNERL1+"\n"+Text.BANNERL2+"\n"+Text.BANNERL3+"\n"+
-      Text.BANNERL4+"\n"+Text.BANNERL5 +"\n"+"by Oğuz Eroğlu - github.com/oguzeroglu",
+      "%c "+BANNERL1+"\n"+BANNERL2+"\n"+BANNERL3+"\n"+
+      BANNERL4+"\n"+BANNERL5 +"\n"+"by Oğuz Eroğlu - github.com/oguzeroglu",
       "background: black; color: lime"
     );
   }
@@ -1499,9 +1501,7 @@ function startDeployment(){
         terminalDiv.style.display = "none";
       }
     }else{
-      terminal.printError(Text.PROJECT_FAILED_TO_LOAD.replace(
-        Text.PARAM1, stateLoader.reason
-      ));
+      terminal.printError("Project failed to load: "+stateLoader.reason);
     }
   }).fail(function(jqxhr, textStatus, error){
     terminal.printError("Application cannot be loaded.");

@@ -175,6 +175,9 @@ function readEngineScripts(projectName, author, noMobile){
       }else if (scriptPath.includes("CommandDescriptor.js")){
         console.log("[*] Skipping CommandDescriptor");
         continue;
+      }else if (scriptPath.includes("Text.js") && !scriptPath.includes("AddedText.js")){
+        console.log("[*] Skipping Text");
+        continue;
       }
       content += scriptContent +"\n";
     }

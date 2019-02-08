@@ -11,15 +11,19 @@ var ModeSwitcher = function(){
   }
   this.scriptReloadErrorFunction = function(scriptName, filePath){
     that.enableTerminal();
-    terminal.printError(Text.FAILED_TO_LOAD_SCRIPT.replace(
-      Text.PARAM1, scriptName
-    ).replace(
-      Text.PARAM2, filePath
-    ));
+    if (!isDeployment){
+      terminal.printError(Text.FAILED_TO_LOAD_SCRIPT.replace(
+        Text.PARAM1, scriptName
+      ).replace(
+        Text.PARAM2, filePath
+      ));
+    }
   }
   this.scriptReloadCompilationErrorFunction = function(scriptName, errorMessage){
     that.enableTerminal();
-    terminal.printError(Text.INVALID_SCRIPT.replace(Text.PARAM1, errorMessage).replace(Text.PARAM2, scriptName));
+    if (!isDeployment){
+      terminal.printError(Text.INVALID_SCRIPT.replace(Text.PARAM1, errorMessage).replace(Text.PARAM2, scriptName));
+    }
   }
   this.enableTerminal = function(){
     canvas.style.visibility = "";
@@ -34,7 +38,9 @@ ModeSwitcher.prototype.switchMode = function(){
     this.loadedScriptsCounter = 0;
     if (this.totalScriptsToLoad > 0){
       terminal.clear();
-      terminal.printInfo(Text.LOADING_SCRIPTS);
+      if (!isDeployment){
+        terminal.printInfo(Text.LOADING_SCRIPTS);
+      }
       canvas.style.visibility = "hidden";
       terminal.disable();
       for (var scriptName in scripts){
@@ -215,7 +221,9 @@ ModeSwitcher.prototype.switchFromDesignToPreview = function(){
   if (!isDeployment){
     $(datGuiObjectManipulation.domElement).attr("hidden", true);
   }
-  terminal.printInfo(Text.SWITCHED_TO_PREVIEW_MODE);
+  if (!isDeployment){
+    terminal.printInfo(Text.SWITCHED_TO_PREVIEW_MODE);
+  }
   $("#cliDivheader").text("ROYGBIV 3D Engine - CLI (Preview mode)");
   mode = 1;
   rayCaster.refresh();
@@ -234,7 +242,9 @@ ModeSwitcher.prototype.switchFromPreviewToDesign = function(){
   camera.oldAspect = camera.aspect;
   camera.aspect = window.innerWidth / window.innerHeight;
   camera.updateProjectionMatrix();
-  terminal.printInfo(Text.SWITCHED_TO_DESIGN_MODE);
+  if (!isDeployment){
+    terminal.printInfo(Text.SWITCHED_TO_DESIGN_MODE);
+  }
   $("#cliDivheader").text("ROYGBIV 3D Engine - CLI (Design mode)");
   if (LOG_FRAME_DROP_ON){
     console.log("[*] Frame-drop recording process stopped.");

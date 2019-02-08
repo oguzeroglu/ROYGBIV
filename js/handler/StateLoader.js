@@ -1209,7 +1209,7 @@ StateLoader.prototype.createObjectGroupsAfterLoadedAssets = function(){
   if (!isDeployment){
     terminal.enable();
     terminal.clear();
-    terminal.printInfo(Text.PROJECT_LOADED);
+    terminal.printInfo("Project loaded.");
   }else{
     terminal.disable();
     terminalDiv.style.display = "none";

@@ -6,11 +6,6 @@ var Text = function(){
   this.PARAM4 = "@@4";
   this.PARAM5 = "@@5";
 
-  this.BANNERL1 = " ____   _____   ______ ____ _____     __ ";
-  this.BANNERL2 = "|  _ \\ / _ \\ \\ / / ___| __ )_ _\\ \\   / / ";
-  this.BANNERL3 = "| |_) | | | \\ V / |  _|  _ \\| | \\ \\ / /  ";
-  this.BANNERL4 = "|  _ <| |_| || || |_| | |_) | |  \\   /   ";
-  this.BANNERL5 = "|_| \\_\\\\___/ |_| \\____|____/___|  \\_/    ";
   this.VERSION = "VERSION";
   this.CODER = "CODER";
 

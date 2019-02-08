@@ -20,37 +20,49 @@ var GridSystem = function(name, sizeX, sizeZ, centerX, centerY, centerZ,
                                               outlineColor, cellSize, axis){
 
   this.isGridSystem = true;
-  
+
   // size negativity/zero check
   if (sizeX<=0 || sizeZ <=0){
-    terminal.printError(Text.GS_CREATION_ERROR_1);
+    if (!isDeployment){
+      terminal.printError(Text.GS_CREATION_ERROR_1);
+    }
     return;
   }
 
   // size mismatch check
   if (sizeX%cellSize != 0){
-    terminal.printError(Text.GS_CREATION_ERROR_2);
+    if (!isDeployment){
+      terminal.printError(Text.GS_CREATION_ERROR_2);
+    }
     return;
   }
   if (sizeZ%cellSize != 0){
-    terminal.printError(Text.GS_CREATION_ERROR_3);
+    if (!isDeployment){
+      terminal.printError(Text.GS_CREATION_ERROR_3);
+    }
     return;
   }
 
   // check if name is unique
   if (gridSystems[name]){
-    terminal.printError(Text.GS_CREATION_ERROR_4);
+    if (!isDeployment){
+      terminal.printError(Text.GS_CREATION_ERROR_4);
+    }
     return;
   }
 
   // LIMITATIONS
   if (cellSize < MIN_CELLSIZE_ALLOWED){
-    terminal.printError(Text.GS_CREATION_ERROR_5);
+    if (!isDeployment){
+      terminal.printError(Text.GS_CREATION_ERROR_5);
+    }
     return;
   }
   var totalGridCount = (sizeX * sizeZ) / (cellSize * cellSize);
   if (gridCounter + totalGridCount > MAX_GRIDS_ALLOWED){
-    terminal.printError(Text.GS_CREATION_ERROR_6);
+    if (!isDeployment){
+      terminal.printError(Text.GS_CREATION_ERROR_6);
+    }
     return;
   }
 
@@ -158,7 +170,9 @@ var GridSystem = function(name, sizeX, sizeZ, centerX, centerY, centerZ,
   this.boundingBox = new THREE.Box3().setFromObject(this.boundingPlane);
   if (!LIMIT_BOUNDING_BOX.containsBox(this.boundingBox)){
     this.destroy();
-    terminal.printError(Text.GRID_SYSTEM_IS_OUT_OF);
+    if (!isDeployment){
+      terminal.printError(Text.GRID_SYSTEM_IS_OUT_OF);
+    }
     return;
   }
 
@@ -166,7 +180,9 @@ var GridSystem = function(name, sizeX, sizeZ, centerX, centerY, centerZ,
 
   gridCounter = gridCounter + totalGridCount;
 
-  terminal.printInfo(Text.GS_CREATED);
+  if (!isDeployment){
+    terminal.printInfo(Text.GS_CREATED);
+  }
 }
 
 GridSystem.prototype.draw = function(){
@@ -549,7 +565,9 @@ GridSystem.prototype.crop = function(grid1, grid2){
 
   }
 
-  terminal.printInfo(Text.GS_CROPPED);
+  if (!isDeployment){
+    terminal.printInfo(Text.GS_CROPPED);
+  }
 }
 
 GridSystem.prototype.newArea = function(name, height, selections){

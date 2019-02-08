@@ -98,11 +98,11 @@ Terminal.prototype.handleAboutCommand = function(){
 		this.printInfo("Author: "+author);
 		this.print("Powered by", {color: "lime", noNewLine: true});
 	}
-	this.print(Text.BANNERL1, {color: "lime", noNewLine: true});
-	this.print(Text.BANNERL2, {color: "lime", noNewLine: true});
-	this.print(Text.BANNERL3, {color: "lime", noNewLine: true});
-	this.print(Text.BANNERL4, {color: "lime", noNewLine: true});
-	this.print(Text.BANNERL5, {color: "lime", noNewLine: false});
+	this.print(BANNERL1, {color: "lime", noNewLine: true});
+	this.print(BANNERL2, {color: "lime", noNewLine: true});
+	this.print(BANNERL3, {color: "lime", noNewLine: true});
+	this.print(BANNERL4, {color: "lime", noNewLine: true});
+	this.print(BANNERL5, {color: "lime", noNewLine: false});
 	if (!isDeployment){
 		terminal.printHeader(Text.VERSION);
 		terminal.printInfo(Text.TREE.replace(Text.PARAM1, ROYGBIV_ENGINE_VERSION));

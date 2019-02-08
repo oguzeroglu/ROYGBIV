@@ -1019,7 +1019,7 @@ var COLLISION_WORKER_ENABLED = true;
 var PS_COLLISION_WORKER_ENABLED = true;
 
 // TEXT POOL
-var Text = new Text();
+var Text = (!isDeployment)? new Text(): 0;
 
 // SCRIPTING UTILITY FUNCTIONS
 var ROYGBIV;
@@ -1125,3 +1125,10 @@ var supportedFontCharMap = new Object();
 for (var i = 0; i<supportedFontAtlasChars.length; i++){
   supportedFontCharMap[supportedFontAtlasChars[i]] = true;
 }
+
+// BANNER
+var BANNERL1 = " ____   _____   ______ ____ _____     __ ";
+var BANNERL2 = "|  _ \\ / _ \\ \\ / / ___| __ )_ _\\ \\   / / ";
+var BANNERL3 = "| |_) | | | \\ V / |  _|  _ \\| | \\ \\ / /  ";
+var BANNERL4 = "|  _ <| |_| || || |_| | |_) | |  \\   /   ";
+var BANNERL5 = "|_| \\_\\\\___/ |_| \\____|____/___|  \\_/    ";
