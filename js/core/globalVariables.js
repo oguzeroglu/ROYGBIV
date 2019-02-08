@@ -653,8 +653,17 @@ var deprecatedCommandIndices = [
   32, //restartPhysicsTest -> Since box and sphere physics tests are deprecated, this command is no longer needed.
   38, //destroySelectedGrids -> Deprecated due to architectural changes during development. Grids are no longer rendered as seperate objects due to performance issues.
   39, //remakeGridSystem -> Deprecated due to architectural changes during development. Since grids are no longer destroyable, this command has no use case anymore.
+  43, //mapSpecular -> Specular maps are not supported for now.
   44, //mapEnvironment -> Deprecated due to lack of use cases of environment maps in the ROYGBIV engine. Will implement mirror materials for better visual effects.
+  47, //setDefaultMaterial -> Only BASIC materials are supported for now.
+  48, //newAmbientLight -> Lights are not supported for now.
+  49, //printLights -> Lights are not supported for now.
+  50, //selectLight -> Lights are not supported for now.
+  51, //destroyLight -> Lights are not supported for now.
+  52, //newPhongMaterial -> Phong materials are not supported for now.
+  53, //mapNormal -> Normal maps are not supported for now.
   55, //newLambertMaterial -> Deprecated due to lack of uses cases. Phong is fine for light affected objects.
+  68, //newPointLight -> Lights are not supported for now.
   78, //undo -> Deprecated because causes memory issues for big projects.
   79, //redo -> Deprecated because causes memory issues for big projects.
   89, //translateObject -> Deprecated due to architectural conflicts. Objects can only be translated using animations. Instead of translating the object in the design mode, a new grid system should be created at the specific position. Every object should be associated with certain grids.
@@ -692,7 +701,6 @@ var loadInput;
 var windowLoaded;
 var cliFocused = true;
 var omGUIFocused = false;
-var lightsGUIFocused = false;
 var cliIsBeingDragged = false;
 var requestID;
 var boundingClientRect;
@@ -782,8 +790,6 @@ var textureURLs = new Object();
 var wallCollections = new Object();
 var uploadedImages = new Object();
 var modifiedTextures = new Object();
-var lights = new Object();
-var pointLightRepresentations = new Object();
 var texturePacks = new Object();
 var skyBoxes = new Object();
 var scripts = new Object();
@@ -816,14 +822,13 @@ var physicsDebugMode = false;
 var textureOffsetAdjustmentDX = 0.01;
 var textureOffsetAdjustmentDY = 0.01;
 var opacityDelta = 0.01;
-var lightIntensityDelta = 0.01;
 var heightMapScaleDelta = 0.1;
 var heightMapBiasDelta = 0.1;
 var superposeYOffset = 1;
 var shininessDelta = 1;
 var selectedAddedObject = 0;
 var selectedObjectGroup = 0;
-var selectedLightName = 0;
+var selectedAddedText = 0;
 var planeWidthSegments = 10;
 var planeHeightSegments = 10;
 var boxWidthSegments = 10;
@@ -833,9 +838,6 @@ var sphereWidthSegments = 10;
 var sphereHeightSegments = 10;
 var cylinderWidthSegments = 10;
 var cylinderHeightSegments = 10;
-var lightPositionDeltaX = 0.5;
-var lightPositionDeltaY = 0.5;
-var lightPositionDeltaZ = 0.5;
 var defaultMaterialType = "BASIC"; //BASIC / PHONG
 var texturePackRootDirectory = "texture_packs/";
 var skyBoxRootDirectory = "skybox/";
@@ -856,8 +858,6 @@ var MIN_CELLSIZE_ALLOWED = 5;
 var diffuseTextureCache = new Object();
 var heightTextureCache = new Object();
 var ambientOcculsionTextureCache = new Object();
-var normalTextureCache = new Object();
-var specularTextureCache = new Object();
 var alphaTextureCache = new Object();
 var emissiveTextureCache = new Object();
 var CACHE_NOT_PRESENT = "CACHE_NOT_PRESENT";
@@ -1027,7 +1027,6 @@ var ROYGBIV;
 // DAT GUI
 var datGui;
 var datGuiObjectManipulation;
-var datGuiLights;
 var datGuiAreaConfigurations;
 var datGuiSkybox;
 var datGuiFog;
@@ -1080,19 +1079,6 @@ var objectManipulationParameters = {
   "Emissive col.": "#ffffff",
   "Disp. scale": 0.0,
   "Disp. bias": 0.0
-};
-
-var lightNameController;
-var lightsOffsetXController;
-var lightsOffsetYController;
-var lightsOffsetZController;
-var lightsIntensityController;
-var lightsParameters = {
-  "Light": "lightName",
-  "Offset x": 0.0,
-  "Offset y": 0.0,
-  "Offset z": 0.0,
-  "Intensity": 0.0
 };
 
 var skyboxNameController;

@@ -131,8 +131,6 @@ AddedObject.prototype.export = function(){
   var alphaMap = this.mesh.material.uniforms.alphaMap.value;
   var aoMap = this.mesh.material.uniforms.aoMap.value;
   var emissiveMap = this.mesh.material.uniforms.emissiveMap.value;
-  var normalMap = this.material.normalMap;
-  var specularMap = this.material.specularMap;
   var displacementMap = this.mesh.material.uniforms.displacementMap.value;
 
   if (this.hasDiffuseMap()){
@@ -154,14 +152,6 @@ AddedObject.prototype.export = function(){
   if (this.hasEmissiveMap()){
     exportObject["emissiveRoygbivTexturePackName"] = emissiveMap.roygbivTexturePackName;
     exportObject["emissiveRoygbivTextureName"] = emissiveMap.roygbivTextureName;
-  }
-  if (normalMap){
-    exportObject["normalRoygbivTexturePackName"] = this.material.normalMap.roygbivTexturePackName;
-    exportObject["normalRoygbivTextureName"] = this.material.normalMap.roygbivTextureName;
-  }
-  if (specularMap){
-    exportObject["specularRoygbivTexturePackName"] = this.material.specularMap.roygbivTexturePackName;
-    exportObject["specularRoygbivTextureName"] = this.material.specularMap.roygbivTextureName;
   }
   if (this.hasDisplacementMap()){
     exportObject["displacementRoygbivTexturePackName"] = displacementMap.roygbivTexturePackName;
@@ -772,12 +762,6 @@ AddedObject.prototype.getTextureStack = function(){
   if (this.hasEmissiveMap()){
     texturesStack.push(this.mesh.material.uniforms.emissiveMap.value);
   }
-  if (this.material.normalMap){
-    texturesStack.push(this.material.normalMap);
-  }
-  if (this.material.specularMap){
-    texturesStack.push(this.material.specularMap);
-  }
   if (this.hasDisplacementMap()){
     texturesStack.push(this.mesh.material.uniforms.displacementMap.value);
   }
@@ -1195,14 +1179,6 @@ AddedObject.prototype.dispose = function(){
   if (this.mesh.material.uniforms.emissiveMap.value){
     this.mesh.material.uniforms.emissiveMap.value.dispose();
   }
-
-  if (this.material.normalMap){
-    this.material.normalMap.dispose();
-  }
-  if (this.material.specularMap){
-    this.material.specularMap.dispose();
-  }
-
   this.mesh.material.dispose();
 }
 
@@ -1225,14 +1201,6 @@ AddedObject.prototype.mapTexturePack = function(texturePack, fromScript){
     if (this.hasEmissiveMap() && this.mesh.material.uniforms.emissiveMap.value.roygbivTextureName){
       this.oldEmissiveMap = this.mesh.material.uniforms.emissiveMap.value;
       this.oldEmissiveMapName = this.mesh.material.uniforms.emissiveMap.value.roygbivTextureName;
-    }
-    if (this.material.normalMap && this.material.normalMap.roygbivTextureName){
-      this.oldNormalMap = this.material.normalMap.clone();
-      this.oldNormalMapName = this.material.normalMap.roygbivTextureName;
-    }
-    if (this.material.specularMap && this.material.specularMap.roygbivTextureName){
-      this.oldSpecularMap = this.material.specularMap.clone();
-      this.oldSpecularMapName = this.material.specularMap.roygbivTextureName;
     }
     if (this.hasDisplacementMap() && this.mesh.material.uniforms.displacementMap.value.roygbivTextureName){
       this.oldDisplacementMap = this.mesh.material.uniforms.displacementMap.value;
@@ -1289,26 +1257,6 @@ AddedObject.prototype.mapTexturePack = function(texturePack, fromScript){
     }
     this.mesh.material.uniforms.emissiveMap.value.needsUpdate = true;
   }
-  if (texturePack.hasNormal){
-    if (!this.hasBasicMaterial){
-      this.material.normalMap = texturePack.normalTexture.clone();
-      if (!fromScript){
-        this.material.normalMap.roygbivTexturePackName = texturePack.name;
-        this.material.normalMap.roygbivTextureName = 0;
-      }
-      this.material.normalMap.needsUpdate = true;
-    }
-  }
-  if (texturePack.hasSpecular){
-    if (this.material.isMeshPhongMaterial){
-      this.material.specularMap = texturePack.specularTexture.clone();
-      if (!fromScript){
-        this.material.specularMap.roygbivTexturePackName = texturePack.name;
-        this.material.specularMap.roygbivTextureName = 0;
-      }
-      this.material.specularMap.needsUpdate = true;
-    }
-  }
   if (texturePack.hasHeight && VERTEX_SHADER_TEXTURE_FETCH_SUPPORTED){
     this.mapDisplacement(texturePack.heightTexture);
     if (!fromScript){
@@ -1356,16 +1304,6 @@ AddedObject.prototype.resetTexturePackAfterAnimation = function(){
     cloneMap.roygbivTextureName = this.oldAlphaMapName;
     this.oldAlphaMap = 0;
     this.mapAlpha(cloneMap);
-  }
-  if (this.oldNormalMap){
-    this.material.normalMap = this.oldNormalMap;
-    this.material.normalMap.needsUpdate = true;
-    this.material.normalMap.roygbivTextureName = this.oldNormalMapName;
-  }
-  if (this.oldSpecularMap){
-    this.material.specularMap = this.oldSpecularMap;
-    this.material.specularMap.needsUpdate = true;
-    this.material.specularMap.roygbivTextureName = this.oldSpecularMapName;
   }
   if (this.oldEmissiveMap){
     var cloneMap = this.oldEmissiveMap;
@@ -1907,8 +1845,6 @@ AddedObject.prototype.resetMaps = function(resetAssociatedTexturePack){
   this.unMapAO();
   this.unMapDisplacement();
   this.unMapEmissive();
-  this.material.normalMap = undefined;
-  this.material.specularMap = undefined;
   if (resetAssociatedTexturePack){
     this.associatedTexturePack = 0;
   }
@@ -1920,8 +1856,6 @@ AddedObject.prototype.isTextured = function(){
     this.hasAlphaMap() ||
     this.hasAOMap() ||
     this.hasEmissiveMap() ||
-    this.material.normalMap ||
-    this.material.specularMap ||
     this.hasDisplacementMap()
   );
 }
@@ -1938,12 +1872,6 @@ AddedObject.prototype.refreshTextueMatrix = function(){
   }
   if (this.hasEmissiveMap()){
     this.mesh.material.uniforms.emissiveMap.value.updateMatrix();
-  }
-  if (this.material.normalMap){
-
-  }
-  if (this.material.specularMap){
-
   }
   if (this.hasDisplacementMap()){
     this.mesh.material.uniforms.displacementMap.value.updateMatrix();
@@ -1976,12 +1904,6 @@ AddedObject.prototype.adjustTextureRepeat = function(repeatU, repeatV){
   if (this.hasEmissiveMap()){
     this.mesh.material.uniforms.emissiveMap.value.repeat.set(repeatU, repeatV);
     this.mesh.material.uniforms.emissiveMap.value.updateMatrix();
-  }
-  if (this.material.normalMap){
-    this.material.normalMap.repeat.set(repeatU, repeatV);
-  }
-  if (this.material.specularMap){
-    this.material.specularMap.repeat.set(repeatU, repeatV);
   }
   if (this.hasDisplacementMap()){
     this.mesh.material.uniforms.displacementMap.value.repeat.set(repeatU, repeatV);

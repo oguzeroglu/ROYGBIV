@@ -1268,7 +1268,6 @@ ObjectGroup.prototype.export = function(){
   exportObj.quaternionW = this.initQuaternion.w;
 
   exportObj.isBasicMaterial = this.isBasicMaterial;
-  exportObj.isPhongMaterial = this.isPhongMaterial;
 
   var blendingModeInt = this.mesh.material.blending;
   if (blendingModeInt == NO_BLENDING){
@@ -1599,7 +1598,6 @@ ObjectGroup.prototype.copy = function(name, isHardCopy, copyPosition, gridSystem
   newObjGroup.graphicsGroup.quaternion.copy(newObjGroup.mesh.quaternion);
   this.glue();
   newObjGroup.isBasicMaterial = this.isBasicMaterial;
-  newObjGroup.isPhongMaterial = this.isPhongMaterial;
   this.physicsBody.position.copy(physicsPositionBeforeDetached);
   this.physicsBody.quaternion.copy(physicsQuaternionBeforeDetached);
   this.mesh.position.copy(positionBeforeDetached);

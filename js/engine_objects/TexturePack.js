@@ -14,15 +14,13 @@ var TexturePack = function(name, directoryName, fileExtension, mapCallback, isPr
   this.scaleFactor = scaleFactor;
   this.refTexturePackName = refTexturePackName;
 
-  this.maxAttemptCount = 7;
+  this.maxAttemptCount = 5;
   this.totalLoadedCount = 0;
 
   this.hasDiffuse = false;
   this.hasAlpha = false;
   this.hasAO = false;
   this.hasEmissive = false;
-  this.hasNormal = false;
-  this.hasSpecular = false;
   this.hasHeight = false;
 
   if (isPreLoaded){
@@ -33,8 +31,6 @@ var TexturePack = function(name, directoryName, fileExtension, mapCallback, isPr
   this.alphaFilePath = texturePackRootDirectory+directoryName+"/"+"alpha."+fileExtension.toLowerCase();
   this.aoFilePath = texturePackRootDirectory+directoryName+"/"+"ao."+fileExtension.toLowerCase();
   this.emissiveFilePath = texturePackRootDirectory+directoryName+"/"+"emissive."+fileExtension.toLowerCase();
-  this.normalFilePath = texturePackRootDirectory+directoryName+"/"+"normal."+fileExtension.toLowerCase();
-  this.specularFilePath = texturePackRootDirectory+directoryName+"/"+"specular."+fileExtension.toLowerCase();
   this.heightFilePath = texturePackRootDirectory+directoryName+"/"+"height."+fileExtension.toLowerCase();
 
   if (fileExtension.toUpperCase() == "DDS"){
@@ -49,8 +45,6 @@ var TexturePack = function(name, directoryName, fileExtension, mapCallback, isPr
   this.alphaCanMapFlag = false;
   this.aoCanMapFlag = false;
   this.emissiveCanMapFlag = false;
-  this.normalCanMapFlag = false;
-  this.specularCanMapFlag = false;
   this.heightCanMapFlag = false;
 
   if (mapCallback){
@@ -76,14 +70,6 @@ var TexturePack = function(name, directoryName, fileExtension, mapCallback, isPr
       this.emissiveTexture = refTexturePack.emissiveTexture.clone();
       this.hasEmissive = true;
     }
-    if (refTexturePack.hasNormal){
-      this.normalTexture = refTexturePack.normalTexture.clone();
-      this.hasNormal = true;
-    }
-    if (refTexturePack.hasSpecular){
-      this.specularTexture = refTexturePack.specularTexture.clone();
-      this.hasSpecular = true;
-    }
     if (refTexturePack.hasHeight){
       this.heightTexture = refTexturePack.heightTexture.clone();
       this.hasHeight = true;
@@ -101,15 +87,11 @@ TexturePack.prototype.export = function(){
   exportObject.hasAlpha = this.hasAlpha;
   exportObject.hasAO = this.hasAO;
   exportObject.hasEmissive = this.hasEmissive;
-  exportObject.hasNormal = this.hasNormal;
-  exportObject.hasSpecular = this.hasSpecular;
   exportObject.hasHeight = this.hasHeight;
   exportObject.diffuseFilePath = this.diffuseFilePath;
   exportObject.alphaFilePath = this.alphaFilePath;
   exportObject.aoFilePath = this.aoFilePath;
   exportObject.emissiveFilePath = this.emissiveFilePath;
-  exportObject.normalFilePath = this.normalFilePath;
-  exportObject.specularFilePath = this.specularFilePath;
   exportObject.heightFilePath = this.heightFilePath;
   if (this.scaleFactor){
     exportObject.scaleFactor = this.scaleFactor;
@@ -138,12 +120,6 @@ TexturePack.prototype.destroy = function(){
   }
   if (this.hasEmissive){
     this.emissiveTexture.dispose();
-  }
-  if (this.hasNormal){
-    this.normalTexture.dispose();
-  }
-  if (this.hasSpecular){
-    this.specularTexture.dispose();
   }
   if (this.hasHeight){
     this.heightTexture.dispose();
@@ -184,24 +160,6 @@ TexturePack.prototype.mapAmbientOcculsion = function(that, textureData){
   that.aoTexture.wrapT = THREE.RepeatWrapping;
   that.hasAO = true;
   that.aoCanMapFlag = true;
-  that.refreshMap();
-}
-
-TexturePack.prototype.mapNormal = function(that, textureData){
-  that.normalTexture = textureData;
-  that.normalTexture.wrapS = THREE.RepeatWrapping;
-  that.normalTexture.wrapT = THREE.RepeatWrapping;
-  that.hasNormal = true;
-  that.normalCanMapFlag = true;
-  that.refreshMap();
-}
-
-TexturePack.prototype.mapSpecular = function(that, textureData){
-  that.specularTexture = textureData;
-  that.specularTexture.wrapS = THREE.RepeatWrapping;
-  that.specularTexture.wrapT = THREE.RepeatWrapping;
-  that.hasSpecular = true;
-  that.specularCanMapFlag = true;
   that.refreshMap();
 }
 
@@ -331,58 +289,6 @@ TexturePack.prototype.loadTextures = function(){
       texturePacks[this.name] = this;
     }
   }
-  //NORMAL
-  var normalTextureCached = normalTextureCache[this.name];
-  if (!normalTextureCached || (normalTextureCached && normalTextureCached == CACHE_NOT_PRESENT)){
-    this.loader.load(this.normalFilePath,
-      function(textureData){
-        if (that.scaleFactor){
-          textureData.image = that.rescaleTextureImage(textureData, that.scaleFactor);
-        }
-        that.mapNormal(that, textureData);
-      },
-      function(xhr){
-
-      },
-      function(xhr){
-        normalTextureCache[that.name] = CACHE_NOT_PRESENT;
-        that.hasNormal = false;
-        that.normalCanMapFlag = true;
-        that.refreshMap();
-      }
-    );
-  }else{
-    if (normalTextureCached != CACHE_NOT_PRESENT){
-      this.mapNormal(this, normalTextureCached);
-      texturePacks[this.name] = this;
-    }
-  }
-  //SPECULAR
-  var specularTextureCached = specularTextureCache[this.name];
-  if (!specularTextureCached || (specularTextureCached && specularTextureCached == CACHE_NOT_PRESENT)){
-    this.loader.load(this.specularFilePath,
-      function(textureData){
-        if (that.scaleFactor){
-          textureData.image = that.rescaleTextureImage(textureData, that.scaleFactor);
-        }
-        that.mapSpecular(that, textureData);
-      },
-      function(xhr){
-
-      },
-      function(xhr){
-        specularTextureCache[that.name] = CACHE_NOT_PRESENT;
-        that.hasSpecular = false;
-        that.specularCanMapFlag = true;
-        that.refreshMap();
-      }
-    );
-  }else{
-    if (specularTextureCached != CACHE_NOT_PRESENT){
-      this.mapSpecular(this, specularTextureCached);
-      texturePacks[this.name] = this;
-    }
-  }
   //HEIGHT
   var heightTextureCached = heightTextureCache[this.name];
   if (!heightTextureCached || (heightTextureCached && heightTextureCached == CACHE_NOT_PRESENT)){
@@ -417,8 +323,6 @@ TexturePack.prototype.printInfo = function(){
   var alphaSizeText = "";
   var ambientOcculsionSizeText = "";
   var emissiveSizeText = "";
-  var normalSizeText = "";
-  var specularSizeText = "";
   var heightSizeText = "";
   if (this.hasDiffuse){
     var img = this.diffuseTexture.image;
@@ -434,14 +338,6 @@ TexturePack.prototype.printInfo = function(){
   if (this.hasEmissive){
     var img = this.emissiveTexture.image;
     emissiveSizeText = " ["+img.width+"x"+img.height+"]";
-  }
-  if (this.hasNormal){
-    var img = this.normalTexture.image;
-    normalSizeText = " ["+img.width+"x"+img.height+"]";
-  }
-  if (this.hasSpecular){
-    var img = this.specularTexture.image;
-    specularSizeText = " ["+img.width+"x"+img.height+"]";
   }
   if (this.hasHeight){
     var img = this.heightTexture.image;
@@ -470,12 +366,6 @@ TexturePack.prototype.printInfo = function(){
   terminal.printInfo(Text.TEXTUREPACK_INFO_TREE_EMISSIVE.replace(
     Text.PARAM1, this.emissiveFilePath
   ), true);
-  terminal.printInfo(Text.TEXTUREPACK_INFO_TREE_NORMAL.replace(
-    Text.PARAM1, this.normalFilePath
-  ), true);
-  terminal.printInfo(Text.TEXTUREPACK_INFO_TREE_SPECULAR.replace(
-    Text.PARAM1, this.specularFilePath
-  ), true);
   terminal.printInfo(Text.TEXTUREPACK_INFO_TREE_HEIGHT.replace(
     Text.PARAM1, this.heightFilePath
   ), true);
@@ -492,12 +382,6 @@ TexturePack.prototype.printInfo = function(){
   terminal.printInfo(Text.TEXTUREPACK_INFO_TREE_EMISSIVE.replace(
     Text.PARAM1, this.hasEmissive + emissiveSizeText
   ), true);
-  terminal.printInfo(Text.TEXTUREPACK_INFO_TREE_NORMAL.replace(
-    Text.PARAM1, this.hasNormal + normalSizeText
-  ), true);
-  terminal.printInfo(Text.TEXTUREPACK_INFO_TREE_SPECULAR.replace(
-    Text.PARAM1, this.hasSpecular + specularSizeText
-  ), true);
   terminal.printInfo(Text.TEXTUREPACK_INFO_TREE_HEIGHT.replace(
     Text.PARAM1, this.hasHeight + heightSizeText
   ), false);
@@ -509,8 +393,6 @@ TexturePack.prototype.isUsable = function(){
     this.hasAlpha ||
     this.hasAO ||
     this.hasEmissive ||
-    this.hasNormal ||
-    this.hasSpecular ||
     this.hasHeight
   );
 }
@@ -519,8 +401,6 @@ TexturePack.prototype.refresh = function(){
   delete diffuseTextureCache[this.name];
   delete heightTextureCache[this.name];
   delete ambientOcculsionTextureCache[this.name];
-  delete normalTextureCache[this.name];
-  delete specularTextureCache[this.name];
   delete alphaTextureCache[this.name];
   delete emissiveTextureCache[this.name];
   this.loadTextures();
@@ -562,14 +442,6 @@ TexturePack.prototype.rescale = function(scale){
   if (this.hasEmissive){
     this.emissiveTexture.image = this.rescaleTextureImage(this.emissiveTexture, scale);
     this.emissiveTexture.needsUpdate = true;
-  }
-  if (this.hasNormal){
-    this.normalTexture.image = this.rescaleTextureImage(this.normalTexture, scale);
-    this.normalTexture.needsUpdate = true;
-  }
-  if (this.hasSpecular){
-    this.specularTexture.image = this.rescaleTextureImage(this.specularTexture, scale);
-    this.specularTexture.needsUpdate = true;
   }
   if (this.hasHeight){
     this.heightTexture.image = this.rescaleTextureImage(this.heightTexture, scale);

@@ -16,23 +16,22 @@ var CommandDescriptor = function(){
   this.S_T_ST                   =   13;
   this.WALL_COLLECTION_NAME     =   14;
   this.DEFAULT_MATERIAL_TYPE    =   15;
-  this.LIGHT_NAME               =   16;
-  this.FILE_EXTENSION           =   17;
-  this.TEXTURE_PACK_NAME        =   18;
-  this.HIDE_SHOW                =   19;
-  this.SKYBOX_NAME              =   20;
-  this.SCRIPT_NAME              =   21;
-  this.ANY_OBJECT               =   22;
-  this.GLUED_OBJECT_NAME        =   23;
-  this.MARKED_POINT_NAME        =   24;
-  this.API_FUNCTION_NAME        =   25;
-  this.BLENDING_MODE            =   26;
-  this.OBJECT_CREATION_NAME     =   27;
-  this.AREA_NAME                =   28;
-  this.AREA_NAME_WITH_DEFAULT   =   29;
-  this.RENDER_SIDE              =   30;
-  this.CHILD_OBJECT_NAME        =   31;
-  this.FONT_NAME                =   32;
+  this.FILE_EXTENSION           =   16;
+  this.TEXTURE_PACK_NAME        =   17;
+  this.HIDE_SHOW                =   18;
+  this.SKYBOX_NAME              =   29;
+  this.SCRIPT_NAME              =   20;
+  this.ANY_OBJECT               =   21;
+  this.GLUED_OBJECT_NAME        =   22;
+  this.MARKED_POINT_NAME        =   23;
+  this.API_FUNCTION_NAME        =   24;
+  this.BLENDING_MODE            =   25;
+  this.OBJECT_CREATION_NAME     =   26;
+  this.AREA_NAME                =   27;
+  this.AREA_NAME_WITH_DEFAULT   =   28;
+  this.RENDER_SIDE              =   29;
+  this.CHILD_OBJECT_NAME        =   30;
+  this.FONT_NAME                =   31;
 
   // newGridSystem
   this.newGridSystem = new Object();
@@ -196,12 +195,6 @@ var CommandDescriptor = function(){
   this.uploadImage.types = [];
   this.uploadImage.types.push(this.UNKNOWN_INDICATOR); //name
 
-  // mapSpecular
-  this.mapSpecular = new Object();
-  this.mapSpecular.types = [];
-  this.mapSpecular.types.push(this.TEXTURE_NAME); //textureName
-  this.mapSpecular.types.push(this.OBJECT_NAME); //objectName
-
   // mapEnvironment
   this.mapEnvironment = new Object();
   this.mapEnvironment.types = [];
@@ -219,39 +212,6 @@ var CommandDescriptor = function(){
   this.mapAlpha.types = [];
   this.mapAlpha.types.push(this.TEXTURE_NAME); //textureName
   this.mapAlpha.types.push(this.OBJECT_NAME); //objectName
-
-  // setDefaultMaterial
-  this.setDefaultMaterial = new Object();
-  this.setDefaultMaterial.types = [];
-  this.setDefaultMaterial.types.push(this.DEFAULT_MATERIAL_TYPE); //basic-phong
-
-  // newAmbientLight
-  this.newAmbientLight = new Object();
-  this.newAmbientLight.types = [];
-  this.newAmbientLight.types.push(this.UNKNOWN_INDICATOR); //name
-  this.newAmbientLight.types.push(this.COLOR); //color
-
-  // selectLight
-  this.selectLight = new Object();
-  this.selectLight.types = [];
-  this.selectLight.types.push(this.LIGHT_NAME); //name
-
-  // destroyLight
-  this.destroyLight = new Object();
-  this.destroyLight.types = [];
-  this.destroyLight.types.push(this.LIGHT_NAME); //name
-
-  // newPhongMaterial
-  this.newPhongMaterial = new Object();
-  this.newPhongMaterial.types = [];
-  this.newPhongMaterial.types.push(this.UNKNOWN_INDICATOR); //name
-  this.newPhongMaterial.types.push(this.COLOR); //color
-
-  // mapNormal
-  this.mapNormal = new Object();
-  this.mapNormal.types = [];
-  this.mapNormal.types.push(this.TEXTURE_NAME); //textureName
-  this.mapNormal.types.push(this.OBJECT_NAME); //objectName
 
   // mapEmissive
   this.mapEmissive = new Object();
@@ -329,15 +289,6 @@ var CommandDescriptor = function(){
   this.sliceGrid.types.push(this.UNKNOWN_INDICATOR); //newName
   this.sliceGrid.types.push(this.UNKNOWN_INDICATOR); //cellSize
   this.sliceGrid.types.push(this.COLOR); //outlineColor
-
-  // newPointLight
-  this.newPointLight = new Object();
-  this.newPointLight.types = [];
-  this.newPointLight.types.push(this.UNKNOWN_INDICATOR); //name
-  this.newPointLight.types.push(this.COLOR); //color
-  this.newPointLight.types.push(this.UNKNOWN_INDICATOR); //offsetX
-  this.newPointLight.types.push(this.UNKNOWN_INDICATOR); //offsetY
-  this.newPointLight.types.push(this.UNKNOWN_INDICATOR); //offsetZ
 
   // newSkybox
   this.newSkybox = new Object();
@@ -707,6 +658,9 @@ var CommandDescriptor = function(){
 
 CommandDescriptor.prototype.test = function(){
   for (var i = 0; i<commands.length; i++){
+    if (deprecatedCommandIndices.includes(i)){
+      continue;
+    }
     var curCommand = commands[i];
     var curDescriptor = this[curCommand];
     if (!curDescriptor && commandArgumentsExpectedCount[i] > 0){

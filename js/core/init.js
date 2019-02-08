@@ -20,7 +20,6 @@ window.onload = function() {
   cliDiv.addEventListener("click", function(){
     cliFocused = true;
     omGUIFocused = false;
-    lightsGUIFocused = false;
     inactiveCounter = 0;
   });
   cliDiv.addEventListener("mousemove", function(event){
@@ -140,40 +139,6 @@ window.onload = function() {
           skyboxMesh.material.uniforms.color.value.b
         );
       }
-    }).listen();
-    // DAT GUI LIGHTS
-    datGuiLights = new dat.GUI();
-    lightNameController = datGuiLights.add(lightsParameters, "Light").listen();
-    disableController(lightNameController, true);
-    lightsOffsetXController = datGuiLights.add(lightsParameters, "Offset x").min(-50).max(50).step(0.1).onChange(function(val){
-      var pl = lights[selectedLightName];
-      var plRep = pointLightRepresentations[selectedLightName];
-      pl.position.x = pl.initialPositionX + val;
-      plRep.position.x = pl.position.x;
-    }).onFinishChange(function(val){
-
-    }).listen();
-    lightsOffsetYController = datGuiLights.add(lightsParameters, "Offset y").min(-50).max(50).step(0.1).onChange(function(val){
-      var pl = lights[selectedLightName];
-      var plRep = pointLightRepresentations[selectedLightName];
-      pl.position.y = pl.initialPositionY + val;
-      plRep.position.y = pl.position.y;
-    }).onFinishChange(function(val){
-
-    }).listen();
-    lightsOffsetZController = datGuiLights.add(lightsParameters, "Offset z").min(-50).max(50).step(0.1).onChange(function(val){
-      var pl = lights[selectedLightName];
-      var plRep = pointLightRepresentations[selectedLightName];
-      pl.position.z = pl.initialPositionZ + val;
-      plRep.position.z = pl.position.z;
-    }).onFinishChange(function(val){
-
-    }).listen();
-    lightsIntensityController = datGuiLights.add(lightsParameters, "Intensity").min(0.0).max(1.0).step(0.01).onChange(function(val){
-      var light = lights[selectedLightName];
-      light.intensity = val;
-    }).onFinishChange(function(val){
-
     }).listen();
     // DAT GUI OBJECT MANIPULATION
     datGuiObjectManipulation = new dat.GUI();
@@ -387,11 +352,6 @@ window.onload = function() {
 
     datGuiObjectManipulation.domElement.addEventListener("mousedown", function(e){
       omGUIFocused = true;
-      lightsGUIFocused = false;
-    });
-    datGuiLights.domElement.addEventListener("mousedown", function(e){
-      lightsGUIFocused = true;
-      omGUIFocused = false;
     });
 
     // DAT GUI
@@ -418,7 +378,6 @@ window.onload = function() {
     }).listen();
     $(datGui.domElement).attr("hidden", true);
     $(datGuiObjectManipulation.domElement).attr("hidden", true);
-    $(datGuiLights.domElement).attr("hidden", true);
     $(datGuiSkybox.domElement).attr("hidden", true);
     $(datGuiFog.domElement).attr("hidden", true);
   }
@@ -487,7 +446,6 @@ window.onload = function() {
     inactiveCounter = 0;
     cliFocused = false;
     omGUIFocused = false;
-    lightsGUIFocused = false;
     if (windowLoaded){
       var rect = renderer.getCurrentViewport();
       var rectX = rect.x, rectY = rect.y, rectZ = rect.z, rectW = rect.w;
@@ -561,6 +519,7 @@ window.onload = function() {
              selectedAddedObject = object;
              objectSelectedByCommand = false;
              selectedObjectGroup = 0;
+             selectedAddedText = 0;
              afterObjectSelection();
              if (object.clickCallbackFunction){
                object.clickCallbackFunction(point.x, point.y, point.z);
@@ -582,12 +541,13 @@ window.onload = function() {
              selectedObjectGroup = object;
              objectSelectedByCommand = false;
              selectedAddedObject = 0;
+             selectedAddedText = 0;
              afterObjectSelection();
              if (object.clickCallbackFunction){
                object.clickCallbackFunction(point.x, point.y, point.z);
              }
            }
-         } else if (object.isGridSystem){
+         }else if (object.isGridSystem){
            var gridSystem = object;
            var point = intersectionPoint;
            var selectedGrid = gridSystem.getGridFromPoint(point);
@@ -614,6 +574,7 @@ window.onload = function() {
                  }
                  selectedAddedObject = addedObject;
                  selectedObjectGroup = 0;
+                 selectedAddedText = 0;
                  objectSelectedByCommand = false;
                  afterObjectSelection();
                  if (addedObject.clickCallbackFunction){
@@ -636,6 +597,7 @@ window.onload = function() {
                    }
                  }
                  selectedAddedObject = 0;
+                 selectedAddedText = 0;
                  selectedObjectGroup = objectGroup;
                  afterObjectSelection();
                  if (objectGroup.clickCallbackFunction){
@@ -647,13 +609,14 @@ window.onload = function() {
             }
            }
          }else if (object.isAddedText){
-           
+           selectedAddedObject = 0;
+           selectedObjectGroup = 0;
          }
        }else{
          if (!objectSelectedByCommand){
            selectedAddedObject = 0;
            selectedObjectGroup = 0;
-           selectedLightName = 0;
+           selectedAddedText = 0;
            afterObjectSelection();
          }
        }
@@ -748,7 +711,7 @@ window.addEventListener('keydown', function(event){
     return;
   }
 
-  if (cliFocused || omGUIFocused || lightsGUIFocused){
+  if (cliFocused || omGUIFocused){
     return;
   }
 
@@ -823,7 +786,7 @@ window.addEventListener('keyup', function(event){
   if (!windowLoaded){
     return;
   }
-  if (cliFocused || omGUIFocused || lightsGUIFocused){
+  if (cliFocused || omGUIFocused){
     return;
   }
   if (keyCodeToChar[event.keyCode]){
@@ -1001,12 +964,6 @@ window.addEventListener('keyup', function(event){
    controller.domElement.style.opacity = 1;
  }
 
- function enableAllLightsControllers(){
-   enableController(lightsOffsetXController);
-   enableController(lightsOffsetYController);
-   enableController(lightsOffsetZController);
- }
-
  function enableAllOMControllers(){
    enableController(omRotationXController);
    enableController(omRotationYController);
@@ -1043,36 +1000,12 @@ function isPSCollisionWorkerEnabled(){
   //return (WORKERS_SUPPORTED && PS_COLLISION_WORKER_ENABLED);
 }
 
-function afterLightSelection(){
-  if (mode != 0){
-    return;
-  }
-  if (selectedLightName){
-    enableAllLightsControllers();
-    $(datGuiLights.domElement).attr("hidden", false);
-    var light = lights[selectedLightName];
-    lightsParameters["Light"] = selectedLightName;
-    lightsParameters["Intensity"] = light.intensity;
-    if (light.isPointLight){
-      lightsParameters["Offset x"] = light.position.x - light.initialPositionX;
-      lightsParameters["Offset y"] = light.position.y - light.initialPositionY;
-      lightsParameters["Offset z"] = light.position.z - light.initialPositionZ;
-    }else{
-      disableController(lightsOffsetXController);
-      disableController(lightsOffsetYController);
-      disableController(lightsOffsetZController);
-    }
-  }else{
-    $(datGuiLights.domElement).attr("hidden", true);
-  }
-}
-
 function afterObjectSelection(){
   if (mode != 0){
     return;
   }
   if (selectedAddedObject || selectedObjectGroup){
-    selectedLightName = 0;
+    selectedAddedText = 0;
     $(datGuiObjectManipulation.domElement).attr("hidden", false);
     enableAllOMControllers();
     var obj = selectedAddedObject;
@@ -1219,7 +1152,6 @@ function afterObjectSelection(){
       objectGroups[objName].mesh.remove(axesHelper);
     }
   }
-  afterLightSelection();
 }
 
 function resizeFunction(){

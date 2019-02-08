@@ -37,12 +37,6 @@ var State = function(projectName, author){
     curMaterialExport["textColor"] = curMaterial.textColor;
     if (curMaterial instanceof BasicMaterial){
       curMaterialExport["materialType"] = "BASIC";
-    }else if (curMaterial.isMeshPhongMaterial){
-      curMaterialExport["materialType"] = "PHONG";
-      var shininess = curMaterial.shininess;
-      var emissiveIntensity = curMaterial.emissiveIntensity;
-      curMaterialExport["shininess"] = shininess;
-      curMaterialExport["emissiveIntensity"] = emissiveIntensity;
     }
     curMaterialExport.roygbivMaterialName = curMaterial.roygbivMaterialName;
     materialsExport[materialName] = curMaterialExport;

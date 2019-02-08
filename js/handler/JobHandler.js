@@ -10,107 +10,108 @@ JobHandler.prototype.handle = function(previewModeCommand){
   jobHandlerWorking = true;
   jobHandlerInternalCounter = 0;
   jobHandlerInternalMaxExecutionCount = 0;
+  this.splitted[0] = this.splitted[0].toLowerCase();
   try{
-    if (this.splitted[0] == "newSurface"){
+    if (this.splitted[0] == "newSurface".toLowerCase()){
       this.handleNewSurfaceCommand();
-    }else if (this.splitted[0] == "newBox"){
+    }else if (this.splitted[0] == "newBox".toLowerCase()){
       this.handleNewBoxCommand();
-    }else if (this.splitted[0] == "newSphere"){
+    }else if (this.splitted[0] == "newSphere".toLowerCase()){
       this.handleNewSphereCommand();
-    }else if (this.splitted[0] == "mapTexturePack"){
+    }else if (this.splitted[0] == "mapTexturePack".toLowerCase()){
       this.handleMapTexturePackCommand();
-    }else if (this.splitted[0] == "destroyGridSystem"){
+    }else if (this.splitted[0] == "destroyGridSystem".toLowerCase()){
       this.handleDestroyGridSystemCommand();
-    }else if (this.splitted[0] == "destroyMaterial"){
+    }else if (this.splitted[0] == "destroyMaterial".toLowerCase()){
       this.handleDestroyMaterialCommand();
-    }else if (this.splitted[0] == "destroyObject"){
+    }else if (this.splitted[0] == "destroyObject".toLowerCase()){
       this.handleDestroyObjectCommand();
-    }else if (this.splitted[0] == "destroyTexture"){
+    }else if (this.splitted[0] == "destroyTexture".toLowerCase()){
       this.handleDestroyTextureCommand();
-    }else if (this.splitted[0] == "mapTexture"){
+    }else if (this.splitted[0] == "mapTexture".toLowerCase()){
       this.handleMapTextureCommand();
-    }else if (this.splitted[0] == "adjustTextureRepeat"){
+    }else if (this.splitted[0] == "adjustTextureRepeat".toLowerCase()){
       this.handleAdjustTextureRepeatCommand();
-    }else if (this.splitted[0] == "mirror"){
+    }else if (this.splitted[0] == "mirror".toLowerCase()){
       this.handleMirrorCommand();
-    }else if (this.splitted[0] == "destroyWallCollection"){
+    }else if (this.splitted[0] == "destroyWallCollection".toLowerCase()){
       this.handleDestroyWallCollectionCommand();
-    }else if (this.splitted[0] == "mapSpecular"){
+    }else if (this.splitted[0] == "mapSpecular".toLowerCase()){
       this.handleMapSpecularCommand();
-    }else if (this.splitted[0] == "mapAmbientOcculsion"){
+    }else if (this.splitted[0] == "mapAmbientOcculsion".toLowerCase()){
       this.handleMapAmbientOcculsionCommand();
-    }else if (this.splitted[0] == "mapAlpha"){
+    }else if (this.splitted[0] == "mapAlpha".toLowerCase()){
       this.handleMapAlphaCommand();
-    }else if (this.splitted[0] == "destroyLight"){
+    }else if (this.splitted[0] == "destroyLight".toLowerCase()){
       this.handleDestroyLightCommand();
-    }else if (this.splitted[0] == "mapNormal"){
+    }else if (this.splitted[0] == "mapNormal".toLowerCase()){
       this.handleMapNormalCommand();
-    }else if (this.splitted[0] == "mapEmissive"){
+    }else if (this.splitted[0] == "mapEmissive".toLowerCase()){
       this.handleMapEmissiveCommand();
-    }else if (this.splitted[0] == "destroyTexturePack"){
+    }else if (this.splitted[0] == "destroyTexturePack".toLowerCase()){
       this.handleDestroyTexturePackCommand();
-    }else if (this.splitted[0] == "refreshTexturePack"){
+    }else if (this.splitted[0] == "refreshTexturePack".toLowerCase()){
       this.handleRefreshTexturePackCommand();
-    }else if (this.splitted[0] == "mapHeight"){
+    }else if (this.splitted[0] == "mapHeight".toLowerCase()){
       this.handleMapHeightCommand();
-    }else if (this.splitted[0] == "resetMaps"){
+    }else if (this.splitted[0] == "resetMaps".toLowerCase()){
       this.handleResetMapsCommand();
-    }else if (this.splitted[0] == "segmentObject"){
+    }else if (this.splitted[0] == "segmentObject".toLowerCase()){
       this.handleSegmentObjectCommand();
-    }else if (this.splitted[0] == "newPointLight"){
+    }else if (this.splitted[0] == "newPointLight".toLowerCase()){
       this.handleNewPointLightCommnand();
-    }else if (this.splitted[0] == "destroySkybox"){
+    }else if (this.splitted[0] == "destroySkybox".toLowerCase()){
       this.handleDestroySkyboxCommand();
-    }else if (this.splitted[0] == "setMass"){
+    }else if (this.splitted[0] == "setMass".toLowerCase()){
       this.handleSetMassCommand();
-    }else if (this.splitted[0] == "rotateObject"){
+    }else if (this.splitted[0] == "rotateObject".toLowerCase()){
       this.handleRotateObjectCommand();
-    }else if (this.splitted[0] == "runScript"){
+    }else if (this.splitted[0] == "runScript".toLowerCase()){
       this.handleRunScriptCommand();
-    }else if (this.splitted[0] == "stopScript"){
+    }else if (this.splitted[0] == "stopScript".toLowerCase()){
       this.handleStopScriptCommand();
-    }else if (this.splitted[0] == "destroyScript"){
+    }else if (this.splitted[0] == "destroyScript".toLowerCase()){
       this.handleDestroyScriptCommand();
-    }else if (this.splitted[0] == "detach"){
+    }else if (this.splitted[0] == "detach".toLowerCase()){
       this.handleDetachCommand();
-    }else if (this.splitted[0] == "mark"){
+    }else if (this.splitted[0] == "mark".toLowerCase()){
       this.handleMarkCommand();
-    }else if (this.splitted[0] == "unmark"){
+    }else if (this.splitted[0] == "unmark".toLowerCase()){
       this.handleUnmarkCommand();
-    }else if (this.splitted[0] == "runAutomatically"){
+    }else if (this.splitted[0] == "runAutomatically".toLowerCase()){
       this.handleRunAutomaticallyCommand();
-    }else if (this.splitted[0] == "runManually"){
+    }else if (this.splitted[0] == "runManually".toLowerCase()){
       this.handleRunManuallyCommand();
-    }else if (this.splitted[0] == "destroyImage"){
+    }else if (this.splitted[0] == "destroyImage".toLowerCase()){
       this.handleDestroyImageCommand();
-    }else if (this.splitted[0] == "setBlending"){
+    }else if (this.splitted[0] == "setBlending".toLowerCase()){
       this.handleSetBlendingCommand();
-    }else if (this.splitted[0] == "applyDisplacementMap"){
+    }else if (this.splitted[0] == "applyDisplacementMap".toLowerCase()){
       this.handleApplyDisplacementMapCommand();
-    }else if (this.splitted[0] == "setSlipperiness"){
+    }else if (this.splitted[0] == "setSlipperiness".toLowerCase()){
       this.handleSetSlipperinessCommand();
-    }else if (this.splitted[0] == "sync"){
+    }else if (this.splitted[0] == "sync".toLowerCase()){
       this.handleSyncCommand();
-    }else if (this.splitted[0] == "selectAllGrids"){
+    }else if (this.splitted[0] == "selectAllGrids".toLowerCase()){
       this.handleSelectAllGridsCommand();
-    }else if (this.splitted[0] == "newAreaConfiguration"){
+    }else if (this.splitted[0] == "newAreaConfiguration".toLowerCase()){
       this.handleNewAreaConfigurationCommand();
-    }else if (this.splitted[0] == "autoConfigureArea"){
+    }else if (this.splitted[0] == "autoConfigureArea".toLowerCase()){
       this.handleAutoConfigureAreaCommand();
-    }else if (this.splitted[0] == "newCylinder"){
+    }else if (this.splitted[0] == "newCylinder".toLowerCase()){
       this.handleNewCylinderCommand();
-    }else if (this.splitted[0] == "setRotationPivot"){
+    }else if (this.splitted[0] == "setRotationPivot".toLowerCase()){
       this.handleSetRotationPivotCommand();
-    }else if (this.splitted[0] == "unsetRotationPivot"){
+    }else if (this.splitted[0] == "unsetRotationPivot".toLowerCase()){
       this.handleUnsetRotationPivotCommand();
-    }else if (this.splitted[0] == "copyObject"){
+    }else if (this.splitted[0] == "copyObject".toLowerCase()){
       this.handleCopyObjectCommand();
     }
   }catch (err){
     console.error(err);
   }
   // because async
-  if (this.splitted[0] != "autoConfigureArea"){
+  if (this.splitted[0] != "autoConfigureArea".toLowerCase()){
     jobHandlerWorking = false;
   }
 }

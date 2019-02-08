@@ -300,7 +300,7 @@ function parse(input){
             terminal.printError(Text.WORKS_ONLY_IN_DESIGN_MODE);
             return true;
           }
-          if (name == "NULL_BASIC" || name == "NULL_PHONG"){
+          if (name == "NULL_BASIC"){
             terminal.printError(Text.NAME_RESERVED);
             return true;
           }
@@ -333,12 +333,6 @@ function parse(input){
             var material = materials[name];
             if (material instanceof BasicMaterial){
               terminal.printInfo(Text.BASIC_MATERIAL_INFO_TREE.replace(
-                Text.PARAM1, name
-              ).replace(
-                Text.PARAM2, material.textColor
-              ), options);
-            }else if (material.isMeshPhongMaterial){
-              terminal.printInfo(Text.PHONG_MATERIAL_INFO_TREE.replace(
                 Text.PARAM1, name
               ).replace(
                 Text.PARAM2, material.textColor
@@ -434,13 +428,6 @@ function parse(input){
                 color: "white",
                 alpha: 1
               });
-            }else if (defaultMaterialType == "PHONG"){
-              selectedMaterial = new THREE.MeshPhongMaterial({
-                color: "white",
-                side: THREE.DoubleSide,
-                wireframe: false
-              });
-              selectedMaterial.roygbivMaterialName = "NULL_PHONG";
             }
           }
           var objectName = splitted[1];
@@ -557,9 +544,7 @@ function parse(input){
             texturePackText = " - ";
           }
           var materialText;
-          if (object.material.isMeshPhongMaterial){
-            materialText = "PHONG";
-          }else if (object.material instanceof BasicMaterial){
+          if (object.material instanceof BasicMaterial){
             materialText = "BASIC";
           }
           terminal.printInfo(Text.TREE2.replace(
@@ -982,13 +967,6 @@ function parse(input){
                 color: "white",
                 alpha: 1
               });
-            }else if (defaultMaterialType == "PHONG"){
-              material = new THREE.MeshPhongMaterial({
-                color: "white",
-                side: THREE.DoubleSide,
-                wireframe: false
-              });
-              material.roygbivMaterialName = "NULL_PHONG";
             }
           }
           if (axis != "x" && axis != "z" && axis != "y"){
@@ -1171,13 +1149,6 @@ function parse(input){
                 color: "white",
                 alpha: 1
               });
-            }else if (defaultMaterialType == "PHONG"){
-              material = new THREE.MeshPhongMaterial({
-                color: "white",
-                side: THREE.DoubleSide,
-                wireframe: false
-              });
-              material.roygbivMaterialName = "NULL_PHONG";
             }
           }
 
@@ -1455,7 +1426,7 @@ function parse(input){
           return true;
         break;
         case 43: //mapSpecular
-
+          // DEPRECATED
         break;
         case 44: //mapEnvironment
           // DEPRECATED
@@ -1557,106 +1528,25 @@ function parse(input){
           }
         break;
         case 47: //setDefaultMaterial
-          if (mode != 0){
-            terminal.printError(Text.WORKS_ONLY_IN_DESIGN_MODE);
-            return true;
-          }
-          var materialType = splitted[1].toUpperCase();
-          if (materialType != "BASIC" && materialType != "PHONG"){
-            terminal.printError(Text.DEFAULT_MATERIAL_TYPE_MUST_BE);
-            return true;
-          }
-          defaultMaterialType = materialType;
-          terminal.printInfo(Text.DEFAULT_MATERIAL_TYPE_SET_TO.replace(
-            Text.PARAM1, defaultMaterialType
-          ));
-          return true;
+          // DEPRECATED
         break;
         case 48: //newAmbientLight
-
+          // DEPRECATED
         break;
         case 49: //printLights
-          var count = 0;
-          var length = Object.keys(lights).length;
-          terminal.printHeader(Text.LIGHTS);
-          for (var lightName in lights){
-            var light = lights[lightName];
-            count ++;
-            var options = true;
-            if (count == length){
-              options = false;
-            }
-            var type = "[AMBIENT - "+light.colorTextVal+"]";
-            if (light.isPointLight){
-              type = "[POINT - "+light.colorTextVal+"]";
-            }else if (light.isDirectionalLight){
-              type = "[DIRECTIONAL - "+light.colorTextVal+"]";
-            }else if (light.isSpotLight){
-              type = "[SPOT - "+light.colorTextVal+"]";
-            }
-            terminal.printInfo(Text.TREE_LIGHTS.replace(
-              Text.PARAM1, type
-            ).replace(
-              Text.PARAM2, lightName
-            ), options);
-          }
-          if (count == 0){
-            terminal.printError(Text.NO_LIGHTS_CREATED);
-          }
-          return true;
+          // DEPRECATED
         break;
         case 50: //selectLight
-          var lightName = splitted[1];
-          if (!lights[lightName]){
-            terminal.printError(Text.NO_SUCH_LIGHT);
-            return true;
-          }
-          selectedLightName = lightName;
-          terminal.printInfo(Text.SELECTED_LIGHT.replace(
-            Text.PARAM1, lightName
-          ));
-          selectedAddedObject = 0;
-          selectedObjectGroup = 0;
-          afterObjectSelection();
-          return true;
+          // DEPRECATED
         break;
         case 51: //destroyLight
-          var lightName = splitted[1];
-          var light = lights[lightName];
-          if (mode != 0){
-            terminal.printError(Text.WORKS_ONLY_IN_DESIGN_MODE);
-            return true;
-          }
-          if (!(lightName.indexOf("*") == -1)){
-            new JobHandler(splitted).handle();
-            return true;
-          }
-          if (!light){
-            terminal.printError(Text.NO_SUCH_LIGHT);
-            return true;
-          }
-          scene.remove(light);
-          for (var objectName in addedObjects){
-            var addedObject = addedObjects[objectName];
-            addedObject.mesh.material.needsUpdate = true;
-          }
-
-          if (light.isPointLight){
-            scene.remove(pointLightRepresentations[lightName]);
-            delete pointLightRepresentations[lightName];
-          }
-          delete lights[lightName];
-          selectedLightName = 0;
-          if (!jobHandlerWorking){
-            terminal.printError(Text.LIGHT_DESTROYED);
-          }
-          return true;
+          // DEPRECATED
         break;
         case 52: //newPhongMaterial
-
+          // DEPRECATED
         break;
         case 53: //mapNormal
-
+          // DEPRECATED
         break;
         case 54: //mapEmissive
           var textureName = splitted[1];
@@ -2143,7 +2033,7 @@ function parse(input){
           }
         break;
         case 68: //newPointLight
-
+          // DEPRECATED
         break;
         case 69: //newSkybox
           var name = splitted[1];
@@ -2430,6 +2320,7 @@ function parse(input){
             camera.lookAt(objGroupSelection.graphicsGroup.position);
           }
           objectSelectedByCommand = true;
+          selectedAddedText = 0;
           terminal.printInfo(Text.OBJECT_SELECTED.replace(
               Text.PARAM1, name
           ));
@@ -2879,17 +2770,9 @@ function parse(input){
               if (!materialUsed){
                 if (group[objName].hasBasicMaterial){
                   materialUsed = 1;
-                }else if (group[objName].material instanceof THREE.MeshPhongMaterial){
-                  materialUsed = 2;
                 }
               }else{
-                if (materialUsed == 1 && (group[objName].material instanceof THREE.MeshPhongMaterial)){
-                  terminal.printError(Text.CANNOT_GLUE_OBJECTS_WITH_DIFFERENT_MATERIAL_TYPES);
-                  return true;
-                }else if (materialUsed == 2 && (group[objName].hasBasicMaterial)){
-                  terminal.printError(Text.CANNOT_GLUE_OBJECTS_WITH_DIFFERENT_MATERIAL_TYPES);
-                  return true;
-                }
+                // check if the same kind of material is used (for now only BASIC materials exist.)
               }
             }
 
@@ -2924,9 +2807,7 @@ function parse(input){
 
             if (materialUsed == 1){
               objectGroup.isBasicMaterial = true;
-              objectGroup.isPhongMaterial = false;
             }else if (materialUsed == 2){
-              objectGroup.isPhongMaterial = true;
               objectGroup.isBasicMaterial = false;
             }
             objectGroup.glue();
@@ -2935,6 +2816,7 @@ function parse(input){
             $(datGuiObjectManipulation.domElement).attr("hidden", true);
             selectedAddedObject = 0;
             selectedObjectGroup = 0;
+            selectedAddedText = 0;
             if (areaConfigurationsVisible){
               $(datGuiAreaConfigurations.domElement).attr("hidden", true);
               areaConfigurationsVisible = false;
@@ -2969,6 +2851,7 @@ function parse(input){
           }
           selectedObjectGroup = 0;
           selectedAddedObject = 0;
+          selectedAddedText = 0;
           if (areaConfigurationsVisible){
             $(datGuiAreaConfigurations.domElement).attr("hidden", true);
             areaConfigurationsVisible = false;
@@ -3449,22 +3332,6 @@ function parse(input){
               return true;
             }
           }
-          if (refTexturePack.hasNormal){
-            var wNormal = refTexturePack.normalTexture.image.width;
-            var hNormal = refTexturePack.normalTexture.image.height;
-            if (wNormal * scale < 1 || hNormal * scale < 1 ){
-              terminal.printError(Text.TEXTURE_SIZE_TOO_SMALL);
-              return true;
-            }
-          }
-          if (refTexturePack.hasSpecular){
-            var wSpecular = refTexturePack.specularTexture.image.width;
-            var hSpecular = refTexturePack.specularTexture.image.height;
-            if (wSpecular * scale < 1 || hSpecular * scale < 1){
-              terminal.printError(Text.TEXTURE_SIZE_TOO_SMALL);
-              return true;
-            }
-          }
           if (refTexturePack.hasHeight){
             var wHeight = refTexturePack.heightTexture.image.width;
             var hHeight = refTexturePack.heightTexture.image.height;
@@ -3888,13 +3755,6 @@ function parse(input){
                 color: "white",
                 alpha: 1
               });
-            }else if (defaultMaterialType == "PHONG"){
-              material = new THREE.MeshPhongMaterial({
-                color: "white",
-                side: THREE.DoubleSide,
-                wireframe: false
-              });
-              material.roygbivMaterialName = "NULL_PHONG";
             }
           }
           if (isNaN(radius)){
@@ -4409,13 +4269,6 @@ function parse(input){
                 color: "white",
                 alpha: 1
               });
-            }else if (defaultMaterialType == "PHONG"){
-              material = new THREE.MeshPhongMaterial({
-                color: "white",
-                side: THREE.DoubleSide,
-                wireframe: false
-              });
-              material.roygbivMaterialName = "NULL_PHONG";
             }
           }
           if (isNaN(topRadius)){

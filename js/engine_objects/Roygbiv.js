@@ -398,8 +398,7 @@ Roygbiv.prototype.getOpacity = function(object){
 }
 
 // getHeightMapScale
-//  Returns the height map scale of an object. Only the objects that have Phong
-//  materials have height maps.
+//  Returns the height map scale of an object.
 Roygbiv.prototype.getHeightMapScale = function(object){
   if (mode == 0){
     return;
@@ -420,8 +419,7 @@ Roygbiv.prototype.getHeightMapScale = function(object){
 }
 
 // getHeightMapBias
-//  Returns the height map bias of an object. Only the objects that have Phong
-//  materials have height maps.
+//  Returns the height map bias of an object.
 Roygbiv.prototype.getHeightMapBias = function(object){
   if (mode == 0){
     return;
@@ -1342,8 +1340,7 @@ Roygbiv.prototype.textureOffset = function(object, dx, dy){
 }
 
 // heightMapScale
-//  Modifies the height map scale of an object. Only the objects that have Phong
-//  materials can have height maps.
+//  Modifies the height map scale of an object.
 Roygbiv.prototype.heightMapScale = function(object, delta){
   if (mode == 0){
     return;
@@ -1376,8 +1373,7 @@ Roygbiv.prototype.heightMapScale = function(object, delta){
 }
 
 // heightMapBias
-//  Modifies the height map bias of an object. Only the objects that have Phong
-//  materials can have height maps.
+//  Modifies the height map bias of an object.
 Roygbiv.prototype.heightMapBias = function(object, delta){
   if (mode == 0){
     return;

@@ -457,14 +457,6 @@ Terminal.prototype.autocomplete = function(command){
 				}
 				helpString = "[Types]: ";
 			break;
-			case commandDescriptor.LIGHT_NAME:
-				for (var lightName in lights){
-					if (lightName.startsWith(curEntry)){
-						possibilities.push(lightName);
-					}
-				}
-				helpString = "[Lights]: ";
-			break;
 			case commandDescriptor.FILE_EXTENSION:
 				var knownExtensions = [
 					"tga", "TGA", "jpg", "JPG", "jpeg",
