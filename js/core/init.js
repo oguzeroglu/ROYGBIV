@@ -913,6 +913,9 @@ window.addEventListener('keydown', function(event){
           $(datGuiAreaConfigurations.domElement).attr("hidden", true);
           areaConfigurationsVisible = false;
         }
+      }else if (selectedAddedText){
+        terminal.clear();
+        parseCommand("destroyText "+selectedAddedText.name);
       }
       afterObjectSelection();
     break;

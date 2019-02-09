@@ -160,7 +160,9 @@ var commandArgumentsExpectedCount = [
     2, //newFont
     1, //destroyFont
     0, //printFonts
-    6 //newText
+    6, //newText
+    1, //selectText
+    1 //destroyText
 ];
 var commandArgumentsExpectedExplanation = [
   "help", //help
@@ -317,7 +319,9 @@ var commandArgumentsExpectedExplanation = [
   "newFont fontName path", //newFont
   "destroyFont fontName", //destroyFont
   "printFonts", //printFonts
-  "newText textName fontName maxCharacterLength offsetX offsetY offsetZ" //newText
+  "newText textName fontName maxCharacterLength offsetX offsetY offsetZ", //newText
+  "selectText textName", //selectText
+  "destroyText textName" //destroyText
 ];
 var commands = [
   "help",
@@ -474,7 +478,9 @@ var commands = [
   "newFont",
   "destroyFont",
   "printFonts",
-  "newText"
+  "newText",
+  "selectText",
+  "destroyText"
 ];
 var commandInfo = [
   "help: Prints command list.",
@@ -631,7 +637,9 @@ var commandInfo = [
   "newFont: Creates a new font.",
   "destroyFont: Destroys a font.",
   "printFonts: Prints all created fonts.",
-  "newText: Allocates a new text object."
+  "newText: Allocates a new text object.",
+  "selectText: Selects a text for modification.",
+  "destroyText: Destroys a text."
 ];
 var keyboardInfo = [
   "W/S : Translates the camera on axis Z.",

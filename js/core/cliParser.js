@@ -4922,6 +4922,53 @@ function parse(input){
           terminal.printInfo(Text.TEXT_ALLOCATED);
           return true;
         break;
+        case 155: //selectText
+          if (mode != 0){
+            terminal.printError(Text.WORKS_ONLY_IN_DESIGN_MODE);
+            return true;
+          }
+          var textName = splitted[1];
+          var textSelection = addedTexts[textName];
+          if (!textSelection){
+            terminal.printError(Text.NO_SUCH_TEXT);
+            return true;
+          }
+          if (selectedAddedObject){
+            selectedAddedObject.mesh.remove(axesHelper);
+          }
+          if (selectedObjectGroup){
+            selectedObjectGroup.mesh.remove(axesHelper);
+          }
+          if (selectedAddedText && selectedAddedText.bbHelper){
+            scene.remove(selectedAddedText.bbHelper);
+          }
+          selectedAddedObject = 0;
+          selectedObjectGroup = 0;
+          selectedAddedText = textSelection;
+          if (!selectedAddedText.bbHelper){
+            selectedAddedText.handleBoundingBox();
+          }
+          scene.add(selectedAddedText.bbHelper);
+          afterObjectSelection();
+          terminal.printInfo(Text.SELECTED.replace(Text.PARAM1, selectedAddedText.name));
+          camera.lookAt(selectedAddedText.mesh.position);
+          return true;
+        break;
+        case 156: //destroyText
+          if (mode != 0){
+            terminal.printError(Text.WORKS_ONLY_IN_DESIGN_MODE);
+            return true;
+          }
+          var textName = splitted[1];
+          var textToDestroy = addedTexts[textName];
+          if (!textToDestroy){
+            terminal.printError(Text.NO_SUCH_TEXT);
+            return true;
+          }
+          textToDestroy.destroy();
+          terminal.printInfo(Text.TEXT_DESTROYED);
+          return true;
+        break;
       }
       return true;
     }catch(err){

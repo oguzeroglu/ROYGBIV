@@ -75,9 +75,27 @@ var AddedText = function(name, font, text, position, color, alpha, characterSize
 }
 
 AddedText.prototype.destroy = function(){
+  if (selectedAddedText && selectedAddedText.name == this.name){
+    if (this.bbHelper){
+      scene.remove(this.bbHelper);
+    }
+    selectedAddedText = 0;
+    afterObjectSelection();
+  }
+  for (var gridName in this.destroyedGrids){
+    if (this.destroyedGrids[gridName].createdAddedTextName == this.name){
+      delete this.destroyedGrids[gridName].createdAddedTextName;
+    }
+  }
   scene.remove(this.mesh);
   this.material.dispose();
   this.geometry.dispose();
+  if (this.bbHelper){
+    this.bbHelper.material.dispose();
+    this.bbHelper.geometry.dispose();
+  }
+  rayCaster.refresh();
+  delete addedTexts[this.name];
 }
 
 AddedText.prototype.constructText = function(){

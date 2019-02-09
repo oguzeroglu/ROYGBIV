@@ -627,6 +627,14 @@ Terminal.prototype.autocomplete = function(command){
 				}
 				helpString = "[Fonts]: ";
 			break;
+			case commandDescriptor.TEXT_NAME:
+				for (var textName in addedTexts){
+					if (textName.startsWith(curEntry)){
+						possibilities.push(textName);
+					}
+				}
+				helpString = "[Texts]: ";
+			break;
 		}
 
 		//  **********************************************************

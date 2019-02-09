@@ -32,6 +32,7 @@ var CommandDescriptor = function(){
   this.RENDER_SIDE              =   29;
   this.CHILD_OBJECT_NAME        =   30;
   this.FONT_NAME                =   31;
+  this.TEXT_NAME                =   32;
 
   // newGridSystem
   this.newGridSystem = new Object();
@@ -653,6 +654,16 @@ var CommandDescriptor = function(){
   this.newText.types.push(this.UNKNOWN_INDICATOR); // offsetX
   this.newText.types.push(this.UNKNOWN_INDICATOR); // offsetY
   this.newText.types.push(this.UNKNOWN_INDICATOR); // offsetZ
+
+  // selectText
+  this.selectText = new Object();
+  this.selectText.types = [];
+  this.selectText.types.push(this.TEXT_NAME); // textName
+
+  // destroyText
+  this.destroyText = new Object();
+  this.destroyText.types = [];
+  this.destroyText.types.push(this.TEXT_NAME); // textName
 
 };
 
