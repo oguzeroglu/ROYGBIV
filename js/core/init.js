@@ -852,7 +852,13 @@ window.addEventListener('keydown', function(event){
   }
 
   if (keyCodeToChar[event.keyCode]){
+    if (keyboardBuffer[keyCodeToChar[event.keyCode]]){
+      return;
+    }
     keyboardBuffer[keyCodeToChar[event.keyCode]] = true;
+    if (mode == 1 && screenKeydownCallbackFunction && !isPaused){
+      screenKeydownCallbackFunction(keyCodeToChar[event.keyCode]);
+    }
   }
 
   if (mode == 0 && keyboardBuffer["."]){
@@ -937,6 +943,9 @@ window.addEventListener('keyup', function(event){
       for (var gridName in gridSelections){
         gridSelections[gridName].removeCornerHelpers();
       }
+    }
+    if (mode == 1 && !isPaused && screenKeyupCallbackFunction){
+      screenKeyupCallbackFunction(keyCodeToChar[event.keyCode]);
     }
   }
   if (mode == 1 && isPaused){

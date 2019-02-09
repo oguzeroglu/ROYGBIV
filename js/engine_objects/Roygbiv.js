@@ -168,7 +168,11 @@ var Roygbiv = function(){
     "getViewport",
     "setUserInactivityCallbackFunction",
     "removeUserInactivityCallbackFunction",
-    "pause"
+    "pause",
+    "setScreenKeydownListener",
+    "removeScreenKeydownListener",
+    "setScreenKeyupListener",
+    "removeScreenKeyupListener"
   ];
 
   this.globals = new Object();
@@ -6763,6 +6767,62 @@ Roygbiv.prototype.removeUserInactivityCallbackFunction = function(){
   inactiveCounter = 0;
   userInactivityCallbackFunction = 0;
   maxInactiveTime = 0;
+}
+
+// setScreenKeydownListener
+// Sets a keydown listener. The callbackFunction is executed with the pressedChar
+// parameter. See the values of keyCodeToChar variable for possible pressedChar
+// parameters.
+Roygbiv.prototype.setScreenKeydownListener = function(callbackFunction){
+  if (mode == 0){
+    return;
+  }
+  if (typeof callbackFunction == UNDEFINED){
+    throw new Error("setScreenKeydownListener error: callbackFunction is not defined.");
+    return;
+  }
+  if (!(callbackFunction instanceof Function)){
+    throw new Error("setScreenKeydownListener error: callbackFunction is not a function.");
+    return;
+  }
+  screenKeydownCallbackFunction = callbackFunction;
+}
+
+// removeScreenKeydownListener
+// Removes the keydown listener.
+Roygbiv.prototype.removeScreenKeydownListener = function(){
+  if (mode == 0){
+    return;
+  }
+  screenKeydownCallbackFunction = 0;
+}
+
+// setScreenKeyupListener
+// Sets a keyup listener. The callbackFunction is executed with the uppedChar
+// parameter. See the values of keyCodeToChar variable for possible uppedChar
+// parameters.
+Roygbiv.prototype.setScreenKeyupListener = function(callbackFunction){
+  if (mode == 0){
+    return;
+  }
+  if (typeof callbackFunction == UNDEFINED){
+    throw new Error("setScreenKeyupListener error: callbackFunction is not defined.");
+    return;
+  }
+  if (!(callbackFunction instanceof Function)){
+    throw new Error("setScreenKeyupListener error: callbackFunction is not a function.");
+    return;
+  }
+  screenKeyupCallbackFunction = callbackFunction;
+}
+
+// removeScreenKeyupListener
+// Removes the keyup listener.
+Roygbiv.prototype.removeScreenKeyupListener = function(){
+  if (mode == 0){
+    return;
+  }
+  screenKeyupCallbackFunction = 0;
 }
 
 // UTILITY FUNCTIONS ***********************************************************
