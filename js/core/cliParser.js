@@ -4881,6 +4881,17 @@ function parse(input){
             terminal.printError(Text.MUST_HAVE_1_OR_2_GRIDS_SELECTED);
             return true;
           }
+          if (selectionSize == 2){
+            var parentGs = 0;
+            for (var gridName in gridSelections){
+              if (!parentGs){
+                parentGs = gridSelections[gridName].parentName;
+              }else if (parentGs != gridSelections[gridName].parentName){
+                terminal.printError(Text.SELECTED_GRIDS_SAME_GRIDSYSTEM);
+                return true;
+              }
+            }
+          }
           var textCoord = new THREE.Vector3(0, 0, 0);
           for (var gridName in gridSelections){
             var sgrid = gridSelections[gridName];
@@ -4903,6 +4914,9 @@ function parse(input){
           addedText.handleBoundingBox();
           rayCaster.refresh();
           for (var gridName in gridSelections){
+            addedText.destroyedGrids[gridName] = gridSelections[gridName];
+            addedText.gsName = gridSelections[gridName].parentName;
+            gridSelections[gridName].createdAddedTextName = addedText.name;
             gridSelections[gridName].toggleSelect(false, false, false, true);
           }
           terminal.printInfo(Text.TEXT_ALLOCATED);

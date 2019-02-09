@@ -225,8 +225,3 @@ Grid.prototype.removeCornerHelpers = function(){
   }
   this.texts = 0;
 }
-
-Grid.prototype.isObjectInFrustum = function(object3D){
-  this.frustum.setFromMatrix(REUSABLE_MATRIX_4.multiplyMatrices(camera.projectionMatrix, camera.matrixWorldInverse));
-  return this.frustum.containsPoint(object3D.position);
-}

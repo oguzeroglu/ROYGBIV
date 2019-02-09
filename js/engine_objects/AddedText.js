@@ -71,6 +71,7 @@ var AddedText = function(name, font, text, position, color, alpha, characterSize
   this.material.uniforms.modelViewMatrix.value = this.mesh.modelViewMatrix;
 
   this.tmpObj = {};
+  this.destroyedGrids = new Object();
 }
 
 AddedText.prototype.destroy = function(){
@@ -138,6 +139,12 @@ AddedText.prototype.export = function(){
   exportObj.backgroundColorG = this.material.uniforms.backgroundColor.value.g;
   exportObj.backgroundColorB = this.material.uniforms.backgroundColor.value.b;
   exportObj.backgroundAlpha = this.material.uniforms.backgroundAlpha.value;
+  exportObj.gsName = this.gsName;
+  var exportDestroyedGrids = new Object();
+  for (var gridName in this.destroyedGrids){
+    exportDestroyedGrids[gridName] = this.destroyedGrids[gridName].export();
+  }
+  exportObj["destroyedGrids"] = exportDestroyedGrids;
   return exportObj;
 }
 
@@ -191,11 +198,6 @@ AddedText.prototype.setText = function(newText){
 
 AddedText.prototype.setColor = function(colorString){
   this.material.uniforms.color.value.set(colorString);
-  this.color.set(
-    this.material.uniforms.color.value.r,
-    this.material.uniforms.color.valug.g,
-    this.material.uniforms.color.value.b
-  );
 }
 
 AddedText.prototype.setAlpha = function(alpha){

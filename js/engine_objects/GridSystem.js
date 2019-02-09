@@ -525,6 +525,27 @@ GridSystem.prototype.destroy = function(){
     }
   }
 
+  for (var objName in addedObjects){
+    var obj = addedObjects[objName];
+    if (obj.metaData.gridSystemName == this.name){
+      obj.destroyedGrids = new Object();
+    }
+  }
+  for (var objName in objectGroups){
+    var obj = objectGroups[objName];
+    for (var childName in obj.group){
+      if (obj.group[childName].metaData.gridSystemName == this.name){
+        obj.group[childName].destroyedGrids = new Object();
+      }
+    }
+  }
+  for (var textName in addedTexts){
+    var obj = addedTexts[textName];
+    if (obj.gsName == this.name){
+      obj.destroyedGrids = new Object();
+    }
+  }
+
   rayCaster.refresh();
 
 }

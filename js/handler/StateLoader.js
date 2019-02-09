@@ -1089,6 +1089,7 @@ StateLoader.prototype.finalize = function(){
       return;
   }
 
+  // ADDED TEXTS ***************************************************
   for (var textName in obj.texts){
     var curTextExport = obj.texts[textName];
     var addedTextInstance = new AddedText(
@@ -1110,9 +1111,25 @@ StateLoader.prototype.finalize = function(){
     addedTextInstance.refInnerHeight = curTextExport.refInnerHeight;
     addedTextInstance.handleResize();
     addedTextInstance.handleBoundingBox();
+    addedTextInstance.gsName = curTextExport.gsName;
+    var gridSystem = gridSystems[addedTextInstance.gsName];
+    if (gridSystem){
+      for (var gridName in curTextExport.destroyedGrids){
+        var gridExport = curTextExport.destroyedGrids[gridName];
+        var grid = gridSystem.getGridByColRow(
+          gridExport.colNumber,
+          gridExport.rowNumber
+        );
+        if (grid){
+          addedTextInstance.destroyedGrids[gridName] = grid;
+          grid.createdAddedTextName = addedTextInstance.name;
+        }
+      }
+    }
     addedTexts[textName] = addedTextInstance;
   }
 
+  // OBJECT GROUPS *************************************************
   for (var objectName in obj.objectGroups){
     var curObjectGroupExport = obj.objectGroups[objectName];
     var group = new Object();
@@ -2068,6 +2085,12 @@ StateLoader.prototype.resetProject = function(undo){
 
   for (var grouppedObjectName in objectGroups){
     objectGroups[grouppedObjectName].destroy();
+  }
+
+  for (var textName in addedTexts){
+    if (addedTexts[textName].bbHelper){
+      scene.remove(addedTexts[textName].bbHelper);
+    }
   }
 
   if (skyboxMesh){

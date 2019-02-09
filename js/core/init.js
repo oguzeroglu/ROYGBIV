@@ -679,21 +679,48 @@ window.onload = function() {
                  if (objectGroup.clickCallbackFunction){
                    objectGroup.clickCallbackFunction(point.x, point.y, point.z);
                  }
+               }else if (selectedGrid.createdAddedTextName && !(keyboardBuffer["Shift"])){
+                  var addedText = addedTexts[selectedGrid.createdAddedTextName];
+                  terminal.clear();
+                  terminal.printInfo(Text.SELECTED.replace(Text.PARAM1, addedText.name));
+                  if (mode == 0){
+                    if (selectedAddedObject){
+                      selectedAddedObject.mesh.remove(axesHelper);
+                    }
+                    if (selectedObjectGroup){
+                      selectedObjectGroup.mesh.remove(axesHelper);
+                    }
+                    if (selectedAddedText && selectedAddedText.bbHelper){
+                      scene.remove(selectedAddedText.bbHelper);
+                    }
+                  }
+                  selectedAddedObject = 0;
+                  selectedObjectGroup = 0;
+                  selectedAddedText = addedText;
+                  if (!selectedAddedText.bbHelper){
+                    selectedAddedText.handleBoundingBox();
+                  }
+                  scene.add(selectedAddedText.bbHelper);
+                  afterObjectSelection();
                }else{
                  selectedGrid.toggleSelect(false, true);
               }
             }
            }
          }else if (object.isAddedText){
-           if (selectedAddedObject){
-             selectedAddedObject.mesh.remove(axesHelper);
+           if (mode == 0){
+             if (selectedAddedObject){
+               selectedAddedObject.mesh.remove(axesHelper);
+             }
+             if (selectedObjectGroup){
+               selectedObjectGroup.mesh.remove(axesHelper);
+             }
+             if (selectedAddedText && selectedAddedText.name != object.name){
+               scene.remove(selectedAddedText.bbHelper);
+             }
            }
-           if (selectedObjectGroup){
-             selectedObjectGroup.mesh.remove(axesHelper);
-           }
-           if (selectedAddedText && selectedAddedText.name != object.name){
-             scene.remove(selectedAddedText.bbHelper);
-           }
+           terminal.clear();
+           terminal.printInfo(Text.SELECTED.replace(Text.PARAM1, object.name));
            selectedAddedObject = 0;
            selectedObjectGroup = 0;
            selectedAddedText = object;
