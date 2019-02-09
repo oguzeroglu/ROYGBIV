@@ -18,6 +18,7 @@ Font.prototype.load = function(){
     that.generateFontTexture();
     that.onLoaded(that);
   }).catch(function(error) {
+    console.error(error);
     that.onError(that.name);
   });
 }

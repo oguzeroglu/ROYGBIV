@@ -670,7 +670,7 @@ StateLoader.prototype.load = function(undo){
       if (curTexture == 1 || curTexture == 2 || curTexture == 3){
         textures[textureName] = curTexture;
         this.totalLoadedTextureCount ++;
-        this.createObjectGroupsAfterLoadedAssets();
+        this.finalize();
         continue;
       }
       var offsetX = curTexture.offset[0];
@@ -694,7 +694,7 @@ StateLoader.prototype.load = function(undo){
           that.totalLoadedTextureCount ++;
           this.textureX.needsUpdate = true;
           that.mapLoadedTexture(this.textureX, this.textureNameX);
-          that.createObjectGroupsAfterLoadedAssets();
+          that.finalize();
         }.bind({textureX: texture, textureNameX: textureName});
       }else if (uploadedImages[textureURL]){
         var texture = new THREE.Texture(uploadedImages[textureURL]);
@@ -726,7 +726,7 @@ StateLoader.prototype.load = function(undo){
                 textures[this.textureNameX] = this.textureX;
                 that.totalLoadedTextureCount ++;
                 that.mapLoadedTexture(this.textureX, this.textureNameX);
-                that.createObjectGroupsAfterLoadedAssets();
+                that.finalize();
               }.bind({textureX: texture, textureNameX: textureName})
               skip = true;
             }
@@ -737,7 +737,7 @@ StateLoader.prototype.load = function(undo){
           that.totalLoadedTextureCount ++;
           texture.needsUpdate = true;
           this.mapLoadedTexture(texture, textureName);
-          this.createObjectGroupsAfterLoadedAssets();
+          this.finalize();
         }
       }else{
         if (textureURL.toUpperCase().endsWith("DDS")){
@@ -783,7 +783,7 @@ StateLoader.prototype.load = function(undo){
             textures[textureNameX].offset.x = this.offsetXX;
             textures[textureNameX].offset.y = this.offsetYY;
             that.mapLoadedTexture(textures[textureNameX], textureNameX);
-            that.createObjectGroupsAfterLoadedAssets();
+            that.finalize();
           }.bind({textureNameX: textureName, offsetXX: offsetX, offsetYY: offsetY, repeatUU: repeatU, repeatVV: repeatV, isCompressed: (
             this.loaders[textureName] instanceof THREE.DDSLoader
           )}), function(xhr){
@@ -791,7 +791,7 @@ StateLoader.prototype.load = function(undo){
           }.bind({textureNameX: textureName}), function(xhr){
             textures[this.textureNameX] = 3;
             that.totalLoadedTextureCount ++;
-            that.createObjectGroupsAfterLoadedAssets();
+            that.finalize();
           }.bind({textureNameX: textureName})
         );
       }
@@ -810,7 +810,7 @@ StateLoader.prototype.load = function(undo){
         function(){
           this.that.totalLoadedTexturePackCount ++;
           this.that.mapLoadedTexturePack(this.texturePackName, this.objj);
-          this.that.createObjectGroupsAfterLoadedAssets();
+          this.that.finalize();
         }.bind({texturePackName: texturePackName, that: this, objj: obj, scaleFactorX: scaleFactor}),
         true,
         null,
@@ -839,7 +839,7 @@ StateLoader.prototype.load = function(undo){
           skyboxExport.color,
           function(){
             that.totalLoadedSkyboxCount ++;
-            that.createObjectGroupsAfterLoadedAssets();
+            that.finalize();
           }
         );
       }else{
@@ -878,7 +878,7 @@ StateLoader.prototype.load = function(undo){
                 skyboxMesh.scale.z = this.skyBoxScale;
               }
             }
-            that.createObjectGroupsAfterLoadedAssets();
+            that.finalize();
           }.bind({skyboxName: skyboxName, skyBoxScale: skyBoxScale})
         );
       }
@@ -929,7 +929,7 @@ StateLoader.prototype.load = function(undo){
     }
 
     // OBJECT GROUPS ***********************************************
-    // NOT HERE -> SEE: createObjectGroupsAfterLoadedAssets
+    // NOT HERE -> SEE: finalize
 
     // MARKED PONTS ************************************************
     markedPointsVisible = false;
@@ -1017,12 +1017,16 @@ StateLoader.prototype.load = function(undo){
       var font = new Font(curFontExport.name, curFontExport.path, function(fontInstance){
         fonts[fontInstance.name] = fontInstance;
         that.totalLoadedFontCount ++;
-        that.createObjectGroupsAfterLoadedAssets();
+        that.finalize();
       }, function(fontName){
         console.error("Error loading font: "+fontName);
+        terminal.printError("Error loading font: "+fontName);
       });
       font.load();
     }
+    // TEXTS *******************************************************
+    // NOT HERE -> SEE: finalize
+
     // POST PROCESSING *********************************************
     bloomStrength = obj.bloomStrength;
     bloomRadius = obj.bloomRadius;
@@ -1064,7 +1068,7 @@ StateLoader.prototype.load = function(undo){
     }
 
     if (!this.hasTextures && !this.hasTexturePacks && !this.hasSkyboxes && !this.hasFonts){
-      this.createObjectGroupsAfterLoadedAssets();
+      this.finalize();
     }
 
     return true;
@@ -1076,13 +1080,37 @@ StateLoader.prototype.load = function(undo){
   }
 }
 
-StateLoader.prototype.createObjectGroupsAfterLoadedAssets = function(){
+StateLoader.prototype.finalize = function(){
   var obj = this.stateObj;
   if (parseInt(this.totalLoadedTextureCount) < parseInt(obj.totalTextureCount) ||
            parseInt(this.totalLoadedTexturePackCount) < parseInt(obj.totalTexturePackCount) ||
                 parseInt(this.totalLoadedSkyboxCount) < parseInt(obj.totalSkyboxCount) ||
                       parseInt(this.totalLoadedFontCount) < parseInt(obj.totalFontCount)){
       return;
+  }
+
+  for (var textName in obj.texts){
+    var curTextExport = obj.texts[textName];
+    var addedTextInstance = new AddedText(
+      textName, fonts[curTextExport.fontName], curTextExport.text,
+      new THREE.Vector3(curTextExport.positionX, curTextExport.positionY, curTextExport.positionZ),
+      new THREE.Color(curTextExport.colorR, curTextExport.colorG, curTextExport.colorB),
+      curTextExport.alpha, curTextExport.charSize, curTextExport.strlen
+    );
+    addedTextInstance.setBackground(
+      "#" + new THREE.Color(curTextExport.backgroundColorR, curTextExport.backgroundColorG, curTextExport.backgroundColorB).getHexString(),
+      curTextExport.backgroundAlpha
+    );
+    if (!curTextExport.hasBackground){
+      addedTextInstance.removeBackground();
+    }
+    addedTextInstance.setMarginBetweenChars(curTextExport.offsetBetweenChars);
+    addedTextInstance.setMarginBetweenLines(curTextExport.offsetBetweenLines);
+    addedTextInstance.refCharSize = curTextExport.refCharSize;
+    addedTextInstance.refInnerHeight = curTextExport.refInnerHeight;
+    addedTextInstance.handleResize();
+    addedTextInstance.handleBoundingBox();
+    addedTexts[textName] = addedTextInstance;
   }
 
   for (var objectName in obj.objectGroups){

@@ -19,7 +19,11 @@ void main(){
   float coordY = ((1.0 - gl_PointCoord.y) * (endV - startV)) + startV;
   vec4 textureColor = texture2D(glyphTexture, vec2(coordX, coordY));
 
-  if (textureColor.a < 0.5 || startU < -300.0 || startV < -300.0 || endU < -300.0 || endV < -300.0){
+  if (startU < -300.0 || startV < -300.0 || endU < -300.0 || endV < -300.0){
+    discard;
+  }
+
+  if (textureColor.a < 0.5){
     if (hasBackgroundColorFlag < 0.0){
       discard;
     }else{

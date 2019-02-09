@@ -130,6 +130,12 @@ ModeSwitcher.prototype.switchFromDesignToPreview = function(){
       script2.runAutomatically = true;
     }
   }
+  for (var textName in addedTexts){
+    var addedText = addedTexts[textName];
+    if (addedText.bbHelper){
+      scene.remove(addedText.bbHelper);
+    }
+  }
   dynamicObjects = new Object();
   dynamicObjectGroups = new Object();
   for (var objectName in objectGroups){
@@ -237,6 +243,9 @@ ModeSwitcher.prototype.switchFromDesignToPreview = function(){
   rayCaster.refresh();
   this.commonSwitchFunctions();
   handleViewport();
+  for (var txtName in addedTexts){
+    addedTexts[txtName].handleResize();
+  }
 }
 
 ModeSwitcher.prototype.switchFromPreviewToDesign = function(){
@@ -283,6 +292,11 @@ ModeSwitcher.prototype.switchFromPreviewToDesign = function(){
   for (var gridName in gridSelections){
     scene.add(gridSelections[gridName].mesh);
     scene.add(gridSelections[gridName].dot);
+  }
+  for (var textName in addedTexts){
+    var addedText = addedTexts[textName];
+    addedText.show();
+    addedText.handleResize();
   }
   collisionCallbackRequests = new Object();
   particleCollisionCallbackRequests = new Object();
@@ -451,4 +465,7 @@ ModeSwitcher.prototype.switchFromPreviewToDesign = function(){
   renderer.setViewport(0, 0, canvas.width / screenResolution, canvas.height / screenResolution);
 
   this.commonSwitchFunctions();
+  for (var txtName in addedTexts){
+    addedTexts[txtName].handleResize();
+  }
 }

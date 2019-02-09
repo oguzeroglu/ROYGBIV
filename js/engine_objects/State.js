@@ -194,4 +194,9 @@ var State = function(projectName, author){
     this.totalFontCount ++;
     this.fonts[fontName] = fonts[fontName].export();
   }
+  // TEXTS *********************************************************
+  this.texts = new Object();
+  for (var textName in addedTexts){
+    this.texts[textName] = addedTexts[textName].export();
+  }
 }

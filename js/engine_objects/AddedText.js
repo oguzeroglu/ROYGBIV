@@ -1,4 +1,4 @@
-var AddedText = function(name, font, text, position, color, alpha, characterSize){
+var AddedText = function(name, font, text, position, color, alpha, characterSize, strlenParameter){
   this.isAddedText = true;
   this.name = name;
   this.font = font;
@@ -8,7 +8,10 @@ var AddedText = function(name, font, text, position, color, alpha, characterSize
   this.alpha = alpha;
   this.characterSize = characterSize;
   this.geometry = new THREE.BufferGeometry();
-  var strlen = text.length;
+  var strlen = strlenParameter;
+  if (typeof strlen == UNDEFINED){
+    strlen = text.length;
+  }
   this.strlen = strlen;
 
   var charIndices = new Float32Array(strlen);
@@ -112,6 +115,32 @@ AddedText.prototype.constructText = function(){
   this.topRight.y = 0;
 }
 
+AddedText.prototype.export = function(){
+  var exportObj = new Object();
+  exportObj.name = this.name;
+  exportObj.fontName = this.font.name;
+  exportObj.text = this.text;
+  exportObj.positionX = this.position.x;
+  exportObj.positionY = this.position.y;
+  exportObj.positionZ = this.position.z;
+  exportObj.colorR = this.color.r;
+  exportObj.colorG = this.color.g;
+  exportObj.colorB = this.color.b;
+  exportObj.alpha = this.alpha;
+  exportObj.charSize = this.characterSize;
+  exportObj.strlen = this.strlen;
+  exportObj.offsetBetweenChars = this.offsetBetweenChars;
+  exportObj.offsetBetweenLines = this.offsetBetweenLines;
+  exportObj.refCharSize = this.refCharSize;
+  exportObj.refInnerHeight = this.refInnerHeight;
+  exportObj.hasBackground = (this.material.uniforms.hasBackgroundColorFlag.value > 0);
+  exportObj.backgroundColorR = this.material.uniforms.backgroundColor.value.r;
+  exportObj.backgroundColorG = this.material.uniforms.backgroundColor.value.g;
+  exportObj.backgroundColorB = this.material.uniforms.backgroundColor.value.b;
+  exportObj.backgroundAlpha = this.material.uniforms.backgroundAlpha.value;
+  return exportObj;
+}
+
 AddedText.prototype.getGlyphUniform = function(){
   var uuid = this.font.textureMerger.mergedTexture.uuid;
   if (textureUniformCache[uuid]){
@@ -162,6 +191,11 @@ AddedText.prototype.setText = function(newText){
 
 AddedText.prototype.setColor = function(colorString){
   this.material.uniforms.color.value.set(colorString);
+  this.color.set(
+    this.material.uniforms.color.value.r,
+    this.material.uniforms.color.valug.g,
+    this.material.uniforms.color.value.b
+  );
 }
 
 AddedText.prototype.setAlpha = function(alpha){
@@ -171,6 +205,7 @@ AddedText.prototype.setAlpha = function(alpha){
     alpha = 0;
   }
   this.material.uniforms.alpha.value = alpha;
+  this.alpha = alpha;
 }
 
 AddedText.prototype.setBackground = function(backgroundColorString, backgroundAlpha){
@@ -296,4 +331,15 @@ AddedText.prototype.debugTriangles = function(triangleIndex){
   s1.position.copy(triangle.a);
   s2.position.copy(triangle.b);
   s3.position.copy(triangle.c);
+}
+
+AddedText.prototype.hide = function(){
+  this.mesh.visible = false;
+  if (mode == 0 && this.bbHelper){
+    scene.remove(this.bbHelper);
+  }
+}
+
+AddedText.prototype.show = function(){
+  this.mesh.visible = true;
 }
