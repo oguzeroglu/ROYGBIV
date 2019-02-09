@@ -22,6 +22,21 @@ window.onload = function() {
     omGUIFocused = false;
     tmGUIFocused = false;
     inactiveCounter = 0;
+    if (keyboardBuffer["Shift"] && mode == 0){
+      keyboardBuffer["Shift"] = false;
+      for (var objName in addedObjects){
+        addedObjects[objName].mesh.visible = true;
+      }
+      for (var objName in objectGroups){
+        objectGroups[objName].mesh.visible = true;
+      }
+      for (var textName in addedTexts){
+        addedTexts[textName].show();
+        if (selectedAddedText && selectedAddedText.name == textName){
+          scene.add(addedTexts[textName].bbHelper);
+        }
+      }
+    }
   });
   cliDiv.addEventListener("mousemove", function(event){
     inactiveCounter = 0;
@@ -865,6 +880,9 @@ window.addEventListener('keydown', function(event){
         for (var objName in objectGroups){
           objectGroups[objName].mesh.visible = false;
         }
+        for (var textName in addedTexts){
+          addedTexts[textName].hide();
+        }
       }
     break;
     case 8: //BACKSPACE
@@ -939,6 +957,12 @@ window.addEventListener('keyup', function(event){
         }
         for (var objName in objectGroups){
           objectGroups[objName].mesh.visible = true;
+        }
+        for (var textName in addedTexts){
+          addedTexts[textName].show();
+          if (selectedAddedText && selectedAddedText.name == textName){
+            scene.add(addedTexts[textName].bbHelper);
+          }
         }
       }
     break;

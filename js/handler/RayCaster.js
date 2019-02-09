@@ -77,10 +77,12 @@ RayCaster.prototype.findIntersections = function(from, direction, intersectGridS
             for (var childName in result){
               var obj = parent.group[childName];
               if (obj){
-                intersectionPoint = obj.intersectsLine(REUSABLE_LINE);
-                if (intersectionPoint){
-                  intersectionObject = objName;
-                  return;
+                if (!(mode == 0 && keyboardBuffer["Shift"])){
+                  intersectionPoint = obj.intersectsLine(REUSABLE_LINE);
+                  if (intersectionPoint){
+                    intersectionObject = objName;
+                    return;
+                  }
                 }
               }
             }
