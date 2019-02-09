@@ -4797,13 +4797,25 @@ function parse(input){
             return true;
           }
           var fontName = splitted[1];
+          if (!(fontName.indexOf("*") == -1)){
+            new JobHandler(splitted).handle();
+            return true;
+          }
           var fontToRemove = fonts[fontName];
           if (!fontToRemove){
             terminal.printError(Text.NO_SUCH_FONT);
             return true;
           }
+          for (var textName in addedTexts){
+            if (addedTexts[textName].font.name == fontName){
+              terminal.printError(Text.FONT_USED_IN.replace(Text.PARAM1, textName));
+              return true;
+            }
+          }
           fontToRemove.destroy();
-          terminal.printInfo(Text.FONT_DESTROYED);
+          if (!jobHandlerWorking){
+            terminal.printInfo(Text.FONT_DESTROYED);
+          }
           return true;
         break;
         case 153: //printFonts
@@ -4827,6 +4839,10 @@ function parse(input){
             return true;
           }
           var textName = splitted[1];
+          if (!(textName.indexOf("*") == -1)){
+            new JobHandler(splitted).handle();
+            return true;
+          }
           var fontName = splitted[2];
           var maxCharacterLength = parseInt(splitted[3]);
           var offsetX = parseFloat(splitted[4]);
@@ -4876,28 +4892,37 @@ function parse(input){
           for (var i = 0; i<maxCharacterLength; i++){
             txt += "x";
           }
-          var selectionSize = Object.keys(gridSelections).length;
-          if (selectionSize != 1 && selectionSize != 2){
-            terminal.printError(Text.MUST_HAVE_1_OR_2_GRIDS_SELECTED);
-            return true;
-          }
-          if (selectionSize == 2){
-            var parentGs = 0;
-            for (var gridName in gridSelections){
-              if (!parentGs){
-                parentGs = gridSelections[gridName].parentName;
-              }else if (parentGs != gridSelections[gridName].parentName){
-                terminal.printError(Text.SELECTED_GRIDS_SAME_GRIDSYSTEM);
-                return true;
+          var selectionSize = 1;
+          if (!jobHandlerWorking){
+            selectionSize = Object.keys(gridSelections).length;
+            if (selectionSize != 1 && selectionSize != 2){
+              terminal.printError(Text.MUST_HAVE_1_OR_2_GRIDS_SELECTED);
+              return true;
+            }
+            if (selectionSize == 2){
+              var parentGs = 0;
+              for (var gridName in gridSelections){
+                if (!parentGs){
+                  parentGs = gridSelections[gridName].parentName;
+                }else if (parentGs != gridSelections[gridName].parentName){
+                  terminal.printError(Text.SELECTED_GRIDS_SAME_GRIDSYSTEM);
+                  return true;
+                }
               }
             }
           }
           var textCoord = new THREE.Vector3(0, 0, 0);
-          for (var gridName in gridSelections){
-            var sgrid = gridSelections[gridName];
-            textCoord.x += sgrid.centerX;
-            textCoord.y += sgrid.centerY;
-            textCoord.z += sgrid.centerZ;
+          if (!jobHandlerWorking){
+            for (var gridName in gridSelections){
+              var sgrid = gridSelections[gridName];
+              textCoord.x += sgrid.centerX;
+              textCoord.y += sgrid.centerY;
+              textCoord.z += sgrid.centerZ;
+            }
+          }else{
+            textCoord.x += jobHandlerSelectedGrid.centerX;
+            textCoord.y += jobHandlerSelectedGrid.centerY;
+            textCoord.z += jobHandlerSelectedGrid.centerZ;
           }
           textCoord.x += offsetX;
           textCoord.y += offsetY;
@@ -4913,13 +4938,21 @@ function parse(input){
           addedText.refInnerHeight = window.innerHeight;
           addedText.handleBoundingBox();
           rayCaster.refresh();
-          for (var gridName in gridSelections){
-            addedText.destroyedGrids[gridName] = gridSelections[gridName];
-            addedText.gsName = gridSelections[gridName].parentName;
-            gridSelections[gridName].createdAddedTextName = addedText.name;
-            gridSelections[gridName].toggleSelect(false, false, false, true);
+          if (!jobHandlerWorking){
+            for (var gridName in gridSelections){
+              addedText.destroyedGrids[gridName] = gridSelections[gridName];
+              addedText.gsName = gridSelections[gridName].parentName;
+              gridSelections[gridName].createdAddedTextName = addedText.name;
+              gridSelections[gridName].toggleSelect(false, false, false, true);
+            }
+          }else{
+            addedText.destroyedGrids[jobHandlerSelectedGrid.name] = jobHandlerSelectedGrid;
+            addedText.gsName = jobHandlerSelectedGrid.parentName;
+            jobHandlerSelectedGrid.createdAddedTextName = addedText.name;
           }
-          terminal.printInfo(Text.TEXT_ALLOCATED);
+          if (!jobHandlerWorking){
+            terminal.printInfo(Text.TEXT_ALLOCATED);
+          }
           return true;
         break;
         case 155: //selectText
@@ -4960,13 +4993,19 @@ function parse(input){
             return true;
           }
           var textName = splitted[1];
+          if (!(textName.indexOf("*") == -1)){
+            new JobHandler(splitted).handle();
+            return true;
+          }
           var textToDestroy = addedTexts[textName];
           if (!textToDestroy){
             terminal.printError(Text.NO_SUCH_TEXT);
             return true;
           }
           textToDestroy.destroy();
-          terminal.printInfo(Text.TEXT_DESTROYED);
+          if (!jobHandlerWorking){
+            terminal.printInfo(Text.TEXT_DESTROYED);
+          }
           return true;
         break;
       }

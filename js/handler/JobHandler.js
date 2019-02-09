@@ -106,6 +106,12 @@ JobHandler.prototype.handle = function(previewModeCommand){
       this.handleUnsetRotationPivotCommand();
     }else if (this.splitted[0] == "copyObject".toLowerCase()){
       this.handleCopyObjectCommand();
+    }else if (this.splitted[0] == "newText".toLowerCase()){
+      this.handleNewTextCommand();
+    }else if (this.splitted[0] == "destroyText".toLowerCase()){
+      this.handleDestroyTextCommand();
+    }else if (this.splitted[0] == "destroyFont".toLowerCase()){
+      this.handleDestroyFontCommand();
     }
   }catch (err){
     console.error(err);
@@ -114,6 +120,65 @@ JobHandler.prototype.handle = function(previewModeCommand){
   if (this.splitted[0] != "autoConfigureArea".toLowerCase()){
     jobHandlerWorking = false;
   }
+}
+
+JobHandler.prototype.handleDestroyFontCommand = function(){
+  var fontNamePrefix = this.splitted[1].split("*")[0];
+  var ctr = 0;
+  for (var fontName in fonts){
+    if (fontName.startsWith(fontNamePrefix)){
+      parseCommand(
+        "destroyFont "+fontName
+      );
+      ctr ++;
+    }
+  }
+  if (ctr == 0){
+    terminal.printError(Text.NO_FONTS_FOUND);
+  }else{
+    terminal.printInfo(Text.COMMAND_EXECUTED_FOR_X_FONTS.replace(Text.PARAM1, ctr));
+  }
+}
+
+JobHandler.prototype.handleDestroyTextCommand = function(){
+  var textNamePrefix = this.splitted[1].split("*")[0];
+  var ctr = 0;
+  for (var textName in addedTexts){
+    if (textName.startsWith(textNamePrefix)){
+      parseCommand(
+        "destroyText "+textName
+      );
+      ctr ++;
+    }
+  }
+  if (ctr == 0){
+    terminal.printError(Text.NO_TEXT_FOUND);
+  }else{
+    terminal.printInfo(Text.COMMAND_EXECUTED_FOR_X_TEXTS.replace(Text.PARAM1, ctr));
+  }
+}
+
+JobHandler.prototype.handleNewTextCommand = function(){
+  var textNamePrefix = this.splitted[1].split("*")[0];
+  var ctr = 0;
+  for (var gridName in gridSelections){
+    jobHandlerSelectedGrid = gridSelections[gridName];
+    parseCommand(
+      "newText " +textNamePrefix+"_"+ctr+" "+this.splitted[2]+" "+this.splitted[3]+" "+
+          this.splitted[4] + " " + this.splitted[5] + " " + this.splitted[6]
+    );
+    ctr ++;
+  }
+  jobHandlerSelectedGrid = 0;
+  if (ctr != 0){
+    terminal.printInfo(Text.COMMAND_EXECUTED_FOR_X_TEXTS.replace(Text.PARAM1, ctr));
+  }else{
+    terminal.printError(Text.MUST_HAVE_AT_LEAST_ONE_GRID_SELECTED);
+  }
+  for (var gridName in gridSelections){
+    gridSelections[gridName].toggleSelect(false, false, false, true);
+  }
+  gridSelections = new Object();
 }
 
 JobHandler.prototype.handleCopyObjectCommand = function(){
