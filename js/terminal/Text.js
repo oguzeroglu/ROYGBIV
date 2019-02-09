@@ -464,6 +464,7 @@ var Text = function(){
   this.OBJECT_COPIED = "Object copied.";
   this.MIN = "Min";
   this.MAX = "Max";
+  this.THIS_TEXT_IS_ALLOCATED_FOR = "This text is allocated for @@1 characters maximum.";
   this.AREA_CREATED = "Area created.";
   this.AREA_HEIGHT_MUST_BE_DIVISABLE = "Area height must be divisable by grid size.";
   this.NO_AREAS_CREATED = "No areas created.";

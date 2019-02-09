@@ -701,6 +701,7 @@ var loadInput;
 var windowLoaded;
 var cliFocused = true;
 var omGUIFocused = false;
+var tmGUIFocused = false;
 var cliIsBeingDragged = false;
 var requestID;
 var boundingClientRect;
@@ -1027,6 +1028,7 @@ var ROYGBIV;
 // DAT GUI
 var datGui;
 var datGuiObjectManipulation;
+var datGuiTextManipulation;
 var datGuiAreaConfigurations;
 var datGuiSkybox;
 var datGuiFog;
@@ -1087,6 +1089,30 @@ var skyboxParameters = {
   "Name": "skyboxName",
   "Color": "#ffffff"
 };
+
+var textManipulationController;
+var textManipulationTextNameController;
+var textManipulationContentController;
+var textManipulationTextColorController;
+var textManipulationAlphaController;
+var textManipulationHasBackgroundController;
+var textManipulationBackgroundColorController;
+var textManipulationBackgroundAlphaController;
+var textManipulationCharacterSizeController;
+var textManipulationCharacterMarginController;
+var textManipulationLineMarginController;
+var textManipulationParameters = {
+  "Text": "textName",
+  "Content": "",
+  "Text color": "#ffffff",
+  "Alpha": 0.0,
+  "Has bg": false,
+  "Bg color": "#ffffff",
+  "Bg alpha": 0.0,
+  "Char size": 0.0,
+  "Char margin": 0.0,
+  "Line margin": 0.0,
+}
 
 var fogDensityController;
 var fogColorController;

@@ -20,6 +20,7 @@ window.onload = function() {
   cliDiv.addEventListener("click", function(){
     cliFocused = true;
     omGUIFocused = false;
+    tmGUIFocused = false;
     inactiveCounter = 0;
   });
   cliDiv.addEventListener("mousemove", function(event){
@@ -141,6 +142,61 @@ window.onload = function() {
           skyboxMesh.material.uniforms.color.value.b
         );
       }
+    }).listen();
+    // DAT GUI TEXT MANIPULATION
+    datGuiTextManipulation = new dat.GUI();
+    textManipulationTextNameController = datGuiTextManipulation.add(textManipulationParameters, "Text").listen();
+    textManipulationContentController = datGuiTextManipulation.add(textManipulationParameters, "Content").onChange(function(val){
+      var addedText = selectedAddedText;
+      val = val.split("\\n").join("\n");
+      var val2 = val.split("\n").join("");
+      if (val2.length > addedText.strlen){
+        terminal.clear();
+        terminal.printError(Text.THIS_TEXT_IS_ALLOCATED_FOR.replace(Text.PARAM1, addedText.strlen));
+        textManipulationParameters["Content"] = addedText.text;
+        return;
+      }
+      addedText.setText(val);
+    }).listen();
+    textManipulationTextColorController = datGuiTextManipulation.addColor(textManipulationParameters, "Text color").onChange(function(val){
+      selectedAddedText.setColor(val);
+    }).listen();
+    textManipulationAlphaController = datGuiTextManipulation.add(textManipulationParameters, "Alpha").min(0).max(1).step(0.01).onChange(function(val){
+      selectedAddedText.setAlpha(val);
+    }).listen();
+    textManipulationHasBackgroundController = datGuiTextManipulation.add(textManipulationParameters, "Has bg").onChange(function(val){
+      if (val){
+        selectedAddedText.setBackground(
+          "#" + selectedAddedText.material.uniforms.backgroundColor.value.getHexString(),
+          selectedAddedText.material.uniforms.backgroundAlpha.value
+        );
+        enableController(textManipulationBackgroundColorController);
+        enableController(textManipulationBackgroundAlphaController);
+      }else{
+        selectedAddedText.removeBackground();
+        disableController(textManipulationBackgroundColorController);
+        disableController(textManipulationBackgroundAlphaController);
+      }
+    }).listen();
+    textManipulationBackgroundColorController = datGuiTextManipulation.addColor(textManipulationParameters, "Bg color").onChange(function(val){
+      selectedAddedText.setBackground(val, selectedAddedText.material.uniforms.backgroundAlpha.value);
+    }).listen();
+    textManipulationBackgroundAlphaController = datGuiTextManipulation.add(textManipulationParameters, "Bg alpha").min(0).max(1).step(0.01).onChange(function(val){
+      selectedAddedText.setBackground(
+        "#" + selectedAddedText.material.uniforms.backgroundColor.value.getHexString(),
+        val
+      );
+    }).listen();
+    textManipulationCharacterSizeController = datGuiTextManipulation.add(textManipulationParameters, "Char size").min(0.5).max(200).step(0.5).onChange(function(val){
+      selectedAddedText.setCharSize(val);
+      selectedAddedText.refCharSize = val;
+      selectedAddedText.refInnerHeight = window.innerHeight;
+    }).listen();
+    textManipulationCharacterMarginController = datGuiTextManipulation.add(textManipulationParameters, "Char margin").min(0.5).max(100).step(0.5).onChange(function(val){
+      selectedAddedText.setMarginBetweenChars(val);
+    }).listen();
+    textManipulationLineMarginController = datGuiTextManipulation.add(textManipulationParameters, "Line margin").min(0.5).max(100).step(0.5).onChange(function(val){
+      selectedAddedText.setMarginBetweenLines(val);
     }).listen();
     // DAT GUI OBJECT MANIPULATION
     datGuiObjectManipulation = new dat.GUI();
@@ -355,6 +411,9 @@ window.onload = function() {
     datGuiObjectManipulation.domElement.addEventListener("mousedown", function(e){
       omGUIFocused = true;
     });
+    datGuiTextManipulation.domElement.addEventListener("mousedown", function(e){
+      tmGUIFocused = true;
+    });
 
     // DAT GUI
     datGui = new dat.GUI();
@@ -378,8 +437,10 @@ window.onload = function() {
       adjustPostProcessing(5, val);
       originalBloomConfigurations.bloomOn = val;
     }).listen();
+
     $(datGui.domElement).attr("hidden", true);
     $(datGuiObjectManipulation.domElement).attr("hidden", true);
+    $(datGuiTextManipulation.domElement).attr("hidden", true);
     $(datGuiSkybox.domElement).attr("hidden", true);
     $(datGuiFog.domElement).attr("hidden", true);
   }
@@ -448,6 +509,7 @@ window.onload = function() {
     inactiveCounter = 0;
     cliFocused = false;
     omGUIFocused = false;
+    tmGUIFocused = false;
     if (windowLoaded){
       var rect = renderer.getCurrentViewport();
       var rectX = rect.x, rectY = rect.y, rectZ = rect.z, rectW = rect.w;
@@ -517,6 +579,9 @@ window.onload = function() {
                if (selectedObjectGroup){
                  selectedObjectGroup.mesh.remove(axesHelper);
                }
+               if (selectedAddedText && selectedAddedText.bbHelper){
+                 scene.remove(selectedAddedText.bbHelper);
+               }
              }
              selectedAddedObject = object;
              objectSelectedByCommand = false;
@@ -538,6 +603,9 @@ window.onload = function() {
                }
                if (selectedObjectGroup){
                  selectedObjectGroup.mesh.remove(axesHelper);
+               }
+               if (selectedAddedText && selectedAddedText.bbHelper){
+                 scene.remove(selectedAddedText.bbHelper);
                }
              }
              selectedObjectGroup = object;
@@ -573,6 +641,9 @@ window.onload = function() {
                    if (selectedObjectGroup){
                      selectedObjectGroup.mesh.remove(axesHelper);
                    }
+                   if (selectedAddedText && selectedAddedText.bbHelper){
+                     scene.remove(selectedAddedText.bbHelper);
+                   }
                  }
                  selectedAddedObject = addedObject;
                  selectedObjectGroup = 0;
@@ -597,6 +668,9 @@ window.onload = function() {
                    if (selectedObjectGroup){
                      selectedObjectGroup.mesh.remove(axesHelper);
                    }
+                   if (selectedAddedText && selectedAddedText.bbHelper){
+                     scene.remove(selectedAddedText.bbHelper);
+                   }
                  }
                  selectedAddedObject = 0;
                  selectedAddedText = 0;
@@ -611,11 +685,29 @@ window.onload = function() {
             }
            }
          }else if (object.isAddedText){
+           if (selectedAddedObject){
+             selectedAddedObject.mesh.remove(axesHelper);
+           }
+           if (selectedObjectGroup){
+             selectedObjectGroup.mesh.remove(axesHelper);
+           }
+           if (selectedAddedText && selectedAddedText.name != object.name){
+             scene.remove(selectedAddedText.bbHelper);
+           }
            selectedAddedObject = 0;
            selectedObjectGroup = 0;
+           selectedAddedText = object;
+           if (!selectedAddedText.bbHelper){
+             selectedAddedText.handleBoundingBox();
+           }
+           scene.add(selectedAddedText.bbHelper);
+           afterObjectSelection();
          }
        }else{
          if (!objectSelectedByCommand){
+           if (selectedAddedText && selectedAddedText.bbHelper){
+             scene.remove(selectedAddedText.bbHelper);
+           }
            selectedAddedObject = 0;
            selectedObjectGroup = 0;
            selectedAddedText = 0;
@@ -713,7 +805,7 @@ window.addEventListener('keydown', function(event){
     return;
   }
 
-  if (cliFocused || omGUIFocused){
+  if (cliFocused || omGUIFocused || tmGUIFocused){
     return;
   }
 
@@ -788,7 +880,7 @@ window.addEventListener('keyup', function(event){
   if (!windowLoaded){
     return;
   }
-  if (cliFocused || omGUIFocused){
+  if (cliFocused || omGUIFocused || tmGUIFocused){
     return;
   }
   if (keyCodeToChar[event.keyCode]){
@@ -987,6 +1079,19 @@ window.addEventListener('keyup', function(event){
    enableController(omSideController);
  }
 
+ function enableAllTMControllers(){
+   enableController(textManipulationTextNameController);
+   enableController(textManipulationContentController);
+   enableController(textManipulationTextColorController);
+   enableController(textManipulationAlphaController);
+   enableController(textManipulationHasBackgroundController);
+   enableController(textManipulationBackgroundColorController);
+   enableController(textManipulationBackgroundAlphaController);
+   enableController(textManipulationCharacterSizeController);
+   enableController(textManipulationCharacterMarginController);
+   enableController(textManipulationLineMarginController);
+ }
+
 function isPhysicsWorkerEnabled(){
   return false;
   //return (WORKERS_SUPPORTED && PHYSICS_WORKER_ENABLED);
@@ -1154,6 +1259,33 @@ function afterObjectSelection(){
       objectGroups[objName].mesh.remove(axesHelper);
     }
   }
+  afterTextSelection();
+}
+
+function afterTextSelection(){
+  if (mode != 0){
+    return;
+  }
+  if (selectedAddedText){
+    enableAllTMControllers();
+    $(datGuiTextManipulation.domElement).attr("hidden", false);
+    textManipulationParameters["Text"] = selectedAddedText.name;
+    textManipulationParameters["Content"] = selectedAddedText.text;
+    textManipulationParameters["Text color"] = "#" + selectedAddedText.material.uniforms.color.value.getHexString();
+    textManipulationParameters["Alpha"] = selectedAddedText.material.uniforms.alpha.value;
+    textManipulationParameters["Has bg"] = (selectedAddedText.material.uniforms.hasBackgroundColorFlag.value > 0);
+    textManipulationParameters["Bg color"] = "#" + selectedAddedText.material.uniforms.backgroundColor.value.getHexString();
+    textManipulationParameters["Bg alpha"] = selectedAddedText.material.uniforms.backgroundAlpha.value;
+    textManipulationParameters["Char margin"] = selectedAddedText.offsetBetweenChars;
+    textManipulationParameters["Line margin"] = selectedAddedText.offsetBetweenLines;
+    if (!textManipulationParameters["Has bg"]){
+      disableController(textManipulationBackgroundColorController);
+      disableController(textManipulationBackgroundAlphaController);
+    }
+    textManipulationParameters["Char size"] = selectedAddedText.characterSize;
+  }else{
+    $(datGuiTextManipulation.domElement).attr("hidden", true);
+  }
 }
 
 function resizeFunction(){
@@ -1195,6 +1327,9 @@ function resizeFunction(){
           }
         }
       }
+    }
+    for (var textName in addedTexts){
+      addedTexts[textName].handleResize();
     }
   }
 }

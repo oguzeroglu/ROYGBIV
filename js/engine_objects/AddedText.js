@@ -83,21 +83,25 @@ AddedText.prototype.constructText = function(){
   var yOffsets = this.material.uniforms.yOffsets.value;
   var xMax = 0;
   var yMin = 0;
-  for (var i = 0; i<this.strlen; i++){
-    xOffsets[i] = xOffset;
-    yOffsets[i] = yOffset;
-    if (xOffset > xMax){
-      xMax = xOffset;
-    }
-    if (yOffset < yMin){
-      yMin = yOffset;
-    }
-    if (this.text.charAt(i) == "\n"){
-      yOffset -= this.offsetBetweenLines;
+  var i = 0;
+  var i2 = 0;
+  while (i2 < this.text.length){
+    if (this.text.charAt(i2) == "\n"){
+      yOffset-= this.offsetBetweenLines;
       xOffset = 0;
     }else{
+      xOffsets[i] = xOffset;
+      yOffsets[i] = yOffset;
+      if (xOffset > xMax){
+        xMax = xOffset;
+      }
+      if (yOffset < yMin){
+        yMin = yOffset;
+      }
       xOffset += this.offsetBetweenChars;
+      i ++;
     }
+    i2 ++;
   }
   this.bottomRight.x = xMax;
   this.bottomRight.y = yMin;
@@ -120,16 +124,22 @@ AddedText.prototype.getGlyphUniform = function(){
 
 AddedText.prototype.handleUVUniform = function(){
   var uvRangesArray = this.material.uniforms.uvRanges.value;
-  for (var i = 0; i<this.strlen; i++){
+  var i2 = 0;
+  for (var i = 0; i<this.text.length; i++){
     var curChar = this.text.charAt(i);
-    var curRange = this.font.textureMerger.ranges[curChar];
-    if (curRange){
-      uvRangesArray[i].set(
-        curRange.startU, curRange.endU, curRange.startV, curRange.endV
-      );
-    }else{
-      uvRangesArray[i].set(-500, -500, -500, -500);
+    if (curChar != "\n"){
+      var curRange = this.font.textureMerger.ranges[curChar];
+      if (curRange){
+        uvRangesArray[i2++].set(
+          curRange.startU, curRange.endU, curRange.startV, curRange.endV
+        );
+      }else{
+        uvRangesArray[i2++].set(-500, -500, -500, -500);
+      }
     }
+  }
+  for (var i = i2; i<this.strlen; i++){
+    uvRangesArray[i].set(-500, -500, -500, -500);
   }
 }
 
@@ -144,13 +154,10 @@ AddedText.prototype.setMarginBetweenLines = function(value){
 }
 
 AddedText.prototype.setText = function(newText){
-  if (newText.length > this.strlen){
-    throw new Error("The length of the next text exceeds the length of the old text.");
-    return;
-  }
   this.text = newText;
   this.constructText();
   this.handleUVUniform();
+  this.handleBoundingBox();
 }
 
 AddedText.prototype.setColor = function(colorString){
@@ -178,10 +185,12 @@ AddedText.prototype.removeBackground = function(){
 
 AddedText.prototype.setCharSize = function(value){
   this.material.uniforms.charSize.value = value;
+  this.characterSize = value;
 }
 
 AddedText.prototype.handleResize = function(){
   this.setCharSize(this.refCharSize * ((renderer.getCurrentViewport().w / screenResolution)/this.refInnerHeight));
+  this.handleBoundingBox();
 }
 
 AddedText.prototype.calculateCharSize = function(){
@@ -221,21 +230,37 @@ AddedText.prototype.handleBoundingBox = function(){
   var cSize = this.calculateCharSize();
   REUSABLE_VECTOR.copy(this.topLeft)
   REUSABLE_VECTOR_2.copy(this.bottomRight);
+  REUSABLE_VECTOR_3.copy(this.topRight);
+  REUSABLE_VECTOR_4.copy(this.bottomLeft);
   REUSABLE_VECTOR.x -= cSize.width / 2;
   REUSABLE_VECTOR.y += cSize.height / 2;
   REUSABLE_VECTOR_2.x += cSize.width / 2;
   REUSABLE_VECTOR_2.y -= cSize.height / 2;
-  REUSABLE_VECTOR_2.applyQuaternion(camera.quaternion);
+  REUSABLE_VECTOR_3.x += cSize.width / 2;
+  REUSABLE_VECTOR_3.y += cSize.height / 2;
+  REUSABLE_VECTOR_4.x -= cSize.width / 2;
+  REUSABLE_VECTOR_4.y -= cSize.height / 2;
+
   REUSABLE_VECTOR.applyQuaternion(camera.quaternion);
+  REUSABLE_VECTOR_2.applyQuaternion(camera.quaternion);
+  REUSABLE_VECTOR_3.applyQuaternion(camera.quaternion);
+  REUSABLE_VECTOR_4.applyQuaternion(camera.quaternion);
+
   REUSABLE_VECTOR.add(this.position);
   REUSABLE_VECTOR_2.add(this.position);
+  REUSABLE_VECTOR_3.add(this.position);
+  REUSABLE_VECTOR_4.add(this.position);
+
   this.boundingBox.expandByPoint(REUSABLE_VECTOR);
   this.boundingBox.expandByPoint(REUSABLE_VECTOR_2);
+  this.boundingBox.expandByPoint(REUSABLE_VECTOR_3);
+  this.boundingBox.expandByPoint(REUSABLE_VECTOR_4);
 
   REUSABLE_VECTOR.copy(this.topLeft)
   REUSABLE_VECTOR_2.copy(this.bottomRight);
   REUSABLE_VECTOR_3.copy(this.topRight);
   REUSABLE_VECTOR_4.copy(this.bottomLeft);
+  REUSABLE_VECTOR.z = 0, REUSABLE_VECTOR_2.z = 0, REUSABLE_VECTOR_3.z = 0, REUSABLE_VECTOR_4.z = 0;
   REUSABLE_VECTOR.x -= cSize.width / 2;
   REUSABLE_VECTOR.y += cSize.height / 2;
   REUSABLE_VECTOR_2.x += cSize.width / 2;
@@ -258,4 +283,17 @@ AddedText.prototype.handleBoundingBox = function(){
   this.plane.setFromCoplanarPoints(REUSABLE_VECTOR, REUSABLE_VECTOR_2, REUSABLE_VECTOR_3);
   this.triangles[0].set(REUSABLE_VECTOR, REUSABLE_VECTOR_2, REUSABLE_VECTOR_3);
   this.triangles[1].set(REUSABLE_VECTOR, REUSABLE_VECTOR_2, REUSABLE_VECTOR_4);
+}
+
+AddedText.prototype.debugTriangles = function(triangleIndex){
+  this.handleBoundingBox();
+  var s1 = new THREE.Mesh(new THREE.SphereGeometry(2), new THREE.MeshBasicMaterial({color: "red"}));
+  var s2 = s1.clone(), s3 = s1.clone();
+  var triangle = this.triangles[triangleIndex];
+  scene.add(s1);
+  scene.add(s2);
+  scene.add(s3);
+  s1.position.copy(triangle.a);
+  s2.position.copy(triangle.b);
+  s3.position.copy(triangle.c);
 }

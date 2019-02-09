@@ -62,6 +62,17 @@ ModeSwitcher.prototype.switchMode = function(){
 }
 
 ModeSwitcher.prototype.commonSwitchFunctions = function(){
+  if (!isDeployment){
+    $(datGui.domElement).attr("hidden", true);
+    $(datGuiObjectManipulation.domElement).attr("hidden", true);
+    $(datGuiTextManipulation.domElement).attr("hidden", true);
+    $(datGuiSkybox.domElement).attr("hidden", true);
+    $(datGuiFog.domElement).attr("hidden", true);
+    if (areaConfigurationsVisible){
+      $(datGuiAreaConfigurations.domElement).attr("hidden", true);
+      areaConfigurationsVisible = false;
+    }
+  }
   var oldIsPaused = isPaused;
   isPaused = false;
   maxInactiveTime = 0;
@@ -219,9 +230,6 @@ ModeSwitcher.prototype.switchFromDesignToPreview = function(){
   }
   ROYGBIV.globals = new Object();
   if (!isDeployment){
-    $(datGuiObjectManipulation.domElement).attr("hidden", true);
-  }
-  if (!isDeployment){
     terminal.printInfo(Text.SWITCHED_TO_PREVIEW_MODE);
   }
   $("#cliDivheader").text("ROYGBIV 3D Engine - CLI (Preview mode)");
@@ -233,12 +241,6 @@ ModeSwitcher.prototype.switchFromDesignToPreview = function(){
 
 ModeSwitcher.prototype.switchFromPreviewToDesign = function(){
   mode = 0;
-  if (!isDeployment){
-    $(datGui.domElement).attr("hidden", true);
-    $(datGuiObjectManipulation.domElement).attr("hidden", true);
-    $(datGuiFog.domElement).attr("hidden", true);
-    fogConfigurationsVisible = false;
-  }
   camera.oldAspect = camera.aspect;
   camera.aspect = window.innerWidth / window.innerHeight;
   camera.updateProjectionMatrix();
