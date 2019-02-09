@@ -178,6 +178,9 @@ function readEngineScripts(projectName, author, noMobile){
       }else if (scriptPath.includes("Text.js") && !scriptPath.includes("AddedText.js")){
         console.log("[*] Skipping Text");
         continue;
+      }else if (scriptPath.includes("JobHandler.js")){
+        console.log("[*] Skipping JobHandler");
+        continue;
       }
       content += scriptContent +"\n";
     }
