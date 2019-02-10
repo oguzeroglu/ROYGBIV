@@ -1099,6 +1099,7 @@ StateLoader.prototype.finalize = function(){
       curTextExport.alpha, curTextExport.charSize, curTextExport.strlen
     );
     addedTextInstance.isClickable = curTextExport.isClickable;
+    addedTextInstance.setAffectedByFog(curTextExport.isAffectedByFog);
     addedTextInstance.setBackground(
       "#" + new THREE.Color(curTextExport.backgroundColorR, curTextExport.backgroundColorG, curTextExport.backgroundColorB).getHexString(),
       curTextExport.backgroundAlpha

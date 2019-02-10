@@ -44,8 +44,10 @@ var AddedText = function(name, font, text, position, color, alpha, characterSize
     side: THREE.DoubleSide,
     uniforms: {
       modelViewMatrix: new THREE.Uniform(new THREE.Matrix4()),
+      worldMatrix: new THREE.Uniform(new THREE.Matrix4()),
       projectionMatrix: GLOBAL_PROJECTION_UNIFORM,
       cameraQuaternion: GLOBAL_CAMERA_QUATERNION_UNIFORM,
+      cameraPosition: GLOBAL_CAMERA_POSITION_UNIFORM,
       charSize: new THREE.Uniform(characterSize),
       color: new THREE.Uniform(color),
       alpha: new THREE.Uniform(alpha),
@@ -55,7 +57,10 @@ var AddedText = function(name, font, text, position, color, alpha, characterSize
       uvRanges: new THREE.Uniform(uvsArray),
       glyphTexture: this.getGlyphUniform(),
       xOffsets: new THREE.Uniform(xOffsetsArray),
-      yOffsets: new THREE.Uniform(yOffsetsArray)
+      yOffsets: new THREE.Uniform(yOffsetsArray),
+      affectedByFogFlag: new THREE.Uniform(-50.0),
+      fogInfo: GLOBAL_FOG_UNIFORM,
+      cubeTexture: GLOBAL_CUBE_TEXTURE_UNIFORM
     }
   });
   this.topLeft = new THREE.Vector3(0, 0, 0);
@@ -69,6 +74,7 @@ var AddedText = function(name, font, text, position, color, alpha, characterSize
   this.mesh.frustumCulled = false;
   scene.add(this.mesh);
   this.material.uniforms.modelViewMatrix.value = this.mesh.modelViewMatrix;
+  this.material.uniforms.worldMatrix.value = this.mesh.matrixWorld;
 
   this.tmpObj = {};
   this.destroyedGrids = new Object();
@@ -79,6 +85,7 @@ var AddedText = function(name, font, text, position, color, alpha, characterSize
 
   this.reusableVector = new THREE.Vector3();
   this.makeFirstUpdate = true;
+  this.isAffectedByFog = false;
 }
 
 AddedText.prototype.destroy = function(){
@@ -166,6 +173,7 @@ AddedText.prototype.export = function(){
   exportObj.backgroundAlpha = this.material.uniforms.backgroundAlpha.value;
   exportObj.gsName = this.gsName;
   exportObj.isClickable = this.isClickable;
+  exportObj.isAffectedByFog = this.isAffectedByFog;
   var exportDestroyedGrids = new Object();
   for (var gridName in this.destroyedGrids){
     exportDestroyedGrids[gridName] = this.destroyedGrids[gridName].export();
@@ -473,4 +481,13 @@ AddedText.prototype.restore = function(){
     delete this.oldBackgroundAlpha;
   }
   this.mesh.position.copy(this.position);
+}
+
+AddedText.prototype.setAffectedByFog = function(val){
+  this.isAffectedByFog = val;
+  if (val){
+    this.material.uniforms.affectedByFogFlag.value = 50.0;
+  }else{
+    this.material.uniforms.affectedByFogFlag.value = -50.0;
+  }
 }

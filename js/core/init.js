@@ -216,6 +216,9 @@ window.onload = function() {
     textManipulationClickableController = datGuiTextManipulation.add(textManipulationParameters, "Clickable").onChange(function(val){
       selectedAddedText.isClickable = val;
     }).listen();
+    textManipulationAffectedByFogController = datGuiTextManipulation.add(textManipulationParameters, "Aff. by fog").onChange(function(val){
+      selectedAddedText.setAffectedByFog(val);
+    }).listen();
     // DAT GUI OBJECT MANIPULATION
     datGuiObjectManipulation = new dat.GUI();
     omObjController = datGuiObjectManipulation.add(objectManipulationParameters, "Object").listen();
@@ -1169,6 +1172,7 @@ window.addEventListener('keyup', function(event){
    enableController(textManipulationCharacterMarginController);
    enableController(textManipulationLineMarginController);
    enableController(textManipulationClickableController);
+   enableController(textManipulationAffectedByFogController);
  }
 
 function isPhysicsWorkerEnabled(){
@@ -1348,6 +1352,7 @@ function afterTextSelection(){
   if (selectedAddedText){
     enableAllTMControllers();
     $(datGuiTextManipulation.domElement).attr("hidden", false);
+    scene.add(selectedAddedText.bbHelper);
     textManipulationParameters["Text"] = selectedAddedText.name;
     textManipulationParameters["Content"] = selectedAddedText.text;
     textManipulationParameters["Text color"] = "#" + selectedAddedText.material.uniforms.color.value.getHexString();
@@ -1357,6 +1362,7 @@ function afterTextSelection(){
     textManipulationParameters["Bg alpha"] = selectedAddedText.material.uniforms.backgroundAlpha.value;
     textManipulationParameters["Char margin"] = selectedAddedText.offsetBetweenChars;
     textManipulationParameters["Line margin"] = selectedAddedText.offsetBetweenLines;
+    textManipulationParameters["Aff. by fog"] = selectedAddedText.isAffectedByFog;
     if (!textManipulationParameters["Has bg"]){
       disableController(textManipulationBackgroundColorController);
       disableController(textManipulationBackgroundAlphaController);

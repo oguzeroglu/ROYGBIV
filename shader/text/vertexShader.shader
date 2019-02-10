@@ -14,7 +14,9 @@ uniform vec4 cameraQuaternion;
 uniform vec4 uvRanges[STR_LEN];
 uniform mat4 modelViewMatrix;
 uniform mat4 projectionMatrix;
+uniform mat4 worldMatrix;
 
+varying vec3 vWorldPosition;
 varying vec4 vUVRanges;
 
 vec3 applyQuaternionToVector(vec3 vector, vec4 quaternion){
@@ -41,7 +43,9 @@ void main(){
   float xOffset = xOffsets[charIndexInt];
   float yOffset = yOffsets[charIndexInt];
   vec3 pos = vec3(xOffset, yOffset, 0.0);
-  vec4 mvPosition = modelViewMatrix * vec4(applyQuaternionToVector(pos, cameraQuaternion), 1.0);
+  vec3 quaternionApplied = applyQuaternionToVector(pos, cameraQuaternion);
+  vWorldPosition = (worldMatrix * vec4(quaternionApplied, 1.0)).xyz;
+  vec4 mvPosition = modelViewMatrix * vec4(quaternionApplied, 1.0);
   gl_PointSize = (500.0) * charSize / length(mvPosition.xyz);
   gl_Position = projectionMatrix * mvPosition;
 }

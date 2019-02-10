@@ -1113,6 +1113,7 @@ var textManipulationCharacterSizeController;
 var textManipulationCharacterMarginController;
 var textManipulationLineMarginController;
 var textManipulationClickableController;
+var textManipulationAffectedByFogController;
 var textManipulationParameters = {
   "Text": "textName",
   "Content": "",
@@ -1125,6 +1126,7 @@ var textManipulationParameters = {
   "Char margin": 0.0,
   "Line margin": 0.0,
   "Clickable": false,
+  "Aff. by fog": false,
 }
 
 var fogDensityController;
