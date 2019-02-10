@@ -2089,9 +2089,7 @@ StateLoader.prototype.resetProject = function(undo){
   }
 
   for (var textName in addedTexts){
-    if (addedTexts[textName].bbHelper){
-      scene.remove(addedTexts[textName].bbHelper);
-    }
+    addedTexts[textName].destroy();
   }
 
   if (skyboxMesh){

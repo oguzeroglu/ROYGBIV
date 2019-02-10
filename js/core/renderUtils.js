@@ -36,8 +36,8 @@ function render(){
   }else{
     cameraOperationsDone = false;
   }
-  updateAddedTexts();
   composer.render(0.1);
+  updateAddedTexts();
   if (mode == 1){
     previewSceneRendered = true;
   }

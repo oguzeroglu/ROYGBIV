@@ -183,7 +183,9 @@ var Roygbiv = function(){
     "removeTextBackground",
     "onTextClick",
     "removeTextClickListener",
-    "setTextCenterPosition"
+    "setTextCenterPosition",
+    "hideText",
+    "showText"
   ];
 
   this.globals = new Object();
@@ -7084,6 +7086,46 @@ Roygbiv.prototype.setTextCenterPosition = function(text, x, y, z){
     text.mesh.position.y + (y - centerPos.y),
     text.mesh.position.z + (z - centerPos.z)
   );
+}
+
+// hideText
+// Makes the given text object invisible. Does nothing if the text is already
+// invisible.
+Roygbiv.prototype.hideText = function(text){
+  if (mode == 0){
+    return;
+  }
+  if (typeof text == UNDEFINED){
+    throw new Error("hideText error: text is not defined.");
+    return;
+  }
+  if (!text.isAddedText){
+    throw new Error("hideText error: text is not a text object.");
+    return;
+  }
+  if (text.mesh.visible){
+    text.hide();
+  }
+}
+
+// showText
+// Makes the given text object visible. Does nothing if the text is already
+// visible.
+Roygbiv.prototype.showText = function(text){
+  if (mode == 0){
+    return;
+  }
+  if (typeof text == UNDEFINED){
+    throw new Error("showText error: text is not defined.");
+    return;
+  }
+  if (!text.isAddedText){
+    throw new Error("showText error: text is not a text object.");
+    return;
+  }
+  if (!text.mesh.visible){
+    text.show();
+  }
 }
 
 // UTILITY FUNCTIONS ***********************************************************

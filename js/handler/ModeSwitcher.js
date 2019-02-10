@@ -240,7 +240,6 @@ ModeSwitcher.prototype.switchFromDesignToPreview = function(){
   }
   $("#cliDivheader").text("ROYGBIV 3D Engine - CLI (Preview mode)");
   mode = 1;
-  rayCaster.refresh();
   this.commonSwitchFunctions();
   handleViewport();
   for (var txtName in addedTexts){

@@ -19,6 +19,13 @@ RayCaster.prototype.refresh = function(){
       var addedText = addedTexts[txtName];
       this.binHandler.insert(addedText.boundingBox, txtName);
     }
+  }else{
+    for (var txtName in addedTexts){
+      var addedText = addedTexts[txtName];
+      if (addedText.isClickable){
+        this.binHandler.insert(addedText.boundingBox, txtName);
+      }
+    }
   }
 }
 

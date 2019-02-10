@@ -78,6 +78,7 @@ var AddedText = function(name, font, text, position, color, alpha, characterSize
   this.lastUpdatePosition = new THREE.Vector3().copy(this.position);
 
   this.reusableVector = new THREE.Vector3();
+  this.makeFirstUpdate = true;
 }
 
 AddedText.prototype.destroy = function(){
@@ -389,6 +390,10 @@ AddedText.prototype.handleBoundingBox = function(){
 }
 
 AddedText.prototype.needsUpdate = function(){
+  if (this.makeFirstUpdate){
+    this.makeFirstUpdate = false;
+    return true;
+  }
   return !(
     this.lastUpdateQuaternion.x == camera.quaternion.x &&
     this.lastUpdateQuaternion.y == camera.quaternion.y &&
@@ -421,10 +426,19 @@ AddedText.prototype.hide = function(){
   if (mode == 0 && this.bbHelper){
     scene.remove(this.bbHelper);
   }
+  if (mode == 1 && this.isClickable){
+    rayCaster.binHandler.deleteObjectFromBin(this.binInfo, this.name);
+  }
 }
 
 AddedText.prototype.show = function(){
   this.mesh.visible = true;
+  if (mode == 1 && this.isClickable){
+    if (!this.boundingBox){
+      this.handleBoundingBox();
+    }
+    rayCaster.binHandler.insert(this.boundingBox, this.name);
+  }
 }
 
 AddedText.prototype.restore = function(){
