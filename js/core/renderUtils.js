@@ -49,14 +49,18 @@ function updateAddedTexts(){
   if (mode == 0){
     for (var addedTextName in addedTexts){
       var addedText = addedTexts[addedTextName];
-      addedText.handleBoundingBox();
-      rayCaster.updateObject(addedText);
+      if (addedText.needsUpdate()){
+        addedText.handleBoundingBox();
+        rayCaster.updateObject(addedText);
+      }
     }
   }else{
     for (var addedTextName in clickableAddedTexts){
       var addedText = addedTexts[addedTextName];
-      addedText.handleBoundingBox();
-      rayCaster.updateObject(addedText);
+      if (addedText.needsUpdate()){
+        addedText.handleBoundingBox();
+        rayCaster.updateObject(addedText);
+      }
     }
   }
 }

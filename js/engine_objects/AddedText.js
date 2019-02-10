@@ -73,6 +73,9 @@ var AddedText = function(name, font, text, position, color, alpha, characterSize
   this.tmpObj = {};
   this.destroyedGrids = new Object();
   this.isClickable = false;
+
+  this.lastUpdateQuaternion = new THREE.Quaternion().copy(camera.quaternion);
+  this.lastUpdatePosition = new THREE.Vector3().copy(this.position);
 }
 
 AddedText.prototype.destroy = function(){
@@ -274,6 +277,7 @@ AddedText.prototype.removeBackground = function(fromScript){
 AddedText.prototype.setCharSize = function(value){
   this.material.uniforms.charSize.value = value;
   this.characterSize = value;
+  this.handleBoundingBox();
 }
 
 AddedText.prototype.handleResize = function(){
@@ -371,6 +375,21 @@ AddedText.prototype.handleBoundingBox = function(){
   this.plane.setFromCoplanarPoints(REUSABLE_VECTOR, REUSABLE_VECTOR_2, REUSABLE_VECTOR_3);
   this.triangles[0].set(REUSABLE_VECTOR, REUSABLE_VECTOR_2, REUSABLE_VECTOR_3);
   this.triangles[1].set(REUSABLE_VECTOR, REUSABLE_VECTOR_2, REUSABLE_VECTOR_4);
+
+  this.lastUpdateQuaternion.copy(camera.quaternion);
+  this.lastUpdatePosition.copy(this.mesh.position);
+}
+
+AddedText.prototype.needsUpdate = function(){
+  return !(
+    this.lastUpdateQuaternion.x == camera.quaternion.x &&
+    this.lastUpdateQuaternion.y == camera.quaternion.y &&
+    this.lastUpdateQuaternion.z == camera.quaternion.z &&
+    this.lastUpdateQuaternion.w == camera.quaternion.w &&
+    this.lastUpdatePosition.x == this.mesh.position.x &&
+    this.lastUpdatePosition.y == this.mesh.position.y &&
+    this.lastUpdatePosition.z == this.mesh.position.z
+  )
 }
 
 AddedText.prototype.debugTriangles = function(triangleIndex){
