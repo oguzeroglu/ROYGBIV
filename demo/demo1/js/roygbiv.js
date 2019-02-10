@@ -2899,6 +2899,7 @@ var gridSelections = new Object();
 var materials = new Object();
 var addedObjects = new Object();
 var addedTexts = new Object();
+var clickableAddedTexts = new Object();
 var textures = new Object();
 var textureURLs = new Object();
 var wallCollections = new Object();
@@ -3216,6 +3217,8 @@ var textManipulationBackgroundAlphaController;
 var textManipulationCharacterSizeController;
 var textManipulationCharacterMarginController;
 var textManipulationLineMarginController;
+var textManipulationClickableController;
+var textManipulationAffectedByFogController;
 var textManipulationParameters = {
   "Text": "textName",
   "Content": "",
@@ -3227,6 +3230,8 @@ var textManipulationParameters = {
   "Char size": 0.0,
   "Char margin": 0.0,
   "Line margin": 0.0,
+  "Clickable": false,
+  "Aff. by fog": false,
 }
 
 var fogDensityController;
@@ -7901,10 +7906,10 @@ function render(){
     updateObjectTrails();
     updateCrosshair();
   }else{
-    updateAddedTexts();
     cameraOperationsDone = false;
   }
   composer.render(0.1);
+  updateAddedTexts();
   if (mode == 1){
     previewSceneRendered = true;
   }
@@ -7913,10 +7918,22 @@ function render(){
 
 
 function updateAddedTexts(){
-  for (var addedTextName in addedTexts){
-    var addedText = addedTexts[addedTextName];
-    addedText.handleBoundingBox();
-    rayCaster.updateObject(addedText);
+  if (mode == 0){
+    for (var addedTextName in addedTexts){
+      var addedText = addedTexts[addedTextName];
+      if (addedText.needsUpdate()){
+        addedText.handleBoundingBox();
+        rayCaster.updateObject(addedText);
+      }
+    }
+  }else{
+    for (var addedTextName in clickableAddedTexts){
+      var addedText = addedTexts[addedTextName];
+      if (addedText.needsUpdate()){
+        addedText.handleBoundingBox();
+        rayCaster.updateObject(addedText);
+      }
+    }
   }
 }
 
@@ -9907,6 +9924,12 @@ window.onload = function() {
     textManipulationLineMarginController = datGuiTextManipulation.add(textManipulationParameters, "Line margin").min(0.5).max(100).step(0.5).onChange(function(val){
       selectedAddedText.setMarginBetweenLines(val);
     }).listen();
+    textManipulationClickableController = datGuiTextManipulation.add(textManipulationParameters, "Clickable").onChange(function(val){
+      selectedAddedText.isClickable = val;
+    }).listen();
+    textManipulationAffectedByFogController = datGuiTextManipulation.add(textManipulationParameters, "Aff. by fog").onChange(function(val){
+      selectedAddedText.setAffectedByFog(val);
+    }).listen();
     // DAT GUI OBJECT MANIPULATION
     datGuiObjectManipulation = new dat.GUI();
     omObjController = datGuiObjectManipulation.add(objectManipulationParameters, "Object").listen();
@@ -10390,8 +10413,10 @@ window.onload = function() {
                  }
                }else if (selectedGrid.createdAddedTextName && !(keyboardBuffer["Shift"])){
                   var addedText = addedTexts[selectedGrid.createdAddedTextName];
-                  terminal.clear();
-                  terminal.printInfo(Text.SELECTED.replace(Text.PARAM1, addedText.name));
+                  if (!defaultCameraControlsDisabled && !isDeployment){
+                    terminal.clear();
+                    terminal.printInfo(Text.SELECTED.replace(Text.PARAM1, addedText.name));
+                  }
                   if (mode == 0){
                     if (selectedAddedObject){
                       selectedAddedObject.mesh.remove(axesHelper);
@@ -10409,7 +10434,11 @@ window.onload = function() {
                   if (!selectedAddedText.bbHelper){
                     selectedAddedText.handleBoundingBox();
                   }
-                  scene.add(selectedAddedText.bbHelper);
+                  if (mode == 0){
+                    scene.add(selectedAddedText.bbHelper);
+                  }else if (addedText.clickCallbackFunction){
+                    addedText.clickCallbackFunction(addedText.name);
+                  }
                   afterObjectSelection();
                }else{
                  selectedGrid.toggleSelect(false, true);
@@ -10428,20 +10457,26 @@ window.onload = function() {
                scene.remove(selectedAddedText.bbHelper);
              }
            }
-           terminal.clear();
-           terminal.printInfo(Text.SELECTED.replace(Text.PARAM1, object.name));
+           if (!defaultCameraControlsDisabled && !isDeployment){
+             terminal.clear();
+             terminal.printInfo(Text.SELECTED.replace(Text.PARAM1, object.name));
+           }
            selectedAddedObject = 0;
            selectedObjectGroup = 0;
            selectedAddedText = object;
            if (!selectedAddedText.bbHelper){
              selectedAddedText.handleBoundingBox();
            }
-           scene.add(selectedAddedText.bbHelper);
+           if (mode == 0){
+             scene.add(selectedAddedText.bbHelper);
+          }else if (object.clickCallbackFunction){
+            object.clickCallbackFunction(object.name);
+          }
            afterObjectSelection();
          }
        }else{
          if (!objectSelectedByCommand){
-           if (selectedAddedText && selectedAddedText.bbHelper){
+           if (selectedAddedText && selectedAddedText.bbHelper && mode == 0){
              scene.remove(selectedAddedText.bbHelper);
            }
            selectedAddedObject = 0;
@@ -10847,6 +10882,8 @@ window.addEventListener('keyup', function(event){
    enableController(textManipulationCharacterSizeController);
    enableController(textManipulationCharacterMarginController);
    enableController(textManipulationLineMarginController);
+   enableController(textManipulationClickableController);
+   enableController(textManipulationAffectedByFogController);
  }
 
 function isPhysicsWorkerEnabled(){
@@ -11026,6 +11063,7 @@ function afterTextSelection(){
   if (selectedAddedText){
     enableAllTMControllers();
     $(datGuiTextManipulation.domElement).attr("hidden", false);
+    scene.add(selectedAddedText.bbHelper);
     textManipulationParameters["Text"] = selectedAddedText.name;
     textManipulationParameters["Content"] = selectedAddedText.text;
     textManipulationParameters["Text color"] = "#" + selectedAddedText.material.uniforms.color.value.getHexString();
@@ -11035,11 +11073,13 @@ function afterTextSelection(){
     textManipulationParameters["Bg alpha"] = selectedAddedText.material.uniforms.backgroundAlpha.value;
     textManipulationParameters["Char margin"] = selectedAddedText.offsetBetweenChars;
     textManipulationParameters["Line margin"] = selectedAddedText.offsetBetweenLines;
+    textManipulationParameters["Aff. by fog"] = selectedAddedText.isAffectedByFog;
     if (!textManipulationParameters["Has bg"]){
       disableController(textManipulationBackgroundColorController);
       disableController(textManipulationBackgroundAlphaController);
     }
     textManipulationParameters["Char size"] = selectedAddedText.characterSize;
+    textManipulationParameters["Clickable"] = selectedAddedText.isClickable;
   }else{
     $(datGuiTextManipulation.domElement).attr("hidden", true);
   }
@@ -12773,6 +12813,8 @@ StateLoader.prototype.finalize = function(){
       new THREE.Color(curTextExport.colorR, curTextExport.colorG, curTextExport.colorB),
       curTextExport.alpha, curTextExport.charSize, curTextExport.strlen
     );
+    addedTextInstance.isClickable = curTextExport.isClickable;
+    addedTextInstance.setAffectedByFog(curTextExport.isAffectedByFog);
     addedTextInstance.setBackground(
       "#" + new THREE.Color(curTextExport.backgroundColorR, curTextExport.backgroundColorG, curTextExport.backgroundColorB).getHexString(),
       curTextExport.backgroundAlpha
@@ -13763,9 +13805,7 @@ StateLoader.prototype.resetProject = function(undo){
   }
 
   for (var textName in addedTexts){
-    if (addedTexts[textName].bbHelper){
-      scene.remove(addedTexts[textName].bbHelper);
-    }
+    addedTexts[textName].destroy();
   }
 
   if (skyboxMesh){
@@ -13803,6 +13843,7 @@ StateLoader.prototype.resetProject = function(undo){
   materials = new Object();
   addedObjects = new Object();
   addedTexts = new Object();
+  clickableAddedTexts = new Object();
   textures = new Object();
   textureURLs = new Object();
   physicsTests = new Object();
@@ -17898,6 +17939,7 @@ var ParticleMaterial = function(configurations){
 //  * Listener functions
 //  * Particle system functions
 //  * Crosshair functions
+//  * Text functions
 var Roygbiv = function(){
   this.functionNames = [
     "getObject",
@@ -18060,7 +18102,19 @@ var Roygbiv = function(){
     "setScreenKeydownListener",
     "removeScreenKeydownListener",
     "setScreenKeyupListener",
-    "removeScreenKeyupListener"
+    "removeScreenKeyupListener",
+    "getText",
+    "setText",
+    "setTextColor",
+    "setTextAlpha",
+    "setTextPosition",
+    "setTextBackground",
+    "removeTextBackground",
+    "onTextClick",
+    "removeTextClickListener",
+    "setTextCenterPosition",
+    "hideText",
+    "showText"
   ];
 
   this.globals = new Object();
@@ -18518,6 +18572,23 @@ Roygbiv.prototype.getViewport = function(){
     return;
   }
   return currentViewport;
+}
+
+// getText
+// Returns a text object or 0 if the text does not exist.
+Roygbiv.prototype.getText = function(textName){
+  if (mode == 0){
+    return;
+  }
+  if (typeof textName == UNDEFINED){
+    throw new Error("getText error: textName is not defined.");
+    return;
+  }
+  var text = addedTexts[textName];
+  if (text){
+    return text;
+  }
+  return 0;
 }
 
 // OBJECT MANIPULATION FUNCTIONS ***********************************************
@@ -24713,6 +24784,279 @@ Roygbiv.prototype.removeScreenKeyupListener = function(){
   screenKeyupCallbackFunction = 0;
 }
 
+// onTextClick
+// Sets a click listener for a text object. The callbackFunction is executed
+// with textName parameter when the text object is clicked.
+Roygbiv.prototype.onTextClick = function(text, callbackFunction){
+  if (mode == 0){
+    return;
+  }
+  if (typeof text == UNDEFINED){
+    throw new Error("onTextClick error: text is not defined.");
+    return;
+  }
+  if (!text.isAddedText){
+    throw new Error("onTextClick error: text is not a text object.");
+    return;
+  }
+  if (typeof callbackFunction == UNDEFINED){
+    throw new Error("onTextClick error: callbackFunction is not defined.");
+    return;
+  }
+  if (!(callbackFunction instanceof Function)){
+    throw new Error("onTextClick error: callbackFunction is not a function.");
+    return;
+  }
+  if (!text.isClickable){
+    throw new Error("onTextClick error: text is not marked as clickable.");
+    return;
+  }
+  text.clickCallbackFunction = callbackFunction;
+}
+
+// removeTextClickListener
+// Removes the click listener of a text object.
+Roygbiv.prototype.removeTextClickListener = function(text){
+  if (mode == 0){
+    return;
+  }
+  if (typeof text == UNDEFINED){
+    throw new Error("removeTextClickListener error: text is not defined.");
+    return;
+  }
+  if (!text.isAddedText){
+    throw new Error("removeTextClickListener error: text is not a text object.");
+    return;
+  }
+  text.clickCallbackFunction = 0;
+}
+
+// TEXT FUNCTIONS **************************************************************
+
+//setText
+// Sets a text to a text object.
+Roygbiv.prototype.setText = function(textObject, text){
+  if (mode == 0){
+    return;
+  }
+  if (typeof textObject == UNDEFINED){
+    throw new Error("setText error: textObject is not defined.");
+    return;
+  }
+  if (!textObject.isAddedText){
+    throw new Error("setText error: textObject is not a text object.");
+    return;
+  }
+  if (typeof text == UNDEFINED){
+    throw new Error("setText error: text is not defined.");
+    return;
+  }
+  if (!(typeof text == "string")){
+    throw new Error("setText error: text is not a string.");
+    return;
+  }
+  textObject.setText(text, true);
+}
+
+// setTextColor
+// Sets the color of a text. colorName can be a color name like red or an hex string
+// like #afef54.
+Roygbiv.prototype.setTextColor = function(text, colorName){
+  if (mode == 0){
+    return;
+  }
+  if (typeof text == UNDEFINED){
+    throw new Error("setTextColor error: text is not defined.");
+    return;
+  }
+  if (!text.isAddedText){
+    throw new Error("setTextColor error: text is not a text object.");
+    return;
+  }
+  if (typeof colorName == UNDEFINED){
+    throw new Error("setTextColor error: colorName is not defined.");
+  }
+  text.setColor(colorName, true);
+}
+
+// setTextAlpha
+// Sets the alpha of a text.
+Roygbiv.prototype.setTextAlpha = function(text, alpha){
+  if (mode == 0){
+    return;
+  }
+  if (typeof text == UNDEFINED){
+    throw new Error("setTextAlpha error: text is not defined.");
+    return;
+  }
+  if (!text.isAddedText){
+    throw new Error("setTextAlpha error: text is not a text object.");
+    return;
+  }
+  if (typeof alpha == UNDEFINED){
+    throw new Error("setTextAlpha error: alpha is not defined.");
+    return;
+  }
+  if (isNaN(alpha)){
+    throw new Error("setTextAlpha error: alpha is not a number.");
+    return;
+  }
+  text.setAlpha(alpha, true);
+}
+
+// setTextPosition
+// Sets the position of a text object.
+Roygbiv.prototype.setTextPosition = function(text, x, y, z){
+  if (mode == 0){
+    return;
+  }
+  if (typeof text == UNDEFINED){
+    throw new Error("setTextPosition error: text is not defined.");
+    return;
+  }
+  if (!text.isAddedText){
+    throw new Error("setTextPosition error: text is not a text object.");
+    return;
+  }
+  if (isNaN(x)){
+    throw new Error("setTextPosition error: Bad x parameter");
+    return;
+  }
+  if (isNaN(y)){
+    throw new Error("setTextPosition error: Bad y parameter.");
+    return;
+  }
+  if (isNaN(z)){
+    throw new Error("setTextPosition error: Bad z parameter.");
+    return;
+  }
+  text.mesh.position.set(x, y, z);
+}
+
+// setTextBackground
+// Sets the background color/alpha of a text object.
+Roygbiv.prototype.setTextBackground = function(text, colorName, alpha){
+  if (mode == 0){
+    return;
+  }
+  if (typeof text == UNDEFINED){
+    throw new Error("setTextBackground error: text is not defined.");
+    return;
+  }
+  if (!text.isAddedText){
+    throw new Error("setTextBackground error: text is not a text object.");
+    return;
+  }
+  if (typeof colorName == UNDEFINED){
+    throw new Error("setTextBackground error: colorName is not defined.");
+    return;
+  }
+  if (!(typeof colorName == "string")){
+    throw new Error("setTextBackground error: colorName is not a string.");
+    return;
+  }
+  if (typeof alpha == UNDEFINED){
+    throw new Error("setTextBackground error: alpha is not defined.");
+    return;
+  }
+  if (isNaN(alpha)){
+    throw new Error("setTextBackground error: Bad alpha parameter.");
+    return;
+  }
+  text.setBackground(colorName, alpha, true);
+}
+
+// removeTextBackground
+// Removes the background of a text object.
+Roygbiv.prototype.removeTextBackground = function(text){
+  if (mode == 0){
+    return;
+  }
+  if (typeof text == UNDEFINED){
+    throw new Error("removeTextBackground error: text is not defined.");
+    return;
+  }
+  if (!text.isAddedText){
+    throw new Error("removeTextBackground error: text is not a text object.");
+    return;
+  }
+  text.removeBackground(true);
+}
+
+// setTextCenterPosition
+// Puts the center of the given text object to given x, y, z coordinates.
+Roygbiv.prototype.setTextCenterPosition = function(text, x, y, z){
+  if (mode == 0){
+    return;
+  }
+  if (typeof text == UNDEFINED){
+    throw new Error("setTextCenterPosition error: text is not defined.");
+    return;
+  }
+  if (!text.isAddedText){
+    throw new Error("setTextCenterPosition error: text is not a text object.");
+    return;
+  }
+  if (isNaN(x)){
+    throw new Error("setTextCenterPosition error: Bad x parameter.");
+    return;
+  }
+  if (isNaN(y)){
+    throw new Error("setTextCenterPosition error: Bad y parameter.");
+    return;
+  }
+  if (isNaN(z)){
+    throw new Error("setTextCenterPosition error: Bad z parameter.");
+    return;
+  }
+  var centerPos = text.getCenterCoordinates();
+  text.mesh.position.set(
+    text.mesh.position.x + (x - centerPos.x),
+    text.mesh.position.y + (y - centerPos.y),
+    text.mesh.position.z + (z - centerPos.z)
+  );
+}
+
+// hideText
+// Makes the given text object invisible. Does nothing if the text is already
+// invisible.
+Roygbiv.prototype.hideText = function(text){
+  if (mode == 0){
+    return;
+  }
+  if (typeof text == UNDEFINED){
+    throw new Error("hideText error: text is not defined.");
+    return;
+  }
+  if (!text.isAddedText){
+    throw new Error("hideText error: text is not a text object.");
+    return;
+  }
+  if (text.mesh.visible){
+    text.hide();
+  }
+}
+
+// showText
+// Makes the given text object visible. Does nothing if the text is already
+// visible.
+Roygbiv.prototype.showText = function(text){
+  if (mode == 0){
+    return;
+  }
+  if (typeof text == UNDEFINED){
+    throw new Error("showText error: text is not defined.");
+    return;
+  }
+  if (!text.isAddedText){
+    throw new Error("showText error: text is not a text object.");
+    return;
+  }
+  if (!text.mesh.visible){
+    text.show();
+  }
+}
+
 // UTILITY FUNCTIONS ***********************************************************
 
 // vector
@@ -27240,8 +27584,10 @@ var AddedText = function(name, font, text, position, color, alpha, characterSize
     side: THREE.DoubleSide,
     uniforms: {
       modelViewMatrix: new THREE.Uniform(new THREE.Matrix4()),
+      worldMatrix: new THREE.Uniform(new THREE.Matrix4()),
       projectionMatrix: GLOBAL_PROJECTION_UNIFORM,
       cameraQuaternion: GLOBAL_CAMERA_QUATERNION_UNIFORM,
+      cameraPosition: GLOBAL_CAMERA_POSITION_UNIFORM,
       charSize: new THREE.Uniform(characterSize),
       color: new THREE.Uniform(color),
       alpha: new THREE.Uniform(alpha),
@@ -27251,7 +27597,10 @@ var AddedText = function(name, font, text, position, color, alpha, characterSize
       uvRanges: new THREE.Uniform(uvsArray),
       glyphTexture: this.getGlyphUniform(),
       xOffsets: new THREE.Uniform(xOffsetsArray),
-      yOffsets: new THREE.Uniform(yOffsetsArray)
+      yOffsets: new THREE.Uniform(yOffsetsArray),
+      affectedByFogFlag: new THREE.Uniform(-50.0),
+      fogInfo: GLOBAL_FOG_UNIFORM,
+      cubeTexture: GLOBAL_CUBE_TEXTURE_UNIFORM
     }
   });
   this.topLeft = new THREE.Vector3(0, 0, 0);
@@ -27265,9 +27614,18 @@ var AddedText = function(name, font, text, position, color, alpha, characterSize
   this.mesh.frustumCulled = false;
   scene.add(this.mesh);
   this.material.uniforms.modelViewMatrix.value = this.mesh.modelViewMatrix;
+  this.material.uniforms.worldMatrix.value = this.mesh.matrixWorld;
 
   this.tmpObj = {};
   this.destroyedGrids = new Object();
+  this.isClickable = false;
+
+  this.lastUpdateQuaternion = new THREE.Quaternion().copy(camera.quaternion);
+  this.lastUpdatePosition = new THREE.Vector3().copy(this.position);
+
+  this.reusableVector = new THREE.Vector3();
+  this.makeFirstUpdate = true;
+  this.isAffectedByFog = false;
 }
 
 AddedText.prototype.destroy = function(){
@@ -27303,7 +27661,7 @@ AddedText.prototype.constructText = function(){
   var yMin = 0;
   var i = 0;
   var i2 = 0;
-  while (i2 < this.text.length){
+  while (i2 < this.text.length && i<this.strlen){
     if (this.text.charAt(i2) == "\n"){
       yOffset-= this.offsetBetweenLines;
       xOffset = 0;
@@ -27354,6 +27712,8 @@ AddedText.prototype.export = function(){
   exportObj.backgroundColorB = this.material.uniforms.backgroundColor.value.b;
   exportObj.backgroundAlpha = this.material.uniforms.backgroundAlpha.value;
   exportObj.gsName = this.gsName;
+  exportObj.isClickable = this.isClickable;
+  exportObj.isAffectedByFog = this.isAffectedByFog;
   var exportDestroyedGrids = new Object();
   for (var gridName in this.destroyedGrids){
     exportDestroyedGrids[gridName] = this.destroyedGrids[gridName].export();
@@ -27387,6 +27747,9 @@ AddedText.prototype.handleUVUniform = function(){
         uvRangesArray[i2++].set(-500, -500, -500, -500);
       }
     }
+    if (i2 >= this.strlen){
+      break;
+    }
   }
   for (var i = i2; i<this.strlen; i++){
     uvRangesArray[i].set(-500, -500, -500, -500);
@@ -27403,18 +27766,29 @@ AddedText.prototype.setMarginBetweenLines = function(value){
   this.constructText();
 }
 
-AddedText.prototype.setText = function(newText){
+AddedText.prototype.setText = function(newText, fromScript){
+  if (fromScript && (typeof this.oldText == UNDEFINED)){
+    this.oldText = this.text;
+  }
   this.text = newText;
   this.constructText();
   this.handleUVUniform();
   this.handleBoundingBox();
 }
 
-AddedText.prototype.setColor = function(colorString){
+AddedText.prototype.setColor = function(colorString, fromScript){
+  if (fromScript && (typeof this.oldColorR == UNDEFINED)){
+    this.oldColorR = this.material.uniforms.color.value.r;
+    this.oldColorG = this.material.uniforms.color.value.g;
+    this.oldColorB = this.material.uniforms.color.value.b;
+  }
   this.material.uniforms.color.value.set(colorString);
 }
 
-AddedText.prototype.setAlpha = function(alpha){
+AddedText.prototype.setAlpha = function(alpha, fromScript){
+  if (fromScript && (typeof this.oldAlpha == UNDEFINED)){
+    this.oldAlpha = this.alpha;
+  }
   if (alpha > 1){
     alpha = 1;
   }else if (alpha < 0){
@@ -27424,19 +27798,37 @@ AddedText.prototype.setAlpha = function(alpha){
   this.alpha = alpha;
 }
 
-AddedText.prototype.setBackground = function(backgroundColorString, backgroundAlpha){
+AddedText.prototype.setBackground = function(backgroundColorString, backgroundAlpha, fromScript){
+  if (backgroundAlpha > 1){
+    backgroundAlpha = 1;
+  }else if (backgroundAlpha < 0){
+    backgroundAlpha = 0;
+  }
+  if (fromScript && (typeof this.oldBackgroundR == UNDEFINED)){
+    this.oldBackgroundR = this.material.uniforms.backgroundColor.value.r;
+    this.oldBackgroundG = this.material.uniforms.backgroundColor.value.g;
+    this.oldBackgroundB = this.material.uniforms.backgroundColor.value.b;
+    this.oldBackgroundAlpha = this.material.uniforms.backgroundAlpha.value;
+  }
+  if (fromScript && (typeof this.oldBackgroundStatus == UNDEFINED)){
+    this.oldBackgroundStatus = this.material.uniforms.hasBackgroundColorFlag.value;
+  }
   this.material.uniforms.backgroundColor.value.set(backgroundColorString);
   this.material.uniforms.backgroundAlpha.value = backgroundAlpha;
   this.material.uniforms.hasBackgroundColorFlag.value = 500;
 }
 
-AddedText.prototype.removeBackground = function(){
+AddedText.prototype.removeBackground = function(fromScript){
+  if (fromScript && (typeof this.oldBackgroundStatus == UNDEFINED)){
+    this.oldBackgroundStatus = this.material.uniforms.hasBackgroundColorFlag.value;
+  }
   this.material.uniforms.hasBackgroundColorFlag.value = -500;
 }
 
 AddedText.prototype.setCharSize = function(value){
   this.material.uniforms.charSize.value = value;
   this.characterSize = value;
+  this.handleBoundingBox();
 }
 
 AddedText.prototype.handleResize = function(){
@@ -27469,6 +27861,12 @@ AddedText.prototype.intersectsLine = function(line){
   return false;
 }
 
+AddedText.prototype.getCenterCoordinates = function(){
+  this.handleBoundingBox();
+  this.boundingBox.getCenter(this.reusableVector);
+  return this.reusableVector;
+}
+
 AddedText.prototype.handleBoundingBox = function(){
   if (!this.boundingBox){
     this.boundingBox = new THREE.Box3();
@@ -27497,10 +27895,10 @@ AddedText.prototype.handleBoundingBox = function(){
   REUSABLE_VECTOR_3.applyQuaternion(camera.quaternion);
   REUSABLE_VECTOR_4.applyQuaternion(camera.quaternion);
 
-  REUSABLE_VECTOR.add(this.position);
-  REUSABLE_VECTOR_2.add(this.position);
-  REUSABLE_VECTOR_3.add(this.position);
-  REUSABLE_VECTOR_4.add(this.position);
+  REUSABLE_VECTOR.add(this.mesh.position);
+  REUSABLE_VECTOR_2.add(this.mesh.position);
+  REUSABLE_VECTOR_3.add(this.mesh.position);
+  REUSABLE_VECTOR_4.add(this.mesh.position);
 
   this.boundingBox.expandByPoint(REUSABLE_VECTOR);
   this.boundingBox.expandByPoint(REUSABLE_VECTOR_2);
@@ -27526,27 +27924,49 @@ AddedText.prototype.handleBoundingBox = function(){
   REUSABLE_VECTOR_3.applyQuaternion(camera.quaternion);
   REUSABLE_VECTOR_4.applyQuaternion(camera.quaternion);
 
-  REUSABLE_VECTOR.add(this.position);
-  REUSABLE_VECTOR_2.add(this.position);
-  REUSABLE_VECTOR_3.add(this.position);
-  REUSABLE_VECTOR_4.add(this.position);
+  REUSABLE_VECTOR.add(this.mesh.position);
+  REUSABLE_VECTOR_2.add(this.mesh.position);
+  REUSABLE_VECTOR_3.add(this.mesh.position);
+  REUSABLE_VECTOR_4.add(this.mesh.position);
 
   this.plane.setFromCoplanarPoints(REUSABLE_VECTOR, REUSABLE_VECTOR_2, REUSABLE_VECTOR_3);
   this.triangles[0].set(REUSABLE_VECTOR, REUSABLE_VECTOR_2, REUSABLE_VECTOR_3);
   this.triangles[1].set(REUSABLE_VECTOR, REUSABLE_VECTOR_2, REUSABLE_VECTOR_4);
+
+  this.lastUpdateQuaternion.copy(camera.quaternion);
+  this.lastUpdatePosition.copy(this.mesh.position);
+}
+
+AddedText.prototype.needsUpdate = function(){
+  if (this.makeFirstUpdate){
+    this.makeFirstUpdate = false;
+    return true;
+  }
+  return !(
+    this.lastUpdateQuaternion.x == camera.quaternion.x &&
+    this.lastUpdateQuaternion.y == camera.quaternion.y &&
+    this.lastUpdateQuaternion.z == camera.quaternion.z &&
+    this.lastUpdateQuaternion.w == camera.quaternion.w &&
+    this.lastUpdatePosition.x == this.mesh.position.x &&
+    this.lastUpdatePosition.y == this.mesh.position.y &&
+    this.lastUpdatePosition.z == this.mesh.position.z
+  )
 }
 
 AddedText.prototype.debugTriangles = function(triangleIndex){
   this.handleBoundingBox();
   var s1 = new THREE.Mesh(new THREE.SphereGeometry(2), new THREE.MeshBasicMaterial({color: "red"}));
   var s2 = s1.clone(), s3 = s1.clone();
+  var sCenter = new THREE.Mesh(new THREE.SphereGeometry(20), new THREE.MeshBasicMaterial({color: "lime"}));
   var triangle = this.triangles[triangleIndex];
   scene.add(s1);
   scene.add(s2);
   scene.add(s3);
+  scene.add(sCenter);
   s1.position.copy(triangle.a);
   s2.position.copy(triangle.b);
   s3.position.copy(triangle.c);
+  sCenter.position.copy(this.getCenterCoordinates());
 }
 
 AddedText.prototype.hide = function(){
@@ -27554,10 +27974,62 @@ AddedText.prototype.hide = function(){
   if (mode == 0 && this.bbHelper){
     scene.remove(this.bbHelper);
   }
+  if (mode == 1 && this.isClickable){
+    rayCaster.binHandler.deleteObjectFromBin(this.binInfo, this.name);
+  }
 }
 
 AddedText.prototype.show = function(){
   this.mesh.visible = true;
+  if (mode == 1 && this.isClickable){
+    if (!this.boundingBox){
+      this.handleBoundingBox();
+    }
+    rayCaster.binHandler.insert(this.boundingBox, this.name);
+  }
+}
+
+AddedText.prototype.restore = function(){
+  if (!(typeof this.oldText == UNDEFINED)){
+    this.setText(this.oldText);
+    delete this.oldText;
+  }
+  if (!(typeof this.oldColorR == UNDEFINED)){
+    this.material.uniforms.color.value.setRGB(
+      this.oldColorR, this.oldColorG, this.oldColorB
+    );
+    delete this.oldColorR;
+    delete this.oldColorG;
+    delete this.oldColorB;
+  }
+  if (!(typeof this.oldAlpha == UNDEFINED)){
+    this.setAlpha(this.oldAlpha);
+    delete this.oldAlpha;
+  }
+  if (!(typeof this.oldBackgroundStatus == UNDEFINED)){
+    this.material.uniforms.hasBackgroundColorFlag.value = this.oldBackgroundStatus;
+    delete this.oldBackgroundStatus;
+  }
+  if (!(typeof this.oldBackgroundR == UNDEFINED)){
+    this.material.uniforms.backgroundColor.value.setRGB(
+      this.oldBackgroundR, this.oldBackgroundG, this.oldBackgroundB
+    );
+    this.material.uniforms.backgroundAlpha.value = this.oldBackgroundAlpha;
+    delete this.oldBackgroundR;
+    delete this.oldBackgroundG;
+    delete this.oldBackgroundB;
+    delete this.oldBackgroundAlpha;
+  }
+  this.mesh.position.copy(this.position);
+}
+
+AddedText.prototype.setAffectedByFog = function(val){
+  this.isAffectedByFog = val;
+  if (val){
+    this.material.uniforms.affectedByFogFlag.value = 50.0;
+  }else{
+    this.material.uniforms.affectedByFogFlag.value = -50.0;
+  }
 }
 
 var AreaConfigurationsHandler = function(){
@@ -27780,6 +28252,13 @@ RayCaster.prototype.refresh = function(){
     for (var txtName in addedTexts){
       var addedText = addedTexts[txtName];
       this.binHandler.insert(addedText.boundingBox, txtName);
+    }
+  }else{
+    for (var txtName in addedTexts){
+      var addedText = addedTexts[txtName];
+      if (addedText.isClickable){
+        this.binHandler.insert(addedText.boundingBox, txtName);
+      }
     }
   }
 }
@@ -28644,11 +29123,13 @@ ModeSwitcher.prototype.switchFromDesignToPreview = function(){
   }
   $("#cliDivheader").text("ROYGBIV 3D Engine - CLI (Preview mode)");
   mode = 1;
-  rayCaster.refresh();
   this.commonSwitchFunctions();
   handleViewport();
   for (var txtName in addedTexts){
     addedTexts[txtName].handleResize();
+    if (addedTexts[txtName].isClickable){
+      clickableAddedTexts[txtName] = addedTexts[txtName];
+    }
   }
 }
 
@@ -28703,6 +29184,7 @@ ModeSwitcher.prototype.switchFromPreviewToDesign = function(){
     var addedText = addedTexts[textName];
     addedText.show();
     addedText.handleResize();
+    delete addedText.clickCallbackFunction;
   }
   collisionCallbackRequests = new Object();
   particleCollisionCallbackRequests = new Object();
@@ -28870,9 +29352,12 @@ ModeSwitcher.prototype.switchFromPreviewToDesign = function(){
   GLOBAL_FOG_UNIFORM.value.set(-100.0, 0, 0, 0);
   renderer.setViewport(0, 0, canvas.width / screenResolution, canvas.height / screenResolution);
 
+  clickableAddedTexts = new Object();
   this.commonSwitchFunctions();
   for (var txtName in addedTexts){
-    addedTexts[txtName].handleResize();
+    var text = addedTexts[txtName];
+    text.restore();
+    text.handleResize();
   }
 }
 
