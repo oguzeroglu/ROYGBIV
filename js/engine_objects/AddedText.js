@@ -76,6 +76,8 @@ var AddedText = function(name, font, text, position, color, alpha, characterSize
 
   this.lastUpdateQuaternion = new THREE.Quaternion().copy(camera.quaternion);
   this.lastUpdatePosition = new THREE.Vector3().copy(this.position);
+
+  this.reusableVector = new THREE.Vector3();
 }
 
 AddedText.prototype.destroy = function(){
@@ -310,6 +312,12 @@ AddedText.prototype.intersectsLine = function(line){
   return false;
 }
 
+AddedText.prototype.getCenterCoordinates = function(){
+  this.handleBoundingBox();
+  this.boundingBox.getCenter(this.reusableVector);
+  return this.reusableVector;
+}
+
 AddedText.prototype.handleBoundingBox = function(){
   if (!this.boundingBox){
     this.boundingBox = new THREE.Box3();
@@ -396,13 +404,16 @@ AddedText.prototype.debugTriangles = function(triangleIndex){
   this.handleBoundingBox();
   var s1 = new THREE.Mesh(new THREE.SphereGeometry(2), new THREE.MeshBasicMaterial({color: "red"}));
   var s2 = s1.clone(), s3 = s1.clone();
+  var sCenter = new THREE.Mesh(new THREE.SphereGeometry(20), new THREE.MeshBasicMaterial({color: "lime"}));
   var triangle = this.triangles[triangleIndex];
   scene.add(s1);
   scene.add(s2);
   scene.add(s3);
+  scene.add(sCenter);
   s1.position.copy(triangle.a);
   s2.position.copy(triangle.b);
   s3.position.copy(triangle.c);
+  sCenter.position.copy(this.getCenterCoordinates());
 }
 
 AddedText.prototype.hide = function(){

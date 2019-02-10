@@ -921,4 +921,5 @@ var Text = function(){
    this.ROYGBIV_SCRIPTING_API_REMOVETEXTBACKGROUND = "Removes the background of a text object.";
    this.ROYGBIV_SCRIPTING_API_ONTEXTCLICK = "Sets a click listener for a text object. The callbackFunction is executed with textName parameter when the text object is clicked.";
    this.ROYGBIV_SCRIPTING_API_REMOVETEXTCLICKLISTENER = "Removes the click listener of a text object.";
+   this.ROYGBIV_SCRIPTING_API_SETTEXTCENTERPOSITION = "Puts the center of the given text object to given x, y, z coordinates.";
 }

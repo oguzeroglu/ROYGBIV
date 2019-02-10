@@ -182,7 +182,8 @@ var Roygbiv = function(){
     "setTextBackground",
     "removeTextBackground",
     "onTextClick",
-    "removeTextClickListener"
+    "removeTextClickListener",
+    "setTextCenterPosition"
   ];
 
   this.globals = new Object();
@@ -7049,6 +7050,40 @@ Roygbiv.prototype.removeTextBackground = function(text){
     return;
   }
   text.removeBackground(true);
+}
+
+// setTextCenterPosition
+// Puts the center of the given text object to given x, y, z coordinates.
+Roygbiv.prototype.setTextCenterPosition = function(text, x, y, z){
+  if (mode == 0){
+    return;
+  }
+  if (typeof text == UNDEFINED){
+    throw new Error("setTextCenterPosition error: text is not defined.");
+    return;
+  }
+  if (!text.isAddedText){
+    throw new Error("setTextCenterPosition error: text is not a text object.");
+    return;
+  }
+  if (isNaN(x)){
+    throw new Error("setTextCenterPosition error: Bad x parameter.");
+    return;
+  }
+  if (isNaN(y)){
+    throw new Error("setTextCenterPosition error: Bad y parameter.");
+    return;
+  }
+  if (isNaN(z)){
+    throw new Error("setTextCenterPosition error: Bad z parameter.");
+    return;
+  }
+  var centerPos = text.getCenterCoordinates();
+  text.mesh.position.set(
+    text.mesh.position.x + (x - centerPos.x),
+    text.mesh.position.y + (y - centerPos.y),
+    text.mesh.position.z + (z - centerPos.z)
+  );
 }
 
 // UTILITY FUNCTIONS ***********************************************************
