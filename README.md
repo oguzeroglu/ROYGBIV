@@ -1,6 +1,6 @@
 # ROYGBIV
 
-![](/screen_shots/shooting.gif?raw=true)
+![](/screen_shots/logo.png?raw=true)
 
 ROYGBIV is a 3D game engine for the Web. I named it after my favorite [Boards of Canada track](https://www.youtube.com/watch?v=W-GWjzw0GwQ).
 
@@ -26,4 +26,5 @@ ROYGBIV works on browsers (preferably Chrome or Firefox). It works with a set of
 
 ![](/screen_shots/scene.png?raw=true)
 ![](/screen_shots/scifi2.png?raw=true)
+![](/screen_shots/shooting.gif?raw=true)
 ![](/screen_shots/roygbiv.gif?raw=true)
