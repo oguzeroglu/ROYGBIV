@@ -10,6 +10,7 @@
 //  * Listener functions
 //  * Particle system functions
 //  * Crosshair functions
+//  * Text functions
 var Roygbiv = function(){
   this.functionNames = [
     "getObject",
@@ -172,7 +173,11 @@ var Roygbiv = function(){
     "setScreenKeydownListener",
     "removeScreenKeydownListener",
     "setScreenKeyupListener",
-    "removeScreenKeyupListener"
+    "removeScreenKeyupListener",
+    "getText",
+    "setText",
+    "setTextColor",
+    "setTextAlpha"
   ];
 
   this.globals = new Object();
@@ -630,6 +635,23 @@ Roygbiv.prototype.getViewport = function(){
     return;
   }
   return currentViewport;
+}
+
+// getText
+// Returns a text object or 0 if the text does not exist.
+Roygbiv.prototype.getText = function(textName){
+  if (mode == 0){
+    return;
+  }
+  if (typeof textName == UNDEFINED){
+    throw new Error("getText error: textName is not defined.");
+    return;
+  }
+  var text = addedTexts[textName];
+  if (text){
+    return text;
+  }
+  return 0;
 }
 
 // OBJECT MANIPULATION FUNCTIONS ***********************************************
@@ -6823,6 +6845,79 @@ Roygbiv.prototype.removeScreenKeyupListener = function(){
     return;
   }
   screenKeyupCallbackFunction = 0;
+}
+
+// TEXT FUNCTIONS **************************************************************
+
+//setText
+// Sets a text to a text object.
+Roygbiv.prototype.setText = function(textObject, text){
+  if (mode == 0){
+    return;
+  }
+  if (typeof textObject == UNDEFINED){
+    throw new Error("setText error: textObject is not defined.");
+    return;
+  }
+  if (!textObject.isAddedText){
+    throw new Error("setText error: textObject is not a text object.");
+    return;
+  }
+  if (typeof text == UNDEFINED){
+    throw new Error("setText error: text is not defined.");
+    return;
+  }
+  if (!(typeof text == "string")){
+    throw new Error("setText error: text is not a string.");
+    return;
+  }
+  textObject.setText(text, true);
+}
+
+// setTextColor
+// Sets the color of a text. colorName can be a color name like red or an hex string
+// like #afef54.
+Roygbiv.prototype.setTextColor = function(text, colorName){
+  if (mode == 0){
+    return;
+  }
+  if (typeof text == UNDEFINED){
+    throw new Error("setTextColor error: text is not defined.");
+    return;
+  }
+  if (!text.isAddedText){
+    throw new Error("setTextColor error: text is not a text object.");
+    return;
+  }
+  if (typeof colorName == UNDEFINED){
+    throw new Error("setTextColor error: colorName is not defined.");
+  }
+  text.setColor(colorName, true);
+}
+
+// setTextAlpha
+// Sets the alpha of a text.
+Roygbiv.prototype.setTextAlpha = function(text, alpha){
+  if (mode == 0){
+    return;
+  }
+  if (typeof text == UNDEFINED){
+    throw new Error("setTextAlpha error: text is not defined.");
+    return;
+  }
+  if (!text.isAddedText){
+    throw new Error("setTextAlpha error: text is not a text object.");
+    return;
+  }
+  if (typeof alpha == UNDEFINED){
+    throw new Error("setTextAlpha error: alpha is not defined.");
+    return;
+  }
+  if (isNaN(alpha)){
+    throw new Error("setTextAlpha error: alpha is not a number.");
+    return;
+  }
+  text.setAlpha(alpha, true);
 }
 
 // UTILITY FUNCTIONS ***********************************************************

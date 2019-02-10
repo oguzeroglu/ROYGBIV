@@ -107,7 +107,7 @@ AddedText.prototype.constructText = function(){
   var yMin = 0;
   var i = 0;
   var i2 = 0;
-  while (i2 < this.text.length){
+  while (i2 < this.text.length && i<this.strlen){
     if (this.text.charAt(i2) == "\n"){
       yOffset-= this.offsetBetweenLines;
       xOffset = 0;
@@ -191,6 +191,9 @@ AddedText.prototype.handleUVUniform = function(){
         uvRangesArray[i2++].set(-500, -500, -500, -500);
       }
     }
+    if (i2 >= this.strlen){
+      break;
+    }
   }
   for (var i = i2; i<this.strlen; i++){
     uvRangesArray[i].set(-500, -500, -500, -500);
@@ -207,18 +210,29 @@ AddedText.prototype.setMarginBetweenLines = function(value){
   this.constructText();
 }
 
-AddedText.prototype.setText = function(newText){
+AddedText.prototype.setText = function(newText, fromScript){
+  if (fromScript && (typeof this.oldText == UNDEFINED)){
+    this.oldText = this.text;
+  }
   this.text = newText;
   this.constructText();
   this.handleUVUniform();
   this.handleBoundingBox();
 }
 
-AddedText.prototype.setColor = function(colorString){
+AddedText.prototype.setColor = function(colorString, fromScript){
+  if (fromScript && (typeof this.oldColorR == UNDEFINED)){
+    this.oldColorR = this.material.uniforms.color.value.r;
+    this.oldColorG = this.material.uniforms.color.value.g;
+    this.oldColorB = this.material.uniforms.color.value.b;
+  }
   this.material.uniforms.color.value.set(colorString);
 }
 
-AddedText.prototype.setAlpha = function(alpha){
+AddedText.prototype.setAlpha = function(alpha, fromScript){
+  if (fromScript && (typeof this.oldAlpha == UNDEFINED)){
+    this.oldAlpha = this.alpha;
+  }
   if (alpha > 1){
     alpha = 1;
   }else if (alpha < 0){
@@ -362,4 +376,23 @@ AddedText.prototype.hide = function(){
 
 AddedText.prototype.show = function(){
   this.mesh.visible = true;
+}
+
+AddedText.prototype.restore = function(){
+  if (!(typeof this.oldText == UNDEFINED)){
+    this.setText(this.oldText);
+    delete this.oldText;
+  }
+  if (!(typeof this.oldColorR == UNDEFINED)){
+    this.material.uniforms.color.value.setRGB(
+      this.oldColorR, this.oldColorG, this.oldColorB
+    );
+    delete this.oldColorR;
+    delete this.oldColorG;
+    delete this.oldColorB;
+  }
+  if (!(typeof this.oldAlpha == UNDEFINED)){
+    this.setAlpha(this.oldAlpha);
+    delete this.oldAlpha;
+  }
 }

@@ -468,6 +468,8 @@ ModeSwitcher.prototype.switchFromPreviewToDesign = function(){
 
   this.commonSwitchFunctions();
   for (var txtName in addedTexts){
-    addedTexts[txtName].handleResize();
+    var text = addedTexts[txtName];
+    text.restore();
+    text.handleResize();
   }
 }
