@@ -70,6 +70,10 @@ function copyAssets(application){
       }
     });
   }
+  copyFolderRecursiveSync("third_party_licenses", "deploy/"+application.projectName+"/");
+  console.log("[*] Copied third party licenses.");
+  copyFileSync("LICENSE", "deploy/"+application.projectName+"/");
+  console.log("[*] Copied ROYGBIV license.");
   for (var texturePackName in application.texturePacks){
     var dirName = application.texturePacks[texturePackName].directoryName;
     fs.readdirSync("texture_packs").forEach(file => {
