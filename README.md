@@ -28,3 +28,7 @@ ROYGBIV works on browsers (preferably Chrome or Firefox). It works with a set of
 ![](/screen_shots/scifi2.png?raw=true)
 ![](/screen_shots/shooting.gif?raw=true)
 ![](/screen_shots/roygbiv.gif?raw=true)
+
+## License
+
+ROYGBIV uses MIT license. See the third_party_licenses folder for licenses of used third party libraries.
