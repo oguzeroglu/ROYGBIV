@@ -242,13 +242,30 @@ AddedText.prototype.setAlpha = function(alpha, fromScript){
   this.alpha = alpha;
 }
 
-AddedText.prototype.setBackground = function(backgroundColorString, backgroundAlpha){
+AddedText.prototype.setBackground = function(backgroundColorString, backgroundAlpha, fromScript){
+  if (backgroundAlpha > 1){
+    backgroundAlpha = 1;
+  }else if (backgroundAlpha < 0){
+    backgroundAlpha = 0;
+  }
+  if (fromScript && (typeof this.oldBackgroundR == UNDEFINED)){
+    this.oldBackgroundR = this.material.uniforms.backgroundColor.value.r;
+    this.oldBackgroundG = this.material.uniforms.backgroundColor.value.g;
+    this.oldBackgroundB = this.material.uniforms.backgroundColor.value.b;
+    this.oldBackgroundAlpha = this.material.uniforms.backgroundAlpha.value;
+  }
+  if (fromScript && (typeof this.oldBackgroundStatus == UNDEFINED)){
+    this.oldBackgroundStatus = this.material.uniforms.hasBackgroundColorFlag.value;
+  }
   this.material.uniforms.backgroundColor.value.set(backgroundColorString);
   this.material.uniforms.backgroundAlpha.value = backgroundAlpha;
   this.material.uniforms.hasBackgroundColorFlag.value = 500;
 }
 
-AddedText.prototype.removeBackground = function(){
+AddedText.prototype.removeBackground = function(fromScript){
+  if (fromScript && (typeof this.oldBackgroundStatus == UNDEFINED)){
+    this.oldBackgroundStatus = this.material.uniforms.hasBackgroundColorFlag.value;
+  }
   this.material.uniforms.hasBackgroundColorFlag.value = -500;
 }
 
@@ -344,10 +361,10 @@ AddedText.prototype.handleBoundingBox = function(){
   REUSABLE_VECTOR_3.applyQuaternion(camera.quaternion);
   REUSABLE_VECTOR_4.applyQuaternion(camera.quaternion);
 
-  REUSABLE_VECTOR.add(this.position);
-  REUSABLE_VECTOR_2.add(this.position);
-  REUSABLE_VECTOR_3.add(this.position);
-  REUSABLE_VECTOR_4.add(this.position);
+  REUSABLE_VECTOR.add(this.mesh.position);
+  REUSABLE_VECTOR_2.add(this.mesh.position);
+  REUSABLE_VECTOR_3.add(this.mesh.position);
+  REUSABLE_VECTOR_4.add(this.mesh.position);
 
   this.plane.setFromCoplanarPoints(REUSABLE_VECTOR, REUSABLE_VECTOR_2, REUSABLE_VECTOR_3);
   this.triangles[0].set(REUSABLE_VECTOR, REUSABLE_VECTOR_2, REUSABLE_VECTOR_3);
@@ -395,4 +412,19 @@ AddedText.prototype.restore = function(){
     this.setAlpha(this.oldAlpha);
     delete this.oldAlpha;
   }
+  if (!(typeof this.oldBackgroundStatus == UNDEFINED)){
+    this.material.uniforms.hasBackgroundColorFlag.value = this.oldBackgroundStatus;
+    delete this.oldBackgroundStatus;
+  }
+  if (!(typeof this.oldBackgroundR == UNDEFINED)){
+    this.material.uniforms.backgroundColor.value.setRGB(
+      this.oldBackgroundR, this.oldBackgroundG, this.oldBackgroundB
+    );
+    this.material.uniforms.backgroundAlpha.value = this.oldBackgroundAlpha;
+    delete this.oldBackgroundR;
+    delete this.oldBackgroundG;
+    delete this.oldBackgroundB;
+    delete this.oldBackgroundAlpha;
+  }
+  this.mesh.position.copy(this.position);
 }

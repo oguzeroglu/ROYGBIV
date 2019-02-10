@@ -916,4 +916,7 @@ var Text = function(){
    this.ROYGBIV_SCRIPTING_API_SETTEXT = "Sets a text to a text object.";
    this.ROYGBIV_SCRIPTING_API_SETTEXTCOLOR = "Sets the color of a text. colorName can be a color name like red or an hex string like #afef54.";
    this.ROYGBIV_SCRIPTING_API_SETTEXTALPHA = "Sets the alpha of a text.";
+   this.ROYGBIV_SCRIPTING_API_SETTEXTPOSITION = "Sets the position of a text object.";
+   this.ROYGBIV_SCRIPTING_API_SETTEXTBACKGROUND = "Sets the background color/alpha of a text object.";
+   this.ROYGBIV_SCRIPTING_API_REMOVETEXTBACKGROUND = "Removes the background of a text object.";
 }

@@ -177,7 +177,10 @@ var Roygbiv = function(){
     "getText",
     "setText",
     "setTextColor",
-    "setTextAlpha"
+    "setTextAlpha",
+    "setTextPosition",
+    "setTextBackground",
+    "removeTextBackground"
   ];
 
   this.globals = new Object();
@@ -6918,6 +6921,85 @@ Roygbiv.prototype.setTextAlpha = function(text, alpha){
     return;
   }
   text.setAlpha(alpha, true);
+}
+
+// setTextPosition
+// Sets the position of a text object.
+Roygbiv.prototype.setTextPosition = function(text, x, y, z){
+  if (mode == 0){
+    return;
+  }
+  if (typeof text == UNDEFINED){
+    throw new Error("setTextPosition error: text is not defined.");
+    return;
+  }
+  if (!text.isAddedText){
+    throw new Error("setTextPosition error: text is not a text object.");
+    return;
+  }
+  if (isNaN(x)){
+    throw new Error("setTextPosition error: Bad x parameter");
+    return;
+  }
+  if (isNaN(y)){
+    throw new Error("setTextPosition error: Bad y parameter.");
+    return;
+  }
+  if (isNaN(z)){
+    throw new Error("setTextPosition error: Bad z parameter.");
+    return;
+  }
+  text.mesh.position.set(x, y, z);
+}
+
+// setTextBackground
+// Sets the background color/alpha of a text object.
+Roygbiv.prototype.setTextBackground = function(text, colorName, alpha){
+  if (mode == 0){
+    return;
+  }
+  if (typeof text == UNDEFINED){
+    throw new Error("setTextBackground error: text is not defined.");
+    return;
+  }
+  if (!text.isAddedText){
+    throw new Error("setTextBackground error: text is not a text object.");
+    return;
+  }
+  if (typeof colorName == UNDEFINED){
+    throw new Error("setTextBackground error: colorName is not defined.");
+    return;
+  }
+  if (!(typeof colorName == "string")){
+    throw new Error("setTextBackground error: colorName is not a string.");
+    return;
+  }
+  if (typeof alpha == UNDEFINED){
+    throw new Error("setTextBackground error: alpha is not defined.");
+    return;
+  }
+  if (isNaN(alpha)){
+    throw new Error("setTextBackground error: Bad alpha parameter.");
+    return;
+  }
+  text.setBackground(colorName, alpha, true);
+}
+
+// removeTextBackground
+// Removes the background of a text object.
+Roygbiv.prototype.removeTextBackground = function(text){
+  if (mode == 0){
+    return;
+  }
+  if (typeof text == UNDEFINED){
+    throw new Error("removeTextBackground error: text is not defined.");
+    return;
+  }
+  if (!text.isAddedText){
+    throw new Error("removeTextBackground error: text is not a text object.");
+    return;
+  }
+  text.removeBackground(true);
 }
 
 // UTILITY FUNCTIONS ***********************************************************
