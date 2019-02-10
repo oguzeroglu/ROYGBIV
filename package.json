@@ -1,0 +1,26 @@
+{
+  "name": "roygbiv",
+  "version": "1.0.0",
+  "description": "A 3D game engine for the Web",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/oguzeroglu/ROYGBIV.git"
+  },
+  "keywords": [
+    "webgl"
+  ],
+  "author": "Oguz Eroglu",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/oguzeroglu/ROYGBIV/issues"
+  },
+  "homepage": "https://github.com/oguzeroglu/ROYGBIV#readme",
+  "dependencies": {
+    "express": "^4.16.4"
+  }
+}
