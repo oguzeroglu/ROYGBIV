@@ -245,6 +245,9 @@ ModeSwitcher.prototype.switchFromDesignToPreview = function(){
   handleViewport();
   for (var txtName in addedTexts){
     addedTexts[txtName].handleResize();
+    if (addedTexts[txtName].isClickable){
+      clickableAddedTexts[txtName] = addedTexts[txtName];
+    }
   }
 }
 
@@ -299,6 +302,7 @@ ModeSwitcher.prototype.switchFromPreviewToDesign = function(){
     var addedText = addedTexts[textName];
     addedText.show();
     addedText.handleResize();
+    delete addedText.clickCallbackFunction;
   }
   collisionCallbackRequests = new Object();
   particleCollisionCallbackRequests = new Object();
@@ -466,6 +470,7 @@ ModeSwitcher.prototype.switchFromPreviewToDesign = function(){
   GLOBAL_FOG_UNIFORM.value.set(-100.0, 0, 0, 0);
   renderer.setViewport(0, 0, canvas.width / screenResolution, canvas.height / screenResolution);
 
+  clickableAddedTexts = new Object();
   this.commonSwitchFunctions();
   for (var txtName in addedTexts){
     var text = addedTexts[txtName];

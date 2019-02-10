@@ -34,9 +34,9 @@ function render(){
     updateObjectTrails();
     updateCrosshair();
   }else{
-    updateAddedTexts();
     cameraOperationsDone = false;
   }
+  updateAddedTexts();
   composer.render(0.1);
   if (mode == 1){
     previewSceneRendered = true;
@@ -46,10 +46,18 @@ function render(){
 
 
 function updateAddedTexts(){
-  for (var addedTextName in addedTexts){
-    var addedText = addedTexts[addedTextName];
-    addedText.handleBoundingBox();
-    rayCaster.updateObject(addedText);
+  if (mode == 0){
+    for (var addedTextName in addedTexts){
+      var addedText = addedTexts[addedTextName];
+      addedText.handleBoundingBox();
+      rayCaster.updateObject(addedText);
+    }
+  }else{
+    for (var addedTextName in clickableAddedTexts){
+      var addedText = addedTexts[addedTextName];
+      addedText.handleBoundingBox();
+      rayCaster.updateObject(addedText);
+    }
   }
 }
 

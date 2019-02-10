@@ -794,6 +794,7 @@ var gridSelections = new Object();
 var materials = new Object();
 var addedObjects = new Object();
 var addedTexts = new Object();
+var clickableAddedTexts = new Object();
 var textures = new Object();
 var textureURLs = new Object();
 var wallCollections = new Object();
@@ -1111,6 +1112,7 @@ var textManipulationBackgroundAlphaController;
 var textManipulationCharacterSizeController;
 var textManipulationCharacterMarginController;
 var textManipulationLineMarginController;
+var textManipulationClickableController;
 var textManipulationParameters = {
   "Text": "textName",
   "Content": "",
@@ -1122,6 +1124,7 @@ var textManipulationParameters = {
   "Char size": 0.0,
   "Char margin": 0.0,
   "Line margin": 0.0,
+  "Clickable": false,
 }
 
 var fogDensityController;

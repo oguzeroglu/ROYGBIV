@@ -72,6 +72,7 @@ var AddedText = function(name, font, text, position, color, alpha, characterSize
 
   this.tmpObj = {};
   this.destroyedGrids = new Object();
+  this.isClickable = false;
 }
 
 AddedText.prototype.destroy = function(){
@@ -158,6 +159,7 @@ AddedText.prototype.export = function(){
   exportObj.backgroundColorB = this.material.uniforms.backgroundColor.value.b;
   exportObj.backgroundAlpha = this.material.uniforms.backgroundAlpha.value;
   exportObj.gsName = this.gsName;
+  exportObj.isClickable = this.isClickable;
   var exportDestroyedGrids = new Object();
   for (var gridName in this.destroyedGrids){
     exportDestroyedGrids[gridName] = this.destroyedGrids[gridName].export();
@@ -332,10 +334,10 @@ AddedText.prototype.handleBoundingBox = function(){
   REUSABLE_VECTOR_3.applyQuaternion(camera.quaternion);
   REUSABLE_VECTOR_4.applyQuaternion(camera.quaternion);
 
-  REUSABLE_VECTOR.add(this.position);
-  REUSABLE_VECTOR_2.add(this.position);
-  REUSABLE_VECTOR_3.add(this.position);
-  REUSABLE_VECTOR_4.add(this.position);
+  REUSABLE_VECTOR.add(this.mesh.position);
+  REUSABLE_VECTOR_2.add(this.mesh.position);
+  REUSABLE_VECTOR_3.add(this.mesh.position);
+  REUSABLE_VECTOR_4.add(this.mesh.position);
 
   this.boundingBox.expandByPoint(REUSABLE_VECTOR);
   this.boundingBox.expandByPoint(REUSABLE_VECTOR_2);

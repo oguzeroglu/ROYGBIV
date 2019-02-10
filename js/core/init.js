@@ -213,6 +213,9 @@ window.onload = function() {
     textManipulationLineMarginController = datGuiTextManipulation.add(textManipulationParameters, "Line margin").min(0.5).max(100).step(0.5).onChange(function(val){
       selectedAddedText.setMarginBetweenLines(val);
     }).listen();
+    textManipulationClickableController = datGuiTextManipulation.add(textManipulationParameters, "Clickable").onChange(function(val){
+      selectedAddedText.isClickable = val;
+    }).listen();
     // DAT GUI OBJECT MANIPULATION
     datGuiObjectManipulation = new dat.GUI();
     omObjController = datGuiObjectManipulation.add(objectManipulationParameters, "Object").listen();
@@ -696,8 +699,10 @@ window.onload = function() {
                  }
                }else if (selectedGrid.createdAddedTextName && !(keyboardBuffer["Shift"])){
                   var addedText = addedTexts[selectedGrid.createdAddedTextName];
-                  terminal.clear();
-                  terminal.printInfo(Text.SELECTED.replace(Text.PARAM1, addedText.name));
+                  if (!defaultCameraControlsDisabled && !isDeployment){
+                    terminal.clear();
+                    terminal.printInfo(Text.SELECTED.replace(Text.PARAM1, addedText.name));
+                  }
                   if (mode == 0){
                     if (selectedAddedObject){
                       selectedAddedObject.mesh.remove(axesHelper);
@@ -715,7 +720,11 @@ window.onload = function() {
                   if (!selectedAddedText.bbHelper){
                     selectedAddedText.handleBoundingBox();
                   }
-                  scene.add(selectedAddedText.bbHelper);
+                  if (mode == 0){
+                    scene.add(selectedAddedText.bbHelper);
+                  }else if (addedText.clickCallbackFunction){
+                    addedText.clickCallbackFunction(addedText.name);
+                  }
                   afterObjectSelection();
                }else{
                  selectedGrid.toggleSelect(false, true);
@@ -734,20 +743,26 @@ window.onload = function() {
                scene.remove(selectedAddedText.bbHelper);
              }
            }
-           terminal.clear();
-           terminal.printInfo(Text.SELECTED.replace(Text.PARAM1, object.name));
+           if (!defaultCameraControlsDisabled && !isDeployment){
+             terminal.clear();
+             terminal.printInfo(Text.SELECTED.replace(Text.PARAM1, object.name));
+           }
            selectedAddedObject = 0;
            selectedObjectGroup = 0;
            selectedAddedText = object;
            if (!selectedAddedText.bbHelper){
              selectedAddedText.handleBoundingBox();
            }
-           scene.add(selectedAddedText.bbHelper);
+           if (mode == 0){
+             scene.add(selectedAddedText.bbHelper);
+          }else if (object.clickCallbackFunction){
+            object.clickCallbackFunction(object.name);
+          }
            afterObjectSelection();
          }
        }else{
          if (!objectSelectedByCommand){
-           if (selectedAddedText && selectedAddedText.bbHelper){
+           if (selectedAddedText && selectedAddedText.bbHelper && mode == 0){
              scene.remove(selectedAddedText.bbHelper);
            }
            selectedAddedObject = 0;
@@ -1153,6 +1168,7 @@ window.addEventListener('keyup', function(event){
    enableController(textManipulationCharacterSizeController);
    enableController(textManipulationCharacterMarginController);
    enableController(textManipulationLineMarginController);
+   enableController(textManipulationClickableController);
  }
 
 function isPhysicsWorkerEnabled(){
@@ -1346,6 +1362,7 @@ function afterTextSelection(){
       disableController(textManipulationBackgroundAlphaController);
     }
     textManipulationParameters["Char size"] = selectedAddedText.characterSize;
+    textManipulationParameters["Clickable"] = selectedAddedText.isClickable;
   }else{
     $(datGuiTextManipulation.domElement).attr("hidden", true);
   }

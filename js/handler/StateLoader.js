@@ -1098,6 +1098,7 @@ StateLoader.prototype.finalize = function(){
       new THREE.Color(curTextExport.colorR, curTextExport.colorG, curTextExport.colorB),
       curTextExport.alpha, curTextExport.charSize, curTextExport.strlen
     );
+    addedTextInstance.isClickable = curTextExport.isClickable;
     addedTextInstance.setBackground(
       "#" + new THREE.Color(curTextExport.backgroundColorR, curTextExport.backgroundColorG, curTextExport.backgroundColorB).getHexString(),
       curTextExport.backgroundAlpha
@@ -2128,6 +2129,7 @@ StateLoader.prototype.resetProject = function(undo){
   materials = new Object();
   addedObjects = new Object();
   addedTexts = new Object();
+  clickableAddedTexts = new Object();
   textures = new Object();
   textureURLs = new Object();
   physicsTests = new Object();

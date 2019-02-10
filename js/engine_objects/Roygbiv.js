@@ -180,7 +180,9 @@ var Roygbiv = function(){
     "setTextAlpha",
     "setTextPosition",
     "setTextBackground",
-    "removeTextBackground"
+    "removeTextBackground",
+    "onTextClick",
+    "removeTextClickListener"
   ];
 
   this.globals = new Object();
@@ -6848,6 +6850,53 @@ Roygbiv.prototype.removeScreenKeyupListener = function(){
     return;
   }
   screenKeyupCallbackFunction = 0;
+}
+
+// onTextClick
+// Sets a click listener for a text object. The callbackFunction is executed
+// with textName parameter when the text object is clicked.
+Roygbiv.prototype.onTextClick = function(text, callbackFunction){
+  if (mode == 0){
+    return;
+  }
+  if (typeof text == UNDEFINED){
+    throw new Error("onTextClick error: text is not defined.");
+    return;
+  }
+  if (!text.isAddedText){
+    throw new Error("onTextClick error: text is not a text object.");
+    return;
+  }
+  if (typeof callbackFunction == UNDEFINED){
+    throw new Error("onTextClick error: callbackFunction is not defined.");
+    return;
+  }
+  if (!(callbackFunction instanceof Function)){
+    throw new Error("onTextClick error: callbackFunction is not a function.");
+    return;
+  }
+  if (!text.isClickable){
+    throw new Error("onTextClick error: text is not marked as clickable.");
+    return;
+  }
+  text.clickCallbackFunction = callbackFunction;
+}
+
+// removeTextClickListener
+// Removes the click listener of a text object.
+Roygbiv.prototype.removeTextClickListener = function(text){
+  if (mode == 0){
+    return;
+  }
+  if (typeof text == UNDEFINED){
+    throw new Error("removeTextClickListener error: text is not defined.");
+    return;
+  }
+  if (!text.isAddedText){
+    throw new Error("removeTextClickListener error: text is not a text object.");
+    return;
+  }
+  text.clickCallbackFunction = 0;
 }
 
 // TEXT FUNCTIONS **************************************************************
