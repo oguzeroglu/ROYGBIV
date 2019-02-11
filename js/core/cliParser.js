@@ -5008,6 +5008,27 @@ function parse(input){
           }
           return true;
         break;
+        case 157: //printTexts
+          terminal.printHeader(Text.TEXTS);
+          var totalTextCount = Object.keys(addedTexts).length;
+          var ctr = 0;
+          for (var textName in addedTexts){
+            ctr ++;
+            var options = true;
+            if (ctr == totalTextCount){
+              options = false;
+            }
+            terminal.printInfo(Text.TREE2.replace(
+              Text.PARAM1, textName
+            ).replace(
+              Text.PARAM2, addedTexts[textName].text
+            ), options);
+          }
+          if (totalTextCount == 0){
+            terminal.printError(Text.NO_TEXTS_CREATED);
+          }
+          return true;
+        break;
       }
       return true;
     }catch(err){

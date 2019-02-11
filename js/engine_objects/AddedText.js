@@ -219,11 +219,13 @@ AddedText.prototype.handleUVUniform = function(){
 AddedText.prototype.setMarginBetweenChars = function(value){
   this.offsetBetweenChars = value;
   this.constructText();
+  this.handleBoundingBox();
 }
 
 AddedText.prototype.setMarginBetweenLines = function(value){
   this.offsetBetweenLines = value;
   this.constructText();
+  this.handleBoundingBox();
 }
 
 AddedText.prototype.setText = function(newText, fromScript){
