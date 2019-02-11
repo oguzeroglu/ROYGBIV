@@ -4,7 +4,7 @@ var Font = function(name, path, onLoaded, onError, customFontFace){
   this.onLoaded = onLoaded;
   this.onError = onError;
   if (!customFontFace){
-    this.fontFace = new FontFace(name, "url("+path+")");
+    this.fontFace = new FontFace(name, "url(./"+path+")");
   }else{
     this.fontFace = customFontFace
     this.generateFontTexture();
