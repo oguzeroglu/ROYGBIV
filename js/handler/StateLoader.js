@@ -1114,6 +1114,12 @@ StateLoader.prototype.finalize = function(){
     addedTextInstance.handleResize();
     addedTextInstance.handleBoundingBox();
     addedTextInstance.gsName = curTextExport.gsName;
+    addedTextInstance.is2D = curTextExport.is2D;
+    if (!(typeof curTextExport.is2DInfoX == UNDEFINED)){
+      addedTextInstance.material.uniforms.isTwoDimensionalInfo.value.set(
+        curTextExport.is2DInfoX, curTextExport.is2DInfoY, curTextExport.is2DInfoZ
+      );
+    }
     var gridSystem = gridSystems[addedTextInstance.gsName];
     if (gridSystem){
       for (var gridName in curTextExport.destroyedGrids){

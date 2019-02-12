@@ -8,6 +8,7 @@ function render(){
 
   GLOBAL_CAMERA_POSITION_UNIFORM.value.copy(camera.position);
   GLOBAL_CAMERA_QUATERNION_UNIFORM.value.copy(camera.quaternion);
+  GLOBAL_VIEWPORT_UNIFORM.value.copy(renderer.getCurrentViewport());
 
   if (!(mode == 1 && defaultCameraControlsDisabled)){
     processKeyboardBuffer();
@@ -49,7 +50,7 @@ function updateAddedTexts(){
   if (mode == 0){
     for (var addedTextName in addedTexts){
       var addedText = addedTexts[addedTextName];
-      if (addedText.needsUpdate()){
+      if (addedText.needsUpdate() && !addedText.is2D){
         addedText.handleBoundingBox();
         rayCaster.updateObject(addedText);
       }
@@ -57,7 +58,7 @@ function updateAddedTexts(){
   }else{
     for (var addedTextName in clickableAddedTexts){
       var addedText = addedTexts[addedTextName];
-      if (addedText.needsUpdate()){
+      if (addedText.needsUpdate() && !addedText.is2D){
         addedText.handleBoundingBox();
         rayCaster.updateObject(addedText);
       }

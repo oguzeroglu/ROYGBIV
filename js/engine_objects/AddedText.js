@@ -1,5 +1,6 @@
 var AddedText = function(name, font, text, position, color, alpha, characterSize, strlenParameter){
   this.isAddedText = true;
+  this.twoDimensionalSize = new THREE.Vector2();
   this.name = name;
   this.font = font;
   this.text = text;
@@ -60,7 +61,9 @@ var AddedText = function(name, font, text, position, color, alpha, characterSize
       yOffsets: new THREE.Uniform(yOffsetsArray),
       affectedByFogFlag: new THREE.Uniform(-50.0),
       fogInfo: GLOBAL_FOG_UNIFORM,
-      cubeTexture: GLOBAL_CUBE_TEXTURE_UNIFORM
+      cubeTexture: GLOBAL_CUBE_TEXTURE_UNIFORM,
+      isTwoDimensionalInfo: new THREE.Uniform(new THREE.Vector3(-500, 0, 0)),
+      currentViewport: GLOBAL_VIEWPORT_UNIFORM
     }
   });
   this.topLeft = new THREE.Vector3(0, 0, 0);
@@ -146,6 +149,9 @@ AddedText.prototype.constructText = function(){
   this.bottomLeft.y = yMin;
   this.topRight.x = xMax;
   this.topRight.y = 0;
+
+  this.twoDimensionalSize.x = (xMax);
+  this.twoDimensionalSize.y = (yMin);
 }
 
 AddedText.prototype.export = function(){
@@ -174,6 +180,10 @@ AddedText.prototype.export = function(){
   exportObj.gsName = this.gsName;
   exportObj.isClickable = this.isClickable;
   exportObj.isAffectedByFog = this.isAffectedByFog;
+  exportObj.is2D = this.is2D;
+  exportObj.is2DInfoX = this.mesh.material.uniforms.isTwoDimensionalInfo.value.x;
+  exportObj.is2DInfoY = this.mesh.material.uniforms.isTwoDimensionalInfo.value.y;
+  exportObj.is2DInfoZ = this.mesh.material.uniforms.isTwoDimensionalInfo.value.z;
   var exportDestroyedGrids = new Object();
   for (var gridName in this.destroyedGrids){
     exportDestroyedGrids[gridName] = this.destroyedGrids[gridName].export();
@@ -447,7 +457,9 @@ AddedText.prototype.show = function(){
     if (!this.boundingBox){
       this.handleBoundingBox();
     }
-    rayCaster.binHandler.insert(this.boundingBox, this.name);
+    if (!this.is2D){
+      rayCaster.binHandler.insert(this.boundingBox, this.name);
+    }
   }
 }
 
@@ -491,5 +503,83 @@ AddedText.prototype.setAffectedByFog = function(val){
     this.material.uniforms.affectedByFogFlag.value = 50.0;
   }else{
     this.material.uniforms.affectedByFogFlag.value = -50.0;
+  }
+}
+
+AddedText.prototype.set2DStatus = function(is2D){
+  if (is2D == this.is2D){
+    return;
+  }
+  this.is2D = is2D;
+  if (is2D){
+    if (typeof this.oldIsClickable == UNDEFINED){
+      this.oldIsClickable = this.isClickable;
+    }
+    this.isClickable = false;
+  }else{
+    this.isClickable = this.oldIsClickable;
+    delete this.oldIsClickable;
+  }
+  if (is2D){
+    selectedAddedText.material.uniforms.isTwoDimensionalInfo.value.x = 500;
+    rayCaster.binHandler.deleteObjectFromBin(this.binInfo, this.name);
+    if (this.bbHelper){
+      scene.remove(this.bbHelper);
+    }
+  }else{
+    selectedAddedText.material.uniforms.isTwoDimensionalInfo.value.x = -500;
+    rayCaster.binHandler.insert(this.boundingBox, this.name);
+    if (this.bbHelper && selectedAddedText && selectedAddedText.name == this.name){
+      scene.add(this.bbHelper);
+    }
+  }
+}
+
+AddedText.prototype.set2DCoordinates = function(isFromLeft, isFromTop, marginPercentWidth, marginPercentHeight){
+  var curViewport = renderer.getCurrentViewport();
+  if (isFromLeft){
+    var tmpX = ((curViewport.z - curViewport.x) / 2.0) + curViewport.x + this.twoDimensionalSize.x;
+    var widthX = (((tmpX - curViewport.x) * 2.0) / curViewport.z) - 1.0;
+    var marginX = (((marginPercentWidth) * (2)) / (100)) -1;
+    var cSizeX = (this.characterSize / (curViewport.z - curViewport.x));
+    marginX += cSizeX;
+    if (marginX + widthX > 1){
+      marginX = 1 - widthX - cSizeX;
+    }
+    this.material.uniforms.isTwoDimensionalInfo.value.y = marginX;
+  }else{
+    marginPercentWidth = marginPercentWidth + 100;
+    var tmpX = ((curViewport.z - curViewport.x) / 2.0) + curViewport.x + this.twoDimensionalSize.x;
+    var widthX = (((tmpX - curViewport.x) * 2.0) / curViewport.z) - 1.0;
+    var marginX = (((marginPercentWidth) * (2)) / (100)) -1;
+    var cSizeX = (this.characterSize / (curViewport.z - curViewport.x));
+    marginX += cSizeX + widthX;
+    marginX = 2 - marginX;
+    if (marginX < -1){
+      marginX = -1 + cSizeX;
+    }
+    this.material.uniforms.isTwoDimensionalInfo.value.y = marginX;
+  }
+  if (isFromTop){
+    marginPercentHeight = 100 - marginPercentHeight;
+    var tmpY = ((curViewport.w - curViewport.y) / 2.0) + curViewport.y + this.twoDimensionalSize.y;
+    var heightY = (((tmpY - curViewport.y) * 2.0) / curViewport.w) - 1.0;
+    var marginY = (((marginPercentHeight) * (2)) / (100)) -1;
+    var cSizeY = (this.characterSize / (curViewport.w - curViewport.y));
+    marginY -= cSizeY;
+    if (marginY + heightY < -1){
+      marginY = -1 + heightY + cSizeY;
+    }
+    this.material.uniforms.isTwoDimensionalInfo.value.z = marginY;
+  }else{
+    var tmpY = ((curViewport.w - curViewport.y) / 2.0) + curViewport.y + this.twoDimensionalSize.y;
+    var heightY = (((tmpY - curViewport.y) * 2.0) / curViewport.w) - 1.0;
+    var marginY = (((marginPercentHeight) * (2)) / (100)) -1;
+    var cSizeY = (this.characterSize / (curViewport.w - curViewport.y));
+    marginY -= cSizeY;
+    if (marginY + heightY < -1){
+      marginY = -1 + heightY + cSizeY;
+    }
+    this.material.uniforms.isTwoDimensionalInfo.value.z = marginY;
   }
 }

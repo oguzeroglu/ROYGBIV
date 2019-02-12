@@ -33,7 +33,9 @@ window.onload = function() {
       for (var textName in addedTexts){
         addedTexts[textName].show();
         if (selectedAddedText && selectedAddedText.name == textName){
-          scene.add(addedTexts[textName].bbHelper);
+          if (!addedTexts[textName].is2D){
+            scene.add(addedTexts[textName].bbHelper);
+          }
         }
       }
     }
@@ -218,6 +220,15 @@ window.onload = function() {
     }).listen();
     textManipulationAffectedByFogController = datGuiTextManipulation.add(textManipulationParameters, "Aff. by fog").onChange(function(val){
       selectedAddedText.setAffectedByFog(val);
+    }).listen();
+    textManipulationIs2DController = datGuiTextManipulation.add(textManipulationParameters, "is 2D").onChange(function(val){
+      selectedAddedText.set2DStatus(val);
+      textManipulationParameters["Clickable"] = selectedAddedText.isClickable;
+      if (val){
+        disableController(textManipulationClickableController);
+      }else{
+        enableController(textManipulationClickableController);
+      }
     }).listen();
     // DAT GUI OBJECT MANIPULATION
     datGuiObjectManipulation = new dat.GUI();
@@ -724,7 +735,9 @@ window.onload = function() {
                     selectedAddedText.handleBoundingBox();
                   }
                   if (mode == 0){
-                    scene.add(selectedAddedText.bbHelper);
+                    if (!selectedAddedText.is2D){
+                      scene.add(selectedAddedText.bbHelper);
+                    }
                   }else if (addedText.clickCallbackFunction){
                     addedText.clickCallbackFunction(addedText.name);
                   }
@@ -757,7 +770,9 @@ window.onload = function() {
              selectedAddedText.handleBoundingBox();
            }
            if (mode == 0){
-             scene.add(selectedAddedText.bbHelper);
+             if (!selectedAddedText.is2D){
+               scene.add(selectedAddedText.bbHelper);
+            }
           }else if (object.clickCallbackFunction){
             object.clickCallbackFunction(object.name);
           }
@@ -822,6 +837,7 @@ window.onload = function() {
   GLOBAL_PROJECTION_UNIFORM.value = camera.projectionMatrix;
   GLOBAL_VIEW_UNIFORM.value = camera.matrixWorldInverse;
   renderer = new THREE.WebGLRenderer({canvas: canvas});
+  GLOBAL_VIEWPORT_UNIFORM.value.copy(renderer.getCurrentViewport());
   if (window.devicePixelRatio > 1){
     screenResolution = 1;
     renderer.setPixelRatio(1);
@@ -991,7 +1007,9 @@ window.addEventListener('keyup', function(event){
         for (var textName in addedTexts){
           addedTexts[textName].show();
           if (selectedAddedText && selectedAddedText.name == textName){
-            scene.add(addedTexts[textName].bbHelper);
+            if (!addedTexts[textName].is2D){
+              scene.add(addedTexts[textName].bbHelper);
+            }
           }
         }
       }
@@ -1173,6 +1191,7 @@ window.addEventListener('keyup', function(event){
    enableController(textManipulationLineMarginController);
    enableController(textManipulationClickableController);
    enableController(textManipulationAffectedByFogController);
+   enableController(textManipulationIs2DController);
  }
 
 function isPhysicsWorkerEnabled(){
@@ -1352,7 +1371,9 @@ function afterTextSelection(){
   if (selectedAddedText){
     enableAllTMControllers();
     $(datGuiTextManipulation.domElement).attr("hidden", false);
-    scene.add(selectedAddedText.bbHelper);
+    if (!selectedAddedText.is2D){
+      scene.add(selectedAddedText.bbHelper);
+    }
     textManipulationParameters["Text"] = selectedAddedText.name;
     textManipulationParameters["Content"] = selectedAddedText.text;
     textManipulationParameters["Text color"] = "#" + selectedAddedText.material.uniforms.color.value.getHexString();
@@ -1363,12 +1384,16 @@ function afterTextSelection(){
     textManipulationParameters["Char margin"] = selectedAddedText.offsetBetweenChars;
     textManipulationParameters["Line margin"] = selectedAddedText.offsetBetweenLines;
     textManipulationParameters["Aff. by fog"] = selectedAddedText.isAffectedByFog;
+    textManipulationParameters["is 2D"] = selectedAddedText.is2D;
     if (!textManipulationParameters["Has bg"]){
       disableController(textManipulationBackgroundColorController);
       disableController(textManipulationBackgroundAlphaController);
     }
     textManipulationParameters["Char size"] = selectedAddedText.characterSize;
     textManipulationParameters["Clickable"] = selectedAddedText.isClickable;
+    if (selectedAddedText.is2D){
+      disableController(textManipulationClickableController);
+    }
   }else{
     $(datGuiTextManipulation.domElement).attr("hidden", true);
   }

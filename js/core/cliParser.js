@@ -4981,7 +4981,9 @@ function parse(input){
           if (!selectedAddedText.bbHelper){
             selectedAddedText.handleBoundingBox();
           }
-          scene.add(selectedAddedText.bbHelper);
+          if (!selectedAddedText.is2D){
+            scene.add(selectedAddedText.bbHelper);
+          }
           afterObjectSelection();
           terminal.printInfo(Text.SELECTED.replace(Text.PARAM1, selectedAddedText.name));
           camera.lookAt(selectedAddedText.mesh.position);

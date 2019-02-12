@@ -17,12 +17,14 @@ RayCaster.prototype.refresh = function(){
     }
     for (var txtName in addedTexts){
       var addedText = addedTexts[txtName];
-      this.binHandler.insert(addedText.boundingBox, txtName);
+      if (!addedText.is2D){
+        this.binHandler.insert(addedText.boundingBox, txtName);
+      }
     }
   }else{
     for (var txtName in addedTexts){
       var addedText = addedTexts[txtName];
-      if (addedText.isClickable){
+      if (addedText.isClickable && !addedText.is2D){
         this.binHandler.insert(addedText.boundingBox, txtName);
       }
     }

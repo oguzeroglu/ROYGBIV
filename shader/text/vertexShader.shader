@@ -10,8 +10,10 @@ attribute float charIndex;
 uniform float charSize;
 uniform float xOffsets[STR_LEN];
 uniform float yOffsets[STR_LEN];
+uniform vec3 isTwoDimensionalInfo;
 uniform vec4 cameraQuaternion;
 uniform vec4 uvRanges[STR_LEN];
+uniform vec4 currentViewport;
 uniform mat4 modelViewMatrix;
 uniform mat4 projectionMatrix;
 uniform mat4 worldMatrix;
@@ -46,6 +48,16 @@ void main(){
   vec3 quaternionApplied = applyQuaternionToVector(pos, cameraQuaternion);
   vWorldPosition = (worldMatrix * vec4(quaternionApplied, 1.0)).xyz;
   vec4 mvPosition = modelViewMatrix * vec4(quaternionApplied, 1.0);
-  gl_PointSize = (500.0) * charSize / length(mvPosition.xyz);
-  gl_Position = projectionMatrix * mvPosition;
+  float isTwoDimensionalFlag = isTwoDimensionalInfo.x;
+  if (isTwoDimensionalFlag < 0.0){
+    gl_Position = projectionMatrix * mvPosition;
+    gl_PointSize = (500.0) * charSize / length(mvPosition.xyz);
+  }else{
+    float oldPosX = ((currentViewport.z - currentViewport.x) / 2.0) + currentViewport.x + xOffset;
+    float oldPosY = ((currentViewport.w - currentViewport.y) / 2.0) + currentViewport.y + yOffset;
+    float x = (((oldPosX - currentViewport.x) * 2.0) / currentViewport.z) - 1.0;
+    float y = (((oldPosY - currentViewport.y) * 2.0) / currentViewport.w) - 1.0;
+    gl_Position = vec4(x + isTwoDimensionalInfo.y, y + isTwoDimensionalInfo.z, 0.0, 1.0);
+    gl_PointSize = charSize;
+  }
 }

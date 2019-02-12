@@ -961,6 +961,7 @@ var GLOBAL_PS_NOT_MERGED_UNIFORM = new THREE.Uniform(-20.0);
 var GLOBAL_CAMERA_POSITION_UNIFORM = new THREE.Uniform(new THREE.Vector3());
 var GLOBAL_CAMERA_QUATERNION_UNIFORM = new THREE.Uniform(new THREE.Quaternion());
 var GLOBAL_CUBE_TEXTURE_UNIFORM = new THREE.Uniform(new THREE.CubeTexture());
+var GLOBAL_VIEWPORT_UNIFORM = new THREE.Uniform(new THREE.Vector4());
 var GLOBAL_SKYBOX_ALPHA_UNIFORM = new THREE.Uniform(1.0);
 var VERTEX_SHADER_TEXTURE_FETCH_SUPPORTED;
 var DDS_SUPPORTED;
@@ -1118,6 +1119,7 @@ var textManipulationCharacterMarginController;
 var textManipulationLineMarginController;
 var textManipulationClickableController;
 var textManipulationAffectedByFogController;
+var textManipulationIs2DController;
 var textManipulationParameters = {
   "Text": "textName",
   "Content": "",
@@ -1131,6 +1133,7 @@ var textManipulationParameters = {
   "Line margin": 0.0,
   "Clickable": false,
   "Aff. by fog": false,
+  "is 2D": false
 }
 
 var fogDensityController;
