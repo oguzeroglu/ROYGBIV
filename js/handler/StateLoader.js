@@ -1120,6 +1120,11 @@ StateLoader.prototype.finalize = function(){
         curTextExport.is2DInfoX, curTextExport.is2DInfoY, curTextExport.is2DInfoZ
       );
     }
+    if (!(typeof curTextExport.marginMode == UNDEFINED)){
+      addedTextInstance.marginMode = curTextExport.marginMode;
+      addedTextInstance.marginPercentWidth = curTextExport.marginPercentWidth;
+      addedTextInstance.marginPercentHeight = curTextExport.marginPercentHeight;
+    }
     var gridSystem = gridSystems[addedTextInstance.gsName];
     if (gridSystem){
       for (var gridName in curTextExport.destroyedGrids){

@@ -89,6 +89,9 @@ var AddedText = function(name, font, text, position, color, alpha, characterSize
   this.reusableVector = new THREE.Vector3();
   this.makeFirstUpdate = true;
   this.isAffectedByFog = false;
+  this.marginMode = MARGIN_MODE_2D_TEXT_TOP_LEFT;
+  this.marginPercentWidth = 50;
+  this.marginPercentHeight = 50;
 }
 
 AddedText.prototype.destroy = function(){
@@ -184,6 +187,9 @@ AddedText.prototype.export = function(){
   exportObj.is2DInfoX = this.mesh.material.uniforms.isTwoDimensionalInfo.value.x;
   exportObj.is2DInfoY = this.mesh.material.uniforms.isTwoDimensionalInfo.value.y;
   exportObj.is2DInfoZ = this.mesh.material.uniforms.isTwoDimensionalInfo.value.z;
+  exportObj.marginMode = this.marginMode;
+  exportObj.marginPercentWidth = this.marginPercentWidth;
+  exportObj.marginPercentHeight = this.marginPercentHeight;
   var exportDestroyedGrids = new Object();
   for (var gridName in this.destroyedGrids){
     exportDestroyedGrids[gridName] = this.destroyedGrids[gridName].export();
@@ -229,13 +235,22 @@ AddedText.prototype.handleUVUniform = function(){
 AddedText.prototype.setMarginBetweenChars = function(value){
   this.offsetBetweenChars = value;
   this.constructText();
-  this.handleBoundingBox();
+  if (this.is2D){
+    this.refCharOffset = value;
+    this.set2DCoordinates(this.marginPercentWidth, this.marginPercentHeight);
+  }else{
+    this.handleBoundingBox();
+  }
 }
 
 AddedText.prototype.setMarginBetweenLines = function(value){
   this.offsetBetweenLines = value;
   this.constructText();
-  this.handleBoundingBox();
+  if (this.is2D){
+    this.set2DCoordinates(this.marginPercentWidth, this.marginPercentHeight);
+  }else{
+    this.handleBoundingBox();
+  }
 }
 
 AddedText.prototype.setText = function(newText, fromScript){
@@ -245,7 +260,11 @@ AddedText.prototype.setText = function(newText, fromScript){
   this.text = newText;
   this.constructText();
   this.handleUVUniform();
-  this.handleBoundingBox();
+  if (this.is2D){
+    this.set2DCoordinates(this.marginPercentWidth, this.marginPercentHeight);
+  }else{
+    this.handleBoundingBox();
+  }
 }
 
 AddedText.prototype.setColor = function(colorString, fromScript){
@@ -300,12 +319,23 @@ AddedText.prototype.removeBackground = function(fromScript){
 AddedText.prototype.setCharSize = function(value){
   this.material.uniforms.charSize.value = value;
   this.characterSize = value;
-  this.handleBoundingBox();
+  if (this.is2D){
+    this.set2DCoordinates(this.marginPercentWidth, this.marginPercentHeight);
+  }else{
+    this.handleBoundingBox();
+  }
 }
 
 AddedText.prototype.handleResize = function(){
   this.setCharSize(this.refCharSize * ((renderer.getCurrentViewport().w / screenResolution)/this.refInnerHeight));
-  this.handleBoundingBox();
+  if (this.is2D){
+    if (typeof this.refCharOffset == UNDEFINED){
+      this.refCharOffset = this.offsetBetweenChars;
+    }
+    this.offsetBetweenChars = this.refCharOffset * ((renderer.getCurrentViewport().w)/this.refInnerHeight);
+    this.constructText();
+    this.set2DCoordinates(this.marginPercentWidth, this.marginPercentHeight);
+  }
 }
 
 AddedText.prototype.calculateCharSize = function(){
@@ -340,6 +370,9 @@ AddedText.prototype.getCenterCoordinates = function(){
 }
 
 AddedText.prototype.handleBoundingBox = function(){
+  if (this.is2D){
+    return;
+  }
   if (!this.boundingBox){
     this.boundingBox = new THREE.Box3();
     this.bbHelper = new THREE.Box3Helper(this.boundingBox);
@@ -512,6 +545,7 @@ AddedText.prototype.set2DStatus = function(is2D){
   }
   this.is2D = is2D;
   if (is2D){
+    this.set2DCoordinates(this.marginPercentWidth, this.marginPercentHeight);
     if (typeof this.oldIsClickable == UNDEFINED){
       this.oldIsClickable = this.isClickable;
     }
@@ -519,6 +553,10 @@ AddedText.prototype.set2DStatus = function(is2D){
   }else{
     this.isClickable = this.oldIsClickable;
     delete this.oldIsClickable;
+    if (!(typeof this.refCharOffset == UNDEFINED)){
+      this.setMarginBetweenChars(this.refCharOffset);
+      delete this.refCharOffset;
+    }
   }
   if (is2D){
     selectedAddedText.material.uniforms.isTwoDimensionalInfo.value.x = 500;
@@ -535,8 +573,19 @@ AddedText.prototype.set2DStatus = function(is2D){
   }
 }
 
-AddedText.prototype.set2DCoordinates = function(isFromLeft, isFromTop, marginPercentWidth, marginPercentHeight){
-  var curViewport = renderer.getCurrentViewport();
+AddedText.prototype.set2DCoordinates = function(marginPercentWidth, marginPercentHeight){
+  this.marginPercentWidth = marginPercentWidth;
+  this.marginPercentHeight = marginPercentHeight;
+  var isFromLeft = false, isFromTop = false;
+  if (this.marginMode == MARGIN_MODE_2D_TEXT_TOP_LEFT){
+    isFromLeft = true;
+    isFromTop = true;
+  }
+  var curViewport = REUSABLE_QUATERNION.copy(renderer.getCurrentViewport());
+  curViewport.x = curViewport.x / screenResolution;
+  curViewport.y = curViewport.y / screenResolution;
+  curViewport.z = curViewport.z / screenResolution;
+  curViewport.w = curViewport.w / screenResolution;
   if (isFromLeft){
     var tmpX = ((curViewport.z - curViewport.x) / 2.0) + curViewport.x + this.twoDimensionalSize.x;
     var widthX = (((tmpX - curViewport.x) * 2.0) / curViewport.z) - 1.0;
@@ -568,7 +617,7 @@ AddedText.prototype.set2DCoordinates = function(isFromLeft, isFromTop, marginPer
     var cSizeY = (this.characterSize / (curViewport.w - curViewport.y));
     marginY -= cSizeY;
     if (marginY + heightY < -1){
-      marginY = -1 + heightY + cSizeY;
+      marginY = -1 - heightY + cSizeY;
     }
     this.material.uniforms.isTwoDimensionalInfo.value.z = marginY;
   }else{
@@ -578,7 +627,7 @@ AddedText.prototype.set2DCoordinates = function(isFromLeft, isFromTop, marginPer
     var cSizeY = (this.characterSize / (curViewport.w - curViewport.y));
     marginY -= cSizeY;
     if (marginY + heightY < -1){
-      marginY = -1 + heightY + cSizeY;
+      marginY = -1 - heightY + cSizeY;
     }
     this.material.uniforms.isTwoDimensionalInfo.value.z = marginY;
   }

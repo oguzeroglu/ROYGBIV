@@ -226,9 +226,38 @@ window.onload = function() {
       textManipulationParameters["Clickable"] = selectedAddedText.isClickable;
       if (val){
         disableController(textManipulationClickableController);
+        enableController(textManipulationMarginModeController);
+        enableController(textManipulationMarginXController);
+        enableController(textManipulationMarginYController);
+        selectedAddedText.set2DCoordinates(
+          selectedAddedText.marginPercentWidth, selectedAddedText.marginPercentHeight
+        );
       }else{
         enableController(textManipulationClickableController);
+        disableController(textManipulationMarginModeController);
+        disableController(textManipulationMarginXController);
+        disableController(textManipulationMarginYController);
       }
+    }).listen();
+    textManipulationMarginModeController = datGuiTextManipulation.add(textManipulationParameters, "Margin mode", ["Top/Left", "Bottom/Right"]).onChange(function(val){
+      if (val == "Top/Left"){
+        selectedAddedText.marginMode = MARGIN_MODE_2D_TEXT_TOP_LEFT;
+      }else{
+        selectedAddedText.marginMode = MARGIN_MODE_2D_TEXT_BOTTOM_RIGHT;
+      }
+      selectedAddedText.set2DCoordinates(
+        selectedAddedText.marginPercentWidth, selectedAddedText.marginPercentHeight
+      );
+    }).listen();
+    textManipulationMarginXController = datGuiTextManipulation.add(textManipulationParameters, "Margin X").min(0).max(100).step(0.1).onChange(function(val){
+      selectedAddedText.set2DCoordinates(
+        val, selectedAddedText.marginPercentHeight
+      );
+    }).listen();
+    textManipulationMarginYController = datGuiTextManipulation.add(textManipulationParameters, "Margin Y").min(0).max(100).step(0.1).onChange(function(val){
+      selectedAddedText.set2DCoordinates(
+        selectedAddedText.marginPercentWidth, val
+      );
     }).listen();
     // DAT GUI OBJECT MANIPULATION
     datGuiObjectManipulation = new dat.GUI();
@@ -1192,6 +1221,9 @@ window.addEventListener('keyup', function(event){
    enableController(textManipulationClickableController);
    enableController(textManipulationAffectedByFogController);
    enableController(textManipulationIs2DController);
+   enableController(textManipulationMarginModeController);
+   enableController(textManipulationMarginXController);
+   enableController(textManipulationMarginYController);
  }
 
 function isPhysicsWorkerEnabled(){
@@ -1391,8 +1423,17 @@ function afterTextSelection(){
     }
     textManipulationParameters["Char size"] = selectedAddedText.characterSize;
     textManipulationParameters["Clickable"] = selectedAddedText.isClickable;
+    if (selectedAddedText.marginMode == MARGIN_MODE_2D_TEXT_TOP_LEFT){
+      textManipulationParameters["Margin mode"] = "Top/Left";
+    }else{
+      textManipulationParameters["Margin mode"] = "Bottom/Right";
+    }
     if (selectedAddedText.is2D){
       disableController(textManipulationClickableController);
+    }else{
+      disableController(textManipulationMarginModeController);
+      disableController(textManipulationMarginXController);
+      disableController(textManipulationMarginYController);
     }
   }else{
     $(datGuiTextManipulation.domElement).attr("hidden", true);

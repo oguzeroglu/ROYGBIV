@@ -43,7 +43,7 @@ Terminal.prototype.init = function(){
 	this.prompt = document.getElementsByClassName("prompt")[0];
 	this.cursor = document.getElementsByClassName("cursor-line")[0];
 	this.clear();
-	this.printInfo(Text.LOADING_SHADERS);
+	this.printInfo("Loading shaders");
 	canvas.style.visibility = "hidden";
 	this.disable();
 }

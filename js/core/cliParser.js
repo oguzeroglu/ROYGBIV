@@ -4075,6 +4075,9 @@ function parse(input){
           }
           screenResolution = resolutionParam;
           renderer.setPixelRatio(screenResolution);
+          for (var textName in addedTexts){
+            addedTexts[textName].handleResize();
+          }
           terminal.printInfo(Text.RESOLUTION_SET);
           return true;
         break;

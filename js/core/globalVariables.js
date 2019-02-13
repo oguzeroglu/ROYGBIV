@@ -1024,6 +1024,8 @@ var fonts = new Object();
 var MAX_TEXT_CHAR_COUNT = 64;
 var DEFAULT_OFFSET_BETWEEN_CHARS = 20;
 var DEFAULT_OFFSET_BETWEEN_LINES = 20;
+var MARGIN_MODE_2D_TEXT_TOP_LEFT = 0;
+var MARGIN_MODE_2D_TEXT_BOTTOM_RIGHT = 1;
 
 // WORKER VARIABLES
 var WORKERS_SUPPORTED = (typeof(Worker) !== "undefined");
@@ -1120,6 +1122,9 @@ var textManipulationLineMarginController;
 var textManipulationClickableController;
 var textManipulationAffectedByFogController;
 var textManipulationIs2DController;
+var textManipulationMarginModeController;
+var textManipulationMarginXController;
+var textManipulationMarginYController;
 var textManipulationParameters = {
   "Text": "textName",
   "Content": "",
@@ -1133,7 +1138,10 @@ var textManipulationParameters = {
   "Line margin": 0.0,
   "Clickable": false,
   "Aff. by fog": false,
-  "is 2D": false
+  "is 2D": false,
+  "Margin mode": "Top/Left",
+  "Margin X": 50.0,
+  "Margin Y": 50.0
 }
 
 var fogDensityController;
