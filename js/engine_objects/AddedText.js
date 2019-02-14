@@ -581,11 +581,7 @@ AddedText.prototype.set2DCoordinates = function(marginPercentWidth, marginPercen
     isFromLeft = true;
     isFromTop = true;
   }
-  var curViewport = REUSABLE_QUATERNION.copy(GLOBAL_ADDEDTEXT_VIEWPORT_UNIFORM.value);
-  curViewport.x = curViewport.x / screenResolution;
-  curViewport.y = curViewport.y / screenResolution;
-  curViewport.z = curViewport.z / screenResolution;
-  curViewport.w = curViewport.w / screenResolution;
+  var curViewport = REUSABLE_QUATERNION.set(0, 0, window.innerWidth, window.innerHeight);
   if (isFromLeft){
     var tmpX = ((curViewport.z - curViewport.x) / 2.0) + curViewport.x + this.twoDimensionalSize.x;
     var widthX = (((tmpX - curViewport.x) * 2.0) / curViewport.z) - 1.0;
