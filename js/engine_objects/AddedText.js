@@ -63,7 +63,7 @@ var AddedText = function(name, font, text, position, color, alpha, characterSize
       fogInfo: GLOBAL_FOG_UNIFORM,
       cubeTexture: GLOBAL_CUBE_TEXTURE_UNIFORM,
       isTwoDimensionalInfo: new THREE.Uniform(new THREE.Vector3(-500, 0, 0)),
-      currentViewport: GLOBAL_VIEWPORT_UNIFORM
+      currentViewport: GLOBAL_ADDEDTEXT_VIEWPORT_UNIFORM
     }
   });
   this.topLeft = new THREE.Vector3(0, 0, 0);
@@ -581,7 +581,7 @@ AddedText.prototype.set2DCoordinates = function(marginPercentWidth, marginPercen
     isFromLeft = true;
     isFromTop = true;
   }
-  var curViewport = REUSABLE_QUATERNION.copy(renderer.getCurrentViewport());
+  var curViewport = REUSABLE_QUATERNION.copy(GLOBAL_ADDEDTEXT_VIEWPORT_UNIFORM.value);
   curViewport.x = curViewport.x / screenResolution;
   curViewport.y = curViewport.y / screenResolution;
   curViewport.z = curViewport.z / screenResolution;

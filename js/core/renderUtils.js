@@ -8,7 +8,6 @@ function render(){
 
   GLOBAL_CAMERA_POSITION_UNIFORM.value.copy(camera.position);
   GLOBAL_CAMERA_QUATERNION_UNIFORM.value.copy(camera.quaternion);
-  GLOBAL_VIEWPORT_UNIFORM.value.copy(renderer.getCurrentViewport());
 
   if (!(mode == 1 && defaultCameraControlsDisabled)){
     processKeyboardBuffer();
