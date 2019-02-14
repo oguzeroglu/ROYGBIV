@@ -1423,6 +1423,8 @@ function afterTextSelection(){
     }
     textManipulationParameters["Char size"] = selectedAddedText.characterSize;
     textManipulationParameters["Clickable"] = selectedAddedText.isClickable;
+    textManipulationParameters["Margin X"] = selectedAddedText.marginPercentWidth;
+    textManipulationParameters["Margin Y"] = selectedAddedText.marginPercentHeight;
     if (selectedAddedText.marginMode == MARGIN_MODE_2D_TEXT_TOP_LEFT){
       textManipulationParameters["Margin mode"] = "Top/Left";
     }else{
