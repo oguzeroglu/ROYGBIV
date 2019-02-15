@@ -558,6 +558,7 @@ AddedText.prototype.set2DStatus = function(is2D){
       this.oldIsClickable = this.isClickable;
     }
     this.isClickable = false;
+    addedTexts2D[this.name] = this;
   }else{
     this.isClickable = this.oldIsClickable;
     delete this.oldIsClickable;
@@ -565,6 +566,7 @@ AddedText.prototype.set2DStatus = function(is2D){
       this.setMarginBetweenChars(this.refCharOffset);
       delete this.refCharOffset;
     }
+    delete addedTexts2D[this.name];
   }
   if (is2D){
     selectedAddedText.material.uniforms.isTwoDimensionalInfo.value.x = 500;

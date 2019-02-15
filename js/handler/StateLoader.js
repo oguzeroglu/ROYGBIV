@@ -1146,6 +1146,9 @@ StateLoader.prototype.finalize = function(){
     }
     addedTexts[textName] = addedTextInstance;
     addedTextInstance.handleResize();
+    if (addedTextInstance.is2D){
+      addedTexts2D[addedTextInstance.name] = addedTextInstance;
+    }
   }
 
   // OBJECT GROUPS *************************************************
@@ -2145,6 +2148,7 @@ StateLoader.prototype.resetProject = function(undo){
   materials = new Object();
   addedObjects = new Object();
   addedTexts = new Object();
+  addedTexts2D = new Object();
   clickableAddedTexts = new Object();
   textures = new Object();
   textureURLs = new Object();

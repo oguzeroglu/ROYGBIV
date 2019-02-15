@@ -101,6 +101,9 @@ window.onload = function() {
   // RAYCASTER
   rayCaster = new RayCaster();
 
+  // OBJECT PICKER 2D
+  objectPicker2D = new ObjectPicker2D();
+
   // MODE SWITCHER
   modeSwitcher = new ModeSwitcher();
 
@@ -223,9 +226,7 @@ window.onload = function() {
     }).listen();
     textManipulationIs2DController = datGuiTextManipulation.add(textManipulationParameters, "is 2D").onChange(function(val){
       selectedAddedText.set2DStatus(val);
-      textManipulationParameters["Clickable"] = selectedAddedText.isClickable;
       if (val){
-        disableController(textManipulationClickableController);
         enableController(textManipulationMarginModeController);
         enableController(textManipulationMarginXController);
         enableController(textManipulationMarginYController);
@@ -233,7 +234,6 @@ window.onload = function() {
           selectedAddedText.marginPercentWidth, selectedAddedText.marginPercentHeight
         );
       }else{
-        enableController(textManipulationClickableController);
         disableController(textManipulationMarginModeController);
         disableController(textManipulationMarginXController);
         disableController(textManipulationMarginYController);
@@ -607,10 +607,12 @@ window.onload = function() {
       if (event.clientX < rectX || event.clientX > rectX + rectZ || event.clientY < rectY || event.clientY > rectY + rectW){
         return;
       }
+      // TRY TO PICK 2D OBJECTS FIRST
+      objectPicker2D.find(event.clientX, window.innerHeight - event.clientY);
       REUSABLE_VECTOR.setFromMatrixPosition(camera.matrixWorld);
       REUSABLE_VECTOR_2.set(coordX, coordY, 0.5).unproject(camera).sub(REUSABLE_VECTOR).normalize();
-       rayCaster.findIntersections(REUSABLE_VECTOR, REUSABLE_VECTOR_2, (mode == 0));
-       if (intersectionPoint){
+      rayCaster.findIntersections(REUSABLE_VECTOR, REUSABLE_VECTOR_2, (mode == 0));
+      if (intersectionPoint){
          var object = addedObjects[intersectionObject];
          if (!object){
            object = objectGroups[intersectionObject];
@@ -807,7 +809,7 @@ window.onload = function() {
           }
            afterObjectSelection();
          }
-       }else{
+      }else{
          if (!objectSelectedByCommand){
            if (selectedAddedText && selectedAddedText.bbHelper && mode == 0){
              scene.remove(selectedAddedText.bbHelper);
@@ -817,7 +819,7 @@ window.onload = function() {
            selectedAddedText = 0;
            afterObjectSelection();
          }
-       }
+      }
     }
   });
 
