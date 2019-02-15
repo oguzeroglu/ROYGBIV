@@ -1,6 +1,8 @@
 var AddedText = function(name, font, text, position, color, alpha, characterSize, strlenParameter){
   this.isAddedText = true;
-  this.twoDimensionalSize = new THREE.Vector2();
+  this.twoDimensionalParameters = new THREE.Vector2();
+  this.twoDimensionalSize = new THREE.Vector4();
+  this.webglSpaceSize = new THREE.Vector2();
   this.name = name;
   this.font = font;
   this.text = text;
@@ -153,8 +155,11 @@ AddedText.prototype.constructText = function(){
   this.topRight.x = xMax;
   this.topRight.y = 0;
 
-  this.twoDimensionalSize.x = (xMax / screenResolution);
-  this.twoDimensionalSize.y = (yMin / screenResolution);
+  this.xMax = xMax;
+  this.yMin = yMin;
+
+  this.twoDimensionalParameters.x = (xMax / screenResolution);
+  this.twoDimensionalParameters.y = (yMin / screenResolution);
 }
 
 AddedText.prototype.export = function(){
@@ -586,10 +591,11 @@ AddedText.prototype.set2DCoordinates = function(marginPercentWidth, marginPercen
   }
   var curViewport = REUSABLE_QUATERNION.set(0, 0, window.innerWidth, window.innerHeight);
   if (isFromLeft){
-    var tmpX = ((curViewport.z - curViewport.x) / 2.0) + curViewport.x + this.twoDimensionalSize.x;
+    var tmpX = ((curViewport.z - curViewport.x) / 2.0) + curViewport.x + this.twoDimensionalParameters.x;
     var widthX = (((tmpX - curViewport.x) * 2.0) / curViewport.z) - 1.0;
     var marginX = (((marginPercentWidth) * (2)) / (100)) -1;
     var cSizeX = (this.characterSize / (renderer.getCurrentViewport().z / screenResolution));
+    this.cSizeX = cSizeX;
     marginX += cSizeX;
     if (marginX + widthX > 1){
       marginX = 1 - widthX - cSizeX;
@@ -597,10 +603,11 @@ AddedText.prototype.set2DCoordinates = function(marginPercentWidth, marginPercen
     this.material.uniforms.isTwoDimensionalInfo.value.y = marginX;
   }else{
     marginPercentWidth = marginPercentWidth + 100;
-    var tmpX = ((curViewport.z - curViewport.x) / 2.0) + curViewport.x + this.twoDimensionalSize.x;
+    var tmpX = ((curViewport.z - curViewport.x) / 2.0) + curViewport.x + this.twoDimensionalParameters.x;
     var widthX = (((tmpX - curViewport.x) * 2.0) / curViewport.z) - 1.0;
     var marginX = (((marginPercentWidth) * (2)) / (100)) -1;
     var cSizeX = (this.characterSize / (renderer.getCurrentViewport().z / screenResolution));
+    this.cSizeX = cSizeX;
     marginX += cSizeX + widthX;
     marginX = 2 - marginX;
     if (marginX < -1){
@@ -610,24 +617,55 @@ AddedText.prototype.set2DCoordinates = function(marginPercentWidth, marginPercen
   }
   if (isFromTop){
     marginPercentHeight = 100 - marginPercentHeight;
-    var tmpY = ((curViewport.w - curViewport.y) / 2.0) + curViewport.y + this.twoDimensionalSize.y;
+    var tmpY = ((curViewport.w - curViewport.y) / 2.0) + curViewport.y + this.twoDimensionalParameters.y;
     var heightY = (((tmpY - curViewport.y) * 2.0) / curViewport.w) - 1.0;
     var marginY = (((marginPercentHeight) * (2)) / (100)) -1;
     var cSizeY = (this.characterSize / (renderer.getCurrentViewport().w / screenResolution));
+    this.cSizeY = cSizeY;
     marginY -= cSizeY;
     if (marginY + heightY < -1){
       marginY = -1 - heightY + cSizeY;
     }
     this.material.uniforms.isTwoDimensionalInfo.value.z = marginY;
   }else{
-    var tmpY = ((curViewport.w - curViewport.y) / 2.0) + curViewport.y + this.twoDimensionalSize.y;
+    var tmpY = ((curViewport.w - curViewport.y) / 2.0) + curViewport.y + this.twoDimensionalParameters.y;
     var heightY = (((tmpY - curViewport.y) * 2.0) / curViewport.w) - 1.0;
     var marginY = (((marginPercentHeight) * (2)) / (100)) -1;
     var cSizeY = (this.characterSize / (renderer.getCurrentViewport().w / screenResolution));
+    this.cSizeY = cSizeY;
     marginY -= cSizeY;
     if (marginY + heightY < -1){
       marginY = -1 - heightY + cSizeY;
     }
     this.material.uniforms.isTwoDimensionalInfo.value.z = marginY;
+  }
+
+  // CONVERTED FROM TEXT VERTEX SHADER CODE
+  var oldPosX = ((GLOBAL_ADDEDTEXT_VIEWPORT_UNIFORM.value.z - GLOBAL_ADDEDTEXT_VIEWPORT_UNIFORM.value.x) / 2.0) + GLOBAL_ADDEDTEXT_VIEWPORT_UNIFORM.value.x + this.xMax;
+  var oldPosY = ((GLOBAL_ADDEDTEXT_VIEWPORT_UNIFORM.value.w - GLOBAL_ADDEDTEXT_VIEWPORT_UNIFORM.value.y) / 2.0) + GLOBAL_ADDEDTEXT_VIEWPORT_UNIFORM.value.y + this.yMin;
+  var x = (((oldPosX - GLOBAL_ADDEDTEXT_VIEWPORT_UNIFORM.value.x) * 2.0) / GLOBAL_ADDEDTEXT_VIEWPORT_UNIFORM.value.z) - 1.0;
+  var y = (((oldPosY - GLOBAL_ADDEDTEXT_VIEWPORT_UNIFORM.value.y) * 2.0) / GLOBAL_ADDEDTEXT_VIEWPORT_UNIFORM.value.w) - 1.0;
+  this.twoDimensionalSize.z = x + this.material.uniforms.isTwoDimensionalInfo.value.y + this.cSizeX;
+  this.twoDimensionalSize.w = y + this.material.uniforms.isTwoDimensionalInfo.value.z - this.cSizeY;
+  oldPosX = ((GLOBAL_ADDEDTEXT_VIEWPORT_UNIFORM.value.z - GLOBAL_ADDEDTEXT_VIEWPORT_UNIFORM.value.x) / 2.0) + GLOBAL_ADDEDTEXT_VIEWPORT_UNIFORM.value.x;
+  oldPosY = ((GLOBAL_ADDEDTEXT_VIEWPORT_UNIFORM.value.w - GLOBAL_ADDEDTEXT_VIEWPORT_UNIFORM.value.y) / 2.0) + GLOBAL_ADDEDTEXT_VIEWPORT_UNIFORM.value.y;
+  x = (((oldPosX - GLOBAL_ADDEDTEXT_VIEWPORT_UNIFORM.value.x) * 2.0) / GLOBAL_ADDEDTEXT_VIEWPORT_UNIFORM.value.z) - 1.0;
+  y = (((oldPosY - GLOBAL_ADDEDTEXT_VIEWPORT_UNIFORM.value.y) * 2.0) / GLOBAL_ADDEDTEXT_VIEWPORT_UNIFORM.value.w) - 1.0;
+  this.twoDimensionalSize.x = x + this.material.uniforms.isTwoDimensionalInfo.value.y - this.cSizeX;
+  this.twoDimensionalSize.y = y + this.material.uniforms.isTwoDimensionalInfo.value.z + this.cSizeY;
+  this.webglSpaceSize.set(
+    this.twoDimensionalSize.z - this.twoDimensionalSize.x,
+    this.twoDimensionalSize.y - this.twoDimensionalSize.w
+  );
+}
+
+AddedText.prototype.debugCornerPoints = function(representativeCharacter, cornerIndex){
+  this.handleResize();
+  if (cornerIndex == 0){
+    representativeCharacter.material.uniforms.isTwoDimensionalInfo.value.y = this.twoDimensionalSize.x;
+    representativeCharacter.material.uniforms.isTwoDimensionalInfo.value.z = this.twoDimensionalSize.y;
+  }else{
+    representativeCharacter.material.uniforms.isTwoDimensionalInfo.value.y = this.twoDimensionalSize.z;
+    representativeCharacter.material.uniforms.isTwoDimensionalInfo.value.z = this.twoDimensionalSize.w;
   }
 }

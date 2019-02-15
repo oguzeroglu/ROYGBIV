@@ -1111,7 +1111,6 @@ StateLoader.prototype.finalize = function(){
     addedTextInstance.setMarginBetweenLines(curTextExport.offsetBetweenLines);
     addedTextInstance.refCharSize = curTextExport.refCharSize;
     addedTextInstance.refInnerHeight = curTextExport.refInnerHeight;
-    addedTextInstance.handleResize();
     addedTextInstance.handleBoundingBox();
     addedTextInstance.gsName = curTextExport.gsName;
     addedTextInstance.is2D = curTextExport.is2D;
@@ -1124,6 +1123,12 @@ StateLoader.prototype.finalize = function(){
       addedTextInstance.marginMode = curTextExport.marginMode;
       addedTextInstance.marginPercentWidth = curTextExport.marginPercentWidth;
       addedTextInstance.marginPercentHeight = curTextExport.marginPercentHeight;
+      if (addedTextInstance.is2D){
+          addedTextInstance.set2DCoordinates(
+            addedTextInstance.marginPercentWidth,
+            addedTextInstance.marginPercentHeight
+          );
+      }
     }
     var gridSystem = gridSystems[addedTextInstance.gsName];
     if (gridSystem){
@@ -1140,6 +1145,7 @@ StateLoader.prototype.finalize = function(){
       }
     }
     addedTexts[textName] = addedTextInstance;
+    addedTextInstance.handleResize();
   }
 
   // OBJECT GROUPS *************************************************
