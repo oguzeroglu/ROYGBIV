@@ -333,6 +333,9 @@ AddedText.prototype.handleResize = function(){
       this.refCharOffset = this.offsetBetweenChars;
     }
     this.offsetBetweenChars = this.refCharOffset * ((renderer.getCurrentViewport().w)/this.refInnerHeight);
+    if (renderer.getCurrentViewport().z / screenResolution < window.innerWidth){
+       this.offsetBetweenChars = this.offsetBetweenChars * (window.innerWidth / (renderer.getCurrentViewport().z / screenResolution));
+     }
     this.constructText();
     this.set2DCoordinates(this.marginPercentWidth, this.marginPercentHeight);
   }
