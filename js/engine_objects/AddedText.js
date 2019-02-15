@@ -589,7 +589,7 @@ AddedText.prototype.set2DCoordinates = function(marginPercentWidth, marginPercen
     var tmpX = ((curViewport.z - curViewport.x) / 2.0) + curViewport.x + this.twoDimensionalSize.x;
     var widthX = (((tmpX - curViewport.x) * 2.0) / curViewport.z) - 1.0;
     var marginX = (((marginPercentWidth) * (2)) / (100)) -1;
-    var cSizeX = (this.characterSize / (curViewport.z - curViewport.x));
+    var cSizeX = (this.characterSize / (renderer.getCurrentViewport().z / screenResolution));
     marginX += cSizeX;
     if (marginX + widthX > 1){
       marginX = 1 - widthX - cSizeX;
@@ -600,7 +600,7 @@ AddedText.prototype.set2DCoordinates = function(marginPercentWidth, marginPercen
     var tmpX = ((curViewport.z - curViewport.x) / 2.0) + curViewport.x + this.twoDimensionalSize.x;
     var widthX = (((tmpX - curViewport.x) * 2.0) / curViewport.z) - 1.0;
     var marginX = (((marginPercentWidth) * (2)) / (100)) -1;
-    var cSizeX = (this.characterSize / (curViewport.z - curViewport.x));
+    var cSizeX = (this.characterSize / (renderer.getCurrentViewport().z / screenResolution));
     marginX += cSizeX + widthX;
     marginX = 2 - marginX;
     if (marginX < -1){
@@ -613,7 +613,7 @@ AddedText.prototype.set2DCoordinates = function(marginPercentWidth, marginPercen
     var tmpY = ((curViewport.w - curViewport.y) / 2.0) + curViewport.y + this.twoDimensionalSize.y;
     var heightY = (((tmpY - curViewport.y) * 2.0) / curViewport.w) - 1.0;
     var marginY = (((marginPercentHeight) * (2)) / (100)) -1;
-    var cSizeY = (this.characterSize / (curViewport.w - curViewport.y));
+    var cSizeY = (this.characterSize / (renderer.getCurrentViewport().w / screenResolution));
     marginY -= cSizeY;
     if (marginY + heightY < -1){
       marginY = -1 - heightY + cSizeY;
@@ -623,7 +623,7 @@ AddedText.prototype.set2DCoordinates = function(marginPercentWidth, marginPercen
     var tmpY = ((curViewport.w - curViewport.y) / 2.0) + curViewport.y + this.twoDimensionalSize.y;
     var heightY = (((tmpY - curViewport.y) * 2.0) / curViewport.w) - 1.0;
     var marginY = (((marginPercentHeight) * (2)) / (100)) -1;
-    var cSizeY = (this.characterSize / (curViewport.w - curViewport.y));
+    var cSizeY = (this.characterSize / (renderer.getCurrentViewport().w / screenResolution));
     marginY -= cSizeY;
     if (marginY + heightY < -1){
       marginY = -1 - heightY + cSizeY;
