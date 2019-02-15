@@ -2150,6 +2150,7 @@ StateLoader.prototype.resetProject = function(undo){
   addedTexts = new Object();
   addedTexts2D = new Object();
   clickableAddedTexts = new Object();
+  clickableAddedTexts2D = new Object();
   textures = new Object();
   textureURLs = new Object();
   physicsTests = new Object();

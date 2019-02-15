@@ -609,9 +609,11 @@ window.onload = function() {
       }
       // TRY TO PICK 2D OBJECTS FIRST
       objectPicker2D.find(event.clientX, window.innerHeight - event.clientY);
-      REUSABLE_VECTOR.setFromMatrixPosition(camera.matrixWorld);
-      REUSABLE_VECTOR_2.set(coordX, coordY, 0.5).unproject(camera).sub(REUSABLE_VECTOR).normalize();
-      rayCaster.findIntersections(REUSABLE_VECTOR, REUSABLE_VECTOR_2, (mode == 0));
+      if (!intersectionPoint){
+        REUSABLE_VECTOR.setFromMatrixPosition(camera.matrixWorld);
+        REUSABLE_VECTOR_2.set(coordX, coordY, 0.5).unproject(camera).sub(REUSABLE_VECTOR).normalize();
+        rayCaster.findIntersections(REUSABLE_VECTOR, REUSABLE_VECTOR_2, (mode == 0));
+      }
       if (intersectionPoint){
          var object = addedObjects[intersectionObject];
          if (!object){

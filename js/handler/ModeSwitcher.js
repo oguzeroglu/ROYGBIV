@@ -245,7 +245,11 @@ ModeSwitcher.prototype.switchFromDesignToPreview = function(){
   for (var txtName in addedTexts){
     addedTexts[txtName].handleResize();
     if (addedTexts[txtName].isClickable){
-      clickableAddedTexts[txtName] = addedTexts[txtName];
+      if (!addedTexts[txtName].is2D){
+        clickableAddedTexts[txtName] = addedTexts[txtName];
+      }else{
+        clickableAddedTexts2D[txtName] = addedTexts[txtName];
+      }
     }
   }
 }
@@ -470,6 +474,7 @@ ModeSwitcher.prototype.switchFromPreviewToDesign = function(){
   renderer.setViewport(0, 0, canvas.width / screenResolution, canvas.height / screenResolution);
 
   clickableAddedTexts = new Object();
+  clickableAddedTexts2D = new Object();
   this.commonSwitchFunctions();
   for (var txtName in addedTexts){
     var text = addedTexts[txtName];

@@ -800,6 +800,7 @@ var addedObjects = new Object();
 var addedTexts = new Object();
 var addedTexts2D = new Object();
 var clickableAddedTexts = new Object();
+var clickableAddedTexts2D = new Object();
 var textures = new Object();
 var textureURLs = new Object();
 var wallCollections = new Object();

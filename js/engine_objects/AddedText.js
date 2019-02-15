@@ -118,6 +118,9 @@ AddedText.prototype.destroy = function(){
   }
   rayCaster.refresh();
   delete addedTexts[this.name];
+  if (this.is2D){
+    delete addedTexts2D[this.name];
+  }
 }
 
 AddedText.prototype.constructText = function(){
