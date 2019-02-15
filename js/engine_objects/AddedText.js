@@ -153,8 +153,8 @@ AddedText.prototype.constructText = function(){
   this.topRight.x = xMax;
   this.topRight.y = 0;
 
-  this.twoDimensionalSize.x = (xMax);
-  this.twoDimensionalSize.y = (yMin);
+  this.twoDimensionalSize.x = (xMax / screenResolution);
+  this.twoDimensionalSize.y = (yMin / screenResolution);
 }
 
 AddedText.prototype.export = function(){
