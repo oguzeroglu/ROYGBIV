@@ -12,6 +12,9 @@ ObjectPicker2D.prototype.find = function(screenSpaceX, screenSpaceY){
   }
   for (var textName in totalObj){
     var textObject = addedTexts2D[textName];
+    if (!textObject.mesh.visible){
+      continue;
+    }
     if (!textObject.twoDimensionalSize){
       textObject.handleResize();
     }

@@ -232,13 +232,17 @@ window.onload = function() {
         enableController(textManipulationMarginModeController);
         enableController(textManipulationMarginXController);
         enableController(textManipulationMarginYController);
+        disableController(textManipulationAffectedByFogController);
         selectedAddedText.set2DCoordinates(
           selectedAddedText.marginPercentWidth, selectedAddedText.marginPercentHeight
         );
+        selectedAddedText.setAffectedByFog(false);
+        textManipulationParameters["Aff. by fog"] = false;
       }else{
         disableController(textManipulationMarginModeController);
         disableController(textManipulationMarginXController);
         disableController(textManipulationMarginYController);
+        enableController(textManipulationAffectedByFogController);
       }
     }).listen();
     textManipulationMarginModeController = datGuiTextManipulation.add(textManipulationParameters, "Margin mode", ["Top/Left", "Bottom/Right"]).onChange(function(val){
@@ -1472,6 +1476,8 @@ function afterTextSelection(){
       disableController(textManipulationMarginModeController);
       disableController(textManipulationMarginXController);
       disableController(textManipulationMarginYController);
+    }else{
+      disableController(textManipulationAffectedByFogController);
     }
   }else{
     $(datGuiTextManipulation.domElement).attr("hidden", true);

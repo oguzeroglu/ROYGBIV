@@ -500,7 +500,7 @@ AddedText.prototype.hide = function(){
   if (mode == 0 && this.rectangle){
     scene.remove(this.rectangle.mesh);
   }
-  if (mode == 1 && this.isClickable){
+  if (mode == 1 && this.isClickable && !this.is2D){
     rayCaster.binHandler.deleteObjectFromBin(this.binInfo, this.name);
   }
 }
@@ -595,6 +595,9 @@ AddedText.prototype.set2DStatus = function(is2D){
     rayCaster.binHandler.insert(this.boundingBox, this.name);
     if (mode == 0 && this.bbHelper && selectedAddedText && selectedAddedText.name == this.name){
       scene.add(this.bbHelper);
+    }
+    if (mode == 0 && this.rectangle && selectedAddedText && selectedAddedText.name == this.name){
+      scene.remove(this.rectangle.mesh);
     }
   }
 }

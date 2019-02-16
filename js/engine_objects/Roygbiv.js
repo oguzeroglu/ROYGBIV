@@ -6989,6 +6989,10 @@ Roygbiv.prototype.setTextPosition = function(text, x, y, z){
     throw new Error("setTextPosition error: text is not a text object.");
     return;
   }
+  if (text.is2D){
+    throw new Error("setTextPosition error: Cannot set position of a 2D text.");
+    return;
+  }
   if (isNaN(x)){
     throw new Error("setTextPosition error: Bad x parameter");
     return;
@@ -7066,6 +7070,10 @@ Roygbiv.prototype.setTextCenterPosition = function(text, x, y, z){
   }
   if (!text.isAddedText){
     throw new Error("setTextCenterPosition error: text is not a text object.");
+    return;
+  }
+  if (text.is2D){
+    throw new Error("setTextCenterPosition error: Cannot set position of a 2D text.");
     return;
   }
   if (isNaN(x)){
