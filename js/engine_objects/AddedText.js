@@ -353,7 +353,22 @@ AddedText.prototype.handleResize = function(){
      }
     this.constructText();
     this.set2DCoordinates(this.marginPercentWidth, this.marginPercentHeight);
+    if (!(typeof this.maxWidthPercent == UNDEFINED)){
+      var iteration = 1;
+      while (this.getWidthPercent() > this.maxWidthPercent){
+        var a = this.characterSize;
+        this.setCharSize((this.characterSize - 0.5));
+        this.offsetBetweenChars = this.offsetBetweenChars * (this.characterSize / a);
+        this.constructText();
+        this.set2DCoordinates(this.marginPercentWidth, this.marginPercentHeight);
+        iteration ++;
+      }
+    }
   }
+}
+
+AddedText.prototype.getWidthPercent = function(){
+  return (((this.webglSpaceSize.x) * (100)) / (2));
 }
 
 AddedText.prototype.calculateCharSize = function(){
