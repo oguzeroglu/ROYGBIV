@@ -262,6 +262,7 @@ AddedText.prototype.setMarginBetweenLines = function(value){
   this.offsetBetweenLines = value;
   this.constructText();
   if (this.is2D){
+    this.refLineOffset = value;
     this.set2DCoordinates(this.marginPercentWidth, this.marginPercentHeight);
   }else{
     this.handleBoundingBox();
@@ -347,10 +348,17 @@ AddedText.prototype.handleResize = function(){
     if (typeof this.refCharOffset == UNDEFINED){
       this.refCharOffset = this.offsetBetweenChars;
     }
+    if (typeof this.refLineOffset == UNDEFINED){
+      this.refLineOffset = this.offsetBetweenLines;
+    }
     this.offsetBetweenChars = this.refCharOffset * ((renderer.getCurrentViewport().w)/this.refInnerHeight);
+    this.offsetBetweenLines = this.refLineOffset * ((renderer.getCurrentViewport().w)/this.refInnerHeight);
     if (renderer.getCurrentViewport().z / screenResolution < window.innerWidth){
        this.offsetBetweenChars = this.offsetBetweenChars * (window.innerWidth / (renderer.getCurrentViewport().z / screenResolution));
-     }
+    }
+    if (renderer.getCurrentViewport().w / screenResolution < window.innerHeight){
+       this.offsetBetweenLines = this.offsetBetweenLines * (window.innerHeight / (renderer.getCurrentViewport().w / screenResolution));
+    }
     this.constructText();
     this.set2DCoordinates(this.marginPercentWidth, this.marginPercentHeight);
     if (!(typeof this.maxWidthPercent == UNDEFINED)){
@@ -369,6 +377,10 @@ AddedText.prototype.handleResize = function(){
 
 AddedText.prototype.getWidthPercent = function(){
   return (((this.webglSpaceSize.x) * (100)) / (2));
+}
+
+AddedText.prototype.getHeightPercent = function(){
+  return (((this.webglSpaceSize.y) * (100)) / (2));
 }
 
 AddedText.prototype.calculateCharSize = function(){
@@ -593,6 +605,10 @@ AddedText.prototype.set2DStatus = function(is2D){
     if (!(typeof this.refCharOffset == UNDEFINED)){
       this.setMarginBetweenChars(this.refCharOffset);
       delete this.refCharOffset;
+    }
+    if (!(typeof this.refLineOffset == UNDEFINED)){
+      this.setMarginBetweenLines(this.refLineOffset);
+      delete this.refLineOffset;
     }
     delete addedTexts2D[this.name];
   }
