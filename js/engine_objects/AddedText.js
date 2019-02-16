@@ -95,6 +95,8 @@ var AddedText = function(name, font, text, position, color, alpha, characterSize
   this.marginMode = MARGIN_MODE_2D_TEXT_TOP_LEFT;
   this.marginPercentWidth = 50;
   this.marginPercentHeight = 50;
+  this.maxWidthPercent = 100;
+  this.maxHeightPercent = 100;
 }
 
 AddedText.prototype.destroy = function(){
@@ -206,6 +208,8 @@ AddedText.prototype.export = function(){
   exportObj.marginMode = this.marginMode;
   exportObj.marginPercentWidth = this.marginPercentWidth;
   exportObj.marginPercentHeight = this.marginPercentHeight;
+  exportObj.maxWidthPercent = this.maxWidthPercent;
+  exportObj.maxHeightPercent = this.maxHeightPercent;
   var exportDestroyedGrids = new Object();
   for (var gridName in this.destroyedGrids){
     exportDestroyedGrids[gridName] = this.destroyedGrids[gridName].export();

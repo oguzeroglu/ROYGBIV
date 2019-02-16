@@ -1128,6 +1128,8 @@ var textManipulationIs2DController;
 var textManipulationMarginModeController;
 var textManipulationMarginXController;
 var textManipulationMarginYController;
+var textManipulationMaxWidthPercentController;
+var textManipulationMaxHeightPercentController;
 var textManipulationParameters = {
   "Text": "textName",
   "Content": "",
@@ -1144,7 +1146,9 @@ var textManipulationParameters = {
   "is 2D": false,
   "Margin mode": "Top/Left",
   "Margin X": 50.0,
-  "Margin Y": 50.0
+  "Margin Y": 50.0,
+  "Max width%": 100,
+  "Max height%": 100
 }
 
 var fogDensityController;

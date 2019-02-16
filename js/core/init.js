@@ -213,12 +213,15 @@ window.onload = function() {
       selectedAddedText.setCharSize(val);
       selectedAddedText.refCharSize = val;
       selectedAddedText.refInnerHeight = window.innerHeight;
+      selectedAddedText.handleResize();
     }).listen();
     textManipulationCharacterMarginController = datGuiTextManipulation.add(textManipulationParameters, "Char margin").min(0.5).max(100).step(0.5).onChange(function(val){
       selectedAddedText.setMarginBetweenChars(val);
+      selectedAddedText.handleResize();
     }).listen();
     textManipulationLineMarginController = datGuiTextManipulation.add(textManipulationParameters, "Line margin").min(0.5).max(100).step(0.5).onChange(function(val){
       selectedAddedText.setMarginBetweenLines(val);
+      selectedAddedText.handleResize();
     }).listen();
     textManipulationClickableController = datGuiTextManipulation.add(textManipulationParameters, "Clickable").onChange(function(val){
       selectedAddedText.isClickable = val;
@@ -232,6 +235,8 @@ window.onload = function() {
         enableController(textManipulationMarginModeController);
         enableController(textManipulationMarginXController);
         enableController(textManipulationMarginYController);
+        enableController(textManipulationMaxWidthPercentController);
+        enableController(textManipulationMaxHeightPercentController);
         disableController(textManipulationAffectedByFogController);
         selectedAddedText.set2DCoordinates(
           selectedAddedText.marginPercentWidth, selectedAddedText.marginPercentHeight
@@ -242,8 +247,11 @@ window.onload = function() {
         disableController(textManipulationMarginModeController);
         disableController(textManipulationMarginXController);
         disableController(textManipulationMarginYController);
+        disableController(textManipulationMaxWidthPercentController);
+        disableController(textManipulationMaxHeightPercentController);
         enableController(textManipulationAffectedByFogController);
       }
+      selectedAddedText.handleResize();
     }).listen();
     textManipulationMarginModeController = datGuiTextManipulation.add(textManipulationParameters, "Margin mode", ["Top/Left", "Bottom/Right"]).onChange(function(val){
       if (val == "Top/Left"){
@@ -259,11 +267,21 @@ window.onload = function() {
       selectedAddedText.set2DCoordinates(
         val, selectedAddedText.marginPercentHeight
       );
+      selectedAddedText.handleResize();
     }).listen();
     textManipulationMarginYController = datGuiTextManipulation.add(textManipulationParameters, "Margin Y").min(0).max(100).step(0.1).onChange(function(val){
       selectedAddedText.set2DCoordinates(
         selectedAddedText.marginPercentWidth, val
       );
+      selectedAddedText.handleResize();
+    }).listen();
+    textManipulationMaxWidthPercentController = datGuiTextManipulation.add(textManipulationParameters, "Max width%").min(0).max(100).step(0.1).onChange(function(val){
+      selectedAddedText.maxWidthPercent = val;
+      selectedAddedText.handleResize();
+    }).listen();
+    textManipulationMaxHeightPercentController = datGuiTextManipulation.add(textManipulationParameters, "Max height%").min(0).max(100).step(0.1).onChange(function(val){
+      selectedAddedText.maxHeightPercent = val;
+      selectedAddedText.handleResize();
     }).listen();
     // DAT GUI OBJECT MANIPULATION
     datGuiObjectManipulation = new dat.GUI();
@@ -1264,6 +1282,8 @@ window.addEventListener('keyup', function(event){
    enableController(textManipulationMarginModeController);
    enableController(textManipulationMarginXController);
    enableController(textManipulationMarginYController);
+   enableController(textManipulationMaxWidthPercentController);
+   enableController(textManipulationMaxHeightPercentController);
  }
 
 function isPhysicsWorkerEnabled(){
@@ -1467,6 +1487,8 @@ function afterTextSelection(){
     textManipulationParameters["Clickable"] = selectedAddedText.isClickable;
     textManipulationParameters["Margin X"] = selectedAddedText.marginPercentWidth;
     textManipulationParameters["Margin Y"] = selectedAddedText.marginPercentHeight;
+    textManipulationParameters["Max width%"] = selectedAddedText.maxWidthPercent;
+    textManipulationParameters["Max height%"] = selectedAddedText.maxHeightPercent;
     if (selectedAddedText.marginMode == MARGIN_MODE_2D_TEXT_TOP_LEFT){
       textManipulationParameters["Margin mode"] = "Top/Left";
     }else{
@@ -1476,6 +1498,8 @@ function afterTextSelection(){
       disableController(textManipulationMarginModeController);
       disableController(textManipulationMarginXController);
       disableController(textManipulationMarginYController);
+      disableController(textManipulationMaxWidthPercentController);
+      disableController(textManipulationMaxHeightPercentController);
     }else{
       disableController(textManipulationAffectedByFogController);
     }

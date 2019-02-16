@@ -1113,6 +1113,8 @@ StateLoader.prototype.finalize = function(){
           );
       }
     }
+    addedTextInstance.maxWidthPercent = curTextExport.maxWidthPercent;
+    addedTextInstance.maxHeightPercent = curTextExport.maxHeightPercent;
     var gridSystem = gridSystems[addedTextInstance.gsName];
     if (gridSystem){
       for (var gridName in curTextExport.destroyedGrids){
