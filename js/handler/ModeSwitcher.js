@@ -135,6 +135,9 @@ ModeSwitcher.prototype.switchFromDesignToPreview = function(){
     if (addedText.bbHelper){
       scene.remove(addedText.bbHelper);
     }
+    if (addedText.rectangle){
+      scene.remove(addedText.rectangle.mesh);
+    }
   }
   dynamicObjects = new Object();
   dynamicObjectGroups = new Object();

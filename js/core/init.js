@@ -35,6 +35,8 @@ window.onload = function() {
         if (selectedAddedText && selectedAddedText.name == textName){
           if (!addedTexts[textName].is2D){
             scene.add(addedTexts[textName].bbHelper);
+          }else{
+            scene.add(addedTexts[textName].rectangle.mesh);
           }
         }
       }
@@ -647,6 +649,9 @@ window.onload = function() {
                if (selectedAddedText && selectedAddedText.bbHelper){
                  scene.remove(selectedAddedText.bbHelper);
                }
+               if (selectedAddedText && selectedAddedText.rectangle){
+                 scene.remove(selectedAddedText.rectangle.mesh);
+               }
              }
              selectedAddedObject = object;
              objectSelectedByCommand = false;
@@ -671,6 +676,9 @@ window.onload = function() {
                }
                if (selectedAddedText && selectedAddedText.bbHelper){
                  scene.remove(selectedAddedText.bbHelper);
+               }
+               if (selectedAddedText && selectedAddedText.rectangle){
+                 scene.remove(selectedAddedText.rectangle.mesh);
                }
              }
              selectedObjectGroup = object;
@@ -709,6 +717,9 @@ window.onload = function() {
                    if (selectedAddedText && selectedAddedText.bbHelper){
                      scene.remove(selectedAddedText.bbHelper);
                    }
+                   if (selectedAddedText && selectedAddedText.rectangle){
+                     scene.remove(selectedAddedText.rectangle.mesh);
+                   }
                  }
                  selectedAddedObject = addedObject;
                  selectedObjectGroup = 0;
@@ -736,6 +747,9 @@ window.onload = function() {
                    if (selectedAddedText && selectedAddedText.bbHelper){
                      scene.remove(selectedAddedText.bbHelper);
                    }
+                   if (selectedAddedText && selectedAddedText.rectangle){
+                     scene.remove(selectedAddedText.rectangle.mesh);
+                   }
                  }
                  selectedAddedObject = 0;
                  selectedAddedText = 0;
@@ -760,16 +774,23 @@ window.onload = function() {
                     if (selectedAddedText && selectedAddedText.bbHelper){
                       scene.remove(selectedAddedText.bbHelper);
                     }
+                    if (selectedAddedText && selectedAddedText.rectangle){
+                      scene.remove(selectedAddedText.rectangle.mesh);
+                    }
                   }
                   selectedAddedObject = 0;
                   selectedObjectGroup = 0;
                   selectedAddedText = addedText;
                   if (!selectedAddedText.bbHelper){
-                    selectedAddedText.handleBoundingBox();
+                    if (!selectedAddedText.is2D){
+                      selectedAddedText.handleBoundingBox();
+                    }
                   }
                   if (mode == 0){
                     if (!selectedAddedText.is2D){
                       scene.add(selectedAddedText.bbHelper);
+                    }else{
+                      scene.add(selectedAddedText.rectangle.mesh);
                     }
                   }else if (addedText.clickCallbackFunction){
                     addedText.clickCallbackFunction(addedText.name);
@@ -789,7 +810,12 @@ window.onload = function() {
                selectedObjectGroup.mesh.remove(axesHelper);
              }
              if (selectedAddedText && selectedAddedText.name != object.name){
-               scene.remove(selectedAddedText.bbHelper);
+               if (selectedAddedText.bbHelper){
+                 scene.remove(selectedAddedText.bbHelper);
+               }
+               if (selectedAddedText.rectangle){
+                 scene.remove(selectedAddedText.rectangle.mesh);
+               }
              }
            }
            if (!defaultCameraControlsDisabled && !isDeployment){
@@ -805,7 +831,9 @@ window.onload = function() {
            if (mode == 0){
              if (!selectedAddedText.is2D){
                scene.add(selectedAddedText.bbHelper);
-            }
+             }else{
+               scene.add(selectedAddedText.rectangle.mesh);
+             }
           }else if (object.clickCallbackFunction){
             object.clickCallbackFunction(object.name);
           }
@@ -815,6 +843,9 @@ window.onload = function() {
          if (!objectSelectedByCommand){
            if (selectedAddedText && selectedAddedText.bbHelper && mode == 0){
              scene.remove(selectedAddedText.bbHelper);
+           }
+           if (selectedAddedText && selectedAddedText.rectangle && mode == 0){
+             scene.remove(selectedAddedText.rectangle.mesh);
            }
            selectedAddedObject = 0;
            selectedObjectGroup = 0;
@@ -1041,6 +1072,8 @@ window.addEventListener('keyup', function(event){
           if (selectedAddedText && selectedAddedText.name == textName){
             if (!addedTexts[textName].is2D){
               scene.add(addedTexts[textName].bbHelper);
+            }else{
+              scene.add(addedTexts[textName].rectangle.mesh);
             }
           }
         }
@@ -1408,6 +1441,8 @@ function afterTextSelection(){
     $(datGuiTextManipulation.domElement).attr("hidden", false);
     if (!selectedAddedText.is2D){
       scene.add(selectedAddedText.bbHelper);
+    }else{
+      scene.add(selectedAddedText.rectangle.mesh);
     }
     textManipulationParameters["Text"] = selectedAddedText.name;
     textManipulationParameters["Content"] = selectedAddedText.text;
@@ -1433,9 +1468,7 @@ function afterTextSelection(){
     }else{
       textManipulationParameters["Margin mode"] = "Bottom/Right";
     }
-    if (selectedAddedText.is2D){
-      disableController(textManipulationClickableController);
-    }else{
+    if (!selectedAddedText.is2D){
       disableController(textManipulationMarginModeController);
       disableController(textManipulationMarginXController);
       disableController(textManipulationMarginYController);

@@ -241,7 +241,7 @@ MeshGenerator.prototype.generateBasicMesh = function(){
       cubeTexture: GLOBAL_CUBE_TEXTURE_UNIFORM
     }
   });
-  var mesh = new THREE.Mesh(this.geometry, material);
+  var mesh = new THREE.LineSegments(this.geometry, material);
   mesh.renderOrder = 10;
   material.uniforms.modelViewMatrix.value = mesh.modelViewMatrix;
   material.uniforms.worldMatrix.value = mesh.matrixWorld;

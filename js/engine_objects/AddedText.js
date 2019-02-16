@@ -101,6 +101,9 @@ AddedText.prototype.destroy = function(){
     if (this.bbHelper){
       scene.remove(this.bbHelper);
     }
+    if (this.rectangle){
+      scene.remove(this.rectangle.mesh);
+    }
     selectedAddedText = 0;
     afterObjectSelection();
   }
@@ -115,6 +118,10 @@ AddedText.prototype.destroy = function(){
   if (this.bbHelper){
     this.bbHelper.material.dispose();
     this.bbHelper.geometry.dispose();
+  }
+  if (this.rectangle){
+    this.rectangle.material.dispose();
+    this.rectangle.geometry.dispose();
   }
   rayCaster.refresh();
   delete addedTexts[this.name];
@@ -490,6 +497,9 @@ AddedText.prototype.hide = function(){
   if (mode == 0 && this.bbHelper){
     scene.remove(this.bbHelper);
   }
+  if (mode == 0 && this.rectangle){
+    scene.remove(this.rectangle.mesh);
+  }
   if (mode == 1 && this.isClickable){
     rayCaster.binHandler.deleteObjectFromBin(this.binInfo, this.name);
   }
@@ -572,15 +582,18 @@ AddedText.prototype.set2DStatus = function(is2D){
     delete addedTexts2D[this.name];
   }
   if (is2D){
-    selectedAddedText.material.uniforms.isTwoDimensionalInfo.value.x = 500;
+    this.material.uniforms.isTwoDimensionalInfo.value.x = 500;
     rayCaster.binHandler.deleteObjectFromBin(this.binInfo, this.name);
     if (this.bbHelper){
       scene.remove(this.bbHelper);
     }
+    if (mode == 0 && selectedAddedText && selectedAddedText.name == this.name){
+      scene.add(this.rectangle.mesh);
+    }
   }else{
     selectedAddedText.material.uniforms.isTwoDimensionalInfo.value.x = -500;
     rayCaster.binHandler.insert(this.boundingBox, this.name);
-    if (this.bbHelper && selectedAddedText && selectedAddedText.name == this.name){
+    if (mode == 0 && this.bbHelper && selectedAddedText && selectedAddedText.name == this.name){
       scene.add(this.bbHelper);
     }
   }
@@ -662,6 +675,15 @@ AddedText.prototype.set2DCoordinates = function(marginPercentWidth, marginPercen
     this.twoDimensionalSize.z - this.twoDimensionalSize.x,
     this.twoDimensionalSize.y - this.twoDimensionalSize.w
   );
+  if (!this.rectangle){
+    this.rectangle = new Rectangle(0, 0, 0, 0);
+  }
+  this.rectangle = this.rectangle.set(
+    this.twoDimensionalSize.x, this.twoDimensionalSize.y,
+    this.twoDimensionalSize.z, this.twoDimensionalSize.w,
+    this.webglSpaceSize.x, this.webglSpaceSize.y
+  );
+  this.rectangle.updateMesh(0.005);
 }
 
 AddedText.prototype.debugCornerPoints = function(representativeCharacter, cornerIndex){

@@ -4978,6 +4978,9 @@ function parse(input){
           if (selectedAddedText && selectedAddedText.bbHelper){
             scene.remove(selectedAddedText.bbHelper);
           }
+          if (selectedAddedText && selectedAddedText.rectangle){
+            scene.remove(selectedAddedText.rectangle.mesh);
+          }
           selectedAddedObject = 0;
           selectedObjectGroup = 0;
           selectedAddedText = textSelection;
@@ -4986,6 +4989,8 @@ function parse(input){
           }
           if (!selectedAddedText.is2D){
             scene.add(selectedAddedText.bbHelper);
+          }else{
+            scene.add(selectedAddedText.rectangle.mesh);
           }
           afterObjectSelection();
           terminal.printInfo(Text.SELECTED.replace(Text.PARAM1, selectedAddedText.name));
