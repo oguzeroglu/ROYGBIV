@@ -373,6 +373,17 @@ AddedText.prototype.handleResize = function(){
         iteration ++;
       }
     }
+    if (!(typeof this.maxHeightPercent == UNDEFINED)){
+      var iteration = 1;
+      while (this.getHeightPercent() > this.maxHeightPercent){
+        var a = this.characterSize;
+        this.setCharSize((this.characterSize - 0.5));
+        this.offsetBetweenLines = this.offsetBetweenLines * (this.characterSize / a);
+        this.constructText();
+        this.set2DCoordinates(this.marginPercentWidth, this.marginPercentHeight);
+        iteration ++;
+      }
+    }
   }
 }
 

@@ -1910,3 +1910,48 @@ function clearChildrenMesh(objectGroup){
     delete child.mesh.geometry;
   }
 }
+
+// WARNING: FOR TEST PURPOSES
+function drawGridToScreen(widthParts, heightParts){
+  var totalParts = (widthParts+1) * (heightParts+1);
+  var gridGeom = new THREE.BufferGeometry();
+  var positions = [];
+  var gridIndices = new Float32Array(totalParts);
+  var curX = 1;
+  var curY = -1;
+  var curIndex = 0;
+  for (var i = 0; i<=widthParts; i++){
+    for (var i2 = 0; i2<=heightParts; i2++){
+      gridIndices[curIndex] = curIndex;
+      curIndex ++;
+      positions.push(new THREE.Vector2(curX, curY));
+      curY += (2 / heightParts);
+    }
+    curX -= (2 / widthParts);
+    curY = -1;
+  }
+  var indicesBufferAttribute = new THREE.BufferAttribute(gridIndices, 1);
+  indicesBufferAttribute.setDynamic(false);
+  gridGeom.addAttribute('rectangleIndex', indicesBufferAttribute);
+  gridGeom.setDrawRange(0, totalParts);
+  var gridMaterial = new THREE.RawShaderMaterial({
+    vertexShader: ShaderContent.rectangleVertexShader.replace(
+      "uniform vec2 positions[24];", "uniform vec2 positions["+totalParts+"];"
+    ).replace(
+      "gl_Position = vec4(curPosition.x, curPosition.y, 0.0, 1.0);",
+      "gl_Position = vec4(curPosition.x, curPosition.y, 0.0, 1.0); gl_PointSize = 5.0;"
+    ),
+    fragmentShader: ShaderContent.rectangleFragmentShader,
+    vertexColors: THREE.VertexColors,
+    transparent: true,
+    side: THREE.DoubleSide,
+    uniforms: {
+      color: new THREE.Uniform(new THREE.Color("lime")),
+      alpha: new THREE.Uniform(1.0),
+      positions: new THREE.Uniform(positions)
+    }
+  });
+  var gridMesh = new THREE.Points(gridGeom, gridMaterial);
+  gridMesh.frustumCulled = false;
+  scene.add(gridMesh);
+}
