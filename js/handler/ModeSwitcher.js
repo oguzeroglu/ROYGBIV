@@ -267,11 +267,21 @@ ModeSwitcher.prototype.switchFromPreviewToDesign = function(){
     console.log("[*] Frame-drop recording process stopped.");
     LOG_FRAME_DROP_ON = false;
   }
-  bloomStrength = originalBloomConfigurations.bloomStrength;
-  bloomRadius = originalBloomConfigurations.bloomRadius;
-  bloomThreshold = originalBloomConfigurations.bloomThreshold;
-  bloomResolutionScale = originalBloomConfigurations.bloomResolutionScale;
-  bloomOn = originalBloomConfigurations.bloomOn;
+  if (!(typeof originalBloomConfigurations.bloomStrength == UNDEFINED)){
+    bloomStrength = originalBloomConfigurations.bloomStrength;
+  }
+  if (!(typeof originalBloomConfigurations.bloomRadius == UNDEFINED)){
+    bloomRadius = originalBloomConfigurations.bloomRadius;
+  }
+  if (!(typeof originalBloomConfigurations.bloomThreshold == UNDEFINED)){
+    bloomThreshold = originalBloomConfigurations.bloomThreshold;
+  }
+  if (!(typeof originalBloomConfigurations.bloomResolutionScale == UNDEFINED)){
+    bloomResolutionScale = originalBloomConfigurations.bloomResolutionScale;
+  }
+  if (!(typeof originalBloomConfigurations.bloomOn == UNDEFINED)){
+    bloomOn = originalBloomConfigurations.bloomOn;
+  }
   originalBloomConfigurations = new Object();
   camera.position.set(initialCameraX, initialCameraY, initialCameraZ);
   camera.rotation.order = 'YXZ';

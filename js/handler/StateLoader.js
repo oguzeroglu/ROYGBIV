@@ -1041,23 +1041,6 @@ StateLoader.prototype.load = function(undo){
         "Bloom_resolution_scale": bloomResolutionScale,
         "Bloom": bloomOn
       };
-      datGui = new dat.GUI();
-      datGui.add(postprocessingParameters, "Bloom_strength").min(0.0).max(3.0).step(0.01).onChange(function(val){
-        adjustPostProcessing(1, val);
-      });
-      datGui.add(postprocessingParameters, "Bloom_radius").min(0.0).max(1.0).step(0.01).onChange(function(val){
-        adjustPostProcessing(2, val);
-      });
-      datGui.add(postprocessingParameters, "Bloom_threshhold").min(0.0).max(1.0).step(0.01).onChange(function(val){
-        adjustPostProcessing(3, val);
-      });
-      datGui.add(postprocessingParameters, "Bloom_resolution_scale").min(0.1).max(1.0).step(0.001).onChange(function(val){
-        adjustPostProcessing(4, val);
-      });
-      datGui.add(postprocessingParameters, "Bloom").onChange(function(val){
-        adjustPostProcessing(5, val);
-      });
-      $(datGui.domElement).attr("hidden", true);
     }
 
     if (this.oldPhysicsDebugMode){
