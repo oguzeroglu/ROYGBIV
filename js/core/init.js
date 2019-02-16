@@ -614,7 +614,7 @@ window.onload = function() {
         return;
       }
       // TRY TO PICK 2D OBJECTS FIRST
-      objectPicker2D.find(event.clientX, window.innerHeight - event.clientY);
+      objectPicker2D.find(event.clientX, event.clientY);
       if (!intersectionPoint){
         REUSABLE_VECTOR.setFromMatrixPosition(camera.matrixWorld);
         REUSABLE_VECTOR_2.set(coordX, coordY, 0.5).unproject(camera).sub(REUSABLE_VECTOR).normalize();
