@@ -87,6 +87,7 @@ var AddedText = function(name, font, text, position, color, alpha, characterSize
 
   this.lastUpdateQuaternion = new THREE.Quaternion().copy(camera.quaternion);
   this.lastUpdatePosition = new THREE.Vector3().copy(this.position);
+  this.lastUpdateCameraPosition = new THREE.Vector3().copy(camera.position);
 
   this.reusableVector = new THREE.Vector3();
   this.makeFirstUpdate = true;
@@ -485,6 +486,7 @@ AddedText.prototype.handleBoundingBox = function(){
 
   this.lastUpdateQuaternion.copy(camera.quaternion);
   this.lastUpdatePosition.copy(this.mesh.position);
+  this.lastUpdateCameraPosition.copy(camera.position);
 }
 
 AddedText.prototype.needsUpdate = function(){
@@ -499,7 +501,10 @@ AddedText.prototype.needsUpdate = function(){
     this.lastUpdateQuaternion.w == camera.quaternion.w &&
     this.lastUpdatePosition.x == this.mesh.position.x &&
     this.lastUpdatePosition.y == this.mesh.position.y &&
-    this.lastUpdatePosition.z == this.mesh.position.z
+    this.lastUpdatePosition.z == this.mesh.position.z &&
+    this.lastUpdateCameraPosition.x == camera.position.x &&
+    this.lastUpdateCameraPosition.y == camera.position.y &&
+    this.lastUpdateCameraPosition.z == camera.position.z
   )
 }
 
