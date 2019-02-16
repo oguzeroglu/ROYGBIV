@@ -603,6 +603,7 @@ AddedText.prototype.set2DStatus = function(is2D){
 }
 
 AddedText.prototype.set2DCoordinates = function(marginPercentWidth, marginPercentHeight){
+  GLOBAL_ADDEDTEXT_VIEWPORT_UNIFORM.value.set(0, 0, window.innerWidth * screenResolution, window.innerHeight * screenResolution);
   this.marginPercentWidth = marginPercentWidth;
   this.marginPercentHeight = marginPercentHeight;
   var isFromLeft = false, isFromTop = false;
