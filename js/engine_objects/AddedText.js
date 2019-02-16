@@ -392,8 +392,8 @@ AddedText.prototype.calculateCharSize = function(){
   var verticalFOV = THREE.Math.degToRad(camera.fov);
   var height = 2 * Math.tan(verticalFOV / 2) * this.position.distanceTo(camera.position);
   var width = height * camera.aspect;
-  var w = width * pointSizePixels /currentViewport.z;
-  var h = height * pointSizePixels / currentViewport.w;
+  var w = width * pointSizePixels /(currentViewport.z / screenResolution);
+  var h = height * pointSizePixels / (currentViewport.w / screenResolution);
   this.tmpObj.width = w;
   this.tmpObj.height = h;
   return this.tmpObj;
