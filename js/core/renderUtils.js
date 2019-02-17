@@ -37,7 +37,8 @@ function render(){
   }else{
     cameraOperationsDone = false;
   }
-  composer.render(0.1);
+
+  renderScene();
   updateAddedTexts();
   if (mode == 1){
     previewSceneRendered = true;
@@ -45,6 +46,18 @@ function render(){
   frameCounter ++;
 }
 
+
+function renderScene(){
+  if (mode == 0){
+    renderer.render(scene, camera);
+  }else{
+    if (bloomOn){
+      composer.render(0.1);
+    }else{
+      renderer.render(scene, camera);
+    }
+  }
+}
 
 function updateAddedTexts(){
   if (mode == 0){
