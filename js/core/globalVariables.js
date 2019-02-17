@@ -1,6 +1,7 @@
 // CLI
 var terminal = new Terminal();
 var cliInnerDiv;
+var cliDivheader;
 var scriptCreatorDiv;
 var scriptCreatorCancelButton;
 var scriptCreatorSaveButton;

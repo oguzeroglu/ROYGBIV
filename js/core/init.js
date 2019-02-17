@@ -1,7 +1,7 @@
 window.onload = function() {
   // DRAGABLE CLI
   var cliDiv = document.getElementById("cliDiv");
-  var cliDivheader = document.getElementById("cliDivheader");
+  cliDivheader = document.getElementById("cliDivheader");
   var terminalDiv = document.getElementById("terminalDiv");
   scriptCreatorDiv = document.getElementById("scriptCreatorDiv");
   scriptCreatorCancelButton = document.getElementById("scriptCreatorCancelButton");
@@ -956,7 +956,7 @@ window.onload = function() {
   nullCubeTexture = new THREE.CubeTexture([
     nullTexture.image, nullTexture.image, nullTexture.image,
     nullTexture.image, nullTexture.image, nullTexture.image
-  ])
+  ]);
   GLOBAL_CUBE_TEXTURE_UNIFORM = new THREE.Uniform(nullCubeTexture);
   GLOBAL_CUBE_TEXTURE_UNIFORM.value.wrapS = THREE.ClampToEdgeWrapping;
   GLOBAL_CUBE_TEXTURE_UNIFORM.value.wrapT = THREE.ClampToEdgeWrapping;
