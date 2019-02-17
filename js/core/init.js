@@ -940,6 +940,28 @@ window.onload = function() {
   MAX_VERTEX_UNIFORM_VECTORS = renderer.context.getParameter(renderer.context.MAX_VERTEX_UNIFORM_VECTORS);
   VERTEX_SHADER_TEXTURE_FETCH_SUPPORTED = (renderer.context.getParameter(renderer.context.MAX_VERTEX_TEXTURE_IMAGE_UNITS) > 0);
   DDS_SUPPORTED = (!(renderer.context.getExtension("WEBGL_compressed_texture_s3tc") == null));
+
+  var tmpCanvas = document.createElement("canvas");
+  tmpCanvas.width = 1;
+  tmpCanvas.height = 1;
+  var tmpCtx = tmpCanvas.getContext("2d");
+  tmpCtx.fillStyle = "rgba("+255+","+255+","+255+","+(0)+")";
+  tmpCtx.fillRect(0, 0, 1, 1);
+  nullTexture = new THREE.CanvasTexture(tmpCanvas);
+  nullTexture.wrapS = THREE.ClampToEdgeWrapping;
+  nullTexture.wrapT = THREE.ClampToEdgeWrapping;
+  nullTexture.minFilter = THREE.NearestFilter;
+  nullTexture.magFilter = THREE.NearestFilter;
+  nullTexture.needsUpdate = true;
+  GLOBAL_CUBE_TEXTURE_UNIFORM = new THREE.Uniform(new THREE.CubeTexture([
+    nullTexture.image, nullTexture.image, nullTexture.image,
+    nullTexture.image, nullTexture.image, nullTexture.image
+  ]));
+  GLOBAL_CUBE_TEXTURE_UNIFORM.value.wrapS = THREE.ClampToEdgeWrapping;
+  GLOBAL_CUBE_TEXTURE_UNIFORM.value.wrapT = THREE.ClampToEdgeWrapping;
+  GLOBAL_CUBE_TEXTURE_UNIFORM.value.minFilter = THREE.NearestFilter;
+  GLOBAL_CUBE_TEXTURE_UNIFORM.value.magFilter = THREE.NearestFilter;
+  GLOBAL_CUBE_TEXTURE_UNIFORM.value.needsUpdate = true;
   nullTexture.isNullTexture = true;
 
   terminal.init();
