@@ -973,6 +973,7 @@ var geometryCache = new Object();
 var physicsShapeCache = new Object();
 var MAX_TEXTURE_COUNT = 8;
 var nullTexture;
+var nullCubeTexture;
 var compressedTextureFallbackFormat = ".png";
 var areaBinHandler;
 var areas = new Object();

@@ -953,10 +953,11 @@ window.onload = function() {
   nullTexture.minFilter = THREE.NearestFilter;
   nullTexture.magFilter = THREE.NearestFilter;
   nullTexture.needsUpdate = true;
-  GLOBAL_CUBE_TEXTURE_UNIFORM = new THREE.Uniform(new THREE.CubeTexture([
+  nullCubeTexture = new THREE.CubeTexture([
     nullTexture.image, nullTexture.image, nullTexture.image,
     nullTexture.image, nullTexture.image, nullTexture.image
-  ]));
+  ])
+  GLOBAL_CUBE_TEXTURE_UNIFORM = new THREE.Uniform(nullCubeTexture);
   GLOBAL_CUBE_TEXTURE_UNIFORM.value.wrapS = THREE.ClampToEdgeWrapping;
   GLOBAL_CUBE_TEXTURE_UNIFORM.value.wrapT = THREE.ClampToEdgeWrapping;
   GLOBAL_CUBE_TEXTURE_UNIFORM.value.minFilter = THREE.NearestFilter;
