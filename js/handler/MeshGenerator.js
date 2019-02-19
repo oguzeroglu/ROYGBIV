@@ -36,7 +36,6 @@ MeshGenerator.prototype.generateObjectTrail = function(
     vertexShader: vertexShaderCode,
     fragmentShader: ShaderContent.objectTrailFragmentShader,
     transparent: true,
-    vertexColors: THREE.VertexColors,
     side: THREE.DoubleSide,
     uniforms: {
       projectionMatrix: GLOBAL_PROJECTION_UNIFORM,
@@ -98,7 +97,6 @@ MeshGenerator.prototype.generateInstancedMesh = function(graphicsGroup, objectGr
   var material = new THREE.RawShaderMaterial({
     vertexShader: vertexShader,
     fragmentShader: ShaderContent.instancedBasicMaterialFragmentShader,
-    vertexColors: THREE.VertexColors,
     transparent: objectGroup.isTransparent,
     side: THREE.DoubleSide,
     uniforms: {
@@ -167,7 +165,6 @@ MeshGenerator.prototype.generateMergedMesh = function(graphicsGroup, objectGroup
   var material = new THREE.RawShaderMaterial({
     vertexShader: vertexShader,
     fragmentShader: ShaderContent.mergedBasicMaterialFragmentShader,
-    vertexColors: THREE.VertexColors,
     transparent: objectGroup.isTransparent,
     side: THREE.DoubleSide,
     uniforms: {
@@ -202,7 +199,6 @@ MeshGenerator.prototype.generateBasicMesh = function(){
   var material = new THREE.RawShaderMaterial({
     vertexShader: ShaderContent.basicMaterialVertexShader,
     fragmentShader: ShaderContent.basicMaterialFragmentShader,
-    vertexColors: THREE.VertexColors,
     transparent: true,
     side: THREE.DoubleSide,
     uniforms:{
@@ -223,7 +219,6 @@ MeshGenerator.prototype.generateSkybox = function(skybox){
   var material = new THREE.RawShaderMaterial({
     vertexShader: ShaderContent.skyboxVertexShader,
     fragmentShader: ShaderContent.skyboxFragmentShader,
-    vertexColors: THREE.VertexColors,
     transparent: true,
     side: THREE.BackSide,
     uniforms: {

@@ -1985,7 +1985,6 @@ function drawGridToScreen(widthParts, heightParts){
       "gl_Position = vec4(curPosition.x, curPosition.y, 0.0, 1.0); gl_PointSize = 5.0;"
     ),
     fragmentShader: ShaderContent.rectangleFragmentShader,
-    vertexColors: THREE.VertexColors,
     transparent: true,
     side: THREE.DoubleSide,
     uniforms: {

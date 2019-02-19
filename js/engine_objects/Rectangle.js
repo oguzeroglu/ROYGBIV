@@ -89,7 +89,6 @@ Rectangle.prototype.updateMesh = function(thicknessOffset){
     this.material = new THREE.RawShaderMaterial({
       vertexShader: ShaderContent.rectangleVertexShader,
       fragmentShader: ShaderContent.rectangleFragmentShader,
-      vertexColors: THREE.VertexColors,
       transparent: true,
       side: THREE.DoubleSide,
       uniforms: {

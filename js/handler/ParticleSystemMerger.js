@@ -178,7 +178,6 @@ var ParticleSystemMerger = function(psObj, name){
   this.material = new THREE.RawShaderMaterial({
     vertexShader: vertexShader,
     fragmentShader: ShaderContent.particleFragmentShader,
-    vertexColors: THREE.VertexColors,
     transparent: true,
     side: THREE.DoubleSide,
     uniforms:{

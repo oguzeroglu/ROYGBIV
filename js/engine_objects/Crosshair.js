@@ -26,7 +26,6 @@ var Crosshair = function(configurations){
   this.material = new THREE.RawShaderMaterial({
     vertexShader: ShaderContent.crossHairVertexShader,
     fragmentShader: ShaderContent.crossHairFragmentShader,
-    vertexColors: THREE.VertexColors,
     transparent: true,
     side: THREE.DoubleSide,
     uniforms: {

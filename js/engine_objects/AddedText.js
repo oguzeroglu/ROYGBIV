@@ -42,7 +42,6 @@ var AddedText = function(name, font, text, position, color, alpha, characterSize
   this.material = new THREE.RawShaderMaterial({
     vertexShader: ShaderContent.textVertexShader.replace("#define STR_LEN 1", "#define STR_LEN "+strlen),
     fragmentShader: ShaderContent.textFragmentShader,
-    vertexColors: THREE.VertexColors,
     transparent: true,
     side: THREE.DoubleSide,
     uniforms: {

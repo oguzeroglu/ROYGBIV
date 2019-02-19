@@ -367,7 +367,6 @@ var ParticleSystem = function(copyPS, name, particles, x, y, z, vx, vy, vz, ax, 
     this.material = new THREE.RawShaderMaterial({
       vertexShader: ShaderContent.particleVertexShader,
       fragmentShader: ShaderContent.particleFragmentShader,
-      vertexColors: THREE.VertexColors,
       transparent: true,
       side: THREE.DoubleSide,
       uniforms:{
