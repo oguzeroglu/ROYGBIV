@@ -28,6 +28,9 @@ var ObjectGroup = function(name, group){
 }
 
 ObjectGroup.prototype.forceColor = function(r, g, b, a){
+  if (!this.isColorizable){
+    return;
+  }
   if (a < 0){
     a = 0;
   }
@@ -41,6 +44,9 @@ ObjectGroup.prototype.forceColor = function(r, g, b, a){
 }
 
 ObjectGroup.prototype.resetColor = function(){
+  if (!this.isColorizable){
+    return;
+  }
   this.mesh.material.uniforms.forcedColor.value.set(-50, 0, 0, 0);
   this.mesh.material.transparent = this.isTransparent;
 }
@@ -1255,6 +1261,11 @@ ObjectGroup.prototype.export = function(){
   }else{
     exportObj.isChangeable = false;
   }
+  if (this.isColorizable){
+    exportObj.isColorizable = true;
+  }else{
+    exportObj.isColorizable = false;
+  }
 
   if (this.noMass){
     exportObj.noMass = true;
@@ -1559,6 +1570,7 @@ ObjectGroup.prototype.copy = function(name, isHardCopy, copyPosition, gridSystem
   var noMass = this.noMass;
   var slippery = this.isSlippery;
   var isChangeable = this.isChangeable;
+  var isColorizable = this.isColorizable;
   var renderSide = this.renderSide;
   var blending = this.mesh.material.blending;
   var totalAlphaBeforeDetached = this.mesh.material.uniforms.totalAlpha.value;
@@ -1617,7 +1629,9 @@ ObjectGroup.prototype.copy = function(name, isHardCopy, copyPosition, gridSystem
     newObjGroup.group[objName].metaData["centerZ"] += dz;
   }
   this.isChangeable = isChangeable;
+  this.isColorizable = isColorizable;
   newObjGroup.isChangeable = isChangeable;
+  newObjGroup.isColorizable = isColorizable;
   if (slippery){
     this.setSlippery(slippery);
     newObjGroup.setSlippery(slippery);
@@ -1691,4 +1705,28 @@ ObjectGroup.prototype.incrementOpacity = function(val){
   }else{
     this.mesh.material.transparent = this.isTransparent;
   }
+}
+
+ObjectGroup.prototype.injectMacro = function(macro, insertVertexShader, insertFragmentShader){
+  if (insertVertexShader){
+    this.mesh.material.vertexShader = this.mesh.material.vertexShader.replace(
+      "#define INSERTION", "#define INSERTION\n#define "+macro
+    )
+  };
+  if (insertFragmentShader){
+    this.mesh.material.fragmentShader = this.mesh.material.fragmentShader.replace(
+      "#define INSERTION", "#define INSERTION\n#define "+macro
+    )
+  };
+  this.mesh.material.needsUpdate = true;
+}
+
+ObjectGroup.prototype.removeMacro = function(macro, removeVertexShader, removeFragmentShader){
+  if (removeVertexShader){
+    this.mesh.material.vertexShader = this.mesh.material.vertexShader.replace("#define "+macro, "");
+  }
+  if (removeFragmentShader){
+    this.mesh.material.fragmentShader = this.mesh.material.fragmentShader.replace("#define "+macro, "");
+  }
+  this.mesh.material.needsUpdate = true;
 }

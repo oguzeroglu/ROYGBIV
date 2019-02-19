@@ -148,6 +148,10 @@ window.onload = function() {
         GLOBAL_FOG_UNIFORM.value.set(fogDensity, fogColorRGB.r, fogColorRGB.g, fogColorRGB.b);
         enableController(fogColorController);
       }
+      for (var objName in addedObjects){
+        addedObjects[objName].removeFog();
+        addedObjects[objName].setFog();
+      }
     }).listen();
     // DAT GUI SKYBOX
     datGuiSkybox = new dat.GUI();
@@ -329,6 +333,24 @@ window.onload = function() {
         terminal.printInfo(Text.OBJECT_MARKED_AS.replace(Text.PARAM1, "unchangeable"));
       }
     }).listen();
+    omColorizableController = datGuiObjectManipulation.add(objectManipulationParameters, "Colorizable").onChange(function(val){
+      var obj = selectedAddedObject;
+      if (!obj){
+        obj = selectedObjectGroup;
+      }
+      terminal.clear();
+      obj.isColorizable = val;
+      if (obj.isColorizable){
+        obj.injectMacro("HAS_FORCED_COLOR", false, true);
+        obj.mesh.material.uniforms.forcedColor = new THREE.Uniform(new THREE.Vector4(-50, 0, 0, 0));
+        terminal.printInfo(Text.OBJECT_MARKED_AS.replace(Text.PARAM1, "colorizable"));
+      }else{
+        delete this.mesh.material.uniforms.forcedColor;
+        this.removeMacro("HAS_FORCED_COLOR", false, true);
+        terminal.printInfo(Text.OBJECT_MARKED_AS.replace(Text.PARAM1, "uncolorizable"));
+      }
+      obj.mesh.material.needsUpdate = true;
+    }).listen();
     omHasMassController = datGuiObjectManipulation.add(objectManipulationParameters, "Has mass").onChange(function(val){
       var obj = selectedAddedObject;
       if (!obj){
@@ -411,33 +433,16 @@ window.onload = function() {
       if (selectedAddedObject && !selectedObjectGroup){
         var material = selectedAddedObject.mesh.material;
         material.uniforms.emissiveColor.value.set(val);
-        selectedAddedObject.initEmissiveColorSet = false;
-        selectedAddedObject.initEmissiveColor = val;
       }else if (selectedObjectGroup && !selectedAddedObject){
         var material = selectedObjectGroup.mesh.material;
         material.uniforms.totalEmissiveColor.value.set(val);
-        selectedObjectGroup.initEmissiveColorSet = false;
-        selectedObjectGroup.initEmissiveColor = val;
       }
-
-    }).onFinishChange(function(value){
-
     }).listen();
     omTextureOffsetXController = datGuiObjectManipulation.add(objectManipulationParameters, "Texture offset x").min(-2).max(2).step(0.001).onChange(function(val){
-      var texture = selectedAddedObject.mesh.material.uniforms.diffuseMap.value;
-      texture.offset.x = val;
-      texture.initOffsetXSet = false;
-      texture.updateMatrix();
-    }).onFinishChange(function(value){
-
+      selectedAddedObject.setTextureOffsetX(val);
     }).listen();
     omTextureOffsetYController = datGuiObjectManipulation.add(objectManipulationParameters, "Texture offset y").min(-2).max(2).step(0.001).onChange(function(val){
-      var texture = selectedAddedObject.mesh.material.uniforms.diffuseMap.value;
-      texture.offset.y = val;
-      texture.initOffsetYSet = false;
-      texture.updateMatrix();
-    }).onFinishChange(function(value){
-
+        selectedAddedObject.setTextureOffsetY(val);
     }).listen();
     omOpacityController = datGuiObjectManipulation.add(objectManipulationParameters, "Opacity").min(0).max(1).step(0.01).onChange(function(val){
       if (selectedObjectGroup && !selectedAddedObject){
@@ -449,48 +454,28 @@ window.onload = function() {
         selectedAddedObject.initOpacitySet = false;
         selectedAddedObject.initOpacity = selectedAddedObject.opacity;
       }
-    }).onFinishChange(function(value){
-
     }).listen();
     omAOIntensityController = datGuiObjectManipulation.add(objectManipulationParameters, "AO intensity").min(0).max(10).step(0.1).onChange(function(val){
       if (selectedAddedObject && !selectedObjectGroup){
         selectedAddedObject.mesh.material.uniforms.aoIntensity.value = val;
-        selectedAddedObject.initAOIntensitySet = false;
-        selectedAddedObject.initAOIntensity = val;
       }else if (selectedObjectGroup && !selectedAddedObject){
         selectedObjectGroup.mesh.material.uniforms.totalAOIntensity.value = val;
-        selectedObjectGroup.initAOIntensitySet = false;
-        selectedObjectGroup.initAOIntensity = val;
       }
-    }).onFinishChange(function(value){
-
     }).listen();
     omEmissiveIntensityController = datGuiObjectManipulation.add(objectManipulationParameters, "Emissive int.").min(0).max(100).step(0.01).onChange(function(val){
       if (selectedAddedObject && !selectedObjectGroup){
         var material = selectedAddedObject.mesh.material;
         material.uniforms.emissiveIntensity.value = val;
-        selectedAddedObject.initEmissiveIntensitySet = false;
-        selectedAddedObject.initEmissiveIntensity = val;
       }else if (selectedObjectGroup && !selectedAddedObject){
         var material = selectedObjectGroup.mesh.material;
         material.uniforms.totalEmissiveIntensity.value = val;
-        selectedObjectGroup.initEmissiveIntensitySet = false;
-        selectedObjectGroup.initEmissiveIntensity = val;
       }
-    }).onFinishChange(function(value){
-
     }).listen();
     omDisplacementScaleController = datGuiObjectManipulation.add(objectManipulationParameters, "Disp. scale").min(-50).max(50).step(0.1).onChange(function(val){
       selectedAddedObject.mesh.material.uniforms.displacementInfo.value.x = val;
-      selectedAddedObject.initDisplacementScaleSet = false;
-    }).onFinishChange(function(value){
-
     }).listen();
     omDisplacementBiasController = datGuiObjectManipulation.add(objectManipulationParameters, "Disp. bias").min(-50).max(50).step(0.1).onChange(function(val){
       selectedAddedObject.mesh.material.uniforms.displacementInfo.value.y = val;
-      selectedAddedObject.initDisplacementBiasSet = false;
-    }).onFinishChange(function(value){
-
     }).listen();
 
     datGuiObjectManipulation.domElement.addEventListener("mousedown", function(e){
@@ -1274,6 +1259,7 @@ window.addEventListener('keyup', function(event){
    enableController(omMassController);
    enableController(omSlipperyController);
    enableController(omChangeableController);
+   enableController(omColorizableController);
    enableController(omHasMassController);
    enableController(omTextureOffsetXController);
    enableController(omTextureOffsetYController);
@@ -1338,7 +1324,7 @@ function afterObjectSelection(){
     }
     omGUIlastObjectName = obj.name;
     objectManipulationParameters["Object"] = obj.name;
-    if (obj instanceof AddedObject){
+    if (obj.isAddedObject){
       objectManipulationParameters["Rotate x"] = 0;
       objectManipulationParameters["Rotate y"] = 0;
       objectManipulationParameters["Rotate z"] = 0;
@@ -1353,6 +1339,11 @@ function afterObjectSelection(){
       }else{
         objectManipulationParameters["Changeable"] = false;
       }
+      if (obj.isColorizable){
+        objectManipulationParameters["Colorizable"] = true;
+      }else{
+        objectManipulationParameters["Colorizable"] = false;
+      }
       if (obj.hasDisplacementMap()){
         objectManipulationParameters["Disp. scale"] = obj.mesh.material.uniforms.displacementInfo.value.x;
         objectManipulationParameters["Disp. bias"] = obj.mesh.material.uniforms.displacementInfo.value.y;
@@ -1364,8 +1355,8 @@ function afterObjectSelection(){
         disableController(omTextureOffsetXController);
         disableController(omTextureOffsetYController);
       }else{
-        objectManipulationParameters["Texture offset x"] = obj.mesh.material.uniforms.diffuseMap.value.offset.x;
-        objectManipulationParameters["Texture offset y"] = obj.mesh.material.uniforms.diffuseMap.value.offset.y;
+        objectManipulationParameters["Texture offset x"] = obj.getTextureOffsetX();
+        objectManipulationParameters["Texture offset y"] = obj.getTextureOffsetY();
       }
       if (!obj.hasAOMap()){
         disableController(omAOIntensityController);
@@ -1401,7 +1392,7 @@ function afterObjectSelection(){
         disableController(omOpacityController);
       }
       obj.mesh.add(axesHelper);
-    }else if (obj instanceof ObjectGroup){
+    }else if (obj.isObjectGroup){
       objectManipulationParameters["Rotate x"] = 0;
       objectManipulationParameters["Rotate y"] = 0;
       objectManipulationParameters["Rotate z"] = 0;
@@ -1414,6 +1405,11 @@ function afterObjectSelection(){
         objectManipulationParameters["Changeable"] = true;
       }else{
         objectManipulationParameters["Changeable"] = false;
+      }
+      if (obj.isColorizable){
+        objectManipulationParameters["Colorizable"] = true;
+      }else{
+        objectManipulationParameters["Colorizable"] = false;
       }
       objectManipulationParameters["Opacity"] = obj.mesh.material.uniforms.totalAlpha.value;
       var hasAOMap = false;

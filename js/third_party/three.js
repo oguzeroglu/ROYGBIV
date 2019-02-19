@@ -17509,7 +17509,8 @@
 			}
 
 			if (object.addedObject){
-				if (object.addedObject.mesh.material.uniforms.forcedColor.value.x == -50){
+				if (object.addedObject.mesh.material.uniforms.forcedColor &&
+						object.addedObject.mesh.material.uniforms.forcedColor.value.x == -50){
 					if (object.addedObject.mesh.material.uniforms.alpha.value == 1){
 						opaque.push(renderItem);
 						object.addedObject.listedAsOpaque = true;
@@ -17518,7 +17519,8 @@
 						object.addedObject.listedAsOpaque = false;
 					}
 				}else{
-					if (object.addedObject.mesh.material.uniforms.forcedColor.value.x == 1){
+					if (object.addedObject.mesh.material.uniforms.forcedColor &&
+							object.addedObject.mesh.material.uniforms.forcedColor.value.x == 1){
 						opaque.push(renderItem);
 						object.addedObject.listedAsOpaque = true;
 					}else{
@@ -20186,8 +20188,8 @@
 
 				if ( image === undefined ) {
 
-					console.warn( 'THREE.WebGLRenderer: Texture marked for update but image is undefined', texture );
-
+					//console.warn( 'THREE.WebGLRenderer: Texture marked for update but image is undefined', texture );
+					return;
 				} else if ( image.complete === false ) {
 
 					console.warn( 'THREE.WebGLRenderer: Texture marked for update but image is incomplete', texture );

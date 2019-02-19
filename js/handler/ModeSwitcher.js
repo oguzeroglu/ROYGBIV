@@ -155,18 +155,6 @@ ModeSwitcher.prototype.switchFromDesignToPreview = function(){
       object.updateOpacity(object.initOpacity);
       object.initOpacitySet = false;
     }
-    if (object.initAOIntensitySet){
-      object.mesh.material.uniforms.totalAOIntensity.value = object.initAOIntensity;
-      object.initAOIntensitySet = false;
-    }
-    if (object.initEmissiveIntensitySet){
-      object.mesh.material.uniforms.totalEmissiveIntensity.value = object.initEmissiveIntensity;
-      object.initEmissiveIntensitySet = false;
-    }
-    if (object.initEmissiveColorSet){
-      object.mesh.material.uniforms.totalEmissiveColor.value.set("#"+object.initEmissiveColor);
-      object.initEmissiveColorSet = false;
-    }
   }
   for (var objectName in addedObjects){
     var object = addedObjects[objectName];
@@ -178,50 +166,9 @@ ModeSwitcher.prototype.switchFromDesignToPreview = function(){
       dynamicObjects[objectName] = object;
     }
     object.saveState();
-    if (object.hasDiffuseMap()){
-      if (object.mesh.material.uniforms.diffuseMap.value.initOffsetXSet){
-        object.mesh.material.uniforms.diffuseMap.value.offset.x = object.mesh.material.uniforms.diffuseMap.value.initOffsetX;
-        object.mesh.material.uniforms.diffuseMap.value.updateMatrix();
-        object.mesh.material.uniforms.diffuseMap.value.initOffsetXSet = false;
-      }
-      if (object.mesh.material.uniforms.diffuseMap.value.initOffsetYSet){
-        object.mesh.material.uniforms.diffuseMap.value.offset.y = object.mesh.material.uniforms.diffuseMap.value.initOffsetY;
-        object.mesh.material.uniforms.diffuseMap.value.updateMatrix();
-        object.mesh.material.uniforms.diffuseMap.value.initOffsetYSet = false;
-      }
-    }
-    if (object.hasDisplacementMap()){
-      if (object.initDisplacementScaleSet){
-        object.mesh.material.uniforms.displacementInfo.value.x = object.initDisplacementScale;
-        object.initDisplacementScaleSet = false;
-      }
-      if (object.initDisplacementBiasSet){
-        object.mesh.material.uniforms.displacementInfo.value.y = object.initDisplacementBias;
-        object.initDisplacementBiasSet = false;
-      }
-    }
     if (object.initOpacitySet){
       object.updateOpacity(object.initOpacity);
       object.initOpacitySet = false;
-    }
-    if (object.initEmissiveIntensitySet){
-      object.mesh.material.uniforms.emissiveIntensity.value = object.initEmissiveIntensity;
-      object.initEmissiveIntensitySet = false;
-    }
-    if (object.initAOIntensitySet){
-      object.mesh.material.uniforms.aoIntensity.value = object.initAOIntensity;
-      object.initAOIntensitySet = false;
-    }
-    if (object.initEmissiveColorSet){
-      object.mesh.material.uniforms.emissiveColor.value.set("#"+object.initEmissiveColor);
-      object.initEmissiveColorSet = false;
-    }
-    if (object.material.isMeshPhongMaterial){
-      if (object.initShininessSet){
-        object.material.shininess = object.initShininess;
-        object.material.needsUpdate = true;
-        object.initShininessSet = false;
-      }
     }
   }
   if (fogActive){
@@ -233,6 +180,9 @@ ModeSwitcher.prototype.switchFromDesignToPreview = function(){
         skyboxMesh.material.uniforms.color.value.g,
         skyboxMesh.material.uniforms.color.value.b
       );
+    }
+    for (var objName in addedObjects){
+      addedObjects[objName].setFog();
     }
   }else{
     GLOBAL_FOG_UNIFORM.value.set(-100.0, 0, 0, 0);
@@ -382,22 +332,9 @@ ModeSwitcher.prototype.switchFromPreviewToDesign = function(){
         physicsWorld.add(object.physicsBody);
       }
     }
-
     if (object.initOpacitySet){
       object.updateOpacity(object.initOpacity);
       object.initOpacitySet = false;
-    }
-    if (object.initAOIntensitySet){
-      object.mesh.material.uniforms.totalAOIntensity.value = object.initAOIntensity;
-      object.initAOIntensitySet = false;
-    }
-    if (object.initEmissiveIntensitySet){
-      object.mesh.material.uniforms.totalEmissiveIntensity.value = object.initEmissiveIntensity;
-      object.initEmissiveIntensitySet = false;
-    }
-    if (object.initEmissiveColorSet){
-      object.mesh.material.uniforms.totalEmissiveColor.value.set("#"+object.initEmissiveColor);
-      object.initEmissiveColorSet = false;
     }
   }
   for (var objectName in addedObjects){
@@ -406,11 +343,6 @@ ModeSwitcher.prototype.switchFromPreviewToDesign = function(){
     delete object.clickCallbackFunction;
 
     object.resetColor();
-
-    if (object.texturePackSetWithScript){
-      object.texturePackSetWithScript = false;
-      object.resetTexturePackAfterAnimation();
-    }
 
     if (object.isHidden){
       object.mesh.visible = true;
@@ -421,44 +353,9 @@ ModeSwitcher.prototype.switchFromPreviewToDesign = function(){
     }
 
     object.loadState();
-
-    if (object.hasDiffuseMap()){
-      if (object.mesh.material.uniforms.diffuseMap.value.initOffsetXSet){
-        object.mesh.material.uniforms.diffuseMap.value.offset.x = object.mesh.material.uniforms.diffuseMap.value.initOffsetX;
-        object.mesh.material.uniforms.diffuseMap.value.updateMatrix();
-        object.mesh.material.uniforms.diffuseMap.value.initOffsetXSet = false;
-      }
-      if (object.mesh.material.uniforms.diffuseMap.value.initOffsetYSet){
-        object.mesh.material.uniforms.diffuseMap.value.offset.y = object.mesh.material.uniforms.diffuseMap.value.initOffsetY;
-        object.mesh.material.uniforms.diffuseMap.value.updateMatrix();
-        object.mesh.material.uniforms.diffuseMap.value.initOffsetYSet = false;
-      }
-    }
-    if (object.hasDisplacementMap()){
-      if (object.initDisplacementScaleSet){
-        object.mesh.material.uniforms.displacementInfo.value.x = object.initDisplacementScale;
-        object.initDisplacementScaleSet = false;
-      }
-      if (object.initDisplacementBiasSet){
-        object.mesh.material.uniforms.displacementInfo.value.y = object.initDisplacementBias;
-        object.initDisplacementBiasSet = false;
-      }
-    }
     if (object.initOpacitySet){
       object.updateOpacity(object.initOpacity);
       object.initOpacitySet = false;
-    }
-    if (object.initAOIntensitySet){
-      object.mesh.material.uniforms.aoIntensity.value = object.initAOIntensity;
-      object.initAOIntensitySet = false;
-    }
-    if (object.initEmissiveIntensitySet){
-      object.mesh.material.uniforms.emissiveIntensity.value = object.initEmissiveIntensity;
-      object.initEmissiveIntensitySet = false;
-    }
-    if (object.initEmissiveColorSet){
-      object.mesh.material.uniforms.emissiveColor.value.set("#"+object.initEmissiveColor);
-      object.initEmissiveColorSet = false;
     }
     if (!(typeof object.originalMass == "undefined")){
       object.setMass(object.originalMass);
@@ -493,5 +390,8 @@ ModeSwitcher.prototype.switchFromPreviewToDesign = function(){
     var text = addedTexts[txtName];
     text.restore();
     text.handleResize();
+  }
+  for (var objName in addedObjects){
+    addedObjects[objName].removeFog();
   }
 }

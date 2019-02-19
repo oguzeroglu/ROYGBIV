@@ -104,8 +104,6 @@ var CommandDescriptor = function(){
   this.newTexture.types = [];
   this.newTexture.types.push(this.UNKNOWN_INDICATOR); //name
   this.newTexture.types.push(this.UPLOADED_IMAGE_NAME); //fileName
-  this.newTexture.types.push(this.UNKNOWN_INDICATOR); //repeatU
-  this.newTexture.types.push(this.UNKNOWN_INDICATOR); //repeatV
 
   // destroyTexture
   this.destroyTexture = new Object();

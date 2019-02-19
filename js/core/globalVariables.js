@@ -28,7 +28,7 @@ var commandArgumentsExpectedCount = [
     0, //printObjects
     1, //printMetaData
     1, //destroyObject
-    4, //newTexture
+    2, //newTexture
     0, //printTextures
     1, //destroyTexture
     2, //mapTexture
@@ -188,7 +188,7 @@ var commandArgumentsExpectedExplanation = [
   "printObjects", //printObjects
   "printMetaData name", //printMetaData
   "destroyObject name", //destroyObject
-  "newTexture name fileName repeatU repeatV", //newTexture
+  "newTexture name fileName", //newTexture
   "printTextures", //printTextures
   "destroyTexture name", //destroyTexture
   "mapTexture textureName objectName", //mapTexture
@@ -1072,6 +1072,7 @@ var omRotationZController;
 var omMassController;
 var omSlipperyController;
 var omChangeableController;
+var omColorizableController;
 var omHasMassController;
 var omSideController;
 var omHideHalfController;
@@ -1092,6 +1093,7 @@ var objectManipulationParameters = {
   "Mass": 0.0,
   "Slippery": false,
   "Changeable": false,
+  "Colorizable": false,
   "Has mass": true,
   "Side": "Both",
   "Hide half": "None",

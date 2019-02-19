@@ -517,6 +517,9 @@ StateLoader.prototype.load = function(undo){
       addedObjectInstance.isDynamicObject = isDynamicObject;
       addedObjectInstance.mass = mass;
 
+      addedObjectInstance.metaData["textureRepeatU"] = curAddedObjectExport.textureRepeatU;
+      addedObjectInstance.metaData["textureRepeatV"] = curAddedObjectExport.textureRepeatV;
+
       if (!curAddedObjectExport.fromObjectGroup){
 
         var rotationX = curAddedObjectExport.rotationX;
@@ -571,6 +574,11 @@ StateLoader.prototype.load = function(undo){
       }
 
       addedObjectInstance.isChangeable = curAddedObjectExport.isChangeable;
+      addedObjectInstance.isColorizable = curAddedObjectExport.isColorizable;
+      if (addedObjectInstance.isColorizable){
+        addedObjectInstance.injectMacro("HAS_FORCED_COLOR", false, true);
+        addedObjectInstance.mesh.material.uniforms.forcedColor = new THREE.Uniform(new THREE.Vector4(-50, 0, 0, 0));
+      }
 
       if (curAddedObjectExport.noMass){
         addedObjectInstance.noMass = true;
@@ -581,9 +589,9 @@ StateLoader.prototype.load = function(undo){
         addedObjectInstance.softCopyParentName = curAddedObjectExport.softCopyParentName;
       }
 
-      addedObjectInstance.mesh.material.uniforms.emissiveIntensity.value = curAddedObjectExport.emissiveIntensity;
-      addedObjectInstance.mesh.material.uniforms.emissiveColor.value.set(curAddedObjectExport.emissiveColor);
-      addedObjectInstance.mesh.material.uniforms.aoIntensity.value = curAddedObjectExport.aoMapIntensity;
+      addedObjectInstance.mesh.material.setEmissiveIntensity = curAddedObjectExport.emissiveIntensity;
+      addedObjectInstance.mesh.material.setEmissiveColor = curAddedObjectExport.emissiveColor;
+      addedObjectInstance.mesh.material.uniforms.setAOIntensity = curAddedObjectExport.aoMapIntensity;
 
       addedObjects[addedObjectName] = addedObjectInstance;
 
@@ -630,6 +638,11 @@ StateLoader.prototype.load = function(undo){
          addedObjectInstance.physicsBody.position.copy(addedObjectInstance.mesh.position);
          addedObjectInstance.pivotRemoved = true;
        }
+
+       if (curAddedObjectExport.txtMatrix){
+         addedObjectInstance.setTxtMatrix = curAddedObjectExport.txtMatrix;
+       }
+
     }
     for (var objName in addedObjects){
       if (addedObjects[objName].softCopyParentName){
@@ -1136,6 +1149,33 @@ StateLoader.prototype.finalize = function(){
     }
   }
 
+  // ADDED OBJECTS EMISSIVE INTENSITY, EMISSIVE COLOR, AO INTENSITY, TEXTURE PROPERTIES
+  for (var objName in addedObjects){
+    var addedObject = addedObjects[objName];
+    if (addedObject.setTxtMatrix){
+      for (var ix = 0; ix<addedObject.setTxtMatrix.length; ix++){
+        addedObject.mesh.material.uniforms.textureMatrix.value.elements[ix] = addedObject.setTxtMatrix[ix];
+      }
+      delete addedObject.setTxtMatrix;
+    }
+    if (addedObject.hasEmissiveMap()){
+      if (!(typeof addedObject.setEmissiveIntensity == UNDEFINED)){
+        addedObject.mesh.material.uniforms.emissiveIntensity.value = addedObject.setEmissiveIntensity;
+        delete addedObject.setEmissiveIntensity;
+      }
+      if (!(typeof addedObject.setEmissiveColor == UNDEFINED)){
+        addedObject.mesh.material.uniforms.emissiveColor.value.set(addedObject.setEmissiveColor);
+        delete addedObject.setEmissiveColor;
+      }
+    }
+    if (addedObject.hasAOMap()){
+      if (!(typeof addedObject.setAOIntensity == UNDEFINED)){
+        addedObject.mesh.material.uniforms.aoIntensity.value = addedObject.setAOIntensity;
+        delete addedObject.setAOIntensity;
+      }
+    }
+  }
+
   // OBJECT GROUPS *************************************************
   for (var objectName in obj.objectGroups){
     var curObjectGroupExport = obj.objectGroups[objectName];
@@ -1169,6 +1209,11 @@ StateLoader.prototype.finalize = function(){
     }
 
     objectGroupInstance.isChangeable = curObjectGroupExport.isChangeable;
+    objectGroupInstance.isColorizable = curObjectGroupExport.isColorizable;
+    if (objectGroupInstance.isColorizable){
+      objectGroupInstance.injectMacro("HAS_FORCED_COLOR", false, true);
+      objectGroupInstance.mesh.material.uniforms.forcedColor = new THREE.Uniform(new THREE.Vector4(-50, 0, 0, 0));
+    }
 
     if (curObjectGroupExport.noMass){
       objectGroupInstance.noMass = true;
@@ -1254,7 +1299,6 @@ StateLoader.prototype.finalize = function(){
       }
     }
   }
-
   projectLoaded = true;
   rayCaster.refresh();
   canvas.style.visibility = "";

@@ -199,20 +199,8 @@ MeshGenerator.prototype.generateMergedMesh = function(graphicsGroup, objectGroup
 }
 
 MeshGenerator.prototype.generateBasicMesh = function(){
-  // diffuse - alpha - ao - displacement
-  var textureFlags = new THREE.Vector4(-10, -10, -10, -10);
-  // emissive - XX - XX - XX
-  var textureFlags2 = new THREE.Vector4(-10, -10, -10, -10);
-  var vertexShader = ShaderContent.basicMaterialVertexShader;
-  if (!VERTEX_SHADER_TEXTURE_FETCH_SUPPORTED){
-    vertexShader = vertexShader.replace(
-      "vec3 objNormal = normalize(normal);", ""
-    ).replace(
-      "transformedPosition += objNormal * (texture2D(displacementMap, vUV).r * displacementInfo.x + displacementInfo.y);", ""
-    );
-  }
   var material = new THREE.RawShaderMaterial({
-    vertexShader: vertexShader,
+    vertexShader: ShaderContent.basicMaterialVertexShader,
     fragmentShader: ShaderContent.basicMaterialFragmentShader,
     vertexColors: THREE.VertexColors,
     transparent: true,
@@ -220,31 +208,13 @@ MeshGenerator.prototype.generateBasicMesh = function(){
     uniforms:{
       projectionMatrix: GLOBAL_PROJECTION_UNIFORM,
       modelViewMatrix: new THREE.Uniform(new THREE.Matrix4()),
-      worldMatrix: new THREE.Uniform(new THREE.Matrix4()),
-      cameraPosition: GLOBAL_CAMERA_POSITION_UNIFORM,
       color: new THREE.Uniform(this.material.color),
-      alpha: new THREE.Uniform(this.material.alpha),
-      fogInfo: GLOBAL_FOG_UNIFORM,
-      aoIntensity: new THREE.Uniform(this.material.aoMapIntensity),
-      emissiveIntensity: new THREE.Uniform(this.material.emissiveIntensity),
-      displacementInfo: new THREE.Uniform(new THREE.Vector2()),
-      textureFlags: new THREE.Uniform(textureFlags),
-      textureFlags2: new THREE.Uniform(textureFlags2),
-      diffuseMap: this.getTextureUniform(nullTexture),
-      alphaMap: this.getTextureUniform(nullTexture),
-      aoMap: this.getTextureUniform(nullTexture),
-      displacementMap: this.getTextureUniform(nullTexture),
-      emissiveMap: this.getTextureUniform(nullTexture),
-      textureMatrix: new THREE.Uniform(new THREE.Matrix3()),
-      emissiveColor: new THREE.Uniform(new THREE.Color(this.material.emissiveColor)),
-      forcedColor: new THREE.Uniform(new THREE.Vector4(-50, 0, 0, 0)),
-      cubeTexture: GLOBAL_CUBE_TEXTURE_UNIFORM
+      alpha: new THREE.Uniform(this.material.alpha)
     }
   });
   var mesh = new THREE.Mesh(this.geometry, material);
   mesh.renderOrder = 10;
   material.uniforms.modelViewMatrix.value = mesh.modelViewMatrix;
-  material.uniforms.worldMatrix.value = mesh.matrixWorld;
   return mesh;
 }
 

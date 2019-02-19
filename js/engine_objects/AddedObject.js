@@ -98,12 +98,6 @@ var AddedObject = function(name, type, metaData, material, mesh, physicsBody, de
 }
 
 AddedObject.prototype.export = function(){
-
-  if (this.texturePackSetWithScript){
-    this.texturePackSetWithScript = false;
-    this.resetTexturePackAfterAnimation();
-  }
-
   var exportObject = new Object();
   exportObject["type"] = this.type;
   exportObject["roygbivMaterialName"] = this.material.roygbivMaterialName;
@@ -123,37 +117,46 @@ AddedObject.prototype.export = function(){
   }
 
   exportObject["opacity"] = this.mesh.material.uniforms.alpha.value;
-  exportObject["aoMapIntensity"] = this.mesh.material.uniforms.aoIntensity.value;
-  exportObject["emissiveIntensity"] = this.mesh.material.uniforms.emissiveIntensity.value;
-  exportObject["emissiveColor"] = "#"+this.mesh.material.uniforms.emissiveColor.value.getHexString();
+  if (this.hasAOMap()){
+    exportObject["aoMapIntensity"] = this.mesh.material.uniforms.aoIntensity.value;
+  }else{
+    exportObject["aoMapIntensity"] = this.material.aoMapIntensity;
+  }
+  if (this.hasEmissiveMap()){
+    exportObject["emissiveIntensity"] = this.mesh.material.uniforms.emissiveIntensity.value;
+    exportObject["emissiveColor"] = "#"+this.mesh.material.uniforms.emissiveColor.value.getHexString();
+  }else{
+    exportObject["emissiveIntensity"] = this.material.emissiveIntensity;
+    exportObject["emissiveColor"] = this.material.emissiveColor;
+  }
 
-  var diffuseMap = this.mesh.material.uniforms.diffuseMap.value;
-  var alphaMap = this.mesh.material.uniforms.alphaMap.value;
-  var aoMap = this.mesh.material.uniforms.aoMap.value;
-  var emissiveMap = this.mesh.material.uniforms.emissiveMap.value;
-  var displacementMap = this.mesh.material.uniforms.displacementMap.value;
+  exportObject["textureOffsetX"] = this.getTextureOffsetX();
+  exportObject["textureOffsetY"] = this.getTextureOffsetY();
+  exportObject["textureRepeatU"] = this.getTextureRepeatX();
+  exportObject["textureRepeatV"] = this.getTextureRepeatY();
 
   if (this.hasDiffuseMap()){
+    var diffuseMap = this.mesh.material.uniforms.diffuseMap.value;
     exportObject["diffuseRoygbivTexturePackName"] = diffuseMap.roygbivTexturePackName;
     exportObject["diffuseRoygbivTextureName"] =  diffuseMap.roygbivTextureName;
-    exportObject["textureOffsetX"] = diffuseMap.offset.x;
-    exportObject["textureOffsetY"] = diffuseMap.offset.y;
-    exportObject["textureRepeatU"] = diffuseMap.repeat.x;
-    exportObject["textureRepeatV"] = diffuseMap.repeat.y;
   }
   if (this.hasAlphaMap()){
+    var alphaMap = this.mesh.material.uniforms.alphaMap.value;
     exportObject["alphaRoygbivTexturePackName"] = alphaMap.roygbivTexturePackName;
     exportObject["alphaRoygbivTextureName"] = alphaMap.roygbivTextureName;
   }
   if (this.hasAOMap()){
+    var aoMap = this.mesh.material.uniforms.aoMap.value;
     exportObject["aoRoygbivTexturePackName"] = aoMap.roygbivTexturePackName;
     exportObject["aoRoygbivTextureName"] = aoMap.roygbivTextureName;
   }
   if (this.hasEmissiveMap()){
+    var emissiveMap = this.mesh.material.uniforms.emissiveMap.value;
     exportObject["emissiveRoygbivTexturePackName"] = emissiveMap.roygbivTexturePackName;
     exportObject["emissiveRoygbivTextureName"] = emissiveMap.roygbivTextureName;
   }
   if (this.hasDisplacementMap()){
+    var displacementMap = this.mesh.material.uniforms.displacementMap.value;
     exportObject["displacementRoygbivTexturePackName"] = displacementMap.roygbivTexturePackName;
     exportObject["displacementRoygbivTextureName"] = displacementMap.roygbivTextureName;
     exportObject["displacementScale"] = this.mesh.material.uniforms.displacementInfo.value.x;
@@ -200,15 +203,6 @@ AddedObject.prototype.export = function(){
     exportObject.blendingMode = "MULTIPLY_BLENDING";
   }
 
-  var manualDisplacementMap = this.metaData["manualDisplacementMap"];
-  var manualDisplacementScale = this.metaData["manualDisplacementScale"];
-  var manualDisplacementBias = this.metaData["manualDisplacementBias"];
-  if (!(typeof manualDisplacementMap == UNDEFINED) && !(typeof manualDisplacementScale == UNDEFINED)
-          && !(typeof manualDisplacementBias == UNDEFINED)){
-      exportObject.manualDisplacementInfo = manualDisplacementMap+
-                      PIPE+manualDisplacementScale+PIPE+manualDisplacementBias;
-  }
-
   if (this.metaData.isSlippery){
     exportObject.isSlippery = true;
   }else{
@@ -219,6 +213,11 @@ AddedObject.prototype.export = function(){
     exportObject.isChangeable = true;
   }else{
     exportObject.isChangeable = false;
+  }
+  if (this.isColorizable){
+    exportObject.isColorizable = true;
+  }else{
+    exportObject.isColorizable = false;
   }
 
   if (this.noMass){
@@ -277,10 +276,17 @@ AddedObject.prototype.export = function(){
     exportObject.softCopyParentName = this.softCopyParentName;
   }
 
+  if (this.hasTexture()){
+    exportObject.txtMatrix = this.mesh.material.uniforms.textureMatrix.value.elements;
+  }
+
   return exportObject;
 }
 
 AddedObject.prototype.forceColor = function(r, g, b, a){
+  if (!this.isColorizable){
+    return;
+  }
   if (a < 0){
     a = 0;
   }
@@ -288,9 +294,13 @@ AddedObject.prototype.forceColor = function(r, g, b, a){
     a = 1;
   }
   this.mesh.material.uniforms.forcedColor.value.set(a, r, g, b);
+  this.mesh.material.needsUpdate = true;
 }
 
 AddedObject.prototype.resetColor = function(){
+  if (!this.isColorizable){
+    return;
+  }
   this.mesh.material.uniforms.forcedColor.value.set(-50, 0, 0, 0);
 }
 
@@ -563,41 +573,38 @@ AddedObject.prototype.sliceInHalf = function(type){
 
 AddedObject.prototype.syncProperties = function(refObject){
   // TEXTURE OFFSETS
-  if (refObject.hasDiffuseMap() && this.hasDiffuseMap()){
-    var refTexture = refObject.mesh.material.uniforms.diffuseMap.value;
-    var srcTexture = this.mesh.material.uniforms.diffuseMap.value;
-    srcTexture.offset.x = refTexture.offset.x;
-    srcTexture.offset.y = refTexture.offset.y;
-    srcTexture.initOffsetXSet = false;
-    srcTexture.updateMatrix();
+  if (refObject.hasTexture() && this.hasTexture()){
+    var m1 = this.mesh.material.uniforms.textureMatrix.value.elements;
+    var m2 = refObject.mesh.material.uniforms.textureMatrix.value.elements;
+    for (var i = 0; i<m2.length; i++){
+      m1[i] = m2[i];
+    }
   }
   // OPACITY
   var refOpacity = refObject.mesh.material.uniforms.alpha.value;
   this.updateOpacity(refOpacity);
   this.initOpacitySet = false;
   // AO INTENSITY
-  var refAOIntensity = refObject.mesh.material.uniforms.aoIntensity.value;
-  this.mesh.material.uniforms.aoIntensity.value = refAOIntensity
-  this.initAOIntensitySet = false;
-  this.initAOIntensity = refAOIntensity;
+  if (refObject.hasAOMap() && this.hasAOMap()){
+    var refAOIntensity = refObject.mesh.material.uniforms.aoIntensity.value;
+    this.mesh.material.uniforms.aoIntensity.value = refAOIntensity
+  }
   // EMISSIVE INTENSITY
-  var refMaterial = refObject.mesh.material;
-  var refEmissiveIntensity = refMaterial.uniforms.emissiveIntensity.value;
-  this.mesh.material.uniforms.emissiveIntensity.value = refEmissiveIntensity;
-  this.initEmissiveIntensitySet = false;
-  this.initEmissiveIntensity = refEmissiveIntensity;
-  // EMISSIVE COLOR
-  var refEmissiveColor = refMaterial.uniforms.emissiveColor.value;
-  this.mesh.material.uniforms.emissiveColor.value.copy(refEmissiveColor);
-  this.initEmissiveColorSet = false;
-  this.initEmissiveColor = "#" + refEmissiveColor.getHexString();
+  if (refObject.hasEmissiveMap() && this.hasEmissiveMap()){
+    var refMaterial = refObject.mesh.material;
+    var refEmissiveIntensity = refMaterial.uniforms.emissiveIntensity.value;
+    this.mesh.material.uniforms.emissiveIntensity.value = refEmissiveIntensity;
+    // EMISSIVE COLOR
+    var refEmissiveColor = refMaterial.uniforms.emissiveColor.value;
+    this.mesh.material.uniforms.emissiveColor.value.copy(refEmissiveColor);
+  }
   // DISPLACEMENT
-  var refDispX = refObject.mesh.material.uniforms.displacementInfo.value.x;
-  var refDispY = refObject.mesh.material.uniforms.displacementInfo.value.y;
-  this.mesh.material.uniforms.displacementInfo.value.x = refDispX;
-  this.mesh.material.uniforms.displacementInfo.value.y = refDispY;
-  this.initDisplacementScaleSet = false;
-  this.initDisplacementBiasSet = false;
+    if (refObject.hasDisplacementMap() && this.hasDisplacementMap()){
+    var refDispX = refObject.mesh.material.uniforms.displacementInfo.value.x;
+    var refDispY = refObject.mesh.material.uniforms.displacementInfo.value.y;
+    this.mesh.material.uniforms.displacementInfo.value.x = refDispX;
+    this.mesh.material.uniforms.displacementInfo.value.y = refDispY;
+  }
 }
 
 AddedObject.prototype.setAttachedProperties = function(){
@@ -624,26 +631,60 @@ AddedObject.prototype.getTextureUniform = function(texture){
 }
 
 AddedObject.prototype.hasEmissiveMap = function(){
-  return (this.mesh.material.uniforms.textureFlags2.value.x > 0);
+  return !(typeof this.mesh.material.uniforms.emissiveMap == UNDEFINED);
 }
 
 AddedObject.prototype.unMapEmissive = function(){
-  this.mesh.material.uniforms.emissiveMap = this.getTextureUniform(nullTexture);
-  this.mesh.material.uniforms.textureFlags2.value.x = -10;
+  if (this.hasEmissiveMap()){
+    delete this.mesh.material.uniforms.emissiveMap;
+    delete this.mesh.material.uniforms.emissiveIntensity;
+    delete this.mesh.material.uniforms.emissiveColor;
+    this.removeMacro("HAS_EMISSIVE", false, true);
+    if (!this.hasTexture()){
+      delete this.mesh.material.uniforms.textureMatrix;
+      this.removeMacro("HAS_TEXTURE", true, true);
+    }
+  }
 }
 
 AddedObject.prototype.mapEmissive = function(emissiveMap){
-  this.mesh.material.uniforms.emissiveMap = this.getTextureUniform(emissiveMap);
-  this.mesh.material.uniforms.textureFlags2.value.x = 10;
+  if (!this.hasTexture()){
+    var tMatrix = new THREE.Matrix3();
+    tMatrix.setUvTransform(0, 0, 1, 1, 0, 0, 0);
+    this.mesh.material.uniforms.textureMatrix = new THREE.Uniform(tMatrix);
+    this.injectMacro("HAS_TEXTURE", true, true);
+    this.mesh.material.uniformsNeedUpdate = true;
+  }
+  if (this.hasEmissiveMap()){
+    this.mesh.material.uniforms.emissiveMap.value = emissiveMap;
+  }else{
+    this.mesh.material.uniforms.emissiveMap = this.getTextureUniform(emissiveMap);
+    this.mesh.material.uniforms.emissiveIntensity = new THREE.Uniform(this.material.emissiveIntensity);
+    this.mesh.material.uniforms.emissiveColor = new THREE.Uniform(new THREE.Color(this.material.emissiveColor));
+    this.injectMacro("HAS_EMISSIVE", false, true);
+    this.mesh.material.uniformsNeedUpdate = true;
+  }
+  emissiveMap.updateMatrix();
 }
 
 AddedObject.prototype.hasDisplacementMap = function(){
-  return (this.mesh.material.uniforms.textureFlags.value.w > 0);
+  return !(typeof this.mesh.material.uniforms.displacementMap == UNDEFINED);
 }
 
 AddedObject.prototype.unMapDisplacement = function(){
-  this.mesh.material.uniforms.displacementMap = this.getTextureUniform(nullTexture);
-  this.mesh.material.uniforms.textureFlags.value.w = -10;
+  if (!VERTEX_SHADER_TEXTURE_FETCH_SUPPORTED){
+    console.error("Displacement mapping is not supported for this device.");
+    return;
+  }
+  if (this.hasDisplacementMap()){
+    delete this.mesh.material.uniforms.displacementMap;
+    delete this.mesh.material.uniforms.displacementInfo;
+    this.removeMacro("HAS_DISPLACEMENT", true, false);
+    if (!this.hasTexture()){
+      delete this.mesh.material.uniforms.textureMatrix;
+      this.removeMacro("HAS_TEXTURE", true, true);
+    }
+  }
 }
 
 AddedObject.prototype.mapDisplacement = function(displacementTexture){
@@ -651,52 +692,123 @@ AddedObject.prototype.mapDisplacement = function(displacementTexture){
     console.error("Displacement mapping is not supported for this device.");
     return;
   }
-  this.mesh.material.uniforms.displacementMap = this.getTextureUniform(displacementTexture);
-  this.mesh.material.uniforms.textureFlags.value.w = 10;
+  if (!this.hasTexture()){
+    var tMatrix = new THREE.Matrix3();
+    tMatrix.setUvTransform(0, 0, 1, 1, 0, 0, 0);
+    this.mesh.material.uniforms.textureMatrix = new THREE.Uniform(tMatrix);
+    this.injectMacro("HAS_TEXTURE", true, true);
+    this.mesh.material.uniformsNeedUpdate = true;
+  }
+  if (this.hasDisplacementMap()){
+    this.mesh.material.uniforms.displacementMap.value = displacementTexture;
+  }else{
+    this.mesh.material.uniforms.displacementMap = this.getTextureUniform(displacementTexture);
+    this.mesh.material.uniforms.displacementInfo = new THREE.Uniform(new THREE.Vector2());
+    this.injectMacro("HAS_DISPLACEMENT", true, false);
+    this.mesh.material.uniformsNeedUpdate = true;
+  }
+  displacementTexture.updateMatrix();
 }
 
 AddedObject.prototype.hasAOMap = function(){
-  return (this.mesh.material.uniforms.textureFlags.value.z > 0);
+  return !(typeof this.mesh.material.uniforms.aoMap == UNDEFINED);
 }
 
 AddedObject.prototype.unMapAO = function(){
-  this.mesh.material.uniforms.aoMap = this.getTextureUniform(nullTexture);
-  this.mesh.material.uniforms.textureFlags.value.z = -10;
+  if (this.hasAOMap()){
+    delete this.mesh.material.uniforms.aoMap;
+    delete this.mesh.material.uniforms.aoIntensity;
+    this.removeMacro("HAS_AO", false, true);
+    if (!this.hasTexture()){
+      delete this.mesh.material.uniforms.textureMatrix;
+      this.removeMacro("HAS_TEXTURE", true, true);
+    }
+  }
 }
 
 AddedObject.prototype.mapAO = function(aoTexture){
-  this.mesh.material.uniforms.aoMap = this.getTextureUniform(aoTexture);
-  this.mesh.material.uniforms.textureFlags.value.z = 10;
+  if (!this.hasTexture()){
+    var tMatrix = new THREE.Matrix3();
+    tMatrix.setUvTransform(0, 0, 1, 1, 0, 0, 0);
+    this.mesh.material.uniforms.textureMatrix = new THREE.Uniform(tMatrix);
+    this.injectMacro("HAS_TEXTURE", true, true);
+    this.mesh.material.uniformsNeedUpdate = true;
+  }
+  if (this.hasAOMap()){
+    this.mesh.material.uniforms.aoMap.value = aoTexture;
+  }else{
+    this.mesh.material.uniforms.aoMap = this.getTextureUniform(aoTexture);
+    this.mesh.material.uniforms.aoIntensity = new THREE.Uniform(this.material.aoMapIntensity);
+    this.injectMacro("HAS_AO", false, true);
+    this.mesh.material.uniformsNeedUpdate = true;
+  }
+  aoTexture.updateMatrix();
 }
 
 AddedObject.prototype.hasAlphaMap = function(){
-  return (this.mesh.material.uniforms.textureFlags.value.y > 0);
+  return !(typeof this.mesh.material.uniforms.alphaMap == UNDEFINED);
 }
 
 AddedObject.prototype.unMapAlpha = function(){
-  this.mesh.material.uniforms.alphaMap = this.getTextureUniform(nullTexture);
-  this.mesh.material.uniforms.textureFlags.value.y = -10;
+  if (this.hasAlphaMap()){
+    delete this.mesh.material.uniforms.alphaMap;
+    this.removeMacro("HAS_ALPHA", false, true);
+    if (!this.hasTexture()){
+      delete this.mesh.material.uniforms.textureMatrix;
+      this.removeMacro("HAS_TEXTURE", true, true);
+    }
+  }
 }
 
 AddedObject.prototype.mapAlpha = function(alphaTexture){
-  this.mesh.material.uniforms.alphaMap = this.getTextureUniform(alphaTexture);
-  this.mesh.material.uniforms.textureFlags.value.y = 10;
+  if (!this.hasTexture()){
+    var tMatrix = new THREE.Matrix3();
+    tMatrix.setUvTransform(0, 0, 1, 1, 0, 0, 0);
+    this.mesh.material.uniforms.textureMatrix = new THREE.Uniform(tMatrix);
+    this.injectMacro("HAS_TEXTURE", true, true);
+    this.mesh.material.uniformsNeedUpdate = true;
+  }
+  if (this.hasAlphaMap()){
+    this.mesh.material.uniforms.alphaMap.value = alphaTexture;
+  }else{
+    this.mesh.material.uniforms.alphaMap = this.getTextureUniform(alphaTexture);
+    this.injectMacro("HAS_ALPHA", false, true);
+    this.mesh.material.uniformsNeedUpdate = true;
+  }
+  alphaTexture.updateMatrix();
 }
 
 AddedObject.prototype.hasDiffuseMap = function(){
-  return (this.mesh.material.uniforms.textureFlags.value.x > 0);
+  return !(typeof this.mesh.material.uniforms.diffuseMap == UNDEFINED);
 }
 
 AddedObject.prototype.unMapDiffuse = function(){
-  this.mesh.material.uniforms.diffuseMap = this.getTextureUniform(nullTexture);
-  this.mesh.material.uniforms.textureFlags.value.x = -10;
+  if (this.hasDiffuseMap()){
+    delete this.mesh.material.uniforms.diffuseMap;
+    this.removeMacro("HAS_DIFFUSE", false, true);
+    if (!this.hasTexture()){
+      delete this.mesh.material.uniforms.textureMatrix;
+      this.removeMacro("HAS_TEXTURE", true, true);
+    }
+  }
 }
 
 AddedObject.prototype.mapDiffuse = function(diffuseTexture){
-  this.mesh.material.uniforms.diffuseMap = this.getTextureUniform(diffuseTexture);
-  this.mesh.material.uniforms.textureFlags.value.x = 10;
+  if (!this.hasTexture()){
+    var tMatrix = new THREE.Matrix3();
+    tMatrix.setUvTransform(0, 0, 1, 1, 0, 0, 0);
+    this.mesh.material.uniforms.textureMatrix = new THREE.Uniform(tMatrix);
+    this.injectMacro("HAS_TEXTURE", true, true);
+    this.mesh.material.uniformsNeedUpdate = true;
+  }
+  if (this.hasDiffuseMap()){
+    this.mesh.material.uniforms.diffuseMap.value = diffuseTexture
+  }else{
+    this.mesh.material.uniforms.diffuseMap = this.getTextureUniform(diffuseTexture);
+    this.injectMacro("HAS_DIFFUSE", false, true);
+    this.mesh.material.uniformsNeedUpdate = true;
+  }
   diffuseTexture.updateMatrix();
-  this.mesh.material.uniforms.textureMatrix.value = diffuseTexture.matrix;
 }
 
 AddedObject.prototype.incrementOpacity = function(val){
@@ -1159,173 +1271,61 @@ AddedObject.prototype.destroy = function(){
   this.dispose();
 
   rayCaster.refresh();
-
 }
 
 AddedObject.prototype.dispose = function(){
 
-  if (this.mesh.material.uniforms.diffuseMap.value){
+  if (this.hasDiffuseMap()){
     this.mesh.material.uniforms.diffuseMap.value.dispose();
   }
-  if (this.mesh.material.uniforms.alphaMap.value){
+  if (this.hasAlphaMap()){
     this.mesh.material.uniforms.alphaMap.value.dispose();
   }
-  if (this.mesh.material.uniforms.aoMap.value){
+  if (this.hasAOMap()){
     this.mesh.material.uniforms.aoMap.value.dispose();
   }
-  if (this.mesh.material.uniforms.displacementMap.value){
+  if (this.hasDisplacementMap()){
     this.mesh.material.uniforms.displacementMap.value.dispose();
   }
-  if (this.mesh.material.uniforms.emissiveMap.value){
+  if (this.hasEmissiveMap()){
     this.mesh.material.uniforms.emissiveMap.value.dispose();
   }
   this.mesh.material.dispose();
 }
 
-AddedObject.prototype.mapTexturePack = function(texturePack, fromScript){
-
-  if (fromScript && !this.texturePackSetWithScript){
-    this.texturePackSetWithScript = true;
-    if (this.hasDiffuseMap() && this.mesh.material.uniforms.diffuseMap.value.roygbivTextureName){
-      this.oldMap = this.mesh.material.uniforms.diffuseMap.value;
-      this.oldMapName = this.mesh.material.uniforms.diffuseMap.value.roygbivTextureName;
-    }
-    if (this.hasAlphaMap() && this.mesh.material.uniforms.alphaMap.value.roygbivTextureName){
-      this.oldAlphaMap = this.mesh.material.uniforms.alphaMap.value;
-      this.oldAlphaMapName = this.mesh.material.uniforms.alphaMap.value.roygbivTextureName;
-    }
-    if (this.hasAOMap() && this.mesh.material.uniforms.aoMap.value.roygbivTextureName){
-      this.oldAoMap = this.mesh.material.uniforms.aoMap.value;
-      this.oldAoMapName = this.mesh.material.uniforms.aoMap.value.roygbivTextureName;
-    }
-    if (this.hasEmissiveMap() && this.mesh.material.uniforms.emissiveMap.value.roygbivTextureName){
-      this.oldEmissiveMap = this.mesh.material.uniforms.emissiveMap.value;
-      this.oldEmissiveMapName = this.mesh.material.uniforms.emissiveMap.value.roygbivTextureName;
-    }
-    if (this.hasDisplacementMap() && this.mesh.material.uniforms.displacementMap.value.roygbivTextureName){
-      this.oldDisplacementMap = this.mesh.material.uniforms.displacementMap.value;
-      this.oldDisplacementMapName = this.mesh.material.uniforms.displacementMap.value.roygbivTextureName;
-    }
-
-    this.oldWidthSegments = this.metaData["widthSegments"];
-    this.oldHeightSegments = this.metaData["heightSegments"];
-    if (this.type == "box"){
-      this.oldDepthSegments = this.metaData["depthSegments"];
-    }
-
-  }
-
+AddedObject.prototype.mapTexturePack = function(texturePack){
   this.resetMaps();
-
   if (texturePack.hasDiffuse){
     this.mapDiffuse(texturePack.diffuseTexture);
-    if  (!fromScript){
-      this.mesh.material.uniforms.diffuseMap.value.roygbivTexturePackName = texturePack.name;
-      this.mesh.material.uniforms.diffuseMap.value.roygbivTextureName = 0;
-    }
-    if (this.adjustTextureOffsetXOnTexturePackMap){
-      this.mesh.material.uniforms.diffuseMap.value.offset.x = this.adjustTextureOffsetXOnTexturePackMap;
-      this.mesh.material.uniforms.diffuseMap.value.updateMatrix();
-    }
-    if (this.adjustTextureOffsetYOnTexturePackMap){
-      this.mesh.material.uniforms.diffuseMap.value.offset.y = this.adjustTextureOffsetYOnTexturePackMap;
-      this.mesh.material.uniforms.diffuseMap.value.updateMatrix();
-    }
+    this.mesh.material.uniforms.diffuseMap.value.roygbivTexturePackName = texturePack.name;
+    this.mesh.material.uniforms.diffuseMap.value.roygbivTextureName = 0;
     this.mesh.material.uniforms.diffuseMap.value.needsUpdate = true;
   }
   if (texturePack.hasAlpha){
     this.mapAlpha(texturePack.alphaTexture);
-    if (!fromScript){
-      this.mesh.material.uniforms.alphaMap.value.roygbivTexturePackName = texturePack.name;
-      this.mesh.material.uniforms.alphaMap.value.roygbivTextureName = 0;
-    }
+    this.mesh.material.uniforms.alphaMap.value.roygbivTexturePackName = texturePack.name;
+    this.mesh.material.uniforms.alphaMap.value.roygbivTextureName = 0;
     this.mesh.material.uniforms.alphaMap.value.needsUpdate = true;
   }
   if (texturePack.hasAO){
     this.mapAO(texturePack.aoTexture);
-    if (!fromScript){
-      this.mesh.material.uniforms.aoMap.value.roygbivTexturePackName = texturePack.name;
-      this.mesh.material.uniforms.aoMap.value.roygbivTextureName = 0;
-    }
+    this.mesh.material.uniforms.aoMap.value.roygbivTexturePackName = texturePack.name;
+    this.mesh.material.uniforms.aoMap.value.roygbivTextureName = 0;
     this.mesh.material.uniforms.aoMap.value.needsUpdate = true;
   }
   if (texturePack.hasEmissive){
     this.mapEmissive(texturePack.emissiveTexture);
-    if (!fromScript){
-      this.mesh.material.uniforms.emissiveMap.value.roygbivTexturePackName = texturePack.name;
-      this.mesh.material.uniforms.emissiveMap.value.roygbivTextureName = 0;
-    }
+    this.mesh.material.uniforms.emissiveMap.value.roygbivTexturePackName = texturePack.name;
+    this.mesh.material.uniforms.emissiveMap.value.roygbivTextureName = 0;
     this.mesh.material.uniforms.emissiveMap.value.needsUpdate = true;
   }
   if (texturePack.hasHeight && VERTEX_SHADER_TEXTURE_FETCH_SUPPORTED){
     this.mapDisplacement(texturePack.heightTexture);
-    if (!fromScript){
-      this.mesh.material.uniforms.displacementMap.value.roygbivTexturePackName = texturePack.name;
-      this.mesh.material.uniforms.displacementMap.value.roygbivTextureName = 0;
-    }
+    this.mesh.material.uniforms.displacementMap.value.roygbivTexturePackName = texturePack.name;
+    this.mesh.material.uniforms.displacementMap.value.roygbivTextureName = 0;
     this.mesh.material.uniforms.displacementMap.value.needsUpdate = true;
   }
-
-  if (this.textureRepeatUOnTexturePackMap && this.textureRepeatVOnTexturePackMap){
-    this.adjustTextureRepeat(
-      this.textureRepeatUOnTexturePackMap,
-      this.textureRepeatVOnTexturePackMap
-    );
-  }
-  if (!fromScript){
-    this.associatedTexturePack = texturePack.name;
-  }
-}
-
-AddedObject.prototype.resetTexturePackAfterAnimation = function(){
-  this.resetMaps();
-  if (this.associatedTexturePack){
-    this.mapTexturePack(
-      texturePacks[this.associatedTexturePack]
-    );
-  }
-  if (this.oldMap){
-    var cloneMap = this.oldMap;
-    cloneMap.needsUpdate = true;
-    cloneMap.roygbivTextureName = this.oldMapName;
-    this.oldMap = 0;
-    this.mapDiffuse(cloneMap);
-  }
-  if (this.oldAoMap){
-    var cloneMap = this.oldAoMap;
-    cloneMap.needsUpdate = true;
-    cloneMap.roygbivTextureName = this.oldAoMapName;
-    this.oldAoMap = 0;
-    this.mapAO(cloneMap);
-  }
-  if (this.oldAlphaMap){
-    var cloneMap = this.oldAlphaMap;
-    cloneMap.needsUpdate = true;
-    cloneMap.roygbivTextureName = this.oldAlphaMapName;
-    this.oldAlphaMap = 0;
-    this.mapAlpha(cloneMap);
-  }
-  if (this.oldEmissiveMap){
-    var cloneMap = this.oldEmissiveMap;
-    cloneMap.needsUpdate = true;
-    cloneMap.roygbivTextureName = this.oldEmissiveMapName;
-    this.oldEmissiveMap = 0;
-    this.mapEmissive(cloneMap);
-  }
-  if (this.oldDisplacementMap){
-    var cloneMap = this.oldDisplacementMap;
-    cloneMap.needsUpdate = true;
-    cloneMap.roygbivTextureName = this.oldDisplacementMapName;
-    this.oldDisplacementMap = 0;
-    this.mapDisplacement(cloneMap);
-  }
-
-  if (this.metaData["widthSegments"] && this.oldWidthSegments){
-    if (this.metaData["widthSegments"] != this.oldWidthSegments){
-      this.segmentGeometry(true, this.oldWidthSegments);
-      this.oldWidthSegments = 0;
-    }
-  }
+  this.associatedTexturePack = texturePack.name;
 }
 
 AddedObject.prototype.resetAssociatedTexturePack = function(){
@@ -1762,17 +1762,6 @@ AddedObject.prototype.segmentGeometry = function(isCustom, count, returnGeometry
       }
     }
   }
-
-  var manualDisplacementMap = this.metaData["manualDisplacementMap"];
-  var manualDisplacementScale = this.metaData["manualDisplacementScale"];
-  var manualDisplacementBias = this.metaData["manualDisplacementBias"];
-  if (!(typeof manualDisplacementMap == UNDEFINED) && !(typeof manualDisplacementScale == UNDEFINED) && !(typeof manualDisplacementBias == UNDEFINED)){
-    var dispTexture = textures[manualDisplacementMap];
-    if (dispTexture && (dispTexture instanceof THREE.Texture)){
-      this.applyDisplacementMap(dispTexture, manualDisplacementMap, manualDisplacementScale, manualDisplacementBias);
-    }
-  }
-
 }
 
 AddedObject.prototype.modifyCylinderPhysicsAfterSegmentChange = function(radialSegments){
@@ -1850,16 +1839,6 @@ AddedObject.prototype.resetMaps = function(resetAssociatedTexturePack){
   }
 }
 
-AddedObject.prototype.isTextured = function(){
-  return (
-    this.hasDiffuseMap() ||
-    this.hasAlphaMap() ||
-    this.hasAOMap() ||
-    this.hasEmissiveMap() ||
-    this.hasDisplacementMap()
-  );
-}
-
 AddedObject.prototype.refreshTextueMatrix = function(){
   if (this.hasDiffuseMap()){
     this.mesh.material.uniforms.diffuseMap.value.updateMatrix();
@@ -1889,27 +1868,10 @@ AddedObject.prototype.adjustTextureRepeat = function(repeatU, repeatV){
   }else{
     repeatV = this.metaData["textureRepeatV"];
   }
-  if (this.hasDiffuseMap()){
-    this.mesh.material.uniforms.diffuseMap.value.repeat.set(repeatU, repeatV);
-    this.mesh.material.uniforms.diffuseMap.value.updateMatrix();
+  if (this.hasTexture()){
+    this.mesh.material.uniforms.textureMatrix.value.elements[0] = repeatU;
+    this.mesh.material.uniforms.textureMatrix.value.elements[4] = repeatV;
   }
-  if (this.hasAlphaMap()){
-    this.mesh.material.uniforms.alphaMap.value.repeat.set(repeatU, repeatV);
-    this.mesh.material.uniforms.alphaMap.value.updateMatrix();
-  }
-  if (this.hasAOMap()){
-    this.mesh.material.uniforms.aoMap.value.repeat.set(repeatU, repeatV);
-    this.mesh.material.uniforms.aoMap.value.updateMatrix();
-  }
-  if (this.hasEmissiveMap()){
-    this.mesh.material.uniforms.emissiveMap.value.repeat.set(repeatU, repeatV);
-    this.mesh.material.uniforms.emissiveMap.value.updateMatrix();
-  }
-  if (this.hasDisplacementMap()){
-    this.mesh.material.uniforms.displacementMap.value.repeat.set(repeatU, repeatV);
-    this.mesh.material.uniforms.displacementMap.value.updateMatrix();
-  }
-
 }
 
 AddedObject.prototype.isVisibleOnThePreviewScene = function(parentName){
@@ -2444,6 +2406,7 @@ AddedObject.prototype.copy = function(name, isHardCopy, copyPosition, gridSystem
   }
   copyInstance.noMass = this.noMass;
   copyInstance.isChangeable = this.isChangeable;
+  copyInstance.isColorizable = this.isColorizable;
   if (this.metaData["isSlippery"]){
     copyInstance.setSlippery(true);
   }
@@ -2464,26 +2427,25 @@ AddedObject.prototype.copy = function(name, isHardCopy, copyPosition, gridSystem
       }
       if (this.hasAOMap()){
         copyInstance.mapAO(this.mesh.material.uniforms.aoMap.value);
+        copyInstance.mesh.material.uniforms.aoIntensity.value = this.mesh.material.uniforms.aoIntensity.value;
       }
       if (this.hasDisplacementMap()){
         copyInstance.mapDisplacement(this.mesh.material.uniforms.displacementMap.value);
+        copyInstance.mesh.material.uniforms.displacementInfo.value.x = this.mesh.material.uniforms.displacementInfo.value.x;
+        copyInstance.mesh.material.uniforms.displacementInfo.value.y = this.mesh.material.uniforms.displacementInfo.value.y;
       }
       if (this.hasEmissiveMap()){
         copyInstance.mapEmissive(this.mesh.material.uniforms.emissiveMap.value);
+        copyInstance.mesh.material.uniforms.emissiveIntensity.value = this.mesh.material.uniforms.emissiveIntensity.value;
+        copyInstance.mesh.material.uniforms.emissiveColor.value = new THREE.Color().copy(this.mesh.material.uniforms.emissiveColor.value);
       }
     }
     copyInstance.updateOpacity(this.mesh.material.uniforms.alpha.value);
-    copyInstance.mesh.material.uniforms.aoIntensity.value =
-                      this.mesh.material.uniforms.aoIntensity.value;
-    copyInstance.mesh.material.uniforms.emissiveIntensity.value =
-                      this.mesh.material.uniforms.emissiveIntensity.value;
-    copyInstance.mesh.material.uniforms.displacementInfo.value.x =
-                      this.mesh.material.uniforms.displacementInfo.value.x;
-    copyInstance.mesh.material.uniforms.displacementInfo.value.y =
-                      this.mesh.material.uniforms.displacementInfo.value.y;
-    copyInstance.mesh.material.uniforms.emissiveColor.value = new THREE.Color().copy(
-                      this.mesh.material.uniforms.emissiveColor.value
-    );
+    if (this.hasTexture()){
+      for (var ix = 0; ix<this.mesh.material.uniforms.textureMatrix.value.elements.length; ix++){
+        copyInstance.mesh.material.uniforms.textureMatrix.value.elements[ix] = this.mesh.material.uniforms.textureMatrix.value.elements[ix];
+      }
+    }
   }
 
   if (this.pivotObject){
@@ -2504,4 +2466,100 @@ AddedObject.prototype.copy = function(name, isHardCopy, copyPosition, gridSystem
   copyInstance.createdWithScript = fromScript;
 
   return copyInstance;
+}
+
+AddedObject.prototype.hasTexture = function(){
+  return (
+    this.hasDiffuseMap() || this.hasAOMap() || this.hasAlphaMap() || this.hasEmissiveMap() || this.hasDisplacementMap()
+  );
+}
+
+AddedObject.prototype.injectMacro = function(macro, insertVertexShader, insertFragmentShader){
+  if (insertVertexShader){
+    this.mesh.material.vertexShader = this.mesh.material.vertexShader.replace(
+      "#define INSERTION", "#define INSERTION\n#define "+macro
+    )
+  };
+  if (insertFragmentShader){
+    this.mesh.material.fragmentShader = this.mesh.material.fragmentShader.replace(
+      "#define INSERTION", "#define INSERTION\n#define "+macro
+    )
+  };
+  this.mesh.material.needsUpdate = true;
+}
+
+AddedObject.prototype.removeMacro = function(macro, removeVertexShader, removeFragmentShader){
+  if (removeVertexShader){
+    this.mesh.material.vertexShader = this.mesh.material.vertexShader.replace("#define "+macro, "");
+  }
+  if (removeFragmentShader){
+    this.mesh.material.fragmentShader = this.mesh.material.fragmentShader.replace("#define "+macro, "");
+  }
+  this.mesh.material.needsUpdate = true;
+}
+
+AddedObject.prototype.getTextureOffsetX = function(){
+  if (this.hasTexture()){
+    return this.mesh.material.uniforms.textureMatrix.value.elements[6];
+  }
+  return 0;
+}
+
+AddedObject.prototype.getTextureOffsetY = function(){
+  if (this.hasTexture()){
+    return this.mesh.material.uniforms.textureMatrix.value.elements[7];
+  }
+  return 0;
+}
+
+AddedObject.prototype.setTextureOffsetX = function(val){
+  if (this.hasTexture()){
+    this.mesh.material.uniforms.textureMatrix.value.elements[6] = val;
+  }
+}
+
+AddedObject.prototype.setTextureOffsetY = function(val){
+  if (this.hasTexture()){
+    this.mesh.material.uniforms.textureMatrix.value.elements[7] = val;
+  }
+}
+
+AddedObject.prototype.getTextureRepeatX = function(){
+  if (this.hasTexture()){
+    return this.mesh.material.uniforms.textureMatrix.value.elements[0];
+  }
+  return 1;
+}
+
+AddedObject.prototype.getTextureRepeatY = function(){
+  if (this.hasTexture()){
+    return this.mesh.material.uniforms.textureMatrix.value.elements[4];
+  }
+  return 1;
+}
+
+AddedObject.prototype.setFog = function(){
+  if (!this.mesh.material.uniforms.fogInfo){
+    this.injectMacro("HAS_FOG", false, true);
+    this.mesh.material.uniforms.fogInfo = GLOBAL_FOG_UNIFORM;
+  }
+  if (fogBlendWithSkybox){
+    if (!this.mesh.material.uniforms.cubeTexture){
+      this.injectMacro("HAS_SKYBOX_FOG", true, true);
+      this.mesh.material.uniforms.worldMatrix = new THREE.Uniform(this.mesh.matrixWorld);
+      this.mesh.material.uniforms.cubeTexture = GLOBAL_CUBE_TEXTURE_UNIFORM;
+      this.mesh.material.uniforms.cameraPosition = GLOBAL_CAMERA_POSITION_UNIFORM;
+    }
+  }
+  this.mesh.material.needsUpdate = true;
+}
+
+AddedObject.prototype.removeFog = function(){
+  this.removeMacro("HAS_FOG", false, true);
+  this.removeMacro("HAS_SKYBOX_FOG", true, true);
+  delete this.mesh.material.uniforms.fogInfo;
+  delete this.mesh.material.uniforms.cubeTexture;
+  delete this.mesh.material.uniforms.worldMatrix;
+  delete this.mesh.material.uniforms.cameraPosition;
+  this.mesh.material.needsUpdate = true;
 }

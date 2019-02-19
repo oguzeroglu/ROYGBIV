@@ -37,16 +37,8 @@ var Roygbiv = function(){
     "isRunning",
     "translate",
     "getPosition",
-    "mapTexturePack",
     "opacity",
     "getOpacity",
-    "textureOffsetX",
-    "textureOffsetY",
-    "textureOffset",
-    "heightMapScale",
-    "getHeightMapScale",
-    "heightMapBias",
-    "getHeightMapBias",
     "setCollisionListener",
     "removeCollisionListener",
     "createParticleMaterial",
@@ -106,7 +98,6 @@ var Roygbiv = function(){
     "expandCrosshair",
     "shrinkCrosshair",
     "setParticleSystemPosition",
-    "emissiveIntensity",
     "startObjectTrail",
     "stopObjectTrail",
     "setObjectVelocity",
@@ -157,8 +148,6 @@ var Roygbiv = function(){
     "setTextInputCallbackFunction",
     "removeTextInputCallbackFunction",
     "lerp",
-    "aoIntensity",
-    "emissiveColor",
     "resetObjectVelocity",
     "setFPSDropCallbackFunction",
     "removeFPSDropCallbackFunction",
@@ -412,48 +401,6 @@ Roygbiv.prototype.getOpacity = function(object){
     return object.mesh.material.uniforms.alpha.value;
   }
   return object.mesh.material.uniforms.totalAlpha.value;
-}
-
-// getHeightMapScale
-//  Returns the height map scale of an object.
-Roygbiv.prototype.getHeightMapScale = function(object){
-  if (mode == 0){
-    return;
-  }
-  if (!object){
-    throw new Error("getHeightMapScale error: Object is not defined.");
-    return;
-  }
-  if (!(object.isAddedObject)){
-    throw new Error("getHeightMapScale error: Type not supported.");
-    return;
-  }
-  if (!object.hasDisplacementMap()){
-    throw new Error("getHeightMapScale error: No height texture mapped to the object.");
-    return;
-  }
-  return object.mesh.material.uniforms.displacementInfo.value.x;
-}
-
-// getHeightMapBias
-//  Returns the height map bias of an object.
-Roygbiv.prototype.getHeightMapBias = function(object){
-  if (mode == 0){
-    return;
-  }
-  if (!object){
-    throw new Error("getHeightMapBias error: Object is not defined.");
-    return;
-  }
-  if (!(object.isAddedObject)){
-    throw new Error("getHeightMapBias error: Type not supported.");
-    return;
-  }
-  if (!object.hasDisplacementMap()){
-    throw new Error("getHeightMapBias error: No height texture mapped to the object.");
-    return;
-  }
-  return object.mesh.material.uniforms.displacementInfo.value.y;
 }
 
 // getMarkedPosition
@@ -1172,38 +1119,6 @@ Roygbiv.prototype.translate = function(object, axis, amount){
   }
 }
 
-// mapTexturePack
-//  Maps a texture pack of given name to an object. Calling this function
-//  repeatedly may cause performance issues.
-Roygbiv.prototype.mapTexturePack = function(object, texturePackName){
-  if (mode == 0){
-    return;
-  }
-  if (!object){
-    throw new Error("mapTexturePack error: Object is undefined.");
-    return;
-  }
-  if (!(object.isAddedObject)){
-    throw new Error("mapTexturePack error: Type not supported.");
-    return;
-  }
-  if (!addedObjects[object.name]){
-    throw new Error("mapTexturePack error: Cannot map texture packs to child objects.");
-    return;
-  }
-
-  var texturePack = texturePacks[texturePackName];
-  if (!texturePack){
-    throw new Error("mapTexturePack error: No such texture pack.");
-    return;
-  }
-  if (!texturePack.isUsable()){
-    throw new Error("mapTexturePack error: Texture pack not usable.");
-    return;
-  }
-  object.mapTexturePack(texturePack, true);
-}
-
 // opacity
 //  Increases/decreases the opacity of given object.
 Roygbiv.prototype.opacity = function(object, delta){
@@ -1254,244 +1169,6 @@ Roygbiv.prototype.opacity = function(object, delta){
     }
   }
 
-}
-
-// textureOffsetX
-//  Adjusts the x coordinate of texture offset of given object.
-Roygbiv.prototype.textureOffsetX = function(object, dx){
-  if (mode == 0){
-    return;
-  }
-  if (!object){
-    throw new Error("textureOffsetX error: Object is undefined.");
-    return;
-  }
-  if (isNaN(dx)){
-    throw new Error("textureOffsetX error: dx is not a number.");
-    return;
-  }
-  if (!(object.isAddedObject)){
-    throw new Error("textureOffsetX error: Type not supported.");
-    return;
-  }
-  if (!addedObjects[object.name]){
-    throw new Error("textureOffsetX error: Cannot set texture offset to child objects.");
-    return;
-  }
-  var texture;
-  if (object.hasDiffuseMap()){
-    texture = object.mesh.material.uniforms.diffuseMap.value;
-  }
-  if (texture){
-    if (!texture.initOffsetXSet){
-      texture.initOffsetX = texture.offset.x;
-      texture.initOffsetXSet = true;
-    }
-    texture.offset.x += dx;
-    texture.updateMatrix();
-  }
-}
-
-// textureOffsetY
-//  Adjusts the y coordinate of texture offset of given object.
-Roygbiv.prototype.textureOffsetY = function(object, dy){
-  if (mode == 0){
-    return;
-  }
-  if (!object){
-    throw new Error("textureOffsetY error: Object is not defined.");
-    return;
-  }
-  if (isNaN(dy)){
-    throw new Error("textureOffsetY error: dy is not a number.");
-    return;
-  }
-  if (!(object.isAddedObject)){
-    throw new Error("textureOffsetY error: Type not supported.");
-    return;
-  }
-  if (!addedObjects[object.name]){
-    throw new Error("textureOffsetY error: Cannot set texture offset of child objects.");
-    return;
-  }
-  var texture;
-  if (object.hasDiffuseMap()){
-    texture = object.mesh.material.uniforms.diffuseMap.value;
-  }
-  if (texture){
-    if (!texture.initOffsetYSet){
-      texture.initOffsetY = texture.offset.y;
-      texture.initOffsetYSet = true;
-    }
-    texture.offset.y += dy;
-    texture.updateMatrix();
-  }
-}
-
-// textureOffset
-//  Adjusts the texture offset of given object.
-Roygbiv.prototype.textureOffset = function(object, dx, dy){
-  if (mode == 0){
-    return;
-  }
-  if (!object){
-    throw new Error("textureOffset error: Object is not defined.");
-    return;
-  }
-  if (isNaN(dx)){
-    throw new Error("textureOffset error: dx is not a number.");
-    return;
-  }
-  if (isNaN(dy)){
-    throw new Error("textureOffset error: dy is not a number.");
-    return;
-  }
-  if (!(object.isAddedObject)){
-    throw new Error("textureOffset error: Type not supported.");
-    return;
-  }
-  if (!addedObjects[object.name]){
-    throw new Error("textureOffset error: Cannot set texture offset to child objects.");
-    return;
-  }
-  var texture;
-  if (object.hasDiffuseMap()){
-    texture = object.mesh.material.uniforms.diffuseMap.value;
-  }
-  if (texture){
-    if (!texture.initOffsetXSet){
-      texture.initOffsetX = texture.offset.x;
-      texture.initOffsetXSet = true;
-    }
-    if (!texture.initOffsetYSet){
-      texture.initOffsetY = texture.offset.y;
-      texture.initOffsetYSet = true;
-    }
-    texture.offset.x += dx;
-    texture.offset.y += dy;
-    texture.updateMatrix();
-  }
-}
-
-// heightMapScale
-//  Modifies the height map scale of an object.
-Roygbiv.prototype.heightMapScale = function(object, delta){
-  if (mode == 0){
-    return;
-  }
-  if (!object){
-    throw new Error("heightMapScale error: Object is not defined.");
-    return;
-  }
-  if (isNaN(delta)){
-    throw new Error("heightMapScale error: Delta is not a number.");
-    return;
-  }
-  if (!(object.isAddedObject)){
-    throw new Error("heightMapScale error: Type not supported.");
-    return;
-  }
-  if (!addedObjects[object.name]){
-    throw new Error("heightMapScale error: Cannot set height map scale to child objects.");
-    return;
-  }
-  if (!object.hasDisplacementMap()){
-    throw new Error("heightMapScale error: No height texture mapped to object.");
-    return;
-  }
-  if (!object.initDisplacementScaleSet){
-    object.initDisplacementScale = object.mesh.material.uniforms.displacementInfo.value.x;
-    object.initDisplacementScaleSet = true;
-  }
-  object.mesh.material.uniforms.displacementInfo.value.x += delta;
-}
-
-// heightMapBias
-//  Modifies the height map bias of an object.
-Roygbiv.prototype.heightMapBias = function(object, delta){
-  if (mode == 0){
-    return;
-  }
-  if (!object){
-    throw new Error("heightMapBias error: Object is not defined.");
-    return;
-  }
-  if (isNaN(delta)){
-    throw new Error("heightMapBias error: Delta is not a number.");
-    return;
-  }
-  if (!(object.isAddedObject)){
-    throw new Error("heightMapBias error: Type not supported.");
-    return;
-  }
-  if (!addedObjects[object.name]){
-    throw new Error("heightMapBias error: Cannot set height map bias to child objects.");
-    return;
-  }
-  if (!object.hasDisplacementMap()){
-    throw new Error("heightMapBias error: No height texture mapped to object.");
-    return;
-  }
-  if (!object.initDisplacementBiasSet){
-    object.initDisplacementBias = object.mesh.material.uniforms.displacementInfo.value.y;
-    object.initDisplacementBiasSet = true;
-  }
-  object.mesh.material.uniforms.displacementInfo.value.y += delta;
-}
-
-// emissiveIntensity
-// Modifies the emissive intensity of given object by given amount
-Roygbiv.prototype.emissiveIntensity = function(object, delta){
-  if (mode == 0){
-    return;
-  }
-  if (typeof object == UNDEFINED){
-    throw new Error("emissiveIntensity error: object is not defined.");
-    return;
-  }
-  var isAddedObject = (object.isAddedObject);
-  var isObjectGroup = (object.isObjectGroup);
-  if (!(isAddedObject || isObjectGroup)){
-    throw new Error("emissiveIntensity error: Type not supported.");
-    return;
-  }
-  if (object.parentObjectName){
-    throw new Error("emissiveIntensity error: Cannot set emissive intensity to child objects.");
-    return;
-  }
-  if (typeof delta == UNDEFINED){
-    throw new Error("emissiveIntensity error: delta is not defined.");
-    return;
-  }
-  if (isNaN(delta)){
-    throw new Error("emissiveIntensity error: delta is not a number.");
-    return;
-  }
-  if (isAddedObject){
-    if (!object.initEmissiveIntensitySet){
-      object.initEmissiveIntensity = object.mesh.material.uniforms.emissiveIntensity.value;
-      object.initEmissiveIntensitySet = true;
-    }
-    object.mesh.material.uniforms.emissiveIntensity.value += delta;
-    if (object.mesh.material.uniforms.emissiveIntensity.value < 0){
-      objet.mesh.material.uniforms.emissiveIntensity.value = 0;
-    }
-    if (object.mesh.material.uniforms.emissiveIntensity.value > 100){
-      object.mesh.material.uniforms.emissiveIntensity.value = 100;
-    }
-  }else{
-    if (!object.initEmissiveIntensitySet){
-      object.initEmissiveIntensity = object.mesh.material.uniforms.totalEmissiveIntensity.value;
-      object.initEmissiveIntensitySet = true;
-    }
-    object.mesh.material.uniforms.totalEmissiveIntensity.value += delta;
-    if (object.mesh.material.uniforms.totalEmissiveIntensity.value < 0){
-      object.mesh.material.uniforms.totalEmissiveIntensity.value = 0;
-    }
-    if (object.mesh.material.uniforms.totalEmissiveIntensity.value > 100){
-      object.mesh.material.uniforms.totalEmissiveIntensity.value = 100;
-    }
-  }
 }
 
 // setObjectVelocity
@@ -1560,6 +1237,10 @@ Roygbiv.prototype.setObjectColor = function(object, colorName, alpha){
     throw new Error("setObjectColor error: Type not supported.");
     return;
   }
+  if (!object.isColorizable){
+    throw new Error("setObjectColor error: Object is not marked as colorizable.");
+    return;
+  }
   if (typeof colorName == UNDEFINED){
     throw new Error("setObjectColor error: colorName is not defined.");
     return;
@@ -1588,6 +1269,10 @@ Roygbiv.prototype.resetObjectColor = function(object){
   }
   if (!(object.isAddedObject) && !(object.isObjectGroup)){
     throw new Error("resetObjectColor error: Type not supported.");
+    return;
+  }
+  if (!object.isColorizable){
+    throw new Error("setObjectColor error: Object is not marked as colorizable.");
     return;
   }
   object.resetColor();
@@ -1641,95 +1326,6 @@ Roygbiv.prototype.unsetRotationPivot = function(object){
   delete object.pivotOffsetX;
   delete object.pivotOffsetY;
   delete object.pivotOffsetZ;
-}
-
-// aoIntensity
-// Modifies the AO intensity of an object by given amount.
-Roygbiv.prototype.aoIntensity = function(object, amount){
-  if (mode == 0){
-    return;
-  }
-  if (typeof object == UNDEFINED){
-    throw new Error("aoIntensity error: object is not defined.");
-    return;
-  }
-  var isAddedObject = (object.isAddedObject);
-  var isObjectGroup = (object.isObjectGroup);
-  if (!(isAddedObject || isObjectGroup)){
-    throw new Error("aoIntensity error: Type not supported.");
-    return;
-  }
-  if (object.parentObjectName){
-    throw new Error("aoIntensity error: Child objects do not support this function.");
-    return;
-  }
-  if (typeof amount == UNDEFINED){
-    throw new Error("aoIntensity error: amount is not defined.");
-    return;
-  }
-  if (isNaN(amount)){
-    throw new Error("aoIntensity error: amount is not a number.");
-    return;
-  }
-  if (isAddedObject){
-    if (!object.initAOIntensitySet){
-      object.initAOIntensity = object.mesh.material.uniforms.aoIntensity.value;
-      object.initAOIntensitySet = true;
-    }
-    object.mesh.material.uniforms.aoIntensity.value += amount;
-    if (object.mesh.material.uniforms.aoIntensity.value < 0){
-      object.mesh.material.uniforms.aoIntensity.value = 0;
-    }
-    if (object.mesh.material.uniforms.aoIntensity.value > 10){
-      object.mesh.material.uniforms.aoIntensity.value = 10;
-    }
-  }else{
-    if (!object.initAOIntensitySet){
-      object.initAOIntensity = object.mesh.material.uniforms.totalAOIntensity.value;
-      object.initAOIntensitySet = true;
-    }
-    object.mesh.material.uniforms.totalAOIntensity.value += amount;
-    if (object.mesh.material.uniforms.totalAOIntensity.value < 0){
-      object.mesh.material.uniforms.totalAOIntensity.value = 0;
-    }
-    if (object.mesh.material.uniforms.totalAOIntensity.value > 10){
-      object.mesh.material.uniforms.totalAOIntensity.value = 10;
-    }
-  }
-}
-
-// emissiveColor
-// Sets the emissive color of an object to a given value.
-Roygbiv.prototype.emissiveColor = function(object, colorText){
-  if (mode == 0){
-    return;
-  }
-  if (typeof object == UNDEFINED){
-
-  }
-  var isAddedObject = (object.isAddedObject);
-  var isObjectGroup = (object.isObjectGroup);
-  if (!(isAddedObject || isObjectGroup)){
-    throw new Error("emissiveColor error: Type not supported.");
-    return;
-  }
-  if (typeof colorText == UNDEFINED){
-    throw new Error("emissiveColor error: colorText is not defined.");
-    return;
-  }
-  if (isAddedObject){
-    if (!object.initEmissiveColorSet){
-      object.initEmissiveColor = object.mesh.material.uniforms.emissiveColor.value.getHexString();
-      object.initEmissiveColorSet = true;
-    }
-    object.mesh.material.uniforms.emissiveColor.value.set(colorText);
-  }else{
-    if (!object.initEmissiveColorSet){
-      object.initEmissiveColor = object.mesh.material.uniforms.totalEmissiveColor.value.getHexString();
-      object.initEmissiveColorSet = true;
-    }
-    object.mesh.material.uniforms.totalEmissiveColor.value.set(colorText);
-  }
 }
 
 // resetObjectVelocity

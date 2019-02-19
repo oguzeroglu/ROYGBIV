@@ -607,16 +607,6 @@ function parse(input){
             terminal.printError(Text.TEXTURE_NAME_MUST_BE_UNIQUE);
             return true;
           }
-          var repeatU = parseInt(splitted[3]);
-          var repeatV = parseInt(splitted[4]);
-          if (isNaN(splitted[3])){
-            terminal.printError(Text.REPEATU_MUST_BE_A_NUMBER);
-            return true;
-          }
-          if (isNaN(splitted[4])){
-            terminal.printError(Text.REPEATV_MUST_BE_A_NUMBER);
-            return true;
-          }
           if (textureName.indexOf(PIPE) != -1){
             terminal.printError(Text.TEXTURE_NAME_NOT_VALID);
             return true;
@@ -629,7 +619,6 @@ function parse(input){
             var texture = new THREE.Texture(imageDom);
             texture.wrapS = THREE.RepeatWrapping;
             texture.wrapT = THREE.RepeatWrapping;
-            texture.repeat.set(repeatU, repeatV);
             texture.needsUpdate = true;
             textures[textureName] = texture;
             textureURLs[textureName] = fileName;
@@ -650,7 +639,6 @@ function parse(input){
                 texture = textures[textureNameX];
                 texture.wrapS = THREE.RepeatWrapping;
                 texture.wrapT = THREE.RepeatWrapping;
-                texture.repeat.set( repeatU, repeatV );
                 texture.needsUpdate = true;
                 textures[textureName] = texture;
                 texture.isLoaded = true;
@@ -682,7 +670,6 @@ function parse(input){
                 texture = textureData;
                 texture.wrapS = THREE.RepeatWrapping;
                 texture.wrapT = THREE.RepeatWrapping;
-                texture.repeat.set( repeatU, repeatV );
                 texture.isLoaded = true;
                 textures[textureName] = texture;
               },
@@ -881,7 +868,7 @@ function parse(input){
             terminal.printError(Text.TEXTURE_REPEAT_V_MUST_BE_A_POSITIVE_NUMBER);
             return true;
           }
-          if (object.isTextured()){
+          if (object.hasTexture()){
             object.adjustTextureRepeat(repeatU, repeatV);
           }else{
             terminal.printError(Text.NO_TEXTURE_MAPPED_TO_OBJECT);
