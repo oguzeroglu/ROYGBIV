@@ -1031,6 +1031,10 @@ var DEFAULT_OFFSET_BETWEEN_CHARS = 20;
 var DEFAULT_OFFSET_BETWEEN_LINES = 20;
 var MARGIN_MODE_2D_TEXT_TOP_LEFT = 0;
 var MARGIN_MODE_2D_TEXT_BOTTOM_RIGHT = 1;
+var roygbivAttributeCounter = 1;
+var roygbivBufferAttributeCounter = 1;
+var roygbivSkippedArrayBufferUpdates = 0;
+var roygbivSkippedElementArrayBufferUpdates = 0;
 
 // WORKER VARIABLES
 var WORKERS_SUPPORTED = (typeof(Worker) !== "undefined");

@@ -2227,6 +2227,10 @@ StateLoader.prototype.resetProject = function(undo){
   fonts = new Object();
   NO_MOBILE = false;
   fixedAspect = 0;
+  roygbivAttributeCounter = 1;
+  roygbivBufferAttributeCounter = 1;
+  roygbivSkippedArrayBufferUpdates = 0;
+  roygbivSkippedElementArrayBufferUpdates = 0;
 
   boundingClientRect = renderer.domElement.getBoundingClientRect();
   pointerLockRequested = false;
