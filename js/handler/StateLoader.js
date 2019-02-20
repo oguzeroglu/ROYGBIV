@@ -1276,10 +1276,15 @@ StateLoader.prototype.finalize = function(){
     }
 
     objectGroupInstance.updateOpacity(curObjectGroupExport.totalAlpha);
-    objectGroupInstance.mesh.material.uniforms.totalAOIntensity.value = curObjectGroupExport.totalAOIntensity;
-    objectGroupInstance.mesh.material.uniforms.totalEmissiveIntensity.value = curObjectGroupExport.totalEmissiveIntensity;
-    objectGroupInstance.mesh.material.uniforms.totalEmissiveColor.value.set(curObjectGroupExport.totalEmissiveColor);
-
+    if (objectGroupInstance.mesh.material.uniforms.totalAOIntensity){
+      objectGroupInstance.mesh.material.uniforms.totalAOIntensity.value = curObjectGroupExport.totalAOIntensity;
+    }
+    if (objectGroupInstance.mesh.material.uniforms.totalEmissiveIntensity){
+      objectGroupInstance.mesh.material.uniforms.totalEmissiveIntensity.value = curObjectGroupExport.totalEmissiveIntensity;
+    }
+    if (objectGroupInstance.mesh.material.uniforms.totalEmissiveColor){
+      objectGroupInstance.mesh.material.uniforms.totalEmissiveColor.value.set(curObjectGroupExport.totalEmissiveColor);
+    }
   }
 
   for (var objName in objectGroups){

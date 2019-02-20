@@ -152,6 +152,10 @@ window.onload = function() {
         addedObjects[objName].removeFog();
         addedObjects[objName].setFog();
       }
+      for (var objName in objectGroups){
+        objectGroups[objName].removeFog();
+        objectGroups[objName].setFog();
+      }
     }).listen();
     // DAT GUI SKYBOX
     datGuiSkybox = new dat.GUI();
@@ -1351,7 +1355,7 @@ function afterObjectSelection(){
         disableController(omDisplacementScaleController);
         disableController(omDisplacementBiasController);
       }
-      if (!obj.hasDiffuseMap()){
+      if (!obj.hasTexture()){
         disableController(omTextureOffsetXController);
         disableController(omTextureOffsetYController);
       }else{

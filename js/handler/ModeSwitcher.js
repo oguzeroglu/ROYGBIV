@@ -184,6 +184,9 @@ ModeSwitcher.prototype.switchFromDesignToPreview = function(){
     for (var objName in addedObjects){
       addedObjects[objName].setFog();
     }
+    for (var objName in objectGroups){
+      objectGroups[objName].setFog();
+    }
   }else{
     GLOBAL_FOG_UNIFORM.value.set(-100.0, 0, 0, 0);
   }
@@ -393,5 +396,8 @@ ModeSwitcher.prototype.switchFromPreviewToDesign = function(){
   }
   for (var objName in addedObjects){
     addedObjects[objName].removeFog();
+  }
+  for (var objName in objectGroups){
+    objectGroups[objName].removeFog();
   }
 }

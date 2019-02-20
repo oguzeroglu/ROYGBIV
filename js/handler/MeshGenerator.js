@@ -68,62 +68,44 @@ MeshGenerator.prototype.generateInstancedMesh = function(graphicsGroup, objectGr
   var aoTexture = objectGroup.aoTexture;
   var displacementTexture = objectGroup.displacementTexture;
   var textureMatrix = objectGroup.textureMatrix;
-  if (!diffuseTexture){
-    diffuseTexture = nullTexture;
-  }
-  if (!emissiveTexture){
-    emissiveTexture = nullTexture;
-  }
-  if (!alphaTexture){
-    alphaTexture = nullTexture;
-  }
-  if (!aoTexture){
-    aoTexture = nullTexture;
-  }
-  if (!displacementTexture){
-    displacementTexture = nullTexture;
-  }
-  if (!textureMatrix){
-    textureMatrix = new THREE.Matrix3();
-  }
   var vertexShader = ShaderContent.instancedBasicMaterialVertexShader;
-  if (!VERTEX_SHADER_TEXTURE_FETCH_SUPPORTED){
-    vertexShader = vertexShader.replace(
-      "vec3 objNormal = normalize(normal);", ""
-    ).replace(
-      "transformedPosition += objNormal * (texture2D(displacementMap, vUV).r * displacementInfo.x + displacementInfo.y);", ""
-    );
+  var uniforms = {
+    projectionMatrix: GLOBAL_PROJECTION_UNIFORM,
+    modelViewMatrix: new THREE.Uniform(new THREE.Matrix4()),
+    totalAlpha: new THREE.Uniform(1)
+  };
+  if (aoTexture){
+    uniforms.aoMap = this.getTextureUniform(aoTexture);
+    uniforms.totalAOIntensity = new THREE.Uniform(1);
+  }
+  if (emissiveTexture){
+    uniforms.emissiveMap = this.getTextureUniform(emissiveTexture);
+    uniforms.totalEmissiveColor = new THREE.Uniform(new THREE.Color("white"));
+    uniforms.totalEmissiveIntensity = new THREE.Uniform(1);
+  }
+  if (diffuseTexture){
+    uniforms.diffuseMap = this.getTextureUniform(diffuseTexture);
+  }
+  if (alphaTexture){
+    uniforms.alphaMap = this.getTextureUniform(alphaTexture);
+  }
+  if (displacementTexture && VERTEX_SHADER_TEXTURE_FETCH_SUPPORTED){
+    uniforms.displacementMap = this.getTextureUniform(displacementTexture);
+  }
+  if (objectGroup.hasTexture){
+    uniforms.textureMatrix = new THREE.Uniform(textureMatrix);
   }
   var material = new THREE.RawShaderMaterial({
-    vertexShader: vertexShader,
+    vertexShader: ShaderContent.instancedBasicMaterialVertexShader,
     fragmentShader: ShaderContent.instancedBasicMaterialFragmentShader,
     transparent: objectGroup.isTransparent,
     side: THREE.DoubleSide,
-    uniforms: {
-      projectionMatrix: GLOBAL_PROJECTION_UNIFORM,
-      modelViewMatrix: new THREE.Uniform(new THREE.Matrix4()),
-      worldMatrix: new THREE.Uniform(new THREE.Matrix4()),
-      cameraPosition: GLOBAL_CAMERA_POSITION_UNIFORM,
-      totalAlpha: new THREE.Uniform(1),
-      totalAOIntensity: new THREE.Uniform(1),
-      totalEmissiveIntensity: new THREE.Uniform(1),
-      totalEmissiveColor: new THREE.Uniform(new THREE.Color("white")),
-      diffuseMap: this.getTextureUniform(diffuseTexture),
-      emissiveMap: this.getTextureUniform(emissiveTexture),
-      alphaMap: this.getTextureUniform(alphaTexture),
-      aoMap: this.getTextureUniform(aoTexture),
-      displacementMap: this.getTextureUniform(displacementTexture),
-      textureMatrix: new THREE.Uniform(textureMatrix),
-      fogInfo: GLOBAL_FOG_UNIFORM,
-      forcedColor: new THREE.Uniform(new THREE.Vector4(-50, 0, 0, 0)),
-      cubeTexture: GLOBAL_CUBE_TEXTURE_UNIFORM
-    }
+    uniforms: uniforms
   });
   var mesh = new THREE.Mesh(this.geometry, material);
   mesh.renderOrder = 10;
   mesh.position.copy(graphicsGroup.position);
   material.uniforms.modelViewMatrix.value = mesh.modelViewMatrix;
-  material.uniforms.worldMatrix.value = mesh.matrixWorld;
   return mesh;
 }
 
