@@ -3,6 +3,9 @@ var SelectionHandler = function(){
 }
 
 SelectionHandler.prototype.select = function(object){
+  if (mode != 0){
+    return;
+  }
   this.resetCurrentSelection();
   if (object.isAddedObject){
     selectedAddedObject = object;

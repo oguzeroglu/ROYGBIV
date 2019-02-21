@@ -4648,15 +4648,15 @@ function parse(input){
             fogParameters["Density"] = fogDensity * 100;
             fogParameters["Blend skybox"] = fogBlendWithSkybox;
             if (!skyboxVisible){
-              enableController(fogColorController);
-              disableController(fogBlendWithSkyboxController);
+              guiHandler.enableController(fogColorController);
+              guiHandler.disableController(fogBlendWithSkyboxController);
             }else{
               if (fogBlendWithSkybox){
-                disableController(fogColorController);
+                guiHandler.disableController(fogColorController);
               }else{
-                enableController(fogColorController);
+                guiHandler.enableController(fogColorController);
               }
-              enableController(fogBlendWithSkyboxController);
+              guiHandler.enableController(fogBlendWithSkyboxController);
             }
             fogConfigurationsVisible = true;
             terminal.printInfo(Text.GUI_OPENED);

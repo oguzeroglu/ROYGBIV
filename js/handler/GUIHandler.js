@@ -252,7 +252,7 @@ GUIHandler.prototype.enableController = function(controller){
   controller.domElement.style.opacity = 1;
 }
 
-GUIHandler.prototype.nableAllTMControllers = function(){
+GUIHandler.prototype.enableAllTMControllers = function(){
   guiHandler.enableController(textManipulationTextNameController);
   guiHandler.enableController(textManipulationContentController);
   guiHandler.enableController(textManipulationTextColorController);
@@ -313,6 +313,7 @@ GUIHandler.prototype.hideAll = function(){
   $(datGuiTextManipulation.domElement).attr("hidden", true);
   $(datGuiSkybox.domElement).attr("hidden", true);
   $(datGuiFog.domElement).attr("hidden", true);
+  skyboxConfigurationsVisible = false;
 }
 
 GUIHandler.prototype.initializePostProcessingGUI = function(){
