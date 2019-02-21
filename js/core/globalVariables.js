@@ -968,6 +968,7 @@ var GLOBAL_ADDEDTEXT_VIEWPORT_UNIFORM = new THREE.Uniform(new THREE.Vector4(0, 0
 var GLOBAL_SKYBOX_ALPHA_UNIFORM = new THREE.Uniform(1.0);
 var VERTEX_SHADER_TEXTURE_FETCH_SUPPORTED;
 var DDS_SUPPORTED;
+var INSTANCING_SUPPORTED;
 var jobHandlerSelectedGrid = 0;
 var jobHandlerWorking = false;
 var geometryCache = new Object();
