@@ -12,10 +12,18 @@ uniform float totalAlpha;
 
 #ifdef HAS_TEXTURE
   varying vec2 vUV;
-  varying float hasDiffuseMap;
-  varying float hasEmissiveMap;
-  varying float hasAlphaMap;
-  varying float hasAOMap;
+  #ifdef HAS_DIFFUSE
+    varying float hasDiffuseMap;
+  #endif
+  #ifdef HAS_EMISSIVE
+    varying float hasEmissiveMap;
+  #endif
+  #ifdef HAS_ALPHA
+    varying float hasAlphaMap;
+  #endif
+  #ifdef HAS_AO
+    varying float hasAOMap;
+  #endif
 #endif
 #ifdef HAS_AO
   uniform float totalAOIntensity;
