@@ -48,8 +48,6 @@ app.post("/build", function(req, res){
 });
 
 function copyAssets(application){
-  var jqueryTerminalCssContent = fs.readFileSync("css/jquery.terminal-1.11.3.min.css", "utf8");
-  fs.writeFileSync("deploy/"+application.projectName+"/css/jquery.terminal-1.11.3.min.css", jqueryTerminalCssContent);
   copyFileSync("css/Hack-Bold.ttf", "deploy/"+application.projectName+"/css/");
   var htmlContent = fs.readFileSync("template/application.html", "utf8");
   htmlContent = htmlContent.replace(
@@ -71,6 +69,7 @@ function copyAssets(application){
     });
   }
   copyFolderRecursiveSync("third_party_licenses", "deploy/"+application.projectName+"/");
+  fs.unlinkSync("deploy/"+application.projectName+"/third_party_licenses/LICENSE_JQUERY_TERMINAL");
   console.log("[*] Copied third party licenses.");
   copyFileSync("LICENSE", "deploy/"+application.projectName+"/");
   console.log("[*] Copied ROYGBIV license.");
@@ -184,6 +183,12 @@ function readEngineScripts(projectName, author, noMobile){
         continue;
       }else if (scriptPath.includes("JobHandler.js")){
         console.log("[*] Skipping JobHandler");
+        continue;
+      }else if (scriptPath.includes("jquery.terminal-1.11.3.min.js")){
+        console.log("[*] Skipping jquery terminal plugin");
+        continue;
+      }else if (scriptPath.includes("Terminal.js")){
+        console.log("[*] Skipping Terminal.");
         continue;
       }
       content += scriptContent +"\n";

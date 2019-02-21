@@ -14672,7 +14672,7 @@
 			// OGUZ
 			return 'lowp';
 
-			if ( precision === 'highp' ) {
+			/*if ( precision === 'highp' ) {
 
 				if ( gl.getShaderPrecisionFormat( gl.VERTEX_SHADER, gl.HIGH_FLOAT ).precision > 0 &&
 				     gl.getShaderPrecisionFormat( gl.FRAGMENT_SHADER, gl.HIGH_FLOAT ).precision > 0 ) {
@@ -14696,7 +14696,7 @@
 
 			}
 
-			return 'lowp';
+			return 'lowp';*/
 
 		}
 

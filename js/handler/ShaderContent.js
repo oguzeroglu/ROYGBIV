@@ -29,7 +29,8 @@ var ShaderContent = function(){
         terminal.clear();
         terminal.print("Type help for list of commands.");
       }else{
-        terminal.printInfo("Shaders loaded.");
+        appendtoDeploymentConsole("Shaders loaded.");
+        appendtoDeploymentConsole("");
         startDeployment();
       }
     }

@@ -1312,8 +1312,7 @@ StateLoader.prototype.finalize = function(){
     terminal.clear();
     terminal.printInfo("Project loaded.");
   }else{
-    terminal.disable();
-    terminalDiv.style.display = "none";
+    removeCLIDom();
     modeSwitcher.switchMode();
     if (screenResolution != 1){
       canvas.style.oldPosition = canvas.style.position;
@@ -2221,7 +2220,6 @@ StateLoader.prototype.resetProject = function(undo){
   screenFullScreenChangeCallbackFunction = 0;
   screenKeydownCallbackFunction = 0;
   screenKeyupCallbackFunction = 0;
-  terminalTextInputCallbackFunction = 0;
   fpsDropCallbackFunction = 0;
   performanceDropCallbackFunction = 0;
   userInactivityCallbackFunction = 0;

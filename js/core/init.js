@@ -45,18 +45,20 @@ window.onload = function() {
   cliDiv.addEventListener("mousemove", function(event){
     inactiveCounter = 0;
   });
-  terminalDiv.addEventListener("mousewheel", function(e){
-    e.preventDefault();
-    e.stopPropagation();
-  });
-  if (typeof InstallTrigger !== 'undefined') {
-    // M O Z I L L A
-    terminalDiv.addEventListener("wheel", function(e){
+  if (!isDeployment){
+    terminalDiv.addEventListener("mousewheel", function(e){
       e.preventDefault();
       e.stopPropagation();
     });
+    if (typeof InstallTrigger !== 'undefined') {
+      // M O Z I L L A
+      terminalDiv.addEventListener("wheel", function(e){
+        e.preventDefault();
+        e.stopPropagation();
+      });
+    }
+    dragElement(cliDiv);
   }
-  dragElement(cliDiv);
 
   // SCRIPTING UTILITY FUNCTIONS
   ROYGBIV = new Roygbiv();
@@ -955,9 +957,13 @@ window.onload = function() {
   GLOBAL_CUBE_TEXTURE_UNIFORM.value.needsUpdate = true;
   nullTexture.isNullTexture = true;
 
-  terminal.init();
+  if (!isDeployment){
+    terminal.init();
+  }
   ShaderContent = new ShaderContent();
   if (isDeployment){
+    cliDiv.value = "";
+    appendtoDeploymentConsole("Loading shaders.");
     console.log(
       "%c "+BANNERL1+"\n"+BANNERL2+"\n"+BANNERL3+"\n"+
       BANNERL4+"\n"+BANNERL5 +"\n"+"by Oğuz Eroğlu - github.com/oguzeroglu",
@@ -1542,7 +1548,7 @@ function resizeFunction(){
     boundingClientRect = renderer.domElement.getBoundingClientRect();
     if (isDeployment){
       canvas.oldWidth = (canvas.width / screenResolution) + 'px';
-      if (terminal.isMadeVisible){
+      if (!isDeployment && terminal.isMadeVisible){
         ROYGBIV.terminal(false);
         ROYGBIV.terminal(true);
         if (!terminal.terminalPromptEnabled){
@@ -1862,32 +1868,48 @@ function processNewGridSystemCommand(name, sizeX, sizeZ, centerX, centerY, cente
 
 // DEPLOYMENT
 function startDeployment(){
+  appendtoDeploymentConsole("Project name: "+projectName);
+  appendtoDeploymentConsole("Author: "+author);
+  appendtoDeploymentConsole("");
+  appendtoDeploymentConsole("Powered by");
+  appendtoDeploymentConsole(BANNERL1);
+  appendtoDeploymentConsole(BANNERL2);
+  appendtoDeploymentConsole(BANNERL3);
+  appendtoDeploymentConsole(BANNERL4);
+  appendtoDeploymentConsole(BANNERL5);
+  appendtoDeploymentConsole("");
+  appendtoDeploymentConsole("by Oğuz Eroğlu - github.com/oguzeroglu");
+  appendtoDeploymentConsole("");
+  appendtoDeploymentConsole("");
   if (NO_MOBILE && isMobile){
-    terminal.clear();
-    terminal.handleAboutCommand();
-    terminal.printError("[!] This application does not support mobile devices. Please run this with a non mobile device.");
+    appendtoDeploymentConsole("[!] This application does not support mobile devices. Please run this with a non mobile device.");
     return;
   }
-  terminal.clear();
-  terminal.handleAboutCommand();
   $.getJSON("js/application.json").done(function(data){
-    terminal.printInfo("Initializing.");
+    appendtoDeploymentConsole("Initializing.");
     var stateLoader = new StateLoader(data);
     var result = stateLoader.load();
     if (result){
       if (stateLoader.hasTextures || stateLoader.hasTexturePacks || stateLoader.hasSkyboxes || stateLoader.hasFonts){
-        terminal.printInfo("Loading assets.");
+        appendtoDeploymentConsole("Loading assets.");
       }else{
-        terminal.disable();
-        terminalDiv.style.display = "none";
+        removeCLIDom();
       }
     }else{
-      terminal.printError("Project failed to load: "+stateLoader.reason);
+      appendtoDeploymentConsole("[!] Project failed to load: "+stateLoader.reason);
     }
   }).fail(function(jqxhr, textStatus, error){
-    terminal.printError("Application cannot be loaded.");
+    appendtoDeploymentConsole("[!] Application cannot be loaded.");
   });
-  terminal.printInfo("Loading application.");
+  appendtoDeploymentConsole("Loading application.");
+}
+
+function appendtoDeploymentConsole(val){
+  cliDiv.value += val + "\n";
+}
+
+function removeCLIDom(){
+  document.body.removeChild(cliDiv);
 }
 
 //******************************************************************

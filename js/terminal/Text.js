@@ -881,12 +881,6 @@ var Text = function(){
    this.ROYGBIV_SCRIPTING_API_INTERSECTIONTEST = "Finds the first intersected object on a ray. The targetResultObject is filled with .x, .y, .z and .objectName parameters\nin case of an intersection. If there's no detected intersection the .objectName is set to null.";
    this.ROYGBIV_SCRIPTING_API_GETENDPOINT = "Gets an end point of an object. The axis may be +x,-x,+y,-y,+z or -z. Note that object groups do not support this function\nbut child objects do. This function may be useful in cases where for example a particle system needs to be started from\nthe tip point of an object.";
    this.ROYGBIV_SCRIPTING_API_ISMOBILE = "Returns if the current client is a mobile client.";
-   this.ROYGBIV_SCRIPTING_API_TERMINAL = "Shows or hides the ROYGBIV terminal.";
-   this.ROYGBIV_SCRIPTING_API_TERMINALPROMPT = "Enables or disables the prompt of the terminal. Does nothing if the terminal is already enabled/disabled.";
-   this.ROYGBIV_SCRIPTING_API_PRINTTOTERMINAL = "Prints a text to the ROYGBIV terminal.";
-   this.ROYGBIV_SCRIPTING_API_CLEARTERMINAL = "Clears the ROYGBIV terminal.";
-   this.ROYGBIV_SCRIPTING_API_SETTEXTINPUTCALLBACKFUNCTION = "Sets a callback function for ROYGBIV terminal text input. The callbackFunction is executed with the text parameter.";
-   this.ROYGBIV_SCRIPTING_API_REMOVETEXTINPUTCALLBACKFUNCTION = "Removes the callback function for ROYGBIV terminal text input.";
    this.ROYGBIV_SCRIPTING_API_LERP = "Linearly interpolate between vector1 and vector2. The result is vector1 if amount = 0 and vector2 if amount = 1.";
    this.ROYGBIV_SCRIPTING_API_RESETOBJECTVELOCITY = "Resets the velocity and angular velocity of an object.";
    this.ROYGBIV_SCRIPTING_API_SETFPSDROPCALLBACKFUNCTION = "Sets a callback function for FPS drops. The callbackFunction is executed with dropAmount parameter if the FPS is\nless than 60 for given second. The dropAmount is calculated using this formula: (60 - [current_fps])";

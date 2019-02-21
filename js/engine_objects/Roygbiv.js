@@ -141,12 +141,6 @@ var Roygbiv = function(){
     "intersectionTest",
     "getEndPoint",
     "isMobile",
-    "terminal",
-    "terminalPrompt",
-    "printToTerminal",
-    "clearTerminal",
-    "setTextInputCallbackFunction",
-    "removeTextInputCallbackFunction",
     "lerp",
     "resetObjectVelocity",
     "setFPSDropCallbackFunction",
@@ -6239,33 +6233,6 @@ Roygbiv.prototype.removeFullScreenChangeCallbackFunction = function(){
   screenFullScreenChangeCallbackFunction = 0;
 }
 
-// setTextInputCallbackFunction
-// Sets a callback function for ROYGBIV terminal text input. The callbackFunction
-// is executed with the text parameter.
-Roygbiv.prototype.setTextInputCallbackFunction = function(callbackFunction){
-  if (mode == 0){
-    return;
-  }
-  if (typeof callbackFunction == UNDEFINED){
-    throw new Error("setTextInputCallbackFunction error: callbackFunction is not defined.");
-    return;
-  }
-  if (!(callbackFunction instanceof Function)){
-    throw new Error("setTextInputCallbackFunction error: callbackFunction is not a function.");
-    return;
-  }
-  terminalTextInputCallbackFunction = callbackFunction;
-}
-
-// removeTextInputCallbackFunction
-// Removes the callback function for ROYGBIV terminal text input.
-Roygbiv.prototype.removeTextInputCallbackFunction = function(){
-  if (mode == 0){
-    return;
-  }
-  terminalTextInputCallbackFunction = 0;
-}
-
 // setFPSDropCallbackFunction
 // Sets a callback function for FPS drops. The callbackFunction is executed
 // with dropAmount parameter if the FPS is less than 60 for given second. The
@@ -7677,100 +7644,6 @@ Roygbiv.prototype.isMobile = function(){
     return;
   }
   return isMobile;
-}
-
-// terminal
-// Shows or hides the ROYGBIV terminal.
-Roygbiv.prototype.terminal = function(isVisible){
-  if (mode == 0){
-    return;
-  }
-  if (typeof isVisible == UNDEFINED){
-    throw new Error("terminal error: isVisible is not defined.");
-    return;
-  }
-  if (!(typeof isVisible == "boolean")){
-    throw new Error("terminal error: isVisible is not a boolean.");
-    return;
-  }
-  if (isVisible){
-    terminal.enable();
-    terminalDiv.style.display = "";
-    if (!isDeployment){
-      cliDivheader.style.display = "";
-    }
-    if (isDeployment){
-      var diff = canvas.clientWidth - terminalDiv.clientWidth;
-      canvas.oldWidth = (canvas.width / screenResolution) + 'px';
-      canvas.style.width = diff + "px";
-    }
-    terminal.isMadeVisible = true;
-    if (isDeployment && screenResolution != 1){
-      canvas.style.left = terminalDiv.offsetWidth + "px";
-    }
-  }else{
-    terminal.disable();
-    terminalDiv.style.display = "none";
-    if (!isDeployment){
-      cliDivheader.style.display = "none";
-    }
-    if (isDeployment && canvas.oldWidth){
-      canvas.style.width = canvas.oldWidth;
-    }
-    terminal.isMadeVisible = false;
-    if (isDeployment && screenResolution != 1){
-      canvas.style.left = "0px";
-    }
-  }
-}
-
-// terminalPrompt
-// Enables or disables the prompt of the terminal. Does nothing if the terminal
-// is already enabled/disabled.
-Roygbiv.prototype.terminalPrompt = function(isEnabled){
-  if (mode == 0){
-    return;
-  }
-  if (typeof isEnabled == UNDEFINED){
-    throw new Error("terminalPrompt error: isEnabled is not defined.");
-    return;
-  }
-  if (!(typeof isEnabled == "boolean")){
-    throw new Error("terminalPrompt error: isEnabled is not a boolean.");
-    return;
-  }
-  if (isEnabled && terminal.isDisabled){
-    terminal.enable();
-  }else if (!isEnabled && !terminal.isDisabled){
-    terminal.disable();
-  }
-  terminal.terminalPromptEnabled = isEnabled;
-}
-
-// printToTerminal
-// Prints a text to the ROYGBIV terminal.
-Roygbiv.prototype.printToTerminal = function(text, colorName){
-  if (mode == 0){
-    return;
-  }
-  if (typeof text == UNDEFINED){
-    throw new Error("printToTerminal error: text is not defined.");
-    return;
-  }
-  if (typeof colorName == UNDEFINED){
-    throw new Error("printToTerminal error: colorName is not defined.");
-    return;
-  }
-  terminal.printFromScript(text, colorName);
-}
-
-// clearTerminal
-// Clears the ROYGBIV terminal.
-Roygbiv.prototype.clearTerminal = function(){
-  if (mode == 0){
-    return;
-  }
-  terminal.clear();
 }
 
 // lerp

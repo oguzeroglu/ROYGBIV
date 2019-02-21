@@ -24,19 +24,8 @@ Terminal.prototype.init = function(){
 	var options = this.options;
 	this.jqueryContext.terminal(
 		function(userInput){
-			if (isDeployment){
-				if (terminalTextInputCallbackFunction){
-					terminalTextInputCallbackFunction(userInput);
-				}
-			}else{
-				if (!terminalTextInputCallbackFunction || userInput == "switchView"){
-					this.clear();
-				}
-				parseCommand(userInput);
-				if (terminalTextInputCallbackFunction){
-					terminalTextInputCallbackFunction(userInput);
-				}
-			}
+			this.clear();
+			parseCommand(userInput);
 		}, options
 	);
 	this.setStyle();
