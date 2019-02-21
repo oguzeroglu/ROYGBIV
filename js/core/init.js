@@ -1909,7 +1909,9 @@ function appendtoDeploymentConsole(val){
 }
 
 function removeCLIDom(){
-  document.body.removeChild(cliDiv);
+  if (!(typeof cliDiv == UNDEFINED)){
+    document.body.removeChild(cliDiv);
+  }
 }
 
 //******************************************************************
