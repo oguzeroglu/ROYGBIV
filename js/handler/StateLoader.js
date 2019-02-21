@@ -7,19 +7,10 @@ var StateLoader = function(stateObj){
   this.totalLoadedFontCount = 0;
 }
 
-StateLoader.prototype.load = function(undo){
+StateLoader.prototype.load = function(){
   try{
-
     projectLoaded = false;
-
-    if (undo){
-      this.resetProject(true);
-    }else{
-      this.resetProject(false);
-    }
-
-    this.isUndo = undo;
-
+    this.resetProject();
     var obj = this.stateObj;
     // NO MOBILE ***************************************************
     NO_MOBILE = obj.noMobile;
@@ -2129,7 +2120,7 @@ StateLoader.prototype.mapLoadedTexture = function(texture, textureName){
   }
 }
 
-StateLoader.prototype.resetProject = function(undo){
+StateLoader.prototype.resetProject = function(){
 
   for (var gridSystemName in gridSystems){
     gridSystems[gridSystemName].destroy();
@@ -2150,16 +2141,14 @@ StateLoader.prototype.resetProject = function(undo){
     scene.remove(skyboxMesh);
   }
 
-  if (!undo){
-    collisionCallbackRequests = new Object();
-    particleCollisionCallbackRequests = new Object();
-    for (var particleSystemName in particleSystems){
-      particleSystems[particleSystemName].destroy();
-    }
-    particleSystems = new Object();
-    particleSystemPool = new Object();
-    particleSystemPools = new Object();
+  collisionCallbackRequests = new Object();
+  particleCollisionCallbackRequests = new Object();
+  for (var particleSystemName in particleSystems){
+    particleSystems[particleSystemName].destroy();
   }
+  particleSystems = new Object();
+  particleSystemPool = new Object();
+  particleSystemPools = new Object();
 
   for (var markedPointName in markedPoints){
     markedPoints[markedPointName].destroy();
@@ -2250,21 +2239,15 @@ StateLoader.prototype.resetProject = function(undo){
   fogBlendWithSkybox = false;
   GLOBAL_FOG_UNIFORM.value.set(-100.0, 0, 0, 0);
 
-  if (!undo){
-    mode = 0; // 0 -> DESIGN, 1-> PREVIEW
-    this.oldPhysicsDebugMode = "NONE";
-  }else{
-    this.oldPhysicsDebugMode = physicsDebugMode;
-  }
+  mode = 0; // 0 -> DESIGN, 1-> PREVIEW
+  this.oldPhysicsDebugMode = "NONE";
+
   physicsDebugMode = false;
-  selectedAddedObject = 0;
-  selectedObjectGroup = 0;
-  selectedAddedText = 0;
+  selectionHandler.resetCurrentSelection();
   skyboxVisible = false;
   croppedGridSystemBuffer = 0;
 
   scriptEditorShowing = false;
-  objectSelectedByCommand = false;
 
   physicsWorld = new CANNON.World();
   physicsSolver = new CANNON.GSSolver();
@@ -2283,13 +2266,11 @@ StateLoader.prototype.resetProject = function(undo){
     scene.remove(objectsToRemove[i]);
   }
 
-  if (!undo){
-    diffuseTextureCache = new Object();
-    heightTextureCache = new Object();
-    ambientOcculsionTextureCache = new Object();
-    alphaTextureCache = new Object();
-    emissiveTextureCache = new Object();
-  }
+  diffuseTextureCache = new Object();
+  heightTextureCache = new Object();
+  ambientOcculsionTextureCache = new Object();
+  alphaTextureCache = new Object();
+  emissiveTextureCache = new Object();
 
   initBadTV();
   if (!isDeployment){

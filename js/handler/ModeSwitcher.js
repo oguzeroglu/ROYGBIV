@@ -72,6 +72,7 @@ ModeSwitcher.prototype.commonSwitchFunctions = function(){
       $(datGuiAreaConfigurations.domElement).attr("hidden", true);
       areaConfigurationsVisible = false;
     }
+    selectionHandler.resetCurrentSelection();
   }
   var oldIsPaused = isPaused;
   isPaused = false;
@@ -139,11 +140,18 @@ ModeSwitcher.prototype.switchFromDesignToPreview = function(){
       scene.remove(addedText.rectangle.mesh);
     }
   }
+  if (selectedAddedObject){
+    selectedAddedObject.removeBoundingBoxesFromScene();
+  }
+  if (selectedObjectGroup){
+    selectedObjectGroup.removeBoundingBoxesFromScene();
+  }
   dynamicObjects = new Object();
   dynamicObjectGroups = new Object();
   for (var objectName in objectGroups){
     var object = objectGroups[objectName];
     object.mesh.remove(axesHelper);
+    object.removeBoundingBoxesFromScene();
     if (object.binInfo){
       object.binInfo = new Map();
     }
@@ -159,6 +167,7 @@ ModeSwitcher.prototype.switchFromDesignToPreview = function(){
   for (var objectName in addedObjects){
     var object = addedObjects[objectName];
     object.mesh.remove(axesHelper);
+    object.removeBoundingBoxesFromScene();
     if (object.binInfo){
       object.binInfo = new Map();
     }

@@ -16,36 +16,28 @@ window.onload = function() {
         this.selectionEnd = s+1;
       }
     }
-  }
-  cliDiv.addEventListener("click", function(){
-    cliFocused = true;
-    omGUIFocused = false;
-    tmGUIFocused = false;
-    inactiveCounter = 0;
-    if (keyboardBuffer["Shift"] && mode == 0){
-      keyboardBuffer["Shift"] = false;
-      for (var objName in addedObjects){
-        addedObjects[objName].mesh.visible = true;
-      }
-      for (var objName in objectGroups){
-        objectGroups[objName].mesh.visible = true;
-      }
-      for (var textName in addedTexts){
-        addedTexts[textName].show();
-        if (selectedAddedText && selectedAddedText.name == textName){
-          if (!addedTexts[textName].is2D){
-            scene.add(addedTexts[textName].bbHelper);
-          }else{
-            scene.add(addedTexts[textName].rectangle.mesh);
-          }
+    cliDiv.addEventListener("click", function(){
+      cliFocused = true;
+      omGUIFocused = false;
+      tmGUIFocused = false;
+      inactiveCounter = 0;
+      if (keyboardBuffer["Shift"] && mode == 0){
+        keyboardBuffer["Shift"] = false;
+        for (var objName in addedObjects){
+          addedObjects[objName].mesh.visible = true;
+        }
+        for (var objName in objectGroups){
+          objectGroups[objName].mesh.visible = true;
+        }
+        for (var textName in addedTexts){
+          addedTexts[textName].show();
         }
       }
-    }
-  });
-  cliDiv.addEventListener("mousemove", function(event){
-    inactiveCounter = 0;
-  });
-  if (!isDeployment){
+    });
+    cliDiv.addEventListener("mousemove", function(event){
+      inactiveCounter = 0;
+    });
+
     terminalDiv.addEventListener("mousewheel", function(e){
       e.preventDefault();
       e.stopPropagation();
@@ -58,6 +50,11 @@ window.onload = function() {
       });
     }
     dragElement(cliDiv);
+  }
+
+  // SELECTION HANDLER
+  if (!isDeployment){
+    selectionHandler = new SelectionHandler();
   }
 
   // SCRIPTING UTILITY FUNCTIONS
@@ -179,7 +176,7 @@ window.onload = function() {
     datGuiTextManipulation = new dat.GUI();
     textManipulationTextNameController = datGuiTextManipulation.add(textManipulationParameters, "Text").listen();
     textManipulationContentController = datGuiTextManipulation.add(textManipulationParameters, "Content").onChange(function(val){
-      var addedText = selectedAddedText;
+      var addedText = selectionHandler.getSelectedObject();
       val = val.split("\\n").join("\n");
       var val2 = val.split("\n").join("");
       if (val2.length > addedText.strlen){
@@ -191,56 +188,56 @@ window.onload = function() {
       addedText.setText(val);
     }).listen();
     textManipulationTextColorController = datGuiTextManipulation.addColor(textManipulationParameters, "Text color").onChange(function(val){
-      selectedAddedText.setColor(val);
+      selectionHandler.getSelectedObject().setColor(val);
     }).listen();
     textManipulationAlphaController = datGuiTextManipulation.add(textManipulationParameters, "Alpha").min(0).max(1).step(0.01).onChange(function(val){
-      selectedAddedText.setAlpha(val);
+      selectionHandler.getSelectedObject().setAlpha(val);
     }).listen();
     textManipulationHasBackgroundController = datGuiTextManipulation.add(textManipulationParameters, "Has bg").onChange(function(val){
       if (val){
-        selectedAddedText.setBackground(
-          "#" + selectedAddedText.material.uniforms.backgroundColor.value.getHexString(),
-          selectedAddedText.material.uniforms.backgroundAlpha.value
+        selectionHandler.getSelectedObject().setBackground(
+          "#" + selectionHandler.getSelectedObject().material.uniforms.backgroundColor.value.getHexString(),
+          selectionHandler.getSelectedObject().material.uniforms.backgroundAlpha.value
         );
         enableController(textManipulationBackgroundColorController);
         enableController(textManipulationBackgroundAlphaController);
       }else{
-        selectedAddedText.removeBackground();
+        selectionHandler.getSelectedObject().removeBackground();
         disableController(textManipulationBackgroundColorController);
         disableController(textManipulationBackgroundAlphaController);
       }
     }).listen();
     textManipulationBackgroundColorController = datGuiTextManipulation.addColor(textManipulationParameters, "Bg color").onChange(function(val){
-      selectedAddedText.setBackground(val, selectedAddedText.material.uniforms.backgroundAlpha.value);
+      selectionHandler.getSelectedObject().setBackground(val, selectionHandler.getSelectedObject().material.uniforms.backgroundAlpha.value);
     }).listen();
     textManipulationBackgroundAlphaController = datGuiTextManipulation.add(textManipulationParameters, "Bg alpha").min(0).max(1).step(0.01).onChange(function(val){
-      selectedAddedText.setBackground(
-        "#" + selectedAddedText.material.uniforms.backgroundColor.value.getHexString(),
+      selectionHandler.getSelectedObject().setBackground(
+        "#" + selectionHandler.getSelectedObject().material.uniforms.backgroundColor.value.getHexString(),
         val
       );
     }).listen();
     textManipulationCharacterSizeController = datGuiTextManipulation.add(textManipulationParameters, "Char size").min(0.5).max(200).step(0.5).onChange(function(val){
-      selectedAddedText.setCharSize(val);
-      selectedAddedText.refCharSize = val;
-      selectedAddedText.refInnerHeight = window.innerHeight;
-      selectedAddedText.handleResize();
+      selectionHandler.getSelectedObject().setCharSize(val);
+      selectionHandler.getSelectedObject().refCharSize = val;
+      selectionHandler.getSelectedObject().refInnerHeight = window.innerHeight;
+      selectionHandler.getSelectedObject().handleResize();
     }).listen();
     textManipulationCharacterMarginController = datGuiTextManipulation.add(textManipulationParameters, "Char margin").min(0.5).max(100).step(0.5).onChange(function(val){
-      selectedAddedText.setMarginBetweenChars(val);
-      selectedAddedText.handleResize();
+      selectionHandler.getSelectedObject().setMarginBetweenChars(val);
+      selectionHandler.getSelectedObject().handleResize();
     }).listen();
     textManipulationLineMarginController = datGuiTextManipulation.add(textManipulationParameters, "Line margin").min(0.5).max(100).step(0.5).onChange(function(val){
-      selectedAddedText.setMarginBetweenLines(val);
-      selectedAddedText.handleResize();
+      selectionHandler.getSelectedObject().setMarginBetweenLines(val);
+      selectionHandler.getSelectedObject().handleResize();
     }).listen();
     textManipulationClickableController = datGuiTextManipulation.add(textManipulationParameters, "Clickable").onChange(function(val){
-      selectedAddedText.isClickable = val;
+      selectionHandler.getSelectedObject().isClickable = val;
     }).listen();
     textManipulationAffectedByFogController = datGuiTextManipulation.add(textManipulationParameters, "Aff. by fog").onChange(function(val){
-      selectedAddedText.setAffectedByFog(val);
+      selectionHandler.getSelectedObject().setAffectedByFog(val);
     }).listen();
     textManipulationIs2DController = datGuiTextManipulation.add(textManipulationParameters, "is 2D").onChange(function(val){
-      selectedAddedText.set2DStatus(val);
+      selectionHandler.getSelectedObject().set2DStatus(val);
       if (val){
         enableController(textManipulationMarginModeController);
         enableController(textManipulationMarginXController);
@@ -248,10 +245,10 @@ window.onload = function() {
         enableController(textManipulationMaxWidthPercentController);
         enableController(textManipulationMaxHeightPercentController);
         disableController(textManipulationAffectedByFogController);
-        selectedAddedText.set2DCoordinates(
-          selectedAddedText.marginPercentWidth, selectedAddedText.marginPercentHeight
+        selectionHandler.getSelectedObject().set2DCoordinates(
+          selectionHandler.getSelectedObject().marginPercentWidth, selectionHandler.getSelectedObject().marginPercentHeight
         );
-        selectedAddedText.setAffectedByFog(false);
+        selectionHandler.getSelectedObject().setAffectedByFog(false);
         textManipulationParameters["Aff. by fog"] = false;
       }else{
         disableController(textManipulationMarginModeController);
@@ -261,37 +258,40 @@ window.onload = function() {
         disableController(textManipulationMaxHeightPercentController);
         enableController(textManipulationAffectedByFogController);
       }
-      selectedAddedText.handleResize();
+      selectionHandler.getSelectedObject().handleResize();
+      var obj = selectionHandler.getSelectedObject();
+      selectionHandler.resetCurrentSelection();
+      selectionHandler.select(obj);
     }).listen();
     textManipulationMarginModeController = datGuiTextManipulation.add(textManipulationParameters, "Margin mode", ["Top/Left", "Bottom/Right"]).onChange(function(val){
       if (val == "Top/Left"){
-        selectedAddedText.marginMode = MARGIN_MODE_2D_TEXT_TOP_LEFT;
+        selectionHandler.getSelectedObject().marginMode = MARGIN_MODE_2D_TEXT_TOP_LEFT;
       }else{
-        selectedAddedText.marginMode = MARGIN_MODE_2D_TEXT_BOTTOM_RIGHT;
+        selectionHandler.getSelectedObject().marginMode = MARGIN_MODE_2D_TEXT_BOTTOM_RIGHT;
       }
-      selectedAddedText.set2DCoordinates(
-        selectedAddedText.marginPercentWidth, selectedAddedText.marginPercentHeight
+      selectionHandler.getSelectedObject().set2DCoordinates(
+        selectionHandler.getSelectedObject().marginPercentWidth, selectionHandler.getSelectedObject().marginPercentHeight
       );
     }).listen();
     textManipulationMarginXController = datGuiTextManipulation.add(textManipulationParameters, "Margin X").min(0).max(100).step(0.1).onChange(function(val){
-      selectedAddedText.set2DCoordinates(
-        val, selectedAddedText.marginPercentHeight
+      selectionHandler.getSelectedObject().set2DCoordinates(
+        val, selectionHandler.getSelectedObject().marginPercentHeight
       );
-      selectedAddedText.handleResize();
+      selectionHandler.getSelectedObject().handleResize();
     }).listen();
     textManipulationMarginYController = datGuiTextManipulation.add(textManipulationParameters, "Margin Y").min(0).max(100).step(0.1).onChange(function(val){
-      selectedAddedText.set2DCoordinates(
-        selectedAddedText.marginPercentWidth, val
+      selectionHandler.getSelectedObject().set2DCoordinates(
+        selectionHandler.getSelectedObject().marginPercentWidth, val
       );
-      selectedAddedText.handleResize();
+      selectionHandler.getSelectedObject().handleResize();
     }).listen();
     textManipulationMaxWidthPercentController = datGuiTextManipulation.add(textManipulationParameters, "Max width%").min(0).max(100).step(0.1).onChange(function(val){
-      selectedAddedText.maxWidthPercent = val;
-      selectedAddedText.handleResize();
+      selectionHandler.getSelectedObject().maxWidthPercent = val;
+      selectionHandler.getSelectedObject().handleResize();
     }).listen();
     textManipulationMaxHeightPercentController = datGuiTextManipulation.add(textManipulationParameters, "Max height%").min(0).max(100).step(0.1).onChange(function(val){
-      selectedAddedText.maxHeightPercent = val;
-      selectedAddedText.handleResize();
+      selectionHandler.getSelectedObject().maxHeightPercent = val;
+      selectionHandler.getSelectedObject().handleResize();
     }).listen();
     // DAT GUI OBJECT MANIPULATION
     datGuiObjectManipulation = new dat.GUI();
@@ -307,18 +307,12 @@ window.onload = function() {
       omGUIRotateEvent("z", val);
     });
     omMassController = datGuiObjectManipulation.add(objectManipulationParameters, "Mass").onChange(function(val){
-      var obj = selectedAddedObject;
-      if (!obj){
-        obj = selectedObjectGroup;
-      }
+      var obj = selectionHandler.getSelectedObject();
       terminal.clear();
       parseCommand("setMass "+obj.name+" "+val);
     });
     omSlipperyController = datGuiObjectManipulation.add(objectManipulationParameters, "Slippery").onChange(function(val){
-      var obj = selectedAddedObject;
-      if (!obj){
-        obj = selectedObjectGroup;
-      }
+      var obj = selectionHandler.getSelectedObject();
       terminal.clear();
       if (val){
         parseCommand("setSlipperiness "+obj.name+" on");
@@ -327,10 +321,7 @@ window.onload = function() {
       }
     }).listen();
     omChangeableController = datGuiObjectManipulation.add(objectManipulationParameters, "Changeable").onChange(function(val){
-      var obj = selectedAddedObject;
-      if (!obj){
-        obj = selectedObjectGroup;
-      }
+      var obj = selectionHandler.getSelectedObject();
       terminal.clear();
       obj.isChangeable = val;
       if (obj.isChangeable){
@@ -340,10 +331,7 @@ window.onload = function() {
       }
     }).listen();
     omColorizableController = datGuiObjectManipulation.add(objectManipulationParameters, "Colorizable").onChange(function(val){
-      var obj = selectedAddedObject;
-      if (!obj){
-        obj = selectedObjectGroup;
-      }
+      var obj = selectionHandler.getSelectedObject();
       terminal.clear();
       obj.isColorizable = val;
       if (obj.isColorizable){
@@ -358,13 +346,10 @@ window.onload = function() {
       obj.mesh.material.needsUpdate = true;
     }).listen();
     omHasMassController = datGuiObjectManipulation.add(objectManipulationParameters, "Has mass").onChange(function(val){
-      var obj = selectedAddedObject;
-      if (!obj){
-        obj = selectedObjectGroup;
-        if (obj.cannotSetMass){
-          objectManipulationParameters["Has mass"] = false;
-          return;
-        }
+      var obj = selectionHandler.getSelectedObject();
+      if (obj.isObjectGroup && obj.cannotSetMass){
+        objectManipulationParameters["Has mass"] = false;
+        return;
       }
       terminal.clear();
       obj.noMass = !val;
@@ -388,41 +373,34 @@ window.onload = function() {
       }else if (val == "Back"){
         pseudoVal = 2;
       }
-      if (selectedAddedObject){
-        selectedAddedObject.handleRenderSide(pseudoVal);
-      }else if (selectedObjectGroup){
-        selectedObjectGroup.handleRenderSide(pseudoVal);
-      }
+      selectionHandler.getSelectedObject().handleRenderSide(pseudoVal);
     }).listen();
     omHideHalfController = datGuiObjectManipulation.add(objectManipulationParameters, "Hide half", [
       "None", "Part 1", "Part 2", "Part 3", "Part 4"
     ]).onChange(function(val){
       if (val == "None"){
-        selectedAddedObject.sliceInHalf(4);
+        selectionHandler.getSelectedObject().sliceInHalf(4);
       }else if (val == "Part 1"){
-        selectedAddedObject.sliceInHalf(0);
+        selectionHandler.getSelectedObject().sliceInHalf(0);
       }else if (val == "Part 2"){
-        selectedAddedObject.sliceInHalf(1);
+        selectionHandler.getSelectedObject().sliceInHalf(1);
       }else if (val == "Part 3"){
-        selectedAddedObject.sliceInHalf(2);
+        selectionHandler.getSelectedObject().sliceInHalf(2);
       }else if (val == "Part 4"){
-        selectedAddedObject.sliceInHalf(3);
+        selectionHandler.getSelectedObject().sliceInHalf(3);
       }
-      rayCaster.updateObject(selectedAddedObject);
+      rayCaster.updateObject(selectionHandler.getSelectedObject());
     }).listen();
     omBlendingController = datGuiObjectManipulation.add(objectManipulationParameters, "Blending", [
       "None", "Normal", "Additive", "Subtractive", "Multiply"
     ]).onChange(function(val){
-      var obj = selectedAddedObject;
-      if (!obj){
-        obj = selectedObjectGroup;
-      }
-      if (obj instanceof AddedObject || obj instanceof ObjectGroup){
+      var obj = selectionHandler.getSelectedObject();
+      if (obj.isAddedObject || obj.isObjectGroup){
         enableController(omOpacityController);
       }
       if (val == "None"){
         obj.setBlending(NO_BLENDING);
-        if (obj instanceof AddedObject || obj instanceof ObjectGroup){
+        if (obj.isAddedObject || obj.isObjectGroup){
           disableController(omOpacityController);
         }
       }else if (val == "Normal"){
@@ -436,52 +414,50 @@ window.onload = function() {
       }
     }).listen();
     omEmissiveColorController = datGuiObjectManipulation.addColor(objectManipulationParameters, "Emissive col.").onChange(function(val){
-      if (selectedAddedObject && !selectedObjectGroup){
-        var material = selectedAddedObject.mesh.material;
+      var obj = selectionHandler.getSelectedObject();
+      if (obj.isAddedObject){
+        var material = obj.mesh.material;
         material.uniforms.emissiveColor.value.set(val);
-      }else if (selectedObjectGroup && !selectedAddedObject){
-        var material = selectedObjectGroup.mesh.material;
+      }else if (obj.isObjectGroup){
+        var material = obj.mesh.material;
         material.uniforms.totalEmissiveColor.value.set(val);
       }
     }).listen();
     omTextureOffsetXController = datGuiObjectManipulation.add(objectManipulationParameters, "Texture offset x").min(-2).max(2).step(0.001).onChange(function(val){
-      selectedAddedObject.setTextureOffsetX(val);
+      selectionHandler.getSelectedObject().setTextureOffsetX(val);
     }).listen();
     omTextureOffsetYController = datGuiObjectManipulation.add(objectManipulationParameters, "Texture offset y").min(-2).max(2).step(0.001).onChange(function(val){
-        selectedAddedObject.setTextureOffsetY(val);
+      selectionHandler.getSelectedObject().setTextureOffsetY(val);
     }).listen();
     omOpacityController = datGuiObjectManipulation.add(objectManipulationParameters, "Opacity").min(0).max(1).step(0.01).onChange(function(val){
-      if (selectedObjectGroup && !selectedAddedObject){
-        selectedObjectGroup.updateOpacity(val);
-        selectedObjectGroup.initOpacitySet = false;
-        selectedObjectGroup.initOpacity = selectedObjectGroup.opacity;
-      }else if (selectedAddedObject){
-        selectedAddedObject.updateOpacity(val);
-        selectedAddedObject.initOpacitySet = false;
-        selectedAddedObject.initOpacity = selectedAddedObject.opacity;
-      }
+      var obj = selectionHandler.getSelectedObject();
+      obj.updateOpacity(val);
+      obj.initOpacitySet = false;
+      obj.initOpacity = obj.opacity;
     }).listen();
     omAOIntensityController = datGuiObjectManipulation.add(objectManipulationParameters, "AO intensity").min(0).max(10).step(0.1).onChange(function(val){
-      if (selectedAddedObject && !selectedObjectGroup){
-        selectedAddedObject.mesh.material.uniforms.aoIntensity.value = val;
-      }else if (selectedObjectGroup && !selectedAddedObject){
-        selectedObjectGroup.mesh.material.uniforms.totalAOIntensity.value = val;
+      var obj = selectionHandler.getSelectedObject();
+      if (obj.isAddedObject){
+        obj.mesh.material.uniforms.aoIntensity.value = val;
+      }else if (obj.isObjectGroup){
+        obj.mesh.material.uniforms.totalAOIntensity.value = val;
       }
     }).listen();
     omEmissiveIntensityController = datGuiObjectManipulation.add(objectManipulationParameters, "Emissive int.").min(0).max(100).step(0.01).onChange(function(val){
-      if (selectedAddedObject && !selectedObjectGroup){
-        var material = selectedAddedObject.mesh.material;
+      var obj = selectionHandler.getSelectedObject();
+      if (obj.isAddedObject){
+        var material = obj.mesh.material;
         material.uniforms.emissiveIntensity.value = val;
-      }else if (selectedObjectGroup && !selectedAddedObject){
-        var material = selectedObjectGroup.mesh.material;
+      }else if (obj.isObjectGroup){
+        var material = obj.mesh.material;
         material.uniforms.totalEmissiveIntensity.value = val;
       }
     }).listen();
     omDisplacementScaleController = datGuiObjectManipulation.add(objectManipulationParameters, "Disp. scale").min(-50).max(50).step(0.1).onChange(function(val){
-      selectedAddedObject.mesh.material.uniforms.displacementInfo.value.x = val;
+      selectionHandler.getSelectedObject().mesh.material.uniforms.displacementInfo.value.x = val;
     }).listen();
     omDisplacementBiasController = datGuiObjectManipulation.add(objectManipulationParameters, "Disp. bias").min(-50).max(50).step(0.1).onChange(function(val){
-      selectedAddedObject.mesh.material.uniforms.displacementInfo.value.y = val;
+      selectionHandler.getSelectedObject().mesh.material.uniforms.displacementInfo.value.y = val;
     }).listen();
 
     datGuiObjectManipulation.domElement.addEventListener("mousedown", function(e){
@@ -653,23 +629,9 @@ window.onload = function() {
                ));
              }
              if (mode == 0){
-               if (selectedAddedObject){
-                 selectedAddedObject.mesh.remove(axesHelper);
-               }
-               if (selectedObjectGroup){
-                 selectedObjectGroup.mesh.remove(axesHelper);
-               }
-               if (selectedAddedText && selectedAddedText.bbHelper){
-                 scene.remove(selectedAddedText.bbHelper);
-               }
-               if (selectedAddedText && selectedAddedText.rectangle){
-                 scene.remove(selectedAddedText.rectangle.mesh);
-               }
+               selectionHandler.resetCurrentSelection();
              }
-             selectedAddedObject = object;
-             objectSelectedByCommand = false;
-             selectedObjectGroup = 0;
-             selectedAddedText = 0;
+             selectionHandler.select(object);
              afterObjectSelection();
              if (object.clickCallbackFunction){
                object.clickCallbackFunction(point.x, point.y, point.z);
@@ -681,23 +643,9 @@ window.onload = function() {
                ));
              }
              if (mode == 0){
-               if (selectedAddedObject){
-                 selectedAddedObject.mesh.remove(axesHelper);
-               }
-               if (selectedObjectGroup){
-                 selectedObjectGroup.mesh.remove(axesHelper);
-               }
-               if (selectedAddedText && selectedAddedText.bbHelper){
-                 scene.remove(selectedAddedText.bbHelper);
-               }
-               if (selectedAddedText && selectedAddedText.rectangle){
-                 scene.remove(selectedAddedText.rectangle.mesh);
-               }
+               selectionHandler.resetCurrentSelection();
              }
-             selectedObjectGroup = object;
-             objectSelectedByCommand = false;
-             selectedAddedObject = 0;
-             selectedAddedText = 0;
+             selectionHandler.select(object);
              afterObjectSelection();
              if (object.clickCallbackFunction){
                object.clickCallbackFunction(point.x, point.y, point.z);
@@ -721,23 +669,9 @@ window.onload = function() {
                    Text.PARAM1, addedObject.name+coordStr
                  ));
                  if (mode == 0){
-                   if (selectedAddedObject){
-                     selectedAddedObject.mesh.remove(axesHelper);
-                   }
-                   if (selectedObjectGroup){
-                     selectedObjectGroup.mesh.remove(axesHelper);
-                   }
-                   if (selectedAddedText && selectedAddedText.bbHelper){
-                     scene.remove(selectedAddedText.bbHelper);
-                   }
-                   if (selectedAddedText && selectedAddedText.rectangle){
-                     scene.remove(selectedAddedText.rectangle.mesh);
-                   }
+                   selectionHandler.resetCurrentSelection();
                  }
-                 selectedAddedObject = addedObject;
-                 selectedObjectGroup = 0;
-                 selectedAddedText = 0;
-                 objectSelectedByCommand = false;
+                 selectionHandler.select(addedObject);
                  afterObjectSelection();
                  if (addedObject.clickCallbackFunction){
                    addedObject.clickCallbackFunction(point.x, point.y, point.z);
@@ -751,22 +685,9 @@ window.onload = function() {
                    Text.PARAM1, objectGroup.name+coordStr
                  ));
                  if (mode == 0){
-                   if (selectedAddedObject){
-                     selectedAddedObject.mesh.remove(axesHelper);
-                   }
-                   if (selectedObjectGroup){
-                     selectedObjectGroup.mesh.remove(axesHelper);
-                   }
-                   if (selectedAddedText && selectedAddedText.bbHelper){
-                     scene.remove(selectedAddedText.bbHelper);
-                   }
-                   if (selectedAddedText && selectedAddedText.rectangle){
-                     scene.remove(selectedAddedText.rectangle.mesh);
-                   }
+                   selectionHandler.resetCurrentSelection();
                  }
-                 selectedAddedObject = 0;
-                 selectedAddedText = 0;
-                 selectedObjectGroup = objectGroup;
+                 selectionHandler.select(objectGroup);
                  afterObjectSelection();
                  if (objectGroup.clickCallbackFunction){
                    objectGroup.clickCallbackFunction(point.x, point.y, point.z);
@@ -778,34 +699,10 @@ window.onload = function() {
                     terminal.printInfo(Text.SELECTED.replace(Text.PARAM1, addedText.name));
                   }
                   if (mode == 0){
-                    if (selectedAddedObject){
-                      selectedAddedObject.mesh.remove(axesHelper);
-                    }
-                    if (selectedObjectGroup){
-                      selectedObjectGroup.mesh.remove(axesHelper);
-                    }
-                    if (selectedAddedText && selectedAddedText.bbHelper){
-                      scene.remove(selectedAddedText.bbHelper);
-                    }
-                    if (selectedAddedText && selectedAddedText.rectangle){
-                      scene.remove(selectedAddedText.rectangle.mesh);
-                    }
+                    selectionHandler.resetCurrentSelection();
                   }
-                  selectedAddedObject = 0;
-                  selectedObjectGroup = 0;
-                  selectedAddedText = addedText;
-                  if (!selectedAddedText.bbHelper){
-                    if (!selectedAddedText.is2D){
-                      selectedAddedText.handleBoundingBox();
-                    }
-                  }
-                  if (mode == 0){
-                    if (!selectedAddedText.is2D){
-                      scene.add(selectedAddedText.bbHelper);
-                    }else{
-                      scene.add(selectedAddedText.rectangle.mesh);
-                    }
-                  }else if (addedText.clickCallbackFunction){
+                  selectionHandler.select(addedText);
+                  if (mode != 0 && addedText.clickCallbackFunction){
                     addedText.clickCallbackFunction(addedText.name);
                   }
                   afterObjectSelection();
@@ -816,55 +713,21 @@ window.onload = function() {
            }
          }else if (object.isAddedText){
            if (mode == 0){
-             if (selectedAddedObject){
-               selectedAddedObject.mesh.remove(axesHelper);
-             }
-             if (selectedObjectGroup){
-               selectedObjectGroup.mesh.remove(axesHelper);
-             }
-             if (selectedAddedText && selectedAddedText.name != object.name){
-               if (selectedAddedText.bbHelper){
-                 scene.remove(selectedAddedText.bbHelper);
-               }
-               if (selectedAddedText.rectangle){
-                 scene.remove(selectedAddedText.rectangle.mesh);
-               }
-             }
+             selectionHandler.resetCurrentSelection();
            }
            if (!defaultCameraControlsDisabled && !isDeployment){
              terminal.clear();
              terminal.printInfo(Text.SELECTED.replace(Text.PARAM1, object.name));
            }
-           selectedAddedObject = 0;
-           selectedObjectGroup = 0;
-           selectedAddedText = object;
-           if (!selectedAddedText.bbHelper){
-             selectedAddedText.handleBoundingBox();
-           }
-           if (mode == 0){
-             if (!selectedAddedText.is2D){
-               scene.add(selectedAddedText.bbHelper);
-             }else{
-               scene.add(selectedAddedText.rectangle.mesh);
-             }
-          }else if (object.clickCallbackFunction){
+           selectionHandler.select(object);
+          if (mode != 0 && object.clickCallbackFunction){
             object.clickCallbackFunction(object.name);
           }
            afterObjectSelection();
          }
       }else{
-         if (!objectSelectedByCommand){
-           if (selectedAddedText && selectedAddedText.bbHelper && mode == 0){
-             scene.remove(selectedAddedText.bbHelper);
-           }
-           if (selectedAddedText && selectedAddedText.rectangle && mode == 0){
-             scene.remove(selectedAddedText.rectangle.mesh);
-           }
-           selectedAddedObject = 0;
-           selectedObjectGroup = 0;
-           selectedAddedText = 0;
-           afterObjectSelection();
-         }
+        selectionHandler.resetCurrentSelection();
+        afterObjectSelection();
       }
     }
   });
@@ -1017,7 +880,8 @@ window.addEventListener('keydown', function(event){
   }
   switch(event.keyCode){
     case 16: //SHIFT
-      if (mode == 0){
+      if (mode == 0 && !isDeployment){
+        selectionHandler.resetCurrentSelection();
         for (var objName in addedObjects){
           addedObjects[objName].mesh.visible = false;
         }
@@ -1031,35 +895,36 @@ window.addEventListener('keydown', function(event){
     break;
     case 8: //BACKSPACE
       //FIREFOX GO BACK FIX
-      if (selectedAddedObject && !cliFocused){
+      if (selectionHandler.getSelectedObject() && !cliFocused){
         event.preventDefault();
       }
-      if (mode == 1){
+      if (mode == 1 || isDeployment){
         return;
       }
-      if (selectedAddedObject){
-        delete addedObjects[selectedAddedObject.name];
-        selectedAddedObject.destroy();
+      var currentSelection = selectionHandler.getSelectedObject();
+      if (currentSelection.isAddedObject){
+        delete addedObjects[currentSelection.name];
+        currentSelection.destroy();
         terminal.clear();
         terminal.printInfo(Text.OBJECT_DESTROYED);
-        selectedAddedObject = 0;
+        selectionHandler.resetCurrentSelection();
         if (areaConfigurationsVisible){
           $(datGuiAreaConfigurations.domElement).attr("hidden", true);
           areaConfigurationsVisible = false;
         }
-      }else if (selectedObjectGroup){
-        delete objectGroups[selectedObjectGroup.name];
-        selectedObjectGroup.destroy();
-        selectedObjectGroup = 0;
+      }else if (currentSelection.isObjectGroup){
+        delete objectGroups[currentSelection.name];
+        currentSelection.destroy();
+        selectionHandler.resetCurrentSelection();
         terminal.clear();
         terminal.printInfo(Text.OBJECT_DESTROYED);
         if (areaConfigurationsVisible){
           $(datGuiAreaConfigurations.domElement).attr("hidden", true);
           areaConfigurationsVisible = false;
         }
-      }else if (selectedAddedText){
+      }else if (currentSelection.isAddedText){
         terminal.clear();
-        parseCommand("destroyText "+selectedAddedText.name);
+        parseCommand("destroyText "+currentSelection.name);
       }
       afterObjectSelection();
     break;
@@ -1110,13 +975,6 @@ window.addEventListener('keyup', function(event){
         }
         for (var textName in addedTexts){
           addedTexts[textName].show();
-          if (selectedAddedText && selectedAddedText.name == textName){
-            if (!addedTexts[textName].is2D){
-              scene.add(addedTexts[textName].bbHelper);
-            }else{
-              scene.add(addedTexts[textName].rectangle.mesh);
-            }
-          }
         }
       }
     break;
@@ -1233,10 +1091,7 @@ window.addEventListener('keyup', function(event){
  }
 
  function omGUIRotateEvent(axis, val){
-   var obj = selectedAddedObject;
-   if (!obj){
-     obj = selectedObjectGroup;
-   }
+   var obj = selectionHandler.getSelectedObject();
    terminal.clear();
    parseCommand("rotateObject "+obj.name+" "+axis+" "+val);
    if (axis == "x"){
@@ -1325,15 +1180,13 @@ function afterObjectSelection(){
   if (mode != 0){
     return;
   }
-  if (selectedAddedObject || selectedObjectGroup){
-    selectedAddedText = 0;
+  var curSelection = selectionHandler.getSelectedObject();
+  if (curSelection && (curSelection.isAddedObject || curSelection.isObjectGroup)){
     $(datGuiObjectManipulation.domElement).attr("hidden", false);
     enableAllOMControllers();
-    var obj = selectedAddedObject;
-    if (!obj){
-      obj = selectedObjectGroup;
-    }
+    var obj = curSelection;
     omGUIlastObjectName = obj.name;
+    obj.visualiseBoundingBoxes();
     objectManipulationParameters["Object"] = obj.name;
     if (obj.isAddedObject){
       objectManipulationParameters["Rotate x"] = 0;
@@ -1478,9 +1331,11 @@ function afterObjectSelection(){
     $(datGuiObjectManipulation.domElement).attr("hidden", true);
     for (objName in addedObjects){
       addedObjects[objName].mesh.remove(axesHelper);
+      addedObjects[objName].removeBoundingBoxesFromScene();
     }
     for (objName in objectGroups){
       objectGroups[objName].mesh.remove(axesHelper);
+      objectGroups[objName].removeBoundingBoxesFromScene();
     }
   }
   afterTextSelection();
@@ -1490,41 +1345,37 @@ function afterTextSelection(){
   if (mode != 0){
     return;
   }
-  if (selectedAddedText){
+  var curSelection = selectionHandler.getSelectedObject();
+  if (curSelection && curSelection.isAddedText){
     enableAllTMControllers();
     $(datGuiTextManipulation.domElement).attr("hidden", false);
-    if (!selectedAddedText.is2D){
-      scene.add(selectedAddedText.bbHelper);
-    }else{
-      scene.add(selectedAddedText.rectangle.mesh);
-    }
-    textManipulationParameters["Text"] = selectedAddedText.name;
-    textManipulationParameters["Content"] = selectedAddedText.text;
-    textManipulationParameters["Text color"] = "#" + selectedAddedText.material.uniforms.color.value.getHexString();
-    textManipulationParameters["Alpha"] = selectedAddedText.material.uniforms.alpha.value;
-    textManipulationParameters["Has bg"] = (selectedAddedText.material.uniforms.hasBackgroundColorFlag.value > 0);
-    textManipulationParameters["Bg color"] = "#" + selectedAddedText.material.uniforms.backgroundColor.value.getHexString();
-    textManipulationParameters["Bg alpha"] = selectedAddedText.material.uniforms.backgroundAlpha.value;
-    textManipulationParameters["Char margin"] = selectedAddedText.offsetBetweenChars;
-    textManipulationParameters["Line margin"] = selectedAddedText.offsetBetweenLines;
-    textManipulationParameters["Aff. by fog"] = selectedAddedText.isAffectedByFog;
-    textManipulationParameters["is 2D"] = selectedAddedText.is2D;
+    textManipulationParameters["Text"] = curSelection.name;
+    textManipulationParameters["Content"] = curSelection.text;
+    textManipulationParameters["Text color"] = "#" + curSelection.material.uniforms.color.value.getHexString();
+    textManipulationParameters["Alpha"] = curSelection.material.uniforms.alpha.value;
+    textManipulationParameters["Has bg"] = (curSelection.material.uniforms.hasBackgroundColorFlag.value > 0);
+    textManipulationParameters["Bg color"] = "#" + curSelection.material.uniforms.backgroundColor.value.getHexString();
+    textManipulationParameters["Bg alpha"] = curSelection.material.uniforms.backgroundAlpha.value;
+    textManipulationParameters["Char margin"] = curSelection.offsetBetweenChars;
+    textManipulationParameters["Line margin"] = curSelection.offsetBetweenLines;
+    textManipulationParameters["Aff. by fog"] = curSelection.isAffectedByFog;
+    textManipulationParameters["is 2D"] = curSelection.is2D;
     if (!textManipulationParameters["Has bg"]){
       disableController(textManipulationBackgroundColorController);
       disableController(textManipulationBackgroundAlphaController);
     }
-    textManipulationParameters["Char size"] = selectedAddedText.characterSize;
-    textManipulationParameters["Clickable"] = selectedAddedText.isClickable;
-    textManipulationParameters["Margin X"] = selectedAddedText.marginPercentWidth;
-    textManipulationParameters["Margin Y"] = selectedAddedText.marginPercentHeight;
-    textManipulationParameters["Max width%"] = selectedAddedText.maxWidthPercent;
-    textManipulationParameters["Max height%"] = selectedAddedText.maxHeightPercent;
-    if (selectedAddedText.marginMode == MARGIN_MODE_2D_TEXT_TOP_LEFT){
+    textManipulationParameters["Char size"] = curSelection.characterSize;
+    textManipulationParameters["Clickable"] = curSelection.isClickable;
+    textManipulationParameters["Margin X"] = curSelection.marginPercentWidth;
+    textManipulationParameters["Margin Y"] = curSelection.marginPercentHeight;
+    textManipulationParameters["Max width%"] = curSelection.maxWidthPercent;
+    textManipulationParameters["Max height%"] = curSelection.maxHeightPercent;
+    if (curSelection.marginMode == MARGIN_MODE_2D_TEXT_TOP_LEFT){
       textManipulationParameters["Margin mode"] = "Top/Left";
     }else{
       textManipulationParameters["Margin mode"] = "Bottom/Right";
     }
-    if (!selectedAddedText.is2D){
+    if (!curSelection.is2D){
       disableController(textManipulationMarginModeController);
       disableController(textManipulationMarginXController);
       disableController(textManipulationMarginYController);

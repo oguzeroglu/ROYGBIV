@@ -99,16 +99,6 @@ var AddedText = function(name, font, text, position, color, alpha, characterSize
 }
 
 AddedText.prototype.destroy = function(){
-  if (selectedAddedText && selectedAddedText.name == this.name){
-    if (this.bbHelper){
-      scene.remove(this.bbHelper);
-    }
-    if (this.rectangle){
-      scene.remove(this.rectangle.mesh);
-    }
-    selectedAddedText = 0;
-    afterObjectSelection();
-  }
   for (var gridName in this.destroyedGrids){
     if (this.destroyedGrids[gridName].createdAddedTextName == this.name){
       delete this.destroyedGrids[gridName].createdAddedTextName;
@@ -637,18 +627,9 @@ AddedText.prototype.set2DStatus = function(is2D){
     if (this.bbHelper){
       scene.remove(this.bbHelper);
     }
-    if (mode == 0 && selectedAddedText && selectedAddedText.name == this.name){
-      scene.add(this.rectangle.mesh);
-    }
   }else{
-    selectedAddedText.material.uniforms.isTwoDimensionalInfo.value.x = -500;
+    this.material.uniforms.isTwoDimensionalInfo.value.x = -500;
     rayCaster.binHandler.insert(this.boundingBox, this.name);
-    if (mode == 0 && this.bbHelper && selectedAddedText && selectedAddedText.name == this.name){
-      scene.add(this.bbHelper);
-    }
-    if (mode == 0 && this.rectangle && selectedAddedText && selectedAddedText.name == this.name){
-      scene.remove(this.rectangle.mesh);
-    }
   }
 }
 

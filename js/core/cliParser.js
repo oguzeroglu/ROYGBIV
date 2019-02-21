@@ -575,16 +575,11 @@ function parse(input){
             terminal.printError(Text.NO_SUCH_OBJECT);
             return true;
           }
+          selectionHandler.resetCurrentSelection();
           if (object){
-            if (selectedAddedObject && selectedAddedObject.name == objectName){
-              selectedAddedObject = 0;
-            }
             object.destroy();
             delete addedObjects[objectName];
           }else if (objectGroup){
-            if (selectedObjectGroup && selectedObjectGroup.name == objectName){
-              selectedObjectGroup = 0;
-            }
             objectGroup.destroy();
             delete objectGroups[objectName];
           }
@@ -2221,6 +2216,7 @@ function parse(input){
             terminal.printError(Text.WORKS_ONLY_IN_DESIGN_MODE);
             return true;
           }
+          selectionHandler.resetCurrentSelection();
           var state = new State();
           var json = JSON.stringify(state);
           var blob = new Blob([json], {type: "application/json"});
@@ -2298,17 +2294,14 @@ function parse(input){
             terminal.printError(Text.NO_SUCH_OBJECT);
             return true;
           }
+          selectionHandler.resetCurrentSelection();
           if (objSelection){
-            selectedAddedObject = objSelection;
-            selectedObjectGroup = 0;
+            selectionHandler.select(objSelection);
             camera.lookAt(objSelection.mesh.position);
           }else if (objGroupSelection){
-            selectedObjectGroup = objGroupSelection;
-            selectedAddedObject = 0;
+            selectionHandler.select(objGroupSelection);
             camera.lookAt(objGroupSelection.graphicsGroup.position);
           }
-          objectSelectedByCommand = true;
-          selectedAddedText = 0;
           terminal.printInfo(Text.OBJECT_SELECTED.replace(
               Text.PARAM1, name
           ));
@@ -2349,7 +2342,9 @@ function parse(input){
             if (mode == 1 && mass > 0){
               dynamicObjects[addedObject.name] = addedObject;
             }
-            if (selectedAddedObject && selectedAddedObject.name == addedObject.name){
+            if (selectionHandler.getSelectedObject() &&
+                  selectionHandler.getSelectedObject().isAddedObject &&
+                        selectionHandler.getSelectedObject().name == addedObject.name){
               objectManipulationParameters["Mass"] = addedObject.physicsBody.mass;
               omMassController.updateDisplay();
             }
@@ -2362,7 +2357,9 @@ function parse(input){
             if (mode == 1 && mass > 0){
               dynamicObjectGroups[grouppedObject.name] = grouppedObject;
             }
-            if (selectedObjectGroup && selectedObjectGroup.name == grouppedObject.name){
+            if (selectionHandler.getSelectedObject() &&
+                  selectionHandler.getSelectedObject().isObjectGroup &&
+                        selectionHandler.getSelectedObject().name == grouppedObject.name){
               objectManipulationParameters["Mass"] = grouppedObject.physicsBody.mass;
               omMassController.updateDisplay();
             }
@@ -2763,6 +2760,7 @@ function parse(input){
                 // check if the same kind of material is used (for now only BASIC materials exist.)
               }
             }
+            selectionHandler.resetCurrentSelection();
 
             var objectGroup = new ObjectGroup(
               groupName,
@@ -2802,9 +2800,6 @@ function parse(input){
             objectGroups[groupName] = objectGroup;
             terminal.printInfo(Text.OBJECTS_GLUED_TOGETHER);
             $(datGuiObjectManipulation.domElement).attr("hidden", true);
-            selectedAddedObject = 0;
-            selectedObjectGroup = 0;
-            selectedAddedText = 0;
             if (areaConfigurationsVisible){
               $(datGuiAreaConfigurations.domElement).attr("hidden", true);
               areaConfigurationsVisible = false;
@@ -2837,9 +2832,7 @@ function parse(input){
           if (!jobHandlerWorking){
             terminal.printInfo(Text.OBJECT_DETACHED);
           }
-          selectedObjectGroup = 0;
-          selectedAddedObject = 0;
-          selectedAddedText = 0;
+          selectionHandler.resetCurrentSelection();
           if (areaConfigurationsVisible){
             $(datGuiAreaConfigurations.domElement).attr("hidden", true);
             areaConfigurationsVisible = false;
@@ -4957,32 +4950,11 @@ function parse(input){
             terminal.printError(Text.NO_SUCH_TEXT);
             return true;
           }
-          if (selectedAddedObject){
-            selectedAddedObject.mesh.remove(axesHelper);
-          }
-          if (selectedObjectGroup){
-            selectedObjectGroup.mesh.remove(axesHelper);
-          }
-          if (selectedAddedText && selectedAddedText.bbHelper){
-            scene.remove(selectedAddedText.bbHelper);
-          }
-          if (selectedAddedText && selectedAddedText.rectangle){
-            scene.remove(selectedAddedText.rectangle.mesh);
-          }
-          selectedAddedObject = 0;
-          selectedObjectGroup = 0;
-          selectedAddedText = textSelection;
-          if (!selectedAddedText.bbHelper){
-            selectedAddedText.handleBoundingBox();
-          }
-          if (!selectedAddedText.is2D){
-            scene.add(selectedAddedText.bbHelper);
-          }else{
-            scene.add(selectedAddedText.rectangle.mesh);
-          }
+          selectionHandler.resetCurrentSelection();
+          selectionHandler.select(textSelection);
           afterObjectSelection();
-          terminal.printInfo(Text.SELECTED.replace(Text.PARAM1, selectedAddedText.name));
-          camera.lookAt(selectedAddedText.mesh.position);
+          terminal.printInfo(Text.SELECTED.replace(Text.PARAM1, textSelection.name));
+          camera.lookAt(textSelection.mesh.position);
           return true;
         break;
         case 156: //destroyText
@@ -5000,6 +4972,7 @@ function parse(input){
             terminal.printError(Text.NO_SUCH_TEXT);
             return true;
           }
+          selectionHandler.resetCurrentSelection();
           textToDestroy.destroy();
           if (!jobHandlerWorking){
             terminal.printInfo(Text.TEXT_DESTROYED);

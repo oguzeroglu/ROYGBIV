@@ -42,8 +42,6 @@ var AddedObject = function(name, type, metaData, material, mesh, physicsBody, de
 
   this.associatedTexturePack = 0;
 
-  objectSelectedByCommand = false;
-
   this.rotationX = 0;
   this.rotationY = 0;
   this.rotationZ = 0;
@@ -1256,9 +1254,6 @@ AddedObject.prototype.setMass = function(mass){
 }
 
 AddedObject.prototype.destroy = function(){
-  if (selectedAddedObject && selectedAddedObject.name == this.name){
-    selectedAddedObject = 0;
-  }
   scene.remove(this.mesh);
   physicsWorld.remove(this.physicsBody);
   if (this.destroyedGrids){
@@ -1266,7 +1261,6 @@ AddedObject.prototype.destroy = function(){
       this.destroyedGrids[gridName].destroyedAddedObject = 0;
     }
   }
-  objectSelectedByCommand = false;
 
   this.dispose();
 
@@ -2057,12 +2051,28 @@ AddedObject.prototype.generateBoundingBoxes = function(parentAry){
   this.pseudoFaces = pseudoGeometry.faces;
 }
 
-AddedObject.prototype.visualiseBoudingBoxes = function(selectedScene){
+AddedObject.prototype.visualiseBoundingBoxes = function(){
+  if (this.bbHelpers){
+    for (var i = 0; i<this.bbHelpers.length; i++){
+      scene.remove(this.bbHelpers[i]);
+    }
+  }
+  this.bbHelpers = [];
   for (var i = 0; i<this.boundingBoxes.length; i++){
     this.correctBoundingBox(this.boundingBoxes[i]);
-    var color = new THREE.Color(ColorNames.generateRandomColor());
-    selectedScene.add(new THREE.Box3Helper(this.boundingBoxes[i], color));
+    var bbHelper = new THREE.Box3Helper(this.boundingBoxes[i], LIME_COLOR);
+    scene.add(bbHelper);
+    this.bbHelpers.push(bbHelper);
   }
+}
+
+AddedObject.prototype.removeBoundingBoxesFromScene = function(){
+  if (this.bbHelpers){
+    for (var i = 0; i<this.bbHelpers.length; i++){
+      scene.remove(this.bbHelpers[i]);
+    }
+  }
+  this.bbHelpers = [];
 }
 
 AddedObject.prototype.getNormalGeometry = function(){

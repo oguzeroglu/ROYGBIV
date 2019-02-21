@@ -889,7 +889,6 @@ var ambientOcculsionTextureCache = new Object();
 var alphaTextureCache = new Object();
 var emissiveTextureCache = new Object();
 var CACHE_NOT_PRESENT = "CACHE_NOT_PRESENT";
-var objectSelectedByCommand = false;
 var THREE_AXIS_VECTOR_X = new THREE.Vector3(1, 0, 0);
 var THREE_AXIS_VECTOR_Y = new THREE.Vector3(0, 1, 0);
 var THREE_AXIS_VECTOR_Z = new THREE.Vector3(0, 0, 1);
@@ -1045,6 +1044,7 @@ var roygbivAttributeCounter = 1;
 var roygbivBufferAttributeCounter = 1;
 var roygbivSkippedArrayBufferUpdates = 0;
 var roygbivSkippedElementArrayBufferUpdates = 0;
+var selectionHandler;
 
 // WORKER VARIABLES
 var WORKERS_SUPPORTED = (typeof(Worker) !== "undefined");

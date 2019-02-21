@@ -2,7 +2,6 @@ var ObjectGroup = function(name, group){
   this.isObjectGroup = true;
   this.name = name;
   this.group = group;
-  objectSelectedByCommand = false;
 
   this.rotationX = 0;
   this.rotationY = 0;
@@ -1020,9 +1019,6 @@ ObjectGroup.prototype.glue = function(){
   var hasAnyPhysicsShape = false;
   for (var objectName in group){
     var addedObject = group[objectName];
-    if (selectedAddedObject && selectedAddedObject.name == objectName){
-      selectedAddedObject = 0;
-    }
     addedObject.setAttachedProperties();
 
     this.totalVertexCount += addedObject.mesh.geometry.attributes.position.count;
@@ -1161,9 +1157,6 @@ ObjectGroup.prototype.destroyParts = function(){
 }
 
 ObjectGroup.prototype.detach = function(){
-  if (selectedObjectGroup && selectedObjectGroup.name == this.name){
-    selectedObjectGroup = 0;
-  }
   this.graphicsGroup.position.copy(this.mesh.position);
   this.graphicsGroup.quaternion.copy(this.mesh.quaternion);
   this.graphicsGroup.updateMatrixWorld();
@@ -1360,9 +1353,7 @@ ObjectGroup.prototype.translate = function(axis, amount, fromScript){
 }
 
 ObjectGroup.prototype.destroy = function(isUndo){
-  if (selectedObjectGroup && selectedObjectGroup.name == this.name){
-    selectedObjectGroup = 0;
-  }
+  this.removeBoundingBoxesFromScene();
   scene.remove(this.mesh);
   physicsWorld.remove(this.physicsBody);
   for (var name in this.group){
@@ -1380,7 +1371,6 @@ ObjectGroup.prototype.destroy = function(isUndo){
     this.group[name].dispose();
     delete disabledObjectNames[name];
   }
-  objectSelectedByCommand = false;
   this.mesh.material.dispose();
   this.mesh.geometry.dispose();
 
@@ -1601,9 +1591,25 @@ ObjectGroup.prototype.generateBoundingBoxes = function(){
   }
 }
 
-ObjectGroup.prototype.visualiseBoudingBoxes = function(selectedScene){
+ObjectGroup.prototype.visualiseBoundingBoxes = function(){
+  if (this.bbHelper){
+    scene.remove(this.bbHelper);
+  }
+  var box3 = new THREE.Box3();
   for (var objName in this.group){
-    this.group[objName].visualiseBoudingBoxes(selectedScene);
+    var boundingBoxes = this.group[objName].boundingBoxes;
+    for (var i = 0; i < boundingBoxes.length; i++){
+      box3.expandByPoint(boundingBoxes[i].min);
+      box3.expandByPoint(boundingBoxes[i].max);
+    }
+  }
+  this.bbHelper = new THREE.Box3Helper(box3, LIME_COLOR);
+  scene.add(this.bbHelper);
+}
+
+ObjectGroup.prototype.removeBoundingBoxesFromScene = function(){
+  if (this.bbHelper){
+    scene.remove(this.bbHelper);
   }
 }
 

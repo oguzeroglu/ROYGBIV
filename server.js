@@ -190,6 +190,9 @@ function readEngineScripts(projectName, author, noMobile){
       }else if (scriptPath.includes("Terminal.js")){
         console.log("[*] Skipping Terminal.");
         continue;
+      }else if (scriptPath.includes("SelectionHandler.js")){
+        console.log("[*] Skipping SelectionHandler.");
+        continue;
       }
       content += scriptContent +"\n";
     }
