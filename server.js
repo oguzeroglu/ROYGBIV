@@ -158,6 +158,8 @@ function generateDeployDirectory(projectName, application){
 function readEngineScripts(projectName, author, noMobile){
   var content = "";
   var htmlContent = fs.readFileSync("roygbiv.html", "utf8");
+  htmlContent = htmlContent.replace("three.js", "three.min.js");
+  console.log(htmlContent);
   var htmlContentSplitted = htmlContent.split("\n");
   for (var i = 0; i<htmlContentSplitted.length; i++){
     if (htmlContentSplitted[i].includes("<script")){
