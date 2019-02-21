@@ -1,4 +1,9 @@
 window.onload = function() {
+  // STATS
+  fpsHandler = new FPSHandler();
+  stats = new Stats();
+  stats.showPanel(0);
+  document.body.appendChild(stats.dom);
   // DRAGABLE CLI
   var cliDiv = document.getElementById("cliDiv");
   cliDivheader = document.getElementById("cliDivheader");
@@ -424,7 +429,6 @@ window.onload = function() {
   initPhysics();
   initBadTV();
   render();
-  fpsCounterIntervalID = setInterval(calculateFps, 1000);
   windowLoaded = true;
   MAX_VERTEX_UNIFORM_VECTORS = renderer.context.getParameter(renderer.context.MAX_VERTEX_UNIFORM_VECTORS);
   VERTEX_SHADER_TEXTURE_FETCH_SUPPORTED = (renderer.context.getParameter(renderer.context.MAX_VERTEX_TEXTURE_IMAGE_UNITS) > 0);

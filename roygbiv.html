@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
     <title>ROYGBIV 3D Engine by Oğuz Eroğlu</title>
     <script src="./js/third_party/jquery-3.2.1.min.js"></script>
+    <script src="./js/third_party/stats.js"></script>
     <link rel="stylesheet" href="./css/jquery.terminal-1.11.3.min.css">
     <script src="./js/third_party/jquery.terminal-1.11.3.min.js"></script>
     <script src="./js/third_party/jquery.mousewheel-min.js"></script>
@@ -35,7 +36,7 @@
     <script src="./js/post_processing/postprocessing/UnrealBloomPass.js"></script>
     <script src="./js/post_processing/shaders/CopyShader.js"></script>
     <script src="./js/post_processing/shaders/LuminosityHighPassShader.js"></script>
-    <script src="./js/gui/dat.gui.min.js"></script>
+    <script src="./js/third_party/dat.gui.min.js"></script>
     <script src="./js/core/init.js"></script>
     <script src="./js/engine_objects/State.js"></script>
     <script src="./js/handler/StateLoader.js"></script>
@@ -68,6 +69,7 @@
     <script src="./js/handler/ObjectPicker2D.js"></script>
     <script src="./js/handler/SelectionHandler.js"></script>
     <script src="./js/handler/GUIHandler.js"></script>
+    <script src="./js/handler/FPSHandler.js"></script>
     <style>
 		  body { margin: 0; position: fixed;}
 			canvas {display: block;}
@@ -154,7 +156,7 @@
     <input type="file" id="loadInput" style="display:none;" />
      <!-- CLI -->
     <div id="cliDiv">
-      <div id="cliDivheader" class = "noselect">ROYGBIV 3D Engine - CLI (Preview mode)</div>
+      <div id="cliDivheader" class = "noselect">ROYGBIV 3D Engine - CLI (Design mode)</div>
       <div id="terminalDiv" class="terminal noselect"></div>
       <div id="scriptCreatorDiv">
         <textarea autofocus id="scriptCreatorTextArea" rows="8" cols="50" spellcheck="false"></textarea>

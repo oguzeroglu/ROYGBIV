@@ -197,6 +197,9 @@ function readEngineScripts(projectName, author, noMobile){
       }else if (scriptPath.includes("GUIHandler.js")){
         console.log("[*] Skipping GUIHandler.");
         continue;
+      }else if (scriptPath.includes("dat.gui.min.js")){
+        console.log("[*] Skipping DAT gui.");
+        continue;
       }
       content += scriptContent +"\n";
     }

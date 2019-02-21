@@ -691,6 +691,7 @@ if (!isDeployment){
     79, //redo -> Deprecated because causes memory issues for big projects.
     89, //translateObject -> Deprecated due to architectural conflicts. Objects can only be translated using animations. Instead of translating the object in the design mode, a new grid system should be created at the specific position. Every object should be associated with certain grids.
     105, //printPerformance -> Deprecated because calling performance.now() multiple times on each render is costly.
+    121, //logFrameDrops -> No need for such functionality after the usage of Stats.js
     125, //applyDisplacementMap -> Deprecated because causes problems with geometry caching.
     127, //setAtlasTextureSize -> Deprecated because has no use cases after deprecation of TextureMerger class
     128 //printAtlasTextureSize -> Deprecated due to same reasons as setAtlasTextureSize
@@ -735,6 +736,10 @@ var onFullScreen = false;
 var isScreenVisible = true;
 var inactiveCounter = 0;
 var maxInactiveTime = 0;
+
+// STATS.JS
+var stats;
+var fpsHandler;
 
 // THREE.JS VARIABLES
 var renderer;
@@ -877,9 +882,6 @@ var skyboxVisible = false;
 var skyboxConfigurationsVisible = false;
 var fogConfigurationsVisible = false;
 var mappedSkyboxName = 0;
-var frameCounter = 0;
-var fps = 0;
-var fpsCounterIntervalID;
 var gridCounter = 0;
 var MAX_GRIDS_ALLOWED = 1000000;
 var MIN_CELLSIZE_ALLOWED = 5;
@@ -942,9 +944,6 @@ var TOTAL_PARTICLE_COLLISION_LISTEN_COUNT = 0;
 var TOTAL_PARTICLE_SYSTEM_COLLISION_LISTEN_COUNT = 0;
 var PARTICLE_POSITION_HISTORY_SIZE = 2;
 var MAX_OBJECT_SEGMENT_COUNT = 200;
-var LOG_FRAME_DROP_ON = false;
-var LOG_FRAME_DROP_CTR = 0;
-var FRAME_DROP_COUNT = 0;
 var MAX_PARTICLE_SYSTEMS_WITH_PARTICLE_COLLISIONS = 50;
 var TOTAL_PARTICLE_SYSTEMS_WITH_PARTICLE_COLLISIONS = 0;
 var SCRIPT_STATUS_STARTED = 1;
@@ -955,7 +954,6 @@ var MESSAGE_TYPE_BUFFER = 1;
 var UNDEFINED = "undefined";
 var PIPE = "|";
 var mergedTextureCache = new Object();
-var lastFPS = 0;
 var reusableCollisionInfo = new CollisionInfo();
 var TOTAL_OBJECT_COLLISION_LISTENER_COUNT = 0;
 var MAX_OBJECT_COLLISION_LISTENER_COUNT = 50;
@@ -1029,9 +1027,6 @@ var WHITE_COLOR = new THREE.Color("white");
 var LIME_COLOR = new THREE.Color("lime");
 var ORANGE_COLOR = new THREE.Color("orange");
 var NO_MOBILE = false;
-var performanceDropMinFPS = 0;
-var performanceDropSeconds = 0;
-var performanceDropCounter = 0;
 var isPaused = false;
 var defaultFont;
 var fonts = new Object();

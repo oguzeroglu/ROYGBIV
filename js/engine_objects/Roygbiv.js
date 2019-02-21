@@ -168,7 +168,8 @@ var Roygbiv = function(){
     "removeTextClickListener",
     "setTextCenterPosition",
     "hideText",
-    "showText"
+    "showText",
+    "getFPS"
   ];
 
   this.globals = new Object();
@@ -601,6 +602,15 @@ Roygbiv.prototype.getText = function(textName){
     return text;
   }
   return 0;
+}
+
+// getFPS
+// Returns the current FPS.
+Roygbiv.prototype.getFPS = function(){
+  if (mode == 0){
+    return;
+  }
+  return fpsHandler.fps;
 }
 
 // OBJECT MANIPULATION FUNCTIONS ***********************************************
@@ -6303,9 +6313,7 @@ Roygbiv.prototype.setPerformanceDropCallbackFunction = function(minFPS, seconds,
     return;
   }
   performanceDropCallbackFunction = callbackFunction;
-  performanceDropMinFPS = minFPS;
-  performanceDropSeconds = seconds;
-  performanceDropCounter = 0;
+  fpsHandler.initiatePerformanceDropMonitoring(minFPS, seconds);
 }
 
 // removePerformanceDropCallbackFunction
@@ -6315,6 +6323,7 @@ Roygbiv.prototype.removePerformanceDropCallbackFunction = function(){
     return;
   }
   performanceDropCallbackFunction = 0;
+  fpsHandler.reset();
 }
 
 // setUserInactivityCallbackFunction

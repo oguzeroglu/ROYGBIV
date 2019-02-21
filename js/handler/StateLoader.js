@@ -2212,9 +2212,7 @@ StateLoader.prototype.resetProject = function(){
   fpsDropCallbackFunction = 0;
   performanceDropCallbackFunction = 0;
   userInactivityCallbackFunction = 0;
-  performanceDropMinFPS = 0;
-  performanceDropSeconds = 0;
-  performanceDropCounter = 0;
+  fpsHandler.reset();
   originalBloomConfigurations = new Object();
   fonts = new Object();
   NO_MOBILE = false;

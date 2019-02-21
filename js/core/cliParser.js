@@ -1,6 +1,6 @@
 function parseCommand(userInput){
   var result = parse(userInput);
-  if (!result && !(mode == 1 && terminalTextInputCallbackFunction)){
+  if (!result){
     terminal.printError(Text.COMMAND_NOT_FOUND);
   }
   guiHandler.afterObjectSelection();
@@ -3626,20 +3626,7 @@ function parse(input){
           return true;
         break;
         case 121: //logFrameDrops
-          if (mode == 0){
-            terminal.printError(Text.WORKS_ONLY_IN_PREVIEW_MODE);
-            return true;
-          }
-          if (LOG_FRAME_DROP_ON){
-            terminal.printError(Text.FRAME_DROP_ALREADY);
-            return true;
-          }
-          LOG_FRAME_DROP_ON = true;
-          LOG_FRAME_DROP_CTR = 0;
-          FRAME_DROP_COUNT = 0;
-          terminal.printInfo(Text.FRAME_DROP_STARTED);
-          console.log("[*] Frame rates are being recorded. Results will be printed after a minute.");
-          return true;
+          // DEPRECATED
         break;
         case 122: //addPaddingToTexture
           if (mode != 0){

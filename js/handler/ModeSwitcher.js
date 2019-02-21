@@ -33,7 +33,6 @@ var ModeSwitcher = function(){
 }
 
 ModeSwitcher.prototype.switchMode = function(){
-  lastFPS = 0;
   if (mode == 0){
     this.loadedScriptsCounter = 0;
     if (this.totalScriptsToLoad > 0){
@@ -224,10 +223,6 @@ ModeSwitcher.prototype.switchFromPreviewToDesign = function(){
     terminal.printInfo(Text.SWITCHED_TO_DESIGN_MODE);
   }
   $("#cliDivheader").text("ROYGBIV 3D Engine - CLI (Design mode)");
-  if (LOG_FRAME_DROP_ON){
-    console.log("[*] Frame-drop recording process stopped.");
-    LOG_FRAME_DROP_ON = false;
-  }
   if (!(typeof originalBloomConfigurations.bloomStrength == UNDEFINED)){
     bloomStrength = originalBloomConfigurations.bloomStrength;
   }
@@ -259,9 +254,7 @@ ModeSwitcher.prototype.switchFromPreviewToDesign = function(){
   fpsDropCallbackFunction = 0;
   performanceDropCallbackFunction = 0;
   userInactivityCallbackFunction = 0;
-  performanceDropMinFPS = 0;
-  performanceDropSeconds = 0;
-  performanceDropCounter = 0;
+  fpsHandler.reset();
   pointerLockRequested = false;
   fullScreenRequested = false;
   for (var gsName in gridSystems){

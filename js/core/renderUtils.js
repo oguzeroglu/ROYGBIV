@@ -1,5 +1,5 @@
 function render(){
-
+  stats.begin();
   if (!(mode == 1 && isPaused)){
     requestID = requestAnimationFrame(render);
   }else{
@@ -43,7 +43,7 @@ function render(){
   if (mode == 1){
     previewSceneRendered = true;
   }
-  frameCounter ++;
+  stats.end();
 }
 
 
@@ -193,61 +193,6 @@ function setTHREEQuaternionFromCANNON(mesh, physicsBody, axis, type, gridSystemA
       mesh.rotateX(Math.PI / 2);
     }
   }
-}
-
-function calculateFps (){
-  if (mode == 1 && isPaused){
-    return;
-  }
-  if (maxInactiveTime > 0 && userInactivityCallbackFunction){
-    if (inactiveCounter >= maxInactiveTime){
-      userInactivityCallbackFunction();
-      userInactivityCallbackFunction = 0;
-      maxInactiveTime = 0;
-      inactiveCounter = 0;
-    }
-    inactiveCounter ++;
-  }
-  if (!isScreenVisible){
-    return;
-  }
-  if (LOG_FRAME_DROP_ON){
-    if (frameCounter < 60){
-      FRAME_DROP_COUNT += 60 - frameCounter;
-    }
-    LOG_FRAME_DROP_CTR ++;
-    if (LOG_FRAME_DROP_CTR == 60){
-      LOG_FRAME_DROP_ON = false;
-      console.log("[*] Frame-drops: "+FRAME_DROP_COUNT);
-    }
-  }
-  fps = frameCounter;
-  frameCounter = 0;
-  if (mode == 1 && fpsDropCallbackFunction && fps < 60){
-    fpsDropCallbackFunction(60 - fps);
-  }
-  if (mode == 1 && performanceDropCallbackFunction){
-    if (fps < performanceDropMinFPS){
-      performanceDropCounter ++;
-      if (performanceDropCounter == performanceDropSeconds){
-        performanceDropCallbackFunction();
-        performanceDropCounter = 0;
-        performanceDropMinFPS = 0;
-        performanceDropSeconds = 0;
-        performanceDropCallbackFunction = 0;
-      }
-    }else{
-      performanceDropCounter = 0;
-    }
-  }
-  if (!isDeployment && !scriptEditorShowing && (fps != lastFPS)){
-    if (mode == 0){
-      cliDivheader.innerText = "ROYGBIV 3D Engine - CLI (Design mode) - "+fps+" FPS";
-    }else if (mode == 1){
-      cliDivheader.innerText = "ROYGBIV 3D Engine - CLI (Preview mode) - "+fps+" FPS";
-    }
-  }
-  lastFPS = fps;
 }
 
 function handleSkybox(){

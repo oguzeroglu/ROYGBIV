@@ -909,4 +909,5 @@ var Text = function(){
    this.ROYGBIV_SCRIPTING_API_SETTEXTCENTERPOSITION = "Puts the center of the given text object to given x, y, z coordinates.";
    this.ROYGBIV_SCRIPTING_API_HIDETEXT = "Makes the given text object invisible. Does nothing if the text is already invisible.";
    this.ROYGBIV_SCRIPTING_API_SHOWTEXT = "Makes the given text object visible. Does nothing if the text is already visible.";
+   this.ROYGBIV_SCRIPTING_API_GETFPS = "Returns the current FPS";
 }
