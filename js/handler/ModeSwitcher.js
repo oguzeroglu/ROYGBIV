@@ -63,13 +63,9 @@ ModeSwitcher.prototype.switchMode = function(){
 
 ModeSwitcher.prototype.commonSwitchFunctions = function(){
   if (!isDeployment){
-    $(datGui.domElement).attr("hidden", true);
-    $(datGuiObjectManipulation.domElement).attr("hidden", true);
-    $(datGuiTextManipulation.domElement).attr("hidden", true);
-    $(datGuiSkybox.domElement).attr("hidden", true);
-    $(datGuiFog.domElement).attr("hidden", true);
+    guiHandler.hideAll();
     if (areaConfigurationsVisible){
-      $(datGuiAreaConfigurations.domElement).attr("hidden", true);
+      guiHandler.hide(datGuiAreaConfigurations);
       areaConfigurationsVisible = false;
     }
     selectionHandler.resetCurrentSelection();

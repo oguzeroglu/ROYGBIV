@@ -2500,10 +2500,10 @@ AddedObject.prototype.injectMacro = function(macro, insertVertexShader, insertFr
 
 AddedObject.prototype.removeMacro = function(macro, removeVertexShader, removeFragmentShader){
   if (removeVertexShader){
-    this.mesh.material.vertexShader = this.mesh.material.vertexShader.replace("#define "+macro, "");
+    this.mesh.material.vertexShader = this.mesh.material.vertexShader.replace("\n#define "+macro, "");
   }
   if (removeFragmentShader){
-    this.mesh.material.fragmentShader = this.mesh.material.fragmentShader.replace("#define "+macro, "");
+    this.mesh.material.fragmentShader = this.mesh.material.fragmentShader.replace("\n#define "+macro, "");
   }
   this.mesh.material.needsUpdate = true;
 }

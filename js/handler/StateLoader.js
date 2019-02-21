@@ -2243,7 +2243,9 @@ StateLoader.prototype.resetProject = function(){
   this.oldPhysicsDebugMode = "NONE";
 
   physicsDebugMode = false;
-  selectionHandler.resetCurrentSelection();
+  if (!isDeployment){
+    selectionHandler.resetCurrentSelection();
+  }
   skyboxVisible = false;
   croppedGridSystemBuffer = 0;
 
@@ -2274,11 +2276,7 @@ StateLoader.prototype.resetProject = function(){
 
   initBadTV();
   if (!isDeployment){
-    $(datGui.domElement).attr("hidden", true);
-    $(datGuiObjectManipulation.domElement).attr("hidden", true);
-    $(datGuiTextManipulation.domElement).attr("hidden", true);
-    $(datGuiSkybox.domElement).attr("hidden", true);
-    $(datGuiFog.domElement).attr("hidden", true);
+    guiHandler.hideAll();
     $("#cliDivheader").text("ROYGBIV Scene Creator - CLI (Design mode)");
   }
 

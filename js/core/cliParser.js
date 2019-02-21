@@ -3,7 +3,7 @@ function parseCommand(userInput){
   if (!result && !(mode == 1 && terminalTextInputCallbackFunction)){
     terminal.printError(Text.COMMAND_NOT_FOUND);
   }
-  afterObjectSelection();
+  guiHandler.afterObjectSelection();
 }
 
 function parse(input){
@@ -455,7 +455,7 @@ function parse(input){
             terminal.printInfo(Text.OBJECT_ADDED);
           }
           if (areaConfigurationsVisible){
-            $(datGuiAreaConfigurations.domElement).attr("hidden", true);
+            guiHandler.hide(datGuiAreaConfigurations);
             areaConfigurationsVisible = false;
           }
           rayCaster.refresh();
@@ -587,7 +587,7 @@ function parse(input){
             terminal.printInfo(Text.OBJECT_DESTROYED);
           }
           if (areaConfigurationsVisible){
-            $(datGuiAreaConfigurations.domElement).attr("hidden", true);
+            guiHandler.hide(datGuiAreaConfigurations);
             areaConfigurationsVisible = false;
           }
           return true;
@@ -1005,7 +1005,7 @@ function parse(input){
           anchorGrid = 0;
           terminal.printInfo(Text.RAMP_CREATED);
           if (areaConfigurationsVisible){
-            $(datGuiAreaConfigurations.domElement).attr("hidden", true);
+            guiHandler.hide(datGuiAreaConfigurations);
             areaConfigurationsVisible = false;
           }
           rayCaster.refresh();
@@ -1177,7 +1177,7 @@ function parse(input){
             terminal.printInfo(Text.BOX_CREATED);
           }
           if (areaConfigurationsVisible){
-            $(datGuiAreaConfigurations.domElement).attr("hidden", true);
+            guiHandler.hide(datGuiAreaConfigurations);
             areaConfigurationsVisible = false;
           }
           rayCaster.refresh();
@@ -1947,21 +1947,21 @@ function parse(input){
             return true;
           }
 
-          var visibility = $(datGui.domElement).is(":visible");
+          var visibility = guiHandler.isVisible(datGui);
 
           if (status == "hide"){
             if (!visibility){
               terminal.printError(Text.GUI_IS_ALREADY_HIDDEN);
               return true;
             }
-            $(datGui.domElement).attr("hidden", true);
+            guiHandler.hide(datGui);
             terminal.printInfo(Text.GUI_CLOSED);
           }else{
             if (visibility){
               terminal.printError(Text.GUI_IS_ALREADY_VISIBLE);
               return true;
             }
-            $(datGui.domElement).attr("hidden", false);
+            guiHandler.show(datGui);
             terminal.printInfo(Text.GUI_OPENED);
           }
           return true;
@@ -2657,7 +2657,7 @@ function parse(input){
           fogActive = false;
           fogBlendWithSkybox = false;
           terminal.printInfo(Text.FOG_REMOVED);
-          afterObjectSelection();
+          guiHandler.afterObjectSelection();
           return true;
         break;
         case 92: //glue
@@ -2799,9 +2799,9 @@ function parse(input){
             objectGroup.glue();
             objectGroups[groupName] = objectGroup;
             terminal.printInfo(Text.OBJECTS_GLUED_TOGETHER);
-            $(datGuiObjectManipulation.domElement).attr("hidden", true);
+            guiHandler.hide(datGuiObjectManipulation);
             if (areaConfigurationsVisible){
-              $(datGuiAreaConfigurations.domElement).attr("hidden", true);
+              guiHandler.hide(datGuiAreaConfigurations);
               areaConfigurationsVisible = false;
             }
             rayCaster.refresh();
@@ -2834,7 +2834,7 @@ function parse(input){
           }
           selectionHandler.resetCurrentSelection();
           if (areaConfigurationsVisible){
-            $(datGuiAreaConfigurations.domElement).attr("hidden", true);
+            guiHandler.hide(datGuiAreaConfigurations);
             areaConfigurationsVisible = false;
           }
           return true;
@@ -3781,7 +3781,7 @@ function parse(input){
             terminal.printInfo(Text.SPHERE_CREATED);
           }
           if (areaConfigurationsVisible){
-            $(datGuiAreaConfigurations.domElement).attr("hidden", true);
+            guiHandler.hide(datGuiAreaConfigurations);
             areaConfigurationsVisible = false;
           }
           rayCaster.refresh();
@@ -3948,7 +3948,7 @@ function parse(input){
           var result = gridSystems[gs].newArea(areaName, height, selections);
           terminal.printInfo(Text.AREA_CREATED);
           if (areaConfigurationsVisible){
-            $(datGuiAreaConfigurations.domElement).attr("hidden", true);
+            guiHandler.hide(datGuiAreaConfigurations);
             areaConfigurationsVisible = false;
           }
           return true;
@@ -3987,7 +3987,7 @@ function parse(input){
           delete areas[area.name];
           terminal.printInfo(Text.AREA_DESTROYED);
           if (areaConfigurationsVisible){
-            $(datGuiAreaConfigurations.domElement).attr("hidden", true);
+            guiHandler.hide(datGuiAreaConfigurations);
             areaConfigurationsVisible = false;
           }
           return true;
@@ -4035,7 +4035,7 @@ function parse(input){
               terminal.printError(Text.AREA_CONFIGURATION_WINDOW_IS_ALREADY_HIDDEN);
               return true;
             }
-            $(datGuiAreaConfigurations.domElement).attr("hidden", true);
+            guiHandler.hide(datGuiAreaConfigurations);
           }
           areaConfigurationsVisible = ! areaConfigurationsVisible;
           terminal.printInfo(Text.OK);
@@ -4086,7 +4086,7 @@ function parse(input){
             return true;
           }
           if (areaConfigurationsVisible){
-            $(datGuiAreaConfigurations.domElement).attr("hidden", true);
+            guiHandler.hide(datGuiAreaConfigurations);
           }
           areaConfigurationsHandler.show(areaName);
           areaConfigurationsVisible = true;
@@ -4314,7 +4314,7 @@ function parse(input){
             terminal.printInfo(Text.CYLINDER_CREATED);
           }
           if (areaConfigurationsVisible){
-            $(datGuiAreaConfigurations.domElement).attr("hidden", true);
+            guiHandler.hide(datGuiAreaConfigurations);
             areaConfigurationsVisible = false;
           }
           rayCaster.refresh();
@@ -4609,7 +4609,7 @@ function parse(input){
               terminal.printError(Text.GUI_IS_ALREADY_VISIBLE);
               return true;
             }
-            $(datGuiSkybox.domElement).attr("hidden", false);
+            guiHandler.show(datGuiSkybox);
             skyboxConfigurationsVisible = true;
             skyboxParameters["Name"] = mappedSkyboxName;
             skyboxParameters["Alpha"] = skyboxMesh.material.uniforms.alpha.value;
@@ -4620,7 +4620,7 @@ function parse(input){
               terminal.printError(Text.GUI_IS_ALREADY_HIDDEN);
               return true;
             }
-            $(datGuiSkybox.domElement).attr("hidden", true);
+            guiHandler.hide(datGuiSkybox);
             skyboxConfigurationsVisible = false;
             terminal.printInfo(Text.GUI_CLOSED);
           }else{
@@ -4643,7 +4643,7 @@ function parse(input){
               terminal.printError(Text.GUI_IS_ALREADY_VISIBLE);
               return true;
             }
-            $(datGuiFog.domElement).attr("hidden", false);
+            guiHandler.show(datGuiFog);
             fogParameters["Color"] = "#"+fogColorRGB.getHexString();
             fogParameters["Density"] = fogDensity * 100;
             fogParameters["Blend skybox"] = fogBlendWithSkybox;
@@ -4665,7 +4665,7 @@ function parse(input){
               terminal.printError(Text.GUI_IS_ALREADY_HIDDEN);
               return true;
             }
-            $(datGuiFog.domElement).attr("hidden", true);
+            guiHandler.hide(datGuiFog);
             fogConfigurationsVisible = false;
             terminal.printInfo(Text.GUI_CLOSED);
           }else{
@@ -4952,7 +4952,7 @@ function parse(input){
           }
           selectionHandler.resetCurrentSelection();
           selectionHandler.select(textSelection);
-          afterObjectSelection();
+          guiHandler.afterObjectSelection();
           terminal.printInfo(Text.SELECTED.replace(Text.PARAM1, textSelection.name));
           camera.lookAt(textSelection.mesh.position);
           return true;

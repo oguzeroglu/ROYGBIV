@@ -70,6 +70,7 @@ function copyAssets(application){
   }
   copyFolderRecursiveSync("third_party_licenses", "deploy/"+application.projectName+"/");
   fs.unlinkSync("deploy/"+application.projectName+"/third_party_licenses/LICENSE_JQUERY_TERMINAL");
+  fs.unlinkSync("deploy/"+application.projectName+"/third_party_licenses/LICENSE_DATGUI");
   console.log("[*] Copied third party licenses.");
   copyFileSync("LICENSE", "deploy/"+application.projectName+"/");
   console.log("[*] Copied ROYGBIV license.");
@@ -192,6 +193,9 @@ function readEngineScripts(projectName, author, noMobile){
         continue;
       }else if (scriptPath.includes("SelectionHandler.js")){
         console.log("[*] Skipping SelectionHandler.");
+        continue;
+      }else if (scriptPath.includes("GUIHandler.js")){
+        console.log("[*] Skipping GUIHandler.");
         continue;
       }
       content += scriptContent +"\n";

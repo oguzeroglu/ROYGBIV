@@ -1045,6 +1045,7 @@ var roygbivBufferAttributeCounter = 1;
 var roygbivSkippedArrayBufferUpdates = 0;
 var roygbivSkippedElementArrayBufferUpdates = 0;
 var selectionHandler;
+var guiHandler;
 
 // WORKER VARIABLES
 var WORKERS_SUPPORTED = (typeof(Worker) !== "undefined");
