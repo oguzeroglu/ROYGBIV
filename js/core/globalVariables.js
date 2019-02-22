@@ -967,8 +967,6 @@ var selectedCrosshair;
 var GLOBAL_FOG_UNIFORM = new THREE.Uniform(new THREE.Vector4(-100.0, 0, 0, 0));
 var GLOBAL_PROJECTION_UNIFORM = new THREE.Uniform(new THREE.Vector3());
 var GLOBAL_VIEW_UNIFORM = new THREE.Uniform(new THREE.Matrix4());
-var GLOBAL_PS_MERGED_UNIFORM = new THREE.Uniform(20.0);
-var GLOBAL_PS_NOT_MERGED_UNIFORM = new THREE.Uniform(-20.0);
 var GLOBAL_CAMERA_POSITION_UNIFORM = new THREE.Uniform(new THREE.Vector3());
 var GLOBAL_CAMERA_QUATERNION_UNIFORM = new THREE.Uniform(new THREE.Quaternion());
 var GLOBAL_CUBE_TEXTURE_UNIFORM;

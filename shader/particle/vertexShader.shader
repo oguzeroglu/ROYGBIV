@@ -3,7 +3,26 @@ precision lowp int;
 
 #define OBJECT_SIZE 1
 
-attribute float mergedIndex;
+#define INSERTION
+
+#ifdef IS_MERGED
+  attribute float mergedIndex;
+  uniform float timeArray[OBJECT_SIZE];
+  uniform mat4 modelViewMatrixArray[OBJECT_SIZE];
+  uniform mat4 worldMatrixArray[OBJECT_SIZE];
+  uniform float hiddenArray[OBJECT_SIZE];
+  uniform mat3 parentMotionMatrixArray[OBJECT_SIZE];
+  uniform float dissapearCoefArray[OBJECT_SIZE];
+  uniform vec3 stopInfoArray[OBJECT_SIZE];
+#else
+  uniform float time;
+  uniform mat4 modelViewMatrix;
+  uniform mat4 worldMatrix;
+  uniform mat3 parentMotionMatrix;
+  uniform float dissapearCoef;
+  uniform vec3 stopInfo;
+#endif
+
 attribute float expiredFlag;
 attribute vec3 position;
 attribute vec3 rgbThreshold;
@@ -24,22 +43,8 @@ varying vec3 vRgbThreshold;
 varying vec3 vWorldPosition;
 varying vec4 vUVCoordinates;
 
-uniform float mergedFlag;
-uniform float time;
-uniform float timeArray[OBJECT_SIZE];
-uniform mat4 modelViewMatrix;
-uniform mat4 modelViewMatrixArray[OBJECT_SIZE];
-uniform mat4 worldMatrix;
-uniform mat4 worldMatrixArray[OBJECT_SIZE];
-uniform float hiddenArray[OBJECT_SIZE];
 uniform mat4 viewMatrix;
 uniform mat4 projectionMatrix;
-uniform mat3 parentMotionMatrix;
-uniform mat3 parentMotionMatrixArray[OBJECT_SIZE];
-uniform float dissapearCoef;
-uniform float dissapearCoefArray[OBJECT_SIZE];
-uniform vec3 stopInfo;
-uniform vec3 stopInfoArray[OBJECT_SIZE];
 
 vec3 calculateColor(float timeValue){
   float colorStep = targetColor[3];
@@ -111,11 +116,13 @@ float isRecentlyRespawned(float timeNow){
 }
 
 float findRepeatTime(){
-  float selectedTime = time;
-  if (mergedFlag > 5.0){
+  float selectedTime;
+  #ifdef IS_MERGED
     int mi = int(mergedIndex);
     selectedTime = timeArray[mi];
-  }
+  #else
+    selectedTime = time;
+  #endif
   float startTime = flags2[3];
   float respawnFlag = flags1[0];
   if (respawnFlag < 5.0){
@@ -148,18 +155,18 @@ void main(){
   float angularVelocity = flags3[2];
   float angularMotionRadius = flags3[3];
   float useWorldPositionFlag = flags4[3];
-  vec3 parentVelocity = parentMotionMatrix[1];
-  vec3 parentAcceleration = parentMotionMatrix[2];
-  vec3 parentInitialPosition = parentMotionMatrix[0];
+  vec3 parentVelocity;
+  vec3 parentAcceleration;
+  vec3 parentInitialPosition;
   vec3 color = vec3(flags4[0], flags4[1], flags4[2]);
 
   float skipFlag = -20.0;
-  mat4 selectedMVMatrix = modelViewMatrix;
-  mat4 selectedWorldMatrix = worldMatrix;
-  float selectedTime = time;
-  float selectedDissapearCoef = dissapearCoef;
-  vec3 selectedStopInfo = stopInfo;
-  if (mergedFlag > 5.0){
+  mat4 selectedMVMatrix;
+  mat4 selectedWorldMatrix;
+  float selectedTime;
+  float selectedDissapearCoef;
+  vec3 selectedStopInfo;
+  #ifdef IS_MERGED
     int mi = int(mergedIndex);
     selectedMVMatrix = modelViewMatrixArray[mi];
     selectedWorldMatrix = worldMatrixArray[mi];
@@ -172,7 +179,16 @@ void main(){
     }
     selectedDissapearCoef = dissapearCoefArray[mi];
     selectedStopInfo = stopInfoArray[mi];
-  }
+  #else
+    selectedMVMatrix = modelViewMatrix;
+    selectedWorldMatrix = worldMatrix;
+    selectedTime = time;
+    selectedDissapearCoef = dissapearCoef;
+    selectedStopInfo = stopInfo;
+    parentVelocity = parentMotionMatrix[1];
+    parentAcceleration = parentMotionMatrix[2];
+    parentInitialPosition = parentMotionMatrix[0];
+  #endif
 
   float parentStoppedFlag = selectedStopInfo[0];
   float stopTime = selectedStopInfo[1];

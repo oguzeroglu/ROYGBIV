@@ -370,7 +370,6 @@ var ParticleSystem = function(copyPS, name, particles, x, y, z, vx, vy, vz, ax, 
       transparent: true,
       side: THREE.DoubleSide,
       uniforms:{
-        mergedFlag: GLOBAL_PS_NOT_MERGED_UNIFORM,
         modelViewMatrix: new THREE.Uniform(new THREE.Matrix4()),
         projectionMatrix: GLOBAL_PROJECTION_UNIFORM,
         cameraPosition: GLOBAL_CAMERA_POSITION_UNIFORM,

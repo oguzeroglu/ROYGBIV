@@ -181,7 +181,6 @@ var ParticleSystemMerger = function(psObj, name){
     transparent: true,
     side: THREE.DoubleSide,
     uniforms:{
-      mergedFlag: GLOBAL_PS_MERGED_UNIFORM,
       modelViewMatrixArray: new THREE.Uniform(mvMatrixArray),
       worldMatrixArray: new THREE.Uniform(worldMatrixArray),
       cameraPosition: GLOBAL_CAMERA_POSITION_UNIFORM,
@@ -197,10 +196,10 @@ var ParticleSystemMerger = function(psObj, name){
       cubeTexture: GLOBAL_CUBE_TEXTURE_UNIFORM
     }
   });
+  this.injectMacro(this.material, "IS_MERGED", true, false);
   this.mesh = new THREE.Points(this.geometry, this.material);
   this.mesh.frustumCulled = false;
   scene.add(this.mesh);
-
   this.clean();
 
 }
@@ -270,4 +269,28 @@ ParticleSystemMerger.prototype.updateObject = function(ps){
 
 ParticleSystemMerger.prototype.update = function(){
   this.activePSMap.forEach(this.updateObject);
+}
+
+ParticleSystemMerger.prototype.injectMacro = function(material, macro, insertVertexShader, insertFragmentShader){
+  if (insertVertexShader){
+    material.vertexShader = material.vertexShader.replace(
+      "#define INSERTION", "#define INSERTION\n#define "+macro
+    )
+  };
+  if (insertFragmentShader){
+    material.fragmentShader = material.fragmentShader.replace(
+      "#define INSERTION", "#define INSERTION\n#define "+macro
+    )
+  };
+  material.needsUpdate = true;
+}
+
+ParticleSystemMerger.prototype.removeMacro = function(material, macro, removeVertexShader, removeFragmentShader){
+  if (removeVertexShader){
+    material.vertexShader = material.vertexShader.replace("\n#define "+macro, "");
+  }
+  if (removeFragmentShader){
+    material.fragmentShader = material.fragmentShader.replace("\n#define "+macro, "");
+  }
+  material.needsUpdate = true;
 }
