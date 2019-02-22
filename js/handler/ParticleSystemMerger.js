@@ -14,9 +14,13 @@ var ParticleSystemMerger = function(psObj, name){
   var textureCount = 0;
   var textureMergerHash = "";
   var len = 0;
+  var noTargetColor = true;
   for (var psName in this.psObj){
     var ps = this.psObj[psName];
     ps.psMerger = this;
+    if (!ps.noTargetColor){
+      noTargetColor = false;
+    }
     len += ps.particles.length;
     for (var textureName in ps.texturesObj){
       if (!texturesObj[textureName]){
@@ -26,7 +30,7 @@ var ParticleSystemMerger = function(psObj, name){
       textureCount ++;
     }
   }
-
+  this.noTargetColor = noTargetColor;
   var textureMerger = 0;
 
   if (textureCount > 0 && !(mergedTextureCache[textureMergerHash])){
@@ -55,7 +59,9 @@ var ParticleSystemMerger = function(psObj, name){
   this.flags1 = new Float32Array(len * 4);
   this.flags3 = new Float32Array(len * 4);
   this.flags4 = new Float32Array(len * 4);
-  this.targetColors = new Float32Array(len * 4);
+  if (!this.noTargetColor){
+    this.targetColors = new Float32Array(len * 4);
+  }
   this.angularQuaternions = new Float32Array(len * 4);
   this.expiredFlags = new Float32Array(len);
   this.flags2 = new Float32Array(len * 4);
@@ -83,14 +89,30 @@ var ParticleSystemMerger = function(psObj, name){
     scene.remove(ps.mesh);
     this.positions.set(ps.positions, offset1);
     if (this.rgbThresholds){
-      this.rgbThresholds.set(ps.rgbThresholds, offset1);
+      if (ps.rgbThresholds){
+        this.rgbThresholds.set(ps.rgbThresholds, offset1);
+      }else{
+        var lim = ax + (ps.particles.length * 3);
+        for (var ax = offset1; ax < lim; ax ++){
+          this.rgbThresholds[ax] = -50;
+        }
+      }
     }
     this.velocities.set(ps.velocities, offset1);
     this.accelerations.set(ps.accelerations, offset1);
     this.flags1.set(ps.flags1, offset2);
     this.flags3.set(ps.flags3, offset2);
     this.flags4.set(ps.flags4, offset2);
-    this.targetColors.set(ps.targetColors, offset2);
+    if (!this.noTargetColor){
+      if (ps.noTargetColor){
+        var lim = ax + (ps.particles.length * 4);
+        for (var ax = offset2; ax<lim; ax++){
+          this.targetColors[ax] = -50;
+        }
+      }else{
+        this.targetColors.set(ps.targetColors, offset2);
+      }
+    }
     this.angularQuaternions.set(ps.angularQuaternions, offset2);
     this.expiredFlags.set(ps.expiredFlags, offset3);
     this.flags2.set(ps.flags2, offset2);
@@ -140,7 +162,9 @@ var ParticleSystemMerger = function(psObj, name){
   this.expiredFlagBufferAttribute = new THREE.BufferAttribute(this.expiredFlags, 1);
   this.velocityBufferAttribute = new THREE.BufferAttribute(this.velocities, 3);
   this.accelerationBufferAttribute = new THREE.BufferAttribute(this.accelerations, 3);
-  this.targetColorBufferAttribute = new THREE.BufferAttribute(this.targetColors, 4);
+  if (this.targetColors){
+    this.targetColorBufferAttribute = new THREE.BufferAttribute(this.targetColors, 4);
+  }
   this.flags1BufferAttribute = new THREE.BufferAttribute(this.flags1, 4);
   this.flags2BufferAttribute = new THREE.BufferAttribute(this.flags2, 4);
   this.flags3BufferAttribute = new THREE.BufferAttribute(this.flags3, 4);
@@ -158,7 +182,9 @@ var ParticleSystemMerger = function(psObj, name){
   this.expiredFlagBufferAttribute.setDynamic(true);
   this.velocityBufferAttribute.setDynamic(false);
   this.accelerationBufferAttribute.setDynamic(false);
-  this.targetColorBufferAttribute.setDynamic(false);
+  if (this.targetColorBufferAttribute){
+    this.targetColorBufferAttribute.setDynamic(false);
+  }
   this.flags1BufferAttribute.setDynamic(false);
   this.flags2BufferAttribute.setDynamic(true);
   this.flags3BufferAttribute.setDynamic(false);
@@ -176,7 +202,9 @@ var ParticleSystemMerger = function(psObj, name){
   this.geometry.addAttribute('expiredFlag', this.expiredFlagBufferAttribute);
   this.geometry.addAttribute('velocity', this.velocityBufferAttribute);
   this.geometry.addAttribute('acceleration', this.accelerationBufferAttribute);
-  this.geometry.addAttribute('targetColor', this.targetColorBufferAttribute);
+  if (this.targetColorBufferAttribute){
+    this.geometry.addAttribute('targetColor', this.targetColorBufferAttribute);
+  }
   this.geometry.addAttribute('flags1', this.flags1BufferAttribute);
   this.geometry.addAttribute('flags2', this.flags2BufferAttribute);
   this.geometry.addAttribute('flags3', this.flags3BufferAttribute);
@@ -221,6 +249,9 @@ var ParticleSystemMerger = function(psObj, name){
   if (texture){
     this.material.uniforms.texture = new THREE.Uniform(texture);
     this.injectMacro(this.material, "HAS_TEXTURE", true, true);
+  }
+  if (!this.noTargetColor){
+    this.injectMacro(this.material, "HAS_TARGET_COLOR", true, false);
   }
   this.mesh = new THREE.Points(this.geometry, this.material);
   this.mesh.frustumCulled = false;

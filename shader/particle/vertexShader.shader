@@ -3,6 +3,22 @@ precision lowp int;
 
 #define OBJECT_SIZE 1
 
+attribute float expiredFlag;
+attribute vec3 position;
+attribute vec3 velocity;
+attribute vec3 acceleration;
+attribute vec4 flags1;
+attribute vec4 flags2;
+attribute vec4 flags3;
+attribute vec4 flags4;
+attribute vec4 angularQuaternion;
+
+varying vec4 vCalculatedColor;
+varying float vDiscardFlag;
+
+uniform mat4 viewMatrix;
+uniform mat4 projectionMatrix;
+
 #define INSERTION
 
 #ifdef IS_MERGED
@@ -34,43 +50,34 @@ precision lowp int;
   varying float vTextureFlag;
 #endif
 
-attribute float expiredFlag;
-attribute vec3 position;
-attribute vec3 velocity;
-attribute vec3 acceleration;
-attribute vec4 targetColor;
-attribute vec4 flags1;
-attribute vec4 flags2;
-attribute vec4 flags3;
-attribute vec4 flags4;
-attribute vec4 angularQuaternion;
+#ifdef HAS_TARGET_COLOR
+  attribute vec4 targetColor;
+#endif
 
-varying vec4 vCalculatedColor;
-varying float vDiscardFlag;
-
-uniform mat4 viewMatrix;
-uniform mat4 projectionMatrix;
-
-vec3 calculateColor(float timeValue){
-  float colorStep = targetColor[3];
-  vec3 color = vec3(flags4[0], flags4[1], flags4[2]);
-  if (timeValue < 0.0){
-    return color;
+#ifdef HAS_TARGET_COLOR
+  vec3 calculateColor(float timeValue){
+    float colorStep = targetColor[3];
+    vec3 color = vec3(flags4[0], flags4[1], flags4[2]);
+    if (colorStep < -10.0){
+      return color;
+    }
+    if (timeValue < 0.0){
+      return color;
+    }
+    if ((colorStep * timeValue) >= 1.0){
+      return vec3(targetColor.x, targetColor.y, targetColor.z);
+    }
+    vec3 diff = vec3(
+      (targetColor.r - color.r),
+      (targetColor.g - color.g),
+      (targetColor.b - color.g)
+    );
+    float calculatedR = color.r + (colorStep * timeValue * (diff.r));
+    float calculatedG = color.g + (colorStep * timeValue * (diff.g));
+    float calculatedB = color.b + (colorStep * timeValue * (diff.b));
+    return vec3(calculatedR, calculatedG, calculatedB);
   }
-  if ((colorStep * timeValue) >= 1.0){
-    return vec3(targetColor.x, targetColor.y, targetColor.z);
-  }
-  vec3 diff = vec3(
-    (targetColor.r - color.r),
-    (targetColor.g - color.g),
-    (targetColor.b - color.g)
-  );
-  float calculatedR = color.r + (colorStep * timeValue * (diff.r));
-  float calculatedG = color.g + (colorStep * timeValue * (diff.g));
-  float calculatedB = color.b + (colorStep * timeValue * (diff.b));
-  return vec3(calculatedR, calculatedG, calculatedB);
-}
-
+#endif
 
 vec3 applyQuaternionToVector(vec3 vector, vec4 quaternion){
   float x = vector.x;
@@ -214,7 +221,11 @@ void main(){
       }
     }
     float calculatedAlpha = calculateAlpha(alphaDelta, opacity, timeOfThis);
-    vCalculatedColor = vec4(calculateColor(timeOfThis), calculatedAlpha);
+    #ifdef HAS_TARGET_COLOR
+      vCalculatedColor = vec4(calculateColor(timeOfThis), calculatedAlpha);
+    #else
+      vCalculatedColor = vec4(flags4[0], flags4[1], flags4[2], calculatedAlpha);
+    #endif
 
     vec3 chosenVelocity;
     vec3 chosenAcceleration;

@@ -24,7 +24,11 @@ var ParticleSystem = function(copyPS, name, particles, x, y, z, vx, vy, vz, ax, 
   var texturesObj = new Object();
   var textureCount = 0;
   var mergedTextureHash = "";
+  var noTargetColor = true;
   for (var i = 0; i<particles.length; i++){
+    if (!particles[i].material.noTargetColor){
+      noTargetColor = false;
+    }
     if (particles[i].material.texture){
       if (!texturesObj[particles[i].material.texture]){
         mergedTextureHash = particles[i].material.texture + PIPE;
@@ -33,6 +37,7 @@ var ParticleSystem = function(copyPS, name, particles, x, y, z, vx, vy, vz, ax, 
       textureCount ++;
     }
   }
+  this.noTargetColor = noTargetColor;
   this.texturesObj = texturesObj;
 
   if (textureCount > 0 && !mergedTextureCache[mergedTextureHash]){
@@ -83,7 +88,9 @@ var ParticleSystem = function(copyPS, name, particles, x, y, z, vx, vy, vz, ax, 
     this.flags1 = new Float32Array(len * 4); // respawn - alphaDelta - trailFlag - lifeTimes
     this.flags3 = new Float32Array(len * 4); // alphaVariationMode - motionMode - angularVelocity - angularMotionRadius
     this.flags4 = new Float32Array(len * 4); // color.r - color.g - color.b - useWorldPositionFlag
-    this.targetColors = new Float32Array(len * 4);
+    if (!noTargetColor){
+      this.targetColors = new Float32Array(len * 4);
+    }
     this.angularQuaternions = new Float32Array(len * 4);
   }else{
     this.positions = this.copyPS.positions;
@@ -96,7 +103,9 @@ var ParticleSystem = function(copyPS, name, particles, x, y, z, vx, vy, vz, ax, 
     this.flags1 = this.copyPS.flags1;
     this.flags3 = this.copyPS.flags3;
     this.flags4 = this.copyPS.flags4;
-    this.targetColors = this.copyPS.targetColors;
+    if (!noTargetColor){
+      this.targetColors = this.copyPS.targetColors;
+    }
     this.angularQuaternions = this.copyPS.angularQuaternions;
   }
 
@@ -154,10 +163,12 @@ var ParticleSystem = function(copyPS, name, particles, x, y, z, vx, vy, vz, ax, 
       }
       i2++;
 
-      this.targetColors[i4++] = particle.material.targetRed;
-      this.targetColors[i4++] = particle.material.targetGreen;
-      this.targetColors[i4++] = particle.material.targetBlue;
-      this.targetColors[i4++] = particle.material.colorStep;
+      if (!noTargetColor){
+        this.targetColors[i4++] = particle.material.targetRed;
+        this.targetColors[i4++] = particle.material.targetGreen;
+        this.targetColors[i4++] = particle.material.targetBlue;
+        this.targetColors[i4++] = particle.material.colorStep;
+      }
 
       this.flags4[i9++] = particle.material.red;
       this.flags4[i9++] = particle.material.green;
@@ -308,7 +319,9 @@ var ParticleSystem = function(copyPS, name, particles, x, y, z, vx, vy, vz, ax, 
     }
     this.velocityBufferAttribute = this.copyPS.velocityBufferAttribute;
     this.accelerationBufferAttribute = this.copyPS.accelerationBufferAttribute;
-    this.targetColorBufferAttribute = this.copyPS.targetColorBufferAttribute;
+    if (!noTargetColor){
+      this.targetColorBufferAttribute = this.copyPS.targetColorBufferAttribute;
+    }
     this.flags1BufferAttribute = this.copyPS.flags1BufferAttribute;
     this.flags3BufferAttribute = this.copyPS.flags3BufferAttribute;
     this.flags4BufferAttribute = this.copyPS.flags4BufferAttribute;
@@ -330,7 +343,10 @@ var ParticleSystem = function(copyPS, name, particles, x, y, z, vx, vy, vz, ax, 
     this.expiredFlagBufferAttribute = new THREE.BufferAttribute(this.expiredFlags, 1);
     this.velocityBufferAttribute = new THREE.BufferAttribute(this.velocities, 3);
     this.accelerationBufferAttribute = new THREE.BufferAttribute(this.accelerations, 3);
-    this.targetColorBufferAttribute = new THREE.BufferAttribute(this.targetColors, 4);
+    if (!noTargetColor){
+      this.targetColorBufferAttribute = new THREE.BufferAttribute(this.targetColors, 4);
+      this.targetColorBufferAttribute.setDynamic(false);
+    }
     this.flags1BufferAttribute = new THREE.BufferAttribute(this.flags1, 4);
     this.flags2BufferAttribute = new THREE.BufferAttribute(this.flags2, 4);
     this.flags3BufferAttribute = new THREE.BufferAttribute(this.flags3, 4);
@@ -345,7 +361,6 @@ var ParticleSystem = function(copyPS, name, particles, x, y, z, vx, vy, vz, ax, 
     this.expiredFlagBufferAttribute.setDynamic(true);
     this.velocityBufferAttribute.setDynamic(false);
     this.accelerationBufferAttribute.setDynamic(false);
-    this.targetColorBufferAttribute.setDynamic(false);
     this.flags1BufferAttribute.setDynamic(false);
     this.flags2BufferAttribute.setDynamic(true);
     this.flags3BufferAttribute.setDynamic(false);
@@ -361,7 +376,9 @@ var ParticleSystem = function(copyPS, name, particles, x, y, z, vx, vy, vz, ax, 
   this.geometry.addAttribute('expiredFlag', this.expiredFlagBufferAttribute);
   this.geometry.addAttribute('velocity', this.velocityBufferAttribute);
   this.geometry.addAttribute('acceleration', this.accelerationBufferAttribute);
-  this.geometry.addAttribute('targetColor', this.targetColorBufferAttribute);
+  if (!noTargetColor){
+    this.geometry.addAttribute('targetColor', this.targetColorBufferAttribute);
+  }
   this.geometry.addAttribute('flags1', this.flags1BufferAttribute);
   this.geometry.addAttribute('flags2', this.flags2BufferAttribute);
   this.geometry.addAttribute('flags3', this.flags3BufferAttribute);
@@ -424,6 +441,9 @@ var ParticleSystem = function(copyPS, name, particles, x, y, z, vx, vy, vz, ax, 
   if (texture){
     this.material.uniforms.texture = new THREE.Uniform(texture);
     this.injectMacro(this.material, "HAS_TEXTURE", true, true);
+  }
+  if (!noTargetColor){
+    this.injectMacro(this.material, "HAS_TARGET_COLOR", true, false);
   }
 
   this.mesh = new THREE.Points(this.geometry, this.material);

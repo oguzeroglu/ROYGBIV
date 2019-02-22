@@ -1038,13 +1038,11 @@ StateLoader.prototype.load = function(){
     bloomResolutionScale = obj.bloomResolutionScale;
     bloomOn = obj.bloomOn;
     if (!isDeployment){
-      postprocessingParameters = {
-        "Bloom_strength": bloomStrength,
-        "Bloom_radius": bloomRadius,
-        "Bloom_threshhold": bloomThreshold,
-        "Bloom_resolution_scale": bloomResolutionScale,
-        "Bloom": bloomOn
-      };
+      postprocessingParameters["Bloom_strength"] = bloomStrength;
+      postprocessingParameters["Bloom_radius"] = bloomRadius;
+      postprocessingParameters["Bloom_threshhold"] = bloomThreshold;
+      postprocessingParameters["Bloom_resolution_scale"] = bloomResolutionScale;
+      postprocessingParameters["Bloom"] = bloomOn;
     }
 
     if (this.oldPhysicsDebugMode){
