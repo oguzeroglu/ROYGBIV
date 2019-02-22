@@ -41,6 +41,7 @@ MeshGenerator.prototype.generateObjectTrail = function(
     }
   });
   var mesh = new THREE.Mesh(this.geometry, material);
+  mesh.renderOrder = 100;
   if (fogBlendWithSkybox){
     material.uniforms.worldMatrix = new THREE.Uniform(mesh.matrixWorld);
     material.uniforms.cameraPosition = GLOBAL_CAMERA_POSITION_UNIFORM;
