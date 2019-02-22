@@ -25,13 +25,6 @@ MeshGenerator.prototype.generateObjectTrail = function(
   ).replace(
     "#define OBJECT_QUATERNION_SIZE 1", "#define OBJECT_QUATERNION_SIZE "+objectQuaternionSize
   );
-  if (!VERTEX_SHADER_TEXTURE_FETCH_SUPPORTED){
-    vertexShaderCode = vertexShaderCode.replace(
-      "vec3 objNormal = normalize(normal);", ""
-    ).replace(
-      "transformedPosition += objNormal * (texture2D(displacementMap, vFaceVertexUV).r * displacementInfo.x + displacementInfo.y);", ""
-    );
-  }
   var material = new THREE.RawShaderMaterial({
     vertexShader: vertexShaderCode,
     fragmentShader: ShaderContent.objectTrailFragmentShader,
@@ -40,24 +33,43 @@ MeshGenerator.prototype.generateObjectTrail = function(
     uniforms: {
       projectionMatrix: GLOBAL_PROJECTION_UNIFORM,
       viewMatrix: GLOBAL_VIEW_UNIFORM,
-      worldMatrix: new THREE.Uniform(new THREE.Matrix4()),
-      cameraPosition: GLOBAL_CAMERA_POSITION_UNIFORM,
       objectCoordinates: new THREE.Uniform(objectCoordinates),
       objectQuaternions: new THREE.Uniform(objectQuaternions),
       currentPosition: new THREE.Uniform(posit),
       currentQuaternion: new THREE.Uniform(quat),
-      alpha: new THREE.Uniform(trail.alpha),
-      diffuseMap: this.getTextureUniform(trail.diffuseTexture),
-      emissiveMap: this.getTextureUniform(trail.emissiveTexture),
-      alphaMap: this.getTextureUniform(trail.alphaTexture),
-      displacementMap: this.getTextureUniform(trail.displacementTexture),
-      textureMatrix: new THREE.Uniform(trail.textureMatrix),
-      fogInfo: GLOBAL_FOG_UNIFORM,
-      cubeTexture: GLOBAL_CUBE_TEXTURE_UNIFORM
+      alpha: new THREE.Uniform(trail.alpha)
     }
   });
   var mesh = new THREE.Mesh(this.geometry, material);
-  material.uniforms.worldMatrix.value = mesh.matrixWorld;
+  if (fogBlendWithSkybox){
+    material.uniforms.worldMatrix = new THREE.Uniform(mesh.matrixWorld);
+    material.uniforms.cameraPosition = GLOBAL_CAMERA_POSITION_UNIFORM;
+    material.uniforms.cubeTexture = GLOBAL_CUBE_TEXTURE_UNIFORM;
+    trail.injectMacro(material, "HAS_SKYBOX_FOG", true, true);
+  }
+  if (fogActive){
+    material.uniforms.fogInfo = GLOBAL_FOG_UNIFORM;
+    trail.injectMacro(material, "HAS_FOG", false, true);
+  }
+  if (trail.diffuseTexture){
+    material.uniforms.diffuseMap = this.getTextureUniform(trail.diffuseTexture);
+    trail.injectMacro(material, "HAS_DIFFUSE", false, true);
+  }
+  if (trail.emissiveTexture){
+    material.uniforms.emissiveMap = this.getTextureUniform(trail.emissiveTexture);
+    trail.injectMacro(material, "HAS_EMISSIVE", true, true);
+  }
+  if (trail.displacementTexture && VERTEX_SHADER_TEXTURE_FETCH_SUPPORTED){
+    material.uniforms.displacementMap = this.getTextureUniform(trail.displacementTexture);
+    trail.injectMacro(material, "HAS_DISPLACEMENT", true, false);
+  }
+  if (trail.alphaTexture){
+    material.uniforms.alphaMap = this.getTextureUniform(trail.alphaTexture);
+    trail.injectMacro(material, "HAS_ALPHA", false, true);
+  }
+  if (trail.hasTexture){
+    trail.injectMacro(material, "HAS_TEXTURE", true, true);
+  }
   return mesh;
 }
 

@@ -6,33 +6,42 @@ precision lowp int;
 
 attribute vec3 position;
 attribute vec3 color;
-attribute vec3 normal;
 attribute float coordIndex;
 attribute float quatIndex;
-attribute vec2 faceVertexUV;
-attribute vec2 displacementInfo;
-attribute vec3 textureFlags;
-attribute vec3 emissiveColor;
-attribute float emissiveIntensity;
-
-uniform mat3 textureMatrix;
-uniform mat4 viewMatrix;
 uniform mat4 projectionMatrix;
-uniform mat4 worldMatrix;
+uniform mat4 viewMatrix;
 uniform float objectCoordinates[OBJECT_COORDINATE_SIZE];
 uniform float objectQuaternions[OBJECT_QUATERNION_SIZE];
 uniform vec3 currentPosition;
 uniform vec4 currentQuaternion;
 uniform float alpha;
-uniform sampler2D displacementMap;
-
 varying float vDiscardFlag;
-varying vec2 vFaceVertexUV;
 varying vec3 vColor;
-varying vec3 vTextureFlags;
-varying vec3 vWorldPosition;
-varying vec3 vEmissiveColor;
-varying float vEmissiveIntensity;
+
+#define INSERTION
+
+#ifdef HAS_DISPLACEMENT
+  attribute vec3 normal;
+  attribute vec2 displacementInfo;
+  uniform sampler2D displacementMap;
+#endif
+#ifdef HAS_TEXTURE
+  attribute vec2 faceVertexUV;
+  attribute vec3 textureFlags;
+  varying vec3 vTextureFlags;
+  varying vec2 vFaceVertexUV;
+  attribute vec4 textureMatrixInfo;
+#endif
+#ifdef HAS_EMISSIVE
+  attribute vec3 emissiveColor;
+  attribute float emissiveIntensity;
+  varying vec3 vEmissiveColor;
+  varying float vEmissiveIntensity;
+#endif
+#ifdef HAS_SKYBOX_FOG
+  uniform mat4 worldMatrix;
+  varying vec3 vWorldPosition;
+#endif
 
 vec3 applyQuaternionToVector(vec3 vector, vec4 quaternion){
   float x = vector.x;
@@ -56,11 +65,21 @@ void main(){
 
   vColor = color;
   vDiscardFlag = -10.0;
-  vFaceVertexUV = (textureMatrix * vec3(faceVertexUV, 1.0)).xy;
-  vTextureFlags = textureFlags;
-  vEmissiveIntensity = emissiveIntensity;
-  vWorldPosition = (worldMatrix * vec4(position, 1.0)).xyz;
-  vEmissiveColor = emissiveColor;
+  #ifdef HAS_TEXTURE
+    vFaceVertexUV = (mat3(
+      textureMatrixInfo.z, 0.0, 0.0,
+      0.0, textureMatrixInfo.w, 0.0,
+      textureMatrixInfo.x, textureMatrixInfo.y, 1.0
+    ) * vec3(faceVertexUV, 1.0)).xy;
+    vTextureFlags = textureFlags;
+  #endif
+  #ifdef HAS_EMISSIVE
+    vEmissiveIntensity = emissiveIntensity;
+    vEmissiveColor = emissiveColor;
+  #endif
+  #ifdef HAS_SKYBOX_FOG
+    vWorldPosition = (worldMatrix * vec4(position, 1.0)).xyz;
+  #endif
 
   int indexX = int(coordIndex);
   int indexY = indexX + 1;
@@ -89,10 +108,12 @@ void main(){
 
   if (vDiscardFlag < 5.0){
     vec3 transformedPosition = position;
-    if (displacementInfo.x > -60.0 && displacementInfo.y > -60.0){
-      vec3 objNormal = normalize(normal);
-      transformedPosition += objNormal * (texture2D(displacementMap, vFaceVertexUV).r * displacementInfo.x + displacementInfo.y);
-    }
+    #ifdef HAS_DISPLACEMENT
+      if (displacementInfo.x > -60.0 && displacementInfo.y > -60.0){
+        vec3 objNormal = normalize(normal);
+        transformedPosition += objNormal * (texture2D(displacementMap, vFaceVertexUV).r * displacementInfo.x + displacementInfo.y);
+      }
+    #endif
     vec3 rotatedPos = applyQuaternionToVector(transformedPosition, quat);
     vec3 newPosition = coord + rotatedPos;
     gl_Position = projectionMatrix * viewMatrix * vec4(newPosition, 1.0);
