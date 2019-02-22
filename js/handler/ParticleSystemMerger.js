@@ -46,7 +46,10 @@ var ParticleSystemMerger = function(psObj, name){
 
   this.mergedIndices = new Float32Array(len);
   this.positions = new Float32Array(len * 3);
-  this.rgbThresholds = new Float32Array(len * 3);
+  if (textureCount > 0){
+    this.rgbThresholds = new Float32Array(len * 3);
+    this.uvCoordinates = new Float32Array(len * 4);
+  }
   this.velocities = new Float32Array(len * 3);
   this.accelerations = new Float32Array(len * 3);
   this.flags1 = new Float32Array(len * 4);
@@ -54,7 +57,6 @@ var ParticleSystemMerger = function(psObj, name){
   this.flags4 = new Float32Array(len * 4);
   this.targetColors = new Float32Array(len * 4);
   this.angularQuaternions = new Float32Array(len * 4);
-  this.uvCoordinates = new Float32Array(len * 4);
   this.expiredFlags = new Float32Array(len);
   this.flags2 = new Float32Array(len * 4);
 
@@ -80,7 +82,9 @@ var ParticleSystemMerger = function(psObj, name){
     motionMatrixArray.push(new THREE.Matrix3());
     scene.remove(ps.mesh);
     this.positions.set(ps.positions, offset1);
-    this.rgbThresholds.set(ps.rgbThresholds, offset1);
+    if (this.rgbThresholds){
+      this.rgbThresholds.set(ps.rgbThresholds, offset1);
+    }
     this.velocities.set(ps.velocities, offset1);
     this.accelerations.set(ps.accelerations, offset1);
     this.flags1.set(ps.flags1, offset2);
@@ -98,17 +102,19 @@ var ParticleSystemMerger = function(psObj, name){
       var particle = ps.particles[i];
       this.mergedIndices[ctr] = index;
       ctr ++;
-      if (particle.material.texture){
-        var range = textureMerger.ranges[particle.material.texture];
-        this.uvCoordinates[uvCounter++] = range.startU;
-        this.uvCoordinates[uvCounter++] = range.startV;
-        this.uvCoordinates[uvCounter++] = range.endU;
-        this.uvCoordinates[uvCounter++] = range.endV;
-      }else{
-        this.uvCoordinates[uvCounter++] = -10;
-        this.uvCoordinates[uvCounter++] = -10;
-        this.uvCoordinates[uvCounter++] = -10;
-        this.uvCoordinates[uvCounter++] = -10;
+      if (textureCount > 0){
+        if (particle.material.texture){
+          var range = textureMerger.ranges[particle.material.texture];
+          this.uvCoordinates[uvCounter++] = range.startU;
+          this.uvCoordinates[uvCounter++] = range.startV;
+          this.uvCoordinates[uvCounter++] = range.endU;
+          this.uvCoordinates[uvCounter++] = range.endV;
+        }else{
+          this.uvCoordinates[uvCounter++] = -10;
+          this.uvCoordinates[uvCounter++] = -10;
+          this.uvCoordinates[uvCounter++] = -10;
+          this.uvCoordinates[uvCounter++] = -10;
+        }
       }
     }
     ps.mergedIndex = index;
@@ -124,13 +130,13 @@ var ParticleSystemMerger = function(psObj, name){
   var texture;
   if (textureMerger){
     texture = textureMerger.mergedTexture;
-  }else{
-    texture = nullTexture;
   }
 
   this.mergedIndicesBufferAttribute = new THREE.BufferAttribute(this.mergedIndices, 1);
   this.positionBufferAttribute = new THREE.BufferAttribute(this.positions, 3);
-  this.rgbThresholdBufferAttribute = new THREE.BufferAttribute(this.rgbThresholds, 3);
+  if (this.rgbThresholds){
+    this.rgbThresholdBufferAttribute = new THREE.BufferAttribute(this.rgbThresholds, 3);
+  }
   this.expiredFlagBufferAttribute = new THREE.BufferAttribute(this.expiredFlags, 1);
   this.velocityBufferAttribute = new THREE.BufferAttribute(this.velocities, 3);
   this.accelerationBufferAttribute = new THREE.BufferAttribute(this.accelerations, 3);
@@ -140,11 +146,15 @@ var ParticleSystemMerger = function(psObj, name){
   this.flags3BufferAttribute = new THREE.BufferAttribute(this.flags3, 4);
   this.flags4BufferAttribute = new THREE.BufferAttribute(this.flags4, 4);
   this.angularQuaternionsBufferAttribute = new THREE.BufferAttribute(this.angularQuaternions, 4);
-  this.uvCoordinatesBufferAttribute = new THREE.BufferAttribute(this.uvCoordinates, 4);
+  if (this.uvCoordinates){
+    this.uvCoordinatesBufferAttribute = new THREE.BufferAttribute(this.uvCoordinates, 4);
+  }
 
   this.mergedIndicesBufferAttribute.setDynamic(false);
   this.positionBufferAttribute.setDynamic(false);
-  this.rgbThresholdBufferAttribute.setDynamic(false);
+  if (this.rgbThresholdBufferAttribute){
+    this.rgbThresholdBufferAttribute.setDynamic(false);
+  }
   this.expiredFlagBufferAttribute.setDynamic(true);
   this.velocityBufferAttribute.setDynamic(false);
   this.accelerationBufferAttribute.setDynamic(false);
@@ -154,11 +164,15 @@ var ParticleSystemMerger = function(psObj, name){
   this.flags3BufferAttribute.setDynamic(false);
   this.flags4BufferAttribute.setDynamic(false);
   this.angularQuaternionsBufferAttribute.setDynamic(false);
-  this.uvCoordinatesBufferAttribute.setDynamic(false);
+  if (this.uvCoordinatesBufferAttribute){
+    this.uvCoordinatesBufferAttribute.setDynamic(false);
+  }
 
   this.geometry.addAttribute('mergedIndex', this.mergedIndicesBufferAttribute);
   this.geometry.addAttribute('position', this.positionBufferAttribute);
-  this.geometry.addAttribute('rgbThreshold', this.rgbThresholdBufferAttribute);
+  if (this.rgbThresholdBufferAttribute){
+    this.geometry.addAttribute('rgbThreshold', this.rgbThresholdBufferAttribute);
+  }
   this.geometry.addAttribute('expiredFlag', this.expiredFlagBufferAttribute);
   this.geometry.addAttribute('velocity', this.velocityBufferAttribute);
   this.geometry.addAttribute('acceleration', this.accelerationBufferAttribute);
@@ -168,7 +182,9 @@ var ParticleSystemMerger = function(psObj, name){
   this.geometry.addAttribute('flags3', this.flags3BufferAttribute);
   this.geometry.addAttribute('flags4', this.flags4BufferAttribute);
   this.geometry.addAttribute('angularQuaternion', this.angularQuaternionsBufferAttribute);
-  this.geometry.addAttribute('uvCoordinates', this.uvCoordinatesBufferAttribute);
+  if (this.uvCoordinatesBufferAttribute){
+    this.geometry.addAttribute('uvCoordinates', this.uvCoordinatesBufferAttribute);
+  }
   this.geometry.setDrawRange(0, len);
 
   var vertexShader = ShaderContent.particleVertexShader.replace(
@@ -187,7 +203,6 @@ var ParticleSystemMerger = function(psObj, name){
       viewMatrix: GLOBAL_VIEW_UNIFORM,
       timeArray: new THREE.Uniform(timeArray),
       hiddenArray: new THREE.Uniform(hiddenArray),
-      texture: new THREE.Uniform(texture),
       dissapearCoefArray: new THREE.Uniform(dissapearCoefArray),
       stopInfoArray: new THREE.Uniform(stopInfoArray),
       parentMotionMatrixArray: new THREE.Uniform(motionMatrixArray),
@@ -202,6 +217,10 @@ var ParticleSystemMerger = function(psObj, name){
   if (fogActive){
     this.material.uniforms.fogInfo = GLOBAL_FOG_UNIFORM;
     this.injectMacro(this.material, "HAS_FOG", false, true);
+  }
+  if (texture){
+    this.material.uniforms.texture = new THREE.Uniform(texture);
+    this.injectMacro(this.material, "HAS_TEXTURE", true, true);
   }
   this.mesh = new THREE.Points(this.geometry, this.material);
   this.mesh.frustumCulled = false;

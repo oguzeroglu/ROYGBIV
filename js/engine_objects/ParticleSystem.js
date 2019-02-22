@@ -74,7 +74,10 @@ var ParticleSystem = function(copyPS, name, particles, x, y, z, vx, vy, vz, ax, 
   this.flags2 = new Float32Array(len * 4); // sizes - transparencies - textureFlag - times
   if (!this.copyPS){
     this.positions = new Float32Array(len * 3); // This is used to store initialAngle and angularAcceleration info for MOTION_MODE_CIRCULAR
-    this.rgbThresholds = new Float32Array(len * 3);
+    if (textureCount > 0){
+      this.rgbThresholds = new Float32Array(len * 3);
+      this.uvCoordinates = new Float32Array(len * 4); // startU - startV - endU - endV
+    }
     this.velocities = new Float32Array(len * 3);
     this.accelerations = new Float32Array(len * 3);
     this.flags1 = new Float32Array(len * 4); // respawn - alphaDelta - trailFlag - lifeTimes
@@ -82,10 +85,12 @@ var ParticleSystem = function(copyPS, name, particles, x, y, z, vx, vy, vz, ax, 
     this.flags4 = new Float32Array(len * 4); // color.r - color.g - color.b - useWorldPositionFlag
     this.targetColors = new Float32Array(len * 4);
     this.angularQuaternions = new Float32Array(len * 4);
-    this.uvCoordinates = new Float32Array(len * 4); // startU - startV - endU - endV
   }else{
     this.positions = this.copyPS.positions;
-    this.rgbThresholds = this.copyPS.rgbThresholds
+    if (textureCount > 0){
+      this.rgbThresholds = this.copyPS.rgbThresholds;
+      this.uvCoordinates = this.copyPS.uvCoordinates;
+    }
     this.velocities = this.copyPS.velocities
     this.accelerations = this.copyPS.accelerations
     this.flags1 = this.copyPS.flags1;
@@ -93,7 +98,6 @@ var ParticleSystem = function(copyPS, name, particles, x, y, z, vx, vy, vz, ax, 
     this.flags4 = this.copyPS.flags4;
     this.targetColors = this.copyPS.targetColors;
     this.angularQuaternions = this.copyPS.angularQuaternions;
-    this.uvCoordinates = this.copyPS.uvCoordinates;
   }
 
   var i2 = 0;
@@ -131,17 +135,23 @@ var ParticleSystem = function(copyPS, name, particles, x, y, z, vx, vy, vz, ax, 
       }else{
         this.positions[i2] = particle.initialAngle;
       }
-      this.rgbThresholds[i2] = rgbFilterX;
+      if (this.rgbThresholds){
+        this.rgbThresholds[i2] = rgbFilterX;
+      }
       i2++;
       if (particle.motionMode == MOTION_MODE_NORMAL){
         this.positions[i2] = particle.y;
       }else{
         this.positions[i2] = particle.angularAcceleration;
       }
-      this.rgbThresholds[i2] = rgbFilterY;
+      if (this.rgbThresholds){
+        this.rgbThresholds[i2] = rgbFilterY;
+      }
       i2++;
       this.positions[i2] = particle.z;
-      this.rgbThresholds[i2] = rgbFilterZ;
+      if (this.rgbThresholds){
+        this.rgbThresholds[i2] = rgbFilterZ;
+      }
       i2++;
 
       this.targetColors[i4++] = particle.material.targetRed;
@@ -165,19 +175,23 @@ var ParticleSystem = function(copyPS, name, particles, x, y, z, vx, vy, vz, ax, 
       this.flags2[i6++] = particle.material.size;
       this.flags2[i6++] = particle.material.alpha;
       this.expiredFlags[i] = 0;
-      if (particle.material.texture){
-        this.flags2[i6++] = 10;
-        var range = textureMerger.ranges[particle.material.texture];
-        this.uvCoordinates[i10++] = range.startU;
-        this.uvCoordinates[i10++] = range.startV;
-        this.uvCoordinates[i10++] = range.endU;
-        this.uvCoordinates[i10++] = range.endV;
+      if (textureCount > 0){
+        if (particle.material.texture){
+          this.flags2[i6++] = 10;
+          var range = textureMerger.ranges[particle.material.texture];
+          this.uvCoordinates[i10++] = range.startU;
+          this.uvCoordinates[i10++] = range.startV;
+          this.uvCoordinates[i10++] = range.endU;
+          this.uvCoordinates[i10++] = range.endV;
+        }else{
+          this.flags2[i6++] = -10;
+          this.uvCoordinates[i10++] = -10;
+          this.uvCoordinates[i10++] = -10;
+          this.uvCoordinates[i10++] = -10;
+          this.uvCoordinates[i10++] = -10;
+        }
       }else{
         this.flags2[i6++] = -10;
-        this.uvCoordinates[i10++] = -10;
-        this.uvCoordinates[i10++] = -10;
-        this.uvCoordinates[i10++] = -10;
-        this.uvCoordinates[i10++] = -10;
       }
 
       var startDelay = 0;
@@ -289,7 +303,9 @@ var ParticleSystem = function(copyPS, name, particles, x, y, z, vx, vy, vz, ax, 
   if (this.copyPS){
 
     this.positionBufferAttribute = this.copyPS.positionBufferAttribute;
-    this.rgbThresholdBufferAttribute = this.copyPS.rgbThresholdBufferAttribute;
+    if (this.copyPS.rgbThresholdBufferAttribute){
+      this.rgbThresholdBufferAttribute = this.copyPS.rgbThresholdBufferAttribute;
+    }
     this.velocityBufferAttribute = this.copyPS.velocityBufferAttribute;
     this.accelerationBufferAttribute = this.copyPS.accelerationBufferAttribute;
     this.targetColorBufferAttribute = this.copyPS.targetColorBufferAttribute;
@@ -297,7 +313,9 @@ var ParticleSystem = function(copyPS, name, particles, x, y, z, vx, vy, vz, ax, 
     this.flags3BufferAttribute = this.copyPS.flags3BufferAttribute;
     this.flags4BufferAttribute = this.copyPS.flags4BufferAttribute;
     this.angularQuaternionsBufferAttribute = this.copyPS.angularQuaternionsBufferAttribute;
-    this.uvCoordinatesBufferAttribute = this.copyPS.uvCoordinatesBufferAttribute;
+    if (this.copyPS.uvCoordinatesBufferAttribute){
+      this.uvCoordinatesBufferAttribute = this.copyPS.uvCoordinatesBufferAttribute;
+    }
 
     this.expiredFlagBufferAttribute = new THREE.BufferAttribute(this.expiredFlags, 1);
     this.flags2BufferAttribute = new THREE.BufferAttribute(this.flags2, 4);
@@ -305,7 +323,10 @@ var ParticleSystem = function(copyPS, name, particles, x, y, z, vx, vy, vz, ax, 
     this.flags2BufferAttribute.setDynamic(true);
   }else{
     this.positionBufferAttribute = new THREE.BufferAttribute(this.positions, 3);
-    this.rgbThresholdBufferAttribute = new THREE.BufferAttribute(this.rgbThresholds, 3);
+    if (this.rgbThresholds){
+      this.rgbThresholdBufferAttribute = new THREE.BufferAttribute(this.rgbThresholds, 3);
+      this.rgbThresholdBufferAttribute.setDynamic(false);
+    }
     this.expiredFlagBufferAttribute = new THREE.BufferAttribute(this.expiredFlags, 1);
     this.velocityBufferAttribute = new THREE.BufferAttribute(this.velocities, 3);
     this.accelerationBufferAttribute = new THREE.BufferAttribute(this.accelerations, 3);
@@ -315,10 +336,12 @@ var ParticleSystem = function(copyPS, name, particles, x, y, z, vx, vy, vz, ax, 
     this.flags3BufferAttribute = new THREE.BufferAttribute(this.flags3, 4);
     this.flags4BufferAttribute = new THREE.BufferAttribute(this.flags4, 4);
     this.angularQuaternionsBufferAttribute = new THREE.BufferAttribute(this.angularQuaternions, 4);
-    this.uvCoordinatesBufferAttribute = new THREE.BufferAttribute(this.uvCoordinates, 4);
+    if (this.uvCoordinates){
+      this.uvCoordinatesBufferAttribute = new THREE.BufferAttribute(this.uvCoordinates, 4);
+      this.uvCoordinatesBufferAttribute.setDynamic(false);
+    }
 
     this.positionBufferAttribute.setDynamic(false);
-    this.rgbThresholdBufferAttribute.setDynamic(false);
     this.expiredFlagBufferAttribute.setDynamic(true);
     this.velocityBufferAttribute.setDynamic(false);
     this.accelerationBufferAttribute.setDynamic(false);
@@ -328,12 +351,13 @@ var ParticleSystem = function(copyPS, name, particles, x, y, z, vx, vy, vz, ax, 
     this.flags3BufferAttribute.setDynamic(false);
     this.flags4BufferAttribute.setDynamic(false);
     this.angularQuaternionsBufferAttribute.setDynamic(false);
-    this.uvCoordinatesBufferAttribute.setDynamic(false);
 
   }
 
   this.geometry.addAttribute('position', this.positionBufferAttribute);
-  this.geometry.addAttribute('rgbThreshold', this.rgbThresholdBufferAttribute);
+  if (this.rgbThresholdBufferAttribute){
+    this.geometry.addAttribute('rgbThreshold', this.rgbThresholdBufferAttribute);
+  }
   this.geometry.addAttribute('expiredFlag', this.expiredFlagBufferAttribute);
   this.geometry.addAttribute('velocity', this.velocityBufferAttribute);
   this.geometry.addAttribute('acceleration', this.accelerationBufferAttribute);
@@ -343,7 +367,9 @@ var ParticleSystem = function(copyPS, name, particles, x, y, z, vx, vy, vz, ax, 
   this.geometry.addAttribute('flags3', this.flags3BufferAttribute);
   this.geometry.addAttribute('flags4', this.flags4BufferAttribute);
   this.geometry.addAttribute('angularQuaternion', this.angularQuaternionsBufferAttribute);
-  this.geometry.addAttribute('uvCoordinates', this.uvCoordinatesBufferAttribute);
+  if (this.uvCoordinatesBufferAttribute){
+    this.geometry.addAttribute('uvCoordinates', this.uvCoordinatesBufferAttribute);
+  }
   this.geometry.setDrawRange(0, particles.length);
 
 
@@ -359,8 +385,6 @@ var ParticleSystem = function(copyPS, name, particles, x, y, z, vx, vy, vz, ax, 
   var texture;
   if (textureMerger){
     texture = textureMerger.mergedTexture;
-  }else{
-    texture = nullTexture;
   }
 
   if (!this.copyPS){
@@ -375,7 +399,6 @@ var ParticleSystem = function(copyPS, name, particles, x, y, z, vx, vy, vz, ax, 
         worldMatrix: new THREE.Uniform(new THREE.Matrix4()),
         viewMatrix: GLOBAL_VIEW_UNIFORM,
         time: new THREE.Uniform(0.0),
-        texture: new THREE.Uniform(texture),
         dissapearCoef: new THREE.Uniform(0.0),
         stopInfo: new THREE.Uniform(new THREE.Vector3(-10, -10, -10)),
         parentMotionMatrix: new THREE.Uniform(new THREE.Matrix3().fromArray([
@@ -397,6 +420,10 @@ var ParticleSystem = function(copyPS, name, particles, x, y, z, vx, vy, vz, ax, 
   if (fogActive){
     this.material.uniforms.fogInfo = GLOBAL_FOG_UNIFORM;
     this.injectMacro(this.material, "HAS_FOG", false, true);
+  }
+  if (texture){
+    this.material.uniforms.texture = new THREE.Uniform(texture);
+    this.injectMacro(this.material, "HAS_TEXTURE", true, true);
   }
 
   this.mesh = new THREE.Points(this.geometry, this.material);

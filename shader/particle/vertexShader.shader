@@ -26,9 +26,16 @@ precision lowp int;
   varying vec3 vWorldPosition;
 #endif
 
+#ifdef HAS_TEXTURE
+  attribute vec3 rgbThreshold;
+  varying vec4 vUVCoordinates;
+  attribute vec4 uvCoordinates;
+  varying vec3 vRgbThreshold;
+  varying float vTextureFlag;
+#endif
+
 attribute float expiredFlag;
 attribute vec3 position;
-attribute vec3 rgbThreshold;
 attribute vec3 velocity;
 attribute vec3 acceleration;
 attribute vec4 targetColor;
@@ -37,13 +44,9 @@ attribute vec4 flags2;
 attribute vec4 flags3;
 attribute vec4 flags4;
 attribute vec4 angularQuaternion;
-attribute vec4 uvCoordinates;
 
 varying vec4 vCalculatedColor;
 varying float vDiscardFlag;
-varying float vTextureFlag;
-varying vec3 vRgbThreshold;
-varying vec4 vUVCoordinates;
 
 uniform mat4 viewMatrix;
 uniform mat4 projectionMatrix;
@@ -288,10 +291,9 @@ void main(){
   }else{
     vDiscardFlag = 10.0;
   }
-
-
-  vTextureFlag = flags2[2];
-  vRgbThreshold = rgbThreshold;
-  vUVCoordinates = uvCoordinates;
-
+  #ifdef HAS_TEXTURE
+    vTextureFlag = flags2[2];
+    vRgbThreshold = rgbThreshold;
+    vUVCoordinates = uvCoordinates;
+  #endif
 }
