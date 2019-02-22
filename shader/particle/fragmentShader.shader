@@ -8,6 +8,9 @@ precision lowp int;
 #ifdef HAS_SKYBOX_FOG
   varying vec3 vWorldPosition;
 #endif
+#ifdef HAS_FOG
+  uniform vec4 fogInfo;
+#endif
 
 varying vec4 vCalculatedColor;
 varying float vDiscardFlag;
@@ -18,7 +21,6 @@ varying vec4 vUVCoordinates;
 uniform sampler2D texture;
 uniform samplerCube cubeTexture;
 uniform vec3 cameraPosition;
-uniform vec4 fogInfo;
 
 float discardDueToTextureColor;
 
