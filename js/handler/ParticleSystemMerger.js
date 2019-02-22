@@ -183,7 +183,6 @@ var ParticleSystemMerger = function(psObj, name){
     uniforms:{
       modelViewMatrixArray: new THREE.Uniform(mvMatrixArray),
       worldMatrixArray: new THREE.Uniform(worldMatrixArray),
-      cameraPosition: GLOBAL_CAMERA_POSITION_UNIFORM,
       projectionMatrix: GLOBAL_PROJECTION_UNIFORM,
       viewMatrix: GLOBAL_VIEW_UNIFORM,
       timeArray: new THREE.Uniform(timeArray),
@@ -192,11 +191,18 @@ var ParticleSystemMerger = function(psObj, name){
       dissapearCoefArray: new THREE.Uniform(dissapearCoefArray),
       stopInfoArray: new THREE.Uniform(stopInfoArray),
       parentMotionMatrixArray: new THREE.Uniform(motionMatrixArray),
-      fogInfo: GLOBAL_FOG_UNIFORM,
-      cubeTexture: GLOBAL_CUBE_TEXTURE_UNIFORM
     }
   });
   this.injectMacro(this.material, "IS_MERGED", true, false);
+  if (fogBlendWithSkybox){
+    this.material.uniforms.cameraPosition = GLOBAL_CAMERA_POSITION_UNIFORM;
+    this.material.uniforms.cubeTexture = GLOBAL_CUBE_TEXTURE_UNIFORM;
+    this.injectMacro(this.material, "HAS_SKYBOX_FOG", true, true);
+  }
+  if (fogActive){
+    this.material.uniforms.fogInfo = GLOBAL_FOG_UNIFORM;
+    this.injectMacro(this.material, "HAS_FOG", false, true);
+  }
   this.mesh = new THREE.Points(this.geometry, this.material);
   this.mesh.frustumCulled = false;
   scene.add(this.mesh);

@@ -372,7 +372,6 @@ var ParticleSystem = function(copyPS, name, particles, x, y, z, vx, vy, vz, ax, 
       uniforms:{
         modelViewMatrix: new THREE.Uniform(new THREE.Matrix4()),
         projectionMatrix: GLOBAL_PROJECTION_UNIFORM,
-        cameraPosition: GLOBAL_CAMERA_POSITION_UNIFORM,
         worldMatrix: new THREE.Uniform(new THREE.Matrix4()),
         viewMatrix: GLOBAL_VIEW_UNIFORM,
         time: new THREE.Uniform(0.0),
@@ -382,18 +381,22 @@ var ParticleSystem = function(copyPS, name, particles, x, y, z, vx, vy, vz, ax, 
         parentMotionMatrix: new THREE.Uniform(new THREE.Matrix3().fromArray([
           x, y, z, vx, vy, vz, ax, ay, az
         ])),
-        fogInfo: GLOBAL_FOG_UNIFORM,
-        cubeTexture: GLOBAL_CUBE_TEXTURE_UNIFORM
       }
     });
   }else{
     this.material = this.copyPS.material.clone();
     this.material.uniforms.projectionMatrix = GLOBAL_PROJECTION_UNIFORM;
-    this.material.uniforms.cameraPosition = GLOBAL_CAMERA_POSITION_UNIFORM;
     this.material.uniforms.viewMatrix = GLOBAL_VIEW_UNIFORM;
-    this.material.uniforms.fogInfo = GLOBAL_FOG_UNIFORM;
+  }
+
+  if (fogBlendWithSkybox){
+    this.material.uniforms.cameraPosition = GLOBAL_CAMERA_POSITION_UNIFORM;
     this.material.uniforms.cubeTexture = GLOBAL_CUBE_TEXTURE_UNIFORM;
-    this.material.uniforms.skyboxAlpha = GLOBAL_SKYBOX_ALPHA_UNIFORM;
+    this.injectMacro(this.material, "HAS_SKYBOX_FOG", true, true);
+  }
+  if (fogActive){
+    this.material.uniforms.fogInfo = GLOBAL_FOG_UNIFORM;
+    this.injectMacro(this.material, "HAS_FOG", false, true);
   }
 
   this.mesh = new THREE.Points(this.geometry, this.material);
@@ -860,4 +863,28 @@ ParticleSystem.prototype.handleCollisions = function(fromWorker){
       }
     }
   }
+}
+
+ParticleSystem.prototype.injectMacro = function(material, macro, insertVertexShader, insertFragmentShader){
+  if (insertVertexShader){
+    material.vertexShader = material.vertexShader.replace(
+      "#define INSERTION", "#define INSERTION\n#define "+macro
+    )
+  };
+  if (insertFragmentShader){
+    material.fragmentShader = material.fragmentShader.replace(
+      "#define INSERTION", "#define INSERTION\n#define "+macro
+    )
+  };
+  material.needsUpdate = true;
+}
+
+ParticleSystem.prototype.removeMacro = function(material, macro, removeVertexShader, removeFragmentShader){
+  if (removeVertexShader){
+    material.vertexShader = material.vertexShader.replace("\n#define "+macro, "");
+  }
+  if (removeFragmentShader){
+    material.fragmentShader = material.fragmentShader.replace("\n#define "+macro, "");
+  }
+  material.needsUpdate = true;
 }

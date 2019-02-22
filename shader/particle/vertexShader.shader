@@ -22,6 +22,9 @@ precision lowp int;
   uniform float dissapearCoef;
   uniform vec3 stopInfo;
 #endif
+#ifdef HAS_SKYBOX_FOG
+  varying vec3 vWorldPosition;
+#endif
 
 attribute float expiredFlag;
 attribute vec3 position;
@@ -40,7 +43,6 @@ varying vec4 vCalculatedColor;
 varying float vDiscardFlag;
 varying float vTextureFlag;
 varying vec3 vRgbThreshold;
-varying vec3 vWorldPosition;
 varying vec4 vUVCoordinates;
 
 uniform mat4 viewMatrix;
@@ -245,7 +247,9 @@ void main(){
       newPosition = position + (chosenVelocity * timeOfThis) + (0.5 * timeOfThis * timeOfThis * chosenAcceleration);
     }
 
-    vWorldPosition = (selectedWorldMatrix * vec4(newPosition, 1.0)).xyz;
+    #ifdef HAS_SKYBOX_FOG
+      vWorldPosition = (selectedWorldMatrix * vec4(newPosition, 1.0)).xyz;
+    #endif
 
     if (useWorldPositionFlag < 5.0){
       mvPosition = selectedMVMatrix * vec4(newPosition, 1.0);
