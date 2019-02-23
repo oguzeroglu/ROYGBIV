@@ -1085,34 +1085,34 @@ StateLoader.prototype.finalize = function(){
     );
     addedTextInstance.isClickable = curTextExport.isClickable;
     addedTextInstance.setAffectedByFog(curTextExport.isAffectedByFog);
-    addedTextInstance.setBackground(
-      "#" + new THREE.Color(curTextExport.backgroundColorR, curTextExport.backgroundColorG, curTextExport.backgroundColorB).getHexString(),
-      curTextExport.backgroundAlpha
-    );
-    if (!curTextExport.hasBackground){
-      addedTextInstance.removeBackground();
+    if (curTextExport.hasBackground){
+      addedTextInstance.setBackground(
+        "#" + new THREE.Color(curTextExport.backgroundColorR, curTextExport.backgroundColorG, curTextExport.backgroundColorB).getHexString(),
+        curTextExport.backgroundAlpha
+      );
     }
     addedTextInstance.setMarginBetweenChars(curTextExport.offsetBetweenChars);
     addedTextInstance.setMarginBetweenLines(curTextExport.offsetBetweenLines);
     addedTextInstance.refCharSize = curTextExport.refCharSize;
     addedTextInstance.refInnerHeight = curTextExport.refInnerHeight;
+    if (!(typeof curTextExport.refCharOffset == UNDEFINED)){
+      addedTextInstance.refCharOffset = curTextExport.refCharOffset;
+    }
+    if (!(typeof curTextExport.refLineOffset == UNDEFINED)){
+      addedTextInstance.refLineOffset = curTextExport.refLineOffset;
+    }
     addedTextInstance.handleBoundingBox();
     addedTextInstance.gsName = curTextExport.gsName;
     addedTextInstance.is2D = curTextExport.is2D;
-    if (!(typeof curTextExport.is2DInfoX == UNDEFINED)){
-      addedTextInstance.material.uniforms.isTwoDimensionalInfo.value.set(
-        curTextExport.is2DInfoX, curTextExport.is2DInfoY, curTextExport.is2DInfoZ
-      );
+    if (addedTextInstance.is2D){
+      addedTextInstance.injectMacro("IS_TWO_DIMENSIONAL", true, false);
     }
     if (!(typeof curTextExport.marginMode == UNDEFINED)){
       addedTextInstance.marginMode = curTextExport.marginMode;
       addedTextInstance.marginPercentWidth = curTextExport.marginPercentWidth;
       addedTextInstance.marginPercentHeight = curTextExport.marginPercentHeight;
       if (addedTextInstance.is2D){
-          addedTextInstance.set2DCoordinates(
-            addedTextInstance.marginPercentWidth,
-            addedTextInstance.marginPercentHeight
-          );
+          addedTextInstance.set2DCoordinates(addedTextInstance.marginPercentWidth,addedTextInstance.marginPercentHeight);
       }
     }
     addedTextInstance.maxWidthPercent = curTextExport.maxWidthPercent;

@@ -22314,21 +22314,8 @@
 				setupVertexAttributes( material, program, geometry );
 
 				if ( index !== null ) {
-					var skip = false;
-					if (!attribute.roygbivID){
-						attribute.roygbivID = roygbivBufferAttributeCounter ++;
-					}else{
-						if (window.lastIssuedBufferAttribute == attribute.roygbivID){
-							skip = true;
-						}
-					}
-					window.lastIssuedBufferAttribute = attribute.roygbivID;
-					if (!skip){
+
 						_gl.bindBuffer( _gl.ELEMENT_ARRAY_BUFFER, attribute.buffer );
-					}else{
-						roygbivSkippedElementArrayBufferUpdates ++;
-						roygbivSkippedElementArrayBufferUpdates %= 10000;
-					}
 
 				}
 
@@ -22520,21 +22507,8 @@
 
 							}
 
-							var skip = false;
-							if (!geometryAttribute.roygbivID){
-								geometryAttribute.roygbivID = window.roygbivAttributeCounter++;
-							}else{
-								if (window.lastIssuedAttribute == geometryAttribute.roygbivID){
-									skip = true;
-									window.roygbivSkippedArrayBufferUpdates ++;
-									window.roygbivSkippedArrayBufferUpdates %= 10000;
-								}
-							}
-							window.lastIssuedAttribute = geometryAttribute.roygbivID;
-							if (!skip){
-								_gl.bindBuffer( _gl.ARRAY_BUFFER, buffer );
-								_gl.vertexAttribPointer( programAttribute, size, type, normalized, 0, 0 );
-							}
+							_gl.bindBuffer( _gl.ARRAY_BUFFER, buffer );
+							_gl.vertexAttribPointer( programAttribute, size, type, normalized, 0, 0 );
 
 						}
 

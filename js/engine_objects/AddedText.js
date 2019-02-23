@@ -3,6 +3,7 @@ var AddedText = function(name, font, text, position, color, alpha, characterSize
   this.twoDimensionalParameters = new THREE.Vector2();
   this.twoDimensionalSize = new THREE.Vector4();
   this.webglSpaceSize = new THREE.Vector2();
+  this.shaderMargin = new THREE.Vector2();
   this.name = name;
   this.font = font;
   this.text = text;
@@ -11,6 +12,7 @@ var AddedText = function(name, font, text, position, color, alpha, characterSize
   this.alpha = alpha;
   this.characterSize = characterSize;
   this.geometry = new THREE.BufferGeometry();
+  this.hasBackground = false;
   var strlen = strlenParameter;
   if (typeof strlen == UNDEFINED){
     strlen = text.length;
@@ -46,27 +48,18 @@ var AddedText = function(name, font, text, position, color, alpha, characterSize
     side: THREE.DoubleSide,
     uniforms: {
       modelViewMatrix: new THREE.Uniform(new THREE.Matrix4()),
-      worldMatrix: new THREE.Uniform(new THREE.Matrix4()),
       projectionMatrix: GLOBAL_PROJECTION_UNIFORM,
       cameraQuaternion: GLOBAL_CAMERA_QUATERNION_UNIFORM,
-      cameraPosition: GLOBAL_CAMERA_POSITION_UNIFORM,
-      charSize: new THREE.Uniform(characterSize),
       color: new THREE.Uniform(color),
       alpha: new THREE.Uniform(alpha),
-      backgroundColor: new THREE.Uniform(new THREE.Color("white")),
-      backgroundAlpha: new THREE.Uniform(0.0),
-      hasBackgroundColorFlag: new THREE.Uniform(-500.0),
       uvRanges: new THREE.Uniform(uvsArray),
       glyphTexture: this.getGlyphUniform(),
       xOffsets: new THREE.Uniform(xOffsetsArray),
       yOffsets: new THREE.Uniform(yOffsetsArray),
-      affectedByFogFlag: new THREE.Uniform(-50.0),
-      fogInfo: GLOBAL_FOG_UNIFORM,
-      cubeTexture: GLOBAL_CUBE_TEXTURE_UNIFORM,
-      isTwoDimensionalInfo: new THREE.Uniform(new THREE.Vector3(-500, 0, 0)),
       currentViewport: GLOBAL_ADDEDTEXT_VIEWPORT_UNIFORM
     }
   });
+  this.injectMacro("CHAR_SIZE "+characterSize, true, false);
   this.topLeft = new THREE.Vector3(0, 0, 0);
   this.bottomRight = new THREE.Vector3();
   this.bottomLeft = new THREE.Vector3();
@@ -78,7 +71,6 @@ var AddedText = function(name, font, text, position, color, alpha, characterSize
   this.mesh.frustumCulled = false;
   scene.add(this.mesh);
   this.material.uniforms.modelViewMatrix.value = this.mesh.modelViewMatrix;
-  this.material.uniforms.worldMatrix.value = this.mesh.matrixWorld;
 
   this.tmpObj = {};
   this.destroyedGrids = new Object();
@@ -182,18 +174,21 @@ AddedText.prototype.export = function(){
   exportObj.offsetBetweenLines = this.offsetBetweenLines;
   exportObj.refCharSize = this.refCharSize;
   exportObj.refInnerHeight = this.refInnerHeight;
-  exportObj.hasBackground = (this.material.uniforms.hasBackgroundColorFlag.value > 0);
-  exportObj.backgroundColorR = this.material.uniforms.backgroundColor.value.r;
-  exportObj.backgroundColorG = this.material.uniforms.backgroundColor.value.g;
-  exportObj.backgroundColorB = this.material.uniforms.backgroundColor.value.b;
-  exportObj.backgroundAlpha = this.material.uniforms.backgroundAlpha.value;
+  exportObj.hasBackground = this.hasBackground;
+  exportObj.refCharOffset = this.refCharOffset;
+  exportObj.refLineOffset = this.refLineOffset;
+  if (this.hasBackground){
+    exportObj.backgroundColorR = this.material.uniforms.backgroundColor.value.r;
+    exportObj.backgroundColorG = this.material.uniforms.backgroundColor.value.g;
+    exportObj.backgroundColorB = this.material.uniforms.backgroundColor.value.b;
+    exportObj.backgroundAlpha = this.material.uniforms.backgroundAlpha.value;
+  }
   exportObj.gsName = this.gsName;
   exportObj.isClickable = this.isClickable;
   exportObj.isAffectedByFog = this.isAffectedByFog;
   exportObj.is2D = this.is2D;
-  exportObj.is2DInfoX = this.mesh.material.uniforms.isTwoDimensionalInfo.value.x;
-  exportObj.is2DInfoY = this.mesh.material.uniforms.isTwoDimensionalInfo.value.y;
-  exportObj.is2DInfoZ = this.mesh.material.uniforms.isTwoDimensionalInfo.value.z;
+  exportObj.shaderMarginX = this.shaderMargin.x;
+  exportObj.shaderMarginY = this.shaderMargin.y;
   exportObj.marginMode = this.marginMode;
   exportObj.marginPercentWidth = this.marginPercentWidth;
   exportObj.marginPercentHeight = this.marginPercentHeight;
@@ -315,20 +310,38 @@ AddedText.prototype.setBackground = function(backgroundColorString, backgroundAl
   if (fromScript && (typeof this.oldBackgroundStatus == UNDEFINED)){
     this.oldBackgroundStatus = this.material.uniforms.hasBackgroundColorFlag.value;
   }
-  this.material.uniforms.backgroundColor.value.set(backgroundColorString);
-  this.material.uniforms.backgroundAlpha.value = backgroundAlpha;
-  this.material.uniforms.hasBackgroundColorFlag.value = 500;
+  if (!this.material.uniforms.backgroundColor){
+    this.injectMacro("HAS_BACKGROUND", false, true);
+    this.material.uniforms.backgroundColor = new THREE.Uniform(new THREE.Color(backgroundColorString));
+    this.material.uniforms.backgroundAlpha = new THREE.Uniform(backgroundAlpha);
+  }else{
+    this.material.uniforms.backgroundColor.value.set(backgroundColorString);
+    this.material.uniforms.backgroundAlpha.value = backgroundAlpha;
+  }
+  if (!fromScript){
+    this.hasBackground = true;
+  }
 }
 
 AddedText.prototype.removeBackground = function(fromScript){
   if (fromScript && (typeof this.oldBackgroundStatus == UNDEFINED)){
     this.oldBackgroundStatus = this.material.uniforms.hasBackgroundColorFlag.value;
   }
-  this.material.uniforms.hasBackgroundColorFlag.value = -500;
+  if (this.material.uniforms.backgroundColor){
+    this.removeMacro("HAS_BACKGROUND", false, true);
+    delete this.material.uniforms.backgroundColor;
+    delete this.material.uniforms.backgroundAlpha;
+  }
+  if (!fromScript){
+    this.hasBackground = false;
+  }
 }
 
 AddedText.prototype.setCharSize = function(value){
-  this.material.uniforms.charSize.value = value;
+  this.material.vertexShader = this.material.vertexShader.replace(
+    "#define CHAR_SIZE "+this.characterSize, "#define CHAR_SIZE "+value
+  );
+  this.material.needsUpdate = true;
   this.characterSize = value;
   if (this.is2D){
     this.set2DCoordinates(this.marginPercentWidth, this.marginPercentHeight);
@@ -365,6 +378,10 @@ AddedText.prototype.handleResize = function(){
         this.constructText();
         this.set2DCoordinates(this.marginPercentWidth, this.marginPercentHeight);
         iteration ++;
+        if (!isDeployment && textManipulationParameters){
+          textManipulationParameters["Char size"] = this.characterSize;
+          textManipulationParameters["Char margin"] = this.offsetBetweenChars;
+        }
       }
     }
     if (!(typeof this.maxHeightPercent == UNDEFINED)){
@@ -376,6 +393,10 @@ AddedText.prototype.handleResize = function(){
         this.constructText();
         this.set2DCoordinates(this.marginPercentWidth, this.marginPercentHeight);
         iteration ++;
+        if (!isDeployment && textManipulationParameters){
+          textManipulationParameters["Char size"] = this.characterSize;
+          textManipulationParameters["Line margin"] = this.offsetBetweenLines;
+        }
       }
     }
   }
@@ -590,11 +611,6 @@ AddedText.prototype.restore = function(){
 
 AddedText.prototype.setAffectedByFog = function(val){
   this.isAffectedByFog = val;
-  if (val){
-    this.material.uniforms.affectedByFogFlag.value = 50.0;
-  }else{
-    this.material.uniforms.affectedByFogFlag.value = -50.0;
-  }
 }
 
 AddedText.prototype.set2DStatus = function(is2D){
@@ -603,6 +619,7 @@ AddedText.prototype.set2DStatus = function(is2D){
   }
   this.is2D = is2D;
   if (is2D){
+    this.injectMacro("IS_TWO_DIMENSIONAL", true, false);
     this.set2DCoordinates(this.marginPercentWidth, this.marginPercentHeight);
     if (typeof this.oldIsClickable == UNDEFINED){
       this.oldIsClickable = this.isClickable;
@@ -610,6 +627,7 @@ AddedText.prototype.set2DStatus = function(is2D){
     this.isClickable = false;
     addedTexts2D[this.name] = this;
   }else{
+    this.removeMacro("IS_TWO_DIMENSIONAL", true, false);
     this.isClickable = this.oldIsClickable;
     delete this.oldIsClickable;
     if (!(typeof this.refCharOffset == UNDEFINED)){
@@ -623,13 +641,11 @@ AddedText.prototype.set2DStatus = function(is2D){
     delete addedTexts2D[this.name];
   }
   if (is2D){
-    this.material.uniforms.isTwoDimensionalInfo.value.x = 500;
     rayCaster.binHandler.deleteObjectFromBin(this.binInfo, this.name);
     if (this.bbHelper){
       scene.remove(this.bbHelper);
     }
   }else{
-    this.material.uniforms.isTwoDimensionalInfo.value.x = -500;
     rayCaster.binHandler.insert(this.boundingBox, this.name);
   }
 }
@@ -654,7 +670,7 @@ AddedText.prototype.set2DCoordinates = function(marginPercentWidth, marginPercen
     if (marginX + widthX > 1){
       marginX = 1 - widthX - cSizeX;
     }
-    this.material.uniforms.isTwoDimensionalInfo.value.y = marginX;
+    this.setShaderMargin(true, marginX);
   }else{
     marginPercentWidth = marginPercentWidth + 100;
     var tmpX = ((curViewport.z - curViewport.x) / 2.0) + curViewport.x + this.twoDimensionalParameters.x;
@@ -667,7 +683,7 @@ AddedText.prototype.set2DCoordinates = function(marginPercentWidth, marginPercen
     if (marginX < -1){
       marginX = -1 + cSizeX;
     }
-    this.material.uniforms.isTwoDimensionalInfo.value.y = marginX;
+    this.setShaderMargin(true, marginX);
   }
   if (isFromTop){
     marginPercentHeight = 100 - marginPercentHeight;
@@ -680,7 +696,7 @@ AddedText.prototype.set2DCoordinates = function(marginPercentWidth, marginPercen
     if (marginY + heightY < -1){
       marginY = -1 - heightY + cSizeY;
     }
-    this.material.uniforms.isTwoDimensionalInfo.value.z = marginY;
+    this.setShaderMargin(false, marginY);
   }else{
     var tmpY = ((curViewport.w - curViewport.y) / 2.0) + curViewport.y + this.twoDimensionalParameters.y;
     var heightY = (((tmpY - curViewport.y) * 2.0) / curViewport.w) - 1.0;
@@ -691,7 +707,7 @@ AddedText.prototype.set2DCoordinates = function(marginPercentWidth, marginPercen
     if (marginY + heightY < -1){
       marginY = -1 - heightY + cSizeY;
     }
-    this.material.uniforms.isTwoDimensionalInfo.value.z = marginY;
+    this.setShaderMargin(false, marginY);
   }
 
   // CONVERTED FROM TEXT VERTEX SHADER CODE
@@ -699,14 +715,14 @@ AddedText.prototype.set2DCoordinates = function(marginPercentWidth, marginPercen
   var oldPosY = ((GLOBAL_ADDEDTEXT_VIEWPORT_UNIFORM.value.w - GLOBAL_ADDEDTEXT_VIEWPORT_UNIFORM.value.y) / 2.0) + GLOBAL_ADDEDTEXT_VIEWPORT_UNIFORM.value.y + this.yMin;
   var x = (((oldPosX - GLOBAL_ADDEDTEXT_VIEWPORT_UNIFORM.value.x) * 2.0) / GLOBAL_ADDEDTEXT_VIEWPORT_UNIFORM.value.z) - 1.0;
   var y = (((oldPosY - GLOBAL_ADDEDTEXT_VIEWPORT_UNIFORM.value.y) * 2.0) / GLOBAL_ADDEDTEXT_VIEWPORT_UNIFORM.value.w) - 1.0;
-  this.twoDimensionalSize.z = x + this.material.uniforms.isTwoDimensionalInfo.value.y + this.cSizeX;
-  this.twoDimensionalSize.w = y + this.material.uniforms.isTwoDimensionalInfo.value.z - this.cSizeY;
+  this.twoDimensionalSize.z = x + this.shaderMargin.x + this.cSizeX;
+  this.twoDimensionalSize.w = y + this.shaderMargin.y - this.cSizeY;
   oldPosX = ((GLOBAL_ADDEDTEXT_VIEWPORT_UNIFORM.value.z - GLOBAL_ADDEDTEXT_VIEWPORT_UNIFORM.value.x) / 2.0) + GLOBAL_ADDEDTEXT_VIEWPORT_UNIFORM.value.x;
   oldPosY = ((GLOBAL_ADDEDTEXT_VIEWPORT_UNIFORM.value.w - GLOBAL_ADDEDTEXT_VIEWPORT_UNIFORM.value.y) / 2.0) + GLOBAL_ADDEDTEXT_VIEWPORT_UNIFORM.value.y;
   x = (((oldPosX - GLOBAL_ADDEDTEXT_VIEWPORT_UNIFORM.value.x) * 2.0) / GLOBAL_ADDEDTEXT_VIEWPORT_UNIFORM.value.z) - 1.0;
   y = (((oldPosY - GLOBAL_ADDEDTEXT_VIEWPORT_UNIFORM.value.y) * 2.0) / GLOBAL_ADDEDTEXT_VIEWPORT_UNIFORM.value.w) - 1.0;
-  this.twoDimensionalSize.x = x + this.material.uniforms.isTwoDimensionalInfo.value.y - this.cSizeX;
-  this.twoDimensionalSize.y = y + this.material.uniforms.isTwoDimensionalInfo.value.z + this.cSizeY;
+  this.twoDimensionalSize.x = x + this.shaderMargin.x - this.cSizeX;
+  this.twoDimensionalSize.y = y + this.shaderMargin.y + this.cSizeY;
   this.webglSpaceSize.set(
     this.twoDimensionalSize.z - this.twoDimensionalSize.x,
     this.twoDimensionalSize.y - this.twoDimensionalSize.w
@@ -725,10 +741,81 @@ AddedText.prototype.set2DCoordinates = function(marginPercentWidth, marginPercen
 AddedText.prototype.debugCornerPoints = function(representativeCharacter, cornerIndex){
   this.handleResize();
   if (cornerIndex == 0){
-    representativeCharacter.material.uniforms.isTwoDimensionalInfo.value.y = this.twoDimensionalSize.x;
-    representativeCharacter.material.uniforms.isTwoDimensionalInfo.value.z = this.twoDimensionalSize.y;
+    representativeCharacter.setShaderMargin(true, this.twoDimensionalSize.x);
+    representativeCharacter.setShaderMargin(false, this.twoDimensionalSize.y);
   }else{
-    representativeCharacter.material.uniforms.isTwoDimensionalInfo.value.y = this.twoDimensionalSize.z;
-    representativeCharacter.material.uniforms.isTwoDimensionalInfo.value.z = this.twoDimensionalSize.w;
+    representativeCharacter.setShaderMargin(true, this.twoDimensionalSize.z);
+    representativeCharacter.setShaderMargin(false, this.twoDimensionalSize.w);
   }
+}
+
+AddedText.prototype.injectMacro = function(macro, insertVertexShader, insertFragmentShader){
+  if (insertVertexShader){
+    this.material.vertexShader = this.material.vertexShader.replace(
+      "#define INSERTION", "#define INSERTION\n#define "+macro
+    )
+  };
+  if (insertFragmentShader){
+    this.material.fragmentShader = this.material.fragmentShader.replace(
+      "#define INSERTION", "#define INSERTION\n#define "+macro
+    )
+  };
+  this.material.needsUpdate = true;
+}
+
+AddedText.prototype.removeMacro = function(macro, removeVertexShader, removeFragmentShader){
+  if (removeVertexShader){
+    this.material.vertexShader = this.material.vertexShader.replace("\n#define "+macro, "");
+  }
+  if (removeFragmentShader){
+    this.material.fragmentShader = this.material.fragmentShader.replace("\n#define "+macro, "");
+  }
+  this.material.needsUpdate = true;
+}
+
+AddedText.prototype.setShaderMargin = function(isMarginX, value){
+  if (isMarginX){
+    this.mesh.material.vertexShader = this.mesh.material.vertexShader.replace(
+      "#define MARGINX "+this.shaderMargin.x, "#define MARGINX "+value
+    );
+    this.shaderMargin.x = value;
+  }else{
+    this.mesh.material.vertexShader = this.mesh.material.vertexShader.replace(
+      "#define MARGINY "+this.shaderMargin.y, "#define MARGINY "+value
+    );
+    this.shaderMargin.y = value;
+  }
+  this.mesh.material.needsUpdate = true;
+}
+
+AddedText.prototype.setFog = function(){
+  if (this.is2D || !this.isAffectedByFog){
+    return;
+  }
+  if (!this.mesh.material.uniforms.fogInfo){
+    this.injectMacro("HAS_FOG", false, true);
+    this.mesh.material.uniforms.fogInfo = GLOBAL_FOG_UNIFORM;
+  }
+  if (fogBlendWithSkybox){
+    if (!this.mesh.material.uniforms.cubeTexture){
+      this.injectMacro("HAS_SKYBOX_FOG", true, true);
+      this.mesh.material.uniforms.worldMatrix = new THREE.Uniform(this.mesh.matrixWorld);
+      this.mesh.material.uniforms.cubeTexture = GLOBAL_CUBE_TEXTURE_UNIFORM;
+      this.mesh.material.uniforms.cameraPosition = GLOBAL_CAMERA_POSITION_UNIFORM;
+    }
+  }
+  this.mesh.material.needsUpdate = true;
+}
+
+AddedText.prototype.removeFog = function(){
+  if (this.is2D || !this.isAffectedByFog){
+    return;
+  }
+  this.removeMacro("HAS_FOG", false, true);
+  this.removeMacro("HAS_SKYBOX_FOG", true, true);
+  delete this.mesh.material.uniforms.fogInfo;
+  delete this.mesh.material.uniforms.cubeTexture;
+  delete this.mesh.material.uniforms.worldMatrix;
+  delete this.mesh.material.uniforms.cameraPosition;
+  this.mesh.material.needsUpdate = true;
 }

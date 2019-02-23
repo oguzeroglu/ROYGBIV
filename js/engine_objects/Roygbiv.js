@@ -6594,6 +6594,10 @@ Roygbiv.prototype.setTextBackground = function(text, colorName, alpha){
     throw new Error("setTextBackground error: text is not a text object.");
     return;
   }
+  if (!text.hasBackground){
+    throw new Error("setTextBackground error: text has no background.");
+    return;
+  }
   if (typeof colorName == UNDEFINED){
     throw new Error("setTextBackground error: colorName is not defined.");
     return;
@@ -6625,6 +6629,10 @@ Roygbiv.prototype.removeTextBackground = function(text){
   }
   if (!text.isAddedText){
     throw new Error("removeTextBackground error: text is not a text object.");
+    return;
+  }
+  if (!text.hasBackground){
+    throw new Error("removeBackground error: text has no background.");
     return;
   }
   text.removeBackground(true);

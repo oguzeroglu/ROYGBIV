@@ -31,9 +31,14 @@ GUIHandler.prototype.afterTextSelection = function(){
     textManipulationParameters["Content"] = curSelection.text;
     textManipulationParameters["Text color"] = "#" + curSelection.material.uniforms.color.value.getHexString();
     textManipulationParameters["Alpha"] = curSelection.material.uniforms.alpha.value;
-    textManipulationParameters["Has bg"] = (curSelection.material.uniforms.hasBackgroundColorFlag.value > 0);
-    textManipulationParameters["Bg color"] = "#" + curSelection.material.uniforms.backgroundColor.value.getHexString();
-    textManipulationParameters["Bg alpha"] = curSelection.material.uniforms.backgroundAlpha.value;
+    textManipulationParameters["Has bg"] = (curSelection.hasBackground);
+    if (curSelection.hasBackground){
+      textManipulationParameters["Bg color"] = "#" + curSelection.material.uniforms.backgroundColor.value.getHexString();
+      textManipulationParameters["Bg alpha"] = curSelection.material.uniforms.backgroundAlpha.value;
+    }else{
+      textManipulationParameters["Bg color"] = "#000000"
+      textManipulationParameters["Bg alpha"] = 1;
+    }
     textManipulationParameters["Char margin"] = curSelection.offsetBetweenChars;
     textManipulationParameters["Line margin"] = curSelection.offsetBetweenLines;
     textManipulationParameters["Aff. by fog"] = curSelection.isAffectedByFog;
@@ -531,10 +536,7 @@ GUIHandler.prototype.initializeTextManipulationGUI = function(){
   }).listen();
   textManipulationHasBackgroundController = datGuiTextManipulation.add(textManipulationParameters, "Has bg").onChange(function(val){
     if (val){
-      selectionHandler.getSelectedObject().setBackground(
-        "#" + selectionHandler.getSelectedObject().material.uniforms.backgroundColor.value.getHexString(),
-        selectionHandler.getSelectedObject().material.uniforms.backgroundAlpha.value
-      );
+      selectionHandler.getSelectedObject().setBackground("#000000", 1);
       guiHandler.enableController(textManipulationBackgroundColorController);
       guiHandler.enableController(textManipulationBackgroundAlphaController);
     }else{
@@ -542,6 +544,8 @@ GUIHandler.prototype.initializeTextManipulationGUI = function(){
       guiHandler.disableController(textManipulationBackgroundColorController);
       guiHandler.disableController(textManipulationBackgroundAlphaController);
     }
+    textManipulationParameters["Bg color"] = "#000000";
+    textManipulationParameters["Alpha"] = 1;
   }).listen();
   textManipulationBackgroundColorController = datGuiTextManipulation.addColor(textManipulationParameters, "Bg color").onChange(function(val){
     selectionHandler.getSelectedObject().setBackground(val, selectionHandler.getSelectedObject().material.uniforms.backgroundAlpha.value);
@@ -554,7 +558,7 @@ GUIHandler.prototype.initializeTextManipulationGUI = function(){
   }).listen();
   textManipulationCharacterSizeController = datGuiTextManipulation.add(textManipulationParameters, "Char size").min(0.5).max(200).step(0.5).onChange(function(val){
     selectionHandler.getSelectedObject().setCharSize(val);
-    selectionHandler.getSelectedObject().refCharSize = val;
+    selectionHandler.getSelectedObject().refCharSize= val;
     selectionHandler.getSelectedObject().refInnerHeight = window.innerHeight;
     selectionHandler.getSelectedObject().handleResize();
   }).listen();
@@ -694,6 +698,10 @@ GUIHandler.prototype.initializeFogGUI = function(){
     for (var objName in objectGroups){
       objectGroups[objName].removeFog();
       objectGroups[objName].setFog();
+    }
+    for (var textName in addedTexts){
+      addedTexts[textName].removeFog();
+      addedTexts[textName].setFog();
     }
   }).listen();
 }
