@@ -308,7 +308,7 @@ AddedText.prototype.setBackground = function(backgroundColorString, backgroundAl
     this.oldBackgroundAlpha = this.material.uniforms.backgroundAlpha.value;
   }
   if (fromScript && (typeof this.oldBackgroundStatus == UNDEFINED)){
-    this.oldBackgroundStatus = this.material.uniforms.hasBackgroundColorFlag.value;
+    this.oldBackgroundStatus = this.hasBackground ? this.hasBackground: false;
   }
   if (!this.material.uniforms.backgroundColor){
     this.injectMacro("HAS_BACKGROUND", false, true);
@@ -590,7 +590,7 @@ AddedText.prototype.restore = function(){
     delete this.oldAlpha;
   }
   if (!(typeof this.oldBackgroundStatus == UNDEFINED)){
-    this.material.uniforms.hasBackgroundColorFlag.value = this.oldBackgroundStatus;
+    this.hasBackground = this.oldBackgroundStatus;
     delete this.oldBackgroundStatus;
   }
   if (!(typeof this.oldBackgroundR == UNDEFINED)){
