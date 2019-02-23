@@ -26456,10 +26456,10 @@ var AddedText = function(name, font, text, position, color, alpha, characterSize
       glyphTexture: this.getGlyphUniform(),
       xOffsets: new THREE.Uniform(xOffsetsArray),
       yOffsets: new THREE.Uniform(yOffsetsArray),
-      currentViewport: GLOBAL_ADDEDTEXT_VIEWPORT_UNIFORM
+      currentViewport: GLOBAL_ADDEDTEXT_VIEWPORT_UNIFORM,
+      charSize: new THREE.Uniform(this.characterSize)
     }
   });
-  this.injectMacro("CHAR_SIZE "+characterSize, true, false);
   this.topLeft = new THREE.Vector3(0, 0, 0);
   this.bottomRight = new THREE.Vector3();
   this.bottomLeft = new THREE.Vector3();
@@ -26738,10 +26738,7 @@ AddedText.prototype.removeBackground = function(fromScript){
 }
 
 AddedText.prototype.setCharSize = function(value){
-  this.material.vertexShader = this.material.vertexShader.replace(
-    "#define CHAR_SIZE "+this.characterSize, "#define CHAR_SIZE "+value
-  );
-  this.material.needsUpdate = true;
+  this.material.uniforms.charSize.value = value;
   this.characterSize = value;
   if (this.is2D){
     this.set2DCoordinates(this.marginPercentWidth, this.marginPercentHeight);
@@ -27028,6 +27025,7 @@ AddedText.prototype.set2DStatus = function(is2D){
     addedTexts2D[this.name] = this;
   }else{
     this.removeMacro("IS_TWO_DIMENSIONAL", true, false);
+    delete this.mesh.material.uniforms.margin2D;
     this.isClickable = this.oldIsClickable;
     delete this.oldIsClickable;
     if (!(typeof this.refCharOffset == UNDEFINED)){
@@ -27174,18 +27172,17 @@ AddedText.prototype.removeMacro = function(macro, removeVertexShader, removeFrag
 }
 
 AddedText.prototype.setShaderMargin = function(isMarginX, value){
-  if (isMarginX){
-    this.mesh.material.vertexShader = this.mesh.material.vertexShader.replace(
-      "#define MARGINX "+this.shaderMargin.x, "#define MARGINX "+value
-    );
-    this.shaderMargin.x = value;
-  }else{
-    this.mesh.material.vertexShader = this.mesh.material.vertexShader.replace(
-      "#define MARGINY "+this.shaderMargin.y, "#define MARGINY "+value
-    );
-    this.shaderMargin.y = value;
+  if (!this.mesh.material.uniforms.margin2D){
+    this.mesh.material.uniforms.margin2D = new THREE.Uniform(new THREE.Vector2());
+    this.mesh.material.needsUpdate = true;
   }
-  this.mesh.material.needsUpdate = true;
+  if (isMarginX){
+    this.shaderMargin.x = value;
+    this.mesh.material.uniforms.margin2D.value.x = value;
+  }else{
+    this.shaderMargin.y = value;
+    this.mesh.material.uniforms.margin2D.value.y = value;
+  }
 }
 
 AddedText.prototype.setFog = function(){

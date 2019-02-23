@@ -2,8 +2,6 @@ precision lowp float;
 precision lowp int;
 
 #define STR_LEN 1
-#define MARGINX 0
-#define MARGINY 0
 
 attribute float charIndex;
 
@@ -14,6 +12,7 @@ uniform vec4 uvRanges[STR_LEN];
 uniform vec4 currentViewport;
 uniform mat4 modelViewMatrix;
 uniform mat4 projectionMatrix;
+uniform float charSize;
 
 varying vec4 vUVRanges;
 
@@ -22,6 +21,9 @@ varying vec4 vUVRanges;
 #ifdef HAS_SKYBOX_FOG
   varying vec3 vWorldPosition;
   uniform mat4 worldMatrix;
+#endif
+#ifdef IS_TWO_DIMENSIONAL
+  uniform vec2 margin2D;
 #endif
 
 vec3 applyQuaternionToVector(vec3 vector, vec4 quaternion){
@@ -58,10 +60,10 @@ void main(){
     float oldPosY = ((currentViewport.w - currentViewport.y) / 2.0) + currentViewport.y + yOffset;
     float x = (((oldPosX - currentViewport.x) * 2.0) / currentViewport.z) - 1.0;
     float y = (((oldPosY - currentViewport.y) * 2.0) / currentViewport.w) - 1.0;
-    gl_Position = vec4(x + float(MARGINX), y + float(MARGINY), 0.0, 1.0);
-    gl_PointSize = float(CHAR_SIZE);
+    gl_Position = vec4(x + float(margin2D.x), y + float(margin2D.y), 0.0, 1.0);
+    gl_PointSize = charSize;
   #else
     gl_Position = projectionMatrix * mvPosition;
-    gl_PointSize = (500.0) * float(CHAR_SIZE) / length(mvPosition.xyz);
+    gl_PointSize = (500.0) * charSize / length(mvPosition.xyz);
   #endif
 }
