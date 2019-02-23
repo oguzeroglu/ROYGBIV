@@ -141,7 +141,7 @@ float findRepeatTime(){
     return startTime;
   }
   float x = selectedTime;
-  for (float i = 0.0; i<10000000.0; i += 0.0000000001){
+  for (float i = 0.0; i<5000.0; i += 0.0001){
     float recentlyRespawnedFlag = isRecentlyRespawned((x - startTime));
     if (recentlyRespawnedFlag > 5.0){
       return x;
