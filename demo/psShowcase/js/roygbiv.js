@@ -2471,7 +2471,6 @@ var GLOBAL_CAMERA_POSITION_UNIFORM = new THREE.Uniform(new THREE.Vector3());
 var GLOBAL_CAMERA_QUATERNION_UNIFORM = new THREE.Uniform(new THREE.Quaternion());
 var GLOBAL_CUBE_TEXTURE_UNIFORM;
 var GLOBAL_ADDEDTEXT_VIEWPORT_UNIFORM = new THREE.Uniform(new THREE.Vector4(0, 0, window.innerWidth, window.innerHeight));
-var GLOBAL_SKYBOX_ALPHA_UNIFORM = new THREE.Uniform(1.0);
 var VERTEX_SHADER_TEXTURE_FETCH_SUPPORTED;
 var DDS_SUPPORTED;
 var INSTANCING_SUPPORTED;
@@ -8022,7 +8021,7 @@ TexturePack.prototype.rescale = function(scale){
   this.scaleFactor = scale;
 }
 
-var SkyBox = function(name, directoryName, fileExtension, alpha, color, callback){
+var SkyBox = function(name, directoryName, fileExtension, color, callback){
 
   this.name = name;
   this.directoryName = directoryName;
@@ -8036,7 +8035,6 @@ var SkyBox = function(name, directoryName, fileExtension, alpha, color, callback
   this.fileExtension = fileExtension;
 
   this.color = color;
-  this.alpha = alpha;
 
   this.hasBack = false;
   this.hasDown = false;
@@ -8084,7 +8082,6 @@ SkyBox.prototype.export = function(){
   exportObject.leftFilePath = this.leftFilePath;
   exportObject.rightFilePath =this.rightFilePath;
   exportObject.upFilePath = this.upFilePath;
-  exportObject.alpha = this.alpha;
   exportObject.color = this.color;
   return exportObject;
 }
@@ -11433,7 +11430,6 @@ StateLoader.prototype.load = function(){
           skyboxExport.name,
           skyboxExport.directoryName,
           skyboxExport.fileExtension,
-          skyboxExport.alpha,
           skyboxExport.color,
           function(){
             that.totalLoadedSkyboxCount ++;
@@ -11445,7 +11441,6 @@ StateLoader.prototype.load = function(){
           skyboxExport.name,
           skyboxExport.directoryName,
           skyboxExport.fileExtension,
-          skyboxExport.alpha,
           skyboxExport.color,
           function(){
             that.totalLoadedSkyboxCount ++;
@@ -26226,8 +26221,7 @@ MeshGenerator.prototype.generateSkybox = function(skybox){
       projectionMatrix: GLOBAL_PROJECTION_UNIFORM,
       modelViewMatrix: new THREE.Uniform(new THREE.Matrix4()),
       cubeTexture: GLOBAL_CUBE_TEXTURE_UNIFORM,
-      color: new THREE.Uniform(new THREE.Color(skybox.color)),
-      alpha: GLOBAL_SKYBOX_ALPHA_UNIFORM
+      color: new THREE.Uniform(new THREE.Color(skybox.color))
     }
   });
   var mesh = new THREE.Mesh(this.geometry, material);
@@ -26708,7 +26702,7 @@ AddedText.prototype.setBackground = function(backgroundColorString, backgroundAl
     this.oldBackgroundAlpha = this.material.uniforms.backgroundAlpha.value;
   }
   if (fromScript && (typeof this.oldBackgroundStatus == UNDEFINED)){
-    this.oldBackgroundStatus = this.material.uniforms.hasBackgroundColorFlag.value;
+    this.oldBackgroundStatus = this.hasBackground ? this.hasBackground: false;
   }
   if (!this.material.uniforms.backgroundColor){
     this.injectMacro("HAS_BACKGROUND", false, true);
@@ -26990,7 +26984,7 @@ AddedText.prototype.restore = function(){
     delete this.oldAlpha;
   }
   if (!(typeof this.oldBackgroundStatus == UNDEFINED)){
-    this.material.uniforms.hasBackgroundColorFlag.value = this.oldBackgroundStatus;
+    this.hasBackground = this.oldBackgroundStatus;
     delete this.oldBackgroundStatus;
   }
   if (!(typeof this.oldBackgroundR == UNDEFINED)){
