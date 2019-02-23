@@ -653,8 +653,14 @@ ParticleSystem.prototype.update = function(){
 
   this.tick += (1/60);
 
-  if (this.tick > MAX_PS_TIME){
-    this.tick = 0;
+  if (isMobile){
+    if (this.tick > 20){
+      this.tick =  0;
+    }
+  }else{
+    if (this.tick > MAX_PS_TIME){
+      this.tick = 0;
+    }
   }
 
   if (!this.psMerger){

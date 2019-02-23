@@ -272,6 +272,7 @@ AddedText.prototype.setText = function(newText, fromScript){
   this.handleUVUniform();
   if (this.is2D){
     this.set2DCoordinates(this.marginPercentWidth, this.marginPercentHeight);
+    this.handleResize();
   }else{
     this.handleBoundingBox();
   }

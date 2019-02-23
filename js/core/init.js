@@ -480,6 +480,9 @@ if (typeof InstallTrigger !== 'undefined') {
   window.addEventListener('wheel', mouseWheelEvent, false);
 }
 window.addEventListener('resize', resizeFunction);
+if (isMobile){
+  window.addEventListener('orientationchange', resizeFunction);
+}
 window.addEventListener('keydown', function(event){
   inactiveCounter = 0;
 
