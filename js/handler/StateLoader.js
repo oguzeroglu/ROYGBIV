@@ -839,7 +839,6 @@ StateLoader.prototype.load = function(){
           skyboxExport.name,
           skyboxExport.directoryName,
           skyboxExport.fileExtension,
-          skyboxExport.alpha,
           skyboxExport.color,
           function(){
             that.totalLoadedSkyboxCount ++;
@@ -851,7 +850,6 @@ StateLoader.prototype.load = function(){
           skyboxExport.name,
           skyboxExport.directoryName,
           skyboxExport.fileExtension,
-          skyboxExport.alpha,
           skyboxExport.color,
           function(){
             that.totalLoadedSkyboxCount ++;

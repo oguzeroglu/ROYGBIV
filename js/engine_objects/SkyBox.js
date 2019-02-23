@@ -1,4 +1,4 @@
-var SkyBox = function(name, directoryName, fileExtension, alpha, color, callback){
+var SkyBox = function(name, directoryName, fileExtension, color, callback){
 
   this.name = name;
   this.directoryName = directoryName;
@@ -12,7 +12,6 @@ var SkyBox = function(name, directoryName, fileExtension, alpha, color, callback
   this.fileExtension = fileExtension;
 
   this.color = color;
-  this.alpha = alpha;
 
   this.hasBack = false;
   this.hasDown = false;
@@ -60,7 +59,6 @@ SkyBox.prototype.export = function(){
   exportObject.leftFilePath = this.leftFilePath;
   exportObject.rightFilePath =this.rightFilePath;
   exportObject.upFilePath = this.upFilePath;
-  exportObject.alpha = this.alpha;
   exportObject.color = this.color;
   return exportObject;
 }

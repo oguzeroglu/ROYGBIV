@@ -2042,7 +2042,7 @@ function parse(input){
             return true;
           }
 
-          var skyBox = new SkyBox(name, directoryName, fileExtension, 1, "#ffffff");
+          var skyBox = new SkyBox(name, directoryName, fileExtension, "#ffffff");
           skyBoxes[name] = skyBox;
           if (!DDS_SUPPORTED && fileExtension.toUpperCase() == "DDS"){
             terminal.printInfo(Text.TEXTURE_CREATED_DDS_SUPPORT_ISSUE);
@@ -2119,7 +2119,6 @@ function parse(input){
           mappedSkyboxName = name;
           if (skyboxParameters){
             skyboxParameters["Name"] = mappedSkyboxName;
-            skyboxParameters["Alpha"] = skyboxMesh.material.uniforms.alpha.value;
             skyboxParameters["Color"] = "#" + skyboxMesh.material.uniforms.color.value.getHexString();
           }
           skyboxMesh.renderOrder = -1;
@@ -4599,7 +4598,6 @@ function parse(input){
             guiHandler.show(datGuiSkybox);
             skyboxConfigurationsVisible = true;
             skyboxParameters["Name"] = mappedSkyboxName;
-            skyboxParameters["Alpha"] = skyboxMesh.material.uniforms.alpha.value;
             skyboxParameters["Color"] = "#" + skyboxMesh.material.uniforms.color.value.getHexString();
             terminal.printInfo(Text.GUI_OPENED);
           }else if (parameter == "hide"){
