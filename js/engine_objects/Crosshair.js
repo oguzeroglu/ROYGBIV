@@ -1,5 +1,7 @@
 var Crosshair = function(configurations){
 
+  this.isCrosshair = true;
+
   var name = configurations.name;
   var texture = configurations.texture;
   var colorR = configurations.colorR;
@@ -52,6 +54,8 @@ var Crosshair = function(configurations){
   this.shrinkTick = 0;
   this.curSize = this.sizeAmount;
   this.shrinkStartSize = this.sizeAmount;
+
+  webglCallbackHandler.registerEngineObject(this);
 }
 
 Crosshair.prototype.update = function(){

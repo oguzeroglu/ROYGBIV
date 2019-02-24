@@ -983,6 +983,7 @@ var nullTexture;
 var nullCubeTexture;
 var compressedTextureFallbackFormat = ".png";
 var areaBinHandler;
+var webglCallbackHandler;
 var areas = new Object();
 var areasVisible = true;
 var areaConfigurationsVisible = false;

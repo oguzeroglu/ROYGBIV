@@ -257,7 +257,7 @@ var ParticleSystemMerger = function(psObj, name){
   this.mesh.frustumCulled = false;
   scene.add(this.mesh);
   this.clean();
-
+  webglCallbackHandler.registerEngineObject(this);
 }
 
 ParticleSystemMerger.prototype.destroy = function(){

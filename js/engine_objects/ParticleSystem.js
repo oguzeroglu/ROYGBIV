@@ -454,6 +454,7 @@ var ParticleSystem = function(copyPS, name, particles, x, y, z, vx, vy, vz, ax, 
   scene.add(this.mesh);
   particleSystemPool[name] = this;
 
+  webglCallbackHandler.registerEngineObject(this);
 }
 
 ParticleSystem.prototype.generatePSCollisionInfo = function(){

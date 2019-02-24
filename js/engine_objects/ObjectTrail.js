@@ -374,6 +374,7 @@ var ObjectTrail = function(configurations){
   this.objectCoordinateCounter = 0;
   this.objectQuaternionCounter = 0;
 
+  webglCallbackHandler.registerEngineObject(this);
 }
 
 ObjectTrail.prototype.stop = function(){

@@ -93,6 +93,8 @@ var AddedObject = function(name, type, metaData, material, mesh, physicsBody, de
   this.reusableVec3_2 = new THREE.Vector3();
   this.reusableVec3_3 = new THREE.Vector3();
 
+  webglCallbackHandler.registerEngineObject(this);
+
 }
 
 AddedObject.prototype.export = function(){
@@ -565,6 +567,7 @@ AddedObject.prototype.sliceInHalf = function(type){
   newMesh.quaternion.copy(this.mesh.quaternion);
   newMesh.addedObject = this;
   this.mesh = newMesh;
+  webglCallbackHandler.registerEngineObject(this);
   scene.add(this.mesh);
   this.generateBoundingBoxes();
 }
@@ -1284,6 +1287,8 @@ AddedObject.prototype.dispose = function(){
   if (this.hasEmissiveMap()){
     this.mesh.material.uniforms.emissiveMap.value.dispose();
   }
+
+  this.mesh.geometry.dispose();
   this.mesh.material.dispose();
 }
 
@@ -1697,6 +1702,7 @@ AddedObject.prototype.segmentGeometry = function(isCustom, count, returnGeometry
 
   scene.remove(this.mesh);
   this.mesh = newMesh;
+  webglCallbackHandler.registerEngineObject(this);
   this.mesh.addedObject = this;
   scene.add(this.mesh);
 

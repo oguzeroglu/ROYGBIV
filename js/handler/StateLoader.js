@@ -2183,6 +2183,7 @@ StateLoader.prototype.resetProject = function(){
   markedPoints = new Object();
   areas = new Object();
   areaBinHandler = new WorldBinHandler(true);
+  webglCallbackHandler = new WebglCallbackHandler();
   rayCaster = new RayCaster();
   areaBinHandler.isAreaBinHandler = true;
   anchorGrid = 0;

@@ -22163,26 +22163,44 @@
 
 			var buffers = properties.get( object );
 
-			if ( object.hasPositions && ! buffers.position ) buffers.position = _gl.createBuffer();
-			if ( object.hasNormals && ! buffers.normal ) buffers.normal = _gl.createBuffer();
-			if ( object.hasUvs && ! buffers.uv ) buffers.uv = _gl.createBuffer();
-			if ( object.hasColors && ! buffers.color ) buffers.color = _gl.createBuffer();
+			if ( object.hasPositions && ! buffers.position ){
+				buffers.position = _gl.createBuffer();
+				window.webglCallbackHandler.onCreateBuffer();
+			}
+			if ( object.hasNormals && ! buffers.normal ){
+				buffers.normal = _gl.createBuffer();
+				window.webglCallbackHandler.onCreateBuffer();
+			}
+			if ( object.hasUvs && ! buffers.uv ){
+				buffers.uv = _gl.createBuffer();
+				window.webglCallbackHandler.onCreateBuffer();
+			}
+			if ( object.hasColors && ! buffers.color ){
+				buffers.color = _gl.createBuffer();
+				window.webglCallbackHandler.onCreateBuffer();
+			}
 
 			var programAttributes = program.getAttributes();
 
 			if ( object.hasPositions ) {
 
-				_gl.bindBuffer( _gl.ARRAY_BUFFER, buffers.position );
+				window.webglCallbackHandler.onBeforeBindBuffer(false, buffers.position, 0);
+				//_gl.bindBuffer( _gl.ARRAY_BUFFER, buffers.position );
 				_gl.bufferData( _gl.ARRAY_BUFFER, object.positionArray, _gl.DYNAMIC_DRAW );
 
 				state.enableAttribute( programAttributes.position );
-				_gl.vertexAttribPointer( programAttributes.position, 3, _gl.FLOAT, false, 0, 0 );
+
+				window.webglCallbackHandler.onBeforeVertexAttribPointer(
+					programAttributes.position, 3, _gl.FLOAT, false, 0, 0, buffers.position, 0
+				);
+				//_gl.vertexAttribPointer( programAttributes.position, 3, _gl.FLOAT, false, 0, 0 );
 
 			}
 
 			if ( object.hasNormals ) {
 
-				_gl.bindBuffer( _gl.ARRAY_BUFFER, buffers.normal );
+				window.webglCallbackHandler.onBeforeBindBuffer(false, buffers.normal, 1);
+				//_gl.bindBuffer( _gl.ARRAY_BUFFER, buffers.normal );
 
 				if ( ! material.isMeshPhongMaterial &&
 					! material.isMeshStandardMaterial &&
@@ -22217,29 +22235,40 @@
 
 				state.enableAttribute( programAttributes.normal );
 
-				_gl.vertexAttribPointer( programAttributes.normal, 3, _gl.FLOAT, false, 0, 0 );
+				window.webglCallbackHandler.onBeforeVertexAttribPointer(
+					programAttributes.normal, 3, _gl.FLOAT, false, 0, 0, buffers.normal, 1
+				);
+				//_gl.vertexAttribPointer( programAttributes.normal, 3, _gl.FLOAT, false, 0, 0 );
 
 			}
 
 			if ( object.hasUvs && material.map ) {
 
-				_gl.bindBuffer( _gl.ARRAY_BUFFER, buffers.uv );
+				window.webglCallbackHandler.onBeforeBindBuffer(false, buffers.uv, 2);
+				//_gl.bindBuffer( _gl.ARRAY_BUFFER, buffers.uv );
 				_gl.bufferData( _gl.ARRAY_BUFFER, object.uvArray, _gl.DYNAMIC_DRAW );
 
 				state.enableAttribute( programAttributes.uv );
 
-				_gl.vertexAttribPointer( programAttributes.uv, 2, _gl.FLOAT, false, 0, 0 );
+				window.webglCallbackHandler.onBeforeVertexAttribPointer(
+					programAttributes.uv, 2, _gl.FLOAT, false, 0, 0, buffers.uv, 2
+				);
+				//_gl.vertexAttribPointer( programAttributes.uv, 2, _gl.FLOAT, false, 0, 0 );
 
 			}
 
 			if ( object.hasColors && material.vertexColors !== NoColors ) {
 
-				_gl.bindBuffer( _gl.ARRAY_BUFFER, buffers.color );
+				window.webglCallbackHandler.onBeforeBindBuffer(false, buffers.color, 3);
+				//_gl.bindBuffer( _gl.ARRAY_BUFFER, buffers.color );
 				_gl.bufferData( _gl.ARRAY_BUFFER, object.colorArray, _gl.DYNAMIC_DRAW );
 
 				state.enableAttribute( programAttributes.color );
 
-				_gl.vertexAttribPointer( programAttributes.color, 3, _gl.FLOAT, false, 0, 0 );
+				window.webglCallbackHandler.onBeforeVertexAttribPointer(
+					programAttributes.color, 3, _gl.FLOAT, false, 0, 0, buffers.color, 3
+				);
+				//_gl.vertexAttribPointer( programAttributes.color, 3, _gl.FLOAT, false, 0, 0 );
 
 			}
 
@@ -22315,7 +22344,8 @@
 
 				if ( index !== null ) {
 
-						_gl.bindBuffer( _gl.ELEMENT_ARRAY_BUFFER, attribute.buffer );
+						window.webglCallbackHandler.onBeforeBindBuffer(true, attribute.buffer, 4);
+						//_gl.bindBuffer( _gl.ELEMENT_ARRAY_BUFFER, attribute.buffer );
 
 				}
 
@@ -22486,8 +22516,12 @@
 
 							}
 
-							_gl.bindBuffer( _gl.ARRAY_BUFFER, buffer );
-							_gl.vertexAttribPointer( programAttribute, size, type, normalized, stride * bytesPerElement, offset * bytesPerElement );
+							window.webglCallbackHandler.onBeforeBindBuffer(false, buffer, 5);
+							//_gl.bindBuffer( _gl.ARRAY_BUFFER, buffer );
+							window.webglCallbackHandler.onBeforeVertexAttribPointer(
+								programAttribute, size, type, normalized, stride * bytesPerElement, offset * bytesPerElement, buffer, 4
+							);
+							//_gl.vertexAttribPointer( programAttribute, size, type, normalized, stride * bytesPerElement, offset * bytesPerElement );
 
 						} else {
 
@@ -22507,8 +22541,12 @@
 
 							}
 
-							_gl.bindBuffer( _gl.ARRAY_BUFFER, buffer );
-							_gl.vertexAttribPointer( programAttribute, size, type, normalized, 0, 0 );
+							window.webglCallbackHandler.onBeforeBindBuffer(false, buffer, 6);
+							//_gl.bindBuffer( _gl.ARRAY_BUFFER, buffer );
+							window.webglCallbackHandler.onBeforeVertexAttribPointer(
+								programAttribute, size, type, normalized, 0, 0, buffer, 5
+							);
+							//_gl.vertexAttribPointer( programAttribute, size, type, normalized, 0, 0 );
 
 						}
 

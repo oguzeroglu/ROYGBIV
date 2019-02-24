@@ -88,6 +88,8 @@ var AddedText = function(name, font, text, position, color, alpha, characterSize
   this.marginPercentHeight = 50;
   this.maxWidthPercent = 100;
   this.maxHeightPercent = 100;
+
+  webglCallbackHandler.registerEngineObject(this);
 }
 
 AddedText.prototype.destroy = function(){

@@ -23,7 +23,6 @@ var ObjectGroup = function(name, group){
       break;
     }
   }
-
 }
 
 ObjectGroup.prototype.forceColor = function(r, g, b, a){
@@ -1063,7 +1062,7 @@ ObjectGroup.prototype.glue = function(){
     this.mesh = meshGenerator.generateInstancedMesh(graphicsGroup, this);
     this.mesh.frustumCulled = false;
   }
-
+  webglCallbackHandler.registerEngineObject(this);
   if (this.aoTexture){
     this.injectMacro("HAS_AO", true, true);
   }

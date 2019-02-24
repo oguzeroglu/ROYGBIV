@@ -198,5 +198,8 @@ MeshGenerator.prototype.generateSkybox = function(skybox){
   });
   var mesh = new THREE.Mesh(this.geometry, material);
   material.uniforms.modelViewMatrix.value = mesh.modelViewMatrix;
+  mesh.onBeforeRender = function(){
+    webglCallbackHandler.onBeforeRender(skybox);
+  }
   return mesh;
 }

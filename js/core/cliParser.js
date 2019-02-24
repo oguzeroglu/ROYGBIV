@@ -2109,9 +2109,7 @@ function parse(input){
             }
             skyboxMesh = new MeshGenerator(skyboxBufferGeometry, null).generateSkybox(skybox);
           }else{
-            var meshGenerator = new MeshGenerator();
             skyboxMesh.material.uniforms.cubeTexture.value = skybox.cubeTexture;
-            skyboxMesh.material.uniforms.alpha.value = skybox.alpha;
             skyboxMesh.material.uniforms.color.value.set(skybox.color);
           }
           scene.add(skyboxMesh);
@@ -2144,6 +2142,9 @@ function parse(input){
             scene.remove(skyboxMesh);
             skyboxVisible = false;
             fogBlendWithSkybox = false;
+            skyboxMesh.material.dispose();
+            skyboxMesh.geometry.dispose();
+            skyboxMesh.material.uniforms.cubeTexture.value.dispose();
           }
           delete skyBoxes[name];
           if (!jobHandlerWorking){
