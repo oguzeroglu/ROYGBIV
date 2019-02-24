@@ -665,8 +665,7 @@ if (!isDeployment){
     "Z/C: Rotates the camera around axis Z.",
     "Backspace: Destroys selected object.",
     ". : Shows corner coordinates of selected grids.",
-    "SHIFT: Activates grid selection mode.",
-    "TE: Opens the ROYGBIV terminal if closed."
+    "SHIFT: Activates grid selection mode."
   ];
 
   deprecatedCommandIndices = [

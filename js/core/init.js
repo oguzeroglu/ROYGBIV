@@ -487,13 +487,6 @@ window.addEventListener('keydown', function(event){
     }
   }
 
-  if (mode == 1 && !isDeployment && keyboardBuffer["E"] && keyboardBuffer["T"] && (terminalDiv.style.display == "none" || terminal.isDisabled)){
-    terminal.enable();
-    terminalDiv.style.display = "";
-    if (!isDeployment){
-      cliDivheader.style.display = "";
-    }
-  }
   if (mode == 1 && isPaused){
     return;
   }
