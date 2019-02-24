@@ -2174,7 +2174,6 @@ function parse(input){
             scene.remove(skyboxMesh);
             skyboxVisible = false;
             fogBlendWithSkybox = false;
-            GLOBAL_CUBE_TEXTURE_UNIFORM.value = nullCubeTexture;
             terminal.printInfo(Text.SKYBOX_HIDDEN);
           }else{
             if (skyboxVisible){

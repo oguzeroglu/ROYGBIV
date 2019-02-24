@@ -436,30 +436,6 @@ window.onload = function() {
   DDS_SUPPORTED = (!(renderer.context.getExtension("WEBGL_compressed_texture_s3tc") == null));
   INSTANCING_SUPPORTED = (!(renderer.context.getExtension("ANGLE_instanced_arrays") == null));
 
-  var tmpCanvas = document.createElement("canvas");
-  tmpCanvas.width = 1;
-  tmpCanvas.height = 1;
-  var tmpCtx = tmpCanvas.getContext("2d");
-  tmpCtx.fillStyle = "rgba("+255+","+255+","+255+","+(0)+")";
-  tmpCtx.fillRect(0, 0, 1, 1);
-  nullTexture = new THREE.CanvasTexture(tmpCanvas);
-  nullTexture.wrapS = THREE.ClampToEdgeWrapping;
-  nullTexture.wrapT = THREE.ClampToEdgeWrapping;
-  nullTexture.minFilter = THREE.NearestFilter;
-  nullTexture.magFilter = THREE.NearestFilter;
-  nullTexture.needsUpdate = true;
-  nullCubeTexture = new THREE.CubeTexture([
-    nullTexture.image, nullTexture.image, nullTexture.image,
-    nullTexture.image, nullTexture.image, nullTexture.image
-  ]);
-  GLOBAL_CUBE_TEXTURE_UNIFORM = new THREE.Uniform(nullCubeTexture);
-  GLOBAL_CUBE_TEXTURE_UNIFORM.value.wrapS = THREE.ClampToEdgeWrapping;
-  GLOBAL_CUBE_TEXTURE_UNIFORM.value.wrapT = THREE.ClampToEdgeWrapping;
-  GLOBAL_CUBE_TEXTURE_UNIFORM.value.minFilter = THREE.NearestFilter;
-  GLOBAL_CUBE_TEXTURE_UNIFORM.value.magFilter = THREE.NearestFilter;
-  GLOBAL_CUBE_TEXTURE_UNIFORM.value.needsUpdate = true;
-  nullTexture.isNullTexture = true;
-
   if (!isDeployment){
     terminal.init();
   }
