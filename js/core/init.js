@@ -125,6 +125,7 @@ window.onload = function() {
   loadInput = $("#loadInput");
   // 3D CANVAS
   canvas = document.getElementById("rendererCanvas");
+  webglCallbackHandler = new WebglCallbackHandler();
   canvas.requestPointerLock = canvas.requestPointerLock ||
                               canvas.mozRequestPointerLock ||
                               canvas.webkitRequestPointerLock;
@@ -416,7 +417,6 @@ window.onload = function() {
   camera.aspect = (window.innerWidth / window.innerHeight);
   GLOBAL_PROJECTION_UNIFORM.value = camera.projectionMatrix;
   GLOBAL_VIEW_UNIFORM.value = camera.matrixWorldInverse;
-  webglCallbackHandler = new WebglCallbackHandler();
   renderer = new THREE.WebGLRenderer({canvas: canvas});
   if (window.devicePixelRatio > 1){
     screenResolution = 1;
@@ -1091,7 +1091,7 @@ function startDeployment(){
 }
 
 function appendtoDeploymentConsole(val){
-  cliDiv.value += val + "\n";
+  document.getElementById("cliDiv").value += val + "\n";
 }
 
 function removeCLIDom(){

@@ -11,12 +11,63 @@ WebglCallbackHandler.prototype.registerEngineObject = function(object){
   }
 }
 
+WebglCallbackHandler.prototype.onShaderCompilationError = function(type, shaderInfoLog, lines){
+  this.shaderCompilationError = true;
+  if (!isDeployment){
+    canvas.style.visibility = "hidden";
+    terminal.disable();
+    terminal.clear();
+    terminal.printHeader("Fatal error");
+    terminal.printInfo("Shader compilation error: "+((type == this.gl.VERTEX_SHADER) ? "[VERTEX_SHADER]" : "[FRAGMENT_SHADER]"));
+    terminal.printInfo("Error: "+shaderInfoLog);
+    terminal.printHeader("Shader code");
+    terminal.printError(lines);
+  }else{
+    if (typeof cliDiv == UNDEFINED){
+      cliDiv = document.createElement("textarea");
+      cliDiv.id = "cliDiv";
+      cliDiv.className = "noselect";
+      document.body.insertBefore(cliDiv, canvas);
+      cliDiv.style.height = window.innerHeight +"px";
+      cliDiv.style.maxHeight = cliDiv.style.height;
+    }
+    canvas.style.visibility = "hidden";
+    cliDiv.value = "";
+    appendtoDeploymentConsole("FATAL ERROR. Please copy the message below and send it to the developer.");
+    appendtoDeploymentConsole("Shader compilation error: "+((type == this.gl.VERTEX_SHADER) ? "[VERTEX_SHADER]" : "[FRAGMENT_SHADER]"));
+    appendtoDeploymentConsole("Error: "+shaderInfoLog);
+    appendtoDeploymentConsole("Shader code");
+    appendtoDeploymentConsole(lines);
+    throw new Error("Shader compilation error.");
+  }
+}
+
+WebglCallbackHandler.prototype.onShaderCompilationWarning = function(type, shaderInfoLog, lines){
+
+}
+
 WebglCallbackHandler.prototype.onCreateBuffer = function(){
 
 }
 
 WebglCallbackHandler.prototype.onBeforeRender = function(object){
 
+}
+
+WebglCallbackHandler.prototype.onCreateProgram = function(){
+
+}
+
+WebglCallbackHandler.prototype.onCreateShader = function(){
+
+}
+
+WebglCallbackHandler.prototype.onBeforeCompileShader = function(shader){
+  this.gl.compileShader(shader);
+}
+
+WebglCallbackHandler.prototype.onBeforeShaderSource = function(shader, string){
+  this.gl.shaderSource(shader, string);
 }
 
 WebglCallbackHandler.prototype.onBeforeActiveTexture = function(slot){

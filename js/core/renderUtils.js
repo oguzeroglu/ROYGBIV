@@ -1,4 +1,7 @@
 function render(){
+  if (webglCallbackHandler.shaderCompilationError){
+    return;
+  }
   stats.begin();
   if (!(mode == 1 && isPaused)){
     requestID = requestAnimationFrame(render);

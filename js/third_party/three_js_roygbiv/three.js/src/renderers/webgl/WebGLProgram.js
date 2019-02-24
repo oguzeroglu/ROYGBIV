@@ -292,6 +292,7 @@ function WebGLProgram( renderer, extensions, code, material, shader, parameters 
 	//
 
 	var program = gl.createProgram();
+	window.webglCallbackHandler.onCreateProgram();
 
 	var prefixVertex, prefixFragment;
 
