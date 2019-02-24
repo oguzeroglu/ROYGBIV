@@ -1,6 +1,6 @@
 var WebglCallbackHandler = function(){
   this.doNotCache = false;
-  this.gl = canvas.getContext('webgl');
+  this.gl = renderer.context;
   this.vertexAttribPointerCache = new Map();
   this.bindedCubeTextureCache = new Map();
 }
@@ -60,6 +60,44 @@ WebglCallbackHandler.prototype.onCreateProgram = function(){
 
 WebglCallbackHandler.prototype.onCreateShader = function(){
 
+}
+
+WebglCallbackHandler.prototype.onBeforeBlendFuncSeparate = function(srcRGB, dstRGB, srcAlpha, dstAlpha, lineID){
+  this.gl.blendFuncSeparate(srcRGB, dstRGB, srcAlpha, dstAlpha);
+}
+
+WebglCallbackHandler.prototype.onBeforeBlendFunc = function(sFactor, dFactor, lineID){
+  this.gl.blendFunc(sFactor, dFactor);
+}
+
+WebglCallbackHandler.prototype.onBeforeBlendEquationSeparate = function(func, funcAlpha, lineID){
+  if (!this.doNotCache){
+    if (this.blendEquationRGBCache && this.blendEquationRGBCache == func){
+      if (this.blendEquationAlphaCache && this.blendEquationAlphaCache == funcAlpha){
+        return;
+      }
+    }
+  }
+  this.gl.blendEquationSeparate(func, funcAlpha);
+  if (!this.doNotCache){
+    this.blendEquationRGBCache = func;
+    this.blendEquationAlphaCache = funcAlpha;
+  }
+}
+
+WebglCallbackHandler.prototype.onBeforeBlendEquation = function(func, lineID){
+  if (!this.doNotCache){
+    if (this.blendEquationRGBCache && this.blendEquationRGBCache == func){
+      if (this.blendEquationAlphaCache && this.blendEquationAlphaCache == func){
+        return;
+      }
+    }
+  }
+  this.gl.blendEquation(func);
+  if (!this.doNotCache){
+    this.blendEquationRGBCache = func;
+    this.blendEquationAlphaCache = func;
+  }
 }
 
 WebglCallbackHandler.prototype.onBeforeUseProgram = function(program){

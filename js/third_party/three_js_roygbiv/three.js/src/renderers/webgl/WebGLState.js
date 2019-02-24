@@ -369,7 +369,11 @@ function WebGLState( gl, extensions, utils ) {
 		var data = new Uint8Array( 4 ); // 4 is required to match default unpack alignment of 4.
 		var texture = gl.createTexture();
 
-		window.webglCallbackHandler.onBeforeBindTexture(type, texture, 0);
+		if (window.webglCallbackHandler){
+			window.webglCallbackHandler.onBeforeBindTexture(type, texture, 0);
+		}else{
+			gl.bindTexture(type, texture);
+		}
 		//gl.bindTexture( type, texture );
 
 		gl.texParameteri( type, gl.TEXTURE_MIN_FILTER, gl.NEAREST );
@@ -549,13 +553,17 @@ function WebGLState( gl, extensions, utils ) {
 
 						if ( premultipliedAlpha ) {
 
-							gl.blendEquationSeparate( gl.FUNC_ADD, gl.FUNC_ADD );
-							gl.blendFuncSeparate( gl.ONE, gl.ONE, gl.ONE, gl.ONE );
+							window.webglCallbackHandler.onBeforeBlendEquationSeparate(gl.FUNC_ADD, gl.FUNC_ADD, 1);
+							//gl.blendEquationSeparate( gl.FUNC_ADD, gl.FUNC_ADD );
+							window.webglCallbackHandler.onBeforeBlendFuncSeparate(gl.ONE, gl.ONE, gl.ONE, gl.ONE, 1);
+							//gl.blendFuncSeparate( gl.ONE, gl.ONE, gl.ONE, gl.ONE );
 
 						} else {
 
-							gl.blendEquation( gl.FUNC_ADD );
-							gl.blendFunc( gl.SRC_ALPHA, gl.ONE );
+							window.webglCallbackHandler.onBeforeBlendEquation(gl.FUNC_ADD, 0);
+							//gl.blendEquation( gl.FUNC_ADD );
+							window.webglCallbackHandler.onBeforeBlendFunc(gl.SRC_ALPHA, gl.ONE, 0);
+							//gl.blendFunc( gl.SRC_ALPHA, gl.ONE );
 
 						}
 						break;
@@ -564,13 +572,17 @@ function WebGLState( gl, extensions, utils ) {
 
 						if ( premultipliedAlpha ) {
 
-							gl.blendEquationSeparate( gl.FUNC_ADD, gl.FUNC_ADD );
-							gl.blendFuncSeparate( gl.ZERO, gl.ZERO, gl.ONE_MINUS_SRC_COLOR, gl.ONE_MINUS_SRC_ALPHA );
+							window.webglCallbackHandler.onBeforeBlendEquationSeparate(gl.FUNC_ADD, gl.FUNC_ADD, 2);
+							//gl.blendEquationSeparate( gl.FUNC_ADD, gl.FUNC_ADD );
+							window.webglCallbackHandler.onBeforeBlendFuncSeparate(gl.ZERO, gl.ZERO, gl.ONE_MINUS_SRC_COLOR, gl.ONE_MINUS_SRC_ALPHA, 2);
+							//gl.blendFuncSeparate( gl.ZERO, gl.ZERO, gl.ONE_MINUS_SRC_COLOR, gl.ONE_MINUS_SRC_ALPHA );
 
 						} else {
 
-							gl.blendEquation( gl.FUNC_ADD );
-							gl.blendFunc( gl.ZERO, gl.ONE_MINUS_SRC_COLOR );
+							window.webglCallbackHandler.onBeforeBlendEquation(gl.FUNC_ADD, 1);
+							//gl.blendEquation( gl.FUNC_ADD );
+							window.webglCallbackHandler.onBeforeBlendFunc(gl.ZERO, gl.ONE_MINUS_SRC_COLOR, 1);
+							//gl.blendFunc( gl.ZERO, gl.ONE_MINUS_SRC_COLOR );
 
 						}
 						break;
@@ -579,13 +591,17 @@ function WebGLState( gl, extensions, utils ) {
 
 						if ( premultipliedAlpha ) {
 
-							gl.blendEquationSeparate( gl.FUNC_ADD, gl.FUNC_ADD );
-							gl.blendFuncSeparate( gl.ZERO, gl.SRC_COLOR, gl.ZERO, gl.SRC_ALPHA );
+							window.webglCallbackHandler.onBeforeBlendEquationSeparate(gl.FUNC_ADD, gl.FUNC_ADD, 3);
+							//gl.blendEquationSeparate( gl.FUNC_ADD, gl.FUNC_ADD );
+							window.webglCallbackHandler.onBeforeBlendFuncSeparate(gl.ZERO, gl.SRC_COLOR, gl.ZERO, gl.SRC_ALPHA, 3);
+							//gl.blendFuncSeparate( gl.ZERO, gl.SRC_COLOR, gl.ZERO, gl.SRC_ALPHA );
 
 						} else {
 
-							gl.blendEquation( gl.FUNC_ADD );
-							gl.blendFunc( gl.ZERO, gl.SRC_COLOR );
+							window.webglCallbackHandler.onBeforeBlendEquation(gl.FUNC_ADD, 2);
+							//gl.blendEquation( gl.FUNC_ADD );
+							window.webglCallbackHandler.onBeforeBlendFunc(gl.ZERO, gl.SRC_COLOR, 2);
+							//gl.blendFunc( gl.ZERO, gl.SRC_COLOR );
 
 						}
 						break;
@@ -594,13 +610,22 @@ function WebGLState( gl, extensions, utils ) {
 
 						if ( premultipliedAlpha ) {
 
-							gl.blendEquationSeparate( gl.FUNC_ADD, gl.FUNC_ADD );
-							gl.blendFuncSeparate( gl.ONE, gl.ONE_MINUS_SRC_ALPHA, gl.ONE, gl.ONE_MINUS_SRC_ALPHA );
+							window.webglCallbackHandler.onBeforeBlendEquationSeparate(gl.FUNC_ADD, gl.FUNC_ADD, 4);
+							//gl.blendEquationSeparate( gl.FUNC_ADD, gl.FUNC_ADD );
+							window.webglCallbackHandler.onBeforeBlendFuncSeparate(gl.ONE, gl.ONE_MINUS_SRC_ALPHA, gl.ONE, gl.ONE_MINUS_SRC_ALPHA, 4);
+							//gl.blendFuncSeparate( gl.ONE, gl.ONE_MINUS_SRC_ALPHA, gl.ONE, gl.ONE_MINUS_SRC_ALPHA );
 
 						} else {
 
-							gl.blendEquationSeparate( gl.FUNC_ADD, gl.FUNC_ADD );
-							gl.blendFuncSeparate( gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA, gl.ONE, gl.ONE_MINUS_SRC_ALPHA );
+							if (window.webglCallbackHandler){
+								window.webglCallbackHandler.onBeforeBlendEquationSeparate(gl.FUNC_ADD, gl.FUNC_ADD, 5);
+								window.webglCallbackHandler.onBeforeBlendFuncSeparate(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA, gl.ONE, gl.ONE_MINUS_SRC_ALPHA, 5);
+							}else{
+								gl.blendEquationSeparate( gl.FUNC_ADD, gl.FUNC_ADD );
+								gl.blendFuncSeparate( gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA, gl.ONE, gl.ONE_MINUS_SRC_ALPHA );
+							}
+							//gl.blendEquationSeparate( gl.FUNC_ADD, gl.FUNC_ADD );
+							//gl.blendFuncSeparate( gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA, gl.ONE, gl.ONE_MINUS_SRC_ALPHA );
 
 						}
 
@@ -623,7 +648,8 @@ function WebGLState( gl, extensions, utils ) {
 
 			if ( blendEquation !== currentBlendEquation || blendEquationAlpha !== currentBlendEquationAlpha ) {
 
-				gl.blendEquationSeparate( utils.convert( blendEquation ), utils.convert( blendEquationAlpha ) );
+				window.webglCallbackHandler.onBeforeBlendEquationSeparate(utils.convert(blendEquation), utils.convert(blendEquationAlpha), 0);
+				//gl.blendEquationSeparate( utils.convert( blendEquation ), utils.convert( blendEquationAlpha ) );
 
 				currentBlendEquation = blendEquation;
 				currentBlendEquationAlpha = blendEquationAlpha;
@@ -632,7 +658,8 @@ function WebGLState( gl, extensions, utils ) {
 
 			if ( blendSrc !== currentBlendSrc || blendDst !== currentBlendDst || blendSrcAlpha !== currentBlendSrcAlpha || blendDstAlpha !== currentBlendDstAlpha ) {
 
-				gl.blendFuncSeparate( utils.convert( blendSrc ), utils.convert( blendDst ), utils.convert( blendSrcAlpha ), utils.convert( blendDstAlpha ) );
+				window.webglCallbackHandler.onBeforeBlendFuncSeparate(utils.convert(blendSrc), utils.convert(blendDst), utils.convert(blendSrcAlpha), utils.convert(blendDstAlpha), 0);
+				//gl.blendFuncSeparate( utils.convert( blendSrc ), utils.convert( blendDst ), utils.convert( blendSrcAlpha ), utils.convert( blendDstAlpha ) );
 
 				currentBlendSrc = blendSrc;
 				currentBlendDst = blendDst;
