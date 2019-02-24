@@ -62,6 +62,18 @@ WebglCallbackHandler.prototype.onCreateShader = function(){
 
 }
 
+WebglCallbackHandler.prototype.onBeforeUseProgram = function(program){
+  this.gl.useProgram(program);
+}
+
+WebglCallbackHandler.prototype.onBeforeLinkProgram = function(program){
+  this.gl.linkProgram(program);
+}
+
+WebglCallbackHandler.prototype.onBeforeAttachShader = function(program, shader){
+  this.gl.attachShader(program, shader);
+}
+
 WebglCallbackHandler.prototype.onBeforeCompileShader = function(shader){
   this.gl.compileShader(shader);
 }

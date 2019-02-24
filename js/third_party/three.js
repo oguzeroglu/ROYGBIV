@@ -16915,8 +16915,10 @@
 		var glVertexShader = WebGLShader( gl, gl.VERTEX_SHADER, vertexGlsl );
 		var glFragmentShader = WebGLShader( gl, gl.FRAGMENT_SHADER, fragmentGlsl );
 
-		gl.attachShader( program, glVertexShader );
-		gl.attachShader( program, glFragmentShader );
+		window.webglCallbackHandler.onBeforeAttachShader(program, glVertexShader);
+		//gl.attachShader( program, glVertexShader );
+		window.webglCallbackHandler.onBeforeAttachShader(program, glFragmentShader);
+		//gl.attachShader( program, glFragmentShader );
 
 		// Force a particular attribute to index 0.
 
@@ -16931,7 +16933,8 @@
 
 		}
 
-		gl.linkProgram( program );
+		window.webglCallbackHandler.onBeforeLinkProgram(program);
+		//gl.linkProgram( program );
 
 		var programLog = gl.getProgramInfoLog( program ).trim();
 		var vertexLog = gl.getShaderInfoLog( glVertexShader ).trim();
@@ -19537,7 +19540,8 @@
 
 			if ( currentProgram !== program ) {
 
-				gl.useProgram( program );
+				window.webglCallbackHandler.onBeforeUseProgram(program);
+				//gl.useProgram( program );
 
 				currentProgram = program;
 

@@ -513,7 +513,8 @@ function WebGLState( gl, extensions, utils ) {
 
 		if ( currentProgram !== program ) {
 
-			gl.useProgram( program );
+			window.webglCallbackHandler.onBeforeUseProgram(program);
+			//gl.useProgram( program );
 
 			currentProgram = program;
 
