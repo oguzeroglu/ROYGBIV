@@ -1139,7 +1139,7 @@ StateLoader.prototype.finalize = function(){
   // ADDED OBJECTS EMISSIVE INTENSITY, EMISSIVE COLOR, AO INTENSITY, TEXTURE PROPERTIES
   for (var objName in addedObjects){
     var addedObject = addedObjects[objName];
-    if (addedObject.setTxtMatrix){
+    if (addedObject.setTxtMatrix && addedObject.mesh.material.uniforms.textureMatrix){
       for (var ix = 0; ix<addedObject.setTxtMatrix.length; ix++){
         addedObject.mesh.material.uniforms.textureMatrix.value.elements[ix] = addedObject.setTxtMatrix[ix];
       }

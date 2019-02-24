@@ -1,7 +1,8 @@
 var WebglCallbackHandler = function(){
   this.doNotCache = false;
-  this.gl = renderer.context;
+  this.gl = canvas.getContext('webgl');
   this.vertexAttribPointerCache = new Map();
+  this.bindedCubeTextureCache = new Map();
 }
 
 WebglCallbackHandler.prototype.registerEngineObject = function(object){
@@ -16,6 +17,30 @@ WebglCallbackHandler.prototype.onCreateBuffer = function(){
 
 WebglCallbackHandler.prototype.onBeforeRender = function(object){
 
+}
+
+WebglCallbackHandler.prototype.onBeforeActiveTexture = function(slot){
+  if (!this.doNotCache){
+    this.activeTextureSlot = slot;
+  }
+  this.gl.activeTexture(slot);
+}
+
+WebglCallbackHandler.prototype.onBeforeBindTexture = function(type, texture, lineID){
+  var curCachedElement;
+  var isCubeTexture = type == this.gl.TEXTURE_CUBE_MAP;
+  if (!this.doNotCache && this.activeTextureSlot && isCubeTexture){
+    curCachedElement = this.bindedCubeTextureCache.get(this.activeTextureSlot);
+    if (curCachedElement){
+      if (texture == curCachedElement){
+        return;
+      }
+    }
+  }
+  this.gl.bindTexture(type, texture);
+  if (!this.doNotCache && !curCachedElement && this.activeTextureSlot && isCubeTexture){
+    this.bindedCubeTextureCache.set(this.activeTextureSlot, texture);
+  }
 }
 
 WebglCallbackHandler.prototype.onBeforeVertexAttribPointer = function(index, size, type, normalized, stride, offset, buffer, lineID){

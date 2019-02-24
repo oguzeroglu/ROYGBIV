@@ -7264,7 +7264,7 @@ Roygbiv.prototype.requestPointerLock = function(){
   if (mode == 0){
     return;
   }
-  if (!pointerLockSupported){
+  if (!pointerLockSupported || isMobile){
     throw new Error("requestPointerLock error: Pointer Lock API is not supported by this browser.");
     return;
   }

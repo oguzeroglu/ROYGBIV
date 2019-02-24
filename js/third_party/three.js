@@ -19383,7 +19383,9 @@
 			var data = new Uint8Array( 4 ); // 4 is required to match default unpack alignment of 4.
 			var texture = gl.createTexture();
 
-			gl.bindTexture( type, texture );
+			window.webglCallbackHandler.onBeforeBindTexture(type, texture, 0);
+			//gl.bindTexture( type, texture );
+
 			gl.texParameteri( type, gl.TEXTURE_MIN_FILTER, gl.NEAREST );
 			gl.texParameteri( type, gl.TEXTURE_MAG_FILTER, gl.NEAREST );
 
@@ -19796,7 +19798,8 @@
 
 			if ( currentTextureSlot !== webglSlot ) {
 
-				gl.activeTexture( webglSlot );
+				window.webglCallbackHandler.onBeforeActiveTexture(webglSlot);
+				//gl.activeTexture( webglSlot );
 				currentTextureSlot = webglSlot;
 
 			}
@@ -19822,7 +19825,8 @@
 
 			if ( boundTexture.type !== webglType || boundTexture.texture !== webglTexture ) {
 
-				gl.bindTexture( webglType, webglTexture || emptyTextures[ webglType ] );
+				window.webglCallbackHandler.onBeforeBindTexture(webglType, webglTexture || emptyTextures[webglType]);
+				//gl.bindTexture( webglType, webglTexture || emptyTextures[ webglType ] );
 
 				boundTexture.type = webglType;
 				boundTexture.texture = webglTexture;
