@@ -1,17 +1,17 @@
-var WebglCallbackHandler = function(){
+var WebGLCallbackHandler = function(){
   this.doNotCache = false;
   this.gl = renderer.context;
   this.vertexAttribPointerCache = new Map();
   this.bindedCubeTextureCache = new Map();
 }
 
-WebglCallbackHandler.prototype.registerEngineObject = function(object){
+WebGLCallbackHandler.prototype.registerEngineObject = function(object){
   object.mesh.onBeforeRender = function(){
     webglCallbackHandler.onBeforeRender(object);
   }
 }
 
-WebglCallbackHandler.prototype.onShaderCompilationError = function(type, shaderInfoLog, lines){
+WebGLCallbackHandler.prototype.onShaderCompilationError = function(type, shaderInfoLog, lines){
   this.shaderCompilationError = true;
   if (!isDeployment){
     canvas.style.visibility = "hidden";
@@ -42,35 +42,35 @@ WebglCallbackHandler.prototype.onShaderCompilationError = function(type, shaderI
   }
 }
 
-WebglCallbackHandler.prototype.onShaderCompilationWarning = function(type, shaderInfoLog, lines){
+WebGLCallbackHandler.prototype.onShaderCompilationWarning = function(type, shaderInfoLog, lines){
 
 }
 
-WebglCallbackHandler.prototype.onCreateBuffer = function(){
+WebGLCallbackHandler.prototype.onCreateBuffer = function(){
 
 }
 
-WebglCallbackHandler.prototype.onBeforeRender = function(object){
+WebGLCallbackHandler.prototype.onBeforeRender = function(object){
 
 }
 
-WebglCallbackHandler.prototype.onCreateProgram = function(){
+WebGLCallbackHandler.prototype.onCreateProgram = function(){
 
 }
 
-WebglCallbackHandler.prototype.onCreateShader = function(){
+WebGLCallbackHandler.prototype.onCreateShader = function(){
 
 }
 
-WebglCallbackHandler.prototype.onBeforeBlendFuncSeparate = function(srcRGB, dstRGB, srcAlpha, dstAlpha, lineID){
+WebGLCallbackHandler.prototype.onBeforeBlendFuncSeparate = function(srcRGB, dstRGB, srcAlpha, dstAlpha, lineID){
   this.gl.blendFuncSeparate(srcRGB, dstRGB, srcAlpha, dstAlpha);
 }
 
-WebglCallbackHandler.prototype.onBeforeBlendFunc = function(sFactor, dFactor, lineID){
+WebGLCallbackHandler.prototype.onBeforeBlendFunc = function(sFactor, dFactor, lineID){
   this.gl.blendFunc(sFactor, dFactor);
 }
 
-WebglCallbackHandler.prototype.onBeforeBlendEquationSeparate = function(func, funcAlpha, lineID){
+WebGLCallbackHandler.prototype.onBeforeBlendEquationSeparate = function(func, funcAlpha, lineID){
   if (!this.doNotCache){
     if (this.blendEquationRGBCache && this.blendEquationRGBCache == func){
       if (this.blendEquationAlphaCache && this.blendEquationAlphaCache == funcAlpha){
@@ -85,7 +85,7 @@ WebglCallbackHandler.prototype.onBeforeBlendEquationSeparate = function(func, fu
   }
 }
 
-WebglCallbackHandler.prototype.onBeforeBlendEquation = function(func, lineID){
+WebGLCallbackHandler.prototype.onBeforeBlendEquation = function(func, lineID){
   if (!this.doNotCache){
     if (this.blendEquationRGBCache && this.blendEquationRGBCache == func){
       if (this.blendEquationAlphaCache && this.blendEquationAlphaCache == func){
@@ -100,34 +100,34 @@ WebglCallbackHandler.prototype.onBeforeBlendEquation = function(func, lineID){
   }
 }
 
-WebglCallbackHandler.prototype.onBeforeUseProgram = function(program){
+WebGLCallbackHandler.prototype.onBeforeUseProgram = function(program){
   this.gl.useProgram(program);
 }
 
-WebglCallbackHandler.prototype.onBeforeLinkProgram = function(program){
+WebGLCallbackHandler.prototype.onBeforeLinkProgram = function(program){
   this.gl.linkProgram(program);
 }
 
-WebglCallbackHandler.prototype.onBeforeAttachShader = function(program, shader){
+WebGLCallbackHandler.prototype.onBeforeAttachShader = function(program, shader){
   this.gl.attachShader(program, shader);
 }
 
-WebglCallbackHandler.prototype.onBeforeCompileShader = function(shader){
+WebGLCallbackHandler.prototype.onBeforeCompileShader = function(shader){
   this.gl.compileShader(shader);
 }
 
-WebglCallbackHandler.prototype.onBeforeShaderSource = function(shader, string){
+WebGLCallbackHandler.prototype.onBeforeShaderSource = function(shader, string){
   this.gl.shaderSource(shader, string);
 }
 
-WebglCallbackHandler.prototype.onBeforeActiveTexture = function(slot){
+WebGLCallbackHandler.prototype.onBeforeActiveTexture = function(slot){
   if (!this.doNotCache){
     this.activeTextureSlot = slot;
   }
   this.gl.activeTexture(slot);
 }
 
-WebglCallbackHandler.prototype.onBeforeBindTexture = function(type, texture, lineID){
+WebGLCallbackHandler.prototype.onBeforeBindTexture = function(type, texture, lineID){
   var curCachedElement;
   var isCubeTexture = type == this.gl.TEXTURE_CUBE_MAP;
   if (!this.doNotCache && this.activeTextureSlot && isCubeTexture){
@@ -144,7 +144,7 @@ WebglCallbackHandler.prototype.onBeforeBindTexture = function(type, texture, lin
   }
 }
 
-WebglCallbackHandler.prototype.onBeforeVertexAttribPointer = function(index, size, type, normalized, stride, offset, buffer, lineID){
+WebGLCallbackHandler.prototype.onBeforeVertexAttribPointer = function(index, size, type, normalized, stride, offset, buffer, lineID){
   var curCachedElement;
   if (!this.doNotCache){
     curCachedElement = this.vertexAttribPointerCache.get(index);
@@ -179,7 +179,7 @@ WebglCallbackHandler.prototype.onBeforeVertexAttribPointer = function(index, siz
   }
 }
 
-WebglCallbackHandler.prototype.onBeforeBindBuffer = function(isElementArrayBuffer, buffer, lineID){
+WebGLCallbackHandler.prototype.onBeforeBindBuffer = function(isElementArrayBuffer, buffer, lineID){
   if (!this.doNotCache){
     if (isElementArrayBuffer && this.lastBindElementArrayBuffer){
       if (this.lastBindElementArrayBuffer == buffer){

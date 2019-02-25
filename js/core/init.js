@@ -417,7 +417,7 @@ window.onload = function() {
   GLOBAL_PROJECTION_UNIFORM.value = camera.projectionMatrix;
   GLOBAL_VIEW_UNIFORM.value = camera.matrixWorldInverse;
   renderer = new THREE.WebGLRenderer({canvas: canvas});
-  webglCallbackHandler = new WebglCallbackHandler();
+  webglCallbackHandler = new WebGLCallbackHandler();
   if (window.devicePixelRatio > 1){
     screenResolution = 1;
     renderer.setPixelRatio(1);
