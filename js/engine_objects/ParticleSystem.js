@@ -445,6 +445,10 @@ var ParticleSystem = function(copyPS, name, particles, x, y, z, vx, vy, vz, ax, 
   if (!noTargetColor){
     this.injectMacro(this.material, "HAS_TARGET_COLOR", true, false);
   }
+  if (particleSystemRefHeight){
+    this.injectMacro(this.material, "HAS_REF_HEIGHT", true, false);
+    this.material.uniforms.refHeightCoef = GLOBAL_PS_REF_HEIGHT_UNIFORM; 
+  }
 
   this.mesh = new THREE.Points(this.geometry, this.material);
   this.mesh.position.set(x, y, z);

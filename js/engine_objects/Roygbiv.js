@@ -169,7 +169,8 @@ var Roygbiv = function(){
     "setTextCenterPosition",
     "hideText",
     "showText",
-    "getFPS"
+    "getFPS",
+    "makeParticleSystemsResponsive"
   ];
 
   this.globals = new Object();
@@ -5483,6 +5484,36 @@ Roygbiv.prototype.createInitializedParticleSystemPool = function(poolName, refPa
     this.addParticleSystemToPool(pool, this.copyParticleSystem(refParticleSystem, this.generateParticleSystemName()));
   }
   return pool;
+}
+
+// makeParticleSystemsResponsive
+// Makes the particle systems responsive for different screens. This function
+// should be used before any particle system creation. The referenceHeight can
+// be calculated by dividing the design screen viewport height by the screen resolution
+// (renderer.getCurrentViewport().w / screenResolution). The referenceHeight should
+// be a constant (not to be calculated during runtime).
+Roygbiv.prototype.makeParticleSystemsResponsive = function(referenceHeight){
+  if (mode == 0){
+    return;
+  }
+  if (typeof referenceHeight == UNDEFINED){
+    throw new Error("makeParticleSystemsResponsive error: referenceHeight is not defined.");
+    return;
+  }
+  if (isNaN(referenceHeight)){
+    throw new Error("makeParticleSystemsResponsive error: referenceHeight is not a number.");
+    return;
+  }
+  if (referenceHeight <= 0){
+    throw new Error("makeParticleSystemsResponsive error: referenceHeight must be greater than zero.");
+    return;
+  }
+  if (TOTAL_PARTICLE_SYSTEM_COUNT > 0){
+    throw new Error("makeParticleSystemsResponsive error: This API should be used before any particle system creation.");
+    return;
+  }
+  particleSystemRefHeight = referenceHeight;
+  GLOBAL_PS_REF_HEIGHT_UNIFORM.value = ((renderer.getCurrentViewport().w / screenResolution) / particleSystemRefHeight);
 }
 
 // CROSSHAIR FUNCTIONS *********************************************************

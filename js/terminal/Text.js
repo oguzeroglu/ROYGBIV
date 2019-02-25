@@ -910,4 +910,5 @@ var Text = function(){
    this.ROYGBIV_SCRIPTING_API_HIDETEXT = "Makes the given text object invisible. Does nothing if the text is already invisible.";
    this.ROYGBIV_SCRIPTING_API_SHOWTEXT = "Makes the given text object visible. Does nothing if the text is already visible.";
    this.ROYGBIV_SCRIPTING_API_GETFPS = "Returns the current FPS";
+   this.ROYGBIV_SCRIPTING_API_MAKEPARTICLESYSTEMSRESPONSIVE = "Makes the particle systems responsive for different screens. This function should be used before any particle system creation.\nThe referenceHeight can be calculated by dividing the design screen viewport height by the screen resolution\n(renderer.getCurrentViewport().w / screenResolution). The referenceHeight should be a constant (not to be calculated during runtime).";
 }

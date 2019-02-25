@@ -253,6 +253,10 @@ var ParticleSystemMerger = function(psObj, name){
   if (!this.noTargetColor){
     this.injectMacro(this.material, "HAS_TARGET_COLOR", true, false);
   }
+  if (particleSystemRefHeight){
+    this.injectMacro(this.material, "HAS_REF_HEIGHT", true, false);
+    this.material.uniforms.refHeightCoef = GLOBAL_PS_REF_HEIGHT_UNIFORM;
+  }
   this.mesh = new THREE.Points(this.geometry, this.material);
   this.mesh.frustumCulled = false;
   scene.add(this.mesh);

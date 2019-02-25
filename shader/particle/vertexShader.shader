@@ -21,6 +21,9 @@ uniform mat4 projectionMatrix;
 
 #define INSERTION
 
+#ifdef HAS_REF_HEIGHT
+  uniform float refHeightCoef;
+#endif
 #ifdef IS_MERGED
   attribute float mergedIndex;
   uniform float timeArray[OBJECT_SIZE];
@@ -281,6 +284,9 @@ void main(){
     }
 
     gl_PointSize = (500.0 - (selectedDissapearCoef * selectedTime)) * size / length(mvPosition.xyz);
+    #ifdef HAS_REF_HEIGHT
+      gl_PointSize = gl_PointSize * refHeightCoef;
+    #endif
     gl_Position = projectionMatrix * mvPosition;
 
   }

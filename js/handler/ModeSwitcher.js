@@ -73,6 +73,8 @@ ModeSwitcher.prototype.commonSwitchFunctions = function(){
   isPaused = false;
   maxInactiveTime = 0;
   inactiveCounter = 0;
+  particleSystemRefHeight = 0;
+  GLOBAL_PS_REF_HEIGHT_UNIFORM.value = 0;
   trackingObjects = new Object();
   defaultCameraControlsDisabled = false;
   initBadTV();

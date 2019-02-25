@@ -737,6 +737,9 @@ function resizeFunction(){
     }
     if (mode == 1){
       handleViewport();
+      if (particleSystemRefHeight){
+        GLOBAL_PS_REF_HEIGHT_UNIFORM.value = ((renderer.getCurrentViewport().w / screenResolution) / particleSystemRefHeight);
+      }
     }
     if (mode == 0){
       for (var areaName in areas){
