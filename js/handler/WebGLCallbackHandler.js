@@ -62,6 +62,22 @@ WebGLCallbackHandler.prototype.onCreateShader = function(){
 
 }
 
+WebGLCallbackHandler.prototype.onBeforeUniform4iv = function(location, v){
+  this.gl.uniform4iv(location, v);
+}
+
+WebGLCallbackHandler.prototype.onBeforeUniform3iv = function(location, v){
+  this.gl.uniform3iv(location, v);
+}
+
+WebGLCallbackHandler.prototype.onBeforeUniform2iv = function(location, v){
+  this.gl.uniform2iv(location, v);
+}
+
+WebGLCallbackHandler.prototype.onBeforeUniform1iv = function(location, v){
+  this.gl.uniform1iv(location, v);
+}
+
 WebGLCallbackHandler.prototype.onBeforeUniform4fv = function(location, v){
   this.gl.uniform4fv(location, v);}
 
