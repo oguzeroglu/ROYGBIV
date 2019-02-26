@@ -15685,7 +15685,7 @@
 
 			if ( cache[ 0 ] !== v.x || cache[ 1 ] !== v.y ) {
 
-				webglCallbackHandler.onBeforeUniform2f(this.addr, v.x, v.y);
+				window.webglCallbackHandler.onBeforeUniform2f(this.addr, v.x, v.y);
 				//gl.uniform2f( this.addr, v.x, v.y );
 
 				cache[ 0 ] = v.x;
@@ -15791,7 +15791,8 @@
 
 			if ( arraysEqual( cache, v ) ) return;
 
-			gl.uniformMatrix2fv( this.addr, false, v );
+			window.webglCallbackHandler.onBeforeUniformMatrix2fv(this.addr, false, v);
+			//gl.uniformMatrix2fv( this.addr, false, v );
 
 			copyArray( cache, v );
 
@@ -15801,7 +15802,8 @@
 
 			mat2array.set( elements );
 
-			gl.uniformMatrix2fv( this.addr, false, mat2array );
+			window.webglCallbackHandler.onBeforeUniformMatrix2fv(this.addr, false, mat2array);
+			//gl.uniformMatrix2fv( this.addr, false, mat2array );
 
 			copyArray( cache, elements );
 
@@ -15818,7 +15820,8 @@
 
 			if ( arraysEqual( cache, v ) ) return;
 
-			gl.uniformMatrix3fv( this.addr, false, v );
+			window.webglCallbackHandler.onBeforeUniformMatrix3fv(this.addr, false, v);
+			//gl.uniformMatrix3fv( this.addr, false, v );
 
 			copyArray( cache, v );
 
@@ -15828,7 +15831,8 @@
 
 			mat3array.set( elements );
 
-			gl.uniformMatrix3fv( this.addr, false, mat3array );
+			window.webglCallbackHandler.onBeforeUniformMatrix3fv(this.addr, false, mat3array);
+			//gl.uniformMatrix3fv( this.addr, false, mat3array );
 
 			copyArray( cache, elements );
 
@@ -15845,7 +15849,8 @@
 
 			if ( arraysEqual( cache, v ) ) return;
 
-			gl.uniformMatrix4fv( this.addr, false, v );
+			window.webglCallbackHandler.onBeforeUniformMatrix4fv(this.addr, false, v);
+			//gl.uniformMatrix4fv( this.addr, false, v );
 
 			copyArray( cache, v );
 
@@ -15855,7 +15860,8 @@
 
 			mat4array.set( elements );
 
-			gl.uniformMatrix4fv( this.addr, false, mat4array );
+			window.webglCallbackHandler.onBeforeUniformMatrix4fv(this.addr, false, mat4array);
+			//gl.uniformMatrix4fv( this.addr, false, mat4array );
 
 			copyArray( cache, elements );
 
@@ -16047,7 +16053,8 @@
 
 		if ( arraysEqual( cache, data ) ) return;
 
-		gl.uniformMatrix2fv( this.addr, false, data );
+		window.webglCallbackHandler.onBeforeUniformMatrix2fv(this.addr, false, data);
+		//gl.uniformMatrix2fv( this.addr, false, data );
 
 		this.updateCache( data );
 
@@ -16060,7 +16067,8 @@
 
 		if ( arraysEqual( cache, data ) ) return;
 
-		gl.uniformMatrix3fv( this.addr, false, data );
+		window.webglCallbackHandler.onBeforeUniformMatrix3fv(this.addr, false, data);
+		//gl.uniformMatrix3fv( this.addr, false, data );
 
 		this.updateCache( data );
 
@@ -16073,7 +16081,8 @@
 
 		if ( arraysEqual( cache, data ) ) return;
 
-		gl.uniformMatrix4fv( this.addr, false, data );
+		window.webglCallbackHandler.onBeforeUniformMatrix4fv(this.addr, false, data);
+		//gl.uniformMatrix4fv( this.addr, false, data );
 
 		this.updateCache( data );
 

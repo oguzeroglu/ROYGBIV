@@ -62,6 +62,18 @@ WebGLCallbackHandler.prototype.onCreateShader = function(){
 
 }
 
+WebGLCallbackHandler.prototype.onBeforeUniformMatrix4fv = function(location, transpose, v){
+  this.gl.uniformMatrix4fv(location, transpose, v);
+}
+
+WebGLCallbackHandler.prototype.onBeforeUniformMatrix3fv = function(location, transpose, v){
+  this.gl.uniformMatrix3fv(location, transpose, v);
+}
+
+WebGLCallbackHandler.prototype.onBeforeUniformMatrix2fv = function(location, transpose, v){
+  this.gl.uniformMatrix2fv(location, transpose, v);
+}
+
 WebGLCallbackHandler.prototype.onBeforeUniform4iv = function(location, v){
   this.gl.uniform4iv(location, v);
 }
