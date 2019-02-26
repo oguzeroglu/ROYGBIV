@@ -15668,7 +15668,8 @@
 
 		if ( cache[ 0 ] === v ) return;
 
-		gl.uniform1i( this.addr, v );
+		window.webglCallbackHandler.onBeforeUniform1i(this.addr, v);
+		//gl.uniform1i( this.addr, v );
 
 		cache[ 0 ] = v;
 
@@ -15868,7 +15869,8 @@
 
 		if ( cache[ 0 ] !== unit ) {
 
-			gl.uniform1i( this.addr, unit );
+			window.webglCallbackHandler.onBeforeUniform1i(this.addr, unit);
+			//gl.uniform1i( this.addr, unit );
 			cache[ 0 ] = unit;
 
 		}
@@ -15884,7 +15886,8 @@
 
 		if ( cache[ 0 ] !== unit ) {
 
-			gl.uniform1i( this.addr, unit );
+			window.webglCallbackHandler.onBeforeUniform1i(this.addr, unit);
+			//gl.uniform1i( this.addr, unit );
 			cache[ 0 ] = unit;
 
 		}

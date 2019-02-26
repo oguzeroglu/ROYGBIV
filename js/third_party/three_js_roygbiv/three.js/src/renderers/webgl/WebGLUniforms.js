@@ -182,7 +182,8 @@ function setValue1i( gl, v ) {
 
 	if ( cache[ 0 ] === v ) return;
 
-	gl.uniform1i( this.addr, v );
+	window.webglCallbackHandler.onBeforeUniform1i(this.addr, v);
+	//gl.uniform1i( this.addr, v );
 
 	cache[ 0 ] = v;
 
@@ -382,7 +383,8 @@ function setValueT1( gl, v, renderer ) {
 
 	if ( cache[ 0 ] !== unit ) {
 
-		gl.uniform1i( this.addr, unit );
+		window.webglCallbackHandler.onBeforeUniform1i(this.addr, unit);
+		//gl.uniform1i( this.addr, unit );
 		cache[ 0 ] = unit;
 
 	}
@@ -398,7 +400,8 @@ function setValueT6( gl, v, renderer ) {
 
 	if ( cache[ 0 ] !== unit ) {
 
-		gl.uniform1i( this.addr, unit );
+		window.webglCallbackHandler.onBeforeUniform1i(this.addr, unit);
+		//gl.uniform1i( this.addr, unit );
 		cache[ 0 ] = unit;
 
 	}
