@@ -62,6 +62,22 @@ WebGLCallbackHandler.prototype.onCreateShader = function(){
 
 }
 
+WebGLCallbackHandler.prototype.onBeforeUniform4f = function(location, v0, v1, v2, v3){
+  this.gl.uniform4f(location, v0, v1, v2, v3);
+}
+
+WebGLCallbackHandler.prototype.onBeforeUniform3f = function(location, v0, v1, v2){
+  this.gl.uniform3f(location, v0, v1, v2);
+}
+
+WebGLCallbackHandler.prototype.onBeforeUniform2f = function(location, v0, v1){
+  this.gl.uniform2f(location, v0, v1);
+}
+
+WebGLCallbackHandler.prototype.onBeforeUniform1f = function(location, v0){
+  this.gl.uniform1f(location, v0);
+}
+
 WebGLCallbackHandler.prototype.onBeforeBlendFuncSeparate = function(srcRGB, dstRGB, srcAlpha, dstAlpha, lineID){
   this.gl.blendFuncSeparate(srcRGB, dstRGB, srcAlpha, dstAlpha);
 }

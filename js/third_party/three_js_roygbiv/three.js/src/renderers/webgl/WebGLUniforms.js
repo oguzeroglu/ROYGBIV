@@ -169,7 +169,8 @@ function setValue1f( gl, v ) {
 
 	if ( cache[ 0 ] === v ) return;
 
-	gl.uniform1f( this.addr, v );
+	window.webglCallbackHandler.onBeforeUniform1f(this.addr, v);
+	//gl.uniform1f( this.addr, v );
 
 	cache[ 0 ] = v;
 
@@ -197,7 +198,8 @@ function setValue2fv( gl, v ) {
 
 		if ( cache[ 0 ] !== v.x || cache[ 1 ] !== v.y ) {
 
-			gl.uniform2f( this.addr, v.x, v.y );
+			webglCallbackHandler.onBeforeUniform2f(this.addr, v.x, v.y);
+			//gl.uniform2f( this.addr, v.x, v.y );
 
 			cache[ 0 ] = v.x;
 			cache[ 1 ] = v.y;
@@ -224,7 +226,8 @@ function setValue3fv( gl, v ) {
 
 		if ( cache[ 0 ] !== v.x || cache[ 1 ] !== v.y || cache[ 2 ] !== v.z ) {
 
-			gl.uniform3f( this.addr, v.x, v.y, v.z );
+			window.webglCallbackHandler.onBeforeUniform3f(this.addr, v.x, v.y, v.z);
+			//gl.uniform3f( this.addr, v.x, v.y, v.z );
 
 			cache[ 0 ] = v.x;
 			cache[ 1 ] = v.y;
@@ -236,7 +239,8 @@ function setValue3fv( gl, v ) {
 
 		if ( cache[ 0 ] !== v.r || cache[ 1 ] !== v.g || cache[ 2 ] !== v.b ) {
 
-			gl.uniform3f( this.addr, v.r, v.g, v.b );
+			window.webglCallbackHandler.onBeforeUniform3f(this.addr, v.r, v.g, v.b);
+			//gl.uniform3f( this.addr, v.r, v.g, v.b );
 
 			cache[ 0 ] = v.r;
 			cache[ 1 ] = v.g;
@@ -264,7 +268,8 @@ function setValue4fv( gl, v ) {
 
 		if ( cache[ 0 ] !== v.x || cache[ 1 ] !== v.y || cache[ 2 ] !== v.z || cache[ 3 ] !== v.w ) {
 
-			gl.uniform4f( this.addr, v.x, v.y, v.z, v.w );
+			window.webglCallbackHandler.onBeforeUniform4f(this.addr, v.x, v.y, v.z, v.w);
+			//gl.uniform4f( this.addr, v.x, v.y, v.z, v.w );
 
 			cache[ 0 ] = v.x;
 			cache[ 1 ] = v.y;
