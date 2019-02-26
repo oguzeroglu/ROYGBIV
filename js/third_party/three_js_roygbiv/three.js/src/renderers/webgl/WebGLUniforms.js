@@ -211,7 +211,8 @@ function setValue2fv( gl, v ) {
 
 		if ( arraysEqual( cache, v ) ) return;
 
-		gl.uniform2fv( this.addr, v );
+		window.webglCallbackHandler.onBeforeUniform2fv(this.addr, v);
+		//gl.uniform2fv( this.addr, v );
 
 		copyArray( cache, v );
 
@@ -253,7 +254,8 @@ function setValue3fv( gl, v ) {
 
 		if ( arraysEqual( cache, v ) ) return;
 
-		gl.uniform3fv( this.addr, v );
+		window.webglCallbackHandler.onBeforeUniform3fv(this.addr, v);
+		//gl.uniform3fv( this.addr, v );
 
 		copyArray( cache, v );
 
@@ -283,7 +285,8 @@ function setValue4fv( gl, v ) {
 
 		if ( arraysEqual( cache, v ) ) return;
 
-		gl.uniform4fv( this.addr, v );
+		window.webglCallbackHandler.onBeforeUniform4fv(this.addr, v);
+		//gl.uniform4fv( this.addr, v );
 
 		copyArray( cache, v );
 
@@ -483,7 +486,8 @@ function setValue1fv( gl, v ) {
 
 	if ( arraysEqual( cache, v ) ) return;
 
-	gl.uniform1fv( this.addr, v );
+	window.webglCallbackHandler.onBeforeUniform1fv(this.addr, v);
+	//gl.uniform1fv( this.addr, v );
 
 	copyArray( cache, v );
 
@@ -509,7 +513,8 @@ function setValueV2a( gl, v ) {
 
 	if ( arraysEqual( cache, data ) ) return;
 
-	gl.uniform2fv( this.addr, data );
+	window.webglCallbackHandler.onBeforeUniform2fv(this.addr, data);
+	//gl.uniform2fv( this.addr, data );
 
 	this.updateCache( data );
 
@@ -522,7 +527,8 @@ function setValueV3a( gl, v ) {
 
 	if ( arraysEqual( cache, data ) ) return;
 
-	gl.uniform3fv( this.addr, data );
+	window.webglCallbackHandler.onBeforeUniform3fv(this.addr, data);
+	//gl.uniform3fv( this.addr, data );
 
 	this.updateCache( data );
 
@@ -535,7 +541,8 @@ function setValueV4a( gl, v ) {
 
 	if ( arraysEqual( cache, data ) ) return;
 
-	gl.uniform4fv( this.addr, data );
+	window.webglCallbackHandler.onBeforeUniform4fv(this.addr, data);
+	//gl.uniform4fv( this.addr, data );
 
 	this.updateCache( data );
 
