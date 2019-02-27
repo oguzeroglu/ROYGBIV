@@ -1037,6 +1037,7 @@ var roygbivSkippedArrayBufferUpdates = 0;
 var roygbivSkippedElementArrayBufferUpdates = 0;
 var selectionHandler;
 var guiHandler;
+var cpuOperationsHandler;
 var particleSystemRefHeight = 0;
 
 // WORKER VARIABLES

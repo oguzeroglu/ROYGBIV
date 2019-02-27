@@ -16,9 +16,11 @@ function render(){
   if (!(mode == 1 && defaultCameraControlsDisabled)){
     processKeyboardBuffer();
   }
-  handleSkybox();
+
+  cpuOperationsHandler.handleSkybox();
+
   if (!stopAreaConfigurationsHandler){
-    areaConfigurationsHandler.handle();
+    cpuOperationsHandler.handleAreaConfigurations();
   }
 
   if (physicsDebugMode){
@@ -27,22 +29,22 @@ function render(){
 
   if (mode == 1){
     if (!isPhysicsWorkerEnabled()){
-      physicsWorld.step(physicsStepAmount);
-      updateDynamicObjects();
-      updateTrackingObjects();
+      cpuOperationsHandler.stepPhysics();
+      cpuOperationsHandler.updateDynamicObjects();
+      cpuOperationsHandler.updateTrackingObjects();
     }
-    processCameraRotationBuffer();
-    runScripts();
-    updateRaycaster();
-    updateParticleSystems();
-    updateObjectTrails();
-    updateCrosshair();
+    cpuOperationsHandler.processCameraRotationBuffer();
+    cpuOperationsHandler.runScripts();
+    cpuOperationsHandler.updateRaycaster();
+    cpuOperationsHandler.updateParticleSystems();
+    cpuOperationsHandler.updateObjectTrails();
+    cpuOperationsHandler.updateCrosshair();
   }else{
     cameraOperationsDone = false;
   }
 
-  renderScene();
-  updateAddedTexts();
+  cpuOperationsHandler.renderScene();
+  cpuOperationsHandler.updateAddedTexts();
   if (mode == 1){
     previewSceneRendered = true;
   }

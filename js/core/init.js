@@ -62,6 +62,9 @@ window.onload = function() {
     selectionHandler = new SelectionHandler();
   }
 
+  // CPU OPERATIONS HANDLER
+  cpuOperationsHandler = new CPUOperationsHandler();
+
   // SCRIPTING UTILITY FUNCTIONS
   ROYGBIV = new Roygbiv();
   if (!isDeployment){
