@@ -23,7 +23,9 @@ function WebGLIndexedBufferRenderer( gl, extensions, info ) {
 
 	function render( start, count ) {
 
-		gl.drawElements( mode, count, type, start * bytesPerElement );
+
+		window.webglCallbackHandler.onBeforeDrawElements(mode, count, type, start * bytesPerElement);
+		//gl.drawElements( mode, count, type, start * bytesPerElement );
 
 		info.update( count, mode );
 
@@ -40,7 +42,8 @@ function WebGLIndexedBufferRenderer( gl, extensions, info ) {
 
 		}
 
-		extension.drawElementsInstancedANGLE( mode, count, type, start * bytesPerElement, geometry.maxInstancedCount );
+		window.webglCallbackHandler.onBeforeDrawElementsInstancedANGLE(extension, mode, count, type, start * bytesPerElement, geometry.maxInstancedCount);
+		//extension.drawElementsInstancedANGLE( mode, count, type, start * bytesPerElement, geometry.maxInstancedCount );
 
 		info.update( count, mode, geometry.maxInstancedCount );
 

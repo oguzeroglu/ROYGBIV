@@ -62,6 +62,22 @@ WebGLCallbackHandler.prototype.onCreateShader = function(){
 
 }
 
+WebGLCallbackHandler.prototype.onBeforeDrawElementsInstancedANGLE = function(ext, mode, count, type, offset, maxCount){
+  ext.drawElementsInstancedANGLE(mode, count, type, offset, maxCount);
+}
+
+WebGLCallbackHandler.prototype.onBeforeDrawArraysInstancedANGLE = function(ext, mode, start, count, maxCount){
+  ext.drawArraysInstancedANGLE(mode, start, count, maxCount);
+}
+
+WebGLCallbackHandler.prototype.onBeforeDrawElements = function(mode, count, type, offset){
+  this.gl.drawElements(mode, count, type, offset);
+}
+
+WebGLCallbackHandler.prototype.onBeforeDrawArrays = function(mode, start, count){
+  this.gl.drawArrays(mode, start, count);
+}
+
 WebGLCallbackHandler.prototype.onBeforeUniformMatrix4fv = function(location, transpose, v){
   this.gl.uniformMatrix4fv(location, transpose, v);
 }

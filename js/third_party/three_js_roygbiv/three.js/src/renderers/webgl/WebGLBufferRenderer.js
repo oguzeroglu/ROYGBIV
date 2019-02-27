@@ -14,7 +14,8 @@ function WebGLBufferRenderer( gl, extensions, info ) {
 
 	function render( start, count ) {
 
-		gl.drawArrays( mode, start, count );
+		window.webglCallbackHandler.onBeforeDrawArrays(mode, start, count);
+		//gl.drawArrays( mode, start, count );
 
 		info.update( count, mode );
 
@@ -31,7 +32,8 @@ function WebGLBufferRenderer( gl, extensions, info ) {
 
 		}
 
-		extension.drawArraysInstancedANGLE( mode, start, count, geometry.maxInstancedCount );
+		window.webglCallbackHandler.onBeforeDrawArraysInstancedANGLE(extension, mode, start, count, geometry.maxInstancedCount);
+		//extension.drawArraysInstancedANGLE( mode, start, count, geometry.maxInstancedCount );
 
 		info.update( count, mode, geometry.maxInstancedCount );
 

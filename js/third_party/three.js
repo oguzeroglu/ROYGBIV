@@ -14608,7 +14608,8 @@
 
 		function render( start, count ) {
 
-			gl.drawArrays( mode, start, count );
+			window.webglCallbackHandler.onBeforeDrawArrays(mode, start, count);
+			//gl.drawArrays( mode, start, count );
 
 			info.update( count, mode );
 
@@ -14625,7 +14626,8 @@
 
 			}
 
-			extension.drawArraysInstancedANGLE( mode, start, count, geometry.maxInstancedCount );
+			window.webglCallbackHandler.onBeforeDrawArraysInstancedANGLE(extension, mode, start, count, geometry.maxInstancedCount);
+			//extension.drawArraysInstancedANGLE( mode, start, count, geometry.maxInstancedCount );
 
 			info.update( count, mode, geometry.maxInstancedCount );
 
@@ -15179,7 +15181,9 @@
 
 		function render( start, count ) {
 
-			gl.drawElements( mode, count, type, start * bytesPerElement );
+
+			window.webglCallbackHandler.onBeforeDrawElements(mode, count, type, start * bytesPerElement);
+			//gl.drawElements( mode, count, type, start * bytesPerElement );
 
 			info.update( count, mode );
 
@@ -15196,7 +15200,8 @@
 
 			}
 
-			extension.drawElementsInstancedANGLE( mode, count, type, start * bytesPerElement, geometry.maxInstancedCount );
+			window.webglCallbackHandler.onBeforeDrawElementsInstancedANGLE(extension, mode, count, type, start * bytesPerElement, geometry.maxInstancedCount);
+			//extension.drawElementsInstancedANGLE( mode, count, type, start * bytesPerElement, geometry.maxInstancedCount );
 
 			info.update( count, mode, geometry.maxInstancedCount );
 
@@ -22349,7 +22354,8 @@
 
 			state.disableUnusedAttributes();
 
-			_gl.drawArrays( _gl.TRIANGLES, 0, object.count );
+			window.webglCallbackHandler.onBeforeDrawArrays(_gl.TRIANGLES, 0, object.count);
+			//_gl.drawArrays( _gl.TRIANGLES, 0, object.count );
 
 			object.count = 0;
 

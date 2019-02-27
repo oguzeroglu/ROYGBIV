@@ -697,7 +697,8 @@ function WebGLRenderer( parameters ) {
 
 		state.disableUnusedAttributes();
 
-		_gl.drawArrays( _gl.TRIANGLES, 0, object.count );
+		window.webglCallbackHandler.onBeforeDrawArrays(_gl.TRIANGLES, 0, object.count);
+		//_gl.drawArrays( _gl.TRIANGLES, 0, object.count );
 
 		object.count = 0;
 
