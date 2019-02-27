@@ -17,6 +17,25 @@ var CPUOperationsHandler = function(){
   }
 }
 
+CPUOperationsHandler.prototype.dumpPerformanceLogs = function(){
+  var sum = 0;
+  var pseudoAry = [];
+  for (var key in this.performanceLogs){
+    sum += this.performanceLogs[key];
+    pseudoAry.push({
+      name: key,
+      value: this.performanceLogs[key]
+    })
+  }
+  pseudoAry.sort(function(obj1, obj2){
+    return obj2.value - obj1.value
+  });
+  console.log("Total time: "+sum+" ms.")
+  for (var i = 0; i<pseudoAry.length; i++){
+    console.log("["+pseudoAry[i].name+"] -> "+pseudoAry[i].value+" ms.");
+  }
+}
+
 CPUOperationsHandler.prototype.updateAddedTexts = function(){
   if (this.record){
     var s = performance.now();
