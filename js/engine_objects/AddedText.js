@@ -558,7 +558,7 @@ AddedText.prototype.hide = function(){
     scene.remove(this.rectangle.mesh);
   }
   if (mode == 1 && this.isClickable && !this.is2D){
-    rayCaster.binHandler.deleteObjectFromBin(this.binInfo, this.name);
+    rayCaster.hide(this);
   }
 }
 
@@ -569,7 +569,7 @@ AddedText.prototype.show = function(){
       this.handleBoundingBox();
     }
     if (!this.is2D){
-      rayCaster.binHandler.insert(this.boundingBox, this.name);
+      rayCaster.show(this);
     }
   }
 }
@@ -641,12 +641,12 @@ AddedText.prototype.set2DStatus = function(is2D){
     delete addedTexts2D[this.name];
   }
   if (is2D){
-    rayCaster.binHandler.deleteObjectFromBin(this.binInfo, this.name);
+    rayCaster.hide(this);
     if (this.bbHelper){
       scene.remove(this.bbHelper);
     }
   }else{
-    rayCaster.binHandler.insert(this.boundingBox, this.name);
+    rayCaster.show(this);
   }
 }
 

@@ -447,7 +447,7 @@ var ParticleSystem = function(copyPS, name, particles, x, y, z, vx, vy, vz, ax, 
   }
   if (particleSystemRefHeight){
     this.injectMacro(this.material, "HAS_REF_HEIGHT", true, false);
-    this.material.uniforms.refHeightCoef = GLOBAL_PS_REF_HEIGHT_UNIFORM; 
+    this.material.uniforms.refHeightCoef = GLOBAL_PS_REF_HEIGHT_UNIFORM;
   }
 
   this.mesh = new THREE.Points(this.geometry, this.material);
@@ -832,14 +832,14 @@ ParticleSystem.prototype.handleCollisions = function(fromWorker){
     if (fromWorker){
       results = worldBinHandler.query(this.mesh.position);
     }else{
-      results = rayCaster.binHandler.query(this.mesh.position);
+      results = rayCaster.query(this.mesh.position);
     }
   }else{
     pseudoPosition = this.calculatePseudoPosition(fromWorker);
     if (fromWorker){
       results = worldBinHandler.query(pseudoPosition);
     }else{
-      results = rayCaster.binHandler.query(pseudoPosition);
+      results = rayCaster.query(pseudoPosition);
     }
   }
   if (this.positionHistoryCounter == 0){

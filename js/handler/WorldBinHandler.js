@@ -96,11 +96,13 @@ WorldBinHandler.prototype.show = function(obj){
     for (var i = 0; i<obj.boundingBoxes.length; i++){
       this.insert(obj.boundingBoxes[i], obj.boundingBoxes[i].roygbivObjectName, obj.name);
     }
+  }else if (obj.isAddedText){
+    this.insert(obj.boundingBox, obj.name);
   }
 }
 
 WorldBinHandler.prototype.hide = function(obj){
-  if (mode == 1 && !obj.isIntersectable){
+  if (mode == 1 && (obj.isAddedObject || obj.isObjectGroup) && !obj.isIntersectable){
     return;
   }
   this.deleteObjectFromBin(obj.binInfo, obj.name);

@@ -31,6 +31,10 @@ RayCaster.prototype.refresh = function(){
   }
 }
 
+RayCaster.prototype.update = function(){
+  this.binHandler.update();
+}
+
 RayCaster.prototype.updateObject = function(obj){
   if (!(mode == 1 && !obj.isIntersectable)){
     this.binHandler.updateObject(obj);
@@ -105,4 +109,16 @@ RayCaster.prototype.findIntersections = function(from, direction, intersectGridS
     this.origin.addScaledVector(this.direction, 32);
     iterate = LIMIT_BOUNDING_BOX.containsPoint(this.origin);
   }
+}
+
+RayCaster.prototype.hide = function(object){
+  this.binHandler.hide(object);
+}
+
+RayCaster.prototype.show = function(object){
+  this.binHandler.show(object);
+}
+
+RayCaster.prototype.query = function(point){
+  this.binHandler.query(point);
 }

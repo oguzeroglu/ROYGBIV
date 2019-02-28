@@ -91,7 +91,7 @@ function updateCrosshair(){
 }
 
 function updateRaycaster(){
-  rayCaster.binHandler.update();
+  rayCaster.update();
 }
 
 function updateParticleSystems(){

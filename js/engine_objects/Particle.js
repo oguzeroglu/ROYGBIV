@@ -239,7 +239,7 @@ Particle.prototype.handleCollisions = function(fromWorker){
   if (fromWorker){
     results = worldBinHandler.query(this.positionHistoryArray[rIndex]);
   }else{
-    results = rayCaster.binHandler.query(this.positionHistoryArray[rIndex]);
+    results = rayCaster.query(this.positionHistoryArray[rIndex]);
   }
   for (var objName in results){
     var result = results[objName];

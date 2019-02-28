@@ -666,7 +666,7 @@ Roygbiv.prototype.hide = function(object, keepPhysics){
         object.physicsKeptWhenHidden = true;
       }
       object.isHidden = true;
-      rayCaster.binHandler.hide(object);
+      rayCaster.hide(object);
     }
   }else if (object.isObjectGroup){
     if (keepPhysicsValue && object.noMass){
@@ -689,7 +689,7 @@ Roygbiv.prototype.hide = function(object, keepPhysics){
         object.physicsKeptWhenHidden = true;
       }
       object.isHidden = true;
-      rayCaster.binHandler.hide(object);
+      rayCaster.hide(object);
     }
   }else{
     throw new Error("hide error: Unsupported type.");
@@ -727,7 +727,7 @@ Roygbiv.prototype.show = function(object){
         }
       }
       object.isHidden = false;
-      rayCaster.binHandler.show(object);
+      rayCaster.show(object);
     }
   }else if (object.isObjectGroup){
     if (!object.isChangeable){
@@ -744,7 +744,7 @@ Roygbiv.prototype.show = function(object){
         }
       }
       object.isHidden = false;
-      rayCaster.binHandler.show(object);
+      rayCaster.show(object);
     }
   }else{
     throw new Error("show error: Unsupported type.");
