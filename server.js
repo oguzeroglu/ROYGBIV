@@ -36,7 +36,7 @@ app.post("/build", function(req, res){
       return;
     }
     var engineScriptsConcatted = readEngineScripts(req.body.projectName, req.body.author, req.body.noMobile);
-    fs.writeFileSync("deploy/"+req.body.projectName+"/js/roygbiv.js", engineScriptsConcatted);
+    fs.writeFileSync("deploy/"+req.body.projectName+"/js/roygbiv.js", handleScripts(req.body, engineScriptsConcatted));
     fs.writeFileSync("deploy/"+req.body.projectName+"/js/application.json", JSON.stringify(req.body));
     copyAssets(req.body);
   }catch (err){
@@ -46,6 +46,25 @@ app.post("/build", function(req, res){
   }
   res.send(JSON.stringify({"path": __dirname+"/deploy/"+req.body.projectName+"/"}));
 });
+
+function handleScripts(application, engineScriptsConcatted){
+  var statusText = "";
+  var scriptsText = "";
+  var len = Object.keys(application.scripts).length;
+  var i = 0;
+  for (var scriptName in application.scripts){
+    var script = application.scripts[scriptName].script.replace("this.stop()", "deploymentScriptsStatus.SCRIPT_EXECUTION_STATUS_"+scriptName+" = false")
+    if (i != len -1){
+      statusText += "SCRIPT_EXECUTION_STATUS_"+scriptName+": false,\n";
+    }else{
+      statusText += "SCRIPT_EXECUTION_STATUS_"+scriptName+": false\n";
+    }
+    scriptsText += "if(deploymentScriptsStatus.SCRIPT_EXECUTION_STATUS_"+scriptName+"){"+script+"}\n"
+    i ++;
+  }
+  engineScriptsConcatted = engineScriptsConcatted.replace("//@DEPLOYMENT_SCRIPTS_STATUS", statusText).replace("//@DEPLOYMENT_SCRIPTS", scriptsText);
+  return engineScriptsConcatted;
+}
 
 function copyAssets(application){
   copyFileSync("css/Hack-Bold.ttf", "deploy/"+application.projectName+"/css/");

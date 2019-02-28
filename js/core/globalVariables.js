@@ -1207,3 +1207,8 @@ var BANNERL2 = "|  _ \\ / _ \\ \\ / / ___| __ )_ _\\ \\   / / ";
 var BANNERL3 = "| |_) | | | \\ V / |  _|  _ \\| | \\ \\ / /  ";
 var BANNERL4 = "|  _ <| |_| || || |_| | |_) | |  \\   /   ";
 var BANNERL5 = "|_| \\_\\\\___/ |_| \\____|____/___|  \\_/    ";
+
+// DEPLOYED SCRIPTS
+var deploymentScriptsStatus = {
+//@DEPLOYMENT_SCRIPTS_STATUS
+};

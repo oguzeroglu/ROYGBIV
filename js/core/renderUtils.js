@@ -116,6 +116,10 @@ function updateObjectTrails(){
 }
 
 function runScripts(){
+  if (isDeployment){
+    deploymentScripts();
+    return;
+  }
   for (var scriptName in scriptsToRun){
     scripts[scriptName].execute();
   }
@@ -204,4 +208,8 @@ function handleSkybox(){
   if (skyboxMesh){
     skyboxMesh.position.copy(camera.position);
   }
+}
+
+function deploymentScripts(){
+  //@DEPLOYMENT_SCRIPTS
 }

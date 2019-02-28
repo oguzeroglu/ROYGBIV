@@ -2,17 +2,26 @@ var Script = function(name, script){
   this.name = name;
   this.script = script;
   this.status = SCRIPT_STATUS_STOPPED;
-  try{
-    this.func = new Function(this.script);
-  }catch(err){
-    this.status = SCRIPT_STATUS_ERROR;
+  if (!isDeployment){
+    try{
+      this.func = new Function(this.script);
+    }catch(err){
+      this.status = SCRIPT_STATUS_ERROR;
+    }
   }
   this.counter1 = 0;
   this.counter2 = 0;
   this.lastExecutionPerformance = 0;
+  if (isDeployment){
+    this.deploymentStatusVariableName = "SCRIPT_EXECUTION_STATUS_"+this.name;
+  }
 }
 
 Script.prototype.execute = function(){
+  if (isDeployment){
+    deploymentScriptsStatus[this.deploymentStatusVariableName] = true;
+    return;
+  }
   if (this.status != SCRIPT_STATUS_STARTED){
     return ;
   }
@@ -76,15 +85,26 @@ Script.prototype.export = function(){
 }
 
 Script.prototype.stop = function(){
+  if (isDeployment){
+    deploymentScriptsStatus[this.deploymentStatusVariableName] = false;
+    return;
+  }
   this.status = SCRIPT_STATUS_STOPPED;
   delete scriptsToRun[this.name];
 }
 
 Script.prototype.start = function(){
+  if (isDeployment){
+    deploymentScriptsStatus[this.deploymentStatusVariableName] = true;
+    return;
+  }
   this.status = SCRIPT_STATUS_STARTED;
   scriptsToRun[this.name] = this;
 }
 
 Script.prototype.isRunning = function(){
+  if (isDeployment){
+    return deploymentScriptsStatus[this.deploymentStatusVariableName];
+  }
   return (this.status == SCRIPT_STATUS_STARTED);
 }
