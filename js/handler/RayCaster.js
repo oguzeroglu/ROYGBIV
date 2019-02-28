@@ -32,7 +32,9 @@ RayCaster.prototype.refresh = function(){
 }
 
 RayCaster.prototype.updateObject = function(obj){
-  this.binHandler.updateObject(obj);
+  if (!(mode == 1 && !obj.isIntersectable)){
+    this.binHandler.updateObject(obj);
+  }
 }
 
 RayCaster.prototype.findIntersections = function(from, direction, intersectGridSystems){

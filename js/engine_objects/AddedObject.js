@@ -93,6 +93,8 @@ var AddedObject = function(name, type, metaData, material, mesh, physicsBody, de
   this.reusableVec3_2 = new THREE.Vector3();
   this.reusableVec3_3 = new THREE.Vector3();
 
+  this.isIntersectable = true;
+
   webglCallbackHandler.registerEngineObject(this);
 
 }
@@ -115,6 +117,8 @@ AddedObject.prototype.export = function(){
   if (this.isDynamicObject){
     exportObject["isDynamicObject"] = this.isDynamicObject;
   }
+
+  exportObject["isIntersectable"] = this.isIntersectable;
 
   exportObject["opacity"] = this.mesh.material.uniforms.alpha.value;
   if (this.hasAOMap()){
@@ -2422,6 +2426,7 @@ AddedObject.prototype.copy = function(name, isHardCopy, copyPosition, gridSystem
   }
   copyInstance.noMass = this.noMass;
   copyInstance.isChangeable = this.isChangeable;
+  copyInstance.isIntersectable = this.isIntersectable;
   copyInstance.isColorizable = this.isColorizable;
   if (this.metaData["isSlippery"]){
     copyInstance.setSlippery(true);

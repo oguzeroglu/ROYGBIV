@@ -6,7 +6,7 @@ GUIHandler.prototype.init = function(){
   this.initializeFogGUI();
   this.initializeSkyboxGUI();
   this.initializeTextManipulationGUI();
-  this.initializeObjectManioulationGUI();
+  this.initializeObjectManipulationGUI();
   this.initializePostProcessingGUI();
 
   this.hideAll();
@@ -99,6 +99,11 @@ GUIHandler.prototype.afterObjectSelection = function(){
       }else{
         objectManipulationParameters["Changeable"] = false;
       }
+      if (obj.isIntersectable){
+        objectManipulationParameters["Intersectable"] = true;
+      }else{
+        objectManipulationParameters["Intersectable"] = false;
+      }
       if (obj.isColorizable){
         objectManipulationParameters["Colorizable"] = true;
       }else{
@@ -165,6 +170,11 @@ GUIHandler.prototype.afterObjectSelection = function(){
         objectManipulationParameters["Changeable"] = true;
       }else{
         objectManipulationParameters["Changeable"] = false;
+      }
+      if (obj.isIntersectable){
+        objectManipulationParameters["Intersectable"] = true;
+      }else{
+        objectManipulationParameters["Intersectable"] = false;
       }
       if (obj.isColorizable){
         objectManipulationParameters["Colorizable"] = true;
@@ -285,6 +295,7 @@ GUIHandler.prototype.enableAllOMControllers = function(){
   guiHandler.enableController(omMassController);
   guiHandler.enableController(omSlipperyController);
   guiHandler.enableController(omChangeableController);
+  guiHandler.enableController(omIntersectableController);
   guiHandler.enableController(omColorizableController);
   guiHandler.enableController(omHasMassController);
   guiHandler.enableController(omTextureOffsetXController);
@@ -345,7 +356,7 @@ GUIHandler.prototype.initializePostProcessingGUI = function(){
   }).listen();
 }
 
-GUIHandler.prototype.initializeObjectManioulationGUI = function(){
+GUIHandler.prototype.initializeObjectManipulationGUI = function(){
   datGuiObjectManipulation = new dat.GUI();
   omObjController = datGuiObjectManipulation.add(objectManipulationParameters, "Object").listen();
   guiHandler.disableController(omObjController, true);
@@ -380,6 +391,16 @@ GUIHandler.prototype.initializeObjectManioulationGUI = function(){
       terminal.printInfo(Text.OBJECT_MARKED_AS.replace(Text.PARAM1, "changeable"));
     }else{
       terminal.printInfo(Text.OBJECT_MARKED_AS.replace(Text.PARAM1, "unchangeable"));
+    }
+  }).listen();
+  omIntersectableController = datGuiObjectManipulation.add(objectManipulationParameters, "Intersectable").onChange(function(val){
+    var obj = selectionHandler.getSelectedObject();
+    terminal.clear();
+    obj.isIntersectable = val;
+    if (obj.isIntersectable){
+      terminal.printInfo(Text.OBJECT_INTERSECTABLE);
+    }else{
+      terminal.printInfo(Text.OBJECT_UNINTERSECTABLE);
     }
   }).listen();
   omColorizableController = datGuiObjectManipulation.add(objectManipulationParameters, "Colorizable").onChange(function(val){

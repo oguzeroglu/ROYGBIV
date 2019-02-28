@@ -3,6 +3,9 @@ var WorldBinHandler = function(isCustom){
   if (!isCustom){
     for (var objName in addedObjects){
       var object = addedObjects[objName];
+      if (mode == 1 && !object.isIntersectable){
+        continue;
+      }
       object.generateBoundingBoxes();
       if (!object.boundingBoxes){
         continue;
@@ -13,6 +16,9 @@ var WorldBinHandler = function(isCustom){
     }
     for (var objName in objectGroups){
       var object = objectGroups[objName];
+      if (mode == 1 && !object.isIntersectable){
+        continue;
+      }
       object.generateBoundingBoxes();
       if (!object.boundingBoxes){
         continue;
@@ -77,10 +83,16 @@ WorldBinHandler.prototype.updateObject = function(obj){
 
 WorldBinHandler.prototype.show = function(obj){
   if (obj.isAddedObject){
+    if (mode == 1 && !obj.isIntersectable){
+      return;
+    }
     for (var i = 0; i<obj.boundingBoxes.length; i++){
       this.insert(obj.boundingBoxes[i], obj.name);
     }
   }else if (obj.isObjectGroup){
+    if (mode == 1 && !obj.isIntersectable){
+      return;
+    }
     for (var i = 0; i<obj.boundingBoxes.length; i++){
       this.insert(obj.boundingBoxes[i], obj.boundingBoxes[i].roygbivObjectName, obj.name);
     }
@@ -88,13 +100,16 @@ WorldBinHandler.prototype.show = function(obj){
 }
 
 WorldBinHandler.prototype.hide = function(obj){
+  if (mode == 1 && !obj.isIntersectable){
+    return;
+  }
   this.deleteObjectFromBin(obj.binInfo, obj.name);
 }
 
 WorldBinHandler.prototype.update = function(){
   for (var objName in dynamicObjects){
     var obj = dynamicObjects[objName];
-    if (obj.isHidden){
+    if (obj.isHidden || (mode == 1 && !obj.isIntersectable)){
       continue;
     }
     this.deleteObjectFromBin(obj.binInfo, obj.name);
@@ -105,7 +120,7 @@ WorldBinHandler.prototype.update = function(){
   }
   for (var objName in dynamicObjectGroups){
     var obj = dynamicObjectGroups[objName];
-    if (obj.isHidden){
+    if (obj.isHidden || (mode == 1 && !obj.isIntersectable)){
       continue;
     }
     this.deleteObjectFromBin(obj.binInfo, obj.name);

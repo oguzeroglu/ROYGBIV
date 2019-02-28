@@ -23,6 +23,7 @@ var ObjectGroup = function(name, group){
       break;
     }
   }
+  this.isIntersectable = true;
 }
 
 ObjectGroup.prototype.forceColor = function(r, g, b, a){
@@ -1404,6 +1405,11 @@ ObjectGroup.prototype.export = function(){
   }else{
     exportObj.isChangeable = false;
   }
+  if (this.isIntersectable){
+    exportObj.isIntersectable = true;
+  }else{
+    exportObj.isIntersectable = false;
+  }
   if (this.isColorizable){
     exportObj.isColorizable = true;
   }else{
@@ -1735,6 +1741,7 @@ ObjectGroup.prototype.copy = function(name, isHardCopy, copyPosition, gridSystem
   var noMass = this.noMass;
   var slippery = this.isSlippery;
   var isChangeable = this.isChangeable;
+  var isIntersectable = this.isIntersectable;
   var isColorizable = this.isColorizable;
   var renderSide = this.renderSide;
   var blending = this.mesh.material.blending;
@@ -1804,8 +1811,10 @@ ObjectGroup.prototype.copy = function(name, isHardCopy, copyPosition, gridSystem
     newObjGroup.group[objName].metaData["centerZ"] += dz;
   }
   this.isChangeable = isChangeable;
+  this.isIntersectable = isIntersectable;
   this.isColorizable = isColorizable;
   newObjGroup.isChangeable = isChangeable;
+  newObjGroup.isIntersectable = isIntersectable;
   newObjGroup.isColorizable = isColorizable;
   if (slippery){
     this.setSlippery(slippery);

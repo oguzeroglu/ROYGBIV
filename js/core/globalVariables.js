@@ -1080,6 +1080,7 @@ var omRotationZController;
 var omMassController;
 var omSlipperyController;
 var omChangeableController;
+var omIntersectableController;
 var omColorizableController;
 var omHasMassController;
 var omSideController;
@@ -1101,6 +1102,7 @@ var objectManipulationParameters = {
   "Mass": 0.0,
   "Slippery": false,
   "Changeable": false,
+  "Intersectable": false,
   "Colorizable": false,
   "Has mass": true,
   "Side": "Both",

@@ -5990,20 +5990,24 @@ Roygbiv.prototype.setObjectClickListener = function(sourceObject, callbackFuncti
   if (mode == 0){
     return;
   }
-  if (sourceObject == UNDEFINED){
-    throw new Error("setClickListener error: sourceObject is not defined.");
+  if (typeof sourceObject == UNDEFINED){
+    throw new Error("setObjectClickListener error: sourceObject is not defined.");
     return;
   }
-  if (callbackFunction == UNDEFINED){
-    throw new Error("setClickListener error: callbackFunction is not defined.");
+  if (typeof callbackFunction == UNDEFINED){
+    throw new Error("setObjectClickListener error: callbackFunction is not defined.");
     return;
   }
   if (!(sourceObject.isAddedObject) && !(sourceObject.isObjectGroup)){
-    throw new Error("setClickListener error: Type not supported.");
+    throw new Error("setObjectClickListener error: Type not supported.");
+    return;
+  }
+  if (!sourceObject.isIntersectable){
+    throw new Error("setObjectClickListener error: sourceObject marked as unintersectable. Cannot be clicked on.");
     return;
   }
   if (!(callbackFunction instanceof Function)){
-    throw new Error("setClickListener error: callbackFunction is not a function.");
+    throw new Error("setObjectClickListener error: callbackFunction is not a function.");
     return;
   }
   sourceObject.clickCallbackFunction = callbackFunction;
@@ -6015,12 +6019,16 @@ Roygbiv.prototype.removeObjectClickListener = function(sourceObject){
   if (mode == 0){
     return;
   }
-  if (sourceObject == UNDEFINED){
+  if (typeof sourceObject == UNDEFINED){
     throw new Error("removeClickListener error: sourceObject is not defined.");
     return;
   }
   if (!(sourceObject.isAddedObject) && !(sourceObject.isObjectGroup)){
     throw new Error("removeClickListener error: Type not supported.");
+    return;
+  }
+  if (!(sourceObject.isIntersectable)){
+    throw new Error("removeClickListener error: sourceObject marked as unintersectable.");
     return;
   }
   delete sourceObject.clickCallbackFunction;

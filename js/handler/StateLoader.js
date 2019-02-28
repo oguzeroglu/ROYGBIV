@@ -565,6 +565,10 @@ StateLoader.prototype.load = function(){
       }
 
       addedObjectInstance.isChangeable = curAddedObjectExport.isChangeable;
+      addedObjectInstance.isIntersectable = curAddedObjectExport.isIntersectable;
+      if (typeof addedObjectInstance.isIntersectable == UNDEFINED){
+        addedObjectInstance.isIntersectable = true;
+      }
       addedObjectInstance.isColorizable = curAddedObjectExport.isColorizable;
       if (addedObjectInstance.isColorizable){
         addedObjectInstance.injectMacro("HAS_FORCED_COLOR", false, true);
@@ -1196,6 +1200,10 @@ StateLoader.prototype.finalize = function(){
     }
 
     objectGroupInstance.isChangeable = curObjectGroupExport.isChangeable;
+    objectGroupInstance.isIntersectable = curObjectGroupExport.isIntersectable;
+    if (typeof objectGroupInstance.isIntersectable == UNDEFINED){
+      objectGroupInstance.isIntersectable = true;
+    }
     objectGroupInstance.isColorizable = curObjectGroupExport.isColorizable;
     if (objectGroupInstance.isColorizable){
       objectGroupInstance.injectMacro("HAS_FORCED_COLOR", false, true);
