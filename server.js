@@ -193,6 +193,16 @@ function readEngineScripts(projectName, author, noMobile){
         }
         console.log("[*] isDeployment flag injected into globalVariables.");
       }
+      if (scriptPath.includes("Roygbiv.js")){
+        var roygbivJSSplitted = scriptContent.split("\n");
+        var commentsFiltered = "";
+        for (var i2 = 0; i2<roygbivJSSplitted.length; i2++){
+          if (!roygbivJSSplitted[i2].startsWith("//")){
+            commentsFiltered += roygbivJSSplitted[i2] + "\n";
+          }
+        }
+        scriptContent = commentsFiltered;
+      }
       if (scriptPath.includes("cliParser.js")){
         console.log("[*] Skipping cliParser");
         continue;
