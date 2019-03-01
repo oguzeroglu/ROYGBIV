@@ -2,67 +2,101 @@ precision lowp float;
 precision lowp int;
 
 attribute float alpha;
-attribute float emissiveIntensity;
-attribute float aoIntensity;
-attribute vec3 position;
-attribute vec3 normal;
 attribute vec3 color;
-attribute vec3 emissiveColor;
-attribute vec2 uv;
-attribute vec2 displacementInfo;
-attribute vec4 textureInfo;
-
-uniform mat3 textureMatrix;
+attribute vec3 position;
 uniform mat4 projectionMatrix;
 uniform mat4 modelViewMatrix;
-uniform mat4 worldMatrix;
-uniform sampler2D displacementMap;
-
-varying float vAlpha;
-varying float vEmissiveIntensity;
-varying float vAOIntensity;
 varying vec3 vColor;
-varying vec3 vWorldPosition;
-varying vec3 vEmissiveColor;
-varying vec2 vUV;
+varying float vAlpha;
 
-varying float hasDiffuseMap;
-varying float hasEmissiveMap;
-varying float hasAlphaMap;
-varying float hasAOMap;
+#define INSERTION
+
+#ifdef HAS_EMISSIVE
+  attribute float emissiveIntensity;
+  attribute vec3 emissiveColor;
+  varying vec3 vEmissiveColor;
+  varying float vEmissiveIntensity;
+#endif
+#ifdef HAS_AO
+  attribute float aoIntensity;
+  varying float vAOIntensity;
+#endif
+#ifdef HAS_DISPLACEMENT
+  attribute vec3 normal;
+  attribute vec2 displacementInfo;
+  uniform sampler2D displacementMap;
+#endif
+#ifdef HAS_TEXTURE
+  attribute vec2 uv;
+  attribute vec4 textureInfo;
+  attribute vec4 textureMatrixInfo;
+  varying vec2 vUV;
+  #ifdef HAS_AO
+    varying float hasAOMap;
+  #endif
+  #ifdef HAS_DIFFUSE
+    varying float hasDiffuseMap;
+  #endif
+  #ifdef HAS_EMISSIVE
+    varying float hasEmissiveMap;
+  #endif
+  #ifdef HAS_ALPHA
+    varying float hasAlphaMap;
+  #endif
+#endif
+#ifdef HAS_SKYBOX_FOG
+  uniform mat4 worldMatrix;
+  varying vec3 vWorldPosition;
+#endif
 
 void main(){
-
   vColor = color;
   vAlpha = alpha;
-  vUV = (textureMatrix * vec3(uv, 1.0)).xy;
-  vEmissiveIntensity = emissiveIntensity;
-  vAOIntensity = aoIntensity;
-  vWorldPosition = (worldMatrix * vec4(position, 1.0)).xyz;
-  vEmissiveColor = emissiveColor;
-
-  hasDiffuseMap = -10.0;
-  hasEmissiveMap = -10.0;
-  hasAlphaMap = -10.0;
-  hasAOMap = -10.0;
-  if (textureInfo[0] > 0.0){
-    hasDiffuseMap = 10.0;
-  }
-  if (textureInfo[1] > 0.0){
-    hasEmissiveMap = 10.0;
-  }
-  if (textureInfo[2] > 0.0){
-    hasAlphaMap = 10.0;
-  }
-  if (textureInfo[3] > 0.0){
-    hasAOMap = 10.0;
-  }
-
+  #ifdef HAS_TEXTURE
+    vUV = (
+      mat3(
+        textureMatrixInfo.z, 0.0, 0.0,
+        0.0, textureMatrixInfo.w, 0.0,
+        textureMatrixInfo.x, textureMatrixInfo.y, 1.0
+      ) * vec3(uv, 1.0)
+    ).xy;
+    #ifdef HAS_DIFFUSE
+      hasDiffuseMap = -10.0;
+      if (textureInfo[0] > 0.0){
+        hasDiffuseMap = 10.0;
+      }
+    #endif
+    #ifdef HAS_EMISSIVE
+      vEmissiveIntensity = emissiveIntensity;
+      vEmissiveColor = emissiveColor;
+      hasEmissiveMap = -10.0;
+      if (textureInfo[1] > 0.0){
+        hasEmissiveMap = 10.0;
+      }
+    #endif
+    #ifdef HAS_AO
+      vAOIntensity = aoIntensity;
+      hasAOMap = -10.0;
+      if (textureInfo[3] > 0.0){
+        hasAOMap = 10.0;
+      }
+    #endif
+    #ifdef HAS_ALPHA
+      hasAlphaMap = -10.0;
+      if (textureInfo[2] > 0.0){
+        hasAlphaMap = 10.0;
+      }
+    #endif
+  #endif
+  #ifdef HAS_SKYBOX_FOG
+    vWorldPosition = (worldMatrix * vec4(position, 1.0)).xyz;
+  #endif
   vec3 transformedPosition = position;
-  if (displacementInfo.x > -60.0 && displacementInfo.y > -60.0){
-    vec3 objNormal = normalize(normal);
-    transformedPosition += objNormal * (texture2D(displacementMap, vUV).r * displacementInfo.x + displacementInfo.y);
-  }
-
+  #ifdef HAS_DISPLACEMENT
+    if (displacementInfo.x > -60.0 && displacementInfo.y > -60.0){
+      vec3 objNormal = normalize(normal);
+      transformedPosition += objNormal * (texture2D(displacementMap, vUV).r * displacementInfo.x + displacementInfo.y);
+    }
+  #endif
   gl_Position = projectionMatrix * modelViewMatrix * vec4(transformedPosition, 1.0);
 }

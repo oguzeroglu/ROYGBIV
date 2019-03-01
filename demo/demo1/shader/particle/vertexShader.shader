@@ -3,64 +3,84 @@ precision lowp int;
 
 #define OBJECT_SIZE 1
 
-attribute float mergedIndex;
 attribute float expiredFlag;
 attribute vec3 position;
-attribute vec3 rgbThreshold;
 attribute vec3 velocity;
 attribute vec3 acceleration;
-attribute vec4 targetColor;
 attribute vec4 flags1;
 attribute vec4 flags2;
 attribute vec4 flags3;
 attribute vec4 flags4;
 attribute vec4 angularQuaternion;
-attribute vec4 uvCoordinates;
 
 varying vec4 vCalculatedColor;
 varying float vDiscardFlag;
-varying float vTextureFlag;
-varying vec3 vRgbThreshold;
-varying vec3 vWorldPosition;
-varying vec4 vUVCoordinates;
 
-uniform float mergedFlag;
-uniform float time;
-uniform float timeArray[OBJECT_SIZE];
-uniform mat4 modelViewMatrix;
-uniform mat4 modelViewMatrixArray[OBJECT_SIZE];
-uniform mat4 worldMatrix;
-uniform mat4 worldMatrixArray[OBJECT_SIZE];
-uniform float hiddenArray[OBJECT_SIZE];
 uniform mat4 viewMatrix;
 uniform mat4 projectionMatrix;
-uniform mat3 parentMotionMatrix;
-uniform mat3 parentMotionMatrixArray[OBJECT_SIZE];
-uniform float dissapearCoef;
-uniform float dissapearCoefArray[OBJECT_SIZE];
-uniform vec3 stopInfo;
-uniform vec3 stopInfoArray[OBJECT_SIZE];
 
-vec3 calculateColor(float timeValue){
-  float colorStep = targetColor[3];
-  vec3 color = vec3(flags4[0], flags4[1], flags4[2]);
-  if (timeValue < 0.0){
-    return color;
-  }
-  if ((colorStep * timeValue) >= 1.0){
-    return vec3(targetColor.x, targetColor.y, targetColor.z);
-  }
-  vec3 diff = vec3(
-    (targetColor.r - color.r),
-    (targetColor.g - color.g),
-    (targetColor.b - color.g)
-  );
-  float calculatedR = color.r + (colorStep * timeValue * (diff.r));
-  float calculatedG = color.g + (colorStep * timeValue * (diff.g));
-  float calculatedB = color.b + (colorStep * timeValue * (diff.b));
-  return vec3(calculatedR, calculatedG, calculatedB);
-}
+#define INSERTION
 
+#ifdef HAS_REF_HEIGHT
+  uniform float refHeightCoef;
+#endif
+#ifdef IS_MERGED
+  attribute float mergedIndex;
+  uniform float timeArray[OBJECT_SIZE];
+  uniform mat4 modelViewMatrixArray[OBJECT_SIZE];
+  uniform mat4 worldMatrixArray[OBJECT_SIZE];
+  uniform float hiddenArray[OBJECT_SIZE];
+  uniform mat3 parentMotionMatrixArray[OBJECT_SIZE];
+  uniform float dissapearCoefArray[OBJECT_SIZE];
+  uniform vec3 stopInfoArray[OBJECT_SIZE];
+#else
+  uniform float time;
+  uniform mat4 modelViewMatrix;
+  uniform mat4 worldMatrix;
+  uniform mat3 parentMotionMatrix;
+  uniform float dissapearCoef;
+  uniform vec3 stopInfo;
+#endif
+#ifdef HAS_SKYBOX_FOG
+  varying vec3 vWorldPosition;
+#endif
+
+#ifdef HAS_TEXTURE
+  attribute vec3 rgbThreshold;
+  varying vec4 vUVCoordinates;
+  attribute vec4 uvCoordinates;
+  varying vec3 vRgbThreshold;
+  varying float vTextureFlag;
+#endif
+
+#ifdef HAS_TARGET_COLOR
+  attribute vec4 targetColor;
+#endif
+
+#ifdef HAS_TARGET_COLOR
+  vec3 calculateColor(float timeValue){
+    float colorStep = targetColor[3];
+    vec3 color = vec3(flags4[0], flags4[1], flags4[2]);
+    if (colorStep < -10.0){
+      return color;
+    }
+    if (timeValue < 0.0){
+      return color;
+    }
+    if ((colorStep * timeValue) >= 1.0){
+      return vec3(targetColor.x, targetColor.y, targetColor.z);
+    }
+    vec3 diff = vec3(
+      (targetColor.r - color.r),
+      (targetColor.g - color.g),
+      (targetColor.b - color.g)
+    );
+    float calculatedR = color.r + (colorStep * timeValue * (diff.r));
+    float calculatedG = color.g + (colorStep * timeValue * (diff.g));
+    float calculatedB = color.b + (colorStep * timeValue * (diff.b));
+    return vec3(calculatedR, calculatedG, calculatedB);
+  }
+#endif
 
 vec3 applyQuaternionToVector(vec3 vector, vec4 quaternion){
   float x = vector.x;
@@ -111,18 +131,20 @@ float isRecentlyRespawned(float timeNow){
 }
 
 float findRepeatTime(){
-  float selectedTime = time;
-  if (mergedFlag > 5.0){
+  float selectedTime;
+  #ifdef IS_MERGED
     int mi = int(mergedIndex);
     selectedTime = timeArray[mi];
-  }
+  #else
+    selectedTime = time;
+  #endif
   float startTime = flags2[3];
   float respawnFlag = flags1[0];
   if (respawnFlag < 5.0){
     return startTime;
   }
   float x = selectedTime;
-  for (float i = 0.0; i<10000000.0; i += 0.0000000001){
+  for (float i = 0.0; i<5000.0; i += 0.0001){
     float recentlyRespawnedFlag = isRecentlyRespawned((x - startTime));
     if (recentlyRespawnedFlag > 5.0){
       return x;
@@ -148,18 +170,18 @@ void main(){
   float angularVelocity = flags3[2];
   float angularMotionRadius = flags3[3];
   float useWorldPositionFlag = flags4[3];
-  vec3 parentVelocity = parentMotionMatrix[1];
-  vec3 parentAcceleration = parentMotionMatrix[2];
-  vec3 parentInitialPosition = parentMotionMatrix[0];
+  vec3 parentVelocity;
+  vec3 parentAcceleration;
+  vec3 parentInitialPosition;
   vec3 color = vec3(flags4[0], flags4[1], flags4[2]);
 
   float skipFlag = -20.0;
-  mat4 selectedMVMatrix = modelViewMatrix;
-  mat4 selectedWorldMatrix = worldMatrix;
-  float selectedTime = time;
-  float selectedDissapearCoef = dissapearCoef;
-  vec3 selectedStopInfo = stopInfo;
-  if (mergedFlag > 5.0){
+  mat4 selectedMVMatrix;
+  mat4 selectedWorldMatrix;
+  float selectedTime;
+  float selectedDissapearCoef;
+  vec3 selectedStopInfo;
+  #ifdef IS_MERGED
     int mi = int(mergedIndex);
     selectedMVMatrix = modelViewMatrixArray[mi];
     selectedWorldMatrix = worldMatrixArray[mi];
@@ -172,7 +194,16 @@ void main(){
     }
     selectedDissapearCoef = dissapearCoefArray[mi];
     selectedStopInfo = stopInfoArray[mi];
-  }
+  #else
+    selectedMVMatrix = modelViewMatrix;
+    selectedWorldMatrix = worldMatrix;
+    selectedTime = time;
+    selectedDissapearCoef = dissapearCoef;
+    selectedStopInfo = stopInfo;
+    parentVelocity = parentMotionMatrix[1];
+    parentAcceleration = parentMotionMatrix[2];
+    parentInitialPosition = parentMotionMatrix[0];
+  #endif
 
   float parentStoppedFlag = selectedStopInfo[0];
   float stopTime = selectedStopInfo[1];
@@ -193,7 +224,11 @@ void main(){
       }
     }
     float calculatedAlpha = calculateAlpha(alphaDelta, opacity, timeOfThis);
-    vCalculatedColor = vec4(calculateColor(timeOfThis), calculatedAlpha);
+    #ifdef HAS_TARGET_COLOR
+      vCalculatedColor = vec4(calculateColor(timeOfThis), calculatedAlpha);
+    #else
+      vCalculatedColor = vec4(flags4[0], flags4[1], flags4[2], calculatedAlpha);
+    #endif
 
     vec3 chosenVelocity;
     vec3 chosenAcceleration;
@@ -229,7 +264,9 @@ void main(){
       newPosition = position + (chosenVelocity * timeOfThis) + (0.5 * timeOfThis * timeOfThis * chosenAcceleration);
     }
 
-    vWorldPosition = (selectedWorldMatrix * vec4(newPosition, 1.0)).xyz;
+    #ifdef HAS_SKYBOX_FOG
+      vWorldPosition = (selectedWorldMatrix * vec4(newPosition, 1.0)).xyz;
+    #endif
 
     if (useWorldPositionFlag < 5.0){
       mvPosition = selectedMVMatrix * vec4(newPosition, 1.0);
@@ -247,6 +284,9 @@ void main(){
     }
 
     gl_PointSize = (500.0 - (selectedDissapearCoef * selectedTime)) * size / length(mvPosition.xyz);
+    #ifdef HAS_REF_HEIGHT
+      gl_PointSize = gl_PointSize * refHeightCoef;
+    #endif
     gl_Position = projectionMatrix * mvPosition;
 
   }
@@ -268,10 +308,9 @@ void main(){
   }else{
     vDiscardFlag = 10.0;
   }
-
-
-  vTextureFlag = flags2[2];
-  vRgbThreshold = rgbThreshold;
-  vUVCoordinates = uvCoordinates;
-
+  #ifdef HAS_TEXTURE
+    vTextureFlag = flags2[2];
+    vRgbThreshold = rgbThreshold;
+    vUVCoordinates = uvCoordinates;
+  #endif
 }

@@ -5,8 +5,6 @@ function render(){
   stats.begin();
   if (!(mode == 1 && isPaused)){
     requestID = requestAnimationFrame(render);
-  }else{
-    return;
   }
 
   GLOBAL_CAMERA_POSITION_UNIFORM.value.copy(camera.position);

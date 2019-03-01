@@ -4,47 +4,39 @@ precision lowp int;
 attribute vec3 position;
 attribute vec3 normal;
 attribute vec2 uv;
-
-uniform sampler2D displacementMap;
-uniform mat3 textureMatrix;
 uniform mat4 projectionMatrix;
 uniform mat4 modelViewMatrix;
-uniform mat4 worldMatrix;
-uniform vec2 displacementInfo;
-uniform vec3 color;
-uniform vec4 textureFlags;
-uniform vec4 textureFlags2;
-uniform float alpha;
 
-varying vec3 vWorldPosition;
-varying vec3 vColor;
-varying float vAlpha;
-varying vec2 vUV;
-varying float hasDiffuseFlag;
-varying float hasAlphaFlag;
-varying float hasAOFlag;
-varying float hasEmissiveFlag;
+#define INSERTION
 
-float hasDisplacementFlag;
+#ifdef HAS_DISPLACEMENT
+  uniform sampler2D displacementMap;
+  uniform vec2 displacementInfo;
+#endif
+#ifdef HAS_TEXTURE
+  varying vec2 vUV;
+  uniform mat3 textureMatrix;
+#endif
+#ifdef HAS_SKYBOX_FOG
+  uniform mat4 worldMatrix;
+  varying vec3 vWorldPosition;
+#endif
 
 void main(){
 
-  hasDiffuseFlag      = textureFlags[0];
-  hasAlphaFlag        = textureFlags[1];
-  hasAOFlag           = textureFlags[2];
-  hasDisplacementFlag = textureFlags[3];
-  hasEmissiveFlag     = textureFlags2[0];
+  #ifdef HAS_TEXTURE
+    vUV = (textureMatrix * vec3(uv, 1.0)).xy;
+  #endif
 
-  vColor = color;
-  vAlpha = alpha;
-  vUV = (textureMatrix * vec3(uv, 1.0)).xy;
-  vWorldPosition = (worldMatrix * vec4(position, 1.0)).xyz;
+  #ifdef HAS_SKYBOX_FOG
+    vWorldPosition = (worldMatrix * vec4(position, 1.0)).xyz;
+  #endif
 
   vec3 transformedPosition = position;
-  if (hasDisplacementFlag > 0.0){
+  #ifdef HAS_DISPLACEMENT
     vec3 objNormal = normalize(normal);
     transformedPosition += objNormal * (texture2D(displacementMap, vUV).r * displacementInfo.x + displacementInfo.y);
-  }
+  #endif
 
   vec4 mvPosition = modelViewMatrix * vec4(transformedPosition, 1.0);
   gl_Position = projectionMatrix * mvPosition;
