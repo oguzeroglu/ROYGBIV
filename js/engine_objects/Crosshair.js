@@ -104,3 +104,15 @@ Crosshair.prototype.destroy = function(){
   this.mesh.material.dispose();
   this.mesh = 0;
 }
+
+Crosshair.prototype.debugCornerPoints = function(representativeCharacter, cornerIndex){
+  var cSizeX = (this.sizeAmount * 5 / (renderer.getCurrentViewport().z / screenResolution));
+  var cSizeY = (this.sizeAmount * 5) / (renderer.getCurrentViewport().w / screenResolution);
+  if (cornerIndex == 0){
+    representativeCharacter.setShaderMargin(true, -cSizeX);
+    representativeCharacter.setShaderMargin(false, cSizeY);
+  }else{
+    representativeCharacter.setShaderMargin(true, cSizeX);
+    representativeCharacter.setShaderMargin(false, -cSizeY);
+  }
+}

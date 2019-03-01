@@ -53,15 +53,7 @@ function render(){
 
 
 function renderScene(){
-  if (mode == 0){
-    renderer.render(scene, camera);
-  }else{
-    if (bloomOn){
-      composer.render(0.1);
-    }else{
-      renderer.render(scene, camera);
-    }
-  }
+  composer.render(0.1);
 }
 
 function updateAddedTexts(){
