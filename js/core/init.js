@@ -762,6 +762,10 @@ function resizeFunction(){
           }
         }
       }
+    }else{
+      for (var crosshairName in crosshairs){
+        crosshairs[crosshairName].handleResize();
+      }
     }
     for (var textName in addedTexts){
       addedTexts[textName].handleResize();

@@ -10,6 +10,9 @@ var Crosshair = function(configurations){
   var alpha = configurations.alpha;
   var size = configurations.size;
 
+  this.maxWidthPercent = configurations.maxWidthPercent;
+  this.maxHeightPercent = configurations.maxHeightPercent;
+
   this.texture = texture;
   this.name = name;
   this.sizeAmount = size;
@@ -43,6 +46,11 @@ var Crosshair = function(configurations){
   this.mesh.frustumCulled = false;
   this.mesh.visible = false;
 
+  if (!(typeof this.maxWidthPercent == UNDEFINED) || !(typeof this.maxHeightPercent == UNDEFINED)){
+    this.mesh.material.uniforms.sizeScale = new THREE.Uniform(1);
+    this.injectMacro("HAS_SIZE_SCALE", true, false);
+  }
+
   scene.add(this.mesh);
 
   crosshairs[this.name] = this;
@@ -54,6 +62,8 @@ var Crosshair = function(configurations){
   this.shrinkTick = 0;
   this.curSize = this.sizeAmount;
   this.shrinkStartSize = this.sizeAmount;
+
+  this.handleResize();
 
   webglCallbackHandler.registerEngineObject(this);
 }
@@ -115,4 +125,38 @@ Crosshair.prototype.debugCornerPoints = function(representativeCharacter, corner
     representativeCharacter.setShaderMargin(true, cSizeX);
     representativeCharacter.setShaderMargin(false, -cSizeY);
   }
+}
+
+Crosshair.prototype.handleResize = function(){
+  if (this.mesh.material.uniforms.sizeScale){
+    this.mesh.material.uniforms.sizeScale.value = 1;
+  }
+  var cSizeX = (this.sizeAmount * 5 / (renderer.getCurrentViewport().z / screenResolution));
+  var cSizeY = (this.sizeAmount * 5) / (renderer.getCurrentViewport().w / screenResolution);
+  if (!(typeof this.maxWidthPercent == UNDEFINED)){
+    var widthPercent = 100 * cSizeX / 2;
+    if (widthPercent > this.maxWidthPercent){
+      this.mesh.material.uniforms.sizeScale.value = ((2 * this.maxWidthPercent / 100) * ((renderer.getCurrentViewport().z / screenResolution)) / 5) / this.sizeAmount;
+    }
+  }
+  if (!(typeof this.maxHeightPercent == UNDEFINED)){
+    var heightPercent = 100 * cSizeY / 2;
+    if (heightPercent > this.maxHeightPercent){
+      this.mesh.material.uniforms.sizeScale.value = ((2 * this.maxHeightPercent / 100) * ((renderer.getCurrentViewport().w / screenResolution)) / 5) / this.sizeAmount;
+    }
+  }
+}
+
+Crosshair.prototype.injectMacro = function(macro, insertVertexShader, insertFragmentShader){
+  if (insertVertexShader){
+    this.material.vertexShader = this.material.vertexShader.replace(
+      "#define INSERTION", "#define INSERTION\n#define "+macro
+    )
+  };
+  if (insertFragmentShader){
+    this.material.fragmentShader = this.material.fragmentShader.replace(
+      "#define INSERTION", "#define INSERTION\n#define "+macro
+    )
+  };
+  this.material.needsUpdate = true;
 }

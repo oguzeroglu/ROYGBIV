@@ -6,6 +6,11 @@ attribute float size;
 uniform vec4 expandInfo;
 uniform float shrinkStartSize;
 
+#define INSERTION
+#ifdef HAS_SIZE_SCALE
+  uniform float sizeScale;
+#endif
+
 void main(){
 
   float expandFlag = expandInfo[0];
@@ -31,4 +36,8 @@ void main(){
       gl_PointSize = 5.0 * size;
     }
   }
+
+  #ifdef HAS_SIZE_SCALE
+    gl_PointSize *= sizeScale;
+  #endif
 }

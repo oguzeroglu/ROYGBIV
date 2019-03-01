@@ -830,7 +830,10 @@ var Text = function(){
                                                 "textureName: The texture name of the crosshair. (mandatory)\n"+
                                                 "colorName: The color name of the crosshair. (mandatory)\n"+
                                                 "alpha: The alpha value of the crosshair. (mandatory)\n"+
-                                                "size: The size of the crosshair. (mandatory)";
+                                                "size: The size of the crosshair. (mandatory)\n"+
+                                                "maxWidthPercent: If set the crosshair width cannot be more than maxWidthPercent% of the screen width. (optional)\n"+
+                                                "maxHeightPercent: If set the crosshair height cannot be more than maxHeightPercent% of the screen height. (optional)";
+
    this.ROYGBIV_SCRIPTING_API_SELECTCROSSHAIR = "Selects a crosshair. Only the selected crosshair is visible on the screen.";
    this.ROYGBIV_SCRIPTING_API_CHANGECROSSHAIRCOLOR = "Changes the color of the selected crosshair.";
    this.ROYGBIV_SCRIPTING_API_HIDECROSSHAIR = "Destroys the selected crosshair. selectCrosshair function should be used after this function\nin order to put a crosshair on the screen.";

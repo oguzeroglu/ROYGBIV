@@ -5525,6 +5525,8 @@ Roygbiv.prototype.makeParticleSystemsResponsive = function(referenceHeight){
 // colorName: The color name of the crosshair. (mandatory)
 // alpha: The alpha value of the crosshair. (mandatory)
 // size: The size of the crosshair. (mandatory)
+// maxWidthPercent: If set the crosshair width cannot be more than maxWidthPercent% of the screen width. (optional)
+// maxHeightPercent: If set the crosshair height cannot be more than maxHeightPercent% of the screen height. (optional)
 Roygbiv.prototype.createCrosshair = function(configurations){
   if (mode == 0){
     return;
@@ -5534,6 +5536,8 @@ Roygbiv.prototype.createCrosshair = function(configurations){
   var colorName = configurations.colorName;
   var alpha = configurations.alpha;
   var size = configurations.size;
+  var maxWidthPercent = configurations.maxWidthPercent;
+  var maxHeightPercent = configurations.maxHeightPercent;
 
   if (typeof name == UNDEFINED){
     throw new Error("createCrosshair error: name is a mandatory configuration.");
@@ -5580,6 +5584,34 @@ Roygbiv.prototype.createCrosshair = function(configurations){
     throw new Error("createCrosshair error: size must be greater than zero.");
     return;
   }
+  if (!(typeof maxWidthPercent == UNDEFINED)){
+    if (isNaN(maxWidthPercent)){
+      throw new Error("createCrosshair error: maxWidthPercent is not a number.");
+      return;
+    }
+    if (maxWidthPercent <= 0){
+      throw new Error("createCrosshair error: maxWidthPercent must be greater than zero.");
+      return;
+    }
+    if (maxWidthPercent > 100){
+      throw new Error("createCrosshair error: maxWidthPercent must be less than 100.");
+      return;
+    }
+  }
+  if (!(typeof maxHeightPercent == UNDEFINED)){
+    if (isNaN(maxHeightPercent)){
+      throw new Error("createCrosshair error: maxHeightPercent is not a number.");
+      return;
+    }
+    if (maxHeightPercent <= 0){
+      throw new Error("createCrosshair error: maxHeightPercent must be greater than zero.");
+      return;
+    }
+    if (maxHeightPercent > 100){
+      throw new Error("createCrosshair error: maxHeightPercent must be less than 100.");
+      return;
+    }
+  }
 
   var color = new THREE.Color(colorName);
   new Crosshair({
@@ -5589,7 +5621,9 @@ Roygbiv.prototype.createCrosshair = function(configurations){
     colorB: color.b,
     colorG: color.g,
     alpha: alpha,
-    size: size
+    size: size,
+    maxWidthPercent: maxWidthPercent,
+    maxHeightPercent: maxHeightPercent
   });
 }
 
@@ -5612,6 +5646,7 @@ Roygbiv.prototype.selectCrosshair = function(crosshairName){
     selectedCrosshair.mesh.visible = false;
   }
   crosshair.mesh.visible = true;
+  crosshair.handleResize();
   selectedCrosshair = crosshair;
 }
 
