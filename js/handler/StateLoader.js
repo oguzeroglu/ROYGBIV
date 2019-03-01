@@ -2203,6 +2203,7 @@ StateLoader.prototype.resetProject = function(){
   dynamicObjectGroups = new Object();
   trackingObjects = new Object();
   screenResolution = 1;
+  renderer.setPixelRatio(screenResolution);
   skyboxConfigurationsVisible = false;
   fogConfigurationsVisible = false;
   stopAreaConfigurationsHandler = false;
