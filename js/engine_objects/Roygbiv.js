@@ -1027,6 +1027,7 @@ Roygbiv.prototype.createParticleMaterial = function(configurations){
   if (mode == 0){
     return;
   }
+  preConditions.checkIfDefined(ROYGBIV.createParticleMaterial, preConditions.configurations, configurations);
   var color = configurations.color;
   var size = configurations.size;
   var alpha = configurations.alpha;
@@ -1034,71 +1035,24 @@ Roygbiv.prototype.createParticleMaterial = function(configurations){
   var rgbFilter = configurations.rgbFilter;
   var targetColor = configurations.targetColor;
   var colorStep = configurations.colorStep;
-
-  if (typeof color == UNDEFINED){
-    throw new Error("createParticleMaterial error: color is a mandatory parameter.");
-    return;
-  }
-  if (typeof size == UNDEFINED){
-    throw new Error("createParticleMaterial error: size is a mandatory parameter.");
-    return;
-  }
-  if (isNaN(size)){
-    throw new Error("createParticleMaterial error: Bad size parameter.");
-    return;
-  }
-  if (size <= 0){
-    throw new Error("createParticleMaterial error: size must be greater than zero.");
-    return;
-  }
-  if (typeof alpha == UNDEFINED){
-    throw new Error("createParticleMaterial error: alpha is a mandatory parameter.");
-    return;
-  }
-  if (isNaN(alpha)){
-    throw new Error("createParticleMaterial error: Bad alpha parameter.");
-    return;
-  }
-  if (alpha < 0 || alpha > 1){
-    throw new Error("createParticleMaterial error: alpha must be between [0,1]");
-    return;
-  }
+  preConditions.checkIfMandatoryParameterExists(ROYGBIV.createParticleMaterial, preConditions.color, color);
+  preConditions.checkIfMandatoryParameterExists(ROYGBIV.createParticleMaterial, preConditions.size, size);
+  preConditions.checkIfNumber(ROYGBIV.createParticleMaterial, preConditions.size, size);
+  preConditions.checkIfLessThan(ROYGBIV.createParticleMaterial, preConditions.size, size, 0);
+  preConditions.checkIfMandatoryParameterExists(ROYGBIV.createParticleMaterial, preConditions.alpha, alpha);
+  preConditions.checkIfNumber(ROYGBIV.createParticleMaterial, preConditions.alpha, alpha);
+  preConditions.checkIfInRange(ROYGBIV.createParticleMaterial, preConditions.alpha, alpha, 0, 1);
   if (!(typeof textureName == UNDEFINED)){
     var texture = textures[textureName];
-    if (typeof texture == UNDEFINED){
-      throw new Error("createParticleMaterial error: No such texture.");
-      return;
-    }
-    if (!(texture instanceof THREE.Texture)){
-      throw new Error("createParticleMaterial error: Texture not ready.");
-      return;
-    }
-    if (texture instanceof THREE.CompressedTexture){
-      throw new Error("createParticleMaterial error: Compressed textures are not supported for particle systems.");
-      return;
-    }
+    preConditions.checkIfTextureExists(ROYGBIV.createParticleMaterial, null, texture);
+    preConditions.checkIfTextureReady(ROYGBIV.createParticleMaterial, null ,texture);
+    preConditions.checkIfTextureCompressed(ROYGBIV.createParticleMaterial, null, texture);
   }
-  if (!(typeof rgbFilter == UNDEFINED)){
-    if (isNaN(rgbFilter.x) || isNaN(rgbFilter.y) || isNaN(rgbFilter.z)){
-      throw new Error("createParticleMaterial error: Bad rgbFilter parameter.");
-      return;
-    }
-  }
-  if (!(typeof targetColor == UNDEFINED)){
-    if (typeof colorStep == UNDEFINED){
-      throw new Error("createParticleMaterial error: colorStep is mandatory if targetColor is specified.");
-      return;
-    }
-  }
+  preConditions.checkIfVectorOnlyIfDefined(ROYGBIV.createParticleMaterial, preConditions.rgbFilter, rgbFilter);
+  preConditions.checkIfXExistsOnlyIfYExists(ROYGBIV.createParticleMaterial, preConditions.colorStep, preConditions.targetColor, colorStep, targetColor);
   if (!(typeof colorStep == UNDEFINED) && configurations.colorStep != 0){
-    if (isNaN(colorStep)){
-      throw new Error("createParticleMaterial error: Bad colorStep parameter.");
-      return;
-    }
-    if (colorStep > 1 || colorStep <= 0){
-      throw new Error("createParticleMaterial error: colorStep must be between ]0,1]");
-      return;
-    }
+    preConditions.checkIfNumber(ROYGBIV.createParticleMaterial, preConditions.colorStep, colorStep);
+    preConditions.checkIfInRangeMinInclusive(ROYGBIV.createParticleMaterial, preConditions.colorStep, colorStep, 0, 1);
   }else{
     configurations.colorStep = 0;
   }
@@ -1137,12 +1091,7 @@ Roygbiv.prototype.createParticle = function(configurations){
   if (mode == 0){
     return;
   }
-
-  if (!configurations){
-    throw new Error("createParticle error: configurations are not defined.");
-    return;
-  }
-
+  preConditions.checkIfDefined(ROYGBIV.createParticle, preConditions.configurations, configurations);
   var position = configurations.position;
   var material = configurations.material;
   var lifetime = configurations.lifetime;
@@ -1160,170 +1109,76 @@ Roygbiv.prototype.createParticle = function(configurations){
   var angularMotionRadius = configurations.angularMotionRadius;
   var angularQuaternion = configurations.angularQuaternion;
   var motionMode = configurations.motionMode;
-
-  if (!(typeof motionMode == UNDEFINED)){
-    if  (motionMode != MOTION_MODE_NORMAL && motionMode != MOTION_MODE_CIRCULAR){
-      throw new Error("createParticle error: motionMode must be MOTION_MODE_NORMAL or MOTION_MODE_CIRCULAR.");
-      return;
-    }
-  }else{
+  preConditions.checkIfMotionModeOnlyIfExists(ROYGBIV.createParticle, preConditions.motionMode, motionMode);
+  if (typeof motionMode == UNDEFINED){
     motionMode = MOTION_MODE_NORMAL;
   }
-
-  if (typeof position == UNDEFINED && motionMode == MOTION_MODE_NORMAL){
-    throw new Error("createParticle error: position is a mandatory parameter for MOTION_MODE_NORMAL.");
-    return;
-  }
+  preConditions.checkIfXExistsOnlyIfYIsZ(ROYGBIV.createParticle, preConditions.position, preConditions.motionMode, preConditions.MOTION_MODE_NORMAL, position, motionMode, MOTION_MODE_NORMAL);
   if (motionMode == MOTION_MODE_NORMAL){
     initialAngle = 0;
-    if (isNaN(position.x) || isNaN(position.y) || isNaN(position.z)){
-      throw new Error("createParticle error: position is not a vector.");
-      return;
-    }
+    preConditions.checkIfVectorOnlyIfDefined(ROYGBIV.createParticle, preConditions.position, position);
   }
-  if (typeof initialAngle == UNDEFINED && motionMode == MOTION_MODE_CIRCULAR){
-    throw new Error("createParticle error: initialAngle is a mandatory for MOTION_MODE_CIRCULAR.");
-    return;
-  }
+  preConditions.checkIfXExistsOnlyIfYIsZ(ROYGBIV.createParticle, preConditions.initialAngle, preConditions.motionMode, preConditions.MOTION_MODE_CIRCULAR, initialAngle, motionMode, MOTION_MODE_CIRCULAR);
   if (motionMode == MOTION_MODE_CIRCULAR){
     position = this.vector(0, 0, 0);
-    if (isNaN(initialAngle)){
-      throw new Error("createParticle error: Bad initialAngle parameter.");
-      return;
-    }
+    preConditions.checkIfNumber(ROYGBIV.createParticle, preConditions.initialAngle, initialAngle);
   }
-  if (!material){
-    throw new Error("createParticle error: material is a mandatory parameter.");
-    return;
-  }
-  if (!(material.isParticleMaterial)){
-    throw new Error("createParticle error: Material type not supported.");
-    return;
-  }
-  if (isNaN(position.x) || isNaN(position.y) || isNaN(position.z)){
-    throw new Error("createParticle error: position is not a vector.");
-    return;
-  }
-  if (typeof lifetime == UNDEFINED){
-    throw new Error("createParticle error: lifetime is a mandatory parameter.");
-    return;
-  }
-  if (isNaN(lifetime)){
-    throw new Error("createParticle error: lifetime is not a number.");
-    return;
-  }
-  if (typeof respawn == UNDEFINED){
-    throw new Error("createParticle error: respawn is a mandatory parameter.");
-    return;
-  }
-  if (!(typeof(respawn) == typeof(true))){
-    throw new Error("createParticle error: respawn is not a boolean.");
-    return;
-  }
-  if (!(typeof alphaVariation == UNDEFINED)){
-    if (isNaN(alphaVariation)){
-      throw new Error("createParticle error: Bad alphaVariation parameter.");
-      return;
-    }
-  }
-  if (!(typeof alphaVariationMode == UNDEFINED)){
-    if (isNaN(alphaVariationMode)){
-      throw new Error("createParticle error: Bad alphaVariationMode parameter.");
-      return;
-    }
-    if (alphaVariationMode != ALPHA_VARIATION_MODE_NORMAL &&
-              alphaVariationMode != ALPHA_VARIATION_MODE_SIN &&
-                  alphaVariationMode != ALPHA_VARIATION_MODE_COS){
-          throw new Error("createParticle error: alphaVariationMode must be one of ALPHA_VARIATION_MODE_NORMAL, ALPHA_VARIATION_MODE_SIN or ALPHA_VARIATION_MODE_COS.");
-          return;
-        }
-  }
-
+  preConditions.checkIfMandatoryParameterExists(ROYGBIV.createParticle, preConditions.material, material);
+  preConditions.checkIfParticleMaterial(ROYGBIV.createParticle, preConditions.material, material);
+  preConditions.checkIfVectorOnlyIfDefined(ROYGBIV.createParticle, preConditions.position, position);
+  preConditions.checkIfMandatoryParameterExists(ROYGBIV.createParticle, preConditions.lifetime, lifetime);
+  preConditions.checkIfNumber(ROYGBIV.createParticle, preConditions.lifetime, lifetime);
+  preConditions.checkIfMandatoryParameterExists(ROYGBIV.createParticle, preConditions.respawn, respawn);
+  preConditions.checkIfBooleanOnlyIfExists(ROYGBIV.createParticle, preConditions.respawn, respawn);
+  preConditions.checkIfNumberOnlyIfExists(ROYGBIV.createParticle, preConditions.alphaVariation, alphaVariation);
+  preConditions.checkIfAlphaVariationModeOnlyIfExists(ROYGBIV.createParticle, preConditions.alphaVariationMode, alphaVariationMode);
   if (!(typeof startDelay == UNDEFINED)){
-    if (isNaN(startDelay)){
-      throw new Error("createParticle error: Bad startDelay parameter.");
-      return;
-    }
-    if (startDelay < 0){
-      throw new Error("createParticle error: startDelay must be a positive number.");
-      return;
-    }
+    preConditions.checkIfNumber(ROYGBIV.createParticle, preConditions.startDelay, startDelay);
+    preConditions.checkIfLessThanExclusive(ROYGBIV.createParticle, preConditions.startDelay, startDelay);
   }else{
     startDelay = 0;
   }
-
   if (!(typeof trailMode == UNDEFINED)){
-    if (typeof trailMode != typeof(true)){
-      throw new Error("createParticle error: Bad trailMode parameter.");
-      return;
-    }
+    preConditions.checkIfBooleanOnlyIfExists(ROYGBIV.createParticle, preConditions.trailMode, trailMode);
     if (trailMode){
-      if(lifetime == 0){
-        throw new Error("createParticle error: Lifetime must be greater than zero for trail particles.");
-        return;
-      }
-      if (!respawn){
-        throw new Error("createParticle error: respawn property must be true for trail particles.");
-        return;
-      }
+      preConditions.checkIfTrue(ROYGBIV.createParticle, "Lifetime must be greater than zero for trail particles.", (lifetime == 0));
+      preConditions.checkIfTrue(ROYGBIV.createParticle, "respawn property must be true for trail particles.", (!respawn));
     }
   }else{
     trailMode = false;
   }
   if (!(typeof velocity == UNDEFINED)){
-    if (isNaN(velocity.x) || isNaN(velocity.y) || isNaN(velocity.z)){
-      throw new Error("createParticle error: Bad velocity parameter.");
-      return;
-    }
+    preConditions.checkIfVectorOnlyIfDefined(ROYGBIV.createParticle, preConditions.velocity, velocity);
   }else{
     velocity = this.vector(0, 0, 0);
   }
   if (!(typeof acceleration == UNDEFINED)){
-    if (isNaN(acceleration.x) || isNaN(acceleration.y) || isNaN(acceleration.z)){
-      throw new Error("createParticle error: Bad acceleration parameter.");
-      return;
-    }
+    preConditions.checkIfVectorOnlyIfDefined(ROYGBIV.createParticle, preConditions.acceleration, acceleration);
   }else{
     acceleration = this.vector(0, 0, 0);
   }
   if (!(typeof angularVelocity == UNDEFINED)){
-    if (isNaN(angularVelocity)){
-      throw new Error("createParticle error: Bad angularVelocity parameter.");
-      return;
-    }
+    preConditions.checkIfNumber(ROYGBIV.createParticle, preConditions.angularVelocity, angularVelocity);
   }else{
     angularVelocity = 0;
   }
   if (!(typeof angularAcceleration == UNDEFINED)){
-    if (isNaN(angularAcceleration)){
-      throw new Error("createParticle error: Bad angularAcceleration parameter.");
-      return;
-    }
+    preConditions.checkIfNumber(ROYGBIV.createParticle, preConditions.angularAcceleration, angularAcceleration);
   }else{
     angularAcceleration = 0;
   }
   if (!(typeof angularMotionRadius == UNDEFINED)){
-    if (isNaN(angularMotionRadius)){
-      throw new Error("createParticle error: Bad angularMotionRadius parameter.");
-      return;
-    }
+    preConditions.checkIfNumber(ROYGBIV.createParticle, preConditions.angularMotionRadius, angularMotionRadius);
   }else{
     angularMotionRadius = 0;
   }
   if (!(typeof angularQuaternion == UNDEFINED)){
-    if (isNaN(angularQuaternion.x) || isNaN(angularQuaternion.y)
-                    || isNaN(angularQuaternion.z) || isNaN(angularQuaternion.w)){
-      throw new Error("createParticle error: Bad angularQuaternion parameter.");
-      return;
-    }
+    preConditions.checkIfQuaternionOnlyIfDefined(ROYGBIV.createParticle, preConditions.angularQuaternion, angularQuaternion);
   }else{
     angularQuaternion = REUSABLE_QUATERNION.set(0, 0, 0, 1);
   }
   if (!(typeof useWorldPosition == UNDEFINED)){
-    if (typeof useWorldPosition != typeof(true)){
-      throw new Error("createParticle error: useWorldPosition is not a boolean.");
-      return;
-    }
+    preConditions.checkIfBooleanOnlyIfExists(ROYGBIV.createParticle, preConditions.useWorldPosition, useWorldPosition);
   }else{
     useWorldPosition = false;
   }
@@ -1391,15 +1246,8 @@ Roygbiv.prototype.createParticleSystem = function(configurations){
     return;
   }
 
-  if (TOTAL_PARTICLE_SYSTEM_COUNT >= MAX_PARTICLE_SYSTEM_COUNT){
-    throw new Error("createParticleSystem error: Cannot create more than "+MAX_PARTICLE_SYSTEM_COUNT+" particle systems.");
-    return;
-  }
-
-  if (!configurations){
-    throw new Error("createParticleSystem error: configurations is not defined.");
-    return;
-  }
+  preConditions.checkIfTrue(ROYGBIV.createParticleSystem, "Cannot create more than "+MAX_PARTICLE_SYSTEM_COUNT+" particle systems.", (TOTAL_PARTICLE_SYSTEM_COUNT >= MAX_PARTICLE_SYSTEM_COUNT));
+  preConditions.checkIfDefined(ROYGBIV.createParticleSystem, preConditions.configurations, configurations);
 
   var name = configurations.name;
   var particles = configurations.particles;
@@ -1414,124 +1262,43 @@ Roygbiv.prototype.createParticleSystem = function(configurations){
   var angularQuaternion = configurations.angularQuaternion;
   var initialAngle = configurations.initialAngle;
   var motionMode = configurations.motionMode;
-
-  if (!name){
-    throw new Error("createParticleSystem error: name is a mandatory configuration.");
-    return;
-  }
-  if (name.indexOf(',') !== -1){
-    throw new Error("createParticleSystem error: name cannot contain coma.");
-    return;
-  }
-  if (particleSystemPool[name]){
-    throw new Error("createParticleSystem error: name must be unique.");
-    return;
-  }
-  if (!particles){
-    throw new Error("createParticleSystem error: particles is a mandatory configuration.");
-    return;
-  }
-  if (particles.length == 0){
-    throw new Error("createParticleSystem error: particles array is empty.");
-    return;
-  }
-  if (!position){
-    throw new Error("createParticleSystem error: position is a mandatory configuration.");
-    return;
-  }
-  if (typeof position.x == UNDEFINED || typeof position.y == UNDEFINED || typeof position.z == UNDEFINED){
-    throw new Error("createParticleSystem error: position is not a vector.");
-    return;
-  }
-  if (isNaN(position.x) || isNaN(position.y) || isNaN(position.z)){
-    throw new Error("createParticleSystem error: position is not a vector.");
-    return;
-  }
-  if (typeof lifetime == UNDEFINED){
-    throw new Error("createParticleSystem error: lifetime is a mandatory parameter.");
-    return;
-  }
-  if (isNaN(lifetime)){
-    throw new Error("createParticleSystem error: Bad lifetime parameter.");
-    return;
-  }
-  if (lifetime < 0){
-    throw new Error("createParticleSystem error: lifetime must be a positive number.");
-    return;
-  }
-
-  if (!(typeof velocity == UNDEFINED)){
-    if (isNaN(velocity.x) || isNaN(velocity.y) || isNaN(velocity.z)){
-      throw new Error("createParticleSystem error: Bad velocity parameter.");
-      return;
-    }
-  }
-
-  if (!(typeof acceleration == UNDEFINED)){
-    if (isNaN(acceleration.x) || isNaN(acceleration.y) || isNaN(acceleration.z)){
-      throw new Error("createParticleSystem error: Bad acceleration parameter.");
-      return;
-    }
-  }
-
-  if (particles.length >= MAX_VERTICES_ALLOWED_IN_A_PARTICLE_SYSTEM){
-    throw new Error("createParticleSystem error: Maximum allowed particle size "+MAX_VERTICES_ALLOWED_IN_A_PARTICLE_SYSTEM+" exceeded.");
-    return;
-  }
-
-  if (!(typeof angularVelocity == UNDEFINED)){
-    if (isNaN(angularVelocity)){
-      throw new Error("createParticleSystem error: Bad angularVelocity parameter.");
-      return;
-    }
-  }else{
+  preConditions.checkIfMandatoryParameterExists(ROYGBIV.createParticleSystem, preConditions.name, name);
+  preConditions.checkIfTrue(ROYGBIV.createParticleSystem, "name cannot contain coma.", (name.indexOf(',') !== -1));
+  preConditions.checkIfTrue(ROYGBIV.createParticleSystem, "name must be unique", (particleSystemPool[name]));
+  preConditions.checkIfMandatoryParameterExists(ROYGBIV.createParticleSystem, preConditions.particles, particles);
+  preConditions.checkIfEmptyArray(ROYGBIV.createParticleSystem, preConditions.particles, particles);
+  preConditions.checkIfMandatoryParameterExists(ROYGBIV.createParticleSystem, preConditions.position, position);
+  preConditions.checkIfVectorOnlyIfDefined(ROYGBIV.createParticleSystem, preConditions.position, position);
+  preConditions.checkIfMandatoryParameterExists(ROYGBIV.createParticleSystem, preConditions.lifetime, lifetime);
+  preConditions.checkIfNumber(ROYGBIV.createParticleSystem, preConditions.lifetime, lifetime);
+  preConditions.checkIfLessThanExclusive(ROYGBIV.createParticleSystem, preConditions.lifetime, lifetime, 0);
+  preConditions.checkIfVectorOnlyIfDefined(ROYGBIV.createParticleSystem, preConditions.velocity, velocity);
+  preConditions.checkIfVectorOnlyIfDefined(ROYGBIV.createParticleSystem, preConditions.acceleration, acceleration);
+  preConditions.checkIfTrue(ROYGBIV.createParticleSystem, "Maximum allowed particle size "+MAX_VERTICES_ALLOWED_IN_A_PARTICLE_SYSTEM+" exceeded.", (particles.length >= MAX_VERTICES_ALLOWED_IN_A_PARTICLE_SYSTEM));
+  preConditions.checkIfNumberOnlyIfExists(ROYGBIV.createParticleSystem, preConditions.angularVelocity, angularVelocity);
+  preConditions.checkIfNumberOnlyIfExists(ROYGBIV.createParticleSystem, preConditions.angularMotionRadius, angularMotionRadius);
+  preConditions.checkIfNumberOnlyIfExists(ROYGBIV.createParticleSystem, preConditions.angularAcceleration, angularAcceleration);
+  preConditions.checkIfQuaternionOnlyIfDefined(ROYGBIV.createParticleSystem, preConditions.angularQuaternion, angularQuaternion);
+  preConditions.checkIfNumberOnlyIfExists(ROYGBIV.createParticleSystem, preConditions.initialAngle ,initialAngle);
+  preConditions.checkIfMotionModeOnlyIfExists(ROYGBIV.createParticleSystem, preConditions.motionMode, motionMode);
+  if ((typeof angularVelocity == UNDEFINED)){
     angularVelocity = 0;
   }
-
-  if (!(typeof angularAcceleration == UNDEFINED)){
-    if (isNaN(angularAcceleration)){
-      throw new Error("createParticleSystem error: Bad angularAcceleration parameter.");
-      return;
-    }
-  }else{
+  if ((typeof angularAcceleration == UNDEFINED)){
     angularAcceleration = 0;
   }
-
-  if (!(typeof angularMotionRadius == UNDEFINED)){
-    if (isNaN(angularMotionRadius)){
-      throw new Error("createParticleSystem error: Bad angularMotionRadius parameter.");
-      return;
-    }
-  }else{
+  if ((typeof angularMotionRadius == UNDEFINED)){
     angularMotionRadius = 0;
   }
-
-  if (!(typeof angularQuaternion == UNDEFINED)){
-    if (isNaN(angularQuaternion.x) || isNaN(angularQuaternion.y) || isNaN(angularQuaternion.z) || isNaN(angularQuaternion.w)){
-      throw new Error("createParticleSystem error: Bad angularQuaternion parameter.");
-    }
-  }else{
+  if ((typeof angularQuaternion == UNDEFINED)){
     angularQuaternion = REUSABLE_QUATERNION.set(0, 0, 0, 1);
   }
-
-  if (!(typeof initialAngle == UNDEFINED)){
-    if (isNaN(initialAngle)){
-      throw new Error("createParticleSystem error: Bad initialAngle parameter.");
-      return;
-    }
-  }else{
+  if ((typeof initialAngle == UNDEFINED)){
     initialAngle = 0;
   }
-
-  if (!(typeof motionMode == UNDEFINED)){
-    if (motionMode != MOTION_MODE_NORMAL && motionMode != MOTION_MODE_CIRCULAR){
-      throw new Error("createParticleSystem error: motionMode must be MOTION_MODE_NORMAL or MOTION_MODE_CIRCULAR.");
-      return;
-    }
-  }else{
+  if ((typeof motionMode == UNDEFINED)){
     motionMode = MOTION_MODE_NORMAL;
   }
-
   var vx = 0, vy = 0, vz = 0, ax = 0, ay = 0, az = 0;
   if (velocity){
     vx = velocity.x;
@@ -1555,7 +1322,6 @@ Roygbiv.prototype.createParticleSystem = function(configurations){
   );
 
   particleSystem.lifetime = lifetime;
-
   particleSystem.angularVelocity = angularVelocity;
   particleSystem.angularAcceleration = angularAcceleration;
   particleSystem.angularMotionRadius = angularMotionRadius;
@@ -1564,9 +1330,7 @@ Roygbiv.prototype.createParticleSystem = function(configurations){
   particleSystem.angularQuaternionZ = angularQuaternion.z;
   particleSystem.angularQuaternionW = angularQuaternion.w;
   particleSystem.initialAngle = initialAngle;
-
   TOTAL_PARTICLE_SYSTEM_COUNT ++;
-
   return particleSystem;
 }
 
@@ -1576,27 +1340,10 @@ Roygbiv.prototype.scale = function(object, scaleVector){
   if (mode == 0){
     return;
   }
-  if (!scaleVector){
-    throw new Error("scale error: scaleVector is not defined.");
-    return;
-  }
-  if (typeof scaleVector.x == UNDEFINED || typeof scaleVector.y == UNDEFINED || typeof scaleVector.z == UNDEFINED){
-    throw new Error("scal error: scaleVector is not a vector.");
-    return;
-  }
-  if (isNaN(scaleVector.x) || isNaN(scaleVector.y) || isNaN(scaleVector.z)){
-    throw new Error("scale error: scaleVector is not a vector.");
-    return;
-  }
-  if (!object){
-    throw new Error("scale error: object is undefined.");
-    return;
-  }
-  if (!(object.isParticleSystem)){
-    throw new Error("scale error: Type not supported.");
-    return;
-  }
-
+  preConditions.checkIfDefined(ROYGBIV.scale, preConditions.scaleVector, scaleVector);
+  preConditions.checkIfVectorOnlyIfDefined(ROYGBIV.scale, preConditions.scaleVector, scaleVector);
+  preConditions.checkIfDefined(ROYGBIV.scale, preConditions.object, object);
+  preConditions.checkIfParticleSystem(ROYGBIV.scale, preConditions.object, object);
   object.mesh.scale.set(scaleVector.x, scaleVector.y, scaleVector.z);
 }
 
@@ -1604,89 +1351,42 @@ Roygbiv.prototype.scale = function(object, scaleVector){
 //  Sets the blending mode of a particle system. Blending mode can be one of
 //  NO_BLENDING, NORMAL_BLENDING, ADDITIVE_BLENDING, SUBTRACTIVE_BLENDING or
 //  MULTIPLY_BLENDING
-Roygbiv.prototype.setBlending = function(particleSystem, mode){
+Roygbiv.prototype.setBlending = function(particleSystem, blendingMode){
   if (mode == 0){
     return;
   }
-  if (!particleSystem){
-    throw new Error("setBlending error: particleSystem is not defined.");
-    return;
-  }
-  if (typeof mode == UNDEFINED){
-    throw new Error("setBlending error: mode is not defined.");
-    return;
-  }
-  if (!(particleSystem.isParticleSystem)){
-    throw new Error("setBlending error: Unsupported type.");
-    return;
-  }
-  if (mode != NO_BLENDING && mode != NORMAL_BLENDING && mode != ADDITIVE_BLENDING && mode != SUBTRACTIVE_BLENDING && mode != MULTIPLY_BLENDING){
-    throw new Error("setBlending error: Bad mode parameter.");
-    return;
-  }
-  particleSystem.setBlending(mode);
+  preConditions.checkIfDefined(ROYGBIV.setBlending, preConditions.particleSystem, particleSystem);
+  preConditions.checkIfDefined(ROYGBIV.setBlending, preConditions.blendingMode, blendingMode);
+  preConditions.checkIfParticleSystem(ROYGBIV.setBlending, preConditions.particleSystem, particleSystem);
+  preConditions.checkIfBlending(ROYGBIV.setBlending, preConditions.blendingMode, blendingMode);
+  particleSystem.setBlending(blendingMode);
 }
 
 // setParticleSystemRotation
 //  Sets the rotation of a particle system around given axis.
-Roygbiv.prototype.setParticleSystemRotation = function(particleSystem, axis, rad){
+Roygbiv.prototype.setParticleSystemRotation = function(particleSystem, axis, radians){
   if (mode == 0){
     return;
   }
-  if (!particleSystem){
-    throw new Error("setParticleSystemRotation error: particleSystem is not defined.");
-    return;
-  }
-  if (!axis){
-    throw new Error("setParticleSystemRotation error: axis is not defined.");
-    return;
-  }
-  if (typeof rad == UNDEFINED){
-    throw new Error("setParticleSystemRotation error: rad is not defined.");
-    return;
-  }
+  preConditions.checkIfDefined(ROYGBIV.setParticleSystemRotation, preConditions.particleSystem, particleSystem);
+  preConditions.checkIfDefined(ROYGBIV.setParticleSystemRotation, preConditions.axis, axis);
+  preConditions.checkIfDefined(ROYGBIV.setParticleSystemRotation, preConditions.radians, radians);
   axis = axis.toLowerCase();
-  if (axis != "x" && axis != "y" && axis != "z"){
-    throw new Error("setParticleSystemRotation error: axis should be one of x, y and z");
-    return;
-  }
-  if (isNaN(rad)){
-    throw new Error("setParticleSystemRotation error: Bad parameters.");
-    return;
-  }
-  if (!particleSystem.mesh.visible){
-    throw new Error("setParticleSystemRotation error: particleSystem is not visible.");
-    return;
-  }
-  if (particleSystem.checkForCollisions){
-    throw new Error("setParticleSystemRotation error: particleSystem has a collision callback attached. Cannot set rotation.");
-    return;
-  }
-  if (particleSystem.particlesWithCollisionCallbacks.size > 0){
-    throw new Error("setParticleSystemRotation error: particleSystem has a collidable particle. Cannot set rotation.");
-    return;
-  }
-  if (particleSystem.hasTrailedParticle){
-    throw new Error("setParticleSystemRotation error: particleSystem has a trailed particle. Cannot set rotation.");
-    return;
-  }
-  if (particleSystem.velocity.x != 0 || particleSystem.velocity.y != 0 || particleSystem.velocity.z != 0 ||
-          particleSystem.acceleration.x != 0 || particleSystem.acceleration.y != 0 || particleSystem.acceleration.z != 0){
-
-      throw new Error("setParticleSystemRotation error: particleSystem has a defined motion. Cannot set rotation.");
-      return;
-  }
-
+  preConditions.checkIfAxisOnlyIfDefined(ROYGBIV.setParticleSystemRotation, preConditions.axis, axis);
+  preConditions.checkIfNumber(ROYGBIV.setParticleSystemRotation, preConditions.radians, radians);
+  preConditions.checkIfTrue(ROYGBIV.setParticleSystemRotation, "particleSystem is not visible", (!particleSystem.mesh.visible));
+  preConditions.checkIfTrue(ROYGBIV.setParticleSystemRotation, "particleSystem has a collision callback attached. Cannot set rotation.", particleSystem.checkForCollisions);
+  preConditions.checkIfTrue(ROYGBIV.setParticleSystemRotation, "particleSystem has a collidable particle. Cannot set rotation.", particleSystem.particlesWithCollisionCallbacks.size > 0);
+  preConditions.checkIfTrue(ROYGBIV.setParticleSystemRotation, "particleSystem has a trailed particle. Cannot set rotation.", particleSystem.hasTrailedParticle);
+  preConditions.checkIfTrue(ROYGBIV.setParticleSystemRotation, "particleSystem has a defined motion. Cannot set rotation.", (particleSystem.velocity.x != 0 || particleSystem.velocity.y != 0 || particleSystem.velocity.z != 0 || particleSystem.acceleration.x != 0 || particleSystem.acceleration.y != 0 || particleSystem.acceleration.z != 0));
   if (axis == "x"){
-    particleSystem.mesh.rotation.x = rad;
+    particleSystem.mesh.rotation.x = radians;
   }else if (axis == "y"){
-    particleSystem.mesh.rotation.y = rad;
+    particleSystem.mesh.rotation.y = radians;
   }else if (axis == "z"){
-    particleSystem.mesh.rotation.z = rad;
+    particleSystem.mesh.rotation.z = radians;
   }
-
   particleSystem.hasManualRotationSet = true;
-
 }
 
 // setParticleSystemQuaternion
@@ -1695,42 +1395,17 @@ Roygbiv.prototype.setParticleSystemQuaternion = function(particleSystem, quatX, 
   if (mode == 0){
     return;
   }
-  if (!particleSystem){
-    throw new Error("setParticleSystemQuaternion error: particleSystem is not defined.");
-    return;
-  }
-  if (!(particleSystem.isParticleSystem)){
-    throw new Error("setParticleSystemQuaternion error: Unsupported type.");
-    return;
-  }
-  if (isNaN(quatX) || isNaN(quatY) || isNaN(quatZ) || isNaN(quatW)){
-    throw new Error("setParticleSystemQuaternion error: Bad parameters.");
-    return;
-  }
-
-  if (!particleSystem.mesh.visible){
-    throw new Error("setParticleSystemQuaternion error: particleSystem is not visible.");
-    return;
-  }
-  if (particleSystem.checkForCollisions){
-    throw new Error("setParticleSystemQuaternion error: particleSystem has a collision callback attached. Cannot set quaternion.");
-    return;
-  }
-  if (particleSystem.particlesWithCollisionCallbacks.size > 0){
-    throw new Error("setParticleSystemQuaternion error: particleSystem has a collidable particle. Cannot set quaternion.");
-    return;
-  }
-  if (particleSystem.hasTrailedParticle){
-    throw new Error("setParticleSystemQuaternion error: particleSystem has a trailed particle. Cannot set quaternion.");
-    return;
-  }
-  if (particleSystem.velocity.x != 0 || particleSystem.velocity.y != 0 || particleSystem.velocity.z != 0 ||
-          particleSystem.acceleration.x != 0 || particleSystem.acceleration.y != 0 || particleSystem.acceleration.z != 0){
-
-      throw new Error("setParticleSystemQuaternion error: particleSystem has a defined motion. Cannot set quaternion.");
-      return;
-  }
-
+  preConditions.checkIfDefined(ROYGBIV.setParticleSystemQuaternion, preConditions.particleSystem, particleSystem);
+  preConditions.checkIfParticleSystem(ROYGBIV.setParticleSystemQuaternion, preConditions.particleSystem, particleSystem);
+  preConditions.checkIfNumber(ROYGBIV.setParticleSystemQuaternion, preConditions.quatX, quatX);
+  preConditions.checkIfNumber(ROYGBIV.setParticleSystemQuaternion, preConditions.quatY, quatY);
+  preConditions.checkIfNumber(ROYGBIV.setParticleSystemQuaternion, preConditions.quatZ, quatZ);
+  preConditions.checkIfNumber(ROYGBIV.setParticleSystemQuaternion, preConditions.quatW, quatW);
+  preConditions.checkIfTrue(ROYGBIV.setParticleSystemQuaternion, "particleSystem is not visible.", (!particleSystem.mesh.visible));
+  preConditions.checkIfTrue(ROYGBIV.setParticleSystemQuaternion, "particleSystem has a collision callback attached. Cannot set quaternion.", (particleSystem.checkForCollisions));
+  preConditions.checkIfTrue(ROYGBIV.setParticleSystemQuaternion, "particleSystem has a collidable particle. Cannot set quaternion.", (particleSystem.particlesWithCollisionCallbacks.size > 0));
+  preConditions.checkIfTrue(ROYGBIV.setParticleSystemQuaternion, "particleSystem has a trailed particle. Cannot set quaternion.", (particleSystem.hasTrailedParticle));
+  preConditions.checkIfTrue(ROYGBIV.setParticleSystemQuaternion, "particleSystem has a defined motion. Cannot set quaternion.", (particleSystem.velocity.x != 0 || particleSystem.velocity.y != 0 || particleSystem.velocity.z != 0 || particleSystem.acceleration.x != 0 || particleSystem.acceleration.y != 0 || particleSystem.acceleration.z != 0));
   particleSystem.mesh.quaternion.set(quatX, quatY, quatZ, quatW);
   particleSystem.hasManualQuaternionSet = true;
 }
@@ -1741,14 +1416,8 @@ Roygbiv.prototype.kill = function(object){
   if (mode == 0){
     return;
   }
-  if (!object){
-    throw new Error("kill error: object is not defined.");
-    return;
-  }
-  if (!(object.isParticle) && !(object.isParticleSystem)){
-    throw new Error("kill error: Unsupported type.");
-    return;
-  }
+  preConditions.checkIfDefined(ROYGBIV.kill, preConditions.object, object);
+  preConditions.checkIfParticleOrParticleSystem(ROYGBIV.kill, preConditions.object, object);
   if (object.isParticle){
     object.isExpired = true;
     if (object.parent){
@@ -1795,194 +1464,72 @@ Roygbiv.prototype.createSmoke = function(configurations){
   if (mode == 0){
     return;
   }
-
-  if (!configurations){
-    throw new Error("createSmoke error: configurations is not defined.");
-    return;
-  }
-
+  preConditions.checkIfDefined(ROYGBIV.createSmoke, preConditions.configurations, configurations);
   var smokeSize = configurations.smokeSize;
   var name = configurations.name;
-  if (typeof name == UNDEFINED){
-    throw new Error("createSmoke error: name is a mandatory configuration.");
-    return;
-  }
-  if (particleSystemPool[name]){
-    throw new Error("createSmoke error: name must be unique.");
-    return;
-  }
-
+  preConditions.checkIfMandatoryParameterExists(ROYGBIV.createSmoke, preConditions.name, name);
+  preConditions.checkIfTrue(ROYGBIV.createSmoke, "name must be unique", particleSystemPool[name]);
   var position = configurations.position;
-  if (typeof position == UNDEFINED){
-    throw new Error("createSmoke error: position is a mandatory parameter.");
-    return;
-  }else{
-    if (isNaN(position.x) || isNaN(position.y) || isNaN(position.z)){
-      throw new Error("createSmoke error: Bad position parameter.");
-      return;
-    }
-  }
+  preConditions.checkIfMandatoryParameterExists(ROYGBIV.createSmoke, preConditions.position, position);
+  preConditions.checkIfVectorOnlyIfDefined(ROYGBIV.createSmoke, preConditions.position, position);
   var expireTime = configurations.expireTime;
-  if (typeof expireTime == UNDEFINED){
-    throw new Error("createSmoke error: expireTime is a mandatory parameter.");
-    return;
-  }else{
-    if (isNaN(expireTime)){
-      throw new Error("createSmoke error: Bad expireTime parameter.");
-      return;
-    }else{
-      if (expireTime < 0){
-        throw new Error("createSmoke error: expireTime must be greater than zero.");
-        return;
-      }
-    }
-  }
-
-  if (typeof smokeSize == UNDEFINED){
-    throw new Error("createSmoke error: smokeSize is a mandatory configuration.");
-    return;
-  }
-  if (isNaN(smokeSize)){
-    throw new Error("createSmoke error: Bad smokeSize parameter");
-    return;
-  }
+  preConditions.checkIfMandatoryParameterExists(ROYGBIV.createSmoke, preConditions.expireTime, expireTime);
+  preConditions.checkIfNumber(ROYGBIV.createSmoke, preConditions.expireTime, expireTime);
+  preConditions.checkIfLessThanExclusive(ROYGBIV.createSmoke, preConditions.expireTime, expireTime, 0);
+  var smokeSize = configurations.smokeSize;
+  preConditions.checkIfMandatoryParameterExists(ROYGBIV.createSmoke, preConditions.smokeSize, smokeSize);
+  preConditions.checkIfNumber(ROYGBIV.createSmoke, preConditions.smokeSize, smokeSize);
   var particleSize = configurations.particleSize;
-  if (typeof particleSize == UNDEFINED){
-    throw new Error("createSmoke error: particleSize is a mandatory configuration.");
-    return;
-  }
-  if (isNaN(particleSize)){
-    throw new Error("createSmoke error: Bad particleSize parameter.");
-    return;
-  }
+  preConditions.checkIfMandatoryParameterExists(ROYGBIV.createSmoke, preConditions.particleSize, particleSize);
+  preConditions.checkIfNumber(ROYGBIV.createSmoke, preConditions.particleSize, particleSize);
   var particleCount = configurations.particleCount;
-  if (typeof particleCount == UNDEFINED){
-    throw new Error("createSmoke error: particleCount is a mandatory configuration.");
-    return;
-  }
-  if (isNaN(particleCount)){
-    throw new Error("createSmoke error: Bad particleCount parameter.");
-    return;
-  }
-  if (particleCount <= 0){
-    throw new Error("createSmoke error: particleCount must be greater than zero.");
-    return;
-  }
+  preConditions.checkIfMandatoryParameterExists(ROYGBIV.createSmoke, preConditions.particleCount, particleCount);
+  preConditions.checkIfNumber(ROYGBIV.createSmoke, preConditions.particleCount, particleCount);
+  preConditions.checkIfLessThan(ROYGBIV.createSmoke, preConditions.particleCount, particleCount);
   var colorName = configurations.colorName;
-  if (typeof colorName == UNDEFINED){
-    throw new Error("createSmoke error: colorName is a mandatory configuration.");
-    return;
-  }
+  preConditions.checkIfMandatoryParameterExists(ROYGBIV.createSmoke, preConditions.colorName, colorName);
   var textureName = configurations.textureName;
   var isTextured = false;
   var texture;
   if (!(typeof textureName == UNDEFINED)){
-    if (!textures[textureName]){
-      throw new Error("createSmoke error: No such texture.");
-      return;
-    }
+    preConditions.checkIfTrue(ROYGBIV.createSmoke, "No such texture", (!textures[textureName]));
     texture = textures[textureName];
-    if (!(texture instanceof THREE.Texture)){
-      throw new Error("createSmoke error: Texture not ready.");
-      return;
-    }
+    preConditions.checkIfTextureReady(ROYGBIV.createSmoke, preConditions.texture, texture);
     isTextured = true;
   }
   var movementAxis = configurations.movementAxis;
-  if (!(typeof movementAxis == UNDEFINED)){
-    if (isNaN(movementAxis.x) || isNaN(movementAxis.y) || isNaN(movementAxis.z)){
-      throw new Error("createSmoke error: Bad movementAxis parameter.");
-    }
-  }else{
+  preConditions.checkIfVectorOnlyIfDefined(ROYGBIV.createSmoke, preConditions.movementAxis, movementAxis);
+  if ((typeof movementAxis == UNDEFINED)){
     movementAxis = ROYGBIV.vector(0, 1, 0);
   }
   var velocity = configurations.velocity;
-  if (typeof velocity == UNDEFINED){
-    throw new Error("createSmoke error: velocity is a mandatory configuration.");
-    return;
-  }
-  if (isNaN(velocity)){
-    throw new Error("createSmoke error: Bad velocity parameter.");
-    return;
-  }
+  preConditions.checkIfMandatoryParameterExists(ROYGBIV.createSmoke, preConditions.velocity, velocity);
+  preConditions.checkIfNumber(ROYGBIV.createSmoke, preConditions.velocity, velocity);
   var acceleration = configurations.acceleration;
-  if (typeof acceleration == UNDEFINED){
-    throw new Error("createSmoke error: acceleration is a mandatory configuration.");
-    return;
-  }
-  if (isNaN(acceleration)){
-    throw new Error("createSmoke error: Bad acceleration parameter.");
-    return;
-  }
+  preConditions.checkIfMandatoryParameterExists(ROYGBIV.createSmoke, preConditions.acceleration, acceleration);
+  preConditions.checkIfNumber(ROYGBIV.createSmoke, preConditions.acceleration, acceleration);
   var randomness = configurations.randomness;
-  if (typeof randomness == UNDEFINED){
-    throw new Error("createSmoke error: randomness is a mandatory configuration.");
-    return;
-  }
-  if (isNaN(randomness)){
-    throw new Error("createSmoke error: Bad randomness parameter.");
-    return;
-  }
+  preConditions.checkIfMandatoryParameterExists(ROYGBIV.createSmoke, preConditions.randomness, randomness);
+  preConditions.checkIfNumber(ROYGBIV.createSmoke, preConditions.randomness, randomness);
   var lifetime = configurations.lifetime;
-  if (typeof lifetime == UNDEFINED){
-    throw new Error("createSmoke error: lifetime is a mandatory configuration.");
-    return;
-  }
-  if (isNaN(lifetime)){
-    throw new Error("createSmoke error: Bad lifetime parameter.");
-    return;
-  }
-  if (lifetime <= 0){
-    throw new Error("createSmoke error: lifetime must be greater than zero.");
-    return;
-  }
+  preConditions.checkIfMandatoryParameterExists(ROYGBIV.createSmoke, preConditions.lifetime, lifetime);
+  preConditions.checkIfNumber(ROYGBIV.createSmoke, preConditions.lifetime, lifetime);
+  preConditions.checkIfLessThan(ROYGBIV.createSmoke, preConditions.lifetime, lifetime, 0);
   var alphaVariation = configurations.alphaVariation;
-  if (typeof alphaVariation == UNDEFINED){
-    throw new Error("createSmoke error: alphaVariation is a mandatory configuration.");
-    return;
-  }
-  if (isNaN(alphaVariation)){
-    throw new Error("createSmoke error: Bad alphaVariation parameter.");
-    return;
-  }
-  if (alphaVariation < -1 || alphaVariation > 1){
-    throw new Error("createSmoke error: alphaVariation must be between [-1,1]");
-    return;
-  }
-
+  preConditions.checkIfMandatoryParameterExists(ROYGBIV.createSmoke, preConditions.alphaVariation, alphaVariation);
+  preConditions.checkIfNumber(ROYGBIV.createSmoke, preConditions.alphaVariation, alphaVariation);
+  preConditions.checkIfInRange(ROYGBIV.createSmoke, preConditions.alphaVariation, alphaVariation, -1, 1);
   var updateFunction = configurations.updateFunction;
-  if (updateFunction){
-    if (!(updateFunction instanceof Function)){
-      throw new Error("createSmoke error: updateFunction must be a function.");
-      return;
-    }
-  }
-
+  preConditions.checkIfFunctionOnlyIfExists(ROYGBIV.createSmoke, preConditions.updateFunction, updateFunction);
   var startDelay = configurations.startDelay;
+  preConditions.checkIfNumberOnlyIfExists(ROYGBIV.createSmoke, preConditions.startDelay, startDelay);
   if (typeof startDelay == UNDEFINED){
     startDelay = 0;
-  }else{
-    if (isNaN(startDelay)){
-      throw new Error("createSmoke error: Bad startDelay parameter.");
-      return;
-    }
   }
-
   var rgbFilter = configurations.rgbFilter;
-  if (!(typeof rgbFilter == UNDEFINED)){
-    if (isNaN(rgbFilter.x) || isNaN(rgbFilter.y) || isNaN(rgbFilter.z)){
-      throw new Error("createSmoke error: Bad rgbFilter parameter.");
-      return;
-    }
-  }
-
+  preConditions.checkIfVectorOnlyIfDefined(ROYGBIV.createSmoke, preConditions.rgbFilter, rgbFilter);
   var accelerationDirection = configurations.accelerationDirection;
-  if (!(typeof accelerationDirection == UNDEFINED)){
-    if (isNaN(accelerationDirection.x) || isNaN(accelerationDirection.y) || isNaN(accelerationDirection.z)){
-      throw new Error("createSmoke error: Bad accelerationDirection parameter.");
-      return;
-    }
-  }
+  preConditions.checkIfVectorOnlyIfDefined(ROYGBIV.createSmoke, preConditions.accelerationDirection, accelerationDirection);
 
   var particleMaterialConfigurations = new Object();
   particleMaterialConfigurations.color = colorName;
@@ -2080,6 +1627,7 @@ Roygbiv.prototype.createTrail = function(configurations){
   if (mode == 0){
     return;
   }
+  preConditions.checkIfDefined(ROYGBIV.createTrail, preConditions.configurations, configurations);
   var name = configurations.name;
   var position = configurations.position;
   var expireTime = configurations.expireTime;
@@ -2098,146 +1646,43 @@ Roygbiv.prototype.createTrail = function(configurations){
   var colorStep = configurations.colorStep;
   var updateFunction = configurations.updateFunction;
 
-  if (typeof name == UNDEFINED){
-    throw new Error("createTrail error: name is a mandatory configuration.");
-    return;
-  }
-  if (particleSystemPool[name]){
-    throw new Error("createTrail error: name must be unique.");
-    return;
-  }
-  if (typeof position == UNDEFINED){
-    throw new Error("createTrail error: position is a mandatory configuration.");
-    return;
-  }
-  if (isNaN(position.x) || isNaN(position.y) || isNaN(position.z)){
-    throw new Error("createTrail error: Bad position parameter.");
-    return;
-  }
-  if (typeof expireTime == UNDEFINED){
-    throw new Error("createTrail error: expireTime is a mandatory configuration.");
-    return;
-  }
-  if (isNaN(expireTime)){
-    throw new Error("createTrail error: Bad expireTime parameter.");
-    return;
-  }
-  if (expireTime < 0){
-    throw new Error("createTrail error: expireTime must be greater than zero.");
-    return;
-  }
-  if (typeof particleCount == UNDEFINED){
-    throw new Error("createTrail error: particleCount is a mandatory configuration.");
-    return;
-  }
-  if (isNaN(particleCount)){
-    throw new Error("createTrail error: Bad particleCount configuration.");
-    return;
-  }
-  if (particleCount == 0){
-    throw new Error("createTrail error: particleCount must be greater than zero.");
-    return;
-  }
-  if (typeof velocity == UNDEFINED){
-    throw new Error("createTrail error: velocity is a mandatory configuration.");
-    return;
-  }
-  if (isNaN(velocity.x) || isNaN(velocity.y) || isNaN(velocity.z)){
-    throw new Error("createTrail error: Bad velocity parameter.");
-    return;
-  }
-  if (typeof acceleration == UNDEFINED){
-    throw new Error("createTrail error: acceleration is a mandatory parameter.");
-    return;
-  }
-  if (isNaN(acceleration.x) || isNaN(acceleration.y) || isNaN(acceleration.z)){
-    throw new Error("createTrail error: Bad acceleration parameter.");
-    return;
-  }
-  if (typeof lifetime == UNDEFINED){
-    throw new Error("createTrail error: lifetime is a mandatory parameter.");
-    return;
-  }
-  if (isNaN(lifetime)){
-    throw new Error("createTrail error: Bad lifetime parameter.");
-    return;
-  }
-  if (typeof alphaVariation == UNDEFINED){
-    throw new Error("createTrail error: alphaVariation is a mandatory configuration.");
-    return;
-  }
-  if (isNaN(alphaVariation)){
-    throw new Error("createTrail error: Bad alphaVariation parameter.");
-    return;
-  }
-  if (alphaVariation > 0 || alphaVariation < -1){
-    throw new Error("createTrail error: alphaVariation must be between [-1,0]");
-    return;
-  }
-  if (typeof startDelay == UNDEFINED){
-    throw new Error("createTrail error: startDelay is a mandatory configuration.");
-    return;
-  }
-  if (isNaN(startDelay)){
-    throw new Error("createTrail error: Bad startDelay parameter.");
-    return;
-  }
-  if (startDelay < 0){
-    throw new Error("createTrail error: startDelay must be greater than zero.");
-    return;
-  }
-  if (typeof colorName == UNDEFINED){
-    throw new Error("createTrail error: colorName is a mandatory configuration.");
-    return;
-  }
-  if (typeof particleSize == UNDEFINED){
-    throw new Error("createTrail error: particleSize is a mandatory configuration.");
-    return;
-  }
-  if (isNaN(particleSize)){
-    throw new Error("createTrail error: Bad particleSize parameter.");
-    return;
-  }
-  if (particleSize <= 0){
-    throw new Error("createTrail error: particleSize must be greater than zero.");
-    return;
-  }
-  if (typeof size == UNDEFINED){
-    throw new Error("createTrail error: size is a mandatory configuration.");
-    return;
-  }
-  if (isNaN(size)){
-    throw new Error("createTrail error: Bad size parameter.");
-    return;
-  }
-  if (size <= 0){
-    throw new Error("createTrail error: size must be greater than zero.");
-    return;
-  }
+  preConditions.checkIfMandatoryParameterExists(ROYGBIV.createTrail, preConditions.name, name);
+  preConditions.checkIfTrue(ROYGBIV.createTrail, "name must be unique", particleSystemPool[name]);
+  preConditions.checkIfMandatoryParameterExists(ROYGBIV.createTrail, preConditions.position, position);
+  preConditions.checkIfVectorOnlyIfDefined(ROYGBIV.createTrail, preConditions.position, position);
+  preConditions.checkIfMandatoryParameterExists(ROYGBIV.createTrail, preConditions.expireTime, expireTime);
+  preConditions.checkIfNumber(ROYGBIV.createTrail, preConditions.expireTime, expireTime);
+  preConditions.checkIfLessThanExclusive(ROYGBIV.createTrail, preConditions.expireTime, expireTime, 0);
+  preConditions.checkIfMandatoryParameterExists(ROYGBIV.createTrail, preConditions.particleCount, particleCount);
+  preConditions.checkIfNumber(ROYGBIV.createTrail, preConditions.particleCount, particleCount);
+  preConditions.checkIfLessThanExclusive(ROYGBIV.createTrail, preConditions.particleCount, particleCount, 0);
+  preConditions.checkIfMandatoryParameterExists(ROYGBIV.createTrail, preConditions.velocity, velocity);
+  preConditions.checkIfVectorOnlyIfDefined(ROYGBIV.createTrail, preConditions.velocity, velocity);
+  preConditions.checkIfMandatoryParameterExists(ROYGBIV.createTrail, preConditions.acceleration, acceleration);
+  preConditions.checkIfVectorOnlyIfDefined(ROYGBIV.createTrail, preConditions.acceleration, acceleration);
+  preConditions.checkIfMandatoryParameterExists(ROYGBIV.createTrail, preConditions.lifetime, lifetime);
+  preConditions.checkIfNumber(ROYGBIV.createTrail, preConditions.lifetime, lifetime);
+  preConditions.checkIfMandatoryParameterExists(ROYGBIV.createTrail, preConditions.alphaVariation, alphaVariation);
+  preConditions.checkIfNumber(ROYGBIV.createTrail, preConditions.alphaVariation, alphaVariation);
+  preConditions.checkIfInRange(ROYGBIV.createTrail, preConditions.alphaVariation, alphaVariation, -1, 0);
+  preConditions.checkIfMandatoryParameterExists(ROYGBIV.createTrail, preConditions.startDelay, startDelay);
+  preConditions.checkIfNumber(ROYGBIV.createTrail, preConditions.startDelay, startDelay);
+  preConditions.checkIfLessThanExclusive(ROYGBIV.createTrail, preConditions.startDelay, startDelay);
+  preConditions.checkIfMandatoryParameterExists(ROYGBIV.createTrail, preConditions.colorName, colorName);
+  preConditions.checkIfMandatoryParameterExists(ROYGBIV.createTrail, preConditions.particleSize, particleSize);
+  preConditions.checkIfNumber(ROYGBIV.createTrail, preConditions.particleSize, particleSize);
+  preConditions.checkIfLessThan(ROYGBIV.createTrail, preConditions.particleSize, particleSize, 0);
+  preConditions.checkIfMandatoryParameterExists(ROYGBIV.createTrail, preConditions.size, size);
+  preConditions.checkIfNumber(ROYGBIV.createTrail, preConditions.size, size);
+  preConditions.checkIfLessThan(ROYGBIV.createTrail, preConditions.size, size);
   var texture;
   if (!(typeof textureName == UNDEFINED)){
     texture = textures[textureName];
-    if (!texture){
-      throw new Error("createTrail error: No such texture.");
-      return;
-    }
-    if (!(texture instanceof THREE.Texture)){
-      throw new Error("createTrail error: Texture not ready.");
-      return;
-    }
+    preConditions.checkIfTextureExists(ROYGBIV.createTrail, preConditions.texture, texture);
+    preConditions.checkIfTextureReady(ROYGBIV.createTrail, preConditions.texture, texture);
   }
-  if (!(typeof rgbFilter == UNDEFINED)){
-    if (isNaN(rgbFilter.x) || isNaN(rgbFilter.y) || isNaN(rgbFilter.z)){
-      throw new Error("createSmoke error: Bad rgbFilter parameter.");
-      return;
-    }
-  }
-  if (!(typeof updateFunction == UNDEFINED)){
-    if (!(updateFunction instanceof Function)){
-      throw new Error("createSmoke error: updateFunction is not a function.");
-      return;
-    }
-  }
+  preConditions.checkIfVectorOnlyIfDefined(ROYGBIV.createTrail, preConditions.rgbFilter, rgbFilter);
+  preConditions.checkIfFunctionOnlyIfExists(ROYGBIV.createTrail, preConditions.updateFunction, updateFunction);
 
   var particleMaterialConfigurations = new Object();
   particleMaterialConfigurations.color = colorName;
@@ -2298,6 +1743,7 @@ Roygbiv.prototype.createPlasma = function(configurations){
   if (mode == 0){
     return;
   }
+  preConditions.checkIfDefined(ROYGBIV.createPlasma, preConditions.configurations, configurations);
   var name = configurations.name;
   var position = configurations.position;
   var expireTime = configurations.expireTime;
@@ -2312,124 +1758,39 @@ Roygbiv.prototype.createPlasma = function(configurations){
   var textureName = configurations.textureName;
   var rgbFilter = configurations.rgbFilter;
   var alphaVariation = configurations.alphaVariation;
-  if (typeof name == UNDEFINED){
-    throw new Error("createPlasma error: name is a mandatory configuration.");
-    return;
-  }
-  if (particleSystemPool[name]){
-    throw new Error("createPlasma error: name must be unique.");
-    return;
-  }
-  if (typeof position == UNDEFINED){
-    throw new Error("createPlasma error: position is a mandatory configuration.");
-    return;
-  }
-  if (isNaN(position.x) || isNaN(position.y) || isNaN(position.z)){
-    throw new Error("createPlasma error: Bad position parameter.");
-    return;
-  }
-  if (typeof expireTime == UNDEFINED){
-    throw new Error("createPlasma error: expireTime is a mandatory configuration.");
-    return;
-  }
-  if (isNaN(expireTime)){
-    throw new Error("createPlasma error: Bad expireTime parameter.");
-    return;
-  }
-  if (expireTime < 0){
-    throw new Error("createPlasma error: expireTime must be greater than zero.");
-    return;
-  }
-  if (typeof velocity == UNDEFINED){
-    throw new Error("createPlasma error: velocity is a mandatory configuration.");
-    return;
-  }
-  if (isNaN(velocity.x) || isNaN(velocity.y) || isNaN(velocity.z)){
-    throw new Error("createPlasma error: Bad velocity parameter.");
-    return;
-  }
-  if (typeof acceleration == UNDEFINED){
-    throw new Error("createPlasma error: acceleration is a mandatory configuration.");
-    return;
-  }
-  if (isNaN(acceleration.x) || isNaN(acceleration.y) || isNaN(acceleration.z)){
-    throw new Error("createPlasma error: Bad acceleration parameter.");
-    return;
-  }
-  if (typeof radius == UNDEFINED){
-    throw new Error("createPlasma error: radius is a mandatory parameter.");
-    return;
-  }
-  if (isNaN(radius)){
-    throw new Error("createPlasma error: Bad radius parameter.");
-    return;
-  }
-  if (radius <= 0){
-    throw new Error("createPlasma error: radius must be greater than zero.");
-    return;
-  }
-  if (typeof avgParticleSpeed == UNDEFINED){
-    throw new Error("createPlasma error: avgParticleSpeed is a mandatory configuration.");
-    return;
-  }
-  if (isNaN(avgParticleSpeed)){
-    throw new Error("createPlasma error: Bad avgParticleSpeed parameter.");
-    return;
-  }
-  if (typeof particleCount == UNDEFINED){
-    throw new Error("createPlasma error: particleCount is a mandatory parameter.");
-    return;
-  }
-  if (isNaN(particleCount)){
-    throw new Error("createPlasma error: Bad particleCount parameter.");
-    return;
-  }
-  if (particleCount <= 0){
-    throw new Error("createPlasma error: particleCount must be greater than zero.");
-    return;
-  }
-  if (typeof colorName == UNDEFINED){
-    throw new Error("createPlasma error: colorName is a mandatory configuration.");
-    return;
-  }
+
+  preConditions.checkIfMandatoryParameterExists(ROYGBIV.createPlasma, preConditions.name, name);
+  preConditions.checkIfMandatoryParameterExists(ROYGBIV.createPlasma, preConditions.position, position);
+  preConditions.checkIfVectorOnlyIfDefined(ROYGBIV.createPlasma, preConditions.position, position);
+  preConditions.checkIfMandatoryParameterExists(ROYGBIV.createPlasma, preConditions.expireTime, expireTime);
+  preConditions.checkIfNumber(ROYGBIV.createPlasma, preConditions.expireTime, expireTime);
+  preConditions.checkIfLessThanExclusive(ROYGBIV.createPlasma, preConditions.expireTime, expireTime, 0);
+  preConditions.checkIfMandatoryParameterExists(ROYGBIV.createPlasma, preConditions.velocity, velocity);
+  preConditions.checkIfVectorOnlyIfDefined(ROYGBIV.createPlasma, preConditions.velocity, velocity);
+  preConditions.checkIfMandatoryParameterExists(ROYGBIV.createPlasma, preConditions.acceleration, acceleration);
+  preConditions.checkIfVectorOnlyIfDefined(ROYGBIV.createPlasma, preConditions.acceleration, acceleration);
+  preConditions.checkIfDefined(ROYGBIV.createPlasma, preConditions.radius, radius);
+  preConditions.checkIfNumber(ROYGBIV.createPlasma, preConditions.radius, radius);
+  preConditions.checkIfLessThan(ROYGBIV.createPlasma, preConditions.radius, radius, 0);
+  preConditions.checkIfMandatoryParameterExists(ROYGBIV.createPlasma, preConditions.avgParticleSpeed, avgParticleSpeed);
+  preConditions.checkIfNumber(ROYGBIV.createPlasma, preConditions.avgParticleSpeed, avgParticleSpeed);
+  preConditions.checkIfMandatoryParameterExists(ROYGBIV.createPlasma, preConditions.particleCount, particleCount);
+  preConditions.checkIfNumber(ROYGBIV.createPlasma, preConditions.particleCount, particleCount);
+  preConditions.checkIfLessThan(ROYGBIV.createPlasma, preConditions.particleCount, particleCount, 0);
+  preConditions.checkIfMandatoryParameterExists(ROYGBIV.createPlasma, preConditions.colorName, colorName);
   var isTextured = false;
   if (!(typeof textureName == UNDEFINED)){
     var texture = textures[textureName];
-    if (!texture){
-      throw new Error("createPlasma error: No such texture.");
-      return;
-    }
-    if (!(texture instanceof THREE.Texture)){
-      throw new Error("createPlasma error: Texture not ready.");
-      return;
-    }
+    preConditions.checkIfTextureExists(ROYGBIV.createPlasma, preConditions.texture, texture);
+    preConditions.checkIfTextureReady(ROYGBIV.createPlasma, preConditions.texture, texture);
     isTextured = true;
   }
-  if (typeof particleSize == UNDEFINED){
-    throw new Error("createPlasma error: particleSize is a mandatory parameter.");
-    return;
-  }
-  if (isNaN(particleSize)){
-    throw new Error("createPlasma error: Bad particleSize parameter.");
-    return;
-  }
+  preConditions.checkIfMandatoryParameterExists(ROYGBIV.createPlasma, preConditions.particleSize, particleSize);
+  preConditions.checkIfNumberOnlyIfExists(ROYGBIV.createPlasma, preConditions.alpha, alpha);
+  preConditions.checkIfInRangeOnlyIfDefined(ROYGBIV.createPlasma, preConditions.alpha, alpha, 0, 1);
+  preConditions.checkIfVectorOnlyIfDefined(ROYGBIV.createPlasma, preConditions.rgbFilter, rgbFilter);
   if (typeof alpha == UNDEFINED){
     alpha = 1;
-  }else{
-    if (isNaN(alpha)){
-      throw new Error("createPlasma error: Bad alpha parameter.");
-      return;
-    }
-    if (alpha > 1 || alpha < 0){
-      throw new Error("createPlasma error: alpha must be between [0, 1]");
-      return;
-    }
-  }
-  if (!(typeof rgbFilter == UNDEFINED)){
-    if (isNaN(rgbFilter.x) || isNaN(rgbFilter.y) || isNaN(rgbFilter.z)){
-      throw new Error("createPlasma error: Bad rgbFilter parameter.");
-      return;
-    }
   }
   var alphaVariationSet = false;
   if (!(typeof alphaVariation == UNDEFINED)){
@@ -2439,7 +1800,6 @@ Roygbiv.prototype.createPlasma = function(configurations){
     }
     alphaVariationSet = true;
   }
-
   var particleMaterialConfigurations = new Object();
   particleMaterialConfigurations.color = colorName;
   particleMaterialConfigurations.size = particleSize;
@@ -2513,6 +1873,7 @@ Roygbiv.prototype.createFireExplosion = function(configurations){
   if (mode == 0){
     return;
   }
+  preConditions.checkIfDefined(ROYGBIV.createFireExplosion, preConditions.configurations, configurations);
   var position = configurations.position;
   var expireTime = configurations.expireTime;
   var name = configurations.name;
@@ -2530,154 +1891,49 @@ Roygbiv.prototype.createFireExplosion = function(configurations){
   var textureName = configurations.textureName;
   var rgbFilter = configurations.rgbFilter;
   var updateFunction = configurations.updateFunction;
-  if (typeof position == UNDEFINED){
-    throw new Error("createFireExplosion error: position is a mandatory configuration.");
-    return;
-  }
-  if (isNaN(position.x) || isNaN(position.y) || isNaN(position.z)){
-    throw new Error("createFireExplosion error: Bad position configuration.");
-    return;
-  }
-  if (typeof expireTime == UNDEFINED){
-    throw new Error("createFireExplosion error: expireTime is a mandatory configuration.");
-    return;
-  }
-  if (isNaN(expireTime)){
-    throw new Error("createFireExplosion error: Bad expireTime parameter.");
-    return;
-  }
-  if (expireTime < 0){
-    throw new Error("createFireExplosion error: expireTime cannot be negative.");
-    return;
-  }
-  if (typeof name == UNDEFINED){
-    throw new Error("createFireExplosion error: name is a mandatory configuration.");
-    return;
-  }
-  if (particleSystemPool[name]){
-    throw new Error("createFireExplosion error: name must be unique.");
-    return;
-  }
-  if (typeof radius == UNDEFINED){
-    throw new Error("createFireExplosion error: radius is a mandatory configuration.");
-    return;
-  }
-  if (isNaN(radius)){
-    throw new Error("createFireExplosion error: Bad radius parameter.");
-    return;
-  }
-  if (radius <= 0){
-    throw new Error("createFireExplosion error: radius must be greater than zero.");
-    return;
-  }
-  if (typeof particleSize == UNDEFINED){
-    throw new Error("createFireExplosion error: particleSize is a mandatory configuration.");
-    return;
-  }
-  if (isNaN(particleSize)){
-    throw new Error("createFireExplosion error: Bad particleSize parameter.");
-    return;
-  }
-  if (particleSize <= 0){
-    throw new Error("createFireExplosion error: particleSize must be greater than zero.");;
-    return;
-  }
-  if (typeof particleCount == UNDEFINED){
-    throw new Error("createFireExplosion error: particleCount is a mandatory configuration.");
-    return;
-  }
-  if (isNaN(particleCount)){
-    throw new Error("createFireExplosion error: Bad particleCount parameter.");
-    return;
-  }
-  if (particleCount <= 0){
-    throw new Error("createFireExplosion error: particleCount must be greater than zero.");
-    return;
-  }
+
+  preConditions.checkIfMandatoryParameterExists(ROYGBIV.createFireExplosion, preConditions.position, position);
+  preConditions.checkIfVectorOnlyIfDefined(ROYGBIV.createFireExplosion, preConditions.position, position);
+  preConditions.checkIfMandatoryParameterExists(ROYGBIV.createFireExplosion, preConditions.expireTime, expireTime);
+  preConditions.checkIfNumber(ROYGBIV.createFireExplosion, preConditions.expireTime, expireTime);
+  preConditions.checkIfLessThanExclusive(ROYGBIV.createFireExplosion, preConditions.expireTime, expireTime, 0);
+  preConditions.checkIfMandatoryParameterExists(ROYGBIV.createFireExplosion, preConditions.name, name);
+  preConditions.checkIfTrue(ROYGBIV.createFireExplosion, "name must be unique", (particleSystemPool[name]));
+  preConditions.checkIfMandatoryParameterExists(ROYGBIV.createFireExplosion, preConditions.radius, radius);
+  preConditions.checkIfNumber(ROYGBIV.createFireExplosion, preConditions.radius, radius);
+  preConditions.checkIfLessThan(ROYGBIV.createFireExplosion, preConditions.radius, radius);
+  preConditions.checkIfMandatoryParameterExists(ROYGBIV.createFireExplosion, preConditions.particleSize, particleSize);
+  preConditions.checkIfNumber(ROYGBIV.createFireExplosion, preConditions.particleSize, particleSize);
+  preConditions.checkIfLessThan(ROYGBIV.createFireExplosion, preConditions.particleSize, particleSize, 0);
+  preConditions.checkIfMandatoryParameterExists(ROYGBIV.createFireExplosion, preConditions.particleCount, particleCount);
+  preConditions.checkIfNumber(ROYGBIV.createFireExplosion, preConditions.particleCount, particleCount);
+  preConditions.checkIfLessThan(ROYGBIV.createFireExplosion, preConditions.particleCount, particleCount);
+  preConditions.checkIfMandatoryParameterExists(ROYGBIV.createFireExplosion, preConditions.colorStep, colorStep);
+  preConditions.checkIfNumber(ROYGBIV.createFireExplosion, preConditions.colorStep, colorStep);
+  preConditions.checkIfInRange(ROYGBIV.createFireExplosion, preConditions.colorStep, colorStep, 0, 1);
+  preConditions.checkIfMandatoryParameterExists(ROYGBIV.createFireExplosion, preConditions.alphaVariationCoef, alphaVariationCoef);
+  preConditions.checkIfNumber(ROYGBIV.createFireExplosion, preConditions.alphaVariationCoef, alphaVariationCoef);
+  preConditions.checkIfMandatoryParameterExists(ROYGBIV.createFireExplosion, preConditions.explosionDirection, explosionDirection);
+  preConditions.checkIfVectorOnlyIfDefined(ROYGBIV.createFireExplosion, preConditions.explosionDirection, explosionDirection);
+  preConditions.checkIfMandatoryParameterExists(ROYGBIV.createFireExplosion, preConditions.explosionSpeed, explosionSpeed);
+  preConditions.checkIfNumber(ROYGBIV.createFireExplosion, preConditions.explosionSpeed, explosionSpeed);
+  preConditions.checkIfMandatoryParameterExists(ROYGBIV.createFireExplosion, preConditions.lifetime, lifetime);
+  preConditions.checkIfNumber(ROYGBIV.createFireExplosion, preConditions.lifetime, lifetime);
+  preConditions.checkIfLessThan(ROYGBIV.createFireExplosion, preConditions.lifetime, lifetime, 0);
+  preConditions.checkIfVectorOnlyIfDefined(ROYGBIV.createFireExplosion, preConditions.accelerationDirection, accelerationDirection);
+  preConditions.checkIfVectorOnlyIfDefined(ROYGBIV.createFireExplosion, preConditions.rgbFilter, rgbFilter);
+  preConditions.checkIfFunctionOnlyIfExists(ROYGBIV.createFireExplosion, preConditions.updateFunction, updateFunction);
   if (typeof fireColorName == UNDEFINED){
     fireColorName = "white";
   }
   if (typeof smokeColorName == UNDEFINED){
     smokeColorName = "black";
   }
-  if (typeof colorStep == UNDEFINED){
-    throw new Error("createFireExplosion error: colorStep is a mandatory configuration.");
-    return;
-  }
-  if (isNaN(colorStep)){
-    throw new Error("createFireExplosion error: Bad colorStep parameter.");
-    return;
-  }
-  if (colorStep < 0 || colorStep > 1){
-    throw new Error("createFireExplosion error: colorStep is expected to be between [0,1].");
-    return;
-  }
-  if (typeof alphaVariationCoef == UNDEFINED){
-    throw new Error("createFireExplosion error: alphaVariationCoef is a mandatory configuration.");
-    return;
-  }
-  if (isNaN(alphaVariationCoef)){
-    throw new Error("createFireExplosion error: Bad alphaVariationCoef parameter.");
-    return;
-  }
-  if (typeof explosionDirection == UNDEFINED){
-    throw new Error("createFireExplosion error: explosionDirection is a mandatory configuration.");
-    return;
-  }
-  if (isNaN(explosionDirection.x) || isNaN(explosionDirection.y) || isNaN(explosionDirection.z)){
-    throw new Error("createFireExplosion error: Bad explosionDirection parameter.");
-    return;
-  }
-  if (typeof explosionSpeed == UNDEFINED){
-    throw new Error("createFireExplosion error: explosionSpeed is a mandatory configuration.");
-    return;
-  }
-  if (isNaN(explosionSpeed)){
-    throw new Error("createFireExplosion error: Bad explosionSpeed parameter.");
-    return;
-  }
-  if (typeof lifetime == UNDEFINED){
-    throw new Error("createFireExplosion error: lifetime is a mandatory configuration.");
-    return;
-  }
-  if (isNaN(lifetime)){
-    throw new Error("createFireExplosion error: Bad lifetime parameter.");
-    return;
-  }
-  if (lifetime <= 0){
-    throw new Error("createFireExplosion error: lifetime must be greater than zero.");
-    return;
-  }
-  if (!(typeof accelerationDirection == UNDEFINED)){
-    if (isNaN(accelerationDirection.x) || isNaN(accelerationDirection.y) || isNaN(accelerationDirection.z)){
-      throw new Error("createFireExplosion error: Bad accelerationDirection parameter.");
-      return;
-    }
-  }
   if (!(typeof textureName == UNDEFINED)){
     var texture = textures[textureName];
-    if (typeof texture == UNDEFINED){
-      throw new Error("createFireExplosion error: No such texture.");
-      return;
-    }
-    if (!(texture instanceof THREE.Texture)){
-      throw new Error("createFireExplosion error: Texture not ready.");
-      return;
-    }
+    preConditions.checkIfTextureExists(ROYGBIV.createFireExplosion, preConditions.texture, texture);
+    preConditions.checkIfTextureReady(ROYGBIV.createFireExplosion, preConditions.texture, texture);
   }
-  if (!(typeof rgbFilter == UNDEFINED)){
-    if (isNaN(rgbFilter.x) || isNaN(rgbFilter.y) || isNaN(rgbFilter.z)){
-      throw new Error("createFireExplosion error: Bad rgbFilter parameter.");
-      return;
-    }
-  }
-  if (!(typeof updateFunction == UNDEFINED)){
-    if (!(updateFunction instanceof Function)){
-      throw new Error("createFireExplosion error: updateFunction is not a function.");
-      return;
-    }
-  }
-
   var particleMaterialConfigurations = new Object();
   particleMaterialConfigurations.color = fireColorName;
   particleMaterialConfigurations.size = particleSize;
@@ -2772,6 +2028,7 @@ Roygbiv.prototype.createMagicCircle = function(configurations){
   if (mode == 0){
     return;
   }
+  preConditions.checkIfDefined(ROYGBIV.createMagicCircle, preConditions.configurations, configurations);
   var name = configurations.name;
   var position = configurations.position;
   var particleCount = configurations.particleCount;
@@ -2794,185 +2051,62 @@ Roygbiv.prototype.createMagicCircle = function(configurations){
   var rgbFilter = configurations.rgbFilter;
   var updateFunction = configurations.updateFunction;
 
-  if (typeof name == UNDEFINED){
-    throw new Error("createMagicCircle error: name is a mandatory configuration.");
-    return;
-  }
-  if (particleSystemPool[name]){
-    throw new Error("createMagicCircle error: name must be unique.");
-    return;
-  }
-  if (typeof position == UNDEFINED){
-    throw new Error("createMagicCircle error: position is a mandatory configuration.");
-    return;
-  }
-  if (isNaN(position.x) || isNaN(position.y) || isNaN(position.z)){
-    throw new Error("createMagicCircle error: Bad position parameter.");
-    return;
-  }
-  if (typeof particleCount == UNDEFINED){
-    throw new Error("createMagicCircle error: particleCount is a mandatory configuration.");
-    return;
-  }
-  if (isNaN(particleCount)){
-    throw new Error("createMagicCircle error: Bad particleCount parameter.");
-    return;
-  }
-  if (particleCount <= 0){
-    throw new Error("createMagicCircle error: particleCount must be greater than zero.");
-    return;
-  }
-  if (typeof expireTime == UNDEFINED){
-    throw new Error("createMagicCircle error: expireTime is a mandatory configuration.");
-    return;
-  }
-  if (isNaN(expireTime)){
-    throw new Error("createMagicCircle error: Bad expireTime parameter.");
-    return;
-  }
-  if (expireTime < 0){
-    throw new Error("createMagicCircle error: expireTime must be greater than zero.");
-    return;
-  }
-  if (typeof speed == UNDEFINED){
-    throw new Error("createMagicCircle error: speed is a mandatory configuration.");
-    return;
-  }
-  if (isNaN(speed)){
-    throw new Error("createMagicCircle error: Bad speed parameter.");
-    return;
-  }
-  if (typeof acceleration == UNDEFINED){
-    throw new Error("createMagicCircle error: acceleration is a mandatory configuration.");
-    return;
-  }
-  if (isNaN(acceleration)){
-    throw new Error("createMagicCircle error: Bad acceleration parameter.");
-    return;
-  }
-  if (typeof radius == UNDEFINED){
-    throw new Error("createMagicCircle error: radius is a mandatory configuration.");
-    return;
-  }
-  if (isNaN(radius)){
-    throw new Error("createMagicCircle error: Bad radius parameter.");
-    return;
-  }
+  preConditions.checkIfMandatoryParameterExists(ROYGBIV.createMagicCircle, preConditions.name, name);
+  preConditions.checkIfTrue(ROYGBIV.createMagicCircle, "name must be unique.", (particleSystemPool[name]));
+  preConditions.checkIfMandatoryParameterExists(ROYGBIV.createMagicCircle, preConditions.position, position);
+  preConditions.checkIfVectorOnlyIfDefined(ROYGBIV.createMagicCircle, preConditions.position, position);
+  preConditions.checkIfMandatoryParameterExists(ROYGBIV.createMagicCircle, preConditions.particleCount, particleCount);
+  preConditions.checkIfNumber(ROYGBIV.createMagicCircle, preConditions.particleCount, particleCount);
+  preConditions.checkIfLessThan(ROYGBIV.createMagicCircle, preConditions.particleCount, particleCount);
+  preConditions.checkIfMandatoryParameterExists(ROYGBIV.createMagicCircle, preConditions.expireTime, expireTime);
+  preConditions.checkIfNumber(ROYGBIV.createMagicCircle, preConditions.expireTime, expireTime);
+  preConditions.checkIfLessThanExclusive(ROYGBIV.createMagicCircle, preConditions.expireTime, expireTime);
+  preConditions.checkIfMandatoryParameterExists(ROYGBIV.createMagicCircle, preConditions.speed, speed);
+  preConditions.checkIfNumber(ROYGBIV.createMagicCircle, preConditions.speed, speed);
+  preConditions.checkIfMandatoryParameterExists(ROYGBIV.createMagicCircle, preConditions.acceleration, acceleration);
+  preConditions.checkIfNumber(ROYGBIV.createMagicCircle, preConditions.acceleration, acceleration);
+  preConditions.checkIfMandatoryParameterExists(ROYGBIV.createMagicCircle, preConditions.radius, radius);
+  preConditions.checkIfNumber(ROYGBIV.createMagicCircle, preConditions.radius, radius);
+  preConditions.checkIfVectorOnlyIfDefined(ROYGBIV.createMagicCircle, preConditions.circleNormal, circleNormal);
+  preConditions.checkIfNumberOnlyIfExists(ROYGBIV.createMagicCircle, preConditions.circleDistortionCoefficient, circleDistortionCoefficient);
+  preConditions.checkIfNumberOnlyIfExists(ROYGBIV.createMagicCircle, preConditions.lifetime, lifetime);
+  preConditions.checkIfLessThanExclusiveOnlyIfExists(ROYGBIV.createMagicCircle, preConditions.lifetime, lifetime, 0);
+  preConditions.checkIfNumberOnlyIfExists(ROYGBIV.createMagicCircle, preConditions.angleStep, angleStep);
+  preConditions.checkIfMandatoryParameterExists(ROYGBIV.createMagicCircle, preConditions.particleSize, particleSize);
+  preConditions.checkIfNumber(ROYGBIV.createMagicCircle, preConditions.particleSize, particleSize);
+  preConditions.checkIfLessThan(ROYGBIV.createMagicCircle, preConditions.particleSize, particleSize);
+  preConditions.checkIfMandatoryParameterExists(ROYGBIV.createMagicCircle, preConditions.colorName, colorName);
+  preConditions.checkIfNumberOnlyIfExists(ROYGBIV.createMagicCircle, preConditions.colorStep, colorStep);
+  preConditions.checkIfInRangeOnlyIfDefined(ROYGBIV.createMagicCircle, preConditions.colorStep, colorStep, 0, 1);
+  preConditions.checkIfMandatoryParameterExists(ROYGBIV.createMagicCircle, preConditions.alpha, alpha);
+  preConditions.checkIfNumber(ROYGBIV.createMagicCircle, preConditions.alpha, alpha);
+  preConditions.checkIfInRange(ROYGBIV.createMagicCircle, preConditions.alpha, alpha, 0, 1);
+  preConditions.checkIfNumberOnlyIfExists(ROYGBIV.createMagicCircle, preConditions.alphaVariation, alphaVariation);
+  preConditions.checkIfAlphaVariationModeOnlyIfExists(ROYGBIV.createMagicCircle, preConditions.alphaVariationMode, alphaVariationMode);
+  preConditions.checkIfVectorOnlyIfDefined(ROYGBIV.createMagicCircle, preConditions.rgbFilter, rgbFilter);
+  preConditions.checkIfFunctionOnlyIfExists(ROYGBIV.createMagicCircle, preConditions.updateFunction, updateFunction);
   if (typeof circleNormal == UNDEFINED){
     circleNormal = this.vector(0, 1, 0);
-  }else{
-    if (isNaN(circleNormal.x) || isNaN(circleNormal.y) || isNaN(circleNormal.z)){
-      throw new Error("createMagicCircle error: Bad circleNormal parameter.");
-      return;
-    }
   }
   if (typeof circleDistortionCoefficient == UNDEFINED){
     circleDistortionCoefficient = 1;
-  }else{
-    if (isNaN(circleDistortionCoefficient)){
-      throw new Error("createMagicCircle error: Bad circleDistortionCoefficient parameter.");
-      return;
-    }
-    if (circleDistortionCoefficient == 0){
-      circleDistortionCoefficient = 1;
-    }
   }
   if (typeof lifetime == UNDEFINED){
     lifetime = 0;
-  }else{
-    if (isNaN(lifetime)){
-      throw new Error("createMagicCircle error: Bad lifetime parameter.");
-      return;
-    }
-    if (lifetime < 0){
-      throw new Error("createMagicCircle error: lifetime cannot be smaller than zero.");
-      return;
-    }
   }
   if (typeof angleStep == UNDEFINED){
     angleStep = 0;
-  }else{
-    if (isNaN(angleStep)){
-      throw new Error("createMagicCircle error: Bad angleStep parameter.");
-      return;
-    }
-  }
-  if (typeof particleSize == UNDEFINED){
-    throw new Error("createMagicCircle error: particleSize is a mandatory configuration.");
-    return;
-  }
-  if (isNaN(particleSize)){
-    throw new Error("createMagicCircle error: Bad particleSize parameter.");
-    return;
-  }
-  if (particleSize <= 0){
-    throw new Error("createMagicCircle error: particleSize must be a positive number.");
-    return;
-  }
-  if (typeof colorName == UNDEFINED){
-    throw new Error("createMagicCircle error: colorName is a mandatory configuration.");
-    return;
-  }
-  if(!(typeof colorStep == UNDEFINED)){
-    if (isNaN(colorStep)){
-      throw new Error("createMagicCircle error: Bad colorStep parameter.");
-      return;
-    }
-    if (colorStep < 0 || colorStep > 1){
-      throw new Error("createMagicCircle error: colorStep should be between [0,1].");
-      return;
-    }
-  }
-  if (typeof alpha == UNDEFINED){
-    throw new Error("createMagicCircle error: alpha is a mandatory configuration.");
-    return;
-  }
-  if (isNaN(alpha)){
-    throw new Error("createMagicCircle error: Bad alpha parameter.");
-    return;
-  }
-  if (alpha < 0 || alpha > 1){
-    throw new Error("createMagicCircle error: alpha must be between [0,1].");
-    return;
   }
   if (typeof alphaVariation == UNDEFINED){
     alphaVariation = 0;
-  }else{
-    if (isNaN(alphaVariation)){
-      throw new Error("createMagicCircle error: Bad alphaVariation parameter.");
-      return;
-    }
   }
   if (typeof alphaVariationMode == UNDEFINED){
     alphaVariationMode = ALPHA_VARIATION_MODE_NORMAL;
-  }else{
-    if (alphaVariationMode != ALPHA_VARIATION_MODE_NORMAL && alphaVariationMode != ALPHA_VARIATION_MODE_COS && alphaVariationMode != ALPHA_VARIATION_MODE_SIN){
-      throw new Error("createMagicCircle error: alphaVariationMode must be ALPHA_VARIATION_MODE_NORMAL, ALPHA_VARIATION_MODE_COS or ALPHA_VARIATION_MODE_SIN.");
-      return;
-    }
   }
   if (!(typeof textureName == UNDEFINED)){
     var texture = textures[textureName];
-    if (typeof texture == UNDEFINED){
-      throw new Error("createMagicCircle error: No such texture.");
-      return;
-    }
-    if (!(texture instanceof THREE.Texture)){
-      throw new Error("createMagicCircle error: Texture not ready.");
-      return;
-    }
-  }
-  if (!(typeof rgbFilter == UNDEFINED)){
-    if (isNaN(rgbFilter.x) || isNaN(rgbFilter.y) || isNaN(rgbFilter.z)){
-      throw new Error("createMagicCircle error: Bad rgbFilter parameter.");
-      return;
-    }
-  }
-  if (!(typeof updateFunction == UNDEFINED)){
-    if (!(updateFunction instanceof Function)){
-      throw new Error("createMagicCircle error: updateFunction is not a function.");
-      return;
-    }
+    preConditions.checkIfTextureExists(ROYGBIV.createMagicCircle, preConditions.texture, texture);
+    preConditions.checkIfTextureReady(ROYGBIV.createMagicCircle, preConditions.texture, texture);
   }
 
   var particleMaterialConfigurations = new Object();
@@ -3044,6 +2178,7 @@ Roygbiv.prototype.createCircularExplosion = function(configurations){
   if (mode == 0){
     return;
   }
+  preConditions.checkIfDefined(ROYGBIV.createCircularExplosion, preConditions.configurations, configurations);
   var name = configurations.name;
   var particleCount = configurations.particleCount;
   var position = configurations.position;
@@ -3061,140 +2196,42 @@ Roygbiv.prototype.createCircularExplosion = function(configurations){
   var expireTime = configurations.expireTime;
   var updateFunction = configurations.updateFunction;
 
-  if (typeof name == UNDEFINED){
-    throw new Error("createCircularExplosion error: name is a mandatory configuration.");
-    return;
-  }
-  if (particleSystemPool[name]){
-    throw new Error("createCircularExplosion error: name must be unique.");
-    return;
-  }
-  if (typeof particleCount == UNDEFINED){
-    throw new Error("createCircularExplosion error: particleCount is a mandatory configuration.");
-    return;
-  }
-  if (isNaN(particleCount)){
-    throw new Error("createCircularExplosion error: Bad particleCount parameter.");
-    return;
-  }
-  if (particleCount <= 0){
-    throw new Error("createCircularExplosion error: particleCount must be greater than zero.");
-    return;
-  }
-  if (typeof position == UNDEFINED){
-    throw new Error("createCircularExplosion error: position is a mandatory configuration.");
-    return;
-  }
-  if (isNaN(position.x) || isNaN(position.y) || isNaN(position.y)){
-    throw new Error("createCircularExplosion error: Bad position parameter.");
-    return;
-  }
-  if (typeof radius == UNDEFINED){
-    throw new Error("createCircularExplosion error: radius is a mandatory configuration.");
-    return;
-  }
-  if (isNaN(radius)){
-    throw new Error("createCircularExplosion error: Bad radius parameter.");
-    return;
-  }
-  if (typeof colorName == UNDEFINED){
-    throw new Error("createCircularExplosion error: colorName is a mandatory configuration.");
-    return;
-  }
-  if (typeof particleSize == UNDEFINED){
-    throw new Error("createCircularExplosion error: particleSize is a mandatory configuration.");
-    return;
-  }
-  if (isNaN(particleSize)){
-    throw new Error("createCircularExplosion error: Bad particleSize parameter.");
-    return;
-  }
-  if (particleSize <= 0){
-    throw new Error("createCircularExplosion error: particleSize must be greater than zero.");
-    return;
-  }
-  if (typeof alpha == UNDEFINED){
-    throw new Error("createCircularExplosion error: alpha is a mandatory configuration.");
-    return;
-  }
-  if (isNaN(alpha)){
-    throw new Error("createCircularExplosion error: Bad alpha parameter.");
-    return;
-  }
-  if (alpha < 0 || alpha > 1){
-    throw new Error("createCircularExplosion error: alpha must be between [0,1].");
-    return;
-  }
+  preConditions.checkIfMandatoryParameterExists(ROYGBIV.createCircularExplosion, preConditions.name, name);
+  preConditions.checkIfTrue(ROYGBIV.createCircularExplosion, "name must be unique", (particleSystemPool[name]));
+  preConditions.checkIfMandatoryParameterExists(ROYGBIV.createCircularExplosion, preConditions.particleCount, particleCount);
+  preConditions.checkIfNumber(ROYGBIV.createCircularExplosion, preConditions.particleCount, particleCount);
+  preConditions.checkIfLessThan(ROYGBIV.createCircularExplosion, preConditions.particleCount, particleCount, 0);
+  preConditions.checkIfMandatoryParameterExists(ROYGBIV.createCircularExplosion, preConditions.position, position);
+  preConditions.checkIfVectorOnlyIfDefined(ROYGBIV.createCircularExplosion, preConditions.position, position);
+  preConditions.checkIfMandatoryParameterExists(ROYGBIV.createCircularExplosion, preConditions.radius, radius);
+  preConditions.checkIfNumber(ROYGBIV.createCircularExplosion, preConditions.radius, radius);
+  preConditions.checkIfMandatoryParameterExists(ROYGBIV.createCircularExplosion, preConditions.colorName, colorName);
+  preConditions.checkIfMandatoryParameterExists(ROYGBIV.createCircularExplosion, preConditions.particleSize, particleSize);
+  preConditions.checkIfNumber(ROYGBIV.createCircularExplosion, preConditions.particleSize, particleSize);
+  preConditions.checkIfLessThan(ROYGBIV.createCircularExplosion, preConditions.particleSize, particleSize, 0);
+  preConditions.checkIfMandatoryParameterExists(ROYGBIV.createCircularExplosion, preConditions.alpha, alpha);
+  preConditions.checkIfNumber(ROYGBIV.createCircularExplosion, preConditions.alpha, alpha);
+  preConditions.checkIfInRange(ROYGBIV.createCircularExplosion, preConditions.alpha, alpha, 0, 1);
+  preConditions.checkIfVectorOnlyIfDefined(ROYGBIV.createCircularExplosion, preConditions.rgbFilter, rgbFilter);
+  preConditions.checkIfMandatoryParameterExists(ROYGBIV.createCircularExplosion, preConditions.alphaVariation, alphaVariation);
+  preConditions.checkIfNumber(ROYGBIV.createCircularExplosion, preConditions.alphaVariation, alphaVariation);
+  preConditions.checkIfInRange(ROYGBIV.createCircularExplosion, preConditions.alphaVariation, alphaVariation, -1, 0);
+  preConditions.checkIfMandatoryParameterExists(ROYGBIV.createCircularExplosion, preConditions.speed, speed);
+  preConditions.checkIfVectorOnlyIfDefined(ROYGBIV.createCircularExplosion, preConditions.normal, normal);
+  preConditions.checkIfMandatoryParameterExists(ROYGBIV.createCircularExplosion, preConditions.expireTime, expireTime);
+  preConditions.checkIfNumber(ROYGBIV.createCircularExplosion, preConditions.expireTime, expireTime);
+  preConditions.checkIfLessThanExclusive(ROYGBIV.createCircularExplosion, preConditions.expireTime, expireTime, 0);
+  preConditions.checkIfFunctionOnlyIfExists(ROYGBIV.createCircularExplosion, preConditions.updateFunction, updateFunction);
+  preConditions.checkIfNumberOnlyIfExists(ROYGBIV.createCircularExplosion, preConditions.colorStep, colorStep);
+  preConditions.checkIfInRangeOnlyIfDefined(ROYGBIV.createCircularExplosion, preConditions.colorStep, colorStep, 0, 1);
   if (!(typeof textureName == UNDEFINED)){
     var texture = textures[textureName];
-    if (!texture){
-      throw new Error("createCircularExplosion error: No such texture.");
-      return;
-    }
-    if (!(texture instanceof THREE.Texture)){
-      throw new Error("createCircularExplosion error: Texture not ready.");
-      return;
-    }
+    preConditions.checkIfTextureExists(ROYGBIV.createCircularExplosion, preConditions.texture, texture);
+    preConditions.checkIfTextureReady(ROYGBIV.createCircularExplosion, preConditions.texture, texture);
   }
-  if (!(typeof rgbFilter == UNDEFINED)){
-    if (isNaN(rgbFilter.x) || isNaN(rgbFilter.y) || isNaN(rgbFilter.z)){
-      throw new Error("createCircularExplosion error: Bad rgbFilter parameter.");
-      return;
-    }
-  }
-  if ((typeof alphaVariation == UNDEFINED)){
-    throw new Error("createCircularExplosion error: alphaVariation is a mandatory configuration.");
-    return;
-  }
-  if (isNaN(alphaVariation)){
-    throw new Error("createCircularExplosion error: Bad alphaVariation parameter.");
-    return;
-  }
-  if (alphaVariation < -1 || alphaVariation > 0){
-    throw new Error("createCircularExplosion error: alphaVariation is expected to be between [-1,0].");
-    return;
-  }
-  if (typeof speed == UNDEFINED){
-    throw new Error("createCircularExplosion error: speed is a mandatory parameter.");
-    return;
-  }
-  if (!(typeof normal == UNDEFINED)){
-    if (isNaN(normal.x) || isNaN(normal.y) || isNaN(normal.z)){
-      throw new Error("createCircularExplosion error: Bad normal parameter.");
-      return;
-    }
-  }else{
+  if ((typeof normal == UNDEFINED)){
     normal = this.vector(0, 1, 0);
   }
-  if (typeof expireTime == UNDEFINED){
-    throw new Error("createCircularExplosion error: expireTime is a mandatory configuration.");
-    return;
-  }
-  if (isNaN(expireTime)){
-    throw new Error("createCircularExplosion error: Bad expireTime parameter.");
-    return;
-  }
-  if (expireTime < 0){
-    throw new Error("createCircularExplosion error: expireTime must be a positive number.");
-    return;
-  }
-  if (!(typeof updateFunction == UNDEFINED)){
-    if (!(updateFunction instanceof Function)){
-      throw new Error("createCircularExplosion error: updateFunction is not a function.");
-      return;
-    }
-  }
-  if (!(typeof colorStep == UNDEFINED)){
-    if (isNaN(colorStep)){
-      throw new Error("createCircularExplosion error: Bad colorStep parameter.");
-      return;
-    }
-    if (colorStep < 0 || colorStep > 1){
-      throw new Error("createCircularExplosion error: colorStep is expected to be between [0,1].");
-      return;
-    }
-  }
-
   var particleMaterialConfigurations = new Object();
   particleMaterialConfigurations.color = colorName;
   particleMaterialConfigurations.size = particleSize;
@@ -3253,6 +2290,7 @@ Roygbiv.prototype.createDynamicTrail = function(configurations){
   if (mode == 0){
     return;
   }
+  preConditions.checkIfDefined(ROYGBIV.createDynamicTrail, preConditions.configurations, configurations);
   var name = configurations.name;
   var position = configurations.position;
   var expireTime = configurations.expireTime;
@@ -3271,168 +2309,48 @@ Roygbiv.prototype.createDynamicTrail = function(configurations){
   var textureName = configurations.textureName;
   var rgbFilter = configurations.rgbFilter;
   var updateFunction = configurations.updateFunction;
-
-  if (particleSystemPool[name]){
-    throw new Error("createDynamicTrail error: Name must be unique.");
-    return;
-  }
-  if (typeof position == UNDEFINED){
-    throw new Error("createDynamicTrail error: position is a mandatory configuration.");
-    return;
-  }
-  if (isNaN(position.x) || isNaN(position.y) || isNaN(position.z)){
-    throw new Error("createDynamicTrail error: Bad position configuration.");
-    return;
-  }
-  if (typeof expireTime == UNDEFINED){
-    throw new Error("createDynamicTrail error: expireTime is a mandatory configuration.");
-    return;
-  }
-  if (isNaN(expireTime)){
-    throw new Error("createDynamicTrail error: Bad expireTime parameter.");
-    return;
-  }
-  if (expireTime <= 0){
-    throw new Error("createDynamicTrail error: expireTime is expected to be greater than zero.");
-    return;
-  }
-  if (typeof particleCount == UNDEFINED){
-    throw new Error("createDynamicTrail error: particleCount is a mandatory configuration.");
-    return;
-  }
-  if (isNaN(particleCount)){
-    throw new Error("createDynamicTrail error: Bad particleCount parameter.");
-    return;
-  }
-  if (particleCount <= 0){
-    throw new Error("createDynamicTrail error: particleCount is expected to be greater than zero.");
-    return;
-  }
-  if (typeof size == UNDEFINED){
-    throw new Error("createDynamicTrail error: size is a mandatory configuration.");
-    return;
-  }
-  if (isNaN(size)){
-    throw new Error("createDynamicTrail error: Bad size parameter.");
-    return;
-  }
-  if (size <= 0){
-    throw new Error("createDynamicTrail error: size is expected to be greater than zero.");
-    return;
-  }
-  if (typeof particleSize == UNDEFINED){
-    throw new Error("createDynamicTrail error: particleSize is a mandatory configuration.");
-    return;
-  }
-  if (isNaN(particleSize)){
-    throw new Error("createDynamicTrail error: Bad particleSize parameter.");
-    return;
-  }
-  if (particleSize <= 0){
-    throw new Error("createDynamicTrail error: particleSize is expected to be greater than zero.");
-    return;
-  }
-  if (typeof startDelay == UNDEFINED){
-    throw new Error("createDynamicTrail error: startDelay is a mandatory configuration.");
-    return;
-  }
-  if (isNaN(startDelay)){
-    throw new Error("createDynamicTrail error: Bad startDelay parameter.");
-    return;
-  }
-  if (startDelay <= 0){
-    throw new Error("createDynamicTrail error: startDelay is expected to be greater than zero.");
-    return;
-  }
-  if (typeof lifetime == UNDEFINED){
-    throw new Error("createDynamicTrail error: lifetime is a mandatory configuration.");
-    return;
-  }
-  if (isNaN(lifetime)){
-    throw new Error("createDynamicTrail error: Bad lifetime parameter.");
-    return;
-  }
-  if (lifetime < 0){
-    lifetime = 0;
-  }
-  if (typeof velocity == UNDEFINED){
-    throw new Error("createDynamicTrail error: velocity is a mandatory configuration.");
-    return;
-  }
-  if (isNaN(velocity.x) || isNaN(velocity.y) || isNaN(velocity.z)){
-    throw new Error("createDynamicTrail error: Bad velocity parameter.");
-    return;
-  }
-  if (typeof acceleration == UNDEFINED){
-    throw new Error("createDynamicTrail error: acceleration is a mandatory configuration.");
-    return;
-  }
-  if (isNaN(acceleration.x) || isNaN(acceleration.y) || isNaN(acceleration.z)){
-    throw new Error("createDynamicTrail error: Bad acceleration parameter.");
-    return;
-  }
-  if (typeof randomness == UNDEFINED){
-    throw new Error("createDynamicTrail error: randomness is a mandatory configuration.");
-    return;
-  }
-  if (isNaN(randomness)){
-    throw new Error("createDynamicTrail error: Bad randomness parameter.");
-    return;
-  }
-  if (typeof alphaVariation == UNDEFINED){
-    throw new Error("createDynamicTrail error: alphaVariation is a mandatory configuration.");
-    return;
-  }
-  if (isNaN(alphaVariation)){
-    throw new Error("createDynamicTrail error: Bad alphaVariation parameter.");
-    return;
-  }
-  if (alphaVariation < -1 || alphaVariation > 0){
-    throw new Error("createDynamicTrail error: alphaVariation is expected to be between [-1,0]");
-    return;
-  }
-  if (typeof colorName == UNDEFINED){
-    throw new Error("createDynamicTrail error: colorName is a mandatory configuration.");
-    return;
-  }
-  if (!(typeof targetColorName == UNDEFINED)){
-    if (typeof colorStep == UNDEFINED){
-      throw new Error("createDynamicTrail error: colorStep is mandatory if targetColorName is specified.");
-      return;
-    }
-    if (isNaN(colorStep)){
-      throw new Error("createDynamicTrail error: Bad colorStep parameter.");
-      return;
-    }
-    if (colorStep < 0 || colorStep > 1){
-      throw new Error("createDynamicTrail error: colorStep is expected to be betwen [0,1].");
-      return;
-    }
-  }
+  preConditions.checkIfMandatoryParameterExists(ROYGBIV.createDynamicTrail, preConditions.name, name);
+  preConditions.checkIfTrue(ROYGBIV.createDynamicTrail, "name must be unique", (particleSystemPool[name]));
+  preConditions.checkIfMandatoryParameterExists(ROYGBIV.createDynamicTrail, preConditions.position, position);
+  preConditions.checkIfVectorOnlyIfDefined(ROYGBIV.createDynamicTrail, preConditions.position, position);
+  preConditions.checkIfMandatoryParameterExists(ROYGBIV.createDynamicTrail, preConditions.expireTime, expireTime);
+  preConditions.checkIfNumber(ROYGBIV.createDynamicTrail, preConditions.expireTime, expireTime);
+  preConditions.checkIfLessThan(ROYGBIV.createDynamicTrail, preConditions.expireTime, expireTime, 0);
+  preConditions.checkIfMandatoryParameterExists(ROYGBIV.createDynamicTrail, preConditions.particleCount, particleCount);
+  preConditions.checkIfNumber(ROYGBIV.createDynamicTrail, preConditions.particleCount, particleCount);
+  preConditions.checkIfLessThan(ROYGBIV.createDynamicTrail, preConditions.particleCount, particleCount, 0);
+  preConditions.checkIfMandatoryParameterExists(ROYGBIV.createDynamicTrail, preConditions.size, size);
+  preConditions.checkIfNumber(ROYGBIV.createDynamicTrail, preConditions.size, size);
+  preConditions.checkIfLessThan(ROYGBIV.createDynamicTrail, preConditions.size, size, 0);
+  preConditions.checkIfMandatoryParameterExists(ROYGBIV.createDynamicTrail, preConditions.particleSize, particleSize);
+  preConditions.checkIfNumber(ROYGBIV.createDynamicTrail, preConditions.particleSize, particleSize);
+  preConditions.checkIfLessThan(ROYGBIV.createDynamicTrail, preConditions.particleSize, particleSize, 0);
+  preConditions.checkIfMandatoryParameterExists(ROYGBIV.createDynamicTrail, preConditions.startDelay, startDelay);
+  preConditions.checkIfNumber(ROYGBIV.createDynamicTrail, preConditions.startDelay, startDelay);
+  preConditions.checkIfLessThan(ROYGBIV.createDynamicTrail, preConditions.startDelay, startDelay, 0);
+  preConditions.checkIfMandatoryParameterExists(ROYGBIV.createDynamicTrail, preConditions.lifetime, lifetime);
+  preConditions.checkIfNumber(ROYGBIV.createDynamicTrail, preConditions.lifetime, lifetime);
+  preConditions.checkIfLessThanExclusive(ROYGBIV.createDynamicTrail, preConditions.lifetime, lifetime, 0);
+  preConditions.checkIfMandatoryParameterExists(ROYGBIV.createDynamicTrail, preConditions.velocity, velocity);
+  preConditions.checkIfVectorOnlyIfDefined(ROYGBIV.createDynamicTrail, preConditions.velocity, velocity);
+  preConditions.checkIfMandatoryParameterExists(ROYGBIV.createDynamicTrail, preConditions.acceleration, acceleration);
+  preConditions.checkIfVectorOnlyIfDefined(ROYGBIV.createDynamicTrail, preConditions.acceleration, acceleration);
+  preConditions.checkIfMandatoryParameterExists(ROYGBIV.createDynamicTrail, preConditions.randomness, randomness);
+  preConditions.checkIfNumber(ROYGBIV.createDynamicTrail, preConditions.randomness, randomness);
+  preConditions.checkIfMandatoryParameterExists(ROYGBIV.createDynamicTrail, preConditions.alphaVariation, alphaVariation);
+  preConditions.checkIfNumber(ROYGBIV.createDynamicTrail, preConditions.alphaVariation, alphaVariation);
+  preConditions.checkIfInRange(ROYGBIV.createDynamicTrail, preConditions.alphaVariation, alphaVariation, -1, 0);
+  preConditions.checkIfMandatoryParameterExists(ROYGBIV.createDynamicTrail, preConditions.colorName, colorName);
+  preConditions.checkIfXExistsOnlyIfYExists(ROYGBIV.createDynamicTrail, preConditions.colorStep, preConditions.targetColorName, colorStep, targetColorName);
+  preConditions.checkIfNumberOnlyIfExists(ROYGBIV.createDynamicTrail, preConditions.colorStep, colorStep);
+  preConditions.checkIfInRangeOnlyIfDefined(ROYGBIV.createDynamicTrail, preConditions.colorStep, colorStep, 0, 1);
+  preConditions.checkIfVectorOnlyIfDefined(ROYGBIV.createDynamicTrail, preConditions.rgbFilter, rgbFilter);
+  preConditions.checkIfFunctionOnlyIfExists(ROYGBIV.createDynamicTrail, preConditions.updateFunction, updateFunction);
   if (!(typeof textureName == UNDEFINED)){
     var texture = textures[textureName];
-    if (typeof texture == UNDEFINED){
-      throw new Error("createDynamicTrail error: No such texture.");
-      return;
-    }
-    if (!(texture instanceof THREE.Texture)){
-      throw new Error("createDynamicTrail error: Texture not ready.");
-      return;
-    }
+    preConditions.checkIfTextureExists(ROYGBIV.createDynamicTrail, preConditions.texture, texture);
+    preConditions.checkIfTextureReady(ROYGBIV.createDynamicTrail, preConditions.texture, texture);
   }
-  if (!(typeof rgbFilter == UNDEFINED)){
-    if (isNaN(rgbFilter.x) || isNaN(rgbFilter.y) || isNaN(rgbFilter.z)){
-      throw new Error("createDynamicTrail error: Bad rgbFilter parameter.");
-      return;
-    }
-  }
-  if (!(typeof updateFunction == UNDEFINED)){
-    if (!(updateFunction instanceof Function)){
-      throw new Error("createDynamicTrail error: updateFunction is not a function.");
-      return;
-    }
-  }
-
   var particleMaterialConfigurations = new Object();
   particleMaterialConfigurations.color = colorName;
   particleMaterialConfigurations.size = particleSize;
@@ -3442,7 +2360,6 @@ Roygbiv.prototype.createDynamicTrail = function(configurations){
   particleMaterialConfigurations.targetColor = targetColorName;
   particleMaterialConfigurations.colorStep = colorStep;
   var particleMaterial = this.createParticleMaterial(particleMaterialConfigurations);
-
   var particles = [];
   var particleConfigurations = new Object();
   particleConfigurations.material = particleMaterial;
@@ -3485,58 +2402,21 @@ Roygbiv.prototype.createObjectTrail = function(configurations){
   if (mode == 0){
     return;
   }
+  preConditions.checkIfDefined(ROYGBIV.createObjectTrail, preConditions.configurations, configurations);
   var object = configurations.object;
   var alpha = configurations.alpha;
 
-  if (typeof object == UNDEFINED){
-    throw new Error("createObjectTrail error: object is a mandatory configuration.");
-    return;
-  }
-  if (!object){
-    throw new Error("createObjectTrail error: No such object.");
-    return;
-  }
-  if (!(object.isAddedObject) && !(object.isObjectGroup)){
-    throw new Error("createObjectTrail error: Bad object parameter.");
-    return;
-  }
-  if ((object.isAddedObject) && (!addedObjects[object.name])){
-    throw new Error("createObjectTrail error: Cannot create object trails for child objects. Use parent object instead.");
-    return;
-  }
-  if (typeof alpha == UNDEFINED){
-    throw new Error("createObjectTrail error: alpha is a mandatory configuration.");
-    return;
-  }
-  if (isNaN(alpha)){
-    throw new Error("createObjectTrail error: Bad alpha parameter.");
-    return;
-  }
-  if (alpha < 0 || alpha > 1){
-    throw new Error("createObjectTrail error: alpha is expected to be between [0,1].");
-  }
-  if (objectTrails[object.name]){
-    throw new Error("createObjectTrail error: A trail is already added to object.");
-    return;
-  }
-  if (!(typeof configurations.maxTimeInSeconds == UNDEFINED)){
-    if (isNaN(configurations.maxTimeInSeconds)){
-      throw new Error("createObjectTrail error: maxTimeInSeconds is not a number.");
-      return;
-    }
-    if (configurations.maxTimeInSeconds <= 0){
-      throw new Error("createObjectTrail error: maxTimeInSeconds must be greater than zero.");
-      return;
-    }
-    if (configurations.maxTimeInSeconds > 1){
-      throw new Error("createObjectTrail error: maxTimeInSeconds must not be greater than zero.");
-      return;
-    }
-    if (configurations.maxTimeInSeconds < (1/60)){
-      throw new Error("createObjectTrail error: maxTimeInSeconds must not be less than 0.01666666666 (1/60).");
-      return;
-    }
-  }
+  preConditions.checkIfMandatoryParameterExists(ROYGBIV.createObjectTrail, preConditions.object, object);
+  preConditions.checkIfAddedObjectOrObjectGroup(ROYGBIV.createObjectTrail, preConditions.object, object);
+  preConditions.checkIfChildObjectOnlyIfExists(ROYGBIV.createObjectTrail, preConditions.object, object);
+  preConditions.checkIfMandatoryParameterExists(ROYGBIV.createObjectTrail, preConditions.alpha, alpha);
+  preConditions.checkIfNumber(ROYGBIV.createObjectTrail, preConditions.alpha, alpha);
+  preConditions.checkIfInRange(ROYGBIV.createObjectTrail, preConditions.alpha, alpha, 0, 1);
+  preConditions.checkIfTrue(ROYGBIV.createObjectTrail, "A trail is already added to object.", (objectTrails[object.name]));
+  preConditions.checkIfNumberOnlyIfExists(ROYGBIV.createObjectTrail, preConditions.maxTimeInSeconds, configurations.maxTimeInSeconds);
+  preConditions.checkIfLessThanOnlyIfExists(ROYGBIV.createObjectTrail, preConditions.maxTimeInSeconds, configurations.maxTimeInSeconds, 0);
+  preConditions.checkIfLessThanExclusiveOnlyIfExists(ROYGBIV.createObjectTrail, preConditions.maxTimeInSeconds, configurations.maxTimeInSeconds, (1/60));
+  preConditions.checkIfTrueOnlyIfYExists(ROYGBIV.createObjectTrail, "maxTimeInSeconds must not be greater than one", configurations.maxTimeInSeconds, (configurations.maxTimeInSeconds > 1));
   new ObjectTrail(configurations);
   return;
 }
@@ -3547,19 +2427,10 @@ Roygbiv.prototype.destroyObjectTrail = function(object){
   if (mode == 0){
     return;
   }
-  if (typeof object == UNDEFINED){
-    throw new Error("destroyObjectTrail error: object is not defined.");
-    return;
-  }
-  if (!(object.isAddedObject) && !(object.isObjectGroup)){
-    throw new Error("destroyObjectTrail error: Type not supported.");
-    return;
-  }
+  preConditions.checkIfDefined(ROYGBIV.destroyObjectTrail, preConditions.object, object);
+  preConditions.checkIfAddedObjectOrObjectGroup(ROYGBIV.destroyObjectTrail, preConditions.object, object);
+  preConditions.checkIfTrue(ROYGBIV.destroyObjectTrail, "No trail effect is added to object", (!objectTrails[object.name]));
   var objectTrail = objectTrails[object.name];
-  if (!objectTrail){
-    throw new Error("destroyObjectTrail error: No trail effect is added to object.");
-    return;
-  }
   objectTrail.destroy();
   delete objectTrails[object.name];
   delete activeObjectTrails[object.name];
@@ -3591,27 +2462,12 @@ Roygbiv.prototype.rewindParticle = function(particle, delay){
   if (mode == 0){
     return;
   }
-  if (!particle){
-    throw new Error("rewindParticle error: particle is not defined.");
-    return;
-  }
-  if (!(particle.isParticle)){
-    throw new Error("rewindParticle error: Bad particle parameter.");
-    return;
-  }
-  if (!particle.respawnSet){
-    throw new Error("rewindParticle error: Particles using this functionality must have respawn = true as configuration.");
-    return;
-  }
-  if (particle.lifetime == 0){
-    throw new Error("rewindParticle error: Particles using this functionality must have lifetime != 0 as configuration.");
-    return;
-  }
-  if (!(typeof delay == UNDEFINED)){
-    if (isNaN(delay)){
-      throw new Error("rewindParticle error: delay must be a number.");
-    }
-  }else{
+  preConditions.checkIfDefined(ROYGBIV.rewindParticle, preConditions.particle, particle);
+  preConditions.checkIfTrue(ROYGBIV.rewindParticle, "particle is not a Particle.", (!particle.isParticle));
+  preConditions.checkIfTrue(ROYGBIV.rewindParticle, "Particles using this API must have respawn = true as configuration.", (!particle.respawnSet));
+  preConditions.checkIfTrue(ROYGBIV.rewindParticle, "Particles using this API must have lifetime != 0 as configuration.", (particle.lifetime == 0));
+  preConditions.checkIfNumberOnlyIfExists(ROYGBIV.rewindParticle, preConditions.delay, delay);
+  if ((typeof delay == UNDEFINED)){
     delay = 0;
   }
   if (!particle.parent){
@@ -3642,6 +2498,7 @@ Roygbiv.prototype.createLaser = function(configurations){
   if (mode == 0){
     return;
   }
+  preConditions.checkIfDefined(ROYGBIV.createLaser, preConditions.configurations, configurations);
   var name = configurations.name;
   var position = configurations.position;
   var particleCount = configurations.particleCount;
@@ -3658,103 +2515,32 @@ Roygbiv.prototype.createLaser = function(configurations){
   var textureName = configurations.textureName;
   var rgbFilter = configurations.rgbFilter;
   var updateFunction = configurations.updateFunction;
-  if (typeof name == UNDEFINED){
-    throw new Error("createLaser error: name is a mandatory configuration.");
-    return;
-  }
-  if (particleSystemPool[name]){
-    throw new Error("createLaser error: name must be unique.");
-    return;
-  }
-  if (typeof position == UNDEFINED){
-    throw new Error("createLaser error: position is a mandatory configuration.");
-    return;
-  }
-  if (isNaN(position.x) || isNaN(position.y) || isNaN(position.z)){
-    throw new Error("createLaser error: Bad position parameter.");
-    return;
-  }
-  if (typeof particleCount == UNDEFINED){
-    throw new Error("createLaser error: particleCount is a mandatory configuration.");
-    return;
-  }
-  if (isNaN(particleCount)){
-    throw new Error("createLaser error: particleCount must be a number.");
-    return;
-  }else if (particleCount <= 0){
-    throw new Error("createLaser error: particleCount must be greater than zero.");
-    return;
-  }
-  if (typeof particleSize == UNDEFINED){
-    throw new Error("createLaser error: particleSize is a mandatory configuration.");
-    return;
-  }
-  if (isNaN(particleSize)){
-    throw new Error("createLaser error: particleSize must be a number.");
-    return;
-  }else if (particleSize <= 0){
-    throw new Error("createLaser error: particleSize must be greater than zero.");
-    return;
-  }
-  if (typeof direction == UNDEFINED){
-    throw new Error("createLaser error: direction is a mandatory configuration.");
-    return;
-  }
-  if (isNaN(direction.x) || isNaN(direction.y) || isNaN(direction.z)){
-    throw new Error("createLaser error: Bad direction parameter.");
-    return;
-  }
-  if (typeof timeDiff == UNDEFINED){
-    throw new Error("createLaser error: timeDiff is a mandatory configuration.");
-    return;
-  }
-  if (isNaN(timeDiff)){
-    throw new Error("createLaser error: timeDiff must be a number.");
-    return;
-  }
-  if (typeof expireTime == UNDEFINED){
-    throw new Error("createLaser error: expireTime is a mandatory configuration.");
-    return;
-  }
-  if (isNaN(expireTime)){
-    throw new Error("createLaser error: expireTime must be a number.");
-    return;
-  }else if (expireTime < 0){
-    throw new Error("createLaser error: expireTime cannot be a negative number.");
-    return;
-  }
-  if (typeof velocity == UNDEFINED){
-    throw new Error("createLaser error: velocity is a mandatory configuration.");
-    return;
-  }
-  if (isNaN(velocity.x) || isNaN(velocity.y) || isNaN(velocity.z)){
-    throw new Error("createLaser error: Bad velocity parameter.");
-    return;
-  }
-  if (typeof acceleration == UNDEFINED){
-    throw new Error("createLaser error: acceleration is a mandatory configuration.");
-    return;
-  }
-  if (isNaN(acceleration.x) || isNaN(acceleration.y) || isNaN(acceleration.z)){
-    throw new Error("createLaser error: Bad acceleration parameter.");
-    return;
-  }
-  if (typeof alpha == UNDEFINED){
-    throw new Error("createLaser error: alpha is a mandatory configuration.");
-    return;
-  }
-  if (isNaN(alpha)){
-    throw new Error("createLaser error: alpha must be a number.");
-    return;
-  }
-  if (alpha > 1 || alpha < 0){
-    throw new Error("createLaser error: alpha must be between [0, 1].");
-    return;
-  }
-  if (typeof colorName == UNDEFINED){
-    throw new Error("createLaser error: colorName is a mandatory configuration.");
-    return;
-  }
+
+  preConditions.checkIfMandatoryParameterExists(ROYGBIV.createLaser, preConditions.name, name);
+  preConditions.checkIfTrue(ROYGBIV.createLaser, "name must be unique", (particleSystemPool[name]));
+  preConditions.checkIfMandatoryParameterExists(ROYGBIV.createLaser, preConditions.position, position);
+  preConditions.checkIfVectorOnlyIfDefined(ROYGBIV.createLaser, preConditions.position, position);
+  preConditions.checkIfMandatoryParameterExists(ROYGBIV.createLaser, preConditions.particleCount, particleCount);
+  preConditions.checkIfNumber(ROYGBIV.createLaser, preConditions.particleCount, particleCount);
+  preConditions.checkIfLessThan(ROYGBIV.createLaser, preConditions.particleCount, particleCount, 0);
+  preConditions.checkIfMandatoryParameterExists(ROYGBIV.createLaser, preConditions.particleSize, particleSize);
+  preConditions.checkIfNumber(ROYGBIV.createLaser, preConditions.particleSize, particleSize);
+  preConditions.checkIfLessThan(ROYGBIV.createLaser, preConditions.particleSize, particleSize, 0);
+  preConditions.checkIfMandatoryParameterExists(ROYGBIV.createLaser, preConditions.direction, direction);
+  preConditions.checkIfVectorOnlyIfDefined(ROYGBIV.createLaser, preConditions.direction, direction);
+  preConditions.checkIfMandatoryParameterExists(ROYGBIV.createLaser, preConditions.timeDiff, timeDiff);
+  preConditions.checkIfNumber(ROYGBIV.createLaser, preConditions.timeDiff, timeDiff);
+  preConditions.checkIfMandatoryParameterExists(ROYGBIV.createLaser, preConditions.expireTime, expireTime);
+  preConditions.checkIfNumber(ROYGBIV.createLaser, preConditions.expireTime, expireTime);
+  preConditions.checkIfLessThanExclusive(ROYGBIV.createLaser, preConditions.expireTime, expireTime, 0);
+  preConditions.checkIfMandatoryParameterExists(ROYGBIV.createLaser, preConditions.velocity, velocity);
+  preConditions.checkIfVectorOnlyIfDefined(ROYGBIV.createLaser, preConditions.velocity, velocity);
+  preConditions.checkIfMandatoryParameterExists(ROYGBIV.createLaser, preConditions.acceleration, acceleration);
+  preConditions.checkIfVectorOnlyIfDefined(ROYGBIV.createLaser, preConditions.acceleration, acceleration);
+  preConditions.checkIfMandatoryParameterExists(ROYGBIV.createLaser, preConditions.alpha, alpha);
+  preConditions.checkIfNumber(ROYGBIV.createLaser, preConditions.alpha, alpha);
+  preConditions.checkIfInRange(ROYGBIV.createLaser, preConditions.alpha, alpha, 0, 1);
+  preConditions.checkIfMandatoryParameterExists(ROYGBIV.createLaser, preConditions.colorName, colorName);
 
   var particleMaterialConfigurations = new Object();
   particleMaterialConfigurations.color = colorName;
@@ -3821,6 +2607,7 @@ Roygbiv.prototype.createWaterfall = function(configurations){
   if (mode == 0){
     return;
   }
+  preConditions.checkIfDefined(ROYGBIV.createWaterfall, preConditions.configurations, configurations);
   var name = configurations.name;
   var position = configurations.position;
   var particleCount = configurations.particleCount;
@@ -3843,151 +2630,49 @@ Roygbiv.prototype.createWaterfall = function(configurations){
   var updateFunction = configurations.updateFunction;
   var collisionTimeOffset = configurations.collisionTimeOffset;
 
-  if (typeof name == UNDEFINED){
-    throw new Error("createWaterfall error: name is a mandatory configuration.");
-    return;
-  }
-  if (particleSystemPool[name]){
-    throw new Error("createWaterfall error: name must be unique.");
-    return;
-  }
-  if (typeof position == UNDEFINED){
-    throw new Error("createWaterfall error: position is a mandatory configuration.");
-    return;
-  }
-  if (isNaN(position.x) || isNaN(position.y) || isNaN(position.z)){
-    throw new Error("createWaterfall error: Bad position parameter.");
-    return;
-  }
-  if (typeof particleCount == UNDEFINED){
-    throw new Error("createWaterfall error: particleCount is a mandatory configuration.");
-    return;
-  }
-  if (isNaN(particleCount)){
-    throw new Error("createWaterfall error: particleCount must be a number.");
-    return;
-  }
-  if (particleCount <= 0){
-    throw new Error("createWaterfall error: particleCount must be greater than zero.");
-    return;
-  }
-  if (typeof size == UNDEFINED){
-    throw new Error("createWaterfall error: size is a mandatory configuration.");
-    return;
-  }
-  if (isNaN(size)){
-    throw new Error("createWaterfall error: Bad size parameter.");
-    return;
-  }
-  if (size <= 0){
-    throw new Error("createWaterfall error: size must be greater than zero.");
-    return;
-  }
-  if (typeof particleSize == UNDEFINED){
-    throw new Error("createWaterfall error: particleSize is a mandatory configuration.");
-    return;
-  }
-  if (isNaN(particleSize)){
-    throw new Error("createWaterfall error: Bad particleSize parameter.");
-    return;
-  }
-  if (particleSize <= 0){
-    throw new Error("createWaterfall error: particleSize must be greater than zero.");
-    return;
-  }
-  if (typeof particleExpireTime == UNDEFINED){
-    throw new Error("createWaterfall error: particleExpireTime is a mandatory configuration.");
-    return;
-  }
-  if (isNaN(particleExpireTime)){
-    throw new Error("createWaterfall error: particleExpireTime must be a number.");
-    return;
-  }
-  if (particleExpireTime <= 0){
-    throw new Error("createWaterfall error: particleExpireTime must be greater than zero.");
-    return;
-  }
-  if (typeof speed == UNDEFINED){
-    throw new Error("createWaterfall error: speed is a mandatory configuration.");
-    return;
-  }
-  if (isNaN(speed)){
-    throw new Error("createWaterfall error: speed must be a number.");
-    return;
-  }
-  if (speed <= 0){
-    throw new Error("createWaterfall error: speed must be greater than zero.");
-    return;
-  }
-  if (typeof acceleration == UNDEFINED){
-    throw new Error("createWaterfall error: acceleration is a mandatory configuration.");
-    return;
-  }
-  if (isNaN(acceleration)){
-    throw new Error("createWaterfall error: acceleration must be a number.");
-    return;
-  }
-  if (acceleration <= 0){
-    throw new Error("createWaterfall error: acceleration must be greater than zero.");
-    return;
-  }
-  if (typeof avgStartDelay == UNDEFINED){
-    throw new Error("createWaterfall error: avgStartDelay is a mandatory configuration.");
-    return;
-  }
-  if (isNaN(avgStartDelay)){
-    throw new Error("createWaterfall error: avgStartDelay must be a number.");
-    return;
-  }
-  if (avgStartDelay <= 0){
-    throw new Error("createWaterfall error: avgStartDelay must be greater than zero.");
-    return;
-  }
-  if (typeof colorName == UNDEFINED){
-    throw new Error("createWaterfall error: colorName is a mandatory configuration.");
-    return;
-  }
-  if (typeof alpha == UNDEFINED){
-    throw new Error("createWaterfall error: alpha is a mandatory configuration.");
-    return;
-  }
-  if (isNaN(alpha)){
-    throw new Error("createWaterfall error: alpha must be a number.");
-    return;
-  }
-  if (alpha < 0 || alpha > 1){
-    throw new Error("createWaterfall error: alpha must be between [0, 1].");
-    return;
-  }
-  if (!(typeof rewindOnCollided == UNDEFINED)){
-    if (!(typeof rewindOnCollided == typeof(true))){
-      throw new Error("createWaterfall error: rewindOnCollided must be a boolean.");
-    }
-  }else{
+  preConditions.checkIfMandatoryParameterExists(ROYGBIV.createWaterfall, preConditions.name, name);
+  preConditions.checkIfTrue(ROYGBIV.createWaterfall, "name must be unique", (particleSystemPool[name]));
+  preConditions.checkIfMandatoryParameterExists(ROYGBIV.createWaterfall, preConditions.position, position);
+  preConditions.checkIfVectorOnlyIfDefined(ROYGBIV.createWaterfall, preConditions.position, position);
+  preConditions.checkIfMandatoryParameterExists(ROYGBIV.createWaterfall, preConditions.particleCount, particleCount);
+  preConditions.checkIfNumber(ROYGBIV.createWaterfall, preConditions.particleCount, particleCount);
+  preConditions.checkIfLessThan(ROYGBIV.createWaterfall, preConditions.particleCount, particleCount, 0);
+  preConditions.checkIfMandatoryParameterExists(ROYGBIV.createWaterfall, preConditions.size, size);
+  preConditions.checkIfNumber(ROYGBIV.createWaterfall, preConditions.size, size);
+  preConditions.checkIfLessThan(ROYGBIV.createWaterfall, preConditions.size, size, 0);
+  preConditions.checkIfMandatoryParameterExists(ROYGBIV.createWaterfall, preConditions.particleSize, particleSize);
+  preConditions.checkIfNumber(ROYGBIV.createWaterfall, preConditions.particleSize, particleSize);
+  preConditions.checkIfLessThan(ROYGBIV.createWaterfall, preConditions.particleSize, particleSize, 0);
+  preConditions.checkIfMandatoryParameterExists(ROYGBIV.createWaterfall, preConditions.particleExpireTime, particleExpireTime);
+  preConditions.checkIfNumber(ROYGBIV.createWaterfall, preConditions.particleExpireTime, particleExpireTime);
+  preConditions.checkIfLessThan(ROYGBIV.createWaterfall, preConditions.particleExpireTime, particleExpireTime, 0);
+  preConditions.checkIfMandatoryParameterExists(ROYGBIV.createWaterfall, preConditions.speed, speed);
+  preConditions.checkIfNumber(ROYGBIV.createWaterfall, preConditions.speed, speed);
+  preConditions.checkIfLessThan(ROYGBIV.createWaterfall, preConditions.speed, speed, 0);
+  preConditions.checkIfMandatoryParameterExists(ROYGBIV.createWaterfall, preConditions.acceleration, acceleration);
+  preConditions.checkIfNumber(ROYGBIV.createWaterfall, preConditions.acceleration, acceleration);
+  preConditions.checkIfLessThan(ROYGBIV.createWaterfall, preConditions.acceleration, acceleration, 0);
+  preConditions.checkIfMandatoryParameterExists(ROYGBIV.createWaterfall, preConditions.avgStartDelay, avgStartDelay);
+  preConditions.checkIfNumber(ROYGBIV.createWaterfall, preConditions.avgStartDelay, avgStartDelay);
+  preConditions.checkIfLessThan(ROYGBIV.createWaterfall, preConditions.avgStartDelay, avgStartDelay, 0);
+  preConditions.checkIfMandatoryParameterExists(ROYGBIV.createWaterfall, preConditions.colorName, colorName);
+  preConditions.checkIfMandatoryParameterExists(ROYGBIV.createWaterfall, preConditions.alpha, alpha);
+  preConditions.checkIfNumber(ROYGBIV.createWaterfall, preConditions.alpha, alpha);
+  preConditions.checkIfInRange(ROYGBIV.createWaterfall, preConditions.alpha, alpha, 0, 1);
+  preConditions.checkIfBooleanOnlyIfExists(ROYGBIV.createWaterfall, preConditions.rewindOnCollided, rewindOnCollided);
+  preConditions.checkIfVectorOnlyIfDefined(ROYGBIV.createWaterfall, preConditions.normal, normal);
+  preConditions.checkIfNumberOnlyIfExists(ROYGBIV.createWaterfall, preConditions.randomness, randomness);
+  preConditions.checkIfNumberOnlyIfExists(ROYGBIV.createWaterfall, preConditions.collisionTimeOffset, collisionTimeOffset);
+  if ((typeof rewindOnCollided == UNDEFINED)){
     rewindOnCollided = true;
   }
-  if (!(typeof normal == UNDEFINED)){
-    if (isNaN(normal.x) || isNaN(normal.y) || isNaN(normal.z)){
-      throw new Error("createWaterfall error: Bad normal parameter.");
-      return;
-    }
-  }else{
+  if ((typeof normal == UNDEFINED)){
     normal = this.vector(0, 0, 1);
   }
-  if (!(typeof randomness == UNDEFINED)){
-    if (isNaN(randomness)){
-      throw new Error("createWaterfall error: randomness must be a number.");
-      return;
-    }
-  }else{
+  if ((typeof randomness == UNDEFINED)){
     randomness = 0;
   }
-  if (!(typeof collisionTimeOffset == UNDEFINED)){
-    if (isNaN(collisionTimeOffset)){
-      throw new Error("createWaterfall error: collisionTimeOffset must be a number.");
-      return;
-    }
-  }else{
+  if ((typeof collisionTimeOffset == UNDEFINED)){
     collisionTimeOffset = 0;
   }
 
@@ -4066,6 +2751,7 @@ Roygbiv.prototype.createSnow = function(configurations){
   if (mode == 0){
     return;
   }
+  preConditions.checkIfDefined(ROYGBIV.createSnow, preConditions.configurations, configurations);
   var name = configurations.name;
   var position = configurations.position;
   var particleCount = configurations.particleCount;
@@ -4089,167 +2775,54 @@ Roygbiv.prototype.createSnow = function(configurations){
   var updateFunction = configurations.updateFunction;
   var collisionTimeOffset = configurations.collisionTimeOffset;
 
-  if (typeof name == UNDEFINED){
-    throw new Error("createSnow error: name is a mandatory configuration.");
-    return;
-  }
-  if (particleSystemPool[name]){
-    throw new Error("createSnow error: name must be unique.");
-    return;
-  }
-  if (typeof position == UNDEFINED){
-    throw new Error("createSnow error: position is a mandatory configuration.");
-    return;
-  }
-  if (isNaN(position.x) || isNaN(position.y) || isNaN(position.z)){
-    throw new Error("createSnow error: Bad position parameter.");
-    return;
-  }
-  if (typeof particleCount == UNDEFINED){
-    throw new Error("createSnow error: particleCount is a mandatory configuration.");
-    return;
-  }
-  if (isNaN(particleCount)){
-    throw new Error("createSnow error: particleCount must be a number.");
-    return;
-  }
-  if (particleCount <= 0){
-    throw new Error("createSnow error: particleCount must be greater than zero.");
-    return;
-  }
-  if (typeof sizeX == UNDEFINED){
-    throw new Error("createSnow error: sizeX is a mandatory configuration.");
-    return;
-  }
-  if (isNaN(sizeX)){
-    throw new Error("createSnow error: sizeX must be a number.");
-    return;
-  }
-  if (sizeX <= 0){
-    throw new Error("createSnow error: sizeX must be greater than zero.");
-    return;
-  }
-  if (typeof sizeZ == UNDEFINED){
-    throw new Error("createSnow error: sizeZ is a mandatory configuration.");
-    return;
-  }
-  if (isNaN(sizeZ)){
-    throw new Error("createSnow error: sizeZ must be a number.");
-    return;
-  }
-  if (sizeZ <= 0){
-    throw new Error("createSnow error: sizeZ must be greater than zero.");
-    return;
-  }
-  if (typeof particleSize == UNDEFINED){
-    throw new Error("createSnow error: particleSize is a mandatory configuration.");
-    return;
-  }
-  if (isNaN(particleSize)){
-    throw new Error("createSnow error: particleSize must be a number.");
-    return;
-  }
-  if (particleSize <= 0){
-    throw new Error("createSnow error: particleSize must be greater than zero.");
-    return;
-  }
-  if (typeof particleExpireTime == UNDEFINED){
-    throw new Error("createSnow error: particleExpireTime is a mandatory configuration.");
-    return;
-  }
-  if (isNaN(particleExpireTime)){
-    throw new Error("createSnow error: particleExpireTime is a mandatory configuration.");
-    return;
-  }
-  if (particleExpireTime <= 0){
-    throw new Error("createSnow error: particleExpireTime must be greater than zero.");
-    return;
-  }
-  if (typeof speed == UNDEFINED){
-    throw new Error("createSnow error: speed is a mandatory configuration.");
-    return;
-  }
-  if (isNaN(speed)){
-    throw new Error("createSnow error: speed must be a number.");
-    return;
-  }
-  if (speed <= 0){
-    throw new Error("createSnow error: speed must be greater than zero.");
-    return;
-  }
-  if (typeof acceleration == UNDEFINED){
-    throw new Error("createSnow error: acceleration is a mandatory configuration.");
-    return;
-  }
-  if (isNaN(acceleration)){
-    throw new Error("createSnow error: acceleration must be a number.");
-    return;
-  }
-  if (acceleration < 0){
-    throw new Error("createSnow error: acceleration cannot be a negative number.");
-    return;
-  }
-  if (typeof avgStartDelay == UNDEFINED){
-    throw new Error("createSnow error: avgStartDelay is a mandatory configuration.");
-    return;
-  }
-  if (isNaN(avgStartDelay)){
-    throw new Error("createSnow error: avgStartDelay must be a number.");
-    return;
-  }
-  if (avgStartDelay <= 0){
-    throw new Error("createSnow error: avgStartDelay must be greater than zero.");
-    return;
-  }
-  if (typeof colorName == UNDEFINED){
-    throw new Error("createSnow error: colorName is a mandatory configuration.");
-    return;
-  }
-  if (typeof alpha == UNDEFINED){
-    throw new Error("createSnow error: alpha is a mandatory configuration.");
-    return;
-  }
-  if (isNaN(alpha)){
-    throw new Error("createSnow error: alpha must be a number.");
-    return;
-  }
-  if (alpha < 0 || alpha > 1){
-    throw new Error("createSnow error: alpha must be between [0, 1].");
-    return;
-  }
-  if (!(typeof rewindOnCollided == UNDEFINED)){
-    if (!(typeof rewindOnCollided == typeof(true))){
-      throw new Error("createSnow error: rewindOnCollided must be a boolean.");
-      return;
-    }
-  }else{
+  preConditions.checkIfMandatoryParameterExists(ROYGBIV.createSnow, preConditions.name, name);
+  preConditions.checkIfTrue(ROYGBIV.createSnow, "name must be unique", (particleSystemPool[name]));
+  preConditions.checkIfMandatoryParameterExists(ROYGBIV.createSnow, preConditions.position, position);
+  preConditions.checkIfVectorOnlyIfDefined(ROYGBIV.createSnow, preConditions.position, position);
+  preConditions.checkIfMandatoryParameterExists(ROYGBIV.createSnow, preConditions.particleCount, particleCount);
+  preConditions.checkIfNumber(ROYGBIV.createSnow, preConditions.particleCount, particleCount);
+  preConditions.checkIfLessThan(ROYGBIV.createSnow, preConditions.particleCount, particleCount, 0);
+  preConditions.checkIfMandatoryParameterExists(ROYGBIV.createSnow, preConditions.sizeX, sizeX);
+  preConditions.checkIfNumber(ROYGBIV.createSnow, preConditions.sizeX, sizeX);
+  preConditions.checkIfLessThan(ROYGBIV.createSnow, preConditions.sizeX, sizeX, 0);
+  preConditions.checkIfMandatoryParameterExists(ROYGBIV.createSnow, preConditions.sizeZ, sizeZ);
+  preConditions.checkIfNumber(ROYGBIV.createSnow, preConditions.sizeZ, sizeZ);
+  preConditions.checkIfLessThan(ROYGBIV.createSnow, preConditions.sizeZ, sizeZ, 0);
+  preConditions.checkIfMandatoryParameterExists(ROYGBIV.createSnow, preConditions.particleSize, particleSize);
+  preConditions.checkIfNumber(ROYGBIV.createSnow, preConditions.particleSize, particleSize);
+  preConditions.checkIfLessThan(ROYGBIV.createSnow, preConditions.particleSize, particleSize, 0);
+  preConditions.checkIfMandatoryParameterExists(ROYGBIV.createSnow, preConditions.particleExpireTime ,particleExpireTime);
+  preConditions.checkIfNumber(ROYGBIV.createSnow, preConditions.particleExpireTime, particleExpireTime);
+  preConditions.checkIfLessThan(ROYGBIV.createSnow, preConditions.particleExpireTime, particleExpireTime, 0);
+  preConditions.checkIfMandatoryParameterExists(ROYGBIV.createSnow, preConditions.speed, speed);
+  preConditions.checkIfNumber(ROYGBIV.createSnow, preConditions.speed, speed);
+  preConditions.checkIfLessThan(ROYGBIV.createSnow, preConditions.speed, speed, 0);
+  preConditions.checkIfMandatoryParameterExists(ROYGBIV.createSnow, preConditions.acceleration, acceleration);
+  preConditions.checkIfNumber(ROYGBIV.createSnow, preConditions.acceleration, acceleration);
+  preConditions.checkIfLessThanExclusive(ROYGBIV.createSnow, preConditions.acceleration, acceleration, 0);
+  preConditions.checkIfMandatoryParameterExists(ROYGBIV.createSnow, preConditions.avgStartDelay, avgStartDelay);
+  preConditions.checkIfNumber(ROYGBIV.createSnow, preConditions.avgStartDelay, avgStartDelay);
+  preConditions.checkIfLessThan(ROYGBIV.createSnow, preConditions.avgStartDelay, avgStartDelay, 0);
+  preConditions.checkIfMandatoryParameterExists(ROYGBIV.createSnow, preConditions.colorName, colorName);
+  preConditions.checkIfMandatoryParameterExists(ROYGBIV.createSnow, preConditions.alpha, alpha);
+  preConditions.checkIfNumber(ROYGBIV.createSnow, preConditions.alpha, alpha);
+  preConditions.checkIfInRange(ROYGBIV.createSnow, preConditions.alpha, alpha, 0, 1);
+  preConditions.checkIfBooleanOnlyIfExists(ROYGBIV.createSnow, preConditions.rewindOnCollided, rewindOnCollided);
+  preConditions.checkIfVectorOnlyIfDefined(ROYGBIV.createSnow, preConditions.normal, normal);
+  preConditions.checkIfNumberOnlyIfExists(ROYGBIV.createSnow, preConditions.randomness, randomness);
+  preConditions.checkIfNumberOnlyIfExists(ROYGBIV.createSnow, preConditions.collisionTimeOffset, collisionTimeOffset);
+  if ((typeof rewindOnCollided == UNDEFINED)){
     rewindOnCollided = true;
   }
-  if (!(typeof normal == UNDEFINED)){
-    if (isNaN(normal.x) || isNaN(normal.y) || isNaN(normal.z)){
-      throw new Error("createSnow error: Bad normal parameter.");
-      return;
-    }
-  }else{
+  if ((typeof normal == UNDEFINED)){
     normal = this.vector(0, -1, 0);
   }
-  if (!(typeof randomness == UNDEFINED)){
-    if (isNaN(randomness)){
-      throw new Error("createSnow error: randomness must be a number.");
-      return;
-    }
-  }else{
+  if ((typeof randomness == UNDEFINED)){
     randomness = 0;
   }
-  if (!(typeof collisionTimeOffset == UNDEFINED)){
-    if (isNaN(collisionTimeOffset)){
-      throw new Error("createSnow error: collisionTimeOffset must be a number.");
-      return;
-    }
-  }else{
+  if ((typeof collisionTimeOffset == UNDEFINED)){
     collisionTimeOffset = 0;
   }
-
   var particleMaterialConfigurations = new Object();
   particleMaterialConfigurations.color = colorName;
   particleMaterialConfigurations.size = particleSize;
@@ -4306,26 +2879,11 @@ Roygbiv.prototype.stopParticleSystem = function(particleSystem, stopDuration){
   if (mode == 0){
     return;
   }
-  if (typeof particleSystem == UNDEFINED){
-    throw new Error("stopParticleSystem error: particleSystem is not defined.");
-    return;
-  }
-  if (!(particleSystem.isParticleSystem)){
-    throw new Error("stopParticleSystem error: Type not supported.");
-    return;
-  }
-  if (typeof stopDuration == UNDEFINED){
-    throw new Error("stopParticleSystem error: stopDuration is not defined.");
-    return;
-  }
-  if (isNaN(stopDuration)){
-    throw new Error("stopParticleSystem error: stopDuration is not defined.");
-    return;
-  }
-  if (stopDuration < 0){
-    throw new Error("stopParticleSystem error: stopDuration must be a positive number.");
-    return;
-  }
+  preConditions.checkIfDefined(ROYGBIV.stopParticleSystem, preConditions.particleSystem, particleSystem);
+  preConditions.checkIfParticleSystem(ROYGBIV.stopParticleSystem, preConditions.particleSystem, particleSystem);
+  preConditions.checkIfDefined(ROYGBIV.stopParticleSystem, preConditions.stopDuration, stopDuration);
+  preConditions.checkIfNumber(ROYGBIV.stopParticleSystem, preConditions.stopDuration, stopDuration);
+  preConditions.checkIfLessThanExclusive(ROYGBIV.stopParticleSystem, preConditions.stopDuration, stopDuration, 0);
   particleSystem.stop(stopDuration);
 }
 
@@ -4340,47 +2898,31 @@ Roygbiv.prototype.startParticleSystem = function(configurations){
   if (mode == 0){
     return;
   }
+  preConditions.checkIfDefined(ROYGBIV.startParticleSystem, preConditions.configurations, configurations);
   var particleSystem = configurations.particleSystem;
   var startPosition = configurations.startPosition;
   var startVelocity = configurations.startVelocity;
   var startAcceleration = configurations.startAcceleration;
   var startQuaternion = configurations.startQuaternion;
 
-  if (!particleSystem){
-    throw new Error("startParticleSystem error: particleSystem is a mandatory configuration.");
-    return;
-  }
-  if (!(particleSystem.isParticleSystem)){
-    throw new Error("startParticleSystem error: Type not supported.");
-    return;
-  }
+  preConditions.checkIfMandatoryParameterExists(ROYGBIV.startParticleSystem, preConditions.particleSystem, particleSystem);
+  preConditions.checkIfParticleSystem(ROYGBIV.startParticleSystem, preConditions.particleSystem, particleSystem);
+  preConditions.checkIfVectorOnlyIfDefined(ROYGBIV.startParticleSystem, preConditions.startPosition, startPosition);
+  preConditions.checkIfVectorOnlyIfDefined(ROYGBIV.startParticleSystem, preConditions.startVelocity, startVelocity);
+  preConditions.checkIfVectorOnlyIfDefined(ROYGBIV.startParticleSystem, preConditions.startAcceleration, startAcceleration);
+  preConditions.checkIfVectorOnlyIfDefined(ROYGBIV.startParticleSystem, preConditions.startQuaternion, startQuaternion);
+
   var startPositionSet = false, startVelocitySet = false, startAccelerationSet = false, startQuaternionSet = false;
   if (!(typeof startPosition == UNDEFINED)){
-    if (isNaN(startPosition.x) || isNaN(startPosition.y) || isNaN(startPosition.z)){
-      throw new Error("startParticleSystem error: Bad startPosition parameter.");
-      return;
-    }
     startPositionSet = true;
   }
   if (!(typeof startVelocity == UNDEFINED)){
-    if (isNaN(startVelocity.x) || isNaN(startVelocity.y) || isNaN(startVelocity.z)){
-      throw new Error("startParticleSystem error: Bad startVelocity parameter.");
-      return;
-    }
     startVelocitySet = true;
   }
   if (!(typeof startAcceleration == UNDEFINED)){
-    if (isNaN(startAcceleration.x) || isNaN(startAcceleration.y) || isNaN(startAcceleration.z)){
-      throw new Error("startParticleSystem error: Bad startAcceleration parameter.");
-      return;
-    }
     startAccelerationSet = true;
   }
   if (!(typeof startQuaternion == UNDEFINED)){
-    if (isNaN(startQuaternion.x) || isNaN(startQuaternion.y) || isNaN(startQuaternion.z) || isNaN(startQuaternion.w)){
-      throw new Error("startParticleSystem error: Bad startQuaternion parameter.");
-      return;
-    }
     startQuaternionSet = true;
   }
 
@@ -4484,14 +3026,9 @@ Roygbiv.prototype.hideParticleSystem = function(particleSystem){
   if (mode == 0){
     return;
   }
-  if (typeof particleSystem == UNDEFINED){
-    throw new Error("hideParticleSystem error: particleSystem is not defined.");
-    return;
-  }
-  if (!(particleSystem.isParticleSystem)){
-    throw new Error("hideParticleSystem error: Type not supported.");
-    return;
-  }
+  preConditions.checkIfDefined(ROYGBIV.hideParticleSystem, preConditions.particleSystem, particleSystem);
+  preConditions.checkIfParticleSystem(ROYGBIV.hideParticleSystem, preConditions.particleSystem, particleSystem);
+
   particleSystem.tick = 0;
   particleSystem.motionMode = 0;
   particleSystem.mesh.visible = false;
@@ -4517,14 +3054,9 @@ Roygbiv.prototype.createParticleSystemPool = function(name){
   if (mode == 0){
     return;
   }
-  if (typeof name == UNDEFINED){
-    throw new Error("createParticleSystemPool error: name is not defined.");
-    return;
-  }
-  if (particleSystemPools[name]){
-    throw new Error("createParticleSystemPool error: name must be unique.");
-    return;
-  }
+  preConditions.checkIfDefined(ROYGBIV.createParticleSystemPool, preConditions.name, name);
+  preConditions.checkIfTrue(ROYGBIV.createParticleSystemPool, "name must be unique", (particleSystemPools[name]));
+
   var psPool = new ParticleSystemPool(name);
   particleSystemPools[name] = psPool;
   return psPool;
@@ -4536,26 +3068,11 @@ Roygbiv.prototype.addParticleSystemToPool = function(pool, particleSystem){
   if (mode == 0){
     return;
   }
-  if (typeof pool == UNDEFINED){
-    throw new Error("addParticleSystemToPool error: pool is not defined.");
-    return;
-  }
-  if (typeof particleSystem == UNDEFINED){
-    throw new Error("addParticleSystemToPool error: particleSystem is not defined.");
-    return;
-  }
-  if (!(pool.isParticleSystemPool)){
-    throw new Error("addParticleSystemToPool error: Pool type not supoorted.");
-    return;
-  }
-  if (!(particleSystem.isParticleSystem)){
-    throw new Error("addParticleSystemToPool error: Particle system type not supported.");
-    return;
-  }
-  if (!(typeof particleSystem.psPool == UNDEFINED)){
-    throw new Error("addParticleSystemToPool error: Particle system belongs to another pool.");
-    return;
-  }
+  preConditions.checkIfDefined(ROYGBIV.addParticleSystemToPool, preConditions.pool, pool);
+  preConditions.checkIfDefined(ROYGBIV.addParticleSystemToPool, preConditions.particleSystem, particleSystem);
+  preConditions.checkIfParticleSystemPool(ROYGBIV.addParticleSystemToPool, preConditions.pool, pool);
+  preConditions.checkIfParticleSystem(ROYGBIV.addParticleSystemToPool, preConditions.particleSystem, particleSystem);
+  preConditions.checkIfTrue(ROYGBIV.addParticleSystemToPool, "Particle system belongs to another pool", (!(typeof particleSystem.psPool == UNDEFINED)));
   pool.add(particleSystem);
 }
 
@@ -4565,18 +3082,9 @@ Roygbiv.prototype.removeParticleSystemFromPool = function(particleSystem){
   if (mode == 0){
     return;
   }
-  if (typeof particleSystem == UNDEFINED){
-    throw new Error("removeParticleSystemFromPool error: particleSystem is not defined.");
-    return;
-  }
-  if (!(particleSystem.isParticleSystem)){
-    throw new Error("removeParticleSystemFromPool error: Type not supported.");
-    return;
-  }
-  if (typeof particleSystem.psPool == UNDEFINED){
-    throw new Error("removeParticleSystemFromPool error: particleSystem does not belong to any pool.");
-    return;
-  }
+  preConditions.checkIfDefined(ROYGBIV.removeParticleSystemFromPool, preConditions.particleSystem, particleSystem);
+  preConditions.checkIfParticleSystem(ROYGBIV.removeParticleSystemFromPool, preConditions.particleSystem, particleSystem);
+  preConditions.checkIfTrue(ROYGBIV.removeParticleSystemFromPool, "particleSystem does not belong to any pool", (typeof particleSystem.psPool == UNDEFINED));
   var psPool = particleSystemPools[particleSystem.psPool];
   psPool.remove(particleSystem);
 }
@@ -4587,14 +3095,8 @@ Roygbiv.prototype.destroyParticleSystemPool = function(pool){
   if (mode == 0){
     return;
   }
-  if (typeof pool == UNDEFINED){
-    throw new Error("destroyParticleSystemPool error: pool is not defined.");
-    return;
-  }
-  if (!(pool.isParticleSystemPool)){
-    throw new Error("destroyParticleSystemPool error: Type not supported.");
-    return;
-  }
+  preConditions.checkIfDefined(ROYGBIV.destroyParticleSystemPool, preConditions.pool, pool);
+  preConditions.checkIfParticleSystemPool(ROYGBIV.destroyParticleSystemPool, preConditions.pool, pool);
   pool.destroy();
 }
 
@@ -4629,6 +3131,7 @@ Roygbiv.prototype.createConfettiExplosion = function(configurations){
   if (mode == 0){
     return;
   }
+  preConditions.checkIfDefined(ROYGBIV.createConfettiExplosion, preConditions.configurations, configurations);
   var name = configurations.name;
   var position = configurations.position;
   var expireTime = configurations.expireTime;
@@ -4650,149 +3153,51 @@ Roygbiv.prototype.createConfettiExplosion = function(configurations){
   var textureName = configurations.textureName;
   var rgbFilter = configurations.rgbFilter;
 
-  if (typeof name == UNDEFINED){
-    throw new Error("createConfettiExplosion error: name is a mandatory configuration.");
-    return;
-  }
-  if (particleSystemPool[name]){
-    throw new Error("createConfettiExplosion error: name must be unique.");
-    return;
-  }
-  if (typeof position == UNDEFINED){
-    throw new Error("createConfettiExplosion error: position is a mandatory configuration.");
-    return;
-  }
-  if (isNaN(position.x) || isNaN(position.y) || isNaN(position.z)){
-    throw new Error("createConfettiExplosion error: Bad position parameter.");
-    return;
-  }
-  if (typeof expireTime == UNDEFINED){
-    throw new Error("createConfettiExplosion error: expireTime is a mandatory configuration.");
-    return;
-  }
-  if (isNaN(expireTime)){
-    throw new Error("createConfettiExplosion error: Bad expireTime parameter.");
-    return;
-  }
-  if (expireTime < 0){
-    throw new Error("createConfettiExplosion error: expireTime cannot be a negative number.");
-    return;
-  }
-  if (typeof lifetime == UNDEFINED){
-    throw new Error("createConfettiExplosion error: lifetime is a mandatory configuration.");
-    return;
-  }
-  if (isNaN(lifetime)){
-    throw new Error("createConfettiExplosion error: Bad lifetime parameter.");
-    return;
-  }
-  if (lifetime < 0){
-    throw new Error("createConfettiExplosion error: lifetime cannot be a negative number.");
-    return;
-  }
-  if (typeof verticalSpeed == UNDEFINED){
-    throw new Error("createConfettiExplosion error: verticalSpeed is a mandatory configuration.");
-    return;
-  }
-  if (isNaN(verticalSpeed)){
-    throw new Error("createConfettiExplosion error: Bad verticalSpeed parameter.");
-    return;
-  }
-  if (typeof horizontalSpeed == UNDEFINED){
-    throw new Error("createConfettiExplosion error: horizontalSpeed is a mandatory configuration.");
-    return;
-  }
-  if (isNaN(horizontalSpeed)){
-    throw new Error("createConfettiExplosion error: Bad horizontalSpeed parameter.");
-    return;
-  }
-  if (typeof verticalAcceleration == UNDEFINED){
-    throw new Error("createConfettiExplosion error: verticalAcceleration is a mandatory configuration.");
-    return;
-  }
-  if (isNaN(verticalAcceleration)){
-    throw new Error("createConfettiExplosion error: Bad verticalAcceleration parameter.");
-    return;
-  }
-  if (verticalAcceleration >= 0){
-    throw new Error("createConfettiExplosion error: verticalAcceleration is expected to be less than zero.");
-    return;
-  }
-  if (typeof particleCount == UNDEFINED){
-    throw new Error("createConfettiExplosion error: particleCount is a mandatory configuration.");
-    return;
-  }
-  if (isNaN(particleCount)){
-    throw new Error("createConfettiExplosion error: Bad particleCount parameter.");
-    return;
-  }
-  if (particleCount <= 0){
-    throw new Error("createConfettiExplosion error: particleCount is expected to be greater than zero.");
-    return;
-  }
-  if (typeof particleSize == UNDEFINED){
-    throw new Error("createConfettiExplosion error: particleSize is a mandatory configuration.");
-    return;
-  }
-  if (isNaN(particleSize)){
-    throw new Error("createConfettiExplosion error: Bad particleSize parameter.");
-    return;
-  }
-  if (particleSize <= 0){
-    throw new Error("createConfettiExplosion error: particleSize is expected to be greater than zero.");
-    return;
-  }
-  if (typeof colorName == UNDEFINED){
-    throw new Error("createConfettiExplosion error: colorName is a mandatory configuration.");
-    return;
-  }
-  if (typeof alpha == UNDEFINED){
-    throw new Error("createConfettiExplosion error: alpha is a mandatory configuration.");
-    return;
-  }
-  if (isNaN(alpha)){
-    throw new Error("createConfettiExplosion error: Bad alpha parameter.");
-    return;
-  }
-  if (alpha < 0 || alpha > 1){
-    throw new Error("createConfettiExplosion error: alpha is expected to be between [0, 1].");
-    return;
-  }
+  preConditions.checkIfMandatoryParameterExists(ROYGBIV.createConfettiExplosion, preConditions.name, name);
+  preConditions.checkIfTrue(ROYGBIV.createConfettiExplosion, "name must be unique", particleSystemPool[name]);
+  preConditions.checkIfMandatoryParameterExists(ROYGBIV.createConfettiExplosion, preConditions.position, position);
+  preConditions.checkIfVectorOnlyIfDefined(ROYGBIV.createConfettiExplosion, preConditions.position, position);
+  preConditions.checkIfMandatoryParameterExists(ROYGBIV.createConfettiExplosion, preConditions.expireTime, expireTime);
+  preConditions.checkIfNumber(ROYGBIV.createConfettiExplosion, preConditions.expireTime, expireTime);
+  preConditions.checkIfLessThanExclusive(ROYGBIV.createConfettiExplosion, preConditions.expireTime, expireTime, 0);
+  preConditions.checkIfMandatoryParameterExists(ROYGBIV.createConfettiExplosion, preConditions.lifetime, lifetime);
+  preConditions.checkIfNumber(ROYGBIV.createConfettiExplosion, preConditions.lifetime, lifetime);
+  preConditions.checkIfLessThanExclusive(ROYGBIV.createConfettiExplosion, preConditions.life, lifetime, 0);
+  preConditions.checkIfMandatoryParameterExists(ROYGBIV.createConfettiExplosion, preConditions.verticalSpeed, verticalSpeed);
+  preConditions.checkIfNumber(ROYGBIV.createConfettiExplosion, preConditions.verticalSpeed, verticalSpeed);
+  preConditions.checkIfMandatoryParameterExists(ROYGBIV.createConfettiExplosion, preConditions.horizontalSpeed, horizontalSpeed);
+  preConditions.checkIfNumber(ROYGBIV.createConfettiExplosion, preConditions.horizontalSpeed, horizontalSpeed);
+  preConditions.checkIfMandatoryParameterExists(ROYGBIV.createConfettiExplosion, preConditions.verticalAcceleration, verticalAcceleration);
+  preConditions.checkIfNumber(ROYGBIV.createConfettiExplosion, preConditions.verticalAcceleration, verticalAcceleration);
+  preConditions.checkIfTrue(ROYGBIV.createConfettiExplosion, "verticalAcceleration is expected to be less than zero", (verticalAcceleration >= 0));
+  preConditions.checkIfMandatoryParameterExists(ROYGBIV.createConfettiExplosion, preConditions.particleCount, particleCount);
+  preConditions.checkIfNumber(ROYGBIV.createConfettiExplosion, preConditions.particleCount, particleCount);
+  preConditions.checkIfLessThan(ROYGBIV.createConfettiExplosion, preConditions.particleCount, particleCount, 0);
+  preConditions.checkIfMandatoryParameterExists(ROYGBIV.createConfettiExplosion, preConditions.particleSize, particleSize);
+  preConditions.checkIfNumber(ROYGBIV.createConfettiExplosion, preConditions.particleSize, particleSize);
+  preConditions.checkIfLessThan(ROYGBIV.createConfettiExplosion, preConditions.particleSize, particleSize, 0);
+  preConditions.checkIfMandatoryParameterExists(ROYGBIV.createConfettiExplosion, preConditions.colorName, colorName);
+  preConditions.checkIfMandatoryParameterExists(ROYGBIV.createConfettiExplosion, preConditions.alpha, alpha);
+  preConditions.checkIfNumber(ROYGBIV.createConfettiExplosion, preConditions.alpha, alpha);
+  preConditions.checkIfInRange(ROYGBIV.createConfettiExplosion, preConditions.alpha, alpha, 0, 1);
+  preConditions.checkIfNumberOnlyIfExists(ROYGBIV.createConfettiExplosion, preConditions.collisionTimeOffset, collisionTimeOffset);
+  preConditions.checkIfNumberOnlyIfExists(ROYGBIV.createConfettiExplosion, preConditions.startDelay, startDelay);
+  preConditions.checkIfLessThanExclusiveOnlyIfExists(ROYGBIV.createConfettiExplosion, preConditions.startDelay, startDelay, 0);
+  preConditions.checkIfVectorOnlyIfDefined(ROYGBIV.createConfettiExplosion, preConditions.normal, normal);
   if (!(typeof collisionMethod == UNDEFINED)){
-    if (collisionMethod != 0 && collisionMethod != 1 && collisionMethod != 2){
-      throw new Error("createConfettiExplosion error: collisionMethod must be 0, 1, or 2.");
-      return;
-    }
+    preConditions.checkIfTrue(ROYGBIV.createConfettiExplosion, "collisionMethod method must be one of 0, 1 or 2", (collisionMethod != 0 && collisionMethod != 1 && collisionMethod != 2));
   }else{
     collisionMethod = 0;
   }
-  if (!(typeof collisionTimeOffset == UNDEFINED)){
-    if (isNaN(collisionTimeOffset)){
-      throw new Error("createConfettiExplosion error: Bad collisionTimeOffset parameter.");
-      return;
-    }
-  }else{
+  if ((typeof collisionTimeOffset == UNDEFINED)){
     collisionTimeOffset = 0;
   }
-  if (!(typeof startDelay == UNDEFINED)){
-    if (isNaN(startDelay)){
-      throw new Error("createConfettiExplosion error: Bad startDelay parameter.");
-      return;
-    }
-    if (startDelay < 0){
-      throw new Error("createConfettiExplosion error: startDelay cannot be a negative number.");
-      return;
-    }
-  }else{
+  if ((typeof startDelay == UNDEFINED)){
     startDelay = 0;
   }
   var normalSet = false;
   if (!(typeof normal == UNDEFINED)){
-      if (isNaN(normal.x) || isNaN(normal.y) || isNaN(normal.z)){
-        throw new Error("createConfettiExplosion error: Bad normal parameter.");
-        return;
-      }
-      normalSet = true;
+    normalSet = true;
   }
 
   var particleMaterial = this.createParticleMaterial({
@@ -4861,26 +3266,11 @@ Roygbiv.prototype.copyParticleSystem = function(particleSystem, newParticleSyste
   if (mode == 0){
     return;
   }
-  if (TOTAL_PARTICLE_SYSTEM_COUNT >= MAX_PARTICLE_SYSTEM_COUNT){
-    throw new Error("copyParticleSystem error: Cannot create more than "+MAX_PARTICLE_SYSTEM_COUNT+" particle systems.");
-    return;
-  }
-  if (typeof particleSystem == UNDEFINED){
-    throw new Error("copyParticleSystem error: particleSystem is not defined.");
-    return;
-  }
-  if (!(particleSystem.isParticleSystem)){
-    throw new Error("copyParticleSystem error: Type not supported.");
-    return;
-  }
-  if (typeof newParticleSystemName == UNDEFINED){
-    throw new Error("copyParticleSystem error: newParticleSystemName is not defined.");
-    return;
-  }
-  if (particleSystemPool[newParticleSystemName]){
-    throw new Error("copyParticleSystem error: Name must be unique.");
-    return;
-  }
+  preConditions.checkIfTrue(ROYGBIV.copyParticleSystem, "Cannot create more than "+MAX_PARTICLE_SYSTEM_COUNT+" particle systems.", (TOTAL_PARTICLE_SYSTEM_COUNT >= MAX_PARTICLE_SYSTEM_COUNT));
+  preConditions.checkIfDefined(ROYGBIV.copyParticleSystem, preConditions.particleSystem, particleSystem);
+  preConditions.checkIfParticleSystem(ROYGBIV.copyParticleSystem, preConditions.particleSystem, particleSystem);
+  preConditions.checkIfDefined(ROYGBIV.copyParticleSystem, preConditions.newParticleSystemName, newParticleSystemName);
+  preConditions.checkIfTrue(ROYGBIV.copyParticleSystem, "name must be unique", particleSystemPool[newParticleSystemName]);
 
   var copyParticleSystem = new ParticleSystem(
     particleSystem, newParticleSystemName, particleSystem.particles,
@@ -4917,26 +3307,11 @@ Roygbiv.prototype.fadeAway = function(particleSystem, coefficient){
   if (mode == 0){
     return;
   }
-  if (typeof particleSystem == UNDEFINED){
-    throw new Error("fadeAway error: particleSystem is not defined.");
-    return;
-  }
-  if (!(particleSystem.isParticleSystem)){
-    throw new Error("fadeAway error: Type not supported.");
-    return;
-  }
-  if (typeof coefficient == UNDEFINED){
-    throw new Error("fadeAway error: coefficient is not defined.");
-    return;
-  }
-  if (isNaN(coefficient)){
-    throw new Error("fadeAway error: Bad coefficient parameter.");
-    return;
-  }
-  if (coefficient <= 0){
-    throw new Error("fadeAway error: coefficient must be greater than zero.");
-    return;
-  }
+  preConditions.checkIfDefined(ROYGBIV.fadeAway, preConditions.particleSystem, particleSystem);
+  preConditions.checkIfParticleSystem(ROYGBIV.fadeAway, preConditions.particleSystem, particleSystem);
+  preConditions.checkIfDefined(ROYGBIV.fadeAway, preConditions.coefficient, coefficient);
+  preConditions.checkIfNumber(ROYGBIV.fadeAway, preConditions.coefficient, coefficient);
+  preConditions.checkIfLessThan(ROYGBIV.fadeAway, preConditions.coefficient, coefficient, 0);
   if (!particleSystem.psMerger){
     particleSystem.material.uniforms.dissapearCoef.value = coefficient;
   }else{
@@ -4950,14 +3325,9 @@ Roygbiv.prototype.mergeParticleSystems = function(){
   if (mode == 0){
     return;
   }
-  if (!MAX_VERTEX_UNIFORM_VECTORS){
-    throw new Error("mergeParticleSystems error: MAX_VERTEX_UNIFORM_VECTORS is not calcualted.");
-    return;
-  }
-  if (Object.keys(particleSystemPool).length < 2){
-    throw new Error("mergeParticleSystems error: Mininmum 2 particle systems must be created in order to merge.");
-    return;
-  }
+  preConditions.checkIfTrue(ROYGBIV.mergeParticleSystems, "MAX_VERTEX_UNIFORM_VECTORS is not calcualted", (!MAX_VERTEX_UNIFORM_VECTORS));
+  preConditions.checkIfTrue(ROYGBIV.mergeParticleSystems, "Mininmum 2 particle systems must be created in order to merge", (Object.keys(particleSystemPool).length < 2));
+
   var diff = parseInt(4096 / MAX_VERTEX_UNIFORM_VECTORS);
   var chunkSize = parseInt(MAX_PS_COMPRESS_AMOUNT_4096 / diff);
   var mergeObj = new Object();
@@ -4988,60 +3358,19 @@ Roygbiv.prototype.setParticleSystemPosition = function(particleSystem, x, y, z){
   if (mode == 0){
     return;
   }
-  if (typeof particleSystem == UNDEFINED){
-    throw new Error("setParticleSystemPosition error: particleSystem is not defined.");
-    return;
-  }
-  if (!(particleSystem.isParticleSystem)){
-    throw new Error("setParticleSystemPosition error: Type not supported.");
-    return;
-  }
-  if (typeof x == UNDEFINED){
-    throw new Error("setParticleSystemPosition error: x is not defined.");
-    return;
-  }
-  if (typeof y == UNDEFINED){
-    throw new Error("setParticleSystemPosition error: y is not defined.");
-    return;
-  }
-  if (typeof z == UNDEFINED){
-    throw new Error("setParticleSystemPosition error: z is not defined.");
-    return;
-  }
-  if (isNaN(x)){
-    throw new Error("setParticleSystemPosition error: x is not a number.");
-    return;
-  }
-  if (isNaN(y)){
-    throw new Error("setParticleSystemPosition error: y is not a number.");
-    return;
-  }
-  if (isNaN(z)){
-    throw new Error("setParticleSystemPosition error: z is not a number.");
-    return;
-  }
-  if (!particleSystem.mesh.visible){
-    throw new Error("setParticleSystemPosition error: particleSystem is not visible.");
-    return;
-  }
-  if (particleSystem.checkForCollisions){
-    throw new Error("setParticleSystemPosition error: particleSystem has a collision callback attached. Cannot set position.");
-    return;
-  }
-  if (particleSystem.particlesWithCollisionCallbacks.size > 0){
-    throw new Error("setParticleSystemPosition error: particleSystem has a collidable particle. Cannot set position.");
-    return;
-  }
-  if (particleSystem.hasTrailedParticle){
-    throw new Error("setParticleSystemPosition error: particleSystem has a trailed particle. Cannot set position.");
-    return;
-  }
-  if (particleSystem.velocity.x != 0 || particleSystem.velocity.y != 0 || particleSystem.velocity.z != 0 ||
-          particleSystem.acceleration.x != 0 || particleSystem.acceleration.y != 0 || particleSystem.acceleration.z != 0){
-
-      throw new Error("setParticleSystemPosition error: particleSystem has a defined motion. Cannot set position.");
-      return;
-  }
+  preConditions.checkIfDefined(ROYGBIV.setParticleSystemPosition, preConditions.particleSystem, particleSystem);
+  preConditions.checkIfParticleSystem(ROYGBIV.setParticleSystemPosition, preConditions.particleSystem, particleSystem);
+  preConditions.checkIfDefined(ROYGBIV.setParticleSystemPosition, preConditions.x, x);
+  preConditions.checkIfDefined(ROYGBIV.setParticleSystemPosition, preConditions.y, y);
+  preConditions.checkIfDefined(ROYGBIV.setParticleSystemPosition, preConditions.z, z);
+  preConditions.checkIfNumber(ROYGBIV.setParticleSystemPosition, preConditions.x, x);
+  preConditions.checkIfNumber(ROYGBIV.setParticleSystemPosition, preConditions.y, y);
+  preConditions.checkIfNumber(ROYGBIV.setParticleSystemPosition, preConditions.z, z);
+  preConditions.checkIfTrue(ROYGBIV.setParticleSystemPosition, "particleSystem is not visible", (!particleSystem.mesh.visible));
+  preConditions.checkIfTrue(ROYGBIV.setParticleSystemPosition, "particleSystem has a collision callback attached.", particleSystem.checkForCollisions);
+  preConditions.checkIfTrue(ROYGBIV.setParticleSystemPosition, "particleSystem has collidable particles.", (particleSystem.particlesWithCollisionCallbacks.size > 0));
+  preConditions.checkIfTrue(ROYGBIV.setParticleSystemPosition, "particleSystem has a trailed particle.", particleSystem.hasTrailedParticle);
+  preConditions.checkIfTrue(ROYGBIV.setParticleSystemPosition, "particleSystem has a defined motion.", (particleSystem.velocity.x != 0 || particleSystem.velocity.y != 0 || particleSystem.velocity.z != 0 || particleSystem.acceleration.x != 0 || particleSystem.acceleration.y != 0 || particleSystem.acceleration.z != 0));
   particleSystem.mesh.position.set(x, y, z);
   particleSystem.hasManualPositionSet = true;
 }
@@ -5052,19 +3381,10 @@ Roygbiv.prototype.startObjectTrail = function(object){
   if (mode == 0){
     return;
   }
-  if (typeof object == UNDEFINED){
-    throw new Error("startObjectTrail error: object is not defined.");
-    return;
-  }
-  if (!(object.isAddedObject) && !(object.isObjectGroup)){
-    throw new Error("startObjectTrail error: Type not supported.");
-    return;
-  }
+  preConditions.checkIfDefined(ROYGBIV.startObjectTrail, preConditions.object, object);
+  preConditions.checkIfAddedObjectOrObjectGroup(ROYGBIV.startObjectTrail, preConditions.object, object);
   var objectTrail = objectTrails[object.name];
-  if (!objectTrail){
-    throw new Error("startObjectTrail error: No trail attached to object.");
-    return;
-  }
+  preConditions.checkIfTrue(ROYGBIV.startObjectTrail, "No trail attached to object.", (!objectTrail));
   objectTrail.start();
 }
 
@@ -5074,19 +3394,10 @@ Roygbiv.prototype.stopObjectTrail = function(object){
   if (mode == 0){
     return;
   }
-  if (typeof object == UNDEFINED){
-    throw new Error("stopObjectTrail error: object is not defined.");
-    return;
-  }
-  if (!(object.isAddedObject) && !(object.isObjectGroup)){
-    throw new Error("stopObjectTrail error: Type not supported.");
-    return;
-  }
+  preConditions.checkIfDefined(ROYGBIV.stopObjectTrail, preConditions.object, object);
+  preConditions.checkIfAddedObjectOrObjectGroup(ROYGBIV.stopObjectTrail, preConditions.object, object);
   var objectTrail = objectTrails[object.name];
-  if (!objectTrail){
-    throw new Error("stopObjectTrail error: No trail attached to object.");
-    return;
-  }
+  preConditions.checkIfTrue(ROYGBIV.stopObjectTrail, "No trail attached to object.", (!objectTrail));
   objectTrail.stop();
 }
 
@@ -5096,34 +3407,13 @@ Roygbiv.prototype.createInitializedParticleSystemPool = function(poolName, refPa
   if (mode == 0){
     return;
   }
-  if (typeof refParticleSystem == UNDEFINED){
-    throw new Error("createInitializedParticleSystemPool error: refParticleSystem is not defined.");
-    return;
-  }
-  if (!(refParticleSystem.isParticleSystem)){
-    throw new Error("createInitializedParticleSystemPool error: refParticleSystem is not a ParticleSystem.");
-    return;
-  }
-  if (typeof poolName == UNDEFINED){
-    throw new Error("createInitializedParticleSystemPool error: poolName is not defined.");
-    return;
-  }
-  if (particleSystemPools[poolName]){
-    throw new Error("createInitializedParticleSystemPool error: poolName must be unique.");
-    return;
-  }
-  if (typeof poolSize == UNDEFINED){
-    throw new Error("createInitializedParticleSystemPool error: poolSize is not defined.");
-    return;
-  }
-  if (isNaN(poolSize)){
-    throw new Error("createInitializedParticleSystemPool error: poolSize is not a number.");
-    return;
-  }
-  if (poolSize <= 1){
-    throw new Error("createInitializedParticleSystemPool error: poolSize must be greater than 1.");
-    return;
-  }
+  preConditions.checkIfDefined(ROYGBIV.createInitializedParticleSystemPool, preConditions.refParticleSystem, refParticleSystem);
+  preConditions.checkIfParticleSystem(ROYGBIV.createInitializedParticleSystemPool, preConditions.refParticleSystem, refParticleSystem);
+  preConditions.checkIfDefined(ROYGBIV.createInitializedParticleSystemPool, preConditions.poolName, poolName);
+  preConditions.checkIfTrue(ROYGBIV.createInitializedParticleSystemPool, "poolName must be unique.", particleSystemPools[poolName]);
+  preConditions.checkIfDefined(ROYGBIV.createInitializedParticleSystemPool, preConditions.poolSize, poolSize);
+  preConditions.checkIfNumber(ROYGBIV.createInitializedParticleSystemPool, preConditions.poolSize, poolSize);
+  preConditions.checkIfLessThan(ROYGBIV.createInitializedParticleSystemPool, preConditions.poolSize, poolSize, 1);
   var pool = this.createParticleSystemPool(poolName);
   this.addParticleSystemToPool(pool, refParticleSystem);
   for (var i = 0; i<poolSize - 1; i++){
@@ -5142,22 +3432,10 @@ Roygbiv.prototype.makeParticleSystemsResponsive = function(referenceHeight){
   if (mode == 0){
     return;
   }
-  if (typeof referenceHeight == UNDEFINED){
-    throw new Error("makeParticleSystemsResponsive error: referenceHeight is not defined.");
-    return;
-  }
-  if (isNaN(referenceHeight)){
-    throw new Error("makeParticleSystemsResponsive error: referenceHeight is not a number.");
-    return;
-  }
-  if (referenceHeight <= 0){
-    throw new Error("makeParticleSystemsResponsive error: referenceHeight must be greater than zero.");
-    return;
-  }
-  if (TOTAL_PARTICLE_SYSTEM_COUNT > 0){
-    throw new Error("makeParticleSystemsResponsive error: This API should be used before any particle system creation.");
-    return;
-  }
+  preConditions.checkIfDefined(ROYGBIV.makeParticleSystemsResponsive, preConditions.referenceHeight, referenceHeight);
+  preConditions.checkIfNumber(ROYGBIV.makeParticleSystemsResponsive, preConditions.referenceHeight, referenceHeight);
+  preConditions.checkIfLessThan(ROYGBIV.makeParticleSystemsResponsive, preConditions.referenceHeight, referenceHeight, 0);
+  preConditions.checkIfTrue(ROYGBIV.makeParticleSystemsResponsive, "This API should be used before any particle system creation.", (TOTAL_PARTICLE_SYSTEM_COUNT > 0));
   particleSystemRefHeight = referenceHeight;
   GLOBAL_PS_REF_HEIGHT_UNIFORM.value = ((renderer.getCurrentViewport().w / screenResolution) / particleSystemRefHeight);
 }

@@ -22,9 +22,87 @@ var Preconditions = function(){
   this.obj = "obj";
   this.mass = "mass";
   this.velocityVector = "velocityVector";
+  this.velocity = "velocity";
+  this.acceleration = "acceleration";
   this.colorName = "colorName";
   this.alpha = "alpha";
   this.rotationPivot = "rotationPivot";
+  this.color = "color";
+  this.size = "size";
+  this.texture = "texture";
+  this.rgbFilter = "rgbFilter";
+  this.targetColor = "targetColor";
+  this.targetColorName = "targetColorName";
+  this.colorStep = "colorStep";
+  this.configurations = "configurations";
+  this.motionMode = "motionMode";
+  this.position = "position";
+  this.initialAngle = "initialAngle";
+  this.MOTION_MODE_NORMAL = "MOTION_MODE_NORMAL";
+  this.MOTION_MODE_CIRCULAR = "MOTION_MODE_CIRCULAR";
+  this.material = "material";
+  this.lifetime = "lifetime";
+  this.respawn = "respawn";
+  this.alphaVariation = "alphaVariation";
+  this.alphaVariationMode = "alphaVariationMode";
+  this.startDelay = "startDelay";
+  this.trailMode = "trailMode";
+  this.angularVelocity = "angularVelocity";
+  this.angularAcceleration = "angularAcceleration";
+  this.angularMotionRadius = "angularMotionRadius";
+  this.angularQuaternion = "angularQuaternion";
+  this.useWorldPosition = "useWorldPosition";
+  this.particles = "particles";
+  this.scaleVector = "scaleVector";
+  this.blendingMode = "blendingMode";
+  this.quatX = "quatX";
+  this.quatY = "quatY";
+  this.quatZ = "quatZ";
+  this.quatW = "quatW";
+  this.expiretime = "expireTime";
+  this.smokeSize = "smokeSize";
+  this.particleSize = "particleSize";
+  this.particleCount = "particleCount";
+  this.movementAxis = "movementAxis";
+  this.randomness = "randomness";
+  this.updateFunction = "updateFunction";
+  this.accelerationDirection = "accelerationDirection";
+  this.radius = "radius";
+  this.avgParticleSpeed = "avgParticleSpeed";
+  this.alphaVariationCoef = "alphaVariationCoef";
+  this.explosionDirection = "explosionDirection";
+  this.explosionSpeed = "explosionSpeed";
+  this.speed = "speed";
+  this.circleNormal = "circleNormal";
+  this.circleDistortionCoefficient = "circleDistortionCoefficient";
+  this.angleStep = "angleStep";
+  this.normal = "normal";
+  this.maxTimeInSeconds = "maxTimeInSeconds";
+  this.particle = "particle";
+  this.delay = "delay";
+  this.direction = "direction";
+  this.timediff = "timeDiff";
+  this.particleExpireTime = "particleExpireTime";
+  this.rewindOnCollided = "rewindOnCollided";
+  this.collisionTimeOffset = "collisionTimeOffset";
+  this.sizeX = "sizeX";
+  this.sizeZ = "sizeZ";
+  this.avgStartDelay = "avgStartDelay";
+  this.stopDuration = "stopDuration";
+  this.startPosition = "startPosition";
+  this.startVelocity = "startVelocity";
+  this.startAcceleration = "startAcceleration";
+  this.startQuaternion = "startQuaternion";
+  this.verticalSpeed = "verticalSpeed";
+  this.horizontalSpeed = "horizontalSpeed";
+  this.verticalAcceleration = "verticalAcceleration";
+  this.collisionMethod = "collisionMethod";
+  this.newParticleSystemName = "newParticleSystemName";
+  this.coefficient = "coefficient";
+  this.refParticleSystem = "refParticleSystem";
+  this.poolName = "poolName";
+  this.poolSize = "poolSize";
+  this.referenceHeight = "referenceHeight";
 }
 
 Preconditions.prototype.errorHeader = function(callerFunc){
@@ -33,6 +111,18 @@ Preconditions.prototype.errorHeader = function(callerFunc){
 
 Preconditions.prototype.throw = function(callerFunc, errorMsg){
   throw new Error(this.errorHeader(callerFunc)+" ["+errorMsg+"]");
+}
+
+Preconditions.prototype.checkIfTrue = function(callerFunc, errorMsg, obj){
+  if (obj){
+    this.throw(callerFunc, errorMsg);
+  }
+}
+
+Preconditions.prototype.checkIfTrueOnlyIfYExists = function(callerFunc, errorMsg, y, obj){
+  if (!(typeof y == UNDEFINED) && obj){
+    this.throw(callerFunc, errorMsg);
+  }
 }
 
 Preconditions.prototype.checkIfDefined = function(callerFunc, parameterName, obj){
@@ -57,6 +147,14 @@ Preconditions.prototype.checkIfVectorOnlyIfDefined = function(callerFunc, parame
   if (!(typeof obj == UNDEFINED) && obj !== null){
     if (isNaN(obj.x) || isNaN(obj.y) || isNaN(obj.z)){
       this.throw(callerFunc, "Bad "+parameterName+" parameter. Expected a vector.");
+    }
+  }
+}
+
+Preconditions.prototype.checkIfQuaternionOnlyIfDefined = function(callerFunc, parameterName, obj){
+  if (!(typeof obj == UNDEFINED) && obj !== null){
+    if (isNaN(obj.x) || isNaN(obj.y) || isNaN(obj.z) || isNaN(obj.w)){
+      this.throw(callerFunc, "Bad "+parameterName+" parameter. Expected a quaternion.");
     }
   }
 }
@@ -106,11 +204,24 @@ Preconditions.prototype.checkIfParticleSystem = function(callerFunc, parameterNa
   }
 }
 
+Preconditions.prototype.checkIfParticleOrParticleSystem = function(callerFunc, parameterName, obj){
+  if (!obj.isParticle && !obj.isParticleSystem){
+    this.throw(callerFunc, parameterName+" is not a particle system or a particle.");
+  }
+}
+
 Preconditions.prototype.checkIfNumber = function(callerFunc, parameterName, obj){
   if (isNaN(obj)){
     this.throw(callerFunc, parameterName+" is not a number.");
   }
 }
+
+Preconditions.prototype.checkIfNumberOnlyIfExists = function(callerFunc, parameterName, obj){
+  if (!(typeof obj == UNDEFINED) && isNaN(obj)){
+    this.throw(callerFunc, parameterName+" is not a number.");
+  }
+}
+
 
 Preconditions.prototype.checkIfPoolDestroyed = function(callerFunc, parameterName, obj){
   if (obj.destroyed){
@@ -175,5 +286,127 @@ Preconditions.prototype.checkIfRotationPivot = function(callerFunc, parameterNam
 Preconditions.prototype.checkIfHavePivotPoint = function(callerFunc, parameterName, obj){
   if (!obj.pivotObject){
     this.throw(callerFunc, parameterName+" does not have a pivot point.");
+  }
+}
+
+Preconditions.prototype.checkIfMandatoryParameterExists = function(callerFunc, parameterName, obj){
+  if ((typeof obj == UNDEFINED) || obj == null){
+    this.throw(callerFunc, parameterName+" is a mandatory parameter.");
+  }
+}
+
+Preconditions.prototype.checkIfLessThanOnlyIfExists = function(callerFunc, parameterName, obj, bound){
+  if (!(typeof obj == UNDEFINED) && (obj <= bound)){
+    this.throw(callerFunc, parameterName +" must be greater than "+bound);
+  }
+}
+
+Preconditions.prototype.checkIfLessThan = function(callerFunc, parameterName, obj, bound){
+  if (obj <= bound){
+    this.throw(callerFunc, parameterName +" must be greater than "+bound);
+  }
+}
+
+Preconditions.prototype.checkIfLessThanExclusive = function(callerFunc, parameterName, obj, bound){
+  if (obj < bound){
+    this.throw(callerFunc, parameterName +" must be greater than or equal to "+bound);
+  }
+}
+
+Preconditions.prototype.checkIfLessThanExclusiveOnlyIfExists = function(callerFunc, parameterName, obj, bound){
+  if (!(typeof obj == UNDEFINED) && (obj < bound)){
+    this.throw(callerFunc, parameterName +" must be greater than or equal to "+bound);
+  }
+}
+
+Preconditions.prototype.checkIfInRange = function(callerFunc, parameterName, obj, boundMin, boundMax){
+  if (obj < boundMin || obj > boundMax){
+    this.throw(callerFunc, parameterName+" must be between ["+boundMin+", "+boundMax+"]");
+  }
+}
+
+Preconditions.prototype.checkIfInRangeOnlyIfDefined = function(callerFunc, parameterName, obj, boundMin, boundMax){
+  if (!(typeof obj == UNDEFINED) && (obj < boundMin || obj > boundMax)){
+    this.throw(callerFunc, parameterName+" must be between ["+boundMin+", "+boundMax+"]");
+  }
+}
+
+Preconditions.prototype.checkIfInRangeMinInclusive = function(callerFunc, parameterName, obj, boundMin, boundMax){
+  if (obj <= boundMin || obj > boundMax){
+    this.throw(callerFunc, parameterName+" must be between ]"+boundMin+", "+boundMax+"]")
+  }
+}
+
+Preconditions.prototype.checkIfTextureExists = function(callerFunc, parameterName, obj){
+  if (!obj){
+    this.throw(callerFunc, "No such texture.");
+  }
+}
+
+Preconditions.prototype.checkIfTextureReady = function(callerFunc, parameter, obj){
+  if (!(obj instanceof THREE.Texture)){
+    this.throw(callerFunc, "Texture not ready.");
+  }
+}
+
+Preconditions.prototype.checkIfTextureCompressed = function(callerFunc, parameter, obj){
+  if (obj instanceof THREE.CompressedTexture){
+    this.throw(callerFunc, "Compressed textures are not supported for this API.");
+  }
+}
+
+Preconditions.prototype.checkIfXExistsOnlyIfYExists = function(callerFunc, xName, yName, x, y){
+  if (!(typeof y == UNDEFINED)){
+    if (typeof x == UNDEFINED){
+      this.throw(callerFunc, xName+" must be defined if "+yName+" is defined.");
+    }
+  }
+}
+
+Preconditions.prototype.checkIfMotionModeOnlyIfExists = function(callerFunc, parameterName, obj){
+  if (!(typeof obj == UNDEFINED)){
+    if (!(obj == MOTION_MODE_NORMAL || obj == MOTION_MODE_CIRCULAR)){
+      this.throw(callerFunc, parameterName+" must be MOTION_MODE_NORMAL or MOTION_MODE_CIRCULAR.");
+    }
+  }
+}
+
+Preconditions.prototype.checkIfXExistsOnlyIfYIsZ = function(callerFunc, xName, yName, zName, x, y, z){
+  if (y == z && (typeof x == UNDEFINED)){
+    this.throw(callerFunc, xName+" must be defined if "+yName+" is "+zName);
+  }
+}
+
+Preconditions.prototype.checkIfParticleMaterial = function(callerFunc, parameterName, obj){
+  if (!(obj.isParticleMaterial)){
+    this.throw(callerFunc, parameterName+" is not a particle material.");
+  }
+}
+
+Preconditions.prototype.checkIfAlphaVariationModeOnlyIfExists = function(callerFunc, parameterName, obj){
+  if (!typeof obj == UNDEFINED){
+    if (isNaN(obj) || (obj != ALPHA_VARIATION_MODE_NORMAL && obj != ALPHA_VARIATION_MODE_SIN && obj != ALPHA_VARIATION_MODE_COS)){
+      this.throw(callerFunc, parameterName+" must be one of ALPHA_VARIATION_MODE_NORMAL, ALPHA_VARIATION_MODE_SIN or ALPHA_VARIATION_MODE_COS.");
+    }
+  }
+}
+
+Preconditions.prototype.checkIfEmptyArray = function(callerFunc, parameterName, obj){
+  if (obj.length == 0){
+    this.throw(callerFunc, parameterName+" is an empty array.");
+  }
+}
+
+Preconditions.prototype.checkIfBlending = function(callerFunc, parameterName, obj){
+  if (blendingMode != NO_BLENDING && blendingMode != NORMAL_BLENDING && blendingMode != ADDITIVE_BLENDING && blendingMode != SUBTRACTIVE_BLENDING && blendingMode != MULTIPLY_BLENDING){
+    this.throw(callerFunc, parameterName+" must be one of NO_BLENDING, NORMAL_BLENDING, ADDITIVE_BLENDING, SUBTRACTIVE_BLENDING or MULTIPLY_BLENDING.");
+  }
+}
+
+Preconditions.prototype.checkIfFunctionOnlyIfExists = function(callerFunc, parameterName, obj){
+  if (!(typeof obj == UNDEFINED)){
+    if (!(obj instanceof Function)){
+      this.throw(callerFunc, parameterName+" is not a function.");
+    }
   }
 }
