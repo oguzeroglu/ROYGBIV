@@ -76,6 +76,7 @@ window.onload = function() {
       if (!Text[Text.ROYGBIV_SCRIPTING_API_PREFIX+ROYGBIV.functionNames[i].toUpperCase()]){
         console.error("[*] Scripting API error: "+ROYGBIV.functionNames[i]+" explanation is not present.");
       }
+      ROYGBIV[ROYGBIV.functionNames[i]].roygbivFuncName = ROYGBIV.functionNames[i];
     }
   }
 
@@ -112,6 +113,9 @@ window.onload = function() {
 
   // OBJECT PICKER 2D
   objectPicker2D = new ObjectPicker2D();
+
+  // PRECONDITIONS
+  preConditions = new Preconditions();
 
   // MODE SWITCHER
   modeSwitcher = new ModeSwitcher();

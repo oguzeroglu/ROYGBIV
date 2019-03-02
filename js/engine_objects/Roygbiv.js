@@ -216,19 +216,13 @@ Roygbiv.prototype.getParticleSystem = function(name){
 //  Returns a child object having the name given as the second parameter
 //  of a glued object given as the first parameter, or zero if no such object
 //  is found.
-Roygbiv.prototype.getChildObject = function(gluedObject, childObjectName){
+Roygbiv.prototype.getChildObject = function(objectGroup, childObjectName){
   if (mode == 0){
     return;
   }
-  if (!gluedObject){
-    throw new Error("getChildObject error: glued object is undefined.");
-    return;
-  }
-  if (!(gluedObject.isObjectGroup)){
-    throw new Error("getChildObject error: Type not supported.");
-    return;
-  }
-  var child = gluedObject.childObjectsByName[childObjectName];
+  preConditions.checkIfDefined(ROYGBIV.getChildObject, preConditions.objectGroup, objectGroup);
+  preConditions.checkIfObjectGroup(ROYGBIV.getChildObject, preConditions.objectGroup, objectGroup);
+  var child = objectGroup.childObjectsByName[childObjectName];
   if (child){
     return child;
   }
@@ -251,22 +245,10 @@ Roygbiv.prototype.getPosition = function(object, targetVector, axis){
   if (mode == 0){
     return;
   }
-  if (!object){
-    throw new Error("getPosition error: Object is undefined.");
-    return;
-  }
-  if (axis){
-    if (axis.toLowerCase() != "x" && axis.toLowerCase() != "y" && axis.toLowerCase() != "z"){
-      throw new Error("getPosition error: Axis must be one of x, y, or z.");
-      return;
-    }
-  }
-  if (!(typeof targetVector == UNDEFINED) && !(targetVector == null)){
-    if (isNaN(targetVector.x) || isNaN(targetVector.y) || isNaN(targetVector.z)){
-      throw new Error("getPosition error: Bad targetVector parameter.");
-      return;
-    }
-  }
+  preConditions.checkIfDefined(ROYGBIV.getPosition, preConditions.object, object);
+  preConditions.checkIfAxisOnlyIfDefined(ROYGBIV.getPosition, preConditions.axis, axis);
+  preConditions.checkIfVectorOnlyIfDefined(ROYGBIV.getPosition, preConditions.targetVector, targetVector);
+  preConditions.checkIfAddedObjectObjectGroupParticleSystem(ROYGBIV.getPosition, preConditions.object, object);
   if (object.isAddedObject){
     if (axis){
       if (object.parentObjectName){
@@ -371,9 +353,6 @@ Roygbiv.prototype.getPosition = function(object, targetVector, axis){
         );
       }
     }
-  }else{
-    throw new Error("getPosition error: Object type not supported.");
-    return;
   }
 }
 
@@ -383,17 +362,9 @@ Roygbiv.prototype.getOpacity = function(object){
   if (mode == 0){
     return;
   }
-  if (!object){
-    throw new Error("getOpacity error: Object is undefined.");
-    return;
-  }
-  var isAddedObject = (object.isAddedObject);
-  var isObjectGroup = (object.isObjectGroup);
-  if (!(isAddedObject || isObjectGroup)){
-    throw new Error("getOpacity error: Type not supported.");
-    return;
-  }
-  if (isAddedObject){
+  preConditions.checkIfDefined(ROYGBIV.getOpacity, preConditions.object, object);
+  preConditions.checkIfAddedObjectOrObjectGroup(ROYGBIV.getOpacity, preConditions.object, object);
+  if (object.isAddedObject){
     return object.mesh.material.uniforms.alpha.value;
   }
   return object.mesh.material.uniforms.totalAlpha.value;
@@ -401,20 +372,19 @@ Roygbiv.prototype.getOpacity = function(object){
 
 // getMarkedPosition
 //  Returns (x,y,z) coordinates of a point marked using the mark command.
-Roygbiv.prototype.getMarkedPosition = function(markedPointName){
+Roygbiv.prototype.getMarkedPosition = function(markedPointName, targetVector){
   if (mode == 0){
     return;
   }
-  if (typeof markedPointName == UNDEFINED){
-    throw new Error("getMarkedPosition error: markedPointName is not defined.");
-    return;
-  }
+  preConditions.checkIfDefined(ROYGBIV.getMarkedPosition, preConditions.markedPointName, markedPointName);
+  preConditions.checkIfDefined(ROYGBIV.getMarkedPosition, preConditions.targetVector, targetVector);
+  preConditions.checkIfVectorOnlyIfDefined(ROYGBIV.getMarkedPosition, preConditions.targetVector, targetVector);
   var markedPoint = markedPoints[markedPointName];
-  if (!markedPoint){
-    throw new Error("getMarkedPosition error: No such marked point.");
-    return;
-  }
-  return this.vector(markedPoint.x, markedPoint.y, markedPoint.z);
+  preConditions.checkIfMarkedPointExists(ROYGBIV.getMarkedPosition, null, markedPoint);
+  targetVector.x = markedPoint.x;
+  targetVector.y = markedPoint.y;
+  targetVector.z = markedPoint.z;
+  return targetVector;
 }
 
 // getParticleSystemVelocityAtTime
@@ -425,28 +395,12 @@ Roygbiv.prototype.getParticleSystemVelocityAtTime = function(particleSystem, tim
   if (mode == 0){
     return;
   }
-  if (!particleSystem){
-    throw new Error("getParticleSystemVelocityAtTime error: particleSystem is not defined.");
-    return;
-  }
-  if (!(particleSystem.isParticleSystem)){
-    throw new Error("getParticleSystemVelocityAtTime error: Unsupported particleSystem type.");
-    return;
-  }
-  if (typeof time == UNDEFINED){
-    throw new Error("getParticleSystemVelocityAtTime error: time is not defined.");
-    return;
-  }
-  if (isNaN(time)){
-    throw new Error("getParticleSystemVelocityAtTime error: time is not a number.");
-    return;
-  }
-  if (!(typeof targetVector == UNDEFINED)){
-    if (isNaN(targetVector.x ) || isNaN(targetVector.y) || isNaN(targetVector.z)){
-      throw new Error("getParticleSystemVelocityAtTime error: Bad targetVector parameter.");
-      return;
-    }
-  }
+  preConditions.checkIfDefined(ROYGBIV.getParticleSystemVelocityAtTime, preConditions.particleSystem, particleSystem);
+  preConditions.checkIfParticleSystem(ROYGBIV.getParticleSystemVelocityAtTime, preConditions.particleSystem, particleSystem);
+  preConditions.checkIfDefined(ROYGBIV.getParticleSystemVelocityAtTime, preConditions.time, time);
+  preConditions.checkIfNumber(ROYGBIV.getParticleSystemVelocityAtTime, preConditions.time, time);
+  preConditions.checkIfDefined(ROYGBIV.getParticleSystemVelocityAtTime, preConditions.targetVector, targetVector);
+  preConditions.checkIfVectorOnlyIfDefined(ROYGBIV.getParticleSystemVelocityAtTime, preConditions.targetVector, targetVector);
   return particleSystem.getVelocityAtTime(time, targetVector);
 }
 
@@ -456,21 +410,13 @@ Roygbiv.prototype.getCameraDirection = function(targetVector){
   if (mode == 0){
     return;
   }
-  if (!(typeof targetVector == UNDEFINED)){
-    if (isNaN(targetVector.x) || isNaN(targetVector.y) || isNaN(targetVector.z)){
-      throw new Error("getCameraDirection error: Bad targetVector parameter.");
-      return;
-    }
-  }
+  preConditions.checkIfDefined(ROYGBIV.getCameraDirection, preConditions.targetVector, targetVector);
+  preConditions.checkIfVectorOnlyIfDefined(ROYGBIV.getCameraDirection, preConditions.targetVector, targetVector);
   REUSABLE_VECTOR.set(0, 0, -1).applyQuaternion(camera.quaternion);
-  if (!targetVector){
-    return this.vector(REUSABLE_VECTOR.x, REUSABLE_VECTOR.y, REUSABLE_VECTOR.z);
-  }else{
-    targetVector.x = REUSABLE_VECTOR.x;
-    targetVector.y = REUSABLE_VECTOR.y;
-    targetVector.z = REUSABLE_VECTOR.z;
-    return targetVector;
-  }
+  targetVector.x = REUSABLE_VECTOR.x;
+  targetVector.y = REUSABLE_VECTOR.y;
+  targetVector.z = REUSABLE_VECTOR.z;
+  return targetVector;
 }
 
 // getCameraPosition
@@ -479,20 +425,12 @@ Roygbiv.prototype.getCameraPosition = function(targetVector){
   if (mode == 0){
     return;
   }
-  if (!(typeof targetVector == UNDEFINED)){
-    if (isNaN(targetVector.x) || isNaN(targetVector.y) || isNaN(targetVector.z)){
-      throw new Error("getCameraPosition error: Bad targetVector parameter.");
-      return;
-    }
-  }
-  if (!targetVector){
-    return this.vector(camera.position.x, camera.position.y, camera.position.z);
-  }else{
-    targetVector.x = camera.position.x;
-    targetVector.y = camera.position.y;
-    targetVector.z = camera.position.z;
-    return targetVector;
-  }
+  preConditions.checkIfDefined(ROYGBIV.getCameraPosition, preConditions.targetVector, targetVector);
+  preConditions.checkIfVectorOnlyIfDefined(ROYGBIV.getCameraPosition, preConditions.targetVector, targetVector);
+  targetVector.x = camera.position.x;
+  targetVector.y = camera.position.y;
+  targetVector.z = camera.position.z;
+  return targetVector;
 }
 
 // getParticleSystemPool
@@ -501,15 +439,9 @@ Roygbiv.prototype.getParticleSystemPool = function(name){
   if (mode == 0){
     return;
   }
-  if (typeof name == UNDEFINED){
-    throw new Error("getParticleSystemPool error: name is not defined.");
-    return;
-  }
+  preConditions.checkIfDefined(ROYGBIV.getParticleSystemPool, preConditions.name, name);
   var psPool = particleSystemPools[name];
-  if (!psPool){
-    throw new Error("getParticleSystemPool error: No such particle system pool.");
-    return;
-  }
+  preConditions.checkIfParticleSystemPoolExists(ROYGBIV.getParticleSystemPool, null, psPool);
   return psPool;
 }
 
@@ -521,18 +453,9 @@ Roygbiv.prototype.getParticleSystemFromPool = function(pool){
   if (mode == 0){
     return;
   }
-  if (typeof pool == UNDEFINED){
-    throw new Error("getParticleSystemFromPool error: pool is not defined.");
-    return;
-  }
-  if (!(pool.isParticleSystemPool)){
-    throw new Error("getParticleSystemFromPool error: Type not supported.");
-    return;
-  }
-  if (pool.destroyed){
-    throw new Error("getParticleSystemFromPool error: pool is destroyed.");
-    return;
-  }
+  preConditions.checkIfDefined(ROYGBIV.getParticleSystemFromPool, preConditions.pool, pool);
+  preConditions.checkIfParticleSystemPool(ROYGBIV.getParticleSystemFromPool, preConditions.pool, pool);
+  preConditions.checkIfPoolDestroyed(ROYGBIV.getParticleSystemFromPool, null, pool);
   return pool.get();
 }
 
@@ -545,37 +468,18 @@ Roygbiv.prototype.getEndPoint = function(object, axis, targetVector){
   if (mode == 0){
     return;
   }
-  if (typeof object == UNDEFINED){
-    throw new Error("getEndPoint error: object is not defined.");
-    return;
-  }
-  if (!(object.isAddedObject)){
-    throw new Error("getEndPoint error: object is not an AddedObject.");
-    return;
-  }
-  if (typeof axis == UNDEFINED){
-    throw new Error("getEndPoint error: axis is not defined.");
-    return;
-  }
-  if (typeof targetVector == UNDEFINED){
-    throw new Error("getEndPoint error: targetVector is not defined.");
-    return;
-  }
-  if (isNaN(targetVector.x) || isNaN(targetVector.y) || isNaN(targetVector.z)){
-    throw new Error("getEndPoint error: targetVector is not a vector.");
-    return;
-  }
+  preConditions.checkIfDefined(ROYGBIV.getEndPoint, preConditions.object, object);
+  preConditions.checkIfAddedObject(ROYGBIV.getEndPoint, preConditions.object, object);
+  preConditions.checkIfDefined(ROYGBIV.getEndPoint, preConditions.axis, axis);
+  preConditions.checkIfDefined(ROYGBIV.getEndPoint, preConditions.targetVector, targetVector);
+  preConditions.checkIfVectorOnlyIfDefined(ROYGBIV.getEndPoint, preConditions.targetVector, targetVector);
   axis = axis.toLowerCase();
-  if (axis == "+x" || axis == "-x" || axis == "+y" || axis == "-y" || axis == "+z" || axis == "-z"){
-    var endPoint = object.getEndPoint(axis);
-    targetVector.x = endPoint.x;
-    targetVector.y = endPoint.y;
-    targetVector.z = endPoint.z;
-    return targetVector;
-  }else{
-    throw new Error("getEndPoint error: Invalid axis.");
-    return;
-  }
+  preConditions.checkIfEndPointAxis(ROYGBIV.getEndPoint, preConditions.axis, axis);
+  var endPoint = object.getEndPoint(axis);
+  targetVector.x = endPoint.x;
+  targetVector.y = endPoint.y;
+  targetVector.z = endPoint.z;
+  return targetVector;
 }
 
 // getViewport
@@ -594,10 +498,7 @@ Roygbiv.prototype.getText = function(textName){
   if (mode == 0){
     return;
   }
-  if (typeof textName == UNDEFINED){
-    throw new Error("getText error: textName is not defined.");
-    return;
-  }
+  preConditions.checkIfDefined(ROYGBIV.getText, preConditions.textName, textName);
   var text = addedTexts[textName];
   if (text){
     return text;
@@ -625,30 +526,16 @@ Roygbiv.prototype.hide = function(object, keepPhysics){
   if (mode == 0){
     return;
   }
-  var keepPhysicsValue = false;
-  if (!(typeof keepPhysics == UNDEFINED)){
-    if (!(typeof keepPhysics == "boolean")){
-      throw new Error("hide error: Bad keepPhysics parameter.");
-      return;
-    }
-    keepPhysicsValue = keepPhysics;
-  }
-  if (!object){
-    throw new Error("hide error: object is not defined.");
-    return;
-  }
+  preConditions.checkIfBooleanOnlyIfExists(ROYGBIV.hide, preConditions.keepPhysics, keepPhysics);
+  var keepPhysicsValue = keepPhysics;
+  preConditions.checkIfDefined(ROYGBIV.hide, preConditions.object, object);
+  preConditions.checkIfAddedObjectOrObjectGroup(ROYGBIV.hide, preConditions.object, object);
   if (object.isAddedObject){
-    if (!addedObjects[object.name]){
-      throw new Error("hide error: Cannot hide a child object. Use the parent object instead.");
-      return;
+    preConditions.checkIfChildObjectOnlyIfExists(ROYGBIV.hide, preConditions.object, object);
+    if (keepPhysicsValue){
+      preConditions.checkIfNoMass(ROYGBIV.hide, preConditions.object, object);
     }
-    if (keepPhysicsValue && object.noMass){
-      throw new Error("hide error: Object has no mass. Cannot keep mass.");
-    }
-    if (!object.isChangeable){
-      throw new Error("hide error: Object is not marked as changeable.");
-      return;
-    }
+    preConditions.checkIfChangeable(ROYGBIV.hide, preConditions.object, object);
     if (object.isVisibleOnThePreviewScene()){
       object.mesh.visible = false;
       // The reason we use delayed execution here is that
@@ -669,13 +556,10 @@ Roygbiv.prototype.hide = function(object, keepPhysics){
       rayCaster.hide(object);
     }
   }else if (object.isObjectGroup){
-    if (keepPhysicsValue && object.noMass){
-      throw new Error("hide error: Object has no mass. Cannot keep mass.");
+    if (keepPhysicsValue){
+      preConditions.checkIfNoMass(ROYGBIV.hide, preConditions.object, object);
     }
-    if (!object.isChangeable){
-      throw new Error("hide error: object is not marked as changeable.");
-      return;
-    }
+    preConditions.checkIfChangeable(ROYGBIV.hide, preConditions.object, object);
     if (object.isVisibleOnThePreviewScene()){
       object.mesh.visible = false;
       if (!keepPhysicsValue){
@@ -691,9 +575,6 @@ Roygbiv.prototype.hide = function(object, keepPhysics){
       object.isHidden = true;
       rayCaster.hide(object);
     }
-  }else{
-    throw new Error("hide error: Unsupported type.");
-    return;
   }
 }
 
@@ -704,19 +585,11 @@ Roygbiv.prototype.show = function(object){
   if (mode == 0){
     return;
   }
-  if (!object){
-    throw new Error("show error: object is not defined.");
-    return;
-  }
+  preConditions.checkIfDefined(ROYGBIV.show, preConditions.object, object);
+  preConditions.checkIfAddedObjectOrObjectGroup(ROYGBIV.show, preConditions.object, object);
   if (object.isAddedObject){
-    if (!addedObjects[object.name]){
-      throw new Error("show error: Cannot show a child object. Use the parent object instead.");
-      return;
-    }
-    if (!object.isChangeable){
-      throw new Error("show error: object is not marked as changeable.");
-      return;
-    }
+    preConditions.checkIfChildObjectOnlyIfExists(ROYGBIV.show, preConditions.object, object);
+    preConditions.checkIfChangeable(ROYGBIV.show, preConditions.object, object);
     if (!object.isVisibleOnThePreviewScene()){
       object.mesh.visible = true;
       if (!object.physicsKeptWhenHidden){
@@ -730,10 +603,7 @@ Roygbiv.prototype.show = function(object){
       rayCaster.show(object);
     }
   }else if (object.isObjectGroup){
-    if (!object.isChangeable){
-      throw new Error("show error: object is not marked as changeable.");
-      return;
-    }
+    preConditions.checkIfChangeable(ROYGBIV.show, preConditions.object, object);
     if (!object.isVisibleOnThePreviewScene()){
       object.mesh.visible = true;
       if (!object.physicsKeptWhenHidden){
@@ -746,9 +616,6 @@ Roygbiv.prototype.show = function(object){
       object.isHidden = false;
       rayCaster.show(object);
     }
-  }else{
-    throw new Error("show error: Unsupported type.");
-    return;
   }
 }
 
@@ -758,37 +625,14 @@ Roygbiv.prototype.applyForce = function(object, force, point){
   if (mode == 0){
     return;
   }
-  if (!object){
-    throw new Error("applyForce error: object is not defined.");
-    return;
-  }
-  if (!(object.isAddedObject) && !(object.isObjectGroup)){
-    throw new Error("applyForce error: object type is not supported.");
-    return;
-  }
-  if (object.noMass){
-    throw new Error("applyForce error: object does not have a mass.");
-    return;
-  }
-  if (!object.isDynamicObject){
-    throw new Error("applyForce error: object is not dynamic.");
-    return;
-  }
-  if (!force){
-    throw new Error("applyForce error: force is not defined.");
-    return;
-  }
-  if (!point){
-    throw new Error("applyForce error: point is not defined.");
-    return;
-  }
-  if (typeof force.x == UNDEFINED || typeof force.y == UNDEFINED || typeof force.z == UNDEFINED){
-    throw new Error("applyForce error: force is not a vector.");
-    return;
-  }
-  if (typeof point.x == UNDEFINED || typeof point.y == UNDEFINED || typeof point.z == UNDEFINED){
-    throw new Error("applyForce error: point is not a vector.");
-  }
+  preConditions.checkIfDefined(ROYGBIV.applyForce, preConditions.object, object);
+  preConditions.checkIfAddedObjectOrObjectGroup(ROYGBIV.applyForce, preConditions.object, object);
+  preConditions.checkIfNoMass(ROYGBIV.applyForce, preConditions.object, object);
+  preConditions.checkIfDynamic(ROYGBIV.applyForce, preConditions.object, object);
+  preConditions.checkIfDefined(ROYGBIV.applyForce, preConditions.force, force);
+  preConditions.checkIfDefined(ROYGBIV.applyForce, preConditions.point, point);
+  preConditions.checkIfVectorOnlyIfDefined(ROYGBIV.applyForce, preConditions.force, force);
+  preConditions.checkIfVectorOnlyIfDefined(ROYGBIV.applyForce, preConditions.point, point);
   if (!isPhysicsWorkerEnabled()){
     REUSABLE_CANNON_VECTOR.set(force.x, force.y, force.z);
     REUSABLE_CANNON_VECTOR_2.set(point.x, point.y, point.z);
@@ -808,27 +652,12 @@ Roygbiv.prototype.rotate = function(object, axis, radians){
   if (mode == 0){
     return;
   }
-  if (!object){
-    throw new Error("rotate error: Object undefined.");
-    return;
-  }
-  if (typeof axis == "UNDEFINED"){
-    throw new Error("rotate error: axis is not defined.");
-    return;
-  }
+  preConditions.checkIfDefined(ROYGBIV.rotate, preConditions.object, object);
+  preConditions.checkIfDefined(ROYGBIV.rotate, preConditions.axis, axis);
   axis = axis.toLowerCase();
-  if (axis != "x" && axis != "y" && axis != "z"){
-    throw new Error("rotate error: Axis must be one of x, y, or z.");
-    return;
-  }
-  if (isNaN(radians)){
-    throw new Error("rotate error: Radians value is not a number.");
-    return;
-  }
-  if (!(object.isAddedObject) && !(object.isObjectGroup) && !(object.isParticleSystem)){
-    throw new Error("rotate error: Type not supported.");
-    return;
-  }
+  preConditions.checkIfAxisOnlyIfDefined(ROYGBIV.rotate, preConditions.axis, axis);
+  preConditions.checkIfNumber(ROYGBIV.rotate, preConditions.radians, radians);
+  preConditions.checkIfAddedObjectObjectGroupParticleSystem(ROYGBIV.rotate, preConditions.object, object);
   var isObject = false;
   if ((object.isAddedObject) || (object.isObjectGroup)){
     isObject = true;
@@ -848,10 +677,7 @@ Roygbiv.prototype.rotate = function(object, axis, radians){
     }
   }
   if ((object.isAddedObject) || (object.isObjectGroup)){
-    if (!object.isChangeable){
-      throw new Error("rotate error: object is not marked as changeable.");
-      return;
-    }
+    preConditions.checkIfChangeable(ROYGBIV.rotate, preConditions.object, object);
   }
   if (object.pivotObject){
     object.rotateAroundPivotObject(axis, radians);
@@ -869,38 +695,20 @@ Roygbiv.prototype.rotateAroundXYZ = function(object, x, y, z, radians, axis, ski
   if (mode == 0){
     return;
   }
-  if (!object){
-    throw new Error("rotateAroundXYZ error: Object is undefined.");
-    return;
-  }
-  if (isNaN(x)){
-    throw new Error("rotateAroundXYZ error: X is not a number.");
-    return;
-  }
-  if (isNaN(y)){
-    throw new Error("rotateAroundXYZ error: Y is not a number.");
-    return;
-  }
-  if (isNaN(z)){
-    throw new Error("rotateAroundXYZ error: Z is not a number.");
-    return;
-  }
-  if (isNaN(radians)){
-    throw new Error("rotateAroundXYZ error: Radian value is not a number.");
-    return;
-  }
-  if (typeof axis == UNDEFINED){
-    throw new Error("rotateAroundXYZ error: axis is not defined.");
-  }
-  if (axis.toLowerCase() != "x" && axis.toLowerCase() != "y" && axis.toLowerCase() != "z"){
-    throw new Error("rotateAroundXYZ error: Axis must be one of x,y or z");
-    return;
-  }
-  if (!(typeof skipLocalRotation == UNDEFINED)){
-    if (!(typeof skipLocalRotation == "boolean")){
-      throw new Error("rotateAroundXYZ error: skipLocalRotation must be a boolean.");
-    }
-  }
+  preConditions.checkIfDefined(ROYGBIV.rotateAroundXYZ, preConditions.object, object);
+  preConditions.checkIfDefined(ROYGBIV.rotateAroundXYZ, preConditions.x, x);
+  preConditions.checkIfDefined(ROYGBIV.rotateAroundXYZ, preConditions.y, y);
+  preConditions.checkIfDefined(ROYGBIV.rotateAroundXYZ, preConditions.z, z);
+  preConditions.checkIfNumber(ROYGBIV.rotateAroundXYZ, preConditions.x, x);
+  preConditions.checkIfNumber(ROYGBIV.rotateAroundXYZ, preConditions.y, y);
+  preConditions.checkIfNumber(ROYGBIV.rotateAroundXYZ, preConditions.z, z);
+  preConditions.checkIfDefined(ROYGBIV.rotateAroundXYZ, preConditions.radians, radians);
+  preConditions.checkIfNumber(ROYGBIV.rotateAroundXYZ, preConditions.radians, radians);
+  preConditions.checkIfDefined(ROYGBIV.rotateAroundXYZ, preConditions.axis, axis);
+  preConditions.checkIfAddedObjectOrObjectGroup(ROYGBIV.rotateAroundXYZ, preConditions.object, object);
+  axis = axis.toLowerCase();
+  preConditions.checkIfAxisOnlyIfDefined(ROYGBIV.rotateAroundXYZ, preConditions.axis, axis);
+  preConditions.checkIfBooleanOnlyIfExists(ROYGBIV.rotateAroundXYZ, preConditions.skipLocalRotation, skipLocalRotation);
   var axisVector;
   if (axis.toLowerCase() == "x"){
     axisVector = THREE_AXIS_VECTOR_X;
@@ -924,20 +732,11 @@ Roygbiv.prototype.rotateAroundXYZ = function(object, x, y, z, radians, axis, ski
         return;
       }
     }
-    if (!object.isChangeable){
-      throw new Error("rotateAroundXYZ error: object is not marked as changeable.");
-      return;
-    }
+    preConditions.checkIfChangeable(ROYGBIV.rotateAroundXYZ, preConditions.object, object);
     mesh = object.mesh;
   }else if (object.isObjectGroup){
-    if (!object.isChangeable){
-      throw new Error("rotateAroundXYZ error: object is not marked as changeable.");
-      return;
-    }
+    preConditions.checkIfChangeable(ROYGBIV.rotateAroundXYZ, preConditions.object, object);
     mesh = object.mesh;
-  }else{
-    throw new Error("rotateAroundXYZ error: Type not supported.");
-    return;
   }
   var point = REUSABLE_VECTOR.set(x, y, z);
   mesh.parent.localToWorld(mesh.position);
@@ -968,56 +767,35 @@ Roygbiv.prototype.setPosition = function(obj, x, y, z){
   if (mode == 0){
     return;
   }
-  if (!obj){
-    throw new Error("setPosition error: Object is undefined");
-    return;
-  }
-  if (isNaN(x)){
-    throw new Error("setPosition error: X is not a number.");
-    return;
-  }
-  if (isNaN(y)){
-    throw new Error("setPosition error: Y is not a number.");
-    return;
-  }
-  if (isNaN(z)){
-    throw new Error("setPosition error: Z is not a number.");
-    return;
-  }
+  preConditions.checkIfDefined(ROYGBIV.setPosition, preConditions.obj, obj);
+  preConditions.checkIfDefined(ROYGBIV.setPosition, preConditions.x, x);
+  preConditions.checkIfDefined(ROYGBIV.setPosition, preConditions.y, y);
+  preConditions.checkIfDefined(ROYGBIV.setPosition, preConditions.z, z);
+  preConditions.checkIfNumber(ROYGBIV.setPosition, preConditions.x, x);
+  preConditions.checkIfNumber(ROYGBIV.setPosition, preConditions.y, y);
+  preConditions.checkIfNumber(ROYGBIV.setPosition, preConditions.z, z);
+  preConditions.checkIfAddedObjectOrObjectGroup(ROYGBIV.setPosition, preConditions.obj, obj);
   if (obj.isAddedObject){
     if (obj.parentObjectName){
       var objGroup = objectGroups[obj.parentObjectName];
-      if (objGroup){
-        this.setPosition(objGroup, x, y, z);
-        return;
-      }else{
-        throw new Error("setPosition error: Parent not defined.");
-        return;
-      }
-    }
-    if (!obj.isChangeable){
-      throw new Error("setPosition error: object is not marked as changeable.");
+      preConditions.checkIfParentExists(ROYGBIV.setPosition, null, objGroup);
+      this.setPosition(objGroup, x, y, z);
       return;
     }
+    preConditions.checkIfChangeable(ROYGBIV.setPosition, preConditions.obj, obj);
     obj.mesh.position.set(x, y, z);
     obj.physicsBody.position.set(x, y, z);
     if (obj.mesh.visible){
       rayCaster.updateObject(obj);
     }
   }else if (obj.isObjectGroup){
-    if (!obj.isChangeable){
-      throw new Error("setPosition error: object is not marked as changeable.");
-      return;
-    }
+    preConditions.checkIfChangeable(ROYGBIV.setPosition, preConditions.obj, obj);
     obj.mesh.position.set(x, y, z);
     obj.graphicsGroup.position.set(x, y, z);
     obj.physicsBody.position.set(x, y, z);
     if (obj.mesh.visible){
       rayCaster.updateObject(obj);
     }
-  }else{
-    throw new Error("setPosition error: Type not supported.");
-    return;
   }
 }
 
@@ -1028,34 +806,13 @@ Roygbiv.prototype.setMass = function(object, mass){
   if (mode == 0){
     return;
   }
-  if (!object){
-    throw new Error("setMass error: Object is undefined.");
-    return;
-  }
-  if (typeof mass == UNDEFINED){
-    throw new Error("setMass error: mass is undefined.");
-    return;
-  }
-  if (isNaN(mass)){
-    throw new Error("setMass error: mass is not a number.");
-    return;
-  }
-  if (!(object.isAddedObject) && !(object.isObjectGroup)){
-    throw new Error("setMass error: Unsupported type.");
-    return;
-  }
-  if (!object.isChangeable){
-    throw new Error("setMass error: object is not marked as changeable.");
-    return;
-  }
-  if (object.noMass){
-    throw new Error("setMass error: object has no mass property.");
-    return;
-  }
-  if ((object.isAddedObject) && !(addedObjects[object.name])){
-    throw new Error("setMass error: Cannot set mass of child objects. Use the parent object instead.");
-    return;
-  }
+  preConditions.checkIfDefined(ROYGBIV.setMass, preConditions.object, object);
+  preConditions.checkIfDefined(ROYGBIV.setMass, preConditions.mass, mass);
+  preConditions.checkIfNumber(ROYGBIV.setMass, preConditions.mass, mass);
+  preConditions.checkIfAddedObjectOrObjectGroup(ROYGBIV.setMass, preConditions.object, object);
+  preConditions.checkIfChangeable(ROYGBIV.setMass, preConditions.object, object);
+  preConditions.checkIfNoMass(ROYGBIV.setMass, preConditions.object, object);
+  preConditions.checkIfChildObjectOnlyIfExists(ROYGBIV.setMass, preConditions.object, object);
   if (typeof object.originalMass == UNDEFINED){
     object.originalMass = object.mass;
   }
@@ -1086,19 +843,13 @@ Roygbiv.prototype.translate = function(object, axis, amount){
   if (mode == 0){
     return;
   }
-  if (!object){
-    throw new Error("translate error: Object not defined.");
-    return;
-  }
+  preConditions.checkIfDefined(ROYGBIV.translate, preConditions.object, object);
+  preConditions.checkIfDefined(ROYGBIV.translate, preConditions.axis, axis);
+  preConditions.checkIfDefined(ROYGBIV.translate, preConditions.amount, amount);
   axis = axis.toLowerCase();
-  if (axis != "x" && axis!= "y" && axis != "z"){
-    throw new Error("translate error: Axis must be one of x, y, or z.");
-    return;
-  }
-  if (isNaN(amount)){
-    throw new Error("translate error: Amount is not a number.");
-    return;
-  }
+  preConditions.checkIfAxisOnlyIfDefined(ROYGBIV.translate, preConditions.axis, axis);
+  preConditions.checkIfNumber(ROYGBIV.translate, preConditions.amount, amount);
+  preConditions.checkIfAddedObjectOrObjectGroup(ROYGBIV.translate, preConditions.object, object);
   if (object.isAddedObject){
     if (object.parentObjectName){
       var parentObject = objectGroups[object.parentObjectName];
@@ -1107,21 +858,9 @@ Roygbiv.prototype.translate = function(object, axis, amount){
         return;
       }
     }
-    if (!object.isChangeable){
-      throw new Error("translate error: object is not marked as changeable.");
-      return;
-    }
-    object.translate(axis, amount, true);
-  }else if (object.isObjectGroup){
-    if (!object.isChangeable){
-      throw new Error("translate error: object is not marked as changeable.");
-      return;
-    }
-    object.translate(axis, amount, true);
-  }else {
-    throw new Error("translate error: Type not supported.");
-    return;
   }
+  preConditions.checkIfChangeable(ROYGBIV.translate, preConditions.object, object);
+  object.translate(axis, amount, true);
 }
 
 // opacity
@@ -1130,34 +869,19 @@ Roygbiv.prototype.opacity = function(object, delta){
   if (mode == 0){
     return;
   }
-  if(!object){
-    throw new Error("opacity error: Object is not defined.");
-    return;
-  }
-  if (isNaN(delta)){
-    throw new Error("opacity error: Delta is not a number.");
-    return;
-  }
-  var isAddedObject = (object.isAddedObject);
-  var isObjectGroup = (object.isObjectGroup);
-  if (!((isAddedObject) || (isObjectGroup))){
-    throw new Error("opacity error: Type not supported.");
-    return;
-  }
-  if (object.parentObjectName){
-    throw new Error("opacity error: Cannot set opacity to child objects.");
-    return;
-  }
-  if (!object.initOpacitySet && (isAddedObject)){
+  preConditions.checkIfDefined(ROYGBIV.opacity, preConditions.object, object);
+  preConditions.checkIfDefined(ROYGBIV.opacity, preConditions.delta, delta);
+  preConditions.checkIfNumber(ROYGBIV.opacity, preConditions.delta, delta);
+  preConditions.checkIfAddedObjectOrObjectGroup(ROYGBIV.opacity, preConditions.object, object);
+  preConditions.checkIfChildObjectOnlyIfExists(ROYGBIV.opacity, preConditions.object, object);
+  if (!object.initOpacitySet && (object.isAddedObject)){
     object.initOpacity = object.mesh.material.uniforms.alpha.value;
     object.initOpacitySet = true;
-  }else if (!object.initOpacitySet && (isObjectGroup)){
+  }else if (!object.initOpacitySet && (object.isObjectGroup)){
     object.initOpacity = object.mesh.material.uniforms.totalAlpha.value;
     object.initOpacitySet = true;
   }
-
   object.incrementOpacity(delta);
-
   if (isAddedObject){
     if (object.mesh.material.uniforms.alpha.value < 0){
       object.updateOpacity(0);
@@ -1173,7 +897,6 @@ Roygbiv.prototype.opacity = function(object, delta){
       object.updateOpacity(1);
     }
   }
-
 }
 
 // setObjectVelocity
@@ -1183,44 +906,21 @@ Roygbiv.prototype.setObjectVelocity = function(object, velocityVector, axis){
   if (mode == 0){
     return;
   }
-  if (typeof object == UNDEFINED){
-    throw new Error("setObjectVelocity error: object is not defined.");
-    return;
-  }
-  if (!(object.isAddedObject) && !(object.isObjectGroup)){
-    throw new Error("setObjectVelocity error: Type not supported.");
-    return;
-  }
-  if (!object.isChangeable){
-    throw new Error("setObjectVelocity error: object is not marked as changeable.");
-    return;
-  }
-  if ((object.isAddedObject) && !addedObjects[object.name]){
-    throw new Error("setObjectVelocity error: Cannot set velocity to child objects. Use parent object instead.");
-    return;
-  }
-  if (!object.isDynamicObject){
-    throw new Error("setObjectVelocity error: Object must have a mass greater than zero.");
-    return;
-  }
-  if (typeof velocityVector == UNDEFINED){
-    throw new Error("setObjectVelocity error: velocityVector is not defined.");
-    return;
-  }
-  if (isNaN(velocityVector.x) || isNaN(velocityVector.y) || isNaN(velocityVector.z)){
-    throw new Error("setObjectVelocity error: Bad velocityVector parameter.");
-    return;
-  }
+  preConditions.checkIfDefined(ROYGBIV.setObjectVelocity, preConditions.object, object);
+  preConditions.checkIfAddedObjectOrObjectGroup(ROYGBIV.setObjectVelocity, preConditions.object, object);
+  preConditions.checkIfChangeable(ROYGBIV.setObjectVelocity, preConditions.object, object);
+  preConditions.checkIfChildObjectOnlyIfExists(ROYGBIV.setObjectVelocity, preConditions.object, object);
+  preConditions.checkIfDynamic(ROYGBIV.setObjectVelocity, preConditions.object, object);
+  preConditions.checkIfDefined(ROYGBIV.setObjectVelocity, preConditions.velocityVector, velocityVector);
+  preConditions.checkIfVectorOnlyIfDefined(ROYGBIV.setObjectVelocity, preConditions.velocityVector, velocityVector);
   if (!(typeof axis == UNDEFINED)){
-    if (axis != "X" && axis != "x" && axis != "y" && axis != "Y" && axis != "z" && axis != "Z"){
-      throw new Error("setObjectVelocity error: Bad axis parameter.");
-      return;
-    }
-    if (axis == "x" || axis == "X"){
+    axis = axis.toLowerCase();
+    preConditions.checkIfAxisOnlyIfDefined(ROYGBIV.setObjectVelocity, preConditions.axis, axis);
+    if (axis == "x"){
       object.physicsBody.velocity.x = velocityVector.x;
-    }else if (axis == "y" || axis == "Y"){
+    }else if (axis == "y"){
       object.physicsBody.velocity.y = velocityVector.y;
-    }else if (axis == "z" || axis == "Z"){
+    }else if (axis == "z"){
       object.physicsBody.velocity.z = velocityVector.z;
     }
     return;
@@ -1234,29 +934,14 @@ Roygbiv.prototype.setObjectColor = function(object, colorName, alpha){
   if (mode == 0){
     return;
   }
-  if (typeof object == UNDEFINED){
-    throw new Error("setObjectColor error: object is not defined.");
-    return;
-  }
-  if (!(object.isAddedObject) && !(object.isObjectGroup)){
-    throw new Error("setObjectColor error: Type not supported.");
-    return;
-  }
-  if (!object.isColorizable){
-    throw new Error("setObjectColor error: Object is not marked as colorizable.");
-    return;
-  }
-  if (typeof colorName == UNDEFINED){
-    throw new Error("setObjectColor error: colorName is not defined.");
-    return;
-  }
+  preConditions.checkIfDefined(ROYGBIV.setObjectColor, preConditions.object, object);
+  preConditions.checkIfAddedObjectOrObjectGroup(ROYGBIV.setObjectColor, preConditions.object, object);
+  preConditions.checkIfColorizable(ROYGBIV.setObjectColor, preConditions.object, object);
+  preConditions.checkIfDefined(ROYGBIV.setObjectColor, preConditions.colorName, colorName);
   if (typeof alpha == UNDEFINED){
     alpha = 1;
   }else{
-    if (isNaN(alpha)){
-      throw new Error("setObjectColor error: alpha is not a number.");
-      return;
-    }
+    preConditions.checkIfNumber(ROYGBIV.setObjectColor, preConditions.alpha, alpha);
   }
   REUSABLE_COLOR.set(colorName);
   object.forceColor(REUSABLE_COLOR.r, REUSABLE_COLOR.g, REUSABLE_COLOR.b, alpha);
@@ -1268,18 +953,9 @@ Roygbiv.prototype.resetObjectColor = function(object){
   if (mode == 0){
     return;
   }
-  if (typeof object == UNDEFINED){
-    throw new Error("resetObjectColor error: object is not defined.");
-    return;
-  }
-  if (!(object.isAddedObject) && !(object.isObjectGroup)){
-    throw new Error("resetObjectColor error: Type not supported.");
-    return;
-  }
-  if (!object.isColorizable){
-    throw new Error("setObjectColor error: Object is not marked as colorizable.");
-    return;
-  }
+  preConditions.checkIfDefined(ROYGBIV.resetObjectColor, preConditions.object, object);
+  preConditions.checkIfAddedObjectOrObjectGroup(ROYGBIV.resetObjectColor, preConditions.object, object);
+  preConditions.checkIfColorizable(ROYGBIV.resetObjectColor, preConditions.object, object);
   object.resetColor();
 }
 
@@ -1289,14 +965,8 @@ Roygbiv.prototype.setRotationPivot = function(rotationPivot){
   if (mode == 0){
     return;
   }
-  if (typeof rotationPivot == UNDEFINED){
-    throw new Error("setRotationPivot error: rotationPivot is not defined.");
-    return;
-  }
-  if (!(rotationPivot.isObject3D)){
-    throw new Error("setRotationPivot error: Bad rotationPivot type.");
-    return;
-  }
+  preConditions.checkIfDefined(ROYGBIV.setRotationPivot, preConditions.rotationPivot, rotationPivot);
+  preConditions.checkIfRotationPivot(ROYGBIV.setRotationPivot, preConditions.rotat, rotationPivot);
   var sourceObject = rotationPivot.sourceObject;
   if (sourceObject.pivotObject){
     rotationPivot.position.copy(sourceObject.pivotObject.position);
@@ -1315,18 +985,9 @@ Roygbiv.prototype.unsetRotationPivot = function(object){
   if (mode == 0){
     return;
   }
-  if (typeof object == UNDEFINED){
-    throw new Error("unsetRotationPivot error: object is not defined.");
-    return;
-  }
-  if (!((object.isAddedObject) || (object.isObjectGroup))){
-    throw new Error("unsetRotationPivot error: Type not supported.");
-    return;
-  }
-  if (!object.pivotObject){
-    throw new Error("unsetRotationPivot error: Object does not have a pivot point.");
-    return;
-  }
+  preConditions.checkIfDefined(ROYGBIV.unsetRotationPivot, preConditions.object, object);
+  preConditions.checkIfAddedObjectOrObjectGroup(ROYGBIV.unsetRotationPivot, preConditions.object, object);
+  preConditions.checkIfHavePivotPoint(ROYGBIV.unsetRotationPivot, preConditions.object, object);
   delete object.pivotObject;
   delete object.pivotOffsetX;
   delete object.pivotOffsetY;
@@ -1339,26 +1000,11 @@ Roygbiv.prototype.resetObjectVelocity = function(object){
   if (mode == 0){
     return;
   }
-  if (typeof object == UNDEFINED){
-    throw new Error("resetObjectVelocity error: object is not defined.");
-    return;
-  }
-  if (!(object.isAddedObject || object.isObjectGroup)){
-    throw new Error("resetObjectVelocity error: Type not supported.");
-    return;
-  }
-  if (!object.isChangeable){
-    throw new Error("resetObjectVelocity error: object is not marked as changeable.");
-    return;
-  }
-  if (object.parentObjectName){
-    throw new Error("resetObjectVelocity error: Cannot set velocity to child objects. Use parent object instead.");
-    return;
-  }
-  if (!object.isDynamicObject){
-    throw new Error("resetObjectVelocity error: Object must have a mass greater than zero.");
-    return;
-  }
+  preConditions.checkIfDefined(ROYGBIV.resetObjectVelocity, preConditions.object, object);
+  preConditions.checkIfAddedObjectOrObjectGroup(ROYGBIV.resetObjectVelocity, preConditions.object, object);
+  preConditions.checkIfChangeable(ROYGBIV.resetObjectVelocity, preConditions.object, object);
+  preConditions.checkIfChildObjectOnlyIfExists(ROYGBIV.resetObjectVelocity, preConditions.object, object);
+  preConditions.checkIfDynamic(ROYGBIV.resetObjectVelocity, preConditions.object, object);
   object.physicsBody.velocity.set(0, 0, 0);
   object.physicsBody.angularVelocity.set(0, 0, 0);
 }

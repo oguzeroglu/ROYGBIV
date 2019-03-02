@@ -1039,6 +1039,7 @@ var selectionHandler;
 var guiHandler;
 var cpuOperationsHandler;
 var particleSystemRefHeight = 0;
+var preConditions;
 
 // WORKER VARIABLES
 var WORKERS_SUPPORTED = (typeof(Worker) !== "undefined");
