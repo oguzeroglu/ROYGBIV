@@ -4118,22 +4118,10 @@ Roygbiv.prototype.setText = function(textObject, text){
   if (mode == 0){
     return;
   }
-  if (typeof textObject == UNDEFINED){
-    throw new Error("setText error: textObject is not defined.");
-    return;
-  }
-  if (!textObject.isAddedText){
-    throw new Error("setText error: textObject is not a text object.");
-    return;
-  }
-  if (typeof text == UNDEFINED){
-    throw new Error("setText error: text is not defined.");
-    return;
-  }
-  if (!(typeof text == "string")){
-    throw new Error("setText error: text is not a string.");
-    return;
-  }
+  preConditions.checkIfDefined(ROYGBIV.setText, preConditions.textObject, textObject);
+  preConditions.checkIfAddedText(ROYGBIV.setText, preConditions.textObject, textObject);
+  preConditions.checkIfDefined(ROYGBIV.setText, preConditions.text, text);
+  preConditions.checkIfString(ROYGBIV.setText, preConditions.text, text);
   textObject.setText(text, true);
 }
 
@@ -4144,17 +4132,9 @@ Roygbiv.prototype.setTextColor = function(text, colorName){
   if (mode == 0){
     return;
   }
-  if (typeof text == UNDEFINED){
-    throw new Error("setTextColor error: text is not defined.");
-    return;
-  }
-  if (!text.isAddedText){
-    throw new Error("setTextColor error: text is not a text object.");
-    return;
-  }
-  if (typeof colorName == UNDEFINED){
-    throw new Error("setTextColor error: colorName is not defined.");
-  }
+  preConditions.checkIfDefined(ROYGBIV.setTextColor, preConditions.text, text);
+  preConditions.checkIfAddedText(ROYGBIV.setTextColor, preConditions.text, text);
+  preConditions.checkIfDefined(ROYGBIV.setTextColor, preConditions.colorName, colorName);
   text.setColor(colorName, true);
 }
 
@@ -4164,22 +4144,10 @@ Roygbiv.prototype.setTextAlpha = function(text, alpha){
   if (mode == 0){
     return;
   }
-  if (typeof text == UNDEFINED){
-    throw new Error("setTextAlpha error: text is not defined.");
-    return;
-  }
-  if (!text.isAddedText){
-    throw new Error("setTextAlpha error: text is not a text object.");
-    return;
-  }
-  if (typeof alpha == UNDEFINED){
-    throw new Error("setTextAlpha error: alpha is not defined.");
-    return;
-  }
-  if (isNaN(alpha)){
-    throw new Error("setTextAlpha error: alpha is not a number.");
-    return;
-  }
+  preConditions.checkIfDefined(ROYGBIV.setTextAlpha, preConditions.text, text);
+  preConditions.checkIfAddedText(ROYGBIV.setTextAlpha, preConditions.text, text);
+  preConditions.checkIfDefined(ROYGBIV.setTextAlpha, preConditions.alpha, alpha);
+  preConditions.checkIfNumber(ROYGBIV.setTextAlpha, preConditions.alpha, alpha);
   text.setAlpha(alpha, true);
 }
 
@@ -4189,30 +4157,15 @@ Roygbiv.prototype.setTextPosition = function(text, x, y, z){
   if (mode == 0){
     return;
   }
-  if (typeof text == UNDEFINED){
-    throw new Error("setTextPosition error: text is not defined.");
-    return;
-  }
-  if (!text.isAddedText){
-    throw new Error("setTextPosition error: text is not a text object.");
-    return;
-  }
-  if (text.is2D){
-    throw new Error("setTextPosition error: Cannot set position of a 2D text.");
-    return;
-  }
-  if (isNaN(x)){
-    throw new Error("setTextPosition error: Bad x parameter");
-    return;
-  }
-  if (isNaN(y)){
-    throw new Error("setTextPosition error: Bad y parameter.");
-    return;
-  }
-  if (isNaN(z)){
-    throw new Error("setTextPosition error: Bad z parameter.");
-    return;
-  }
+  preConditions.checkIfDefined(ROYGBIV.setTextPosition, preConditions.text, text);
+  preConditions.checkIfAddedText(ROYGBIV.setTextPosition, preConditions.text, text);
+  preConditions.checkIfText2D(ROYGBIV.setTextPosition, preConditions.text, text);
+  preConditions.checkIfDefined(ROYGBIV.setTextPosition, preConditions.x, x);
+  preConditions.checkIfDefined(ROYGBIV.setTextPosition, preConditions.y, y);
+  preConditions.checkIfDefined(ROYGBIV.setTextPosition, preConditions.z, z);
+  preConditions.checkIfNumber(ROYGBIV.setTextPosition, preConditions.x, x);
+  preConditions.checkIfNumber(ROYGBIV.setTextPosition, preConditions.y, y);
+  preConditions.checkIfNumber(ROYGBIV.setTextPosition, preConditions.z, z);
   text.mesh.position.set(x, y, z);
 }
 
@@ -4222,34 +4175,13 @@ Roygbiv.prototype.setTextBackground = function(text, colorName, alpha){
   if (mode == 0){
     return;
   }
-  if (typeof text == UNDEFINED){
-    throw new Error("setTextBackground error: text is not defined.");
-    return;
-  }
-  if (!text.isAddedText){
-    throw new Error("setTextBackground error: text is not a text object.");
-    return;
-  }
-  if (!text.hasBackground){
-    throw new Error("setTextBackground error: text has no background.");
-    return;
-  }
-  if (typeof colorName == UNDEFINED){
-    throw new Error("setTextBackground error: colorName is not defined.");
-    return;
-  }
-  if (!(typeof colorName == "string")){
-    throw new Error("setTextBackground error: colorName is not a string.");
-    return;
-  }
-  if (typeof alpha == UNDEFINED){
-    throw new Error("setTextBackground error: alpha is not defined.");
-    return;
-  }
-  if (isNaN(alpha)){
-    throw new Error("setTextBackground error: Bad alpha parameter.");
-    return;
-  }
+  preConditions.checkIfDefined(ROYGBIV.setTextBackground, preConditions.text, text);
+  preConditions.checkIfAddedText(ROYGBIV.setTextBackground, preConditions.text, text);
+  preConditions.checkIfTrue(ROYGBIV.setTextBackground, "text has no background", (!text.hasBackground));
+  preConditions.checkIfDefined(ROYGBIV.setTextBackground, preConditions.colorName, colorName);
+  preConditions.checkIfString(ROYGBIV.setTextBackground, preConditions.colorName, colorName);
+  preConditions.checkIfDefined(ROYGBIV.setTextBackground, preConditions.alpha, alpha);
+  preConditions.checkIfNumber(ROYGBIV.setTextBackground, preConditions.alpha, alpha);
   text.setBackground(colorName, alpha, true);
 }
 
@@ -4259,18 +4191,9 @@ Roygbiv.prototype.removeTextBackground = function(text){
   if (mode == 0){
     return;
   }
-  if (typeof text == UNDEFINED){
-    throw new Error("removeTextBackground error: text is not defined.");
-    return;
-  }
-  if (!text.isAddedText){
-    throw new Error("removeTextBackground error: text is not a text object.");
-    return;
-  }
-  if (!text.hasBackground){
-    throw new Error("removeBackground error: text has no background.");
-    return;
-  }
+  preConditions.checkIfDefined(ROYGBIV.removeTextBackground, preConditions.text, text);
+  preConditions.checkIfAddedText(ROYGBIV.removeTextBackground, preConditions.text, text);
+  preConditions.checkIfTrue(ROYGBIV.setTextBackground, "text has no background", (!text.hasBackground));
   text.removeBackground(true);
 }
 
@@ -4280,30 +4203,15 @@ Roygbiv.prototype.setTextCenterPosition = function(text, x, y, z){
   if (mode == 0){
     return;
   }
-  if (typeof text == UNDEFINED){
-    throw new Error("setTextCenterPosition error: text is not defined.");
-    return;
-  }
-  if (!text.isAddedText){
-    throw new Error("setTextCenterPosition error: text is not a text object.");
-    return;
-  }
-  if (text.is2D){
-    throw new Error("setTextCenterPosition error: Cannot set position of a 2D text.");
-    return;
-  }
-  if (isNaN(x)){
-    throw new Error("setTextCenterPosition error: Bad x parameter.");
-    return;
-  }
-  if (isNaN(y)){
-    throw new Error("setTextCenterPosition error: Bad y parameter.");
-    return;
-  }
-  if (isNaN(z)){
-    throw new Error("setTextCenterPosition error: Bad z parameter.");
-    return;
-  }
+  preConditions.checkIfDefined(ROYGBIV.setTextCenterPosition, preConditions.text, text);
+  preConditions.checkIfAddedText(ROYGBIV.setTextCenterPosition, preConditions.text, text);
+  preConditions.checkIfText2D(ROYGBIV.setTextCenterPosition, preConditions.text, text);
+  preConditions.checkIfDefined(ROYGBIV.setTextCenterPosition, preConditions.x, x);
+  preConditions.checkIfDefined(ROYGBIV.setTextCenterPosition, preConditions.y, y);
+  preConditions.checkIfDefined(ROYGBIV.setTextCenterPosition, preConditions.z, z);
+  preConditions.checkIfNumber(ROYGBIV.setTextCenterPosition, preConditions.x, x);
+  preConditions.checkIfNumber(ROYGBIV.setTextCenterPosition, preConditions.y, y);
+  preConditions.checkIfNumber(ROYGBIV.setTextCenterPosition, preConditions.z, z);
   var centerPos = text.getCenterCoordinates();
   text.mesh.position.set(
     text.mesh.position.x + (x - centerPos.x),
@@ -4319,14 +4227,8 @@ Roygbiv.prototype.hideText = function(text){
   if (mode == 0){
     return;
   }
-  if (typeof text == UNDEFINED){
-    throw new Error("hideText error: text is not defined.");
-    return;
-  }
-  if (!text.isAddedText){
-    throw new Error("hideText error: text is not a text object.");
-    return;
-  }
+  preConditions.checkIfDefined(ROYGBIV.hideText, preConditions.text, text);
+  preConditions.checkIfAddedText(ROYGBIV.hideText, preConditions.text, text);
   if (text.mesh.visible){
     text.hide();
   }
@@ -4339,14 +4241,8 @@ Roygbiv.prototype.showText = function(text){
   if (mode == 0){
     return;
   }
-  if (typeof text == UNDEFINED){
-    throw new Error("showText error: text is not defined.");
-    return;
-  }
-  if (!text.isAddedText){
-    throw new Error("showText error: text is not a text object.");
-    return;
-  }
+  preConditions.checkIfDefined(ROYGBIV.showText, preConditions.text, text);
+  preConditions.checkIfAddedText(ROYGBIV.showText, preConditions.text, text);
   if (!text.mesh.visible){
     text.show();
   }
@@ -4360,18 +4256,12 @@ Roygbiv.prototype.vector = function(x, y, z){
   if (mode == 0){
     return;
   }
-  if (typeof x == UNDEFINED){
-    throw new Error("vector error: x is not defined.");
-    return;
-  }
-  if (typeof y == UNDEFINED){
-    throw new Error("vector error: y is not defined.");
-    return;
-  }
-  if (typeof z == UNDEFINED){
-    throw new Error("vector error: z is not defined.");
-    return;
-  }
+  preConditions.checkIfDefined(ROYGBIV.vector, preConditions.x, x);
+  preConditions.checkIfDefined(ROYGBIV.vector, preConditions.y, y);
+  preConditions.checkIfDefined(ROYGBIV.vector, preConditions.z, z);
+  preConditions.checkIfNumber(ROYGBIV.vector, preConditions.x, x);
+  preConditions.checkIfNumber(ROYGBIV.vector, preConditions.y, y);
+  preConditions.checkIfNumber(ROYGBIV.vector, preConditions.z, z);
   var obj = new Object();
   obj.x = x;
   obj.y = y;
@@ -4386,22 +4276,10 @@ Roygbiv.prototype.distance = function(vec1, vec2){
   if (mode == 0){
     return;
   }
-  if (!vec1){
-    throw new Error("distance error: vec1 is not defined.");
-    return;
-  }
-  if (!vec2){
-    throw new Error("distance error: vec2 is not defined.");
-    return;
-  }
-  if (isNaN(vec1.x) || isNaN(vec1.y) || isNaN(vec1.z)){
-    throw new Error("distance error: vec1 is not a vector.");
-    return;
-  }
-  if (isNaN(vec2.x) || isNaN(vec2.y) || isNaN(vec2.z)){
-    throw new Error("distance error: vec2 is not a vector.");
-    return;
-  }
+  preConditions.checkIfDefined(ROYGBIV.distance, preConditions.vec1, vec1);
+  preConditions.checkIfDefined(ROYGBIV.distance, preConditions.vec2, vec2);
+  preConditions.checkIfVectorOnlyIfDefined(ROYGBIV.distance, preConditions.vec1, vec1);
+  preConditions.checkIfVectorOnlyIfDefined(ROYGBIV.distance, preConditions.vec2, vec2);
   var dx = vec2.x - vec1.x;
   var dy = vec2.y - vec1.y;
   var dz = vec2.z - vec1.z;
@@ -4416,27 +4294,12 @@ Roygbiv.prototype.sub = function(vec1, vec2, targetVector){
   if (mode == 0){
     return;
   }
-  if (!vec1){
-    throw new Error("sub error: vec1 is not defined.");
-    return;
-  }
-  if (!vec2){
-    throw new Error("sub error: vec2 is not defined.");
-    return;
-  }
-  if (isNaN(vec1.x) || isNaN(vec1.y) || isNaN(vec1.z)){
-    throw new Error("sub error: vec1 is not a vector.");
-    return;
-  }
-  if (isNaN(vec2.x) || isNaN(vec2.y) || isNaN(vec2.z)){
-    throw new Error("sub error: vec2 is not a vector.");
-    return;
-  }
+  preConditions.checkIfDefined(ROYGBIV.sub, preConditions.vec1, vec1);
+  preConditions.checkIfDefined(ROYGBIV.sub, preConditions.vec2, vec2);
+  preConditions.checkIfVectorOnlyIfDefined(ROYGBIV.sub, preConditions.vec1, vec1);
+  preConditions.checkIfVectorOnlyIfDefined(ROYGBIV.sub, preConditions.vec2, vec2);
+  preConditions.checkIfVectorOnlyIfDefined(ROYGBIV.sub, preConditions.targetVector, targetVector);
   if (!(typeof targetVector == UNDEFINED)){
-    if (isNaN(targetVector.x) || isNaN(targetVector.y) || isNaN(targetVector.z)){
-      throw new Error("sub error: Bad targetVector parameter.");
-      return;
-    }
     targetVector.x = vec1.x - vec2.x;
     targetVector.y = vec1.y - vec2.y;
     targetVector.z = vec1.z - vec2.z;
@@ -4451,25 +4314,20 @@ Roygbiv.prototype.sub = function(vec1, vec2, targetVector){
 
 // add
 //  Returns the summation of two vectors.
-Roygbiv.prototype.add = function(vec1, vec2){
+Roygbiv.prototype.add = function(vec1, vec2, targetVector){
   if (mode == 0){
     return;
   }
-  if (!vec1){
-    throw new Error("add error: vec1 is not defined.");
-    return;
-  }
-  if (!vec2){
-    throw new Error("add error: vec2 is not defined.");
-    return;
-  }
-  if (isNaN(vec1.x) || isNaN(vec1.y) || isNaN(vec1.z)){
-    throw new Error("add error: vec1 is not a vector.");
-    return;
-  }
-  if (isNaN(vec2.x) || isNaN(vec2.y) || isNaN(vec2.z)){
-    throw new Error("add error: vec2 is not a vector.");
-    return;
+  preConditions.checkIfDefined(ROYGBIV.add, preConditions.vec1, vec1);
+  preConditions.checkIfDefined(ROYGBIV.add, preConditions.vec2, vec2);
+  preConditions.checkIfVectorOnlyIfDefined(ROYGBIV.add, preConditions.vec1, vec1);
+  preConditions.checkIfVectorOnlyIfDefined(ROYGBIV.add, preConditions.vec2, vec2);
+  preConditions.checkIfVectorOnlyIfDefined(ROYGBIV.add, preConditions.targetVector, targetVector);
+  if (!(typeof targetVector == UNDEFINED)){
+    targetVector.x = vec1.x + vec2.x;
+    targetVector.y = vec1.y + vec2.y;
+    targetVector.z = vec1.z + vec2.z;
+    return targetVector;
   }
   var obj = new Object();
   obj.x = vec1.x + vec2.x;
@@ -4485,34 +4343,14 @@ Roygbiv.prototype.moveTowards = function(vec1, vec2, amount, targetVector){
   if (mode == 0){
     return;
   }
-  if (!vec1){
-    throw new Error("moveTowards error: vec1 is not defined.");
-    return;
-  }
-  if (!vec2){
-    throw new Error("moveTowards error: vec2 is not defined.");
-    return;
-  }
-  if (isNaN(vec1.x) || isNaN(vec1.y) || isNaN(vec1.z)){
-    throw new Error("moveTowards error: vec1 is not a vector.");
-    return;
-  }
-  if (isNaN(vec2.x) || isNaN(vec2.y) || isNaN(vec2.z)){
-    throw new Error("moveTowards error: vec2 is not a vector.");
-    return;
-  }
-  if (typeof amount == UNDEFINED){
-    throw new Error("moveTowards error: amount is not defined.");
-    return;
-  }
-  if (isNaN(amount)){
-    throw new Error("moveTowards error: amount is not a number.");
-    return;
-  }
+  preConditions.checkIfDefined(ROYGBIV.moveTowards, preConditions.vec1, vec1);
+  preConditions.checkIfDefined(ROYGBIV.moveTowards, preConditions.vec2, vec2);
+  preConditions.checkIfVectorOnlyIfDefined(ROYGBIV.moveTowards, preConditions.vec1, vec1);
+  preConditions.checkIfVectorOnlyIfDefined(ROYGBIV.moveTowards, preConditions.vec2, vec2);
+  preConditions.checkIfDefined(ROYGBIV.moveTowards, preConditions.amount, amount);
+  preConditions.checkIfNumber(ROYGBIV.moveTowards, preConditions.amount, amount);
+  preConditions.checkIfVectorOnlyIfDefined(ROYGBIV.moveTowards, preConditions.targetVector, targetVector);
   if (!(typeof targetVector == UNDEFINED)){
-    if (isNaN(targetVector.x) || isNaN(targetVector.y) || isNaN(targetVector.z)){
-      throw new Error("moveTowards error: Bad targetVector parameter.");
-    }
     var diff = this.sub(vec2, vec1, targetVector);
     targetVector.x = vec1.x + (amount * diff.x);
     targetVector.y = vec1.y + (amount * diff.y);
@@ -4535,19 +4373,8 @@ Roygbiv.prototype.applyNoise = function(vec, amount){
   if (mode == 0){
     return;
   }
-  if (!vec){
-    throw new Error("applyNoise error: vector is not defined.");
-    return;
-  }
-  if (typeof vec.x == UNDEFINED || typeof vec.y == UNDEFINED || typeof vec.z == UNDEFINED){
-    throw new Error("applyNoise error: vector format not supported.");
-    return;
-  }
-  if (isNaN(vec.x) || isNaN(vec.y) || isNaN(vec.z)){
-    throw new Error("applyNoise error: vector format not supported.");
-    return;
-  }
-
+  preConditions.checkIfDefined(ROYGBIV.applyNoise, preConditions.vec, vec);
+  preConditions.checkIfVectorOnlyIfDefined(ROYGBIV.applyNoise, preConditions.vec, vec);
   var toNormalize = REUSABLE_VECTOR.set(vec.x, vec.y, vec.z);
   toNormalize.normalize();
   var noiseAmount = noise.perlin3(
@@ -4575,25 +4402,14 @@ Roygbiv.prototype.sphericalDistribution = function(radius){
   if (mode == 0){
     return;
   }
-  if (!radius){
-    throw new Error("sphericalDistribution error: radius is not defined.");
-    return;
-  }
-  if (isNaN(radius)){
-    throw new Error("sphericalDistribution error: radius is not numerical.");
-    return;
-  }
-  if (radius <= 0){
-    throw new Error("sphericalDistribution error: radius is not a positive number.");
-    return;
-  }
-
+  preConditions.checkIfDefined(ROYGBIV.sphericalDistribution, preConditions.radius, radius);
+  preConditions.checkIfNumber(ROYGBIV.sphericalDistribution, preConditions.radius, radius);
+  preConditions.checkIfLessThan(ROYGBIV.sphericalDistribution, preConditions.radius, radius, 0);
   REUSABLE_VECTOR.set(
     Math.random() - 0.5,
     Math.random() - 0.5,
     Math.random() - 0.5
   );
-
   REUSABLE_VECTOR.normalize();
   REUSABLE_VECTOR.multiplyScalar(radius);
   return this.vector(REUSABLE_VECTOR.x, REUSABLE_VECTOR.y, REUSABLE_VECTOR.z);
@@ -4614,18 +4430,15 @@ Roygbiv.prototype.boxDistribution = function(sizeX, sizeY, sizeZ, side){
   if (mode == 0){
     return;
   }
-  if (typeof sizeX == UNDEFINED || typeof sizeY == UNDEFINED || typeof sizeZ == UNDEFINED){
-    throw new Error("boxDistribution error: Bad parameters.");
-    return;
-  }
-  if (isNaN(sizeX) || isNaN(sizeY) || isNaN(sizeZ)){
-    throw new Error("boxDistribution error: Bad parameters.");
-    return;
-  }
-  if (sizeX < 0 || sizeY < 0 || sizeZ < 0){
-    throw new Error("boxDistribution error: Bad parameters.");
-    return;
-  }
+  preConditions.checkIfDefined(ROYGBIV.boxDistribution, preConditions.sizeX, sizeX);
+  preConditions.checkIfDefined(ROYGBIV.boxDistribution, preConditions.sizeY, sizeY);
+  preConditions.checkIfDefined(ROYGBIV.boxDistribution, preConditions.sizeZ, sizeZ);
+  preConditions.checkIfNumber(ROYGBIV.boxDistribution, preConditions.sizeX, sizeX);
+  preConditions.checkIfNumber(ROYGBIV.boxDistribution, preConditions.sizeY, sizeY);
+  preConditions.checkIfNumber(ROYGBIV.boxDistribution, preConditions.sizeZ, sizeZ);
+  preConditions.checkIfLessThanExclusive(ROYGBIV.boxDistribution, preConditions.sizeX, sizeX, 0);
+  preConditions.checkIfLessThanExclusive(ROYGBIV.boxDistribution, preConditions.sizeY, sizeY, 0);
+  preConditions.checkIfLessThanExclusive(ROYGBIV.boxDistribution, preConditions.sizeZ, sizeZ, 0);
   var randomSide = Math.floor(Math.random() * 6) + 1;
   if (typeof side != UNDEFINED &&!isNaN(side) && side <= 6 && side >= 1){
     randomSide = side;
@@ -4675,30 +4488,19 @@ Roygbiv.prototype.color = function(colorName){
   if (mode == 0){
     return;
   }
-  if (!colorName){
-    throw new Error("color error: colorName is not defined.");
-    return;
-  }
+  preConditions.checkIfDefined(ROYGBIV.color, preConditions.colorName, colorName);
   return new THREE.Color(colorName.toLowerCase());
 }
 
 // runScript
-//  Starts a script of the given name. If parameters are provided, they may
-//  be reached using this.[parameterName] within the newly started script.
-Roygbiv.prototype.runScript = function(name, parameters){
+//  Starts a script of the given name.
+Roygbiv.prototype.runScript = function(name){
   if (mode == 0){
     return;
   }
+  preConditions.checkIfDefined(ROYGBIV.runScript, preConditions.name, name);
   var script = scripts[name];
-  if (!script){
-    throw new Error("runScript error: Script is undefined.");
-    return;
-  }
-  if (parameters){
-    for (var key in parameters){
-      script[key] = parameters[key];
-    }
-  }
+  preConditions.checkIfScriptExists(ROYGBIV.runScript, null, script);
   script.start();
 }
 
@@ -4708,12 +4510,10 @@ Roygbiv.prototype.isRunning = function(name){
   if (mode == 0){
     return;
   }
+  preConditions.checkIfDefined(ROYGBIV.isRunning, preConditions.name, name);
   var script = scripts[name];
-  if (!script){
-    throw new Error("isRunning error: Script is undefined.");
-    return;
-  }
-  return script.status == SCRIPT_STATUS_STARTED;
+  preConditions.checkIfScriptExists(ROYGBIV.isRunning, null, script);
+  return script.isRunning();
 }
 
 // normalizeVector
@@ -4723,14 +4523,8 @@ Roygbiv.prototype.normalizeVector = function(vector){
   if (mode == 0){
     return;
   }
-  if (typeof vector == UNDEFINED){
-    throw new Error("normalizeVector error: vector is not defined.");
-    return;
-  }
-  if (isNaN(vector.x) || isNaN(vector.y) || isNaN(vector.z)){
-    throw new Error("normalizeVector error: Bad vector parameter.");
-    return;
-  }
+  preConditions.checkIfDefined(ROYGBIV.normalizeVector, preConditions.vector, vector);
+  preConditions.checkIfVectorOnlyIfDefined(ROYGBIV.normalizeVector, preConditions.vector, vector);
   var len = Math.sqrt((vector.x * vector.x) + (vector.y * vector.y) + (vector.z * vector.z));
   vector.x = vector.x / len;
   vector.y = vector.y / len;
@@ -4743,28 +4537,11 @@ Roygbiv.prototype.computeQuaternionFromVectors = function(vec1, vec2, targetQuat
   if (mode == 0){
     return;
   }
-  if (typeof vec1 == UNDEFINED){
-    throw new Error("computeQuaternionFromVectors error: vec1 is not defined.");
-    return;
-  }
-  if (typeof vec2 == UNDEFINED){
-    throw new Error("computeQuaternionFromVectors error: vec2 is not defined.");
-    return;
-  }
-  if (isNaN(vec1.x) || isNaN(vec1.y) || isNaN(vec1.z)){
-    throw new Error("computeQuaternionFromVectors error: Bad vec1 parameter.");
-    return;
-  }
-  if (isNaN(vec2.x) || isNaN(vec2.y) || isNaN(vec2.z)){
-    throw new Error("computeQuaternionFromVectors error: Bad vec2 parameter.");
-    return;
-  }
-  if (!(typeof targetQuaternion == UNDEFINED)){
-    if (isNaN(targetQuaternion.x) || isNaN(targetQuaternion.y) || isNaN(targetQuaternion.z) || isNaN(targetQuaternion.w)){
-      throw new Error("computeQuaternionFromVectors error: Bad targetQuaternion parameter.");
-      return;
-    }
-  }
+  preConditions.checkIfDefined(ROYGBIV.computeQuaternionFromVectors, preConditions.vec1, vec1);
+  preConditions.checkIfDefined(ROYGBIV.computeQuaternionFromVectors, preConditions.vec2, vec2);
+  preConditions.checkIfVectorOnlyIfDefined(ROYGBIV.computeQuaternionFromVectors, preConditions.vec1, vec1);
+  preConditions.checkIfVectorOnlyIfDefined(ROYGBIV.computeQuaternionFromVectors, preConditions.vec2, vec2);
+  preConditions.checkIfQuaternionOnlyIfDefined(ROYGBIV.computeQuaternionFromVectors, preConditions.targetQuaternion, targetQuaternion);
   this.normalizeVector(vec1);
   this.normalizeVector(vec2);
   REUSABLE_VECTOR.set(vec1.x, vec1.y, vec1.z);
@@ -4787,24 +4564,10 @@ Roygbiv.prototype.circularDistribution = function(radius, quaternion){
   if (mode == 0){
     return;
   }
-  if (typeof radius == UNDEFINED){
-    throw new Error("circularDistribution error: radius is not defined.");
-    return;
-  }
-  if (isNaN(radius)){
-    throw new Error("circularDistribution error: Bad radius parameter.");
-    return;
-  }
-  if (radius <= 0){
-    throw new Error("circularDistribution error: radius must be greater than zero.");
-    return;
-  }
-  if (!(typeof quaternion == UNDEFINED)){
-    if (isNaN(quaternion.x) || isNaN(quaternion.y) || isNaN(quaternion.y) || isNaN(quaternion.w)){
-      throw new Error("circularDistribution error: Bad quaternion parameter.");
-      return;
-    }
-  }
+  preConditions.checkIfDefined(ROYGBIV.circularDistribution, preConditions.radius, radius);
+  preConditions.checkIfNumber(ROYGBIV.circularDistribution, preConditions.radius, radius);
+  preConditions.checkIfLessThan(ROYGBIV.circularDistribution, preConditions.radius, radius, 0);
+  preConditions.checkIfQuaternionOnlyIfDefined(ROYGBIV.circularDistribution, preConditions.quaternion, quaternion);
   REUSABLE_VECTOR_3.set(
     Math.random() - 0.5,
     Math.random() - 0.5,
@@ -4824,28 +4587,11 @@ Roygbiv.prototype.multiplyScalar = function(vector, scalar, targetVector){
   if (mode == 0){
     return;
   }
-  if (typeof scalar == UNDEFINED){
-    throw new Error("multiplyScalar error: scalar is not defined.");
-    return;
-  }
-  if (isNaN(scalar)){
-    throw new Error("multiplyScalar error: Bad scalar parameter.");
-    return;
-  }
-  if (typeof vector == UNDEFINED){
-    throw new Error("multiplyScalar error: vector is not defined.");
-    return;
-  }
-  if (isNaN(vector.x) || isNaN(vector.y) || isNaN(vector.z)){
-    throw new Error("multiplyScalar error: Bad vector parameter.");
-    return;
-  }
-  if (!(typeof targetVector == UNDEFINED)){
-    if (isNaN(targetVector.x) || isNaN(targetVector.y) || isNaN(targetVector.z)){
-      throw new Error("multiplyScalar error: Bad targetVector parameter.");
-      return;
-    }
-  }
+  preConditions.checkIfDefined(ROYGBIV.multiplyScalar, preConditions.scalar, scalar);
+  preConditions.checkIfNumber(ROYGBIV.multiplyScalar, preConditions.scalar, scalar);
+  preConditions.checkIfDefined(ROYGBIV.multiplyScalar, preConditions.vector, vector);
+  preConditions.checkIfVectorOnlyIfDefined(ROYGBIV.multiplyScalar, preConditions.vector, vector);
+  preConditions.checkIfVectorOnlyIfDefined(ROYGBIV.targetVector, preConditions.targetVector, targetVector);
   if (!targetVector){
     return this.vector(vector.x * scalar, vector.y * scalar, vector.z * scalar);
   }else{
@@ -4862,26 +4608,14 @@ Roygbiv.prototype.setVector = function(vector, x, y, z){
   if (mode == 0){
     return;
   }
-  if (typeof vector == UNDEFINED){
-    throw new Error("setVector error: vector is not defined.");
-    return;
-  }
-  if (typeof x == UNDEFINED){
-    throw new Error("setVector error: x is not defined.");
-    return;
-  }
-  if (typeof y == UNDEFINED){
-    throw new Error("setVector error: y is not defined.");
-    return;
-  }
-  if (typeof z == UNDEFINED){
-    throw new Error("setVector error: z is not defined.");
-    return;
-  }
-  if (isNaN(x) || isNaN(y) || isNaN(y)){
-    throw new Error("setVector error: Components must be numerical.");
-    return;
-  }
+  preConditions.checkIfDefined(ROYGBIV.setVector, preConditions.vector, vector);
+  preConditions.checkIfVectorOnlyIfDefined(ROYGBIV.setVector, preConditions.vector, vector);
+  preConditions.checkIfDefined(ROYGBIV.setVector, preConditions.x, x);
+  preConditions.checkIfDefined(ROYGBIV.setVector, preConditions.y, y);
+  preConditions.checkIfDefined(ROYGBIV.setVector, preConditions.z, z);
+  preConditions.checkIfNumber(ROYGBIV.setVector, preConditions.x, x);
+  preConditions.checkIfNumber(ROYGBIV.setVector, preConditions.y, y);
+  preConditions.checkIfNumber(ROYGBIV.setVector, preConditions.z, z);
   vector.x = x;
   vector.y = y;
   vector.z = z;
@@ -4900,10 +4634,7 @@ Roygbiv.prototype.requestPointerLock = function(){
   if (mode == 0){
     return;
   }
-  if (!pointerLockSupported || isMobile){
-    throw new Error("requestPointerLock error: Pointer Lock API is not supported by this browser.");
-    return;
-  }
+  preConditions.checkIfTrue(ROYGBIV.requestPointerLock, "Pointer Lock API is not supported by this browser", (!pointerLockSupported || isMobile));
   pointerLockRequested = true;
 }
 
@@ -4913,10 +4644,8 @@ Roygbiv.prototype.convertEulerToDegrees = function(eulerAngle){
   if (mode == 0){
     return;
   }
-  if (typeof eulerAngle == UNDEFINED){
-    throw new Error("convertEulerToDegrees error: eulerAngle is not defined.");
-    return;
-  }
+  preConditions.checkIfDefined(ROYGBIV.convertEulerToDegrees, preConditions.eulerAngle, eulerAngle);
+  preConditions.checkIfNumber(ROYGBIV.convertEulerToDegrees, preConditions.eulerAngle, eulerAngle);
   return ((eulerAngle * 180) / Math.PI);
 }
 
@@ -4927,14 +4656,8 @@ Roygbiv.prototype.disableDefaultControls = function(isDisabled){
   if (mode == 0){
     return;
   }
-  if (typeof isDisabled == UNDEFINED){
-    throw new Error("disableDefaultControls error: isDisabled is not defined.");
-    return;
-  }
-  if (!(typeof isDisabled == "boolean")){
-    throw new Error("disableDefaultControls error: isDisabled is not a boolean.");
-    return;
-  }
+  preConditions.checkIfDefined(ROYGBIV.disableDefaultControls, preConditions.isDisabled, isDisabled);
+  preConditions.checkIfBooleanOnlyIfExists(ROYGBIV.disableDefaultControls, preConditions.isDisabled, isDisabled);
   defaultCameraControlsDisabled = isDisabled;
 }
 
@@ -4945,10 +4668,7 @@ Roygbiv.prototype.isKeyPressed = function(key){
   if (mode == 0){
     return;
   }
-  if (typeof key == UNDEFINED){
-    throw new Error("isKeyPressed error: key is not defined.");
-    return;
-  }
+  preConditions.checkIfDefined(ROYGBIV.isKeyPressed, preConditions.key, key);
   return keyboardBuffer[key];
 }
 
@@ -4958,30 +4678,12 @@ Roygbiv.prototype.setCameraPosition = function(x, y, z){
   if (mode == 0){
     return;
   }
-  if (typeof x == UNDEFINED){
-    throw new Error("setCameraPosition error: x is not defined.");
-    return;
-  }
-  if (typeof y == UNDEFINED){
-    throw new Error("setCameraPosition error: y is not defined.");
-    return;
-  }
-  if (typeof z == UNDEFINED){
-    throw new Error("setCameraPosition error: z is not defined.");
-    return;
-  }
-  if (isNaN(x)){
-    throw new Error("setCameraPosition error: x is not a number.");
-    return;
-  }
-  if (isNaN(y)){
-    throw new Error("setCameraPosition error: y is not a number.");
-    return;
-  }
-  if (isNaN(z)){
-    throw new Error("setCameraPosition error: z is not a number.");
-    return;
-  }
+  preConditions.checkIfDefined(ROYGBIV.setCameraPosition, preConditions.x, x);
+  preConditions.checkIfDefined(ROYGBIV.setCameraPosition, preConditions.y, y);
+  preConditions.checkIfDefined(ROYGBIV.setCameraPosition, preConditions.z, z);
+  preConditions.checkIfNumber(ROYGBIV.setCameraPosition, preConditions.x, x);
+  preConditions.checkIfNumber(ROYGBIV.setCameraPosition, preConditions.y, y);
+  preConditions.checkIfNumber(ROYGBIV.setCameraPosition, preConditions.z, z);
   camera.position.set(x, y, z);
 }
 
@@ -4991,30 +4693,12 @@ Roygbiv.prototype.lookAt = function(x, y, z){
   if (mode == 0){
     return;
   }
-  if (typeof x == UNDEFINED){
-    throw new Error("lookAt error: x is not defined.");
-    return;
-  }
-  if (typeof y == UNDEFINED){
-    throw new Error("lookAt error: y is not defined.");
-    return;
-  }
-  if (typeof z == UNDEFINED){
-    throw new Error("lookAt error: z is not defined.");
-    return;
-  }
-  if (isNaN(x)){
-    throw new Error("lookAt error: x is not a number.");
-    return;
-  }
-  if (isNaN(y)){
-    throw new Error("lookAt error: y is not a number.");
-    return;
-  }
-  if (isNaN(z)){
-    throw new Error("lookAt error: z is not a number.");
-    return;
-  }
+  preConditions.checkIfDefined(ROYGBIV.lookAt, preConditions.x, x);
+  preConditions.checkIfDefined(ROYGBIV.lookAt, preConditions.y, y);
+  preConditions.checkIfDefined(ROYGBIV.lookAt, preConditions.z, z);
+  preConditions.checkIfNumber(ROYGBIV.lookAt, preConditions.x, x);
+  preConditions.checkIfNumber(ROYGBIV.lookAt, preConditions.y, y);
+  preConditions.checkIfNumber(ROYGBIV.lookAt, preConditions.z, z);
   camera.lookAt(x, y, z);
 }
 
@@ -5024,38 +4708,17 @@ Roygbiv.prototype.applyAxisAngle = function(vector, axisVector, angle, targetVec
   if (mode == 0){
     return;
   }
-  if (typeof vector == UNDEFINED){
-    throw new Error("applyAxisAngle error: vector is not defined.");
-    return;
-  }
-  if (typeof axisVector == UNDEFINED){
-    throw new Error("applyAxisAngle error: axisVector is not defined.");
-    return;
-  }
-  if (typeof angle == UNDEFINED){
-    throw new Error("applyAxisAngle error: angle is not defined.");
-    return;
-  }
-  if (isNaN(vector.x) || isNaN(vector.y) || isNaN(vector.z)){
-    throw new Error("applyAxisAngle error: Bad vector parameter.");
-    return;
-  }
-  if (isNaN(axisVector.x) || isNaN(axisVector.y) || isNaN(axisVector.z)){
-    throw new Error("applyAxisAngle error: Bad axisVector parameter.");
-    return;
-  }
-  if (isNaN(angle)){
-    throw new Error("applyAxisAngle error: Bad angle parameter.");
-    return;
-  }
+  preConditions.checkIfDefined(ROYGBIV.applyAxisAngle, preConditions.vector, vector);
+  preConditions.checkIfVectorOnlyIfDefined(ROYGBIV.applyAxisAngle, preConditions.vector, vector);
+  preConditions.checkIfDefined(ROYGBIV.applyAxisAngle, preConditions.axisVector, axisVector);
+  preConditions.checkIfVectorOnlyIfDefined(ROYGBIV.applyAxisAngle, preConditions.axisVector, axisVector);
+  preConditions.checkIfDefined(ROYGBIV.applyAxisAngle, preConditions.angle, angle);
+  preConditions.checkIfNumber(ROYGBIV.applyAxisAngle, preConditions.angle, angle);
+  preConditions.checkIfVectorOnlyIfDefined(ROYGBIV.applyAxisAngle, preConditions.targetVector, targetVector);
   REUSABLE_VECTOR.set(vector.x, vector.y, vector.z);
   REUSABLE_VECTOR_2.set(axisVector.x, axisVector.y, axisVector.z);
   REUSABLE_VECTOR.applyAxisAngle(REUSABLE_VECTOR_2, angle);
   if (!(typeof targetVector == UNDEFINED)){
-    if (isNaN(targetVector.x) || isNaN(targetVector.y) || isNaN(targetVector.z)){
-      throw new Error("applyAxisAngle errorİ Bad targetVector parameter.");
-      return;
-    }
     targetVector.x = REUSABLE_VECTOR.x;
     targetVector.y = REUSABLE_VECTOR.y;
     targetVector.z = REUSABLE_VECTOR.z;
@@ -5070,38 +4733,15 @@ Roygbiv.prototype.trackObjectPosition = function(sourceObject, targetObject){
   if (mode == 0){
     return;
   }
-  if (typeof sourceObject == UNDEFINED){
-    throw new Error("trackObjectPosition error: sourceObject is not defined.");
-    return;
-  }
-  if (typeof targetObject == UNDEFINED){
-    throw new Error("trackObjectPosition error: targetObject is not defined.");
-    return;
-  }
-  if (!(sourceObject.isAddedObject || sourceObject.isObjectGroup)){
-    throw new Error("trackObjectPosition error: sourceObject type not supported.");
-    return;
-  }
-  if (!(targetObject.isAddedObject || targetObject.isObjectGroup)){
-    throw new Error("trackObjectPosition error: targetObject type not supported.");
-    return;
-  }
-  if (targetObject.parentObjectName || sourceObject.parentObjectName){
-    throw new Error("trackObjectPosition error: Child objects do not support this function.");
-    return;
-  }
-  if (!targetObject.isDynamicObject){
-    throw new Error("trackObjectPosition error: targetObject is not a dynamic object.");
-    return;
-  }
-  if (sourceObject.isDynamicObject){
-    throw new Error("trackObjectPosition error: sourceObject is a dynamic object.");
-    return;
-  }
-  if (!sourceObject.isChangeable){
-    throw new Error("trackObjectPosition error: sourceObject is not marked as changeable.");
-    return;
-  }
+  preConditions.checkIfDefined(ROYGBIV.trackObjectPosition, preConditions.sourceObject, sourceObject);
+  preConditions.checkIfDefined(ROYGBIV.trackObjectPosition, preConditions.targetObject, targetObject);
+  preConditions.checkIfAddedObjectOrObjectGroup(ROYGBIV.trackObjectPosition, preConditions.sourceObject, sourceObject);
+  preConditions.checkIfAddedObjectOrObjectGroup(ROYGBIV.trackObjectPosition, preConditions.targetObject, targetObject);
+  preConditions.checkIfChildObjectOnlyIfExists(ROYGBIV.trackObjectPosition, preConditions.sourceObject, sourceObject);
+  preConditions.checkIfChildObjectOnlyIfExists(ROYGBIV.trackObjectPosition, preConditions.targetObject, targetObject);
+  preConditions.checkIfDynamic(ROYGBIV.trackObjectPosition, preConditions.targetObject, targetObject);
+  preConditions.checkIfNotDynamic(ROYGBIV.trackObjectPosition, preConditions.sourceObject, sourceObject);
+  preConditions.checkIfChangeable(ROYGBIV.trackObjectPosition, preConditions.sourceObject, sourceObject);
   sourceObject.trackedObject = targetObject;
   targetObject.isTracked = true;
   trackingObjects[sourceObject.name] = sourceObject;
@@ -5116,14 +4756,8 @@ Roygbiv.prototype.untrackObjectPosition = function(sourceObject){
   if (mode == 0){
     return;
   }
-  if (typeof sourceObject == UNDEFINED){
-    throw new Error("untrackObjectPosition error: sourceObject is not defined.");
-    return;
-  }
-  if (!(sourceObject.isAddedObject || sourceObject.isObjectGroup)){
-    throw new Error("untrackObjectPosition error: sourceObject type not supported.");
-    return;
-  }
+  preConditions.checkIfDefined(ROYGBIV.untrackObjectPosition, preConditions.sourceObject, sourceObject);
+  preConditions.checkIfAddedObjectOrObjectGroup(ROYGBIV.untrackObjectPosition, preConditions.sourceObject, sourceObject);
   delete sourceObject.trackedObject;
   delete trackingObjects[sourceObject.name];
 }
@@ -5137,26 +4771,14 @@ Roygbiv.prototype.createRotationPivot = function(sourceObject, offsetX, offsetY,
   if (mode == 0){
     return;
   }
-  if (typeof sourceObject == UNDEFINED){
-    throw new Error("createRotationPivot error: sourceObject is not defined.");
-    return;
-  }
-  if (!(sourceObject.isAddedObject || sourceObject.isObjectGroup)){
-    throw new Error("createRotationPivot error: Unsupported type.");
-    return;
-  }
-  if (isNaN(offsetX)){
-    throw new Error("createRotationPivot error: offsetX is not a number.");
-    return;
-  }
-  if (isNaN(offsetY)){
-    throw new Error("createRotationPivot error: offsetY is not a number.");
-    return;
-  }
-  if (isNaN(offsetZ)){
-    throw new Error("createRotationPivot error: offsetZ is not a number.");
-    return;
-  }
+  preConditions.checkIfDefined(ROYGBIV.createRotationPivot, preConditions.sourceObject, sourceObject);
+  preConditions.checkIfAddedObjectOrObjectGroup(ROYGBIV.createRotationPivot, preConditions.sourceObject, sourceObject);
+  preConditions.checkIfDefined(ROYGBIV.createRotationPivot, preConditions.offsetX, offsetX);
+  preConditions.checkIfDefined(ROYGBIV.createRotationPivot, preConditions.offsetY, offsetY);
+  preConditions.checkIfDefined(ROYGBIV.createRotationPivot, preConditions.offsetZ, offsetZ);
+  preConditions.checkIfNumber(ROYGBIV.createRotationPivot, preConditions.offsetX, offsetX);
+  preConditions.checkIfNumber(ROYGBIV.createRotationPivot, preConditions.offsetY, offsetY);
+  preConditions.checkIfNumber(ROYGBIV.createRotationPivot, preConditions.offsetZ, offsetZ);
   return sourceObject.makePivot(offsetX, offsetY, offsetZ);
 }
 
@@ -5166,23 +4788,11 @@ Roygbiv.prototype.rotateCamera = function(axis, radians){
   if (mode == 0){
     return;
   }
-  if (typeof axis == UNDEFINED){
-    throw new Error("rotateCamera error: axis is not defined.");
-    return;
-  }
-  if (typeof radians == UNDEFINED){
-    throw new Error("rotateCamera error: radians is not defined.");
-    return;
-  }
+  preConditions.checkIfDefined(ROYGBIV.rotateCamera, preConditions.axis, axis);
+  preConditions.checkIfDefined(ROYGBIV.rotateCamera, preConditions.radians, radians);
+  preConditions.checkIfNumber(ROYGBIV.rotateCamera, preConditions.radians, radians);
   axis = axis.toLowerCase();
-  if (axis != "x" && axis != "y" && axis != "z"){
-    throw new Error("rotateCamera error: axis must be x, y or z.");
-    return;
-  }
-  if (isNaN(radians)){
-    throw new Error("rotateCamera error: radians is not a number.");
-    return;
-  }
+  preConditions.checkIfAxisOnlyIfDefined(ROYGBIV.rotateCamera, preConditions.axis, axis);
   if (axis == "x"){
     cameraRotationBuffer.x += radians;
   }else if (axis == "y"){
@@ -5198,23 +4808,11 @@ Roygbiv.prototype.translateCamera = function(axis, amount){
   if (mode == 0){
     return;
   }
-  if (typeof axis == UNDEFINED){
-    throw new Error("translateCamera error: axis is not defined.");
-    return;
-  }
-  if (typeof amount == UNDEFINED){
-    throw new Error("translateCamera error: amount is not defined.");
-    return;
-  }
+  preConditions.checkIfDefined(ROYGBIV.translateCamera, preConditions.axis, axis);
+  preConditions.checkIfDefined(ROYGBIV.translateCamera, preConditions.amount, amount);
+  preConditions.checkIfNumber(ROYGBIV.translateCamera, preConditions.amount, amount);
   axis = axis.toLowerCase();
-  if (axis != "x" && axis != "y" && axis != "z"){
-    throw new Error("translateCamera error: axis must be x, y or z.");
-    return;
-  }
-  if (isNaN(amount)){
-    throw new Error("translateCamera error: amount is not a number.");
-    return;
-  }
+  preConditions.checkIfAxisOnlyIfDefined(ROYGBIV.translateCamera, preConditions.axis, axis);
   if (axis == "x"){
     camera.translateX(amount * defaultAspect / camera.aspect);
   }else if (axis == "y"){
@@ -5254,26 +4852,11 @@ Roygbiv.prototype.intersectionTest = function(fromVector, directionVector, targe
   if (mode == 0){
     return;
   }
-  if (typeof fromVector == UNDEFINED){
-    throw new Error("intersectionTest error: fromVector is not defined.");
-    return;
-  }
-  if (isNaN(fromVector.x) || isNaN(fromVector.y) || isNaN(fromVector.z)){
-    throw new Error("intersectionTest error: fromVector is not a vector.");
-    return;
-  }
-  if (typeof directionVector == UNDEFINED){
-    throw new Error("intersectionTest error: directionVector is not defined.");
-    return;
-  }
-  if (isNaN(directionVector.x) || isNaN(directionVector.y) || isNaN(directionVector.z)){
-    throw new Error("intersectionTest error: directionVector is not a vector.");
-    return;
-  }
-  if (typeof targetResultObject == UNDEFINED){
-    throw new Error("intersectionTest error: targetResultObject is not defined.");
-    return;
-  }
+  preConditions.checkIfDefined(ROYGBIV.intersectionTest, preConditions.fromVector, fromVector);
+  preConditions.checkIfVectorOnlyIfDefined(ROYGBIV.intersectionTest, preConditions.fromVector, fromVector);
+  preConditions.checkIfDefined(ROYGBIV.intersectionTest, preConditions.directionVector, directionVector);
+  preConditions.checkIfVectorOnlyIfDefined(ROYGBIV.intersectionTest, preConditions.directionVector, directionVector);
+  preConditions.checkIfDefined(ROYGBIV.intersectionTest, preConditions.targetResultObject, targetResultObject);
   REUSABLE_VECTOR.set(fromVector.x, fromVector.y, fromVector.z);
   REUSABLE_VECTOR_2.set(directionVector.x, directionVector.y, directionVector.z).normalize();
   rayCaster.findIntersections(REUSABLE_VECTOR, REUSABLE_VECTOR_2, false);
@@ -5306,42 +4889,15 @@ Roygbiv.prototype.lerp = function(vector1, vector2, amount, targetVector){
   if (mode == 0){
     return;
   }
-  if (typeof vector1 == UNDEFINED){
-    throw new Error("lerp error: vector1 is not defined.");
-    return;
-  }
-  if (typeof vector2 == UNDEFINED){
-    throw new Error("lerp error: vector2 is not defined.");
-    return;
-  }
-  if (typeof amount == UNDEFINED){
-    throw new Error("lerp error: amount is not defined.");
-    return;
-  }
-  if (typeof targetVector == UNDEFINED){
-    throw new Error("lerp error: targetVector is not defined.");
-    return;
-  }
-  if (isNaN(vector1.x) || isNaN(vector1.y) || isNaN(vector1.z)){
-    throw new Error("lerp error: vector1 is not a vector.");
-    return;
-  }
-  if (isNaN(vector2.x) || isNaN(vector2.y) || isNaN(vector2.z)){
-    throw new Error("lerp error: vector2 is not a vector.");
-    return;
-  }
-  if (isNaN(targetVector.x) || isNaN(targetVector.y) || isNaN(targetVector.z)){
-    throw new Error("lerp error: targetVector is not a vector.");
-    return;
-  }
-  if (isNaN(amount)){
-    throw new Error("lerp error: amount is not a number.");
-    return;
-  }
-  if (amount < 0 || amount > 1){
-    throw new Error("lerp error: amount must be between [0,1].");
-    return;
-  }
+  preConditions.checkIfDefined(ROYGBIV.lerp, preConditions.vector1, vector1);
+  preConditions.checkIfDefined(ROYGBIV.lerp, preConditions.vector2, vector2);
+  preConditions.checkIfDefined(ROYGBIV.lerp, preConditions.amount, amount);
+  preConditions.checkIfDefined(ROYGBIV.lerp, preConditions.targetVector, targetVector);
+  preConditions.checkIfVectorOnlyIfDefined(ROYGBIV.lerp, preConditions.vector1, vector1);
+  preConditions.checkIfVectorOnlyIfDefined(ROYGBIV.lerp, preConditions.vector2, vector2);
+  preConditions.checkIfVectorOnlyIfDefined(ROYGBIV.lerp, preConditions.targetVector, targetVector);
+  preConditions.checkIfNumber(ROYGBIV.lerp, preConditions.amount, amount);
+  preConditions.checkIfInRange(ROYGBIV.lerp, preConditions.amount, amount, 0, 1);
   REUSABLE_VECTOR.set(vector1.x, vector1.y, vector1.z);
   REUSABLE_VECTOR_2.set(vector2.x, vector2.y, vector2.z);
   REUSABLE_VECTOR.lerp(REUSABLE_VECTOR_2, amount);
@@ -5361,50 +4917,27 @@ Roygbiv.prototype.setBloom = function(params){
   if (mode == 0){
     return;
   }
+  preConditions.checkIfDefined(ROYGBIV.setBloom, preConditions.params, params);
+  preConditions.checkIfNumberOnlyIfExists(ROYGBIV.setBloom, preConditions.strength, params.strength);
+  preConditions.checkIfInRangeOnlyIfDefined(ROYGBIV.setBloom, preConditions.strength, params.strength, 0, 3);
+  preConditions.checkIfNumberOnlyIfExists(ROYGBIV.setBloom, preConditions.radius, params.radius);
+  preConditions.checkIfInRangeOnlyIfDefined(ROYGBIV.setBloom, preConditions.radius, params.radius, 0, 1);
+  preConditions.checkIfNumberOnlyIfExists(ROYGBIV.setBloom, preConditions.threshold, params.threshold);
+  preConditions.checkIfInRangeOnlyIfDefined(ROYGBIV.setBloom, preConditions.threshold, params.threshold, 0, 1);
+  preConditions.checkIfNumberOnlyIfExists(ROYGBIV.setBloom, preConditions.resolutionScale, params.resolutionScale);
+  preConditions.checkIfInRangeOnlyIfDefined(ROYGBIV.setBloom, preConditions.resolutionScale, params.resolutionScale, 0.1, 1);
   var hasStrength = false, hasRadius = false, hasThreshold = false, hasResolutionScale = false;
   if (!(typeof params.strength == UNDEFINED)){
     hasStrength = true;
-    if (isNaN(params.strength)){
-      throw new Error("setBloom error: strength parameter is not a number.");
-      return;
-    }
-    if (params.strength < 0 || params.strength > 3){
-      throw new Error("setBloom error: strength parameter must be between [0, 3].");
-      return;
-    }
   }
   if (!(typeof params.radius == UNDEFINED)){
     hasRadius = true;
-    if (isNaN(params.radius)){
-      throw new Error("setBloom error: radius parameter is not a number.");
-      return;
-    }
-    if (params.radius < 0 || params.radius > 1){
-      throw new Error("setBloom error: radius parameter must be between [0, 1].");
-      return;
-    }
   }
   if (!(typeof params.threshold == UNDEFINED)){
     hasThreshold = true;
-    if (isNaN(params.threshold)){
-      throw new Error("setBloom error: threshold parameter is not a number.");
-      return;
-    }
-    if (params.threshold < 0 || params.threshold > 1){
-      throw new Error("setBloom error: threshold parameter must be between [0, 1].");
-      return;
-    }
   }
   if (!(typeof params.resolutionScale == UNDEFINED)){
     hasResolutionScale = true;
-    if (isNaN(params.resolutionScale)){
-      throw new Error("setBloom error: resolutionScale parameter is not a number.");
-      return;
-    }
-    if (params.resolutionScale < 0.1 || params.resolutionScale > 1){
-      throw new Error("setBloom error: resolutionScale parameter must be between [0.1, 1].");
-      return;
-    }
   }
   bloomOn = true;
   if (hasStrength){
@@ -5443,14 +4976,8 @@ Roygbiv.prototype.pause = function(paused){
   if (mode == 0){
     return;
   }
-  if (typeof paused == UNDEFINED){
-    throw new Error("pause error: paused is not defined.");
-    return;
-  }
-  if (!(typeof paused == "boolean")){
-    throw new Error("pause error: paused is not a boolean.");
-    return;
-  }
+  preConditions.checkIfDefined(ROYGBIV.pause, preConditions.paused, paused);
+  preConditions.checkIfBooleanOnlyIfExists(ROYGBIV.pause, preConditions.paused, paused);
   var oldIsPaused = isPaused;
   isPaused = paused;
   if (!paused && oldIsPaused){

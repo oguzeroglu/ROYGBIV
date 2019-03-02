@@ -86,6 +86,7 @@ var Preconditions = function(){
   this.rewindOnCollided = "rewindOnCollided";
   this.collisionTimeOffset = "collisionTimeOffset";
   this.sizeX = "sizeX";
+  this.sizeY = "sizeY";
   this.sizeZ = "sizeZ";
   this.avgStartDelay = "avgStartDelay";
   this.stopDuration = "stopDuration";
@@ -111,6 +112,7 @@ var Preconditions = function(){
   this.targetSize = "targetSize";
   this.delta = "delta";
   this.sourceObject = "sourceObject";
+  this.targetObject = "targetObject";
   this.callbackFunction = "callbackFunction";
   this.timeOffset = "timeOffset";
   this.psPool = "psPool";
@@ -118,6 +120,33 @@ var Preconditions = function(){
   this.seconds = "seconds";
   this.maxTimeInSeconds = "maxTimeInSeconds";
   this.text = "text";
+  this.textObject = "textObject";
+  this.vec = "vec";
+  this.vec1 = "vec1";
+  this.vec2 = "vec2";
+  this.amount = "amount";
+  this.vector = "vector";
+  this.targetQuaternion = "targetQuaternion";
+  this.quaternion = "quaternion";
+  this.scalar = "scalar";
+  this.eulerAngle = "eulerAngle";
+  this.isDisabled = "isDisabled";
+  this.key = "key";
+  this.axisVector = "axisVector";
+  this.angle = "angle";
+  this.offsetX = "offsetX";
+  this.offsetY = "offsetY";
+  this.offsetZ = "offsetZ";
+  this.fromVector = "fromVector";
+  this.directionVector = "directionVector";
+  this.targetResultObject = "targetResultObject";
+  this.vector1 = "vector1";
+  this.vector2 = "vector2";
+  this.params = "params";
+  this.strength = "strength";
+  this.threshold = "threshold";
+  this.resolutionScale = "resolutionScale";
+  this.paused = "paused";
 }
 
 Preconditions.prototype.errorHeader = function(callerFunc){
@@ -249,6 +278,12 @@ Preconditions.prototype.checkIfNumber = function(callerFunc, parameterName, obj)
   }
 }
 
+Preconditions.prototype.checkIfString = function(callerFunc, parameterName, obj){
+  if(!(typeof obj == "string")){
+    this.throw(callerFunc, parameterName+" is not a string.");
+  }
+}
+
 Preconditions.prototype.checkIfNumberOnlyIfExists = function(callerFunc, parameterName, obj){
   if (!(typeof obj == UNDEFINED) && isNaN(obj)){
     this.throw(callerFunc, parameterName+" is not a number.");
@@ -295,6 +330,12 @@ Preconditions.prototype.checkIfChangeable = function(callerFunc, parameterName, 
 Preconditions.prototype.checkIfDynamic = function(callerFunc, parameterName, obj){
   if (!obj.isDynamicObject){
     this.throw(callerFunc, parameterName+" is not a dynamic object.");
+  }
+}
+
+Preconditions.prototype.checkIfNotDynamic = function(callerFunc, parameterName, obj){
+  if (obj.isDynamicObject){
+    this.throw(callerFunc, parameterName+" is a dynamic object.");
   }
 }
 
@@ -370,6 +411,12 @@ Preconditions.prototype.checkIfInRangeMinInclusive = function(callerFunc, parame
   }
 }
 
+Preconditions.prototype.checkIfScriptExists = function(callerFunc, parameterName, obj){
+  if (!obj){
+    this.throw(callerFunc, "No such script.");
+  }
+}
+
 Preconditions.prototype.checkIfTextureExists = function(callerFunc, parameterName, obj){
   if (!obj){
     this.throw(callerFunc, "No such texture.");
@@ -441,5 +488,11 @@ Preconditions.prototype.checkIfFunctionOnlyIfExists = function(callerFunc, param
     if (!(obj instanceof Function)){
       this.throw(callerFunc, parameterName+" is not a function.");
     }
+  }
+}
+
+Preconditions.prototype.checkIfText2D = function(callerFunc, parameterName, obj){
+  if (obj.is2D){
+    this.throw(callerFunc, "Cannot use this API for 2D texts.");
   }
 }
