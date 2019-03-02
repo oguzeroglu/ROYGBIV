@@ -110,6 +110,14 @@ var Preconditions = function(){
   this.angularSpeed = "angularSpeed";
   this.targetSize = "targetSize";
   this.delta = "delta";
+  this.sourceObject = "sourceObject";
+  this.callbackFunction = "callbackFunction";
+  this.timeOffset = "timeOffset";
+  this.psPool = "psPool";
+  this.minFPS = "minFPS";
+  this.seconds = "seconds";
+  this.maxTimeInSeconds = "maxTimeInSeconds";
+  this.text = "text";
 }
 
 Preconditions.prototype.errorHeader = function(callerFunc){
@@ -175,6 +183,18 @@ Preconditions.prototype.checkIfAxisOnlyIfDefined = function(callerFunc, paramete
   }
 }
 
+Preconditions.prototype.checkIfTextClickable = function(callerFunc, parameterName, obj){
+  if (!obj.isClickable){
+    this.throw(callerFunc, parameterName+" is not marked as clickable.");
+  }
+}
+
+Preconditions.prototype.checkIfAddedText = function(callerFunc, parameterName, obj){
+  if(!obj.isAddedText){
+    this.throw(callerFunc, parameterName+" is not a text object.");
+  }
+}
+
 Preconditions.prototype.checkIfAddedObject = function(callerFunc, parameterName, obj){
   if (!obj.isAddedObject){
     this.throw(callerFunc, parameterName+" is not an AddedObject.");
@@ -190,6 +210,12 @@ Preconditions.prototype.checkIfAddedObjectOrObjectGroup = function(callerFunc, p
 Preconditions.prototype.checkIfAddedObjectObjectGroupParticleSystem = function(callerFunc, parameterName, obj){
   if (!obj.isAddedObject && !obj.isObjectGroup && !obj.isParticleSystem){
     this.throw(callerFunc, parameterName+" must be an object, object group or a particle system.");
+  }
+}
+
+Preconditions.prototype.checkIfAddedObjectObjectGroupParticleSystemParticle = function(callerFunc, parameterName, obj){
+  if (!(obj.isAddedObject) && !(obj.isObjectGroup) && !(obj.isParticle) && !(obj.isParticleSystem)){
+    this.throw(callerFunc, parameterName+" must be an object, object group, particle system or particle.");
   }
 }
 

@@ -3626,54 +3626,27 @@ Roygbiv.prototype.setCollisionListener = function(sourceObject, callbackFunction
   if (mode == 0){
     return;
   }
-  if (!sourceObject){
-    throw new Error("setCollisionListener error: sourceObject is not defined.");
-    return;
-  }
-  if (!(sourceObject.isAddedObject) && !(sourceObject.isObjectGroup) && !(sourceObject.isParticle) && !(sourceObject.isParticleSystem)){
-    throw new Error("setCollisionListener error: Type not supported.");
-    return;
-  }
+  preConditions.checkIfDefined(ROYGBIV.setCollisionListener, preConditions.sourceObject, sourceObject);
+  preConditions.checkIfAddedObjectObjectGroupParticleSystemParticle(ROYGBIV.setCollisionListener, preConditions.sourceObject, sourceObject);
+  preConditions.checkIfDefined(ROYGBIV.setCollisionListener, preConditions.callbackFunction, callbackFunction);
+  preConditions.checkIfFunctionOnlyIfExists(ROYGBIV.setCollisionListener, preConditions.callbackFunction, callbackFunction);
+  preConditions.checkIfNumberOnlyIfExists(ROYGBIV.setCollisionListener, preConditions.timeOffset, timeOffset);
   if ((sourceObject.isAddedObject) || (sourceObject.isObjectGroup)){
-    if (TOTAL_OBJECT_COLLISION_LISTENER_COUNT >= MAX_OBJECT_COLLISION_LISTENER_COUNT){
-      throw new Error("setCollisionListener error: Cannot set collision listener for more than "+MAX_OBJECT_COLLISION_LISTENER_COUNT+" objects.");
-      return;
-    }
-    if (sourceObject.noMass){
-      throw new Error("setCollisionListener error: Object has no mass.");
-      return;
-    }
+    preConditions.checkIfTrue(ROYGBIV.setCollisionListener, "Cannot set collision listener for more than "+MAX_OBJECT_COLLISION_LISTENER_COUNT+" objects.", (TOTAL_OBJECT_COLLISION_LISTENER_COUNT >= MAX_OBJECT_COLLISION_LISTENER_COUNT));
+    preConditions.checkIfNoMass(ROYGBIV.setCollisionListener, preConditions.sourceObject, sourceObject);
     collisionCallbackRequests[sourceObject.name] = callbackFunction.bind(sourceObject);
     TOTAL_OBJECT_COLLISION_LISTENER_COUNT ++;
   }else if (sourceObject.isParticle){
-    if (sourceObject.parent && sourceObject.parent.isStopped){
-      throw new Error("setCollisionListener error: Particle system is stopped.");
-      return;
-    }
+    preConditions.checkIfTrue(ROYGBIV.setCollisionListener, "Particle system is stopped.", (sourceObject.parent && sourceObject.parent.isStopped));
     if (sourceObject.uuid && !particleCollisionCallbackRequests[sourceObject.uuid]){
-      if (TOTAL_PARTICLE_COLLISION_LISTEN_COUNT >= MAX_PARTICLE_COLLISION_LISTEN_COUNT){
-        throw new Error("setCollisionListener error: Cannot set collision listener for more than "+MAX_PARTICLE_COLLISION_LISTEN_COUNT+" particles.");
-        return;
-      }
+      preConditions.checkIfTrue(ROYGBIV.setCollisionListener, "Cannot set collision lsitener for more than "+MAX_PARTICLE_COLLISION_LISTEN_COUNT+" particles.", (TOTAL_PARTICLE_COLLISION_LISTEN_COUNT >= MAX_PARTICLE_COLLISION_LISTEN_COUNT));
     }
     if (sourceObject.parent){
-      if (sourceObject.parent.hasManualPositionSet){
-        throw new Error("setCollisionListener error: A position is set manually to the parent particle system. Cannot listen for collisions.");
-        return;
-      }
-      if (sourceObject.parent.hasManualRotationSet){
-        throw new Error("setCollisionListener error: A rotation is set manually to the parent particle system. Cannot listen for collisions.");
-        return;
-      }
-      if (sourceObject.parent.hasManualQuaternionSet){
-        throw new Error("setCollisionListener error: A quaternion is set manually to the parent particle system. Cannot listen for collisions.");
-        return;
-      }
+      preConditions.checkIfTrue(ROYGBIV.setCollisionListener, "A position is manually set to the parent particle system. Cannot listen for collisions.", (sourceObject.parent.hasManualPositionSet));
+      preConditions.checkIfTrue(ROYGBIV.setCollisionListener, "A rotation is manually set to the parent particle system. Cannot listen for collisions.", (sourceObject.parent.hasManualRotationSet));
+      preConditions.checkIfTrue(ROYGBIV.setCollisionListener, "A quaternion is manually set to the parent particle system. Cannot listen for collisions.", (sourceObject.parent.hasManualQuaternionSet));
       if (!sourceObject.parent.hasParticleCollision){
-        if (TOTAL_PARTICLE_SYSTEMS_WITH_PARTICLE_COLLISIONS >= MAX_PARTICLE_SYSTEMS_WITH_PARTICLE_COLLISIONS){
-          throw new Error("setCollisionListener error: Maximum "+MAX_PARTICLE_SYSTEMS_WITH_PARTICLE_COLLISIONS+" can have collidable particles.");
-          return;
-        }
+        preConditions.checkIfTrue(ROYGBIV.setCollisionListener, "Maximum "+MAX_PARTICLE_SYSTEMS_WITH_PARTICLE_COLLISIONS+" can have collisions particles.", (TOTAL_PARTICLE_SYSTEMS_WITH_PARTICLE_COLLISIONS >= MAX_PARTICLE_SYSTEMS_WITH_PARTICLE_COLLISIONS));
         TOTAL_PARTICLE_SYSTEMS_WITH_PARTICLE_COLLISIONS ++;
       }
     }
@@ -3697,24 +3670,12 @@ Roygbiv.prototype.setCollisionListener = function(sourceObject, callbackFunction
       sourceObject.parent.notifyParticleCollisionCallbackChange(sourceObject);
     }
   }else if (sourceObject.isParticleSystem){
-    if (sourceObject.hasManualPositionSet){
-      throw new Error("setCollisionListener error: A position is set manually to the particle system. Cannot listen for collisions.");
-      return;
-    }
-    if (sourceObject.hasManualRotationSet){
-      throw new Error("setCollisionListener error: A rotation is set manually to the particle system. Cannot listen for collisions.");
-      return;
-    }
-    if (sourceObject.hasManualQuaternionSet){
-      throw new Error("setCollisionListener error: A quaternion is set manually to the particle system. Cannot listen for collisions.");
-      return;
-    }
+    preConditions.checkIfTrue(ROYGBIV.setCollisionListener, "A position is set manually to the particle system. Cannot listen for collisions.", (sourceObject.hasManualPositionSet));
+    preConditions.checkIfTrue(ROYGBIV.setCollisionListener, "A rotation is set manually to the particle system. Cannot listen for collisions.", (sourceObject.hasManualRotationSet));
+    preConditions.checkIfTrue(ROYGBIV.setCollisionListener, "A quaternion is set manually to the particle system. Cannot listen for collisions.", (sourceObject.hasManualQuaternionSet));
     var incrCounter = false;
     if (!particleSystemCollisionCallbackRequests[sourceObject.name]){
-      if (TOTAL_PARTICLE_SYSTEM_COLLISION_LISTEN_COUNT >= MAX_PARTICLE_SYSTEM_COUNT){
-        throw new Error("setCollisionListener error: Cannot set collision listener for more than "+MAX_PARTICLE_SYSTEM_COUNT+" particle systems.");
-        return;
-      }
+      preConditions.checkIfTrue(ROYGBIV.setCollisionListener, "Cannot set collision listener for more than "+MAX_PARTICLE_SYSTEM_COUNT+" particle systems.", (TOTAL_PARTICLE_SYSTEM_COLLISION_LISTEN_COUNT >= MAX_PARTICLE_SYSTEM_COUNT));
       incrCounter = true;
     }
     particleSystemCollisionCallbackRequests[sourceObject.name] = callbackFunction.bind(sourceObject);
@@ -3736,14 +3697,8 @@ Roygbiv.prototype.removeCollisionListener = function(sourceObject){
   if (mode == 0){
     return;
   }
-  if (!sourceObject){
-    throw new Error("removeCollisionListener error: sourceObject is not defined.");
-    return;
-  }
-  if (!(sourceObject.isAddedObject) && !(sourceObject.isObjectGroup) && !(sourceObject.isParticle) && !(sourceObject.isParticleSystem)){
-    throw new Error("removeCollisionListener error: Type not supported.");
-    return;
-  }
+  preConditions.checkIfDefined(ROYGBIV.removeCollisionListener, preConditions.sourceObject, sourceObject);
+  preConditions.checkIfAddedObjectObjectGroupParticleSystemParticle(ROYGBIV.removeCollisionListener, preConditions.sourceObject, sourceObject);
   var curCallbackRequest;
   if ((sourceObject.isAddedObject) || (sourceObject.isObjectGroup)){
     curCallbackRequest = collisionCallbackRequests[sourceObject.name];
@@ -3779,26 +3734,11 @@ Roygbiv.prototype.setExpireListener = function(sourceObject, callbackFunction){
   if (mode == 0){
     return;
   }
-  if (typeof sourceObject == UNDEFINED){
-    throw new Error("setExpireListener error: sourceObject is not defined.");
-    return;
-  }
-  if (!(sourceObject.isParticleSystem)){
-    throw new Error("setExpireListener error: sourceObject is not a particle system.");
-    return;
-  }
-  if (typeof callbackFunction == UNDEFINED){
-    throw new Error("setExpireListener error: callbackFunction is not defined.");
-    return;
-  }
-  if (!(callbackFunction instanceof Function)){
-    throw new Error("setExpireListener error: callbackFunction is not a function.");
-    return;
-  }
-  if (sourceObject.destroyed){
-    throw new Error("setExpireListener error: sourceObject is already expired.");
-    return;
-  }
+  preConditions.checkIfDefined(ROYGBIV.setExpireListener, preConditions.sourceObject, sourceObject);
+  preConditions.checkIfParticleSystem(ROYGBIV.setExpireListener, preConditions.sourceObject, sourceObject);
+  preConditions.checkIfDefined(ROYGBIV.setExpireListener, preConditions.callbackFunction, callbackFunction);
+  preConditions.checkIfFunctionOnlyIfExists(ROYGBIV.setExpireListener, preConditions.callbackFunction, callbackFunction);
+  preConditions.checkIfTrue(ROYGBIV.setExpireListener, "sourceObject is already expired.", (sourceObject.destroyed));
   sourceObject.expirationFunction = callbackFunction;
 }
 
@@ -3808,18 +3748,9 @@ Roygbiv.prototype.removeExpireListener = function(sourceObject){
   if (mode == 0){
     return;
   }
-  if (typeof sourceObject == UNDEFINED){
-    throw new Error("removeExpireListener error: sourceObject is not defined.");
-    return;
-  }
-  if (!(sourceObject.isParticleSystem)){
-    throw new Error("removeExpireListener error: sourceObject is not a particle system.");
-    return;
-  }
-  if (sourceObject.destroyed){
-    throw new Error("removeExpireListener error: sourceObject is already expired.");
-    return;
-  }
+  preConditions.checkIfDefined(ROYGBIV.removeExpireListener, preConditions.sourceObject, sourceObject);
+  preConditions.checkIfParticleSystem(ROYGBIV.removeExpireListener, preConditions.sourceObject, sourceObject);
+  preConditions.checkIfTrue(ROYGBIV.removeExpireListener, "sourceObject is already expired", (sourceObject.destroyed));
   delete sourceObject.expirationFunction;
 }
 
@@ -3830,26 +3761,11 @@ Roygbiv.prototype.setObjectClickListener = function(sourceObject, callbackFuncti
   if (mode == 0){
     return;
   }
-  if (typeof sourceObject == UNDEFINED){
-    throw new Error("setObjectClickListener error: sourceObject is not defined.");
-    return;
-  }
-  if (typeof callbackFunction == UNDEFINED){
-    throw new Error("setObjectClickListener error: callbackFunction is not defined.");
-    return;
-  }
-  if (!(sourceObject.isAddedObject) && !(sourceObject.isObjectGroup)){
-    throw new Error("setObjectClickListener error: Type not supported.");
-    return;
-  }
-  if (!sourceObject.isIntersectable){
-    throw new Error("setObjectClickListener error: sourceObject marked as unintersectable. Cannot be clicked on.");
-    return;
-  }
-  if (!(callbackFunction instanceof Function)){
-    throw new Error("setObjectClickListener error: callbackFunction is not a function.");
-    return;
-  }
+  preConditions.checkIfDefined(ROYGBIV.setObjectClickListener, preConditions.sourceObject, sourceObject);
+  preConditions.checkIfDefined(ROYGBIV.setObjectClickListener, preConditions.callbackFunction, callbackFunction);
+  preConditions.checkIfAddedObjectOrObjectGroup(ROYGBIV.setObjectClickListener, preConditions.sourceObject, sourceObject);
+  preConditions.checkIfTrue(ROYGBIV.setObjectClickListener, "sourceObject marked as unintersectable, cannot be clicked on.", (!sourceObject.isIntersectable));
+  preConditions.checkIfFunctionOnlyIfExists(ROYGBIV.setObjectClickListener, preConditions.callbackFunction, callbackFunction);
   sourceObject.clickCallbackFunction = callbackFunction;
 }
 
@@ -3859,18 +3775,9 @@ Roygbiv.prototype.removeObjectClickListener = function(sourceObject){
   if (mode == 0){
     return;
   }
-  if (typeof sourceObject == UNDEFINED){
-    throw new Error("removeClickListener error: sourceObject is not defined.");
-    return;
-  }
-  if (!(sourceObject.isAddedObject) && !(sourceObject.isObjectGroup)){
-    throw new Error("removeClickListener error: Type not supported.");
-    return;
-  }
-  if (!(sourceObject.isIntersectable)){
-    throw new Error("removeClickListener error: sourceObject marked as unintersectable.");
-    return;
-  }
+  preConditions.checkIfDefined(ROYGBIV.removeObjectClickListener, preConditions.sourceObject, sourceObject);
+  preConditions.checkIfAddedObjectOrObjectGroup(ROYGBIV.removeObjectClickListener, preConditions.sourceObject, sourceObject);
+  preConditions.checkIfTrue(ROYGBIV.removeObjectClickListener, "sourceObject is marked as unintersectable.", (!sourceObject.isIntersectable));
   delete sourceObject.clickCallbackFunction;
 }
 
@@ -3881,14 +3788,8 @@ Roygbiv.prototype.setScreenClickListener = function(callbackFunction){
   if (mode == 0){
     return;
   }
-  if (typeof callbackFunction == UNDEFINED){
-    throw new Error("setScreenClickListener error: callbackFunction is not defined.");
-    return;
-  }
-  if (!(callbackFunction instanceof Function)){
-    throw new Error("setScreenClickListener error: callbackFunction is not a function.");
-    return;
-  }
+  preConditions.checkIfDefined(ROYGBIV.setScreenClickListener, preConditions.callbackFunction, callbackFunction);
+  preConditions.checkIfFunctionOnlyIfExists(ROYGBIV.setScreenClickListener, preConditions.callbackFunction, callbackFunction);
   screenClickCallbackFunction = callbackFunction;
 }
 
@@ -3908,14 +3809,8 @@ Roygbiv.prototype.setScreenMouseDownListener = function(callbackFunction){
   if (mode == 0){
     return;
   }
-  if (typeof callbackFunction == UNDEFINED){
-    throw new Error("setScreenMouseDownListener error: callbackFunction is not defined.");
-    return;
-  }
-  if (!(callbackFunction instanceof Function)){
-    throw new Error("setScreenMouseDownListener error: callbackFunction is not a function.");
-    return;
-  }
+  preConditions.checkIfDefined(ROYGBIV.setScreenMouseDownListener, preConditions.callbackFunction, callbackFunction);
+  preConditions.checkIfFunctionOnlyIfExists(ROYGBIV.setScreenMouseDownListener, preConditions.callbackFunction, callbackFunction);
   screenMouseDownCallbackFunction = callbackFunction;
 }
 
@@ -3935,14 +3830,8 @@ Roygbiv.prototype.setScreenMouseUpListener = function(callbackFunction){
   if (mode == 0){
     return;
   }
-  if (typeof callbackFunction == UNDEFINED){
-    throw new Error("setScreenMouseUpListener error: callbackFunction is not defined.");
-    return;
-  }
-  if (!(callbackFunction instanceof Function)){
-    throw new Error("setScreenMouseUpListener error: callbackFunction is not a function.");
-    return;
-  }
+  preConditions.checkIfDefined(ROYGBIV.setScreenMouseUpListener, preConditions.callbackFunction, callbackFunction);
+  preConditions.checkIfFunctionOnlyIfExists(ROYGBIV.setScreenMouseUpListener, preConditions.callbackFunction, callbackFunction);
   screenMouseUpCallbackFunction = callbackFunction;
 }
 
@@ -3962,14 +3851,8 @@ Roygbiv.prototype.setScreenMouseMoveListener = function(callbackFunction){
   if (mode == 0){
     return;
   }
-  if (typeof callbackFunction == UNDEFINED){
-    throw new Error("setScreenMouseMoveListener error: callbackFunction is not defined.");
-    return;
-  }
-  if (!(callbackFunction instanceof Function)){
-    throw new Error("setScreenMouseMoveListener error: callbackFunction is not a function.");
-    return;
-  }
+  preConditions.checkIfDefined(ROYGBIV.setScreenMouseMoveListener, preConditions.callbackFunction, callbackFunction);
+  preConditions.checkIfFunctionOnlyIfExists(ROYGBIV.setScreenMouseMoveListener, preConditions.callbackFunction, callbackFunction);
   screenMouseMoveCallbackFunction = callbackFunction;
 }
 
@@ -3989,14 +3872,8 @@ Roygbiv.prototype.setScreenPointerLockChangeListener = function(callbackFunction
   if (mode == 0){
     return;
   }
-  if (typeof callbackFunction == UNDEFINED){
-    throw new Error("setScreenPointerLockChangeListener error: callbackFunction is not defined.");
-    return;
-  }
-  if (!(callbackFunction instanceof Function)){
-    throw new Error("setScreenPointerLockChangeListener error: callbackFunction is not a function.");
-    return;
-  }
+  preConditions.checkIfDefined(ROYGBIV.setScreenPointerLockChangeListener, preConditions.callbackFunction, callbackFunction);
+  preConditions.checkIfFunctionOnlyIfExists(ROYGBIV.setScreenPointerLockChangeListener, preConditions.callbackFunction, callbackFunction);
   screenPointerLockChangedCallbackFunction = callbackFunction;
 }
 
@@ -4016,22 +3893,10 @@ Roygbiv.prototype.setParticleSystemPoolConsumedListener = function(psPool, callb
   if (mode == 0){
     return;
   }
-  if (typeof psPool == UNDEFINED){
-    throw new Error("setParticleSystemPoolConsumedListener error: psPool is not defined.");
-    return;
-  }
-  if (typeof callbackFunction == UNDEFINED){
-    throw new Error("setParticleSystemPoolConsumedListener error: callbackFunction is not defined.");
-    return;
-  }
-  if (!(psPool.isParticleSystemPool)){
-    throw new Error("setParticleSystemPoolConsumedListener error: psPool is not a ParticleSystemPool.");
-    return;
-  }
-  if (!(callbackFunction instanceof Function)){
-    throw new Error("setParticleSystemPoolConsumedListener error: callbackFunction is not a function.");
-    return;
-  }
+  preConditions.checkIfDefined(ROYGBIV.setParticleSystemPoolConsumedListener, preConditions.psPool, psPool);
+  preConditions.checkIfParticleSystemPool(ROYGBIV.setParticleSystemPoolConsumedListener, preConditions.psPool, psPool);
+  preConditions.checkIfDefined(ROYGBIV.setParticleSystemPoolConsumedListener, preConditions.callbackFunction, callbackFunction);
+  preConditions.checkIfFunctionOnlyIfExists(ROYGBIV.setParticleSystemPoolConsumedListener, preConditions.callbackFunction, callbackFunction);
   psPool.consumedCallback = callbackFunction;
 }
 
@@ -4041,14 +3906,8 @@ Roygbiv.prototype.removeParticleSystemPoolConsumedListener = function(psPool){
   if (mode == 0){
     return;
   }
-  if (typeof psPool == UNDEFINED){
-    throw new Error("removeParticleSystemPoolConsumedListener error: psPool is not defined.");
-    return;
-  }
-  if (!(psPool.isParticleSystemPool)){
-    throw new Error("removeParticleSystemPoolConsumedListener error: psPool is not a ParticleSystemPool.");
-    return;
-  }
+  preConditions.checkIfDefined(ROYGBIV.removeParticleSystemPoolConsumedListener, preConditions.psPool, psPool);
+  preConditions.checkIfParticleSystemPool(ROYGBIV.removeParticleSystemPoolConsumedListener, preConditions.psPool, psPool);
   psPool.consumedCallback = 0;
 }
 
@@ -4059,22 +3918,10 @@ Roygbiv.prototype.setParticleSystemPoolAvailableListener = function(psPool, call
   if (mode == 0){
     return;
   }
-  if (typeof psPool == UNDEFINED){
-    throw new Error("setParticleSystemPoolAvailableListener error: psPool is not defined.");
-    return;
-  }
-  if (typeof callbackFunction == UNDEFINED){
-    throw new Error("setParticleSystemPoolAvailableListener error: callbackFunction is not defined.");
-    return;
-  }
-  if (!(psPool.isParticleSystemPool)){
-    throw new Error("setParticleSystemPoolAvailableListener error: psPool is not a ParticleSystemPool.");
-    return;
-  }
-  if (!(callbackFunction instanceof Function)){
-    throw new Error("setParticleSystemPoolAvailableListener error: callbackFunction is not a function.");
-    return;
-  }
+  preConditions.checkIfDefined(ROYGBIV.setParticleSystemPoolAvailableListener, preConditions.psPool, psPool);
+  preConditions.checkIfParticleSystemPool(ROYGBIV.setParticleSystemPoolAvailableListener, preConditions.psPool, psPool);
+  preConditions.checkIfDefined(ROYGBIV.setParticleSystemPoolAvailableListener, preConditions.callbackFunction, callbackFunction);
+  preConditions.checkIfFunctionOnlyIfExists(ROYGBIV.setParticleSystemPoolAvailableListener, preConditions.callbackFunction, callbackFunction);
   psPool.availableCallback = callbackFunction;
 }
 
@@ -4084,14 +3931,8 @@ Roygbiv.prototype.removeParticleSystemPoolAvailableListener = function(psPool){
   if (mode == 0){
     return;
   }
-  if (typeof psPool == UNDEFINED){
-    throw new Error("removeParticleSystemPoolAvailableListener error: psPool is not defined.");
-    return;
-  }
-  if (!(psPool.isParticleSystemPool)){
-    throw new Error("removeParticleSystemPoolAvailableListener error: psPool is not a ParticleSystemPool.");
-    return;
-  }
+  preConditions.checkIfDefined(ROYGBIV.removeParticleSystemPoolAvailableListener, preConditions.psPool, psPool);
+  preConditions.checkIfParticleSystemPool(ROYGBIV.removeParticleSystemPoolAvailableListener, preConditions.psPool, psPool);
   psPool.availableCallback = 0;
 }
 
@@ -4102,14 +3943,8 @@ Roygbiv.prototype.setFullScreenChangeCallbackFunction = function(callbackFunctio
   if (mode == 0){
     return;
   }
-  if (typeof callbackFunction == UNDEFINED){
-    throw new Error("setFullScreenChangeCallbackFunction error: callbackFunction is not defined.");
-    return;
-  }
-  if (!(callbackFunction instanceof Function)){
-    throw new Error("setFullScreenChangeCallbackFunction error: callbackFunction is not a function.");
-    return;
-  }
+  preConditions.checkIfDefined(ROYGBIV.setFullScreenChangeCallbackFunction, preConditions.callbackFunction, callbackFunction);
+  preConditions.checkIfFunctionOnlyIfExists(ROYGBIV.setFullScreenChangeCallbackFunction, preConditions.callbackFunction, callbackFunction);
   screenFullScreenChangeCallbackFunction = callbackFunction;
 }
 
@@ -4130,14 +3965,8 @@ Roygbiv.prototype.setFPSDropCallbackFunction = function(callbackFunction){
   if (mode == 0){
     return;
   }
-  if (typeof callbackFunction == UNDEFINED){
-    throw new Error("setFPSDropCallbackFunction error: callbackFunction is not defined.");
-    return;
-  }
-  if (!(callbackFunction instanceof Function)){
-    throw new Error("setFPSDropCallbackFunction error: callbackFunction is not a function.");
-    return;
-  }
+  preConditions.checkIfDefined(ROYGBIV.setFPSDropCallbackFunction, preConditions.callbackFunction, callbackFunction);
+  preConditions.checkIfFunctionOnlyIfExists(ROYGBIV.setFPSDropCallbackFunction, preConditions.callbackFunction, callbackFunction);
   fpsDropCallbackFunction = callbackFunction;
 }
 
@@ -4159,38 +3988,14 @@ Roygbiv.prototype.setPerformanceDropCallbackFunction = function(minFPS, seconds,
   if (mode == 0){
     return;
   }
-  if (typeof minFPS == UNDEFINED){
-    throw new Error("setPerformanceDropCallbackFunction error: minFPS is not defined.");
-    return;
-  }
-  if (isNaN(minFPS)){
-    throw new Error("setPerformanceDropCallbackFunction error: minFPS is not a number.");
-    return;
-  }
-  if (!(minFPS > 0 && minFPS <= 60)){
-    throw new Error("setPerformanceDropCallbackFunction error: minFPS must be between (0,60]");
-    return;
-  }
-  if (typeof seconds == UNDEFINED){
-    throw new Error("setPerformanceDropCallbackFunction error: seconds is not defined.");
-    return;
-  }
-  if (isNaN(seconds)){
-    throw new Error("setPerformanceDropCallbackFunction error: seconds is not a number.");
-    return;
-  }
-  if (seconds <= 0){
-    throw new Error("setPerformanceDropCallbackFunction error: seconds must be greater than zero.");
-    return;
-  }
-  if (typeof callbackFunction == UNDEFINED){
-    throw new Error("setPerformanceDropCallbackFunction error: callbackFunction is not defined.");
-    return;
-  }
-  if (!(callbackFunction instanceof Function)){
-    throw new Error("setPerformanceDropCallbackFunction error: callbackFunction is not a function.");
-    return;
-  }
+  preConditions.checkIfDefined(ROYGBIV.setPerformanceDropCallbackFunction, preConditions.minFPS, minFPS);
+  preConditions.checkIfNumber(ROYGBIV.setPerformanceDropCallbackFunction, preConditions.minFPS, minFPS);
+  preConditions.checkIfInRangeMinInclusive(ROYGBIV.setPerformanceDropCallbackFunction, preConditions.minFPS, minFPS, 0, 60);
+  preConditions.checkIfDefined(ROYGBIV.setPerformanceDropCallbackFunction, preConditions.callbackFunction, callbackFunction);
+  preConditions.checkIfFunctionOnlyIfExists(ROYGBIV.setPerformanceDropCallbackFunction, preConditions.callbackFunction, callbackFunction);
+  preConditions.checkIfDefined(ROYGBIV.setPerformanceDropCallbackFunction, preConditions.seconds, seconds);
+  preConditions.checkIfNumber(ROYGBIV.setPerformanceDropCallbackFunction, preConditions.seconds, seconds);
+  preConditions.checkIfLessThan(ROYGBIV.setPerformanceDropCallbackFunction, preConditions.seconds, seconds, 0);
   performanceDropCallbackFunction = callbackFunction;
   fpsHandler.initiatePerformanceDropMonitoring(minFPS, seconds);
 }
@@ -4214,26 +4019,11 @@ Roygbiv.prototype.setUserInactivityCallbackFunction = function(maxTimeInSeconds,
   if (mode == 0){
     return;
   }
-  if (typeof maxTimeInSeconds == UNDEFINED){
-    throw new Error("setUserInactivityCallbackFunction error: maxTimeInSeconds is not defined.");
-    return;
-  }
-  if (isNaN(maxTimeInSeconds)){
-    throw new Error("setUserInactivityCallbackFunction error: maxTimeInSeconds is not a number.");
-    return;
-  }
-  if (maxTimeInSeconds <= 0){
-    throw new Error("setUserInactivityCallbackFunction error: maxTimeInSeconds must be greater than zero.");
-    return;
-  }
-  if (typeof callbackFunction == UNDEFINED){
-    throw new Error("setUserInactivityCallbackFunction error: callbackFunction is not defined.");
-    return;
-  }
-  if (!(callbackFunction instanceof Function)){
-    throw new Error("setUserInactivityCallbackFunction error: callbackFunction is not a function.");
-    return;
-  }
+  preConditions.checkIfDefined(ROYGBIV.setUserInactivityCallbackFunction, preConditions.callbackFunction, callbackFunction);
+  preConditions.checkIfFunctionOnlyIfExists(ROYGBIV.setUserInactivityCallbackFunction, preConditions.callbackFunction, callbackFunction);
+  preConditions.checkIfDefined(ROYGBIV.setUserInactivityCallbackFunction, preConditions.maxTimeInSeconds, maxTimeInSeconds);
+  preConditions.checkIfNumber(ROYGBIV.setUserInactivityCallbackFunction, preConditions.maxTimeInSeconds, maxTimeInSeconds);
+  preConditions.checkIfLessThan(ROYGBIV.setUserInactivityCallbackFunction, preConditions.maxTimeInSeconds, maxTimeInSeconds, 0);
   inactiveCounter = 0;
   maxInactiveTime = maxTimeInSeconds;
   userInactivityCallbackFunction = callbackFunction;
@@ -4258,14 +4048,8 @@ Roygbiv.prototype.setScreenKeydownListener = function(callbackFunction){
   if (mode == 0){
     return;
   }
-  if (typeof callbackFunction == UNDEFINED){
-    throw new Error("setScreenKeydownListener error: callbackFunction is not defined.");
-    return;
-  }
-  if (!(callbackFunction instanceof Function)){
-    throw new Error("setScreenKeydownListener error: callbackFunction is not a function.");
-    return;
-  }
+  preConditions.checkIfDefined(ROYGBIV.setScreenKeydownListener, preConditions.callbackFunction, callbackFunction);
+  preConditions.checkIfFunctionOnlyIfExists(ROYGBIV.setScreenKeydownListener, preConditions.callbackFunction, callbackFunction);
   screenKeydownCallbackFunction = callbackFunction;
 }
 
@@ -4286,14 +4070,8 @@ Roygbiv.prototype.setScreenKeyupListener = function(callbackFunction){
   if (mode == 0){
     return;
   }
-  if (typeof callbackFunction == UNDEFINED){
-    throw new Error("setScreenKeyupListener error: callbackFunction is not defined.");
-    return;
-  }
-  if (!(callbackFunction instanceof Function)){
-    throw new Error("setScreenKeyupListener error: callbackFunction is not a function.");
-    return;
-  }
+  preConditions.checkIfDefined(ROYGBIV.setScreenKeyupListener, preConditions.callbackFunction, callbackFunction);
+  preConditions.checkIfFunctionOnlyIfExists(ROYGBIV.setScreenKeyupListener, preConditions.callbackFunction, callbackFunction);
   screenKeyupCallbackFunction = callbackFunction;
 }
 
@@ -4313,26 +4091,11 @@ Roygbiv.prototype.onTextClick = function(text, callbackFunction){
   if (mode == 0){
     return;
   }
-  if (typeof text == UNDEFINED){
-    throw new Error("onTextClick error: text is not defined.");
-    return;
-  }
-  if (!text.isAddedText){
-    throw new Error("onTextClick error: text is not a text object.");
-    return;
-  }
-  if (typeof callbackFunction == UNDEFINED){
-    throw new Error("onTextClick error: callbackFunction is not defined.");
-    return;
-  }
-  if (!(callbackFunction instanceof Function)){
-    throw new Error("onTextClick error: callbackFunction is not a function.");
-    return;
-  }
-  if (!text.isClickable){
-    throw new Error("onTextClick error: text is not marked as clickable.");
-    return;
-  }
+  preConditions.checkIfDefined(ROYGBIV.onTextClick, preConditions.text, text);
+  preConditions.checkIfAddedText(ROYGBIV.onTextClick, preConditions.text, text);
+  preConditions.checkIfTextClickable(ROYGBIV.onTextClick, preConditions.text, text);
+  preConditions.checkIfDefined(ROYGBIV.onTextClick, preConditions.callbackFunction, callbackFunction);
+  preConditions.checkIfFunctionOnlyIfExists(ROYGBIV.onTextClick, preConditions.callbackFunction, callbackFunction);
   text.clickCallbackFunction = callbackFunction;
 }
 
@@ -4342,14 +4105,8 @@ Roygbiv.prototype.removeTextClickListener = function(text){
   if (mode == 0){
     return;
   }
-  if (typeof text == UNDEFINED){
-    throw new Error("removeTextClickListener error: text is not defined.");
-    return;
-  }
-  if (!text.isAddedText){
-    throw new Error("removeTextClickListener error: text is not a text object.");
-    return;
-  }
+  preConditions.checkIfDefined(ROYGBIV.removeTextClickListener, preConditions.text, text);
+  preConditions.checkIfAddedText(ROYGBIV.removeTextClickListener, preConditions.text, text);
   text.clickCallbackFunction = 0;
 }
 
