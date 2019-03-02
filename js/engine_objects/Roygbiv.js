@@ -1794,10 +1794,7 @@ Roygbiv.prototype.createPlasma = function(configurations){
   }
   var alphaVariationSet = false;
   if (!(typeof alphaVariation == UNDEFINED)){
-    if (isNaN(alphaVariation)){
-      throw new Error("createPlasma error: Bad alphaVariation parameter.");
-      return;
-    }
+    preConditions.checkIfNumber(ROYGBIV.createPlasma, preConditions.alphaVariation, alphaVariation);
     alphaVariationSet = true;
   }
   var particleMaterialConfigurations = new Object();
@@ -3455,6 +3452,7 @@ Roygbiv.prototype.createCrosshair = function(configurations){
   if (mode == 0){
     return;
   }
+  preConditions.checkIfDefined(ROYGBIV.createCrosshair, preConditions.configurations, configurations);
   var name = configurations.name;
   var textureName = configurations.textureName;
   var colorName = configurations.colorName;
@@ -3462,81 +3460,24 @@ Roygbiv.prototype.createCrosshair = function(configurations){
   var size = configurations.size;
   var maxWidthPercent = configurations.maxWidthPercent;
   var maxHeightPercent = configurations.maxHeightPercent;
-
-  if (typeof name == UNDEFINED){
-    throw new Error("createCrosshair error: name is a mandatory configuration.");
-    return;
-  }
-  if (crosshairs[name]){
-    throw new Error("createCrosshair error: name must be unique.");
-    return;
-  }
-  if (typeof textureName == UNDEFINED){
-    throw new Error("createCrosshair error: textureName is a mandatory configuration.");
-    return;
-  }
+  preConditions.checkIfMandatoryParameterExists(ROYGBIV.createCrosshair, preConditions.name, name);
+  preConditions.checkIfTrue(ROYGBIV.createCrosshair, "name must be unique", crosshairs[name]);
+  preConditions.checkIfMandatoryParameterExists(ROYGBIV.createCrosshair, preConditions.textureName, textureName);
   var texture = textures[textureName];
-  if (typeof texture == UNDEFINED){
-    throw new Error("createCrosshair error: No such texture.");
-    return;
-  }
-  if (!(texture instanceof THREE.Texture)){
-    throw new Error("createCrosshair error: Texture not ready.");
-    return;
-  }
-  if (typeof alpha == UNDEFINED){
-    throw new Error("createCrosshair error: alpha is a mandatory configuration.");
-    return;
-  }
-  if (isNaN(alpha)){
-    throw new Error("createCrosshair error: Bad alpha parameter.");
-    return;
-  }
-  if (alpha < 0 || alpha > 1){
-    throw new Error("createCrosshair error: alpha must be between 0 and 1.");
-    return;
-  }
-  if (typeof size == UNDEFINED){
-    throw new Error("createCrosshair error: size is a mandatory configuration.");
-    return;
-  }
-  if (isNaN(size)){
-    throw new Error("createCrosshair error: Bad size parameter.");
-    return;
-  }
-  if (size <= 0){
-    throw new Error("createCrosshair error: size must be greater than zero.");
-    return;
-  }
-  if (!(typeof maxWidthPercent == UNDEFINED)){
-    if (isNaN(maxWidthPercent)){
-      throw new Error("createCrosshair error: maxWidthPercent is not a number.");
-      return;
-    }
-    if (maxWidthPercent <= 0){
-      throw new Error("createCrosshair error: maxWidthPercent must be greater than zero.");
-      return;
-    }
-    if (maxWidthPercent > 100){
-      throw new Error("createCrosshair error: maxWidthPercent must be less than 100.");
-      return;
-    }
-  }
-  if (!(typeof maxHeightPercent == UNDEFINED)){
-    if (isNaN(maxHeightPercent)){
-      throw new Error("createCrosshair error: maxHeightPercent is not a number.");
-      return;
-    }
-    if (maxHeightPercent <= 0){
-      throw new Error("createCrosshair error: maxHeightPercent must be greater than zero.");
-      return;
-    }
-    if (maxHeightPercent > 100){
-      throw new Error("createCrosshair error: maxHeightPercent must be less than 100.");
-      return;
-    }
-  }
-
+  preConditions.checkIfTextureExists(ROYGBIV.createCrosshair, preConditions.texture, texture);
+  preConditions.checkIfTextureReady(ROYGBIV.createCrosshair, preConditions.texture, texture);
+  preConditions.checkIfMandatoryParameterExists(ROYGBIV.createCrosshair, preConditions.alpha, alpha);
+  preConditions.checkIfNumber(ROYGBIV.createCrosshair, preConditions.alpha, alpha);
+  preConditions.checkIfInRange(ROYGBIV.createCrosshair, preConditions.alpha, alpha, 0, 1);
+  preConditions.checkIfMandatoryParameterExists(ROYGBIV.createCrosshair, preConditions.size, size);
+  preConditions.checkIfNumber(ROYGBIV.createCrosshair, preConditions.size, size);
+  preConditions.checkIfLessThan(ROYGBIV.createCrosshair, preConditions.size, size, 0);
+  preConditions.checkIfNumberOnlyIfExists(ROYGBIV.createCrosshair, preConditions.maxWidthPercent, maxWidthPercent);
+  preConditions.checkIfLessThanOnlyIfExists(ROYGBIV.createCrosshair, preConditions.maxWidthPercent, maxWidthPercent);
+  preConditions.checkIfTrueOnlyIfYExists(ROYGBIV.createCrosshair, "maxWidthPercent must be less than 100", (maxWidthPercent), (maxWidthPercent > 100));
+  preConditions.checkIfNumberOnlyIfExists(ROYGBIV.createCrosshair, preConditions.maxHeightPercent, maxHeightPercent);
+  preConditions.checkIfLessThanOnlyIfExists(ROYGBIV.createCrosshair, preConditions.maxHeightPercent, maxHeightPercent);
+  preConditions.checkIfTrueOnlyIfYExists(ROYGBIV.createCrosshair, "maxHeightPercent must be less than 100", (maxHeightPercent), (maxHeightPercent > 100));
   var color = new THREE.Color(colorName);
   new Crosshair({
     name: name,
@@ -3557,15 +3498,9 @@ Roygbiv.prototype.selectCrosshair = function(crosshairName){
   if (mode == 0){
     return;
   }
-  if (typeof crosshairName == UNDEFINED){
-    throw new Error("selectCrosshair error: crosshairName is not defined.");
-    return;
-  }
+  preConditions.checkIfDefined(ROYGBIV.selectCrosshair, preConditions.crosshairName, crosshairName);
   var crosshair = crosshairs[crosshairName];
-  if (!crosshair){
-    throw new Error("selectCrosshair error: No such crosshair.");
-    return;
-  }
+  preConditions.checkIfTrue(ROYGBIV.selectCrosshair, "No such crosshair.", (!crosshair));
   if (selectedCrosshair){
     selectedCrosshair.mesh.visible = false;
   }
@@ -3580,14 +3515,8 @@ Roygbiv.prototype.changeCrosshairColor = function(colorName){
   if (mode == 0){
     return;
   }
-  if (typeof colorName == UNDEFINED){
-    throw new Error("changeCrosshairColor error: colorName is not defined.");
-    return;
-  }
-  if (!selectedCrosshair){
-    throw new Error("changeCrosshairColor error: No crosshair is selected.");
-    return;
-  }
+  preConditions.checkIfDefined(ROYGBIV.changeCrosshairColor, preConditions.colorName, colorName);
+  preConditions.checkIfTrue(ROYGBIV.changeCrosshairColor, "No crosshair is selected", (!selectedCrosshair));
   REUSABLE_COLOR.set(colorName);
   selectedCrosshair.material.uniforms.color.value.x = REUSABLE_COLOR.r;
   selectedCrosshair.material.uniforms.color.value.y = REUSABLE_COLOR.g;
@@ -3613,18 +3542,9 @@ Roygbiv.prototype.startCrosshairRotation = function(angularSpeed){
   if (mode == 0){
     return;
   }
-  if (!selectedCrosshair){
-    throw new Error("startCrosshairRotation error: No selected crosshair.");
-    return;
-  }
-  if (typeof angularSpeed == UNDEFINED){
-    throw new Error("startCrosshairRotation error: angularSpeed is not defined.");
-    return;
-  }
-  if (isNaN(angularSpeed)){
-    throw new Error("startCrosshairRotation error: angularSpeed is not a number.");
-    return;
-  }
+  preConditions.checkIfTrue(ROYGBIV.startCrosshairRotation, "No selected crosshair", (!selectedCrosshair));
+  preConditions.checkIfDefined(ROYGBIV.startCrosshairRotation, preConditions.angularSpeed, angularSpeed);
+  preConditions.checkIfNumber(ROYGBIV.startCrosshairRotation, preConditions.angularSpeed, angularSpeed);
   selectedCrosshair.angularSpeed = angularSpeed;
 }
 
@@ -3634,10 +3554,7 @@ Roygbiv.prototype.stopCrosshairRotation = function(){
   if (mode == 0){
     return;
   }
-  if (!selectedCrosshair){
-    throw new Error("stopCrosshairRotation error: No selected crosshair.");
-    return;
-  }
+  preConditions.checkIfTrue(ROYGBIV.stopCrosshairRotation, "No selectedCrosshair.", (!selectedCrosshair));
   selectedCrosshair.rotationTime = 0;
   selectedCrosshair.angularSpeed = 0;
   selectedCrosshair.resetRotation();
@@ -3650,10 +3567,7 @@ Roygbiv.prototype.pauseCrosshairRotation = function(){
   if (mode == 0){
     return;
   }
-  if (!selectedCrosshair){
-    throw new Error("pauseCrosshairRotation error: No selected crosshair.");
-    return;
-  }
+  preConditions.checkIfTrue(ROYGBIV.pauseCrosshairRotation, "No selectedCrosshair.", (!selectedCrosshair));
   selectedCrosshair.angularSpeed = 0;
 }
 
@@ -3665,34 +3579,13 @@ Roygbiv.prototype.expandCrosshair = function(targetSize, delta){
   if (mode == 0){
     return;
   }
-  if (!selectedCrosshair){
-    throw new Error("expandCrosshair error: No selected crosshair.");
-    return;
-  }
-  if (typeof targetSize == UNDEFINED){
-    throw new Error("expandCrosshair error: targetSize is not defined.");
-    return;
-  }
-  if (isNaN(targetSize)){
-    throw new Error("expandCrosshair error: Bad targetSize parameter.");
-    return;
-  }
-  if (targetSize <= selectedCrosshair.sizeAmount){
-    throw new Error("expandCrosshair error: targetSize must not be less than the size of the crosshair.");
-    return;
-  }
-  if (typeof delta == UNDEFINED){
-    throw new Error("expandCrosshair error: delta is not defined.");
-    return;
-  }
-  if (isNaN(delta)){
-    throw new Error("expandCrosshair error: Bad delta parameter.");
-    return;
-  }
-  if (delta <= 0){
-    throw new Error("expandCrosshair error: delta must be greater than zero.");
-    return;
-  }
+  preConditions.checkIfTrue(ROYGBIV.expandCrosshair, "No selectedCrosshair.", (!selectedCrosshair));
+  preConditions.checkIfDefined(ROYGBIV.expandCrosshair, preConditions.targetSize, targetSize);
+  preConditions.checkIfNumber(ROYGBIV.expandCrosshair, preConditions.targetSize, targetSize);
+  preConditions.checkIfLessThan(ROYGBIV.expandCrosshair, preConditions.targetSize, targetSize, selectedCrosshair.sizeAmount);
+  preConditions.checkIfDefined(ROYGBIV.expandCrosshair, preConditions.delta, delta);
+  preConditions.checkIfNumber(ROYGBIV.expandCrosshair, preConditions.delta, delta);
+  preConditions.checkIfLessThan(ROYGBIV.expandCrosshair, preConditions.delta, delta, 0);
   selectedCrosshair.expandTick = 0;
   selectedCrosshair.expandTargetSize = targetSize;
   selectedCrosshair.expandDelta = delta;
@@ -3708,22 +3601,10 @@ Roygbiv.prototype.shrinkCrosshair = function(delta){
   if (mode == 0){
     return;
   }
-  if (typeof delta == UNDEFINED){
-    throw new Error("shrinkCrosshair error: delta is not defined.");
-    return;
-  }
-  if (isNaN(delta)){
-    throw new Error("shrinkCrosshair error: Bad delta parameter.");
-    return;
-  }
-  if (delta <= 0){
-    throw new Error("shrinkCrosshair error: delta must be greater than zero.");
-    return;
-  }
-  if (!selectedCrosshair){
-    throw new Error("shrinkCrosshair error: No selected crosshair.");
-    return;
-  }
+  preConditions.checkIfDefined(ROYGBIV.shrinkCrosshair, preConditions.delta, delta);
+  preConditions.checkIfNumber(ROYGBIV.shrinkCrosshair, preConditions.delta, delta);
+  preConditions.checkIfLessThan(ROYGBIV.shrinkCrosshair, preConditions.delta, delta, 0);
+  preConditions.checkIfTrue(ROYGBIV.shrinkCrosshair, "No selected crosshair.", (!selectedCrosshair));
   selectedCrosshair.shrinkTick = 0;
   selectedCrosshair.expandDelta = delta;
   selectedCrosshair.material.uniforms.shrinkStartSize.value = selectedCrosshair.curSize;

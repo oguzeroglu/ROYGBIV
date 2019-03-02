@@ -103,6 +103,13 @@ var Preconditions = function(){
   this.poolName = "poolName";
   this.poolSize = "poolSize";
   this.referenceHeight = "referenceHeight";
+  this.textureName = "textureName";
+  this.maxWidthPercent = "maxWidthPercent";
+  this.maxHeightPercent = "maxHeightPercent";
+  this.crosshairName = "crosshairName";
+  this.angularSpeed = "angularSpeed";
+  this.targetSize = "targetSize";
+  this.delta = "delta";
 }
 
 Preconditions.prototype.errorHeader = function(callerFunc){
