@@ -197,7 +197,7 @@ function readEngineScripts(projectName, author, noMobile){
         var roygbivJSSplitted = scriptContent.split("\n");
         var commentsFiltered = "";
         for (var i2 = 0; i2<roygbivJSSplitted.length; i2++){
-          if (!roygbivJSSplitted[i2].startsWith("//")){
+          if (!roygbivJSSplitted[i2].startsWith("//") && !roygbivJSSplitted[i2].trim().startsWith("preConditions")){
             commentsFiltered += roygbivJSSplitted[i2] + "\n";
           }
         }
@@ -229,6 +229,9 @@ function readEngineScripts(projectName, author, noMobile){
         continue;
       }else if (scriptPath.includes("dat.gui.min.js")){
         console.log("[*] Skipping DAT gui.");
+        continue;
+      }else if (scriptPath.includes("Preconditions.js")){
+        console.log("[*] Skipping Preconditions");
         continue;
       }
       content += scriptContent +"\n";

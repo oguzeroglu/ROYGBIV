@@ -115,7 +115,9 @@ window.onload = function() {
   objectPicker2D = new ObjectPicker2D();
 
   // PRECONDITIONS
-  preConditions = new Preconditions();
+  if (!isDeployment){
+    preConditions = new Preconditions();
+  }
 
   // MODE SWITCHER
   modeSwitcher = new ModeSwitcher();

@@ -2539,6 +2539,7 @@ var selectionHandler;
 var guiHandler;
 var cpuOperationsHandler;
 var particleSystemRefHeight = 0;
+var preConditions;
 
 // WORKER VARIABLES
 var WORKERS_SUPPORTED = (typeof(Worker) !== "undefined");
@@ -9392,6 +9393,7 @@ window.onload = function() {
       if (!Text[Text.ROYGBIV_SCRIPTING_API_PREFIX+ROYGBIV.functionNames[i].toUpperCase()]){
         console.error("[*] Scripting API error: "+ROYGBIV.functionNames[i]+" explanation is not present.");
       }
+      ROYGBIV[ROYGBIV.functionNames[i]].roygbivFuncName = ROYGBIV.functionNames[i];
     }
   }
 
@@ -9428,6 +9430,11 @@ window.onload = function() {
 
   // OBJECT PICKER 2D
   objectPicker2D = new ObjectPicker2D();
+
+  // PRECONDITIONS
+  if (!isDeployment){
+    preConditions = new Preconditions();
+  }
 
   // MODE SWITCHER
   modeSwitcher = new ModeSwitcher();
@@ -17662,19 +17669,11 @@ Roygbiv.prototype.getParticleSystem = function(name){
   }
 }
 
-Roygbiv.prototype.getChildObject = function(gluedObject, childObjectName){
+Roygbiv.prototype.getChildObject = function(objectGroup, childObjectName){
   if (mode == 0){
     return;
   }
-  if (!gluedObject){
-    throw new Error("getChildObject error: glued object is undefined.");
-    return;
-  }
-  if (!(gluedObject.isObjectGroup)){
-    throw new Error("getChildObject error: Type not supported.");
-    return;
-  }
-  var child = gluedObject.childObjectsByName[childObjectName];
+  var child = objectGroup.childObjectsByName[childObjectName];
   if (child){
     return child;
   }
@@ -17691,22 +17690,6 @@ Roygbiv.prototype.getRandomColor = function(){
 Roygbiv.prototype.getPosition = function(object, targetVector, axis){
   if (mode == 0){
     return;
-  }
-  if (!object){
-    throw new Error("getPosition error: Object is undefined.");
-    return;
-  }
-  if (axis){
-    if (axis.toLowerCase() != "x" && axis.toLowerCase() != "y" && axis.toLowerCase() != "z"){
-      throw new Error("getPosition error: Axis must be one of x, y, or z.");
-      return;
-    }
-  }
-  if (!(typeof targetVector == UNDEFINED) && !(targetVector == null)){
-    if (isNaN(targetVector.x) || isNaN(targetVector.y) || isNaN(targetVector.z)){
-      throw new Error("getPosition error: Bad targetVector parameter.");
-      return;
-    }
   }
   if (object.isAddedObject){
     if (axis){
@@ -17812,9 +17795,6 @@ Roygbiv.prototype.getPosition = function(object, targetVector, axis){
         );
       }
     }
-  }else{
-    throw new Error("getPosition error: Object type not supported.");
-    return;
   }
 }
 
@@ -17822,63 +17802,26 @@ Roygbiv.prototype.getOpacity = function(object){
   if (mode == 0){
     return;
   }
-  if (!object){
-    throw new Error("getOpacity error: Object is undefined.");
-    return;
-  }
-  var isAddedObject = (object.isAddedObject);
-  var isObjectGroup = (object.isObjectGroup);
-  if (!(isAddedObject || isObjectGroup)){
-    throw new Error("getOpacity error: Type not supported.");
-    return;
-  }
-  if (isAddedObject){
+  if (object.isAddedObject){
     return object.mesh.material.uniforms.alpha.value;
   }
   return object.mesh.material.uniforms.totalAlpha.value;
 }
 
-Roygbiv.prototype.getMarkedPosition = function(markedPointName){
+Roygbiv.prototype.getMarkedPosition = function(markedPointName, targetVector){
   if (mode == 0){
     return;
   }
-  if (typeof markedPointName == UNDEFINED){
-    throw new Error("getMarkedPosition error: markedPointName is not defined.");
-    return;
-  }
   var markedPoint = markedPoints[markedPointName];
-  if (!markedPoint){
-    throw new Error("getMarkedPosition error: No such marked point.");
-    return;
-  }
-  return this.vector(markedPoint.x, markedPoint.y, markedPoint.z);
+  targetVector.x = markedPoint.x;
+  targetVector.y = markedPoint.y;
+  targetVector.z = markedPoint.z;
+  return targetVector;
 }
 
 Roygbiv.prototype.getParticleSystemVelocityAtTime = function(particleSystem, time, targetVector){
   if (mode == 0){
     return;
-  }
-  if (!particleSystem){
-    throw new Error("getParticleSystemVelocityAtTime error: particleSystem is not defined.");
-    return;
-  }
-  if (!(particleSystem.isParticleSystem)){
-    throw new Error("getParticleSystemVelocityAtTime error: Unsupported particleSystem type.");
-    return;
-  }
-  if (typeof time == UNDEFINED){
-    throw new Error("getParticleSystemVelocityAtTime error: time is not defined.");
-    return;
-  }
-  if (isNaN(time)){
-    throw new Error("getParticleSystemVelocityAtTime error: time is not a number.");
-    return;
-  }
-  if (!(typeof targetVector == UNDEFINED)){
-    if (isNaN(targetVector.x ) || isNaN(targetVector.y) || isNaN(targetVector.z)){
-      throw new Error("getParticleSystemVelocityAtTime error: Bad targetVector parameter.");
-      return;
-    }
   }
   return particleSystem.getVelocityAtTime(time, targetVector);
 }
@@ -17887,73 +17830,33 @@ Roygbiv.prototype.getCameraDirection = function(targetVector){
   if (mode == 0){
     return;
   }
-  if (!(typeof targetVector == UNDEFINED)){
-    if (isNaN(targetVector.x) || isNaN(targetVector.y) || isNaN(targetVector.z)){
-      throw new Error("getCameraDirection error: Bad targetVector parameter.");
-      return;
-    }
-  }
   REUSABLE_VECTOR.set(0, 0, -1).applyQuaternion(camera.quaternion);
-  if (!targetVector){
-    return this.vector(REUSABLE_VECTOR.x, REUSABLE_VECTOR.y, REUSABLE_VECTOR.z);
-  }else{
-    targetVector.x = REUSABLE_VECTOR.x;
-    targetVector.y = REUSABLE_VECTOR.y;
-    targetVector.z = REUSABLE_VECTOR.z;
-    return targetVector;
-  }
+  targetVector.x = REUSABLE_VECTOR.x;
+  targetVector.y = REUSABLE_VECTOR.y;
+  targetVector.z = REUSABLE_VECTOR.z;
+  return targetVector;
 }
 
 Roygbiv.prototype.getCameraPosition = function(targetVector){
   if (mode == 0){
     return;
   }
-  if (!(typeof targetVector == UNDEFINED)){
-    if (isNaN(targetVector.x) || isNaN(targetVector.y) || isNaN(targetVector.z)){
-      throw new Error("getCameraPosition error: Bad targetVector parameter.");
-      return;
-    }
-  }
-  if (!targetVector){
-    return this.vector(camera.position.x, camera.position.y, camera.position.z);
-  }else{
-    targetVector.x = camera.position.x;
-    targetVector.y = camera.position.y;
-    targetVector.z = camera.position.z;
-    return targetVector;
-  }
+  targetVector.x = camera.position.x;
+  targetVector.y = camera.position.y;
+  targetVector.z = camera.position.z;
+  return targetVector;
 }
 
 Roygbiv.prototype.getParticleSystemPool = function(name){
   if (mode == 0){
     return;
   }
-  if (typeof name == UNDEFINED){
-    throw new Error("getParticleSystemPool error: name is not defined.");
-    return;
-  }
   var psPool = particleSystemPools[name];
-  if (!psPool){
-    throw new Error("getParticleSystemPool error: No such particle system pool.");
-    return;
-  }
   return psPool;
 }
 
 Roygbiv.prototype.getParticleSystemFromPool = function(pool){
   if (mode == 0){
-    return;
-  }
-  if (typeof pool == UNDEFINED){
-    throw new Error("getParticleSystemFromPool error: pool is not defined.");
-    return;
-  }
-  if (!(pool.isParticleSystemPool)){
-    throw new Error("getParticleSystemFromPool error: Type not supported.");
-    return;
-  }
-  if (pool.destroyed){
-    throw new Error("getParticleSystemFromPool error: pool is destroyed.");
     return;
   }
   return pool.get();
@@ -17963,37 +17866,12 @@ Roygbiv.prototype.getEndPoint = function(object, axis, targetVector){
   if (mode == 0){
     return;
   }
-  if (typeof object == UNDEFINED){
-    throw new Error("getEndPoint error: object is not defined.");
-    return;
-  }
-  if (!(object.isAddedObject)){
-    throw new Error("getEndPoint error: object is not an AddedObject.");
-    return;
-  }
-  if (typeof axis == UNDEFINED){
-    throw new Error("getEndPoint error: axis is not defined.");
-    return;
-  }
-  if (typeof targetVector == UNDEFINED){
-    throw new Error("getEndPoint error: targetVector is not defined.");
-    return;
-  }
-  if (isNaN(targetVector.x) || isNaN(targetVector.y) || isNaN(targetVector.z)){
-    throw new Error("getEndPoint error: targetVector is not a vector.");
-    return;
-  }
   axis = axis.toLowerCase();
-  if (axis == "+x" || axis == "-x" || axis == "+y" || axis == "-y" || axis == "+z" || axis == "-z"){
-    var endPoint = object.getEndPoint(axis);
-    targetVector.x = endPoint.x;
-    targetVector.y = endPoint.y;
-    targetVector.z = endPoint.z;
-    return targetVector;
-  }else{
-    throw new Error("getEndPoint error: Invalid axis.");
-    return;
-  }
+  var endPoint = object.getEndPoint(axis);
+  targetVector.x = endPoint.x;
+  targetVector.y = endPoint.y;
+  targetVector.z = endPoint.z;
+  return targetVector;
 }
 
 Roygbiv.prototype.getViewport = function(){
@@ -18005,10 +17883,6 @@ Roygbiv.prototype.getViewport = function(){
 
 Roygbiv.prototype.getText = function(textName){
   if (mode == 0){
-    return;
-  }
-  if (typeof textName == UNDEFINED){
-    throw new Error("getText error: textName is not defined.");
     return;
   }
   var text = addedTexts[textName];
@@ -18030,29 +17904,9 @@ Roygbiv.prototype.hide = function(object, keepPhysics){
   if (mode == 0){
     return;
   }
-  var keepPhysicsValue = false;
-  if (!(typeof keepPhysics == UNDEFINED)){
-    if (!(typeof keepPhysics == "boolean")){
-      throw new Error("hide error: Bad keepPhysics parameter.");
-      return;
-    }
-    keepPhysicsValue = keepPhysics;
-  }
-  if (!object){
-    throw new Error("hide error: object is not defined.");
-    return;
-  }
+  var keepPhysicsValue = keepPhysics;
   if (object.isAddedObject){
-    if (!addedObjects[object.name]){
-      throw new Error("hide error: Cannot hide a child object. Use the parent object instead.");
-      return;
-    }
-    if (keepPhysicsValue && object.noMass){
-      throw new Error("hide error: Object has no mass. Cannot keep mass.");
-    }
-    if (!object.isChangeable){
-      throw new Error("hide error: Object is not marked as changeable.");
-      return;
+    if (keepPhysicsValue){
     }
     if (object.isVisibleOnThePreviewScene()){
       object.mesh.visible = false;
@@ -18074,12 +17928,7 @@ Roygbiv.prototype.hide = function(object, keepPhysics){
       rayCaster.hide(object);
     }
   }else if (object.isObjectGroup){
-    if (keepPhysicsValue && object.noMass){
-      throw new Error("hide error: Object has no mass. Cannot keep mass.");
-    }
-    if (!object.isChangeable){
-      throw new Error("hide error: object is not marked as changeable.");
-      return;
+    if (keepPhysicsValue){
     }
     if (object.isVisibleOnThePreviewScene()){
       object.mesh.visible = false;
@@ -18096,9 +17945,6 @@ Roygbiv.prototype.hide = function(object, keepPhysics){
       object.isHidden = true;
       rayCaster.hide(object);
     }
-  }else{
-    throw new Error("hide error: Unsupported type.");
-    return;
   }
 }
 
@@ -18106,19 +17952,7 @@ Roygbiv.prototype.show = function(object){
   if (mode == 0){
     return;
   }
-  if (!object){
-    throw new Error("show error: object is not defined.");
-    return;
-  }
   if (object.isAddedObject){
-    if (!addedObjects[object.name]){
-      throw new Error("show error: Cannot show a child object. Use the parent object instead.");
-      return;
-    }
-    if (!object.isChangeable){
-      throw new Error("show error: object is not marked as changeable.");
-      return;
-    }
     if (!object.isVisibleOnThePreviewScene()){
       object.mesh.visible = true;
       if (!object.physicsKeptWhenHidden){
@@ -18132,10 +17966,6 @@ Roygbiv.prototype.show = function(object){
       rayCaster.show(object);
     }
   }else if (object.isObjectGroup){
-    if (!object.isChangeable){
-      throw new Error("show error: object is not marked as changeable.");
-      return;
-    }
     if (!object.isVisibleOnThePreviewScene()){
       object.mesh.visible = true;
       if (!object.physicsKeptWhenHidden){
@@ -18148,46 +17978,12 @@ Roygbiv.prototype.show = function(object){
       object.isHidden = false;
       rayCaster.show(object);
     }
-  }else{
-    throw new Error("show error: Unsupported type.");
-    return;
   }
 }
 
 Roygbiv.prototype.applyForce = function(object, force, point){
   if (mode == 0){
     return;
-  }
-  if (!object){
-    throw new Error("applyForce error: object is not defined.");
-    return;
-  }
-  if (!(object.isAddedObject) && !(object.isObjectGroup)){
-    throw new Error("applyForce error: object type is not supported.");
-    return;
-  }
-  if (object.noMass){
-    throw new Error("applyForce error: object does not have a mass.");
-    return;
-  }
-  if (!object.isDynamicObject){
-    throw new Error("applyForce error: object is not dynamic.");
-    return;
-  }
-  if (!force){
-    throw new Error("applyForce error: force is not defined.");
-    return;
-  }
-  if (!point){
-    throw new Error("applyForce error: point is not defined.");
-    return;
-  }
-  if (typeof force.x == UNDEFINED || typeof force.y == UNDEFINED || typeof force.z == UNDEFINED){
-    throw new Error("applyForce error: force is not a vector.");
-    return;
-  }
-  if (typeof point.x == UNDEFINED || typeof point.y == UNDEFINED || typeof point.z == UNDEFINED){
-    throw new Error("applyForce error: point is not a vector.");
   }
   if (!isPhysicsWorkerEnabled()){
     REUSABLE_CANNON_VECTOR.set(force.x, force.y, force.z);
@@ -18203,27 +17999,7 @@ Roygbiv.prototype.rotate = function(object, axis, radians){
   if (mode == 0){
     return;
   }
-  if (!object){
-    throw new Error("rotate error: Object undefined.");
-    return;
-  }
-  if (typeof axis == "UNDEFINED"){
-    throw new Error("rotate error: axis is not defined.");
-    return;
-  }
   axis = axis.toLowerCase();
-  if (axis != "x" && axis != "y" && axis != "z"){
-    throw new Error("rotate error: Axis must be one of x, y, or z.");
-    return;
-  }
-  if (isNaN(radians)){
-    throw new Error("rotate error: Radians value is not a number.");
-    return;
-  }
-  if (!(object.isAddedObject) && !(object.isObjectGroup) && !(object.isParticleSystem)){
-    throw new Error("rotate error: Type not supported.");
-    return;
-  }
   var isObject = false;
   if ((object.isAddedObject) || (object.isObjectGroup)){
     isObject = true;
@@ -18243,10 +18019,6 @@ Roygbiv.prototype.rotate = function(object, axis, radians){
     }
   }
   if ((object.isAddedObject) || (object.isObjectGroup)){
-    if (!object.isChangeable){
-      throw new Error("rotate error: object is not marked as changeable.");
-      return;
-    }
   }
   if (object.pivotObject){
     object.rotateAroundPivotObject(axis, radians);
@@ -18259,38 +18031,7 @@ Roygbiv.prototype.rotateAroundXYZ = function(object, x, y, z, radians, axis, ski
   if (mode == 0){
     return;
   }
-  if (!object){
-    throw new Error("rotateAroundXYZ error: Object is undefined.");
-    return;
-  }
-  if (isNaN(x)){
-    throw new Error("rotateAroundXYZ error: X is not a number.");
-    return;
-  }
-  if (isNaN(y)){
-    throw new Error("rotateAroundXYZ error: Y is not a number.");
-    return;
-  }
-  if (isNaN(z)){
-    throw new Error("rotateAroundXYZ error: Z is not a number.");
-    return;
-  }
-  if (isNaN(radians)){
-    throw new Error("rotateAroundXYZ error: Radian value is not a number.");
-    return;
-  }
-  if (typeof axis == UNDEFINED){
-    throw new Error("rotateAroundXYZ error: axis is not defined.");
-  }
-  if (axis.toLowerCase() != "x" && axis.toLowerCase() != "y" && axis.toLowerCase() != "z"){
-    throw new Error("rotateAroundXYZ error: Axis must be one of x,y or z");
-    return;
-  }
-  if (!(typeof skipLocalRotation == UNDEFINED)){
-    if (!(typeof skipLocalRotation == "boolean")){
-      throw new Error("rotateAroundXYZ error: skipLocalRotation must be a boolean.");
-    }
-  }
+  axis = axis.toLowerCase();
   var axisVector;
   if (axis.toLowerCase() == "x"){
     axisVector = THREE_AXIS_VECTOR_X;
@@ -18314,20 +18055,9 @@ Roygbiv.prototype.rotateAroundXYZ = function(object, x, y, z, radians, axis, ski
         return;
       }
     }
-    if (!object.isChangeable){
-      throw new Error("rotateAroundXYZ error: object is not marked as changeable.");
-      return;
-    }
     mesh = object.mesh;
   }else if (object.isObjectGroup){
-    if (!object.isChangeable){
-      throw new Error("rotateAroundXYZ error: object is not marked as changeable.");
-      return;
-    }
     mesh = object.mesh;
-  }else{
-    throw new Error("rotateAroundXYZ error: Type not supported.");
-    return;
   }
   var point = REUSABLE_VECTOR.set(x, y, z);
   mesh.parent.localToWorld(mesh.position);
@@ -18356,35 +18086,10 @@ Roygbiv.prototype.setPosition = function(obj, x, y, z){
   if (mode == 0){
     return;
   }
-  if (!obj){
-    throw new Error("setPosition error: Object is undefined");
-    return;
-  }
-  if (isNaN(x)){
-    throw new Error("setPosition error: X is not a number.");
-    return;
-  }
-  if (isNaN(y)){
-    throw new Error("setPosition error: Y is not a number.");
-    return;
-  }
-  if (isNaN(z)){
-    throw new Error("setPosition error: Z is not a number.");
-    return;
-  }
   if (obj.isAddedObject){
     if (obj.parentObjectName){
       var objGroup = objectGroups[obj.parentObjectName];
-      if (objGroup){
-        this.setPosition(objGroup, x, y, z);
-        return;
-      }else{
-        throw new Error("setPosition error: Parent not defined.");
-        return;
-      }
-    }
-    if (!obj.isChangeable){
-      throw new Error("setPosition error: object is not marked as changeable.");
+      this.setPosition(objGroup, x, y, z);
       return;
     }
     obj.mesh.position.set(x, y, z);
@@ -18393,52 +18098,17 @@ Roygbiv.prototype.setPosition = function(obj, x, y, z){
       rayCaster.updateObject(obj);
     }
   }else if (obj.isObjectGroup){
-    if (!obj.isChangeable){
-      throw new Error("setPosition error: object is not marked as changeable.");
-      return;
-    }
     obj.mesh.position.set(x, y, z);
     obj.graphicsGroup.position.set(x, y, z);
     obj.physicsBody.position.set(x, y, z);
     if (obj.mesh.visible){
       rayCaster.updateObject(obj);
     }
-  }else{
-    throw new Error("setPosition error: Type not supported.");
-    return;
   }
 }
 
 Roygbiv.prototype.setMass = function(object, mass){
   if (mode == 0){
-    return;
-  }
-  if (!object){
-    throw new Error("setMass error: Object is undefined.");
-    return;
-  }
-  if (typeof mass == UNDEFINED){
-    throw new Error("setMass error: mass is undefined.");
-    return;
-  }
-  if (isNaN(mass)){
-    throw new Error("setMass error: mass is not a number.");
-    return;
-  }
-  if (!(object.isAddedObject) && !(object.isObjectGroup)){
-    throw new Error("setMass error: Unsupported type.");
-    return;
-  }
-  if (!object.isChangeable){
-    throw new Error("setMass error: object is not marked as changeable.");
-    return;
-  }
-  if (object.noMass){
-    throw new Error("setMass error: object has no mass property.");
-    return;
-  }
-  if ((object.isAddedObject) && !(addedObjects[object.name])){
-    throw new Error("setMass error: Cannot set mass of child objects. Use the parent object instead.");
     return;
   }
   if (typeof object.originalMass == UNDEFINED){
@@ -18468,19 +18138,7 @@ Roygbiv.prototype.translate = function(object, axis, amount){
   if (mode == 0){
     return;
   }
-  if (!object){
-    throw new Error("translate error: Object not defined.");
-    return;
-  }
   axis = axis.toLowerCase();
-  if (axis != "x" && axis!= "y" && axis != "z"){
-    throw new Error("translate error: Axis must be one of x, y, or z.");
-    return;
-  }
-  if (isNaN(amount)){
-    throw new Error("translate error: Amount is not a number.");
-    return;
-  }
   if (object.isAddedObject){
     if (object.parentObjectName){
       var parentObject = objectGroups[object.parentObjectName];
@@ -18489,55 +18147,22 @@ Roygbiv.prototype.translate = function(object, axis, amount){
         return;
       }
     }
-    if (!object.isChangeable){
-      throw new Error("translate error: object is not marked as changeable.");
-      return;
-    }
-    object.translate(axis, amount, true);
-  }else if (object.isObjectGroup){
-    if (!object.isChangeable){
-      throw new Error("translate error: object is not marked as changeable.");
-      return;
-    }
-    object.translate(axis, amount, true);
-  }else {
-    throw new Error("translate error: Type not supported.");
-    return;
   }
+  object.translate(axis, amount, true);
 }
 
 Roygbiv.prototype.opacity = function(object, delta){
   if (mode == 0){
     return;
   }
-  if(!object){
-    throw new Error("opacity error: Object is not defined.");
-    return;
-  }
-  if (isNaN(delta)){
-    throw new Error("opacity error: Delta is not a number.");
-    return;
-  }
-  var isAddedObject = (object.isAddedObject);
-  var isObjectGroup = (object.isObjectGroup);
-  if (!((isAddedObject) || (isObjectGroup))){
-    throw new Error("opacity error: Type not supported.");
-    return;
-  }
-  if (object.parentObjectName){
-    throw new Error("opacity error: Cannot set opacity to child objects.");
-    return;
-  }
-  if (!object.initOpacitySet && (isAddedObject)){
+  if (!object.initOpacitySet && (object.isAddedObject)){
     object.initOpacity = object.mesh.material.uniforms.alpha.value;
     object.initOpacitySet = true;
-  }else if (!object.initOpacitySet && (isObjectGroup)){
+  }else if (!object.initOpacitySet && (object.isObjectGroup)){
     object.initOpacity = object.mesh.material.uniforms.totalAlpha.value;
     object.initOpacitySet = true;
   }
-
   object.incrementOpacity(delta);
-
   if (isAddedObject){
     if (object.mesh.material.uniforms.alpha.value < 0){
       object.updateOpacity(0);
@@ -18553,51 +18178,19 @@ Roygbiv.prototype.opacity = function(object, delta){
       object.updateOpacity(1);
     }
   }
-
 }
 
 Roygbiv.prototype.setObjectVelocity = function(object, velocityVector, axis){
   if (mode == 0){
     return;
   }
-  if (typeof object == UNDEFINED){
-    throw new Error("setObjectVelocity error: object is not defined.");
-    return;
-  }
-  if (!(object.isAddedObject) && !(object.isObjectGroup)){
-    throw new Error("setObjectVelocity error: Type not supported.");
-    return;
-  }
-  if (!object.isChangeable){
-    throw new Error("setObjectVelocity error: object is not marked as changeable.");
-    return;
-  }
-  if ((object.isAddedObject) && !addedObjects[object.name]){
-    throw new Error("setObjectVelocity error: Cannot set velocity to child objects. Use parent object instead.");
-    return;
-  }
-  if (!object.isDynamicObject){
-    throw new Error("setObjectVelocity error: Object must have a mass greater than zero.");
-    return;
-  }
-  if (typeof velocityVector == UNDEFINED){
-    throw new Error("setObjectVelocity error: velocityVector is not defined.");
-    return;
-  }
-  if (isNaN(velocityVector.x) || isNaN(velocityVector.y) || isNaN(velocityVector.z)){
-    throw new Error("setObjectVelocity error: Bad velocityVector parameter.");
-    return;
-  }
   if (!(typeof axis == UNDEFINED)){
-    if (axis != "X" && axis != "x" && axis != "y" && axis != "Y" && axis != "z" && axis != "Z"){
-      throw new Error("setObjectVelocity error: Bad axis parameter.");
-      return;
-    }
-    if (axis == "x" || axis == "X"){
+    axis = axis.toLowerCase();
+    if (axis == "x"){
       object.physicsBody.velocity.x = velocityVector.x;
-    }else if (axis == "y" || axis == "Y"){
+    }else if (axis == "y"){
       object.physicsBody.velocity.y = velocityVector.y;
-    }else if (axis == "z" || axis == "Z"){
+    }else if (axis == "z"){
       object.physicsBody.velocity.z = velocityVector.z;
     }
     return;
@@ -18609,29 +18202,9 @@ Roygbiv.prototype.setObjectColor = function(object, colorName, alpha){
   if (mode == 0){
     return;
   }
-  if (typeof object == UNDEFINED){
-    throw new Error("setObjectColor error: object is not defined.");
-    return;
-  }
-  if (!(object.isAddedObject) && !(object.isObjectGroup)){
-    throw new Error("setObjectColor error: Type not supported.");
-    return;
-  }
-  if (!object.isColorizable){
-    throw new Error("setObjectColor error: Object is not marked as colorizable.");
-    return;
-  }
-  if (typeof colorName == UNDEFINED){
-    throw new Error("setObjectColor error: colorName is not defined.");
-    return;
-  }
   if (typeof alpha == UNDEFINED){
     alpha = 1;
   }else{
-    if (isNaN(alpha)){
-      throw new Error("setObjectColor error: alpha is not a number.");
-      return;
-    }
   }
   REUSABLE_COLOR.set(colorName);
   object.forceColor(REUSABLE_COLOR.r, REUSABLE_COLOR.g, REUSABLE_COLOR.b, alpha);
@@ -18641,31 +18214,11 @@ Roygbiv.prototype.resetObjectColor = function(object){
   if (mode == 0){
     return;
   }
-  if (typeof object == UNDEFINED){
-    throw new Error("resetObjectColor error: object is not defined.");
-    return;
-  }
-  if (!(object.isAddedObject) && !(object.isObjectGroup)){
-    throw new Error("resetObjectColor error: Type not supported.");
-    return;
-  }
-  if (!object.isColorizable){
-    throw new Error("setObjectColor error: Object is not marked as colorizable.");
-    return;
-  }
   object.resetColor();
 }
 
 Roygbiv.prototype.setRotationPivot = function(rotationPivot){
   if (mode == 0){
-    return;
-  }
-  if (typeof rotationPivot == UNDEFINED){
-    throw new Error("setRotationPivot error: rotationPivot is not defined.");
-    return;
-  }
-  if (!(rotationPivot.isObject3D)){
-    throw new Error("setRotationPivot error: Bad rotationPivot type.");
     return;
   }
   var sourceObject = rotationPivot.sourceObject;
@@ -18684,18 +18237,6 @@ Roygbiv.prototype.unsetRotationPivot = function(object){
   if (mode == 0){
     return;
   }
-  if (typeof object == UNDEFINED){
-    throw new Error("unsetRotationPivot error: object is not defined.");
-    return;
-  }
-  if (!((object.isAddedObject) || (object.isObjectGroup))){
-    throw new Error("unsetRotationPivot error: Type not supported.");
-    return;
-  }
-  if (!object.pivotObject){
-    throw new Error("unsetRotationPivot error: Object does not have a pivot point.");
-    return;
-  }
   delete object.pivotObject;
   delete object.pivotOffsetX;
   delete object.pivotOffsetY;
@@ -18704,26 +18245,6 @@ Roygbiv.prototype.unsetRotationPivot = function(object){
 
 Roygbiv.prototype.resetObjectVelocity = function(object){
   if (mode == 0){
-    return;
-  }
-  if (typeof object == UNDEFINED){
-    throw new Error("resetObjectVelocity error: object is not defined.");
-    return;
-  }
-  if (!(object.isAddedObject || object.isObjectGroup)){
-    throw new Error("resetObjectVelocity error: Type not supported.");
-    return;
-  }
-  if (!object.isChangeable){
-    throw new Error("resetObjectVelocity error: object is not marked as changeable.");
-    return;
-  }
-  if (object.parentObjectName){
-    throw new Error("resetObjectVelocity error: Cannot set velocity to child objects. Use parent object instead.");
-    return;
-  }
-  if (!object.isDynamicObject){
-    throw new Error("resetObjectVelocity error: Object must have a mass greater than zero.");
     return;
   }
   object.physicsBody.velocity.set(0, 0, 0);
@@ -18742,71 +18263,10 @@ Roygbiv.prototype.createParticleMaterial = function(configurations){
   var rgbFilter = configurations.rgbFilter;
   var targetColor = configurations.targetColor;
   var colorStep = configurations.colorStep;
-
-  if (typeof color == UNDEFINED){
-    throw new Error("createParticleMaterial error: color is a mandatory parameter.");
-    return;
-  }
-  if (typeof size == UNDEFINED){
-    throw new Error("createParticleMaterial error: size is a mandatory parameter.");
-    return;
-  }
-  if (isNaN(size)){
-    throw new Error("createParticleMaterial error: Bad size parameter.");
-    return;
-  }
-  if (size <= 0){
-    throw new Error("createParticleMaterial error: size must be greater than zero.");
-    return;
-  }
-  if (typeof alpha == UNDEFINED){
-    throw new Error("createParticleMaterial error: alpha is a mandatory parameter.");
-    return;
-  }
-  if (isNaN(alpha)){
-    throw new Error("createParticleMaterial error: Bad alpha parameter.");
-    return;
-  }
-  if (alpha < 0 || alpha > 1){
-    throw new Error("createParticleMaterial error: alpha must be between [0,1]");
-    return;
-  }
   if (!(typeof textureName == UNDEFINED)){
     var texture = textures[textureName];
-    if (typeof texture == UNDEFINED){
-      throw new Error("createParticleMaterial error: No such texture.");
-      return;
-    }
-    if (!(texture instanceof THREE.Texture)){
-      throw new Error("createParticleMaterial error: Texture not ready.");
-      return;
-    }
-    if (texture instanceof THREE.CompressedTexture){
-      throw new Error("createParticleMaterial error: Compressed textures are not supported for particle systems.");
-      return;
-    }
-  }
-  if (!(typeof rgbFilter == UNDEFINED)){
-    if (isNaN(rgbFilter.x) || isNaN(rgbFilter.y) || isNaN(rgbFilter.z)){
-      throw new Error("createParticleMaterial error: Bad rgbFilter parameter.");
-      return;
-    }
-  }
-  if (!(typeof targetColor == UNDEFINED)){
-    if (typeof colorStep == UNDEFINED){
-      throw new Error("createParticleMaterial error: colorStep is mandatory if targetColor is specified.");
-      return;
-    }
   }
   if (!(typeof colorStep == UNDEFINED) && configurations.colorStep != 0){
-    if (isNaN(colorStep)){
-      throw new Error("createParticleMaterial error: Bad colorStep parameter.");
-      return;
-    }
-    if (colorStep > 1 || colorStep <= 0){
-      throw new Error("createParticleMaterial error: colorStep must be between ]0,1]");
-      return;
-    }
   }else{
     configurations.colorStep = 0;
   }
@@ -18817,12 +18277,6 @@ Roygbiv.prototype.createParticle = function(configurations){
   if (mode == 0){
     return;
   }
-
-  if (!configurations){
-    throw new Error("createParticle error: configurations are not defined.");
-    return;
-  }
-
   var position = configurations.position;
   var material = configurations.material;
   var lifetime = configurations.lifetime;
@@ -18840,170 +18294,50 @@ Roygbiv.prototype.createParticle = function(configurations){
   var angularMotionRadius = configurations.angularMotionRadius;
   var angularQuaternion = configurations.angularQuaternion;
   var motionMode = configurations.motionMode;
-
-  if (!(typeof motionMode == UNDEFINED)){
-    if  (motionMode != MOTION_MODE_NORMAL && motionMode != MOTION_MODE_CIRCULAR){
-      throw new Error("createParticle error: motionMode must be MOTION_MODE_NORMAL or MOTION_MODE_CIRCULAR.");
-      return;
-    }
-  }else{
+  if (typeof motionMode == UNDEFINED){
     motionMode = MOTION_MODE_NORMAL;
-  }
-
-  if (typeof position == UNDEFINED && motionMode == MOTION_MODE_NORMAL){
-    throw new Error("createParticle error: position is a mandatory parameter for MOTION_MODE_NORMAL.");
-    return;
   }
   if (motionMode == MOTION_MODE_NORMAL){
     initialAngle = 0;
-    if (isNaN(position.x) || isNaN(position.y) || isNaN(position.z)){
-      throw new Error("createParticle error: position is not a vector.");
-      return;
-    }
-  }
-  if (typeof initialAngle == UNDEFINED && motionMode == MOTION_MODE_CIRCULAR){
-    throw new Error("createParticle error: initialAngle is a mandatory for MOTION_MODE_CIRCULAR.");
-    return;
   }
   if (motionMode == MOTION_MODE_CIRCULAR){
     position = this.vector(0, 0, 0);
-    if (isNaN(initialAngle)){
-      throw new Error("createParticle error: Bad initialAngle parameter.");
-      return;
-    }
   }
-  if (!material){
-    throw new Error("createParticle error: material is a mandatory parameter.");
-    return;
-  }
-  if (!(material.isParticleMaterial)){
-    throw new Error("createParticle error: Material type not supported.");
-    return;
-  }
-  if (isNaN(position.x) || isNaN(position.y) || isNaN(position.z)){
-    throw new Error("createParticle error: position is not a vector.");
-    return;
-  }
-  if (typeof lifetime == UNDEFINED){
-    throw new Error("createParticle error: lifetime is a mandatory parameter.");
-    return;
-  }
-  if (isNaN(lifetime)){
-    throw new Error("createParticle error: lifetime is not a number.");
-    return;
-  }
-  if (typeof respawn == UNDEFINED){
-    throw new Error("createParticle error: respawn is a mandatory parameter.");
-    return;
-  }
-  if (!(typeof(respawn) == typeof(true))){
-    throw new Error("createParticle error: respawn is not a boolean.");
-    return;
-  }
-  if (!(typeof alphaVariation == UNDEFINED)){
-    if (isNaN(alphaVariation)){
-      throw new Error("createParticle error: Bad alphaVariation parameter.");
-      return;
-    }
-  }
-  if (!(typeof alphaVariationMode == UNDEFINED)){
-    if (isNaN(alphaVariationMode)){
-      throw new Error("createParticle error: Bad alphaVariationMode parameter.");
-      return;
-    }
-    if (alphaVariationMode != ALPHA_VARIATION_MODE_NORMAL &&
-              alphaVariationMode != ALPHA_VARIATION_MODE_SIN &&
-                  alphaVariationMode != ALPHA_VARIATION_MODE_COS){
-          throw new Error("createParticle error: alphaVariationMode must be one of ALPHA_VARIATION_MODE_NORMAL, ALPHA_VARIATION_MODE_SIN or ALPHA_VARIATION_MODE_COS.");
-          return;
-        }
-  }
-
   if (!(typeof startDelay == UNDEFINED)){
-    if (isNaN(startDelay)){
-      throw new Error("createParticle error: Bad startDelay parameter.");
-      return;
-    }
-    if (startDelay < 0){
-      throw new Error("createParticle error: startDelay must be a positive number.");
-      return;
-    }
   }else{
     startDelay = 0;
   }
-
   if (!(typeof trailMode == UNDEFINED)){
-    if (typeof trailMode != typeof(true)){
-      throw new Error("createParticle error: Bad trailMode parameter.");
-      return;
-    }
     if (trailMode){
-      if(lifetime == 0){
-        throw new Error("createParticle error: Lifetime must be greater than zero for trail particles.");
-        return;
-      }
-      if (!respawn){
-        throw new Error("createParticle error: respawn property must be true for trail particles.");
-        return;
-      }
     }
   }else{
     trailMode = false;
   }
   if (!(typeof velocity == UNDEFINED)){
-    if (isNaN(velocity.x) || isNaN(velocity.y) || isNaN(velocity.z)){
-      throw new Error("createParticle error: Bad velocity parameter.");
-      return;
-    }
   }else{
     velocity = this.vector(0, 0, 0);
   }
   if (!(typeof acceleration == UNDEFINED)){
-    if (isNaN(acceleration.x) || isNaN(acceleration.y) || isNaN(acceleration.z)){
-      throw new Error("createParticle error: Bad acceleration parameter.");
-      return;
-    }
   }else{
     acceleration = this.vector(0, 0, 0);
   }
   if (!(typeof angularVelocity == UNDEFINED)){
-    if (isNaN(angularVelocity)){
-      throw new Error("createParticle error: Bad angularVelocity parameter.");
-      return;
-    }
   }else{
     angularVelocity = 0;
   }
   if (!(typeof angularAcceleration == UNDEFINED)){
-    if (isNaN(angularAcceleration)){
-      throw new Error("createParticle error: Bad angularAcceleration parameter.");
-      return;
-    }
   }else{
     angularAcceleration = 0;
   }
   if (!(typeof angularMotionRadius == UNDEFINED)){
-    if (isNaN(angularMotionRadius)){
-      throw new Error("createParticle error: Bad angularMotionRadius parameter.");
-      return;
-    }
   }else{
     angularMotionRadius = 0;
   }
   if (!(typeof angularQuaternion == UNDEFINED)){
-    if (isNaN(angularQuaternion.x) || isNaN(angularQuaternion.y)
-                    || isNaN(angularQuaternion.z) || isNaN(angularQuaternion.w)){
-      throw new Error("createParticle error: Bad angularQuaternion parameter.");
-      return;
-    }
   }else{
     angularQuaternion = REUSABLE_QUATERNION.set(0, 0, 0, 1);
   }
   if (!(typeof useWorldPosition == UNDEFINED)){
-    if (typeof useWorldPosition != typeof(true)){
-      throw new Error("createParticle error: useWorldPosition is not a boolean.");
-      return;
-    }
   }else{
     useWorldPosition = false;
   }
@@ -19051,15 +18385,6 @@ Roygbiv.prototype.createParticleSystem = function(configurations){
     return;
   }
 
-  if (TOTAL_PARTICLE_SYSTEM_COUNT >= MAX_PARTICLE_SYSTEM_COUNT){
-    throw new Error("createParticleSystem error: Cannot create more than "+MAX_PARTICLE_SYSTEM_COUNT+" particle systems.");
-    return;
-  }
-
-  if (!configurations){
-    throw new Error("createParticleSystem error: configurations is not defined.");
-    return;
-  }
 
   var name = configurations.name;
   var particles = configurations.particles;
@@ -19074,124 +18399,24 @@ Roygbiv.prototype.createParticleSystem = function(configurations){
   var angularQuaternion = configurations.angularQuaternion;
   var initialAngle = configurations.initialAngle;
   var motionMode = configurations.motionMode;
-
-  if (!name){
-    throw new Error("createParticleSystem error: name is a mandatory configuration.");
-    return;
-  }
-  if (name.indexOf(',') !== -1){
-    throw new Error("createParticleSystem error: name cannot contain coma.");
-    return;
-  }
-  if (particleSystemPool[name]){
-    throw new Error("createParticleSystem error: name must be unique.");
-    return;
-  }
-  if (!particles){
-    throw new Error("createParticleSystem error: particles is a mandatory configuration.");
-    return;
-  }
-  if (particles.length == 0){
-    throw new Error("createParticleSystem error: particles array is empty.");
-    return;
-  }
-  if (!position){
-    throw new Error("createParticleSystem error: position is a mandatory configuration.");
-    return;
-  }
-  if (typeof position.x == UNDEFINED || typeof position.y == UNDEFINED || typeof position.z == UNDEFINED){
-    throw new Error("createParticleSystem error: position is not a vector.");
-    return;
-  }
-  if (isNaN(position.x) || isNaN(position.y) || isNaN(position.z)){
-    throw new Error("createParticleSystem error: position is not a vector.");
-    return;
-  }
-  if (typeof lifetime == UNDEFINED){
-    throw new Error("createParticleSystem error: lifetime is a mandatory parameter.");
-    return;
-  }
-  if (isNaN(lifetime)){
-    throw new Error("createParticleSystem error: Bad lifetime parameter.");
-    return;
-  }
-  if (lifetime < 0){
-    throw new Error("createParticleSystem error: lifetime must be a positive number.");
-    return;
-  }
-
-  if (!(typeof velocity == UNDEFINED)){
-    if (isNaN(velocity.x) || isNaN(velocity.y) || isNaN(velocity.z)){
-      throw new Error("createParticleSystem error: Bad velocity parameter.");
-      return;
-    }
-  }
-
-  if (!(typeof acceleration == UNDEFINED)){
-    if (isNaN(acceleration.x) || isNaN(acceleration.y) || isNaN(acceleration.z)){
-      throw new Error("createParticleSystem error: Bad acceleration parameter.");
-      return;
-    }
-  }
-
-  if (particles.length >= MAX_VERTICES_ALLOWED_IN_A_PARTICLE_SYSTEM){
-    throw new Error("createParticleSystem error: Maximum allowed particle size "+MAX_VERTICES_ALLOWED_IN_A_PARTICLE_SYSTEM+" exceeded.");
-    return;
-  }
-
-  if (!(typeof angularVelocity == UNDEFINED)){
-    if (isNaN(angularVelocity)){
-      throw new Error("createParticleSystem error: Bad angularVelocity parameter.");
-      return;
-    }
-  }else{
+  if ((typeof angularVelocity == UNDEFINED)){
     angularVelocity = 0;
   }
-
-  if (!(typeof angularAcceleration == UNDEFINED)){
-    if (isNaN(angularAcceleration)){
-      throw new Error("createParticleSystem error: Bad angularAcceleration parameter.");
-      return;
-    }
-  }else{
+  if ((typeof angularAcceleration == UNDEFINED)){
     angularAcceleration = 0;
   }
-
-  if (!(typeof angularMotionRadius == UNDEFINED)){
-    if (isNaN(angularMotionRadius)){
-      throw new Error("createParticleSystem error: Bad angularMotionRadius parameter.");
-      return;
-    }
-  }else{
+  if ((typeof angularMotionRadius == UNDEFINED)){
     angularMotionRadius = 0;
   }
-
-  if (!(typeof angularQuaternion == UNDEFINED)){
-    if (isNaN(angularQuaternion.x) || isNaN(angularQuaternion.y) || isNaN(angularQuaternion.z) || isNaN(angularQuaternion.w)){
-      throw new Error("createParticleSystem error: Bad angularQuaternion parameter.");
-    }
-  }else{
+  if ((typeof angularQuaternion == UNDEFINED)){
     angularQuaternion = REUSABLE_QUATERNION.set(0, 0, 0, 1);
   }
-
-  if (!(typeof initialAngle == UNDEFINED)){
-    if (isNaN(initialAngle)){
-      throw new Error("createParticleSystem error: Bad initialAngle parameter.");
-      return;
-    }
-  }else{
+  if ((typeof initialAngle == UNDEFINED)){
     initialAngle = 0;
   }
-
-  if (!(typeof motionMode == UNDEFINED)){
-    if (motionMode != MOTION_MODE_NORMAL && motionMode != MOTION_MODE_CIRCULAR){
-      throw new Error("createParticleSystem error: motionMode must be MOTION_MODE_NORMAL or MOTION_MODE_CIRCULAR.");
-      return;
-    }
-  }else{
+  if ((typeof motionMode == UNDEFINED)){
     motionMode = MOTION_MODE_NORMAL;
   }
-
   var vx = 0, vy = 0, vz = 0, ax = 0, ay = 0, az = 0;
   if (velocity){
     vx = velocity.x;
@@ -19215,7 +18440,6 @@ Roygbiv.prototype.createParticleSystem = function(configurations){
   );
 
   particleSystem.lifetime = lifetime;
-
   particleSystem.angularVelocity = angularVelocity;
   particleSystem.angularAcceleration = angularAcceleration;
   particleSystem.angularMotionRadius = angularMotionRadius;
@@ -19224,9 +18448,7 @@ Roygbiv.prototype.createParticleSystem = function(configurations){
   particleSystem.angularQuaternionZ = angularQuaternion.z;
   particleSystem.angularQuaternionW = angularQuaternion.w;
   particleSystem.initialAngle = initialAngle;
-
   TOTAL_PARTICLE_SYSTEM_COUNT ++;
-
   return particleSystem;
 }
 
@@ -19234,167 +18456,41 @@ Roygbiv.prototype.scale = function(object, scaleVector){
   if (mode == 0){
     return;
   }
-  if (!scaleVector){
-    throw new Error("scale error: scaleVector is not defined.");
-    return;
-  }
-  if (typeof scaleVector.x == UNDEFINED || typeof scaleVector.y == UNDEFINED || typeof scaleVector.z == UNDEFINED){
-    throw new Error("scal error: scaleVector is not a vector.");
-    return;
-  }
-  if (isNaN(scaleVector.x) || isNaN(scaleVector.y) || isNaN(scaleVector.z)){
-    throw new Error("scale error: scaleVector is not a vector.");
-    return;
-  }
-  if (!object){
-    throw new Error("scale error: object is undefined.");
-    return;
-  }
-  if (!(object.isParticleSystem)){
-    throw new Error("scale error: Type not supported.");
-    return;
-  }
-
   object.mesh.scale.set(scaleVector.x, scaleVector.y, scaleVector.z);
 }
 
-Roygbiv.prototype.setBlending = function(particleSystem, mode){
+Roygbiv.prototype.setBlending = function(particleSystem, blendingMode){
   if (mode == 0){
     return;
   }
-  if (!particleSystem){
-    throw new Error("setBlending error: particleSystem is not defined.");
-    return;
-  }
-  if (typeof mode == UNDEFINED){
-    throw new Error("setBlending error: mode is not defined.");
-    return;
-  }
-  if (!(particleSystem.isParticleSystem)){
-    throw new Error("setBlending error: Unsupported type.");
-    return;
-  }
-  if (mode != NO_BLENDING && mode != NORMAL_BLENDING && mode != ADDITIVE_BLENDING && mode != SUBTRACTIVE_BLENDING && mode != MULTIPLY_BLENDING){
-    throw new Error("setBlending error: Bad mode parameter.");
-    return;
-  }
-  particleSystem.setBlending(mode);
+  particleSystem.setBlending(blendingMode);
 }
 
-Roygbiv.prototype.setParticleSystemRotation = function(particleSystem, axis, rad){
+Roygbiv.prototype.setParticleSystemRotation = function(particleSystem, axis, radians){
   if (mode == 0){
-    return;
-  }
-  if (!particleSystem){
-    throw new Error("setParticleSystemRotation error: particleSystem is not defined.");
-    return;
-  }
-  if (!axis){
-    throw new Error("setParticleSystemRotation error: axis is not defined.");
-    return;
-  }
-  if (typeof rad == UNDEFINED){
-    throw new Error("setParticleSystemRotation error: rad is not defined.");
     return;
   }
   axis = axis.toLowerCase();
-  if (axis != "x" && axis != "y" && axis != "z"){
-    throw new Error("setParticleSystemRotation error: axis should be one of x, y and z");
-    return;
-  }
-  if (isNaN(rad)){
-    throw new Error("setParticleSystemRotation error: Bad parameters.");
-    return;
-  }
-  if (!particleSystem.mesh.visible){
-    throw new Error("setParticleSystemRotation error: particleSystem is not visible.");
-    return;
-  }
-  if (particleSystem.checkForCollisions){
-    throw new Error("setParticleSystemRotation error: particleSystem has a collision callback attached. Cannot set rotation.");
-    return;
-  }
-  if (particleSystem.particlesWithCollisionCallbacks.size > 0){
-    throw new Error("setParticleSystemRotation error: particleSystem has a collidable particle. Cannot set rotation.");
-    return;
-  }
-  if (particleSystem.hasTrailedParticle){
-    throw new Error("setParticleSystemRotation error: particleSystem has a trailed particle. Cannot set rotation.");
-    return;
-  }
-  if (particleSystem.velocity.x != 0 || particleSystem.velocity.y != 0 || particleSystem.velocity.z != 0 ||
-          particleSystem.acceleration.x != 0 || particleSystem.acceleration.y != 0 || particleSystem.acceleration.z != 0){
-
-      throw new Error("setParticleSystemRotation error: particleSystem has a defined motion. Cannot set rotation.");
-      return;
-  }
-
   if (axis == "x"){
-    particleSystem.mesh.rotation.x = rad;
+    particleSystem.mesh.rotation.x = radians;
   }else if (axis == "y"){
-    particleSystem.mesh.rotation.y = rad;
+    particleSystem.mesh.rotation.y = radians;
   }else if (axis == "z"){
-    particleSystem.mesh.rotation.z = rad;
+    particleSystem.mesh.rotation.z = radians;
   }
-
   particleSystem.hasManualRotationSet = true;
-
 }
 
 Roygbiv.prototype.setParticleSystemQuaternion = function(particleSystem, quatX, quatY, quatZ, quatW){
   if (mode == 0){
     return;
   }
-  if (!particleSystem){
-    throw new Error("setParticleSystemQuaternion error: particleSystem is not defined.");
-    return;
-  }
-  if (!(particleSystem.isParticleSystem)){
-    throw new Error("setParticleSystemQuaternion error: Unsupported type.");
-    return;
-  }
-  if (isNaN(quatX) || isNaN(quatY) || isNaN(quatZ) || isNaN(quatW)){
-    throw new Error("setParticleSystemQuaternion error: Bad parameters.");
-    return;
-  }
-
-  if (!particleSystem.mesh.visible){
-    throw new Error("setParticleSystemQuaternion error: particleSystem is not visible.");
-    return;
-  }
-  if (particleSystem.checkForCollisions){
-    throw new Error("setParticleSystemQuaternion error: particleSystem has a collision callback attached. Cannot set quaternion.");
-    return;
-  }
-  if (particleSystem.particlesWithCollisionCallbacks.size > 0){
-    throw new Error("setParticleSystemQuaternion error: particleSystem has a collidable particle. Cannot set quaternion.");
-    return;
-  }
-  if (particleSystem.hasTrailedParticle){
-    throw new Error("setParticleSystemQuaternion error: particleSystem has a trailed particle. Cannot set quaternion.");
-    return;
-  }
-  if (particleSystem.velocity.x != 0 || particleSystem.velocity.y != 0 || particleSystem.velocity.z != 0 ||
-          particleSystem.acceleration.x != 0 || particleSystem.acceleration.y != 0 || particleSystem.acceleration.z != 0){
-
-      throw new Error("setParticleSystemQuaternion error: particleSystem has a defined motion. Cannot set quaternion.");
-      return;
-  }
-
   particleSystem.mesh.quaternion.set(quatX, quatY, quatZ, quatW);
   particleSystem.hasManualQuaternionSet = true;
 }
 
 Roygbiv.prototype.kill = function(object){
   if (mode == 0){
-    return;
-  }
-  if (!object){
-    throw new Error("kill error: object is not defined.");
-    return;
-  }
-  if (!(object.isParticle) && !(object.isParticleSystem)){
-    throw new Error("kill error: Unsupported type.");
     return;
   }
   if (object.isParticle){
@@ -19421,194 +18517,37 @@ Roygbiv.prototype.createSmoke = function(configurations){
   if (mode == 0){
     return;
   }
-
-  if (!configurations){
-    throw new Error("createSmoke error: configurations is not defined.");
-    return;
-  }
-
   var smokeSize = configurations.smokeSize;
   var name = configurations.name;
-  if (typeof name == UNDEFINED){
-    throw new Error("createSmoke error: name is a mandatory configuration.");
-    return;
-  }
-  if (particleSystemPool[name]){
-    throw new Error("createSmoke error: name must be unique.");
-    return;
-  }
-
   var position = configurations.position;
-  if (typeof position == UNDEFINED){
-    throw new Error("createSmoke error: position is a mandatory parameter.");
-    return;
-  }else{
-    if (isNaN(position.x) || isNaN(position.y) || isNaN(position.z)){
-      throw new Error("createSmoke error: Bad position parameter.");
-      return;
-    }
-  }
   var expireTime = configurations.expireTime;
-  if (typeof expireTime == UNDEFINED){
-    throw new Error("createSmoke error: expireTime is a mandatory parameter.");
-    return;
-  }else{
-    if (isNaN(expireTime)){
-      throw new Error("createSmoke error: Bad expireTime parameter.");
-      return;
-    }else{
-      if (expireTime < 0){
-        throw new Error("createSmoke error: expireTime must be greater than zero.");
-        return;
-      }
-    }
-  }
-
-  if (typeof smokeSize == UNDEFINED){
-    throw new Error("createSmoke error: smokeSize is a mandatory configuration.");
-    return;
-  }
-  if (isNaN(smokeSize)){
-    throw new Error("createSmoke error: Bad smokeSize parameter");
-    return;
-  }
+  var smokeSize = configurations.smokeSize;
   var particleSize = configurations.particleSize;
-  if (typeof particleSize == UNDEFINED){
-    throw new Error("createSmoke error: particleSize is a mandatory configuration.");
-    return;
-  }
-  if (isNaN(particleSize)){
-    throw new Error("createSmoke error: Bad particleSize parameter.");
-    return;
-  }
   var particleCount = configurations.particleCount;
-  if (typeof particleCount == UNDEFINED){
-    throw new Error("createSmoke error: particleCount is a mandatory configuration.");
-    return;
-  }
-  if (isNaN(particleCount)){
-    throw new Error("createSmoke error: Bad particleCount parameter.");
-    return;
-  }
-  if (particleCount <= 0){
-    throw new Error("createSmoke error: particleCount must be greater than zero.");
-    return;
-  }
   var colorName = configurations.colorName;
-  if (typeof colorName == UNDEFINED){
-    throw new Error("createSmoke error: colorName is a mandatory configuration.");
-    return;
-  }
   var textureName = configurations.textureName;
   var isTextured = false;
   var texture;
   if (!(typeof textureName == UNDEFINED)){
-    if (!textures[textureName]){
-      throw new Error("createSmoke error: No such texture.");
-      return;
-    }
     texture = textures[textureName];
-    if (!(texture instanceof THREE.Texture)){
-      throw new Error("createSmoke error: Texture not ready.");
-      return;
-    }
     isTextured = true;
   }
   var movementAxis = configurations.movementAxis;
-  if (!(typeof movementAxis == UNDEFINED)){
-    if (isNaN(movementAxis.x) || isNaN(movementAxis.y) || isNaN(movementAxis.z)){
-      throw new Error("createSmoke error: Bad movementAxis parameter.");
-    }
-  }else{
+  if ((typeof movementAxis == UNDEFINED)){
     movementAxis = ROYGBIV.vector(0, 1, 0);
   }
   var velocity = configurations.velocity;
-  if (typeof velocity == UNDEFINED){
-    throw new Error("createSmoke error: velocity is a mandatory configuration.");
-    return;
-  }
-  if (isNaN(velocity)){
-    throw new Error("createSmoke error: Bad velocity parameter.");
-    return;
-  }
   var acceleration = configurations.acceleration;
-  if (typeof acceleration == UNDEFINED){
-    throw new Error("createSmoke error: acceleration is a mandatory configuration.");
-    return;
-  }
-  if (isNaN(acceleration)){
-    throw new Error("createSmoke error: Bad acceleration parameter.");
-    return;
-  }
   var randomness = configurations.randomness;
-  if (typeof randomness == UNDEFINED){
-    throw new Error("createSmoke error: randomness is a mandatory configuration.");
-    return;
-  }
-  if (isNaN(randomness)){
-    throw new Error("createSmoke error: Bad randomness parameter.");
-    return;
-  }
   var lifetime = configurations.lifetime;
-  if (typeof lifetime == UNDEFINED){
-    throw new Error("createSmoke error: lifetime is a mandatory configuration.");
-    return;
-  }
-  if (isNaN(lifetime)){
-    throw new Error("createSmoke error: Bad lifetime parameter.");
-    return;
-  }
-  if (lifetime <= 0){
-    throw new Error("createSmoke error: lifetime must be greater than zero.");
-    return;
-  }
   var alphaVariation = configurations.alphaVariation;
-  if (typeof alphaVariation == UNDEFINED){
-    throw new Error("createSmoke error: alphaVariation is a mandatory configuration.");
-    return;
-  }
-  if (isNaN(alphaVariation)){
-    throw new Error("createSmoke error: Bad alphaVariation parameter.");
-    return;
-  }
-  if (alphaVariation < -1 || alphaVariation > 1){
-    throw new Error("createSmoke error: alphaVariation must be between [-1,1]");
-    return;
-  }
-
   var updateFunction = configurations.updateFunction;
-  if (updateFunction){
-    if (!(updateFunction instanceof Function)){
-      throw new Error("createSmoke error: updateFunction must be a function.");
-      return;
-    }
-  }
-
   var startDelay = configurations.startDelay;
   if (typeof startDelay == UNDEFINED){
     startDelay = 0;
-  }else{
-    if (isNaN(startDelay)){
-      throw new Error("createSmoke error: Bad startDelay parameter.");
-      return;
-    }
   }
-
   var rgbFilter = configurations.rgbFilter;
-  if (!(typeof rgbFilter == UNDEFINED)){
-    if (isNaN(rgbFilter.x) || isNaN(rgbFilter.y) || isNaN(rgbFilter.z)){
-      throw new Error("createSmoke error: Bad rgbFilter parameter.");
-      return;
-    }
-  }
-
   var accelerationDirection = configurations.accelerationDirection;
-  if (!(typeof accelerationDirection == UNDEFINED)){
-    if (isNaN(accelerationDirection.x) || isNaN(accelerationDirection.y) || isNaN(accelerationDirection.z)){
-      throw new Error("createSmoke error: Bad accelerationDirection parameter.");
-      return;
-    }
-  }
 
   var particleMaterialConfigurations = new Object();
   particleMaterialConfigurations.color = colorName;
@@ -19703,145 +18642,9 @@ Roygbiv.prototype.createTrail = function(configurations){
   var colorStep = configurations.colorStep;
   var updateFunction = configurations.updateFunction;
 
-  if (typeof name == UNDEFINED){
-    throw new Error("createTrail error: name is a mandatory configuration.");
-    return;
-  }
-  if (particleSystemPool[name]){
-    throw new Error("createTrail error: name must be unique.");
-    return;
-  }
-  if (typeof position == UNDEFINED){
-    throw new Error("createTrail error: position is a mandatory configuration.");
-    return;
-  }
-  if (isNaN(position.x) || isNaN(position.y) || isNaN(position.z)){
-    throw new Error("createTrail error: Bad position parameter.");
-    return;
-  }
-  if (typeof expireTime == UNDEFINED){
-    throw new Error("createTrail error: expireTime is a mandatory configuration.");
-    return;
-  }
-  if (isNaN(expireTime)){
-    throw new Error("createTrail error: Bad expireTime parameter.");
-    return;
-  }
-  if (expireTime < 0){
-    throw new Error("createTrail error: expireTime must be greater than zero.");
-    return;
-  }
-  if (typeof particleCount == UNDEFINED){
-    throw new Error("createTrail error: particleCount is a mandatory configuration.");
-    return;
-  }
-  if (isNaN(particleCount)){
-    throw new Error("createTrail error: Bad particleCount configuration.");
-    return;
-  }
-  if (particleCount == 0){
-    throw new Error("createTrail error: particleCount must be greater than zero.");
-    return;
-  }
-  if (typeof velocity == UNDEFINED){
-    throw new Error("createTrail error: velocity is a mandatory configuration.");
-    return;
-  }
-  if (isNaN(velocity.x) || isNaN(velocity.y) || isNaN(velocity.z)){
-    throw new Error("createTrail error: Bad velocity parameter.");
-    return;
-  }
-  if (typeof acceleration == UNDEFINED){
-    throw new Error("createTrail error: acceleration is a mandatory parameter.");
-    return;
-  }
-  if (isNaN(acceleration.x) || isNaN(acceleration.y) || isNaN(acceleration.z)){
-    throw new Error("createTrail error: Bad acceleration parameter.");
-    return;
-  }
-  if (typeof lifetime == UNDEFINED){
-    throw new Error("createTrail error: lifetime is a mandatory parameter.");
-    return;
-  }
-  if (isNaN(lifetime)){
-    throw new Error("createTrail error: Bad lifetime parameter.");
-    return;
-  }
-  if (typeof alphaVariation == UNDEFINED){
-    throw new Error("createTrail error: alphaVariation is a mandatory configuration.");
-    return;
-  }
-  if (isNaN(alphaVariation)){
-    throw new Error("createTrail error: Bad alphaVariation parameter.");
-    return;
-  }
-  if (alphaVariation > 0 || alphaVariation < -1){
-    throw new Error("createTrail error: alphaVariation must be between [-1,0]");
-    return;
-  }
-  if (typeof startDelay == UNDEFINED){
-    throw new Error("createTrail error: startDelay is a mandatory configuration.");
-    return;
-  }
-  if (isNaN(startDelay)){
-    throw new Error("createTrail error: Bad startDelay parameter.");
-    return;
-  }
-  if (startDelay < 0){
-    throw new Error("createTrail error: startDelay must be greater than zero.");
-    return;
-  }
-  if (typeof colorName == UNDEFINED){
-    throw new Error("createTrail error: colorName is a mandatory configuration.");
-    return;
-  }
-  if (typeof particleSize == UNDEFINED){
-    throw new Error("createTrail error: particleSize is a mandatory configuration.");
-    return;
-  }
-  if (isNaN(particleSize)){
-    throw new Error("createTrail error: Bad particleSize parameter.");
-    return;
-  }
-  if (particleSize <= 0){
-    throw new Error("createTrail error: particleSize must be greater than zero.");
-    return;
-  }
-  if (typeof size == UNDEFINED){
-    throw new Error("createTrail error: size is a mandatory configuration.");
-    return;
-  }
-  if (isNaN(size)){
-    throw new Error("createTrail error: Bad size parameter.");
-    return;
-  }
-  if (size <= 0){
-    throw new Error("createTrail error: size must be greater than zero.");
-    return;
-  }
   var texture;
   if (!(typeof textureName == UNDEFINED)){
     texture = textures[textureName];
-    if (!texture){
-      throw new Error("createTrail error: No such texture.");
-      return;
-    }
-    if (!(texture instanceof THREE.Texture)){
-      throw new Error("createTrail error: Texture not ready.");
-      return;
-    }
-  }
-  if (!(typeof rgbFilter == UNDEFINED)){
-    if (isNaN(rgbFilter.x) || isNaN(rgbFilter.y) || isNaN(rgbFilter.z)){
-      throw new Error("createSmoke error: Bad rgbFilter parameter.");
-      return;
-    }
-  }
-  if (!(typeof updateFunction == UNDEFINED)){
-    if (!(updateFunction instanceof Function)){
-      throw new Error("createSmoke error: updateFunction is not a function.");
-      return;
-    }
   }
 
   var particleMaterialConfigurations = new Object();
@@ -19901,134 +18704,19 @@ Roygbiv.prototype.createPlasma = function(configurations){
   var textureName = configurations.textureName;
   var rgbFilter = configurations.rgbFilter;
   var alphaVariation = configurations.alphaVariation;
-  if (typeof name == UNDEFINED){
-    throw new Error("createPlasma error: name is a mandatory configuration.");
-    return;
-  }
-  if (particleSystemPool[name]){
-    throw new Error("createPlasma error: name must be unique.");
-    return;
-  }
-  if (typeof position == UNDEFINED){
-    throw new Error("createPlasma error: position is a mandatory configuration.");
-    return;
-  }
-  if (isNaN(position.x) || isNaN(position.y) || isNaN(position.z)){
-    throw new Error("createPlasma error: Bad position parameter.");
-    return;
-  }
-  if (typeof expireTime == UNDEFINED){
-    throw new Error("createPlasma error: expireTime is a mandatory configuration.");
-    return;
-  }
-  if (isNaN(expireTime)){
-    throw new Error("createPlasma error: Bad expireTime parameter.");
-    return;
-  }
-  if (expireTime < 0){
-    throw new Error("createPlasma error: expireTime must be greater than zero.");
-    return;
-  }
-  if (typeof velocity == UNDEFINED){
-    throw new Error("createPlasma error: velocity is a mandatory configuration.");
-    return;
-  }
-  if (isNaN(velocity.x) || isNaN(velocity.y) || isNaN(velocity.z)){
-    throw new Error("createPlasma error: Bad velocity parameter.");
-    return;
-  }
-  if (typeof acceleration == UNDEFINED){
-    throw new Error("createPlasma error: acceleration is a mandatory configuration.");
-    return;
-  }
-  if (isNaN(acceleration.x) || isNaN(acceleration.y) || isNaN(acceleration.z)){
-    throw new Error("createPlasma error: Bad acceleration parameter.");
-    return;
-  }
-  if (typeof radius == UNDEFINED){
-    throw new Error("createPlasma error: radius is a mandatory parameter.");
-    return;
-  }
-  if (isNaN(radius)){
-    throw new Error("createPlasma error: Bad radius parameter.");
-    return;
-  }
-  if (radius <= 0){
-    throw new Error("createPlasma error: radius must be greater than zero.");
-    return;
-  }
-  if (typeof avgParticleSpeed == UNDEFINED){
-    throw new Error("createPlasma error: avgParticleSpeed is a mandatory configuration.");
-    return;
-  }
-  if (isNaN(avgParticleSpeed)){
-    throw new Error("createPlasma error: Bad avgParticleSpeed parameter.");
-    return;
-  }
-  if (typeof particleCount == UNDEFINED){
-    throw new Error("createPlasma error: particleCount is a mandatory parameter.");
-    return;
-  }
-  if (isNaN(particleCount)){
-    throw new Error("createPlasma error: Bad particleCount parameter.");
-    return;
-  }
-  if (particleCount <= 0){
-    throw new Error("createPlasma error: particleCount must be greater than zero.");
-    return;
-  }
-  if (typeof colorName == UNDEFINED){
-    throw new Error("createPlasma error: colorName is a mandatory configuration.");
-    return;
-  }
+
   var isTextured = false;
   if (!(typeof textureName == UNDEFINED)){
     var texture = textures[textureName];
-    if (!texture){
-      throw new Error("createPlasma error: No such texture.");
-      return;
-    }
-    if (!(texture instanceof THREE.Texture)){
-      throw new Error("createPlasma error: Texture not ready.");
-      return;
-    }
     isTextured = true;
-  }
-  if (typeof particleSize == UNDEFINED){
-    throw new Error("createPlasma error: particleSize is a mandatory parameter.");
-    return;
-  }
-  if (isNaN(particleSize)){
-    throw new Error("createPlasma error: Bad particleSize parameter.");
-    return;
   }
   if (typeof alpha == UNDEFINED){
     alpha = 1;
-  }else{
-    if (isNaN(alpha)){
-      throw new Error("createPlasma error: Bad alpha parameter.");
-      return;
-    }
-    if (alpha > 1 || alpha < 0){
-      throw new Error("createPlasma error: alpha must be between [0, 1]");
-      return;
-    }
-  }
-  if (!(typeof rgbFilter == UNDEFINED)){
-    if (isNaN(rgbFilter.x) || isNaN(rgbFilter.y) || isNaN(rgbFilter.z)){
-      throw new Error("createPlasma error: Bad rgbFilter parameter.");
-      return;
-    }
   }
   var alphaVariationSet = false;
   if (!(typeof alphaVariation == UNDEFINED)){
-    if (isNaN(alphaVariation)){
-      throw new Error("createPlasma error: Bad alphaVariation parameter.");
-      return;
-    }
     alphaVariationSet = true;
   }
-
   var particleMaterialConfigurations = new Object();
   particleMaterialConfigurations.color = colorName;
   particleMaterialConfigurations.size = particleSize;
@@ -20094,154 +18782,16 @@ Roygbiv.prototype.createFireExplosion = function(configurations){
   var textureName = configurations.textureName;
   var rgbFilter = configurations.rgbFilter;
   var updateFunction = configurations.updateFunction;
-  if (typeof position == UNDEFINED){
-    throw new Error("createFireExplosion error: position is a mandatory configuration.");
-    return;
-  }
-  if (isNaN(position.x) || isNaN(position.y) || isNaN(position.z)){
-    throw new Error("createFireExplosion error: Bad position configuration.");
-    return;
-  }
-  if (typeof expireTime == UNDEFINED){
-    throw new Error("createFireExplosion error: expireTime is a mandatory configuration.");
-    return;
-  }
-  if (isNaN(expireTime)){
-    throw new Error("createFireExplosion error: Bad expireTime parameter.");
-    return;
-  }
-  if (expireTime < 0){
-    throw new Error("createFireExplosion error: expireTime cannot be negative.");
-    return;
-  }
-  if (typeof name == UNDEFINED){
-    throw new Error("createFireExplosion error: name is a mandatory configuration.");
-    return;
-  }
-  if (particleSystemPool[name]){
-    throw new Error("createFireExplosion error: name must be unique.");
-    return;
-  }
-  if (typeof radius == UNDEFINED){
-    throw new Error("createFireExplosion error: radius is a mandatory configuration.");
-    return;
-  }
-  if (isNaN(radius)){
-    throw new Error("createFireExplosion error: Bad radius parameter.");
-    return;
-  }
-  if (radius <= 0){
-    throw new Error("createFireExplosion error: radius must be greater than zero.");
-    return;
-  }
-  if (typeof particleSize == UNDEFINED){
-    throw new Error("createFireExplosion error: particleSize is a mandatory configuration.");
-    return;
-  }
-  if (isNaN(particleSize)){
-    throw new Error("createFireExplosion error: Bad particleSize parameter.");
-    return;
-  }
-  if (particleSize <= 0){
-    throw new Error("createFireExplosion error: particleSize must be greater than zero.");;
-    return;
-  }
-  if (typeof particleCount == UNDEFINED){
-    throw new Error("createFireExplosion error: particleCount is a mandatory configuration.");
-    return;
-  }
-  if (isNaN(particleCount)){
-    throw new Error("createFireExplosion error: Bad particleCount parameter.");
-    return;
-  }
-  if (particleCount <= 0){
-    throw new Error("createFireExplosion error: particleCount must be greater than zero.");
-    return;
-  }
+
   if (typeof fireColorName == UNDEFINED){
     fireColorName = "white";
   }
   if (typeof smokeColorName == UNDEFINED){
     smokeColorName = "black";
   }
-  if (typeof colorStep == UNDEFINED){
-    throw new Error("createFireExplosion error: colorStep is a mandatory configuration.");
-    return;
-  }
-  if (isNaN(colorStep)){
-    throw new Error("createFireExplosion error: Bad colorStep parameter.");
-    return;
-  }
-  if (colorStep < 0 || colorStep > 1){
-    throw new Error("createFireExplosion error: colorStep is expected to be between [0,1].");
-    return;
-  }
-  if (typeof alphaVariationCoef == UNDEFINED){
-    throw new Error("createFireExplosion error: alphaVariationCoef is a mandatory configuration.");
-    return;
-  }
-  if (isNaN(alphaVariationCoef)){
-    throw new Error("createFireExplosion error: Bad alphaVariationCoef parameter.");
-    return;
-  }
-  if (typeof explosionDirection == UNDEFINED){
-    throw new Error("createFireExplosion error: explosionDirection is a mandatory configuration.");
-    return;
-  }
-  if (isNaN(explosionDirection.x) || isNaN(explosionDirection.y) || isNaN(explosionDirection.z)){
-    throw new Error("createFireExplosion error: Bad explosionDirection parameter.");
-    return;
-  }
-  if (typeof explosionSpeed == UNDEFINED){
-    throw new Error("createFireExplosion error: explosionSpeed is a mandatory configuration.");
-    return;
-  }
-  if (isNaN(explosionSpeed)){
-    throw new Error("createFireExplosion error: Bad explosionSpeed parameter.");
-    return;
-  }
-  if (typeof lifetime == UNDEFINED){
-    throw new Error("createFireExplosion error: lifetime is a mandatory configuration.");
-    return;
-  }
-  if (isNaN(lifetime)){
-    throw new Error("createFireExplosion error: Bad lifetime parameter.");
-    return;
-  }
-  if (lifetime <= 0){
-    throw new Error("createFireExplosion error: lifetime must be greater than zero.");
-    return;
-  }
-  if (!(typeof accelerationDirection == UNDEFINED)){
-    if (isNaN(accelerationDirection.x) || isNaN(accelerationDirection.y) || isNaN(accelerationDirection.z)){
-      throw new Error("createFireExplosion error: Bad accelerationDirection parameter.");
-      return;
-    }
-  }
   if (!(typeof textureName == UNDEFINED)){
     var texture = textures[textureName];
-    if (typeof texture == UNDEFINED){
-      throw new Error("createFireExplosion error: No such texture.");
-      return;
-    }
-    if (!(texture instanceof THREE.Texture)){
-      throw new Error("createFireExplosion error: Texture not ready.");
-      return;
-    }
   }
-  if (!(typeof rgbFilter == UNDEFINED)){
-    if (isNaN(rgbFilter.x) || isNaN(rgbFilter.y) || isNaN(rgbFilter.z)){
-      throw new Error("createFireExplosion error: Bad rgbFilter parameter.");
-      return;
-    }
-  }
-  if (!(typeof updateFunction == UNDEFINED)){
-    if (!(updateFunction instanceof Function)){
-      throw new Error("createFireExplosion error: updateFunction is not a function.");
-      return;
-    }
-  }
-
   var particleMaterialConfigurations = new Object();
   particleMaterialConfigurations.color = fireColorName;
   particleMaterialConfigurations.size = particleSize;
@@ -20329,185 +18879,26 @@ Roygbiv.prototype.createMagicCircle = function(configurations){
   var rgbFilter = configurations.rgbFilter;
   var updateFunction = configurations.updateFunction;
 
-  if (typeof name == UNDEFINED){
-    throw new Error("createMagicCircle error: name is a mandatory configuration.");
-    return;
-  }
-  if (particleSystemPool[name]){
-    throw new Error("createMagicCircle error: name must be unique.");
-    return;
-  }
-  if (typeof position == UNDEFINED){
-    throw new Error("createMagicCircle error: position is a mandatory configuration.");
-    return;
-  }
-  if (isNaN(position.x) || isNaN(position.y) || isNaN(position.z)){
-    throw new Error("createMagicCircle error: Bad position parameter.");
-    return;
-  }
-  if (typeof particleCount == UNDEFINED){
-    throw new Error("createMagicCircle error: particleCount is a mandatory configuration.");
-    return;
-  }
-  if (isNaN(particleCount)){
-    throw new Error("createMagicCircle error: Bad particleCount parameter.");
-    return;
-  }
-  if (particleCount <= 0){
-    throw new Error("createMagicCircle error: particleCount must be greater than zero.");
-    return;
-  }
-  if (typeof expireTime == UNDEFINED){
-    throw new Error("createMagicCircle error: expireTime is a mandatory configuration.");
-    return;
-  }
-  if (isNaN(expireTime)){
-    throw new Error("createMagicCircle error: Bad expireTime parameter.");
-    return;
-  }
-  if (expireTime < 0){
-    throw new Error("createMagicCircle error: expireTime must be greater than zero.");
-    return;
-  }
-  if (typeof speed == UNDEFINED){
-    throw new Error("createMagicCircle error: speed is a mandatory configuration.");
-    return;
-  }
-  if (isNaN(speed)){
-    throw new Error("createMagicCircle error: Bad speed parameter.");
-    return;
-  }
-  if (typeof acceleration == UNDEFINED){
-    throw new Error("createMagicCircle error: acceleration is a mandatory configuration.");
-    return;
-  }
-  if (isNaN(acceleration)){
-    throw new Error("createMagicCircle error: Bad acceleration parameter.");
-    return;
-  }
-  if (typeof radius == UNDEFINED){
-    throw new Error("createMagicCircle error: radius is a mandatory configuration.");
-    return;
-  }
-  if (isNaN(radius)){
-    throw new Error("createMagicCircle error: Bad radius parameter.");
-    return;
-  }
   if (typeof circleNormal == UNDEFINED){
     circleNormal = this.vector(0, 1, 0);
-  }else{
-    if (isNaN(circleNormal.x) || isNaN(circleNormal.y) || isNaN(circleNormal.z)){
-      throw new Error("createMagicCircle error: Bad circleNormal parameter.");
-      return;
-    }
   }
   if (typeof circleDistortionCoefficient == UNDEFINED){
     circleDistortionCoefficient = 1;
-  }else{
-    if (isNaN(circleDistortionCoefficient)){
-      throw new Error("createMagicCircle error: Bad circleDistortionCoefficient parameter.");
-      return;
-    }
-    if (circleDistortionCoefficient == 0){
-      circleDistortionCoefficient = 1;
-    }
   }
   if (typeof lifetime == UNDEFINED){
     lifetime = 0;
-  }else{
-    if (isNaN(lifetime)){
-      throw new Error("createMagicCircle error: Bad lifetime parameter.");
-      return;
-    }
-    if (lifetime < 0){
-      throw new Error("createMagicCircle error: lifetime cannot be smaller than zero.");
-      return;
-    }
   }
   if (typeof angleStep == UNDEFINED){
     angleStep = 0;
-  }else{
-    if (isNaN(angleStep)){
-      throw new Error("createMagicCircle error: Bad angleStep parameter.");
-      return;
-    }
-  }
-  if (typeof particleSize == UNDEFINED){
-    throw new Error("createMagicCircle error: particleSize is a mandatory configuration.");
-    return;
-  }
-  if (isNaN(particleSize)){
-    throw new Error("createMagicCircle error: Bad particleSize parameter.");
-    return;
-  }
-  if (particleSize <= 0){
-    throw new Error("createMagicCircle error: particleSize must be a positive number.");
-    return;
-  }
-  if (typeof colorName == UNDEFINED){
-    throw new Error("createMagicCircle error: colorName is a mandatory configuration.");
-    return;
-  }
-  if(!(typeof colorStep == UNDEFINED)){
-    if (isNaN(colorStep)){
-      throw new Error("createMagicCircle error: Bad colorStep parameter.");
-      return;
-    }
-    if (colorStep < 0 || colorStep > 1){
-      throw new Error("createMagicCircle error: colorStep should be between [0,1].");
-      return;
-    }
-  }
-  if (typeof alpha == UNDEFINED){
-    throw new Error("createMagicCircle error: alpha is a mandatory configuration.");
-    return;
-  }
-  if (isNaN(alpha)){
-    throw new Error("createMagicCircle error: Bad alpha parameter.");
-    return;
-  }
-  if (alpha < 0 || alpha > 1){
-    throw new Error("createMagicCircle error: alpha must be between [0,1].");
-    return;
   }
   if (typeof alphaVariation == UNDEFINED){
     alphaVariation = 0;
-  }else{
-    if (isNaN(alphaVariation)){
-      throw new Error("createMagicCircle error: Bad alphaVariation parameter.");
-      return;
-    }
   }
   if (typeof alphaVariationMode == UNDEFINED){
     alphaVariationMode = ALPHA_VARIATION_MODE_NORMAL;
-  }else{
-    if (alphaVariationMode != ALPHA_VARIATION_MODE_NORMAL && alphaVariationMode != ALPHA_VARIATION_MODE_COS && alphaVariationMode != ALPHA_VARIATION_MODE_SIN){
-      throw new Error("createMagicCircle error: alphaVariationMode must be ALPHA_VARIATION_MODE_NORMAL, ALPHA_VARIATION_MODE_COS or ALPHA_VARIATION_MODE_SIN.");
-      return;
-    }
   }
   if (!(typeof textureName == UNDEFINED)){
     var texture = textures[textureName];
-    if (typeof texture == UNDEFINED){
-      throw new Error("createMagicCircle error: No such texture.");
-      return;
-    }
-    if (!(texture instanceof THREE.Texture)){
-      throw new Error("createMagicCircle error: Texture not ready.");
-      return;
-    }
-  }
-  if (!(typeof rgbFilter == UNDEFINED)){
-    if (isNaN(rgbFilter.x) || isNaN(rgbFilter.y) || isNaN(rgbFilter.z)){
-      throw new Error("createMagicCircle error: Bad rgbFilter parameter.");
-      return;
-    }
-  }
-  if (!(typeof updateFunction == UNDEFINED)){
-    if (!(updateFunction instanceof Function)){
-      throw new Error("createMagicCircle error: updateFunction is not a function.");
-      return;
-    }
   }
 
   var particleMaterialConfigurations = new Object();
@@ -20577,140 +18968,12 @@ Roygbiv.prototype.createCircularExplosion = function(configurations){
   var expireTime = configurations.expireTime;
   var updateFunction = configurations.updateFunction;
 
-  if (typeof name == UNDEFINED){
-    throw new Error("createCircularExplosion error: name is a mandatory configuration.");
-    return;
-  }
-  if (particleSystemPool[name]){
-    throw new Error("createCircularExplosion error: name must be unique.");
-    return;
-  }
-  if (typeof particleCount == UNDEFINED){
-    throw new Error("createCircularExplosion error: particleCount is a mandatory configuration.");
-    return;
-  }
-  if (isNaN(particleCount)){
-    throw new Error("createCircularExplosion error: Bad particleCount parameter.");
-    return;
-  }
-  if (particleCount <= 0){
-    throw new Error("createCircularExplosion error: particleCount must be greater than zero.");
-    return;
-  }
-  if (typeof position == UNDEFINED){
-    throw new Error("createCircularExplosion error: position is a mandatory configuration.");
-    return;
-  }
-  if (isNaN(position.x) || isNaN(position.y) || isNaN(position.y)){
-    throw new Error("createCircularExplosion error: Bad position parameter.");
-    return;
-  }
-  if (typeof radius == UNDEFINED){
-    throw new Error("createCircularExplosion error: radius is a mandatory configuration.");
-    return;
-  }
-  if (isNaN(radius)){
-    throw new Error("createCircularExplosion error: Bad radius parameter.");
-    return;
-  }
-  if (typeof colorName == UNDEFINED){
-    throw new Error("createCircularExplosion error: colorName is a mandatory configuration.");
-    return;
-  }
-  if (typeof particleSize == UNDEFINED){
-    throw new Error("createCircularExplosion error: particleSize is a mandatory configuration.");
-    return;
-  }
-  if (isNaN(particleSize)){
-    throw new Error("createCircularExplosion error: Bad particleSize parameter.");
-    return;
-  }
-  if (particleSize <= 0){
-    throw new Error("createCircularExplosion error: particleSize must be greater than zero.");
-    return;
-  }
-  if (typeof alpha == UNDEFINED){
-    throw new Error("createCircularExplosion error: alpha is a mandatory configuration.");
-    return;
-  }
-  if (isNaN(alpha)){
-    throw new Error("createCircularExplosion error: Bad alpha parameter.");
-    return;
-  }
-  if (alpha < 0 || alpha > 1){
-    throw new Error("createCircularExplosion error: alpha must be between [0,1].");
-    return;
-  }
   if (!(typeof textureName == UNDEFINED)){
     var texture = textures[textureName];
-    if (!texture){
-      throw new Error("createCircularExplosion error: No such texture.");
-      return;
-    }
-    if (!(texture instanceof THREE.Texture)){
-      throw new Error("createCircularExplosion error: Texture not ready.");
-      return;
-    }
   }
-  if (!(typeof rgbFilter == UNDEFINED)){
-    if (isNaN(rgbFilter.x) || isNaN(rgbFilter.y) || isNaN(rgbFilter.z)){
-      throw new Error("createCircularExplosion error: Bad rgbFilter parameter.");
-      return;
-    }
-  }
-  if ((typeof alphaVariation == UNDEFINED)){
-    throw new Error("createCircularExplosion error: alphaVariation is a mandatory configuration.");
-    return;
-  }
-  if (isNaN(alphaVariation)){
-    throw new Error("createCircularExplosion error: Bad alphaVariation parameter.");
-    return;
-  }
-  if (alphaVariation < -1 || alphaVariation > 0){
-    throw new Error("createCircularExplosion error: alphaVariation is expected to be between [-1,0].");
-    return;
-  }
-  if (typeof speed == UNDEFINED){
-    throw new Error("createCircularExplosion error: speed is a mandatory parameter.");
-    return;
-  }
-  if (!(typeof normal == UNDEFINED)){
-    if (isNaN(normal.x) || isNaN(normal.y) || isNaN(normal.z)){
-      throw new Error("createCircularExplosion error: Bad normal parameter.");
-      return;
-    }
-  }else{
+  if ((typeof normal == UNDEFINED)){
     normal = this.vector(0, 1, 0);
   }
-  if (typeof expireTime == UNDEFINED){
-    throw new Error("createCircularExplosion error: expireTime is a mandatory configuration.");
-    return;
-  }
-  if (isNaN(expireTime)){
-    throw new Error("createCircularExplosion error: Bad expireTime parameter.");
-    return;
-  }
-  if (expireTime < 0){
-    throw new Error("createCircularExplosion error: expireTime must be a positive number.");
-    return;
-  }
-  if (!(typeof updateFunction == UNDEFINED)){
-    if (!(updateFunction instanceof Function)){
-      throw new Error("createCircularExplosion error: updateFunction is not a function.");
-      return;
-    }
-  }
-  if (!(typeof colorStep == UNDEFINED)){
-    if (isNaN(colorStep)){
-      throw new Error("createCircularExplosion error: Bad colorStep parameter.");
-      return;
-    }
-    if (colorStep < 0 || colorStep > 1){
-      throw new Error("createCircularExplosion error: colorStep is expected to be between [0,1].");
-      return;
-    }
-  }
-
   var particleMaterialConfigurations = new Object();
   particleMaterialConfigurations.color = colorName;
   particleMaterialConfigurations.size = particleSize;
@@ -20765,168 +19028,9 @@ Roygbiv.prototype.createDynamicTrail = function(configurations){
   var textureName = configurations.textureName;
   var rgbFilter = configurations.rgbFilter;
   var updateFunction = configurations.updateFunction;
-
-  if (particleSystemPool[name]){
-    throw new Error("createDynamicTrail error: Name must be unique.");
-    return;
-  }
-  if (typeof position == UNDEFINED){
-    throw new Error("createDynamicTrail error: position is a mandatory configuration.");
-    return;
-  }
-  if (isNaN(position.x) || isNaN(position.y) || isNaN(position.z)){
-    throw new Error("createDynamicTrail error: Bad position configuration.");
-    return;
-  }
-  if (typeof expireTime == UNDEFINED){
-    throw new Error("createDynamicTrail error: expireTime is a mandatory configuration.");
-    return;
-  }
-  if (isNaN(expireTime)){
-    throw new Error("createDynamicTrail error: Bad expireTime parameter.");
-    return;
-  }
-  if (expireTime <= 0){
-    throw new Error("createDynamicTrail error: expireTime is expected to be greater than zero.");
-    return;
-  }
-  if (typeof particleCount == UNDEFINED){
-    throw new Error("createDynamicTrail error: particleCount is a mandatory configuration.");
-    return;
-  }
-  if (isNaN(particleCount)){
-    throw new Error("createDynamicTrail error: Bad particleCount parameter.");
-    return;
-  }
-  if (particleCount <= 0){
-    throw new Error("createDynamicTrail error: particleCount is expected to be greater than zero.");
-    return;
-  }
-  if (typeof size == UNDEFINED){
-    throw new Error("createDynamicTrail error: size is a mandatory configuration.");
-    return;
-  }
-  if (isNaN(size)){
-    throw new Error("createDynamicTrail error: Bad size parameter.");
-    return;
-  }
-  if (size <= 0){
-    throw new Error("createDynamicTrail error: size is expected to be greater than zero.");
-    return;
-  }
-  if (typeof particleSize == UNDEFINED){
-    throw new Error("createDynamicTrail error: particleSize is a mandatory configuration.");
-    return;
-  }
-  if (isNaN(particleSize)){
-    throw new Error("createDynamicTrail error: Bad particleSize parameter.");
-    return;
-  }
-  if (particleSize <= 0){
-    throw new Error("createDynamicTrail error: particleSize is expected to be greater than zero.");
-    return;
-  }
-  if (typeof startDelay == UNDEFINED){
-    throw new Error("createDynamicTrail error: startDelay is a mandatory configuration.");
-    return;
-  }
-  if (isNaN(startDelay)){
-    throw new Error("createDynamicTrail error: Bad startDelay parameter.");
-    return;
-  }
-  if (startDelay <= 0){
-    throw new Error("createDynamicTrail error: startDelay is expected to be greater than zero.");
-    return;
-  }
-  if (typeof lifetime == UNDEFINED){
-    throw new Error("createDynamicTrail error: lifetime is a mandatory configuration.");
-    return;
-  }
-  if (isNaN(lifetime)){
-    throw new Error("createDynamicTrail error: Bad lifetime parameter.");
-    return;
-  }
-  if (lifetime < 0){
-    lifetime = 0;
-  }
-  if (typeof velocity == UNDEFINED){
-    throw new Error("createDynamicTrail error: velocity is a mandatory configuration.");
-    return;
-  }
-  if (isNaN(velocity.x) || isNaN(velocity.y) || isNaN(velocity.z)){
-    throw new Error("createDynamicTrail error: Bad velocity parameter.");
-    return;
-  }
-  if (typeof acceleration == UNDEFINED){
-    throw new Error("createDynamicTrail error: acceleration is a mandatory configuration.");
-    return;
-  }
-  if (isNaN(acceleration.x) || isNaN(acceleration.y) || isNaN(acceleration.z)){
-    throw new Error("createDynamicTrail error: Bad acceleration parameter.");
-    return;
-  }
-  if (typeof randomness == UNDEFINED){
-    throw new Error("createDynamicTrail error: randomness is a mandatory configuration.");
-    return;
-  }
-  if (isNaN(randomness)){
-    throw new Error("createDynamicTrail error: Bad randomness parameter.");
-    return;
-  }
-  if (typeof alphaVariation == UNDEFINED){
-    throw new Error("createDynamicTrail error: alphaVariation is a mandatory configuration.");
-    return;
-  }
-  if (isNaN(alphaVariation)){
-    throw new Error("createDynamicTrail error: Bad alphaVariation parameter.");
-    return;
-  }
-  if (alphaVariation < -1 || alphaVariation > 0){
-    throw new Error("createDynamicTrail error: alphaVariation is expected to be between [-1,0]");
-    return;
-  }
-  if (typeof colorName == UNDEFINED){
-    throw new Error("createDynamicTrail error: colorName is a mandatory configuration.");
-    return;
-  }
-  if (!(typeof targetColorName == UNDEFINED)){
-    if (typeof colorStep == UNDEFINED){
-      throw new Error("createDynamicTrail error: colorStep is mandatory if targetColorName is specified.");
-      return;
-    }
-    if (isNaN(colorStep)){
-      throw new Error("createDynamicTrail error: Bad colorStep parameter.");
-      return;
-    }
-    if (colorStep < 0 || colorStep > 1){
-      throw new Error("createDynamicTrail error: colorStep is expected to be betwen [0,1].");
-      return;
-    }
-  }
   if (!(typeof textureName == UNDEFINED)){
     var texture = textures[textureName];
-    if (typeof texture == UNDEFINED){
-      throw new Error("createDynamicTrail error: No such texture.");
-      return;
-    }
-    if (!(texture instanceof THREE.Texture)){
-      throw new Error("createDynamicTrail error: Texture not ready.");
-      return;
-    }
   }
-  if (!(typeof rgbFilter == UNDEFINED)){
-    if (isNaN(rgbFilter.x) || isNaN(rgbFilter.y) || isNaN(rgbFilter.z)){
-      throw new Error("createDynamicTrail error: Bad rgbFilter parameter.");
-      return;
-    }
-  }
-  if (!(typeof updateFunction == UNDEFINED)){
-    if (!(updateFunction instanceof Function)){
-      throw new Error("createDynamicTrail error: updateFunction is not a function.");
-      return;
-    }
-  }
-
   var particleMaterialConfigurations = new Object();
   particleMaterialConfigurations.color = colorName;
   particleMaterialConfigurations.size = particleSize;
@@ -20936,7 +19040,6 @@ Roygbiv.prototype.createDynamicTrail = function(configurations){
   particleMaterialConfigurations.targetColor = targetColorName;
   particleMaterialConfigurations.colorStep = colorStep;
   var particleMaterial = this.createParticleMaterial(particleMaterialConfigurations);
-
   var particles = [];
   var particleConfigurations = new Object();
   particleConfigurations.material = particleMaterial;
@@ -20977,55 +19080,6 @@ Roygbiv.prototype.createObjectTrail = function(configurations){
   var object = configurations.object;
   var alpha = configurations.alpha;
 
-  if (typeof object == UNDEFINED){
-    throw new Error("createObjectTrail error: object is a mandatory configuration.");
-    return;
-  }
-  if (!object){
-    throw new Error("createObjectTrail error: No such object.");
-    return;
-  }
-  if (!(object.isAddedObject) && !(object.isObjectGroup)){
-    throw new Error("createObjectTrail error: Bad object parameter.");
-    return;
-  }
-  if ((object.isAddedObject) && (!addedObjects[object.name])){
-    throw new Error("createObjectTrail error: Cannot create object trails for child objects. Use parent object instead.");
-    return;
-  }
-  if (typeof alpha == UNDEFINED){
-    throw new Error("createObjectTrail error: alpha is a mandatory configuration.");
-    return;
-  }
-  if (isNaN(alpha)){
-    throw new Error("createObjectTrail error: Bad alpha parameter.");
-    return;
-  }
-  if (alpha < 0 || alpha > 1){
-    throw new Error("createObjectTrail error: alpha is expected to be between [0,1].");
-  }
-  if (objectTrails[object.name]){
-    throw new Error("createObjectTrail error: A trail is already added to object.");
-    return;
-  }
-  if (!(typeof configurations.maxTimeInSeconds == UNDEFINED)){
-    if (isNaN(configurations.maxTimeInSeconds)){
-      throw new Error("createObjectTrail error: maxTimeInSeconds is not a number.");
-      return;
-    }
-    if (configurations.maxTimeInSeconds <= 0){
-      throw new Error("createObjectTrail error: maxTimeInSeconds must be greater than zero.");
-      return;
-    }
-    if (configurations.maxTimeInSeconds > 1){
-      throw new Error("createObjectTrail error: maxTimeInSeconds must not be greater than zero.");
-      return;
-    }
-    if (configurations.maxTimeInSeconds < (1/60)){
-      throw new Error("createObjectTrail error: maxTimeInSeconds must not be less than 0.01666666666 (1/60).");
-      return;
-    }
-  }
   new ObjectTrail(configurations);
   return;
 }
@@ -21034,19 +19088,7 @@ Roygbiv.prototype.destroyObjectTrail = function(object){
   if (mode == 0){
     return;
   }
-  if (typeof object == UNDEFINED){
-    throw new Error("destroyObjectTrail error: object is not defined.");
-    return;
-  }
-  if (!(object.isAddedObject) && !(object.isObjectGroup)){
-    throw new Error("destroyObjectTrail error: Type not supported.");
-    return;
-  }
   var objectTrail = objectTrails[object.name];
-  if (!objectTrail){
-    throw new Error("destroyObjectTrail error: No trail effect is added to object.");
-    return;
-  }
   objectTrail.destroy();
   delete objectTrails[object.name];
   delete activeObjectTrails[object.name];
@@ -21072,27 +19114,7 @@ Roygbiv.prototype.rewindParticle = function(particle, delay){
   if (mode == 0){
     return;
   }
-  if (!particle){
-    throw new Error("rewindParticle error: particle is not defined.");
-    return;
-  }
-  if (!(particle.isParticle)){
-    throw new Error("rewindParticle error: Bad particle parameter.");
-    return;
-  }
-  if (!particle.respawnSet){
-    throw new Error("rewindParticle error: Particles using this functionality must have respawn = true as configuration.");
-    return;
-  }
-  if (particle.lifetime == 0){
-    throw new Error("rewindParticle error: Particles using this functionality must have lifetime != 0 as configuration.");
-    return;
-  }
-  if (!(typeof delay == UNDEFINED)){
-    if (isNaN(delay)){
-      throw new Error("rewindParticle error: delay must be a number.");
-    }
-  }else{
+  if ((typeof delay == UNDEFINED)){
     delay = 0;
   }
   if (!particle.parent){
@@ -21121,103 +19143,7 @@ Roygbiv.prototype.createLaser = function(configurations){
   var textureName = configurations.textureName;
   var rgbFilter = configurations.rgbFilter;
   var updateFunction = configurations.updateFunction;
-  if (typeof name == UNDEFINED){
-    throw new Error("createLaser error: name is a mandatory configuration.");
-    return;
-  }
-  if (particleSystemPool[name]){
-    throw new Error("createLaser error: name must be unique.");
-    return;
-  }
-  if (typeof position == UNDEFINED){
-    throw new Error("createLaser error: position is a mandatory configuration.");
-    return;
-  }
-  if (isNaN(position.x) || isNaN(position.y) || isNaN(position.z)){
-    throw new Error("createLaser error: Bad position parameter.");
-    return;
-  }
-  if (typeof particleCount == UNDEFINED){
-    throw new Error("createLaser error: particleCount is a mandatory configuration.");
-    return;
-  }
-  if (isNaN(particleCount)){
-    throw new Error("createLaser error: particleCount must be a number.");
-    return;
-  }else if (particleCount <= 0){
-    throw new Error("createLaser error: particleCount must be greater than zero.");
-    return;
-  }
-  if (typeof particleSize == UNDEFINED){
-    throw new Error("createLaser error: particleSize is a mandatory configuration.");
-    return;
-  }
-  if (isNaN(particleSize)){
-    throw new Error("createLaser error: particleSize must be a number.");
-    return;
-  }else if (particleSize <= 0){
-    throw new Error("createLaser error: particleSize must be greater than zero.");
-    return;
-  }
-  if (typeof direction == UNDEFINED){
-    throw new Error("createLaser error: direction is a mandatory configuration.");
-    return;
-  }
-  if (isNaN(direction.x) || isNaN(direction.y) || isNaN(direction.z)){
-    throw new Error("createLaser error: Bad direction parameter.");
-    return;
-  }
-  if (typeof timeDiff == UNDEFINED){
-    throw new Error("createLaser error: timeDiff is a mandatory configuration.");
-    return;
-  }
-  if (isNaN(timeDiff)){
-    throw new Error("createLaser error: timeDiff must be a number.");
-    return;
-  }
-  if (typeof expireTime == UNDEFINED){
-    throw new Error("createLaser error: expireTime is a mandatory configuration.");
-    return;
-  }
-  if (isNaN(expireTime)){
-    throw new Error("createLaser error: expireTime must be a number.");
-    return;
-  }else if (expireTime < 0){
-    throw new Error("createLaser error: expireTime cannot be a negative number.");
-    return;
-  }
-  if (typeof velocity == UNDEFINED){
-    throw new Error("createLaser error: velocity is a mandatory configuration.");
-    return;
-  }
-  if (isNaN(velocity.x) || isNaN(velocity.y) || isNaN(velocity.z)){
-    throw new Error("createLaser error: Bad velocity parameter.");
-    return;
-  }
-  if (typeof acceleration == UNDEFINED){
-    throw new Error("createLaser error: acceleration is a mandatory configuration.");
-    return;
-  }
-  if (isNaN(acceleration.x) || isNaN(acceleration.y) || isNaN(acceleration.z)){
-    throw new Error("createLaser error: Bad acceleration parameter.");
-    return;
-  }
-  if (typeof alpha == UNDEFINED){
-    throw new Error("createLaser error: alpha is a mandatory configuration.");
-    return;
-  }
-  if (isNaN(alpha)){
-    throw new Error("createLaser error: alpha must be a number.");
-    return;
-  }
-  if (alpha > 1 || alpha < 0){
-    throw new Error("createLaser error: alpha must be between [0, 1].");
-    return;
-  }
-  if (typeof colorName == UNDEFINED){
-    throw new Error("createLaser error: colorName is a mandatory configuration.");
-    return;
-  }
+
 
   var particleMaterialConfigurations = new Object();
   particleMaterialConfigurations.color = colorName;
@@ -21282,151 +19208,16 @@ Roygbiv.prototype.createWaterfall = function(configurations){
   var updateFunction = configurations.updateFunction;
   var collisionTimeOffset = configurations.collisionTimeOffset;
 
-  if (typeof name == UNDEFINED){
-    throw new Error("createWaterfall error: name is a mandatory configuration.");
-    return;
-  }
-  if (particleSystemPool[name]){
-    throw new Error("createWaterfall error: name must be unique.");
-    return;
-  }
-  if (typeof position == UNDEFINED){
-    throw new Error("createWaterfall error: position is a mandatory configuration.");
-    return;
-  }
-  if (isNaN(position.x) || isNaN(position.y) || isNaN(position.z)){
-    throw new Error("createWaterfall error: Bad position parameter.");
-    return;
-  }
-  if (typeof particleCount == UNDEFINED){
-    throw new Error("createWaterfall error: particleCount is a mandatory configuration.");
-    return;
-  }
-  if (isNaN(particleCount)){
-    throw new Error("createWaterfall error: particleCount must be a number.");
-    return;
-  }
-  if (particleCount <= 0){
-    throw new Error("createWaterfall error: particleCount must be greater than zero.");
-    return;
-  }
-  if (typeof size == UNDEFINED){
-    throw new Error("createWaterfall error: size is a mandatory configuration.");
-    return;
-  }
-  if (isNaN(size)){
-    throw new Error("createWaterfall error: Bad size parameter.");
-    return;
-  }
-  if (size <= 0){
-    throw new Error("createWaterfall error: size must be greater than zero.");
-    return;
-  }
-  if (typeof particleSize == UNDEFINED){
-    throw new Error("createWaterfall error: particleSize is a mandatory configuration.");
-    return;
-  }
-  if (isNaN(particleSize)){
-    throw new Error("createWaterfall error: Bad particleSize parameter.");
-    return;
-  }
-  if (particleSize <= 0){
-    throw new Error("createWaterfall error: particleSize must be greater than zero.");
-    return;
-  }
-  if (typeof particleExpireTime == UNDEFINED){
-    throw new Error("createWaterfall error: particleExpireTime is a mandatory configuration.");
-    return;
-  }
-  if (isNaN(particleExpireTime)){
-    throw new Error("createWaterfall error: particleExpireTime must be a number.");
-    return;
-  }
-  if (particleExpireTime <= 0){
-    throw new Error("createWaterfall error: particleExpireTime must be greater than zero.");
-    return;
-  }
-  if (typeof speed == UNDEFINED){
-    throw new Error("createWaterfall error: speed is a mandatory configuration.");
-    return;
-  }
-  if (isNaN(speed)){
-    throw new Error("createWaterfall error: speed must be a number.");
-    return;
-  }
-  if (speed <= 0){
-    throw new Error("createWaterfall error: speed must be greater than zero.");
-    return;
-  }
-  if (typeof acceleration == UNDEFINED){
-    throw new Error("createWaterfall error: acceleration is a mandatory configuration.");
-    return;
-  }
-  if (isNaN(acceleration)){
-    throw new Error("createWaterfall error: acceleration must be a number.");
-    return;
-  }
-  if (acceleration <= 0){
-    throw new Error("createWaterfall error: acceleration must be greater than zero.");
-    return;
-  }
-  if (typeof avgStartDelay == UNDEFINED){
-    throw new Error("createWaterfall error: avgStartDelay is a mandatory configuration.");
-    return;
-  }
-  if (isNaN(avgStartDelay)){
-    throw new Error("createWaterfall error: avgStartDelay must be a number.");
-    return;
-  }
-  if (avgStartDelay <= 0){
-    throw new Error("createWaterfall error: avgStartDelay must be greater than zero.");
-    return;
-  }
-  if (typeof colorName == UNDEFINED){
-    throw new Error("createWaterfall error: colorName is a mandatory configuration.");
-    return;
-  }
-  if (typeof alpha == UNDEFINED){
-    throw new Error("createWaterfall error: alpha is a mandatory configuration.");
-    return;
-  }
-  if (isNaN(alpha)){
-    throw new Error("createWaterfall error: alpha must be a number.");
-    return;
-  }
-  if (alpha < 0 || alpha > 1){
-    throw new Error("createWaterfall error: alpha must be between [0, 1].");
-    return;
-  }
-  if (!(typeof rewindOnCollided == UNDEFINED)){
-    if (!(typeof rewindOnCollided == typeof(true))){
-      throw new Error("createWaterfall error: rewindOnCollided must be a boolean.");
-    }
-  }else{
+  if ((typeof rewindOnCollided == UNDEFINED)){
     rewindOnCollided = true;
   }
-  if (!(typeof normal == UNDEFINED)){
-    if (isNaN(normal.x) || isNaN(normal.y) || isNaN(normal.z)){
-      throw new Error("createWaterfall error: Bad normal parameter.");
-      return;
-    }
-  }else{
+  if ((typeof normal == UNDEFINED)){
     normal = this.vector(0, 0, 1);
   }
-  if (!(typeof randomness == UNDEFINED)){
-    if (isNaN(randomness)){
-      throw new Error("createWaterfall error: randomness must be a number.");
-      return;
-    }
-  }else{
+  if ((typeof randomness == UNDEFINED)){
     randomness = 0;
   }
-  if (!(typeof collisionTimeOffset == UNDEFINED)){
-    if (isNaN(collisionTimeOffset)){
-      throw new Error("createWaterfall error: collisionTimeOffset must be a number.");
-      return;
-    }
-  }else{
+  if ((typeof collisionTimeOffset == UNDEFINED)){
     collisionTimeOffset = 0;
   }
 
@@ -21502,167 +19293,18 @@ Roygbiv.prototype.createSnow = function(configurations){
   var updateFunction = configurations.updateFunction;
   var collisionTimeOffset = configurations.collisionTimeOffset;
 
-  if (typeof name == UNDEFINED){
-    throw new Error("createSnow error: name is a mandatory configuration.");
-    return;
-  }
-  if (particleSystemPool[name]){
-    throw new Error("createSnow error: name must be unique.");
-    return;
-  }
-  if (typeof position == UNDEFINED){
-    throw new Error("createSnow error: position is a mandatory configuration.");
-    return;
-  }
-  if (isNaN(position.x) || isNaN(position.y) || isNaN(position.z)){
-    throw new Error("createSnow error: Bad position parameter.");
-    return;
-  }
-  if (typeof particleCount == UNDEFINED){
-    throw new Error("createSnow error: particleCount is a mandatory configuration.");
-    return;
-  }
-  if (isNaN(particleCount)){
-    throw new Error("createSnow error: particleCount must be a number.");
-    return;
-  }
-  if (particleCount <= 0){
-    throw new Error("createSnow error: particleCount must be greater than zero.");
-    return;
-  }
-  if (typeof sizeX == UNDEFINED){
-    throw new Error("createSnow error: sizeX is a mandatory configuration.");
-    return;
-  }
-  if (isNaN(sizeX)){
-    throw new Error("createSnow error: sizeX must be a number.");
-    return;
-  }
-  if (sizeX <= 0){
-    throw new Error("createSnow error: sizeX must be greater than zero.");
-    return;
-  }
-  if (typeof sizeZ == UNDEFINED){
-    throw new Error("createSnow error: sizeZ is a mandatory configuration.");
-    return;
-  }
-  if (isNaN(sizeZ)){
-    throw new Error("createSnow error: sizeZ must be a number.");
-    return;
-  }
-  if (sizeZ <= 0){
-    throw new Error("createSnow error: sizeZ must be greater than zero.");
-    return;
-  }
-  if (typeof particleSize == UNDEFINED){
-    throw new Error("createSnow error: particleSize is a mandatory configuration.");
-    return;
-  }
-  if (isNaN(particleSize)){
-    throw new Error("createSnow error: particleSize must be a number.");
-    return;
-  }
-  if (particleSize <= 0){
-    throw new Error("createSnow error: particleSize must be greater than zero.");
-    return;
-  }
-  if (typeof particleExpireTime == UNDEFINED){
-    throw new Error("createSnow error: particleExpireTime is a mandatory configuration.");
-    return;
-  }
-  if (isNaN(particleExpireTime)){
-    throw new Error("createSnow error: particleExpireTime is a mandatory configuration.");
-    return;
-  }
-  if (particleExpireTime <= 0){
-    throw new Error("createSnow error: particleExpireTime must be greater than zero.");
-    return;
-  }
-  if (typeof speed == UNDEFINED){
-    throw new Error("createSnow error: speed is a mandatory configuration.");
-    return;
-  }
-  if (isNaN(speed)){
-    throw new Error("createSnow error: speed must be a number.");
-    return;
-  }
-  if (speed <= 0){
-    throw new Error("createSnow error: speed must be greater than zero.");
-    return;
-  }
-  if (typeof acceleration == UNDEFINED){
-    throw new Error("createSnow error: acceleration is a mandatory configuration.");
-    return;
-  }
-  if (isNaN(acceleration)){
-    throw new Error("createSnow error: acceleration must be a number.");
-    return;
-  }
-  if (acceleration < 0){
-    throw new Error("createSnow error: acceleration cannot be a negative number.");
-    return;
-  }
-  if (typeof avgStartDelay == UNDEFINED){
-    throw new Error("createSnow error: avgStartDelay is a mandatory configuration.");
-    return;
-  }
-  if (isNaN(avgStartDelay)){
-    throw new Error("createSnow error: avgStartDelay must be a number.");
-    return;
-  }
-  if (avgStartDelay <= 0){
-    throw new Error("createSnow error: avgStartDelay must be greater than zero.");
-    return;
-  }
-  if (typeof colorName == UNDEFINED){
-    throw new Error("createSnow error: colorName is a mandatory configuration.");
-    return;
-  }
-  if (typeof alpha == UNDEFINED){
-    throw new Error("createSnow error: alpha is a mandatory configuration.");
-    return;
-  }
-  if (isNaN(alpha)){
-    throw new Error("createSnow error: alpha must be a number.");
-    return;
-  }
-  if (alpha < 0 || alpha > 1){
-    throw new Error("createSnow error: alpha must be between [0, 1].");
-    return;
-  }
-  if (!(typeof rewindOnCollided == UNDEFINED)){
-    if (!(typeof rewindOnCollided == typeof(true))){
-      throw new Error("createSnow error: rewindOnCollided must be a boolean.");
-      return;
-    }
-  }else{
+  if ((typeof rewindOnCollided == UNDEFINED)){
     rewindOnCollided = true;
   }
-  if (!(typeof normal == UNDEFINED)){
-    if (isNaN(normal.x) || isNaN(normal.y) || isNaN(normal.z)){
-      throw new Error("createSnow error: Bad normal parameter.");
-      return;
-    }
-  }else{
+  if ((typeof normal == UNDEFINED)){
     normal = this.vector(0, -1, 0);
   }
-  if (!(typeof randomness == UNDEFINED)){
-    if (isNaN(randomness)){
-      throw new Error("createSnow error: randomness must be a number.");
-      return;
-    }
-  }else{
+  if ((typeof randomness == UNDEFINED)){
     randomness = 0;
   }
-  if (!(typeof collisionTimeOffset == UNDEFINED)){
-    if (isNaN(collisionTimeOffset)){
-      throw new Error("createSnow error: collisionTimeOffset must be a number.");
-      return;
-    }
-  }else{
+  if ((typeof collisionTimeOffset == UNDEFINED)){
     collisionTimeOffset = 0;
   }
-
   var particleMaterialConfigurations = new Object();
   particleMaterialConfigurations.color = colorName;
   particleMaterialConfigurations.size = particleSize;
@@ -21713,26 +19355,6 @@ Roygbiv.prototype.stopParticleSystem = function(particleSystem, stopDuration){
   if (mode == 0){
     return;
   }
-  if (typeof particleSystem == UNDEFINED){
-    throw new Error("stopParticleSystem error: particleSystem is not defined.");
-    return;
-  }
-  if (!(particleSystem.isParticleSystem)){
-    throw new Error("stopParticleSystem error: Type not supported.");
-    return;
-  }
-  if (typeof stopDuration == UNDEFINED){
-    throw new Error("stopParticleSystem error: stopDuration is not defined.");
-    return;
-  }
-  if (isNaN(stopDuration)){
-    throw new Error("stopParticleSystem error: stopDuration is not defined.");
-    return;
-  }
-  if (stopDuration < 0){
-    throw new Error("stopParticleSystem error: stopDuration must be a positive number.");
-    return;
-  }
   particleSystem.stop(stopDuration);
 }
 
@@ -21746,41 +19368,18 @@ Roygbiv.prototype.startParticleSystem = function(configurations){
   var startAcceleration = configurations.startAcceleration;
   var startQuaternion = configurations.startQuaternion;
 
-  if (!particleSystem){
-    throw new Error("startParticleSystem error: particleSystem is a mandatory configuration.");
-    return;
-  }
-  if (!(particleSystem.isParticleSystem)){
-    throw new Error("startParticleSystem error: Type not supported.");
-    return;
-  }
+
   var startPositionSet = false, startVelocitySet = false, startAccelerationSet = false, startQuaternionSet = false;
   if (!(typeof startPosition == UNDEFINED)){
-    if (isNaN(startPosition.x) || isNaN(startPosition.y) || isNaN(startPosition.z)){
-      throw new Error("startParticleSystem error: Bad startPosition parameter.");
-      return;
-    }
     startPositionSet = true;
   }
   if (!(typeof startVelocity == UNDEFINED)){
-    if (isNaN(startVelocity.x) || isNaN(startVelocity.y) || isNaN(startVelocity.z)){
-      throw new Error("startParticleSystem error: Bad startVelocity parameter.");
-      return;
-    }
     startVelocitySet = true;
   }
   if (!(typeof startAcceleration == UNDEFINED)){
-    if (isNaN(startAcceleration.x) || isNaN(startAcceleration.y) || isNaN(startAcceleration.z)){
-      throw new Error("startParticleSystem error: Bad startAcceleration parameter.");
-      return;
-    }
     startAccelerationSet = true;
   }
   if (!(typeof startQuaternion == UNDEFINED)){
-    if (isNaN(startQuaternion.x) || isNaN(startQuaternion.y) || isNaN(startQuaternion.z) || isNaN(startQuaternion.w)){
-      throw new Error("startParticleSystem error: Bad startQuaternion parameter.");
-      return;
-    }
     startQuaternionSet = true;
   }
 
@@ -21881,14 +19480,7 @@ Roygbiv.prototype.hideParticleSystem = function(particleSystem){
   if (mode == 0){
     return;
   }
-  if (typeof particleSystem == UNDEFINED){
-    throw new Error("hideParticleSystem error: particleSystem is not defined.");
-    return;
-  }
-  if (!(particleSystem.isParticleSystem)){
-    throw new Error("hideParticleSystem error: Type not supported.");
-    return;
-  }
+
   particleSystem.tick = 0;
   particleSystem.motionMode = 0;
   particleSystem.mesh.visible = false;
@@ -21909,14 +19501,7 @@ Roygbiv.prototype.createParticleSystemPool = function(name){
   if (mode == 0){
     return;
   }
-  if (typeof name == UNDEFINED){
-    throw new Error("createParticleSystemPool error: name is not defined.");
-    return;
-  }
-  if (particleSystemPools[name]){
-    throw new Error("createParticleSystemPool error: name must be unique.");
-    return;
-  }
+
   var psPool = new ParticleSystemPool(name);
   particleSystemPools[name] = psPool;
   return psPool;
@@ -21926,43 +19511,11 @@ Roygbiv.prototype.addParticleSystemToPool = function(pool, particleSystem){
   if (mode == 0){
     return;
   }
-  if (typeof pool == UNDEFINED){
-    throw new Error("addParticleSystemToPool error: pool is not defined.");
-    return;
-  }
-  if (typeof particleSystem == UNDEFINED){
-    throw new Error("addParticleSystemToPool error: particleSystem is not defined.");
-    return;
-  }
-  if (!(pool.isParticleSystemPool)){
-    throw new Error("addParticleSystemToPool error: Pool type not supoorted.");
-    return;
-  }
-  if (!(particleSystem.isParticleSystem)){
-    throw new Error("addParticleSystemToPool error: Particle system type not supported.");
-    return;
-  }
-  if (!(typeof particleSystem.psPool == UNDEFINED)){
-    throw new Error("addParticleSystemToPool error: Particle system belongs to another pool.");
-    return;
-  }
   pool.add(particleSystem);
 }
 
 Roygbiv.prototype.removeParticleSystemFromPool = function(particleSystem){
   if (mode == 0){
-    return;
-  }
-  if (typeof particleSystem == UNDEFINED){
-    throw new Error("removeParticleSystemFromPool error: particleSystem is not defined.");
-    return;
-  }
-  if (!(particleSystem.isParticleSystem)){
-    throw new Error("removeParticleSystemFromPool error: Type not supported.");
-    return;
-  }
-  if (typeof particleSystem.psPool == UNDEFINED){
-    throw new Error("removeParticleSystemFromPool error: particleSystem does not belong to any pool.");
     return;
   }
   var psPool = particleSystemPools[particleSystem.psPool];
@@ -21971,14 +19524,6 @@ Roygbiv.prototype.removeParticleSystemFromPool = function(particleSystem){
 
 Roygbiv.prototype.destroyParticleSystemPool = function(pool){
   if (mode == 0){
-    return;
-  }
-  if (typeof pool == UNDEFINED){
-    throw new Error("destroyParticleSystemPool error: pool is not defined.");
-    return;
-  }
-  if (!(pool.isParticleSystemPool)){
-    throw new Error("destroyParticleSystemPool error: Type not supported.");
     return;
   }
   pool.destroy();
@@ -22009,149 +19554,19 @@ Roygbiv.prototype.createConfettiExplosion = function(configurations){
   var textureName = configurations.textureName;
   var rgbFilter = configurations.rgbFilter;
 
-  if (typeof name == UNDEFINED){
-    throw new Error("createConfettiExplosion error: name is a mandatory configuration.");
-    return;
-  }
-  if (particleSystemPool[name]){
-    throw new Error("createConfettiExplosion error: name must be unique.");
-    return;
-  }
-  if (typeof position == UNDEFINED){
-    throw new Error("createConfettiExplosion error: position is a mandatory configuration.");
-    return;
-  }
-  if (isNaN(position.x) || isNaN(position.y) || isNaN(position.z)){
-    throw new Error("createConfettiExplosion error: Bad position parameter.");
-    return;
-  }
-  if (typeof expireTime == UNDEFINED){
-    throw new Error("createConfettiExplosion error: expireTime is a mandatory configuration.");
-    return;
-  }
-  if (isNaN(expireTime)){
-    throw new Error("createConfettiExplosion error: Bad expireTime parameter.");
-    return;
-  }
-  if (expireTime < 0){
-    throw new Error("createConfettiExplosion error: expireTime cannot be a negative number.");
-    return;
-  }
-  if (typeof lifetime == UNDEFINED){
-    throw new Error("createConfettiExplosion error: lifetime is a mandatory configuration.");
-    return;
-  }
-  if (isNaN(lifetime)){
-    throw new Error("createConfettiExplosion error: Bad lifetime parameter.");
-    return;
-  }
-  if (lifetime < 0){
-    throw new Error("createConfettiExplosion error: lifetime cannot be a negative number.");
-    return;
-  }
-  if (typeof verticalSpeed == UNDEFINED){
-    throw new Error("createConfettiExplosion error: verticalSpeed is a mandatory configuration.");
-    return;
-  }
-  if (isNaN(verticalSpeed)){
-    throw new Error("createConfettiExplosion error: Bad verticalSpeed parameter.");
-    return;
-  }
-  if (typeof horizontalSpeed == UNDEFINED){
-    throw new Error("createConfettiExplosion error: horizontalSpeed is a mandatory configuration.");
-    return;
-  }
-  if (isNaN(horizontalSpeed)){
-    throw new Error("createConfettiExplosion error: Bad horizontalSpeed parameter.");
-    return;
-  }
-  if (typeof verticalAcceleration == UNDEFINED){
-    throw new Error("createConfettiExplosion error: verticalAcceleration is a mandatory configuration.");
-    return;
-  }
-  if (isNaN(verticalAcceleration)){
-    throw new Error("createConfettiExplosion error: Bad verticalAcceleration parameter.");
-    return;
-  }
-  if (verticalAcceleration >= 0){
-    throw new Error("createConfettiExplosion error: verticalAcceleration is expected to be less than zero.");
-    return;
-  }
-  if (typeof particleCount == UNDEFINED){
-    throw new Error("createConfettiExplosion error: particleCount is a mandatory configuration.");
-    return;
-  }
-  if (isNaN(particleCount)){
-    throw new Error("createConfettiExplosion error: Bad particleCount parameter.");
-    return;
-  }
-  if (particleCount <= 0){
-    throw new Error("createConfettiExplosion error: particleCount is expected to be greater than zero.");
-    return;
-  }
-  if (typeof particleSize == UNDEFINED){
-    throw new Error("createConfettiExplosion error: particleSize is a mandatory configuration.");
-    return;
-  }
-  if (isNaN(particleSize)){
-    throw new Error("createConfettiExplosion error: Bad particleSize parameter.");
-    return;
-  }
-  if (particleSize <= 0){
-    throw new Error("createConfettiExplosion error: particleSize is expected to be greater than zero.");
-    return;
-  }
-  if (typeof colorName == UNDEFINED){
-    throw new Error("createConfettiExplosion error: colorName is a mandatory configuration.");
-    return;
-  }
-  if (typeof alpha == UNDEFINED){
-    throw new Error("createConfettiExplosion error: alpha is a mandatory configuration.");
-    return;
-  }
-  if (isNaN(alpha)){
-    throw new Error("createConfettiExplosion error: Bad alpha parameter.");
-    return;
-  }
-  if (alpha < 0 || alpha > 1){
-    throw new Error("createConfettiExplosion error: alpha is expected to be between [0, 1].");
-    return;
-  }
   if (!(typeof collisionMethod == UNDEFINED)){
-    if (collisionMethod != 0 && collisionMethod != 1 && collisionMethod != 2){
-      throw new Error("createConfettiExplosion error: collisionMethod must be 0, 1, or 2.");
-      return;
-    }
   }else{
     collisionMethod = 0;
   }
-  if (!(typeof collisionTimeOffset == UNDEFINED)){
-    if (isNaN(collisionTimeOffset)){
-      throw new Error("createConfettiExplosion error: Bad collisionTimeOffset parameter.");
-      return;
-    }
-  }else{
+  if ((typeof collisionTimeOffset == UNDEFINED)){
     collisionTimeOffset = 0;
   }
-  if (!(typeof startDelay == UNDEFINED)){
-    if (isNaN(startDelay)){
-      throw new Error("createConfettiExplosion error: Bad startDelay parameter.");
-      return;
-    }
-    if (startDelay < 0){
-      throw new Error("createConfettiExplosion error: startDelay cannot be a negative number.");
-      return;
-    }
-  }else{
+  if ((typeof startDelay == UNDEFINED)){
     startDelay = 0;
   }
   var normalSet = false;
   if (!(typeof normal == UNDEFINED)){
-      if (isNaN(normal.x) || isNaN(normal.y) || isNaN(normal.z)){
-        throw new Error("createConfettiExplosion error: Bad normal parameter.");
-        return;
-      }
-      normalSet = true;
+    normalSet = true;
   }
 
   var particleMaterial = this.createParticleMaterial({
@@ -22215,26 +19630,6 @@ Roygbiv.prototype.copyParticleSystem = function(particleSystem, newParticleSyste
   if (mode == 0){
     return;
   }
-  if (TOTAL_PARTICLE_SYSTEM_COUNT >= MAX_PARTICLE_SYSTEM_COUNT){
-    throw new Error("copyParticleSystem error: Cannot create more than "+MAX_PARTICLE_SYSTEM_COUNT+" particle systems.");
-    return;
-  }
-  if (typeof particleSystem == UNDEFINED){
-    throw new Error("copyParticleSystem error: particleSystem is not defined.");
-    return;
-  }
-  if (!(particleSystem.isParticleSystem)){
-    throw new Error("copyParticleSystem error: Type not supported.");
-    return;
-  }
-  if (typeof newParticleSystemName == UNDEFINED){
-    throw new Error("copyParticleSystem error: newParticleSystemName is not defined.");
-    return;
-  }
-  if (particleSystemPool[newParticleSystemName]){
-    throw new Error("copyParticleSystem error: Name must be unique.");
-    return;
-  }
 
   var copyParticleSystem = new ParticleSystem(
     particleSystem, newParticleSystemName, particleSystem.particles,
@@ -22267,26 +19662,6 @@ Roygbiv.prototype.fadeAway = function(particleSystem, coefficient){
   if (mode == 0){
     return;
   }
-  if (typeof particleSystem == UNDEFINED){
-    throw new Error("fadeAway error: particleSystem is not defined.");
-    return;
-  }
-  if (!(particleSystem.isParticleSystem)){
-    throw new Error("fadeAway error: Type not supported.");
-    return;
-  }
-  if (typeof coefficient == UNDEFINED){
-    throw new Error("fadeAway error: coefficient is not defined.");
-    return;
-  }
-  if (isNaN(coefficient)){
-    throw new Error("fadeAway error: Bad coefficient parameter.");
-    return;
-  }
-  if (coefficient <= 0){
-    throw new Error("fadeAway error: coefficient must be greater than zero.");
-    return;
-  }
   if (!particleSystem.psMerger){
     particleSystem.material.uniforms.dissapearCoef.value = coefficient;
   }else{
@@ -22298,14 +19673,7 @@ Roygbiv.prototype.mergeParticleSystems = function(){
   if (mode == 0){
     return;
   }
-  if (!MAX_VERTEX_UNIFORM_VECTORS){
-    throw new Error("mergeParticleSystems error: MAX_VERTEX_UNIFORM_VECTORS is not calcualted.");
-    return;
-  }
-  if (Object.keys(particleSystemPool).length < 2){
-    throw new Error("mergeParticleSystems error: Mininmum 2 particle systems must be created in order to merge.");
-    return;
-  }
+
   var diff = parseInt(4096 / MAX_VERTEX_UNIFORM_VECTORS);
   var chunkSize = parseInt(MAX_PS_COMPRESS_AMOUNT_4096 / diff);
   var mergeObj = new Object();
@@ -22331,60 +19699,6 @@ Roygbiv.prototype.setParticleSystemPosition = function(particleSystem, x, y, z){
   if (mode == 0){
     return;
   }
-  if (typeof particleSystem == UNDEFINED){
-    throw new Error("setParticleSystemPosition error: particleSystem is not defined.");
-    return;
-  }
-  if (!(particleSystem.isParticleSystem)){
-    throw new Error("setParticleSystemPosition error: Type not supported.");
-    return;
-  }
-  if (typeof x == UNDEFINED){
-    throw new Error("setParticleSystemPosition error: x is not defined.");
-    return;
-  }
-  if (typeof y == UNDEFINED){
-    throw new Error("setParticleSystemPosition error: y is not defined.");
-    return;
-  }
-  if (typeof z == UNDEFINED){
-    throw new Error("setParticleSystemPosition error: z is not defined.");
-    return;
-  }
-  if (isNaN(x)){
-    throw new Error("setParticleSystemPosition error: x is not a number.");
-    return;
-  }
-  if (isNaN(y)){
-    throw new Error("setParticleSystemPosition error: y is not a number.");
-    return;
-  }
-  if (isNaN(z)){
-    throw new Error("setParticleSystemPosition error: z is not a number.");
-    return;
-  }
-  if (!particleSystem.mesh.visible){
-    throw new Error("setParticleSystemPosition error: particleSystem is not visible.");
-    return;
-  }
-  if (particleSystem.checkForCollisions){
-    throw new Error("setParticleSystemPosition error: particleSystem has a collision callback attached. Cannot set position.");
-    return;
-  }
-  if (particleSystem.particlesWithCollisionCallbacks.size > 0){
-    throw new Error("setParticleSystemPosition error: particleSystem has a collidable particle. Cannot set position.");
-    return;
-  }
-  if (particleSystem.hasTrailedParticle){
-    throw new Error("setParticleSystemPosition error: particleSystem has a trailed particle. Cannot set position.");
-    return;
-  }
-  if (particleSystem.velocity.x != 0 || particleSystem.velocity.y != 0 || particleSystem.velocity.z != 0 ||
-          particleSystem.acceleration.x != 0 || particleSystem.acceleration.y != 0 || particleSystem.acceleration.z != 0){
-
-      throw new Error("setParticleSystemPosition error: particleSystem has a defined motion. Cannot set position.");
-      return;
-  }
   particleSystem.mesh.position.set(x, y, z);
   particleSystem.hasManualPositionSet = true;
 }
@@ -22393,19 +19707,7 @@ Roygbiv.prototype.startObjectTrail = function(object){
   if (mode == 0){
     return;
   }
-  if (typeof object == UNDEFINED){
-    throw new Error("startObjectTrail error: object is not defined.");
-    return;
-  }
-  if (!(object.isAddedObject) && !(object.isObjectGroup)){
-    throw new Error("startObjectTrail error: Type not supported.");
-    return;
-  }
   var objectTrail = objectTrails[object.name];
-  if (!objectTrail){
-    throw new Error("startObjectTrail error: No trail attached to object.");
-    return;
-  }
   objectTrail.start();
 }
 
@@ -22413,52 +19715,12 @@ Roygbiv.prototype.stopObjectTrail = function(object){
   if (mode == 0){
     return;
   }
-  if (typeof object == UNDEFINED){
-    throw new Error("stopObjectTrail error: object is not defined.");
-    return;
-  }
-  if (!(object.isAddedObject) && !(object.isObjectGroup)){
-    throw new Error("stopObjectTrail error: Type not supported.");
-    return;
-  }
   var objectTrail = objectTrails[object.name];
-  if (!objectTrail){
-    throw new Error("stopObjectTrail error: No trail attached to object.");
-    return;
-  }
   objectTrail.stop();
 }
 
 Roygbiv.prototype.createInitializedParticleSystemPool = function(poolName, refParticleSystem, poolSize){
   if (mode == 0){
-    return;
-  }
-  if (typeof refParticleSystem == UNDEFINED){
-    throw new Error("createInitializedParticleSystemPool error: refParticleSystem is not defined.");
-    return;
-  }
-  if (!(refParticleSystem.isParticleSystem)){
-    throw new Error("createInitializedParticleSystemPool error: refParticleSystem is not a ParticleSystem.");
-    return;
-  }
-  if (typeof poolName == UNDEFINED){
-    throw new Error("createInitializedParticleSystemPool error: poolName is not defined.");
-    return;
-  }
-  if (particleSystemPools[poolName]){
-    throw new Error("createInitializedParticleSystemPool error: poolName must be unique.");
-    return;
-  }
-  if (typeof poolSize == UNDEFINED){
-    throw new Error("createInitializedParticleSystemPool error: poolSize is not defined.");
-    return;
-  }
-  if (isNaN(poolSize)){
-    throw new Error("createInitializedParticleSystemPool error: poolSize is not a number.");
-    return;
-  }
-  if (poolSize <= 1){
-    throw new Error("createInitializedParticleSystemPool error: poolSize must be greater than 1.");
     return;
   }
   var pool = this.createParticleSystemPool(poolName);
@@ -22471,22 +19733,6 @@ Roygbiv.prototype.createInitializedParticleSystemPool = function(poolName, refPa
 
 Roygbiv.prototype.makeParticleSystemsResponsive = function(referenceHeight){
   if (mode == 0){
-    return;
-  }
-  if (typeof referenceHeight == UNDEFINED){
-    throw new Error("makeParticleSystemsResponsive error: referenceHeight is not defined.");
-    return;
-  }
-  if (isNaN(referenceHeight)){
-    throw new Error("makeParticleSystemsResponsive error: referenceHeight is not a number.");
-    return;
-  }
-  if (referenceHeight <= 0){
-    throw new Error("makeParticleSystemsResponsive error: referenceHeight must be greater than zero.");
-    return;
-  }
-  if (TOTAL_PARTICLE_SYSTEM_COUNT > 0){
-    throw new Error("makeParticleSystemsResponsive error: This API should be used before any particle system creation.");
     return;
   }
   particleSystemRefHeight = referenceHeight;
@@ -22505,81 +19751,7 @@ Roygbiv.prototype.createCrosshair = function(configurations){
   var size = configurations.size;
   var maxWidthPercent = configurations.maxWidthPercent;
   var maxHeightPercent = configurations.maxHeightPercent;
-
-  if (typeof name == UNDEFINED){
-    throw new Error("createCrosshair error: name is a mandatory configuration.");
-    return;
-  }
-  if (crosshairs[name]){
-    throw new Error("createCrosshair error: name must be unique.");
-    return;
-  }
-  if (typeof textureName == UNDEFINED){
-    throw new Error("createCrosshair error: textureName is a mandatory configuration.");
-    return;
-  }
   var texture = textures[textureName];
-  if (typeof texture == UNDEFINED){
-    throw new Error("createCrosshair error: No such texture.");
-    return;
-  }
-  if (!(texture instanceof THREE.Texture)){
-    throw new Error("createCrosshair error: Texture not ready.");
-    return;
-  }
-  if (typeof alpha == UNDEFINED){
-    throw new Error("createCrosshair error: alpha is a mandatory configuration.");
-    return;
-  }
-  if (isNaN(alpha)){
-    throw new Error("createCrosshair error: Bad alpha parameter.");
-    return;
-  }
-  if (alpha < 0 || alpha > 1){
-    throw new Error("createCrosshair error: alpha must be between 0 and 1.");
-    return;
-  }
-  if (typeof size == UNDEFINED){
-    throw new Error("createCrosshair error: size is a mandatory configuration.");
-    return;
-  }
-  if (isNaN(size)){
-    throw new Error("createCrosshair error: Bad size parameter.");
-    return;
-  }
-  if (size <= 0){
-    throw new Error("createCrosshair error: size must be greater than zero.");
-    return;
-  }
-  if (!(typeof maxWidthPercent == UNDEFINED)){
-    if (isNaN(maxWidthPercent)){
-      throw new Error("createCrosshair error: maxWidthPercent is not a number.");
-      return;
-    }
-    if (maxWidthPercent <= 0){
-      throw new Error("createCrosshair error: maxWidthPercent must be greater than zero.");
-      return;
-    }
-    if (maxWidthPercent > 100){
-      throw new Error("createCrosshair error: maxWidthPercent must be less than 100.");
-      return;
-    }
-  }
-  if (!(typeof maxHeightPercent == UNDEFINED)){
-    if (isNaN(maxHeightPercent)){
-      throw new Error("createCrosshair error: maxHeightPercent is not a number.");
-      return;
-    }
-    if (maxHeightPercent <= 0){
-      throw new Error("createCrosshair error: maxHeightPercent must be greater than zero.");
-      return;
-    }
-    if (maxHeightPercent > 100){
-      throw new Error("createCrosshair error: maxHeightPercent must be less than 100.");
-      return;
-    }
-  }
-
   var color = new THREE.Color(colorName);
   new Crosshair({
     name: name,
@@ -22598,15 +19770,7 @@ Roygbiv.prototype.selectCrosshair = function(crosshairName){
   if (mode == 0){
     return;
   }
-  if (typeof crosshairName == UNDEFINED){
-    throw new Error("selectCrosshair error: crosshairName is not defined.");
-    return;
-  }
   var crosshair = crosshairs[crosshairName];
-  if (!crosshair){
-    throw new Error("selectCrosshair error: No such crosshair.");
-    return;
-  }
   if (selectedCrosshair){
     selectedCrosshair.mesh.visible = false;
   }
@@ -22617,14 +19781,6 @@ Roygbiv.prototype.selectCrosshair = function(crosshairName){
 
 Roygbiv.prototype.changeCrosshairColor = function(colorName){
   if (mode == 0){
-    return;
-  }
-  if (typeof colorName == UNDEFINED){
-    throw new Error("changeCrosshairColor error: colorName is not defined.");
-    return;
-  }
-  if (!selectedCrosshair){
-    throw new Error("changeCrosshairColor error: No crosshair is selected.");
     return;
   }
   REUSABLE_COLOR.set(colorName);
@@ -22647,27 +19803,11 @@ Roygbiv.prototype.startCrosshairRotation = function(angularSpeed){
   if (mode == 0){
     return;
   }
-  if (!selectedCrosshair){
-    throw new Error("startCrosshairRotation error: No selected crosshair.");
-    return;
-  }
-  if (typeof angularSpeed == UNDEFINED){
-    throw new Error("startCrosshairRotation error: angularSpeed is not defined.");
-    return;
-  }
-  if (isNaN(angularSpeed)){
-    throw new Error("startCrosshairRotation error: angularSpeed is not a number.");
-    return;
-  }
   selectedCrosshair.angularSpeed = angularSpeed;
 }
 
 Roygbiv.prototype.stopCrosshairRotation = function(){
   if (mode == 0){
-    return;
-  }
-  if (!selectedCrosshair){
-    throw new Error("stopCrosshairRotation error: No selected crosshair.");
     return;
   }
   selectedCrosshair.rotationTime = 0;
@@ -22679,43 +19819,11 @@ Roygbiv.prototype.pauseCrosshairRotation = function(){
   if (mode == 0){
     return;
   }
-  if (!selectedCrosshair){
-    throw new Error("pauseCrosshairRotation error: No selected crosshair.");
-    return;
-  }
   selectedCrosshair.angularSpeed = 0;
 }
 
 Roygbiv.prototype.expandCrosshair = function(targetSize, delta){
   if (mode == 0){
-    return;
-  }
-  if (!selectedCrosshair){
-    throw new Error("expandCrosshair error: No selected crosshair.");
-    return;
-  }
-  if (typeof targetSize == UNDEFINED){
-    throw new Error("expandCrosshair error: targetSize is not defined.");
-    return;
-  }
-  if (isNaN(targetSize)){
-    throw new Error("expandCrosshair error: Bad targetSize parameter.");
-    return;
-  }
-  if (targetSize <= selectedCrosshair.sizeAmount){
-    throw new Error("expandCrosshair error: targetSize must not be less than the size of the crosshair.");
-    return;
-  }
-  if (typeof delta == UNDEFINED){
-    throw new Error("expandCrosshair error: delta is not defined.");
-    return;
-  }
-  if (isNaN(delta)){
-    throw new Error("expandCrosshair error: Bad delta parameter.");
-    return;
-  }
-  if (delta <= 0){
-    throw new Error("expandCrosshair error: delta must be greater than zero.");
     return;
   }
   selectedCrosshair.expandTick = 0;
@@ -22727,22 +19835,6 @@ Roygbiv.prototype.expandCrosshair = function(targetSize, delta){
 
 Roygbiv.prototype.shrinkCrosshair = function(delta){
   if (mode == 0){
-    return;
-  }
-  if (typeof delta == UNDEFINED){
-    throw new Error("shrinkCrosshair error: delta is not defined.");
-    return;
-  }
-  if (isNaN(delta)){
-    throw new Error("shrinkCrosshair error: Bad delta parameter.");
-    return;
-  }
-  if (delta <= 0){
-    throw new Error("shrinkCrosshair error: delta must be greater than zero.");
-    return;
-  }
-  if (!selectedCrosshair){
-    throw new Error("shrinkCrosshair error: No selected crosshair.");
     return;
   }
   selectedCrosshair.shrinkTick = 0;
@@ -22757,54 +19849,14 @@ Roygbiv.prototype.setCollisionListener = function(sourceObject, callbackFunction
   if (mode == 0){
     return;
   }
-  if (!sourceObject){
-    throw new Error("setCollisionListener error: sourceObject is not defined.");
-    return;
-  }
-  if (!(sourceObject.isAddedObject) && !(sourceObject.isObjectGroup) && !(sourceObject.isParticle) && !(sourceObject.isParticleSystem)){
-    throw new Error("setCollisionListener error: Type not supported.");
-    return;
-  }
   if ((sourceObject.isAddedObject) || (sourceObject.isObjectGroup)){
-    if (TOTAL_OBJECT_COLLISION_LISTENER_COUNT >= MAX_OBJECT_COLLISION_LISTENER_COUNT){
-      throw new Error("setCollisionListener error: Cannot set collision listener for more than "+MAX_OBJECT_COLLISION_LISTENER_COUNT+" objects.");
-      return;
-    }
-    if (sourceObject.noMass){
-      throw new Error("setCollisionListener error: Object has no mass.");
-      return;
-    }
     collisionCallbackRequests[sourceObject.name] = callbackFunction.bind(sourceObject);
     TOTAL_OBJECT_COLLISION_LISTENER_COUNT ++;
   }else if (sourceObject.isParticle){
-    if (sourceObject.parent && sourceObject.parent.isStopped){
-      throw new Error("setCollisionListener error: Particle system is stopped.");
-      return;
-    }
     if (sourceObject.uuid && !particleCollisionCallbackRequests[sourceObject.uuid]){
-      if (TOTAL_PARTICLE_COLLISION_LISTEN_COUNT >= MAX_PARTICLE_COLLISION_LISTEN_COUNT){
-        throw new Error("setCollisionListener error: Cannot set collision listener for more than "+MAX_PARTICLE_COLLISION_LISTEN_COUNT+" particles.");
-        return;
-      }
     }
     if (sourceObject.parent){
-      if (sourceObject.parent.hasManualPositionSet){
-        throw new Error("setCollisionListener error: A position is set manually to the parent particle system. Cannot listen for collisions.");
-        return;
-      }
-      if (sourceObject.parent.hasManualRotationSet){
-        throw new Error("setCollisionListener error: A rotation is set manually to the parent particle system. Cannot listen for collisions.");
-        return;
-      }
-      if (sourceObject.parent.hasManualQuaternionSet){
-        throw new Error("setCollisionListener error: A quaternion is set manually to the parent particle system. Cannot listen for collisions.");
-        return;
-      }
       if (!sourceObject.parent.hasParticleCollision){
-        if (TOTAL_PARTICLE_SYSTEMS_WITH_PARTICLE_COLLISIONS >= MAX_PARTICLE_SYSTEMS_WITH_PARTICLE_COLLISIONS){
-          throw new Error("setCollisionListener error: Maximum "+MAX_PARTICLE_SYSTEMS_WITH_PARTICLE_COLLISIONS+" can have collidable particles.");
-          return;
-        }
         TOTAL_PARTICLE_SYSTEMS_WITH_PARTICLE_COLLISIONS ++;
       }
     }
@@ -22828,24 +19880,8 @@ Roygbiv.prototype.setCollisionListener = function(sourceObject, callbackFunction
       sourceObject.parent.notifyParticleCollisionCallbackChange(sourceObject);
     }
   }else if (sourceObject.isParticleSystem){
-    if (sourceObject.hasManualPositionSet){
-      throw new Error("setCollisionListener error: A position is set manually to the particle system. Cannot listen for collisions.");
-      return;
-    }
-    if (sourceObject.hasManualRotationSet){
-      throw new Error("setCollisionListener error: A rotation is set manually to the particle system. Cannot listen for collisions.");
-      return;
-    }
-    if (sourceObject.hasManualQuaternionSet){
-      throw new Error("setCollisionListener error: A quaternion is set manually to the particle system. Cannot listen for collisions.");
-      return;
-    }
     var incrCounter = false;
     if (!particleSystemCollisionCallbackRequests[sourceObject.name]){
-      if (TOTAL_PARTICLE_SYSTEM_COLLISION_LISTEN_COUNT >= MAX_PARTICLE_SYSTEM_COUNT){
-        throw new Error("setCollisionListener error: Cannot set collision listener for more than "+MAX_PARTICLE_SYSTEM_COUNT+" particle systems.");
-        return;
-      }
       incrCounter = true;
     }
     particleSystemCollisionCallbackRequests[sourceObject.name] = callbackFunction.bind(sourceObject);
@@ -22861,14 +19897,6 @@ Roygbiv.prototype.setCollisionListener = function(sourceObject, callbackFunction
 
 Roygbiv.prototype.removeCollisionListener = function(sourceObject){
   if (mode == 0){
-    return;
-  }
-  if (!sourceObject){
-    throw new Error("removeCollisionListener error: sourceObject is not defined.");
-    return;
-  }
-  if (!(sourceObject.isAddedObject) && !(sourceObject.isObjectGroup) && !(sourceObject.isParticle) && !(sourceObject.isParticleSystem)){
-    throw new Error("removeCollisionListener error: Type not supported.");
     return;
   }
   var curCallbackRequest;
@@ -22902,43 +19930,11 @@ Roygbiv.prototype.setExpireListener = function(sourceObject, callbackFunction){
   if (mode == 0){
     return;
   }
-  if (typeof sourceObject == UNDEFINED){
-    throw new Error("setExpireListener error: sourceObject is not defined.");
-    return;
-  }
-  if (!(sourceObject.isParticleSystem)){
-    throw new Error("setExpireListener error: sourceObject is not a particle system.");
-    return;
-  }
-  if (typeof callbackFunction == UNDEFINED){
-    throw new Error("setExpireListener error: callbackFunction is not defined.");
-    return;
-  }
-  if (!(callbackFunction instanceof Function)){
-    throw new Error("setExpireListener error: callbackFunction is not a function.");
-    return;
-  }
-  if (sourceObject.destroyed){
-    throw new Error("setExpireListener error: sourceObject is already expired.");
-    return;
-  }
   sourceObject.expirationFunction = callbackFunction;
 }
 
 Roygbiv.prototype.removeExpireListener = function(sourceObject){
   if (mode == 0){
-    return;
-  }
-  if (typeof sourceObject == UNDEFINED){
-    throw new Error("removeExpireListener error: sourceObject is not defined.");
-    return;
-  }
-  if (!(sourceObject.isParticleSystem)){
-    throw new Error("removeExpireListener error: sourceObject is not a particle system.");
-    return;
-  }
-  if (sourceObject.destroyed){
-    throw new Error("removeExpireListener error: sourceObject is already expired.");
     return;
   }
   delete sourceObject.expirationFunction;
@@ -22948,26 +19944,6 @@ Roygbiv.prototype.setObjectClickListener = function(sourceObject, callbackFuncti
   if (mode == 0){
     return;
   }
-  if (typeof sourceObject == UNDEFINED){
-    throw new Error("setObjectClickListener error: sourceObject is not defined.");
-    return;
-  }
-  if (typeof callbackFunction == UNDEFINED){
-    throw new Error("setObjectClickListener error: callbackFunction is not defined.");
-    return;
-  }
-  if (!(sourceObject.isAddedObject) && !(sourceObject.isObjectGroup)){
-    throw new Error("setObjectClickListener error: Type not supported.");
-    return;
-  }
-  if (!sourceObject.isIntersectable){
-    throw new Error("setObjectClickListener error: sourceObject marked as unintersectable. Cannot be clicked on.");
-    return;
-  }
-  if (!(callbackFunction instanceof Function)){
-    throw new Error("setObjectClickListener error: callbackFunction is not a function.");
-    return;
-  }
   sourceObject.clickCallbackFunction = callbackFunction;
 }
 
@@ -22975,31 +19951,11 @@ Roygbiv.prototype.removeObjectClickListener = function(sourceObject){
   if (mode == 0){
     return;
   }
-  if (typeof sourceObject == UNDEFINED){
-    throw new Error("removeClickListener error: sourceObject is not defined.");
-    return;
-  }
-  if (!(sourceObject.isAddedObject) && !(sourceObject.isObjectGroup)){
-    throw new Error("removeClickListener error: Type not supported.");
-    return;
-  }
-  if (!(sourceObject.isIntersectable)){
-    throw new Error("removeClickListener error: sourceObject marked as unintersectable.");
-    return;
-  }
   delete sourceObject.clickCallbackFunction;
 }
 
 Roygbiv.prototype.setScreenClickListener = function(callbackFunction){
   if (mode == 0){
-    return;
-  }
-  if (typeof callbackFunction == UNDEFINED){
-    throw new Error("setScreenClickListener error: callbackFunction is not defined.");
-    return;
-  }
-  if (!(callbackFunction instanceof Function)){
-    throw new Error("setScreenClickListener error: callbackFunction is not a function.");
     return;
   }
   screenClickCallbackFunction = callbackFunction;
@@ -23016,14 +19972,6 @@ Roygbiv.prototype.setScreenMouseDownListener = function(callbackFunction){
   if (mode == 0){
     return;
   }
-  if (typeof callbackFunction == UNDEFINED){
-    throw new Error("setScreenMouseDownListener error: callbackFunction is not defined.");
-    return;
-  }
-  if (!(callbackFunction instanceof Function)){
-    throw new Error("setScreenMouseDownListener error: callbackFunction is not a function.");
-    return;
-  }
   screenMouseDownCallbackFunction = callbackFunction;
 }
 
@@ -23036,14 +19984,6 @@ Roygbiv.prototype.removeScreenMouseDownListener = function(){
 
 Roygbiv.prototype.setScreenMouseUpListener = function(callbackFunction){
   if (mode == 0){
-    return;
-  }
-  if (typeof callbackFunction == UNDEFINED){
-    throw new Error("setScreenMouseUpListener error: callbackFunction is not defined.");
-    return;
-  }
-  if (!(callbackFunction instanceof Function)){
-    throw new Error("setScreenMouseUpListener error: callbackFunction is not a function.");
     return;
   }
   screenMouseUpCallbackFunction = callbackFunction;
@@ -23060,14 +20000,6 @@ Roygbiv.prototype.setScreenMouseMoveListener = function(callbackFunction){
   if (mode == 0){
     return;
   }
-  if (typeof callbackFunction == UNDEFINED){
-    throw new Error("setScreenMouseMoveListener error: callbackFunction is not defined.");
-    return;
-  }
-  if (!(callbackFunction instanceof Function)){
-    throw new Error("setScreenMouseMoveListener error: callbackFunction is not a function.");
-    return;
-  }
   screenMouseMoveCallbackFunction = callbackFunction;
 }
 
@@ -23080,14 +20012,6 @@ Roygbiv.prototype.removeScreenMouseMoveListener = function(){
 
 Roygbiv.prototype.setScreenPointerLockChangeListener = function(callbackFunction){
   if (mode == 0){
-    return;
-  }
-  if (typeof callbackFunction == UNDEFINED){
-    throw new Error("setScreenPointerLockChangeListener error: callbackFunction is not defined.");
-    return;
-  }
-  if (!(callbackFunction instanceof Function)){
-    throw new Error("setScreenPointerLockChangeListener error: callbackFunction is not a function.");
     return;
   }
   screenPointerLockChangedCallbackFunction = callbackFunction;
@@ -23104,35 +20028,11 @@ Roygbiv.prototype.setParticleSystemPoolConsumedListener = function(psPool, callb
   if (mode == 0){
     return;
   }
-  if (typeof psPool == UNDEFINED){
-    throw new Error("setParticleSystemPoolConsumedListener error: psPool is not defined.");
-    return;
-  }
-  if (typeof callbackFunction == UNDEFINED){
-    throw new Error("setParticleSystemPoolConsumedListener error: callbackFunction is not defined.");
-    return;
-  }
-  if (!(psPool.isParticleSystemPool)){
-    throw new Error("setParticleSystemPoolConsumedListener error: psPool is not a ParticleSystemPool.");
-    return;
-  }
-  if (!(callbackFunction instanceof Function)){
-    throw new Error("setParticleSystemPoolConsumedListener error: callbackFunction is not a function.");
-    return;
-  }
   psPool.consumedCallback = callbackFunction;
 }
 
 Roygbiv.prototype.removeParticleSystemPoolConsumedListener = function(psPool){
   if (mode == 0){
-    return;
-  }
-  if (typeof psPool == UNDEFINED){
-    throw new Error("removeParticleSystemPoolConsumedListener error: psPool is not defined.");
-    return;
-  }
-  if (!(psPool.isParticleSystemPool)){
-    throw new Error("removeParticleSystemPoolConsumedListener error: psPool is not a ParticleSystemPool.");
     return;
   }
   psPool.consumedCallback = 0;
@@ -23142,22 +20042,6 @@ Roygbiv.prototype.setParticleSystemPoolAvailableListener = function(psPool, call
   if (mode == 0){
     return;
   }
-  if (typeof psPool == UNDEFINED){
-    throw new Error("setParticleSystemPoolAvailableListener error: psPool is not defined.");
-    return;
-  }
-  if (typeof callbackFunction == UNDEFINED){
-    throw new Error("setParticleSystemPoolAvailableListener error: callbackFunction is not defined.");
-    return;
-  }
-  if (!(psPool.isParticleSystemPool)){
-    throw new Error("setParticleSystemPoolAvailableListener error: psPool is not a ParticleSystemPool.");
-    return;
-  }
-  if (!(callbackFunction instanceof Function)){
-    throw new Error("setParticleSystemPoolAvailableListener error: callbackFunction is not a function.");
-    return;
-  }
   psPool.availableCallback = callbackFunction;
 }
 
@@ -23165,27 +20049,11 @@ Roygbiv.prototype.removeParticleSystemPoolAvailableListener = function(psPool){
   if (mode == 0){
     return;
   }
-  if (typeof psPool == UNDEFINED){
-    throw new Error("removeParticleSystemPoolAvailableListener error: psPool is not defined.");
-    return;
-  }
-  if (!(psPool.isParticleSystemPool)){
-    throw new Error("removeParticleSystemPoolAvailableListener error: psPool is not a ParticleSystemPool.");
-    return;
-  }
   psPool.availableCallback = 0;
 }
 
 Roygbiv.prototype.setFullScreenChangeCallbackFunction = function(callbackFunction){
   if (mode == 0){
-    return;
-  }
-  if (typeof callbackFunction == UNDEFINED){
-    throw new Error("setFullScreenChangeCallbackFunction error: callbackFunction is not defined.");
-    return;
-  }
-  if (!(callbackFunction instanceof Function)){
-    throw new Error("setFullScreenChangeCallbackFunction error: callbackFunction is not a function.");
     return;
   }
   screenFullScreenChangeCallbackFunction = callbackFunction;
@@ -23202,14 +20070,6 @@ Roygbiv.prototype.setFPSDropCallbackFunction = function(callbackFunction){
   if (mode == 0){
     return;
   }
-  if (typeof callbackFunction == UNDEFINED){
-    throw new Error("setFPSDropCallbackFunction error: callbackFunction is not defined.");
-    return;
-  }
-  if (!(callbackFunction instanceof Function)){
-    throw new Error("setFPSDropCallbackFunction error: callbackFunction is not a function.");
-    return;
-  }
   fpsDropCallbackFunction = callbackFunction;
 }
 
@@ -23222,38 +20082,6 @@ Roygbiv.prototype.removeFPSDropCallbackFunction = function(){
 
 Roygbiv.prototype.setPerformanceDropCallbackFunction = function(minFPS, seconds, callbackFunction){
   if (mode == 0){
-    return;
-  }
-  if (typeof minFPS == UNDEFINED){
-    throw new Error("setPerformanceDropCallbackFunction error: minFPS is not defined.");
-    return;
-  }
-  if (isNaN(minFPS)){
-    throw new Error("setPerformanceDropCallbackFunction error: minFPS is not a number.");
-    return;
-  }
-  if (!(minFPS > 0 && minFPS <= 60)){
-    throw new Error("setPerformanceDropCallbackFunction error: minFPS must be between (0,60]");
-    return;
-  }
-  if (typeof seconds == UNDEFINED){
-    throw new Error("setPerformanceDropCallbackFunction error: seconds is not defined.");
-    return;
-  }
-  if (isNaN(seconds)){
-    throw new Error("setPerformanceDropCallbackFunction error: seconds is not a number.");
-    return;
-  }
-  if (seconds <= 0){
-    throw new Error("setPerformanceDropCallbackFunction error: seconds must be greater than zero.");
-    return;
-  }
-  if (typeof callbackFunction == UNDEFINED){
-    throw new Error("setPerformanceDropCallbackFunction error: callbackFunction is not defined.");
-    return;
-  }
-  if (!(callbackFunction instanceof Function)){
-    throw new Error("setPerformanceDropCallbackFunction error: callbackFunction is not a function.");
     return;
   }
   performanceDropCallbackFunction = callbackFunction;
@@ -23270,26 +20098,6 @@ Roygbiv.prototype.removePerformanceDropCallbackFunction = function(){
 
 Roygbiv.prototype.setUserInactivityCallbackFunction = function(maxTimeInSeconds, callbackFunction){
   if (mode == 0){
-    return;
-  }
-  if (typeof maxTimeInSeconds == UNDEFINED){
-    throw new Error("setUserInactivityCallbackFunction error: maxTimeInSeconds is not defined.");
-    return;
-  }
-  if (isNaN(maxTimeInSeconds)){
-    throw new Error("setUserInactivityCallbackFunction error: maxTimeInSeconds is not a number.");
-    return;
-  }
-  if (maxTimeInSeconds <= 0){
-    throw new Error("setUserInactivityCallbackFunction error: maxTimeInSeconds must be greater than zero.");
-    return;
-  }
-  if (typeof callbackFunction == UNDEFINED){
-    throw new Error("setUserInactivityCallbackFunction error: callbackFunction is not defined.");
-    return;
-  }
-  if (!(callbackFunction instanceof Function)){
-    throw new Error("setUserInactivityCallbackFunction error: callbackFunction is not a function.");
     return;
   }
   inactiveCounter = 0;
@@ -23310,14 +20118,6 @@ Roygbiv.prototype.setScreenKeydownListener = function(callbackFunction){
   if (mode == 0){
     return;
   }
-  if (typeof callbackFunction == UNDEFINED){
-    throw new Error("setScreenKeydownListener error: callbackFunction is not defined.");
-    return;
-  }
-  if (!(callbackFunction instanceof Function)){
-    throw new Error("setScreenKeydownListener error: callbackFunction is not a function.");
-    return;
-  }
   screenKeydownCallbackFunction = callbackFunction;
 }
 
@@ -23330,14 +20130,6 @@ Roygbiv.prototype.removeScreenKeydownListener = function(){
 
 Roygbiv.prototype.setScreenKeyupListener = function(callbackFunction){
   if (mode == 0){
-    return;
-  }
-  if (typeof callbackFunction == UNDEFINED){
-    throw new Error("setScreenKeyupListener error: callbackFunction is not defined.");
-    return;
-  }
-  if (!(callbackFunction instanceof Function)){
-    throw new Error("setScreenKeyupListener error: callbackFunction is not a function.");
     return;
   }
   screenKeyupCallbackFunction = callbackFunction;
@@ -23354,39 +20146,11 @@ Roygbiv.prototype.onTextClick = function(text, callbackFunction){
   if (mode == 0){
     return;
   }
-  if (typeof text == UNDEFINED){
-    throw new Error("onTextClick error: text is not defined.");
-    return;
-  }
-  if (!text.isAddedText){
-    throw new Error("onTextClick error: text is not a text object.");
-    return;
-  }
-  if (typeof callbackFunction == UNDEFINED){
-    throw new Error("onTextClick error: callbackFunction is not defined.");
-    return;
-  }
-  if (!(callbackFunction instanceof Function)){
-    throw new Error("onTextClick error: callbackFunction is not a function.");
-    return;
-  }
-  if (!text.isClickable){
-    throw new Error("onTextClick error: text is not marked as clickable.");
-    return;
-  }
   text.clickCallbackFunction = callbackFunction;
 }
 
 Roygbiv.prototype.removeTextClickListener = function(text){
   if (mode == 0){
-    return;
-  }
-  if (typeof text == UNDEFINED){
-    throw new Error("removeTextClickListener error: text is not defined.");
-    return;
-  }
-  if (!text.isAddedText){
-    throw new Error("removeTextClickListener error: text is not a text object.");
     return;
   }
   text.clickCallbackFunction = 0;
@@ -23397,22 +20161,6 @@ Roygbiv.prototype.setText = function(textObject, text){
   if (mode == 0){
     return;
   }
-  if (typeof textObject == UNDEFINED){
-    throw new Error("setText error: textObject is not defined.");
-    return;
-  }
-  if (!textObject.isAddedText){
-    throw new Error("setText error: textObject is not a text object.");
-    return;
-  }
-  if (typeof text == UNDEFINED){
-    throw new Error("setText error: text is not defined.");
-    return;
-  }
-  if (!(typeof text == "string")){
-    throw new Error("setText error: text is not a string.");
-    return;
-  }
   textObject.setText(text, true);
 }
 
@@ -23420,38 +20168,11 @@ Roygbiv.prototype.setTextColor = function(text, colorName){
   if (mode == 0){
     return;
   }
-  if (typeof text == UNDEFINED){
-    throw new Error("setTextColor error: text is not defined.");
-    return;
-  }
-  if (!text.isAddedText){
-    throw new Error("setTextColor error: text is not a text object.");
-    return;
-  }
-  if (typeof colorName == UNDEFINED){
-    throw new Error("setTextColor error: colorName is not defined.");
-  }
   text.setColor(colorName, true);
 }
 
 Roygbiv.prototype.setTextAlpha = function(text, alpha){
   if (mode == 0){
-    return;
-  }
-  if (typeof text == UNDEFINED){
-    throw new Error("setTextAlpha error: text is not defined.");
-    return;
-  }
-  if (!text.isAddedText){
-    throw new Error("setTextAlpha error: text is not a text object.");
-    return;
-  }
-  if (typeof alpha == UNDEFINED){
-    throw new Error("setTextAlpha error: alpha is not defined.");
-    return;
-  }
-  if (isNaN(alpha)){
-    throw new Error("setTextAlpha error: alpha is not a number.");
     return;
   }
   text.setAlpha(alpha, true);
@@ -23461,63 +20182,11 @@ Roygbiv.prototype.setTextPosition = function(text, x, y, z){
   if (mode == 0){
     return;
   }
-  if (typeof text == UNDEFINED){
-    throw new Error("setTextPosition error: text is not defined.");
-    return;
-  }
-  if (!text.isAddedText){
-    throw new Error("setTextPosition error: text is not a text object.");
-    return;
-  }
-  if (text.is2D){
-    throw new Error("setTextPosition error: Cannot set position of a 2D text.");
-    return;
-  }
-  if (isNaN(x)){
-    throw new Error("setTextPosition error: Bad x parameter");
-    return;
-  }
-  if (isNaN(y)){
-    throw new Error("setTextPosition error: Bad y parameter.");
-    return;
-  }
-  if (isNaN(z)){
-    throw new Error("setTextPosition error: Bad z parameter.");
-    return;
-  }
   text.mesh.position.set(x, y, z);
 }
 
 Roygbiv.prototype.setTextBackground = function(text, colorName, alpha){
   if (mode == 0){
-    return;
-  }
-  if (typeof text == UNDEFINED){
-    throw new Error("setTextBackground error: text is not defined.");
-    return;
-  }
-  if (!text.isAddedText){
-    throw new Error("setTextBackground error: text is not a text object.");
-    return;
-  }
-  if (!text.hasBackground){
-    throw new Error("setTextBackground error: text has no background.");
-    return;
-  }
-  if (typeof colorName == UNDEFINED){
-    throw new Error("setTextBackground error: colorName is not defined.");
-    return;
-  }
-  if (!(typeof colorName == "string")){
-    throw new Error("setTextBackground error: colorName is not a string.");
-    return;
-  }
-  if (typeof alpha == UNDEFINED){
-    throw new Error("setTextBackground error: alpha is not defined.");
-    return;
-  }
-  if (isNaN(alpha)){
-    throw new Error("setTextBackground error: Bad alpha parameter.");
     return;
   }
   text.setBackground(colorName, alpha, true);
@@ -23527,47 +20196,11 @@ Roygbiv.prototype.removeTextBackground = function(text){
   if (mode == 0){
     return;
   }
-  if (typeof text == UNDEFINED){
-    throw new Error("removeTextBackground error: text is not defined.");
-    return;
-  }
-  if (!text.isAddedText){
-    throw new Error("removeTextBackground error: text is not a text object.");
-    return;
-  }
-  if (!text.hasBackground){
-    throw new Error("removeBackground error: text has no background.");
-    return;
-  }
   text.removeBackground(true);
 }
 
 Roygbiv.prototype.setTextCenterPosition = function(text, x, y, z){
   if (mode == 0){
-    return;
-  }
-  if (typeof text == UNDEFINED){
-    throw new Error("setTextCenterPosition error: text is not defined.");
-    return;
-  }
-  if (!text.isAddedText){
-    throw new Error("setTextCenterPosition error: text is not a text object.");
-    return;
-  }
-  if (text.is2D){
-    throw new Error("setTextCenterPosition error: Cannot set position of a 2D text.");
-    return;
-  }
-  if (isNaN(x)){
-    throw new Error("setTextCenterPosition error: Bad x parameter.");
-    return;
-  }
-  if (isNaN(y)){
-    throw new Error("setTextCenterPosition error: Bad y parameter.");
-    return;
-  }
-  if (isNaN(z)){
-    throw new Error("setTextCenterPosition error: Bad z parameter.");
     return;
   }
   var centerPos = text.getCenterCoordinates();
@@ -23582,14 +20215,6 @@ Roygbiv.prototype.hideText = function(text){
   if (mode == 0){
     return;
   }
-  if (typeof text == UNDEFINED){
-    throw new Error("hideText error: text is not defined.");
-    return;
-  }
-  if (!text.isAddedText){
-    throw new Error("hideText error: text is not a text object.");
-    return;
-  }
   if (text.mesh.visible){
     text.hide();
   }
@@ -23597,14 +20222,6 @@ Roygbiv.prototype.hideText = function(text){
 
 Roygbiv.prototype.showText = function(text){
   if (mode == 0){
-    return;
-  }
-  if (typeof text == UNDEFINED){
-    throw new Error("showText error: text is not defined.");
-    return;
-  }
-  if (!text.isAddedText){
-    throw new Error("showText error: text is not a text object.");
     return;
   }
   if (!text.mesh.visible){
@@ -23615,18 +20232,6 @@ Roygbiv.prototype.showText = function(text){
 
 Roygbiv.prototype.vector = function(x, y, z){
   if (mode == 0){
-    return;
-  }
-  if (typeof x == UNDEFINED){
-    throw new Error("vector error: x is not defined.");
-    return;
-  }
-  if (typeof y == UNDEFINED){
-    throw new Error("vector error: y is not defined.");
-    return;
-  }
-  if (typeof z == UNDEFINED){
-    throw new Error("vector error: z is not defined.");
     return;
   }
   var obj = new Object();
@@ -23641,22 +20246,6 @@ Roygbiv.prototype.distance = function(vec1, vec2){
   if (mode == 0){
     return;
   }
-  if (!vec1){
-    throw new Error("distance error: vec1 is not defined.");
-    return;
-  }
-  if (!vec2){
-    throw new Error("distance error: vec2 is not defined.");
-    return;
-  }
-  if (isNaN(vec1.x) || isNaN(vec1.y) || isNaN(vec1.z)){
-    throw new Error("distance error: vec1 is not a vector.");
-    return;
-  }
-  if (isNaN(vec2.x) || isNaN(vec2.y) || isNaN(vec2.z)){
-    throw new Error("distance error: vec2 is not a vector.");
-    return;
-  }
   var dx = vec2.x - vec1.x;
   var dy = vec2.y - vec1.y;
   var dz = vec2.z - vec1.z;
@@ -23669,27 +20258,7 @@ Roygbiv.prototype.sub = function(vec1, vec2, targetVector){
   if (mode == 0){
     return;
   }
-  if (!vec1){
-    throw new Error("sub error: vec1 is not defined.");
-    return;
-  }
-  if (!vec2){
-    throw new Error("sub error: vec2 is not defined.");
-    return;
-  }
-  if (isNaN(vec1.x) || isNaN(vec1.y) || isNaN(vec1.z)){
-    throw new Error("sub error: vec1 is not a vector.");
-    return;
-  }
-  if (isNaN(vec2.x) || isNaN(vec2.y) || isNaN(vec2.z)){
-    throw new Error("sub error: vec2 is not a vector.");
-    return;
-  }
   if (!(typeof targetVector == UNDEFINED)){
-    if (isNaN(targetVector.x) || isNaN(targetVector.y) || isNaN(targetVector.z)){
-      throw new Error("sub error: Bad targetVector parameter.");
-      return;
-    }
     targetVector.x = vec1.x - vec2.x;
     targetVector.y = vec1.y - vec2.y;
     targetVector.z = vec1.z - vec2.z;
@@ -23702,25 +20271,15 @@ Roygbiv.prototype.sub = function(vec1, vec2, targetVector){
   return obj;
 }
 
-Roygbiv.prototype.add = function(vec1, vec2){
+Roygbiv.prototype.add = function(vec1, vec2, targetVector){
   if (mode == 0){
     return;
   }
-  if (!vec1){
-    throw new Error("add error: vec1 is not defined.");
-    return;
-  }
-  if (!vec2){
-    throw new Error("add error: vec2 is not defined.");
-    return;
-  }
-  if (isNaN(vec1.x) || isNaN(vec1.y) || isNaN(vec1.z)){
-    throw new Error("add error: vec1 is not a vector.");
-    return;
-  }
-  if (isNaN(vec2.x) || isNaN(vec2.y) || isNaN(vec2.z)){
-    throw new Error("add error: vec2 is not a vector.");
-    return;
+  if (!(typeof targetVector == UNDEFINED)){
+    targetVector.x = vec1.x + vec2.x;
+    targetVector.y = vec1.y + vec2.y;
+    targetVector.z = vec1.z + vec2.z;
+    return targetVector;
   }
   var obj = new Object();
   obj.x = vec1.x + vec2.x;
@@ -23733,34 +20292,7 @@ Roygbiv.prototype.moveTowards = function(vec1, vec2, amount, targetVector){
   if (mode == 0){
     return;
   }
-  if (!vec1){
-    throw new Error("moveTowards error: vec1 is not defined.");
-    return;
-  }
-  if (!vec2){
-    throw new Error("moveTowards error: vec2 is not defined.");
-    return;
-  }
-  if (isNaN(vec1.x) || isNaN(vec1.y) || isNaN(vec1.z)){
-    throw new Error("moveTowards error: vec1 is not a vector.");
-    return;
-  }
-  if (isNaN(vec2.x) || isNaN(vec2.y) || isNaN(vec2.z)){
-    throw new Error("moveTowards error: vec2 is not a vector.");
-    return;
-  }
-  if (typeof amount == UNDEFINED){
-    throw new Error("moveTowards error: amount is not defined.");
-    return;
-  }
-  if (isNaN(amount)){
-    throw new Error("moveTowards error: amount is not a number.");
-    return;
-  }
   if (!(typeof targetVector == UNDEFINED)){
-    if (isNaN(targetVector.x) || isNaN(targetVector.y) || isNaN(targetVector.z)){
-      throw new Error("moveTowards error: Bad targetVector parameter.");
-    }
     var diff = this.sub(vec2, vec1, targetVector);
     targetVector.x = vec1.x + (amount * diff.x);
     targetVector.y = vec1.y + (amount * diff.y);
@@ -23779,19 +20311,6 @@ Roygbiv.prototype.applyNoise = function(vec, amount){
   if (mode == 0){
     return;
   }
-  if (!vec){
-    throw new Error("applyNoise error: vector is not defined.");
-    return;
-  }
-  if (typeof vec.x == UNDEFINED || typeof vec.y == UNDEFINED || typeof vec.z == UNDEFINED){
-    throw new Error("applyNoise error: vector format not supported.");
-    return;
-  }
-  if (isNaN(vec.x) || isNaN(vec.y) || isNaN(vec.z)){
-    throw new Error("applyNoise error: vector format not supported.");
-    return;
-  }
-
   var toNormalize = REUSABLE_VECTOR.set(vec.x, vec.y, vec.z);
   toNormalize.normalize();
   var noiseAmount = noise.perlin3(
@@ -23816,25 +20335,11 @@ Roygbiv.prototype.sphericalDistribution = function(radius){
   if (mode == 0){
     return;
   }
-  if (!radius){
-    throw new Error("sphericalDistribution error: radius is not defined.");
-    return;
-  }
-  if (isNaN(radius)){
-    throw new Error("sphericalDistribution error: radius is not numerical.");
-    return;
-  }
-  if (radius <= 0){
-    throw new Error("sphericalDistribution error: radius is not a positive number.");
-    return;
-  }
-
   REUSABLE_VECTOR.set(
     Math.random() - 0.5,
     Math.random() - 0.5,
     Math.random() - 0.5
   );
-
   REUSABLE_VECTOR.normalize();
   REUSABLE_VECTOR.multiplyScalar(radius);
   return this.vector(REUSABLE_VECTOR.x, REUSABLE_VECTOR.y, REUSABLE_VECTOR.z);
@@ -23842,18 +20347,6 @@ Roygbiv.prototype.sphericalDistribution = function(radius){
 
 Roygbiv.prototype.boxDistribution = function(sizeX, sizeY, sizeZ, side){
   if (mode == 0){
-    return;
-  }
-  if (typeof sizeX == UNDEFINED || typeof sizeY == UNDEFINED || typeof sizeZ == UNDEFINED){
-    throw new Error("boxDistribution error: Bad parameters.");
-    return;
-  }
-  if (isNaN(sizeX) || isNaN(sizeY) || isNaN(sizeZ)){
-    throw new Error("boxDistribution error: Bad parameters.");
-    return;
-  }
-  if (sizeX < 0 || sizeY < 0 || sizeZ < 0){
-    throw new Error("boxDistribution error: Bad parameters.");
     return;
   }
   var randomSide = Math.floor(Math.random() * 6) + 1;
@@ -23903,27 +20396,14 @@ Roygbiv.prototype.color = function(colorName){
   if (mode == 0){
     return;
   }
-  if (!colorName){
-    throw new Error("color error: colorName is not defined.");
-    return;
-  }
   return new THREE.Color(colorName.toLowerCase());
 }
 
-Roygbiv.prototype.runScript = function(name, parameters){
+Roygbiv.prototype.runScript = function(name){
   if (mode == 0){
     return;
   }
   var script = scripts[name];
-  if (!script){
-    throw new Error("runScript error: Script is undefined.");
-    return;
-  }
-  if (parameters){
-    for (var key in parameters){
-      script[key] = parameters[key];
-    }
-  }
   script.start();
 }
 
@@ -23932,23 +20412,11 @@ Roygbiv.prototype.isRunning = function(name){
     return;
   }
   var script = scripts[name];
-  if (!script){
-    throw new Error("isRunning error: Script is undefined.");
-    return;
-  }
-  return script.status == SCRIPT_STATUS_STARTED;
+  return script.isRunning();
 }
 
 Roygbiv.prototype.normalizeVector = function(vector){
   if (mode == 0){
-    return;
-  }
-  if (typeof vector == UNDEFINED){
-    throw new Error("normalizeVector error: vector is not defined.");
-    return;
-  }
-  if (isNaN(vector.x) || isNaN(vector.y) || isNaN(vector.z)){
-    throw new Error("normalizeVector error: Bad vector parameter.");
     return;
   }
   var len = Math.sqrt((vector.x * vector.x) + (vector.y * vector.y) + (vector.z * vector.z));
@@ -23960,28 +20428,6 @@ Roygbiv.prototype.normalizeVector = function(vector){
 Roygbiv.prototype.computeQuaternionFromVectors = function(vec1, vec2, targetQuaternion){
   if (mode == 0){
     return;
-  }
-  if (typeof vec1 == UNDEFINED){
-    throw new Error("computeQuaternionFromVectors error: vec1 is not defined.");
-    return;
-  }
-  if (typeof vec2 == UNDEFINED){
-    throw new Error("computeQuaternionFromVectors error: vec2 is not defined.");
-    return;
-  }
-  if (isNaN(vec1.x) || isNaN(vec1.y) || isNaN(vec1.z)){
-    throw new Error("computeQuaternionFromVectors error: Bad vec1 parameter.");
-    return;
-  }
-  if (isNaN(vec2.x) || isNaN(vec2.y) || isNaN(vec2.z)){
-    throw new Error("computeQuaternionFromVectors error: Bad vec2 parameter.");
-    return;
-  }
-  if (!(typeof targetQuaternion == UNDEFINED)){
-    if (isNaN(targetQuaternion.x) || isNaN(targetQuaternion.y) || isNaN(targetQuaternion.z) || isNaN(targetQuaternion.w)){
-      throw new Error("computeQuaternionFromVectors error: Bad targetQuaternion parameter.");
-      return;
-    }
   }
   this.normalizeVector(vec1);
   this.normalizeVector(vec2);
@@ -24002,24 +20448,6 @@ Roygbiv.prototype.circularDistribution = function(radius, quaternion){
   if (mode == 0){
     return;
   }
-  if (typeof radius == UNDEFINED){
-    throw new Error("circularDistribution error: radius is not defined.");
-    return;
-  }
-  if (isNaN(radius)){
-    throw new Error("circularDistribution error: Bad radius parameter.");
-    return;
-  }
-  if (radius <= 0){
-    throw new Error("circularDistribution error: radius must be greater than zero.");
-    return;
-  }
-  if (!(typeof quaternion == UNDEFINED)){
-    if (isNaN(quaternion.x) || isNaN(quaternion.y) || isNaN(quaternion.y) || isNaN(quaternion.w)){
-      throw new Error("circularDistribution error: Bad quaternion parameter.");
-      return;
-    }
-  }
   REUSABLE_VECTOR_3.set(
     Math.random() - 0.5,
     Math.random() - 0.5,
@@ -24037,28 +20465,6 @@ Roygbiv.prototype.multiplyScalar = function(vector, scalar, targetVector){
   if (mode == 0){
     return;
   }
-  if (typeof scalar == UNDEFINED){
-    throw new Error("multiplyScalar error: scalar is not defined.");
-    return;
-  }
-  if (isNaN(scalar)){
-    throw new Error("multiplyScalar error: Bad scalar parameter.");
-    return;
-  }
-  if (typeof vector == UNDEFINED){
-    throw new Error("multiplyScalar error: vector is not defined.");
-    return;
-  }
-  if (isNaN(vector.x) || isNaN(vector.y) || isNaN(vector.z)){
-    throw new Error("multiplyScalar error: Bad vector parameter.");
-    return;
-  }
-  if (!(typeof targetVector == UNDEFINED)){
-    if (isNaN(targetVector.x) || isNaN(targetVector.y) || isNaN(targetVector.z)){
-      throw new Error("multiplyScalar error: Bad targetVector parameter.");
-      return;
-    }
-  }
   if (!targetVector){
     return this.vector(vector.x * scalar, vector.y * scalar, vector.z * scalar);
   }else{
@@ -24071,26 +20477,6 @@ Roygbiv.prototype.multiplyScalar = function(vector, scalar, targetVector){
 
 Roygbiv.prototype.setVector = function(vector, x, y, z){
   if (mode == 0){
-    return;
-  }
-  if (typeof vector == UNDEFINED){
-    throw new Error("setVector error: vector is not defined.");
-    return;
-  }
-  if (typeof x == UNDEFINED){
-    throw new Error("setVector error: x is not defined.");
-    return;
-  }
-  if (typeof y == UNDEFINED){
-    throw new Error("setVector error: y is not defined.");
-    return;
-  }
-  if (typeof z == UNDEFINED){
-    throw new Error("setVector error: z is not defined.");
-    return;
-  }
-  if (isNaN(x) || isNaN(y) || isNaN(y)){
-    throw new Error("setVector error: Components must be numerical.");
     return;
   }
   vector.x = x;
@@ -24107,19 +20493,11 @@ Roygbiv.prototype.requestPointerLock = function(){
   if (mode == 0){
     return;
   }
-  if (!pointerLockSupported || isMobile){
-    throw new Error("requestPointerLock error: Pointer Lock API is not supported by this browser.");
-    return;
-  }
   pointerLockRequested = true;
 }
 
 Roygbiv.prototype.convertEulerToDegrees = function(eulerAngle){
   if (mode == 0){
-    return;
-  }
-  if (typeof eulerAngle == UNDEFINED){
-    throw new Error("convertEulerToDegrees error: eulerAngle is not defined.");
     return;
   }
   return ((eulerAngle * 180) / Math.PI);
@@ -24129,23 +20507,11 @@ Roygbiv.prototype.disableDefaultControls = function(isDisabled){
   if (mode == 0){
     return;
   }
-  if (typeof isDisabled == UNDEFINED){
-    throw new Error("disableDefaultControls error: isDisabled is not defined.");
-    return;
-  }
-  if (!(typeof isDisabled == "boolean")){
-    throw new Error("disableDefaultControls error: isDisabled is not a boolean.");
-    return;
-  }
   defaultCameraControlsDisabled = isDisabled;
 }
 
 Roygbiv.prototype.isKeyPressed = function(key){
   if (mode == 0){
-    return;
-  }
-  if (typeof key == UNDEFINED){
-    throw new Error("isKeyPressed error: key is not defined.");
     return;
   }
   return keyboardBuffer[key];
@@ -24155,59 +20521,11 @@ Roygbiv.prototype.setCameraPosition = function(x, y, z){
   if (mode == 0){
     return;
   }
-  if (typeof x == UNDEFINED){
-    throw new Error("setCameraPosition error: x is not defined.");
-    return;
-  }
-  if (typeof y == UNDEFINED){
-    throw new Error("setCameraPosition error: y is not defined.");
-    return;
-  }
-  if (typeof z == UNDEFINED){
-    throw new Error("setCameraPosition error: z is not defined.");
-    return;
-  }
-  if (isNaN(x)){
-    throw new Error("setCameraPosition error: x is not a number.");
-    return;
-  }
-  if (isNaN(y)){
-    throw new Error("setCameraPosition error: y is not a number.");
-    return;
-  }
-  if (isNaN(z)){
-    throw new Error("setCameraPosition error: z is not a number.");
-    return;
-  }
   camera.position.set(x, y, z);
 }
 
 Roygbiv.prototype.lookAt = function(x, y, z){
   if (mode == 0){
-    return;
-  }
-  if (typeof x == UNDEFINED){
-    throw new Error("lookAt error: x is not defined.");
-    return;
-  }
-  if (typeof y == UNDEFINED){
-    throw new Error("lookAt error: y is not defined.");
-    return;
-  }
-  if (typeof z == UNDEFINED){
-    throw new Error("lookAt error: z is not defined.");
-    return;
-  }
-  if (isNaN(x)){
-    throw new Error("lookAt error: x is not a number.");
-    return;
-  }
-  if (isNaN(y)){
-    throw new Error("lookAt error: y is not a number.");
-    return;
-  }
-  if (isNaN(z)){
-    throw new Error("lookAt error: z is not a number.");
     return;
   }
   camera.lookAt(x, y, z);
@@ -24217,38 +20535,10 @@ Roygbiv.prototype.applyAxisAngle = function(vector, axisVector, angle, targetVec
   if (mode == 0){
     return;
   }
-  if (typeof vector == UNDEFINED){
-    throw new Error("applyAxisAngle error: vector is not defined.");
-    return;
-  }
-  if (typeof axisVector == UNDEFINED){
-    throw new Error("applyAxisAngle error: axisVector is not defined.");
-    return;
-  }
-  if (typeof angle == UNDEFINED){
-    throw new Error("applyAxisAngle error: angle is not defined.");
-    return;
-  }
-  if (isNaN(vector.x) || isNaN(vector.y) || isNaN(vector.z)){
-    throw new Error("applyAxisAngle error: Bad vector parameter.");
-    return;
-  }
-  if (isNaN(axisVector.x) || isNaN(axisVector.y) || isNaN(axisVector.z)){
-    throw new Error("applyAxisAngle error: Bad axisVector parameter.");
-    return;
-  }
-  if (isNaN(angle)){
-    throw new Error("applyAxisAngle error: Bad angle parameter.");
-    return;
-  }
   REUSABLE_VECTOR.set(vector.x, vector.y, vector.z);
   REUSABLE_VECTOR_2.set(axisVector.x, axisVector.y, axisVector.z);
   REUSABLE_VECTOR.applyAxisAngle(REUSABLE_VECTOR_2, angle);
   if (!(typeof targetVector == UNDEFINED)){
-    if (isNaN(targetVector.x) || isNaN(targetVector.y) || isNaN(targetVector.z)){
-      throw new Error("applyAxisAngle errorİ Bad targetVector parameter.");
-      return;
-    }
     targetVector.x = REUSABLE_VECTOR.x;
     targetVector.y = REUSABLE_VECTOR.y;
     targetVector.z = REUSABLE_VECTOR.z;
@@ -24259,38 +20549,6 @@ Roygbiv.prototype.applyAxisAngle = function(vector, axisVector, angle, targetVec
 
 Roygbiv.prototype.trackObjectPosition = function(sourceObject, targetObject){
   if (mode == 0){
-    return;
-  }
-  if (typeof sourceObject == UNDEFINED){
-    throw new Error("trackObjectPosition error: sourceObject is not defined.");
-    return;
-  }
-  if (typeof targetObject == UNDEFINED){
-    throw new Error("trackObjectPosition error: targetObject is not defined.");
-    return;
-  }
-  if (!(sourceObject.isAddedObject || sourceObject.isObjectGroup)){
-    throw new Error("trackObjectPosition error: sourceObject type not supported.");
-    return;
-  }
-  if (!(targetObject.isAddedObject || targetObject.isObjectGroup)){
-    throw new Error("trackObjectPosition error: targetObject type not supported.");
-    return;
-  }
-  if (targetObject.parentObjectName || sourceObject.parentObjectName){
-    throw new Error("trackObjectPosition error: Child objects do not support this function.");
-    return;
-  }
-  if (!targetObject.isDynamicObject){
-    throw new Error("trackObjectPosition error: targetObject is not a dynamic object.");
-    return;
-  }
-  if (sourceObject.isDynamicObject){
-    throw new Error("trackObjectPosition error: sourceObject is a dynamic object.");
-    return;
-  }
-  if (!sourceObject.isChangeable){
-    throw new Error("trackObjectPosition error: sourceObject is not marked as changeable.");
     return;
   }
   sourceObject.trackedObject = targetObject;
@@ -24305,40 +20563,12 @@ Roygbiv.prototype.untrackObjectPosition = function(sourceObject){
   if (mode == 0){
     return;
   }
-  if (typeof sourceObject == UNDEFINED){
-    throw new Error("untrackObjectPosition error: sourceObject is not defined.");
-    return;
-  }
-  if (!(sourceObject.isAddedObject || sourceObject.isObjectGroup)){
-    throw new Error("untrackObjectPosition error: sourceObject type not supported.");
-    return;
-  }
   delete sourceObject.trackedObject;
   delete trackingObjects[sourceObject.name];
 }
 
 Roygbiv.prototype.createRotationPivot = function(sourceObject, offsetX, offsetY, offsetZ){
   if (mode == 0){
-    return;
-  }
-  if (typeof sourceObject == UNDEFINED){
-    throw new Error("createRotationPivot error: sourceObject is not defined.");
-    return;
-  }
-  if (!(sourceObject.isAddedObject || sourceObject.isObjectGroup)){
-    throw new Error("createRotationPivot error: Unsupported type.");
-    return;
-  }
-  if (isNaN(offsetX)){
-    throw new Error("createRotationPivot error: offsetX is not a number.");
-    return;
-  }
-  if (isNaN(offsetY)){
-    throw new Error("createRotationPivot error: offsetY is not a number.");
-    return;
-  }
-  if (isNaN(offsetZ)){
-    throw new Error("createRotationPivot error: offsetZ is not a number.");
     return;
   }
   return sourceObject.makePivot(offsetX, offsetY, offsetZ);
@@ -24348,23 +20578,7 @@ Roygbiv.prototype.rotateCamera = function(axis, radians){
   if (mode == 0){
     return;
   }
-  if (typeof axis == UNDEFINED){
-    throw new Error("rotateCamera error: axis is not defined.");
-    return;
-  }
-  if (typeof radians == UNDEFINED){
-    throw new Error("rotateCamera error: radians is not defined.");
-    return;
-  }
   axis = axis.toLowerCase();
-  if (axis != "x" && axis != "y" && axis != "z"){
-    throw new Error("rotateCamera error: axis must be x, y or z.");
-    return;
-  }
-  if (isNaN(radians)){
-    throw new Error("rotateCamera error: radians is not a number.");
-    return;
-  }
   if (axis == "x"){
     cameraRotationBuffer.x += radians;
   }else if (axis == "y"){
@@ -24378,23 +20592,7 @@ Roygbiv.prototype.translateCamera = function(axis, amount){
   if (mode == 0){
     return;
   }
-  if (typeof axis == UNDEFINED){
-    throw new Error("translateCamera error: axis is not defined.");
-    return;
-  }
-  if (typeof amount == UNDEFINED){
-    throw new Error("translateCamera error: amount is not defined.");
-    return;
-  }
   axis = axis.toLowerCase();
-  if (axis != "x" && axis != "y" && axis != "z"){
-    throw new Error("translateCamera error: axis must be x, y or z.");
-    return;
-  }
-  if (isNaN(amount)){
-    throw new Error("translateCamera error: amount is not a number.");
-    return;
-  }
   if (axis == "x"){
     camera.translateX(amount * defaultAspect / camera.aspect);
   }else if (axis == "y"){
@@ -24425,26 +20623,6 @@ Roygbiv.prototype.intersectionTest = function(fromVector, directionVector, targe
   if (mode == 0){
     return;
   }
-  if (typeof fromVector == UNDEFINED){
-    throw new Error("intersectionTest error: fromVector is not defined.");
-    return;
-  }
-  if (isNaN(fromVector.x) || isNaN(fromVector.y) || isNaN(fromVector.z)){
-    throw new Error("intersectionTest error: fromVector is not a vector.");
-    return;
-  }
-  if (typeof directionVector == UNDEFINED){
-    throw new Error("intersectionTest error: directionVector is not defined.");
-    return;
-  }
-  if (isNaN(directionVector.x) || isNaN(directionVector.y) || isNaN(directionVector.z)){
-    throw new Error("intersectionTest error: directionVector is not a vector.");
-    return;
-  }
-  if (typeof targetResultObject == UNDEFINED){
-    throw new Error("intersectionTest error: targetResultObject is not defined.");
-    return;
-  }
   REUSABLE_VECTOR.set(fromVector.x, fromVector.y, fromVector.z);
   REUSABLE_VECTOR_2.set(directionVector.x, directionVector.y, directionVector.z).normalize();
   rayCaster.findIntersections(REUSABLE_VECTOR, REUSABLE_VECTOR_2, false);
@@ -24472,42 +20650,6 @@ Roygbiv.prototype.lerp = function(vector1, vector2, amount, targetVector){
   if (mode == 0){
     return;
   }
-  if (typeof vector1 == UNDEFINED){
-    throw new Error("lerp error: vector1 is not defined.");
-    return;
-  }
-  if (typeof vector2 == UNDEFINED){
-    throw new Error("lerp error: vector2 is not defined.");
-    return;
-  }
-  if (typeof amount == UNDEFINED){
-    throw new Error("lerp error: amount is not defined.");
-    return;
-  }
-  if (typeof targetVector == UNDEFINED){
-    throw new Error("lerp error: targetVector is not defined.");
-    return;
-  }
-  if (isNaN(vector1.x) || isNaN(vector1.y) || isNaN(vector1.z)){
-    throw new Error("lerp error: vector1 is not a vector.");
-    return;
-  }
-  if (isNaN(vector2.x) || isNaN(vector2.y) || isNaN(vector2.z)){
-    throw new Error("lerp error: vector2 is not a vector.");
-    return;
-  }
-  if (isNaN(targetVector.x) || isNaN(targetVector.y) || isNaN(targetVector.z)){
-    throw new Error("lerp error: targetVector is not a vector.");
-    return;
-  }
-  if (isNaN(amount)){
-    throw new Error("lerp error: amount is not a number.");
-    return;
-  }
-  if (amount < 0 || amount > 1){
-    throw new Error("lerp error: amount must be between [0,1].");
-    return;
-  }
   REUSABLE_VECTOR.set(vector1.x, vector1.y, vector1.z);
   REUSABLE_VECTOR_2.set(vector2.x, vector2.y, vector2.z);
   REUSABLE_VECTOR.lerp(REUSABLE_VECTOR_2, amount);
@@ -24524,47 +20666,15 @@ Roygbiv.prototype.setBloom = function(params){
   var hasStrength = false, hasRadius = false, hasThreshold = false, hasResolutionScale = false;
   if (!(typeof params.strength == UNDEFINED)){
     hasStrength = true;
-    if (isNaN(params.strength)){
-      throw new Error("setBloom error: strength parameter is not a number.");
-      return;
-    }
-    if (params.strength < 0 || params.strength > 3){
-      throw new Error("setBloom error: strength parameter must be between [0, 3].");
-      return;
-    }
   }
   if (!(typeof params.radius == UNDEFINED)){
     hasRadius = true;
-    if (isNaN(params.radius)){
-      throw new Error("setBloom error: radius parameter is not a number.");
-      return;
-    }
-    if (params.radius < 0 || params.radius > 1){
-      throw new Error("setBloom error: radius parameter must be between [0, 1].");
-      return;
-    }
   }
   if (!(typeof params.threshold == UNDEFINED)){
     hasThreshold = true;
-    if (isNaN(params.threshold)){
-      throw new Error("setBloom error: threshold parameter is not a number.");
-      return;
-    }
-    if (params.threshold < 0 || params.threshold > 1){
-      throw new Error("setBloom error: threshold parameter must be between [0, 1].");
-      return;
-    }
   }
   if (!(typeof params.resolutionScale == UNDEFINED)){
     hasResolutionScale = true;
-    if (isNaN(params.resolutionScale)){
-      throw new Error("setBloom error: resolutionScale parameter is not a number.");
-      return;
-    }
-    if (params.resolutionScale < 0.1 || params.resolutionScale > 1){
-      throw new Error("setBloom error: resolutionScale parameter must be between [0.1, 1].");
-      return;
-    }
   }
   bloomOn = true;
   if (hasStrength){
@@ -24595,14 +20705,6 @@ Roygbiv.prototype.unsetBloom = function(){
 
 Roygbiv.prototype.pause = function(paused){
   if (mode == 0){
-    return;
-  }
-  if (typeof paused == UNDEFINED){
-    throw new Error("pause error: paused is not defined.");
-    return;
-  }
-  if (!(typeof paused == "boolean")){
-    throw new Error("pause error: paused is not a boolean.");
     return;
   }
   var oldIsPaused = isPaused;
