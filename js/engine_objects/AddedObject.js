@@ -95,6 +95,9 @@ var AddedObject = function(name, type, metaData, material, mesh, physicsBody, de
 
   this.isIntersectable = true;
 
+  this.lastUpdatePosition = new THREE.Vector3();
+  this.lastUpdateQuaternion = new THREE.Quaternion();
+
   webglCallbackHandler.registerEngineObject(this);
 
 }
@@ -1990,7 +1993,6 @@ AddedObject.prototype.correctBoundingBox = function(bb){
 }
 
 AddedObject.prototype.updateBoundingBoxes = function(parentAry){
-  var startTime = performance.now();
   var bb = this.boundingBoxes[0];
   bb.makeEmpty();
   for (var i = 0; i<this.vertices.length; i++){
@@ -2017,7 +2019,18 @@ AddedObject.prototype.updateBoundingBoxes = function(parentAry){
   if (parentAry){
     parentAry[this.parentBoundingBoxIndex] = bb;
   }
-  this.boundingBoxUpdatePerformance = performance.now() - startTime;
+  this.lastUpdatePosition.copy(this.mesh.position);
+  this.lastUpdateQuaternion.copy(this.mesh.quaternion);
+}
+
+AddedObject.prototype.boundingBoxesNeedUpdate = function(){
+  return !(Math.abs(this.lastUpdatePosition.x - this.mesh.position.x) < 0.1 &&
+            Math.abs(this.lastUpdatePosition.y - this.mesh.position.y) < 0.1 &&
+              Math.abs(this.lastUpdatePosition.z - this.mesh.position.z) < 0.1 &&
+                Math.abs(this.lastUpdateQuaternion.x - this.mesh.quaternion.x) < 0.0001 &&
+                  Math.abs(this.lastUpdateQuaternion.y - this.mesh.quaternion.y) < 0.0001 &&
+                    Math.abs(this.lastUpdateQuaternion.z - this.mesh.quaternion.z) < 0.0001 &&
+                      Math.abs(this.lastUpdateQuaternion.w - this.mesh.quaternion.w) < 0.0001);
 }
 
 AddedObject.prototype.generateBoundingBoxes = function(parentAry){

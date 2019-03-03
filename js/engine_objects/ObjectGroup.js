@@ -24,6 +24,8 @@ var ObjectGroup = function(name, group){
     }
   }
   this.isIntersectable = true;
+  this.lastUpdatePosition = new THREE.Vector3();
+  this.lastUpdateQuaternion = new THREE.Quaternion();
 }
 
 ObjectGroup.prototype.forceColor = function(r, g, b, a){
@@ -1580,6 +1582,18 @@ ObjectGroup.prototype.updateBoundingBoxes = function(){
   for (var objName in this.group){
     this.group[objName].updateBoundingBoxes(this.boundingBoxes);
   }
+  this.lastUpdatePosition.copy(this.mesh.position);
+  this.lastUpdateQuaternion.copy(this.mesh.quaternion);
+}
+
+ObjectGroup.prototype.boundingBoxesNeedUpdate = function(){
+  return !(Math.abs(this.lastUpdatePosition.x - this.mesh.position.x) < 0.1 &&
+            Math.abs(this.lastUpdatePosition.y - this.mesh.position.y) < 0.1 &&
+              Math.abs(this.lastUpdatePosition.z - this.mesh.position.z) < 0.1 &&
+                Math.abs(this.lastUpdateQuaternion.x - this.mesh.quaternion.x) < 0.0001 &&
+                  Math.abs(this.lastUpdateQuaternion.y - this.mesh.quaternion.y) < 0.0001 &&
+                    Math.abs(this.lastUpdateQuaternion.z - this.mesh.quaternion.z) < 0.0001 &&
+                      Math.abs(this.lastUpdateQuaternion.w - this.mesh.quaternion.w) < 0.0001);
 }
 
 ObjectGroup.prototype.generateBoundingBoxes = function(){

@@ -111,7 +111,7 @@ WorldBinHandler.prototype.hide = function(obj){
 WorldBinHandler.prototype.update = function(){
   for (var objName in dynamicObjects){
     var obj = dynamicObjects[objName];
-    if (obj.isHidden || (mode == 1 && !obj.isIntersectable)){
+    if (obj.isHidden || (mode == 1 && !obj.isIntersectable) || !obj.boundingBoxesNeedUpdate()){
       continue;
     }
     this.deleteObjectFromBin(obj.binInfo, obj.name);
@@ -122,7 +122,7 @@ WorldBinHandler.prototype.update = function(){
   }
   for (var objName in dynamicObjectGroups){
     var obj = dynamicObjectGroups[objName];
-    if (obj.isHidden || (mode == 1 && !obj.isIntersectable)){
+    if (obj.isHidden || (mode == 1 && !obj.isIntersectable) || !obj.boundingBoxesNeedUpdate()){
       continue;
     }
     this.deleteObjectFromBin(obj.binInfo, obj.name);
