@@ -20,6 +20,9 @@ var GridSystem = function(name, sizeX, sizeZ, centerX, centerY, centerZ,
                                               outlineColor, cellSize, axis){
 
   this.isGridSystem = true;
+  if (IS_WORKER_CONTEXT){
+    return this;
+  }
 
   // size negativity/zero check
   if (sizeX<=0 || sizeZ <=0){
@@ -403,6 +406,20 @@ GridSystem.prototype.getGridFromPoint = function(point){
         return this.grids[count];
       }
     }
+}
+
+GridSystem.prototype.exportLightweight = function(){
+  var exportObject = new Object();
+  exportObject.name = this.name;
+  exportObject.bbMin = this.boundingBox.min;
+  exportObject.bbMax = this.boundingBox.max;
+  exportObject.triangles = [];
+  for (var i = 0; i<this.triangles.length; i++){
+    exportObject.triangles.push({
+      a: this.triangles[i].a, b: this.triangles[i].b, c: this.triangles[i].c
+    })
+  }
+  return exportObject;
 }
 
 GridSystem.prototype.export = function(){

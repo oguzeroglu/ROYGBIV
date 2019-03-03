@@ -1,15 +1,22 @@
-var RayCaster = function(){
-  this.binHandler = new WorldBinHandler();
+var RayCaster = function(isCustom){
+  this.binHandler = new WorldBinHandler(isCustom);
   this.origin = new THREE.Vector3();
   this.direction = new THREE.Vector3();
   this.oldPosition = new THREE.Vector3();
+  this.isCustom = isCustom;
 }
 
 RayCaster.prototype.refresh = function(){
   if (!projectLoaded){
     return;
   }
-  this.binHandler = new WorldBinHandler();
+  this.binHandler = new WorldBinHandler(this.isCustom);
+  if (IS_WORKER_CONTEXT){
+    for (var objName in addedObjects){
+      var addedObject = addedObjects[objName];
+      this.binHandler.insert(addedObject.boundingBoxes[0], objName);
+    }
+  }
   if (mode == 0){
     for (var gsName in gridSystems){
       var gridSystem = gridSystems[gsName];
@@ -41,7 +48,7 @@ RayCaster.prototype.updateObject = function(obj){
   }
 }
 
-RayCaster.prototype.findIntersections = function(from, direction, intersectGridSystems){
+RayCaster.prototype.findIntersections = function(from, direction, intersectGridSystems, callbackFunction){
   intersectionPoint = 0, intersectionObject = 0;
   this.origin.copy(from);
   this.direction.copy(direction);
@@ -59,6 +66,7 @@ RayCaster.prototype.findIntersections = function(from, direction, intersectGridS
             intersectionPoint = obj.intersectsLine(REUSABLE_LINE);
             if (intersectionPoint){
               intersectionObject = objName;
+              callbackFunction();
               return;
             }
           }
@@ -68,12 +76,9 @@ RayCaster.prototype.findIntersections = function(from, direction, intersectGridS
         if (gs && intersectGridSystems){
           intersectionPoint = gs.intersectsLine(REUSABLE_LINE);
           if (intersectionPoint){
-            var selectedGrid = gs.getGridFromPoint(intersectionPoint);
-            if (!(selectedGrid.sliced && gridSystems[selectedGrid.slicedGridSystemName])){
-              intersectionObject = objName;
-              return;
-            }
-            intersectionPoint = 0;
+            intersectionObject = objName;
+            callbackFunction();
+            return;
           }
         }
       }else if (result == 20){
@@ -82,6 +87,7 @@ RayCaster.prototype.findIntersections = function(from, direction, intersectGridS
           intersectionPoint = addedText.intersectsLine(REUSABLE_LINE);
           if (intersectionPoint){
             intersectionObject = objName;
+            callbackFunction();
             return;
           }
         }
@@ -96,6 +102,7 @@ RayCaster.prototype.findIntersections = function(from, direction, intersectGridS
                   intersectionPoint = obj.intersectsLine(REUSABLE_LINE);
                   if (intersectionPoint){
                     intersectionObject = objName;
+                    callbackFunction();
                     return;
                   }
                 }
@@ -109,6 +116,7 @@ RayCaster.prototype.findIntersections = function(from, direction, intersectGridS
     this.origin.addScaledVector(this.direction, 32);
     iterate = LIMIT_BOUNDING_BOX.containsPoint(this.origin);
   }
+  callbackFunction();
 }
 
 RayCaster.prototype.hide = function(object){

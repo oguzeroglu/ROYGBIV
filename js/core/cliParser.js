@@ -3428,6 +3428,7 @@ function parse(input){
           var lowerBound = new THREE.Vector3(minX, minY, minZ);
           var upperBound = new THREE.Vector3(maxX, maxY, maxZ);
           LIMIT_BOUNDING_BOX = new THREE.Box3(lowerBound, upperBound);
+          rayCaster.refresh();
           terminal.printInfo(Text.OCTREE_LIMIT_SET);
           return true;
         break;
@@ -3466,6 +3467,7 @@ function parse(input){
             areaBinHandler.insert(areas[areaName].boundingBox, areaName);
           }
           terminal.printInfo(Text.BIN_SIZE_SET);
+          rayCaster.refresh();
           return true;
         break;
         case 115: //printWorldLimits

@@ -37,6 +37,9 @@ window.onload = function() {
         for (var textName in addedTexts){
           addedTexts[textName].show();
         }
+        if (WORKERS_SUPPORTED){
+          rayCaster.onShiftPress(false);
+        }
       }
     });
     cliDiv.addEventListener("mousemove", function(event){
@@ -109,7 +112,28 @@ window.onload = function() {
   areaConfigurationsHandler = new AreaConfigurationsHandler();
 
   // RAYCASTER
-  rayCaster = new RayCaster();
+  if (!WORKERS_SUPPORTED){
+    rayCaster = new RayCaster();
+  }else{
+    rayCaster = new RaycasterWorkerBridge();
+  }
+  if (!isDeployment){
+    var raycasterMethodCount = (Object.keys(RayCaster.prototype).length);
+    var raycasterWorkerBridgeMethodCount = (Object.keys(RaycasterWorkerBridge.prototype).length);
+    if (raycasterMethodCount != raycasterWorkerBridgeMethodCount){
+      console.error("[!] Method count mismatch between RayCaster and RaycasterWorkerBridge.");
+    }
+    for (var api in RayCaster.prototype){
+      if (!RaycasterWorkerBridge.prototype[api]){
+        console.error("[!] API: "+api+" is missing in RaycasterWorkerBridge.");
+      }
+    }
+    for (var api in RaycasterWorkerBridge.prototype){
+      if (!RayCaster.prototype[api]){
+        console.error("[!] API: "+api+" is missing in RayCaster.");
+      }
+    }
+  }
 
   // OBJECT PICKER 2D
   objectPicker2D = new ObjectPicker2D();
@@ -234,149 +258,7 @@ window.onload = function() {
       if (!intersectionPoint){
         REUSABLE_VECTOR.setFromMatrixPosition(camera.matrixWorld);
         REUSABLE_VECTOR_2.set(coordX, coordY, 0.5).unproject(camera).sub(REUSABLE_VECTOR).normalize();
-        rayCaster.findIntersections(REUSABLE_VECTOR, REUSABLE_VECTOR_2, (mode == 0));
-      }
-      if (intersectionPoint){
-         var object = addedObjects[intersectionObject];
-         if (!object){
-           object = objectGroups[intersectionObject];
-         }
-         if (!object){
-           object = gridSystems[intersectionObject];
-         }
-         if (!object){
-           object = addedTexts[intersectionObject];
-         }
-         if (object.isAddedObject || object.isObjectGroup){
-           if (!defaultCameraControlsDisabled && !isDeployment){
-             terminal.clear();
-           }
-           var point = intersectionPoint;
-           var coordStr = " ("+point.x.toFixed(2)+", "+point.y.toFixed(2)+", "+point.z.toFixed(2)+")";
-           if (object.isAddedObject){
-             if (!defaultCameraControlsDisabled && !isDeployment){
-               terminal.printInfo(Text.CLICKED_ON.replace(
-                 Text.PARAM1, object.name + coordStr
-               ));
-             }
-             if (mode == 0){
-               selectionHandler.resetCurrentSelection();
-             }
-             if (!isDeployment){
-               selectionHandler.select(object);
-               guiHandler.afterObjectSelection();
-             }
-             if (object.clickCallbackFunction){
-               object.clickCallbackFunction(point.x, point.y, point.z);
-             }
-           }else if (object.isObjectGroup){
-             if (!defaultCameraControlsDisabled && !isDeployment){
-               terminal.printInfo(Text.CLICKED_ON.replace(
-                 Text.PARAM1, object.name+coordStr
-               ));
-             }
-             if (mode == 0){
-               selectionHandler.resetCurrentSelection();
-             }
-             if (!isDeployment){
-               selectionHandler.select(object);
-               guiHandler.afterObjectSelection();
-             }
-             if (object.clickCallbackFunction){
-               object.clickCallbackFunction(point.x, point.y, point.z);
-             }
-           }
-         }else if (object.isGridSystem){
-           var gridSystem = object;
-           var point = intersectionPoint;
-           var selectedGrid = gridSystem.getGridFromPoint(point);
-           if (selectedGrid.sliced && !selectedGrid.slicedGridSystemName){
-             selectedGrid.sliced = false;
-           }
-           if (selectedGrid){
-             if (!selectedGrid.sliced){
-               if (selectedGrid.destroyedAddedObject && !(keyboardBuffer["Shift"])){
-                 var addedObject = addedObjects[selectedGrid.destroyedAddedObject];
-                 terminal.clear();
-                 var point = intersectionPoint;
-                 var coordStr = " ("+point.x.toFixed(2)+", "+point.y.toFixed(2)+", "+point.z.toFixed(2)+")";
-                 terminal.printInfo(Text.CLICKED_ON.replace(
-                   Text.PARAM1, addedObject.name+coordStr
-                 ));
-                 if (mode == 0){
-                   selectionHandler.resetCurrentSelection();
-                 }
-                 if (!isDeployment){
-                   selectionHandler.select(addedObject);
-                   guiHandler.afterObjectSelection();
-                 }
-                 if (addedObject.clickCallbackFunction){
-                   addedObject.clickCallbackFunction(point.x, point.y, point.z);
-                 }
-               }else if (selectedGrid.destroyedObjectGroup && !(keyboardBuffer["Shift"])){
-                 var objectGroup = objectGroups[selectedGrid.destroyedObjectGroup];
-                 terminal.clear();
-                 var point = intersectionPoint;
-                 var coordStr = " ("+point.x.toFixed(2)+", "+point.y.toFixed(2)+", "+point.z.toFixed(2)+")";
-                 terminal.printInfo(Text.CLICKED_ON.replace(
-                   Text.PARAM1, objectGroup.name+coordStr
-                 ));
-                 if (mode == 0){
-                   selectionHandler.resetCurrentSelection();
-                 }
-                 if (!isDeployment){
-                   selectionHandler.select(objectGroup);
-                   guiHandler.afterObjectSelection();
-                 }
-                 if (objectGroup.clickCallbackFunction){
-                   objectGroup.clickCallbackFunction(point.x, point.y, point.z);
-                 }
-               }else if (selectedGrid.createdAddedTextName && !(keyboardBuffer["Shift"])){
-                  var addedText = addedTexts[selectedGrid.createdAddedTextName];
-                  if (!defaultCameraControlsDisabled && !isDeployment){
-                    terminal.clear();
-                    terminal.printInfo(Text.SELECTED.replace(Text.PARAM1, addedText.name));
-                  }
-                  if (mode == 0){
-                    selectionHandler.resetCurrentSelection();
-                  }
-                  if (!isDeployment){
-                    selectionHandler.select(addedText);
-                  }
-                  if (mode != 0 && addedText.clickCallbackFunction){
-                    addedText.clickCallbackFunction(addedText.name);
-                  }
-                  if (!isDeployment){
-                    guiHandler.afterObjectSelection();
-                  }
-               }else{
-                 selectedGrid.toggleSelect(false, true);
-              }
-            }
-           }
-         }else if (object.isAddedText){
-           if (mode == 0){
-             selectionHandler.resetCurrentSelection();
-           }
-           if (!defaultCameraControlsDisabled && !isDeployment){
-             terminal.clear();
-             terminal.printInfo(Text.SELECTED.replace(Text.PARAM1, object.name));
-           }
-           if (!isDeployment){
-             selectionHandler.select(object);
-           }
-           if (mode != 0 && object.clickCallbackFunction){
-             object.clickCallbackFunction(object.name);
-           }
-           if (!isDeployment){
-             guiHandler.afterObjectSelection();
-           }
-         }
-      }else{
-        if (!isDeployment){
-          selectionHandler.resetCurrentSelection();
-          guiHandler.afterObjectSelection();
-        }
+        rayCaster.findIntersections(REUSABLE_VECTOR, REUSABLE_VECTOR_2, (mode == 0), onRaycasterIntersection);
       }
     }
   });
@@ -512,6 +394,9 @@ window.addEventListener('keydown', function(event){
         for (var textName in addedTexts){
           addedTexts[textName].hide();
         }
+        if (WORKERS_SUPPORTED){
+          rayCaster.onShiftPress(true);
+        }
       }
     break;
     case 8: //BACKSPACE
@@ -596,6 +481,9 @@ window.addEventListener('keyup', function(event){
         }
         for (var textName in addedTexts){
           addedTexts[textName].show();
+        }
+        if (WORKERS_SUPPORTED){
+          rayCaster.onShiftPress(false);
         }
       }
     break;
@@ -1091,6 +979,161 @@ function appendtoDeploymentConsole(val){
 function removeCLIDom(){
   if (!(typeof cliDiv == UNDEFINED)){
     document.body.removeChild(cliDiv);
+  }
+}
+
+function onRaycasterIntersection(){
+  if (intersectionPoint){
+     var object = addedObjects[intersectionObject];
+     if (!object){
+       object = objectGroups[intersectionObject];
+     }
+     if (!object){
+       object = gridSystems[intersectionObject];
+     }
+     if (!object){
+       object = addedTexts[intersectionObject];
+     }
+     if (object.isAddedObject || object.isObjectGroup){
+       if (!defaultCameraControlsDisabled && !isDeployment){
+         terminal.clear();
+       }
+       var point = intersectionPoint;
+       var coordStr = " ("+point.x.toFixed(2)+", "+point.y.toFixed(2)+", "+point.z.toFixed(2)+")";
+       if (object.isAddedObject){
+         if (!defaultCameraControlsDisabled && !isDeployment){
+           terminal.printInfo(Text.CLICKED_ON.replace(
+             Text.PARAM1, object.name + coordStr
+           ));
+         }
+         if (mode == 0){
+           selectionHandler.resetCurrentSelection();
+         }
+         if (!isDeployment){
+           selectionHandler.select(object);
+           guiHandler.afterObjectSelection();
+         }
+         if (object.clickCallbackFunction){
+           object.clickCallbackFunction(point.x, point.y, point.z);
+         }
+       }else if (object.isObjectGroup){
+         if (!defaultCameraControlsDisabled && !isDeployment){
+           terminal.printInfo(Text.CLICKED_ON.replace(
+             Text.PARAM1, object.name+coordStr
+           ));
+         }
+         if (mode == 0){
+           selectionHandler.resetCurrentSelection();
+         }
+         if (!isDeployment){
+           selectionHandler.select(object);
+           guiHandler.afterObjectSelection();
+         }
+         if (object.clickCallbackFunction){
+           object.clickCallbackFunction(point.x, point.y, point.z);
+         }
+       }
+     }else if (object.isGridSystem){
+       var gridSystem = object;
+       var point = intersectionPoint;
+       var selectedGrid = gridSystem.getGridFromPoint(point);
+       if (selectedGrid.sliced && selectedGrid.slicedGridSystemName){
+         var sgs = gridSystems[selectedGrid.slicedGridSystemName];
+         if (sgs){
+           selectedGrid = sgs.getGridFromPoint(point);
+           if (selectedGrid){
+             object = sgs;
+             intersectionObject = sgs.name;
+           }
+         }
+       }
+       if (selectedGrid.sliced && !selectedGrid.slicedGridSystemName){
+         selectedGrid.sliced = false;
+       }
+       if (selectedGrid){
+         if (!selectedGrid.sliced){
+           if (selectedGrid.destroyedAddedObject && !(keyboardBuffer["Shift"])){
+             var addedObject = addedObjects[selectedGrid.destroyedAddedObject];
+             terminal.clear();
+             var point = intersectionPoint;
+             var coordStr = " ("+point.x.toFixed(2)+", "+point.y.toFixed(2)+", "+point.z.toFixed(2)+")";
+             terminal.printInfo(Text.CLICKED_ON.replace(
+               Text.PARAM1, addedObject.name+coordStr
+             ));
+             if (mode == 0){
+               selectionHandler.resetCurrentSelection();
+             }
+             if (!isDeployment){
+               selectionHandler.select(addedObject);
+               guiHandler.afterObjectSelection();
+             }
+             if (addedObject.clickCallbackFunction){
+               addedObject.clickCallbackFunction(point.x, point.y, point.z);
+             }
+           }else if (selectedGrid.destroyedObjectGroup && !(keyboardBuffer["Shift"])){
+             var objectGroup = objectGroups[selectedGrid.destroyedObjectGroup];
+             terminal.clear();
+             var point = intersectionPoint;
+             var coordStr = " ("+point.x.toFixed(2)+", "+point.y.toFixed(2)+", "+point.z.toFixed(2)+")";
+             terminal.printInfo(Text.CLICKED_ON.replace(
+               Text.PARAM1, objectGroup.name+coordStr
+             ));
+             if (mode == 0){
+               selectionHandler.resetCurrentSelection();
+             }
+             if (!isDeployment){
+               selectionHandler.select(objectGroup);
+               guiHandler.afterObjectSelection();
+             }
+             if (objectGroup.clickCallbackFunction){
+               objectGroup.clickCallbackFunction(point.x, point.y, point.z);
+             }
+           }else if (selectedGrid.createdAddedTextName && !(keyboardBuffer["Shift"])){
+              var addedText = addedTexts[selectedGrid.createdAddedTextName];
+              if (!defaultCameraControlsDisabled && !isDeployment){
+                terminal.clear();
+                terminal.printInfo(Text.SELECTED.replace(Text.PARAM1, addedText.name));
+              }
+              if (mode == 0){
+                selectionHandler.resetCurrentSelection();
+              }
+              if (!isDeployment){
+                selectionHandler.select(addedText);
+              }
+              if (mode != 0 && addedText.clickCallbackFunction){
+                addedText.clickCallbackFunction(addedText.name);
+              }
+              if (!isDeployment){
+                guiHandler.afterObjectSelection();
+              }
+           }else{
+             selectedGrid.toggleSelect(false, true);
+          }
+        }
+       }
+     }else if (object.isAddedText){
+       if (mode == 0){
+         selectionHandler.resetCurrentSelection();
+       }
+       if (!defaultCameraControlsDisabled && !isDeployment){
+         terminal.clear();
+         terminal.printInfo(Text.SELECTED.replace(Text.PARAM1, object.name));
+       }
+       if (!isDeployment){
+         selectionHandler.select(object);
+       }
+       if (mode != 0 && object.clickCallbackFunction){
+         object.clickCallbackFunction(object.name);
+       }
+       if (!isDeployment){
+         guiHandler.afterObjectSelection();
+       }
+     }
+  }else{
+    if (!isDeployment){
+      selectionHandler.resetCurrentSelection();
+      guiHandler.afterObjectSelection();
+    }
   }
 }
 

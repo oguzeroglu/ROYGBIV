@@ -1,5 +1,8 @@
 var AddedObject = function(name, type, metaData, material, mesh, physicsBody, destroyedGrids){
   this.isAddedObject = true;
+  if (IS_WORKER_CONTEXT){
+    return this;
+  }
   this.name = name;
   this.type = type;
   this.metaData = metaData;
@@ -10,7 +13,7 @@ var AddedObject = function(name, type, metaData, material, mesh, physicsBody, de
 
   this.physicsBody.addedObject = this;
 
-  if (mesh instanceof BasicMaterial){
+  if (mesh.material instanceof BasicMaterial){
     this.hasBasicMaterial = true;
   }
 
@@ -94,8 +97,28 @@ var AddedObject = function(name, type, metaData, material, mesh, physicsBody, de
   this.lastUpdatePosition = new THREE.Vector3();
   this.lastUpdateQuaternion = new THREE.Quaternion();
 
+  if (WORKERS_SUPPORTED){
+    this.generateBoundingBoxes();
+  }
+
   webglCallbackHandler.registerEngineObject(this);
 
+}
+
+AddedObject.prototype.exportLightweight = function(){
+  if (!this.boundingBoxes){
+    this.generateBoundingBoxes();
+  }
+  var exportObject = new Object();
+  exportObject.vertices = [];
+  exportObject.triangles = [];
+  for (var i = 0; i<this.vertices.length; i++){
+    exportObject.vertices.push({x: this.vertices[i].x, y: this.vertices[i].y, z: this.vertices[i].z})
+  }
+  for (var i = 0; i<this.triangles.length; i++){
+    exportObject.triangles.push({a: this.triangles[i].a, b: this.triangles[i].b, c: this.triangles[i].c})
+  }
+  return exportObject;
 }
 
 AddedObject.prototype.export = function(){

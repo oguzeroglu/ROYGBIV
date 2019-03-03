@@ -1,4 +1,5 @@
 var isDeployment = false;
+var IS_WORKER_CONTEXT = false;
 
 // CLI
 var terminal;
