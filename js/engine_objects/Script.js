@@ -9,9 +9,6 @@ var Script = function(name, script){
       this.status = SCRIPT_STATUS_ERROR;
     }
   }
-  this.counter1 = 0;
-  this.counter2 = 0;
-  this.lastExecutionPerformance = 0;
   if (isDeployment){
     this.deploymentStatusVariableName = "SCRIPT_EXECUTION_STATUS_"+this.name;
   }
@@ -30,15 +27,18 @@ Script.prototype.execute = function(){
     terminal.printError(Text.SCRIPT_IS_NOT_VALID);
     return;
   }
-  this.counter1 = performance.now();
+  if (cpuOperationsHandler.record){
+    cpuOperationsHandler.scriptPerformances[this.name] = performance.now();
+  }
   try{
     this.func();
   }catch (err){
     console.error("Error at "+this.name+": "+err);
     this.status = SCRIPT_STATUS_ERROR;
   }
-  this.counter2 = performance.now();
-  this.lastExecutionPerformance = this.counter2 - this.counter1;
+  if (cpuOperationsHandler.record){
+    cpuOperationsHandler.scriptPerformances[this.name] = performance.now() - cpuOperationsHandler.scriptPerformances[this.name];
+  }
 }
 
 Script.prototype.reload = function(onSuccess, onLoadError, onCompilationError){

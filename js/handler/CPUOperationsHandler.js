@@ -15,11 +15,13 @@ var CPUOperationsHandler = function(){
     renderScene: 0,
     updateAddedTexts: 0
   }
+  this.scriptPerformances = {};
 }
 
 CPUOperationsHandler.prototype.dumpPerformanceLogs = function(){
   var sum = 0;
   var pseudoAry = [];
+  var pseudoAry2 = [];
   for (var key in this.performanceLogs){
     sum += this.performanceLogs[key];
     pseudoAry.push({
@@ -27,12 +29,28 @@ CPUOperationsHandler.prototype.dumpPerformanceLogs = function(){
       value: this.performanceLogs[key]
     })
   }
+  for (var key in this.scriptPerformances){
+    pseudoAry2.push({
+      name: key,
+      value: this.scriptPerformances[key]
+    })
+  }
   pseudoAry.sort(function(obj1, obj2){
+    return obj2.value - obj1.value
+  });
+  pseudoAry2.sort(function(obj1, obj2){
     return obj2.value - obj1.value
   });
   console.log("Total time: "+sum+" ms.")
   for (var i = 0; i<pseudoAry.length; i++){
     console.log("["+pseudoAry[i].name+"] -> "+pseudoAry[i].value+" ms.");
+    if (pseudoAry[i].name == "runScripts"){
+      console.log("|")
+      for (var i2 = 0; i2<pseudoAry2.length; i2++){
+        console.log("|___["+pseudoAry2[i2].name+"] -> "+pseudoAry2[i2].value+" ms.");
+      }
+      console.log("|");
+    }
   }
 }
 
