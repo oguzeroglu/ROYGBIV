@@ -59,7 +59,15 @@ function handleScripts(application, engineScriptsConcatted){
     }else{
       statusText += "SCRIPT_EXECUTION_STATUS_"+scriptName+": false\n";
     }
-    scriptsText += "if(deploymentScriptsStatus.SCRIPT_EXECUTION_STATUS_"+scriptName+"){"+script+"}\n"
+    scriptsText += "if(deploymentScriptsStatus.SCRIPT_EXECUTION_STATUS_"+scriptName+"){"+
+      "if (cpuOperationsHandler.record){"+
+      "cpuOperationsHandler.scriptPerformances."+scriptName+" = performance.now()" +
+      "}" +
+      script +
+      "if (cpuOperationsHandler.record){" +
+      "cpuOperationsHandler.scriptPerformances."+scriptName+" = performance.now() - cpuOperationsHandler.scriptPerformances."+scriptName +
+      "}"+
+    "}\n"
     i ++;
   }
   engineScriptsConcatted = engineScriptsConcatted.replace("//@DEPLOYMENT_SCRIPTS_STATUS", statusText).replace("//@DEPLOYMENT_SCRIPTS", scriptsText);
