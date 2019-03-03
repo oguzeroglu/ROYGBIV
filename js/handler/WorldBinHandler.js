@@ -1,33 +1,5 @@
-var WorldBinHandler = function(isCustom){
+var WorldBinHandler = function(){
   this.bin = new Map();
-  if (!isCustom){
-    for (var objName in addedObjects){
-      var object = addedObjects[objName];
-      if (mode == 1 && !object.isIntersectable){
-        continue;
-      }
-      object.generateBoundingBoxes();
-      if (!object.boundingBoxes){
-        continue;
-      }
-      for (var i = 0; i<object.boundingBoxes.length; i++){
-        this.insert(object.boundingBoxes[i], objName);
-      }
-    }
-    for (var objName in objectGroups){
-      var object = objectGroups[objName];
-      if (mode == 1 && !object.isIntersectable){
-        continue;
-      }
-      object.generateBoundingBoxes();
-      if (!object.boundingBoxes){
-        continue;
-      }
-      for (var i = 0; i<object.boundingBoxes.length; i++){
-        this.insert(object.boundingBoxes[i], object.boundingBoxes[i].roygbivObjectName, objName);
-      }
-    }
-  }
 }
 
 WorldBinHandler.prototype.deleteObjectFromBin = function(binInfo, objName){

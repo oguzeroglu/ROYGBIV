@@ -11,7 +11,7 @@ var IS_WORKER_CONTEXT = true;
 var RaycasterWorker = function(){
   this.reusableVector1 = new THREE.Vector3();
   this.reusableVector2 = new THREE.Vector3();
-  this.rayCaster = new RayCaster(true);
+  this.rayCaster = new RayCaster();
 }
 RaycasterWorker.prototype.refresh = function(state){
   gridSystems = new Object();

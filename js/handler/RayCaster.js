@@ -1,20 +1,36 @@
-var RayCaster = function(isCustom){
-  this.binHandler = new WorldBinHandler(isCustom);
+var RayCaster = function(){
+  this.binHandler = new WorldBinHandler();
   this.origin = new THREE.Vector3();
   this.direction = new THREE.Vector3();
   this.oldPosition = new THREE.Vector3();
-  this.isCustom = isCustom;
 }
 
 RayCaster.prototype.refresh = function(){
   if (!projectLoaded){
     return;
   }
-  this.binHandler = new WorldBinHandler(this.isCustom);
-  if (IS_WORKER_CONTEXT){
-    for (var objName in addedObjects){
-      var addedObject = addedObjects[objName];
-      this.binHandler.insert(addedObject.boundingBoxes[0], objName);
+  this.binHandler = new WorldBinHandler();
+  for (var objName in addedObjects){
+    var addedObject = addedObjects[objName];
+    if (mode == 1 && !addedObject.isIntersectable){
+      continue;
+    }
+    if (!addedObject.boundingBoxes){
+      addedObject.generateBoundingBoxes();
+    }
+    this.binHandler.insert(addedObject.boundingBoxes[0], objName);
+  }
+  for (var objName in objectGroups){
+    var objectGroup = objectGroups[objName];
+    if (mode == 1 && !objectGroup.isIntersectable){
+      continue;
+    }
+    if (!objectGroup.boundingBoxes){
+      objectGroup.generateBoundingBoxes();
+    }
+    this.binHandler.insert(addedObject.boundingBoxes[0], objName);
+    for (var i = 0; i<objectGroup.boundingBoxes.length; i++){
+      this.insert(object.boundingBoxes[i], object.boundingBoxes[i].roygbivObjectName, objName);
     }
   }
   if (mode == 0){
