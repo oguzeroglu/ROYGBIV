@@ -25,86 +25,6 @@ var Particle = function(x, y, z, material, lifetime){
 
 }
 
-Particle.prototype.setFromPseudoObject = function(pseudoObject){
-  this.angularAcceleration = pseudoObject.angularAcceleration;
-  this.angularMotionRadius = pseudoObject.angularMotionRadius;
-  this.angularQuaternionW = pseudoObject.angularQuaternionW;
-  this.angularQuaternionX = pseudoObject.angularQuaternionX;
-  this.angularQuaternionY = pseudoObject.angularQuaternionY;
-  this.angularQuaternionZ = pseudoObject.angularQuaternionZ;
-  this.angularVelocity = pseudoObject.angularVelocity;
-  this.gpuAcceleration = new THREE.Vector3(pseudoObject.ax, pseudoObject.ay, pseudoObject.az);
-  this.initialAngle = pseudoObject.initialAngle;
-  this.lifetime = pseudoObject.lifetime;
-  this.motionMode = pseudoObject.motionMode;
-  this.respawnSet = pseudoObject.respawnSet;
-  this.startDelay = pseudoObject.startDelay;
-  this.trailFlag = pseudoObject.trailFlag;
-  this.useWorldPositionFlag = pseudoObject.useWorldPositionFlag;
-  this.uuid = parseInt(pseudoObject.uuid);
-  this.gpuVelocity = new THREE.Vector3(pseudoObject.vx, pseudoObject.vy, pseudoObject.vz);
-  this.x = pseudoObject.x;
-  this.y = pseudoObject.y;
-  this.z = pseudoObject.z;
-  this.parentCollisionWorkerIndex = pseudoObject.parentCollisionWorkerIndex;
-  this.fromPseudoObject = true;
-  this.parent = new Object();
-  var parentInitPosition = particleSystemInitialPositions[this.parentCollisionWorkerIndex];
-  this.parent.x = parentInitPosition.x;
-  this.parent.y = parentInitPosition.y;
-  this.parent.z = parentInitPosition.z;
-  var parentVelocity = particleSystemVelocities[this.parentCollisionWorkerIndex];
-  this.parent.vx = parentVelocity.x;
-  this.parent.vy = parentVelocity.y;
-  this.parent.vz = parentVelocity.z;
-  var parentAcceleration = particleSystemAccelerations[this.parentCollisionWorkerIndex];
-  this.parent.ax = parentAcceleration.x;
-  this.parent.ay = parentAcceleration.y;
-  this.parent.az = parentAcceleration.z;
-  this.parent.mesh = new Object();
-  this.parent.mesh.matrixWorld = particleSystemMatrices[this.parentCollisionWorkerIndex];
-  this.parent.name = pseudoObject.parentName;
-  this.index = pseudoObject.index;
-  this.collisionTimeOffset = pseudoObject.collisionTimeOffset;
-
-  var vect = this.positionHistoryArray[this.positionHistoryCounter];
-  this.getPosition(null, vect);
-  this.positionHistoryCounter ++;
-}
-
-Particle.prototype.generateCollisionWorkerInfo = function(){
-  var collisionWorkerInfo = new Object();
-  collisionWorkerInfo.uuid = this.uuid;
-  collisionWorkerInfo.parentCollisionWorkerIndex = this.parent.collisionWorkerIndex;
-  collisionWorkerInfo.x = this.x;
-  collisionWorkerInfo.y = this.y;
-  collisionWorkerInfo.z = this.z;
-  collisionWorkerInfo.startDelay = this.startDelay;
-  collisionWorkerInfo.lifetime = this.lifetime;
-  collisionWorkerInfo.respawnSet = this.respawnSet;
-  collisionWorkerInfo.trailFlag = this.trailFlag;
-  collisionWorkerInfo.useWorldPositionFlag = this.useWorldPositionFlag;
-  collisionWorkerInfo.vx = this.gpuVelocity.x;
-  collisionWorkerInfo.vy = this.gpuVelocity.y;
-  collisionWorkerInfo.vz = this.gpuVelocity.z;
-  collisionWorkerInfo.ax = this.gpuAcceleration.x;
-  collisionWorkerInfo.ay = this.gpuAcceleration.y;
-  collisionWorkerInfo.az = this.gpuAcceleration.z;
-  collisionWorkerInfo.motionMode = this.motionMode;
-  collisionWorkerInfo.initialAngle = this.initialAngle;
-  collisionWorkerInfo.angularAcceleration = this.angularAcceleration;
-  collisionWorkerInfo.angularVelocity = this.angularVelocity;
-  collisionWorkerInfo.angularMotionRadius = this.angularMotionRadius;
-  collisionWorkerInfo.angularQuaternionX = this.angularQuaternionX;
-  collisionWorkerInfo.angularQuaternionY = this.angularQuaternionY;
-  collisionWorkerInfo.angularQuaternionZ = this.angularQuaternionZ;
-  collisionWorkerInfo.angularQuaternionW = this.angularQuaternionW;
-  collisionWorkerInfo.parentName = this.parent.name;
-  collisionWorkerInfo.index = this.index;
-  collisionWorkerInfo.collisionTimeOffset = this.collisionTimeOffset;
-  return JSON.stringify(collisionWorkerInfo);
-}
-
 // WORLD COORDINATES OF THIS PARTICLE
 Particle.prototype.getPosition = function(axis, targetVector){
   if (this.isExpired || !this.parent || this.isParticleExpired() || (this.parent && !this.parent.mesh)){
@@ -225,7 +145,7 @@ Particle.prototype.generateLine = function(){
   REUSABLE_LINE.set(this.positionHistoryArray[index1], this.positionHistoryArray[index2]);
 }
 
-Particle.prototype.handleCollisions = function(fromWorker){
+Particle.prototype.handleCollisions = function(){
   var timer1 = performance.now();
   this.updatePositionHistory();
   if (!this.readyForCollisionCheckFlag){
@@ -235,12 +155,7 @@ Particle.prototype.handleCollisions = function(fromWorker){
   if (rIndex < 0){
     rIndex = PARTICLE_POSITION_HISTORY_SIZE - 1;
   }
-  var results;
-  if (fromWorker){
-    results = worldBinHandler.query(this.positionHistoryArray[rIndex]);
-  }else{
-    results = rayCaster.query(this.positionHistoryArray[rIndex]);
-  }
+  var results = rayCaster.query(this.positionHistoryArray[rIndex]);
   for (var objName in results){
     var result = results[objName];
     if (result == 5){
@@ -249,13 +164,7 @@ Particle.prototype.handleCollisions = function(fromWorker){
         return;
       }
       this.generateLine();
-      var intersectionPoint;
-      if (!fromWorker){
-        intersectionPoint = obj.intersectsLine(REUSABLE_LINE);
-      }else{
-        intersectsLine(objName, this);
-        continue;
-      }
+      var intersectionPoint = obj.intersectsLine(REUSABLE_LINE);
       if (intersectionPoint){
         this.fireCollisionCallback();
       }
@@ -266,22 +175,12 @@ Particle.prototype.handleCollisions = function(fromWorker){
         return;
       }
       for (var childName in result){
-        if (!fromWorker){
-          obj = parent.group[childName];
-        }else{
-          obj = true;
-        }
+        obj = parent.group[childName];
         if (!obj){
           return;
         }
         this.generateLine();
-        if (!fromWorker){
-          var intersectionPoint = obj.intersectsLine(REUSABLE_LINE);
-        }else{
-          if (intersectsLine(objName, this, childName)){
-            continue;
-          }
-        }
+        var intersectionPoint = obj.intersectsLine(REUSABLE_LINE);
         if (intersectionPoint){
           this.fireCollisionCallback();
           return;

@@ -150,12 +150,6 @@ var State = function(projectName, author){
   this.bloomThreshold = bloomThreshold;
   this.bloomResolutionScale = bloomResolutionScale;
   this.bloomOn = bloomOn;
-  // PHYSICS WORKER MODE *******************************************
-  this.physicsWorkerMode = PHYSICS_WORKER_ENABLED;
-  // PARTICLE COLLISION WORKER MODE ********************************
-  this.particleCollisionWorkerMode = COLLISION_WORKER_ENABLED;
-  // PARTICLE SYSTME COLLISION WORKER MODE *************************
-  this.particleSystemCollisionWorkerMode = PS_COLLISION_WORKER_ENABLED;
   // OCTREE LIMITS *************************************************
   var octreeMinX = LIMIT_BOUNDING_BOX.min.x;
   var octreeMinY = LIMIT_BOUNDING_BOX.min.y;

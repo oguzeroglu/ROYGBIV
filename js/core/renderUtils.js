@@ -26,11 +26,9 @@ function render(){
   }
 
   if (mode == 1){
-    if (!isPhysicsWorkerEnabled()){
-      cpuOperationsHandler.stepPhysics();
-      cpuOperationsHandler.updateDynamicObjects();
-      cpuOperationsHandler.updateTrackingObjects();
-    }
+    cpuOperationsHandler.stepPhysics();
+    cpuOperationsHandler.updateDynamicObjects();
+    cpuOperationsHandler.updateTrackingObjects();
     cpuOperationsHandler.processCameraRotationBuffer();
     cpuOperationsHandler.runScripts();
     cpuOperationsHandler.updateRaycaster();

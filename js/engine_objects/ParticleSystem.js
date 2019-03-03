@@ -1,8 +1,7 @@
-var ParticleSystem = function(copyPS, name, particles, x, y, z, vx, vy, vz, ax, ay, az, motionMode, updateFunction, fromWorker){
+var ParticleSystem = function(copyPS, name, particles, x, y, z, vx, vy, vz, ax, ay, az, motionMode, updateFunction){
 
   this.isParticleSystem = true;
 
-  this.collisionWorkerInfo = new Object();
   this.copyPS = copyPS;
 
   this.name = name;
@@ -69,10 +68,6 @@ var ParticleSystem = function(copyPS, name, particles, x, y, z, vx, vy, vz, ax, 
   this.REUSABLE_ACCELERATION_VECTOR = new THREE.Vector3();
 
   var len = this.particles.length;
-
-  if (fromWorker){
-    return this;
-  }
 
   this.geometry = new THREE.BufferGeometry();
   this.expiredFlags = new Float32Array(len); // This is dynamic
@@ -287,12 +282,6 @@ var ParticleSystem = function(copyPS, name, particles, x, y, z, vx, vy, vz, ax, 
           this.hasParticleCollision = true;
         }
         this.particlesWithCollisionCallbacks.set(particle.uuid, particle);
-        if (isCollisionWorkerEnabled()){
-          if (!this.checkForCollisionBuffer){
-            this.checkForCollisionBuffer = new Object();
-          }
-          this.checkForCollisionBuffer[particle.uuid] = particle;
-        }
       }
 
     }
@@ -461,39 +450,6 @@ var ParticleSystem = function(copyPS, name, particles, x, y, z, vx, vy, vz, ax, 
   webglCallbackHandler.registerEngineObject(this);
 }
 
-ParticleSystem.prototype.generatePSCollisionInfo = function(){
-  var obj = this.collisionWorkerInfo;
-  obj.name = this.name;
-  obj.psCollisionWorkerIndex = this.psCollisionWorkerIndex;
-  obj.psCollisionWorkerSegment = this.psCollisionWorkerSegment;
-  obj.x = this.x;
-  obj.y = this.y;
-  obj.z = this.z;
-  obj.vx = this.vx;
-  obj.vy = this.vy;
-  obj.vz = this.vz;
-  obj.ax = this.ax;
-  obj.ay = this.ay;
-  obj.az = this.az;
-  obj.motionMode = this.motionMode;
-  obj.angularVelocity = this.angularVelocity;
-  obj.angularAcceleration = this.angularAcceleration;
-  obj.angularMotionRadius = this.angularMotionRadius;
-  obj.angularQuaternionX = this.angularQuaternionX;
-  obj.angularQuaternionY = this.angularQuaternionY;
-  obj.angularQuaternionZ = this.angularQuaternionZ;
-  obj.angularQuaternionW = this.angularQuaternionW;
-  obj.initialAngle = this.initialAngle;
-  obj.lifetime = this.lifetime;
-  obj.collisionTimeOffset = this.collisionTimeOffset;
-  return obj;
-}
-
-ParticleSystem.prototype.generateNewPSInfo = function(){
-  return this.name+","+this.collisionWorkerIndex+","+this.x+","+this.y+","+this.z+","+
-         this.vx+","+this.vy+","+this.vz+","+this.ax+","+this.ay+","+this.az;
-}
-
 ParticleSystem.prototype.notifyParticleCollisionCallbackChange = function(particle){
   if (particle.checkForCollisions){
     this.particlesWithCollisionCallbacks.set(particle.uuid, particle);
@@ -544,9 +500,7 @@ ParticleSystem.prototype.stop = function(newLifetime){
   this.stoppedX = this.mesh.position.x;
   this.stoppedY = this.mesh.position.y;
   this.stoppedZ = this.mesh.position.z;
-  if(!isCollisionWorkerEnabled()){
-    this.particlesWithCollisionCallbacks.forEach(this.particleIterationStopFunc);
-  }
+  this.particlesWithCollisionCallbacks.forEach(this.particleIterationStopFunc);
 }
 
 ParticleSystem.prototype.particleIterationStopFunc = function(value, key){
@@ -601,27 +555,18 @@ ParticleSystem.prototype.rewindParticle = function(particle, delay){
   selectedGeometry.attributes.flags2.needsUpdate = true;
 }
 
-ParticleSystem.prototype.calculatePseudoPosition = function(fromWorker){
+ParticleSystem.prototype.calculatePseudoPosition = function(){
   var pseudoTick = this.tick + (this.collisionTimeOffset * (1/60));
   var vx = 0, vy = 0, vz = 0, ax = 0, ay = 0, az = 0;
-  if (!fromWorker){
-    if (this.velocity){
-      vx = this.velocity.x;
-      vy = this.velocity.y;
-      vz = this.velocity.z;
-    }
-    if (this.acceleration){
-      ax = this.acceleration.x;
-      ay = this.acceleration.y;
-      az = this.acceleration.z;
-    }
-  }else{
-    vx = this.vx;
-    vy = this.vy;
-    vz = this.vz;
-    ax = this.ax;
-    ay = this.ay;
-    az = this.az;
+  if (this.velocity){
+    vx = this.velocity.x;
+    vy = this.velocity.y;
+    vz = this.velocity.z;
+  }
+  if (this.acceleration){
+    ax = this.acceleration.x;
+    ay = this.acceleration.y;
+    az = this.acceleration.z;
   }
   if (this.motionMode == MOTION_MODE_NORMAL){
     var dx = (vx * pseudoTick) + (0.5 * ax * pseudoTick * pseudoTick);
@@ -735,9 +680,7 @@ ParticleSystem.prototype.update = function(){
     this.updateFunction();
   }
 
-  if (!isCollisionWorkerEnabled()){
-    this.particlesWithCollisionCallbacks.forEach(this.particleIterationCollisionFunc);
-  }
+  this.particlesWithCollisionCallbacks.forEach(this.particleIterationCollisionFunc);
 
   if (this.gpuMotionUpdateBuffer.length > 0){
     var firstIndex = this.gpuMotionUpdateBuffer[0].index;
@@ -767,7 +710,7 @@ ParticleSystem.prototype.update = function(){
     }
   }
 
-  if (this.checkForCollisions && !isPSCollisionWorkerEnabled() && this.mesh && this.mesh.visible){
+  if (this.checkForCollisions && this.mesh && this.mesh.visible){
     this.handleCollisions();
   }
 }
@@ -825,22 +768,14 @@ ParticleSystem.prototype.fireCollisionCallback = function(collisionInfo){
   request(collisionInfo);
 }
 
-ParticleSystem.prototype.handleCollisions = function(fromWorker){
+ParticleSystem.prototype.handleCollisions = function(){
   var results;
   var pseudoPosition;
   if (this.collisionTimeOffset == 0){
-    if (fromWorker){
-      results = worldBinHandler.query(this.mesh.position);
-    }else{
-      results = rayCaster.query(this.mesh.position);
-    }
+    results = rayCaster.query(this.mesh.position);
   }else{
-    pseudoPosition = this.calculatePseudoPosition(fromWorker);
-    if (fromWorker){
-      results = worldBinHandler.query(pseudoPosition);
-    }else{
-      results = rayCaster.query(pseudoPosition);
-    }
+    pseudoPosition = this.calculatePseudoPosition();
+    results = rayCaster.query(pseudoPosition);
   }
   if (this.positionHistoryCounter == 0){
     var end = this.positionLine.end;
@@ -868,16 +803,7 @@ ParticleSystem.prototype.handleCollisions = function(fromWorker){
       if (!obj){
         return;
       }
-      var intersectionPoint;
-      if (!fromWorker){
-        intersectionPoint = obj.intersectsLine(this.positionLine);
-      }else{
-        var res = intersectsLine(objName, this);
-        if (res){
-          return;
-        }
-        continue;
-      }
+      var intersectionPoint = obj.intersectsLine(this.positionLine);
       if (intersectionPoint){
         var collisionInfo = reusableCollisionInfo.set(
           objName, intersectionPoint.x, intersectionPoint.y, intersectionPoint.z,
@@ -893,21 +819,11 @@ ParticleSystem.prototype.handleCollisions = function(fromWorker){
         return;
       }
       for (var childName in result){
-        if (!fromWorker){
-          obj = parent.group[childName];
-        }else{
-          obj = true;
-        }
+        obj = parent.group[childName];
         if (!obj){
           return;
         }
-        if (!fromWorker){
-          var intersectionPoint = obj.intersectsLine(this.positionLine);
-        }else{
-          if (intersectsLine(objName, this, childName)){
-            return;
-          }
-        }
+        var intersectionPoint = obj.intersectsLine(this.positionLine);
         if (intersectionPoint){
           var collisionInfo = reusableCollisionInfo.set(
             objName, intersectionPoint.x, intersectionPoint.y, intersectionPoint.z,

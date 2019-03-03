@@ -3065,51 +3065,10 @@ function parse(input){
           return true;
         break;
         case 101: //physicsWorkerMode
-          if (mode != 0){
-            terminal.printError(Text.WORKS_ONLY_IN_DESIGN_MODE);
-            return true;
-          }
-          var state = splitted[1].toUpperCase();
-          if (state != "ON" && state != "OFF"){
-            terminal.printError(Text.PHYSICS_WORKER_MODE_MUST_BE_ON_OR_OFF);
-            return true;
-          }
-          if (state == "ON"){
-            if (!WORKERS_SUPPORTED){
-              terminal.printError(Text.WORKERS_ARE_NOT_SUPPORTED);
-              return true;
-            }
-            if (PHYSICS_WORKER_ENABLED){
-              terminal.printError(Text.PHYSICS_WORKER_MODE_IS_ALREADY_ENABLED);
-              return true;
-            }
-            PHYSICS_WORKER_ENABLED = true;
-            terminal.printInfo(Text.PHYSICS_WORKER_MODE.replace(
-              Text.PARAM1, Text.ENABLED
-            ));
-          }else if (state == "OFF"){
-            if (!PHYSICS_WORKER_ENABLED){
-              terminal.printError(Text.PHYSICS_WORKER_MODE_IS_ALREADY_DISABLED);
-              return true;
-            }
-            PHYSICS_WORKER_ENABLED = false;
-            terminal.printInfo(Text.PHYSICS_WORKER_MODE.replace(
-              Text.PARAM1, Text.DISABLED
-            ));
-          }
-          return true;
+          // DEPRECATED
         break;
         case 102: //printPhysicsWorkerMode
-          var modeText = "";
-          if (PHYSICS_WORKER_ENABLED){
-            modeText = Text.ENABLED;
-          }else{
-            modeText = Text.DISABLED;
-          }
-          terminal.printInfo(Text.PHYSICS_WORKER_MODE.replace(
-            Text.PARAM1, modeText
-          ));
-          return true;
+          // DEPRECATED
         break;
         case 103: //explain
           var functionName = splitted[1].toUpperCase();
@@ -3537,92 +3496,16 @@ function parse(input){
           return true;
         break;
         case 117: //particleCollisionWorkerMode
-          if (mode != 0){
-            terminal.printError(Text.WORKS_ONLY_IN_DESIGN_MODE);
-            return true;
-          }
-          var selection = splitted[1].toUpperCase();
-          var modeText = "";
-          if (selection != "ON" && selection != "OFF"){
-            terminal.printError(Text.PARTICLE_COLLISION_WORKER_MODE_MUST_BE_ON_OR_OFF);
-            return true;
-          }
-          if (selection == "ON"){
-            if (!WORKERS_SUPPORTED){
-              terminal.printError(Text.WORKERS_ARE_NOT_SUPPORTED);
-              return true;
-            }
-            if (COLLISION_WORKER_ENABLED){
-              terminal.printError(Text.PARTICLE_COLLISION_ALREADY_ENABLED);
-              return true;
-            }
-            COLLISION_WORKER_ENABLED = true;
-            modeText = Text.ENABLED;
-          }else if (selection == "OFF"){
-            if (!COLLISION_WORKER_ENABLED){
-              terminal.printError(Text.PARTICLE_COLLISION_ALREADY_DISABLED);
-              return true;
-            }
-            COLLISION_WORKER_ENABLED = false;
-            modeText = Text.DISABLED;
-          }
-          terminal.printInfo(Text.PARTICLE_COLLISION_WORKER_MODE.replace(Text.PARAM1, modeText));
-          return true;
+          // DEPRECATED
         break;
         case 118: //printParticleCollisionWorkerMode
-          var modeText = "";
-          if (COLLISION_WORKER_ENABLED){
-            modeText = Text.ENABLED;
-          }else{
-            modeText = Text.DISABLED;
-          }
-          terminal.printInfo(Text.PARTICLE_COLLISION_WORKER_MODE.replace(
-            Text.PARAM1, modeText
-          ));
-          return true;
+          // DEPRECATED
         break;
         case 119: //particleSystemCollisionWorkerMode
-          if (mode != 0){
-            terminal.printError(Text.WORKS_ONLY_IN_DESIGN_MODE);
-            return true;
-          }
-          var selection = splitted[1].toUpperCase();
-          if (selection != "ON" && selection != "OFF"){
-            terminal.printError(Text.PARTICLE_SYSTEM_COLLISION_WORKER_MODE_MUST_BE_ON_OR_OFF);
-            return true;
-          }
-          var modeText = "";
-          if (selection == "ON"){
-            if (!WORKERS_SUPPORTED){
-              terminal.printError(Text.WORKERS_ARE_NOT_SUPPORTED);
-              return true;
-            }
-            if (PS_COLLISION_WORKER_ENABLED){
-              terminal.printError(Text.PARTICLE_SYSTEM_COLLISION_ALREADY_ENABLED);
-              return true;
-            }
-            PS_COLLISION_WORKER_ENABLED = true;
-            modeText = Text.ENABLED;
-          }else if (selection == "OFF"){
-            if (!PS_COLLISION_WORKER_ENABLED){
-              terminal.printError(Text.PARTICLE_SYSTEM_COLLISION_ALREADY_DISABLED);
-              return true;
-            }
-            PS_COLLISION_WORKER_ENABLED = false;
-            modeText = Text.DISABLED;
-          }
-          terminal.printInfo(Text.PARTICLE_SYSTEM_COLLISION_WORKER_MODE.replace(Text.PARAM1, modeText));
-          return true;
+          // DEPRECATED
         break;
         case 120: //printParticleSystemCollisionWorkerMode
-          var modeText = "";
-          if (PS_COLLISION_WORKER_ENABLED){
-            modeText = Text.ENABLED;
-          }else{
-            modeText = Text.DISABLED;
-          }
-          terminal.printInfo(Text.PARTICLE_SYSTEM_COLLISION_WORKER_MODE.replace(Text.PARAM1, modeText));
-          return true;
+          // DEPRECATED
         break;
         case 121: //logFrameDrops
           // DEPRECATED

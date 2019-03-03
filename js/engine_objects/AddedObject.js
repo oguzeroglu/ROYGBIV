@@ -52,10 +52,6 @@ var AddedObject = function(name, type, metaData, material, mesh, physicsBody, de
     if (!collisionEvent.body.addedObject || (!this.isVisibleOnThePreviewScene() && !this.physicsKeptWhenHidden)){
       return;
     }
-    if (isPhysicsWorkerEnabled()){
-      // WE WILL HANDLE PHYSICS CALCULATIONS INSIDE THE WORKER
-      return;
-    }
     var targetObjectName = collisionEvent.body.addedObject.name;
     var contact = collisionEvent.contact;
     var collisionPosition = new Object();
@@ -2122,14 +2118,10 @@ AddedObject.prototype.getNormalGeometry = function(){
 
 AddedObject.prototype.setSlippery = function(isSlippery){
   if (isSlippery){
-    if (!isPhysicsWorkerEnabled()){
-      this.setFriction(0);
-    }
+    this.setFriction(0);
     this.metaData["isSlippery"] = true;
   }else{
-    if (!isPhysicsWorkerEnabled()){
-      this.setFriction(friction);
-    }
+    this.setFriction(friction);
     this.metaData["isSlippery"] = false;
   }
 }

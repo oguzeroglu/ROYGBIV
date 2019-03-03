@@ -689,7 +689,13 @@ if (!isDeployment){
     78, //undo -> Deprecated because causes memory issues for big projects.
     79, //redo -> Deprecated because causes memory issues for big projects.
     89, //translateObject -> Deprecated due to architectural conflicts. Objects can only be translated using animations. Instead of translating the object in the design mode, a new grid system should be created at the specific position. Every object should be associated with certain grids.
+    101, //physicsWorkerMode -> Workers will be re-implemented.
+    102, //printPhysicsWorkerMode -> Workers will be re-implemented.
     105, //printPerformance -> Deprecated because calling performance.now() multiple times on each render is costly.
+    117, //particleCollisionWorkerMode  -> Workers will be re-implemented.
+    118, //printParticleCollisionWorkerMode -> Workers will be re-implemented.
+    119, //particleSystemCollisionWorkerMode -> Workers will be re-implemented.
+    120, //printParticleCollisionWorkerMode -> Workers will be re-implemented.
     121, //logFrameDrops -> No need for such functionality after the usage of Stats.js
     125, //applyDisplacementMap -> Deprecated because causes problems with geometry caching.
     127, //setAtlasTextureSize -> Deprecated because has no use cases after deprecation of TextureMerger class
@@ -1043,13 +1049,6 @@ var preConditions;
 
 // WORKER VARIABLES
 var WORKERS_SUPPORTED = (typeof(Worker) !== "undefined");
-var WORKERS_DEBUG_MODE_ENABLED = false;
-var PHYSICS_WORKER_PATH = "/js/worker/physicsWorker.js";
-var COLLISION_WORKER_PATH = "/js/worker/collisionWorker.js";
-var PS_COLLISION_WORKER_PATH = "/js/worker/psCollisionWorker.js";
-var PHYSICS_WORKER_ENABLED = true;
-var COLLISION_WORKER_ENABLED = true;
-var PS_COLLISION_WORKER_ENABLED = true;
 
 // TEXT POOL
 var Text = (!isDeployment)? new Text(): 0;

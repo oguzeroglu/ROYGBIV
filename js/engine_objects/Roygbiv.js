@@ -633,14 +633,12 @@ Roygbiv.prototype.applyForce = function(object, force, point){
   preConditions.checkIfDefined(ROYGBIV.applyForce, preConditions.point, point);
   preConditions.checkIfVectorOnlyIfDefined(ROYGBIV.applyForce, preConditions.force, force);
   preConditions.checkIfVectorOnlyIfDefined(ROYGBIV.applyForce, preConditions.point, point);
-  if (!isPhysicsWorkerEnabled()){
-    REUSABLE_CANNON_VECTOR.set(force.x, force.y, force.z);
-    REUSABLE_CANNON_VECTOR_2.set(point.x, point.y, point.z);
-    object.physicsBody.applyImpulse(
-      REUSABLE_CANNON_VECTOR,
-      REUSABLE_CANNON_VECTOR_2
-    );
-  }
+  REUSABLE_CANNON_VECTOR.set(force.x, force.y, force.z);
+  REUSABLE_CANNON_VECTOR_2.set(point.x, point.y, point.z);
+  object.physicsBody.applyImpulse(
+    REUSABLE_CANNON_VECTOR,
+    REUSABLE_CANNON_VECTOR_2
+  );
 }
 
 // rotate

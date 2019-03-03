@@ -1107,10 +1107,6 @@ ObjectGroup.prototype.glue = function(){
     if (!collisionEvent.body.addedObject || (!this.isVisibleOnThePreviewScene() && !this.physicsKeptWhenHidden)){
       return;
     }
-    if (isPhysicsWorkerEnabled()){
-      // WE WILL HANDLE PHYSICS CALCULATIONS INSIDE THE WORKER
-      return;
-    }
     var targetObjectName = collisionEvent.target.addedObject.name;
     var contact = collisionEvent.contact;
     var collisionPosition = new Object();
@@ -1634,14 +1630,10 @@ ObjectGroup.prototype.removeBoundingBoxesFromScene = function(){
 
 ObjectGroup.prototype.setSlippery = function(isSlippery){
   if (isSlippery){
-    if (!isPhysicsWorkerEnabled()){
-      this.setFriction(0);
-    }
+    this.setFriction(0);
     this.isSlippery = true;
   }else{
-    if (!isPhysicsWorkerEnabled()){
-      this.setFriction(friction);
-    }
+    this.setFriction(friction);
     this.isSlippery = false;
   }
 }

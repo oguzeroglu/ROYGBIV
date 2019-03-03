@@ -711,21 +711,6 @@ window.addEventListener('keyup', function(event){
    setPostProcessingParams();
  }
 
-function isPhysicsWorkerEnabled(){
-  return false;
-  //return (WORKERS_SUPPORTED && PHYSICS_WORKER_ENABLED);
-}
-
-function isCollisionWorkerEnabled(){
-  return false;
-  //return (WORKERS_SUPPORTED && COLLISION_WORKER_ENABLED);
-}
-
-function isPSCollisionWorkerEnabled(){
-  return false;
-  //return (WORKERS_SUPPORTED && PS_COLLISION_WORKER_ENABLED);
-}
-
 function resizeFunction(){
   if (renderer && composer){
     renderer.setSize(window.innerWidth, window.innerHeight);

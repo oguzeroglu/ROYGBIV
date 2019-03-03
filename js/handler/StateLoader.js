@@ -962,12 +962,6 @@ StateLoader.prototype.load = function(){
       }
       markedPoints[markedPointName] = markedPoint;
     }
-    // PHYSICS WORKER MODE *****************************************
-    PHYSICS_WORKER_ENABLED = obj.physicsWorkerMode;
-    // PARTICLE COLLISION WORKER MODE ******************************
-    COLLISION_WORKER_ENABLED = obj.particleCollisionWorkerMode;
-    // PARTICLE SYSTEM COLLISION WORKER MODE ***********************
-    PS_COLLISION_WORKER_ENABLED = obj.particleSystemCollisionWorkerMode;
     // OCTREE LIMIT ************************************************
     var octreeLimitInfo = obj.octreeLimit
     var octreeLimitInfoSplitted = octreeLimitInfo.split(",");
