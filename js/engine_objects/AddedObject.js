@@ -97,10 +97,6 @@ var AddedObject = function(name, type, metaData, material, mesh, physicsBody, de
   this.lastUpdatePosition = new THREE.Vector3();
   this.lastUpdateQuaternion = new THREE.Quaternion();
 
-  if (WORKERS_SUPPORTED){
-    this.generateBoundingBoxes();
-  }
-
   webglCallbackHandler.registerEngineObject(this);
 
 }
@@ -109,14 +105,28 @@ AddedObject.prototype.exportLightweight = function(){
   if (!this.boundingBoxes){
     this.generateBoundingBoxes();
   }
+  this.mesh.updateMatrixWorld();
   var exportObject = new Object();
+  if (!this.parentObjectName){
+    exportObject.position = this.mesh.position.clone();
+    exportObject.quaternion = this.mesh.quaternion.clone();
+  }else{
+    exportObject.position = new THREE.Vector3(this.positionXWhenAttached, this.positionYWhenAttached, this.positionZWhenAttached);
+    exportObject.quaternion = new THREE.Quaternion(this.qxWhenAttached, this.qyWhenAttached, this.qzWhenAttached, this.qwWhenAttached);
+  }
   exportObject.vertices = [];
   exportObject.triangles = [];
+  exportObject.pseudoFaces = [];
+  exportObject.parentBoundingBoxIndex = this.parentBoundingBoxIndex;
+  exportObject.matrixWorld = this.mesh.matrixWorld.elements;
   for (var i = 0; i<this.vertices.length; i++){
     exportObject.vertices.push({x: this.vertices[i].x, y: this.vertices[i].y, z: this.vertices[i].z})
   }
   for (var i = 0; i<this.triangles.length; i++){
     exportObject.triangles.push({a: this.triangles[i].a, b: this.triangles[i].b, c: this.triangles[i].c})
+  }
+  for (var i = 0; i<this.pseudoFaces.length; i++){
+    exportObject.pseudoFaces.push(this.pseudoFaces[i]);
   }
   return exportObject;
 }

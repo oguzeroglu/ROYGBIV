@@ -21,4 +21,13 @@ var LightweightState = function(){
       this.addedObjects[objName] = addedObjects[objName].exportLightweight();
     }
   }
+  // OBJECT GROUPS
+  this.childAddedObjects = new Object();
+  this.objectGroups = new Object();
+  for (var objName in objectGroups){
+    this.objectGroups[objName] = objectGroups[objName].exportLightweight();
+    for (var childName in objectGroups[objName].group){
+      this.childAddedObjects[childName] = objectGroups[objName].group[childName].exportLightweight();
+    }
+  }
 }

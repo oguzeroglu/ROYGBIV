@@ -28,9 +28,8 @@ RayCaster.prototype.refresh = function(){
     if (!objectGroup.boundingBoxes){
       objectGroup.generateBoundingBoxes();
     }
-    this.binHandler.insert(addedObject.boundingBoxes[0], objName);
     for (var i = 0; i<objectGroup.boundingBoxes.length; i++){
-      this.insert(object.boundingBoxes[i], object.boundingBoxes[i].roygbivObjectName, objName);
+      this.binHandler.insert(objectGroup.boundingBoxes[i], objectGroup.boundingBoxes[i].roygbivObjectName, objName);
     }
   }
   if (mode == 0){

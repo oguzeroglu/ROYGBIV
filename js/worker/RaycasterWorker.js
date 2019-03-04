@@ -4,6 +4,7 @@ importScripts("../third_party/three.min.js");
 importScripts("../worker/StateLoaderLightweight.js");
 importScripts("../engine_objects/GridSystem.js");
 importScripts("../engine_objects/AddedObject.js");
+importScripts("../engine_objects/ObjectGroup.js");
 
 var IS_WORKER_CONTEXT = true;
 
@@ -31,6 +32,11 @@ RaycasterWorker.prototype.refresh = function(state){
     addedObjects[objName].workerID = idCounter ++;
     idResponse.push({type: "addedObject", name: objName, id: addedObjects[objName].workerID});
     this.workerIDsByObjectName[objName] = addedObjects[objName].workerID;
+  }
+  for (var objName in objectGroups){
+    objectGroups[objName].workerID = idCounter ++;
+    idResponse.push({type: "objectGroup", name: objName, id: objectGroups[objName].workerID});
+    this.workerIDsByObjectName[objName] = objectGroups[objName].workerID;
   }
   this.rayCaster.refresh();
   postMessage({type: "idResponse", ids: idResponse});

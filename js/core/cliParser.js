@@ -2828,6 +2828,7 @@ function parse(input){
           }
           objectGroup.detach();
           delete objectGroups[name];
+          rayCaster.refresh();
           if (!jobHandlerWorking){
             terminal.printInfo(Text.OBJECT_DETACHED);
           }

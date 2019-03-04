@@ -1,5 +1,8 @@
 var ObjectGroup = function(name, group){
   this.isObjectGroup = true;
+  if (IS_WORKER_CONTEXT){
+    return this;
+  }
   this.name = name;
   this.group = group;
 
@@ -1260,8 +1263,6 @@ ObjectGroup.prototype.detach = function(){
 
   }
 
-  rayCaster.refresh();
-
 }
 
 ObjectGroup.prototype.setQuaternion = function(axis, val){
@@ -1374,6 +1375,33 @@ ObjectGroup.prototype.destroy = function(isUndo){
 
   rayCaster.refresh();
 
+}
+
+ObjectGroup.prototype.exportLightweight = function(){
+  var exportObj = new Object();
+  this.graphicsGroup.position.copy(this.mesh.position);
+  this.graphicsGroup.quaternion.copy(this.mesh.quaternion);
+  this.graphicsGroup.updateMatrixWorld();
+  if (!this.boundingBoxes){
+    this.generateBoundingBoxes();
+  }
+  this.updateBoundingBoxes();
+  exportObj.matrixWorld = this.graphicsGroup.matrixWorld.elements;
+  exportObj.position = this.graphicsGroup.position;
+  exportObj.quaternion = new THREE.Quaternion().copy(this.graphicsGroup.quaternion);
+  exportObj.childNames = [];
+  exportObj.center = this.getInitialCenter();
+  exportObj.boundingBoxes = [];
+  for (var objName in this.group){
+    exportObj.childNames.push(objName);
+  }
+  for (var i = 0; i<this.boundingBoxes.length; i++){
+    exportObj.boundingBoxes.push({
+      roygbivObjectName: this.boundingBoxes[i].roygbivObjectName,
+      boundingBox: this.boundingBoxes[i]
+    });
+  }
+  return exportObj;
 }
 
 ObjectGroup.prototype.export = function(){
