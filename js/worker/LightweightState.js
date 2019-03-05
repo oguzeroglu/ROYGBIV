@@ -12,6 +12,7 @@ var LightweightState = function(){
   // VIEWPORT
   var vp = renderer.getCurrentViewport();
   this.viewport = {x: vp.x, y: vp.y, z: vp.z, w: vp.w}
+  this.screenResolution = screenResolution;
   // CAMERA
   this.camera = {
     position: {x: camera.position.x, y: camera.position.y, z: camera.position.z},

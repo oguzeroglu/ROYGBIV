@@ -41,6 +41,11 @@ RaycasterWorker.prototype.refresh = function(state){
     idResponse.push({type: "objectGroup", name: objName, id: objectGroups[objName].workerID});
     this.workerIDsByObjectName[objName] = objectGroups[objName].workerID;
   }
+  for (var textName in addedTexts){
+    addedTexts[textName].workerID = idCounter ++;
+    idResponse.push({type: "addedText", name: textName, id: addedTexts[textName].workerID});
+    this.workerIDsByObjectName[textName] = addedTexts[textName].workerID;
+  }
   this.rayCaster.refresh();
   postMessage({type: "idResponse", ids: idResponse});
 }
@@ -81,11 +86,15 @@ RaycasterWorker.prototype.onRaycasterCompleted = function(){
 // START
 var keyboardBuffer = new Object();
 var renderer = new Object();
+var screenResolution = 1;
 var camera = new Object();
 var LIMIT_BOUNDING_BOX = new THREE.Box3(new THREE.Vector3(-4000, -4000, -4000), new THREE.Vector3(4000, 4000, 4000));
 var BIN_SIZE = 50;
 var REUSABLE_LINE = new THREE.Line3();
 var REUSABLE_VECTOR = new THREE.Vector3();
+var REUSABLE_VECTOR_2 = new THREE.Vector3();
+var REUSABLE_VECTOR_3 = new THREE.Vector3();
+var REUSABLE_VECTOR_4 = new THREE.Vector3();
 var INTERSECTION_NORMAL = new THREE.Vector3();
 var mode = 0;
 var projectLoaded = true;

@@ -10,6 +10,8 @@ var RaycasterWorkerBridge = function(){
           rayCaster.objectsByWorkerID[msg.data.ids[i].id] = addedObjects[msg.data.ids[i].name];
         }else if (msg.data.ids[i].type == "objectGroup"){
           rayCaster.objectsByWorkerID[msg.data.ids[i].id] = objectGroups[msg.data.ids[i].name];
+        }else if (msg.data.ids[i].type == "addedText"){
+          rayCaster.objectsByWorkerID[msg.data.ids[i].id] = addedTexts[msg.data.ids[i].name];
         }else{
           throw new Error("Not implemented.");
         }

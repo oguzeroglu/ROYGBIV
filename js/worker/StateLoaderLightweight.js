@@ -15,6 +15,7 @@ StateLoaderLightweight.prototype.loadRenderer = function(){
       return this.viewport;
     }
   }
+  screenResolution = this.state.screenResolution;
 }
 
 StateLoaderLightweight.prototype.loadWorldLimits = function(){
@@ -153,8 +154,12 @@ StateLoaderLightweight.prototype.loadBoundingBoxes = function(){
     addedText.characterSize = curExport.charSize;
     addedText.mesh = new THREE.Object3D();
     addedText.mesh.position.set(curExport.position.x, curExport.position.y, curExport.position.z);
+    addedText.position = new THREE.Vector3(curExport.initPosition.x, curExport.initPosition.y, curExport.initPosition.z);
+    addedText.tmpObj = new Object();
+    addedText.lastUpdateQuaternion = new THREE.Quaternion();
+    addedText.lastUpdatePosition = new THREE.Vector3();
+    addedText.lastUpdateCameraPosition = new THREE.Vector3();
     addedText.handleBoundingBox();
-    console.log(addedText);
     addedTexts[textName] = addedText;
   }
 }

@@ -170,6 +170,7 @@ AddedText.prototype.exportLightweight = function(){
   exportObj.bottomLeft = this.bottomLeft;
   exportObj.bottomRight = this.bottomRight;
   exportObj.position = this.mesh.position;
+  exportObj.initPosition = this.position;
   return exportObj;
 }
 
