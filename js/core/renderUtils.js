@@ -43,12 +43,18 @@ function render(){
   if (mode == 1){
     previewSceneRendered = true;
   }
+  cpuOperationsHandler.updateRaycaster();
   stats.end();
 }
 
 
 function renderScene(){
   composer.render(0.1);
+}
+
+function updateRaycaster(){
+  rayCaster.updateBuffer.forEach(rayCaster.issueUpdate);
+  rayCaster.updateBuffer.clear();
 }
 
 function updateAddedTexts(){

@@ -3,6 +3,7 @@ var RayCaster = function(){
   this.origin = new THREE.Vector3();
   this.direction = new THREE.Vector3();
   this.oldPosition = new THREE.Vector3();
+  this.updateBuffer = new Map();
 }
 
 RayCaster.prototype.refresh = function(){
@@ -54,8 +55,12 @@ RayCaster.prototype.refresh = function(){
 }
 
 RayCaster.prototype.updateObject = function(obj){
+  this.updateBuffer.set(obj.name, obj);
+}
+
+RayCaster.prototype.issueUpdate = function(obj){
   if (!(mode == 1 && (obj.isAddedObject || obj.isObjectGroup) && !obj.isIntersectable)){
-    this.binHandler.updateObject(obj);
+    rayCaster.binHandler.updateObject(obj);
   }
 }
 

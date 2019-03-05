@@ -12,7 +12,8 @@ var CPUOperationsHandler = function(){
     updateObjectTrails: 0,
     updateCrosshair: 0,
     renderScene: 0,
-    updateAddedTexts: 0
+    updateAddedTexts: 0,
+    updateRaycaster: 0
   }
   this.scriptPerformances = {};
 }
@@ -50,6 +51,16 @@ CPUOperationsHandler.prototype.dumpPerformanceLogs = function(){
       }
       console.log("|");
     }
+  }
+}
+
+CPUOperationsHandler.prototype.updateRaycaster = function(){
+  if (this.record){
+    var s = performance.now();
+    updateRaycaster();
+    this.performanceLogs.updateRaycaster = performance.now() - s;
+  }else{
+    updateRaycaster();
   }
 }
 

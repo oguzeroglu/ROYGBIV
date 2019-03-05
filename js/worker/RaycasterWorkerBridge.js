@@ -1,5 +1,6 @@
 var RaycasterWorkerBridge = function(){
   this.worker = new Worker("../js/worker/RaycasterWorker.js");
+  this.updateBuffer = new Map();
   this.worker.addEventListener("message", function(msg){
     if (msg.data.type){
       rayCaster.objectsByWorkerID = new Object();
@@ -53,9 +54,15 @@ RaycasterWorkerBridge.prototype.refresh = function(){
   this.worker.postMessage(new LightweightState());
 }
 
-RaycasterWorkerBridge.prototype.updateObject = function(){
+RaycasterWorkerBridge.prototype.updateObject = function(obj){
   console.log("UPDATE OBJECT");
+  this.updateBuffer.set(obj.name, obj);
 }
+
+RaycasterWorkerBridge.prototype.issueUpdate = function(obj){
+  console.log("ISSUE UPDATE");
+}
+
 
 RaycasterWorkerBridge.prototype.findIntersections = function(from, direction, intersectGridSystems, callbackFunction){
   console.log("FIND INTERSECTIONS");
