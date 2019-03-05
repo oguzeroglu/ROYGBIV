@@ -31,7 +31,6 @@ function render(){
     cpuOperationsHandler.updateTrackingObjects();
     cpuOperationsHandler.processCameraRotationBuffer();
     cpuOperationsHandler.runScripts();
-    cpuOperationsHandler.updateRaycaster();
     cpuOperationsHandler.updateParticleSystems();
     cpuOperationsHandler.updateObjectTrails();
     cpuOperationsHandler.updateCrosshair();
@@ -76,10 +75,6 @@ function updateCrosshair(){
   if (selectedCrosshair && (selectedCrosshair.angularSpeed != 0 || selectedCrosshair.expand || selectedCrosshair.shrink)){
     selectedCrosshair.update();
   }
-}
-
-function updateRaycaster(){
-  rayCaster.update();
 }
 
 function updateParticleSystems(){
@@ -154,6 +149,9 @@ function updateDynamicObjects(){
     }
     object.mesh.position.copy(physicsBody.position);
     setTHREEQuaternionFromCANNON(object.mesh, physicsBody, axis, type, gridSystemAxis);
+    if (!(object.isHidden || (!object.isIntersectable) || !object.boundingBoxesNeedUpdate())){
+      rayCaster.updateObject(object);
+    }
   }
   for (var grouppedObjectName in dynamicObjectGroups){
     var grouppedObject = objectGroups[grouppedObjectName];
@@ -168,6 +166,9 @@ function updateDynamicObjects(){
     }
     grouppedObject.mesh.position.copy(physicsBody.position);
     grouppedObject.mesh.quaternion.copy(physicsBody.quaternion);
+    if (!(grouppedObject.isHidden || (!grouppedObject.isIntersectable) || !grouppedObject.boundingBoxesNeedUpdate())){
+      rayCaster.updateObject(grouppedObject);
+    }
   }
 }
 

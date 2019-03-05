@@ -4843,10 +4843,11 @@ Roygbiv.prototype.isMouseDown = function(){
 }
 
 // intersectionTest
-// Finds the first intersected object on a ray. The targetResultObject is filled with
-// .x, .y, .z and .objectName parameters in case of an intersection. If there's no detected
-// intersection the .objectName is set to null.
-Roygbiv.prototype.intersectionTest = function(fromVector, directionVector, targetResultObject){
+// Finds the first intersected object on a ray. The onComplete callback function
+// is executed with x, y, z and objectName parameters. If there's no intersection,
+// the objectName is set to null. If the web workers not supported, the onComplete
+// is executed immediately.
+Roygbiv.prototype.intersectionTest = function(fromVector, directionVector, onComplete){
   if (mode == 0){
     return;
   }
@@ -4854,21 +4855,11 @@ Roygbiv.prototype.intersectionTest = function(fromVector, directionVector, targe
   preConditions.checkIfVectorOnlyIfDefined(ROYGBIV.intersectionTest, preConditions.fromVector, fromVector);
   preConditions.checkIfDefined(ROYGBIV.intersectionTest, preConditions.directionVector, directionVector);
   preConditions.checkIfVectorOnlyIfDefined(ROYGBIV.intersectionTest, preConditions.directionVector, directionVector);
-  preConditions.checkIfDefined(ROYGBIV.intersectionTest, preConditions.targetResultObject, targetResultObject);
+  preConditions.checkIfDefined(ROYGBIV.intersectionTest, preConditions.onComplete, onComplete);
+  preConditions.checkIfFunctionOnlyIfExists(ROYGBIV.intersectionTest, preConditions.onComplete, onComplete);
   REUSABLE_VECTOR.set(fromVector.x, fromVector.y, fromVector.z);
   REUSABLE_VECTOR_2.set(directionVector.x, directionVector.y, directionVector.z).normalize();
-  rayCaster.findIntersections(REUSABLE_VECTOR, REUSABLE_VECTOR_2, false);
-  if (intersectionPoint){
-    targetResultObject.x = intersectionPoint.x;
-    targetResultObject.y = intersectionPoint.y;
-    targetResultObject.z = intersectionPoint.z;
-    targetResultObject.objectName = intersectionObject;
-  }else{
-    targetResultObject.x = 0;
-    targetResultObject.y = 0;
-    targetResultObject.z = 0;
-    targetResultObject.objectName = null;
-  }
+  rayCaster.findIntersections(REUSABLE_VECTOR, REUSABLE_VECTOR_2, false, onComplete);
 }
 
 // isMobile

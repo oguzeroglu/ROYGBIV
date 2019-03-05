@@ -80,31 +80,6 @@ WorldBinHandler.prototype.hide = function(obj){
   this.deleteObjectFromBin(obj.binInfo, obj.name);
 }
 
-WorldBinHandler.prototype.update = function(){
-  for (var objName in dynamicObjects){
-    var obj = dynamicObjects[objName];
-    if (obj.isHidden || (mode == 1 && !obj.isIntersectable) || !obj.boundingBoxesNeedUpdate()){
-      continue;
-    }
-    this.deleteObjectFromBin(obj.binInfo, obj.name);
-    obj.updateBoundingBoxes();
-    for (var i = 0; i<obj.boundingBoxes.length; i++){
-      this.insert(obj.boundingBoxes[i], objName);
-    }
-  }
-  for (var objName in dynamicObjectGroups){
-    var obj = dynamicObjectGroups[objName];
-    if (obj.isHidden || (mode == 1 && !obj.isIntersectable) || !obj.boundingBoxesNeedUpdate()){
-      continue;
-    }
-    this.deleteObjectFromBin(obj.binInfo, obj.name);
-    obj.updateBoundingBoxes();
-    for (var i = 0; i<obj.boundingBoxes.length; i++){
-      this.insert(obj.boundingBoxes[i], obj.boundingBoxes[i].roygbivObjectName, objName);
-    }
-  }
-}
-
 WorldBinHandler.prototype.visualize = function(selectedScene, customBin){
   if (customBin){
     this.bin = customBin;

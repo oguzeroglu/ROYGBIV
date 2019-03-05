@@ -158,6 +158,10 @@ AddedText.prototype.constructText = function(){
   this.twoDimensionalParameters.y = (yMin / screenResolution);
 }
 
+AddedText.prototype.exportLightweight = function(){
+  
+}
+
 AddedText.prototype.export = function(){
   var exportObj = new Object();
   exportObj.name = this.name;

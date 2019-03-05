@@ -2186,7 +2186,11 @@ StateLoader.prototype.resetProject = function(){
   areas = new Object();
   areaBinHandler = new WorldBinHandler(true);
   webglCallbackHandler = new WebGLCallbackHandler();
-  rayCaster = new RayCaster();
+  if (!WORKERS_SUPPORTED){
+    rayCaster = new RayCaster();
+  }else{
+    rayCaster = new RaycasterWorkerBridge();
+  }
   areaBinHandler.isAreaBinHandler = true;
   anchorGrid = 0;
   areasVisible = true;

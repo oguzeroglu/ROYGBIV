@@ -22,8 +22,11 @@ var RaycasterWorkerBridge = function(){
         intersectionObject = intersectedObj.name;
         REUSABLE_VECTOR.set(msg.data[2], msg.data[3], msg.data[4]);
         intersectionPoint = REUSABLE_VECTOR;
+        rayCaster.intersectionTestCallbackFunctions[msg.data[0]](intersectionPoint.x, intersectionPoint.y, intersectionPoint.z, intersectedObj);
+      }else{
+        rayCaster.intersectionTestCallbackFunctions[msg.data[0]](0, 0, 0, null);
       }
-      rayCaster.intersectionTestCallbackFunctions[msg.data[0]]();
+
     }
   });
   // initialize buffers ********************************************
@@ -46,10 +49,6 @@ var RaycasterWorkerBridge = function(){
 RaycasterWorkerBridge.prototype.refresh = function(){
   console.log("REFRESH");
   this.worker.postMessage(new LightweightState());
-}
-
-RaycasterWorkerBridge.prototype.update = function(){
-  console.log("UPDATE");
 }
 
 RaycasterWorkerBridge.prototype.updateObject = function(){

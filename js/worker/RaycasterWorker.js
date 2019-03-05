@@ -19,6 +19,8 @@ RaycasterWorker.prototype.refresh = function(state){
   var stateLoader = new StateLoaderLightweight(state);
   mode = state.mode;
   stateLoader.loadWorldLimits();
+  stateLoader.loadCamera();
+  stateLoader.loadRenderer();
   stateLoader.loadBoundingBoxes();
   var idCounter = 0;
   var idResponse = [];
@@ -40,6 +42,8 @@ RaycasterWorker.prototype.refresh = function(state){
   }
   this.rayCaster.refresh();
   postMessage({type: "idResponse", ids: idResponse});
+  console.log(camera);
+  console.log(renderer);
 }
 RaycasterWorker.prototype.findIntersections = function(data){
   var bufferId = data[0];
@@ -77,6 +81,8 @@ RaycasterWorker.prototype.onRaycasterCompleted = function(){
 
 // START
 var keyboardBuffer = new Object();
+var renderer = new Object();
+var camera = new Object();
 var LIMIT_BOUNDING_BOX = new THREE.Box3(new THREE.Vector3(-4000, -4000, -4000), new THREE.Vector3(4000, 4000, 4000));
 var BIN_SIZE = 50;
 var REUSABLE_LINE = new THREE.Line3();

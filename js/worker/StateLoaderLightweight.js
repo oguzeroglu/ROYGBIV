@@ -2,6 +2,19 @@ var StateLoaderLightweight = function(state){
   this.state = state;
 }
 
+StateLoaderLightweight.prototype.loadCamera = function(){
+  camera = new THREE.PerspectiveCamera( this.state.camera.fov, this.state.camera.aspect, 1, 10000 );
+}
+
+StateLoaderLightweight.prototype.loadRenderer = function(){
+  renderer = {
+    viewport: new THREE.Vector4(this.state.viewport.x, this.state.viewport.y, this.state.viewport.z, this.state.viewport.w),
+    getCurrentViewport: function(){
+      return this.viewport;
+    }
+  }
+}
+
 StateLoaderLightweight.prototype.loadWorldLimits = function(){
   var octreeLimit = this.state.octreeLimit;
   LIMIT_BOUNDING_BOX.min.set(octreeLimit.minX, octreeLimit.minY, octreeLimit.minZ);

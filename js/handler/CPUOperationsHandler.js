@@ -8,7 +8,6 @@ var CPUOperationsHandler = function(){
     updateTrackingObjects: 0,
     processCameraRotationBuffer: 0,
     runScripts: 0,
-    updateRaycaster: 0,
     updateParticleSystems: 0,
     updateObjectTrails: 0,
     updateCrosshair: 0,
@@ -101,16 +100,6 @@ CPUOperationsHandler.prototype.updateParticleSystems = function(){
     this.performanceLogs.updateParticleSystems = performance.now() - s;
   }else{
     updateParticleSystems();
-  }
-}
-
-CPUOperationsHandler.prototype.updateRaycaster = function(){
-  if (this.record){
-    var s = performance.now();
-    updateRaycaster();
-    this.performanceLogs.updateRaycaster = performance.now() - s;
-  }else{
-    updateRaycaster();
   }
 }
 

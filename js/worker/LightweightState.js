@@ -9,6 +9,15 @@ var LightweightState = function(){
   }
   // BIN SIZE
   this.binSize = BIN_SIZE;
+  // VIEWPORT
+  var vp = renderer.getCurrentViewport();
+  this.viewport = {x: vp.x, y: vp.y, z: vp.z, w: vp.w}
+  // CAMERA
+  this.camera = {
+    position: {x: camera.position.x, y: camera.position.y, z: camera.position.z},
+    aspect: camera.aspect,
+    fov: camera.fov
+  }
   // GRID SYSTEMS
   this.gridSystems = new Object();
   for (var gsName in gridSystems){

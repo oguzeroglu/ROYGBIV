@@ -147,6 +147,7 @@ var Preconditions = function(){
   this.threshold = "threshold";
   this.resolutionScale = "resolutionScale";
   this.paused = "paused";
+  this.onComplete = "onComplete";
 }
 
 Preconditions.prototype.errorHeader = function(callerFunc){
