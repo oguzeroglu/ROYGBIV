@@ -1049,7 +1049,7 @@ var particleSystemRefHeight = 0;
 var preConditions;
 
 // WORKER VARIABLES
-var WORKERS_SUPPORTED = (typeof(Worker) !== "undefined");
+var WORKERS_SUPPORTED = false; //(typeof(Worker) !== "undefined");
 
 // TEXT POOL
 var Text = (!isDeployment)? new Text(): 0;

@@ -54,7 +54,7 @@ RayCaster.prototype.refresh = function(){
 }
 
 RayCaster.prototype.updateObject = function(obj){
-  if (!(mode == 1 && !obj.isIntersectable)){
+  if (!(mode == 1 && (obj.isAddedObject || obj.isObjectGroup) && !obj.isIntersectable)){
     this.binHandler.updateObject(obj);
   }
 }

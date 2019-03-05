@@ -5,6 +5,7 @@ importScripts("../worker/StateLoaderLightweight.js");
 importScripts("../engine_objects/GridSystem.js");
 importScripts("../engine_objects/AddedObject.js");
 importScripts("../engine_objects/ObjectGroup.js");
+importScripts("../engine_objects/AddedText.js");
 
 var IS_WORKER_CONTEXT = true;
 
@@ -42,8 +43,6 @@ RaycasterWorker.prototype.refresh = function(state){
   }
   this.rayCaster.refresh();
   postMessage({type: "idResponse", ids: idResponse});
-  console.log(camera);
-  console.log(renderer);
 }
 RaycasterWorker.prototype.findIntersections = function(data){
   var bufferId = data[0];

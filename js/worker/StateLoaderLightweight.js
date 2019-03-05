@@ -4,6 +4,8 @@ var StateLoaderLightweight = function(state){
 
 StateLoaderLightweight.prototype.loadCamera = function(){
   camera = new THREE.PerspectiveCamera( this.state.camera.fov, this.state.camera.aspect, 1, 10000 );
+  camera.position.set(this.state.camera.position.x, this.state.camera.position.y, this.state.camera.position.z);
+  camera.quaternion.set(this.state.camera.quaternion.x, this.state.camera.quaternion.y, this.state.camera.quaternion.z, this.state.camera.quaternion.w);
 }
 
 StateLoaderLightweight.prototype.loadRenderer = function(){
@@ -27,6 +29,7 @@ StateLoaderLightweight.prototype.loadBoundingBoxes = function(){
   var addedObjectExports = this.state.addedObjects;
   var childAddedObjectExports = this.state.childAddedObjects;
   var objectGroupExports = this.state.objectGroups;
+  var addedTextExports = this.state.addedTexts3D;
   for (var gsName in gridSystemExports){
     var gridSystem = new GridSystem();
     gridSystem.name = gsName;
@@ -138,6 +141,21 @@ StateLoaderLightweight.prototype.loadBoundingBoxes = function(){
     }
     objectGroup.updateBoundingBoxes();
     objectGroups[objName] = objectGroup;
+  }
+  for (var textName in addedTextExports){
+    var curExport = addedTextExports[textName];
+    var addedText = new AddedText();
+    addedText.name = curExport.name;
+    addedText.bottomLeft = new THREE.Vector3(curExport.bottomLeft.x, curExport.bottomLeft.y, curExport.bottomLeft.z);
+    addedText.bottomRight = new THREE.Vector3(curExport.bottomRight.x, curExport.bottomRight.y, curExport.bottomRight.z);
+    addedText.topLeft = new THREE.Vector3(curExport.topLeft.x, curExport.topLeft.y, curExport.topLeft.z);
+    addedText.topRight = new THREE.Vector3(curExport.topRight.x, curExport.topRight.y, curExport.topRight.z);
+    addedText.characterSize = curExport.charSize;
+    addedText.mesh = new THREE.Object3D();
+    addedText.mesh.position.set(curExport.position.x, curExport.position.y, curExport.position.z);
+    addedText.handleBoundingBox();
+    console.log(addedText);
+    addedTexts[textName] = addedText;
   }
 }
 

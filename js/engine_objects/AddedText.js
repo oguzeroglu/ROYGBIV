@@ -1,5 +1,8 @@
 var AddedText = function(name, font, text, position, color, alpha, characterSize, strlenParameter){
   this.isAddedText = true;
+  if (IS_WORKER_CONTEXT){
+    return this;
+  }
   this.twoDimensionalParameters = new THREE.Vector2();
   this.twoDimensionalSize = new THREE.Vector4();
   this.webglSpaceSize = new THREE.Vector2();
@@ -159,7 +162,15 @@ AddedText.prototype.constructText = function(){
 }
 
 AddedText.prototype.exportLightweight = function(){
-  
+  var exportObj = new Object();
+  exportObj.name = this.name;
+  exportObj.charSize = this.characterSize;
+  exportObj.topLeft = this.topLeft;
+  exportObj.topRight = this.topRight;
+  exportObj.bottomLeft = this.bottomLeft;
+  exportObj.bottomRight = this.bottomRight;
+  exportObj.position = this.mesh.position;
+  return exportObj;
 }
 
 AddedText.prototype.export = function(){

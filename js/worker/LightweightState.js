@@ -15,6 +15,7 @@ var LightweightState = function(){
   // CAMERA
   this.camera = {
     position: {x: camera.position.x, y: camera.position.y, z: camera.position.z},
+    quaternion: {x: camera.quaternion.x, y: camera.quaternion.y, z: camera.quaternion.z, w: camera.quaternion.w},
     aspect: camera.aspect,
     fov: camera.fov
   }
@@ -37,6 +38,13 @@ var LightweightState = function(){
     this.objectGroups[objName] = objectGroups[objName].exportLightweight();
     for (var childName in objectGroups[objName].group){
       this.childAddedObjects[childName] = objectGroups[objName].group[childName].exportLightweight();
+    }
+  }
+  // 3D ADDED TEXTS
+  this.addedTexts3D = new Object();
+  for (var textName in addedTexts){
+    if (!addedTexts[textName].is2D){
+      this.addedTexts3D[textName] = addedTexts[textName].exportLightweight();
     }
   }
 }
