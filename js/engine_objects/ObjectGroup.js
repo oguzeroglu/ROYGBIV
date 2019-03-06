@@ -1379,6 +1379,8 @@ ObjectGroup.prototype.destroy = function(isUndo){
 
 ObjectGroup.prototype.exportLightweight = function(){
   var exportObj = new Object();
+  exportObj.isChangeable = this.isChangeable;
+  exportObj.isIntersectable = this.isIntersectable;
   this.graphicsGroup.position.copy(this.mesh.position);
   this.graphicsGroup.quaternion.copy(this.mesh.quaternion);
   this.graphicsGroup.updateMatrixWorld();
@@ -1390,10 +1392,15 @@ ObjectGroup.prototype.exportLightweight = function(){
   exportObj.position = this.graphicsGroup.position;
   exportObj.quaternion = new THREE.Quaternion().copy(this.graphicsGroup.quaternion);
   exportObj.childNames = [];
+  exportObj.childWorkerIndices = [];
   exportObj.center = this.getInitialCenter();
   exportObj.boundingBoxes = [];
+  this.childWorkerIdsByChildNames = new Object();
+  var childWorkerIndexCtr = 0;
   for (var objName in this.group){
     exportObj.childNames.push(objName);
+    exportObj.childWorkerIndices.push(childWorkerIndexCtr);
+    this.childWorkerIdsByChildNames[objName] = childWorkerIndexCtr ++;
   }
   for (var i = 0; i<this.boundingBoxes.length; i++){
     exportObj.boundingBoxes.push({

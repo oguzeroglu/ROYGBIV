@@ -7,6 +7,7 @@ var RaycasterWorkerBridge = function(){
       rayCaster.idsByObjectNames = new Object();
       rayCaster.addedObjectsUpdateBuffer = [];
       rayCaster.addedObjectsUpdateBufferAvailibilities = [];
+      rayCaster.objectGroupsUpdateBuffer = new Object();
       for (var i = 0; i<msg.data.ids.length; i++){
         if (msg.data.ids[i].type == "gridSystem"){
           rayCaster.objectsByWorkerID[msg.data.ids[i].id] = gridSystems[msg.data.ids[i].name];
@@ -14,11 +15,16 @@ var RaycasterWorkerBridge = function(){
         }else if (msg.data.ids[i].type == "addedObject"){
           rayCaster.objectsByWorkerID[msg.data.ids[i].id] = addedObjects[msg.data.ids[i].name];
           rayCaster.idsByObjectNames[msg.data.ids[i].name] = msg.data.ids[i].id;
-          rayCaster.addedObjectsUpdateBuffer.push(new Float32Array(18), new Float32Array(18));
+          rayCaster.addedObjectsUpdateBuffer.push(new Float32Array(19), new Float32Array(19));
           rayCaster.addedObjectsUpdateBufferAvailibilities.push(true, true);
         }else if (msg.data.ids[i].type == "objectGroup"){
           rayCaster.objectsByWorkerID[msg.data.ids[i].id] = objectGroups[msg.data.ids[i].name];
           rayCaster.idsByObjectNames[msg.data.ids[i].name] = msg.data.ids[i].id;
+          var childCount = Object.keys(objectGroups[msg.data.ids[i].name]).length;
+          rayCaster.objectGroupsUpdateBuffer[msg.data.ids[i].name] = {
+            buffers: [new Float32Array(19), new Float32Array(19)],
+            bufferAvailibilities: [true, true]
+          }
         }else if (msg.data.ids[i].type == "addedText"){
           rayCaster.objectsByWorkerID[msg.data.ids[i].id] = addedTexts[msg.data.ids[i].name];
           rayCaster.idsByObjectNames[msg.data.ids[i].name] = msg.data.ids[i].id;
@@ -41,10 +47,17 @@ var RaycasterWorkerBridge = function(){
             rayCaster.intersectionTestCallbackFunctions[msg.data[0]](0, 0, 0, null);
           }
         return;
-        case 18:
-          var bufID = msg.data[0];
-          rayCaster.addedObjectsUpdateBuffer[bufID] = msg.data;
-          rayCaster.addedObjectsUpdateBufferAvailibilities[bufID] = true;
+        default:
+          if (msg.data[0] == 0){
+            var bufID = msg.data[1];
+            rayCaster.addedObjectsUpdateBuffer[bufID] = msg.data;
+            rayCaster.addedObjectsUpdateBufferAvailibilities[bufID] = true;
+          }else if (msg.data[0] == 1){
+            var obj = rayCaster.objectsByWorkerID[msg.data[2]];
+            var bufID = msg.data[1];
+            rayCaster.objectGroupsUpdateBuffer[obj.name].buffers[bufID] = msg.data;
+            rayCaster.objectGroupsUpdateBuffer[obj.name].bufferAvailibilities[bufID] = true;
+          }
         return;
       }
     }
@@ -67,6 +80,9 @@ var RaycasterWorkerBridge = function(){
 }
 
 RaycasterWorkerBridge.prototype.refresh = function(){
+  if (!projectLoaded){
+    return;
+  }
   this.worker.postMessage(new LightweightState());
 }
 
@@ -80,15 +96,32 @@ RaycasterWorkerBridge.prototype.issueUpdate = function(obj){
     for (var i = 0; i < len; i++){
       if (rayCaster.addedObjectsUpdateBufferAvailibilities[i]){
         var buf = rayCaster.addedObjectsUpdateBuffer[i];
-        buf[0] = i;
-        buf[1] = rayCaster.idsByObjectNames[obj.name];
-        buf.set(obj.mesh.matrixWorld.elements, 2);
+        buf[0] = 0;
+        buf[1] = i;
+        buf[2] = rayCaster.idsByObjectNames[obj.name];
+        buf.set(obj.mesh.matrixWorld.elements, 3);
         rayCaster.worker.postMessage(buf, [buf.buffer]);
         rayCaster.addedObjectsUpdateBufferAvailibilities[i] = false;
         return;
       }
     }
     console.error("[!] RaycasterWorkerBridge.issueUpdate added object buffer overflow.");
+  }else if (obj.isObjectGroup){
+    var objectGroupUpdateBuffer = rayCaster.objectGroupsUpdateBuffer[obj.name];
+    var len = objectGroupUpdateBuffer.buffers.length;
+    for (var i = 0; i<len; i++){
+      if (objectGroupUpdateBuffer.bufferAvailibilities[i]){
+        var buf = objectGroupUpdateBuffer.buffers[i];
+        buf[0] = 1;
+        buf[1] = i;
+        buf[2] = rayCaster.idsByObjectNames[obj.name];
+        buf.set(obj.mesh.matrixWorld.elements, 3);
+        rayCaster.worker.postMessage(buf, [buf.buffer]);
+        objectGroupUpdateBuffer.bufferAvailibilities[i] = false;
+        return;
+      }
+    }
+    console.error("[!] RaycasterWorkerBridge.issueUpdate object group buffer overflow.");
   }
 }
 

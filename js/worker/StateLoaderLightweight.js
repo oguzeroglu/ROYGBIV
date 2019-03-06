@@ -73,8 +73,12 @@ StateLoaderLightweight.prototype.loadBoundingBoxes = function(){
     addedObject.pseudoFaces = [];
     addedObject.mesh = new THREE.Object3D();
     addedObject.mesh.matrixWorld.fromArray(curExport.matrixWorld);
+    addedObject.mesh.matrixWorld.decompose(addedObject.mesh.position, addedObject.mesh.quaternion, addedObject.mesh.scale);
     addedObject.mesh.position = new THREE.Vector3(curExport.position.x, curExport.position.y, curExport.position.z);
     addedObject.mesh.quaternion = new THREE.Quaternion(curExport.quaternion.x, curExport.quaternion.y, curExport.quaternion.z, curExport.quaternion.w);
+    if (childAddedObjectExports[objName]){
+      addedObject.mesh.matrixWorld.decompose(addedObject.mesh.position, addedObject.mesh.quaternion, addedObject.mesh.scale);
+    }
     addedObject.name = objName;
     var bb = new THREE.Box3();
     bb.roygbivObjectName = objName;
@@ -112,6 +116,8 @@ StateLoaderLightweight.prototype.loadBoundingBoxes = function(){
   for (var objName in objectGroupExports){
     var curExport = objectGroupExports[objName];
     var objectGroup = new ObjectGroup();
+    objectGroup.isIntersectable = curExport.isIntersectable;
+    objectGroup.isChangeable = curExport.isChangeable;
     objectGroup.lastUpdatePosition = new THREE.Vector3();
     objectGroup.lastUpdateQuaternion = new THREE.Quaternion();
     objectGroup.boundingBoxes = [];
@@ -124,6 +130,7 @@ StateLoaderLightweight.prototype.loadBoundingBoxes = function(){
     objectGroup.center = new THREE.Vector3(curExport.center.x, curExport.center.y, curExport.center.z);
     objectGroup.mesh.updateMatrixWorld();
     objectGroup.graphicsGroup = objectGroup.mesh;
+    objectGroup.childsByChildWorkerId = new Object();
     for (var i = 0; i<curExport.childNames.length; i++){
       var childObj = addedObjects[curExport.childNames[i]];
       childObj.mesh.updateMatrixWorld();
@@ -133,12 +140,13 @@ StateLoaderLightweight.prototype.loadBoundingBoxes = function(){
       objectGroup.graphicsGroup.updateMatrixWorld();
       childObj.mesh.updateMatrixWorld();
       delete addedObjects[childObj.name];
+      objectGroup.childsByChildWorkerId[curExport.childWorkerIndices[i]] = childObj;
     }
     for (var i = 0; i<curExport.boundingBoxes.length; i++){
       var curBBExport = curExport.boundingBoxes[i].boundingBox;
       var min = new THREE.Vector3(curBBExport.min.x, curBBExport.min.y, curBBExport.min.z);
       var max = new THREE.Vector3(curBBExport.max.x, curBBExport.max.y, curBBExport.max.z);
-      var bb = new THREE.Box3(min, max);
+      var bb = new THREE.Box3(min.clone(), max.clone());
       bb.roygbivObjectName = curBBExport.roygbivObjectName;
       objectGroup.boundingBoxes.push(bb);
     }

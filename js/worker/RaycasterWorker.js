@@ -88,10 +88,24 @@ RaycasterWorker.prototype.showObjects = function(){
   }
 }
 RaycasterWorker.prototype.updateAddedObject = function(data){
-  var objID = data[1];
+  var objID = data[2];
   var obj = this.objectsByWorkerID[objID];
-  for (var i = 2; i<18; i++){
-    this.reusableArray16[i - 2] = data[i];
+  for (var i = 3; i<19; i++){
+    this.reusableArray16[i - 3] = data[i];
+  }
+  obj.mesh.matrixWorld.fromArray(this.reusableArray16);
+  obj.mesh.matrixWorld.decompose(this.reusableVector1, this.reusableQuaternion, this.reusableVector2);
+  obj.mesh.position.copy(this.reusableVector1);
+  obj.mesh.quaternion.copy(this.reusableQuaternion);
+  postMessage(data, [data.buffer]);
+  obj.updateBoundingBoxes();
+  this.rayCaster.updateObject(obj, true);
+}
+RaycasterWorker.prototype.updateObjectGroup = function(data){
+  var objID = data[2];
+  var obj = this.objectsByWorkerID[objID];
+  for (var i = 3; i<19; i++){
+    this.reusableArray16[i - 3] = data[i];
   }
   obj.mesh.matrixWorld.fromArray(this.reusableArray16);
   obj.mesh.matrixWorld.decompose(this.reusableVector1, this.reusableQuaternion, this.reusableVector2);
@@ -136,12 +150,15 @@ self.onmessage = function(msg){
       worker.showObjects();
     }
   }else{
-    switch(msg.data.length){
-      case 8:
-        worker.findIntersections(msg.data);
+    if (msg.data.length == 8){
+      worker.findIntersections(msg.data);
       return;
-      case 18:
-        worker.updateAddedObject(msg.data);
+    }
+    if (msg.data[0] == 0){
+      worker.updateAddedObject(msg.data);
+      return;
+    }else if (msg.data[0] = 1){
+      worker.updateObjectGroup(msg.data);
       return;
     }
   }
