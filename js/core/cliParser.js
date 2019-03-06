@@ -2407,12 +2407,15 @@ function parse(input){
             }else{
               addedObject.rotate(axis, radian);
             }
+            addedObject.mesh.updateMatrixWorld();
+            addedObject.updateBoundingBoxes();
           }else if (objectGroup){
             if (objectGroup.pivotObject){
               objectGroup.rotateAroundPivotObject(axis, radian);
             }else{
               objectGroup.rotate(axis, radian);
             }
+            objectGroup.updateBoundingBoxes();
           }
           if (!jobHandlerWorking){
             terminal.printInfo(Text.OBJECT_ROTATED);

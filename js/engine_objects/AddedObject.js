@@ -107,6 +107,8 @@ AddedObject.prototype.exportLightweight = function(){
   }
   this.mesh.updateMatrixWorld();
   var exportObject = new Object();
+  exportObject.isChangeable = this.isChangeable;
+  exportObject.isIntersectable = this.isIntersectable;
   if (!this.parentObjectName){
     exportObject.position = this.mesh.position.clone();
     exportObject.quaternion = this.mesh.quaternion.clone();
@@ -998,7 +1000,6 @@ AddedObject.prototype.rotate = function(axis, radians, fromScript){
   if (this.mesh.visible){
     rayCaster.updateObject(this);
   }
-
 }
 
 AddedObject.prototype.setPhysicsAfterRotationAroundPoint = function(axis, radians){

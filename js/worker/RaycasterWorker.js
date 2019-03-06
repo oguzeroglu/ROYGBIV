@@ -13,6 +13,9 @@ var IS_WORKER_CONTEXT = true;
 var RaycasterWorker = function(){
   this.reusableVector1 = new THREE.Vector3();
   this.reusableVector2 = new THREE.Vector3();
+  this.reusableQuaternion = new THREE.Quaternion();
+  this.reusableMatrix = new THREE.Matrix4();
+  this.reusableArray16 = new Array();
   this.rayCaster = new RayCaster();
 }
 RaycasterWorker.prototype.refresh = function(state){
@@ -26,25 +29,30 @@ RaycasterWorker.prototype.refresh = function(state){
   var idCounter = 0;
   var idResponse = [];
   this.workerIDsByObjectName = new Object();
+  this.objectsByWorkerID = new Object();
   for (var gsName in gridSystems){
     gridSystems[gsName].workerID = idCounter ++;
     idResponse.push({type: "gridSystem", name: gsName, id: gridSystems[gsName].workerID});
     this.workerIDsByObjectName[gsName] = gridSystems[gsName].workerID;
+    this.objectsByWorkerID[gridSystems[gsName].workerID] = gridSystems[gsName];
   }
   for (var objName in addedObjects){
     addedObjects[objName].workerID = idCounter ++;
     idResponse.push({type: "addedObject", name: objName, id: addedObjects[objName].workerID});
     this.workerIDsByObjectName[objName] = addedObjects[objName].workerID;
+    this.objectsByWorkerID[addedObjects[objName].workerID] = addedObjects[objName];
   }
   for (var objName in objectGroups){
     objectGroups[objName].workerID = idCounter ++;
     idResponse.push({type: "objectGroup", name: objName, id: objectGroups[objName].workerID});
     this.workerIDsByObjectName[objName] = objectGroups[objName].workerID;
+    this.objectsByWorkerID[objectGroups[objName].workerID] = objectGroups[objName];
   }
   for (var textName in addedTexts){
     addedTexts[textName].workerID = idCounter ++;
     idResponse.push({type: "addedText", name: textName, id: addedTexts[textName].workerID});
     this.workerIDsByObjectName[textName] = addedTexts[textName].workerID;
+    this.objectsByWorkerID[addedTexts[textName].workerID] = addedTexts[textName];
   }
   this.rayCaster.refresh();
   postMessage({type: "idResponse", ids: idResponse});
@@ -78,6 +86,20 @@ RaycasterWorker.prototype.showObjects = function(){
   for (var objName in objectGroups){
     this.rayCaster.show(objectGroups[objName]);
   }
+}
+RaycasterWorker.prototype.updateAddedObject = function(data){
+  var objID = data[1];
+  var obj = this.objectsByWorkerID[objID];
+  for (var i = 2; i<18; i++){
+    this.reusableArray16[i - 2] = data[i];
+  }
+  obj.mesh.matrixWorld.fromArray(this.reusableArray16);
+  obj.mesh.matrixWorld.decompose(this.reusableVector1, this.reusableQuaternion, this.reusableVector2);
+  obj.mesh.position.copy(this.reusableVector1);
+  obj.mesh.quaternion.copy(this.reusableQuaternion);
+  postMessage(data, [data.buffer]);
+  obj.updateBoundingBoxes();
+  this.rayCaster.updateObject(obj, true);
 }
 // A dummy function
 RaycasterWorker.prototype.onRaycasterCompleted = function(){
@@ -114,6 +136,13 @@ self.onmessage = function(msg){
       worker.showObjects();
     }
   }else{
-    worker.findIntersections(msg.data);
+    switch(msg.data.length){
+      case 8:
+        worker.findIntersections(msg.data);
+      return;
+      case 18:
+        worker.updateAddedObject(msg.data);
+      return;
+    }
   }
 }

@@ -54,7 +54,11 @@ RayCaster.prototype.refresh = function(){
   }
 }
 
-RayCaster.prototype.updateObject = function(obj){
+RayCaster.prototype.updateObject = function(obj, forceUpdate){
+  if (forceUpdate){
+    this.binHandler.updateObject(obj);
+    return;
+  }
   this.updateBuffer.set(obj.name, obj);
 }
 

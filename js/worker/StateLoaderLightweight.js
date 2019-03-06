@@ -60,6 +60,8 @@ StateLoaderLightweight.prototype.loadBoundingBoxes = function(){
   for (var objName in totalAddedObjectExports){
     var curExport = totalAddedObjectExports[objName];
     var addedObject = new AddedObject();
+    addedObject.isChangeable = curExport.isChangeable;
+    addedObject.isIntersectable = curExport.isIntersectable;
     addedObject.parentBoundingBoxIndex = curExport.parentBoundingBoxIndex;
     addedObject.lastUpdatePosition = new THREE.Vector3();
     addedObject.lastUpdateQuaternion = new THREE.Quaternion();
@@ -80,7 +82,7 @@ StateLoaderLightweight.prototype.loadBoundingBoxes = function(){
     for (var i = 0; i<curExport.vertices.length; i++){
       var curVertex = curExport.vertices[i];
       var vect = new THREE.Vector3(curVertex.x, curVertex.y, curVertex.z)
-      addedObject.vertices.push(vect);
+      addedObject.vertices.push(vect.clone());
       addedObject.transformedVertices.push(vect);
       bb.expandByPoint(vect);
     }
