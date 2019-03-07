@@ -2189,6 +2189,7 @@ StateLoader.prototype.resetProject = function(){
   if (!WORKERS_SUPPORTED){
     rayCaster = new RayCaster();
   }else{
+    rayCaster.worker.terminate();
     rayCaster = new RaycasterWorkerBridge();
   }
   areaBinHandler.isAreaBinHandler = true;
