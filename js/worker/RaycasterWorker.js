@@ -69,7 +69,7 @@ RaycasterWorker.prototype.findIntersections = function(data){
   }else{
     data[1] = -1;
   }
-  postMessage(data, [data.buffer]);
+  postMessage(data, data.buffer);
 }
 RaycasterWorker.prototype.hideObjects = function(){
   for (var objName in addedObjects){
@@ -97,7 +97,7 @@ RaycasterWorker.prototype.updateAddedObject = function(data){
   obj.mesh.matrixWorld.decompose(this.reusableVector1, this.reusableQuaternion, this.reusableVector2);
   obj.mesh.position.copy(this.reusableVector1);
   obj.mesh.quaternion.copy(this.reusableQuaternion);
-  postMessage(data, [data.buffer]);
+  postMessage(data, data.buffer);
   obj.updateBoundingBoxes();
   this.rayCaster.updateObject(obj, true);
 }
@@ -111,14 +111,14 @@ RaycasterWorker.prototype.updateObjectGroup = function(data){
   obj.mesh.matrixWorld.decompose(this.reusableVector1, this.reusableQuaternion, this.reusableVector2);
   obj.mesh.position.copy(this.reusableVector1);
   obj.mesh.quaternion.copy(this.reusableQuaternion);
-  postMessage(data, [data.buffer]);
+  postMessage(data, data.buffer);
   obj.updateBoundingBoxes();
   this.rayCaster.updateObject(obj, true);
 }
 RaycasterWorker.prototype.updateCameraOrientation = function(data){
   camera.position.set(data[2], data[3], data[4]);
   camera.quaternion.set(data[5], data[6], data[7], data[8]);
-  postMessage(data, [data.buffer]);
+  postMessage(data, data.buffer);
 }
 // A dummy function
 RaycasterWorker.prototype.onRaycasterCompleted = function(){

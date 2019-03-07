@@ -110,7 +110,7 @@ RaycasterWorkerBridge.prototype.issueUpdate = function(obj){
         buf[1] = i;
         buf[2] = camera.position.x; buf[3] = camera.position.y; buf[4] = camera.position.z;
         buf[5] = camera.quaternion.x; buf[6] = camera.quaternion.y; buf[7] = camera.quaternion.z; buf[8] = camera.quaternion.w;
-        rayCaster.worker.postMessage(buf, [buf.buffer]);
+        rayCaster.worker.postMessage(buf, buf.buffer);
         rayCaster.cameraOrientationUpdateBufferAvailibilities[i] = false;
         cameraOrientationUpdateBufferSent = true;
         return;
@@ -130,7 +130,7 @@ RaycasterWorkerBridge.prototype.issueUpdate = function(obj){
         buf[1] = i;
         buf[2] = rayCaster.idsByObjectNames[obj.name];
         buf.set(obj.mesh.matrixWorld.elements, 3);
-        rayCaster.worker.postMessage(buf, [buf.buffer]);
+        rayCaster.worker.postMessage(buf, buf.buffer);
         rayCaster.addedObjectsUpdateBufferAvailibilities[i] = false;
         return;
       }
@@ -146,7 +146,7 @@ RaycasterWorkerBridge.prototype.issueUpdate = function(obj){
         buf[1] = i;
         buf[2] = rayCaster.idsByObjectNames[obj.name];
         buf.set(obj.mesh.matrixWorld.elements, 3);
-        rayCaster.worker.postMessage(buf, [buf.buffer]);
+        rayCaster.worker.postMessage(buf, buf.buffer);
         objectGroupUpdateBuffer.bufferAvailibilities[i] = false;
         return;
       }
@@ -168,7 +168,7 @@ RaycasterWorkerBridge.prototype.findIntersections = function(from, direction, in
       ary[4] = direction.x; ary[5] = direction.y; ary[6] = direction.z;
       ary[7] = (intersectGridSystems? 1: 0)
       var buf = ary.buffer;
-      this.worker.postMessage(ary, [buf]);
+      this.worker.postMessage(ary, buf);
       this.intersectionTestBufferAvailibilities[i] = false;
       this.intersectionTestCallbackFunctions[i] = callbackFunction;
       sent = true;
