@@ -6,6 +6,10 @@ var RayCaster = function(){
   this.updateBuffer = new Map();
 }
 
+RayCaster.prototype.flush = function(){
+  
+}
+
 RayCaster.prototype.refresh = function(){
   if (!projectLoaded){
     return;

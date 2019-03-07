@@ -1,5 +1,6 @@
 var RaycasterWorkerBridge = function(){
   this.worker = new Worker("/js/worker/RaycasterWorker.js");
+  this.workerMessageHandler = new WorkerMessageHandler(this.worker);
   this.updateBuffer = new Map();
   this.hasUpdatedTexts = false;
   this.cameraOrientationUpdateBuffer = [new Float32Array(9), new Float32Array(9)];
@@ -18,8 +19,10 @@ var RaycasterWorkerBridge = function(){
         }else if (msg.data.ids[i].type == "addedObject"){
           rayCaster.objectsByWorkerID[msg.data.ids[i].id] = addedObjects[msg.data.ids[i].name];
           rayCaster.idsByObjectNames[msg.data.ids[i].name] = msg.data.ids[i].id;
-          rayCaster.addedObjectsUpdateBuffer.push(new Float32Array(19), new Float32Array(19), new Float32Array(19));
-          rayCaster.addedObjectsUpdateBufferAvailibilities.push(true, true, true);
+          for (var x = 0; x<10; x++){
+            rayCaster.addedObjectsUpdateBuffer.push(new Float32Array(19));
+            rayCaster.addedObjectsUpdateBufferAvailibilities.push(true);
+          }
         }else if (msg.data.ids[i].type == "objectGroup"){
           rayCaster.objectsByWorkerID[msg.data.ids[i].id] = objectGroups[msg.data.ids[i].name];
           rayCaster.idsByObjectNames[msg.data.ids[i].name] = msg.data.ids[i].id;
@@ -36,36 +39,36 @@ var RaycasterWorkerBridge = function(){
         }
       }
     }else{
-      switch (msg.data.length){
-        case 8:
-          rayCaster.intersectionTestBuffers[msg.data[0]] = msg.data;
-          rayCaster.intersectionTestBufferAvailibilities[msg.data[0]] = true;
-          if (msg.data[1] > -1){
-            var intersectedObj = rayCaster.objectsByWorkerID[msg.data[1]];
+      for (var i = 0; i<msg.data.length; i++){
+        var ary = new Float32Array(msg.data[i]);
+        if (ary.length == 8){
+          rayCaster.intersectionTestBuffers[ary[0]] = ary;
+          rayCaster.intersectionTestBufferAvailibilities[ary[0]] = true;
+          if (ary[1] > -1){
+            var intersectedObj = rayCaster.objectsByWorkerID[ary[1]];
             intersectionObject = intersectedObj.name;
-            REUSABLE_VECTOR.set(msg.data[2], msg.data[3], msg.data[4]);
+            REUSABLE_VECTOR.set(ary[2], ary[3], ary[4]);
             intersectionPoint = REUSABLE_VECTOR;
-            rayCaster.intersectionTestCallbackFunctions[msg.data[0]](intersectionPoint.x, intersectionPoint.y, intersectionPoint.z, intersectedObj);
+            rayCaster.intersectionTestCallbackFunctions[ary[0]](intersectionPoint.x, intersectionPoint.y, intersectionPoint.z, intersectedObj);
           }else{
-            rayCaster.intersectionTestCallbackFunctions[msg.data[0]](0, 0, 0, null);
+            rayCaster.intersectionTestCallbackFunctions[ary[0]](0, 0, 0, null);
           }
-        return;
-        default:
-          if (msg.data[0] == 0){
-            var bufID = msg.data[1];
-            rayCaster.addedObjectsUpdateBuffer[bufID] = msg.data;
+        }else{
+          if (ary[0] == 0){
+            var bufID = ary[1];
+            rayCaster.addedObjectsUpdateBuffer[bufID] = ary;
             rayCaster.addedObjectsUpdateBufferAvailibilities[bufID] = true;
-          }else if (msg.data[0] == 1){
-            var obj = rayCaster.objectsByWorkerID[msg.data[2]];
-            var bufID = msg.data[1];
-            rayCaster.objectGroupsUpdateBuffer[obj.name].buffers[bufID] = msg.data;
+          }else if (ary[0] == 1){
+            var obj = rayCaster.objectsByWorkerID[ary[2]];
+            var bufID = ary[1];
+            rayCaster.objectGroupsUpdateBuffer[obj.name].buffers[bufID] = ary;
             rayCaster.objectGroupsUpdateBuffer[obj.name].bufferAvailibilities[bufID] = true;
-          }else if (msg.data[0] == 2){
-            var bufID = msg.data[1];
-            rayCaster.cameraOrientationUpdateBuffer[bufID] = msg.data;
+          }else if (ary[0] == 2){
+            var bufID = ary[1];
+            rayCaster.cameraOrientationUpdateBuffer[bufID] = ary;
             rayCaster.cameraOrientationUpdateBufferAvailibilities[bufID] = true;
           }
-        return;
+        }
       }
     }
   });
@@ -84,6 +87,10 @@ var RaycasterWorkerBridge = function(){
       "shiftPress": {isPressed: isPressed}
     })
   }
+}
+
+RaycasterWorkerBridge.prototype.flush = function(){
+  this.workerMessageHandler.flush();
 }
 
 RaycasterWorkerBridge.prototype.refresh = function(){
@@ -110,7 +117,7 @@ RaycasterWorkerBridge.prototype.issueUpdate = function(obj){
         buf[1] = i;
         buf[2] = camera.position.x; buf[3] = camera.position.y; buf[4] = camera.position.z;
         buf[5] = camera.quaternion.x; buf[6] = camera.quaternion.y; buf[7] = camera.quaternion.z; buf[8] = camera.quaternion.w;
-        rayCaster.worker.postMessage(buf, buf.buffer);
+        rayCaster.workerMessageHandler.push(buf.buffer);
         rayCaster.cameraOrientationUpdateBufferAvailibilities[i] = false;
         cameraOrientationUpdateBufferSent = true;
         return;
@@ -130,7 +137,7 @@ RaycasterWorkerBridge.prototype.issueUpdate = function(obj){
         buf[1] = i;
         buf[2] = rayCaster.idsByObjectNames[obj.name];
         buf.set(obj.mesh.matrixWorld.elements, 3);
-        rayCaster.worker.postMessage(buf, buf.buffer);
+        rayCaster.workerMessageHandler.push(buf.buffer);
         rayCaster.addedObjectsUpdateBufferAvailibilities[i] = false;
         return;
       }
@@ -146,7 +153,7 @@ RaycasterWorkerBridge.prototype.issueUpdate = function(obj){
         buf[1] = i;
         buf[2] = rayCaster.idsByObjectNames[obj.name];
         buf.set(obj.mesh.matrixWorld.elements, 3);
-        rayCaster.worker.postMessage(buf, buf.buffer);
+        rayCaster.workerMessageHandler.push(buf.buffer);
         objectGroupUpdateBuffer.bufferAvailibilities[i] = false;
         return;
       }
@@ -168,7 +175,7 @@ RaycasterWorkerBridge.prototype.findIntersections = function(from, direction, in
       ary[4] = direction.x; ary[5] = direction.y; ary[6] = direction.z;
       ary[7] = (intersectGridSystems? 1: 0)
       var buf = ary.buffer;
-      this.worker.postMessage(ary, buf);
+      rayCaster.workerMessageHandler.push(buf);
       this.intersectionTestBufferAvailibilities[i] = false;
       this.intersectionTestCallbackFunctions[i] = callbackFunction;
       sent = true;

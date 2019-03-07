@@ -55,6 +55,7 @@ function renderScene(){
 function updateRaycaster(){
   rayCaster.updateBuffer.forEach(rayCaster.issueUpdate);
   rayCaster.updateBuffer.clear();
+  rayCaster.flush();
 }
 
 function updateAddedTexts(){

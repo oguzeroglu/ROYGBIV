@@ -6,6 +6,7 @@ importScripts("../engine_objects/GridSystem.js");
 importScripts("../engine_objects/AddedObject.js");
 importScripts("../engine_objects/ObjectGroup.js");
 importScripts("../engine_objects/AddedText.js");
+importScripts("../worker/WorkerMessageHandler.js");
 
 var IS_WORKER_CONTEXT = true;
 
@@ -17,6 +18,7 @@ var RaycasterWorker = function(){
   this.reusableMatrix = new THREE.Matrix4();
   this.reusableArray16 = new Array();
   this.rayCaster = new RayCaster();
+  this.workerMessageHandler = new WorkerMessageHandler();
 }
 RaycasterWorker.prototype.refresh = function(state){
   gridSystems = new Object();
@@ -69,7 +71,7 @@ RaycasterWorker.prototype.findIntersections = function(data){
   }else{
     data[1] = -1;
   }
-  postMessage(data, data.buffer);
+  this.workerMessageHandler.push(data.buffer);
 }
 RaycasterWorker.prototype.hideObjects = function(){
   for (var objName in addedObjects){
@@ -97,7 +99,7 @@ RaycasterWorker.prototype.updateAddedObject = function(data){
   obj.mesh.matrixWorld.decompose(this.reusableVector1, this.reusableQuaternion, this.reusableVector2);
   obj.mesh.position.copy(this.reusableVector1);
   obj.mesh.quaternion.copy(this.reusableQuaternion);
-  postMessage(data, data.buffer);
+  this.workerMessageHandler.push(data.buffer);
   obj.updateBoundingBoxes();
   this.rayCaster.updateObject(obj, true);
 }
@@ -111,14 +113,14 @@ RaycasterWorker.prototype.updateObjectGroup = function(data){
   obj.mesh.matrixWorld.decompose(this.reusableVector1, this.reusableQuaternion, this.reusableVector2);
   obj.mesh.position.copy(this.reusableVector1);
   obj.mesh.quaternion.copy(this.reusableQuaternion);
-  postMessage(data, data.buffer);
+  this.workerMessageHandler.push(data.buffer);
   obj.updateBoundingBoxes();
   this.rayCaster.updateObject(obj, true);
 }
 RaycasterWorker.prototype.updateCameraOrientation = function(data){
   camera.position.set(data[2], data[3], data[4]);
   camera.quaternion.set(data[5], data[6], data[7], data[8]);
-  postMessage(data, data.buffer);
+  this.workerMessageHandler.push(data.buffer);
 }
 // A dummy function
 RaycasterWorker.prototype.onRaycasterCompleted = function(){
@@ -155,19 +157,20 @@ self.onmessage = function(msg){
       worker.showObjects();
     }
   }else{
-    if (msg.data.length == 8){
-      worker.findIntersections(msg.data);
-      return;
+    for (var i = 0; i<msg.data.length; i++){
+      var ary = new Float32Array(msg.data[i]);
+      if (ary.length == 8){
+        worker.findIntersections(ary);
+      }else{
+        if (ary[0] == 0){
+          worker.updateAddedObject(ary);
+        }else if (ary[0] == 1){
+          worker.updateObjectGroup(ary);
+        }else if (ary[0] == 2){
+          worker.updateCameraOrientation(ary);
+        }
+      }
     }
-    if (msg.data[0] == 0){
-      worker.updateAddedObject(msg.data);
-      return;
-    }else if (msg.data[0] == 1){
-      worker.updateObjectGroup(msg.data);
-      return;
-    }else if (msg.data[0] == 2){
-      worker.updateCameraOrientation(msg.data);
-      return;
-    }
+    worker.workerMessageHandler.flush();
   }
 }
