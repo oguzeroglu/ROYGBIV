@@ -115,6 +115,11 @@ RaycasterWorker.prototype.updateObjectGroup = function(data){
   obj.updateBoundingBoxes();
   this.rayCaster.updateObject(obj, true);
 }
+RaycasterWorker.prototype.updateCameraOrientation = function(data){
+  camera.position.set(data[2], data[3], data[4]);
+  camera.quaternion.set(data[5], data[6], data[7], data[8]);
+  postMessage(data, [data.buffer]);
+}
 // A dummy function
 RaycasterWorker.prototype.onRaycasterCompleted = function(){
 }
@@ -157,8 +162,11 @@ self.onmessage = function(msg){
     if (msg.data[0] == 0){
       worker.updateAddedObject(msg.data);
       return;
-    }else if (msg.data[0] = 1){
+    }else if (msg.data[0] == 1){
       worker.updateObjectGroup(msg.data);
+      return;
+    }else if (msg.data[0] == 2){
+      worker.updateCameraOrientation(msg.data);
       return;
     }
   }

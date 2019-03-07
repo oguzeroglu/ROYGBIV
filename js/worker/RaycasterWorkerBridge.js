@@ -1,6 +1,9 @@
 var RaycasterWorkerBridge = function(){
-  this.worker = new Worker("../js/worker/RaycasterWorker.js");
+  this.worker = new Worker("/js/worker/RaycasterWorker.js");
   this.updateBuffer = new Map();
+  this.hasUpdatedTexts = false;
+  this.cameraOrientationUpdateBuffer = [new Float32Array(9), new Float32Array(9)];
+  this.cameraOrientationUpdateBufferAvailibilities = [true, true];
   this.worker.addEventListener("message", function(msg){
     if (msg.data.type){
       rayCaster.objectsByWorkerID = new Object();
@@ -15,15 +18,15 @@ var RaycasterWorkerBridge = function(){
         }else if (msg.data.ids[i].type == "addedObject"){
           rayCaster.objectsByWorkerID[msg.data.ids[i].id] = addedObjects[msg.data.ids[i].name];
           rayCaster.idsByObjectNames[msg.data.ids[i].name] = msg.data.ids[i].id;
-          rayCaster.addedObjectsUpdateBuffer.push(new Float32Array(19), new Float32Array(19));
-          rayCaster.addedObjectsUpdateBufferAvailibilities.push(true, true);
+          rayCaster.addedObjectsUpdateBuffer.push(new Float32Array(19), new Float32Array(19), new Float32Array(19));
+          rayCaster.addedObjectsUpdateBufferAvailibilities.push(true, true, true);
         }else if (msg.data.ids[i].type == "objectGroup"){
           rayCaster.objectsByWorkerID[msg.data.ids[i].id] = objectGroups[msg.data.ids[i].name];
           rayCaster.idsByObjectNames[msg.data.ids[i].name] = msg.data.ids[i].id;
           var childCount = Object.keys(objectGroups[msg.data.ids[i].name]).length;
           rayCaster.objectGroupsUpdateBuffer[msg.data.ids[i].name] = {
-            buffers: [new Float32Array(19), new Float32Array(19)],
-            bufferAvailibilities: [true, true]
+            buffers: [new Float32Array(19), new Float32Array(19), new Float32Array(19)],
+            bufferAvailibilities: [true, true, true]
           }
         }else if (msg.data.ids[i].type == "addedText"){
           rayCaster.objectsByWorkerID[msg.data.ids[i].id] = addedTexts[msg.data.ids[i].name];
@@ -57,6 +60,10 @@ var RaycasterWorkerBridge = function(){
             var bufID = msg.data[1];
             rayCaster.objectGroupsUpdateBuffer[obj.name].buffers[bufID] = msg.data;
             rayCaster.objectGroupsUpdateBuffer[obj.name].bufferAvailibilities[bufID] = true;
+          }else if (msg.data[0] == 2){
+            var bufID = msg.data[1];
+            rayCaster.cameraOrientationUpdateBuffer[bufID] = msg.data;
+            rayCaster.cameraOrientationUpdateBufferAvailibilities[bufID] = true;
           }
         return;
       }
@@ -88,9 +95,32 @@ RaycasterWorkerBridge.prototype.refresh = function(){
 
 RaycasterWorkerBridge.prototype.updateObject = function(obj){
   this.updateBuffer.set(obj.name, obj);
+  if(obj.isAddedText){
+    this.hasUpdatedTexts = true;
+  }
 }
 
 RaycasterWorkerBridge.prototype.issueUpdate = function(obj){
+  if (rayCaster.hasUpdatedTexts){
+    var cameraOrientationUpdateBufferSent = false;
+    for (var i = 0; i<rayCaster.cameraOrientationUpdateBuffer.length; i++){
+      if (rayCaster.cameraOrientationUpdateBufferAvailibilities[i]){
+        var buf = rayCaster.cameraOrientationUpdateBuffer[i];
+        buf[0] = 2;
+        buf[1] = i;
+        buf[2] = camera.position.x; buf[3] = camera.position.y; buf[4] = camera.position.z;
+        buf[5] = camera.quaternion.x; buf[6] = camera.quaternion.y; buf[7] = camera.quaternion.z; buf[8] = camera.quaternion.w;
+        rayCaster.worker.postMessage(buf, [buf.buffer]);
+        rayCaster.cameraOrientationUpdateBufferAvailibilities[i] = false;
+        cameraOrientationUpdateBufferSent = true;
+        return;
+      }
+    }
+    if (!cameraOrientationUpdateBufferSent){
+      console.error("[!] RaycasterWorkerBridge.issueUpdate camera orientation buffer overflow.");
+    }
+    this.hasUpdatedTexts = false;
+  }
   if (obj.isAddedObject){
     var len = rayCaster.addedObjectsUpdateBuffer.length;
     for (var i = 0; i < len; i++){
@@ -122,6 +152,8 @@ RaycasterWorkerBridge.prototype.issueUpdate = function(obj){
       }
     }
     console.error("[!] RaycasterWorkerBridge.issueUpdate object group buffer overflow.");
+  }else if (obj.isAddedText){
+
   }
 }
 
