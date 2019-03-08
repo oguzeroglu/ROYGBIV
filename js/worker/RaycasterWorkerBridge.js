@@ -160,7 +160,7 @@ RaycasterWorkerBridge.prototype.refresh = function(){
 }
 
 RaycasterWorkerBridge.prototype.updateObject = function(obj){
-  if (mode == 1 && (object.isAddedObject || object.isObjectGroup) && !obj.isIntersectable){
+  if (mode == 1 && (obj.isAddedObject || obj.isObjectGroup) && !obj.isIntersectable){
     return;
   }
   this.updateBuffer.set(obj.name, obj);

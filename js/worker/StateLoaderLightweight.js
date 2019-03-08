@@ -169,6 +169,7 @@ StateLoaderLightweight.prototype.loadBoundingBoxes = function(){
     addedText.lastUpdateQuaternion = new THREE.Quaternion();
     addedText.lastUpdatePosition = new THREE.Vector3();
     addedText.lastUpdateCameraPosition = new THREE.Vector3();
+    addedText.isClickable = curExport.isClickable;
     addedText.handleBoundingBox();
     addedTexts[textName] = addedText;
   }

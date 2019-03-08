@@ -171,6 +171,7 @@ AddedText.prototype.exportLightweight = function(){
   exportObj.bottomRight = this.bottomRight;
   exportObj.position = this.mesh.position;
   exportObj.initPosition = this.position;
+  exportObj.isClickable = this.isClickable;
   return exportObj;
 }
 
@@ -458,6 +459,9 @@ AddedText.prototype.getCenterCoordinates = function(){
 
 AddedText.prototype.handleBoundingBox = function(){
   if (this.is2D){
+    return;
+  }
+  if (mode == 1 && !IS_WORKER_CONTEXT && rayCaster.isRaycasterWorkerBridge){
     return;
   }
   if (!this.boundingBox){
