@@ -329,5 +329,5 @@ RaycasterWorkerBridge.prototype.show = function(object){
 
 
 RaycasterWorkerBridge.prototype.query = function(point){
-  console.log("QUERY");
+  throw new Error("not implemented.");
 }
