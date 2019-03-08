@@ -7,6 +7,7 @@ var RaycasterWorkerBridge = function(){
   this.textBufferSize = 10;
   this.intersectionTestBufferSize = 10;
   this.cameraOrientationAndViewportBufferSize = 10;
+  this.hideShowBufferSize = 10;
 
   this.worker.addEventListener("message", function(msg){
     if (msg.data.type){
@@ -17,6 +18,8 @@ var RaycasterWorkerBridge = function(){
       rayCaster.objectGroupsUpdateBuffer = new Object();
       rayCaster.addedTextsUpdateBuffer = [];
       rayCaster.addedTextsUpdateBufferAvailibilities = [];
+      rayCaster.hideShowBuffer = [];
+      rayCaster.hideShowBufferAvailibilities = [];
       for (var i = 0; i<msg.data.ids.length; i++){
         if (msg.data.ids[i].type == "gridSystem"){
           rayCaster.objectsByWorkerID[msg.data.ids[i].id] = gridSystems[msg.data.ids[i].name];
@@ -28,6 +31,12 @@ var RaycasterWorkerBridge = function(){
             rayCaster.addedObjectsUpdateBuffer.push(new Float32Array(19));
             rayCaster.addedObjectsUpdateBufferAvailibilities.push(true);
           }
+          if (mode == 1 && addedObjects[msg.data.ids[i].name].isChangeable){
+            for (var x = 0; x<rayCaster.hideShowBufferSize; x++){
+              rayCaster.hideShowBuffer.push(new Float32Array(3));
+              rayCaster.hideShowBufferAvailibilities.push(true);
+            }
+          }
         }else if (msg.data.ids[i].type == "objectGroup"){
           rayCaster.objectsByWorkerID[msg.data.ids[i].id] = objectGroups[msg.data.ids[i].name];
           rayCaster.idsByObjectNames[msg.data.ids[i].name] = msg.data.ids[i].id;
@@ -38,6 +47,12 @@ var RaycasterWorkerBridge = function(){
           for (var x = 0; x<rayCaster.objectBufferSize; x++){
             rayCaster.objectGroupsUpdateBuffer[msg.data.ids[i].name].buffers.push(new Float32Array(19));
             rayCaster.objectGroupsUpdateBuffer[msg.data.ids[i].name].bufferAvailibilities.push(true);
+          }
+          if (mode == 1 && objectGroups[msg.data.ids[i].name].isChangeable){
+            for (var x = 0; x<rayCaster.hideShowBufferSize; x++){
+              rayCaster.hideShowBuffer.push(new Float32Array(3));
+              rayCaster.hideShowBufferAvailibilities.push(true);
+            }
           }
         }else if (msg.data.ids[i].type == "addedText"){
           rayCaster.objectsByWorkerID[msg.data.ids[i].id] = addedTexts[msg.data.ids[i].name];
@@ -87,6 +102,10 @@ var RaycasterWorkerBridge = function(){
             var bufID = ary[1];
             rayCaster.addedTextsUpdateBuffer[bufID] = ary;
             rayCaster.addedTextsUpdateBufferAvailibilities[bufID] = true;
+          }else if (ary[0] == 5 || ary[0] == 6){
+            var bufID = ary[1];
+            rayCaster.hideShowBuffer[bufID] = ary;
+            rayCaster.hideShowBufferAvailibilities[bufID] = true;
           }
         }
       }
@@ -264,12 +283,37 @@ RaycasterWorkerBridge.prototype.findIntersections = function(from, direction, in
 }
 
 RaycasterWorkerBridge.prototype.hide = function(object){
-  console.log("HIDE");
+  var len = this.hideShowBuffer.length;
+  for (var i = 0; i<len; i++){
+    if (this.hideShowBufferAvailibilities[i]){
+      var ary = this.hideShowBuffer[i];
+      ary[0] = 5;
+      ary[1] = i;
+      ary[2] = this.idsByObjectNames[object.name];
+      this.workerMessageHandler.push(ary.buffer);
+      this.hideShowBufferAvailibilities[i] = false;
+      return;
+    }
+  }
+  console.error("[!] RaycasterWorkerBridge.hide buffer overflow.");
 }
 
 RaycasterWorkerBridge.prototype.show = function(object){
-  console.log("SHOW");
+  var len = this.hideShowBuffer.length;
+  for (var i = 0; i<len; i++){
+    if (this.hideShowBufferAvailibilities[i]){
+      var ary = this.hideShowBuffer[i];
+      ary[0] = 6;
+      ary[1] = i;
+      ary[2] = this.idsByObjectNames[object.name];
+      this.workerMessageHandler.push(ary.buffer);
+      this.hideShowBufferAvailibilities[i] = false;
+      return;
+    }
+  }
+  console.error("[!] RaycasterWorkerBridge.show buffer overflow.");
 }
+
 
 RaycasterWorkerBridge.prototype.query = function(point){
   console.log("QUERY");

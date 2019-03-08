@@ -99,7 +99,6 @@ RaycasterWorker.prototype.updateAddedObject = function(data){
   obj.mesh.matrixWorld.decompose(this.reusableVector1, this.reusableQuaternion, this.reusableVector2);
   obj.mesh.position.copy(this.reusableVector1);
   obj.mesh.quaternion.copy(this.reusableQuaternion);
-  this.workerMessageHandler.push(data.buffer);
   obj.updateBoundingBoxes();
   this.rayCaster.updateObject(obj, true);
 }
@@ -113,7 +112,6 @@ RaycasterWorker.prototype.updateObjectGroup = function(data){
   obj.mesh.matrixWorld.decompose(this.reusableVector1, this.reusableQuaternion, this.reusableVector2);
   obj.mesh.position.copy(this.reusableVector1);
   obj.mesh.quaternion.copy(this.reusableQuaternion);
-  this.workerMessageHandler.push(data.buffer);
   obj.updateBoundingBoxes();
   this.rayCaster.updateObject(obj, true);
 }
@@ -138,12 +136,18 @@ RaycasterWorker.prototype.updateCameraOrientation = function(data){
   camera.position.set(data[2], data[3], data[4]);
   camera.quaternion.set(data[5], data[6], data[7], data[8]);
   camera.aspect = data[9];
-  this.workerMessageHandler.push(data.buffer);
 }
 RaycasterWorker.prototype.updateViewport = function(data){
   renderer.viewport.set(data[2], data[3], data[4], data[5]);
   screenResolution = data[6];
-  this.workerMessageHandler.push(data.buffer);
+}
+RaycasterWorker.prototype.hide = function(data){
+  var object = this.objectsByWorkerID[data[2]];
+  this.rayCaster.binHandler.hide(object);
+}
+RaycasterWorker.prototype.show = function(data){
+  var object = this.objectsByWorkerID[data[2]];
+  this.rayCaster.binHandler.show(object);
 }
 // A dummy function
 RaycasterWorker.prototype.onRaycasterCompleted = function(){
@@ -195,7 +199,12 @@ self.onmessage = function(msg){
           worker.updateViewport(ary);
         }else if (ary[0] == 4){
           worker.updateAddedText(ary);
+        }else if (ary[0] == 5){
+          worker.hide(ary);
+        }else if (ary[0] == 6){
+          worker.show(ary);
         }
+        worker.workerMessageHandler.push(ary.buffer);
       }
     }
     worker.workerMessageHandler.flush();
