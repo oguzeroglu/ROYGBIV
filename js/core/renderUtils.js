@@ -107,6 +107,9 @@ function updateObjectTrails(){
 }
 
 function runScripts(){
+  if(!rayCaster.ready){
+    return;
+  }
   if (isDeployment){
     deploymentScripts();
     return;

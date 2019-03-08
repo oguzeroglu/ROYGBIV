@@ -4,16 +4,21 @@ var RayCaster = function(){
   this.direction = new THREE.Vector3();
   this.oldPosition = new THREE.Vector3();
   this.updateBuffer = new Map();
+  this.ready = false;
+}
+
+RayCaster.prototype.onReady = function(){
+  this.ready = true;
 }
 
 RayCaster.prototype.flush = function(){
-
 }
 
 RayCaster.prototype.refresh = function(){
   if (!projectLoaded){
     return;
   }
+  this.ready = false;
   this.binHandler = new WorldBinHandler();
   for (var objName in addedObjects){
     var addedObject = addedObjects[objName];
@@ -56,6 +61,7 @@ RayCaster.prototype.refresh = function(){
       }
     }
   }
+  this.onReady();
 }
 
 RayCaster.prototype.updateObject = function(obj, forceUpdate){
@@ -67,7 +73,7 @@ RayCaster.prototype.updateObject = function(obj, forceUpdate){
 }
 
 RayCaster.prototype.onBeforeUpdate = function(){
-  
+
 }
 
 RayCaster.prototype.issueUpdate = function(obj){

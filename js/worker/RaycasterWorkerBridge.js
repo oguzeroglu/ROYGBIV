@@ -8,7 +8,7 @@ var RaycasterWorkerBridge = function(){
   this.intersectionTestBufferSize = 10;
   this.cameraOrientationAndViewportBufferSize = 10;
   this.hideShowBufferSize = 10;
-
+  this.ready = false;
   this.worker.addEventListener("message", function(msg){
     if (msg.data.type){
       rayCaster.objectsByWorkerID = new Object();
@@ -65,6 +65,7 @@ var RaycasterWorkerBridge = function(){
           throw new Error("Not implemented.");
         }
       }
+      rayCaster.onReady();
     }else{
       for (var i = 0; i<msg.data.length; i++){
         var ary = new Float32Array(msg.data[i]);
@@ -138,6 +139,10 @@ var RaycasterWorkerBridge = function(){
   }
 }
 
+RaycasterWorkerBridge.prototype.onReady = function(){
+  this.ready = true;
+}
+
 RaycasterWorkerBridge.prototype.flush = function(){
   this.workerMessageHandler.flush();
 }
@@ -146,6 +151,7 @@ RaycasterWorkerBridge.prototype.refresh = function(){
   if (!projectLoaded){
     return;
   }
+  this.ready = false;
   this.worker.postMessage(new LightweightState());
 }
 
@@ -298,7 +304,7 @@ RaycasterWorkerBridge.prototype.hide = function(object){
       return;
     }
   }
-  console.error("[!] RaycasterWorkerBridge.hide buffer overflow: ");
+  console.error("[!] RaycasterWorkerBridge.hide buffer overflow.");
 }
 
 RaycasterWorkerBridge.prototype.show = function(object){
