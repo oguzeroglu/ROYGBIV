@@ -159,8 +159,9 @@ var State = function(projectName, author){
   var octreeMaxZ = LIMIT_BOUNDING_BOX.max.z;
   this.octreeLimit = octreeMinX+","+octreeMinY+","+octreeMinZ+","+
                      octreeMaxX+","+octreeMaxY+","+octreeMaxZ;
-  // BIN SIZE ******************************************************
+  // BIN SIZE AND RAYCASTER STEP AMOUNT*****************************
   this.binSize = BIN_SIZE;
+  this.raycasterStepAmount = RAYCASTER_STEP_AMOUNT;
   // FOG ***********************************************************
   this.fogObj = {
     fogActive: fogActive,

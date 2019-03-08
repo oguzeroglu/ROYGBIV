@@ -175,7 +175,9 @@ if (!isDeployment){
       6, //newText
       1, //selectText
       1, //destroyText
-      0 //printTexts
+      0, //printTexts
+      1, //setRayStep
+      0 //printRayStep
   ];
   commandArgumentsExpectedExplanation = [
     "help", //help
@@ -335,7 +337,9 @@ if (!isDeployment){
     "newText textName fontName maxCharacterLength offsetX offsetY offsetZ", //newText
     "selectText textName", //selectText
     "destroyText textName", //destroyText
-    "printTexts" //printTexts
+    "printTexts", //printTexts
+    "setRayStep stepAmount", //setRayStep
+    "printRayStep"
   ];
   commands = [
     "help",
@@ -495,7 +499,9 @@ if (!isDeployment){
     "newText",
     "selectText",
     "destroyText",
-    "printTexts"
+    "printTexts",
+    "setRayStep",
+    "printRayStep"
   ];
   commandInfo = [
     "help: Prints command list.",
@@ -655,7 +661,9 @@ if (!isDeployment){
     "newText: Allocates a new text object.",
     "selectText: Selects a text for modification.",
     "destroyText: Destroys a text.",
-    "printTexts: Prints a list of created texts."
+    "printTexts: Prints a list of created texts.",
+    "setRayStep: Sets the step amount used by the Raycaster while detecting intersections. Small step amount means more precise intersection\n  detection but worse performance. Default value is 32.",
+    "printRayStep: Prints the ray step amount."
   ];
   keyboardInfo = [
     "W/S : Translates the camera on axis Z.",
@@ -942,6 +950,7 @@ var LIMIT_BOUNDING_BOX = new THREE.Box3(new THREE.Vector3(-4000, -4000, -4000), 
 var DEFAULT_OBJECT_OCTREE_SEGMENTS = 2;
 var DEFAULT_OCTREE_MAX_DEPTH = 8;
 var BIN_SIZE = 50;
+var RAYCASTER_STEP_AMOUNT = 32;
 var INTERSECTION_NORMAL = new THREE.Vector3();
 var MAX_PARTICLE_SYSTEM_COUNT = 1000; // MUST BE DIVISIBLE BY 10
 var MAX_PARTICLE_COLLISION_LISTEN_COUNT = 10000;

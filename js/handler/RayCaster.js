@@ -150,7 +150,7 @@ RayCaster.prototype.findIntersections = function(from, direction, intersectGridS
       }
     }
     this.oldPosition.copy(this.origin);
-    this.origin.addScaledVector(this.direction, 32);
+    this.origin.addScaledVector(this.direction, RAYCASTER_STEP_AMOUNT);
     iterate = LIMIT_BOUNDING_BOX.containsPoint(this.origin);
   }
   callbackFunction(0, 0, 0, null);

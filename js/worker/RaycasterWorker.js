@@ -160,6 +160,7 @@ var screenResolution = 1;
 var camera = new Object();
 var LIMIT_BOUNDING_BOX = new THREE.Box3(new THREE.Vector3(-4000, -4000, -4000), new THREE.Vector3(4000, 4000, 4000));
 var BIN_SIZE = 50;
+var RAYCASTER_STEP_AMOUNT = 32;
 var REUSABLE_LINE = new THREE.Line3();
 var REUSABLE_VECTOR = new THREE.Vector3();
 var REUSABLE_VECTOR_2 = new THREE.Vector3();

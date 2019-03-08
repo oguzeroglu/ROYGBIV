@@ -663,6 +663,11 @@ var CommandDescriptor = function(){
   this.destroyText.types = [];
   this.destroyText.types.push(this.TEXT_NAME); // textName
 
+  // setRayStep
+  this.setRayStep = new Object();
+  this.setRayStep.types = [];
+  this.setRayStep.types.push(this.UNKNOWN_INDICATOR); // stepAmount
+
 };
 
 CommandDescriptor.prototype.test = function(){

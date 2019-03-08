@@ -4894,6 +4894,29 @@ function parse(input){
           }
           return true;
         break;
+        case 158: //setRayStep
+          if  (mode != 0){
+            terminal.printError(Text.WORKS_ONLY_IN_DESIGN_MODE);
+          }
+          var stepAmount = parseFloat(splitted[1]);
+          if (isNaN(stepAmount)){
+            terminal.printError(Text.IS_NOT_A_NUMBER.replace(Text.PARAM1, "stepAmount"));
+            return true;
+          }
+          if (stepAmount <= 0){
+            terminal.printError(Text.MUST_BE_GREATER_THAN.replace(Text.PARAM1, "stepAmount").replace(Text.PARAM2, "0"));
+            return true;
+          }
+          RAYCASTER_STEP_AMOUNT = stepAmount;
+          terminal.printInfo(Text.RAYCASTER_STEP_AMOUNT_SET_TO.replace(Text.PARAM1, RAYCASTER_STEP_AMOUNT));
+          rayCaster.refresh();
+          return true;
+        break;
+        case 159: //printRayStep
+          terminal.printHeader(Text.RAYCASTER_STEP_AMOUNT);
+          terminal.printInfo(Text.TREE.replace(Text.PARAM1, RAYCASTER_STEP_AMOUNT));
+          return true;
+        break;
       }
       return true;
     }catch(err){

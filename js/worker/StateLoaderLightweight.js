@@ -23,6 +23,8 @@ StateLoaderLightweight.prototype.loadWorldLimits = function(){
   LIMIT_BOUNDING_BOX.min.set(octreeLimit.minX, octreeLimit.minY, octreeLimit.minZ);
   LIMIT_BOUNDING_BOX.max.set(octreeLimit.maxX, octreeLimit.maxY, octreeLimit.maxZ);
   BIN_SIZE = this.state.binSize;
+  RAYCASTER_STEP_AMOUNT = this.state.raycasterStepAmount;
+  console.log(RAYCASTER_STEP_AMOUNT);
 }
 
 StateLoaderLightweight.prototype.loadBoundingBoxes = function(){

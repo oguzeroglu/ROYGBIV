@@ -984,8 +984,12 @@ StateLoader.prototype.load = function(){
       octreeLimitInfoSplitted[3], octreeLimitInfoSplitted[4], octreeLimitInfoSplitted[5]
     );
     LIMIT_BOUNDING_BOX = new THREE.Box3(lowerBound, upperBound);
-    // BIN SIZE ****************************************************
+    // BIN SIZE AND STEP AMOUNT*************************************
     BIN_SIZE = parseInt(obj.binSize);
+    RAYCASTER_STEP_AMOUNT = parseFloat(obj.raycasterStepAmount);
+    if (isNaN(RAYCASTER_STEP_AMOUNT)){
+      RAYCASTER_STEP_AMOUNT = 32;
+    }
     // FOG *********************************************************
     var fogObj = obj.fogObj;
     fogActive = fogObj.fogActive;
@@ -2298,7 +2302,7 @@ StateLoader.prototype.resetProject = function(){
 
   LIMIT_BOUNDING_BOX = new THREE.Box3(new THREE.Vector3(-4000, -4000, -4000), new THREE.Vector3(4000, 4000, 4000));
   BIN_SIZE = 50;
-
+  RAYCASTER_STEP_AMOUNT = 32;
   geometryCache = new Object();
   physicsShapeCache = new Object();
 

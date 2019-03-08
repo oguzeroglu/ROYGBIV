@@ -9,6 +9,8 @@ var LightweightState = function(){
   }
   // BIN SIZE
   this.binSize = BIN_SIZE;
+  // RAYCASTER STEP AMOUNT
+  this.raycasterStepAmount = RAYCASTER_STEP_AMOUNT;
   // VIEWPORT
   var vp = renderer.getCurrentViewport();
   this.viewport = {x: vp.x, y: vp.y, z: vp.z, w: vp.w}
