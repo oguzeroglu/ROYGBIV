@@ -172,6 +172,9 @@ Grid.prototype.toggleSelect = function(sliced, printInfo, fromStateLoader, allAt
     scene.add(this.mesh);
     scene.add(this.dot);
     gridSelections[this.name] = this;
+    if (keyboardBuffer["."]){
+      this.renderCornerHelpers();
+    }
   }
   this.selected = ! this.selected;
   if (sliced){

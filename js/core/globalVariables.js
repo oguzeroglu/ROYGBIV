@@ -751,6 +751,16 @@ var isScreenVisible = true;
 var inactiveCounter = 0;
 var maxInactiveTime = 0;
 
+// EVENT HANDLERS
+var touchEventHandler;
+var pointerLockEventHandler;
+var fullScreenEventHandler;
+var visibilityChangeEventHandler;
+var mouseEventHandler;
+var resizeEventHandler;
+var orientationChangeEventHandler;
+var keyboardEventHandler;
+
 // STATS.JS
 var stats;
 var fpsHandler;

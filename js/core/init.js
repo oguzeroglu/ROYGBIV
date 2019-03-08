@@ -12,53 +12,6 @@ window.onload = function() {
   scriptCreatorCancelButton = document.getElementById("scriptCreatorCancelButton");
   scriptCreatorSaveButton = document.getElementById("scriptCreatorSaveButton");
   scriptCreatorTextArea = document.getElementById("scriptCreatorTextArea");
-  if (!isDeployment){
-    scriptCreatorTextArea.onkeydown = function(e){
-      if(e.keyCode==9 || e.which==9){
-        e.preventDefault();
-        var s = this.selectionStart;
-        this.value = this.value.substring(0,this.selectionStart) + "\t" + this.value.substring(this.selectionEnd);
-        this.selectionEnd = s+1;
-      }
-    }
-    cliDiv.addEventListener("click", function(){
-      cliFocused = true;
-      omGUIFocused = false;
-      tmGUIFocused = false;
-      inactiveCounter = 0;
-      if (keyboardBuffer["Shift"] && mode == 0){
-        keyboardBuffer["Shift"] = false;
-        for (var objName in addedObjects){
-          addedObjects[objName].mesh.visible = true;
-        }
-        for (var objName in objectGroups){
-          objectGroups[objName].mesh.visible = true;
-        }
-        for (var textName in addedTexts){
-          addedTexts[textName].show();
-        }
-        if (WORKERS_SUPPORTED){
-          rayCaster.onShiftPress(false);
-        }
-      }
-    });
-    cliDiv.addEventListener("mousemove", function(event){
-      inactiveCounter = 0;
-    });
-
-    terminalDiv.addEventListener("mousewheel", function(e){
-      e.preventDefault();
-      e.stopPropagation();
-    });
-    if (typeof InstallTrigger !== 'undefined') {
-      // M O Z I L L A
-      terminalDiv.addEventListener("wheel", function(e){
-        e.preventDefault();
-        e.stopPropagation();
-      });
-    }
-    dragElement(cliDiv);
-  }
 
   // SELECTION HANDLER
   if (!isDeployment){
@@ -83,17 +36,12 @@ window.onload = function() {
     }
   }
 
-  pointerLockSupported = 'pointerLockElement' in document ||
-                         'mozPointerLockElement' in document ||
-                         'webkitPointerLockElement' in document;
-
   // DEFAULT FONT
   document.fonts.forEach(function(font){
     if (font.family == "hack"){
       defaultFont = new Font(null, null, null, null, font);
     }
   });
-
 
   // COMMAND DESCRIPTOR
   if (!isDeployment){
@@ -158,144 +106,7 @@ window.onload = function() {
   loadInput = $("#loadInput");
   // 3D CANVAS
   canvas = document.getElementById("rendererCanvas");
-  canvas.requestPointerLock = canvas.requestPointerLock ||
-                              canvas.mozRequestPointerLock ||
-                              canvas.webkitRequestPointerLock;
-  var pointerLockChangeFunction = 0;
-  if ("onpointerlockchange" in document){
-    pointerLockChangeFunction = "pointerlockchange";
-  }else if ("onmozpointerlockchange" in document){
-    pointerLockChangeFunction = "mozpointerlockchange";
-  }else if ("onwebkitpointerlockchange" in document){
-    pointerLockChangeFunction = "webkitpointerlockchange";
-  }
-  if (pointerLockChangeFunction){
-    document.addEventListener(pointerLockChangeFunction, function(event){
-      if (mode == 1 && screenPointerLockChangedCallbackFunction){
-        if (document.pointerLockElement == canvas ||
-              document.mozPointerLockElement == canvas ||
-                document.webkitPointerLockElement == canvas){
-          screenPointerLockChangedCallbackFunction(true);
-        }else{
-          screenPointerLockChangedCallbackFunction(false);
-        }
-      }
-    });
-  }
-  canvas.onfullscreenchange = function(event){
-    if (document.fullscreenElement == canvas){
-      onFullScreen = true;
-      if (mode == 1 && screenFullScreenChangeCallbackFunction){
-        screenFullScreenChangeCallbackFunction(true);
-      }
-    }else{
-      onFullScreen = false;
-      if (mode == 1 && screenFullScreenChangeCallbackFunction){
-        screenFullScreenChangeCallbackFunction(false);
-      }
-    }
-  }
-  var hiddenText, visibilityChange;
-  if (!(typeof document.hidden == UNDEFINED)){
-    hiddenText = "hidden";
-    visibilityChange = "visibilitychange";
-  }else if (!(typeof document.mozHidden == UNDEFINED)){
-    hiddenText = "mozHidden";
-    visibilityChange = "mozvisibilitychange";
-  }else if (!(typeof document.msHidden == UNDEFINED)){
-    hiddenText = "msHidden";
-    visibilityChange = "msvisibilitychange";
-  }else if (!(typeof document.webkitHidden == UNDEFINED)){
-    hiddenText = "webkitHidden";
-    visibilityChange = "webkitvisibilitychange";
-  }
-  document.addEventListener(visibilityChange, function(){
-    isScreenVisible = !(document[hiddenText]);
-  }, false);
-  canvas.addEventListener("click", function(event){
-    inactiveCounter = 0;
-    cliFocused = false;
-    omGUIFocused = false;
-    tmGUIFocused = false;
-    if (windowLoaded){
-      var rect = renderer.getCurrentViewport();
-      var rectX = rect.x, rectY = rect.y, rectZ = rect.z, rectW = rect.w;
-      if (screenResolution != 1){
-        rectX = rectX / screenResolution;
-        rectY = rectY / screenResolution;
-        rectZ = rectZ / screenResolution;
-        rectW = rectW / screenResolution;
-      }
-      var coordX = ((event.clientX - rectX) / rectZ) * 2 - 1;
-      var coordY = - ((event.clientY - rectY) / rectW) * 2 + 1;
-      if (mode == 1 && screenClickCallbackFunction){
-        screenClickCallbackFunction(coordX, coordY);
-      }
-      if (mode == 1 && pointerLockSupported && pointerLockRequested){
-        canvas.requestPointerLock();
-        pointerLockRequested = false;
-      }
-      if (mode == 1 && fullScreenRequested){
-        if (canvas.requestFullscreen){
-          canvas.requestFullscreen();
-        } else if (canvas.mozRequestFullScreen){
-          canvas.mozRequestFullScreen();
-        } else if (canvas.webkitRequestFullscreen){
-          canvas.webkitRequestFullscreen();
-        } else if (canvas.msRequestFullscreen){
-          canvas.msRequestFullscreen();
-        }
-        fullScreenRequested = false;
-      }
-      if (mode == 1 && isPaused){
-        return;
-      }
-      if (event.clientX < rectX || event.clientX > rectX + rectZ || event.clientY < rectY || event.clientY > rectY + rectW){
-        return;
-      }
-      // TRY TO PICK 2D OBJECTS FIRST
-      objectPicker2D.find(event.clientX, event.clientY);
-      if (!intersectionPoint){
-        REUSABLE_VECTOR.setFromMatrixPosition(camera.matrixWorld);
-        REUSABLE_VECTOR_2.set(coordX, coordY, 0.5).unproject(camera).sub(REUSABLE_VECTOR).normalize();
-        rayCaster.findIntersections(REUSABLE_VECTOR, REUSABLE_VECTOR_2, (mode == 0), onRaycasterIntersection);
-      }
-    }
-  });
-
-  canvas.addEventListener("mousedown", function(event){
-    inactiveCounter = 0;
-    if (mode == 1 && screenMouseDownCallbackFunction){
-      var rect = boundingClientRect;
-      var coordX = ((event.clientX - rect.left) / rect.width) * 2 - 1;
-      var coordY = - ((event.clientY - rect.top) / rect.height) * 2 + 1;
-      screenMouseDownCallbackFunction(coordX, coordY);
-    }
-    isMouseDown = true;
-  });
-  canvas.addEventListener("mouseup", function(event){
-    inactiveCounter = 0;
-    if (mode == 1 && screenMouseUpCallbackFunction){
-      var rect = boundingClientRect;
-      var coordX = ((event.clientX - rect.left) / rect.width) * 2 - 1;
-      var coordY = - ((event.clientY - rect.top) / rect.height) * 2 + 1;
-      screenMouseUpCallbackFunction(coordX, coordY);
-    }
-    isMouseDown = false;
-  });
-  canvas.addEventListener("mousemove", function(event){
-    inactiveCounter = 0;
-    if (mode == 1 && screenMouseMoveCallbackFunction){
-      var rect = boundingClientRect;
-      var coordX = ((event.clientX - rect.left) / rect.width) * 2 - 1;
-      var coordY = - ((event.clientY - rect.top) / rect.height) * 2 + 1;
-      var movementX = event.movementX || event.mozMovementX ||
-                      event.webkitMovementX || 0;
-      var movementY = event.movementY || event.mozMovementY ||
-                      event.webkitMovementY || 0;
-      screenMouseMoveCallbackFunction(coordX, coordY, movementX, movementY);
-    }
-  });
+  onCanvasInitiated();
 
   // INITIALIZE THREE.JS SCENE AND RENDERER
   scene = new THREE.Scene();
@@ -342,158 +153,78 @@ window.onload = function() {
   }
 };
 
-window.addEventListener('mousewheel', mouseWheelEvent, false);
-if (typeof InstallTrigger !== 'undefined') {
-  // M O Z I L L A
-  window.addEventListener('wheel', mouseWheelEvent, false);
+
+function initBadTV(){
+ renderPass = new THREE.RenderPass(scene, camera);
+ if (mode == 1){
+  bloomPass = new THREE.UnrealBloomPass(
+    new THREE.Vector2(
+      renderer.getCurrentViewport().z * bloomResolutionScale,
+      renderer.getCurrentViewport().w * bloomResolutionScale
+    ),
+    bloomStrength,
+    bloomRadius,
+    bloomThreshold
+  );
+ }
+ copyPass = new THREE.ShaderPass( THREE.CopyShader );
+ setPostProcessingParams();
+ composer = new THREE.EffectComposer(renderer);
+ composer.setSize(renderer.getCurrentViewport().z / screenResolution, renderer.getCurrentViewport().w / screenResolution);
+ composer.addPass( renderPass );
+ if (mode == 1){
+  if (bloomOn){
+    composer.addPass( bloomPass );
+    bloomPass.renderToScreen = true;
+  }
+ }
+ if (!(mode == 1 && bloomOn)){
+    composer.addPass( copyPass );
+    copyPass.renderToScreen = true;
+ }
+ setPostProcessingParams();
 }
-window.addEventListener('resize', resizeFunction);
-if (isMobile){
-  window.addEventListener('orientationchange', resizeFunction);
+
+function setPostProcessingParams(){
+ if (mode == 1){
+  if (bloomOn){
+    bloomPass.strength = bloomStrength;
+    bloomPass.radius = bloomRadius;
+    bloomPass.threshold = bloomThreshold;
+    bloomPass.resolution = new THREE.Vector2(
+      window.innerWidth * bloomResolutionScale,
+      window.innerHeight * bloomResolutionScale
+    );
+  }
+ }
 }
-window.addEventListener('keydown', function(event){
-  inactiveCounter = 0;
 
-  if (!windowLoaded){
-    return;
-  }
+function initPhysics(){
+ physicsWorld.quatNormalizeSkip = quatNormalizeSkip;
+ physicsWorld.quatNormalizeFast = quatNormalizeFast;
+ physicsWorld.defaultContactMaterial.contactEquationStiffness = contactEquationStiffness;
+ physicsWorld.defaultContactMaterial.contactEquationRelaxation = contactEquationRelaxation;
+ physicsWorld.defaultContactMaterial.friction = friction;
+ physicsSolver.iterations = physicsIterations;
+ physicsSolver.tolerance = physicsTolerance;
+ physicsWorld.solver = physicsSolver;
+ physicsWorld.gravity.set(0, gravityY, 0);
+ physicsWorld.broadphase = new CANNON.SAPBroadphase(physicsWorld);
+}
 
-  if (cliFocused || omGUIFocused || tmGUIFocused){
-    return;
-  }
-
-  if (keyCodeToChar[event.keyCode]){
-    if (keyboardBuffer[keyCodeToChar[event.keyCode]]){
-      return;
-    }
-    keyboardBuffer[keyCodeToChar[event.keyCode]] = true;
-    if (mode == 1 && screenKeydownCallbackFunction && !isPaused){
-      screenKeydownCallbackFunction(keyCodeToChar[event.keyCode]);
-    }
-  }
-
-  if (mode == 0 && keyboardBuffer["."]){
-    for (var gridName in gridSelections){
-      gridSelections[gridName].renderCornerHelpers();
-    }
-  }
-
-  if (mode == 1 && isPaused){
-    return;
-  }
-  switch(event.keyCode){
-    case 16: //SHIFT
-      if (mode == 0 && !isDeployment){
-        selectionHandler.resetCurrentSelection();
-        for (var objName in addedObjects){
-          addedObjects[objName].mesh.visible = false;
-        }
-        for (var objName in objectGroups){
-          objectGroups[objName].mesh.visible = false;
-        }
-        for (var textName in addedTexts){
-          addedTexts[textName].hide();
-        }
-        if (WORKERS_SUPPORTED){
-          rayCaster.onShiftPress(true);
-        }
-      }
-    break;
-    case 8: //BACKSPACE
-      //FIREFOX GO BACK FIX
-      if (selectionHandler.getSelectedObject() && !cliFocused){
-        event.preventDefault();
-      }
-      if (mode == 1 || isDeployment){
-        return;
-      }
-      var currentSelection = selectionHandler.getSelectedObject();
-      if (currentSelection.isAddedObject){
-        delete addedObjects[currentSelection.name];
-        currentSelection.destroy();
-        terminal.clear();
-        terminal.printInfo(Text.OBJECT_DESTROYED);
-        selectionHandler.resetCurrentSelection();
-        if (areaConfigurationsVisible){
-          guiHandler.hide(datGuiAreaConfigurations);
-          areaConfigurationsVisible = false;
-        }
-      }else if (currentSelection.isObjectGroup){
-        delete objectGroups[currentSelection.name];
-        currentSelection.destroy();
-        selectionHandler.resetCurrentSelection();
-        terminal.clear();
-        terminal.printInfo(Text.OBJECT_DESTROYED);
-        if (areaConfigurationsVisible){
-          guiHandler.hide(datGuiAreaConfigurations);
-          areaConfigurationsVisible = false;
-        }
-      }else if (currentSelection.isAddedText){
-        terminal.clear();
-        parseCommand("destroyText "+currentSelection.name);
-      }
-      guiHandler.afterObjectSelection();
-    break;
-  }
-
-});
-window.addEventListener('keyup', function(event){
-  inactiveCounter = 0;
-
-  if (!windowLoaded){
-    return;
-  }
-  if (cliFocused || omGUIFocused || tmGUIFocused){
-    return;
-  }
-  if (keyCodeToChar[event.keyCode]){
-    keyboardBuffer[keyCodeToChar[event.keyCode]] = false;
-    if (mode == 0 && keyCodeToChar[event.keyCode] == "."){
-      for (var gridName in gridSelections){
-        gridSelections[gridName].removeCornerHelpers();
-      }
-    }
-    if (mode == 1 && !isPaused && screenKeyupCallbackFunction){
-      screenKeyupCallbackFunction(keyCodeToChar[event.keyCode]);
-    }
-  }
-  if (mode == 1 && isPaused){
-    return;
-  }
-  switch(event.keyCode){
-    case 190: //PERIOD
-      for (var gridName in gridSelections){
-        var grid = gridSelections[gridName];
-        if (grid.divs){
-          for (var i = 0; i<grid.divs.length; i++){
-            grid.divs[i].style.visibility = "hidden";
-          }
-        }
-      }
-    break;
-    case 16: //SHIFT
-      if (mode == 0){
-        for (var objName in addedObjects){
-          addedObjects[objName].mesh.visible = true;
-        }
-        for (var objName in objectGroups){
-          objectGroups[objName].mesh.visible = true;
-        }
-        for (var textName in addedTexts){
-          addedTexts[textName].show();
-        }
-        if (WORKERS_SUPPORTED){
-          rayCaster.onShiftPress(false);
-        }
-      }
-    break;
-  }
-
-});
-
- function initBadTV(){
-   renderPass = new THREE.RenderPass(scene, camera);
-   if (mode == 1){
+function adjustPostProcessing(variableIndex, val){
+ switch(variableIndex){
+   case 1: //bloomStrength
+    bloomStrength = val;
+   break;
+   case 2: //Bloom_radius
+    bloomRadius = val;
+   break;
+   case 3: //Bloom_threshhold
+    bloomThreshold = val;
+   break;
+   case 4: //Bloom_resolution_scale
+    bloomResolutionScale = val;
     bloomPass = new THREE.UnrealBloomPass(
       new THREE.Vector2(
         renderer.getCurrentViewport().z * bloomResolutionScale,
@@ -503,195 +234,32 @@ window.addEventListener('keyup', function(event){
       bloomRadius,
       bloomThreshold
     );
-   }
-   copyPass = new THREE.ShaderPass( THREE.CopyShader );
-   setPostProcessingParams();
-   composer = new THREE.EffectComposer(renderer);
-   composer.setSize(renderer.getCurrentViewport().z / screenResolution, renderer.getCurrentViewport().w / screenResolution);
-   composer.addPass( renderPass );
-   if (mode == 1){
-    if (bloomOn){
-      composer.addPass( bloomPass );
-      bloomPass.renderToScreen = true;
+   break;
+   case 5: //Bloom
+    bloomOn = val;
+   break;
+   case -1: //from script
+    if(!isDeployment){
+      postprocessingParameters["Bloom_strength"] = bloomStrength;
+      postprocessingParameters["Bloom_radius"] = bloomRadius;
+      postprocessingParameters["Bloom_threshhold"] = bloomThreshold;
+      postprocessingParameters["Bloom_resolution_scale"] = bloomResolutionScale;
+      postprocessingParameters["Bloom"] = bloomOn;
     }
-   }
-   if (!(mode == 1 && bloomOn)){
-	    composer.addPass( copyPass );
-	    copyPass.renderToScreen = true;
-   }
-   setPostProcessingParams();
+   break;
  }
-
- function setPostProcessingParams(){
-   if (mode == 1){
-    if (bloomOn){
-      bloomPass.strength = bloomStrength;
-      bloomPass.radius = bloomRadius;
-      bloomPass.threshold = bloomThreshold;
-      bloomPass.resolution = new THREE.Vector2(
-        window.innerWidth * bloomResolutionScale,
-        window.innerHeight * bloomResolutionScale
-      );
-    }
-   }
+ composer = new THREE.EffectComposer(renderer);
+ composer.setSize(renderer.getCurrentViewport().z / screenResolution, renderer.getCurrentViewport().w / screenResolution);
+ composer.addPass(renderPass);
+ if (bloomOn){
+   composer.addPass(bloomPass);
+   bloomPass.renderToScreen = true;
  }
-
- function initPhysics(){
-   physicsWorld.quatNormalizeSkip = quatNormalizeSkip;
-   physicsWorld.quatNormalizeFast = quatNormalizeFast;
-   physicsWorld.defaultContactMaterial.contactEquationStiffness = contactEquationStiffness;
-   physicsWorld.defaultContactMaterial.contactEquationRelaxation = contactEquationRelaxation;
-   physicsWorld.defaultContactMaterial.friction = friction;
-   physicsSolver.iterations = physicsIterations;
-   physicsSolver.tolerance = physicsTolerance;
-   physicsWorld.solver = physicsSolver;
-   physicsWorld.gravity.set(0, gravityY, 0);
-   physicsWorld.broadphase = new CANNON.SAPBroadphase(physicsWorld);
+ if (!(mode == 1 && bloomOn)){
+    composer.addPass(copyPass);
+    copyPass.renderToScreen = true;
  }
-
- function adjustPostProcessing(variableIndex, val){
-   switch(variableIndex){
-     case 1: //bloomStrength
-      bloomStrength = val;
-     break;
-     case 2: //Bloom_radius
-      bloomRadius = val;
-     break;
-     case 3: //Bloom_threshhold
-      bloomThreshold = val;
-     break;
-     case 4: //Bloom_resolution_scale
-      bloomResolutionScale = val;
-      bloomPass = new THREE.UnrealBloomPass(
-        new THREE.Vector2(
-          renderer.getCurrentViewport().z * bloomResolutionScale,
-          renderer.getCurrentViewport().w * bloomResolutionScale
-        ),
-        bloomStrength,
-        bloomRadius,
-        bloomThreshold
-      );
-     break;
-     case 5: //Bloom
-      bloomOn = val;
-     break;
-     case -1: //from script
-      if(!isDeployment){
-        postprocessingParameters["Bloom_strength"] = bloomStrength;
-        postprocessingParameters["Bloom_radius"] = bloomRadius;
-        postprocessingParameters["Bloom_threshhold"] = bloomThreshold;
-        postprocessingParameters["Bloom_resolution_scale"] = bloomResolutionScale;
-        postprocessingParameters["Bloom"] = bloomOn;
-      }
-     break;
-   }
-   composer = new THREE.EffectComposer(renderer);
-   composer.setSize(renderer.getCurrentViewport().z / screenResolution, renderer.getCurrentViewport().w / screenResolution);
-   composer.addPass(renderPass);
-   if (bloomOn){
-     composer.addPass(bloomPass);
-     bloomPass.renderToScreen = true;
-   }
-   if (!(mode == 1 && bloomOn)){
-	    composer.addPass(copyPass);
-	    copyPass.renderToScreen = true;
-   }
-   setPostProcessingParams();
- }
-
-function resizeFunction(){
-  if (renderer && composer){
-    renderer.setSize(window.innerWidth, window.innerHeight);
-    composer.setSize(window.innerWidth, window.innerHeight);
-    camera.oldAspect = camera.aspect;
-    camera.aspect = window.innerWidth / window.innerHeight;
-    camera.updateProjectionMatrix();
-    boundingClientRect = renderer.domElement.getBoundingClientRect();
-    if (isDeployment){
-      canvas.oldWidth = (canvas.width / screenResolution) + 'px';
-      if (!isDeployment && terminal.isMadeVisible){
-        ROYGBIV.terminal(false);
-        ROYGBIV.terminal(true);
-        if (!terminal.terminalPromptEnabled){
-          ROYGBIV.terminalPrompt(false);
-        }
-      }
-    }
-    if (mode == 1){
-      handleViewport();
-      if (particleSystemRefHeight){
-        GLOBAL_PS_REF_HEIGHT_UNIFORM.value = ((renderer.getCurrentViewport().w / screenResolution) / particleSystemRefHeight);
-      }
-      if (bloomOn){
-        adjustPostProcessing(4, bloomResolutionScale);
-      }
-    }
-    if (mode == 0){
-      for (var areaName in areas){
-        if (areas[areaName].text){
-          areas[areaName].text.handleResize();
-        }
-      }
-      for (var pointName in markedPoints){
-        if (markedPoints[pointName].text){
-          markedPoints[pointName].text.handleResize();
-        }
-      }
-      for (var gridName in gridSelections){
-        if (gridSelections[gridName].texts){
-          for (var i = 0; i<gridSelections[gridName].texts.length; i++){
-            gridSelections[gridName].texts[i].handleResize();
-          }
-        }
-      }
-    }else{
-      for (var crosshairName in crosshairs){
-        crosshairs[crosshairName].handleResize();
-      }
-    }
-    for (var textName in addedTexts){
-      addedTexts[textName].handleResize();
-    }
-  }
-}
-
-function processKeyboardBuffer(){
-  if (keyboardBuffer["Left"]){
-    camera.rotation.y += rotationYDelta;
-  }
-  if (keyboardBuffer["Right"]){
-    camera.rotation.y -= rotationYDelta;
-  }
-  if (keyboardBuffer["Up"]){
-    camera.rotation.x += rotationXDelta;
-  }
-  if (keyboardBuffer["Down"]){
-    camera.rotation.x -= rotationXDelta;
-  }
-  if (keyboardBuffer["W"]){
-    camera.translateZ(-1 * translateZAmount * defaultAspect / camera.aspect);
-  }
-  if (keyboardBuffer["S"]){
-    camera.translateZ(translateZAmount * defaultAspect / camera.aspect);
-  }
-  if (keyboardBuffer["D"]){
-    camera.translateX(translateXAmount * defaultAspect / camera.aspect);
-  }
-  if (keyboardBuffer["A"]){
-    camera.translateX(-1 * translateXAmount * defaultAspect / camera.aspect);
-  }
-  if (keyboardBuffer["E"]){
-    camera.translateY(-1 * translateYAmount * defaultAspect / camera.aspect);
-  }
-  if (keyboardBuffer["Q"]){
-    camera.translateY(translateYAmount * defaultAspect / camera.aspect);
-  }
-  if (keyboardBuffer["Z"]){
-    camera.rotation.z += rotationZDelta;
-  }
-  if (keyboardBuffer["C"]){
-    camera.rotation.z -= rotationZDelta;
-  }
+ setPostProcessingParams();
 }
 
 function processCameraRotationBuffer(){
@@ -701,29 +269,6 @@ function processCameraRotationBuffer(){
   cameraRotationBuffer.x = 0;
   cameraRotationBuffer.y = 0;
   cameraRotationBuffer.z = 0;
-}
-
-function mouseWheelEvent(e) {
-  if (mode == 1 && isPaused){
-    return;
-  }
-  e.preventDefault();
-  if (mode == 1 && defaultCameraControlsDisabled){
-    return;
-  }
-  if (!windowLoaded){
-    return;
-  }
-  var deltaX = e.deltaX;
-  var deltaY = e.deltaY;
-  if((typeof deltaX == "undefined") || (typeof deltaY == "undefined")){
-    return;
-  }
-  if (Math.abs(deltaX) < Math.abs(deltaY)){
-    camera.translateZ(deltaY * defaultAspect / camera.aspect);
-  }else{
-    camera.translateX(deltaX * defaultAspect / camera.aspect);
-  }
 }
 
 function rescale(canvas, scale){
@@ -856,85 +401,15 @@ function generateUniqueObjectName(){
   return generatedName;
 }
 
-function isNameUsedAsSoftCopyParentName(name){
-  for (var objName in addedObjects){
-    if (addedObjects[objName].softCopyParentName && addedObjects[objName].softCopyParentName == name){
-      return true;
-    }
-  }
-  for (var objName in objectGroups){
-    if (objectGroups[objName].softCopyParentName && objectGroups[objName].softCopyParentName == name){
-      return true;
-    }
-  }
-  return false;
-}
-
-function processNewGridSystemCommand(name, sizeX, sizeZ, centerX, centerY, centerZ, outlineColor, cellSize, axis, isSuperposed, slicedGrid){
-  if (addedObjects[name] || objectGroups[name]){
-    terminal.printError(Text.NAME_MUST_BE_UNIQUE);
-    return true;
-  }
-  for (var objName in objectGroups){
-    for (var childName in objectGroups[objName].group){
-      if (childName == name){
-        terminal.printError(Text.NAME_MUST_BE_UNIQUE);
-      }
-    }
-  }
-  sizeX = parseInt(sizeX);
-  if (isNaN(sizeX)){
-    terminal.printError(Text.SIZEX_MUST_BE_A_NUMBER);
-    return true;
-  }
-  sizeZ = parseInt(sizeZ);
-  if (isNaN(sizeZ)){
-    terminal.printError(Text.SIZEZ_MUST_BE_A_NUMBER);
-    return true;
-  }
-  centerX = parseInt(centerX);
-  if (isNaN(centerX)){
-    terminal.printError(Text.CENTERX_MUST_BE_A_NUMBER);
-    return true;
-  }
-  centerY = parseInt(centerY);
-  if (isNaN(centerY)){
-    terminal.printError(Text.CENTERY_MUST_BE_A_NUMBER);
-    return true;
-  }
-  centerZ = parseInt(centerZ);
-  if (isNaN(centerZ)){
-    terminal.printError(Text.CENTERZ_MUST_BE_A_NUMBER);
-    return true;
-  }
-  cellSize = parseInt(cellSize);
-  if (isNaN(cellSize)){
-    terminal.printError(Text.CELLSIZE_MUST_BE_A_NUMBER);
-    return true;
-  }
-  if (!axis){
-    terminal.printError(Text.AXIS_MUST_BE_ONE_OF_XY_YZ_XZ);
-    return true;
-  }
-  if (axis.toUpperCase() != "XZ" && axis.toUpperCase() != "XY" && axis.toUpperCase() != "YZ"){
-    terminal.printError(Text.AXIS_MUST_BE_ONE_OF_XY_YZ_XZ);
-    return true;
-  }
-  var gsObject = new GridSystem(name, parseInt(sizeX), parseInt(sizeZ),
-          parseInt(centerX), parseInt(centerY), parseInt(centerZ),
-                            outlineColor, parseInt(cellSize), axis.toUpperCase());
-
-  gsObject.isSuperposed = isSuperposed;
-
-  if (slicedGrid){
-    gsObject.slicedGrid = slicedGrid;
-    slicedGrid.toggleSelect(true, false, false, true);
-    slicedGrid.slicedGridSystemName = name;
-  }
-
-  rayCaster.refresh();
-
-  return true;
+function onCanvasInitiated(){
+  mouseEventHandler = new MouseEventHandler();
+  touchEventHandler = new TouchEventHandler();
+  pointerLockEventHandler = new PointerLockEventHandler();
+  fullScreenEventHandler = new FullScreenEventHandler();
+  visibilityChangeEventHandler = new VisibilityChangeEventHandler();
+  resizeEventHandler = new ResizeEventHandler();
+  orientationChangeEventHandler = new OrientationChangeEventHandler();
+  keyboardEventHandler = new KeyboardEventHandler();
 }
 
 // DEPLOYMENT

@@ -215,7 +215,10 @@ function readEngineScripts(projectName, author, noMobile){
         }
         scriptContent = commentsFiltered;
       }
-      if (scriptPath.includes("cliParser.js")){
+      if (scriptPath.includes("draggableCLI.js")){
+        console.log("[*] Skipping draggableCLI");
+        continue;
+      }else if (scriptPath.includes("cliParser.js")){
         console.log("[*] Skipping cliParser");
         continue;
       }else if (scriptPath.includes("CommandDescriptor.js")){
