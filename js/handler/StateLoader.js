@@ -637,7 +637,7 @@ StateLoader.prototype.load = function(){
        if (curAddedObjectExport.txtMatrix){
          addedObjectInstance.setTxtMatrix = curAddedObjectExport.txtMatrix;
        }
-
+       addedObjectInstance.mesh.material.uniforms.alpha.value = curAddedObjectExport.opacity;
     }
     for (var objName in addedObjects){
       if (addedObjects[objName].softCopyParentName){
