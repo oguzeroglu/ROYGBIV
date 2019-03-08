@@ -638,6 +638,15 @@ StateLoader.prototype.load = function(){
          addedObjectInstance.setTxtMatrix = curAddedObjectExport.txtMatrix;
        }
        addedObjectInstance.mesh.material.uniforms.alpha.value = curAddedObjectExport.opacity;
+       if (!(typeof curAddedObjectExport.aoMapIntensity == UNDEFINED)){
+         addedObjectInstance.setAOIntensity = curAddedObjectExport.aoMapIntensity;
+       }
+       if (!(typeof curAddedObjectExport.emissiveIntensity == UNDEFINED)){
+         addedObjectInstance.setEmissiveIntensity = curAddedObjectExport.emissiveIntensity;
+       }
+       if (!(typeof curAddedObjectExport.emissiveColor == UNDEFINED)){
+         addedObjectInstance.setEmissiveColor = curAddedObjectExport.emissiveColor;
+       }
     }
     for (var objName in addedObjects){
       if (addedObjects[objName].softCopyParentName){
@@ -1657,6 +1666,10 @@ StateLoader.prototype.mapTexturePackToSingleObject = function(diff){
             material.uniforms.aoMap.value.repeat.y = textureRepeatV;
           }
           material.uniforms.aoMap.value.needsUpdate = true;
+          if (addedObject.setAOIntensity){
+            addedObject.mesh.material.uniforms.aoIntensity = addedObject.setAOIntensity;
+            delete addedObject.setAOIntensity;
+          }
         }
       }
     }
