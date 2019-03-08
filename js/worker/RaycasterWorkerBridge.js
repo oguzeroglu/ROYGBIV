@@ -1,4 +1,5 @@
 var RaycasterWorkerBridge = function(){
+  this.isRaycasterWorkerBridge = true;
   this.worker = new Worker("/js/worker/RaycasterWorker.js");
   this.workerMessageHandler = new WorkerMessageHandler(this.worker);
   this.updateBuffer = new Map();
@@ -159,7 +160,7 @@ RaycasterWorkerBridge.prototype.refresh = function(){
 }
 
 RaycasterWorkerBridge.prototype.updateObject = function(obj){
-  if (!obj.isIntersectable){
+  if (mode == 1 && (object.isAddedObject || object.isObjectGroup) && !obj.isIntersectable){
     return;
   }
   this.updateBuffer.set(obj.name, obj);

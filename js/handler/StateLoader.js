@@ -1294,9 +1294,9 @@ StateLoader.prototype.finalize = function(){
     }
   }
   projectLoaded = true;
-  rayCaster.refresh();
-  canvas.style.visibility = "";
   if (!isDeployment){
+    rayCaster.refresh();
+    canvas.style.visibility = "";
     terminal.enable();
     terminal.clear();
     terminal.printInfo("Project loaded.");
