@@ -496,8 +496,8 @@ window.addEventListener('keyup', function(event){
    if (mode == 1){
     bloomPass = new THREE.UnrealBloomPass(
       new THREE.Vector2(
-        window.innerWidth * bloomResolutionScale,
-        window.innerHeight * bloomResolutionScale
+        renderer.getCurrentViewport().z * bloomResolutionScale,
+        renderer.getCurrentViewport().w * bloomResolutionScale
       ),
       bloomStrength,
       bloomRadius,
@@ -564,8 +564,8 @@ window.addEventListener('keyup', function(event){
       bloomResolutionScale = val;
       bloomPass = new THREE.UnrealBloomPass(
         new THREE.Vector2(
-          window.innerWidth * bloomResolutionScale,
-          window.innerHeight * bloomResolutionScale
+          renderer.getCurrentViewport().z * bloomResolutionScale,
+          renderer.getCurrentViewport().w * bloomResolutionScale
         ),
         bloomStrength,
         bloomRadius,
@@ -621,6 +621,9 @@ function resizeFunction(){
       handleViewport();
       if (particleSystemRefHeight){
         GLOBAL_PS_REF_HEIGHT_UNIFORM.value = ((renderer.getCurrentViewport().w / screenResolution) / particleSystemRefHeight);
+      }
+      if (bloomOn){
+        adjustPostProcessing(4, bloomResolutionScale);
       }
     }
     if (mode == 0){
