@@ -15,9 +15,13 @@ console.log("\n*******************************************");
 
 app = express();
 
-app.use(bodyParser.json());
+app.use(bodyParser.json({
+  parameterLimit: 1000000,
+  limit: '500mb',
+  extended: true
+}));
 app.use(bodyParser.urlencoded({
-  parameterLimit: 100000,
+  parameterLimit: 1000000,
   limit: '500mb',
   extended: true
 }));
