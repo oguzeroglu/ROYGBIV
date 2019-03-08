@@ -117,9 +117,32 @@ RaycasterWorker.prototype.updateObjectGroup = function(data){
   obj.updateBoundingBoxes();
   this.rayCaster.updateObject(obj, true);
 }
+RaycasterWorker.prototype.updateAddedText = function(data){
+  var text = this.objectsByWorkerID[data[2]];
+  text.mesh.position.set(data[3], data[4], data[5]);
+  text.mesh.quaternion.set(data[6], data[7], data[8], data[9]);
+  for (var i = 10; i<26; i++){
+    this.reusableArray16[i-10] = data[i];
+  }
+  text.mesh.modelViewMatrix.fromArray(this.reusableArray16);
+  text.characterSize = data[26];
+  text.topLeft.set(data[27], data[28], data[29]);
+  text.bottomRight.set(data[30], data[31], data[32]);
+  text.topRight.set(data[33], data[34], data[35]);
+  text.bottomLeft.set(data[36], data[37], data[38]);
+  this.workerMessageHandler.push(data.buffer);
+  text.handleBoundingBox();
+  this.rayCaster.updateObject(text, true);
+}
 RaycasterWorker.prototype.updateCameraOrientation = function(data){
   camera.position.set(data[2], data[3], data[4]);
   camera.quaternion.set(data[5], data[6], data[7], data[8]);
+  camera.aspect = data[9];
+  this.workerMessageHandler.push(data.buffer);
+}
+RaycasterWorker.prototype.updateViewport = function(data){
+  renderer.viewport.set(data[2], data[3], data[4], data[5]);
+  screenResolution = data[6];
   this.workerMessageHandler.push(data.buffer);
 }
 // A dummy function
@@ -168,6 +191,10 @@ self.onmessage = function(msg){
           worker.updateObjectGroup(ary);
         }else if (ary[0] == 2){
           worker.updateCameraOrientation(ary);
+        }else if (ary[0] == 3){
+          worker.updateViewport(ary);
+        }else if (ary[0] == 4){
+          worker.updateAddedText(ary);
         }
       }
     }

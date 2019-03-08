@@ -53,6 +53,7 @@ function renderScene(){
 }
 
 function updateRaycaster(){
+  rayCaster.onBeforeUpdate();
   rayCaster.updateBuffer.forEach(rayCaster.issueUpdate);
   rayCaster.updateBuffer.clear();
   rayCaster.flush();

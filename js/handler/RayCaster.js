@@ -7,7 +7,7 @@ var RayCaster = function(){
 }
 
 RayCaster.prototype.flush = function(){
-  
+
 }
 
 RayCaster.prototype.refresh = function(){
@@ -64,6 +64,10 @@ RayCaster.prototype.updateObject = function(obj, forceUpdate){
     return;
   }
   this.updateBuffer.set(obj.name, obj);
+}
+
+RayCaster.prototype.onBeforeUpdate = function(){
+  
 }
 
 RayCaster.prototype.issueUpdate = function(obj){

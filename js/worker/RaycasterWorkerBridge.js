@@ -3,8 +3,11 @@ var RaycasterWorkerBridge = function(){
   this.workerMessageHandler = new WorkerMessageHandler(this.worker);
   this.updateBuffer = new Map();
   this.hasUpdatedTexts = false;
-  this.cameraOrientationUpdateBuffer = [new Float32Array(9), new Float32Array(9)];
-  this.cameraOrientationUpdateBufferAvailibilities = [true, true];
+  this.objectBufferSize = 10;
+  this.textBufferSize = 10;
+  this.intersectionTestBufferSize = 10;
+  this.cameraOrientationAndViewportBufferSize = 10;
+
   this.worker.addEventListener("message", function(msg){
     if (msg.data.type){
       rayCaster.objectsByWorkerID = new Object();
@@ -12,6 +15,8 @@ var RaycasterWorkerBridge = function(){
       rayCaster.addedObjectsUpdateBuffer = [];
       rayCaster.addedObjectsUpdateBufferAvailibilities = [];
       rayCaster.objectGroupsUpdateBuffer = new Object();
+      rayCaster.addedTextsUpdateBuffer = [];
+      rayCaster.addedTextsUpdateBufferAvailibilities = [];
       for (var i = 0; i<msg.data.ids.length; i++){
         if (msg.data.ids[i].type == "gridSystem"){
           rayCaster.objectsByWorkerID[msg.data.ids[i].id] = gridSystems[msg.data.ids[i].name];
@@ -19,21 +24,28 @@ var RaycasterWorkerBridge = function(){
         }else if (msg.data.ids[i].type == "addedObject"){
           rayCaster.objectsByWorkerID[msg.data.ids[i].id] = addedObjects[msg.data.ids[i].name];
           rayCaster.idsByObjectNames[msg.data.ids[i].name] = msg.data.ids[i].id;
-          for (var x = 0; x<10; x++){
+          for (var x = 0; x<rayCaster.objectBufferSize; x++){
             rayCaster.addedObjectsUpdateBuffer.push(new Float32Array(19));
             rayCaster.addedObjectsUpdateBufferAvailibilities.push(true);
           }
         }else if (msg.data.ids[i].type == "objectGroup"){
           rayCaster.objectsByWorkerID[msg.data.ids[i].id] = objectGroups[msg.data.ids[i].name];
           rayCaster.idsByObjectNames[msg.data.ids[i].name] = msg.data.ids[i].id;
-          var childCount = Object.keys(objectGroups[msg.data.ids[i].name]).length;
           rayCaster.objectGroupsUpdateBuffer[msg.data.ids[i].name] = {
-            buffers: [new Float32Array(19), new Float32Array(19), new Float32Array(19)],
-            bufferAvailibilities: [true, true, true]
+            buffers: [],
+            bufferAvailibilities: []
+          }
+          for (var x = 0; x<rayCaster.objectBufferSize; x++){
+            rayCaster.objectGroupsUpdateBuffer[msg.data.ids[i].name].buffers.push(new Float32Array(19));
+            rayCaster.objectGroupsUpdateBuffer[msg.data.ids[i].name].bufferAvailibilities.push(true);
           }
         }else if (msg.data.ids[i].type == "addedText"){
           rayCaster.objectsByWorkerID[msg.data.ids[i].id] = addedTexts[msg.data.ids[i].name];
           rayCaster.idsByObjectNames[msg.data.ids[i].name] = msg.data.ids[i].id;
+          for (var x = 0; x<rayCaster.textBufferSize; x++){
+            rayCaster.addedTextsUpdateBuffer.push(new Float32Array(39));
+            rayCaster.addedTextsUpdateBufferAvailibilities.push(true);
+          }
         }else{
           throw new Error("Not implemented.");
         }
@@ -67,6 +79,14 @@ var RaycasterWorkerBridge = function(){
             var bufID = ary[1];
             rayCaster.cameraOrientationUpdateBuffer[bufID] = ary;
             rayCaster.cameraOrientationUpdateBufferAvailibilities[bufID] = true;
+          }else if (ary[0] == 3){
+            var bufID = ary[1];
+            rayCaster.viewportUpdateBuffer[bufID] = ary;
+            rayCaster.viewportUpdateBufferAvailibilities[bufID] = true;
+          }else if (ary[0] == 4){
+            var bufID = ary[1];
+            rayCaster.addedTextsUpdateBuffer[bufID] = ary;
+            rayCaster.addedTextsUpdateBufferAvailibilities[bufID] = true;
           }
         }
       }
@@ -76,10 +96,20 @@ var RaycasterWorkerBridge = function(){
   this.intersectionTestBuffers = [];
   this.intersectionTestBufferAvailibilities = [];
   this.intersectionTestCallbackFunctions = [];
-  for (var i = 0; i<10; i++){
+  this.cameraOrientationUpdateBuffer = [];
+  this.cameraOrientationUpdateBufferAvailibilities = [];
+  this.viewportUpdateBuffer = [];
+  this.viewportUpdateBufferAvailibilities = [];
+  for (var i = 0; i<this.intersectionTestBufferSize; i++){
     this.intersectionTestBuffers.push(new Float32Array(8));
     this.intersectionTestBufferAvailibilities.push(true);
     this.intersectionTestCallbackFunctions.push(function(){});
+  }
+  for (var i = 0; i<this.cameraOrientationAndViewportBufferSize; i++){
+    this.cameraOrientationUpdateBuffer.push(new Float32Array(10));
+    this.cameraOrientationUpdateBufferAvailibilities.push(true);
+    this.viewportUpdateBuffer.push(new Float32Array(7));
+    this.viewportUpdateBufferAvailibilities.push(true);
   }
   // ***************************************************************
   this.onShiftPress = function(isPressed){
@@ -107,9 +137,10 @@ RaycasterWorkerBridge.prototype.updateObject = function(obj){
   }
 }
 
-RaycasterWorkerBridge.prototype.issueUpdate = function(obj){
+RaycasterWorkerBridge.prototype.onBeforeUpdate = function(){
   if (rayCaster.hasUpdatedTexts){
     var cameraOrientationUpdateBufferSent = false;
+    var viewportUpdateBufferSent = false;
     for (var i = 0; i<rayCaster.cameraOrientationUpdateBuffer.length; i++){
       if (rayCaster.cameraOrientationUpdateBufferAvailibilities[i]){
         var buf = rayCaster.cameraOrientationUpdateBuffer[i];
@@ -117,17 +148,38 @@ RaycasterWorkerBridge.prototype.issueUpdate = function(obj){
         buf[1] = i;
         buf[2] = camera.position.x; buf[3] = camera.position.y; buf[4] = camera.position.z;
         buf[5] = camera.quaternion.x; buf[6] = camera.quaternion.y; buf[7] = camera.quaternion.z; buf[8] = camera.quaternion.w;
+        buf[9] = camera.aspect;
         rayCaster.workerMessageHandler.push(buf.buffer);
         rayCaster.cameraOrientationUpdateBufferAvailibilities[i] = false;
         cameraOrientationUpdateBufferSent = true;
-        return;
+        break;
+      }
+    }
+    for (var i = 0; i<rayCaster.viewportUpdateBuffer.length; i++){
+      if (rayCaster.viewportUpdateBufferAvailibilities[i]){
+        var buf = rayCaster.viewportUpdateBuffer[i];
+        var vp = renderer.getCurrentViewport();
+        buf[0] = 3;
+        buf[1] = i;
+        buf[2] = vp.x; buf[3] = vp.y; buf[4] = vp.z; buf[5] = vp.w;
+        buf[6] = screenResolution;
+        rayCaster.workerMessageHandler.push(buf.buffer);
+        rayCaster.viewportUpdateBufferAvailibilities[i] = false;
+        viewportUpdateBufferSent = true;
+        break;
       }
     }
     if (!cameraOrientationUpdateBufferSent){
       console.error("[!] RaycasterWorkerBridge.issueUpdate camera orientation buffer overflow.");
     }
+    if (!viewportUpdateBufferSent){
+      console.error("[!] RaycasterWorkerBridge.issueUpdate viewport buffer overflow.");
+    }
     this.hasUpdatedTexts = false;
   }
+}
+
+RaycasterWorkerBridge.prototype.issueUpdate = function(obj){
   if (obj.isAddedObject){
     var len = rayCaster.addedObjectsUpdateBuffer.length;
     for (var i = 0; i < len; i++){
@@ -160,7 +212,31 @@ RaycasterWorkerBridge.prototype.issueUpdate = function(obj){
     }
     console.error("[!] RaycasterWorkerBridge.issueUpdate object group buffer overflow.");
   }else if (obj.isAddedText){
-
+    if (!rayCaster.addedTextsUpdateBuffer){
+      return;
+    }
+    var len = rayCaster.addedTextsUpdateBuffer.length;
+    for (var i = 0; i<len; i++){
+      if (rayCaster.addedTextsUpdateBufferAvailibilities[i]){
+        var buf = rayCaster.addedTextsUpdateBuffer[i];
+        buf[0] = 4;
+        buf[1] = i;
+        buf[2] = rayCaster.idsByObjectNames[obj.name];
+        var mesh = obj.mesh;
+        buf[3] = mesh.position.x; buf[4] = mesh.position.y; buf[5] = mesh.position.z;
+        buf[6] = mesh.quaternion.x; buf[7] = mesh.quaternion.y; buf[8] = mesh.quaternion.z; buf[9] = mesh.quaternion.w;
+        buf.set(mesh.modelViewMatrix.elements, 10);
+        buf[26] = obj.characterSize;
+        buf[27] = obj.topLeft.x; buf[28] = obj.topLeft.y; buf[29] = obj.topLeft.z;
+        buf[30] = obj.bottomRight.x; buf[31] = obj.bottomRight.y; buf[32] = obj.bottomRight.z;
+        buf[33] = obj.topRight.x; buf[34] = obj.topRight.y; buf[35] = obj.topRight.z;
+        buf[36] = obj.bottomLeft.x; buf[37] = obj.bottomLeft.y; buf[38] = obj.bottomLeft.z;
+        rayCaster.workerMessageHandler.push(buf.buffer);
+        rayCaster.addedTextsUpdateBufferAvailibilities[i] = false;
+        return;
+      }
+    }
+    console.error("[!] RaycasterWorkerBridge.issueUpdate added text buffer overflow.");
   }
 }
 
