@@ -416,18 +416,22 @@ function parse(input){
           var selectedGridSystemName = selectedGrid1.parentName;
           var materialName = splitted[2];
           var selectedMaterial = materials[materialName];
-          if (materialName.toUpperCase() != "NULL"){
-            if (!selectedMaterial){
-              terminal.printError(Text.NO_SUCH_MATERIAL);
-              return true;
-            }
+          if (materialName == "*"){
+            selectedMaterial = pickRandomMaterial();
           }else{
-            if (defaultMaterialType == "BASIC"){
-              selectedMaterial = new BasicMaterial({
-                name: "NULL_BASIC",
-                color: "white",
-                alpha: 1
-              });
+            if (materialName.toUpperCase() != "NULL"){
+              if (!selectedMaterial){
+                terminal.printError(Text.NO_SUCH_MATERIAL);
+                return true;
+              }
+            }else{
+              if (defaultMaterialType == "BASIC"){
+                selectedMaterial = new BasicMaterial({
+                  name: "NULL_BASIC",
+                  color: "white",
+                  alpha: 1
+                });
+              }
             }
           }
           var objectName = splitted[1];
@@ -937,18 +941,22 @@ function parse(input){
             terminal.printError(Text.NAME_USED_IN_AN_OBJECT_GROUP);
             return true;
           }
-          if (materialName.toUpperCase() != "NULL"){
-            if (!material){
-              terminal.printError(Text.NO_SUCH_MATERIAL);
-              return true;
-            }
+          if (materialName == "*"){
+            material = pickRandomMaterial();
           }else{
-            if (defaultMaterialType == "BASIC"){
-              material = new BasicMaterial({
-                name: "NULL_BASIC",
-                color: "white",
-                alpha: 1
-              });
+            if (materialName.toUpperCase() != "NULL"){
+              if (!material){
+                terminal.printError(Text.NO_SUCH_MATERIAL);
+                return true;
+              }
+            }else{
+              if (defaultMaterialType == "BASIC"){
+                material = new BasicMaterial({
+                  name: "NULL_BASIC",
+                  color: "white",
+                  alpha: 1
+                });
+              }
             }
           }
           if (axis != "x" && axis != "z" && axis != "y"){
@@ -1119,18 +1127,22 @@ function parse(input){
           }
 
           var material = materials[materialName];
-          if (materialName.toUpperCase() != "NULL"){
-            if (!material){
-              terminal.printError(Text.NO_SUCH_MATERIAL);
-              return true;
-            }
+          if (materialName == "*"){
+            material = pickRandomMaterial();
           }else{
-            if (defaultMaterialType == "BASIC"){
-              material = new BasicMaterial({
-                name: "NULL_BASIC",
-                color: "white",
-                alpha: 1
-              });
+            if (materialName.toUpperCase() != "NULL"){
+              if (!material){
+                terminal.printError(Text.NO_SUCH_MATERIAL);
+                return true;
+              }
+            }else{
+              if (defaultMaterialType == "BASIC"){
+                material = new BasicMaterial({
+                  name: "NULL_BASIC",
+                  color: "white",
+                  alpha: 1
+                });
+              }
             }
           }
 
@@ -3599,18 +3611,22 @@ function parse(input){
             return true;
           }
           var material = materials[materialName];
-          if (materialName.toUpperCase() != "NULL"){
-            if (!material){
-              terminal.printError(Text.NO_SUCH_MATERIAL);
-              return true;
-            }
+          if (materialName == "*"){
+            material = pickRandomMaterial();
           }else{
-            if (defaultMaterialType == "BASIC"){
-              material = new BasicMaterial({
-                name: "NULL_BASIC",
-                color: "white",
-                alpha: 1
-              });
+            if (materialName.toUpperCase() != "NULL"){
+              if (!material){
+                terminal.printError(Text.NO_SUCH_MATERIAL);
+                return true;
+              }
+            }else{
+              if (defaultMaterialType == "BASIC"){
+                material = new BasicMaterial({
+                  name: "NULL_BASIC",
+                  color: "white",
+                  alpha: 1
+                });
+              }
             }
           }
           if (isNaN(radius)){
@@ -4116,18 +4132,22 @@ function parse(input){
             return true;
           }
           var material = materials[materialName];
-          if (materialName.toUpperCase() != "NULL"){
-            if (!material){
-              terminal.printError(Text.NO_SUCH_MATERIAL);
-              return true;
-            }
+          if (materialName == "*"){
+            material = pickRandomMaterial();
           }else{
-            if (defaultMaterialType == "BASIC"){
-              material = new BasicMaterial({
-                name: "NULL_BASIC",
-                color: "white",
-                alpha: 1
-              });
+            if (materialName.toUpperCase() != "NULL"){
+              if (!material){
+                terminal.printError(Text.NO_SUCH_MATERIAL);
+                return true;
+              }
+            }else{
+              if (defaultMaterialType == "BASIC"){
+                material = new BasicMaterial({
+                  name: "NULL_BASIC",
+                  color: "white",
+                  alpha: 1
+                });
+              }
             }
           }
           if (isNaN(topRadius)){
@@ -4881,4 +4901,16 @@ function parse(input){
       console.error(err);
       return true;
     }
+}
+
+function pickRandomMaterial(){
+  var keys = Object.keys(materials);
+  if (keys.length == 0){
+    return new BasicMaterial({
+      name: "NULL_BASIC",
+      color: "white",
+      alpha: 1
+    });
+  }
+  return materials[keys[keys.length * Math.random() << 0]];
 }
