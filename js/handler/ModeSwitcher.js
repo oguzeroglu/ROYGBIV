@@ -5,7 +5,6 @@ var ModeSwitcher = function(){
   this.scriptReloadSuccessFunction = function(scriptName){
     that.loadedScriptsCounter ++;
     if (that.loadedScriptsCounter == that.totalScriptsToLoad){
-      that.enableTerminal();
       that.switchFromDesignToPreview();
     }
   }
@@ -200,11 +199,15 @@ ModeSwitcher.prototype.switchFromDesignToPreview = function(){
     GLOBAL_FOG_UNIFORM.value.set(-100.0, 0, 0, 0);
   }
   ROYGBIV.globals = new Object();
-  if (!isDeployment){
-    terminal.printInfo(Text.SWITCHED_TO_PREVIEW_MODE);
-  }
   $("#cliDivheader").text("ROYGBIV 3D Engine - CLI (Preview mode)");
   mode = 1;
+  var that = this;
+  rayCaster.onReadyCallback = function(){
+    if (!isDeployment){
+      that.enableTerminal();
+      terminal.printInfo(Text.SWITCHED_TO_PREVIEW_MODE);
+    }
+  }
   this.commonSwitchFunctions();
   handleViewport();
   for (var txtName in addedTexts){

@@ -9,6 +9,9 @@ var RayCaster = function(){
 
 RayCaster.prototype.onReady = function(){
   this.ready = true;
+  if (this.onReadyCallback){
+    this.onReadyCallback();
+  }
 }
 
 RayCaster.prototype.flush = function(){

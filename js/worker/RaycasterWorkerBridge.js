@@ -141,6 +141,9 @@ var RaycasterWorkerBridge = function(){
 
 RaycasterWorkerBridge.prototype.onReady = function(){
   this.ready = true;
+  if (this.onReadyCallback){
+    this.onReadyCallback();
+  }
 }
 
 RaycasterWorkerBridge.prototype.flush = function(){
