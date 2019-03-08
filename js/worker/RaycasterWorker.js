@@ -21,9 +21,9 @@ var RaycasterWorker = function(){
   this.workerMessageHandler = new WorkerMessageHandler();
 }
 RaycasterWorker.prototype.refresh = function(state){
-  gridSystems = new Object();
   var stateLoader = new StateLoaderLightweight(state);
   mode = state.mode;
+  stateLoader.reset();
   stateLoader.loadWorldLimits();
   stateLoader.loadCamera();
   stateLoader.loadRenderer();
