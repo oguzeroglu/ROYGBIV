@@ -76,7 +76,7 @@ var RaycasterWorkerBridge = function(){
             intersectionObject = intersectedObj.name;
             REUSABLE_VECTOR.set(ary[2], ary[3], ary[4]);
             intersectionPoint = REUSABLE_VECTOR;
-            rayCaster.intersectionTestCallbackFunctions[ary[0]](intersectionPoint.x, intersectionPoint.y, intersectionPoint.z, intersectedObj);
+            rayCaster.intersectionTestCallbackFunctions[ary[0]](intersectionPoint.x, intersectionPoint.y, intersectionPoint.z, intersectionObject);
           }else{
             rayCaster.intersectionTestCallbackFunctions[ary[0]](0, 0, 0, null);
           }
@@ -150,6 +150,9 @@ RaycasterWorkerBridge.prototype.refresh = function(){
 }
 
 RaycasterWorkerBridge.prototype.updateObject = function(obj){
+  if (!obj.isIntersectable){
+    return;
+  }
   this.updateBuffer.set(obj.name, obj);
   if(obj.isAddedText){
     this.hasUpdatedTexts = true;
@@ -295,7 +298,7 @@ RaycasterWorkerBridge.prototype.hide = function(object){
       return;
     }
   }
-  console.error("[!] RaycasterWorkerBridge.hide buffer overflow.");
+  console.error("[!] RaycasterWorkerBridge.hide buffer overflow: ");
 }
 
 RaycasterWorkerBridge.prototype.show = function(object){
