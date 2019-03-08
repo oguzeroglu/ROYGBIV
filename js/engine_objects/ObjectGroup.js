@@ -1150,7 +1150,7 @@ ObjectGroup.prototype.destroyParts = function(){
   for (var objName in this.group){
     var addedObject = addedObjects[objName];
     if (addedObject){
-      addedObject.destroy();
+      addedObject.destroy(true);
       delete addedObjects[objName];
       disabledObjectNames[objName] = 1;
     }

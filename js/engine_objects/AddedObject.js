@@ -1293,18 +1293,18 @@ AddedObject.prototype.setMass = function(mass){
   this.mass = mass;
 }
 
-AddedObject.prototype.destroy = function(){
+AddedObject.prototype.destroy = function(skipRaycasterRefresh){
   scene.remove(this.mesh);
   physicsWorld.remove(this.physicsBody);
   if (this.destroyedGrids){
     for (var gridName in this.destroyedGrids){
       this.destroyedGrids[gridName].destroyedAddedObject = 0;
     }
-  }
-
+  } 
   this.dispose();
-
-  rayCaster.refresh();
+  if (!skipRaycasterRefresh){
+    rayCaster.refresh();
+  }
 }
 
 AddedObject.prototype.dispose = function(){
