@@ -9412,9 +9412,7 @@ window.onload = function() {
   DDS_SUPPORTED = (!(renderer.context.getExtension("WEBGL_compressed_texture_s3tc") == null));
   INSTANCING_SUPPORTED = (!(renderer.context.getExtension("ANGLE_instanced_arrays") == null));
   HIGH_PRECISION_SUPPORTED = !(
-    renderer.context.getShaderPrecisionFormat(renderer.context.VERTEX_SHADER, renderer.context.HIGH_INT).precision <= 0 ||
     renderer.context.getShaderPrecisionFormat(renderer.context.VERTEX_SHADER, renderer.context.HIGH_FLOAT).precision <= 0 ||
-    renderer.context.getShaderPrecisionFormat(renderer.context.FRAGMENT_SHADER, renderer.context.HIGH_INT).precision <= 0 ||
     renderer.context.getShaderPrecisionFormat(renderer.context.FRAGMENT_SHADER, renderer.context.HIGH_FLOAT).precision <= 0
   );
   if (!isDeployment){
