@@ -43,6 +43,7 @@ app.post("/build", function(req, res){
     fs.writeFileSync("deploy/"+req.body.projectName+"/js/roygbiv.js", handleScripts(req.body, engineScriptsConcatted));
     fs.writeFileSync("deploy/"+req.body.projectName+"/js/application.json", JSON.stringify(req.body));
     copyAssets(req.body);
+    copyWorkers(req.body);
   }catch (err){
     console.log("[*] Error building project: "+err.message);
     res.send(JSON.stringify({"error": "Build error: "+err.message}));
@@ -50,6 +51,23 @@ app.post("/build", function(req, res){
   }
   res.send(JSON.stringify({"path": __dirname+"/deploy/"+req.body.projectName+"/"}));
 });
+
+function copyWorkers(application){
+  fs.mkdirSync("deploy/"+application.projectName+"/js/worker/");
+  var raycasterWorkerContent = fs.readFileSync("./js/worker/RaycasterWorker.js", "utf8");
+  var raycasterWorkerContentSplitted = raycasterWorkerContent.split("\n");
+  var rayCasterWorkerImportContent = "";
+  for (var i = 0; i<raycasterWorkerContentSplitted.length; i++){
+    if (raycasterWorkerContentSplitted[i].startsWith("importScripts")){
+      raycasterWorkerContent = raycasterWorkerContent.replace(raycasterWorkerContentSplitted[i], "");
+      var path = extractFirstText(raycasterWorkerContentSplitted[i]).replace("..", "js");
+      rayCasterWorkerImportContent += fs.readFileSync(path, "utf8");
+    }
+  }
+  raycasterWorkerContent = "importScripts(\"./RaycasterWorkerImport.js\");\n" + raycasterWorkerContent.trim();
+  fs.writeFileSync("deploy/"+application.projectName+"/js/worker/RaycasterWorker.js", raycasterWorkerContent);
+  fs.writeFileSync("deploy/"+application.projectName+"/js/worker/RaycasterWorkerImport.js", rayCasterWorkerImportContent);
+}
 
 function handleScripts(application, engineScriptsConcatted){
   var statusText = "";

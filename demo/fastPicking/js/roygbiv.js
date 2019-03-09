@@ -24178,7 +24178,7 @@ CPUOperationsHandler.prototype.handleSkybox = function(){
 
 var RaycasterWorkerBridge = function(){
   this.isRaycasterWorkerBridge = true;
-  this.worker = new Worker("/js/worker/RaycasterWorker.js");
+  this.worker = new Worker("./js/worker/RaycasterWorker.js");
   this.workerMessageHandler = new WorkerMessageHandler(this.worker);
   this.updateBuffer = new Map();
   this.hasUpdatedTexts = false;
