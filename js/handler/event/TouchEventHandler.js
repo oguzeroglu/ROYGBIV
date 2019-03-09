@@ -25,6 +25,7 @@ var TouchEventHandler = function(){
   this.lastTranslateYAmount = 0;
   this.lastTranslateZAmount = 0;
   this.distance = 0;
+  this.isTap = true;
 }
 
 TouchEventHandler.prototype.onTouchStart = function(event){
@@ -34,7 +35,9 @@ TouchEventHandler.prototype.onTouchStart = function(event){
     touchEventHandler.touch1 = event.targetTouches[0];
     touchEventHandler.touch1Initial = event.targetTouches[0];
     touchEventHandler.touchCount = 1;
+    touchEventHandler.isTap = true;
   }else if (event.targetTouches.length == 2){
+    touchEventHandler.isTap = false;
     touchEventHandler.touch2 = event.targetTouches[1];
     touchEventHandler.touch2Initial = event.targetTouches[1];
     touchEventHandler.touchCount = 2;
@@ -131,7 +134,7 @@ TouchEventHandler.prototype.onTap = function(touch){
 
 TouchEventHandler.prototype.onTouchEnd = function(event){
   if (event.targetTouches.length == 0){
-    if (touchEventHandler.touch1 && !touchEventHandler.touch2){
+    if (touchEventHandler.touch1 && !touchEventHandler.touch2 && touchEventHandler.isTap){
       touchEventHandler.onTap(touchEventHandler.touch1);
     }
     touchEventHandler.isAnyFingerTouching = false;
@@ -141,6 +144,7 @@ TouchEventHandler.prototype.onTouchEnd = function(event){
     touchEventHandler.touch1DiffFromInitial.x = 0; touchEventHandler.touch1DiffFromInitial.y = 0;
     touchEventHandler.touchCount = 0;
     touchEventHandler.distance = 0;
+    touchEventHandler.isTap = true;
   }else if (event.targetTouches.length == 1){
     if (event.changedTouches[0].identifier == touchEventHandler.touch1.identifier){
       touchEventHandler.touch1 = touchEventHandler.touch2;
