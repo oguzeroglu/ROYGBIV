@@ -453,6 +453,9 @@ function appendtoDeploymentConsole(val){
 }
 
 function removeCLIDom(){
+  if (webglCallbackHandler.shaderCompilationError){
+    return;
+  }
   if (!(typeof cliDiv == UNDEFINED)){
     document.body.removeChild(cliDiv);
   }
