@@ -2659,7 +2659,7 @@ Roygbiv.prototype.createWaterfall = function(configurations){
   preConditions.checkIfNumberOnlyIfExists(ROYGBIV.createWaterfall, preConditions.randomness, randomness);
   preConditions.checkIfNumberOnlyIfExists(ROYGBIV.createWaterfall, preConditions.collisionTimeOffset, collisionTimeOffset);
   if ((typeof rewindOnCollided == UNDEFINED)){
-    rewindOnCollided = true;
+    rewindOnCollided = false;
   }
   if ((typeof normal == UNDEFINED)){
     normal = this.vector(0, 0, 1);
