@@ -1314,12 +1314,8 @@ StateLoader.prototype.finalize = function(){
     terminal.clear();
     terminal.printInfo("Project loaded.");
   }else{
-    removeCLIDom();
+    appendtoDeploymentConsole("Initializing workers.");
     modeSwitcher.switchMode();
-    if (screenResolution != 1){
-      canvas.style.oldPosition = canvas.style.position;
-      canvas.style.position = "absolute";
-    }
   }
 }
 

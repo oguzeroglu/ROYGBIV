@@ -438,8 +438,6 @@ function startDeployment(){
     if (result){
       if (stateLoader.hasTextures || stateLoader.hasTexturePacks || stateLoader.hasSkyboxes || stateLoader.hasFonts){
         appendtoDeploymentConsole("Loading assets.");
-      }else{
-        removeCLIDom();
       }
     }else{
       appendtoDeploymentConsole("[!] Project failed to load: "+stateLoader.reason);

@@ -206,6 +206,12 @@ ModeSwitcher.prototype.switchFromDesignToPreview = function(){
     if (!isDeployment){
       that.enableTerminal();
       terminal.printInfo(Text.SWITCHED_TO_PREVIEW_MODE);
+    }else{
+      removeCLIDom();
+      if (screenResolution != 1){
+        canvas.style.oldPosition = canvas.style.position;
+        canvas.style.position = "absolute";
+      }
     }
   }
   this.commonSwitchFunctions();
