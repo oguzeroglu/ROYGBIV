@@ -26,6 +26,7 @@ var TouchEventHandler = function(){
   this.lastTranslateZAmount = 0;
   this.distance = 0;
   this.isTap = true;
+  this.tapStartTime = 0;
 }
 
 TouchEventHandler.prototype.onTouchStart = function(event){
@@ -36,6 +37,7 @@ TouchEventHandler.prototype.onTouchStart = function(event){
     touchEventHandler.touch1Initial = event.targetTouches[0];
     touchEventHandler.touchCount = 1;
     touchEventHandler.isTap = true;
+    touchEventHandler.tapStartTime = performance.now();
   }else if (event.targetTouches.length == 2){
     touchEventHandler.isTap = false;
     touchEventHandler.touch2 = event.targetTouches[1];
@@ -135,7 +137,9 @@ TouchEventHandler.prototype.onTap = function(touch){
 TouchEventHandler.prototype.onTouchEnd = function(event){
   if (event.targetTouches.length == 0){
     if (touchEventHandler.touch1 && !touchEventHandler.touch2 && touchEventHandler.isTap){
-      touchEventHandler.onTap(touchEventHandler.touch1);
+      if (performance.now() - touchEventHandler.tapStartTime < 160){
+        touchEventHandler.onTap(touchEventHandler.touch1);
+      }
     }
     touchEventHandler.isAnyFingerTouching = false;
     touchEventHandler.touch1 = 0;
