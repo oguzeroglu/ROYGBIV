@@ -7,7 +7,7 @@ ROYGBIV is a 3D game engine for the Web. I named it after my favorite [Boards of
 ## Demos
 [The first playable demo](https://oguzeroglu.github.io/ROYGBIV/demo/demo1/application.html)  
 [GPU particles showcase](https://oguzeroglu.github.io/ROYGBIV/demo/psShowcase/application.html)  
-[Fast object picking](https://oguzeroglu.github.io/ROYGBIV/demo/fastPicking/application.html)
+[Fast object picking](https://oguzeroglu.github.io/ROYGBIV/demo/fastPicking/application.html) 
 [Online preview of the engine](https://oguzeroglu.github.io/ROYGBIV/roygbiv.html)  
 
 ## The current state of the project
