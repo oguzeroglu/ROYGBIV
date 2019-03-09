@@ -1,4 +1,7 @@
 var MouseEventHandler = function(){
+  if (isMobile){
+    return;
+  }
   canvas.addEventListener("click", this.onClick);
   canvas.addEventListener("mousedown", this.onMouseDown);
   canvas.addEventListener("mouseup", this.onMouseUp);

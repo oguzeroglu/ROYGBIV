@@ -87,11 +87,13 @@ TouchEventHandler.prototype.onTouchMove = function(event){
       var touch1Y = - ((touch1.clientY - rect.top) / rect.height) * 2 + 1;
       var touch2X = ((touch2.clientX - rect.left) / rect.width) * 2 - 1;
       var touch2Y = - ((touch2.clientY - rect.top) / rect.height) * 2 + 1;
-      var newDistance = Math.sqrt(((touch2X - touch1X) * (touch2X - touch1X)) + ((touch2Y - touch1Y) * (touch2Y - touch1Y)));
-      var translateZAmount = -350 * (newDistance - touchEventHandler.distance);
-      touchEventHandler.lastTranslateZAmount = translateZAmount;
-      camera.translateZ(translateZAmount);
-      touchEventHandler.distance = newDistance;
+      if (!(mode == 1 && defaultCameraControlsDisabled)){
+        var newDistance = Math.sqrt(((touch2X - touch1X) * (touch2X - touch1X)) + ((touch2Y - touch1Y) * (touch2Y - touch1Y)));
+        var translateZAmount = -350 * (newDistance - touchEventHandler.distance);
+        touchEventHandler.lastTranslateZAmount = translateZAmount;
+        camera.translateZ(translateZAmount);
+        touchEventHandler.distance = newDistance;
+      }
     }
     for (var i = 0; i<event.changedTouches.length; i++){
       var changedTouch = 0;

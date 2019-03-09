@@ -1,4 +1,7 @@
 var KeyboardEventHandler = function(){
+  if (isMobile){
+    return;
+  }
   if (!isDeployment){
     scriptCreatorTextArea.onkeydown = this.onScriptCreatorTextAreaKeyDown;
   }

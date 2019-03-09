@@ -1,4 +1,7 @@
 var PointerLockEventHandler = function(){
+  if (isMobile){
+    return;
+  }
   pointerLockSupported = 'pointerLockElement' in document || 'mozPointerLockElement' in document || 'webkitPointerLockElement' in document;
   canvas.requestPointerLock = canvas.requestPointerLock || canvas.mozRequestPointerLock || canvas.webkitRequestPointerLock;
   var pointerLockChangeFunction = 0;
