@@ -51,6 +51,7 @@ TouchEventHandler.prototype.onTouchStart = function(event){
     touchEventHandler.touchCount = 1;
     touchEventHandler.isTap = true;
     touchEventHandler.tapStartTime = performance.now();
+    touchEventHandler.distance = 0;
   }else if (event.targetTouches.length == 2){
     touchEventHandler.isTap = false;
     touchEventHandler.touch2 = event.targetTouches[1];
@@ -66,6 +67,7 @@ TouchEventHandler.prototype.onTouchStart = function(event){
 
 TouchEventHandler.prototype.onTouchMove = function(event){
   event.preventDefault();
+  event.stopPropagation();
   if (event.targetTouches.length == 1){
     var newCoordX = event.targetTouches[0].pageX;
     var newCoordY = event.targetTouches[0].pageY;
@@ -94,8 +96,10 @@ TouchEventHandler.prototype.onTouchMove = function(event){
       var touch2Y = touch2.pageY;
       if (!(mode == 1 && defaultCameraControlsDisabled)){
         var newDistance = Math.sqrt(((touch2X - touch1X) * (touch2X - touch1X)) + ((touch2Y - touch1Y) * (touch2Y - touch1Y)));
-        var translateZAmount = touchEventHandler.getTranslateZAmount((newDistance - touchEventHandler.distance));
-        camera.translateZ(-translateZAmount);
+        if (touchEventHandler.distance != 0){
+          var translateZAmount = touchEventHandler.getTranslateZAmount((newDistance - touchEventHandler.distance));
+          camera.translateZ(-translateZAmount);
+        }
         touchEventHandler.distance = newDistance;
       }
     }
