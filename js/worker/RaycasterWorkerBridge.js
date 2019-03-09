@@ -145,9 +145,11 @@ var RaycasterWorkerBridge = function(){
   }
   // ***************************************************************
   this.onShiftPress = function(isPressed){
-    rayCaster.worker.postMessage({
-      "shiftPress": {isPressed: isPressed}
-    })
+    if (mode == 0){
+      rayCaster.worker.postMessage({
+        "shiftPress": {isPressed: isPressed}
+      })
+    }
   }
 }
 
@@ -213,10 +215,10 @@ RaycasterWorkerBridge.prototype.onBeforeUpdate = function(){
       }
     }
     if (!cameraOrientationUpdateBufferSent){
-      console.error("[!] RaycasterWorkerBridge.issueUpdate camera orientation buffer overflow.");
+      console.warn("[!] RaycasterWorkerBridge.issueUpdate camera orientation buffer overflow.");
     }
     if (!viewportUpdateBufferSent){
-      console.error("[!] RaycasterWorkerBridge.issueUpdate viewport buffer overflow.");
+      console.warn("[!] RaycasterWorkerBridge.issueUpdate viewport buffer overflow.");
     }
     this.hasUpdatedTexts = false;
   }
@@ -237,7 +239,7 @@ RaycasterWorkerBridge.prototype.issueUpdate = function(obj){
         return;
       }
     }
-    console.error("[!] RaycasterWorkerBridge.issueUpdate added object buffer overflow.");
+    console.warn("[!] RaycasterWorkerBridge.issueUpdate added object buffer overflow.");
   }else if (obj.isObjectGroup){
     var objectGroupUpdateBuffer = rayCaster.objectGroupsUpdateBuffer[obj.name];
     var len = objectGroupUpdateBuffer.buffers.length;
@@ -253,7 +255,7 @@ RaycasterWorkerBridge.prototype.issueUpdate = function(obj){
         return;
       }
     }
-    console.error("[!] RaycasterWorkerBridge.issueUpdate object group buffer overflow.");
+    console.warn("[!] RaycasterWorkerBridge.issueUpdate object group buffer overflow.");
   }else if (obj.isAddedText){
     if (!rayCaster.addedTextsUpdateBuffer){
       return;
@@ -279,7 +281,7 @@ RaycasterWorkerBridge.prototype.issueUpdate = function(obj){
         return;
       }
     }
-    console.error("[!] RaycasterWorkerBridge.issueUpdate added text buffer overflow.");
+    console.warn("[!] RaycasterWorkerBridge.issueUpdate added text buffer overflow.");
   }
 }
 
@@ -302,7 +304,7 @@ RaycasterWorkerBridge.prototype.findIntersections = function(from, direction, in
     }
   }
   if (!sent){
-    console.error("[!] RaycasterWorkerBridge.findIntersections buffer overflow.");
+    console.warn("[!] RaycasterWorkerBridge.findIntersections buffer overflow.");
   }
 }
 
@@ -319,7 +321,7 @@ RaycasterWorkerBridge.prototype.hide = function(object){
       return;
     }
   }
-  console.error("[!] RaycasterWorkerBridge.hide buffer overflow.");
+  console.warn("[!] RaycasterWorkerBridge.hide buffer overflow.");
 }
 
 RaycasterWorkerBridge.prototype.show = function(object){
@@ -335,7 +337,7 @@ RaycasterWorkerBridge.prototype.show = function(object){
       return;
     }
   }
-  console.error("[!] RaycasterWorkerBridge.show buffer overflow.");
+  console.warn("[!] RaycasterWorkerBridge.show buffer overflow.");
 }
 
 

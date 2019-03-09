@@ -886,7 +886,7 @@ var GridSystem = function(name, sizeX, sizeZ, centerX, centerY, centerZ,
 
   gridCounter = gridCounter + totalGridCount;
 
-  if (!isDeployment){
+  if (!isDeployment && projectLoaded){
     terminal.printInfo(Text.GS_CREATED);
   }
 }
@@ -7750,7 +7750,7 @@ WorkerMessageHandler.prototype.push = function(data){
 }
 
 WorkerMessageHandler.prototype.flush = function(){
-  if (this.buffer.length > 0){
+  if (this.buffer.length > 0){ 
     if (this.worker){
       this.worker.postMessage(this.buffer);
     }else{

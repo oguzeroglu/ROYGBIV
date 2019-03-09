@@ -64,22 +64,6 @@ RaycasterWorker.prototype.findIntersections = function(data){
   }
   this.workerMessageHandler.push(data.buffer);
 }
-RaycasterWorker.prototype.hideObjects = function(){
-  for (var objName in addedObjects){
-    this.rayCaster.hide(addedObjects[objName]);
-  }
-  for (var objName in objectGroups){
-    this.rayCaster.hide(objectGroups[objName]);
-  }
-}
-RaycasterWorker.prototype.showObjects = function(){
-  for (var objName in addedObjects){
-    this.rayCaster.show(addedObjects[objName]);
-  }
-  for (var objName in objectGroups){
-    this.rayCaster.show(objectGroups[objName]);
-  }
-}
 RaycasterWorker.prototype.updateAddedObject = function(data){
   var objID = data[2];
   var obj = this.objectsByWorkerID[objID];
@@ -171,9 +155,9 @@ self.onmessage = function(msg){
     worker.refresh(msg.data);
   }else if (msg.data.shiftPress){
     if (msg.data.shiftPress.isPressed){
-      worker.hideObjects();
+      keyboardBuffer["Shift"] = true;
     }else{
-      worker.showObjects();
+      keyboardBuffer["Shift"] = false;
     }
   }else{
     for (var i = 0; i<msg.data.length; i++){

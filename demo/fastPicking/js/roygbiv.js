@@ -3123,7 +3123,7 @@ var GridSystem = function(name, sizeX, sizeZ, centerX, centerY, centerZ,
 
   gridCounter = gridCounter + totalGridCount;
 
-  if (!isDeployment){
+  if (!isDeployment && projectLoaded){
     terminal.printInfo(Text.GS_CREATED);
   }
 }
@@ -7502,11 +7502,13 @@ function updateRaycaster(){
 
 function updateAddedTexts(){
   if (mode == 0){
-    for (var addedTextName in addedTexts){
-      var addedText = addedTexts[addedTextName];
-      if (addedText.needsUpdate() && !addedText.is2D){
-        addedText.handleBoundingBox();
-        rayCaster.updateObject(addedText);
+    if (!keyboardBuffer["Shift"]){
+      for (var addedTextName in addedTexts){
+        var addedText = addedTexts[addedTextName];
+        if (addedText.needsUpdate() && !addedText.is2D){
+          addedText.handleBoundingBox();
+          rayCaster.updateObject(addedText);
+        }
       }
     }
   }else{
@@ -9410,10 +9412,10 @@ window.onload = function() {
   DDS_SUPPORTED = (!(renderer.context.getExtension("WEBGL_compressed_texture_s3tc") == null));
   INSTANCING_SUPPORTED = (!(renderer.context.getExtension("ANGLE_instanced_arrays") == null));
   HIGH_PRECISION_SUPPORTED = !(
-    renderer.context.getShaderPrecisionFormat(renderer.context.VERTEX_SHADER, renderer.context.HIGH_INT) == null ||
-    renderer.context.getShaderPrecisionFormat(renderer.context.VERTEX_SHADER, renderer.context.HIGH_FLOAT) == null ||
-    renderer.context.getShaderPrecisionFormat(renderer.context.FRAGMENT_SHADER, renderer.context.HIGH_INT) == null ||
-    renderer.context.getShaderPrecisionFormat(renderer.context.FRAGMENT_SHADER, renderer.context.HIGH_FLOAT) == null
+    renderer.context.getShaderPrecisionFormat(renderer.context.VERTEX_SHADER, renderer.context.HIGH_INT) <= 0 ||
+    renderer.context.getShaderPrecisionFormat(renderer.context.VERTEX_SHADER, renderer.context.HIGH_FLOAT) <= 0 ||
+    renderer.context.getShaderPrecisionFormat(renderer.context.FRAGMENT_SHADER, renderer.context.HIGH_INT) <= 0 ||
+    renderer.context.getShaderPrecisionFormat(renderer.context.FRAGMENT_SHADER, renderer.context.HIGH_FLOAT) <= 0
   );
   if (!isDeployment){
     terminal.init();
@@ -11514,11 +11516,14 @@ StateLoader.prototype.finalize = function(){
   }
   projectLoaded = true;
   if (!isDeployment){
+    terminal.printInfo("Initializing workers.");
+    rayCaster.onReadyCallback = function(){
+      canvas.style.visibility = "";
+      terminal.enable();
+      terminal.clear();
+      terminal.printInfo("Project loaded.");
+    }
     rayCaster.refresh();
-    canvas.style.visibility = "";
-    terminal.enable();
-    terminal.clear();
-    terminal.printInfo("Project loaded.");
   }else{
     appendtoDeploymentConsole("Initializing workers.");
     modeSwitcher.switchMode();
@@ -23417,6 +23422,9 @@ ModeSwitcher.prototype.switchFromDesignToPreview = function(){
   $("#cliDivheader").text("ROYGBIV 3D Engine - CLI (Preview mode)");
   mode = 1;
   var that = this;
+  if (!canvas.ready && !isDeployment){
+    terminal.printInfo(Text.INITIALIZING_WORKERS);
+  }
   rayCaster.onReadyCallback = function(){
     if (!isDeployment){
       that.enableTerminal();
@@ -23448,10 +23456,6 @@ ModeSwitcher.prototype.switchFromPreviewToDesign = function(){
   camera.oldAspect = camera.aspect;
   camera.aspect = window.innerWidth / window.innerHeight;
   camera.updateProjectionMatrix();
-  if (!isDeployment){
-    terminal.printInfo(Text.SWITCHED_TO_DESIGN_MODE);
-  }
-  $("#cliDivheader").text("ROYGBIV 3D Engine - CLI (Design mode)");
   if (!(typeof originalBloomConfigurations.bloomStrength == UNDEFINED)){
     bloomStrength = originalBloomConfigurations.bloomStrength;
   }
@@ -23629,6 +23633,18 @@ ModeSwitcher.prototype.switchFromPreviewToDesign = function(){
   }
   for (var textName in addedTexts){
     addedTexts[textName].removeFog();
+  }
+  if (!rayCaster.ready){
+    terminal.printInfo(Text.INITIALIZING_WORKERS);
+    var that = this;
+    canvas.style.visibility = "hidden";
+    terminal.disable();
+    rayCaster.onReadyCallback = function(){
+      $("#cliDivheader").text("ROYGBIV 3D Engine - CLI (Design mode)");
+      that.enableTerminal();
+      canvas.style.visibility = "";
+      terminal.printInfo(Text.SWITCHED_TO_DESIGN_MODE);
+    }
   }
 }
 
@@ -24323,9 +24339,11 @@ var RaycasterWorkerBridge = function(){
   }
   // ***************************************************************
   this.onShiftPress = function(isPressed){
-    rayCaster.worker.postMessage({
-      "shiftPress": {isPressed: isPressed}
-    })
+    if (mode == 0){
+      rayCaster.worker.postMessage({
+        "shiftPress": {isPressed: isPressed}
+      })
+    }
   }
 }
 
@@ -24391,10 +24409,10 @@ RaycasterWorkerBridge.prototype.onBeforeUpdate = function(){
       }
     }
     if (!cameraOrientationUpdateBufferSent){
-      console.error("[!] RaycasterWorkerBridge.issueUpdate camera orientation buffer overflow.");
+      console.warn("[!] RaycasterWorkerBridge.issueUpdate camera orientation buffer overflow.");
     }
     if (!viewportUpdateBufferSent){
-      console.error("[!] RaycasterWorkerBridge.issueUpdate viewport buffer overflow.");
+      console.warn("[!] RaycasterWorkerBridge.issueUpdate viewport buffer overflow.");
     }
     this.hasUpdatedTexts = false;
   }
@@ -24415,7 +24433,7 @@ RaycasterWorkerBridge.prototype.issueUpdate = function(obj){
         return;
       }
     }
-    console.error("[!] RaycasterWorkerBridge.issueUpdate added object buffer overflow.");
+    console.warn("[!] RaycasterWorkerBridge.issueUpdate added object buffer overflow.");
   }else if (obj.isObjectGroup){
     var objectGroupUpdateBuffer = rayCaster.objectGroupsUpdateBuffer[obj.name];
     var len = objectGroupUpdateBuffer.buffers.length;
@@ -24431,7 +24449,7 @@ RaycasterWorkerBridge.prototype.issueUpdate = function(obj){
         return;
       }
     }
-    console.error("[!] RaycasterWorkerBridge.issueUpdate object group buffer overflow.");
+    console.warn("[!] RaycasterWorkerBridge.issueUpdate object group buffer overflow.");
   }else if (obj.isAddedText){
     if (!rayCaster.addedTextsUpdateBuffer){
       return;
@@ -24457,7 +24475,7 @@ RaycasterWorkerBridge.prototype.issueUpdate = function(obj){
         return;
       }
     }
-    console.error("[!] RaycasterWorkerBridge.issueUpdate added text buffer overflow.");
+    console.warn("[!] RaycasterWorkerBridge.issueUpdate added text buffer overflow.");
   }
 }
 
@@ -24480,7 +24498,7 @@ RaycasterWorkerBridge.prototype.findIntersections = function(from, direction, in
     }
   }
   if (!sent){
-    console.error("[!] RaycasterWorkerBridge.findIntersections buffer overflow.");
+    console.warn("[!] RaycasterWorkerBridge.findIntersections buffer overflow.");
   }
 }
 
@@ -24497,7 +24515,7 @@ RaycasterWorkerBridge.prototype.hide = function(object){
       return;
     }
   }
-  console.error("[!] RaycasterWorkerBridge.hide buffer overflow.");
+  console.warn("[!] RaycasterWorkerBridge.hide buffer overflow.");
 }
 
 RaycasterWorkerBridge.prototype.show = function(object){
@@ -24513,7 +24531,7 @@ RaycasterWorkerBridge.prototype.show = function(object){
       return;
     }
   }
-  console.error("[!] RaycasterWorkerBridge.show buffer overflow.");
+  console.warn("[!] RaycasterWorkerBridge.show buffer overflow.");
 }
 
 
@@ -24587,7 +24605,7 @@ WorkerMessageHandler.prototype.push = function(data){
 }
 
 WorkerMessageHandler.prototype.flush = function(){
-  if (this.buffer.length > 0){
+  if (this.buffer.length > 0){ 
     if (this.worker){
       this.worker.postMessage(this.buffer);
     }else{

@@ -64,11 +64,13 @@ function updateRaycaster(){
 
 function updateAddedTexts(){
   if (mode == 0){
-    for (var addedTextName in addedTexts){
-      var addedText = addedTexts[addedTextName];
-      if (addedText.needsUpdate() && !addedText.is2D){
-        addedText.handleBoundingBox();
-        rayCaster.updateObject(addedText);
+    if (!keyboardBuffer["Shift"]){
+      for (var addedTextName in addedTexts){
+        var addedText = addedTexts[addedTextName];
+        if (addedText.needsUpdate() && !addedText.is2D){
+          addedText.handleBoundingBox();
+          rayCaster.updateObject(addedText);
+        }
       }
     }
   }else{
