@@ -157,6 +157,8 @@ MouseEventHandler.prototype.onClick = function(event){
       REUSABLE_VECTOR.setFromMatrixPosition(camera.matrixWorld);
       REUSABLE_VECTOR_2.set(coordX, coordY, 0.5).unproject(camera).sub(REUSABLE_VECTOR).normalize();
       rayCaster.findIntersections(REUSABLE_VECTOR, REUSABLE_VECTOR_2, (mode == 0), onRaycasterIntersection);
+    }else{
+      onRaycasterIntersection();
     }
   }
 }
