@@ -1066,6 +1066,7 @@ var guiHandler;
 var cpuOperationsHandler;
 var particleSystemRefHeight = 0;
 var preConditions;
+var HIGH_PRECISION_SUPPORTED = false;
 
 // WORKER VARIABLES
 var WORKERS_SUPPORTED = (typeof(Worker) !== "undefined") && (typeof(MessageChannel) !== "undefined");
