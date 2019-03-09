@@ -43,55 +43,48 @@ TouchEventHandler.prototype.onTouchStart = function(event){
     touchEventHandler.touch2 = event.targetTouches[1];
     touchEventHandler.touch2Initial = event.targetTouches[1];
     touchEventHandler.touchCount = 2;
-    var rect = boundingClientRect;
-    var touch1X = ((touchEventHandler.touch1.clientX - rect.left) / rect.width) * 2 - 1;
-    var touch1Y = - ((touchEventHandler.touch1.clientY - rect.top) / rect.height) * 2 + 1;
-    var touch2X = ((touchEventHandler.touch2.clientX - rect.left) / rect.width) * 2 - 1;
-    var touch2Y = - ((touchEventHandler.touch2.clientY - rect.top) / rect.height) * 2 + 1;
+    var touch1X = touchEventHandler.touch1.pageX;
+    var touch1Y = touchEventHandler.touch1.pageY;
+    var touch2X = touchEventHandler.touch2.pageX;
+    var touch2Y = touchEventHandler.touch2.pageY;
     touchEventHandler.distance = Math.sqrt(((touch2X - touch1X) * (touch2X - touch1X)) + ((touch2Y - touch1Y) * (touch2Y - touch1Y)));
   }
 }
 
 TouchEventHandler.prototype.onTouchMove = function(event){
   if (event.targetTouches.length == 1){
-    var rect = boundingClientRect;
-    var newCoordX = ((event.targetTouches[0].clientX - rect.left) / rect.width) * 2 - 1;
-    var newCoordY = - ((event.targetTouches[0].clientY - rect.top) / rect.height) * 2 + 1;
-    var oldCoordX = ((touchEventHandler.touch1.clientX - rect.left) / rect.width) * 2 - 1;
-    var oldCoordY = - ((touchEventHandler.touch1.clientY - rect.top) / rect.height) * 2 + 1;
-    var initialOldCoordX = ((touchEventHandler.touch1Initial.clientX - rect.left) / rect.width) * 2 - 1;
-    var initialOldCoordY = - ((touchEventHandler.touch1Initial.clientY - rect.top) / rect.height) * 2 + 1;
+    var newCoordX = event.targetTouches[0].pageX;
+    var newCoordY = event.targetTouches[0].pageY;
+    var oldCoordX = touchEventHandler.touch1.pageX;
+    var oldCoordY = touchEventHandler.touch1.pageY;
+    var initialOldCoordX = touchEventHandler.touch1Initial.pageX;
+    var initialOldCoordY = touchEventHandler.touch1Initial.pageY;
     touchEventHandler.touch1Diff.x = newCoordX - oldCoordX;
     touchEventHandler.touch1Diff.y = newCoordY - oldCoordY;
     touchEventHandler.touch1DiffFromInitial.x = newCoordX - initialOldCoordX;
     touchEventHandler.touch1DiffFromInitial.y = newCoordY - initialOldCoordY;
     if (!(mode == 1 && defaultCameraControlsDisabled)){
-      var translateXAmount = -350 * touchEventHandler.touch1Diff.x;
-      var translateYAmount = -350 * touchEventHandler.touch1Diff.y;
-      if (touchEventHandler.touch1Diff.y > 0.004 || touchEventHandler.touch1Diff.y < -0.004){
-        camera.translateY(translateYAmount);
-        touchEventHandler.lastTranslateYAmount = translateYAmount;
-      }
-      if (touchEventHandler.touch1Diff.x > 0.004 || touchEventHandler.touch1Diff.x < -0.004){
-        camera.translateX(translateXAmount);
-        touchEventHandler.lastTranslateXAmount = translateXAmount;
-      }
+      var translateXAmount = touchEventHandler.touch1Diff.x;
+      var translateYAmount = touchEventHandler.touch1Diff.y;
+      camera.translateY(translateYAmount);
+      touchEventHandler.lastTranslateYAmount = translateYAmount;
+      camera.translateX(-translateXAmount);
+      touchEventHandler.lastTranslateXAmount = translateXAmount;
     }
     touchEventHandler.touch1 = event.targetTouches[0];
   }else if (event.targetTouches.length == 2){
     if (event.changedTouches.length == 2){
-      var rect = boundingClientRect;
       var touch1 = event.changedTouches[0];
       var touch2 = event.changedTouches[1];
-      var touch1X = ((touch1.clientX - rect.left) / rect.width) * 2 - 1;
-      var touch1Y = - ((touch1.clientY - rect.top) / rect.height) * 2 + 1;
-      var touch2X = ((touch2.clientX - rect.left) / rect.width) * 2 - 1;
-      var touch2Y = - ((touch2.clientY - rect.top) / rect.height) * 2 + 1;
+      var touch1X =touch1.pageX;
+      var touch1Y = touch1.pageY;
+      var touch2X = touch2.pageX;
+      var touch2Y = touch2.pageY;
       if (!(mode == 1 && defaultCameraControlsDisabled)){
         var newDistance = Math.sqrt(((touch2X - touch1X) * (touch2X - touch1X)) + ((touch2Y - touch1Y) * (touch2Y - touch1Y)));
-        var translateZAmount = -350 * (newDistance - touchEventHandler.distance);
+        var translateZAmount = (newDistance - touchEventHandler.distance);
         touchEventHandler.lastTranslateZAmount = translateZAmount;
-        camera.translateZ(translateZAmount);
+        camera.translateZ(-translateZAmount);
         touchEventHandler.distance = newDistance;
       }
     }
@@ -111,13 +104,12 @@ TouchEventHandler.prototype.onTouchMove = function(event){
         diffFromInitial = touchEventHandler.touch2DiffFromInitial;
       }
       if (changedTouch){
-        var rect = boundingClientRect;
-        var newCoordX = ((event.changedTouches[i].clientX - rect.left) / rect.width) * 2 - 1;
-        var newCoordY = - ((event.changedTouches[i].clientY - rect.top) / rect.height) * 2 + 1;
-        var oldCoordX = ((changedTouch.clientX - rect.left) / rect.width) * 2 - 1;
-        var oldCoordY = - ((changedTouch.clientY - rect.top) / rect.height) * 2 + 1;
-        var initialOldCoordX = ((initTouch.clientX - rect.left) / rect.width) * 2 - 1;
-        var initialOldCoordY = - ((initTouch.clientY - rect.top) / rect.height) * 2 + 1;
+        var newCoordX = event.changedTouches[i].pageX;
+        var newCoordY = event.changedTouches[i].pageY;
+        var oldCoordX = changedTouch.pageX;
+        var oldCoordY = changedTouch.pageY;
+        var initialOldCoordX = initTouch.pageX;
+        var initialOldCoordY = initTouch.pageY;
         diff.x = newCoordX - oldCoordX;
         diff.y = newCoordY - oldCoordY;
         diffFromInitial.x = newCoordX - initialOldCoordX;
