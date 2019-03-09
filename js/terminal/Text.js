@@ -118,6 +118,7 @@ var Text = function(){
   this.STATUS_ERROR = "(ERROR)";
   this.STATUS_LOADED = "(LOADED)";
   this.TEXTURES = "Textures";
+  this.INITIALIZING_WORKERS = "Initializing workers.";
   this.NAME_CANNOT_EXCEED_X_CHARS = "Name cannot exceed @@1 characters.";
   this.CREATED_X_SURFACES = "Command executed for @@1 surfaces.";
   this.CREATED_X_BOXES = "Command executed for @@1 boxes.";

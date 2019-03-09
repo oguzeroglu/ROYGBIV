@@ -183,7 +183,7 @@ var GridSystem = function(name, sizeX, sizeZ, centerX, centerY, centerZ,
 
   gridCounter = gridCounter + totalGridCount;
 
-  if (!isDeployment){
+  if (!isDeployment && projectLoaded){
     terminal.printInfo(Text.GS_CREATED);
   }
 }

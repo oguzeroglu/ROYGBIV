@@ -202,6 +202,9 @@ ModeSwitcher.prototype.switchFromDesignToPreview = function(){
   $("#cliDivheader").text("ROYGBIV 3D Engine - CLI (Preview mode)");
   mode = 1;
   var that = this;
+  if (!canvas.ready && !isDeployment){
+    terminal.printInfo(Text.INITIALIZING_WORKERS);
+  }
   rayCaster.onReadyCallback = function(){
     if (!isDeployment){
       that.enableTerminal();
@@ -233,10 +236,6 @@ ModeSwitcher.prototype.switchFromPreviewToDesign = function(){
   camera.oldAspect = camera.aspect;
   camera.aspect = window.innerWidth / window.innerHeight;
   camera.updateProjectionMatrix();
-  if (!isDeployment){
-    terminal.printInfo(Text.SWITCHED_TO_DESIGN_MODE);
-  }
-  $("#cliDivheader").text("ROYGBIV 3D Engine - CLI (Design mode)");
   if (!(typeof originalBloomConfigurations.bloomStrength == UNDEFINED)){
     bloomStrength = originalBloomConfigurations.bloomStrength;
   }
@@ -414,5 +413,17 @@ ModeSwitcher.prototype.switchFromPreviewToDesign = function(){
   }
   for (var textName in addedTexts){
     addedTexts[textName].removeFog();
+  }
+  if (!rayCaster.ready){
+    terminal.printInfo(Text.INITIALIZING_WORKERS);
+    var that = this;
+    canvas.style.visibility = "hidden";
+    terminal.disable();
+    rayCaster.onReadyCallback = function(){
+      $("#cliDivheader").text("ROYGBIV 3D Engine - CLI (Design mode)");
+      that.enableTerminal();
+      canvas.style.visibility = "";
+      terminal.printInfo(Text.SWITCHED_TO_DESIGN_MODE);
+    }
   }
 }

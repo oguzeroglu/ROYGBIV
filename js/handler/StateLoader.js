@@ -1308,11 +1308,14 @@ StateLoader.prototype.finalize = function(){
   }
   projectLoaded = true;
   if (!isDeployment){
+    terminal.printInfo("Initializing workers.");
+    rayCaster.onReadyCallback = function(){
+      canvas.style.visibility = "";
+      terminal.enable();
+      terminal.clear();
+      terminal.printInfo("Project loaded.");
+    }
     rayCaster.refresh();
-    canvas.style.visibility = "";
-    terminal.enable();
-    terminal.clear();
-    terminal.printInfo("Project loaded.");
   }else{
     appendtoDeploymentConsole("Initializing workers.");
     modeSwitcher.switchMode();
