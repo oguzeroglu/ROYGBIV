@@ -2807,7 +2807,7 @@ Roygbiv.prototype.createSnow = function(configurations){
   preConditions.checkIfNumberOnlyIfExists(ROYGBIV.createSnow, preConditions.randomness, randomness);
   preConditions.checkIfNumberOnlyIfExists(ROYGBIV.createSnow, preConditions.collisionTimeOffset, collisionTimeOffset);
   if ((typeof rewindOnCollided == UNDEFINED)){
-    rewindOnCollided = true;
+    rewindOnCollided = false;
   }
   if ((typeof normal == UNDEFINED)){
     normal = this.vector(0, -1, 0);
