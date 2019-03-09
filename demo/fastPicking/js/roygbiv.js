@@ -24709,6 +24709,7 @@ TouchEventHandler.prototype.onTouchStart = function(event){
 }
 
 TouchEventHandler.prototype.onTouchMove = function(event){
+  event.preventDefault();
   if (event.targetTouches.length == 1){
     var newCoordX = event.targetTouches[0].pageX;
     var newCoordY = event.targetTouches[0].pageY;
@@ -24783,6 +24784,7 @@ TouchEventHandler.prototype.onTap = function(touch){
 }
 
 TouchEventHandler.prototype.onTouchEnd = function(event){
+  event.preventDefault();
   if (event.targetTouches.length == 0){
     if (touchEventHandler.touch1 && !touchEventHandler.touch2 && touchEventHandler.isTap){
       if (performance.now() - touchEventHandler.tapStartTime < 160){
