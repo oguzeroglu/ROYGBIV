@@ -24665,12 +24665,25 @@ var TouchEventHandler = function(){
   this.touch2DiffFromInitial = {
     x:0, y:0
   }
-  this.lastTranslateXAmount = 0;
-  this.lastTranslateYAmount = 0;
-  this.lastTranslateZAmount = 0;
   this.distance = 0;
   this.isTap = true;
   this.tapStartTime = 0;
+
+  this.maxTranslateCoef = 1000;
+  this.maxDistance = Math.sqrt((window.innerWidth * window.innerWidth) + (window.innerHeight * window.innerHeight));
+
+}
+
+TouchEventHandler.prototype.getRotationYAmount = function(diff){
+  return (diff / window.innerWidth);
+}
+
+TouchEventHandler.prototype.getRotationXAmount = function(diff){
+  return (diff / window.innerHeight);
+}
+
+TouchEventHandler.prototype.getTranslateZAmount = function(distance){
+  return touchEventHandler.maxTranslateCoef * (distance / touchEventHandler.maxDistance);
 }
 
 TouchEventHandler.prototype.onTouchStart = function(event){
@@ -24708,12 +24721,10 @@ TouchEventHandler.prototype.onTouchMove = function(event){
     touchEventHandler.touch1DiffFromInitial.x = newCoordX - initialOldCoordX;
     touchEventHandler.touch1DiffFromInitial.y = newCoordY - initialOldCoordY;
     if (!(mode == 1 && defaultCameraControlsDisabled)){
-      var translateXAmount = touchEventHandler.touch1Diff.x;
-      var translateYAmount = touchEventHandler.touch1Diff.y;
-      camera.translateY(translateYAmount);
-      touchEventHandler.lastTranslateYAmount = translateYAmount;
-      camera.translateX(-translateXAmount);
-      touchEventHandler.lastTranslateXAmount = translateXAmount;
+      var rotateYAmount = touchEventHandler.getRotationYAmount(touchEventHandler.touch1Diff.x);
+      var rotateXAmount = touchEventHandler.getRotationXAmount(touchEventHandler.touch1Diff.y);
+      camera.rotation.y += rotateYAmount;
+      camera.rotation.x += rotateXAmount;
     }
     touchEventHandler.touch1 = event.targetTouches[0];
   }else if (event.targetTouches.length == 2){
@@ -24726,8 +24737,7 @@ TouchEventHandler.prototype.onTouchMove = function(event){
       var touch2Y = touch2.pageY;
       if (!(mode == 1 && defaultCameraControlsDisabled)){
         var newDistance = Math.sqrt(((touch2X - touch1X) * (touch2X - touch1X)) + ((touch2Y - touch1Y) * (touch2Y - touch1Y)));
-        var translateZAmount = (newDistance - touchEventHandler.distance);
-        touchEventHandler.lastTranslateZAmount = translateZAmount;
+        var translateZAmount = touchEventHandler.getTranslateZAmount((newDistance - touchEventHandler.distance));
         camera.translateZ(-translateZAmount);
         touchEventHandler.distance = newDistance;
       }
