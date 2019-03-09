@@ -661,13 +661,11 @@ AddedText.prototype.set2DStatus = function(is2D){
     delete addedTexts2D[this.name];
   }
   if (is2D){
-    rayCaster.hide(this);
     if (this.bbHelper){
       scene.remove(this.bbHelper);
     }
-  }else{
-    rayCaster.show(this);
   }
+  rayCaster.refresh();
 }
 
 AddedText.prototype.set2DCoordinates = function(marginPercentWidth, marginPercentHeight){

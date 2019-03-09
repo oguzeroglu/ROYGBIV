@@ -62,6 +62,17 @@ var RaycasterWorkerBridge = function(){
             rayCaster.addedTextsUpdateBuffer.push(new Float32Array(39));
             rayCaster.addedTextsUpdateBufferAvailibilities.push(true);
           }
+          if (mode == 1 && addedTexts[msg.data.ids[i].name].isClickable && !addedTexts[msg.data.ids[i].name].is2D){
+            for (var x = 0; x<rayCaster.hideShowBufferSize; x++){
+              rayCaster.hideShowBuffer.push(new Float32Array(3));
+              rayCaster.hideShowBufferAvailibilities.push(true);
+            }
+          }else if (mode == 0){
+            for (var x = 0; x<rayCaster.hideShowBufferSize; x++){
+              rayCaster.hideShowBuffer.push(new Float32Array(3));
+              rayCaster.hideShowBufferAvailibilities.push(true);
+            }
+          }
         }else{
           throw new Error("Not implemented.");
         }
