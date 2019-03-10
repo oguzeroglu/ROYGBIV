@@ -103,7 +103,6 @@ RaycasterWorker.prototype.updateAddedText = function(data){
   text.bottomRight.set(data[30], data[31], data[32]);
   text.topRight.set(data[33], data[34], data[35]);
   text.bottomLeft.set(data[36], data[37], data[38]);
-  this.workerMessageHandler.push(data.buffer);
   text.handleBoundingBox();
   this.rayCaster.updateObject(text, true);
 }
