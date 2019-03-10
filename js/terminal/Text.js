@@ -173,7 +173,6 @@ var Text = function(){
   this.THERE_ARE_NO_PHYSICS_TESTS = "There are no physics tests.";
   this.PHYSICS_DEBUG_MODE_ON = "Physics debug mode: ON";
   this.PHYSICS_DEBUG_MODE_OFF = "Physics debug mode: OFF";
-  this.SIMPLIFY_STATE_MUST_BE_ON_OFF = "Simplify state must be on or off.";
   this.AXIS_MUST_BE_ONE_OF_X_Y_Z = "Axis must be one of x, y, or z.";
   this.HEIGHT_MUST_BE_A_NUMBER = "Height must be a number.";
   this.NO_ANCHOR_GRIDS_SELECTED = "No anchor grid selected. Use setAnchor command first.";

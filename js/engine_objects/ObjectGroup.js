@@ -2024,8 +2024,4 @@ ObjectGroup.prototype.simplifyPhysics = function(sizeX, sizeY, sizeZ){
   newPhysicsBody.quaternion.copy(this.physicsBody.quaternion);
   this.physicsBody = newPhysicsBody;
   physicsWorld.addBody(this.physicsBody);
-  this.isPhysicsSimplified = true;
-  this.physicsSimplifyParametersX = sizeX;
-  this.physicsSimplifyParametersY = sizeY;
-  this.physicsSimplifyParametersZ = sizeZ;
 }
