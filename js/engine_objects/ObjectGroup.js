@@ -1359,11 +1359,7 @@ ObjectGroup.prototype.destroy = function(skipRaycasterRefresh){
     var childObj= this.group[name];
     if (childObj.destroyedGrids){
       for (var gridName in childObj.destroyedGrids){
-        if (!isUndo){
-          delete childObj.destroyedGrids[gridName].destroyedAddedObject;
-        }else{
-          childObj.destroyedGrids[gridName].destroyedAddedObject = childObj.name;
-        }
+        delete childObj.destroyedGrids[gridName].destroyedAddedObject;
         delete childObj.destroyedGrids[gridName].destroyedObjectGroup;
       }
     }
