@@ -196,6 +196,9 @@ RaycasterWorkerBridge.prototype.refresh = function(){
 }
 
 RaycasterWorkerBridge.prototype.onAddedTextResize = function(addedText){
+  if (!rayCaster.ready){
+    return;
+  }
   if (!addedText.is2D){
     if (mode == 0 || (mode == 1 && addedText.isClickable)){
       rayCaster.textScaleUpdateBuffer.set(addedText.name, addedText);
