@@ -177,7 +177,8 @@ if (!isDeployment){
       1, //destroyText
       0, //printTexts
       1, //setRayStep
-      0 //printRayStep
+      0, //printRayStep
+      4 //simplifyPhysics
   ];
   commandArgumentsExpectedExplanation = [
     "help", //help
@@ -339,7 +340,8 @@ if (!isDeployment){
     "destroyText textName", //destroyText
     "printTexts", //printTexts
     "setRayStep stepAmount", //setRayStep
-    "printRayStep"
+    "printRayStep", //printRayStep
+    "simplifyPhysics objName sizeX sizeY sizeZ" //simplifyPhysics
   ];
   commands = [
     "help",
@@ -501,7 +503,8 @@ if (!isDeployment){
     "destroyText",
     "printTexts",
     "setRayStep",
-    "printRayStep"
+    "printRayStep",
+    "simplifyPhysics"
   ];
   commandInfo = [
     "help: Prints command list.",
@@ -663,7 +666,8 @@ if (!isDeployment){
     "destroyText: Destroys a text.",
     "printTexts: Prints a list of created texts.",
     "setRayStep: Sets the step amount used by the Raycaster while detecting intersections. Small step amount means more precise intersection\n  detection but worse performance. Default value is 32.",
-    "printRayStep: Prints the ray step amount."
+    "printRayStep: Prints the ray step amount.",
+    "simplifyPhysics: Sets the physics of an object to a box shape of sizeX, sizeY, sizeZ sizes. This helps optimizing the performance of the\n  physics engine but causes physics precision loss."
   ];
   keyboardInfo = [
     "W/S : Translates the camera on axis Z.",

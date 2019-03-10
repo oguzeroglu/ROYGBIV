@@ -1004,6 +1004,7 @@ ObjectGroup.prototype.glue = function(){
   var group = this.group;
   var physicsMaterial = new CANNON.Material();
   var physicsBody = new CANNON.Body({mass: 0, material: physicsMaterial});
+  this.originalPhysicsBody = physicsBody;
   var centerPosition = this.getInitialCenter();
   var graphicsGroup = new THREE.Group();
   var centerX = centerPosition.x;
@@ -2004,4 +2005,27 @@ ObjectGroup.prototype.removeFog = function(){
   delete this.mesh.material.uniforms.worldMatrix;
   delete this.mesh.material.uniforms.cameraPosition;
   this.mesh.material.needsUpdate = true;
+}
+
+ObjectGroup.prototype.simplifyPhysics = function(sizeX, sizeY, sizeZ){
+  physicsWorld.remove(this.physicsBody);
+  var physicsShapeKey = "BOX" + PIPE + sizeX + PIPE + sizeY + PIPE + sizeZ;
+  newPhysicsShape = physicsShapeCache[physicsShapeKey];
+  if (!newPhysicsShape){
+    newPhysicsShape = new CANNON.Box(new CANNON.Vec3(sizeX, sizeY, sizeZ));
+    physicsShapeCache[physicsShapeKey] = newPhysicsShape;
+  }
+  var newPhysicsBody = new CANNON.Body({
+    mass: this.physicsBody.mass,
+    shape: newPhysicsShape,
+    material: this.originalPhysicsBody.material
+  });
+  newPhysicsBody.position.copy(this.physicsBody.position);
+  newPhysicsBody.quaternion.copy(this.physicsBody.quaternion);
+  this.physicsBody = newPhysicsBody;
+  physicsWorld.addBody(this.physicsBody);
+  this.isPhysicsSimplified = true;
+  this.physicsSimplifyParametersX = sizeX;
+  this.physicsSimplifyParametersY = sizeY;
+  this.physicsSimplifyParametersZ = sizeZ;
 }

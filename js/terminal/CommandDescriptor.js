@@ -668,6 +668,14 @@ var CommandDescriptor = function(){
   this.setRayStep.types = [];
   this.setRayStep.types.push(this.UNKNOWN_INDICATOR); // stepAmount
 
+  // simplifyPhysics
+  this.simplifyPhysics = new Object();
+  this.simplifyPhysics.types = [];
+  this.simplifyPhysics.types.push(this.GLUED_OBJECT_NAME); // objName
+  this.simplifyPhysics.types.push(this.UNKNOWN_INDICATOR); // sizeX
+  this.simplifyPhysics.types.push(this.UNKNOWN_INDICATOR); // sizeY
+  this.simplifyPhysics.types.push(this.UNKNOWN_INDICATOR); // sizeZ
+
 };
 
 CommandDescriptor.prototype.test = function(){

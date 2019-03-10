@@ -4925,6 +4925,57 @@ function parse(input){
           terminal.printInfo(Text.TREE.replace(Text.PARAM1, RAYCASTER_STEP_AMOUNT));
           return true;
         break;
+        case 160: //simplifyPhysics
+          if (mode != 0){
+            terminal.printError(Text.WORKS_ONLY_IN_DESIGN_MODE);
+            return true;
+          }
+          var objName = splitted[1];
+          var sizeX = parseFloat(splitted[2]);
+          var sizeY = parseFloat(splitted[3]);
+          var sizeZ = parseFloat(splitted[4]);
+          var obj = objectGroups[objName];
+          if (!obj){
+            terminal.printError(Text.NO_SUCH_OBJECT_GROUP);
+            return true;
+          }
+          if (obj.noMass){
+            terminal.printError(Text.OBJECT_HAS_NO_MASS);
+            return true;
+          }
+          if (obj.cannotSetMass){
+            terminal.printError(Text.OBJECT_CANNOT_SET_MASS);
+            return true;
+          }
+          if (isNaN(sizeX)){
+            terminal.printError(Text.IS_NOT_A_NUMBER.replace(Text.PARAM1, "sizeX"));
+            return true;
+          }
+          if (isNaN(sizeY)){
+            terminal.printError(Text.IS_NOT_A_NUMBER.replace(Text.PARAM1, "sizeY"));
+            return true;
+          }
+          if (isNaN(sizeZ)){
+            terminal.printError(Text.IS_NOT_A_NUMBER.replace(Text.PARAM1, "sizeZ"));
+            return true;
+          }
+          if (sizeX <= 0){
+            terminal.printError(Text.MUST_BE_GREATER_THAN.replace(Text.PARAM1, "sizeX").replace(Text.PARAM2, "0"));
+            return true;
+          }
+          if (sizeY <= 0){
+            terminal.printError(Text.MUST_BE_GREATER_THAN.replace(Text.PARAM1, "sizeY").replace(Text.PARAM2, "0"));
+            return true;
+          }
+          if (sizeZ <= 0){
+            terminal.printError(Text.MUST_BE_GREATER_THAN.replace(Text.PARAM1, "sizeZ").replace(Text.PARAM2, "0"));
+            return true;
+          }
+          selectionHandler.resetCurrentSelection();
+          obj.simplifyPhysics(sizeX/2, sizeY/2, sizeZ/2);
+          terminal.printInfo(Text.PHYSICS_SIMPLIFIED);
+          return true;
+        break;
       }
       return true;
     }catch(err){
