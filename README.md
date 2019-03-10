@@ -2,7 +2,7 @@
 
 ![](/screen_shots/logo.png?raw=true)
 
-ROYGBIV is a WebGL game engine for motivated programmers who do not have the budged for buying fancy 3D models or licensing a popular engine but still want to make 60 FPS web games. It is being developed by one of such programmers on top of low level THREE.js features for the graphics and CANNON.js for physics. It is names after this [Boards of Canada track](https://www.youtube.com/watch?v=W-GWjzw0GwQ).
+ROYGBIV is a WebGL game engine for motivated programmers who do not have the budget for buying fancy 3D models or licensing a popular engine but still want to make 60 FPS web games. It is being developed by one of such programmers on top of low level THREE.js features for the graphics and CANNON.js for physics. It is names after this [Boards of Canada track](https://www.youtube.com/watch?v=W-GWjzw0GwQ).
 
 ## Demos
 [The first playable demo](https://oguzeroglu.github.io/ROYGBIV/demo/demo1/application.html)  
