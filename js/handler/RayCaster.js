@@ -14,6 +14,9 @@ RayCaster.prototype.onReady = function(){
   }
 }
 
+RayCaster.prototype.onAddedTextResize = function(){
+}
+
 RayCaster.prototype.flush = function(){
 }
 

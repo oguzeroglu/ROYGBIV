@@ -100,18 +100,17 @@ RaycasterWorker.prototype.updateObjectGroup = function(data){
   this.rayCaster.updateObject(obj, true);
 }
 RaycasterWorker.prototype.updateAddedText = function(data){
-  var text = this.objectsByWorkerID[data[2]];
-  text.mesh.position.set(data[3], data[4], data[5]);
-  text.mesh.quaternion.set(data[6], data[7], data[8], data[9]);
-  for (var i = 10; i<26; i++){
-    this.reusableArray16[i-10] = data[i];
+  var text;
+  if (data.isAddedText){
+    text = data;
+  }else{
+    text = this.objectsByWorkerID[data[2]];
+    text.mesh.position.set(data[3], data[4], data[5]);
   }
-  text.mesh.modelViewMatrix.fromArray(this.reusableArray16);
-  text.characterSize = data[26];
-  text.topLeft.set(data[27], data[28], data[29]);
-  text.bottomRight.set(data[30], data[31], data[32]);
-  text.topRight.set(data[33], data[34], data[35]);
-  text.bottomLeft.set(data[36], data[37], data[38]);
+  text.mesh.updateMatrixWorld();
+  REUSABLE_MATRIX_4.copy(text.mesh.matrixWorld);
+  REUSABLE_MATRIX_4.premultiply(camera.matrixWorldInverse);
+  text.mesh.modelViewMatrix.copy(REUSABLE_MATRIX_4);
   text.handleBoundingBox();
   this.rayCaster.updateObject(text, true);
 }
@@ -119,10 +118,10 @@ RaycasterWorker.prototype.updateCameraOrientation = function(data){
   camera.position.set(data[2], data[3], data[4]);
   camera.quaternion.set(data[5], data[6], data[7], data[8]);
   camera.aspect = data[9];
-}
-RaycasterWorker.prototype.updateViewport = function(data){
-  renderer.viewport.set(data[2], data[3], data[4], data[5]);
-  screenResolution = data[6];
+  camera.updateMatrixWorld();
+  for (var textName in addedTexts){
+    this.updateAddedText(addedTexts[textName]);
+  }
 }
 RaycasterWorker.prototype.hide = function(data){
   var object = this.objectsByWorkerID[data[2]];
@@ -132,7 +131,14 @@ RaycasterWorker.prototype.show = function(data){
   var object = this.objectsByWorkerID[data[2]];
   this.rayCaster.binHandler.show(object);
 }
-// A dummy function
+RaycasterWorker.prototype.onAddedTextRescale = function(data){
+  var text = this.objectsByWorkerID[data[2]];
+  text.characterSize = data[3];
+  text.bottomRight.set(data[4], data[5], data[6]);
+  text.topRight.set(data[7], data[8], data[9]);
+  text.bottomLeft.set(data[10], data[11], data[12]);
+  this.updateAddedText(text);
+}
 RaycasterWorker.prototype.onRaycasterCompleted = function(){
 }
 
@@ -150,6 +156,7 @@ var REUSABLE_VECTOR_2 = new THREE.Vector3();
 var REUSABLE_VECTOR_3 = new THREE.Vector3();
 var REUSABLE_VECTOR_4 = new THREE.Vector3();
 var INTERSECTION_NORMAL = new THREE.Vector3();
+var REUSABLE_MATRIX_4 = new THREE.Matrix4();
 var mode = 0;
 var projectLoaded = true;
 var addedObjects = new Object();
@@ -180,7 +187,7 @@ self.onmessage = function(msg){
         }else if (ary[0] == 2){
           worker.updateCameraOrientation(ary);
         }else if (ary[0] == 3){
-          worker.updateViewport(ary);
+          worker.onAddedTextRescale(ary);
         }else if (ary[0] == 4){
           worker.updateAddedText(ary);
         }else if (ary[0] == 5){

@@ -418,6 +418,7 @@ AddedText.prototype.handleResize = function(){
       }
     }
   }
+  rayCaster.onAddedTextResize(this);
 }
 
 AddedText.prototype.getWidthPercent = function(){

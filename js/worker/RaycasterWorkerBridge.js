@@ -3,11 +3,13 @@ var RaycasterWorkerBridge = function(){
   this.worker = new Worker("./js/worker/RaycasterWorker.js");
   this.workerMessageHandler = new WorkerMessageHandler(this.worker);
   this.updateBuffer = new Map();
+  this.textScaleUpdateBuffer = new Map();
   this.hasUpdatedTexts = false;
   this.objectBufferSize = 10;
   this.textBufferSize = 10;
+  this.textScaleBufferSize = 10;
   this.intersectionTestBufferSize = 10;
-  this.cameraOrientationAndViewportBufferSize = 10;
+  this.cameraOrientationBufferSize = 10;
   this.hideShowBufferSize = 10;
   this.ready = false;
   this.worker.addEventListener("message", function(msg){
@@ -19,6 +21,8 @@ var RaycasterWorkerBridge = function(){
       rayCaster.objectGroupsUpdateBuffer = new Object();
       rayCaster.addedTextsUpdateBuffer = [];
       rayCaster.addedTextsUpdateBufferAvailibilities = [];
+      rayCaster.addedTextsScaleUpdateBuffer = [];
+      rayCaster.addedTextsScaleUpdateBufferAvailibilities = [];
       rayCaster.hideShowBuffer = [];
       rayCaster.hideShowBufferAvailibilities = [];
       for (var i = 0; i<msg.data.ids.length; i++){
@@ -59,18 +63,21 @@ var RaycasterWorkerBridge = function(){
           rayCaster.objectsByWorkerID[msg.data.ids[i].id] = addedTexts[msg.data.ids[i].name];
           rayCaster.idsByObjectNames[msg.data.ids[i].name] = msg.data.ids[i].id;
           for (var x = 0; x<rayCaster.textBufferSize; x++){
-            rayCaster.addedTextsUpdateBuffer.push(new Float32Array(39));
+            rayCaster.addedTextsUpdateBuffer.push(new Float32Array(6));
             rayCaster.addedTextsUpdateBufferAvailibilities.push(true);
           }
-          if (mode == 1 && addedTexts[msg.data.ids[i].name].isClickable && !addedTexts[msg.data.ids[i].name].is2D){
+          if (mode == 0 || (mode == 1 && addedTexts[msg.data.ids[i].name].isClickable && !addedTexts[msg.data.ids[i].name].is2D)){
             for (var x = 0; x<rayCaster.hideShowBufferSize; x++){
               rayCaster.hideShowBuffer.push(new Float32Array(3));
               rayCaster.hideShowBufferAvailibilities.push(true);
             }
-          }else if (mode == 0){
-            for (var x = 0; x<rayCaster.hideShowBufferSize; x++){
-              rayCaster.hideShowBuffer.push(new Float32Array(3));
-              rayCaster.hideShowBufferAvailibilities.push(true);
+            for (var x = 0; x<rayCaster.cameraOrientationBufferSize; x++){
+              rayCaster.cameraOrientationUpdateBuffer.push(new Float32Array(10));
+              rayCaster.cameraOrientationUpdateBufferAvailibilities.push(true);
+            }
+            for (var x = 0; x<rayCaster.textScaleBufferSize; x++){
+              rayCaster.addedTextsScaleUpdateBuffer.push(new Float32Array(13));
+              rayCaster.addedTextsScaleUpdateBufferAvailibilities.push(true);
             }
           }
         }else{
@@ -109,8 +116,8 @@ var RaycasterWorkerBridge = function(){
             rayCaster.cameraOrientationUpdateBufferAvailibilities[bufID] = true;
           }else if (ary[0] == 3){
             var bufID = ary[1];
-            rayCaster.viewportUpdateBuffer[bufID] = ary;
-            rayCaster.viewportUpdateBufferAvailibilities[bufID] = true;
+            rayCaster.addedTextsScaleUpdateBuffer[bufID] = ary;
+            rayCaster.addedTextsScaleUpdateBufferAvailibilities[bufID] = true;
           }else if (ary[0] == 4){
             var bufID = ary[1];
             rayCaster.addedTextsUpdateBuffer[bufID] = ary;
@@ -130,18 +137,10 @@ var RaycasterWorkerBridge = function(){
   this.intersectionTestCallbackFunctions = [];
   this.cameraOrientationUpdateBuffer = [];
   this.cameraOrientationUpdateBufferAvailibilities = [];
-  this.viewportUpdateBuffer = [];
-  this.viewportUpdateBufferAvailibilities = [];
   for (var i = 0; i<this.intersectionTestBufferSize; i++){
     this.intersectionTestBuffers.push(new Float32Array(8));
     this.intersectionTestBufferAvailibilities.push(true);
     this.intersectionTestCallbackFunctions.push(function(){});
-  }
-  for (var i = 0; i<this.cameraOrientationAndViewportBufferSize; i++){
-    this.cameraOrientationUpdateBuffer.push(new Float32Array(10));
-    this.cameraOrientationUpdateBufferAvailibilities.push(true);
-    this.viewportUpdateBuffer.push(new Float32Array(7));
-    this.viewportUpdateBufferAvailibilities.push(true);
   }
   // ***************************************************************
   this.onShiftPress = function(isPressed){
@@ -150,7 +149,31 @@ var RaycasterWorkerBridge = function(){
         "shiftPress": {isPressed: isPressed}
       })
     }
-  }
+  };
+  this.updateAddedTextScale = function(addedText){
+    var scaleBufferSent = false;
+    var len = rayCaster.addedTextsScaleUpdateBuffer.length;
+    for (var i = 0; i<len; i++){
+      if (rayCaster.addedTextsScaleUpdateBufferAvailibilities[i]){
+        var buf = rayCaster.addedTextsScaleUpdateBuffer[i];
+        buf[0] = 3;
+        buf[1] = i;
+        buf[2] = rayCaster.idsByObjectNames[addedText.name];
+        buf[3] = addedText.characterSize;
+        buf[4] = addedText.bottomRight.x; buf[5] = addedText.bottomRight.y; buf[6] = addedText.bottomRight.z;
+        buf[7] = addedText.topRight.x; buf[8] = addedText.topRight.y; buf[9] = addedText.topRight.z;
+        buf[10] = addedText.bottomLeft.x; buf[11] = addedText.bottomLeft.y; buf[12] = addedText.bottomLeft.z;
+        rayCaster.workerMessageHandler.push(buf.buffer);
+        rayCaster.addedTextsScaleUpdateBufferAvailibilities[i] = false;
+        rayCaster.workerMessageHandler.flush();
+        scaleBufferSent = true;
+        return;
+      }
+    }
+    if (!scaleBufferSent){
+      console.warn("[!] RaycasterWorkerBridge.issueUpdate text scale buffer overflow.");
+    }
+  };
 }
 
 RaycasterWorkerBridge.prototype.onReady = function(){
@@ -172,6 +195,14 @@ RaycasterWorkerBridge.prototype.refresh = function(){
   this.worker.postMessage(new LightweightState());
 }
 
+RaycasterWorkerBridge.prototype.onAddedTextResize = function(addedText){
+  if (!addedText.is2D){
+    if (mode == 0 || (mode == 1 && addedText.isClickable)){
+      rayCaster.textScaleUpdateBuffer.set(addedText.name, addedText);
+    }
+  }
+}
+
 RaycasterWorkerBridge.prototype.updateObject = function(obj){
   if (mode == 1 && (obj.isAddedObject || obj.isObjectGroup) && !obj.isIntersectable){
     return;
@@ -183,9 +214,10 @@ RaycasterWorkerBridge.prototype.updateObject = function(obj){
 }
 
 RaycasterWorkerBridge.prototype.onBeforeUpdate = function(){
+  rayCaster.textScaleUpdateBuffer.forEach(rayCaster.updateAddedTextScale);
+  rayCaster.textScaleUpdateBuffer.clear();
   if (rayCaster.hasUpdatedTexts){
     var cameraOrientationUpdateBufferSent = false;
-    var viewportUpdateBufferSent = false;
     for (var i = 0; i<rayCaster.cameraOrientationUpdateBuffer.length; i++){
       if (rayCaster.cameraOrientationUpdateBufferAvailibilities[i]){
         var buf = rayCaster.cameraOrientationUpdateBuffer[i];
@@ -200,25 +232,8 @@ RaycasterWorkerBridge.prototype.onBeforeUpdate = function(){
         break;
       }
     }
-    for (var i = 0; i<rayCaster.viewportUpdateBuffer.length; i++){
-      if (rayCaster.viewportUpdateBufferAvailibilities[i]){
-        var buf = rayCaster.viewportUpdateBuffer[i];
-        var vp = renderer.getCurrentViewport();
-        buf[0] = 3;
-        buf[1] = i;
-        buf[2] = vp.x; buf[3] = vp.y; buf[4] = vp.z; buf[5] = vp.w;
-        buf[6] = screenResolution;
-        rayCaster.workerMessageHandler.push(buf.buffer);
-        rayCaster.viewportUpdateBufferAvailibilities[i] = false;
-        viewportUpdateBufferSent = true;
-        break;
-      }
-    }
     if (!cameraOrientationUpdateBufferSent){
       console.warn("[!] RaycasterWorkerBridge.issueUpdate camera orientation buffer overflow.");
-    }
-    if (!viewportUpdateBufferSent){
-      console.warn("[!] RaycasterWorkerBridge.issueUpdate viewport buffer overflow.");
     }
     this.hasUpdatedTexts = false;
   }
@@ -260,28 +275,35 @@ RaycasterWorkerBridge.prototype.issueUpdate = function(obj){
     if (!rayCaster.addedTextsUpdateBuffer){
       return;
     }
-    var len = rayCaster.addedTextsUpdateBuffer.length;
-    for (var i = 0; i<len; i++){
-      if (rayCaster.addedTextsUpdateBufferAvailibilities[i]){
-        var buf = rayCaster.addedTextsUpdateBuffer[i];
-        buf[0] = 4;
-        buf[1] = i;
-        buf[2] = rayCaster.idsByObjectNames[obj.name];
-        var mesh = obj.mesh;
-        buf[3] = mesh.position.x; buf[4] = mesh.position.y; buf[5] = mesh.position.z;
-        buf[6] = mesh.quaternion.x; buf[7] = mesh.quaternion.y; buf[8] = mesh.quaternion.z; buf[9] = mesh.quaternion.w;
-        buf.set(mesh.modelViewMatrix.elements, 10);
-        buf[26] = obj.characterSize;
-        buf[27] = obj.topLeft.x; buf[28] = obj.topLeft.y; buf[29] = obj.topLeft.z;
-        buf[30] = obj.bottomRight.x; buf[31] = obj.bottomRight.y; buf[32] = obj.bottomRight.z;
-        buf[33] = obj.topRight.x; buf[34] = obj.topRight.y; buf[35] = obj.topRight.z;
-        buf[36] = obj.bottomLeft.x; buf[37] = obj.bottomLeft.y; buf[38] = obj.bottomLeft.z;
-        rayCaster.workerMessageHandler.push(buf.buffer);
-        rayCaster.addedTextsUpdateBufferAvailibilities[i] = false;
-        return;
-      }
+    var updateAddedTextPosition = false;
+    if (!rayCaster.addedTextPositionUpdateCache){
+      rayCaster.addedTextPositionUpdateCache = new Object();
+      rayCaster.addedTextPositionUpdateCache[obj.name] = new THREE.Vector3();
+      updateAddedTextPosition = true;
+    }else if (!rayCaster.addedTextPositionUpdateCache[obj.name]){
+      rayCaster.addedTextPositionUpdateCache[obj.name] = new THREE.Vector3();
+      updateAddedTextPosition = true;
+    }else{
+      var cache = rayCaster.addedTextPositionUpdateCache[obj.name]
+      updateAddedTextPosition = ((cache.x != obj.mesh.position.x) || (cache.y != obj.mesh.position.y) || (cache.z != obj.mesh.position.z));
     }
-    console.warn("[!] RaycasterWorkerBridge.issueUpdate added text buffer overflow.");
+    if (updateAddedTextPosition){
+      var len = rayCaster.addedTextsUpdateBuffer.length;
+      for (var i = 0; i<len; i++){
+        if (rayCaster.addedTextsUpdateBufferAvailibilities[i]){
+          var buf = rayCaster.addedTextsUpdateBuffer[i];
+          buf[0] = 4;
+          buf[1] = i;
+          buf[2] = rayCaster.idsByObjectNames[obj.name];
+          buf[3] = obj.mesh.position.x; buf[4] = obj.mesh.position.y; buf[5] = obj.mesh.position.z;
+          rayCaster.workerMessageHandler.push(buf.buffer);
+          rayCaster.addedTextsUpdateBufferAvailibilities[i] = false;
+          rayCaster.addedTextPositionUpdateCache[obj.name].set(obj.mesh.position.x, obj.mesh.position.y, obj.mesh.position.z);
+          return;
+        }
+      }
+      console.warn("[!] RaycasterWorkerBridge.issueUpdate added text buffer overflow.");
+    }
   }
 }
 
