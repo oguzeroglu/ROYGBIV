@@ -11,7 +11,7 @@ ROYGBIV is a WebGL game engine for motivated programmers who do not have the bud
 [Online preview of the engine](https://oguzeroglu.github.io/ROYGBIV/roygbiv.html)  
 
 ## The current state of the project
-ROYGBIV is still under development. You can watch demo videos [here](https://www.youtube.com/channel/UCfDfMiMjN3P_K_vMLUbp7QA?view_as=subscriber). I upload new videos when I develop some cool feature :)
+ROYGBIV is still under development and not documented yet. Estimated documentation date is September 2019.
 
 ## How to run?
 
