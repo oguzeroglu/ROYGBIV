@@ -1651,6 +1651,18 @@ ObjectGroup.prototype.visualiseBoundingBoxes = function(){
       box3.expandByPoint(boundingBoxes[i].max);
     }
   }
+  if (box3.min.x == box3.max.x){
+    box3.max.x += 1;
+    box3.min.x -= 1;
+  }
+  if (box3.min.y == box3.max.y){
+    box3.max.y += 1;
+    box3.min.y -= 1;
+  }
+  if (box3.min.z == box3.max.z){
+    box3.max.z += 1;
+    box3.min.z -= 1;
+  }
   this.bbHelper = new THREE.Box3Helper(box3, LIME_COLOR);
   scene.add(this.bbHelper);
 }
