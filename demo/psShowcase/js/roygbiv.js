@@ -2471,6 +2471,7 @@ var DDS_SUPPORTED;
 var INSTANCING_SUPPORTED;
 var jobHandlerSelectedGrid = 0;
 var jobHandlerWorking = false;
+var jobHandlerRaycasterRefresh = false;
 var geometryCache = new Object();
 var physicsShapeCache = new Object();
 var MAX_TEXTURE_COUNT = 8;
@@ -3122,9 +3123,6 @@ var GridSystem = function(name, sizeX, sizeZ, centerX, centerY, centerZ,
 
   gridCounter = gridCounter + totalGridCount;
 
-  if (!isDeployment && projectLoaded){
-    terminal.printInfo(Text.GS_CREATED);
-  }
 }
 
 GridSystem.prototype.draw = function(){
@@ -3501,9 +3499,6 @@ GridSystem.prototype.destroy = function(){
       obj.destroyedGrids = new Object();
     }
   }
-
-  rayCaster.refresh();
-
 }
 
 GridSystem.prototype.selectAllGrids = function(){
@@ -7448,7 +7443,7 @@ function render(){
   GLOBAL_CAMERA_QUATERNION_UNIFORM.value.copy(camera.quaternion);
   GLOBAL_ADDEDTEXT_VIEWPORT_UNIFORM.value.set(0, 0, window.innerWidth * screenResolution, window.innerHeight * screenResolution);
 
-  if (!(mode == 1 && defaultCameraControlsDisabled)){
+  if (!(mode == 1 && defaultCameraControlsDisabled) && !isMobile){
     keyboardEventHandler.handleDefaultKeyboardControls();
   }
 
@@ -14085,7 +14080,7 @@ ObjectGroup.prototype.translate = function(axis, amount, fromScript){
   }
 }
 
-ObjectGroup.prototype.destroy = function(isUndo){
+ObjectGroup.prototype.destroy = function(skipRaycasterRefresh){
   this.removeBoundingBoxesFromScene();
   scene.remove(this.mesh);
   physicsWorld.remove(this.physicsBody);
@@ -14107,7 +14102,9 @@ ObjectGroup.prototype.destroy = function(isUndo){
   this.mesh.material.dispose();
   this.mesh.geometry.dispose();
 
-  rayCaster.refresh();
+  if (!skipRaycasterRefresh){
+    rayCaster.refresh();
+  }
 
 }
 
@@ -21563,7 +21560,7 @@ var AddedText = function(name, font, text, position, color, alpha, characterSize
   webglCallbackHandler.registerEngineObject(this);
 }
 
-AddedText.prototype.destroy = function(){
+AddedText.prototype.destroy = function(skipRaycasterRefresh){
   for (var gridName in this.destroyedGrids){
     if (this.destroyedGrids[gridName].createdAddedTextName == this.name){
       delete this.destroyedGrids[gridName].createdAddedTextName;
@@ -21580,7 +21577,9 @@ AddedText.prototype.destroy = function(){
     this.rectangle.material.dispose();
     this.rectangle.geometry.dispose();
   }
-  rayCaster.refresh();
+  if (!skipRaycasterRefresh){
+    rayCaster.refresh();
+  }
   delete addedTexts[this.name];
   if (this.is2D){
     delete addedTexts2D[this.name];
@@ -21884,6 +21883,7 @@ AddedText.prototype.handleResize = function(){
       }
     }
   }
+  rayCaster.onAddedTextResize(this);
 }
 
 AddedText.prototype.getWidthPercent = function(){
@@ -22133,7 +22133,6 @@ AddedText.prototype.set2DStatus = function(is2D){
       scene.remove(this.bbHelper);
     }
   }
-  rayCaster.refresh();
 }
 
 AddedText.prototype.set2DCoordinates = function(marginPercentWidth, marginPercentHeight){
@@ -22526,6 +22525,9 @@ RayCaster.prototype.onReady = function(){
   if (this.onReadyCallback){
     this.onReadyCallback();
   }
+}
+
+RayCaster.prototype.onAddedTextResize = function(){
 }
 
 RayCaster.prototype.flush = function(){
@@ -24301,11 +24303,13 @@ var RaycasterWorkerBridge = function(){
   this.worker = new Worker("./js/worker/RaycasterWorker.js");
   this.workerMessageHandler = new WorkerMessageHandler(this.worker);
   this.updateBuffer = new Map();
+  this.textScaleUpdateBuffer = new Map();
   this.hasUpdatedTexts = false;
   this.objectBufferSize = 10;
   this.textBufferSize = 10;
+  this.textScaleBufferSize = 10;
   this.intersectionTestBufferSize = 10;
-  this.cameraOrientationAndViewportBufferSize = 10;
+  this.cameraOrientationBufferSize = 10;
   this.hideShowBufferSize = 10;
   this.ready = false;
   this.worker.addEventListener("message", function(msg){
@@ -24317,6 +24321,8 @@ var RaycasterWorkerBridge = function(){
       rayCaster.objectGroupsUpdateBuffer = new Object();
       rayCaster.addedTextsUpdateBuffer = [];
       rayCaster.addedTextsUpdateBufferAvailibilities = [];
+      rayCaster.addedTextsScaleUpdateBuffer = [];
+      rayCaster.addedTextsScaleUpdateBufferAvailibilities = [];
       rayCaster.hideShowBuffer = [];
       rayCaster.hideShowBufferAvailibilities = [];
       for (var i = 0; i<msg.data.ids.length; i++){
@@ -24357,18 +24363,21 @@ var RaycasterWorkerBridge = function(){
           rayCaster.objectsByWorkerID[msg.data.ids[i].id] = addedTexts[msg.data.ids[i].name];
           rayCaster.idsByObjectNames[msg.data.ids[i].name] = msg.data.ids[i].id;
           for (var x = 0; x<rayCaster.textBufferSize; x++){
-            rayCaster.addedTextsUpdateBuffer.push(new Float32Array(39));
+            rayCaster.addedTextsUpdateBuffer.push(new Float32Array(6));
             rayCaster.addedTextsUpdateBufferAvailibilities.push(true);
           }
-          if (mode == 1 && addedTexts[msg.data.ids[i].name].isClickable && !addedTexts[msg.data.ids[i].name].is2D){
+          if (mode == 0 || (mode == 1 && addedTexts[msg.data.ids[i].name].isClickable && !addedTexts[msg.data.ids[i].name].is2D)){
             for (var x = 0; x<rayCaster.hideShowBufferSize; x++){
               rayCaster.hideShowBuffer.push(new Float32Array(3));
               rayCaster.hideShowBufferAvailibilities.push(true);
             }
-          }else if (mode == 0){
-            for (var x = 0; x<rayCaster.hideShowBufferSize; x++){
-              rayCaster.hideShowBuffer.push(new Float32Array(3));
-              rayCaster.hideShowBufferAvailibilities.push(true);
+            for (var x = 0; x<rayCaster.cameraOrientationBufferSize; x++){
+              rayCaster.cameraOrientationUpdateBuffer.push(new Float32Array(10));
+              rayCaster.cameraOrientationUpdateBufferAvailibilities.push(true);
+            }
+            for (var x = 0; x<rayCaster.textScaleBufferSize; x++){
+              rayCaster.addedTextsScaleUpdateBuffer.push(new Float32Array(13));
+              rayCaster.addedTextsScaleUpdateBufferAvailibilities.push(true);
             }
           }
         }else{
@@ -24407,8 +24416,8 @@ var RaycasterWorkerBridge = function(){
             rayCaster.cameraOrientationUpdateBufferAvailibilities[bufID] = true;
           }else if (ary[0] == 3){
             var bufID = ary[1];
-            rayCaster.viewportUpdateBuffer[bufID] = ary;
-            rayCaster.viewportUpdateBufferAvailibilities[bufID] = true;
+            rayCaster.addedTextsScaleUpdateBuffer[bufID] = ary;
+            rayCaster.addedTextsScaleUpdateBufferAvailibilities[bufID] = true;
           }else if (ary[0] == 4){
             var bufID = ary[1];
             rayCaster.addedTextsUpdateBuffer[bufID] = ary;
@@ -24428,18 +24437,10 @@ var RaycasterWorkerBridge = function(){
   this.intersectionTestCallbackFunctions = [];
   this.cameraOrientationUpdateBuffer = [];
   this.cameraOrientationUpdateBufferAvailibilities = [];
-  this.viewportUpdateBuffer = [];
-  this.viewportUpdateBufferAvailibilities = [];
   for (var i = 0; i<this.intersectionTestBufferSize; i++){
     this.intersectionTestBuffers.push(new Float32Array(8));
     this.intersectionTestBufferAvailibilities.push(true);
     this.intersectionTestCallbackFunctions.push(function(){});
-  }
-  for (var i = 0; i<this.cameraOrientationAndViewportBufferSize; i++){
-    this.cameraOrientationUpdateBuffer.push(new Float32Array(10));
-    this.cameraOrientationUpdateBufferAvailibilities.push(true);
-    this.viewportUpdateBuffer.push(new Float32Array(7));
-    this.viewportUpdateBufferAvailibilities.push(true);
   }
   // ***************************************************************
   this.onShiftPress = function(isPressed){
@@ -24448,7 +24449,31 @@ var RaycasterWorkerBridge = function(){
         "shiftPress": {isPressed: isPressed}
       })
     }
-  }
+  };
+  this.updateAddedTextScale = function(addedText){
+    var scaleBufferSent = false;
+    var len = rayCaster.addedTextsScaleUpdateBuffer.length;
+    for (var i = 0; i<len; i++){
+      if (rayCaster.addedTextsScaleUpdateBufferAvailibilities[i]){
+        var buf = rayCaster.addedTextsScaleUpdateBuffer[i];
+        buf[0] = 3;
+        buf[1] = i;
+        buf[2] = rayCaster.idsByObjectNames[addedText.name];
+        buf[3] = addedText.characterSize;
+        buf[4] = addedText.bottomRight.x; buf[5] = addedText.bottomRight.y; buf[6] = addedText.bottomRight.z;
+        buf[7] = addedText.topRight.x; buf[8] = addedText.topRight.y; buf[9] = addedText.topRight.z;
+        buf[10] = addedText.bottomLeft.x; buf[11] = addedText.bottomLeft.y; buf[12] = addedText.bottomLeft.z;
+        rayCaster.workerMessageHandler.push(buf.buffer);
+        rayCaster.addedTextsScaleUpdateBufferAvailibilities[i] = false;
+        rayCaster.workerMessageHandler.flush();
+        scaleBufferSent = true;
+        return;
+      }
+    }
+    if (!scaleBufferSent){
+      console.warn("[!] RaycasterWorkerBridge.issueUpdate text scale buffer overflow.");
+    }
+  };
 }
 
 RaycasterWorkerBridge.prototype.onReady = function(){
@@ -24470,6 +24495,14 @@ RaycasterWorkerBridge.prototype.refresh = function(){
   this.worker.postMessage(new LightweightState());
 }
 
+RaycasterWorkerBridge.prototype.onAddedTextResize = function(addedText){
+  if (!addedText.is2D){
+    if (mode == 0 || (mode == 1 && addedText.isClickable)){
+      rayCaster.textScaleUpdateBuffer.set(addedText.name, addedText);
+    }
+  }
+}
+
 RaycasterWorkerBridge.prototype.updateObject = function(obj){
   if (mode == 1 && (obj.isAddedObject || obj.isObjectGroup) && !obj.isIntersectable){
     return;
@@ -24481,9 +24514,10 @@ RaycasterWorkerBridge.prototype.updateObject = function(obj){
 }
 
 RaycasterWorkerBridge.prototype.onBeforeUpdate = function(){
+  rayCaster.textScaleUpdateBuffer.forEach(rayCaster.updateAddedTextScale);
+  rayCaster.textScaleUpdateBuffer.clear();
   if (rayCaster.hasUpdatedTexts){
     var cameraOrientationUpdateBufferSent = false;
-    var viewportUpdateBufferSent = false;
     for (var i = 0; i<rayCaster.cameraOrientationUpdateBuffer.length; i++){
       if (rayCaster.cameraOrientationUpdateBufferAvailibilities[i]){
         var buf = rayCaster.cameraOrientationUpdateBuffer[i];
@@ -24498,25 +24532,8 @@ RaycasterWorkerBridge.prototype.onBeforeUpdate = function(){
         break;
       }
     }
-    for (var i = 0; i<rayCaster.viewportUpdateBuffer.length; i++){
-      if (rayCaster.viewportUpdateBufferAvailibilities[i]){
-        var buf = rayCaster.viewportUpdateBuffer[i];
-        var vp = renderer.getCurrentViewport();
-        buf[0] = 3;
-        buf[1] = i;
-        buf[2] = vp.x; buf[3] = vp.y; buf[4] = vp.z; buf[5] = vp.w;
-        buf[6] = screenResolution;
-        rayCaster.workerMessageHandler.push(buf.buffer);
-        rayCaster.viewportUpdateBufferAvailibilities[i] = false;
-        viewportUpdateBufferSent = true;
-        break;
-      }
-    }
     if (!cameraOrientationUpdateBufferSent){
       console.warn("[!] RaycasterWorkerBridge.issueUpdate camera orientation buffer overflow.");
-    }
-    if (!viewportUpdateBufferSent){
-      console.warn("[!] RaycasterWorkerBridge.issueUpdate viewport buffer overflow.");
     }
     this.hasUpdatedTexts = false;
   }
@@ -24558,28 +24575,35 @@ RaycasterWorkerBridge.prototype.issueUpdate = function(obj){
     if (!rayCaster.addedTextsUpdateBuffer){
       return;
     }
-    var len = rayCaster.addedTextsUpdateBuffer.length;
-    for (var i = 0; i<len; i++){
-      if (rayCaster.addedTextsUpdateBufferAvailibilities[i]){
-        var buf = rayCaster.addedTextsUpdateBuffer[i];
-        buf[0] = 4;
-        buf[1] = i;
-        buf[2] = rayCaster.idsByObjectNames[obj.name];
-        var mesh = obj.mesh;
-        buf[3] = mesh.position.x; buf[4] = mesh.position.y; buf[5] = mesh.position.z;
-        buf[6] = mesh.quaternion.x; buf[7] = mesh.quaternion.y; buf[8] = mesh.quaternion.z; buf[9] = mesh.quaternion.w;
-        buf.set(mesh.modelViewMatrix.elements, 10);
-        buf[26] = obj.characterSize;
-        buf[27] = obj.topLeft.x; buf[28] = obj.topLeft.y; buf[29] = obj.topLeft.z;
-        buf[30] = obj.bottomRight.x; buf[31] = obj.bottomRight.y; buf[32] = obj.bottomRight.z;
-        buf[33] = obj.topRight.x; buf[34] = obj.topRight.y; buf[35] = obj.topRight.z;
-        buf[36] = obj.bottomLeft.x; buf[37] = obj.bottomLeft.y; buf[38] = obj.bottomLeft.z;
-        rayCaster.workerMessageHandler.push(buf.buffer);
-        rayCaster.addedTextsUpdateBufferAvailibilities[i] = false;
-        return;
-      }
+    var updateAddedTextPosition = false;
+    if (!rayCaster.addedTextPositionUpdateCache){
+      rayCaster.addedTextPositionUpdateCache = new Object();
+      rayCaster.addedTextPositionUpdateCache[obj.name] = new THREE.Vector3();
+      updateAddedTextPosition = true;
+    }else if (!rayCaster.addedTextPositionUpdateCache[obj.name]){
+      rayCaster.addedTextPositionUpdateCache[obj.name] = new THREE.Vector3();
+      updateAddedTextPosition = true;
+    }else{
+      var cache = rayCaster.addedTextPositionUpdateCache[obj.name]
+      updateAddedTextPosition = ((cache.x != obj.mesh.position.x) || (cache.y != obj.mesh.position.y) || (cache.z != obj.mesh.position.z));
     }
-    console.warn("[!] RaycasterWorkerBridge.issueUpdate added text buffer overflow.");
+    if (updateAddedTextPosition){
+      var len = rayCaster.addedTextsUpdateBuffer.length;
+      for (var i = 0; i<len; i++){
+        if (rayCaster.addedTextsUpdateBufferAvailibilities[i]){
+          var buf = rayCaster.addedTextsUpdateBuffer[i];
+          buf[0] = 4;
+          buf[1] = i;
+          buf[2] = rayCaster.idsByObjectNames[obj.name];
+          buf[3] = obj.mesh.position.x; buf[4] = obj.mesh.position.y; buf[5] = obj.mesh.position.z;
+          rayCaster.workerMessageHandler.push(buf.buffer);
+          rayCaster.addedTextsUpdateBufferAvailibilities[i] = false;
+          rayCaster.addedTextPositionUpdateCache[obj.name].set(obj.mesh.position.x, obj.mesh.position.y, obj.mesh.position.z);
+          return;
+        }
+      }
+      console.warn("[!] RaycasterWorkerBridge.issueUpdate added text buffer overflow.");
+    }
   }
 }
 
@@ -24709,7 +24733,7 @@ WorkerMessageHandler.prototype.push = function(data){
 }
 
 WorkerMessageHandler.prototype.flush = function(){
-  if (this.buffer.length > 0){ 
+  if (this.buffer.length > 0){
     if (this.worker){
       this.worker.postMessage(this.buffer);
     }else{
@@ -24749,127 +24773,83 @@ PointerLockEventHandler.prototype.onPointerLock = function(event){
 }
 
 var TouchEventHandler = function(){
-  canvas.ontouchstart = this.onTouchStart;
-  canvas.ontouchmove = this.onTouchMove;
-  canvas.ontouchcancel = this.onTouchEnd;
-  canvas.ontouchend = this.onTouchEnd;
-  this.isAnyFingerTouching = false;
-  this.touchCount = 0;
-  this.touch1 = 0;
-  this.touch2 = 0;
-  this.touch1Initial = 0;
-  this.touch2Initial;
-  this.touch1Diff = {
-    x: 0, y: 0
-  }
-  this.touch2Diff = {
-    x:0, y: 0
-  }
-  this.touch1DiffFromInitial = {
-    x: 0, y: 0
-  }
-  this.touch2DiffFromInitial = {
-    x:0, y:0
-  }
-  this.lastTranslateXAmount = 0;
-  this.lastTranslateYAmount = 0;
-  this.lastTranslateZAmount = 0;
+  canvas.addEventListener('touchstart', this.onTouchStart, false);
+  canvas.addEventListener('touchmove', this.onTouchMove, false);
+  canvas.addEventListener('touchcancel', this.onTouchEnd, false);
+  canvas.addEventListener('touchend', this.onTouchEnd, false);
   this.distance = 0;
-  this.isTap = true;
+  this.isZooming = false;
+  this.isSwiping = false;
+  this.isTapping = false;
+  this.lastSwipeCoordinates = {x: 0, y: 0, isInitiated: false};
   this.tapStartTime = 0;
 }
 
 TouchEventHandler.prototype.onTouchStart = function(event){
   event.preventDefault();
-  touchEventHandler.isAnyFingerTouching = true;
+  touchEventHandler.isZooming = false;
+  touchEventHandler.isSwiping = false;
+  touchEventHandler.isTapping = false;
   if (event.targetTouches.length == 1){
-    touchEventHandler.touch1 = event.targetTouches[0];
-    touchEventHandler.touch1Initial = event.targetTouches[0];
-    touchEventHandler.touchCount = 1;
-    touchEventHandler.isTap = true;
+    touchEventHandler.isSwiping = true;
+    touchEventHandler.isTapping = true;
+  }
+  if (event.targetTouches.length == 2){
+    touchEventHandler.isZooming = true;
+  }
+  if (!touchEventHandler.isZooming){
+    touchEventHandler.distance = 0;
+  }
+  if (!touchEventHandler.isSwiping){
+    touchEventHandler.lastSwipeCoordinates.isInitiated = false;
+  }
+  if (touchEventHandler.isTapping){
     touchEventHandler.tapStartTime = performance.now();
-  }else if (event.targetTouches.length == 2){
-    touchEventHandler.isTap = false;
-    touchEventHandler.touch2 = event.targetTouches[1];
-    touchEventHandler.touch2Initial = event.targetTouches[1];
-    touchEventHandler.touchCount = 2;
-    var touch1X = touchEventHandler.touch1.pageX;
-    var touch1Y = touchEventHandler.touch1.pageY;
-    var touch2X = touchEventHandler.touch2.pageX;
-    var touch2Y = touchEventHandler.touch2.pageY;
-    touchEventHandler.distance = Math.sqrt(((touch2X - touch1X) * (touch2X - touch1X)) + ((touch2Y - touch1Y) * (touch2Y - touch1Y)));
+  }else{
+    touchEventHandler.tapStartTime = 0;
   }
 }
 
 TouchEventHandler.prototype.onTouchMove = function(event){
-  if (event.targetTouches.length == 1){
-    var newCoordX = event.targetTouches[0].pageX;
-    var newCoordY = event.targetTouches[0].pageY;
-    var oldCoordX = touchEventHandler.touch1.pageX;
-    var oldCoordY = touchEventHandler.touch1.pageY;
-    var initialOldCoordX = touchEventHandler.touch1Initial.pageX;
-    var initialOldCoordY = touchEventHandler.touch1Initial.pageY;
-    touchEventHandler.touch1Diff.x = newCoordX - oldCoordX;
-    touchEventHandler.touch1Diff.y = newCoordY - oldCoordY;
-    touchEventHandler.touch1DiffFromInitial.x = newCoordX - initialOldCoordX;
-    touchEventHandler.touch1DiffFromInitial.y = newCoordY - initialOldCoordY;
-    if (!(mode == 1 && defaultCameraControlsDisabled)){
-      var translateXAmount = touchEventHandler.touch1Diff.x;
-      var translateYAmount = touchEventHandler.touch1Diff.y;
-      camera.translateY(translateYAmount);
-      touchEventHandler.lastTranslateYAmount = translateYAmount;
-      camera.translateX(-translateXAmount);
-      touchEventHandler.lastTranslateXAmount = translateXAmount;
-    }
-    touchEventHandler.touch1 = event.targetTouches[0];
-  }else if (event.targetTouches.length == 2){
+  event.preventDefault();
+  event.stopPropagation();
+  if (touchEventHandler.isZooming){
     if (event.changedTouches.length == 2){
-      var touch1 = event.changedTouches[0];
-      var touch2 = event.changedTouches[1];
-      var touch1X =touch1.pageX;
-      var touch1Y = touch1.pageY;
-      var touch2X = touch2.pageX;
-      var touch2Y = touch2.pageY;
-      if (!(mode == 1 && defaultCameraControlsDisabled)){
-        var newDistance = Math.sqrt(((touch2X - touch1X) * (touch2X - touch1X)) + ((touch2Y - touch1Y) * (touch2Y - touch1Y)));
-        var translateZAmount = (newDistance - touchEventHandler.distance);
-        touchEventHandler.lastTranslateZAmount = translateZAmount;
-        camera.translateZ(-translateZAmount);
-        touchEventHandler.distance = newDistance;
+      var t1 = event.changedTouches[0];
+      var t2 = event.changedTouches[1];
+      var xs = (t1.pageX - t2.pageX) * (t1.pageX - t2.pageX);
+      var ys = (t1.pageY - t2.pageY) * (t1.pageY - t2.pageY);
+      var dist = Math.sqrt(xs + ys);
+      if (touchEventHandler.distance){
+        touchEventHandler.onPinch(dist - touchEventHandler.distance);
       }
+      touchEventHandler.distance = dist;
     }
-    for (var i = 0; i<event.changedTouches.length; i++){
-      var changedTouch = 0;
-      var initTouch = 0;
-      var diff = 0, diffFromInitial = 0;
-      if (event.changedTouches[i].identifier == touchEventHandler.touch1.identifier){
-        changedTouch = touchEventHandler.touch1;
-        initTouch = touchEventHandler.touch1Initial;
-        diff = touchEventHandler.touch1Diff;
-        diffFromInitial = touchEventHandler.touch1DiffFromInitial;
-      }else if (event.changedTouches[i].identifier == touchEventHandler.touch2.identifier){
-        changedTouch = touchEventHandler.touch2;
-        initTouch = touchEventHandler.touch2Initial;
-        diff = touchEventHandler.touch2Diff;
-        diffFromInitial = touchEventHandler.touch2DiffFromInitial;
-      }
-      if (changedTouch){
-        var newCoordX = event.changedTouches[i].pageX;
-        var newCoordY = event.changedTouches[i].pageY;
-        var oldCoordX = changedTouch.pageX;
-        var oldCoordY = changedTouch.pageY;
-        var initialOldCoordX = initTouch.pageX;
-        var initialOldCoordY = initTouch.pageY;
-        diff.x = newCoordX - oldCoordX;
-        diff.y = newCoordY - oldCoordY;
-        diffFromInitial.x = newCoordX - initialOldCoordX;
-        diffFromInitial.y = newCoordY - initialOldCoordY;
-        if (changedTouch.identifier == touchEventHandler.touch1.identifier){
-          touchEventHandler.touch1 = event.changedTouches[i];
-        }else{
-          touchEventHandler.touch2 = event.changedTouches[i];
+  }
+  if (touchEventHandler.isSwiping){
+    if (event.changedTouches.length == 1){
+      var t1 = event.changedTouches[0];
+      if (touchEventHandler.lastSwipeCoordinates.isInitiated){
+        var diffX = t1.pageX - touchEventHandler.lastSwipeCoordinates.x;
+        var diffY = t1.pageY - touchEventHandler.lastSwipeCoordinates.y;
+        if (!(mode == 1 && defaultCameraControlsDisabled)){
+          camera.rotation.y += diffX / 500;
+          camera.rotation.x += diffY / 500;
         }
       }
+      touchEventHandler.lastSwipeCoordinates.x = t1.pageX;
+      touchEventHandler.lastSwipeCoordinates.y = t1.pageY;
+      touchEventHandler.lastSwipeCoordinates.isInitiated = true;
+    }
+  }
+}
+
+TouchEventHandler.prototype.onPinch = function(diff){
+  if (!(mode == 1 && defaultCameraControlsDisabled)){
+    if (diff > 0){
+      camera.translateZ(-1 * translateZAmount * defaultAspect / camera.aspect);
+    }else{
+      camera.translateZ(translateZAmount * defaultAspect / camera.aspect);
     }
   }
 }
@@ -24879,39 +24859,18 @@ TouchEventHandler.prototype.onTap = function(touch){
 }
 
 TouchEventHandler.prototype.onTouchEnd = function(event){
-  if (event.targetTouches.length == 0){
-    if (touchEventHandler.touch1 && !touchEventHandler.touch2 && touchEventHandler.isTap){
-      if (performance.now() - touchEventHandler.tapStartTime < 160){
-        touchEventHandler.onTap(touchEventHandler.touch1);
-      }
+  event.preventDefault();
+  if (touchEventHandler.isTapping){
+    if(performance.now() - touchEventHandler.tapStartTime < 250){
+      touchEventHandler.onTap(event.changedTouches[0]);
     }
-    touchEventHandler.isAnyFingerTouching = false;
-    touchEventHandler.touch1 = 0;
-    touchEventHandler.touch1Initial = 0;
-    touchEventHandler.touch1Diff.x = 0; touchEventHandler.touch1Diff.y = 0;
-    touchEventHandler.touch1DiffFromInitial.x = 0; touchEventHandler.touch1DiffFromInitial.y = 0;
-    touchEventHandler.touchCount = 0;
-    touchEventHandler.distance = 0;
-    touchEventHandler.isTap = true;
-  }else if (event.targetTouches.length == 1){
-    if (event.changedTouches[0].identifier == touchEventHandler.touch1.identifier){
-      touchEventHandler.touch1 = touchEventHandler.touch2;
-      touchEventHandler.touch1Initial = touchEventHandler.touch2Initial;
-      touchEventHandler.touch1Diff.x = touchEventHandler.touch2Diff.x; touchEventHandler.touch1Diff.y = touchEventHandler.touch2Diff.y;
-      touchEventHandler.touch1DiffFromInitial.x = touchEventHandler.touch2DiffFromInitial.x; touchEventHandler.touch1DiffFromInitial.y = touchEventHandler.touch2DiffFromInitial.y;
-      touchEventHandler.touch2 = 0;
-      touchEventHandler.touch2Initial = 0;
-      touchEventHandler.touch2Diff.x = 0; touchEventHandler.touch2Diff.y = 0;
-      touchEventHandler.touch2DiffFromInitial.x = 0; touchEventHandler.touch2DiffFromInitial.y = 0;
-    }else if (event.changedTouches[0].identifier == touchEventHandler.touch2.identifier){
-      touchEventHandler.touch2 = 0;
-      touchEventHandler.touch2Initial = 0;
-      touchEventHandler.touch2Diff.x = 0; touchEventHandler.touch2Diff.y = 0;
-      touchEventHandler.touch2DiffFromInitial.x = 0; touchEventHandler.touch2DiffFromInitial.y = 0;
-    }
-    touchEventHandler.touchCount = 1;
-    touchEventHandler.distance = 0;
   }
+  touchEventHandler.isZooming = false;
+  touchEventHandler.isSwiping = false;
+  touchEventHandler.isTapping = false;
+  touchEventHandler.distance = 0;
+  touchEventHandler.lastSwipeCoordinates.isInitiated = false;
+  touchEventHandler.tapStartTime = 0;
 }
 
 var FullScreenEventHandler = function(){

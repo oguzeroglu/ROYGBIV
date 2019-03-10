@@ -133,6 +133,9 @@ RaycasterWorker.prototype.show = function(data){
 }
 RaycasterWorker.prototype.onAddedTextRescale = function(data){
   var text = this.objectsByWorkerID[data[2]];
+  if (!text){
+    return;
+  }
   text.characterSize = data[3];
   text.bottomRight.set(data[4], data[5], data[6]);
   text.topRight.set(data[7], data[8], data[9]);
