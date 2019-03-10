@@ -1002,6 +1002,7 @@ var DDS_SUPPORTED;
 var INSTANCING_SUPPORTED;
 var jobHandlerSelectedGrid = 0;
 var jobHandlerWorking = false;
+var jobHandlerRaycasterRefresh = false;
 var geometryCache = new Object();
 var physicsShapeCache = new Object();
 var MAX_TEXTURE_COUNT = 8;

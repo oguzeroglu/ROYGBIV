@@ -8,6 +8,7 @@ JobHandler.prototype.handle = function(previewModeCommand){
     return;
   }
   jobHandlerWorking = true;
+  jobHandlerRaycasterRefresh = false;
   jobHandlerInternalCounter = 0;
   jobHandlerInternalMaxExecutionCount = 0;
   this.splitted[0] = this.splitted[0].toLowerCase();
@@ -112,6 +113,9 @@ JobHandler.prototype.handle = function(previewModeCommand){
       this.handleDestroyTextCommand();
     }else if (this.splitted[0] == "destroyFont".toLowerCase()){
       this.handleDestroyFontCommand();
+    }
+    if (jobHandlerRaycasterRefresh){
+      refreshRaycaster(Text.JOB_COMPLETED, true);
     }
   }catch (err){
     console.error(err);

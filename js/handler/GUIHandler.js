@@ -599,6 +599,7 @@ GUIHandler.prototype.initializeTextManipulationGUI = function(){
   }).listen();
   textManipulationIs2DController = datGuiTextManipulation.add(textManipulationParameters, "is 2D").onChange(function(val){
     selectionHandler.getSelectedObject().set2DStatus(val);
+    refreshRaycaster("Ok")
     if (val){
       guiHandler.enableController(textManipulationMarginModeController);
       guiHandler.enableController(textManipulationMarginXController);

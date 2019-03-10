@@ -151,7 +151,9 @@ function parse(input){
           }else{
             gridSystems[name].destroy();
             if (!jobHandlerWorking){
-              terminal.printInfo(Text.GRID_SYSTEM_DESTROYED);
+              refreshRaycaster(Text.GRID_SYSTEM_DESTROYED);
+            }else{
+              jobHandlerRaycasterRefresh = true;
             }
           }
         break;
@@ -455,14 +457,15 @@ function parse(input){
             return true;
           }
           gridSystems[selectedGridSystemName].newSurface(objectName, selectedGrid1, selectedGrid2, selectedMaterial);
-          if (!jobHandlerWorking){
-            terminal.printInfo(Text.OBJECT_ADDED);
-          }
           if (areaConfigurationsVisible){
             guiHandler.hide(datGuiAreaConfigurations);
             areaConfigurationsVisible = false;
           }
-          rayCaster.refresh();
+          if (!jobHandlerWorking){
+            refreshRaycaster(Text.OBJECT_ADDED);
+          }else{
+            jobHandlerRaycasterRefresh = true;
+          }
           return true;
         break;
         case 18: //printObjects
@@ -581,18 +584,20 @@ function parse(input){
           }
           selectionHandler.resetCurrentSelection();
           if (object){
-            object.destroy();
+            object.destroy(true);
             delete addedObjects[objectName];
           }else if (objectGroup){
-            objectGroup.destroy();
+            objectGroup.destroy(true);
             delete objectGroups[objectName];
-          }
-          if (!jobHandlerWorking){
-            terminal.printInfo(Text.OBJECT_DESTROYED);
           }
           if (areaConfigurationsVisible){
             guiHandler.hide(datGuiAreaConfigurations);
             areaConfigurationsVisible = false;
+          }
+          if (!jobHandlerWorking){
+            refreshRaycaster(Text.OBJECT_DESTROYED);
+          }else{
+            jobHandlerRaycasterRefresh = true;
           }
           return true;
         break;
@@ -1011,12 +1016,11 @@ function parse(input){
           }
           gridSystem.newRamp(anchorGrid, otherGrid, axis, parseInt(height), material, name);
           anchorGrid = 0;
-          terminal.printInfo(Text.RAMP_CREATED);
           if (areaConfigurationsVisible){
             guiHandler.hide(datGuiAreaConfigurations);
             areaConfigurationsVisible = false;
           }
-          rayCaster.refresh();
+          refreshRaycaster(Text.RAMP_CREATED);
           return true;
         break;
         case 31: //setAnchor
@@ -1185,14 +1189,15 @@ function parse(input){
           var gridSystem = gridSystems[gridSystemName];
 
           gridSystem.newBox(selections, height, material, name);
-          if (!jobHandlerWorking){
-            terminal.printInfo(Text.BOX_CREATED);
-          }
           if (areaConfigurationsVisible){
             guiHandler.hide(datGuiAreaConfigurations);
             areaConfigurationsVisible = false;
           }
-          rayCaster.refresh();
+          if (!jobHandlerWorking){
+            refreshRaycaster(Text.BOX_CREATED);
+          }else{
+            jobHandlerRaycasterRefresh = true;
+          }
           return true;
         break;
         case 35: //newWallCollection
@@ -1293,8 +1298,8 @@ function parse(input){
           for (var gridName in gridSelections){
             gridSelections[gridName].toggleSelect(false, false, false, true);
           }
-          rayCaster.refresh();
-          terminal.printInfo(Text.WALL_COLLECTION_CREATED);
+          refreshRaycaster(Text.WALL_COLLECTION_CREATED);
+          return true;
         break;
         case 36: //printWallCollections
           var count = 0;
@@ -2812,13 +2817,12 @@ function parse(input){
             }
             objectGroup.glue();
             objectGroups[groupName] = objectGroup;
-            terminal.printInfo(Text.OBJECTS_GLUED_TOGETHER);
             guiHandler.hide(datGuiObjectManipulation);
             if (areaConfigurationsVisible){
               guiHandler.hide(datGuiAreaConfigurations);
               areaConfigurationsVisible = false;
             }
-            rayCaster.refresh();
+            refreshRaycaster(Text.OBJECTS_GLUED_TOGETHER);
             return true;
           }catch(err){
             terminal.printError(Text.INVALID_SYNTAX);
@@ -2843,14 +2847,15 @@ function parse(input){
           }
           objectGroup.detach();
           delete objectGroups[name];
-          rayCaster.refresh();
-          if (!jobHandlerWorking){
-            terminal.printInfo(Text.OBJECT_DETACHED);
-          }
           selectionHandler.resetCurrentSelection();
           if (areaConfigurationsVisible){
             guiHandler.hide(datGuiAreaConfigurations);
             areaConfigurationsVisible = false;
+          }
+          if (!jobHandlerWorking){
+            refreshRaycaster(Text.OBJECT_DETACHED);
+          }else{
+            jobHandlerRaycasterRefresh = true;
           }
           return true;
         break;
@@ -3444,8 +3449,7 @@ function parse(input){
           var lowerBound = new THREE.Vector3(minX, minY, minZ);
           var upperBound = new THREE.Vector3(maxX, maxY, maxZ);
           LIMIT_BOUNDING_BOX = new THREE.Box3(lowerBound, upperBound);
-          rayCaster.refresh();
-          terminal.printInfo(Text.OCTREE_LIMIT_SET);
+          refreshRaycaster(Text.OCTREE_LIMIT_SET);
           return true;
         break;
         case 114: //setBinSize
@@ -3482,8 +3486,7 @@ function parse(input){
           for (var areaName in areas){
             areaBinHandler.insert(areas[areaName].boundingBox, areaName);
           }
-          terminal.printInfo(Text.BIN_SIZE_SET);
-          rayCaster.refresh();
+          refreshRaycaster(Text.BIN_SIZE_SET);
           return true;
         break;
         case 115: //printWorldLimits
@@ -3668,14 +3671,15 @@ function parse(input){
           var gridSystem = gridSystems[gridSystemName];
 
           gridSystem.newSphere(sphereName, material, radius, selections);
-          if (!jobHandlerWorking){
-            terminal.printInfo(Text.SPHERE_CREATED);
-          }
           if (areaConfigurationsVisible){
             guiHandler.hide(datGuiAreaConfigurations);
             areaConfigurationsVisible = false;
           }
-          rayCaster.refresh();
+          if (!jobHandlerWorking){
+            refreshRaycaster(Text.SPHERE_CREATED);
+          }else{
+            jobHandlerRaycasterRefresh = true;
+          }
           return true;
         break;
         case 124: //printFogInfo
@@ -4205,14 +4209,15 @@ function parse(input){
             cylinderName, material, topRadius, bottomRadius,
             cylinderHeight, isOpenEnded, selections
           );
-          if (!jobHandlerWorking){
-            terminal.printInfo(Text.CYLINDER_CREATED);
-          }
           if (areaConfigurationsVisible){
             guiHandler.hide(datGuiAreaConfigurations);
             areaConfigurationsVisible = false;
           }
-          rayCaster.refresh();
+          if (!jobHandlerWorking){
+            refreshRaycaster(Text.CYLINDER_CREATED);
+          }else{
+            jobHandlerRaycasterRefresh = true;
+          }
           return true;
         break;
         case 141: // setRotationPivot
@@ -4434,9 +4439,10 @@ function parse(input){
               gridSelections = new Object();
             }
           }
-          rayCaster.refresh();
           if (!jobHandlerWorking){
-            terminal.printInfo(Text.OBJECT_COPIED);
+            refreshRaycaster(Text.OBJECT_COPIED);
+          }else{
+            jobHandlerRaycasterRefresh = true;
           }
           return true;
         break;
@@ -4815,7 +4821,6 @@ function parse(input){
           addedText.refCharSize = 20;
           addedText.refInnerHeight = window.innerHeight;
           addedText.handleBoundingBox();
-          rayCaster.refresh();
           if (!jobHandlerWorking){
             for (var gridName in gridSelections){
               addedText.destroyedGrids[gridName] = gridSelections[gridName];
@@ -4829,7 +4834,9 @@ function parse(input){
             jobHandlerSelectedGrid.createdAddedTextName = addedText.name;
           }
           if (!jobHandlerWorking){
-            terminal.printInfo(Text.TEXT_ALLOCATED);
+            refreshRaycaster(Text.TEXT_ALLOCATED);
+          }else{
+            jobHandlerRaycasterRefresh = true;
           }
           return true;
         break;
@@ -4867,9 +4874,11 @@ function parse(input){
             return true;
           }
           selectionHandler.resetCurrentSelection();
-          textToDestroy.destroy();
+          textToDestroy.destroy(true);
           if (!jobHandlerWorking){
-            terminal.printInfo(Text.TEXT_DESTROYED);
+            refreshRaycaster(Text.TEXT_DESTROYED);
+          }else{
+            jobHandlerRaycasterRefresh = true;
           }
           return true;
         break;
@@ -4908,8 +4917,7 @@ function parse(input){
             return true;
           }
           RAYCASTER_STEP_AMOUNT = stepAmount;
-          terminal.printInfo(Text.RAYCASTER_STEP_AMOUNT_SET_TO.replace(Text.PARAM1, RAYCASTER_STEP_AMOUNT));
-          rayCaster.refresh();
+          refreshRaycaster(Text.RAYCASTER_STEP_AMOUNT_SET_TO.replace(Text.PARAM1, RAYCASTER_STEP_AMOUNT));
           return true;
         break;
         case 159: //printRayStep
@@ -5000,9 +5008,24 @@ function processNewGridSystemCommand(name, sizeX, sizeZ, centerX, centerY, cente
     slicedGrid.slicedGridSystemName = name;
   }
 
-  rayCaster.refresh();
+  refreshRaycaster(Text.GS_CREATED);
 
   return true;
+}
+
+function refreshRaycaster(messageOnFinished, noClear){
+  if (!isDeployment){
+    terminal.printInfo(Text.REFRESHING_RAYCASTER);
+    terminal.disable();
+    rayCaster.onReadyCallback = function(){
+      if (!noClear){
+        terminal.clear();
+      }
+      terminal.printInfo(messageOnFinished);
+      terminal.enable();
+    }
+  }
+  rayCaster.refresh();
 }
 
 function isNameUsedAsSoftCopyParentName(name){

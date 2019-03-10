@@ -1351,7 +1351,7 @@ ObjectGroup.prototype.translate = function(axis, amount, fromScript){
   }
 }
 
-ObjectGroup.prototype.destroy = function(isUndo){
+ObjectGroup.prototype.destroy = function(skipRaycasterRefresh){
   this.removeBoundingBoxesFromScene();
   scene.remove(this.mesh);
   physicsWorld.remove(this.physicsBody);
@@ -1373,7 +1373,9 @@ ObjectGroup.prototype.destroy = function(isUndo){
   this.mesh.material.dispose();
   this.mesh.geometry.dispose();
 
-  rayCaster.refresh();
+  if (!skipRaycasterRefresh){
+    rayCaster.refresh();
+  }
 
 }
 

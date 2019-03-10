@@ -183,9 +183,6 @@ var GridSystem = function(name, sizeX, sizeZ, centerX, centerY, centerZ,
 
   gridCounter = gridCounter + totalGridCount;
 
-  if (!isDeployment && projectLoaded){
-    terminal.printInfo(Text.GS_CREATED);
-  }
 }
 
 GridSystem.prototype.draw = function(){
@@ -562,9 +559,6 @@ GridSystem.prototype.destroy = function(){
       obj.destroyedGrids = new Object();
     }
   }
-
-  rayCaster.refresh();
-
 }
 
 GridSystem.prototype.selectAllGrids = function(){

@@ -95,7 +95,7 @@ var AddedText = function(name, font, text, position, color, alpha, characterSize
   webglCallbackHandler.registerEngineObject(this);
 }
 
-AddedText.prototype.destroy = function(){
+AddedText.prototype.destroy = function(skipRaycasterRefresh){
   for (var gridName in this.destroyedGrids){
     if (this.destroyedGrids[gridName].createdAddedTextName == this.name){
       delete this.destroyedGrids[gridName].createdAddedTextName;
@@ -112,7 +112,9 @@ AddedText.prototype.destroy = function(){
     this.rectangle.material.dispose();
     this.rectangle.geometry.dispose();
   }
-  rayCaster.refresh();
+  if (!skipRaycasterRefresh){
+    rayCaster.refresh();
+  }
   delete addedTexts[this.name];
   if (this.is2D){
     delete addedTexts2D[this.name];
@@ -665,7 +667,6 @@ AddedText.prototype.set2DStatus = function(is2D){
       scene.remove(this.bbHelper);
     }
   }
-  rayCaster.refresh();
 }
 
 AddedText.prototype.set2DCoordinates = function(marginPercentWidth, marginPercentHeight){
