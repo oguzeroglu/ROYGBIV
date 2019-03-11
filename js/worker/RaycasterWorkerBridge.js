@@ -199,6 +199,9 @@ RaycasterWorkerBridge.prototype.onAddedTextResize = function(addedText){
   if (!rayCaster.ready){
     return;
   }
+  if (addedText.isEditorHelper){
+    return;
+  }
   if (!addedText.is2D){
     if (mode == 0 || (mode == 1 && addedText.isClickable)){
       rayCaster.textScaleUpdateBuffer.set(addedText.name, addedText);
@@ -208,6 +211,9 @@ RaycasterWorkerBridge.prototype.onAddedTextResize = function(addedText){
 
 RaycasterWorkerBridge.prototype.updateObject = function(obj){
   if (mode == 1 && (obj.isAddedObject || obj.isObjectGroup) && !obj.isIntersectable){
+    return;
+  }
+  if (obj.isAddedText && obj.isEditorHelper){
     return;
   }
   this.updateBuffer.set(obj.name, obj);

@@ -66,6 +66,7 @@ Area.prototype.renderToScreen = function(){
   }
   if(!this.text){
     this.text = new AddedText(null, defaultFont, this.name, this.center, color, 1, 15);
+    this.text.isEditorHelper = true;
     this.text.setMarginBetweenChars(7);
     this.text.refInnerHeight = 569;
     this.text.refCharSize = 15;

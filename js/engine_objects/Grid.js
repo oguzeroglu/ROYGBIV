@@ -211,6 +211,7 @@ Grid.prototype.renderCornerHelpers = function(){
     var addedText = new AddedText(
       null, defaultFont, text, new THREE.Vector3().copy(vertex), ORANGE_COLOR, 1, 6
     );
+    addedText.isEditorHelper = true;
     addedText.setMarginBetweenChars(2.5);
     addedText.refInnerHeight = 569;
     addedText.refCharSize = 6;
