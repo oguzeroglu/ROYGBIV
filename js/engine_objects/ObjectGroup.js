@@ -1296,25 +1296,30 @@ ObjectGroup.prototype.setQuaternion = function(axis, val){
 }
 
 ObjectGroup.prototype.rotate = function(axis, radian, fromScript){
+  REUSABLE_QUATERNION.copy(this.mesh.quaternion);
+  var axisVector
   if (axis == "x"){
-    this.mesh.rotateOnWorldAxis(
-      THREE_AXIS_VECTOR_X,
-      radian
-    );
+    axisVector = THREE_AXIS_VECTOR_X;
   }else if (axis == "y"){
-    this.mesh.rotateOnWorldAxis(
-      THREE_AXIS_VECTOR_Y,
-      radian
-    );
+    axisVector = THREE_AXIS_VECTOR_Y;
   }else if (axis == "z"){
-    this.mesh.rotateOnWorldAxis(
-      THREE_AXIS_VECTOR_Z,
-      radian
-    );
+    axisVector = THREE_AXIS_VECTOR_Z;
   }
+  this.mesh.rotateOnWorldAxis(axisVector, radian);
 
-  this.physicsBody.quaternion.copy(this.mesh.quaternion);
-  this.graphicsGroup.quaternion.copy(this.mesh.quaternion);
+  if (!this.isPhysicsSimplified){
+    this.physicsBody.quaternion.copy(this.mesh.quaternion);
+    this.graphicsGroup.quaternion.copy(this.mesh.quaternion);
+  }else{
+    var point = REUSABLE_VECTOR.copy(this.mesh.position);
+    this.physicsSimplificationObject3D.position.copy(this.physicsBody.position);
+    this.physicsSimplificationObject3D.position.sub(point);
+    this.physicsSimplificationObject3D.position.applyAxisAngle(axisVector, radian);
+    this.physicsSimplificationObject3D.position.add(point);
+    this.physicsSimplificationObject3D.rotateOnAxis(axisVector, radian);
+    this.physicsBody.position.copy(this.physicsSimplificationObject3D.position);
+    this.physicsBody.quaternion.copy(this.mesh.quaternion);
+  }
 
   if (!fromScript){
     this.initQuaternion = this.mesh.quaternion.clone();
@@ -1752,11 +1757,15 @@ ObjectGroup.prototype.rotateAroundPivotObject = function(axis, radians){
   this.updatePivot();
   this.pivotObject.updateMatrix();
   this.pivotObject.updateMatrixWorld();
+  var axisVector;
   if (axis == "x"){
+    axisVector = THREE_AXIS_VECTOR_X;
     this.pivotObject.rotation.x += radians;
   }else if (axis == "y"){
+    axisVector = THREE_AXIS_VECTOR_Y;
     this.pivotObject.rotation.y += radians;
   }else if (axis == "z"){
+    axisVector = THREE_AXIS_VECTOR_Z;
     this.pivotObject.rotation.z += radians;
   }
   this.pivotObject.updateMatrix();
@@ -1766,8 +1775,12 @@ ObjectGroup.prototype.rotateAroundPivotObject = function(axis, radians){
   this.pivotObject.pseudoMesh.matrixWorld.decompose(REUSABLE_VECTOR, REUSABLE_QUATERNION, REUSABLE_VECTOR_2);
   this.mesh.position.copy(REUSABLE_VECTOR);
   this.mesh.quaternion.copy(REUSABLE_QUATERNION);
-  this.physicsBody.quaternion.copy(this.mesh.quaternion);
-  this.physicsBody.position.copy(this.mesh.position);
+  if (!this.isPhysicsSimplified){
+    this.physicsBody.quaternion.copy(this.mesh.quaternion);
+    this.physicsBody.position.copy(this.mesh.position);
+  }else{
+
+  }
   if (this.mesh.visible){
     rayCaster.updateObject(this);
   }
@@ -2009,6 +2022,12 @@ ObjectGroup.prototype.removeFog = function(){
 
 ObjectGroup.prototype.simplifyPhysics = function(sizeX, sizeY, sizeZ){
   physicsWorld.remove(this.physicsBody);
+  var box3 = new THREE.Box3();
+  for (var i = 0; i<this.boundingBoxes.length; i++){
+    box3.expandByPoint(this.boundingBoxes[i].min);
+    box3.expandByPoint(this.boundingBoxes[i].max);
+  }
+  box3.getCenter(REUSABLE_VECTOR);
   var physicsShapeKey = "BOX" + PIPE + sizeX + PIPE + sizeY + PIPE + sizeZ;
   newPhysicsShape = physicsShapeCache[physicsShapeKey];
   if (!newPhysicsShape){
@@ -2020,9 +2039,11 @@ ObjectGroup.prototype.simplifyPhysics = function(sizeX, sizeY, sizeZ){
     shape: newPhysicsShape,
     material: this.originalPhysicsBody.material
   });
-  newPhysicsBody.position.copy(this.physicsBody.position);
+  newPhysicsBody.position.copy(REUSABLE_VECTOR);
   newPhysicsBody.quaternion.copy(this.physicsBody.quaternion);
   this.physicsBody = newPhysicsBody;
   physicsWorld.addBody(this.physicsBody);
   this.isPhysicsSimplified = true;
+  this.physicsSimplificationObject3D = new THREE.Object3D();
+  this.simplifiedPhysicsOffset = new THREE.Vector3(this.mesh.position.x - this.physicsBody.position.x, this.mesh.position.y - this.physicsBody.position.y, this.mesh.position.z - this.physicsBody.position.z);
 }
