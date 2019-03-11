@@ -2045,5 +2045,4 @@ ObjectGroup.prototype.simplifyPhysics = function(sizeX, sizeY, sizeZ){
   physicsWorld.addBody(this.physicsBody);
   this.isPhysicsSimplified = true;
   this.physicsSimplificationObject3D = new THREE.Object3D();
-  this.simplifiedPhysicsOffset = new THREE.Vector3(this.mesh.position.x - this.physicsBody.position.x, this.mesh.position.y - this.physicsBody.position.y, this.mesh.position.z - this.physicsBody.position.z);
 }
