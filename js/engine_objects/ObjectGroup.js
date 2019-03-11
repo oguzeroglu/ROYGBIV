@@ -1742,6 +1742,14 @@ ObjectGroup.prototype.makePivot = function(offsetX, offsetY, offsetZ){
   pseudoMesh.position.y = -offsetY;
   pseudoMesh.position.z = -offsetZ;
   pivot.pseudoMesh = pseudoMesh;
+  if (this.isPhysicsSimplified){
+    this.physicsSimplificationObject3D.position.copy(this.physicsBody.position);
+    this.physicsSimplificationObject3D.quaternion.copy(this.physicsBody.quaternion);
+    pivot.add(this.physicsSimplificationObject3D);
+    this.physicsSimplificationObject3D.position.x = -offsetX + (this.physicsBody.position.x - obj.mesh.position.x);
+    this.physicsSimplificationObject3D.position.y = -offsetY + (this.physicsBody.position.y - obj.mesh.position.y);
+    this.physicsSimplificationObject3D.position.z = -offsetZ + (this.physicsBody.position.z - obj.mesh.position.z);
+  }
   pivot.offsetX = offsetX;
   pivot.offsetY = offsetY;
   pivot.offsetZ = offsetZ;
@@ -1775,12 +1783,17 @@ ObjectGroup.prototype.rotateAroundPivotObject = function(axis, radians){
   this.pivotObject.pseudoMesh.matrixWorld.decompose(REUSABLE_VECTOR, REUSABLE_QUATERNION, REUSABLE_VECTOR_2);
   this.mesh.position.copy(REUSABLE_VECTOR);
   this.mesh.quaternion.copy(REUSABLE_QUATERNION);
-  if (!this.isPhysicsSimplified){
-    this.physicsBody.quaternion.copy(this.mesh.quaternion);
-    this.physicsBody.position.copy(this.mesh.position);
-  }else{
 
+  this.physicsBody.quaternion.copy(this.mesh.quaternion);
+  this.physicsBody.position.copy(this.mesh.position);
+  if (this.isPhysicsSimplified){
+    this.physicsSimplificationObject3D.updateMatrix();
+    this.physicsSimplificationObject3D.updateMatrixWorld();
+    this.physicsSimplificationObject3D.matrixWorld.decompose(REUSABLE_VECTOR, REUSABLE_QUATERNION, REUSABLE_VECTOR_2);
+    this.physicsBody.position.copy(REUSABLE_VECTOR);
+    this.physicsBody.quaternion.copy(REUSABLE_QUATERNION);
   }
+
   if (this.mesh.visible){
     rayCaster.updateObject(this);
   }
@@ -2045,4 +2058,12 @@ ObjectGroup.prototype.simplifyPhysics = function(sizeX, sizeY, sizeZ){
   physicsWorld.addBody(this.physicsBody);
   this.isPhysicsSimplified = true;
   this.physicsSimplificationObject3D = new THREE.Object3D();
+  if (this.pivotObject){
+    this.physicsSimplificationObject3D.position.copy(this.physicsBody.position);
+    this.physicsSimplificationObject3D.quaternion.copy(this.physicsBody.quaternion);
+    this.pivotObject.add(this.physicsSimplificationObject3D);
+    this.physicsSimplificationObject3D.position.x = -this.pivotObject.offsetX + (this.physicsBody.position.x - this.mesh.position.x);
+    this.physicsSimplificationObject3D.position.y = -this.pivotObject.offsetY + (this.physicsBody.position.y - this.mesh.position.y);
+    this.physicsSimplificationObject3D.position.z = -this.pivotObject.offsetZ + (this.physicsBody.position.z - this.mesh.position.z);
+  }
 }
