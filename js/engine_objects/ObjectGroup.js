@@ -1602,7 +1602,6 @@ ObjectGroup.prototype.export = function(){
   if (this.mesh.material.uniforms.totalEmissiveColor){
     exportObj.totalEmissiveColor = "#"+this.mesh.material.uniforms.totalEmissiveColor.value.getHexString();
   }
-
   return exportObj;
 }
 
@@ -2100,6 +2099,9 @@ ObjectGroup.prototype.removeFog = function(){
 }
 
 ObjectGroup.prototype.simplifyPhysics = function(sizeX, sizeY, sizeZ){
+  if (!this.boundingBoxes){
+    this.generateBoundingBoxes();
+  }
   physicsWorld.remove(this.physicsBody);
   var box3 = new THREE.Box3();
   for (var i = 0; i<this.boundingBoxes.length; i++){
@@ -2125,14 +2127,6 @@ ObjectGroup.prototype.simplifyPhysics = function(sizeX, sizeY, sizeZ){
   this.isPhysicsSimplified = true;
   this.physicsSimplificationObject3D = new THREE.Object3D();
   this.physicsSimplificationObject3D.rotation.order = 'YXZ';
-  if (this.pivotObject){
-    this.physicsSimplificationObject3D.position.copy(this.physicsBody.position);
-    this.physicsSimplificationObject3D.quaternion.copy(this.physicsBody.quaternion);
-    this.pivotObject.add(this.physicsSimplificationObject3D);
-    this.physicsSimplificationObject3D.position.x = -this.pivotObject.offsetX + (this.physicsBody.position.x - this.mesh.position.x);
-    this.physicsSimplificationObject3D.position.y = -this.pivotObject.offsetY + (this.physicsBody.position.y - this.mesh.position.y);
-    this.physicsSimplificationObject3D.position.z = -this.pivotObject.offsetZ + (this.physicsBody.position.z - this.mesh.position.z);
-  }
   this.physicsSimplificationObject3D.position.copy(this.physicsBody.position);
   this.physicsSimplificationObject3D.quaternion.copy(this.physicsBody.quaternion);
   this.physicsSimplificationObject3D.position.sub(this.mesh.position);
@@ -2140,4 +2134,14 @@ ObjectGroup.prototype.simplifyPhysics = function(sizeX, sizeY, sizeZ){
   this.physicsSimplificationObject3DContainer.position.copy(this.mesh.position);
   this.physicsSimplificationObject3DContainer.quaternion.copy(this.mesh.quaternion);
   this.physicsSimplificationObject3DContainer.add(this.physicsSimplificationObject3D);
+  this.physicsSimplificationParameters = {sizeX: sizeX, sizeY: sizeY, sizeZ: sizeZ};
+  if (this.pivotObject){
+    this.pivotObject.pseudoMesh.updateMatrix();
+    this.pivotObject.pseudoMesh.updateMatrixWorld();
+    this.updateSimplifiedPhysicsBody();
+    this.pivotObject.pseudoMesh.getWorldPosition(REUSABLE_VECTOR);
+    this.physicsSimplificationObject3DContainer.position.sub(REUSABLE_VECTOR);
+    this.pivotObject.pseudoMesh.add(this.physicsSimplificationObject3DContainer);
+    this.updateSimplifiedPhysicsBody();
+  }
 }
