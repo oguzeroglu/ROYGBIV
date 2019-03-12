@@ -1413,7 +1413,11 @@ ObjectGroup.prototype.translate = function(axis, amount, fromScript){
   }else if (axis == "z"){
     this.mesh.translateZ(amount);
   }
-  physicsBody.position.copy(this.mesh.position);
+  if (!this.isPhysicsSimplified){
+    physicsBody.position.copy(this.mesh.position);
+  }else{
+    this.updateSimplifiedPhysicsBody();
+  }
   this.graphicsGroup.position.copy(this.mesh.position);
   if (this.mesh.visible){
     rayCaster.updateObject(this);

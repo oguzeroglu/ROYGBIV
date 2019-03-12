@@ -765,7 +765,11 @@ Roygbiv.prototype.setPosition = function(obj, x, y, z){
     preConditions.checkIfChangeable(ROYGBIV.setPosition, preConditions.obj, obj);
     obj.mesh.position.set(x, y, z);
     obj.graphicsGroup.position.set(x, y, z);
-    obj.physicsBody.position.set(x, y, z);
+    if (!obj.isPhysicsSimplified){
+      obj.physicsBody.position.set(x, y, z);
+    }else {
+      obj.updateSimplifiedPhysicsBody();
+    }
     if (obj.mesh.visible){
       rayCaster.updateObject(obj);
     }
