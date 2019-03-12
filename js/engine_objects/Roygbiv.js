@@ -736,6 +736,7 @@ Roygbiv.prototype.rotateAroundXYZ = function(object, x, y, z, radians, axis, ski
     preConditions.checkIfChangeable(ROYGBIV.rotateAroundXYZ, preConditions.object, object);
     mesh = object.mesh;
   }
+  REUSABLE_QUATERNION.copy(object.mesh.quaternion);
   var point = REUSABLE_VECTOR.set(x, y, z);
   mesh.parent.localToWorld(mesh.position);
   mesh.position.sub(point);
@@ -751,8 +752,12 @@ Roygbiv.prototype.rotateAroundXYZ = function(object, x, y, z, radians, axis, ski
       rayCaster.updateObject(object);
     }
   }else if (object.isObjectGroup){
-    object.physicsBody.quaternion.copy(mesh.quaternion);
-    object.physicsBody.position.copy(mesh.position);
+    if (!object.isPhysicsSimplified){
+      object.physicsBody.quaternion.copy(mesh.quaternion);
+      object.physicsBody.position.copy(mesh.position);
+    }else{
+      object.rotateSimplifiedPhysics(REUSABLE_QUATERNION, point, axisVector, radians);
+    }
     if (object.mesh.visible){
       rayCaster.updateObject(object);
     }
