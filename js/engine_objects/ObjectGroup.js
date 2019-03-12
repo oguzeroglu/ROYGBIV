@@ -1386,8 +1386,18 @@ ObjectGroup.prototype.rotate = function(axis, radian, fromScript){
 }
 
 ObjectGroup.prototype.updateSimplifiedPhysicsBody = function(){
-  this.mesh.updateMatrixWorld();
-  this.mesh.updateMatrix();
+  if (this.pivotObject){
+    this.updatePivot();
+    this.pivotObject.updateMatrixWorld();
+    this.pivotObject.updateMatrix();
+    this.pivotObject.pseudoMesh.updateMatrixWorld();
+    this.pivotObject.pseudoMesh.updateMatrix();
+  }else{
+    this.physicsSimplificationObject3DContainer.position.copy(this.mesh.position);
+    this.physicsSimplificationObject3DContainer.quaternion.copy(this.mesh.quaternion);
+    this.physicsSimplificationObject3DContainer.updateMatrixWorld();
+    this.physicsSimplificationObject3DContainer.updateMatrix();
+  }
   this.physicsSimplificationObject3D.getWorldPosition(REUSABLE_VECTOR);
   this.physicsSimplificationObject3D.getWorldQuaternion(REUSABLE_QUATERNION);
   this.physicsBody.position.copy(REUSABLE_VECTOR);
@@ -1784,6 +1794,13 @@ ObjectGroup.prototype.makePivot = function(offsetX, offsetY, offsetZ){
   var pseudoMesh = new THREE.Mesh(obj.mesh.geometry, obj.mesh.material);
   pseudoMesh.position.copy(obj.mesh.position);
   pseudoMesh.quaternion.copy(obj.mesh.quaternion);
+  if (this.isPhysicsSimplified){
+    pseudoMesh.updateMatrix();
+    pseudoMesh.updateMatrixWorld();
+    this.updateSimplifiedPhysicsBody();
+    this.physicsSimplificationObject3DContainer.position.sub(pseudoMesh.position);
+    pseudoMesh.add(this.physicsSimplificationObject3DContainer);
+  }
   var pivot = new THREE.Object3D();
   pivot.add(pseudoMesh);
   pivot.position.set(
@@ -1795,14 +1812,6 @@ ObjectGroup.prototype.makePivot = function(offsetX, offsetY, offsetZ){
   pseudoMesh.position.y = -offsetY;
   pseudoMesh.position.z = -offsetZ;
   pivot.pseudoMesh = pseudoMesh;
-  if (this.isPhysicsSimplified){
-    this.physicsSimplificationObject3D.position.copy(this.physicsBody.position);
-    this.physicsSimplificationObject3D.quaternion.copy(this.physicsBody.quaternion);
-    pivot.add(this.physicsSimplificationObject3D);
-    this.physicsSimplificationObject3D.position.x = -offsetX + (this.physicsBody.position.x - obj.mesh.position.x);
-    this.physicsSimplificationObject3D.position.y = -offsetY + (this.physicsBody.position.y - obj.mesh.position.y);
-    this.physicsSimplificationObject3D.position.z = -offsetZ + (this.physicsBody.position.z - obj.mesh.position.z);
-  }
   pivot.offsetX = offsetX;
   pivot.offsetY = offsetY;
   pivot.offsetZ = offsetZ;
@@ -2122,6 +2131,9 @@ ObjectGroup.prototype.simplifyPhysics = function(sizeX, sizeY, sizeZ){
   }
   this.physicsSimplificationObject3D.position.copy(this.physicsBody.position);
   this.physicsSimplificationObject3D.quaternion.copy(this.physicsBody.quaternion);
-  this.physicsSimplificationObject3D.position.sub(this.graphicsGroup.position);
-  this.mesh.add(this.physicsSimplificationObject3D);
+  this.physicsSimplificationObject3D.position.sub(this.mesh.position);
+  this.physicsSimplificationObject3DContainer = new THREE.Object3D();
+  this.physicsSimplificationObject3DContainer.position.copy(this.mesh.position);
+  this.physicsSimplificationObject3DContainer.quaternion.copy(this.mesh.quaternion);
+  this.physicsSimplificationObject3DContainer.add(this.physicsSimplificationObject3D);
 }
