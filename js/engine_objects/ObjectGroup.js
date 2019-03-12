@@ -1315,7 +1315,7 @@ ObjectGroup.prototype.rotatePivotAroundXYZ = function(x, y, z, axis, axisVector,
     this.physicsBody.quaternion.copy(this.mesh.quaternion);
     this.physicsBody.position.copy(this.mesh.position);
   }else{
-    this.rotateSimplifiedPhysics(REUSABLE_QUATERNION2, point, axisVector, radians);
+    this.updateSimplifiedPhysicsBody();
   }
   if (this.mesh.visible){
     rayCaster.updateObject(this);
@@ -1339,7 +1339,7 @@ ObjectGroup.prototype.rotateAroundXYZ = function(x, y, z, axis, axisVector, radi
     this.physicsBody.quaternion.copy(this.mesh.quaternion);
     this.physicsBody.position.copy(this.mesh.position);
   }else{
-    this.rotateSimplifiedPhysics(REUSABLE_QUATERNION2, point, axisVector, radians);
+    this.updateSimplifiedPhysicsBody();
   }
   if (this.mesh.visible){
     rayCaster.updateObject(this);
@@ -1362,7 +1362,7 @@ ObjectGroup.prototype.rotate = function(axis, radian, fromScript){
     this.physicsBody.quaternion.copy(this.mesh.quaternion);
     this.graphicsGroup.quaternion.copy(this.mesh.quaternion);
   }else{
-    this.rotateSimplifiedPhysics(REUSABLE_QUATERNION, REUSABLE_VECTOR.copy(this.mesh.position), axisVector, radian);
+    this.updateSimplifiedPhysicsBody();
   }
 
   if (!fromScript){
@@ -1385,14 +1385,13 @@ ObjectGroup.prototype.rotate = function(axis, radian, fromScript){
 
 }
 
-ObjectGroup.prototype.rotateSimplifiedPhysics = function(meshQuaternionBeforeRotation, point, axisVector, radian){
-  this.physicsSimplificationObject3D.position.copy(this.physicsBody.position);
-  this.physicsSimplificationObject3D.position.sub(point);
-  this.physicsSimplificationObject3D.position.applyAxisAngle(axisVector, radian);
-  this.physicsSimplificationObject3D.position.add(point);
-  this.physicsSimplificationObject3D.rotateOnAxis(axisVector, radian);
-  this.physicsBody.position.copy(this.physicsSimplificationObject3D.position);
-  this.physicsBody.quaternion.copy(this.mesh.quaternion);
+ObjectGroup.prototype.updateSimplifiedPhysicsBody = function(){
+  this.mesh.updateMatrixWorld();
+  this.mesh.updateMatrix();
+  this.physicsSimplificationObject3D.getWorldPosition(REUSABLE_VECTOR);
+  this.physicsSimplificationObject3D.getWorldQuaternion(REUSABLE_QUATERNION);
+  this.physicsBody.position.copy(REUSABLE_VECTOR);
+  this.physicsBody.quaternion.copy(REUSABLE_QUATERNION);
 }
 
 ObjectGroup.prototype.translate = function(axis, amount, fromScript){
@@ -2121,4 +2120,8 @@ ObjectGroup.prototype.simplifyPhysics = function(sizeX, sizeY, sizeZ){
     this.physicsSimplificationObject3D.position.y = -this.pivotObject.offsetY + (this.physicsBody.position.y - this.mesh.position.y);
     this.physicsSimplificationObject3D.position.z = -this.pivotObject.offsetZ + (this.physicsBody.position.z - this.mesh.position.z);
   }
+  this.physicsSimplificationObject3D.position.copy(this.physicsBody.position);
+  this.physicsSimplificationObject3D.quaternion.copy(this.physicsBody.quaternion);
+  this.physicsSimplificationObject3D.position.sub(this.graphicsGroup.position);
+  this.mesh.add(this.physicsSimplificationObject3D);
 }
