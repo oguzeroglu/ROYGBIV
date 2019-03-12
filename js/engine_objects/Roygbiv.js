@@ -687,9 +687,8 @@ Roygbiv.prototype.rotate = function(object, axis, radians){
 // rotateAroundXYZ
 //  Rotates an object or a glued object around the given (x, y, z)
 //  Unlike the rotate function, the positions of the objects can change when rotated
-//  using this function. If the optional skipLocalRotation flag is set, the object is
-//  not rotated in its local axis system.
-Roygbiv.prototype.rotateAroundXYZ = function(object, x, y, z, radians, axis, skipLocalRotation){
+//  using this function.
+Roygbiv.prototype.rotateAroundXYZ = function(object, x, y, z, radians, axis){
   if (mode == 0){
     return;
   }
@@ -706,7 +705,6 @@ Roygbiv.prototype.rotateAroundXYZ = function(object, x, y, z, radians, axis, ski
   preConditions.checkIfAddedObjectOrObjectGroup(ROYGBIV.rotateAroundXYZ, preConditions.object, object);
   axis = axis.toLowerCase();
   preConditions.checkIfAxisOnlyIfDefined(ROYGBIV.rotateAroundXYZ, preConditions.axis, axis);
-  preConditions.checkIfBooleanOnlyIfExists(ROYGBIV.rotateAroundXYZ, preConditions.skipLocalRotation, skipLocalRotation);
   var axisVector;
   if (axis.toLowerCase() == "x"){
     axisVector = THREE_AXIS_VECTOR_X;
@@ -724,44 +722,16 @@ Roygbiv.prototype.rotateAroundXYZ = function(object, x, y, z, radians, axis, ski
           parentObject,
           x, y, z,
           radians,
-          axis,
-          skipLocalRotation
+          axis
         );
         return;
       }
     }
     preConditions.checkIfChangeable(ROYGBIV.rotateAroundXYZ, preConditions.object, object);
-    mesh = object.mesh;
   }else if (object.isObjectGroup){
     preConditions.checkIfChangeable(ROYGBIV.rotateAroundXYZ, preConditions.object, object);
-    mesh = object.mesh;
   }
-  REUSABLE_QUATERNION.copy(object.mesh.quaternion);
-  var point = REUSABLE_VECTOR.set(x, y, z);
-  mesh.parent.localToWorld(mesh.position);
-  mesh.position.sub(point);
-  mesh.position.applyAxisAngle(axisVector, radians);
-  mesh.position.add(point);
-  mesh.parent.worldToLocal(mesh.position);
-  if (!skipLocalRotation){
-    mesh.rotateOnAxis(axisVector, radians);
-  }
-  if (object.isAddedObject){
-    object.setPhysicsAfterRotationAroundPoint(axis, radians);
-    if (object.mesh.visible){
-      rayCaster.updateObject(object);
-    }
-  }else if (object.isObjectGroup){
-    if (!object.isPhysicsSimplified){
-      object.physicsBody.quaternion.copy(mesh.quaternion);
-      object.physicsBody.position.copy(mesh.position);
-    }else{
-      object.rotateSimplifiedPhysics(REUSABLE_QUATERNION, point, axisVector, radians);
-    }
-    if (object.mesh.visible){
-      rayCaster.updateObject(object);
-    }
-  }
+  object.rotateAroundXYZ(x, y, z, axis, axisVector, radians);
 }
 
 // setPosition

@@ -1295,6 +1295,57 @@ ObjectGroup.prototype.setQuaternion = function(axis, val){
   }
 }
 
+ObjectGroup.prototype.rotatePivotAroundXYZ = function(x, y, z, axis, axisVector, radians){
+  this.updatePivot();
+  this.pivotObject.updateMatrix();
+  this.pivotObject.updateMatrixWorld();
+  var point = REUSABLE_VECTOR.set(x, y, z);
+  this.pivotObject.position.sub(point);
+  this.pivotObject.position.applyAxisAngle(axisVector, radians);
+  this.pivotObject.position.add(point);
+  this.pivotObject.rotateOnAxis(axisVector, radians);
+  this.pivotObject.updateMatrix();
+  this.pivotObject.updateMatrixWorld();
+  this.pivotObject.pseudoMesh.updateMatrix();
+  this.pivotObject.pseudoMesh.updateMatrixWorld();
+  this.pivotObject.pseudoMesh.matrixWorld.decompose(REUSABLE_VECTOR, REUSABLE_QUATERNION, REUSABLE_VECTOR_2);
+  this.mesh.position.copy(REUSABLE_VECTOR);
+  this.mesh.quaternion.copy(REUSABLE_QUATERNION);
+  if (!this.isPhysicsSimplified){
+    this.physicsBody.quaternion.copy(this.mesh.quaternion);
+    this.physicsBody.position.copy(this.mesh.position);
+  }else{
+    this.rotateSimplifiedPhysics(REUSABLE_QUATERNION2, point, axisVector, radians);
+  }
+  if (this.mesh.visible){
+    rayCaster.updateObject(this);
+  }
+}
+
+ObjectGroup.prototype.rotateAroundXYZ = function(x, y, z, axis, axisVector, radians){
+  REUSABLE_QUATERNION2.copy(this.mesh.quaternion);
+  if (this.pivotObject){
+    this.rotatePivotAroundXYZ(x, y, z, axis, axisVector, radians);
+    return;
+  }
+  var point = REUSABLE_VECTOR.set(x, y, z);
+  this.mesh.parent.localToWorld(this.mesh.position);
+  this.mesh.position.sub(point);
+  this.mesh.position.applyAxisAngle(axisVector, radians);
+  this.mesh.position.add(point);
+  this.mesh.parent.worldToLocal(this.mesh.position);
+  this.mesh.rotateOnAxis(axisVector, radians);
+  if (!this.isPhysicsSimplified){
+    this.physicsBody.quaternion.copy(this.mesh.quaternion);
+    this.physicsBody.position.copy(this.mesh.position);
+  }else{
+    this.rotateSimplifiedPhysics(REUSABLE_QUATERNION2, point, axisVector, radians);
+  }
+  if (this.mesh.visible){
+    rayCaster.updateObject(this);
+  }
+}
+
 ObjectGroup.prototype.rotate = function(axis, radian, fromScript){
   REUSABLE_QUATERNION.copy(this.mesh.quaternion);
   var axisVector
@@ -2061,6 +2112,7 @@ ObjectGroup.prototype.simplifyPhysics = function(sizeX, sizeY, sizeZ){
   physicsWorld.addBody(this.physicsBody);
   this.isPhysicsSimplified = true;
   this.physicsSimplificationObject3D = new THREE.Object3D();
+  this.physicsSimplificationObject3D.rotation.order = 'YXZ';
   if (this.pivotObject){
     this.physicsSimplificationObject3D.position.copy(this.physicsBody.position);
     this.physicsSimplificationObject3D.quaternion.copy(this.physicsBody.quaternion);

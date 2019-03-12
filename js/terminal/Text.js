@@ -504,7 +504,7 @@ var Text = function(){
   this.ROYGBIV_SCRIPTING_API_BOXDISTRIBUTION = "Returns a vector sampled on a face of a box centered at (0, 0, 0).\nThe size of the boxis specified with the parameters sizeX, sizeY and sizeZ.\nThe optional parameter [side] can be used to generate the point on a specific face.\nside = 1 -> UP\nside = 2 -> DOWN\nside = 3 -> FRONT\nside = 4 -> BACK\nside = 5 -> RIGHT\nside = 6 -> LEFT";
   this.ROYGBIV_SCRIPTING_API_APPLYFORCE = "Applies a physical force to an object or a glued object from a given point.";
   this.ROYGBIV_SCRIPTING_API_ROTATE = "Rotates an object or a glued object around a given world axis by given radians. The parameter axis must be one of x, y or z.\nObjects are rotated around their own centers, so their positions do not change when rotated using this function.";
-  this.ROYGBIV_SCRIPTING_API_ROTATEAROUNDXYZ = "Rotates an object or a glued object around the given (x, y, z). Unlike the rotate function, the positions of the objects\ncan change when rotated using this function. If the optional skipLocalRotation flag is set, the object is not rotated in\nits local axis system.";
+  this.ROYGBIV_SCRIPTING_API_ROTATEAROUNDXYZ = "Rotates an object or a glued object around the given (x, y, z). Unlike the rotate function, the positions of the objects\ncan change when rotated using this function.";
   this.ROYGBIV_SCRIPTING_API_SETPOSITION = "Puts an object or glued object to the specified (x, y, z) coordinate.";
   this.ROYGBIV_SCRIPTING_API_COLOR = "Creates a new color object from the given HTML color name.";
   this.ROYGBIV_SCRIPTING_API_SETMASS = "Sets the mass property of an object or a glued object. Objects are considered dynamic if and only if their mass is greater than zero.";
