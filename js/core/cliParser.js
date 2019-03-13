@@ -4313,11 +4313,21 @@ function parse(input){
             terminal.printError(Text.OBJECT_DOES_NOT_HAVE_A_PIVOT);
             return true;
           }
+          if (obj.isObjectGroup && obj.isPhysicsSimplified){
+            obj.pivotObject.pseudoMesh.remove(obj.physicsSimplificationObject3DContainer);
+            obj.physicsSimplificationObject3DContainer.position.copy(obj.mesh.position);
+            obj.physicsSimplificationObject3DContainer.quaternion.copy(obj.mesh.quaternion);
+            obj.physicsSimplificationObject3DContainer.updateMatrixWorld();
+            obj.physicsSimplificationObject3DContainer.updateMatrix();
+          }
           delete obj.pivotObject;
           delete obj.pivotOffsetX;
           delete obj.pivotOffsetY;
           delete obj.pivotOffsetZ;
           obj.pivotRemoved = true;
+          if (obj.isObjectGroup && obj.isPhysicsSimplified){
+            obj.updateSimplifiedPhysicsBody();
+          }
           if (!jobHandlerWorking){
             terminal.printInfo(Text.PIVOT_UNSET);
           }
