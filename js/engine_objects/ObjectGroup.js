@@ -1801,9 +1801,17 @@ ObjectGroup.prototype.makePivot = function(offsetX, offsetY, offsetZ){
   pseudoMesh.position.copy(obj.mesh.position);
   pseudoMesh.quaternion.copy(obj.mesh.quaternion);
   if (this.isPhysicsSimplified){
+    if (this.pivotObject){
+      obj.pivotObject.pseudoMesh.remove(obj.physicsSimplificationObject3DContainer);
+      obj.physicsSimplificationObject3DContainer.position.copy(obj.mesh.position);
+      obj.physicsSimplificationObject3DContainer.quaternion.copy(obj.mesh.quaternion);
+      obj.physicsSimplificationObject3DContainer.updateMatrixWorld();
+      obj.physicsSimplificationObject3DContainer.updateMatrix();
+    }
     pseudoMesh.updateMatrix();
     pseudoMesh.updateMatrixWorld();
     this.updateSimplifiedPhysicsBody();
+    this.physicsSimplificationObject3DContainer.quaternion.set(0, 0, 0, 1);
     this.physicsSimplificationObject3DContainer.position.sub(pseudoMesh.position);
     pseudoMesh.add(this.physicsSimplificationObject3DContainer);
   }
