@@ -317,7 +317,7 @@ AddedObject.prototype.export = function(){
   if (this.hasTexture()){
     exportObject.txtMatrix = this.mesh.material.uniforms.textureMatrix.value.elements;
   }
-
+  exportObject.isRotationDirty = this.isRotationDirty;
   return exportObject;
 }
 

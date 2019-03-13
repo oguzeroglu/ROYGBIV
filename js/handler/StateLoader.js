@@ -589,7 +589,9 @@ StateLoader.prototype.load = function(){
       addedObjectInstance.mesh.material.uniforms.setAOIntensity = curAddedObjectExport.aoMapIntensity;
 
       addedObjects[addedObjectName] = addedObjectInstance;
-
+      if (curAddedObjectExport.isRotationDirty){
+        addedObjectInstance.isRotationDirty = true;
+      }
       addedObjectInstance.rotationX = curAddedObjectExport.rotationX;
       addedObjectInstance.rotationY = curAddedObjectExport.rotationY;
       addedObjectInstance.rotationZ = curAddedObjectExport.rotationZ;
@@ -1183,6 +1185,9 @@ StateLoader.prototype.finalize = function(){
     }
     var objectGroupInstance = new ObjectGroup(objectName, group);
     objectGroups[objectName] = objectGroupInstance;
+    if (curObjectGroupExport.isRotationDirty){
+      objectGroupInstance.isRotationDirty = true;
+    }
     objectGroupInstance.glue();
     if (curObjectGroupExport.mass){
       objectGroupInstance.setMass(curObjectGroupExport.mass);

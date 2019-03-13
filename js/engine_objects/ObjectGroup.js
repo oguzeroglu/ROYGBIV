@@ -1602,6 +1602,7 @@ ObjectGroup.prototype.export = function(){
   if (this.mesh.material.uniforms.totalEmissiveColor){
     exportObj.totalEmissiveColor = "#"+this.mesh.material.uniforms.totalEmissiveColor.value.getHexString();
   }
+  exportObj.isRotationDirty = this.isRotationDirty;
   return exportObj;
 }
 

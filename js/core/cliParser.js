@@ -2426,6 +2426,7 @@ function parse(input){
             }
             addedObject.mesh.updateMatrixWorld();
             addedObject.updateBoundingBoxes();
+            addedObject.isRotationDirty = true;
           }else if (objectGroup){
             if (objectGroup.pivotObject){
               objectGroup.rotateAroundPivotObject(axis, radian);
@@ -2433,6 +2434,7 @@ function parse(input){
               objectGroup.rotate(axis, radian);
             }
             objectGroup.updateBoundingBoxes();
+            objectGroup.isRotationDirty = true;
           }
           if (!jobHandlerWorking){
             terminal.printInfo(Text.OBJECT_ROTATED);
@@ -4970,6 +4972,17 @@ function parse(input){
           if (sizeZ <= 0){
             terminal.printError(Text.MUST_BE_GREATER_THAN.replace(Text.PARAM1, "sizeZ").replace(Text.PARAM2, "0"));
             return true;
+          }
+          if (obj.isRotationDirty){
+            terminal.printError(Text.OBJECT_HAS_ROTATION_SET);
+            return true;
+          }else{
+            for (var objName in obj.group){
+              if (obj.group[objName].isRotationDirty){
+                terminal.printError(Text.OBJECT_HAS_CHILD_ROTATION_SET);
+                return true;
+              }
+            }
           }
           selectionHandler.resetCurrentSelection();
           obj.simplifyPhysics(sizeX/2, sizeY/2, sizeZ/2);
