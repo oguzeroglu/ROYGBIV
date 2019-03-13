@@ -1292,6 +1292,16 @@ StateLoader.prototype.finalize = function(){
     if (objectGroupInstance.mesh.material.uniforms.totalEmissiveColor){
       objectGroupInstance.mesh.material.uniforms.totalEmissiveColor.value.set(curObjectGroupExport.totalEmissiveColor);
     }
+    if (curObjectGroupExport.isPhysicsSimplified){
+      var params = curObjectGroupExport.physicsSimplificationParameters;
+      objectGroupInstance.simplifyPhysics(params.sizeX, params.sizeY, params.sizeZ);
+      objectGroupInstance.physicsBody.position.copy(params.pbodyPosition);
+      objectGroupInstance.physicsBody.quaternion.copy(params.pbodyQuaternion);
+      objectGroupInstance.physicsSimplificationObject3D.position.copy(params.physicsSimplificationObject3DPosition);
+      objectGroupInstance.physicsSimplificationObject3D.quaternion.copy(params.physicsSimplificationObject3DQuaternion);
+      objectGroupInstance.physicsSimplificationObject3DContainer.position.copy(params.physicsSimplificationObject3DContainerPosition);
+      objectGroupInstance.physicsSimplificationObject3DContainer.quaternion.copy(params.physicsSimplificationObject3DContainerQuaternion);
+    }
   }
 
   for (var objName in objectGroups){

@@ -1603,6 +1603,8 @@ ObjectGroup.prototype.export = function(){
     exportObj.totalEmissiveColor = "#"+this.mesh.material.uniforms.totalEmissiveColor.value.getHexString();
   }
   exportObj.isRotationDirty = this.isRotationDirty;
+  exportObj.isPhysicsSimplified = this.isPhysicsSimplified;
+  exportObj.physicsSimplificationParameters = this.physicsSimplificationParameters;
   return exportObj;
 }
 
@@ -2135,7 +2137,6 @@ ObjectGroup.prototype.simplifyPhysics = function(sizeX, sizeY, sizeZ){
   this.physicsSimplificationObject3DContainer.position.copy(this.mesh.position);
   this.physicsSimplificationObject3DContainer.quaternion.copy(this.mesh.quaternion);
   this.physicsSimplificationObject3DContainer.add(this.physicsSimplificationObject3D);
-  this.physicsSimplificationParameters = {sizeX: sizeX, sizeY: sizeY, sizeZ: sizeZ};
   if (this.pivotObject){
     this.pivotObject.pseudoMesh.updateMatrix();
     this.pivotObject.pseudoMesh.updateMatrixWorld();
@@ -2145,4 +2146,12 @@ ObjectGroup.prototype.simplifyPhysics = function(sizeX, sizeY, sizeZ){
     this.pivotObject.pseudoMesh.add(this.physicsSimplificationObject3DContainer);
     this.updateSimplifiedPhysicsBody();
   }
+  this.physicsSimplificationParameters = {
+    sizeX: sizeX, sizeY: sizeY, sizeZ: sizeZ,
+    pbodyPosition: this.physicsBody.position, pbodyQuaternion: this.physicsBody.quaternion,
+    physicsSimplificationObject3DPosition: this.physicsSimplificationObject3D.position,
+    physicsSimplificationObject3DQuaternion: new CANNON.Quaternion().copy(this.physicsSimplificationObject3D.quaternion),
+    physicsSimplificationObject3DContainerPosition: this.physicsSimplificationObject3DContainer.position,
+    physicsSimplificationObject3DContainerQuaternion: new CANNON.Quaternion().copy(this.physicsSimplificationObject3DContainer.quaternion)
+  };
 }
