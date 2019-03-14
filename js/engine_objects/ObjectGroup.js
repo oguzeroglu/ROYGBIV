@@ -1963,6 +1963,10 @@ ObjectGroup.prototype.copy = function(name, isHardCopy, copyPosition, gridSystem
   var newObjGroup = new ObjectGroup(name, newGroup);
   newObjGroup.handleTextures();
   newObjGroup.glue();
+  if (this.isPhysicsSimplified){
+    newObjGroup.simplifyPhysics(this.physicsSimplificationParameters.sizeX, this.physicsSimplificationParameters.sizeY, this.physicsSimplificationParameters.sizeZ);
+    newObjGroup.updateSimplifiedPhysicsBody();
+  }
   newObjGroup.mesh.position.copy(copyPosition);
   newObjGroup.physicsBody.position.copy(copyPosition);
   newObjGroup.mesh.quaternion.copy(quaternionBeforeDetached);
@@ -2071,6 +2075,9 @@ ObjectGroup.prototype.copy = function(name, isHardCopy, copyPosition, gridSystem
 
   newObjGroup.createdWithScript = fromScript;
   newObjGroup.copiedInitialCenter = {x: newObjGroup.mesh.position.x, y: newObjGroup.mesh.position.y, z: newObjGroup.mesh.position.z};
+  if (newObjGroup.isPhysicsSimplified){
+    newObjGroup.updateSimplifiedPhysicsBody();
+  }
   return newObjGroup;
 }
 
