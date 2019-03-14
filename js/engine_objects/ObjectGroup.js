@@ -1916,6 +1916,16 @@ ObjectGroup.prototype.copy = function(name, isHardCopy, copyPosition, gridSystem
   var totalEmissiveIntensityBeforeDetached;
   var totalEmissiveColorBeforeDetached;
   var oldMaterial = this.mesh.material;
+  var phsimplObj3DPos;
+  var phsimplObj3DQuat;
+  var phsimplContPos;
+  var phsimplContQuat;
+  if (this.isPhysicsSimplified){
+    phsimplObj3DPos = this.physicsSimplificationObject3D.position.clone();
+    phsimplObj3DQuat = this.physicsSimplificationObject3D.quaternion.clone();
+    phsimplContPos = this.physicsSimplificationObject3DContainer.position.clone();
+    phsimplContQuat = this.physicsSimplificationObject3DContainer.quaternion.clone();
+  }
   if (this.mesh.material.uniforms.totalAOIntensity){
     totalAOIntensityBeforeDetached = this.mesh.material.uniforms.totalAOIntensity.value;
   }
@@ -1958,6 +1968,13 @@ ObjectGroup.prototype.copy = function(name, isHardCopy, copyPosition, gridSystem
   newObjGroup.graphicsGroup.quaternion.copy(newObjGroup.mesh.quaternion);
   this.glue();
   newObjGroup.isBasicMaterial = this.isBasicMaterial;
+  if (this.isPhysicsSimplified){
+    this.simplifyPhysics(this.physicsSimplificationParameters.sizeX, this.physicsSimplificationParameters.sizeY, this.physicsSimplificationParameters.sizeZ);
+    this.physicsSimplificationObject3D.position.copy(phsimplObj3DPos);
+    this.physicsSimplificationObject3D.quaternion.copy(phsimplObj3DQuat);
+    this.physicsSimplificationObject3DContainer.position.copy(phsimplContPos);
+    this.physicsSimplificationObject3DContainer.quaternion.copy(phsimplContQuat);
+  }
   this.physicsBody.position.copy(physicsPositionBeforeDetached);
   this.physicsBody.quaternion.copy(physicsQuaternionBeforeDetached);
   this.mesh.position.copy(positionBeforeDetached);
