@@ -181,6 +181,9 @@ GUIHandler.prototype.afterObjectSelection = function(){
       }else{
         objectManipulationParameters["Colorizable"] = false;
       }
+      if (obj.isPhysicsSimplified){
+        guiHandler.disableController(omMassController);
+      }
       objectManipulationParameters["Opacity"] = obj.mesh.material.uniforms.totalAlpha.value;
       var hasAOMap = false;
       var hasEmissiveMap = false;

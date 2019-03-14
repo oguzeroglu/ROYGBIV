@@ -2369,6 +2369,10 @@ function parse(input){
               terminal.printError(Text.OBJECT_HAS_NO_MASS);
               return true;
             }
+            if (grouppedObject.isPhysicsSimplified){
+              terminal.printError(Text.CANNOT_SET_MASS_FOR_SIMPLIFIED_OBJECTS);
+              return true;
+            }
             grouppedObject.setMass(mass);
             if (mode == 1 && mass > 0){
               dynamicObjectGroups[grouppedObject.name] = grouppedObject;
@@ -4953,6 +4957,10 @@ function parse(input){
           }
           if (obj.noMass){
             terminal.printError(Text.OBJECT_HAS_NO_MASS);
+            return true;
+          }
+          if (obj.physicsBody.mass > 0){
+            terminal.printError(Text.CANNOT_SIMPLIFY_PHYISCS_DYNAMIC_OBJECTS);
             return true;
           }
           if (obj.cannotSetMass){
