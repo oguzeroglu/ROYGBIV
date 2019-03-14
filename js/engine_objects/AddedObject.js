@@ -115,6 +115,8 @@ AddedObject.prototype.exportLightweight = function(){
   }else{
     exportObject.position = new THREE.Vector3(this.positionXWhenAttached, this.positionYWhenAttached, this.positionZWhenAttached);
     exportObject.quaternion = new THREE.Quaternion(this.qxWhenAttached, this.qyWhenAttached, this.qzWhenAttached, this.qwWhenAttached);
+    exportObject.positionWhenAttached = exportObject.position.clone();
+    exportObject.quaternionWhenAttached = exportObject.quaternion.clone();
   }
   exportObject.vertices = [];
   exportObject.triangles = [];
