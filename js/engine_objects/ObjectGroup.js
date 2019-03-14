@@ -1603,8 +1603,20 @@ ObjectGroup.prototype.export = function(){
     exportObj.totalEmissiveColor = "#"+this.mesh.material.uniforms.totalEmissiveColor.value.getHexString();
   }
   exportObj.isRotationDirty = this.isRotationDirty;
-  exportObj.isPhysicsSimplified = this.isPhysicsSimplified;
-  exportObj.physicsSimplificationParameters = this.physicsSimplificationParameters;
+  if (this.isPhysicsSimplified){
+    exportObj.isPhysicsSimplified = true;
+    this.physicsSimplificationParameters = {
+      sizeX: this.physicsSimplificationParameters.sizeX,
+      sizeY: this.physicsSimplificationParameters.sizeY,
+      sizeZ: this.physicsSimplificationParameters.sizeZ,
+      pbodyPosition: this.physicsBody.position, pbodyQuaternion: this.physicsBody.quaternion,
+      physicsSimplificationObject3DPosition: this.physicsSimplificationObject3D.position,
+      physicsSimplificationObject3DQuaternion: new CANNON.Quaternion().copy(this.physicsSimplificationObject3D.quaternion),
+      physicsSimplificationObject3DContainerPosition: this.physicsSimplificationObject3DContainer.position,
+      physicsSimplificationObject3DContainerQuaternion: new CANNON.Quaternion().copy(this.physicsSimplificationObject3DContainer.quaternion)
+    };
+    exportObj.physicsSimplificationParameters = this.physicsSimplificationParameters;
+  }
   return exportObj;
 }
 
