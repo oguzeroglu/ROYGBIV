@@ -1646,7 +1646,8 @@ if (!isDeployment){
       1, //destroyText
       0, //printTexts
       1, //setRayStep
-      0 //printRayStep
+      0, //printRayStep
+      4 //simplifyPhysics
   ];
   commandArgumentsExpectedExplanation = [
     "help", //help
@@ -1808,7 +1809,8 @@ if (!isDeployment){
     "destroyText textName", //destroyText
     "printTexts", //printTexts
     "setRayStep stepAmount", //setRayStep
-    "printRayStep"
+    "printRayStep", //printRayStep
+    "simplifyPhysics objName sizeX sizeY sizeZ" //simplifyPhysics
   ];
   commands = [
     "help",
@@ -1970,7 +1972,8 @@ if (!isDeployment){
     "destroyText",
     "printTexts",
     "setRayStep",
-    "printRayStep"
+    "printRayStep",
+    "simplifyPhysics"
   ];
   commandInfo = [
     "help: Prints command list.",
@@ -2132,7 +2135,8 @@ if (!isDeployment){
     "destroyText: Destroys a text.",
     "printTexts: Prints a list of created texts.",
     "setRayStep: Sets the step amount used by the Raycaster while detecting intersections. Small step amount means more precise intersection\n  detection but worse performance. Default value is 32.",
-    "printRayStep: Prints the ray step amount."
+    "printRayStep: Prints the ray step amount.",
+    "simplifyPhysics: Sets the physics of an object to a box shape of sizeX, sizeY, sizeZ sizes. This helps optimizing the performance of the\n  physics engine but causes physics precision loss."
   ];
   keyboardInfo = [
     "W/S : Translates the camera on axis Z.",
@@ -2934,6 +2938,7 @@ Grid.prototype.renderCornerHelpers = function(){
     var addedText = new AddedText(
       null, defaultFont, text, new THREE.Vector3().copy(vertex), ORANGE_COLOR, 1, 6
     );
+    addedText.isEditorHelper = true;
     addedText.setMarginBetweenChars(2.5);
     addedText.refInnerHeight = 569;
     addedText.refCharSize = 6;
@@ -4935,6 +4940,8 @@ AddedObject.prototype.exportLightweight = function(){
   }else{
     exportObject.position = new THREE.Vector3(this.positionXWhenAttached, this.positionYWhenAttached, this.positionZWhenAttached);
     exportObject.quaternion = new THREE.Quaternion(this.qxWhenAttached, this.qyWhenAttached, this.qzWhenAttached, this.qwWhenAttached);
+    exportObject.positionWhenAttached = exportObject.position.clone();
+    exportObject.quaternionWhenAttached = exportObject.quaternion.clone();
   }
   exportObject.vertices = [];
   exportObject.triangles = [];
@@ -5137,7 +5144,7 @@ AddedObject.prototype.export = function(){
   if (this.hasTexture()){
     exportObject.txtMatrix = this.mesh.material.uniforms.textureMatrix.value.elements;
   }
-
+  exportObject.isRotationDirty = this.isRotationDirty;
   return exportObject;
 }
 
@@ -5792,6 +5799,46 @@ AddedObject.prototype.translate = function(axis, amount, fromScript){
   }
 }
 
+AddedObject.prototype.rotatePivotAroundXYZ = function(x, y, z, axis, axisVector, radians){
+  this.updatePivot();
+  this.pivotObject.updateMatrix();
+  this.pivotObject.updateMatrixWorld();
+  var point = REUSABLE_VECTOR.set(x, y, z);
+  this.pivotObject.position.sub(point);
+  this.pivotObject.position.applyAxisAngle(axisVector, radians);
+  this.pivotObject.position.add(point);
+  this.pivotObject.rotateOnAxis(axisVector, radians);
+  this.pivotObject.updateMatrix();
+  this.pivotObject.updateMatrixWorld();
+  this.pivotObject.pseudoMesh.updateMatrix();
+  this.pivotObject.pseudoMesh.updateMatrixWorld();
+  this.pivotObject.pseudoMesh.matrixWorld.decompose(REUSABLE_VECTOR, REUSABLE_QUATERNION, REUSABLE_VECTOR_2);
+  this.mesh.position.copy(REUSABLE_VECTOR);
+  this.mesh.quaternion.copy(REUSABLE_QUATERNION);
+  this.setPhysicsAfterRotationAroundPoint(axis, radians);
+  if (this.mesh.visible){
+    rayCaster.updateObject(this);
+  }
+}
+
+AddedObject.prototype.rotateAroundXYZ = function(x, y, z, axis, axisVector, radians){
+  if (this.pivotObject){
+    this.rotatePivotAroundXYZ(x, y, z, axis, axisVector, radians);
+    return;
+  }
+  var point = REUSABLE_VECTOR.set(x, y, z);
+  this.mesh.parent.localToWorld(this.mesh.position);
+  this.mesh.position.sub(point);
+  this.mesh.position.applyAxisAngle(axisVector, radians);
+  this.mesh.position.add(point);
+  this.mesh.parent.worldToLocal(this.mesh.position);
+  this.mesh.rotateOnAxis(axisVector, radians);
+  this.setPhysicsAfterRotationAroundPoint(axis, radians);
+  if (this.mesh.visible){
+    rayCaster.updateObject(this);
+  }
+}
+
 AddedObject.prototype.rotate = function(axis, radians, fromScript){
 
   if (this.type == "surface"){
@@ -6120,7 +6167,7 @@ AddedObject.prototype.destroy = function(skipRaycasterRefresh){
     for (var gridName in this.destroyedGrids){
       this.destroyedGrids[gridName].destroyedAddedObject = 0;
     }
-  } 
+  }
   this.dispose();
   if (!skipRaycasterRefresh){
     rayCaster.refresh();
@@ -11306,7 +11353,9 @@ StateLoader.prototype.load = function(){
       addedObjectInstance.mesh.material.uniforms.setAOIntensity = curAddedObjectExport.aoMapIntensity;
 
       addedObjects[addedObjectName] = addedObjectInstance;
-
+      if (curAddedObjectExport.isRotationDirty){
+        addedObjectInstance.isRotationDirty = true;
+      }
       addedObjectInstance.rotationX = curAddedObjectExport.rotationX;
       addedObjectInstance.rotationY = curAddedObjectExport.rotationY;
       addedObjectInstance.rotationZ = curAddedObjectExport.rotationZ;
@@ -11900,6 +11949,9 @@ StateLoader.prototype.finalize = function(){
     }
     var objectGroupInstance = new ObjectGroup(objectName, group);
     objectGroups[objectName] = objectGroupInstance;
+    if (curObjectGroupExport.isRotationDirty){
+      objectGroupInstance.isRotationDirty = true;
+    }
     objectGroupInstance.glue();
     if (curObjectGroupExport.mass){
       objectGroupInstance.setMass(curObjectGroupExport.mass);
@@ -11932,11 +11984,6 @@ StateLoader.prototype.finalize = function(){
     if (objectGroupInstance.isColorizable){
       objectGroupInstance.injectMacro("HAS_FORCED_COLOR", false, true);
       objectGroupInstance.mesh.material.uniforms.forcedColor = new THREE.Uniform(new THREE.Vector4(-50, 0, 0, 0));
-    }
-
-    if (curObjectGroupExport.noMass){
-      objectGroupInstance.noMass = true;
-      physicsWorld.remove(objectGroupInstance.physicsBody);
     }
 
     objectGroupInstance.isDynamicObject = isDynamicObject;
@@ -12003,6 +12050,20 @@ StateLoader.prototype.finalize = function(){
     }
     if (objectGroupInstance.mesh.material.uniforms.totalEmissiveColor){
       objectGroupInstance.mesh.material.uniforms.totalEmissiveColor.value.set(curObjectGroupExport.totalEmissiveColor);
+    }
+    if (curObjectGroupExport.isPhysicsSimplified){
+      var params = curObjectGroupExport.physicsSimplificationParameters;
+      objectGroupInstance.simplifyPhysics(params.sizeX, params.sizeY, params.sizeZ);
+      objectGroupInstance.physicsBody.position.copy(params.pbodyPosition);
+      objectGroupInstance.physicsBody.quaternion.copy(params.pbodyQuaternion);
+      objectGroupInstance.physicsSimplificationObject3D.position.copy(params.physicsSimplificationObject3DPosition);
+      objectGroupInstance.physicsSimplificationObject3D.quaternion.copy(params.physicsSimplificationObject3DQuaternion);
+      objectGroupInstance.physicsSimplificationObject3DContainer.position.copy(params.physicsSimplificationObject3DContainerPosition);
+      objectGroupInstance.physicsSimplificationObject3DContainer.quaternion.copy(params.physicsSimplificationObject3DContainerQuaternion);
+    }
+    if (curObjectGroupExport.noMass){
+      objectGroupInstance.noMass = true;
+      physicsWorld.remove(objectGroupInstance.physicsBody);
     }
   }
 
@@ -14143,6 +14204,7 @@ ObjectGroup.prototype.glue = function(){
   var group = this.group;
   var physicsMaterial = new CANNON.Material();
   var physicsBody = new CANNON.Body({mass: 0, material: physicsMaterial});
+  this.originalPhysicsBody = physicsBody;
   var centerPosition = this.getInitialCenter();
   var graphicsGroup = new THREE.Group();
   var centerX = centerPosition.x;
@@ -14433,26 +14495,75 @@ ObjectGroup.prototype.setQuaternion = function(axis, val){
   }
 }
 
-ObjectGroup.prototype.rotate = function(axis, radian, fromScript){
-  if (axis == "x"){
-    this.mesh.rotateOnWorldAxis(
-      THREE_AXIS_VECTOR_X,
-      radian
-    );
-  }else if (axis == "y"){
-    this.mesh.rotateOnWorldAxis(
-      THREE_AXIS_VECTOR_Y,
-      radian
-    );
-  }else if (axis == "z"){
-    this.mesh.rotateOnWorldAxis(
-      THREE_AXIS_VECTOR_Z,
-      radian
-    );
+ObjectGroup.prototype.rotatePivotAroundXYZ = function(x, y, z, axis, axisVector, radians){
+  this.updatePivot();
+  this.pivotObject.updateMatrix();
+  this.pivotObject.updateMatrixWorld();
+  var point = REUSABLE_VECTOR.set(x, y, z);
+  this.pivotObject.position.sub(point);
+  this.pivotObject.position.applyAxisAngle(axisVector, radians);
+  this.pivotObject.position.add(point);
+  this.pivotObject.rotateOnAxis(axisVector, radians);
+  this.pivotObject.updateMatrix();
+  this.pivotObject.updateMatrixWorld();
+  this.pivotObject.pseudoMesh.updateMatrix();
+  this.pivotObject.pseudoMesh.updateMatrixWorld();
+  this.pivotObject.pseudoMesh.matrixWorld.decompose(REUSABLE_VECTOR, REUSABLE_QUATERNION, REUSABLE_VECTOR_2);
+  this.mesh.position.copy(REUSABLE_VECTOR);
+  this.mesh.quaternion.copy(REUSABLE_QUATERNION);
+  if (!this.isPhysicsSimplified){
+    this.physicsBody.quaternion.copy(this.mesh.quaternion);
+    this.physicsBody.position.copy(this.mesh.position);
+  }else{
+    this.updateSimplifiedPhysicsBody();
   }
+  if (this.mesh.visible){
+    rayCaster.updateObject(this);
+  }
+}
 
-  this.physicsBody.quaternion.copy(this.mesh.quaternion);
-  this.graphicsGroup.quaternion.copy(this.mesh.quaternion);
+ObjectGroup.prototype.rotateAroundXYZ = function(x, y, z, axis, axisVector, radians){
+  REUSABLE_QUATERNION2.copy(this.mesh.quaternion);
+  if (this.pivotObject){
+    this.rotatePivotAroundXYZ(x, y, z, axis, axisVector, radians);
+    return;
+  }
+  var point = REUSABLE_VECTOR.set(x, y, z);
+  this.mesh.parent.localToWorld(this.mesh.position);
+  this.mesh.position.sub(point);
+  this.mesh.position.applyAxisAngle(axisVector, radians);
+  this.mesh.position.add(point);
+  this.mesh.parent.worldToLocal(this.mesh.position);
+  this.mesh.rotateOnAxis(axisVector, radians);
+  if (!this.isPhysicsSimplified){
+    this.physicsBody.quaternion.copy(this.mesh.quaternion);
+    this.physicsBody.position.copy(this.mesh.position);
+  }else{
+    this.updateSimplifiedPhysicsBody();
+  }
+  if (this.mesh.visible){
+    rayCaster.updateObject(this);
+  }
+}
+
+ObjectGroup.prototype.rotate = function(axis, radian, fromScript){
+  REUSABLE_QUATERNION.copy(this.mesh.quaternion);
+  var axisVector
+  if (axis == "x"){
+    axisVector = THREE_AXIS_VECTOR_X;
+  }else if (axis == "y"){
+    axisVector = THREE_AXIS_VECTOR_Y;
+  }else if (axis == "z"){
+    axisVector = THREE_AXIS_VECTOR_Z;
+  }
+  this.mesh.rotateOnWorldAxis(axisVector, radian);
+
+  if (!this.isPhysicsSimplified){
+    this.physicsBody.quaternion.copy(this.mesh.quaternion);
+    this.graphicsGroup.quaternion.copy(this.mesh.quaternion);
+  }else{
+    this.updateSimplifiedPhysicsBody();
+  }
 
   if (!fromScript){
     this.initQuaternion = this.mesh.quaternion.clone();
@@ -14474,6 +14585,25 @@ ObjectGroup.prototype.rotate = function(axis, radian, fromScript){
 
 }
 
+ObjectGroup.prototype.updateSimplifiedPhysicsBody = function(){
+  if (this.pivotObject){
+    this.updatePivot();
+    this.pivotObject.updateMatrixWorld();
+    this.pivotObject.updateMatrix();
+    this.pivotObject.pseudoMesh.updateMatrixWorld();
+    this.pivotObject.pseudoMesh.updateMatrix();
+  }else{
+    this.physicsSimplificationObject3DContainer.position.copy(this.mesh.position);
+    this.physicsSimplificationObject3DContainer.quaternion.copy(this.mesh.quaternion);
+    this.physicsSimplificationObject3DContainer.updateMatrixWorld();
+    this.physicsSimplificationObject3DContainer.updateMatrix();
+  }
+  this.physicsSimplificationObject3D.getWorldPosition(REUSABLE_VECTOR);
+  this.physicsSimplificationObject3D.getWorldQuaternion(REUSABLE_QUATERNION);
+  this.physicsBody.position.copy(REUSABLE_VECTOR);
+  this.physicsBody.quaternion.copy(REUSABLE_QUATERNION);
+}
+
 ObjectGroup.prototype.translate = function(axis, amount, fromScript){
   var physicsBody = this.physicsBody;
   if (axis == "x"){
@@ -14483,7 +14613,11 @@ ObjectGroup.prototype.translate = function(axis, amount, fromScript){
   }else if (axis == "z"){
     this.mesh.translateZ(amount);
   }
-  physicsBody.position.copy(this.mesh.position);
+  if (!this.isPhysicsSimplified){
+    physicsBody.position.copy(this.mesh.position);
+  }else{
+    this.updateSimplifiedPhysicsBody();
+  }
   this.graphicsGroup.position.copy(this.mesh.position);
   if (this.mesh.visible){
     rayCaster.updateObject(this);
@@ -14498,11 +14632,7 @@ ObjectGroup.prototype.destroy = function(skipRaycasterRefresh){
     var childObj= this.group[name];
     if (childObj.destroyedGrids){
       for (var gridName in childObj.destroyedGrids){
-        if (!isUndo){
-          delete childObj.destroyedGrids[gridName].destroyedAddedObject;
-        }else{
-          childObj.destroyedGrids[gridName].destroyedAddedObject = childObj.name;
-        }
+        delete childObj.destroyedGrids[gridName].destroyedAddedObject;
         delete childObj.destroyedGrids[gridName].destroyedObjectGroup;
       }
     }
@@ -14672,11 +14802,28 @@ ObjectGroup.prototype.export = function(){
   if (this.mesh.material.uniforms.totalEmissiveColor){
     exportObj.totalEmissiveColor = "#"+this.mesh.material.uniforms.totalEmissiveColor.value.getHexString();
   }
-
+  exportObj.isRotationDirty = this.isRotationDirty;
+  if (this.isPhysicsSimplified){
+    exportObj.isPhysicsSimplified = true;
+    this.physicsSimplificationParameters = {
+      sizeX: this.physicsSimplificationParameters.sizeX,
+      sizeY: this.physicsSimplificationParameters.sizeY,
+      sizeZ: this.physicsSimplificationParameters.sizeZ,
+      pbodyPosition: this.physicsBody.position, pbodyQuaternion: this.physicsBody.quaternion,
+      physicsSimplificationObject3DPosition: this.physicsSimplificationObject3D.position,
+      physicsSimplificationObject3DQuaternion: new CANNON.Quaternion().copy(this.physicsSimplificationObject3D.quaternion),
+      physicsSimplificationObject3DContainerPosition: this.physicsSimplificationObject3DContainer.position,
+      physicsSimplificationObject3DContainerQuaternion: new CANNON.Quaternion().copy(this.physicsSimplificationObject3DContainer.quaternion)
+    };
+    exportObj.physicsSimplificationParameters = this.physicsSimplificationParameters;
+  }
   return exportObj;
 }
 
 ObjectGroup.prototype.getInitialCenter = function(){
+  if (this.copiedInitialCenter){
+    return this.copiedInitialCenter;
+  }
   var group = this.group;
   var centerX = 0;
   var centerY = 0;
@@ -14794,6 +14941,18 @@ ObjectGroup.prototype.visualiseBoundingBoxes = function(){
       box3.expandByPoint(boundingBoxes[i].max);
     }
   }
+  if (box3.min.x == box3.max.x){
+    box3.max.x += 1;
+    box3.min.x -= 1;
+  }
+  if (box3.min.y == box3.max.y){
+    box3.max.y += 1;
+    box3.min.y -= 1;
+  }
+  if (box3.min.z == box3.max.z){
+    box3.max.z += 1;
+    box3.min.z -= 1;
+  }
   this.bbHelper = new THREE.Box3Helper(box3, LIME_COLOR);
   scene.add(this.bbHelper);
 }
@@ -14856,6 +15015,21 @@ ObjectGroup.prototype.makePivot = function(offsetX, offsetY, offsetZ){
   var pseudoMesh = new THREE.Mesh(obj.mesh.geometry, obj.mesh.material);
   pseudoMesh.position.copy(obj.mesh.position);
   pseudoMesh.quaternion.copy(obj.mesh.quaternion);
+  if (this.isPhysicsSimplified){
+    if (this.pivotObject){
+      obj.pivotObject.pseudoMesh.remove(obj.physicsSimplificationObject3DContainer);
+      obj.physicsSimplificationObject3DContainer.position.copy(obj.mesh.position);
+      obj.physicsSimplificationObject3DContainer.quaternion.copy(obj.mesh.quaternion);
+      obj.physicsSimplificationObject3DContainer.updateMatrixWorld();
+      obj.physicsSimplificationObject3DContainer.updateMatrix();
+    }
+    pseudoMesh.updateMatrix();
+    pseudoMesh.updateMatrixWorld();
+    this.updateSimplifiedPhysicsBody();
+    this.physicsSimplificationObject3DContainer.quaternion.set(0, 0, 0, 1);
+    this.physicsSimplificationObject3DContainer.position.sub(pseudoMesh.position);
+    pseudoMesh.add(this.physicsSimplificationObject3DContainer);
+  }
   var pivot = new THREE.Object3D();
   pivot.add(pseudoMesh);
   pivot.position.set(
@@ -14882,11 +15056,15 @@ ObjectGroup.prototype.rotateAroundPivotObject = function(axis, radians){
   this.updatePivot();
   this.pivotObject.updateMatrix();
   this.pivotObject.updateMatrixWorld();
+  var axisVector;
   if (axis == "x"){
+    axisVector = THREE_AXIS_VECTOR_X;
     this.pivotObject.rotation.x += radians;
   }else if (axis == "y"){
+    axisVector = THREE_AXIS_VECTOR_Y;
     this.pivotObject.rotation.y += radians;
   }else if (axis == "z"){
+    axisVector = THREE_AXIS_VECTOR_Z;
     this.pivotObject.rotation.z += radians;
   }
   this.pivotObject.updateMatrix();
@@ -14896,8 +15074,17 @@ ObjectGroup.prototype.rotateAroundPivotObject = function(axis, radians){
   this.pivotObject.pseudoMesh.matrixWorld.decompose(REUSABLE_VECTOR, REUSABLE_QUATERNION, REUSABLE_VECTOR_2);
   this.mesh.position.copy(REUSABLE_VECTOR);
   this.mesh.quaternion.copy(REUSABLE_QUATERNION);
+
   this.physicsBody.quaternion.copy(this.mesh.quaternion);
   this.physicsBody.position.copy(this.mesh.position);
+  if (this.isPhysicsSimplified){
+    this.physicsSimplificationObject3D.updateMatrix();
+    this.physicsSimplificationObject3D.updateMatrixWorld();
+    this.physicsSimplificationObject3D.matrixWorld.decompose(REUSABLE_VECTOR, REUSABLE_QUATERNION, REUSABLE_VECTOR_2);
+    this.physicsBody.position.copy(REUSABLE_VECTOR);
+    this.physicsBody.quaternion.copy(REUSABLE_QUATERNION);
+  }
+
   if (this.mesh.visible){
     rayCaster.updateObject(this);
   }
@@ -14932,6 +15119,16 @@ ObjectGroup.prototype.copy = function(name, isHardCopy, copyPosition, gridSystem
   var totalEmissiveIntensityBeforeDetached;
   var totalEmissiveColorBeforeDetached;
   var oldMaterial = this.mesh.material;
+  var phsimplObj3DPos;
+  var phsimplObj3DQuat;
+  var phsimplContPos;
+  var phsimplContQuat;
+  if (this.isPhysicsSimplified){
+    phsimplObj3DPos = this.physicsSimplificationObject3D.position.clone();
+    phsimplObj3DQuat = this.physicsSimplificationObject3D.quaternion.clone();
+    phsimplContPos = this.physicsSimplificationObject3DContainer.position.clone();
+    phsimplContQuat = this.physicsSimplificationObject3DContainer.quaternion.clone();
+  }
   if (this.mesh.material.uniforms.totalAOIntensity){
     totalAOIntensityBeforeDetached = this.mesh.material.uniforms.totalAOIntensity.value;
   }
@@ -14966,6 +15163,10 @@ ObjectGroup.prototype.copy = function(name, isHardCopy, copyPosition, gridSystem
   var newObjGroup = new ObjectGroup(name, newGroup);
   newObjGroup.handleTextures();
   newObjGroup.glue();
+  if (this.isPhysicsSimplified){
+    newObjGroup.simplifyPhysics(this.physicsSimplificationParameters.sizeX, this.physicsSimplificationParameters.sizeY, this.physicsSimplificationParameters.sizeZ);
+    newObjGroup.updateSimplifiedPhysicsBody();
+  }
   newObjGroup.mesh.position.copy(copyPosition);
   newObjGroup.physicsBody.position.copy(copyPosition);
   newObjGroup.mesh.quaternion.copy(quaternionBeforeDetached);
@@ -14974,6 +15175,13 @@ ObjectGroup.prototype.copy = function(name, isHardCopy, copyPosition, gridSystem
   newObjGroup.graphicsGroup.quaternion.copy(newObjGroup.mesh.quaternion);
   this.glue();
   newObjGroup.isBasicMaterial = this.isBasicMaterial;
+  if (this.isPhysicsSimplified){
+    this.simplifyPhysics(this.physicsSimplificationParameters.sizeX, this.physicsSimplificationParameters.sizeY, this.physicsSimplificationParameters.sizeZ);
+    this.physicsSimplificationObject3D.position.copy(phsimplObj3DPos);
+    this.physicsSimplificationObject3D.quaternion.copy(phsimplObj3DQuat);
+    this.physicsSimplificationObject3DContainer.position.copy(phsimplContPos);
+    this.physicsSimplificationObject3DContainer.quaternion.copy(phsimplContQuat);
+  }
   this.physicsBody.position.copy(physicsPositionBeforeDetached);
   this.physicsBody.quaternion.copy(physicsQuaternionBeforeDetached);
   this.mesh.position.copy(positionBeforeDetached);
@@ -15066,7 +15274,10 @@ ObjectGroup.prototype.copy = function(name, isHardCopy, copyPosition, gridSystem
   }
 
   newObjGroup.createdWithScript = fromScript;
-
+  newObjGroup.copiedInitialCenter = {x: newObjGroup.mesh.position.x, y: newObjGroup.mesh.position.y, z: newObjGroup.mesh.position.z};
+  if (newObjGroup.isPhysicsSimplified){
+    newObjGroup.updateSimplifiedPhysicsBody();
+  }
   return newObjGroup;
 }
 
@@ -15137,6 +15348,61 @@ ObjectGroup.prototype.removeFog = function(){
   this.mesh.material.needsUpdate = true;
 }
 
+ObjectGroup.prototype.simplifyPhysics = function(sizeX, sizeY, sizeZ){
+  if (!this.boundingBoxes){
+    this.generateBoundingBoxes();
+  }
+  physicsWorld.remove(this.physicsBody);
+  var box3 = new THREE.Box3();
+  for (var i = 0; i<this.boundingBoxes.length; i++){
+    box3.expandByPoint(this.boundingBoxes[i].min);
+    box3.expandByPoint(this.boundingBoxes[i].max);
+  }
+  box3.getCenter(REUSABLE_VECTOR);
+  var physicsShapeKey = "BOX" + PIPE + sizeX + PIPE + sizeY + PIPE + sizeZ;
+  newPhysicsShape = physicsShapeCache[physicsShapeKey];
+  if (!newPhysicsShape){
+    newPhysicsShape = new CANNON.Box(new CANNON.Vec3(sizeX, sizeY, sizeZ));
+    physicsShapeCache[physicsShapeKey] = newPhysicsShape;
+  }
+  var newPhysicsBody = new CANNON.Body({
+    mass: this.physicsBody.mass,
+    shape: newPhysicsShape,
+    material: this.originalPhysicsBody.material
+  });
+  newPhysicsBody.position.copy(REUSABLE_VECTOR);
+  newPhysicsBody.quaternion.copy(this.physicsBody.quaternion);
+  this.physicsBody = newPhysicsBody;
+  physicsWorld.addBody(this.physicsBody);
+  this.isPhysicsSimplified = true;
+  this.physicsSimplificationObject3D = new THREE.Object3D();
+  this.physicsSimplificationObject3D.rotation.order = 'YXZ';
+  this.physicsSimplificationObject3D.position.copy(this.physicsBody.position);
+  this.physicsSimplificationObject3D.quaternion.copy(this.physicsBody.quaternion);
+  this.physicsSimplificationObject3D.position.sub(this.mesh.position);
+  this.physicsSimplificationObject3DContainer = new THREE.Object3D();
+  this.physicsSimplificationObject3DContainer.position.copy(this.mesh.position);
+  this.physicsSimplificationObject3DContainer.quaternion.copy(this.mesh.quaternion);
+  this.physicsSimplificationObject3DContainer.add(this.physicsSimplificationObject3D);
+  if (this.pivotObject){
+    this.pivotObject.pseudoMesh.updateMatrix();
+    this.pivotObject.pseudoMesh.updateMatrixWorld();
+    this.updateSimplifiedPhysicsBody();
+    this.pivotObject.pseudoMesh.getWorldPosition(REUSABLE_VECTOR);
+    this.physicsSimplificationObject3DContainer.position.sub(REUSABLE_VECTOR);
+    this.pivotObject.pseudoMesh.add(this.physicsSimplificationObject3DContainer);
+    this.updateSimplifiedPhysicsBody();
+  }
+  this.physicsSimplificationParameters = {
+    sizeX: sizeX, sizeY: sizeY, sizeZ: sizeZ,
+    pbodyPosition: this.physicsBody.position, pbodyQuaternion: this.physicsBody.quaternion,
+    physicsSimplificationObject3DPosition: this.physicsSimplificationObject3D.position,
+    physicsSimplificationObject3DQuaternion: new CANNON.Quaternion().copy(this.physicsSimplificationObject3D.quaternion),
+    physicsSimplificationObject3DContainerPosition: this.physicsSimplificationObject3DContainer.position,
+    physicsSimplificationObject3DContainerQuaternion: new CANNON.Quaternion().copy(this.physicsSimplificationObject3DContainer.quaternion)
+  };
+}
+
 var MarkedPoint = function(name, x, y, z, fromX, fromY, fromZ, gridDestroyed){
   this.name = name;
   this.x = x;
@@ -15149,6 +15415,7 @@ var MarkedPoint = function(name, x, y, z, fromX, fromY, fromZ, gridDestroyed){
   if (!isDeployment){
     var txt = "@@1 (@@2, @@3, @@4)".replace("@@1", name).replace("@@2", x).replace("@@3", y).replace("@@4", z);
     this.text = new AddedText(null, defaultFont, txt, new THREE.Vector3(x, y, z), new THREE.Color("yellow"), 1, 15);
+    this.text.isEditorHelper = true;
     this.text.setBackground("magenta", 1);
     this.text.setMarginBetweenChars(7);
     this.text.refInnerHeight = 569;
@@ -17871,7 +18138,7 @@ Roygbiv.prototype.rotate = function(object, axis, radians){
   object.rotate(axis, radians, true);
 }
 
-Roygbiv.prototype.rotateAroundXYZ = function(object, x, y, z, radians, axis, skipLocalRotation){
+Roygbiv.prototype.rotateAroundXYZ = function(object, x, y, z, radians, axis){
   if (mode == 0){
     return;
   }
@@ -17893,37 +18160,14 @@ Roygbiv.prototype.rotateAroundXYZ = function(object, x, y, z, radians, axis, ski
           parentObject,
           x, y, z,
           radians,
-          axis,
-          skipLocalRotation
+          axis
         );
         return;
       }
     }
-    mesh = object.mesh;
   }else if (object.isObjectGroup){
-    mesh = object.mesh;
   }
-  var point = REUSABLE_VECTOR.set(x, y, z);
-  mesh.parent.localToWorld(mesh.position);
-  mesh.position.sub(point);
-  mesh.position.applyAxisAngle(axisVector, radians);
-  mesh.position.add(point);
-  mesh.parent.worldToLocal(mesh.position);
-  if (!skipLocalRotation){
-    mesh.rotateOnAxis(axisVector, radians);
-  }
-  if (object.isAddedObject){
-    object.setPhysicsAfterRotationAroundPoint(axis, radians);
-    if (object.mesh.visible){
-      rayCaster.updateObject(object);
-    }
-  }else if (object.isObjectGroup){
-    object.physicsBody.quaternion.copy(mesh.quaternion);
-    object.physicsBody.position.copy(mesh.position);
-    if (object.mesh.visible){
-      rayCaster.updateObject(object);
-    }
-  }
+  object.rotateAroundXYZ(x, y, z, axis, axisVector, radians);
 }
 
 Roygbiv.prototype.setPosition = function(obj, x, y, z){
@@ -17944,7 +18188,11 @@ Roygbiv.prototype.setPosition = function(obj, x, y, z){
   }else if (obj.isObjectGroup){
     obj.mesh.position.set(x, y, z);
     obj.graphicsGroup.position.set(x, y, z);
-    obj.physicsBody.position.set(x, y, z);
+    if (!obj.isPhysicsSimplified){
+      obj.physicsBody.position.set(x, y, z);
+    }else {
+      obj.updateSimplifiedPhysicsBody();
+    }
     if (obj.mesh.visible){
       rayCaster.updateObject(obj);
     }
@@ -21778,6 +22026,7 @@ Area.prototype.renderToScreen = function(){
   }
   if(!this.text){
     this.text = new AddedText(null, defaultFont, this.name, this.center, color, 1, 15);
+    this.text.isEditorHelper = true;
     this.text.setMarginBetweenChars(7);
     this.text.refInnerHeight = 569;
     this.text.refCharSize = 15;
@@ -24909,6 +25158,9 @@ RaycasterWorkerBridge.prototype.onAddedTextResize = function(addedText){
   if (!rayCaster.ready){
     return;
   }
+  if (addedText.isEditorHelper){
+    return;
+  }
   if (!addedText.is2D){
     if (mode == 0 || (mode == 1 && addedText.isClickable)){
       rayCaster.textScaleUpdateBuffer.set(addedText.name, addedText);
@@ -24918,6 +25170,9 @@ RaycasterWorkerBridge.prototype.onAddedTextResize = function(addedText){
 
 RaycasterWorkerBridge.prototype.updateObject = function(obj){
   if (mode == 1 && (obj.isAddedObject || obj.isObjectGroup) && !obj.isIntersectable){
+    return;
+  }
+  if (obj.isAddedText && obj.isEditorHelper){
     return;
   }
   this.updateBuffer.set(obj.name, obj);
