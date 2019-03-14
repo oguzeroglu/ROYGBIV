@@ -1222,11 +1222,6 @@ StateLoader.prototype.finalize = function(){
       objectGroupInstance.mesh.material.uniforms.forcedColor = new THREE.Uniform(new THREE.Vector4(-50, 0, 0, 0));
     }
 
-    if (curObjectGroupExport.noMass){
-      objectGroupInstance.noMass = true;
-      physicsWorld.remove(objectGroupInstance.physicsBody);
-    }
-
     objectGroupInstance.isDynamicObject = isDynamicObject;
     objectGroupInstance.isBasicMaterial = curObjectGroupExport.isBasicMaterial;
 
@@ -1301,6 +1296,10 @@ StateLoader.prototype.finalize = function(){
       objectGroupInstance.physicsSimplificationObject3D.quaternion.copy(params.physicsSimplificationObject3DQuaternion);
       objectGroupInstance.physicsSimplificationObject3DContainer.position.copy(params.physicsSimplificationObject3DContainerPosition);
       objectGroupInstance.physicsSimplificationObject3DContainer.quaternion.copy(params.physicsSimplificationObject3DContainerQuaternion);
+    }
+    if (curObjectGroupExport.noMass){
+      objectGroupInstance.noMass = true;
+      physicsWorld.remove(objectGroupInstance.physicsBody);
     }
   }
 
