@@ -1621,6 +1621,9 @@ ObjectGroup.prototype.export = function(){
 }
 
 ObjectGroup.prototype.getInitialCenter = function(){
+  if (this.copiedInitialCenter){
+    return this.copiedInitialCenter;
+  }
   var group = this.group;
   var centerX = 0;
   var centerY = 0;
@@ -2067,7 +2070,7 @@ ObjectGroup.prototype.copy = function(name, isHardCopy, copyPosition, gridSystem
   }
 
   newObjGroup.createdWithScript = fromScript;
-
+  newObjGroup.copiedInitialCenter = {x: newObjGroup.mesh.position.x, y: newObjGroup.mesh.position.y, z: newObjGroup.mesh.position.z};
   return newObjGroup;
 }
 
