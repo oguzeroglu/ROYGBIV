@@ -676,6 +676,11 @@ var CommandDescriptor = function(){
   this.simplifyPhysics.types.push(this.UNKNOWN_INDICATOR); // sizeY
   this.simplifyPhysics.types.push(this.UNKNOWN_INDICATOR); // sizeZ
 
+  // unsimplifyPhysics
+  this.unsimplifyPhysics = new Object();
+  this.unsimplifyPhysics.types = [];
+  this.unsimplifyPhysics.types.push(this.GLUED_OBJECT_NAME); // objName
+
 };
 
 CommandDescriptor.prototype.test = function(){

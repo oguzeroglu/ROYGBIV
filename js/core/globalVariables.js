@@ -178,7 +178,8 @@ if (!isDeployment){
       0, //printTexts
       1, //setRayStep
       0, //printRayStep
-      4 //simplifyPhysics
+      4, //simplifyPhysics
+      1 //unsimplifyPhysics
   ];
   commandArgumentsExpectedExplanation = [
     "help", //help
@@ -341,7 +342,8 @@ if (!isDeployment){
     "printTexts", //printTexts
     "setRayStep stepAmount", //setRayStep
     "printRayStep", //printRayStep
-    "simplifyPhysics objName sizeX sizeY sizeZ" //simplifyPhysics
+    "simplifyPhysics objName sizeX sizeY sizeZ", //simplifyPhysics
+    "unsimplifyPhysics objName" //unsimplifyPhysics
   ];
   commands = [
     "help",
@@ -504,7 +506,8 @@ if (!isDeployment){
     "printTexts",
     "setRayStep",
     "printRayStep",
-    "simplifyPhysics"
+    "simplifyPhysics",
+    "unsimplifyPhysics"
   ];
   commandInfo = [
     "help: Prints command list.",
@@ -667,7 +670,8 @@ if (!isDeployment){
     "printTexts: Prints a list of created texts.",
     "setRayStep: Sets the step amount used by the Raycaster while detecting intersections. Small step amount means more precise intersection\n  detection but worse performance. Default value is 32.",
     "printRayStep: Prints the ray step amount.",
-    "simplifyPhysics: Sets the physics of an object to a box shape of sizeX, sizeY, sizeZ sizes. This helps optimizing the performance of the\n  physics engine but causes physics precision loss."
+    "simplifyPhysics: Sets the physics of an object to a box shape of sizeX, sizeY, sizeZ sizes. This helps optimizing the performance of the\n  physics engine but causes physics precision loss.",
+    "unsimplifyPhysics: Brings back the original physics for an object after the usage of simplifyPhysics command."
   ];
   keyboardInfo = [
     "W/S : Translates the camera on axis Z.",

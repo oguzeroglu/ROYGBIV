@@ -5007,6 +5007,25 @@ function parse(input){
           terminal.printInfo(Text.PHYSICS_SIMPLIFIED);
           return true;
         break;
+        case 161: //unsimplifyPhysics
+          if (mode != 0){
+            terminal.printError(Text.WORKS_ONLY_IN_DESIGN_MODE);
+            return true;
+          }
+          var objName = splitted[1];
+          var obj = objectGroups[objName];
+          if (!obj){
+            terminal.printError(Text.NO_SUCH_OBJECT_GROUP);
+            return true;
+          }
+          if (!obj.isPhysicsSimplified){
+            terminal.printError(Text.PHYSICS_IS_NOT_SIMPLIFIED);
+            return true;
+          }
+          obj.unsimplifyPhysics();
+          terminal.printInfo(Text.PHYSICS_UNSIMPLIFIED);
+          return true;
+        break;
       }
       return true;
     }catch(err){
