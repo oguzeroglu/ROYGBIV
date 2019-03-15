@@ -4947,6 +4947,10 @@ function parse(input){
             return true;
           }
           var objName = splitted[1];
+          if (!(objName.indexOf("*") == -1)){
+            new JobHandler(splitted).handle();
+            return true;
+          }
           var sizeX = parseFloat(splitted[2]);
           var sizeY = parseFloat(splitted[3]);
           var sizeZ = parseFloat(splitted[4]);
@@ -5004,7 +5008,9 @@ function parse(input){
           }
           selectionHandler.resetCurrentSelection();
           obj.simplifyPhysics(sizeX/2, sizeY/2, sizeZ/2);
-          terminal.printInfo(Text.PHYSICS_SIMPLIFIED);
+          if (!jobHandlerWorking){
+            terminal.printInfo(Text.PHYSICS_SIMPLIFIED);
+          }
           return true;
         break;
         case 161: //unsimplifyPhysics
@@ -5013,6 +5019,10 @@ function parse(input){
             return true;
           }
           var objName = splitted[1];
+          if (!(objName.indexOf("*") == -1)){
+            new JobHandler(splitted).handle();
+            return true;
+          }
           var obj = objectGroups[objName];
           if (!obj){
             terminal.printError(Text.NO_SUCH_OBJECT_GROUP);
@@ -5023,7 +5033,9 @@ function parse(input){
             return true;
           }
           obj.unsimplifyPhysics();
-          terminal.printInfo(Text.PHYSICS_UNSIMPLIFIED);
+          if (!jobHandlerWorking){
+            terminal.printInfo(Text.PHYSICS_UNSIMPLIFIED);
+          }
           return true;
         break;
       }
