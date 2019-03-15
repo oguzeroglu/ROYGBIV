@@ -7094,6 +7094,18 @@ ObjectGroup.prototype.removeFog = function(){
   this.mesh.material.needsUpdate = true;
 }
 
+ObjectGroup.prototype.unsimplifyPhysics = function(){
+  physicsWorld.remove(this.physicsBody);
+  this.physicsBody = this.originalPhysicsBody;
+  physicsWorld.addBody(this.physicsBody);
+  this.isPhysicsSimplified = false;
+  delete this.physicsSimplificationObject3D;
+  delete this.physicsSimplificationObject3DContainer;
+  delete this.physicsSimplificationParameters;
+  this.physicsBody.position.copy(this.mesh.position);
+  this.physicsBody.quaternion.copy(this.mesh.quaternion);
+}
+
 ObjectGroup.prototype.simplifyPhysics = function(sizeX, sizeY, sizeZ){
   if (!this.boundingBoxes){
     this.generateBoundingBoxes();
@@ -7546,9 +7558,9 @@ AddedText.prototype.handleResize = function(){
         this.constructText();
         this.set2DCoordinates(this.marginPercentWidth, this.marginPercentHeight);
         iteration ++;
-        if (!isDeployment && textManipulationParameters){
-          textManipulationParameters["Char size"] = this.characterSize;
-          textManipulationParameters["Char margin"] = this.offsetBetweenChars;
+        if (!isDeployment && guiHandler.textManipulationParameters){
+          guiHandler.textManipulationParameters["Char size"] = this.characterSize;
+          guiHandler.textManipulationParameters["Char margin"] = this.offsetBetweenChars;
         }
       }
     }
@@ -7561,9 +7573,9 @@ AddedText.prototype.handleResize = function(){
         this.constructText();
         this.set2DCoordinates(this.marginPercentWidth, this.marginPercentHeight);
         iteration ++;
-        if (!isDeployment && textManipulationParameters){
-          textManipulationParameters["Char size"] = this.characterSize;
-          textManipulationParameters["Line margin"] = this.offsetBetweenLines;
+        if (!isDeployment && guiHandler.textManipulationParameters){
+          guiHandler.textManipulationParameters["Char size"] = this.characterSize;
+          guiHandler.textManipulationParameters["Line margin"] = this.offsetBetweenLines;
         }
       }
     }

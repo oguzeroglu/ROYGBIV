@@ -89,16 +89,18 @@ ModeSwitcher.prototype.switchFromDesignToPreview = function(){
   TOTAL_PARTICLE_COLLISION_LISTEN_COUNT = 0;
   TOTAL_PARTICLE_SYSTEM_COLLISION_LISTEN_COUNT = 0;
   TOTAL_PARTICLE_SYSTEMS_WITH_PARTICLE_COLLISIONS = 0;
-  originalBloomConfigurations.bloomStrength = bloomStrength;
-  originalBloomConfigurations.bloomRadius = bloomRadius;
-  originalBloomConfigurations.bloomThreshold = bloomThreshold;
-  originalBloomConfigurations.bloomResolutionScale = bloomResolutionScale;
-  originalBloomConfigurations.bloomOn = bloomOn;
-  guiHandler.postprocessingParameters["Bloom_strength"] = bloomStrength;
-  guiHandler.postprocessingParameters["Bloom_radius"] = bloomRadius;
-  guiHandler.postprocessingParameters["Bloom_threshhold"] = bloomThreshold;
-  guiHandler.postprocessingParameters["Bloom_resolution_scale"] = bloomResolutionScale;
-  guiHandler.postprocessingParameters["Bloom"] = bloomOn;
+  if (!isDeployment){
+    originalBloomConfigurations.bloomStrength = bloomStrength;
+    originalBloomConfigurations.bloomRadius = bloomRadius;
+    originalBloomConfigurations.bloomThreshold = bloomThreshold;
+    originalBloomConfigurations.bloomResolutionScale = bloomResolutionScale;
+    originalBloomConfigurations.bloomOn = bloomOn;
+    guiHandler.postprocessingParameters["Bloom_strength"] = bloomStrength;
+    guiHandler.postprocessingParameters["Bloom_radius"] = bloomRadius;
+    guiHandler.postprocessingParameters["Bloom_threshhold"] = bloomThreshold;
+    guiHandler.postprocessingParameters["Bloom_resolution_scale"] = bloomResolutionScale;
+    guiHandler.postprocessingParameters["Bloom"] = bloomOn;
+  }
   for (var gsName in gridSystems){
     scene.remove(gridSystems[gsName].gridSystemRepresentation);
     scene.remove(gridSystems[gsName].boundingPlane);

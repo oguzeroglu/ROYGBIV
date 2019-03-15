@@ -1478,722 +1478,8 @@ var scriptCreatorDiv;
 var scriptCreatorCancelButton;
 var scriptCreatorSaveButton;
 var scriptCreatorTextArea;
-var commandArgumentsExpectedCount;
-var commandArgumentsExpectedExplanation;
-var commands;
-var commandInfo;
-var keyboardInfo;
-var deprecatedCommandIndices;
 if (!isDeployment){
   terminal = new Terminal();
-  commandArgumentsExpectedCount = [
-      0, //help
-      9, //newGridSystem
-      0, //printCameraPosition
-      0, //printCameraDirection
-      0, //printGridSystems
-      1, //printGridSystemInfo
-      1, //destroyGridSystem
-      0, //printKeyboardInfo
-      0, //printSelectedGrids
-      0, //resetSelectedGrids
-      1, //selectAllGrids
-      0, //cropGridSystem
-      6, //pasteCroppedGridSystem
-      0, //switchView
-      2, //newBasicMaterial
-      0, //printMaterials
-      1, //destroyMaterial
-      2, //newSurface
-      0, //printObjects
-      1, //printMetaData
-      1, //destroyObject
-      2, //newTexture
-      0, //printTextures
-      1, //destroyTexture
-      2, //mapTexture
-      3, //adjustTextureRepeat
-      8, //newPhysicsBoxTest
-      6, //newPhysicsSphereTest
-      0, //printPhysicsTests
-      0, //switchPhysicsDebugMode
-      4, //newRamp
-      0, //setAnchor
-      1, //restartPhysicsTest
-      3, //mirror
-      3, //newBox
-      3, //newWallCollection
-      0, //printWallCollections
-      1, //destroyWallCollection
-      0, //destroySelectedGrids
-      1, //remakeGridSystem
-      0, //resetCamera
-      1, //uploadImage
-      0, //printImages
-      2, //mapSpecular
-      2, //mapEnvironment
-      2, //mapAmbientOcculsion
-      2, //mapAlpha
-      1, //setDefaultMaterial
-      2, //newAmbientLight
-      0, //printLights
-      1, //selectLight
-      1, //destroyLight
-      2, //newPhongMaterial
-      2, //mapNormal
-      2, //mapEmissive
-      2, //newLambertMaterial
-      3, //newTexturePack
-      0, //printTexturePacks
-      1, //printTexturePackInfo
-      2, //mapTexturePack
-      1, //destroyTexturePack
-      1, //refreshTexturePack
-      2, //mapHeight
-      1, //resetMaps
-      2, //segmentObject
-      4, //superposeGridSystem
-      1, //postProcessing
-      3, //sliceGrid
-      5, //newPointLight
-      3, //newSkybox
-      0, //printSkyboxes
-      1, //printSkyboxInfo
-      1, //mapSkybox
-      1, //destroySkybox
-      1, //skybox
-      1, //scaleSkybox
-      0, //save
-      0, //load
-      0, //undo
-      0, //redo
-      1, //selectObject
-      2, //setMass
-      3, //rotateObject
-      1, //newScript
-      1, //runScript
-      1, //stopScript
-      0, //printScripts
-      1, //editScript
-      1, //destroyScript
-      3, //translateObject
-      2, //setFog
-      0, //removeFog
-      2, //glue
-      1, //detach
-      4, //mark
-      1, //unmark
-      0, //printMarkedPoints
-      0, //toggleMarkedPoints
-      1, //runAutomatically
-      2, //uploadScript
-      1, //runManually
-      1, //physicsWorkerMode
-      0, //printPhysicsWorkerMode
-      1, //explain
-      0, //printScriptingFunctions
-      0, //printPerformance
-      1, //search
-      3, //rescaleTexture
-      3, //rescaleTexturePack
-      1, //destroyImage
-      2, //setBlending
-      0, //about
-      0, //resetKeyboardBuffer
-      6, //setWorldLimits
-      1, //setBinSize
-      0, //printWorldLimits
-      0, //printBinSize
-      1, //particleCollisionWorkerMode
-      0, //printParticleCollisionWorkerMode
-      1, //particleSystemCollisionWorkerMode
-      0, //printParticleSystemCollisionWorkerMode
-      0, //logFrameDrops
-      3, //addPaddingToTexture
-      3, //newSphere
-      0, //printFogInfo
-      4, //applyDisplacementMap
-      2, //setSlipperiness
-      2, //setAtlasTextureSize
-      0, //printAtlasTextureSize
-      2, //sync
-      2, //newArea
-      0, //toggleAreas
-      1, //destroyArea
-      1, //areaConfigurations
-      1, //setResolution
-      1, //configureArea
-      4, //newAreaConfiguration
-      1, //autoConfigureArea
-      0, //stopAreaConfigurations
-      0, //startAreaConfigurations
-      6, //newCylinder
-      4, //setRotationPivot
-      2, //printChildPosition
-      1, //unsetRotationPivot
-      6, //copyObject
-      2, //build
-      1, //skyboxConfigurations
-      1, //fogConfigurations
-      1, //noMobile
-      2, //setMaxViewport
-      1, //keepAspect
-      2, //newFont
-      1, //destroyFont
-      0, //printFonts
-      6, //newText
-      1, //selectText
-      1, //destroyText
-      0, //printTexts
-      1, //setRayStep
-      0 //printRayStep
-  ];
-  commandArgumentsExpectedExplanation = [
-    "help", //help
-    "newGridSystem name sizeX sizeZ centerX centerY centerZ color cellSize axis", //newGridSystem
-    "printCameraPosition", //printCameraPosition
-    "printCameraDirection", //printCameraDirection
-    "printGridSystems", //printGridSystems
-    "printGridSystemInfo name", //printGridSystemInfo
-    "destroyGridSystem name", //destroyGridSystem
-    "printKeyboardInfo", //printKeyboardInfo
-    "printSelectedGrids", //printSelectedGrids
-    "resetSelectedGrids", //resetSelectedGrids
-    "selectAllGrids name", //selectAllGrids
-    "cropGridSystem", // cropGridSystem
-    "pasteCroppedGridSystem name xTranslation yTranslation zTranslation outlineColor cellSize", //pasteCroppedGridSystem
-    "switchView", //switchView
-    "newBasicMaterial name color", //newBasicMaterial
-    "printMaterials", //printMaterials
-    "destroyMaterial name", //destroyMaterial
-    "newSurface name material", //newSurface
-    "printObjects", //printObjects
-    "printMetaData name", //printMetaData
-    "destroyObject name", //destroyObject
-    "newTexture name fileName", //newTexture
-    "printTextures", //printTextures
-    "destroyTexture name", //destroyTexture
-    "mapTexture textureName objectName", //mapTexture
-    "adjustTextureRepeat objectName repeatU repeatV", //adjustTextureRepeat
-    "newPhysicsBoxTest duration sizeX sizeY sizeZ mass positionX positionY positionZ", //newPhysicsBoxTest
-    "newPhysicsSphereTest duration radius mass positionX positionY positionZ", //newPhysicsSphereTest
-    "printPhysicsTests", //printPhysicsTests
-    "switchPhysicsDebugMode", //switchPhysicsDebugMode
-    "newRamp name material axis height", //newRamp
-    "setAnchor", //setAnchor
-    "restartPhysicsTest physicsTestIndex", //restartPhysicsTest
-    "mirror objectName on/off s/t/st", //mirror
-    "newBox name material height", //newBox
-    "newWallCollection name height outlineColor", //newWallCollection
-    "printWallCollections", //printWallCollections
-    "destroyWallCollection name", //destroyWallCollection
-    "destroySelectedGrids", //destroySelectedGrids
-    "remakeGridSystem name", //remakeGridSystem
-    "resetCamera", //resetCamera
-    "uploadImage name", //uploadImage
-    "printImages", //printImages
-    "mapSpecular textureName objectName", //mapSpecular
-    "mapEnvironment textureName objectName", //mapEnvironment
-    "mapAmbientOcculsion textureName objectName", //mapAmbientOcculsion
-    "mapAlpha textureName objectName", //mapAlpha
-    "setDefaultMaterial basic/phong", //setDefaultMaterial"
-    "newAmbientLight name color", //newAmbientLight
-    "printLights", //printLights
-    "selectLight name", //selectLight
-    "destroyLight name", //destroyLight
-    "newPhongMaterial name color", //newPhongMaterial
-    "mapNormal textureName objectName", //mapNormal
-    "mapEmissive textureName objectName", //mapEmissive
-    "newLambertMaterial name color", //newLambertMaterial
-    "newTexturePack name directoryName fileExtension", //newTexturePack
-    "printTexturePacks", //printTexturePacks
-    "printTexturePackInfo name", //printTexturePackInfo
-    "mapTexturePack texturePackName objectName", //mapTexturePack
-    "destroyTexturePack name", //destroyTexturePack
-    "refreshTexturePack name", //refreshTexturePack
-    "mapHeight textureName objectName", //mapHeight
-    "resetMaps name", //resetMaps
-    "segmentObject name count", //segmentObject
-    "superposeGridSystem gridSystemName outlineColor cellSize objectName", //superposeGridSystem
-    "postProcessing hide/show", //postProcessing
-    "sliceGrid newName cellSize outlineColor", //sliceGrid
-    "newPointLight name color offsetX offsetY offsetZ", //newPointLight
-    "newSkybox name directory fileExtension", //newSkybox
-    "printSkyboxes", //printSkyboxes
-    "printSkyboxInfo name", //printSkyboxInfo
-    "mapSkybox name", //mapSkybox
-    "destroySkybox name", //destroySkybox
-    "skybox show/hide", //skybox
-    "scaleSkybox amount", //scaleSkybox
-    "save", //save
-    "load", //load
-    "undo", //undo
-    "redo", //redo
-    "selectObject name", //selectObject
-    "setMass name mass", //setMass
-    "rotateObject name axis radian", //rotateObject
-    "newScript name", //newScript
-    "runScript name", //runScript
-    "stopScript name", //stopScript
-    "printScripts", //printScripts
-    "editScript name", //editScript
-    "destroyScript name", //destroyScript
-    "translateObject name axis amount", //translateObject
-    "setFog fogColor fogDensity", //setFog
-    "removeFog", //removeFog
-    "glue newName objectName[1],objectName[2],...objectName[n]", //glue
-    "detach name", //detach
-    "mark name offsetX offsetY offsetZ", //mark
-    "unmark name", //unmark
-    "printMarkedPoints", //printMarkedPoints
-    "toggleMarkedPoints", //toggleMarkedPoints
-    "runAutomatically scriptName", //runAutomatically
-    "uploadScript scriptName filePath", //uploadScript
-    "runManually scriptName", //runManually
-    "physicsWorkerMode on/off", //physicsWorkerMode
-    "printPhysicsWorkerMode", //printPhysicsWorkerMode
-    "explain functionName", //explain
-    "printScriptingFunctions", //printScriptingFunctions
-    "printPerformance", //printPerformance
-    "search textToSearch", // search
-    "rescaleTexture textureName scale newTextureName", //rescaleTexture
-    "rescaleTexturePack texturePackName scale newTexturePackName", //rescaleTexturePack
-    "destroyImage imageName", //destroyImage
-    "setBlending objectName mode", //setBlending
-    "about", //about
-    "resetKeyboardBuffer", //resetKeyboardBuffer
-    "setWorldLimits minX minY minZ maxX maxY maxZ", //setWorldLimits
-    "setBinSize size", //setBinSize
-    "printWorldLimits", //printWorldLimits
-    "printBinSize", //printBinSize
-    "particleCollisionWorkerMode on/off", //particleCollisionWorkerMode
-    "printParticleCollisionWorkerMode", //printParticleCollisionWorkerMode
-    "particleSystemCollisionWorkerMode on/off", //particleSystemCollisionWorkerMode
-    "printParticleSystemCollisionWorkerMode", //printParticleSystemCollisionWorkerMode
-    "logFrameDrops", //logFrameDrops
-    "addPaddingToTexture textureName padding newTextureName", //addPaddingToTexture
-    "newSphere name material radius", //newSphere
-    "printFogInfo", //printFogInfo
-    "applyDisplacementMap objectName textureName scale bias", //applyDisplacementMap
-    "setSlipperiness objectName on/off", //setSlipperiness
-    "setAtlasTextureSize width height", //setAtlasTextureSize
-    "printAtlasTextureSize", //printAtlasTextureSize
-    "sync sourceObject targetObject", //sync
-    "newArea areaName height", //newArea
-    "toggleAreas", //toggleAreas
-    "destroyArea areaName", //destroyArea
-    "areaConfigurations show/hide", //areaConfigurations
-    "setResolution resolution", //setResolution
-    "configureArea areaName", //configureArea
-    "newAreaConfiguration areaName objectName isVisible sides", //newAreaConfiguration
-    "autoConfigureArea areaName", //autoConfigureArea
-    "stopAreaConfigurations", //stopAreaConfigurations
-    "startAreaConfigurations", //startAreaConfigurations
-    "newCylinder name materialName topRadius bottomRadius height isOpenEnded", //newCylinder
-    "setRotationPivot objectName offsetX offsetY offsetZ", //setRotationPivot
-    "printChildPosition objectName childObjectName", //printChildPosition
-    "unsetRotationPivot objectName", //unsetRotationPivot
-    "copyObject sourceName targetName offsetX offsetY offsetZ isHardCopy", //copyObject
-    "build projectName author", //build
-    "skyboxConfigurations show/hide", //skyboxConfigurations
-    "fogConfigurations show/hide", //fogConfigurations
-    "noMobile on/off", //noMobile
-    "setMaxViewport widthInPx heightInPx", //setMaxViewport
-    "keepAspect ratio", //keepAspect
-    "newFont fontName path", //newFont
-    "destroyFont fontName", //destroyFont
-    "printFonts", //printFonts
-    "newText textName fontName maxCharacterLength offsetX offsetY offsetZ", //newText
-    "selectText textName", //selectText
-    "destroyText textName", //destroyText
-    "printTexts", //printTexts
-    "setRayStep stepAmount", //setRayStep
-    "printRayStep"
-  ];
-  commands = [
-    "help",
-    "newGridSystem",
-    "printCameraPosition",
-    "printCameraDirection",
-    "printGridSystems",
-    "printGridSystemInfo",
-    "destroyGridSystem",
-    "printKeyboardInfo",
-    "printSelectedGrids",
-    "resetSelectedGrids",
-    "selectAllGrids",
-    "cropGridSystem",
-    "pasteCroppedGridSystem",
-    "switchView",
-    "newBasicMaterial",
-    "printMaterials",
-    "destroyMaterial",
-    "newSurface",
-    "printObjects",
-    "printMetaData",
-    "destroyObject",
-    "newTexture",
-    "printTextures",
-    "destroyTexture",
-    "mapTexture",
-    "adjustTextureRepeat",
-    "newPhysicsBoxTest",
-    "newPhysicsSphereTest",
-    "printPhysicsTests",
-    "switchPhysicsDebugMode",
-    "newRamp",
-    "setAnchor",
-    "restartPhysicsTest",
-    "mirror",
-    "newBox",
-    "newWallCollection",
-    "printWallCollections",
-    "destroyWallCollection",
-    "destroySelectedGrids",
-    "remakeGridSystem",
-    "resetCamera",
-    "uploadImage",
-    "printImages",
-    "mapSpecular",
-    "mapEnvironment",
-    "mapAmbientOcculsion",
-    "mapAlpha",
-    "setDefaultMaterial",
-    "newAmbientLight",
-    "printLights",
-    "selectLight",
-    "destroyLight",
-    "newPhongMaterial",
-    "mapNormal",
-    "mapEmissive",
-    "newLambertMaterial",
-    "newTexturePack",
-    "printTexturePacks",
-    "printTexturePackInfo",
-    "mapTexturePack",
-    "destroyTexturePack",
-    "refreshTexturePack",
-    "mapHeight",
-    "resetMaps",
-    "segmentObject",
-    "superposeGridSystem",
-    "postProcessing",
-    "sliceGrid",
-    "newPointLight",
-    "newSkybox",
-    "printSkyboxes",
-    "printSkyboxInfo",
-    "mapSkybox",
-    "destroySkybox",
-    "skybox",
-    "scaleSkybox",
-    "save",
-    "load",
-    "undo",
-    "redo",
-    "selectObject",
-    "setMass",
-    "rotateObject",
-    "newScript",
-    "runScript",
-    "stopScript",
-    "printScripts",
-    "editScript",
-    "destroyScript",
-    "translateObject",
-    "setFog",
-    "removeFog",
-    "glue",
-    "detach",
-    "mark",
-    "unmark",
-    "printMarkedPoints",
-    "toggleMarkedPoints",
-    "runAutomatically",
-    "uploadScript",
-    "runManually",
-    "physicsWorkerMode",
-    "printPhysicsWorkerMode",
-    "explain",
-    "printScriptingFunctions",
-    "printPerformance",
-    "search",
-    "rescaleTexture",
-    "rescaleTexturePack",
-    "destroyImage",
-    "setBlending",
-    "about",
-    "resetKeyboardBuffer",
-    "setWorldLimits",
-    "setBinSize",
-    "printWorldLimits",
-    "printBinSize",
-    "particleCollisionWorkerMode",
-    "printParticleCollisionWorkerMode",
-    "particleSystemCollisionWorkerMode",
-    "printParticleSystemCollisionWorkerMode",
-    "logFrameDrops",
-    "addPaddingToTexture",
-    "newSphere",
-    "printFogInfo",
-    "applyDisplacementMap",
-    "setSlipperiness",
-    "setAtlasTextureSize",
-    "printAtlasTextureSize",
-    "sync",
-    "newArea",
-    "toggleAreas",
-    "destroyArea",
-    "areaConfigurations",
-    "setResolution",
-    "configureArea",
-    "newAreaConfiguration",
-    "autoConfigureArea",
-    "stopAreaConfigurations",
-    "startAreaConfigurations",
-    "newCylinder",
-    "setRotationPivot",
-    "printChildPosition",
-    "unsetRotationPivot",
-    "copyObject",
-    "build",
-    "skyboxConfigurations",
-    "fogConfigurations",
-    "noMobile",
-    "setMaxViewport",
-    "keepAspect",
-    "newFont",
-    "destroyFont",
-    "printFonts",
-    "newText",
-    "selectText",
-    "destroyText",
-    "printTexts",
-    "setRayStep",
-    "printRayStep"
-  ];
-  commandInfo = [
-    "help: Prints command list.",
-    "newGridSystem: Creates a new GridSystem.",
-    "printCameraPosition: Prints the camera position.",
-    "printCameraDirection: Prints the camera direction vector.",
-    "printGridSystems: Prints existent grid system names.",
-    "printGridSystemInfo: Prints a grid system information.",
-    "destroyGridSystem: Destroys a grid system.",
-    "printKeyboardInfo: Prints information about keyboard shortcuts.",
-    "printSelectedGrids: Prints selected grid names.",
-    "resetSelectedGrids: Resets all selected grids.",
-    "selectAllGrids: Select all grids of a grid system.",
-    "cropGridSystem: Crops selected part of a grid system.",
-    "pasteCroppedGridSystem: Draws a cropped grid system.",
-    "switchView: Switches between views (design/preview).",
-    "newBasicMaterial: Creates a new basic material.",
-    "printMaterials: Prints created materials.",
-    "destroyMaterial: Destroys a material.",
-    "newSurface: Creates a new surface.",
-    "printObjects: Prints objects.",
-    "printMetaData: Prints the metadata of an object.",
-    "destroyObject: Destroys an object",
-    "newTexture: Creates a new texture.",
-    "printTextures: Prints textures.",
-    "destroyTexture: Destroys a texture.",
-    "mapTexture: Maps a diffuse/color texture to an object.",
-    "adjustTextureRepeat: Modifies the repeat amount of a texture/texture pack.",
-    "newPhysicsBoxTest: Simulates a box in a physical world.",
-    "newPhysicsSphereTest: Simulates a sphere in a physical world.",
-    "printPhysicsTests: Prints physics tests statuses.",
-    "switchPhysicsDebugMode: Switches physics debug mode (on/off).",
-    "newRamp: Creates a new inclined plane.",
-    "setAnchor: Sets an anchor grid.",
-    "restartPhysicsTest: Restarts a physics test.",
-    "mirror: Sets on/off a mapped textures mirrored repeat property.",
-    "newBox: Creates a new box.",
-    "newWallCollection: Creates a new wall collection, a set of grid systems.",
-    "printWallCollections: Prints created wall collections.",
-    "destroyWallCollection: Destroys a wall collection.",
-    "destroySelectedGrids: Destroys selected grids.",
-    "remakeGridSystem: Remakes destroyed grids of a grid system.",
-    "resetCamera: Resets camera position and rotation.",
-    "uploadImage: Uploads an image from the local filesystem (TGA images not supported).",
-    "printImages: Prints uploaded images.",
-    "mapSpecular: Sets a specular map of an object.",
-    "mapEnvironment: Sets an environment map of an object.",
-    "mapAmbientOcculsion: Sets an ambient occulsion map of an object.",
-    "mapAlpha: Sets an alpha map of an object.",
-    "setDefaultMaterial: Sets the type of the default material (basic/phong).",
-    "newAmbientLight: Creates a new ambient light.",
-    "printLights: Prints created lights.",
-    "selectLight: Selects a created light.",
-    "destroyLight: Destroys a created light.",
-    "newPhongMaterial: Creates a new Phong material (light sensitive).",
-    "mapNormal: Sets a normal map of an object.",
-    "mapEmissive: Sets an emissive map of an object.",
-    "newLambertMaterial: Creates a new Lambert material (light sensitive).",
-    "newTexturePack: Cretes a new Texture Pack.",
-    "printTexturePacks: Prints created texture packs.",
-    "printTexturePackInfo: Prints information about a texture pack.",
-    "mapTexturePack: Maps a texture pack to an object.",
-    "destroyTexturePack: Destroys a texture pack.",
-    "refreshTexturePack: Reloads a texture pack.",
-    "mapHeight: Set a displacement/height map of an object.",
-    "resetMaps: Resets all textures of an object.",
-    "segmentObject: Segments an object (width/height/depth).",
-    "superposeGridSystem: Creates a new grid system above a specific object.",
-    "postProcessing: Shows/hides post processing effects GUI.",
-    "sliceGrid: Slices a grid into equal parts and creates a new Grid System with the pieces.",
-    "newPointLight: Creates a new point light.",
-    "newSkybox: Creates a new Skybox",
-    "printSkyboxes: Prints created skyboxes.",
-    "printSkyboxInfo: Prints information about a Skybox.",
-    "mapSkybox: Maps a Skybox to the scene.",
-    "destroySkybox: Destroys a Skybox.",
-    "skybox: Shows/hides the skybox cube.",
-    "scaleSkybox: Modifies the scale of the Skybox cube.",
-    "save: Saves the current state of the engine as a JSON file and initiates the download process.",
-    "load: Loads a project saved in JSON format (via the save command).",
-    "undo: Undo the last successful command.",
-    "redo: Redo the last successful command.",
-    "selectObject: Selects an object.",
-    "setMass: Sets the mass of an object.",
-    "rotateObject: Rotates an object around given axis.",
-    "newScript: Creates a new script.",
-    "runScript: Runs a script.",
-    "stopScript: Stops a running script.",
-    "printScripts: Prints created scripts.",
-    "editScript: Edits a script.",
-    "destroyScript: Destroys a script.",
-    "translateObject: Translates an object along given axis.",
-    "setFog: Sets the fog attributes of the scene.",
-    "removeFog: Removes the fog from the scene.",
-    "glue: Creates a new object, gluing given objects together.",
-    "detach: Detaches a group of objects glued together using the glue command.",
-    "mark: Marks a specific point.",
-    "unmark: Unmarks a marked point.",
-    "printMarkedPoints: Prints marked points.",
-    "toggleMarkedPoints: Hides or shows the marked points on the screen.",
-    "runAutomatically: Makes a script start automatically when switched to the preview mode.",
-    "uploadScript: Uploads a script from the local file system.",
-    "runManually: Makes a script wait for the runScript command to start the execution.",
-    "physicsWorkerMode: Enables or disables the usage of web workers for physics iterations.",
-    "printPhysicsWorkerMode: Prints if the physics web worker is enabled or not.",
-    "explain: Prints information about given scripting API function.",
-    "printScriptingFunctions: Prints a list of ROYGBIV scripting API functions.",
-    "printPerformance: Prints the performance of rendering functions for the last rendered frame.",
-    "search: Finds related commands.",
-    "rescaleTexture: Rescales a texture and creates a new texture from the rescaled version.",
-    "rescaleTexturePack: Rescales a texture pack and creates a new texture pack from the rescaled version.",
-    "destroyImage: Destroys an uploaded image.",
-    "setBlending: Sets the blending mode of an object. Mode can be one of NO_BLENDING, NORMAL_BLENDING, ADDITIVE_BLENDING, SUBTRACTIVE_BLENDING,\n  MULTIPLY_BLENDING.",
-    "about: Prints info about this engine.",
-    "resetKeyboardBuffer: Resets the keyboard buffer.",
-    "setWorldLimits: Sets the limits of the scene. Objects outside of this limit will be ignored for collisions with particles/particle systems\n  and area calculations.",
-    "setBinSize: Sets the size of the bin. Bins are imaginary cubes that split the scene into segments to help particle/particle system\n  collision detections and area calculations.Larger the size worse the performance but better the collision detection performs\n  for fast particles.",
-    "printWorldLimits: Prints the limit info of the world. Objects outside of this limit will be ignored for collisions with particles/particle systems.",
-    "printBinSize: Prints the size of the bin. Bins are imaginary cubes that split the scene into segments to help particle collision detections.",
-    "particleCollisionWorkerMode: Enables or disables the usage of web workers for particle collision detection.",
-    "printParticleCollisionWorkerMode: Prints if the particle collision web worker is enabled or not.",
-    "particleSystemCollisionWorkerMode: Enables or disables the usage of web workers for particle system collision detection.",
-    "printParticleSystemCollisionWorkerMode: Prints if the particle system collision web worker is enabled or not.",
-    "logFrameDrops: Records frame drops for a minute and prints exactly how many frames are missed within a minute to Javascript console.",
-    "addPaddingToTexture: Adds padding to a texture. This can be useful for crosshair rotations to prevent visual errors.",
-    "newSphere: Creates a new sphere.",
-    "printFogInfo: Prints the fog info.",
-    "applyDisplacementMap: Applies a displacement map to an object and modifies its geometry.",
-    "setSlipperiness: Sets the slipperiness of an object.",
-    "setAtlasTextureSize: Sets the size of each texture/texture pack when creating object groups.",
-    "printAtlasTextureSize: Prints the atlas texture size set with setAtlasTextureSize command.",
-    "sync: Sets the material properties of the target object according to the source object.",
-    "newArea: Creates a new area.",
-    "toggleAreas: Show/hides the areas.",
-    "destroyArea: Destroys an area.",
-    "areaConfigurations: Show/hides the area configuration window.",
-    "setResolution: Sets the screen resolution.",
-    "configureArea: Shows the area configuration window for a certain area.",
-    "newAreaConfiguration: Creates a new area configuration for an area and object.",
-    "autoConfigureArea: Automatically configures an area using ray tests. Manual corrections may be necesary after using this command.",
-    "stopAreaConfigurations: Stops area configurations handling.",
-    "startAreaConfigurations: Starts area configurations handling.",
-    "newCylinder: Creates a new cylinder.",
-    "setRotationPivot: Defines a pivot point of rotation for an object in its local axis system.",
-    "printChildPosition: Prints the world position of a child object of an object group.",
-    "unsetRotationPivot: Unsets the rotation pivot point of an object set by using setRotationPivot command.",
-    "copyObject: Creates a clone of an object.",
-    "build: Builds the project for release.",
-    "skyboxConfigurations: Shows/hides the skybox configuration GUI.",
-    "fogConfigurations: Shows/hides the fog configuration GUI.",
-    "noMobile: Prevents the application from loading and alerts a warning message in deployment mode for mobile devices if used with on parameter.",
-    "setMaxViewport: Sets the maximum viewport of the renderer. Use 0 or a negative number for unlimited width/height.",
-    "keepAspect: Modifies the renderer aspect in the browser of the client in a way where width/height = ratio. If ratio<0 the aspect is not kept.",
-    "newFont: Creates a new font.",
-    "destroyFont: Destroys a font.",
-    "printFonts: Prints all created fonts.",
-    "newText: Allocates a new text object.",
-    "selectText: Selects a text for modification.",
-    "destroyText: Destroys a text.",
-    "printTexts: Prints a list of created texts.",
-    "setRayStep: Sets the step amount used by the Raycaster while detecting intersections. Small step amount means more precise intersection\n  detection but worse performance. Default value is 32.",
-    "printRayStep: Prints the ray step amount."
-  ];
-  keyboardInfo = [
-    "W/S : Translates the camera on axis Z.",
-    "A/D : Translates the camera on axis X.",
-    "Up/Down : Rotates the camera around axis X.",
-    "Left/Right : Rotates the camera around axis Y.",
-    "E/Q : Translates the camera on axis Y.",
-    "Z/C: Rotates the camera around axis Z.",
-    "Backspace: Destroys selected object.",
-    ". : Shows corner coordinates of selected grids.",
-    "SHIFT: Activates grid selection mode."
-  ];
-
-  deprecatedCommandIndices = [
-    26, //newPhysicsBoxTest -> Deprecated due to lack of use cases. This command is implemented to test if the physics bodies fit the meshes. After the implementation of switchPhysicsDebugMode, this command is no longer needed.
-    27, //newPhysicsSphereTest -> Deprecated due to lack of use cases. This command is implemented to test if the physics bodies fit the meshes. After the implementation of switchPhysicsDebugMode, this command is no longer needed.
-    28, //printPhysicsTests -> Since box and sphere physics tests are deprecated, this command is no longer needed.
-    32, //restartPhysicsTest -> Since box and sphere physics tests are deprecated, this command is no longer needed.
-    38, //destroySelectedGrids -> Deprecated due to architectural changes during development. Grids are no longer rendered as seperate objects due to performance issues.
-    39, //remakeGridSystem -> Deprecated due to architectural changes during development. Since grids are no longer destroyable, this command has no use case anymore.
-    43, //mapSpecular -> Specular maps are not supported for now.
-    44, //mapEnvironment -> Deprecated due to lack of use cases of environment maps in the ROYGBIV engine. Will implement mirror materials for better visual effects.
-    47, //setDefaultMaterial -> Only BASIC materials are supported for now.
-    48, //newAmbientLight -> Lights are not supported for now.
-    49, //printLights -> Lights are not supported for now.
-    50, //selectLight -> Lights are not supported for now.
-    51, //destroyLight -> Lights are not supported for now.
-    52, //newPhongMaterial -> Phong materials are not supported for now.
-    53, //mapNormal -> Normal maps are not supported for now.
-    55, //newLambertMaterial -> Deprecated due to lack of uses cases. Phong is fine for light affected objects.
-    68, //newPointLight -> Lights are not supported for now.
-    78, //undo -> Deprecated because causes memory issues for big projects.
-    79, //redo -> Deprecated because causes memory issues for big projects.
-    89, //translateObject -> Deprecated due to architectural conflicts. Objects can only be translated using animations. Instead of translating the object in the design mode, a new grid system should be created at the specific position. Every object should be associated with certain grids.
-    101, //physicsWorkerMode -> Workers will be re-implemented.
-    102, //printPhysicsWorkerMode -> Workers will be re-implemented.
-    105, //printPerformance -> Deprecated because calling performance.now() multiple times on each render is costly.
-    117, //particleCollisionWorkerMode  -> Workers will be re-implemented.
-    118, //printParticleCollisionWorkerMode -> Workers will be re-implemented.
-    119, //particleSystemCollisionWorkerMode -> Workers will be re-implemented.
-    120, //printParticleCollisionWorkerMode -> Workers will be re-implemented.
-    121, //logFrameDrops -> No need for such functionality after the usage of Stats.js
-    125, //applyDisplacementMap -> Deprecated because causes problems with geometry caching.
-    127, //setAtlasTextureSize -> Deprecated because has no use cases after deprecation of TextureMerger class
-    128 //printAtlasTextureSize -> Deprecated due to same reasons as setAtlasTextureSize
-  ];
-
-  if (commandInfo.length != commands.length){
-    console.error("CommandInfo & commands mismatch");
-  }
-  if (commandArgumentsExpectedCount.length != commands.length){
-    console.error("commandArgumentsExpectedCount & commands mismatch");
-    console.error(commandArgumentsExpectedCount.length+", "+commands.length);
-  }
-
-  for (var i=0; i<commands.length; i++){
-    var splitted = commandArgumentsExpectedExplanation[i].split(" ");
-    if (splitted.length != (commandArgumentsExpectedCount[i] + 1)){
-      console.error("commandArgumentsExpectedExplanation commandArgumentsExpectedCount mismatch: "+i);
-    }
-  }
 }
 
 // VERSION
@@ -2471,6 +1757,7 @@ var DDS_SUPPORTED;
 var INSTANCING_SUPPORTED;
 var jobHandlerSelectedGrid = 0;
 var jobHandlerWorking = false;
+var jobHandlerRaycasterRefresh = false;
 var geometryCache = new Object();
 var physicsShapeCache = new Object();
 var MAX_TEXTURE_COUNT = 8;
@@ -2545,115 +1832,6 @@ var Text = (!isDeployment)? new Text(): 0;
 
 // SCRIPTING UTILITY FUNCTIONS
 var ROYGBIV;
-
-// DAT GUI
-var datGui;
-var datGuiObjectManipulation;
-var datGuiTextManipulation;
-var datGuiAreaConfigurations;
-var datGuiSkybox;
-var datGuiFog;
-var omGUIlastObjectName = "";
-
-var postprocessingParameters = {
-  "Bloom_strength": bloomStrength,
-  "Bloom_radius": bloomRadius,
-  "Bloom_threshhold": bloomThreshold,
-  "Bloom_resolution_scale": bloomResolutionScale,
-  "Bloom": bloomOn
-};
-
-var omObjController;
-var omRotationXController;
-var omRotationYController;
-var omRotationZController;
-var omMassController;
-var omSlipperyController;
-var omChangeableController;
-var omIntersectableController;
-var omColorizableController;
-var omHasMassController;
-var omSideController;
-var omHideHalfController;
-var omBlendingController;
-var omTextureOffsetXController;
-var omTextureOffsetYController;
-var omOpacityController;
-var omAOIntensityController;
-var omEmissiveIntensityController;
-var omEmissiveColorController;
-var omDisplacementScaleController;
-var omDisplacementBiasController;
-var objectManipulationParameters = {
-  "Object": "objectName",
-  "Rotate x": 0.0,
-  "Rotate y": 0.0,
-  "Rotate z": 0.0,
-  "Mass": 0.0,
-  "Slippery": false,
-  "Changeable": false,
-  "Intersectable": false,
-  "Colorizable": false,
-  "Has mass": true,
-  "Side": "Both",
-  "Hide half": "None",
-  "Blending": "None",
-  "Texture offset x": 0.0,
-  "Texture offset y": 0.0,
-  "Opacity": 1.0,
-  "AO intensity": 0.0,
-  "Emissive int.": 0.0,
-  "Emissive col.": "#ffffff",
-  "Disp. scale": 0.0,
-  "Disp. bias": 0.0
-};
-
-var skyboxNameController;
-var skyboxColorController;
-var skyboxParameters = {
-  "Name": "skyboxName",
-  "Color": "#ffffff"
-};
-
-var textManipulationController;
-var textManipulationTextNameController;
-var textManipulationContentController;
-var textManipulationTextColorController;
-var textManipulationAlphaController;
-var textManipulationHasBackgroundController;
-var textManipulationBackgroundColorController;
-var textManipulationBackgroundAlphaController;
-var textManipulationCharacterSizeController;
-var textManipulationCharacterMarginController;
-var textManipulationLineMarginController;
-var textManipulationClickableController;
-var textManipulationAffectedByFogController;
-var textManipulationIs2DController;
-var textManipulationMarginModeController;
-var textManipulationMarginXController;
-var textManipulationMarginYController;
-var textManipulationMaxWidthPercentController;
-var textManipulationMaxHeightPercentController;
-var textManipulationParameters = {
-  "Text": "textName",
-  "Content": "",
-  "Text color": "#ffffff",
-  "Alpha": 0.0,
-  "Has bg": false,
-  "Bg color": "#ffffff",
-  "Bg alpha": 0.0,
-  "Char size": 0.0,
-  "Char margin": 0.0,
-  "Line margin": 0.0,
-  "Clickable": false,
-  "Aff. by fog": false,
-  "is 2D": false,
-  "Margin mode": "Top/Left",
-  "Margin X": 50.0,
-  "Margin Y": 50.0,
-  "Max width%": 100,
-  "Max height%": 100
-}
 
 var fogDensityController;
 var fogColorController;
@@ -2920,6 +2098,7 @@ Grid.prototype.renderCornerHelpers = function(){
     var addedText = new AddedText(
       null, defaultFont, text, new THREE.Vector3().copy(vertex), ORANGE_COLOR, 1, 6
     );
+    addedText.isEditorHelper = true;
     addedText.setMarginBetweenChars(2.5);
     addedText.refInnerHeight = 569;
     addedText.refCharSize = 6;
@@ -3123,9 +2302,6 @@ var GridSystem = function(name, sizeX, sizeZ, centerX, centerY, centerZ,
 
   gridCounter = gridCounter + totalGridCount;
 
-  if (!isDeployment && projectLoaded){
-    terminal.printInfo(Text.GS_CREATED);
-  }
 }
 
 GridSystem.prototype.draw = function(){
@@ -3502,9 +2678,6 @@ GridSystem.prototype.destroy = function(){
       obj.destroyedGrids = new Object();
     }
   }
-
-  rayCaster.refresh();
-
 }
 
 GridSystem.prototype.selectAllGrids = function(){
@@ -4927,6 +4100,8 @@ AddedObject.prototype.exportLightweight = function(){
   }else{
     exportObject.position = new THREE.Vector3(this.positionXWhenAttached, this.positionYWhenAttached, this.positionZWhenAttached);
     exportObject.quaternion = new THREE.Quaternion(this.qxWhenAttached, this.qyWhenAttached, this.qzWhenAttached, this.qwWhenAttached);
+    exportObject.positionWhenAttached = exportObject.position.clone();
+    exportObject.quaternionWhenAttached = exportObject.quaternion.clone();
   }
   exportObject.vertices = [];
   exportObject.triangles = [];
@@ -5129,7 +4304,7 @@ AddedObject.prototype.export = function(){
   if (this.hasTexture()){
     exportObject.txtMatrix = this.mesh.material.uniforms.textureMatrix.value.elements;
   }
-
+  exportObject.isRotationDirty = this.isRotationDirty;
   return exportObject;
 }
 
@@ -5784,6 +4959,46 @@ AddedObject.prototype.translate = function(axis, amount, fromScript){
   }
 }
 
+AddedObject.prototype.rotatePivotAroundXYZ = function(x, y, z, axis, axisVector, radians){
+  this.updatePivot();
+  this.pivotObject.updateMatrix();
+  this.pivotObject.updateMatrixWorld();
+  var point = REUSABLE_VECTOR.set(x, y, z);
+  this.pivotObject.position.sub(point);
+  this.pivotObject.position.applyAxisAngle(axisVector, radians);
+  this.pivotObject.position.add(point);
+  this.pivotObject.rotateOnAxis(axisVector, radians);
+  this.pivotObject.updateMatrix();
+  this.pivotObject.updateMatrixWorld();
+  this.pivotObject.pseudoMesh.updateMatrix();
+  this.pivotObject.pseudoMesh.updateMatrixWorld();
+  this.pivotObject.pseudoMesh.matrixWorld.decompose(REUSABLE_VECTOR, REUSABLE_QUATERNION, REUSABLE_VECTOR_2);
+  this.mesh.position.copy(REUSABLE_VECTOR);
+  this.mesh.quaternion.copy(REUSABLE_QUATERNION);
+  this.setPhysicsAfterRotationAroundPoint(axis, radians);
+  if (this.mesh.visible){
+    rayCaster.updateObject(this);
+  }
+}
+
+AddedObject.prototype.rotateAroundXYZ = function(x, y, z, axis, axisVector, radians){
+  if (this.pivotObject){
+    this.rotatePivotAroundXYZ(x, y, z, axis, axisVector, radians);
+    return;
+  }
+  var point = REUSABLE_VECTOR.set(x, y, z);
+  this.mesh.parent.localToWorld(this.mesh.position);
+  this.mesh.position.sub(point);
+  this.mesh.position.applyAxisAngle(axisVector, radians);
+  this.mesh.position.add(point);
+  this.mesh.parent.worldToLocal(this.mesh.position);
+  this.mesh.rotateOnAxis(axisVector, radians);
+  this.setPhysicsAfterRotationAroundPoint(axis, radians);
+  if (this.mesh.visible){
+    rayCaster.updateObject(this);
+  }
+}
+
 AddedObject.prototype.rotate = function(axis, radians, fromScript){
 
   if (this.type == "surface"){
@@ -6112,7 +5327,7 @@ AddedObject.prototype.destroy = function(skipRaycasterRefresh){
     for (var gridName in this.destroyedGrids){
       this.destroyedGrids[gridName].destroyedAddedObject = 0;
     }
-  } 
+  }
   this.dispose();
   if (!skipRaycasterRefresh){
     rayCaster.refresh();
@@ -9517,11 +8732,11 @@ function adjustPostProcessing(variableIndex, val){
    break;
    case -1: //from script
     if(!isDeployment){
-      postprocessingParameters["Bloom_strength"] = bloomStrength;
-      postprocessingParameters["Bloom_radius"] = bloomRadius;
-      postprocessingParameters["Bloom_threshhold"] = bloomThreshold;
-      postprocessingParameters["Bloom_resolution_scale"] = bloomResolutionScale;
-      postprocessingParameters["Bloom"] = bloomOn;
+      guiHandler.postprocessingParameters["Bloom_strength"] = bloomStrength;
+      guiHandler.postprocessingParameters["Bloom_radius"] = bloomRadius;
+      guiHandler.postprocessingParameters["Bloom_threshhold"] = bloomThreshold;
+      guiHandler.postprocessingParameters["Bloom_resolution_scale"] = bloomResolutionScale;
+      guiHandler.postprocessingParameters["Bloom"] = bloomOn;
     }
    break;
  }
@@ -10795,7 +10010,9 @@ StateLoader.prototype.load = function(){
       addedObjectInstance.mesh.material.uniforms.setAOIntensity = curAddedObjectExport.aoMapIntensity;
 
       addedObjects[addedObjectName] = addedObjectInstance;
-
+      if (curAddedObjectExport.isRotationDirty){
+        addedObjectInstance.isRotationDirty = true;
+      }
       addedObjectInstance.rotationX = curAddedObjectExport.rotationX;
       addedObjectInstance.rotationY = curAddedObjectExport.rotationY;
       addedObjectInstance.rotationZ = curAddedObjectExport.rotationZ;
@@ -11253,11 +10470,11 @@ StateLoader.prototype.load = function(){
     bloomResolutionScale = obj.bloomResolutionScale;
     bloomOn = obj.bloomOn;
     if (!isDeployment){
-      postprocessingParameters["Bloom_strength"] = bloomStrength;
-      postprocessingParameters["Bloom_radius"] = bloomRadius;
-      postprocessingParameters["Bloom_threshhold"] = bloomThreshold;
-      postprocessingParameters["Bloom_resolution_scale"] = bloomResolutionScale;
-      postprocessingParameters["Bloom"] = bloomOn;
+      guiHandler.postprocessingParameters["Bloom_strength"] = bloomStrength;
+      guiHandler.postprocessingParameters["Bloom_radius"] = bloomRadius;
+      guiHandler.postprocessingParameters["Bloom_threshhold"] = bloomThreshold;
+      guiHandler.postprocessingParameters["Bloom_resolution_scale"] = bloomResolutionScale;
+      guiHandler.postprocessingParameters["Bloom"] = bloomOn;
     }
 
     if (this.oldPhysicsDebugMode){
@@ -11389,6 +10606,9 @@ StateLoader.prototype.finalize = function(){
     }
     var objectGroupInstance = new ObjectGroup(objectName, group);
     objectGroups[objectName] = objectGroupInstance;
+    if (curObjectGroupExport.isRotationDirty){
+      objectGroupInstance.isRotationDirty = true;
+    }
     objectGroupInstance.glue();
     if (curObjectGroupExport.mass){
       objectGroupInstance.setMass(curObjectGroupExport.mass);
@@ -11421,11 +10641,6 @@ StateLoader.prototype.finalize = function(){
     if (objectGroupInstance.isColorizable){
       objectGroupInstance.injectMacro("HAS_FORCED_COLOR", false, true);
       objectGroupInstance.mesh.material.uniforms.forcedColor = new THREE.Uniform(new THREE.Vector4(-50, 0, 0, 0));
-    }
-
-    if (curObjectGroupExport.noMass){
-      objectGroupInstance.noMass = true;
-      physicsWorld.remove(objectGroupInstance.physicsBody);
     }
 
     objectGroupInstance.isDynamicObject = isDynamicObject;
@@ -11492,6 +10707,20 @@ StateLoader.prototype.finalize = function(){
     }
     if (objectGroupInstance.mesh.material.uniforms.totalEmissiveColor){
       objectGroupInstance.mesh.material.uniforms.totalEmissiveColor.value.set(curObjectGroupExport.totalEmissiveColor);
+    }
+    if (curObjectGroupExport.isPhysicsSimplified){
+      var params = curObjectGroupExport.physicsSimplificationParameters;
+      objectGroupInstance.simplifyPhysics(params.sizeX, params.sizeY, params.sizeZ);
+      objectGroupInstance.physicsBody.position.copy(params.pbodyPosition);
+      objectGroupInstance.physicsBody.quaternion.copy(params.pbodyQuaternion);
+      objectGroupInstance.physicsSimplificationObject3D.position.copy(params.physicsSimplificationObject3DPosition);
+      objectGroupInstance.physicsSimplificationObject3D.quaternion.copy(params.physicsSimplificationObject3DQuaternion);
+      objectGroupInstance.physicsSimplificationObject3DContainer.position.copy(params.physicsSimplificationObject3DContainerPosition);
+      objectGroupInstance.physicsSimplificationObject3DContainer.quaternion.copy(params.physicsSimplificationObject3DContainerQuaternion);
+    }
+    if (curObjectGroupExport.noMass){
+      objectGroupInstance.noMass = true;
+      physicsWorld.remove(objectGroupInstance.physicsBody);
     }
   }
 
@@ -13632,6 +12861,7 @@ ObjectGroup.prototype.glue = function(){
   var group = this.group;
   var physicsMaterial = new CANNON.Material();
   var physicsBody = new CANNON.Body({mass: 0, material: physicsMaterial});
+  this.originalPhysicsBody = physicsBody;
   var centerPosition = this.getInitialCenter();
   var graphicsGroup = new THREE.Group();
   var centerX = centerPosition.x;
@@ -13922,26 +13152,75 @@ ObjectGroup.prototype.setQuaternion = function(axis, val){
   }
 }
 
-ObjectGroup.prototype.rotate = function(axis, radian, fromScript){
-  if (axis == "x"){
-    this.mesh.rotateOnWorldAxis(
-      THREE_AXIS_VECTOR_X,
-      radian
-    );
-  }else if (axis == "y"){
-    this.mesh.rotateOnWorldAxis(
-      THREE_AXIS_VECTOR_Y,
-      radian
-    );
-  }else if (axis == "z"){
-    this.mesh.rotateOnWorldAxis(
-      THREE_AXIS_VECTOR_Z,
-      radian
-    );
+ObjectGroup.prototype.rotatePivotAroundXYZ = function(x, y, z, axis, axisVector, radians){
+  this.updatePivot();
+  this.pivotObject.updateMatrix();
+  this.pivotObject.updateMatrixWorld();
+  var point = REUSABLE_VECTOR.set(x, y, z);
+  this.pivotObject.position.sub(point);
+  this.pivotObject.position.applyAxisAngle(axisVector, radians);
+  this.pivotObject.position.add(point);
+  this.pivotObject.rotateOnAxis(axisVector, radians);
+  this.pivotObject.updateMatrix();
+  this.pivotObject.updateMatrixWorld();
+  this.pivotObject.pseudoMesh.updateMatrix();
+  this.pivotObject.pseudoMesh.updateMatrixWorld();
+  this.pivotObject.pseudoMesh.matrixWorld.decompose(REUSABLE_VECTOR, REUSABLE_QUATERNION, REUSABLE_VECTOR_2);
+  this.mesh.position.copy(REUSABLE_VECTOR);
+  this.mesh.quaternion.copy(REUSABLE_QUATERNION);
+  if (!this.isPhysicsSimplified){
+    this.physicsBody.quaternion.copy(this.mesh.quaternion);
+    this.physicsBody.position.copy(this.mesh.position);
+  }else{
+    this.updateSimplifiedPhysicsBody();
   }
+  if (this.mesh.visible){
+    rayCaster.updateObject(this);
+  }
+}
 
-  this.physicsBody.quaternion.copy(this.mesh.quaternion);
-  this.graphicsGroup.quaternion.copy(this.mesh.quaternion);
+ObjectGroup.prototype.rotateAroundXYZ = function(x, y, z, axis, axisVector, radians){
+  REUSABLE_QUATERNION2.copy(this.mesh.quaternion);
+  if (this.pivotObject){
+    this.rotatePivotAroundXYZ(x, y, z, axis, axisVector, radians);
+    return;
+  }
+  var point = REUSABLE_VECTOR.set(x, y, z);
+  this.mesh.parent.localToWorld(this.mesh.position);
+  this.mesh.position.sub(point);
+  this.mesh.position.applyAxisAngle(axisVector, radians);
+  this.mesh.position.add(point);
+  this.mesh.parent.worldToLocal(this.mesh.position);
+  this.mesh.rotateOnAxis(axisVector, radians);
+  if (!this.isPhysicsSimplified){
+    this.physicsBody.quaternion.copy(this.mesh.quaternion);
+    this.physicsBody.position.copy(this.mesh.position);
+  }else{
+    this.updateSimplifiedPhysicsBody();
+  }
+  if (this.mesh.visible){
+    rayCaster.updateObject(this);
+  }
+}
+
+ObjectGroup.prototype.rotate = function(axis, radian, fromScript){
+  REUSABLE_QUATERNION.copy(this.mesh.quaternion);
+  var axisVector
+  if (axis == "x"){
+    axisVector = THREE_AXIS_VECTOR_X;
+  }else if (axis == "y"){
+    axisVector = THREE_AXIS_VECTOR_Y;
+  }else if (axis == "z"){
+    axisVector = THREE_AXIS_VECTOR_Z;
+  }
+  this.mesh.rotateOnWorldAxis(axisVector, radian);
+
+  if (!this.isPhysicsSimplified){
+    this.physicsBody.quaternion.copy(this.mesh.quaternion);
+    this.graphicsGroup.quaternion.copy(this.mesh.quaternion);
+  }else{
+    this.updateSimplifiedPhysicsBody();
+  }
 
   if (!fromScript){
     this.initQuaternion = this.mesh.quaternion.clone();
@@ -13963,6 +13242,25 @@ ObjectGroup.prototype.rotate = function(axis, radian, fromScript){
 
 }
 
+ObjectGroup.prototype.updateSimplifiedPhysicsBody = function(){
+  if (this.pivotObject){
+    this.updatePivot();
+    this.pivotObject.updateMatrixWorld();
+    this.pivotObject.updateMatrix();
+    this.pivotObject.pseudoMesh.updateMatrixWorld();
+    this.pivotObject.pseudoMesh.updateMatrix();
+  }else{
+    this.physicsSimplificationObject3DContainer.position.copy(this.mesh.position);
+    this.physicsSimplificationObject3DContainer.quaternion.copy(this.mesh.quaternion);
+    this.physicsSimplificationObject3DContainer.updateMatrixWorld();
+    this.physicsSimplificationObject3DContainer.updateMatrix();
+  }
+  this.physicsSimplificationObject3D.getWorldPosition(REUSABLE_VECTOR);
+  this.physicsSimplificationObject3D.getWorldQuaternion(REUSABLE_QUATERNION);
+  this.physicsBody.position.copy(REUSABLE_VECTOR);
+  this.physicsBody.quaternion.copy(REUSABLE_QUATERNION);
+}
+
 ObjectGroup.prototype.translate = function(axis, amount, fromScript){
   var physicsBody = this.physicsBody;
   if (axis == "x"){
@@ -13972,14 +13270,18 @@ ObjectGroup.prototype.translate = function(axis, amount, fromScript){
   }else if (axis == "z"){
     this.mesh.translateZ(amount);
   }
-  physicsBody.position.copy(this.mesh.position);
+  if (!this.isPhysicsSimplified){
+    physicsBody.position.copy(this.mesh.position);
+  }else{
+    this.updateSimplifiedPhysicsBody();
+  }
   this.graphicsGroup.position.copy(this.mesh.position);
   if (this.mesh.visible){
     rayCaster.updateObject(this);
   }
 }
 
-ObjectGroup.prototype.destroy = function(isUndo){
+ObjectGroup.prototype.destroy = function(skipRaycasterRefresh){
   this.removeBoundingBoxesFromScene();
   scene.remove(this.mesh);
   physicsWorld.remove(this.physicsBody);
@@ -13987,11 +13289,7 @@ ObjectGroup.prototype.destroy = function(isUndo){
     var childObj= this.group[name];
     if (childObj.destroyedGrids){
       for (var gridName in childObj.destroyedGrids){
-        if (!isUndo){
-          delete childObj.destroyedGrids[gridName].destroyedAddedObject;
-        }else{
-          childObj.destroyedGrids[gridName].destroyedAddedObject = childObj.name;
-        }
+        delete childObj.destroyedGrids[gridName].destroyedAddedObject;
         delete childObj.destroyedGrids[gridName].destroyedObjectGroup;
       }
     }
@@ -14001,7 +13299,9 @@ ObjectGroup.prototype.destroy = function(isUndo){
   this.mesh.material.dispose();
   this.mesh.geometry.dispose();
 
-  rayCaster.refresh();
+  if (!skipRaycasterRefresh){
+    rayCaster.refresh();
+  }
 
 }
 
@@ -14159,11 +13459,28 @@ ObjectGroup.prototype.export = function(){
   if (this.mesh.material.uniforms.totalEmissiveColor){
     exportObj.totalEmissiveColor = "#"+this.mesh.material.uniforms.totalEmissiveColor.value.getHexString();
   }
-
+  exportObj.isRotationDirty = this.isRotationDirty;
+  if (this.isPhysicsSimplified){
+    exportObj.isPhysicsSimplified = true;
+    this.physicsSimplificationParameters = {
+      sizeX: this.physicsSimplificationParameters.sizeX,
+      sizeY: this.physicsSimplificationParameters.sizeY,
+      sizeZ: this.physicsSimplificationParameters.sizeZ,
+      pbodyPosition: this.physicsBody.position, pbodyQuaternion: this.physicsBody.quaternion,
+      physicsSimplificationObject3DPosition: this.physicsSimplificationObject3D.position,
+      physicsSimplificationObject3DQuaternion: new CANNON.Quaternion().copy(this.physicsSimplificationObject3D.quaternion),
+      physicsSimplificationObject3DContainerPosition: this.physicsSimplificationObject3DContainer.position,
+      physicsSimplificationObject3DContainerQuaternion: new CANNON.Quaternion().copy(this.physicsSimplificationObject3DContainer.quaternion)
+    };
+    exportObj.physicsSimplificationParameters = this.physicsSimplificationParameters;
+  }
   return exportObj;
 }
 
 ObjectGroup.prototype.getInitialCenter = function(){
+  if (this.copiedInitialCenter){
+    return this.copiedInitialCenter;
+  }
   var group = this.group;
   var centerX = 0;
   var centerY = 0;
@@ -14281,6 +13598,18 @@ ObjectGroup.prototype.visualiseBoundingBoxes = function(){
       box3.expandByPoint(boundingBoxes[i].max);
     }
   }
+  if (box3.min.x == box3.max.x){
+    box3.max.x += 1;
+    box3.min.x -= 1;
+  }
+  if (box3.min.y == box3.max.y){
+    box3.max.y += 1;
+    box3.min.y -= 1;
+  }
+  if (box3.min.z == box3.max.z){
+    box3.max.z += 1;
+    box3.min.z -= 1;
+  }
   this.bbHelper = new THREE.Box3Helper(box3, LIME_COLOR);
   scene.add(this.bbHelper);
 }
@@ -14343,6 +13672,21 @@ ObjectGroup.prototype.makePivot = function(offsetX, offsetY, offsetZ){
   var pseudoMesh = new THREE.Mesh(obj.mesh.geometry, obj.mesh.material);
   pseudoMesh.position.copy(obj.mesh.position);
   pseudoMesh.quaternion.copy(obj.mesh.quaternion);
+  if (this.isPhysicsSimplified){
+    if (this.pivotObject){
+      obj.pivotObject.pseudoMesh.remove(obj.physicsSimplificationObject3DContainer);
+      obj.physicsSimplificationObject3DContainer.position.copy(obj.mesh.position);
+      obj.physicsSimplificationObject3DContainer.quaternion.copy(obj.mesh.quaternion);
+      obj.physicsSimplificationObject3DContainer.updateMatrixWorld();
+      obj.physicsSimplificationObject3DContainer.updateMatrix();
+    }
+    pseudoMesh.updateMatrix();
+    pseudoMesh.updateMatrixWorld();
+    this.updateSimplifiedPhysicsBody();
+    this.physicsSimplificationObject3DContainer.quaternion.set(0, 0, 0, 1);
+    this.physicsSimplificationObject3DContainer.position.sub(pseudoMesh.position);
+    pseudoMesh.add(this.physicsSimplificationObject3DContainer);
+  }
   var pivot = new THREE.Object3D();
   pivot.add(pseudoMesh);
   pivot.position.set(
@@ -14369,11 +13713,15 @@ ObjectGroup.prototype.rotateAroundPivotObject = function(axis, radians){
   this.updatePivot();
   this.pivotObject.updateMatrix();
   this.pivotObject.updateMatrixWorld();
+  var axisVector;
   if (axis == "x"){
+    axisVector = THREE_AXIS_VECTOR_X;
     this.pivotObject.rotation.x += radians;
   }else if (axis == "y"){
+    axisVector = THREE_AXIS_VECTOR_Y;
     this.pivotObject.rotation.y += radians;
   }else if (axis == "z"){
+    axisVector = THREE_AXIS_VECTOR_Z;
     this.pivotObject.rotation.z += radians;
   }
   this.pivotObject.updateMatrix();
@@ -14383,8 +13731,17 @@ ObjectGroup.prototype.rotateAroundPivotObject = function(axis, radians){
   this.pivotObject.pseudoMesh.matrixWorld.decompose(REUSABLE_VECTOR, REUSABLE_QUATERNION, REUSABLE_VECTOR_2);
   this.mesh.position.copy(REUSABLE_VECTOR);
   this.mesh.quaternion.copy(REUSABLE_QUATERNION);
+
   this.physicsBody.quaternion.copy(this.mesh.quaternion);
   this.physicsBody.position.copy(this.mesh.position);
+  if (this.isPhysicsSimplified){
+    this.physicsSimplificationObject3D.updateMatrix();
+    this.physicsSimplificationObject3D.updateMatrixWorld();
+    this.physicsSimplificationObject3D.matrixWorld.decompose(REUSABLE_VECTOR, REUSABLE_QUATERNION, REUSABLE_VECTOR_2);
+    this.physicsBody.position.copy(REUSABLE_VECTOR);
+    this.physicsBody.quaternion.copy(REUSABLE_QUATERNION);
+  }
+
   if (this.mesh.visible){
     rayCaster.updateObject(this);
   }
@@ -14419,6 +13776,16 @@ ObjectGroup.prototype.copy = function(name, isHardCopy, copyPosition, gridSystem
   var totalEmissiveIntensityBeforeDetached;
   var totalEmissiveColorBeforeDetached;
   var oldMaterial = this.mesh.material;
+  var phsimplObj3DPos;
+  var phsimplObj3DQuat;
+  var phsimplContPos;
+  var phsimplContQuat;
+  if (this.isPhysicsSimplified){
+    phsimplObj3DPos = this.physicsSimplificationObject3D.position.clone();
+    phsimplObj3DQuat = this.physicsSimplificationObject3D.quaternion.clone();
+    phsimplContPos = this.physicsSimplificationObject3DContainer.position.clone();
+    phsimplContQuat = this.physicsSimplificationObject3DContainer.quaternion.clone();
+  }
   if (this.mesh.material.uniforms.totalAOIntensity){
     totalAOIntensityBeforeDetached = this.mesh.material.uniforms.totalAOIntensity.value;
   }
@@ -14453,6 +13820,10 @@ ObjectGroup.prototype.copy = function(name, isHardCopy, copyPosition, gridSystem
   var newObjGroup = new ObjectGroup(name, newGroup);
   newObjGroup.handleTextures();
   newObjGroup.glue();
+  if (this.isPhysicsSimplified){
+    newObjGroup.simplifyPhysics(this.physicsSimplificationParameters.sizeX, this.physicsSimplificationParameters.sizeY, this.physicsSimplificationParameters.sizeZ);
+    newObjGroup.updateSimplifiedPhysicsBody();
+  }
   newObjGroup.mesh.position.copy(copyPosition);
   newObjGroup.physicsBody.position.copy(copyPosition);
   newObjGroup.mesh.quaternion.copy(quaternionBeforeDetached);
@@ -14461,6 +13832,13 @@ ObjectGroup.prototype.copy = function(name, isHardCopy, copyPosition, gridSystem
   newObjGroup.graphicsGroup.quaternion.copy(newObjGroup.mesh.quaternion);
   this.glue();
   newObjGroup.isBasicMaterial = this.isBasicMaterial;
+  if (this.isPhysicsSimplified){
+    this.simplifyPhysics(this.physicsSimplificationParameters.sizeX, this.physicsSimplificationParameters.sizeY, this.physicsSimplificationParameters.sizeZ);
+    this.physicsSimplificationObject3D.position.copy(phsimplObj3DPos);
+    this.physicsSimplificationObject3D.quaternion.copy(phsimplObj3DQuat);
+    this.physicsSimplificationObject3DContainer.position.copy(phsimplContPos);
+    this.physicsSimplificationObject3DContainer.quaternion.copy(phsimplContQuat);
+  }
   this.physicsBody.position.copy(physicsPositionBeforeDetached);
   this.physicsBody.quaternion.copy(physicsQuaternionBeforeDetached);
   this.mesh.position.copy(positionBeforeDetached);
@@ -14553,7 +13931,10 @@ ObjectGroup.prototype.copy = function(name, isHardCopy, copyPosition, gridSystem
   }
 
   newObjGroup.createdWithScript = fromScript;
-
+  newObjGroup.copiedInitialCenter = {x: newObjGroup.mesh.position.x, y: newObjGroup.mesh.position.y, z: newObjGroup.mesh.position.z};
+  if (newObjGroup.isPhysicsSimplified){
+    newObjGroup.updateSimplifiedPhysicsBody();
+  }
   return newObjGroup;
 }
 
@@ -14624,6 +14005,73 @@ ObjectGroup.prototype.removeFog = function(){
   this.mesh.material.needsUpdate = true;
 }
 
+ObjectGroup.prototype.unsimplifyPhysics = function(){
+  physicsWorld.remove(this.physicsBody);
+  this.physicsBody = this.originalPhysicsBody;
+  physicsWorld.addBody(this.physicsBody);
+  this.isPhysicsSimplified = false;
+  delete this.physicsSimplificationObject3D;
+  delete this.physicsSimplificationObject3DContainer;
+  delete this.physicsSimplificationParameters;
+  this.physicsBody.position.copy(this.mesh.position);
+  this.physicsBody.quaternion.copy(this.mesh.quaternion);
+}
+
+ObjectGroup.prototype.simplifyPhysics = function(sizeX, sizeY, sizeZ){
+  if (!this.boundingBoxes){
+    this.generateBoundingBoxes();
+  }
+  physicsWorld.remove(this.physicsBody);
+  var box3 = new THREE.Box3();
+  for (var i = 0; i<this.boundingBoxes.length; i++){
+    box3.expandByPoint(this.boundingBoxes[i].min);
+    box3.expandByPoint(this.boundingBoxes[i].max);
+  }
+  box3.getCenter(REUSABLE_VECTOR);
+  var physicsShapeKey = "BOX" + PIPE + sizeX + PIPE + sizeY + PIPE + sizeZ;
+  newPhysicsShape = physicsShapeCache[physicsShapeKey];
+  if (!newPhysicsShape){
+    newPhysicsShape = new CANNON.Box(new CANNON.Vec3(sizeX, sizeY, sizeZ));
+    physicsShapeCache[physicsShapeKey] = newPhysicsShape;
+  }
+  var newPhysicsBody = new CANNON.Body({
+    mass: this.physicsBody.mass,
+    shape: newPhysicsShape,
+    material: this.originalPhysicsBody.material
+  });
+  newPhysicsBody.position.copy(REUSABLE_VECTOR);
+  newPhysicsBody.quaternion.copy(this.physicsBody.quaternion);
+  this.physicsBody = newPhysicsBody;
+  physicsWorld.addBody(this.physicsBody);
+  this.isPhysicsSimplified = true;
+  this.physicsSimplificationObject3D = new THREE.Object3D();
+  this.physicsSimplificationObject3D.rotation.order = 'YXZ';
+  this.physicsSimplificationObject3D.position.copy(this.physicsBody.position);
+  this.physicsSimplificationObject3D.quaternion.copy(this.physicsBody.quaternion);
+  this.physicsSimplificationObject3D.position.sub(this.mesh.position);
+  this.physicsSimplificationObject3DContainer = new THREE.Object3D();
+  this.physicsSimplificationObject3DContainer.position.copy(this.mesh.position);
+  this.physicsSimplificationObject3DContainer.quaternion.copy(this.mesh.quaternion);
+  this.physicsSimplificationObject3DContainer.add(this.physicsSimplificationObject3D);
+  if (this.pivotObject){
+    this.pivotObject.pseudoMesh.updateMatrix();
+    this.pivotObject.pseudoMesh.updateMatrixWorld();
+    this.updateSimplifiedPhysicsBody();
+    this.pivotObject.pseudoMesh.getWorldPosition(REUSABLE_VECTOR);
+    this.physicsSimplificationObject3DContainer.position.sub(REUSABLE_VECTOR);
+    this.pivotObject.pseudoMesh.add(this.physicsSimplificationObject3DContainer);
+    this.updateSimplifiedPhysicsBody();
+  }
+  this.physicsSimplificationParameters = {
+    sizeX: sizeX, sizeY: sizeY, sizeZ: sizeZ,
+    pbodyPosition: this.physicsBody.position, pbodyQuaternion: this.physicsBody.quaternion,
+    physicsSimplificationObject3DPosition: this.physicsSimplificationObject3D.position,
+    physicsSimplificationObject3DQuaternion: new CANNON.Quaternion().copy(this.physicsSimplificationObject3D.quaternion),
+    physicsSimplificationObject3DContainerPosition: this.physicsSimplificationObject3DContainer.position,
+    physicsSimplificationObject3DContainerQuaternion: new CANNON.Quaternion().copy(this.physicsSimplificationObject3DContainer.quaternion)
+  };
+}
+
 var MarkedPoint = function(name, x, y, z, fromX, fromY, fromZ, gridDestroyed){
   this.name = name;
   this.x = x;
@@ -14636,6 +14084,7 @@ var MarkedPoint = function(name, x, y, z, fromX, fromY, fromZ, gridDestroyed){
   if (!isDeployment){
     var txt = "@@1 (@@2, @@3, @@4)".replace("@@1", name).replace("@@2", x).replace("@@3", y).replace("@@4", z);
     this.text = new AddedText(null, defaultFont, txt, new THREE.Vector3(x, y, z), new THREE.Color("yellow"), 1, 15);
+    this.text.isEditorHelper = true;
     this.text.setBackground("magenta", 1);
     this.text.setMarginBetweenChars(7);
     this.text.refInnerHeight = 569;
@@ -17358,7 +16807,7 @@ Roygbiv.prototype.rotate = function(object, axis, radians){
   object.rotate(axis, radians, true);
 }
 
-Roygbiv.prototype.rotateAroundXYZ = function(object, x, y, z, radians, axis, skipLocalRotation){
+Roygbiv.prototype.rotateAroundXYZ = function(object, x, y, z, radians, axis){
   if (mode == 0){
     return;
   }
@@ -17380,37 +16829,14 @@ Roygbiv.prototype.rotateAroundXYZ = function(object, x, y, z, radians, axis, ski
           parentObject,
           x, y, z,
           radians,
-          axis,
-          skipLocalRotation
+          axis
         );
         return;
       }
     }
-    mesh = object.mesh;
   }else if (object.isObjectGroup){
-    mesh = object.mesh;
   }
-  var point = REUSABLE_VECTOR.set(x, y, z);
-  mesh.parent.localToWorld(mesh.position);
-  mesh.position.sub(point);
-  mesh.position.applyAxisAngle(axisVector, radians);
-  mesh.position.add(point);
-  mesh.parent.worldToLocal(mesh.position);
-  if (!skipLocalRotation){
-    mesh.rotateOnAxis(axisVector, radians);
-  }
-  if (object.isAddedObject){
-    object.setPhysicsAfterRotationAroundPoint(axis, radians);
-    if (object.mesh.visible){
-      rayCaster.updateObject(object);
-    }
-  }else if (object.isObjectGroup){
-    object.physicsBody.quaternion.copy(mesh.quaternion);
-    object.physicsBody.position.copy(mesh.position);
-    if (object.mesh.visible){
-      rayCaster.updateObject(object);
-    }
-  }
+  object.rotateAroundXYZ(x, y, z, axis, axisVector, radians);
 }
 
 Roygbiv.prototype.setPosition = function(obj, x, y, z){
@@ -17431,7 +16857,11 @@ Roygbiv.prototype.setPosition = function(obj, x, y, z){
   }else if (obj.isObjectGroup){
     obj.mesh.position.set(x, y, z);
     obj.graphicsGroup.position.set(x, y, z);
-    obj.physicsBody.position.set(x, y, z);
+    if (!obj.isPhysicsSimplified){
+      obj.physicsBody.position.set(x, y, z);
+    }else {
+      obj.updateSimplifiedPhysicsBody();
+    }
     if (obj.mesh.visible){
       rayCaster.updateObject(obj);
     }
@@ -20019,7 +19449,7 @@ Roygbiv.prototype.unsetBloom = function(){
   }
   adjustPostProcessing(5, false);
   if (!isDeployment){
-    postprocessingParameters["Bloom"] = false;
+    guiHandler.postprocessingParameters["Bloom"] = false;
   }
 }
 
@@ -21265,6 +20695,7 @@ Area.prototype.renderToScreen = function(){
   }
   if(!this.text){
     this.text = new AddedText(null, defaultFont, this.name, this.center, color, 1, 15);
+    this.text.isEditorHelper = true;
     this.text.setMarginBetweenChars(7);
     this.text.refInnerHeight = 569;
     this.text.refCharSize = 15;
@@ -21457,7 +20888,7 @@ var AddedText = function(name, font, text, position, color, alpha, characterSize
   webglCallbackHandler.registerEngineObject(this);
 }
 
-AddedText.prototype.destroy = function(){
+AddedText.prototype.destroy = function(skipRaycasterRefresh){
   for (var gridName in this.destroyedGrids){
     if (this.destroyedGrids[gridName].createdAddedTextName == this.name){
       delete this.destroyedGrids[gridName].createdAddedTextName;
@@ -21474,7 +20905,9 @@ AddedText.prototype.destroy = function(){
     this.rectangle.material.dispose();
     this.rectangle.geometry.dispose();
   }
-  rayCaster.refresh();
+  if (!skipRaycasterRefresh){
+    rayCaster.refresh();
+  }
   delete addedTexts[this.name];
   if (this.is2D){
     delete addedTexts2D[this.name];
@@ -21756,9 +21189,9 @@ AddedText.prototype.handleResize = function(){
         this.constructText();
         this.set2DCoordinates(this.marginPercentWidth, this.marginPercentHeight);
         iteration ++;
-        if (!isDeployment && textManipulationParameters){
-          textManipulationParameters["Char size"] = this.characterSize;
-          textManipulationParameters["Char margin"] = this.offsetBetweenChars;
+        if (!isDeployment && guiHandler.textManipulationParameters){
+          guiHandler.textManipulationParameters["Char size"] = this.characterSize;
+          guiHandler.textManipulationParameters["Char margin"] = this.offsetBetweenChars;
         }
       }
     }
@@ -21771,13 +21204,14 @@ AddedText.prototype.handleResize = function(){
         this.constructText();
         this.set2DCoordinates(this.marginPercentWidth, this.marginPercentHeight);
         iteration ++;
-        if (!isDeployment && textManipulationParameters){
-          textManipulationParameters["Char size"] = this.characterSize;
-          textManipulationParameters["Line margin"] = this.offsetBetweenLines;
+        if (!isDeployment && guiHandler.textManipulationParameters){
+          guiHandler.textManipulationParameters["Char size"] = this.characterSize;
+          guiHandler.textManipulationParameters["Line margin"] = this.offsetBetweenLines;
         }
       }
     }
   }
+  rayCaster.onAddedTextResize(this);
 }
 
 AddedText.prototype.getWidthPercent = function(){
@@ -22027,7 +21461,6 @@ AddedText.prototype.set2DStatus = function(is2D){
       scene.remove(this.bbHelper);
     }
   }
-  rayCaster.refresh();
 }
 
 AddedText.prototype.set2DCoordinates = function(marginPercentWidth, marginPercentHeight){
@@ -22288,7 +21721,7 @@ AreaConfigurationsHandler.prototype.generateConfigurations = function(singleArea
 
 AreaConfigurationsHandler.prototype.show = function(singleAreaName){
   this.generateConfigurations(singleAreaName);
-  datGuiAreaConfigurations = new dat.GUI();
+  guiHandler.datGuiAreaConfigurations = new dat.GUI();
   var pseudoAreas = areas;
   if (singleAreaName){
     pseudoAreas = new Object();
@@ -22297,11 +21730,11 @@ AreaConfigurationsHandler.prototype.show = function(singleAreaName){
     }
   }
   for (var areaName in pseudoAreas){
-    var areaFolder = datGuiAreaConfigurations.addFolder(areaName);
+    var areaFolder = guiHandler.datGuiAreaConfigurations.addFolder(areaName);
     this.addSubFolder(areaName, areaFolder);
   }
   if (!singleAreaName || (singleAreaName && singleAreaName.toLowerCase() == "default")){
-    var defaultFolder = datGuiAreaConfigurations.addFolder("default");
+    var defaultFolder = guiHandler.datGuiAreaConfigurations.addFolder("default");
     this.addSubFolder("default", defaultFolder);
   }
 }
@@ -22420,6 +21853,9 @@ RayCaster.prototype.onReady = function(){
   if (this.onReadyCallback){
     this.onReadyCallback();
   }
+}
+
+RayCaster.prototype.onAddedTextResize = function(){
 }
 
 RayCaster.prototype.flush = function(){
@@ -23281,7 +22717,7 @@ ModeSwitcher.prototype.commonSwitchFunctions = function(){
   if (!isDeployment){
     guiHandler.hideAll();
     if (areaConfigurationsVisible){
-      guiHandler.hide(datGuiAreaConfigurations);
+      guiHandler.hide(guiHandler.datGuiAreaConfigurations);
       areaConfigurationsVisible = false;
     }
     selectionHandler.resetCurrentSelection();
@@ -23307,16 +22743,18 @@ ModeSwitcher.prototype.switchFromDesignToPreview = function(){
   TOTAL_PARTICLE_COLLISION_LISTEN_COUNT = 0;
   TOTAL_PARTICLE_SYSTEM_COLLISION_LISTEN_COUNT = 0;
   TOTAL_PARTICLE_SYSTEMS_WITH_PARTICLE_COLLISIONS = 0;
-  originalBloomConfigurations.bloomStrength = bloomStrength;
-  originalBloomConfigurations.bloomRadius = bloomRadius;
-  originalBloomConfigurations.bloomThreshold = bloomThreshold;
-  originalBloomConfigurations.bloomResolutionScale = bloomResolutionScale;
-  originalBloomConfigurations.bloomOn = bloomOn;
-  postprocessingParameters["Bloom_strength"] = bloomStrength;
-  postprocessingParameters["Bloom_radius"] = bloomRadius;
-  postprocessingParameters["Bloom_threshhold"] = bloomThreshold;
-  postprocessingParameters["Bloom_resolution_scale"] = bloomResolutionScale;
-  postprocessingParameters["Bloom"] = bloomOn;
+  if (!isDeployment){
+    originalBloomConfigurations.bloomStrength = bloomStrength;
+    originalBloomConfigurations.bloomRadius = bloomRadius;
+    originalBloomConfigurations.bloomThreshold = bloomThreshold;
+    originalBloomConfigurations.bloomResolutionScale = bloomResolutionScale;
+    originalBloomConfigurations.bloomOn = bloomOn;
+    guiHandler.postprocessingParameters["Bloom_strength"] = bloomStrength;
+    guiHandler.postprocessingParameters["Bloom_radius"] = bloomRadius;
+    guiHandler.postprocessingParameters["Bloom_threshhold"] = bloomThreshold;
+    guiHandler.postprocessingParameters["Bloom_resolution_scale"] = bloomResolutionScale;
+    guiHandler.postprocessingParameters["Bloom"] = bloomOn;
+  }
   for (var gsName in gridSystems){
     scene.remove(gridSystems[gsName].gridSystemRepresentation);
     scene.remove(gridSystems[gsName].boundingPlane);
@@ -23720,10 +23158,65 @@ FPSHandler.prototype.initiatePerformanceDropMonitoring = function(minFPS, second
 }
 
 var WebGLCallbackHandler = function(){
+  this.record = false;
+  this.performanceLogs = {
+    drawElementsInstancedANGLE: 0,
+    drawArraysInstancedANGLE: 0,
+    drawElements: 0,
+    drawArrays: 0,
+    uniformMatrix4fv: 0,
+    uniformMatrix3fv: 0,
+    uniformMatrix2fv: 0,
+    uniform4iv: 0,
+    uniform3iv: 0,
+    uniform2iv: 0,
+    uniform1iv: 0,
+    uniform4fv: 0,
+    uniform3fv: 0,
+    uniform2fv: 0,
+    uniform1fv: 0,
+    uniform1i: 0,
+    uniform4f: 0,
+    uniform3f: 0,
+    uniform2f: 0,
+    uniform1f: 0,
+    blendFuncSeparate: 0,
+    blendFunc: 0,
+    blendEquationSeparate: 0,
+    blendEquation: 0,
+    useProgram: 0,
+    linkProgram: 0,
+    attachShader: 0,
+    compileShader: 0,
+    shaderSource: 0,
+    activeTexture: 0,
+    bindTexture: 0,
+    vertexAttribPointer: 0,
+    bindBuffer: 0
+  }
   this.doNotCache = false;
   this.gl = renderer.context;
   this.vertexAttribPointerCache = new Map();
   this.bindedCubeTextureCache = new Map();
+}
+
+WebGLCallbackHandler.prototype.dumpPerformanceLogs = function(){
+  var sum = 0;
+  var pseudoAry = [];
+  for (var key in this.performanceLogs){
+    sum += this.performanceLogs[key];
+    pseudoAry.push({
+      name: key,
+      value: this.performanceLogs[key]
+    })
+  }
+  pseudoAry.sort(function(obj1, obj2){
+    return obj2.value - obj1.value
+  });
+  console.log("Total time: "+sum+" ms.")
+  for (var i = 0; i<pseudoAry.length; i++){
+    console.log("["+pseudoAry[i].name+"] -> "+pseudoAry[i].value+" ms.");
+  }
 }
 
 WebGLCallbackHandler.prototype.registerEngineObject = function(object){
@@ -23784,90 +23277,223 @@ WebGLCallbackHandler.prototype.onCreateShader = function(){
 }
 
 WebGLCallbackHandler.prototype.onBeforeDrawElementsInstancedANGLE = function(ext, mode, count, type, offset, maxCount){
-  ext.drawElementsInstancedANGLE(mode, count, type, offset, maxCount);
+  if (this.record){
+    s = performance.now();
+    ext.drawElementsInstancedANGLE(mode, count, type, offset, maxCount);
+    this.performanceLogs.drawElementsInstancedANGLE = performance.now() - s;
+  }else{
+    ext.drawElementsInstancedANGLE(mode, count, type, offset, maxCount);
+  }
 }
 
 WebGLCallbackHandler.prototype.onBeforeDrawArraysInstancedANGLE = function(ext, mode, start, count, maxCount){
-  ext.drawArraysInstancedANGLE(mode, start, count, maxCount);
+  if (this.record){
+    s = performance.now();
+    ext.drawArraysInstancedANGLE(mode, start, count, maxCount);
+    this.performanceLogs.drawArraysInstancedANGLE = performance.now() - s;
+  }else{
+    ext.drawArraysInstancedANGLE(mode, start, count, maxCount);
+  }
 }
 
 WebGLCallbackHandler.prototype.onBeforeDrawElements = function(mode, count, type, offset){
-  this.gl.drawElements(mode, count, type, offset);
+  if (this.record){
+    s = performance.now();
+    this.gl.drawElements(mode, count, type, offset);
+    this.performanceLogs.drawElements = performance.now() - s;
+  }else{
+    this.gl.drawElements(mode, count, type, offset);
+  }
 }
 
 WebGLCallbackHandler.prototype.onBeforeDrawArrays = function(mode, start, count){
-  this.gl.drawArrays(mode, start, count);
+  if (this.record){
+    s = performance.now();
+    this.gl.drawArrays(mode, start, count);
+    this.performanceLogs.drawArrays = performance.now() - s;
+  }else{
+    this.gl.drawArrays(mode, start, count);
+  }
 }
 
 WebGLCallbackHandler.prototype.onBeforeUniformMatrix4fv = function(location, transpose, v){
-  this.gl.uniformMatrix4fv(location, transpose, v);
+  if (this.record){
+    var s = performance.now();
+    this.gl.uniformMatrix4fv(location, transpose, v);
+    this.performanceLogs.uniformMatrix4fv = performance.now() - s;
+  }else{
+    this.gl.uniformMatrix4fv(location, transpose, v);
+  }
 }
 
 WebGLCallbackHandler.prototype.onBeforeUniformMatrix3fv = function(location, transpose, v){
-  this.gl.uniformMatrix3fv(location, transpose, v);
+  if (this.record){
+    var s = performance.now();
+    this.gl.uniformMatrix3fv(location, transpose, v);
+    this.performanceLogs.uniformMatrix3fv = performance.now() - s;
+  }else{
+    this.gl.uniformMatrix3fv(location, transpose, v);
+  }
 }
 
 WebGLCallbackHandler.prototype.onBeforeUniformMatrix2fv = function(location, transpose, v){
-  this.gl.uniformMatrix2fv(location, transpose, v);
+  if (this.record){
+    var s = performance.now();
+    this.gl.uniformMatrix2fv(location, transpose, v);
+    this.performanceLogs.uniformMatrix2fv = performance.now() - s;
+  }else{
+    this.gl.uniformMatrix2fv(location, transpose, v);
+  }
 }
 
 WebGLCallbackHandler.prototype.onBeforeUniform4iv = function(location, v){
-  this.gl.uniform4iv(location, v);
+  if (this.record){
+    var s = performance.now();
+    this.gl.uniform4iv(location, v);
+    this.performanceLogs.uniform4iv = performance.now() - s;
+  }else{
+    this.gl.uniform4iv(location, v);
+  }
 }
 
 WebGLCallbackHandler.prototype.onBeforeUniform3iv = function(location, v){
-  this.gl.uniform3iv(location, v);
+  if (this.record){
+    var s = performance.now();
+    this.gl.uniform3iv(location, v);
+    this.performanceLogs.uniform3iv = performance.now() - s;
+  }else{
+    this.gl.uniform3iv(location, v);
+  }
 }
 
 WebGLCallbackHandler.prototype.onBeforeUniform2iv = function(location, v){
-  this.gl.uniform2iv(location, v);
+  if (this.record){
+    var s = performance.now();
+    this.gl.uniform2iv(location, v);
+    this.performanceLogs.uniform2iv = performance.now() - s;
+  }else{
+    this.gl.uniform2iv(location, v);
+  }
 }
 
 WebGLCallbackHandler.prototype.onBeforeUniform1iv = function(location, v){
-  this.gl.uniform1iv(location, v);
+  if (this.record){
+    var s = performance.now();
+    this.gl.uniform1iv(location, v);
+    this.performanceLogs.uniform1iv = performance.now() - s;
+  }else{
+    this.gl.uniform1iv(location, v);
+  }
 }
 
 WebGLCallbackHandler.prototype.onBeforeUniform4fv = function(location, v){
-  this.gl.uniform4fv(location, v);}
+  if (this.record){
+    var s = performance.now();
+    this.gl.uniform4fv(location, v);
+    this.performanceLogs.uniform4fv = performance.now() - s;
+  }else{
+    this.gl.uniform4fv(location, v);
+  }
+}
 
 WebGLCallbackHandler.prototype.onBeforeUniform3fv = function(location, v){
-  this.gl.uniform3fv(location, v);
+  if (this.record){
+    var s = performance.now();
+    this.gl.uniform3fv(location, v);
+    this.performanceLogs.uniform3fv = performance.now() - s;
+  }else{
+    this.gl.uniform3fv(location, v);
+  }
 }
 
 WebGLCallbackHandler.prototype.onBeforeUniform2fv = function(location, v){
-  this.gl.uniform2fv(location, v);
+  if (this.record){
+    var s = performance.now();
+    this.gl.uniform2fv(location, v);
+    this.performanceLogs.uniform2fv = performance.now() - s;
+  }else{
+    this.gl.uniform2fv(location, v);
+  }
 }
 
 WebGLCallbackHandler.prototype.onBeforeUniform1fv = function(location, v){
-  this.gl.uniform1fv(location, v);
+  if (this.record){
+    var s = performance.now();
+    this.gl.uniform1fv(location, v);
+    this.performanceLogs.uniform1fv = performance.now() - s;
+  }else{
+    this.gl.uniform1fv(location, v);
+  }
 }
 
 WebGLCallbackHandler.prototype.onBeforeUniform1i = function(location, unit){
-  this.gl.uniform1i(location, unit);
+  if (this.record){
+    var s = performance.now();
+    this.gl.uniform1i(location, unit);
+    this.performanceLogs.uniform1i = performance.now() - s;
+  }else{
+    this.gl.uniform1i(location, unit);
+  }
 }
 
 WebGLCallbackHandler.prototype.onBeforeUniform4f = function(location, v0, v1, v2, v3){
-  this.gl.uniform4f(location, v0, v1, v2, v3);
+  if (this.record){
+    var s = performance.now();
+    this.gl.uniform4f(location, v0, v1, v2, v3);
+    this.performanceLogs.uniform4f = performance.now() - s;
+  }else{
+    this.gl.uniform4f(location, v0, v1, v2, v3);
+  }
 }
 
 WebGLCallbackHandler.prototype.onBeforeUniform3f = function(location, v0, v1, v2){
-  this.gl.uniform3f(location, v0, v1, v2);
+  if (this.record){
+    var s = performance.now();
+    this.gl.uniform3f(location, v0, v1, v2);
+    this.performanceLogs.uniform3f = performance.now() - s;
+  }else{
+    this.gl.uniform3f(location, v0, v1, v2);
+  }
 }
 
 WebGLCallbackHandler.prototype.onBeforeUniform2f = function(location, v0, v1){
-  this.gl.uniform2f(location, v0, v1);
+  if (this.record){
+    var s = performance.now();
+    this.gl.uniform2f(location, v0, v1);
+    this.performanceLogs.uniform2f = performance.now() - s;
+  }else{
+    this.gl.uniform2f(location, v0, v1);
+  }
 }
 
 WebGLCallbackHandler.prototype.onBeforeUniform1f = function(location, v0){
-  this.gl.uniform1f(location, v0);
+  if (this.record){
+    var s = performance.now();
+    this.gl.uniform1f(location, v0);
+    this.performanceLogs.uniform1f = performance.now() - s;
+  }else{
+    this.gl.uniform1f(location, v0);
+  }
 }
 
 WebGLCallbackHandler.prototype.onBeforeBlendFuncSeparate = function(srcRGB, dstRGB, srcAlpha, dstAlpha, lineID){
-  this.gl.blendFuncSeparate(srcRGB, dstRGB, srcAlpha, dstAlpha);
+  if (this.record){
+    var s = performance.now();
+    this.gl.blendFuncSeparate(srcRGB, dstRGB, srcAlpha, dstAlpha);
+    this.performanceLogs.blendFuncSeparate = performance.now() - s;
+  }else{
+    this.gl.blendFuncSeparate(srcRGB, dstRGB, srcAlpha, dstAlpha);
+  }
 }
 
 WebGLCallbackHandler.prototype.onBeforeBlendFunc = function(sFactor, dFactor, lineID){
-  this.gl.blendFunc(sFactor, dFactor);
+  if (this.record){
+    var s = performance.now();
+    this.gl.blendFunc(sFactor, dFactor);
+    this.performanceLogs.blendFunc = performance.now() - s;
+  }else{
+    this.gl.blendFunc(sFactor, dFactor);
+  }
 }
 
 WebGLCallbackHandler.prototype.onBeforeBlendEquationSeparate = function(func, funcAlpha, lineID){
@@ -23878,7 +23504,13 @@ WebGLCallbackHandler.prototype.onBeforeBlendEquationSeparate = function(func, fu
       }
     }
   }
-  this.gl.blendEquationSeparate(func, funcAlpha);
+  if (this.record){
+    var s = performance.now();
+    this.gl.blendEquationSeparate(func, funcAlpha);
+    this.performanceLogs.blendEquationSeparate = performance.now() - s;
+  }else{
+    this.gl.blendEquationSeparate(func, funcAlpha);
+  }
   if (!this.doNotCache){
     this.blendEquationRGBCache = func;
     this.blendEquationAlphaCache = funcAlpha;
@@ -23893,7 +23525,13 @@ WebGLCallbackHandler.prototype.onBeforeBlendEquation = function(func, lineID){
       }
     }
   }
-  this.gl.blendEquation(func);
+  if (this.record){
+    var s = performance.now();
+    this.gl.blendEquation(func);
+    this.performanceLogs.blendEquation = performance.now() - s;
+  }else{
+    this.gl.blendEquation(func);
+  }
   if (!this.doNotCache){
     this.blendEquationRGBCache = func;
     this.blendEquationAlphaCache = func;
@@ -23901,30 +23539,66 @@ WebGLCallbackHandler.prototype.onBeforeBlendEquation = function(func, lineID){
 }
 
 WebGLCallbackHandler.prototype.onBeforeUseProgram = function(program){
-  this.gl.useProgram(program);
+  if (this.record){
+    var s = performance.now();
+    this.gl.useProgram(program);
+    this.performanceLogs.useProgram = performance.now() - s;
+  }else{
+    this.gl.useProgram(program);
+  }
 }
 
 WebGLCallbackHandler.prototype.onBeforeLinkProgram = function(program){
-  this.gl.linkProgram(program);
+  if (this.record){
+    var s = performance.now();
+    this.gl.linkProgram(program);
+    this.performanceLogs.linkProgram = performance.now() - s;
+  }else{
+    this.gl.linkProgram(program);
+  }
 }
 
 WebGLCallbackHandler.prototype.onBeforeAttachShader = function(program, shader){
-  this.gl.attachShader(program, shader);
+  if (this.record){
+    var s = performance.now();
+    this.gl.attachShader(program, shader);
+    this.performanceLogs.attachShader = performance.now() - s;
+  }else{
+    this.gl.attachShader(program, shader);
+  }
 }
 
 WebGLCallbackHandler.prototype.onBeforeCompileShader = function(shader){
-  this.gl.compileShader(shader);
+  if (this.record){
+    var s = performance.now();
+    this.gl.compileShader(shader);
+    this.performanceLogs.compileShader = performance.now() - s;
+  }else{
+    this.gl.compileShader(shader);
+  }
 }
 
 WebGLCallbackHandler.prototype.onBeforeShaderSource = function(shader, string){
-  this.gl.shaderSource(shader, string);
+  if (this.record){
+    var s = performance.now();
+    this.gl.shaderSource(shader, string);
+    this.performanceLogs.shaderSource = performance.now() - s;
+  }else{
+    this.gl.shaderSource(shader, string);
+  }
 }
 
 WebGLCallbackHandler.prototype.onBeforeActiveTexture = function(slot){
   if (!this.doNotCache){
     this.activeTextureSlot = slot;
   }
-  this.gl.activeTexture(slot);
+  if (this.record){
+    var s = performance.now();
+    this.gl.activeTexture(slot);
+    this.performanceLogs.activeTexture = performance.now() - s;
+  }else{
+    this.gl.activeTexture(slot);
+  }
 }
 
 WebGLCallbackHandler.prototype.onBeforeBindTexture = function(type, texture, lineID){
@@ -23938,7 +23612,13 @@ WebGLCallbackHandler.prototype.onBeforeBindTexture = function(type, texture, lin
       }
     }
   }
-  this.gl.bindTexture(type, texture);
+  if (this.record){
+    var s = performance.now();
+    this.gl.bindTexture(type, texture);
+    this.performanceLogs.bindTexture = performance.now() - s;
+  }else{
+    this.gl.bindTexture(type, texture);
+  }
   if (!this.doNotCache && !curCachedElement && this.activeTextureSlot && isCubeTexture){
     this.bindedCubeTextureCache.set(this.activeTextureSlot, texture);
   }
@@ -23961,7 +23641,13 @@ WebGLCallbackHandler.prototype.onBeforeVertexAttribPointer = function(index, siz
       }
     }
   }
-  this.gl.vertexAttribPointer(index, size, type, normalized, stride, offset);
+  if (this.record){
+    var s = performance.now();
+    this.gl.vertexAttribPointer(index, size, type, normalized, stride, offset);
+    this.performanceLogs.vertexAttribPointer = performance.now() - s;
+  }else{
+    this.gl.vertexAttribPointer(index, size, type, normalized, stride, offset);
+  }
   if (!this.doNotCache){
     if (curCachedElement){
       curCachedElement.size = size;
@@ -23992,12 +23678,24 @@ WebGLCallbackHandler.prototype.onBeforeBindBuffer = function(isElementArrayBuffe
     }
   }
   if (isElementArrayBuffer){
-    this.gl.bindBuffer(this.gl.ELEMENT_ARRAY_BUFFER, buffer);
+    if (this.record){
+      var s = performance.now();
+      this.gl.bindBuffer(this.gl.ELEMENT_ARRAY_BUFFER, buffer);
+      this.performanceLogs.bindBuffer = performance.now() - s;
+    }else{
+      this.gl.bindBuffer(this.gl.ELEMENT_ARRAY_BUFFER, buffer);
+    }
     if (!this.doNotCache){
       this.lastBindElementArrayBuffer = buffer;
     }
   }else{
-    this.gl.bindBuffer(this.gl.ARRAY_BUFFER, buffer);
+    if (this.record){
+      var s = performance.now();
+      this.gl.bindBuffer(this.gl.ARRAY_BUFFER, buffer);
+      this.performanceLogs.bindBuffer = performance.now() - s;
+    }else{
+      this.gl.bindBuffer(this.gl.ARRAY_BUFFER, buffer);
+    }
     if (!this.doNotCache){
       this.lastBindArrayBuffer = buffer;
     }
@@ -24195,11 +23893,13 @@ var RaycasterWorkerBridge = function(){
   this.worker = new Worker("./js/worker/RaycasterWorker.js");
   this.workerMessageHandler = new WorkerMessageHandler(this.worker);
   this.updateBuffer = new Map();
+  this.textScaleUpdateBuffer = new Map();
   this.hasUpdatedTexts = false;
   this.objectBufferSize = 10;
   this.textBufferSize = 10;
+  this.textScaleBufferSize = 10;
   this.intersectionTestBufferSize = 10;
-  this.cameraOrientationAndViewportBufferSize = 10;
+  this.cameraOrientationBufferSize = 10;
   this.hideShowBufferSize = 10;
   this.ready = false;
   this.worker.addEventListener("message", function(msg){
@@ -24211,6 +23911,8 @@ var RaycasterWorkerBridge = function(){
       rayCaster.objectGroupsUpdateBuffer = new Object();
       rayCaster.addedTextsUpdateBuffer = [];
       rayCaster.addedTextsUpdateBufferAvailibilities = [];
+      rayCaster.addedTextsScaleUpdateBuffer = [];
+      rayCaster.addedTextsScaleUpdateBufferAvailibilities = [];
       rayCaster.hideShowBuffer = [];
       rayCaster.hideShowBufferAvailibilities = [];
       for (var i = 0; i<msg.data.ids.length; i++){
@@ -24251,18 +23953,21 @@ var RaycasterWorkerBridge = function(){
           rayCaster.objectsByWorkerID[msg.data.ids[i].id] = addedTexts[msg.data.ids[i].name];
           rayCaster.idsByObjectNames[msg.data.ids[i].name] = msg.data.ids[i].id;
           for (var x = 0; x<rayCaster.textBufferSize; x++){
-            rayCaster.addedTextsUpdateBuffer.push(new Float32Array(39));
+            rayCaster.addedTextsUpdateBuffer.push(new Float32Array(6));
             rayCaster.addedTextsUpdateBufferAvailibilities.push(true);
           }
-          if (mode == 1 && addedTexts[msg.data.ids[i].name].isClickable && !addedTexts[msg.data.ids[i].name].is2D){
+          if (mode == 0 || (mode == 1 && addedTexts[msg.data.ids[i].name].isClickable && !addedTexts[msg.data.ids[i].name].is2D)){
             for (var x = 0; x<rayCaster.hideShowBufferSize; x++){
               rayCaster.hideShowBuffer.push(new Float32Array(3));
               rayCaster.hideShowBufferAvailibilities.push(true);
             }
-          }else if (mode == 0){
-            for (var x = 0; x<rayCaster.hideShowBufferSize; x++){
-              rayCaster.hideShowBuffer.push(new Float32Array(3));
-              rayCaster.hideShowBufferAvailibilities.push(true);
+            for (var x = 0; x<rayCaster.cameraOrientationBufferSize; x++){
+              rayCaster.cameraOrientationUpdateBuffer.push(new Float32Array(10));
+              rayCaster.cameraOrientationUpdateBufferAvailibilities.push(true);
+            }
+            for (var x = 0; x<rayCaster.textScaleBufferSize; x++){
+              rayCaster.addedTextsScaleUpdateBuffer.push(new Float32Array(13));
+              rayCaster.addedTextsScaleUpdateBufferAvailibilities.push(true);
             }
           }
         }else{
@@ -24301,8 +24006,8 @@ var RaycasterWorkerBridge = function(){
             rayCaster.cameraOrientationUpdateBufferAvailibilities[bufID] = true;
           }else if (ary[0] == 3){
             var bufID = ary[1];
-            rayCaster.viewportUpdateBuffer[bufID] = ary;
-            rayCaster.viewportUpdateBufferAvailibilities[bufID] = true;
+            rayCaster.addedTextsScaleUpdateBuffer[bufID] = ary;
+            rayCaster.addedTextsScaleUpdateBufferAvailibilities[bufID] = true;
           }else if (ary[0] == 4){
             var bufID = ary[1];
             rayCaster.addedTextsUpdateBuffer[bufID] = ary;
@@ -24322,18 +24027,10 @@ var RaycasterWorkerBridge = function(){
   this.intersectionTestCallbackFunctions = [];
   this.cameraOrientationUpdateBuffer = [];
   this.cameraOrientationUpdateBufferAvailibilities = [];
-  this.viewportUpdateBuffer = [];
-  this.viewportUpdateBufferAvailibilities = [];
   for (var i = 0; i<this.intersectionTestBufferSize; i++){
     this.intersectionTestBuffers.push(new Float32Array(8));
     this.intersectionTestBufferAvailibilities.push(true);
     this.intersectionTestCallbackFunctions.push(function(){});
-  }
-  for (var i = 0; i<this.cameraOrientationAndViewportBufferSize; i++){
-    this.cameraOrientationUpdateBuffer.push(new Float32Array(10));
-    this.cameraOrientationUpdateBufferAvailibilities.push(true);
-    this.viewportUpdateBuffer.push(new Float32Array(7));
-    this.viewportUpdateBufferAvailibilities.push(true);
   }
   // ***************************************************************
   this.onShiftPress = function(isPressed){
@@ -24342,7 +24039,31 @@ var RaycasterWorkerBridge = function(){
         "shiftPress": {isPressed: isPressed}
       })
     }
-  }
+  };
+  this.updateAddedTextScale = function(addedText){
+    var scaleBufferSent = false;
+    var len = rayCaster.addedTextsScaleUpdateBuffer.length;
+    for (var i = 0; i<len; i++){
+      if (rayCaster.addedTextsScaleUpdateBufferAvailibilities[i]){
+        var buf = rayCaster.addedTextsScaleUpdateBuffer[i];
+        buf[0] = 3;
+        buf[1] = i;
+        buf[2] = rayCaster.idsByObjectNames[addedText.name];
+        buf[3] = addedText.characterSize;
+        buf[4] = addedText.bottomRight.x; buf[5] = addedText.bottomRight.y; buf[6] = addedText.bottomRight.z;
+        buf[7] = addedText.topRight.x; buf[8] = addedText.topRight.y; buf[9] = addedText.topRight.z;
+        buf[10] = addedText.bottomLeft.x; buf[11] = addedText.bottomLeft.y; buf[12] = addedText.bottomLeft.z;
+        rayCaster.workerMessageHandler.push(buf.buffer);
+        rayCaster.addedTextsScaleUpdateBufferAvailibilities[i] = false;
+        rayCaster.workerMessageHandler.flush();
+        scaleBufferSent = true;
+        return;
+      }
+    }
+    if (!scaleBufferSent){
+      console.warn("[!] RaycasterWorkerBridge.issueUpdate text scale buffer overflow.");
+    }
+  };
 }
 
 RaycasterWorkerBridge.prototype.onReady = function(){
@@ -24364,8 +24085,25 @@ RaycasterWorkerBridge.prototype.refresh = function(){
   this.worker.postMessage(new LightweightState());
 }
 
+RaycasterWorkerBridge.prototype.onAddedTextResize = function(addedText){
+  if (!rayCaster.ready){
+    return;
+  }
+  if (addedText.isEditorHelper){
+    return;
+  }
+  if (!addedText.is2D){
+    if (mode == 0 || (mode == 1 && addedText.isClickable)){
+      rayCaster.textScaleUpdateBuffer.set(addedText.name, addedText);
+    }
+  }
+}
+
 RaycasterWorkerBridge.prototype.updateObject = function(obj){
   if (mode == 1 && (obj.isAddedObject || obj.isObjectGroup) && !obj.isIntersectable){
+    return;
+  }
+  if (obj.isAddedText && obj.isEditorHelper){
     return;
   }
   this.updateBuffer.set(obj.name, obj);
@@ -24375,9 +24113,10 @@ RaycasterWorkerBridge.prototype.updateObject = function(obj){
 }
 
 RaycasterWorkerBridge.prototype.onBeforeUpdate = function(){
+  rayCaster.textScaleUpdateBuffer.forEach(rayCaster.updateAddedTextScale);
+  rayCaster.textScaleUpdateBuffer.clear();
   if (rayCaster.hasUpdatedTexts){
     var cameraOrientationUpdateBufferSent = false;
-    var viewportUpdateBufferSent = false;
     for (var i = 0; i<rayCaster.cameraOrientationUpdateBuffer.length; i++){
       if (rayCaster.cameraOrientationUpdateBufferAvailibilities[i]){
         var buf = rayCaster.cameraOrientationUpdateBuffer[i];
@@ -24392,25 +24131,8 @@ RaycasterWorkerBridge.prototype.onBeforeUpdate = function(){
         break;
       }
     }
-    for (var i = 0; i<rayCaster.viewportUpdateBuffer.length; i++){
-      if (rayCaster.viewportUpdateBufferAvailibilities[i]){
-        var buf = rayCaster.viewportUpdateBuffer[i];
-        var vp = renderer.getCurrentViewport();
-        buf[0] = 3;
-        buf[1] = i;
-        buf[2] = vp.x; buf[3] = vp.y; buf[4] = vp.z; buf[5] = vp.w;
-        buf[6] = screenResolution;
-        rayCaster.workerMessageHandler.push(buf.buffer);
-        rayCaster.viewportUpdateBufferAvailibilities[i] = false;
-        viewportUpdateBufferSent = true;
-        break;
-      }
-    }
     if (!cameraOrientationUpdateBufferSent){
       console.warn("[!] RaycasterWorkerBridge.issueUpdate camera orientation buffer overflow.");
-    }
-    if (!viewportUpdateBufferSent){
-      console.warn("[!] RaycasterWorkerBridge.issueUpdate viewport buffer overflow.");
     }
     this.hasUpdatedTexts = false;
   }
@@ -24452,28 +24174,35 @@ RaycasterWorkerBridge.prototype.issueUpdate = function(obj){
     if (!rayCaster.addedTextsUpdateBuffer){
       return;
     }
-    var len = rayCaster.addedTextsUpdateBuffer.length;
-    for (var i = 0; i<len; i++){
-      if (rayCaster.addedTextsUpdateBufferAvailibilities[i]){
-        var buf = rayCaster.addedTextsUpdateBuffer[i];
-        buf[0] = 4;
-        buf[1] = i;
-        buf[2] = rayCaster.idsByObjectNames[obj.name];
-        var mesh = obj.mesh;
-        buf[3] = mesh.position.x; buf[4] = mesh.position.y; buf[5] = mesh.position.z;
-        buf[6] = mesh.quaternion.x; buf[7] = mesh.quaternion.y; buf[8] = mesh.quaternion.z; buf[9] = mesh.quaternion.w;
-        buf.set(mesh.modelViewMatrix.elements, 10);
-        buf[26] = obj.characterSize;
-        buf[27] = obj.topLeft.x; buf[28] = obj.topLeft.y; buf[29] = obj.topLeft.z;
-        buf[30] = obj.bottomRight.x; buf[31] = obj.bottomRight.y; buf[32] = obj.bottomRight.z;
-        buf[33] = obj.topRight.x; buf[34] = obj.topRight.y; buf[35] = obj.topRight.z;
-        buf[36] = obj.bottomLeft.x; buf[37] = obj.bottomLeft.y; buf[38] = obj.bottomLeft.z;
-        rayCaster.workerMessageHandler.push(buf.buffer);
-        rayCaster.addedTextsUpdateBufferAvailibilities[i] = false;
-        return;
-      }
+    var updateAddedTextPosition = false;
+    if (!rayCaster.addedTextPositionUpdateCache){
+      rayCaster.addedTextPositionUpdateCache = new Object();
+      rayCaster.addedTextPositionUpdateCache[obj.name] = new THREE.Vector3();
+      updateAddedTextPosition = true;
+    }else if (!rayCaster.addedTextPositionUpdateCache[obj.name]){
+      rayCaster.addedTextPositionUpdateCache[obj.name] = new THREE.Vector3();
+      updateAddedTextPosition = true;
+    }else{
+      var cache = rayCaster.addedTextPositionUpdateCache[obj.name]
+      updateAddedTextPosition = ((cache.x != obj.mesh.position.x) || (cache.y != obj.mesh.position.y) || (cache.z != obj.mesh.position.z));
     }
-    console.warn("[!] RaycasterWorkerBridge.issueUpdate added text buffer overflow.");
+    if (updateAddedTextPosition){
+      var len = rayCaster.addedTextsUpdateBuffer.length;
+      for (var i = 0; i<len; i++){
+        if (rayCaster.addedTextsUpdateBufferAvailibilities[i]){
+          var buf = rayCaster.addedTextsUpdateBuffer[i];
+          buf[0] = 4;
+          buf[1] = i;
+          buf[2] = rayCaster.idsByObjectNames[obj.name];
+          buf[3] = obj.mesh.position.x; buf[4] = obj.mesh.position.y; buf[5] = obj.mesh.position.z;
+          rayCaster.workerMessageHandler.push(buf.buffer);
+          rayCaster.addedTextsUpdateBufferAvailibilities[i] = false;
+          rayCaster.addedTextPositionUpdateCache[obj.name].set(obj.mesh.position.x, obj.mesh.position.y, obj.mesh.position.z);
+          return;
+        }
+      }
+      console.warn("[!] RaycasterWorkerBridge.issueUpdate added text buffer overflow.");
+    }
   }
 }
 
@@ -25180,7 +24909,7 @@ KeyboardEventHandler.prototype.onKeyDown = function(event){
         terminal.printInfo(Text.OBJECT_DESTROYED);
         selectionHandler.resetCurrentSelection();
         if (areaConfigurationsVisible){
-          guiHandler.hide(datGuiAreaConfigurations);
+          guiHandler.hide(guiHandler.datGuiAreaConfigurations);
           areaConfigurationsVisible = false;
         }
       }else if (currentSelection.isObjectGroup){
@@ -25190,7 +24919,7 @@ KeyboardEventHandler.prototype.onKeyDown = function(event){
         terminal.clear();
         terminal.printInfo(Text.OBJECT_DESTROYED);
         if (areaConfigurationsVisible){
-          guiHandler.hide(datGuiAreaConfigurations);
+          guiHandler.hide(guiHandler.datGuiAreaConfigurations);
           areaConfigurationsVisible = false;
         }
       }else if (currentSelection.isAddedText){
