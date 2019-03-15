@@ -156,6 +156,8 @@ GUIHandler.prototype.afterObjectSelection = function(){
       if (obj.mesh.material.blending == NO_BLENDING){
         guiHandler.disableController(omOpacityController);
       }
+      objectManipulationParameters["Phy. simpl."] = false;
+      guiHandler.disableController(omPhysicsSimplifiedController);
       obj.mesh.add(axesHelper);
     }else if (obj.isObjectGroup){
       objectManipulationParameters["Rotate x"] = 0;
@@ -223,6 +225,14 @@ GUIHandler.prototype.afterObjectSelection = function(){
         }else if (obj.renderSide == 2){
           objectManipulationParameters["Side"] = "Back";
         }
+      }
+      if (obj.isPhysicsSimplified){
+        objectManipulationParameters["Phy. simpl."] = true;
+      }else{
+        objectManipulationParameters["Phy. simpl."] = false;
+      }
+      if (obj.noMass || obj.physicsBody.mass > 0){
+        guiHandler.disableController(omPhysicsSimplifiedController);
       }
       obj.mesh.add(axesHelper);
     }
@@ -296,6 +306,7 @@ GUIHandler.prototype.enableAllOMControllers = function(){
   guiHandler.enableController(omRotationYController);
   guiHandler.enableController(omRotationZController);
   guiHandler.enableController(omMassController);
+  guiHandler.enableController(omPhysicsSimplifiedController);
   guiHandler.enableController(omSlipperyController);
   guiHandler.enableController(omChangeableController);
   guiHandler.enableController(omIntersectableController);
@@ -376,7 +387,35 @@ GUIHandler.prototype.initializeObjectManipulationGUI = function(){
     var obj = selectionHandler.getSelectedObject();
     terminal.clear();
     parseCommand("setMass "+obj.name+" "+val);
+    if (!isNaN(val) && parseFloat(val) > 0){
+      guiHandler.disableController(omPhysicsSimplifiedController);
+    }else{
+      guiHandler.enableController(omPhysicsSimplifiedController);
+    }
   });
+  omPhysicsSimplifiedController = datGuiObjectManipulation.add(objectManipulationParameters, "Phy. simpl.").onChange(function(val){
+    var obj = selectionHandler.getSelectedObject();
+    if (obj.isAddedObject || obj.noMass || obj.physicsBody.mass > 0){
+      objectManipulationParameters["Phy. simpl."] = false;
+      return;
+    }
+    terminal.clear();
+    if (val){
+      if (!obj.boundingBoxes){
+        obj.generateBoundingBoxes();
+      }
+      var box3 = new THREE.Box3();
+      for (var i = 0; i<obj.boundingBoxes.length; i++){
+        box3.expandByPoint(obj.boundingBoxes[i].min);
+        box3.expandByPoint(obj.boundingBoxes[i].max);
+      }
+      var sizeVec = new THREE.Vector3();
+      box3.getSize(sizeVec);
+      parseCommand("simplifyPhysics "+obj.name+" "+sizeVec.x+" "+sizeVec.y+" "+sizeVec.z);
+    }else{
+      parseCommand("unsimplifyPhysics "+obj.name);
+    }
+  }).listen();
   omSlipperyController = datGuiObjectManipulation.add(objectManipulationParameters, "Slippery").onChange(function(val){
     var obj = selectionHandler.getSelectedObject();
     terminal.clear();
@@ -432,10 +471,12 @@ GUIHandler.prototype.initializeObjectManipulationGUI = function(){
     if (val){
       physicsWorld.add(obj.physicsBody);
       guiHandler.enableController(omMassController);
+      guiHandler.enableController(omPhysicsSimplifiedController);
       terminal.printInfo(Text.PHYSICS_ENABLED);
     }else{
       physicsWorld.remove(obj.physicsBody);
       guiHandler.disableController(omMassController);
+      guiHandler.disableController(omPhysicsSimplifiedController);
       terminal.printInfo(Text.PHYSICS_DISABLED);
     }
     omMassController.updateDisplay();

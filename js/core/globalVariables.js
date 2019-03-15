@@ -1108,6 +1108,7 @@ var omRotationXController;
 var omRotationYController;
 var omRotationZController;
 var omMassController;
+var omPhysicsSimplifiedController
 var omSlipperyController;
 var omChangeableController;
 var omIntersectableController;
@@ -1130,6 +1131,7 @@ var objectManipulationParameters = {
   "Rotate y": 0.0,
   "Rotate z": 0.0,
   "Mass": 0.0,
+  "Phy. simpl.": false,
   "Slippery": false,
   "Changeable": false,
   "Intersectable": false,

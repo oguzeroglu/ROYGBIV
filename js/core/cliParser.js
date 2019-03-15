@@ -5006,7 +5006,6 @@ function parse(input){
               }
             }
           }
-          selectionHandler.resetCurrentSelection();
           obj.simplifyPhysics(sizeX/2, sizeY/2, sizeZ/2);
           if (!jobHandlerWorking){
             terminal.printInfo(Text.PHYSICS_SIMPLIFIED);
@@ -5026,6 +5025,10 @@ function parse(input){
           var obj = objectGroups[objName];
           if (!obj){
             terminal.printError(Text.NO_SUCH_OBJECT_GROUP);
+            return true;
+          }
+          if (obj.noMass){
+            terminal.printError(Text.OBJECT_HAS_NO_MASS);
             return true;
           }
           if (!obj.isPhysicsSimplified){
