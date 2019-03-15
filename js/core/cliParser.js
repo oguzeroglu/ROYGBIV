@@ -12,8 +12,8 @@ function parse(input){
       var splitted = input.trim().split(" ");
       var commandIndex;
       var found = false;
-      for (var i=0; i<commands.length; i++){
-        if (commands[i].toLowerCase() == splitted[0].toLowerCase()){
+      for (var i=0; i<commandDescriptor.commands.length; i++){
+        if (commandDescriptor.commands[i].toLowerCase() == splitted[0].toLowerCase()){
           found = true;
           commandIndex = i;
         }
@@ -25,14 +25,14 @@ function parse(input){
       // COMMAND FOUND
 
       //CHECK IF DEPRECATED
-      for (var i = 0; i<deprecatedCommandIndices.length; i++){
-        if (deprecatedCommandIndices[i] == commandIndex){
+      for (var i = 0; i<commandDescriptor.deprecatedCommandIndices.length; i++){
+        if (commandDescriptor.deprecatedCommandIndices[i] == commandIndex){
           terminal.printError(Text.COMMAND_DEPRECATED);
           return true;
         }
       }
 
-      if (splitted.length -1 != commandArgumentsExpectedCount[commandIndex]){
+      if (splitted.length -1 != commandDescriptor.commandArgumentsExpectedCount[commandIndex]){
         terminal.printFunctionArguments(commandIndex);
         return true;
       }
@@ -41,18 +41,18 @@ function parse(input){
         case 0: //help
           var commandInfos = [];
           var commandsSorted = [];
-          for (var i=0; i<commandInfo.length; i++){
+          for (var i=0; i<commandDescriptor.commandInfo.length; i++){
             var found = false;
             var i2 = 0;
-            while (i2 < deprecatedCommandIndices.length && !found){
-              if (deprecatedCommandIndices[i2] == i){
+            while (i2 < commandDescriptor.deprecatedCommandIndices.length && !found){
+              if (commandDescriptor.deprecatedCommandIndices[i2] == i){
                 found = true;
               }
               i2++;
             }
             if (!found){
-              commandInfos.push(commandInfo[i]);
-              commandsSorted.push(commands[i]);
+              commandInfos.push(commandDescriptor.commandInfo[i]);
+              commandsSorted.push(commandDescriptor.commands[i]);
             }
           }
           commandInfos.sort();
@@ -159,15 +159,15 @@ function parse(input){
         break;
         case 7: //printKeyboardInfo
           terminal.printHeader(Text.CONTROLS);
-          for (var i=0; i<keyboardInfo.length; i++){
-            if (i != keyboardInfo.length -1){
+          for (var i=0; i<commandDescriptor.keyboardInfo.length; i++){
+            if (i != commandDescriptor.keyboardInfo.length -1){
               terminal.printInfo(
-                Text.TREE.replace(Text.PARAM1, keyboardInfo[i]),
+                Text.TREE.replace(Text.PARAM1, commandDescriptor.keyboardInfo[i]),
                 true
               );
             }else{
               terminal.printInfo(
-                Text.TREE.replace(Text.PARAM1, keyboardInfo[i])
+                Text.TREE.replace(Text.PARAM1, commandDescriptor.keyboardInfo[i])
               );
             }
           }
@@ -3133,20 +3133,20 @@ function parse(input){
           var possibleMatches = new Object();
           var possibleAPIMathces = new Object();
           var possibleMatchCount = 0;
-          for (var i = 0; i<commands.length; i++){
+          for (var i = 0; i<commandDescriptor.commands.length; i++){
             var i2 = 0;
             var found = false;
-            while (i2 < deprecatedCommandIndices.length && !found){
-              if (deprecatedCommandIndices[i2] == i){
+            while (i2 < commandDescriptor.deprecatedCommandIndices.length && !found){
+              if (commandDescriptor.commandDescriptor.deprecatedCommandIndices[i2] == i){
                 found = true;
               }
               i2++;
             }
-            var command = commands[i];
+            var command = commandDescriptor.commands[i];
             if (command.toLowerCase().indexOf(textToSearch) !== -1 && !found){
               possibleMatches[command] = i;
               possibleMatchCount ++;
-            }else if (commandInfo[i].toLowerCase().indexOf(textToSearch) !== -1 && !found){
+            }else if (commandDescriptor.commandInfo[i].toLowerCase().indexOf(textToSearch) !== -1 && !found){
               possibleMatches[command] = i;
               possibleMatchCount ++;
             }
@@ -3172,7 +3172,7 @@ function parse(input){
             var apiMatchesSorted = [];
             for(var commandName in possibleMatches){
               commandNamesSorted.push(commandName);
-              commandInfosSorted.push(commandInfo[possibleMatches[commandName]]);
+              commandInfosSorted.push(commandDescriptor.commandInfo[possibleMatches[commandName]]);
             }
             for (var functionName in possibleAPIMathces){
               apiMatchesSorted.push(functionName);

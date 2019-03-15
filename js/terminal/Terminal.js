@@ -128,8 +128,8 @@ Terminal.prototype.print = function(text, options){
 }
 
 Terminal.prototype.printFunctionArguments = function(commandIndex){
-	var expectedCount = commandArgumentsExpectedCount[commandIndex];
-	var functionName = commands[commandIndex];
+	var expectedCount = commandDescriptor.commandArgumentsExpectedCount[commandIndex];
+	var functionName = commandDescriptor.commands[commandIndex];
 	if (expectedCount == 0){
 		terminal.print(
 			Text.NO_ARGUMENTS_EXPECTED.replace(
@@ -140,7 +140,7 @@ Terminal.prototype.printFunctionArguments = function(commandIndex){
 		);
 		return;
 	}
-	var args = commandArgumentsExpectedExplanation[commandIndex];
+	var args = commandDescriptor.commandArgumentsExpectedExplanation[commandIndex];
 	var argumentsSplitted = args.split(" ");
 	terminal.print(
 		Text.ARGUMENTS_EXPECTED.replace(
@@ -232,9 +232,9 @@ Terminal.prototype.setCommand = function(command){
 }
 
 Terminal.prototype.getExpectedArgCountByCommandName = function(commandName){
-	for (var i = 0; i<commands.length; i++){
-		if (commands[i] == commandName.toLowerCase()){
-			return commandArgumentsExpectedCount[i];
+	for (var i = 0; i<commandDescriptor.commands.length; i++){
+		if (commandDescriptor.commands[i] == commandName.toLowerCase()){
+			return commandDescriptor.commandArgumentsExpectedCount[i];
 		}
 	}
 	return "NOT_FOUND";
@@ -249,9 +249,9 @@ Terminal.prototype.autocomplete = function(command){
 	var command = commandSplitted[0];
 
 	var possibilities = [];
-	for (var i = 0; i<commands.length; i++){
-		if (commands[i].toLowerCase().startsWith(command.toLowerCase())){
-			possibilities.push(commandArgumentsExpectedExplanation[i]);
+	for (var i = 0; i<commandDescriptor.commands.length; i++){
+		if (commandDescriptor.commands[i].toLowerCase().startsWith(command.toLowerCase())){
+			possibilities.push(commandDescriptor.commandArgumentsExpectedExplanation[i]);
 		}
 	}
 	possibilities.sort();
