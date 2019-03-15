@@ -396,9 +396,9 @@ AddedText.prototype.handleResize = function(){
         this.constructText();
         this.set2DCoordinates(this.marginPercentWidth, this.marginPercentHeight);
         iteration ++;
-        if (!isDeployment && textManipulationParameters){
-          textManipulationParameters["Char size"] = this.characterSize;
-          textManipulationParameters["Char margin"] = this.offsetBetweenChars;
+        if (!isDeployment && guiHandler.textManipulationParameters){
+          guiHandler.textManipulationParameters["Char size"] = this.characterSize;
+          guiHandler.textManipulationParameters["Char margin"] = this.offsetBetweenChars;
         }
       }
     }
@@ -411,9 +411,9 @@ AddedText.prototype.handleResize = function(){
         this.constructText();
         this.set2DCoordinates(this.marginPercentWidth, this.marginPercentHeight);
         iteration ++;
-        if (!isDeployment && textManipulationParameters){
-          textManipulationParameters["Char size"] = this.characterSize;
-          textManipulationParameters["Line margin"] = this.offsetBetweenLines;
+        if (!isDeployment && guiHandler.textManipulationParameters){
+          guiHandler.textManipulationParameters["Char size"] = this.characterSize;
+          guiHandler.textManipulationParameters["Line margin"] = this.offsetBetweenLines;
         }
       }
     }

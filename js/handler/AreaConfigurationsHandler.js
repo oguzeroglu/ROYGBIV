@@ -80,7 +80,7 @@ AreaConfigurationsHandler.prototype.generateConfigurations = function(singleArea
 
 AreaConfigurationsHandler.prototype.show = function(singleAreaName){
   this.generateConfigurations(singleAreaName);
-  datGuiAreaConfigurations = new dat.GUI();
+  guiHandler.datGuiAreaConfigurations = new dat.GUI();
   var pseudoAreas = areas;
   if (singleAreaName){
     pseudoAreas = new Object();
@@ -89,11 +89,11 @@ AreaConfigurationsHandler.prototype.show = function(singleAreaName){
     }
   }
   for (var areaName in pseudoAreas){
-    var areaFolder = datGuiAreaConfigurations.addFolder(areaName);
+    var areaFolder = guiHandler.datGuiAreaConfigurations.addFolder(areaName);
     this.addSubFolder(areaName, areaFolder);
   }
   if (!singleAreaName || (singleAreaName && singleAreaName.toLowerCase() == "default")){
-    var defaultFolder = datGuiAreaConfigurations.addFolder("default");
+    var defaultFolder = guiHandler.datGuiAreaConfigurations.addFolder("default");
     this.addSubFolder("default", defaultFolder);
   }
 }

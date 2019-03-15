@@ -4932,7 +4932,7 @@ Roygbiv.prototype.unsetBloom = function(){
   }
   adjustPostProcessing(5, false);
   if (!isDeployment){
-    postprocessingParameters["Bloom"] = false;
+    guiHandler.postprocessingParameters["Bloom"] = false;
   }
 }
 

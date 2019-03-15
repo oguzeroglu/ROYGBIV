@@ -1,5 +1,59 @@
 var GUIHandler = function(){
-
+  this.postprocessingParameters = {
+    "Bloom_strength": bloomStrength,
+    "Bloom_radius": bloomRadius,
+    "Bloom_threshhold": bloomThreshold,
+    "Bloom_resolution_scale": bloomResolutionScale,
+    "Bloom": bloomOn
+  };
+  this.objectManipulationParameters = {
+    "Object": "objectName",
+    "Rotate x": 0.0,
+    "Rotate y": 0.0,
+    "Rotate z": 0.0,
+    "Mass": 0.0,
+    "Phy. simpl.": false,
+    "Slippery": false,
+    "Changeable": false,
+    "Intersectable": false,
+    "Colorizable": false,
+    "Has mass": true,
+    "Side": "Both",
+    "Hide half": "None",
+    "Blending": "None",
+    "Texture offset x": 0.0,
+    "Texture offset y": 0.0,
+    "Opacity": 1.0,
+    "AO intensity": 0.0,
+    "Emissive int.": 0.0,
+    "Emissive col.": "#ffffff",
+    "Disp. scale": 0.0,
+    "Disp. bias": 0.0
+  };
+  this.skyboxParameters = {
+    "Name": "skyboxName",
+    "Color": "#ffffff"
+  };
+  this.textManipulationParameters = {
+    "Text": "textName",
+    "Content": "",
+    "Text color": "#ffffff",
+    "Alpha": 0.0,
+    "Has bg": false,
+    "Bg color": "#ffffff",
+    "Bg alpha": 0.0,
+    "Char size": 0.0,
+    "Char margin": 0.0,
+    "Line margin": 0.0,
+    "Clickable": false,
+    "Aff. by fog": false,
+    "is 2D": false,
+    "Margin mode": "Top/Left",
+    "Margin X": 50.0,
+    "Margin Y": 50.0,
+    "Max width%": 100,
+    "Max height%": 100
+  };
 }
 
 GUIHandler.prototype.init = function(){
@@ -11,10 +65,10 @@ GUIHandler.prototype.init = function(){
 
   this.hideAll();
 
-  datGuiObjectManipulation.domElement.addEventListener("mousedown", function(e){
+  guiHandler.datGuiObjectManipulation.domElement.addEventListener("mousedown", function(e){
     omGUIFocused = true;
   });
-  datGuiTextManipulation.domElement.addEventListener("mousedown", function(e){
+  guiHandler.datGuiTextManipulation.domElement.addEventListener("mousedown", function(e){
     tmGUIFocused = true;
   });
 }
@@ -26,49 +80,49 @@ GUIHandler.prototype.afterTextSelection = function(){
   var curSelection = selectionHandler.getSelectedObject();
   if (curSelection && curSelection.isAddedText){
     guiHandler.enableAllTMControllers();
-    guiHandler.show(datGuiTextManipulation);
-    textManipulationParameters["Text"] = curSelection.name;
-    textManipulationParameters["Content"] = curSelection.text;
-    textManipulationParameters["Text color"] = "#" + curSelection.material.uniforms.color.value.getHexString();
-    textManipulationParameters["Alpha"] = curSelection.material.uniforms.alpha.value;
-    textManipulationParameters["Has bg"] = (curSelection.hasBackground);
+    guiHandler.show(guiHandler.datGuiTextManipulation);
+    guiHandler.textManipulationParameters["Text"] = curSelection.name;
+    guiHandler.textManipulationParameters["Content"] = curSelection.text;
+    guiHandler.textManipulationParameters["Text color"] = "#" + curSelection.material.uniforms.color.value.getHexString();
+    guiHandler.textManipulationParameters["Alpha"] = curSelection.material.uniforms.alpha.value;
+    guiHandler.textManipulationParameters["Has bg"] = (curSelection.hasBackground);
     if (curSelection.hasBackground){
-      textManipulationParameters["Bg color"] = "#" + curSelection.material.uniforms.backgroundColor.value.getHexString();
-      textManipulationParameters["Bg alpha"] = curSelection.material.uniforms.backgroundAlpha.value;
+      guiHandler.textManipulationParameters["Bg color"] = "#" + curSelection.material.uniforms.backgroundColor.value.getHexString();
+      guiHandler.textManipulationParameters["Bg alpha"] = curSelection.material.uniforms.backgroundAlpha.value;
     }else{
-      textManipulationParameters["Bg color"] = "#000000"
-      textManipulationParameters["Bg alpha"] = 1;
+      guiHandler.textManipulationParameters["Bg color"] = "#000000"
+      guiHandler.textManipulationParameters["Bg alpha"] = 1;
     }
-    textManipulationParameters["Char margin"] = curSelection.offsetBetweenChars;
-    textManipulationParameters["Line margin"] = curSelection.offsetBetweenLines;
-    textManipulationParameters["Aff. by fog"] = curSelection.isAffectedByFog;
-    textManipulationParameters["is 2D"] = curSelection.is2D;
-    if (!textManipulationParameters["Has bg"]){
-      guiHandler.disableController(textManipulationBackgroundColorController);
-      guiHandler.disableController(textManipulationBackgroundAlphaController);
+    guiHandler.textManipulationParameters["Char margin"] = curSelection.offsetBetweenChars;
+    guiHandler.textManipulationParameters["Line margin"] = curSelection.offsetBetweenLines;
+    guiHandler.textManipulationParameters["Aff. by fog"] = curSelection.isAffectedByFog;
+    guiHandler.textManipulationParameters["is 2D"] = curSelection.is2D;
+    if (!guiHandler.textManipulationParameters["Has bg"]){
+      guiHandler.disableController(guiHandler.textManipulationBackgroundColorController);
+      guiHandler.disableController(guiHandler.textManipulationBackgroundAlphaController);
     }
-    textManipulationParameters["Char size"] = curSelection.characterSize;
-    textManipulationParameters["Clickable"] = curSelection.isClickable;
-    textManipulationParameters["Margin X"] = curSelection.marginPercentWidth;
-    textManipulationParameters["Margin Y"] = curSelection.marginPercentHeight;
-    textManipulationParameters["Max width%"] = curSelection.maxWidthPercent;
-    textManipulationParameters["Max height%"] = curSelection.maxHeightPercent;
+    guiHandler.textManipulationParameters["Char size"] = curSelection.characterSize;
+    guiHandler.textManipulationParameters["Clickable"] = curSelection.isClickable;
+    guiHandler.textManipulationParameters["Margin X"] = curSelection.marginPercentWidth;
+    guiHandler.textManipulationParameters["Margin Y"] = curSelection.marginPercentHeight;
+    guiHandler.textManipulationParameters["Max width%"] = curSelection.maxWidthPercent;
+    guiHandler.textManipulationParameters["Max height%"] = curSelection.maxHeightPercent;
     if (curSelection.marginMode == MARGIN_MODE_2D_TEXT_TOP_LEFT){
-      textManipulationParameters["Margin mode"] = "Top/Left";
+      guiHandler.textManipulationParameters["Margin mode"] = "Top/Left";
     }else{
-      textManipulationParameters["Margin mode"] = "Bottom/Right";
+      guiHandler.textManipulationParameters["Margin mode"] = "Bottom/Right";
     }
     if (!curSelection.is2D){
-      guiHandler.disableController(textManipulationMarginModeController);
-      guiHandler.disableController(textManipulationMarginXController);
-      guiHandler.disableController(textManipulationMarginYController);
-      guiHandler.disableController(textManipulationMaxWidthPercentController);
-      guiHandler.disableController(textManipulationMaxHeightPercentController);
+      guiHandler.disableController(guiHandler.textManipulationMarginModeController);
+      guiHandler.disableController(guiHandler.textManipulationMarginXController);
+      guiHandler.disableController(guiHandler.textManipulationMarginYController);
+      guiHandler.disableController(guiHandler.textManipulationMaxWidthPercentController);
+      guiHandler.disableController(guiHandler.textManipulationMaxHeightPercentController);
     }else{
-      guiHandler.disableController(textManipulationAffectedByFogController);
+      guiHandler.disableController(guiHandler.textManipulationAffectedByFogController);
     }
   }else{
-    guiHandler.hide(datGuiTextManipulation);
+    guiHandler.hide(guiHandler.datGuiTextManipulation);
   }
 }
 
@@ -78,115 +132,114 @@ GUIHandler.prototype.afterObjectSelection = function(){
   }
   var curSelection = selectionHandler.getSelectedObject();
   if (curSelection && (curSelection.isAddedObject || curSelection.isObjectGroup)){
-    guiHandler.show(datGuiObjectManipulation);
+    guiHandler.show(guiHandler.datGuiObjectManipulation);
     guiHandler.enableAllOMControllers();
     var obj = curSelection;
-    omGUIlastObjectName = obj.name;
     obj.visualiseBoundingBoxes();
-    objectManipulationParameters["Object"] = obj.name;
+    guiHandler.objectManipulationParameters["Object"] = obj.name;
     if (obj.isAddedObject){
-      objectManipulationParameters["Rotate x"] = 0;
-      objectManipulationParameters["Rotate y"] = 0;
-      objectManipulationParameters["Rotate z"] = 0;
-      objectManipulationParameters["Opacity"] = obj.mesh.material.uniforms.alpha.value;
+      guiHandler.objectManipulationParameters["Rotate x"] = 0;
+      guiHandler.objectManipulationParameters["Rotate y"] = 0;
+      guiHandler.objectManipulationParameters["Rotate z"] = 0;
+      guiHandler.objectManipulationParameters["Opacity"] = obj.mesh.material.uniforms.alpha.value;
       if (obj.metaData.isSlippery){
-        objectManipulationParameters["Slippery"] = true;
+        guiHandler.objectManipulationParameters["Slippery"] = true;
       }else{
-        objectManipulationParameters["Slippery"] = false;
+        guiHandler.objectManipulationParameters["Slippery"] = false;
       }
       if (obj.isChangeable){
-        objectManipulationParameters["Changeable"] = true;
+        guiHandler.objectManipulationParameters["Changeable"] = true;
       }else{
-        objectManipulationParameters["Changeable"] = false;
+        guiHandler.objectManipulationParameters["Changeable"] = false;
       }
       if (obj.isIntersectable){
-        objectManipulationParameters["Intersectable"] = true;
+        guiHandler.objectManipulationParameters["Intersectable"] = true;
       }else{
-        objectManipulationParameters["Intersectable"] = false;
+        guiHandler.objectManipulationParameters["Intersectable"] = false;
       }
       if (obj.isColorizable){
-        objectManipulationParameters["Colorizable"] = true;
+        guiHandler.objectManipulationParameters["Colorizable"] = true;
       }else{
-        objectManipulationParameters["Colorizable"] = false;
+        guiHandler.objectManipulationParameters["Colorizable"] = false;
       }
       if (obj.hasDisplacementMap()){
-        objectManipulationParameters["Disp. scale"] = obj.mesh.material.uniforms.displacementInfo.value.x;
-        objectManipulationParameters["Disp. bias"] = obj.mesh.material.uniforms.displacementInfo.value.y;
+        guiHandler.objectManipulationParameters["Disp. scale"] = obj.mesh.material.uniforms.displacementInfo.value.x;
+        guiHandler.objectManipulationParameters["Disp. bias"] = obj.mesh.material.uniforms.displacementInfo.value.y;
       }else{
-        guiHandler.disableController(omDisplacementScaleController);
-        guiHandler.disableController(omDisplacementBiasController);
+        guiHandler.disableController(guiHandler.omDisplacementScaleController);
+        guiHandler.disableController(guiHandler.omDisplacementBiasController);
       }
       if (!obj.hasTexture()){
-        guiHandler.disableController(omTextureOffsetXController);
-        guiHandler.disableController(omTextureOffsetYController);
+        guiHandler.disableController(guiHandler.omTextureOffsetXController);
+        guiHandler.disableController(guiHandler.omTextureOffsetYController);
       }else{
-        objectManipulationParameters["Texture offset x"] = obj.getTextureOffsetX();
-        objectManipulationParameters["Texture offset y"] = obj.getTextureOffsetY();
+        guiHandler.objectManipulationParameters["Texture offset x"] = obj.getTextureOffsetX();
+        guiHandler.objectManipulationParameters["Texture offset y"] = obj.getTextureOffsetY();
       }
       if (!obj.hasAOMap()){
-        guiHandler.disableController(omAOIntensityController);
+        guiHandler.disableController(guiHandler.omAOIntensityController);
       }else{
-        objectManipulationParameters["AO intensity"] = obj.mesh.material.uniforms.aoIntensity.value;
+        guiHandler.objectManipulationParameters["AO intensity"] = obj.mesh.material.uniforms.aoIntensity.value;
       }
       if (!obj.hasEmissiveMap()){
-        guiHandler.disableController(omEmissiveIntensityController);
-        guiHandler.disableController(omEmissiveColorController);
+        guiHandler.disableController(guiHandler.omEmissiveIntensityController);
+        guiHandler.disableController(guiHandler.omEmissiveColorController);
       }else{
-        objectManipulationParameters["Emissive int."] = obj.mesh.material.uniforms.emissiveIntensity.value;
-        objectManipulationParameters["Emissive col."] = "#"+obj.mesh.material.uniforms.emissiveColor.value.getHexString();
+        guiHandler.objectManipulationParameters["Emissive int."] = obj.mesh.material.uniforms.emissiveIntensity.value;
+        guiHandler.objectManipulationParameters["Emissive col."] = "#"+obj.mesh.material.uniforms.emissiveColor.value.getHexString();
       }
       if (!obj.isSlicable()){
-        objectManipulationParameters["Hide half"] = "None";
-        guiHandler.disableController(omHideHalfController);
+        guiHandler.objectManipulationParameters["Hide half"] = "None";
+        guiHandler.disableController(guiHandler.omHideHalfController);
       }else{
         if (!(typeof obj.metaData.slicedType == UNDEFINED)){
-          objectManipulationParameters["Hide half"] = "Part "+(obj.metaData.slicedType + 1)
+          guiHandler.objectManipulationParameters["Hide half"] = "Part "+(obj.metaData.slicedType + 1)
         }else{
-          objectManipulationParameters["Hide half"] = "None";
+          guiHandler.objectManipulationParameters["Hide half"] = "None";
         }
       }
-      objectManipulationParameters["Side"] = "Both";
+      guiHandler.objectManipulationParameters["Side"] = "Both";
       if (obj.metaData.renderSide){
         if (obj.metaData.renderSide == 1){
-          objectManipulationParameters["Side"] = "Front";
+          guiHandler.objectManipulationParameters["Side"] = "Front";
         }else if (obj.metaData.renderSide == 2){
-          objectManipulationParameters["Side"] = "Back";
+          guiHandler.objectManipulationParameters["Side"] = "Back";
         }
       }
       if (obj.mesh.material.blending == NO_BLENDING){
-        guiHandler.disableController(omOpacityController);
+        guiHandler.disableController(guiHandler.omOpacityController);
       }
-      objectManipulationParameters["Phy. simpl."] = false;
-      guiHandler.disableController(omPhysicsSimplifiedController);
+      guiHandler.objectManipulationParameters["Phy. simpl."] = false;
+      guiHandler.disableController(guiHandler.omPhysicsSimplifiedController);
       obj.mesh.add(axesHelper);
     }else if (obj.isObjectGroup){
-      objectManipulationParameters["Rotate x"] = 0;
-      objectManipulationParameters["Rotate y"] = 0;
-      objectManipulationParameters["Rotate z"] = 0;
+      guiHandler.objectManipulationParameters["Rotate x"] = 0;
+      guiHandler.objectManipulationParameters["Rotate y"] = 0;
+      guiHandler.objectManipulationParameters["Rotate z"] = 0;
       if (obj.isSlippery){
-        objectManipulationParameters["Slippery"] = true;
+        guiHandler.objectManipulationParameters["Slippery"] = true;
       }else{
-        objectManipulationParameters["Slippery"] = false;
+        guiHandler.objectManipulationParameters["Slippery"] = false;
       }
       if (obj.isChangeable){
-        objectManipulationParameters["Changeable"] = true;
+        guiHandler.objectManipulationParameters["Changeable"] = true;
       }else{
-        objectManipulationParameters["Changeable"] = false;
+        guiHandler.objectManipulationParameters["Changeable"] = false;
       }
       if (obj.isIntersectable){
-        objectManipulationParameters["Intersectable"] = true;
+        guiHandler.objectManipulationParameters["Intersectable"] = true;
       }else{
-        objectManipulationParameters["Intersectable"] = false;
+        guiHandler.objectManipulationParameters["Intersectable"] = false;
       }
       if (obj.isColorizable){
-        objectManipulationParameters["Colorizable"] = true;
+        guiHandler.objectManipulationParameters["Colorizable"] = true;
       }else{
-        objectManipulationParameters["Colorizable"] = false;
+        guiHandler.objectManipulationParameters["Colorizable"] = false;
       }
       if (obj.isPhysicsSimplified){
-        guiHandler.disableController(omMassController);
+        guiHandler.disableController(guiHandler.omMassController);
       }
-      objectManipulationParameters["Opacity"] = obj.mesh.material.uniforms.totalAlpha.value;
+      guiHandler.objectManipulationParameters["Opacity"] = obj.mesh.material.uniforms.totalAlpha.value;
       var hasAOMap = false;
       var hasEmissiveMap = false;
       for (var childObjName in obj.group){
@@ -198,56 +251,56 @@ GUIHandler.prototype.afterObjectSelection = function(){
         }
       }
       if (!hasAOMap){
-        guiHandler.disableController(omAOIntensityController);
+        guiHandler.disableController(guiHandler.omAOIntensityController);
       }else{
-        objectManipulationParameters["AO intensity"] = obj.mesh.material.uniforms.totalAOIntensity.value;
+        guiHandler.objectManipulationParameters["AO intensity"] = obj.mesh.material.uniforms.totalAOIntensity.value;
       }
       if (!hasEmissiveMap){
-        guiHandler.disableController(omEmissiveIntensityController);
-        guiHandler.disableController(omEmissiveColorController);
+        guiHandler.disableController(guiHandler.omEmissiveIntensityController);
+        guiHandler.disableController(guiHandler.omEmissiveColorController);
       }else{
-        objectManipulationParameters["Emissive int."] = obj.mesh.material.uniforms.totalEmissiveIntensity.value;
-        objectManipulationParameters["Emissive col."] = "#"+obj.mesh.material.uniforms.totalEmissiveColor.value.getHexString();
+        guiHandler.objectManipulationParameters["Emissive int."] = obj.mesh.material.uniforms.totalEmissiveIntensity.value;
+        guiHandler.objectManipulationParameters["Emissive col."] = "#"+obj.mesh.material.uniforms.totalEmissiveColor.value.getHexString();
       }
-      guiHandler.disableController(omTextureOffsetXController);
-      guiHandler.disableController(omTextureOffsetYController);
-      guiHandler.disableController(omDisplacementScaleController);
-      guiHandler.disableController(omDisplacementBiasController);
-      guiHandler.disableController(omHideHalfController);
+      guiHandler.disableController(guiHandler.omTextureOffsetXController);
+      guiHandler.disableController(guiHandler.omTextureOffsetYController);
+      guiHandler.disableController(guiHandler.omDisplacementScaleController);
+      guiHandler.disableController(guiHandler.omDisplacementBiasController);
+      guiHandler.disableController(guiHandler.omHideHalfController);
       if (obj.cannotSetMass){
-        guiHandler.disableController(omHasMassController);
+        guiHandler.disableController(guiHandler.omHasMassController);
       }
 
-      objectManipulationParameters["Side"] = "Both";
+      guiHandler.objectManipulationParameters["Side"] = "Both";
       if (obj.renderSide){
         if (obj.renderSide == 1){
-          objectManipulationParameters["Side"] = "Front";
+          guiHandler.objectManipulationParameters["Side"] = "Front";
         }else if (obj.renderSide == 2){
-          objectManipulationParameters["Side"] = "Back";
+          guiHandler.objectManipulationParameters["Side"] = "Back";
         }
       }
       if (obj.isPhysicsSimplified){
-        objectManipulationParameters["Phy. simpl."] = true;
+        guiHandler.objectManipulationParameters["Phy. simpl."] = true;
       }else{
-        objectManipulationParameters["Phy. simpl."] = false;
+        guiHandler.objectManipulationParameters["Phy. simpl."] = false;
       }
       if (obj.noMass || obj.physicsBody.mass > 0){
-        guiHandler.disableController(omPhysicsSimplifiedController);
+        guiHandler.disableController(guiHandler.omPhysicsSimplifiedController);
       }
       obj.mesh.add(axesHelper);
     }
-    objectManipulationParameters["Mass"] = obj.physicsBody.mass;
+    guiHandler.objectManipulationParameters["Mass"] = obj.physicsBody.mass;
     if (obj.noMass){
-      guiHandler.disableController(omMassController);
+      guiHandler.disableController(guiHandler.omMassController);
     }
-    objectManipulationParameters["Has mass"] = !obj.noMass;
-    objectManipulationParameters["Blending"] = obj.getBlendingText();
+    guiHandler.objectManipulationParameters["Has mass"] = !obj.noMass;
+    guiHandler.objectManipulationParameters["Blending"] = obj.getBlendingText();
     if (obj.mesh.material.blending == NO_BLENDING){
-      guiHandler.disableController(omOpacityController);
+      guiHandler.disableController(guiHandler.omOpacityController);
     }
-    omMassController.updateDisplay();
+    guiHandler.omMassController.updateDisplay();
   }else{
-    guiHandler.hide(datGuiObjectManipulation);
+    guiHandler.hide(guiHandler.datGuiObjectManipulation);
   }
   guiHandler.afterTextSelection();
 }
@@ -257,14 +310,14 @@ GUIHandler.prototype.omGUIRotateEvent = function(axis, val){
   terminal.clear();
   parseCommand("rotateObject "+obj.name+" "+axis+" "+val);
   if (axis == "x"){
-    objectManipulationParameters["Rotate x"] = 0;
-    omRotationXController.updateDisplay();
+    guiHandler.objectManipulationParameters["Rotate x"] = 0;
+    guiHandler.omRotationXController.updateDisplay();
   }else if (axis == "y"){
-    objectManipulationParameters["Rotate y"] = 0;
-    omRotationYController.updateDisplay();
+    guiHandler.objectManipulationParameters["Rotate y"] = 0;
+    guiHandler.omRotationYController.updateDisplay();
   }else if (axis == "z"){
-    objectManipulationParameters["Rotate z"] = 0;
-    omRotationZController.updateDisplay();
+    guiHandler.objectManipulationParameters["Rotate z"] = 0;
+    guiHandler.omRotationZController.updateDisplay();
   }
 }
 
@@ -281,48 +334,48 @@ GUIHandler.prototype.enableController = function(controller){
 }
 
 GUIHandler.prototype.enableAllTMControllers = function(){
-  guiHandler.enableController(textManipulationTextNameController);
-  guiHandler.enableController(textManipulationContentController);
-  guiHandler.enableController(textManipulationTextColorController);
-  guiHandler.enableController(textManipulationAlphaController);
-  guiHandler.enableController(textManipulationHasBackgroundController);
-  guiHandler.enableController(textManipulationBackgroundColorController);
-  guiHandler.enableController(textManipulationBackgroundAlphaController);
-  guiHandler.enableController(textManipulationCharacterSizeController);
-  guiHandler.enableController(textManipulationCharacterMarginController);
-  guiHandler.enableController(textManipulationLineMarginController);
-  guiHandler.enableController(textManipulationClickableController);
-  guiHandler.enableController(textManipulationAffectedByFogController);
-  guiHandler.enableController(textManipulationIs2DController);
-  guiHandler.enableController(textManipulationMarginModeController);
-  guiHandler.enableController(textManipulationMarginXController);
-  guiHandler.enableController(textManipulationMarginYController);
-  guiHandler.enableController(textManipulationMaxWidthPercentController);
-  guiHandler.enableController(textManipulationMaxHeightPercentController);
+  guiHandler.enableController(guiHandler.textManipulationTextNameController);
+  guiHandler.enableController(guiHandler.textManipulationContentController);
+  guiHandler.enableController(guiHandler.textManipulationTextColorController);
+  guiHandler.enableController(guiHandler.textManipulationAlphaController);
+  guiHandler.enableController(guiHandler.textManipulationHasBackgroundController);
+  guiHandler.enableController(guiHandler.textManipulationBackgroundColorController);
+  guiHandler.enableController(guiHandler.textManipulationBackgroundAlphaController);
+  guiHandler.enableController(guiHandler.textManipulationCharacterSizeController);
+  guiHandler.enableController(guiHandler.textManipulationCharacterMarginController);
+  guiHandler.enableController(guiHandler.textManipulationLineMarginController);
+  guiHandler.enableController(guiHandler.textManipulationClickableController);
+  guiHandler.enableController(guiHandler.textManipulationAffectedByFogController);
+  guiHandler.enableController(guiHandler.textManipulationIs2DController);
+  guiHandler.enableController(guiHandler.textManipulationMarginModeController);
+  guiHandler.enableController(guiHandler.textManipulationMarginXController);
+  guiHandler.enableController(guiHandler.textManipulationMarginYController);
+  guiHandler.enableController(guiHandler.textManipulationMaxWidthPercentController);
+  guiHandler.enableController(guiHandler.textManipulationMaxHeightPercentController);
 }
 
 GUIHandler.prototype.enableAllOMControllers = function(){
-  guiHandler.enableController(omRotationXController);
-  guiHandler.enableController(omRotationYController);
-  guiHandler.enableController(omRotationZController);
-  guiHandler.enableController(omMassController);
-  guiHandler.enableController(omPhysicsSimplifiedController);
-  guiHandler.enableController(omSlipperyController);
-  guiHandler.enableController(omChangeableController);
-  guiHandler.enableController(omIntersectableController);
-  guiHandler.enableController(omColorizableController);
-  guiHandler.enableController(omHasMassController);
-  guiHandler.enableController(omTextureOffsetXController);
-  guiHandler.enableController(omTextureOffsetYController);
-  guiHandler.enableController(omOpacityController);
-  guiHandler.enableController(omEmissiveIntensityController);
-  guiHandler.enableController(omEmissiveColorController);
-  guiHandler.enableController(omDisplacementScaleController);
-  guiHandler.enableController(omDisplacementBiasController);
-  guiHandler.enableController(omAOIntensityController);
-  guiHandler.enableController(omHideHalfController);
-  guiHandler.enableController(omBlendingController);
-  guiHandler.enableController(omSideController);
+  guiHandler.enableController(guiHandler.omRotationXController);
+  guiHandler.enableController(guiHandler.omRotationYController);
+  guiHandler.enableController(guiHandler.omRotationZController);
+  guiHandler.enableController(guiHandler.omMassController);
+  guiHandler.enableController(guiHandler.omPhysicsSimplifiedController);
+  guiHandler.enableController(guiHandler.omSlipperyController);
+  guiHandler.enableController(guiHandler.omChangeableController);
+  guiHandler.enableController(guiHandler.omIntersectableController);
+  guiHandler.enableController(guiHandler.omColorizableController);
+  guiHandler.enableController(guiHandler.omHasMassController);
+  guiHandler.enableController(guiHandler.omTextureOffsetXController);
+  guiHandler.enableController(guiHandler.omTextureOffsetYController);
+  guiHandler.enableController(guiHandler.omOpacityController);
+  guiHandler.enableController(guiHandler.omEmissiveIntensityController);
+  guiHandler.enableController(guiHandler.omEmissiveColorController);
+  guiHandler.enableController(guiHandler.omDisplacementScaleController);
+  guiHandler.enableController(guiHandler.omDisplacementBiasController);
+  guiHandler.enableController(guiHandler.omAOIntensityController);
+  guiHandler.enableController(guiHandler.omHideHalfController);
+  guiHandler.enableController(guiHandler.omBlendingController);
+  guiHandler.enableController(guiHandler.omSideController);
 }
 
 GUIHandler.prototype.isVisible = function(guiObject){
@@ -338,65 +391,65 @@ GUIHandler.prototype.hide = function(guiObject){
 }
 
 GUIHandler.prototype.hideAll = function(){
-  $(datGui.domElement).attr("hidden", true);
-  $(datGuiObjectManipulation.domElement).attr("hidden", true);
-  $(datGuiTextManipulation.domElement).attr("hidden", true);
-  $(datGuiSkybox.domElement).attr("hidden", true);
-  $(datGuiFog.domElement).attr("hidden", true);
+  $(guiHandler.datGui.domElement).attr("hidden", true);
+  $(guiHandler.datGuiObjectManipulation.domElement).attr("hidden", true);
+  $(guiHandler.datGuiTextManipulation.domElement).attr("hidden", true);
+  $(guiHandler.datGuiSkybox.domElement).attr("hidden", true);
+  $(guiHandler.datGuiFog.domElement).attr("hidden", true);
   skyboxConfigurationsVisible = false;
 }
 
 GUIHandler.prototype.initializePostProcessingGUI = function(){
-  datGui = new dat.GUI();
-  datGui.add(postprocessingParameters, "Bloom_strength").min(0.0).max(3.0).step(0.01).onChange(function(val){
+  guiHandler.datGui = new dat.GUI();
+  guiHandler.datGui.add(guiHandler.postprocessingParameters, "Bloom_strength").min(0.0).max(3.0).step(0.01).onChange(function(val){
     adjustPostProcessing(1, val);
     originalBloomConfigurations.bloomStrength = val;
   }).listen();
-  datGui.add(postprocessingParameters, "Bloom_radius").min(0.0).max(1.0).step(0.01).onChange(function(val){
+  guiHandler.datGui.add(guiHandler.postprocessingParameters, "Bloom_radius").min(0.0).max(1.0).step(0.01).onChange(function(val){
     adjustPostProcessing(2, val);
     originalBloomConfigurations.bloomRadius = val;
   }).listen();
-  datGui.add(postprocessingParameters, "Bloom_threshhold").min(0.0).max(1.0).step(0.01).onChange(function(val){
+  guiHandler.datGui.add(guiHandler.postprocessingParameters, "Bloom_threshhold").min(0.0).max(1.0).step(0.01).onChange(function(val){
     adjustPostProcessing(3, val);
     originalBloomConfigurations.bloomThreshold = val;
   }).listen();
-  datGui.add(postprocessingParameters, "Bloom_resolution_scale").min(0.1).max(1.0).step(0.001).onChange(function(val){
+  guiHandler.datGui.add(guiHandler.postprocessingParameters, "Bloom_resolution_scale").min(0.1).max(1.0).step(0.001).onChange(function(val){
     adjustPostProcessing(4, val);
     originalBloomConfigurations.bloomResolutionScale = val;
   }).listen();
-  datGui.add(postprocessingParameters, "Bloom").onChange(function(val){
+  guiHandler.datGui.add(guiHandler.postprocessingParameters, "Bloom").onChange(function(val){
     adjustPostProcessing(5, val);
     originalBloomConfigurations.bloomOn = val;
   }).listen();
 }
 
 GUIHandler.prototype.initializeObjectManipulationGUI = function(){
-  datGuiObjectManipulation = new dat.GUI();
-  omObjController = datGuiObjectManipulation.add(objectManipulationParameters, "Object").listen();
-  guiHandler.disableController(omObjController, true);
-  omRotationXController = datGuiObjectManipulation.add(objectManipulationParameters, "Rotate x").onChange(function(val){
+  guiHandler.datGuiObjectManipulation = new dat.GUI();
+  guiHandler.omObjController = guiHandler.datGuiObjectManipulation.add(guiHandler.objectManipulationParameters, "Object").listen();
+  guiHandler.disableController(guiHandler.omObjController, true);
+  guiHandler.omRotationXController = guiHandler.datGuiObjectManipulation.add(guiHandler.objectManipulationParameters, "Rotate x").onChange(function(val){
     guiHandler.omGUIRotateEvent("x", val);
   });
-  omRotationYController = datGuiObjectManipulation.add(objectManipulationParameters, "Rotate y").onChange(function(val){
+  guiHandler.omRotationYController = guiHandler.datGuiObjectManipulation.add(guiHandler.objectManipulationParameters, "Rotate y").onChange(function(val){
     guiHandler.omGUIRotateEvent("y", val);
   });
-  omRotationZController = datGuiObjectManipulation.add(objectManipulationParameters, "Rotate z").onChange(function(val){
+  guiHandler.omRotationZController = guiHandler.datGuiObjectManipulation.add(guiHandler.objectManipulationParameters, "Rotate z").onChange(function(val){
     guiHandler.omGUIRotateEvent("z", val);
   });
-  omMassController = datGuiObjectManipulation.add(objectManipulationParameters, "Mass").onChange(function(val){
+  guiHandler.omMassController = guiHandler.datGuiObjectManipulation.add(guiHandler.objectManipulationParameters, "Mass").onChange(function(val){
     var obj = selectionHandler.getSelectedObject();
     terminal.clear();
     parseCommand("setMass "+obj.name+" "+val);
     if (!isNaN(val) && parseFloat(val) > 0){
-      guiHandler.disableController(omPhysicsSimplifiedController);
+      guiHandler.disableController(guiHandler.omPhysicsSimplifiedController);
     }else{
-      guiHandler.enableController(omPhysicsSimplifiedController);
+      guiHandler.enableController(guiHandler.omPhysicsSimplifiedController);
     }
   });
-  omPhysicsSimplifiedController = datGuiObjectManipulation.add(objectManipulationParameters, "Phy. simpl.").onChange(function(val){
+  guiHandler.omPhysicsSimplifiedController = guiHandler.datGuiObjectManipulation.add(guiHandler.objectManipulationParameters, "Phy. simpl.").onChange(function(val){
     var obj = selectionHandler.getSelectedObject();
     if (obj.isAddedObject || obj.noMass || obj.physicsBody.mass > 0){
-      objectManipulationParameters["Phy. simpl."] = false;
+      guiHandler.objectManipulationParameters["Phy. simpl."] = false;
       return;
     }
     terminal.clear();
@@ -416,7 +469,7 @@ GUIHandler.prototype.initializeObjectManipulationGUI = function(){
       parseCommand("unsimplifyPhysics "+obj.name);
     }
   }).listen();
-  omSlipperyController = datGuiObjectManipulation.add(objectManipulationParameters, "Slippery").onChange(function(val){
+  guiHandler.omSlipperyController = guiHandler.datGuiObjectManipulation.add(guiHandler.objectManipulationParameters, "Slippery").onChange(function(val){
     var obj = selectionHandler.getSelectedObject();
     terminal.clear();
     if (val){
@@ -425,7 +478,7 @@ GUIHandler.prototype.initializeObjectManipulationGUI = function(){
       parseCommand("setSlipperiness "+obj.name+" off");
     }
   }).listen();
-  omChangeableController = datGuiObjectManipulation.add(objectManipulationParameters, "Changeable").onChange(function(val){
+  guiHandler.omChangeableController = guiHandler.datGuiObjectManipulation.add(guiHandler.objectManipulationParameters, "Changeable").onChange(function(val){
     var obj = selectionHandler.getSelectedObject();
     terminal.clear();
     obj.isChangeable = val;
@@ -435,7 +488,7 @@ GUIHandler.prototype.initializeObjectManipulationGUI = function(){
       terminal.printInfo(Text.OBJECT_MARKED_AS.replace(Text.PARAM1, "unchangeable"));
     }
   }).listen();
-  omIntersectableController = datGuiObjectManipulation.add(objectManipulationParameters, "Intersectable").onChange(function(val){
+  guiHandler.omIntersectableController = guiHandler.datGuiObjectManipulation.add(guiHandler.objectManipulationParameters, "Intersectable").onChange(function(val){
     var obj = selectionHandler.getSelectedObject();
     terminal.clear();
     obj.isIntersectable = val;
@@ -445,7 +498,7 @@ GUIHandler.prototype.initializeObjectManipulationGUI = function(){
       terminal.printInfo(Text.OBJECT_UNINTERSECTABLE);
     }
   }).listen();
-  omColorizableController = datGuiObjectManipulation.add(objectManipulationParameters, "Colorizable").onChange(function(val){
+  guiHandler.omColorizableController = guiHandler.datGuiObjectManipulation.add(guiHandler.objectManipulationParameters, "Colorizable").onChange(function(val){
     var obj = selectionHandler.getSelectedObject();
     terminal.clear();
     obj.isColorizable = val;
@@ -460,28 +513,28 @@ GUIHandler.prototype.initializeObjectManipulationGUI = function(){
     }
     obj.mesh.material.needsUpdate = true;
   }).listen();
-  omHasMassController = datGuiObjectManipulation.add(objectManipulationParameters, "Has mass").onChange(function(val){
+  guiHandler.omHasMassController = guiHandler.datGuiObjectManipulation.add(guiHandler.objectManipulationParameters, "Has mass").onChange(function(val){
     var obj = selectionHandler.getSelectedObject();
     if (obj.isObjectGroup && obj.cannotSetMass){
-      objectManipulationParameters["Has mass"] = false;
+      guiHandler.objectManipulationParameters["Has mass"] = false;
       return;
     }
     terminal.clear();
     obj.noMass = !val;
     if (val){
       physicsWorld.add(obj.physicsBody);
-      guiHandler.enableController(omMassController);
-      guiHandler.enableController(omPhysicsSimplifiedController);
+      guiHandler.enableController(guiHandler.omMassController);
+      guiHandler.enableController(guiHandler.omPhysicsSimplifiedController);
       terminal.printInfo(Text.PHYSICS_ENABLED);
     }else{
       physicsWorld.remove(obj.physicsBody);
-      guiHandler.disableController(omMassController);
-      guiHandler.disableController(omPhysicsSimplifiedController);
+      guiHandler.disableController(guiHandler.omMassController);
+      guiHandler.disableController(guiHandler.omPhysicsSimplifiedController);
       terminal.printInfo(Text.PHYSICS_DISABLED);
     }
-    omMassController.updateDisplay();
+    guiHandler.omMassController.updateDisplay();
   }).listen();
-  omSideController = datGuiObjectManipulation.add(objectManipulationParameters, "Side", [
+  guiHandler.omSideController = guiHandler.datGuiObjectManipulation.add(guiHandler.objectManipulationParameters, "Side", [
     "Both", "Front", "Back"
   ]).onChange(function(val){
     var pseudoVal = 0;
@@ -492,7 +545,7 @@ GUIHandler.prototype.initializeObjectManipulationGUI = function(){
     }
     selectionHandler.getSelectedObject().handleRenderSide(pseudoVal);
   }).listen();
-  omHideHalfController = datGuiObjectManipulation.add(objectManipulationParameters, "Hide half", [
+  guiHandler.omHideHalfController = guiHandler.datGuiObjectManipulation.add(guiHandler.objectManipulationParameters, "Hide half", [
     "None", "Part 1", "Part 2", "Part 3", "Part 4"
   ]).onChange(function(val){
     if (val == "None"){
@@ -508,17 +561,17 @@ GUIHandler.prototype.initializeObjectManipulationGUI = function(){
     }
     rayCaster.updateObject(selectionHandler.getSelectedObject());
   }).listen();
-  omBlendingController = datGuiObjectManipulation.add(objectManipulationParameters, "Blending", [
+  guiHandler.omBlendingController = guiHandler.datGuiObjectManipulation.add(guiHandler.objectManipulationParameters, "Blending", [
     "None", "Normal", "Additive", "Subtractive", "Multiply"
   ]).onChange(function(val){
     var obj = selectionHandler.getSelectedObject();
     if (obj.isAddedObject || obj.isObjectGroup){
-      guiHandler.enableController(omOpacityController);
+      guiHandler.enableController(guiHandler.omOpacityController);
     }
     if (val == "None"){
       obj.setBlending(NO_BLENDING);
       if (obj.isAddedObject || obj.isObjectGroup){
-        guiHandler.disableController(omOpacityController);
+        guiHandler.disableController(guiHandler.omOpacityController);
       }
     }else if (val == "Normal"){
       obj.setBlending(NORMAL_BLENDING);
@@ -530,7 +583,7 @@ GUIHandler.prototype.initializeObjectManipulationGUI = function(){
       obj.setBlending(MULTIPLY_BLENDING);
     }
   }).listen();
-  omEmissiveColorController = datGuiObjectManipulation.addColor(objectManipulationParameters, "Emissive col.").onChange(function(val){
+  guiHandler.omEmissiveColorController = guiHandler.datGuiObjectManipulation.addColor(guiHandler.objectManipulationParameters, "Emissive col.").onChange(function(val){
     var obj = selectionHandler.getSelectedObject();
     if (obj.isAddedObject){
       var material = obj.mesh.material;
@@ -540,19 +593,19 @@ GUIHandler.prototype.initializeObjectManipulationGUI = function(){
       material.uniforms.totalEmissiveColor.value.set(val);
     }
   }).listen();
-  omTextureOffsetXController = datGuiObjectManipulation.add(objectManipulationParameters, "Texture offset x").min(-2).max(2).step(0.001).onChange(function(val){
+  guiHandler.omTextureOffsetXController = guiHandler.datGuiObjectManipulation.add(guiHandler.objectManipulationParameters, "Texture offset x").min(-2).max(2).step(0.001).onChange(function(val){
     selectionHandler.getSelectedObject().setTextureOffsetX(val);
   }).listen();
-  omTextureOffsetYController = datGuiObjectManipulation.add(objectManipulationParameters, "Texture offset y").min(-2).max(2).step(0.001).onChange(function(val){
+  guiHandler.omTextureOffsetYController = guiHandler.datGuiObjectManipulation.add(guiHandler.objectManipulationParameters, "Texture offset y").min(-2).max(2).step(0.001).onChange(function(val){
     selectionHandler.getSelectedObject().setTextureOffsetY(val);
   }).listen();
-  omOpacityController = datGuiObjectManipulation.add(objectManipulationParameters, "Opacity").min(0).max(1).step(0.01).onChange(function(val){
+  guiHandler.omOpacityController = guiHandler.datGuiObjectManipulation.add(guiHandler.objectManipulationParameters, "Opacity").min(0).max(1).step(0.01).onChange(function(val){
     var obj = selectionHandler.getSelectedObject();
     obj.updateOpacity(val);
     obj.initOpacitySet = false;
     obj.initOpacity = obj.opacity;
   }).listen();
-  omAOIntensityController = datGuiObjectManipulation.add(objectManipulationParameters, "AO intensity").min(0).max(10).step(0.1).onChange(function(val){
+  guiHandler.omAOIntensityController = guiHandler.datGuiObjectManipulation.add(guiHandler.objectManipulationParameters, "AO intensity").min(0).max(10).step(0.1).onChange(function(val){
     var obj = selectionHandler.getSelectedObject();
     if (obj.isAddedObject){
       obj.mesh.material.uniforms.aoIntensity.value = val;
@@ -560,7 +613,7 @@ GUIHandler.prototype.initializeObjectManipulationGUI = function(){
       obj.mesh.material.uniforms.totalAOIntensity.value = val;
     }
   }).listen();
-  omEmissiveIntensityController = datGuiObjectManipulation.add(objectManipulationParameters, "Emissive int.").min(0).max(100).step(0.01).onChange(function(val){
+  guiHandler.omEmissiveIntensityController = guiHandler.datGuiObjectManipulation.add(guiHandler.objectManipulationParameters, "Emissive int.").min(0).max(100).step(0.01).onChange(function(val){
     var obj = selectionHandler.getSelectedObject();
     if (obj.isAddedObject){
       var material = obj.mesh.material;
@@ -570,106 +623,106 @@ GUIHandler.prototype.initializeObjectManipulationGUI = function(){
       material.uniforms.totalEmissiveIntensity.value = val;
     }
   }).listen();
-  omDisplacementScaleController = datGuiObjectManipulation.add(objectManipulationParameters, "Disp. scale").min(-50).max(50).step(0.1).onChange(function(val){
+  guiHandler.omDisplacementScaleController = guiHandler.datGuiObjectManipulation.add(guiHandler.objectManipulationParameters, "Disp. scale").min(-50).max(50).step(0.1).onChange(function(val){
     selectionHandler.getSelectedObject().mesh.material.uniforms.displacementInfo.value.x = val;
   }).listen();
-  omDisplacementBiasController = datGuiObjectManipulation.add(objectManipulationParameters, "Disp. bias").min(-50).max(50).step(0.1).onChange(function(val){
+  guiHandler.omDisplacementBiasController = guiHandler.datGuiObjectManipulation.add(guiHandler.objectManipulationParameters, "Disp. bias").min(-50).max(50).step(0.1).onChange(function(val){
     selectionHandler.getSelectedObject().mesh.material.uniforms.displacementInfo.value.y = val;
   }).listen();
 }
 
 GUIHandler.prototype.initializeTextManipulationGUI = function(){
-  datGuiTextManipulation = new dat.GUI();
-  textManipulationTextNameController = datGuiTextManipulation.add(textManipulationParameters, "Text").listen();
-  textManipulationContentController = datGuiTextManipulation.add(textManipulationParameters, "Content").onChange(function(val){
+  guiHandler.datGuiTextManipulation = new dat.GUI();
+  guiHandler.textManipulationTextNameController = guiHandler.datGuiTextManipulation.add(guiHandler.textManipulationParameters, "Text").listen();
+  guiHandler.textManipulationContentController = guiHandler.datGuiTextManipulation.add(guiHandler.textManipulationParameters, "Content").onChange(function(val){
     var addedText = selectionHandler.getSelectedObject();
     val = val.split("\\n").join("\n");
     var val2 = val.split("\n").join("");
     if (val2.length > addedText.strlen){
       terminal.clear();
       terminal.printError(Text.THIS_TEXT_IS_ALLOCATED_FOR.replace(Text.PARAM1, addedText.strlen));
-      textManipulationParameters["Content"] = addedText.text;
+      guiHandler.textManipulationParameters["Content"] = addedText.text;
       return;
     }
     addedText.setText(val);
   }).listen();
-  textManipulationTextColorController = datGuiTextManipulation.addColor(textManipulationParameters, "Text color").onChange(function(val){
+  guiHandler.textManipulationTextColorController = guiHandler.datGuiTextManipulation.addColor(guiHandler.textManipulationParameters, "Text color").onChange(function(val){
     selectionHandler.getSelectedObject().setColor(val);
   }).listen();
-  textManipulationAlphaController = datGuiTextManipulation.add(textManipulationParameters, "Alpha").min(0).max(1).step(0.01).onChange(function(val){
+  guiHandler.textManipulationAlphaController = guiHandler.datGuiTextManipulation.add(guiHandler.textManipulationParameters, "Alpha").min(0).max(1).step(0.01).onChange(function(val){
     selectionHandler.getSelectedObject().setAlpha(val);
   }).listen();
-  textManipulationHasBackgroundController = datGuiTextManipulation.add(textManipulationParameters, "Has bg").onChange(function(val){
+  guiHandler.textManipulationHasBackgroundController = guiHandler.datGuiTextManipulation.add(guiHandler.textManipulationParameters, "Has bg").onChange(function(val){
     if (val){
       selectionHandler.getSelectedObject().setBackground("#000000", 1);
-      guiHandler.enableController(textManipulationBackgroundColorController);
-      guiHandler.enableController(textManipulationBackgroundAlphaController);
+      guiHandler.enableController(guiHandler.textManipulationBackgroundColorController);
+      guiHandler.enableController(guiHandler.textManipulationBackgroundAlphaController);
     }else{
       selectionHandler.getSelectedObject().removeBackground();
-      guiHandler.disableController(textManipulationBackgroundColorController);
-      guiHandler.disableController(textManipulationBackgroundAlphaController);
+      guiHandler.disableController(guiHandler.textManipulationBackgroundColorController);
+      guiHandler.disableController(guiHandler.textManipulationBackgroundAlphaController);
     }
-    textManipulationParameters["Bg color"] = "#000000";
-    textManipulationParameters["Alpha"] = 1;
+    guiHandler.textManipulationParameters["Bg color"] = "#000000";
+    guiHandler.textManipulationParameters["Alpha"] = 1;
   }).listen();
-  textManipulationBackgroundColorController = datGuiTextManipulation.addColor(textManipulationParameters, "Bg color").onChange(function(val){
+  guiHandler.textManipulationBackgroundColorController = guiHandler.datGuiTextManipulation.addColor(guiHandler.textManipulationParameters, "Bg color").onChange(function(val){
     selectionHandler.getSelectedObject().setBackground(val, selectionHandler.getSelectedObject().material.uniforms.backgroundAlpha.value);
   }).listen();
-  textManipulationBackgroundAlphaController = datGuiTextManipulation.add(textManipulationParameters, "Bg alpha").min(0).max(1).step(0.01).onChange(function(val){
+  guiHandler.textManipulationBackgroundAlphaController = guiHandler.datGuiTextManipulation.add(guiHandler.textManipulationParameters, "Bg alpha").min(0).max(1).step(0.01).onChange(function(val){
     selectionHandler.getSelectedObject().setBackground(
       "#" + selectionHandler.getSelectedObject().material.uniforms.backgroundColor.value.getHexString(),
       val
     );
   }).listen();
-  textManipulationCharacterSizeController = datGuiTextManipulation.add(textManipulationParameters, "Char size").min(0.5).max(200).step(0.5).onChange(function(val){
+  guiHandler.textManipulationCharacterSizeController = guiHandler.datGuiTextManipulation.add(guiHandler.textManipulationParameters, "Char size").min(0.5).max(200).step(0.5).onChange(function(val){
     selectionHandler.getSelectedObject().setCharSize(val);
     selectionHandler.getSelectedObject().refCharSize= val;
     selectionHandler.getSelectedObject().refInnerHeight = window.innerHeight;
     selectionHandler.getSelectedObject().handleResize();
   }).listen();
-  textManipulationCharacterMarginController = datGuiTextManipulation.add(textManipulationParameters, "Char margin").min(0.5).max(100).step(0.5).onChange(function(val){
+  guiHandler.textManipulationCharacterMarginController = guiHandler.datGuiTextManipulation.add(guiHandler.textManipulationParameters, "Char margin").min(0.5).max(100).step(0.5).onChange(function(val){
     selectionHandler.getSelectedObject().setMarginBetweenChars(val);
     selectionHandler.getSelectedObject().handleResize();
   }).listen();
-  textManipulationLineMarginController = datGuiTextManipulation.add(textManipulationParameters, "Line margin").min(0.5).max(100).step(0.5).onChange(function(val){
+  guiHandler.textManipulationLineMarginController = guiHandler.datGuiTextManipulation.add(guiHandler.textManipulationParameters, "Line margin").min(0.5).max(100).step(0.5).onChange(function(val){
     selectionHandler.getSelectedObject().setMarginBetweenLines(val);
     selectionHandler.getSelectedObject().handleResize();
   }).listen();
-  textManipulationClickableController = datGuiTextManipulation.add(textManipulationParameters, "Clickable").onChange(function(val){
+  guiHandler.textManipulationClickableController = guiHandler.datGuiTextManipulation.add(guiHandler.textManipulationParameters, "Clickable").onChange(function(val){
     selectionHandler.getSelectedObject().isClickable = val;
   }).listen();
-  textManipulationAffectedByFogController = datGuiTextManipulation.add(textManipulationParameters, "Aff. by fog").onChange(function(val){
+  guiHandler.textManipulationAffectedByFogController = guiHandler.datGuiTextManipulation.add(guiHandler.textManipulationParameters, "Aff. by fog").onChange(function(val){
     selectionHandler.getSelectedObject().setAffectedByFog(val);
   }).listen();
-  textManipulationIs2DController = datGuiTextManipulation.add(textManipulationParameters, "is 2D").onChange(function(val){
+  guiHandler.textManipulationIs2DController = guiHandler.datGuiTextManipulation.add(guiHandler.textManipulationParameters, "is 2D").onChange(function(val){
     selectionHandler.getSelectedObject().set2DStatus(val);
     refreshRaycaster("Ok")
     if (val){
-      guiHandler.enableController(textManipulationMarginModeController);
-      guiHandler.enableController(textManipulationMarginXController);
-      guiHandler.enableController(textManipulationMarginYController);
-      guiHandler.enableController(textManipulationMaxWidthPercentController);
-      guiHandler.enableController(textManipulationMaxHeightPercentController);
-      guiHandler.disableController(textManipulationAffectedByFogController);
+      guiHandler.enableController(guiHandler.textManipulationMarginModeController);
+      guiHandler.enableController(guiHandler.textManipulationMarginXController);
+      guiHandler.enableController(guiHandler.textManipulationMarginYController);
+      guiHandler.enableController(guiHandler.textManipulationMaxWidthPercentController);
+      guiHandler.enableController(guiHandler.textManipulationMaxHeightPercentController);
+      guiHandler.disableController(guiHandler.textManipulationAffectedByFogController);
       selectionHandler.getSelectedObject().set2DCoordinates(
         selectionHandler.getSelectedObject().marginPercentWidth, selectionHandler.getSelectedObject().marginPercentHeight
       );
       selectionHandler.getSelectedObject().setAffectedByFog(false);
-      textManipulationParameters["Aff. by fog"] = false;
+      guiHandler.textManipulationParameters["Aff. by fog"] = false;
     }else{
-      guiHandler.disableController(textManipulationMarginModeController);
-      guiHandler.disableController(textManipulationMarginXController);
-      guiHandler.disableController(textManipulationMarginYController);
-      guiHandler.disableController(textManipulationMaxWidthPercentController);
-      guiHandler.disableController(textManipulationMaxHeightPercentController);
-      guiHandler.enableController(textManipulationAffectedByFogController);
+      guiHandler.disableController(guiHandler.textManipulationMarginModeController);
+      guiHandler.disableController(guiHandler.textManipulationMarginXController);
+      guiHandler.disableController(guiHandler.textManipulationMarginYController);
+      guiHandler.disableController(guiHandler.textManipulationMaxWidthPercentController);
+      guiHandler.disableController(guiHandler.textManipulationMaxHeightPercentController);
+      guiHandler.enableController(guiHandler.textManipulationAffectedByFogController);
     }
     selectionHandler.getSelectedObject().handleResize();
     var obj = selectionHandler.getSelectedObject();
     selectionHandler.resetCurrentSelection();
     selectionHandler.select(obj);
   }).listen();
-  textManipulationMarginModeController = datGuiTextManipulation.add(textManipulationParameters, "Margin mode", ["Top/Left", "Bottom/Right"]).onChange(function(val){
+  guiHandler.textManipulationMarginModeController = guiHandler.datGuiTextManipulation.add(guiHandler.textManipulationParameters, "Margin mode", ["Top/Left", "Bottom/Right"]).onChange(function(val){
     if (val == "Top/Left"){
       selectionHandler.getSelectedObject().marginMode = MARGIN_MODE_2D_TEXT_TOP_LEFT;
     }else{
@@ -679,33 +732,33 @@ GUIHandler.prototype.initializeTextManipulationGUI = function(){
       selectionHandler.getSelectedObject().marginPercentWidth, selectionHandler.getSelectedObject().marginPercentHeight
     );
   }).listen();
-  textManipulationMarginXController = datGuiTextManipulation.add(textManipulationParameters, "Margin X").min(0).max(100).step(0.1).onChange(function(val){
+  guiHandler.textManipulationMarginXController = guiHandler.datGuiTextManipulation.add(guiHandler.textManipulationParameters, "Margin X").min(0).max(100).step(0.1).onChange(function(val){
     selectionHandler.getSelectedObject().set2DCoordinates(
       val, selectionHandler.getSelectedObject().marginPercentHeight
     );
     selectionHandler.getSelectedObject().handleResize();
   }).listen();
-  textManipulationMarginYController = datGuiTextManipulation.add(textManipulationParameters, "Margin Y").min(0).max(100).step(0.1).onChange(function(val){
+  guiHandler.textManipulationMarginYController = guiHandler.datGuiTextManipulation.add(guiHandler.textManipulationParameters, "Margin Y").min(0).max(100).step(0.1).onChange(function(val){
     selectionHandler.getSelectedObject().set2DCoordinates(
       selectionHandler.getSelectedObject().marginPercentWidth, val
     );
     selectionHandler.getSelectedObject().handleResize();
   }).listen();
-  textManipulationMaxWidthPercentController = datGuiTextManipulation.add(textManipulationParameters, "Max width%").min(0).max(100).step(0.1).onChange(function(val){
+  guiHandler.textManipulationMaxWidthPercentController = guiHandler.datGuiTextManipulation.add(guiHandler.textManipulationParameters, "Max width%").min(0).max(100).step(0.1).onChange(function(val){
     selectionHandler.getSelectedObject().maxWidthPercent = val;
     selectionHandler.getSelectedObject().handleResize();
   }).listen();
-  textManipulationMaxHeightPercentController = datGuiTextManipulation.add(textManipulationParameters, "Max height%").min(0).max(100).step(0.1).onChange(function(val){
+  guiHandler.textManipulationMaxHeightPercentController = guiHandler.datGuiTextManipulation.add(guiHandler.textManipulationParameters, "Max height%").min(0).max(100).step(0.1).onChange(function(val){
     selectionHandler.getSelectedObject().maxHeightPercent = val;
     selectionHandler.getSelectedObject().handleResize();
   }).listen();
 }
 
 GUIHandler.prototype.initializeSkyboxGUI = function(){
-  datGuiSkybox = new dat.GUI();
-  skyboxNameController = datGuiSkybox.add(skyboxParameters, "Name").listen();
-  guiHandler.disableController(skyboxNameController, true);
-  skyboxColorController = datGuiSkybox.addColor(skyboxParameters, "Color").onChange(function(val){
+  guiHandler.datGuiSkybox = new dat.GUI();
+  guiHandler.skyboxNameController = guiHandler.datGuiSkybox.add(guiHandler.skyboxParameters, "Name").listen();
+  guiHandler.disableController(guiHandler.skyboxNameController, true);
+  guiHandler.skyboxColorController = guiHandler.datGuiSkybox.addColor(guiHandler.skyboxParameters, "Color").onChange(function(val){
     skyboxMesh.material.uniforms.color.value.set(val);
     skyBoxes[mappedSkyboxName].color = val;
     if (fogBlendWithSkybox){
@@ -720,8 +773,8 @@ GUIHandler.prototype.initializeSkyboxGUI = function(){
 }
 
 GUIHandler.prototype.initializeFogGUI = function(){
-  datGuiFog = new dat.GUI();
-  fogDensityController = datGuiFog.add(fogParameters, "Density").min(0).max(1).step(0.01).onChange(function(val){
+  guiHandler.datGuiFog = new dat.GUI();
+  fogDensityController = guiHandler.datGuiFog.add(fogParameters, "Density").min(0).max(1).step(0.01).onChange(function(val){
     fogDensity = val / 100;
     if (!fogBlendWithSkybox){
       GLOBAL_FOG_UNIFORM.value.set(fogDensity, fogColorRGB.r, fogColorRGB.g, fogColorRGB.b);
@@ -734,11 +787,11 @@ GUIHandler.prototype.initializeFogGUI = function(){
       );
     }
   }).listen();
-  fogColorController = datGuiFog.addColor(fogParameters, "Color").onChange(function(val){
+  fogColorController = guiHandler.datGuiFog.addColor(fogParameters, "Color").onChange(function(val){
     fogColorRGB.set(val);
     GLOBAL_FOG_UNIFORM.value.set(fogDensity, fogColorRGB.r, fogColorRGB.g, fogColorRGB.b);
   }).listen();
-  fogBlendWithSkyboxController = datGuiFog.add(fogParameters, "Blend skybox").onChange(function(val){
+  fogBlendWithSkyboxController = guiHandler.datGuiFog.add(fogParameters, "Blend skybox").onChange(function(val){
     if (!skyboxVisible){
       fogParameters["Blend skybox"] = false;
       return;

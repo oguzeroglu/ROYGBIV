@@ -63,7 +63,7 @@ ModeSwitcher.prototype.commonSwitchFunctions = function(){
   if (!isDeployment){
     guiHandler.hideAll();
     if (areaConfigurationsVisible){
-      guiHandler.hide(datGuiAreaConfigurations);
+      guiHandler.hide(guiHandler.datGuiAreaConfigurations);
       areaConfigurationsVisible = false;
     }
     selectionHandler.resetCurrentSelection();
@@ -94,11 +94,11 @@ ModeSwitcher.prototype.switchFromDesignToPreview = function(){
   originalBloomConfigurations.bloomThreshold = bloomThreshold;
   originalBloomConfigurations.bloomResolutionScale = bloomResolutionScale;
   originalBloomConfigurations.bloomOn = bloomOn;
-  postprocessingParameters["Bloom_strength"] = bloomStrength;
-  postprocessingParameters["Bloom_radius"] = bloomRadius;
-  postprocessingParameters["Bloom_threshhold"] = bloomThreshold;
-  postprocessingParameters["Bloom_resolution_scale"] = bloomResolutionScale;
-  postprocessingParameters["Bloom"] = bloomOn;
+  guiHandler.postprocessingParameters["Bloom_strength"] = bloomStrength;
+  guiHandler.postprocessingParameters["Bloom_radius"] = bloomRadius;
+  guiHandler.postprocessingParameters["Bloom_threshhold"] = bloomThreshold;
+  guiHandler.postprocessingParameters["Bloom_resolution_scale"] = bloomResolutionScale;
+  guiHandler.postprocessingParameters["Bloom"] = bloomOn;
   for (var gsName in gridSystems){
     scene.remove(gridSystems[gsName].gridSystemRepresentation);
     scene.remove(gridSystems[gsName].boundingPlane);

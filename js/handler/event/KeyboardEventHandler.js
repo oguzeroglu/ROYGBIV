@@ -159,7 +159,7 @@ KeyboardEventHandler.prototype.onKeyDown = function(event){
         terminal.printInfo(Text.OBJECT_DESTROYED);
         selectionHandler.resetCurrentSelection();
         if (areaConfigurationsVisible){
-          guiHandler.hide(datGuiAreaConfigurations);
+          guiHandler.hide(guiHandler.datGuiAreaConfigurations);
           areaConfigurationsVisible = false;
         }
       }else if (currentSelection.isObjectGroup){
@@ -169,7 +169,7 @@ KeyboardEventHandler.prototype.onKeyDown = function(event){
         terminal.clear();
         terminal.printInfo(Text.OBJECT_DESTROYED);
         if (areaConfigurationsVisible){
-          guiHandler.hide(datGuiAreaConfigurations);
+          guiHandler.hide(guiHandler.datGuiAreaConfigurations);
           areaConfigurationsVisible = false;
         }
       }else if (currentSelection.isAddedText){
