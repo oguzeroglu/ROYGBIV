@@ -186,24 +186,8 @@ StateLoader.prototype.load = function(){
         var centerX = metaData["centerX"];
         var centerY = metaData["centerY"];
         var centerZ = metaData["centerZ"];
-        var boxPhysicsShape;
-        var physicsShapeKey = "BOX" + PIPE + (boxSizeX / 2) + PIPE +
-                                             (boxSizeY / 2) + PIPE +
-                                             (boxSizeZ / 2);
-        boxPhysicsShape = physicsShapeCache[physicsShapeKey];
-        if (!boxPhysicsShape){
-          boxPhysicsShape = new CANNON.Box(new CANNON.Vec3(
-            boxSizeX / 2,
-            boxSizeY / 2,
-            boxSizeZ / 2
-          ));
-          physicsShapeCache[physicsShapeKey] = boxPhysicsShape;
-        }
-        var physicsMaterial = new CANNON.Material();
-        var boxPhysicsBody = new CANNON.Body({
-          mass: mass,
-          shape: boxPhysicsShape,
-          material: physicsMaterial
+        var boxPhysicsBody = physicsBodyGenerator.generateBoxBody({
+          x: metaData.physicsShapeParameterX, y: metaData.physicsShapeParameterY, z: metaData.physicsShapeParameterZ
         });
         var boxMesh;
         var boxClone;
@@ -273,25 +257,8 @@ StateLoader.prototype.load = function(){
 
         scene.add(surface);
 
-        var surfacePhysicsShape;
-        var physicsShapeKey = "BOX" + PIPE + physicsShapeParameterX + PIPE +
-                                             physicsShapeParameterY+ PIPE +
-                                             physicsShapeParameterZ;
-        surfacePhysicsShape = physicsShapeCache[physicsShapeKey];
-        if (!surfacePhysicsShape){
-          surfacePhysicsShape = new CANNON.Box(new CANNON.Vec3(
-              physicsShapeParameterX,
-              physicsShapeParameterY,
-              physicsShapeParameterZ
-          ));
-          physicsShapeCache[physicsShapeKey] = surfacePhysicsShape;
-        }
-
-        var physicsMaterial = new CANNON.Material();
-        var surfacePhysicsBody = new CANNON.Body({
-          mass: mass,
-          shape: surfacePhysicsShape,
-          material: physicsMaterial
+        var surfacePhysicsBody = physicsBodyGenerator.generateBoxBody({
+          x: physicsShapeParameterX, y: physicsShapeParameterY, z: physicsShapeParameterZ
         });
         surfacePhysicsBody.position.set(
           positionX,
@@ -299,8 +266,7 @@ StateLoader.prototype.load = function(){
           positionZ
         );
         physicsWorld.add(surfacePhysicsBody);
-        addedObjectInstance = new AddedObject(addedObjectName, "surface", metaData, material,
-                                    surface, surfacePhysicsBody, destroyedGrids);
+        addedObjectInstance = new AddedObject(addedObjectName, "surface", metaData, material, surface, surfacePhysicsBody, destroyedGrids);
         surface.addedObject = addedObjectInstance;
       }else if (type == "ramp"){
         var rampHeight = metaData["rampHeight"];
@@ -334,26 +300,8 @@ StateLoader.prototype.load = function(){
         ramp.quaternion.y = quaternionY;
         ramp.quaternion.z = quaternionZ;
         ramp.quaternion.w = quaternionW;
-
-        var rampPhysicsShape;
-        var physicsShapeKey = "BOX" + PIPE + (rampWidth / 2) + PIPE +
-                                             (surfacePhysicalThickness) + PIPE +
-                                             (rampHeight / 2);
-        rampPhysicsShape = physicsShapeCache[physicsShapeKey];
-        if (!rampPhysicsShape){
-          rampPhysicsShape = new CANNON.Box(new CANNON.Vec3(
-            rampWidth/2,
-            surfacePhysicalThickness,
-            rampHeight/2
-          ));
-          physicsShapeCache[physicsShapeKey] = rampPhysicsShape;
-        }
-
-        var physicsMaterial = new CANNON.Material();
-        var rampPhysicsBody = new CANNON.Body({
-          mass: mass,
-          shape: rampPhysicsShape,
-          material: physicsMaterial
+        var rampPhysicsBody = physicsBodyGenerator.generateBoxBody({
+          x: metaData.physicsShapeParameterX, y: metaData.physicsShapeParameterY, z: metaData.physicsShapeParameterZ
         });
         rampPhysicsBody.position.set(
           ramp.position.x,
@@ -379,19 +327,8 @@ StateLoader.prototype.load = function(){
         var centerX = metaData["centerX"];
         var centerY = metaData["centerY"];
         var centerZ = metaData["centerZ"];
-        var spherePhysicsShape;
-        var physicsShapeKey = "SPHERE" + PIPE + radius;
-        spherePhysicsShape = physicsShapeCache[physicsShapeKey];
-        if (!spherePhysicsShape){
-          spherePhysicsShape = new CANNON.Sphere(Math.abs(radius));
-          physicsShapeCache[physicsShapeKey] = spherePhysicsShape;
-        }
-        var physicsMaterial = new CANNON.Material();
-        var spherePhysicsBody = new CANNON.Body({
-          mass: mass,
-          shape: spherePhysicsShape,
-          material: physicsMaterial
-        });
+
+        var spherePhysicsBody = physicsBodyGenerator.generateSphereBody({radius: metaData.physicsShapeParameterRadius});
         var sphereMesh;
         var sphereClone;
         var axis = metaData["gridSystemAxis"];
@@ -441,58 +378,15 @@ StateLoader.prototype.load = function(){
         var centerZ = metaData["centerZ"];
         cylinderMesh.position.set(centerX, centerY, centerZ);
         scene.add(cylinderMesh);
-        var physicsMaterial = new CANNON.Material();
-        var cylinderPhysicsShape;
-        var physicsShapeKey = "CYLINDER" + PIPE + topRadius + PIPE + bottomRadius + PIPE +
-                                                  Math.abs(cylinderHeight) + PIPE + widthSegments + PIPE +
-                                                  metaData.gridSystemAxis;
-        var cached = false;
-        cylinderPhysicsShape = physicsShapeCache[physicsShapeKey];
-        if (!cylinderPhysicsShape){
-          cylinderPhysicsShape = new CANNON.Cylinder(topRadius, bottomRadius, Math.abs(cylinderHeight), widthSegments);
-          physicsShapeCache[physicsShapeKey] = cylinderPhysicsShape;
-        }else{
-          cached = true;
-        }
-        if (metaData.gridSystemAxis == "XZ"){
-          if (!cached){
-            var quat = new CANNON.Quaternion();
-            var coef = 1;
-            if (height < 0){
-              coef = -1;
-            }
-            quat.setFromAxisAngle(new CANNON.Vec3(1, 0, 0), -Math.PI/2 * coef);
-            var translation = new CANNON.Vec3(0, 0, 0);
-            cylinderPhysicsShape.transformAllPoints(translation,quat);
-          }
-        }else if (metaData.gridSystemAxis == "XY"){
+        if (metaData.gridSystemAxis == "XY"){
           cylinderMesh.rotateX(Math.PI/2);
-          if (!cached){
-            if (height < 0){
-              var quat = new CANNON.Quaternion();
-              quat.setFromAxisAngle(new CANNON.Vec3(0, 1, 0), -Math.PI);
-              var translation = new CANNON.Vec3(0, 0, 0);
-              cylinderPhysicsShape.transformAllPoints(translation,quat);
-            }
-          }
         }else if (metaData.gridSystemAxis == "YZ"){
           cylinderMesh.rotateZ(-Math.PI/2);
-          if (!cached){
-            var quat = new CANNON.Quaternion();
-            var coef = 1;
-            if (height < 0){
-              coef = -1;
-            }
-            quat.setFromAxisAngle(new CANNON.Vec3(0, 1, 0), coef * Math.PI/2);
-            var translation = new CANNON.Vec3(0, 0, 0);
-            cylinderPhysicsShape.transformAllPoints(translation,quat);
-          }
         }
-        var cylinderPhysicsBody = new CANNON.Body({
-          mass: mass,
-          shape: cylinderPhysicsShape,
-          material: physicsMaterial
-        });
+        var cylinderPhysicsBody = physicsBodyGenerator.generateCylinderBody({
+          topRadius: metaData.physicsShapeParameterTopRadius, bottomRadius: metaData.physicsShapeParameterBottomRadius,
+          height: metaData.physicsShapeParameterHeight, axis: metaData.physicsShapeParameterAxis
+        })
         cylinderPhysicsBody.position.set(centerX, centerY, centerZ);
         physicsWorld.add(cylinderPhysicsBody);
         addedObjectInstance = new AddedObject(
@@ -2307,7 +2201,7 @@ StateLoader.prototype.resetProject = function(){
   alphaTextureCache = new Object();
   emissiveTextureCache = new Object();
 
-  initBadTV();
+  initPostProcessing();
   if (!isDeployment){
     guiHandler.hideAll();
     $("#cliDivheader").text("ROYGBIV Scene Creator - CLI (Design mode)");

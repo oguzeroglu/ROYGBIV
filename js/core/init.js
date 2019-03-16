@@ -18,6 +18,9 @@ window.onload = function() {
     selectionHandler = new SelectionHandler();
   }
 
+  // PHYSICS BODY GENERATOR
+  physicsBodyGenerator = new PhysicsBodyGenerator();
+
   // CPU OPERATIONS HANDLER
   cpuOperationsHandler = new CPUOperationsHandler();
 
@@ -130,7 +133,7 @@ window.onload = function() {
   renderer.setSize(window.innerWidth, window.innerHeight);
   boundingClientRect = renderer.domElement.getBoundingClientRect();
   initPhysics();
-  initBadTV();
+  initPostProcessing();
   render();
   windowLoaded = true;
   MAX_VERTEX_UNIFORM_VECTORS = renderer.context.getParameter(renderer.context.MAX_VERTEX_UNIFORM_VECTORS);
@@ -157,7 +160,7 @@ window.onload = function() {
 };
 
 
-function initBadTV(){
+function initPostProcessing(){
  renderPass = new THREE.RenderPass(scene, camera);
  if (mode == 1){
   bloomPass = new THREE.UnrealBloomPass(

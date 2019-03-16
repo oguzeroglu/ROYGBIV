@@ -76,7 +76,7 @@ ModeSwitcher.prototype.commonSwitchFunctions = function(){
   GLOBAL_PS_REF_HEIGHT_UNIFORM.value = 0;
   trackingObjects = new Object();
   defaultCameraControlsDisabled = false;
-  initBadTV();
+  initPostProcessing();
   rayCaster.refresh();
   if (oldIsPaused){
     render();

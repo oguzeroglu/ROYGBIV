@@ -762,9 +762,7 @@ GridSystem.prototype.newSurface = function(name, grid1, grid2, material){
 
   scene.add(surface);
 
-  var surfacePhysicsShape;
   var physicsShapeParameters = new Object();
-
   if (this.axis == "XZ"){
     physicsShapeParameters["x"] = width/2;
     physicsShapeParameters["y"] = surfacePhysicalThickness;
@@ -778,24 +776,7 @@ GridSystem.prototype.newSurface = function(name, grid1, grid2, material){
     physicsShapeParameters["x"] = surfacePhysicalThickness;
     physicsShapeParameters["y"] = height/2;
   }
-  var physicsShapeKey = "BOX" + PIPE + physicsShapeParameters["x"] + PIPE +
-                                       physicsShapeParameters["y"] + PIPE +
-                                       physicsShapeParameters["z"];
-  surfacePhysicsShape = physicsShapeCache[physicsShapeKey];
-  if (!surfacePhysicsShape){
-    surfacePhysicsShape = new CANNON.Box(new CANNON.Vec3(
-      physicsShapeParameters["x"],
-      physicsShapeParameters["y"],
-      physicsShapeParameters["z"]
-    ));
-    physicsShapeCache[physicsShapeKey] = surfacePhysicsShape;
-  }
-  var physicsMaterial = new CANNON.Material();
-  var surfacePhysicsBody = new CANNON.Body({
-    mass: 0,
-    shape: surfacePhysicsShape,
-    material: physicsMaterial
-  });
+  var surfacePhysicsBody = physicsBodyGenerator.generateBoxBody(physicsShapeParameters);
   surfacePhysicsBody.position.set(
     surface.position.x,
     surface.position.y,
@@ -961,39 +942,19 @@ GridSystem.prototype.newRamp = function(anchorGrid, otherGrid, axis, height, mat
 
   scene.add(ramp);
 
-  var rampPhysicsShape;
-  var physicsShapeKey = "BOX" + PIPE + (rampWidth/2) + PIPE +
-                                       (surfacePhysicalThickness) + PIPE +
-                                       (rampHeight/2);
-  rampPhysicsShape = physicsShapeCache[physicsShapeKey];
-  if (!rampPhysicsShape){
-    rampPhysicsShape = new CANNON.Box(new CANNON.Vec3(
-      rampWidth/2,
-      surfacePhysicalThickness,
-      rampHeight/2
-    ));
-    physicsShapeCache[physicsShapeKey] = rampPhysicsShape;
+  var physicsShapeParameters = {
+    x: rampWidth/2, y: surfacePhysicalThickness, z: rampHeight/2
   }
-
-  var physicsMaterial = new CANNON.Material();
-
-  var rampPhysicsBody = new CANNON.Body({
-    mass: 0,
-    shape: rampPhysicsShape,
-    material: physicsMaterial
-  });
+  var rampPhysicsBody = physicsBodyGenerator.generateBoxBody(physicsShapeParameters);
   rampPhysicsBody.position.set(
     ramp.position.x,
     ramp.position.y,
     ramp.position.z
   );
-
   var fromEuler = new Object();
-
   fromEuler["x"] = 0;
   fromEuler["y"] = 0;
   fromEuler["z"] = 0;
-
   if (axis == "x"){
     if (this.axis == "XZ"){
       fromEuler["x"] = 0;
@@ -1010,7 +971,6 @@ GridSystem.prototype.newRamp = function(anchorGrid, otherGrid, axis, height, mat
       if (otherGrid.centerZ > anchorGrid.centerZ){
         coef = -1;
       }
-
       if (height < 0){
           coef = coef * -1;
       }
@@ -1033,7 +993,6 @@ GridSystem.prototype.newRamp = function(anchorGrid, otherGrid, axis, height, mat
       fromEuler["z"] = 0;
     }
   }
-
   rampPhysicsBody.quaternion.setFromEuler(
     fromEuler["x"],
     fromEuler["y"],
@@ -1060,6 +1019,10 @@ GridSystem.prototype.newRamp = function(anchorGrid, otherGrid, axis, height, mat
   metaData["fromEulerX"] = fromEuler["x"];
   metaData["fromEulerY"] = fromEuler["y"];
   metaData["fromEulerZ"] = fromEuler["z"];
+  metaData["physicsShapeParameterX"] = physicsShapeParameters["x"];
+  metaData["physicsShapeParameterY"] = physicsShapeParameters["y"];
+  metaData["physicsShapeParameterZ"] = physicsShapeParameters["z"];
+
 
   var addedObjectInstance = new AddedObject(name, "ramp", metaData, material,
                                     ramp, rampPhysicsBody, new Object());
@@ -1154,42 +1117,19 @@ GridSystem.prototype.newBox = function(selections, height, material, name){
 
   scene.add(boxMesh);
 
-  var boxPhysicsShape;
-  var physicsShapeKey = "BOX" + PIPE + (boxSizeX / 2) + PIPE +
-                                       (boxSizeY / 2) + PIPE +
-                                       (boxSizeZ / 2);
-  boxPhysicsShape = physicsShapeCache[physicsShapeKey];
-  if (!boxPhysicsShape){
-    boxPhysicsShape = new CANNON.Box(new CANNON.Vec3(
-      boxSizeX / 2,
-      boxSizeY / 2,
-      boxSizeZ / 2
-    ));
-    physicsShapeCache[physicsShapeKey] = boxPhysicsShape;
-  }
-
-  var physicsMaterial = new CANNON.Material();
-
-  var boxPhysicsBody = new CANNON.Body({
-    mass: 0,
-    shape: boxPhysicsShape,
-    material: physicsMaterial
-  });
+  var physicsShapeParameters = {x: boxSizeX/2, y: boxSizeY/2, z: boxSizeZ/2};
+  var boxPhysicsBody = physicsBodyGenerator.generateBoxBody(physicsShapeParameters);
   boxPhysicsBody.position.set(
     boxMesh.position.x,
     boxMesh.position.y,
     boxMesh.position.z
   );
-
   physicsWorld.add(boxPhysicsBody);
-
   for (var i = 0; i<selections.length; i++){
     selections[i].toggleSelect(false, false, false, true);
     delete gridSelections[selections[i].name];
   }
-
   var destroyedGrids = new Object();
-
   if(selections.length == 1){
     destroyedGrids[selections[0].name] = selections[0];
   }else{
@@ -1236,6 +1176,9 @@ GridSystem.prototype.newBox = function(selections, height, material, name){
   metaData["centerY"] = boxCenterY;
   metaData["centerZ"] = boxCenterZ;
   metaData["gridSystemAxis"] = this.axis;
+  metaData["physicsShapeParameterX"] = physicsShapeParameters["x"];
+  metaData["physicsShapeParameterY"] = physicsShapeParameters["y"];
+  metaData["physicsShapeParameterZ"] = physicsShapeParameters["z"];
 
   var addedObjectInstance = new AddedObject(name, "box", metaData, material,
                                     boxMesh, boxPhysicsBody, destroyedGrids);
@@ -1307,35 +1250,19 @@ GridSystem.prototype.newSphere = function(sphereName, material, radius, selectio
   sphereMesh.position.set(sphereCenterX, sphereCenterY, sphereCenterZ);
   scene.add(sphereMesh);
 
-  var spherePhysicsShape;
-  var physicsShapeKey = "SPHERE" + PIPE + radius;
-  spherePhysicsShape = physicsShapeCache[physicsShapeKey];
-  if (!spherePhysicsShape){
-    spherePhysicsShape = new CANNON.Sphere(Math.abs(radius));
-    physicsShapeCache[physicsShapeKey] = spherePhysicsShape;
-  }
-  var physicsMaterial = new CANNON.Material();
-
-  var spherePhysicsBody = new CANNON.Body({
-    mass: 0,
-    shape: spherePhysicsShape,
-    material: physicsMaterial
-  });
+  var physicsShapeParameters = {radius: radius};
+  var spherePhysicsBody = physicsBodyGenerator.generateSphereBody(physicsShapeParameters);
   spherePhysicsBody.position.set(
     sphereMesh.position.x,
     sphereMesh.position.y,
     sphereMesh.position.z
   );
-
   physicsWorld.add(spherePhysicsBody);
-
   for (var i = 0; i<selections.length; i++){
     selections[i].toggleSelect(false, false, false, true);
     delete gridSelections[selections[i].name];
   }
-
   var destroyedGrids = new Object();
-
   if(selections.length == 1){
     destroyedGrids[selections[0].name] = selections[0];
   }else{
@@ -1366,7 +1293,6 @@ GridSystem.prototype.newSphere = function(sphereName, material, radius, selectio
       }
     }
   }
-
   var metaData = new Object();
   metaData["radius"] = radius;
   metaData["gridCount"] = selections.length;
@@ -1379,11 +1305,9 @@ GridSystem.prototype.newSphere = function(sphereName, material, radius, selectio
   metaData["centerY"] = sphereMesh.position.y;
   metaData["centerZ"] = sphereMesh.position.z;
   metaData["gridSystemAxis"] = this.axis;
-
-  var addedObjectInstance = new AddedObject(sphereName, "sphere", metaData, material,
-                                    sphereMesh, spherePhysicsBody, destroyedGrids);
+  metaData["physicsShapeParameterRadius"] = physicsShapeParameters.radius;
+  var addedObjectInstance = new AddedObject(sphereName, "sphere", metaData, material, sphereMesh, spherePhysicsBody, destroyedGrids);
   addedObjects[sphereName] = addedObjectInstance;
-
   sphereMesh.addedObject = addedObjectInstance;
   addedObjectInstance.updateMVMatrix();
 }
@@ -1443,66 +1367,14 @@ GridSystem.prototype.newCylinder = function(cylinderName, material, topRadius, b
   var cylinderMesh = new MeshGenerator(cylinderGeometry, material).generateMesh();
   cylinderMesh.position.set(cylinderCenterX, cylinderCenterY, cylinderCenterZ);
   scene.add(cylinderMesh);
-  var cylinderPhysicsShape;
-  var physicsShapeKey = "CYLINDER" + PIPE + topRadius + PIPE + bottomRadius + PIPE +
-                                            Math.abs(height) + PIPE + 8 + PIPE +
-                                            this.axis;
-  cylinderPhysicsShape = physicsShapeCache[physicsShapeKey];
-  var cached = false;
-  if (!cylinderPhysicsShape){
-      cylinderPhysicsShape = new CANNON.Cylinder(topRadius, bottomRadius, Math.abs(height), 8);
-      physicsShapeCache[physicsShapeKey] = cylinderPhysicsShape;
-  }else{
-    cached = true;
-  }
-  cylinderPhysicsShape.topRadius = topRadius;
-  cylinderPhysicsShape.bottomRadius = bottomRadius;
-  cylinderPhysicsShape.height = Math.abs(height);
-  if (this.axis == "XZ"){
-    if (!cached){
-      var quat = new CANNON.Quaternion();
-      var coef = 1;
-      if (height < 0){
-        coef = -1;
-      }
-      quat.setFromAxisAngle(new CANNON.Vec3(1, 0, 0), -Math.PI/2 * coef);
-      var translation = new CANNON.Vec3(0, 0, 0);
-      cylinderPhysicsShape.transformAllPoints(translation,quat);
-    }
-  }else if (this.axis == "XY"){
+  var physicsShapeParameters = {topRadius: topRadius, bottomRadius: bottomRadius, height: height, axis: this.axis};
+  if (this.axis == "XY"){
     cylinderMesh.rotateX(Math.PI/2);
-    if (!cached){
-      if (height < 0){
-        var quat = new CANNON.Quaternion();
-        quat.setFromAxisAngle(new CANNON.Vec3(0, 1, 0), -Math.PI);
-        var translation = new CANNON.Vec3(0, 0, 0);
-        cylinderPhysicsShape.transformAllPoints(translation,quat);
-      }
-    }
   }else if (this.axis == "YZ"){
     cylinderMesh.rotateZ(-Math.PI/2);
-    if (!cached){
-      var quat = new CANNON.Quaternion();
-      var coef = 1;
-      if (height < 0){
-        coef = -1;
-      }
-      quat.setFromAxisAngle(new CANNON.Vec3(0, 1, 0), coef * Math.PI/2);
-      var translation = new CANNON.Vec3(0, 0, 0);
-      cylinderPhysicsShape.transformAllPoints(translation,quat);
-    }
   }
-  var physicsMaterial = new CANNON.Material();
-  var cylinderPhysicsBody = new CANNON.Body({
-    mass: 0,
-    shape: cylinderPhysicsShape,
-    material: physicsMaterial
-  });
-  cylinderPhysicsBody.position.set(
-    cylinderMesh.position.x,
-    cylinderMesh.position.y,
-    cylinderMesh.position.z
-  );
+  var cylinderPhysicsBody = physicsBodyGenerator.generateCylinderBody(physicsShapeParameters);
+  cylinderPhysicsBody.position.set(cylinderMesh.position.x, cylinderMesh.position.y, cylinderMesh.position.z);
   physicsWorld.add(cylinderPhysicsBody);
   for (var i = 0; i<selections.length; i++){
     selections[i].toggleSelect(false, false, false, true);
@@ -1554,6 +1426,10 @@ GridSystem.prototype.newCylinder = function(cylinderName, material, topRadius, b
   metaData["centerY"] = cylinderMesh.position.y;
   metaData["centerZ"] = cylinderMesh.position.z;
   metaData["gridSystemAxis"] = this.axis;
+  metaData["physicsShapeParameterTopRadius"] = physicsShapeParameters.topRadius;
+  metaData["physicsShapeParameterBottomRadius"] = physicsShapeParameters.bottomRadius;
+  metaData["physicsShapeParameterHeight"] = physicsShapeParameters.height;
+  metaData["physicsShapeParameterAxis"] = physicsShapeParameters.axis;
 
   var addedObjectInstance = new AddedObject(cylinderName, "cylinder", metaData, material,
                                     cylinderMesh, cylinderPhysicsBody, destroyedGrids);
