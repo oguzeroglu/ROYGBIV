@@ -186,6 +186,15 @@ StateLoader.prototype.load = function(){
         var centerX = metaData["centerX"];
         var centerY = metaData["centerY"];
         var centerZ = metaData["centerZ"];
+        if (!metaData.physicsShapeParameterX){
+          metaData.physicsShapeParameterX = boxSizeX / 2;
+        }
+        if (!metaData.physicsShapeParameterY){
+          metaData.physicsShapeParameterY = boxSizeY / 2;
+        }
+        if (!metaData.physicsShapeParameterZ){
+          metaData.physicsShapeParameterZ = boxSizeZ / 2;
+        }
         var boxPhysicsBody = physicsBodyGenerator.generateBoxBody({
           x: metaData.physicsShapeParameterX, y: metaData.physicsShapeParameterY, z: metaData.physicsShapeParameterZ,
           mass: mass
@@ -329,7 +338,9 @@ StateLoader.prototype.load = function(){
         var centerX = metaData["centerX"];
         var centerY = metaData["centerY"];
         var centerZ = metaData["centerZ"];
-
+        if (!metaData.physicsShapeParameterRadius){
+          metaData.physicsShapeParameterRadius = metaData.radius;
+        }
         var spherePhysicsBody = physicsBodyGenerator.generateSphereBody({radius: metaData.physicsShapeParameterRadius, mass: mass});
         var sphereMesh;
         var sphereClone;
