@@ -187,7 +187,8 @@ StateLoader.prototype.load = function(){
         var centerY = metaData["centerY"];
         var centerZ = metaData["centerZ"];
         var boxPhysicsBody = physicsBodyGenerator.generateBoxBody({
-          x: metaData.physicsShapeParameterX, y: metaData.physicsShapeParameterY, z: metaData.physicsShapeParameterZ
+          x: metaData.physicsShapeParameterX, y: metaData.physicsShapeParameterY, z: metaData.physicsShapeParameterZ,
+          mass: mass
         });
         var boxMesh;
         var boxClone;
@@ -258,7 +259,7 @@ StateLoader.prototype.load = function(){
         scene.add(surface);
 
         var surfacePhysicsBody = physicsBodyGenerator.generateBoxBody({
-          x: physicsShapeParameterX, y: physicsShapeParameterY, z: physicsShapeParameterZ
+          x: physicsShapeParameterX, y: physicsShapeParameterY, z: physicsShapeParameterZ, mass: mass
         });
         surfacePhysicsBody.position.set(
           positionX,
@@ -301,7 +302,8 @@ StateLoader.prototype.load = function(){
         ramp.quaternion.z = quaternionZ;
         ramp.quaternion.w = quaternionW;
         var rampPhysicsBody = physicsBodyGenerator.generateBoxBody({
-          x: metaData.physicsShapeParameterX, y: metaData.physicsShapeParameterY, z: metaData.physicsShapeParameterZ
+          x: metaData.physicsShapeParameterX, y: metaData.physicsShapeParameterY, z: metaData.physicsShapeParameterZ,
+          mass: mass
         });
         rampPhysicsBody.position.set(
           ramp.position.x,
@@ -328,7 +330,7 @@ StateLoader.prototype.load = function(){
         var centerY = metaData["centerY"];
         var centerZ = metaData["centerZ"];
 
-        var spherePhysicsBody = physicsBodyGenerator.generateSphereBody({radius: metaData.physicsShapeParameterRadius});
+        var spherePhysicsBody = physicsBodyGenerator.generateSphereBody({radius: metaData.physicsShapeParameterRadius, mass: mass});
         var sphereMesh;
         var sphereClone;
         var axis = metaData["gridSystemAxis"];
@@ -389,7 +391,7 @@ StateLoader.prototype.load = function(){
         var cylinderPhysicsBody = physicsBodyGenerator.generateCylinderBody({
           topRadius: metaData.physicsShapeParameterTopRadius, bottomRadius: metaData.physicsShapeParameterBottomRadius,
           height: metaData.physicsShapeParameterHeight, axis: metaData.physicsShapeParameterAxis,
-          radialSegments: metaData.physicsShapeParameterRadialSegments
+          radialSegments: metaData.physicsShapeParameterRadialSegments, mass: mass
         })
         cylinderPhysicsBody.position.set(centerX, centerY, centerZ);
         physicsWorld.addBody(cylinderPhysicsBody);

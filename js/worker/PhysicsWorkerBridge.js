@@ -7,6 +7,7 @@ var PhysicsWorkerBridge = function(){
   this.idsByObjectName = new Object();
   this.objectsByID = new Object();
   this.updateObjectBufferSize = 10;
+  this.tickBufferSize = 10;
   this.worker.addEventListener("message", function(msg){
     if (msg.data.isDebug){
       console.log("[*] Debug response received.");
@@ -20,6 +21,12 @@ var PhysicsWorkerBridge = function(){
         }
       }
     }else if (msg.data.isIDResponse){
+      physicsWorld.tickBuffer = [];
+      physicsWorld.tickBufferAvailibilities = [];
+      for (var i = 0; i<physicsWorld.tickBufferSize; i++){
+        physicsWorld.tickBuffer.push(new Float32Array(3));
+        physicsWorld.tickBufferAvailibilities.push(true);
+      }
       physicsWorld.updateObjectBuffer = [];
       physicsWorld.updateObjectBufferAvailibilities = [];
       physicsWorld.updateBuffer = new Map();
@@ -46,6 +53,10 @@ var PhysicsWorkerBridge = function(){
           var bufID = ary[1];
           physicsWorld.updateObjectBuffer[bufID] = ary;
           physicsWorld.updateObjectBufferAvailibilities[bufID] = true;
+        }else if (ary[0] == 1){
+          var bufID = ary[1];
+          physicsWorld.tickBuffer[bufID] = ary;
+          physicsWorld.tickBufferAvailibilities[bufID] = true;
         }
       }
     }
@@ -92,6 +103,22 @@ PhysicsWorkerBridge.prototype.step = function(stepAmount){
   }
   this.updateBuffer.forEach(this.issueUpdate);
   this.updateBuffer.clear();
+  var tickSent = false;
+  for (var i = 0; i<this.tickBuffer.length; i++){
+    if (this.tickBufferAvailibilities[i]){
+      var buf = this.tickBuffer[i];
+      buf[0] = 1;
+      buf[1] = i;
+      buf[2] = stepAmount;
+      this.workerMessageHandler.push(buf.buffer);
+      this.tickBufferAvailibilities[i] = false;
+      tickSent = true;
+      break;
+    }
+  }
+  if (!tickSent){
+    console.warn("[!] PhysicsWorkerBridge.step tick buffer overflow.");
+  }
   this.workerMessageHandler.flush();
 }
 

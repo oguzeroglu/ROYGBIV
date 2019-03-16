@@ -69,6 +69,9 @@ PhysicsWorker.prototype.updateObject = function(ary){
   obj.physicsBody.position.set(ary[3], ary[4], ary[5]);
   obj.physicsBody.quaternion.set(ary[6], ary[7], ary[8], ary[9]);
 }
+PhysicsWorker.prototype.step = function(ary){
+  physicsWorld.step(ary[2]);
+}
 // START
 var PIPE = "|";
 var UNDEFINED = "undefined";
@@ -92,6 +95,8 @@ self.onmessage = function(msg){
       var ary = new Float32Array(msg.data[i]);
       if (ary[0] == 0){
         worker.updateObject(ary);
+      }else if (ary[0] == 1){
+        worker.step(ary);
       }
       worker.workerMessageHandler.push(ary.buffer);
     }
