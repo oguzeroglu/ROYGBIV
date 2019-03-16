@@ -106,6 +106,27 @@ PhysicsWorker.prototype.step = function(ary){
   dynamicAddedObjects.forEach(this.updateDynamicObjectBuffer);
   dynamicObjectGroups.forEach(this.updateDynamicObjectBuffer)
 }
+PhysicsWorker.prototype.resetObjectVelocity = function(ary){
+  var obj = worker.objectsByID[ary[2]];
+  obj.physicsBody.velocity.set(0, 0, 0);
+  obj.physicsBody.angularVelocity.set(0, 0, 0);
+}
+PhysicsWorker.prototype.setObjectVelocity = function(ary){
+  var obj = worker.objectsByID[ary[2]];
+  obj.physicsBody.velocity.set(ary[3], ary[4], ary[5]);
+}
+PhysicsWorker.prototype.setObjectVelocityX = function(ary){
+  var obj = worker.objectsByID[ary[2]];
+  obj.physicsBody.velocity.x = ary[3];
+}
+PhysicsWorker.prototype.setObjectVelocityY = function(ary){
+  var obj = worker.objectsByID[ary[2]];
+  obj.physicsBody.velocity.y = ary[3];
+}
+PhysicsWorker.prototype.setObjectVelocityZ = function(ary){
+  var obj = worker.objectsByID[ary[2]];
+  obj.physicsBody.velocity.z = ary[3];
+}
 // START
 var PIPE = "|";
 var UNDEFINED = "undefined";
@@ -135,6 +156,16 @@ self.onmessage = function(msg){
         var bufID = ary[1];
         worker.dynamicObjectUpdateBuffer[bufID] = ary;
         worker.dynamicObjectUpdateBufferAvailibilities[bufID] = true;
+      }else if (ary[0] == 3){
+        worker.resetObjectVelocity(ary);
+      }else if (ary[0] == 4){
+        worker.setObjectVelocity(ary);
+      }else if (ary[0] == 5){
+        worker.setObjectVelocityX(ary);
+      }else if (ary[0] == 6){
+        worker.setObjectVelocityY(ary);
+      }else if (ary[0] == 7){
+        worker.setObjectVelocityZ(ary);
       }
       if (ary[0] != 2){
         worker.workerMessageHandler.push(ary.buffer);

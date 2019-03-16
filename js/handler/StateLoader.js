@@ -2132,6 +2132,11 @@ StateLoader.prototype.resetProject = function(){
     physicsWorld = new CANNON.World();
     physicsWorld.refresh = function(){}
     physicsWorld.updateObject = function(){}
+    physicsWorld.resetObjectVelocity = function(){}
+    physicsWorld.setObjectVelocity = function(){}
+    physicsWorld.setObjectVelocityX = function(){}
+    physicsWorld.setObjectVelocityY = function(){}
+    physicsWorld.setObjectVelocityZ = function(){}
     physicsWorld.ready = true;
   }else{
     rayCaster.worker.terminate();

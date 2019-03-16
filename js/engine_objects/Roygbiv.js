@@ -900,14 +900,18 @@ Roygbiv.prototype.setObjectVelocity = function(object, velocityVector, axis){
     preConditions.checkIfAxisOnlyIfDefined(ROYGBIV.setObjectVelocity, preConditions.axis, axis);
     if (axis == "x"){
       object.physicsBody.velocity.x = velocityVector.x;
+      physicsWorld.setObjectVelocityX(object, velocityVector.x);
     }else if (axis == "y"){
       object.physicsBody.velocity.y = velocityVector.y;
+      physicsWorld.setObjectVelocityY(object, velocityVector.y);
     }else if (axis == "z"){
       object.physicsBody.velocity.z = velocityVector.z;
+      physicsWorld.setObjectVelocityZ(object, velocityVector.z);
     }
     return;
   }
   object.physicsBody.velocity.set(velocityVector.x, velocityVector.y, velocityVector.z);
+  physicsWorld.setObjectVelocity(object, velocityVector);
 }
 
 // setObjectColor
@@ -989,6 +993,7 @@ Roygbiv.prototype.resetObjectVelocity = function(object){
   preConditions.checkIfDynamic(ROYGBIV.resetObjectVelocity, preConditions.object, object);
   object.physicsBody.velocity.set(0, 0, 0);
   object.physicsBody.angularVelocity.set(0, 0, 0);
+  physicsWorld.resetObjectVelocity(object);
 }
 
 // PARTICLE SYSTEM FUNCTIONS ***************************************************
