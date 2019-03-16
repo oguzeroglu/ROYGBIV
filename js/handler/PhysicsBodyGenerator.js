@@ -110,6 +110,10 @@ PhysicsBodyGenerator.prototype.generateSphereBody = function(params){
     physicsShapeCache[physicsShapeKey] = spherePhysicsShape;
   }
   var physicsMaterial = new CANNON.Material();
-  var spherePhysicsBody = new CANNON.Body({mass: 0, shape: spherePhysicsShape, material: physicsMaterial});
+  var mass = 0;
+  if (!(typeof params.mass == UNDEFINED)){
+    mass = params.mass;
+  }
+  var spherePhysicsBody = new CANNON.Body({mass: mass, shape: spherePhysicsShape, material: physicsMaterial});
   return spherePhysicsBody;
 }

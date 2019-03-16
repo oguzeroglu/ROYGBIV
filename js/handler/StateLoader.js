@@ -2117,6 +2117,7 @@ StateLoader.prototype.resetProject = function(){
   if (!WORKERS_SUPPORTED){
     rayCaster = new RayCaster();
     physicsWorld = new CANNON.World();
+    physicsWorld.refresh = function(){}
   }else{
     rayCaster.worker.terminate();
     physicsWorld.worker.terminate();

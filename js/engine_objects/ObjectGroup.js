@@ -1015,7 +1015,7 @@ ObjectGroup.prototype.glue = function(){
   var referenceVectorTHREE = new THREE.Vector3(
     centerX, centerY, centerZ
   );
-
+  this.initialPhysicsPositionWhenGlued = {x: referenceVector.x, y: referenceVector.y, z: referenceVector.z};
   physicsBody.position = referenceVector;
   graphicsGroup.position.copy(physicsBody.position);
 
@@ -1478,6 +1478,12 @@ ObjectGroup.prototype.exportLightweight = function(){
       boundingBox: this.boundingBoxes[i]
     });
   }
+  exportObj.mass = this.physicsBody.mass;
+  exportObj.noMass = this.noMass;
+  exportObj.cannotSetMass = this.cannotSetMass;
+  exportObj.physicsPosition = {x: this.physicsBody.position.x, y: this.physicsBody.position.y, z: this.physicsBody.position.z};
+  exportObj.physicsQuaternion = {x: this.physicsBody.quaternion.x, y: this.physicsBody.quaternion.y, z: this.physicsBody.quaternion.z, w: this.physicsBody.quaternion.w};
+  exportObj.initialPhysicsPositionWhenGlued = this.initialPhysicsPositionWhenGlued;
   return exportObj;
 }
 

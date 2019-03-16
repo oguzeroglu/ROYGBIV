@@ -107,6 +107,7 @@ AddedObject.prototype.exportLightweight = function(){
   }
   this.mesh.updateMatrixWorld();
   var exportObject = new Object();
+  exportObject.type = this.type;
   exportObject.isChangeable = this.isChangeable;
   exportObject.isIntersectable = this.isIntersectable;
   if (!this.parentObjectName){
@@ -133,6 +134,16 @@ AddedObject.prototype.exportLightweight = function(){
     exportObject.pseudoFaces.push(this.pseudoFaces[i]);
   }
   exportObject.metaData = this.metaData;
+  exportObject.mass = this.physicsBody.mass;
+  exportObject.noMass = this.noMass;
+  if (!this.parentObjectName){
+    exportObject.physicsPosition = {x: this.physicsBody.position.x, y: this.physicsBody.position.y, z: this.physicsBody.position.z};
+    exportObject.physicsQuaternion = {x: this.physicsBody.quaternion.x, y: this.physicsBody.quaternion.y, z: this.physicsBody.quaternion.z, w: this.physicsBody.quaternion.w};
+  }else{
+    exportObject.hasParent = true;
+    exportObject.physicsPosition = this.physicsPositionWhenAttached;
+    exportObject.physicsQuaternion = this.physicsQuaternionWhenAttached;
+  }
   return exportObject;
 }
 
@@ -661,6 +672,8 @@ AddedObject.prototype.setAttachedProperties = function(){
   this.positionXWhenAttached = this.mesh.position.x;
   this.positionYWhenAttached = this.mesh.position.y;
   this.positionZWhenAttached = this.mesh.position.z;
+  this.physicsPositionWhenAttached = {x: this.physicsBody.position.x, y: this.physicsBody.position.y, z: this.physicsBody.position.z};
+  this.physicsQuaternionWhenAttached = {x: this.physicsBody.quaternion.x, y: this.physicsBody.quaternion.y, z: this.physicsBody.quaternion.z, w: this.physicsBody.quaternion.w};
 }
 
 AddedObject.prototype.getTextureUniform = function(texture){

@@ -66,6 +66,7 @@ window.onload = function() {
   if (!WORKERS_SUPPORTED){
     rayCaster = new RayCaster();
     physicsWorld = new CANNON.World();
+    physicsWorld.refresh = function(){}
   }else{
     rayCaster = new RaycasterWorkerBridge();
     physicsWorld = new PhysicsWorkerBridge();

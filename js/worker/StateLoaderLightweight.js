@@ -185,6 +185,110 @@ StateLoaderLightweight.prototype.loadBoundingBoxes = function(){
   }
 }
 
+StateLoaderLightweight.prototype.loadPhysics = function(){
+  var addedObjectExports = this.state.addedObjects;
+  var childAddedObjectExports = this.state.childAddedObjects;
+  var objectGroupExports = this.state.objectGroups;
+  var totalAddedObjectExports = new Object();
+  var childBodies = new Object();
+  for (var objName in addedObjectExports){
+    totalAddedObjectExports[objName] = addedObjectExports[objName];
+  }
+  for (var objName in childAddedObjectExports){
+    totalAddedObjectExports[objName] = childAddedObjectExports[objName];
+  }
+  for (var objName in totalAddedObjectExports){
+    var curAddedObjectExport = totalAddedObjectExports[objName];
+    var physicsBody;
+    switch (curAddedObjectExport.type){
+      case "surface":
+        physicsBody = physicsBodyGenerator.generateBoxBody({
+          x: curAddedObjectExport.metaData.physicsShapeParameterX, y: curAddedObjectExport.metaData.physicsShapeParameterY,
+          z: curAddedObjectExport.metaData.physicsShapeParameterZ, mass: curAddedObjectExport.mass
+        });
+      break;
+      case "ramp":
+        physicsBody = physicsBodyGenerator.generateBoxBody({
+          x: curAddedObjectExport.metaData.physicsShapeParameterX, y: curAddedObjectExport.metaData.physicsShapeParameterY,
+          z: curAddedObjectExport.metaData.physicsShapeParameterZ, mass: curAddedObjectExport.mass
+        });
+      break;
+      case "box":
+        physicsBody = physicsBodyGenerator.generateBoxBody({
+          x: curAddedObjectExport.metaData.physicsShapeParameterX, y: curAddedObjectExport.metaData.physicsShapeParameterY,
+          z: curAddedObjectExport.metaData.physicsShapeParameterZ, mass: curAddedObjectExport.mass
+        });
+      break;
+      case "sphere":
+        physicsBody = physicsBodyGenerator.generateSphereBody({
+          radius: curAddedObjectExport.metaData.physicsShapeParameterRadius, mass: curAddedObjectExport.mass
+        });
+      break;
+      case "cylinder":
+        physicsBody = physicsBodyGenerator.generateCylinderBody({
+          topRadius: curAddedObjectExport.metaData.physicsShapeParameterTopRadius,
+          bottomRadius: curAddedObjectExport.metaData.physicsShapeParameterBottomRadius,
+          height: curAddedObjectExport.metaData.physicsShapeParameterHeight,
+          radialSegments: curAddedObjectExport.metaData.physicsShapeParameterRadialSegments,
+          axis: curAddedObjectExport.metaData.physicsShapeParameterAxis
+        });
+      break;
+      default:
+        throw new Error("Not implemented.");
+      break;
+    }
+    physicsBody.position.copy(curAddedObjectExport.physicsPosition);
+    physicsBody.quaternion.copy(curAddedObjectExport.physicsQuaternion);
+    physicsBody.roygbivName = objName;
+    if (!curAddedObjectExport.noMass){
+      physicsWorld.addBody(physicsBody);
+      if (curAddedObjectExport.hasParent){
+        childBodies[objName] = physicsBody;
+      }
+    }
+  }
+  for (var objName in objectGroupExports){
+    var curExport = objectGroupExports[objName];
+    if (curExport.noMass || curExport.cannotSetMass){
+      continue;
+    }
+    var physicsBody = physicsBodyGenerator.generateEmptyBody();
+    physicsBody.roygbivName = objName;
+    physicsBody.mass = curExport.mass;
+    var hasAnyPhysicsShape = false;
+    physicsBody.position.copy(curExport.initialPhysicsPositionWhenGlued);
+    for (var i = 0; i<curExport.childNames.length; i++){
+      var childBody = childBodies[curExport.childNames[i]];
+      physicsWorld.removeBody(childBody);
+      delete childBodies[objName];
+      var shape = childBody.shapes[0];
+      physicsBody.addShape(shape, childBody.position.vsub(physicsBody.position), childBody.quaternion);
+      hasAnyPhysicsShape = true;
+    }
+    if (hasAnyPhysicsShape){
+      physicsBody.position.copy(curExport.physicsPosition);
+      physicsBody.quaternion.copy(curExport.physicsQuaternion);
+      physicsWorld.addBody(physicsBody);
+    }
+  }
+}
+
+StateLoaderLightweight.prototype.loadPhysicsData = function(){
+  quatNormalizeSkip = this.state.quatNormalizeSkip;
+  quatNormalizeFast = this.state.quatNormalizeFast;
+  contactEquationStiffness = this.state.contactEquationStiffness;
+  contactEquationRelaxation = this.state.contactEquationRelaxation;
+  friction = this.state.friction;
+  physicsIterations = this.state.physicsIterations;
+  physicsTolerance = this.state.physicsTolerance;
+  physicsSolver = new CANNON.GSSolver();
+  gravityY = this.state.gravityY;
+}
+
+StateLoaderLightweight.prototype.resetPhysics = function(){
+  physicsWorld = new CANNON.World();
+}
+
 StateLoaderLightweight.prototype.reset = function(){
   addedObjects = new Object();
   objectGroups = new Object();

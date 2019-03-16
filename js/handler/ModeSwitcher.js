@@ -78,6 +78,7 @@ ModeSwitcher.prototype.commonSwitchFunctions = function(){
   defaultCameraControlsDisabled = false;
   initPostProcessing();
   rayCaster.refresh();
+  physicsWorld.refresh();
   if (oldIsPaused){
     render();
   }

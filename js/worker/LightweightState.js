@@ -15,6 +15,15 @@ var LightweightState = function(){
   var vp = renderer.getCurrentViewport();
   this.viewport = {x: vp.x, y: vp.y, z: vp.z, w: vp.w}
   this.screenResolution = screenResolution;
+  // PHYSICS DATA
+  this.quatNormalizeSkip = quatNormalizeSkip;
+  this.quatNormalizeFast = quatNormalizeFast;
+  this.contactEquationStiffness = contactEquationStiffness;
+  this.contactEquationRelaxation = contactEquationRelaxation;
+  this.friction = friction;
+  this.physicsIterations = physicsIterations;
+  this.physicsTolerance = physicsTolerance;
+  this.gravityY = gravityY;
   // CAMERA
   this.camera = {
     position: {x: camera.position.x, y: camera.position.y, z: camera.position.z},
