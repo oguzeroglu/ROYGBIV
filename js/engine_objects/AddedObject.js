@@ -1852,53 +1852,10 @@ AddedObject.prototype.modifyCylinderPhysicsAfterSegmentChange = function(radialS
   if (!this.noMass){
     physicsWorld.remove(this.physicsBody);
   }
-  var physicsShapeKey = "CYLINDER" + PIPE + topRadius + PIPE + bottomRadius + PIPE +
-                                            Math.abs(height) + PIPE + radialSegments + PIPE +
-                                            this.metaData.gridSystemAxis;
-  var newPhysicsShape = physicsShapeCache[physicsShapeKey];
-  var cached = false;
-  if (!newPhysicsShape){
-    newPhysicsShape = new CANNON.Cylinder(
-      this.metaData.topRadius, this.metaData.bottomRadius, Math.abs(this.metaData.height), parseInt(radialSegments)
-    );
-    physicsShapeCache[physicsShapeKey] = newPhysicsShape;
-  }else{
-    cached = true;
-  }
-  if (!cached){
-    if (this.metaData.gridSystemAxis == "XZ"){
-      var quat = new CANNON.Quaternion();
-      var coef = 1;
-      if (height < 0){
-        coef = -1;
-      }
-      quat.setFromAxisAngle(new CANNON.Vec3(1, 0, 0), -Math.PI/2 * coef);
-      var translation = new CANNON.Vec3(0, 0, 0);
-      newPhysicsShape.transformAllPoints(translation,quat);
-    }else if (this.metaData.gridSystemAxis == "XY"){
-      if (height < 0){
-        var quat = new CANNON.Quaternion();
-        quat.setFromAxisAngle(new CANNON.Vec3(0, 1, 0), -Math.PI);
-        var translation = new CANNON.Vec3(0, 0, 0);
-        newPhysicsShape.transformAllPoints(translation,quat);
-      }
-    }else if (this.metaData.gridSystemAxis == "YZ"){
-      var quat = new CANNON.Quaternion();
-      var coef = 1;
-      if (height < 0){
-        coef = -1;
-      }
-      quat.setFromAxisAngle(new CANNON.Vec3(0, 1, 0), coef * Math.PI/2);
-      var translation = new CANNON.Vec3(0, 0, 0);
-      newPhysicsShape.transformAllPoints(translation,quat);
-    }
-  }
-  var physicsMaterial = this.physicsBody.material;
-  var mass = this.physicsBody.mass;
-  this.physicsBody = new CANNON.Body({
-    mass: mass,
-    shape: newPhysicsShape,
-    material: physicsMaterial
+  this.physicsBody = physicsBodyGenerator.generateCylinderBody({
+    topRadius: topRadius, bottomRadius: bottomRadius, height: height,
+    radialSegments: radialSegments, axis: this.metaData.gridSystemAxis,
+    material: this.physicsBody.material, mass: this.physicsBody.mass
   });
   this.physicsBody.position.copy(oldPosition);
   this.physicsBody.quaternion.copy(oldQuaternion);
@@ -2409,11 +2366,7 @@ AddedObject.prototype.copy = function(name, isHardCopy, copyPosition, gridSystem
   }else{
     copyMesh = new THREE.Mesh(this.mesh.geometry, this.mesh.material);
   }
-  var copyPhysicsbody = new CANNON.Body({
-    mass: 0,
-    shape: this.physicsBody.shapes[0],
-    material: new CANNON.Material()
-  });
+  var copyPhysicsbody = physicsBodyGenerator.generateBodyFromSameShape(this.physicsBody);
   copyMesh.position.copy(copyPosition);
   copyPhysicsbody.position.copy(copyPosition);
   copyMesh.quaternion.copy(this.mesh.quaternion);

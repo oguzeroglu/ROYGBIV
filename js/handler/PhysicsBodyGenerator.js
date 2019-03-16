@@ -2,6 +2,14 @@ var PhysicsBodyGenerator = function(){
 
 }
 
+PhysicsBodyGenerator.prototype.generateBodyFromSameShape = function(sourceBody){
+  return new CANNON.Body({
+      mass: 0,
+      shape: sourceBody.shapes[0],
+      material: new CANNON.Material()
+  });
+}
+
 PhysicsBodyGenerator.prototype.generateEmptyBody = function(){
   var physicsMaterial = new CANNON.Material();
   var physicsBody = new CANNON.Body({mass: 0, material: physicsMaterial});
@@ -30,11 +38,15 @@ PhysicsBodyGenerator.prototype.generateBoxBody = function(params){
 }
 
 PhysicsBodyGenerator.prototype.generateCylinderBody = function(params){
-  var physicsShapeKey = "CYLINDER" + PIPE + params.topRadius + PIPE + params.bottomRadius + PIPE + Math.abs(params.height) + PIPE + 8 + PIPE + params.axis + PIPE + (params.height > 0);
+  var radialSegments = 8;
+  if (params.radialSegments){
+    radialSegments = params.radialSegments;
+  }
+  var physicsShapeKey = "CYLINDER" + PIPE + params.topRadius + PIPE + params.bottomRadius + PIPE + Math.abs(params.height) + PIPE + radialSegments + PIPE + params.axis + PIPE + (params.height > 0);
   var cylinderPhysicsShape = physicsShapeCache[physicsShapeKey];
   var cached = false;
   if (!cylinderPhysicsShape){
-      cylinderPhysicsShape = new CANNON.Cylinder(params.topRadius, params.bottomRadius, Math.abs(params.height), 8);
+      cylinderPhysicsShape = new CANNON.Cylinder(params.topRadius, params.bottomRadius, Math.abs(params.height), radialSegments);
       physicsShapeCache[physicsShapeKey] = cylinderPhysicsShape;
   }else{
     cached = true;
@@ -74,8 +86,19 @@ PhysicsBodyGenerator.prototype.generateCylinderBody = function(params){
       cylinderPhysicsShape.transformAllPoints(translation, quat);
     }
   }
-  var physicsMaterial = new CANNON.Material();
-  var cylinderPhysicsBody = new CANNON.Body({mass: 0, shape: cylinderPhysicsShape, material: physicsMaterial});
+  var physicsMaterial;
+  var mass;
+  if (!params.material){
+    physicsMaterial = new CANNON.Material();
+  }else{
+    physicsMaterial = params.material;
+  }
+  if (typeof params.mass == UNDEFINED){
+    mass = 0;
+  }else{
+    mass = params.mass
+  }
+  var cylinderPhysicsBody = new CANNON.Body({mass: mass, shape: cylinderPhysicsShape, material: physicsMaterial});
   return cylinderPhysicsBody;
 }
 

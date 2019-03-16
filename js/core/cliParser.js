@@ -1884,6 +1884,11 @@ function parse(input){
             return true;
           }
           addedObject.segmentGeometry(true, count);
+          if(addedObject.type == "cylinder" && physicsDebugMode){
+            parseCommand("switchPhysicsDebugMode");
+            parseCommand("switchPhysicsDebugMode");
+            terminal.clear();
+          }
           if (!jobHandlerWorking){
             terminal.printError(Text.OBJECT_SEGMENTED);
           }
