@@ -112,7 +112,7 @@ function updateObjectTrails(){
 }
 
 function runScripts(){
-  if(!rayCaster.ready){
+  if(!rayCaster.ready || !physicsWorld.ready){
     return;
   }
   if (isDeployment){

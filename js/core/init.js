@@ -67,6 +67,8 @@ window.onload = function() {
     rayCaster = new RayCaster();
     physicsWorld = new CANNON.World();
     physicsWorld.refresh = function(){}
+    physicsWorld.updateObject = function(){}
+    physicsWorld.ready = true;
   }else{
     rayCaster = new RaycasterWorkerBridge();
     physicsWorld = new PhysicsWorkerBridge();

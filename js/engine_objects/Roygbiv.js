@@ -682,6 +682,7 @@ Roygbiv.prototype.rotate = function(object, axis, radians){
     return;
   }
   object.rotate(axis, radians, true);
+  physicsWorld.updateObject(object);
 }
 
 // rotateAroundXYZ
@@ -732,6 +733,7 @@ Roygbiv.prototype.rotateAroundXYZ = function(object, x, y, z, radians, axis){
     preConditions.checkIfChangeable(ROYGBIV.rotateAroundXYZ, preConditions.object, object);
   }
   object.rotateAroundXYZ(x, y, z, axis, axisVector, radians);
+  physicsWorld.updateObject(object);
 }
 
 // setPosition
@@ -761,6 +763,7 @@ Roygbiv.prototype.setPosition = function(obj, x, y, z){
     if (obj.mesh.visible){
       rayCaster.updateObject(obj);
     }
+    physicsWorld.updateObject(obj);
   }else if (obj.isObjectGroup){
     preConditions.checkIfChangeable(ROYGBIV.setPosition, preConditions.obj, obj);
     obj.mesh.position.set(x, y, z);
@@ -773,6 +776,7 @@ Roygbiv.prototype.setPosition = function(obj, x, y, z){
     if (obj.mesh.visible){
       rayCaster.updateObject(obj);
     }
+    physicsWorld.updateObject(obj);
   }
 }
 
@@ -838,6 +842,7 @@ Roygbiv.prototype.translate = function(object, axis, amount){
   }
   preConditions.checkIfChangeable(ROYGBIV.translate, preConditions.object, object);
   object.translate(axis, amount, true);
+  physicsWorld.updateObject(object);
 }
 
 // opacity

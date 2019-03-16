@@ -240,10 +240,18 @@ StateLoaderLightweight.prototype.loadPhysics = function(){
     physicsBody.position.copy(curAddedObjectExport.physicsPosition);
     physicsBody.quaternion.copy(curAddedObjectExport.physicsQuaternion);
     physicsBody.roygbivName = objName;
+    var addedObject = new AddedObject();
+    addedObject.name = objName;
+    addedObject.physicsBody = physicsBody;
+    addedObjects[objName] = addedObject;
     if (!curAddedObjectExport.noMass){
       physicsWorld.addBody(physicsBody);
       if (curAddedObjectExport.hasParent){
         childBodies[objName] = physicsBody;
+      }else{
+        if (physicsBody.mass > 0){
+          dynamicAddedObjects.set(objName, addedObject);
+        }
       }
     }
   }
@@ -260,15 +268,23 @@ StateLoaderLightweight.prototype.loadPhysics = function(){
     for (var i = 0; i<curExport.childNames.length; i++){
       var childBody = childBodies[curExport.childNames[i]];
       physicsWorld.removeBody(childBody);
-      delete childBodies[objName];
+      delete childBodies[curExport.childNames[i]];
+      delete addedObjects[curExport.childNames[i]];
       var shape = childBody.shapes[0];
       physicsBody.addShape(shape, childBody.position.vsub(physicsBody.position), childBody.quaternion);
       hasAnyPhysicsShape = true;
     }
+    var objGroup = new ObjectGroup();
+    objGroup.name = objName;
+    objGroup.physicsBody = physicsBody;
+    objectGroups[objName] = objGroup;
     if (hasAnyPhysicsShape){
       physicsBody.position.copy(curExport.physicsPosition);
       physicsBody.quaternion.copy(curExport.physicsQuaternion);
       physicsWorld.addBody(physicsBody);
+      if (!curExport.noMass && physicsBody.mass > 0){
+        dynamicObjectGroups.set(objName, objGroup);
+      }
     }
   }
 }
@@ -287,6 +303,10 @@ StateLoaderLightweight.prototype.loadPhysicsData = function(){
 
 StateLoaderLightweight.prototype.resetPhysics = function(){
   physicsWorld = new CANNON.World();
+  dynamicAddedObjects = new Map()
+  dynamicObjectGroups = new Map();
+  addedObjects = new Object();
+  objectGroups = new Object();
 }
 
 StateLoaderLightweight.prototype.reset = function(){
