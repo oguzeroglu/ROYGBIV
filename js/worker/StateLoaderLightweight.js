@@ -230,7 +230,7 @@ StateLoaderLightweight.prototype.loadPhysics = function(){
           bottomRadius: curAddedObjectExport.metaData.physicsShapeParameterBottomRadius,
           height: curAddedObjectExport.metaData.physicsShapeParameterHeight,
           radialSegments: curAddedObjectExport.metaData.physicsShapeParameterRadialSegments,
-          axis: curAddedObjectExport.metaData.physicsShapeParameterAxis
+          axis: curAddedObjectExport.metaData.physicsShapeParameterAxis, mass: curAddedObjectExport.mass
         });
       break;
       default:
@@ -246,20 +246,17 @@ StateLoaderLightweight.prototype.loadPhysics = function(){
     addedObjects[objName] = addedObject;
     if (!curAddedObjectExport.noMass){
       physicsWorld.addBody(physicsBody);
-      if (curAddedObjectExport.hasParent){
-        childBodies[objName] = physicsBody;
-      }else{
-        if (physicsBody.mass > 0){
-          dynamicAddedObjects.set(objName, addedObject);
-        }
+    }
+    if (curAddedObjectExport.hasParent){
+      childBodies[objName] = physicsBody;
+    }else{
+      if (physicsBody.mass > 0){
+        dynamicAddedObjects.set(objName, addedObject);
       }
     }
   }
   for (var objName in objectGroupExports){
     var curExport = objectGroupExports[objName];
-    if (curExport.noMass || curExport.cannotSetMass){
-      continue;
-    }
     var physicsBody = physicsBodyGenerator.generateEmptyBody();
     physicsBody.roygbivName = objName;
     physicsBody.mass = curExport.mass;
@@ -278,7 +275,7 @@ StateLoaderLightweight.prototype.loadPhysics = function(){
     objGroup.name = objName;
     objGroup.physicsBody = physicsBody;
     objectGroups[objName] = objGroup;
-    if (hasAnyPhysicsShape){
+    if (hasAnyPhysicsShape && !(curExport.noMass || curExport.cannotSetMass)){
       physicsBody.position.copy(curExport.physicsPosition);
       physicsBody.quaternion.copy(curExport.physicsQuaternion);
       physicsWorld.addBody(physicsBody);

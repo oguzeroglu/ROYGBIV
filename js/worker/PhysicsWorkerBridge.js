@@ -7,7 +7,7 @@ var PhysicsWorkerBridge = function(){
   this.idsByObjectName = new Object();
   this.objectsByID = new Object();
   this.updateObjectBufferSize = 10;
-  this.tickBufferSize = 10;
+  this.tickBufferSize = 1;
   this.worker.addEventListener("message", function(msg){
     if (msg.data.isDebug){
       console.log("[*] Debug response received.");
@@ -35,7 +35,7 @@ var PhysicsWorkerBridge = function(){
         physicsWorld.idsByObjectName[curIDInfo.name] = curIDInfo.id;
         var obj = addedObjects[curIDInfo.name] || objectGroups[curIDInfo.name];
         if (!obj){
-          throw new Error("[!] PhysicsWorkerBridge object not found.");
+          throw new Error("[!] PhysicsWorkerBridge object not found: "+curIDInfo.name);
         }
         physicsWorld.objectsByID[curIDInfo.id] = obj;
         if (obj.isChangeable){
@@ -57,6 +57,15 @@ var PhysicsWorkerBridge = function(){
           var bufID = ary[1];
           physicsWorld.tickBuffer[bufID] = ary;
           physicsWorld.tickBufferAvailibilities[bufID] = true;
+        }else if (ary[0] == 2){
+          if (mode == 0){
+            physicsWorld.workerMessageHandler.push(ary.buffer);
+            return;
+          }
+          var obj = physicsWorld.objectsByID[ary[2]];
+          obj.physicsBody.position.set(ary[3], ary[4], ary[5]);
+          obj.physicsBody.quaternion.set(ary[6], ary[7], ary[8], ary[9]);
+          physicsWorld.workerMessageHandler.push(ary.buffer);
         }
       }
     }
@@ -112,12 +121,8 @@ PhysicsWorkerBridge.prototype.step = function(stepAmount){
       buf[2] = stepAmount;
       this.workerMessageHandler.push(buf.buffer);
       this.tickBufferAvailibilities[i] = false;
-      tickSent = true;
       break;
     }
-  }
-  if (!tickSent){
-    console.warn("[!] PhysicsWorkerBridge.step tick buffer overflow.");
   }
   this.workerMessageHandler.flush();
 }
