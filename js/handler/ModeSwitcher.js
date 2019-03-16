@@ -345,7 +345,7 @@ ModeSwitcher.prototype.switchFromPreviewToDesign = function(){
       object.mesh.visible = true;
       object.isHidden = false;
       if (!object.physicsKeptWhenHidden && !object.noMass){
-        physicsWorld.add(object.physicsBody);
+        physicsWorld.addBody(object.physicsBody);
       }
     }
     if (object.initOpacitySet){
@@ -364,7 +364,7 @@ ModeSwitcher.prototype.switchFromPreviewToDesign = function(){
       object.mesh.visible = true;
       object.isHidden = false;
       if (!object.physicsKeptWhenHidden && !object.noMass){
-        physicsWorld.add(object.physicsBody);
+        physicsWorld.addBody(object.physicsBody);
       }
     }
 

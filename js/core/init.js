@@ -65,8 +65,10 @@ window.onload = function() {
   // RAYCASTER
   if (!WORKERS_SUPPORTED){
     rayCaster = new RayCaster();
+    physicsWorld = new CANNON.World();
   }else{
     rayCaster = new RaycasterWorkerBridge();
+    physicsWorld = new PhysicsWorkerBridge();
   }
   if (!isDeployment){
     var raycasterMethodCount = (Object.keys(RayCaster.prototype).length);
@@ -206,6 +208,10 @@ function setPostProcessingParams(){
 }
 
 function initPhysics(){
+ if (physicsWorld.init){
+   physicsWorld.init();
+   return;
+ }
  physicsWorld.quatNormalizeSkip = quatNormalizeSkip;
  physicsWorld.quatNormalizeFast = quatNormalizeFast;
  physicsWorld.defaultContactMaterial.contactEquationStiffness = contactEquationStiffness;

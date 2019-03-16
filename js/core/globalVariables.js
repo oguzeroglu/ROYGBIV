@@ -70,7 +70,7 @@ var fixedAspect = 0;
 
 // PHYSICS
 var debugRenderer;
-var physicsWorld = new CANNON.World();
+var physicsWorld;
 var physicsSolver = new CANNON.GSSolver();
 var quatNormalizeSkip = 0;
 var quatNormalizeFast = false;

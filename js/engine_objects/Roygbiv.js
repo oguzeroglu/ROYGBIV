@@ -545,7 +545,7 @@ Roygbiv.prototype.hide = function(object, keepPhysics){
       if (!keepPhysicsValue){
         if (!object.noMass){
           setTimeout(function(){
-            physicsWorld.removeBody(object.physicsBody);
+            physicsWorld.remove(object.physicsBody);
             object.physicsKeptWhenHidden = false;
           });
         }
@@ -565,7 +565,7 @@ Roygbiv.prototype.hide = function(object, keepPhysics){
       if (!keepPhysicsValue){
         if (!object.noMass){
           setTimeout(function(){
-            physicsWorld.removeBody(object.physicsBody);
+            physicsWorld.remove(object.physicsBody);
             object.physicsKeptWhenHidden = false;
           });
         }

@@ -782,7 +782,7 @@ GridSystem.prototype.newSurface = function(name, grid1, grid2, material){
     surface.position.y,
     surface.position.z
   );
-  physicsWorld.add(surfacePhysicsBody);
+  physicsWorld.addBody(surfacePhysicsBody);
 
   var metaData = new Object();
   metaData["grid1Name"] = grid1.name;
@@ -998,7 +998,7 @@ GridSystem.prototype.newRamp = function(anchorGrid, otherGrid, axis, height, mat
     fromEuler["y"],
     fromEuler["z"]
   );
-  physicsWorld.add(rampPhysicsBody);
+  physicsWorld.addBody(rampPhysicsBody);
 
   var metaData = new Object();
   metaData["anchorGridName"] = anchorGrid.name;
@@ -1124,7 +1124,7 @@ GridSystem.prototype.newBox = function(selections, height, material, name){
     boxMesh.position.y,
     boxMesh.position.z
   );
-  physicsWorld.add(boxPhysicsBody);
+  physicsWorld.addBody(boxPhysicsBody);
   for (var i = 0; i<selections.length; i++){
     selections[i].toggleSelect(false, false, false, true);
     delete gridSelections[selections[i].name];
@@ -1257,7 +1257,7 @@ GridSystem.prototype.newSphere = function(sphereName, material, radius, selectio
     sphereMesh.position.y,
     sphereMesh.position.z
   );
-  physicsWorld.add(spherePhysicsBody);
+  physicsWorld.addBody(spherePhysicsBody);
   for (var i = 0; i<selections.length; i++){
     selections[i].toggleSelect(false, false, false, true);
     delete gridSelections[selections[i].name];
@@ -1375,7 +1375,7 @@ GridSystem.prototype.newCylinder = function(cylinderName, material, topRadius, b
   }
   var cylinderPhysicsBody = physicsBodyGenerator.generateCylinderBody(physicsShapeParameters);
   cylinderPhysicsBody.position.set(cylinderMesh.position.x, cylinderMesh.position.y, cylinderMesh.position.z);
-  physicsWorld.add(cylinderPhysicsBody);
+  physicsWorld.addBody(cylinderPhysicsBody);
   for (var i = 0; i<selections.length; i++){
     selections[i].toggleSelect(false, false, false, true);
     delete gridSelections[selections[i].name];

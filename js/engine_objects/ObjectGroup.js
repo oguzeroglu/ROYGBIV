@@ -1206,7 +1206,7 @@ ObjectGroup.prototype.detach = function(){
     var addedObject = this.group[objectName];
 
     if (!addedObject.noMass){
-      physicsWorld.add(addedObject.physicsBody);
+      physicsWorld.addBody(addedObject.physicsBody);
     }
     scene.add(addedObject.mesh);
 

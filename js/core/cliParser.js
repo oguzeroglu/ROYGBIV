@@ -4447,7 +4447,7 @@ function parse(input){
           var copiedObj = sourceObj.copy(targetName, isHardCopyBoolean, copyPosition, gs, false);
           scene.add(copiedObj.mesh);
           if (!copiedObj.noMass && (copiedObj instanceof AddedObject)){
-            physicsWorld.add(copiedObj.physicsBody);
+            physicsWorld.addBody(copiedObj.physicsBody);
           }
           if (sourceObj instanceof AddedObject){
             addedObjects[targetName] = copiedObj;
@@ -5107,6 +5107,10 @@ function processNewGridSystemCommand(name, sizeX, sizeZ, centerX, centerY, cente
   cellSize = parseInt(cellSize);
   if (isNaN(cellSize)){
     terminal.printError(Text.CELLSIZE_MUST_BE_A_NUMBER);
+    return true;
+  }
+  if (cellSize <= 0){
+    terminal.printError(Text.MUST_BE_GREATER_THAN.replace(Text.PARAM1, "cellSize").replace(Text.PARAM2, "0"));
     return true;
   }
   if (!axis){

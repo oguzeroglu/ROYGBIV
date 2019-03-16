@@ -132,6 +132,7 @@ AddedObject.prototype.exportLightweight = function(){
   for (var i = 0; i<this.pseudoFaces.length; i++){
     exportObject.pseudoFaces.push(this.pseudoFaces[i]);
   }
+  exportObject.metaData = this.metaData;
   return exportObject;
 }
 
@@ -1861,7 +1862,7 @@ AddedObject.prototype.modifyCylinderPhysicsAfterSegmentChange = function(radialS
   this.physicsBody.position.copy(oldPosition);
   this.physicsBody.quaternion.copy(oldQuaternion);
   if (!this.noMass){
-    physicsWorld.add(this.physicsBody);
+    physicsWorld.addBody(this.physicsBody);
   }
 }
 

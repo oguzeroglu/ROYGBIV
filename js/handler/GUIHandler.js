@@ -522,7 +522,7 @@ GUIHandler.prototype.initializeObjectManipulationGUI = function(){
     terminal.clear();
     obj.noMass = !val;
     if (val){
-      physicsWorld.add(obj.physicsBody);
+      physicsWorld.addBody(obj.physicsBody);
       guiHandler.enableController(guiHandler.omMassController);
       guiHandler.enableController(guiHandler.omPhysicsSimplifiedController);
       terminal.printInfo(Text.PHYSICS_ENABLED);

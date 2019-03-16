@@ -11,7 +11,11 @@ THREE.CannonDebugRenderer = function(scene, world, options){
     options = options || {};
 
     this.scene = scene;
-    this.world = world;
+    if (world.isPhysicsWorkerBridge){
+      this.world = world.physicsWorld;
+    }else{
+      this.world = world;
+    }
 
     this._meshes = [];
 

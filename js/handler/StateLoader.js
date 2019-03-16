@@ -215,7 +215,7 @@ StateLoader.prototype.load = function(){
           boxMesh.position.y,
           boxMesh.position.z
         );
-        physicsWorld.add(boxPhysicsBody);
+        physicsWorld.addBody(boxPhysicsBody);
         addedObjectInstance = new AddedObject(
           addedObjectName, "box", metaData, material,
           boxMesh, boxPhysicsBody, destroyedGrids
@@ -265,7 +265,7 @@ StateLoader.prototype.load = function(){
           positionY,
           positionZ
         );
-        physicsWorld.add(surfacePhysicsBody);
+        physicsWorld.addBody(surfacePhysicsBody);
         addedObjectInstance = new AddedObject(addedObjectName, "surface", metaData, material, surface, surfacePhysicsBody, destroyedGrids);
         surface.addedObject = addedObjectInstance;
       }else if (type == "ramp"){
@@ -316,7 +316,7 @@ StateLoader.prototype.load = function(){
           );
         }
         scene.add(ramp);
-        physicsWorld.add(rampPhysicsBody);
+        physicsWorld.addBody(rampPhysicsBody);
         addedObjectInstance = new AddedObject(
           addedObjectName, "ramp", metaData, material, ramp,
           rampPhysicsBody, new Object()
@@ -352,7 +352,7 @@ StateLoader.prototype.load = function(){
           sphereMesh.position.y,
           sphereMesh.position.z
         );
-        physicsWorld.add(spherePhysicsBody);
+        physicsWorld.addBody(spherePhysicsBody);
         addedObjectInstance = new AddedObject(
           addedObjectName, "sphere", metaData, material,
           sphereMesh, spherePhysicsBody, destroyedGrids
@@ -392,7 +392,7 @@ StateLoader.prototype.load = function(){
           radialSegments: metaData.physicsShapeParameterRadialSegments
         })
         cylinderPhysicsBody.position.set(centerX, centerY, centerZ);
-        physicsWorld.add(cylinderPhysicsBody);
+        physicsWorld.addBody(cylinderPhysicsBody);
         addedObjectInstance = new AddedObject(
           addedObjectName, "cylinder", metaData, material,
           cylinderMesh, cylinderPhysicsBody, destroyedGrids
@@ -2116,9 +2116,12 @@ StateLoader.prototype.resetProject = function(){
   webglCallbackHandler = new WebGLCallbackHandler();
   if (!WORKERS_SUPPORTED){
     rayCaster = new RayCaster();
+    physicsWorld = new CANNON.World();
   }else{
     rayCaster.worker.terminate();
+    physicsWorld.worker.terminate();
     rayCaster = new RaycasterWorkerBridge();
+    physicsWorld = new PhysicsWorkerBridge();
   }
   areaBinHandler.isAreaBinHandler = true;
   anchorGrid = 0;
@@ -2182,7 +2185,6 @@ StateLoader.prototype.resetProject = function(){
 
   scriptEditorShowing = false;
 
-  physicsWorld = new CANNON.World();
   physicsSolver = new CANNON.GSSolver();
   initPhysics();
 
