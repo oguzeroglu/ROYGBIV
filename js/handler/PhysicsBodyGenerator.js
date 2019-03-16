@@ -2,6 +2,12 @@ var PhysicsBodyGenerator = function(){
 
 }
 
+PhysicsBodyGenerator.prototype.generateEmptyBody = function(){
+  var physicsMaterial = new CANNON.Material();
+  var physicsBody = new CANNON.Body({mass: 0, material: physicsMaterial});
+  return physicsBody;
+}
+
 PhysicsBodyGenerator.prototype.generateBoxBody = function(params){
   var physicsShapeKey = "BOX" + PIPE + params["x"] + PIPE + params["y"] + PIPE + params["z"];
   var surfacePhysicsShape = physicsShapeCache[physicsShapeKey];
@@ -9,8 +15,17 @@ PhysicsBodyGenerator.prototype.generateBoxBody = function(params){
     surfacePhysicsShape = new CANNON.Box(new CANNON.Vec3(params["x"], params["y"], params["z"]));
     physicsShapeCache[physicsShapeKey] = surfacePhysicsShape;
   }
-  var physicsMaterial = new CANNON.Material();
-  var surfacePhysicsBody = new CANNON.Body({mass: 0, shape: surfacePhysicsShape, material: physicsMaterial});
+  var mass = 0;
+  if (!(typeof params.mass == UNDEFINED)){
+    mass = params.mass;
+  }
+  var material;
+  if (typeof params.material == UNDEFINED){
+    material = new CANNON.Material();
+  }else{
+    material = params.material;
+  }
+  var surfacePhysicsBody = new CANNON.Body({mass: mass, shape: surfacePhysicsShape, material: material});
   return surfacePhysicsBody;
 }
 

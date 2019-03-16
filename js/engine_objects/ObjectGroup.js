@@ -1002,8 +1002,7 @@ ObjectGroup.prototype.merge = function(){
 
 ObjectGroup.prototype.glue = function(){
   var group = this.group;
-  var physicsMaterial = new CANNON.Material();
-  var physicsBody = new CANNON.Body({mass: 0, material: physicsMaterial});
+  var physicsBody = physicsBodyGenerator.generateEmptyBody();
   this.originalPhysicsBody = physicsBody;
   var centerPosition = this.getInitialCenter();
   var graphicsGroup = new THREE.Group();
@@ -2171,17 +2170,7 @@ ObjectGroup.prototype.simplifyPhysics = function(sizeX, sizeY, sizeZ){
     box3.expandByPoint(this.boundingBoxes[i].max);
   }
   box3.getCenter(REUSABLE_VECTOR);
-  var physicsShapeKey = "BOX" + PIPE + sizeX + PIPE + sizeY + PIPE + sizeZ;
-  newPhysicsShape = physicsShapeCache[physicsShapeKey];
-  if (!newPhysicsShape){
-    newPhysicsShape = new CANNON.Box(new CANNON.Vec3(sizeX, sizeY, sizeZ));
-    physicsShapeCache[physicsShapeKey] = newPhysicsShape;
-  }
-  var newPhysicsBody = new CANNON.Body({
-    mass: this.physicsBody.mass,
-    shape: newPhysicsShape,
-    material: this.originalPhysicsBody.material
-  });
+  var newPhysicsBody = physicsBodyGenerator.generateBoxBody({x: sizeX, y: sizeY, z: sizeZ, mass: this.physicsBody.mass, material: this.physicsBody.material});
   newPhysicsBody.position.copy(REUSABLE_VECTOR);
   newPhysicsBody.quaternion.copy(this.physicsBody.quaternion);
   this.physicsBody = newPhysicsBody;
