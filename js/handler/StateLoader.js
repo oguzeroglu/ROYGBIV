@@ -383,9 +383,13 @@ StateLoader.prototype.load = function(){
         }else if (metaData.gridSystemAxis == "YZ"){
           cylinderMesh.rotateZ(-Math.PI/2);
         }
+        if (!metaData.physicsShapeParameterRadialSegments){
+            metaData.physicsShapeParameterRadialSegments = 8;
+        }
         var cylinderPhysicsBody = physicsBodyGenerator.generateCylinderBody({
           topRadius: metaData.physicsShapeParameterTopRadius, bottomRadius: metaData.physicsShapeParameterBottomRadius,
-          height: metaData.physicsShapeParameterHeight, axis: metaData.physicsShapeParameterAxis
+          height: metaData.physicsShapeParameterHeight, axis: metaData.physicsShapeParameterAxis,
+          radialSegments: metaData.physicsShapeParameterRadialSegments
         })
         cylinderPhysicsBody.position.set(centerX, centerY, centerZ);
         physicsWorld.add(cylinderPhysicsBody);

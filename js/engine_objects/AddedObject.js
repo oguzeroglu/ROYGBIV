@@ -1852,6 +1852,7 @@ AddedObject.prototype.modifyCylinderPhysicsAfterSegmentChange = function(radialS
   if (!this.noMass){
     physicsWorld.remove(this.physicsBody);
   }
+  this.metaData["physicsShapeParameterRadialSegments"] = radialSegments;
   this.physicsBody = physicsBodyGenerator.generateCylinderBody({
     topRadius: topRadius, bottomRadius: bottomRadius, height: height,
     radialSegments: radialSegments, axis: this.metaData.gridSystemAxis,

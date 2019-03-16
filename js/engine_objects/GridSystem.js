@@ -1367,7 +1367,7 @@ GridSystem.prototype.newCylinder = function(cylinderName, material, topRadius, b
   var cylinderMesh = new MeshGenerator(cylinderGeometry, material).generateMesh();
   cylinderMesh.position.set(cylinderCenterX, cylinderCenterY, cylinderCenterZ);
   scene.add(cylinderMesh);
-  var physicsShapeParameters = {topRadius: topRadius, bottomRadius: bottomRadius, height: height, axis: this.axis};
+  var physicsShapeParameters = {topRadius: topRadius, bottomRadius: bottomRadius, height: height, axis: this.axis, radialSegments: 8};
   if (this.axis == "XY"){
     cylinderMesh.rotateX(Math.PI/2);
   }else if (this.axis == "YZ"){
@@ -1430,6 +1430,7 @@ GridSystem.prototype.newCylinder = function(cylinderName, material, topRadius, b
   metaData["physicsShapeParameterBottomRadius"] = physicsShapeParameters.bottomRadius;
   metaData["physicsShapeParameterHeight"] = physicsShapeParameters.height;
   metaData["physicsShapeParameterAxis"] = physicsShapeParameters.axis;
+  metaData["physicsShapeParameterRadialSegments"] = 8;
 
   var addedObjectInstance = new AddedObject(cylinderName, "cylinder", metaData, material,
                                     cylinderMesh, cylinderPhysicsBody, destroyedGrids);
