@@ -13,6 +13,7 @@ var PhysicsWorkerBridge = function(){
   this.applyImpulseBufferSize = 10;
   this.hideBufferSize = 10;
   this.showBufferSize = 10;
+  this.setMassBufferSize = 10;
   this.tickBufferSize = 1;
   this.worker.addEventListener("message", function(msg){
     if (msg.data.isDebug){
@@ -42,6 +43,7 @@ var PhysicsWorkerBridge = function(){
       physicsWorld.applyImpulseObjectBuffer = [];
       physicsWorld.hideObjectBuffer = [];
       physicsWorld.showObjectBuffer = [];
+      physicsWorld.setObjectMassBuffer = [];
       physicsWorld.updateObjectBufferAvailibilities = [];
       physicsWorld.resetObjectVelocityBufferAvailibilities = [];
       physicsWorld.setObjectVelocityBufferAvailibilities = [];
@@ -51,6 +53,7 @@ var PhysicsWorkerBridge = function(){
       physicsWorld.applyImpulseObjectBufferAvailibilities = [];
       physicsWorld.hideObjectBufferAvailibilities = [];
       physicsWorld.showObjectBufferAvailibilities = [];
+      physicsWorld.setObjectMassBufferAvailibilities = [];
       physicsWorld.updateBuffer = new Map();
       physicsWorld.velocityUpdateBuffer = new Map();
       physicsWorld.velocityResetBuffer = new Map();
@@ -60,6 +63,7 @@ var PhysicsWorkerBridge = function(){
       physicsWorld.applyImpulseBuffer = new Map();
       physicsWorld.hideBuffer = new Map();
       physicsWorld.showBuffer = new Map();
+      physicsWorld.setMassBuffer = new Map();
       for (var i = 0; i<msg.data.ids.length; i++){
         var curIDInfo = msg.data.ids[i];
         physicsWorld.idsByObjectName[curIDInfo.name] = curIDInfo.id;
@@ -101,64 +105,85 @@ var PhysicsWorkerBridge = function(){
             physicsWorld.showObjectBuffer.push(new Float32Array(3));
             physicsWorld.showObjectBufferAvailibilities.push(true);
           }
+          for (var i2 = 0; i2<physicsWorld.setMassBufferSize; i2++){
+            physicsWorld.setObjectMassBuffer.push(new Float32Array(4));
+            physicsWorld.setObjectMassBufferAvailibilities.push(true);
+          }
         }
       }
       physicsWorld.ready = true;
     }else{
       for (var i = 0; i<msg.data.length; i++){
         var ary = new Float32Array(msg.data[i]);
-        if (ary[0] == 0){
-          var bufID = ary[1];
-          physicsWorld.updateObjectBuffer[bufID] = ary;
-          physicsWorld.updateObjectBufferAvailibilities[bufID] = true;
-          var obj = physicsWorld.objectsByID[ary[2]];
-          obj.isPhysicsDirty = false;
-        }else if (ary[0] == 1){
-          var bufID = ary[1];
-          physicsWorld.tickBuffer[bufID] = ary;
-          physicsWorld.tickBufferAvailibilities[bufID] = true;
-        }else if (ary[0] == 2){
-          if (mode == 0){
+        switch(ary[0]){
+          case 0:
+            var bufID = ary[1];
+            physicsWorld.updateObjectBuffer[bufID] = ary;
+            physicsWorld.updateObjectBufferAvailibilities[bufID] = true;
+            var obj = physicsWorld.objectsByID[ary[2]];
+            obj.isPhysicsDirty = false;
+          break;
+          case 1:
+            var bufID = ary[1];
+            physicsWorld.tickBuffer[bufID] = ary;
+            physicsWorld.tickBufferAvailibilities[bufID] = true;
+          break;
+          case 2:
+            if (mode == 0){
+              physicsWorld.workerMessageHandler.push(ary.buffer);
+              return;
+            }
+            var obj = physicsWorld.objectsByID[ary[2]];
+            if (!obj.isPhysicsDirty){
+              obj.physicsBody.position.set(ary[3], ary[4], ary[5]);
+              obj.physicsBody.quaternion.set(ary[6], ary[7], ary[8], ary[9]);
+            }
             physicsWorld.workerMessageHandler.push(ary.buffer);
-            return;
-          }
-          var obj = physicsWorld.objectsByID[ary[2]];
-          if (!obj.isPhysicsDirty){
-            obj.physicsBody.position.set(ary[3], ary[4], ary[5]);
-            obj.physicsBody.quaternion.set(ary[6], ary[7], ary[8], ary[9]);
-          }
-          physicsWorld.workerMessageHandler.push(ary.buffer);
-        }else if (ary[0] == 3){
-          var bufID = ary[1];
-          physicsWorld.resetObjectVelocityBuffer[bufID] = ary;
-          physicsWorld.resetObjectVelocityBufferAvailibilities[bufID] = true;
-        }else if (ary[0] == 4){
-          var bufID = ary[1];
-          physicsWorld.setObjectVelocityBuffer[bufID] = ary;
-          physicsWorld.setObjectVelocityBufferAvailibilities[bufID] = true;
-        }else if (ary[0] == 5){
-          var bufID = ary[1];
-          physicsWorld.setObjectVelocityXBuffer[bufID] = ary;
-          physicsWorld.setObjectVelocityXBufferAvailibilities[bufID] = true;
-        }else if (ary[0] == 6){
-          var bufID = ary[1];
-          physicsWorld.setObjectVelocityYBuffer[bufID] = ary;
-          physicsWorld.setObjectVelocityYBufferAvailibilities[bufID] = true;
-        }else if (ary[0] == 7){
-          var bufID = ary[1];
-          physicsWorld.setObjectVelocityZBuffer[bufID] = ary;
-          physicsWorld.setObjectVelocityZBufferAvailibilities[bufID] = true;
-        }else if (ary[0] == 8){
-          var bufID = ary[1];
-          physicsWorld.applyImpulseObjectBuffer[bufID] = ary;
-          physicsWorld.applyImpulseObjectBufferAvailibilities[bufID] = true;
-        }else if (ary[0] == 9){
-          var bufID = ary[1];
-          physicsWorld.showObjectBuffer[bufID] = ary;
-          physicsWorld.showObjectBufferAvailibilities[bufID] = true;
-        }else if (ary[0] == 10){
-          physicsWorld.hideObjectBuffer[bufID] = ary;
-          physicsWorld.hideObjectBufferAvailibilities[bufID] = true;
+          break;
+          case 3:
+            var bufID = ary[1];
+            physicsWorld.resetObjectVelocityBuffer[bufID] = ary;
+            physicsWorld.resetObjectVelocityBufferAvailibilities[bufID] = true;
+          break;
+          case 4:
+            var bufID = ary[1];
+            physicsWorld.setObjectVelocityBuffer[bufID] = ary;
+            physicsWorld.setObjectVelocityBufferAvailibilities[bufID] = true;
+          break;
+          case 5:
+            var bufID = ary[1];
+            physicsWorld.setObjectVelocityXBuffer[bufID] = ary;
+            physicsWorld.setObjectVelocityXBufferAvailibilities[bufID] = true;
+          break;
+          case 6:
+            var bufID = ary[1];
+            physicsWorld.setObjectVelocityYBuffer[bufID] = ary;
+            physicsWorld.setObjectVelocityYBufferAvailibilities[bufID] = true;
+          break;
+          case 7:
+            var bufID = ary[1];
+            physicsWorld.setObjectVelocityZBuffer[bufID] = ary;
+            physicsWorld.setObjectVelocityZBufferAvailibilities[bufID] = true;
+          break;
+          case 8:
+            var bufID = ary[1];
+            physicsWorld.applyImpulseObjectBuffer[bufID] = ary;
+            physicsWorld.applyImpulseObjectBufferAvailibilities[bufID] = true;
+          break;
+          case 9:
+            var bufID = ary[1];
+            physicsWorld.showObjectBuffer[bufID] = ary;
+            physicsWorld.showObjectBufferAvailibilities[bufID] = true;
+          break;
+          case 10:
+            var bufID = ary[1];
+            physicsWorld.hideObjectBuffer[bufID] = ary;
+            physicsWorld.hideObjectBufferAvailibilities[bufID] = true;
+          break;
+          case 11:
+            physicsWorld.setObjectMassBuffer[bufID] = ary;
+            physicsWorld.setObjectMassBufferAvailibilities[bufID] = true;
+          break;
         }
       }
     }
@@ -238,6 +263,10 @@ PhysicsWorkerBridge.prototype.step = function(stepAmount){
   if (this.hideBuffer.size > 0){
     this.hideBuffer.forEach(this.issueHide);
     this.hideBuffer.clear();
+  }
+  if (this.setMassBuffer.size > 0){
+    this.setMassBuffer.forEach(this.issueSetMass);
+    this.setMassBuffer.clear();
   }
   var tickSent = false;
   for (var i = 0; i<this.tickBuffer.length; i++){
@@ -384,7 +413,6 @@ PhysicsWorkerBridge.prototype.issueShow = function(obj){
 }
 
 PhysicsWorkerBridge.prototype.issueHide = function(obj){
-  console.log(obj);
   for (var i = 0; i<physicsWorld.hideObjectBuffer.length; i++){
     if (physicsWorld.hideObjectBufferAvailibilities[i]){
       var buf = physicsWorld.hideObjectBuffer[i];
@@ -397,6 +425,22 @@ PhysicsWorkerBridge.prototype.issueHide = function(obj){
     }
   }
   console.error("[!] PhysicsWorkerBridge.issueHide buffer overflow.");
+}
+
+PhysicsWorkerBridge.prototype.issueSetMass = function(obj){
+  for (var i = 0; i<physicsWorld.setObjectMassBuffer.length; i++){
+    if (physicsWorld.setObjectMassBufferAvailibilities[i]){
+      var buf = physicsWorld.setObjectMassBuffer[i];
+      buf[0] = 11;
+      buf[1] = i;
+      buf[2] = physicsWorld.idsByObjectName[obj.name];
+      buf[3] = obj.physicsBody.mass;
+      physicsWorld.workerMessageHandler.push(buf.buffer);
+      physicsWorld.setObjectMassBufferAvailibilities[i] = false;
+      return;
+    }
+  }
+  console.error("[!] PhysicsWorkerBridge.issueSetMass buffer overflow.");
 }
 
 PhysicsWorkerBridge.prototype.updateObject = function(obj){
@@ -440,4 +484,8 @@ PhysicsWorkerBridge.prototype.hide = function(obj){
 
 PhysicsWorkerBridge.prototype.show = function(obj){
   this.showBuffer.set(obj.name, obj);
+}
+
+PhysicsWorkerBridge.prototype.setMass = function(obj, mass){
+  this.setMassBuffer.set(obj.name, obj);
 }

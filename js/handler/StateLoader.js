@@ -2149,6 +2149,7 @@ StateLoader.prototype.resetProject = function(){
     physicsWorld.applyImpulse = function(){}
     physicsWorld.show = function(){}
     physicsWorld.hide = function(){}
+    physicsWorld.setMass = function(){}
     physicsWorld.ready = true;
   }else{
     rayCaster.worker.terminate();

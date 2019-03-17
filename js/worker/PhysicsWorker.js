@@ -143,6 +143,10 @@ PhysicsWorker.prototype.hide = function(ary){
   var obj = worker.objectsByID[ary[2]];
   physicsWorld.remove(obj.physicsBody);
 }
+PhysicsWorker.prototype.setMass = function(ary){
+  var obj = worker.objectsByID[ary[2]];
+  obj.setMass(ary[3]);
+}
 // START
 var PIPE = "|";
 var UNDEFINED = "undefined";
@@ -164,30 +168,45 @@ self.onmessage = function(msg){
   }else{
     for (var i = 0; i<msg.data.length; i++){
       var ary = new Float32Array(msg.data[i]);
-      if (ary[0] == 0){
-        worker.updateObject(ary);
-      }else if (ary[0] == 1){
-        worker.step(ary);
-      }else if (ary[0] == 2){
-        var bufID = ary[1];
-        worker.dynamicObjectUpdateBuffer[bufID] = ary;
-        worker.dynamicObjectUpdateBufferAvailibilities[bufID] = true;
-      }else if (ary[0] == 3){
-        worker.resetObjectVelocity(ary);
-      }else if (ary[0] == 4){
-        worker.setObjectVelocity(ary);
-      }else if (ary[0] == 5){
-        worker.setObjectVelocityX(ary);
-      }else if (ary[0] == 6){
-        worker.setObjectVelocityY(ary);
-      }else if (ary[0] == 7){
-        worker.setObjectVelocityZ(ary);
-      }else if (ary[0] == 8){
-        worker.applyImpulse(ary);
-      }else if (ary[0] == 9){
-        worker.show(ary);
-      }else if (ary[0] == 10){
-        worker.hide(ary);
+      switch (ary[0]){
+        case 0:
+          worker.updateObject(ary);
+        break;
+        case 1:
+          worker.step(ary);
+        break;
+        case 2:
+          var bufID = ary[1];
+          worker.dynamicObjectUpdateBuffer[bufID] = ary;
+          worker.dynamicObjectUpdateBufferAvailibilities[bufID] = true;
+        break;
+        case 3:
+          worker.resetObjectVelocity(ary);
+        break;
+        case 4:
+          worker.setObjectVelocity(ary);
+        break;
+        case 5:
+          worker.setObjectVelocityX(ary);
+        break;
+        case 6:
+          worker.setObjectVelocityY(ary);
+        break;
+        case 7:
+          worker.setObjectVelocityZ(ary);
+        break;
+        case 8:
+          worker.applyImpulse(ary);
+        break;
+        case 9:
+          worker.show(ary);
+        break;
+        case 10:
+          worker.hide(ary);
+        break;
+        case 11:
+          worker.setMass(ary);
+        break;
       }
       if (ary[0] != 2){
         worker.workerMessageHandler.push(ary.buffer);

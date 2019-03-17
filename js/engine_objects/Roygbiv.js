@@ -807,6 +807,7 @@ Roygbiv.prototype.setMass = function(object, mass){
     object.mass = 0;
   }
   object.setMass(mass);
+  physicsWorld.setMass(object, mass);
   if (object.isAddedObject){
     if (mass > 0){
       dynamicObjects[object.name] = object;

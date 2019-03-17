@@ -55,18 +55,36 @@ app.post("/build", function(req, res){
 function copyWorkers(application){
   fs.mkdirSync("deploy/"+application.projectName+"/js/worker/");
   var raycasterWorkerContent = fs.readFileSync("./js/worker/RaycasterWorker.js", "utf8");
+  var physicsWorkerContent = fs.readFileSync("./js/worker/PhysicsWorker.js", "utf8");
   var raycasterWorkerContentSplitted = raycasterWorkerContent.split("\n");
-  var rayCasterWorkerImportContent = "";
+  var physicsWorkerContentSplitted = physicsWorkerContent.split("\n");
+  var workerImportContent = "";
+  var imports = new Object();
   for (var i = 0; i<raycasterWorkerContentSplitted.length; i++){
     if (raycasterWorkerContentSplitted[i].startsWith("importScripts")){
       raycasterWorkerContent = raycasterWorkerContent.replace(raycasterWorkerContentSplitted[i], "");
       var path = extractFirstText(raycasterWorkerContentSplitted[i]).replace("..", "js");
-      rayCasterWorkerImportContent += fs.readFileSync(path, "utf8");
+      if (!imports[path]){
+        workerImportContent += fs.readFileSync(path, "utf8");
+        imports[path] = true;
+      }
     }
   }
-  raycasterWorkerContent = "importScripts(\"./RaycasterWorkerImport.js\");\n" + raycasterWorkerContent.trim();
+  for (var i = 0; i<physicsWorkerContentSplitted.length; i++){
+    if (physicsWorkerContentSplitted[i].startsWith("importScripts")){
+      physicsWorkerContent = physicsWorkerContent.replace(physicsWorkerContentSplitted[i], "");
+      var path = extractFirstText(physicsWorkerContentSplitted[i]).replace("..", "js");
+      if (!imports[path]){
+        workerImportContent += fs.readFileSync(path, "utf8");
+        imports[path] = true;
+      }
+    }
+  }
+  raycasterWorkerContent = "importScripts(\"./WorkerImport.js\");\n" + raycasterWorkerContent.trim();
+  physicsWorkerContent = "importScripts(\"./WorkerImport.js\");\n" + physicsWorkerContent.trim();
   fs.writeFileSync("deploy/"+application.projectName+"/js/worker/RaycasterWorker.js", raycasterWorkerContent);
-  fs.writeFileSync("deploy/"+application.projectName+"/js/worker/RaycasterWorkerImport.js", rayCasterWorkerImportContent);
+  fs.writeFileSync("deploy/"+application.projectName+"/js/worker/PhysicsWorker.js", physicsWorkerContent);
+  fs.writeFileSync("deploy/"+application.projectName+"/js/worker/WorkerImport.js", workerImportContent);
 }
 
 function handleScripts(application, engineScriptsConcatted){
