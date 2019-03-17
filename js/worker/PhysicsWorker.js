@@ -102,9 +102,17 @@ PhysicsWorker.prototype.updateDynamicObjectBuffer = function(obj){
   console.error("[!] PhysicsWorker.updateDynamicObjectBuffer buffer overflow.");
 }
 PhysicsWorker.prototype.step = function(ary){
-  physicsWorld.step(ary[2]);
+  var step = ary[2];
+  if (this.lastSendTime){
+    var dt = (performance.now() - this.lastSendTime) / 1000;
+    if (dt < ary[2]){
+      step -= step - dt;
+    }
+  }
+  physicsWorld.step(step);
   dynamicAddedObjects.forEach(this.updateDynamicObjectBuffer);
-  dynamicObjectGroups.forEach(this.updateDynamicObjectBuffer)
+  dynamicObjectGroups.forEach(this.updateDynamicObjectBuffer);
+  this.lastSendTime = performance.now();
 }
 PhysicsWorker.prototype.resetObjectVelocity = function(ary){
   var obj = worker.objectsByID[ary[2]];

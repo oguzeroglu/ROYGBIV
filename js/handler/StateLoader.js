@@ -310,6 +310,15 @@ StateLoader.prototype.load = function(){
         ramp.quaternion.y = quaternionY;
         ramp.quaternion.z = quaternionZ;
         ramp.quaternion.w = quaternionW;
+        if (!metaData.physicsShapeParameterX){
+          metaData.physicsShapeParameterX = metaData.rampWidth / 2;
+        }
+        if (!metaData.physicsShapeParameterY){
+          metaData.physicsShapeParameterY = surfacePhysicalThickness;
+        }
+        if (!metaData.physicsShapeParameterZ){
+          metaData.physicsShapeParameterZ = metaData.rampHeight / 2;
+        }
         var rampPhysicsBody = physicsBodyGenerator.generateBoxBody({
           x: metaData.physicsShapeParameterX, y: metaData.physicsShapeParameterY, z: metaData.physicsShapeParameterZ,
           mass: mass
