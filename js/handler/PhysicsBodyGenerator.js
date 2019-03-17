@@ -2,18 +2,24 @@ var PhysicsBodyGenerator = function(){
 
 }
 
+PhysicsBodyGenerator.prototype.addImpulseInfo = function(body){
+  body.impulseVec1 = new CANNON.Vec3();
+  body.impulseVec2 = new CANNON.Vec3();
+  return body;
+}
+
 PhysicsBodyGenerator.prototype.generateBodyFromSameShape = function(sourceBody){
-  return new CANNON.Body({
+  return this.addImpulseInfo(new CANNON.Body({
       mass: 0,
       shape: sourceBody.shapes[0],
       material: new CANNON.Material()
-  });
+  }));
 }
 
 PhysicsBodyGenerator.prototype.generateEmptyBody = function(){
   var physicsMaterial = new CANNON.Material();
   var physicsBody = new CANNON.Body({mass: 0, material: physicsMaterial});
-  return physicsBody;
+  return this.addImpulseInfo(physicsBody);
 }
 
 PhysicsBodyGenerator.prototype.generateBoxBody = function(params){
@@ -34,7 +40,7 @@ PhysicsBodyGenerator.prototype.generateBoxBody = function(params){
     material = params.material;
   }
   var surfacePhysicsBody = new CANNON.Body({mass: mass, shape: surfacePhysicsShape, material: material});
-  return surfacePhysicsBody;
+  return this.addImpulseInfo(surfacePhysicsBody);
 }
 
 PhysicsBodyGenerator.prototype.generateCylinderBody = function(params){
@@ -99,7 +105,7 @@ PhysicsBodyGenerator.prototype.generateCylinderBody = function(params){
     mass = params.mass
   }
   var cylinderPhysicsBody = new CANNON.Body({mass: mass, shape: cylinderPhysicsShape, material: physicsMaterial});
-  return cylinderPhysicsBody;
+  return this.addImpulseInfo(cylinderPhysicsBody);
 }
 
 PhysicsBodyGenerator.prototype.generateSphereBody = function(params){
@@ -115,5 +121,5 @@ PhysicsBodyGenerator.prototype.generateSphereBody = function(params){
     mass = params.mass;
   }
   var spherePhysicsBody = new CANNON.Body({mass: mass, shape: spherePhysicsShape, material: physicsMaterial});
-  return spherePhysicsBody;
+  return this.addImpulseInfo(spherePhysicsBody);
 }

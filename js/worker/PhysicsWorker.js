@@ -13,6 +13,8 @@ var PhysicsWorker = function(){
   this.objectsByID = new Object();
   this.workerMessageHandler = new WorkerMessageHandler();
   this.updateBufferSize = 10;
+  this.reusableVec1 = new CANNON.Vec3();
+  this.reusableVec2 = new CANNON.Vec3();
 }
 PhysicsWorker.prototype.refresh = function(state){
   this.idsByObjectName = new Object();
@@ -102,17 +104,9 @@ PhysicsWorker.prototype.updateDynamicObjectBuffer = function(obj){
   console.error("[!] PhysicsWorker.updateDynamicObjectBuffer buffer overflow.");
 }
 PhysicsWorker.prototype.step = function(ary){
-  var step = ary[2];
-  if (this.lastSendTime){
-    var dt = (performance.now() - this.lastSendTime) / 1000;
-    if (dt < ary[2]){
-      step -= step - dt;
-    }
-  }
-  physicsWorld.step(step);
+  physicsWorld.step(ary[2]);
   dynamicAddedObjects.forEach(this.updateDynamicObjectBuffer);
   dynamicObjectGroups.forEach(this.updateDynamicObjectBuffer);
-  this.lastSendTime = performance.now();
 }
 PhysicsWorker.prototype.resetObjectVelocity = function(ary){
   var obj = worker.objectsByID[ary[2]];
@@ -134,6 +128,20 @@ PhysicsWorker.prototype.setObjectVelocityY = function(ary){
 PhysicsWorker.prototype.setObjectVelocityZ = function(ary){
   var obj = worker.objectsByID[ary[2]];
   obj.physicsBody.velocity.z = ary[3];
+}
+PhysicsWorker.prototype.applyImpulse = function(ary){
+  var obj = worker.objectsByID[ary[2]];
+  worker.reusableVec1.set(ary[3], ary[4], ary[5]);
+  worker.reusableVec2.set(ary[6], ary[7], ary[8]);
+  obj.physicsBody.applyImpulse(worker.reusableVec1, worker.reusableVec2);
+}
+PhysicsWorker.prototype.show = function(ary){
+  var obj = worker.objectsByID[ary[2]];
+  physicsWorld.addBody(obj.physicsBody);
+}
+PhysicsWorker.prototype.hide = function(ary){
+  var obj = worker.objectsByID[ary[2]];
+  physicsWorld.remove(obj.physicsBody);
 }
 // START
 var PIPE = "|";
@@ -174,6 +182,12 @@ self.onmessage = function(msg){
         worker.setObjectVelocityY(ary);
       }else if (ary[0] == 7){
         worker.setObjectVelocityZ(ary);
+      }else if (ary[0] == 8){
+        worker.applyImpulse(ary);
+      }else if (ary[0] == 9){
+        worker.show(ary);
+      }else if (ary[0] == 10){
+        worker.hide(ary);
       }
       if (ary[0] != 2){
         worker.workerMessageHandler.push(ary.buffer);

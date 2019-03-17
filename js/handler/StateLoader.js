@@ -2146,6 +2146,9 @@ StateLoader.prototype.resetProject = function(){
     physicsWorld.setObjectVelocityX = function(){}
     physicsWorld.setObjectVelocityY = function(){}
     physicsWorld.setObjectVelocityZ = function(){}
+    physicsWorld.applyImpulse = function(){}
+    physicsWorld.show = function(){}
+    physicsWorld.hide = function(){}
     physicsWorld.ready = true;
   }else{
     rayCaster.worker.terminate();

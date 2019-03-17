@@ -548,6 +548,7 @@ Roygbiv.prototype.hide = function(object, keepPhysics){
             physicsWorld.remove(object.physicsBody);
             object.physicsKeptWhenHidden = false;
           });
+          physicsWorld.hide(object);
         }
       }else{
         object.physicsKeptWhenHidden = true;
@@ -568,6 +569,7 @@ Roygbiv.prototype.hide = function(object, keepPhysics){
             physicsWorld.remove(object.physicsBody);
             object.physicsKeptWhenHidden = false;
           });
+          physicsWorld.hide(object);
         }
       }else{
         object.physicsKeptWhenHidden = true;
@@ -597,6 +599,7 @@ Roygbiv.prototype.show = function(object){
           setTimeout(function(){
             physicsWorld.addBody(object.physicsBody);
           });
+          physicsWorld.show(object);
         }
       }
       object.isHidden = false;
@@ -611,6 +614,7 @@ Roygbiv.prototype.show = function(object){
           setTimeout(function(){
             physicsWorld.addBody(object.physicsBody);
           });
+          physicsWorld.show(object);
         }
       }
       object.isHidden = false;
@@ -639,6 +643,7 @@ Roygbiv.prototype.applyForce = function(object, force, point){
     REUSABLE_CANNON_VECTOR,
     REUSABLE_CANNON_VECTOR_2
   );
+  physicsWorld.applyImpulse(object, REUSABLE_CANNON_VECTOR, REUSABLE_CANNON_VECTOR_2);
 }
 
 // rotate
