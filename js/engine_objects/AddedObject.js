@@ -109,6 +109,7 @@ AddedObject.prototype.exportLightweight = function(){
   var exportObject = new Object();
   exportObject.type = this.type;
   exportObject.isChangeable = this.isChangeable;
+  exportObject.isSlippery = this.metaData["isSlippery"];
   exportObject.isIntersectable = this.isIntersectable;
   if (!this.parentObjectName){
     exportObject.position = this.mesh.position.clone();

@@ -243,6 +243,8 @@ StateLoaderLightweight.prototype.loadPhysics = function(){
     var addedObject = new AddedObject();
     addedObject.name = objName;
     addedObject.physicsBody = physicsBody;
+    addedObject.isSlippery = curAddedObjectExport.isSlippery;
+    addedObject.metaData = new Object();
     addedObjects[objName] = addedObject;
     addedObject.isChangeable = curAddedObjectExport.isChangeable;
     if (!curAddedObjectExport.noMass){
@@ -283,6 +285,7 @@ StateLoaderLightweight.prototype.loadPhysics = function(){
     objGroup.name = objName;
     objGroup.isChangeable = curExport.isChangeable;
     objGroup.physicsBody = physicsBody;
+    objGroup.isSlippery = curExport.isSlippery;
     objectGroups[objName] = objGroup;
     if (hasAnyPhysicsShape && !(curExport.noMass || curExport.cannotSetMass)){
       physicsBody.position.copy(curExport.physicsPosition);
@@ -291,6 +294,16 @@ StateLoaderLightweight.prototype.loadPhysics = function(){
       if (!curExport.noMass && physicsBody.mass > 0){
         dynamicObjectGroups.set(objName, objGroup);
       }
+    }
+  }
+  for (var objName in addedObjects){
+    if (addedObjects[objName].isSlippery){
+      addedObjects[objName].setSlippery(true);
+    }
+  }
+  for (var objName in objectGroups){
+    if (objectGroups[objName].isSlippery){
+      objectGroups[objName].setSlippery(true);
     }
   }
 }

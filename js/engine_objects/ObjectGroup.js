@@ -1448,16 +1448,17 @@ ObjectGroup.prototype.destroy = function(skipRaycasterRefresh){
 }
 
 ObjectGroup.prototype.exportLightweight = function(){
-  var exportObj = new Object();
-  exportObj.isChangeable = this.isChangeable;
-  exportObj.isIntersectable = this.isIntersectable;
-  this.graphicsGroup.position.copy(this.mesh.position);
-  this.graphicsGroup.quaternion.copy(this.mesh.quaternion);
-  this.graphicsGroup.updateMatrixWorld();
   if (!this.boundingBoxes){
     this.generateBoundingBoxes();
   }
   this.updateBoundingBoxes();
+  var exportObj = new Object();
+  exportObj.isChangeable = this.isChangeable;
+  exportObj.isSlippery = this.isSlippery;
+  exportObj.isIntersectable = this.isIntersectable;
+  this.graphicsGroup.position.copy(this.mesh.position);
+  this.graphicsGroup.quaternion.copy(this.mesh.quaternion);
+  this.graphicsGroup.updateMatrixWorld();
   exportObj.matrixWorld = this.graphicsGroup.matrixWorld.elements;
   exportObj.position = this.graphicsGroup.position;
   exportObj.quaternion = new THREE.Quaternion().copy(this.graphicsGroup.quaternion);
