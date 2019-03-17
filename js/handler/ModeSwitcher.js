@@ -146,7 +146,7 @@ ModeSwitcher.prototype.switchFromDesignToPreview = function(){
     selectedObjectGroup.removeBoundingBoxesFromScene();
   }
   dynamicObjects = new Map();
-  dynamicObjectGroups = new Object();
+  dynamicObjectGroups = new Map();
   for (var objectName in objectGroups){
     var object = objectGroups[objectName];
     object.mesh.remove(axesHelper);
@@ -156,7 +156,7 @@ ModeSwitcher.prototype.switchFromDesignToPreview = function(){
     }
     object.saveState();
     if (object.isDynamicObject && !object.noMass){
-      dynamicObjectGroups[objectName] = object;
+      dynamicObjectGroups.set(objectName, object);
     }
     if (object.initOpacitySet){
       object.updateOpacity(object.initOpacity);
@@ -337,7 +337,7 @@ ModeSwitcher.prototype.switchFromPreviewToDesign = function(){
     if (!(typeof object.originalMass == "undefined")){
       object.setMass(object.originalMass);
       if (object.originalMass == 0){
-        delete dynamicObjectGroups[object.name];
+        dynamicObjectGroups.delete(object.name);
       }
       delete object.originalMass;
     }

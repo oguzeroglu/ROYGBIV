@@ -816,9 +816,9 @@ Roygbiv.prototype.setMass = function(object, mass){
     }
   }else if (object.isObjectGroup){
     if (mass > 0){
-      dynamicObjectGroups[object.name] = object;
+      dynamicObjectGroups.set(object.name, object);
     }else{
-      delete dynamicObjectGroups[object.name];
+      dynamicObjectGroups.delete(object.name);
     }
   }
 }

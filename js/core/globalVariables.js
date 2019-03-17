@@ -150,7 +150,7 @@ var particleSystemPools = new Object();
 var objectTrails = new Object();
 var activeObjectTrails = new Object();
 var dynamicObjects = new Map();
-var dynamicObjectGroups = new Object();
+var dynamicObjectGroups = new Map();
 var addedObjectsInsideGroups = new Object();
 var trackingObjects = new Object();
 var ShaderContent;

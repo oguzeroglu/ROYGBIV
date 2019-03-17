@@ -2164,7 +2164,7 @@ StateLoader.prototype.resetProject = function(){
   areaConfigurationsHandler = new AreaConfigurationsHandler();
   textureUniformCache = new Object();
   dynamicObjects = new Map();
-  dynamicObjectGroups = new Object();
+  dynamicObjectGroups = new Map();
   trackingObjects = new Object();
   screenResolution = 1;
   renderer.setPixelRatio(screenResolution);

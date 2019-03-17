@@ -2380,7 +2380,7 @@ function parse(input){
             }
             grouppedObject.setMass(mass);
             if (mode == 1 && mass > 0){
-              dynamicObjectGroups[grouppedObject.name] = grouppedObject;
+              dynamicObjectGroups.set(grouppedObject.name, grouppedObject);
             }
             if (selectionHandler.getSelectedObject() &&
                   selectionHandler.getSelectedObject().isObjectGroup &&

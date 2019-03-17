@@ -150,9 +150,6 @@ function updateTrackingObjects(){
 
 function dynamicObjectUpdateFunction(object, objectName){
   var physicsBody = object.physicsBody;
-  var axis = object.metaData.axis;
-  var gridSystemAxis = object.metaData.gridSystemAxis;
-  var type = object.type;
   if (object.isTracked){
     object.dx = physicsBody.position.x - object.oldPX;
     object.dy = physicsBody.position.y - object.oldPY;
@@ -162,7 +159,14 @@ function dynamicObjectUpdateFunction(object, objectName){
     object.oldPZ = physicsBody.position.z;
   }
   object.mesh.position.copy(physicsBody.position);
-  setTHREEQuaternionFromCANNON(object.mesh, physicsBody, axis, type, gridSystemAxis);
+  if (object.isAddedObject){
+    var gridSystemAxis = object.metaData.gridSystemAxis;
+    var axis = object.metaData.axis;
+    var type = object.type;
+    setTHREEQuaternionFromCANNON(object.mesh, physicsBody, axis, type, gridSystemAxis);
+  }else{
+    object.mesh.quaternion.copy(physicsBody.quaternion);
+  }
   if (!(object.isHidden || (!object.isIntersectable) || !object.boundingBoxesNeedUpdate())){
     rayCaster.updateObject(object);
   }
@@ -170,23 +174,7 @@ function dynamicObjectUpdateFunction(object, objectName){
 
 function updateDynamicObjects(){
   dynamicObjects.forEach(dynamicObjectUpdateFunction);
-  for (var grouppedObjectName in dynamicObjectGroups){
-    var grouppedObject = objectGroups[grouppedObjectName];
-    var physicsBody = grouppedObject.physicsBody;
-    if (grouppedObject.isTracked){
-      grouppedObject.dx = physicsBody.position.x - grouppedObject.oldPX;
-      grouppedObject.dy = physicsBody.position.y - grouppedObject.oldPY;
-      grouppedObject.dz = physicsBody.position.z - grouppedObject.oldPZ;
-      grouppedObject.oldPX = physicsBody.position.x;
-      grouppedObject.oldPY = physicsBody.position.y;
-      grouppedObject.oldPZ = physicsBody.position.z;
-    }
-    grouppedObject.mesh.position.copy(physicsBody.position);
-    grouppedObject.mesh.quaternion.copy(physicsBody.quaternion);
-    if (!(grouppedObject.isHidden || (!grouppedObject.isIntersectable) || !grouppedObject.boundingBoxesNeedUpdate())){
-      rayCaster.updateObject(grouppedObject);
-    }
-  }
+  dynamicObjectGroups.forEach(dynamicObjectUpdateFunction);
 }
 
 function setTHREEQuaternionFromCANNON(mesh, physicsBody, axis, type, gridSystemAxis){
