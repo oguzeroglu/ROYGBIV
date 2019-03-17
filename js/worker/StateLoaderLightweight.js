@@ -258,7 +258,12 @@ StateLoaderLightweight.prototype.loadPhysics = function(){
   }
   for (var objName in objectGroupExports){
     var curExport = objectGroupExports[objName];
-    var physicsBody = physicsBodyGenerator.generateEmptyBody();
+    var physicsBody;
+    if (!curExport.isPhysicsSimplified){
+      physicsBody = physicsBodyGenerator.generateEmptyBody();
+    }else{
+      physicsBody = physicsBodyGenerator.generateBoxBody({x: curExport.physicsSimplificationParameters.sizeX, y: curExport.physicsSimplificationParameters.sizeY, z: curExport.physicsSimplificationParameters.sizeZ});
+    }
     physicsBody.roygbivName = objName;
     physicsBody.mass = curExport.mass;
     var hasAnyPhysicsShape = false;
@@ -268,8 +273,10 @@ StateLoaderLightweight.prototype.loadPhysics = function(){
       physicsWorld.removeBody(childBody);
       delete childBodies[curExport.childNames[i]];
       delete addedObjects[curExport.childNames[i]];
-      var shape = childBody.shapes[0];
-      physicsBody.addShape(shape, childBody.position.vsub(physicsBody.position), childBody.quaternion);
+      if (!curExport.isPhysicsSimplified){
+        var shape = childBody.shapes[0];
+        physicsBody.addShape(shape, childBody.position.vsub(physicsBody.position), childBody.quaternion);
+      }
       hasAnyPhysicsShape = true;
     }
     var objGroup = new ObjectGroup();

@@ -1484,6 +1484,10 @@ ObjectGroup.prototype.exportLightweight = function(){
   exportObj.physicsPosition = {x: this.physicsBody.position.x, y: this.physicsBody.position.y, z: this.physicsBody.position.z};
   exportObj.physicsQuaternion = {x: this.physicsBody.quaternion.x, y: this.physicsBody.quaternion.y, z: this.physicsBody.quaternion.z, w: this.physicsBody.quaternion.w};
   exportObj.initialPhysicsPositionWhenGlued = this.initialPhysicsPositionWhenGlued;
+  if (this.isPhysicsSimplified){
+    exportObj.physicsSimplificationParameters = this.physicsSimplificationParameters;
+    exportObj.isPhysicsSimplified = true;
+  }
   return exportObj;
 }
 
