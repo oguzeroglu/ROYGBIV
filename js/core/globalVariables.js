@@ -149,7 +149,7 @@ var particleSystemPool = new Object();
 var particleSystemPools = new Object();
 var objectTrails = new Object();
 var activeObjectTrails = new Object();
-var dynamicObjects = new Object();
+var dynamicObjects = new Map();
 var dynamicObjectGroups = new Object();
 var addedObjectsInsideGroups = new Object();
 var trackingObjects = new Object();
@@ -357,7 +357,7 @@ var HIGH_PRECISION_SUPPORTED = false;
 var physicsBodyGenerator;
 
 // WORKER VARIABLES
-var WORKERS_SUPPORTED = (typeof(Worker) !== "undefined") && (typeof(MessageChannel) !== "undefined");
+var WORKERS_SUPPORTED = false; //(typeof(Worker) !== "undefined") && (typeof(MessageChannel) !== "undefined");
 
 // TEXT POOL
 var Text = (!isDeployment)? new Text(): 0;

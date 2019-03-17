@@ -2361,7 +2361,7 @@ function parse(input){
             }
             addedObject.setMass(mass);
             if (mode == 1 && mass > 0){
-              dynamicObjects[addedObject.name] = addedObject;
+              dynamicObjects.set(addedObject.name, addedObject);
             }
             if (selectionHandler.getSelectedObject() &&
                   selectionHandler.getSelectedObject().isAddedObject &&

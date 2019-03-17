@@ -148,27 +148,28 @@ function updateTrackingObjects(){
   }
 }
 
-function updateDynamicObjects(){
-  for (var objectName in dynamicObjects){
-    var object = addedObjects[objectName];
-    var physicsBody = object.physicsBody;
-    var axis = object.metaData.axis;
-    var gridSystemAxis = object.metaData.gridSystemAxis;
-    var type = object.type;
-    if (object.isTracked){
-      object.dx = physicsBody.position.x - object.oldPX;
-      object.dy = physicsBody.position.y - object.oldPY;
-      object.dz = physicsBody.position.z - object.oldPZ;
-      object.oldPX = physicsBody.position.x;
-      object.oldPY = physicsBody.position.y;
-      object.oldPZ = physicsBody.position.z;
-    }
-    object.mesh.position.copy(physicsBody.position);
-    setTHREEQuaternionFromCANNON(object.mesh, physicsBody, axis, type, gridSystemAxis);
-    if (!(object.isHidden || (!object.isIntersectable) || !object.boundingBoxesNeedUpdate())){
-      rayCaster.updateObject(object);
-    }
+function dynamicObjectUpdateFunction(object, objectName){
+  var physicsBody = object.physicsBody;
+  var axis = object.metaData.axis;
+  var gridSystemAxis = object.metaData.gridSystemAxis;
+  var type = object.type;
+  if (object.isTracked){
+    object.dx = physicsBody.position.x - object.oldPX;
+    object.dy = physicsBody.position.y - object.oldPY;
+    object.dz = physicsBody.position.z - object.oldPZ;
+    object.oldPX = physicsBody.position.x;
+    object.oldPY = physicsBody.position.y;
+    object.oldPZ = physicsBody.position.z;
   }
+  object.mesh.position.copy(physicsBody.position);
+  setTHREEQuaternionFromCANNON(object.mesh, physicsBody, axis, type, gridSystemAxis);
+  if (!(object.isHidden || (!object.isIntersectable) || !object.boundingBoxesNeedUpdate())){
+    rayCaster.updateObject(object);
+  }
+}
+
+function updateDynamicObjects(){
+  dynamicObjects.forEach(dynamicObjectUpdateFunction);
   for (var grouppedObjectName in dynamicObjectGroups){
     var grouppedObject = objectGroups[grouppedObjectName];
     var physicsBody = grouppedObject.physicsBody;

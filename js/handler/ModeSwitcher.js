@@ -145,7 +145,7 @@ ModeSwitcher.prototype.switchFromDesignToPreview = function(){
   if (selectedObjectGroup){
     selectedObjectGroup.removeBoundingBoxesFromScene();
   }
-  dynamicObjects = new Object();
+  dynamicObjects = new Map();
   dynamicObjectGroups = new Object();
   for (var objectName in objectGroups){
     var object = objectGroups[objectName];
@@ -171,7 +171,7 @@ ModeSwitcher.prototype.switchFromDesignToPreview = function(){
       object.binInfo = new Map();
     }
     if (object.isDynamicObject && !object.noMass){
-      dynamicObjects[objectName] = object;
+      dynamicObjects.set(objectName, object);
     }
     object.saveState();
     if (object.initOpacitySet){
@@ -377,7 +377,7 @@ ModeSwitcher.prototype.switchFromPreviewToDesign = function(){
     if (!(typeof object.originalMass == "undefined")){
       object.setMass(object.originalMass);
       if (object.originalMass == 0){
-        delete dynamicObjects[object.name];
+        dynamicObjects.delete(object.name);
       }
       delete object.originalMass;
     }

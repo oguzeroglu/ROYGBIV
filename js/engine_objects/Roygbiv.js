@@ -810,9 +810,9 @@ Roygbiv.prototype.setMass = function(object, mass){
   physicsWorld.setMass(object, mass);
   if (object.isAddedObject){
     if (mass > 0){
-      dynamicObjects[object.name] = object;
+      dynamicObjects.set(object.name,  object);
     }else{
-      delete dynamicObjects[object.name];
+      dynamicObjects.delete(object.name);
     }
   }else if (object.isObjectGroup){
     if (mass > 0){
