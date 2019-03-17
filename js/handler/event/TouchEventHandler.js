@@ -10,6 +10,7 @@ var TouchEventHandler = function(){
   this.lastSwipeCoordinates = {x: 0, y: 0, isInitiated: false};
   this.tapStartTime = 0;
   this.isThereFingerTouched = false;
+  this.currentTouchCount = 0;
 }
 
 TouchEventHandler.prototype.onTouchStart = function(event){
@@ -18,6 +19,7 @@ TouchEventHandler.prototype.onTouchStart = function(event){
   touchEventHandler.isSwiping = false;
   touchEventHandler.isTapping = false;
   touchEventHandler.isThereFingerTouched = true;
+  touchEventHandler.currentTouchCount = event.targetTouches.length;
   if (event.targetTouches.length == 1){
     touchEventHandler.isSwiping = true;
     touchEventHandler.isTapping = true;
@@ -99,7 +101,8 @@ TouchEventHandler.prototype.onTouchEnd = function(event){
   touchEventHandler.distance = 0;
   touchEventHandler.lastSwipeCoordinates.isInitiated = false;
   touchEventHandler.tapStartTime = 0;
-  if (event.targetTouches.length == 0){
+  touchEventHandler.currentTouchCount = event.targetTouches.length;
+  if (touchEventHandler.currentTouchCount == 0){
     touchEventHandler.isThereFingerTouched = false;
   }
 }

@@ -919,4 +919,6 @@ var Text = function(){
    this.ROYGBIV_SCRIPTING_API_MAKEPARTICLESYSTEMSRESPONSIVE = "Makes the particle systems responsive for different screens. This function should be used before any particle system creation.\nThe referenceHeight can be calculated by dividing the design screen viewport height by the screen resolution\n(renderer.getCurrentViewport().w / screenResolution). The referenceHeight should be a constant (not to be calculated during runtime).";
    this.ROYGBIV_SCRIPTING_API_EXECUTEFOREACHOBJECT = "Executes the given function for each object and object group. The func paremter is executed with\nobject and objectName parameters.";
    this.ROYGBIV_SCRIPTING_API_GETRANDOMINTEGER = "Returns a random integer in range [minInclusive, maxInclusive]";
+   this.ROYGBIV_SCRIPTING_API_ISANYFINGERTOUCHING = "For mobile devices, returns true if there is any finger touching to the screen.";
+   this.ROYGBIV_SCRIPTING_API_GETCURRENTTOUCHCOUNT = "For mobile devices, returns the amount of fingers touching to the screen.";
 }

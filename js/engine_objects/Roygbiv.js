@@ -172,7 +172,9 @@ var Roygbiv = function(){
     "getFPS",
     "makeParticleSystemsResponsive",
     "executeForEachObject",
-    "getRandomInteger"
+    "getRandomInteger",
+    "isAnyFingerTouching",
+    "getCurrentTouchCount"
   ];
 
   this.globals = new Object();
@@ -5000,4 +5002,22 @@ Roygbiv.prototype.getRandomInteger = function(minInclusive, maxInclusive){
   preConditions.checkIfNumber(ROYGBIV.getRandomInteger, preConditions.maxInclusive, maxInclusive);
   preConditions.checkIfTrue(ROYGBIV.getRandomInteger, "minInclusive must be less than maxInclusive", (minInclusive > maxInclusive));
   return Math.floor(Math.random() * (maxInclusive - minInclusive + 1)) + minInclusive;
+}
+
+// isAnyFingerTouching
+// For mobile devices, returns true if there is any finger touching to the screen.
+Roygbiv.prototype.isAnyFingerTouching = function(){
+  if (mode == 0){
+    return;
+  }
+  return touchEventHandler.isThereFingerTouched;
+}
+
+// getCurrentTouchCount
+// For mobile devices, returns the amount of fingers touching to the screen.
+Roygbiv.prototype.getCurrentTouchCount = function(){
+  if (mode == 0){
+    return;
+  }
+  return touchEventHandler.currentTouchCount;
 }
