@@ -1,4 +1,4 @@
-importScripts("./RaycasterWorkerImport.js");
+importScripts("./WorkerImport.js");
 var IS_WORKER_CONTEXT = true;
 
 // CLASS DEFINITION
