@@ -2119,6 +2119,9 @@ AddedObject.prototype.generateBoundingBoxes = function(parentAry){
 }
 
 AddedObject.prototype.visualiseBoundingBoxes = function(){
+  if (!this.boundingBoxes){
+    this.generateBoundingBoxes();
+  }
   if (this.bbHelpers){
     for (var i = 0; i<this.bbHelpers.length; i++){
       scene.remove(this.bbHelpers[i]);

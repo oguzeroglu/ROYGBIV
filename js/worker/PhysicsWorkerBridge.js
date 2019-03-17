@@ -134,7 +134,7 @@ var PhysicsWorkerBridge = function(){
               return;
             }
             var obj = physicsWorld.objectsByID[ary[2]];
-            if (!obj.isPhysicsDirty){
+            if (!obj.isPhysicsDirty && obj.physicsBody.mass > 0){
               obj.physicsBody.position.set(ary[3], ary[4], ary[5]);
               obj.physicsBody.quaternion.set(ary[6], ary[7], ary[8], ary[9]);
             }

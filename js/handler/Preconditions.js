@@ -148,6 +148,9 @@ var Preconditions = function(){
   this.resolutionScale = "resolutionScale";
   this.paused = "paused";
   this.onComplete = "onComplete";
+  this.func = "func";
+  this.minInclusive = "minInclusive";
+  this.maxInclusive = "maxInclusive";
 }
 
 Preconditions.prototype.errorHeader = function(callerFunc){

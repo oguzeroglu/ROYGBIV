@@ -1739,6 +1739,9 @@ ObjectGroup.prototype.generateBoundingBoxes = function(){
 }
 
 ObjectGroup.prototype.visualiseBoundingBoxes = function(){
+  if (!this.boundingBoxes){
+    this.generateBoundingBoxes();
+  }
   if (this.bbHelper){
     scene.remove(this.bbHelper);
   }

@@ -170,7 +170,9 @@ var Roygbiv = function(){
     "hideText",
     "showText",
     "getFPS",
-    "makeParticleSystemsResponsive"
+    "makeParticleSystemsResponsive",
+    "executeForEachObject",
+    "getRandomInteger"
   ];
 
   this.globals = new Object();
@@ -4967,4 +4969,35 @@ Roygbiv.prototype.pause = function(paused){
   if (!paused && oldIsPaused){
     render();
   }
+}
+
+// executeForEachObject
+// Executes the given function for each object and object group. The func paremter
+// is executed with object and objectName parameters.
+Roygbiv.prototype.executeForEachObject = function(func){
+  if (mode == 0){
+    return;
+  }
+  preConditions.checkIfDefined(ROYGBIV.executeForEachObject, preConditions.func, func);
+  preConditions.checkIfFunctionOnlyIfExists(ROYGBIV.executeForEachObject, preConditions.func, func);
+  for (var objName in addedObjects){
+    func(addedObjects[objName], objName)
+  }
+  for (var objName in objectGroups){
+    func(objectGroups[objName], objName)
+  }
+}
+
+// getRandomInteger
+// Returns a random integer in range [minInclusive, maxInclusive]
+Roygbiv.prototype.getRandomInteger = function(minInclusive, maxInclusive){
+  if (mode == 0){
+    return;
+  }
+  preConditions.checkIfDefined(ROYGBIV.getRandomInteger, preConditions.minInclusive, minInclusive);
+  preConditions.checkIfDefined(ROYGBIV.getRandomInteger, preConditions.maxInclusive, maxInclusive);
+  preConditions.checkIfNumber(ROYGBIV.getRandomInteger, preConditions.minInclusive, minInclusive);
+  preConditions.checkIfNumber(ROYGBIV.getRandomInteger, preConditions.maxInclusive, maxInclusive);
+  preConditions.checkIfTrue(ROYGBIV.getRandomInteger, "minInclusive must be less than maxInclusive", (minInclusive > maxInclusive));
+  return Math.floor(Math.random() * (maxInclusive - minInclusive + 1)) + minInclusive;
 }
