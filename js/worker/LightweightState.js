@@ -39,9 +39,7 @@ var LightweightState = function(){
   // ADDED OBJECTS
   this.addedObjects = new Object();
   for (var objName in addedObjects){
-    if (addedObjects[objName].isIntersectable){
-      this.addedObjects[objName] = addedObjects[objName].exportLightweight();
-    }
+    this.addedObjects[objName] = addedObjects[objName].exportLightweight();
   }
   // OBJECT GROUPS
   this.childAddedObjects = new Object();
