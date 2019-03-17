@@ -244,6 +244,7 @@ StateLoaderLightweight.prototype.loadPhysics = function(){
     addedObject.name = objName;
     addedObject.physicsBody = physicsBody;
     addedObjects[objName] = addedObject;
+    addedObject.isChangeable = curAddedObjectExport.isChangeable;
     if (!curAddedObjectExport.noMass){
       physicsWorld.addBody(physicsBody);
     }
@@ -273,6 +274,7 @@ StateLoaderLightweight.prototype.loadPhysics = function(){
     }
     var objGroup = new ObjectGroup();
     objGroup.name = objName;
+    objGroup.isChangeable = curExport.isChangeable;
     objGroup.physicsBody = physicsBody;
     objectGroups[objName] = objGroup;
     if (hasAnyPhysicsShape && !(curExport.noMass || curExport.cannotSetMass)){

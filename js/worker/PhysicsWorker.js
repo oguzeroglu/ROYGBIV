@@ -35,7 +35,7 @@ PhysicsWorker.prototype.refresh = function(state){
     });
     this.idsByObjectName[objName] = idCtr;
     this.objectsByID[idCtr] = addedObjects[objName];
-    if (addedObjects[objName].physicsBody.mass > 0){
+    if (addedObjects[objName].physicsBody.mass > 0 || addedObjects[objName].isChangeable){
       dynamicObjCount ++;
       dynamicAddedObjects.set(objName, addedObjects[objName]);
     }
@@ -47,7 +47,7 @@ PhysicsWorker.prototype.refresh = function(state){
     });
     this.idsByObjectName[objName] = idCtr;
     this.objectsByID[idCtr] = objectGroups[objName];
-    if (objectGroups[objName].physicsBody.mass > 0){
+    if (objectGroups[objName].physicsBody.mass > 0 || objectGroups[objName].isChangeable){
       dynamicObjCount ++;
       dynamicObjectGroups.set(objName, objectGroups[objName]);
     }
@@ -146,6 +146,19 @@ PhysicsWorker.prototype.hide = function(ary){
 PhysicsWorker.prototype.setMass = function(ary){
   var obj = worker.objectsByID[ary[2]];
   obj.setMass(ary[3]);
+  if (obj.isAddedObject){
+    if (ary[3] > 0){
+      dynamicAddedObjects.set(obj.name, obj);
+    }else{
+      dynamicAddedObjects.delete(obj.name);
+    }
+  }else if (obj.isObjectGroup){
+    if (ary[3] > 0){
+      dynamicObjectGroups.set(obj.name, obj);
+    }else{
+      dynamicObjectGroups.delete(obj.name);
+    }
+  }
 }
 // START
 var PIPE = "|";
