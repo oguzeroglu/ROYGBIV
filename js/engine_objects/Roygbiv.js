@@ -176,7 +176,9 @@ var Roygbiv = function(){
     "isAnyFingerTouching",
     "getCurrentTouchCount",
     "setScreenMouseWheelListener",
-    "removeScreenMouseWheelListener"
+    "removeScreenMouseWheelListener",
+    "setScreenPinchListener",
+    "removeScreenPinchListener"
   ];
 
   this.globals = new Object();
@@ -4128,6 +4130,27 @@ Roygbiv.prototype.removeScreenMouseWheelListener = function(){
     return;
   }
   screenMouseWheelCallbackFunction = 0;
+}
+
+// setScreenPinchListener
+// For mobile devices, sets a pinch zoom gesture listener. The callbackFunction is executed with
+// delta parameter that represents the variation of the distance between two fingers.
+Roygbiv.prototype.setScreenPinchListener = function(callbackFunction){
+  if (mode == 0){
+    return;
+  }
+  preConditions.checkIfDefined(ROYGBIV.setScreenPinchListener, preConditions.callbackFunction, callbackFunction);
+  preConditions.checkIfFunctionOnlyIfExists(ROYGBIV.setScreenPinchListener, preConditions.callbackFunction, callbackFunction);
+  screenPinchCallbackFunction = callbackFunction;
+}
+
+// removeScreenPinchListener
+// Removes the listener for pinch gesture.
+Roygbiv.prototype.removeScreenPinchListener = function(){
+  if (mode == 0){
+    return;
+  }
+  screenPinchCallbackFunction = 0;
 }
 
 // TEXT FUNCTIONS **************************************************************

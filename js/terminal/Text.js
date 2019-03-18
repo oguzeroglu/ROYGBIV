@@ -923,4 +923,6 @@ var Text = function(){
    this.ROYGBIV_SCRIPTING_API_GETCURRENTTOUCHCOUNT = "For mobile devices, returns the amount of fingers touching to the screen.";
    this.ROYGBIV_SCRIPTING_API_SETSCREENMOUSEWHEELLISTENER = "Sets a mouse wheel listener. The callbackFunction is executed with deltaX and deltaY parameters when a mousewheel event is triggered.";
    this.ROYGBIV_SCRIPTING_API_REMOVESCREENMOUSEWHEELLISTENER = "Removes the listener for mousewheel events.";
+   this.ROYGBIV_SCRIPTING_API_SETSCREENPINCHLISTENER = "For mobile devices, sets a pinch zoom gesture listener. The callbackFunction is executed with delta parameter\nthat represents the variation of the distance between two fingers.";
+   this.ROYGBIV_SCRIPTING_API_REMOVESCREENPINCHLISTENER = "Removes the listener for pinch gesture.";
 }

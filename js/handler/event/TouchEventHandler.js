@@ -75,6 +75,9 @@ TouchEventHandler.prototype.onTouchMove = function(event){
 }
 
 TouchEventHandler.prototype.onPinch = function(diff){
+  if (mode == 1 && screenPinchCallbackFunction){
+    screenPinchCallbackFunction(diff);
+  }
   if (!(mode == 1 && defaultCameraControlsDisabled)){
     if (diff > 0){
       camera.translateZ(-1 * translateZAmount * defaultAspect / camera.aspect);

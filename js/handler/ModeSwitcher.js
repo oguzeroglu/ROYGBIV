@@ -271,6 +271,7 @@ ModeSwitcher.prototype.switchFromPreviewToDesign = function(){
   performanceDropCallbackFunction = 0;
   userInactivityCallbackFunction = 0;
   screenMouseWheelCallbackFunction = 0;
+  screenPinchCallbackFunction = 0;
   fpsHandler.reset();
   pointerLockRequested = false;
   fullScreenRequested = false;
