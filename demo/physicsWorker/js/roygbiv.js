@@ -1495,6 +1495,9 @@ var imageUploaderInput;
 // LOAD
 var loadInput;
 
+// NOOP
+function noop(){}
+
 // WINDOW
 var windowLoaded;
 var cliFocused = true;
@@ -8430,17 +8433,18 @@ window.onload = function() {
   if (!WORKERS_SUPPORTED){
     rayCaster = new RayCaster();
     physicsWorld = new CANNON.World();
-    physicsWorld.refresh = function(){}
-    physicsWorld.updateObject = function(){}
-    physicsWorld.resetObjectVelocity = function(){}
-    physicsWorld.setObjectVelocity = function(){}
-    physicsWorld.setObjectVelocityX = function(){}
-    physicsWorld.setObjectVelocityY = function(){}
-    physicsWorld.setObjectVelocityZ = function(){}
-    physicsWorld.applyImpulse = function(){}
-    physicsWorld.show = function(){}
-    physicsWorld.hide = function(){}
-    physicsWorld.setMass = function(){}
+    physicsWorld.refresh = noop;
+    physicsWorld.updateObject = noop;
+    physicsWorld.resetObjectVelocity = noop;
+    physicsWorld.setObjectVelocity = noop;
+    physicsWorld.setObjectVelocityX = noop;
+    physicsWorld.setObjectVelocityY = noop;
+    physicsWorld.setObjectVelocityZ = noop;
+    physicsWorld.applyImpulse = noop;
+    physicsWorld.show = noop;
+    physicsWorld.hide = noop;
+    physicsWorld.setMass = noop;
+    physicsWorld.setCollisionListener = noop;
     physicsWorld.ready = true;
   }else{
     rayCaster = new RaycasterWorkerBridge();
@@ -11456,17 +11460,18 @@ StateLoader.prototype.resetProject = function(){
   if (!WORKERS_SUPPORTED){
     rayCaster = new RayCaster();
     physicsWorld = new CANNON.World();
-    physicsWorld.refresh = function(){}
-    physicsWorld.updateObject = function(){}
-    physicsWorld.resetObjectVelocity = function(){}
-    physicsWorld.setObjectVelocity = function(){}
-    physicsWorld.setObjectVelocityX = function(){}
-    physicsWorld.setObjectVelocityY = function(){}
-    physicsWorld.setObjectVelocityZ = function(){}
-    physicsWorld.applyImpulse = function(){}
-    physicsWorld.show = function(){}
-    physicsWorld.hide = function(){}
-    physicsWorld.setMass = function(){}
+    physicsWorld.refresh = noop;
+    physicsWorld.updateObject = noop;
+    physicsWorld.resetObjectVelocity = noop;
+    physicsWorld.setObjectVelocity = noop;
+    physicsWorld.setObjectVelocityX = noop;
+    physicsWorld.setObjectVelocityY = noop;
+    physicsWorld.setObjectVelocityZ = noop;
+    physicsWorld.applyImpulse = noop;
+    physicsWorld.show = noop;
+    physicsWorld.hide = noop;
+    physicsWorld.setMass = noop;
+    physicsWorld.setCollisionListener = noop;
     physicsWorld.ready = true;
   }else{
     rayCaster.worker.terminate();
@@ -18471,6 +18476,7 @@ Roygbiv.prototype.setCollisionListener = function(sourceObject, callbackFunction
   }
   if ((sourceObject.isAddedObject) || (sourceObject.isObjectGroup)){
     collisionCallbackRequests[sourceObject.name] = callbackFunction.bind(sourceObject);
+    physicsWorld.setCollisionListener(sourceObject);
     TOTAL_OBJECT_COLLISION_LISTENER_COUNT ++;
   }else if (sourceObject.isParticle){
     if (sourceObject.uuid && !particleCollisionCallbackRequests[sourceObject.uuid]){
@@ -25029,7 +25035,6 @@ var PhysicsWorkerBridge = function(){
   this.isPhysicsWorkerBridge = true;
   this.worker = new Worker("./js/worker/PhysicsWorker.js");
   this.workerMessageHandler = new WorkerMessageHandler(this.worker);
-  this.physicsWorld = new CANNON.World();
   this.ready = false;
   this.idsByObjectName = new Object();
   this.objectsByID = new Object();
@@ -25041,6 +25046,7 @@ var PhysicsWorkerBridge = function(){
   this.hideBufferSize = 10;
   this.showBufferSize = 10;
   this.setMassBufferSize = 10;
+  this.setCollisionListenerBufferSize = 10;
   this.tickBufferSize = 1;
   this.worker.addEventListener("message", function(msg){
     if (msg.data.isDebug){
@@ -25071,6 +25077,7 @@ var PhysicsWorkerBridge = function(){
       physicsWorld.hideObjectBuffer = [];
       physicsWorld.showObjectBuffer = [];
       physicsWorld.setObjectMassBuffer = [];
+      physicsWorld.setObjectCollisionListenerBuffer = [];
       physicsWorld.updateObjectBufferAvailibilities = [];
       physicsWorld.resetObjectVelocityBufferAvailibilities = [];
       physicsWorld.setObjectVelocityBufferAvailibilities = [];
@@ -25081,6 +25088,7 @@ var PhysicsWorkerBridge = function(){
       physicsWorld.hideObjectBufferAvailibilities = [];
       physicsWorld.showObjectBufferAvailibilities = [];
       physicsWorld.setObjectMassBufferAvailibilities = [];
+      physicsWorld.setObjectCollisionListenerBufferAvailibilities = [];
       physicsWorld.updateBuffer = new Map();
       physicsWorld.velocityUpdateBuffer = new Map();
       physicsWorld.velocityResetBuffer = new Map();
@@ -25091,6 +25099,7 @@ var PhysicsWorkerBridge = function(){
       physicsWorld.hideBuffer = new Map();
       physicsWorld.showBuffer = new Map();
       physicsWorld.setMassBuffer = new Map();
+      physicsWorld.setCollisionListenerBuffer = new Map();
       for (var i = 0; i<msg.data.ids.length; i++){
         var curIDInfo = msg.data.ids[i];
         physicsWorld.idsByObjectName[curIDInfo.name] = curIDInfo.id;
@@ -25120,10 +25129,6 @@ var PhysicsWorkerBridge = function(){
             physicsWorld.setObjectVelocityYBufferAvailibilities.push(true);
             physicsWorld.setObjectVelocityZBufferAvailibilities.push(true);
           }
-          for (var i2 = 0; i2<physicsWorld.applyImpulseBufferSize; i2++){
-            physicsWorld.applyImpulseObjectBuffer.push(new Float32Array(9));
-            physicsWorld.applyImpulseObjectBufferAvailibilities.push(true);
-          }
           for (var i2 = 0; i2<physicsWorld.hideBufferSize; i2++){
             physicsWorld.hideObjectBuffer.push(new Float32Array(3));
             physicsWorld.hideObjectBufferAvailibilities.push(true);
@@ -25135,6 +25140,18 @@ var PhysicsWorkerBridge = function(){
           for (var i2 = 0; i2<physicsWorld.setMassBufferSize; i2++){
             physicsWorld.setObjectMassBuffer.push(new Float32Array(4));
             physicsWorld.setObjectMassBufferAvailibilities.push(true);
+          }
+        }
+        if (obj.physicsBody.mass > 0){
+          for (var i2 = 0; i2<physicsWorld.applyImpulseBufferSize; i2++){
+            physicsWorld.applyImpulseObjectBuffer.push(new Float32Array(9));
+            physicsWorld.applyImpulseObjectBufferAvailibilities.push(true);
+          }
+        }
+        if (!(obj.noMass || obj.cannotSetMass)){
+          for (var i2 = 0; i2<physicsWorld.setCollisionListenerBufferSize; i2++){
+            physicsWorld.setObjectCollisionListenerBuffer.push(new Float32Array(4));
+            physicsWorld.setObjectCollisionListenerBufferAvailibilities.push(true);
           }
         }
       }
@@ -25211,6 +25228,10 @@ var PhysicsWorkerBridge = function(){
             physicsWorld.setObjectMassBuffer[bufID] = ary;
             physicsWorld.setObjectMassBufferAvailibilities[bufID] = true;
           break;
+          case 12:
+            physicsWorld.setObjectCollisionListenerBuffer[bufID] = ary;
+            physicsWorld.setObjectCollisionListenerBufferAvailibilities[bufID] = true;
+          break;
         }
       }
     }
@@ -25231,6 +25252,10 @@ PhysicsWorkerBridge.prototype.refresh = function(){
   this.worker.postMessage(new LightweightState());
 }
 
+PhysicsWorkerBridge.prototype.setCollisionListener = function(obj){
+  this.setCollisionListenerBuffer.set(obj.name, obj);
+}
+
 PhysicsWorkerBridge.prototype.init = function(){
 
 }
@@ -25244,11 +25269,11 @@ PhysicsWorkerBridge.prototype.getContactMaterial = function(mt1, mt2){
 }
 
 PhysicsWorkerBridge.prototype.remove = function(body){
-  this.physicsWorld.remove(body);
+
 }
 
 PhysicsWorkerBridge.prototype.addBody = function(body){
-  this.physicsWorld.addBody(body);
+
 }
 
 PhysicsWorkerBridge.prototype.step = function(stepAmount){
@@ -25294,6 +25319,10 @@ PhysicsWorkerBridge.prototype.step = function(stepAmount){
   if (this.setMassBuffer.size > 0){
     this.setMassBuffer.forEach(this.issueSetMass);
     this.setMassBuffer.clear();
+  }
+  if (this.setCollisionListenerBuffer.size > 0){
+    this.setCollisionListenerBuffer.forEach(this.issueSetCollisionListener);
+    this.setCollisionListenerBuffer.clear();
   }
   var tickSent = false;
   for (var i = 0; i<this.tickBuffer.length; i++){
@@ -25468,6 +25497,21 @@ PhysicsWorkerBridge.prototype.issueSetMass = function(obj){
     }
   }
   console.error("[!] PhysicsWorkerBridge.issueSetMass buffer overflow.");
+}
+
+PhysicsWorkerBridge.prototype.issueSetCollisionListener = function(obj){
+  for (var i = 0; i<physicsWorld.setObjectCollisionListenerBuffer.length; i++){
+    if (physicsWorld.setObjectCollisionListenerBufferAvailibilities[i]){
+      var buf = physicsWorld.setObjectCollisionListenerBuffer[i];
+      buf[0] = 12;
+      buf[1] = i;
+      buf[2] = physicsWorld.idsByObjectName[obj.name];
+      physicsWorld.workerMessageHandler.push(buf.buffer);
+      physicsWorld.setObjectCollisionListenerBufferAvailibilities[i] = false;
+      return;
+    }
+  }
+  console.error("[!] PhysicsWorkerBridge.issueSetCollisionListener buffer overflow.");
 }
 
 PhysicsWorkerBridge.prototype.updateObject = function(obj){

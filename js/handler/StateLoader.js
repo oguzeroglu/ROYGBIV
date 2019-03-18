@@ -2139,17 +2139,18 @@ StateLoader.prototype.resetProject = function(){
   if (!WORKERS_SUPPORTED){
     rayCaster = new RayCaster();
     physicsWorld = new CANNON.World();
-    physicsWorld.refresh = function(){}
-    physicsWorld.updateObject = function(){}
-    physicsWorld.resetObjectVelocity = function(){}
-    physicsWorld.setObjectVelocity = function(){}
-    physicsWorld.setObjectVelocityX = function(){}
-    physicsWorld.setObjectVelocityY = function(){}
-    physicsWorld.setObjectVelocityZ = function(){}
-    physicsWorld.applyImpulse = function(){}
-    physicsWorld.show = function(){}
-    physicsWorld.hide = function(){}
-    physicsWorld.setMass = function(){}
+    physicsWorld.refresh = noop;
+    physicsWorld.updateObject = noop;
+    physicsWorld.resetObjectVelocity = noop;
+    physicsWorld.setObjectVelocity = noop;
+    physicsWorld.setObjectVelocityX = noop;
+    physicsWorld.setObjectVelocityY = noop;
+    physicsWorld.setObjectVelocityZ = noop;
+    physicsWorld.applyImpulse = noop;
+    physicsWorld.show = noop;
+    physicsWorld.hide = noop;
+    physicsWorld.setMass = noop;
+    physicsWorld.setCollisionListener = noop;
     physicsWorld.ready = true;
   }else{
     rayCaster.worker.terminate();

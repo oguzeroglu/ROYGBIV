@@ -22,6 +22,9 @@ var imageUploaderInput;
 // LOAD
 var loadInput;
 
+// NOOP
+function noop(){}
+
 // WINDOW
 var windowLoaded;
 var cliFocused = true;

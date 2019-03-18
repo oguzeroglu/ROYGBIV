@@ -769,6 +769,7 @@ StateLoaderLightweight.prototype.loadPhysics = function(){
     addedObject.metaData = new Object();
     addedObjects[objName] = addedObject;
     addedObject.isChangeable = curAddedObjectExport.isChangeable;
+    addedObject.noMass = curAddedObjectExport.noMass;
     if (!curAddedObjectExport.noMass){
       physicsWorld.addBody(physicsBody);
     }
@@ -809,6 +810,8 @@ StateLoaderLightweight.prototype.loadPhysics = function(){
     objGroup.physicsBody = physicsBody;
     objGroup.isSlippery = curExport.isSlippery;
     objectGroups[objName] = objGroup;
+    objGroup.noMass = curExport.noMass;
+    objGroup.cannotSetMass = curExport.cannotSetMass;
     if (hasAnyPhysicsShape && !(curExport.noMass || curExport.cannotSetMass)){
       physicsBody.position.copy(curExport.physicsPosition);
       physicsBody.quaternion.copy(curExport.physicsQuaternion);

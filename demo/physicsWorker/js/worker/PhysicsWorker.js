@@ -154,6 +154,12 @@ PhysicsWorker.prototype.setMass = function(ary){
     }
   }
 }
+PhysicsWorker.prototype.setCollisionListener = function(ary){
+  var obj = worker.objectsByID[ary[2]];
+  obj.physicsBody.addEventListener("collide", function(event){
+    console.log(event);
+  });
+}
 // START
 var PIPE = "|";
 var UNDEFINED = "undefined";
@@ -213,6 +219,9 @@ self.onmessage = function(msg){
         break;
         case 11:
           worker.setMass(ary);
+        break;
+        case 12:
+          worker.setCollisionListener(ary);
         break;
       }
       if (ary[0] != 2){
