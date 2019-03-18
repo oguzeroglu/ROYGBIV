@@ -6715,11 +6715,18 @@ function handleSkybox(){
 
 function deploymentScripts(){
   if(deploymentScriptsStatus.SCRIPT_EXECUTION_STATUS_init){if (cpuOperationsHandler.record){cpuOperationsHandler.scriptPerformances.init = performance.now()}var text = ROYGBIV.getText("info");
+var githubText = ROYGBIV.getText("github");
 if (ROYGBIV.isMobile()){
-  ROYGBIV.setText(text, "touch: rotate surface\ntwo finger pinch: zoom")
+  ROYGBIV.setText(text, "touch: rotate surface\ntwo finger pinch: zoom");
 }
+ROYGBIV.onTextClick(githubText, function(){
+  var redirectWindow = window.open('https://github.com/oguzeroglu/ROYGBIV', '_blank');
+  redirectWindow.location;
+});
+ROYGBIV.setTextColor(githubText, "lime");
 ROYGBIV.setTextColor(text, "lime");
 ROYGBIV.setTextAlpha(text, 0.5);
+ROYGBIV.setTextAlpha(githubText, 0.5);
 ROYGBIV.disableDefaultControls(true);
 ROYGBIV.setCameraPosition(0, 50, 1500);
 ROYGBIV.lookAt(0, 0, 0);
