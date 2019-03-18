@@ -174,7 +174,9 @@ var Roygbiv = function(){
     "executeForEachObject",
     "getRandomInteger",
     "isAnyFingerTouching",
-    "getCurrentTouchCount"
+    "getCurrentTouchCount",
+    "setScreenMouseWheelListener",
+    "removeScreenMouseWheelListener"
   ];
 
   this.globals = new Object();
@@ -4105,6 +4107,27 @@ Roygbiv.prototype.removeTextClickListener = function(text){
   preConditions.checkIfDefined(ROYGBIV.removeTextClickListener, preConditions.text, text);
   preConditions.checkIfAddedText(ROYGBIV.removeTextClickListener, preConditions.text, text);
   text.clickCallbackFunction = 0;
+}
+
+// setScreenMouseWheelListener
+// Sets a mouse wheel listener. The callbackFunction is executed with deltaX and deltaY parameters
+// when a mousewheel event is triggered.
+Roygbiv.prototype.setScreenMouseWheelListener = function(callbackFunction){
+  if (mode == 0){
+    return;
+  }
+  preConditions.checkIfDefined(ROYGBIV.setScreenMouseWheelListener, preConditions.callbackFunction, callbackFunction);
+  preConditions.checkIfFunctionOnlyIfExists(ROYGBIV.setScreenMouseWheelListener, preConditions.callbackFunction, callbackFunction);
+  screenMouseWheelCallbackFunction = callbackFunction;
+}
+
+// removeScreenMouseWheelListener
+// Removes the listener for mousewheel events.
+Roygbiv.prototype.removeScreenMouseWheelListener = function(){
+  if (mode == 0){
+    return;
+  }
+  screenMouseWheelCallbackFunction = 0;
 }
 
 // TEXT FUNCTIONS **************************************************************

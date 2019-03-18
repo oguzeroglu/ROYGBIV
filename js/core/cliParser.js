@@ -3142,7 +3142,7 @@ function parse(input){
             var i2 = 0;
             var found = false;
             while (i2 < commandDescriptor.deprecatedCommandIndices.length && !found){
-              if (commandDescriptor.commandDescriptor.deprecatedCommandIndices[i2] == i){
+              if (commandDescriptor.deprecatedCommandIndices[i2] == i){
                 found = true;
               }
               i2++;

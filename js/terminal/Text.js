@@ -921,4 +921,6 @@ var Text = function(){
    this.ROYGBIV_SCRIPTING_API_GETRANDOMINTEGER = "Returns a random integer in range [minInclusive, maxInclusive]";
    this.ROYGBIV_SCRIPTING_API_ISANYFINGERTOUCHING = "For mobile devices, returns true if there is any finger touching to the screen.";
    this.ROYGBIV_SCRIPTING_API_GETCURRENTTOUCHCOUNT = "For mobile devices, returns the amount of fingers touching to the screen.";
+   this.ROYGBIV_SCRIPTING_API_SETSCREENMOUSEWHEELLISTENER = "Sets a mouse wheel listener. The callbackFunction is executed with deltaX and deltaY parameters when a mousewheel event is triggered.";
+   this.ROYGBIV_SCRIPTING_API_REMOVESCREENMOUSEWHEELLISTENER = "Removes the listener for mousewheel events.";
 }

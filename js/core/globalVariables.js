@@ -322,6 +322,7 @@ var screenPointerLockChangedCallbackFunction = 0;
 var screenFullScreenChangeCallbackFunction = 0;
 var screenKeydownCallbackFunction = 0;
 var screenKeyupCallbackFunction = 0;
+var screenMouseWheelCallbackFunction;
 var userInactivityCallbackFunction = 0;
 var fpsDropCallbackFunction = 0;
 var performanceDropCallbackFunction = 0;

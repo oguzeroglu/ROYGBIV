@@ -59,16 +59,21 @@ MouseEventHandler.prototype.onMouseWheel = function(event){
     return;
   }
   event.preventDefault();
-  if (mode == 1 && defaultCameraControlsDisabled){
-    return;
-  }
   if (!windowLoaded){
     return;
   }
   var deltaX = event.deltaX;
   var deltaY = event.deltaY;
-  if((typeof deltaX == "undefined") || (typeof deltaY == "undefined")){
+  if((typeof deltaX == UNDEFINED) || (typeof deltaY == UNDEFINED)){
     return;
+  }
+  if (mode == 1){
+    if (screenMouseWheelCallbackFunction){
+      screenMouseWheelCallbackFunction(deltaX, deltaY);
+    }
+    if (defaultCameraControlsDisabled){
+      return;
+    }
   }
   if (Math.abs(deltaX) < Math.abs(deltaY)){
     camera.translateZ(deltaY * defaultAspect / camera.aspect);
