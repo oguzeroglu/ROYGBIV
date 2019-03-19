@@ -218,6 +218,7 @@ PhysicsWorkerBridge.prototype.initializeObjectBuffers = function(obj){
   obj.collisionListenerRemoveRequestBufferAvailibility = true;
   obj.collisionListenerRemoveRequestBuffer[0] = 14;
   obj.collisionListenerRemoveRequestBuffer[1] = id;
+  obj.availibilityModifierBuffer = new Map();
 }
 
 PhysicsWorkerBridge.prototype.debug = function(){
@@ -230,21 +231,33 @@ PhysicsWorkerBridge.prototype.refresh = function(){
   }
   this.idsByObjectName = new Object();
   this.objectsByID = new Object();
+  this.availibilityModifierBuffer = new Map();
   this.ready = false;
   this.worker.postMessage(new LightweightState());
+}
+
+PhysicsWorkerBridge.prototype.issueObjectAvailibilityBuffers = function(obj, bufferKey){
+  obj[bufferKey] = false;
+}
+
+PhysicsWorkerBridge.prototype.issueAvailibilityBuffers = function(obj, key){
+  obj.availibilityModifierBuffer.forEach(physicsWorld.issueObjectAvailibilityBuffers);
+  obj.availibilityModifierBuffer.clear();
 }
 
 PhysicsWorkerBridge.prototype.removeCollisionListener = function(obj){
   if (obj.collisionListenerRemoveRequestBufferAvailibility){
     physicsWorld.workerMessageHandler.push(obj.collisionListenerRemoveRequestBuffer.buffer);
-    obj.collisionListenerRemoveRequestBufferAvailibility = false;
+    physicsWorld.availibilityModifierBuffer.set(obj.name, obj);
+    obj.availibilityModifierBuffer.set("collisionListenerRemoveRequestBufferAvailibility", obj);
   }
 }
 
 PhysicsWorkerBridge.prototype.setCollisionListener = function(obj){
   if (obj.collisionListenerRequestBufferAvailibility){
     physicsWorld.workerMessageHandler.push(obj.collisionListenerRequestBuffer.buffer);
-    obj.collisionListenerRequestBufferAvailibility = false;
+    physicsWorld.availibilityModifierBuffer.set(obj.name, obj);
+    obj.availibilityModifierBuffer.set("collisionListenerRequestBufferAvailibility", obj);
   }
 }
 
@@ -332,6 +345,10 @@ PhysicsWorkerBridge.prototype.step = function(stepAmount){
       this.tickBufferAvailibilities[i] = false;
       break;
     }
+  }
+  if (this.availibilityModifierBuffer.size > 0){
+    this.availibilityModifierBuffer.forEach(this.issueAvailibilityBuffers);
+    this.availibilityModifierBuffer.clear();
   }
   this.workerMessageHandler.flush();
 }
