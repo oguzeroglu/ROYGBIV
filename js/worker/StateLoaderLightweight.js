@@ -268,7 +268,6 @@ StateLoaderLightweight.prototype.loadPhysics = function(){
       physicsBody = physicsBodyGenerator.generateBoxBody({x: curExport.physicsSimplificationParameters.sizeX, y: curExport.physicsSimplificationParameters.sizeY, z: curExport.physicsSimplificationParameters.sizeZ});
     }
     physicsBody.roygbivName = objName;
-    physicsBody.mass = curExport.mass;
     var hasAnyPhysicsShape = false;
     physicsBody.position.copy(curExport.initialPhysicsPositionWhenGlued);
     for (var i = 0; i<curExport.childNames.length; i++){
@@ -286,6 +285,7 @@ StateLoaderLightweight.prototype.loadPhysics = function(){
     objGroup.name = objName;
     objGroup.isChangeable = curExport.isChangeable;
     objGroup.physicsBody = physicsBody;
+    objGroup.setMass(curExport.mass);
     objGroup.isSlippery = curExport.isSlippery;
     objectGroups[objName] = objGroup;
     objGroup.noMass = curExport.noMass;

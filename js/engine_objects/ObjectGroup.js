@@ -3,6 +3,9 @@ var ObjectGroup = function(name, group){
   if (IS_WORKER_CONTEXT){
     return this;
   }
+  if (WORKERS_SUPPORTED){
+    this.initializeWorkerBuffers();
+  }
   this.name = name;
   this.group = group;
 
@@ -29,6 +32,12 @@ var ObjectGroup = function(name, group){
   this.isIntersectable = true;
   this.lastUpdatePosition = new THREE.Vector3();
   this.lastUpdateQuaternion = new THREE.Quaternion();
+}
+
+ObjectGroup.prototype.initializeWorkerBuffers = function(){
+  this.collisionListenerRequestBuffer = new Float32Array(2);
+  this.collisionListenerRequestBufferAvailibility = true;
+  this.collisionListenerRequestBuffer[0] = 12;
 }
 
 ObjectGroup.prototype.forceColor = function(r, g, b, a){

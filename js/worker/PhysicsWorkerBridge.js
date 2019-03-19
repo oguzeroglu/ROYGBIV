@@ -196,8 +196,15 @@ var PhysicsWorkerBridge = function(){
             physicsWorld.setObjectMassBufferAvailibilities[bufID] = true;
           break;
           case 12:
-            physicsWorld.setObjectCollisionListenerBuffer[bufID] = ary;
-            physicsWorld.setObjectCollisionListenerBufferAvailibilities[bufID] = true;
+            var obj = physicsWorld.objectsByID[ary[1]];
+            obj.collisionListenerRequestBuffer = ary;
+            obj.collisionListenerRequestBufferAvailibility = true;
+          break;
+          case 13:
+            if (mode != 0){
+              physicsWorld.fireCollision(ary);
+            }
+            physicsWorld.workerMessageHandler.push(ary.buffer);
           break;
         }
       }
@@ -221,6 +228,15 @@ PhysicsWorkerBridge.prototype.refresh = function(){
 
 PhysicsWorkerBridge.prototype.setCollisionListener = function(obj){
   this.setCollisionListenerBuffer.set(obj.name, obj);
+}
+
+PhysicsWorkerBridge.prototype.fireCollision = function(ary){
+  var obj = physicsWorld.objectsByID[ary[1]];
+  var curCollisionCallbackRequest = collisionCallbackRequests[obj.name];
+  if (curCollisionCallbackRequest){
+    reusableCollisionInfo.set(physicsWorld.objectsByID[ary[2]].name, ary[3], ary[4], ary[5], ary[6], ary[7], ary[8], ary[9], ary[10]);
+    curCollisionCallbackRequest(reusableCollisionInfo);
+  }
 }
 
 PhysicsWorkerBridge.prototype.init = function(){
@@ -467,18 +483,11 @@ PhysicsWorkerBridge.prototype.issueSetMass = function(obj){
 }
 
 PhysicsWorkerBridge.prototype.issueSetCollisionListener = function(obj){
-  for (var i = 0; i<physicsWorld.setObjectCollisionListenerBuffer.length; i++){
-    if (physicsWorld.setObjectCollisionListenerBufferAvailibilities[i]){
-      var buf = physicsWorld.setObjectCollisionListenerBuffer[i];
-      buf[0] = 12;
-      buf[1] = i;
-      buf[2] = physicsWorld.idsByObjectName[obj.name];
-      physicsWorld.workerMessageHandler.push(buf.buffer);
-      physicsWorld.setObjectCollisionListenerBufferAvailibilities[i] = false;
-      return;
-    }
+  if (obj.collisionListenerRequestBufferAvailibility){
+    obj.collisionListenerRequestBuffer[1] = physicsWorld.idsByObjectName[obj.name];
+    physicsWorld.workerMessageHandler.push(obj.collisionListenerRequestBuffer.buffer);
+    obj.collisionListenerRequestBufferAvailibility = false;
   }
-  console.error("[!] PhysicsWorkerBridge.issueSetCollisionListener buffer overflow.");
 }
 
 PhysicsWorkerBridge.prototype.updateObject = function(obj){

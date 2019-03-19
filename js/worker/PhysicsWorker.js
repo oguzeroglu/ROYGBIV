@@ -40,6 +40,7 @@ PhysicsWorker.prototype.refresh = function(state){
       dynamicAddedObjects.set(objName, addedObjects[objName]);
     }
     idCtr ++;
+    worker.initializeBuffers(addedObjects[objName]);
   }
   for (var objName in objectGroups){
     idResponse.ids.push({
@@ -52,12 +53,19 @@ PhysicsWorker.prototype.refresh = function(state){
       dynamicObjectGroups.set(objName, objectGroups[objName]);
     }
     idCtr ++;
+    worker.initializeBuffers(objectGroups[objName]);
   }
   for (var i = 0; i <dynamicObjCount * worker.updateBufferSize; i++){
     worker.dynamicObjectUpdateBuffer.push(new Float32Array(10));
     worker.dynamicObjectUpdateBufferAvailibilities.push(true);
   }
   postMessage(idResponse);
+}
+PhysicsWorker.prototype.initializeBuffers = function(obj){
+  obj.collisionCallbackBuffer = new Float32Array(11);
+  obj.collisionCallbackBufferAvailibility = true;
+  obj.collisionCallbackBuffer[0] = 13;
+  obj.collisionCallbackBuffer[1] = worker.idsByObjectName[obj.name];
 }
 PhysicsWorker.prototype.initPhysics = function(){
   physicsWorld.quatNormalizeSkip = quatNormalizeSkip;
@@ -161,10 +169,24 @@ PhysicsWorker.prototype.setMass = function(ary){
   }
 }
 PhysicsWorker.prototype.setCollisionListener = function(ary){
-  var obj = worker.objectsByID[ary[2]];
+  var obj = worker.objectsByID[ary[1]];
   obj.physicsBody.addEventListener("collide", function(event){
-    
-  });
+    if (!this.collisionCallbackBufferAvailibility){
+      return;
+    }
+    var contact = event.contact;
+    this.collisionCallbackBuffer[2] = worker.idsByObjectName[event.body.roygbivName];
+    this.collisionCallbackBuffer[3] = contact.bi.position.x + contact.ri.x;
+    this.collisionCallbackBuffer[4] = contact.bi.position.y + contact.ri.y;
+    this.collisionCallbackBuffer[5] = contact.bi.position.z + contact.ri.z;
+    this.collisionCallbackBuffer[6] = contact.getImpactVelocityAlongNormal();
+    this.collisionCallbackBuffer[7] = this.physicsBody.quaternion.x;
+    this.collisionCallbackBuffer[8] = this.physicsBody.quaternion.y;
+    this.collisionCallbackBuffer[9] = this.physicsBody.quaternion.z;
+    this.collisionCallbackBuffer[10] = this.physicsBody.quaternion.w;
+    this.collisionCallbackBufferAvailibility = false;
+    worker.workerMessageHandler.push(this.collisionCallbackBuffer.buffer);
+  }.bind(obj));
 }
 // START
 var PIPE = "|";
@@ -229,8 +251,13 @@ self.onmessage = function(msg){
         case 12:
           worker.setCollisionListener(ary);
         break;
+        case 13:
+          var obj = worker.objectsByID[ary[1]];
+          obj.collisionCallbackBuffer = ary;
+          obj.collisionCallbackBufferAvailibility = true;
+        break;
       }
-      if (ary[0] != 2){
+      if (ary[0] != 2 && ary[0] != 13){
         worker.workerMessageHandler.push(ary.buffer);
       }
     }

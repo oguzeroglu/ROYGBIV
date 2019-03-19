@@ -3,6 +3,11 @@ var AddedObject = function(name, type, metaData, material, mesh, physicsBody, de
   if (IS_WORKER_CONTEXT){
     return this;
   }
+
+  if (WORKERS_SUPPORTED){
+    this.initializeWorkerBuffers();
+  }
+
   this.name = name;
   this.type = type;
   this.metaData = metaData;
@@ -99,6 +104,12 @@ var AddedObject = function(name, type, metaData, material, mesh, physicsBody, de
 
   webglCallbackHandler.registerEngineObject(this);
 
+}
+
+AddedObject.prototype.initializeWorkerBuffers = function(){
+  this.collisionListenerRequestBuffer = new Float32Array(2);
+  this.collisionListenerRequestBufferAvailibility = true;
+  this.collisionListenerRequestBuffer[0] = 12;
 }
 
 AddedObject.prototype.exportLightweight = function(){
