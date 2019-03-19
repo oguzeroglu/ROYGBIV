@@ -3635,7 +3635,7 @@ Roygbiv.prototype.setCollisionListener = function(sourceObject, callbackFunction
   if ((sourceObject.isAddedObject) || (sourceObject.isObjectGroup)){
     preConditions.checkIfTrue(ROYGBIV.setCollisionListener, "Cannot set collision listener for more than "+MAX_OBJECT_COLLISION_LISTENER_COUNT+" objects.", (TOTAL_OBJECT_COLLISION_LISTENER_COUNT >= MAX_OBJECT_COLLISION_LISTENER_COUNT));
     preConditions.checkIfNoMass(ROYGBIV.setCollisionListener, preConditions.sourceObject, sourceObject);
-    collisionCallbackRequests[sourceObject.name] = callbackFunction.bind(sourceObject);
+    collisionCallbackRequests.set(sourceObject.name, callbackFunction.bind(sourceObject));
     physicsWorld.setCollisionListener(sourceObject);
     TOTAL_OBJECT_COLLISION_LISTENER_COUNT ++;
   }else if (sourceObject.isParticle){
@@ -3703,7 +3703,7 @@ Roygbiv.prototype.removeCollisionListener = function(sourceObject){
   preConditions.checkIfAddedObjectObjectGroupParticleSystemParticle(ROYGBIV.removeCollisionListener, preConditions.sourceObject, sourceObject);
   var curCallbackRequest;
   if ((sourceObject.isAddedObject) || (sourceObject.isObjectGroup)){
-    curCallbackRequest = collisionCallbackRequests[sourceObject.name];
+    curCallbackRequest = collisionCallbackRequests.get(sourceObject.name);
   }else if (sourceObject.isParticle){
     curCallbackRequest = particleCollisionCallbackRequests[sourceObject.uuid];
   }else if (sourceObject.isParticleSystem){
@@ -3711,7 +3711,7 @@ Roygbiv.prototype.removeCollisionListener = function(sourceObject){
   }
   if (curCallbackRequest){
     if ((sourceObject.isAddedObject) || (sourceObject.isObjectGroup)){
-      delete collisionCallbackRequests[sourceObject.name];
+      collisionCallbackRequests.delete(sourceObject.name);
       TOTAL_OBJECT_COLLISION_LISTENER_COUNT --;
       physicsWorld.removeCollisionListener(sourceObject);
     }else if (sourceObject.isParticle){

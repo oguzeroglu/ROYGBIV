@@ -263,7 +263,7 @@ PhysicsWorkerBridge.prototype.setCollisionListener = function(obj){
 
 PhysicsWorkerBridge.prototype.fireCollision = function(ary){
   var obj = physicsWorld.objectsByID[ary[1]];
-  var curCollisionCallbackRequest = collisionCallbackRequests[obj.name];
+  var curCollisionCallbackRequest = collisionCallbackRequests.get(obj.name);
   if (curCollisionCallbackRequest){
     reusableCollisionInfo.set(physicsWorld.objectsByID[ary[2]].name, ary[3], ary[4], ary[5], ary[6], ary[7], ary[8], ary[9], ary[10]);
     curCollisionCallbackRequest(reusableCollisionInfo);

@@ -289,7 +289,7 @@ ModeSwitcher.prototype.switchFromPreviewToDesign = function(){
     addedText.handleResize();
     delete addedText.clickCallbackFunction;
   }
-  collisionCallbackRequests = new Object();
+  collisionCallbackRequests = new Map();
   particleCollisionCallbackRequests = new Object();
   particleSystemCollisionCallbackRequests = new Object();
 

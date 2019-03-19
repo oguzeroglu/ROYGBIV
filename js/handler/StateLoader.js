@@ -2089,7 +2089,7 @@ StateLoader.prototype.resetProject = function(){
     scene.remove(skyboxMesh);
   }
 
-  collisionCallbackRequests = new Object();
+  collisionCallbackRequests = new Map();
   particleCollisionCallbackRequests = new Object();
   for (var particleSystemName in particleSystems){
     particleSystems[particleSystemName].destroy();

@@ -1133,7 +1133,7 @@ ObjectGroup.prototype.glue = function(){
       quatZ,
       quatW
     );
-    var curCollisionCallbackRequest = collisionCallbackRequests[this.name];
+    var curCollisionCallbackRequest = collisionCallbackRequests.get(this.name);
     if (curCollisionCallbackRequest){
       curCollisionCallbackRequest(collisionInfo);
     }
