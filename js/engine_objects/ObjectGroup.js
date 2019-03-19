@@ -1107,44 +1107,26 @@ ObjectGroup.prototype.glue = function(){
   this.physicsBody = physicsBody;
   this.initQuaternion = this.graphicsGroup.quaternion.clone();
 
-  this.collisionCallbackFunction = function(collisionEvent){
-    if (!collisionEvent.body.addedObject || (!this.isVisibleOnThePreviewScene() && !this.physicsKeptWhenHidden)){
-      return;
-    }
-    var targetObjectName = collisionEvent.target.addedObject.name;
-    var contact = collisionEvent.contact;
-    var collisionPosition = new Object();
-    var collisionImpact = contact.getImpactVelocityAlongNormal();
-    collisionPosition.x = contact.bi.position.x + contact.ri.x;
-    collisionPosition.y = contact.bi.position.y + contact.ri.y;
-    collisionPosition.z = contact.bi.position.z + contact.ri.z;
-    var quatX = this.mesh.quaternion.x;
-    var quatY = this.mesh.quaternion.y;
-    var quatZ = this.mesh.quaternion.z;
-    var quatW = this.mesh.quaternion.w;
-    var collisionInfo = reusableCollisionInfo.set(
-      targetObjectName,
-      collisionPosition.x,
-      collisionPosition.y,
-      collisionPosition.z,
-      collisionImpact,
-      quatX,
-      quatY,
-      quatZ,
-      quatW
-    );
-    var curCollisionCallbackRequest = collisionCallbackRequests.get(this.name);
-    if (curCollisionCallbackRequest){
-      curCollisionCallbackRequest(collisionInfo);
-    }
-  };
-
-  this.physicsBody.addEventListener(
-    "collide",
-    this.collisionCallbackFunction.bind(this)
-  );
+  this.boundCallbackFunction = this.collisionCallback.bind(this);
 
   this.gridSystemName = this.group[Object.keys(this.group)[0]].metaData.gridSystemName;
+}
+
+ObjectGroup.prototype.collisionCallback = function(collisionEvent){
+  if (!collisionEvent.body.addedObject || (!this.isVisibleOnThePreviewScene() && !this.physicsKeptWhenHidden)){
+    return;
+  }
+  var targetObjectName = collisionEvent.body.addedObject.name;
+  var contact = collisionEvent.contact;
+  var collisionInfo = reusableCollisionInfo.set(
+    targetObjectName, contact.bi.position.x + contact.ri.x, contact.bi.position.y + contact.ri.y,
+    contact.bi.position.z + contact.ri.z, contact.getImpactVelocityAlongNormal(), this.physicsBody.quaternion.x,
+    this.physicsBody.quaternion.y, this.physicsBody.quaternion.z, this.physicsBody.quaternion.w
+  );
+  var curCollisionCallbackRequest = collisionCallbackRequests.get(this.name);
+  if (curCollisionCallbackRequest){
+    curCollisionCallbackRequest(collisionInfo);
+  }
 }
 
 ObjectGroup.prototype.destroyParts = function(){

@@ -52,42 +52,7 @@ var AddedObject = function(name, type, metaData, material, mesh, physicsBody, de
 
   this.initQuaternion = this.mesh.quaternion.clone();
 
-  this.collisionCallbackFunction = function(collisionEvent){
-    if (!collisionEvent.body.addedObject || (!this.isVisibleOnThePreviewScene() && !this.physicsKeptWhenHidden)){
-      return;
-    }
-    var targetObjectName = collisionEvent.body.addedObject.name;
-    var contact = collisionEvent.contact;
-    var collisionPosition = new Object();
-    var collisionImpact = contact.getImpactVelocityAlongNormal();
-    collisionPosition.x = contact.bi.position.x + contact.ri.x;
-    collisionPosition.y = contact.bi.position.y + contact.ri.y;
-    collisionPosition.z = contact.bi.position.z + contact.ri.z;
-    var quatX = this.mesh.quaternion.x;
-    var quatY = this.mesh.quaternion.y;
-    var quatZ = this.mesh.quaternion.z;
-    var quatW = this.mesh.quaternion.w;
-    var collisionInfo = reusableCollisionInfo.set(
-      targetObjectName,
-      collisionPosition.x,
-      collisionPosition.y,
-      collisionPosition.z,
-      collisionImpact,
-      quatX,
-      quatY,
-      quatZ,
-      quatW
-    );
-    var curCollisionCallbackRequest = collisionCallbackRequests.get(this.name);
-    if (curCollisionCallbackRequest){
-      curCollisionCallbackRequest(collisionInfo);
-    }
-  };
-
-  this.physicsBody.addEventListener(
-    "collide",
-    this.collisionCallbackFunction.bind(this)
-  );
+  this.boundCallbackFunction = this.collisionCallback.bind(this);
 
   this.reusableVec3 = new THREE.Vector3();
   this.reusableVec3_2 = new THREE.Vector3();
@@ -100,6 +65,23 @@ var AddedObject = function(name, type, metaData, material, mesh, physicsBody, de
 
   webglCallbackHandler.registerEngineObject(this);
 
+}
+
+AddedObject.prototype.collisionCallback = function(collisionEvent){
+  if (!collisionEvent.body.addedObject || (!this.isVisibleOnThePreviewScene() && !this.physicsKeptWhenHidden)){
+    return;
+  }
+  var targetObjectName = collisionEvent.body.addedObject.name;
+  var contact = collisionEvent.contact;
+  var collisionInfo = reusableCollisionInfo.set(
+    targetObjectName, contact.bi.position.x + contact.ri.x, contact.bi.position.y + contact.ri.y,
+    contact.bi.position.z + contact.ri.z, contact.getImpactVelocityAlongNormal(), this.physicsBody.quaternion.x,
+    this.physicsBody.quaternion.y, this.physicsBody.quaternion.z, this.physicsBody.quaternion.w
+  );
+  var curCollisionCallbackRequest = collisionCallbackRequests.get(this.name);
+  if (curCollisionCallbackRequest){
+    curCollisionCallbackRequest(collisionInfo);
+  }
 }
 
 AddedObject.prototype.exportLightweight = function(){

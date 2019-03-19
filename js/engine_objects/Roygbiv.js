@@ -189,7 +189,7 @@ var Roygbiv = function(){
 
 // getObject
 //   Returns the object or glued object having the name given as the parameter,
-//   or zero if no such object or glued object is found.
+//   or undefined if no such object or glued object is found.
 Roygbiv.prototype.getObject = function(name){
   if (mode == 0){
     return;
@@ -202,7 +202,6 @@ Roygbiv.prototype.getObject = function(name){
   if (objectGroup){
     return objectGroup;
   }
-  return 0;
 }
 
 // getParticleSystem
@@ -3638,6 +3637,7 @@ Roygbiv.prototype.setCollisionListener = function(sourceObject, callbackFunction
     if (!collisionCallbackRequests.has(sourceObject.name)){
       TOTAL_OBJECT_COLLISION_LISTENER_COUNT ++;
     }
+    sourceObject.physicsBody.addEventListener("collide", sourceObject.boundCallbackFunction);
     collisionCallbackRequests.set(sourceObject.name, callbackFunction.bind(sourceObject));
     physicsWorld.setCollisionListener(sourceObject);
   }else if (sourceObject.isParticle){
@@ -3713,6 +3713,7 @@ Roygbiv.prototype.removeCollisionListener = function(sourceObject){
   }
   if (curCallbackRequest){
     if ((sourceObject.isAddedObject) || (sourceObject.isObjectGroup)){
+      sourceObject.physicsBody.removeEventListener("collide", sourceObject.boundCallbackFunction);
       collisionCallbackRequests.delete(sourceObject.name);
       TOTAL_OBJECT_COLLISION_LISTENER_COUNT --;
       physicsWorld.removeCollisionListener(sourceObject);
