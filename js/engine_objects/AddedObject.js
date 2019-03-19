@@ -4,10 +4,6 @@ var AddedObject = function(name, type, metaData, material, mesh, physicsBody, de
     return this;
   }
 
-  if (WORKERS_SUPPORTED){
-    this.initializeWorkerBuffers();
-  }
-
   this.name = name;
   this.type = type;
   this.metaData = metaData;
@@ -104,15 +100,6 @@ var AddedObject = function(name, type, metaData, material, mesh, physicsBody, de
 
   webglCallbackHandler.registerEngineObject(this);
 
-}
-
-AddedObject.prototype.initializeWorkerBuffers = function(){
-  this.collisionListenerRequestBuffer = new Float32Array(2);
-  this.collisionListenerRequestBufferAvailibility = true;
-  this.collisionListenerRequestBuffer[0] = 12;
-  this.collisionListenerRemoveRequestBuffer = new Float32Array(2);
-  this.collisionListenerRemoveRequestBufferAvailibility = true;
-  this.collisionListenerRemoveRequestBuffer[0] = 14;
 }
 
 AddedObject.prototype.exportLightweight = function(){

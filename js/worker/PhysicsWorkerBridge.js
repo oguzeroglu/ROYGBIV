@@ -111,6 +111,7 @@ var PhysicsWorkerBridge = function(){
             physicsWorld.applyImpulseObjectBufferAvailibilities.push(true);
           }
         }
+        physicsWorld.initializeObjectBuffers(obj);
       }
       physicsWorld.ready = true;
     }else{
@@ -207,6 +208,18 @@ var PhysicsWorkerBridge = function(){
   });
 }
 
+PhysicsWorkerBridge.prototype.initializeObjectBuffers = function(obj){
+  var id = physicsWorld.idsByObjectName[obj.name];
+  obj.collisionListenerRequestBuffer = new Float32Array(2);
+  obj.collisionListenerRequestBufferAvailibility = true;
+  obj.collisionListenerRequestBuffer[0] = 12;
+  obj.collisionListenerRequestBuffer[1] = id;
+  obj.collisionListenerRemoveRequestBuffer = new Float32Array(2);
+  obj.collisionListenerRemoveRequestBufferAvailibility = true;
+  obj.collisionListenerRemoveRequestBuffer[0] = 14;
+  obj.collisionListenerRemoveRequestBuffer[1] = id;
+}
+
 PhysicsWorkerBridge.prototype.debug = function(){
   this.worker.postMessage({isDebug: true});
 }
@@ -223,7 +236,6 @@ PhysicsWorkerBridge.prototype.refresh = function(){
 
 PhysicsWorkerBridge.prototype.removeCollisionListener = function(obj){
   if (obj.collisionListenerRemoveRequestBufferAvailibility){
-    obj.collisionListenerRemoveRequestBuffer[1] = physicsWorld.idsByObjectName[obj.name];
     physicsWorld.workerMessageHandler.push(obj.collisionListenerRemoveRequestBuffer.buffer);
     obj.collisionListenerRemoveRequestBufferAvailibility = false;
   }
@@ -231,7 +243,6 @@ PhysicsWorkerBridge.prototype.removeCollisionListener = function(obj){
 
 PhysicsWorkerBridge.prototype.setCollisionListener = function(obj){
   if (obj.collisionListenerRequestBufferAvailibility){
-    obj.collisionListenerRequestBuffer[1] = physicsWorld.idsByObjectName[obj.name];
     physicsWorld.workerMessageHandler.push(obj.collisionListenerRequestBuffer.buffer);
     obj.collisionListenerRequestBufferAvailibility = false;
   }
