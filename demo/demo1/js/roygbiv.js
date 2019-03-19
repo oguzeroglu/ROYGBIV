@@ -1495,6 +1495,9 @@ var imageUploaderInput;
 // LOAD
 var loadInput;
 
+// NOOP
+function noop(){}
+
 // WINDOW
 var windowLoaded;
 var cliFocused = true;
@@ -1613,7 +1616,7 @@ var scriptsToRun = new Object();
 var objectGroups = new Object();
 var disabledObjectNames = new Object();
 var markedPoints = new Object();
-var collisionCallbackRequests = new Object();
+var collisionCallbackRequests = new Map();
 var particleCollisionCallbackRequests = new Object();
 var particleSystemCollisionCallbackRequests = new Object();
 var particleSystems = new Object();
@@ -1795,6 +1798,8 @@ var screenPointerLockChangedCallbackFunction = 0;
 var screenFullScreenChangeCallbackFunction = 0;
 var screenKeydownCallbackFunction = 0;
 var screenKeyupCallbackFunction = 0;
+var screenMouseWheelCallbackFunction = 0;
+var screenPinchCallbackFunction = 0;
 var userInactivityCallbackFunction = 0;
 var fpsDropCallbackFunction = 0;
 var performanceDropCallbackFunction = 0;
@@ -3883,6 +3888,7 @@ var AddedObject = function(name, type, metaData, material, mesh, physicsBody, de
   if (IS_WORKER_CONTEXT){
     return this;
   }
+
   this.name = name;
   this.type = type;
   this.metaData = metaData;
@@ -3931,42 +3937,7 @@ var AddedObject = function(name, type, metaData, material, mesh, physicsBody, de
 
   this.initQuaternion = this.mesh.quaternion.clone();
 
-  this.collisionCallbackFunction = function(collisionEvent){
-    if (!collisionEvent.body.addedObject || (!this.isVisibleOnThePreviewScene() && !this.physicsKeptWhenHidden)){
-      return;
-    }
-    var targetObjectName = collisionEvent.body.addedObject.name;
-    var contact = collisionEvent.contact;
-    var collisionPosition = new Object();
-    var collisionImpact = contact.getImpactVelocityAlongNormal();
-    collisionPosition.x = contact.bi.position.x + contact.ri.x;
-    collisionPosition.y = contact.bi.position.y + contact.ri.y;
-    collisionPosition.z = contact.bi.position.z + contact.ri.z;
-    var quatX = this.mesh.quaternion.x;
-    var quatY = this.mesh.quaternion.y;
-    var quatZ = this.mesh.quaternion.z;
-    var quatW = this.mesh.quaternion.w;
-    var collisionInfo = reusableCollisionInfo.set(
-      targetObjectName,
-      collisionPosition.x,
-      collisionPosition.y,
-      collisionPosition.z,
-      collisionImpact,
-      quatX,
-      quatY,
-      quatZ,
-      quatW
-    );
-    var curCollisionCallbackRequest = collisionCallbackRequests[this.name];
-    if (curCollisionCallbackRequest){
-      curCollisionCallbackRequest(collisionInfo);
-    }
-  };
-
-  this.physicsBody.addEventListener(
-    "collide",
-    this.collisionCallbackFunction.bind(this)
-  );
+  this.boundCallbackFunction = this.collisionCallback.bind(this);
 
   this.reusableVec3 = new THREE.Vector3();
   this.reusableVec3_2 = new THREE.Vector3();
@@ -3981,6 +3952,23 @@ var AddedObject = function(name, type, metaData, material, mesh, physicsBody, de
 
 }
 
+AddedObject.prototype.collisionCallback = function(collisionEvent){
+  if (!collisionEvent.body.addedObject || (!this.isVisibleOnThePreviewScene() && !this.physicsKeptWhenHidden)){
+    return;
+  }
+  var targetObjectName = collisionEvent.body.addedObject.name;
+  var contact = collisionEvent.contact;
+  var collisionInfo = reusableCollisionInfo.set(
+    targetObjectName, contact.bi.position.x + contact.ri.x, contact.bi.position.y + contact.ri.y,
+    contact.bi.position.z + contact.ri.z, contact.getImpactVelocityAlongNormal(), this.physicsBody.quaternion.x,
+    this.physicsBody.quaternion.y, this.physicsBody.quaternion.z, this.physicsBody.quaternion.w
+  );
+  var curCollisionCallbackRequest = collisionCallbackRequests.get(this.name);
+  if (curCollisionCallbackRequest){
+    curCollisionCallbackRequest(collisionInfo);
+  }
+}
+
 AddedObject.prototype.exportLightweight = function(){
   if (!this.boundingBoxes){
     this.generateBoundingBoxes();
@@ -3989,6 +3977,7 @@ AddedObject.prototype.exportLightweight = function(){
   var exportObject = new Object();
   exportObject.type = this.type;
   exportObject.isChangeable = this.isChangeable;
+  exportObject.isSlippery = this.metaData["isSlippery"];
   exportObject.isIntersectable = this.isIntersectable;
   if (!this.parentObjectName){
     exportObject.position = this.mesh.position.clone();
@@ -5999,6 +5988,9 @@ AddedObject.prototype.generateBoundingBoxes = function(parentAry){
 }
 
 AddedObject.prototype.visualiseBoundingBoxes = function(){
+  if (!this.boundingBoxes){
+    this.generateBoundingBoxes();
+  }
   if (this.bbHelpers){
     for (var i = 0; i<this.bbHelpers.length; i++){
       scene.remove(this.bbHelpers[i]);
@@ -8911,17 +8903,19 @@ window.onload = function() {
   if (!WORKERS_SUPPORTED){
     rayCaster = new RayCaster();
     physicsWorld = new CANNON.World();
-    physicsWorld.refresh = function(){}
-    physicsWorld.updateObject = function(){}
-    physicsWorld.resetObjectVelocity = function(){}
-    physicsWorld.setObjectVelocity = function(){}
-    physicsWorld.setObjectVelocityX = function(){}
-    physicsWorld.setObjectVelocityY = function(){}
-    physicsWorld.setObjectVelocityZ = function(){}
-    physicsWorld.applyImpulse = function(){}
-    physicsWorld.show = function(){}
-    physicsWorld.hide = function(){}
-    physicsWorld.setMass = function(){}
+    physicsWorld.refresh = noop;
+    physicsWorld.updateObject = noop;
+    physicsWorld.resetObjectVelocity = noop;
+    physicsWorld.setObjectVelocity = noop;
+    physicsWorld.setObjectVelocityX = noop;
+    physicsWorld.setObjectVelocityY = noop;
+    physicsWorld.setObjectVelocityZ = noop;
+    physicsWorld.applyImpulse = noop;
+    physicsWorld.show = noop;
+    physicsWorld.hide = noop;
+    physicsWorld.setMass = noop;
+    physicsWorld.setCollisionListener = noop;
+    physicsWorld.removeCollisionListener = noop;
     physicsWorld.ready = true;
   }else{
     rayCaster = new RaycasterWorkerBridge();
@@ -11887,7 +11881,7 @@ StateLoader.prototype.resetProject = function(){
     scene.remove(skyboxMesh);
   }
 
-  collisionCallbackRequests = new Object();
+  collisionCallbackRequests = new Map();
   particleCollisionCallbackRequests = new Object();
   for (var particleSystemName in particleSystems){
     particleSystems[particleSystemName].destroy();
@@ -11937,17 +11931,19 @@ StateLoader.prototype.resetProject = function(){
   if (!WORKERS_SUPPORTED){
     rayCaster = new RayCaster();
     physicsWorld = new CANNON.World();
-    physicsWorld.refresh = function(){}
-    physicsWorld.updateObject = function(){}
-    physicsWorld.resetObjectVelocity = function(){}
-    physicsWorld.setObjectVelocity = function(){}
-    physicsWorld.setObjectVelocityX = function(){}
-    physicsWorld.setObjectVelocityY = function(){}
-    physicsWorld.setObjectVelocityZ = function(){}
-    physicsWorld.applyImpulse = function(){}
-    physicsWorld.show = function(){}
-    physicsWorld.hide = function(){}
-    physicsWorld.setMass = function(){}
+    physicsWorld.refresh = noop;
+    physicsWorld.updateObject = noop;
+    physicsWorld.resetObjectVelocity = noop;
+    physicsWorld.setObjectVelocity = noop;
+    physicsWorld.setObjectVelocityX = noop;
+    physicsWorld.setObjectVelocityY = noop;
+    physicsWorld.setObjectVelocityZ = noop;
+    physicsWorld.applyImpulse = noop;
+    physicsWorld.show = noop;
+    physicsWorld.hide = noop;
+    physicsWorld.setMass = noop;
+    physicsWorld.setCollisionListener = noop;
+    physicsWorld.removeCollisionListener = noop;
     physicsWorld.ready = true;
   }else{
     rayCaster.worker.terminate();
@@ -11980,6 +11976,8 @@ StateLoader.prototype.resetProject = function(){
   fpsDropCallbackFunction = 0;
   performanceDropCallbackFunction = 0;
   userInactivityCallbackFunction = 0;
+  screenMouseWheelCallbackFunction = 0;
+  screenPinchCallbackFunction = 0;
   fpsHandler.reset();
   originalBloomConfigurations = new Object();
   fonts = new Object();
@@ -12171,6 +12169,7 @@ var ObjectGroup = function(name, group){
   if (IS_WORKER_CONTEXT){
     return this;
   }
+
   this.name = name;
   this.group = group;
 
@@ -13274,44 +13273,26 @@ ObjectGroup.prototype.glue = function(){
   this.physicsBody = physicsBody;
   this.initQuaternion = this.graphicsGroup.quaternion.clone();
 
-  this.collisionCallbackFunction = function(collisionEvent){
-    if (!collisionEvent.body.addedObject || (!this.isVisibleOnThePreviewScene() && !this.physicsKeptWhenHidden)){
-      return;
-    }
-    var targetObjectName = collisionEvent.target.addedObject.name;
-    var contact = collisionEvent.contact;
-    var collisionPosition = new Object();
-    var collisionImpact = contact.getImpactVelocityAlongNormal();
-    collisionPosition.x = contact.bi.position.x + contact.ri.x;
-    collisionPosition.y = contact.bi.position.y + contact.ri.y;
-    collisionPosition.z = contact.bi.position.z + contact.ri.z;
-    var quatX = this.mesh.quaternion.x;
-    var quatY = this.mesh.quaternion.y;
-    var quatZ = this.mesh.quaternion.z;
-    var quatW = this.mesh.quaternion.w;
-    var collisionInfo = reusableCollisionInfo.set(
-      targetObjectName,
-      collisionPosition.x,
-      collisionPosition.y,
-      collisionPosition.z,
-      collisionImpact,
-      quatX,
-      quatY,
-      quatZ,
-      quatW
-    );
-    var curCollisionCallbackRequest = collisionCallbackRequests[this.name];
-    if (curCollisionCallbackRequest){
-      curCollisionCallbackRequest(collisionInfo);
-    }
-  };
-
-  this.physicsBody.addEventListener(
-    "collide",
-    this.collisionCallbackFunction.bind(this)
-  );
+  this.boundCallbackFunction = this.collisionCallback.bind(this);
 
   this.gridSystemName = this.group[Object.keys(this.group)[0]].metaData.gridSystemName;
+}
+
+ObjectGroup.prototype.collisionCallback = function(collisionEvent){
+  if (!collisionEvent.body.addedObject || (!this.isVisibleOnThePreviewScene() && !this.physicsKeptWhenHidden)){
+    return;
+  }
+  var targetObjectName = collisionEvent.body.addedObject.name;
+  var contact = collisionEvent.contact;
+  var collisionInfo = reusableCollisionInfo.set(
+    targetObjectName, contact.bi.position.x + contact.ri.x, contact.bi.position.y + contact.ri.y,
+    contact.bi.position.z + contact.ri.z, contact.getImpactVelocityAlongNormal(), this.physicsBody.quaternion.x,
+    this.physicsBody.quaternion.y, this.physicsBody.quaternion.z, this.physicsBody.quaternion.w
+  );
+  var curCollisionCallbackRequest = collisionCallbackRequests.get(this.name);
+  if (curCollisionCallbackRequest){
+    curCollisionCallbackRequest(collisionInfo);
+  }
 }
 
 ObjectGroup.prototype.destroyParts = function(){
@@ -13616,16 +13597,17 @@ ObjectGroup.prototype.destroy = function(skipRaycasterRefresh){
 }
 
 ObjectGroup.prototype.exportLightweight = function(){
-  var exportObj = new Object();
-  exportObj.isChangeable = this.isChangeable;
-  exportObj.isIntersectable = this.isIntersectable;
-  this.graphicsGroup.position.copy(this.mesh.position);
-  this.graphicsGroup.quaternion.copy(this.mesh.quaternion);
-  this.graphicsGroup.updateMatrixWorld();
   if (!this.boundingBoxes){
     this.generateBoundingBoxes();
   }
   this.updateBoundingBoxes();
+  var exportObj = new Object();
+  exportObj.isChangeable = this.isChangeable;
+  exportObj.isSlippery = this.isSlippery;
+  exportObj.isIntersectable = this.isIntersectable;
+  this.graphicsGroup.position.copy(this.mesh.position);
+  this.graphicsGroup.quaternion.copy(this.mesh.quaternion);
+  this.graphicsGroup.updateMatrixWorld();
   exportObj.matrixWorld = this.graphicsGroup.matrixWorld.elements;
   exportObj.position = this.graphicsGroup.position;
   exportObj.quaternion = new THREE.Quaternion().copy(this.graphicsGroup.quaternion);
@@ -13907,6 +13889,9 @@ ObjectGroup.prototype.generateBoundingBoxes = function(){
 }
 
 ObjectGroup.prototype.visualiseBoundingBoxes = function(){
+  if (!this.boundingBoxes){
+    this.generateBoundingBoxes();
+  }
   if (this.bbHelper){
     scene.remove(this.bbHelper);
   }
@@ -16726,7 +16711,15 @@ var Roygbiv = function(){
     "hideText",
     "showText",
     "getFPS",
-    "makeParticleSystemsResponsive"
+    "makeParticleSystemsResponsive",
+    "executeForEachObject",
+    "getRandomInteger",
+    "isAnyFingerTouching",
+    "getCurrentTouchCount",
+    "setScreenMouseWheelListener",
+    "removeScreenMouseWheelListener",
+    "setScreenPinchListener",
+    "removeScreenPinchListener"
   ];
 
   this.globals = new Object();
@@ -16746,7 +16739,6 @@ Roygbiv.prototype.getObject = function(name){
   if (objectGroup){
     return objectGroup;
   }
-  return 0;
 }
 
 Roygbiv.prototype.getParticleSystem = function(name){
@@ -18937,8 +18929,12 @@ Roygbiv.prototype.setCollisionListener = function(sourceObject, callbackFunction
     return;
   }
   if ((sourceObject.isAddedObject) || (sourceObject.isObjectGroup)){
-    collisionCallbackRequests[sourceObject.name] = callbackFunction.bind(sourceObject);
-    TOTAL_OBJECT_COLLISION_LISTENER_COUNT ++;
+    if (!collisionCallbackRequests.has(sourceObject.name)){
+      TOTAL_OBJECT_COLLISION_LISTENER_COUNT ++;
+    }
+    sourceObject.physicsBody.addEventListener("collide", sourceObject.boundCallbackFunction);
+    collisionCallbackRequests.set(sourceObject.name, callbackFunction.bind(sourceObject));
+    physicsWorld.setCollisionListener(sourceObject);
   }else if (sourceObject.isParticle){
     if (sourceObject.uuid && !particleCollisionCallbackRequests[sourceObject.uuid]){
     }
@@ -18988,7 +18984,7 @@ Roygbiv.prototype.removeCollisionListener = function(sourceObject){
   }
   var curCallbackRequest;
   if ((sourceObject.isAddedObject) || (sourceObject.isObjectGroup)){
-    curCallbackRequest = collisionCallbackRequests[sourceObject.name];
+    curCallbackRequest = collisionCallbackRequests.get(sourceObject.name);
   }else if (sourceObject.isParticle){
     curCallbackRequest = particleCollisionCallbackRequests[sourceObject.uuid];
   }else if (sourceObject.isParticleSystem){
@@ -18996,8 +18992,10 @@ Roygbiv.prototype.removeCollisionListener = function(sourceObject){
   }
   if (curCallbackRequest){
     if ((sourceObject.isAddedObject) || (sourceObject.isObjectGroup)){
-      delete collisionCallbackRequests[sourceObject.name];
+      sourceObject.physicsBody.removeEventListener("collide", sourceObject.boundCallbackFunction);
+      collisionCallbackRequests.delete(sourceObject.name);
       TOTAL_OBJECT_COLLISION_LISTENER_COUNT --;
+      physicsWorld.removeCollisionListener(sourceObject);
     }else if (sourceObject.isParticle){
       delete particleCollisionCallbackRequests[sourceObject.uuid];
       TOTAL_PARTICLE_COLLISION_LISTEN_COUNT --;
@@ -19052,7 +19050,7 @@ Roygbiv.prototype.removeScreenClickListener = function(){
   if (mode == 0){
     return;
   }
-  screenClickCallbackFunction = 0;
+  screenClickCallbackFunction = noop;
 }
 
 Roygbiv.prototype.setScreenMouseDownListener = function(callbackFunction){
@@ -19066,7 +19064,7 @@ Roygbiv.prototype.removeScreenMouseDownListener = function(){
   if (mode == 0){
     return;
   }
-  screenMouseDownCallbackFunction = 0;
+  screenMouseDownCallbackFunction = noop;
 }
 
 Roygbiv.prototype.setScreenMouseUpListener = function(callbackFunction){
@@ -19080,7 +19078,7 @@ Roygbiv.prototype.removeScreenMouseUpListener = function(){
   if (mode == 0){
     return;
   }
-  screenMouseUpCallbackFunction = 0;
+  screenMouseUpCallbackFunction = noop;
 }
 
 Roygbiv.prototype.setScreenMouseMoveListener = function(callbackFunction){
@@ -19094,7 +19092,7 @@ Roygbiv.prototype.removeScreenMouseMoveListener = function(){
   if (mode == 0){
     return;
   }
-  screenMouseMoveCallbackFunction = 0;
+  screenMouseMoveCallbackFunction = noop;
 }
 
 Roygbiv.prototype.setScreenPointerLockChangeListener = function(callbackFunction){
@@ -19108,7 +19106,7 @@ Roygbiv.prototype.removeScreenPointerLockChangeListener = function(){
   if (mode == 0){
     return;
   }
-  screenPointerLockChangedCallbackFunction = 0;
+  screenPointerLockChangedCallbackFunction = noop;
 }
 
 Roygbiv.prototype.setParticleSystemPoolConsumedListener = function(psPool, callbackFunction){
@@ -19122,7 +19120,7 @@ Roygbiv.prototype.removeParticleSystemPoolConsumedListener = function(psPool){
   if (mode == 0){
     return;
   }
-  psPool.consumedCallback = 0;
+  psPool.consumedCallback = noop;
 }
 
 Roygbiv.prototype.setParticleSystemPoolAvailableListener = function(psPool, callbackFunction){
@@ -19136,7 +19134,7 @@ Roygbiv.prototype.removeParticleSystemPoolAvailableListener = function(psPool){
   if (mode == 0){
     return;
   }
-  psPool.availableCallback = 0;
+  psPool.availableCallback = noop;
 }
 
 Roygbiv.prototype.setFullScreenChangeCallbackFunction = function(callbackFunction){
@@ -19150,7 +19148,7 @@ Roygbiv.prototype.removeFullScreenChangeCallbackFunction = function(){
   if (mode == 0){
     return;
   }
-  screenFullScreenChangeCallbackFunction = 0;
+  screenFullScreenChangeCallbackFunction = noop;
 }
 
 Roygbiv.prototype.setFPSDropCallbackFunction = function(callbackFunction){
@@ -19164,7 +19162,7 @@ Roygbiv.prototype.removeFPSDropCallbackFunction = function(){
   if (mode == 0){
     return;
   }
-  fpsDropCallbackFunction = 0;
+  fpsDropCallbackFunction = noop;
 }
 
 Roygbiv.prototype.setPerformanceDropCallbackFunction = function(minFPS, seconds, callbackFunction){
@@ -19179,7 +19177,7 @@ Roygbiv.prototype.removePerformanceDropCallbackFunction = function(){
   if (mode == 0){
     return;
   }
-  performanceDropCallbackFunction = 0;
+  performanceDropCallbackFunction = noop;
   fpsHandler.reset();
 }
 
@@ -19197,7 +19195,7 @@ Roygbiv.prototype.removeUserInactivityCallbackFunction = function(){
     return;
   }
   inactiveCounter = 0;
-  userInactivityCallbackFunction = 0;
+  userInactivityCallbackFunction = noop;
   maxInactiveTime = 0;
 }
 
@@ -19212,7 +19210,7 @@ Roygbiv.prototype.removeScreenKeydownListener = function(){
   if (mode == 0){
     return;
   }
-  screenKeydownCallbackFunction = 0;
+  screenKeydownCallbackFunction = noop;
 }
 
 Roygbiv.prototype.setScreenKeyupListener = function(callbackFunction){
@@ -19226,7 +19224,7 @@ Roygbiv.prototype.removeScreenKeyupListener = function(){
   if (mode == 0){
     return;
   }
-  screenKeyupCallbackFunction = 0;
+  screenKeyupCallbackFunction = noop;
 }
 
 Roygbiv.prototype.onTextClick = function(text, callbackFunction){
@@ -19240,7 +19238,35 @@ Roygbiv.prototype.removeTextClickListener = function(text){
   if (mode == 0){
     return;
   }
-  text.clickCallbackFunction = 0;
+  text.clickCallbackFunction = noop;
+}
+
+Roygbiv.prototype.setScreenMouseWheelListener = function(callbackFunction){
+  if (mode == 0){
+    return;
+  }
+  screenMouseWheelCallbackFunction = callbackFunction;
+}
+
+Roygbiv.prototype.removeScreenMouseWheelListener = function(){
+  if (mode == 0){
+    return;
+  }
+  screenMouseWheelCallbackFunction = noop;
+}
+
+Roygbiv.prototype.setScreenPinchListener = function(callbackFunction){
+  if (mode == 0){
+    return;
+  }
+  screenPinchCallbackFunction = callbackFunction;
+}
+
+Roygbiv.prototype.removeScreenPinchListener = function(){
+  if (mode == 0){
+    return;
+  }
+  screenPinchCallbackFunction = noop;
 }
 
 
@@ -19788,6 +19814,39 @@ Roygbiv.prototype.pause = function(paused){
   if (!paused && oldIsPaused){
     render();
   }
+}
+
+Roygbiv.prototype.executeForEachObject = function(func){
+  if (mode == 0){
+    return;
+  }
+  for (var objName in addedObjects){
+    func(addedObjects[objName], objName)
+  }
+  for (var objName in objectGroups){
+    func(objectGroups[objName], objName)
+  }
+}
+
+Roygbiv.prototype.getRandomInteger = function(minInclusive, maxInclusive){
+  if (mode == 0){
+    return;
+  }
+  return Math.floor(Math.random() * (maxInclusive - minInclusive + 1)) + minInclusive;
+}
+
+Roygbiv.prototype.isAnyFingerTouching = function(){
+  if (mode == 0){
+    return;
+  }
+  return touchEventHandler.isThereFingerTouched;
+}
+
+Roygbiv.prototype.getCurrentTouchCount = function(){
+  if (mode == 0){
+    return;
+  }
+  return touchEventHandler.currentTouchCount;
 }
 
 
@@ -23250,6 +23309,8 @@ ModeSwitcher.prototype.switchFromPreviewToDesign = function(){
   fpsDropCallbackFunction = 0;
   performanceDropCallbackFunction = 0;
   userInactivityCallbackFunction = 0;
+  screenMouseWheelCallbackFunction = 0;
+  screenPinchCallbackFunction = 0;
   fpsHandler.reset();
   pointerLockRequested = false;
   fullScreenRequested = false;
@@ -23267,7 +23328,7 @@ ModeSwitcher.prototype.switchFromPreviewToDesign = function(){
     addedText.handleResize();
     delete addedText.clickCallbackFunction;
   }
-  collisionCallbackRequests = new Object();
+  collisionCallbackRequests = new Map();
   particleCollisionCallbackRequests = new Object();
   particleSystemCollisionCallbackRequests = new Object();
 
@@ -24634,9 +24695,7 @@ var LightweightState = function(){
   // ADDED OBJECTS
   this.addedObjects = new Object();
   for (var objName in addedObjects){
-    if (addedObjects[objName].isIntersectable){
-      this.addedObjects[objName] = addedObjects[objName].exportLightweight();
-    }
+    this.addedObjects[objName] = addedObjects[objName].exportLightweight();
   }
   // OBJECT GROUPS
   this.childAddedObjects = new Object();
@@ -24731,6 +24790,8 @@ var TouchEventHandler = function(){
   this.isTapping = false;
   this.lastSwipeCoordinates = {x: 0, y: 0, isInitiated: false};
   this.tapStartTime = 0;
+  this.isThereFingerTouched = false;
+  this.currentTouchCount = 0;
 }
 
 TouchEventHandler.prototype.onTouchStart = function(event){
@@ -24738,6 +24799,8 @@ TouchEventHandler.prototype.onTouchStart = function(event){
   touchEventHandler.isZooming = false;
   touchEventHandler.isSwiping = false;
   touchEventHandler.isTapping = false;
+  touchEventHandler.isThereFingerTouched = true;
+  touchEventHandler.currentTouchCount = event.targetTouches.length;
   if (event.targetTouches.length == 1){
     touchEventHandler.isSwiping = true;
     touchEventHandler.isTapping = true;
@@ -24793,6 +24856,9 @@ TouchEventHandler.prototype.onTouchMove = function(event){
 }
 
 TouchEventHandler.prototype.onPinch = function(diff){
+  if (mode == 1 && screenPinchCallbackFunction){
+    screenPinchCallbackFunction(diff);
+  }
   if (!(mode == 1 && defaultCameraControlsDisabled)){
     if (diff > 0){
       camera.translateZ(-1 * translateZAmount * defaultAspect / camera.aspect);
@@ -24819,6 +24885,10 @@ TouchEventHandler.prototype.onTouchEnd = function(event){
   touchEventHandler.distance = 0;
   touchEventHandler.lastSwipeCoordinates.isInitiated = false;
   touchEventHandler.tapStartTime = 0;
+  touchEventHandler.currentTouchCount = event.targetTouches.length;
+  if (touchEventHandler.currentTouchCount == 0){
+    touchEventHandler.isThereFingerTouched = false;
+  }
 }
 
 var FullScreenEventHandler = function(){
@@ -24925,16 +24995,21 @@ MouseEventHandler.prototype.onMouseWheel = function(event){
     return;
   }
   event.preventDefault();
-  if (mode == 1 && defaultCameraControlsDisabled){
-    return;
-  }
   if (!windowLoaded){
     return;
   }
   var deltaX = event.deltaX;
   var deltaY = event.deltaY;
-  if((typeof deltaX == "undefined") || (typeof deltaY == "undefined")){
+  if((typeof deltaX == UNDEFINED) || (typeof deltaY == UNDEFINED)){
     return;
+  }
+  if (mode == 1){
+    if (screenMouseWheelCallbackFunction){
+      screenMouseWheelCallbackFunction(deltaX, deltaY);
+    }
+    if (defaultCameraControlsDisabled){
+      return;
+    }
   }
   if (Math.abs(deltaX) < Math.abs(deltaY)){
     camera.translateZ(deltaY * defaultAspect / camera.aspect);
@@ -25419,11 +25494,9 @@ var PhysicsWorkerBridge = function(){
   this.isPhysicsWorkerBridge = true;
   this.worker = new Worker("./js/worker/PhysicsWorker.js");
   this.workerMessageHandler = new WorkerMessageHandler(this.worker);
-  this.physicsWorld = new CANNON.World();
   this.ready = false;
   this.idsByObjectName = new Object();
   this.objectsByID = new Object();
-  this.updateObjectBufferSize = 10;
   this.resetObjectVelocityBufferSize = 10;
   this.setObjectVelocityBufferSize = 10;
   this.singularObjectVelocityBufferSize = 10;
@@ -25451,7 +25524,6 @@ var PhysicsWorkerBridge = function(){
         physicsWorld.tickBuffer.push(new Float32Array(3));
         physicsWorld.tickBufferAvailibilities.push(true);
       }
-      physicsWorld.updateObjectBuffer = [];
       physicsWorld.resetObjectVelocityBuffer = [];
       physicsWorld.setObjectVelocityBuffer = [];
       physicsWorld.setObjectVelocityXBuffer = [];
@@ -25461,7 +25533,6 @@ var PhysicsWorkerBridge = function(){
       physicsWorld.hideObjectBuffer = [];
       physicsWorld.showObjectBuffer = [];
       physicsWorld.setObjectMassBuffer = [];
-      physicsWorld.updateObjectBufferAvailibilities = [];
       physicsWorld.resetObjectVelocityBufferAvailibilities = [];
       physicsWorld.setObjectVelocityBufferAvailibilities = [];
       physicsWorld.setObjectVelocityXBufferAvailibilities = [];
@@ -25490,10 +25561,6 @@ var PhysicsWorkerBridge = function(){
         }
         physicsWorld.objectsByID[curIDInfo.id] = obj;
         if (obj.isChangeable){
-          for (var i2 = 0; i2<physicsWorld.updateObjectBufferSize; i2++){
-            physicsWorld.updateObjectBuffer.push(new Float32Array(10));
-            physicsWorld.updateObjectBufferAvailibilities.push(true);
-          }
           for (var i2 = 0; i2<physicsWorld.resetObjectVelocityBufferSize; i2++){
             physicsWorld.resetObjectVelocityBuffer.push(new Float32Array(3));
             physicsWorld.resetObjectVelocityBufferAvailibilities.push(true);
@@ -25510,10 +25577,6 @@ var PhysicsWorkerBridge = function(){
             physicsWorld.setObjectVelocityYBufferAvailibilities.push(true);
             physicsWorld.setObjectVelocityZBufferAvailibilities.push(true);
           }
-          for (var i2 = 0; i2<physicsWorld.applyImpulseBufferSize; i2++){
-            physicsWorld.applyImpulseObjectBuffer.push(new Float32Array(9));
-            physicsWorld.applyImpulseObjectBufferAvailibilities.push(true);
-          }
           for (var i2 = 0; i2<physicsWorld.hideBufferSize; i2++){
             physicsWorld.hideObjectBuffer.push(new Float32Array(3));
             physicsWorld.hideObjectBufferAvailibilities.push(true);
@@ -25527,6 +25590,13 @@ var PhysicsWorkerBridge = function(){
             physicsWorld.setObjectMassBufferAvailibilities.push(true);
           }
         }
+        if (obj.physicsBody.mass > 0){
+          for (var i2 = 0; i2<physicsWorld.applyImpulseBufferSize; i2++){
+            physicsWorld.applyImpulseObjectBuffer.push(new Float32Array(9));
+            physicsWorld.applyImpulseObjectBufferAvailibilities.push(true);
+          }
+        }
+        physicsWorld.initializeObjectBuffers(obj);
       }
       physicsWorld.ready = true;
     }else{
@@ -25534,10 +25604,10 @@ var PhysicsWorkerBridge = function(){
         var ary = new Float32Array(msg.data[i]);
         switch(ary[0]){
           case 0:
-            var bufID = ary[1];
-            physicsWorld.updateObjectBuffer[bufID] = ary;
-            physicsWorld.updateObjectBufferAvailibilities[bufID] = true;
-            var obj = physicsWorld.objectsByID[ary[2]];
+            var objID = ary[1];
+            var obj = physicsWorld.objectsByID[objID];
+            obj.updateBuffer = ary;
+            obj.updateBufferAvailibility = true;
             obj.isPhysicsDirty = false;
           break;
           case 1:
@@ -25550,10 +25620,10 @@ var PhysicsWorkerBridge = function(){
               physicsWorld.workerMessageHandler.push(ary.buffer);
               return;
             }
-            var obj = physicsWorld.objectsByID[ary[2]];
-            if (!obj.isPhysicsDirty){
-              obj.physicsBody.position.set(ary[3], ary[4], ary[5]);
-              obj.physicsBody.quaternion.set(ary[6], ary[7], ary[8], ary[9]);
+            var obj = physicsWorld.objectsByID[ary[1]];
+            if (!obj.isPhysicsDirty && obj.physicsBody.mass > 0){
+              obj.physicsBody.position.set(ary[2], ary[3], ary[4]);
+              obj.physicsBody.quaternion.set(ary[5], ary[6], ary[7], ary[8]);
             }
             physicsWorld.workerMessageHandler.push(ary.buffer);
           break;
@@ -25601,10 +25671,43 @@ var PhysicsWorkerBridge = function(){
             physicsWorld.setObjectMassBuffer[bufID] = ary;
             physicsWorld.setObjectMassBufferAvailibilities[bufID] = true;
           break;
+          case 12:
+            var obj = physicsWorld.objectsByID[ary[1]];
+            obj.collisionListenerRequestBuffer = ary;
+            obj.collisionListenerRequestBufferAvailibility = true;
+          break;
+          case 13:
+            if (mode != 0){
+              physicsWorld.fireCollision(ary);
+            }
+            physicsWorld.workerMessageHandler.push(ary.buffer);
+          break;
+          case 14:
+            var obj = physicsWorld.objectsByID[ary[1]];
+            obj.collisionListenerRemoveRequestBuffer = ary;
+            obj.collisionListenerRemoveRequestBufferAvailibility = true;
+          break;
         }
       }
     }
   });
+}
+
+PhysicsWorkerBridge.prototype.initializeObjectBuffers = function(obj){
+  var id = physicsWorld.idsByObjectName[obj.name];
+  obj.collisionListenerRequestBuffer = new Float32Array(2);
+  obj.collisionListenerRequestBufferAvailibility = true;
+  obj.collisionListenerRequestBuffer[0] = 12;
+  obj.collisionListenerRequestBuffer[1] = id;
+  obj.collisionListenerRemoveRequestBuffer = new Float32Array(2);
+  obj.collisionListenerRemoveRequestBufferAvailibility = true;
+  obj.collisionListenerRemoveRequestBuffer[0] = 14;
+  obj.collisionListenerRemoveRequestBuffer[1] = id;
+  obj.updateBuffer = new Float32Array(9);
+  obj.updateBufferAvailibility = true;
+  obj.updateBuffer[0] = 0;
+  obj.updateBuffer[1] = id;
+  obj.availibilityModifierBuffer = new Map();
 }
 
 PhysicsWorkerBridge.prototype.debug = function(){
@@ -25617,8 +25720,42 @@ PhysicsWorkerBridge.prototype.refresh = function(){
   }
   this.idsByObjectName = new Object();
   this.objectsByID = new Object();
+  this.availibilityModifierBuffer = new Map();
   this.ready = false;
   this.worker.postMessage(new LightweightState());
+}
+
+PhysicsWorkerBridge.prototype.issueObjectAvailibilityBuffers = function(obj, bufferKey){
+  obj[bufferKey] = false;
+}
+
+PhysicsWorkerBridge.prototype.issueAvailibilityBuffers = function(obj, key){
+  obj.availibilityModifierBuffer.forEach(physicsWorld.issueObjectAvailibilityBuffers);
+  obj.availibilityModifierBuffer.clear();
+}
+
+PhysicsWorkerBridge.prototype.removeCollisionListener = function(obj){
+  if (obj.collisionListenerRemoveRequestBufferAvailibility){
+    physicsWorld.workerMessageHandler.push(obj.collisionListenerRemoveRequestBuffer.buffer);
+    physicsWorld.handleBufferAvailibilityUpdate(obj, "collisionListenerRemoveRequestBufferAvailibility");
+  }
+}
+
+PhysicsWorkerBridge.prototype.setCollisionListener = function(obj){
+  if (obj.collisionListenerRequestBufferAvailibility){
+    physicsWorld.workerMessageHandler.push(obj.collisionListenerRequestBuffer.buffer);
+    physicsWorld.availibilityModifierBuffer.set(obj.name, obj);
+    obj.availibilityModifierBuffer.set("collisionListenerRequestBufferAvailibility", obj);
+  }
+}
+
+PhysicsWorkerBridge.prototype.fireCollision = function(ary){
+  var obj = physicsWorld.objectsByID[ary[1]];
+  var curCollisionCallbackRequest = collisionCallbackRequests.get(obj.name);
+  if (curCollisionCallbackRequest){
+    reusableCollisionInfo.set(physicsWorld.objectsByID[ary[2]].name, ary[3], ary[4], ary[5], ary[6], ary[7], ary[8], ary[9], ary[10]);
+    curCollisionCallbackRequest(reusableCollisionInfo);
+  }
 }
 
 PhysicsWorkerBridge.prototype.init = function(){
@@ -25634,20 +25771,16 @@ PhysicsWorkerBridge.prototype.getContactMaterial = function(mt1, mt2){
 }
 
 PhysicsWorkerBridge.prototype.remove = function(body){
-  this.physicsWorld.remove(body);
+
 }
 
 PhysicsWorkerBridge.prototype.addBody = function(body){
-  this.physicsWorld.addBody(body);
+
 }
 
 PhysicsWorkerBridge.prototype.step = function(stepAmount){
   if (!this.ready){
     return;
-  }
-  if (this.updateBuffer.size > 0){
-    this.updateBuffer.forEach(this.issueUpdate);
-    this.updateBuffer.clear();
   }
   if (this.velocityUpdateBuffer.size > 0){
     this.velocityUpdateBuffer.forEach(this.issueObjectVelocityUpdate);
@@ -25697,24 +25830,11 @@ PhysicsWorkerBridge.prototype.step = function(stepAmount){
       break;
     }
   }
-  this.workerMessageHandler.flush();
-}
-
-PhysicsWorkerBridge.prototype.issueUpdate = function(obj){
-  for (var i = 0; i<physicsWorld.updateObjectBuffer.length; i++){
-    if(physicsWorld.updateObjectBufferAvailibilities[i]){
-      var buf = physicsWorld.updateObjectBuffer[i];
-      buf[0] = 0;
-      buf[1] = i;
-      buf[2] = physicsWorld.idsByObjectName[obj.name];
-      buf[3] = obj.physicsBody.position.x; buf[4] = obj.physicsBody.position.y; buf[5] = obj.physicsBody.position.z;
-      buf[6] = obj.physicsBody.quaternion.x; buf[7] = obj.physicsBody.quaternion.y; buf[8] = obj.physicsBody.quaternion.z; buf[9] = obj.physicsBody.quaternion.w;
-      physicsWorld.workerMessageHandler.push(buf.buffer);
-      physicsWorld.updateObjectBufferAvailibilities[i] = false;
-      return;
-    }
+  if (this.availibilityModifierBuffer.size > 0){
+    this.availibilityModifierBuffer.forEach(this.issueAvailibilityBuffers);
+    this.availibilityModifierBuffer.clear();
   }
-  console.warn("[!] PhysicsWorkerBridge.issueUpdate updateObjectBuffer overflow.");
+  this.workerMessageHandler.flush();
 }
 
 PhysicsWorkerBridge.prototype.issueObjectVelocityUpdate = function(obj){
@@ -25860,9 +25980,22 @@ PhysicsWorkerBridge.prototype.issueSetMass = function(obj){
   console.error("[!] PhysicsWorkerBridge.issueSetMass buffer overflow.");
 }
 
+PhysicsWorkerBridge.prototype.handleBufferAvailibilityUpdate = function(obj, key){
+  physicsWorld.availibilityModifierBuffer.set(obj.name, obj);
+  obj.availibilityModifierBuffer.set(key, obj);
+}
+
 PhysicsWorkerBridge.prototype.updateObject = function(obj){
+  if (!obj.updateBufferAvailibility){
+    return;
+  }
   obj.isPhysicsDirty = true;
-  this.updateBuffer.set(obj.name, obj);
+  var buf = obj.updateBuffer;
+  buf[2] = obj.physicsBody.position.x; buf[3] = obj.physicsBody.position.y; buf[4] = obj.physicsBody.position.z;
+  buf[5] = obj.physicsBody.quaternion.x; buf[6] = obj.physicsBody.quaternion.y; buf[7] = obj.physicsBody.quaternion.z;
+  buf[8] = obj.physicsBody.quaternion.w;
+  physicsWorld.workerMessageHandler.push(buf.buffer);
+  physicsWorld.handleBufferAvailibilityUpdate(obj, "updateBufferAvailibility");
 }
 
 PhysicsWorkerBridge.prototype.setObjectVelocity = function(obj, velocityVector){

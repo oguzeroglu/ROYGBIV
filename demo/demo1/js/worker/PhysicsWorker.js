@@ -18,8 +18,6 @@ PhysicsWorker.prototype.refresh = function(state){
   stateLoader.loadPhysicsData();
   this.initPhysics();
   stateLoader.loadPhysics();
-  this.dynamicObjectUpdateBuffer = [];
-  this.dynamicObjectUpdateBufferAvailibilities = [];
   var idCtr = 0;
   var idResponse = {isIDResponse: true, ids: []}
   var dynamicObjCount = 0;
@@ -34,6 +32,7 @@ PhysicsWorker.prototype.refresh = function(state){
       dynamicAddedObjects.set(objName, addedObjects[objName]);
     }
     idCtr ++;
+    worker.initializeBuffers(addedObjects[objName]);
   }
   for (var objName in objectGroups){
     idResponse.ids.push({
@@ -46,12 +45,20 @@ PhysicsWorker.prototype.refresh = function(state){
       dynamicObjectGroups.set(objName, objectGroups[objName]);
     }
     idCtr ++;
-  }
-  for (var i = 0; i <dynamicObjCount * worker.updateBufferSize; i++){
-    worker.dynamicObjectUpdateBuffer.push(new Float32Array(10));
-    worker.dynamicObjectUpdateBufferAvailibilities.push(true);
+    worker.initializeBuffers(objectGroups[objName]);
   }
   postMessage(idResponse);
+}
+PhysicsWorker.prototype.initializeBuffers = function(obj){
+  var id = worker.idsByObjectName[obj.name];
+  obj.collisionCallbackBuffer = new Float32Array(11);
+  obj.updateBuffer = new Float32Array(9);
+  obj.collisionCallbackBufferAvailibility = true;
+  obj.updateBufferAvailibility = true;
+  obj.collisionCallbackBuffer[0] = 13;
+  obj.updateBuffer[0] = 2;
+  obj.collisionCallbackBuffer[1] = id;
+  obj.updateBuffer[1] = id;
 }
 PhysicsWorker.prototype.initPhysics = function(){
   physicsWorld.quatNormalizeSkip = quatNormalizeSkip;
@@ -77,25 +84,20 @@ PhysicsWorker.prototype.debug = function(){
   postMessage(response);
 }
 PhysicsWorker.prototype.updateObject = function(ary){
-  var obj = this.objectsByID[ary[2]];
-  obj.physicsBody.position.set(ary[3], ary[4], ary[5]);
-  obj.physicsBody.quaternion.set(ary[6], ary[7], ary[8], ary[9]);
+  var obj = this.objectsByID[ary[1]];
+  obj.physicsBody.position.set(ary[2], ary[3], ary[4]);
+  obj.physicsBody.quaternion.set(ary[5], ary[6], ary[7], ary[8]);
 }
 PhysicsWorker.prototype.updateDynamicObjectBuffer = function(obj){
-  for (var i = 0; i<worker.dynamicObjectUpdateBuffer.length; i++){
-    if (worker.dynamicObjectUpdateBufferAvailibilities[i]){
-      var buf = worker.dynamicObjectUpdateBuffer[i];
-      buf[0] = 2;
-      buf[1] = i;
-      buf[2] = worker.idsByObjectName[obj.name];
-      buf[3] = obj.physicsBody.position.x; buf[4] = obj.physicsBody.position.y; buf[5] = obj.physicsBody.position.z;
-      buf[6] = obj.physicsBody.quaternion.x; buf[7] = obj.physicsBody.quaternion.y; buf[8] = obj.physicsBody.quaternion.z; buf[9] = obj.physicsBody.quaternion.w;
-      worker.workerMessageHandler.push(buf.buffer);
-      worker.dynamicObjectUpdateBufferAvailibilities[i] = false;
-      return;
-    }
+  if (!obj.updateBufferAvailibility){
+    return;
   }
-  console.error("[!] PhysicsWorker.updateDynamicObjectBuffer buffer overflow.");
+  var buf = obj.updateBuffer;
+  buf[2] = obj.physicsBody.position.x; buf[3] = obj.physicsBody.position.y; buf[4] = obj.physicsBody.position.z;
+  buf[5] = obj.physicsBody.quaternion.x; buf[6] = obj.physicsBody.quaternion.y; buf[7] = obj.physicsBody.quaternion.z;
+  buf[8] = obj.physicsBody.quaternion.w;
+  worker.workerMessageHandler.push(buf.buffer);
+  obj.updateBufferAvailibility = false;
 }
 PhysicsWorker.prototype.step = function(ary){
   physicsWorld.step(ary[2]);
@@ -154,6 +156,31 @@ PhysicsWorker.prototype.setMass = function(ary){
     }
   }
 }
+PhysicsWorker.prototype.setCollisionListener = function(ary){
+  var obj = worker.objectsByID[ary[1]];
+  obj.collisionEvent = function(event){
+    if (!this.collisionCallbackBufferAvailibility){
+      return;
+    }
+    var contact = event.contact;
+    this.collisionCallbackBuffer[2] = worker.idsByObjectName[event.body.roygbivName];
+    this.collisionCallbackBuffer[3] = contact.bi.position.x + contact.ri.x;
+    this.collisionCallbackBuffer[4] = contact.bi.position.y + contact.ri.y;
+    this.collisionCallbackBuffer[5] = contact.bi.position.z + contact.ri.z;
+    this.collisionCallbackBuffer[6] = contact.getImpactVelocityAlongNormal();
+    this.collisionCallbackBuffer[7] = this.physicsBody.quaternion.x;
+    this.collisionCallbackBuffer[8] = this.physicsBody.quaternion.y;
+    this.collisionCallbackBuffer[9] = this.physicsBody.quaternion.z;
+    this.collisionCallbackBuffer[10] = this.physicsBody.quaternion.w;
+    this.collisionCallbackBufferAvailibility = false;
+    worker.workerMessageHandler.push(this.collisionCallbackBuffer.buffer);
+  }.bind(obj)
+  obj.physicsBody.addEventListener("collide", obj.collisionEvent);
+}
+PhysicsWorker.prototype.removeCollisionListener = function(ary){
+  var obj = worker.objectsByID[ary[1]];
+  obj.physicsBody.removeEventListener("collide", obj.collisionEvent);
+}
 // START
 var PIPE = "|";
 var UNDEFINED = "undefined";
@@ -183,9 +210,10 @@ self.onmessage = function(msg){
           worker.step(ary);
         break;
         case 2:
-          var bufID = ary[1];
-          worker.dynamicObjectUpdateBuffer[bufID] = ary;
-          worker.dynamicObjectUpdateBufferAvailibilities[bufID] = true;
+          var objID = ary[1];
+          var obj = worker.objectsByID[objID];
+          obj.updateBuffer = ary;
+          obj.updateBufferAvailibility = true;
         break;
         case 3:
           worker.resetObjectVelocity(ary);
@@ -214,8 +242,19 @@ self.onmessage = function(msg){
         case 11:
           worker.setMass(ary);
         break;
+        case 12:
+          worker.setCollisionListener(ary);
+        break;
+        case 13:
+          var obj = worker.objectsByID[ary[1]];
+          obj.collisionCallbackBuffer = ary;
+          obj.collisionCallbackBufferAvailibility = true;
+        break;
+        case 14:
+        worker.removeCollisionListener(ary);
+        break;
       }
-      if (ary[0] != 2){
+      if (ary[0] != 2 && ary[0] != 13){
         worker.workerMessageHandler.push(ary.buffer);
       }
     }

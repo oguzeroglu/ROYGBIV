@@ -765,8 +765,11 @@ StateLoaderLightweight.prototype.loadPhysics = function(){
     var addedObject = new AddedObject();
     addedObject.name = objName;
     addedObject.physicsBody = physicsBody;
+    addedObject.isSlippery = curAddedObjectExport.isSlippery;
+    addedObject.metaData = new Object();
     addedObjects[objName] = addedObject;
     addedObject.isChangeable = curAddedObjectExport.isChangeable;
+    addedObject.noMass = curAddedObjectExport.noMass;
     if (!curAddedObjectExport.noMass){
       physicsWorld.addBody(physicsBody);
     }
@@ -787,7 +790,6 @@ StateLoaderLightweight.prototype.loadPhysics = function(){
       physicsBody = physicsBodyGenerator.generateBoxBody({x: curExport.physicsSimplificationParameters.sizeX, y: curExport.physicsSimplificationParameters.sizeY, z: curExport.physicsSimplificationParameters.sizeZ});
     }
     physicsBody.roygbivName = objName;
-    physicsBody.mass = curExport.mass;
     var hasAnyPhysicsShape = false;
     physicsBody.position.copy(curExport.initialPhysicsPositionWhenGlued);
     for (var i = 0; i<curExport.childNames.length; i++){
@@ -805,7 +807,11 @@ StateLoaderLightweight.prototype.loadPhysics = function(){
     objGroup.name = objName;
     objGroup.isChangeable = curExport.isChangeable;
     objGroup.physicsBody = physicsBody;
+    objGroup.setMass(curExport.mass);
+    objGroup.isSlippery = curExport.isSlippery;
     objectGroups[objName] = objGroup;
+    objGroup.noMass = curExport.noMass;
+    objGroup.cannotSetMass = curExport.cannotSetMass;
     if (hasAnyPhysicsShape && !(curExport.noMass || curExport.cannotSetMass)){
       physicsBody.position.copy(curExport.physicsPosition);
       physicsBody.quaternion.copy(curExport.physicsQuaternion);
@@ -813,6 +819,16 @@ StateLoaderLightweight.prototype.loadPhysics = function(){
       if (!curExport.noMass && physicsBody.mass > 0){
         dynamicObjectGroups.set(objName, objGroup);
       }
+    }
+  }
+  for (var objName in addedObjects){
+    if (addedObjects[objName].isSlippery){
+      addedObjects[objName].setSlippery(true);
+    }
+  }
+  for (var objName in objectGroups){
+    if (objectGroups[objName].isSlippery){
+      objectGroups[objName].setSlippery(true);
     }
   }
 }
@@ -2289,6 +2305,7 @@ var AddedObject = function(name, type, metaData, material, mesh, physicsBody, de
   if (IS_WORKER_CONTEXT){
     return this;
   }
+
   this.name = name;
   this.type = type;
   this.metaData = metaData;
@@ -2337,42 +2354,7 @@ var AddedObject = function(name, type, metaData, material, mesh, physicsBody, de
 
   this.initQuaternion = this.mesh.quaternion.clone();
 
-  this.collisionCallbackFunction = function(collisionEvent){
-    if (!collisionEvent.body.addedObject || (!this.isVisibleOnThePreviewScene() && !this.physicsKeptWhenHidden)){
-      return;
-    }
-    var targetObjectName = collisionEvent.body.addedObject.name;
-    var contact = collisionEvent.contact;
-    var collisionPosition = new Object();
-    var collisionImpact = contact.getImpactVelocityAlongNormal();
-    collisionPosition.x = contact.bi.position.x + contact.ri.x;
-    collisionPosition.y = contact.bi.position.y + contact.ri.y;
-    collisionPosition.z = contact.bi.position.z + contact.ri.z;
-    var quatX = this.mesh.quaternion.x;
-    var quatY = this.mesh.quaternion.y;
-    var quatZ = this.mesh.quaternion.z;
-    var quatW = this.mesh.quaternion.w;
-    var collisionInfo = reusableCollisionInfo.set(
-      targetObjectName,
-      collisionPosition.x,
-      collisionPosition.y,
-      collisionPosition.z,
-      collisionImpact,
-      quatX,
-      quatY,
-      quatZ,
-      quatW
-    );
-    var curCollisionCallbackRequest = collisionCallbackRequests[this.name];
-    if (curCollisionCallbackRequest){
-      curCollisionCallbackRequest(collisionInfo);
-    }
-  };
-
-  this.physicsBody.addEventListener(
-    "collide",
-    this.collisionCallbackFunction.bind(this)
-  );
+  this.boundCallbackFunction = this.collisionCallback.bind(this);
 
   this.reusableVec3 = new THREE.Vector3();
   this.reusableVec3_2 = new THREE.Vector3();
@@ -2387,6 +2369,23 @@ var AddedObject = function(name, type, metaData, material, mesh, physicsBody, de
 
 }
 
+AddedObject.prototype.collisionCallback = function(collisionEvent){
+  if (!collisionEvent.body.addedObject || (!this.isVisibleOnThePreviewScene() && !this.physicsKeptWhenHidden)){
+    return;
+  }
+  var targetObjectName = collisionEvent.body.addedObject.name;
+  var contact = collisionEvent.contact;
+  var collisionInfo = reusableCollisionInfo.set(
+    targetObjectName, contact.bi.position.x + contact.ri.x, contact.bi.position.y + contact.ri.y,
+    contact.bi.position.z + contact.ri.z, contact.getImpactVelocityAlongNormal(), this.physicsBody.quaternion.x,
+    this.physicsBody.quaternion.y, this.physicsBody.quaternion.z, this.physicsBody.quaternion.w
+  );
+  var curCollisionCallbackRequest = collisionCallbackRequests.get(this.name);
+  if (curCollisionCallbackRequest){
+    curCollisionCallbackRequest(collisionInfo);
+  }
+}
+
 AddedObject.prototype.exportLightweight = function(){
   if (!this.boundingBoxes){
     this.generateBoundingBoxes();
@@ -2395,6 +2394,7 @@ AddedObject.prototype.exportLightweight = function(){
   var exportObject = new Object();
   exportObject.type = this.type;
   exportObject.isChangeable = this.isChangeable;
+  exportObject.isSlippery = this.metaData["isSlippery"];
   exportObject.isIntersectable = this.isIntersectable;
   if (!this.parentObjectName){
     exportObject.position = this.mesh.position.clone();
@@ -4405,6 +4405,9 @@ AddedObject.prototype.generateBoundingBoxes = function(parentAry){
 }
 
 AddedObject.prototype.visualiseBoundingBoxes = function(){
+  if (!this.boundingBoxes){
+    this.generateBoundingBoxes();
+  }
   if (this.bbHelpers){
     for (var i = 0; i<this.bbHelpers.length; i++){
       scene.remove(this.bbHelpers[i]);
@@ -4924,6 +4927,7 @@ var ObjectGroup = function(name, group){
   if (IS_WORKER_CONTEXT){
     return this;
   }
+
   this.name = name;
   this.group = group;
 
@@ -6027,44 +6031,26 @@ ObjectGroup.prototype.glue = function(){
   this.physicsBody = physicsBody;
   this.initQuaternion = this.graphicsGroup.quaternion.clone();
 
-  this.collisionCallbackFunction = function(collisionEvent){
-    if (!collisionEvent.body.addedObject || (!this.isVisibleOnThePreviewScene() && !this.physicsKeptWhenHidden)){
-      return;
-    }
-    var targetObjectName = collisionEvent.target.addedObject.name;
-    var contact = collisionEvent.contact;
-    var collisionPosition = new Object();
-    var collisionImpact = contact.getImpactVelocityAlongNormal();
-    collisionPosition.x = contact.bi.position.x + contact.ri.x;
-    collisionPosition.y = contact.bi.position.y + contact.ri.y;
-    collisionPosition.z = contact.bi.position.z + contact.ri.z;
-    var quatX = this.mesh.quaternion.x;
-    var quatY = this.mesh.quaternion.y;
-    var quatZ = this.mesh.quaternion.z;
-    var quatW = this.mesh.quaternion.w;
-    var collisionInfo = reusableCollisionInfo.set(
-      targetObjectName,
-      collisionPosition.x,
-      collisionPosition.y,
-      collisionPosition.z,
-      collisionImpact,
-      quatX,
-      quatY,
-      quatZ,
-      quatW
-    );
-    var curCollisionCallbackRequest = collisionCallbackRequests[this.name];
-    if (curCollisionCallbackRequest){
-      curCollisionCallbackRequest(collisionInfo);
-    }
-  };
-
-  this.physicsBody.addEventListener(
-    "collide",
-    this.collisionCallbackFunction.bind(this)
-  );
+  this.boundCallbackFunction = this.collisionCallback.bind(this);
 
   this.gridSystemName = this.group[Object.keys(this.group)[0]].metaData.gridSystemName;
+}
+
+ObjectGroup.prototype.collisionCallback = function(collisionEvent){
+  if (!collisionEvent.body.addedObject || (!this.isVisibleOnThePreviewScene() && !this.physicsKeptWhenHidden)){
+    return;
+  }
+  var targetObjectName = collisionEvent.body.addedObject.name;
+  var contact = collisionEvent.contact;
+  var collisionInfo = reusableCollisionInfo.set(
+    targetObjectName, contact.bi.position.x + contact.ri.x, contact.bi.position.y + contact.ri.y,
+    contact.bi.position.z + contact.ri.z, contact.getImpactVelocityAlongNormal(), this.physicsBody.quaternion.x,
+    this.physicsBody.quaternion.y, this.physicsBody.quaternion.z, this.physicsBody.quaternion.w
+  );
+  var curCollisionCallbackRequest = collisionCallbackRequests.get(this.name);
+  if (curCollisionCallbackRequest){
+    curCollisionCallbackRequest(collisionInfo);
+  }
 }
 
 ObjectGroup.prototype.destroyParts = function(){
@@ -6369,16 +6355,17 @@ ObjectGroup.prototype.destroy = function(skipRaycasterRefresh){
 }
 
 ObjectGroup.prototype.exportLightweight = function(){
-  var exportObj = new Object();
-  exportObj.isChangeable = this.isChangeable;
-  exportObj.isIntersectable = this.isIntersectable;
-  this.graphicsGroup.position.copy(this.mesh.position);
-  this.graphicsGroup.quaternion.copy(this.mesh.quaternion);
-  this.graphicsGroup.updateMatrixWorld();
   if (!this.boundingBoxes){
     this.generateBoundingBoxes();
   }
   this.updateBoundingBoxes();
+  var exportObj = new Object();
+  exportObj.isChangeable = this.isChangeable;
+  exportObj.isSlippery = this.isSlippery;
+  exportObj.isIntersectable = this.isIntersectable;
+  this.graphicsGroup.position.copy(this.mesh.position);
+  this.graphicsGroup.quaternion.copy(this.mesh.quaternion);
+  this.graphicsGroup.updateMatrixWorld();
   exportObj.matrixWorld = this.graphicsGroup.matrixWorld.elements;
   exportObj.position = this.graphicsGroup.position;
   exportObj.quaternion = new THREE.Quaternion().copy(this.graphicsGroup.quaternion);
@@ -6660,6 +6647,9 @@ ObjectGroup.prototype.generateBoundingBoxes = function(){
 }
 
 ObjectGroup.prototype.visualiseBoundingBoxes = function(){
+  if (!this.boundingBoxes){
+    this.generateBoundingBoxes();
+  }
   if (this.bbHelper){
     scene.remove(this.bbHelper);
   }
