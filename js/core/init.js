@@ -78,6 +78,7 @@ window.onload = function() {
     physicsWorld.hide = noop;
     physicsWorld.setMass = noop;
     physicsWorld.setCollisionListener = noop;
+    physicsWorld.removeCollisionListener = noop;
     physicsWorld.ready = true;
   }else{
     rayCaster = new RaycasterWorkerBridge();

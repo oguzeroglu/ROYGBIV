@@ -110,6 +110,9 @@ AddedObject.prototype.initializeWorkerBuffers = function(){
   this.collisionListenerRequestBuffer = new Float32Array(2);
   this.collisionListenerRequestBufferAvailibility = true;
   this.collisionListenerRequestBuffer[0] = 12;
+  this.collisionListenerRemoveRequestBuffer = new Float32Array(2);
+  this.collisionListenerRemoveRequestBufferAvailibility = true;
+  this.collisionListenerRemoveRequestBuffer[0] = 14;
 }
 
 AddedObject.prototype.exportLightweight = function(){

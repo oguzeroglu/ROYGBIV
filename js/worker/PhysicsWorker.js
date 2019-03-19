@@ -170,7 +170,7 @@ PhysicsWorker.prototype.setMass = function(ary){
 }
 PhysicsWorker.prototype.setCollisionListener = function(ary){
   var obj = worker.objectsByID[ary[1]];
-  obj.physicsBody.addEventListener("collide", function(event){
+  obj.collisionEvent = function(event){
     if (!this.collisionCallbackBufferAvailibility){
       return;
     }
@@ -186,7 +186,12 @@ PhysicsWorker.prototype.setCollisionListener = function(ary){
     this.collisionCallbackBuffer[10] = this.physicsBody.quaternion.w;
     this.collisionCallbackBufferAvailibility = false;
     worker.workerMessageHandler.push(this.collisionCallbackBuffer.buffer);
-  }.bind(obj));
+  }.bind(obj)
+  obj.physicsBody.addEventListener("collide", obj.collisionEvent);
+}
+PhysicsWorker.prototype.removeCollisionListener = function(ary){
+  var obj = worker.objectsByID[ary[1]];
+  obj.physicsBody.removeEventListener("collide", obj.collisionEvent);
 }
 // START
 var PIPE = "|";
@@ -255,6 +260,9 @@ self.onmessage = function(msg){
           var obj = worker.objectsByID[ary[1]];
           obj.collisionCallbackBuffer = ary;
           obj.collisionCallbackBufferAvailibility = true;
+        break;
+        case 14:
+        worker.removeCollisionListener(ary);
         break;
       }
       if (ary[0] != 2 && ary[0] != 13){

@@ -3713,6 +3713,7 @@ Roygbiv.prototype.removeCollisionListener = function(sourceObject){
     if ((sourceObject.isAddedObject) || (sourceObject.isObjectGroup)){
       delete collisionCallbackRequests[sourceObject.name];
       TOTAL_OBJECT_COLLISION_LISTENER_COUNT --;
+      physicsWorld.removeCollisionListener(sourceObject);
     }else if (sourceObject.isParticle){
       delete particleCollisionCallbackRequests[sourceObject.uuid];
       TOTAL_PARTICLE_COLLISION_LISTEN_COUNT --;
