@@ -3802,7 +3802,7 @@ Roygbiv.prototype.removeScreenClickListener = function(){
   if (mode == 0){
     return;
   }
-  screenClickCallbackFunction = 0;
+  screenClickCallbackFunction = noop;
 }
 
 // setScreenMouseDownListener
@@ -3823,7 +3823,7 @@ Roygbiv.prototype.removeScreenMouseDownListener = function(){
   if (mode == 0){
     return;
   }
-  screenMouseDownCallbackFunction = 0;
+  screenMouseDownCallbackFunction = noop;
 }
 
 // setScreenMouseUpListener
@@ -3844,7 +3844,7 @@ Roygbiv.prototype.removeScreenMouseUpListener = function(){
   if (mode == 0){
     return;
   }
-  screenMouseUpCallbackFunction = 0;
+  screenMouseUpCallbackFunction = noop;
 }
 
 // setScreenMouseMoveListener
@@ -3865,7 +3865,7 @@ Roygbiv.prototype.removeScreenMouseMoveListener = function(){
   if (mode == 0){
     return;
   }
-  screenMouseMoveCallbackFunction = 0;
+  screenMouseMoveCallbackFunction = noop;
 }
 
 // setScreenPointerLockChangeListener
@@ -3886,7 +3886,7 @@ Roygbiv.prototype.removeScreenPointerLockChangeListener = function(){
   if (mode == 0){
     return;
   }
-  screenPointerLockChangedCallbackFunction = 0;
+  screenPointerLockChangedCallbackFunction = noop;
 }
 
 // setParticleSystemPoolConsumedListener
@@ -3911,7 +3911,7 @@ Roygbiv.prototype.removeParticleSystemPoolConsumedListener = function(psPool){
   }
   preConditions.checkIfDefined(ROYGBIV.removeParticleSystemPoolConsumedListener, preConditions.psPool, psPool);
   preConditions.checkIfParticleSystemPool(ROYGBIV.removeParticleSystemPoolConsumedListener, preConditions.psPool, psPool);
-  psPool.consumedCallback = 0;
+  psPool.consumedCallback = noop;
 }
 
 // setParticleSystemPoolAvailableListener
@@ -3936,7 +3936,7 @@ Roygbiv.prototype.removeParticleSystemPoolAvailableListener = function(psPool){
   }
   preConditions.checkIfDefined(ROYGBIV.removeParticleSystemPoolAvailableListener, preConditions.psPool, psPool);
   preConditions.checkIfParticleSystemPool(ROYGBIV.removeParticleSystemPoolAvailableListener, preConditions.psPool, psPool);
-  psPool.availableCallback = 0;
+  psPool.availableCallback = noop;
 }
 
 // setFullScreenChangeCallbackFunction
@@ -3957,7 +3957,7 @@ Roygbiv.prototype.removeFullScreenChangeCallbackFunction = function(){
   if (mode == 0){
     return;
   }
-  screenFullScreenChangeCallbackFunction = 0;
+  screenFullScreenChangeCallbackFunction = noop;
 }
 
 // setFPSDropCallbackFunction
@@ -3979,7 +3979,7 @@ Roygbiv.prototype.removeFPSDropCallbackFunction = function(){
   if (mode == 0){
     return;
   }
-  fpsDropCallbackFunction = 0;
+  fpsDropCallbackFunction = noop;
 }
 
 // setPerformanceDropCallbackFunction
@@ -4009,7 +4009,7 @@ Roygbiv.prototype.removePerformanceDropCallbackFunction = function(){
   if (mode == 0){
     return;
   }
-  performanceDropCallbackFunction = 0;
+  performanceDropCallbackFunction = noop;
   fpsHandler.reset();
 }
 
@@ -4039,7 +4039,7 @@ Roygbiv.prototype.removeUserInactivityCallbackFunction = function(){
     return;
   }
   inactiveCounter = 0;
-  userInactivityCallbackFunction = 0;
+  userInactivityCallbackFunction = noop;
   maxInactiveTime = 0;
 }
 
@@ -4062,7 +4062,7 @@ Roygbiv.prototype.removeScreenKeydownListener = function(){
   if (mode == 0){
     return;
   }
-  screenKeydownCallbackFunction = 0;
+  screenKeydownCallbackFunction = noop;
 }
 
 // setScreenKeyupListener
@@ -4084,7 +4084,7 @@ Roygbiv.prototype.removeScreenKeyupListener = function(){
   if (mode == 0){
     return;
   }
-  screenKeyupCallbackFunction = 0;
+  screenKeyupCallbackFunction = noop;
 }
 
 // onTextClick
@@ -4110,7 +4110,7 @@ Roygbiv.prototype.removeTextClickListener = function(text){
   }
   preConditions.checkIfDefined(ROYGBIV.removeTextClickListener, preConditions.text, text);
   preConditions.checkIfAddedText(ROYGBIV.removeTextClickListener, preConditions.text, text);
-  text.clickCallbackFunction = 0;
+  text.clickCallbackFunction = noop;
 }
 
 // setScreenMouseWheelListener
@@ -4131,7 +4131,7 @@ Roygbiv.prototype.removeScreenMouseWheelListener = function(){
   if (mode == 0){
     return;
   }
-  screenMouseWheelCallbackFunction = 0;
+  screenMouseWheelCallbackFunction = noop;
 }
 
 // setScreenPinchListener
@@ -4152,7 +4152,7 @@ Roygbiv.prototype.removeScreenPinchListener = function(){
   if (mode == 0){
     return;
   }
-  screenPinchCallbackFunction = 0;
+  screenPinchCallbackFunction = noop;
 }
 
 // TEXT FUNCTIONS **************************************************************
