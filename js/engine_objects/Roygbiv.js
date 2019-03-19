@@ -3635,9 +3635,11 @@ Roygbiv.prototype.setCollisionListener = function(sourceObject, callbackFunction
   if ((sourceObject.isAddedObject) || (sourceObject.isObjectGroup)){
     preConditions.checkIfTrue(ROYGBIV.setCollisionListener, "Cannot set collision listener for more than "+MAX_OBJECT_COLLISION_LISTENER_COUNT+" objects.", (TOTAL_OBJECT_COLLISION_LISTENER_COUNT >= MAX_OBJECT_COLLISION_LISTENER_COUNT));
     preConditions.checkIfNoMass(ROYGBIV.setCollisionListener, preConditions.sourceObject, sourceObject);
+    if (!collisionCallbackRequests.has(sourceObject.name)){
+      TOTAL_OBJECT_COLLISION_LISTENER_COUNT ++;
+    }
     collisionCallbackRequests.set(sourceObject.name, callbackFunction.bind(sourceObject));
     physicsWorld.setCollisionListener(sourceObject);
-    TOTAL_OBJECT_COLLISION_LISTENER_COUNT ++;
   }else if (sourceObject.isParticle){
     preConditions.checkIfTrue(ROYGBIV.setCollisionListener, "Particle system is stopped.", (sourceObject.parent && sourceObject.parent.isStopped));
     if (sourceObject.uuid && !particleCollisionCallbackRequests[sourceObject.uuid]){
