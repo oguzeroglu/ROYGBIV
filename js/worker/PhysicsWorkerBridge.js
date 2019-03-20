@@ -281,54 +281,6 @@ PhysicsWorkerBridge.prototype.step = function(stepAmount){
   this.workerMessageHandler.flush();
 }
 
-PhysicsWorkerBridge.prototype.issueObjectVelocityXUpdate = function(obj){
-  for (var i = 0 ; i<physicsWorld.setObjectVelocityXBuffer.length; i++){
-    if (physicsWorld.setObjectVelocityXBufferAvailibilities[i]){
-      var buf = physicsWorld.setObjectVelocityXBuffer[i];
-      buf[0] = 5;
-      buf[1] = i;
-      buf[2] = physicsWorld.idsByObjectName[obj.name];
-      buf[3] = obj.physicsBody.velocity.x;
-      physicsWorld.workerMessageHandler.push(buf.buffer);
-      physicsWorld.setObjectVelocityXBufferAvailibilities[i] = false;
-      return;
-    }
-  }
-  console.error("[!] PhysicsWorkerBridge.issueObjectVelocityXUpdate buffer overflow.");
-}
-
-PhysicsWorkerBridge.prototype.issueObjectVelocityYUpdate = function(obj){
-  for (var i = 0 ; i<physicsWorld.setObjectVelocityYBuffer.length; i++){
-    if (physicsWorld.setObjectVelocityYBufferAvailibilities[i]){
-      var buf = physicsWorld.setObjectVelocityYBuffer[i];
-      buf[0] = 6;
-      buf[1] = i;
-      buf[2] = physicsWorld.idsByObjectName[obj.name];
-      buf[3] = obj.physicsBody.velocity.y;
-      physicsWorld.workerMessageHandler.push(buf.buffer);
-      physicsWorld.setObjectVelocityYBufferAvailibilities[i] = false;
-      return;
-    }
-  }
-  console.error("[!] PhysicsWorkerBridge.issueObjectVelocityYUpdate buffer overflow.");
-}
-
-PhysicsWorkerBridge.prototype.issueObjectVelocityZUpdate = function(obj){
-  for (var i = 0 ; i<physicsWorld.setObjectVelocityZBuffer.length; i++){
-    if (physicsWorld.setObjectVelocityZBufferAvailibilities[i]){
-      var buf = physicsWorld.setObjectVelocityZBuffer[i];
-      buf[0] = 7;
-      buf[1] = i;
-      buf[2] = physicsWorld.idsByObjectName[obj.name];
-      buf[3] = obj.physicsBody.velocity.z;
-      physicsWorld.workerMessageHandler.push(buf.buffer);
-      physicsWorld.setObjectVelocityZBufferAvailibilities[i] = false;
-      return;
-    }
-  }
-  console.error("[!] PhysicsWorkerBridge.issueObjectVelocityZUpdate buffer overflow.");
-}
-
 PhysicsWorkerBridge.prototype.handleBufferAvailibilityUpdate = function(obj, key){
   physicsWorld.availibilityModifierBuffer.set(obj.name, obj);
   obj.availibilityModifierBuffer.set(key, obj);
