@@ -25497,14 +25497,18 @@ var PhysicsWorkerBridge = function(){
   this.ready = false;
   this.idsByObjectName = new Object();
   this.objectsByID = new Object();
-  this.resetObjectVelocityBufferSize = 10;
-  this.setObjectVelocityBufferSize = 10;
-  this.singularObjectVelocityBufferSize = 10;
-  this.applyImpulseBufferSize = 10;
-  this.hideBufferSize = 10;
-  this.showBufferSize = 10;
-  this.setMassBufferSize = 10;
-  this.tickBufferSize = 1;
+  this.updateBufferAvailibility = "updateBufferAvailibility";
+  this.resetVelocityBufferAvailibility = "resetVelocityBufferAvailibility";
+  this.collisionListenerRemoveRequestBufferAvailibility = "collisionListenerRemoveRequestBufferAvailibility";
+  this.collisionListenerRequestBufferAvailibility = "collisionListenerRequestBufferAvailibility";
+  this.setVelocityBufferAvailibility = "setVelocityBufferAvailibility";
+  this.setVelocityXBufferAvailibility = "setVelocityXBufferAvailibility";
+  this.setVelocityYBufferAvailibility = "setVelocityYBufferAvailibility";
+  this.setVelocityZBufferAvailibility = "setVelocityZBufferAvailibility";
+  this.applyImpulseBufferAvailibility = "applyImpulseBufferAvailibility";
+  this.showBufferAvailibility = "showBufferAvailibility";
+  this.hideBufferAvailibility = "hideBufferAvailibility";
+  this.setMassBufferAvailibility = "setMassBufferAvailibility"
   this.worker.addEventListener("message", function(msg){
     if (msg.data.isDebug){
       console.log("[*] Debug response received.");
@@ -25518,40 +25522,6 @@ var PhysicsWorkerBridge = function(){
         }
       }
     }else if (msg.data.isIDResponse){
-      physicsWorld.tickBuffer = [];
-      physicsWorld.tickBufferAvailibilities = [];
-      for (var i = 0; i<physicsWorld.tickBufferSize; i++){
-        physicsWorld.tickBuffer.push(new Float32Array(3));
-        physicsWorld.tickBufferAvailibilities.push(true);
-      }
-      physicsWorld.resetObjectVelocityBuffer = [];
-      physicsWorld.setObjectVelocityBuffer = [];
-      physicsWorld.setObjectVelocityXBuffer = [];
-      physicsWorld.setObjectVelocityYBuffer = [];
-      physicsWorld.setObjectVelocityZBuffer = [];
-      physicsWorld.applyImpulseObjectBuffer = [];
-      physicsWorld.hideObjectBuffer = [];
-      physicsWorld.showObjectBuffer = [];
-      physicsWorld.setObjectMassBuffer = [];
-      physicsWorld.resetObjectVelocityBufferAvailibilities = [];
-      physicsWorld.setObjectVelocityBufferAvailibilities = [];
-      physicsWorld.setObjectVelocityXBufferAvailibilities = [];
-      physicsWorld.setObjectVelocityYBufferAvailibilities = [];
-      physicsWorld.setObjectVelocityZBufferAvailibilities = [];
-      physicsWorld.applyImpulseObjectBufferAvailibilities = [];
-      physicsWorld.hideObjectBufferAvailibilities = [];
-      physicsWorld.showObjectBufferAvailibilities = [];
-      physicsWorld.setObjectMassBufferAvailibilities = [];
-      physicsWorld.updateBuffer = new Map();
-      physicsWorld.velocityUpdateBuffer = new Map();
-      physicsWorld.velocityResetBuffer = new Map();
-      physicsWorld.velocityXUpdateBuffer = new Map();
-      physicsWorld.velocityYUpdateBuffer = new Map();
-      physicsWorld.velocityZUpdateBuffer = new Map();
-      physicsWorld.applyImpulseBuffer = new Map();
-      physicsWorld.hideBuffer = new Map();
-      physicsWorld.showBuffer = new Map();
-      physicsWorld.setMassBuffer = new Map();
       for (var i = 0; i<msg.data.ids.length; i++){
         var curIDInfo = msg.data.ids[i];
         physicsWorld.idsByObjectName[curIDInfo.name] = curIDInfo.id;
@@ -25560,42 +25530,6 @@ var PhysicsWorkerBridge = function(){
           throw new Error("[!] PhysicsWorkerBridge object not found: "+curIDInfo.name);
         }
         physicsWorld.objectsByID[curIDInfo.id] = obj;
-        if (obj.isChangeable){
-          for (var i2 = 0; i2<physicsWorld.resetObjectVelocityBufferSize; i2++){
-            physicsWorld.resetObjectVelocityBuffer.push(new Float32Array(3));
-            physicsWorld.resetObjectVelocityBufferAvailibilities.push(true);
-          }
-          for (var i2 = 0; i2<physicsWorld.setObjectVelocityBufferSize; i2++){
-            physicsWorld.setObjectVelocityBuffer.push(new Float32Array(6));
-            physicsWorld.setObjectVelocityBufferAvailibilities.push(true);
-          }
-          for (var i2 = 0; i2<physicsWorld.singularObjectVelocityBufferSize; i2++){
-            physicsWorld.setObjectVelocityXBuffer.push(new Float32Array(4));
-            physicsWorld.setObjectVelocityYBuffer.push(new Float32Array(4));
-            physicsWorld.setObjectVelocityZBuffer.push(new Float32Array(4));
-            physicsWorld.setObjectVelocityXBufferAvailibilities.push(true);
-            physicsWorld.setObjectVelocityYBufferAvailibilities.push(true);
-            physicsWorld.setObjectVelocityZBufferAvailibilities.push(true);
-          }
-          for (var i2 = 0; i2<physicsWorld.hideBufferSize; i2++){
-            physicsWorld.hideObjectBuffer.push(new Float32Array(3));
-            physicsWorld.hideObjectBufferAvailibilities.push(true);
-          }
-          for (var i2 = 0; i2<physicsWorld.showBufferSize; i2++){
-            physicsWorld.showObjectBuffer.push(new Float32Array(3));
-            physicsWorld.showObjectBufferAvailibilities.push(true);
-          }
-          for (var i2 = 0; i2<physicsWorld.setMassBufferSize; i2++){
-            physicsWorld.setObjectMassBuffer.push(new Float32Array(4));
-            physicsWorld.setObjectMassBufferAvailibilities.push(true);
-          }
-        }
-        if (obj.physicsBody.mass > 0){
-          for (var i2 = 0; i2<physicsWorld.applyImpulseBufferSize; i2++){
-            physicsWorld.applyImpulseObjectBuffer.push(new Float32Array(9));
-            physicsWorld.applyImpulseObjectBufferAvailibilities.push(true);
-          }
-        }
         physicsWorld.initializeObjectBuffers(obj);
       }
       physicsWorld.ready = true;
@@ -25611,9 +25545,8 @@ var PhysicsWorkerBridge = function(){
             obj.isPhysicsDirty = false;
           break;
           case 1:
-            var bufID = ary[1];
-            physicsWorld.tickBuffer[bufID] = ary;
-            physicsWorld.tickBufferAvailibilities[bufID] = true;
+            physicsWorld.tickBuffer = ary;
+            physicsWorld.tickBufferAvailibility = true;
           break;
           case 2:
             if (mode == 0){
@@ -25628,48 +25561,58 @@ var PhysicsWorkerBridge = function(){
             physicsWorld.workerMessageHandler.push(ary.buffer);
           break;
           case 3:
-            var bufID = ary[1];
-            physicsWorld.resetObjectVelocityBuffer[bufID] = ary;
-            physicsWorld.resetObjectVelocityBufferAvailibilities[bufID] = true;
+            var objID = ary[1];
+            var obj = physicsWorld.objectsByID[objID];
+            obj.resetVelocityBuffer = ary;
+            obj.resetVelocityBufferAvailibility = true;
           break;
           case 4:
-            var bufID = ary[1];
-            physicsWorld.setObjectVelocityBuffer[bufID] = ary;
-            physicsWorld.setObjectVelocityBufferAvailibilities[bufID] = true;
+            var objID = ary[1];
+            var obj = physicsWorld.objectsByID[objID];
+            obj.setVelocityBuffer = ary;
+            obj.setVelocityBufferAvailibility = true;
           break;
           case 5:
-            var bufID = ary[1];
-            physicsWorld.setObjectVelocityXBuffer[bufID] = ary;
-            physicsWorld.setObjectVelocityXBufferAvailibilities[bufID] = true;
+            var objID = ary[1];
+            var obj = physicsWorld.objectsByID[objID];
+            obj.setVelocityXBuffer = ary;
+            obj.setVelocityXBufferAvailibility = true;
           break;
           case 6:
-            var bufID = ary[1];
-            physicsWorld.setObjectVelocityYBuffer[bufID] = ary;
-            physicsWorld.setObjectVelocityYBufferAvailibilities[bufID] = true;
+            var objID = ary[1];
+            var obj = physicsWorld.objectsByID[objID];
+            obj.setVelocityYBuffer = ary;
+            obj.setVelocityYBufferAvailibility = true;
           break;
           case 7:
-            var bufID = ary[1];
-            physicsWorld.setObjectVelocityZBuffer[bufID] = ary;
-            physicsWorld.setObjectVelocityZBufferAvailibilities[bufID] = true;
+            var objID = ary[1];
+            var obj = physicsWorld.objectsByID[objID];
+            obj.setVelocityZBuffer = ary;
+            obj.setVelocityZBufferAvailibility = true;
           break;
           case 8:
-            var bufID = ary[1];
-            physicsWorld.applyImpulseObjectBuffer[bufID] = ary;
-            physicsWorld.applyImpulseObjectBufferAvailibilities[bufID] = true;
+            var objID = ary[1];
+            var obj = physicsWorld.objectsByID[objID];
+            obj.applyImpulseBuffer = ary;
+            obj.applyImpulseBufferAvailibility = true;
           break;
           case 9:
-            var bufID = ary[1];
-            physicsWorld.showObjectBuffer[bufID] = ary;
-            physicsWorld.showObjectBufferAvailibilities[bufID] = true;
+            var objID = ary[1];
+            var obj = physicsWorld.objectsByID[objID];
+            obj.showBuffer = ary;
+            obj.showBufferAvailibility = true;
           break;
           case 10:
-            var bufID = ary[1];
-            physicsWorld.hideObjectBuffer[bufID] = ary;
-            physicsWorld.hideObjectBufferAvailibilities[bufID] = true;
+            var objID = ary[1];
+            var obj = physicsWorld.objectsByID[objID];
+            obj.hideBuffer = ary;
+            obj.hideBufferAvailibility = true;
           break;
           case 11:
-            physicsWorld.setObjectMassBuffer[bufID] = ary;
-            physicsWorld.setObjectMassBufferAvailibilities[bufID] = true;
+            var objID = ary[1];
+            var obj = physicsWorld.objectsByID[objID];
+            obj.setMassBuffer = ary;
+            obj.setMassBufferAvailibility = true;
           break;
           case 12:
             var obj = physicsWorld.objectsByID[ary[1]];
@@ -25694,6 +25637,7 @@ var PhysicsWorkerBridge = function(){
 }
 
 PhysicsWorkerBridge.prototype.initializeObjectBuffers = function(obj){
+  obj.availibilityModifierBuffer = new Map();
   var id = physicsWorld.idsByObjectName[obj.name];
   obj.collisionListenerRequestBuffer = new Float32Array(2);
   obj.collisionListenerRequestBufferAvailibility = true;
@@ -25707,7 +25651,42 @@ PhysicsWorkerBridge.prototype.initializeObjectBuffers = function(obj){
   obj.updateBufferAvailibility = true;
   obj.updateBuffer[0] = 0;
   obj.updateBuffer[1] = id;
-  obj.availibilityModifierBuffer = new Map();
+  obj.resetVelocityBuffer = new Float32Array(2);
+  obj.resetVelocityBufferAvailibility = true;
+  obj.resetVelocityBuffer[0] = 3;
+  obj.resetVelocityBuffer[1] = id;
+  obj.setVelocityBuffer = new Float32Array(5);
+  obj.setVelocityBufferAvailibility = true;
+  obj.setVelocityBuffer[0] = 4;
+  obj.setVelocityBuffer[1] = id;
+  obj.setVelocityXBuffer = new Float32Array(3);
+  obj.setVelocityXBufferAvailibility = true;
+  obj.setVelocityXBuffer[0] = 5;
+  obj.setVelocityXBuffer[1] = id;
+  obj.setVelocityYBuffer = new Float32Array(3);
+  obj.setVelocityYBufferAvailibility = true;
+  obj.setVelocityYBuffer[0] = 6;
+  obj.setVelocityYBuffer[1] = id;
+  obj.setVelocityZBuffer = new Float32Array(3);
+  obj.setVelocityZBufferAvailibility = true;
+  obj.setVelocityZBuffer[0] = 7;
+  obj.setVelocityZBuffer[1] = id;
+  obj.applyImpulseBuffer = new Float32Array(8);
+  obj.applyImpulseBufferAvailibility = true;
+  obj.applyImpulseBuffer[0] = 8;
+  obj.applyImpulseBuffer[1] = id;
+  obj.showBuffer = new Float32Array(2);
+  obj.showBufferAvailibility = true;
+  obj.showBuffer[0] = 9;
+  obj.showBuffer[1] = id;
+  obj.hideBuffer = new Float32Array(2);
+  obj.hideBufferAvailibility = true;
+  obj.hideBuffer[0] = 10;
+  obj.hideBuffer[1] = id;
+  obj.setMassBuffer = new Float32Array(3);
+  obj.setMassBufferAvailibility = true;
+  obj.setMassBuffer[0] = 11;
+  obj.setMassBuffer[1] = id;
 }
 
 PhysicsWorkerBridge.prototype.debug = function(){
@@ -25718,6 +25697,9 @@ PhysicsWorkerBridge.prototype.refresh = function(){
   if (mode == 0){
     return;
   }
+  this.tickBuffer = new Float32Array(2);
+  this.tickBuffer[0] = 1;
+  this.tickBufferAvailibility = true;
   this.idsByObjectName = new Object();
   this.objectsByID = new Object();
   this.availibilityModifierBuffer = new Map();
@@ -25737,15 +25719,14 @@ PhysicsWorkerBridge.prototype.issueAvailibilityBuffers = function(obj, key){
 PhysicsWorkerBridge.prototype.removeCollisionListener = function(obj){
   if (obj.collisionListenerRemoveRequestBufferAvailibility){
     physicsWorld.workerMessageHandler.push(obj.collisionListenerRemoveRequestBuffer.buffer);
-    physicsWorld.handleBufferAvailibilityUpdate(obj, "collisionListenerRemoveRequestBufferAvailibility");
+    physicsWorld.handleBufferAvailibilityUpdate(obj, physicsWorld.collisionListenerRemoveRequestBufferAvailibility);
   }
 }
 
 PhysicsWorkerBridge.prototype.setCollisionListener = function(obj){
   if (obj.collisionListenerRequestBufferAvailibility){
     physicsWorld.workerMessageHandler.push(obj.collisionListenerRequestBuffer.buffer);
-    physicsWorld.availibilityModifierBuffer.set(obj.name, obj);
-    obj.availibilityModifierBuffer.set("collisionListenerRequestBufferAvailibility", obj);
+    physicsWorld.handleBufferAvailibilityUpdate(obj, physicsWorld.collisionListenerRequestBufferAvailibility);
   }
 }
 
@@ -25782,91 +25763,14 @@ PhysicsWorkerBridge.prototype.step = function(stepAmount){
   if (!this.ready){
     return;
   }
-  if (this.velocityUpdateBuffer.size > 0){
-    this.velocityUpdateBuffer.forEach(this.issueObjectVelocityUpdate);
-    this.velocityUpdateBuffer.clear();
-  }
-  if (this.velocityResetBuffer.size > 0){
-    this.velocityResetBuffer.forEach(this.issueObjectVelocityReset);
-    this.velocityResetBuffer.clear();
-  }
-  if (this.velocityXUpdateBuffer.size > 0){
-    this.velocityXUpdateBuffer.forEach(this.issueObjectVelocityXUpdate);
-    this.velocityXUpdateBuffer.clear();
-  }
-  if (this.velocityYUpdateBuffer.size > 0){
-    this.velocityYUpdateBuffer.forEach(this.issueObjectVelocityYUpdate);
-    this.velocityYUpdateBuffer.clear();
-  }
-  if (this.velocityZUpdateBuffer.size > 0){
-    this.velocityZUpdateBuffer.forEach(this.issueObjectVelocityZUpdate);
-    this.velocityZUpdateBuffer.clear();
-  }
-  if (this.applyImpulseBuffer.size > 0){
-    this.applyImpulseBuffer.forEach(this.issueApplyImpulse);
-    this.applyImpulseBuffer.clear();
-  }
-  if (this.showBuffer.size > 0){
-    this.showBuffer.forEach(this.issueShow);
-    this.showBuffer.clear();
-  }
-  if (this.hideBuffer.size > 0){
-    this.hideBuffer.forEach(this.issueHide);
-    this.hideBuffer.clear();
-  }
-  if (this.setMassBuffer.size > 0){
-    this.setMassBuffer.forEach(this.issueSetMass);
-    this.setMassBuffer.clear();
-  }
-  var tickSent = false;
-  for (var i = 0; i<this.tickBuffer.length; i++){
-    if (this.tickBufferAvailibilities[i]){
-      var buf = this.tickBuffer[i];
-      buf[0] = 1;
-      buf[1] = i;
-      buf[2] = stepAmount;
-      this.workerMessageHandler.push(buf.buffer);
-      this.tickBufferAvailibilities[i] = false;
-      break;
-    }
-  }
+  this.tickBuffer[1] = stepAmount;
+  this.workerMessageHandler.push(this.tickBuffer.buffer);
+  this.tickBufferAvailibility = false;
   if (this.availibilityModifierBuffer.size > 0){
     this.availibilityModifierBuffer.forEach(this.issueAvailibilityBuffers);
     this.availibilityModifierBuffer.clear();
   }
   this.workerMessageHandler.flush();
-}
-
-PhysicsWorkerBridge.prototype.issueObjectVelocityUpdate = function(obj){
-  for (var i = 0 ; i<physicsWorld.setObjectVelocityBuffer.length; i++){
-    if (physicsWorld.setObjectVelocityBufferAvailibilities[i]){
-      var buf = physicsWorld.setObjectVelocityBuffer[i];
-      var velocityVector = obj.physicsBody.velocity;
-      buf[0] = 4;
-      buf[1] = i;
-      buf[2] = physicsWorld.idsByObjectName[obj.name];
-      buf[3] = velocityVector.x; buf[4] = velocityVector.y; buf[5] = velocityVector.z;
-      physicsWorld.workerMessageHandler.push(buf.buffer);
-      physicsWorld.setObjectVelocityBufferAvailibilities[i] = false;
-      return;
-    }
-  }
-  console.error("[!] PhysicsWorkerBridge.issueObjectVelocityUpdate buffer overflow.");
-}
-
-PhysicsWorkerBridge.prototype.issueObjectVelocityReset = function(obj){
-  for (var i = 0 ; i<physicsWorld.resetObjectVelocityBuffer.length; i++){
-    if (physicsWorld.resetObjectVelocityBufferAvailibilities[i]){
-      var buf = physicsWorld.resetObjectVelocityBuffer[i];
-      buf[0] = 3;
-      buf[1] = i;
-      buf[2] = physicsWorld.idsByObjectName[obj.name];
-      physicsWorld.workerMessageHandler.push(buf.buffer);
-      physicsWorld.resetObjectVelocityBufferAvailibilities[i] = false;
-      return;
-    }
-  }
-  console.error("[!] PhysicsWorkerBridge.resetObjectVelocity buffer overflow.");
 }
 
 PhysicsWorkerBridge.prototype.issueObjectVelocityXUpdate = function(obj){
@@ -25917,69 +25821,6 @@ PhysicsWorkerBridge.prototype.issueObjectVelocityZUpdate = function(obj){
   console.error("[!] PhysicsWorkerBridge.issueObjectVelocityZUpdate buffer overflow.");
 }
 
-PhysicsWorkerBridge.prototype.issueApplyImpulse = function(obj){
-  for (var i = 0; i<physicsWorld.applyImpulseObjectBuffer.length; i++){
-    if (physicsWorld.applyImpulseObjectBufferAvailibilities[i]){
-      var buf = physicsWorld.applyImpulseObjectBuffer[i];
-      buf[0] = 8;
-      buf[1] = i;
-      buf[2] = physicsWorld.idsByObjectName[obj.name];
-      buf[3] = obj.physicsBody.impulseVec1.x; buf[4] = obj.physicsBody.impulseVec1.y; buf[5] = obj.physicsBody.impulseVec1.z;
-      buf[6] = obj.physicsBody.impulseVec2.x; buf[7] = obj.physicsBody.impulseVec2.y; buf[8] = obj.physicsBody.impulseVec2.z;
-      physicsWorld.workerMessageHandler.push(buf.buffer);
-      physicsWorld.applyImpulseObjectBufferAvailibilities[i] = false;
-      return;
-    }
-  }
-  console.error("[!] PhysicsWorkerBridge.issueApplyImpulse buffer overflow.");
-}
-
-PhysicsWorkerBridge.prototype.issueShow = function(obj){
-  for (var i = 0; i<physicsWorld.showObjectBuffer.length; i++){
-    if (physicsWorld.showObjectBufferAvailibilities[i]){
-      var buf = physicsWorld.showObjectBuffer[i];
-      buf[0] = 9;
-      buf[1] = i;
-      buf[2] = physicsWorld.idsByObjectName[obj.name];
-      physicsWorld.workerMessageHandler.push(buf.buffer);
-      physicsWorld.showObjectBufferAvailibilities[i] = false;
-      return;
-    }
-  }
-  console.error("[!] PhysicsWorkerBridge.issueShow buffer overflow.");
-}
-
-PhysicsWorkerBridge.prototype.issueHide = function(obj){
-  for (var i = 0; i<physicsWorld.hideObjectBuffer.length; i++){
-    if (physicsWorld.hideObjectBufferAvailibilities[i]){
-      var buf = physicsWorld.hideObjectBuffer[i];
-      buf[0] = 10;
-      buf[1] = i;
-      buf[2] = physicsWorld.idsByObjectName[obj.name];
-      physicsWorld.workerMessageHandler.push(buf.buffer);
-      physicsWorld.hideObjectBufferAvailibilities[i] = false;
-      return;
-    }
-  }
-  console.error("[!] PhysicsWorkerBridge.issueHide buffer overflow.");
-}
-
-PhysicsWorkerBridge.prototype.issueSetMass = function(obj){
-  for (var i = 0; i<physicsWorld.setObjectMassBuffer.length; i++){
-    if (physicsWorld.setObjectMassBufferAvailibilities[i]){
-      var buf = physicsWorld.setObjectMassBuffer[i];
-      buf[0] = 11;
-      buf[1] = i;
-      buf[2] = physicsWorld.idsByObjectName[obj.name];
-      buf[3] = obj.physicsBody.mass;
-      physicsWorld.workerMessageHandler.push(buf.buffer);
-      physicsWorld.setObjectMassBufferAvailibilities[i] = false;
-      return;
-    }
-  }
-  console.error("[!] PhysicsWorkerBridge.issueSetMass buffer overflow.");
-}
-
 PhysicsWorkerBridge.prototype.handleBufferAvailibilityUpdate = function(obj, key){
   physicsWorld.availibilityModifierBuffer.set(obj.name, obj);
   obj.availibilityModifierBuffer.set(key, obj);
@@ -25995,48 +25836,95 @@ PhysicsWorkerBridge.prototype.updateObject = function(obj){
   buf[5] = obj.physicsBody.quaternion.x; buf[6] = obj.physicsBody.quaternion.y; buf[7] = obj.physicsBody.quaternion.z;
   buf[8] = obj.physicsBody.quaternion.w;
   physicsWorld.workerMessageHandler.push(buf.buffer);
-  physicsWorld.handleBufferAvailibilityUpdate(obj, "updateBufferAvailibility");
+  physicsWorld.handleBufferAvailibilityUpdate(obj, physicsWorld.updateBufferAvailibility);
 }
 
 PhysicsWorkerBridge.prototype.setObjectVelocity = function(obj, velocityVector){
-  obj.physicsBody.velocity.copy(velocityVector);
-  this.velocityUpdateBuffer.set(obj.name, obj);
+  if (!obj.setVelocityBufferAvailibility){
+    return;
+  }
+  var buf = obj.setVelocityBuffer;
+  buf[2] = obj.physicsBody.velocity.x;
+  buf[3] = obj.physicsBody.velocity.y;
+  buf[4] = obj.physicsBody.velocity.z;
+  physicsWorld.workerMessageHandler.push(buf.buffer);
+  physicsWorld.handleBufferAvailibilityUpdate(obj, physicsWorld.setVelocityBufferAvailibility);
 }
 
 PhysicsWorkerBridge.prototype.setObjectVelocityX = function(obj, vx){
-  obj.physicsBody.velocity.x = vx;
-  this.velocityXUpdateBuffer.set(obj.name, obj);
+  if (!obj.setVelocityXBufferAvailibility){
+    return;
+  }
+  var buf = obj.setVelocityXBuffer;
+  buf[2] = vx;
+  physicsWorld.workerMessageHandler.push(buf.buffer);
+  physicsWorld.handleBufferAvailibilityUpdate(obj, physicsWorld.setVelocityXBufferAvailibility);
 }
 
 PhysicsWorkerBridge.prototype.setObjectVelocityY = function(obj, vy){
-  obj.physicsBody.velocity.y = vy;
-  this.velocityYUpdateBuffer.set(obj.name, obj);
+  if (!obj.setVelocityYBufferAvailibility){
+    return;
+  }
+  var buf = obj.setVelocityYBuffer;
+  buf[2] = vy;
+  physicsWorld.workerMessageHandler.push(buf.buffer);
+  physicsWorld.handleBufferAvailibilityUpdate(obj, physicsWorld.setVelocityYBufferAvailibility);
 }
 
 PhysicsWorkerBridge.prototype.setObjectVelocityZ = function(obj, vz){
-  obj.physicsBody.velocity.z = vz;
-  this.velocityZUpdateBuffer.set(obj.name, obj);
+  if (!obj.setVelocityZBufferAvailibility){
+    return;
+  }
+  var buf = obj.setVelocityZBuffer;
+  buf[2] = vz;
+  physicsWorld.workerMessageHandler.push(buf.buffer);
+  physicsWorld.handleBufferAvailibilityUpdate(obj, physicsWorld.setVelocityZBufferAvailibility);
 }
 
 PhysicsWorkerBridge.prototype.resetObjectVelocity = function(obj){
-  this.velocityResetBuffer.set(obj.name, obj);
+  if (!obj.resetVelocityBufferAvailibility){
+    return;
+  }
+  var buf = obj.resetVelocityBuffer;
+  physicsWorld.workerMessageHandler.push(buf.buffer);
+  physicsWorld.handleBufferAvailibilityUpdate(obj, physicsWorld.resetVelocityBufferAvailibility);
 }
 
 PhysicsWorkerBridge.prototype.applyImpulse = function(obj, vec1, vec2){
-  obj.physicsBody.impulseVec1.copy(vec1);
-  obj.physicsBody.impulseVec2.copy(vec2);
-  this.applyImpulseBuffer.set(obj.name, obj);
+  if (!obj.applyImpulseBufferAvailibility){
+    return;
+  }
+  var buf = obj.applyImpulseBuffer;
+  buf[2] = vec1.x; buf[3] = vec1.y; buf[4] = vec1.z; buf[5] = vec2.x; buf[6] = vec2.y; buf[7] = vec2.z;
+  physicsWorld.workerMessageHandler.push(buf.buffer);
+  physicsWorld.handleBufferAvailibilityUpdate(obj, physicsWorld.applyImpulseBufferAvailibility);
 }
 
 PhysicsWorkerBridge.prototype.hide = function(obj){
-  this.hideBuffer.set(obj.name, obj);
+  if (!obj.hideBufferAvailibility){
+    return;
+  }
+  var buf = obj.hideBuffer;
+  physicsWorld.workerMessageHandler.push(buf.buffer);
+  physicsWorld.handleBufferAvailibilityUpdate(obj, physicsWorld.hideBufferAvailibility);
 }
 
 PhysicsWorkerBridge.prototype.show = function(obj){
-  this.showBuffer.set(obj.name, obj);
+  if (!obj.showBufferAvailibility){
+    return;
+  }
+  var buf = obj.showBuffer;
+  physicsWorld.workerMessageHandler.push(buf.buffer);
+  physicsWorld.handleBufferAvailibilityUpdate(obj, physicsWorld.showBufferAvailibility);
 }
 
 PhysicsWorkerBridge.prototype.setMass = function(obj, mass){
-  this.setMassBuffer.set(obj.name, obj);
+  if (!obj.setMassBufferAvailibility){
+    return;
+  }
+  var buf = obj.setMassBuffer;
+  buf[2] = mass;
+  physicsWorld.workerMessageHandler.push(buf.buffer);
+  physicsWorld.handleBufferAvailibilityUpdate(obj, physicsWorld.setMassBufferAvailibility);
 }
 

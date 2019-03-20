@@ -100,56 +100,56 @@ PhysicsWorker.prototype.updateDynamicObjectBuffer = function(obj){
   obj.updateBufferAvailibility = false;
 }
 PhysicsWorker.prototype.step = function(ary){
-  physicsWorld.step(ary[2]);
+  physicsWorld.step(ary[1]);
   dynamicAddedObjects.forEach(this.updateDynamicObjectBuffer);
   dynamicObjectGroups.forEach(this.updateDynamicObjectBuffer);
 }
 PhysicsWorker.prototype.resetObjectVelocity = function(ary){
-  var obj = worker.objectsByID[ary[2]];
+  var obj = worker.objectsByID[ary[1]];
   obj.physicsBody.velocity.set(0, 0, 0);
   obj.physicsBody.angularVelocity.set(0, 0, 0);
 }
 PhysicsWorker.prototype.setObjectVelocity = function(ary){
-  var obj = worker.objectsByID[ary[2]];
-  obj.physicsBody.velocity.set(ary[3], ary[4], ary[5]);
+  var obj = worker.objectsByID[ary[1]];
+  obj.physicsBody.velocity.set(ary[2], ary[3], ary[4]);
 }
 PhysicsWorker.prototype.setObjectVelocityX = function(ary){
-  var obj = worker.objectsByID[ary[2]];
-  obj.physicsBody.velocity.x = ary[3];
+  var obj = worker.objectsByID[ary[1]];
+  obj.physicsBody.velocity.x = ary[2];
 }
 PhysicsWorker.prototype.setObjectVelocityY = function(ary){
-  var obj = worker.objectsByID[ary[2]];
-  obj.physicsBody.velocity.y = ary[3];
+  var obj = worker.objectsByID[ary[1]];
+  obj.physicsBody.velocity.y = ary[2];
 }
 PhysicsWorker.prototype.setObjectVelocityZ = function(ary){
-  var obj = worker.objectsByID[ary[2]];
-  obj.physicsBody.velocity.z = ary[3];
+  var obj = worker.objectsByID[ary[1]];
+  obj.physicsBody.velocity.z = ary[2];
 }
 PhysicsWorker.prototype.applyImpulse = function(ary){
-  var obj = worker.objectsByID[ary[2]];
-  worker.reusableVec1.set(ary[3], ary[4], ary[5]);
-  worker.reusableVec2.set(ary[6], ary[7], ary[8]);
+  var obj = worker.objectsByID[ary[1]];
+  worker.reusableVec1.set(ary[2], ary[3], ary[4]);
+  worker.reusableVec2.set(ary[5], ary[6], ary[7]);
   obj.physicsBody.applyImpulse(worker.reusableVec1, worker.reusableVec2);
 }
 PhysicsWorker.prototype.show = function(ary){
-  var obj = worker.objectsByID[ary[2]];
+  var obj = worker.objectsByID[ary[1]];
   physicsWorld.addBody(obj.physicsBody);
 }
 PhysicsWorker.prototype.hide = function(ary){
-  var obj = worker.objectsByID[ary[2]];
+  var obj = worker.objectsByID[ary[1]];
   physicsWorld.remove(obj.physicsBody);
 }
 PhysicsWorker.prototype.setMass = function(ary){
-  var obj = worker.objectsByID[ary[2]];
-  obj.setMass(ary[3]);
+  var obj = worker.objectsByID[ary[1]];
+  obj.setMass(ary[2]);
   if (obj.isAddedObject){
-    if (ary[3] > 0){
+    if (ary[2] > 0){
       dynamicAddedObjects.set(obj.name, obj);
     }else{
       dynamicAddedObjects.delete(obj.name);
     }
   }else if (obj.isObjectGroup){
-    if (ary[3] > 0){
+    if (ary[2] > 0){
       dynamicObjectGroups.set(obj.name, obj);
     }else{
       dynamicObjectGroups.delete(obj.name);
