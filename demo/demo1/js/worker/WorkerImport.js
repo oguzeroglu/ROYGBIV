@@ -7417,6 +7417,7 @@ AddedText.prototype.setText = function(newText, fromScript){
     this.handleResize();
   }else{
     this.handleBoundingBox();
+    rayCaster.onAddedTextResize(this);
   }
 }
 

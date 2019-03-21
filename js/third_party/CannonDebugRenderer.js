@@ -12,7 +12,8 @@ THREE.CannonDebugRenderer = function(scene, world, options){
 
     this.scene = scene;
     if (world.isPhysicsWorkerBridge){
-      this.world = world.physicsWorld;
+      this.world = new CANNON.World();
+      this.refresh();
     }else{
       this.world = world;
     }
@@ -32,6 +33,30 @@ THREE.CannonDebugRenderer.prototype = {
     tmpVec1: new CANNON.Vec3(),
     tmpVec2: new CANNON.Vec3(),
     tmpQuat0: new CANNON.Vec3(),
+
+    refresh: function(){
+      for (var i = 0; i<this.world.bodies.length; i++){
+        this.world.remove(this.world.bodies[i]);
+      }
+      for (var objName in addedObjects){
+        if (!addedObjects[objName].noMass){
+          this.world.add(addedObjects[objName].physicsBody);
+        }
+      }
+      for (var objName in objectGroups){
+        if (!objectGroups[objName].noMass){
+          this.world.add(objectGroups[objName].physicsBody);
+        }
+      }
+    },
+
+    hide: function(obj){
+      this.world.remove(obj.physicsBody);
+    },
+
+    show: function(obj){
+      this.world.addBody(obj.physicsBody);
+    },
 
     update: function(){
 

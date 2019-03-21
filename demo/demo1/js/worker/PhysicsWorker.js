@@ -6,7 +6,6 @@ var PhysicsWorker = function(){
   this.idsByObjectName = new Object();
   this.objectsByID = new Object();
   this.workerMessageHandler = new WorkerMessageHandler();
-  this.updateBufferSize = 10;
   this.reusableVec1 = new CANNON.Vec3();
   this.reusableVec2 = new CANNON.Vec3();
 }

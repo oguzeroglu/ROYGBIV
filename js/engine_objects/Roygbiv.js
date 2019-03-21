@@ -556,6 +556,9 @@ Roygbiv.prototype.hide = function(object, keepPhysics){
             object.physicsKeptWhenHidden = false;
           });
           physicsWorld.hide(object);
+          if (physicsDebugMode){
+            debugRenderer.hide(object);
+          }
         }
       }else{
         object.physicsKeptWhenHidden = true;
@@ -577,6 +580,9 @@ Roygbiv.prototype.hide = function(object, keepPhysics){
             object.physicsKeptWhenHidden = false;
           });
           physicsWorld.hide(object);
+          if (physicsDebugMode){
+            debugRenderer.hide(object);
+          }
         }
       }else{
         object.physicsKeptWhenHidden = true;
@@ -607,6 +613,9 @@ Roygbiv.prototype.show = function(object){
             physicsWorld.addBody(object.physicsBody);
           });
           physicsWorld.show(object);
+          if (physicsDebugMode){
+            debugRenderer.show(object);
+          }
         }
       }
       object.isHidden = false;
@@ -622,6 +631,9 @@ Roygbiv.prototype.show = function(object){
             physicsWorld.addBody(object.physicsBody);
           });
           physicsWorld.show(object);
+          if (physicsDebugMode){
+            debugRenderer.show(object);
+          }
         }
       }
       object.isHidden = false;

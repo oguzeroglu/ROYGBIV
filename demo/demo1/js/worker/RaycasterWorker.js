@@ -65,10 +65,10 @@ RaycasterWorker.prototype.findIntersections = function(data){
   this.workerMessageHandler.push(data.buffer);
 }
 RaycasterWorker.prototype.updateAddedObject = function(data){
-  var objID = data[2];
+  var objID = data[1];
   var obj = this.objectsByWorkerID[objID];
-  for (var i = 3; i<19; i++){
-    this.reusableArray16[i - 3] = data[i];
+  for (var i = 2; i<18; i++){
+    this.reusableArray16[i - 2] = data[i];
   }
   obj.mesh.matrixWorld.fromArray(this.reusableArray16);
   obj.mesh.matrixWorld.decompose(this.reusableVector1, this.reusableQuaternion, this.reusableVector2);
@@ -78,10 +78,10 @@ RaycasterWorker.prototype.updateAddedObject = function(data){
   this.rayCaster.updateObject(obj, true);
 }
 RaycasterWorker.prototype.updateObjectGroup = function(data){
-  var objID = data[2];
+  var objID = data[1];
   var obj = this.objectsByWorkerID[objID];
-  for (var i = 3; i<19; i++){
-    this.reusableArray16[i - 3] = data[i];
+  for (var i = 2; i<18; i++){
+    this.reusableArray16[i - 2] = data[i];
   }
   obj.mesh.matrixWorld.fromArray(this.reusableArray16);
   obj.mesh.matrixWorld.decompose(this.reusableVector1, this.reusableQuaternion, this.reusableVector2);
@@ -95,8 +95,8 @@ RaycasterWorker.prototype.updateAddedText = function(data){
   if (data.isAddedText){
     text = data;
   }else{
-    text = this.objectsByWorkerID[data[2]];
-    text.mesh.position.set(data[3], data[4], data[5]);
+    text = this.objectsByWorkerID[data[1]];
+    text.mesh.position.set(data[2], data[3], data[4]);
   }
   text.mesh.updateMatrixWorld();
   REUSABLE_MATRIX_4.copy(text.mesh.matrixWorld);
@@ -106,31 +106,31 @@ RaycasterWorker.prototype.updateAddedText = function(data){
   this.rayCaster.updateObject(text, true);
 }
 RaycasterWorker.prototype.updateCameraOrientation = function(data){
-  camera.position.set(data[2], data[3], data[4]);
-  camera.quaternion.set(data[5], data[6], data[7], data[8]);
-  camera.aspect = data[9];
+  camera.position.set(data[1], data[2], data[3]);
+  camera.quaternion.set(data[4], data[5], data[6], data[7]);
+  camera.aspect = data[8];
   camera.updateMatrixWorld();
   for (var textName in addedTexts){
     this.updateAddedText(addedTexts[textName]);
   }
 }
 RaycasterWorker.prototype.hide = function(data){
-  var object = this.objectsByWorkerID[data[2]];
+  var object = this.objectsByWorkerID[data[1]];
   this.rayCaster.binHandler.hide(object);
 }
 RaycasterWorker.prototype.show = function(data){
-  var object = this.objectsByWorkerID[data[2]];
+  var object = this.objectsByWorkerID[data[1]];
   this.rayCaster.binHandler.show(object);
 }
 RaycasterWorker.prototype.onAddedTextRescale = function(data){
-  var text = this.objectsByWorkerID[data[2]];
+  var text = this.objectsByWorkerID[data[1]];
   if (!text){
     return;
   }
-  text.characterSize = data[3];
-  text.bottomRight.set(data[4], data[5], data[6]);
-  text.topRight.set(data[7], data[8], data[9]);
-  text.bottomLeft.set(data[10], data[11], data[12]);
+  text.characterSize = data[2];
+  text.bottomRight.set(data[3], data[4], data[5]);
+  text.topRight.set(data[6], data[7], data[8]);
+  text.bottomLeft.set(data[9], data[10], data[11]);
   this.updateAddedText(text);
 }
 RaycasterWorker.prototype.onRaycasterCompleted = function(){

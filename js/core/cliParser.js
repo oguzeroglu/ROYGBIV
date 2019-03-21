@@ -5012,6 +5012,9 @@ function parse(input){
             }
           }
           obj.simplifyPhysics(sizeX/2, sizeY/2, sizeZ/2);
+          if (physicsDebugMode){
+            debugRenderer.refresh();
+          }
           if (!jobHandlerWorking){
             terminal.printInfo(Text.PHYSICS_SIMPLIFIED);
           }
@@ -5140,6 +5143,9 @@ function processNewGridSystemCommand(name, sizeX, sizeZ, centerX, centerY, cente
 
 function refreshRaycaster(messageOnFinished, noClear){
   if (!isDeployment){
+    if (physicsDebugMode){
+      debugRenderer.refresh();
+    }
     terminal.printInfo(Text.REFRESHING_RAYCASTER);
     terminal.disable();
     rayCaster.onReadyCallback = function(){

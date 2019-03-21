@@ -152,26 +152,8 @@ KeyboardEventHandler.prototype.onKeyDown = function(event){
         return;
       }
       var currentSelection = selectionHandler.getSelectedObject();
-      if (currentSelection.isAddedObject){
-        delete addedObjects[currentSelection.name];
-        currentSelection.destroy();
-        terminal.clear();
-        terminal.printInfo(Text.OBJECT_DESTROYED);
-        selectionHandler.resetCurrentSelection();
-        if (areaConfigurationsVisible){
-          guiHandler.hide(guiHandler.datGuiAreaConfigurations);
-          areaConfigurationsVisible = false;
-        }
-      }else if (currentSelection.isObjectGroup){
-        delete objectGroups[currentSelection.name];
-        currentSelection.destroy();
-        selectionHandler.resetCurrentSelection();
-        terminal.clear();
-        terminal.printInfo(Text.OBJECT_DESTROYED);
-        if (areaConfigurationsVisible){
-          guiHandler.hide(guiHandler.datGuiAreaConfigurations);
-          areaConfigurationsVisible = false;
-        }
+      if (currentSelection.isAddedObject || currentSelection.isObjectGroup){
+        parseCommand("destroyObject "+currentSelection.name);
       }else if (currentSelection.isAddedText){
         terminal.clear();
         parseCommand("destroyText "+currentSelection.name);
