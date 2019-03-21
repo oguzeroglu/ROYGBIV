@@ -689,12 +689,13 @@ var CommandDescriptor = function(){
     52, //newPhongMaterial -> Phong materials are not supported for now.
     53, //mapNormal -> Normal maps are not supported for now.
     55, //newLambertMaterial -> Deprecated due to lack of uses cases. Phong is fine for light affected objects.
+    65, //superposeGridSystem -> Deprecated due to lack of uses cases after grid selection mode implementation.
     68, //newPointLight -> Lights are not supported for now.
     78, //undo -> Deprecated because causes memory issues for big projects.
     79, //redo -> Deprecated because causes memory issues for big projects.
     89, //translateObject -> Deprecated due to architectural conflicts. Objects can only be translated using animations. Instead of translating the object in the design mode, a new grid system should be created at the specific position. Every object should be associated with certain grids.
-    101, //physicsWorkerMode -> Workers will be re-implemented.
-    102, //printPhysicsWorkerMode -> Workers will be re-implemented.
+    101, //physicsWorkerMode -> Physics workers are now always enabled if the web workers are supported.
+    102, //printPhysicsWorkerMode -> Physics workers are now always enabled if the web workers are supported.
     105, //printPerformance -> Deprecated because calling performance.now() multiple times on each render is costly.
     117, //particleCollisionWorkerMode  -> Workers will be re-implemented.
     118, //printParticleCollisionWorkerMode -> Workers will be re-implemented.
@@ -844,28 +845,6 @@ var CommandDescriptor = function(){
   this.adjustTextureRepeat.types.push(this.UNKNOWN_INDICATOR); //repeatU
   this.adjustTextureRepeat.types.push(this.UNKNOWN_INDICATOR); //repeatV
 
-  // newPhysicsBoxTest
-  this.newPhysicsBoxTest = new Object();
-  this.newPhysicsBoxTest.types = [];
-  this.newPhysicsBoxTest.types.push(this.UNKNOWN_INDICATOR); //duration
-  this.newPhysicsBoxTest.types.push(this.UNKNOWN_INDICATOR); //sizeX
-  this.newPhysicsBoxTest.types.push(this.UNKNOWN_INDICATOR); //sizeY
-  this.newPhysicsBoxTest.types.push(this.UNKNOWN_INDICATOR); //sizeZ
-  this.newPhysicsBoxTest.types.push(this.UNKNOWN_INDICATOR); //mass
-  this.newPhysicsBoxTest.types.push(this.UNKNOWN_INDICATOR); //positionX
-  this.newPhysicsBoxTest.types.push(this.UNKNOWN_INDICATOR); //positionY
-  this.newPhysicsBoxTest.types.push(this.UNKNOWN_INDICATOR); //positionZ
-
-  // newPhysicsSphereTest
-  this.newPhysicsSphereTest = new Object();
-  this.newPhysicsSphereTest.types = [];
-  this.newPhysicsSphereTest.types.push(this.UNKNOWN_INDICATOR); //duration
-  this.newPhysicsSphereTest.types.push(this.UNKNOWN_INDICATOR); //radius
-  this.newPhysicsSphereTest.types.push(this.UNKNOWN_INDICATOR); //mass
-  this.newPhysicsSphereTest.types.push(this.UNKNOWN_INDICATOR); //positionX
-  this.newPhysicsSphereTest.types.push(this.UNKNOWN_INDICATOR); //positionY
-  this.newPhysicsSphereTest.types.push(this.UNKNOWN_INDICATOR); //positionZ
-
   // newRamp
   this.newRamp = new Object();
   this.newRamp.types = [];
@@ -873,11 +852,6 @@ var CommandDescriptor = function(){
   this.newRamp.types.push(this.MATERIAL_NAME_WITH_NULL); //material
   this.newRamp.types.push(this.OBJECT_AXIS); //axis
   this.newRamp.types.push(this.UNKNOWN_INDICATOR); //height
-
-  // restartPhysicsTest
-  this.restartPhysicsTest = new Object();
-  this.restartPhysicsTest.types = [];
-  this.restartPhysicsTest.types.push(this.PHYSICS_TEST_INDEX); //physicsTestIndex
 
   // mirror
   this.mirror = new Object();
@@ -905,21 +879,10 @@ var CommandDescriptor = function(){
   this.destroyWallCollection.types = [];
   this.destroyWallCollection.types.push(this.WALL_COLLECTION_NAME); //name
 
-  // remakeGridSystem --> DEPRECATED
-  this.remakeGridSystem = new Object();
-  this.remakeGridSystem.types = [];
-  this.remakeGridSystem.types.push(this.GRID_SYSTEM_NAME); //name
-
   // uploadImage
   this.uploadImage = new Object();
   this.uploadImage.types = [];
   this.uploadImage.types.push(this.UNKNOWN_INDICATOR); //name
-
-  // mapEnvironment
-  this.mapEnvironment = new Object();
-  this.mapEnvironment.types = [];
-  this.mapEnvironment.types.push(this.TEXTURE_NAME); //textureName
-  this.mapEnvironment.types.push(this.OBJECT_NAME); //objectName
 
   // mapAmbientOcculsion
   this.mapAmbientOcculsion = new Object();
@@ -938,12 +901,6 @@ var CommandDescriptor = function(){
   this.mapEmissive.types = [];
   this.mapEmissive.types.push(this.TEXTURE_NAME); //textureName
   this.mapEmissive.types.push(this.OBJECT_NAME); //objectName
-
-  // newLambertMaterial
-  this.newLambertMaterial = new Object();
-  this.newLambertMaterial.types = [];
-  this.newLambertMaterial.types.push(this.UNKNOWN_INDICATOR); //name
-  this.newLambertMaterial.types.push(this.COLOR); //color
 
   // newTexturePack
   this.newTexturePack = new Object();
@@ -989,14 +946,6 @@ var CommandDescriptor = function(){
   this.segmentObject.types = [];
   this.segmentObject.types.push(this.OBJECT_NAME); //name
   this.segmentObject.types.push(this.UNKNOWN_INDICATOR); //count
-
-  // superposeGridSystem
-  this.superposeGridSystem = new Object();
-  this.superposeGridSystem.types = [];
-  this.superposeGridSystem.types.push(this.GRID_SYSTEM_NAME); //gridSystemName
-  this.superposeGridSystem.types.push(this.COLOR); //outlineColor
-  this.superposeGridSystem.types.push(this.UNKNOWN_INDICATOR); //cellSize
-  this.superposeGridSystem.types.push(this.OBJECT_NAME); //objectName
 
   // postProcessing
   this.postProcessing = new Object();
@@ -1085,13 +1034,6 @@ var CommandDescriptor = function(){
   this.destroyScript.types = [];
   this.destroyScript.types.push(this.SCRIPT_NAME); //nane
 
-  // translateObject --> DEPRECATED
-  this.translateObject = new Object();
-  this.translateObject.types = [];
-  this.translateObject.types.push(this.OBJECT_NAME); //name
-  this.translateObject.types.push(this.OBJECT_AXIS); //axis
-  this.translateObject.types.push(this.UNKNOWN_INDICATOR); //amount
-
   // setFog
   this.setFog = new Object();
   this.setFog.types = [];
@@ -1137,11 +1079,6 @@ var CommandDescriptor = function(){
   this.runManually = new Object();
   this.runManually.types = [];
   this.runManually.types.push(this.SCRIPT_NAME); //scriptName
-
-  // physicsWorkerMode
-  this.physicsWorkerMode = new Object();
-  this.physicsWorkerMode.types = [];
-  this.physicsWorkerMode.types.push(this.STATE_ON_OFF); //state
 
   // explain
   this.explain = new Object();
@@ -1193,16 +1130,6 @@ var CommandDescriptor = function(){
   this.setBinSize.types = [];
   this.setBinSize.types.push(this.UNKNOWN_INDICATOR); //size
 
-  // particleCollisionWorkerMode
-  this.particleCollisionWorkerMode = new Object();
-  this.particleCollisionWorkerMode.types = [];
-  this.particleCollisionWorkerMode.types.push(this.STATE_ON_OFF); // on/off
-
-  // particleSystemCollisionWorkerMode
-  this.particleSystemCollisionWorkerMode = new Object();
-  this.particleSystemCollisionWorkerMode.types = [];
-  this.particleSystemCollisionWorkerMode.types.push(this.STATE_ON_OFF); // on/off
-
   // addPaddingToTexture
   this.addPaddingToTexture = new Object();
   this.addPaddingToTexture.types = [];
@@ -1217,25 +1144,11 @@ var CommandDescriptor = function(){
   this.newSphere.types.push(this.MATERIAL_NAME_WITH_NULL); // material
   this.newSphere.types.push(this.UNKNOWN_INDICATOR); // radius
 
-  // applyDisplacementMap
-  this.applyDisplacementMap = new Object();
-  this.applyDisplacementMap.types = [];
-  this.applyDisplacementMap.types.push(this.OBJECT_NAME); // objectName
-  this.applyDisplacementMap.types.push(this.TEXTURE_NAME); // textureName
-  this.applyDisplacementMap.types.push(this.UNKNOWN_INDICATOR); // scale
-  this.applyDisplacementMap.types.push(this.UNKNOWN_INDICATOR); // bias
-
   // setSlipperiness
   this.setSlipperiness = new Object();
   this.setSlipperiness.types = [];
   this.setSlipperiness.types.push(this.OBJECT_NAME); // objectName
   this.setSlipperiness.types.push(this.STATE_ON_OFF); // on/off
-
-  // setAtlasTextureSize
-  this.setAtlasTextureSize = new Object();
-  this.setAtlasTextureSize.types = [];
-  this.setAtlasTextureSize.types.push(this.UNKNOWN_INDICATOR); // width
-  this.setAtlasTextureSize.types.push(this.UNKNOWN_INDICATOR); // height
 
   // sync
   this.sync = new Object();
@@ -1407,6 +1320,10 @@ var CommandDescriptor = function(){
 CommandDescriptor.prototype.test = function(){
   for (var i = 0; i<this.commands.length; i++){
     if (this.deprecatedCommandIndices.includes(i)){
+      if (this[this.commands[i]]){
+        console.error("CommandDescriptor error: "+this.commands[i]+" is deprecated but still described.");
+        return;
+      }
       continue;
     }
     var curCommand = this.commands[i];

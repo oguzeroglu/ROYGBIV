@@ -78,7 +78,7 @@ function parse(input){
 
           name = name.replace(/_/g, "-");
 
-          var result =  processNewGridSystemCommand(name, sizeX, sizeZ, centerX, centerY, centerZ, color, cellSize, axis, false, false);
+          var result =  processNewGridSystemCommand(name, sizeX, sizeZ, centerX, centerY, centerZ, color, cellSize, axis, false);
           return result;
         break;
         case 2: //printCameraPosition
@@ -288,7 +288,7 @@ function parse(input){
 
           name = name.replace(/_/g, "-");
 
-          var result = processNewGridSystemCommand(name, croppedGridSystem.sizeX, croppedGridSystem.sizeZ, croppedGridSystem.centerX, croppedGridSystem.centerY, croppedGridSystem.centerZ, outlineColor, cellSize, croppedGridSystem.axis, false, false);
+          var result = processNewGridSystemCommand(name, croppedGridSystem.sizeX, croppedGridSystem.sizeZ, croppedGridSystem.centerX, croppedGridSystem.centerY, croppedGridSystem.centerZ, outlineColor, cellSize, croppedGridSystem.axis, false);
           return result;
         break;
         case 13: //switchView
@@ -1287,14 +1287,9 @@ function parse(input){
             }
           }
 
-          var isSuperPosed = false;
           var baseGridSystem = gridSystems[grid1.parentName];
-          if (baseGridSystem.isSuperposed){
-            isSuperPosed = true;
-          }
 
-          new WallCollection(name, height, outlineColor,
-                                                  grid1, grid2, isSuperPosed);
+          new WallCollection(name, height, outlineColor, grid1, grid2);
           for (var gridName in gridSelections){
             gridSelections[gridName].toggleSelect(false, false, false, true);
           }
@@ -1895,68 +1890,7 @@ function parse(input){
           return true;
         break;
         case 65: //superposeGridSystem
-          var gridSystemName = splitted[1];
-          var outlineColor = splitted[2];
-          var cellSize = parseInt(splitted[3]);
-          var objectName = splitted[4];
-
-          var object = addedObjects[objectName];
-
-          if (mode != 0){
-            terminal.printError(Text.WORKS_ONLY_IN_DESIGN_MODE);
-            return true;
-          }
-          if (objectGroups[objectName]){
-            terminal.printError(Text.GLUED_OBJECTS_DO_NOT_SUPPORT_THIS_FUNCTION);
-            return true;
-          }
-
-          if (!object){
-            terminal.printError(Text.NO_SUCH_OBJECT);
-            return true;
-          }
-          if (gridSystems[gridSystemName]){
-            terminal.printError(Text.NAME_MUST_BE_UNIQUE);
-            return true;
-          }
-          if (object.type == "ramp"){
-            terminal.printError(Text.RAMPS_DO_NOT_SUPPORT_THIS_FUNCTION);
-            return true;
-          }else if (object.type == "sphere"){
-            terminal.printError(Text.SPHERES_DO_NOT_SUPPORT_THIS_FUNCTION);
-            return true;
-          }
-
-          var baseGridSystemNameAxis = object.metaData["baseGridSystemAxis"];
-          if (baseGridSystemNameAxis != "XZ"){
-            if (object.type == "surface"){
-              terminal.printError(Text.SURFACES_DO_NOT_SUPPORT_THIS_FUNCTION_UNLESS);
-              return true;
-            }
-          }
-
-          var sizeX, sizeZ;
-          var centerX, centerY, centerZ;
-
-          if (object.type == "surface"){
-            sizeX = object.metaData["width"];
-            sizeZ = object.metaData["height"];
-            centerX = object.mesh.position.x;
-            centerY = object.mesh.position.y;
-            centerZ = object.mesh.position.z;
-          }else if (object.type == "box"){
-            sizeX = object.metaData["boxSizeX"];
-            sizeZ = object.metaData["boxSizeZ"];
-            centerX = object.mesh.position.x;
-            centerY = object.mesh.position.y + (object.metaData["boxSizeY"] / 2);
-            centerZ = object.mesh.position.z;
-          }
-
-          centerY = centerY + superposeYOffset;
-
-          gridSystemName = gridSystemName.replace(/_/g, "-");
-
-          processNewGridSystemCommand(gridSystemName, sizeX, sizeZ, centerX, centerY, centerZ, outlineColor, cellSize, "XZ", true, false);
+          // DEPRECATED
         break;
         case 66: //postProcessing
           if (mode != 1){
@@ -2027,7 +1961,6 @@ function parse(input){
             outlineColor,
             cellSize,
             selectedGrid.axis,
-            false,
             selectedGrid
           );
           if (!gridSystems[name]){
@@ -5070,7 +5003,7 @@ function pickRandomMaterial(){
   return materials[keys[keys.length * Math.random() << 0]];
 }
 
-function processNewGridSystemCommand(name, sizeX, sizeZ, centerX, centerY, centerZ, outlineColor, cellSize, axis, isSuperposed, slicedGrid){
+function processNewGridSystemCommand(name, sizeX, sizeZ, centerX, centerY, centerZ, outlineColor, cellSize, axis, slicedGrid){
   if (addedObjects[name] || objectGroups[name]){
     terminal.printError(Text.NAME_MUST_BE_UNIQUE);
     return true;
@@ -5124,11 +5057,34 @@ function processNewGridSystemCommand(name, sizeX, sizeZ, centerX, centerY, cente
     terminal.printError(Text.AXIS_MUST_BE_ONE_OF_XY_YZ_XZ);
     return true;
   }
-  var gsObject = new GridSystem(name, parseInt(sizeX), parseInt(sizeZ),
-          parseInt(centerX), parseInt(centerY), parseInt(centerZ),
-                            outlineColor, parseInt(cellSize), axis.toUpperCase());
-
-  gsObject.isSuperposed = isSuperposed;
+  sizeX = parseFloat(sizeX), sizeZ = parseFloat(sizeZ), cellSize = parseFloat(cellSize);
+  centerX = parseFloat(centerX), centerY = parseFloat(centerY), centerZ = parseFloat(centerZ);
+  if (sizeX<=0 || sizeZ <=0){
+    terminal.printError(Text.GS_CREATION_ERROR_1);
+    return true;
+  }
+  if (sizeX % cellSize != 0){
+    terminal.printError(Text.GS_CREATION_ERROR_2);
+    return true;
+  }
+  if (sizeZ % cellSize != 0){
+    terminal.printError(Text.GS_CREATION_ERROR_3);
+    return true;
+  }
+  if (gridSystems[name]){
+    terminal.printError(Text.GS_CREATION_ERROR_4);
+    return true;
+  }
+  if (cellSize < MIN_CELLSIZE_ALLOWED){
+    terminal.printError(Text.GS_CREATION_ERROR_5);
+    return true;
+  }
+  var totalGridCount = (sizeX * sizeZ) / (cellSize * cellSize);
+  if (gridCounter + totalGridCount > MAX_GRIDS_ALLOWED){
+    terminal.printError(Text.GS_CREATION_ERROR_6);
+    return true;
+  }
+  var gsObject = new GridSystem(name, sizeX, sizeZ, centerX, centerY, centerZ, outlineColor, cellSize, axis.toUpperCase());
 
   if (slicedGrid){
     gsObject.slicedGrid = slicedGrid;

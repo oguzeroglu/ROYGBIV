@@ -37,9 +37,7 @@ StateLoader.prototype.load = function(){
       var outlineColor = exportObject.outlineColor;
       var cellSize = exportObject.cellSize;
       var axis = exportObject.axis;
-      var isSuperposed = exportObject.isSuperposed;
-      var gs = new GridSystem(name, sizeX, sizeZ, centerX, centerY, centerZ,
-                                              outlineColor, cellSize, axis);
+      var gs = new GridSystem(name, sizeX, sizeZ, centerX, centerY, centerZ, outlineColor, cellSize, axis);
       var selectedGridsExport = exportObject.selectedGridsExport;
       var slicedGridsExport = exportObject.slicedGridsExport;
       var slicedGridSystemNamesExport = exportObject.slicedGridSystemNamesExport;
@@ -52,7 +50,6 @@ StateLoader.prototype.load = function(){
         gs.grids[gridNumber].sliced = true;
         gs.grids[gridNumber].slicedGridSystemName = slicedGridSystemNamesExport[i];
       }
-      gs.isSuperposed = isSuperposed;
       gs.markedPointNames = exportObject.markedPointNames;
     }
     for (var gridSystemName in gridSystems){
@@ -75,11 +72,7 @@ StateLoader.prototype.load = function(){
       var name = curWallCollectionExport.name;
       var height = curWallCollectionExport.height;
       var outlineColor = curWallCollectionExport.outlineColor;
-      var isSuperposed = curWallCollectionExport.isSuperposed;
-      new WallCollection(
-        name, height, outlineColor, 0, 0, isSuperposed, true,
-        curWallCollectionExport
-      );
+      new WallCollection(name, height, outlineColor, 0, 0, true, curWallCollectionExport);
     }
     // MATERIALS ***************************************************
     var materialsExport = obj.materials;

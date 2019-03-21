@@ -1,11 +1,9 @@
 var WallCollection = function(name, height, outlineColor,
-                            grid1, grid2, isSuperposed, isLoaded, exportObj){
+                            grid1, grid2, isLoaded, exportObj){
 
   this.name = name;
   this.height = height;
   this.outlineColor = outlineColor;
-
-  this.isSuperposed = isSuperposed;
 
   if (isLoaded){
     this.createPreloadedWallCollection(exportObj);
@@ -40,10 +38,6 @@ var WallCollection = function(name, height, outlineColor,
     centerX = grid1.centerX + (this.height / 2);
     centerY = (grid1.centerY + grid2.centerY) / 2;
     centerZ = (grid1.centerZ + grid2.centerZ) / 2;
-  }
-
-  if (this.isSuperposed){
-    centerY = centerY - superposeYOffset;
   }
 
   var gridSystem1Name, gridSystem2Name, gridSystem3Name, gridSystem4Name, gridSystemRoofName;
@@ -258,7 +252,6 @@ WallCollection.prototype.export = function(){
   exportObject["name"] = this.name;
   exportObject["height"] = this.height;
   exportObject["outlineColor"] = this.outlineColor;
-  exportObject["isSuperposed"] = this.isSuperposed;
   exportObject["sizeX"] = this.sizeX;
   exportObject["sizeZ"] = this.sizeZ;
   exportObject["gridSystemNames"] = this.gridSystemNames;

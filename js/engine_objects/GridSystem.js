@@ -16,59 +16,14 @@
     axis -> axis (XZ / XY / YZ)
 
 */
-var GridSystem = function(name, sizeX, sizeZ, centerX, centerY, centerZ,
-                                              outlineColor, cellSize, axis){
+var GridSystem = function(name, sizeX, sizeZ, centerX, centerY, centerZ, outlineColor, cellSize, axis){
 
   this.isGridSystem = true;
   if (IS_WORKER_CONTEXT){
     return this;
   }
 
-  // size negativity/zero check
-  if (sizeX<=0 || sizeZ <=0){
-    if (!isDeployment){
-      terminal.printError(Text.GS_CREATION_ERROR_1);
-    }
-    return;
-  }
-
-  // size mismatch check
-  if (sizeX%cellSize != 0){
-    if (!isDeployment){
-      terminal.printError(Text.GS_CREATION_ERROR_2);
-    }
-    return;
-  }
-  if (sizeZ%cellSize != 0){
-    if (!isDeployment){
-      terminal.printError(Text.GS_CREATION_ERROR_3);
-    }
-    return;
-  }
-
-  // check if name is unique
-  if (gridSystems[name]){
-    if (!isDeployment){
-      terminal.printError(Text.GS_CREATION_ERROR_4);
-    }
-    return;
-  }
-
-  // LIMITATIONS
-  if (cellSize < MIN_CELLSIZE_ALLOWED){
-    if (!isDeployment){
-      terminal.printError(Text.GS_CREATION_ERROR_5);
-    }
-    return;
-  }
   var totalGridCount = (sizeX * sizeZ) / (cellSize * cellSize);
-  if (gridCounter + totalGridCount > MAX_GRIDS_ALLOWED){
-    if (!isDeployment){
-      terminal.printError(Text.GS_CREATION_ERROR_6);
-    }
-    return;
-  }
-
   this.totalGridCount = totalGridCount;
   this.name = name;
   this.sizeX = sizeX;
@@ -430,7 +385,6 @@ GridSystem.prototype.export = function(){
   exportObject.outlineColor = this.outlineColor;
   exportObject.cellSize = this.cellSize;
   exportObject.axis = this.axis;
-  exportObject.isSuperposed = this.isSuperposed;
   var selectedGridsExport = [];
   var slicedGridsExport = [];
   var slicedGridSystemNamesExport = [];
@@ -656,10 +610,6 @@ GridSystem.prototype.newArea = function(name, height, selections){
     }
   }
 
-  if (this.isSuperposed){
-    boxCenterY = boxCenterY - superposeYOffset;
-  }
-
   var boundingBox = new THREE.Box3().setFromCenterAndSize(
     new THREE.Vector3(boxCenterX, boxCenterY, boxCenterZ),
     new THREE.Vector3(boxSizeX, boxSizeY, boxSizeZ)
@@ -703,10 +653,6 @@ GridSystem.prototype.newSurface = function(name, grid1, grid2, material){
     surface.position.y = this.centerY;
     surface.position.z = (grid1.centerZ + grid2.centerZ) / 2;
     surface.rotation.x = Math.PI / 2;
-
-    if (this.isSuperposed){
-      surface.position.y = surface.position.y - superposeYOffset;
-    }
 
   } else if (this.axis == "XY"){
 
@@ -819,10 +765,6 @@ GridSystem.prototype.newRamp = function(anchorGrid, otherGrid, axis, height, mat
   if (this.axis == "XZ"){
     centerX = (anchorGrid.centerX + otherGrid.centerX) / 2;
     centerZ = (anchorGrid.centerZ + otherGrid.centerZ) / 2;
-    if (this.isSuperposed){
-        anchorGrid.centerY = anchorGrid.centerY - superposeYOffset;
-        otherGrid.centerY = otherGrid.centerY - superposeYOffset;
-    }
     centerY = (anchorGrid.centerY + (otherGrid.centerY + height)) / 2;
   }else if (this.axis == "XY"){
     centerX = (anchorGrid.centerX + otherGrid.centerX) / 2;
@@ -1095,10 +1037,6 @@ GridSystem.prototype.newBox = function(selections, height, material, name){
     }
   }
 
-  if (this.isSuperposed){
-    boxCenterY = boxCenterY - superposeYOffset;
-  }
-
   var geomKey = (
     "BoxBufferGeometry" + PIPE +
     boxSizeX + PIPE + boxSizeY + PIPE + boxSizeZ + PIPE +
@@ -1233,9 +1171,6 @@ GridSystem.prototype.newSphere = function(sphereName, material, radius, selectio
     }
   }
 
-  if (this.isSuperposed){
-    sphereCenterY = sphereCenterY - superposeYOffset;
-  }
   var geomKey = (
     "SphereBufferGeometry" + PIPE +
     Math.abs(radius)+ PIPE +
@@ -1353,9 +1288,6 @@ GridSystem.prototype.newCylinder = function(cylinderName, material, topRadius, b
       cylinderCenterY = (grid1.centerY + grid2.centerY) / 2;
       cylinderCenterZ = (grid1.centerZ + grid2.centerZ) / 2;
     }
-  }
-  if (this.isSuperposed){
-    cylinderCenterY = cylinderCenterY - superposeYOffset;
   }
   var geomKey = "CylinderBufferGeometry" + PIPE + height + PIPE + topRadius + PIPE +
                                          bottomRadius + PIPE + 8 + PIPE + 1 + PIPE + isOpenEnded;
