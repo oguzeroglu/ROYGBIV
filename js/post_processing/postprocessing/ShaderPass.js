@@ -4,6 +4,9 @@
 
 THREE.ShaderPass = function( shader, textureID ) {
 
+	this.passName = "shaderPass";
+	this.isShaderPass = true;
+
 	this.textureID = ( textureID !== undefined ) ? textureID : "tDiffuse";
 
 	if ( shader instanceof THREE.ShaderMaterial ) {

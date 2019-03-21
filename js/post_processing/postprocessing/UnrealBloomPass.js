@@ -18,6 +18,9 @@
  */
 THREE.UnrealBloomPass = function ( resolution, strength, radius, threshold ) {
 
+  this.passName = "unrealBloomPass";
+  this.isUnrealBloomPass = true;
+
 	THREE.Pass.call( this );
 
 	this.strength = ( strength !== undefined ) ? strength : 1;

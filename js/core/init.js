@@ -113,6 +113,9 @@ window.onload = function() {
   // MODE SWITCHER
   modeSwitcher = new ModeSwitcher();
 
+  // THREEJS RENDER MONITORING HANDLER
+  threejsRenderMonitoringHandler = new THREEJSRenderMonitoringHandler();
+
   if (!isDeployment){
     // GUI HANDLER
     guiHandler = new GUIHandler();

@@ -4,6 +4,9 @@
 
 THREE.RenderPass = function ( scene, camera, overrideMaterial, clearColor, clearAlpha ) {
 
+	this.passName = "renderPass";
+	this.isRenderPass = true;
+
 	this.scene = scene;
 	this.camera = camera;
 

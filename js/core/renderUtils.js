@@ -49,7 +49,11 @@ function render(){
 
 
 function renderScene(){
+  threejsRenderMonitoringHandler.currentRenderCallCountPerFrame = 0;
   composer.render(0.1);
+  if (threejsRenderMonitoringHandler.currentRenderCallCountPerFrame > threejsRenderMonitoringHandler.maxRenderCallCountPerFrame){
+    threejsRenderMonitoringHandler.maxRenderCallCountPerFrame = threejsRenderMonitoringHandler.currentRenderCallCountPerFrame;
+  }
 }
 
 function updateRaycaster(){

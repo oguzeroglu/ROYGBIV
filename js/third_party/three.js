@@ -22771,7 +22771,92 @@
 
 		// Rendering
 
+		this.renderAltered = function(scene, camera, renderTarget, forceClear){
+			window.threejsRenderMonitoringHandler.currentRenderCallCountPerFrame ++;
+			_currentGeometryProgram_PID = null;
+			_currentGeometryProgram_GID = null;
+			_currentGeometryProgram_WIREFRAME = null;
+			_currentMaterialId = - 1;
+			_currentCamera = null;
+			window.threejsRenderMonitoringHandler.dispatchEvent(0, true);
+			scene.updateMatrixWorld();
+			camera.updateMatrixWorld();
+			window.threejsRenderMonitoringHandler.dispatchEvent(0, false);
+
+			window.threejsRenderMonitoringHandler.dispatchEvent(1, true);
+			currentRenderState = renderStates.get(scene, camera);
+			currentRenderState.init();
+			window.threejsRenderMonitoringHandler.dispatchEvent(1, false);
+
+			window.threejsRenderMonitoringHandler.dispatchEvent(2, true);
+			_projScreenMatrix.multiplyMatrices(camera.projectionMatrix, camera.matrixWorldInverse);
+			_frustum.setFromMatrix(_projScreenMatrix);
+			window.threejsRenderMonitoringHandler.dispatchEvent(2, false);
+
+			window.threejsRenderMonitoringHandler.dispatchEvent(3, true);
+			_localClippingEnabled = this.localClippingEnabled;
+			_clippingEnabled = _clipping.init(this.clippingPlanes, _localClippingEnabled, camera);
+			window.threejsRenderMonitoringHandler.dispatchEvent(3, false);
+
+			window.threejsRenderMonitoringHandler.dispatchEvent(4, true);
+			currentRenderList = renderLists.get(scene, camera);
+			currentRenderList.init();
+			window.threejsRenderMonitoringHandler.dispatchEvent(4, false);
+
+			window.threejsRenderMonitoringHandler.dispatchEvent(5, true);
+			projectObject(scene, camera, _this.sortObjects);
+			window.threejsRenderMonitoringHandler.dispatchEvent(5, false);
+
+			window.threejsRenderMonitoringHandler.dispatchEvent(6, true);
+			if ( _this.sortObjects === true){
+				currentRenderList.sort();
+			}
+			window.threejsRenderMonitoringHandler.dispatchEvent(6, false);
+
+			window.threejsRenderMonitoringHandler.dispatchEvent(7, true);
+			if (renderTarget === undefined){
+				renderTarget = null;
+			}
+			this.setRenderTarget(renderTarget);
+			window.threejsRenderMonitoringHandler.dispatchEvent(7, false);
+
+			window.threejsRenderMonitoringHandler.dispatchEvent(8, true);
+			background.render(currentRenderList, scene, camera, forceClear);
+			window.threejsRenderMonitoringHandler.dispatchEvent(8, false);
+
+			window.threejsRenderMonitoringHandler.dispatchEvent(9, true);
+			var opaqueObjects = currentRenderList.opaque;
+			var transparentObjects = currentRenderList.transparent;
+			if (opaqueObjects.length){
+				renderObjects(opaqueObjects, scene, camera);
+			}
+			if (transparentObjects.length){
+				renderObjects(transparentObjects, scene, camera);
+			}
+			window.threejsRenderMonitoringHandler.dispatchEvent(9, false);
+
+			window.threejsRenderMonitoringHandler.dispatchEvent(10, true);
+			if (renderTarget){
+				textures.updateRenderTargetMipmap(renderTarget);
+			}
+			window.threejsRenderMonitoringHandler.dispatchEvent(10, false);
+
+			window.threejsRenderMonitoringHandler.dispatchEvent(11, true);
+			state.buffers.depth.setTest(true);
+			state.buffers.depth.setMask(true);
+			state.buffers.color.setMask(true);
+			state.setPolygonOffset(false);
+			window.threejsRenderMonitoringHandler.dispatchEvent(11, false);
+
+			currentRenderList = null;
+			currentRenderState = null;
+		};
+
 		this.render = function ( scene, camera, renderTarget, forceClear ) {
+			if (window.alterThreeJSRenderFunction){
+				this.renderAltered(scene, camera, renderTarget, forceClear);
+				return;
+			}
 
 			if ( ! ( camera && camera.isCamera ) ) {
 

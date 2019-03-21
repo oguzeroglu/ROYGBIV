@@ -298,6 +298,7 @@ var MAX_TEXTURE_COUNT = 8;
 var compressedTextureFallbackFormat = ".png";
 var areaBinHandler;
 var webglCallbackHandler;
+var threejsRenderMonitoringHandler;
 var areas = new Object();
 var areasVisible = true;
 var areaConfigurationsVisible = false;
@@ -360,6 +361,7 @@ var particleSystemRefHeight = 0;
 var preConditions;
 var HIGH_PRECISION_SUPPORTED = false;
 var physicsBodyGenerator;
+var alterThreeJSRenderFunction = true;
 
 // WORKER VARIABLES
 var WORKERS_SUPPORTED = (typeof(Worker) !== "undefined") && (typeof(MessageChannel) !== "undefined");

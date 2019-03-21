@@ -2129,6 +2129,7 @@ StateLoader.prototype.resetProject = function(){
   areas = new Object();
   areaBinHandler = new WorldBinHandler(true);
   webglCallbackHandler = new WebGLCallbackHandler();
+  threejsRenderMonitoringHandler = new THREEJSRenderMonitoringHandler();
   if (!WORKERS_SUPPORTED){
     rayCaster = new RayCaster();
     physicsWorld = new CANNON.World();

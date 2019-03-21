@@ -71,6 +71,7 @@ THREE.EffectComposer.prototype = {
 
 			if ( ! pass.enabled ) continue;
 
+			threejsRenderMonitoringHandler.currentPassName = pass.passName;
 			pass.render( this.renderer, this.writeBuffer, this.readBuffer, delta, maskActive );
 
 			if ( pass.needsSwap ) {
@@ -91,13 +92,9 @@ THREE.EffectComposer.prototype = {
 
 			}
 
-			if ( pass instanceof THREE.MaskPass ) {
+			if ( pass.isMaskPass ) {
 
 				maskActive = true;
-
-			} else if ( pass instanceof THREE.ClearMaskPass ) {
-
-				maskActive = false;
 
 			}
 

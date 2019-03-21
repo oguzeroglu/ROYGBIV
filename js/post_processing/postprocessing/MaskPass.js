@@ -4,6 +4,9 @@
 
 THREE.MaskPass = function ( scene, camera ) {
 
+	this.passName = "maskPass";
+	this.isMaskPass = true;
+
 	this.scene = scene;
 	this.camera = camera;
 
