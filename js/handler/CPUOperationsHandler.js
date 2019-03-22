@@ -18,6 +18,10 @@ var CPUOperationsHandler = function(){
   this.scriptPerformances = {};
 }
 
+CPUOperationsHandler.prototype.startRecording = function(){
+  this.record = true;
+}
+
 CPUOperationsHandler.prototype.dumpPerformanceLogs = function(){
   var sum = 0;
   var pseudoAry = [];
@@ -41,15 +45,13 @@ CPUOperationsHandler.prototype.dumpPerformanceLogs = function(){
   pseudoAry2.sort(function(obj1, obj2){
     return obj2.value - obj1.value
   });
-  console.log("Total time: "+sum+" ms.")
+  console.log("%cTotal time: "+sum+" ms.", "background: black; color: magenta")
   for (var i = 0; i<pseudoAry.length; i++){
-    console.log("["+pseudoAry[i].name+"] -> "+pseudoAry[i].value+" ms.");
+    console.log("%c["+pseudoAry[i].name+"] -> "+pseudoAry[i].value+" ms.", "background: black; color: yellow");
     if (pseudoAry[i].name == "runScripts"){
-      console.log("|")
       for (var i2 = 0; i2<pseudoAry2.length; i2++){
-        console.log("|___["+pseudoAry2[i2].name+"] -> "+pseudoAry2[i2].value+" ms.");
+        console.log("%c   ["+pseudoAry2[i2].name+"] -> "+pseudoAry2[i2].value+" ms.", "background: black; color: lightcyan");
       }
-      console.log("|");
     }
   }
 }

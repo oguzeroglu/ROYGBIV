@@ -60,12 +60,12 @@ THREEJSRenderMonitoringHandler.prototype.dumpPerformanceLogs = function(){
       passName: curRenderOperation.passName
     });
   }
-  console.log("Total WebGLRenderer.render time: "+totalRenderTime+" ms.");
+  console.log("%cTotal WebGLRenderer.render time: "+totalRenderTime+" ms.", "background: black; color: magenta");
   performances.sort(function(a, b){
     return b.totalTime - a.totalTime;
   });
   for (var i = 0 ; i<performances.length; i++){
-    console.log("   "+performances[i].passName+"  [Render #"+performances[i].renderOperationIndex+"] -> "+performances[i].totalTime+" ms.");
+    console.log("%c   "+performances[i].passName+"  [Render #"+performances[i].renderOperationIndex+"] -> "+performances[i].totalTime+" ms.", "background: black; color: yellow");
     var curPerformanceLogs = this.renderOperations[performances[i].renderOperationIndex].performanceLogs;
     var performanceLogsAry = [];
     for (var operationKey in curPerformanceLogs){
@@ -77,7 +77,7 @@ THREEJSRenderMonitoringHandler.prototype.dumpPerformanceLogs = function(){
       return b.time - a.time
     });
     for (var i2 = 0; i2<performanceLogsAry.length; i2++){
-      console.log("     ["+performanceLogsAry[i2].key+"]: "+performanceLogsAry[i2].time+" ms.");
+      console.log("%c     ["+performanceLogsAry[i2].key+"]: "+performanceLogsAry[i2].time+" ms.", "background: black; color: lightcyan");
     }
   }
 }

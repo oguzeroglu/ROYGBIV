@@ -41,6 +41,10 @@ var WebGLCallbackHandler = function(){
   this.bindedCubeTextureCache = new Map();
 }
 
+WebGLCallbackHandler.prototype.startRecording = function(){
+  this.record = true;
+}
+
 WebGLCallbackHandler.prototype.dumpPerformanceLogs = function(){
   var sum = 0;
   var pseudoAry = [];
@@ -54,9 +58,9 @@ WebGLCallbackHandler.prototype.dumpPerformanceLogs = function(){
   pseudoAry.sort(function(obj1, obj2){
     return obj2.value - obj1.value
   });
-  console.log("Total time: "+sum+" ms.")
+  console.log("%cTotal time: "+sum+" ms.", "background: black; color: magenta")
   for (var i = 0; i<pseudoAry.length; i++){
-    console.log("["+pseudoAry[i].name+"] -> "+pseudoAry[i].value+" ms.");
+    console.log("%c["+pseudoAry[i].name+"] -> "+pseudoAry[i].value+" ms.", "background: black; color: yellow");
   }
 }
 

@@ -645,6 +645,29 @@ function onRaycasterIntersection(){
   }
 }
 
+function startPerformanceAnalysis(){
+  if (mode == 0){
+    console.error("[!] startPerformanceAnalysis runs only on preview mode.");
+    return;
+  }
+  cpuOperationsHandler.startRecording();
+  webglCallbackHandler.startRecording();
+  threejsRenderMonitoringHandler.startRecording();
+}
+
+function dumpPerformance(){
+  if (mode == 0){
+    console.error("[!] dumpPerformance runs only on preview mode.");
+    return;
+  }
+  console.log("%c                    CPU OPERATIONS                    ", "background: black; color: lime");
+  cpuOperationsHandler.dumpPerformanceLogs();
+  console.log("%c                    WEBGL OPERATIONS                  ", "background: black; color: lime");
+  webglCallbackHandler.dumpPerformanceLogs();
+  console.log("%c                    THREEJS RENDER                    ", "background: black; color: lime");
+  threejsRenderMonitoringHandler.dumpPerformanceLogs();
+}
+
 //******************************************************************
 // WARNING: FOR TEST PURPOSES
 function generateRandomBoxes(gridSystemName){
