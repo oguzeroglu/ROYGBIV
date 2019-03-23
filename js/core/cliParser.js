@@ -2696,7 +2696,6 @@ function parse(input){
             }
 
             var detachedObjectGroups = new Object();
-            var hasOnlyObjectGroupChildren = true;
             for (var i = 0; i<objectNamesArray.length; i++){
               var object = addedObjects[objectNamesArray[i]];
               if (!object){
@@ -2707,7 +2706,6 @@ function parse(input){
                 }
               }else{
                 group[objectNamesArray[i]] = object;
-                hasOnlyObjectGroupChildren = false;
               }
             }
 
@@ -2723,10 +2721,7 @@ function parse(input){
             }
             selectionHandler.resetCurrentSelection();
 
-            var objectGroup = new ObjectGroup(
-              groupName,
-              group
-            );
+            var objectGroup = new ObjectGroup(groupName, group);
 
             if (!objectGroup.areGeometriesIdentical()){
               var ctr = 0;
