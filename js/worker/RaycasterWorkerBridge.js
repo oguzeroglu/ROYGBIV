@@ -257,6 +257,9 @@ RaycasterWorkerBridge.prototype.issueUpdate = function(obj){
     if (!obj.raycasterUpdateBufferAvailibility){
       return;
     }
+    if (obj.autoInstancedParent){
+      obj.mesh.updateMatrixWorld();
+    }
     obj.raycasterUpdateBuffer.set(obj.mesh.matrixWorld.elements, 2);
     rayCaster.workerMessageHandler.push(obj.raycasterUpdateBuffer.buffer);
     obj.raycasterUpdateBufferAvailibility = false;

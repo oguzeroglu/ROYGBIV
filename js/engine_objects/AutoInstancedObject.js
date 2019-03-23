@@ -78,6 +78,22 @@ AutoInstancedObject.prototype.init = function(){
   this.mesh.material.uniforms.autoInstanceOrientationArray = new THREE.Uniform(orientationAry);
 }
 
+AutoInstancedObject.prototype.setFog = function(){
+  if (!this.mesh.material.uniforms.fogInfo){
+    this.injectMacro("HAS_FOG", false, true);
+    this.mesh.material.uniforms.fogInfo = GLOBAL_FOG_UNIFORM;
+  }
+  if (fogBlendWithSkybox){
+    if (!this.mesh.material.uniforms.cubeTexture){
+      this.injectMacro("HAS_SKYBOX_FOG", true, true);
+      this.mesh.material.uniforms.worldMatrix = new THREE.Uniform(this.mesh.matrixWorld);
+      this.mesh.material.uniforms.cubeTexture = GLOBAL_CUBE_TEXTURE_UNIFORM;
+      this.mesh.material.uniforms.cameraPosition = GLOBAL_CAMERA_POSITION_UNIFORM;
+    }
+  }
+  this.mesh.material.needsUpdate = true;
+}
+
 AutoInstancedObject.prototype.injectMacro = function(macro, insertVertexShader, insertFragmentShader){
   if (insertVertexShader){
     this.mesh.material.vertexShader = this.mesh.material.vertexShader.replace(

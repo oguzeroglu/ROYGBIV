@@ -179,6 +179,7 @@ ModeSwitcher.prototype.switchFromDesignToPreview = function(){
       object.initOpacitySet = false;
     }
   }
+  autoInstancingHandler.handle();
   if (fogActive){
     GLOBAL_FOG_UNIFORM.value.set(fogDensity, fogColorRGB.r, fogColorRGB.g, fogColorRGB.b);
     if (fogBlendWithSkybox){
@@ -197,6 +198,9 @@ ModeSwitcher.prototype.switchFromDesignToPreview = function(){
     }
     for (var textName in addedTexts){
       addedTexts[textName].setFog();
+    }
+    for (var objName in autoInstancedObjects){
+      autoInstancedObjects[objName].setFog();
     }
   }else{
     GLOBAL_FOG_UNIFORM.value.set(-100.0, 0, 0, 0);
@@ -220,7 +224,6 @@ ModeSwitcher.prototype.switchFromDesignToPreview = function(){
       }
     }
   }
-  autoInstancingHandler.handle();
   this.commonSwitchFunctions();
   handleViewport();
   for (var txtName in addedTexts){
