@@ -1238,15 +1238,17 @@ ObjectGroup.prototype.detach = function(){
     delete addedObject.positionZWhenAttached;
     delete addedObject.qxWhenAttached;
     delete addedObject.qyWhenAttached;
-    delete addedObjects.qzWhenAttached;
+    delete addedObject.qzWhenAttached;
     delete addedObject.qwWhenAttached;
     delete addedObject.pqxWhenAttached;
     delete addedObject.pqyWhenAttached;
     delete addedObject.pqzWhenAttached;
     delete addedObject.pqwWhenAttached;
-
+    delete addedObject.opacityWhenAttached;
+    delete addedObject.emissiveIntensityWhenAttached;
+    delete addedObject.emissiveColorWhenAttached;
+    delete addedObject.aoIntensityWhenAttached;
   }
-
 }
 
 ObjectGroup.prototype.setQuaternion = function(axis, val){

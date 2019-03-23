@@ -152,15 +152,28 @@ AddedObject.prototype.export = function(){
 
   exportObject["isIntersectable"] = this.isIntersectable;
 
-  exportObject["opacity"] = this.mesh.material.uniforms.alpha.value;
+  if (!this.parentObjectName){
+    exportObject["opacity"] = this.mesh.material.uniforms.alpha.value;
+  }else{
+    exportObject["opacity"] = this.opacityWhenAttached;
+  }
   if (this.hasAOMap()){
-    exportObject["aoMapIntensity"] = this.mesh.material.uniforms.aoIntensity.value;
+    if (!this.parentObjectName){
+      exportObject["aoMapIntensity"] = this.mesh.material.uniforms.aoIntensity.value;
+    }else{
+      exportObject["aoMapIntensity"] = this.aoIntensityWhenAttached;
+    }
   }else{
     exportObject["aoMapIntensity"] = this.material.aoMapIntensity;
   }
   if (this.hasEmissiveMap()){
-    exportObject["emissiveIntensity"] = this.mesh.material.uniforms.emissiveIntensity.value;
-    exportObject["emissiveColor"] = "#"+this.mesh.material.uniforms.emissiveColor.value.getHexString();
+    if (!this.parentObjectName){
+      exportObject["emissiveIntensity"] = this.mesh.material.uniforms.emissiveIntensity.value;
+      exportObject["emissiveColor"] = "#"+this.mesh.material.uniforms.emissiveColor.value.getHexString();
+    }else{
+      exportObject["emissiveIntensity"] = this.emissiveIntensityWhenAttached;
+      exportObject["emissiveColor"] = "#"+this.emissiveColorWhenAttached.getHexString();
+    }
   }else{
     exportObject["emissiveIntensity"] = this.material.emissiveIntensity;
     exportObject["emissiveColor"] = this.material.emissiveColor;
@@ -221,9 +234,6 @@ AddedObject.prototype.export = function(){
     exportObject.pQuaternionY = this.pqyWhenAttached;
     exportObject.pQuaternionZ = this.pqzWhenAttached;
     exportObject.pQuaternionW = this.pqwWhenAttached;
-    exportObject.positionXWhenAttached = this.positionXWhenAttached;
-    exportObject.positionYWhenAttached = this.positionYWhenAttached;
-    exportObject.positionZWhenAttached = this.positionZWhenAttached;
   }
 
   var blendingModeInt = this.mesh.material.blending;
@@ -658,6 +668,14 @@ AddedObject.prototype.setAttachedProperties = function(){
   this.positionZWhenAttached = this.mesh.position.z;
   this.physicsPositionWhenAttached = {x: this.physicsBody.position.x, y: this.physicsBody.position.y, z: this.physicsBody.position.z};
   this.physicsQuaternionWhenAttached = {x: this.physicsBody.quaternion.x, y: this.physicsBody.quaternion.y, z: this.physicsBody.quaternion.z, w: this.physicsBody.quaternion.w};
+  this.opacityWhenAttached = this.mesh.material.uniforms.alpha.value;
+  if (this.hasAOMap()){
+    this.aoIntensityWhenAttached = this.mesh.material.uniforms.aoIntensity.value;
+  }
+  if (this.hasEmissiveMap()){
+    this.emissiveIntensityWhenAttached = this.mesh.material.uniforms.emissiveIntensity.value;
+    this.emissiveColorWhenAttached = this.mesh.material.uniforms.emissiveColor.value.clone();
+  }
 }
 
 AddedObject.prototype.getTextureUniform = function(texture){
@@ -856,6 +874,10 @@ AddedObject.prototype.incrementOpacity = function(val){
 
 AddedObject.prototype.updateOpacity = function(val){
   this.mesh.material.uniforms.alpha.value = val;
+}
+
+AddedObject.prototype.multiplyOpacity = function(val){
+  this.mesh.material.uniforms.alpha.value *= val;
 }
 
 AddedObject.prototype.updateMVMatrix = function(){

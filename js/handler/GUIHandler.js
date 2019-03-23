@@ -591,6 +591,13 @@ GUIHandler.prototype.initializeObjectManipulationGUI = function(){
     }else if (obj.isObjectGroup){
       var material = obj.mesh.material;
       material.uniforms.totalEmissiveColor.value.set(val);
+      for (var objName in obj.group){
+        if (!(typeof obj.group[objName].emissiveColorWhenAttached == UNDEFINED)){
+          REUSABLE_COLOR.set(obj.group[objName].emissiveColorWhenAttached);
+          REUSABLE_COLOR.multiply(material.uniforms.totalEmissiveColor.value);
+          obj.group[objName].mesh.material.uniforms.emissiveColor.value.copy(REUSABLE_COLOR);
+        }
+      }
     }
   }).listen();
   guiHandler.omTextureOffsetXController = guiHandler.datGuiObjectManipulation.add(guiHandler.objectManipulationParameters, "Texture offset x").min(-2).max(2).step(0.001).onChange(function(val){
@@ -604,6 +611,11 @@ GUIHandler.prototype.initializeObjectManipulationGUI = function(){
     obj.updateOpacity(val);
     obj.initOpacitySet = false;
     obj.initOpacity = obj.opacity;
+    if (obj.isObjectGroup){
+      for (var objName in obj.group){
+        obj.group[objName].updateOpacity(val * obj.group[objName].opacityWhenAttached);
+      }
+    }
   }).listen();
   guiHandler.omAOIntensityController = guiHandler.datGuiObjectManipulation.add(guiHandler.objectManipulationParameters, "AO intensity").min(0).max(10).step(0.1).onChange(function(val){
     var obj = selectionHandler.getSelectedObject();
@@ -611,6 +623,11 @@ GUIHandler.prototype.initializeObjectManipulationGUI = function(){
       obj.mesh.material.uniforms.aoIntensity.value = val;
     }else if (obj.isObjectGroup){
       obj.mesh.material.uniforms.totalAOIntensity.value = val;
+      for (var objName in obj.group){
+        if (!(typeof obj.group[objName].aoIntensityWhenAttached == UNDEFINED)){
+          obj.group[objName].mesh.material.uniforms.aoIntensity.value = obj.group[objName].aoIntensityWhenAttached * val;
+        }
+      }
     }
   }).listen();
   guiHandler.omEmissiveIntensityController = guiHandler.datGuiObjectManipulation.add(guiHandler.objectManipulationParameters, "Emissive int.").min(0).max(100).step(0.01).onChange(function(val){
@@ -621,6 +638,11 @@ GUIHandler.prototype.initializeObjectManipulationGUI = function(){
     }else if (obj.isObjectGroup){
       var material = obj.mesh.material;
       material.uniforms.totalEmissiveIntensity.value = val;
+      for (var objName in obj.group){
+        if (!(typeof obj.group[objName].emissiveIntensityWhenAttached == UNDEFINED)){
+          obj.group[objName].mesh.material.uniforms.emissiveIntensity.value = obj.group[objName].emissiveIntensityWhenAttached * val;
+        }
+      }
     }
   }).listen();
   guiHandler.omDisplacementScaleController = guiHandler.datGuiObjectManipulation.add(guiHandler.objectManipulationParameters, "Disp. scale").min(-50).max(50).step(0.1).onChange(function(val){
