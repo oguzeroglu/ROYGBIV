@@ -174,6 +174,9 @@ function dynamicObjectUpdateFunction(object, objectName){
   if (!(object.isHidden || (!object.isIntersectable) || !object.boundingBoxesNeedUpdate())){
     rayCaster.updateObject(object);
   }
+  if (object.autoInstancedParent){
+    object.autoInstancedParent.updateObject(object);
+  }
 }
 
 function updateDynamicObjects(){

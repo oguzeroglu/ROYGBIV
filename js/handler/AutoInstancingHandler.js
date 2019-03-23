@@ -3,6 +3,9 @@ var AutoInstancingHandler = function(){
 }
 
 AutoInstancingHandler.prototype.handle = function(){
+  if (!INSTANCING_SUPPORTED){
+    return;
+  }
   autoInstancedObjects = new Object();
   var objectsByGeometryID = new Object();
   var countersByGeometryID = new Object();
@@ -42,6 +45,9 @@ AutoInstancingHandler.prototype.handle = function(){
 }
 
 AutoInstancingHandler.prototype.reset = function(){
+  if (!INSTANCING_SUPPORTED){
+    return;
+  }
   for (var autoInstancedObjectName in autoInstancedObjects){
     var autoInstancedObject = autoInstancedObjects[autoInstancedObjectName];
     scene.remove(autoInstancedObject.mesh);

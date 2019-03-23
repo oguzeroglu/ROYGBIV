@@ -5,9 +5,11 @@ var AutoInstancedObject = function(name, objects){
   this.pseudoObjectGroup = new ObjectGroup(null, objects);
 }
 
-AutoInstancedObject.prototype.updateObjectOrientation = function(object, position, quaternion){
+AutoInstancedObject.prototype.updateObject = function(object){
   var index = this.orientationIndicesByObjectName.get(object.name);
   var orientationAry = this.mesh.material.uniforms.autoInstanceOrientationArray.value;
+  var position = object.mesh.position;
+  var quaternion = object.mesh.quaternion;
   orientationAry[index].set(orientationAry[index].x, position.x, position.y, position.z);
   orientationAry[index+1].set(quaternion.x, quaternion.y, quaternion.z, quaternion.w);
 }
