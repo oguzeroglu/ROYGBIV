@@ -589,11 +589,6 @@ function parse(input){
           }else if (objectGroup){
             objectGroup.destroy(true);
             delete objectGroups[objectName];
-            for (var objName in objectGroups){
-              if (objectGroups[objName].geometryConnections.has(objectName)){
-                objectGroups[objName].geometryConnections.delete(objectName);
-              }
-            }
           }
           if (areaConfigurationsVisible){
             guiHandler.hide(guiHandler.datGuiAreaConfigurations);

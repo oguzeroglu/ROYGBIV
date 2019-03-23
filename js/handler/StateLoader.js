@@ -1101,9 +1101,6 @@ StateLoader.prototype.finalize = function(){
     if (curObjectGroupExport.isRotationDirty){
       objectGroupInstance.isRotationDirty = true;
     }
-    for (var i = 0; i<curObjectGroupExport.geometryConnections.length; i++){
-      objectGroupInstance.geometryConnections.set(curObjectGroupExport.geometryConnections[i], true);
-    }
     objectGroupInstance.glue();
     if (curObjectGroupExport.mass){
       objectGroupInstance.setMass(curObjectGroupExport.mass);
