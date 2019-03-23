@@ -1116,14 +1116,21 @@ function WebGLRenderer( parameters ) {
 
 	this.renderAltered = function(scene, camera, renderTarget, forceClear){
 		window.threejsRenderMonitoringHandler.currentRenderCallCountPerFrame ++;
+		if (_isContextLost){
+			return;
+		}
 		_currentGeometryProgram_PID = null;
 		_currentGeometryProgram_GID = null;
 		_currentGeometryProgram_WIREFRAME = null;
 		_currentMaterialId = - 1;
 		_currentCamera = null;
 		window.threejsRenderMonitoringHandler.dispatchEvent(0, true);
-		scene.updateMatrixWorld();
-		camera.updateMatrixWorld();
+		if (scene.autoUpdate === true){
+			scene.updateMatrixWorld();
+		}
+		if (camera.parent === null){
+			camera.updateMatrixWorld();
+		}
 		window.threejsRenderMonitoringHandler.dispatchEvent(0, false);
 
 		window.threejsRenderMonitoringHandler.dispatchEvent(1, true);
@@ -1132,6 +1139,7 @@ function WebGLRenderer( parameters ) {
 		window.threejsRenderMonitoringHandler.dispatchEvent(1, false);
 
 		window.threejsRenderMonitoringHandler.dispatchEvent(2, true);
+		scene.onBeforeRender(_this, scene, camera, renderTarget);
 		_projScreenMatrix.multiplyMatrices(camera.projectionMatrix, camera.matrixWorldInverse);
 		_frustum.setFromMatrix(_projScreenMatrix);
 		window.threejsRenderMonitoringHandler.dispatchEvent(2, false);
@@ -1157,6 +1165,9 @@ function WebGLRenderer( parameters ) {
 		window.threejsRenderMonitoringHandler.dispatchEvent(6, false);
 
 		window.threejsRenderMonitoringHandler.dispatchEvent(7, true);
+		if (this.info.autoReset){
+			this.info.reset();
+		}
 		if (renderTarget === undefined){
 			renderTarget = null;
 		}
@@ -1170,11 +1181,21 @@ function WebGLRenderer( parameters ) {
 		window.threejsRenderMonitoringHandler.dispatchEvent(9, true);
 		var opaqueObjects = currentRenderList.opaque;
 		var transparentObjects = currentRenderList.transparent;
-		if (opaqueObjects.length){
-			renderObjects(opaqueObjects, scene, camera);
-		}
-		if (transparentObjects.length){
-			renderObjects(transparentObjects, scene, camera);
+		if (scene.overrideMaterial){
+			var overrideMaterial = scene.overrideMaterial;
+			if (opaqueObjects.length){
+				renderObjects(opaqueObjects, scene, camera, overrideMaterial);
+			}
+			if (transparentObjects.length){
+				renderObjects(transparentObjects, scene, camera, overrideMaterial);
+			}
+		}else{
+			if (opaqueObjects.length){
+				renderObjects(opaqueObjects, scene, camera);
+			}
+			if (transparentObjects.length){
+				renderObjects(transparentObjects, scene, camera);
+			}
 		}
 		window.threejsRenderMonitoringHandler.dispatchEvent(9, false);
 
@@ -1189,11 +1210,12 @@ function WebGLRenderer( parameters ) {
 		state.buffers.depth.setMask(true);
 		state.buffers.color.setMask(true);
 		state.setPolygonOffset(false);
+		scene.onAfterRender(_this, scene, camera);
 		window.threejsRenderMonitoringHandler.dispatchEvent(11, false);
 
 		currentRenderList = null;
 		currentRenderState = null;
-	}
+	};
 
 	this.render = function ( scene, camera, renderTarget, forceClear ) {
 		if (window.alterThreeJSRenderFunction){
