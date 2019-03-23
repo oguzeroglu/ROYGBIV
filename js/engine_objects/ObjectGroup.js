@@ -30,6 +30,7 @@ var ObjectGroup = function(name, group){
   this.isIntersectable = true;
   this.lastUpdatePosition = new THREE.Vector3();
   this.lastUpdateQuaternion = new THREE.Quaternion();
+  this.geometryConnections = new Map();
 }
 
 ObjectGroup.prototype.forceColor = function(r, g, b, a){
@@ -1610,6 +1611,7 @@ ObjectGroup.prototype.export = function(){
     };
     exportObj.physicsSimplificationParameters = this.physicsSimplificationParameters;
   }
+  exportObj.geometryConnections = Array.from(this.geometryConnections.keys());
   return exportObj;
 }
 
@@ -2074,6 +2076,8 @@ ObjectGroup.prototype.copy = function(name, isHardCopy, copyPosition, gridSystem
   if (newObjGroup.isPhysicsSimplified){
     newObjGroup.updateSimplifiedPhysicsBody();
   }
+  this.geometryConnections.set(newObjGroup.name, true);
+  newObjGroup.geometryConnections.set(this.name, true);
   return newObjGroup;
 }
 
