@@ -2696,6 +2696,7 @@ function parse(input){
             }
 
             var detachedObjectGroups = new Object();
+            var hasOnlyObjectGroupChildren = true;
             for (var i = 0; i<objectNamesArray.length; i++){
               var object = addedObjects[objectNamesArray[i]];
               if (!object){
@@ -2704,18 +2705,10 @@ function parse(input){
                 for (var gluedObjectName in gluedObject.group){
                   group[gluedObjectName] = gluedObject.group[gluedObjectName];
                 }
-                continue;
               }else{
-                if (object.physicsBody.velocity.x != 0 || object.physicsBody.velocity.y != 0 ||
-                    object.physicsBody.velocity.z != 0){
-
-                  terminal.printError(Text.OBJECT_IN_MOTION.replace(
-                    Text.PARAM1, (i+1)
-                  ));
-                  return true;
-                }
+                group[objectNamesArray[i]] = object;
+                hasOnlyObjectGroupChildren = false;
               }
-              group[objectNamesArray[i]] = object;
             }
 
             var materialUsed = 0;

@@ -1194,14 +1194,34 @@ StateLoader.prototype.finalize = function(){
     }
 
     objectGroupInstance.updateOpacity(curObjectGroupExport.totalAlpha);
+    for (var childName in objectGroupInstance.group){
+      objectGroupInstance.group[childName].updateOpacity(curObjectGroupExport.totalAlpha * objectGroupInstance.group[childName].opacityWhenAttached);
+    }
     if (objectGroupInstance.mesh.material.uniforms.totalAOIntensity){
       objectGroupInstance.mesh.material.uniforms.totalAOIntensity.value = curObjectGroupExport.totalAOIntensity;
+      for (var childName in objectGroupInstance.group){
+        if (!(typeof objectGroupInstance.group[childName].aoIntensityWhenAttached == UNDEFINED)){
+          objectGroupInstance.group[childName].mesh.material.uniforms.aoIntensity.value = objectGroupInstance.group[childName].aoIntensityWhenAttached * curObjectGroupExport.totalAOIntensity;
+        }
+      }
     }
     if (objectGroupInstance.mesh.material.uniforms.totalEmissiveIntensity){
       objectGroupInstance.mesh.material.uniforms.totalEmissiveIntensity.value = curObjectGroupExport.totalEmissiveIntensity;
+      for (var childName in objectGroupInstance.group){
+        if (!(typeof objectGroupInstance.group[childName].emissiveIntensityWhenAttached == UNDEFINED)){
+          objectGroupInstance.group[childName].mesh.material.uniforms.emissiveIntensity.value = objectGroupInstance.group[childName].emissiveIntensityWhenAttached * curObjectGroupExport.totalEmissiveIntensity;
+        }
+      }
     }
     if (objectGroupInstance.mesh.material.uniforms.totalEmissiveColor){
       objectGroupInstance.mesh.material.uniforms.totalEmissiveColor.value.set(curObjectGroupExport.totalEmissiveColor);
+      for (var childName in objectGroupInstance.group){
+        if (!(typeof objectGroupInstance.group[childName].emissiveColorWhenAttached == UNDEFINED)){
+          REUSABLE_COLOR.set(objectGroupInstance.group[childName].emissiveColorWhenAttached);
+          REUSABLE_COLOR.multiply(objectGroupInstance.mesh.material.uniforms.totalEmissiveColor.value);
+          objectGroupInstance.group[childName].mesh.material.uniforms.emissiveColor.value.copy(REUSABLE_COLOR);
+        }
+      }
     }
     if (curObjectGroupExport.isPhysicsSimplified){
       var params = curObjectGroupExport.physicsSimplificationParameters;
