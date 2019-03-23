@@ -166,6 +166,8 @@ window.onload = function() {
   if (!isDeployment){
     terminal.init();
   }
+  // AUTO INSTANCING HANDLER
+  autoInstancingHandler = new AutoInstancingHandler();
   ShaderContent = new ShaderContent();
   if (isDeployment){
     cliDiv.value = "";

@@ -220,6 +220,7 @@ ModeSwitcher.prototype.switchFromDesignToPreview = function(){
       }
     }
   }
+  autoInstancingHandler.handle();
   this.commonSwitchFunctions();
   handleViewport();
   for (var txtName in addedTexts){
@@ -236,6 +237,7 @@ ModeSwitcher.prototype.switchFromDesignToPreview = function(){
 
 ModeSwitcher.prototype.switchFromPreviewToDesign = function(){
   mode = 0;
+  autoInstancingHandler.reset();
   camera.oldAspect = camera.aspect;
   camera.aspect = window.innerWidth / window.innerHeight;
   camera.updateProjectionMatrix();

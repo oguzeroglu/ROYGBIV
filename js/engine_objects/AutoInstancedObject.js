@@ -8,20 +8,20 @@ var AutoInstancedObject = function(name, objects){
 AutoInstancedObject.prototype.updateObjectOrientation = function(object, position, quaternion){
   var index = this.orientationIndicesByObjectName.get(object.name);
   var orientationAry = this.mesh.material.uniforms.autoInstanceOrientationArray.value;
-  orientationAry[index] = position.x; orientationAry[index+1] = position.y; orientationAry[index+2] = position.z;
-  orientationAry[index+3] = quaternion.x; orientationAry[index+4] = quaternion.y; orientationAry[index+5] = quaternion.z; orientationAry[index+6] = quaternion.w;
+  orientationAry[index].set(orientationAry[index].x, position.x, position.y, position.z);
+  orientationAry[index+1].set(quaternion.x, quaternion.y, quaternion.z, quaternion.w);
 }
 
 AutoInstancedObject.prototype.hideObject = function(object){
   var index = this.orientationIndicesByObjectName.get(object.name);
   var orientationAry = this.mesh.material.uniforms.autoInstanceOrientationArray.value;
-  orientationAry[index + 7] = -10;
+  orientationAry[index].x = -10;
 }
 
 AutoInstancedObject.prototype.showObject = function(object){
   var index = this.orientationIndicesByObjectName.get(object.name);
   var orientationAry = this.mesh.material.uniforms.autoInstanceOrientationArray.value;
-  orientationAry[index + 7] = 10;
+  orientationAry[index].x = 10;
 }
 
 AutoInstancedObject.prototype.init = function(){
@@ -63,17 +63,16 @@ AutoInstancedObject.prototype.init = function(){
     var obj = this.objects[objName];
     this.orientationIndicesByObjectName.set(objName, curIndex);
     orientationIndices.push(curIndex);
-    curIndex += 8;
+    curIndex += 2;
     objCount ++;
-    orientationAry.push(obj.mesh.position.x); orientationAry.push(obj.mesh.position.y); orientationAry.push(obj.mesh.position.z);
-    orientationAry.push(obj.mesh.quaternion.x); orientationAry.push(obj.mesh.quaternion.y); orientationAry.push(obj.mesh.quaternion.z); orientationAry.push(obj.mesh.quaternion.w);
-    orientationAry.push(10);
+    orientationAry.push(new THREE.Vector4(10, obj.mesh.position.x, obj.mesh.position.y, obj.mesh.position.z));
+    orientationAry.push(new THREE.Vector4(obj.mesh.quaternion.x, obj.mesh.quaternion.y, obj.mesh.quaternion.z, obj.mesh.quaternion.w));
     obj.autoInstancedParent = this;
   }
   var orientationIndicesBufferAttribute = new THREE.InstancedBufferAttribute(new Float32Array(orientationIndices), 1);
   orientationIndicesBufferAttribute.setDynamic(false);
   this.mesh.geometry.addAttribute("orientationIndex", orientationIndicesBufferAttribute);
-  this.injectMacro("AUTO_INSTANCE_ORIENTATION_ARRAY_SIZE "+(objCount * 8), true, false);
+  this.injectMacro("AUTO_INSTANCE_ORIENTATION_ARRAY_SIZE "+(objCount * 2), true, false);
   this.mesh.material.uniforms.autoInstanceOrientationArray = new THREE.Uniform(orientationAry);
 }
 

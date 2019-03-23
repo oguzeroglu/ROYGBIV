@@ -2150,6 +2150,7 @@ StateLoader.prototype.resetProject = function(){
   disabledObjectNames = new Object();
   markedPoints = new Object();
   areas = new Object();
+  autoInstancedObjects = new Object();
   areaBinHandler = new WorldBinHandler(true);
   webglCallbackHandler = new WebGLCallbackHandler();
   threejsRenderMonitoringHandler = new THREEJSRenderMonitoringHandler();

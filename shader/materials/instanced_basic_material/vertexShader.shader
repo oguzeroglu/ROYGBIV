@@ -15,7 +15,7 @@ varying float vAlpha;
 
 #ifdef IS_AUTO_INSTANCED
   attribute float orientationIndex;
-  uniform float autoInstanceOrientationArray[AUTO_INSTANCE_ORIENTATION_ARRAY_SIZE];
+  uniform vec4 autoInstanceOrientationArray[AUTO_INSTANCE_ORIENTATION_ARRAY_SIZE];
   varying float vDiscardFlag;
 #else
   attribute vec3 positionOffset;
@@ -82,7 +82,7 @@ void main(){
 
   #ifdef IS_AUTO_INSTANCED
     int oi = int(orientationIndex);
-    if (autoInstanceOrientationArray[oi+7] < 0.0){
+    if (autoInstanceOrientationArray[oi].x < 0.0){
       vDiscardFlag = 50.0;
       return;
     }
@@ -144,8 +144,8 @@ void main(){
   #endif
 
   #ifdef IS_AUTO_INSTANCED
-    vec3 positionOffset = vec3(autoInstanceOrientationArray[oi], autoInstanceOrientationArray[oi+1], autoInstanceOrientationArray[oi+2]);
-    vec4 quaternion = vec4(autoInstanceOrientationArray[oi+3], autoInstanceOrientationArray[oi+4], autoInstanceOrientationArray[oi+5], autoInstanceOrientationArray[oi+6]);
+    vec3 positionOffset = autoInstanceOrientationArray[oi].yzw;
+    vec4 quaternion = autoInstanceOrientationArray[oi+1];
   #endif
   transformedPosition = applyQuaternionToVector(transformedPosition, quaternion) + positionOffset;
   gl_Position = projectionMatrix * modelViewMatrix * vec4(transformedPosition, 1.0);

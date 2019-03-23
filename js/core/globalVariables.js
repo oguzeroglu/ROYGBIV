@@ -362,6 +362,8 @@ var preConditions;
 var HIGH_PRECISION_SUPPORTED = false;
 var physicsBodyGenerator;
 var alterThreeJSRenderFunction = true;
+var autoInstancingHandler;
+var autoInstancedObjects = new Object();
 
 // WORKER VARIABLES
 var WORKERS_SUPPORTED = (typeof(Worker) !== "undefined") && (typeof(MessageChannel) !== "undefined");
