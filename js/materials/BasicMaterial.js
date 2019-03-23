@@ -1,4 +1,5 @@
 var BasicMaterial = function(parameters){
+  this.isBasicMaterial = true;
   // name
   this.roygbivMaterialName = parameters.name;
   // color

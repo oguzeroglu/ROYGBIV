@@ -4,8 +4,6 @@ precision lowp int;
 attribute float alpha;
 attribute vec3 color;
 attribute vec3 position;
-attribute vec3 positionOffset;
-attribute vec4 quaternion;
 
 uniform mat4 modelViewMatrix;
 uniform mat4 projectionMatrix;
@@ -14,6 +12,15 @@ varying vec3 vColor;
 varying float vAlpha;
 
 #define INSERTION
+
+#ifdef IS_AUTO_INSTANCED
+  attribute float orientationIndex;
+  uniform float autoInstanceOrientationArray[AUTO_INSTANCE_ORIENTATION_ARRAY_SIZE];
+  varying float vDiscardFlag;
+#else
+  attribute vec3 positionOffset;
+  attribute vec4 quaternion;
+#endif
 
 #ifdef HAS_EMISSIVE
   attribute float emissiveIntensity;
@@ -73,6 +80,15 @@ vec3 applyQuaternionToVector(vec3 vector, vec4 quaternion){
 
 void main(){
 
+  #ifdef IS_AUTO_INSTANCED
+    int oi = int(orientationIndex);
+    if (autoInstanceOrientationArray[oi+7] < 0.0){
+      vDiscardFlag = 50.0;
+      return;
+    }
+    vDiscardFlag = -50.0;
+  #endif
+
   vAlpha = alpha;
   vColor = color;
   #ifdef HAS_TEXTURE
@@ -125,6 +141,11 @@ void main(){
       vec3 objNormal = normalize(normal);
       transformedPosition += objNormal * (texture2D(displacementMap, vUV).r * displacementInfo.x + displacementInfo.y);
     }
+  #endif
+
+  #ifdef IS_AUTO_INSTANCED
+    vec3 positionOffset = vec3(autoInstanceOrientationArray[oi], autoInstanceOrientationArray[oi+1], autoInstanceOrientationArray[oi+2]);
+    vec4 quaternion = vec4(autoInstanceOrientationArray[oi+3], autoInstanceOrientationArray[oi+4], autoInstanceOrientationArray[oi+5], autoInstanceOrientationArray[oi+6]);
   #endif
   transformedPosition = applyQuaternionToVector(transformedPosition, quaternion) + positionOffset;
   gl_Position = projectionMatrix * modelViewMatrix * vec4(transformedPosition, 1.0);

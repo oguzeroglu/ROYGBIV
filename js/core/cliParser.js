@@ -2714,6 +2714,8 @@ function parse(input){
               if (!materialUsed){
                 if (group[objName].hasBasicMaterial){
                   materialUsed = 1;
+                }else{
+                  throw new Error("Not implemented")
                 }
               }else{
                 // check if the same kind of material is used (for now only BASIC materials exist.)
@@ -2749,8 +2751,6 @@ function parse(input){
 
             if (materialUsed == 1){
               objectGroup.isBasicMaterial = true;
-            }else if (materialUsed == 2){
-              objectGroup.isBasicMaterial = false;
             }
             objectGroup.glue();
             objectGroups[groupName] = objectGroup;
