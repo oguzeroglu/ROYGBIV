@@ -131,9 +131,6 @@ void main(){
   #ifdef HAS_AO
     vAOIntensity = aoIntensity;
   #endif
-  #ifdef HAS_SKYBOX_FOG
-    vWorldPosition = (worldMatrix * vec4(position, 1.0)).xyz;
-  #endif
 
   vec3 transformedPosition = position;
   #ifdef HAS_DISPLACEMENT
@@ -142,11 +139,17 @@ void main(){
       transformedPosition += objNormal * (texture2D(displacementMap, vUV).r * displacementInfo.x + displacementInfo.y);
     }
   #endif
-
   #ifdef IS_AUTO_INSTANCED
     vec3 positionOffset = autoInstanceOrientationArray[oi].yzw;
     vec4 quaternion = autoInstanceOrientationArray[oi+1];
   #endif
   transformedPosition = applyQuaternionToVector(transformedPosition, quaternion) + positionOffset;
   gl_Position = projectionMatrix * modelViewMatrix * vec4(transformedPosition, 1.0);
+  #ifdef HAS_SKYBOX_FOG
+    #ifdef IS_AUTO_INSTANCED
+      vWorldPosition = transformedPosition;
+    #else
+      vWorldPosition = (worldMatrix * vec4(position, 1.0)).xyz;
+    #endif
+  #endif
 }

@@ -844,5 +844,9 @@ GUIHandler.prototype.initializeFogGUI = function(){
       addedTexts[textName].removeFog();
       addedTexts[textName].setFog();
     }
+    for (var objName in autoInstancedObjects){
+      autoInstancedObjects[objName].removeFog();
+      autoInstancedObjects[objName].setFog();
+    }
   }).listen();
 }

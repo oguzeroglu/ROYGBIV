@@ -94,6 +94,16 @@ AutoInstancedObject.prototype.setFog = function(){
   this.mesh.material.needsUpdate = true;
 }
 
+AutoInstancedObject.prototype.removeFog = function(){
+  this.removeMacro("HAS_FOG", false, true);
+  this.removeMacro("HAS_SKYBOX_FOG", true, true);
+  delete this.mesh.material.uniforms.fogInfo;
+  delete this.mesh.material.uniforms.cubeTexture;
+  delete this.mesh.material.uniforms.worldMatrix;
+  delete this.mesh.material.uniforms.cameraPosition;
+  this.mesh.material.needsUpdate = true;
+}
+
 AutoInstancedObject.prototype.injectMacro = function(macro, insertVertexShader, insertFragmentShader){
   if (insertVertexShader){
     this.mesh.material.vertexShader = this.mesh.material.vertexShader.replace(
@@ -105,5 +115,15 @@ AutoInstancedObject.prototype.injectMacro = function(macro, insertVertexShader, 
       "#define INSERTION", "#define INSERTION\n#define "+macro
     )
   };
+  this.mesh.material.needsUpdate = true;
+}
+
+AutoInstancedObject.prototype.removeMacro = function(macro, removeVertexShader, removeFragmentShader){
+  if (removeVertexShader){
+    this.mesh.material.vertexShader = this.mesh.material.vertexShader.replace("\n#define "+macro, "");
+  }
+  if (removeFragmentShader){
+    this.mesh.material.fragmentShader = this.mesh.material.fragmentShader.replace("\n#define "+macro, "");
+  }
   this.mesh.material.needsUpdate = true;
 }
