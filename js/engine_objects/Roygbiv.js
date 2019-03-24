@@ -709,13 +709,14 @@ Roygbiv.prototype.rotate = function(object, axis, radians){
   }
   if (object.pivotObject){
     object.rotateAroundPivotObject(axis, radians);
+    physicsWorld.updateObject(object, false, true);
     if (object.autoInstancedParent){
       object.autoInstancedParent.updateObject(object);
     }
     return;
   }
   object.rotate(axis, radians, true);
-  physicsWorld.updateObject(object);
+  physicsWorld.updateObject(object, false, true);
   if (object.autoInstancedParent){
     object.autoInstancedParent.updateObject(object);
   }
@@ -769,7 +770,7 @@ Roygbiv.prototype.rotateAroundXYZ = function(object, x, y, z, radians, axis){
     preConditions.checkIfChangeable(ROYGBIV.rotateAroundXYZ, preConditions.object, object);
   }
   object.rotateAroundXYZ(x, y, z, axis, axisVector, radians);
-  physicsWorld.updateObject(object);
+  physicsWorld.updateObject(object, false, true);
   if (object.autoInstancedParent){
     object.autoInstancedParent.updateObject(object);
   }
@@ -802,7 +803,7 @@ Roygbiv.prototype.setPosition = function(obj, x, y, z){
     if (obj.mesh.visible){
       rayCaster.updateObject(obj);
     }
-    physicsWorld.updateObject(obj);
+    physicsWorld.updateObject(obj, true, false);
     if (obj.autoInstancedParent){
       obj.autoInstancedParent.updateObject(obj);
     }
@@ -818,7 +819,7 @@ Roygbiv.prototype.setPosition = function(obj, x, y, z){
     if (obj.mesh.visible){
       rayCaster.updateObject(obj);
     }
-    physicsWorld.updateObject(obj);
+    physicsWorld.updateObject(obj, true, false);
   }
 }
 
@@ -885,7 +886,7 @@ Roygbiv.prototype.translate = function(object, axis, amount){
   }
   preConditions.checkIfChangeable(ROYGBIV.translate, preConditions.object, object);
   object.translate(axis, amount, true);
-  physicsWorld.updateObject(object);
+  physicsWorld.updateObject(object, true, false);
   if (object.autoInstancedParent){
     object.autoInstancedParent.updateObject(object);
   }

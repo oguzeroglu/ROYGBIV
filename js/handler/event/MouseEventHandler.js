@@ -6,7 +6,7 @@ var MouseEventHandler = function(){
   canvas.addEventListener("mousedown", this.onMouseDown);
   canvas.addEventListener("mouseup", this.onMouseUp);
   canvas.addEventListener("mousemove", this.onMouseMove);
-  window.addEventListener('mousewheel', this.onMouseWheel, false);
+  canvas.addEventListener('mousewheel', this.onMouseWheel, false);
   if (typeof InstallTrigger !== 'undefined') {
     // M O Z I L L A
     window.addEventListener('wheel', this.onMouseWheel, false);
