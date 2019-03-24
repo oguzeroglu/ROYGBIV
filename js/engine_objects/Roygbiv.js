@@ -545,6 +545,9 @@ Roygbiv.prototype.hide = function(object, keepPhysics){
     preConditions.checkIfChangeable(ROYGBIV.hide, preConditions.object, object);
     if (object.isVisibleOnThePreviewScene()){
       object.mesh.visible = false;
+      if (object.autoInstancedParent){
+        object.autoInstancedParent.hideObject(object);
+      }
       // The reason we use delayed execution here is that
       // during the collision callback, cannon.js crashes if a body
       // is removed. It is safe to remove the bodies after the
@@ -607,6 +610,9 @@ Roygbiv.prototype.show = function(object){
     preConditions.checkIfChangeable(ROYGBIV.show, preConditions.object, object);
     if (!object.isVisibleOnThePreviewScene()){
       object.mesh.visible = true;
+      if (object.autoInstancedParent){
+        object.autoInstancedParent.showObject(object);
+      }
       if (!object.physicsKeptWhenHidden){
         if (!object.noMass){
           setTimeout(function(){
@@ -703,10 +709,16 @@ Roygbiv.prototype.rotate = function(object, axis, radians){
   }
   if (object.pivotObject){
     object.rotateAroundPivotObject(axis, radians);
+    if (object.autoInstancedParent){
+      object.autoInstancedParent.updateObject(object);
+    }
     return;
   }
   object.rotate(axis, radians, true);
   physicsWorld.updateObject(object);
+  if (object.autoInstancedParent){
+    object.autoInstancedParent.updateObject(object);
+  }
 }
 
 // rotateAroundXYZ
@@ -758,6 +770,9 @@ Roygbiv.prototype.rotateAroundXYZ = function(object, x, y, z, radians, axis){
   }
   object.rotateAroundXYZ(x, y, z, axis, axisVector, radians);
   physicsWorld.updateObject(object);
+  if (object.autoInstancedParent){
+    object.autoInstancedParent.updateObject(object);
+  }
 }
 
 // setPosition
@@ -788,6 +803,9 @@ Roygbiv.prototype.setPosition = function(obj, x, y, z){
       rayCaster.updateObject(obj);
     }
     physicsWorld.updateObject(obj);
+    if (obj.autoInstancedParent){
+      obj.autoInstancedParent.updateObject(obj);
+    }
   }else if (obj.isObjectGroup){
     preConditions.checkIfChangeable(ROYGBIV.setPosition, preConditions.obj, obj);
     obj.mesh.position.set(x, y, z);
@@ -868,6 +886,9 @@ Roygbiv.prototype.translate = function(object, axis, amount){
   preConditions.checkIfChangeable(ROYGBIV.translate, preConditions.object, object);
   object.translate(axis, amount, true);
   physicsWorld.updateObject(object);
+  if (object.autoInstancedParent){
+    object.autoInstancedParent.updateObject(object);
+  }
 }
 
 // opacity

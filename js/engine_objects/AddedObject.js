@@ -1021,11 +1021,15 @@ AddedObject.prototype.rotateAroundXYZ = function(x, y, z, axis, axisVector, radi
     return;
   }
   var point = REUSABLE_VECTOR.set(x, y, z);
-  this.mesh.parent.localToWorld(this.mesh.position);
+  if (this.mesh.parent){
+    this.mesh.parent.localToWorld(this.mesh.position);
+  }
   this.mesh.position.sub(point);
   this.mesh.position.applyAxisAngle(axisVector, radians);
   this.mesh.position.add(point);
-  this.mesh.parent.worldToLocal(this.mesh.position);
+  if (this.mesh.parent){
+    this.mesh.parent.worldToLocal(this.mesh.position);
+  }
   this.mesh.rotateOnAxis(axisVector, radians);
   this.setPhysicsAfterRotationAroundPoint(axis, radians);
   if (this.mesh.visible){
@@ -1931,7 +1935,7 @@ AddedObject.prototype.adjustTextureRepeat = function(repeatU, repeatV){
 }
 
 AddedObject.prototype.isVisibleOnThePreviewScene = function(parentName){
-  if (typeof parentName == "undefined"){
+  if (typeof parentName == UNDEFINED){
     return !(this.isHidden);
   }else{
     return objectGroups[parentName].isVisibleOnThePreviewScene();

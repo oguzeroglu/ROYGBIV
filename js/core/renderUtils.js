@@ -149,6 +149,9 @@ function updateTrackingObjects(){
     if (obj.mesh.visible){
       rayCaster.updateObject(obj);
     }
+    if (obj.autoInstancedParent){
+      obj.autoInstancedParent.updateObject(obj);
+    }
   }
 }
 
