@@ -3,12 +3,21 @@ var IS_WORKER_CONTEXT = true;
 
 // CLASS DEFINITION
 var PhysicsWorker = function(){
+  this.record = false;
   this.idsByObjectName = new Object();
   this.objectsByID = new Object();
   this.workerMessageHandler = new WorkerMessageHandler();
-  this.updateBufferSize = 10;
   this.reusableVec1 = new CANNON.Vec3();
   this.reusableVec2 = new CANNON.Vec3();
+  this.performanceLogs = {
+    isPerformanceLog: true,
+    stepTime: 0,
+    dynamicObjectsUpdate: 0,
+    workerMessageHandler_preallocatedArrayCacheSize: 0,
+    workerMessageHandler_totalArraysSentLastFrame: 0,
+    workerMessageHandler_totalBytesSentLastFrame: 0,
+    workerMessageHandler_flushTimeLastFrame: 0
+  }
 }
 PhysicsWorker.prototype.refresh = function(state){
   this.idsByObjectName = new Object();
@@ -100,9 +109,21 @@ PhysicsWorker.prototype.updateDynamicObjectBuffer = function(obj){
   obj.updateBufferAvailibility = false;
 }
 PhysicsWorker.prototype.step = function(ary){
+  if (this.record){
+    this.performanceLogs.stepTime = performance.now();
+  }
   physicsWorld.step(ary[1]);
+  if (this.record){
+    this.performanceLogs.stepTime = performance.now() - this.performanceLogs.stepTime;
+  }
+  if (this.record){
+    this.performanceLogs.dynamicObjectsUpdate = performance.now();
+  }
   dynamicAddedObjects.forEach(this.updateDynamicObjectBuffer);
   dynamicObjectGroups.forEach(this.updateDynamicObjectBuffer);
+  if (this.record){
+    this.performanceLogs.dynamicObjectsUpdate = performance.now() - this.performanceLogs.dynamicObjectsUpdate;
+  }
 }
 PhysicsWorker.prototype.resetObjectVelocity = function(ary){
   var obj = worker.objectsByID[ary[1]];
@@ -181,6 +202,17 @@ PhysicsWorker.prototype.removeCollisionListener = function(ary){
   var obj = worker.objectsByID[ary[1]];
   obj.physicsBody.removeEventListener("collide", obj.collisionEvent);
 }
+PhysicsWorker.prototype.startRecording = function(){
+  this.record = true;
+  this.workerMessageHandler.startRecording();
+}
+PhysicsWorker.prototype.dumpPerformanceLogs = function(){
+  this.performanceLogs.workerMessageHandler_preallocatedArrayCacheSize = this.workerMessageHandler.preallocatedArrayCache.size;
+  this.performanceLogs.workerMessageHandler_totalArraysSentLastFrame = this.workerMessageHandler.performanceLogs.totalArraysSentLastFrame;
+  this.performanceLogs.workerMessageHandler_totalBytesSentLastFrame = this.workerMessageHandler.performanceLogs.totalBytesSentLastFrame;
+  this.performanceLogs.workerMessageHandler_flushTimeLastFrame = this.workerMessageHandler.performanceLogs.flushTimeLastFrame;
+  postMessage(this.performanceLogs)
+}
 // START
 var PIPE = "|";
 var UNDEFINED = "undefined";
@@ -199,6 +231,10 @@ self.onmessage = function(msg){
     worker.refresh(msg.data);
   }else if (msg.data.isDebug){
     worker.debug();
+  }else if (msg.data.startRecording){
+    worker.startRecording();
+  }else if (msg.data.dumpPerformanceLogs){
+    worker.dumpPerformanceLogs();
   }else{
     for (var i = 0; i<msg.data.length; i++){
       var ary = new Float32Array(msg.data[i]);

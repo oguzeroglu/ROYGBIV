@@ -366,7 +366,7 @@ var autoInstancingHandler;
 var autoInstancedObjects = new Object();
 
 // WORKER VARIABLES
-var WORKERS_SUPPORTED = (typeof(Worker) !== "undefined") && (typeof(MessageChannel) !== "undefined");
+var WORKERS_SUPPORTED = false; //(typeof(Worker) !== "undefined") && (typeof(MessageChannel) !== "undefined");
 
 // TEXT POOL
 var Text = (!isDeployment)? new Text(): 0;
