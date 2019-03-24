@@ -18,7 +18,15 @@ var PhysicsWorkerBridge = function(){
   this.hideBufferAvailibility = "hideBufferAvailibility";
   this.setMassBufferAvailibility = "setMassBufferAvailibility"
   this.worker.addEventListener("message", function(msg){
-    if (msg.data.isDebug){
+    if (msg.data.isPerformanceLog){
+      console.log("%c                    PHYSICS WORKER                    ", "background: black; color: lime");
+      console.log("%cStep time: "+msg.data.stepTime+" ms", "background: black; color: magenta");
+      console.log("%cDynamic objects update time: "+msg.data.dynamicObjectsUpdate+" ms", "background: black; color: magenta");
+      console.log("%cWorker message handler flush time: "+msg.data.workerMessageHandler_flushTimeLastFrame+" ms", "background: black; color: magenta");
+      console.log("%cPreallocated array cache size: "+msg.data.workerMessageHandler_preallocatedArrayCacheSize, "background: black; color: magenta");
+      console.log("%cTotal arrays sent last frame: "+msg.data.workerMessageHandler_totalArraysSentLastFrame, "background: black; color: magenta");
+      console.log("%cTotal bytes sent last frame: "+msg.data.workerMessageHandler_totalBytesSentLastFrame, "background: black; color: magenta");
+    }if (msg.data.isDebug){
       console.log("[*] Debug response received.");
       for (var i = 0; i<msg.data.bodies.length; i++){
         var obj = addedObjects[msg.data.bodies[i].name] || objectGroups[msg.data.bodies[i].name];

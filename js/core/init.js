@@ -655,6 +655,12 @@ function startPerformanceAnalysis(){
   cpuOperationsHandler.startRecording();
   webglCallbackHandler.startRecording();
   threejsRenderMonitoringHandler.startRecording();
+  if (WORKERS_SUPPORTED){
+    physicsWorld.workerMessageHandler.startRecording();
+    rayCaster.workerMessageHandler.startRecording();
+    physicsWorld.worker.postMessage({startRecording: true});
+    rayCaster.worker.postMessage({startRecording: true});
+  }
 }
 
 function dumpPerformance(){
@@ -668,6 +674,14 @@ function dumpPerformance(){
   webglCallbackHandler.dumpPerformanceLogs();
   console.log("%c                    THREEJS RENDER                    ", "background: black; color: lime");
   threejsRenderMonitoringHandler.dumpPerformanceLogs();
+  if (WORKERS_SUPPORTED){
+    physicsWorld.worker.postMessage({dumpPerformanceLogs: true});
+    rayCaster.worker.postMessage({dumpPerformanceLogs: true});
+    console.log("%c                  PHYSICS WORKER BRIDGE             ", "background: black; color: lime");
+    physicsWorld.workerMessageHandler.dumpPerformanceLogs();
+    console.log("%c                  RAYCASTER WORKER BRIDGE           ", "background: black; color: lime");
+    rayCaster.workerMessageHandler.dumpPerformanceLogs();
+  }
 }
 
 //******************************************************************

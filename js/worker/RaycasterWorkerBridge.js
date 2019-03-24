@@ -8,7 +8,13 @@ var RaycasterWorkerBridge = function(){
   this.intersectionTestBufferSize = 10;
   this.ready = false;
   this.worker.addEventListener("message", function(msg){
-    if (msg.data.type){
+    if (msg.data.isPerformanceLog){
+      console.log("%c                    RAYCASTER WORKER                  ", "background: black; color: lime");
+      console.log("%cWorker message handler flush time: "+msg.data.flushTimeLastFrame+" ms", "background: black; color: magenta");
+      console.log("%cPreallocated array cache size: "+msg.data.preallocatedArrayCacheSize, "background: black; color: magenta");
+      console.log("%cTotal arrays sent last frame: "+msg.data.totalArraysSentLastFrame, "background: black; color: magenta");
+      console.log("%cTotal bytes sent last frame: "+msg.data.totalBytesSentLastFrame, "background: black; color: magenta");
+    }else if (msg.data.type){
       rayCaster.objectsByWorkerID = new Object();
       rayCaster.idsByObjectNames = new Object();
       for (var i = 0; i<msg.data.ids.length; i++){
