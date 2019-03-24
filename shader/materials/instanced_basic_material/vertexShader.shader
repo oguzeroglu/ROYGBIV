@@ -149,7 +149,7 @@ void main(){
     #ifdef IS_AUTO_INSTANCED
       vWorldPosition = transformedPosition;
     #else
-      vWorldPosition = (worldMatrix * vec4(position, 1.0)).xyz;
+      vWorldPosition = (worldMatrix * vec4(transformedPosition, 1.0)).xyz;
     #endif
   #endif
 }
