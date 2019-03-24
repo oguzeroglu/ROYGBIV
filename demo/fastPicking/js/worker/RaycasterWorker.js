@@ -135,6 +135,14 @@ RaycasterWorker.prototype.onAddedTextRescale = function(data){
 }
 RaycasterWorker.prototype.onRaycasterCompleted = function(){
 }
+RaycasterWorker.prototype.startRecording = function(){
+  this.workerMessageHandler.startRecording();
+}
+RaycasterWorker.prototype.dumpPerformanceLogs = function(){
+  this.workerMessageHandler.performanceLogs.isPerformanceLog = true;
+  this.workerMessageHandler.performanceLogs.preallocatedArrayCacheSize = this.workerMessageHandler.preallocatedArrayCache.size;
+  postMessage(this.workerMessageHandler.performanceLogs);
+}
 
 // START
 var keyboardBuffer = new Object();
@@ -160,7 +168,11 @@ var addedTexts = new Object();
 var worker = new RaycasterWorker();
 
 self.onmessage = function(msg){
-  if (msg.data.isLightweightState){
+  if (msg.data.startRecording){
+    worker.startRecording();
+  }else if (msg.data.dumpPerformanceLogs){
+    worker.dumpPerformanceLogs();
+  }if (msg.data.isLightweightState){
     worker.refresh(msg.data);
   }else if (msg.data.shiftPress){
     if (msg.data.shiftPress.isPressed){

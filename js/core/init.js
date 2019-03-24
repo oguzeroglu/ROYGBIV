@@ -1,9 +1,5 @@
 window.onload = function() {
-  // STATS
   fpsHandler = new FPSHandler();
-  stats = new Stats();
-  stats.showPanel(0);
-  document.body.appendChild(stats.dom);
   // DRAGABLE CLI
   var cliDiv = document.getElementById("cliDiv");
   cliDivheader = document.getElementById("cliDivheader");

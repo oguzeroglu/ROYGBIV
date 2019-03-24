@@ -50,10 +50,6 @@ var resizeEventHandler;
 var orientationChangeEventHandler;
 var keyboardEventHandler;
 
-// STATS.JS
-var stats;
-var fpsHandler;
-
 // THREE.JS VARIABLES
 var renderer;
 var scene;
@@ -364,6 +360,7 @@ var physicsBodyGenerator;
 var alterThreeJSRenderFunction = true;
 var autoInstancingHandler;
 var autoInstancedObjects = new Object();
+var fpsHandler;
 
 // WORKER VARIABLES
 var WORKERS_SUPPORTED = (typeof(Worker) !== "undefined") && (typeof(MessageChannel) !== "undefined");

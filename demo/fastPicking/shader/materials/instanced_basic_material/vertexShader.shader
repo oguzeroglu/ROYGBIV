@@ -4,8 +4,6 @@ precision lowp int;
 attribute float alpha;
 attribute vec3 color;
 attribute vec3 position;
-attribute vec3 positionOffset;
-attribute vec4 quaternion;
 
 uniform mat4 modelViewMatrix;
 uniform mat4 projectionMatrix;
@@ -14,6 +12,15 @@ varying vec3 vColor;
 varying float vAlpha;
 
 #define INSERTION
+
+#ifdef IS_AUTO_INSTANCED
+  attribute float orientationIndex;
+  uniform vec4 autoInstanceOrientationArray[AUTO_INSTANCE_ORIENTATION_ARRAY_SIZE];
+  varying float vDiscardFlag;
+#else
+  attribute vec3 positionOffset;
+  attribute vec4 quaternion;
+#endif
 
 #ifdef HAS_EMISSIVE
   attribute float emissiveIntensity;
@@ -73,6 +80,15 @@ vec3 applyQuaternionToVector(vec3 vector, vec4 quaternion){
 
 void main(){
 
+  #ifdef IS_AUTO_INSTANCED
+    int oi = int(orientationIndex);
+    if (autoInstanceOrientationArray[oi].x < 0.0){
+      vDiscardFlag = 50.0;
+      return;
+    }
+    vDiscardFlag = -50.0;
+  #endif
+
   vAlpha = alpha;
   vColor = color;
   #ifdef HAS_TEXTURE
@@ -115,9 +131,6 @@ void main(){
   #ifdef HAS_AO
     vAOIntensity = aoIntensity;
   #endif
-  #ifdef HAS_SKYBOX_FOG
-    vWorldPosition = (worldMatrix * vec4(position, 1.0)).xyz;
-  #endif
 
   vec3 transformedPosition = position;
   #ifdef HAS_DISPLACEMENT
@@ -126,6 +139,17 @@ void main(){
       transformedPosition += objNormal * (texture2D(displacementMap, vUV).r * displacementInfo.x + displacementInfo.y);
     }
   #endif
+  #ifdef IS_AUTO_INSTANCED
+    vec3 positionOffset = autoInstanceOrientationArray[oi].yzw;
+    vec4 quaternion = autoInstanceOrientationArray[oi+1];
+  #endif
   transformedPosition = applyQuaternionToVector(transformedPosition, quaternion) + positionOffset;
   gl_Position = projectionMatrix * modelViewMatrix * vec4(transformedPosition, 1.0);
+  #ifdef HAS_SKYBOX_FOG
+    #ifdef IS_AUTO_INSTANCED
+      vWorldPosition = transformedPosition;
+    #else
+      vWorldPosition = (worldMatrix * vec4(transformedPosition, 1.0)).xyz;
+    #endif
+  #endif
 }

@@ -10,6 +10,10 @@ uniform float totalAlpha;
 
 #define INSERTION
 
+#ifdef IS_AUTO_INSTANCED
+  varying float vDiscardFlag;
+#endif
+
 #ifdef HAS_TEXTURE
   varying vec2 vUV;
   #ifdef HAS_DIFFUSE
@@ -56,6 +60,13 @@ uniform float totalAlpha;
 #endif
 
 void main(){
+
+  #ifdef IS_AUTO_INSTANCED
+    if (vDiscardFlag > 0.0){
+      discard;
+      return;
+    }
+  #endif
 
   #ifdef HAS_FORCED_COLOR
     if (forcedColor.x >= -10.0){

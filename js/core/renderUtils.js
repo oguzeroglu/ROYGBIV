@@ -2,7 +2,7 @@ function render(){
   if (webglCallbackHandler.shaderCompilationError){
     return;
   }
-  stats.begin();
+  fpsHandler.begin();
   if (!(mode == 1 && isPaused)){
     requestID = requestAnimationFrame(render);
   }
@@ -44,7 +44,7 @@ function render(){
     previewSceneRendered = true;
   }
   cpuOperationsHandler.updateRaycaster();
-  stats.end();
+  fpsHandler.end();
 }
 
 
