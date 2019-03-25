@@ -69,13 +69,49 @@ PhysicsWorkerBridge.prototype.issueUpdate = function(obj){
   }
 }
 
+PhysicsWorkerBridge.prototype.handleCollisions = function(collisionDescription){
+  if (collisionDescription){
+    for (var i = 0; i<collisionDescription.length; i+= 10){
+      if (collisionDescription[i] < 0){
+        break;
+      }
+      var sourceObject = physicsWorld.objectsByID[collisionDescription[i]];
+      var targetObject = physicsWorld.objectsByID[collisionDescription[i+1]];
+      var positionX = collisionDescription[i+2];
+      var positionY = collisionDescription[i+3];
+      var positionZ = collisionDescription[i+4];
+      var collisionImpact = collisionDescription[i+5];
+      var quaternionX = collisionDescription[i+6];
+      var quaternionY = collisionDescription[i+7];
+      var quaternionZ = collisionDescription[i+8];
+      var quaternionW = collisionDescription[i+9];
+      reusableCollisionInfo.set(targetObject.name, positionX, positionY, positionZ, collisionImpact, quaternionX, quaternionY, quaternionZ, quaternionW);
+      var curCollisionCallbackRequest = collisionCallbackRequests.get(sourceObject.name);
+      if (curCollisionCallbackRequest){
+        curCollisionCallbackRequest(reusableCollisionInfo);
+      }
+      collisionDescription[i] = -1;
+    }
+  }
+  return collisionDescription;
+}
+
 PhysicsWorkerBridge.prototype.updateObjects = function(data){
   if (mode != 1){
     return;
   }
   var ary = data.objDescription;
+  var collisionDescription = this.handleCollisions(data.collisionDescription);
   this.transferableMessageBody.objDescription = ary;
   this.transferableList[0] = ary.buffer;
+  if (collisionDescription){
+    this.transferableMessageBody.collisionDescription = collisionDescription;
+    if (this.transferableList.length == 1){
+      this.transferableList.push(collisionDescription.buffer);
+    }else{
+      this.transferableList[1] = collisionDescription.buffer;
+    }
+  }
   this.hasOwnership = true;
   this.updateBuffer.forEach(this.issueUpdate);
   this.updateBuffer.clear();
@@ -146,12 +182,17 @@ PhysicsWorkerBridge.prototype.refresh = function(){
 }
 
 PhysicsWorkerBridge.prototype.removeCollisionListener = function(obj){
-
+  this.worker.postMessage({
+    isRemoveCollisionListener: true, objName: obj.name
+  });
 }
 
 PhysicsWorkerBridge.prototype.setCollisionListener = function(obj){
-
+  this.worker.postMessage({
+    isSetCollisionListener: true, objName: obj.name
+  });
 }
+
 
 PhysicsWorkerBridge.prototype.fireCollision = function(ary){
 
