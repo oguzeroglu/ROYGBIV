@@ -9,6 +9,7 @@ var IS_WORKER_CONTEXT = true;
 
 // CLASS DEFINITION
 var PhysicsWorker = function(){
+  this.record = false;
   this.idsByObjectName = new Object();
   this.objectsByID = new Object();
   this.reusableVec1 = new CANNON.Vec3();
@@ -17,6 +18,7 @@ var PhysicsWorker = function(){
   this.removeCollisionListenerBuffer = new Map();
   this.objectsWithCollisions = new Map();
   this.collisionsBuffer = new Map();
+  this.performanceLogs = {isPerformanceLog: true, stepTime: 0}
 }
 PhysicsWorker.prototype.refresh = function(state){
   delete this.transferableMessageBody;
@@ -139,6 +141,10 @@ PhysicsWorker.prototype.handleCollisions = function(collisionDescription){
   return collisionDescription;
 }
 PhysicsWorker.prototype.step = function(data){
+  var startTime
+  if (this.record){
+    startTime = performance.now();
+  }
   var collisionDescriptionArray = this.handleCollisions(data.collisionDescription);
   this.setCollisionListenerBuffer.clear(); this.removeCollisionListenerBuffer.clear(); this.collisionsBuffer.clear();
   if (collisionDescriptionArray){
@@ -196,13 +202,16 @@ PhysicsWorker.prototype.step = function(data){
     }
   }
   postMessage(worker.transferableMessageBody, worker.transferableList);
+  if (this.record){
+    this.performanceLogs.stepTime = performance.now() - startTime;
+  }
 }
 
 PhysicsWorker.prototype.startRecording = function(){
-
+  this.record = true;
 }
 PhysicsWorker.prototype.dumpPerformanceLogs = function(){
-
+  postMessage(this.performanceLogs);
 }
 PhysicsWorker.prototype.setCollisionListener = function(objName){
   if (this.removeCollisionListenerBuffer.has(objName)){
@@ -241,9 +250,9 @@ self.onmessage = function(msg){
   }else if (msg.data.isDebug){
     worker.debug();
   }else if (msg.data.startRecording){
-
+    worker.startRecording();
   }else if (msg.data.dumpPerformanceLogs){
-
+    worker.dumpPerformanceLogs();
   }else{
     worker.hasOwnership = true;
     worker.step(msg.data);

@@ -1,14 +1,19 @@
 var PhysicsWorkerBridge = function(){
+  this.record = false;
   this.isPhysicsWorkerBridge = true;
   this.worker = new Worker("./js/worker/PhysicsWorker.js");
   this.ready = false;
   this.idsByObjectName = new Object();
   this.objectsByID = new Object();
   this.updateBuffer = new Map();
+  this.performanceLogs = {
+    objectDescriptionBufferSize: 0, collisionDescriptionBufferSize: 0
+  }
   this.worker.addEventListener("message", function(msg){
     if (msg.data.isPerformanceLog){
-
-    }if (msg.data.isDebug){
+      console.log("%c                    PHYSICS WORKER                    ", "background: black; color: lime");
+      console.log("%cStep time: "+msg.data.stepTime+" ms", "background: black; color: magenta");
+    }else if (msg.data.isDebug){
       console.log("[*] Debug response received.");
       for (var i = 0; i<msg.data.bodies.length; i++){
         var obj = addedObjects[msg.data.bodies[i].name] || objectGroups[msg.data.bodies[i].name];
@@ -35,6 +40,15 @@ var PhysicsWorkerBridge = function(){
       physicsWorld.updateObjects(msg.data);
     }
   });
+}
+
+PhysicsWorkerBridge.prototype.startRecording = function(){
+  this.record = true;
+}
+
+PhysicsWorkerBridge.prototype.dumpPerformanceLogs = function(){
+  console.log("%cObject description buffer length: "+this.performanceLogs.objectDescriptionBufferSize, "background: black; color: magenta");
+  console.log("%cCollision description buffer length: "+this.performanceLogs.collisionDescriptionBufferSize, "background: black; color: magenta");
 }
 
 PhysicsWorkerBridge.prototype.issueUpdate = function(obj){
@@ -193,11 +207,6 @@ PhysicsWorkerBridge.prototype.setCollisionListener = function(obj){
   });
 }
 
-
-PhysicsWorkerBridge.prototype.fireCollision = function(ary){
-
-}
-
 PhysicsWorkerBridge.prototype.init = function(){
 
 }
@@ -221,6 +230,12 @@ PhysicsWorkerBridge.prototype.addBody = function(body){
 PhysicsWorkerBridge.prototype.step = function(stepAmount){
   if (!this.ready || !this.hasOwnership){
     return;
+  }
+  if (this.record){
+    this.performanceLogs.objectDescriptionBufferSize = this.transferableMessageBody.objDescription.length;
+    if (this.transferableMessageBody.collisionDescription){
+      this.performanceLogs.collisionDescriptionBufferSize = this.transferableMessageBody.collisionDescription.length;
+    }
   }
   this.worker.postMessage(this.transferableMessageBody, this.transferableList);
   this.hasOwnership = false;
