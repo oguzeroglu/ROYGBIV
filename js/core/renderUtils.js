@@ -60,9 +60,6 @@ function updateRaycaster(){
   if (!rayCaster.ready){
     return;
   }
-  rayCaster.onBeforeUpdate();
-  rayCaster.updateBuffer.forEach(rayCaster.issueUpdate);
-  rayCaster.updateBuffer.clear();
   rayCaster.flush();
 }
 

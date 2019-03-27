@@ -6,7 +6,6 @@ importScripts("../engine_objects/GridSystem.js");
 importScripts("../engine_objects/AddedObject.js");
 importScripts("../engine_objects/ObjectGroup.js");
 importScripts("../engine_objects/AddedText.js");
-importScripts("../worker/WorkerMessageHandler.js");
 
 var IS_WORKER_CONTEXT = true;
 
@@ -18,9 +17,10 @@ var RaycasterWorker = function(){
   this.reusableMatrix = new THREE.Matrix4();
   this.reusableArray16 = new Array();
   this.rayCaster = new RayCaster();
-  this.workerMessageHandler = new WorkerMessageHandler();
 }
 RaycasterWorker.prototype.refresh = function(state){
+  this.transferableMessageBody = {};
+  this.transferableList = [];
   var stateLoader = new StateLoaderLightweight(state);
   mode = state.mode;
   stateLoader.reset();
@@ -59,101 +59,90 @@ RaycasterWorker.prototype.refresh = function(state){
   this.rayCaster.refresh();
   postMessage({type: "idResponse", ids: idResponse});
 }
-RaycasterWorker.prototype.findIntersections = function(data){
-  var bufferId = data[0];
-  this.reusableVector1.set(data[1], data[2], data[3]);
-  this.reusableVector2.set(data[4], data[5], data[6]);
-  var intersectGridSystems = (data[7] == 1)? true: false;
-  this.rayCaster.findIntersections(this.reusableVector1, this.reusableVector2, intersectGridSystems, this.onRaycasterCompleted);
-  if (intersectionObject){
-    data[1] = this.workerIDsByObjectName[intersectionObject];
-    data[2] = intersectionPoint.x; data[3] = intersectionPoint.y; data[4] = intersectionPoint.z;
-  }else{
-    data[1] = -1;
-  }
-  this.workerMessageHandler.push(data.buffer);
-}
-RaycasterWorker.prototype.updateAddedObject = function(data){
-  var objID = data[1];
-  var obj = this.objectsByWorkerID[objID];
-  for (var i = 2; i<18; i++){
-    this.reusableArray16[i - 2] = data[i];
-  }
-  obj.mesh.matrixWorld.fromArray(this.reusableArray16);
-  obj.mesh.matrixWorld.decompose(this.reusableVector1, this.reusableQuaternion, this.reusableVector2);
-  obj.mesh.position.copy(this.reusableVector1);
-  obj.mesh.quaternion.copy(this.reusableQuaternion);
-  obj.updateBoundingBoxes();
-  this.rayCaster.updateObject(obj, true);
-}
-RaycasterWorker.prototype.updateObjectGroup = function(data){
-  var objID = data[1];
-  var obj = this.objectsByWorkerID[objID];
-  for (var i = 2; i<18; i++){
-    this.reusableArray16[i - 2] = data[i];
-  }
-  obj.mesh.matrixWorld.fromArray(this.reusableArray16);
-  obj.mesh.matrixWorld.decompose(this.reusableVector1, this.reusableQuaternion, this.reusableVector2);
-  obj.mesh.position.copy(this.reusableVector1);
-  obj.mesh.quaternion.copy(this.reusableQuaternion);
-  obj.updateBoundingBoxes();
-  this.rayCaster.updateObject(obj, true);
-}
-RaycasterWorker.prototype.updateAddedText = function(data){
-  var text;
-  if (data.isAddedText){
-    text = data;
-  }else{
-    text = this.objectsByWorkerID[data[1]];
-    text.mesh.position.set(data[2], data[3], data[4]);
-  }
-  text.mesh.updateMatrixWorld();
-  REUSABLE_MATRIX_4.copy(text.mesh.matrixWorld);
-  REUSABLE_MATRIX_4.premultiply(camera.matrixWorldInverse);
-  text.mesh.modelViewMatrix.copy(REUSABLE_MATRIX_4);
-  text.handleBoundingBox();
-  this.rayCaster.updateObject(text, true);
-}
-RaycasterWorker.prototype.updateCameraOrientation = function(data){
-  camera.position.set(data[1], data[2], data[3]);
-  camera.quaternion.set(data[4], data[5], data[6], data[7]);
-  camera.aspect = data[8];
-  camera.updateMatrixWorld();
-  for (var textName in addedTexts){
-    this.updateAddedText(addedTexts[textName]);
-  }
-}
-RaycasterWorker.prototype.hide = function(data){
-  var object = this.objectsByWorkerID[data[1]];
-  this.rayCaster.binHandler.hide(object);
-}
-RaycasterWorker.prototype.show = function(data){
-  var object = this.objectsByWorkerID[data[1]];
-  this.rayCaster.binHandler.show(object);
-}
-RaycasterWorker.prototype.onAddedTextRescale = function(data){
-  var text = this.objectsByWorkerID[data[1]];
-  if (!text){
-    return;
-  }
-  text.characterSize = data[2];
-  text.bottomRight.set(data[3], data[4], data[5]);
-  text.topRight.set(data[6], data[7], data[8]);
-  text.bottomLeft.set(data[9], data[10], data[11]);
-  this.updateAddedText(text);
-}
-RaycasterWorker.prototype.onRaycasterCompleted = function(){
-}
 RaycasterWorker.prototype.startRecording = function(){
-  this.workerMessageHandler.startRecording();
+
 }
 RaycasterWorker.prototype.dumpPerformanceLogs = function(){
-  this.workerMessageHandler.performanceLogs.isPerformanceLog = true;
-  this.workerMessageHandler.performanceLogs.preallocatedArrayCacheSize = this.workerMessageHandler.preallocatedArrayCache.size;
-  postMessage(this.workerMessageHandler.performanceLogs);
+
+}
+RaycasterWorker.prototype.update = function(transferableMessageBody){
+  var cameraOrientationDescription = transferableMessageBody.cameraOrientationDescription;
+  camera.position.set(cameraOrientationDescription[0], cameraOrientationDescription[1], cameraOrientationDescription[2]);
+  camera.quaternion.set(cameraOrientationDescription[3], cameraOrientationDescription[4], cameraOrientationDescription[5], cameraOrientationDescription[6]);
+  camera.aspect = cameraOrientationDescription[7];
+  camera.updateMatrixWorld();
+  if (transferableMessageBody.flagsDescription[0] > 0){
+    var intersectableObjDescription = transferableMessageBody.intersectableObjDescription;
+    for (var i = 0; i<intersectableObjDescription.length; i+=18){
+      var obj = this.objectsByWorkerID[intersectableObjDescription[i]];
+      if (obj.isAddedObject || obj.isObjectGroup){
+        for (var i2 = i+2; i2 < (i+18); i2++){
+          this.reusableArray16[i2-i-2] = intersectableObjDescription[i2];
+        }
+        obj.mesh.matrixWorld.fromArray(this.reusableArray16);
+        obj.mesh.matrixWorld.decompose(this.reusableVector1, this.reusableQuaternion, this.reusableVector2);
+        obj.mesh.position.copy(this.reusableVector1);
+        obj.mesh.quaternion.copy(this.reusableQuaternion);
+        obj.updateBoundingBoxes();
+        this.rayCaster.updateObject(obj, true);
+        if (!obj.isHidden && intersectableObjDescription[i+1] < 0){
+          this.rayCaster.binHandler.hide(obj);
+          obj.isHidden = true;
+        }else if (obj.isHidden && intersectableObjDescription[i+1] > 0){
+          this.rayCaster.binHandler.show(obj);
+          obj.isHidden = false;
+        }
+      }else if (obj.isAddedText){
+        for (var i2 = i+2; i2 < (i+18); i2++){
+          this.reusableArray16[i2-i-2] = intersectableObjDescription[i2];
+        }
+        obj.mesh.matrixWorld.fromArray(this.reusableArray16);
+        obj.mesh.matrixWorld.decompose(this.reusableVector1, this.reusableQuaternion, this.reusableVector2);
+        obj.mesh.position.copy(this.reusableVector1);
+        obj.mesh.quaternion.copy(this.reusableQuaternion);
+        REUSABLE_MATRIX_4.copy(obj.mesh.matrixWorld);
+        REUSABLE_MATRIX_4.premultiply(camera.matrixWorldInverse);
+        obj.mesh.modelViewMatrix.copy(REUSABLE_MATRIX_4);
+        obj.handleBoundingBox();
+        this.rayCaster.updateObject(obj, true);
+      }else{
+        throw new Error("Not implemented.");
+      }
+    }
+  }
+  if (transferableMessageBody.flagsDescription[2] > 0){
+    var addedTextScaleDescription = transferableMessageBody.addedTextScaleDescription;
+    for (var i = 0; i<addedTextScaleDescription.length; i+= 11){
+      var text = this.objectsByWorkerID[addedTextScaleDescription[i]];
+      text.characterSize = addedTextScaleDescription[i+1];
+      text.bottomRight.set(addedTextScaleDescription[i+2], addedTextScaleDescription[i+3], addedTextScaleDescription[i+4]);
+      text.topRight.set(addedTextScaleDescription[i+5], addedTextScaleDescription[i+6], addedTextScaleDescription[i+7]);
+      text.bottomLeft.set(addedTextScaleDescription[i+8], addedTextScaleDescription[i+9], addedTextScaleDescription[i+10]);
+      text.mesh.updateMatrixWorld();
+      REUSABLE_MATRIX_4.copy(text.mesh.matrixWorld);
+      REUSABLE_MATRIX_4.premultiply(camera.matrixWorldInverse);
+      text.mesh.modelViewMatrix.copy(REUSABLE_MATRIX_4);
+      text.handleBoundingBox();
+      this.rayCaster.updateObject(text, true);
+    }
+  }
+  if (transferableMessageBody.flagsDescription[1] > 0){
+    var intersectionTestDescription = transferableMessageBody.intersectionTestDescription;
+    this.reusableVector1.set(intersectionTestDescription[0], intersectionTestDescription[1], intersectionTestDescription[2]);
+    this.reusableVector2.set(intersectionTestDescription[3], intersectionTestDescription[4], intersectionTestDescription[5]);
+    var intersectGridSystems = (intersectionTestDescription[6] > 0);
+    this.rayCaster.findIntersections(this.reusableVector1, this.reusableVector2, intersectGridSystems, noop);
+    if (intersectionObject){
+      intersectionTestDescription[0] = this.workerIDsByObjectName[intersectionObject];
+      intersectionTestDescription[1] = intersectionPoint.x; intersectionTestDescription[2] = intersectionPoint.y; intersectionTestDescription[3] = intersectionPoint.z;
+    }else{
+      intersectionTestDescription[0] = -1;
+    }
+  }
 }
 
 // START
+var noop = function(){}
 var keyboardBuffer = new Object();
 var renderer = new Object();
 var screenResolution = 1;
@@ -178,9 +167,9 @@ var worker = new RaycasterWorker();
 
 self.onmessage = function(msg){
   if (msg.data.startRecording){
-    worker.startRecording();
+
   }else if (msg.data.dumpPerformanceLogs){
-    worker.dumpPerformanceLogs();
+
   }if (msg.data.isLightweightState){
     worker.refresh(msg.data);
   }else if (msg.data.shiftPress){
@@ -190,29 +179,13 @@ self.onmessage = function(msg){
       keyboardBuffer["Shift"] = false;
     }
   }else{
-    for (var i = 0; i<msg.data.length; i++){
-      var ary = new Float32Array(msg.data[i]);
-      if (ary.length == 8){
-        worker.findIntersections(ary);
-      }else{
-        if (ary[0] == 0){
-          worker.updateAddedObject(ary);
-        }else if (ary[0] == 1){
-          worker.updateObjectGroup(ary);
-        }else if (ary[0] == 2){
-          worker.updateCameraOrientation(ary);
-        }else if (ary[0] == 3){
-          worker.onAddedTextRescale(ary);
-        }else if (ary[0] == 4){
-          worker.updateAddedText(ary);
-        }else if (ary[0] == 5){
-          worker.hide(ary);
-        }else if (ary[0] == 6){
-          worker.show(ary);
-        }
-        worker.workerMessageHandler.push(ary.buffer);
-      }
-    }
-    worker.workerMessageHandler.flush();
+    worker.update(msg.data);
+    worker.transferableMessageBody = msg.data;
+    worker.transferableList[0] = worker.transferableMessageBody.intersectableObjDescription.buffer;
+    worker.transferableList[1] = worker.transferableMessageBody.intersectionTestDescription.buffer;
+    worker.transferableList[2] = worker.transferableMessageBody.flagsDescription.buffer;
+    worker.transferableList[3] = worker.transferableMessageBody.cameraOrientationDescription.buffer;
+    worker.transferableList[4] = worker.transferableMessageBody.addedTextScaleDescription.buffer;
+    postMessage(worker.transferableMessageBody);
   }
 }

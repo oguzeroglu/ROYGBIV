@@ -575,6 +575,7 @@ AddedText.prototype.debugTriangles = function(triangleIndex){
 
 AddedText.prototype.hide = function(){
   this.mesh.visible = false;
+  this.isHidden = true;
   if (mode == 0 && this.bbHelper){
     scene.remove(this.bbHelper);
   }
@@ -588,6 +589,7 @@ AddedText.prototype.hide = function(){
 
 AddedText.prototype.show = function(){
   this.mesh.visible = true;
+  this.isHidden = false;
   if (mode == 1 && this.isClickable){
     if (!this.boundingBox){
       this.handleBoundingBox();
