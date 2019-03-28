@@ -1,17 +1,24 @@
 var RaycasterWorkerBridge = function(){
+  this.record = false;
   this.isRaycasterWorkerBridge = true;
   this.worker = new Worker("./js/worker/RaycasterWorker.js");
   this.ready = false;
   this.updateBuffer = new Map();
   this.addedTextScaleUpdateBuffer = new Map();
   this.hasOwnership = false;
+  this.performanceLogs = {
+    intersectableObjDescriptionLen: 0, intersectionTestDescriptionLen: 0,
+    flagsDescriptionLen: 0, cameraOrientationDescriptionLen: 0, addedTextScaleDescriptionLen: 0,
+    flushTime: 0
+  };
   this.intersectionTestBuffer = {
     isActive: false, fromVector: new THREE.Vector3(), directionVector: new THREE.Vector3(),
     intersectGridSystems: false, callbackFunction: noop
-  }
+  };
   this.worker.addEventListener("message", function(msg){
     if (msg.data.isPerformanceLog){
-
+      console.log("%c                    RAYCASTER WORKER                  ", "background: black; color: lime");
+      console.log("%cUpdate time: "+msg.data.updateTime+" ms", "background: black; color: magenta");
     }else if (msg.data.type){
       rayCaster.objectsByWorkerID = new Object();
       rayCaster.idsByObjectNames = new Object();
@@ -149,6 +156,17 @@ var RaycasterWorkerBridge = function(){
     addedTextScaleDescription[i+5] = text.topRight.x; addedTextScaleDescription[i+6] = text.topRight.y; addedTextScaleDescription[i+7] = text.topRight.z;
     addedTextScaleDescription[i+8] = text.bottomLeft.x; addedTextScaleDescription[i+9] = text.bottomLeft.y; addedTextScaleDescription[i+10] = text.bottomLeft.z;
   }
+  this.startRecording = function(){
+    rayCaster.record = true;
+  }
+  this.dumpPerformanceLogs = function(){
+    console.log("%cFlush time: "+this.performanceLogs.flushTime+" ms.", "background: black; color: magenta");
+    console.log("%cObject description array length: "+this.performanceLogs.intersectableObjDescriptionLen, "background: black; color: magenta");
+    console.log("%cAdded text scale description length: "+this.performanceLogs.addedTextScaleDescriptionLen, "background: black; color: magenta");
+    console.log("%cIntersection test description length: "+this.performanceLogs.intersectionTestDescriptionLen, "background: black; color: magenta");
+    console.log("%cFlags description length: "+this.performanceLogs.flagsDescriptionLen, "background: black; color: magenta");
+    console.log("%cCamera orientation description length: "+this.performanceLogs.cameraOrientationDescriptionLen, "background: black; color: magenta");
+  }
 }
 
 RaycasterWorkerBridge.prototype.onReady = function(){
@@ -161,6 +179,15 @@ RaycasterWorkerBridge.prototype.onReady = function(){
 RaycasterWorkerBridge.prototype.flush = function(){
   if (!this.hasOwnership){
     return;
+  }
+  var flushStartTime;
+  if (this.record){
+    flushStartTime = performance.now();
+    this.performanceLogs.intersectableObjDescriptionLen = this.transferableMessageBody.intersectableObjDescription.length;
+    this.performanceLogs.intersectionTestDescriptionLen = this.transferableMessageBody.intersectionTestDescription.length;
+    this.performanceLogs.flagsDescriptionLen = this.transferableMessageBody.flagsDescription.length;
+    this.performanceLogs.cameraOrientationDescriptionLen = this.transferableMessageBody.cameraOrientationDescription.length;
+    this.performanceLogs.addedTextScaleDescriptionLen = this.transferableMessageBody.addedTextScaleDescription.length;
   }
   var sendMessage = false;
   if (this.updateBuffer.size > 0){
@@ -197,6 +224,9 @@ RaycasterWorkerBridge.prototype.flush = function(){
     cameraOrientationDescription[7] = camera.aspect;
     this.worker.postMessage(this.transferableMessageBody, this.transferableList);
     this.hasOwnership = false;
+  }
+  if (this.record){
+    this.performanceLogs.flushTime = performance.now() - flushStartTime;
   }
 }
 

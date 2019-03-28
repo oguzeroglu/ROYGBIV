@@ -11,6 +11,8 @@ var IS_WORKER_CONTEXT = true;
 
 // CLASS DEFINITION
 var RaycasterWorker = function(){
+  this.record = false;
+  this.performanceLogs = {isPerformanceLog: true, updateTime: 0}
   this.reusableVector1 = new THREE.Vector3();
   this.reusableVector2 = new THREE.Vector3();
   this.reusableQuaternion = new THREE.Quaternion();
@@ -60,12 +62,16 @@ RaycasterWorker.prototype.refresh = function(state){
   postMessage({type: "idResponse", ids: idResponse});
 }
 RaycasterWorker.prototype.startRecording = function(){
-
+  this.record = true;
 }
 RaycasterWorker.prototype.dumpPerformanceLogs = function(){
-
+  postMessage(this.performanceLogs);
 }
 RaycasterWorker.prototype.update = function(transferableMessageBody){
+  var updateStartTime;
+  if (this.record){
+    updateStartTime = performance.now();
+  }
   var cameraOrientationDescription = transferableMessageBody.cameraOrientationDescription;
   camera.position.set(cameraOrientationDescription[0], cameraOrientationDescription[1], cameraOrientationDescription[2]);
   camera.quaternion.set(cameraOrientationDescription[3], cameraOrientationDescription[4], cameraOrientationDescription[5], cameraOrientationDescription[6]);
@@ -139,6 +145,9 @@ RaycasterWorker.prototype.update = function(transferableMessageBody){
       intersectionTestDescription[0] = -1;
     }
   }
+  if (this.record){
+    this.performanceLogs.updateTime = performance.now() - updateStartTime;
+  }
 }
 
 // START
@@ -167,10 +176,10 @@ var worker = new RaycasterWorker();
 
 self.onmessage = function(msg){
   if (msg.data.startRecording){
-
+    worker.startRecording();
   }else if (msg.data.dumpPerformanceLogs){
-
-  }if (msg.data.isLightweightState){
+    worker.dumpPerformanceLogs();
+  }else if (msg.data.isLightweightState){
     worker.refresh(msg.data);
   }else if (msg.data.shiftPress){
     if (msg.data.shiftPress.isPressed){

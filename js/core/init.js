@@ -653,7 +653,7 @@ function startPerformanceAnalysis(){
   threejsRenderMonitoringHandler.startRecording();
   if (WORKERS_SUPPORTED){
     physicsWorld.startRecording();
-    rayCaster.workerMessageHandler.startRecording();
+    rayCaster.startRecording();
     physicsWorld.worker.postMessage({startRecording: true});
     rayCaster.worker.postMessage({startRecording: true});
   }
@@ -676,7 +676,7 @@ function dumpPerformance(){
     console.log("%c                  PHYSICS WORKER BRIDGE             ", "background: black; color: lime");
     physicsWorld.dumpPerformanceLogs();
     console.log("%c                  RAYCASTER WORKER BRIDGE           ", "background: black; color: lime");
-    rayCaster.workerMessageHandler.dumpPerformanceLogs();
+    rayCaster.dumpPerformanceLogs();
   }
 }
 
