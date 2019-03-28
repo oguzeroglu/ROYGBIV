@@ -52,7 +52,7 @@ var RaycasterWorkerBridge = function(){
       var intersectableArrayIndex = 0;
       for (var objName in addedObjects){
         var obj = addedObjects[objName];
-        var insertObjectToBuffer = (mode == 0) || (mode == 1 && obj.isIntersectable && obj.isChangeable);
+        var insertObjectToBuffer = (mode == 0) || (mode == 1 && obj.isIntersectable && (obj.isChangeable || (!obj.noMass && obj.physicsBody.mass > 0)));
         if (insertObjectToBuffer){
           obj.indexInIntersectableObjDescriptionArray = intersectableArrayIndex;
           intersectablesAry.push(rayCaster.idsByObjectNames[obj.name]);
@@ -66,7 +66,7 @@ var RaycasterWorkerBridge = function(){
       }
       for (var objName in objectGroups){
         var obj = objectGroups[objName];
-        var insertObjectToBuffer = (mode == 0) || (mode == 1 && obj.isIntersectable && obj.isChangeable);
+        var insertObjectToBuffer = (mode == 0) || (mode == 1 && obj.isIntersectable && (obj.isChangeable || (!obj.noMass && obj.physicsBody.mass > 0)));
         if (insertObjectToBuffer){
           obj.indexInIntersectableObjDescriptionArray = intersectableArrayIndex;
           intersectablesAry.push(rayCaster.idsByObjectNames[obj.name]);

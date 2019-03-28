@@ -86,6 +86,11 @@ THREEJSRenderMonitoringHandler.prototype.dispatchEvent = function(eventID, isSta
   if (!this.record){
     return;
   }
+  if (!this.renderOperations[this.currentRenderCallCountPerFrame-1]){
+    this.maxRenderCallCountPerFrame = this.currentRenderCallCountPerFrame;
+    this.startRecording();
+    return;
+  }
   var curCounter = this.renderOperations[this.currentRenderCallCountPerFrame-1].counters;
   var curPerformanceLogs = this.renderOperations[this.currentRenderCallCountPerFrame-1].performanceLogs;
   this.renderOperations[this.currentRenderCallCountPerFrame-1].passName = this.currentPassName;
