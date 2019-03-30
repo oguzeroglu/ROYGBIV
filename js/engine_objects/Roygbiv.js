@@ -977,6 +977,9 @@ Roygbiv.prototype.setObjectColor = function(object, colorName, alpha){
     preConditions.checkIfNumber(ROYGBIV.setObjectColor, preConditions.alpha, alpha);
   }
   REUSABLE_COLOR.set(colorName);
+  if (object.autoInstancedParent){
+    object.autoInstancedParent.forceColor(object, REUSABLE_COLOR.r, REUSABLE_COLOR.g, REUSABLE_COLOR.b, alpha);
+  }
   object.forceColor(REUSABLE_COLOR.r, REUSABLE_COLOR.g, REUSABLE_COLOR.b, alpha);
 }
 
@@ -989,6 +992,9 @@ Roygbiv.prototype.resetObjectColor = function(object){
   preConditions.checkIfDefined(ROYGBIV.resetObjectColor, preConditions.object, object);
   preConditions.checkIfAddedObjectOrObjectGroup(ROYGBIV.resetObjectColor, preConditions.object, object);
   preConditions.checkIfColorizable(ROYGBIV.resetObjectColor, preConditions.object, object);
+  if (object.autoInstancedParent){
+    object.autoInstancedParent.resetColor(object);
+  }
   object.resetColor();
 }
 

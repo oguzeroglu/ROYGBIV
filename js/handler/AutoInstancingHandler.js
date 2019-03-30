@@ -1,5 +1,5 @@
 var AutoInstancingHandler = function(){
-  this.maxBatchObjectSize = parseInt((MAX_VERTEX_UNIFORM_VECTORS - 50) / 2);
+  this.maxBatchObjectSize = parseInt((MAX_VERTEX_UNIFORM_VECTORS - 50) / 3);
 }
 
 AutoInstancingHandler.prototype.handle = function(){

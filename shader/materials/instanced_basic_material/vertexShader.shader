@@ -17,6 +17,11 @@ varying float vAlpha;
   attribute float orientationIndex;
   uniform vec4 autoInstanceOrientationArray[AUTO_INSTANCE_ORIENTATION_ARRAY_SIZE];
   varying float vDiscardFlag;
+  #ifdef AUTO_INSTANCE_HAS_COLORIZABLE_MEMBER
+    attribute float forcedColorIndex;
+    uniform vec4 autoInstanceForcedColorArray[AUTO_INSTANCE_FORCED_COLOR_ARRAY_SIZE];
+    varying vec4 vAutoInstancedForcedColorInfo;
+  #endif
 #else
   attribute vec3 positionOffset;
   attribute vec4 quaternion;
@@ -87,6 +92,10 @@ void main(){
       return;
     }
     vDiscardFlag = -50.0;
+    #ifdef AUTO_INSTANCE_HAS_COLORIZABLE_MEMBER
+      int fi = int(forcedColorIndex);
+      vAutoInstancedForcedColorInfo = autoInstanceForcedColorArray[fi];
+    #endif
   #endif
 
   vAlpha = alpha;
