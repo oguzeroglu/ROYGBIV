@@ -486,6 +486,7 @@ function removeCLIDom(){
   if (!(typeof cliDiv == UNDEFINED)){
     document.body.removeChild(cliDiv);
   }
+  resizeEventHandler.onResize();
 }
 
 function onRaycasterMouseMoveIntersection(){
