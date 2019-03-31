@@ -15,11 +15,14 @@ var PointerLockEventHandler = function(){
   if (pointerLockChangeFunction){
     document.addEventListener(pointerLockChangeFunction, this.onPointerLock);
   }
+  this.isPointerLocked = false;
 }
 
 PointerLockEventHandler.prototype.onPointerLock = function(event){
+  var isPointerLocked = document.pointerLockElement == canvas || document.mozPointerLockElement == canvas || document.webkitPointerLockElement == canvas;
+  pointerLockEventHandler.isPointerLocked = isPointerLocked;
   if (mode == 1 && screenPointerLockChangedCallbackFunction){
-    if (document.pointerLockElement == canvas || document.mozPointerLockElement == canvas || document.webkitPointerLockElement == canvas){
+    if (isPointerLocked){
       screenPointerLockChangedCallbackFunction(true);
     }else{
       screenPointerLockChangedCallbackFunction(false);

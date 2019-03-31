@@ -83,7 +83,7 @@ MouseEventHandler.prototype.onMouseWheel = function(event){
 }
 
 MouseEventHandler.prototype.handleObjectMouseEvents = function(){
-  if (typeof this.coordX == UNDEFINED){
+  if (typeof this.coordX == UNDEFINED || pointerLockEventHandler.isPointerLocked){
     return;
   }
   var objectsWithMouseOverListenersSize = objectsWithMouseOverListeners.size;
