@@ -361,6 +361,10 @@ var alterThreeJSRenderFunction = true;
 var autoInstancingHandler;
 var autoInstancedObjects = new Object();
 var fpsHandler;
+var objectsWithOnClickListeners = new Map();
+var objectsWithMouseOverListeners = new Map();
+var objectsWithMouseOutListeners = new Map();
+var currentMouseOverObjectName;
 
 // WORKER VARIABLES
 var WORKERS_SUPPORTED = (typeof(Worker) !== "undefined") && (typeof(MessageChannel) !== "undefined");

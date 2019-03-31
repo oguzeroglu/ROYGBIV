@@ -847,7 +847,7 @@ var Text = function(){
    this.ROYGBIV_SCRIPTING_API_STARTOBJECTTRAIL = "Starts the trail effect of an object create with createObjectTrail command.";
    this.ROYGBIV_SCRIPTING_API_STOPOBJECTTRAIL = "Stops the trail effect of an object. The effect can be restarted using the startObjectTrail command.";
    this.ROYGBIV_SCRIPTING_API_SETOBJECTVELOCITY = "Sets the velocity of an object or a glued object. The object must be a dynamic object (mass > 0) in order to have a velocity.";
-   this.ROYGBIV_SCRIPTING_API_SETOBJECTCLICKLISTENER = "Sets a click listener for an object or an object group. The callbackFunction is executed with\nx, y, z coordinates of the clicked point.";
+   this.ROYGBIV_SCRIPTING_API_SETOBJECTCLICKLISTENER = "Sets a click listener for an object or an object group. The callbackFunction is executed with\nx, y, z coordinates of the clicked point. The callbackFunction is bound to object (this = object inside the function).";
    this.ROYGBIV_SCRIPTING_API_REMOVEOBJECTCLICKLISTENER = "Removes the click listener of an object or an object group.";
    this.ROYGBIV_SCRIPTING_API_SETOBJECTCOLOR = "Modifies the color and alpha value of an object or an object group.";
    this.ROYGBIV_SCRIPTING_API_RESETOBJECTCOLOR = "Resets the color and alpha value of an object or an object group.";
@@ -925,4 +925,8 @@ var Text = function(){
    this.ROYGBIV_SCRIPTING_API_REMOVESCREENMOUSEWHEELLISTENER = "Removes the listener for mousewheel events.";
    this.ROYGBIV_SCRIPTING_API_SETSCREENPINCHLISTENER = "For mobile devices, sets a pinch zoom gesture listener. The callbackFunction is executed with delta parameter\nthat represents the variation of the distance between two fingers.";
    this.ROYGBIV_SCRIPTING_API_REMOVESCREENPINCHLISTENER = "Removes the listener for pinch gesture.";
+   this.ROYGBIV_SCRIPTING_API_SETOBJECTMOUSEOVERLISTENER = "Sets a mouseover listener for an object or an object group. The callbackFunction is executed with x, y, z coordinates of mouse.\nThe callbackFunction is bound to object (this = object inside the function).";
+   this.ROYGBIV_SCRIPTING_API_REMOVEOBJECTMOUSEOVERLISTENER = "Removes the mouseover listener of an object or an object group.";
+   this.ROYGBIV_SCRIPTING_API_SETOBJECTMOUSEOUTLISTENER = "Sets a mouseout listener for an object or an object group. The callbackFunction is bound to object (this = object inside the function).";
+   this.ROYGBIV_SCRIPTING_API_REMOVEOBJECTMOUSEOUTLISTENER = "Removes the mouseout listener of an object or an object group.";
 }

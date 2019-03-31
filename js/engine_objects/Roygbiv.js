@@ -178,7 +178,11 @@ var Roygbiv = function(){
     "setScreenMouseWheelListener",
     "removeScreenMouseWheelListener",
     "setScreenPinchListener",
-    "removeScreenPinchListener"
+    "removeScreenPinchListener",
+    "setObjectMouseOverListener",
+    "removeObjectMouseOverListener",
+    "setObjectMouseOutListener",
+    "removeObjectMouseOutListener"
   ];
 
   this.globals = new Object();
@@ -3802,7 +3806,7 @@ Roygbiv.prototype.removeExpireListener = function(sourceObject){
 
 // setObjectClickListener
 // Sets a click listener for an object or an object group. The callbackFunction is executed
-// with x, y, z coordinates of the clicked point.
+// with x, y, z coordinates of the clicked point. The callbackFunction is bound to object (this = object inside the function).
 Roygbiv.prototype.setObjectClickListener = function(sourceObject, callbackFunction){
   if (mode == 0){
     return;
@@ -3813,6 +3817,7 @@ Roygbiv.prototype.setObjectClickListener = function(sourceObject, callbackFuncti
   preConditions.checkIfTrue(ROYGBIV.setObjectClickListener, "sourceObject marked as unintersectable, cannot be clicked on.", (!sourceObject.isIntersectable));
   preConditions.checkIfFunctionOnlyIfExists(ROYGBIV.setObjectClickListener, preConditions.callbackFunction, callbackFunction);
   sourceObject.clickCallbackFunction = callbackFunction;
+  objectsWithOnClickListeners.set(sourceObject.name, sourceObject);
 }
 
 // removeObjectClickListener
@@ -3825,6 +3830,7 @@ Roygbiv.prototype.removeObjectClickListener = function(sourceObject){
   preConditions.checkIfAddedObjectOrObjectGroup(ROYGBIV.removeObjectClickListener, preConditions.sourceObject, sourceObject);
   preConditions.checkIfTrue(ROYGBIV.removeObjectClickListener, "sourceObject is marked as unintersectable.", (!sourceObject.isIntersectable));
   delete sourceObject.clickCallbackFunction;
+  objectsWithOnClickListeners.delete(sourceObject.name);
 }
 
 // setScreenClickListener
@@ -4143,6 +4149,7 @@ Roygbiv.prototype.onTextClick = function(text, callbackFunction){
   preConditions.checkIfDefined(ROYGBIV.onTextClick, preConditions.callbackFunction, callbackFunction);
   preConditions.checkIfFunctionOnlyIfExists(ROYGBIV.onTextClick, preConditions.callbackFunction, callbackFunction);
   text.clickCallbackFunction = callbackFunction;
+  objectsWithOnClickListeners.set(text.name, text);
 }
 
 // removeTextClickListener
@@ -4154,6 +4161,7 @@ Roygbiv.prototype.removeTextClickListener = function(text){
   preConditions.checkIfDefined(ROYGBIV.removeTextClickListener, preConditions.text, text);
   preConditions.checkIfAddedText(ROYGBIV.removeTextClickListener, preConditions.text, text);
   text.clickCallbackFunction = noop;
+  objectsWithOnClickListeners.delete(text.name);
 }
 
 // setScreenMouseWheelListener
@@ -4196,6 +4204,64 @@ Roygbiv.prototype.removeScreenPinchListener = function(){
     return;
   }
   screenPinchCallbackFunction = noop;
+}
+
+// setObjectMouseOverListener
+// Sets a mouseover listener for an object or an object group. The callbackFunction is executed
+// with x, y, z coordinates of mouse. The callbackFunction is bound to object (this = object inside the function).
+Roygbiv.prototype.setObjectMouseOverListener = function(sourceObject, callbackFunction){
+  if (mode == 0){
+    return;
+  }
+  preConditions.checkIfDefined(ROYGBIV.setObjectMouseOverListener, preConditions.sourceObject, sourceObject);
+  preConditions.checkIfDefined(ROYGBIV.setObjectMouseOverListener, preConditions.callbackFunction, callbackFunction);
+  preConditions.checkIfAddedObjectOrObjectGroup(ROYGBIV.setObjectMouseOverListener, preConditions.sourceObject, sourceObject);
+  preConditions.checkIfTrue(ROYGBIV.setObjectMouseOverListener, "sourceObject marked as unintersectable, cannot be selected.", (!sourceObject.isIntersectable));
+  preConditions.checkIfFunctionOnlyIfExists(ROYGBIV.setObjectMouseOverListener, preConditions.callbackFunction, callbackFunction);
+  sourceObject.mouseOverCallbackFunction = callbackFunction;
+  objectsWithMouseOverListeners.set(sourceObject.name, sourceObject);
+}
+
+// removeObjectMouseOverListener
+// Removes the mouseover listener of an object or an object group.
+Roygbiv.prototype.removeObjectMouseOverListener = function(sourceObject){
+  if (mode == 0){
+    return;
+  }
+  preConditions.checkIfDefined(ROYGBIV.removeObjectMouseOverListener, preConditions.sourceObject, sourceObject);
+  preConditions.checkIfAddedObjectOrObjectGroup(ROYGBIV.removeObjectMouseOverListener, preConditions.sourceObject, sourceObject);
+  preConditions.checkIfTrue(ROYGBIV.removeObjectMouseOverListener, "sourceObject is marked as unintersectable.", (!sourceObject.isIntersectable));
+  delete sourceObject.mouseOverCallbackFunction;
+  objectsWithMouseOverListeners.delete(sourceObject.name);
+}
+
+// setObjectMouseOutListener
+// Sets a mouseout listener for an object or an object group. The callbackFunction is bound to object
+// (this = object inside the function).
+Roygbiv.prototype.setObjectMouseOutListener = function(sourceObject, callbackFunction){
+  if (mode == 0){
+    return;
+  }
+  preConditions.checkIfDefined(ROYGBIV.setObjectMouseOutListener, preConditions.sourceObject, sourceObject);
+  preConditions.checkIfDefined(ROYGBIV.setObjectMouseOutListener, preConditions.callbackFunction, callbackFunction);
+  preConditions.checkIfAddedObjectOrObjectGroup(ROYGBIV.setObjectMouseOutListener, preConditions.sourceObject, sourceObject);
+  preConditions.checkIfTrue(ROYGBIV.setObjectMouseOutListener, "sourceObject marked as unintersectable, cannot be selected.", (!sourceObject.isIntersectable));
+  preConditions.checkIfFunctionOnlyIfExists(ROYGBIV.setObjectMouseOutListener, preConditions.callbackFunction, callbackFunction);
+  sourceObject.mouseOutCallbackFunction = callbackFunction;
+  objectsWithMouseOutListeners.set(sourceObject.name, sourceObject);
+}
+
+// removeObjectMouseOutListener
+// Removes the mouseout listener of an object or an object group.
+Roygbiv.prototype.removeObjectMouseOutListener = function(sourceObject){
+  if (mode == 0){
+    return;
+  }
+  preConditions.checkIfDefined(ROYGBIV.removeObjectMouseOutListener, preConditions.sourceObject, sourceObject);
+  preConditions.checkIfAddedObjectOrObjectGroup(ROYGBIV.removeObjectMouseOutListener, preConditions.sourceObject, sourceObject);
+  preConditions.checkIfTrue(ROYGBIV.removeObjectMouseOutListener, "sourceObject is marked as unintersectable.", (!sourceObject.isIntersectable));
+  delete sourceObject.mouseOutCallbackFunction;
+  objectsWithMouseOutListeners.delete(sourceObject.name);
 }
 
 // TEXT FUNCTIONS **************************************************************

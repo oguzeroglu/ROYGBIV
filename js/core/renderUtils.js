@@ -34,6 +34,7 @@ function render(){
     cpuOperationsHandler.updateParticleSystems();
     cpuOperationsHandler.updateObjectTrails();
     cpuOperationsHandler.updateCrosshair();
+    cpuOperationsHandler.handleObjectMouseEvents();
   }else{
     cameraOperationsDone = false;
   }

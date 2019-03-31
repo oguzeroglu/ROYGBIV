@@ -2151,6 +2151,10 @@ StateLoader.prototype.resetProject = function(){
   areaBinHandler = new WorldBinHandler(true);
   webglCallbackHandler = new WebGLCallbackHandler();
   threejsRenderMonitoringHandler = new THREEJSRenderMonitoringHandler();
+  objectsWithOnClickListeners = new Map();
+  objectsWithMouseOverListeners = new Map();
+  objectsWithMouseOutListeners = new Map();
+  currentMouseOverObjectName = 0;
   if (!WORKERS_SUPPORTED){
     rayCaster = new RayCaster();
     physicsWorld = new CANNON.World();

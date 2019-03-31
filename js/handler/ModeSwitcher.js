@@ -75,6 +75,10 @@ ModeSwitcher.prototype.commonSwitchFunctions = function(){
   particleSystemRefHeight = 0;
   GLOBAL_PS_REF_HEIGHT_UNIFORM.value = 0;
   trackingObjects = new Object();
+  objectsWithOnClickListeners = new Map();
+  objectsWithMouseOverListeners = new Map();
+  objectsWithMouseOutListeners = new Map();
+  currentMouseOverObjectName = 0;
   defaultCameraControlsDisabled = false;
   initPostProcessing();
   rayCaster.refresh();
@@ -293,6 +297,8 @@ ModeSwitcher.prototype.switchFromPreviewToDesign = function(){
     addedText.show();
     addedText.handleResize();
     delete addedText.clickCallbackFunction;
+    delete addedText.mouseOverCallbackFunction;
+    delete addedText.mouseOutCallbackFunction;
   }
   collisionCallbackRequests = new Map();
   particleCollisionCallbackRequests = new Object();
@@ -340,8 +346,10 @@ ModeSwitcher.prototype.switchFromPreviewToDesign = function(){
     object.resetColor();
 
     delete object.clickCallbackFunction;
+    delete object.mouseOverCallbackFunction;
+    delete object.mouseOutCallbackFunction;
 
-    if (!(typeof object.originalMass == "undefined")){
+    if (!(typeof object.originalMass == UNDEFINED)){
       object.setMass(object.originalMass);
       if (object.originalMass == 0){
         dynamicObjectGroups.delete(object.name);
@@ -365,6 +373,8 @@ ModeSwitcher.prototype.switchFromPreviewToDesign = function(){
     var object = addedObjects[objectName];
 
     delete object.clickCallbackFunction;
+    delete object.mouseOverCallbackFunction;
+    delete object.mouseOutCallbackFunction;
 
     object.resetColor();
 
@@ -381,7 +391,7 @@ ModeSwitcher.prototype.switchFromPreviewToDesign = function(){
       object.updateOpacity(object.initOpacity);
       object.initOpacitySet = false;
     }
-    if (!(typeof object.originalMass == "undefined")){
+    if (!(typeof object.originalMass == UNDEFINED)){
       object.setMass(object.originalMass);
       if (object.originalMass == 0){
         dynamicObjects.delete(object.name);

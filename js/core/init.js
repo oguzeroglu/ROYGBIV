@@ -488,6 +488,49 @@ function removeCLIDom(){
   }
 }
 
+function onRaycasterMouseMoveIntersection(){
+  if (intersectionPoint){
+    var object = addedObjects[intersectionObject];
+    if (!object){
+      object = objectGroups[intersectionObject];
+    }
+    if (!object){
+      object = addedTexts[intersectionObject];
+    }
+    var isDifferent = currentMouseOverObjectName != object.name;
+    if (object.mouseOverCallbackFunction && isDifferent){
+      object.mouseOverCallbackFunction(intersectionPoint.x, intersectionPoint.y, intersectionPoint.z);
+    }
+    if (currentMouseOverObjectName && isDifferent){
+      var curObj = addedObjects[currentMouseOverObjectName];
+      if (!curObj){
+        curObj = objectGroups[currentMouseOverObjectName];
+      }
+      if (!curObj){
+        curObj = addedTexts[currentMouseOverObjectName];
+      }
+      if (curObj && curObj.mouseOutCallbackFunction){
+        curObj.mouseOutCallbackFunction();
+      }
+    }
+    currentMouseOverObjectName = intersectionObject;
+  }else{
+    if (currentMouseOverObjectName){
+      var curObj = addedObjects[currentMouseOverObjectName];
+      if (!curObj){
+        curObj = objectGroups[currentMouseOverObjectName];
+      }
+      if (!curObj){
+        curObj = addedTexts[currentMouseOverObjectName];
+      }
+      if (curObj && curObj.mouseOutCallbackFunction){
+        curObj.mouseOutCallbackFunction();
+      }
+    }
+    currentMouseOverObjectName = 0;
+  }
+}
+
 function onRaycasterIntersection(){
   if (intersectionPoint){
      var object = addedObjects[intersectionObject];
