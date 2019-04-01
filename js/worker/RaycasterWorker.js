@@ -81,6 +81,9 @@ RaycasterWorker.prototype.update = function(transferableMessageBody){
     var intersectableObjDescription = transferableMessageBody.intersectableObjDescription;
     for (var i = 0; i<intersectableObjDescription.length; i+=18){
       var obj = this.objectsByWorkerID[intersectableObjDescription[i]];
+      if (mode == 0 && obj.isGridSystem){
+        continue;
+      }
       if (obj.isAddedObject || obj.isObjectGroup){
         for (var i2 = i+2; i2 < (i+18); i2++){
           this.reusableArray16[i2-i-2] = intersectableObjDescription[i2];
