@@ -83,7 +83,7 @@ MouseEventHandler.prototype.onMouseWheel = function(event){
 }
 
 MouseEventHandler.prototype.handleObjectMouseEvents = function(){
-  if (typeof this.coordX == UNDEFINED || pointerLockEventHandler.isPointerLocked){
+  if (isMobile || typeof this.coordX == UNDEFINED || pointerLockEventHandler.isPointerLocked){
     return;
   }
   var objectsWithMouseOverListenersSize = objectsWithMouseOverListeners.size;
@@ -109,6 +109,8 @@ MouseEventHandler.prototype.handleObjectMouseEvents = function(){
 MouseEventHandler.prototype.onMouseMove = function(event){
   inactiveCounter = 0;
   var rect = boundingClientRect;
+  mouseEventHandler.clientX = event.clientX;
+  mouseEventHandler.clientY = event.clientY;
   mouseEventHandler.coordX = ((event.clientX - rect.left) / rect.width) * 2 - 1;
   mouseEventHandler.coordY = - ((event.clientY - rect.top) / rect.height) * 2 + 1;
   mouseEventHandler.movementX = event.movementX || event.mozMovementX || event.webkitMovementX || 0;

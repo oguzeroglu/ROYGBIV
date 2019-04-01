@@ -725,43 +725,6 @@ function dumpPerformance(){
 }
 
 //******************************************************************
-// WARNING: FOR TEST PURPOSES
-function generateRandomBoxes(gridSystemName){
-  var gridSystem = gridSystems[gridSystemName];
-  for (var gridNumber in gridSystem.grids){
-    var grid = gridSystem.grids[gridNumber];
-    grid.toggleSelect(false, false, false, false);
-    var height = Math.random() * 100;
-    var name = "randomGeneratedBox_"+gridSystemName+"_"+gridNumber;
-    var color = ColorNames.generateRandomColor();
-    var material = new BasicMaterial({
-      color: color,
-      name: "null"
-    });
-    gridSystem.newBox([grid], height, material, name);
-  }
-}
-
-// WARNING: FOR TEST PURPOSES
-function mergeAllAddedObjects(){
-  var objNames = "";
-  for (var addedObjectName in addedObjects){
-    objNames += addedObjectName + ",";
-  }
-  objNames = objNames.substring(0, objNames.length - 1);
-  parseCommand("glue glue_test_1 "+objNames);
-}
-
-// WARNING: FOR TEST PURPOSES
-function printParticleSystemPerformances(){
-  for (var particleSystemName in particleSystems){
-    var particleSystem = particleSystems[particleSystemName];
-    var particles = particleSystem.particles;
-    var lastParticle = particles[particles.length-1];
-    console.log(particleSystemName+": "+lastParticle.performance/1000+" secs.");
-  }
-}
-
 // WARNING: FOR TEST PURPOSES - WORKS ONLY FOR CANVAS TEXTURES
 function debugTexture(textureName){
   var texture = textures[textureName];
@@ -782,15 +745,6 @@ function debugCanvas(dbgCanvas){
   var img = new Image(dbgCanvas.width, dbgCanvas.height);
   img.src = dbgCanvas.toDataURL();
   newTab.document.body.appendChild(img);
-}
-
-// WARNING: FOR TEST PURPOSES
-function clearChildrenMesh(objectGroup){
-  for (var childName in objectGroup.group){
-    var child = objectGroup.group[childName];
-    child.mesh.geometry.dispose();
-    delete child.mesh.geometry;
-  }
 }
 
 // WARNING: FOR TEST PURPOSES

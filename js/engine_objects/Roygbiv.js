@@ -182,7 +182,11 @@ var Roygbiv = function(){
     "setObjectMouseOverListener",
     "removeObjectMouseOverListener",
     "setObjectMouseOutListener",
-    "removeObjectMouseOutListener"
+    "removeObjectMouseOutListener",
+    "onTextMouseOver",
+    "removeTextMouseOverListener",
+    "onTextMouseOut",
+    "removeTextMouseOutListener"
   ];
 
   this.globals = new Object();
@@ -191,7 +195,6 @@ var Roygbiv = function(){
 
 // GETTER FUNCTIONS ************************************************************
 
-// getObject
 //   Returns the object or glued object having the name given as the parameter,
 //   or undefined if no such object or glued object is found.
 Roygbiv.prototype.getObject = function(name){
@@ -208,7 +211,6 @@ Roygbiv.prototype.getObject = function(name){
   }
 }
 
-// getParticleSystem
 //  Returns the particle system having the name given as the parameter,
 //  or zero if no such particle system is found.
 Roygbiv.prototype.getParticleSystem = function(name){
@@ -223,7 +225,6 @@ Roygbiv.prototype.getParticleSystem = function(name){
   }
 }
 
-// getChildObject
 //  Returns a child object having the name given as the second parameter
 //  of a glued object given as the first parameter, or zero if no such object
 //  is found.
@@ -367,7 +368,6 @@ Roygbiv.prototype.getPosition = function(object, targetVector, axis){
   }
 }
 
-// getOpacity
 //  Returns the opacity of given object.
 Roygbiv.prototype.getOpacity = function(object){
   if (mode == 0){
@@ -381,7 +381,6 @@ Roygbiv.prototype.getOpacity = function(object){
   return object.mesh.material.uniforms.totalAlpha.value;
 }
 
-// getMarkedPosition
 //  Returns (x,y,z) coordinates of a point marked using the mark command.
 Roygbiv.prototype.getMarkedPosition = function(markedPointName, targetVector){
   if (mode == 0){
@@ -398,7 +397,6 @@ Roygbiv.prototype.getMarkedPosition = function(markedPointName, targetVector){
   return targetVector;
 }
 
-// getParticleSystemVelocityAtTime
 // Calcualtes and returns the velocity vector of a particle system at given time.
 // For particles with circular motion, this function returns the angular velocity
 // at given time.
@@ -415,7 +413,6 @@ Roygbiv.prototype.getParticleSystemVelocityAtTime = function(particleSystem, tim
   return particleSystem.getVelocityAtTime(time, targetVector);
 }
 
-// getCameraDirection
 // Returns the direction vector of the camera.
 Roygbiv.prototype.getCameraDirection = function(targetVector){
   if (mode == 0){
@@ -430,7 +427,6 @@ Roygbiv.prototype.getCameraDirection = function(targetVector){
   return targetVector;
 }
 
-// getCameraPosition
 // Returns the position of the camera.
 Roygbiv.prototype.getCameraPosition = function(targetVector){
   if (mode == 0){
@@ -444,7 +440,6 @@ Roygbiv.prototype.getCameraPosition = function(targetVector){
   return targetVector;
 }
 
-// getParticleSystemPool
 // Finds a particle system pool by name and returns it.
 Roygbiv.prototype.getParticleSystemPool = function(name){
   if (mode == 0){
@@ -456,7 +451,6 @@ Roygbiv.prototype.getParticleSystemPool = function(name){
   return psPool;
 }
 
-// getParticleSystemFromPool
 // Returns an available particle system from the pool, or false if there is
 // not an available particle system inside the pool. The particle systems become
 // available when hidden or expired.
@@ -470,7 +464,6 @@ Roygbiv.prototype.getParticleSystemFromPool = function(pool){
   return pool.get();
 }
 
-// getEndPoint
 // Gets an end point of an object. The axis may be +x,-x,+y,-y,+z or -z. Note that
 // object groups do not support this function but child objects do. This function
 // may be useful in cases where for example a particle system needs to be started
@@ -493,7 +486,6 @@ Roygbiv.prototype.getEndPoint = function(object, axis, targetVector){
   return targetVector;
 }
 
-// getViewport
 // Returns the current viewport object having startX, startY, width and height parameters.
 // Do not modify the values of the returned object.
 Roygbiv.prototype.getViewport = function(){
@@ -503,7 +495,6 @@ Roygbiv.prototype.getViewport = function(){
   return currentViewport;
 }
 
-// getText
 // Returns a text object or 0 if the text does not exist.
 Roygbiv.prototype.getText = function(textName){
   if (mode == 0){
@@ -517,7 +508,6 @@ Roygbiv.prototype.getText = function(textName){
   return 0;
 }
 
-// getFPS
 // Returns the current FPS.
 Roygbiv.prototype.getFPS = function(){
   if (mode == 0){
@@ -528,7 +518,6 @@ Roygbiv.prototype.getFPS = function(){
 
 // OBJECT MANIPULATION FUNCTIONS ***********************************************
 
-// hide
 //  Hides an object or a glued object, removes it from the scene. Does nothing
 //  if the object is already hidden. The additional keepPhysics parameter can
 //  be used in order to hide only the graphical representation of the object
@@ -600,7 +589,6 @@ Roygbiv.prototype.hide = function(object, keepPhysics){
   }
 }
 
-// show
 //  Makes a hidden object or glued object visible. Does nothing if the object is
 //  already visible.
 Roygbiv.prototype.show = function(object){
@@ -652,7 +640,6 @@ Roygbiv.prototype.show = function(object){
   }
 }
 
-// applyForce
 // Applies a physical force to an object or a glued object from a given point.
 Roygbiv.prototype.applyForce = function(object, force, point){
   if (mode == 0){
@@ -675,7 +662,6 @@ Roygbiv.prototype.applyForce = function(object, force, point){
   physicsWorld.applyImpulse(object, REUSABLE_CANNON_VECTOR, REUSABLE_CANNON_VECTOR_2);
 }
 
-// rotate
 //  Rotates an object or a glued object around a given world axis by given radians.
 //  The parameter axis must be one of x, y or z. Objects are rotated around
 //  their own centers, so their positions do not change when rotated using this
@@ -726,7 +712,6 @@ Roygbiv.prototype.rotate = function(object, axis, radians){
   }
 }
 
-// rotateAroundXYZ
 //  Rotates an object or a glued object around the given (x, y, z)
 //  Unlike the rotate function, the positions of the objects can change when rotated
 //  using this function.
@@ -780,7 +765,6 @@ Roygbiv.prototype.rotateAroundXYZ = function(object, x, y, z, radians, axis){
   }
 }
 
-// setPosition
 //  Puts an object or glued object to the specified (x, y, z) coordinate.
 Roygbiv.prototype.setPosition = function(obj, x, y, z){
   if (mode == 0){
@@ -827,7 +811,6 @@ Roygbiv.prototype.setPosition = function(obj, x, y, z){
   }
 }
 
-// setMass
 //  Sets the mass property of an object or a glued object. Objects are considered
 //  dynamic if and only if their mass is greater than zero.
 Roygbiv.prototype.setMass = function(object, mass){
@@ -865,7 +848,6 @@ Roygbiv.prototype.setMass = function(object, mass){
   }
 }
 
-// translate
 //  Translates an object or glued object on the given axis by the given amount.
 //  Axis must be one of x, y or z.
 Roygbiv.prototype.translate = function(object, axis, amount){
@@ -896,7 +878,6 @@ Roygbiv.prototype.translate = function(object, axis, amount){
   }
 }
 
-// opacity
 //  Increases/decreases the opacity of given object.
 Roygbiv.prototype.opacity = function(object, delta){
   if (mode == 0){
@@ -932,7 +913,6 @@ Roygbiv.prototype.opacity = function(object, delta){
   }
 }
 
-// setObjectVelocity
 //  Sets the velocity of an object or a glued object. The object must be a dynamic object
 //  (mass > 0) in order to have a velocity.
 Roygbiv.prototype.setObjectVelocity = function(object, velocityVector, axis){
@@ -965,7 +945,6 @@ Roygbiv.prototype.setObjectVelocity = function(object, velocityVector, axis){
   physicsWorld.setObjectVelocity(object, velocityVector);
 }
 
-// setObjectColor
 // Modifies the color and alpha value of an object or an object group.
 Roygbiv.prototype.setObjectColor = function(object, colorName, alpha){
   if (mode == 0){
@@ -987,7 +966,6 @@ Roygbiv.prototype.setObjectColor = function(object, colorName, alpha){
   object.forceColor(REUSABLE_COLOR.r, REUSABLE_COLOR.g, REUSABLE_COLOR.b, alpha);
 }
 
-// resetObjectColor
 // Resets the color and alpha value of an object or an object group.
 Roygbiv.prototype.resetObjectColor = function(object){
   if (mode == 0){
@@ -1002,7 +980,6 @@ Roygbiv.prototype.resetObjectColor = function(object){
   object.resetColor();
 }
 
-// setRotationPivot
 // Sets a rotation pivot for an object created with createRotationPivot API.
 Roygbiv.prototype.setRotationPivot = function(rotationPivot){
   if (mode == 0){
@@ -1022,7 +999,6 @@ Roygbiv.prototype.setRotationPivot = function(rotationPivot){
   sourceObject.pivotOffsetZ = rotationPivot.offsetZ;
 }
 
-// unsetRotationPivot
 // Unsets a rotation pivot point for an object set with setRotationPivot API.
 Roygbiv.prototype.unsetRotationPivot = function(object){
   if (mode == 0){
@@ -1037,7 +1013,6 @@ Roygbiv.prototype.unsetRotationPivot = function(object){
   delete object.pivotOffsetZ;
 }
 
-// resetObjectVelocity
 // Resets the velocity and angular velocity of an object.
 Roygbiv.prototype.resetObjectVelocity = function(object){
   if (mode == 0){
@@ -1055,7 +1030,6 @@ Roygbiv.prototype.resetObjectVelocity = function(object){
 
 // PARTICLE SYSTEM FUNCTIONS ***************************************************
 
-// createParticleMaterial
 // Returns a material for a particle. The configurations are:
 // color: The HTML color name of the particle. (mandatory)
 // size: The size of the particle. (mandatory)
@@ -1103,7 +1077,6 @@ Roygbiv.prototype.createParticleMaterial = function(configurations){
   return new ParticleMaterial(configurations);
 }
 
-// createParticle
 //  Creates and returns a new particle based on following configurations:
 //  position: The initial local coordinates of the particle. This is mandatory unless the motionMode is MOTION_MODE_CIRCULAR. (optional)
 //  material: The material of the particle created using createParticleMaterial function. (mandatory)
@@ -1265,7 +1238,6 @@ Roygbiv.prototype.createParticle = function(configurations){
   return particle;
 }
 
-// createParticleSystem
 // Creates a new particle system based on following configurations:
 // name: The unique name of the particle system. (mandatory)
 // particles: An array of particles created using createParticle function. (mandatory)
@@ -1378,7 +1350,6 @@ Roygbiv.prototype.createParticleSystem = function(configurations){
   return particleSystem;
 }
 
-// scale
 //  Modifies the scale of a particle system.
 Roygbiv.prototype.scale = function(object, scaleVector){
   if (mode == 0){
@@ -1391,7 +1362,6 @@ Roygbiv.prototype.scale = function(object, scaleVector){
   object.mesh.scale.set(scaleVector.x, scaleVector.y, scaleVector.z);
 }
 
-// setBlending
 //  Sets the blending mode of a particle system. Blending mode can be one of
 //  NO_BLENDING, NORMAL_BLENDING, ADDITIVE_BLENDING, SUBTRACTIVE_BLENDING or
 //  MULTIPLY_BLENDING
@@ -1406,7 +1376,6 @@ Roygbiv.prototype.setBlending = function(particleSystem, blendingMode){
   particleSystem.setBlending(blendingMode);
 }
 
-// setParticleSystemRotation
 //  Sets the rotation of a particle system around given axis.
 Roygbiv.prototype.setParticleSystemRotation = function(particleSystem, axis, radians){
   if (mode == 0){
@@ -1433,7 +1402,6 @@ Roygbiv.prototype.setParticleSystemRotation = function(particleSystem, axis, rad
   particleSystem.hasManualRotationSet = true;
 }
 
-// setParticleSystemQuaternion
 //  Sets the quaternion of given particle system.
 Roygbiv.prototype.setParticleSystemQuaternion = function(particleSystem, quatX, quatY, quatZ, quatW){
   if (mode == 0){
@@ -1454,7 +1422,6 @@ Roygbiv.prototype.setParticleSystemQuaternion = function(particleSystem, quatX, 
   particleSystem.hasManualQuaternionSet = true;
 }
 
-// kill
 //  Destroys a particle or a particle system.
 Roygbiv.prototype.kill = function(object){
   if (mode == 0){
@@ -1482,7 +1449,6 @@ Roygbiv.prototype.kill = function(object){
   }
 }
 
-// createSmoke
 //  Returns a new smoke like particle system based on following configurations:
 //  name: The unique name of the particle system (mandatory)
 //  position: The initial position of the particle system (mandatory)
@@ -1646,7 +1612,6 @@ Roygbiv.prototype.createSmoke = function(configurations){
   return smoke;
 }
 
-// createTrail
 //  Creates a trail particle system. The configurations are:
 //  name: The unique name of the particle system. (mandatory)
 //  position: The initial position of the particle system. (mandatory)
@@ -1767,7 +1732,6 @@ Roygbiv.prototype.createTrail = function(configurations){
   return this.createParticleSystem(particleSystemConfigurations);
 }
 
-// createPlasma
 // Returns a plasma like particle system (see Doom 4 - plasma rifle). The configurations are:
 // name: The unique name of the particle system. (mandatory)
 // position: The initial position of the particle system. (mandatory)
@@ -1885,7 +1849,6 @@ Roygbiv.prototype.createPlasma = function(configurations){
   return this.createParticleSystem(particleSystemConfigurations);
 }
 
-// createFireExplosion
 // Returns a fire explosion particle system. The configurations are:
 // position: The initial position of the particle system. (mandatory)
 // expireTime: The maximum lifetime of the particle system in seconds. This can be set to 0 for
@@ -2036,7 +1999,6 @@ Roygbiv.prototype.createFireExplosion = function(configurations){
   return explosion;
 }
 
-// createMagicCircle
 // Creates a magic circle effect. Configurations are:
 // name: The unique name of the circle. (mandatory)
 // position: The center position of the circle. (mandatory)
@@ -2196,7 +2158,6 @@ Roygbiv.prototype.createMagicCircle = function(configurations){
 
 }
 
-// createCircularExplosion
 // Creates a circular explosion effect. The configurations are:
 // name: The unique name of the particle system. (mandatory)
 // particleCount: The count of particles. (mandatory)
@@ -2305,7 +2266,6 @@ Roygbiv.prototype.createCircularExplosion = function(configurations){
   return this.createParticleSystem(particleSystemConfigurations);
 }
 
-// createDynamicTrail
 // Creates a dynamic trail effect. Unlike normal trails, the particles of dynamic
 // trails may have their unique velocities and accelerations. This may be useful to achieve
 // smoke trails and fireballs that follow a linear path. Configurations are:
@@ -2434,7 +2394,6 @@ Roygbiv.prototype.createDynamicTrail = function(configurations){
   return this.createParticleSystem(particleSystemConfigurations);
 }
 
-// createObjectTrail
 // Creates an object trail effect based on following configurations:
 // object: The object or object group to which the trail effect is added. (mandatory)
 // alpha: The alpha value of trails between [0,1]. (mandatory)
@@ -2462,7 +2421,6 @@ Roygbiv.prototype.createObjectTrail = function(configurations){
   return;
 }
 
-// destroyObjectTrail
 // Destroys the trail effect of an object created using the createObjectTrail function.
 Roygbiv.prototype.destroyObjectTrail = function(object){
   if (mode == 0){
@@ -2478,7 +2436,6 @@ Roygbiv.prototype.destroyObjectTrail = function(object){
   return;
 }
 
-// generateParticleSystemName
 // Generates a unique name for a particle system.
 Roygbiv.prototype.generateParticleSystemName = function(){
   if (mode == 0){
@@ -2495,7 +2452,6 @@ Roygbiv.prototype.generateParticleSystemName = function(){
   return generatedName;
 }
 
-// rewindParticle
 // Rewinds a particle and restarts its motion. Particles using this functionality
 // must have respawn = true and lifetime != 0 as configuration. The additional
 // delay parameter may be used to delay the rewind process in seconds.
@@ -2517,7 +2473,6 @@ Roygbiv.prototype.rewindParticle = function(particle, delay){
   particle.parent.rewindParticle(particle, delay);
 }
 
-// createLaser
 // Creates a laser like particle system. Configurations are:
 // name: The unique name of the particle system. (mandatory)
 // position: The initial position of the particle system. (mandatory)
@@ -2620,7 +2575,6 @@ Roygbiv.prototype.createLaser = function(configurations){
   return this.createParticleSystem(particleSystemConfigurations);
 }
 
-// createWaterfall
 // Creates a waterfall like particle system. This function initially puts the particles
 // on an imaginary line on the X axis. Size and normal of this line are configurable. Configurations are:
 // name: The unique name of the particle system. (mandatory)
@@ -2762,7 +2716,6 @@ Roygbiv.prototype.createWaterfall = function(configurations){
   return waterfall;
 }
 
-// createSnow
 // Creates a snow or rain like particle system. Particles are initially created
 // on an imaginary rectangle on XZ plane. The normal vector and width/height values
 // of this rectangle are configurable. Configurations are:
@@ -2910,7 +2863,6 @@ Roygbiv.prototype.createSnow = function(configurations){
   return snow;
 }
 
-// stopParticleSystem
 // Stops the motion of a particle system. This can be useful for smooth after collision
 // effects of particle systems as it lets particles to dissapear smoothly. The particle
 // system is killed after stopDuration seconds. If particle systems have collision listener
@@ -2928,7 +2880,6 @@ Roygbiv.prototype.stopParticleSystem = function(particleSystem, stopDuration){
   particleSystem.stop(stopDuration);
 }
 
-// startParticleSystem
 // Starts a particle system after its creation. Configurations are:
 // particleSystem: The particle system to start. (mandatory)
 // startPosition: The initial position vector of the particle system. (optional)
@@ -3060,7 +3011,6 @@ Roygbiv.prototype.startParticleSystem = function(configurations){
   }
 }
 
-// hideParticleSystem
 // Removes a particle system from the scene. Use this instead of ROYGBIV.kill() for
 // reusable particle systems.
 Roygbiv.prototype.hideParticleSystem = function(particleSystem){
@@ -3086,7 +3036,6 @@ Roygbiv.prototype.hideParticleSystem = function(particleSystem){
   }
 }
 
-// createParticleSystemPool
 // Creates a new particle system pool. Particle system pools are used to hold
 // and keep track of particle systems. For instance, for a plasma gun it is suggested
 // to create the plasma particle systems, put them inside a pool and get them from
@@ -3103,7 +3052,6 @@ Roygbiv.prototype.createParticleSystemPool = function(name){
   return psPool;
 }
 
-// addParticleSystemToPool
 // Puts a particle system to a particle system pool.
 Roygbiv.prototype.addParticleSystemToPool = function(pool, particleSystem){
   if (mode == 0){
@@ -3117,7 +3065,6 @@ Roygbiv.prototype.addParticleSystemToPool = function(pool, particleSystem){
   pool.add(particleSystem);
 }
 
-// removeParticleSystemFromPool
 // Removes a particle system from its particle system pool.
 Roygbiv.prototype.removeParticleSystemFromPool = function(particleSystem){
   if (mode == 0){
@@ -3130,7 +3077,6 @@ Roygbiv.prototype.removeParticleSystemFromPool = function(particleSystem){
   psPool.remove(particleSystem);
 }
 
-// destroyParticleSystemPool
 // Destroys a particle system pool.
 Roygbiv.prototype.destroyParticleSystemPool = function(pool){
   if (mode == 0){
@@ -3141,7 +3087,6 @@ Roygbiv.prototype.destroyParticleSystemPool = function(pool){
   pool.destroy();
 }
 
-// createConfettiExplosion
 // Creates a confetti like explosion. This function initially puts the particles
 // to the same position on the XZ plane and defines parabolic motion for each particle.
 // The configurations are:
@@ -3298,7 +3243,6 @@ Roygbiv.prototype.createConfettiExplosion = function(configurations){
 
 }
 
-// copyParticleSystem
 // Returns a new copy of given particle system. This function can be used to
 // improve memory usage of particle system pools. For instance, given a plasma
 // gun with X plasma particle systems it is better to create one plasma particle system
@@ -3340,7 +3284,6 @@ Roygbiv.prototype.copyParticleSystem = function(particleSystem, newParticleSyste
 
 }
 
-// fadeAway
 // Makes the particles of given particle system smaller on each frame. Greater
 // the coefficient, faster the particles fade away. This can be used for
 // smoke like particle systems to make them dissapear smoothly.
@@ -3360,7 +3303,6 @@ Roygbiv.prototype.fadeAway = function(particleSystem, coefficient){
   }
 }
 
-// mergeParticleSystems
 // Merges all created particle systems to improve render performance.
 Roygbiv.prototype.mergeParticleSystems = function(){
   if (mode == 0){
@@ -3390,7 +3332,6 @@ Roygbiv.prototype.mergeParticleSystems = function(){
   }
 }
 
-// setParticleSystemPosition
 // Sets the position of a particle system. This function is designed for
 // magic circle like particle systems which may follow players. This function
 // should not be used for particle systems with collision callbacks or particle systems
@@ -3416,7 +3357,6 @@ Roygbiv.prototype.setParticleSystemPosition = function(particleSystem, x, y, z){
   particleSystem.hasManualPositionSet = true;
 }
 
-// startObjectTrail
 // Starts the trail effect of an object create with createObjectTrail command.
 Roygbiv.prototype.startObjectTrail = function(object){
   if (mode == 0){
@@ -3429,7 +3369,6 @@ Roygbiv.prototype.startObjectTrail = function(object){
   objectTrail.start();
 }
 
-// stopObjectTrail
 // Stops the trail effect of an object. The effect can be restarted using the startObjectTrail command.
 Roygbiv.prototype.stopObjectTrail = function(object){
   if (mode == 0){
@@ -3442,7 +3381,6 @@ Roygbiv.prototype.stopObjectTrail = function(object){
   objectTrail.stop();
 }
 
-// createInitializedParticleSystemPool
 // Creates a particle system pool and fills it with poolSize copies of refParticleSystem.
 Roygbiv.prototype.createInitializedParticleSystemPool = function(poolName, refParticleSystem, poolSize){
   if (mode == 0){
@@ -3463,7 +3401,6 @@ Roygbiv.prototype.createInitializedParticleSystemPool = function(poolName, refPa
   return pool;
 }
 
-// makeParticleSystemsResponsive
 // Makes the particle systems responsive for different screens. This function
 // should be used before any particle system creation. The referenceHeight can
 // be calculated by dividing the design screen viewport height by the screen resolution
@@ -3483,7 +3420,6 @@ Roygbiv.prototype.makeParticleSystemsResponsive = function(referenceHeight){
 
 // CROSSHAIR FUNCTIONS *********************************************************
 
-// createCrosshair
 // Creates a new crosshair. Configurations are:
 // name: The unique name of the crosshair. (mandatory)
 // textureName: The texture name of the crosshair. (mandatory)
@@ -3536,7 +3472,6 @@ Roygbiv.prototype.createCrosshair = function(configurations){
   });
 }
 
-// selectCrosshair
 // Selects a crosshair. Only the selected crosshair is visible on the screen.
 Roygbiv.prototype.selectCrosshair = function(crosshairName){
   if (mode == 0){
@@ -3553,7 +3488,6 @@ Roygbiv.prototype.selectCrosshair = function(crosshairName){
   selectedCrosshair = crosshair;
 }
 
-// changeCrosshairColor
 // Changes the color of the selected crosshair.
 Roygbiv.prototype.changeCrosshairColor = function(colorName){
   if (mode == 0){
@@ -3567,7 +3501,6 @@ Roygbiv.prototype.changeCrosshairColor = function(colorName){
   selectedCrosshair.material.uniforms.color.value.z = REUSABLE_COLOR.b;
 }
 
-// hideCrosshair
 // Destroys the selected crosshair. selectCrosshair function should be used after this function
 // in order to put a crosshair on the screen.
 Roygbiv.prototype.hideCrosshair = function(){
@@ -3580,7 +3513,6 @@ Roygbiv.prototype.hideCrosshair = function(){
   }
 }
 
-// startCrosshairRotation
 // Starts rotation effect of the selected crosshair.
 Roygbiv.prototype.startCrosshairRotation = function(angularSpeed){
   if (mode == 0){
@@ -3592,7 +3524,6 @@ Roygbiv.prototype.startCrosshairRotation = function(angularSpeed){
   selectedCrosshair.angularSpeed = angularSpeed;
 }
 
-// stopCrosshairRotation
 // Stops rotation effect of the selected crosshair.
 Roygbiv.prototype.stopCrosshairRotation = function(){
   if (mode == 0){
@@ -3604,7 +3535,6 @@ Roygbiv.prototype.stopCrosshairRotation = function(){
   selectedCrosshair.resetRotation();
 }
 
-// pauseCrosshairRotation
 // Pauses rotation effect of the selected crosshair. startCrosshairRotation function
 // can be used to continue the rotation effect.
 Roygbiv.prototype.pauseCrosshairRotation = function(){
@@ -3615,7 +3545,6 @@ Roygbiv.prototype.pauseCrosshairRotation = function(){
   selectedCrosshair.angularSpeed = 0;
 }
 
-// expandCrosshair
 // Expands a crosshair. This can be used while shooting or walking for fps games.
 // The crosshair expands by delta while its size is less than targetSize on each frame.
 // This function is designed to be called inside onmousedown or onkeydown like events.
@@ -3637,7 +3566,6 @@ Roygbiv.prototype.expandCrosshair = function(targetSize, delta){
   selectedCrosshair.shrink = false;
 }
 
-// shrinkCrosshair
 // Shrinks a crosshair. This can be used after calling the expandCrosshair function.
 // The crosshair shrinks by delta while its size is greater than its initial size. This function
 // is designed to be called inside onmouseup or onkeyup like events.
@@ -3658,7 +3586,6 @@ Roygbiv.prototype.shrinkCrosshair = function(delta){
 
 // LISTENER FUNCTIONS **********************************************************
 
-// setCollisionListener
 //  Sets a collision listener for an object, glued object, particle or a particle system. Using
 //  this with loads of particles may cause performance issues if web worker usage is not enabled or supported.
 //  Callback function given as the second parameter is fired with a CollisionInfo instance (except for particle collisions) when
@@ -3737,7 +3664,6 @@ Roygbiv.prototype.setCollisionListener = function(sourceObject, callbackFunction
   }
 }
 
-// removeCollisionListener
 //  Removes collision listeners of an object, glued object, particle or a particle system.. Use this
 //  for performance improvements if collision callbacks are no longer necessary
 //  for particles or particle systems.
@@ -3776,7 +3702,6 @@ Roygbiv.prototype.removeCollisionListener = function(sourceObject){
   }
 }
 
-// setExpireListener
 // Sets an expiration listener for a particle system. The parameter callbackFunction
 // is executed when sourceObject is expired. The name of the particle system is passed
 // to the callbackFunction as a parameter.
@@ -3792,7 +3717,6 @@ Roygbiv.prototype.setExpireListener = function(sourceObject, callbackFunction){
   sourceObject.expirationFunction = callbackFunction;
 }
 
-// removeExpireListener
 // Removes the expiration listener function of a particle system.
 Roygbiv.prototype.removeExpireListener = function(sourceObject){
   if (mode == 0){
@@ -3804,7 +3728,6 @@ Roygbiv.prototype.removeExpireListener = function(sourceObject){
   delete sourceObject.expirationFunction;
 }
 
-// setObjectClickListener
 // Sets a click listener for an object or an object group. The callbackFunction is executed
 // with x, y, z coordinates of the clicked point. The callbackFunction is bound to object (this = object inside the function).
 Roygbiv.prototype.setObjectClickListener = function(sourceObject, callbackFunction){
@@ -3820,7 +3743,6 @@ Roygbiv.prototype.setObjectClickListener = function(sourceObject, callbackFuncti
   objectsWithOnClickListeners.set(sourceObject.name, sourceObject);
 }
 
-// removeObjectClickListener
 // Removes the click listener of an object or an object group.
 Roygbiv.prototype.removeObjectClickListener = function(sourceObject){
   if (mode == 0){
@@ -3833,7 +3755,6 @@ Roygbiv.prototype.removeObjectClickListener = function(sourceObject){
   objectsWithOnClickListeners.delete(sourceObject.name);
 }
 
-// setScreenClickListener
 // Sets a click listener for the screen. The callbackFunction is
 // executed with x, y coordinates when clicked on the screen.
 Roygbiv.prototype.setScreenClickListener = function(callbackFunction){
@@ -3845,7 +3766,6 @@ Roygbiv.prototype.setScreenClickListener = function(callbackFunction){
   screenClickCallbackFunction = callbackFunction;
 }
 
-// removeScreenClickListener
 // Removes the click listener of screen.
 Roygbiv.prototype.removeScreenClickListener = function(){
   if (mode == 0){
@@ -3854,7 +3774,6 @@ Roygbiv.prototype.removeScreenClickListener = function(){
   screenClickCallbackFunction = noop;
 }
 
-// setScreenMouseDownListener
 // Sets a mouse down listener for screen. The callbackFunction is
 // executed with x, y coordinates when mouse-downed on the screen.
 Roygbiv.prototype.setScreenMouseDownListener = function(callbackFunction){
@@ -3866,7 +3785,6 @@ Roygbiv.prototype.setScreenMouseDownListener = function(callbackFunction){
   screenMouseDownCallbackFunction = callbackFunction;
 }
 
-// removeScreenMouseDownListener
 // Removes the mouse down listener of screen.
 Roygbiv.prototype.removeScreenMouseDownListener = function(){
   if (mode == 0){
@@ -3875,7 +3793,6 @@ Roygbiv.prototype.removeScreenMouseDownListener = function(){
   screenMouseDownCallbackFunction = noop;
 }
 
-// setScreenMouseUpListener
 // Sets mouse up listener for screen. The callbackFunction is
 // executed with x, y coordinates when mouse-upped on the screen.
 Roygbiv.prototype.setScreenMouseUpListener = function(callbackFunction){
@@ -3887,7 +3804,6 @@ Roygbiv.prototype.setScreenMouseUpListener = function(callbackFunction){
   screenMouseUpCallbackFunction = callbackFunction;
 }
 
-// removeScreenMouseUpListener
 // Removes mouse up listener for screen.
 Roygbiv.prototype.removeScreenMouseUpListener = function(){
   if (mode == 0){
@@ -3896,7 +3812,6 @@ Roygbiv.prototype.removeScreenMouseUpListener = function(){
   screenMouseUpCallbackFunction = noop;
 }
 
-// setScreenMouseMoveListener
 // Sets mouse move listener for screen. The callbackFunction is
 // executed with x, y coordinates and dX, dY values when mouse moves on the screen.
 Roygbiv.prototype.setScreenMouseMoveListener = function(callbackFunction){
@@ -3908,7 +3823,6 @@ Roygbiv.prototype.setScreenMouseMoveListener = function(callbackFunction){
   screenMouseMoveCallbackFunction = callbackFunction;
 }
 
-// removeScreenMouseMoveListener
 // Removes mouse move listener for screen.
 Roygbiv.prototype.removeScreenMouseMoveListener = function(){
   if (mode == 0){
@@ -3917,7 +3831,6 @@ Roygbiv.prototype.removeScreenMouseMoveListener = function(){
   screenMouseMoveCallbackFunction = noop;
 }
 
-// setScreenPointerLockChangeListener
 // Sets a callback function for Pointer Lock API status changes. The callbackFunction
 // is executed with isPointerLocked parameter.
 Roygbiv.prototype.setScreenPointerLockChangeListener = function(callbackFunction){
@@ -3929,7 +3842,6 @@ Roygbiv.prototype.setScreenPointerLockChangeListener = function(callbackFunction
   screenPointerLockChangedCallbackFunction = callbackFunction;
 }
 
-// removeScreenPointerLockChangeListener
 // Removes the Pointer Lock change listener for the screen.
 Roygbiv.prototype.removeScreenPointerLockChangeListener = function(){
   if (mode == 0){
@@ -3938,7 +3850,6 @@ Roygbiv.prototype.removeScreenPointerLockChangeListener = function(){
   screenPointerLockChangedCallbackFunction = noop;
 }
 
-// setParticleSystemPoolConsumedListener
 // Sets a listener for particle system pool consumption. The callbackFunction is
 // executed wheren there is no available particle system left inside the pool.
 Roygbiv.prototype.setParticleSystemPoolConsumedListener = function(psPool, callbackFunction){
@@ -3952,7 +3863,6 @@ Roygbiv.prototype.setParticleSystemPoolConsumedListener = function(psPool, callb
   psPool.consumedCallback = callbackFunction;
 }
 
-// removeParticleSystemPoolConsumedListener
 // Removes the consumption listener of a particle system pool.
 Roygbiv.prototype.removeParticleSystemPoolConsumedListener = function(psPool){
   if (mode == 0){
@@ -3963,7 +3873,6 @@ Roygbiv.prototype.removeParticleSystemPoolConsumedListener = function(psPool){
   psPool.consumedCallback = noop;
 }
 
-// setParticleSystemPoolAvailableListener
 // Sets an availability listener for a particle system pool. The callbackFunction is executed
 // when there is at least one available particle system inside the pool again.
 Roygbiv.prototype.setParticleSystemPoolAvailableListener = function(psPool, callbackFunction){
@@ -3977,7 +3886,6 @@ Roygbiv.prototype.setParticleSystemPoolAvailableListener = function(psPool, call
   psPool.availableCallback = callbackFunction;
 }
 
-// removeParticleSystemPoolAvailableListener
 // Removes the availablity listener for a particle system pool.
 Roygbiv.prototype.removeParticleSystemPoolAvailableListener = function(psPool){
   if (mode == 0){
@@ -3988,7 +3896,6 @@ Roygbiv.prototype.removeParticleSystemPoolAvailableListener = function(psPool){
   psPool.availableCallback = noop;
 }
 
-// setFullScreenChangeCallbackFunction
 // Sets a callback function for fullscreen change API. The callbackFunction is executed
 // with isFullScreenOn boolean parameter when the fullscreen status is changed.
 Roygbiv.prototype.setFullScreenChangeCallbackFunction = function(callbackFunction){
@@ -4000,7 +3907,6 @@ Roygbiv.prototype.setFullScreenChangeCallbackFunction = function(callbackFunctio
   screenFullScreenChangeCallbackFunction = callbackFunction;
 }
 
-// removeFullScreenChangeCallbackFunction
 // Removes the fullscreen change listener.
 Roygbiv.prototype.removeFullScreenChangeCallbackFunction = function(){
   if (mode == 0){
@@ -4009,7 +3915,6 @@ Roygbiv.prototype.removeFullScreenChangeCallbackFunction = function(){
   screenFullScreenChangeCallbackFunction = noop;
 }
 
-// setFPSDropCallbackFunction
 // Sets a callback function for FPS drops. The callbackFunction is executed
 // with dropAmount parameter if the FPS is less than 60 for given second. The
 // dropAmount is calculated using this formula: (60 - [current_fps])
@@ -4022,7 +3927,6 @@ Roygbiv.prototype.setFPSDropCallbackFunction = function(callbackFunction){
   fpsDropCallbackFunction = callbackFunction;
 }
 
-// removeFPSDropCallbackFunction
 // Removes the callback function for FPS drops.
 Roygbiv.prototype.removeFPSDropCallbackFunction = function(){
   if (mode == 0){
@@ -4031,7 +3935,6 @@ Roygbiv.prototype.removeFPSDropCallbackFunction = function(){
   fpsDropCallbackFunction = noop;
 }
 
-// setPerformanceDropCallbackFunction
 // Sets a callback function for performance drops. The callbackFunction is executed
 // if the FPS is under [minFPS] for [seconds] seconds. The callbackFunction is automatically
 // removed after the execution, so use this function again if needed after the execution
@@ -4052,7 +3955,6 @@ Roygbiv.prototype.setPerformanceDropCallbackFunction = function(minFPS, seconds,
   fpsHandler.initiatePerformanceDropMonitoring(minFPS, seconds);
 }
 
-// removePerformanceDropCallbackFunction
 // Removes the callback function for performance drops.
 Roygbiv.prototype.removePerformanceDropCallbackFunction = function(){
   if (mode == 0){
@@ -4062,7 +3964,6 @@ Roygbiv.prototype.removePerformanceDropCallbackFunction = function(){
   fpsHandler.reset();
 }
 
-// setUserInactivityCallbackFunction
 // Sets a callback function for user inactivity. The callbackFunction is executed
 // if the user does not move or press the mouse or press a key for more than maxTimeInSeconds seconds.
 // The callbackFunction is reset after the execution so use this function again to create a new
@@ -4081,7 +3982,6 @@ Roygbiv.prototype.setUserInactivityCallbackFunction = function(maxTimeInSeconds,
   userInactivityCallbackFunction = callbackFunction;
 }
 
-// removeUserInactivityCallbackFunction
 // Removes the user inactivity callback function.
 Roygbiv.prototype.removeUserInactivityCallbackFunction = function(){
   if (mode == 0){
@@ -4092,7 +3992,6 @@ Roygbiv.prototype.removeUserInactivityCallbackFunction = function(){
   maxInactiveTime = 0;
 }
 
-// setScreenKeydownListener
 // Sets a keydown listener. The callbackFunction is executed with the pressedChar
 // parameter. See the values of keyCodeToChar variable for possible pressedChar
 // parameters.
@@ -4105,7 +4004,6 @@ Roygbiv.prototype.setScreenKeydownListener = function(callbackFunction){
   screenKeydownCallbackFunction = callbackFunction;
 }
 
-// removeScreenKeydownListener
 // Removes the keydown listener.
 Roygbiv.prototype.removeScreenKeydownListener = function(){
   if (mode == 0){
@@ -4114,7 +4012,6 @@ Roygbiv.prototype.removeScreenKeydownListener = function(){
   screenKeydownCallbackFunction = noop;
 }
 
-// setScreenKeyupListener
 // Sets a keyup listener. The callbackFunction is executed with the uppedChar
 // parameter. See the values of keyCodeToChar variable for possible uppedChar
 // parameters.
@@ -4127,7 +4024,6 @@ Roygbiv.prototype.setScreenKeyupListener = function(callbackFunction){
   screenKeyupCallbackFunction = callbackFunction;
 }
 
-// removeScreenKeyupListener
 // Removes the keyup listener.
 Roygbiv.prototype.removeScreenKeyupListener = function(){
   if (mode == 0){
@@ -4136,7 +4032,6 @@ Roygbiv.prototype.removeScreenKeyupListener = function(){
   screenKeyupCallbackFunction = noop;
 }
 
-// onTextClick
 // Sets a click listener for a text object. The callbackFunction is executed
 // with textName parameter when the text object is clicked.
 Roygbiv.prototype.onTextClick = function(text, callbackFunction){
@@ -4152,7 +4047,6 @@ Roygbiv.prototype.onTextClick = function(text, callbackFunction){
   objectsWithOnClickListeners.set(text.name, text);
 }
 
-// removeTextClickListener
 // Removes the click listener of a text object.
 Roygbiv.prototype.removeTextClickListener = function(text){
   if (mode == 0){
@@ -4164,7 +4058,6 @@ Roygbiv.prototype.removeTextClickListener = function(text){
   objectsWithOnClickListeners.delete(text.name);
 }
 
-// setScreenMouseWheelListener
 // Sets a mouse wheel listener. The callbackFunction is executed with deltaX and deltaY parameters
 // when a mousewheel event is triggered.
 Roygbiv.prototype.setScreenMouseWheelListener = function(callbackFunction){
@@ -4176,7 +4069,6 @@ Roygbiv.prototype.setScreenMouseWheelListener = function(callbackFunction){
   screenMouseWheelCallbackFunction = callbackFunction;
 }
 
-// removeScreenMouseWheelListener
 // Removes the listener for mousewheel events.
 Roygbiv.prototype.removeScreenMouseWheelListener = function(){
   if (mode == 0){
@@ -4185,7 +4077,6 @@ Roygbiv.prototype.removeScreenMouseWheelListener = function(){
   screenMouseWheelCallbackFunction = noop;
 }
 
-// setScreenPinchListener
 // For mobile devices, sets a pinch zoom gesture listener. The callbackFunction is executed with
 // delta parameter that represents the variation of the distance between two fingers.
 Roygbiv.prototype.setScreenPinchListener = function(callbackFunction){
@@ -4197,7 +4088,6 @@ Roygbiv.prototype.setScreenPinchListener = function(callbackFunction){
   screenPinchCallbackFunction = callbackFunction;
 }
 
-// removeScreenPinchListener
 // Removes the listener for pinch gesture.
 Roygbiv.prototype.removeScreenPinchListener = function(){
   if (mode == 0){
@@ -4206,7 +4096,6 @@ Roygbiv.prototype.removeScreenPinchListener = function(){
   screenPinchCallbackFunction = noop;
 }
 
-// setObjectMouseOverListener
 // Sets a mouseover listener for an object or an object group. The callbackFunction is executed
 // with x, y, z coordinates of mouse. The callbackFunction is bound to object (this = object inside the function).
 Roygbiv.prototype.setObjectMouseOverListener = function(sourceObject, callbackFunction){
@@ -4222,7 +4111,6 @@ Roygbiv.prototype.setObjectMouseOverListener = function(sourceObject, callbackFu
   objectsWithMouseOverListeners.set(sourceObject.name, sourceObject);
 }
 
-// removeObjectMouseOverListener
 // Removes the mouseover listener of an object or an object group.
 Roygbiv.prototype.removeObjectMouseOverListener = function(sourceObject){
   if (mode == 0){
@@ -4235,7 +4123,6 @@ Roygbiv.prototype.removeObjectMouseOverListener = function(sourceObject){
   objectsWithMouseOverListeners.delete(sourceObject.name);
 }
 
-// setObjectMouseOutListener
 // Sets a mouseout listener for an object or an object group. The callbackFunction is bound to object
 // (this = object inside the function).
 Roygbiv.prototype.setObjectMouseOutListener = function(sourceObject, callbackFunction){
@@ -4251,7 +4138,6 @@ Roygbiv.prototype.setObjectMouseOutListener = function(sourceObject, callbackFun
   objectsWithMouseOutListeners.set(sourceObject.name, sourceObject);
 }
 
-// removeObjectMouseOutListener
 // Removes the mouseout listener of an object or an object group.
 Roygbiv.prototype.removeObjectMouseOutListener = function(sourceObject){
   if (mode == 0){
@@ -4264,9 +4150,49 @@ Roygbiv.prototype.removeObjectMouseOutListener = function(sourceObject){
   objectsWithMouseOutListeners.delete(sourceObject.name);
 }
 
+// Sets a mouseover listener for a text. The callbackFunction is bound to text (this = text inside the function).
+Roygbiv.prototype.onTextMouseOver = function(text, callbackFunction){
+  if (mode == 0){
+    return;
+  }
+  preConditions.checkIfDefined(ROYGBIV.onTextMouseOver, preConditions.text, text);
+  preConditions.checkIfAddedText(ROYGBIV.onTextMouseOver, preConditions.text, text);
+  preConditions.checkIfTextClickable(ROYGBIV.onTextMouseOver, preConditions.text, text);
+  preConditions.checkIfDefined(ROYGBIV.onTextMouseOver, preConditions.callbackFunction, callbackFunction);
+  preConditions.checkIfFunctionOnlyIfExists(ROYGBIV.onTextMouseOver, preConditions.callbackFunction, callbackFunction);
+  text.mouseOverCallbackFunction = callbackFunction;
+  objectsWithMouseOverListeners.set(text.name, text);
+}
+
+// Removes the mouseover listener of a text.
+Roygbiv.prototype.removeTextMouseOverListener = function(text){
+  preConditions.checkIfDefined(ROYGBIV.removeTextMouseOverListener, preConditions.text, text);
+  preConditions.checkIfAddedText(ROYGBIV.removeTextMouseOverListener, preConditions.text, text);
+  delete text.mouseOverCallbackFunction;
+  objectsWithMouseOverListeners.delete(text.name);
+}
+
+// Sets a mouseout listener for a text. The callbackFunction is bound to text (this = text inside the function).
+Roygbiv.prototype.onTextMouseOut = function(text, callbackFunction){
+  preConditions.checkIfDefined(ROYGBIV.onTextMouseOut, preConditions.text, text);
+  preConditions.checkIfAddedText(ROYGBIV.onTextMouseOut, preConditions.text, text);
+  preConditions.checkIfTextClickable(ROYGBIV.onTextMouseOut, preConditions.text, text);
+  preConditions.checkIfDefined(ROYGBIV.onTextMouseOut, preConditions.callbackFunction, callbackFunction);
+  preConditions.checkIfFunctionOnlyIfExists(ROYGBIV.onTextMouseOut, preConditions.callbackFunction, callbackFunction);
+  text.mouseOutCallbackFunction = callbackFunction;
+  objectsWithMouseOutListeners.set(text.name, text);
+}
+
+// Removes the mouseout listener of a text.
+Roygbiv.prototype.removeTextMouseOutListener = function(text){
+  preConditions.checkIfDefined(ROYGBIV.removeTextMouseOutListener, preConditions.text, text);
+  preConditions.checkIfAddedText(ROYGBIV.removeTextMouseOutListener, preConditions.text, text);
+  delete text.mouseOutCallbackFunction;
+  objectsWithMouseOutListeners.delete(text.name);
+}
+
 // TEXT FUNCTIONS **************************************************************
 
-//setText
 // Sets a text to a text object.
 Roygbiv.prototype.setText = function(textObject, text){
   if (mode == 0){
@@ -4279,7 +4205,6 @@ Roygbiv.prototype.setText = function(textObject, text){
   textObject.setText(text, true);
 }
 
-// setTextColor
 // Sets the color of a text. colorName can be a color name like red or an hex string
 // like #afef54.
 Roygbiv.prototype.setTextColor = function(text, colorName){
@@ -4292,7 +4217,6 @@ Roygbiv.prototype.setTextColor = function(text, colorName){
   text.setColor(colorName, true);
 }
 
-// setTextAlpha
 // Sets the alpha of a text.
 Roygbiv.prototype.setTextAlpha = function(text, alpha){
   if (mode == 0){
@@ -4305,7 +4229,6 @@ Roygbiv.prototype.setTextAlpha = function(text, alpha){
   text.setAlpha(alpha, true);
 }
 
-// setTextPosition
 // Sets the position of a text object.
 Roygbiv.prototype.setTextPosition = function(text, x, y, z){
   if (mode == 0){
@@ -4323,7 +4246,6 @@ Roygbiv.prototype.setTextPosition = function(text, x, y, z){
   text.mesh.position.set(x, y, z);
 }
 
-// setTextBackground
 // Sets the background color/alpha of a text object.
 Roygbiv.prototype.setTextBackground = function(text, colorName, alpha){
   if (mode == 0){
@@ -4339,7 +4261,6 @@ Roygbiv.prototype.setTextBackground = function(text, colorName, alpha){
   text.setBackground(colorName, alpha, true);
 }
 
-// removeTextBackground
 // Removes the background of a text object.
 Roygbiv.prototype.removeTextBackground = function(text){
   if (mode == 0){
@@ -4351,7 +4272,6 @@ Roygbiv.prototype.removeTextBackground = function(text){
   text.removeBackground(true);
 }
 
-// setTextCenterPosition
 // Puts the center of the given text object to given x, y, z coordinates.
 Roygbiv.prototype.setTextCenterPosition = function(text, x, y, z){
   if (mode == 0){
@@ -4374,7 +4294,6 @@ Roygbiv.prototype.setTextCenterPosition = function(text, x, y, z){
   );
 }
 
-// hideText
 // Makes the given text object invisible. Does nothing if the text is already
 // invisible.
 Roygbiv.prototype.hideText = function(text){
@@ -4388,7 +4307,6 @@ Roygbiv.prototype.hideText = function(text){
   }
 }
 
-// showText
 // Makes the given text object visible. Does nothing if the text is already
 // visible.
 Roygbiv.prototype.showText = function(text){
@@ -4404,7 +4322,6 @@ Roygbiv.prototype.showText = function(text){
 
 // UTILITY FUNCTIONS ***********************************************************
 
-// vector
 //  Creates a new vector from x, y and z coordinates.
 Roygbiv.prototype.vector = function(x, y, z){
   if (mode == 0){
@@ -4424,7 +4341,6 @@ Roygbiv.prototype.vector = function(x, y, z){
   return obj;
 }
 
-// distance
 //  Returns the distance between two vectors.
 Roygbiv.prototype.distance = function(vec1, vec2){
   if (mode == 0){
@@ -4442,7 +4358,6 @@ Roygbiv.prototype.distance = function(vec1, vec2){
   );
 }
 
-// sub
 //  Returns the substraction of two vectors.
 Roygbiv.prototype.sub = function(vec1, vec2, targetVector){
   if (mode == 0){
@@ -4466,7 +4381,6 @@ Roygbiv.prototype.sub = function(vec1, vec2, targetVector){
   return obj;
 }
 
-// add
 //  Returns the summation of two vectors.
 Roygbiv.prototype.add = function(vec1, vec2, targetVector){
   if (mode == 0){
@@ -4490,7 +4404,6 @@ Roygbiv.prototype.add = function(vec1, vec2, targetVector){
   return obj;
 }
 
-// moveTowards
 //  Moves vec1 towards vec2 by given amount and returns the new position of vec1.
 //  Amount = 1 means that vec1 goes all the way towards vec2.
 Roygbiv.prototype.moveTowards = function(vec1, vec2, amount, targetVector){
@@ -4519,7 +4432,6 @@ Roygbiv.prototype.moveTowards = function(vec1, vec2, amount, targetVector){
   return newVec;
 }
 
-// applyNoise
 //  Applies Perlin noise to given vector [amount] times and returns the
 //  distorted value. The default amount is 1. Setting the amount too high can
 //  cause performance issues.
@@ -4549,7 +4461,6 @@ Roygbiv.prototype.applyNoise = function(vec, amount){
   }
 }
 
-// sphericalDistribution
 //  Returns a vector sampled around an imaginary sphere of given radius centered
 //  at (0, 0, 0)
 Roygbiv.prototype.sphericalDistribution = function(radius){
@@ -4569,7 +4480,6 @@ Roygbiv.prototype.sphericalDistribution = function(radius){
   return this.vector(REUSABLE_VECTOR.x, REUSABLE_VECTOR.y, REUSABLE_VECTOR.z);
 }
 
-// boxDistribution
 //  Returns a vector sampled on a face of a box centered at (0, 0, 0).
 //  The size of the boxis specified with the parameters sizeX, sizeY and sizeZ.
 //  The optional parameter side can be used to generate the point on a
@@ -4636,7 +4546,6 @@ Roygbiv.prototype.boxDistribution = function(sizeX, sizeY, sizeZ, side){
   return this.vector(x, y, z);
 }
 
-// color
 //  Creates a new color object from the given HTML color name.
 Roygbiv.prototype.color = function(colorName){
   if (mode == 0){
@@ -4646,7 +4555,6 @@ Roygbiv.prototype.color = function(colorName){
   return new THREE.Color(colorName.toLowerCase());
 }
 
-// runScript
 //  Starts a script of the given name.
 Roygbiv.prototype.runScript = function(name){
   if (mode == 0){
@@ -4658,7 +4566,6 @@ Roygbiv.prototype.runScript = function(name){
   script.start();
 }
 
-// isRunning
 //  Returns whether a script of the given name is running or not.
 Roygbiv.prototype.isRunning = function(name){
   if (mode == 0){
@@ -4670,7 +4577,6 @@ Roygbiv.prototype.isRunning = function(name){
   return script.isRunning();
 }
 
-// normalizeVector
 //  Normalizes the vector given in the parameter. Note that this function modifies directly the
 //  parameter and returns nothing.
 Roygbiv.prototype.normalizeVector = function(vector){
@@ -4685,7 +4591,6 @@ Roygbiv.prototype.normalizeVector = function(vector){
   vector.z = vector.z / len;
 }
 
-// computeQuaternionFromVectors
 //  Returns the quaternion between two vectors.
 Roygbiv.prototype.computeQuaternionFromVectors = function(vec1, vec2, targetQuaternion){
   if (mode == 0){
@@ -4711,7 +4616,6 @@ Roygbiv.prototype.computeQuaternionFromVectors = function(vec1, vec2, targetQuat
   }
 }
 
-// circularDistribution
 //  Returns a random point sampled around an imaginary circle with given radius and given
 //  quaternion in 3D space. If no quaternion is specified the circle is sampled on the XY plane.
 Roygbiv.prototype.circularDistribution = function(radius, quaternion){
@@ -4735,7 +4639,6 @@ Roygbiv.prototype.circularDistribution = function(radius, quaternion){
   return this.vector(REUSABLE_VECTOR_3.x, REUSABLE_VECTOR_3.y, REUSABLE_VECTOR_3.z);
 }
 
-// multiplyScalar
 //  Multiplies a vector by a scalar.
 Roygbiv.prototype.multiplyScalar = function(vector, scalar, targetVector){
   if (mode == 0){
@@ -4756,7 +4659,6 @@ Roygbiv.prototype.multiplyScalar = function(vector, scalar, targetVector){
   }
 }
 
-// setVector
 // Set the x, y, z components of a vector.
 Roygbiv.prototype.setVector = function(vector, x, y, z){
   if (mode == 0){
@@ -4776,13 +4678,11 @@ Roygbiv.prototype.setVector = function(vector, x, y, z){
   return vector;
 }
 
-// quaternion
 // Returns a new THREE.Quaternion instance.
 Roygbiv.prototype.quaternion = function(){
   return new THREE.Quaternion();
 }
 
-// requestPointerLock
 // Requests pointer lock from window on the next click.
 Roygbiv.prototype.requestPointerLock = function(){
   if (mode == 0){
@@ -4792,7 +4692,6 @@ Roygbiv.prototype.requestPointerLock = function(){
   pointerLockRequested = true;
 }
 
-// convertEulerToDegrees
 // Returns the degree equivalent of an Euler angle.
 Roygbiv.prototype.convertEulerToDegrees = function(eulerAngle){
   if (mode == 0){
@@ -4803,7 +4702,6 @@ Roygbiv.prototype.convertEulerToDegrees = function(eulerAngle){
   return ((eulerAngle * 180) / Math.PI);
 }
 
-// disableDefaultControls
 // Disables or enables the default WASD camera controls. This function can be used
 // before implementing manual camera controls.
 Roygbiv.prototype.disableDefaultControls = function(isDisabled){
@@ -4815,7 +4713,6 @@ Roygbiv.prototype.disableDefaultControls = function(isDisabled){
   defaultCameraControlsDisabled = isDisabled;
 }
 
-// isKeyPressed
 // Returns whether the given key is pressed or not. See the keyCodeToChar
 // variable for possible key names.
 Roygbiv.prototype.isKeyPressed = function(key){
@@ -4826,7 +4723,6 @@ Roygbiv.prototype.isKeyPressed = function(key){
   return keyboardBuffer[key];
 }
 
-// setCameraPosition
 // Sets the position of the camera.
 Roygbiv.prototype.setCameraPosition = function(x, y, z){
   if (mode == 0){
@@ -4841,7 +4737,6 @@ Roygbiv.prototype.setCameraPosition = function(x, y, z){
   camera.position.set(x, y, z);
 }
 
-// lookAt
 // Makes the camera look at specific position.
 Roygbiv.prototype.lookAt = function(x, y, z){
   if (mode == 0){
@@ -4856,7 +4751,6 @@ Roygbiv.prototype.lookAt = function(x, y, z){
   camera.lookAt(x, y, z);
 }
 
-// applyAxisAngle
 // Rotates the vector around an axis by given angle.
 Roygbiv.prototype.applyAxisAngle = function(vector, axisVector, angle, targetVector){
   if (mode == 0){
@@ -4881,7 +4775,6 @@ Roygbiv.prototype.applyAxisAngle = function(vector, axisVector, angle, targetVec
   return this.vector(REUSABLE_VECTOR.x, REUSABLE_VECTOR.y, REUSABLE_VECTOR.z);
 }
 
-// trackObjectPosition
 // Makes sourceObject keep its relative position to targetObject.
 Roygbiv.prototype.trackObjectPosition = function(sourceObject, targetObject){
   if (mode == 0){
@@ -4904,7 +4797,6 @@ Roygbiv.prototype.trackObjectPosition = function(sourceObject, targetObject){
   targetObject.oldPZ = targetObject.physicsBody.position.z;
 }
 
-// untrackObjectPosition
 // Stops tracking an objects position for an object.
 Roygbiv.prototype.untrackObjectPosition = function(sourceObject){
   if (mode == 0){
@@ -4916,7 +4808,6 @@ Roygbiv.prototype.untrackObjectPosition = function(sourceObject){
   delete trackingObjects[sourceObject.name];
 }
 
-// createRotationPivot
 // Creates and returns a rotation pivot for an object. This function is not
 // optimized for the runtime. Use this function before setRotationPivot API on
 // initialization. Instead of ROYGBIV.rotate API that works on world axes, this
@@ -4936,7 +4827,6 @@ Roygbiv.prototype.createRotationPivot = function(sourceObject, offsetX, offsetY,
   return sourceObject.makePivot(offsetX, offsetY, offsetZ);
 }
 
-// rotateCamera
 // Rotates the camera around its axis by given radians.
 Roygbiv.prototype.rotateCamera = function(axis, radians){
   if (mode == 0){
@@ -4956,7 +4846,6 @@ Roygbiv.prototype.rotateCamera = function(axis, radians){
   }
 }
 
-// translateCamera
 // Translates the camera along given axis by given amount.
 Roygbiv.prototype.translateCamera = function(axis, amount){
   if (mode == 0){
@@ -4976,7 +4865,6 @@ Roygbiv.prototype.translateCamera = function(axis, amount){
   }
 }
 
-// requestFullScreen
 // Goes to full screen mode. on the next mouse click. Does nothing if the screen is
 // already in full screen mode.
 Roygbiv.prototype.requestFullScreen = function(){
@@ -4989,7 +4877,6 @@ Roygbiv.prototype.requestFullScreen = function(){
   fullScreenRequested = true;
 }
 
-// isMouseDown
 // Returns true if the mouse is pressed, false otherwise.
 Roygbiv.prototype.isMouseDown = function(){
   if (mode == 0){
@@ -4998,7 +4885,6 @@ Roygbiv.prototype.isMouseDown = function(){
   return isMouseDown;
 }
 
-// intersectionTest
 // Finds the first intersected object on a ray. The onComplete callback function
 // is executed with x, y, z and objectName parameters. If there's no intersection,
 // the objectName is set to null. If the web workers not supported, the onComplete
@@ -5018,7 +4904,6 @@ Roygbiv.prototype.intersectionTest = function(fromVector, directionVector, onCom
   rayCaster.findIntersections(REUSABLE_VECTOR, REUSABLE_VECTOR_2, false, onComplete);
 }
 
-// isMobile
 // Returns if the current client is a mobile client.
 Roygbiv.prototype.isMobile = function(){
   if (mode == 0){
@@ -5027,7 +4912,6 @@ Roygbiv.prototype.isMobile = function(){
   return isMobile;
 }
 
-// lerp
 // Linearly interpolate between vector1 and vector2. The result is vector1 if
 // amount = 0 and vector2 if amount = 1.
 Roygbiv.prototype.lerp = function(vector1, vector2, amount, targetVector){
@@ -5052,7 +4936,6 @@ Roygbiv.prototype.lerp = function(vector1, vector2, amount, targetVector){
   return targetVector;
 }
 
-// setBloom
 // Sets the Bloom effect properties of the scene. Parameters are:
 // strength (optional): The bloom strength between [0, 3]
 // radius (optional): The bloom radius between [0, 1]
@@ -5101,7 +4984,6 @@ Roygbiv.prototype.setBloom = function(params){
   }
 }
 
-// unsetBloom
 // Unsets the Bloom effect.
 Roygbiv.prototype.unsetBloom = function(){
   if (mode == 0){
@@ -5113,7 +4995,6 @@ Roygbiv.prototype.unsetBloom = function(){
   }
 }
 
-// pause
 // Pauses/unpauses rendering. Note that once the rendering is paused the scripts
 // also pause so in order to unpause the rendering, use callback functions such
 // as ROYGBIV.setScreenClickListener or ROYGBIV.setScreenPointerLockChangeListener.
@@ -5130,7 +5011,6 @@ Roygbiv.prototype.pause = function(paused){
   }
 }
 
-// executeForEachObject
 // Executes the given function for each object and object group. The func paremter
 // is executed with object and objectName parameters.
 Roygbiv.prototype.executeForEachObject = function(func){
@@ -5147,7 +5027,6 @@ Roygbiv.prototype.executeForEachObject = function(func){
   }
 }
 
-// getRandomInteger
 // Returns a random integer in range [minInclusive, maxInclusive]
 Roygbiv.prototype.getRandomInteger = function(minInclusive, maxInclusive){
   if (mode == 0){
@@ -5161,7 +5040,6 @@ Roygbiv.prototype.getRandomInteger = function(minInclusive, maxInclusive){
   return Math.floor(Math.random() * (maxInclusive - minInclusive + 1)) + minInclusive;
 }
 
-// isAnyFingerTouching
 // For mobile devices, returns true if there is any finger touching to the screen.
 Roygbiv.prototype.isAnyFingerTouching = function(){
   if (mode == 0){
@@ -5170,7 +5048,6 @@ Roygbiv.prototype.isAnyFingerTouching = function(){
   return touchEventHandler.isThereFingerTouched;
 }
 
-// getCurrentTouchCount
 // For mobile devices, returns the amount of fingers touching to the screen.
 Roygbiv.prototype.getCurrentTouchCount = function(){
   if (mode == 0){
