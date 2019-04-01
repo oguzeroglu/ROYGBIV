@@ -1,12 +1,4 @@
-importScripts("../handler/RayCaster.js");
-importScripts("../handler/WorldBinHandler.js");
-importScripts("../third_party/three.min.js");
-importScripts("../worker/StateLoaderLightweight.js");
-importScripts("../engine_objects/GridSystem.js");
-importScripts("../engine_objects/AddedObject.js");
-importScripts("../engine_objects/ObjectGroup.js");
-importScripts("../engine_objects/AddedText.js");
-
+importScripts("./WorkerImport.js");
 var IS_WORKER_CONTEXT = true;
 
 // CLASS DEFINITION

@@ -367,7 +367,7 @@ var objectsWithMouseOutListeners = new Map();
 var currentMouseOverObjectName;
 
 // WORKER VARIABLES
-var WORKERS_SUPPORTED = (typeof(Worker) !== "undefined") && (typeof(MessageChannel) !== "undefined");
+var WORKERS_SUPPORTED = (typeof(Worker) !== UNDEFINED) && (typeof(MessageChannel) !== UNDEFINED);
 
 // TEXT POOL
 var Text = (!isDeployment)? new Text(): 0;

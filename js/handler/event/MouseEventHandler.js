@@ -88,7 +88,7 @@ MouseEventHandler.prototype.handleObjectMouseEvents = function(){
   }
   var objectsWithMouseOverListenersSize = objectsWithMouseOverListeners.size;
   var objectsWithMouseOutListenerSize = objectsWithMouseOutListeners.size;
-  if (mode == 1 && objectsWithMouseOverListenersSize > 0 || objectsWithMouseOutListenerSize > 0){
+  if (mode == 1 && (objectsWithMouseOverListenersSize > 0 || objectsWithMouseOutListenerSize > 0)){
     // TRY TO PICK 2D OBJECTS FIRST
     objectPicker2D.find(this.clientX, this.clientY);
     if (!intersectionPoint){
