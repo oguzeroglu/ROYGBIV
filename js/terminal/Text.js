@@ -929,4 +929,8 @@ var Text = function(){
    this.ROYGBIV_SCRIPTING_API_REMOVEOBJECTMOUSEOVERLISTENER = "Removes the mouseover listener of an object or an object group.";
    this.ROYGBIV_SCRIPTING_API_SETOBJECTMOUSEOUTLISTENER = "Sets a mouseout listener for an object or an object group. The callbackFunction is bound to object (this = object inside the function).";
    this.ROYGBIV_SCRIPTING_API_REMOVEOBJECTMOUSEOUTLISTENER = "Removes the mouseout listener of an object or an object group.";
+   this.ROYGBIV_SCRIPTING_API_ONTEXTMOUSEOVER = "Sets a mouseover listener for a text. The callbackFunction is bound to text (this = text inside the function).";
+   this.ROYGBIV_SCRIPTING_API_REMOVETEXTMOUSEOVERLISTENER = "Removes the mouseover listener of a text.";
+   this.ROYGBIV_SCRIPTING_API_ONTEXTMOUSEOUT = "Sets a mouseout listener for a text. The callbackFunction is bound to text (this = text inside the function).";
+   this.ROYGBIV_SCRIPTING_API_REMOVETEXTMOUSEOUTLISTENER = "Removes the mouseout listener of a text.";
 }
