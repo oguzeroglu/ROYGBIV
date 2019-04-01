@@ -88,20 +88,15 @@ MouseEventHandler.prototype.handleObjectMouseEvents = function(){
   }
   var objectsWithMouseOverListenersSize = objectsWithMouseOverListeners.size;
   var objectsWithMouseOutListenerSize = objectsWithMouseOutListeners.size;
-  if (mode == 1 && (screenMouseMoveCallbackFunction || objectsWithMouseOverListenersSize > 0 || objectsWithMouseOutListenerSize)){
-    if (screenMouseMoveCallbackFunction){
-      screenMouseMoveCallbackFunction(this.coordX, this.coordY, this.movementX, this.movementY);
-    }
-    if (objectsWithMouseOverListenersSize > 0 || objectsWithMouseOutListenerSize){
-      // TRY TO PICK 2D OBJECTS FIRST
-      objectPicker2D.find(this.clientX, this.clientY);
-      if (!intersectionPoint){
-        REUSABLE_VECTOR.setFromMatrixPosition(camera.matrixWorld);
-        REUSABLE_VECTOR_2.set(this.coordX, this.coordY, 0.5).unproject(camera).sub(REUSABLE_VECTOR).normalize();
-        rayCaster.findIntersections(REUSABLE_VECTOR, REUSABLE_VECTOR_2, false, onRaycasterMouseMoveIntersection);
-      }else{
-        onRaycasterMouseMoveIntersection();
-      }
+  if (mode == 1 && objectsWithMouseOverListenersSize > 0 || objectsWithMouseOutListenerSize > 0){
+    // TRY TO PICK 2D OBJECTS FIRST
+    objectPicker2D.find(this.clientX, this.clientY);
+    if (!intersectionPoint){
+      REUSABLE_VECTOR.setFromMatrixPosition(camera.matrixWorld);
+      REUSABLE_VECTOR_2.set(this.coordX, this.coordY, 0.5).unproject(camera).sub(REUSABLE_VECTOR).normalize();
+      rayCaster.findIntersections(REUSABLE_VECTOR, REUSABLE_VECTOR_2, false, onRaycasterMouseMoveIntersection);
+    }else{
+      onRaycasterMouseMoveIntersection();
     }
   }
 }
@@ -115,6 +110,9 @@ MouseEventHandler.prototype.onMouseMove = function(event){
   mouseEventHandler.coordY = - ((event.clientY - rect.top) / rect.height) * 2 + 1;
   mouseEventHandler.movementX = event.movementX || event.mozMovementX || event.webkitMovementX || 0;
   mouseEventHandler.movementY = event.movementY || event.mozMovementY || event.webkitMovementY || 0;
+  if (mode == 1 && screenMouseMoveCallbackFunction){
+    screenMouseMoveCallbackFunction(mouseEventHandler.coordX, mouseEventHandler.coordY, mouseEventHandler.movementX, mouseEventHandler.movementY);
+  }
 }
 
 MouseEventHandler.prototype.onMouseUp = function(event){
