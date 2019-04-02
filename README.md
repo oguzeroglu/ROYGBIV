@@ -9,6 +9,7 @@ ROYGBIV is a WebGL game engine for motivated programmers who do not have the bud
 [GPU particles showcase](https://oguzeroglu.github.io/ROYGBIV/demo/psShowcase/application.html)  
 [Fast object picking](https://oguzeroglu.github.io/ROYGBIV/demo/fastPicking/application.html)  
 [Physics worker](https://oguzeroglu.github.io/ROYGBIV/demo/physicsWorker/application.html)  
+[Dynamic instances](https://oguzeroglu.github.io/ROYGBIV/demo/dynamicInstances/application.html)  
 [Online preview of the engine](https://oguzeroglu.github.io/ROYGBIV/roygbiv.html)  
 
 ## The current state of the project
