@@ -1893,34 +1893,7 @@ function parse(input){
           // DEPRECATED
         break;
         case 66: //postProcessing
-          if (mode != 1){
-            terminal.printError(Text.WORKS_ONLY_IN_PREVIEW_MODE);
-            return true;
-          }
-          var status = splitted[1];
-          if (status.toLowerCase() != "show" && status.toLowerCase() != "hide"){
-            terminal.printError(Text.STATUS_MUST_BE_ONE_OF);
-            return true;
-          }
-
-          var visibility = guiHandler.isVisible(guiHandler.datGui);
-
-          if (status == "hide"){
-            if (!visibility){
-              terminal.printError(Text.GUI_IS_ALREADY_HIDDEN);
-              return true;
-            }
-            guiHandler.hide(guiHandler.datGui);
-            terminal.printInfo(Text.GUI_CLOSED);
-          }else{
-            if (visibility){
-              terminal.printError(Text.GUI_IS_ALREADY_VISIBLE);
-              return true;
-            }
-            guiHandler.show(guiHandler.datGui);
-            terminal.printInfo(Text.GUI_OPENED);
-          }
-          return true;
+          // DEPRECATED
         break;
         case 67: //sliceGrid
           var name = splitted[1];

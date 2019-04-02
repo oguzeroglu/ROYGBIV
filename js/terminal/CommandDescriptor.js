@@ -690,6 +690,7 @@ var CommandDescriptor = function(){
     53, //mapNormal -> Normal maps are not supported for now.
     55, //newLambertMaterial -> Deprecated due to lack of uses cases. Phong is fine for light affected objects.
     65, //superposeGridSystem -> Deprecated due to lack of uses cases after grid selection mode implementation.
+    66, //postProcessing -> Will implement in-house composer. This command is not necessary for now.
     68, //newPointLight -> Lights are not supported for now.
     78, //undo -> Deprecated because causes memory issues for big projects.
     79, //redo -> Deprecated because causes memory issues for big projects.
@@ -946,11 +947,6 @@ var CommandDescriptor = function(){
   this.segmentObject.types = [];
   this.segmentObject.types.push(this.OBJECT_NAME); //name
   this.segmentObject.types.push(this.UNKNOWN_INDICATOR); //count
-
-  // postProcessing
-  this.postProcessing = new Object();
-  this.postProcessing.types = [];
-  this.postProcessing.types.push(this.HIDE_SHOW); //hide/show
 
   // sliceGrid
   this.sliceGrid = new Object();
