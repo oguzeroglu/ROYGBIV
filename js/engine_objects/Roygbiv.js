@@ -147,8 +147,6 @@ var Roygbiv = function(){
     "removeFPSDropCallbackFunction",
     "setPerformanceDropCallbackFunction",
     "removePerformanceDropCallbackFunction",
-    "setBloom",
-    "unsetBloom",
     "getViewport",
     "setUserInactivityCallbackFunction",
     "removeUserInactivityCallbackFunction",
@@ -4934,65 +4932,6 @@ Roygbiv.prototype.lerp = function(vector1, vector2, amount, targetVector){
   targetVector.y = REUSABLE_VECTOR.y;
   targetVector.z = REUSABLE_VECTOR.z;
   return targetVector;
-}
-
-// Sets the Bloom effect properties of the scene. Parameters are:
-// strength (optional): The bloom strength between [0, 3]
-// radius (optional): The bloom radius between [0, 1]
-// threshold (optional): The bloom threshold between [0, 1]
-// resolutionScale (optional): The bloom resolution scale between [0.1, 1]
-Roygbiv.prototype.setBloom = function(params){
-  if (mode == 0){
-    return;
-  }
-  preConditions.checkIfDefined(ROYGBIV.setBloom, preConditions.params, params);
-  preConditions.checkIfNumberOnlyIfExists(ROYGBIV.setBloom, preConditions.strength, params.strength);
-  preConditions.checkIfInRangeOnlyIfDefined(ROYGBIV.setBloom, preConditions.strength, params.strength, 0, 3);
-  preConditions.checkIfNumberOnlyIfExists(ROYGBIV.setBloom, preConditions.radius, params.radius);
-  preConditions.checkIfInRangeOnlyIfDefined(ROYGBIV.setBloom, preConditions.radius, params.radius, 0, 1);
-  preConditions.checkIfNumberOnlyIfExists(ROYGBIV.setBloom, preConditions.threshold, params.threshold);
-  preConditions.checkIfInRangeOnlyIfDefined(ROYGBIV.setBloom, preConditions.threshold, params.threshold, 0, 1);
-  preConditions.checkIfNumberOnlyIfExists(ROYGBIV.setBloom, preConditions.resolutionScale, params.resolutionScale);
-  preConditions.checkIfInRangeOnlyIfDefined(ROYGBIV.setBloom, preConditions.resolutionScale, params.resolutionScale, 0.1, 1);
-  var hasStrength = false, hasRadius = false, hasThreshold = false, hasResolutionScale = false;
-  if (!(typeof params.strength == UNDEFINED)){
-    hasStrength = true;
-  }
-  if (!(typeof params.radius == UNDEFINED)){
-    hasRadius = true;
-  }
-  if (!(typeof params.threshold == UNDEFINED)){
-    hasThreshold = true;
-  }
-  if (!(typeof params.resolutionScale == UNDEFINED)){
-    hasResolutionScale = true;
-  }
-  bloomOn = true;
-  if (hasStrength){
-    bloomStrength = params.strength;
-  }
-  if (hasRadius){
-    bloomRadius = params.radius;
-  }
-  if (hasThreshold){
-    bloomThreshold = params.threshold;
-  }
-  if (hasResolutionScale){
-    adjustPostProcessing(4, params.resolutionScale);
-  }else{
-    adjustPostProcessing(-1, null);
-  }
-}
-
-// Unsets the Bloom effect.
-Roygbiv.prototype.unsetBloom = function(){
-  if (mode == 0){
-    return;
-  }
-  adjustPostProcessing(5, false);
-  if (!isDeployment){
-    guiHandler.postprocessingParameters["Bloom"] = false;
-  }
 }
 
 // Pauses/unpauses rendering. Note that once the rendering is paused the scripts
