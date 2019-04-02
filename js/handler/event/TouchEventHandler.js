@@ -1,4 +1,7 @@
 var TouchEventHandler = function(){
+  if (!isMobile){
+    return;
+  }
   canvas.addEventListener('touchstart', this.onTouchStart, false);
   canvas.addEventListener('touchmove', this.onTouchMove, false);
   canvas.addEventListener('touchcancel', this.onTouchEnd, false);
