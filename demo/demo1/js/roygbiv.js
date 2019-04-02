@@ -1693,9 +1693,13 @@ var alterThreeJSRenderFunction = true;
 var autoInstancingHandler;
 var autoInstancedObjects = new Object();
 var fpsHandler;
+var objectsWithOnClickListeners = new Map();
+var objectsWithMouseOverListeners = new Map();
+var objectsWithMouseOutListeners = new Map();
+var currentMouseOverObjectName;
 
 // WORKER VARIABLES
-var WORKERS_SUPPORTED = (typeof(Worker) !== "undefined") && (typeof(MessageChannel) !== "undefined");
+var WORKERS_SUPPORTED = (typeof(Worker) !== UNDEFINED) && (typeof(MessageChannel) !== UNDEFINED);
 
 // TEXT POOL
 var Text = (!isDeployment)? new Text(): 0;
@@ -6352,6 +6356,7 @@ function render(){
     cpuOperationsHandler.updateParticleSystems();
     cpuOperationsHandler.updateObjectTrails();
     cpuOperationsHandler.updateCrosshair();
+    cpuOperationsHandler.handleObjectMouseEvents();
   }else{
     cameraOperationsDone = false;
   }
@@ -6378,9 +6383,6 @@ function updateRaycaster(){
   if (!rayCaster.ready){
     return;
   }
-  rayCaster.onBeforeUpdate();
-  rayCaster.updateBuffer.forEach(rayCaster.issueUpdate);
-  rayCaster.updateBuffer.clear();
   rayCaster.flush();
 }
 
@@ -6534,15 +6536,13 @@ function handleSkybox(){
 
 function deploymentScripts(){
   if(deploymentScriptsStatus.SCRIPT_EXECUTION_STATUS_hideSides){if (cpuOperationsHandler.record){cpuOperationsHandler.scriptPerformances.hideSides = performance.now()}var obj = ROYGBIV.getObject("hidden");
-
 ROYGBIV.hide(obj, true);
-
-deploymentScriptsStatus.SCRIPT_EXECUTION_STATUS_hideSides = false;if (cpuOperationsHandler.record){cpuOperationsHandler.scriptPerformances.hideSides = performance.now() - cpuOperationsHandler.scriptPerformances.hideSides}}
+deploymentScriptsStatus.SCRIPT_EXECUTION_STATUS_hideSides = false;
+if (cpuOperationsHandler.record){cpuOperationsHandler.scriptPerformances.hideSides = performance.now() - cpuOperationsHandler.scriptPerformances.hideSides}}
 if(deploymentScriptsStatus.SCRIPT_EXECUTION_STATUS_hidePlayerBody){if (cpuOperationsHandler.record){cpuOperationsHandler.scriptPerformances.hidePlayerBody = performance.now()}var playerBody = ROYGBIV.getObject("playerBody");
-
 ROYGBIV.hide(playerBody, true);
-
-deploymentScriptsStatus.SCRIPT_EXECUTION_STATUS_hidePlayerBody = false;if (cpuOperationsHandler.record){cpuOperationsHandler.scriptPerformances.hidePlayerBody = performance.now() - cpuOperationsHandler.scriptPerformances.hidePlayerBody}}
+deploymentScriptsStatus.SCRIPT_EXECUTION_STATUS_hidePlayerBody = false;
+if (cpuOperationsHandler.record){cpuOperationsHandler.scriptPerformances.hidePlayerBody = performance.now() - cpuOperationsHandler.scriptPerformances.hidePlayerBody}}
 if(deploymentScriptsStatus.SCRIPT_EXECUTION_STATUS_init){if (cpuOperationsHandler.record){cpuOperationsHandler.scriptPerformances.init = performance.now()}ROYGBIV.makeParticleSystemsResponsive(536);
 if (!isMobile){
   ROYGBIV.pause(true);
@@ -6821,13 +6821,11 @@ if (cpuOperationsHandler.record){cpuOperationsHandler.scriptPerformances.init = 
 if(deploymentScriptsStatus.SCRIPT_EXECUTION_STATUS_setInitialCam){if (cpuOperationsHandler.record){cpuOperationsHandler.scriptPerformances.setInitialCam = performance.now()}var obj = ROYGBIV.getObject("playerBody");
 var pos = ROYGBIV.getEndPoint(obj, "+z", ROYGBIV.vector(0, 0, 0));
 var markedPosition = ROYGBIV.getMarkedPosition("initLookAtPoint", ROYGBIV.vector(0, 0, 0));
-
 ROYGBIV.setCameraPosition(pos.x, pos.y, pos.z - 3);
 ROYGBIV.lookAt(markedPosition.x, markedPosition.y, markedPosition.z);
-
 camera.rotation.y += Math.PI/2;
-
-deploymentScriptsStatus.SCRIPT_EXECUTION_STATUS_setInitialCam = false;if (cpuOperationsHandler.record){cpuOperationsHandler.scriptPerformances.setInitialCam = performance.now() - cpuOperationsHandler.scriptPerformances.setInitialCam}}
+deploymentScriptsStatus.SCRIPT_EXECUTION_STATUS_setInitialCam = false;
+if (cpuOperationsHandler.record){cpuOperationsHandler.scriptPerformances.setInitialCam = performance.now() - cpuOperationsHandler.scriptPerformances.setInitialCam}}
 if(deploymentScriptsStatus.SCRIPT_EXECUTION_STATUS_crossHair){if (cpuOperationsHandler.record){cpuOperationsHandler.scriptPerformances.crossHair = performance.now()}ROYGBIV.createCrosshair({
 	name: "crosshair1",
 	textureName: "ch2",
@@ -6836,10 +6834,9 @@ if(deploymentScriptsStatus.SCRIPT_EXECUTION_STATUS_crossHair){if (cpuOperationsH
 	size: 8,
 	maxHeightPercent: 9
 });
-
 ROYGBIV.selectCrosshair("crosshair1");
-
-deploymentScriptsStatus.SCRIPT_EXECUTION_STATUS_crossHair = false;if (cpuOperationsHandler.record){cpuOperationsHandler.scriptPerformances.crossHair = performance.now() - cpuOperationsHandler.scriptPerformances.crossHair}}
+deploymentScriptsStatus.SCRIPT_EXECUTION_STATUS_crossHair = false;
+if (cpuOperationsHandler.record){cpuOperationsHandler.scriptPerformances.crossHair = performance.now() - cpuOperationsHandler.scriptPerformances.crossHair}}
 if(deploymentScriptsStatus.SCRIPT_EXECUTION_STATUS_cameraPositionLoop){if (cpuOperationsHandler.record){cpuOperationsHandler.scriptPerformances.cameraPositionLoop = performance.now()}ROYGBIV.getPosition(ROYGBIV.globals.body, ROYGBIV.globals.reusableVector1);
 ROYGBIV.setCameraPosition(ROYGBIV.globals.reusableVector1.x, ROYGBIV.globals.reusableVector1.y, ROYGBIV.globals.reusableVector1.z);
 ROYGBIV.translateCamera(ROYGBIV.globals.zAxis, 12 * ROYGBIV.getViewport().height / 485);
@@ -6934,7 +6931,8 @@ ROYGBIV.createObjectTrail({
 ROYGBIV.startObjectTrail(obj1);
 ROYGBIV.startObjectTrail(obj2);
 ROYGBIV.startObjectTrail(obj3);
-deploymentScriptsStatus.SCRIPT_EXECUTION_STATUS_objectTrail = false;if (cpuOperationsHandler.record){cpuOperationsHandler.scriptPerformances.objectTrail = performance.now() - cpuOperationsHandler.scriptPerformances.objectTrail}}
+deploymentScriptsStatus.SCRIPT_EXECUTION_STATUS_objectTrail = false;
+if (cpuOperationsHandler.record){cpuOperationsHandler.scriptPerformances.objectTrail = performance.now() - cpuOperationsHandler.scriptPerformances.objectTrail}}
 if(deploymentScriptsStatus.SCRIPT_EXECUTION_STATUS_boxPositionCtrl){if (cpuOperationsHandler.record){cpuOperationsHandler.scriptPerformances.boxPositionCtrl = performance.now()}ROYGBIV.getPosition(ROYGBIV.globals.box1, ROYGBIV.globals.boxPVector);
 
 if (ROYGBIV.globals.boxPVector.y < -10){
@@ -9152,6 +9150,50 @@ function removeCLIDom(){
   if (!(typeof cliDiv == UNDEFINED)){
     document.body.removeChild(cliDiv);
   }
+  resizeEventHandler.onResize();
+}
+
+function onRaycasterMouseMoveIntersection(){
+  if (intersectionPoint){
+    var object = addedObjects[intersectionObject];
+    if (!object){
+      object = objectGroups[intersectionObject];
+    }
+    if (!object){
+      object = addedTexts[intersectionObject];
+    }
+    var isDifferent = currentMouseOverObjectName != object.name;
+    if (object.mouseOverCallbackFunction && isDifferent){
+      object.mouseOverCallbackFunction(intersectionPoint.x, intersectionPoint.y, intersectionPoint.z);
+    }
+    if (currentMouseOverObjectName && isDifferent){
+      var curObj = addedObjects[currentMouseOverObjectName];
+      if (!curObj){
+        curObj = objectGroups[currentMouseOverObjectName];
+      }
+      if (!curObj){
+        curObj = addedTexts[currentMouseOverObjectName];
+      }
+      if (curObj && curObj.mouseOutCallbackFunction){
+        curObj.mouseOutCallbackFunction();
+      }
+    }
+    currentMouseOverObjectName = intersectionObject;
+  }else{
+    if (currentMouseOverObjectName){
+      var curObj = addedObjects[currentMouseOverObjectName];
+      if (!curObj){
+        curObj = objectGroups[currentMouseOverObjectName];
+      }
+      if (!curObj){
+        curObj = addedTexts[currentMouseOverObjectName];
+      }
+      if (curObj && curObj.mouseOutCallbackFunction){
+        curObj.mouseOutCallbackFunction();
+      }
+    }
+    currentMouseOverObjectName = 0;
+  }
 }
 
 function onRaycasterIntersection(){
@@ -9318,8 +9360,8 @@ function startPerformanceAnalysis(){
   webglCallbackHandler.startRecording();
   threejsRenderMonitoringHandler.startRecording();
   if (WORKERS_SUPPORTED){
-    physicsWorld.workerMessageHandler.startRecording();
-    rayCaster.workerMessageHandler.startRecording();
+    physicsWorld.startRecording();
+    rayCaster.startRecording();
     physicsWorld.worker.postMessage({startRecording: true});
     rayCaster.worker.postMessage({startRecording: true});
   }
@@ -9340,50 +9382,13 @@ function dumpPerformance(){
     physicsWorld.worker.postMessage({dumpPerformanceLogs: true});
     rayCaster.worker.postMessage({dumpPerformanceLogs: true});
     console.log("%c                  PHYSICS WORKER BRIDGE             ", "background: black; color: lime");
-    physicsWorld.workerMessageHandler.dumpPerformanceLogs();
+    physicsWorld.dumpPerformanceLogs();
     console.log("%c                  RAYCASTER WORKER BRIDGE           ", "background: black; color: lime");
-    rayCaster.workerMessageHandler.dumpPerformanceLogs();
+    rayCaster.dumpPerformanceLogs();
   }
 }
 
 //******************************************************************
-// WARNING: FOR TEST PURPOSES
-function generateRandomBoxes(gridSystemName){
-  var gridSystem = gridSystems[gridSystemName];
-  for (var gridNumber in gridSystem.grids){
-    var grid = gridSystem.grids[gridNumber];
-    grid.toggleSelect(false, false, false, false);
-    var height = Math.random() * 100;
-    var name = "randomGeneratedBox_"+gridSystemName+"_"+gridNumber;
-    var color = ColorNames.generateRandomColor();
-    var material = new BasicMaterial({
-      color: color,
-      name: "null"
-    });
-    gridSystem.newBox([grid], height, material, name);
-  }
-}
-
-// WARNING: FOR TEST PURPOSES
-function mergeAllAddedObjects(){
-  var objNames = "";
-  for (var addedObjectName in addedObjects){
-    objNames += addedObjectName + ",";
-  }
-  objNames = objNames.substring(0, objNames.length - 1);
-  parseCommand("glue glue_test_1 "+objNames);
-}
-
-// WARNING: FOR TEST PURPOSES
-function printParticleSystemPerformances(){
-  for (var particleSystemName in particleSystems){
-    var particleSystem = particleSystems[particleSystemName];
-    var particles = particleSystem.particles;
-    var lastParticle = particles[particles.length-1];
-    console.log(particleSystemName+": "+lastParticle.performance/1000+" secs.");
-  }
-}
-
 // WARNING: FOR TEST PURPOSES - WORKS ONLY FOR CANVAS TEXTURES
 function debugTexture(textureName){
   var texture = textures[textureName];
@@ -9404,15 +9409,6 @@ function debugCanvas(dbgCanvas){
   var img = new Image(dbgCanvas.width, dbgCanvas.height);
   img.src = dbgCanvas.toDataURL();
   newTab.document.body.appendChild(img);
-}
-
-// WARNING: FOR TEST PURPOSES
-function clearChildrenMesh(objectGroup){
-  for (var childName in objectGroup.group){
-    var child = objectGroup.group[childName];
-    child.mesh.geometry.dispose();
-    delete child.mesh.geometry;
-  }
 }
 
 // WARNING: FOR TEST PURPOSES
@@ -11810,6 +11806,10 @@ StateLoader.prototype.resetProject = function(){
   areaBinHandler = new WorldBinHandler(true);
   webglCallbackHandler = new WebGLCallbackHandler();
   threejsRenderMonitoringHandler = new THREEJSRenderMonitoringHandler();
+  objectsWithOnClickListeners = new Map();
+  objectsWithMouseOverListeners = new Map();
+  objectsWithMouseOutListeners = new Map();
+  currentMouseOverObjectName = 0;
   if (!WORKERS_SUPPORTED){
     rayCaster = new RayCaster();
     physicsWorld = new CANNON.World();
@@ -16603,7 +16603,15 @@ var Roygbiv = function(){
     "setScreenMouseWheelListener",
     "removeScreenMouseWheelListener",
     "setScreenPinchListener",
-    "removeScreenPinchListener"
+    "removeScreenPinchListener",
+    "setObjectMouseOverListener",
+    "removeObjectMouseOverListener",
+    "setObjectMouseOutListener",
+    "removeObjectMouseOutListener",
+    "onTextMouseOver",
+    "removeTextMouseOverListener",
+    "onTextMouseOut",
+    "removeTextMouseOutListener"
   ];
 
   this.globals = new Object();
@@ -17203,12 +17211,18 @@ Roygbiv.prototype.setObjectColor = function(object, colorName, alpha){
   }else{
   }
   REUSABLE_COLOR.set(colorName);
+  if (object.autoInstancedParent){
+    object.autoInstancedParent.forceColor(object, REUSABLE_COLOR.r, REUSABLE_COLOR.g, REUSABLE_COLOR.b, alpha);
+  }
   object.forceColor(REUSABLE_COLOR.r, REUSABLE_COLOR.g, REUSABLE_COLOR.b, alpha);
 }
 
 Roygbiv.prototype.resetObjectColor = function(object){
   if (mode == 0){
     return;
+  }
+  if (object.autoInstancedParent){
+    object.autoInstancedParent.resetColor(object);
   }
   object.resetColor();
 }
@@ -18948,6 +18962,7 @@ Roygbiv.prototype.setObjectClickListener = function(sourceObject, callbackFuncti
     return;
   }
   sourceObject.clickCallbackFunction = callbackFunction;
+  objectsWithOnClickListeners.set(sourceObject.name, sourceObject);
 }
 
 Roygbiv.prototype.removeObjectClickListener = function(sourceObject){
@@ -18955,6 +18970,7 @@ Roygbiv.prototype.removeObjectClickListener = function(sourceObject){
     return;
   }
   delete sourceObject.clickCallbackFunction;
+  objectsWithOnClickListeners.delete(sourceObject.name);
 }
 
 Roygbiv.prototype.setScreenClickListener = function(callbackFunction){
@@ -19150,6 +19166,7 @@ Roygbiv.prototype.onTextClick = function(text, callbackFunction){
     return;
   }
   text.clickCallbackFunction = callbackFunction;
+  objectsWithOnClickListeners.set(text.name, text);
 }
 
 Roygbiv.prototype.removeTextClickListener = function(text){
@@ -19157,6 +19174,7 @@ Roygbiv.prototype.removeTextClickListener = function(text){
     return;
   }
   text.clickCallbackFunction = noop;
+  objectsWithOnClickListeners.delete(text.name);
 }
 
 Roygbiv.prototype.setScreenMouseWheelListener = function(callbackFunction){
@@ -19185,6 +19203,61 @@ Roygbiv.prototype.removeScreenPinchListener = function(){
     return;
   }
   screenPinchCallbackFunction = noop;
+}
+
+Roygbiv.prototype.setObjectMouseOverListener = function(sourceObject, callbackFunction){
+  if (mode == 0){
+    return;
+  }
+  sourceObject.mouseOverCallbackFunction = callbackFunction;
+  objectsWithMouseOverListeners.set(sourceObject.name, sourceObject);
+}
+
+Roygbiv.prototype.removeObjectMouseOverListener = function(sourceObject){
+  if (mode == 0){
+    return;
+  }
+  delete sourceObject.mouseOverCallbackFunction;
+  objectsWithMouseOverListeners.delete(sourceObject.name);
+}
+
+Roygbiv.prototype.setObjectMouseOutListener = function(sourceObject, callbackFunction){
+  if (mode == 0){
+    return;
+  }
+  sourceObject.mouseOutCallbackFunction = callbackFunction;
+  objectsWithMouseOutListeners.set(sourceObject.name, sourceObject);
+}
+
+Roygbiv.prototype.removeObjectMouseOutListener = function(sourceObject){
+  if (mode == 0){
+    return;
+  }
+  delete sourceObject.mouseOutCallbackFunction;
+  objectsWithMouseOutListeners.delete(sourceObject.name);
+}
+
+Roygbiv.prototype.onTextMouseOver = function(text, callbackFunction){
+  if (mode == 0){
+    return;
+  }
+  text.mouseOverCallbackFunction = callbackFunction;
+  objectsWithMouseOverListeners.set(text.name, text);
+}
+
+Roygbiv.prototype.removeTextMouseOverListener = function(text){
+  delete text.mouseOverCallbackFunction;
+  objectsWithMouseOverListeners.delete(text.name);
+}
+
+Roygbiv.prototype.onTextMouseOut = function(text, callbackFunction){
+  text.mouseOutCallbackFunction = callbackFunction;
+  objectsWithMouseOutListeners.set(text.name, text);
+}
+
+Roygbiv.prototype.removeTextMouseOutListener = function(text){
+  delete text.mouseOutCallbackFunction;
+  objectsWithMouseOutListeners.delete(text.name);
 }
 
 
@@ -21672,6 +21745,7 @@ AddedText.prototype.debugTriangles = function(triangleIndex){
 
 AddedText.prototype.hide = function(){
   this.mesh.visible = false;
+  this.isHidden = true;
   if (mode == 0 && this.bbHelper){
     scene.remove(this.bbHelper);
   }
@@ -21685,6 +21759,7 @@ AddedText.prototype.hide = function(){
 
 AddedText.prototype.show = function(){
   this.mesh.visible = true;
+  this.isHidden = false;
   if (mode == 1 && this.isClickable){
     if (!this.boundingBox){
       this.handleBoundingBox();
@@ -22164,6 +22239,8 @@ RayCaster.prototype.onAddedTextResize = function(){
 }
 
 RayCaster.prototype.flush = function(){
+  this.updateBuffer.forEach(this.issueUpdate);
+  this.updateBuffer.clear();
 }
 
 RayCaster.prototype.refresh = function(){
@@ -22222,10 +22299,6 @@ RayCaster.prototype.updateObject = function(obj, forceUpdate){
     return;
   }
   this.updateBuffer.set(obj.name, obj);
-}
-
-RayCaster.prototype.onBeforeUpdate = function(){
-
 }
 
 RayCaster.prototype.issueUpdate = function(obj){
@@ -23034,6 +23107,10 @@ ModeSwitcher.prototype.commonSwitchFunctions = function(){
   particleSystemRefHeight = 0;
   GLOBAL_PS_REF_HEIGHT_UNIFORM.value = 0;
   trackingObjects = new Object();
+  objectsWithOnClickListeners = new Map();
+  objectsWithMouseOverListeners = new Map();
+  objectsWithMouseOutListeners = new Map();
+  currentMouseOverObjectName = 0;
   defaultCameraControlsDisabled = false;
   initPostProcessing();
   rayCaster.refresh();
@@ -23252,6 +23329,8 @@ ModeSwitcher.prototype.switchFromPreviewToDesign = function(){
     addedText.show();
     addedText.handleResize();
     delete addedText.clickCallbackFunction;
+    delete addedText.mouseOverCallbackFunction;
+    delete addedText.mouseOutCallbackFunction;
   }
   collisionCallbackRequests = new Map();
   particleCollisionCallbackRequests = new Object();
@@ -23299,8 +23378,10 @@ ModeSwitcher.prototype.switchFromPreviewToDesign = function(){
     object.resetColor();
 
     delete object.clickCallbackFunction;
+    delete object.mouseOverCallbackFunction;
+    delete object.mouseOutCallbackFunction;
 
-    if (!(typeof object.originalMass == "undefined")){
+    if (!(typeof object.originalMass == UNDEFINED)){
       object.setMass(object.originalMass);
       if (object.originalMass == 0){
         dynamicObjectGroups.delete(object.name);
@@ -23324,6 +23405,8 @@ ModeSwitcher.prototype.switchFromPreviewToDesign = function(){
     var object = addedObjects[objectName];
 
     delete object.clickCallbackFunction;
+    delete object.mouseOverCallbackFunction;
+    delete object.mouseOutCallbackFunction;
 
     object.resetColor();
 
@@ -23340,7 +23423,7 @@ ModeSwitcher.prototype.switchFromPreviewToDesign = function(){
       object.updateOpacity(object.initOpacity);
       object.initOpacitySet = false;
     }
-    if (!(typeof object.originalMass == "undefined")){
+    if (!(typeof object.originalMass == UNDEFINED)){
       object.setMass(object.originalMass);
       if (object.originalMass == 0){
         dynamicObjects.delete(object.name);
@@ -24055,7 +24138,8 @@ var CPUOperationsHandler = function(){
     updateCrosshair: 0,
     renderScene: 0,
     updateAddedTexts: 0,
-    updateRaycaster: 0
+    updateRaycaster: 0,
+    objectMouseEvents: 0
   }
   this.scriptPerformances = {};
 }
@@ -24095,6 +24179,16 @@ CPUOperationsHandler.prototype.dumpPerformanceLogs = function(){
         console.log("%c   ["+pseudoAry2[i2].name+"] -> "+pseudoAry2[i2].value+" ms.", "background: black; color: lightcyan");
       }
     }
+  }
+}
+
+CPUOperationsHandler.prototype.handleObjectMouseEvents = function(){
+  if (this.record){
+    var s = performance.now();
+    mouseEventHandler.handleObjectMouseEvents();
+    this.performanceLogs.objectMouseEvents = performance.now() - s;
+  }else{
+    mouseEventHandler.handleObjectMouseEvents();
   }
 }
 
@@ -24229,21 +24323,34 @@ CPUOperationsHandler.prototype.handleSkybox = function(){
 }
 
 var RaycasterWorkerBridge = function(){
+  this.record = false;
   this.isRaycasterWorkerBridge = true;
   this.worker = new Worker("./js/worker/RaycasterWorker.js");
-  this.workerMessageHandler = new WorkerMessageHandler(this.worker);
-  this.updateBuffer = new Map();
-  this.textScaleUpdateBuffer = new Map();
-  this.hasUpdatedTexts = false;
-  this.intersectionTestBufferSize = 10;
   this.ready = false;
+  this.updateBuffer = new Map();
+  this.addedTextScaleUpdateBuffer = new Map();
+  this.hasOwnership = false;
+  this.maxIntersectionCountInAFrame = 10;
+  this.curIntersectionTestRequestCount = 0;
+  this.performanceLogs = {
+    intersectableObjDescriptionLen: 0, intersectionTestDescriptionLen: 0,
+    flagsDescriptionLen: 0, cameraOrientationDescriptionLen: 0, addedTextScaleDescriptionLen: 0,
+    flushTime: 0
+  };
+  this.intersectionTestBuffer = {
+    isActive: false, fromVectors: [] , directionVectors: [],
+    intersectGridSystems: [], callbackFunctions: []
+  };
+  for (var i = 0 ; i < this.maxIntersectionCountInAFrame; i ++){
+    this.intersectionTestBuffer.fromVectors.push(new THREE.Vector3());
+    this.intersectionTestBuffer.directionVectors.push(new THREE.Vector3());
+    this.intersectionTestBuffer.intersectGridSystems.push(false);
+    this.intersectionTestBuffer.callbackFunctions.push(noop);
+  }
   this.worker.addEventListener("message", function(msg){
     if (msg.data.isPerformanceLog){
       console.log("%c                    RAYCASTER WORKER                  ", "background: black; color: lime");
-      console.log("%cWorker message handler flush time: "+msg.data.flushTimeLastFrame+" ms", "background: black; color: magenta");
-      console.log("%cPreallocated array cache size: "+msg.data.preallocatedArrayCacheSize, "background: black; color: magenta");
-      console.log("%cTotal arrays sent last frame: "+msg.data.totalArraysSentLastFrame, "background: black; color: magenta");
-      console.log("%cTotal bytes sent last frame: "+msg.data.totalBytesSentLastFrame, "background: black; color: magenta");
+      console.log("%cUpdate time: "+msg.data.updateTime+" ms", "background: black; color: magenta");
     }else if (msg.data.type){
       rayCaster.objectsByWorkerID = new Object();
       rayCaster.idsByObjectNames = new Object();
@@ -24256,130 +24363,122 @@ var RaycasterWorkerBridge = function(){
           var objWorkerID = msg.data.ids[i].id;
           rayCaster.objectsByWorkerID[objWorkerID] = obj;
           rayCaster.idsByObjectNames[obj.name] = objWorkerID;
-          obj.raycasterUpdateBuffer = new Float32Array(18);
-          obj.raycasterUpdateBufferAvailibility = true;
-          obj.raycasterUpdateBuffer[0] = 0; obj.raycasterUpdateBuffer[1] = objWorkerID;
-          if (mode == 1 && obj.isChangeable){
-            obj.raycasterHideBuffer = new Float32Array(2);
-            obj.raycasterShowBuffer = new Float32Array(2);
-            obj.raycasterHideBuffer[0] = 5;
-            obj.raycasterShowBuffer[0] = 6;
-            obj.raycasterHideBuffer[1] = objWorkerID;
-            obj.raycasterShowBuffer[1] = objWorkerID;
-            obj.raycasterHideBufferAvailibility = true;
-            obj.raycasterShowBufferAvailibility = true;
-          }
-          obj.raycasterAvailibilityModifierBuffer = new Map();
         }else if (msg.data.ids[i].type == "objectGroup"){
           var obj = objectGroups[msg.data.ids[i].name];
           var objWorkerID = msg.data.ids[i].id;
           rayCaster.objectsByWorkerID[objWorkerID] = obj;
           rayCaster.idsByObjectNames[obj.name] = objWorkerID;
-          obj.raycasterUpdateBuffer = new Float32Array(18);
-          obj.raycasterUpdateBufferAvailibility = true;
-          obj.raycasterUpdateBuffer[0] = 1; obj.raycasterUpdateBuffer[1] = objWorkerID;
-          if (mode == 1 && objectGroups[msg.data.ids[i].name].isChangeable){
-            obj.raycasterHideBuffer = new Float32Array(2);
-            obj.raycasterShowBuffer = new Float32Array(2);
-            obj.raycasterHideBuffer[0] = 5;
-            obj.raycasterShowBuffer[0] = 6;
-            obj.raycasterHideBuffer[1] = objWorkerID;
-            obj.raycasterShowBuffer[1] = objWorkerID;
-            obj.raycasterHideBufferAvailibility = true;
-            obj.raycasterShowBufferAvailibility = true;
-          }
-          obj.raycasterAvailibilityModifierBuffer = new Map();
         }else if (msg.data.ids[i].type == "addedText"){
           var text = addedTexts[msg.data.ids[i].name];
           var textWorkerID = msg.data.ids[i].id;
           rayCaster.objectsByWorkerID[textWorkerID] = text;
           rayCaster.idsByObjectNames[text.name] = textWorkerID;
-          text.raycasterUpdateBuffer = new Float32Array(5);
-          text.raycasterUpdateBufferAvailibility = true;
-          text.raycasterUpdateBuffer[0] = 4; text.raycasterUpdateBuffer[1] = textWorkerID;
-          text.raycasterScaleUpdateBuffer = new Float32Array(12);
-          text.raycasterScaleUpdateBufferAvailibility = true;
-          text.raycasterScaleUpdateBuffer[0] = 3; text.raycasterScaleUpdateBuffer[1] = textWorkerID;
-          if (mode == 0 || (mode == 1 && addedTexts[msg.data.ids[i].name].isClickable && !addedTexts[msg.data.ids[i].name].is2D)){
-            text.raycasterHideBuffer = new Float32Array(2);
-            text.raycasterShowBuffer = new Float32Array(2);
-            text.raycasterHideBuffer[0] = 5;
-            text.raycasterShowBuffer[0] = 6;
-            text.raycasterHideBuffer[1] = textWorkerID;
-            text.raycasterShowBuffer[1] = textWorkerID;
-            text.raycasterHideBufferAvailibility = true;
-            text.raycasterShowBufferAvailibility = true;
-          }
-          text.raycasterAvailibilityModifierBuffer = new Map();
         }else{
           throw new Error("Not implemented.");
         }
       }
+      // GENERATE TRANSFERABLE MESSAGE BODY
+      rayCaster.transferableMessageBody = {};
+      rayCaster.transferableList = [];
+      var intersectablesAry = [];
+      var intersectableArrayIndex = 0;
+      for (var objName in addedObjects){
+        var obj = addedObjects[objName];
+        var insertObjectToBuffer = (mode == 0) || (mode == 1 && obj.isIntersectable && (obj.isChangeable || (!obj.noMass && obj.physicsBody.mass > 0)));
+        if (insertObjectToBuffer){
+          obj.indexInIntersectableObjDescriptionArray = intersectableArrayIndex;
+          intersectablesAry.push(rayCaster.idsByObjectNames[obj.name]);
+          intersectablesAry.push(1);
+          obj.mesh.updateMatrixWorld();
+          for (var i = 0; i<obj.mesh.matrixWorld.elements.length; i++){
+            intersectablesAry.push(obj.mesh.matrixWorld.elements[i]);
+          }
+          intersectableArrayIndex += obj.mesh.matrixWorld.elements.length + 2;
+        }
+      }
+      for (var objName in objectGroups){
+        var obj = objectGroups[objName];
+        var insertObjectToBuffer = (mode == 0) || (mode == 1 && obj.isIntersectable && (obj.isChangeable || (!obj.noMass && obj.physicsBody.mass > 0)));
+        if (insertObjectToBuffer){
+          obj.indexInIntersectableObjDescriptionArray = intersectableArrayIndex;
+          intersectablesAry.push(rayCaster.idsByObjectNames[obj.name]);
+          intersectablesAry.push(1);
+          obj.mesh.updateMatrixWorld();
+          for (var i = 0; i<obj.mesh.matrixWorld.elements.length; i++){
+            intersectablesAry.push(obj.mesh.matrixWorld.elements[i]);
+          }
+          intersectableArrayIndex += obj.mesh.matrixWorld.elements.length + 1;
+        }
+      }
+      var addedTextScaleDescriptionArray = [];
+      var addedTextScaleDescriptionIndex = 0;
+      for (var textName in addedTexts){
+        var text = addedTexts[textName];
+        var insertTextToBuffer = (!text.is2D) && ((mode == 0) || (mode == 1 && text.isClickable));
+        if (insertTextToBuffer){
+          text.indexInIntersectableObjDescriptionArray = intersectableArrayIndex;
+          text.indexInTextScaleDescriptionArray = addedTextScaleDescriptionIndex;
+          intersectablesAry.push(rayCaster.idsByObjectNames[text.name]);
+          intersectablesAry.push(1);
+          addedTextScaleDescriptionArray.push(rayCaster.idsByObjectNames[text.name]);
+          text.mesh.updateMatrixWorld();
+          for (var i = 0; i<text.mesh.matrixWorld.elements.length; i++){
+            intersectablesAry.push(text.mesh.matrixWorld.elements[i]);
+          }
+          intersectableArrayIndex += text.mesh.matrixWorld.elements.length + 1;
+          addedTextScaleDescriptionArray.push(text.characterSize);
+          addedTextScaleDescriptionArray.push(text.bottomRight.x); addedTextScaleDescriptionArray.push(text.bottomRight.y); addedTextScaleDescriptionArray.push(text.bottomRight.z);
+          addedTextScaleDescriptionArray.push(text.topRight.x); addedTextScaleDescriptionArray.push(text.topRight.y); addedTextScaleDescriptionArray.push(text.topRight.z);
+          addedTextScaleDescriptionArray.push(text.bottomLeft.x); addedTextScaleDescriptionArray.push(text.bottomLeft.y); addedTextScaleDescriptionArray.push(text.bottomLeft.z);
+          addedTextScaleDescriptionIndex += 11;
+        }
+      }
+      var intersectableObjectDescriptionArray = new Float32Array(intersectablesAry);
+      var intersectionTestDescription = new Float32Array(8 * rayCaster.maxIntersectionCountInAFrame);
+      var cameraOrientationDescription = new Float32Array(8);
+      var flagsDescription = new Float32Array(3);
+      var addedTextScaleDescription = new Float32Array(addedTextScaleDescriptionArray);
+      rayCaster.transferableMessageBody.intersectableObjDescription = intersectableObjectDescriptionArray;
+      rayCaster.transferableList.push(intersectableObjectDescriptionArray.buffer);
+      rayCaster.transferableMessageBody.intersectionTestDescription = intersectionTestDescription;
+      rayCaster.transferableList.push(intersectionTestDescription.buffer);
+      rayCaster.transferableMessageBody.flagsDescription = flagsDescription;
+      rayCaster.transferableList.push(flagsDescription.buffer);
+      rayCaster.transferableMessageBody.cameraOrientationDescription = cameraOrientationDescription;
+      rayCaster.transferableList.push(cameraOrientationDescription.buffer);
+      rayCaster.transferableMessageBody.addedTextScaleDescription = addedTextScaleDescription;
+      rayCaster.transferableList.push(addedTextScaleDescription.buffer);
+      rayCaster.hasOwnership = true;
       rayCaster.onReady();
     }else{
-      for (var i = 0; i<msg.data.length; i++){
-        var ary = new Float32Array(msg.data[i]);
-        if (ary.length == 8){
-          rayCaster.intersectionTestBuffers[ary[0]] = ary;
-          rayCaster.intersectionTestBufferAvailibilities[ary[0]] = true;
-          if (ary[1] > -1){
-            var intersectedObj = rayCaster.objectsByWorkerID[ary[1]];
-            intersectionObject = intersectedObj.name;
-            REUSABLE_VECTOR.set(ary[2], ary[3], ary[4]);
-            intersectionPoint = REUSABLE_VECTOR;
-            rayCaster.intersectionTestCallbackFunctions[ary[0]](intersectionPoint.x, intersectionPoint.y, intersectionPoint.z, intersectionObject);
-          }else{
-            rayCaster.intersectionTestCallbackFunctions[ary[0]](0, 0, 0, null);
+      rayCaster.transferableMessageBody= msg.data;
+      rayCaster.transferableList[0] = rayCaster.transferableMessageBody.intersectableObjDescription.buffer;
+      rayCaster.transferableList[1] = rayCaster.transferableMessageBody.intersectionTestDescription.buffer;
+      rayCaster.transferableList[2] = rayCaster.transferableMessageBody.flagsDescription.buffer;
+      rayCaster.transferableList[3] = rayCaster.transferableMessageBody.cameraOrientationDescription.buffer;
+      rayCaster.transferableList[4] = rayCaster.transferableMessageBody.addedTextScaleDescription.buffer;
+      var intersectionTestDescription = rayCaster.transferableMessageBody.intersectionTestDescription;
+      if (rayCaster.transferableMessageBody.flagsDescription[1] > 0){
+        for (var i = 0; i<intersectionTestDescription.length; i+=8){
+          if (intersectionTestDescription[i] < 0){
+            break;
           }
-        }else{
-          if (ary[0] == 0){
-            var objID = ary[1];
-            var obj = rayCaster.objectsByWorkerID[objID];
-            obj.raycasterUpdateBuffer = ary;
-            obj.raycasterUpdateBufferAvailibility = true;
-          }else if (ary[0] == 1){
-            var objID = ary[1];
-            var obj = rayCaster.objectsByWorkerID[objID];
-            obj.raycasterUpdateBuffer = ary;
-            obj.raycasterUpdateBufferAvailibility = true;
-          }else if (ary[0] == 2){
-            rayCaster.cameraOrientationBuffer = ary;
-            rayCaster.cameraOrientationBufferAvailibility = true;
-          }else if (ary[0] == 3){
-            var objID = ary[1];
-            var obj = rayCaster.objectsByWorkerID[objID];
-            obj.raycasterScaleUpdateBuffer = ary;
-            obj.raycasterScaleUpdateBufferAvailibility = true;
-          }else if (ary[0] == 4){
-            var textID = ary[1];
-            var text = rayCaster.objectsByWorkerID[textID];
-            text.raycasterUpdateBuffer = ary;
-            text.raycasterUpdateBufferAvailibility = true;
-          }else if (ary[0] == 5){
-            var id = ary[1];
-            var obj = rayCaster.objectsByWorkerID[id];
-            obj.raycasterHideBuffer = ary;
-            obj.raycasterHideBufferAvailibility = true;
-          }else if (ary[0] == 6){
-            var id = ary[1];
-            var obj = rayCaster.objectsByWorkerID[id];
-            obj.raycasterShowBuffer = ary;
-            obj.raycasterShowBufferAvailibility = true;
+          var callbackFunc = rayCaster.intersectionTestBuffer.callbackFunctions[intersectionTestDescription[i]];
+          if (intersectionTestDescription[i+1] >= 0){
+            var objID = intersectionTestDescription[i+1];
+            var intersectedObject = rayCaster.objectsByWorkerID[objID];
+            intersectionObject = intersectedObject.name;
+            REUSABLE_VECTOR.set(intersectionTestDescription[i+2], intersectionTestDescription[i+3], intersectionTestDescription[i+4]);
+            intersectionPoint = REUSABLE_VECTOR;
+            callbackFunc(intersectionPoint.x, intersectionPoint.y, intersectionPoint.z, intersectionObject)
+          }else{
+            callbackFunc(0, 0, 0, null);
           }
         }
       }
+      rayCaster.hasOwnership = true;
     }
   });
-  // initialize buffers ********************************************
-  this.intersectionTestBuffers = [];
-  this.intersectionTestBufferAvailibilities = [];
-  this.intersectionTestCallbackFunctions = [];
-  for (var i = 0; i<this.intersectionTestBufferSize; i++){
-    this.intersectionTestBuffers.push(new Float32Array(8));
-    this.intersectionTestBufferAvailibilities.push(true);
-    this.intersectionTestCallbackFunctions.push(function(){});
-  }
-  // ***************************************************************
   this.onShiftPress = function(isPressed){
     if (mode == 0){
       rayCaster.worker.postMessage({
@@ -24387,31 +24486,25 @@ var RaycasterWorkerBridge = function(){
       })
     }
   };
-  this.updateAddedTextScale = function(addedText){
-    if (!addedText.raycasterScaleUpdateBufferAvailibility){
-      return;
-    }
-    var buf = addedText.raycasterScaleUpdateBuffer;
-    buf[2] = addedText.characterSize;
-    buf[3] = addedText.bottomRight.x; buf[4] = addedText.bottomRight.y; buf[5] = addedText.bottomRight.z;
-    buf[6] = addedText.topRight.x; buf[7] = addedText.topRight.y; buf[8] = addedText.topRight.z;
-    buf[9] = addedText.bottomLeft.x; buf[10] = addedText.bottomLeft.y; buf[11] = addedText.bottomLeft.z;
-    rayCaster.workerMessageHandler.push(buf.buffer);
-    addedText.raycasterScaleUpdateBufferAvailibility = false;
-  };
-  this.raycasterHideBufferAvailibility = "raycasterHideBufferAvailibility";
-  this.raycasterShowBufferAvailibility = "raycasterShowBufferAvailibility";
-  this.handleBufferAvailibilityUpdate = function(obj, key){
-    rayCaster.raycasterAvailibilityModifierBuffer.set(obj.name, obj);
-    obj.raycasterAvailibilityModifierBuffer.set(key, obj);
-  };
-  this.issueAvailibilityBuffers = function(obj, key){
-    obj.raycasterAvailibilityModifierBuffer.forEach(rayCaster.issueObjectAvailibilityBuffers);
-    obj.raycasterAvailibilityModifierBuffer.clear();
-  };
-  this.issueObjectAvailibilityBuffers = function(obj, bufferKey){
-    obj[bufferKey] = false;
-  };
+  this.issueAddedTextScaleUpdate = function(text){
+    var addedTextScaleDescription = rayCaster.transferableMessageBody.addedTextScaleDescription;
+    var i = text.indexInTextScaleDescriptionArray;
+    addedTextScaleDescription[i+1] = text.characterSize;
+    addedTextScaleDescription[i+2] = text.bottomRight.x; addedTextScaleDescription[i+3] = text.bottomRight.y; addedTextScaleDescription[i+4] = text.bottomRight.z;
+    addedTextScaleDescription[i+5] = text.topRight.x; addedTextScaleDescription[i+6] = text.topRight.y; addedTextScaleDescription[i+7] = text.topRight.z;
+    addedTextScaleDescription[i+8] = text.bottomLeft.x; addedTextScaleDescription[i+9] = text.bottomLeft.y; addedTextScaleDescription[i+10] = text.bottomLeft.z;
+  }
+  this.startRecording = function(){
+    rayCaster.record = true;
+  }
+  this.dumpPerformanceLogs = function(){
+    console.log("%cFlush time: "+this.performanceLogs.flushTime+" ms.", "background: black; color: magenta");
+    console.log("%cObject description array length: "+this.performanceLogs.intersectableObjDescriptionLen, "background: black; color: magenta");
+    console.log("%cAdded text scale description length: "+this.performanceLogs.addedTextScaleDescriptionLen, "background: black; color: magenta");
+    console.log("%cIntersection test description length: "+this.performanceLogs.intersectionTestDescriptionLen, "background: black; color: magenta");
+    console.log("%cFlags description length: "+this.performanceLogs.flagsDescriptionLen, "background: black; color: magenta");
+    console.log("%cCamera orientation description length: "+this.performanceLogs.cameraOrientationDescriptionLen, "background: black; color: magenta");
+  }
 }
 
 RaycasterWorkerBridge.prototype.onReady = function(){
@@ -24422,11 +24515,71 @@ RaycasterWorkerBridge.prototype.onReady = function(){
 }
 
 RaycasterWorkerBridge.prototype.flush = function(){
-  if (this.raycasterAvailibilityModifierBuffer.size > 0){
-    this.raycasterAvailibilityModifierBuffer.forEach(this.issueAvailibilityBuffers);
-    this.raycasterAvailibilityModifierBuffer.clear();
+  if (!this.hasOwnership){
+    return;
   }
-  this.workerMessageHandler.flush();
+  var flushStartTime;
+  if (this.record){
+    flushStartTime = performance.now();
+    this.performanceLogs.intersectableObjDescriptionLen = this.transferableMessageBody.intersectableObjDescription.length;
+    this.performanceLogs.intersectionTestDescriptionLen = this.transferableMessageBody.intersectionTestDescription.length;
+    this.performanceLogs.flagsDescriptionLen = this.transferableMessageBody.flagsDescription.length;
+    this.performanceLogs.cameraOrientationDescriptionLen = this.transferableMessageBody.cameraOrientationDescription.length;
+    this.performanceLogs.addedTextScaleDescriptionLen = this.transferableMessageBody.addedTextScaleDescription.length;
+  }
+  var sendMessage = false;
+  if (this.updateBuffer.size > 0){
+    this.updateBuffer.forEach(this.issueUpdate);
+    this.updateBuffer.clear();
+    sendMessage = true;
+    this.transferableMessageBody.flagsDescription[0] = 1;
+  }else{
+    this.transferableMessageBody.flagsDescription[0] = -1;
+  }
+  if (this.addedTextScaleUpdateBuffer.size > 0){
+    this.addedTextScaleUpdateBuffer.forEach(this.issueAddedTextScaleUpdate);
+    this.addedTextScaleUpdateBuffer.clear();
+    sendMessage = true;
+    this.transferableMessageBody.flagsDescription[2] = 1;
+  }else{
+    this.transferableMessageBody.flagsDescription[2] = -1;
+  }
+  if (this.intersectionTestBuffer.isActive){
+    sendMessage = true;
+    var intersectionTestDescription = this.transferableMessageBody.intersectionTestDescription;
+    this.transferableMessageBody.flagsDescription[1] = 1;
+    var i2 = 0;
+    for (var i = 0; i<this.maxIntersectionCountInAFrame; i++){
+      if (i < this.curIntersectionTestRequestCount){
+        intersectionTestDescription[i2++] = i;
+        intersectionTestDescription[i2++] = this.intersectionTestBuffer.fromVectors[i].x;
+        intersectionTestDescription[i2++] = this.intersectionTestBuffer.fromVectors[i].y;
+        intersectionTestDescription[i2++] = this.intersectionTestBuffer.fromVectors[i].z;
+        intersectionTestDescription[i2++] = this.intersectionTestBuffer.directionVectors[i].x;
+        intersectionTestDescription[i2++] = this.intersectionTestBuffer.directionVectors[i].y;
+        intersectionTestDescription[i2++] = this.intersectionTestBuffer.directionVectors[i].z;
+        intersectionTestDescription[i2++] = (this.intersectionTestBuffer.intersectGridSystems[i]? 1: -1)
+      }else{
+        intersectionTestDescription[i2] = -1;
+        i2+=8;
+      }
+    }
+    this.intersectionTestBuffer.isActive = false;
+    this.curIntersectionTestRequestCount = 0;
+  }else{
+    this.transferableMessageBody.flagsDescription[1] = -1;
+  }
+  if (sendMessage){
+    var cameraOrientationDescription = this.transferableMessageBody.cameraOrientationDescription;
+    cameraOrientationDescription[0] = camera.position.x; cameraOrientationDescription[1] = camera.position.y; cameraOrientationDescription[2] = camera.position.z;
+    cameraOrientationDescription[3] = camera.quaternion.x; cameraOrientationDescription[4] = camera.quaternion.y; cameraOrientationDescription[5] = camera.quaternion.z; cameraOrientationDescription[6] = camera.quaternion.w;
+    cameraOrientationDescription[7] = camera.aspect;
+    this.worker.postMessage(this.transferableMessageBody, this.transferableList);
+    this.hasOwnership = false;
+  }
+  if (this.record){
+    this.performanceLogs.flushTime = performance.now() - flushStartTime;
+  }
 }
 
 RaycasterWorkerBridge.prototype.refresh = function(){
@@ -24434,13 +24587,18 @@ RaycasterWorkerBridge.prototype.refresh = function(){
     return;
   }
   this.ready = false;
-  this.addedTextPositionUpdateCache = new Object();
-  this.cameraOrientationBuffer = new Float32Array(9);
-  this.cameraOrientationBufferAvailibility = true;
-  this.cameraOrientationBuffer[0] = 2;
-  this.raycasterAvailibilityModifierBuffer = new Map();
+  this.hasOwnership = false;
   this.updateBuffer = new Map();
-  this.textScaleUpdateBuffer = new Map();
+  this.intersectionTestBuffer = {
+    isActive: false, fromVectors: [] , directionVectors: [],
+    intersectGridSystems: [], callbackFunctions: []
+  };
+  for (var i = 0 ; i < this.maxIntersectionCountInAFrame; i ++){
+    this.intersectionTestBuffer.fromVectors.push(new THREE.Vector3());
+    this.intersectionTestBuffer.directionVectors.push(new THREE.Vector3());
+    this.intersectionTestBuffer.intersectGridSystems.push(false);
+    this.intersectionTestBuffer.callbackFunctions.push(noop);
+  }
   this.worker.postMessage(new LightweightState());
 }
 
@@ -24453,8 +24611,21 @@ RaycasterWorkerBridge.prototype.onAddedTextResize = function(addedText){
   }
   if (!addedText.is2D){
     if (mode == 0 || (mode == 1 && addedText.isClickable)){
-      rayCaster.textScaleUpdateBuffer.set(addedText.name, addedText);
+      rayCaster.addedTextScaleUpdateBuffer.set(addedText.name, addedText);
     }
+  }
+}
+
+RaycasterWorkerBridge.prototype.issueUpdate = function(obj){
+  obj.mesh.updateMatrixWorld();
+  var description = rayCaster.transferableMessageBody.intersectableObjDescription;
+  for (var i = obj.indexInIntersectableObjDescriptionArray + 2; i < obj.indexInIntersectableObjDescriptionArray + 18; i++){
+    description[i] = obj.mesh.matrixWorld.elements[i - obj.indexInIntersectableObjDescriptionArray - 2]
+  }
+  if (obj.isHidden){
+    description[obj.indexInIntersectableObjDescriptionArray+1] = -1;
+  }else{
+    description[obj.indexInIntersectableObjDescriptionArray+1] = 1;
   }
 }
 
@@ -24466,112 +24637,27 @@ RaycasterWorkerBridge.prototype.updateObject = function(obj){
     return;
   }
   this.updateBuffer.set(obj.name, obj);
-  if(obj.isAddedText){
-    this.hasUpdatedTexts = true;
-  }
 }
-
-RaycasterWorkerBridge.prototype.onBeforeUpdate = function(){
-  rayCaster.textScaleUpdateBuffer.forEach(rayCaster.updateAddedTextScale);
-  rayCaster.textScaleUpdateBuffer.clear();
-  if (rayCaster.hasUpdatedTexts){
-    if (rayCaster.cameraOrientationBufferAvailibility){
-      var buf = rayCaster.cameraOrientationBuffer;
-      buf[1] = camera.position.x; buf[2] = camera.position.y; buf[3] = camera.position.z;
-      buf[4] = camera.quaternion.x; buf[5] = camera.quaternion.y; buf[6] = camera.quaternion.z; buf[7] = camera.quaternion.w;
-      buf[8] = camera.aspect;
-      rayCaster.workerMessageHandler.push(buf.buffer);
-      rayCaster.cameraOrientationBufferAvailibility = false;
-      rayCaster.hasUpdatedTexts = false;
-    }
-  }
-  rayCaster.workerMessageHandler.flush();
-}
-
-RaycasterWorkerBridge.prototype.issueUpdate = function(obj){
-  if (obj.isAddedObject){
-    if (!obj.raycasterUpdateBufferAvailibility){
-      return;
-    }
-    if (obj.autoInstancedParent){
-      obj.mesh.updateMatrixWorld();
-    }
-    obj.raycasterUpdateBuffer.set(obj.mesh.matrixWorld.elements, 2);
-    rayCaster.workerMessageHandler.push(obj.raycasterUpdateBuffer.buffer);
-    obj.raycasterUpdateBufferAvailibility = false;
-    return;
-  }
-  if (obj.isObjectGroup){
-    if (!obj.raycasterUpdateBufferAvailibility){
-      return;
-    }
-    obj.raycasterUpdateBuffer.set(obj.mesh.matrixWorld.elements, 2);
-    rayCaster.workerMessageHandler.push(obj.raycasterUpdateBuffer.buffer);
-    obj.raycasterUpdateBufferAvailibility = false;
-    return;
-  }else if (obj.isAddedText){
-    if (!obj.raycasterUpdateBufferAvailibility){
-      return;
-    }
-    var updateAddedTextPosition = false;
-    if (!rayCaster.addedTextPositionUpdateCache){
-      rayCaster.addedTextPositionUpdateCache = new Object();
-      rayCaster.addedTextPositionUpdateCache[obj.name] = new THREE.Vector3();
-      updateAddedTextPosition = true;
-    }else if (!rayCaster.addedTextPositionUpdateCache[obj.name]){
-      rayCaster.addedTextPositionUpdateCache[obj.name] = new THREE.Vector3();
-      updateAddedTextPosition = true;
-    }else{
-      var cache = rayCaster.addedTextPositionUpdateCache[obj.name]
-      updateAddedTextPosition = ((cache.x != obj.mesh.position.x) || (cache.y != obj.mesh.position.y) || (cache.z != obj.mesh.position.z));
-    }
-    if (updateAddedTextPosition){
-      obj.raycasterUpdateBuffer[2] = obj.mesh.position.x; obj.raycasterUpdateBuffer[3] = obj.mesh.position.y; obj.raycasterUpdateBuffer[4] = obj.mesh.position.z;
-      rayCaster.workerMessageHandler.push(obj.raycasterUpdateBuffer.buffer);
-      obj.raycasterUpdateBufferAvailibility = false;
-    }
-  }
-}
-
 
 RaycasterWorkerBridge.prototype.findIntersections = function(from, direction, intersectGridSystems, callbackFunction){
-  var len = this.intersectionTestBuffers.length;
-  var sent = false;
-  for (var i = 0; i<len; i++){
-    if (this.intersectionTestBufferAvailibilities[i]){
-      var ary = this.intersectionTestBuffers[i];
-      ary[0] = i; ary[1] = from.x; ary[2] = from.y; ary[3] = from.z;
-      ary[4] = direction.x; ary[5] = direction.y; ary[6] = direction.z;
-      ary[7] = (intersectGridSystems? 1: 0)
-      var buf = ary.buffer;
-      rayCaster.workerMessageHandler.push(buf);
-      this.intersectionTestBufferAvailibilities[i] = false;
-      this.intersectionTestCallbackFunctions[i] = callbackFunction;
-      sent = true;
-      break;
-    }
-  }
-  if (!sent){
-    console.warn("[!] RaycasterWorkerBridge.findIntersections buffer overflow.");
+  if (this.curIntersectionTestRequestCount < this.maxIntersectionCountInAFrame){
+    var i = this.curIntersectionTestRequestCount;
+    this.intersectionTestBuffer.isActive = true;
+    this.intersectionTestBuffer.fromVectors[i].copy(from);
+    this.intersectionTestBuffer.directionVectors[i].copy(direction);
+    this.intersectionTestBuffer.intersectGridSystems[i] = intersectGridSystems;
+    this.intersectionTestBuffer.callbackFunctions[i] = callbackFunction;
+    this.curIntersectionTestRequestCount ++;
   }
 }
 
 RaycasterWorkerBridge.prototype.hide = function(object){
-  if (!object.raycasterHideBufferAvailibility){
-    return;
-  }
-  rayCaster.workerMessageHandler.push(object.raycasterHideBuffer.buffer);
-  rayCaster.handleBufferAvailibilityUpdate(object, rayCaster.raycasterHideBufferAvailibility);
+  this.updateBuffer.set(object.name, object);
 }
 
 RaycasterWorkerBridge.prototype.show = function(object){
-  if (!object.raycasterShowBufferAvailibility){
-    return;
-  }
-  rayCaster.workerMessageHandler.push(object.raycasterShowBuffer.buffer);
-  rayCaster.handleBufferAvailibilityUpdate(object, rayCaster.raycasterShowBufferAvailibility);
+  this.updateBuffer.set(object.name, object);
 }
-
 
 RaycasterWorkerBridge.prototype.query = function(point){
   throw new Error("not implemented.");
@@ -24638,71 +24724,6 @@ var LightweightState = function(){
   }
 }
 
-var WorkerMessageHandler = function(worker){
-  if (worker){
-    this.worker = worker;
-  }
-  this.record = false;
-  this.bufferIndex = 0;
-  this.elementCount = 0;
-  this.buffer = new Array(5);
-  this.preallocatedArrayCache = new Map();
-  this.performanceLogs = {
-    preallocatedArrayCacheSize: 0,
-    totalArraysSentLastFrame: 0,
-    totalBytesSentLastFrame: 0,
-    flushTimeLastFrame: 0
-  };
-}
-
-WorkerMessageHandler.prototype.startRecording = function(){
-  this.record = true;
-}
-
-WorkerMessageHandler.prototype.dumpPerformanceLogs = function(){
-  this.performanceLogs.preallocatedArrayCacheSize = this.preallocatedArrayCache.size;
-  console.log("%cFlush time last frame:" +this.performanceLogs.flushTimeLastFrame+" ms", "background: black; color: magenta");
-  console.log("%cPreallocated array cache size: "+this.performanceLogs.preallocatedArrayCacheSize, "background: black; color: magenta");
-  console.log("%cTotal arrays sent last frame: "+this.performanceLogs.totalArraysSentLastFrame, "background: black; color: magenta");
-  console.log("%cTotal bytes sent last frame: "+this.performanceLogs.totalBytesSentLastFrame, "background: black; color: magenta");
-}
-
-WorkerMessageHandler.prototype.push = function(data){
-  this.buffer[this.bufferIndex ++] = data;
-  this.elementCount ++;
-}
-
-WorkerMessageHandler.prototype.flush = function(){
-  if (this.elementCount > 0){
-    if (this.record){
-      this.performanceLogs.flushTimeLastFrame = performance.now();
-      this.performanceLogs.totalBytesSentLastFrame = 0;
-      this.performanceLogs.totalArraysSentLastFrame = this.elementCount;
-    }
-    var ary = this.preallocatedArrayCache.get(this.elementCount);
-    if (!ary){
-      ary = new Array(this.elementCount);
-      this.preallocatedArrayCache.set(this.elementCount, ary);
-    }
-    for (var i = 0; i<this.elementCount; i++){
-      ary[i] = this.buffer[i];
-      if (this.record){
-        this.performanceLogs.totalBytesSentLastFrame += this.buffer[i].byteLength
-      }
-    }
-    if (this.worker){
-      this.worker.postMessage(ary);
-    }else{
-      postMessage(ary);
-    }
-    this.elementCount = 0;
-    this.bufferIndex = 0;
-    if (this.record){
-      this.performanceLogs.flushTimeLastFrame = performance.now() - this.performanceLogs.flushTimeLastFrame;
-    }
-  }
-}
-
 var PointerLockEventHandler = function(){
   if (isMobile){
     return;
@@ -24720,11 +24741,14 @@ var PointerLockEventHandler = function(){
   if (pointerLockChangeFunction){
     document.addEventListener(pointerLockChangeFunction, this.onPointerLock);
   }
+  this.isPointerLocked = false;
 }
 
 PointerLockEventHandler.prototype.onPointerLock = function(event){
+  var isPointerLocked = document.pointerLockElement == canvas || document.mozPointerLockElement == canvas || document.webkitPointerLockElement == canvas;
+  pointerLockEventHandler.isPointerLocked = isPointerLocked;
   if (mode == 1 && screenPointerLockChangedCallbackFunction){
-    if (document.pointerLockElement == canvas || document.mozPointerLockElement == canvas || document.webkitPointerLockElement == canvas){
+    if (isPointerLocked){
       screenPointerLockChangedCallbackFunction(true);
     }else{
       screenPointerLockChangedCallbackFunction(false);
@@ -24733,6 +24757,9 @@ PointerLockEventHandler.prototype.onPointerLock = function(event){
 }
 
 var TouchEventHandler = function(){
+  if (!isMobile){
+    return;
+  }
   canvas.addEventListener('touchstart', this.onTouchStart, false);
   canvas.addEventListener('touchmove', this.onTouchMove, false);
   canvas.addEventListener('touchcancel', this.onTouchEnd, false);
@@ -24971,17 +24998,36 @@ MouseEventHandler.prototype.onMouseWheel = function(event){
   }
 }
 
+MouseEventHandler.prototype.handleObjectMouseEvents = function(){
+  if (isMobile || typeof this.coordX == UNDEFINED || pointerLockEventHandler.isPointerLocked){
+    return;
+  }
+  var objectsWithMouseOverListenersSize = objectsWithMouseOverListeners.size;
+  var objectsWithMouseOutListenerSize = objectsWithMouseOutListeners.size;
+  if (mode == 1 && (objectsWithMouseOverListenersSize > 0 || objectsWithMouseOutListenerSize > 0)){
+    // TRY TO PICK 2D OBJECTS FIRST
+    objectPicker2D.find(this.clientX, this.clientY);
+    if (!intersectionPoint){
+      REUSABLE_VECTOR.setFromMatrixPosition(camera.matrixWorld);
+      REUSABLE_VECTOR_2.set(this.coordX, this.coordY, 0.5).unproject(camera).sub(REUSABLE_VECTOR).normalize();
+      rayCaster.findIntersections(REUSABLE_VECTOR, REUSABLE_VECTOR_2, false, onRaycasterMouseMoveIntersection);
+    }else{
+      onRaycasterMouseMoveIntersection();
+    }
+  }
+}
+
 MouseEventHandler.prototype.onMouseMove = function(event){
   inactiveCounter = 0;
+  var rect = boundingClientRect;
+  mouseEventHandler.clientX = event.clientX;
+  mouseEventHandler.clientY = event.clientY;
+  mouseEventHandler.coordX = ((event.clientX - rect.left) / rect.width) * 2 - 1;
+  mouseEventHandler.coordY = - ((event.clientY - rect.top) / rect.height) * 2 + 1;
+  mouseEventHandler.movementX = event.movementX || event.mozMovementX || event.webkitMovementX || 0;
+  mouseEventHandler.movementY = event.movementY || event.mozMovementY || event.webkitMovementY || 0;
   if (mode == 1 && screenMouseMoveCallbackFunction){
-    var rect = boundingClientRect;
-    var coordX = ((event.clientX - rect.left) / rect.width) * 2 - 1;
-    var coordY = - ((event.clientY - rect.top) / rect.height) * 2 + 1;
-    var movementX = event.movementX || event.mozMovementX ||
-                    event.webkitMovementX || 0;
-    var movementY = event.movementY || event.mozMovementY ||
-                    event.webkitMovementY || 0;
-    screenMouseMoveCallbackFunction(coordX, coordY, movementX, movementY);
+    screenMouseMoveCallbackFunction(mouseEventHandler.coordX, mouseEventHandler.coordY, mouseEventHandler.movementX, mouseEventHandler.movementY);
   }
 }
 
@@ -25046,6 +25092,9 @@ MouseEventHandler.prototype.onClick = function(event){
       return;
     }
     if (event.clientX < rectX || event.clientX > rectX + rectZ || event.clientY < rectY || event.clientY > rectY + rectW){
+      return;
+    }
+    if (mode == 1 && objectsWithOnClickListeners.size == 0){
       return;
     }
     // TRY TO PICK 2D OBJECTS FIRST
@@ -25122,6 +25171,9 @@ ResizeEventHandler.prototype.onResize = function(){
 }
 
 var OrientationChangeEventHandler = function(){
+  if (!isMobile){
+    return;
+  }
   window.addEventListener('orientationchange', resizeEventHandler.onResize);
 }
 
@@ -25426,16 +25478,21 @@ PhysicsBodyGenerator.prototype.generateSphereBody = function(params){
 }
 
 var PhysicsWorkerBridge = function(){
+  this.record = false;
   this.isPhysicsWorkerBridge = true;
   this.worker = new Worker("./js/worker/PhysicsWorker.js");
   this.ready = false;
   this.idsByObjectName = new Object();
   this.objectsByID = new Object();
   this.updateBuffer = new Map();
+  this.performanceLogs = {
+    objectDescriptionBufferSize: 0, collisionDescriptionBufferSize: 0
+  }
   this.worker.addEventListener("message", function(msg){
     if (msg.data.isPerformanceLog){
-
-    }if (msg.data.isDebug){
+      console.log("%c                    PHYSICS WORKER                    ", "background: black; color: lime");
+      console.log("%cStep time: "+msg.data.stepTime+" ms", "background: black; color: magenta");
+    }else if (msg.data.isDebug){
       console.log("[*] Debug response received.");
       for (var i = 0; i<msg.data.bodies.length; i++){
         var obj = addedObjects[msg.data.bodies[i].name] || objectGroups[msg.data.bodies[i].name];
@@ -25462,6 +25519,15 @@ var PhysicsWorkerBridge = function(){
       physicsWorld.updateObjects(msg.data);
     }
   });
+}
+
+PhysicsWorkerBridge.prototype.startRecording = function(){
+  this.record = true;
+}
+
+PhysicsWorkerBridge.prototype.dumpPerformanceLogs = function(){
+  console.log("%cObject description buffer length: "+this.performanceLogs.objectDescriptionBufferSize, "background: black; color: magenta");
+  console.log("%cCollision description buffer length: "+this.performanceLogs.collisionDescriptionBufferSize, "background: black; color: magenta");
 }
 
 PhysicsWorkerBridge.prototype.issueUpdate = function(obj){
@@ -25496,13 +25562,49 @@ PhysicsWorkerBridge.prototype.issueUpdate = function(obj){
   }
 }
 
+PhysicsWorkerBridge.prototype.handleCollisions = function(collisionDescription){
+  if (collisionDescription){
+    for (var i = 0; i<collisionDescription.length; i+= 10){
+      if (collisionDescription[i] < 0){
+        break;
+      }
+      var sourceObject = physicsWorld.objectsByID[collisionDescription[i]];
+      var targetObject = physicsWorld.objectsByID[collisionDescription[i+1]];
+      var positionX = collisionDescription[i+2];
+      var positionY = collisionDescription[i+3];
+      var positionZ = collisionDescription[i+4];
+      var collisionImpact = collisionDescription[i+5];
+      var quaternionX = collisionDescription[i+6];
+      var quaternionY = collisionDescription[i+7];
+      var quaternionZ = collisionDescription[i+8];
+      var quaternionW = collisionDescription[i+9];
+      reusableCollisionInfo.set(targetObject.name, positionX, positionY, positionZ, collisionImpact, quaternionX, quaternionY, quaternionZ, quaternionW);
+      var curCollisionCallbackRequest = collisionCallbackRequests.get(sourceObject.name);
+      if (curCollisionCallbackRequest){
+        curCollisionCallbackRequest(reusableCollisionInfo);
+      }
+      collisionDescription[i] = -1;
+    }
+  }
+  return collisionDescription;
+}
+
 PhysicsWorkerBridge.prototype.updateObjects = function(data){
   if (mode != 1){
     return;
   }
   var ary = data.objDescription;
+  var collisionDescription = this.handleCollisions(data.collisionDescription);
   this.transferableMessageBody.objDescription = ary;
   this.transferableList[0] = ary.buffer;
+  if (collisionDescription){
+    this.transferableMessageBody.collisionDescription = collisionDescription;
+    if (this.transferableList.length == 1){
+      this.transferableList.push(collisionDescription.buffer);
+    }else{
+      this.transferableList[1] = collisionDescription.buffer;
+    }
+  }
   this.hasOwnership = true;
   this.updateBuffer.forEach(this.issueUpdate);
   this.updateBuffer.clear();
@@ -25573,15 +25675,15 @@ PhysicsWorkerBridge.prototype.refresh = function(){
 }
 
 PhysicsWorkerBridge.prototype.removeCollisionListener = function(obj){
-
+  this.worker.postMessage({
+    isRemoveCollisionListener: true, objName: obj.name
+  });
 }
 
 PhysicsWorkerBridge.prototype.setCollisionListener = function(obj){
-
-}
-
-PhysicsWorkerBridge.prototype.fireCollision = function(ary){
-
+  this.worker.postMessage({
+    isSetCollisionListener: true, objName: obj.name
+  });
 }
 
 PhysicsWorkerBridge.prototype.init = function(){
@@ -25607,6 +25709,12 @@ PhysicsWorkerBridge.prototype.addBody = function(body){
 PhysicsWorkerBridge.prototype.step = function(stepAmount){
   if (!this.ready || !this.hasOwnership){
     return;
+  }
+  if (this.record){
+    this.performanceLogs.objectDescriptionBufferSize = this.transferableMessageBody.objDescription.length;
+    if (this.transferableMessageBody.collisionDescription){
+      this.performanceLogs.collisionDescriptionBufferSize = this.transferableMessageBody.collisionDescription.length;
+    }
   }
   this.worker.postMessage(this.transferableMessageBody, this.transferableList);
   this.hasOwnership = false;
@@ -25753,6 +25861,11 @@ THREEJSRenderMonitoringHandler.prototype.dispatchEvent = function(eventID, isSta
   if (!this.record){
     return;
   }
+  if (!this.renderOperations[this.currentRenderCallCountPerFrame-1]){
+    this.maxRenderCallCountPerFrame = this.currentRenderCallCountPerFrame;
+    this.startRecording();
+    return;
+  }
   var curCounter = this.renderOperations[this.currentRenderCallCountPerFrame-1].counters;
   var curPerformanceLogs = this.renderOperations[this.currentRenderCallCountPerFrame-1].performanceLogs;
   this.renderOperations[this.currentRenderCallCountPerFrame-1].passName = this.currentPassName;
@@ -25872,6 +25985,27 @@ AutoInstancedObject.prototype.showObject = function(object){
   orientationAry[index].x = 10;
 }
 
+AutoInstancedObject.prototype.forceColor = function(object, r, g, b, a){
+  var index = this.forcedColorIndicesByObjectName.get(object.name);
+  var forcedColorAry = this.mesh.material.uniforms.autoInstanceForcedColorArray.value;
+  forcedColorAry[index].set(a, r, g, b);
+  if (a < 0){
+    a = 0;
+  }
+  if (a > 1){
+    a = 1;
+  }
+  if (a != 1 && !this.mesh.material.transparent){
+    this.mesh.material.transparent = true;
+  }
+}
+
+AutoInstancedObject.prototype.resetColor = function(object){
+  var index = this.forcedColorIndicesByObjectName.get(object.name);
+  var forcedColorAry = this.mesh.material.uniforms.autoInstanceForcedColorArray.value;
+  forcedColorAry[index].set(-100, -100, -100, -100);
+}
+
 AutoInstancedObject.prototype.init = function(){
   this.pseudoObjectGroup.handleTextures();
   this.pseudoObjectGroup.mergeInstanced();
@@ -25904,9 +26038,14 @@ AutoInstancedObject.prototype.init = function(){
   this.injectMacro("IS_AUTO_INSTANCED", true, true);
   var objCount = 0;
   var curIndex = 0;
+  var forcedColorIndex = 0;
   this.orientationIndicesByObjectName = new Map();
+  this.forcedColorIndicesByObjectName = new Map();
   var orientationIndices = [];
   var orientationAry = [];
+  var forcedColorAry = [];
+  var forcedColorIndices = [];
+  var hasColorizableMember = false;
   for (var objName in this.objects){
     var obj = this.objects[objName];
     this.orientationIndicesByObjectName.set(objName, curIndex);
@@ -25916,12 +26055,28 @@ AutoInstancedObject.prototype.init = function(){
     orientationAry.push(new THREE.Vector4(10, obj.mesh.position.x, obj.mesh.position.y, obj.mesh.position.z));
     orientationAry.push(new THREE.Vector4(obj.mesh.quaternion.x, obj.mesh.quaternion.y, obj.mesh.quaternion.z, obj.mesh.quaternion.w));
     obj.autoInstancedParent = this;
+    if (obj.isColorizable){
+      hasColorizableMember = true;
+    }
+    forcedColorAry.push(new THREE.Vector4(-100, -100, -100, -100));
+    forcedColorIndices.push(forcedColorIndex);
+    this.forcedColorIndicesByObjectName.set(objName, forcedColorIndex);
+    forcedColorIndex ++;
   }
   var orientationIndicesBufferAttribute = new THREE.InstancedBufferAttribute(new Float32Array(orientationIndices), 1);
   orientationIndicesBufferAttribute.setDynamic(false);
   this.mesh.geometry.addAttribute("orientationIndex", orientationIndicesBufferAttribute);
   this.injectMacro("AUTO_INSTANCE_ORIENTATION_ARRAY_SIZE "+(objCount * 2), true, false);
   this.mesh.material.uniforms.autoInstanceOrientationArray = new THREE.Uniform(orientationAry);
+  if (hasColorizableMember){
+    this.injectMacro("AUTO_INSTANCE_FORCED_COLOR_ARRAY_SIZE "+(objCount), true, false);
+    this.injectMacro("AUTO_INSTANCE_HAS_COLORIZABLE_MEMBER", true, true);
+    var forcedColorIndicesBufferAttribute = new THREE.InstancedBufferAttribute(new Float32Array(forcedColorIndices), 1);
+    forcedColorIndicesBufferAttribute.setDynamic(false);
+    this.mesh.geometry.addAttribute("forcedColorIndex", forcedColorIndicesBufferAttribute);
+    this.mesh.material.uniforms.autoInstanceForcedColorArray = new THREE.Uniform(forcedColorAry);
+  }
+  this.mesh.material.needsUpdate = true;
 }
 
 AutoInstancedObject.prototype.setFog = function(){
@@ -25975,7 +26130,28 @@ AutoInstancedObject.prototype.removeMacro = function(macro, removeVertexShader, 
 }
 
 var AutoInstancingHandler = function(){
-  this.maxBatchObjectSize = parseInt((MAX_VERTEX_UNIFORM_VECTORS - 50) / 2);
+  this.maxBatchObjectSize = parseInt((MAX_VERTEX_UNIFORM_VECTORS - 50) / 3);
+}
+
+AutoInstancingHandler.prototype.getObjectKey = function(obj){
+  var geomKey = obj.mesh.geometry.uuid;
+  var diffuseKey = "null", alphaKey = "null", aoKey = "null", displacementKey = "null", emissiveKey = "null";
+  if (obj.hasDiffuseMap()){
+    diffuseKey = obj.mesh.material.uniforms.diffuseMap.value.uuid;
+  }
+  if (obj.hasAlphaMap()){
+    alphaKey = obj.mesh.material.uniforms.alphaMap.value.uuid;
+  }
+  if (obj.hasAOMap()){
+    aoKey = obj.mesh.material.uniforms.aoMap.value.uuid;
+  }
+  if (obj.hasDisplacementMap()){
+    displacementKey = obj.mesh.material.uniforms.displacementMap.value.uuid;
+  }
+  if (obj.hasEmissiveMap()){
+    emissiveKey = obj.mesh.material.uniforms.emissiveMap.value.uuid;
+  }
+  return geomKey + PIPE + diffuseKey + PIPE + alphaKey + PIPE + aoKey + PIPE + displacementKey + PIPE + emissiveKey;
 }
 
 AutoInstancingHandler.prototype.handle = function(){
@@ -25984,20 +26160,20 @@ AutoInstancingHandler.prototype.handle = function(){
   }
   autoInstancedObjects = new Object();
   var objectsByGeometryID = new Object();
-  var countersByGeometryID = new Object();
+  var countersByObjectKey = new Object();
   for (var objName in addedObjects){
     var obj = addedObjects[objName];
     if (obj.isChangeable || (!obj.noMass && obj.physicsBody.mass > 0)){
-      var geom = obj.mesh.geometry;
-      if (typeof countersByGeometryID[geom.uuid] == UNDEFINED){
-        countersByGeometryID[geom.uuid] = 0;
+      var objKey = this.getObjectKey(obj);
+      if (typeof countersByObjectKey[objKey] == UNDEFINED){
+        countersByObjectKey[objKey] = 0;
       }
-      var key = geom.uuid + PIPE + countersByGeometryID[geom.uuid];
+      var key = objKey + PIPE + countersByObjectKey[objKey];
       if (!objectsByGeometryID[key]){
         objectsByGeometryID[key] = [];
       }else if (objectsByGeometryID[key].length > this.maxBatchObjectSize){
-        countersByGeometryID[geom.uuid] ++;
-        key = geom.uuid + PIPE + (countersByGeometryID[geom.uuid]);
+        countersByObjectKey[objKey] ++;
+        key = objKey + PIPE + (countersByObjectKey[objKey]);
         objectsByGeometryID[key] = [];
       }
       objectsByGeometryID[key].push(obj);

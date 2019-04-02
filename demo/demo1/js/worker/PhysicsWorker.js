@@ -3,12 +3,24 @@ var IS_WORKER_CONTEXT = true;
 
 // CLASS DEFINITION
 var PhysicsWorker = function(){
+  this.record = false;
   this.idsByObjectName = new Object();
   this.objectsByID = new Object();
   this.reusableVec1 = new CANNON.Vec3();
   this.reusableVec2 = new CANNON.Vec3();
+  this.setCollisionListenerBuffer = new Map();
+  this.removeCollisionListenerBuffer = new Map();
+  this.objectsWithCollisions = new Map();
+  this.collisionsBuffer = new Map();
+  this.performanceLogs = {isPerformanceLog: true, stepTime: 0}
 }
 PhysicsWorker.prototype.refresh = function(state){
+  delete this.transferableMessageBody;
+  delete this.transferableList;
+  this.setCollisionListenerBuffer = new Map();
+  this.removeCollisionListenerBuffer = new Map();
+  this.objectsWithCollisionListeners = new Map();
+  this.collisionsBuffer = new Map();
   this.idsByObjectName = new Object();
   this.objectsByID = new Object();
   var stateLoader = new StateLoaderLightweight(state);
@@ -68,7 +80,70 @@ PhysicsWorker.prototype.debug = function(){
   }
   postMessage(response);
 }
+PhysicsWorker.prototype.setObjectCollisionCallback = function(obj){
+  if (!worker.objectsWithCollisionListeners.has(obj.name)){
+    obj.collisionEvent = function(event){
+      if (!obj.physicsWorkerCollisionInfo){
+        obj.physicsWorkerCollisionInfo = new CollisionInfo();
+      }
+      var contact = event.contact;
+      obj.physicsWorkerCollisionInfo.set(
+        worker.idsByObjectName[event.body.roygbivName], contact.bi.position.x + contact.ri.x,
+        contact.bi.position.y + contact.ri.y, contact.bi.position.z + contact.ri.z, contact.getImpactVelocityAlongNormal(),
+        this.physicsBody.quaternion.x, this.physicsBody.quaternion.y, this.physicsBody.quaternion.z, this.physicsBody.quaternion.w
+      );
+      worker.collisionsBuffer.set(this.name, this);
+    }.bind(obj);
+    obj.physicsBody.addEventListener("collide", obj.collisionEvent);
+    worker.objectsWithCollisionListeners.set(obj.name, obj);
+  }
+}
+PhysicsWorker.prototype.removeObjectCollisionCallback = function(obj){
+  if (worker.objectsWithCollisionListeners.has(obj.name)){
+    obj.physicsBody.removeEventListener("collide", obj.collisionEvent);
+    worker.objectsWithCollisionListeners.delete(obj.name);
+    if (worker.collisionsBuffer.has(obj.name)){
+      worker.collisionsBuffer.delete(obj.name);
+    }
+  }
+}
+PhysicsWorker.prototype.insertCollisionIntoBuffer = function(obj){
+  var i = worker.collisionDescriptionIndex;
+  var collisionInfo = obj.physicsWorkerCollisionInfo;
+  worker.collisionDescription[i] = worker.idsByObjectName[obj.name];
+  worker.collisionDescription[i+1] = collisionInfo.targetObjectName;
+  worker.collisionDescription[i+2] = collisionInfo.x; worker.collisionDescription[i+3] = collisionInfo.y; worker.collisionDescription[i+4] = collisionInfo.z;
+  worker.collisionDescription[i+5] = collisionInfo.collisionImpact;
+  worker.collisionDescription[i+6] = collisionInfo.quaternionX; worker.collisionDescription[i+7] = collisionInfo.quaternionY; worker.collisionDescription[i+8] = collisionInfo.quaternionZ; worker.collisionDescription[i+9] = collisionInfo.quaternionW;
+  worker.collisionDescriptionIndex += 10;
+}
+PhysicsWorker.prototype.handleCollisions = function(collisionDescription){
+  this.setCollisionListenerBuffer.forEach(this.setObjectCollisionCallback);
+  this.removeCollisionListenerBuffer.forEach(this.removeObjectCollisionCallback);
+  var collisionsSize = this.collisionsBuffer.size;
+  if (collisionsSize > 0){
+    if (!collisionDescription){
+      collisionDescription = new Float32Array(10 * collisionsSize);
+    }
+    this.collisionDescription = collisionDescription;
+    this.collisionDescriptionIndex = 0;
+    this.collisionsBuffer.forEach(this.insertCollisionIntoBuffer);
+    for (var i = this.collisionDescriptionIndex; i<this.collisionDescription.length; i++){
+      this.collisionDescription[i] = -1;
+    }
+  }
+  return collisionDescription;
+}
 PhysicsWorker.prototype.step = function(data){
+  var startTime
+  if (this.record){
+    startTime = performance.now();
+  }
+  var collisionDescriptionArray = this.handleCollisions(data.collisionDescription);
+  this.setCollisionListenerBuffer.clear(); this.removeCollisionListenerBuffer.clear(); this.collisionsBuffer.clear();
+  if (collisionDescriptionArray){
+    data.collisionDescription = collisionDescriptionArray;
+  }
   var ary = data.objDescription;
   for (var i = 0; i<ary.length; i+=19){
     var obj = worker.objectsByID[ary[i]];
@@ -104,18 +179,47 @@ PhysicsWorker.prototype.step = function(data){
   if (!worker.transferableMessageBody){
     worker.transferableMessageBody = {objDescription: ary}
     worker.transferableList = [ary.buffer];
+    if (data.collisionDescription){
+      worker.transferableMessageBody.collisionDescription = data.collisionDescription;
+      worker.transferableList.push(data.collisionDescription.buffer);
+    }
   }else{
     worker.transferableMessageBody.objDescription = ary;
     worker.transferableList[0] = ary.buffer;
+    if (data.collisionDescription){
+      worker.transferableMessageBody.collisionDescription = data.collisionDescription;
+      if (worker.transferableList.length == 1){
+        worker.transferableList.push(data.collisionDescription.buffer);
+      }else{
+        worker.transferableList[1] = data.collisionDescription.buffer;
+      }
+    }
   }
   postMessage(worker.transferableMessageBody, worker.transferableList);
+  if (this.record){
+    this.performanceLogs.stepTime = performance.now() - startTime;
+  }
 }
 
 PhysicsWorker.prototype.startRecording = function(){
-
+  this.record = true;
 }
 PhysicsWorker.prototype.dumpPerformanceLogs = function(){
-
+  postMessage(this.performanceLogs);
+}
+PhysicsWorker.prototype.setCollisionListener = function(objName){
+  if (this.removeCollisionListenerBuffer.has(objName)){
+    this.removeCollisionListenerBuffer.delete(objName);
+  }
+  var obj = addedObjects[objName] || objectGroups[objName];
+  this.setCollisionListenerBuffer.set(objName, obj);
+}
+PhysicsWorker.prototype.removeCollisionListener = function(objName){
+  if (this.setCollisionListenerBuffer.has(objName)){
+    this.setCollisionListenerBuffer.delete(objName);
+  }
+  var obj = addedObjects[objName] || objectGroups[objName];
+  this.removeCollisionListenerBuffer.set(objName, obj);
 }
 // START
 var PIPE = "|";
@@ -131,14 +235,18 @@ var quatNormalizeSkip, quatNormalizeFast, contactEquationStiffness, contactEquat
 var physicsIterations, physicsTolerance, physicsSolver, gravityY;
 var worker = new PhysicsWorker();
 self.onmessage = function(msg){
-  if (msg.data.isLightweightState){
+  if (msg.data.isSetCollisionListener){
+    worker.setCollisionListener(msg.data.objName);
+  }else if (msg.data.isRemoveCollisionListener){
+    worker.removeCollisionListener(msg.data.objName);
+  }else if (msg.data.isLightweightState){
     worker.refresh(msg.data);
   }else if (msg.data.isDebug){
     worker.debug();
   }else if (msg.data.startRecording){
-
+    worker.startRecording();
   }else if (msg.data.dumpPerformanceLogs){
-
+    worker.dumpPerformanceLogs();
   }else{
     worker.hasOwnership = true;
     worker.step(msg.data);

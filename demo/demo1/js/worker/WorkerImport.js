@@ -18,6 +18,8 @@ RayCaster.prototype.onAddedTextResize = function(){
 }
 
 RayCaster.prototype.flush = function(){
+  this.updateBuffer.forEach(this.issueUpdate);
+  this.updateBuffer.clear();
 }
 
 RayCaster.prototype.refresh = function(){
@@ -76,10 +78,6 @@ RayCaster.prototype.updateObject = function(obj, forceUpdate){
     return;
   }
   this.updateBuffer.set(obj.name, obj);
-}
-
-RayCaster.prototype.onBeforeUpdate = function(){
-
 }
 
 RayCaster.prototype.issueUpdate = function(obj){
@@ -7660,6 +7658,7 @@ AddedText.prototype.debugTriangles = function(triangleIndex){
 
 AddedText.prototype.hide = function(){
   this.mesh.visible = false;
+  this.isHidden = true;
   if (mode == 0 && this.bbHelper){
     scene.remove(this.bbHelper);
   }
@@ -7673,6 +7672,7 @@ AddedText.prototype.hide = function(){
 
 AddedText.prototype.show = function(){
   this.mesh.visible = true;
+  this.isHidden = false;
   if (mode == 1 && this.isClickable){
     if (!this.boundingBox){
       this.handleBoundingBox();
@@ -7931,70 +7931,6 @@ AddedText.prototype.setShaderPrecision = function(shaderCode){
   }
   return shaderCode;
 }
-var WorkerMessageHandler = function(worker){
-  if (worker){
-    this.worker = worker;
-  }
-  this.record = false;
-  this.bufferIndex = 0;
-  this.elementCount = 0;
-  this.buffer = new Array(5);
-  this.preallocatedArrayCache = new Map();
-  this.performanceLogs = {
-    preallocatedArrayCacheSize: 0,
-    totalArraysSentLastFrame: 0,
-    totalBytesSentLastFrame: 0,
-    flushTimeLastFrame: 0
-  };
-}
-
-WorkerMessageHandler.prototype.startRecording = function(){
-  this.record = true;
-}
-
-WorkerMessageHandler.prototype.dumpPerformanceLogs = function(){
-  this.performanceLogs.preallocatedArrayCacheSize = this.preallocatedArrayCache.size;
-  console.log("%cFlush time last frame:" +this.performanceLogs.flushTimeLastFrame+" ms", "background: black; color: magenta");
-  console.log("%cPreallocated array cache size: "+this.performanceLogs.preallocatedArrayCacheSize, "background: black; color: magenta");
-  console.log("%cTotal arrays sent last frame: "+this.performanceLogs.totalArraysSentLastFrame, "background: black; color: magenta");
-  console.log("%cTotal bytes sent last frame: "+this.performanceLogs.totalBytesSentLastFrame, "background: black; color: magenta");
-}
-
-WorkerMessageHandler.prototype.push = function(data){
-  this.buffer[this.bufferIndex ++] = data;
-  this.elementCount ++;
-}
-
-WorkerMessageHandler.prototype.flush = function(){
-  if (this.elementCount > 0){
-    if (this.record){
-      this.performanceLogs.flushTimeLastFrame = performance.now();
-      this.performanceLogs.totalBytesSentLastFrame = 0;
-      this.performanceLogs.totalArraysSentLastFrame = this.elementCount;
-    }
-    var ary = this.preallocatedArrayCache.get(this.elementCount);
-    if (!ary){
-      ary = new Array(this.elementCount);
-      this.preallocatedArrayCache.set(this.elementCount, ary);
-    }
-    for (var i = 0; i<this.elementCount; i++){
-      ary[i] = this.buffer[i];
-      if (this.record){
-        this.performanceLogs.totalBytesSentLastFrame += this.buffer[i].byteLength
-      }
-    }
-    if (this.worker){
-      this.worker.postMessage(ary);
-    }else{
-      postMessage(ary);
-    }
-    this.elementCount = 0;
-    this.bufferIndex = 0;
-    if (this.record){
-      this.performanceLogs.flushTimeLastFrame = performance.now() - this.performanceLogs.flushTimeLastFrame;
-    }
-  }
-}
 /*
  * Copyright (c) 2015 cannon.js Authors
  *
@@ -8146,4 +8082,35 @@ PhysicsBodyGenerator.prototype.generateSphereBody = function(params){
   }
   var spherePhysicsBody = new CANNON.Body({mass: mass, shape: spherePhysicsShape, material: physicsMaterial});
   return this.addImpulseInfo(spherePhysicsBody);
+}
+var CollisionInfo = function(targetObjectName, x, y, z, collisionImpact, quaternionX, quaternionY, quaternionZ, quaternionW, faceNormal, time){
+  this.set(targetObjectName, x, y, z, collisionImpact, quaternionX, quaternionY, quaternionZ, quaternionW, faceNormal, time);
+}
+
+CollisionInfo.prototype.set = function(targetObjectName, x, y, z, collisionImpact, quaternionX, quaternionY, quaternionZ, quaternionW, faceNormal, time){
+  this.targetObjectName = targetObjectName;
+  this.x = x;
+  this.y = y;
+  this.z = z;
+
+  // Set only for object collisions
+  this.collisionImpact = collisionImpact;
+
+  this.quaternionX = quaternionX;
+  this.quaternionY = quaternionY;
+  this.quaternionZ = quaternionZ;
+  this.quaternionW = quaternionW;
+
+  // Set only for particle collisions
+  if (faceNormal){
+    this.faceNormalX = faceNormal.x;
+    this.faceNormalY = faceNormal.y;
+    this.faceNormalZ = faceNormal.z;
+  }
+
+  // Set only for particle system collisions
+  if (!(typeof time == "undefined")){
+    this.particleSystemTime = time;
+  }
+  return this;
 }
