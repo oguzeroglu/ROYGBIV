@@ -148,7 +148,6 @@ window.onload = function() {
   renderer.setSize(window.innerWidth, window.innerHeight);
   boundingClientRect = renderer.domElement.getBoundingClientRect();
   initPhysics();
-  initPostProcessing();
   render();
   windowLoaded = true;
   MAX_VERTEX_UNIFORM_VECTORS = renderer.context.getParameter(renderer.context.MAX_VERTEX_UNIFORM_VECTORS);
@@ -176,52 +175,6 @@ window.onload = function() {
   }
 };
 
-
-function initPostProcessing(){
- renderPass = new THREE.RenderPass(scene, camera);
- if (mode == 1){
-  bloomPass = new THREE.UnrealBloomPass(
-    new THREE.Vector2(
-      renderer.getCurrentViewport().z * bloomResolutionScale,
-      renderer.getCurrentViewport().w * bloomResolutionScale
-    ),
-    bloomStrength,
-    bloomRadius,
-    bloomThreshold
-  );
- }
- copyPass = new THREE.ShaderPass( THREE.CopyShader );
- setPostProcessingParams();
- composer = new THREE.EffectComposer(renderer);
- composer.setSize(renderer.getCurrentViewport().z / screenResolution, renderer.getCurrentViewport().w / screenResolution);
- composer.addPass( renderPass );
- if (mode == 1){
-  if (bloomOn){
-    composer.addPass( bloomPass );
-    bloomPass.renderToScreen = true;
-  }
- }
- if (!(mode == 1 && bloomOn)){
-    composer.addPass( copyPass );
-    copyPass.renderToScreen = true;
- }
- setPostProcessingParams();
-}
-
-function setPostProcessingParams(){
- if (mode == 1){
-  if (bloomOn){
-    bloomPass.strength = bloomStrength;
-    bloomPass.radius = bloomRadius;
-    bloomPass.threshold = bloomThreshold;
-    bloomPass.resolution = new THREE.Vector2(
-      window.innerWidth * bloomResolutionScale,
-      window.innerHeight * bloomResolutionScale
-    );
-  }
- }
-}
-
 function initPhysics(){
  if (physicsWorld.init){
    physicsWorld.init();
@@ -237,56 +190,6 @@ function initPhysics(){
  physicsWorld.solver = physicsSolver;
  physicsWorld.gravity.set(0, gravityY, 0);
  physicsWorld.broadphase = new CANNON.SAPBroadphase(physicsWorld);
-}
-
-function adjustPostProcessing(variableIndex, val){
- switch(variableIndex){
-   case 1: //bloomStrength
-    bloomStrength = val;
-   break;
-   case 2: //Bloom_radius
-    bloomRadius = val;
-   break;
-   case 3: //Bloom_threshhold
-    bloomThreshold = val;
-   break;
-   case 4: //Bloom_resolution_scale
-    bloomResolutionScale = val;
-    bloomPass = new THREE.UnrealBloomPass(
-      new THREE.Vector2(
-        renderer.getCurrentViewport().z * bloomResolutionScale,
-        renderer.getCurrentViewport().w * bloomResolutionScale
-      ),
-      bloomStrength,
-      bloomRadius,
-      bloomThreshold
-    );
-   break;
-   case 5: //Bloom
-    bloomOn = val;
-   break;
-   case -1: //from script
-    if(!isDeployment){
-      guiHandler.postprocessingParameters["Bloom_strength"] = bloomStrength;
-      guiHandler.postprocessingParameters["Bloom_radius"] = bloomRadius;
-      guiHandler.postprocessingParameters["Bloom_threshhold"] = bloomThreshold;
-      guiHandler.postprocessingParameters["Bloom_resolution_scale"] = bloomResolutionScale;
-      guiHandler.postprocessingParameters["Bloom"] = bloomOn;
-    }
-   break;
- }
- composer = new THREE.EffectComposer(renderer);
- composer.setSize(renderer.getCurrentViewport().z / screenResolution, renderer.getCurrentViewport().w / screenResolution);
- composer.addPass(renderPass);
- if (bloomOn){
-   composer.addPass(bloomPass);
-   bloomPass.renderToScreen = true;
- }
- if (!(mode == 1 && bloomOn)){
-    composer.addPass(copyPass);
-    copyPass.renderToScreen = true;
- }
- setPostProcessingParams();
 }
 
 function processCameraRotationBuffer(){
@@ -324,7 +227,7 @@ function handleViewport(){
     var newViewportZ = result.width;
     var newViewportW = result.height;
     renderer.setViewport(newViewportX, newViewportY, newViewportZ, newViewportW);
-    composer.setSize(newViewportZ, newViewportW);
+    renderer.setSize(newViewportZ, newViewportW);
     currentViewport.startX = newViewportX;
     currentViewport.startY = newViewportY;
     currentViewport.width = newViewportZ;
@@ -353,7 +256,7 @@ function handleViewport(){
     }
   }
   renderer.setViewport(newViewportX, newViewportY, newViewportZ, newViewportW);
-  composer.setSize(newViewportZ, newViewportW);
+  renderer.setSize(newViewportZ, newViewportW);
   currentViewport.startX = newViewportX;
   currentViewport.startY = newViewportY;
   currentViewport.width = newViewportZ;

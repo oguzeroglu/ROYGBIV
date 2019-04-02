@@ -955,19 +955,6 @@ StateLoader.prototype.load = function(){
     // TEXTS *******************************************************
     // NOT HERE -> SEE: finalize
 
-    // POST PROCESSING *********************************************
-    bloomStrength = obj.bloomStrength;
-    bloomRadius = obj.bloomRadius;
-    bloomThreshold = obj.bloomThreshold;
-    bloomResolutionScale = obj.bloomResolutionScale;
-    bloomOn = obj.bloomOn;
-    if (!isDeployment){
-      guiHandler.postprocessingParameters["Bloom_strength"] = bloomStrength;
-      guiHandler.postprocessingParameters["Bloom_radius"] = bloomRadius;
-      guiHandler.postprocessingParameters["Bloom_threshhold"] = bloomThreshold;
-      guiHandler.postprocessingParameters["Bloom_resolution_scale"] = bloomResolutionScale;
-      guiHandler.postprocessingParameters["Bloom"] = bloomOn;
-    }
 
     if (this.oldPhysicsDebugMode){
       if (this.oldPhysicsDebugMode != "NONE"){
@@ -2206,7 +2193,6 @@ StateLoader.prototype.resetProject = function(){
   screenMouseWheelCallbackFunction = 0;
   screenPinchCallbackFunction = 0;
   fpsHandler.reset();
-  originalBloomConfigurations = new Object();
   fonts = new Object();
   NO_MOBILE = false;
   fixedAspect = 0;
@@ -2264,7 +2250,6 @@ StateLoader.prototype.resetProject = function(){
   alphaTextureCache = new Object();
   emissiveTextureCache = new Object();
 
-  initPostProcessing();
   if (!isDeployment){
     guiHandler.hideAll();
     $("#cliDivheader").text("ROYGBIV Scene Creator - CLI (Design mode)");

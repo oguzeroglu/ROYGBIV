@@ -82,18 +82,6 @@ var physicsStepAmount = 1/60;
 var friction = 1;
 var surfacePhysicalThickness = 1;
 
-// POST PROCESSING
-var renderPass;
-var copyPass;
-var composer;
-var bloomPass;
-var bloomStrength = 0.4; // 0 - 3
-var bloomRadius = 0; // 0 - 1
-var bloomThreshold = 1; // 0 - 1
-var bloomResolutionScale = 1; // 0.1 - 1
-var bloomOn = false;
-var originalBloomConfigurations = new Object();
-
 // CAMERA CONFIGURATIONS
 var initialCameraX = 0;
 var initialCameraY = 50;

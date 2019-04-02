@@ -1,11 +1,4 @@
 var GUIHandler = function(){
-  this.postprocessingParameters = {
-    "Bloom_strength": bloomStrength,
-    "Bloom_radius": bloomRadius,
-    "Bloom_threshhold": bloomThreshold,
-    "Bloom_resolution_scale": bloomResolutionScale,
-    "Bloom": bloomOn
-  };
   this.objectManipulationParameters = {
     "Object": "objectName",
     "Rotate x": 0.0,
@@ -61,7 +54,6 @@ GUIHandler.prototype.init = function(){
   this.initializeSkyboxGUI();
   this.initializeTextManipulationGUI();
   this.initializeObjectManipulationGUI();
-  this.initializePostProcessingGUI();
 
   this.hideAll();
 
@@ -391,36 +383,11 @@ GUIHandler.prototype.hide = function(guiObject){
 }
 
 GUIHandler.prototype.hideAll = function(){
-  $(guiHandler.datGui.domElement).attr("hidden", true);
   $(guiHandler.datGuiObjectManipulation.domElement).attr("hidden", true);
   $(guiHandler.datGuiTextManipulation.domElement).attr("hidden", true);
   $(guiHandler.datGuiSkybox.domElement).attr("hidden", true);
   $(guiHandler.datGuiFog.domElement).attr("hidden", true);
   skyboxConfigurationsVisible = false;
-}
-
-GUIHandler.prototype.initializePostProcessingGUI = function(){
-  guiHandler.datGui = new dat.GUI();
-  guiHandler.datGui.add(guiHandler.postprocessingParameters, "Bloom_strength").min(0.0).max(3.0).step(0.01).onChange(function(val){
-    adjustPostProcessing(1, val);
-    originalBloomConfigurations.bloomStrength = val;
-  }).listen();
-  guiHandler.datGui.add(guiHandler.postprocessingParameters, "Bloom_radius").min(0.0).max(1.0).step(0.01).onChange(function(val){
-    adjustPostProcessing(2, val);
-    originalBloomConfigurations.bloomRadius = val;
-  }).listen();
-  guiHandler.datGui.add(guiHandler.postprocessingParameters, "Bloom_threshhold").min(0.0).max(1.0).step(0.01).onChange(function(val){
-    adjustPostProcessing(3, val);
-    originalBloomConfigurations.bloomThreshold = val;
-  }).listen();
-  guiHandler.datGui.add(guiHandler.postprocessingParameters, "Bloom_resolution_scale").min(0.1).max(1.0).step(0.001).onChange(function(val){
-    adjustPostProcessing(4, val);
-    originalBloomConfigurations.bloomResolutionScale = val;
-  }).listen();
-  guiHandler.datGui.add(guiHandler.postprocessingParameters, "Bloom").onChange(function(val){
-    adjustPostProcessing(5, val);
-    originalBloomConfigurations.bloomOn = val;
-  }).listen();
 }
 
 GUIHandler.prototype.initializeObjectManipulationGUI = function(){

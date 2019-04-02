@@ -51,7 +51,7 @@ function render(){
 
 function renderScene(){
   threejsRenderMonitoringHandler.currentRenderCallCountPerFrame = 0;
-  composer.render(0.1);
+  renderer.render(scene, camera);
   if (threejsRenderMonitoringHandler.currentRenderCallCountPerFrame > threejsRenderMonitoringHandler.maxRenderCallCountPerFrame){
     threejsRenderMonitoringHandler.maxRenderCallCountPerFrame = threejsRenderMonitoringHandler.currentRenderCallCountPerFrame;
   }
