@@ -955,7 +955,6 @@ StateLoader.prototype.load = function(){
     // TEXTS *******************************************************
     // NOT HERE -> SEE: finalize
 
-
     if (this.oldPhysicsDebugMode){
       if (this.oldPhysicsDebugMode != "NONE"){
         debugRenderer = new THREE.CannonDebugRenderer(scene, physicsWorld);
@@ -2201,7 +2200,7 @@ StateLoader.prototype.resetProject = function(){
   roygbivSkippedArrayBufferUpdates = 0;
   roygbivSkippedElementArrayBufferUpdates = 0;
 
-  boundingClientRect = renderer.domElement.getBoundingClientRect();
+  boundingClientRect = renderer.getBoundingClientRect();
   pointerLockRequested = false;
   fullScreenRequested = false;
   defaultCameraControlsDisabled = false;

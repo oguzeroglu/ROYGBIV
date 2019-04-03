@@ -36,7 +36,7 @@ var WebGLCallbackHandler = function(){
     bindBuffer: 0
   }
   this.doNotCache = false;
-  this.gl = renderer.context;
+  this.gl = renderer.getContext();
   this.vertexAttribPointerCache = new Map();
   this.bindedCubeTextureCache = new Map();
 }

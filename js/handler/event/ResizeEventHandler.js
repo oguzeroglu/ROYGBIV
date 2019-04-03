@@ -10,7 +10,7 @@ ResizeEventHandler.prototype.onResize = function(){
   camera.oldAspect = camera.aspect;
   camera.aspect = window.innerWidth / window.innerHeight;
   camera.updateProjectionMatrix();
-  boundingClientRect = renderer.domElement.getBoundingClientRect();
+  boundingClientRect = renderer.getBoundingClientRect();
   if (isDeployment){
     canvas.oldWidth = (canvas.width / screenResolution) + 'px';
     if (!isDeployment && terminal.isMadeVisible){

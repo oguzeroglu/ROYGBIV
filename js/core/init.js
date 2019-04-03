@@ -136,7 +136,7 @@ window.onload = function() {
   camera.aspect = (window.innerWidth / window.innerHeight);
   GLOBAL_PROJECTION_UNIFORM.value = camera.projectionMatrix;
   GLOBAL_VIEW_UNIFORM.value = camera.matrixWorldInverse;
-  renderer = new THREE.WebGLRenderer({canvas: canvas});
+  renderer = new Renderer();
   webglCallbackHandler = new WebGLCallbackHandler();
   if (window.devicePixelRatio > 1){
     screenResolution = 1;
@@ -146,18 +146,15 @@ window.onload = function() {
     screenResolution = window.devicePixelRatio;
   }
   renderer.setSize(window.innerWidth, window.innerHeight);
-  boundingClientRect = renderer.domElement.getBoundingClientRect();
+  boundingClientRect = renderer.getBoundingClientRect();
   initPhysics();
   render();
   windowLoaded = true;
-  MAX_VERTEX_UNIFORM_VECTORS = renderer.context.getParameter(renderer.context.MAX_VERTEX_UNIFORM_VECTORS);
-  VERTEX_SHADER_TEXTURE_FETCH_SUPPORTED = (renderer.context.getParameter(renderer.context.MAX_VERTEX_TEXTURE_IMAGE_UNITS) > 0);
-  DDS_SUPPORTED = (!(renderer.context.getExtension("WEBGL_compressed_texture_s3tc") == null));
-  INSTANCING_SUPPORTED = (!(renderer.context.getExtension("ANGLE_instanced_arrays") == null));
-  HIGH_PRECISION_SUPPORTED = !(
-    renderer.context.getShaderPrecisionFormat(renderer.context.VERTEX_SHADER, renderer.context.HIGH_FLOAT).precision <= 0 ||
-    renderer.context.getShaderPrecisionFormat(renderer.context.FRAGMENT_SHADER, renderer.context.HIGH_FLOAT).precision <= 0
-  );
+  MAX_VERTEX_UNIFORM_VECTORS = renderer.getMaxVertexUniformVectors();
+  VERTEX_SHADER_TEXTURE_FETCH_SUPPORTED = renderer.isVertexShaderTextureFetchSupported();
+  DDS_SUPPORTED = renderer.isDDSSupported();
+  INSTANCING_SUPPORTED = renderer.isInstancingSupported();
+  HIGH_PRECISION_SUPPORTED = renderer.isHighPrecisionSupported();
   if (!isDeployment){
     terminal.init();
   }

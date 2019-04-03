@@ -51,7 +51,6 @@ var orientationChangeEventHandler;
 var keyboardEventHandler;
 
 // THREE.JS VARIABLES
-var renderer;
 var scene;
 var camera;
 var canvas;
@@ -353,6 +352,7 @@ var objectsWithOnClickListeners = new Map();
 var objectsWithMouseOverListeners = new Map();
 var objectsWithMouseOutListeners = new Map();
 var currentMouseOverObjectName;
+var renderer;
 
 // WORKER VARIABLES
 var WORKERS_SUPPORTED = (typeof(Worker) !== UNDEFINED) && (typeof(MessageChannel) !== UNDEFINED);
