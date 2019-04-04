@@ -1,5 +1,8 @@
 var Renderer = function(){
   this.webglRenderer = new THREE.WebGLRenderer({canvas: canvas});
+}
+
+Renderer.prototype.initEffects = function(){
   this.effects = {bloom: new Bloom()};
   this.mandatoryEffectMethods = ["setSize", "setViewport", "setPixelRatio", "render"];
   for (var effectName in this.effects){
@@ -12,6 +15,10 @@ var Renderer = function(){
 }
 
 Renderer.prototype.render = function(scene, camera){
+  if (this.bloomOn){
+    this.effects.bloom.render();
+    return;
+  }
   this.webglRenderer.render(scene, camera);
 }
 

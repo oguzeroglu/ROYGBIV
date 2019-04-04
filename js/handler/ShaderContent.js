@@ -17,10 +17,13 @@ var ShaderContent = function(){
     {name: "textVertexShader", isVertexShader: true, dir: "text"},
     {name: "textFragmentShader", isVertexShader: false, dir: "text"},
     {name: "rectangleVertexShader", isVertexShader: true, dir: "rectangle"},
-    {name: "rectangleFragmentShader", isVertexShader: false, dir: "rectangle"}
+    {name: "rectangleFragmentShader", isVertexShader: false, dir: "rectangle"},
+    {name: "bloomBlurVertexShader", isVertexShader: true, dir: "post_processing/bloom/blur"},
+    {name: "bloomBlurFragmentShader", isVertexShader: false, dir: "post_processing/bloom/blur"}
   ];
   this.currentLoadCount = 0;
   this.allShadersReadyCallback = function(){
+    renderer.initEffects();
     if (!isDeployment){
       canvas.style.visibility = "";
       terminal.enable();
