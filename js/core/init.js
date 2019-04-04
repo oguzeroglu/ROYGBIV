@@ -130,7 +130,8 @@ window.onload = function() {
   scene = new THREE.Scene();
   debugRenderer = new THREE.CannonDebugRenderer(scene, physicsWorld);
   scene.background = new THREE.Color(sceneBackgroundColor);
-  camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 10000 );
+  camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 1, 10000);
+  orthographicCamera = new THREE.OrthographicCamera(-1, 1, 1, -1, 0, 1);
   camera.position.set(initialCameraX, initialCameraY, initialCameraZ);
   camera.rotation.order = 'YXZ';
   camera.aspect = (window.innerWidth / window.innerHeight);

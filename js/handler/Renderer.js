@@ -1,5 +1,14 @@
 var Renderer = function(){
   this.webglRenderer = new THREE.WebGLRenderer({canvas: canvas});
+  this.effects = {bloom: new Bloom()};
+  this.mandatoryEffectMethods = ["setSize", "setViewport", "setPixelRatio", "render"];
+  for (var effectName in this.effects){
+    for (var i = 0; i<this.mandatoryEffectMethods.length; i++){
+      if (!this.effects[effectName][this.mandatoryEffectMethods[i]]){
+        console.error("[!] Renderer error: effect "+effectName+" does not have "+this.mandatoryEffectMethods[i]+" implemented.");
+      }
+    }
+  }
 }
 
 Renderer.prototype.render = function(scene, camera){
@@ -8,6 +17,9 @@ Renderer.prototype.render = function(scene, camera){
 
 Renderer.prototype.setViewport = function(x, y, z, w){
   this.webglRenderer.setViewport(x, y, z, w);
+  for (var effectName in this.effects){
+    this.effects[effectName].setViewport(x, y, z, w);
+  }
 }
 
 Renderer.prototype.getCurrentViewport = function(){
@@ -43,10 +55,16 @@ Renderer.prototype.getBoundingClientRect = function(){
 
 Renderer.prototype.setSize = function(width, height){
   this.webglRenderer.setSize(width, height);
+  for (var effectName in this.effects){
+    this.effects[effectName].setSize(width, height);
+  }
 }
 
 Renderer.prototype.setPixelRatio = function(ratio){
   this.webglRenderer.setPixelRatio(ratio);
+  for (var effectName in this.effects){
+    this.effects[effectName].setPixelRatio(ratio);
+  }
 }
 
 Renderer.prototype.getContext = function(){

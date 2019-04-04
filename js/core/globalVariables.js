@@ -53,6 +53,7 @@ var keyboardEventHandler;
 // THREE.JS VARIABLES
 var scene;
 var camera;
+var orthographicCamera;
 var canvas;
 var sceneBackgroundColor = 0x000000 ;
 var textureLoader = new THREE.TextureLoader();
@@ -196,6 +197,7 @@ var CANNON_AXIS_VECTOR_Z = new CANNON.Vec3(0, 0, 1);
 var CANNON_ZERO_VECTOR = new CANNON.Vec3(0, 0, 0);
 var REUSABLE_CANNON_QUATERNION = new CANNON.Quaternion();
 var REUSABLE_CANNON_QUATERNION_2 = new CANNON.Quaternion();
+var REUSABLE_QUAD_GEOMETRY = new THREE.PlaneBufferGeometry(2, 2);
 var scriptEditorShowing = false;
 var NO_BLENDING = THREE.NoBlending;
 var NORMAL_BLENDING = THREE.NormalBlending;
