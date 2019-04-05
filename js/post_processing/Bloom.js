@@ -10,7 +10,8 @@ var Bloom = function(){
     uniforms: {
       modelViewMatrix: new THREE.Uniform(), projectionMatrix: new THREE.Uniform(), sceneTexture: new THREE.Uniform(),
       direction: new THREE.Uniform(new THREE.Vector2()), resolution: new THREE.Uniform(new THREE.Vector2()),
-      brightnessThreshold: new THREE.Uniform(1), combineTexture: new THREE.Uniform(), combineFlag: new THREE.Uniform(-10.0)
+      brightnessThreshold: new THREE.Uniform(1), combineTexture: new THREE.Uniform(), combineFlag: new THREE.Uniform(-10.0),
+      exposure: new THREE.Uniform(1), gamma: new THREE.Uniform(1), bloomStrength: new THREE.Uniform(1)
     }
   });
   this.blurQuad = new THREE.Mesh(REUSABLE_QUAD_GEOMETRY, blurMaterial);
@@ -19,6 +20,18 @@ var Bloom = function(){
   blurMaterial.uniforms.combineTexture.value = this.sceneTarget.texture;
   this.blurScene = new THREE.Scene();
   this.blurScene.add(this.blurQuad);
+}
+
+Bloom.prototype.setBloomStrength = function(bloomStrength){
+  this.blurQuad.material.uniforms.bloomStrength.value = bloomStrength;
+}
+
+Bloom.prototype.setGamma = function(gamma){
+  this.blurQuad.material.uniforms.gamma.value = gamma;
+}
+
+Bloom.prototype.setExposure = function(exposure){
+  this.blurQuad.material.uniforms.exposure.value = exposure;
 }
 
 Bloom.prototype.setBrightnessThreshold = function(brightnessThreshold){

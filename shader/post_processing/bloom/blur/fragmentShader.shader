@@ -7,6 +7,9 @@ uniform vec2 direction;
 uniform vec2 resolution;
 uniform float brightnessThreshold;
 uniform float combineFlag;
+uniform float exposure;
+uniform float gamma;
+uniform float bloomStrength;
 varying vec2 vUV;
 
 vec4 blur(vec4 color1) {
@@ -34,6 +37,9 @@ void main(){
   }
   if (combineFlag > 0.0){
     vec4 sceneColor = texture2D(combineTexture, vUV);
-    gl_FragColor = gl_FragColor + sceneColor;
+    gl_FragColor = (bloomStrength * gl_FragColor) + sceneColor;
+    vec3 result = vec3(1.0) - exp(-gl_FragColor.rgb * exposure);
+    result = pow(result, vec3(1.0 / gamma));
+    gl_FragColor = vec4(result, gl_FragColor.a);
   }
 }
