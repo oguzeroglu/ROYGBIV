@@ -161,7 +161,7 @@ Bloom.prototype.generateBlurPass = function(){
   for (var i = 0; i<5; i++){
     this.horizontalBlurTargets.push(new THREE.WebGLRenderTarget(window.innerWidth / coef, window.innerHeight / coef, this.rtParameters));
     this.verticalBlurTargets.push(new THREE.WebGLRenderTarget(window.innerWidth / coef, window.innerHeight / coef, this.rtParameters));
-    coef = coef * 3;
+    coef = coef * 2;
   }
 }
 
@@ -192,7 +192,7 @@ Bloom.prototype.setSize = function(width, height){
   for (var i = 0; i<5; i++){
     this.horizontalBlurTargets[i].setSize(width/coef, height/coef);
     this.verticalBlurTargets[i].setSize(width/coef, height/coef);
-    coef = coef * 3;
+    coef = coef * 2;
   }
 }
 
@@ -204,7 +204,7 @@ Bloom.prototype.setViewport = function(x, y, z, w){
   for (var i = 0; i<5; i++){
     this.horizontalBlurTargets[i].viewport.set(x, y, z/coef, w/coef);
     this.verticalBlurTargets[i].viewport.set(x, y, z/coef, w/coef);
-    coef = coef * 3;
+    coef = coef * 2;
   }
 }
 
