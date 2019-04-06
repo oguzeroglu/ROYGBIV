@@ -23,7 +23,9 @@ var ShaderContent = function(){
     {name: "bloomBlurPassVertexShader", isVertexShader: true, dir: "post_processing/bloom/blur_pass"},
     {name: "bloomBlurPassFragmentShader", isVertexShader: false, dir: "post_processing/bloom/blur_pass"},
     {name: "bloomTexturePassVertexShader", isVertexShader: true, dir: "post_processing/bloom/texture_pass"},
-    {name: "bloomTexturePassFragmentShader", isVertexShader: false, dir: "post_processing/bloom/texture_pass"}
+    {name: "bloomTexturePassFragmentShader", isVertexShader: false, dir: "post_processing/bloom/texture_pass"},
+    {name: "bloomCombinerVertexShader", isVertexShader: true, dir: "post_processing/bloom/combiner"},
+    {name: "bloomCombinerFragmentShader", isVertexShader: false, dir: "post_processing/bloom/combiner"}
   ];
   this.currentLoadCount = 0;
   this.allShadersReadyCallback = function(){

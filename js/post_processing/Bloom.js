@@ -1,7 +1,7 @@
 var Bloom = function(){
   this.configurations = {
     blurAllocationAmount: 5,
-    blurAmount: 4,
+    blurAmount: 3,
     texturePassDivisionCoef: 5,
     tapAmount: 13,
     threshold: 1,
@@ -13,6 +13,7 @@ var Bloom = function(){
   this.generateBrightPass();
   this.generateBlurPass();
   this.generateTexturePass();
+  this.generateCombinerPass();
 }
 
 Bloom.prototype.setOptimizationMode = function(isOn){
@@ -55,6 +56,10 @@ Bloom.prototype.setBlurDirection = function(isX){
   }
 }
 
+Bloom.prototype.combinerPass = function(){
+  renderer.webglRenderer.render(this.combinerScene, orthographicCamera);
+}
+
 Bloom.prototype.texturePass = function(){
   renderer.webglRenderer.render(this.texturePassScene, orthographicCamera, this.texturePassTarget);
   this.blurPassMaterial.uniforms.optimizationTexture.value = this.texturePassTarget.texture;
@@ -71,11 +76,7 @@ Bloom.prototype.blurPass = function(){
     this.blurPassMaterial.uniforms.inputTexture.value = rt.texture;
     this.blurPassMaterial.uniforms.resolution.value.set(rt.width, rt.height);
     this.setBlurDirection(false);
-    if (i != this.configurations.blurAmount-1){
-      renderer.webglRenderer.render(this.blurPassScene, orthographicCamera, this.verticalBlurTargets[i]);
-    }else{
-      renderer.webglRenderer.render(this.blurPassScene, orthographicCamera);
-    }
+    renderer.webglRenderer.render(this.blurPassScene, orthographicCamera, this.verticalBlurTargets[i]);
     rt = this.verticalBlurTargets[i];
     this.blurPassMaterial.uniforms.inputTexture.value = rt.texture;
     this.blurPassMaterial.uniforms.resolution.value.set(rt.width, rt.height);
@@ -88,6 +89,23 @@ Bloom.prototype.brightPass = function(){
 
 Bloom.prototype.directPass = function(){
   renderer.webglRenderer.render(scene, camera, this.sceneTarget);
+}
+
+Bloom.prototype.generateCombinerPass = function(){
+  this.combinerMaterial = new THREE.RawShaderMaterial({
+    vertexShader: ShaderContent.bloomCombinerVertexShader,
+    fragmentShader: ShaderContent.bloomCombinerFragmentShader,
+    uniforms:{
+      modelViewMatrix: new THREE.Uniform(),
+      projectionMatrix: new THREE.Uniform(orthographicCamera.projectionMatrix),
+      sceneTexture: new THREE.Uniform(this.sceneTarget.texture),
+      blurTexture: new THREE.Uniform(this.verticalBlurTargets[this.configurations.blurAmount-1].texture)
+    }
+  });
+  this.combinerQuad = new THREE.Mesh(REUSABLE_QUAD_GEOMETRY, this.combinerMaterial);
+  this.combinerMaterial.uniforms.modelViewMatrix.value = this.combinerQuad.modelViewMatrix;
+  this.combinerScene = new THREE.Scene();
+  this.combinerScene.add(this.combinerQuad);
 }
 
 Bloom.prototype.generateDirectPass = function(){
@@ -135,9 +153,11 @@ Bloom.prototype.generateBlurPass = function(){
   this.blurPassScene = new THREE.Scene();
   this.blurPassScene.add(this.blurPassQuad);
   this.horizontalBlurTargets = [], this.verticalBlurTargets = [];
+  var coef = 1;
   for (var i = 0; i<this.configurations.blurAllocationAmount; i++){
-    this.horizontalBlurTargets.push(new THREE.WebGLRenderTarget(window.innerWidth, window.innerHeight, this.rtParameters));
-    this.verticalBlurTargets.push(new THREE.WebGLRenderTarget(window.innerWidth, window.innerHeight, this.rtParameters));
+    this.horizontalBlurTargets.push(new THREE.WebGLRenderTarget(window.innerWidth / coef, window.innerHeight / coef, this.rtParameters));
+    this.verticalBlurTargets.push(new THREE.WebGLRenderTarget(window.innerWidth / coef, window.innerHeight / coef, this.rtParameters));
+    coef = coef * 3;
   }
 }
 
@@ -164,9 +184,11 @@ Bloom.prototype.setSize = function(width, height){
   this.sceneTarget.setSize(width, height);
   this.brightTarget.setSize(width, height);
   this.texturePassTarget.setSize(width / this.configurations.texturePassDivisionCoef, height / this.configurations.texturePassDivisionCoef);
+  var coef = 1;
   for (var i = 0; i<this.configurations.blurAllocationAmount; i++){
-    this.horizontalBlurTargets[i].setSize(width, height);
-    this.verticalBlurTargets[i].setSize(width, height);
+    this.horizontalBlurTargets[i].setSize(width/coef, height/coef);
+    this.verticalBlurTargets[i].setSize(width/coef, height/coef);
+    coef = coef * 3;
   }
 }
 
@@ -174,9 +196,11 @@ Bloom.prototype.setViewport = function(x, y, z, w){
   this.sceneTarget.viewport.set(x, y, z, w);
   this.brightTarget.viewport.set(x, y, z, w);
   this.texturePassTarget.viewport.set(x, y, z / this.configurations.texturePassDivisionCoef, w / this.configurations.texturePassDivisionCoef);
+  var coef = 1;
   for (var i = 0; i<this.configurations.blurAllocationAmount; i++){
-    this.horizontalBlurTargets[i].viewport.set(x, y, z, w);
-    this.verticalBlurTargets[i].viewport.set(x, y, z, w);
+    this.horizontalBlurTargets[i].viewport.set(x, y, z/coef, w/coef);
+    this.verticalBlurTargets[i].viewport.set(x, y, z/coef, w/coef);
+    coef = coef * 3;
   }
 }
 
@@ -191,4 +215,5 @@ Bloom.prototype.render = function(){
   }
   this.brightPass();
   this.blurPass();
+  this.combinerPass();
 }
