@@ -1,33 +1,19 @@
 var Bloom = function(){
   this.configurations = {
-    texturePassDivisionCoef: 5,
     tapAmount: 13,
     threshold: 1,
-    optimized: true,
-    texturePassDivisionThresholdCoef: 1,
     bloomStrength: 2
   }
   this.rtParameters = {minFilter: THREE.LinearFilter, magFilter: THREE.LinearFilter, format: THREE.RGBAFormat};
   this.generateDirectPass();
   this.generateBrightPass();
   this.generateBlurPass();
-  this.generateTexturePass();
   this.generateCombinerPass();
-}
-
-Bloom.prototype.setOptimizationMode = function(isOn){
-  this.configurations.optimized = isOn;
-  if (isOn){
-    this.blurPassMaterial.uniforms.isOptimizedFlag.value = 10;
-  }else{
-    this.blurPassMaterial.uniforms.isOptimizedFlag.value = -10;
-  }
 }
 
 Bloom.prototype.setThreshold = function(threshold){
   this.configurations.threshold = threshold;
   this.brightPassMaterial.uniforms.threshold.value = threshold;
-  this.texturePassMaterial.uniforms.threshold.value = threshold / this.configurations.texturePassDivisionCoef;
 }
 
 Bloom.prototype.setBlurTap = function(tap){
@@ -59,16 +45,10 @@ Bloom.prototype.combinerPass = function(){
   renderer.webglRenderer.render(this.combinerScene, orthographicCamera);
 }
 
-Bloom.prototype.texturePass = function(){
-  renderer.webglRenderer.render(this.texturePassScene, orthographicCamera, this.texturePassTarget);
-  this.blurPassMaterial.uniforms.optimizationTexture.value = this.texturePassTarget.texture;
-}
-
 Bloom.prototype.blurPass = function(){
-  renderer.webglRenderer.render(this.blurPassScene, orthographicCamera);
   this.blurPassMaterial.uniforms.inputTexture.value = this.brightTarget.texture;
   this.blurPassMaterial.uniforms.resolution.value.set(this.brightTarget.width, this.brightTarget.height);
-  for (var i = 0 ; i <5; i++){
+  for (var i = 0; i <5; i++){
     this.setBlurDirection(true);
     renderer.webglRenderer.render(this.blurPassScene, orthographicCamera, this.horizontalBlurTargets[i]);
     var rt = this.horizontalBlurTargets[i];
@@ -116,25 +96,6 @@ Bloom.prototype.generateDirectPass = function(){
   this.sceneTarget = new THREE.WebGLRenderTarget(window.innerWidth, window.innerHeight, this.rtParameters);
 }
 
-Bloom.prototype.generateTexturePass = function(){
-  this.texturePassTarget = new THREE.WebGLRenderTarget(window.innerWidth / this.configurations.texturePassDivisionCoef, window.innerHeight / this.configurations.texturePassDivisionCoef);
-  this.texturePassMaterial = new THREE.RawShaderMaterial({
-    vertexShader: ShaderContent.bloomTexturePassVertexShader,
-    fragmentShader: ShaderContent.bloomTexturePassFragmentShader,
-    uniforms: {
-      modelViewMatrix: new THREE.Uniform(),
-      projectionMatrix: new THREE.Uniform(orthographicCamera.projectionMatrix),
-      inputTexture: new THREE.Uniform(),
-      threshold: new THREE.Uniform(this.configurations.threshold / this.configurations.texturePassDivisionCoef)
-    }
-  });
-  this.texturePassQuad = new THREE.Mesh(REUSABLE_QUAD_GEOMETRY, this.texturePassMaterial);
-  this.texturePassMaterial.uniforms.modelViewMatrix.value = this.texturePassQuad.modelViewMatrix;
-  this.texturePassMaterial.uniforms.inputTexture.value = this.sceneTarget.texture;
-  this.texturePassScene = new THREE.Scene();
-  this.texturePassScene.add(this.texturePassQuad);
-}
-
 Bloom.prototype.generateBlurPass = function(){
   this.blurPassDirectionX = new THREE.Vector2(1, 0);
   this.blurPassDirectionY = new THREE.Vector2(0, 1);
@@ -145,8 +106,6 @@ Bloom.prototype.generateBlurPass = function(){
       modelViewMatrix: new THREE.Uniform(),
       projectionMatrix: new THREE.Uniform(orthographicCamera.projectionMatrix),
       inputTexture: new THREE.Uniform(),
-      optimizationTexture: new THREE.Uniform(),
-      isOptimizedFlag: new THREE.Uniform(10),
       numberOfTap: new THREE.Uniform(20),
       resolution: new THREE.Uniform(new THREE.Vector2()),
       direction: new THREE.Uniform(new THREE.Vector2()),
@@ -187,7 +146,6 @@ Bloom.prototype.generateBrightPass = function(){
 Bloom.prototype.setSize = function(width, height){
   this.sceneTarget.setSize(width, height);
   this.brightTarget.setSize(width, height);
-  this.texturePassTarget.setSize(width / this.configurations.texturePassDivisionCoef, height / this.configurations.texturePassDivisionCoef);
   var coef = 1;
   for (var i = 0; i<5; i++){
     this.horizontalBlurTargets[i].setSize(width/coef, height/coef);
@@ -199,7 +157,6 @@ Bloom.prototype.setSize = function(width, height){
 Bloom.prototype.setViewport = function(x, y, z, w){
   this.sceneTarget.viewport.set(x, y, z, w);
   this.brightTarget.viewport.set(x, y, z, w);
-  this.texturePassTarget.viewport.set(x, y, z / this.configurations.texturePassDivisionCoef, w / this.configurations.texturePassDivisionCoef);
   var coef = 1;
   for (var i = 0; i<5; i++){
     this.horizontalBlurTargets[i].viewport.set(x, y, z/coef, w/coef);
@@ -214,9 +171,6 @@ Bloom.prototype.setPixelRatio = function(ratio){
 
 Bloom.prototype.render = function(){
   this.directPass();
-  if (this.configurations.optimized){
-    this.texturePass();
-  }
   this.brightPass();
   this.blurPass();
   this.combinerPass();

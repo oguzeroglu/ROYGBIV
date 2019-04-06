@@ -2,9 +2,7 @@ precision lowp float;
 precision lowp int;
 
 uniform sampler2D inputTexture;
-uniform sampler2D optimizationTexture;
 uniform float numberOfTap;
-uniform float isOptimizedFlag;
 uniform vec2 resolution;
 uniform vec2 direction;
 
@@ -47,13 +45,6 @@ vec4 blur5() {
 }
 
 void main(){
-  if (isOptimizedFlag > 0.0){
-    vec4 colorTest = texture2D(optimizationTexture, vUV);
-    if (colorTest.r < 0.05 && colorTest.g < 0.05 && colorTest.b < 0.05){
-      gl_FragColor = vec4(0.0);
-      return;
-    }
-  }
   if (numberOfTap < 0.0){
     gl_FragColor = blur5();
   }else if (numberOfTap < 10.0){
