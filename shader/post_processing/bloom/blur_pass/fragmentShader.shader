@@ -49,7 +49,7 @@ vec4 blur5() {
 void main(){
   if (isOptimizedFlag > 0.0){
     vec4 colorTest = texture2D(optimizationTexture, vUV);
-    if (colorTest.r < 0.05 && colorTest.g < 0.05 && colorTest.b < 0.05 && colorTest.a < 0.05){
+    if (colorTest.r < 0.05 && colorTest.g < 0.05 && colorTest.b < 0.05){
       gl_FragColor = vec4(0.0);
       return;
     }

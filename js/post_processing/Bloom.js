@@ -1,12 +1,12 @@
 var Bloom = function(){
   this.configurations = {
     blurAllocationAmount: 5,
-    blurAmount: 5,
+    blurAmount: 4,
     texturePassDivisionCoef: 5,
     tapAmount: 13,
     threshold: 1,
     optimized: true,
-    texturePassDivisionThresholdCoef: 2
+    texturePassDivisionThresholdCoef: 1
   }
   this.rtParameters = {minFilter: THREE.LinearFilter, magFilter: THREE.LinearFilter, format: THREE.RGBAFormat};
   this.generateDirectPass();
