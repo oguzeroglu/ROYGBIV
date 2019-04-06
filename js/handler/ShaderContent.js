@@ -18,8 +18,8 @@ var ShaderContent = function(){
     {name: "textFragmentShader", isVertexShader: false, dir: "text"},
     {name: "rectangleVertexShader", isVertexShader: true, dir: "rectangle"},
     {name: "rectangleFragmentShader", isVertexShader: false, dir: "rectangle"},
-    {name: "bloomBlurVertexShader", isVertexShader: true, dir: "post_processing/bloom"},
-    {name: "bloomBlurFragmentShader", isVertexShader: false, dir: "post_processing/bloom"}
+    {name: "bloomBrightPassVertexShader", isVertexShader: true, dir: "post_processing/bloom/bright_pass"},
+    {name: "bloomBrightPassFragmentShader", isVertexShader: false, dir: "post_processing/bloom/bright_pass"}
   ];
   this.currentLoadCount = 0;
   this.allShadersReadyCallback = function(){
