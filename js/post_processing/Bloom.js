@@ -2,13 +2,20 @@ var Bloom = function(){
   this.configurations = {
     tapAmount: 13,
     threshold: 1,
-    bloomStrength: 2
+    bloomStrength: 2,
+    exposure: 1,
+    gamma: 1
   }
   this.rtParameters = {minFilter: THREE.LinearFilter, magFilter: THREE.LinearFilter, format: THREE.RGBAFormat};
   this.generateDirectPass();
   this.generateBrightPass();
   this.generateBlurPass();
   this.generateCombinerPass();
+}
+
+Bloom.prototype.setBloomStrength = function(strength){
+  this.combinerMaterial.uniforms.bloomStrength.value = strength;
+  this.configurations.bloomStrength = strength;
 }
 
 Bloom.prototype.setThreshold = function(threshold){
@@ -83,7 +90,9 @@ Bloom.prototype.generateCombinerPass = function(){
       blurTexture3: new THREE.Uniform(this.verticalBlurTargets[2].texture),
       blurTexture4: new THREE.Uniform(this.verticalBlurTargets[3].texture),
       blurTexture5: new THREE.Uniform(this.verticalBlurTargets[4].texture),
-      bloomStrength: new THREE.Uniform(this.configurations.bloomStrength)
+      bloomStrength: new THREE.Uniform(this.configurations.bloomStrength),
+      exposure: new THREE.Uniform(this.configurations.exposure),
+      gamma: new THREE.Uniform(this.configurations.gamma)
     }
   });
   this.combinerQuad = new THREE.Mesh(REUSABLE_QUAD_GEOMETRY, this.combinerMaterial);

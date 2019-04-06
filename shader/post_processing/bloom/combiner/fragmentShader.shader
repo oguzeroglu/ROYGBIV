@@ -8,6 +8,8 @@ uniform sampler2D blurTexture3;
 uniform sampler2D blurTexture4;
 uniform sampler2D blurTexture5;
 uniform float bloomStrength;
+uniform float exposure;
+uniform float gamma;
 varying vec2 vUV;
 
 void main(){
@@ -17,5 +19,8 @@ void main(){
   vec4 blurColor4 = texture2D(blurTexture4, vUV);
   vec4 blurColor5 = texture2D(blurTexture5, vUV);
   vec4 sceneColor = texture2D(sceneTexture, vUV);
-  gl_FragColor = sceneColor + (bloomStrength * (blurColor1 + blurColor2 + blurColor3 + blurColor4 + blurColor5));
+  vec4 hdrColor = sceneColor + (bloomStrength * (blurColor1 + blurColor2 + blurColor3 + blurColor4 + blurColor5));
+  vec3 toneMappedColor = vec3(1.0) - exp(-hdrColor.rgb * exposure);
+  toneMappedColor = pow(toneMappedColor, vec3(1.0 / gamma));
+  gl_FragColor = vec4(toneMappedColor.rgb, hdrColor.a);
 }
