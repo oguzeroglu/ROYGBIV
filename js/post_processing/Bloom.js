@@ -1,5 +1,6 @@
 var Bloom = function(){
   this.configurations = {
+    blurStepCount: 5,
     tapAmount: 13,
     threshold: 1,
     bloomStrength: 2,
@@ -11,6 +12,25 @@ var Bloom = function(){
   this.generateBrightPass();
   this.generateBlurPass();
   this.generateCombinerPass();
+  this.setBlurStepCount(this.configurations.blurStepCount);
+}
+
+Bloom.prototype.setBlurStepCount = function(stepCount){
+  if (stepCount > 5){
+    throw new Error("[!] Bloom.setBlurStepCount error: Max alloed stepCount is 5.");
+  }
+  if (stepCount < 1){
+    stepCount = 1
+  }
+  this.configurations.blurStepCount = stepCount;
+  for (var i = 0; i<5; i++){
+    var macro = "BLUR_STEP_"+(i+1)+"_ACTIVE";
+    this.removeMacro(macro, this.combinerMaterial, false, true);
+  }
+  for (var i = 0; i<stepCount; i++){
+    var macro = "BLUR_STEP_"+(i+1)+"_ACTIVE";
+    this.injectMacro(macro, this.combinerMaterial, false, true);
+  }
 }
 
 Bloom.prototype.setBloomStrength = function(strength){
@@ -37,7 +57,7 @@ Bloom.prototype.setBlurTap = function(tap){
     this.blurPassMaterial.uniforms.numberOfTap.value = 20;
     return;
   }
-  throw new Error("[!] setBlurTap error: Undefined tap.");
+  throw new Error("[!] Bloom.setBlurTap error: Undefined tap.");
 }
 
 Bloom.prototype.setBlurDirection = function(isX){
@@ -55,7 +75,7 @@ Bloom.prototype.combinerPass = function(){
 Bloom.prototype.blurPass = function(){
   this.blurPassMaterial.uniforms.inputTexture.value = this.brightTarget.texture;
   this.blurPassMaterial.uniforms.resolution.value.set(this.brightTarget.width, this.brightTarget.height);
-  for (var i = 0; i <5; i++){
+  for (var i = 0; i <this.configurations.blurStepCount; i++){
     this.setBlurDirection(true);
     renderer.webglRenderer.render(this.blurPassScene, orthographicCamera, this.horizontalBlurTargets[i]);
     var rt = this.horizontalBlurTargets[i];
@@ -126,7 +146,7 @@ Bloom.prototype.generateBlurPass = function(){
   this.blurPassScene.add(this.blurPassQuad);
   this.horizontalBlurTargets = [], this.verticalBlurTargets = [];
   var coef = 2;
-  for (var i = 0; i<5; i++){
+  for (var i = 0; i<this.configurations.blurStepCount; i++){
     this.horizontalBlurTargets.push(new THREE.WebGLRenderTarget(window.innerWidth / coef, window.innerHeight / coef, this.rtParameters));
     this.verticalBlurTargets.push(new THREE.WebGLRenderTarget(window.innerWidth / coef, window.innerHeight / coef, this.rtParameters));
     coef = coef * 2;
@@ -156,7 +176,7 @@ Bloom.prototype.setSize = function(width, height){
   this.sceneTarget.setSize(width, height);
   this.brightTarget.setSize(width / 2, height / 2);
   var coef = 2;
-  for (var i = 0; i<5; i++){
+  for (var i = 0; i<this.configurations.blurStepCount; i++){
     this.horizontalBlurTargets[i].setSize(width/coef, height/coef);
     this.verticalBlurTargets[i].setSize(width/coef, height/coef);
     coef = coef * 2;
@@ -167,7 +187,7 @@ Bloom.prototype.setViewport = function(x, y, z, w){
   this.sceneTarget.viewport.set(x, y, z, w);
   this.brightTarget.viewport.set(x, y, z / 2, w / 2);
   var coef = 2;
-  for (var i = 0; i<5; i++){
+  for (var i = 0; i<this.configurations.blurStepCount; i++){
     this.horizontalBlurTargets[i].viewport.set(x, y, z/coef, w/coef);
     this.verticalBlurTargets[i].viewport.set(x, y, z/coef, w/coef);
     coef = coef * 2;
@@ -183,4 +203,28 @@ Bloom.prototype.render = function(){
   this.brightPass();
   this.blurPass();
   this.combinerPass();
+}
+
+Bloom.prototype.injectMacro = function(macro, material, insertVertexShader, insertFragmentShader){
+  if (insertVertexShader){
+    material.vertexShader = material.vertexShader.replace(
+      "#define INSERTION", "#define INSERTION\n#define "+macro
+    )
+  };
+  if (insertFragmentShader){
+    material.fragmentShader = material.fragmentShader.replace(
+      "#define INSERTION", "#define INSERTION\n#define "+macro
+    )
+  };
+  material.needsUpdate = true;
+}
+
+Bloom.prototype.removeMacro = function(macro, material, removeVertexShader, removeFragmentShader){
+  if (removeVertexShader){
+    material.vertexShader = material.vertexShader.replace("\n#define "+macro, "");
+  }
+  if (removeFragmentShader){
+    material.fragmentShader = material.fragmentShader.replace("\n#define "+macro, "");
+  }
+  material.needsUpdate = true;
 }
