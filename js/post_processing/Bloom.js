@@ -117,7 +117,7 @@ Bloom.prototype.blurPass = function(){
   this.blurPassMaterial.uniforms.inputTexture.value = this.brightTarget.texture;
   this.blurPassMaterial.uniforms.resolution.value.set(this.brightTarget.width, this.brightTarget.height);
   for (var i = 0; i <this.configurations.blurStepCount; i++){
-    this.setBlurTap(this.configurations.tapTypes[i]);
+    //this.setBlurTap(this.configurations.tapTypes[i]);
     this.setBlurDirection(true);
     renderer.webglRenderer.render(this.blurPassScene, orthographicCamera, this.horizontalBlurTargets[i]);
     var rt = this.horizontalBlurTargets[i];
@@ -167,6 +167,7 @@ Bloom.prototype.generateCombinerPass = function(){
 
 Bloom.prototype.generateDirectPass = function(){
   this.sceneTarget = new THREE.WebGLRenderTarget(window.innerWidth, window.innerHeight, this.rtParameters);
+  this.sceneTarget.texture.generateMipmaps = false;
 }
 
 Bloom.prototype.generateBlurPass = function(){
@@ -191,8 +192,12 @@ Bloom.prototype.generateBlurPass = function(){
   this.horizontalBlurTargets = [], this.verticalBlurTargets = [];
   var coef = 2;
   for (var i = 0; i<this.configurations.blurStepCount; i++){
-    this.horizontalBlurTargets.push(new THREE.WebGLRenderTarget(window.innerWidth / coef, window.innerHeight / coef, this.rtParameters));
-    this.verticalBlurTargets.push(new THREE.WebGLRenderTarget(window.innerWidth / coef, window.innerHeight / coef, this.rtParameters));
+    var rt1 = new THREE.WebGLRenderTarget(window.innerWidth / coef, window.innerHeight / coef, this.rtParameters);
+    var rt2 = new THREE.WebGLRenderTarget(window.innerWidth / coef, window.innerHeight / coef, this.rtParameters);
+    rt1.texture.generateMipmaps = false;
+    rt2.texture.generateMipmaps = false;
+    this.horizontalBlurTargets.push(rt1);
+    this.verticalBlurTargets.push(rt2);
     coef = coef * 2;
   }
 }
@@ -214,6 +219,7 @@ Bloom.prototype.generateBrightPass = function(){
   this.brightPassScene = new THREE.Scene();
   this.brightPassScene.add(this.brightPassQuad);
   this.brightTarget = new THREE.WebGLRenderTarget(window.innerWidth / 2, window.innerHeight / 2, this.rtParameters);
+  this.brightTarget.texture.generateMipmaps = false;
 }
 
 Bloom.prototype.setSize = function(width, height){
