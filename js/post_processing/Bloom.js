@@ -15,6 +15,16 @@ var Bloom = function(){
   this.setBlurStepCount(this.configurations.blurStepCount);
 }
 
+Bloom.prototype.setGamma = function(gamma){
+  this.configurations.gamma = gamma;
+  this.combinerMaterial.uniforms.gamma.value = gamma;
+}
+
+Bloom.prototype.setExposure = function(exposure){
+  this.configurations.exposure = exposure;
+  this.combinerMaterial.uniforms.exposure.value = exposure;
+}
+
 Bloom.prototype.setBlurStepCount = function(stepCount){
   if (stepCount > 5){
     throw new Error("[!] Bloom.setBlurStepCount error: Max alloed stepCount is 5.");

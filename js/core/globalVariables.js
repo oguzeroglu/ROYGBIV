@@ -355,6 +355,7 @@ var objectsWithMouseOverListeners = new Map();
 var objectsWithMouseOutListeners = new Map();
 var currentMouseOverObjectName;
 var renderer;
+var bloom;
 
 // WORKER VARIABLES
 var WORKERS_SUPPORTED = (typeof(Worker) !== UNDEFINED) && (typeof(MessageChannel) !== UNDEFINED);
