@@ -117,7 +117,7 @@ Bloom.prototype.blurPass = function(){
   this.blurPassMaterial.uniforms.inputTexture.value = this.brightTarget.texture;
   this.blurPassMaterial.uniforms.resolution.value.set(this.brightTarget.width, this.brightTarget.height);
   for (var i = 0; i <this.configurations.blurStepCount; i++){
-    //this.setBlurTap(this.configurations.tapTypes[i]);
+    this.setBlurTap(this.configurations.tapTypes[i]);
     this.setBlurDirection(true);
     renderer.webglRenderer.render(this.blurPassScene, orthographicCamera, this.horizontalBlurTargets[i]);
     var rt = this.horizontalBlurTargets[i];
