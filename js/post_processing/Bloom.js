@@ -125,7 +125,7 @@ Bloom.prototype.generateBlurPass = function(){
   this.blurPassScene = new THREE.Scene();
   this.blurPassScene.add(this.blurPassQuad);
   this.horizontalBlurTargets = [], this.verticalBlurTargets = [];
-  var coef = 1;
+  var coef = 2;
   for (var i = 0; i<5; i++){
     this.horizontalBlurTargets.push(new THREE.WebGLRenderTarget(window.innerWidth / coef, window.innerHeight / coef, this.rtParameters));
     this.verticalBlurTargets.push(new THREE.WebGLRenderTarget(window.innerWidth / coef, window.innerHeight / coef, this.rtParameters));
@@ -149,13 +149,13 @@ Bloom.prototype.generateBrightPass = function(){
   this.brightPassMaterial.uniforms.sceneTexture.value = this.sceneTarget.texture;
   this.brightPassScene = new THREE.Scene();
   this.brightPassScene.add(this.brightPassQuad);
-  this.brightTarget = new THREE.WebGLRenderTarget(window.innerWidth, window.innerHeight, this.rtParameters);
+  this.brightTarget = new THREE.WebGLRenderTarget(window.innerWidth / 2, window.innerHeight / 2, this.rtParameters);
 }
 
 Bloom.prototype.setSize = function(width, height){
   this.sceneTarget.setSize(width, height);
-  this.brightTarget.setSize(width, height);
-  var coef = 1;
+  this.brightTarget.setSize(width / 2, height / 2);
+  var coef = 2;
   for (var i = 0; i<5; i++){
     this.horizontalBlurTargets[i].setSize(width/coef, height/coef);
     this.verticalBlurTargets[i].setSize(width/coef, height/coef);
@@ -165,8 +165,8 @@ Bloom.prototype.setSize = function(width, height){
 
 Bloom.prototype.setViewport = function(x, y, z, w){
   this.sceneTarget.viewport.set(x, y, z, w);
-  this.brightTarget.viewport.set(x, y, z, w);
-  var coef = 1;
+  this.brightTarget.viewport.set(x, y, z / 2, w / 2);
+  var coef = 2;
   for (var i = 0; i<5; i++){
     this.horizontalBlurTargets[i].viewport.set(x, y, z/coef, w/coef);
     this.verticalBlurTargets[i].viewport.set(x, y, z/coef, w/coef);
