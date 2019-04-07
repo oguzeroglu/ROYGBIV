@@ -5,7 +5,8 @@ var Bloom = function(){
     threshold: 1,
     bloomStrength: 2,
     exposure: 1,
-    gamma: 1
+    gamma: 1,
+    bloomFactors: [1, 1, 1, 1, 1]
   }
   this.rtParameters = {minFilter: THREE.LinearFilter, magFilter: THREE.LinearFilter, format: THREE.RGBAFormat};
   this.generateDirectPass();
@@ -13,6 +14,10 @@ var Bloom = function(){
   this.generateBlurPass();
   this.generateCombinerPass();
   this.setBlurStepCount(this.configurations.blurStepCount);
+}
+
+Bloom.prototype.setBloomFactor = function(levelIndex, factor){
+  this.configurations.bloomFactors[levelIndex] = factor;
 }
 
 Bloom.prototype.setGamma = function(gamma){
@@ -122,7 +127,8 @@ Bloom.prototype.generateCombinerPass = function(){
       blurTexture5: new THREE.Uniform(this.verticalBlurTargets[4].texture),
       bloomStrength: new THREE.Uniform(this.configurations.bloomStrength),
       exposure: new THREE.Uniform(this.configurations.exposure),
-      gamma: new THREE.Uniform(this.configurations.gamma)
+      gamma: new THREE.Uniform(this.configurations.gamma),
+      bloomFactors: new THREE.Uniform(this.configurations.bloomFactors)
     }
   });
   this.combinerQuad = new THREE.Mesh(REUSABLE_QUAD_GEOMETRY, this.combinerMaterial);
