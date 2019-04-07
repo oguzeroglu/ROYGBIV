@@ -52,6 +52,19 @@ var GUIHandler = function(){
     "Color": "#ffffff",
     "Blend skybox": false
   };
+  this.bloomParameters = {
+    "Threshold": 0.0,
+    "Active": false,
+    "Strength": 0.0,
+    "Exposure": 0.0,
+    "Gamma": 0.0,
+    "BlurStepAmount": 0,
+    "BlurPass1": {"Factor": 0.0, "Color": "#ffffff", "Quality": "high"},
+    "BlurPass2": {"Factor": 0.0, "Color": "#ffffff", "Quality": "high"},
+    "BlurPass3": {"Factor": 0.0, "Color": "#ffffff", "Quality": "high"},
+    "BlurPass4": {"Factor": 0.0, "Color": "#ffffff", "Quality": "high"},
+    "BlurPass5": {"Factor": 0.0, "Color": "#ffffff", "Quality": "high"}
+  }
 }
 
 GUIHandler.prototype.init = function(){
@@ -393,7 +406,9 @@ GUIHandler.prototype.hideAll = function(){
   $(guiHandler.datGuiTextManipulation.domElement).attr("hidden", true);
   $(guiHandler.datGuiSkybox.domElement).attr("hidden", true);
   $(guiHandler.datGuiFog.domElement).attr("hidden", true);
+  $(guiHandler.datGuiBloom.domElement).attr("hidden", true);
   skyboxConfigurationsVisible = false;
+  postProcessiongConfigurationsVisibility = new Object();
 }
 
 GUIHandler.prototype.initializeObjectManipulationGUI = function(){
@@ -769,7 +784,57 @@ GUIHandler.prototype.initializeSkyboxGUI = function(){
 
 GUIHandler.prototype.initializeBloomGUI = function(){
   guiHandler.datGuiBloom = new dat.GUI();
-
+  guiHandler.bloomThresholdController = guiHandler.datGuiBloom.add(guiHandler.bloomParameters, "Threshold").min(0).max(1).step(0.01).onChange(function(val){
+    bloom.setThreshold(val);
+  }).listen();
+  guiHandler.bloomActiveController = guiHandler.datGuiBloom.add(guiHandler.bloomParameters, "Strength").min(0).max(100).step(0.1).onChange(function(val){
+    bloom.setBloomStrength(val);
+  }).listen();
+  guiHandler.bloomExposureController = guiHandler.datGuiBloom.add(guiHandler.bloomParameters, "Exposure").min(0).max(100).step(0.01).onChange(function(val){
+    bloom.setExposure(val);
+  }).listen();
+  guiHandler.bloomGammaController = guiHandler.datGuiBloom.add(guiHandler.bloomParameters, "Gamma").min(0).max(100).step(0.01).onChange(function(val){
+    bloom.setGamma(val);
+  }).listen();
+  guiHandler.bloomBlurStepAmountController = guiHandler.datGuiBloom.add(guiHandler.bloomParameters, "BlurStepAmount").min(1).max(5).step(1).onChange(function(val){
+    bloom.setBlurStepCount(val);
+    for (var i = 0; i < 5; i++){
+      guiHandler.enableController(guiHandler["blurPassFactorController"+(i+1)]);
+      guiHandler.enableController(guiHandler["blurPassTintColorController"+(i+1)]);
+      guiHandler.enableController(guiHandler["blurPassTapController"+(i+1)]);
+    }
+    for (var i = val; i < 5; i++){
+      guiHandler.disableController(guiHandler["blurPassFactorController"+(i+1)]);
+      guiHandler.disableController(guiHandler["blurPassTintColorController"+(i+1)]);
+      guiHandler.disableController(guiHandler["blurPassTapController"+(i+1)]);
+    }
+  }).listen();
+  guiHandler.bloomActiveController = guiHandler.datGuiBloom.add(guiHandler.bloomParameters, "Active").onChange(function(val){
+    renderer.bloomOn = val;
+  }).listen();
+  for (var i = 0; i<5; i++){
+    var blurPassFolder = guiHandler.datGuiBloom.addFolder("BlurPass"+(i+1));
+    guiHandler["blurPassFactorController"+(i+1)] = blurPassFolder.add(guiHandler.bloomParameters["BlurPass"+(i+1)], "Factor").min(0).max(1).step(0.01).onChange(function(val){
+      bloom.setBloomFactor(this.index, val);
+    }.bind({index: i})).listen();
+    guiHandler["blurPassTapController"+(i+1)] = blurPassFolder.add(guiHandler.bloomParameters["BlurPass"+(i+1)], "Quality", ["high", "medium", "low"]).onChange(function(val){
+      var tapAmount;
+      if (val == "high"){
+        tapAmount = 13;
+      }else if (val == "medium"){
+        tapAmount = 9;
+      }else if (val == "low"){
+        tapAmount = 5;
+      }else{
+        throw new Error("Unknown tap type.");
+      }
+      bloom.setTapForLevel(this.index, tapAmount);
+    }.bind({index: i})).listen();
+    guiHandler["blurPassTintColorController"+(i+1)] = blurPassFolder.addColor(guiHandler.bloomParameters["BlurPass"+(i+1)], "Color").onChange(function(val){
+      REUSABLE_COLOR.set(val);
+      bloom.setBloomTintColor(this.index, REUSABLE_COLOR.r, REUSABLE_COLOR.g, REUSABLE_COLOR.b);
+    }.bind({index: i})).listen();
+  }
 }
 
 GUIHandler.prototype.initializeFogGUI = function(){

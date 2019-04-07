@@ -624,6 +624,14 @@ Terminal.prototype.autocomplete = function(command){
 				}
 				helpString = "[Texts]: ";
 			break;
+			case commandDescriptor.EFFECT_NAME:
+				for (var effectName in renderer.effects){
+					if (effectName.toLowerCase().startsWith(curEntry.toLowerCase())){
+						possibilities.push(effectName);
+					}
+				}
+				helpString = "[Effects]: ";
+			break;
 		}
 
 		//  **********************************************************

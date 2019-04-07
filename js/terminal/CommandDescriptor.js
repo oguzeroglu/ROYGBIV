@@ -67,7 +67,7 @@ var CommandDescriptor = function(){
       1, //resetMaps
       2, //segmentObject
       4, //superposeGridSystem
-      1, //postProcessing
+      2, //postProcessing
       3, //sliceGrid
       5, //newPointLight
       3, //newSkybox
@@ -162,7 +162,7 @@ var CommandDescriptor = function(){
       1, //setRayStep
       0, //printRayStep
       4, //simplifyPhysics
-      1 //unsimplifyPhysics
+      1, //unsimplifyPhysics
   ];
 
   this.commandArgumentsExpectedExplanation = [
@@ -232,7 +232,7 @@ var CommandDescriptor = function(){
     "resetMaps name", //resetMaps
     "segmentObject name count", //segmentObject
     "superposeGridSystem gridSystemName outlineColor cellSize objectName", //superposeGridSystem
-    "postProcessing hide/show", //postProcessing
+    "postProcessing effectName hide/show", //postProcessing
     "sliceGrid newName cellSize outlineColor", //sliceGrid
     "newPointLight name color offsetX offsetY offsetZ", //newPointLight
     "newSkybox name directory fileExtension", //newSkybox
@@ -562,7 +562,7 @@ var CommandDescriptor = function(){
     "resetMaps: Resets all textures of an object.",
     "segmentObject: Segments an object (width/height/depth).",
     "superposeGridSystem: Creates a new grid system above a specific object.",
-    "postProcessing: Shows/hides post processing effects GUI.",
+    "postProcessing: Shows/hides post processing effects GUI for an effect.",
     "sliceGrid: Slices a grid into equal parts and creates a new Grid System with the pieces.",
     "newPointLight: Creates a new point light.",
     "newSkybox: Creates a new Skybox",
@@ -690,7 +690,6 @@ var CommandDescriptor = function(){
     53, //mapNormal -> Normal maps are not supported for now.
     55, //newLambertMaterial -> Deprecated due to lack of uses cases. Phong is fine for light affected objects.
     65, //superposeGridSystem -> Deprecated due to lack of uses cases after grid selection mode implementation.
-    66, //postProcessing -> Will implement in-house composer. This command is not necessary for now.
     68, //newPointLight -> Lights are not supported for now.
     78, //undo -> Deprecated because causes memory issues for big projects.
     79, //redo -> Deprecated because causes memory issues for big projects.
@@ -756,6 +755,7 @@ var CommandDescriptor = function(){
   this.CHILD_OBJECT_NAME        =   30;
   this.FONT_NAME                =   31;
   this.TEXT_NAME                =   32;
+  this.EFFECT_NAME              =   33;
 
   // newGridSystem
   this.newGridSystem = new Object();
@@ -947,6 +947,12 @@ var CommandDescriptor = function(){
   this.segmentObject.types = [];
   this.segmentObject.types.push(this.OBJECT_NAME); //name
   this.segmentObject.types.push(this.UNKNOWN_INDICATOR); //count
+
+  // postProcessing
+  this.postProcessing = new Object();
+  this.postProcessing.types = [];
+  this.postProcessing.types.push(this.EFFECT_NAME); //effectName
+  this.postProcessing.types.push(this.HIDE_SHOW); // hide/show
 
   // sliceGrid
   this.sliceGrid = new Object();

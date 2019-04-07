@@ -1893,7 +1893,35 @@ function parse(input){
           // DEPRECATED
         break;
         case 66: //postProcessing
-          // DEPRECATED
+          var effectName = splitted[1].toLowerCase();
+          var guiVisibilityAction = splitted[2].toLowerCase();
+          if (!renderer.effects[effectName]){
+            terminal.printError(Text.NO_SUCH_EFFECT);
+            return true;
+          }
+          if (guiVisibilityAction == "show"){
+            if (postProcessiongConfigurationsVisibility[effectName]){
+              terminal.printError(Text.GUI_IS_ALREADY_VISIBLE);
+              return true;
+            }
+            renderer.effects[effectName].showConfigurations();
+            postProcessiongConfigurationsVisibility[effectName] = true;
+            terminal.printInfo(Text.GUI_OPENED);
+            return true;
+          }else if (guiVisibilityAction == "hide"){
+            if (!postProcessiongConfigurationsVisibility[effectName]){
+              terminal.printError(Text.GUI_IS_ALREADY_HIDDEN);
+              return true;
+            }
+            renderer.effects[effectName].hideConfigurations();
+            postProcessiongConfigurationsVisibility[effectName] = false;
+            terminal.printInfo(Text.GUI_CLOSED);
+            return true;
+          }else{
+            terminal.printError(Text.STATUS_MUST_BE_ONE_OF);
+            return true;
+          }
+          return true;
         break;
         case 67: //sliceGrid
           var name = splitted[1];

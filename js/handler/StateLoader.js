@@ -2140,6 +2140,7 @@ StateLoader.prototype.resetProject = function(){
   objectsWithOnClickListeners = new Map();
   objectsWithMouseOverListeners = new Map();
   objectsWithMouseOutListeners = new Map();
+  postProcessiongConfigurationsVisibility = new Object();
   currentMouseOverObjectName = 0;
   if (!WORKERS_SUPPORTED){
     rayCaster = new RayCaster();

@@ -155,6 +155,7 @@ var Text = function(){
   this.REPEAT_AMOUNT_MODIFIED = "Repeat amount modified.";
   this.WORKS_ONLY_IN_PREVIEW_MODE = "This command works only in preview mode.";
   this.DURATION_MUST_BE_A_NUMBER = "Duration must be a number.";
+  this.NO_SUCH_EFFECT = "No such effect.";
   this.SIZEX_MUST_BE_A_NUMBER = "SizeX must be a number.";
   this.SIZEY_MUST_BE_A_NUMBER = "SizeY must be a number.";
   this.SIZEZ_MUST_BE_A_NUMBER = "SizeZ must be a number.";

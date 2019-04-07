@@ -178,6 +178,7 @@ var skyboxPreviewMesh;
 var skyboxVisible = false;
 var skyboxConfigurationsVisible = false;
 var fogConfigurationsVisible = false;
+var postProcessiongConfigurationsVisibility = new Object();
 var mappedSkyboxName = 0;
 var gridCounter = 0;
 var MAX_GRIDS_ALLOWED = 1000000;

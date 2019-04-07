@@ -5,7 +5,7 @@ var Renderer = function(){
 Renderer.prototype.initEffects = function(){
   this.effects = {bloom: new Bloom()};
   bloom = this.effects.bloom;
-  this.mandatoryEffectMethods = ["setSize", "setViewport", "setPixelRatio", "render"];
+  this.mandatoryEffectMethods = ["setSize", "setViewport", "setPixelRatio", "render", "showConfigurations", "hideConfigurations"];
   for (var effectName in this.effects){
     for (var i = 0; i<this.mandatoryEffectMethods.length; i++){
       if (!this.effects[effectName][this.mandatoryEffectMethods[i]]){

@@ -1,11 +1,11 @@
 var Bloom = function(){
   this.configurations = {
     blurStepCount: 5,
-    tapAmount: 13,
     threshold: 1,
     bloomStrength: 2,
     exposure: 1,
     gamma: 1,
+    tapTypes: [13, 13, 13, 13, 13],
     bloomFactors: [1, 1, 1, 1, 1],
     bloomTintColors: [new THREE.Vector3(1, 1, 1), new THREE.Vector3(1, 1, 1), new THREE.Vector3(1, 1, 1), new THREE.Vector3(1, 1, 1), new THREE.Vector3(1, 1, 1)]
   }
@@ -18,7 +18,21 @@ var Bloom = function(){
 }
 
 Bloom.prototype.showConfigurations = function(){
-  
+  guiHandler.show(guiHandler.datGuiBloom);
+  guiHandler.bloomParameters["Active"] = renderer.bloomOn;
+  guiHandler.bloomParameters["Threshold"] = this.configurations.threshold;
+  guiHandler.bloomParameters["Strength"] = this.configurations.bloomStrength;
+  guiHandler.bloomParameters["Exposure"] = this.configurations.exposure;
+  guiHandler.bloomParameters["Gamma"] = this.configurations.gamma;
+  guiHandler.bloomParameters["BlurStepAmount"] = this.configurations.blurStepCount;
+  for (var i=0; i<5; i++){
+    guiHandler.bloomParameters["BlurPass"+(i+1)]["Factor"] = this.configurations.bloomFactors[i];
+    guiHandler.bloomParameters["BlurPass"+(i+1)]["Color"] = "#" + (REUSABLE_COLOR.setRGB(this.configurations.bloomTintColors[i].x, this.configurations.bloomTintColors[i].y, this.configurations.bloomTintColors[i].z).getHexString());
+  }
+}
+
+Bloom.prototype.hideConfigurations = function(){
+  guiHandler.hide(guiHandler.datGuiBloom);
 }
 
 Bloom.prototype.setBloomTintColor = function(levelIndex, r, g, b){
@@ -67,8 +81,11 @@ Bloom.prototype.setThreshold = function(threshold){
   this.brightPassMaterial.uniforms.threshold.value = threshold;
 }
 
+Bloom.prototype.setTapForLevel = function(levelIndex, tap){
+  this.configurations.tapTypes[levelIndex] = tap;
+}
+
 Bloom.prototype.setBlurTap = function(tap){
-  this.configurations.tapAmount = tap;
   if (tap == 5){
     this.blurPassMaterial.uniforms.numberOfTap.value = -10;
     return;
@@ -100,6 +117,7 @@ Bloom.prototype.blurPass = function(){
   this.blurPassMaterial.uniforms.inputTexture.value = this.brightTarget.texture;
   this.blurPassMaterial.uniforms.resolution.value.set(this.brightTarget.width, this.brightTarget.height);
   for (var i = 0; i <this.configurations.blurStepCount; i++){
+    this.setBlurTap(this.configurations.tapTypes[i]);
     this.setBlurDirection(true);
     renderer.webglRenderer.render(this.blurPassScene, orthographicCamera, this.horizontalBlurTargets[i]);
     var rt = this.horizontalBlurTargets[i];
