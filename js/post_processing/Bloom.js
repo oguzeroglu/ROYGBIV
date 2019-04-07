@@ -17,6 +17,10 @@ var Bloom = function(){
   this.setBlurStepCount(this.configurations.blurStepCount);
 }
 
+Bloom.prototype.showConfigurations = function(){
+  
+}
+
 Bloom.prototype.setBloomTintColor = function(levelIndex, r, g, b){
   this.configurations.bloomTintColors[levelIndex].set(r, g, b);
 }

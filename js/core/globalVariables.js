@@ -366,15 +366,6 @@ var Text = (!isDeployment)? new Text(): 0;
 // SCRIPTING UTILITY FUNCTIONS
 var ROYGBIV;
 
-var fogDensityController;
-var fogColorController;
-var fogBlendWithSkyboxController;
-var fogParameters = {
-  "Density": 0.0,
-  "Color": "#ffffff",
-  "Blend skybox": false
-};
-
 // KEYCODE TO STRING MAP
 keyCodeToChar = {
   8:"Backspace",9:"Tab",13:"Enter",16:"Shift",17:"Ctrl",18:"Alt",19:"Pause/Break",20:"Caps Lock",

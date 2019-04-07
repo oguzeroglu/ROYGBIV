@@ -4459,19 +4459,19 @@ function parse(input){
               return true;
             }
             guiHandler.show(guiHandler.datGuiFog);
-            fogParameters["Color"] = "#"+fogColorRGB.getHexString();
-            fogParameters["Density"] = fogDensity * 100;
-            fogParameters["Blend skybox"] = fogBlendWithSkybox;
+            guiHandler.fogParameters["Color"] = "#"+fogColorRGB.getHexString();
+            guiHandler.fogParameters["Density"] = fogDensity * 100;
+            guiHandler.fogParameters["Blend skybox"] = fogBlendWithSkybox;
             if (!skyboxVisible){
-              guiHandler.enableController(fogColorController);
-              guiHandler.disableController(fogBlendWithSkyboxController);
+              guiHandler.enableController(guiHandler.fogColorController);
+              guiHandler.disableController(guiHandler.fogBlendWithSkyboxController);
             }else{
               if (fogBlendWithSkybox){
-                guiHandler.disableController(fogColorController);
+                guiHandler.disableController(guiHandler.fogColorController);
               }else{
-                guiHandler.enableController(fogColorController);
+                guiHandler.enableController(guiHandler.fogColorController);
               }
-              guiHandler.enableController(fogBlendWithSkyboxController);
+              guiHandler.enableController(guiHandler.fogBlendWithSkyboxController);
             }
             fogConfigurationsVisible = true;
             terminal.printInfo(Text.GUI_OPENED);

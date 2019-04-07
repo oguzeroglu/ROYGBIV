@@ -47,6 +47,11 @@ var GUIHandler = function(){
     "Max width%": 100,
     "Max height%": 100
   };
+  this.fogParameters = {
+    "Density": 0.0,
+    "Color": "#ffffff",
+    "Blend skybox": false
+  };
 }
 
 GUIHandler.prototype.init = function(){
@@ -54,6 +59,7 @@ GUIHandler.prototype.init = function(){
   this.initializeSkyboxGUI();
   this.initializeTextManipulationGUI();
   this.initializeObjectManipulationGUI();
+  this.initializeBloomGUI();
 
   this.hideAll();
 
@@ -761,9 +767,14 @@ GUIHandler.prototype.initializeSkyboxGUI = function(){
   }).listen();
 }
 
+GUIHandler.prototype.initializeBloomGUI = function(){
+  guiHandler.datGuiBloom = new dat.GUI();
+
+}
+
 GUIHandler.prototype.initializeFogGUI = function(){
   guiHandler.datGuiFog = new dat.GUI();
-  fogDensityController = guiHandler.datGuiFog.add(fogParameters, "Density").min(0).max(1).step(0.01).onChange(function(val){
+  guiHandler.fogDensityController = guiHandler.datGuiFog.add(guiHandler.fogParameters, "Density").min(0).max(1).step(0.01).onChange(function(val){
     fogDensity = val / 100;
     if (!fogBlendWithSkybox){
       GLOBAL_FOG_UNIFORM.value.set(fogDensity, fogColorRGB.r, fogColorRGB.g, fogColorRGB.b);
@@ -776,13 +787,13 @@ GUIHandler.prototype.initializeFogGUI = function(){
       );
     }
   }).listen();
-  fogColorController = guiHandler.datGuiFog.addColor(fogParameters, "Color").onChange(function(val){
+  guiHandler.fogColorController = guiHandler.datGuiFog.addColor(guiHandler.fogParameters, "Color").onChange(function(val){
     fogColorRGB.set(val);
     GLOBAL_FOG_UNIFORM.value.set(fogDensity, fogColorRGB.r, fogColorRGB.g, fogColorRGB.b);
   }).listen();
-  fogBlendWithSkyboxController = guiHandler.datGuiFog.add(fogParameters, "Blend skybox").onChange(function(val){
+  guiHandler.fogBlendWithSkyboxController = guiHandler.datGuiFog.add(guiHandler.fogParameters, "Blend skybox").onChange(function(val){
     if (!skyboxVisible){
-      fogParameters["Blend skybox"] = false;
+      guiHandler.fogParameters["Blend skybox"] = false;
       return;
     }
     if (val){
@@ -793,11 +804,11 @@ GUIHandler.prototype.initializeFogGUI = function(){
         skyboxMesh.material.uniforms.color.value.g,
         skyboxMesh.material.uniforms.color.value.b
       );
-      guiHandler.disableController(fogColorController);
+      guiHandler.disableController(guiHandler.fogColorController);
     }else{
       fogBlendWithSkybox = false;
       GLOBAL_FOG_UNIFORM.value.set(fogDensity, fogColorRGB.r, fogColorRGB.g, fogColorRGB.b);
-      guiHandler.enableController(fogColorController);
+      guiHandler.enableController(guiHandler.fogColorController);
     }
     for (var objName in addedObjects){
       addedObjects[objName].removeFog();
