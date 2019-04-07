@@ -6,7 +6,8 @@ var Bloom = function(){
     bloomStrength: 2,
     exposure: 1,
     gamma: 1,
-    bloomFactors: [1, 1, 1, 1, 1]
+    bloomFactors: [1, 1, 1, 1, 1],
+    bloomTintColors: [new THREE.Vector3(1, 1, 1), new THREE.Vector3(1, 1, 1), new THREE.Vector3(1, 1, 1), new THREE.Vector3(1, 1, 1), new THREE.Vector3(1, 1, 1)]
   }
   this.rtParameters = {minFilter: THREE.LinearFilter, magFilter: THREE.LinearFilter, format: THREE.RGBAFormat};
   this.generateDirectPass();
@@ -14,6 +15,10 @@ var Bloom = function(){
   this.generateBlurPass();
   this.generateCombinerPass();
   this.setBlurStepCount(this.configurations.blurStepCount);
+}
+
+Bloom.prototype.setBloomTintColor = function(levelIndex, r, g, b){
+  this.configurations.bloomTintColors[levelIndex].set(r, g, b);
 }
 
 Bloom.prototype.setBloomFactor = function(levelIndex, factor){
@@ -128,7 +133,8 @@ Bloom.prototype.generateCombinerPass = function(){
       bloomStrength: new THREE.Uniform(this.configurations.bloomStrength),
       exposure: new THREE.Uniform(this.configurations.exposure),
       gamma: new THREE.Uniform(this.configurations.gamma),
-      bloomFactors: new THREE.Uniform(this.configurations.bloomFactors)
+      bloomFactors: new THREE.Uniform(this.configurations.bloomFactors),
+      bloomTintColors: new THREE.Uniform(this.configurations.bloomTintColors)
     }
   });
   this.combinerQuad = new THREE.Mesh(REUSABLE_QUAD_GEOMETRY, this.combinerMaterial);
