@@ -458,7 +458,7 @@ function parse(input){
           }
           gridSystems[selectedGridSystemName].newSurface(objectName, selectedGrid1, selectedGrid2, selectedMaterial);
           if (areaConfigurationsVisible){
-            guiHandler.hide(guiHandler.datGuiAreaConfigurations);
+            guiHandler.hide(guiHandler.guiTypes.AREA);
             areaConfigurationsVisible = false;
           }
           if (!jobHandlerWorking){
@@ -591,7 +591,7 @@ function parse(input){
             delete objectGroups[objectName];
           }
           if (areaConfigurationsVisible){
-            guiHandler.hide(guiHandler.datGuiAreaConfigurations);
+            guiHandler.hide(guiHandler.guiTypes.AREA);
             areaConfigurationsVisible = false;
           }
           if (!jobHandlerWorking){
@@ -1017,7 +1017,7 @@ function parse(input){
           gridSystem.newRamp(anchorGrid, otherGrid, axis, parseInt(height), material, name);
           anchorGrid = 0;
           if (areaConfigurationsVisible){
-            guiHandler.hide(guiHandler.datGuiAreaConfigurations);
+            guiHandler.hide(guiHandler.guiTypes.AREA);
             areaConfigurationsVisible = false;
           }
           refreshRaycaster(Text.RAMP_CREATED);
@@ -1190,7 +1190,7 @@ function parse(input){
 
           gridSystem.newBox(selections, height, material, name);
           if (areaConfigurationsVisible){
-            guiHandler.hide(guiHandler.datGuiAreaConfigurations);
+            guiHandler.hide(guiHandler.guiTypes.AREA);
             areaConfigurationsVisible = false;
           }
           if (!jobHandlerWorking){
@@ -2750,9 +2750,9 @@ function parse(input){
             }
             objectGroup.glue();
             objectGroups[groupName] = objectGroup;
-            guiHandler.hide(guiHandler.datGuiObjectManipulation);
+            guiHandler.hide(guiHandler.guiTypes.OBJECT);
             if (areaConfigurationsVisible){
-              guiHandler.hide(guiHandler.datGuiAreaConfigurations);
+              guiHandler.hide(guiHandler.guiTypes.AREA);
               areaConfigurationsVisible = false;
             }
             refreshRaycaster(Text.OBJECTS_GLUED_TOGETHER);
@@ -2782,7 +2782,7 @@ function parse(input){
           delete objectGroups[name];
           selectionHandler.resetCurrentSelection();
           if (areaConfigurationsVisible){
-            guiHandler.hide(guiHandler.datGuiAreaConfigurations);
+            guiHandler.hide(guiHandler.guiTypes.AREA);
             areaConfigurationsVisible = false;
           }
           if (!jobHandlerWorking){
@@ -3605,7 +3605,7 @@ function parse(input){
 
           gridSystem.newSphere(sphereName, material, radius, selections);
           if (areaConfigurationsVisible){
-            guiHandler.hide(guiHandler.datGuiAreaConfigurations);
+            guiHandler.hide(guiHandler.guiTypes.AREA);
             areaConfigurationsVisible = false;
           }
           if (!jobHandlerWorking){
@@ -3776,7 +3776,7 @@ function parse(input){
           var result = gridSystems[gs].newArea(areaName, height, selections);
           terminal.printInfo(Text.AREA_CREATED);
           if (areaConfigurationsVisible){
-            guiHandler.hide(guiHandler.datGuiAreaConfigurations);
+            guiHandler.hide(guiHandler.guiTypes.AREA);
             areaConfigurationsVisible = false;
           }
           return true;
@@ -3815,7 +3815,7 @@ function parse(input){
           delete areas[area.name];
           terminal.printInfo(Text.AREA_DESTROYED);
           if (areaConfigurationsVisible){
-            guiHandler.hide(guiHandler.datGuiAreaConfigurations);
+            guiHandler.hide(guiHandler.guiTypes.AREA);
             areaConfigurationsVisible = false;
           }
           return true;
@@ -3863,7 +3863,7 @@ function parse(input){
               terminal.printError(Text.AREA_CONFIGURATION_WINDOW_IS_ALREADY_HIDDEN);
               return true;
             }
-            guiHandler.hide(guiHandler.datGuiAreaConfigurations);
+            guiHandler.hide(guiHandler.guiTypes.AREA);
           }
           areaConfigurationsVisible = ! areaConfigurationsVisible;
           terminal.printInfo(Text.OK);
@@ -3914,7 +3914,7 @@ function parse(input){
             return true;
           }
           if (areaConfigurationsVisible){
-            guiHandler.hide(guiHandler.datGuiAreaConfigurations);
+            guiHandler.hide(guiHandler.guiTypes.AREA);
           }
           areaConfigurationsHandler.show(areaName);
           areaConfigurationsVisible = true;
@@ -4143,7 +4143,7 @@ function parse(input){
             cylinderHeight, isOpenEnded, selections
           );
           if (areaConfigurationsVisible){
-            guiHandler.hide(guiHandler.datGuiAreaConfigurations);
+            guiHandler.hide(guiHandler.guiTypes.AREA);
             areaConfigurationsVisible = false;
           }
           if (!jobHandlerWorking){
@@ -4453,7 +4453,7 @@ function parse(input){
               terminal.printError(Text.GUI_IS_ALREADY_VISIBLE);
               return true;
             }
-            guiHandler.show(guiHandler.datGuiSkybox);
+            guiHandler.show(guiHandler.guiTypes.SKYBOX);
             skyboxConfigurationsVisible = true;
             guiHandler.skyboxParameters["Name"] = mappedSkyboxName;
             guiHandler.skyboxParameters["Color"] = "#" + skyboxMesh.material.uniforms.color.value.getHexString();
@@ -4463,7 +4463,7 @@ function parse(input){
               terminal.printError(Text.GUI_IS_ALREADY_HIDDEN);
               return true;
             }
-            guiHandler.hide(guiHandler.datGuiSkybox);
+            guiHandler.hide(guiHandler.guiTypes.SKYBOX);
             skyboxConfigurationsVisible = false;
             terminal.printInfo(Text.GUI_CLOSED);
           }else{
@@ -4486,7 +4486,7 @@ function parse(input){
               terminal.printError(Text.GUI_IS_ALREADY_VISIBLE);
               return true;
             }
-            guiHandler.show(guiHandler.datGuiFog);
+            guiHandler.show(guiHandler.guiTypes.FOG);
             guiHandler.fogParameters["Color"] = "#"+fogColorRGB.getHexString();
             guiHandler.fogParameters["Density"] = fogDensity * 100;
             guiHandler.fogParameters["Blend skybox"] = fogBlendWithSkybox;
@@ -4508,7 +4508,7 @@ function parse(input){
               terminal.printError(Text.GUI_IS_ALREADY_HIDDEN);
               return true;
             }
-            guiHandler.hide(guiHandler.datGuiFog);
+            guiHandler.hide(guiHandler.guiTypes.FOG);
             fogConfigurationsVisible = false;
             terminal.printInfo(Text.GUI_CLOSED);
           }else{

@@ -65,23 +65,10 @@ var GUIHandler = function(){
     "BlurPass4": {"Factor": 0.0, "Color": "#ffffff", "Quality": "high"},
     "BlurPass5": {"Factor": 0.0, "Color": "#ffffff", "Quality": "high"}
   }
-}
-
-GUIHandler.prototype.init = function(){
-  this.initializeFogGUI();
-  this.initializeSkyboxGUI();
-  this.initializeTextManipulationGUI();
-  this.initializeObjectManipulationGUI();
-  this.initializeBloomGUI();
-
-  this.hideAll();
-
-  guiHandler.datGuiObjectManipulation.domElement.addEventListener("mousedown", function(e){
-    omGUIFocused = true;
-  });
-  guiHandler.datGuiTextManipulation.domElement.addEventListener("mousedown", function(e){
-    tmGUIFocused = true;
-  });
+  // GUI TYPES DEFINITION
+  this.guiTypes = {
+    FOG: 0, SKYBOX: 1, TEXT: 2, OBJECT: 3, BLOOM: 4
+  };
 }
 
 GUIHandler.prototype.afterTextSelection = function(){
@@ -90,8 +77,8 @@ GUIHandler.prototype.afterTextSelection = function(){
   }
   var curSelection = selectionHandler.getSelectedObject();
   if (curSelection && curSelection.isAddedText){
+    guiHandler.show(guiHandler.guiTypes.TEXT);
     guiHandler.enableAllTMControllers();
-    guiHandler.show(guiHandler.datGuiTextManipulation);
     guiHandler.textManipulationParameters["Text"] = curSelection.name;
     guiHandler.textManipulationParameters["Content"] = curSelection.text;
     guiHandler.textManipulationParameters["Text color"] = "#" + curSelection.material.uniforms.color.value.getHexString();
@@ -133,7 +120,7 @@ GUIHandler.prototype.afterTextSelection = function(){
       guiHandler.disableController(guiHandler.textManipulationAffectedByFogController);
     }
   }else{
-    guiHandler.hide(guiHandler.datGuiTextManipulation);
+    guiHandler.hide(guiHandler.guiTypes.TEXT);
   }
 }
 
@@ -143,7 +130,7 @@ GUIHandler.prototype.afterObjectSelection = function(){
   }
   var curSelection = selectionHandler.getSelectedObject();
   if (curSelection && (curSelection.isAddedObject || curSelection.isObjectGroup)){
-    guiHandler.show(guiHandler.datGuiObjectManipulation);
+    guiHandler.show(guiHandler.guiTypes.OBJECT);
     guiHandler.enableAllOMControllers();
     var obj = curSelection;
     obj.visualiseBoundingBoxes();
@@ -311,7 +298,7 @@ GUIHandler.prototype.afterObjectSelection = function(){
     }
     guiHandler.omMassController.updateDisplay();
   }else{
-    guiHandler.hide(guiHandler.datGuiObjectManipulation);
+    guiHandler.hide(guiHandler.guiTypes.OBJECT);
   }
   guiHandler.afterTextSelection();
 }
@@ -389,30 +376,113 @@ GUIHandler.prototype.enableAllOMControllers = function(){
   guiHandler.enableController(guiHandler.omSideController);
 }
 
-GUIHandler.prototype.isVisible = function(guiObject){
-  return $(guiObject.domElement).is(":visible");
+GUIHandler.prototype.show = function(guiType){
+  switch(guiType){
+    case this.guiTypes.OBJECT:
+      if (!this.datGuiObjectManipulation){
+        this.initializeObjectManipulationGUI();
+      }
+    return;
+    case this.guiTypes.TEXT:
+      if (!this.datGuiTextManipulation){
+        this.initializeTextManipulationGUI();
+      }
+    return;
+    case this.guiTypes.SKYBOX:
+      if (!this.datGuiSkybox){
+        this.initializeSkyboxGUI();
+        skyboxConfigurationsVisible = true;
+      }
+    return;
+    case this.guiTypes.FOG:
+      if (!this.datGuiFog){
+        this.initializeFogGUI();
+      }
+    return;
+    case this.guiTypes.BLOOM:
+      if (!this.datGuiBloom){
+        this.initializeBloomGUI();
+        postProcessiongConfigurationsVisibility.bloom = true;
+      }
+    return;
+  }
+  throw new Error("Unknown guiType.");
 }
 
-GUIHandler.prototype.show = function(guiObject){
-  $(guiObject.domElement).attr("hidden", false);
+GUIHandler.prototype.unbindSubFolderEvents = function(gui){
+  var folders = gui.__folders;
+  for (var folderName in folders){
+    dat.dom.dom.unbind(window, "resize", folders[folderName].__resizeHandler);
+    var len = folders[folderName].__controllers.length;
+    for (var i = 0; i<len; i++){
+      folders[folderName].remove(folders[folderName].__controllers[0]);
+    }
+    gui.removeFolder(folders[folderName]);
+  }
 }
 
-GUIHandler.prototype.hide = function(guiObject){
-  $(guiObject.domElement).attr("hidden", true);
+GUIHandler.prototype.removeControllers = function(gui){
+  var len = gui.__controllers.length;
+  for (var i = 0; i<len; i++){
+    gui.remove(gui.__controllers[0]);
+  }
+}
+
+GUIHandler.prototype.destroyGUI = function(gui){
+  this.removeControllers(gui);
+  this.unbindSubFolderEvents(gui);
+  gui.destroy();
+}
+
+GUIHandler.prototype.hide = function(guiType){
+  switch(guiType){
+    case this.guiTypes.OBJECT:
+      if (this.datGuiObjectManipulation){
+        this.destroyGUI(this.datGuiObjectManipulation);
+        this.datGuiObjectManipulation = 0;
+      }
+    return;
+    case this.guiTypes.TEXT:
+      if (this.datGuiTextManipulation){
+        this.destroyGUI(this.datGuiTextManipulation);
+        this.datGuiTextManipulation = 0;
+      }
+    return;
+    case this.guiTypes.SKYBOX:
+      if (this.datGuiSkybox){
+        this.destroyGUI(this.datGuiSkybox);
+        skyboxConfigurationsVisible = false;
+        this.datGuiSkybox = 0;
+      }
+    return;
+    case this.guiTypes.FOG:
+      if (this.datGuiFog){
+        this.destroyGUI(this.datGuiFog);
+        this.datGuiFog = 0;
+      }
+    return;
+    case this.guiTypes.BLOOM:
+      if (this.datGuiBloom){
+        this.destroyGUI(this.datGuiBloom);
+        postProcessiongConfigurationsVisibility.bloom = false;
+        this.datGuiBloom = 0;
+      }
+    return;
+  }
+  throw new Error("Unknown guiType.");
 }
 
 GUIHandler.prototype.hideAll = function(){
-  $(guiHandler.datGuiObjectManipulation.domElement).attr("hidden", true);
-  $(guiHandler.datGuiTextManipulation.domElement).attr("hidden", true);
-  $(guiHandler.datGuiSkybox.domElement).attr("hidden", true);
-  $(guiHandler.datGuiFog.domElement).attr("hidden", true);
-  $(guiHandler.datGuiBloom.domElement).attr("hidden", true);
-  skyboxConfigurationsVisible = false;
-  postProcessiongConfigurationsVisibility = new Object();
+  for (var key in this.guiTypes){
+    this.hide(this.guiTypes[key]);
+  }
 }
 
 GUIHandler.prototype.initializeObjectManipulationGUI = function(){
   guiHandler.datGuiObjectManipulation = new dat.GUI();
+  guiHandler.datGuiObjectManipulation.domElement.addEventListener("mousedown", function(e){
+    omGUIFocused = true;
+  });
   guiHandler.omObjController = guiHandler.datGuiObjectManipulation.add(guiHandler.objectManipulationParameters, "Object").listen();
   guiHandler.disableController(guiHandler.omObjController, true);
   guiHandler.omRotationXController = guiHandler.datGuiObjectManipulation.add(guiHandler.objectManipulationParameters, "Rotate x").onChange(function(val){
@@ -643,6 +713,9 @@ GUIHandler.prototype.initializeObjectManipulationGUI = function(){
 
 GUIHandler.prototype.initializeTextManipulationGUI = function(){
   guiHandler.datGuiTextManipulation = new dat.GUI();
+  guiHandler.datGuiTextManipulation.domElement.addEventListener("mousedown", function(e){
+    tmGUIFocused = true;
+  });
   guiHandler.textManipulationTextNameController = guiHandler.datGuiTextManipulation.add(guiHandler.textManipulationParameters, "Text").listen();
   guiHandler.textManipulationContentController = guiHandler.datGuiTextManipulation.add(guiHandler.textManipulationParameters, "Content").onChange(function(val){
     var addedText = selectionHandler.getSelectedObject();

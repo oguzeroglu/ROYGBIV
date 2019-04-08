@@ -115,7 +115,6 @@ window.onload = function() {
   if (!isDeployment){
     // GUI HANDLER
     guiHandler = new GUIHandler();
-    guiHandler.init();
   }
 
   // IMAGE UPLOADER

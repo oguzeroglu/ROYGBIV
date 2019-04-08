@@ -63,7 +63,7 @@ ModeSwitcher.prototype.commonSwitchFunctions = function(){
   if (!isDeployment){
     guiHandler.hideAll();
     if (areaConfigurationsVisible){
-      guiHandler.hide(guiHandler.datGuiAreaConfigurations);
+      guiHandler.hide(guiHandler.guiTypes.AREA);
       areaConfigurationsVisible = false;
     }
     selectionHandler.resetCurrentSelection();

@@ -18,8 +18,11 @@ var Bloom = function(){
 }
 
 Bloom.prototype.showConfigurations = function(){
-  guiHandler.show(guiHandler.datGuiBloom);
+  guiHandler.show(guiHandler.guiTypes.BLOOM);
   guiHandler.bloomParameters["Active"] = renderer.bloomOn;
+  if (typeof guiHandler.bloomParameters["Active"] == UNDEFINED){
+    guiHandler.bloomParameters["Active"] = false;
+  }
   guiHandler.bloomParameters["Threshold"] = this.configurations.threshold;
   guiHandler.bloomParameters["Strength"] = this.configurations.bloomStrength;
   guiHandler.bloomParameters["Exposure"] = this.configurations.exposure;
@@ -32,7 +35,7 @@ Bloom.prototype.showConfigurations = function(){
 }
 
 Bloom.prototype.hideConfigurations = function(){
-  guiHandler.hide(guiHandler.datGuiBloom);
+  guiHandler.hide(guiHandler.guiTypes.BLOOM);
 }
 
 Bloom.prototype.setBloomTintColor = function(levelIndex, r, g, b){
