@@ -83,7 +83,7 @@ var RaycasterWorkerBridge = function(){
           for (var i = 0; i<obj.mesh.matrixWorld.elements.length; i++){
             intersectablesAry.push(obj.mesh.matrixWorld.elements[i]);
           }
-          intersectableArrayIndex += obj.mesh.matrixWorld.elements.length + 1;
+          intersectableArrayIndex += obj.mesh.matrixWorld.elements.length + 2;
         }
       }
       var addedTextScaleDescriptionArray = [];
@@ -101,7 +101,7 @@ var RaycasterWorkerBridge = function(){
           for (var i = 0; i<text.mesh.matrixWorld.elements.length; i++){
             intersectablesAry.push(text.mesh.matrixWorld.elements[i]);
           }
-          intersectableArrayIndex += text.mesh.matrixWorld.elements.length + 1;
+          intersectableArrayIndex += text.mesh.matrixWorld.elements.length + 2;
           addedTextScaleDescriptionArray.push(text.characterSize);
           addedTextScaleDescriptionArray.push(text.bottomRight.x); addedTextScaleDescriptionArray.push(text.bottomRight.y); addedTextScaleDescriptionArray.push(text.bottomRight.z);
           addedTextScaleDescriptionArray.push(text.topRight.x); addedTextScaleDescriptionArray.push(text.topRight.y); addedTextScaleDescriptionArray.push(text.topRight.z);
