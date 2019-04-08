@@ -95,6 +95,9 @@ GUIHandler.prototype.afterTextSelection = function(){
     guiHandler.textManipulationParameters["Line margin"] = curSelection.offsetBetweenLines;
     guiHandler.textManipulationParameters["Aff. by fog"] = curSelection.isAffectedByFog;
     guiHandler.textManipulationParameters["is 2D"] = curSelection.is2D;
+    if (typeof guiHandler.textManipulationParameters["is 2D"] == UNDEFINED){
+      guiHandler.textManipulationParameters["is 2D"] = false;
+    }
     if (!guiHandler.textManipulationParameters["Has bg"]){
       guiHandler.disableController(guiHandler.textManipulationBackgroundColorController);
       guiHandler.disableController(guiHandler.textManipulationBackgroundAlphaController);
@@ -105,6 +108,12 @@ GUIHandler.prototype.afterTextSelection = function(){
     guiHandler.textManipulationParameters["Margin Y"] = curSelection.marginPercentHeight;
     guiHandler.textManipulationParameters["Max width%"] = curSelection.maxWidthPercent;
     guiHandler.textManipulationParameters["Max height%"] = curSelection.maxHeightPercent;
+    if (typeof guiHandler.textManipulationParameters["Max width%"] == UNDEFINED){
+      guiHandler.textManipulationParameters["Max width%"] = 0;
+    }
+    if (typeof guiHandler.textManipulationParameters["Max height%"] == UNDEFINED){
+      guiHandler.textManipulationParameters["Max height%"] = 0;
+    }
     if (curSelection.marginMode == MARGIN_MODE_2D_TEXT_TOP_LEFT){
       guiHandler.textManipulationParameters["Margin mode"] = "Top/Left";
     }else{
