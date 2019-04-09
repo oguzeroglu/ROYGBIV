@@ -477,6 +477,10 @@ GUIHandler.prototype.hide = function(guiType){
         this.datGuiBloom = 0;
       }
     return;
+    case this.guiTypes.AREA:
+      this.destroyGUI(this.datGuiAreaConfigurations);
+      this.datGuiAreaConfigurations = 0;
+    return;
   }
   throw new Error("Unknown guiType.");
 }
@@ -488,7 +492,7 @@ GUIHandler.prototype.hideAll = function(){
 }
 
 GUIHandler.prototype.initializeObjectManipulationGUI = function(){
-  guiHandler.datGuiObjectManipulation = new dat.GUI();
+  guiHandler.datGuiObjectManipulation = new dat.GUI({hideable: false});
   guiHandler.datGuiObjectManipulation.domElement.addEventListener("mousedown", function(e){
     omGUIFocused = true;
   });
@@ -721,7 +725,7 @@ GUIHandler.prototype.initializeObjectManipulationGUI = function(){
 }
 
 GUIHandler.prototype.initializeTextManipulationGUI = function(){
-  guiHandler.datGuiTextManipulation = new dat.GUI();
+  guiHandler.datGuiTextManipulation = new dat.GUI({hideable: false});
   guiHandler.datGuiTextManipulation.domElement.addEventListener("mousedown", function(e){
     tmGUIFocused = true;
   });
@@ -847,7 +851,7 @@ GUIHandler.prototype.initializeTextManipulationGUI = function(){
 }
 
 GUIHandler.prototype.initializeSkyboxGUI = function(){
-  guiHandler.datGuiSkybox = new dat.GUI();
+  guiHandler.datGuiSkybox = new dat.GUI({hideable: false});
   guiHandler.skyboxNameController = guiHandler.datGuiSkybox.add(guiHandler.skyboxParameters, "Name").listen();
   guiHandler.disableController(guiHandler.skyboxNameController, true);
   guiHandler.skyboxColorController = guiHandler.datGuiSkybox.addColor(guiHandler.skyboxParameters, "Color").onChange(function(val){
@@ -865,7 +869,7 @@ GUIHandler.prototype.initializeSkyboxGUI = function(){
 }
 
 GUIHandler.prototype.initializeBloomGUI = function(){
-  guiHandler.datGuiBloom = new dat.GUI();
+  guiHandler.datGuiBloom = new dat.GUI({hideable: false});
   guiHandler.bloomThresholdController = guiHandler.datGuiBloom.add(guiHandler.bloomParameters, "Threshold").min(0).max(1).step(0.01).onChange(function(val){
     bloom.setThreshold(val);
   }).listen();
@@ -920,7 +924,7 @@ GUIHandler.prototype.initializeBloomGUI = function(){
 }
 
 GUIHandler.prototype.initializeFogGUI = function(){
-  guiHandler.datGuiFog = new dat.GUI();
+  guiHandler.datGuiFog = new dat.GUI({hideable: false});
   guiHandler.fogDensityController = guiHandler.datGuiFog.add(guiHandler.fogParameters, "Density").min(0).max(1).step(0.01).onChange(function(val){
     fogDensity = val / 100;
     if (!fogBlendWithSkybox){

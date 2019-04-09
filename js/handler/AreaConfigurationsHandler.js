@@ -80,7 +80,7 @@ AreaConfigurationsHandler.prototype.generateConfigurations = function(singleArea
 
 AreaConfigurationsHandler.prototype.show = function(singleAreaName){
   this.generateConfigurations(singleAreaName);
-  guiHandler.datGuiAreaConfigurations = new dat.GUI();
+  guiHandler.datGuiAreaConfigurations = new dat.GUI({hideable: false});
   var pseudoAreas = areas;
   if (singleAreaName){
     pseudoAreas = new Object();

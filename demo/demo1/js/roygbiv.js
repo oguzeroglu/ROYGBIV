@@ -14522,7 +14522,7 @@ ColorNames.prototype.generateRandomColor = function(){
   function Grad(x, y, z) {
     this.x = x; this.y = y; this.z = z;
   }
-  
+
   Grad.prototype.dot2 = function(x, y) {
     return this.x*x + this.y*y;
   };
@@ -26210,4 +26210,3 @@ AutoInstancingHandler.prototype.reset = function(){
   }
   autoInstancedObjects = new Object();
 }
-
