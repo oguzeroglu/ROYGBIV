@@ -174,7 +174,6 @@ var skyBoxRootDirectory = "skybox/";
 var dataPrefix = "text/json;charset=utf-8,";
 var skyboxDistance = 4000;
 var skyboxMesh;
-var skyboxPreviewMesh;
 var skyboxVisible = false;
 var skyboxConfigurationsVisible = false;
 var fogConfigurationsVisible = false;

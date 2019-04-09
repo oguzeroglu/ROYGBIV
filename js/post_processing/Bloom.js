@@ -17,6 +17,21 @@ var Bloom = function(){
   this.setBlurStepCount(this.configurations.blurStepCount);
 }
 
+Bloom.prototype.setBlendWithSkyboxStatus = function(status){
+  if (status){
+    if (!this.skyboxMesh){
+      this.generateSkyboxPass();
+    }
+    this.injectMacro("BLEND_WITH_SKYBOX", this.combinerMaterial, false, true);
+    this.combinerMaterial.uniforms.skyboxColorTexture = new THREE.Uniform(this.skyboxTarget.texture);
+    this.blendWithSkybox = true;
+  }else{
+    this.removeMacro("BLEND_WITH_SKYBOX", this.combinerMaterial, false, true);
+    delete this.combinerMaterial.uniforms.skyboxColorTexture;
+    this.blendWithSkybox = false;
+  }
+}
+
 Bloom.prototype.showConfigurations = function(){
   guiHandler.show(guiHandler.guiTypes.BLOOM);
   guiHandler.bloomParameters["Active"] = renderer.bloomOn;
@@ -112,6 +127,12 @@ Bloom.prototype.setBlurDirection = function(isX){
   }
 }
 
+Bloom.prototype.skyboxPass = function(){
+  this.skyboxMesh.position.copy(skyboxMesh.position);
+  this.skyboxMesh.quaternion.copy(skyboxMesh.quaternion);
+  renderer.webglRenderer.render(this.skyboxPassScene, camera, this.skyboxTarget);
+}
+
 Bloom.prototype.combinerPass = function(){
   renderer.webglRenderer.render(this.combinerScene, orthographicCamera);
 }
@@ -140,6 +161,13 @@ Bloom.prototype.brightPass = function(){
 
 Bloom.prototype.directPass = function(){
   renderer.webglRenderer.render(scene, camera, this.sceneTarget);
+}
+
+Bloom.prototype.generateSkyboxPass = function(){
+  this.skyboxTarget = new THREE.WebGLRenderTarget(window.innerWidth, window.innerHeight, this.rtParameters);
+  this.skyboxPassScene = new THREE.Scene();
+  this.skyboxMesh = new THREE.Mesh(skyboxMesh.geometry, skyboxMesh.material);
+  this.skyboxPassScene.add(this.skyboxMesh);
 }
 
 Bloom.prototype.generateCombinerPass = function(){
@@ -255,6 +283,9 @@ Bloom.prototype.render = function(){
   this.directPass();
   this.brightPass();
   this.blurPass();
+  if (this.blendWithSkybox){
+    this.skyboxPass();
+  }
   this.combinerPass();
 }
 
