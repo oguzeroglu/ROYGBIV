@@ -2140,6 +2140,9 @@ function parse(input){
             skyboxVisible = true;
             terminal.printInfo(Text.SKYBOX_SHOWN);
           }
+          if (bloom){
+            bloom.onSkyboxVisibilityChange();
+          }
           return true;
         break;
         case 75: //scaleSkybox
