@@ -1120,182 +1120,70 @@ THREE.CannonDebugRenderer.prototype = {
 };
 
 var ShaderContent = function(){
-
-    this.particleVertexShader = 0;
-    this.particleFragmentShader = 0;
-    this.objectTrailVertexShader = 0;
-    this.objectTrailFragmentShader = 0;
-    this.crossHairVertexShader = 0;
-    this.crossHairFragmentShader = 0;
-    this.basicMaterialVertexShader = 0;
-    this.basicMaterialFragmentShader = 0;
-    this.mergedBasicMaterialVertexShader = 0;
-    this.mergedBasicMaterialFragmentShader = 0;
-    this.instancedBasicMaterialVertexShader = 0;
-    this.instancedBasicMaterialFragmentShader = 0;
-    this.skyboxVertexShader = 0;
-    this.skyboxFragmentShader = 0;
-    this.textVertexShader = 0;
-    this.textFragmentShader = 0;
-    this.rectangleVertexShader = 0;
-    this.rectangleFragmentShader = 0;
-
-    this.totalLoadCount = 18;
-    this.currentLoadCount = 0;
-
-    this.allShadersReadyCallback = function(){
-      if (!isDeployment){
-        canvas.style.visibility = "";
-        terminal.enable();
-        terminal.clear();
-        terminal.print("Type help for list of commands.");
-      }else{
-        appendtoDeploymentConsole("Shaders loaded.");
-        appendtoDeploymentConsole("");
-        startDeployment();
-      }
+  this.shaders = [
+    {name: "particleVertexShader", isVertexShader: true, dir: "particle"},
+    {name: "particleFragmentShader", isVertexShader: false, dir: "particle"},
+    {name: "objectTrailVertexShader", isVertexShader: true, dir: "object_trail"},
+    {name: "objectTrailFragmentShader", isVertexShader: false, dir: "object_trail"},
+    {name: "crossHairVertexShader", isVertexShader: true, dir: "crosshair"},
+    {name: "crossHairFragmentShader", isVertexShader: false, dir: "crosshair"},
+    {name: "basicMaterialVertexShader", isVertexShader: true, dir: "materials/basic_material"},
+    {name: "basicMaterialFragmentShader", isVertexShader: false, dir: "materials/basic_material"},
+    {name: "mergedBasicMaterialVertexShader", isVertexShader: true, dir: "materials/merged_basic_material"},
+    {name: "mergedBasicMaterialFragmentShader", isVertexShader: false, dir: "materials/merged_basic_material"},
+    {name: "instancedBasicMaterialVertexShader", isVertexShader: true, dir: "materials/instanced_basic_material"},
+    {name: "instancedBasicMaterialFragmentShader", isVertexShader: false, dir: "materials/instanced_basic_material"},
+    {name: "skyboxVertexShader", isVertexShader: true, dir: "skybox"},
+    {name: "skyboxFragmentShader", isVertexShader: false, dir: "skybox"},
+    {name: "textVertexShader", isVertexShader: true, dir: "text"},
+    {name: "textFragmentShader", isVertexShader: false, dir: "text"},
+    {name: "rectangleVertexShader", isVertexShader: true, dir: "rectangle"},
+    {name: "rectangleFragmentShader", isVertexShader: false, dir: "rectangle"},
+    {name: "bloomBrightPassVertexShader", isVertexShader: true, dir: "post_processing/bloom/bright_pass"},
+    {name: "bloomBrightPassFragmentShader", isVertexShader: false, dir: "post_processing/bloom/bright_pass"},
+    {name: "bloomBlurPassVertexShader", isVertexShader: true, dir: "post_processing/bloom/blur_pass"},
+    {name: "bloomBlurPassFragmentShader", isVertexShader: false, dir: "post_processing/bloom/blur_pass"},
+    {name: "bloomCombinerVertexShader", isVertexShader: true, dir: "post_processing/bloom/combiner"},
+    {name: "bloomCombinerFragmentShader", isVertexShader: false, dir: "post_processing/bloom/combiner"}
+  ];
+  this.currentLoadCount = 0;
+  this.allShadersReadyCallback = function(){
+    renderer.initEffects();
+    if (!isDeployment){
+      canvas.style.visibility = "";
+      terminal.enable();
+      terminal.clear();
+      terminal.print("Type help for list of commands.");
+    }else{
+      appendtoDeploymentConsole("Shaders loaded.");
+      appendtoDeploymentConsole("");
+      startDeployment();
     }
-    this.aShaderLoadedCallback = function(){
-      this.currentLoadCount ++;
-      if (this.currentLoadCount == this.totalLoadCount){
-        this.allShadersReadyCallback();
-      }
+  }
+  this.aShaderLoadedCallback = function(){
+    this.currentLoadCount ++;
+    if (this.currentLoadCount == this.shaders.length){
+      this.allShadersReadyCallback();
     }
-    this.load();
+  }
+  this.load();
 }
 
 ShaderContent.prototype.load = function(){
-  var particleVertexShaderRequest = new XMLHttpRequest();
-  var particleFragmentShaderRequest = new XMLHttpRequest();
-  var objectTrailVertexShaderRequest = new XMLHttpRequest();
-  var objectTrailFragmentShaderRequest = new XMLHttpRequest();
-  var crossHairVertexShaderRequest = new XMLHttpRequest();
-  var crossHairFragmentShaderRequest = new XMLHttpRequest();
-  var basicMaterialVertexShaderRequest = new XMLHttpRequest();
-  var basicMaterialFragmentShaderRequest = new XMLHttpRequest();
-  var mergedBasicMaterialVertexShaderRequest = new XMLHttpRequest();
-  var mergedBasicMaterialFragmentShaderRequest = new XMLHttpRequest();
-  var instancedBasicMaterialVertexShaderRequest = new XMLHttpRequest();
-  var instancedBasicMaterialFragmentShaderRequest = new XMLHttpRequest();
-  var skyboxVertexShaderRequest = new XMLHttpRequest();
-  var skyboxFragmentShaderRequest = new XMLHttpRequest();
-  var textVertexShaderRequest = new XMLHttpRequest();
-  var textFragmentShaderRequest = new XMLHttpRequest();
-  var rectangleVertexShaderRequest = new XMLHttpRequest();
-  var rectangleFragmentShaderRequest = new XMLHttpRequest();
-
-  particleVertexShaderRequest.open('GET', "./shader/particle/vertexShader.shader");
-  particleFragmentShaderRequest.open('GET', "./shader/particle/fragmentShader.shader");
-  objectTrailVertexShaderRequest.open('GET', "./shader/object_trail/vertexShader.shader");
-  objectTrailFragmentShaderRequest.open('GET', "./shader/object_trail/fragmentShader.shader");
-  crossHairVertexShaderRequest.open('GET', "./shader/crosshair/vertexShader.shader");
-  crossHairFragmentShaderRequest.open('GET', "./shader/crosshair/fragmentShader.shader");
-  basicMaterialVertexShaderRequest.open('GET', "./shader/materials/basic_material/vertexShader.shader");
-  basicMaterialFragmentShaderRequest.open('GET', "./shader/materials/basic_material/fragmentShader.shader");
-  mergedBasicMaterialVertexShaderRequest.open('GET', "./shader/materials/merged_basic_material/vertexShader.shader");
-  mergedBasicMaterialFragmentShaderRequest.open('GET', "./shader/materials/merged_basic_material/fragmentShader.shader");
-  instancedBasicMaterialVertexShaderRequest.open('GET', "./shader/materials/instanced_basic_material/vertexShader.shader");
-  instancedBasicMaterialFragmentShaderRequest.open('GET', "./shader/materials/instanced_basic_material/fragmentShader.shader");
-  skyboxVertexShaderRequest.open('GET', "./shader/skybox/vertexShader.shader");
-  skyboxFragmentShaderRequest.open('GET', "./shader/skybox/fragmentShader.shader");
-  textVertexShaderRequest.open('GET', "./shader/text/vertexShader.shader");
-  textFragmentShaderRequest.open('GET', "./shader/text/fragmentShader.shader");
-  rectangleVertexShaderRequest.open('GET', "./shader/rectangle/vertexShader.shader");
-  rectangleFragmentShaderRequest.open('GET', "./shader/rectangle/fragmentShader.shader");
-
-  var that = this;
-  particleVertexShaderRequest.addEventListener("load", function(){
-    that.particleVertexShader = particleVertexShaderRequest.responseText;
-    that.aShaderLoadedCallback();
-  });
-  particleFragmentShaderRequest.addEventListener("load", function(){
-    that.particleFragmentShader = particleFragmentShaderRequest.responseText;
-    that.aShaderLoadedCallback();
-  });
-  objectTrailVertexShaderRequest.addEventListener("load", function(){
-    that.objectTrailVertexShader= objectTrailVertexShaderRequest.responseText;
-    that.aShaderLoadedCallback();
-  });
-  objectTrailFragmentShaderRequest.addEventListener("load", function(){
-    that.objectTrailFragmentShader = objectTrailFragmentShaderRequest.responseText;
-    that.aShaderLoadedCallback();
-  });
-  crossHairVertexShaderRequest.addEventListener("load", function(){
-    that.crossHairVertexShader = crossHairVertexShaderRequest.responseText;
-    that.aShaderLoadedCallback();
-  });
-  crossHairFragmentShaderRequest.addEventListener("load", function(){
-    that.crossHairFragmentShader = crossHairFragmentShaderRequest.responseText;
-    that.aShaderLoadedCallback();
-  });
-  basicMaterialVertexShaderRequest.addEventListener("load", function(){
-    that.basicMaterialVertexShader = basicMaterialVertexShaderRequest.responseText;
-    that.aShaderLoadedCallback();
-  });
-  basicMaterialFragmentShaderRequest.addEventListener("load", function(){
-    that.basicMaterialFragmentShader = basicMaterialFragmentShaderRequest.responseText;
-    that.aShaderLoadedCallback();
-  });
-  mergedBasicMaterialVertexShaderRequest.addEventListener("load", function(){
-    that.mergedBasicMaterialVertexShader = mergedBasicMaterialVertexShaderRequest.responseText;
-    that.aShaderLoadedCallback();
-  });
-  mergedBasicMaterialFragmentShaderRequest.addEventListener("load", function(){
-    that.mergedBasicMaterialFragmentShader = mergedBasicMaterialFragmentShaderRequest.responseText;
-    that.aShaderLoadedCallback();
-  });
-  instancedBasicMaterialVertexShaderRequest.addEventListener("load", function(){
-    that.instancedBasicMaterialVertexShader = instancedBasicMaterialVertexShaderRequest.responseText;
-    that.aShaderLoadedCallback();
-  });
-  instancedBasicMaterialFragmentShaderRequest.addEventListener("load", function(){
-    that.instancedBasicMaterialFragmentShader = instancedBasicMaterialFragmentShaderRequest.responseText;
-    that.aShaderLoadedCallback();
-  });
-  skyboxVertexShaderRequest.addEventListener("load", function(){
-    that.skyboxVertexShader = skyboxVertexShaderRequest.responseText;
-    that.aShaderLoadedCallback();
-  });
-  skyboxFragmentShaderRequest.addEventListener("load", function(){
-    that.skyboxFragmentShader = skyboxFragmentShaderRequest.responseText;
-    that.aShaderLoadedCallback();
-  });
-  textVertexShaderRequest.addEventListener("load", function(){
-    that.textVertexShader = textVertexShaderRequest.responseText;
-    that.aShaderLoadedCallback();
-  });
-  textFragmentShaderRequest.addEventListener("load", function(){
-    that.textFragmentShader = textFragmentShaderRequest.responseText;
-    that.aShaderLoadedCallback();
-  });
-  rectangleVertexShaderRequest.addEventListener("load", function(){
-    that.rectangleVertexShader = rectangleVertexShaderRequest.responseText;
-    that.aShaderLoadedCallback();
-  });
-  rectangleFragmentShaderRequest.addEventListener("load", function(){
-    that.rectangleFragmentShader = rectangleFragmentShaderRequest.responseText;
-    that.aShaderLoadedCallback();
-  });
-
-  particleVertexShaderRequest.send();
-  particleFragmentShaderRequest.send();
-  objectTrailVertexShaderRequest.send();
-  objectTrailFragmentShaderRequest.send();
-  crossHairVertexShaderRequest.send();
-  crossHairFragmentShaderRequest.send();
-  basicMaterialVertexShaderRequest.send();
-  basicMaterialFragmentShaderRequest.send();
-  mergedBasicMaterialVertexShaderRequest.send();
-  mergedBasicMaterialFragmentShaderRequest.send();
-  instancedBasicMaterialVertexShaderRequest.send();
-  instancedBasicMaterialFragmentShaderRequest.send();
-  skyboxVertexShaderRequest.send();
-  skyboxFragmentShaderRequest.send();
-  textVertexShaderRequest.send();
-  textFragmentShaderRequest.send();
-  rectangleVertexShaderRequest.send();
-  rectangleFragmentShaderRequest.send();
-
+  for (var i = 0; i<this.shaders.length; i++){
+    var req = new XMLHttpRequest();
+    var postfix = "vertexShader.shader";
+    if (!this.shaders[i].isVertexShader){
+      postfix = "fragmentShader.shader";
+    }
+    req.open("GET", "./shader/"+this.shaders[i].dir+"/"+postfix);
+    req.addEventListener("load", function(){
+      var shader = ShaderContent.shaders[this.index];
+      ShaderContent[shader.name] = this.request.responseText;
+      ShaderContent.aShaderLoadedCallback();
+    }.bind({index: i, request: req}));
+    req.send();
+  }
 }
 
 var CollisionInfo = function(targetObjectName, x, y, z, collisionImpact, quaternionX, quaternionY, quaternionZ, quaternionW, faceNormal, time){
@@ -1383,9 +1271,9 @@ var orientationChangeEventHandler;
 var keyboardEventHandler;
 
 // THREE.JS VARIABLES
-var renderer;
 var scene;
 var camera;
+var orthographicCamera;
 var canvas;
 var sceneBackgroundColor = 0x000000 ;
 var textureLoader = new THREE.TextureLoader();
@@ -1413,18 +1301,6 @@ var gravityY = -900;
 var physicsStepAmount = 1/60;
 var friction = 1;
 var surfacePhysicalThickness = 1;
-
-// POST PROCESSING
-var renderPass;
-var copyPass;
-var composer;
-var bloomPass;
-var bloomStrength = 0.4; // 0 - 3
-var bloomRadius = 0; // 0 - 1
-var bloomThreshold = 1; // 0 - 1
-var bloomResolutionScale = 1; // 0.1 - 1
-var bloomOn = false;
-var originalBloomConfigurations = new Object();
 
 // CAMERA CONFIGURATIONS
 var initialCameraX = 0;
@@ -1518,10 +1394,10 @@ var skyBoxRootDirectory = "skybox/";
 var dataPrefix = "text/json;charset=utf-8,";
 var skyboxDistance = 4000;
 var skyboxMesh;
-var skyboxPreviewMesh;
 var skyboxVisible = false;
 var skyboxConfigurationsVisible = false;
 var fogConfigurationsVisible = false;
+var postProcessiongConfigurationsVisibility = new Object();
 var mappedSkyboxName = 0;
 var gridCounter = 0;
 var MAX_GRIDS_ALLOWED = 1000000;
@@ -1541,6 +1417,7 @@ var CANNON_AXIS_VECTOR_Z = new CANNON.Vec3(0, 0, 1);
 var CANNON_ZERO_VECTOR = new CANNON.Vec3(0, 0, 0);
 var REUSABLE_CANNON_QUATERNION = new CANNON.Quaternion();
 var REUSABLE_CANNON_QUATERNION_2 = new CANNON.Quaternion();
+var REUSABLE_QUAD_GEOMETRY = new THREE.PlaneBufferGeometry(2, 2);
 var scriptEditorShowing = false;
 var NO_BLENDING = THREE.NoBlending;
 var NORMAL_BLENDING = THREE.NormalBlending;
@@ -1693,24 +1570,21 @@ var alterThreeJSRenderFunction = true;
 var autoInstancingHandler;
 var autoInstancedObjects = new Object();
 var fpsHandler;
+var objectsWithOnClickListeners = new Map();
+var objectsWithMouseOverListeners = new Map();
+var objectsWithMouseOutListeners = new Map();
+var currentMouseOverObjectName;
+var renderer;
+var bloom;
 
 // WORKER VARIABLES
-var WORKERS_SUPPORTED = (typeof(Worker) !== "undefined") && (typeof(MessageChannel) !== "undefined");
+var WORKERS_SUPPORTED = (typeof(Worker) !== UNDEFINED) && (typeof(MessageChannel) !== UNDEFINED);
 
 // TEXT POOL
 var Text = (!isDeployment)? new Text(): 0;
 
 // SCRIPTING UTILITY FUNCTIONS
 var ROYGBIV;
-
-var fogDensityController;
-var fogColorController;
-var fogBlendWithSkyboxController;
-var fogParameters = {
-  "Density": 0.0,
-  "Color": "#ffffff",
-  "Blend skybox": false
-};
 
 // KEYCODE TO STRING MAP
 keyCodeToChar = {
@@ -6338,6 +6212,7 @@ function render(){
     cpuOperationsHandler.updateParticleSystems();
     cpuOperationsHandler.updateObjectTrails();
     cpuOperationsHandler.updateCrosshair();
+    cpuOperationsHandler.handleObjectMouseEvents();
   }else{
     cameraOperationsDone = false;
   }
@@ -6354,7 +6229,7 @@ function render(){
 
 function renderScene(){
   threejsRenderMonitoringHandler.currentRenderCallCountPerFrame = 0;
-  composer.render(0.1);
+  renderer.render(scene, camera);
   if (threejsRenderMonitoringHandler.currentRenderCallCountPerFrame > threejsRenderMonitoringHandler.maxRenderCallCountPerFrame){
     threejsRenderMonitoringHandler.maxRenderCallCountPerFrame = threejsRenderMonitoringHandler.currentRenderCallCountPerFrame;
   }
@@ -6364,9 +6239,6 @@ function updateRaycaster(){
   if (!rayCaster.ready){
     return;
   }
-  rayCaster.onBeforeUpdate();
-  rayCaster.updateBuffer.forEach(rayCaster.issueUpdate);
-  rayCaster.updateBuffer.clear();
   rayCaster.flush();
 }
 
@@ -6650,14 +6522,6 @@ ROYGBIV.onTextClick(ROYGBIV.globals.gitButton, function(){
   var redirectWindow = window.open('https://github.com/oguzeroglu/ROYGBIV', '_blank');
   redirectWindow.location;
 })
-
-ROYGBIV.setPerformanceDropCallbackFunction(58, 5, function(){
-  ROYGBIV.unsetBloom();
-  ROYGBIV.setTextAlpha(ROYGBIV.globals.psNameText, 1);
-  ROYGBIV.setTextAlpha(ROYGBIV.globals.nextButton, 1);
-  ROYGBIV.setTextAlpha(ROYGBIV.globals.previousButton, 1);
-  ROYGBIV.setTextAlpha(ROYGBIV.globals.gitButton, 1);
-});
 
 ROYGBIV.disableDefaultControls(true);
 deploymentScriptsStatus.SCRIPT_EXECUTION_STATUS_init = false;
@@ -7360,899 +7224,6 @@ SkyBox.prototype.printInfo = function(){
   ), false);
 }
 
-/**
- * @author alteredq / http://alteredqualia.com/
- */
-
-THREE.EffectComposer = function ( renderer, renderTarget ) {
-
-	this.renderer = renderer;
-
-	if ( renderTarget === undefined ) {
-
-		var parameters = {
-			minFilter: THREE.LinearFilter,
-			magFilter: THREE.LinearFilter,
-			format: THREE.RGBAFormat,
-			stencilBuffer: false
-		};
-		var size = renderer.getSize();
-		renderTarget = new THREE.WebGLRenderTarget( size.width, size.height, parameters );
-
-	}
-
-	this.renderTarget1 = renderTarget;
-	this.renderTarget2 = renderTarget.clone();
-
-	this.writeBuffer = this.renderTarget1;
-	this.readBuffer = this.renderTarget2;
-
-	this.passes = [];
-
-	if ( THREE.CopyShader === undefined )
-		console.error( "THREE.EffectComposer relies on THREE.CopyShader" );
-
-	this.copyPass = new THREE.ShaderPass( THREE.CopyShader );
-
-};
-
-THREE.EffectComposer.prototype = {
-
-	swapBuffers: function() {
-
-		var tmp = this.readBuffer;
-		this.readBuffer = this.writeBuffer;
-		this.writeBuffer = tmp;
-
-	},
-
-	addPass: function ( pass ) {
-
-		this.passes.push( pass );
-
-	},
-
-	insertPass: function ( pass, index ) {
-
-		this.passes.splice( index, 0, pass );
-
-	},
-
-	render: function ( delta ) {
-
-		this.writeBuffer = this.renderTarget1;
-		this.readBuffer = this.renderTarget2;
-
-		var maskActive = false;
-
-		var pass, i, il = this.passes.length;
-
-		for ( i = 0; i < il; i ++ ) {
-
-			pass = this.passes[ i ];
-
-			if ( ! pass.enabled ) continue;
-
-			threejsRenderMonitoringHandler.currentPassName = pass.passName;
-			pass.render( this.renderer, this.writeBuffer, this.readBuffer, delta, maskActive );
-
-			if ( pass.needsSwap ) {
-
-				if ( maskActive ) {
-
-					var context = this.renderer.context;
-
-					context.stencilFunc( context.NOTEQUAL, 1, 0xffffffff );
-
-					this.copyPass.render( this.renderer, this.writeBuffer, this.readBuffer, delta );
-
-					context.stencilFunc( context.EQUAL, 1, 0xffffffff );
-
-				}
-
-				this.swapBuffers();
-
-			}
-
-			if ( pass.isMaskPass ) {
-
-				maskActive = true;
-
-			}
-
-		}
-
-	},
-
-	reset: function ( renderTarget ) {
-
-		if ( renderTarget === undefined ) {
-
-			var size = this.renderer.getSize();
-
-			renderTarget = this.renderTarget1.clone();
-			renderTarget.setSize( size.width, size.height );
-
-		}
-
-		this.renderTarget1.dispose();
-		this.renderTarget2.dispose();
-		this.renderTarget1 = renderTarget;
-		this.renderTarget2 = renderTarget.clone();
-
-		this.writeBuffer = this.renderTarget1;
-		this.readBuffer = this.renderTarget2;
-
-	},
-
-	setSize: function ( width, height ) {
-
-		this.renderTarget1.setSize( width, height );
-		this.renderTarget2.setSize( width, height );
-
-	}
-
-};
-
-THREE.Pass = function () {
-
-	// if set to true, the pass is processed by the composer
-	this.enabled = true;
-
-	// if set to true, the pass indicates to swap read and write buffer after rendering
-	this.needsSwap = true;
-
-	// if set to true, the pass clears its buffer before rendering
-	this.clear = false;
-
-	// if set to true, the result of the pass is rendered to screen
-	this.renderToScreen = false;
-
-};
-
-Object.assign( THREE.Pass.prototype, {
-
-	setSize: function( width, height ) {},
-
-	render: function ( renderer, writeBuffer, readBuffer, delta, maskActive ) {
-
-		console.error( 'THREE.Pass: .render() must be implemented in derived pass.' );
-
-	}
-
-} );
-
-/**
- * @author alteredq / http://alteredqualia.com/
- */
-
-THREE.RenderPass = function ( scene, camera, overrideMaterial, clearColor, clearAlpha ) {
-
-	this.passName = "renderPass";
-	this.isRenderPass = true;
-
-	this.scene = scene;
-	this.camera = camera;
-
-	this.overrideMaterial = overrideMaterial;
-
-	this.clearColor = clearColor;
-	this.clearAlpha = ( clearAlpha !== undefined ) ? clearAlpha : 1;
-
-	this.oldClearColor = new THREE.Color();
-	this.oldClearAlpha = 1;
-
-	this.enabled = true;
-	this.clear = true;
-	this.needsSwap = false;
-
-};
-
-THREE.RenderPass.prototype = {
-
-	render: function ( renderer, writeBuffer, readBuffer, delta ) {
-
-		this.scene.overrideMaterial = this.overrideMaterial;
-
-		if ( this.clearColor ) {
-
-			this.oldClearColor.copy( renderer.getClearColor() );
-			this.oldClearAlpha = renderer.getClearAlpha();
-
-			renderer.setClearColor( this.clearColor, this.clearAlpha );
-
-		}
-
-		renderer.render( this.scene, this.camera, readBuffer, this.clear );
-
-		if ( this.clearColor ) {
-
-			renderer.setClearColor( this.oldClearColor, this.oldClearAlpha );
-
-		}
-
-		this.scene.overrideMaterial = null;
-
-	}
-
-};
-
-/**
- * @author alteredq / http://alteredqualia.com/
- */
-
-THREE.ShaderPass = function( shader, textureID ) {
-
-	this.passName = "shaderPass";
-	this.isShaderPass = true;
-
-	this.textureID = ( textureID !== undefined ) ? textureID : "tDiffuse";
-
-	if ( shader instanceof THREE.ShaderMaterial ) {
-
-		this.uniforms = shader.uniforms;
-
-		this.material = shader;
-
-	}
-	else if ( shader ) {
-
-		this.uniforms = THREE.UniformsUtils.clone( shader.uniforms );
-
-		this.material = new THREE.ShaderMaterial( {
-
-			defines: shader.defines || {},
-			uniforms: this.uniforms,
-			vertexShader: shader.vertexShader,
-			fragmentShader: shader.fragmentShader
-
-		} );
-
-	}
-
-	this.renderToScreen = false;
-
-	this.enabled = true;
-	this.needsSwap = true;
-	this.clear = false;
-
-
-	this.camera = new THREE.OrthographicCamera( - 1, 1, 1, - 1, 0, 1 );
-	this.scene = new THREE.Scene();
-
-	this.quad = new THREE.Mesh( new THREE.PlaneBufferGeometry( 2, 2 ), null );
-	this.scene.add( this.quad );
-
-};
-
-THREE.ShaderPass.prototype = {
-
-	render: function( renderer, writeBuffer, readBuffer, delta ) {
-
-		if ( this.uniforms[ this.textureID ] ) {
-
-			this.uniforms[ this.textureID ].value = readBuffer.texture;
-
-		}
-
-		this.quad.material = this.material;
-
-		if ( this.renderToScreen ) {
-
-			renderer.render( this.scene, this.camera );
-
-		} else {
-
-			renderer.render( this.scene, this.camera, writeBuffer, this.clear );
-
-		}
-
-	}
-
-};
-
-/**
- * @author alteredq / http://alteredqualia.com/
- */
-
-THREE.MaskPass = function ( scene, camera ) {
-
-	this.passName = "maskPass";
-	this.isMaskPass = true;
-
-	this.scene = scene;
-	this.camera = camera;
-
-	this.enabled = true;
-	this.clear = true;
-	this.needsSwap = false;
-
-	this.inverse = false;
-
-};
-
-THREE.MaskPass.prototype = {
-
-	render: function ( renderer, writeBuffer, readBuffer, delta ) {
-
-		var context = renderer.context;
-
-		// don't update color or depth
-
-		context.colorMask( false, false, false, false );
-		context.depthMask( false );
-
-		// set up stencil
-
-		var writeValue, clearValue;
-
-		if ( this.inverse ) {
-
-			writeValue = 0;
-			clearValue = 1;
-
-		} else {
-
-			writeValue = 1;
-			clearValue = 0;
-
-		}
-
-		context.enable( context.STENCIL_TEST );
-		context.stencilOp( context.REPLACE, context.REPLACE, context.REPLACE );
-		context.stencilFunc( context.ALWAYS, writeValue, 0xffffffff );
-		context.clearStencil( clearValue );
-
-		// draw into the stencil buffer
-
-		renderer.render( this.scene, this.camera, readBuffer, this.clear );
-		renderer.render( this.scene, this.camera, writeBuffer, this.clear );
-
-		// re-enable update of color and depth
-
-		context.colorMask( true, true, true, true );
-		context.depthMask( true );
-
-		// only render where stencil is set to 1
-
-		context.stencilFunc( context.EQUAL, 1, 0xffffffff );  // draw if == 1
-		context.stencilOp( context.KEEP, context.KEEP, context.KEEP );
-
-	}
-
-};
-
-
-THREE.ClearMaskPass = function () {
-
-	this.enabled = true;
-
-};
-
-THREE.ClearMaskPass.prototype = {
-
-	render: function ( renderer, writeBuffer, readBuffer, delta ) {
-
-		var context = renderer.context;
-
-		context.disable( context.STENCIL_TEST );
-
-	}
-
-};
-
-(function(root, factory) {
-    if (typeof define === 'function' && define.amd) {
-        define('three.UnrealBloomPass', ['three'], factory);
-    }
-    else if ('undefined' !== typeof exports && 'undefined' !== typeof module) {
-        module.exports = factory(require('three'));
-    }
-    else {
-        factory(root.THREE);
-    }
-}(this, function(THREE) {
-
-/**
- * @author spidersharma / http://eduperiment.com/
- *
- * Inspired from Unreal Engine
- * https://docs.unrealengine.com/latest/INT/Engine/Rendering/PostProcessEffects/Bloom/
- */
-THREE.UnrealBloomPass = function ( resolution, strength, radius, threshold ) {
-
-  this.passName = "unrealBloomPass";
-  this.isUnrealBloomPass = true;
-
-	THREE.Pass.call( this );
-
-	this.strength = ( strength !== undefined ) ? strength : 1;
-	this.radius = radius;
-	this.threshold = threshold;
-	this.resolution = ( resolution !== undefined ) ? new THREE.Vector2( resolution.x, resolution.y ) : new THREE.Vector2( 256, 256 );
-
-  this.reusableColor = new THREE.Color( 0, 0, 0 );
-
-	// render targets
-	var pars = { minFilter: THREE.LinearFilter, magFilter: THREE.LinearFilter, format: THREE.RGBAFormat };
-	this.renderTargetsHorizontal = [];
-	this.renderTargetsVertical = [];
-	this.nMips = 5;
-	var resx = Math.round( this.resolution.x / 2 );
-	var resy = Math.round( this.resolution.y / 2 );
-
-	this.renderTargetBright = new THREE.WebGLRenderTarget( resx, resy, pars );
-	this.renderTargetBright.texture.name = "UnrealBloomPass.bright";
-	this.renderTargetBright.texture.generateMipmaps = false;
-
-	for ( var i = 0; i < this.nMips; i ++ ) {
-
-		var renderTarget = new THREE.WebGLRenderTarget( resx, resy, pars );
-
-		renderTarget.texture.name = "UnrealBloomPass.h" + i;
-		renderTarget.texture.generateMipmaps = false;
-
-		this.renderTargetsHorizontal.push( renderTarget );
-
-		var renderTarget = new THREE.WebGLRenderTarget( resx, resy, pars );
-
-		renderTarget.texture.name = "UnrealBloomPass.v" + i;
-		renderTarget.texture.generateMipmaps = false;
-
-		this.renderTargetsVertical.push( renderTarget );
-
-		resx = Math.round( resx / 2 );
-
-		resy = Math.round( resy / 2 );
-
-	}
-
-	// luminosity high pass material
-
-	if ( THREE.LuminosityHighPassShader === undefined )
-		console.error( "THREE.UnrealBloomPass relies on THREE.LuminosityHighPassShader" );
-
-	var highPassShader = THREE.LuminosityHighPassShader;
-	this.highPassUniforms = THREE.UniformsUtils.clone( highPassShader.uniforms );
-
-	this.highPassUniforms[ "luminosityThreshold" ].value = threshold;
-	this.highPassUniforms[ "smoothWidth" ].value = 0.01;
-
-	this.materialHighPassFilter = new THREE.ShaderMaterial( {
-		uniforms: this.highPassUniforms,
-		vertexShader: highPassShader.vertexShader,
-		fragmentShader: highPassShader.fragmentShader,
-		defines: {}
-	} );
-
-	// Gaussian Blur Materials
-	this.separableBlurMaterials = [];
-	var kernelSizeArray = [ 3, 5, 7, 9, 11 ];
-	var resx = Math.round( this.resolution.x / 2 );
-	var resy = Math.round( this.resolution.y / 2 );
-
-	for ( var i = 0; i < this.nMips; i ++ ) {
-
-		this.separableBlurMaterials.push( this.getSeperableBlurMaterial( kernelSizeArray[ i ] ) );
-
-		this.separableBlurMaterials[ i ].uniforms[ "texSize" ].value = new THREE.Vector2( resx, resy );
-
-		resx = Math.round( resx / 2 );
-
-		resy = Math.round( resy / 2 );
-
-	}
-
-	// Composite material
-	this.compositeMaterial = this.getCompositeMaterial( this.nMips );
-	this.compositeMaterial.uniforms[ "blurTexture1" ].value = this.renderTargetsVertical[ 0 ].texture;
-	this.compositeMaterial.uniforms[ "blurTexture2" ].value = this.renderTargetsVertical[ 1 ].texture;
-	this.compositeMaterial.uniforms[ "blurTexture3" ].value = this.renderTargetsVertical[ 2 ].texture;
-	this.compositeMaterial.uniforms[ "blurTexture4" ].value = this.renderTargetsVertical[ 3 ].texture;
-	this.compositeMaterial.uniforms[ "blurTexture5" ].value = this.renderTargetsVertical[ 4 ].texture;
-	this.compositeMaterial.uniforms[ "bloomStrength" ].value = strength;
-	this.compositeMaterial.uniforms[ "bloomRadius" ].value = 0.1;
-	this.compositeMaterial.needsUpdate = true;
-
-	var bloomFactors = [ 1.0, 0.8, 0.6, 0.4, 0.2 ];
-	this.compositeMaterial.uniforms[ "bloomFactors" ].value = bloomFactors;
-	this.bloomTintColors = [ new THREE.Vector3( 1, 1, 1 ), new THREE.Vector3( 1, 1, 1 ), new THREE.Vector3( 1, 1, 1 ),
-							 new THREE.Vector3( 1, 1, 1 ), new THREE.Vector3( 1, 1, 1 ) ];
-	this.compositeMaterial.uniforms[ "bloomTintColors" ].value = this.bloomTintColors;
-
-	// copy material
-	if ( THREE.CopyShader === undefined ) {
-
-		console.error( "THREE.BloomPass relies on THREE.CopyShader" );
-
-	}
-
-	var copyShader = THREE.CopyShader;
-
-	this.copyUniforms = THREE.UniformsUtils.clone( copyShader.uniforms );
-	this.copyUniforms[ "opacity" ].value = 1.0;
-
-	this.materialCopy = new THREE.ShaderMaterial( {
-		uniforms: this.copyUniforms,
-		vertexShader: copyShader.vertexShader,
-		fragmentShader: copyShader.fragmentShader,
-		blending: THREE.AdditiveBlending,
-		depthTest: false,
-		depthWrite: false,
-		transparent: true
-	} );
-
-	this.enabled = true;
-	this.needsSwap = false;
-
-	this.oldClearColor = new THREE.Color();
-	this.oldClearAlpha = 1;
-
-	this.camera = new THREE.OrthographicCamera( - 1, 1, 1, - 1, 0, 1 );
-	this.scene = new THREE.Scene();
-
-	this.basic = new THREE.MeshBasicMaterial();
-
-	this.quad = new THREE.Mesh( new THREE.PlaneBufferGeometry( 2, 2 ), null );
-	this.quad.frustumCulled = false; // Avoid getting clipped
-	this.scene.add( this.quad );
-
-};
-
-THREE.UnrealBloomPass.prototype = Object.assign( Object.create( THREE.Pass.prototype ), {
-
-	constructor: THREE.UnrealBloomPass,
-
-	dispose: function () {
-
-		for ( var i = 0; i < this.renderTargetsHorizontal.length; i ++ ) {
-
-			this.renderTargetsHorizontal[ i ].dispose();
-
-		}
-
-		for ( var i = 0; i < this.renderTargetsVertical.length; i ++ ) {
-
-			this.renderTargetsVertical[ i ].dispose();
-
-		}
-
-		this.renderTargetBright.dispose();
-
-	},
-
-	setSize: function ( width, height ) {
-
-		var resx = Math.round( width / 2 );
-		var resy = Math.round( height / 2 );
-
-		this.renderTargetBright.setSize( resx, resy );
-
-		for ( var i = 0; i < this.nMips; i ++ ) {
-
-			this.renderTargetsHorizontal[ i ].setSize( resx, resy );
-			this.renderTargetsVertical[ i ].setSize( resx, resy );
-
-			this.separableBlurMaterials[ i ].uniforms[ "texSize" ].value = new THREE.Vector2( resx, resy );
-
-			resx = Math.round( resx / 2 );
-			resy = Math.round( resy / 2 );
-
-		}
-
-	},
-
-	render: function ( renderer, writeBuffer, readBuffer, delta, maskActive ) {
-
-		this.oldClearColor.copy( renderer.getClearColor() );
-		this.oldClearAlpha = renderer.getClearAlpha();
-		var oldAutoClear = renderer.autoClear;
-		renderer.autoClear = false;
-
-		renderer.setClearColor( this.reusableColor , 0 );
-
-		if ( maskActive ) renderer.context.disable( renderer.context.STENCIL_TEST );
-
-		// Render input to screen
-
-		if ( this.renderToScreen ) {
-
-			this.quad.material = this.basic;
-			this.basic.map = readBuffer.texture;
-
-			renderer.render( this.scene, this.camera, undefined, true );
-
-		}
-
-		// 1. Extract Bright Areas
-
-		this.highPassUniforms[ "tDiffuse" ].value = readBuffer.texture;
-		this.highPassUniforms[ "luminosityThreshold" ].value = this.threshold;
-		this.quad.material = this.materialHighPassFilter;
-
-		renderer.render( this.scene, this.camera, this.renderTargetBright, true );
-
-		// 2. Blur All the mips progressively
-
-		var inputRenderTarget = this.renderTargetBright;
-
-		for ( var i = 0; i < this.nMips; i ++ ) {
-
-			this.quad.material = this.separableBlurMaterials[ i ];
-
-			this.separableBlurMaterials[ i ].uniforms[ "colorTexture" ].value = inputRenderTarget.texture;
-			this.separableBlurMaterials[ i ].uniforms[ "direction" ].value = THREE.UnrealBloomPass.BlurDirectionX;
-			renderer.render( this.scene, this.camera, this.renderTargetsHorizontal[ i ], true );
-
-			this.separableBlurMaterials[ i ].uniforms[ "colorTexture" ].value = this.renderTargetsHorizontal[ i ].texture;
-			this.separableBlurMaterials[ i ].uniforms[ "direction" ].value = THREE.UnrealBloomPass.BlurDirectionY;
-			renderer.render( this.scene, this.camera, this.renderTargetsVertical[ i ], true );
-
-			inputRenderTarget = this.renderTargetsVertical[ i ];
-
-		}
-
-		// Composite All the mips
-
-		this.quad.material = this.compositeMaterial;
-		this.compositeMaterial.uniforms[ "bloomStrength" ].value = this.strength;
-		this.compositeMaterial.uniforms[ "bloomRadius" ].value = this.radius;
-		this.compositeMaterial.uniforms[ "bloomTintColors" ].value = this.bloomTintColors;
-
-		renderer.render( this.scene, this.camera, this.renderTargetsHorizontal[ 0 ], true );
-
-		// Blend it additively over the input texture
-
-		this.quad.material = this.materialCopy;
-		this.copyUniforms[ "tDiffuse" ].value = this.renderTargetsHorizontal[ 0 ].texture;
-
-		if ( maskActive ) renderer.context.enable( renderer.context.STENCIL_TEST );
-
-
-		if ( this.renderToScreen ) {
-
-			renderer.render( this.scene, this.camera, undefined, false );
-
-		} else {
-
-			renderer.render( this.scene, this.camera, readBuffer, false );
-
-		}
-
-		// Restore renderer settings
-
-		renderer.setClearColor( this.oldClearColor, this.oldClearAlpha );
-		renderer.autoClear = oldAutoClear;
-
-	},
-
-	getSeperableBlurMaterial: function ( kernelRadius ) {
-
-		return new THREE.ShaderMaterial( {
-
-			defines: {
-				"KERNEL_RADIUS": kernelRadius,
-				"SIGMA": kernelRadius
-			},
-
-			uniforms: {
-				"colorTexture": { value: null },
-				"texSize": { value: new THREE.Vector2( 0.5, 0.5 ) },
-				"direction": { value: new THREE.Vector2( 0.5, 0.5 ) }
-			},
-
-			vertexShader:
-				"varying vec2 vUv;\n\
-				void main() {\n\
-					vUv = uv;\n\
-					gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );\n\
-				}",
-
-			fragmentShader:
-				"#include <common>\
-				varying vec2 vUv;\n\
-				uniform sampler2D colorTexture;\n\
-				uniform vec2 texSize;\
-				uniform vec2 direction;\
-				\
-				float gaussianPdf(in float x, in float sigma) {\
-					return 0.39894 * exp( -0.5 * x * x/( sigma * sigma))/sigma;\
-				}\
-				void main() {\n\
-					vec2 invSize = 1.0 / texSize;\
-					float fSigma = float(SIGMA);\
-					float weightSum = gaussianPdf(0.0, fSigma);\
-					vec3 diffuseSum = texture2D( colorTexture, vUv).rgb * weightSum;\
-					for( int i = 1; i < KERNEL_RADIUS; i ++ ) {\
-						float x = float(i);\
-						float w = gaussianPdf(x, fSigma);\
-						vec2 uvOffset = direction * invSize * x;\
-						vec3 sample1 = texture2D( colorTexture, vUv + uvOffset).rgb;\
-						vec3 sample2 = texture2D( colorTexture, vUv - uvOffset).rgb;\
-						diffuseSum += (sample1 + sample2) * w;\
-						weightSum += 2.0 * w;\
-					}\
-					gl_FragColor = vec4(diffuseSum/weightSum, 1.0);\n\
-				}"
-		} );
-
-	},
-
-	getCompositeMaterial: function ( nMips ) {
-
-		return new THREE.ShaderMaterial( {
-
-			defines: {
-				"NUM_MIPS": nMips
-			},
-
-			uniforms: {
-				"blurTexture1": { value: null },
-				"blurTexture2": { value: null },
-				"blurTexture3": { value: null },
-				"blurTexture4": { value: null },
-				"blurTexture5": { value: null },
-				"dirtTexture": { value: null },
-				"bloomStrength": { value: 1.0 },
-				"bloomFactors": { value: null },
-				"bloomTintColors": { value: null },
-				"bloomRadius": { value: 0.0 }
-			},
-
-			vertexShader:
-				"varying vec2 vUv;\n\
-				void main() {\n\
-					vUv = uv;\n\
-					gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );\n\
-				}",
-
-			fragmentShader:
-				"varying vec2 vUv;\
-				uniform sampler2D blurTexture1;\
-				uniform sampler2D blurTexture2;\
-				uniform sampler2D blurTexture3;\
-				uniform sampler2D blurTexture4;\
-				uniform sampler2D blurTexture5;\
-				uniform sampler2D dirtTexture;\
-				uniform float bloomStrength;\
-				uniform float bloomRadius;\
-				uniform float bloomFactors[NUM_MIPS];\
-				uniform vec3 bloomTintColors[NUM_MIPS];\
-				\
-				float lerpBloomFactor(const in float factor) { \
-					float mirrorFactor = 1.2 - factor;\
-					return mix(factor, mirrorFactor, bloomRadius);\
-				}\
-				\
-				void main() {\
-					gl_FragColor = bloomStrength * ( lerpBloomFactor(bloomFactors[0]) * vec4(bloomTintColors[0], 1.0) * texture2D(blurTexture1, vUv) + \
-													 lerpBloomFactor(bloomFactors[1]) * vec4(bloomTintColors[1], 1.0) * texture2D(blurTexture2, vUv) + \
-													 lerpBloomFactor(bloomFactors[2]) * vec4(bloomTintColors[2], 1.0) * texture2D(blurTexture3, vUv) + \
-													 lerpBloomFactor(bloomFactors[3]) * vec4(bloomTintColors[3], 1.0) * texture2D(blurTexture4, vUv) + \
-													 lerpBloomFactor(bloomFactors[4]) * vec4(bloomTintColors[4], 1.0) * texture2D(blurTexture5, vUv) );\
-				}"
-		} );
-
-	}
-
-} );
-
-THREE.UnrealBloomPass.BlurDirectionX = new THREE.Vector2( 1.0, 0.0 );
-THREE.UnrealBloomPass.BlurDirectionY = new THREE.Vector2( 0.0, 1.0 );
-}));
-
-/**
- * @author alteredq / http://alteredqualia.com/
- *
- * Full-screen textured quad shader
- */
-
-THREE.CopyShader = {
-
-	uniforms: {
-
-		"tDiffuse": { type: "t", value: null },
-		"opacity":  { type: "f", value: 1.0 }
-
-	},
-
-	vertexShader: [
-
-		"varying vec2 vUv;",
-
-		"void main() {",
-
-			"vUv = uv;",
-			"gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );",
-
-		"}"
-
-	].join( "\n" ),
-
-	fragmentShader: [
-
-		"uniform float opacity;",
-
-		"uniform sampler2D tDiffuse;",
-
-		"varying vec2 vUv;",
-
-		"void main() {",
-
-			"vec4 texel = texture2D( tDiffuse, vUv );",
-			"gl_FragColor = opacity * texel;",
-
-		"}"
-
-	].join( "\n" )
-
-};
-
-/**
- * @author bhouston / http://clara.io/
- *
- * Luminosity
- * http://en.wikipedia.org/wiki/Luminosity
- */
-
-THREE.LuminosityHighPassShader = {
-
-  shaderID: "luminosityHighPass",
-
-	uniforms: {
-
-		"tDiffuse": { type: "t", value: null },
-		"luminosityThreshold": { type: "f", value: 1.0 },
-		"smoothWidth": { type: "f", value: 1.0 },
-		"defaultColor": { type: "c", value: new THREE.Color( 0x000000 ) },
-		"defaultOpacity":  { type: "f", value: 0.0 }
-
-	},
-
-	vertexShader: [
-
-		"varying vec2 vUv;",
-
-		"void main() {",
-
-			"vUv = uv;",
-
-			"gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );",
-
-		"}"
-
-	].join("\n"),
-
-	fragmentShader: [
-
-		"uniform sampler2D tDiffuse;",
-		"uniform vec3 defaultColor;",
-		"uniform float defaultOpacity;",
-		"uniform float luminosityThreshold;",
-		"uniform float smoothWidth;",
-
-		"varying vec2 vUv;",
-
-		"void main() {",
-
-			"vec4 texel = texture2D( tDiffuse, vUv );",
-
-			"vec3 luma = vec3( 0.299, 0.587, 0.114 );",
-
-			"float v = dot( texel.xyz, luma );",
-
-			"vec4 outputColor = vec4( defaultColor.rgb, defaultOpacity );",
-
-			"float alpha = smoothstep( luminosityThreshold, luminosityThreshold + smoothWidth, v );",
-
-			"gl_FragColor = mix( outputColor, texel, alpha );",
-
-		"}"
-
-	].join("\n")
-
-};
-
 window.onload = function() {
   fpsHandler = new FPSHandler();
   // DRAGABLE CLI
@@ -8370,7 +7341,6 @@ window.onload = function() {
   if (!isDeployment){
     // GUI HANDLER
     guiHandler = new GUIHandler();
-    guiHandler.init();
   }
 
   // IMAGE UPLOADER
@@ -8385,13 +7355,14 @@ window.onload = function() {
   scene = new THREE.Scene();
   debugRenderer = new THREE.CannonDebugRenderer(scene, physicsWorld);
   scene.background = new THREE.Color(sceneBackgroundColor);
-  camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 10000 );
+  camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 1, 10000);
+  orthographicCamera = new THREE.OrthographicCamera(-1, 1, 1, -1, 0, 1);
   camera.position.set(initialCameraX, initialCameraY, initialCameraZ);
   camera.rotation.order = 'YXZ';
   camera.aspect = (window.innerWidth / window.innerHeight);
   GLOBAL_PROJECTION_UNIFORM.value = camera.projectionMatrix;
   GLOBAL_VIEW_UNIFORM.value = camera.matrixWorldInverse;
-  renderer = new THREE.WebGLRenderer({canvas: canvas});
+  renderer = new Renderer();
   webglCallbackHandler = new WebGLCallbackHandler();
   if (window.devicePixelRatio > 1){
     screenResolution = 1;
@@ -8401,19 +7372,15 @@ window.onload = function() {
     screenResolution = window.devicePixelRatio;
   }
   renderer.setSize(window.innerWidth, window.innerHeight);
-  boundingClientRect = renderer.domElement.getBoundingClientRect();
+  boundingClientRect = renderer.getBoundingClientRect();
   initPhysics();
-  initPostProcessing();
   render();
   windowLoaded = true;
-  MAX_VERTEX_UNIFORM_VECTORS = renderer.context.getParameter(renderer.context.MAX_VERTEX_UNIFORM_VECTORS);
-  VERTEX_SHADER_TEXTURE_FETCH_SUPPORTED = (renderer.context.getParameter(renderer.context.MAX_VERTEX_TEXTURE_IMAGE_UNITS) > 0);
-  DDS_SUPPORTED = (!(renderer.context.getExtension("WEBGL_compressed_texture_s3tc") == null));
-  INSTANCING_SUPPORTED = (!(renderer.context.getExtension("ANGLE_instanced_arrays") == null));
-  HIGH_PRECISION_SUPPORTED = !(
-    renderer.context.getShaderPrecisionFormat(renderer.context.VERTEX_SHADER, renderer.context.HIGH_FLOAT).precision <= 0 ||
-    renderer.context.getShaderPrecisionFormat(renderer.context.FRAGMENT_SHADER, renderer.context.HIGH_FLOAT).precision <= 0
-  );
+  MAX_VERTEX_UNIFORM_VECTORS = renderer.getMaxVertexUniformVectors();
+  VERTEX_SHADER_TEXTURE_FETCH_SUPPORTED = renderer.isVertexShaderTextureFetchSupported();
+  DDS_SUPPORTED = renderer.isDDSSupported();
+  INSTANCING_SUPPORTED = renderer.isInstancingSupported();
+  HIGH_PRECISION_SUPPORTED = renderer.isHighPrecisionSupported();
   if (!isDeployment){
     terminal.init();
   }
@@ -8431,52 +7398,6 @@ window.onload = function() {
   }
 };
 
-
-function initPostProcessing(){
- renderPass = new THREE.RenderPass(scene, camera);
- if (mode == 1){
-  bloomPass = new THREE.UnrealBloomPass(
-    new THREE.Vector2(
-      renderer.getCurrentViewport().z * bloomResolutionScale,
-      renderer.getCurrentViewport().w * bloomResolutionScale
-    ),
-    bloomStrength,
-    bloomRadius,
-    bloomThreshold
-  );
- }
- copyPass = new THREE.ShaderPass( THREE.CopyShader );
- setPostProcessingParams();
- composer = new THREE.EffectComposer(renderer);
- composer.setSize(renderer.getCurrentViewport().z / screenResolution, renderer.getCurrentViewport().w / screenResolution);
- composer.addPass( renderPass );
- if (mode == 1){
-  if (bloomOn){
-    composer.addPass( bloomPass );
-    bloomPass.renderToScreen = true;
-  }
- }
- if (!(mode == 1 && bloomOn)){
-    composer.addPass( copyPass );
-    copyPass.renderToScreen = true;
- }
- setPostProcessingParams();
-}
-
-function setPostProcessingParams(){
- if (mode == 1){
-  if (bloomOn){
-    bloomPass.strength = bloomStrength;
-    bloomPass.radius = bloomRadius;
-    bloomPass.threshold = bloomThreshold;
-    bloomPass.resolution = new THREE.Vector2(
-      window.innerWidth * bloomResolutionScale,
-      window.innerHeight * bloomResolutionScale
-    );
-  }
- }
-}
-
 function initPhysics(){
  if (physicsWorld.init){
    physicsWorld.init();
@@ -8492,56 +7413,6 @@ function initPhysics(){
  physicsWorld.solver = physicsSolver;
  physicsWorld.gravity.set(0, gravityY, 0);
  physicsWorld.broadphase = new CANNON.SAPBroadphase(physicsWorld);
-}
-
-function adjustPostProcessing(variableIndex, val){
- switch(variableIndex){
-   case 1: //bloomStrength
-    bloomStrength = val;
-   break;
-   case 2: //Bloom_radius
-    bloomRadius = val;
-   break;
-   case 3: //Bloom_threshhold
-    bloomThreshold = val;
-   break;
-   case 4: //Bloom_resolution_scale
-    bloomResolutionScale = val;
-    bloomPass = new THREE.UnrealBloomPass(
-      new THREE.Vector2(
-        renderer.getCurrentViewport().z * bloomResolutionScale,
-        renderer.getCurrentViewport().w * bloomResolutionScale
-      ),
-      bloomStrength,
-      bloomRadius,
-      bloomThreshold
-    );
-   break;
-   case 5: //Bloom
-    bloomOn = val;
-   break;
-   case -1: //from script
-    if(!isDeployment){
-      guiHandler.postprocessingParameters["Bloom_strength"] = bloomStrength;
-      guiHandler.postprocessingParameters["Bloom_radius"] = bloomRadius;
-      guiHandler.postprocessingParameters["Bloom_threshhold"] = bloomThreshold;
-      guiHandler.postprocessingParameters["Bloom_resolution_scale"] = bloomResolutionScale;
-      guiHandler.postprocessingParameters["Bloom"] = bloomOn;
-    }
-   break;
- }
- composer = new THREE.EffectComposer(renderer);
- composer.setSize(renderer.getCurrentViewport().z / screenResolution, renderer.getCurrentViewport().w / screenResolution);
- composer.addPass(renderPass);
- if (bloomOn){
-   composer.addPass(bloomPass);
-   bloomPass.renderToScreen = true;
- }
- if (!(mode == 1 && bloomOn)){
-    composer.addPass(copyPass);
-    copyPass.renderToScreen = true;
- }
- setPostProcessingParams();
 }
 
 function processCameraRotationBuffer(){
@@ -8579,7 +7450,7 @@ function handleViewport(){
     var newViewportZ = result.width;
     var newViewportW = result.height;
     renderer.setViewport(newViewportX, newViewportY, newViewportZ, newViewportW);
-    composer.setSize(newViewportZ, newViewportW);
+    renderer.setSize(newViewportZ, newViewportW);
     currentViewport.startX = newViewportX;
     currentViewport.startY = newViewportY;
     currentViewport.width = newViewportZ;
@@ -8608,7 +7479,7 @@ function handleViewport(){
     }
   }
   renderer.setViewport(newViewportX, newViewportY, newViewportZ, newViewportW);
-  composer.setSize(newViewportZ, newViewportW);
+  renderer.setSize(newViewportZ, newViewportW);
   currentViewport.startX = newViewportX;
   currentViewport.startY = newViewportY;
   currentViewport.width = newViewportZ;
@@ -8740,6 +7611,50 @@ function removeCLIDom(){
   }
   if (!(typeof cliDiv == UNDEFINED)){
     document.body.removeChild(cliDiv);
+  }
+  resizeEventHandler.onResize();
+}
+
+function onRaycasterMouseMoveIntersection(){
+  if (intersectionPoint){
+    var object = addedObjects[intersectionObject];
+    if (!object){
+      object = objectGroups[intersectionObject];
+    }
+    if (!object){
+      object = addedTexts[intersectionObject];
+    }
+    var isDifferent = currentMouseOverObjectName != object.name;
+    if (object.mouseOverCallbackFunction && isDifferent){
+      object.mouseOverCallbackFunction(intersectionPoint.x, intersectionPoint.y, intersectionPoint.z);
+    }
+    if (currentMouseOverObjectName && isDifferent){
+      var curObj = addedObjects[currentMouseOverObjectName];
+      if (!curObj){
+        curObj = objectGroups[currentMouseOverObjectName];
+      }
+      if (!curObj){
+        curObj = addedTexts[currentMouseOverObjectName];
+      }
+      if (curObj && curObj.mouseOutCallbackFunction){
+        curObj.mouseOutCallbackFunction();
+      }
+    }
+    currentMouseOverObjectName = intersectionObject;
+  }else{
+    if (currentMouseOverObjectName){
+      var curObj = addedObjects[currentMouseOverObjectName];
+      if (!curObj){
+        curObj = objectGroups[currentMouseOverObjectName];
+      }
+      if (!curObj){
+        curObj = addedTexts[currentMouseOverObjectName];
+      }
+      if (curObj && curObj.mouseOutCallbackFunction){
+        curObj.mouseOutCallbackFunction();
+      }
+    }
+    currentMouseOverObjectName = 0;
   }
 }
 
@@ -8907,8 +7822,8 @@ function startPerformanceAnalysis(){
   webglCallbackHandler.startRecording();
   threejsRenderMonitoringHandler.startRecording();
   if (WORKERS_SUPPORTED){
-    physicsWorld.workerMessageHandler.startRecording();
-    rayCaster.workerMessageHandler.startRecording();
+    physicsWorld.startRecording();
+    rayCaster.startRecording();
     physicsWorld.worker.postMessage({startRecording: true});
     rayCaster.worker.postMessage({startRecording: true});
   }
@@ -8929,50 +7844,13 @@ function dumpPerformance(){
     physicsWorld.worker.postMessage({dumpPerformanceLogs: true});
     rayCaster.worker.postMessage({dumpPerformanceLogs: true});
     console.log("%c                  PHYSICS WORKER BRIDGE             ", "background: black; color: lime");
-    physicsWorld.workerMessageHandler.dumpPerformanceLogs();
+    physicsWorld.dumpPerformanceLogs();
     console.log("%c                  RAYCASTER WORKER BRIDGE           ", "background: black; color: lime");
-    rayCaster.workerMessageHandler.dumpPerformanceLogs();
+    rayCaster.dumpPerformanceLogs();
   }
 }
 
 //******************************************************************
-// WARNING: FOR TEST PURPOSES
-function generateRandomBoxes(gridSystemName){
-  var gridSystem = gridSystems[gridSystemName];
-  for (var gridNumber in gridSystem.grids){
-    var grid = gridSystem.grids[gridNumber];
-    grid.toggleSelect(false, false, false, false);
-    var height = Math.random() * 100;
-    var name = "randomGeneratedBox_"+gridSystemName+"_"+gridNumber;
-    var color = ColorNames.generateRandomColor();
-    var material = new BasicMaterial({
-      color: color,
-      name: "null"
-    });
-    gridSystem.newBox([grid], height, material, name);
-  }
-}
-
-// WARNING: FOR TEST PURPOSES
-function mergeAllAddedObjects(){
-  var objNames = "";
-  for (var addedObjectName in addedObjects){
-    objNames += addedObjectName + ",";
-  }
-  objNames = objNames.substring(0, objNames.length - 1);
-  parseCommand("glue glue_test_1 "+objNames);
-}
-
-// WARNING: FOR TEST PURPOSES
-function printParticleSystemPerformances(){
-  for (var particleSystemName in particleSystems){
-    var particleSystem = particleSystems[particleSystemName];
-    var particles = particleSystem.particles;
-    var lastParticle = particles[particles.length-1];
-    console.log(particleSystemName+": "+lastParticle.performance/1000+" secs.");
-  }
-}
-
 // WARNING: FOR TEST PURPOSES - WORKS ONLY FOR CANVAS TEXTURES
 function debugTexture(textureName){
   var texture = textures[textureName];
@@ -8993,15 +7871,6 @@ function debugCanvas(dbgCanvas){
   var img = new Image(dbgCanvas.width, dbgCanvas.height);
   img.src = dbgCanvas.toDataURL();
   newTab.document.body.appendChild(img);
-}
-
-// WARNING: FOR TEST PURPOSES
-function clearChildrenMesh(objectGroup){
-  for (var childName in objectGroup.group){
-    var child = objectGroup.group[childName];
-    child.mesh.geometry.dispose();
-    delete child.mesh.geometry;
-  }
 }
 
 // WARNING: FOR TEST PURPOSES
@@ -9194,12 +8063,6 @@ var State = function(projectName, author){
     markedPointsExport[markedPointName] = markedPoints[markedPointName].export();
   }
   this.markedPointsExport = markedPointsExport;
-  // POST PROCESSING ***********************************************
-  this.bloomStrength = bloomStrength;
-  this.bloomRadius = bloomRadius;
-  this.bloomThreshold = bloomThreshold;
-  this.bloomResolutionScale = bloomResolutionScale;
-  this.bloomOn = bloomOn;
   // OCTREE LIMITS *************************************************
   var octreeMinX = LIMIT_BOUNDING_BOX.min.x;
   var octreeMinY = LIMIT_BOUNDING_BOX.min.y;
@@ -9243,6 +8106,11 @@ var State = function(projectName, author){
   this.texts = new Object();
   for (var textName in addedTexts){
     this.texts[textName] = addedTexts[textName].export();
+  }
+  // POST PROCESSING ***********************************************
+  this.effects = new Object();
+  for (var effectName in renderer.effects){
+    this.effects[effectName] = renderer.effects[effectName].export();
   }
 }
 
@@ -10202,20 +9070,8 @@ StateLoader.prototype.load = function(){
     }
     // TEXTS *******************************************************
     // NOT HERE -> SEE: finalize
-
-    // POST PROCESSING *********************************************
-    bloomStrength = obj.bloomStrength;
-    bloomRadius = obj.bloomRadius;
-    bloomThreshold = obj.bloomThreshold;
-    bloomResolutionScale = obj.bloomResolutionScale;
-    bloomOn = obj.bloomOn;
-    if (!isDeployment){
-      guiHandler.postprocessingParameters["Bloom_strength"] = bloomStrength;
-      guiHandler.postprocessingParameters["Bloom_radius"] = bloomRadius;
-      guiHandler.postprocessingParameters["Bloom_threshhold"] = bloomThreshold;
-      guiHandler.postprocessingParameters["Bloom_resolution_scale"] = bloomResolutionScale;
-      guiHandler.postprocessingParameters["Bloom"] = bloomOn;
-    }
+    // EFFECTS *****************************************************
+    // NOT HERE -> SEE: finalize
 
     if (this.oldPhysicsDebugMode){
       if (this.oldPhysicsDebugMode != "NONE"){
@@ -10483,7 +9339,6 @@ StateLoader.prototype.finalize = function(){
       physicsWorld.remove(objectGroupInstance.physicsBody);
     }
   }
-
   for (var objName in objectGroups){
     if (objectGroups[objName].softCopyParentName){
       var softCopyParent = objectGroups[objectGroups[objName].softCopyParentName];
@@ -10500,6 +9355,9 @@ StateLoader.prototype.finalize = function(){
         }
       }
     }
+  }
+  for (var effecName in obj.effects){
+    renderer.effects[effecName].load(obj.effects[effecName]);
   }
   projectLoaded = true;
   if (!isDeployment){
@@ -11399,6 +10257,11 @@ StateLoader.prototype.resetProject = function(){
   areaBinHandler = new WorldBinHandler(true);
   webglCallbackHandler = new WebGLCallbackHandler();
   threejsRenderMonitoringHandler = new THREEJSRenderMonitoringHandler();
+  objectsWithOnClickListeners = new Map();
+  objectsWithMouseOverListeners = new Map();
+  objectsWithMouseOutListeners = new Map();
+  postProcessiongConfigurationsVisibility = new Object();
+  currentMouseOverObjectName = 0;
   if (!WORKERS_SUPPORTED){
     rayCaster = new RayCaster();
     physicsWorld = new CANNON.World();
@@ -11450,7 +10313,6 @@ StateLoader.prototype.resetProject = function(){
   screenMouseWheelCallbackFunction = 0;
   screenPinchCallbackFunction = 0;
   fpsHandler.reset();
-  originalBloomConfigurations = new Object();
   fonts = new Object();
   NO_MOBILE = false;
   fixedAspect = 0;
@@ -11459,7 +10321,7 @@ StateLoader.prototype.resetProject = function(){
   roygbivSkippedArrayBufferUpdates = 0;
   roygbivSkippedElementArrayBufferUpdates = 0;
 
-  boundingClientRect = renderer.domElement.getBoundingClientRect();
+  boundingClientRect = renderer.getBoundingClientRect();
   pointerLockRequested = false;
   fullScreenRequested = false;
   defaultCameraControlsDisabled = false;
@@ -11501,14 +10363,15 @@ StateLoader.prototype.resetProject = function(){
   for (var i = 0; i<objectsToRemove.length; i++){
     scene.remove(objectsToRemove[i]);
   }
-
+  for (var effectName in renderer.effects){
+    renderer.effects[effectName].reset();
+  }
   diffuseTextureCache = new Object();
   heightTextureCache = new Object();
   ambientOcculsionTextureCache = new Object();
   alphaTextureCache = new Object();
   emissiveTextureCache = new Object();
 
-  initPostProcessing();
   if (!isDeployment){
     guiHandler.hideAll();
     $("#cliDivheader").text("ROYGBIV Scene Creator - CLI (Design mode)");
@@ -16161,8 +15024,6 @@ var Roygbiv = function(){
     "removeFPSDropCallbackFunction",
     "setPerformanceDropCallbackFunction",
     "removePerformanceDropCallbackFunction",
-    "setBloom",
-    "unsetBloom",
     "getViewport",
     "setUserInactivityCallbackFunction",
     "removeUserInactivityCallbackFunction",
@@ -16192,7 +15053,15 @@ var Roygbiv = function(){
     "setScreenMouseWheelListener",
     "removeScreenMouseWheelListener",
     "setScreenPinchListener",
-    "removeScreenPinchListener"
+    "removeScreenPinchListener",
+    "setObjectMouseOverListener",
+    "removeObjectMouseOverListener",
+    "setObjectMouseOutListener",
+    "removeObjectMouseOutListener",
+    "onTextMouseOver",
+    "removeTextMouseOverListener",
+    "onTextMouseOut",
+    "removeTextMouseOutListener"
   ];
 
   this.globals = new Object();
@@ -16600,13 +15469,14 @@ Roygbiv.prototype.rotate = function(object, axis, radians){
   }
   if (object.pivotObject){
     object.rotateAroundPivotObject(axis, radians);
+    physicsWorld.updateObject(object, false, true);
     if (object.autoInstancedParent){
       object.autoInstancedParent.updateObject(object);
     }
     return;
   }
   object.rotate(axis, radians, true);
-  physicsWorld.updateObject(object);
+  physicsWorld.updateObject(object, false, true);
   if (object.autoInstancedParent){
     object.autoInstancedParent.updateObject(object);
   }
@@ -16642,7 +15512,7 @@ Roygbiv.prototype.rotateAroundXYZ = function(object, x, y, z, radians, axis){
   }else if (object.isObjectGroup){
   }
   object.rotateAroundXYZ(x, y, z, axis, axisVector, radians);
-  physicsWorld.updateObject(object);
+  physicsWorld.updateObject(object, false, true);
   if (object.autoInstancedParent){
     object.autoInstancedParent.updateObject(object);
   }
@@ -16663,7 +15533,7 @@ Roygbiv.prototype.setPosition = function(obj, x, y, z){
     if (obj.mesh.visible){
       rayCaster.updateObject(obj);
     }
-    physicsWorld.updateObject(obj);
+    physicsWorld.updateObject(obj, true, false);
     if (obj.autoInstancedParent){
       obj.autoInstancedParent.updateObject(obj);
     }
@@ -16678,7 +15548,7 @@ Roygbiv.prototype.setPosition = function(obj, x, y, z){
     if (obj.mesh.visible){
       rayCaster.updateObject(obj);
     }
-    physicsWorld.updateObject(obj);
+    physicsWorld.updateObject(obj, true, false);
   }
 }
 
@@ -16725,7 +15595,7 @@ Roygbiv.prototype.translate = function(object, axis, amount){
     }
   }
   object.translate(axis, amount, true);
-  physicsWorld.updateObject(object);
+  physicsWorld.updateObject(object, true, false);
   if (object.autoInstancedParent){
     object.autoInstancedParent.updateObject(object);
   }
@@ -16791,12 +15661,18 @@ Roygbiv.prototype.setObjectColor = function(object, colorName, alpha){
   }else{
   }
   REUSABLE_COLOR.set(colorName);
+  if (object.autoInstancedParent){
+    object.autoInstancedParent.forceColor(object, REUSABLE_COLOR.r, REUSABLE_COLOR.g, REUSABLE_COLOR.b, alpha);
+  }
   object.forceColor(REUSABLE_COLOR.r, REUSABLE_COLOR.g, REUSABLE_COLOR.b, alpha);
 }
 
 Roygbiv.prototype.resetObjectColor = function(object){
   if (mode == 0){
     return;
+  }
+  if (object.autoInstancedParent){
+    object.autoInstancedParent.resetColor(object);
   }
   object.resetColor();
 }
@@ -18536,6 +17412,7 @@ Roygbiv.prototype.setObjectClickListener = function(sourceObject, callbackFuncti
     return;
   }
   sourceObject.clickCallbackFunction = callbackFunction;
+  objectsWithOnClickListeners.set(sourceObject.name, sourceObject);
 }
 
 Roygbiv.prototype.removeObjectClickListener = function(sourceObject){
@@ -18543,6 +17420,7 @@ Roygbiv.prototype.removeObjectClickListener = function(sourceObject){
     return;
   }
   delete sourceObject.clickCallbackFunction;
+  objectsWithOnClickListeners.delete(sourceObject.name);
 }
 
 Roygbiv.prototype.setScreenClickListener = function(callbackFunction){
@@ -18738,6 +17616,7 @@ Roygbiv.prototype.onTextClick = function(text, callbackFunction){
     return;
   }
   text.clickCallbackFunction = callbackFunction;
+  objectsWithOnClickListeners.set(text.name, text);
 }
 
 Roygbiv.prototype.removeTextClickListener = function(text){
@@ -18745,6 +17624,7 @@ Roygbiv.prototype.removeTextClickListener = function(text){
     return;
   }
   text.clickCallbackFunction = noop;
+  objectsWithOnClickListeners.delete(text.name);
 }
 
 Roygbiv.prototype.setScreenMouseWheelListener = function(callbackFunction){
@@ -18773,6 +17653,61 @@ Roygbiv.prototype.removeScreenPinchListener = function(){
     return;
   }
   screenPinchCallbackFunction = noop;
+}
+
+Roygbiv.prototype.setObjectMouseOverListener = function(sourceObject, callbackFunction){
+  if (mode == 0){
+    return;
+  }
+  sourceObject.mouseOverCallbackFunction = callbackFunction;
+  objectsWithMouseOverListeners.set(sourceObject.name, sourceObject);
+}
+
+Roygbiv.prototype.removeObjectMouseOverListener = function(sourceObject){
+  if (mode == 0){
+    return;
+  }
+  delete sourceObject.mouseOverCallbackFunction;
+  objectsWithMouseOverListeners.delete(sourceObject.name);
+}
+
+Roygbiv.prototype.setObjectMouseOutListener = function(sourceObject, callbackFunction){
+  if (mode == 0){
+    return;
+  }
+  sourceObject.mouseOutCallbackFunction = callbackFunction;
+  objectsWithMouseOutListeners.set(sourceObject.name, sourceObject);
+}
+
+Roygbiv.prototype.removeObjectMouseOutListener = function(sourceObject){
+  if (mode == 0){
+    return;
+  }
+  delete sourceObject.mouseOutCallbackFunction;
+  objectsWithMouseOutListeners.delete(sourceObject.name);
+}
+
+Roygbiv.prototype.onTextMouseOver = function(text, callbackFunction){
+  if (mode == 0){
+    return;
+  }
+  text.mouseOverCallbackFunction = callbackFunction;
+  objectsWithMouseOverListeners.set(text.name, text);
+}
+
+Roygbiv.prototype.removeTextMouseOverListener = function(text){
+  delete text.mouseOverCallbackFunction;
+  objectsWithMouseOverListeners.delete(text.name);
+}
+
+Roygbiv.prototype.onTextMouseOut = function(text, callbackFunction){
+  text.mouseOutCallbackFunction = callbackFunction;
+  objectsWithMouseOutListeners.set(text.name, text);
+}
+
+Roygbiv.prototype.removeTextMouseOutListener = function(text){
+  delete text.mouseOutCallbackFunction;
+  objectsWithMouseOutListeners.delete(text.name);
 }
 
 
@@ -19265,50 +18200,6 @@ Roygbiv.prototype.lerp = function(vector1, vector2, amount, targetVector){
   targetVector.y = REUSABLE_VECTOR.y;
   targetVector.z = REUSABLE_VECTOR.z;
   return targetVector;
-}
-
-Roygbiv.prototype.setBloom = function(params){
-  if (mode == 0){
-    return;
-  }
-  var hasStrength = false, hasRadius = false, hasThreshold = false, hasResolutionScale = false;
-  if (!(typeof params.strength == UNDEFINED)){
-    hasStrength = true;
-  }
-  if (!(typeof params.radius == UNDEFINED)){
-    hasRadius = true;
-  }
-  if (!(typeof params.threshold == UNDEFINED)){
-    hasThreshold = true;
-  }
-  if (!(typeof params.resolutionScale == UNDEFINED)){
-    hasResolutionScale = true;
-  }
-  bloomOn = true;
-  if (hasStrength){
-    bloomStrength = params.strength;
-  }
-  if (hasRadius){
-    bloomRadius = params.radius;
-  }
-  if (hasThreshold){
-    bloomThreshold = params.threshold;
-  }
-  if (hasResolutionScale){
-    adjustPostProcessing(4, params.resolutionScale);
-  }else{
-    adjustPostProcessing(-1, null);
-  }
-}
-
-Roygbiv.prototype.unsetBloom = function(){
-  if (mode == 0){
-    return;
-  }
-  adjustPostProcessing(5, false);
-  if (!isDeployment){
-    guiHandler.postprocessingParameters["Bloom"] = false;
-  }
 }
 
 Roygbiv.prototype.pause = function(paused){
@@ -21260,6 +20151,7 @@ AddedText.prototype.debugTriangles = function(triangleIndex){
 
 AddedText.prototype.hide = function(){
   this.mesh.visible = false;
+  this.isHidden = true;
   if (mode == 0 && this.bbHelper){
     scene.remove(this.bbHelper);
   }
@@ -21273,6 +20165,7 @@ AddedText.prototype.hide = function(){
 
 AddedText.prototype.show = function(){
   this.mesh.visible = true;
+  this.isHidden = false;
   if (mode == 1 && this.isClickable){
     if (!this.boundingBox){
       this.handleBoundingBox();
@@ -21614,7 +20507,7 @@ AreaConfigurationsHandler.prototype.generateConfigurations = function(singleArea
 
 AreaConfigurationsHandler.prototype.show = function(singleAreaName){
   this.generateConfigurations(singleAreaName);
-  guiHandler.datGuiAreaConfigurations = new dat.GUI();
+  guiHandler.datGuiAreaConfigurations = new dat.GUI({hideable: false});
   var pseudoAreas = areas;
   if (singleAreaName){
     pseudoAreas = new Object();
@@ -21752,6 +20645,8 @@ RayCaster.prototype.onAddedTextResize = function(){
 }
 
 RayCaster.prototype.flush = function(){
+  this.updateBuffer.forEach(this.issueUpdate);
+  this.updateBuffer.clear();
 }
 
 RayCaster.prototype.refresh = function(){
@@ -21810,10 +20705,6 @@ RayCaster.prototype.updateObject = function(obj, forceUpdate){
     return;
   }
   this.updateBuffer.set(obj.name, obj);
-}
-
-RayCaster.prototype.onBeforeUpdate = function(){
-
 }
 
 RayCaster.prototype.issueUpdate = function(obj){
@@ -22610,7 +21501,7 @@ ModeSwitcher.prototype.commonSwitchFunctions = function(){
   if (!isDeployment){
     guiHandler.hideAll();
     if (areaConfigurationsVisible){
-      guiHandler.hide(guiHandler.datGuiAreaConfigurations);
+      guiHandler.hide(guiHandler.guiTypes.AREA);
       areaConfigurationsVisible = false;
     }
     selectionHandler.resetCurrentSelection();
@@ -22622,8 +21513,11 @@ ModeSwitcher.prototype.commonSwitchFunctions = function(){
   particleSystemRefHeight = 0;
   GLOBAL_PS_REF_HEIGHT_UNIFORM.value = 0;
   trackingObjects = new Object();
+  objectsWithOnClickListeners = new Map();
+  objectsWithMouseOverListeners = new Map();
+  objectsWithMouseOutListeners = new Map();
+  currentMouseOverObjectName = 0;
   defaultCameraControlsDisabled = false;
-  initPostProcessing();
   rayCaster.refresh();
   physicsWorld.refresh();
   if (oldIsPaused){
@@ -22637,18 +21531,6 @@ ModeSwitcher.prototype.switchFromDesignToPreview = function(){
   TOTAL_PARTICLE_COLLISION_LISTEN_COUNT = 0;
   TOTAL_PARTICLE_SYSTEM_COLLISION_LISTEN_COUNT = 0;
   TOTAL_PARTICLE_SYSTEMS_WITH_PARTICLE_COLLISIONS = 0;
-  if (!isDeployment){
-    originalBloomConfigurations.bloomStrength = bloomStrength;
-    originalBloomConfigurations.bloomRadius = bloomRadius;
-    originalBloomConfigurations.bloomThreshold = bloomThreshold;
-    originalBloomConfigurations.bloomResolutionScale = bloomResolutionScale;
-    originalBloomConfigurations.bloomOn = bloomOn;
-    guiHandler.postprocessingParameters["Bloom_strength"] = bloomStrength;
-    guiHandler.postprocessingParameters["Bloom_radius"] = bloomRadius;
-    guiHandler.postprocessingParameters["Bloom_threshhold"] = bloomThreshold;
-    guiHandler.postprocessingParameters["Bloom_resolution_scale"] = bloomResolutionScale;
-    guiHandler.postprocessingParameters["Bloom"] = bloomOn;
-  }
   for (var gsName in gridSystems){
     scene.remove(gridSystems[gsName].gridSystemRepresentation);
     scene.remove(gridSystems[gsName].boundingPlane);
@@ -22791,22 +21673,6 @@ ModeSwitcher.prototype.switchFromPreviewToDesign = function(){
   camera.oldAspect = camera.aspect;
   camera.aspect = window.innerWidth / window.innerHeight;
   camera.updateProjectionMatrix();
-  if (!(typeof originalBloomConfigurations.bloomStrength == UNDEFINED)){
-    bloomStrength = originalBloomConfigurations.bloomStrength;
-  }
-  if (!(typeof originalBloomConfigurations.bloomRadius == UNDEFINED)){
-    bloomRadius = originalBloomConfigurations.bloomRadius;
-  }
-  if (!(typeof originalBloomConfigurations.bloomThreshold == UNDEFINED)){
-    bloomThreshold = originalBloomConfigurations.bloomThreshold;
-  }
-  if (!(typeof originalBloomConfigurations.bloomResolutionScale == UNDEFINED)){
-    bloomResolutionScale = originalBloomConfigurations.bloomResolutionScale;
-  }
-  if (!(typeof originalBloomConfigurations.bloomOn == UNDEFINED)){
-    bloomOn = originalBloomConfigurations.bloomOn;
-  }
-  originalBloomConfigurations = new Object();
   camera.position.set(initialCameraX, initialCameraY, initialCameraZ);
   camera.rotation.order = 'YXZ';
   camera.rotation.set(0, 0, 0);
@@ -22840,6 +21706,8 @@ ModeSwitcher.prototype.switchFromPreviewToDesign = function(){
     addedText.show();
     addedText.handleResize();
     delete addedText.clickCallbackFunction;
+    delete addedText.mouseOverCallbackFunction;
+    delete addedText.mouseOutCallbackFunction;
   }
   collisionCallbackRequests = new Map();
   particleCollisionCallbackRequests = new Object();
@@ -22887,8 +21755,10 @@ ModeSwitcher.prototype.switchFromPreviewToDesign = function(){
     object.resetColor();
 
     delete object.clickCallbackFunction;
+    delete object.mouseOverCallbackFunction;
+    delete object.mouseOutCallbackFunction;
 
-    if (!(typeof object.originalMass == "undefined")){
+    if (!(typeof object.originalMass == UNDEFINED)){
       object.setMass(object.originalMass);
       if (object.originalMass == 0){
         dynamicObjectGroups.delete(object.name);
@@ -22912,6 +21782,8 @@ ModeSwitcher.prototype.switchFromPreviewToDesign = function(){
     var object = addedObjects[objectName];
 
     delete object.clickCallbackFunction;
+    delete object.mouseOverCallbackFunction;
+    delete object.mouseOutCallbackFunction;
 
     object.resetColor();
 
@@ -22928,7 +21800,7 @@ ModeSwitcher.prototype.switchFromPreviewToDesign = function(){
       object.updateOpacity(object.initOpacity);
       object.initOpacitySet = false;
     }
-    if (!(typeof object.originalMass == "undefined")){
+    if (!(typeof object.originalMass == UNDEFINED)){
       object.setMass(object.originalMass);
       if (object.originalMass == 0){
         dynamicObjects.delete(object.name);
@@ -23117,7 +21989,7 @@ var WebGLCallbackHandler = function(){
     bindBuffer: 0
   }
   this.doNotCache = false;
-  this.gl = renderer.context;
+  this.gl = renderer.getContext();
   this.vertexAttribPointerCache = new Map();
   this.bindedCubeTextureCache = new Map();
 }
@@ -23643,7 +22515,8 @@ var CPUOperationsHandler = function(){
     updateCrosshair: 0,
     renderScene: 0,
     updateAddedTexts: 0,
-    updateRaycaster: 0
+    updateRaycaster: 0,
+    objectMouseEvents: 0
   }
   this.scriptPerformances = {};
 }
@@ -23683,6 +22556,16 @@ CPUOperationsHandler.prototype.dumpPerformanceLogs = function(){
         console.log("%c   ["+pseudoAry2[i2].name+"] -> "+pseudoAry2[i2].value+" ms.", "background: black; color: lightcyan");
       }
     }
+  }
+}
+
+CPUOperationsHandler.prototype.handleObjectMouseEvents = function(){
+  if (this.record){
+    var s = performance.now();
+    mouseEventHandler.handleObjectMouseEvents();
+    this.performanceLogs.objectMouseEvents = performance.now() - s;
+  }else{
+    mouseEventHandler.handleObjectMouseEvents();
   }
 }
 
@@ -23817,21 +22700,34 @@ CPUOperationsHandler.prototype.handleSkybox = function(){
 }
 
 var RaycasterWorkerBridge = function(){
+  this.record = false;
   this.isRaycasterWorkerBridge = true;
   this.worker = new Worker("./js/worker/RaycasterWorker.js");
-  this.workerMessageHandler = new WorkerMessageHandler(this.worker);
-  this.updateBuffer = new Map();
-  this.textScaleUpdateBuffer = new Map();
-  this.hasUpdatedTexts = false;
-  this.intersectionTestBufferSize = 10;
   this.ready = false;
+  this.updateBuffer = new Map();
+  this.addedTextScaleUpdateBuffer = new Map();
+  this.hasOwnership = false;
+  this.maxIntersectionCountInAFrame = 10;
+  this.curIntersectionTestRequestCount = 0;
+  this.performanceLogs = {
+    intersectableObjDescriptionLen: 0, intersectionTestDescriptionLen: 0,
+    flagsDescriptionLen: 0, cameraOrientationDescriptionLen: 0, addedTextScaleDescriptionLen: 0,
+    flushTime: 0
+  };
+  this.intersectionTestBuffer = {
+    isActive: false, fromVectors: [] , directionVectors: [],
+    intersectGridSystems: [], callbackFunctions: []
+  };
+  for (var i = 0 ; i < this.maxIntersectionCountInAFrame; i ++){
+    this.intersectionTestBuffer.fromVectors.push(new THREE.Vector3());
+    this.intersectionTestBuffer.directionVectors.push(new THREE.Vector3());
+    this.intersectionTestBuffer.intersectGridSystems.push(false);
+    this.intersectionTestBuffer.callbackFunctions.push(noop);
+  }
   this.worker.addEventListener("message", function(msg){
     if (msg.data.isPerformanceLog){
       console.log("%c                    RAYCASTER WORKER                  ", "background: black; color: lime");
-      console.log("%cWorker message handler flush time: "+msg.data.flushTimeLastFrame+" ms", "background: black; color: magenta");
-      console.log("%cPreallocated array cache size: "+msg.data.preallocatedArrayCacheSize, "background: black; color: magenta");
-      console.log("%cTotal arrays sent last frame: "+msg.data.totalArraysSentLastFrame, "background: black; color: magenta");
-      console.log("%cTotal bytes sent last frame: "+msg.data.totalBytesSentLastFrame, "background: black; color: magenta");
+      console.log("%cUpdate time: "+msg.data.updateTime+" ms", "background: black; color: magenta");
     }else if (msg.data.type){
       rayCaster.objectsByWorkerID = new Object();
       rayCaster.idsByObjectNames = new Object();
@@ -23844,130 +22740,122 @@ var RaycasterWorkerBridge = function(){
           var objWorkerID = msg.data.ids[i].id;
           rayCaster.objectsByWorkerID[objWorkerID] = obj;
           rayCaster.idsByObjectNames[obj.name] = objWorkerID;
-          obj.raycasterUpdateBuffer = new Float32Array(18);
-          obj.raycasterUpdateBufferAvailibility = true;
-          obj.raycasterUpdateBuffer[0] = 0; obj.raycasterUpdateBuffer[1] = objWorkerID;
-          if (mode == 1 && obj.isChangeable){
-            obj.raycasterHideBuffer = new Float32Array(2);
-            obj.raycasterShowBuffer = new Float32Array(2);
-            obj.raycasterHideBuffer[0] = 5;
-            obj.raycasterShowBuffer[0] = 6;
-            obj.raycasterHideBuffer[1] = objWorkerID;
-            obj.raycasterShowBuffer[1] = objWorkerID;
-            obj.raycasterHideBufferAvailibility = true;
-            obj.raycasterShowBufferAvailibility = true;
-          }
-          obj.raycasterAvailibilityModifierBuffer = new Map();
         }else if (msg.data.ids[i].type == "objectGroup"){
           var obj = objectGroups[msg.data.ids[i].name];
           var objWorkerID = msg.data.ids[i].id;
           rayCaster.objectsByWorkerID[objWorkerID] = obj;
           rayCaster.idsByObjectNames[obj.name] = objWorkerID;
-          obj.raycasterUpdateBuffer = new Float32Array(18);
-          obj.raycasterUpdateBufferAvailibility = true;
-          obj.raycasterUpdateBuffer[0] = 1; obj.raycasterUpdateBuffer[1] = objWorkerID;
-          if (mode == 1 && objectGroups[msg.data.ids[i].name].isChangeable){
-            obj.raycasterHideBuffer = new Float32Array(2);
-            obj.raycasterShowBuffer = new Float32Array(2);
-            obj.raycasterHideBuffer[0] = 5;
-            obj.raycasterShowBuffer[0] = 6;
-            obj.raycasterHideBuffer[1] = objWorkerID;
-            obj.raycasterShowBuffer[1] = objWorkerID;
-            obj.raycasterHideBufferAvailibility = true;
-            obj.raycasterShowBufferAvailibility = true;
-          }
-          obj.raycasterAvailibilityModifierBuffer = new Map();
         }else if (msg.data.ids[i].type == "addedText"){
           var text = addedTexts[msg.data.ids[i].name];
           var textWorkerID = msg.data.ids[i].id;
           rayCaster.objectsByWorkerID[textWorkerID] = text;
           rayCaster.idsByObjectNames[text.name] = textWorkerID;
-          text.raycasterUpdateBuffer = new Float32Array(5);
-          text.raycasterUpdateBufferAvailibility = true;
-          text.raycasterUpdateBuffer[0] = 4; text.raycasterUpdateBuffer[1] = textWorkerID;
-          text.raycasterScaleUpdateBuffer = new Float32Array(12);
-          text.raycasterScaleUpdateBufferAvailibility = true;
-          text.raycasterScaleUpdateBuffer[0] = 3; text.raycasterScaleUpdateBuffer[1] = textWorkerID;
-          if (mode == 0 || (mode == 1 && addedTexts[msg.data.ids[i].name].isClickable && !addedTexts[msg.data.ids[i].name].is2D)){
-            text.raycasterHideBuffer = new Float32Array(2);
-            text.raycasterShowBuffer = new Float32Array(2);
-            text.raycasterHideBuffer[0] = 5;
-            text.raycasterShowBuffer[0] = 6;
-            text.raycasterHideBuffer[1] = textWorkerID;
-            text.raycasterShowBuffer[1] = textWorkerID;
-            text.raycasterHideBufferAvailibility = true;
-            text.raycasterShowBufferAvailibility = true;
-          }
-          text.raycasterAvailibilityModifierBuffer = new Map();
         }else{
           throw new Error("Not implemented.");
         }
       }
+      // GENERATE TRANSFERABLE MESSAGE BODY
+      rayCaster.transferableMessageBody = {};
+      rayCaster.transferableList = [];
+      var intersectablesAry = [];
+      var intersectableArrayIndex = 0;
+      for (var objName in addedObjects){
+        var obj = addedObjects[objName];
+        var insertObjectToBuffer = (mode == 0) || (mode == 1 && obj.isIntersectable && (obj.isChangeable || (!obj.noMass && obj.physicsBody.mass > 0)));
+        if (insertObjectToBuffer){
+          obj.indexInIntersectableObjDescriptionArray = intersectableArrayIndex;
+          intersectablesAry.push(rayCaster.idsByObjectNames[obj.name]);
+          intersectablesAry.push(1);
+          obj.mesh.updateMatrixWorld();
+          for (var i = 0; i<obj.mesh.matrixWorld.elements.length; i++){
+            intersectablesAry.push(obj.mesh.matrixWorld.elements[i]);
+          }
+          intersectableArrayIndex += obj.mesh.matrixWorld.elements.length + 2;
+        }
+      }
+      for (var objName in objectGroups){
+        var obj = objectGroups[objName];
+        var insertObjectToBuffer = (mode == 0) || (mode == 1 && obj.isIntersectable && (obj.isChangeable || (!obj.noMass && obj.physicsBody.mass > 0)));
+        if (insertObjectToBuffer){
+          obj.indexInIntersectableObjDescriptionArray = intersectableArrayIndex;
+          intersectablesAry.push(rayCaster.idsByObjectNames[obj.name]);
+          intersectablesAry.push(1);
+          obj.mesh.updateMatrixWorld();
+          for (var i = 0; i<obj.mesh.matrixWorld.elements.length; i++){
+            intersectablesAry.push(obj.mesh.matrixWorld.elements[i]);
+          }
+          intersectableArrayIndex += obj.mesh.matrixWorld.elements.length + 2;
+        }
+      }
+      var addedTextScaleDescriptionArray = [];
+      var addedTextScaleDescriptionIndex = 0;
+      for (var textName in addedTexts){
+        var text = addedTexts[textName];
+        var insertTextToBuffer = (!text.is2D) && ((mode == 0) || (mode == 1 && text.isClickable));
+        if (insertTextToBuffer){
+          text.indexInIntersectableObjDescriptionArray = intersectableArrayIndex;
+          text.indexInTextScaleDescriptionArray = addedTextScaleDescriptionIndex;
+          intersectablesAry.push(rayCaster.idsByObjectNames[text.name]);
+          intersectablesAry.push(1);
+          addedTextScaleDescriptionArray.push(rayCaster.idsByObjectNames[text.name]);
+          text.mesh.updateMatrixWorld();
+          for (var i = 0; i<text.mesh.matrixWorld.elements.length; i++){
+            intersectablesAry.push(text.mesh.matrixWorld.elements[i]);
+          }
+          intersectableArrayIndex += text.mesh.matrixWorld.elements.length + 2;
+          addedTextScaleDescriptionArray.push(text.characterSize);
+          addedTextScaleDescriptionArray.push(text.bottomRight.x); addedTextScaleDescriptionArray.push(text.bottomRight.y); addedTextScaleDescriptionArray.push(text.bottomRight.z);
+          addedTextScaleDescriptionArray.push(text.topRight.x); addedTextScaleDescriptionArray.push(text.topRight.y); addedTextScaleDescriptionArray.push(text.topRight.z);
+          addedTextScaleDescriptionArray.push(text.bottomLeft.x); addedTextScaleDescriptionArray.push(text.bottomLeft.y); addedTextScaleDescriptionArray.push(text.bottomLeft.z);
+          addedTextScaleDescriptionIndex += 11;
+        }
+      }
+      var intersectableObjectDescriptionArray = new Float32Array(intersectablesAry);
+      var intersectionTestDescription = new Float32Array(8 * rayCaster.maxIntersectionCountInAFrame);
+      var cameraOrientationDescription = new Float32Array(8);
+      var flagsDescription = new Float32Array(3);
+      var addedTextScaleDescription = new Float32Array(addedTextScaleDescriptionArray);
+      rayCaster.transferableMessageBody.intersectableObjDescription = intersectableObjectDescriptionArray;
+      rayCaster.transferableList.push(intersectableObjectDescriptionArray.buffer);
+      rayCaster.transferableMessageBody.intersectionTestDescription = intersectionTestDescription;
+      rayCaster.transferableList.push(intersectionTestDescription.buffer);
+      rayCaster.transferableMessageBody.flagsDescription = flagsDescription;
+      rayCaster.transferableList.push(flagsDescription.buffer);
+      rayCaster.transferableMessageBody.cameraOrientationDescription = cameraOrientationDescription;
+      rayCaster.transferableList.push(cameraOrientationDescription.buffer);
+      rayCaster.transferableMessageBody.addedTextScaleDescription = addedTextScaleDescription;
+      rayCaster.transferableList.push(addedTextScaleDescription.buffer);
+      rayCaster.hasOwnership = true;
       rayCaster.onReady();
     }else{
-      for (var i = 0; i<msg.data.length; i++){
-        var ary = new Float32Array(msg.data[i]);
-        if (ary.length == 8){
-          rayCaster.intersectionTestBuffers[ary[0]] = ary;
-          rayCaster.intersectionTestBufferAvailibilities[ary[0]] = true;
-          if (ary[1] > -1){
-            var intersectedObj = rayCaster.objectsByWorkerID[ary[1]];
-            intersectionObject = intersectedObj.name;
-            REUSABLE_VECTOR.set(ary[2], ary[3], ary[4]);
-            intersectionPoint = REUSABLE_VECTOR;
-            rayCaster.intersectionTestCallbackFunctions[ary[0]](intersectionPoint.x, intersectionPoint.y, intersectionPoint.z, intersectionObject);
-          }else{
-            rayCaster.intersectionTestCallbackFunctions[ary[0]](0, 0, 0, null);
+      rayCaster.transferableMessageBody= msg.data;
+      rayCaster.transferableList[0] = rayCaster.transferableMessageBody.intersectableObjDescription.buffer;
+      rayCaster.transferableList[1] = rayCaster.transferableMessageBody.intersectionTestDescription.buffer;
+      rayCaster.transferableList[2] = rayCaster.transferableMessageBody.flagsDescription.buffer;
+      rayCaster.transferableList[3] = rayCaster.transferableMessageBody.cameraOrientationDescription.buffer;
+      rayCaster.transferableList[4] = rayCaster.transferableMessageBody.addedTextScaleDescription.buffer;
+      var intersectionTestDescription = rayCaster.transferableMessageBody.intersectionTestDescription;
+      if (rayCaster.transferableMessageBody.flagsDescription[1] > 0){
+        for (var i = 0; i<intersectionTestDescription.length; i+=8){
+          if (intersectionTestDescription[i] < 0){
+            break;
           }
-        }else{
-          if (ary[0] == 0){
-            var objID = ary[1];
-            var obj = rayCaster.objectsByWorkerID[objID];
-            obj.raycasterUpdateBuffer = ary;
-            obj.raycasterUpdateBufferAvailibility = true;
-          }else if (ary[0] == 1){
-            var objID = ary[1];
-            var obj = rayCaster.objectsByWorkerID[objID];
-            obj.raycasterUpdateBuffer = ary;
-            obj.raycasterUpdateBufferAvailibility = true;
-          }else if (ary[0] == 2){
-            rayCaster.cameraOrientationBuffer = ary;
-            rayCaster.cameraOrientationBufferAvailibility = true;
-          }else if (ary[0] == 3){
-            var objID = ary[1];
-            var obj = rayCaster.objectsByWorkerID[objID];
-            obj.raycasterScaleUpdateBuffer = ary;
-            obj.raycasterScaleUpdateBufferAvailibility = true;
-          }else if (ary[0] == 4){
-            var textID = ary[1];
-            var text = rayCaster.objectsByWorkerID[textID];
-            text.raycasterUpdateBuffer = ary;
-            text.raycasterUpdateBufferAvailibility = true;
-          }else if (ary[0] == 5){
-            var id = ary[1];
-            var obj = rayCaster.objectsByWorkerID[id];
-            obj.raycasterHideBuffer = ary;
-            obj.raycasterHideBufferAvailibility = true;
-          }else if (ary[0] == 6){
-            var id = ary[1];
-            var obj = rayCaster.objectsByWorkerID[id];
-            obj.raycasterShowBuffer = ary;
-            obj.raycasterShowBufferAvailibility = true;
+          var callbackFunc = rayCaster.intersectionTestBuffer.callbackFunctions[intersectionTestDescription[i]];
+          if (intersectionTestDescription[i+1] >= 0){
+            var objID = intersectionTestDescription[i+1];
+            var intersectedObject = rayCaster.objectsByWorkerID[objID];
+            intersectionObject = intersectedObject.name;
+            REUSABLE_VECTOR.set(intersectionTestDescription[i+2], intersectionTestDescription[i+3], intersectionTestDescription[i+4]);
+            intersectionPoint = REUSABLE_VECTOR;
+            callbackFunc(intersectionPoint.x, intersectionPoint.y, intersectionPoint.z, intersectionObject)
+          }else{
+            callbackFunc(0, 0, 0, null);
           }
         }
       }
+      rayCaster.hasOwnership = true;
     }
   });
-  // initialize buffers ********************************************
-  this.intersectionTestBuffers = [];
-  this.intersectionTestBufferAvailibilities = [];
-  this.intersectionTestCallbackFunctions = [];
-  for (var i = 0; i<this.intersectionTestBufferSize; i++){
-    this.intersectionTestBuffers.push(new Float32Array(8));
-    this.intersectionTestBufferAvailibilities.push(true);
-    this.intersectionTestCallbackFunctions.push(function(){});
-  }
-  // ***************************************************************
   this.onShiftPress = function(isPressed){
     if (mode == 0){
       rayCaster.worker.postMessage({
@@ -23975,31 +22863,25 @@ var RaycasterWorkerBridge = function(){
       })
     }
   };
-  this.updateAddedTextScale = function(addedText){
-    if (!addedText.raycasterScaleUpdateBufferAvailibility){
-      return;
-    }
-    var buf = addedText.raycasterScaleUpdateBuffer;
-    buf[2] = addedText.characterSize;
-    buf[3] = addedText.bottomRight.x; buf[4] = addedText.bottomRight.y; buf[5] = addedText.bottomRight.z;
-    buf[6] = addedText.topRight.x; buf[7] = addedText.topRight.y; buf[8] = addedText.topRight.z;
-    buf[9] = addedText.bottomLeft.x; buf[10] = addedText.bottomLeft.y; buf[11] = addedText.bottomLeft.z;
-    rayCaster.workerMessageHandler.push(buf.buffer);
-    addedText.raycasterScaleUpdateBufferAvailibility = false;
-  };
-  this.raycasterHideBufferAvailibility = "raycasterHideBufferAvailibility";
-  this.raycasterShowBufferAvailibility = "raycasterShowBufferAvailibility";
-  this.handleBufferAvailibilityUpdate = function(obj, key){
-    rayCaster.raycasterAvailibilityModifierBuffer.set(obj.name, obj);
-    obj.raycasterAvailibilityModifierBuffer.set(key, obj);
-  };
-  this.issueAvailibilityBuffers = function(obj, key){
-    obj.raycasterAvailibilityModifierBuffer.forEach(rayCaster.issueObjectAvailibilityBuffers);
-    obj.raycasterAvailibilityModifierBuffer.clear();
-  };
-  this.issueObjectAvailibilityBuffers = function(obj, bufferKey){
-    obj[bufferKey] = false;
-  };
+  this.issueAddedTextScaleUpdate = function(text){
+    var addedTextScaleDescription = rayCaster.transferableMessageBody.addedTextScaleDescription;
+    var i = text.indexInTextScaleDescriptionArray;
+    addedTextScaleDescription[i+1] = text.characterSize;
+    addedTextScaleDescription[i+2] = text.bottomRight.x; addedTextScaleDescription[i+3] = text.bottomRight.y; addedTextScaleDescription[i+4] = text.bottomRight.z;
+    addedTextScaleDescription[i+5] = text.topRight.x; addedTextScaleDescription[i+6] = text.topRight.y; addedTextScaleDescription[i+7] = text.topRight.z;
+    addedTextScaleDescription[i+8] = text.bottomLeft.x; addedTextScaleDescription[i+9] = text.bottomLeft.y; addedTextScaleDescription[i+10] = text.bottomLeft.z;
+  }
+  this.startRecording = function(){
+    rayCaster.record = true;
+  }
+  this.dumpPerformanceLogs = function(){
+    console.log("%cFlush time: "+this.performanceLogs.flushTime+" ms.", "background: black; color: magenta");
+    console.log("%cObject description array length: "+this.performanceLogs.intersectableObjDescriptionLen, "background: black; color: magenta");
+    console.log("%cAdded text scale description length: "+this.performanceLogs.addedTextScaleDescriptionLen, "background: black; color: magenta");
+    console.log("%cIntersection test description length: "+this.performanceLogs.intersectionTestDescriptionLen, "background: black; color: magenta");
+    console.log("%cFlags description length: "+this.performanceLogs.flagsDescriptionLen, "background: black; color: magenta");
+    console.log("%cCamera orientation description length: "+this.performanceLogs.cameraOrientationDescriptionLen, "background: black; color: magenta");
+  }
 }
 
 RaycasterWorkerBridge.prototype.onReady = function(){
@@ -24010,11 +22892,71 @@ RaycasterWorkerBridge.prototype.onReady = function(){
 }
 
 RaycasterWorkerBridge.prototype.flush = function(){
-  if (this.raycasterAvailibilityModifierBuffer.size > 0){
-    this.raycasterAvailibilityModifierBuffer.forEach(this.issueAvailibilityBuffers);
-    this.raycasterAvailibilityModifierBuffer.clear();
+  if (!this.hasOwnership){
+    return;
   }
-  this.workerMessageHandler.flush();
+  var flushStartTime;
+  if (this.record){
+    flushStartTime = performance.now();
+    this.performanceLogs.intersectableObjDescriptionLen = this.transferableMessageBody.intersectableObjDescription.length;
+    this.performanceLogs.intersectionTestDescriptionLen = this.transferableMessageBody.intersectionTestDescription.length;
+    this.performanceLogs.flagsDescriptionLen = this.transferableMessageBody.flagsDescription.length;
+    this.performanceLogs.cameraOrientationDescriptionLen = this.transferableMessageBody.cameraOrientationDescription.length;
+    this.performanceLogs.addedTextScaleDescriptionLen = this.transferableMessageBody.addedTextScaleDescription.length;
+  }
+  var sendMessage = false;
+  if (this.updateBuffer.size > 0){
+    this.updateBuffer.forEach(this.issueUpdate);
+    this.updateBuffer.clear();
+    sendMessage = true;
+    this.transferableMessageBody.flagsDescription[0] = 1;
+  }else{
+    this.transferableMessageBody.flagsDescription[0] = -1;
+  }
+  if (this.addedTextScaleUpdateBuffer.size > 0){
+    this.addedTextScaleUpdateBuffer.forEach(this.issueAddedTextScaleUpdate);
+    this.addedTextScaleUpdateBuffer.clear();
+    sendMessage = true;
+    this.transferableMessageBody.flagsDescription[2] = 1;
+  }else{
+    this.transferableMessageBody.flagsDescription[2] = -1;
+  }
+  if (this.intersectionTestBuffer.isActive){
+    sendMessage = true;
+    var intersectionTestDescription = this.transferableMessageBody.intersectionTestDescription;
+    this.transferableMessageBody.flagsDescription[1] = 1;
+    var i2 = 0;
+    for (var i = 0; i<this.maxIntersectionCountInAFrame; i++){
+      if (i < this.curIntersectionTestRequestCount){
+        intersectionTestDescription[i2++] = i;
+        intersectionTestDescription[i2++] = this.intersectionTestBuffer.fromVectors[i].x;
+        intersectionTestDescription[i2++] = this.intersectionTestBuffer.fromVectors[i].y;
+        intersectionTestDescription[i2++] = this.intersectionTestBuffer.fromVectors[i].z;
+        intersectionTestDescription[i2++] = this.intersectionTestBuffer.directionVectors[i].x;
+        intersectionTestDescription[i2++] = this.intersectionTestBuffer.directionVectors[i].y;
+        intersectionTestDescription[i2++] = this.intersectionTestBuffer.directionVectors[i].z;
+        intersectionTestDescription[i2++] = (this.intersectionTestBuffer.intersectGridSystems[i]? 1: -1)
+      }else{
+        intersectionTestDescription[i2] = -1;
+        i2+=8;
+      }
+    }
+    this.intersectionTestBuffer.isActive = false;
+    this.curIntersectionTestRequestCount = 0;
+  }else{
+    this.transferableMessageBody.flagsDescription[1] = -1;
+  }
+  if (sendMessage){
+    var cameraOrientationDescription = this.transferableMessageBody.cameraOrientationDescription;
+    cameraOrientationDescription[0] = camera.position.x; cameraOrientationDescription[1] = camera.position.y; cameraOrientationDescription[2] = camera.position.z;
+    cameraOrientationDescription[3] = camera.quaternion.x; cameraOrientationDescription[4] = camera.quaternion.y; cameraOrientationDescription[5] = camera.quaternion.z; cameraOrientationDescription[6] = camera.quaternion.w;
+    cameraOrientationDescription[7] = camera.aspect;
+    this.worker.postMessage(this.transferableMessageBody, this.transferableList);
+    this.hasOwnership = false;
+  }
+  if (this.record){
+    this.performanceLogs.flushTime = performance.now() - flushStartTime;
+  }
 }
 
 RaycasterWorkerBridge.prototype.refresh = function(){
@@ -24022,13 +22964,18 @@ RaycasterWorkerBridge.prototype.refresh = function(){
     return;
   }
   this.ready = false;
-  this.addedTextPositionUpdateCache = new Object();
-  this.cameraOrientationBuffer = new Float32Array(9);
-  this.cameraOrientationBufferAvailibility = true;
-  this.cameraOrientationBuffer[0] = 2;
-  this.raycasterAvailibilityModifierBuffer = new Map();
+  this.hasOwnership = false;
   this.updateBuffer = new Map();
-  this.textScaleUpdateBuffer = new Map();
+  this.intersectionTestBuffer = {
+    isActive: false, fromVectors: [] , directionVectors: [],
+    intersectGridSystems: [], callbackFunctions: []
+  };
+  for (var i = 0 ; i < this.maxIntersectionCountInAFrame; i ++){
+    this.intersectionTestBuffer.fromVectors.push(new THREE.Vector3());
+    this.intersectionTestBuffer.directionVectors.push(new THREE.Vector3());
+    this.intersectionTestBuffer.intersectGridSystems.push(false);
+    this.intersectionTestBuffer.callbackFunctions.push(noop);
+  }
   this.worker.postMessage(new LightweightState());
 }
 
@@ -24041,8 +22988,21 @@ RaycasterWorkerBridge.prototype.onAddedTextResize = function(addedText){
   }
   if (!addedText.is2D){
     if (mode == 0 || (mode == 1 && addedText.isClickable)){
-      rayCaster.textScaleUpdateBuffer.set(addedText.name, addedText);
+      rayCaster.addedTextScaleUpdateBuffer.set(addedText.name, addedText);
     }
+  }
+}
+
+RaycasterWorkerBridge.prototype.issueUpdate = function(obj){
+  obj.mesh.updateMatrixWorld();
+  var description = rayCaster.transferableMessageBody.intersectableObjDescription;
+  for (var i = obj.indexInIntersectableObjDescriptionArray + 2; i < obj.indexInIntersectableObjDescriptionArray + 18; i++){
+    description[i] = obj.mesh.matrixWorld.elements[i - obj.indexInIntersectableObjDescriptionArray - 2]
+  }
+  if (obj.isHidden){
+    description[obj.indexInIntersectableObjDescriptionArray+1] = -1;
+  }else{
+    description[obj.indexInIntersectableObjDescriptionArray+1] = 1;
   }
 }
 
@@ -24054,112 +23014,27 @@ RaycasterWorkerBridge.prototype.updateObject = function(obj){
     return;
   }
   this.updateBuffer.set(obj.name, obj);
-  if(obj.isAddedText){
-    this.hasUpdatedTexts = true;
-  }
 }
-
-RaycasterWorkerBridge.prototype.onBeforeUpdate = function(){
-  rayCaster.textScaleUpdateBuffer.forEach(rayCaster.updateAddedTextScale);
-  rayCaster.textScaleUpdateBuffer.clear();
-  if (rayCaster.hasUpdatedTexts){
-    if (rayCaster.cameraOrientationBufferAvailibility){
-      var buf = rayCaster.cameraOrientationBuffer;
-      buf[1] = camera.position.x; buf[2] = camera.position.y; buf[3] = camera.position.z;
-      buf[4] = camera.quaternion.x; buf[5] = camera.quaternion.y; buf[6] = camera.quaternion.z; buf[7] = camera.quaternion.w;
-      buf[8] = camera.aspect;
-      rayCaster.workerMessageHandler.push(buf.buffer);
-      rayCaster.cameraOrientationBufferAvailibility = false;
-      rayCaster.hasUpdatedTexts = false;
-    }
-  }
-  rayCaster.workerMessageHandler.flush();
-}
-
-RaycasterWorkerBridge.prototype.issueUpdate = function(obj){
-  if (obj.isAddedObject){
-    if (!obj.raycasterUpdateBufferAvailibility){
-      return;
-    }
-    if (obj.autoInstancedParent){
-      obj.mesh.updateMatrixWorld();
-    }
-    obj.raycasterUpdateBuffer.set(obj.mesh.matrixWorld.elements, 2);
-    rayCaster.workerMessageHandler.push(obj.raycasterUpdateBuffer.buffer);
-    obj.raycasterUpdateBufferAvailibility = false;
-    return;
-  }
-  if (obj.isObjectGroup){
-    if (!obj.raycasterUpdateBufferAvailibility){
-      return;
-    }
-    obj.raycasterUpdateBuffer.set(obj.mesh.matrixWorld.elements, 2);
-    rayCaster.workerMessageHandler.push(obj.raycasterUpdateBuffer.buffer);
-    obj.raycasterUpdateBufferAvailibility = false;
-    return;
-  }else if (obj.isAddedText){
-    if (!obj.raycasterUpdateBufferAvailibility){
-      return;
-    }
-    var updateAddedTextPosition = false;
-    if (!rayCaster.addedTextPositionUpdateCache){
-      rayCaster.addedTextPositionUpdateCache = new Object();
-      rayCaster.addedTextPositionUpdateCache[obj.name] = new THREE.Vector3();
-      updateAddedTextPosition = true;
-    }else if (!rayCaster.addedTextPositionUpdateCache[obj.name]){
-      rayCaster.addedTextPositionUpdateCache[obj.name] = new THREE.Vector3();
-      updateAddedTextPosition = true;
-    }else{
-      var cache = rayCaster.addedTextPositionUpdateCache[obj.name]
-      updateAddedTextPosition = ((cache.x != obj.mesh.position.x) || (cache.y != obj.mesh.position.y) || (cache.z != obj.mesh.position.z));
-    }
-    if (updateAddedTextPosition){
-      obj.raycasterUpdateBuffer[2] = obj.mesh.position.x; obj.raycasterUpdateBuffer[3] = obj.mesh.position.y; obj.raycasterUpdateBuffer[4] = obj.mesh.position.z;
-      rayCaster.workerMessageHandler.push(obj.raycasterUpdateBuffer.buffer);
-      obj.raycasterUpdateBufferAvailibility = false;
-    }
-  }
-}
-
 
 RaycasterWorkerBridge.prototype.findIntersections = function(from, direction, intersectGridSystems, callbackFunction){
-  var len = this.intersectionTestBuffers.length;
-  var sent = false;
-  for (var i = 0; i<len; i++){
-    if (this.intersectionTestBufferAvailibilities[i]){
-      var ary = this.intersectionTestBuffers[i];
-      ary[0] = i; ary[1] = from.x; ary[2] = from.y; ary[3] = from.z;
-      ary[4] = direction.x; ary[5] = direction.y; ary[6] = direction.z;
-      ary[7] = (intersectGridSystems? 1: 0)
-      var buf = ary.buffer;
-      rayCaster.workerMessageHandler.push(buf);
-      this.intersectionTestBufferAvailibilities[i] = false;
-      this.intersectionTestCallbackFunctions[i] = callbackFunction;
-      sent = true;
-      break;
-    }
-  }
-  if (!sent){
-    console.warn("[!] RaycasterWorkerBridge.findIntersections buffer overflow.");
+  if (this.curIntersectionTestRequestCount < this.maxIntersectionCountInAFrame){
+    var i = this.curIntersectionTestRequestCount;
+    this.intersectionTestBuffer.isActive = true;
+    this.intersectionTestBuffer.fromVectors[i].copy(from);
+    this.intersectionTestBuffer.directionVectors[i].copy(direction);
+    this.intersectionTestBuffer.intersectGridSystems[i] = intersectGridSystems;
+    this.intersectionTestBuffer.callbackFunctions[i] = callbackFunction;
+    this.curIntersectionTestRequestCount ++;
   }
 }
 
 RaycasterWorkerBridge.prototype.hide = function(object){
-  if (!object.raycasterHideBufferAvailibility){
-    return;
-  }
-  rayCaster.workerMessageHandler.push(object.raycasterHideBuffer.buffer);
-  rayCaster.handleBufferAvailibilityUpdate(object, rayCaster.raycasterHideBufferAvailibility);
+  this.updateBuffer.set(object.name, object);
 }
 
 RaycasterWorkerBridge.prototype.show = function(object){
-  if (!object.raycasterShowBufferAvailibility){
-    return;
-  }
-  rayCaster.workerMessageHandler.push(object.raycasterShowBuffer.buffer);
-  rayCaster.handleBufferAvailibilityUpdate(object, rayCaster.raycasterShowBufferAvailibility);
+  this.updateBuffer.set(object.name, object);
 }
-
 
 RaycasterWorkerBridge.prototype.query = function(point){
   throw new Error("not implemented.");
@@ -24226,71 +23101,6 @@ var LightweightState = function(){
   }
 }
 
-var WorkerMessageHandler = function(worker){
-  if (worker){
-    this.worker = worker;
-  }
-  this.record = false;
-  this.bufferIndex = 0;
-  this.elementCount = 0;
-  this.buffer = new Array(5);
-  this.preallocatedArrayCache = new Map();
-  this.performanceLogs = {
-    preallocatedArrayCacheSize: 0,
-    totalArraysSentLastFrame: 0,
-    totalBytesSentLastFrame: 0,
-    flushTimeLastFrame: 0
-  };
-}
-
-WorkerMessageHandler.prototype.startRecording = function(){
-  this.record = true;
-}
-
-WorkerMessageHandler.prototype.dumpPerformanceLogs = function(){
-  this.performanceLogs.preallocatedArrayCacheSize = this.preallocatedArrayCache.size;
-  console.log("%cFlush time last frame:" +this.performanceLogs.flushTimeLastFrame+" ms", "background: black; color: magenta");
-  console.log("%cPreallocated array cache size: "+this.performanceLogs.preallocatedArrayCacheSize, "background: black; color: magenta");
-  console.log("%cTotal arrays sent last frame: "+this.performanceLogs.totalArraysSentLastFrame, "background: black; color: magenta");
-  console.log("%cTotal bytes sent last frame: "+this.performanceLogs.totalBytesSentLastFrame, "background: black; color: magenta");
-}
-
-WorkerMessageHandler.prototype.push = function(data){
-  this.buffer[this.bufferIndex ++] = data;
-  this.elementCount ++;
-}
-
-WorkerMessageHandler.prototype.flush = function(){
-  if (this.elementCount > 0){
-    if (this.record){
-      this.performanceLogs.flushTimeLastFrame = performance.now();
-      this.performanceLogs.totalBytesSentLastFrame = 0;
-      this.performanceLogs.totalArraysSentLastFrame = this.elementCount;
-    }
-    var ary = this.preallocatedArrayCache.get(this.elementCount);
-    if (!ary){
-      ary = new Array(this.elementCount);
-      this.preallocatedArrayCache.set(this.elementCount, ary);
-    }
-    for (var i = 0; i<this.elementCount; i++){
-      ary[i] = this.buffer[i];
-      if (this.record){
-        this.performanceLogs.totalBytesSentLastFrame += this.buffer[i].byteLength
-      }
-    }
-    if (this.worker){
-      this.worker.postMessage(ary);
-    }else{
-      postMessage(ary);
-    }
-    this.elementCount = 0;
-    this.bufferIndex = 0;
-    if (this.record){
-      this.performanceLogs.flushTimeLastFrame = performance.now() - this.performanceLogs.flushTimeLastFrame;
-    }
-  }
-}
-
 var PointerLockEventHandler = function(){
   if (isMobile){
     return;
@@ -24308,11 +23118,14 @@ var PointerLockEventHandler = function(){
   if (pointerLockChangeFunction){
     document.addEventListener(pointerLockChangeFunction, this.onPointerLock);
   }
+  this.isPointerLocked = false;
 }
 
 PointerLockEventHandler.prototype.onPointerLock = function(event){
+  var isPointerLocked = document.pointerLockElement == canvas || document.mozPointerLockElement == canvas || document.webkitPointerLockElement == canvas;
+  pointerLockEventHandler.isPointerLocked = isPointerLocked;
   if (mode == 1 && screenPointerLockChangedCallbackFunction){
-    if (document.pointerLockElement == canvas || document.mozPointerLockElement == canvas || document.webkitPointerLockElement == canvas){
+    if (isPointerLocked){
       screenPointerLockChangedCallbackFunction(true);
     }else{
       screenPointerLockChangedCallbackFunction(false);
@@ -24321,6 +23134,9 @@ PointerLockEventHandler.prototype.onPointerLock = function(event){
 }
 
 var TouchEventHandler = function(){
+  if (!isMobile){
+    return;
+  }
   canvas.addEventListener('touchstart', this.onTouchStart, false);
   canvas.addEventListener('touchmove', this.onTouchMove, false);
   canvas.addEventListener('touchcancel', this.onTouchEnd, false);
@@ -24483,7 +23299,7 @@ var MouseEventHandler = function(){
   canvas.addEventListener("mousedown", this.onMouseDown);
   canvas.addEventListener("mouseup", this.onMouseUp);
   canvas.addEventListener("mousemove", this.onMouseMove);
-  window.addEventListener('mousewheel', this.onMouseWheel, false);
+  canvas.addEventListener('mousewheel', this.onMouseWheel, false);
   if (typeof InstallTrigger !== 'undefined') {
     // M O Z I L L A
     window.addEventListener('wheel', this.onMouseWheel, false);
@@ -24559,17 +23375,36 @@ MouseEventHandler.prototype.onMouseWheel = function(event){
   }
 }
 
+MouseEventHandler.prototype.handleObjectMouseEvents = function(){
+  if (isMobile || typeof this.coordX == UNDEFINED || pointerLockEventHandler.isPointerLocked){
+    return;
+  }
+  var objectsWithMouseOverListenersSize = objectsWithMouseOverListeners.size;
+  var objectsWithMouseOutListenerSize = objectsWithMouseOutListeners.size;
+  if (mode == 1 && (objectsWithMouseOverListenersSize > 0 || objectsWithMouseOutListenerSize > 0)){
+    // TRY TO PICK 2D OBJECTS FIRST
+    objectPicker2D.find(this.clientX, this.clientY);
+    if (!intersectionPoint){
+      REUSABLE_VECTOR.setFromMatrixPosition(camera.matrixWorld);
+      REUSABLE_VECTOR_2.set(this.coordX, this.coordY, 0.5).unproject(camera).sub(REUSABLE_VECTOR).normalize();
+      rayCaster.findIntersections(REUSABLE_VECTOR, REUSABLE_VECTOR_2, false, onRaycasterMouseMoveIntersection);
+    }else{
+      onRaycasterMouseMoveIntersection();
+    }
+  }
+}
+
 MouseEventHandler.prototype.onMouseMove = function(event){
   inactiveCounter = 0;
+  var rect = boundingClientRect;
+  mouseEventHandler.clientX = event.clientX;
+  mouseEventHandler.clientY = event.clientY;
+  mouseEventHandler.coordX = ((event.clientX - rect.left) / rect.width) * 2 - 1;
+  mouseEventHandler.coordY = - ((event.clientY - rect.top) / rect.height) * 2 + 1;
+  mouseEventHandler.movementX = event.movementX || event.mozMovementX || event.webkitMovementX || 0;
+  mouseEventHandler.movementY = event.movementY || event.mozMovementY || event.webkitMovementY || 0;
   if (mode == 1 && screenMouseMoveCallbackFunction){
-    var rect = boundingClientRect;
-    var coordX = ((event.clientX - rect.left) / rect.width) * 2 - 1;
-    var coordY = - ((event.clientY - rect.top) / rect.height) * 2 + 1;
-    var movementX = event.movementX || event.mozMovementX ||
-                    event.webkitMovementX || 0;
-    var movementY = event.movementY || event.mozMovementY ||
-                    event.webkitMovementY || 0;
-    screenMouseMoveCallbackFunction(coordX, coordY, movementX, movementY);
+    screenMouseMoveCallbackFunction(mouseEventHandler.coordX, mouseEventHandler.coordY, mouseEventHandler.movementX, mouseEventHandler.movementY);
   }
 }
 
@@ -24636,6 +23471,9 @@ MouseEventHandler.prototype.onClick = function(event){
     if (event.clientX < rectX || event.clientX > rectX + rectZ || event.clientY < rectY || event.clientY > rectY + rectW){
       return;
     }
+    if (mode == 1 && objectsWithOnClickListeners.size == 0){
+      return;
+    }
     // TRY TO PICK 2D OBJECTS FIRST
     objectPicker2D.find(event.clientX, event.clientY);
     if (!intersectionPoint){
@@ -24653,15 +23491,14 @@ var ResizeEventHandler = function(){
 }
 
 ResizeEventHandler.prototype.onResize = function(){
-  if (!(renderer && composer)){
+  if (!(renderer)){
     return;
   }
   renderer.setSize(window.innerWidth, window.innerHeight);
-  composer.setSize(window.innerWidth, window.innerHeight);
   camera.oldAspect = camera.aspect;
   camera.aspect = window.innerWidth / window.innerHeight;
   camera.updateProjectionMatrix();
-  boundingClientRect = renderer.domElement.getBoundingClientRect();
+  boundingClientRect = renderer.getBoundingClientRect();
   if (isDeployment){
     canvas.oldWidth = (canvas.width / screenResolution) + 'px';
     if (!isDeployment && terminal.isMadeVisible){
@@ -24676,9 +23513,6 @@ ResizeEventHandler.prototype.onResize = function(){
     handleViewport();
     if (particleSystemRefHeight){
       GLOBAL_PS_REF_HEIGHT_UNIFORM.value = ((renderer.getCurrentViewport().w / screenResolution) / particleSystemRefHeight);
-    }
-    if (bloomOn){
-      adjustPostProcessing(4, bloomResolutionScale);
     }
   }
   if (mode == 0){
@@ -24710,6 +23544,9 @@ ResizeEventHandler.prototype.onResize = function(){
 }
 
 var OrientationChangeEventHandler = function(){
+  if (!isMobile){
+    return;
+  }
   window.addEventListener('orientationchange', resizeEventHandler.onResize);
 }
 
@@ -25014,34 +23851,21 @@ PhysicsBodyGenerator.prototype.generateSphereBody = function(params){
 }
 
 var PhysicsWorkerBridge = function(){
+  this.record = false;
   this.isPhysicsWorkerBridge = true;
   this.worker = new Worker("./js/worker/PhysicsWorker.js");
-  this.workerMessageHandler = new WorkerMessageHandler(this.worker);
   this.ready = false;
   this.idsByObjectName = new Object();
   this.objectsByID = new Object();
-  this.updateBufferAvailibility = "updateBufferAvailibility";
-  this.resetVelocityBufferAvailibility = "resetVelocityBufferAvailibility";
-  this.collisionListenerRemoveRequestBufferAvailibility = "collisionListenerRemoveRequestBufferAvailibility";
-  this.collisionListenerRequestBufferAvailibility = "collisionListenerRequestBufferAvailibility";
-  this.setVelocityBufferAvailibility = "setVelocityBufferAvailibility";
-  this.setVelocityXBufferAvailibility = "setVelocityXBufferAvailibility";
-  this.setVelocityYBufferAvailibility = "setVelocityYBufferAvailibility";
-  this.setVelocityZBufferAvailibility = "setVelocityZBufferAvailibility";
-  this.applyImpulseBufferAvailibility = "applyImpulseBufferAvailibility";
-  this.showBufferAvailibility = "showBufferAvailibility";
-  this.hideBufferAvailibility = "hideBufferAvailibility";
-  this.setMassBufferAvailibility = "setMassBufferAvailibility"
+  this.updateBuffer = new Map();
+  this.performanceLogs = {
+    objectDescriptionBufferSize: 0, collisionDescriptionBufferSize: 0
+  }
   this.worker.addEventListener("message", function(msg){
     if (msg.data.isPerformanceLog){
       console.log("%c                    PHYSICS WORKER                    ", "background: black; color: lime");
       console.log("%cStep time: "+msg.data.stepTime+" ms", "background: black; color: magenta");
-      console.log("%cDynamic objects update time: "+msg.data.dynamicObjectsUpdate+" ms", "background: black; color: magenta");
-      console.log("%cWorker message handler flush time: "+msg.data.workerMessageHandler_flushTimeLastFrame+" ms", "background: black; color: magenta");
-      console.log("%cPreallocated array cache size: "+msg.data.workerMessageHandler_preallocatedArrayCacheSize, "background: black; color: magenta");
-      console.log("%cTotal arrays sent last frame: "+msg.data.workerMessageHandler_totalArraysSentLastFrame, "background: black; color: magenta");
-      console.log("%cTotal bytes sent last frame: "+msg.data.workerMessageHandler_totalBytesSentLastFrame, "background: black; color: magenta");
-    }if (msg.data.isDebug){
+    }else if (msg.data.isDebug){
       console.log("[*] Debug response received.");
       for (var i = 0; i<msg.data.bodies.length; i++){
         var obj = addedObjects[msg.data.bodies[i].name] || objectGroups[msg.data.bodies[i].name];
@@ -25061,163 +23885,151 @@ var PhysicsWorkerBridge = function(){
           throw new Error("[!] PhysicsWorkerBridge object not found: "+curIDInfo.name);
         }
         physicsWorld.objectsByID[curIDInfo.id] = obj;
-        physicsWorld.initializeObjectBuffers(obj);
       }
+      physicsWorld.initTransferableBody();
       physicsWorld.ready = true;
     }else{
-      for (var i = 0; i<msg.data.length; i++){
-        var ary = new Float32Array(msg.data[i]);
-        switch(ary[0]){
-          case 0:
-            var objID = ary[1];
-            var obj = physicsWorld.objectsByID[objID];
-            obj.updateBuffer = ary;
-            obj.updateBufferAvailibility = true;
-            obj.isPhysicsDirty = false;
-          break;
-          case 1:
-            physicsWorld.tickBuffer = ary;
-            physicsWorld.tickBufferAvailibility = true;
-          break;
-          case 2:
-            if (mode == 0){
-              physicsWorld.workerMessageHandler.push(ary.buffer);
-              return;
-            }
-            var obj = physicsWorld.objectsByID[ary[1]];
-            if (!obj.isPhysicsDirty && obj.physicsBody.mass > 0){
-              obj.physicsBody.position.set(ary[2], ary[3], ary[4]);
-              obj.physicsBody.quaternion.set(ary[5], ary[6], ary[7], ary[8]);
-            }
-            physicsWorld.workerMessageHandler.push(ary.buffer);
-          break;
-          case 3:
-            var objID = ary[1];
-            var obj = physicsWorld.objectsByID[objID];
-            obj.resetVelocityBuffer = ary;
-            obj.resetVelocityBufferAvailibility = true;
-          break;
-          case 4:
-            var objID = ary[1];
-            var obj = physicsWorld.objectsByID[objID];
-            obj.setVelocityBuffer = ary;
-            obj.setVelocityBufferAvailibility = true;
-          break;
-          case 5:
-            var objID = ary[1];
-            var obj = physicsWorld.objectsByID[objID];
-            obj.setVelocityXBuffer = ary;
-            obj.setVelocityXBufferAvailibility = true;
-          break;
-          case 6:
-            var objID = ary[1];
-            var obj = physicsWorld.objectsByID[objID];
-            obj.setVelocityYBuffer = ary;
-            obj.setVelocityYBufferAvailibility = true;
-          break;
-          case 7:
-            var objID = ary[1];
-            var obj = physicsWorld.objectsByID[objID];
-            obj.setVelocityZBuffer = ary;
-            obj.setVelocityZBufferAvailibility = true;
-          break;
-          case 8:
-            var objID = ary[1];
-            var obj = physicsWorld.objectsByID[objID];
-            obj.applyImpulseBuffer = ary;
-            obj.applyImpulseBufferAvailibility = true;
-          break;
-          case 9:
-            var objID = ary[1];
-            var obj = physicsWorld.objectsByID[objID];
-            obj.showBuffer = ary;
-            obj.showBufferAvailibility = true;
-          break;
-          case 10:
-            var objID = ary[1];
-            var obj = physicsWorld.objectsByID[objID];
-            obj.hideBuffer = ary;
-            obj.hideBufferAvailibility = true;
-          break;
-          case 11:
-            var objID = ary[1];
-            var obj = physicsWorld.objectsByID[objID];
-            obj.setMassBuffer = ary;
-            obj.setMassBufferAvailibility = true;
-          break;
-          case 12:
-            var obj = physicsWorld.objectsByID[ary[1]];
-            obj.collisionListenerRequestBuffer = ary;
-            obj.collisionListenerRequestBufferAvailibility = true;
-          break;
-          case 13:
-            if (mode != 0){
-              physicsWorld.fireCollision(ary);
-            }
-            physicsWorld.workerMessageHandler.push(ary.buffer);
-          break;
-          case 14:
-            var obj = physicsWorld.objectsByID[ary[1]];
-            obj.collisionListenerRemoveRequestBuffer = ary;
-            obj.collisionListenerRemoveRequestBufferAvailibility = true;
-          break;
-        }
-      }
+      physicsWorld.updateObjects(msg.data);
     }
   });
 }
 
-PhysicsWorkerBridge.prototype.initializeObjectBuffers = function(obj){
-  obj.availibilityModifierBuffer = new Map();
-  var id = physicsWorld.idsByObjectName[obj.name];
-  obj.collisionListenerRequestBuffer = new Float32Array(2);
-  obj.collisionListenerRequestBufferAvailibility = true;
-  obj.collisionListenerRequestBuffer[0] = 12;
-  obj.collisionListenerRequestBuffer[1] = id;
-  obj.collisionListenerRemoveRequestBuffer = new Float32Array(2);
-  obj.collisionListenerRemoveRequestBufferAvailibility = true;
-  obj.collisionListenerRemoveRequestBuffer[0] = 14;
-  obj.collisionListenerRemoveRequestBuffer[1] = id;
-  obj.updateBuffer = new Float32Array(9);
-  obj.updateBufferAvailibility = true;
-  obj.updateBuffer[0] = 0;
-  obj.updateBuffer[1] = id;
-  obj.resetVelocityBuffer = new Float32Array(2);
-  obj.resetVelocityBufferAvailibility = true;
-  obj.resetVelocityBuffer[0] = 3;
-  obj.resetVelocityBuffer[1] = id;
-  obj.setVelocityBuffer = new Float32Array(5);
-  obj.setVelocityBufferAvailibility = true;
-  obj.setVelocityBuffer[0] = 4;
-  obj.setVelocityBuffer[1] = id;
-  obj.setVelocityXBuffer = new Float32Array(3);
-  obj.setVelocityXBufferAvailibility = true;
-  obj.setVelocityXBuffer[0] = 5;
-  obj.setVelocityXBuffer[1] = id;
-  obj.setVelocityYBuffer = new Float32Array(3);
-  obj.setVelocityYBufferAvailibility = true;
-  obj.setVelocityYBuffer[0] = 6;
-  obj.setVelocityYBuffer[1] = id;
-  obj.setVelocityZBuffer = new Float32Array(3);
-  obj.setVelocityZBufferAvailibility = true;
-  obj.setVelocityZBuffer[0] = 7;
-  obj.setVelocityZBuffer[1] = id;
-  obj.applyImpulseBuffer = new Float32Array(8);
-  obj.applyImpulseBufferAvailibility = true;
-  obj.applyImpulseBuffer[0] = 8;
-  obj.applyImpulseBuffer[1] = id;
-  obj.showBuffer = new Float32Array(2);
-  obj.showBufferAvailibility = true;
-  obj.showBuffer[0] = 9;
-  obj.showBuffer[1] = id;
-  obj.hideBuffer = new Float32Array(2);
-  obj.hideBufferAvailibility = true;
-  obj.hideBuffer[0] = 10;
-  obj.hideBuffer[1] = id;
-  obj.setMassBuffer = new Float32Array(3);
-  obj.setMassBufferAvailibility = true;
-  obj.setMassBuffer[0] = 11;
-  obj.setMassBuffer[1] = id;
+PhysicsWorkerBridge.prototype.startRecording = function(){
+  this.record = true;
+}
+
+PhysicsWorkerBridge.prototype.dumpPerformanceLogs = function(){
+  console.log("%cObject description buffer length: "+this.performanceLogs.objectDescriptionBufferSize, "background: black; color: magenta");
+  console.log("%cCollision description buffer length: "+this.performanceLogs.collisionDescriptionBufferSize, "background: black; color: magenta");
+}
+
+PhysicsWorkerBridge.prototype.issueUpdate = function(obj){
+  var ary = physicsWorld.transferableMessageBody.objDescription;
+  var i = obj.indexInPhysicsObjDescriptionArray;
+  if (obj.isPositionDirty){
+    ary[i+1] = obj.physicsBody.position.x; ary[i+2] = obj.physicsBody.position.y; ary[i+3] = obj.physicsBody.position.z;
+    obj.isPositionDirty = false;
+  }
+  if (obj.isRotationDirty){
+    ary[i+4] = obj.physicsBody.quaternion.x; ary[i+5] = obj.physicsBody.quaternion.y; ary[i+6] = obj.physicsBody.quaternion.z; ary[i+7] = obj.physicsBody.quaternion.w;
+    obj.isRotationDirty = false;
+  }
+  ary[i+8] = obj.physicsBody.mass;
+  if (obj.isVelocityXDirty){
+    ary[i+9] = obj.physicsBody.velocity.x;
+    obj.isVelocityXDirty = false;
+  }
+  if (obj.isVelocityYDirty){
+    ary[i+10] = obj.physicsBody.velocity.y;
+    obj.isVelocityYDirty = false;
+  }
+  if (obj.isVelocityZDirty){
+    ary[i+11] = obj.physicsBody.velocity.z;
+    obj.isVelocityZDirty = false;
+  }
+  ary[i+12] = obj.impulseVec1.x; ary[i+13] = obj.impulseVec1.y; ary[i+14] = obj.impulseVec1.z;
+  ary[i+15] = obj.impulseVec2.x; ary[i+16] = obj.impulseVec2.y; ary[i+17] = obj.impulseVec2.z;
+  ary[i+18] = 1;
+  if (!obj.mesh.visible && !obj.physicsKeptWhenHidden){
+    ary[i+18] = 0;
+  }
+}
+
+PhysicsWorkerBridge.prototype.handleCollisions = function(collisionDescription){
+  if (collisionDescription){
+    for (var i = 0; i<collisionDescription.length; i+= 10){
+      if (collisionDescription[i] < 0){
+        break;
+      }
+      var sourceObject = physicsWorld.objectsByID[collisionDescription[i]];
+      var targetObject = physicsWorld.objectsByID[collisionDescription[i+1]];
+      var positionX = collisionDescription[i+2];
+      var positionY = collisionDescription[i+3];
+      var positionZ = collisionDescription[i+4];
+      var collisionImpact = collisionDescription[i+5];
+      var quaternionX = collisionDescription[i+6];
+      var quaternionY = collisionDescription[i+7];
+      var quaternionZ = collisionDescription[i+8];
+      var quaternionW = collisionDescription[i+9];
+      reusableCollisionInfo.set(targetObject.name, positionX, positionY, positionZ, collisionImpact, quaternionX, quaternionY, quaternionZ, quaternionW);
+      var curCollisionCallbackRequest = collisionCallbackRequests.get(sourceObject.name);
+      if (curCollisionCallbackRequest){
+        curCollisionCallbackRequest(reusableCollisionInfo);
+      }
+      collisionDescription[i] = -1;
+    }
+  }
+  return collisionDescription;
+}
+
+PhysicsWorkerBridge.prototype.updateObjects = function(data){
+  if (mode != 1){
+    return;
+  }
+  var ary = data.objDescription;
+  var collisionDescription = this.handleCollisions(data.collisionDescription);
+  this.transferableMessageBody.objDescription = ary;
+  this.transferableList[0] = ary.buffer;
+  if (collisionDescription){
+    this.transferableMessageBody.collisionDescription = collisionDescription;
+    if (this.transferableList.length == 1){
+      this.transferableList.push(collisionDescription.buffer);
+    }else{
+      this.transferableList[1] = collisionDescription.buffer;
+    }
+  }
+  this.hasOwnership = true;
+  this.updateBuffer.forEach(this.issueUpdate);
+  this.updateBuffer.clear();
+  for (var i = 0; i<ary.length; i+=19){
+    var obj = this.objectsByID[ary[i]];
+    obj.physicsBody.position.x = ary[i+1]; obj.physicsBody.position.y = ary[i+2]; obj.physicsBody.position.z = ary[i+3];
+    obj.physicsBody.quaternion.x = ary[i+4]; obj.physicsBody.quaternion.y = ary[i+5]; obj.physicsBody.quaternion.z = ary[i+6]; obj.physicsBody.quaternion.w = ary[i+7];
+    obj.physicsBody.velocity.x = ary[i+9]; obj.physicsBody.velocity.y = ary[i+10]; obj.physicsBody.velocity.z = ary[i+11];
+    obj.impulseVec1.set(0, 0, 0); obj.impulseVec2.set(0, 0, 0);
+  }
+}
+
+PhysicsWorkerBridge.prototype.initTransferableBody = function(){
+  //objectID, px, py, pz, qx, qy, qz, qw, mass, vx, vy, vz, impulseVec1x, impulseVec1y, impulseVec1xz, impulseVec2x, impulseVec2y, impulseVec2z, isVisible
+  var objDescriptionAry = [];
+  var index = 0;
+  for (var objName in addedObjects){
+    var obj = addedObjects[objName];
+    if (obj.isChangeable || (!obj.noMass && obj.physicsBody.mass > 0)){
+      obj.impulseVec1 = new THREE.Vector3(); obj.impulseVec2 = new THREE.Vector3();
+      objDescriptionAry.push(physicsWorld.idsByObjectName[obj.name]);
+      objDescriptionAry.push(obj.physicsBody.position.x); objDescriptionAry.push(obj.physicsBody.position.y); objDescriptionAry.push(obj.physicsBody.position.z);
+      objDescriptionAry.push(obj.physicsBody.quaternion.x); objDescriptionAry.push(obj.physicsBody.quaternion.y); objDescriptionAry.push(obj.physicsBody.quaternion.z); objDescriptionAry.push(obj.physicsBody.quaternion.w);
+      objDescriptionAry.push(obj.physicsBody.mass);
+      objDescriptionAry.push(obj.physicsBody.velocity.x); objDescriptionAry.push(obj.physicsBody.velocity.y); objDescriptionAry.push(obj.physicsBody.velocity.z);
+      objDescriptionAry.push(0); objDescriptionAry.push(0); objDescriptionAry.push(0); objDescriptionAry.push(0); objDescriptionAry.push(0); objDescriptionAry.push(0);
+      objDescriptionAry.push(1);
+      obj.indexInPhysicsObjDescriptionArray = index;
+      index += 19;
+    }
+  }
+  for (var objName in objectGroups){
+    var obj = objectGroups[objName];
+    if (obj.isChangeable || (!obj.noMass && obj.physicsBody.mass > 0)){
+      obj.impulseVec1 = new THREE.Vector3(); obj.impulseVec2 = new THREE.Vector3();
+      objDescriptionAry.push(physicsWorld.idsByObjectName[obj.name]);
+      objDescriptionAry.push(obj.physicsBody.position.x); objDescriptionAry.push(obj.physicsBody.position.y); objDescriptionAry.push(obj.physicsBody.position.z);
+      objDescriptionAry.push(obj.physicsBody.quaternion.x); objDescriptionAry.push(obj.physicsBody.quaternion.y); objDescriptionAry.push(obj.physicsBody.quaternion.z); objDescriptionAry.push(obj.physicsBody.quaternion.w);
+      objDescriptionAry.push(obj.physicsBody.mass);
+      objDescriptionAry.push(obj.physicsBody.velocity.x); objDescriptionAry.push(obj.physicsBody.velocity.y); objDescriptionAry.push(obj.physicsBody.velocity.z);
+      objDescriptionAry.push(0); objDescriptionAry.push(0); objDescriptionAry.push(0); objDescriptionAry.push(0); objDescriptionAry.push(0); objDescriptionAry.push(0);
+      objDescriptionAry.push(1);
+      obj.indexInPhysicsObjDescriptionArray = index;
+      index += 19;
+    }
+  }
+  var objDescriptionTypedArray = new Float32Array(objDescriptionAry);
+  this.transferableMessageBody = {
+    objDescription: objDescriptionTypedArray
+  }
+  this.transferableList = [objDescriptionTypedArray.buffer];
+  this.hasOwnership = true;
 }
 
 PhysicsWorkerBridge.prototype.debug = function(){
@@ -25228,46 +24040,23 @@ PhysicsWorkerBridge.prototype.refresh = function(){
   if (mode == 0){
     return;
   }
-  this.tickBuffer = new Float32Array(2);
-  this.tickBuffer[0] = 1;
-  this.tickBufferAvailibility = true;
   this.idsByObjectName = new Object();
   this.objectsByID = new Object();
-  this.availibilityModifierBuffer = new Map();
+  this.updateBuffer = new Map();
   this.ready = false;
   this.worker.postMessage(new LightweightState());
 }
 
-PhysicsWorkerBridge.prototype.issueObjectAvailibilityBuffers = function(obj, bufferKey){
-  obj[bufferKey] = false;
-}
-
-PhysicsWorkerBridge.prototype.issueAvailibilityBuffers = function(obj, key){
-  obj.availibilityModifierBuffer.forEach(physicsWorld.issueObjectAvailibilityBuffers);
-  obj.availibilityModifierBuffer.clear();
-}
-
 PhysicsWorkerBridge.prototype.removeCollisionListener = function(obj){
-  if (obj.collisionListenerRemoveRequestBufferAvailibility){
-    physicsWorld.workerMessageHandler.push(obj.collisionListenerRemoveRequestBuffer.buffer);
-    physicsWorld.handleBufferAvailibilityUpdate(obj, physicsWorld.collisionListenerRemoveRequestBufferAvailibility);
-  }
+  this.worker.postMessage({
+    isRemoveCollisionListener: true, objName: obj.name
+  });
 }
 
 PhysicsWorkerBridge.prototype.setCollisionListener = function(obj){
-  if (obj.collisionListenerRequestBufferAvailibility){
-    physicsWorld.workerMessageHandler.push(obj.collisionListenerRequestBuffer.buffer);
-    physicsWorld.handleBufferAvailibilityUpdate(obj, physicsWorld.collisionListenerRequestBufferAvailibility);
-  }
-}
-
-PhysicsWorkerBridge.prototype.fireCollision = function(ary){
-  var obj = physicsWorld.objectsByID[ary[1]];
-  var curCollisionCallbackRequest = collisionCallbackRequests.get(obj.name);
-  if (curCollisionCallbackRequest){
-    reusableCollisionInfo.set(physicsWorld.objectsByID[ary[2]].name, ary[3], ary[4], ary[5], ary[6], ary[7], ary[8], ary[9], ary[10]);
-    curCollisionCallbackRequest(reusableCollisionInfo);
-  }
+  this.worker.postMessage({
+    isSetCollisionListener: true, objName: obj.name
+  });
 }
 
 PhysicsWorkerBridge.prototype.init = function(){
@@ -25291,124 +24080,70 @@ PhysicsWorkerBridge.prototype.addBody = function(body){
 }
 
 PhysicsWorkerBridge.prototype.step = function(stepAmount){
-  if (!this.ready){
+  if (!this.ready || !this.hasOwnership){
     return;
   }
-  this.tickBuffer[1] = stepAmount;
-  this.workerMessageHandler.push(this.tickBuffer.buffer);
-  this.tickBufferAvailibility = false;
-  if (this.availibilityModifierBuffer.size > 0){
-    this.availibilityModifierBuffer.forEach(this.issueAvailibilityBuffers);
-    this.availibilityModifierBuffer.clear();
+  if (this.record){
+    this.performanceLogs.objectDescriptionBufferSize = this.transferableMessageBody.objDescription.length;
+    if (this.transferableMessageBody.collisionDescription){
+      this.performanceLogs.collisionDescriptionBufferSize = this.transferableMessageBody.collisionDescription.length;
+    }
   }
-  this.workerMessageHandler.flush();
+  this.worker.postMessage(this.transferableMessageBody, this.transferableList);
+  this.hasOwnership = false;
 }
 
-PhysicsWorkerBridge.prototype.handleBufferAvailibilityUpdate = function(obj, key){
-  physicsWorld.availibilityModifierBuffer.set(obj.name, obj);
-  obj.availibilityModifierBuffer.set(key, obj);
-}
-
-PhysicsWorkerBridge.prototype.updateObject = function(obj){
-  if (!obj.updateBufferAvailibility){
-    return;
-  }
-  obj.isPhysicsDirty = true;
-  var buf = obj.updateBuffer;
-  buf[2] = obj.physicsBody.position.x; buf[3] = obj.physicsBody.position.y; buf[4] = obj.physicsBody.position.z;
-  buf[5] = obj.physicsBody.quaternion.x; buf[6] = obj.physicsBody.quaternion.y; buf[7] = obj.physicsBody.quaternion.z;
-  buf[8] = obj.physicsBody.quaternion.w;
-  physicsWorld.workerMessageHandler.push(buf.buffer);
-  physicsWorld.handleBufferAvailibilityUpdate(obj, physicsWorld.updateBufferAvailibility);
+PhysicsWorkerBridge.prototype.updateObject = function(obj, isPositionUpdated, isRotationUpdated){
+  obj.isPositionDirty = isPositionUpdated;
+  obj.isRotationDirty = isRotationUpdated;
+  this.updateBuffer.set(obj.name, obj);
 }
 
 PhysicsWorkerBridge.prototype.setObjectVelocity = function(obj, velocityVector){
-  if (!obj.setVelocityBufferAvailibility){
-    return;
-  }
-  var buf = obj.setVelocityBuffer;
-  buf[2] = obj.physicsBody.velocity.x;
-  buf[3] = obj.physicsBody.velocity.y;
-  buf[4] = obj.physicsBody.velocity.z;
-  physicsWorld.workerMessageHandler.push(buf.buffer);
-  physicsWorld.handleBufferAvailibilityUpdate(obj, physicsWorld.setVelocityBufferAvailibility);
+  this.updateBuffer.set(obj.name, obj);
+  obj.isVelocityXDirty = true;
+  obj.isVelocityYDirty = true;
+  obj.isVelocityZDirty = true;
 }
 
 PhysicsWorkerBridge.prototype.setObjectVelocityX = function(obj, vx){
-  if (!obj.setVelocityXBufferAvailibility){
-    return;
-  }
-  var buf = obj.setVelocityXBuffer;
-  buf[2] = vx;
-  physicsWorld.workerMessageHandler.push(buf.buffer);
-  physicsWorld.handleBufferAvailibilityUpdate(obj, physicsWorld.setVelocityXBufferAvailibility);
+  this.updateBuffer.set(obj.name, obj);
+  obj.isVelocityXDirty = true;
 }
 
 PhysicsWorkerBridge.prototype.setObjectVelocityY = function(obj, vy){
-  if (!obj.setVelocityYBufferAvailibility){
-    return;
-  }
-  var buf = obj.setVelocityYBuffer;
-  buf[2] = vy;
-  physicsWorld.workerMessageHandler.push(buf.buffer);
-  physicsWorld.handleBufferAvailibilityUpdate(obj, physicsWorld.setVelocityYBufferAvailibility);
+  this.updateBuffer.set(obj.name, obj);
+  obj.isVelocityYDirty = true;
 }
 
 PhysicsWorkerBridge.prototype.setObjectVelocityZ = function(obj, vz){
-  if (!obj.setVelocityZBufferAvailibility){
-    return;
-  }
-  var buf = obj.setVelocityZBuffer;
-  buf[2] = vz;
-  physicsWorld.workerMessageHandler.push(buf.buffer);
-  physicsWorld.handleBufferAvailibilityUpdate(obj, physicsWorld.setVelocityZBufferAvailibility);
+  this.updateBuffer.set(obj.name, obj);
+  obj.isVelocityZDirty = true;
 }
 
 PhysicsWorkerBridge.prototype.resetObjectVelocity = function(obj){
-  if (!obj.resetVelocityBufferAvailibility){
-    return;
-  }
-  var buf = obj.resetVelocityBuffer;
-  physicsWorld.workerMessageHandler.push(buf.buffer);
-  physicsWorld.handleBufferAvailibilityUpdate(obj, physicsWorld.resetVelocityBufferAvailibility);
+  this.updateBuffer.set(obj.name, obj);
+  obj.isVelocityXDirty = true;
+  obj.isVelocityYDirty = true;
+  obj.isVelocityZDirty = true;
 }
 
 PhysicsWorkerBridge.prototype.applyImpulse = function(obj, vec1, vec2){
-  if (!obj.applyImpulseBufferAvailibility){
-    return;
-  }
-  var buf = obj.applyImpulseBuffer;
-  buf[2] = vec1.x; buf[3] = vec1.y; buf[4] = vec1.z; buf[5] = vec2.x; buf[6] = vec2.y; buf[7] = vec2.z;
-  physicsWorld.workerMessageHandler.push(buf.buffer);
-  physicsWorld.handleBufferAvailibilityUpdate(obj, physicsWorld.applyImpulseBufferAvailibility);
+  obj.impulseVec1.copy(vec1);
+  obj.impulseVec2.copy(vec2);
+  this.updateBuffer.set(obj.name, obj);
 }
 
 PhysicsWorkerBridge.prototype.hide = function(obj){
-  if (!obj.hideBufferAvailibility){
-    return;
-  }
-  var buf = obj.hideBuffer;
-  physicsWorld.workerMessageHandler.push(buf.buffer);
-  physicsWorld.handleBufferAvailibilityUpdate(obj, physicsWorld.hideBufferAvailibility);
+  this.updateBuffer.set(obj.name, obj);
 }
 
 PhysicsWorkerBridge.prototype.show = function(obj){
-  if (!obj.showBufferAvailibility){
-    return;
-  }
-  var buf = obj.showBuffer;
-  physicsWorld.workerMessageHandler.push(buf.buffer);
-  physicsWorld.handleBufferAvailibilityUpdate(obj, physicsWorld.showBufferAvailibility);
+  this.updateBuffer.set(obj.name, obj);
 }
 
 PhysicsWorkerBridge.prototype.setMass = function(obj, mass){
-  if (!obj.setMassBufferAvailibility){
-    return;
-  }
-  var buf = obj.setMassBuffer;
-  buf[2] = mass;
-  physicsWorld.workerMessageHandler.push(buf.buffer);
-  physicsWorld.handleBufferAvailibilityUpdate(obj, physicsWorld.setMassBufferAvailibility);
+  this.updateBuffer.set(obj.name, obj);
 }
 
 var THREEJSRenderMonitoringHandler = function(){
@@ -25497,6 +24232,11 @@ THREEJSRenderMonitoringHandler.prototype.dumpPerformanceLogs = function(){
 
 THREEJSRenderMonitoringHandler.prototype.dispatchEvent = function(eventID, isStartEvent){
   if (!this.record){
+    return;
+  }
+  if (!this.renderOperations[this.currentRenderCallCountPerFrame-1]){
+    this.maxRenderCallCountPerFrame = this.currentRenderCallCountPerFrame;
+    this.startRecording();
     return;
   }
   var curCounter = this.renderOperations[this.currentRenderCallCountPerFrame-1].counters;
@@ -25618,6 +24358,27 @@ AutoInstancedObject.prototype.showObject = function(object){
   orientationAry[index].x = 10;
 }
 
+AutoInstancedObject.prototype.forceColor = function(object, r, g, b, a){
+  var index = this.forcedColorIndicesByObjectName.get(object.name);
+  var forcedColorAry = this.mesh.material.uniforms.autoInstanceForcedColorArray.value;
+  forcedColorAry[index].set(a, r, g, b);
+  if (a < 0){
+    a = 0;
+  }
+  if (a > 1){
+    a = 1;
+  }
+  if (a != 1 && !this.mesh.material.transparent){
+    this.mesh.material.transparent = true;
+  }
+}
+
+AutoInstancedObject.prototype.resetColor = function(object){
+  var index = this.forcedColorIndicesByObjectName.get(object.name);
+  var forcedColorAry = this.mesh.material.uniforms.autoInstanceForcedColorArray.value;
+  forcedColorAry[index].set(-100, -100, -100, -100);
+}
+
 AutoInstancedObject.prototype.init = function(){
   this.pseudoObjectGroup.handleTextures();
   this.pseudoObjectGroup.mergeInstanced();
@@ -25650,9 +24411,14 @@ AutoInstancedObject.prototype.init = function(){
   this.injectMacro("IS_AUTO_INSTANCED", true, true);
   var objCount = 0;
   var curIndex = 0;
+  var forcedColorIndex = 0;
   this.orientationIndicesByObjectName = new Map();
+  this.forcedColorIndicesByObjectName = new Map();
   var orientationIndices = [];
   var orientationAry = [];
+  var forcedColorAry = [];
+  var forcedColorIndices = [];
+  var hasColorizableMember = false;
   for (var objName in this.objects){
     var obj = this.objects[objName];
     this.orientationIndicesByObjectName.set(objName, curIndex);
@@ -25662,12 +24428,28 @@ AutoInstancedObject.prototype.init = function(){
     orientationAry.push(new THREE.Vector4(10, obj.mesh.position.x, obj.mesh.position.y, obj.mesh.position.z));
     orientationAry.push(new THREE.Vector4(obj.mesh.quaternion.x, obj.mesh.quaternion.y, obj.mesh.quaternion.z, obj.mesh.quaternion.w));
     obj.autoInstancedParent = this;
+    if (obj.isColorizable){
+      hasColorizableMember = true;
+    }
+    forcedColorAry.push(new THREE.Vector4(-100, -100, -100, -100));
+    forcedColorIndices.push(forcedColorIndex);
+    this.forcedColorIndicesByObjectName.set(objName, forcedColorIndex);
+    forcedColorIndex ++;
   }
   var orientationIndicesBufferAttribute = new THREE.InstancedBufferAttribute(new Float32Array(orientationIndices), 1);
   orientationIndicesBufferAttribute.setDynamic(false);
   this.mesh.geometry.addAttribute("orientationIndex", orientationIndicesBufferAttribute);
   this.injectMacro("AUTO_INSTANCE_ORIENTATION_ARRAY_SIZE "+(objCount * 2), true, false);
   this.mesh.material.uniforms.autoInstanceOrientationArray = new THREE.Uniform(orientationAry);
+  if (hasColorizableMember){
+    this.injectMacro("AUTO_INSTANCE_FORCED_COLOR_ARRAY_SIZE "+(objCount), true, false);
+    this.injectMacro("AUTO_INSTANCE_HAS_COLORIZABLE_MEMBER", true, true);
+    var forcedColorIndicesBufferAttribute = new THREE.InstancedBufferAttribute(new Float32Array(forcedColorIndices), 1);
+    forcedColorIndicesBufferAttribute.setDynamic(false);
+    this.mesh.geometry.addAttribute("forcedColorIndex", forcedColorIndicesBufferAttribute);
+    this.mesh.material.uniforms.autoInstanceForcedColorArray = new THREE.Uniform(forcedColorAry);
+  }
+  this.mesh.material.needsUpdate = true;
 }
 
 AutoInstancedObject.prototype.setFog = function(){
@@ -25721,7 +24503,28 @@ AutoInstancedObject.prototype.removeMacro = function(macro, removeVertexShader, 
 }
 
 var AutoInstancingHandler = function(){
-  this.maxBatchObjectSize = parseInt((MAX_VERTEX_UNIFORM_VECTORS - 50) / 2);
+  this.maxBatchObjectSize = parseInt((MAX_VERTEX_UNIFORM_VECTORS - 50) / 3);
+}
+
+AutoInstancingHandler.prototype.getObjectKey = function(obj){
+  var geomKey = obj.mesh.geometry.uuid;
+  var diffuseKey = "null", alphaKey = "null", aoKey = "null", displacementKey = "null", emissiveKey = "null";
+  if (obj.hasDiffuseMap()){
+    diffuseKey = obj.mesh.material.uniforms.diffuseMap.value.uuid;
+  }
+  if (obj.hasAlphaMap()){
+    alphaKey = obj.mesh.material.uniforms.alphaMap.value.uuid;
+  }
+  if (obj.hasAOMap()){
+    aoKey = obj.mesh.material.uniforms.aoMap.value.uuid;
+  }
+  if (obj.hasDisplacementMap()){
+    displacementKey = obj.mesh.material.uniforms.displacementMap.value.uuid;
+  }
+  if (obj.hasEmissiveMap()){
+    emissiveKey = obj.mesh.material.uniforms.emissiveMap.value.uuid;
+  }
+  return geomKey + PIPE + diffuseKey + PIPE + alphaKey + PIPE + aoKey + PIPE + displacementKey + PIPE + emissiveKey;
 }
 
 AutoInstancingHandler.prototype.handle = function(){
@@ -25730,20 +24533,20 @@ AutoInstancingHandler.prototype.handle = function(){
   }
   autoInstancedObjects = new Object();
   var objectsByGeometryID = new Object();
-  var countersByGeometryID = new Object();
+  var countersByObjectKey = new Object();
   for (var objName in addedObjects){
     var obj = addedObjects[objName];
     if (obj.isChangeable || (!obj.noMass && obj.physicsBody.mass > 0)){
-      var geom = obj.mesh.geometry;
-      if (typeof countersByGeometryID[geom.uuid] == UNDEFINED){
-        countersByGeometryID[geom.uuid] = 0;
+      var objKey = this.getObjectKey(obj);
+      if (typeof countersByObjectKey[objKey] == UNDEFINED){
+        countersByObjectKey[objKey] = 0;
       }
-      var key = geom.uuid + PIPE + countersByGeometryID[geom.uuid];
+      var key = objKey + PIPE + countersByObjectKey[objKey];
       if (!objectsByGeometryID[key]){
         objectsByGeometryID[key] = [];
       }else if (objectsByGeometryID[key].length > this.maxBatchObjectSize){
-        countersByGeometryID[geom.uuid] ++;
-        key = geom.uuid + PIPE + (countersByGeometryID[geom.uuid]);
+        countersByObjectKey[objKey] ++;
+        key = objKey + PIPE + (countersByObjectKey[objKey]);
         objectsByGeometryID[key] = [];
       }
       objectsByGeometryID[key].push(obj);
@@ -25779,5 +24582,484 @@ AutoInstancingHandler.prototype.reset = function(){
     }
   }
   autoInstancedObjects = new Object();
+}
+
+var Renderer = function(){
+  this.webglRenderer = new THREE.WebGLRenderer({canvas: canvas});
+}
+
+Renderer.prototype.initEffects = function(){
+  this.effects = {bloom: new Bloom()};
+  bloom = this.effects.bloom;
+  this.mandatoryEffectMethods = ["setSize", "setViewport", "setPixelRatio", "render", "showConfigurations", "hideConfigurations", "export", "load", "reset"];
+  for (var effectName in this.effects){
+    for (var i = 0; i<this.mandatoryEffectMethods.length; i++){
+      if (!this.effects[effectName][this.mandatoryEffectMethods[i]]){
+        console.error("[!] Renderer error: effect "+effectName+" does not have "+this.mandatoryEffectMethods[i]+" implemented.");
+      }
+    }
+  }
+}
+
+Renderer.prototype.render = function(scene, camera){
+  if (this.bloomOn){
+    this.effects.bloom.render();
+    return;
+  }
+  this.webglRenderer.render(scene, camera);
+}
+
+Renderer.prototype.setViewport = function(x, y, z, w){
+  this.webglRenderer.setViewport(x, y, z, w);
+  for (var effectName in this.effects){
+    this.effects[effectName].setViewport(x, y, z, w);
+  }
+}
+
+Renderer.prototype.getCurrentViewport = function(){
+  return this.webglRenderer.getCurrentViewport();
+}
+
+Renderer.prototype.isHighPrecisionSupported = function(){
+  return !(
+    this.webglRenderer.context.getShaderPrecisionFormat(this.webglRenderer.context.VERTEX_SHADER, this.webglRenderer.context.HIGH_FLOAT).precision <= 0 ||
+    this.webglRenderer.context.getShaderPrecisionFormat(this.webglRenderer.context.FRAGMENT_SHADER, this.webglRenderer.context.HIGH_FLOAT).precision <= 0
+  );
+}
+
+Renderer.prototype.isInstancingSupported = function(){
+  return (!(this.webglRenderer.context.getExtension("ANGLE_instanced_arrays") == null));
+}
+
+Renderer.prototype.isDDSSupported = function(){
+  return (!(this.webglRenderer.context.getExtension("WEBGL_compressed_texture_s3tc") == null));
+}
+
+Renderer.prototype.isVertexShaderTextureFetchSupported = function(){
+  return (this.webglRenderer.context.getParameter(this.webglRenderer.context.MAX_VERTEX_TEXTURE_IMAGE_UNITS) > 0);
+}
+
+Renderer.prototype.getMaxVertexUniformVectors = function(){
+  return this.webglRenderer.context.getParameter(this.webglRenderer.context.MAX_VERTEX_UNIFORM_VECTORS);
+}
+
+Renderer.prototype.getBoundingClientRect = function(){
+  return this.webglRenderer.domElement.getBoundingClientRect();
+}
+
+Renderer.prototype.setSize = function(width, height){
+  this.webglRenderer.setSize(width, height);
+  for (var effectName in this.effects){
+    this.effects[effectName].setSize(width, height);
+  }
+}
+
+Renderer.prototype.setPixelRatio = function(ratio){
+  this.webglRenderer.setPixelRatio(ratio);
+  for (var effectName in this.effects){
+    this.effects[effectName].setPixelRatio(ratio);
+  }
+}
+
+Renderer.prototype.getContext = function(){
+  return this.webglRenderer.context;
+}
+
+var Bloom = function(){
+  this.configurations = {
+    blurStepCount: 5,
+    threshold: 1,
+    bloomStrength: 2,
+    exposure: 1,
+    gamma: 1,
+    tapTypes: [13, 13, 13, 13, 13],
+    bloomFactors: [1, 1, 1, 1, 1],
+    bloomTintColors: [new THREE.Vector3(1, 1, 1), new THREE.Vector3(1, 1, 1), new THREE.Vector3(1, 1, 1), new THREE.Vector3(1, 1, 1), new THREE.Vector3(1, 1, 1)],
+    blendWithSkybox: false
+  }
+  this.rtParameters = {minFilter: THREE.LinearFilter, magFilter: THREE.LinearFilter, format: THREE.RGBAFormat};
+  this.generateDirectPass();
+  this.generateBrightPass();
+  this.generateBlurPass();
+  this.generateCombinerPass();
+  this.setBlurStepCount(this.configurations.blurStepCount);
+}
+
+Bloom.prototype.reset = function(){
+  renderer.bloomOn = false;
+  this.setBlurStepCount(5);
+  this.setThreshold(1);
+  this.setBloomStrength(2);
+  this.setExposure(1);
+  this.setGamma(1);
+  for (var i = 0; i<5; i++){
+    this.setTapForLevel(i, 13);
+    this.setBloomFactor(i, 1);
+    this.setBloomTintColor(i, 1, 1, 1);
+  }
+  this.setBlendWithSkyboxStatus(false);
+}
+
+Bloom.prototype.load = function(configs){
+  this.setBlurStepCount(configs.blurStepCount);
+  this.setThreshold(configs.threshold);
+  this.setBloomStrength(configs.bloomStrength);
+  this.setExposure(configs.exposure);
+  this.setGamma(configs.gamma);
+  for (var i = 0; i<5; i++){
+    this.setTapForLevel(i, configs.tapTypes[i]);
+    this.setBloomFactor(i, configs.bloomFactors[i]);
+    var curBloomTintColor = configs.bloomTintColors[i];
+    this.setBloomTintColor(i, curBloomTintColor.x, curBloomTintColor.y, curBloomTintColor.z);
+  }
+  this.setBlendWithSkyboxStatus(configs.blendWithSkybox);
+  renderer.bloomOn = configs.isOn;
+}
+
+Bloom.prototype.export = function(){
+  var exportObj = new Object();
+  exportObj.isOn = renderer.bloomOn;
+  for (var config in this.configurations){
+    exportObj[config] = this.configurations[config];
+  }
+  return exportObj;
+}
+
+Bloom.prototype.onSkyboxVisibilityChange = function(){
+  if (!this.configurationsOpen){
+    return;
+  }
+  if (!skyboxVisible){
+    if (this.configurations.blendWithSkybox){
+      for (var i = 0; i<this.configurations.blurStepCount; i++){
+        guiHandler.enableController(guiHandler["blurPassTintColorController"+(i+1)]);
+      }
+    }
+    if (this.configurationsOpen.blendWithSkybox){
+      this.setBlendWithSkyboxStatus(false);
+    }
+    guiHandler.disableController(guiHandler.bloomBlendWithSkyboxController);
+    guiHandler.bloomParameters["Blend skybox"] = false;
+  }else{
+    guiHandler.enableController(guiHandler.bloomBlendWithSkyboxController);
+  }
+}
+
+Bloom.prototype.showConfigurations = function(){
+  guiHandler.show(guiHandler.guiTypes.BLOOM);
+  guiHandler.bloomParameters["Active"] = renderer.bloomOn;
+  if (typeof guiHandler.bloomParameters["Active"] == UNDEFINED){
+    guiHandler.bloomParameters["Active"] = false;
+  }
+  guiHandler.bloomParameters["Threshold"] = this.configurations.threshold;
+  guiHandler.bloomParameters["Strength"] = this.configurations.bloomStrength;
+  guiHandler.bloomParameters["Exposure"] = this.configurations.exposure;
+  guiHandler.bloomParameters["Gamma"] = this.configurations.gamma;
+  guiHandler.bloomParameters["Blend skybox"] = this.configurations.blendWithSkybox;
+  guiHandler.bloomParameters["BlurStepAmount"] = this.configurations.blurStepCount;
+  for (var i=0; i<5; i++){
+    guiHandler.bloomParameters["BlurPass"+(i+1)]["Factor"] = this.configurations.bloomFactors[i];
+    guiHandler.bloomParameters["BlurPass"+(i+1)]["Color"] = "#" + (REUSABLE_COLOR.setRGB(this.configurations.bloomTintColors[i].x, this.configurations.bloomTintColors[i].y, this.configurations.bloomTintColors[i].z).getHexString());
+    guiHandler.enableController(guiHandler["blurPassFactorController"+(i+1)]);
+    guiHandler.enableController(guiHandler["blurPassTintColorController"+(i+1)]);
+    guiHandler.enableController(guiHandler["blurPassTapController"+(i+1)]);
+  }
+  for (var i = this.configurations.blurStepCount; i < 5; i++){
+    guiHandler.disableController(guiHandler["blurPassFactorController"+(i+1)]);
+    guiHandler.disableController(guiHandler["blurPassTintColorController"+(i+1)]);
+    guiHandler.disableController(guiHandler["blurPassTapController"+(i+1)]);
+  }
+  if (skyboxVisible){
+    if (this.configurations.blendWithSkybox){
+      for (var i = 0; i<this.configurations.blurStepCount; i++){
+        guiHandler.disableController(guiHandler["blurPassTintColorController"+(i+1)]);
+      }
+    }
+    guiHandler.enableController(guiHandler.bloomBlendWithSkyboxController);
+  }else{
+    guiHandler.disableController(guiHandler.bloomBlendWithSkyboxController);
+    guiHandler.bloomParameters["Blend skybox"] = false;
+  }
+  this.configurationsOpen = true;
+}
+
+Bloom.prototype.hideConfigurations = function(){
+  guiHandler.hide(guiHandler.guiTypes.BLOOM);
+  this.configurationsOpen = false;
+}
+
+Bloom.prototype.setBlendWithSkyboxStatus = function(status){
+  if (status){
+    if (!this.skyboxMesh){
+      this.generateSkyboxPass();
+    }
+    this.injectMacro("BLEND_WITH_SKYBOX", this.combinerMaterial, false, true);
+    this.combinerMaterial.uniforms.skyboxColorTexture = new THREE.Uniform(this.skyboxTarget.texture);
+    this.configurations.blendWithSkybox = true;
+  }else{
+    this.removeMacro("BLEND_WITH_SKYBOX", this.combinerMaterial, false, true);
+    delete this.combinerMaterial.uniforms.skyboxColorTexture;
+    this.configurations.blendWithSkybox = false;
+  }
+}
+
+Bloom.prototype.setBloomTintColor = function(levelIndex, r, g, b){
+  this.configurations.bloomTintColors[levelIndex].set(r, g, b);
+}
+
+Bloom.prototype.setBloomFactor = function(levelIndex, factor){
+  this.configurations.bloomFactors[levelIndex] = factor;
+}
+
+Bloom.prototype.setGamma = function(gamma){
+  this.configurations.gamma = gamma;
+  this.combinerMaterial.uniforms.gamma.value = gamma;
+}
+
+Bloom.prototype.setExposure = function(exposure){
+  this.configurations.exposure = exposure;
+  this.combinerMaterial.uniforms.exposure.value = exposure;
+}
+
+Bloom.prototype.setBlurStepCount = function(stepCount){
+  if (stepCount > 5){
+    throw new Error("[!] Bloom.setBlurStepCount error: Max alloed stepCount is 5.");
+  }
+  if (stepCount < 1){
+    stepCount = 1
+  }
+  this.configurations.blurStepCount = stepCount;
+  for (var i = 0; i<5; i++){
+    var macro = "BLUR_STEP_"+(i+1)+"_ACTIVE";
+    this.removeMacro(macro, this.combinerMaterial, false, true);
+  }
+  for (var i = 0; i<stepCount; i++){
+    var macro = "BLUR_STEP_"+(i+1)+"_ACTIVE";
+    this.injectMacro(macro, this.combinerMaterial, false, true);
+  }
+}
+
+Bloom.prototype.setBloomStrength = function(strength){
+  this.combinerMaterial.uniforms.bloomStrength.value = strength;
+  this.configurations.bloomStrength = strength;
+}
+
+Bloom.prototype.setThreshold = function(threshold){
+  this.configurations.threshold = threshold;
+  this.brightPassMaterial.uniforms.threshold.value = threshold;
+}
+
+Bloom.prototype.setTapForLevel = function(levelIndex, tap){
+  this.configurations.tapTypes[levelIndex] = tap;
+}
+
+Bloom.prototype.setBlurTap = function(tap){
+  if (tap == 5){
+    this.blurPassMaterial.uniforms.numberOfTap.value = -10;
+    return;
+  }
+  if (tap == 9){
+    this.blurPassMaterial.uniforms.numberOfTap.value = 5;
+    return;
+  }
+  if (tap == 13){
+    this.blurPassMaterial.uniforms.numberOfTap.value = 20;
+    return;
+  }
+  throw new Error("[!] Bloom.setBlurTap error: Undefined tap.");
+}
+
+Bloom.prototype.setBlurDirection = function(isX){
+  if (isX){
+    this.blurPassMaterial.uniforms.direction.value = this.blurPassDirectionX;
+  }else{
+    this.blurPassMaterial.uniforms.direction.value = this.blurPassDirectionY;
+  }
+}
+
+Bloom.prototype.skyboxPass = function(){
+  this.skyboxMesh.position.copy(skyboxMesh.position);
+  this.skyboxMesh.quaternion.copy(skyboxMesh.quaternion);
+  renderer.webglRenderer.render(this.skyboxPassScene, camera, this.skyboxTarget);
+}
+
+Bloom.prototype.combinerPass = function(){
+  renderer.webglRenderer.render(this.combinerScene, orthographicCamera);
+}
+
+Bloom.prototype.blurPass = function(){
+  this.blurPassMaterial.uniforms.inputTexture.value = this.brightTarget.texture;
+  this.blurPassMaterial.uniforms.resolution.value.set(this.brightTarget.width, this.brightTarget.height);
+  for (var i = 0; i <this.configurations.blurStepCount; i++){
+    this.setBlurTap(this.configurations.tapTypes[i]);
+    this.setBlurDirection(true);
+    renderer.webglRenderer.render(this.blurPassScene, orthographicCamera, this.horizontalBlurTargets[i]);
+    var rt = this.horizontalBlurTargets[i];
+    this.blurPassMaterial.uniforms.inputTexture.value = rt.texture;
+    this.blurPassMaterial.uniforms.resolution.value.set(rt.width, rt.height);
+    this.setBlurDirection(false);
+    renderer.webglRenderer.render(this.blurPassScene, orthographicCamera, this.verticalBlurTargets[i]);
+    rt = this.verticalBlurTargets[i];
+    this.blurPassMaterial.uniforms.inputTexture.value = rt.texture;
+    this.blurPassMaterial.uniforms.resolution.value.set(rt.width, rt.height);
+  }
+}
+
+Bloom.prototype.brightPass = function(){
+  renderer.webglRenderer.render(this.brightPassScene, orthographicCamera, this.brightTarget);
+}
+
+Bloom.prototype.directPass = function(){
+  renderer.webglRenderer.render(scene, camera, this.sceneTarget);
+}
+
+Bloom.prototype.generateSkyboxPass = function(){
+  this.skyboxTarget = new THREE.WebGLRenderTarget(window.innerWidth, window.innerHeight, this.rtParameters);
+  this.skyboxPassScene = new THREE.Scene();
+  this.skyboxMesh = new THREE.Mesh(skyboxMesh.geometry, skyboxMesh.material);
+  this.skyboxPassScene.add(this.skyboxMesh);
+}
+
+Bloom.prototype.generateCombinerPass = function(){
+  this.combinerMaterial = new THREE.RawShaderMaterial({
+    vertexShader: ShaderContent.bloomCombinerVertexShader,
+    fragmentShader: ShaderContent.bloomCombinerFragmentShader,
+    uniforms:{
+      modelViewMatrix: new THREE.Uniform(),
+      projectionMatrix: new THREE.Uniform(orthographicCamera.projectionMatrix),
+      sceneTexture: new THREE.Uniform(this.sceneTarget.texture),
+      blurTexture1: new THREE.Uniform(this.verticalBlurTargets[0].texture),
+      blurTexture2: new THREE.Uniform(this.verticalBlurTargets[1].texture),
+      blurTexture3: new THREE.Uniform(this.verticalBlurTargets[2].texture),
+      blurTexture4: new THREE.Uniform(this.verticalBlurTargets[3].texture),
+      blurTexture5: new THREE.Uniform(this.verticalBlurTargets[4].texture),
+      bloomStrength: new THREE.Uniform(this.configurations.bloomStrength),
+      exposure: new THREE.Uniform(this.configurations.exposure),
+      gamma: new THREE.Uniform(this.configurations.gamma),
+      bloomFactors: new THREE.Uniform(this.configurations.bloomFactors),
+      bloomTintColors: new THREE.Uniform(this.configurations.bloomTintColors)
+    }
+  });
+  this.combinerQuad = new THREE.Mesh(REUSABLE_QUAD_GEOMETRY, this.combinerMaterial);
+  this.combinerMaterial.uniforms.modelViewMatrix.value = this.combinerQuad.modelViewMatrix;
+  this.combinerScene = new THREE.Scene();
+  this.combinerScene.add(this.combinerQuad);
+}
+
+Bloom.prototype.generateDirectPass = function(){
+  this.sceneTarget = new THREE.WebGLRenderTarget(window.innerWidth, window.innerHeight, this.rtParameters);
+  this.sceneTarget.texture.generateMipmaps = false;
+}
+
+Bloom.prototype.generateBlurPass = function(){
+  this.blurPassDirectionX = new THREE.Vector2(1, 0);
+  this.blurPassDirectionY = new THREE.Vector2(0, 1);
+  this.blurPassMaterial = new THREE.RawShaderMaterial({
+    vertexShader: ShaderContent.bloomBlurPassVertexShader,
+    fragmentShader: ShaderContent.bloomBlurPassFragmentShader,
+    uniforms: {
+      modelViewMatrix: new THREE.Uniform(),
+      projectionMatrix: new THREE.Uniform(orthographicCamera.projectionMatrix),
+      inputTexture: new THREE.Uniform(),
+      numberOfTap: new THREE.Uniform(20),
+      resolution: new THREE.Uniform(new THREE.Vector2()),
+      direction: new THREE.Uniform(new THREE.Vector2()),
+    }
+  });
+  this.blurPassQuad = new THREE.Mesh(REUSABLE_QUAD_GEOMETRY, this.blurPassMaterial);
+  this.blurPassMaterial.uniforms.modelViewMatrix.value = this.blurPassQuad.modelViewMatrix;
+  this.blurPassScene = new THREE.Scene();
+  this.blurPassScene.add(this.blurPassQuad);
+  this.horizontalBlurTargets = [], this.verticalBlurTargets = [];
+  var coef = 2;
+  for (var i = 0; i<this.configurations.blurStepCount; i++){
+    var rt1 = new THREE.WebGLRenderTarget(window.innerWidth / coef, window.innerHeight / coef, this.rtParameters);
+    var rt2 = new THREE.WebGLRenderTarget(window.innerWidth / coef, window.innerHeight / coef, this.rtParameters);
+    rt1.texture.generateMipmaps = false;
+    rt2.texture.generateMipmaps = false;
+    this.horizontalBlurTargets.push(rt1);
+    this.verticalBlurTargets.push(rt2);
+    coef = coef * 2;
+  }
+}
+
+Bloom.prototype.generateBrightPass = function(){
+  this.brightPassMaterial = new THREE.RawShaderMaterial({
+    vertexShader: ShaderContent.bloomBrightPassVertexShader,
+    fragmentShader: ShaderContent.bloomBrightPassFragmentShader,
+    uniforms: {
+      modelViewMatrix: new THREE.Uniform(),
+      projectionMatrix: new THREE.Uniform(orthographicCamera.projectionMatrix),
+      sceneTexture: new THREE.Uniform(),
+      threshold: new THREE.Uniform(this.configurations.threshold)
+    }
+  });
+  this.brightPassQuad = new THREE.Mesh(REUSABLE_QUAD_GEOMETRY, this.brightPassMaterial);
+  this.brightPassMaterial.uniforms.modelViewMatrix.value = this.brightPassQuad.modelViewMatrix;
+  this.brightPassMaterial.uniforms.sceneTexture.value = this.sceneTarget.texture;
+  this.brightPassScene = new THREE.Scene();
+  this.brightPassScene.add(this.brightPassQuad);
+  this.brightTarget = new THREE.WebGLRenderTarget(window.innerWidth / 2, window.innerHeight / 2, this.rtParameters);
+  this.brightTarget.texture.generateMipmaps = false;
+}
+
+Bloom.prototype.setSize = function(width, height){
+  this.sceneTarget.setSize(width, height);
+  this.brightTarget.setSize(width / 2, height / 2);
+  var coef = 2;
+  for (var i = 0; i<this.configurations.blurStepCount; i++){
+    this.horizontalBlurTargets[i].setSize(width/coef, height/coef);
+    this.verticalBlurTargets[i].setSize(width/coef, height/coef);
+    coef = coef * 2;
+  }
+}
+
+Bloom.prototype.setViewport = function(x, y, z, w){
+  this.sceneTarget.viewport.set(x, y, z, w);
+  this.brightTarget.viewport.set(x, y, z / 2, w / 2);
+  var coef = 2;
+  for (var i = 0; i<this.configurations.blurStepCount; i++){
+    this.horizontalBlurTargets[i].viewport.set(x, y, z/coef, w/coef);
+    this.verticalBlurTargets[i].viewport.set(x, y, z/coef, w/coef);
+    coef = coef * 2;
+  }
+}
+
+Bloom.prototype.setPixelRatio = function(ratio){
+
+}
+
+Bloom.prototype.render = function(){
+  this.directPass();
+  this.brightPass();
+  this.blurPass();
+  if (this.configurations.blendWithSkybox){
+    this.skyboxPass();
+  }
+  this.combinerPass();
+}
+
+Bloom.prototype.injectMacro = function(macro, material, insertVertexShader, insertFragmentShader){
+  if (insertVertexShader){
+    material.vertexShader = material.vertexShader.replace(
+      "#define INSERTION", "#define INSERTION\n#define "+macro
+    )
+  };
+  if (insertFragmentShader){
+    material.fragmentShader = material.fragmentShader.replace(
+      "#define INSERTION", "#define INSERTION\n#define "+macro
+    )
+  };
+  material.needsUpdate = true;
+}
+
+Bloom.prototype.removeMacro = function(macro, material, removeVertexShader, removeFragmentShader){
+  if (removeVertexShader){
+    material.vertexShader = material.vertexShader.replace("\n#define "+macro, "");
+  }
+  if (removeFragmentShader){
+    material.fragmentShader = material.fragmentShader.replace("\n#define "+macro, "");
+  }
+  material.needsUpdate = true;
 }
 
