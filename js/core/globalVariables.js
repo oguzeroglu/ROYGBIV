@@ -51,9 +51,9 @@ var orientationChangeEventHandler;
 var keyboardEventHandler;
 
 // THREE.JS VARIABLES
-var renderer;
 var scene;
 var camera;
+var orthographicCamera;
 var canvas;
 var sceneBackgroundColor = 0x000000 ;
 var textureLoader = new THREE.TextureLoader();
@@ -81,18 +81,6 @@ var gravityY = -900;
 var physicsStepAmount = 1/60;
 var friction = 1;
 var surfacePhysicalThickness = 1;
-
-// POST PROCESSING
-var renderPass;
-var copyPass;
-var composer;
-var bloomPass;
-var bloomStrength = 0.4; // 0 - 3
-var bloomRadius = 0; // 0 - 1
-var bloomThreshold = 1; // 0 - 1
-var bloomResolutionScale = 1; // 0.1 - 1
-var bloomOn = false;
-var originalBloomConfigurations = new Object();
 
 // CAMERA CONFIGURATIONS
 var initialCameraX = 0;
@@ -186,10 +174,10 @@ var skyBoxRootDirectory = "skybox/";
 var dataPrefix = "text/json;charset=utf-8,";
 var skyboxDistance = 4000;
 var skyboxMesh;
-var skyboxPreviewMesh;
 var skyboxVisible = false;
 var skyboxConfigurationsVisible = false;
 var fogConfigurationsVisible = false;
+var postProcessiongConfigurationsVisibility = new Object();
 var mappedSkyboxName = 0;
 var gridCounter = 0;
 var MAX_GRIDS_ALLOWED = 1000000;
@@ -209,6 +197,7 @@ var CANNON_AXIS_VECTOR_Z = new CANNON.Vec3(0, 0, 1);
 var CANNON_ZERO_VECTOR = new CANNON.Vec3(0, 0, 0);
 var REUSABLE_CANNON_QUATERNION = new CANNON.Quaternion();
 var REUSABLE_CANNON_QUATERNION_2 = new CANNON.Quaternion();
+var REUSABLE_QUAD_GEOMETRY = new THREE.PlaneBufferGeometry(2, 2);
 var scriptEditorShowing = false;
 var NO_BLENDING = THREE.NoBlending;
 var NORMAL_BLENDING = THREE.NormalBlending;
@@ -365,6 +354,8 @@ var objectsWithOnClickListeners = new Map();
 var objectsWithMouseOverListeners = new Map();
 var objectsWithMouseOutListeners = new Map();
 var currentMouseOverObjectName;
+var renderer;
+var bloom;
 
 // WORKER VARIABLES
 var WORKERS_SUPPORTED = (typeof(Worker) !== UNDEFINED) && (typeof(MessageChannel) !== UNDEFINED);
@@ -374,15 +365,6 @@ var Text = (!isDeployment)? new Text(): 0;
 
 // SCRIPTING UTILITY FUNCTIONS
 var ROYGBIV;
-
-var fogDensityController;
-var fogColorController;
-var fogBlendWithSkyboxController;
-var fogParameters = {
-  "Density": 0.0,
-  "Color": "#ffffff",
-  "Blend skybox": false
-};
 
 // KEYCODE TO STRING MAP
 keyCodeToChar = {

@@ -144,12 +144,6 @@ var State = function(projectName, author){
     markedPointsExport[markedPointName] = markedPoints[markedPointName].export();
   }
   this.markedPointsExport = markedPointsExport;
-  // POST PROCESSING ***********************************************
-  this.bloomStrength = bloomStrength;
-  this.bloomRadius = bloomRadius;
-  this.bloomThreshold = bloomThreshold;
-  this.bloomResolutionScale = bloomResolutionScale;
-  this.bloomOn = bloomOn;
   // OCTREE LIMITS *************************************************
   var octreeMinX = LIMIT_BOUNDING_BOX.min.x;
   var octreeMinY = LIMIT_BOUNDING_BOX.min.y;
@@ -193,5 +187,10 @@ var State = function(projectName, author){
   this.texts = new Object();
   for (var textName in addedTexts){
     this.texts[textName] = addedTexts[textName].export();
+  }
+  // POST PROCESSING ***********************************************
+  this.effects = new Object();
+  for (var effectName in renderer.effects){
+    this.effects[effectName] = renderer.effects[effectName].export();
   }
 }

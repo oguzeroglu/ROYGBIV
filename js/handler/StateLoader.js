@@ -954,20 +954,8 @@ StateLoader.prototype.load = function(){
     }
     // TEXTS *******************************************************
     // NOT HERE -> SEE: finalize
-
-    // POST PROCESSING *********************************************
-    bloomStrength = obj.bloomStrength;
-    bloomRadius = obj.bloomRadius;
-    bloomThreshold = obj.bloomThreshold;
-    bloomResolutionScale = obj.bloomResolutionScale;
-    bloomOn = obj.bloomOn;
-    if (!isDeployment){
-      guiHandler.postprocessingParameters["Bloom_strength"] = bloomStrength;
-      guiHandler.postprocessingParameters["Bloom_radius"] = bloomRadius;
-      guiHandler.postprocessingParameters["Bloom_threshhold"] = bloomThreshold;
-      guiHandler.postprocessingParameters["Bloom_resolution_scale"] = bloomResolutionScale;
-      guiHandler.postprocessingParameters["Bloom"] = bloomOn;
-    }
+    // EFFECTS *****************************************************
+    // NOT HERE -> SEE: finalize
 
     if (this.oldPhysicsDebugMode){
       if (this.oldPhysicsDebugMode != "NONE"){
@@ -1235,7 +1223,6 @@ StateLoader.prototype.finalize = function(){
       physicsWorld.remove(objectGroupInstance.physicsBody);
     }
   }
-
   for (var objName in objectGroups){
     if (objectGroups[objName].softCopyParentName){
       var softCopyParent = objectGroups[objectGroups[objName].softCopyParentName];
@@ -1252,6 +1239,9 @@ StateLoader.prototype.finalize = function(){
         }
       }
     }
+  }
+  for (var effecName in obj.effects){
+    renderer.effects[effecName].load(obj.effects[effecName]);
   }
   projectLoaded = true;
   if (!isDeployment){
@@ -2154,6 +2144,7 @@ StateLoader.prototype.resetProject = function(){
   objectsWithOnClickListeners = new Map();
   objectsWithMouseOverListeners = new Map();
   objectsWithMouseOutListeners = new Map();
+  postProcessiongConfigurationsVisibility = new Object();
   currentMouseOverObjectName = 0;
   if (!WORKERS_SUPPORTED){
     rayCaster = new RayCaster();
@@ -2206,7 +2197,6 @@ StateLoader.prototype.resetProject = function(){
   screenMouseWheelCallbackFunction = 0;
   screenPinchCallbackFunction = 0;
   fpsHandler.reset();
-  originalBloomConfigurations = new Object();
   fonts = new Object();
   NO_MOBILE = false;
   fixedAspect = 0;
@@ -2215,7 +2205,7 @@ StateLoader.prototype.resetProject = function(){
   roygbivSkippedArrayBufferUpdates = 0;
   roygbivSkippedElementArrayBufferUpdates = 0;
 
-  boundingClientRect = renderer.domElement.getBoundingClientRect();
+  boundingClientRect = renderer.getBoundingClientRect();
   pointerLockRequested = false;
   fullScreenRequested = false;
   defaultCameraControlsDisabled = false;
@@ -2257,14 +2247,15 @@ StateLoader.prototype.resetProject = function(){
   for (var i = 0; i<objectsToRemove.length; i++){
     scene.remove(objectsToRemove[i]);
   }
-
+  for (var effectName in renderer.effects){
+    renderer.effects[effectName].reset();
+  }
   diffuseTextureCache = new Object();
   heightTextureCache = new Object();
   ambientOcculsionTextureCache = new Object();
   alphaTextureCache = new Object();
   emissiveTextureCache = new Object();
 
-  initPostProcessing();
   if (!isDeployment){
     guiHandler.hideAll();
     $("#cliDivheader").text("ROYGBIV Scene Creator - CLI (Design mode)");

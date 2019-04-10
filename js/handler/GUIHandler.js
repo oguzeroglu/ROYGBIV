@@ -1,11 +1,4 @@
 var GUIHandler = function(){
-  this.postprocessingParameters = {
-    "Bloom_strength": bloomStrength,
-    "Bloom_radius": bloomRadius,
-    "Bloom_threshhold": bloomThreshold,
-    "Bloom_resolution_scale": bloomResolutionScale,
-    "Bloom": bloomOn
-  };
   this.objectManipulationParameters = {
     "Object": "objectName",
     "Rotate x": 0.0,
@@ -54,23 +47,29 @@ var GUIHandler = function(){
     "Max width%": 100,
     "Max height%": 100
   };
-}
-
-GUIHandler.prototype.init = function(){
-  this.initializeFogGUI();
-  this.initializeSkyboxGUI();
-  this.initializeTextManipulationGUI();
-  this.initializeObjectManipulationGUI();
-  this.initializePostProcessingGUI();
-
-  this.hideAll();
-
-  guiHandler.datGuiObjectManipulation.domElement.addEventListener("mousedown", function(e){
-    omGUIFocused = true;
-  });
-  guiHandler.datGuiTextManipulation.domElement.addEventListener("mousedown", function(e){
-    tmGUIFocused = true;
-  });
+  this.fogParameters = {
+    "Density": 0.0,
+    "Color": "#ffffff",
+    "Blend skybox": false
+  };
+  this.bloomParameters = {
+    "Threshold": 0.0,
+    "Active": false,
+    "Strength": 0.0,
+    "Exposure": 0.0,
+    "Gamma": 0.0,
+    "BlurStepAmount": 0,
+    "Blend skybox": false,
+    "BlurPass1": {"Factor": 0.0, "Color": "#ffffff", "Quality": "high"},
+    "BlurPass2": {"Factor": 0.0, "Color": "#ffffff", "Quality": "high"},
+    "BlurPass3": {"Factor": 0.0, "Color": "#ffffff", "Quality": "high"},
+    "BlurPass4": {"Factor": 0.0, "Color": "#ffffff", "Quality": "high"},
+    "BlurPass5": {"Factor": 0.0, "Color": "#ffffff", "Quality": "high"}
+  }
+  // GUI TYPES DEFINITION
+  this.guiTypes = {
+    FOG: 0, SKYBOX: 1, TEXT: 2, OBJECT: 3, BLOOM: 4
+  };
 }
 
 GUIHandler.prototype.afterTextSelection = function(){
@@ -79,8 +78,8 @@ GUIHandler.prototype.afterTextSelection = function(){
   }
   var curSelection = selectionHandler.getSelectedObject();
   if (curSelection && curSelection.isAddedText){
+    guiHandler.show(guiHandler.guiTypes.TEXT);
     guiHandler.enableAllTMControllers();
-    guiHandler.show(guiHandler.datGuiTextManipulation);
     guiHandler.textManipulationParameters["Text"] = curSelection.name;
     guiHandler.textManipulationParameters["Content"] = curSelection.text;
     guiHandler.textManipulationParameters["Text color"] = "#" + curSelection.material.uniforms.color.value.getHexString();
@@ -97,6 +96,9 @@ GUIHandler.prototype.afterTextSelection = function(){
     guiHandler.textManipulationParameters["Line margin"] = curSelection.offsetBetweenLines;
     guiHandler.textManipulationParameters["Aff. by fog"] = curSelection.isAffectedByFog;
     guiHandler.textManipulationParameters["is 2D"] = curSelection.is2D;
+    if (typeof guiHandler.textManipulationParameters["is 2D"] == UNDEFINED){
+      guiHandler.textManipulationParameters["is 2D"] = false;
+    }
     if (!guiHandler.textManipulationParameters["Has bg"]){
       guiHandler.disableController(guiHandler.textManipulationBackgroundColorController);
       guiHandler.disableController(guiHandler.textManipulationBackgroundAlphaController);
@@ -107,6 +109,12 @@ GUIHandler.prototype.afterTextSelection = function(){
     guiHandler.textManipulationParameters["Margin Y"] = curSelection.marginPercentHeight;
     guiHandler.textManipulationParameters["Max width%"] = curSelection.maxWidthPercent;
     guiHandler.textManipulationParameters["Max height%"] = curSelection.maxHeightPercent;
+    if (typeof guiHandler.textManipulationParameters["Max width%"] == UNDEFINED){
+      guiHandler.textManipulationParameters["Max width%"] = 0;
+    }
+    if (typeof guiHandler.textManipulationParameters["Max height%"] == UNDEFINED){
+      guiHandler.textManipulationParameters["Max height%"] = 0;
+    }
     if (curSelection.marginMode == MARGIN_MODE_2D_TEXT_TOP_LEFT){
       guiHandler.textManipulationParameters["Margin mode"] = "Top/Left";
     }else{
@@ -122,7 +130,7 @@ GUIHandler.prototype.afterTextSelection = function(){
       guiHandler.disableController(guiHandler.textManipulationAffectedByFogController);
     }
   }else{
-    guiHandler.hide(guiHandler.datGuiTextManipulation);
+    guiHandler.hide(guiHandler.guiTypes.TEXT);
   }
 }
 
@@ -132,7 +140,7 @@ GUIHandler.prototype.afterObjectSelection = function(){
   }
   var curSelection = selectionHandler.getSelectedObject();
   if (curSelection && (curSelection.isAddedObject || curSelection.isObjectGroup)){
-    guiHandler.show(guiHandler.datGuiObjectManipulation);
+    guiHandler.show(guiHandler.guiTypes.OBJECT);
     guiHandler.enableAllOMControllers();
     var obj = curSelection;
     obj.visualiseBoundingBoxes();
@@ -300,7 +308,7 @@ GUIHandler.prototype.afterObjectSelection = function(){
     }
     guiHandler.omMassController.updateDisplay();
   }else{
-    guiHandler.hide(guiHandler.datGuiObjectManipulation);
+    guiHandler.hide(guiHandler.guiTypes.OBJECT);
   }
   guiHandler.afterTextSelection();
 }
@@ -378,53 +386,117 @@ GUIHandler.prototype.enableAllOMControllers = function(){
   guiHandler.enableController(guiHandler.omSideController);
 }
 
-GUIHandler.prototype.isVisible = function(guiObject){
-  return $(guiObject.domElement).is(":visible");
+GUIHandler.prototype.show = function(guiType){
+  switch(guiType){
+    case this.guiTypes.OBJECT:
+      if (!this.datGuiObjectManipulation){
+        this.initializeObjectManipulationGUI();
+      }
+    return;
+    case this.guiTypes.TEXT:
+      if (!this.datGuiTextManipulation){
+        this.initializeTextManipulationGUI();
+      }
+    return;
+    case this.guiTypes.SKYBOX:
+      if (!this.datGuiSkybox){
+        this.initializeSkyboxGUI();
+        skyboxConfigurationsVisible = true;
+      }
+    return;
+    case this.guiTypes.FOG:
+      if (!this.datGuiFog){
+        this.initializeFogGUI();
+      }
+    return;
+    case this.guiTypes.BLOOM:
+      if (!this.datGuiBloom){
+        this.initializeBloomGUI();
+        postProcessiongConfigurationsVisibility.bloom = true;
+      }
+    return;
+  }
+  throw new Error("Unknown guiType.");
 }
 
-GUIHandler.prototype.show = function(guiObject){
-  $(guiObject.domElement).attr("hidden", false);
+GUIHandler.prototype.unbindSubFolderEvents = function(gui){
+  var folders = gui.__folders;
+  for (var folderName in folders){
+    dat.dom.dom.unbind(window, "resize", folders[folderName].__resizeHandler);
+    var len = folders[folderName].__controllers.length;
+    for (var i = 0; i<len; i++){
+      folders[folderName].remove(folders[folderName].__controllers[0]);
+    }
+    gui.removeFolder(folders[folderName]);
+  }
 }
 
-GUIHandler.prototype.hide = function(guiObject){
-  $(guiObject.domElement).attr("hidden", true);
+GUIHandler.prototype.removeControllers = function(gui){
+  var len = gui.__controllers.length;
+  for (var i = 0; i<len; i++){
+    gui.remove(gui.__controllers[0]);
+  }
+}
+
+GUIHandler.prototype.destroyGUI = function(gui){
+  this.removeControllers(gui);
+  this.unbindSubFolderEvents(gui);
+  gui.destroy();
+}
+
+GUIHandler.prototype.hide = function(guiType){
+  switch(guiType){
+    case this.guiTypes.OBJECT:
+      if (this.datGuiObjectManipulation){
+        this.destroyGUI(this.datGuiObjectManipulation);
+        this.datGuiObjectManipulation = 0;
+      }
+    return;
+    case this.guiTypes.TEXT:
+      if (this.datGuiTextManipulation){
+        this.destroyGUI(this.datGuiTextManipulation);
+        this.datGuiTextManipulation = 0;
+      }
+    return;
+    case this.guiTypes.SKYBOX:
+      if (this.datGuiSkybox){
+        this.destroyGUI(this.datGuiSkybox);
+        skyboxConfigurationsVisible = false;
+        this.datGuiSkybox = 0;
+      }
+    return;
+    case this.guiTypes.FOG:
+      if (this.datGuiFog){
+        this.destroyGUI(this.datGuiFog);
+        this.datGuiFog = 0;
+      }
+    return;
+    case this.guiTypes.BLOOM:
+      if (this.datGuiBloom){
+        this.destroyGUI(this.datGuiBloom);
+        postProcessiongConfigurationsVisibility.bloom = false;
+        this.datGuiBloom = 0;
+      }
+    return;
+    case this.guiTypes.AREA:
+      this.destroyGUI(this.datGuiAreaConfigurations);
+      this.datGuiAreaConfigurations = 0;
+    return;
+  }
+  throw new Error("Unknown guiType.");
 }
 
 GUIHandler.prototype.hideAll = function(){
-  $(guiHandler.datGui.domElement).attr("hidden", true);
-  $(guiHandler.datGuiObjectManipulation.domElement).attr("hidden", true);
-  $(guiHandler.datGuiTextManipulation.domElement).attr("hidden", true);
-  $(guiHandler.datGuiSkybox.domElement).attr("hidden", true);
-  $(guiHandler.datGuiFog.domElement).attr("hidden", true);
-  skyboxConfigurationsVisible = false;
-}
-
-GUIHandler.prototype.initializePostProcessingGUI = function(){
-  guiHandler.datGui = new dat.GUI();
-  guiHandler.datGui.add(guiHandler.postprocessingParameters, "Bloom_strength").min(0.0).max(3.0).step(0.01).onChange(function(val){
-    adjustPostProcessing(1, val);
-    originalBloomConfigurations.bloomStrength = val;
-  }).listen();
-  guiHandler.datGui.add(guiHandler.postprocessingParameters, "Bloom_radius").min(0.0).max(1.0).step(0.01).onChange(function(val){
-    adjustPostProcessing(2, val);
-    originalBloomConfigurations.bloomRadius = val;
-  }).listen();
-  guiHandler.datGui.add(guiHandler.postprocessingParameters, "Bloom_threshhold").min(0.0).max(1.0).step(0.01).onChange(function(val){
-    adjustPostProcessing(3, val);
-    originalBloomConfigurations.bloomThreshold = val;
-  }).listen();
-  guiHandler.datGui.add(guiHandler.postprocessingParameters, "Bloom_resolution_scale").min(0.1).max(1.0).step(0.001).onChange(function(val){
-    adjustPostProcessing(4, val);
-    originalBloomConfigurations.bloomResolutionScale = val;
-  }).listen();
-  guiHandler.datGui.add(guiHandler.postprocessingParameters, "Bloom").onChange(function(val){
-    adjustPostProcessing(5, val);
-    originalBloomConfigurations.bloomOn = val;
-  }).listen();
+  for (var key in this.guiTypes){
+    this.hide(this.guiTypes[key]);
+  }
 }
 
 GUIHandler.prototype.initializeObjectManipulationGUI = function(){
-  guiHandler.datGuiObjectManipulation = new dat.GUI();
+  guiHandler.datGuiObjectManipulation = new dat.GUI({hideable: false});
+  guiHandler.datGuiObjectManipulation.domElement.addEventListener("mousedown", function(e){
+    omGUIFocused = true;
+  });
   guiHandler.omObjController = guiHandler.datGuiObjectManipulation.add(guiHandler.objectManipulationParameters, "Object").listen();
   guiHandler.disableController(guiHandler.omObjController, true);
   guiHandler.omRotationXController = guiHandler.datGuiObjectManipulation.add(guiHandler.objectManipulationParameters, "Rotate x").onChange(function(val){
@@ -654,7 +726,10 @@ GUIHandler.prototype.initializeObjectManipulationGUI = function(){
 }
 
 GUIHandler.prototype.initializeTextManipulationGUI = function(){
-  guiHandler.datGuiTextManipulation = new dat.GUI();
+  guiHandler.datGuiTextManipulation = new dat.GUI({hideable: false});
+  guiHandler.datGuiTextManipulation.domElement.addEventListener("mousedown", function(e){
+    tmGUIFocused = true;
+  });
   guiHandler.textManipulationTextNameController = guiHandler.datGuiTextManipulation.add(guiHandler.textManipulationParameters, "Text").listen();
   guiHandler.textManipulationContentController = guiHandler.datGuiTextManipulation.add(guiHandler.textManipulationParameters, "Content").onChange(function(val){
     var addedText = selectionHandler.getSelectedObject();
@@ -777,7 +852,7 @@ GUIHandler.prototype.initializeTextManipulationGUI = function(){
 }
 
 GUIHandler.prototype.initializeSkyboxGUI = function(){
-  guiHandler.datGuiSkybox = new dat.GUI();
+  guiHandler.datGuiSkybox = new dat.GUI({hideable: false});
   guiHandler.skyboxNameController = guiHandler.datGuiSkybox.add(guiHandler.skyboxParameters, "Name").listen();
   guiHandler.disableController(guiHandler.skyboxNameController, true);
   guiHandler.skyboxColorController = guiHandler.datGuiSkybox.addColor(guiHandler.skyboxParameters, "Color").onChange(function(val){
@@ -794,9 +869,82 @@ GUIHandler.prototype.initializeSkyboxGUI = function(){
   }).listen();
 }
 
+GUIHandler.prototype.initializeBloomGUI = function(){
+  guiHandler.datGuiBloom = new dat.GUI({hideable: false});
+  guiHandler.bloomThresholdController = guiHandler.datGuiBloom.add(guiHandler.bloomParameters, "Threshold").min(0).max(1).step(0.01).onChange(function(val){
+    bloom.setThreshold(val);
+  }).listen();
+  guiHandler.bloomActiveController = guiHandler.datGuiBloom.add(guiHandler.bloomParameters, "Strength").min(0).max(100).step(0.1).onChange(function(val){
+    bloom.setBloomStrength(val);
+  }).listen();
+  guiHandler.bloomExposureController = guiHandler.datGuiBloom.add(guiHandler.bloomParameters, "Exposure").min(0).max(100).step(0.01).onChange(function(val){
+    bloom.setExposure(val);
+  }).listen();
+  guiHandler.bloomGammaController = guiHandler.datGuiBloom.add(guiHandler.bloomParameters, "Gamma").min(0).max(100).step(0.01).onChange(function(val){
+    bloom.setGamma(val);
+  }).listen();
+  guiHandler.bloomBlurStepAmountController = guiHandler.datGuiBloom.add(guiHandler.bloomParameters, "BlurStepAmount").min(1).max(5).step(1).onChange(function(val){
+    bloom.setBlurStepCount(val);
+    for (var i = 0; i < 5; i++){
+      guiHandler.enableController(guiHandler["blurPassFactorController"+(i+1)]);
+      if (!bloom.configurations.blendWithSkybox){
+        guiHandler.enableController(guiHandler["blurPassTintColorController"+(i+1)]);
+      }
+      guiHandler.enableController(guiHandler["blurPassTapController"+(i+1)]);
+    }
+    for (var i = val; i < 5; i++){
+      guiHandler.disableController(guiHandler["blurPassFactorController"+(i+1)]);
+      guiHandler.disableController(guiHandler["blurPassTintColorController"+(i+1)]);
+      guiHandler.disableController(guiHandler["blurPassTapController"+(i+1)]);
+    }
+  }).listen();
+  guiHandler.bloomActiveController = guiHandler.datGuiBloom.add(guiHandler.bloomParameters, "Active").onChange(function(val){
+    renderer.bloomOn = val;
+  }).listen();
+  guiHandler.bloomBlendWithSkyboxController = guiHandler.datGuiBloom.add(guiHandler.bloomParameters, "Blend skybox").onChange(function(val){
+    if (!skyboxVisible){
+      guiHandler.bloomParameters["Blend skybox"] = false;
+      return;
+    }
+    bloom.setBlendWithSkyboxStatus(val);
+    if (val){
+      for (var i = 0; i<bloom.configurations.blurStepCount; i++){
+        guiHandler.disableController(guiHandler["blurPassTintColorController"+(i+1)]);
+      }
+    }else{
+      for (var i = 0; i<bloom.configurations.blurStepCount; i++){
+        guiHandler.enableController(guiHandler["blurPassTintColorController"+(i+1)]);
+      }
+    }
+  }).listen();
+  for (var i = 0; i<5; i++){
+    var blurPassFolder = guiHandler.datGuiBloom.addFolder("BlurPass"+(i+1));
+    guiHandler["blurPassFactorController"+(i+1)] = blurPassFolder.add(guiHandler.bloomParameters["BlurPass"+(i+1)], "Factor").min(0).max(1).step(0.01).onChange(function(val){
+      bloom.setBloomFactor(this.index, val);
+    }.bind({index: i})).listen();
+    guiHandler["blurPassTapController"+(i+1)] = blurPassFolder.add(guiHandler.bloomParameters["BlurPass"+(i+1)], "Quality", ["high", "medium", "low"]).onChange(function(val){
+      var tapAmount;
+      if (val == "high"){
+        tapAmount = 13;
+      }else if (val == "medium"){
+        tapAmount = 9;
+      }else if (val == "low"){
+        tapAmount = 5;
+      }else{
+        throw new Error("Unknown tap type.");
+      }
+      bloom.setTapForLevel(this.index, tapAmount);
+    }.bind({index: i})).listen();
+    guiHandler["blurPassTintColorController"+(i+1)] = blurPassFolder.addColor(guiHandler.bloomParameters["BlurPass"+(i+1)], "Color").onChange(function(val){
+      REUSABLE_COLOR.set(val);
+      bloom.setBloomTintColor(this.index, REUSABLE_COLOR.r, REUSABLE_COLOR.g, REUSABLE_COLOR.b);
+    }.bind({index: i})).listen();
+  }
+}
+
 GUIHandler.prototype.initializeFogGUI = function(){
-  guiHandler.datGuiFog = new dat.GUI();
-  fogDensityController = guiHandler.datGuiFog.add(fogParameters, "Density").min(0).max(1).step(0.01).onChange(function(val){
+  guiHandler.datGuiFog = new dat.GUI({hideable: false});
+  guiHandler.fogDensityController = guiHandler.datGuiFog.add(guiHandler.fogParameters, "Density").min(0).max(1).step(0.01).onChange(function(val){
     fogDensity = val / 100;
     if (!fogBlendWithSkybox){
       GLOBAL_FOG_UNIFORM.value.set(fogDensity, fogColorRGB.r, fogColorRGB.g, fogColorRGB.b);
@@ -809,13 +957,13 @@ GUIHandler.prototype.initializeFogGUI = function(){
       );
     }
   }).listen();
-  fogColorController = guiHandler.datGuiFog.addColor(fogParameters, "Color").onChange(function(val){
+  guiHandler.fogColorController = guiHandler.datGuiFog.addColor(guiHandler.fogParameters, "Color").onChange(function(val){
     fogColorRGB.set(val);
     GLOBAL_FOG_UNIFORM.value.set(fogDensity, fogColorRGB.r, fogColorRGB.g, fogColorRGB.b);
   }).listen();
-  fogBlendWithSkyboxController = guiHandler.datGuiFog.add(fogParameters, "Blend skybox").onChange(function(val){
+  guiHandler.fogBlendWithSkyboxController = guiHandler.datGuiFog.add(guiHandler.fogParameters, "Blend skybox").onChange(function(val){
     if (!skyboxVisible){
-      fogParameters["Blend skybox"] = false;
+      guiHandler.fogParameters["Blend skybox"] = false;
       return;
     }
     if (val){
@@ -826,11 +974,11 @@ GUIHandler.prototype.initializeFogGUI = function(){
         skyboxMesh.material.uniforms.color.value.g,
         skyboxMesh.material.uniforms.color.value.b
       );
-      guiHandler.disableController(fogColorController);
+      guiHandler.disableController(guiHandler.fogColorController);
     }else{
       fogBlendWithSkybox = false;
       GLOBAL_FOG_UNIFORM.value.set(fogDensity, fogColorRGB.r, fogColorRGB.g, fogColorRGB.b);
-      guiHandler.enableController(fogColorController);
+      guiHandler.enableController(guiHandler.fogColorController);
     }
     for (var objName in addedObjects){
       addedObjects[objName].removeFog();

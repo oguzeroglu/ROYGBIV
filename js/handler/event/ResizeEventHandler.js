@@ -3,15 +3,14 @@ var ResizeEventHandler = function(){
 }
 
 ResizeEventHandler.prototype.onResize = function(){
-  if (!(renderer && composer)){
+  if (!(renderer)){
     return;
   }
   renderer.setSize(window.innerWidth, window.innerHeight);
-  composer.setSize(window.innerWidth, window.innerHeight);
   camera.oldAspect = camera.aspect;
   camera.aspect = window.innerWidth / window.innerHeight;
   camera.updateProjectionMatrix();
-  boundingClientRect = renderer.domElement.getBoundingClientRect();
+  boundingClientRect = renderer.getBoundingClientRect();
   if (isDeployment){
     canvas.oldWidth = (canvas.width / screenResolution) + 'px';
     if (!isDeployment && terminal.isMadeVisible){
@@ -26,9 +25,6 @@ ResizeEventHandler.prototype.onResize = function(){
     handleViewport();
     if (particleSystemRefHeight){
       GLOBAL_PS_REF_HEIGHT_UNIFORM.value = ((renderer.getCurrentViewport().w / screenResolution) / particleSystemRefHeight);
-    }
-    if (bloomOn){
-      adjustPostProcessing(4, bloomResolutionScale);
     }
   }
   if (mode == 0){

@@ -115,7 +115,6 @@ window.onload = function() {
   if (!isDeployment){
     // GUI HANDLER
     guiHandler = new GUIHandler();
-    guiHandler.init();
   }
 
   // IMAGE UPLOADER
@@ -130,13 +129,14 @@ window.onload = function() {
   scene = new THREE.Scene();
   debugRenderer = new THREE.CannonDebugRenderer(scene, physicsWorld);
   scene.background = new THREE.Color(sceneBackgroundColor);
-  camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 10000 );
+  camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 1, 10000);
+  orthographicCamera = new THREE.OrthographicCamera(-1, 1, 1, -1, 0, 1);
   camera.position.set(initialCameraX, initialCameraY, initialCameraZ);
   camera.rotation.order = 'YXZ';
   camera.aspect = (window.innerWidth / window.innerHeight);
   GLOBAL_PROJECTION_UNIFORM.value = camera.projectionMatrix;
   GLOBAL_VIEW_UNIFORM.value = camera.matrixWorldInverse;
-  renderer = new THREE.WebGLRenderer({canvas: canvas});
+  renderer = new Renderer();
   webglCallbackHandler = new WebGLCallbackHandler();
   if (window.devicePixelRatio > 1){
     screenResolution = 1;
@@ -146,19 +146,15 @@ window.onload = function() {
     screenResolution = window.devicePixelRatio;
   }
   renderer.setSize(window.innerWidth, window.innerHeight);
-  boundingClientRect = renderer.domElement.getBoundingClientRect();
+  boundingClientRect = renderer.getBoundingClientRect();
   initPhysics();
-  initPostProcessing();
   render();
   windowLoaded = true;
-  MAX_VERTEX_UNIFORM_VECTORS = renderer.context.getParameter(renderer.context.MAX_VERTEX_UNIFORM_VECTORS);
-  VERTEX_SHADER_TEXTURE_FETCH_SUPPORTED = (renderer.context.getParameter(renderer.context.MAX_VERTEX_TEXTURE_IMAGE_UNITS) > 0);
-  DDS_SUPPORTED = (!(renderer.context.getExtension("WEBGL_compressed_texture_s3tc") == null));
-  INSTANCING_SUPPORTED = (!(renderer.context.getExtension("ANGLE_instanced_arrays") == null));
-  HIGH_PRECISION_SUPPORTED = !(
-    renderer.context.getShaderPrecisionFormat(renderer.context.VERTEX_SHADER, renderer.context.HIGH_FLOAT).precision <= 0 ||
-    renderer.context.getShaderPrecisionFormat(renderer.context.FRAGMENT_SHADER, renderer.context.HIGH_FLOAT).precision <= 0
-  );
+  MAX_VERTEX_UNIFORM_VECTORS = renderer.getMaxVertexUniformVectors();
+  VERTEX_SHADER_TEXTURE_FETCH_SUPPORTED = renderer.isVertexShaderTextureFetchSupported();
+  DDS_SUPPORTED = renderer.isDDSSupported();
+  INSTANCING_SUPPORTED = renderer.isInstancingSupported();
+  HIGH_PRECISION_SUPPORTED = renderer.isHighPrecisionSupported();
   if (!isDeployment){
     terminal.init();
   }
@@ -176,52 +172,6 @@ window.onload = function() {
   }
 };
 
-
-function initPostProcessing(){
- renderPass = new THREE.RenderPass(scene, camera);
- if (mode == 1){
-  bloomPass = new THREE.UnrealBloomPass(
-    new THREE.Vector2(
-      renderer.getCurrentViewport().z * bloomResolutionScale,
-      renderer.getCurrentViewport().w * bloomResolutionScale
-    ),
-    bloomStrength,
-    bloomRadius,
-    bloomThreshold
-  );
- }
- copyPass = new THREE.ShaderPass( THREE.CopyShader );
- setPostProcessingParams();
- composer = new THREE.EffectComposer(renderer);
- composer.setSize(renderer.getCurrentViewport().z / screenResolution, renderer.getCurrentViewport().w / screenResolution);
- composer.addPass( renderPass );
- if (mode == 1){
-  if (bloomOn){
-    composer.addPass( bloomPass );
-    bloomPass.renderToScreen = true;
-  }
- }
- if (!(mode == 1 && bloomOn)){
-    composer.addPass( copyPass );
-    copyPass.renderToScreen = true;
- }
- setPostProcessingParams();
-}
-
-function setPostProcessingParams(){
- if (mode == 1){
-  if (bloomOn){
-    bloomPass.strength = bloomStrength;
-    bloomPass.radius = bloomRadius;
-    bloomPass.threshold = bloomThreshold;
-    bloomPass.resolution = new THREE.Vector2(
-      window.innerWidth * bloomResolutionScale,
-      window.innerHeight * bloomResolutionScale
-    );
-  }
- }
-}
-
 function initPhysics(){
  if (physicsWorld.init){
    physicsWorld.init();
@@ -237,56 +187,6 @@ function initPhysics(){
  physicsWorld.solver = physicsSolver;
  physicsWorld.gravity.set(0, gravityY, 0);
  physicsWorld.broadphase = new CANNON.SAPBroadphase(physicsWorld);
-}
-
-function adjustPostProcessing(variableIndex, val){
- switch(variableIndex){
-   case 1: //bloomStrength
-    bloomStrength = val;
-   break;
-   case 2: //Bloom_radius
-    bloomRadius = val;
-   break;
-   case 3: //Bloom_threshhold
-    bloomThreshold = val;
-   break;
-   case 4: //Bloom_resolution_scale
-    bloomResolutionScale = val;
-    bloomPass = new THREE.UnrealBloomPass(
-      new THREE.Vector2(
-        renderer.getCurrentViewport().z * bloomResolutionScale,
-        renderer.getCurrentViewport().w * bloomResolutionScale
-      ),
-      bloomStrength,
-      bloomRadius,
-      bloomThreshold
-    );
-   break;
-   case 5: //Bloom
-    bloomOn = val;
-   break;
-   case -1: //from script
-    if(!isDeployment){
-      guiHandler.postprocessingParameters["Bloom_strength"] = bloomStrength;
-      guiHandler.postprocessingParameters["Bloom_radius"] = bloomRadius;
-      guiHandler.postprocessingParameters["Bloom_threshhold"] = bloomThreshold;
-      guiHandler.postprocessingParameters["Bloom_resolution_scale"] = bloomResolutionScale;
-      guiHandler.postprocessingParameters["Bloom"] = bloomOn;
-    }
-   break;
- }
- composer = new THREE.EffectComposer(renderer);
- composer.setSize(renderer.getCurrentViewport().z / screenResolution, renderer.getCurrentViewport().w / screenResolution);
- composer.addPass(renderPass);
- if (bloomOn){
-   composer.addPass(bloomPass);
-   bloomPass.renderToScreen = true;
- }
- if (!(mode == 1 && bloomOn)){
-    composer.addPass(copyPass);
-    copyPass.renderToScreen = true;
- }
- setPostProcessingParams();
 }
 
 function processCameraRotationBuffer(){
@@ -324,7 +224,7 @@ function handleViewport(){
     var newViewportZ = result.width;
     var newViewportW = result.height;
     renderer.setViewport(newViewportX, newViewportY, newViewportZ, newViewportW);
-    composer.setSize(newViewportZ, newViewportW);
+    renderer.setSize(newViewportZ, newViewportW);
     currentViewport.startX = newViewportX;
     currentViewport.startY = newViewportY;
     currentViewport.width = newViewportZ;
@@ -353,7 +253,7 @@ function handleViewport(){
     }
   }
   renderer.setViewport(newViewportX, newViewportY, newViewportZ, newViewportW);
-  composer.setSize(newViewportZ, newViewportW);
+  renderer.setSize(newViewportZ, newViewportW);
   currentViewport.startX = newViewportX;
   currentViewport.startY = newViewportY;
   currentViewport.width = newViewportZ;

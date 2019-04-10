@@ -12,6 +12,9 @@ uniform float totalAlpha;
 
 #ifdef IS_AUTO_INSTANCED
   varying float vDiscardFlag;
+  #ifdef AUTO_INSTANCE_HAS_COLORIZABLE_MEMBER
+    varying vec4 vAutoInstancedForcedColorInfo;
+  #endif
 #endif
 
 #ifdef HAS_TEXTURE
@@ -66,6 +69,12 @@ void main(){
       discard;
       return;
     }
+    #ifdef AUTO_INSTANCE_HAS_COLORIZABLE_MEMBER
+      if (vAutoInstancedForcedColorInfo.x >= -10.0){
+        gl_FragColor = vec4(vAutoInstancedForcedColorInfo.y, vAutoInstancedForcedColorInfo.z, vAutoInstancedForcedColorInfo.w, vAutoInstancedForcedColorInfo.x);
+        return;
+      }
+    #endif
   #endif
 
   #ifdef HAS_FORCED_COLOR
