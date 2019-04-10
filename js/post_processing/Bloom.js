@@ -18,6 +18,46 @@ var Bloom = function(){
   this.setBlurStepCount(this.configurations.blurStepCount);
 }
 
+Bloom.prototype.reset = function(){
+  renderer.bloomOn = false;
+  this.setBlurStepCount(5);
+  this.setThreshold(1);
+  this.setBloomStrength(2);
+  this.setExposure(1);
+  this.setGamma(1);
+  for (var i = 0; i<5; i++){
+    this.setTapForLevel(i, 13);
+    this.setBloomFactor(i, 1);
+    this.setBloomTintColor(i, 1, 1, 1);
+  }
+  this.setBlendWithSkyboxStatus(false);
+}
+
+Bloom.prototype.load = function(configs){
+  this.setBlurStepCount(configs.blurStepCount);
+  this.setThreshold(configs.threshold);
+  this.setBloomStrength(configs.bloomStrength);
+  this.setExposure(configs.exposure);
+  this.setGamma(configs.gamma);
+  for (var i = 0; i<5; i++){
+    this.setTapForLevel(i, configs.tapTypes[i]);
+    this.setBloomFactor(i, configs.bloomFactors[i]);
+    var curBloomTintColor = configs.bloomTintColors[i];
+    this.setBloomTintColor(i, curBloomTintColor.x, curBloomTintColor.y, curBloomTintColor.z);
+  }
+  this.setBlendWithSkyboxStatus(configs.blendWithSkybox);
+  renderer.bloomOn = configs.isOn;
+}
+
+Bloom.prototype.export = function(){
+  var exportObj = new Object();
+  exportObj.isOn = renderer.bloomOn;
+  for (var config in this.configurations){
+    exportObj[config] = this.configurations[config];
+  }
+  return exportObj;
+}
+
 Bloom.prototype.onSkyboxVisibilityChange = function(){
   if (!this.configurationsOpen){
     return;

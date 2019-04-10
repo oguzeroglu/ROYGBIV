@@ -954,6 +954,8 @@ StateLoader.prototype.load = function(){
     }
     // TEXTS *******************************************************
     // NOT HERE -> SEE: finalize
+    // EFFECTS *****************************************************
+    // NOT HERE -> SEE: finalize
 
     if (this.oldPhysicsDebugMode){
       if (this.oldPhysicsDebugMode != "NONE"){
@@ -1221,7 +1223,6 @@ StateLoader.prototype.finalize = function(){
       physicsWorld.remove(objectGroupInstance.physicsBody);
     }
   }
-
   for (var objName in objectGroups){
     if (objectGroups[objName].softCopyParentName){
       var softCopyParent = objectGroups[objectGroups[objName].softCopyParentName];
@@ -1238,6 +1239,9 @@ StateLoader.prototype.finalize = function(){
         }
       }
     }
+  }
+  for (var effecName in obj.effects){
+    renderer.effects[effecName].load(obj.effects[effecName]);
   }
   projectLoaded = true;
   if (!isDeployment){
@@ -2243,7 +2247,9 @@ StateLoader.prototype.resetProject = function(){
   for (var i = 0; i<objectsToRemove.length; i++){
     scene.remove(objectsToRemove[i]);
   }
-
+  for (var effectName in renderer.effects){
+    renderer.effects[effectName].reset();
+  }
   diffuseTextureCache = new Object();
   heightTextureCache = new Object();
   ambientOcculsionTextureCache = new Object();
