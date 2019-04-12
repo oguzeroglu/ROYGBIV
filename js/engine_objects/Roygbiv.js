@@ -184,7 +184,8 @@ var Roygbiv = function(){
     "onTextMouseOver",
     "removeTextMouseOverListener",
     "onTextMouseOut",
-    "removeTextMouseOutListener"
+    "removeTextMouseOutListener",
+    "onObjectPositionThresholdExceeded"
   ];
 
   this.globals = new Object();
@@ -696,11 +697,13 @@ Roygbiv.prototype.rotate = function(object, axis, radians){
     preConditions.checkIfChangeable(ROYGBIV.rotate, preConditions.object, object);
   }
   if (object.pivotObject){
+    object.prevPositionVector.copy(object.mesh.position);
     object.rotateAroundPivotObject(axis, radians);
     physicsWorld.updateObject(object, false, true);
     if (object.autoInstancedParent){
       object.autoInstancedParent.updateObject(object);
     }
+    object.onPositionChange(object.prevPositionVector, object.mesh.position);
     return;
   }
   object.rotate(axis, radians, true);
@@ -756,11 +759,13 @@ Roygbiv.prototype.rotateAroundXYZ = function(object, x, y, z, radians, axis){
   }else if (object.isObjectGroup){
     preConditions.checkIfChangeable(ROYGBIV.rotateAroundXYZ, preConditions.object, object);
   }
+  object.prevPositionVector.copy(object.mesh.position);
   object.rotateAroundXYZ(x, y, z, axis, axisVector, radians);
   physicsWorld.updateObject(object, false, true);
   if (object.autoInstancedParent){
     object.autoInstancedParent.updateObject(object);
   }
+  object.onPositionChange(object.prevPositionVector, object.mesh.position);
 }
 
 //  Puts an object or glued object to the specified (x, y, z) coordinate.
@@ -784,6 +789,7 @@ Roygbiv.prototype.setPosition = function(obj, x, y, z){
       return;
     }
     preConditions.checkIfChangeable(ROYGBIV.setPosition, preConditions.obj, obj);
+    obj.prevPositionVector.copy(obj.mesh.position);
     obj.mesh.position.set(x, y, z);
     obj.physicsBody.position.set(x, y, z);
     if (obj.mesh.visible){
@@ -793,8 +799,10 @@ Roygbiv.prototype.setPosition = function(obj, x, y, z){
     if (obj.autoInstancedParent){
       obj.autoInstancedParent.updateObject(obj);
     }
+    obj.onPositionChange(obj.prevPositionVector, obj.mesh.position);
   }else if (obj.isObjectGroup){
     preConditions.checkIfChangeable(ROYGBIV.setPosition, preConditions.obj, obj);
+    obj.prevPositionVector.copy(obj.mesh.position);
     obj.mesh.position.set(x, y, z);
     obj.graphicsGroup.position.set(x, y, z);
     if (!obj.isPhysicsSimplified){
@@ -806,6 +814,7 @@ Roygbiv.prototype.setPosition = function(obj, x, y, z){
       rayCaster.updateObject(obj);
     }
     physicsWorld.updateObject(obj, true, false);
+    obj.onPositionChange(obj.prevPositionVector, obj.mesh.position);
   }
 }
 
@@ -4164,6 +4173,9 @@ Roygbiv.prototype.onTextMouseOver = function(text, callbackFunction){
 
 // Removes the mouseover listener of a text.
 Roygbiv.prototype.removeTextMouseOverListener = function(text){
+  if (mode == 0){
+    return;
+  }
   preConditions.checkIfDefined(ROYGBIV.removeTextMouseOverListener, preConditions.text, text);
   preConditions.checkIfAddedText(ROYGBIV.removeTextMouseOverListener, preConditions.text, text);
   delete text.mouseOverCallbackFunction;
@@ -4172,6 +4184,9 @@ Roygbiv.prototype.removeTextMouseOverListener = function(text){
 
 // Sets a mouseout listener for a text. The callbackFunction is bound to text (this = text inside the function).
 Roygbiv.prototype.onTextMouseOut = function(text, callbackFunction){
+  if (mode == 0){
+    return;
+  }
   preConditions.checkIfDefined(ROYGBIV.onTextMouseOut, preConditions.text, text);
   preConditions.checkIfAddedText(ROYGBIV.onTextMouseOut, preConditions.text, text);
   preConditions.checkIfTextClickable(ROYGBIV.onTextMouseOut, preConditions.text, text);
@@ -4183,10 +4198,42 @@ Roygbiv.prototype.onTextMouseOut = function(text, callbackFunction){
 
 // Removes the mouseout listener of a text.
 Roygbiv.prototype.removeTextMouseOutListener = function(text){
+  if (mode == 0){
+    return;
+  }
   preConditions.checkIfDefined(ROYGBIV.removeTextMouseOutListener, preConditions.text, text);
   preConditions.checkIfAddedText(ROYGBIV.removeTextMouseOutListener, preConditions.text, text);
   delete text.mouseOutCallbackFunction;
   objectsWithMouseOutListeners.delete(text.name);
+}
+
+// Sets a listener for an object detecting the position threshold passage for given axis. If controlMode = 1
+// the callbackFunction is executed when object.position[axis] > threshold, if controlMode = 2 the callbackFunction
+// is executed when object.position[axis] < threshold. The callbackFunction is bound to object (this = object inside the function)
+// This API may be used to restart position of objects that went out of bounds of the scene by falling down etc.
+Roygbiv.prototype.onObjectPositionThresholdExceeded = function(object, axis, threshold, controlMode, callbackFunction){
+  if (mode == 0){
+    return;
+  }
+  preConditions.checkIfDefined(ROYGBIV.onObjectPositionThresholdExceeded, preConditions.object, object);
+  preConditions.checkIfDefined(ROYGBIV.onObjectPositionThresholdExceeded, preConditions.axis, axis);
+  preConditions.checkIfDefined(ROYGBIV.onObjectPositionThresholdExceeded, preConditions.threshold, threshold);
+  preConditions.checkIfDefined(ROYGBIV.onObjectPositionThresholdExceeded, preConditions.callbackFunction, callbackFunction);
+  preConditions.checkIfDefined(ROYGBIV.onObjectPositionThresholdExceeded, preConditions.controlMode, controlMode);
+  preConditions.checkIfAddedObjectOrObjectGroup(ROYGBIV.onObjectPositionThresholdExceeded, preConditions.object, object);
+  preConditions.checkIfChildObjectOnlyIfExists(ROYGBIV.onObjectPositionThresholdExceeded, preConditions.object, object);
+  preConditions.checkIfAxisOnlyIfDefined(ROYGBIV.onObjectPositionThresholdExceeded, preConditions.axis, axis);
+  preConditions.checkIfNumber(ROYGBIV.onObjectPositionThresholdExceeded, preConditions.threshold, threshold);
+  preConditions.checkIfFunctionOnlyIfExists(ROYGBIV.onObjectPositionThresholdExceeded, preConditions.callbackFunction, callbackFunction);
+  preConditions.checkIfTrue(ROYGBIV.onObjectPositionThresholdExceeded, "controlMode must be 1 or 2", (controlMode != 1 && controlMode != 2));
+  if (!object.positionThresholdExceededListenerInfo){
+    object.positionThresholdExceededListenerInfo = new Object();
+  }
+  object.positionThresholdExceededListenerInfo.axis = axis.toLowerCase();
+  object.positionThresholdExceededListenerInfo.isActive = true;
+  object.positionThresholdExceededListenerInfo.threshold = threshold;
+  object.positionThresholdExceededListenerInfo.controlMode = controlMode;
+  object.positionThresholdExceededListenerInfo.callbackFunction = callbackFunction.bind(object);
 }
 
 // TEXT FUNCTIONS **************************************************************

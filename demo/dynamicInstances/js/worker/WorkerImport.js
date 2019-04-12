@@ -2289,6 +2289,7 @@ var AddedObject = function(name, type, metaData, material, mesh, physicsBody, de
   this.reusableVec3_2 = new THREE.Vector3();
   this.reusableVec3_3 = new THREE.Vector3();
 
+  this.prevPositionVector = new THREE.Vector3();
   this.isIntersectable = true;
 
   this.lastUpdatePosition = new THREE.Vector3();
@@ -2296,6 +2297,27 @@ var AddedObject = function(name, type, metaData, material, mesh, physicsBody, de
 
   webglCallbackHandler.registerEngineObject(this);
 
+}
+
+AddedObject.prototype.onPositionChange = function(from, to){
+  if(mode == 0){
+    return;
+  }
+  if (this.positionThresholdExceededListenerInfo && this.positionThresholdExceededListenerInfo.isActive){
+    var axis = this.positionThresholdExceededListenerInfo.axis;
+    var oldPos = from[axis];
+    var newPos = to[axis];
+    var threshold = this.positionThresholdExceededListenerInfo.threshold;
+    if (this.positionThresholdExceededListenerInfo.controlMode == 1){
+      if (oldPos <= threshold && newPos > threshold){
+        this.positionThresholdExceededListenerInfo.callbackFunction();
+      }
+    }else{
+      if (oldPos >= threshold && newPos < threshold){
+        this.positionThresholdExceededListenerInfo.callbackFunction();
+      }
+    }
+  }
 }
 
 AddedObject.prototype.collisionCallback = function(collisionEvent){
@@ -4894,6 +4916,8 @@ var ObjectGroup = function(name, group){
 
   this.childObjectsByName = new Object();
 
+  this.prevPositionVector = new THREE.Vector3();
+
   this.totalVertexCount = 0;
   this.skippedVertexCount = 0;
 
@@ -4909,6 +4933,27 @@ var ObjectGroup = function(name, group){
   this.isIntersectable = true;
   this.lastUpdatePosition = new THREE.Vector3();
   this.lastUpdateQuaternion = new THREE.Quaternion();
+}
+
+ObjectGroup.prototype.onPositionChange = function(from, to){
+  if (mode == 0){
+    return;
+  }
+  if (this.positionThresholdExceededListenerInfo && this.positionThresholdExceededListenerInfo.isActive){
+    var axis = this.positionThresholdExceededListenerInfo.axis;
+    var oldPos = from[axis];
+    var newPos = to[axis];
+    var threshold = this.positionThresholdExceededListenerInfo.threshold;
+    if (this.positionThresholdExceededListenerInfo.controlMode == 1){
+      if (oldPos <= threshold && newPos > threshold){
+        this.positionThresholdExceededListenerInfo.callbackFunction();
+      }
+    }else{
+      if (oldPos >= threshold && newPos < threshold){
+        this.positionThresholdExceededListenerInfo.callbackFunction();
+      }
+    }
+  }
 }
 
 ObjectGroup.prototype.forceColor = function(r, g, b, a){

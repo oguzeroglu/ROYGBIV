@@ -3588,6 +3588,7 @@ var AddedObject = function(name, type, metaData, material, mesh, physicsBody, de
   this.reusableVec3_2 = new THREE.Vector3();
   this.reusableVec3_3 = new THREE.Vector3();
 
+  this.prevPositionVector = new THREE.Vector3();
   this.isIntersectable = true;
 
   this.lastUpdatePosition = new THREE.Vector3();
@@ -3595,6 +3596,27 @@ var AddedObject = function(name, type, metaData, material, mesh, physicsBody, de
 
   webglCallbackHandler.registerEngineObject(this);
 
+}
+
+AddedObject.prototype.onPositionChange = function(from, to){
+  if(mode == 0){
+    return;
+  }
+  if (this.positionThresholdExceededListenerInfo && this.positionThresholdExceededListenerInfo.isActive){
+    var axis = this.positionThresholdExceededListenerInfo.axis;
+    var oldPos = from[axis];
+    var newPos = to[axis];
+    var threshold = this.positionThresholdExceededListenerInfo.threshold;
+    if (this.positionThresholdExceededListenerInfo.controlMode == 1){
+      if (oldPos <= threshold && newPos > threshold){
+        this.positionThresholdExceededListenerInfo.callbackFunction();
+      }
+    }else{
+      if (oldPos >= threshold && newPos < threshold){
+        this.positionThresholdExceededListenerInfo.callbackFunction();
+      }
+    }
+  }
 }
 
 AddedObject.prototype.collisionCallback = function(collisionEvent){
@@ -6313,6 +6335,7 @@ function updateTrackingObjects(){
       obj = objectGroups[objName];
       isObjectGroup = true;
     }
+    obj.prevPositionVector.copy(obj.mesh.position);
     obj.mesh.position.set(
       obj.mesh.position.x + obj.trackedObject.dx,
       obj.mesh.position.y + obj.trackedObject.dy,
@@ -6329,11 +6352,13 @@ function updateTrackingObjects(){
     if (obj.autoInstancedParent){
       obj.autoInstancedParent.updateObject(obj);
     }
+    obj.onPositionChange(obj.prevPositionVector, obj.mesh.position);
   }
 }
 
 function dynamicObjectUpdateFunction(object, objectName){
   var physicsBody = object.physicsBody;
+  object.prevPositionVector.copy(object.mesh.position);
   if (object.isTracked){
     object.dx = physicsBody.position.x - object.oldPX;
     object.dy = physicsBody.position.y - object.oldPY;
@@ -6357,6 +6382,7 @@ function dynamicObjectUpdateFunction(object, objectName){
   if (object.autoInstancedParent){
     object.autoInstancedParent.updateObject(object);
   }
+  object.onPositionChange(object.prevPositionVector, physicsBody.position);
 }
 
 function updateDynamicObjects(){
@@ -6413,14 +6439,13 @@ ROYGBIV.globals.leftKey = "Left";
 ROYGBIV.globals.rightKey = "Right";
 ROYGBIV.globals.surface = ROYGBIV.getObject("surface1");
 ROYGBIV.globals.reusableVector = ROYGBIV.vector(0, 0, 0);
-ROYGBIV.globals.positionCtrlFunc = function(obj, objName){
-  ROYGBIV.getPosition(obj, ROYGBIV.globals.reusableVector);
-  if (ROYGBIV.globals.reusableVector.y <= -500){
-    ROYGBIV.setPosition(obj, ROYGBIV.getRandomInteger(-200, 200), ROYGBIV.getRandomInteger(400, 500), ROYGBIV.getRandomInteger(-20, 70));
-    ROYGBIV.resetObjectVelocity(obj);
-  }
-}
 ROYGBIV.globals.cameraPositionVector = ROYGBIV.vector(0, 0, 0);
+ROYGBIV.executeForEachObject(function(obj){
+  ROYGBIV.onObjectPositionThresholdExceeded(obj, "y", -500, 2, function(){
+    ROYGBIV.setPosition(this, ROYGBIV.getRandomInteger(-200, 200), ROYGBIV.getRandomInteger(400, 500), ROYGBIV.getRandomInteger(-20, 70));
+    ROYGBIV.resetObjectVelocity(this);
+  });
+});
 ROYGBIV.globals.mousewheelCallback = function(deltaX, deltaY){
   if (Math.abs(deltaX) < Math.abs(deltaY)){
     ROYGBIV.getCameraPosition(ROYGBIV.globals.cameraPositionVector);
@@ -6448,9 +6473,7 @@ ROYGBIV.setScreenPinchListener(ROYGBIV.globals.pinchCallback);
 ROYGBIV.runScript("loop");
 deploymentScriptsStatus.SCRIPT_EXECUTION_STATUS_init = false;
 if (cpuOperationsHandler.record){cpuOperationsHandler.scriptPerformances.init = performance.now() - cpuOperationsHandler.scriptPerformances.init}}
-if(deploymentScriptsStatus.SCRIPT_EXECUTION_STATUS_loop){if (cpuOperationsHandler.record){cpuOperationsHandler.scriptPerformances.loop = performance.now()}ROYGBIV.executeForEachObject(ROYGBIV.globals.positionCtrlFunc);
-
-if (ROYGBIV.isKeyPressed(ROYGBIV.globals.leftKey)){
+if(deploymentScriptsStatus.SCRIPT_EXECUTION_STATUS_loop){if (cpuOperationsHandler.record){cpuOperationsHandler.scriptPerformances.loop = performance.now()}if (ROYGBIV.isKeyPressed(ROYGBIV.globals.leftKey)){
   ROYGBIV.rotate(ROYGBIV.globals.surface, ROYGBIV.globals.axisZ, 0.01);
 }else if (ROYGBIV.isKeyPressed(ROYGBIV.globals.rightKey)){
   ROYGBIV.rotate(ROYGBIV.globals.surface, ROYGBIV.globals.axisZ, -0.01);
@@ -10447,6 +10470,8 @@ var ObjectGroup = function(name, group){
 
   this.childObjectsByName = new Object();
 
+  this.prevPositionVector = new THREE.Vector3();
+
   this.totalVertexCount = 0;
   this.skippedVertexCount = 0;
 
@@ -10462,6 +10487,27 @@ var ObjectGroup = function(name, group){
   this.isIntersectable = true;
   this.lastUpdatePosition = new THREE.Vector3();
   this.lastUpdateQuaternion = new THREE.Quaternion();
+}
+
+ObjectGroup.prototype.onPositionChange = function(from, to){
+  if (mode == 0){
+    return;
+  }
+  if (this.positionThresholdExceededListenerInfo && this.positionThresholdExceededListenerInfo.isActive){
+    var axis = this.positionThresholdExceededListenerInfo.axis;
+    var oldPos = from[axis];
+    var newPos = to[axis];
+    var threshold = this.positionThresholdExceededListenerInfo.threshold;
+    if (this.positionThresholdExceededListenerInfo.controlMode == 1){
+      if (oldPos <= threshold && newPos > threshold){
+        this.positionThresholdExceededListenerInfo.callbackFunction();
+      }
+    }else{
+      if (oldPos >= threshold && newPos < threshold){
+        this.positionThresholdExceededListenerInfo.callbackFunction();
+      }
+    }
+  }
 }
 
 ObjectGroup.prototype.forceColor = function(r, g, b, a){
@@ -14993,7 +15039,8 @@ var Roygbiv = function(){
     "onTextMouseOver",
     "removeTextMouseOverListener",
     "onTextMouseOut",
-    "removeTextMouseOutListener"
+    "removeTextMouseOutListener",
+    "onObjectPositionThresholdExceeded"
   ];
 
   this.globals = new Object();
@@ -15400,11 +15447,13 @@ Roygbiv.prototype.rotate = function(object, axis, radians){
   if ((object.isAddedObject) || (object.isObjectGroup)){
   }
   if (object.pivotObject){
+    object.prevPositionVector.copy(object.mesh.position);
     object.rotateAroundPivotObject(axis, radians);
     physicsWorld.updateObject(object, false, true);
     if (object.autoInstancedParent){
       object.autoInstancedParent.updateObject(object);
     }
+    object.onPositionChange(object.prevPositionVector, object.mesh.position);
     return;
   }
   object.rotate(axis, radians, true);
@@ -15443,11 +15492,13 @@ Roygbiv.prototype.rotateAroundXYZ = function(object, x, y, z, radians, axis){
     }
   }else if (object.isObjectGroup){
   }
+  object.prevPositionVector.copy(object.mesh.position);
   object.rotateAroundXYZ(x, y, z, axis, axisVector, radians);
   physicsWorld.updateObject(object, false, true);
   if (object.autoInstancedParent){
     object.autoInstancedParent.updateObject(object);
   }
+  object.onPositionChange(object.prevPositionVector, object.mesh.position);
 }
 
 Roygbiv.prototype.setPosition = function(obj, x, y, z){
@@ -15460,6 +15511,7 @@ Roygbiv.prototype.setPosition = function(obj, x, y, z){
       this.setPosition(objGroup, x, y, z);
       return;
     }
+    obj.prevPositionVector.copy(obj.mesh.position);
     obj.mesh.position.set(x, y, z);
     obj.physicsBody.position.set(x, y, z);
     if (obj.mesh.visible){
@@ -15469,7 +15521,9 @@ Roygbiv.prototype.setPosition = function(obj, x, y, z){
     if (obj.autoInstancedParent){
       obj.autoInstancedParent.updateObject(obj);
     }
+    obj.onPositionChange(obj.prevPositionVector, obj.mesh.position);
   }else if (obj.isObjectGroup){
+    obj.prevPositionVector.copy(obj.mesh.position);
     obj.mesh.position.set(x, y, z);
     obj.graphicsGroup.position.set(x, y, z);
     if (!obj.isPhysicsSimplified){
@@ -15481,6 +15535,7 @@ Roygbiv.prototype.setPosition = function(obj, x, y, z){
       rayCaster.updateObject(obj);
     }
     physicsWorld.updateObject(obj, true, false);
+    obj.onPositionChange(obj.prevPositionVector, obj.mesh.position);
   }
 }
 
@@ -17628,18 +17683,41 @@ Roygbiv.prototype.onTextMouseOver = function(text, callbackFunction){
 }
 
 Roygbiv.prototype.removeTextMouseOverListener = function(text){
+  if (mode == 0){
+    return;
+  }
   delete text.mouseOverCallbackFunction;
   objectsWithMouseOverListeners.delete(text.name);
 }
 
 Roygbiv.prototype.onTextMouseOut = function(text, callbackFunction){
+  if (mode == 0){
+    return;
+  }
   text.mouseOutCallbackFunction = callbackFunction;
   objectsWithMouseOutListeners.set(text.name, text);
 }
 
 Roygbiv.prototype.removeTextMouseOutListener = function(text){
+  if (mode == 0){
+    return;
+  }
   delete text.mouseOutCallbackFunction;
   objectsWithMouseOutListeners.delete(text.name);
+}
+
+Roygbiv.prototype.onObjectPositionThresholdExceeded = function(object, axis, threshold, controlMode, callbackFunction){
+  if (mode == 0){
+    return;
+  }
+  if (!object.positionThresholdExceededListenerInfo){
+    object.positionThresholdExceededListenerInfo = new Object();
+  }
+  object.positionThresholdExceededListenerInfo.axis = axis.toLowerCase();
+  object.positionThresholdExceededListenerInfo.isActive = true;
+  object.positionThresholdExceededListenerInfo.threshold = threshold;
+  object.positionThresholdExceededListenerInfo.controlMode = controlMode;
+  object.positionThresholdExceededListenerInfo.callbackFunction = callbackFunction.bind(object);
 }
 
 
@@ -18080,11 +18158,11 @@ Roygbiv.prototype.translateCamera = function(axis, amount){
   }
   axis = axis.toLowerCase();
   if (axis == "x"){
-    camera.translateX(amount * defaultAspect / camera.aspect);
+    camera.translateX(amount);
   }else if (axis == "y"){
-    camera.translateY(amount * defaultAspect / camera.aspect);
+    camera.translateY(amount);
   }else if (axis == "z"){
-    camera.translateZ(amount * defaultAspect / camera.aspect);
+    camera.translateZ(amount);
   }
 }
 
@@ -21686,6 +21764,9 @@ ModeSwitcher.prototype.switchFromPreviewToDesign = function(){
     object.loadState();
     object.resetColor();
 
+    if (object.positionThresholdExceededListenerInfo){
+      object.positionThresholdExceededListenerInfo.isActive = false;
+    }
     delete object.clickCallbackFunction;
     delete object.mouseOverCallbackFunction;
     delete object.mouseOutCallbackFunction;
@@ -21712,6 +21793,10 @@ ModeSwitcher.prototype.switchFromPreviewToDesign = function(){
   }
   for (var objectName in addedObjects){
     var object = addedObjects[objectName];
+
+    if (object.positionThresholdExceededListenerInfo){
+      object.positionThresholdExceededListenerInfo.isActive = false;
+    }
 
     delete object.clickCallbackFunction;
     delete object.mouseOverCallbackFunction;

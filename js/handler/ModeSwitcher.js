@@ -316,6 +316,9 @@ ModeSwitcher.prototype.switchFromPreviewToDesign = function(){
     object.loadState();
     object.resetColor();
 
+    if (object.positionThresholdExceededListenerInfo){
+      object.positionThresholdExceededListenerInfo.isActive = false;
+    }
     delete object.clickCallbackFunction;
     delete object.mouseOverCallbackFunction;
     delete object.mouseOutCallbackFunction;
@@ -342,6 +345,10 @@ ModeSwitcher.prototype.switchFromPreviewToDesign = function(){
   }
   for (var objectName in addedObjects){
     var object = addedObjects[objectName];
+
+    if (object.positionThresholdExceededListenerInfo){
+      object.positionThresholdExceededListenerInfo.isActive = false;
+    }
 
     delete object.clickCallbackFunction;
     delete object.mouseOverCallbackFunction;

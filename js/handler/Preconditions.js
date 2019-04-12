@@ -151,6 +151,7 @@ var Preconditions = function(){
   this.func = "func";
   this.minInclusive = "minInclusive";
   this.maxInclusive = "maxInclusive";
+  this.controlMode = "controlMode";
 }
 
 Preconditions.prototype.errorHeader = function(callerFunc){

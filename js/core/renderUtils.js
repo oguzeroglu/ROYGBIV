@@ -134,6 +134,7 @@ function updateTrackingObjects(){
       obj = objectGroups[objName];
       isObjectGroup = true;
     }
+    obj.prevPositionVector.copy(obj.mesh.position);
     obj.mesh.position.set(
       obj.mesh.position.x + obj.trackedObject.dx,
       obj.mesh.position.y + obj.trackedObject.dy,
@@ -150,11 +151,13 @@ function updateTrackingObjects(){
     if (obj.autoInstancedParent){
       obj.autoInstancedParent.updateObject(obj);
     }
+    obj.onPositionChange(obj.prevPositionVector, obj.mesh.position);
   }
 }
 
 function dynamicObjectUpdateFunction(object, objectName){
   var physicsBody = object.physicsBody;
+  object.prevPositionVector.copy(object.mesh.position);
   if (object.isTracked){
     object.dx = physicsBody.position.x - object.oldPX;
     object.dy = physicsBody.position.y - object.oldPY;
@@ -178,6 +181,7 @@ function dynamicObjectUpdateFunction(object, objectName){
   if (object.autoInstancedParent){
     object.autoInstancedParent.updateObject(object);
   }
+  object.onPositionChange(object.prevPositionVector, physicsBody.position);
 }
 
 function updateDynamicObjects(){
