@@ -185,7 +185,8 @@ var Roygbiv = function(){
     "removeTextMouseOverListener",
     "onTextMouseOut",
     "removeTextMouseOutListener",
-    "onObjectPositionThresholdExceeded"
+    "onObjectPositionThresholdExceeded",
+    "removeObjectPositionThresholdExceededListener"
   ];
 
   this.globals = new Object();
@@ -4234,6 +4235,19 @@ Roygbiv.prototype.onObjectPositionThresholdExceeded = function(object, axis, thr
   object.positionThresholdExceededListenerInfo.threshold = threshold;
   object.positionThresholdExceededListenerInfo.controlMode = controlMode;
   object.positionThresholdExceededListenerInfo.callbackFunction = callbackFunction.bind(object);
+}
+
+// Removes the position threshold passage listener for an object. Does nothing
+// if the object does not have such listener.
+Roygbiv.prototype.removeObjectPositionThresholdExceededListener = function(object){
+  if (mode == 0){
+    return;
+  }
+  preConditions.checkIfDefined(ROYGBIV.removeObjectPositionThresholdExceededListener, preConditions.object, object);
+  preConditions.checkIfAddedObjectOrObjectGroup(ROYGBIV.removeObjectPositionThresholdExceededListener, preConditions.object, object);
+  if (object.positionThresholdExceededListenerInfo){
+    object.positionThresholdExceededListenerInfo.isActive = false;
+  }
 }
 
 // TEXT FUNCTIONS **************************************************************

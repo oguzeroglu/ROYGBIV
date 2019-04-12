@@ -934,4 +934,5 @@ var Text = function(){
    this.ROYGBIV_SCRIPTING_API_REMOVETEXTMOUSEOUTLISTENER = "Removes the mouseout listener of a text.";
    this.ROYGBIV_SCRIPTING_API_ONOBJECTPOSITIONTHRESHOLDEXCEEDED = "Sets a listener for an object detecting the position threshold passage for given axis. If controlMode = 1 the callbackFunction\nis executed when object.position[axis] > threshold, if controlMode = 2 the callbackFunction is executed when\nobject.position[axis] < threshold. The callbackFunction is bound to object (this = object inside the function)."+
                                                                   "This API\nmay be used to restart position of objects that went out of bounds of the scene by falling down etc.";
+   this.ROYGBIV_SCRIPTING_API_REMOVEOBJECTPOSITIONTHRESHOLDEXCEEDEDLISTENER = "Removes the position threshold passage listener for an object. Does nothing if the object does not have such listener.";                                                          
 }
