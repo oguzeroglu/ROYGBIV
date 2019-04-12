@@ -6414,9 +6414,6 @@ ROYGBIV.hide(playerBody, true);
 deploymentScriptsStatus.SCRIPT_EXECUTION_STATUS_hidePlayerBody = false;
 if (cpuOperationsHandler.record){cpuOperationsHandler.scriptPerformances.hidePlayerBody = performance.now() - cpuOperationsHandler.scriptPerformances.hidePlayerBody}}
 if(deploymentScriptsStatus.SCRIPT_EXECUTION_STATUS_init){if (cpuOperationsHandler.record){cpuOperationsHandler.scriptPerformances.init = performance.now()}ROYGBIV.makeParticleSystemsResponsive(536);
-if (!isMobile){
-  //ROYGBIV.pause(true);
-}
 var reusableVector1 = ROYGBIV.vector(0, 0, 0);
 var isPointerLocked = false;
 var totalVerticalRotation = 0;
@@ -6425,7 +6422,7 @@ if (!isMobile){
 }
 ROYGBIV.disableDefaultControls(true);
 
-//ROYGBIV.requestFullScreen();
+ROYGBIV.requestFullScreen();
 var reusablePositionVector = ROYGBIV.vector(0, 0, 0);
 var body = ROYGBIV.getObject("playerBody");
 var gun1 = ROYGBIV.getObject("gun1");
@@ -6491,9 +6488,7 @@ ROYGBIV.setScreenPointerLockChangeListener(function(isOn){
     ROYGBIV.setText(ROYGBIV.globals.info, "Click onto the screen to continue");
     ROYGBIV.setTextColor(ROYGBIV.globals.info, "white");
     ROYGBIV.requestPointerLock();
-    //ROYGBIV.pause(true);
   }else{
-    //ROYGBIV.pause(false);
     ROYGBIV.setText(ROYGBIV.globals.info, "[WSAD] or [ZQSD] to move - Click to shoot");
     ROYGBIV.setTextColor(ROYGBIV.globals.info, "white");
   }
@@ -18559,11 +18554,11 @@ Roygbiv.prototype.translateCamera = function(axis, amount){
   }
   axis = axis.toLowerCase();
   if (axis == "x"){
-    camera.translateX(amount * defaultAspect / camera.aspect);
+    camera.translateX(amount);
   }else if (axis == "y"){
-    camera.translateY(amount * defaultAspect / camera.aspect);
+    camera.translateY(amount);
   }else if (axis == "z"){
-    camera.translateZ(amount * defaultAspect / camera.aspect);
+    camera.translateZ(amount);
   }
 }
 
