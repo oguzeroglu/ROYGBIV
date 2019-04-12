@@ -4855,11 +4855,11 @@ Roygbiv.prototype.translateCamera = function(axis, amount){
   axis = axis.toLowerCase();
   preConditions.checkIfAxisOnlyIfDefined(ROYGBIV.translateCamera, preConditions.axis, axis);
   if (axis == "x"){
-    camera.translateX(amount * defaultAspect / camera.aspect);
+    camera.translateX(amount);
   }else if (axis == "y"){
-    camera.translateY(amount * defaultAspect / camera.aspect);
+    camera.translateY(amount);
   }else if (axis == "z"){
-    camera.translateZ(amount * defaultAspect / camera.aspect);
+    camera.translateZ(amount);
   }
 }
 
