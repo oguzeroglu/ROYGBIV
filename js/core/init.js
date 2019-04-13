@@ -9,6 +9,22 @@ window.onload = function() {
   scriptCreatorSaveButton = document.getElementById("scriptCreatorSaveButton");
   scriptCreatorTextArea = document.getElementById("scriptCreatorTextArea");
 
+  // CONTROLS TEST
+  if (!isDeployment){
+    var controlClasses = [FreeControls, FPSControls, CustomControls];
+    var mandatoryControlMethods = ["update", "onMouseWheel", "onPinch", "onSwipe", "onTap", "onClick"];
+    for (var i = 0; i<controlClasses.length; i++){
+      for (var i2 = 0; i2<mandatoryControlMethods.length; i2++){
+        if (!controlClasses[i].prototype[mandatoryControlMethods[i2]]){
+          console.error("[!] Control class #"+(i)+" does not implement "+mandatoryControlMethods[i2]);
+        }
+      }
+    }
+  }
+
+  // DEFAULT CONTROL
+  activeControl = new FreeControls(defaultControlParameters);
+
   // SELECTION HANDLER
   if (!isDeployment){
     selectionHandler = new SelectionHandler();
@@ -444,13 +460,13 @@ function onRaycasterIntersection(){
        object = addedTexts[intersectionObject];
      }
      if (object.isAddedObject || object.isObjectGroup){
-       if (!defaultCameraControlsDisabled && !isDeployment){
+       if (!isDeployment){
          terminal.clear();
        }
        var point = intersectionPoint;
        var coordStr = " ("+point.x.toFixed(2)+", "+point.y.toFixed(2)+", "+point.z.toFixed(2)+")";
        if (object.isAddedObject){
-         if (!defaultCameraControlsDisabled && !isDeployment){
+         if (!isDeployment){
            terminal.printInfo(Text.CLICKED_ON.replace(
              Text.PARAM1, object.name + coordStr
            ));
@@ -466,7 +482,7 @@ function onRaycasterIntersection(){
            object.clickCallbackFunction(point.x, point.y, point.z);
          }
        }else if (object.isObjectGroup){
-         if (!defaultCameraControlsDisabled && !isDeployment){
+         if (!isDeployment){
            terminal.printInfo(Text.CLICKED_ON.replace(
              Text.PARAM1, object.name+coordStr
            ));
@@ -539,7 +555,7 @@ function onRaycasterIntersection(){
              }
            }else if (selectedGrid.createdAddedTextName && !(keyboardBuffer["Shift"])){
               var addedText = addedTexts[selectedGrid.createdAddedTextName];
-              if (!defaultCameraControlsDisabled && !isDeployment){
+              if (!isDeployment){
                 terminal.clear();
                 terminal.printInfo(Text.SELECTED.replace(Text.PARAM1, addedText.name));
               }
@@ -564,7 +580,7 @@ function onRaycasterIntersection(){
        if (mode == 0){
          selectionHandler.resetCurrentSelection();
        }
-       if (!defaultCameraControlsDisabled && !isDeployment){
+       if (!isDeployment){
          terminal.clear();
          terminal.printInfo(Text.SELECTED.replace(Text.PARAM1, object.name));
        }

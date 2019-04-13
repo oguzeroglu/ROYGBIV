@@ -2208,9 +2208,9 @@ StateLoader.prototype.resetProject = function(){
   boundingClientRect = renderer.getBoundingClientRect();
   pointerLockRequested = false;
   fullScreenRequested = false;
-  defaultCameraControlsDisabled = false;
   isMouseDown = false;
   modeSwitcher = new ModeSwitcher();
+  activeControl = new FreeControls(defaultControlParameters);
 
   // FOG
   fogActive = false;

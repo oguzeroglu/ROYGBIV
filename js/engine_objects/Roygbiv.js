@@ -11,6 +11,7 @@
 //  * Particle system functions
 //  * Crosshair functions
 //  * Text functions
+//  * Control functions
 var Roygbiv = function(){
   this.functionNames = [
     "getObject",
@@ -121,7 +122,6 @@ var Roygbiv = function(){
     "removeParticleSystemPoolConsumedListener",
     "setParticleSystemPoolAvailableListener",
     "removeParticleSystemPoolAvailableListener",
-    "disableDefaultControls",
     "isKeyPressed",
     "setCameraPosition",
     "lookAt",
@@ -186,7 +186,9 @@ var Roygbiv = function(){
     "onTextMouseOut",
     "removeTextMouseOutListener",
     "onObjectPositionThresholdExceeded",
-    "removeObjectPositionThresholdExceededListener"
+    "removeObjectPositionThresholdExceededListener",
+    "createFreeControl",
+    "createCustomControl"
   ];
 
   this.globals = new Object();
@@ -4379,6 +4381,79 @@ Roygbiv.prototype.showText = function(text){
   }
 }
 
+// CONTROL FUNCTIONS ***********************************************************
+
+// Creates a new FreeControl implementation where the camera can freely move
+// inside the scene for both desktop and mobile devices. The controls are:
+// WSAD or ZQSD (French keyboard): Translate on plane XZ
+// E - Space: Translate on axis Y
+// Arrow keys or touch (mobile): Look around
+// Finger pinch (mobile) - Mouse wheel (desktop): Translate on axis Z
+// The configurations are:
+// rotationYDelta (optional): Camera rotation amount for left-right keys. Default is 0.07.
+// rotationXDelta (optional): Camera rotation amount for up-down keys. Default is 0.07.
+// translateZAmount (optional): Translation amount on Z axis for WS or ZS keys or finger pinch events. Default is 3.
+// translateXAmount (optional): Translation amount on X axis for DA or DQ keys. Default is 3.
+// translateYAmount (optional): Translation amount on Y axis for E-Space keys. Default is 3.
+// mouseWheelSpeed (optional): Translation speed for mousewheel zoom in/out. Default is 1.
+// swipeSpeed (optional): Rotation speed for look with touch events on mobile. Default is 0.002.
+Roygbiv.prototype.createFreeControl = function(parameters){
+  if (mode == 0){
+    return;
+  }
+  preConditions.checkIfDefined(ROYGBIV.createFreeControl, preConditions.parameters, parameters);
+  preConditions.checkIfNumberOnlyIfExists(ROYGBIV.createFreeControl, preConditions.rotationYDelta, parameters.rotationYDelta);
+  preConditions.checkIfNumberOnlyIfExists(ROYGBIV.createFreeControl, preConditions.rotationXDelta, parameters.rotationXDelta);
+  preConditions.checkIfNumberOnlyIfExists(ROYGBIV.createFreeControl, preConditions.translateZAmount, parameters.translateZAmount);
+  preConditions.checkIfNumberOnlyIfExists(ROYGBIV.createFreeControl, preConditions.translateXAmount, parameters.translateXAmount);
+  preConditions.checkIfNumberOnlyIfExists(ROYGBIV.createFreeControl, preConditions.translateYAmount, parameters.translateYAmount);
+  preConditions.checkIfNumberOnlyIfExists(ROYGBIV.createFreeControl, preConditions.mouseWheelSpeed, parameters.mouseWheelSpeed);
+  preConditions.checkIfNumberOnlyIfExists(ROYGBIV.createFreeControl, preConditions.swipeSpeed, parameters.swipeSpeed);
+  var params = {
+    rotationYDelta: (!(typeof parameters.rotationYDelta == UNDEFINED))? parameters.rotationYDelta: 0.07,
+    rotationXDelta: (!(typeof parameters.rotationXDelta == UNDEFINED))? parameters.rotationXDelta: 0.07,
+    translateZAmount: (!(typeof parameters.translateZAmount == UNDEFINED))? parameters.translateZAmount: 3,
+    translateXAmount: (!(typeof parameters.translateXAmount == UNDEFINED))? parameters.translateXAmount: 3,
+    translateYAmount: (!(typeof parameters.translateYAmount == UNDEFINED))? parameters.translateYAmount: 3,
+    mouseWheelSpeed: (!(typeof parameters.mouseWheelSpeed == UNDEFINED))? parameters.mouseWheelSpeed: 1,
+    swipeSpeed: (!(typeof parameters.swipeSpeed == UNDEFINED))? parameters.swipeSpeed: 0.002
+  }
+  return new FreeControls(params);
+}
+
+// Creates a CustomControl implementation. This API may be used to create custom
+// controls by filling the related event handlers. Parameters are:
+// onClick (optional): Function to be executed with the click event when the user clicks. Default value is noop.
+// onTap (optional): Function to be executed with the touch event when the user taps (mobile). Default value is noop.
+// onSwipe (optional): Function to be executed with diffX and diffY parameters when the user moves their finger
+// on the screen (mobile). Default value is noop.
+// onPinch (optional): Function to be executed with diff parameter when the user performs a pinch zoom (mobile).
+// Default value is noop.
+// onMouseWheel (optional): Function to be executed with the mouse wheel event when the user performs a mouse wheel.
+// Default value is noop.
+// onUpdate (optional): Function to be executed on each frame. Default value is noop.
+Roygbiv.prototype.createCustomControl = function(parameters){
+  if (mode == 0){
+    return;
+  }
+  preConditions.checkIfDefined(ROYGBIV.createCustomControl, preConditions.parameters, parameters);
+  preConditions.checkIfFunctionOnlyIfExists(ROYGBIV.createCustomControl, preConditions.onClick, parameters.onClick);
+  preConditions.checkIfFunctionOnlyIfExists(ROYGBIV.createCustomControl, preConditions.onTap, parameters.onTap);
+  preConditions.checkIfFunctionOnlyIfExists(ROYGBIV.createCustomControl, preConditions.onSwipe, parameters.onSwipe);
+  preConditions.checkIfFunctionOnlyIfExists(ROYGBIV.createCustomControl, preConditions.onPinch, parameters.onPinch);
+  preConditions.checkIfFunctionOnlyIfExists(ROYGBIV.createCustomControl, preConditions.onMouseWheel, parameters.onMouseWheel);
+  preConditions.checkIfFunctionOnlyIfExists(ROYGBIV.createCustomControl, preConditions.onUpdate, parameters.onUpdate);
+  var params = {
+    onClick: (!(typeof parameters.onClick == UNDEFINED))? parameters.onClick: noop,
+    onTap: (!(typeof parameters.onTap == UNDEFINED))? parameters.onTap: noop,
+    onSwipe: (!(typeof parameters.onSwipe == UNDEFINED))? parameters.onSwipe: noop,
+    onPinch: (!(typeof parameters.onPinch == UNDEFINED))? parameters.onPinch: noop,
+    onMouseWheel: (!(typeof parameters.onMouseWheel == UNDEFINED))? parameters.onMouseWheel: noop,
+    onUpdate: (!(typeof parameters.onUpdate == UNDEFINED))? parameters.onUpdate: noop
+  }
+  return new CustomControls(params);
+}
+
 // UTILITY FUNCTIONS ***********************************************************
 
 //  Creates a new vector from x, y and z coordinates.
@@ -4759,17 +4834,6 @@ Roygbiv.prototype.convertEulerToDegrees = function(eulerAngle){
   preConditions.checkIfDefined(ROYGBIV.convertEulerToDegrees, preConditions.eulerAngle, eulerAngle);
   preConditions.checkIfNumber(ROYGBIV.convertEulerToDegrees, preConditions.eulerAngle, eulerAngle);
   return ((eulerAngle * 180) / Math.PI);
-}
-
-// Disables or enables the default WASD camera controls. This function can be used
-// before implementing manual camera controls.
-Roygbiv.prototype.disableDefaultControls = function(isDisabled){
-  if (mode == 0){
-    return;
-  }
-  preConditions.checkIfDefined(ROYGBIV.disableDefaultControls, preConditions.isDisabled, isDisabled);
-  preConditions.checkIfBooleanOnlyIfExists(ROYGBIV.disableDefaultControls, preConditions.isDisabled, isDisabled);
-  defaultCameraControlsDisabled = isDisabled;
 }
 
 // Returns whether the given key is pressed or not. See the keyCodeToChar

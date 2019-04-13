@@ -82,16 +82,9 @@ var physicsStepAmount = 1/60;
 var friction = 1;
 var surfacePhysicalThickness = 1;
 
-// CAMERA CONFIGURATIONS
 var initialCameraX = 0;
 var initialCameraY = 50;
 var initialCameraZ = 0;
-var rotationYDelta = 0.07;
-var rotationXDelta = 0.07;
-var rotationZDelta = 0.07;
-var translateZAmount = 3;
-var translateXAmount = 3;
-var translateYAmount = 3;
 
 // FOG
 var fogActive = false;
@@ -303,7 +296,6 @@ var screenPinchCallbackFunction = 0;
 var userInactivityCallbackFunction = 0;
 var fpsDropCallbackFunction = 0;
 var performanceDropCallbackFunction = 0;
-var defaultCameraControlsDisabled = false;
 var modeSwitcher;
 var isMouseDown = false;
 var projectName = "@@1";
@@ -344,6 +336,17 @@ var currentMouseOverObjectName;
 var renderer;
 var bloom;
 var macroHandler = new MacroHandler();
+var defaultControlParameters = {
+  rotationYDelta: 0.07,
+  rotationXDelta: 0.07,
+  translateZAmount: 3,
+  translateXAmount: 3,
+  translateYAmount: 3,
+  mouseWheelSpeed: 1,
+  swipeSpeed: 0.002,
+  
+};
+var activeControl;
 
 // WORKER VARIABLES
 var WORKERS_SUPPORTED = (typeof(Worker) !== UNDEFINED) && (typeof(MessageChannel) !== UNDEFINED);

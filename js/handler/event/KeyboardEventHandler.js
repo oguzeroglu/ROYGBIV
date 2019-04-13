@@ -9,45 +9,6 @@ var KeyboardEventHandler = function(){
   window.addEventListener('keyup', this.onKeyUp);
 }
 
-KeyboardEventHandler.prototype.handleDefaultKeyboardControls = function(){
-  if (keyboardBuffer["Left"]){
-    camera.rotation.y += rotationYDelta;
-  }
-  if (keyboardBuffer["Right"]){
-    camera.rotation.y -= rotationYDelta;
-  }
-  if (keyboardBuffer["Up"]){
-    camera.rotation.x += rotationXDelta;
-  }
-  if (keyboardBuffer["Down"]){
-    camera.rotation.x -= rotationXDelta;
-  }
-  if (keyboardBuffer["W"]){
-    camera.translateZ(-1 * translateZAmount * defaultAspect / camera.aspect);
-  }
-  if (keyboardBuffer["S"]){
-    camera.translateZ(translateZAmount * defaultAspect / camera.aspect);
-  }
-  if (keyboardBuffer["D"]){
-    camera.translateX(translateXAmount * defaultAspect / camera.aspect);
-  }
-  if (keyboardBuffer["A"]){
-    camera.translateX(-1 * translateXAmount * defaultAspect / camera.aspect);
-  }
-  if (keyboardBuffer["E"]){
-    camera.translateY(-1 * translateYAmount * defaultAspect / camera.aspect);
-  }
-  if (keyboardBuffer["Q"]){
-    camera.translateY(translateYAmount * defaultAspect / camera.aspect);
-  }
-  if (keyboardBuffer["Z"]){
-    camera.rotation.z += rotationZDelta;
-  }
-  if (keyboardBuffer["C"]){
-    camera.rotation.z -= rotationZDelta;
-  }
-}
-
 KeyboardEventHandler.prototype.onKeyUp = function(event){
   inactiveCounter = 0;
   if (!windowLoaded){

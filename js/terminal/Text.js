@@ -868,7 +868,6 @@ var Text = function(){
    this.ROYGBIV_SCRIPTING_API_REMOVEPARTICLESYSTEMPOOLCONSUMEDLISTENER = "Removes the consumption listener of a particle system pool.";
    this.ROYGBIV_SCRIPTING_API_SETPARTICLESYSTEMPOOLAVAILABLELISTENER = "Sets an availability listener for a particle system pool. The callbackFunction is executed when there is at least\none available particle system inside the pool again.";
    this.ROYGBIV_SCRIPTING_API_REMOVEPARTICLESYSTEMPOOLAVAILABLELISTENER = "Removes the availablity listener for a particle system pool.";
-   this.ROYGBIV_SCRIPTING_API_DISABLEDEFAULTCONTROLS = "Disables or enables the default WASD camera controls. This function can be used before implementing manual camera controls.";
    this.ROYGBIV_SCRIPTING_API_ISKEYPRESSED = "Returns whether the given key is pressed or not. See the keyCodeToChar variable for possible key names.";
    this.ROYGBIV_SCRIPTING_API_SETCAMERAPOSITION = "Sets the position of the camera.";
    this.ROYGBIV_SCRIPTING_API_LOOKAT = "Makes the camera look at specific position.";
@@ -934,5 +933,25 @@ var Text = function(){
    this.ROYGBIV_SCRIPTING_API_REMOVETEXTMOUSEOUTLISTENER = "Removes the mouseout listener of a text.";
    this.ROYGBIV_SCRIPTING_API_ONOBJECTPOSITIONTHRESHOLDEXCEEDED = "Sets a listener for an object detecting the position threshold passage for given axis. If controlMode = 1 the callbackFunction\nis executed when object.position[axis] > threshold, if controlMode = 2 the callbackFunction is executed when\nobject.position[axis] < threshold. The callbackFunction is bound to object (this = object inside the function)."+
                                                                   "This API\nmay be used to restart position of objects that went out of bounds of the scene by falling down etc.";
-   this.ROYGBIV_SCRIPTING_API_REMOVEOBJECTPOSITIONTHRESHOLDEXCEEDEDLISTENER = "Removes the position threshold passage listener for an object. Does nothing if the object does not have such listener.";                                                          
+   this.ROYGBIV_SCRIPTING_API_REMOVEOBJECTPOSITIONTHRESHOLDEXCEEDEDLISTENER = "Removes the position threshold passage listener for an object. Does nothing if the object does not have such listener.";
+   this.ROYGBIV_SCRIPTING_API_CREATEFREECONTROL = "Creates a new FreeControl implementation where the camera can freely move inside the scene for both desktop and mobile devices.\nThe controls are:\n" +
+                                                  "WSAD or ZQSD (French keyboard): Translate on plane XZ\n" +
+                                                  "E - Space: Translate on axis Y\n" +
+                                                  "Arrow keys or touch (mobile): Look around\n" +
+                                                  "Finger pinch (mobile) - Mouse wheel (desktop): Translate on axis Z\n"+
+                                                  "The configurations are:\n"+
+                                                  "rotationYDelta (optional): Camera rotation amount for left-right keys. Default is 0.07.\n"+
+                                                  "rotationXDelta (optional): Camera rotation amount for up-down keys. Default is 0.07.\n"+
+                                                  "translateZAmount (optional): Translation amount on Z axis for WS or ZS keys or finger pinch events. Default is 3.\n"+
+                                                  "translateXAmount (optional): Translation amount on X axis for DA or DQ keys. Default is 3.\n"+
+                                                  "translateYAmount (optional): Translation amount on Y axis for E-Space keys. Default is 3.\n"+
+                                                  "mouseWheelSpeed (optional): Translation speed for mousewheel zoom in/out. Default is 1.\n"+
+                                                  "swipeSpeed (optional): Rotation speed for look with touch events on mobile. Default is 0.002.";
+this.ROYGBIV_SCRIPTING_API_CREATECUSTOMCONTROL = "Creates a CustomControl implementation. This API may be used to create custom controls by filling the related event handlers.\nParameters are:\n"+
+                                                 "onClick (optional): Function to be executed with the click event when the user clicks. Default value is noop.\n"+
+                                                 "onTap (optional): Function to be executed with the touch event when the user taps (mobile). Default value is noop.\n"+
+                                                 "onSwipe (optional): Function to be executed with diffX and diffY parameters when the user moves their finger on the screen (mobile).\nDefault value is noop.\n"+
+                                                 "onPinch (optional): Function to be executed with diff parameter when the user performs a pinch zoom (mobile). Default value is noop.\n"+
+                                                 "onMouseWheel (optional): Function to be executed with the mouse wheel event when the user performs a mouse wheel. Default value is noop.\n"+
+                                                 "onUpdate (optional): Function to be executed on each frame. Default value is noop.";
 }

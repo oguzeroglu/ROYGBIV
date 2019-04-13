@@ -661,12 +661,11 @@ var CommandDescriptor = function(){
   ];
 
   this.keyboardInfo = [
-    "W/S : Translates the camera on axis Z.",
-    "A/D : Translates the camera on axis X.",
+    "W/S or ZS: Translates the camera on axis Z.",
+    "A/D or QD : Translates the camera on axis X.",
+    "E/Space: Translates the camera on axis Y.",
     "Up/Down : Rotates the camera around axis X.",
     "Left/Right : Rotates the camera around axis Y.",
-    "E/Q : Translates the camera on axis Y.",
-    "Z/C: Rotates the camera around axis Z.",
     "Backspace: Destroys selected object.",
     ". : Shows corner coordinates of selected grids.",
     "SHIFT: Activates grid selection mode."

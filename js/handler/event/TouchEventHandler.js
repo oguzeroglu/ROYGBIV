@@ -65,10 +65,7 @@ TouchEventHandler.prototype.onTouchMove = function(event){
       if (touchEventHandler.lastSwipeCoordinates.isInitiated){
         var diffX = t1.pageX - touchEventHandler.lastSwipeCoordinates.x;
         var diffY = t1.pageY - touchEventHandler.lastSwipeCoordinates.y;
-        if (!(mode == 1 && defaultCameraControlsDisabled)){
-          camera.rotation.y += diffX / 500;
-          camera.rotation.x += diffY / 500;
-        }
+        activeControl.onSwipe(diffX, diffY);
       }
       touchEventHandler.lastSwipeCoordinates.x = t1.pageX;
       touchEventHandler.lastSwipeCoordinates.y = t1.pageY;
@@ -81,17 +78,12 @@ TouchEventHandler.prototype.onPinch = function(diff){
   if (mode == 1 && screenPinchCallbackFunction){
     screenPinchCallbackFunction(diff);
   }
-  if (!(mode == 1 && defaultCameraControlsDisabled)){
-    if (diff > 0){
-      camera.translateZ(-1 * translateZAmount * defaultAspect / camera.aspect);
-    }else{
-      camera.translateZ(translateZAmount * defaultAspect / camera.aspect);
-    }
-  }
+  activeControl.onPinch(diff);
 }
 
 TouchEventHandler.prototype.onTap = function(touch){
-  mouseEventHandler.onClick(touch);
+  mouseEventHandler.onClick(touch, true);
+  activeControl.onTap(touch);
 }
 
 TouchEventHandler.prototype.onTouchEnd = function(event){

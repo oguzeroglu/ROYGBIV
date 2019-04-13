@@ -71,15 +71,8 @@ MouseEventHandler.prototype.onMouseWheel = function(event){
     if (screenMouseWheelCallbackFunction){
       screenMouseWheelCallbackFunction(deltaX, deltaY);
     }
-    if (defaultCameraControlsDisabled){
-      return;
-    }
   }
-  if (Math.abs(deltaX) < Math.abs(deltaY)){
-    camera.translateZ(deltaY * defaultAspect / camera.aspect);
-  }else{
-    camera.translateX(deltaX * defaultAspect / camera.aspect);
-  }
+  activeControl.onMouseWheel(event);
 }
 
 MouseEventHandler.prototype.handleObjectMouseEvents = function(){
@@ -137,7 +130,7 @@ MouseEventHandler.prototype.onMouseDown = function(event){
   isMouseDown = true;
 }
 
-MouseEventHandler.prototype.onClick = function(event){
+MouseEventHandler.prototype.onClick = function(event, fromTap){
   inactiveCounter = 0;
   cliFocused = false;
   omGUIFocused = false;
@@ -177,6 +170,9 @@ MouseEventHandler.prototype.onClick = function(event){
     }
     if (event.clientX < rectX || event.clientX > rectX + rectZ || event.clientY < rectY || event.clientY > rectY + rectW){
       return;
+    }
+    if (!fromTap){
+      activeControl.onClick(event);
     }
     if (mode == 1 && objectsWithOnClickListeners.size == 0){
       return;

@@ -152,6 +152,20 @@ var Preconditions = function(){
   this.minInclusive = "minInclusive";
   this.maxInclusive = "maxInclusive";
   this.controlMode = "controlMode";
+  this.rotationYDelta = "rotationYDelta";
+  this.rotationXDelta = "rotationXDelta";
+  this.translateZAmount = "translateZAmount";
+  this.translateXAmount = "translateXAmount";
+  this.translateYAmount = "translateYAmount";
+  this.mouseWheelSpeed = "mouseWheelSpeed";
+  this.swipeSpeed = "swipeSpeed";
+  this.parameters = "parameters";
+  this.onClick = "onClick";
+  this.onTap = "onTap";
+  this.onSwipe = "onSwipe";
+  this.onPinch = "onPinch";
+  this.onMouseWheel = "onMouseWheel";
+  this.onUpdate = "onUpdate";
 }
 
 Preconditions.prototype.errorHeader = function(callerFunc){
