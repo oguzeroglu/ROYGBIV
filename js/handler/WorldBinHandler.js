@@ -314,6 +314,9 @@ WorldBinHandler.prototype.insert = function(boundingBox, objName, parentName){
         if (!parentName){
           this.bin.get(x).get(y).get(z).set(objName, true);
         }else{
+          if (this.bin.get(x).get(y).get(z).has(parentName)){
+            continue;
+          }
           var newMap = new Map();
           newMap.set(objName, true);
           this.bin.get(x).get(y).get(z).set(parentName, newMap);
