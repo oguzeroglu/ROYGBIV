@@ -393,7 +393,7 @@ ModeSwitcher.prototype.switchFromPreviewToDesign = function(){
   }
   newScripts = undefined;
   GLOBAL_FOG_UNIFORM.value.set(-100.0, 0, 0, 0);
-  renderer.setViewport(0, 0, canvas.width / screenResolution, canvas.height / screenResolution);
+  renderer.setViewport(0, 0, window.innerWidth, window.innerHeight);
 
   clickableAddedTexts = new Object();
   clickableAddedTexts2D = new Object();

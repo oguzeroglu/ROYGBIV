@@ -247,7 +247,7 @@ Bloom.prototype.directPass = function(){
 }
 
 Bloom.prototype.generateSkyboxPass = function(){
-  this.skyboxTarget = new THREE.WebGLRenderTarget(window.innerWidth, window.innerHeight, this.rtParameters);
+  this.skyboxTarget = new THREE.WebGLRenderTarget(renderer.getCurrentViewport().z, renderer.getCurrentViewport().w, this.rtParameters);
   this.skyboxPassScene = new THREE.Scene();
   this.skyboxMesh = new THREE.Mesh(skyboxMesh.geometry, skyboxMesh.material);
   this.skyboxPassScene.add(this.skyboxMesh);
@@ -280,7 +280,7 @@ Bloom.prototype.generateCombinerPass = function(){
 }
 
 Bloom.prototype.generateDirectPass = function(){
-  this.sceneTarget = new THREE.WebGLRenderTarget(window.innerWidth, window.innerHeight, this.rtParameters);
+  this.sceneTarget = new THREE.WebGLRenderTarget(renderer.getCurrentViewport().z, renderer.getCurrentViewport().w, this.rtParameters);
   this.sceneTarget.texture.generateMipmaps = false;
 }
 
@@ -306,8 +306,8 @@ Bloom.prototype.generateBlurPass = function(){
   this.horizontalBlurTargets = [], this.verticalBlurTargets = [];
   var coef = 2;
   for (var i = 0; i<this.configurations.blurStepCount; i++){
-    var rt1 = new THREE.WebGLRenderTarget(window.innerWidth / coef, window.innerHeight / coef, this.rtParameters);
-    var rt2 = new THREE.WebGLRenderTarget(window.innerWidth / coef, window.innerHeight / coef, this.rtParameters);
+    var rt1 = new THREE.WebGLRenderTarget(renderer.getCurrentViewport().z / coef, renderer.getCurrentViewport().w / coef, this.rtParameters);
+    var rt2 = new THREE.WebGLRenderTarget(renderer.getCurrentViewport().z / coef, renderer.getCurrentViewport().w / coef, this.rtParameters);
     rt1.texture.generateMipmaps = false;
     rt2.texture.generateMipmaps = false;
     this.horizontalBlurTargets.push(rt1);
@@ -332,7 +332,7 @@ Bloom.prototype.generateBrightPass = function(){
   this.brightPassMaterial.uniforms.sceneTexture.value = this.sceneTarget.texture;
   this.brightPassScene = new THREE.Scene();
   this.brightPassScene.add(this.brightPassQuad);
-  this.brightTarget = new THREE.WebGLRenderTarget(window.innerWidth / 2, window.innerHeight / 2, this.rtParameters);
+  this.brightTarget = new THREE.WebGLRenderTarget(renderer.getCurrentViewport().z / 2, renderer.getCurrentViewport().w / 2, this.rtParameters);
   this.brightTarget.texture.generateMipmaps = false;
 }
 
@@ -348,18 +348,11 @@ Bloom.prototype.setSize = function(width, height){
 }
 
 Bloom.prototype.setViewport = function(x, y, z, w){
-  this.sceneTarget.viewport.set(x, y, z, w);
-  this.brightTarget.viewport.set(x, y, z / 2, w / 2);
-  var coef = 2;
-  for (var i = 0; i<this.configurations.blurStepCount; i++){
-    this.horizontalBlurTargets[i].viewport.set(x, y, z/coef, w/coef);
-    this.verticalBlurTargets[i].viewport.set(x, y, z/coef, w/coef);
-    coef = coef * 2;
-  }
+  this.setSize(z, w);
 }
 
 Bloom.prototype.setPixelRatio = function(ratio){
-
+  this.setSize(renderer.getCurrentViewport().z, renderer.getCurrentViewport().w);
 }
 
 Bloom.prototype.render = function(){
