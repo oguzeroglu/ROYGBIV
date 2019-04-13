@@ -13,6 +13,7 @@ uniform vec4 currentViewport;
 uniform mat4 modelViewMatrix;
 uniform mat4 projectionMatrix;
 uniform float charSize;
+uniform float screenResolution;
 
 varying vec4 vUVRanges;
 
@@ -61,9 +62,9 @@ void main(){
     float x = (((oldPosX - currentViewport.x) * 2.0) / currentViewport.z) - 1.0;
     float y = (((oldPosY - currentViewport.y) * 2.0) / currentViewport.w) - 1.0;
     gl_Position = vec4(x + float(margin2D.x), y + float(margin2D.y), 0.0, 1.0);
-    gl_PointSize = charSize;
+    gl_PointSize = charSize * screenResolution;
   #else
     gl_Position = projectionMatrix * mvPosition;
-    gl_PointSize = (500.0) * charSize / length(mvPosition.xyz);
+    gl_PointSize = (500.0) * (charSize * screenResolution) / length(mvPosition.xyz);
   #endif
 }
