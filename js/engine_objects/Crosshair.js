@@ -48,7 +48,7 @@ var Crosshair = function(configurations){
 
   if (!(typeof this.maxWidthPercent == UNDEFINED) || !(typeof this.maxHeightPercent == UNDEFINED)){
     this.mesh.material.uniforms.sizeScale = new THREE.Uniform(1);
-    this.injectMacro("HAS_SIZE_SCALE", true, false);
+    macroHandler.injectMacro("HAS_SIZE_SCALE", this.material, true, false);
   }
 
   scene.add(this.mesh);
@@ -145,18 +145,4 @@ Crosshair.prototype.handleResize = function(){
       this.mesh.material.uniforms.sizeScale.value = ((2 * this.maxHeightPercent / 100) * ((renderer.getCurrentViewport().w / screenResolution)) / 5) / this.sizeAmount;
     }
   }
-}
-
-Crosshair.prototype.injectMacro = function(macro, insertVertexShader, insertFragmentShader){
-  if (insertVertexShader){
-    this.material.vertexShader = this.material.vertexShader.replace(
-      "#define INSERTION", "#define INSERTION\n#define "+macro
-    )
-  };
-  if (insertFragmentShader){
-    this.material.fragmentShader = this.material.fragmentShader.replace(
-      "#define INSERTION", "#define INSERTION\n#define "+macro
-    )
-  };
-  this.material.needsUpdate = true;
 }

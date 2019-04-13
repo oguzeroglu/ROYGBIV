@@ -334,7 +334,7 @@ AddedText.prototype.setBackground = function(backgroundColorString, backgroundAl
     this.oldBackgroundStatus = this.hasBackground ? this.hasBackground: false;
   }
   if (!this.material.uniforms.backgroundColor){
-    this.injectMacro("HAS_BACKGROUND", false, true);
+    macroHandler.injectMacro("HAS_BACKGROUND", this.material, false, true);
     this.material.uniforms.backgroundColor = new THREE.Uniform(new THREE.Color(backgroundColorString));
     this.material.uniforms.backgroundAlpha = new THREE.Uniform(backgroundAlpha);
   }else{
@@ -351,7 +351,7 @@ AddedText.prototype.removeBackground = function(fromScript){
     this.oldBackgroundStatus = this.material.uniforms.hasBackgroundColorFlag.value;
   }
   if (this.material.uniforms.backgroundColor){
-    this.removeMacro("HAS_BACKGROUND", false, true);
+    macroHandler.removeMacro("HAS_BACKGROUND", this.material, false, true);
     delete this.material.uniforms.backgroundColor;
     delete this.material.uniforms.backgroundAlpha;
   }
@@ -645,7 +645,7 @@ AddedText.prototype.set2DStatus = function(is2D){
   }
   this.is2D = is2D;
   if (is2D){
-    this.injectMacro("IS_TWO_DIMENSIONAL", true, false);
+    macroHandler.injectMacro("IS_TWO_DIMENSIONAL", this.material, true, false);
     this.set2DCoordinates(this.marginPercentWidth, this.marginPercentHeight);
     if (typeof this.oldIsClickable == UNDEFINED){
       this.oldIsClickable = this.isClickable;
@@ -653,7 +653,7 @@ AddedText.prototype.set2DStatus = function(is2D){
     this.isClickable = false;
     addedTexts2D[this.name] = this;
   }else{
-    this.removeMacro("IS_TWO_DIMENSIONAL", true, false);
+    macroHandler.removeMacro("IS_TWO_DIMENSIONAL", this.material, true, false);
     delete this.mesh.material.uniforms.margin2D;
     this.isClickable = this.oldIsClickable;
     delete this.oldIsClickable;
@@ -773,30 +773,6 @@ AddedText.prototype.debugCornerPoints = function(representativeCharacter, corner
   }
 }
 
-AddedText.prototype.injectMacro = function(macro, insertVertexShader, insertFragmentShader){
-  if (insertVertexShader){
-    this.material.vertexShader = this.material.vertexShader.replace(
-      "#define INSERTION", "#define INSERTION\n#define "+macro
-    )
-  };
-  if (insertFragmentShader){
-    this.material.fragmentShader = this.material.fragmentShader.replace(
-      "#define INSERTION", "#define INSERTION\n#define "+macro
-    )
-  };
-  this.material.needsUpdate = true;
-}
-
-AddedText.prototype.removeMacro = function(macro, removeVertexShader, removeFragmentShader){
-  if (removeVertexShader){
-    this.material.vertexShader = this.material.vertexShader.replace("\n#define "+macro, "");
-  }
-  if (removeFragmentShader){
-    this.material.fragmentShader = this.material.fragmentShader.replace("\n#define "+macro, "");
-  }
-  this.material.needsUpdate = true;
-}
-
 AddedText.prototype.setShaderMargin = function(isMarginX, value){
   if (!this.mesh.material.uniforms.margin2D){
     this.mesh.material.uniforms.margin2D = new THREE.Uniform(new THREE.Vector2());
@@ -816,12 +792,12 @@ AddedText.prototype.setFog = function(){
     return;
   }
   if (!this.mesh.material.uniforms.fogInfo){
-    this.injectMacro("HAS_FOG", false, true);
+    macroHandler.injectMacro("HAS_FOG", this.material, false, true);
     this.mesh.material.uniforms.fogInfo = GLOBAL_FOG_UNIFORM;
   }
   if (fogBlendWithSkybox){
     if (!this.mesh.material.uniforms.cubeTexture){
-      this.injectMacro("HAS_SKYBOX_FOG", true, true);
+      macroHandler.injectMacro("HAS_SKYBOX_FOG", this.material, true, true);
       this.mesh.material.uniforms.worldMatrix = new THREE.Uniform(this.mesh.matrixWorld);
       this.mesh.material.uniforms.cubeTexture = GLOBAL_CUBE_TEXTURE_UNIFORM;
       this.mesh.material.uniforms.cameraPosition = GLOBAL_CAMERA_POSITION_UNIFORM;
@@ -834,8 +810,8 @@ AddedText.prototype.removeFog = function(){
   if (this.is2D || !this.isAffectedByFog){
     return;
   }
-  this.removeMacro("HAS_FOG", false, true);
-  this.removeMacro("HAS_SKYBOX_FOG", true, true);
+  macroHandler.removeMacro("HAS_FOG", this.material, false, true);
+  macroHandler.removeMacro("HAS_SKYBOX_FOG", this.material, true, true);
   delete this.mesh.material.uniforms.fogInfo;
   delete this.mesh.material.uniforms.cubeTexture;
   delete this.mesh.material.uniforms.worldMatrix;

@@ -578,12 +578,12 @@ GUIHandler.prototype.initializeObjectManipulationGUI = function(){
     terminal.clear();
     obj.isColorizable = val;
     if (obj.isColorizable){
-      obj.injectMacro("HAS_FORCED_COLOR", false, true);
+      macroHandler.injectMacro("HAS_FORCED_COLOR", obj.mesh.material, false, true);
       obj.mesh.material.uniforms.forcedColor = new THREE.Uniform(new THREE.Vector4(-50, 0, 0, 0));
       terminal.printInfo(Text.OBJECT_MARKED_AS.replace(Text.PARAM1, "colorizable"));
     }else{
       delete obj.mesh.material.uniforms.forcedColor;
-      obj.removeMacro("HAS_FORCED_COLOR", false, true);
+      macroHandler.removeMacro("HAS_FORCED_COLOR", obj.mesh.material, false, true);
       terminal.printInfo(Text.OBJECT_MARKED_AS.replace(Text.PARAM1, "uncolorizable"));
     }
     obj.mesh.material.needsUpdate = true;

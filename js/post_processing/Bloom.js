@@ -126,11 +126,11 @@ Bloom.prototype.setBlendWithSkyboxStatus = function(status){
     if (!this.skyboxMesh){
       this.generateSkyboxPass();
     }
-    this.injectMacro("BLEND_WITH_SKYBOX", this.combinerMaterial, false, true);
+    macroHandler.injectMacro("BLEND_WITH_SKYBOX", this.combinerMaterial, false, true);
     this.combinerMaterial.uniforms.skyboxColorTexture = new THREE.Uniform(this.skyboxTarget.texture);
     this.configurations.blendWithSkybox = true;
   }else{
-    this.removeMacro("BLEND_WITH_SKYBOX", this.combinerMaterial, false, true);
+    macroHandler.removeMacro("BLEND_WITH_SKYBOX", this.combinerMaterial, false, true);
     delete this.combinerMaterial.uniforms.skyboxColorTexture;
     this.configurations.blendWithSkybox = false;
   }
@@ -164,11 +164,11 @@ Bloom.prototype.setBlurStepCount = function(stepCount){
   this.configurations.blurStepCount = stepCount;
   for (var i = 0; i<5; i++){
     var macro = "BLUR_STEP_"+(i+1)+"_ACTIVE";
-    this.removeMacro(macro, this.combinerMaterial, false, true);
+    macroHandler.removeMacro(macro, this.combinerMaterial, false, true);
   }
   for (var i = 0; i<stepCount; i++){
     var macro = "BLUR_STEP_"+(i+1)+"_ACTIVE";
-    this.injectMacro(macro, this.combinerMaterial, false, true);
+    macroHandler.injectMacro(macro, this.combinerMaterial, false, true);
   }
 }
 
@@ -363,28 +363,4 @@ Bloom.prototype.render = function(){
     this.skyboxPass();
   }
   this.combinerPass();
-}
-
-Bloom.prototype.injectMacro = function(macro, material, insertVertexShader, insertFragmentShader){
-  if (insertVertexShader){
-    material.vertexShader = material.vertexShader.replace(
-      "#define INSERTION", "#define INSERTION\n#define "+macro
-    )
-  };
-  if (insertFragmentShader){
-    material.fragmentShader = material.fragmentShader.replace(
-      "#define INSERTION", "#define INSERTION\n#define "+macro
-    )
-  };
-  material.needsUpdate = true;
-}
-
-Bloom.prototype.removeMacro = function(macro, material, removeVertexShader, removeFragmentShader){
-  if (removeVertexShader){
-    material.vertexShader = material.vertexShader.replace("\n#define "+macro, "");
-  }
-  if (removeFragmentShader){
-    material.fragmentShader = material.fragmentShader.replace("\n#define "+macro, "");
-  }
-  material.needsUpdate = true;
 }

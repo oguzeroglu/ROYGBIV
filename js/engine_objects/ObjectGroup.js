@@ -1094,22 +1094,22 @@ ObjectGroup.prototype.glue = function(){
   }
   webglCallbackHandler.registerEngineObject(this);
   if (this.aoTexture){
-    this.injectMacro("HAS_AO", true, true);
+    macroHandler.injectMacro("HAS_AO", this.mesh.material, true, true);
   }
   if (this.emissiveTexture){
-    this.injectMacro("HAS_EMISSIVE", true, true);
+    macroHandler.injectMacro("HAS_EMISSIVE", this.mesh.material, true, true);
   }
   if (this.diffuseTexture){
-    this.injectMacro("HAS_DIFFUSE", true, true);
+    macroHandler.injectMacro("HAS_DIFFUSE", this.mesh.material, true, true);
   }
   if (this.alphaTexture){
-    this.injectMacro("HAS_ALPHA", true, true);
+    macroHandler.injectMacro("HAS_ALPHA", this.mesh.material, true, true);
   }
   if (this.displacementTexture && VERTEX_SHADER_TEXTURE_FETCH_SUPPORTED){
-    this.injectMacro("HAS_DISPLACEMENT", true, false);
+    macroHandler.injectMacro("HAS_DISPLACEMENT", this.mesh.material, true, false);
   }
   if (this.hasTexture){
-    this.injectMacro("HAS_TEXTURE", true, true);
+    macroHandler.injectMacro("HAS_TEXTURE", this.mesh.material, true, true);
   }
 
   this.mesh.objectGroupName = this.name;
@@ -2119,38 +2119,14 @@ ObjectGroup.prototype.incrementOpacity = function(val){
   }
 }
 
-ObjectGroup.prototype.injectMacro = function(macro, insertVertexShader, insertFragmentShader){
-  if (insertVertexShader){
-    this.mesh.material.vertexShader = this.mesh.material.vertexShader.replace(
-      "#define INSERTION", "#define INSERTION\n#define "+macro
-    )
-  };
-  if (insertFragmentShader){
-    this.mesh.material.fragmentShader = this.mesh.material.fragmentShader.replace(
-      "#define INSERTION", "#define INSERTION\n#define "+macro
-    )
-  };
-  this.mesh.material.needsUpdate = true;
-}
-
-ObjectGroup.prototype.removeMacro = function(macro, removeVertexShader, removeFragmentShader){
-  if (removeVertexShader){
-    this.mesh.material.vertexShader = this.mesh.material.vertexShader.replace("\n#define "+macro, "");
-  }
-  if (removeFragmentShader){
-    this.mesh.material.fragmentShader = this.mesh.material.fragmentShader.replace("\n#define "+macro, "");
-  }
-  this.mesh.material.needsUpdate = true;
-}
-
 ObjectGroup.prototype.setFog = function(){
   if (!this.mesh.material.uniforms.fogInfo){
-    this.injectMacro("HAS_FOG", false, true);
+    macroHandler.injectMacro("HAS_FOG", this.mesh.material, false, true);
     this.mesh.material.uniforms.fogInfo = GLOBAL_FOG_UNIFORM;
   }
   if (fogBlendWithSkybox){
     if (!this.mesh.material.uniforms.cubeTexture){
-      this.injectMacro("HAS_SKYBOX_FOG", true, true);
+      macroHandler.injectMacro("HAS_SKYBOX_FOG", this.mesh.material, true, true);
       this.mesh.material.uniforms.worldMatrix = new THREE.Uniform(this.mesh.matrixWorld);
       this.mesh.material.uniforms.cubeTexture = GLOBAL_CUBE_TEXTURE_UNIFORM;
       this.mesh.material.uniforms.cameraPosition = GLOBAL_CAMERA_POSITION_UNIFORM;
@@ -2160,8 +2136,8 @@ ObjectGroup.prototype.setFog = function(){
 }
 
 ObjectGroup.prototype.removeFog = function(){
-  this.removeMacro("HAS_FOG", false, true);
-  this.removeMacro("HAS_SKYBOX_FOG", true, true);
+  macroHandler.removeMacro("HAS_FOG", this.mesh.material, false, true);
+  macroHandler.removeMacro("HAS_SKYBOX_FOG", this.mesh.material, true, true);
   delete this.mesh.material.uniforms.fogInfo;
   delete this.mesh.material.uniforms.cubeTexture;
   delete this.mesh.material.uniforms.worldMatrix;

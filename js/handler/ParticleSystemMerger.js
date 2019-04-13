@@ -236,25 +236,25 @@ var ParticleSystemMerger = function(psObj, name){
       parentMotionMatrixArray: new THREE.Uniform(motionMatrixArray),
     }
   });
-  this.injectMacro(this.material, "IS_MERGED", true, false);
+  macroHandler.injectMacro("IS_MERGED", this.material, true, false);
   if (fogBlendWithSkybox){
     this.material.uniforms.cameraPosition = GLOBAL_CAMERA_POSITION_UNIFORM;
     this.material.uniforms.cubeTexture = GLOBAL_CUBE_TEXTURE_UNIFORM;
-    this.injectMacro(this.material, "HAS_SKYBOX_FOG", true, true);
+    macroHandler.injectMacro("HAS_SKYBOX_FOG", this.material, true, true);
   }
   if (fogActive){
     this.material.uniforms.fogInfo = GLOBAL_FOG_UNIFORM;
-    this.injectMacro(this.material, "HAS_FOG", false, true);
+    macroHandler.injectMacro("HAS_FOG", this.material, false, true);
   }
   if (texture){
     this.material.uniforms.texture = new THREE.Uniform(texture);
-    this.injectMacro(this.material, "HAS_TEXTURE", true, true);
+    macroHandler.injectMacro("HAS_TEXTURE", this.material, true, true);
   }
   if (!this.noTargetColor){
-    this.injectMacro(this.material, "HAS_TARGET_COLOR", true, false);
+    macroHandler.injectMacro("HAS_TARGET_COLOR", this.material, true, false);
   }
   if (particleSystemRefHeight){
-    this.injectMacro(this.material, "HAS_REF_HEIGHT", true, false);
+    macroHandler.injectMacro("HAS_REF_HEIGHT", this.material, true, false);
     this.material.uniforms.refHeightCoef = GLOBAL_PS_REF_HEIGHT_UNIFORM;
   }
   this.mesh = new THREE.Points(this.geometry, this.material);
@@ -329,28 +329,4 @@ ParticleSystemMerger.prototype.updateObject = function(ps){
 
 ParticleSystemMerger.prototype.update = function(){
   this.activePSMap.forEach(this.updateObject);
-}
-
-ParticleSystemMerger.prototype.injectMacro = function(material, macro, insertVertexShader, insertFragmentShader){
-  if (insertVertexShader){
-    material.vertexShader = material.vertexShader.replace(
-      "#define INSERTION", "#define INSERTION\n#define "+macro
-    )
-  };
-  if (insertFragmentShader){
-    material.fragmentShader = material.fragmentShader.replace(
-      "#define INSERTION", "#define INSERTION\n#define "+macro
-    )
-  };
-  material.needsUpdate = true;
-}
-
-ParticleSystemMerger.prototype.removeMacro = function(material, macro, removeVertexShader, removeFragmentShader){
-  if (removeVertexShader){
-    material.vertexShader = material.vertexShader.replace("\n#define "+macro, "");
-  }
-  if (removeFragmentShader){
-    material.fragmentShader = material.fragmentShader.replace("\n#define "+macro, "");
-  }
-  material.needsUpdate = true;
 }

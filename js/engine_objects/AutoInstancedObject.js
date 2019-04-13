@@ -59,24 +59,24 @@ AutoInstancedObject.prototype.init = function(){
   this.mesh.frustumCulled = false;
   webglCallbackHandler.registerEngineObject(this);
   if (this.pseudoObjectGroup.aoTexture){
-    this.injectMacro("HAS_AO", true, true);
+    macroHandler.injectMacro("HAS_AO", this.mesh.material, true, true);
   }
   if (this.pseudoObjectGroup.emissiveTexture){
-    this.injectMacro("HAS_EMISSIVE", true, true);
+    macroHandler.injectMacro("HAS_EMISSIVE", this.mesh.material, true, true);
   }
   if (this.pseudoObjectGroup.diffuseTexture){
-    this.injectMacro("HAS_DIFFUSE", true, true);
+    macroHandler.injectMacro("HAS_DIFFUSE", this.mesh.material, true, true);
   }
   if (this.pseudoObjectGroup.alphaTexture){
-    this.injectMacro("HAS_ALPHA", true, true);
+    macroHandler.injectMacro("HAS_ALPHA", this.mesh.material, true, true);
   }
   if (this.pseudoObjectGroup.displacementTexture && VERTEX_SHADER_TEXTURE_FETCH_SUPPORTED){
-    this.injectMacro("HAS_DISPLACEMENT", true, false);
+    macroHandler.injectMacro("HAS_DISPLACEMENT", this.mesh.material, true, false);
   }
   if (this.pseudoObjectGroup.hasTexture){
-    this.injectMacro("HAS_TEXTURE", true, true);
+    macroHandler.injectMacro("HAS_TEXTURE", this.mesh.material, true, true);
   }
-  this.injectMacro("IS_AUTO_INSTANCED", true, true);
+  macroHandler.injectMacro("IS_AUTO_INSTANCED", this.mesh.material, true, true);
   var objCount = 0;
   var curIndex = 0;
   var forcedColorIndex = 0;
@@ -107,11 +107,11 @@ AutoInstancedObject.prototype.init = function(){
   var orientationIndicesBufferAttribute = new THREE.InstancedBufferAttribute(new Float32Array(orientationIndices), 1);
   orientationIndicesBufferAttribute.setDynamic(false);
   this.mesh.geometry.addAttribute("orientationIndex", orientationIndicesBufferAttribute);
-  this.injectMacro("AUTO_INSTANCE_ORIENTATION_ARRAY_SIZE "+(objCount * 2), true, false);
+  macroHandler.injectMacro("AUTO_INSTANCE_ORIENTATION_ARRAY_SIZE "+(objCount * 2), this.mesh.material, true, false);
   this.mesh.material.uniforms.autoInstanceOrientationArray = new THREE.Uniform(orientationAry);
   if (hasColorizableMember){
-    this.injectMacro("AUTO_INSTANCE_FORCED_COLOR_ARRAY_SIZE "+(objCount), true, false);
-    this.injectMacro("AUTO_INSTANCE_HAS_COLORIZABLE_MEMBER", true, true);
+    macroHandler.injectMacro("AUTO_INSTANCE_FORCED_COLOR_ARRAY_SIZE "+(objCount), this.mesh.material, true, false);
+    macroHandler.injectMacro("AUTO_INSTANCE_HAS_COLORIZABLE_MEMBER", this.mesh.material, true, true);
     var forcedColorIndicesBufferAttribute = new THREE.InstancedBufferAttribute(new Float32Array(forcedColorIndices), 1);
     forcedColorIndicesBufferAttribute.setDynamic(false);
     this.mesh.geometry.addAttribute("forcedColorIndex", forcedColorIndicesBufferAttribute);
@@ -122,12 +122,12 @@ AutoInstancedObject.prototype.init = function(){
 
 AutoInstancedObject.prototype.setFog = function(){
   if (!this.mesh.material.uniforms.fogInfo){
-    this.injectMacro("HAS_FOG", false, true);
+    macroHandler.injectMacro("HAS_FOG", this.mesh.material, false, true);
     this.mesh.material.uniforms.fogInfo = GLOBAL_FOG_UNIFORM;
   }
   if (fogBlendWithSkybox){
     if (!this.mesh.material.uniforms.cubeTexture){
-      this.injectMacro("HAS_SKYBOX_FOG", true, true);
+      macroHandler.injectMacro("HAS_SKYBOX_FOG", this.mesh.material, true, true);
       this.mesh.material.uniforms.worldMatrix = new THREE.Uniform(this.mesh.matrixWorld);
       this.mesh.material.uniforms.cubeTexture = GLOBAL_CUBE_TEXTURE_UNIFORM;
       this.mesh.material.uniforms.cameraPosition = GLOBAL_CAMERA_POSITION_UNIFORM;
@@ -137,35 +137,11 @@ AutoInstancedObject.prototype.setFog = function(){
 }
 
 AutoInstancedObject.prototype.removeFog = function(){
-  this.removeMacro("HAS_FOG", false, true);
-  this.removeMacro("HAS_SKYBOX_FOG", true, true);
+  macroHandler.removeMacro("HAS_FOG", this.mesh.material, false, true);
+  macroHandler.removeMacro("HAS_SKYBOX_FOG", this.mesh.material, true, true);
   delete this.mesh.material.uniforms.fogInfo;
   delete this.mesh.material.uniforms.cubeTexture;
   delete this.mesh.material.uniforms.worldMatrix;
   delete this.mesh.material.uniforms.cameraPosition;
-  this.mesh.material.needsUpdate = true;
-}
-
-AutoInstancedObject.prototype.injectMacro = function(macro, insertVertexShader, insertFragmentShader){
-  if (insertVertexShader){
-    this.mesh.material.vertexShader = this.mesh.material.vertexShader.replace(
-      "#define INSERTION", "#define INSERTION\n#define "+macro
-    )
-  };
-  if (insertFragmentShader){
-    this.mesh.material.fragmentShader = this.mesh.material.fragmentShader.replace(
-      "#define INSERTION", "#define INSERTION\n#define "+macro
-    )
-  };
-  this.mesh.material.needsUpdate = true;
-}
-
-AutoInstancedObject.prototype.removeMacro = function(macro, removeVertexShader, removeFragmentShader){
-  if (removeVertexShader){
-    this.mesh.material.vertexShader = this.mesh.material.vertexShader.replace("\n#define "+macro, "");
-  }
-  if (removeFragmentShader){
-    this.mesh.material.fragmentShader = this.mesh.material.fragmentShader.replace("\n#define "+macro, "");
-  }
   this.mesh.material.needsUpdate = true;
 }

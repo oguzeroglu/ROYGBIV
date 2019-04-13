@@ -484,7 +484,7 @@ StateLoader.prototype.load = function(){
       }
       addedObjectInstance.isColorizable = curAddedObjectExport.isColorizable;
       if (addedObjectInstance.isColorizable){
-        addedObjectInstance.injectMacro("HAS_FORCED_COLOR", false, true);
+        macroHandler.injectMacro("HAS_FORCED_COLOR", addedObjectInstance.mesh.material, false, true);
         addedObjectInstance.mesh.material.uniforms.forcedColor = new THREE.Uniform(new THREE.Vector4(-50, 0, 0, 0));
       }
 
@@ -1017,7 +1017,7 @@ StateLoader.prototype.finalize = function(){
     addedTextInstance.gsName = curTextExport.gsName;
     addedTextInstance.is2D = curTextExport.is2D;
     if (addedTextInstance.is2D){
-      addedTextInstance.injectMacro("IS_TWO_DIMENSIONAL", true, false);
+      macroHandler.injectMacro("IS_TWO_DIMENSIONAL", addedTextInstance.material, true, false);
     }
     if (!(typeof curTextExport.marginMode == UNDEFINED)){
       addedTextInstance.marginMode = curTextExport.marginMode;
@@ -1119,7 +1119,7 @@ StateLoader.prototype.finalize = function(){
     }
     objectGroupInstance.isColorizable = curObjectGroupExport.isColorizable;
     if (objectGroupInstance.isColorizable){
-      objectGroupInstance.injectMacro("HAS_FORCED_COLOR", false, true);
+      macroHandler.injectMacro("HAS_FORCED_COLOR", objectGroupInstance.mesh.material, false, true);
       objectGroupInstance.mesh.material.uniforms.forcedColor = new THREE.Uniform(new THREE.Vector4(-50, 0, 0, 0));
     }
 

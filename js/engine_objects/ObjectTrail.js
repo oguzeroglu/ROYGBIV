@@ -423,27 +423,3 @@ ObjectTrail.prototype.destroy = function(){
     this.destroyed = true;
   }
 }
-
-ObjectTrail.prototype.injectMacro = function(material, macro, insertVertexShader, insertFragmentShader){
-  if (insertVertexShader){
-    material.vertexShader = material.vertexShader.replace(
-      "#define INSERTION", "#define INSERTION\n#define "+macro
-    )
-  };
-  if (insertFragmentShader){
-    material.fragmentShader = material.fragmentShader.replace(
-      "#define INSERTION", "#define INSERTION\n#define "+macro
-    )
-  };
-  material.needsUpdate = true;
-}
-
-ObjectTrail.prototype.removeMacro = function(material, macro, removeVertexShader, removeFragmentShader){
-  if (removeVertexShader){
-    material.vertexShader = material.vertexShader.replace("\n#define "+macro, "");
-  }
-  if (removeFragmentShader){
-    material.fragmentShader = material.fragmentShader.replace("\n#define "+macro, "");
-  }
-  material.needsUpdate = true;
-}

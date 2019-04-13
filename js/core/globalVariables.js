@@ -343,6 +343,7 @@ var objectsWithMouseOutListeners = new Map();
 var currentMouseOverObjectName;
 var renderer;
 var bloom;
+var macroHandler = new MacroHandler();
 
 // WORKER VARIABLES
 var WORKERS_SUPPORTED = (typeof(Worker) !== UNDEFINED) && (typeof(MessageChannel) !== UNDEFINED);

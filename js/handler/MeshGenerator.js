@@ -46,30 +46,30 @@ MeshGenerator.prototype.generateObjectTrail = function(
     material.uniforms.worldMatrix = new THREE.Uniform(mesh.matrixWorld);
     material.uniforms.cameraPosition = GLOBAL_CAMERA_POSITION_UNIFORM;
     material.uniforms.cubeTexture = GLOBAL_CUBE_TEXTURE_UNIFORM;
-    trail.injectMacro(material, "HAS_SKYBOX_FOG", true, true);
+    macroHandler.injectMacro("HAS_SKYBOX_FOG", material, true, true);
   }
   if (fogActive){
     material.uniforms.fogInfo = GLOBAL_FOG_UNIFORM;
-    trail.injectMacro(material, "HAS_FOG", false, true);
+    macroHandler.injectMacro("HAS_FOG", material, false, true);
   }
   if (trail.diffuseTexture){
     material.uniforms.diffuseMap = this.getTextureUniform(trail.diffuseTexture);
-    trail.injectMacro(material, "HAS_DIFFUSE", false, true);
+    macroHandler.injectMacro("HAS_DIFFUSE", material, false, true);
   }
   if (trail.emissiveTexture){
     material.uniforms.emissiveMap = this.getTextureUniform(trail.emissiveTexture);
-    trail.injectMacro(material, "HAS_EMISSIVE", true, true);
+    macroHandler.injectMacro("HAS_EMISSIVE", material, true, true);
   }
   if (trail.displacementTexture && VERTEX_SHADER_TEXTURE_FETCH_SUPPORTED){
     material.uniforms.displacementMap = this.getTextureUniform(trail.displacementTexture);
-    trail.injectMacro(material, "HAS_DISPLACEMENT", true, false);
+    macroHandler.injectMacro("HAS_DISPLACEMENT", material, true, false);
   }
   if (trail.alphaTexture){
     material.uniforms.alphaMap = this.getTextureUniform(trail.alphaTexture);
-    trail.injectMacro(material, "HAS_ALPHA", false, true);
+    macroHandler.injectMacro("HAS_ALPHA", material, false, true);
   }
   if (trail.hasTexture){
-    trail.injectMacro(material, "HAS_TEXTURE", true, true);
+    macroHandler.injectMacro("HAS_TEXTURE", material, true, true);
   }
   return mesh;
 }
