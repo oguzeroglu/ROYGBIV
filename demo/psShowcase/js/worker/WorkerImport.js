@@ -484,6 +484,9 @@ WorldBinHandler.prototype.insert = function(boundingBox, objName, parentName){
         if (!parentName){
           this.bin.get(x).get(y).get(z).set(objName, true);
         }else{
+          if (this.bin.get(x).get(y).get(z).has(parentName)){
+            continue;
+          }
           var newMap = new Map();
           newMap.set(objName, true);
           this.bin.get(x).get(y).get(z).set(parentName, newMap);
@@ -2289,6 +2292,7 @@ var AddedObject = function(name, type, metaData, material, mesh, physicsBody, de
   this.reusableVec3_2 = new THREE.Vector3();
   this.reusableVec3_3 = new THREE.Vector3();
 
+  this.prevPositionVector = new THREE.Vector3();
   this.isIntersectable = true;
 
   this.lastUpdatePosition = new THREE.Vector3();
@@ -2296,6 +2300,27 @@ var AddedObject = function(name, type, metaData, material, mesh, physicsBody, de
 
   webglCallbackHandler.registerEngineObject(this);
 
+}
+
+AddedObject.prototype.onPositionChange = function(from, to){
+  if(mode == 0){
+    return;
+  }
+  if (this.positionThresholdExceededListenerInfo && this.positionThresholdExceededListenerInfo.isActive){
+    var axis = this.positionThresholdExceededListenerInfo.axis;
+    var oldPos = from[axis];
+    var newPos = to[axis];
+    var threshold = this.positionThresholdExceededListenerInfo.threshold;
+    if (this.positionThresholdExceededListenerInfo.controlMode == 1){
+      if (oldPos <= threshold && newPos > threshold){
+        this.positionThresholdExceededListenerInfo.callbackFunction();
+      }
+    }else{
+      if (oldPos >= threshold && newPos < threshold){
+        this.positionThresholdExceededListenerInfo.callbackFunction();
+      }
+    }
+  }
 }
 
 AddedObject.prototype.collisionCallback = function(collisionEvent){
@@ -2927,10 +2952,10 @@ AddedObject.prototype.unMapEmissive = function(){
     delete this.mesh.material.uniforms.emissiveMap;
     delete this.mesh.material.uniforms.emissiveIntensity;
     delete this.mesh.material.uniforms.emissiveColor;
-    this.removeMacro("HAS_EMISSIVE", false, true);
+    macroHandler.removeMacro("HAS_EMISSIVE", this.mesh.material, false, true);
     if (!this.hasTexture()){
       delete this.mesh.material.uniforms.textureMatrix;
-      this.removeMacro("HAS_TEXTURE", true, true);
+      macroHandler.removeMacro("HAS_TEXTURE", this.mesh.material, true, true);
     }
   }
 }
@@ -2940,7 +2965,7 @@ AddedObject.prototype.mapEmissive = function(emissiveMap){
     var tMatrix = new THREE.Matrix3();
     tMatrix.setUvTransform(0, 0, 1, 1, 0, 0, 0);
     this.mesh.material.uniforms.textureMatrix = new THREE.Uniform(tMatrix);
-    this.injectMacro("HAS_TEXTURE", true, true);
+    macroHandler.injectMacro("HAS_TEXTURE", this.mesh.material, true, true);
     this.mesh.material.uniformsNeedUpdate = true;
   }
   if (this.hasEmissiveMap()){
@@ -2949,7 +2974,7 @@ AddedObject.prototype.mapEmissive = function(emissiveMap){
     this.mesh.material.uniforms.emissiveMap = this.getTextureUniform(emissiveMap);
     this.mesh.material.uniforms.emissiveIntensity = new THREE.Uniform(this.material.emissiveIntensity);
     this.mesh.material.uniforms.emissiveColor = new THREE.Uniform(new THREE.Color(this.material.emissiveColor));
-    this.injectMacro("HAS_EMISSIVE", false, true);
+    macroHandler.injectMacro("HAS_EMISSIVE", this.mesh.material, false, true);
     this.mesh.material.uniformsNeedUpdate = true;
   }
   emissiveMap.updateMatrix();
@@ -2967,10 +2992,10 @@ AddedObject.prototype.unMapDisplacement = function(){
   if (this.hasDisplacementMap()){
     delete this.mesh.material.uniforms.displacementMap;
     delete this.mesh.material.uniforms.displacementInfo;
-    this.removeMacro("HAS_DISPLACEMENT", true, false);
+    macroHandler.removeMacro("HAS_DISPLACEMENT", this.mesh.material, true, false);
     if (!this.hasTexture()){
       delete this.mesh.material.uniforms.textureMatrix;
-      this.removeMacro("HAS_TEXTURE", true, true);
+      macroHandler.removeMacro("HAS_TEXTURE", this.mesh.material, true, true);
     }
   }
 }
@@ -2984,7 +3009,7 @@ AddedObject.prototype.mapDisplacement = function(displacementTexture){
     var tMatrix = new THREE.Matrix3();
     tMatrix.setUvTransform(0, 0, 1, 1, 0, 0, 0);
     this.mesh.material.uniforms.textureMatrix = new THREE.Uniform(tMatrix);
-    this.injectMacro("HAS_TEXTURE", true, true);
+    macroHandler.injectMacro("HAS_TEXTURE", this.mesh.material, true, true);
     this.mesh.material.uniformsNeedUpdate = true;
   }
   if (this.hasDisplacementMap()){
@@ -2992,7 +3017,7 @@ AddedObject.prototype.mapDisplacement = function(displacementTexture){
   }else{
     this.mesh.material.uniforms.displacementMap = this.getTextureUniform(displacementTexture);
     this.mesh.material.uniforms.displacementInfo = new THREE.Uniform(new THREE.Vector2());
-    this.injectMacro("HAS_DISPLACEMENT", true, false);
+    macroHandler.injectMacro("HAS_DISPLACEMENT", this.mesh.material, true, false);
     this.mesh.material.uniformsNeedUpdate = true;
   }
   displacementTexture.updateMatrix();
@@ -3006,10 +3031,10 @@ AddedObject.prototype.unMapAO = function(){
   if (this.hasAOMap()){
     delete this.mesh.material.uniforms.aoMap;
     delete this.mesh.material.uniforms.aoIntensity;
-    this.removeMacro("HAS_AO", false, true);
+    macroHandler.removeMacro("HAS_AO", this.mesh.material, false, true);
     if (!this.hasTexture()){
       delete this.mesh.material.uniforms.textureMatrix;
-      this.removeMacro("HAS_TEXTURE", true, true);
+      macroHandler.removeMacro("HAS_TEXTURE", this.mesh.material, true, true);
     }
   }
 }
@@ -3019,7 +3044,7 @@ AddedObject.prototype.mapAO = function(aoTexture){
     var tMatrix = new THREE.Matrix3();
     tMatrix.setUvTransform(0, 0, 1, 1, 0, 0, 0);
     this.mesh.material.uniforms.textureMatrix = new THREE.Uniform(tMatrix);
-    this.injectMacro("HAS_TEXTURE", true, true);
+    macroHandler.injectMacro("HAS_TEXTURE", this.mesh.material, true, true);
     this.mesh.material.uniformsNeedUpdate = true;
   }
   if (this.hasAOMap()){
@@ -3027,7 +3052,7 @@ AddedObject.prototype.mapAO = function(aoTexture){
   }else{
     this.mesh.material.uniforms.aoMap = this.getTextureUniform(aoTexture);
     this.mesh.material.uniforms.aoIntensity = new THREE.Uniform(this.material.aoMapIntensity);
-    this.injectMacro("HAS_AO", false, true);
+    macroHandler.injectMacro("HAS_AO", this.mesh.material, false, true);
     this.mesh.material.uniformsNeedUpdate = true;
   }
   aoTexture.updateMatrix();
@@ -3040,10 +3065,10 @@ AddedObject.prototype.hasAlphaMap = function(){
 AddedObject.prototype.unMapAlpha = function(){
   if (this.hasAlphaMap()){
     delete this.mesh.material.uniforms.alphaMap;
-    this.removeMacro("HAS_ALPHA", false, true);
+    macroHandler.removeMacro("HAS_ALPHA", this.mesh.material, false, true);
     if (!this.hasTexture()){
       delete this.mesh.material.uniforms.textureMatrix;
-      this.removeMacro("HAS_TEXTURE", true, true);
+      macroHandler.removeMacro("HAS_TEXTURE", this.mesh.material, true, true);
     }
   }
 }
@@ -3053,14 +3078,14 @@ AddedObject.prototype.mapAlpha = function(alphaTexture){
     var tMatrix = new THREE.Matrix3();
     tMatrix.setUvTransform(0, 0, 1, 1, 0, 0, 0);
     this.mesh.material.uniforms.textureMatrix = new THREE.Uniform(tMatrix);
-    this.injectMacro("HAS_TEXTURE", true, true);
+    macroHandler.injectMacro("HAS_TEXTURE", this.mesh.material, true, true);
     this.mesh.material.uniformsNeedUpdate = true;
   }
   if (this.hasAlphaMap()){
     this.mesh.material.uniforms.alphaMap.value = alphaTexture;
   }else{
     this.mesh.material.uniforms.alphaMap = this.getTextureUniform(alphaTexture);
-    this.injectMacro("HAS_ALPHA", false, true);
+    macroHandler.injectMacro("HAS_ALPHA", this.mesh.material, false, true);
     this.mesh.material.uniformsNeedUpdate = true;
   }
   alphaTexture.updateMatrix();
@@ -3073,10 +3098,10 @@ AddedObject.prototype.hasDiffuseMap = function(){
 AddedObject.prototype.unMapDiffuse = function(){
   if (this.hasDiffuseMap()){
     delete this.mesh.material.uniforms.diffuseMap;
-    this.removeMacro("HAS_DIFFUSE", false, true);
+    macroHandler.removeMacro("HAS_DIFFUSE", this.mesh.material, false, true);
     if (!this.hasTexture()){
       delete this.mesh.material.uniforms.textureMatrix;
-      this.removeMacro("HAS_TEXTURE", true, true);
+      macroHandler.removeMacro("HAS_TEXTURE", this.mesh.material, true, true);
     }
   }
 }
@@ -3086,14 +3111,14 @@ AddedObject.prototype.mapDiffuse = function(diffuseTexture){
     var tMatrix = new THREE.Matrix3();
     tMatrix.setUvTransform(0, 0, 1, 1, 0, 0, 0);
     this.mesh.material.uniforms.textureMatrix = new THREE.Uniform(tMatrix);
-    this.injectMacro("HAS_TEXTURE", true, true);
+    macroHandler.injectMacro("HAS_TEXTURE", this.mesh.material, true, true);
     this.mesh.material.uniformsNeedUpdate = true;
   }
   if (this.hasDiffuseMap()){
     this.mesh.material.uniforms.diffuseMap.value = diffuseTexture
   }else{
     this.mesh.material.uniforms.diffuseMap = this.getTextureUniform(diffuseTexture);
-    this.injectMacro("HAS_DIFFUSE", false, true);
+    macroHandler.injectMacro("HAS_DIFFUSE", this.mesh.material, false, true);
     this.mesh.material.uniformsNeedUpdate = true;
   }
   diffuseTexture.updateMatrix();
@@ -4788,30 +4813,6 @@ AddedObject.prototype.hasTexture = function(){
   );
 }
 
-AddedObject.prototype.injectMacro = function(macro, insertVertexShader, insertFragmentShader){
-  if (insertVertexShader){
-    this.mesh.material.vertexShader = this.mesh.material.vertexShader.replace(
-      "#define INSERTION", "#define INSERTION\n#define "+macro
-    )
-  };
-  if (insertFragmentShader){
-    this.mesh.material.fragmentShader = this.mesh.material.fragmentShader.replace(
-      "#define INSERTION", "#define INSERTION\n#define "+macro
-    )
-  };
-  this.mesh.material.needsUpdate = true;
-}
-
-AddedObject.prototype.removeMacro = function(macro, removeVertexShader, removeFragmentShader){
-  if (removeVertexShader){
-    this.mesh.material.vertexShader = this.mesh.material.vertexShader.replace("\n#define "+macro, "");
-  }
-  if (removeFragmentShader){
-    this.mesh.material.fragmentShader = this.mesh.material.fragmentShader.replace("\n#define "+macro, "");
-  }
-  this.mesh.material.needsUpdate = true;
-}
-
 AddedObject.prototype.getTextureOffsetX = function(){
   if (this.hasTexture()){
     return this.mesh.material.uniforms.textureMatrix.value.elements[6];
@@ -4854,12 +4855,12 @@ AddedObject.prototype.getTextureRepeatY = function(){
 
 AddedObject.prototype.setFog = function(){
   if (!this.mesh.material.uniforms.fogInfo){
-    this.injectMacro("HAS_FOG", false, true);
+    macroHandler.injectMacro("HAS_FOG", this.mesh.material, false, true);
     this.mesh.material.uniforms.fogInfo = GLOBAL_FOG_UNIFORM;
   }
   if (fogBlendWithSkybox){
     if (!this.mesh.material.uniforms.cubeTexture){
-      this.injectMacro("HAS_SKYBOX_FOG", true, true);
+      macroHandler.injectMacro("HAS_SKYBOX_FOG", this.mesh.material, true, true);
       this.mesh.material.uniforms.worldMatrix = new THREE.Uniform(this.mesh.matrixWorld);
       this.mesh.material.uniforms.cubeTexture = GLOBAL_CUBE_TEXTURE_UNIFORM;
       this.mesh.material.uniforms.cameraPosition = GLOBAL_CAMERA_POSITION_UNIFORM;
@@ -4869,8 +4870,8 @@ AddedObject.prototype.setFog = function(){
 }
 
 AddedObject.prototype.removeFog = function(){
-  this.removeMacro("HAS_FOG", false, true);
-  this.removeMacro("HAS_SKYBOX_FOG", true, true);
+  macroHandler.removeMacro("HAS_FOG", this.mesh.material, false, true);
+  macroHandler.removeMacro("HAS_SKYBOX_FOG", this.mesh.material, true, true);
   delete this.mesh.material.uniforms.fogInfo;
   delete this.mesh.material.uniforms.cubeTexture;
   delete this.mesh.material.uniforms.worldMatrix;
@@ -4894,6 +4895,8 @@ var ObjectGroup = function(name, group){
 
   this.childObjectsByName = new Object();
 
+  this.prevPositionVector = new THREE.Vector3();
+
   this.totalVertexCount = 0;
   this.skippedVertexCount = 0;
 
@@ -4909,6 +4912,27 @@ var ObjectGroup = function(name, group){
   this.isIntersectable = true;
   this.lastUpdatePosition = new THREE.Vector3();
   this.lastUpdateQuaternion = new THREE.Quaternion();
+}
+
+ObjectGroup.prototype.onPositionChange = function(from, to){
+  if (mode == 0){
+    return;
+  }
+  if (this.positionThresholdExceededListenerInfo && this.positionThresholdExceededListenerInfo.isActive){
+    var axis = this.positionThresholdExceededListenerInfo.axis;
+    var oldPos = from[axis];
+    var newPos = to[axis];
+    var threshold = this.positionThresholdExceededListenerInfo.threshold;
+    if (this.positionThresholdExceededListenerInfo.controlMode == 1){
+      if (oldPos <= threshold && newPos > threshold){
+        this.positionThresholdExceededListenerInfo.callbackFunction();
+      }
+    }else{
+      if (oldPos >= threshold && newPos < threshold){
+        this.positionThresholdExceededListenerInfo.callbackFunction();
+      }
+    }
+  }
 }
 
 ObjectGroup.prototype.forceColor = function(r, g, b, a){
@@ -5950,22 +5974,22 @@ ObjectGroup.prototype.glue = function(){
   }
   webglCallbackHandler.registerEngineObject(this);
   if (this.aoTexture){
-    this.injectMacro("HAS_AO", true, true);
+    macroHandler.injectMacro("HAS_AO", this.mesh.material, true, true);
   }
   if (this.emissiveTexture){
-    this.injectMacro("HAS_EMISSIVE", true, true);
+    macroHandler.injectMacro("HAS_EMISSIVE", this.mesh.material, true, true);
   }
   if (this.diffuseTexture){
-    this.injectMacro("HAS_DIFFUSE", true, true);
+    macroHandler.injectMacro("HAS_DIFFUSE", this.mesh.material, true, true);
   }
   if (this.alphaTexture){
-    this.injectMacro("HAS_ALPHA", true, true);
+    macroHandler.injectMacro("HAS_ALPHA", this.mesh.material, true, true);
   }
   if (this.displacementTexture && VERTEX_SHADER_TEXTURE_FETCH_SUPPORTED){
-    this.injectMacro("HAS_DISPLACEMENT", true, false);
+    macroHandler.injectMacro("HAS_DISPLACEMENT", this.mesh.material, true, false);
   }
   if (this.hasTexture){
-    this.injectMacro("HAS_TEXTURE", true, true);
+    macroHandler.injectMacro("HAS_TEXTURE", this.mesh.material, true, true);
   }
 
   this.mesh.objectGroupName = this.name;
@@ -6975,38 +6999,14 @@ ObjectGroup.prototype.incrementOpacity = function(val){
   }
 }
 
-ObjectGroup.prototype.injectMacro = function(macro, insertVertexShader, insertFragmentShader){
-  if (insertVertexShader){
-    this.mesh.material.vertexShader = this.mesh.material.vertexShader.replace(
-      "#define INSERTION", "#define INSERTION\n#define "+macro
-    )
-  };
-  if (insertFragmentShader){
-    this.mesh.material.fragmentShader = this.mesh.material.fragmentShader.replace(
-      "#define INSERTION", "#define INSERTION\n#define "+macro
-    )
-  };
-  this.mesh.material.needsUpdate = true;
-}
-
-ObjectGroup.prototype.removeMacro = function(macro, removeVertexShader, removeFragmentShader){
-  if (removeVertexShader){
-    this.mesh.material.vertexShader = this.mesh.material.vertexShader.replace("\n#define "+macro, "");
-  }
-  if (removeFragmentShader){
-    this.mesh.material.fragmentShader = this.mesh.material.fragmentShader.replace("\n#define "+macro, "");
-  }
-  this.mesh.material.needsUpdate = true;
-}
-
 ObjectGroup.prototype.setFog = function(){
   if (!this.mesh.material.uniforms.fogInfo){
-    this.injectMacro("HAS_FOG", false, true);
+    macroHandler.injectMacro("HAS_FOG", this.mesh.material, false, true);
     this.mesh.material.uniforms.fogInfo = GLOBAL_FOG_UNIFORM;
   }
   if (fogBlendWithSkybox){
     if (!this.mesh.material.uniforms.cubeTexture){
-      this.injectMacro("HAS_SKYBOX_FOG", true, true);
+      macroHandler.injectMacro("HAS_SKYBOX_FOG", this.mesh.material, true, true);
       this.mesh.material.uniforms.worldMatrix = new THREE.Uniform(this.mesh.matrixWorld);
       this.mesh.material.uniforms.cubeTexture = GLOBAL_CUBE_TEXTURE_UNIFORM;
       this.mesh.material.uniforms.cameraPosition = GLOBAL_CAMERA_POSITION_UNIFORM;
@@ -7016,8 +7016,8 @@ ObjectGroup.prototype.setFog = function(){
 }
 
 ObjectGroup.prototype.removeFog = function(){
-  this.removeMacro("HAS_FOG", false, true);
-  this.removeMacro("HAS_SKYBOX_FOG", true, true);
+  macroHandler.removeMacro("HAS_FOG", this.mesh.material, false, true);
+  macroHandler.removeMacro("HAS_SKYBOX_FOG", this.mesh.material, true, true);
   delete this.mesh.material.uniforms.fogInfo;
   delete this.mesh.material.uniforms.cubeTexture;
   delete this.mesh.material.uniforms.worldMatrix;
@@ -7143,7 +7143,8 @@ var AddedText = function(name, font, text, position, color, alpha, characterSize
       xOffsets: new THREE.Uniform(xOffsetsArray),
       yOffsets: new THREE.Uniform(yOffsetsArray),
       currentViewport: GLOBAL_ADDEDTEXT_VIEWPORT_UNIFORM,
-      charSize: new THREE.Uniform(this.characterSize)
+      charSize: new THREE.Uniform(this.characterSize),
+      screenResolution: GLOBAL_SCREEN_RESOLUTION_UNIFORM
     }
   });
   this.topLeft = new THREE.Vector3(0, 0, 0);
@@ -7416,7 +7417,7 @@ AddedText.prototype.setBackground = function(backgroundColorString, backgroundAl
     this.oldBackgroundStatus = this.hasBackground ? this.hasBackground: false;
   }
   if (!this.material.uniforms.backgroundColor){
-    this.injectMacro("HAS_BACKGROUND", false, true);
+    macroHandler.injectMacro("HAS_BACKGROUND", this.material, false, true);
     this.material.uniforms.backgroundColor = new THREE.Uniform(new THREE.Color(backgroundColorString));
     this.material.uniforms.backgroundAlpha = new THREE.Uniform(backgroundAlpha);
   }else{
@@ -7433,7 +7434,7 @@ AddedText.prototype.removeBackground = function(fromScript){
     this.oldBackgroundStatus = this.material.uniforms.hasBackgroundColorFlag.value;
   }
   if (this.material.uniforms.backgroundColor){
-    this.removeMacro("HAS_BACKGROUND", false, true);
+    macroHandler.removeMacro("HAS_BACKGROUND", this.material, false, true);
     delete this.material.uniforms.backgroundColor;
     delete this.material.uniforms.backgroundAlpha;
   }
@@ -7727,7 +7728,7 @@ AddedText.prototype.set2DStatus = function(is2D){
   }
   this.is2D = is2D;
   if (is2D){
-    this.injectMacro("IS_TWO_DIMENSIONAL", true, false);
+    macroHandler.injectMacro("IS_TWO_DIMENSIONAL", this.material, true, false);
     this.set2DCoordinates(this.marginPercentWidth, this.marginPercentHeight);
     if (typeof this.oldIsClickable == UNDEFINED){
       this.oldIsClickable = this.isClickable;
@@ -7735,7 +7736,7 @@ AddedText.prototype.set2DStatus = function(is2D){
     this.isClickable = false;
     addedTexts2D[this.name] = this;
   }else{
-    this.removeMacro("IS_TWO_DIMENSIONAL", true, false);
+    macroHandler.removeMacro("IS_TWO_DIMENSIONAL", this.material, true, false);
     delete this.mesh.material.uniforms.margin2D;
     this.isClickable = this.oldIsClickable;
     delete this.oldIsClickable;
@@ -7855,30 +7856,6 @@ AddedText.prototype.debugCornerPoints = function(representativeCharacter, corner
   }
 }
 
-AddedText.prototype.injectMacro = function(macro, insertVertexShader, insertFragmentShader){
-  if (insertVertexShader){
-    this.material.vertexShader = this.material.vertexShader.replace(
-      "#define INSERTION", "#define INSERTION\n#define "+macro
-    )
-  };
-  if (insertFragmentShader){
-    this.material.fragmentShader = this.material.fragmentShader.replace(
-      "#define INSERTION", "#define INSERTION\n#define "+macro
-    )
-  };
-  this.material.needsUpdate = true;
-}
-
-AddedText.prototype.removeMacro = function(macro, removeVertexShader, removeFragmentShader){
-  if (removeVertexShader){
-    this.material.vertexShader = this.material.vertexShader.replace("\n#define "+macro, "");
-  }
-  if (removeFragmentShader){
-    this.material.fragmentShader = this.material.fragmentShader.replace("\n#define "+macro, "");
-  }
-  this.material.needsUpdate = true;
-}
-
 AddedText.prototype.setShaderMargin = function(isMarginX, value){
   if (!this.mesh.material.uniforms.margin2D){
     this.mesh.material.uniforms.margin2D = new THREE.Uniform(new THREE.Vector2());
@@ -7898,12 +7875,12 @@ AddedText.prototype.setFog = function(){
     return;
   }
   if (!this.mesh.material.uniforms.fogInfo){
-    this.injectMacro("HAS_FOG", false, true);
+    macroHandler.injectMacro("HAS_FOG", this.material, false, true);
     this.mesh.material.uniforms.fogInfo = GLOBAL_FOG_UNIFORM;
   }
   if (fogBlendWithSkybox){
     if (!this.mesh.material.uniforms.cubeTexture){
-      this.injectMacro("HAS_SKYBOX_FOG", true, true);
+      macroHandler.injectMacro("HAS_SKYBOX_FOG", this.material, true, true);
       this.mesh.material.uniforms.worldMatrix = new THREE.Uniform(this.mesh.matrixWorld);
       this.mesh.material.uniforms.cubeTexture = GLOBAL_CUBE_TEXTURE_UNIFORM;
       this.mesh.material.uniforms.cameraPosition = GLOBAL_CAMERA_POSITION_UNIFORM;
@@ -7916,8 +7893,8 @@ AddedText.prototype.removeFog = function(){
   if (this.is2D || !this.isAffectedByFog){
     return;
   }
-  this.removeMacro("HAS_FOG", false, true);
-  this.removeMacro("HAS_SKYBOX_FOG", true, true);
+  macroHandler.removeMacro("HAS_FOG", this.material, false, true);
+  macroHandler.removeMacro("HAS_SKYBOX_FOG", this.material, true, true);
   delete this.mesh.material.uniforms.fogInfo;
   delete this.mesh.material.uniforms.cubeTexture;
   delete this.mesh.material.uniforms.worldMatrix;
