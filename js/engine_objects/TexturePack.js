@@ -136,7 +136,6 @@ TexturePack.prototype.readyCallback = function(){
 
 TexturePack.prototype.mapDiffuse = function (that, textureData){
   that.diffuseTexture = textureData;
-  diffuseTextureCache[that.name] = textureData;
   that.diffuseTexture.wrapS = THREE.RepeatWrapping;
   that.diffuseTexture.wrapT = THREE.RepeatWrapping;
   that.hasDiffuse = true;
@@ -146,7 +145,6 @@ TexturePack.prototype.mapDiffuse = function (that, textureData){
 
 TexturePack.prototype.mapHeight = function (that, textureData){
   that.heightTexture = textureData;
-  heightTextureCache[that.name] = textureData;
   that.heightTexture.wrapS = THREE.RepeatWrapping;
   that.heightTexture.wrapT = THREE.RepeatWrapping;
   that.hasHeight = true;
@@ -186,136 +184,90 @@ TexturePack.prototype.loadTextures = function(){
   var that = this;
 
   //DIFFUSE
-  var diffuseTextureCached = diffuseTextureCache[this.name];
-  if (!diffuseTextureCached || (diffuseTextureCached && diffuseTextureCached == CACHE_NOT_PRESENT)){
-    this.loader.load(this.diffuseFilePath,
-      function(textureData){
-        if (that.scaleFactor){
-          textureData.image = that.rescaleTextureImage(textureData, that.scaleFactor);
-        }
-        that.mapDiffuse(that, textureData);
-      },
-      function(xhr){
-
-      },
-      function(xhr){
-        diffuseTextureCache[that.name] = CACHE_NOT_PRESENT;
-        that.hasDiffuse = false;
-        that.diffuseCanMapFlag = true;
-        that.refreshMap();
+  this.loader.load(this.diffuseFilePath,
+    function(textureData){
+      if (that.scaleFactor){
+        textureData.image = that.rescaleTextureImage(textureData, that.scaleFactor);
       }
-    );
-  }else{
-    if (diffuseTextureCached != CACHE_NOT_PRESENT){
-      texturePacks[this.name] = this;
-      this.mapDiffuse(this, diffuseTextureCached);
+      that.mapDiffuse(that, textureData);
+    },
+    function(xhr){
+
+    },
+    function(xhr){
+      that.hasDiffuse = false;
+      that.diffuseCanMapFlag = true;
+      that.refreshMap();
     }
-  }
+  );
   //ALPHA
-  var alphaTextureCached = alphaTextureCache[this.name];
-  if (!alphaTextureCached || (alphaTextureCached && alphaTextureCached == CACHE_NOT_PRESENT)){
-    this.loader.load(this.alphaFilePath,
-      function(textureData){
-        if (that.scaleFactor){
-          textureData.image = that.rescaleTextureImage(textureData, that.scaleFactor);
-        }
-        that.mapAlpha(that, textureData);
-      },
-      function(xhr){
-
-      },
-      function(xhr){
-        alphaTextureCache[that.name] = CACHE_NOT_PRESENT;
-        that.hasAlpha = false;
-        that.alphaCanMapFlag = true;
-        that.refreshMap();
+  this.loader.load(this.alphaFilePath,
+    function(textureData){
+      if (that.scaleFactor){
+        textureData.image = that.rescaleTextureImage(textureData, that.scaleFactor);
       }
-    );
-  }else{
-    if (alphaTextureCached != CACHE_NOT_PRESENT){
-      this.mapAlpha(this, alphaTextureCached);
-      texturePacks[this.name] = this;
+      that.mapAlpha(that, textureData);
+    },
+    function(xhr){
+
+    },
+    function(xhr){
+      that.hasAlpha = false;
+      that.alphaCanMapFlag = true;
+      that.refreshMap();
     }
-  }
+  );
   //AO
-  var ambientOcculsionTextureCached = ambientOcculsionTextureCache[this.name];
-  if (!ambientOcculsionTextureCached || (ambientOcculsionTextureCached && ambientOcculsionTextureCached == CACHE_NOT_PRESENT)){
-    this.loader.load(this.aoFilePath,
-      function(textureData){
-        if (that.scaleFactor){
-          textureData.image = that.rescaleTextureImage(textureData, that.scaleFactor);
-        }
-        that.mapAmbientOcculsion(that, textureData);
-      },
-      function(xhr){
-
-      },
-      function(xhr){
-        ambientOcculsionTextureCache[that.name] = CACHE_NOT_PRESENT;
-        that.hasAo = false;
-        that.aoCanMapFlag = true;
-        that.refreshMap();
+  this.loader.load(this.aoFilePath,
+    function(textureData){
+      if (that.scaleFactor){
+        textureData.image = that.rescaleTextureImage(textureData, that.scaleFactor);
       }
-    );
-  }else{
-    if (ambientOcculsionTextureCached != CACHE_NOT_PRESENT){
-      this.mapAmbientOcculsion(this, ambientOcculsionTextureCached);
-      texturePacks[this.name] = this;
+      that.mapAmbientOcculsion(that, textureData);
+    },
+    function(xhr){
+
+    },
+    function(xhr){
+      that.hasAo = false;
+      that.aoCanMapFlag = true;
+      that.refreshMap();
     }
-  }
+  );
   //EMISSIVE
-  var emissiveTextureCached = emissiveTextureCache[this.name];
-  if (!emissiveTextureCached || (emissiveTextureCached && emissiveTextureCached == CACHE_NOT_PRESENT)){
-    this.loader.load(this.emissiveFilePath,
-      function(textureData){
-        if (that.scaleFactor){
-          textureData.image = that.rescaleTextureImage(textureData, that.scaleFactor);
-        }
-        that.mapEmissive(that, textureData);
-      },
-      function(xhr){
-
-      },
-      function(xhr){
-        emissiveTextureCache[that.name] = CACHE_NOT_PRESENT;
-        that.hasEmissive = false;
-        that.emissiveCanMapFlag = true;
-        that.refreshMap();
+  this.loader.load(this.emissiveFilePath,
+    function(textureData){
+      if (that.scaleFactor){
+        textureData.image = that.rescaleTextureImage(textureData, that.scaleFactor);
       }
-    );
-  }else{
-    if (emissiveTextureCached != CACHE_NOT_PRESENT){
-      this.mapEmissive(this, emissiveTextureCached);
-      texturePacks[this.name] = this;
+      that.mapEmissive(that, textureData);
+    },
+    function(xhr){
+
+    },
+    function(xhr){
+      that.hasEmissive = false;
+      that.emissiveCanMapFlag = true;
+      that.refreshMap();
     }
-  }
+  );
   //HEIGHT
-  var heightTextureCached = heightTextureCache[this.name];
-  if (!heightTextureCached || (heightTextureCached && heightTextureCached == CACHE_NOT_PRESENT)){
-    this.loader.load(this.heightFilePath,
-      function(textureData){
-        if (that.scaleFactor){
-          textureData.image = that.rescaleTextureImage(textureData, that.scaleFactor);
-        }
-        that.mapHeight(that, textureData);
-      },
-      function(xhr){
-
-      },
-      function(xhr){
-        heightTextureCache[that.name] = CACHE_NOT_PRESENT;
-        that.hasHeight = false;
-        that.heightCanMapFlag = true;
-        that.refreshMap();
+  this.loader.load(this.heightFilePath,
+    function(textureData){
+      if (that.scaleFactor){
+        textureData.image = that.rescaleTextureImage(textureData, that.scaleFactor);
       }
-    );
-  }else{
-      if (heightTextureCached != CACHE_NOT_PRESENT){
-        this.mapHeight(this, heightTextureCached);
-        texturePacks[this.name] = this;
-      }
-  }
+      that.mapHeight(that, textureData);
+    },
+    function(xhr){
 
+    },
+    function(xhr){
+      that.hasHeight = false;
+      that.heightCanMapFlag = true;
+      that.refreshMap();
+    }
+  );
 }
 
 TexturePack.prototype.printInfo = function(){
@@ -398,11 +350,6 @@ TexturePack.prototype.isUsable = function(){
 }
 
 TexturePack.prototype.refresh = function(){
-  delete diffuseTextureCache[this.name];
-  delete heightTextureCache[this.name];
-  delete ambientOcculsionTextureCache[this.name];
-  delete alphaTextureCache[this.name];
-  delete emissiveTextureCache[this.name];
   this.loadTextures();
 }
 

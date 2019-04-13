@@ -2250,11 +2250,6 @@ StateLoader.prototype.resetProject = function(){
   for (var effectName in renderer.effects){
     renderer.effects[effectName].reset();
   }
-  diffuseTextureCache = new Object();
-  heightTextureCache = new Object();
-  ambientOcculsionTextureCache = new Object();
-  alphaTextureCache = new Object();
-  emissiveTextureCache = new Object();
 
   if (!isDeployment){
     guiHandler.hideAll();
