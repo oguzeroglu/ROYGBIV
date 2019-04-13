@@ -166,6 +166,7 @@ var Preconditions = function(){
   this.onPinch = "onPinch";
   this.onMouseWheel = "onMouseWheel";
   this.onUpdate = "onUpdate";
+  this.control = "control";
 }
 
 Preconditions.prototype.errorHeader = function(callerFunc){

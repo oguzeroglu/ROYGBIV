@@ -188,7 +188,8 @@ var Roygbiv = function(){
     "onObjectPositionThresholdExceeded",
     "removeObjectPositionThresholdExceededListener",
     "createFreeControl",
-    "createCustomControl"
+    "createCustomControl",
+    "setActiveControl"
   ];
 
   this.globals = new Object();
@@ -4452,6 +4453,16 @@ Roygbiv.prototype.createCustomControl = function(parameters){
     onUpdate: (!(typeof parameters.onUpdate == UNDEFINED))? parameters.onUpdate: noop
   }
   return new CustomControls(params);
+}
+
+// Sets the active control.
+Roygbiv.prototype.setActiveControl = function(control){
+  if (mode == 0){
+    return;
+  }
+  preConditions.checkIfDefined(ROYGBIV.setActiveControl, preConditions.control, control);
+  preConditions.checkIfTrue(ROYGBIV.setActiveControl, "control is not a Control object.", !control.isControl);
+  activeControl = control;
 }
 
 // UTILITY FUNCTIONS ***********************************************************

@@ -954,4 +954,5 @@ this.ROYGBIV_SCRIPTING_API_CREATECUSTOMCONTROL = "Creates a CustomControl implem
                                                  "onPinch (optional): Function to be executed with diff parameter when the user performs a pinch zoom (mobile). Default value is noop.\n"+
                                                  "onMouseWheel (optional): Function to be executed with the mouse wheel event when the user performs a mouse wheel. Default value is noop.\n"+
                                                  "onUpdate (optional): Function to be executed on each frame. Default value is noop.";
+this.ROYGBIV_SCRIPTING_API_SETACTIVECONTROL = "Sets the active control.";
 }
