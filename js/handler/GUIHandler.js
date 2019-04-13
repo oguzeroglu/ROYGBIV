@@ -105,6 +105,9 @@ GUIHandler.prototype.afterTextSelection = function(){
     }
     guiHandler.textManipulationParameters["Char size"] = curSelection.characterSize;
     guiHandler.textManipulationParameters["Clickable"] = curSelection.isClickable;
+    if (typeof guiHandler.textManipulationParameters["Clickable"] == UNDEFINED){
+      guiHandler.textManipulationParameters["Clickable"] = false;
+    }
     guiHandler.textManipulationParameters["Margin X"] = curSelection.marginPercentWidth;
     guiHandler.textManipulationParameters["Margin Y"] = curSelection.marginPercentHeight;
     guiHandler.textManipulationParameters["Max width%"] = curSelection.maxWidthPercent;

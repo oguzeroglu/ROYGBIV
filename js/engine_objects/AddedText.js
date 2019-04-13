@@ -60,7 +60,8 @@ var AddedText = function(name, font, text, position, color, alpha, characterSize
       xOffsets: new THREE.Uniform(xOffsetsArray),
       yOffsets: new THREE.Uniform(yOffsetsArray),
       currentViewport: GLOBAL_ADDEDTEXT_VIEWPORT_UNIFORM,
-      charSize: new THREE.Uniform(this.characterSize)
+      charSize: new THREE.Uniform(this.characterSize),
+      screenResolution: GLOBAL_SCREEN_RESOLUTION_UNIFORM
     }
   });
   this.topLeft = new THREE.Vector3(0, 0, 0);

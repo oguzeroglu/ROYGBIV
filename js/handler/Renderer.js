@@ -70,6 +70,7 @@ Renderer.prototype.setSize = function(width, height){
 
 Renderer.prototype.setPixelRatio = function(ratio){
   this.webglRenderer.setPixelRatio(ratio);
+  GLOBAL_SCREEN_RESOLUTION_UNIFORM.value = ratio;
   for (var effectName in this.effects){
     this.effects[effectName].setPixelRatio(ratio);
   }
