@@ -6,6 +6,7 @@ var CustomControls = function(params){
   this.onPinchFunc = params.onPinch;
   this.onMouseWheelFunc = params.onMouseWheel;
   this.onUpdateFunc = params.onUpdate;
+  this.onMouseMoveFunc = params.onMouseMove;
 }
 
 CustomControls.prototype.onClick = function(event){
@@ -28,10 +29,14 @@ CustomControls.prototype.onMouseWheel = function(event){
   this.onMouseWheelFunc(event);
 }
 
+CustomControls.prototype.onMouseMove = function(event){
+  this.onMouseMoveFunc(event);
+}
+
 CustomControls.prototype.update = function(){
   this.onUpdateFunc();
 }
 
 CustomControls.prototype.onActivated = function(){
-  
+
 }

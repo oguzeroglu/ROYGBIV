@@ -106,6 +106,7 @@ MouseEventHandler.prototype.onMouseMove = function(event){
   if (mode == 1 && screenMouseMoveCallbackFunction){
     screenMouseMoveCallbackFunction(mouseEventHandler.coordX, mouseEventHandler.coordY, mouseEventHandler.movementX, mouseEventHandler.movementY);
   }
+  activeControl.onMouseMove(event);
 }
 
 MouseEventHandler.prototype.onMouseUp = function(event){

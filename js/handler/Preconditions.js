@@ -165,6 +165,7 @@ var Preconditions = function(){
   this.onSwipe = "onSwipe";
   this.onPinch = "onPinch";
   this.onMouseWheel = "onMouseWheel";
+  this.onMouseMove = "onMouseMove";
   this.onUpdate = "onUpdate";
   this.control = "control";
 }

@@ -106,6 +106,10 @@ FreeControls.prototype.onMouseWheel = function(event){
   }
 }
 
+FreeControls.prototype.onMouseMove = function(event){
+  
+}
+
 FreeControls.prototype.update = function(){
   if (!isMobile){
     var len = this.keyboardActions.length;
@@ -119,5 +123,5 @@ FreeControls.prototype.update = function(){
 }
 
 FreeControls.prototype.onActivated = function(){
-  
+
 }

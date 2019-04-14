@@ -23,10 +23,14 @@ FPSControls.prototype.onMouseWheel = function(event){
 
 }
 
+FPSControls.prototype.onMouseMove = function(event){
+  
+}
+
 FPSControls.prototype.update = function(){
 
 }
 
 FPSControls.prototype.onActivated = function(){
-  
+
 }

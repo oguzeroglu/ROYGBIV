@@ -12,7 +12,7 @@ window.onload = function() {
   // CONTROLS TEST
   if (!isDeployment){
     var controlClasses = [FreeControls, FPSControls, CustomControls];
-    var mandatoryControlMethods = ["update", "onMouseWheel", "onPinch", "onSwipe", "onTap", "onClick", "onActivated"];
+    var mandatoryControlMethods = ["update", "onMouseWheel", "onMouseMove", "onPinch", "onSwipe", "onTap", "onClick", "onActivated"];
     for (var i = 0; i<controlClasses.length; i++){
       for (var i2 = 0; i2<mandatoryControlMethods.length; i2++){
         if (!controlClasses[i].prototype[mandatoryControlMethods[i2]]){

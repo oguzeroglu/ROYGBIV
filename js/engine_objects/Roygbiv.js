@@ -4356,6 +4356,8 @@ Roygbiv.prototype.createFreeControl = function(parameters){
 // Default value is noop.
 // onMouseWheel (optional): Function to be executed with the mouse wheel event when the user performs a mouse wheel.
 // Default value is noop.
+// onMouseMove (optional): Function to be executed with the mouse move event when the user performs a mouse move.
+// Default value is noop.
 // onUpdate (optional): Function to be executed on each frame. Default value is noop.
 Roygbiv.prototype.createCustomControl = function(parameters){
   if (mode == 0){
@@ -4367,6 +4369,7 @@ Roygbiv.prototype.createCustomControl = function(parameters){
   preConditions.checkIfFunctionOnlyIfExists(ROYGBIV.createCustomControl, preConditions.onSwipe, parameters.onSwipe);
   preConditions.checkIfFunctionOnlyIfExists(ROYGBIV.createCustomControl, preConditions.onPinch, parameters.onPinch);
   preConditions.checkIfFunctionOnlyIfExists(ROYGBIV.createCustomControl, preConditions.onMouseWheel, parameters.onMouseWheel);
+  preConditions.checkIfFunctionOnlyIfExists(ROYGBIV.createCustomControl, preConditions.onMouseMove, parameters.onMouseMove);
   preConditions.checkIfFunctionOnlyIfExists(ROYGBIV.createCustomControl, preConditions.onUpdate, parameters.onUpdate);
   var params = {
     onClick: (!(typeof parameters.onClick == UNDEFINED))? parameters.onClick: noop,
@@ -4374,6 +4377,7 @@ Roygbiv.prototype.createCustomControl = function(parameters){
     onSwipe: (!(typeof parameters.onSwipe == UNDEFINED))? parameters.onSwipe: noop,
     onPinch: (!(typeof parameters.onPinch == UNDEFINED))? parameters.onPinch: noop,
     onMouseWheel: (!(typeof parameters.onMouseWheel == UNDEFINED))? parameters.onMouseWheel: noop,
+    onMouseMove: (!(typeof parameters.onMouseMove == UNDEFINED))? parameters.onMouseMove: noop,
     onUpdate: (!(typeof parameters.onUpdate == UNDEFINED))? parameters.onUpdate: noop
   }
   return new CustomControls(params);
