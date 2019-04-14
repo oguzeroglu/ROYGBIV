@@ -67,6 +67,28 @@ var AddedObject = function(name, type, metaData, material, mesh, physicsBody, de
 
 }
 
+AddedObject.prototype.show = function(){
+  if (!this.isVisibleOnThePreviewScene()){
+    this.mesh.visible = true;
+    if (this.autoInstancedParent){
+      this.autoInstancedParent.showObject(this);
+    }
+    if (!this.physicsKeptWhenHidden){
+      if (!this.noMass){
+        setTimeout(function(){
+          physicsWorld.addBody(this.physicsBody);
+        });
+        physicsWorld.show(this);
+        if (physicsDebugMode){
+          debugRenderer.show(this);
+        }
+      }
+    }
+    this.isHidden = false;
+    rayCaster.show(this);
+  }
+}
+
 AddedObject.prototype.hide = function(keepPhysics){
   if (this.isVisibleOnThePreviewScene()){
     this.mesh.visible = false;

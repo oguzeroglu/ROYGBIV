@@ -560,43 +560,10 @@ Roygbiv.prototype.show = function(object){
   if (object.isAddedObject){
     preConditions.checkIfChildObjectOnlyIfExists(ROYGBIV.show, preConditions.object, object);
     preConditions.checkIfChangeable(ROYGBIV.show, preConditions.object, object);
-    if (!object.isVisibleOnThePreviewScene()){
-      object.mesh.visible = true;
-      if (object.autoInstancedParent){
-        object.autoInstancedParent.showObject(object);
-      }
-      if (!object.physicsKeptWhenHidden){
-        if (!object.noMass){
-          setTimeout(function(){
-            physicsWorld.addBody(object.physicsBody);
-          });
-          physicsWorld.show(object);
-          if (physicsDebugMode){
-            debugRenderer.show(object);
-          }
-        }
-      }
-      object.isHidden = false;
-      rayCaster.show(object);
-    }
+    object.show();
   }else if (object.isObjectGroup){
     preConditions.checkIfChangeable(ROYGBIV.show, preConditions.object, object);
-    if (!object.isVisibleOnThePreviewScene()){
-      object.mesh.visible = true;
-      if (!object.physicsKeptWhenHidden){
-        if (!object.noMass){
-          setTimeout(function(){
-            physicsWorld.addBody(object.physicsBody);
-          });
-          physicsWorld.show(object);
-          if (physicsDebugMode){
-            debugRenderer.show(object);
-          }
-        }
-      }
-      object.isHidden = false;
-      rayCaster.show(object);
-    }
+    object.show();
   }
 }
 
