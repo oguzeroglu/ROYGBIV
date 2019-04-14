@@ -1,17 +1,5 @@
 var FreeControls = function(params){
   this.isControl = true;
-  this.left = "Left";
-  this.right = "Right";
-  this.up = "Up";
-  this.down = "Down";
-  this.space = "Space";
-  this.w = "W";
-  this.s = "S";
-  this.d = "D";
-  this.a = "A";
-  this.e = "E";
-  this.z = "Z";
-  this.q = "Q";
   this.rotationYDelta = params.rotationYDelta;
   this.rotationXDelta = params.rotationXDelta;
   this.translateZAmount = params.translateZAmount;
@@ -20,18 +8,18 @@ var FreeControls = function(params){
   this.mouseWheelSpeed = params.mouseWheelSpeed;
   this.swipeSpeed = params.swipeSpeed;
   this.keyboardActions = [
-    {key: this.left, action: this.incrRotationY},
-    {key: this.right, action: this.decrRotationY},
-    {key: this.up, action: this.incrRotationX},
-    {key: this.down, action: this.decrRotationX},
-    {key: this.w, action: this.translateZNegative},
-    {key: this.z, action: this.translateZNegative},
-    {key: this.s, action: this.translateZ},
-    {key: this.d, action: this.translateX},
-    {key: this.a, action: this.translateXNegative},
-    {key: this.q, action: this.translateXNegative},
-    {key: this.e, action: this.translateY},
-    {key: this.space, action: this.translateYNegative}
+    {key: "Left", action: this.incrRotationY},
+    {key: "Right", action: this.decrRotationY},
+    {key: "Up", action: this.incrRotationX},
+    {key: "Down", action: this.decrRotationX},
+    {key: "W", action: this.translateZNegative},
+    {key: "Z", action: this.translateZNegative},
+    {key: "S", action: this.translateZ},
+    {key: "D", action: this.translateX},
+    {key: "A", action: this.translateXNegative},
+    {key: "Q", action: this.translateXNegative},
+    {key: "E", action: this.translateY},
+    {key: "Space", action: this.translateYNegative}
   ];
 }
 
