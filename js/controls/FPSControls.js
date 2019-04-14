@@ -1,5 +1,6 @@
-var FPSControls = function(){
+var FPSControls = function(params){
   this.isControl = true;
+  this.playerBodyObject = params.playerBodyObject;
 }
 
 FPSControls.prototype.onClick = function(event){
@@ -24,4 +25,8 @@ FPSControls.prototype.onMouseWheel = function(event){
 
 FPSControls.prototype.update = function(){
 
+}
+
+FPSControls.prototype.onActivated = function(){
+  
 }

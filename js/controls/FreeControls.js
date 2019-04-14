@@ -117,3 +117,7 @@ FreeControls.prototype.update = function(){
     }
   }
 }
+
+FreeControls.prototype.onActivated = function(){
+  
+}

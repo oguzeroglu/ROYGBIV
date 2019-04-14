@@ -539,56 +539,13 @@ Roygbiv.prototype.hide = function(object, keepPhysics){
       preConditions.checkIfNoMass(ROYGBIV.hide, preConditions.object, object);
     }
     preConditions.checkIfChangeable(ROYGBIV.hide, preConditions.object, object);
-    if (object.isVisibleOnThePreviewScene()){
-      object.mesh.visible = false;
-      if (object.autoInstancedParent){
-        object.autoInstancedParent.hideObject(object);
-      }
-      // The reason we use delayed execution here is that
-      // during the collision callback, cannon.js crashes if a body
-      // is removed. It is safe to remove the bodies after the
-      // physics iteration.
-      if (!keepPhysicsValue){
-        if (!object.noMass){
-          setTimeout(function(){
-            physicsWorld.remove(object.physicsBody);
-            object.physicsKeptWhenHidden = false;
-          });
-          physicsWorld.hide(object);
-          if (physicsDebugMode){
-            debugRenderer.hide(object);
-          }
-        }
-      }else{
-        object.physicsKeptWhenHidden = true;
-      }
-      object.isHidden = true;
-      rayCaster.hide(object);
-    }
+    object.hide(keepPhysicsValue);
   }else if (object.isObjectGroup){
     if (keepPhysicsValue){
       preConditions.checkIfNoMass(ROYGBIV.hide, preConditions.object, object);
     }
     preConditions.checkIfChangeable(ROYGBIV.hide, preConditions.object, object);
-    if (object.isVisibleOnThePreviewScene()){
-      object.mesh.visible = false;
-      if (!keepPhysicsValue){
-        if (!object.noMass){
-          setTimeout(function(){
-            physicsWorld.remove(object.physicsBody);
-            object.physicsKeptWhenHidden = false;
-          });
-          physicsWorld.hide(object);
-          if (physicsDebugMode){
-            debugRenderer.hide(object);
-          }
-        }
-      }else{
-        object.physicsKeptWhenHidden = true;
-      }
-      object.isHidden = true;
-      rayCaster.hide(object);
-    }
+    object.hide(keepPhysicsValue);
   }
 }
 
@@ -4462,6 +4419,9 @@ Roygbiv.prototype.setActiveControl = function(control){
   }
   preConditions.checkIfDefined(ROYGBIV.setActiveControl, preConditions.control, control);
   preConditions.checkIfTrue(ROYGBIV.setActiveControl, "control is not a Control object.", !control.isControl);
+  if (activeControl !== control){
+    control.onActivated();
+  }
   activeControl = control;
 }
 

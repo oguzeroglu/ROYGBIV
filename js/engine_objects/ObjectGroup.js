@@ -34,6 +34,28 @@ var ObjectGroup = function(name, group){
   this.lastUpdateQuaternion = new THREE.Quaternion();
 }
 
+ObjectGroup.prototype.hide = function(keepPhysics){
+  if (this.isVisibleOnThePreviewScene()){
+    this.mesh.visible = false;
+    if (!keepPhysics){
+      if (!this.noMass){
+        setTimeout(function(){
+          physicsWorld.remove(this.physicsBody);
+          this.physicsKeptWhenHidden = false;
+        });
+        physicsWorld.hide(this);
+        if (physicsDebugMode){
+          debugRenderer.hide(this);
+        }
+      }
+    }else{
+      this.physicsKeptWhenHidden = true;
+    }
+    this.isHidden = true;
+    rayCaster.hide(this);
+  }
+}
+
 ObjectGroup.prototype.onPositionChange = function(from, to){
   if (mode == 0){
     return;

@@ -31,3 +31,7 @@ CustomControls.prototype.onMouseWheel = function(event){
 CustomControls.prototype.update = function(){
   this.onUpdateFunc();
 }
+
+CustomControls.prototype.onActivated = function(){
+  
+}
