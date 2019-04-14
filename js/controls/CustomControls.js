@@ -9,6 +9,8 @@ var CustomControls = function(params){
   this.onMouseMoveFunc = params.onMouseMove;
 }
 
+CustomControls.prototype.onActivated = noop;
+
 CustomControls.prototype.onClick = function(event){
   this.onClickFunc(event);
 }
@@ -35,8 +37,4 @@ CustomControls.prototype.onMouseMove = function(event){
 
 CustomControls.prototype.update = function(){
   this.onUpdateFunc();
-}
-
-CustomControls.prototype.onActivated = function(){
-
 }

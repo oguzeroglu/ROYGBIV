@@ -3,34 +3,11 @@ var FPSControls = function(params){
   this.playerBodyObject = params.playerBodyObject;
 }
 
-FPSControls.prototype.onClick = function(event){
-
-}
-
-FPSControls.prototype.onTap = function(event){
-
-}
-
-FPSControls.prototype.onSwipe = function(diffX, diffY){
-
-}
-
-FPSControls.prototype.onPinch = function(diff){
-
-}
-
-FPSControls.prototype.onMouseWheel = function(event){
-
-}
-
-FPSControls.prototype.onMouseMove = function(event){
-  
-}
-
-FPSControls.prototype.update = function(){
-
-}
-
-FPSControls.prototype.onActivated = function(){
-
-}
+FPSControls.prototype.onClick = noop;
+FPSControls.prototype.onTap = noop;
+FPSControls.prototype.onSwipe = noop;
+FPSControls.prototype.onPinch = noop;
+FPSControls.prototype.onMouseWheel = noop;
+FPSControls.prototype.onMouseMove = noop;
+FPSControls.prototype.update = noop;
+FPSControls.prototype.onActivated = noop;

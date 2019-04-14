@@ -35,6 +35,11 @@ var FreeControls = function(params){
   ];
 }
 
+FreeControls.prototype.onMouseMove = noop;
+FreeControls.prototype.onClick = noop;
+FreeControls.prototype.onTap = noop;
+FreeControls.prototype.onActivated = noop;
+
 FreeControls.prototype.incrRotationY = function(){
   camera.rotation.y += activeControl.rotationYDelta;
 }
@@ -75,14 +80,6 @@ FreeControls.prototype.translateYNegative = function(){
   camera.translateY(-1 * activeControl.translateYAmount);
 }
 
-FreeControls.prototype.onClick = function(event){
-
-}
-
-FreeControls.prototype.onTap = function(event){
-
-}
-
 FreeControls.prototype.onSwipe = function(diffX, diffY){
   camera.rotation.y += diffX * activeControl.swipeSpeed;
   camera.rotation.x += diffY * activeControl.swipeSpeed;
@@ -106,10 +103,6 @@ FreeControls.prototype.onMouseWheel = function(event){
   }
 }
 
-FreeControls.prototype.onMouseMove = function(event){
-  
-}
-
 FreeControls.prototype.update = function(){
   if (!isMobile){
     var len = this.keyboardActions.length;
@@ -120,8 +113,4 @@ FreeControls.prototype.update = function(){
       }
     }
   }
-}
-
-FreeControls.prototype.onActivated = function(){
-
 }
