@@ -14,7 +14,8 @@ window.onload = function() {
     var controlClasses = [FreeControls, FPSControls, CustomControls];
     var mandatoryControlMethods = [
       "update", "onMouseWheel", "onMouseMove", "onMouseDown", "onMouseUp",
-      "onPinch", "onSwipe", "onTap", "onClick", "onActivated"
+      "onPinch", "onSwipe", "onTap", "onClick", "onActivated", "onTouchStart",
+      "onTouchMove", "onTouchEnd"
     ];
     for (var i = 0; i<controlClasses.length; i++){
       for (var i2 = 0; i2<mandatoryControlMethods.length; i2++){

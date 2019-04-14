@@ -956,6 +956,9 @@ this.ROYGBIV_SCRIPTING_API_CREATECUSTOMCONTROL = "Creates a CustomControl implem
                                                  "onMouseMove (optional): Function to be executed with the mouse move event when the user performs a mouse move. Default value is noop.\n"+
                                                  "onMouseDown (optional): Function to be executed with the mouse down event when the user performs a mouse down. Default vaue is noop.\n"+
                                                  "onMouseUp (optional): Function to be executed with the mouse up event when the user performs a mouse up. Default value is noop.\n"+
+                                                 "onTouchStart (optional): Function to be executed with the TouchEvent when the user performs a touch start. Default value is noop.\n"+
+                                                 "onTouchMove (optional): Function to be executed with the TouchEvent when the user performs a touch move. Default value is noop.\n"+
+                                                 "onTouchEnd (optional): Function to be executed with the TouchEvent when the user performs a touch end. Default value is noop.\n"+
                                                  "onUpdate (optional): Function to be executed on each frame. Default value is noop.";
 this.ROYGBIV_SCRIPTING_API_SETACTIVECONTROL = "Sets the active control.";
 }

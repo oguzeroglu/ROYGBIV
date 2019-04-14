@@ -4356,6 +4356,12 @@ Roygbiv.prototype.createFreeControl = function(parameters){
 // Default vaue is noop.
 // onMouseUp (optional): Function to be executed with the mouse up event when the user performs a mouse up. Default
 // value is noop.
+// onTouchStart (optional): Function to be executed with the TouchEvent when the user performs a touch start. Default
+// value is noop.
+// onTouchMove (optional): Function to be executed with the TouchEvent when the user performs a touch move. Default
+// value is noop.
+// onTouchEnd (optional): Function to be executed with the TouchEvent when the user performs a touch end. Default
+// value is noop.
 // onUpdate (optional): Function to be executed on each frame. Default value is noop.
 Roygbiv.prototype.createCustomControl = function(parameters){
   if (mode == 0){
@@ -4370,6 +4376,9 @@ Roygbiv.prototype.createCustomControl = function(parameters){
   preConditions.checkIfFunctionOnlyIfExists(ROYGBIV.createCustomControl, preConditions.onMouseMove, parameters.onMouseMove);
   preConditions.checkIfFunctionOnlyIfExists(ROYGBIV.createCustomControl, preConditions.onMouseDown, parameters.onMouseDown);
   preConditions.checkIfFunctionOnlyIfExists(ROYGBIV.createCustomControl, preConditions.onMouseUp, parameters.onMouseUp);
+  preConditions.checkIfFunctionOnlyIfExists(ROYGBIV.createCustomControl, preConditions.onTouchStart, parameters.onTouchStart);
+  preConditions.checkIfFunctionOnlyIfExists(ROYGBIV.createCustomControl, preConditions.onTouchMove, parameters.onTouchMove);
+  preConditions.checkIfFunctionOnlyIfExists(ROYGBIV.createCustomControl, preConditions.onTouchEnd, parameters.onTouchEnd);
   preConditions.checkIfFunctionOnlyIfExists(ROYGBIV.createCustomControl, preConditions.onUpdate, parameters.onUpdate);
   var params = {
     onClick: (!(typeof parameters.onClick == UNDEFINED))? parameters.onClick: noop,
@@ -4380,6 +4389,9 @@ Roygbiv.prototype.createCustomControl = function(parameters){
     onMouseMove: (!(typeof parameters.onMouseMove == UNDEFINED))? parameters.onMouseMove: noop,
     onMouseDown: (!(typeof parameters.onMouseDown == UNDEFINED))? parameters.onMouseDown: noop,
     onMouseUp: (!(typeof parameters.onMouseUp == UNDEFINED))? parameters.onMouseUp: noop,
+    onTouchStart: (!(typeof parameters.onTouchStart == UNDEFINED))? parameters.onTouchStart: noop,
+    onTouchMove: (!(typeof parameters.onTouchMove == UNDEFINED))? parameters.onTouchMove: noop,
+    onTouchEnd: (!(typeof parameters.onTouchEnd == UNDEFINED))? parameters.onTouchEnd: noop,
     onUpdate: (!(typeof parameters.onUpdate == UNDEFINED))? parameters.onUpdate: noop
   }
   return new CustomControls(params);

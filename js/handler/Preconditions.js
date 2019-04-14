@@ -170,6 +170,9 @@ var Preconditions = function(){
   this.onMouseUp = "onMouseUp";
   this.onUpdate = "onUpdate";
   this.control = "control";
+  this.onTouchStart = "onTouchStart";
+  this.onTouchMove = "onTouchMove";
+  this.onTouchEnd = "onTouchEnd";
 }
 
 Preconditions.prototype.errorHeader = function(callerFunc){

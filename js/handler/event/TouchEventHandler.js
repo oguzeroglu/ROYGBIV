@@ -18,6 +18,7 @@ var TouchEventHandler = function(){
 
 TouchEventHandler.prototype.onTouchStart = function(event){
   event.preventDefault();
+  activeControl.onTouchStart(event);
   touchEventHandler.isZooming = false;
   touchEventHandler.isSwiping = false;
   touchEventHandler.isTapping = false;
@@ -46,6 +47,7 @@ TouchEventHandler.prototype.onTouchStart = function(event){
 TouchEventHandler.prototype.onTouchMove = function(event){
   event.preventDefault();
   event.stopPropagation();
+  activeControl.onTouchMove(event);
   if (touchEventHandler.isZooming){
     if (event.changedTouches.length == 2){
       var t1 = event.changedTouches[0];
@@ -88,6 +90,7 @@ TouchEventHandler.prototype.onTap = function(touch){
 
 TouchEventHandler.prototype.onTouchEnd = function(event){
   event.preventDefault();
+  activeControl.onTouchEnd(event);
   if (touchEventHandler.isTapping){
     if(performance.now() - touchEventHandler.tapStartTime < 250){
       touchEventHandler.onTap(event.changedTouches[0]);

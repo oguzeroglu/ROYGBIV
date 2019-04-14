@@ -9,6 +9,9 @@ var CustomControls = function(params){
   this.onMouseMoveFunc = params.onMouseMove;
   this.onMouseDownFunc = params.onMouseDown;
   this.onMouseUpFunc = params.onMouseUp;
+  this.onTouchStartFunc = params.onTouchStart;
+  this.onTouchMoveFunc = params.onTouchMove;
+  this.onTouchEndFunc = params.onTouchEnd;
 }
 
 CustomControls.prototype.onActivated = noop;
@@ -43,6 +46,18 @@ CustomControls.prototype.onMouseDown = function(event){
 
 CustomControls.prototype.onMouseUp = function(event){
   this.onMouseUpFunc(event);
+}
+
+CustomControls.prototype.onTouchStart = function(event){
+  this.onTouchStartFunc(event);
+}
+
+CustomControls.prototype.onTouchMove = function(event){
+  this.onTouchMoveFunc(event);
+}
+
+CustomControls.prototype.onTouchEnd = function(event){
+  this.onTouchEndFunc(event);
 }
 
 CustomControls.prototype.update = function(){

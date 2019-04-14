@@ -78,6 +78,18 @@ FPSControls.prototype.onMouseMove = function(event){
   }
 }
 
+FPSControls.prototype.onTouchStart = function(event){
+
+}
+
+FPSControls.prototype.onTouchMove = function(event){
+
+}
+
+FPSControls.prototype.onTouchEnd = function(event){
+  
+}
+
 FPSControls.prototype.update = function(){
   camera.position.copy(this.playerBodyObject.mesh.position);
   var len = this.keyboardActions.length;
