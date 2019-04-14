@@ -7,6 +7,8 @@ var CustomControls = function(params){
   this.onMouseWheelFunc = params.onMouseWheel;
   this.onUpdateFunc = params.onUpdate;
   this.onMouseMoveFunc = params.onMouseMove;
+  this.onMouseDownFunc = params.onMouseDown;
+  this.onMouseUpFunc = params.onMouseUp;
 }
 
 CustomControls.prototype.onActivated = noop;
@@ -33,6 +35,14 @@ CustomControls.prototype.onMouseWheel = function(event){
 
 CustomControls.prototype.onMouseMove = function(event){
   this.onMouseMoveFunc(event);
+}
+
+CustomControls.prototype.onMouseDown = function(event){
+  this.onMouseDownFunc(event);
+}
+
+CustomControls.prototype.onMouseUp = function(event){
+  this.onMouseUpFunc(event);
 }
 
 CustomControls.prototype.update = function(){

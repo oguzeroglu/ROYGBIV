@@ -36,6 +36,8 @@ var FreeControls = function(params){
 }
 
 FreeControls.prototype.onMouseMove = noop;
+FreeControls.prototype.onMouseUp = noop;
+FreeControls.prototype.onMouseDown = noop;
 FreeControls.prototype.onClick = noop;
 FreeControls.prototype.onTap = noop;
 FreeControls.prototype.onActivated = noop;

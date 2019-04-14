@@ -4358,6 +4358,10 @@ Roygbiv.prototype.createFreeControl = function(parameters){
 // Default value is noop.
 // onMouseMove (optional): Function to be executed with the mouse move event when the user performs a mouse move.
 // Default value is noop.
+// onMouseDown (optional): Function to be executed with the mouse down event when the user performs a mouse down.
+// Default vaue is noop.
+// onMouseUp (optional): Function to be executed with the mouse up event when the user performs a mouse up. Default
+// value is noop.
 // onUpdate (optional): Function to be executed on each frame. Default value is noop.
 Roygbiv.prototype.createCustomControl = function(parameters){
   if (mode == 0){
@@ -4370,6 +4374,8 @@ Roygbiv.prototype.createCustomControl = function(parameters){
   preConditions.checkIfFunctionOnlyIfExists(ROYGBIV.createCustomControl, preConditions.onPinch, parameters.onPinch);
   preConditions.checkIfFunctionOnlyIfExists(ROYGBIV.createCustomControl, preConditions.onMouseWheel, parameters.onMouseWheel);
   preConditions.checkIfFunctionOnlyIfExists(ROYGBIV.createCustomControl, preConditions.onMouseMove, parameters.onMouseMove);
+  preConditions.checkIfFunctionOnlyIfExists(ROYGBIV.createCustomControl, preConditions.onMouseDown, parameters.onMouseDown);
+  preConditions.checkIfFunctionOnlyIfExists(ROYGBIV.createCustomControl, preConditions.onMouseUp, parameters.onMouseUp);
   preConditions.checkIfFunctionOnlyIfExists(ROYGBIV.createCustomControl, preConditions.onUpdate, parameters.onUpdate);
   var params = {
     onClick: (!(typeof parameters.onClick == UNDEFINED))? parameters.onClick: noop,
@@ -4378,6 +4384,8 @@ Roygbiv.prototype.createCustomControl = function(parameters){
     onPinch: (!(typeof parameters.onPinch == UNDEFINED))? parameters.onPinch: noop,
     onMouseWheel: (!(typeof parameters.onMouseWheel == UNDEFINED))? parameters.onMouseWheel: noop,
     onMouseMove: (!(typeof parameters.onMouseMove == UNDEFINED))? parameters.onMouseMove: noop,
+    onMouseDown: (!(typeof parameters.onMouseDown == UNDEFINED))? parameters.onMouseDown: noop,
+    onMouseUp: (!(typeof parameters.onMouseUp == UNDEFINED))? parameters.onMouseUp: noop,
     onUpdate: (!(typeof parameters.onUpdate == UNDEFINED))? parameters.onUpdate: noop
   }
   return new CustomControls(params);

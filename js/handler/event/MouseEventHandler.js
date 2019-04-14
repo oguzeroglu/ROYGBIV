@@ -118,6 +118,7 @@ MouseEventHandler.prototype.onMouseUp = function(event){
     screenMouseUpCallbackFunction(coordX, coordY);
   }
   isMouseDown = false;
+  activeControl.onMouseUp(event);
 }
 
 MouseEventHandler.prototype.onMouseDown = function(event){
@@ -129,6 +130,7 @@ MouseEventHandler.prototype.onMouseDown = function(event){
     screenMouseDownCallbackFunction(coordX, coordY);
   }
   isMouseDown = true;
+  activeControl.onMouseDown(event);
 }
 
 MouseEventHandler.prototype.onClick = function(event, fromTap){
