@@ -15,6 +15,7 @@ var FPSControls = function(params){
   ];
   this.playerBodyObject = params.playerBodyObject;
   this.mouseSpeed = params.mouseSpeed;
+  this.touchLookSpeed = params.touchLookSpeed;
   this.speed = params.speed;
 }
 
@@ -79,15 +80,53 @@ FPSControls.prototype.onMouseMove = function(event){
 }
 
 FPSControls.prototype.onTouchStart = function(event){
+  for (var i = 0; i<event.changedTouches.length; i++){
+    var curTouch = event.changedTouches[i];
+    activeControl.touchTrack.set(curTouch.identifier, curTouch);
+  }
+}
 
+FPSControls.prototype.onRightHandFinger = function(touch){
+  var oldTouch = activeControl.touchTrack.get(touch.identifier);
+  var movementX = (touch.pageX - oldTouch.pageX);
+  var movementY = (touch.pageY - oldTouch.pageY);
+  var dx = (movementX * activeControl.touchLookSpeed);
+  camera.rotation.y += dx;
+  activeControl.alpha -= dx;
+  var dy = movementY * activeControl.touchLookSpeed;
+  if (!(dy > 0 && (activeControl.totalXRotation + dy >= 1.10)) && !(dy <0 && (activeControl.totalXRotation + dy <= -1.10))){
+    camera.rotation.x += dy;
+    activeControl.totalXRotation += dy;
+  }
 }
 
 FPSControls.prototype.onTouchMove = function(event){
-
+  var size = activeControl.touchTrack.size;
+  if (size != 1 && size != 2){
+    return;
+  }
+  var curViewport = renderer.getCurrentViewport();
+  var centerX = (curViewport.x + (curViewport.z / screenResolution)) / 2;
+  var centerY = (curViewport.y + (curViewport.w / screenResolution)) / 2;
+  for (var i = 0; i<event.changedTouches.length; i++){
+    var curTouch = event.changedTouches[i];
+    if (!activeControl.touchTrack.has(curTouch.identifier)){
+      activeControl.touchTrack.set(curTouch.identifier, curTouch);
+      continue;
+    }
+    var clientX = curTouch.clientX;
+    var clientY = curTouch.clientY;
+    if (clientX >= centerX){
+      activeControl.onRightHandFinger(curTouch);
+    }
+    activeControl.touchTrack.set(curTouch.identifier, curTouch);
+  }
 }
 
 FPSControls.prototype.onTouchEnd = function(event){
-  
+  for (var i = 0; i<event.changedTouches.length; i++){
+    activeControl.touchTrack.delete(event.changedTouches[i].identifier);
+  }
 }
 
 FPSControls.prototype.update = function(){
@@ -108,6 +147,7 @@ FPSControls.prototype.update = function(){
 }
 
 FPSControls.prototype.onActivated = function(){
+  this.touchTrack = new Map();
   camera.quaternion.set(0, 0, 0, 1);
   this.totalXRotation = 0;
   this.alpha = 0;
