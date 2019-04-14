@@ -344,9 +344,15 @@ var defaultControlParameters = {
   translateYAmount: 3,
   mouseWheelSpeed: 1,
   swipeSpeed: 0.002,
-  
+
 };
 var activeControl;
+
+// RENDER ORDERS
+var renderOrders = {
+  SKYBOX: -1, GRID: 10, GRID_DOT: 10, GRID_SYSTEM_BOUNDING_PLANE: 10, GRID_SYSTEM_REPRESENTATION: 10,
+  OBJECT_TRAIL: 100, OBJECT: 10
+}
 
 // WORKER VARIABLES
 var WORKERS_SUPPORTED = (typeof(Worker) !== UNDEFINED) && (typeof(MessageChannel) !== UNDEFINED);

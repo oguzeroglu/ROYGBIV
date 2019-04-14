@@ -205,13 +205,13 @@ GridSystem.prototype.draw = function(){
   var boundingPlane = new THREE.Mesh(
     boundingPlaneGeometry, boundingPlaneMaterial
   );
-  boundingPlane.renderOrder = 10;
+  boundingPlane.renderOrder = renderOrders.GRID_SYSTEM_BOUNDING_PLANE;
 
   geometry.center();
   var gridSystemRepresentation = new THREE.LineSegments(
     geometry, material
   );
-  gridSystemRepresentation.renderOrder = 10;
+  gridSystemRepresentation.renderOrder = renderOrders.GRID_SYSTEM_REPRESENTATION;
 
   gridSystemRepresentation.position.set(
     this.centerX,

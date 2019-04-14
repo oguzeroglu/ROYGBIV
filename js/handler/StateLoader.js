@@ -797,7 +797,7 @@ StateLoader.prototype.load = function(){
                   geometryCache[geomKey] = skyboxBufferGeometry;
                 }
                 skyboxMesh = new MeshGenerator(skyboxBufferGeometry, null).generateSkybox(skybox);
-                skyboxMesh.renderOrder = -1;
+                skyboxMesh.renderOrder = renderOrders.SKYBOX;
               }
               if (skyboxVisible){
                 scene.add(skyboxMesh);

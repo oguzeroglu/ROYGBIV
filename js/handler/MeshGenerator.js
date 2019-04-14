@@ -41,7 +41,7 @@ MeshGenerator.prototype.generateObjectTrail = function(
     }
   });
   var mesh = new THREE.Mesh(this.geometry, material);
-  mesh.renderOrder = 100;
+  mesh.renderOrder = renderOrders.OBJECT_TRAIL;
   if (fogBlendWithSkybox){
     material.uniforms.worldMatrix = new THREE.Uniform(mesh.matrixWorld);
     material.uniforms.cameraPosition = GLOBAL_CAMERA_POSITION_UNIFORM;
@@ -112,7 +112,7 @@ MeshGenerator.prototype.generateInstancedMesh = function(graphicsGroup, objectGr
     uniforms: uniforms
   });
   var mesh = new THREE.Mesh(this.geometry, material);
-  mesh.renderOrder = 10;
+  mesh.renderOrder = renderOrders.OBJECT;
   mesh.position.copy(graphicsGroup.position);
   material.uniforms.modelViewMatrix.value = mesh.modelViewMatrix;
   return mesh;
@@ -157,7 +157,7 @@ MeshGenerator.prototype.generateMergedMesh = function(graphicsGroup, objectGroup
     uniforms: uniforms
   });
   var mesh = new THREE.Mesh(this.geometry, material);
-  mesh.renderOrder = 10;
+  mesh.renderOrder = renderOrders.OBJECT;
   mesh.position.copy(graphicsGroup.position);
   material.uniforms.modelViewMatrix.value = mesh.modelViewMatrix;
   return mesh;
@@ -177,7 +177,7 @@ MeshGenerator.prototype.generateBasicMesh = function(){
     }
   });
   var mesh = new THREE.Mesh(this.geometry, material);
-  mesh.renderOrder = 10;
+  mesh.renderOrder = renderOrders.OBJECT;
   material.uniforms.modelViewMatrix.value = mesh.modelViewMatrix;
   return mesh;
 }

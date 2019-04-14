@@ -75,7 +75,7 @@ Grid.prototype.makeMesh = function(size, startX, startY, startZ){
     geometryCache[geomKey] = this.geometry;
   }
   this.mesh = new THREE.Mesh(this.geometry, this.material);
-  this.mesh.renderOrder = 10;
+  this.mesh.renderOrder = renderOrders.GRID;
   this.mesh.gridSystemName = this.parentName;
   if (this.axis == "XZ"){
 
@@ -109,7 +109,7 @@ Grid.prototype.makeMesh = function(size, startX, startY, startZ){
   this.centerDotGeometry.vertices.push(new THREE.Vector3(this.centerX, this.centerY, this.centerZ));
   this.centerDotMaterial = new THREE.PointsMaterial( { color: this.dotColor, size: 4, sizeAttenuation: false } );
   this.dot = new THREE.Points( this.centerDotGeometry, this.centerDotMaterial);
-  this.dot.renderOrder = 10;
+  this.dot.renderOrder = renderOrders.GRID_DOT;
   this.dot.gridSystemName = this.parentName;
 
   this.vertices = [];

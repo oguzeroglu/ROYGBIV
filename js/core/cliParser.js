@@ -2075,7 +2075,7 @@ function parse(input){
             guiHandler.skyboxParameters["Name"] = mappedSkyboxName;
             guiHandler.skyboxParameters["Color"] = "#" + skyboxMesh.material.uniforms.color.value.getHexString();
           }
-          skyboxMesh.renderOrder = -1;
+          skyboxMesh.renderOrder = renderOrders.SKYBOX;
           if (bloom){
             bloom.onSkyboxVisibilityChange();
           }
