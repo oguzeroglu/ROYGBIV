@@ -71,6 +71,7 @@ var AddedText = function(name, font, text, position, color, alpha, characterSize
   this.constructText();
   this.handleUVUniform();
   this.mesh = new THREE.Points(this.geometry, this.material);
+  this.mesh.renderOrder = renderOrders.TEXT_3D;
   this.mesh.position.copy(position);
   this.mesh.frustumCulled = false;
   scene.add(this.mesh);
@@ -652,6 +653,7 @@ AddedText.prototype.set2DStatus = function(is2D){
     }
     this.isClickable = false;
     addedTexts2D[this.name] = this;
+    this.mesh.renderOrder = renderOrders.TEXT_2D;
   }else{
     macroHandler.removeMacro("IS_TWO_DIMENSIONAL", this.material, true, false);
     delete this.mesh.material.uniforms.margin2D;
@@ -666,6 +668,7 @@ AddedText.prototype.set2DStatus = function(is2D){
       delete this.refLineOffset;
     }
     delete addedTexts2D[this.name];
+    this.mesh.renderOrder = renderOrders.TEXT_3D;
   }
   if (is2D){
     if (this.bbHelper){

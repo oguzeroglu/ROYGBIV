@@ -42,6 +42,7 @@ var Crosshair = function(configurations){
     }
   });
   this.mesh = new THREE.Points(this.geometry, this.material);
+  this.mesh.renderOrder = renderOrders.CROSSHAIR;
   this.mesh.position.set(0, 0, 0);
   this.mesh.frustumCulled = false;
   this.mesh.visible = false;

@@ -258,6 +258,7 @@ var ParticleSystemMerger = function(psObj, name){
     this.material.uniforms.refHeightCoef = GLOBAL_PS_REF_HEIGHT_UNIFORM;
   }
   this.mesh = new THREE.Points(this.geometry, this.material);
+  this.mesh.renderOrder = renderOrders.PARTICLE_SYSTEM;
   this.mesh.frustumCulled = false;
   scene.add(this.mesh);
   this.clean();

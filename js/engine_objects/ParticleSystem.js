@@ -440,6 +440,7 @@ var ParticleSystem = function(copyPS, name, particles, x, y, z, vx, vy, vz, ax, 
   }
 
   this.mesh = new THREE.Points(this.geometry, this.material);
+  this.mesh.renderOrder = renderOrders.PARTICLE_SYSTEM;
   this.mesh.position.set(x, y, z);
   this.mesh.frustumCulled = false;
   this.mesh.visible = false;
