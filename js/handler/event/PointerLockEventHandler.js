@@ -28,4 +28,7 @@ PointerLockEventHandler.prototype.onPointerLock = function(event){
       screenPointerLockChangedCallbackFunction(false);
     }
   }
+  if (activeControl.isFPSControls){
+    activeControl.onPointerLockChange(isPointerLocked);
+  }
 }

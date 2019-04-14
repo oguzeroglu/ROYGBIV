@@ -67,6 +67,32 @@ var AddedObject = function(name, type, metaData, material, mesh, physicsBody, de
 
 }
 
+AddedObject.prototype.setVelocity = function(velocityVector){
+  this.physicsBody.velocity.set(velocityVector.x, velocityVector.y, velocityVector.z);
+  physicsWorld.setObjectVelocity(this, velocityVector);
+}
+
+AddedObject.prototype.setVelocityX = function(velocityX){
+  this.physicsBody.velocity.x = velocityX;
+  physicsWorld.setObjectVelocityX(this, velocityX);
+}
+
+AddedObject.prototype.setVelocityY = function(velocityY){
+  this.physicsBody.velocity.y = velocityY;
+  physicsWorld.setObjectVelocityY(this, velocityY);
+}
+
+AddedObject.prototype.setVelocityZ = function(velocityZ){
+  this.physicsBody.velocity.z = velocityZ;
+  physicsWorld.setObjectVelocityZ(this, velocityZ);
+}
+
+AddedObject.prototype.resetVelocity = function(){
+  this.physicsBody.velocity.set(0, 0, 0);
+  this.physicsBody.angularVelocity.set(0, 0, 0);
+  physicsWorld.resetObjectVelocity(this);
+}
+
 AddedObject.prototype.show = function(){
   if (!this.isVisibleOnThePreviewScene()){
     this.mesh.visible = true;

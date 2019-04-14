@@ -865,19 +865,15 @@ Roygbiv.prototype.setObjectVelocity = function(object, velocityVector, axis){
     axis = axis.toLowerCase();
     preConditions.checkIfAxisOnlyIfDefined(ROYGBIV.setObjectVelocity, preConditions.axis, axis);
     if (axis == "x"){
-      object.physicsBody.velocity.x = velocityVector.x;
-      physicsWorld.setObjectVelocityX(object, velocityVector.x);
+      object.setVelocityX(velocityVector.x);
     }else if (axis == "y"){
-      object.physicsBody.velocity.y = velocityVector.y;
-      physicsWorld.setObjectVelocityY(object, velocityVector.y);
+      object.setVelocityY(velocityVector.y);
     }else if (axis == "z"){
-      object.physicsBody.velocity.z = velocityVector.z;
-      physicsWorld.setObjectVelocityZ(object, velocityVector.z);
+      object.setVelocityZ(velocityVector.z);
     }
     return;
   }
-  object.physicsBody.velocity.set(velocityVector.x, velocityVector.y, velocityVector.z);
-  physicsWorld.setObjectVelocity(object, velocityVector);
+  object.setVelocity(velocityVector);
 }
 
 // Modifies the color and alpha value of an object or an object group.
@@ -958,9 +954,7 @@ Roygbiv.prototype.resetObjectVelocity = function(object){
   preConditions.checkIfChangeable(ROYGBIV.resetObjectVelocity, preConditions.object, object);
   preConditions.checkIfChildObjectOnlyIfExists(ROYGBIV.resetObjectVelocity, preConditions.object, object);
   preConditions.checkIfDynamic(ROYGBIV.resetObjectVelocity, preConditions.object, object);
-  object.physicsBody.velocity.set(0, 0, 0);
-  object.physicsBody.angularVelocity.set(0, 0, 0);
-  physicsWorld.resetObjectVelocity(object);
+  object.resetVelocity();
 }
 
 // PARTICLE SYSTEM FUNCTIONS ***************************************************

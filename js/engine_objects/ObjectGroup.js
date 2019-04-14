@@ -34,6 +34,32 @@ var ObjectGroup = function(name, group){
   this.lastUpdateQuaternion = new THREE.Quaternion();
 }
 
+ObjectGroup.prototype.setVelocity = function(velocityVector){
+  this.physicsBody.velocity.set(velocityVector.x, velocityVector.y, velocityVector.z);
+  physicsWorld.setObjectVelocity(this, velocityVector);
+}
+
+ObjectGroup.prototype.setVelocityX = function(velocityX){
+  this.physicsBody.velocity.x = velocityX;
+  physicsWorld.setObjectVelocityX(this, velocityX);
+}
+
+ObjectGroup.prototype.setVelocityY = function(velocityY){
+  this.physicsBody.velocity.y = velocityY;
+  physicsWorld.setObjectVelocityY(this, velocityY);
+}
+
+ObjectGroup.prototype.setVelocityZ = function(velocityZ){
+  this.physicsBody.velocity.z = velocityZ;
+  physicsWorld.setObjectVelocityZ(this, velocityZ);
+}
+
+ObjectGroup.prototype.resetVelocity = function(){
+  this.physicsBody.velocity.set(0, 0, 0);
+  this.physicsBody.angularVelocity.set(0, 0, 0);
+  physicsWorld.resetObjectVelocity(this);
+}
+
 ObjectGroup.prototype.show = function(){
   if (!this.isVisibleOnThePreviewScene()){
     this.mesh.visible = true;
