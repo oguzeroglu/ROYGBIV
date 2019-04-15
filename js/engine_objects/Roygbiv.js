@@ -4404,10 +4404,14 @@ Roygbiv.prototype.setActiveControl = function(control){
   }
   preConditions.checkIfDefined(ROYGBIV.setActiveControl, preConditions.control, control);
   preConditions.checkIfTrue(ROYGBIV.setActiveControl, "control is not a Control object.", !control.isControl);
+  var callOnActivated = false;
   if (activeControl !== control){
-    control.onActivated();
+    callOnActivated = true;
   }
   activeControl = control;
+  if (callOnActivated){
+    control.onActivated();
+  }
 }
 
 // UTILITY FUNCTIONS ***********************************************************
