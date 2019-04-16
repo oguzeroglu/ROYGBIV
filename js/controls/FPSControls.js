@@ -20,6 +20,7 @@ var FPSControls = function(params){
   this.touchLookSpeed = params.touchLookSpeed;
   this.speed = params.speed;
   this.jumpSpeed = params.jumpSpeed;
+  this.jumpAgainTimeThreshold = params.jumpAgainTimeThreshold;
   this.touchJoystickThreshold = params.touchJoystickThreshold;
   this.touchJoystickDegreeInterval = params.touchJoystickDegreeInterval;
 }
@@ -33,7 +34,17 @@ FPSControls.prototype.onMouseUp = noop;
 FPSControls.prototype.onActivated = noop;
 
 FPSControls.prototype.jump = function(){
-  activeControl.playerBodyObject.setVelocityY(activeControl.jumpSpeed);
+  var skip = false;
+  var now = performance.now();
+  if (activeControl.lastJumpTime){
+    if (now - activeControl.lastJumpTime < activeControl.jumpAgainTimeThreshold){
+      skip = true;
+    }
+  }
+  if (!skip){
+    activeControl.playerBodyObject.setVelocityY(activeControl.jumpSpeed);
+    activeControl.lastJumpTime = now;
+  }
 }
 
 FPSControls.prototype.goBackward = function(){
@@ -247,6 +258,7 @@ FPSControls.prototype.onActivated = function(){
   this.joystickStatus = {
     right: false, left: false, up: false, down: false
   };
+  this.lastJumpTime = 0;
   this.touchTrack = new Map();
   camera.quaternion.set(0, 0, 0, 1);
   this.totalXRotation = 0;
