@@ -12,24 +12,29 @@ var FPSControls = function(params){
     {key: "Up", action: this.goForward},
     {key: "Right", action: this.goRight},
     {key: "Left", action: this.goLeft},
-    {key: "Down", action: this.goBackward}
+    {key: "Down", action: this.goBackward},
+    {key: "Space", action: this.jump}
   ];
   this.playerBodyObject = params.playerBodyObject;
   this.mouseSpeed = params.mouseSpeed;
   this.touchLookSpeed = params.touchLookSpeed;
   this.speed = params.speed;
+  this.jumpSpeed = params.jumpSpeed;
   this.touchJoystickThreshold = params.touchJoystickThreshold;
   this.touchJoystickDegreeInterval = params.touchJoystickDegreeInterval;
 }
 
 FPSControls.prototype.onClick = noop;
-FPSControls.prototype.onTap = noop;
 FPSControls.prototype.onSwipe = noop;
 FPSControls.prototype.onPinch = noop;
 FPSControls.prototype.onMouseWheel = noop;
 FPSControls.prototype.onMouseDown = noop;
 FPSControls.prototype.onMouseUp = noop;
 FPSControls.prototype.onActivated = noop;
+
+FPSControls.prototype.jump = function(){
+  activeControl.playerBodyObject.setVelocityY(activeControl.jumpSpeed);
+}
 
 FPSControls.prototype.goBackward = function(){
   if (activeControl.zVelocity == activeControl.speed){
@@ -230,6 +235,12 @@ FPSControls.prototype.resetJoystickStatus = function(){
   activeControl.joystickStatus.right = false;
   activeControl.joystickStatus.up = false;
   activeControl.joystickStatus.down = false;
+}
+
+FPSControls.prototype.onTap = function(touch){
+  if (activeControl.isTouchOnTheRightSide(touch)){
+    activeControl.jump();
+  }
 }
 
 FPSControls.prototype.onActivated = function(){

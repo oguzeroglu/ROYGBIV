@@ -14,6 +14,7 @@ var TouchEventHandler = function(){
   this.tapStartTime = 0;
   this.isThereFingerTouched = false;
   this.currentTouchCount = 0;
+  this.tapThreshold = 110;
   this.touchTrack = new Map();
 }
 
@@ -35,6 +36,7 @@ TouchEventHandler.prototype.onTouchStart = function(event){
   }
   if (event.targetTouches.length == 2){
     touchEventHandler.isZooming = true;
+    touchEventHandler.isTapping = true;
   }
   if (!touchEventHandler.isZooming){
     touchEventHandler.distance = 0;
@@ -104,7 +106,7 @@ TouchEventHandler.prototype.onTouchEnd = function(event){
     touchEventHandler.touchTrack.delete(event.changedTouches[i].identifier);
   }
   if (touchEventHandler.isTapping){
-    if(performance.now() - touchEventHandler.tapStartTime < 250){
+    if(performance.now() - touchEventHandler.tapStartTime < touchEventHandler.tapThreshold){
       touchEventHandler.onTap(event.changedTouches[0]);
     }
   }
