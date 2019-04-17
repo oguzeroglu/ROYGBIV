@@ -255,6 +255,14 @@ FPSControls.prototype.onTap = function(touch){
   }
 }
 
+FPSControls.prototype.onKeyUp = function(event){
+
+}
+
+FPSControls.prototype.onKeyDown = function(event){
+  
+}
+
 FPSControls.prototype.onActivated = function(){
   this.joystickStatus = {
     right: false, left: false, up: false, down: false
@@ -271,5 +279,11 @@ FPSControls.prototype.onActivated = function(){
     this.isPointerLocked = false;
   }else{
     this.isPointerLocked = true;
+  }
+  if (!(typeof this.crosshairName == UNDEFINED)){
+    this.hasCrosshair = true;
+    crosshairHandler.selectCrosshair(crosshairs[this.crosshairName]);
+  }else{
+    this.hasCrosshair = false;
   }
 }

@@ -32,6 +32,8 @@ FreeControls.prototype.onActivated = noop;
 FreeControls.prototype.onTouchStart = noop;
 FreeControls.prototype.onTouchMove = noop;
 FreeControls.prototype.onTouchEnd = noop;
+FreeControls.prototype.onKeyUp = noop;
+FreeControls.prototype.onKeyDown = noop;
 
 FreeControls.prototype.incrRotationY = function(){
   camera.rotation.y += activeControl.rotationYDelta;

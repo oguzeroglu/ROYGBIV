@@ -28,6 +28,7 @@ KeyboardEventHandler.prototype.onKeyUp = function(event){
       screenKeyupCallbackFunction(keyCodeToChar[event.keyCode]);
     }
   }
+  activeControl.onKeyUp(event);
   if (mode == 1 && isPaused){
     return;
   }
@@ -78,6 +79,7 @@ KeyboardEventHandler.prototype.onKeyDown = function(event){
       screenKeydownCallbackFunction(keyCodeToChar[event.keyCode]);
     }
   }
+  activeControl.onKeyDown(event);
   if (mode == 0 && keyboardBuffer["."]){
     for (var gridName in gridSelections){
       gridSelections[gridName].renderCornerHelpers();

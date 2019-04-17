@@ -12,6 +12,8 @@ var CustomControls = function(params){
   this.onTouchStartFunc = params.onTouchStart;
   this.onTouchMoveFunc = params.onTouchMove;
   this.onTouchEndFunc = params.onTouchEnd;
+  this.onKeyUpFunc = params.onKeyUp;
+  this.onKeyDownFunc = params.onKeyDown;
 }
 
 CustomControls.prototype.onActivated = noop;
@@ -58,6 +60,14 @@ CustomControls.prototype.onTouchMove = function(event){
 
 CustomControls.prototype.onTouchEnd = function(event){
   this.onTouchEndFunc(event);
+}
+
+CustomControls.prototype.onKeyUp = function(event){
+  this.onKeyUpFunc(event);
+}
+
+CustomControls.prototype.onKeyDown = function(event){
+  this.onKeyDownFunc(event);
 }
 
 CustomControls.prototype.update = function(){

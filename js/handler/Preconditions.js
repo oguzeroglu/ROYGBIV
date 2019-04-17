@@ -173,6 +173,8 @@ var Preconditions = function(){
   this.onTouchStart = "onTouchStart";
   this.onTouchMove = "onTouchMove";
   this.onTouchEnd = "onTouchEnd";
+  this.onKeyDown = "onKeyDown";
+  this.onKeyUp = "onKeyUp";
 }
 
 Preconditions.prototype.errorHeader = function(callerFunc){

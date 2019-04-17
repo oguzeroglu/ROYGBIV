@@ -4341,6 +4341,10 @@ Roygbiv.prototype.createFreeControl = function(parameters){
 // value is noop.
 // onTouchEnd (optional): Function to be executed with the TouchEvent when the user performs a touch end. Default
 // value is noop.
+// onKeyDown (optional): Function to be executed with the key down event when the user performs a key down. Default
+// value is noop.
+// onKeyUp (optional): Function to be executed with the key up event when the user performs a key up. Default
+// value is noop.
 // onUpdate (optional): Function to be executed on each frame. Default value is noop.
 Roygbiv.prototype.createCustomControl = function(parameters){
   if (mode == 0){
@@ -4359,6 +4363,8 @@ Roygbiv.prototype.createCustomControl = function(parameters){
   preConditions.checkIfFunctionOnlyIfExists(ROYGBIV.createCustomControl, preConditions.onTouchMove, parameters.onTouchMove);
   preConditions.checkIfFunctionOnlyIfExists(ROYGBIV.createCustomControl, preConditions.onTouchEnd, parameters.onTouchEnd);
   preConditions.checkIfFunctionOnlyIfExists(ROYGBIV.createCustomControl, preConditions.onUpdate, parameters.onUpdate);
+  preConditions.checkIfFunctionOnlyIfExists(ROYGBIV.createCustomControl, preConditions.onKeyDown, parameters.onKeyDown);
+  preConditions.checkIfFunctionOnlyIfExists(ROYGBIV.createCustomControl, preConditions.onKeyUp, parameters.onKeyUp);
   var params = {
     onClick: (!(typeof parameters.onClick == UNDEFINED))? parameters.onClick: noop,
     onTap: (!(typeof parameters.onTap == UNDEFINED))? parameters.onTap: noop,
@@ -4371,7 +4377,9 @@ Roygbiv.prototype.createCustomControl = function(parameters){
     onTouchStart: (!(typeof parameters.onTouchStart == UNDEFINED))? parameters.onTouchStart: noop,
     onTouchMove: (!(typeof parameters.onTouchMove == UNDEFINED))? parameters.onTouchMove: noop,
     onTouchEnd: (!(typeof parameters.onTouchEnd == UNDEFINED))? parameters.onTouchEnd: noop,
-    onUpdate: (!(typeof parameters.onUpdate == UNDEFINED))? parameters.onUpdate: noop
+    onUpdate: (!(typeof parameters.onUpdate == UNDEFINED))? parameters.onUpdate: noop,
+    onKeyDown: (!(typeof parameters.onKeyDown == UNDEFINED))? parameters.onKeyDown: noop,
+    onKeyUp: (!(typeof parameters.onKeyUp == UNDEFINED))? parameters.onKeyUp: noop
   }
   return new CustomControls(params);
 }
