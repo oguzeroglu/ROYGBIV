@@ -24,6 +24,8 @@ var FPSControls = function(params){
   this.touchJoystickThreshold = params.touchJoystickThreshold;
   this.touchJoystickDegreeInterval = params.touchJoystickDegreeInterval;
   this.crosshairName = params.crosshairName;
+  this.crosshairExpandSize = params.crosshairExpandSize;
+  this.crosshairAnimationDelta = params.crosshairAnimationDelta;
 }
 
 FPSControls.prototype.onClick = noop;
@@ -33,6 +35,8 @@ FPSControls.prototype.onMouseWheel = noop;
 FPSControls.prototype.onMouseDown = noop;
 FPSControls.prototype.onMouseUp = noop;
 FPSControls.prototype.onActivated = noop;
+FPSControls.prototype.onKeyDown = noop;
+FPSControls.prototype.onKeyUp = noop;
 
 FPSControls.prototype.jump = function(){
   var skip = false;
@@ -216,30 +220,47 @@ FPSControls.prototype.update = function(){
   this.playerBodyObject.setVelocityZ(0);
   this.xVelocity = 0;
   this.zVelocity = 0;
+  var hasMotion = false;
   if (!isMobile){
     var len = this.keyboardActions.length;
     for (var i = 0; i<len; i++){
       var curAction = this.keyboardActions[i];
       if (keyboardBuffer[curAction.key]){
         curAction.action();
+        hasMotion = true;
       }
     }
   }else{
     if (this.joystickStatus.up){
       this.goForward();
+      hasMotion = true;
     }
     if (this.joystickStatus.down){
       this.goBackward();
+      hasMotion = true;
     }
     if (this.joystickStatus.right){
       this.goRight();
+      hasMotion = true;
     }
     if (this.joystickStatus.left){
       this.goLeft();
+      hasMotion = true;
     }
   }
   this.playerBodyObject.setVelocityX((this.xVelocity * Math.cos(this.alpha)) - (this.zVelocity * Math.sin(this.alpha)));
   this.playerBodyObject.setVelocityZ((this.xVelocity * Math.sin(this.alpha)) + (this.zVelocity * Math.cos(this.alpha)));
+  if (this.hasCrosshair){
+    if (!hasMotion){
+      if (!selectedCrosshair.shrink){
+        crosshairHandler.shrinkCrosshair(this.crosshairAnimationDelta);
+      }
+    }else{
+      if (!selectedCrosshair.expand){
+        crosshairHandler.expandCrosshair(this.crosshairExpandSize, this.crosshairAnimationDelta);
+      }
+    }
+  }
 }
 
 FPSControls.prototype.resetJoystickStatus = function(){
@@ -253,14 +274,6 @@ FPSControls.prototype.onTap = function(touch){
   if (activeControl.isTouchOnTheRightSide(touch)){
     activeControl.jump();
   }
-}
-
-FPSControls.prototype.onKeyUp = function(event){
-
-}
-
-FPSControls.prototype.onKeyDown = function(event){
-  
 }
 
 FPSControls.prototype.onActivated = function(){
