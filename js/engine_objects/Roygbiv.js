@@ -3409,12 +3409,7 @@ Roygbiv.prototype.selectCrosshair = function(crosshairName){
   preConditions.checkIfDefined(ROYGBIV.selectCrosshair, preConditions.crosshairName, crosshairName);
   var crosshair = crosshairs[crosshairName];
   preConditions.checkIfTrue(ROYGBIV.selectCrosshair, "No such crosshair.", (!crosshair));
-  if (selectedCrosshair){
-    selectedCrosshair.mesh.visible = false;
-  }
-  crosshair.mesh.visible = true;
-  crosshair.handleResize();
-  selectedCrosshair = crosshair;
+  crosshairHandler.selectCrosshair(crosshair);
 }
 
 // Changes the color of the selected crosshair.
@@ -3424,10 +3419,7 @@ Roygbiv.prototype.changeCrosshairColor = function(colorName){
   }
   preConditions.checkIfDefined(ROYGBIV.changeCrosshairColor, preConditions.colorName, colorName);
   preConditions.checkIfTrue(ROYGBIV.changeCrosshairColor, "No crosshair is selected", (!selectedCrosshair));
-  REUSABLE_COLOR.set(colorName);
-  selectedCrosshair.material.uniforms.color.value.x = REUSABLE_COLOR.r;
-  selectedCrosshair.material.uniforms.color.value.y = REUSABLE_COLOR.g;
-  selectedCrosshair.material.uniforms.color.value.z = REUSABLE_COLOR.b;
+  crosshairHandler.changeCrosshairColor(colorName);
 }
 
 // Destroys the selected crosshair. selectCrosshair function should be used after this function
@@ -3436,10 +3428,7 @@ Roygbiv.prototype.hideCrosshair = function(){
   if (mode == 0){
     return;
   }
-  if (selectedCrosshair){
-    selectedCrosshair.mesh.visible = false;
-    selectedCrosshair = 0;
-  }
+  crosshairHandler.hideCrosshair();
 }
 
 // Starts rotation effect of the selected crosshair.
@@ -3450,7 +3439,7 @@ Roygbiv.prototype.startCrosshairRotation = function(angularSpeed){
   preConditions.checkIfTrue(ROYGBIV.startCrosshairRotation, "No selected crosshair", (!selectedCrosshair));
   preConditions.checkIfDefined(ROYGBIV.startCrosshairRotation, preConditions.angularSpeed, angularSpeed);
   preConditions.checkIfNumber(ROYGBIV.startCrosshairRotation, preConditions.angularSpeed, angularSpeed);
-  selectedCrosshair.angularSpeed = angularSpeed;
+  crosshairHandler.startCrosshairRotation(angularSpeed);
 }
 
 // Stops rotation effect of the selected crosshair.
@@ -3459,9 +3448,7 @@ Roygbiv.prototype.stopCrosshairRotation = function(){
     return;
   }
   preConditions.checkIfTrue(ROYGBIV.stopCrosshairRotation, "No selectedCrosshair.", (!selectedCrosshair));
-  selectedCrosshair.rotationTime = 0;
-  selectedCrosshair.angularSpeed = 0;
-  selectedCrosshair.resetRotation();
+  crosshairHandler.stopCrosshairRotation();
 }
 
 // Pauses rotation effect of the selected crosshair. startCrosshairRotation function
@@ -3471,7 +3458,7 @@ Roygbiv.prototype.pauseCrosshairRotation = function(){
     return;
   }
   preConditions.checkIfTrue(ROYGBIV.pauseCrosshairRotation, "No selectedCrosshair.", (!selectedCrosshair));
-  selectedCrosshair.angularSpeed = 0;
+  crosshairHandler.pauseCrosshairRotation();
 }
 
 // Expands a crosshair. This can be used while shooting or walking for fps games.
@@ -3488,11 +3475,7 @@ Roygbiv.prototype.expandCrosshair = function(targetSize, delta){
   preConditions.checkIfDefined(ROYGBIV.expandCrosshair, preConditions.delta, delta);
   preConditions.checkIfNumber(ROYGBIV.expandCrosshair, preConditions.delta, delta);
   preConditions.checkIfLessThan(ROYGBIV.expandCrosshair, preConditions.delta, delta, 0);
-  selectedCrosshair.expandTick = 0;
-  selectedCrosshair.expandTargetSize = targetSize;
-  selectedCrosshair.expandDelta = delta;
-  selectedCrosshair.expand = true;
-  selectedCrosshair.shrink = false;
+  crosshairHandler.expandCrosshair(targetSize, delta);
 }
 
 // Shrinks a crosshair. This can be used after calling the expandCrosshair function.
@@ -3506,11 +3489,7 @@ Roygbiv.prototype.shrinkCrosshair = function(delta){
   preConditions.checkIfNumber(ROYGBIV.shrinkCrosshair, preConditions.delta, delta);
   preConditions.checkIfLessThan(ROYGBIV.shrinkCrosshair, preConditions.delta, delta, 0);
   preConditions.checkIfTrue(ROYGBIV.shrinkCrosshair, "No selected crosshair.", (!selectedCrosshair));
-  selectedCrosshair.shrinkTick = 0;
-  selectedCrosshair.expandDelta = delta;
-  selectedCrosshair.material.uniforms.shrinkStartSize.value = selectedCrosshair.curSize;
-  selectedCrosshair.expand = false;
-  selectedCrosshair.shrink = true;
+  crosshairHandler.shrinkCrosshair(delta);
 }
 
 // LISTENER FUNCTIONS **********************************************************

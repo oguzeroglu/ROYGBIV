@@ -347,6 +347,7 @@ var defaultControlParameters = {
 
 };
 var activeControl;
+var crosshairHandler;
 
 // RENDER ORDERS
 var renderOrders = {
@@ -360,7 +361,7 @@ var renderOrders = {
   TEXT_3D: 10,
   TEXT_2D: 50,
   CROSSHAIR: 60,
-  OBJECT_TRAIL: 100   
+  OBJECT_TRAIL: 100
 }
 
 // WORKER VARIABLES

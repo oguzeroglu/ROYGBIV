@@ -23,6 +23,7 @@ var FPSControls = function(params){
   this.jumpAgainTimeThreshold = params.jumpAgainTimeThreshold;
   this.touchJoystickThreshold = params.touchJoystickThreshold;
   this.touchJoystickDegreeInterval = params.touchJoystickDegreeInterval;
+  this.crosshairName = params.crosshairName;
 }
 
 FPSControls.prototype.onClick = noop;

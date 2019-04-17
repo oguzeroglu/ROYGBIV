@@ -29,6 +29,9 @@ window.onload = function() {
   // DEFAULT CONTROL
   activeControl = new FreeControls(defaultControlParameters);
 
+  // CROSSHAIR HANDLER
+  crosshairHandler = new CrosshairHandler();
+
   // SELECTION HANDLER
   if (!isDeployment){
     selectionHandler = new SelectionHandler();
