@@ -20,35 +20,28 @@ var FPSControls = function(params){
   this.touchLookSpeed = params.touchLookSpeed;
   this.speed = params.speed;
   this.jumpSpeed = params.jumpSpeed;
-  this.jumpAgainTimeThreshold = params.jumpAgainTimeThreshold;
+  this.jumpableVelocityCoefficient = params.jumpableVelocityCoefficient;
   this.touchJoystickThreshold = params.touchJoystickThreshold;
   this.touchJoystickDegreeInterval = params.touchJoystickDegreeInterval;
   this.crosshairName = params.crosshairName;
   this.crosshairExpandSize = params.crosshairExpandSize;
   this.crosshairAnimationDelta = params.crosshairAnimationDelta;
+  this.doubleJumpTimeThresholdInMs = params.doubleJumpTimeThresholdInMs;
 }
 
 FPSControls.prototype.onClick = noop;
 FPSControls.prototype.onSwipe = noop;
 FPSControls.prototype.onPinch = noop;
 FPSControls.prototype.onMouseWheel = noop;
-FPSControls.prototype.onMouseDown = noop;
-FPSControls.prototype.onMouseUp = noop;
 FPSControls.prototype.onActivated = noop;
-FPSControls.prototype.onKeyDown = noop;
 FPSControls.prototype.onKeyUp = noop;
 
-FPSControls.prototype.jump = function(){
-  var skip = false;
-  var now = performance.now();
-  if (activeControl.lastJumpTime){
-    if (now - activeControl.lastJumpTime < activeControl.jumpAgainTimeThreshold){
-      skip = true;
-    }
-  }
-  if (!skip){
+FPSControls.prototype.jump = function(isDouble){
+  if ((!isDouble && activeControl.canJump) || (isDouble && activeControl.canDoubleJump)){
     activeControl.playerBodyObject.setVelocityY(activeControl.jumpSpeed);
-    activeControl.lastJumpTime = now;
+    if (isDouble){
+      activeControl.canDoubleJump = false;
+    }
   }
 }
 
@@ -215,12 +208,16 @@ FPSControls.prototype.onTouchEnd = function(event){
 }
 
 FPSControls.prototype.update = function(){
+  this.canJump = (this.playerBodyObject.physicsBody.velocity.y <= this.jumpableVelocityCoefficient && this.playerBodyObject.physicsBody.velocity.y >= -this.jumpableVelocityCoefficient);
+  if (this.canJump){
+    this.canDoubleJump = true;
+  }
   camera.position.copy(this.playerBodyObject.mesh.position);
   this.playerBodyObject.setVelocityX(0);
   this.playerBodyObject.setVelocityZ(0);
   this.xVelocity = 0;
   this.zVelocity = 0;
-  var hasMotion = false;
+  var hasMotion = this.isMouseDown;
   if (!isMobile){
     var len = this.keyboardActions.length;
     for (var i = 0; i<len; i++){
@@ -270,17 +267,59 @@ FPSControls.prototype.resetJoystickStatus = function(){
   activeControl.joystickStatus.down = false;
 }
 
+FPSControls.prototype.onDoubleTap = function(touch){
+  activeControl.jump(true);
+}
+
 FPSControls.prototype.onTap = function(touch){
-  if (activeControl.isTouchOnTheRightSide(touch)){
+  var isOnTheRightSide = activeControl.isTouchOnTheRightSide(touch);
+  if (activeControl.hasDoubleJump && isOnTheRightSide){
+    var now = performance.now();
+    if (activeControl.lastTapTime){
+      if (now - activeControl.lastTapTime < activeControl.doubleJumpTimeThresholdInMs){
+        activeControl.onDoubleTap(touch);
+        activeControl.lastTapTime = 0;
+        return;
+      }
+    }
+    activeControl.lastTapTime = now;
+  }
+  if (isOnTheRightSide){
     activeControl.jump();
   }
 }
 
+FPSControls.prototype.onKeyDown = function(event){
+  if (activeControl.hasDoubleJump){
+    if (event.keyCode == 32){
+      var now = performance.now();
+      if (activeControl.lastSpaceKeydownTime){
+        if (now - activeControl.lastSpaceKeydownTime < activeControl.doubleJumpTimeThresholdInMs){
+          activeControl.jump(true);
+          activeControl.lastTapTime = 0;
+          return;
+        }
+      }
+      activeControl.lastSpaceKeydownTime = now;
+    }
+  }
+}
+
+FPSControls.prototype.onMouseDown = function(){
+  activeControl.isMouseDown = true;
+}
+
+FPSControls.prototype.onMouseUp = function(){
+  activeControl.isMouseDown = false;
+}
+
 FPSControls.prototype.onActivated = function(){
+  this.isMouseDown = false;
+  this.lastTapTime = 0;
+  this.lastSpaceKeydownTime = 0;
   this.joystickStatus = {
     right: false, left: false, up: false, down: false
   };
-  this.lastJumpTime = 0;
   this.touchTrack = new Map();
   camera.quaternion.set(0, 0, 0, 1);
   this.totalXRotation = 0;
@@ -298,5 +337,10 @@ FPSControls.prototype.onActivated = function(){
     crosshairHandler.selectCrosshair(crosshairs[this.crosshairName]);
   }else{
     this.hasCrosshair = false;
+  }
+  if (!(typeof this.doubleJumpTimeThresholdInMs == UNDEFINED)){
+    this.hasDoubleJump = true;
+  }else{
+    this.hasDoubleJump = false;
   }
 }
