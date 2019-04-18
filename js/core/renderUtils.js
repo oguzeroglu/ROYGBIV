@@ -132,6 +132,9 @@ function updateTrackingObjects(){
       obj = objectGroups[objName];
       isObjectGroup = true;
     }
+    if (typeof obj.trackedObject.dx == UNDEFINED){
+      continue;
+    }
     obj.prevPositionVector.copy(obj.mesh.position);
     obj.mesh.position.set(
       obj.mesh.position.x + obj.trackedObject.dx,
