@@ -12,7 +12,7 @@ function render(){
   GLOBAL_ADDEDTEXT_VIEWPORT_UNIFORM.value.set(0, 0, window.innerWidth * screenResolution, window.innerHeight * screenResolution);
 
   activeControl.update();
-  
+
   cpuOperationsHandler.handleSkybox();
 
   if (!stopAreaConfigurationsHandler){
@@ -25,8 +25,8 @@ function render(){
 
   if (mode == 1){
     cpuOperationsHandler.stepPhysics();
-    cpuOperationsHandler.updateDynamicObjects();
     cpuOperationsHandler.updateTrackingObjects();
+    cpuOperationsHandler.updateDynamicObjects();
     cpuOperationsHandler.processCameraRotationBuffer();
     cpuOperationsHandler.runScripts();
     cpuOperationsHandler.updateParticleSystems();

@@ -34,6 +34,36 @@ var ObjectGroup = function(name, group){
   this.lastUpdateQuaternion = new THREE.Quaternion();
 }
 
+ObjectGroup.prototype.untrackObjectPosition = function(){
+  delete this.trackedObject;
+  delete trackingObjects[this.name];
+}
+
+ObjectGroup.prototype.trackObjectPosition = function(targetObject){
+  this.trackedObject = targetObject;
+  targetObject.isTracked = true;
+  trackingObjects[this.name] = this;
+  targetObject.oldPX = targetObject.physicsBody.position.x;
+  targetObject.oldPY = targetObject.physicsBody.position.y;
+  targetObject.oldPZ = targetObject.physicsBody.position.z;
+}
+
+ObjectGroup.prototype.setPosition = function(x, y, z){
+  this.prevPositionVector.copy(this.mesh.position);
+  this.mesh.position.set(x, y, z);
+  this.graphicsGroup.position.set(x, y, z);
+  if (!this.isPhysicsSimplified){
+    this.physicsBody.position.set(x, y, z);
+  }else {
+    this.updateSimplifiedPhysicsBody();
+  }
+  if (this.mesh.visible){
+    rayCaster.updateObject(this);
+  }
+  physicsWorld.updateObject(this, true, false);
+  this.onPositionChange(this.prevPositionVector, this.mesh.position);
+}
+
 ObjectGroup.prototype.setVelocity = function(velocityVector){
   this.physicsBody.velocity.set(velocityVector.x, velocityVector.y, velocityVector.z);
   physicsWorld.setObjectVelocity(this, velocityVector);

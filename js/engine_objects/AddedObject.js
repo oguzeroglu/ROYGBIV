@@ -1057,6 +1057,34 @@ AddedObject.prototype.getPositionAtAxis = function(axis){
   }
 }
 
+AddedObject.prototype.untrackObjectPosition = function(){
+  delete this.trackedObject;
+  delete trackingObjects[this.name];
+}
+
+AddedObject.prototype.trackObjectPosition = function(targetObject){
+  this.trackedObject = targetObject;
+  targetObject.isTracked = true;
+  trackingObjects[this.name] = this;
+  targetObject.oldPX = targetObject.physicsBody.position.x;
+  targetObject.oldPY = targetObject.physicsBody.position.y;
+  targetObject.oldPZ = targetObject.physicsBody.position.z;
+}
+
+AddedObject.prototype.setPosition = function(x, y, z){
+  this.prevPositionVector.copy(this.mesh.position);
+  this.mesh.position.set(x, y, z);
+  this.physicsBody.position.set(x, y, z);
+  if (this.mesh.visible){
+    rayCaster.updateObject(this);
+  }
+  physicsWorld.updateObject(this, true, false);
+  if (this.autoInstancedParent){
+    this.autoInstancedParent.updateObject(this);
+  }
+  this.onPositionChange(this.prevPositionVector, this.mesh.position);
+}
+
 AddedObject.prototype.resetPosition = function(){
   var mesh = this.mesh;
   var physicsBody = this.physicsBody;

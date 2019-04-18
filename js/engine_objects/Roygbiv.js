@@ -709,41 +709,14 @@ Roygbiv.prototype.setPosition = function(obj, x, y, z){
   preConditions.checkIfNumber(ROYGBIV.setPosition, preConditions.y, y);
   preConditions.checkIfNumber(ROYGBIV.setPosition, preConditions.z, z);
   preConditions.checkIfAddedObjectOrObjectGroup(ROYGBIV.setPosition, preConditions.obj, obj);
-  if (obj.isAddedObject){
-    if (obj.parentObjectName){
-      var objGroup = objectGroups[obj.parentObjectName];
-      preConditions.checkIfParentExists(ROYGBIV.setPosition, null, objGroup);
-      this.setPosition(objGroup, x, y, z);
-      return;
-    }
-    preConditions.checkIfChangeable(ROYGBIV.setPosition, preConditions.obj, obj);
-    obj.prevPositionVector.copy(obj.mesh.position);
-    obj.mesh.position.set(x, y, z);
-    obj.physicsBody.position.set(x, y, z);
-    if (obj.mesh.visible){
-      rayCaster.updateObject(obj);
-    }
-    physicsWorld.updateObject(obj, true, false);
-    if (obj.autoInstancedParent){
-      obj.autoInstancedParent.updateObject(obj);
-    }
-    obj.onPositionChange(obj.prevPositionVector, obj.mesh.position);
-  }else if (obj.isObjectGroup){
-    preConditions.checkIfChangeable(ROYGBIV.setPosition, preConditions.obj, obj);
-    obj.prevPositionVector.copy(obj.mesh.position);
-    obj.mesh.position.set(x, y, z);
-    obj.graphicsGroup.position.set(x, y, z);
-    if (!obj.isPhysicsSimplified){
-      obj.physicsBody.position.set(x, y, z);
-    }else {
-      obj.updateSimplifiedPhysicsBody();
-    }
-    if (obj.mesh.visible){
-      rayCaster.updateObject(obj);
-    }
-    physicsWorld.updateObject(obj, true, false);
-    obj.onPositionChange(obj.prevPositionVector, obj.mesh.position);
+  if (obj.parentObjectName){
+    var objGroup = objectGroups[obj.parentObjectName];
+    preConditions.checkIfParentExists(ROYGBIV.setPosition, null, objGroup);
+    this.setPosition(objGroup, x, y, z);
+    return;
   }
+  preConditions.checkIfChangeable(ROYGBIV.setPosition, preConditions.obj, obj);
+  obj.setPosition(x, y, z);
 }
 
 //  Sets the mass property of an object or a glued object. Objects are considered
@@ -4859,12 +4832,7 @@ Roygbiv.prototype.trackObjectPosition = function(sourceObject, targetObject){
   preConditions.checkIfDynamic(ROYGBIV.trackObjectPosition, preConditions.targetObject, targetObject);
   preConditions.checkIfNotDynamic(ROYGBIV.trackObjectPosition, preConditions.sourceObject, sourceObject);
   preConditions.checkIfChangeable(ROYGBIV.trackObjectPosition, preConditions.sourceObject, sourceObject);
-  sourceObject.trackedObject = targetObject;
-  targetObject.isTracked = true;
-  trackingObjects[sourceObject.name] = sourceObject;
-  targetObject.oldPX = targetObject.physicsBody.position.x;
-  targetObject.oldPY = targetObject.physicsBody.position.y;
-  targetObject.oldPZ = targetObject.physicsBody.position.z;
+  sourceObject.trackObjectPosition(targetObject);
 }
 
 // Stops tracking an objects position for an object.
@@ -4874,8 +4842,7 @@ Roygbiv.prototype.untrackObjectPosition = function(sourceObject){
   }
   preConditions.checkIfDefined(ROYGBIV.untrackObjectPosition, preConditions.sourceObject, sourceObject);
   preConditions.checkIfAddedObjectOrObjectGroup(ROYGBIV.untrackObjectPosition, preConditions.sourceObject, sourceObject);
-  delete sourceObject.trackedObject;
-  delete trackingObjects[sourceObject.name];
+  sourceObject.untrackObjectPosition();
 }
 
 // Creates and returns a rotation pivot for an object. This function is not
