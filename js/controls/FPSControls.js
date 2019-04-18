@@ -16,8 +16,6 @@ var FPSControls = function(params){
     {key: "Space", action: this.jump}
   ];
   this.playerBodyObject = params.playerBodyObject;
-  this.gunRightObject = params.gunRightObject;
-  this.gunRightPositionOffset = params.gunRightPositionOffset;
   this.mouseSpeed = params.mouseSpeed;
   this.touchLookSpeed = params.touchLookSpeed;
   this.speed = params.speed;
@@ -344,14 +342,5 @@ FPSControls.prototype.onActivated = function(){
     this.hasDoubleJump = true;
   }else{
     this.hasDoubleJump = false;
-  }
-  if (!(typeof this.gunRightObject == UNDEFINED)){
-    this.hasGunOnRight = true;
-    var refPos = this.playerBodyObject.mesh.position;
-    var offs = this.gunRightPositionOffset;
-    this.gunRightObject.setPosition(refPos.x + offs.x, refPos.y + offs.y, refPos.z + offs.z);
-    this.gunRightObject.trackObjectPosition(this.playerBodyObject);
-  }else{
-    this.hasGunOnRight = false;
   }
 }
