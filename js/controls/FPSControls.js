@@ -31,7 +31,6 @@ var FPSControls = function(params){
   this.crosshairAnimationDelta = params.crosshairAnimationDelta; // default: none
   this.doubleJumpTimeThresholdInMs = params.doubleJumpTimeThresholdInMs; // default: 500
   this.weaponObject1 = params.weaponObject1; // default: none
-  this.weapon1Position = params.weapon1Position; // default none
 }
 
 FPSControls.prototype.onClick = noop;
@@ -399,6 +398,7 @@ FPSControls.prototype.onActivated = function(){
   if (!(typeof this.weaponObject1 == UNDEFINED)){
     this.hasWeapon1 = true;
     this.weapon1InitQuaternion.copy(this.weaponObject1.mesh.quaternion);
+    this.weapon1Position = new THREE.Vector3(this.weaponObject1.fpsWeaponAlignment.x, this.weaponObject1.fpsWeaponAlignment.y, this.weaponObject1.fpsWeaponAlignment.z);
     this.updateGunAlignment(0, this.weapon1Position.x, this.weapon1Position.y, this.weapon1Position.z);
   }else{
     this.hasWeapon1 = false;

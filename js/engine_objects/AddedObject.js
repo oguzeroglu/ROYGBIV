@@ -97,6 +97,7 @@ AddedObject.prototype.resetFPSWeaponProperties = function(){
   delete this.quaternionWhenUsedAsFPSWeapon;
   delete this.physicsPositionWhenUsedAsFPSWeapon;
   delete this.physicsQuaternionWhenUsedAsFPSWeapon;
+  delete this.fpsWeaponAlignment;
 }
 
 AddedObject.prototype.useAsFPSWeapon = function(){
@@ -108,6 +109,7 @@ AddedObject.prototype.useAsFPSWeapon = function(){
   this.quaternionWhenUsedAsFPSWeapon = this.mesh.quaternion.clone();
   this.physicsPositionWhenUsedAsFPSWeapon = new THREE.Vector3().copy(this.physicsBody.position);
   this.physicsQuaternionWhenUsedAsFPSWeapon = new THREE.Quaternion().copy(this.physicsBody.quaternion);
+  this.fpsWeaponAlignment = {x: 0, y: 0, z: 0};
 }
 
 AddedObject.prototype.handleRotation = function(axis, radians){
@@ -480,6 +482,7 @@ AddedObject.prototype.export = function(){
     exportObject.quaternionWhenUsedAsFPSWeapon = this.quaternionWhenUsedAsFPSWeapon;
     exportObject.physicsPositionWhenUsedAsFPSWeapon = this.physicsPositionWhenUsedAsFPSWeapon;
     exportObject.physicsQuaternionWhenUsedAsFPSWeapon = this.physicsQuaternionWhenUsedAsFPSWeapon;
+    exportObject.fpsWeaponAlignment = this.fpsWeaponAlignment;
   }
   if (this.hasTexture()){
     exportObject.txtMatrix = this.mesh.material.uniforms.textureMatrix.value.elements;

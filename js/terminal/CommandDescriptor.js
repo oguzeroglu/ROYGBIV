@@ -163,6 +163,7 @@ var CommandDescriptor = function(){
       0, //printRayStep
       4, //simplifyPhysics
       1, //unsimplifyPhysics
+      2 //fpsWeaponAlignment
   ];
 
   this.commandArgumentsExpectedExplanation = [
@@ -327,7 +328,8 @@ var CommandDescriptor = function(){
     "setRayStep stepAmount", //setRayStep
     "printRayStep", //printRayStep
     "simplifyPhysics objName sizeX sizeY sizeZ", //simplifyPhysics
-    "unsimplifyPhysics objName" //unsimplifyPhysics
+    "unsimplifyPhysics objName", //unsimplifyPhysics
+    "fpsWeaponAlignment objName show/hide"
   ];
 
   this.commands = [
@@ -492,7 +494,8 @@ var CommandDescriptor = function(){
     "setRayStep",
     "printRayStep",
     "simplifyPhysics",
-    "unsimplifyPhysics"
+    "unsimplifyPhysics",
+    "fpsWeaponAlignment"
   ];
 
   this.commandInfo = [
@@ -657,7 +660,8 @@ var CommandDescriptor = function(){
     "setRayStep: Sets the step amount used by the Raycaster while detecting intersections. Small step amount means more precise intersection\n  detection but worse performance. Default value is 32.",
     "printRayStep: Prints the ray step amount.",
     "simplifyPhysics: Sets the physics of an object to a box shape of sizeX, sizeY, sizeZ sizes. This helps optimizing the performance of the\n  physics engine but causes physics precision loss.",
-    "unsimplifyPhysics: Brings back the original physics for an object after the usage of simplifyPhysics command."
+    "unsimplifyPhysics: Brings back the original physics for an object after the usage of simplifyPhysics command.",
+    "fpsWeaponAlignment: Shows/hides the FPS weapon alignment GUI."
   ];
 
   this.keyboardInfo = [
@@ -755,6 +759,7 @@ var CommandDescriptor = function(){
   this.FONT_NAME                =   31;
   this.TEXT_NAME                =   32;
   this.EFFECT_NAME              =   33;
+  this.FPS_WEAPON               =   34;
 
   // newGridSystem
   this.newGridSystem = new Object();
@@ -1315,6 +1320,12 @@ var CommandDescriptor = function(){
   this.unsimplifyPhysics = new Object();
   this.unsimplifyPhysics.types = [];
   this.unsimplifyPhysics.types.push(this.GLUED_OBJECT_NAME); // objName
+
+  // fpsWeaponAlignment
+  this.fpsWeaponAlignment = new Object();
+  this.fpsWeaponAlignment.types = [];
+  this.fpsWeaponAlignment.types.push(this.FPS_WEAPON); // objName
+  this.fpsWeaponAlignment.types.push(this.HIDE_SHOW); // show/hide
 
 };
 

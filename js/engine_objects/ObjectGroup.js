@@ -75,6 +75,7 @@ ObjectGroup.prototype.useAsFPSWeapon = function(){
   this.quaternionWhenUsedAsFPSWeapon = this.mesh.quaternion.clone();
   this.physicsPositionWhenUsedAsFPSWeapon = new THREE.Vector3().copy(this.physicsBody.position);
   this.physicsQuaternionWhenUsedAsFPSWeapon = new THREE.Quaternion().copy(this.physicsBody.quaternion);
+  this.fpsWeaponAlignment = {x: 0, y: 0, z: 0};
 }
 
 ObjectGroup.prototype.handleRotation = function(axis, radians){
@@ -1801,6 +1802,7 @@ ObjectGroup.prototype.export = function(){
     exportObj.quaternionWhenUsedAsFPSWeapon = this.quaternionWhenUsedAsFPSWeapon;
     exportObj.physicsPositionWhenUsedAsFPSWeapon = this.physicsPositionWhenUsedAsFPSWeapon;
     exportObj.physicsQuaternionWhenUsedAsFPSWeapon = this.physicsQuaternionWhenUsedAsFPSWeapon;
+    exportObj.fpsWeaponAlignment = this.fpsWeaponAlignment;
   }
   return exportObj;
 }

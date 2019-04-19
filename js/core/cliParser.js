@@ -4977,6 +4977,26 @@ function parse(input){
           }
           return true;
         break;
+        case 162: //fpsWeaponAlignment
+          if (mode != 0){
+            terminal.printError(Text.WORKS_ONLY_IN_DESIGN_MODE);
+            return true;
+          }
+          var objName = splitted[1];
+          var obj = addedObjects[objName];
+          if (!obj){
+            obj = objectGroups[objName];
+            if (!obj){
+              terminal.printError(Text.NO_SUCH_OBJECT);
+              return true;
+            }
+          }
+          if (!obj.isFPSWeapon){
+            terminal.printError(Text.OBJECT_IS_NOT_MARKED_AS_FPS_WEAPON);
+            return true;
+          }
+          return true;
+        break;
       }
       return true;
     }catch(err){

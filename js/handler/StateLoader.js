@@ -572,6 +572,7 @@ StateLoader.prototype.load = function(){
          addedObjectInstance.quaternionWhenUsedAsFPSWeapon = new THREE.Quaternion(quaternionWhenUsedAsFPSWeapon._x, quaternionWhenUsedAsFPSWeapon._y, quaternionWhenUsedAsFPSWeapon._z, quaternionWhenUsedAsFPSWeapon._w);
          addedObjectInstance.physicsPositionWhenUsedAsFPSWeapon = new THREE.Vector3(physicsPositionWhenUsedAsFPSWeapon.x, physicsPositionWhenUsedAsFPSWeapon.y, physicsPositionWhenUsedAsFPSWeapon.z);
          addedObjectInstance.physicsQuaternionWhenUsedAsFPSWeapon = new THREE.Quaternion(physicsQuaternionWhenUsedAsFPSWeapon._x, physicsQuaternionWhenUsedAsFPSWeapon._y, physicsQuaternionWhenUsedAsFPSWeapon._z, physicsQuaternionWhenUsedAsFPSWeapon._w);
+         addedObjectInstance.fpsWeaponAlignment = curAddedObjectExport.fpsWeaponAlignment;
        }
     }
     for (var objName in addedObjects){
@@ -1243,6 +1244,7 @@ StateLoader.prototype.finalize = function(){
       objectGroupInstance.quaternionWhenUsedAsFPSWeapon = new THREE.Quaternion(quaternionWhenUsedAsFPSWeapon._x, quaternionWhenUsedAsFPSWeapon._y, quaternionWhenUsedAsFPSWeapon._z, quaternionWhenUsedAsFPSWeapon._w);
       objectGroupInstance.physicsPositionWhenUsedAsFPSWeapon = new THREE.Vector3(physicsPositionWhenUsedAsFPSWeapon.x, physicsPositionWhenUsedAsFPSWeapon.y, physicsPositionWhenUsedAsFPSWeapon.z);
       objectGroupInstance.physicsQuaternionWhenUsedAsFPSWeapon = new THREE.Quaternion(physicsQuaternionWhenUsedAsFPSWeapon._x, physicsQuaternionWhenUsedAsFPSWeapon._y, physicsQuaternionWhenUsedAsFPSWeapon._z, physicsQuaternionWhenUsedAsFPSWeapon._w);
+      objectGroupInstance.fpsWeaponAlignment = curObjectGroupExport.fpsWeaponAlignment;
     }
   }
   for (var objName in objectGroups){

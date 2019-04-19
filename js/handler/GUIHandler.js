@@ -66,10 +66,15 @@ var GUIHandler = function(){
     "BlurPass3": {"Factor": 0.0, "Color": "#ffffff", "Quality": "high"},
     "BlurPass4": {"Factor": 0.0, "Color": "#ffffff", "Quality": "high"},
     "BlurPass5": {"Factor": 0.0, "Color": "#ffffff", "Quality": "high"}
-  }
+  };
+  this.fpsWeaponAlignmentParameters = {
+    "x": 0.0,
+    "y": 0.0,
+    "z": 0.0
+  };
   // GUI TYPES DEFINITION
   this.guiTypes = {
-    FOG: 0, SKYBOX: 1, TEXT: 2, OBJECT: 3, BLOOM: 4
+    FOG: 0, SKYBOX: 1, TEXT: 2, OBJECT: 3, BLOOM: 4, FPS_WEAPON_ALIGNMENT: 5
   };
 }
 
@@ -428,6 +433,11 @@ GUIHandler.prototype.show = function(guiType){
         postProcessiongConfigurationsVisibility.bloom = true;
       }
     return;
+    case this.guiType.FPS_WEAPON_ALIGNMENT:
+      if (!this.datGuiFPSWeaponAlignment){
+        this.initializeFPSWeaponAlignmentGUI();
+      }
+    return;
   }
   throw new Error("Unknown guiType.");
 }
@@ -495,6 +505,12 @@ GUIHandler.prototype.hide = function(guiType){
       this.destroyGUI(this.datGuiAreaConfigurations);
       this.datGuiAreaConfigurations = 0;
     return;
+    case this.guiTypes.FPS_WEAPON_ALIGNMENT:
+      if (this.datGuiFPSWeaponAlignment){
+        this.destroyGUI(this.datGuiFPSWeaponAlignment);
+        this.datGuiFPSWeaponAlignment = 0;
+      }
+    return;
   }
   throw new Error("Unknown guiType.");
 }
@@ -503,6 +519,19 @@ GUIHandler.prototype.hideAll = function(){
   for (var key in this.guiTypes){
     this.hide(this.guiTypes[key]);
   }
+}
+
+GUIHandler.prototype.initializeFPSWeaponAlignmentGUI = function(){
+  guiHandler.datGuiFPSWeaponAlignment = new dat.GUI({hideable: false});
+  guiHandler.datGuiFPSWeaponAlignment.add(guiHandler.fpsWeaponAlignmentParameters, "x").min(-20).max(20).step(0.1).onChange(function(val){
+    console.log("x:" + val);
+  }).listen();
+  guiHandler.datGuiFPSWeaponAlignment.add(guiHandler.fpsWeaponAlignmentParameters, "y").min(-20).max(20).step(0.1).onChange(function(val){
+    console.log("y: "+val);
+  }).listen();
+  guiHandler.datGuiFPSWeaponAlignment.add(guiHandler.fpsWeaponAlignmentParameters, "z").min(-20).max(20).step(0.1).onChange(function(val){
+    console.log("z: "+val);
+  }).listen();
 }
 
 GUIHandler.prototype.initializeObjectManipulationGUI = function(){
@@ -650,11 +679,17 @@ GUIHandler.prototype.initializeObjectManipulationGUI = function(){
       guiHandler.objectManipulationParameters["Changeable"] = false;
       guiHandler.objectManipulationParameters["Intersectable"] = true;
     }
-    rayCaster.refresh();
     if (physicsDebugMode){
       debugRenderer.refresh();
     }
     guiHandler.omMassController.updateDisplay();
+    if (val){
+      terminal.clear();
+      terminal.printInfo(Text.OBJECT_WILL_BE_USED_AS_FPS_WEAPON);
+    }else{
+      terminal.clear();
+      terminal.printInfo(Text.OK);
+    }
   }).listen();
   guiHandler.omSideController = guiHandler.datGuiObjectManipulation.add(guiHandler.objectManipulationParameters, "Side", [
     "Both", "Front", "Back"

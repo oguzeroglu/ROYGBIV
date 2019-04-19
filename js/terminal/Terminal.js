@@ -632,6 +632,19 @@ Terminal.prototype.autocomplete = function(command){
 				}
 				helpString = "[Effects]: ";
 			break;
+			case commandDescriptor.FPS_WEAPON:
+				for (var objName in addedObjects){
+					if (objName.toLowerCase().startsWith(curEntry.toLowerCase())){
+						possibilities.push(objName);
+					}
+				}
+				for (var objName in objectGroups){
+					if (objName.toLowerCase().startsWith(curEntry.toLowerCase())){
+						possibilities.push(objName);
+					}
+				}
+				helpString = "[FPS weapons]: ";
+			break;
 		}
 
 		//  **********************************************************
