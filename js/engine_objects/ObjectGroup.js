@@ -34,6 +34,49 @@ var ObjectGroup = function(name, group){
   this.lastUpdateQuaternion = new THREE.Quaternion();
 }
 
+ObjectGroup.prototype.setChangeableStatus = function(val){
+  this.isChangeable = val;
+}
+
+ObjectGroup.prototype.setIntersectableStatus = function(val){
+  this.isIntersectable = val;
+}
+
+ObjectGroup.prototype.setNoMass = function(val){
+  if (!val){
+    physicsWorld.addBody(this.physicsBody);
+  }else{
+    physicsWorld.remove(this.physicsBody);
+  }
+  this.noMass = val;
+}
+
+ObjectGroup.prototype.resetFPSWeaponProperties = function(){
+  this.setNoMass(false);
+  this.setIntersectableStatus(true);
+  this.setChangeableStatus(false);
+  this.isFPSWeapon = false;
+  this.mesh.position.copy(this.positionWhenUsedAsFPSWeapon);
+  this.mesh.quaternion.copy(this.quaternionWhenUsedAsFPSWeapon);
+  this.physicsBody.position.copy(this.physicsPositionWhenUsedAsFPSWeapon);
+  this.physicsBody.quaternion.copy(this.physicsQuaternionWhenUsedAsFPSWeapon);
+  delete this.positionWhenUsedAsFPSWeapon;
+  delete this.quaternionWhenUsedAsFPSWeapon;
+  delete this.physicsPositionWhenUsedAsFPSWeapon;
+  delete this.physicsQuaternionWhenUsedAsFPSWeapon;
+}
+
+ObjectGroup.prototype.useAsFPSWeapon = function(){
+  this.setNoMass(true);
+  this.setIntersectableStatus(false);
+  this.setChangeableStatus(true);
+  this.isFPSWeapon = true;
+  this.positionWhenUsedAsFPSWeapon = this.mesh.position.clone();
+  this.quaternionWhenUsedAsFPSWeapon = this.mesh.quaternion.clone();
+  this.physicsPositionWhenUsedAsFPSWeapon = new THREE.Vector3().copy(this.physicsBody.position);
+  this.physicsQuaternionWhenUsedAsFPSWeapon = new THREE.Quaternion().copy(this.physicsBody.quaternion);
+}
+
 ObjectGroup.prototype.handleRotation = function(axis, radians){
   if (this.pivotObject){
     this.prevPositionVector.copy(this.mesh.position);
@@ -1164,6 +1207,9 @@ ObjectGroup.prototype.glue = function(){
   for (var objectName in group){
     var addedObject = group[objectName];
     addedObject.setAttachedProperties();
+    if (addedObject.isFPSWeapon){
+      addedObject.resetFPSWeaponProperties();
+    }
 
     this.totalVertexCount += addedObject.mesh.geometry.attributes.position.count;
     // GLUE PHYSICS ************************************************
@@ -1749,6 +1795,12 @@ ObjectGroup.prototype.export = function(){
       physicsSimplificationObject3DContainerQuaternion: new CANNON.Quaternion().copy(this.physicsSimplificationObject3DContainer.quaternion)
     };
     exportObj.physicsSimplificationParameters = this.physicsSimplificationParameters;
+  }
+  if (this.positionWhenUsedAsFPSWeapon){
+    exportObj.positionWhenUsedAsFPSWeapon = this.positionWhenUsedAsFPSWeapon;
+    exportObj.quaternionWhenUsedAsFPSWeapon = this.quaternionWhenUsedAsFPSWeapon;
+    exportObj.physicsPositionWhenUsedAsFPSWeapon = this.physicsPositionWhenUsedAsFPSWeapon;
+    exportObj.physicsQuaternionWhenUsedAsFPSWeapon = this.physicsQuaternionWhenUsedAsFPSWeapon;
   }
   return exportObj;
 }

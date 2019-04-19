@@ -562,6 +562,17 @@ StateLoader.prototype.load = function(){
        if (!(typeof curAddedObjectExport.emissiveColor == UNDEFINED)){
          addedObjectInstance.setEmissiveColor = curAddedObjectExport.emissiveColor;
        }
+       if (!(typeof curAddedObjectExport.positionWhenUsedAsFPSWeapon == UNDEFINED)){
+         addedObjectInstance.isFPSWeapon = true;
+         var positionWhenUsedAsFPSWeapon = curAddedObjectExport.positionWhenUsedAsFPSWeapon;
+         var quaternionWhenUsedAsFPSWeapon = curAddedObjectExport.quaternionWhenUsedAsFPSWeapon;
+         var physicsPositionWhenUsedAsFPSWeapon = curAddedObjectExport.physicsPositionWhenUsedAsFPSWeapon;
+         var physicsQuaternionWhenUsedAsFPSWeapon = curAddedObjectExport.physicsQuaternionWhenUsedAsFPSWeapon;
+         addedObjectInstance.positionWhenUsedAsFPSWeapon = new THREE.Vector3(positionWhenUsedAsFPSWeapon.x, positionWhenUsedAsFPSWeapon.y, positionWhenUsedAsFPSWeapon.z);
+         addedObjectInstance.quaternionWhenUsedAsFPSWeapon = new THREE.Quaternion(quaternionWhenUsedAsFPSWeapon._x, quaternionWhenUsedAsFPSWeapon._y, quaternionWhenUsedAsFPSWeapon._z, quaternionWhenUsedAsFPSWeapon._w);
+         addedObjectInstance.physicsPositionWhenUsedAsFPSWeapon = new THREE.Vector3(physicsPositionWhenUsedAsFPSWeapon.x, physicsPositionWhenUsedAsFPSWeapon.y, physicsPositionWhenUsedAsFPSWeapon.z);
+         addedObjectInstance.physicsQuaternionWhenUsedAsFPSWeapon = new THREE.Quaternion(physicsQuaternionWhenUsedAsFPSWeapon._x, physicsQuaternionWhenUsedAsFPSWeapon._y, physicsQuaternionWhenUsedAsFPSWeapon._z, physicsQuaternionWhenUsedAsFPSWeapon._w);
+       }
     }
     for (var objName in addedObjects){
       if (addedObjects[objName].softCopyParentName){
@@ -1221,6 +1232,17 @@ StateLoader.prototype.finalize = function(){
     if (curObjectGroupExport.noMass){
       objectGroupInstance.noMass = true;
       physicsWorld.remove(objectGroupInstance.physicsBody);
+    }
+    if (!(typeof curObjectGroupExport.positionWhenUsedAsFPSWeapon == UNDEFINED)){
+      objectGroupInstance.isFPSWeapon = true;
+      var positionWhenUsedAsFPSWeapon = curObjectGroupExport.positionWhenUsedAsFPSWeapon;
+      var quaternionWhenUsedAsFPSWeapon = curObjectGroupExport.quaternionWhenUsedAsFPSWeapon;
+      var physicsPositionWhenUsedAsFPSWeapon = curObjectGroupExport.physicsPositionWhenUsedAsFPSWeapon;
+      var physicsQuaternionWhenUsedAsFPSWeapon = curObjectGroupExport.physicsQuaternionWhenUsedAsFPSWeapon;
+      objectGroupInstance.positionWhenUsedAsFPSWeapon = new THREE.Vector3(positionWhenUsedAsFPSWeapon.x, positionWhenUsedAsFPSWeapon.y, positionWhenUsedAsFPSWeapon.z);
+      objectGroupInstance.quaternionWhenUsedAsFPSWeapon = new THREE.Quaternion(quaternionWhenUsedAsFPSWeapon._x, quaternionWhenUsedAsFPSWeapon._y, quaternionWhenUsedAsFPSWeapon._z, quaternionWhenUsedAsFPSWeapon._w);
+      objectGroupInstance.physicsPositionWhenUsedAsFPSWeapon = new THREE.Vector3(physicsPositionWhenUsedAsFPSWeapon.x, physicsPositionWhenUsedAsFPSWeapon.y, physicsPositionWhenUsedAsFPSWeapon.z);
+      objectGroupInstance.physicsQuaternionWhenUsedAsFPSWeapon = new THREE.Quaternion(physicsQuaternionWhenUsedAsFPSWeapon._x, physicsQuaternionWhenUsedAsFPSWeapon._y, physicsQuaternionWhenUsedAsFPSWeapon._z, physicsQuaternionWhenUsedAsFPSWeapon._w);
     }
   }
   for (var objName in objectGroups){

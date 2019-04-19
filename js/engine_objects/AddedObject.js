@@ -67,6 +67,49 @@ var AddedObject = function(name, type, metaData, material, mesh, physicsBody, de
 
 }
 
+AddedObject.prototype.setChangeableStatus = function(val){
+  this.isChangeable = val;
+}
+
+AddedObject.prototype.setIntersectableStatus = function(val){
+  this.isIntersectable = val;
+}
+
+AddedObject.prototype.setNoMass = function(val){
+  if (!val){
+    physicsWorld.addBody(this.physicsBody);
+  }else{
+    physicsWorld.remove(this.physicsBody);
+  }
+  this.noMass = val;
+}
+
+AddedObject.prototype.resetFPSWeaponProperties = function(){
+  this.setNoMass(false);
+  this.setIntersectableStatus(true);
+  this.setChangeableStatus(false);
+  this.isFPSWeapon = false;
+  this.mesh.position.copy(this.positionWhenUsedAsFPSWeapon);
+  this.mesh.quaternion.copy(this.quaternionWhenUsedAsFPSWeapon);
+  this.physicsBody.position.copy(this.physicsPositionWhenUsedAsFPSWeapon);
+  this.physicsBody.quaternion.copy(this.physicsQuaternionWhenUsedAsFPSWeapon);
+  delete this.positionWhenUsedAsFPSWeapon;
+  delete this.quaternionWhenUsedAsFPSWeapon;
+  delete this.physicsPositionWhenUsedAsFPSWeapon;
+  delete this.physicsQuaternionWhenUsedAsFPSWeapon;
+}
+
+AddedObject.prototype.useAsFPSWeapon = function(){
+  this.setNoMass(true);
+  this.setIntersectableStatus(false);
+  this.setChangeableStatus(true);
+  this.isFPSWeapon = true;
+  this.positionWhenUsedAsFPSWeapon = this.mesh.position.clone();
+  this.quaternionWhenUsedAsFPSWeapon = this.mesh.quaternion.clone();
+  this.physicsPositionWhenUsedAsFPSWeapon = new THREE.Vector3().copy(this.physicsBody.position);
+  this.physicsQuaternionWhenUsedAsFPSWeapon = new THREE.Quaternion().copy(this.physicsBody.quaternion);
+}
+
 AddedObject.prototype.handleRotation = function(axis, radians){
   if (this.pivotObject){
     this.prevPositionVector.copy(this.mesh.position);
@@ -429,11 +472,15 @@ AddedObject.prototype.export = function(){
       }
     }
   }
-
   if (this.softCopyParentName){
     exportObject.softCopyParentName = this.softCopyParentName;
   }
-
+  if (this.positionWhenUsedAsFPSWeapon){
+    exportObject.positionWhenUsedAsFPSWeapon = this.positionWhenUsedAsFPSWeapon;
+    exportObject.quaternionWhenUsedAsFPSWeapon = this.quaternionWhenUsedAsFPSWeapon;
+    exportObject.physicsPositionWhenUsedAsFPSWeapon = this.physicsPositionWhenUsedAsFPSWeapon;
+    exportObject.physicsQuaternionWhenUsedAsFPSWeapon = this.physicsQuaternionWhenUsedAsFPSWeapon;
+  }
   if (this.hasTexture()){
     exportObject.txtMatrix = this.mesh.material.uniforms.textureMatrix.value.elements;
   }

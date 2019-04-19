@@ -11,6 +11,7 @@ var GUIHandler = function(){
     "Intersectable": false,
     "Colorizable": false,
     "Has mass": true,
+    "FPS Weapon": false,
     "Side": "Both",
     "Hide half": "None",
     "Blending": "None",
@@ -310,6 +311,14 @@ GUIHandler.prototype.afterObjectSelection = function(){
       guiHandler.disableController(guiHandler.omOpacityController);
     }
     guiHandler.omMassController.updateDisplay();
+    if (obj.isFPSWeapon){
+      guiHandler.objectManipulationParameters["FPS Weapon"] = true;
+      guiHandler.disableController(guiHandler.omHasMassController);
+      guiHandler.disableController(guiHandler.omIntersectableController);
+      guiHandler.disableController(guiHandler.omChangeableController);
+    }else{
+      guiHandler.objectManipulationParameters["FPS Weapon"] = false;
+    }
   }else{
     guiHandler.hide(guiHandler.guiTypes.OBJECT);
   }
@@ -387,6 +396,7 @@ GUIHandler.prototype.enableAllOMControllers = function(){
   guiHandler.enableController(guiHandler.omHideHalfController);
   guiHandler.enableController(guiHandler.omBlendingController);
   guiHandler.enableController(guiHandler.omSideController);
+  guiHandler.enableController(guiHandler.omFPSWeaponController);
 }
 
 GUIHandler.prototype.show = function(guiType){
@@ -555,8 +565,12 @@ GUIHandler.prototype.initializeObjectManipulationGUI = function(){
   }).listen();
   guiHandler.omChangeableController = guiHandler.datGuiObjectManipulation.add(guiHandler.objectManipulationParameters, "Changeable").onChange(function(val){
     var obj = selectionHandler.getSelectedObject();
+    if (obj.isFPSWeapon){
+      guiHandler.objectManipulationParameters["Changeable"] = true;
+      return;
+    }
     terminal.clear();
-    obj.isChangeable = val;
+    obj.setChangeableStatus(val);
     if (obj.isChangeable){
       terminal.printInfo(Text.OBJECT_MARKED_AS.replace(Text.PARAM1, "changeable"));
     }else{
@@ -565,8 +579,12 @@ GUIHandler.prototype.initializeObjectManipulationGUI = function(){
   }).listen();
   guiHandler.omIntersectableController = guiHandler.datGuiObjectManipulation.add(guiHandler.objectManipulationParameters, "Intersectable").onChange(function(val){
     var obj = selectionHandler.getSelectedObject();
+    if (obj.isFPSWeapon){
+      guiHandler.objectManipulationParameters["Intersectable"] = false;
+      return;
+    }
     terminal.clear();
-    obj.isIntersectable = val;
+    obj.setIntersectableStatus(val);
     if (obj.isIntersectable){
       terminal.printInfo(Text.OBJECT_INTERSECTABLE);
     }else{
@@ -594,18 +612,47 @@ GUIHandler.prototype.initializeObjectManipulationGUI = function(){
       guiHandler.objectManipulationParameters["Has mass"] = false;
       return;
     }
+    if (obj.isFPSWeapon){
+      guiHandler.objectManipulationParameters["Has mass"] = false;
+      return;
+    }
     terminal.clear();
-    obj.noMass = !val;
+    obj.setNoMass(!val);
     if (val){
-      physicsWorld.addBody(obj.physicsBody);
       guiHandler.enableController(guiHandler.omMassController);
       guiHandler.enableController(guiHandler.omPhysicsSimplifiedController);
       terminal.printInfo(Text.PHYSICS_ENABLED);
     }else{
-      physicsWorld.remove(obj.physicsBody);
       guiHandler.disableController(guiHandler.omMassController);
       guiHandler.disableController(guiHandler.omPhysicsSimplifiedController);
       terminal.printInfo(Text.PHYSICS_DISABLED);
+    }
+    if (physicsDebugMode){
+      debugRenderer.refresh();
+    }
+    guiHandler.omMassController.updateDisplay();
+  }).listen();
+  guiHandler.omFPSWeaponController = guiHandler.datGuiObjectManipulation.add(guiHandler.objectManipulationParameters, "FPS Weapon").onChange(function(val){
+    if (val){
+      selectionHandler.getSelectedObject().useAsFPSWeapon();
+      guiHandler.disableController(guiHandler.omHasMassController);
+      guiHandler.disableController(guiHandler.omChangeableController);
+      guiHandler.disableController(guiHandler.omIntersectableController);
+      guiHandler.objectManipulationParameters["Has mass"] = false;
+      guiHandler.objectManipulationParameters["Changeable"] = true;
+      guiHandler.objectManipulationParameters["Intersectable"] = false;
+    }else{
+      selectionHandler.getSelectedObject().resetFPSWeaponProperties();
+      guiHandler.enableController(guiHandler.omHasMassController);
+      guiHandler.enableController(guiHandler.omChangeableController);
+      guiHandler.enableController(guiHandler.omIntersectableController);
+      guiHandler.objectManipulationParameters["Has mass"] = true;
+      guiHandler.objectManipulationParameters["Changeable"] = false;
+      guiHandler.objectManipulationParameters["Intersectable"] = true;
+    }
+    rayCaster.refresh();
+    if (physicsDebugMode){
+      debugRenderer.refresh();
     }
     guiHandler.omMassController.updateDisplay();
   }).listen();
