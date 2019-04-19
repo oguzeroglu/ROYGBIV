@@ -170,10 +170,16 @@ FPSControls.prototype.onRightHandFinger = function(touch){
   var movementY = (touch.pageY - oldTouch.pageY);
   var dx = -(movementX * activeControl.touchLookSpeed);
   camera.rotation.y += dx;
+  if (activeControl.hasWeapon1){
+    activeControl.weaponObject1.handleRotation(activeControl.axisY, dx);
+  }
   activeControl.alpha -= dx;
   var dy = -movementY * activeControl.touchLookSpeed;
   if (!(dy > 0 && (activeControl.totalXRotation + dy >= 1.10)) && !(dy <0 && (activeControl.totalXRotation + dy <= -1.10))){
     camera.rotation.x += dy;
+    if (activeControl.hasWeapon1){
+      activeControl.weaponObject1.handleRotation(activeControl.axisX, dy);
+    }
     activeControl.totalXRotation += dy;
   }
 }
