@@ -37,7 +37,6 @@ FPSControls.prototype.onPinch = noop;
 FPSControls.prototype.onMouseWheel = noop;
 FPSControls.prototype.onActivated = noop;
 FPSControls.prototype.onKeyUp = noop;
-FPSControls.prototype.onResize = noop;
 
 FPSControls.prototype.jump = function(isDouble){
   if ((!isDouble && activeControl.canJump) || (isDouble && activeControl.canDoubleJump)){
@@ -314,6 +313,13 @@ FPSControls.prototype.onMouseDown = function(){
 
 FPSControls.prototype.onMouseUp = function(){
   activeControl.isMouseDown = false;
+}
+
+FPSControls.prototype.onResize = function(){
+  if (activeControl.hasWeapon1){
+    var pos = activeControl.weapon1Position;
+    activeControl.updateGunAlignment(0, pos.x, pos.y, pos.z);
+  }
 }
 
 FPSControls.prototype.updateGunAlignment = function(gunIndex, x, y, z){
