@@ -175,6 +175,7 @@ var Preconditions = function(){
   this.onTouchEnd = "onTouchEnd";
   this.onKeyDown = "onKeyDown";
   this.onKeyUp = "onKeyUp";
+  this.onResize = "onResize";
 }
 
 Preconditions.prototype.errorHeader = function(callerFunc){

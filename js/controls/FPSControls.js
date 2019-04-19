@@ -37,6 +37,7 @@ FPSControls.prototype.onPinch = noop;
 FPSControls.prototype.onMouseWheel = noop;
 FPSControls.prototype.onActivated = noop;
 FPSControls.prototype.onKeyUp = noop;
+FPSControls.prototype.onResize = noop;
 
 FPSControls.prototype.jump = function(isDouble){
   if ((!isDouble && activeControl.canJump) || (isDouble && activeControl.canDoubleJump)){

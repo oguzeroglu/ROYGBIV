@@ -27,6 +27,7 @@ ResizeEventHandler.prototype.onResize = function(){
       GLOBAL_PS_REF_HEIGHT_UNIFORM.value = ((renderer.getCurrentViewport().w / screenResolution) / particleSystemRefHeight);
     }
   }
+  activeControl.onResize();
   if (mode == 0){
     for (var areaName in areas){
       if (areas[areaName].text){

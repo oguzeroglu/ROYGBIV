@@ -959,6 +959,7 @@ this.ROYGBIV_SCRIPTING_API_CREATECUSTOMCONTROL = "Creates a CustomControl implem
                                                  "onTouchStart (optional): Function to be executed with the TouchEvent when the user performs a touch start. Default value is noop.\n"+
                                                  "onTouchMove (optional): Function to be executed with the TouchEvent when the user performs a touch move. Default value is noop.\n"+
                                                  "onTouchEnd (optional): Function to be executed with the TouchEvent when the user performs a touch end. Default value is noop.\n"+
+                                                 "onResize (optional): Function to be executed when the screen is resized. Default value is noop.\n"+
                                                  "onUpdate (optional): Function to be executed on each frame. Default value is noop.";
 this.ROYGBIV_SCRIPTING_API_SETACTIVECONTROL = "Sets the active control.";
 }

@@ -14,9 +14,14 @@ var CustomControls = function(params){
   this.onTouchEndFunc = params.onTouchEnd;
   this.onKeyUpFunc = params.onKeyUp;
   this.onKeyDownFunc = params.onKeyDown;
+  this.onResizeFunc = params.onResize;
 }
 
 CustomControls.prototype.onActivated = noop;
+
+CustomControls.prototype.onResize = function(){
+  this.onResizeFunc();
+}
 
 CustomControls.prototype.onClick = function(event){
   this.onClickFunc(event);

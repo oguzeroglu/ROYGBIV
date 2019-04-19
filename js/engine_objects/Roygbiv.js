@@ -4318,6 +4318,7 @@ Roygbiv.prototype.createFreeControl = function(parameters){
 // value is noop.
 // onKeyUp (optional): Function to be executed with the key up event when the user performs a key up. Default
 // value is noop.
+// onResize (optional): Function to be executed when the screen is resized. Default value is noop.
 // onUpdate (optional): Function to be executed on each frame. Default value is noop.
 Roygbiv.prototype.createCustomControl = function(parameters){
   if (mode == 0){
@@ -4337,6 +4338,7 @@ Roygbiv.prototype.createCustomControl = function(parameters){
   preConditions.checkIfFunctionOnlyIfExists(ROYGBIV.createCustomControl, preConditions.onTouchEnd, parameters.onTouchEnd);
   preConditions.checkIfFunctionOnlyIfExists(ROYGBIV.createCustomControl, preConditions.onUpdate, parameters.onUpdate);
   preConditions.checkIfFunctionOnlyIfExists(ROYGBIV.createCustomControl, preConditions.onKeyDown, parameters.onKeyDown);
+  preConditions.checkIfFunctionOnlyIfExists(ROYGBIV.createCustomControl, preConditions.onResize, parameters.onResize);
   preConditions.checkIfFunctionOnlyIfExists(ROYGBIV.createCustomControl, preConditions.onKeyUp, parameters.onKeyUp);
   var params = {
     onClick: (!(typeof parameters.onClick == UNDEFINED))? parameters.onClick: noop,
@@ -4352,7 +4354,8 @@ Roygbiv.prototype.createCustomControl = function(parameters){
     onTouchEnd: (!(typeof parameters.onTouchEnd == UNDEFINED))? parameters.onTouchEnd: noop,
     onUpdate: (!(typeof parameters.onUpdate == UNDEFINED))? parameters.onUpdate: noop,
     onKeyDown: (!(typeof parameters.onKeyDown == UNDEFINED))? parameters.onKeyDown: noop,
-    onKeyUp: (!(typeof parameters.onKeyUp == UNDEFINED))? parameters.onKeyUp: noop
+    onKeyUp: (!(typeof parameters.onKeyUp == UNDEFINED))? parameters.onKeyUp: noop,
+    onResize: (!(typeof parameters.onResize == UNDEFINED))? parameters.onResize: noop
   }
   return new CustomControls(params);
 }
