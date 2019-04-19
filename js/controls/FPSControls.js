@@ -15,18 +15,18 @@ var FPSControls = function(params){
     {key: "Down", action: this.goBackward},
     {key: "Space", action: this.jump}
   ];
-  this.playerBodyObject = params.playerBodyObject;
-  this.mouseSpeed = params.mouseSpeed;
-  this.touchLookSpeed = params.touchLookSpeed;
-  this.speed = params.speed;
-  this.jumpSpeed = params.jumpSpeed;
-  this.jumpableVelocityCoefficient = params.jumpableVelocityCoefficient;
-  this.touchJoystickThreshold = params.touchJoystickThreshold;
-  this.touchJoystickDegreeInterval = params.touchJoystickDegreeInterval;
-  this.crosshairName = params.crosshairName;
-  this.crosshairExpandSize = params.crosshairExpandSize;
-  this.crosshairAnimationDelta = params.crosshairAnimationDelta;
-  this.doubleJumpTimeThresholdInMs = params.doubleJumpTimeThresholdInMs;
+  this.playerBodyObject = params.playerBodyObject; // default: none
+  this.mouseSpeed = params.mouseSpeed; // default: 0.002
+  this.touchLookSpeed = params.touchLookSpeed; // default: 0.01
+  this.speed = params.speed; // default: 200
+  this.jumpSpeed = params.jumpSpeed; // default: 500
+  this.jumpableVelocityCoefficient = params.jumpableVelocityCoefficient; // default: 3.5
+  this.touchJoystickThreshold = params.touchJoystickThreshold; // default: 1.5
+  this.touchJoystickDegreeInterval = params.touchJoystickDegreeInterval; // default: 30
+  this.crosshairName = params.crosshairName; // default: none
+  this.crosshairExpandSize = params.crosshairExpandSize; // default: none
+  this.crosshairAnimationDelta = params.crosshairAnimationDelta; // default: none
+  this.doubleJumpTimeThresholdInMs = params.doubleJumpTimeThresholdInMs; // default: 500
 }
 
 FPSControls.prototype.onClick = noop;
