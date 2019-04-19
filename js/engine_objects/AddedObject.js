@@ -67,6 +67,24 @@ var AddedObject = function(name, type, metaData, material, mesh, physicsBody, de
 
 }
 
+AddedObject.prototype.handleRotation = function(axis, radians){
+  if (this.pivotObject){
+    this.prevPositionVector.copy(this.mesh.position);
+    this.rotateAroundPivotObject(axis, radians);
+    physicsWorld.updateObject(this, false, true);
+    if (this.autoInstancedParent){
+      this.autoInstancedParent.updateObject(this);
+    }
+    this.onPositionChange(this.prevPositionVector, this.mesh.position);
+    return;
+  }
+  this.rotate(axis, radians, true);
+  physicsWorld.updateObject(this, false, true);
+  if (this.autoInstancedParent){
+    this.autoInstancedParent.updateObject(this);
+  }
+}
+
 AddedObject.prototype.setVelocity = function(velocityVector){
   this.physicsBody.velocity.set(velocityVector.x, velocityVector.y, velocityVector.z);
   physicsWorld.setObjectVelocity(this, velocityVector);
@@ -2344,6 +2362,25 @@ AddedObject.prototype.setFriction = function(val){
       physicsWorld.addContactMaterial(contact);
     }
   }
+}
+
+AddedObject.prototype.unsetRotationPivot = function(){
+  delete this.pivotObject;
+  delete this.pivotOffsetX;
+  delete this.pivotOffsetY;
+  delete this.pivotOffsetZ;
+}
+
+AddedObject.prototype.setRotationPivot = function(rotationPivot){
+  if (this.pivotObject){
+    rotationPivot.position.copy(this.pivotObject.position);
+    rotationPivot.quaternion.copy(this.pivotObject.quaternion);
+    rotationPivot.rotation.copy(this.pivotObject.rotation);
+  }
+  this.pivotObject = rotationPivot;
+  this.pivotOffsetX = rotationPivot.offsetX;
+  this.pivotOffsetY = rotationPivot.offsetY;
+  this.pivotOffsetZ = rotationPivot.offsetZ;
 }
 
 AddedObject.prototype.makePivot = function(offsetX, offsetY, offsetZ){

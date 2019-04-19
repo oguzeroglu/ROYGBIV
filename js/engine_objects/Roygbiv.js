@@ -602,11 +602,7 @@ Roygbiv.prototype.rotate = function(object, axis, radians){
   axis = axis.toLowerCase();
   preConditions.checkIfAxisOnlyIfDefined(ROYGBIV.rotate, preConditions.axis, axis);
   preConditions.checkIfNumber(ROYGBIV.rotate, preConditions.radians, radians);
-  preConditions.checkIfAddedObjectObjectGroupParticleSystem(ROYGBIV.rotate, preConditions.object, object);
-  var isObject = false;
-  if ((object.isAddedObject) || (object.isObjectGroup)){
-    isObject = true;
-  }
+  preConditions.checkIfAddedObjectOrObjectGroup(ROYGBIV.rotate, preConditions.object, object);
   if (object.isAddedObject && object.parentObjectName){
     var parentObject = objectGroups[object.parentObjectName];
     if (parentObject){
@@ -621,24 +617,8 @@ Roygbiv.prototype.rotate = function(object, axis, radians){
       return;
     }
   }
-  if ((object.isAddedObject) || (object.isObjectGroup)){
-    preConditions.checkIfChangeable(ROYGBIV.rotate, preConditions.object, object);
-  }
-  if (object.pivotObject){
-    object.prevPositionVector.copy(object.mesh.position);
-    object.rotateAroundPivotObject(axis, radians);
-    physicsWorld.updateObject(object, false, true);
-    if (object.autoInstancedParent){
-      object.autoInstancedParent.updateObject(object);
-    }
-    object.onPositionChange(object.prevPositionVector, object.mesh.position);
-    return;
-  }
-  object.rotate(axis, radians, true);
-  physicsWorld.updateObject(object, false, true);
-  if (object.autoInstancedParent){
-    object.autoInstancedParent.updateObject(object);
-  }
+  preConditions.checkIfChangeable(ROYGBIV.rotate, preConditions.object, object);
+  object.handleRotation(axis, radians);
 }
 
 //  Rotates an object or a glued object around the given (x, y, z)
@@ -892,15 +872,7 @@ Roygbiv.prototype.setRotationPivot = function(rotationPivot){
   preConditions.checkIfDefined(ROYGBIV.setRotationPivot, preConditions.rotationPivot, rotationPivot);
   preConditions.checkIfRotationPivot(ROYGBIV.setRotationPivot, preConditions.rotat, rotationPivot);
   var sourceObject = rotationPivot.sourceObject;
-  if (sourceObject.pivotObject){
-    rotationPivot.position.copy(sourceObject.pivotObject.position);
-    rotationPivot.quaternion.copy(sourceObject.pivotObject.quaternion);
-    rotationPivot.rotation.copy(sourceObject.pivotObject.rotation);
-  }
-  sourceObject.pivotObject = rotationPivot;
-  sourceObject.pivotOffsetX = rotationPivot.offsetX;
-  sourceObject.pivotOffsetY = rotationPivot.offsetY;
-  sourceObject.pivotOffsetZ = rotationPivot.offsetZ;
+  sourceObject.setRotationPivot(rotationPivot);
 }
 
 // Unsets a rotation pivot point for an object set with setRotationPivot API.
@@ -911,10 +883,7 @@ Roygbiv.prototype.unsetRotationPivot = function(object){
   preConditions.checkIfDefined(ROYGBIV.unsetRotationPivot, preConditions.object, object);
   preConditions.checkIfAddedObjectOrObjectGroup(ROYGBIV.unsetRotationPivot, preConditions.object, object);
   preConditions.checkIfHavePivotPoint(ROYGBIV.unsetRotationPivot, preConditions.object, object);
-  delete object.pivotObject;
-  delete object.pivotOffsetX;
-  delete object.pivotOffsetY;
-  delete object.pivotOffsetZ;
+  object.unsetRotationPivot();
 }
 
 // Resets the velocity and angular velocity of an object.

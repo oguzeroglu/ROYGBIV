@@ -2,6 +2,8 @@ var FPSControls = function(params){
   this.isControl = true;
   this.isFPSControls = true;
   this.reusableVec2 = new THREE.Vector2();
+  this.axisY = "y";
+  this.axisX = "x";
   this.keyboardActions = [
     {key: "A", action: this.goLeft},
     {key: "Q", action: this.goLeft},
@@ -90,10 +92,16 @@ FPSControls.prototype.onMouseMove = function(event){
   var movementY = event.movementY || event.mozMovementY || event.webkitMovementY || 0;
   var dx = (-movementX * this.mouseSpeed);
   camera.rotation.y += dx;
+  if (activeControl.hasWeapon1){
+    activeControl.weaponObject1.handleRotation(activeControl.axisY, dx);
+  }
   this.alpha -= dx;
   var dy = -movementY * this.mouseSpeed;
   if (!(dy > 0 && (this.totalXRotation + dy >= 1.10)) && !(dy <0 && (this.totalXRotation + dy <= -1.10))){
     camera.rotation.x += dy;
+    if (activeControl.hasWeapon1){
+      activeControl.weaponObject1.handleRotation(activeControl.axisX, dy);
+    }
     this.totalXRotation += dy;
   }
 }
@@ -332,17 +340,25 @@ FPSControls.prototype.updateGunAlignment = function(gunIndex, x, y, z){
   if (gunIndex == 0){
     obj = this.weaponObject1;
   }
+  if (obj.pivotObject){
+    obj.unsetRotationPivot();
+  }
   obj.untrackObjectPosition();
   REUSABLE_VECTOR.set(x, y, z);
   REUSABLE_VECTOR.unproject(camera);
   obj.setPosition(REUSABLE_VECTOR.x, REUSABLE_VECTOR.y, REUSABLE_VECTOR.z);
   obj.trackObjectPosition(this.playerBodyObject);
+  var pivot = obj.makePivot(camera.position.x - obj.mesh.position.x, camera.position.y - obj.mesh.position.y, camera.position.z - obj.mesh.position.z);
+  obj.setRotationPivot(pivot);
 }
 
 FPSControls.prototype.resetRotation = function(){
   camera.quaternion.set(0, 0, 0, 1);
   this.totalXRotation = 0;
   this.alpha = 0;
+  if (this.hasWeapon1){
+    this.weaponObject1.mesh.quaternion.set(0, 0, 0, 1);
+  }
 }
 
 FPSControls.prototype.onActivated = function(){
