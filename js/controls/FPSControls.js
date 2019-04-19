@@ -27,6 +27,8 @@ var FPSControls = function(params){
   this.crosshairExpandSize = params.crosshairExpandSize; // default: none
   this.crosshairAnimationDelta = params.crosshairAnimationDelta; // default: none
   this.doubleJumpTimeThresholdInMs = params.doubleJumpTimeThresholdInMs; // default: 500
+  this.weaponObject1 = params.weaponObject1; // default: none
+  this.weapon1Position = params.weapon1Position; // default none
 }
 
 FPSControls.prototype.onClick = noop;
@@ -313,6 +315,29 @@ FPSControls.prototype.onMouseUp = function(){
   activeControl.isMouseDown = false;
 }
 
+FPSControls.prototype.updateGunAlignment = function(gunIndex, x, y, z){
+  camera.position.copy(this.playerBodyObject.mesh.position);
+  this.resetRotation();
+  camera.updateMatrix();
+  camera.updateMatrixWorld(true);
+  camera.updateProjectionMatrix();
+  var obj;
+  if (gunIndex == 0){
+    obj = this.weaponObject1;
+  }
+  obj.untrackObjectPosition();
+  REUSABLE_VECTOR.set(x, y, z);
+  REUSABLE_VECTOR.unproject(camera);
+  obj.setPosition(REUSABLE_VECTOR.x, REUSABLE_VECTOR.y, REUSABLE_VECTOR.z);
+  obj.trackObjectPosition(this.playerBodyObject);
+}
+
+FPSControls.prototype.resetRotation = function(){
+  camera.quaternion.set(0, 0, 0, 1);
+  this.totalXRotation = 0;
+  this.alpha = 0;
+}
+
 FPSControls.prototype.onActivated = function(){
   this.isMouseDown = false;
   this.lastTapTime = 0;
@@ -321,9 +346,7 @@ FPSControls.prototype.onActivated = function(){
     right: false, left: false, up: false, down: false
   };
   this.touchTrack = new Map();
-  camera.quaternion.set(0, 0, 0, 1);
-  this.totalXRotation = 0;
-  this.alpha = 0;
+  camera.position.copy(this.playerBodyObject.mesh.position);
   this.playerBodyObject.show();
   this.playerBodyObject.hide(true);
   if (!pointerLockEventHandler.isPointerLocked){
@@ -342,5 +365,11 @@ FPSControls.prototype.onActivated = function(){
     this.hasDoubleJump = true;
   }else{
     this.hasDoubleJump = false;
+  }
+  if (!(typeof this.weaponObject1 == UNDEFINED)){
+    this.hasWeapon1 = true;
+    this.updateGunAlignment(0, this.weapon1Position.x, this.weapon1Position.y, this.weapon1Position.z);
+  }else{
+    this.hasWeapon1 = false;
   }
 }
