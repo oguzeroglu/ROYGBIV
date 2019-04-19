@@ -242,6 +242,9 @@ PhysicsWorkerBridge.prototype.step = function(stepAmount){
 }
 
 PhysicsWorkerBridge.prototype.updateObject = function(obj, isPositionUpdated, isRotationUpdated){
+  if (obj.noMass){
+    return;
+  }
   obj.isPositionDirty = isPositionUpdated;
   obj.isRotationDirty = isRotationUpdated;
   this.updateBuffer.set(obj.name, obj);

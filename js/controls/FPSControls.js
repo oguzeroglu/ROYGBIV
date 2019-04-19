@@ -93,14 +93,14 @@ FPSControls.prototype.onMouseMove = function(event){
   var dx = (-movementX * this.mouseSpeed);
   camera.rotation.y += dx;
   if (activeControl.hasWeapon1){
-    activeControl.weaponObject1.handleRotation(activeControl.axisY, dx);
+    //activeControl.weaponObject1.handleRotation(activeControl.axisY, dx);
   }
   this.alpha -= dx;
   var dy = -movementY * this.mouseSpeed;
   if (!(dy > 0 && (this.totalXRotation + dy >= 1.10)) && !(dy <0 && (this.totalXRotation + dy <= -1.10))){
     camera.rotation.x += dy;
     if (activeControl.hasWeapon1){
-      activeControl.weaponObject1.handleRotation(activeControl.axisX, dy);
+      //activeControl.weaponObject1.handleRotation(activeControl.axisX, dy);
     }
     this.totalXRotation += dy;
   }
