@@ -4,6 +4,7 @@ var FPSControls = function(params){
   this.reusableVec2 = new THREE.Vector2();
   this.axisY = "y";
   this.axisX = "x";
+  this.weapon1InitQuaternion = new THREE.Quaternion();
   this.keyboardActions = [
     {key: "A", action: this.goLeft},
     {key: "Q", action: this.goLeft},
@@ -93,14 +94,14 @@ FPSControls.prototype.onMouseMove = function(event){
   var dx = (-movementX * this.mouseSpeed);
   camera.rotation.y += dx;
   if (activeControl.hasWeapon1){
-    //activeControl.weaponObject1.handleRotation(activeControl.axisY, dx);
+    activeControl.weaponObject1.handleRotation(activeControl.axisY, dx);
   }
   this.alpha -= dx;
   var dy = -movementY * this.mouseSpeed;
   if (!(dy > 0 && (this.totalXRotation + dy >= 1.10)) && !(dy <0 && (this.totalXRotation + dy <= -1.10))){
     camera.rotation.x += dy;
     if (activeControl.hasWeapon1){
-      //activeControl.weaponObject1.handleRotation(activeControl.axisX, dy);
+      activeControl.weaponObject1.handleRotation(activeControl.axisX, dy);
     }
     this.totalXRotation += dy;
   }
@@ -363,7 +364,7 @@ FPSControls.prototype.resetRotation = function(){
   this.totalXRotation = 0;
   this.alpha = 0;
   if (this.hasWeapon1){
-    this.weaponObject1.mesh.quaternion.set(0, 0, 0, 1);
+    this.weaponObject1.mesh.quaternion.copy(this.weapon1InitQuaternion);
   }
 }
 
@@ -397,6 +398,7 @@ FPSControls.prototype.onActivated = function(){
   }
   if (!(typeof this.weaponObject1 == UNDEFINED)){
     this.hasWeapon1 = true;
+    this.weapon1InitQuaternion.copy(this.weaponObject1.mesh.quaternion);
     this.updateGunAlignment(0, this.weapon1Position.x, this.weapon1Position.y, this.weapon1Position.z);
   }else{
     this.hasWeapon1 = false;
