@@ -67,6 +67,17 @@ var AddedObject = function(name, type, metaData, material, mesh, physicsBody, de
 
 }
 
+AddedObject.prototype.setPositionThresholdExceededListener = function(axis, threshold, controlMode, callbackFunction){
+  if (!this.positionThresholdExceededListenerInfo){
+    this.positionThresholdExceededListenerInfo = new Object();
+  }
+  this.positionThresholdExceededListenerInfo.axis = axis.toLowerCase();
+  this.positionThresholdExceededListenerInfo.isActive = true;
+  this.positionThresholdExceededListenerInfo.threshold = threshold;
+  this.positionThresholdExceededListenerInfo.controlMode = controlMode;
+  this.positionThresholdExceededListenerInfo.callbackFunction = callbackFunction.bind(this);
+}
+
 AddedObject.prototype.onFPSWeaponAlignmentUpdate = function(){
   REUSABLE_VECTOR.set(this.fpsWeaponAlignment.x, this.fpsWeaponAlignment.y, this.fpsWeaponAlignment.z);
   REUSABLE_VECTOR.unproject(camera);

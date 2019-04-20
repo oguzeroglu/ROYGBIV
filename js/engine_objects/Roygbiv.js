@@ -4069,14 +4069,7 @@ Roygbiv.prototype.onObjectPositionThresholdExceeded = function(object, axis, thr
   preConditions.checkIfNumber(ROYGBIV.onObjectPositionThresholdExceeded, preConditions.threshold, threshold);
   preConditions.checkIfFunctionOnlyIfExists(ROYGBIV.onObjectPositionThresholdExceeded, preConditions.callbackFunction, callbackFunction);
   preConditions.checkIfTrue(ROYGBIV.onObjectPositionThresholdExceeded, "controlMode must be 1 or 2", (controlMode != 1 && controlMode != 2));
-  if (!object.positionThresholdExceededListenerInfo){
-    object.positionThresholdExceededListenerInfo = new Object();
-  }
-  object.positionThresholdExceededListenerInfo.axis = axis.toLowerCase();
-  object.positionThresholdExceededListenerInfo.isActive = true;
-  object.positionThresholdExceededListenerInfo.threshold = threshold;
-  object.positionThresholdExceededListenerInfo.controlMode = controlMode;
-  object.positionThresholdExceededListenerInfo.callbackFunction = callbackFunction.bind(object);
+  object.setPositionThresholdExceededListener(axis, threshold, controlMode, callbackFunction);
 }
 
 // Removes the position threshold passage listener for an object. Does nothing
