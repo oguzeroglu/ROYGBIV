@@ -163,7 +163,7 @@ var CommandDescriptor = function(){
       0, //printRayStep
       4, //simplifyPhysics
       1, //unsimplifyPhysics
-      2 //fpsWeaponAlignment
+      1 //fpsWeaponAlignment
   ];
 
   this.commandArgumentsExpectedExplanation = [
@@ -329,7 +329,7 @@ var CommandDescriptor = function(){
     "printRayStep", //printRayStep
     "simplifyPhysics objName sizeX sizeY sizeZ", //simplifyPhysics
     "unsimplifyPhysics objName", //unsimplifyPhysics
-    "fpsWeaponAlignment objName show/hide"
+    "fpsWeaponAlignment objName"
   ];
 
   this.commands = [
@@ -661,7 +661,7 @@ var CommandDescriptor = function(){
     "printRayStep: Prints the ray step amount.",
     "simplifyPhysics: Sets the physics of an object to a box shape of sizeX, sizeY, sizeZ sizes. This helps optimizing the performance of the\n  physics engine but causes physics precision loss.",
     "unsimplifyPhysics: Brings back the original physics for an object after the usage of simplifyPhysics command.",
-    "fpsWeaponAlignment: Shows/hides the FPS weapon alignment GUI."
+    "fpsWeaponAlignment: Shows the FPS weapon alignment GUI."
   ];
 
   this.keyboardInfo = [
@@ -1325,7 +1325,6 @@ var CommandDescriptor = function(){
   this.fpsWeaponAlignment = new Object();
   this.fpsWeaponAlignment.types = [];
   this.fpsWeaponAlignment.types.push(this.FPS_WEAPON); // objName
-  this.fpsWeaponAlignment.types.push(this.HIDE_SHOW); // show/hide
 
 };
 

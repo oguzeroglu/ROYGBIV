@@ -71,7 +71,15 @@ var GUIHandler = function(){
     "x": 0.0,
     "y": 0.0,
     "z": 0.0,
-    "scale": 1.0
+    "scale": 1.0,
+    "Done": function(){
+      fpsWeaponAlignmentConfigurationObject.revertPositionAfterFPSWeaponConfigurations();
+      fpsWeaponAlignmentConfigurationObject = 0;
+      guiHandler.hide(guiHandler.guiTypes.FPS_WEAPON_ALIGNMENT);
+      terminal.clear();
+      terminal.printInfo(Text.DONE);
+      terminal.enable();
+    }
   };
   // GUI TYPES DEFINITION
   this.guiTypes = {
@@ -544,6 +552,7 @@ GUIHandler.prototype.initializeFPSWeaponAlignmentGUI = function(){
     fpsWeaponAlignmentConfigurationObject.fpsWeaponAlignment.scale = val;
     fpsWeaponAlignmentConfigurationObject.onFPSWeaponAlignmentUpdate();
   }).listen();
+  guiHandler.datGuiFPSWeaponAlignment.add(guiHandler.fpsWeaponAlignmentParameters, "Done");
 }
 
 GUIHandler.prototype.initializeObjectManipulationGUI = function(){

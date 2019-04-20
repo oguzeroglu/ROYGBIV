@@ -139,6 +139,9 @@ MouseEventHandler.prototype.onClick = function(event, fromTap){
   omGUIFocused = false;
   tmGUIFocused = false;
   if (windowLoaded){
+    if (mode == 0 && fpsWeaponAlignmentConfigurationObject){
+      return;
+    }
     var rect = renderer.getCurrentViewport();
     var rectX = rect.x, rectY = rect.y, rectZ = rect.z, rectW = rect.w;
     if (screenResolution != 1){
