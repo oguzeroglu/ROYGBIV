@@ -37,7 +37,6 @@ FPSControls.prototype.onClick = noop;
 FPSControls.prototype.onSwipe = noop;
 FPSControls.prototype.onPinch = noop;
 FPSControls.prototype.onMouseWheel = noop;
-FPSControls.prototype.onActivated = noop;
 FPSControls.prototype.onKeyUp = noop;
 
 FPSControls.prototype.jump = function(isDouble){
@@ -397,7 +396,9 @@ FPSControls.prototype.onActivated = function(){
   }
   if (!(typeof this.weaponObject1 == UNDEFINED)){
     this.hasWeapon1 = true;
+    this.weaponObject1.mesh.quaternion.set(this.weaponObject1.fpsWeaponAlignment.qx, this.weaponObject1.fpsWeaponAlignment.qy, this.weaponObject1.fpsWeaponAlignment.qz, this.weaponObject1.fpsWeaponAlignment.qw);
     this.weapon1InitQuaternion.copy(this.weaponObject1.mesh.quaternion);
+    this.weaponObject1.mesh.scale.set(this.weaponObject1.fpsWeaponAlignment.scale, this.weaponObject1.fpsWeaponAlignment.scale, this.weaponObject1.fpsWeaponAlignment.scale);
     this.weapon1Position = new THREE.Vector3(this.weaponObject1.fpsWeaponAlignment.x, this.weaponObject1.fpsWeaponAlignment.y, this.weaponObject1.fpsWeaponAlignment.z);
     this.updateGunAlignment(0, this.weapon1Position.x, this.weapon1Position.y, this.weapon1Position.z);
   }else{
