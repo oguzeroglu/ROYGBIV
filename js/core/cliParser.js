@@ -5016,6 +5016,7 @@ function parse(input){
           guiHandler.fpsWeaponAlignmentParameters["Translate x"] = "0";
           guiHandler.fpsWeaponAlignmentParameters["Translate y"] = "0";
           guiHandler.fpsWeaponAlignmentParameters["Translate z"] = "0";
+          guiHandler.fpsWeaponAlignmentParameters["Load from"] = "";
           selectionHandler.resetCurrentSelection();
           guiHandler.show(guiHandler.guiTypes.FPS_WEAPON_ALIGNMENT);
           terminal.printInfo(Text.PRESS_DONE_BUTTON_TO);

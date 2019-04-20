@@ -78,6 +78,7 @@ var GUIHandler = function(){
     "Translate x": "",
     "Translate y": "",
     "Translate z": "",
+    "Load from": "",
     "Reset pos.": function(){
       fpsWeaponAlignmentConfigurationObject.fpsWeaponAlignment.x = 0;
       fpsWeaponAlignmentConfigurationObject.fpsWeaponAlignment.y = 0;
@@ -687,6 +688,31 @@ GUIHandler.prototype.initializeFPSWeaponAlignmentGUI = function(){
     }catch (err){
     }
   });
+  var otherWeaponsArray = [];
+  for (var objName in addedObjects){
+    var obj = addedObjects[objName];
+    if (objName != fpsWeaponAlignmentConfigurationObject.name && obj.isFPSWeapon){
+      otherWeaponsArray.push(objName);
+    }
+  }
+  for (var objName in objectGroups){
+    var obj = objectGroups[objName];
+    if (objName != fpsWeaponAlignmentConfigurationObject.name && obj.isFPSWeapon){
+      otherWeaponsArray.push(objName);
+    }
+  }
+  guiHandler.datGuiFPSWeaponAlignment.add(guiHandler.fpsWeaponAlignmentParameters, "Load from", otherWeaponsArray).onChange(function(val){
+    var obj = addedObjects[val] || objectGroups[val];
+    for (var key in obj.fpsWeaponAlignment){
+      fpsWeaponAlignmentConfigurationObject.fpsWeaponAlignment[key] = obj.fpsWeaponAlignment[key];
+    }
+    fpsWeaponAlignmentConfigurationObject.onFPSWeaponAlignmentUpdate();
+    guiHandler.fpsWeaponAlignmentParameters.x = obj.fpsWeaponAlignment.x;
+    guiHandler.fpsWeaponAlignmentParameters.y = obj.fpsWeaponAlignment.y;
+    guiHandler.fpsWeaponAlignmentParameters.z = obj.fpsWeaponAlignment.z;
+    guiHandler.fpsWeaponAlignmentParameters.scale = obj.fpsWeaponAlignment.scale;
+    guiHandler.datGuiFPSWeaponAlignment.updateDisplay();
+  }).listen();
   guiHandler.datGuiFPSWeaponAlignment.add(guiHandler.fpsWeaponAlignmentParameters, "Reset pos.");
   guiHandler.datGuiFPSWeaponAlignment.add(guiHandler.fpsWeaponAlignmentParameters, "Reset rot.");
   guiHandler.datGuiFPSWeaponAlignment.add(guiHandler.fpsWeaponAlignmentParameters, "Reset scale");
