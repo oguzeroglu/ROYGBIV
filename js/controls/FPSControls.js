@@ -448,6 +448,7 @@ FPSControls.prototype.resetRotation = function(){
 
 FPSControls.prototype.onDeactivated = function(){
   if (this.hasWeapon1){
+    this.weaponObject1.mesh.renderOrder = renderOrders.OBJECT;
     this.weaponObject1.unsetRotationPivot();
     this.weaponObject1.untrackObjectPosition();
     this.weaponObject1.mesh.position.copy(this.weaponObject1.beforeFPSControlsInfo.position);
@@ -455,6 +456,7 @@ FPSControls.prototype.onDeactivated = function(){
     this.weaponObject1.mesh.scale.set(1, 1, 1);
   }
   if (this.hasWeapon2){
+    this.weaponObject2.mesh.renderOrder = renderOrders.OBJECT;
     this.weaponObject2.unsetRotationPivot();
     this.weaponObject2.untrackObjectPosition();
     this.weaponObject2.mesh.position.copy(this.weaponObject2.beforeFPSControlsInfo.position);
@@ -492,6 +494,7 @@ FPSControls.prototype.onActivated = function(){
     this.hasDoubleJump = false;
   }
   if (!(typeof this.weaponObject1 == UNDEFINED)){
+    this.weaponObject1.mesh.renderOrder = renderOrders.FPS_WEAPON;
     var pos = this.weaponObject1.mesh.position;
     var quat = this.weaponObject1.mesh.quaternion;
     this.weaponObject1.beforeFPSControlsInfo = {position: pos.clone(), quaternion: quat.clone()};
@@ -510,6 +513,7 @@ FPSControls.prototype.onActivated = function(){
     this.hasWeapon1 = false;
   }
   if (!(typeof this.weaponObject2 == UNDEFINED)){
+    this.weaponObject2.mesh.renderOrder = renderOrders.FPS_WEAPON;
     var pos = this.weaponObject2.mesh.position;
     var quat = this.weaponObject2.mesh.quaternion;
     this.weaponObject2.beforeFPSControlsInfo = {position: pos.clone(), quaternion: quat.clone()};

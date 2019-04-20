@@ -352,6 +352,7 @@ var fpsWeaponAlignmentConfigurationObject;
 
 // RENDER ORDERS
 var renderOrders = {
+  FPS_WEAPON: -10,
   SKYBOX: -1,
   PARTICLE_SYSTEM: 0,
   GRID: 10,
