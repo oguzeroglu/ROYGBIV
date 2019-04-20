@@ -79,6 +79,9 @@ ModeSwitcher.prototype.commonSwitchFunctions = function(){
   objectsWithMouseOverListeners = new Map();
   objectsWithMouseOutListeners = new Map();
   currentMouseOverObjectName = 0;
+  if (activeControl){
+    activeControl.onDeactivated();
+  }
   activeControl = new FreeControls(defaultControlParameters);
   rayCaster.refresh();
   physicsWorld.refresh();

@@ -405,6 +405,23 @@ FPSControls.prototype.resetRotation = function(){
   }
 }
 
+FPSControls.prototype.onDeactivated = function(){
+  if (this.hasWeapon1){
+    this.weaponObject1.unsetRotationPivot();
+    this.weaponObject1.untrackObjectPosition();
+    this.weaponObject1.mesh.position.copy(this.weaponObject1.beforeFPSControlsInfo.position);
+    this.weaponObject1.mesh.quaternion.copy(this.weaponObject1.beforeFPSControlsInfo.quaternion);
+    this.weaponObject1.mesh.scale.set(1, 1, 1);
+  }
+  if (this.hasWeapon2){
+    this.weaponObject2.unsetRotationPivot();
+    this.weaponObject2.untrackObjectPosition();
+    this.weaponObject2.mesh.position.copy(this.weaponObject2.beforeFPSControlsInfo.position);
+    this.weaponObject2.mesh.quaternion.copy(this.weaponObject2.beforeFPSControlsInfo.quaternion);
+    this.weaponObject2.mesh.scale.set(1, 1, 1);
+  }
+}
+
 FPSControls.prototype.onActivated = function(){
   this.isMouseDown = false;
   this.lastTapTime = 0;
@@ -434,6 +451,9 @@ FPSControls.prototype.onActivated = function(){
     this.hasDoubleJump = false;
   }
   if (!(typeof this.weaponObject1 == UNDEFINED)){
+    var pos = this.weaponObject1.mesh.position;
+    var quat = this.weaponObject1.mesh.quaternion;
+    this.weaponObject1.beforeFPSControlsInfo = {position: pos.clone(), quaternion: quat.clone()};
     this.hasWeapon1 = true;
     this.weaponObject1.mesh.quaternion.set(this.weaponObject1.fpsWeaponAlignment.qx, this.weaponObject1.fpsWeaponAlignment.qy, this.weaponObject1.fpsWeaponAlignment.qz, this.weaponObject1.fpsWeaponAlignment.qw);
     this.weapon1InitQuaternion.copy(this.weaponObject1.mesh.quaternion);
@@ -447,6 +467,9 @@ FPSControls.prototype.onActivated = function(){
     this.hasWeapon1 = false;
   }
   if (!(typeof this.weaponObject2 == UNDEFINED)){
+    var pos = this.weaponObject2.mesh.position;
+    var quat = this.weaponObject2.mesh.quaternion;
+    this.weaponObject2.beforeFPSControlsInfo = {position: pos.clone(), quaternion: quat.clone()};
     this.hasWeapon2 = true;
     this.weaponObject2.mesh.quaternion.set(this.weaponObject2.fpsWeaponAlignment.qx, this.weaponObject2.fpsWeaponAlignment.qy, this.weaponObject2.fpsWeaponAlignment.qz, this.weaponObject2.fpsWeaponAlignment.qw);
     this.weapon2InitQuaternion.copy(this.weaponObject2.mesh.quaternion);

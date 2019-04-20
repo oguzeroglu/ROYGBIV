@@ -18,6 +18,7 @@ var CustomControls = function(params){
 }
 
 CustomControls.prototype.onActivated = noop;
+CustomControls.prototype.onDeactivated = noop;
 
 CustomControls.prototype.onResize = function(){
   this.onResizeFunc();

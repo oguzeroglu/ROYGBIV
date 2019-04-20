@@ -4322,6 +4322,7 @@ Roygbiv.prototype.setActiveControl = function(control){
   var callOnActivated = false;
   if (activeControl !== control){
     callOnActivated = true;
+    activeControl.onDeactivated();
   }
   activeControl = control;
   if (callOnActivated){
