@@ -528,19 +528,19 @@ GUIHandler.prototype.hideAll = function(){
 
 GUIHandler.prototype.initializeFPSWeaponAlignmentGUI = function(){
   guiHandler.datGuiFPSWeaponAlignment = new dat.GUI({hideable: false});
-  guiHandler.datGuiFPSWeaponAlignment.add(guiHandler.fpsWeaponAlignmentParameters, "x").min(-20).max(20).step(0.05).onChange(function(val){
+  guiHandler.datGuiFPSWeaponAlignment.add(guiHandler.fpsWeaponAlignmentParameters, "x").min(-2).max(2).step(0.01).onChange(function(val){
     fpsWeaponAlignmentConfigurationObject.fpsWeaponAlignment.x = val;
     fpsWeaponAlignmentConfigurationObject.onFPSWeaponAlignmentUpdate();
   }).listen();
-  guiHandler.datGuiFPSWeaponAlignment.add(guiHandler.fpsWeaponAlignmentParameters, "y").min(-20).max(20).step(0.05).onChange(function(val){
+  guiHandler.datGuiFPSWeaponAlignment.add(guiHandler.fpsWeaponAlignmentParameters, "y").min(-2).max(2).step(0.01).onChange(function(val){
     fpsWeaponAlignmentConfigurationObject.fpsWeaponAlignment.y = val;
     fpsWeaponAlignmentConfigurationObject.onFPSWeaponAlignmentUpdate();
   }).listen();
-  guiHandler.datGuiFPSWeaponAlignment.add(guiHandler.fpsWeaponAlignmentParameters, "z").min(-20).max(20).step(0.05).onChange(function(val){
+  guiHandler.datGuiFPSWeaponAlignment.add(guiHandler.fpsWeaponAlignmentParameters, "z").min(-2).max(2).step(0.01).onChange(function(val){
     fpsWeaponAlignmentConfigurationObject.fpsWeaponAlignment.z = val;
     fpsWeaponAlignmentConfigurationObject.onFPSWeaponAlignmentUpdate();
   }).listen();
-  guiHandler.datGuiFPSWeaponAlignment.add(guiHandler.fpsWeaponAlignmentParameters, "scale").min(0.01).max(5).step(0.01).onChange(function(val){
+  guiHandler.datGuiFPSWeaponAlignment.add(guiHandler.fpsWeaponAlignmentParameters, "scale").min(0.01).max(2).step(0.005).onChange(function(val){
     fpsWeaponAlignmentConfigurationObject.fpsWeaponAlignment.scale = val;
     fpsWeaponAlignmentConfigurationObject.onFPSWeaponAlignmentUpdate();
   }).listen();

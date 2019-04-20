@@ -76,6 +76,7 @@ AddedObject.prototype.onFPSWeaponAlignmentUpdate = function(){
 
 AddedObject.prototype.revertPositionAfterFPSWeaponConfigurations = function(){
   this.mesh.position.copy(this.positionWhenUsedAsFPSWeapon);
+  this.mesh.scale.set(1, 1, 1);
 }
 
 AddedObject.prototype.setChangeableStatus = function(val){
