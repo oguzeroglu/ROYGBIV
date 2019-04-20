@@ -634,11 +634,19 @@ Terminal.prototype.autocomplete = function(command){
 			break;
 			case commandDescriptor.FPS_WEAPON:
 				for (var objName in addedObjects){
+					var obj = addedObjects[objName];
+					if (!obj.isFPSWeapon){
+						continue;
+					}
 					if (objName.toLowerCase().startsWith(curEntry.toLowerCase())){
 						possibilities.push(objName);
 					}
 				}
 				for (var objName in objectGroups){
+					var obj = objectGroups[objName];
+					if (!obj.isFPSWeapon){
+						continue;
+					}
 					if (objName.toLowerCase().startsWith(curEntry.toLowerCase())){
 						possibilities.push(objName);
 					}

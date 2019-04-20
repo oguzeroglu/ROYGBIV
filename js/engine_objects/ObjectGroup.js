@@ -34,6 +34,17 @@ var ObjectGroup = function(name, group){
   this.lastUpdateQuaternion = new THREE.Quaternion();
 }
 
+ObjectGroup.prototype.onFPSWeaponAlignmentUpdate = function(){
+  REUSABLE_VECTOR.set(this.fpsWeaponAlignment.x, this.fpsWeaponAlignment.y, this.fpsWeaponAlignment.z);
+  REUSABLE_VECTOR.unproject(camera);
+  this.mesh.position.copy(REUSABLE_VECTOR);
+  this.mesh.scale.set(this.fpsWeaponAlignment.scale, this.fpsWeaponAlignment.scale, this.fpsWeaponAlignment.scale);
+}
+
+ObjectGroup.prototype.revertPositionAfterFPSWeaponConfigurations = function(){
+  this.mesh.position.copy(this.positionWhenUsedAsFPSWeapon);
+}
+
 ObjectGroup.prototype.setChangeableStatus = function(val){
   this.isChangeable = val;
 }
@@ -75,7 +86,7 @@ ObjectGroup.prototype.useAsFPSWeapon = function(){
   this.quaternionWhenUsedAsFPSWeapon = this.mesh.quaternion.clone();
   this.physicsPositionWhenUsedAsFPSWeapon = new THREE.Vector3().copy(this.physicsBody.position);
   this.physicsQuaternionWhenUsedAsFPSWeapon = new THREE.Quaternion().copy(this.physicsBody.quaternion);
-  this.fpsWeaponAlignment = {x: 0, y: 0, z: 0};
+  this.fpsWeaponAlignment = {x: 0, y: 0, z: 0, scale: 1};
 }
 
 ObjectGroup.prototype.handleRotation = function(axis, radians){

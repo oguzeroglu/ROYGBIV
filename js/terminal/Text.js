@@ -373,6 +373,7 @@ var Text = function(){
   this.NO_HEIGHT_TEXTURE_MAPPED_TO_THIS_OBJECT = "No height texture mapped to this object.";
   this.NO_OBJECTS_SELECTED_TO_ADJUST_HEIGHT_MAP_SCALE = "No objects selected to adjust height map scale.";
   this.HEIGHT_MAP_BIAS = "Height map bias: @@1";
+  this.GUI_IS_ALREADY_OPEN_FOR_THIS_OBJECT = "GUI is already open for this object.";
   this.GS_CREATION_ERROR_1 = "sizeX and sizeZ must be greater than zero.";
   this.GS_CREATION_ERROR_2 = "sizeX is not multiple of cellSize";
   this.GS_CREATION_ERROR_3 = "sizeZ is not multiple of cellSize";

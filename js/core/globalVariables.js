@@ -348,6 +348,7 @@ var defaultControlParameters = {
 };
 var activeControl;
 var crosshairHandler;
+var fpsWeaponAlignmentConfigurationObject;
 
 // RENDER ORDERS
 var renderOrders = {

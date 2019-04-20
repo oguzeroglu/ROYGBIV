@@ -4995,6 +4995,21 @@ function parse(input){
             terminal.printError(Text.OBJECT_IS_NOT_MARKED_AS_FPS_WEAPON);
             return true;
           }
+          if (fpsWeaponAlignmentConfigurationObject){
+            if (fpsWeaponAlignmentConfigurationObject.name == objName){
+              terminal.printError(Text.GUI_IS_ALREADY_OPEN_FOR_THIS_OBJECT);
+              return true;
+            }
+            fpsWeaponAlignmentConfigurationObject.revertPositionAfterFPSWeaponConfigurations();
+          }
+          camera.quaternion.set(0, 0, 0, 1);
+          fpsWeaponAlignmentConfigurationObject = obj;
+          obj.onFPSWeaponAlignmentUpdate();
+          guiHandler.fpsWeaponAlignmentParameters.x = obj.fpsWeaponAlignment.x;
+          guiHandler.fpsWeaponAlignmentParameters.y = obj.fpsWeaponAlignment.y;
+          guiHandler.fpsWeaponAlignmentParameters.z = obj.fpsWeaponAlignment.z;
+          guiHandler.fpsWeaponAlignmentParameters.scale = obj.fpsWeaponAlignment.scale;
+          guiHandler.show(guiHandler.guiTypes.FPS_WEAPON_ALIGNMENT);
           return true;
         break;
       }
