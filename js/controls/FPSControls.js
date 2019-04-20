@@ -6,6 +6,7 @@ var FPSControls = function(params){
   this.axisY = "y";
   this.axisX = "x";
   this.weapon1InitQuaternion = new THREE.Quaternion();
+  this.weapon2InitQuaternion = new THREE.Quaternion();
   this.keyboardActions = [
     {key: "A", action: this.goLeft},
     {key: "Q", action: this.goLeft},
@@ -32,6 +33,7 @@ var FPSControls = function(params){
   this.crosshairAnimationDelta = params.crosshairAnimationDelta; // default: none
   this.doubleJumpTimeThresholdInMs = params.doubleJumpTimeThresholdInMs; // default: 500
   this.weaponObject1 = params.weaponObject1; // default: none
+  this.weaponObject2 = params.weaponObject2; // default: none;
   this.hasIdleGunAnimation = params.hasIdleGunAnimation; // default: none
   this.idleGunAnimationSpeed = params.idleGunAnimationSpeed; // default: 0.05
 }
@@ -97,12 +99,18 @@ FPSControls.prototype.onMouseMove = function(event){
   if (activeControl.hasWeapon1){
     activeControl.weaponObject1.handleRotation(activeControl.axisY, dx);
   }
+  if (activeControl.hasWeapon2){
+    activeControl.weaponObject2.handleRotation(activeControl.axisY, dx);
+  }
   this.alpha -= dx;
   var dy = -movementY * this.mouseSpeed;
   if (!(dy > 0 && (this.totalXRotation + dy >= 1.10)) && !(dy <0 && (this.totalXRotation + dy <= -1.10))){
     camera.rotation.x += dy;
     if (activeControl.hasWeapon1){
       activeControl.weaponObject1.handleRotation(activeControl.axisX, dy);
+    }
+    if (activeControl.hasWeapon2){
+      activeControl.weaponObject2.handleRotation(activeControl.axisX, dy);
     }
     this.totalXRotation += dy;
   }
@@ -175,12 +183,18 @@ FPSControls.prototype.onRightHandFinger = function(touch){
   if (activeControl.hasWeapon1){
     activeControl.weaponObject1.handleRotation(activeControl.axisY, dx);
   }
+  if (activeControl.hasWeapon2){
+    activeControl.weaponObject2.handleRotation(activeControl.axisY, dx);
+  }
   activeControl.alpha -= dx;
   var dy = -movementY * activeControl.touchLookSpeed;
   if (!(dy > 0 && (activeControl.totalXRotation + dy >= 1.10)) && !(dy <0 && (activeControl.totalXRotation + dy <= -1.10))){
     camera.rotation.x += dy;
     if (activeControl.hasWeapon1){
       activeControl.weaponObject1.handleRotation(activeControl.axisX, dy);
+    }
+    if (activeControl.hasWeapon2){
+      activeControl.weaponObject2.handleRotation(activeControl.axisX, dy);
     }
     activeControl.totalXRotation += dy;
   }
@@ -279,8 +293,14 @@ FPSControls.prototype.update = function(){
   if (this.weapon1IdleAnimationInfo){
     this.weapon1IdleAnimationInfo.x += this.idleGunAnimationSpeed * Math.random();
     this.weapon1IdleAnimationInfo.z += this.idleGunAnimationSpeed * Math.random();
-    this.weaponObject1.handleRotation(activeControl.axisX,  Math.sin(this.weapon1IdleAnimationInfo.x) / 1000 * Math.random());
-    this.weaponObject1.handleRotation(activeControl.axisZ,  Math.sin(this.weapon1IdleAnimationInfo.z) / 1000 * Math.random());
+    this.weaponObject1.handleRotation(activeControl.axisX, Math.sin(this.weapon1IdleAnimationInfo.x) / 1000 * Math.random());
+    this.weaponObject1.handleRotation(activeControl.axisZ, Math.sin(this.weapon1IdleAnimationInfo.z) / 1000 * Math.random());
+  }
+  if (this.weapon2IdleAnimationInfo){
+    this.weapon2IdleAnimationInfo.x += this.idleGunAnimationSpeed * Math.random();
+    this.weapon2IdleAnimationInfo.z += this.idleGunAnimationSpeed * Math.random();
+    this.weaponObject2.handleRotation(activeControl.axisX, Math.sin(this.weapon2IdleAnimationInfo.x) / 1000 * Math.random());
+    this.weaponObject2.handleRotation(activeControl.axisZ, Math.sin(this.weapon2IdleAnimationInfo.z) / 1000 * Math.random());
   }
 }
 
@@ -342,6 +362,10 @@ FPSControls.prototype.onResize = function(){
     var pos = activeControl.weapon1Position;
     activeControl.updateGunAlignment(0, pos.x, pos.y, pos.z);
   }
+  if (activeControl.hasWeapon2){
+    var pos = activeControl.weapon2Position;
+    activeControl.updateGunAlignment(1, pos.x, pos.y, pos.z);
+  }
 }
 
 FPSControls.prototype.updateGunAlignment = function(gunIndex, x, y, z){
@@ -353,6 +377,9 @@ FPSControls.prototype.updateGunAlignment = function(gunIndex, x, y, z){
   var obj;
   if (gunIndex == 0){
     obj = this.weaponObject1;
+  }
+  if (gunIndex == 1){
+    obj = this.weaponObject2;
   }
   if (obj.pivotObject){
     obj.unsetRotationPivot();
@@ -372,6 +399,9 @@ FPSControls.prototype.resetRotation = function(){
   this.alpha = 0;
   if (this.hasWeapon1){
     this.weaponObject1.mesh.quaternion.copy(this.weapon1InitQuaternion);
+  }
+  if (this.hasWeapon2){
+    this.weaponObject2.mesh.quaternion.copy(this.weapon2InitQuaternion);
   }
 }
 
@@ -411,11 +441,22 @@ FPSControls.prototype.onActivated = function(){
     this.weapon1Position = new THREE.Vector3(this.weaponObject1.fpsWeaponAlignment.x, this.weaponObject1.fpsWeaponAlignment.y, this.weaponObject1.fpsWeaponAlignment.z);
     this.updateGunAlignment(0, this.weapon1Position.x, this.weapon1Position.y, this.weapon1Position.z);
     if (this.hasIdleGunAnimation){
-      this.weapon1IdleAnimationInfo = {
-        x: 0, z: 0
-      };
+      this.weapon1IdleAnimationInfo = {x: 0, z: 0};
     }
   }else{
     this.hasWeapon1 = false;
+  }
+  if (!(typeof this.weaponObject2 == UNDEFINED)){
+    this.hasWeapon2 = true;
+    this.weaponObject2.mesh.quaternion.set(this.weaponObject2.fpsWeaponAlignment.qx, this.weaponObject2.fpsWeaponAlignment.qy, this.weaponObject2.fpsWeaponAlignment.qz, this.weaponObject2.fpsWeaponAlignment.qw);
+    this.weapon2InitQuaternion.copy(this.weaponObject2.mesh.quaternion);
+    this.weaponObject2.mesh.scale.set(this.weaponObject2.fpsWeaponAlignment.scale, this.weaponObject2.fpsWeaponAlignment.scale, this.weaponObject2.fpsWeaponAlignment.scale);
+    this.weapon2Position = new THREE.Vector3(this.weaponObject2.fpsWeaponAlignment.x, this.weaponObject2.fpsWeaponAlignment.y, this.weaponObject2.fpsWeaponAlignment.z);
+    this.updateGunAlignment(1, this.weapon2Position.x, this.weapon2Position.y, this.weapon2Position.z);
+    if (this.hasIdleGunAnimation){
+      this.weapon2IdleAnimationInfo = {x: 0, z: 0};
+    }
+  }else{
+    this.hasWeapon2 = false;
   }
 }
