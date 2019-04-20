@@ -36,6 +36,7 @@ var FPSControls = function(params){
   this.weaponObject2 = params.weaponObject2; // default: none;
   this.hasIdleGunAnimation = params.hasIdleGunAnimation; // default: none
   this.idleGunAnimationSpeed = params.idleGunAnimationSpeed; // default: 0.05
+  this.rotationRandomnessOn = params.rotationRandomnessOn; // default: true
 }
 
 FPSControls.prototype.onClick = noop;
@@ -97,20 +98,40 @@ FPSControls.prototype.onMouseMove = function(event){
   var dx = (-movementX * this.mouseSpeed);
   camera.rotation.y += dx;
   if (activeControl.hasWeapon1){
-    activeControl.weaponObject1.handleRotation(activeControl.axisY, dx);
+    var randomness = 0;
+    if (activeControl.rotationRandomnessOn){
+      activeControl.weapon1RotationRandomnessCounter += 0.06 * Math.random();
+      randomness = (Math.random() * (Math.sin(activeControl.weapon1RotationRandomnessCounter) / 400));
+    }
+    activeControl.weaponObject1.handleRotation(activeControl.axisY, dx + randomness);
   }
   if (activeControl.hasWeapon2){
-    activeControl.weaponObject2.handleRotation(activeControl.axisY, dx);
+    var randomness = 0;
+    if (activeControl.rotationRandomnessOn){
+      activeControl.weapon2RotationRandomnessCounter += 0.06 * Math.random();
+      randomness = (Math.random() * (Math.sin(activeControl.weapon2RotationRandomnessCounter) / 400));
+    }
+    activeControl.weaponObject2.handleRotation(activeControl.axisY, dx + randomness);
   }
   this.alpha -= dx;
   var dy = -movementY * this.mouseSpeed;
   if (!(dy > 0 && (this.totalXRotation + dy >= 1.10)) && !(dy <0 && (this.totalXRotation + dy <= -1.10))){
     camera.rotation.x += dy;
     if (activeControl.hasWeapon1){
-      activeControl.weaponObject1.handleRotation(activeControl.axisX, dy);
+      var randomness = 0;
+      if (activeControl.rotationRandomnessOn){
+        activeControl.weapon1RotationRandomnessCounter2 += 0.06 * Math.random();
+        randomness = (Math.random() * (Math.sin(activeControl.weapon1RotationRandomnessCounter2) / 400));
+      }
+      activeControl.weaponObject1.handleRotation(activeControl.axisX, dy + randomness);
     }
     if (activeControl.hasWeapon2){
-      activeControl.weaponObject2.handleRotation(activeControl.axisX, dy);
+      var randomness = 0;
+      if (activeControl.rotationRandomnessOn){
+        activeControl.weapon2RotationRandomnessCounter2 += 0.06 * Math.random();
+        randomness = (Math.random() * (Math.sin(activeControl.weapon2RotationRandomnessCounter2) / 400));
+      }
+      activeControl.weaponObject2.handleRotation(activeControl.axisX, dy + randomness);
     }
     this.totalXRotation += dy;
   }
@@ -181,20 +202,40 @@ FPSControls.prototype.onRightHandFinger = function(touch){
   var dx = -(movementX * activeControl.touchLookSpeed);
   camera.rotation.y += dx;
   if (activeControl.hasWeapon1){
-    activeControl.weaponObject1.handleRotation(activeControl.axisY, dx);
+    var randomness = 0;
+    if (activeControl.rotationRandomnessOn){
+      activeControl.weapon1RotationRandomnessCounter += 0.06 * Math.random();
+      randomness = (Math.random() * (Math.sin(activeControl.weapon1RotationRandomnessCounter) / 400));
+    }
+    activeControl.weaponObject1.handleRotation(activeControl.axisY, dx + randomness);
   }
   if (activeControl.hasWeapon2){
-    activeControl.weaponObject2.handleRotation(activeControl.axisY, dx);
+    var randomness = 0;
+    if (activeControl.rotationRandomnessOn){
+      activeControl.weapon2RotationRandomnessCounter += 0.06 * Math.random();
+      randomness = (Math.random() * (Math.sin(activeControl.weapon2RotationRandomnessCounter) / 400));
+    }
+    activeControl.weaponObject2.handleRotation(activeControl.axisY, dx + randomness);
   }
   activeControl.alpha -= dx;
   var dy = -movementY * activeControl.touchLookSpeed;
   if (!(dy > 0 && (activeControl.totalXRotation + dy >= 1.10)) && !(dy <0 && (activeControl.totalXRotation + dy <= -1.10))){
     camera.rotation.x += dy;
     if (activeControl.hasWeapon1){
-      activeControl.weaponObject1.handleRotation(activeControl.axisX, dy);
+      var randomness = 0;
+      if (activeControl.rotationRandomnessOn){
+        activeControl.weapon1RotationRandomnessCounter2 += 0.06 * Math.random();
+        randomness = (Math.random() * (Math.sin(activeControl.weapon1RotationRandomnessCounter2) / 400));
+      }
+      activeControl.weaponObject1.handleRotation(activeControl.axisX, dy + randomness);
     }
     if (activeControl.hasWeapon2){
-      activeControl.weaponObject2.handleRotation(activeControl.axisX, dy);
+      var randomness = 0;
+      if (activeControl.rotationRandomnessOn){
+        activeControl.weapon2RotationRandomnessCounter2 += 0.06 * Math.random();
+        randomness = (Math.random() * (Math.sin(activeControl.weapon2RotationRandomnessCounter2) / 400));
+      }
+      activeControl.weaponObject2.handleRotation(activeControl.axisX, dy + randomness);
     }
     activeControl.totalXRotation += dy;
   }
@@ -463,6 +504,8 @@ FPSControls.prototype.onActivated = function(){
     if (this.hasIdleGunAnimation){
       this.weapon1IdleAnimationInfo = {x: 0, z: 0};
     }
+    this.weapon1RotationRandomnessCounter = 0;
+    this.weapon1RotationRandomnessCounter2 = 0;
   }else{
     this.hasWeapon1 = false;
   }
@@ -479,6 +522,8 @@ FPSControls.prototype.onActivated = function(){
     if (this.hasIdleGunAnimation){
       this.weapon2IdleAnimationInfo = {x: 0, z: 0};
     }
+    this.weapon2RotationRandomnessCounter = 0;
+    this.weapon2RotationRandomnessCounter2 = 0;
   }else{
     this.hasWeapon2 = false;
   }
