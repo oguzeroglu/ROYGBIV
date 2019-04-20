@@ -2,6 +2,7 @@ var FPSControls = function(params){
   this.isControl = true;
   this.isFPSControls = true;
   this.reusableVec2 = new THREE.Vector2();
+  this.axisZ = "z";
   this.axisY = "y";
   this.axisX = "x";
   this.weapon1InitQuaternion = new THREE.Quaternion();
@@ -31,6 +32,8 @@ var FPSControls = function(params){
   this.crosshairAnimationDelta = params.crosshairAnimationDelta; // default: none
   this.doubleJumpTimeThresholdInMs = params.doubleJumpTimeThresholdInMs; // default: 500
   this.weaponObject1 = params.weaponObject1; // default: none
+  this.hasIdleGunAnimation = params.hasIdleGunAnimation; // default: none
+  this.idleGunAnimationSpeed = params.idleGunAnimationSpeed; // default: 0.05
 }
 
 FPSControls.prototype.onClick = noop;
@@ -273,6 +276,12 @@ FPSControls.prototype.update = function(){
       }
     }
   }
+  if (this.weapon1IdleAnimationInfo){
+    this.weapon1IdleAnimationInfo.x += this.idleGunAnimationSpeed * Math.random();
+    this.weapon1IdleAnimationInfo.z += this.idleGunAnimationSpeed * Math.random();
+    this.weaponObject1.handleRotation(activeControl.axisX,  Math.sin(this.weapon1IdleAnimationInfo.x) / 1000 * Math.random());
+    this.weaponObject1.handleRotation(activeControl.axisZ,  Math.sin(this.weapon1IdleAnimationInfo.z) / 1000 * Math.random());
+  }
 }
 
 FPSControls.prototype.resetJoystickStatus = function(){
@@ -401,6 +410,11 @@ FPSControls.prototype.onActivated = function(){
     this.weaponObject1.mesh.scale.set(this.weaponObject1.fpsWeaponAlignment.scale, this.weaponObject1.fpsWeaponAlignment.scale, this.weaponObject1.fpsWeaponAlignment.scale);
     this.weapon1Position = new THREE.Vector3(this.weaponObject1.fpsWeaponAlignment.x, this.weaponObject1.fpsWeaponAlignment.y, this.weaponObject1.fpsWeaponAlignment.z);
     this.updateGunAlignment(0, this.weapon1Position.x, this.weapon1Position.y, this.weapon1Position.z);
+    if (this.hasIdleGunAnimation){
+      this.weapon1IdleAnimationInfo = {
+        x: 0, z: 0
+      };
+    }
   }else{
     this.hasWeapon1 = false;
   }
