@@ -5002,6 +5002,7 @@ function parse(input){
             }
             fpsWeaponAlignmentConfigurationObject.revertPositionAfterFPSWeaponConfigurations();
           }
+          obj.quaternionBeforeFPSWeaponConfigurationPanelOpened = obj.mesh.quaternion.clone();
           camera.quaternion.set(0, 0, 0, 1);
           fpsWeaponAlignmentConfigurationObject = obj;
           obj.onFPSWeaponAlignmentUpdate();
@@ -5009,6 +5010,9 @@ function parse(input){
           guiHandler.fpsWeaponAlignmentParameters.y = obj.fpsWeaponAlignment.y;
           guiHandler.fpsWeaponAlignmentParameters.z = obj.fpsWeaponAlignment.z;
           guiHandler.fpsWeaponAlignmentParameters.scale = obj.fpsWeaponAlignment.scale;
+          guiHandler.fpsWeaponAlignmentParameters["Rotate x"] = "0";
+          guiHandler.fpsWeaponAlignmentParameters["Rotate y"] = "0";
+          guiHandler.fpsWeaponAlignmentParameters["Rotate z"] = "0";
           selectionHandler.resetCurrentSelection();
           guiHandler.show(guiHandler.guiTypes.FPS_WEAPON_ALIGNMENT);
           terminal.printInfo(Text.PRESS_DONE_BUTTON_TO);

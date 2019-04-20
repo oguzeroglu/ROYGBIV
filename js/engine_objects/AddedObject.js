@@ -71,12 +71,15 @@ AddedObject.prototype.onFPSWeaponAlignmentUpdate = function(){
   REUSABLE_VECTOR.set(this.fpsWeaponAlignment.x, this.fpsWeaponAlignment.y, this.fpsWeaponAlignment.z);
   REUSABLE_VECTOR.unproject(camera);
   this.mesh.position.copy(REUSABLE_VECTOR);
+  this.mesh.quaternion.set(this.fpsWeaponAlignment.qx, this.fpsWeaponAlignment.qy, this.fpsWeaponAlignment.qz, this.fpsWeaponAlignment.qw);
   this.mesh.scale.set(this.fpsWeaponAlignment.scale, this.fpsWeaponAlignment.scale, this.fpsWeaponAlignment.scale);
 }
 
 AddedObject.prototype.revertPositionAfterFPSWeaponConfigurations = function(){
   this.mesh.position.copy(this.positionWhenUsedAsFPSWeapon);
+  this.mesh.quaternion.copy(this.quaternionBeforeFPSWeaponConfigurationPanelOpened);
   this.mesh.scale.set(1, 1, 1);
+  delete this.quaternionBeforeFPSWeaponConfigurationPanelOpened;
 }
 
 AddedObject.prototype.setChangeableStatus = function(val){
@@ -121,7 +124,7 @@ AddedObject.prototype.useAsFPSWeapon = function(){
   this.quaternionWhenUsedAsFPSWeapon = this.mesh.quaternion.clone();
   this.physicsPositionWhenUsedAsFPSWeapon = new THREE.Vector3().copy(this.physicsBody.position);
   this.physicsQuaternionWhenUsedAsFPSWeapon = new THREE.Quaternion().copy(this.physicsBody.quaternion);
-  this.fpsWeaponAlignment = {x: 0, y: 0, z: 0, scale: 1};
+  this.fpsWeaponAlignment = {x: 0, y: 0, z: 0, scale: 1, qx: 0, qy: 0, qz: 0, qw: 1};
 }
 
 AddedObject.prototype.handleRotation = function(axis, radians){

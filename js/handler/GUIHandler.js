@@ -72,6 +72,32 @@ var GUIHandler = function(){
     "y": 0.0,
     "z": 0.0,
     "scale": 1.0,
+    "Rotate x": "",
+    "Rotate y": "",
+    "Rotate z": "",
+    "Reset pos.": function(){
+      fpsWeaponAlignmentConfigurationObject.fpsWeaponAlignment.x = 0;
+      fpsWeaponAlignmentConfigurationObject.fpsWeaponAlignment.y = 0;
+      fpsWeaponAlignmentConfigurationObject.fpsWeaponAlignment.z = 0;
+      fpsWeaponAlignmentConfigurationObject.onFPSWeaponAlignmentUpdate();
+      guiHandler.fpsWeaponAlignmentParameters.x = 0;
+      guiHandler.fpsWeaponAlignmentParameters.y = 0;
+      guiHandler.fpsWeaponAlignmentParameters.z = 0;
+      guiHandler.datGuiFPSWeaponAlignment.updateDisplay();
+    },
+    "Reset rot.": function(){
+      fpsWeaponAlignmentConfigurationObject.fpsWeaponAlignment.qx = 0;
+      fpsWeaponAlignmentConfigurationObject.fpsWeaponAlignment.qy = 0;
+      fpsWeaponAlignmentConfigurationObject.fpsWeaponAlignment.qz = 0;
+      fpsWeaponAlignmentConfigurationObject.fpsWeaponAlignment.qw = 1;
+      fpsWeaponAlignmentConfigurationObject.onFPSWeaponAlignmentUpdate();
+    },
+    "Reset scale": function(){
+      fpsWeaponAlignmentConfigurationObject.fpsWeaponAlignment.scale = 1;
+      fpsWeaponAlignmentConfigurationObject.onFPSWeaponAlignmentUpdate();
+      guiHandler.fpsWeaponAlignmentParameters.scale = 1;
+      guiHandler.datGuiFPSWeaponAlignment.updateDisplay();
+    },
     "Done": function(){
       fpsWeaponAlignmentConfigurationObject.revertPositionAfterFPSWeaponConfigurations();
       fpsWeaponAlignmentConfigurationObject = 0;
@@ -552,6 +578,60 @@ GUIHandler.prototype.initializeFPSWeaponAlignmentGUI = function(){
     fpsWeaponAlignmentConfigurationObject.fpsWeaponAlignment.scale = val;
     fpsWeaponAlignmentConfigurationObject.onFPSWeaponAlignmentUpdate();
   }).listen();
+  guiHandler.datGuiFPSWeaponAlignment.add(guiHandler.fpsWeaponAlignmentParameters, "Rotate x").onFinishChange(function(val){
+    var rotVal;
+    try{
+      rotVal = parseFloat(eval(val));
+      if (!(typeof rotVal == UNDEFINED) && !isNaN(rotVal)){
+        fpsWeaponAlignmentConfigurationObject.mesh.rotateX(rotVal);
+        fpsWeaponAlignmentConfigurationObject.fpsWeaponAlignment.qx = fpsWeaponAlignmentConfigurationObject.mesh.quaternion.x;
+        fpsWeaponAlignmentConfigurationObject.fpsWeaponAlignment.qy = fpsWeaponAlignmentConfigurationObject.mesh.quaternion.y;
+        fpsWeaponAlignmentConfigurationObject.fpsWeaponAlignment.qz = fpsWeaponAlignmentConfigurationObject.mesh.quaternion.z;
+        fpsWeaponAlignmentConfigurationObject.fpsWeaponAlignment.qw = fpsWeaponAlignmentConfigurationObject.mesh.quaternion.w;
+        fpsWeaponAlignmentConfigurationObject.onFPSWeaponAlignmentUpdate();
+        guiHandler.fpsWeaponAlignmentParameters["Rotate x"] = 0;
+        guiHandler.datGuiFPSWeaponAlignment.updateDisplay();
+      }
+    }catch (err){
+    }
+  });
+  guiHandler.datGuiFPSWeaponAlignment.add(guiHandler.fpsWeaponAlignmentParameters, "Rotate y").onFinishChange(function(val){
+    var rotVal;
+    try{
+      rotVal = parseFloat(eval(val));
+      if (!(typeof rotVal == UNDEFINED) && !isNaN(rotVal)){
+        fpsWeaponAlignmentConfigurationObject.mesh.rotateY(rotVal);
+        fpsWeaponAlignmentConfigurationObject.fpsWeaponAlignment.qx = fpsWeaponAlignmentConfigurationObject.mesh.quaternion.x;
+        fpsWeaponAlignmentConfigurationObject.fpsWeaponAlignment.qy = fpsWeaponAlignmentConfigurationObject.mesh.quaternion.y;
+        fpsWeaponAlignmentConfigurationObject.fpsWeaponAlignment.qz = fpsWeaponAlignmentConfigurationObject.mesh.quaternion.z;
+        fpsWeaponAlignmentConfigurationObject.fpsWeaponAlignment.qw = fpsWeaponAlignmentConfigurationObject.mesh.quaternion.w;
+        fpsWeaponAlignmentConfigurationObject.onFPSWeaponAlignmentUpdate();
+        guiHandler.fpsWeaponAlignmentParameters["Rotate y"] = 0;
+        guiHandler.datGuiFPSWeaponAlignment.updateDisplay();
+      }
+    }catch (err){
+    }
+  });
+  guiHandler.datGuiFPSWeaponAlignment.add(guiHandler.fpsWeaponAlignmentParameters, "Rotate z").onFinishChange(function(val){
+    var rotVal;
+    try{
+      rotVal = parseFloat(eval(val));
+      if (!(typeof rotVal == UNDEFINED) && !isNaN(rotVal)){
+        fpsWeaponAlignmentConfigurationObject.mesh.rotateZ(rotVal);
+        fpsWeaponAlignmentConfigurationObject.fpsWeaponAlignment.qx = fpsWeaponAlignmentConfigurationObject.mesh.quaternion.x;
+        fpsWeaponAlignmentConfigurationObject.fpsWeaponAlignment.qy = fpsWeaponAlignmentConfigurationObject.mesh.quaternion.y;
+        fpsWeaponAlignmentConfigurationObject.fpsWeaponAlignment.qz = fpsWeaponAlignmentConfigurationObject.mesh.quaternion.z;
+        fpsWeaponAlignmentConfigurationObject.fpsWeaponAlignment.qw = fpsWeaponAlignmentConfigurationObject.mesh.quaternion.w;
+        fpsWeaponAlignmentConfigurationObject.onFPSWeaponAlignmentUpdate();
+        guiHandler.fpsWeaponAlignmentParameters["Rotate z"] = 0;
+        guiHandler.datGuiFPSWeaponAlignment.updateDisplay();
+      }
+    }catch (err){
+    }
+  });
+  guiHandler.datGuiFPSWeaponAlignment.add(guiHandler.fpsWeaponAlignmentParameters, "Reset pos.");
+  guiHandler.datGuiFPSWeaponAlignment.add(guiHandler.fpsWeaponAlignmentParameters, "Reset rot.");
+  guiHandler.datGuiFPSWeaponAlignment.add(guiHandler.fpsWeaponAlignmentParameters, "Reset scale");
   guiHandler.datGuiFPSWeaponAlignment.add(guiHandler.fpsWeaponAlignmentParameters, "Done");
 }
 
