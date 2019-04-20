@@ -32,7 +32,7 @@ AutoInstancingHandler.prototype.handle = function(){
   var countersByObjectKey = new Object();
   for (var objName in addedObjects){
     var obj = addedObjects[objName];
-    if (obj.isChangeable || (!obj.noMass && obj.physicsBody.mass > 0)){
+    if (!obj.isFPSWeapon && (obj.isChangeable || (!obj.noMass && obj.physicsBody.mass > 0))){
       var objKey = this.getObjectKey(obj);
       if (typeof countersByObjectKey[objKey] == UNDEFINED){
         countersByObjectKey[objKey] = 0;
