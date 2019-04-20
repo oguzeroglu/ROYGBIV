@@ -5013,10 +5013,14 @@ function parse(input){
           guiHandler.fpsWeaponAlignmentParameters["Rotate x"] = "0";
           guiHandler.fpsWeaponAlignmentParameters["Rotate y"] = "0";
           guiHandler.fpsWeaponAlignmentParameters["Rotate z"] = "0";
+          guiHandler.fpsWeaponAlignmentParameters["Translate x"] = "0";
+          guiHandler.fpsWeaponAlignmentParameters["Translate y"] = "0";
+          guiHandler.fpsWeaponAlignmentParameters["Translate z"] = "0";
           selectionHandler.resetCurrentSelection();
           guiHandler.show(guiHandler.guiTypes.FPS_WEAPON_ALIGNMENT);
           terminal.printInfo(Text.PRESS_DONE_BUTTON_TO);
           terminal.disable();
+          activeControl = new CustomControls({});
           return true;
         break;
       }

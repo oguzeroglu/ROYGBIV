@@ -44,7 +44,7 @@ KeyboardEventHandler.prototype.onKeyUp = function(event){
       }
     break;
     case 16: //SHIFT
-      if (mode == 0){
+      if (mode == 0 && !fpsWeaponAlignmentConfigurationObject){
         for (var objName in addedObjects){
           addedObjects[objName].mesh.visible = true;
         }
@@ -90,7 +90,7 @@ KeyboardEventHandler.prototype.onKeyDown = function(event){
   }
   switch(event.keyCode){
     case 16: //SHIFT
-      if (mode == 0 && !isDeployment){
+      if (mode == 0 && !isDeployment && !fpsWeaponAlignmentConfigurationObject){
         selectionHandler.resetCurrentSelection();
         for (var objName in addedObjects){
           addedObjects[objName].mesh.visible = false;

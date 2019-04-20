@@ -1,20 +1,20 @@
 var CustomControls = function(params){
   this.isControl = true;
-  this.onClickFunc = params.onClick;
-  this.onTapFunc = params.onTap;
-  this.onSwipeFunc = params.onSwipe;
-  this.onPinchFunc = params.onPinch;
-  this.onMouseWheelFunc = params.onMouseWheel;
-  this.onUpdateFunc = params.onUpdate;
-  this.onMouseMoveFunc = params.onMouseMove;
-  this.onMouseDownFunc = params.onMouseDown;
-  this.onMouseUpFunc = params.onMouseUp;
-  this.onTouchStartFunc = params.onTouchStart;
-  this.onTouchMoveFunc = params.onTouchMove;
-  this.onTouchEndFunc = params.onTouchEnd;
-  this.onKeyUpFunc = params.onKeyUp;
-  this.onKeyDownFunc = params.onKeyDown;
-  this.onResizeFunc = params.onResize;
+  this.onClickFunc = params.onClick || noop;
+  this.onTapFunc = params.onTap || noop;
+  this.onSwipeFunc = params.onSwipe || noop;
+  this.onPinchFunc = params.onPinch || noop;
+  this.onMouseWheelFunc = params.onMouseWheel || noop;
+  this.onUpdateFunc = params.onUpdate || noop;
+  this.onMouseMoveFunc = params.onMouseMove || noop;
+  this.onMouseDownFunc = params.onMouseDown || noop;
+  this.onMouseUpFunc = params.onMouseUp || noop;
+  this.onTouchStartFunc = params.onTouchStart || noop;
+  this.onTouchMoveFunc = params.onTouchMove || noop;
+  this.onTouchEndFunc = params.onTouchEnd || noop;
+  this.onKeyUpFunc = params.onKeyUp || noop;
+  this.onKeyDownFunc = params.onKeyDown || noop;
+  this.onResizeFunc = params.onResize || noop;
 }
 
 CustomControls.prototype.onActivated = noop;

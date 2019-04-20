@@ -75,6 +75,9 @@ var GUIHandler = function(){
     "Rotate x": "",
     "Rotate y": "",
     "Rotate z": "",
+    "Translate x": "",
+    "Translate y": "",
+    "Translate z": "",
     "Reset pos.": function(){
       fpsWeaponAlignmentConfigurationObject.fpsWeaponAlignment.x = 0;
       fpsWeaponAlignmentConfigurationObject.fpsWeaponAlignment.y = 0;
@@ -105,6 +108,7 @@ var GUIHandler = function(){
       terminal.clear();
       terminal.printInfo(Text.DONE);
       terminal.enable();
+      activeControl = new FreeControls(defaultControlParameters);
     }
   };
   // GUI TYPES DEFINITION
@@ -589,7 +593,7 @@ GUIHandler.prototype.initializeFPSWeaponAlignmentGUI = function(){
         fpsWeaponAlignmentConfigurationObject.fpsWeaponAlignment.qz = fpsWeaponAlignmentConfigurationObject.mesh.quaternion.z;
         fpsWeaponAlignmentConfigurationObject.fpsWeaponAlignment.qw = fpsWeaponAlignmentConfigurationObject.mesh.quaternion.w;
         fpsWeaponAlignmentConfigurationObject.onFPSWeaponAlignmentUpdate();
-        guiHandler.fpsWeaponAlignmentParameters["Rotate x"] = 0;
+        guiHandler.fpsWeaponAlignmentParameters["Rotate x"] = "0";
         guiHandler.datGuiFPSWeaponAlignment.updateDisplay();
       }
     }catch (err){
@@ -606,7 +610,7 @@ GUIHandler.prototype.initializeFPSWeaponAlignmentGUI = function(){
         fpsWeaponAlignmentConfigurationObject.fpsWeaponAlignment.qz = fpsWeaponAlignmentConfigurationObject.mesh.quaternion.z;
         fpsWeaponAlignmentConfigurationObject.fpsWeaponAlignment.qw = fpsWeaponAlignmentConfigurationObject.mesh.quaternion.w;
         fpsWeaponAlignmentConfigurationObject.onFPSWeaponAlignmentUpdate();
-        guiHandler.fpsWeaponAlignmentParameters["Rotate y"] = 0;
+        guiHandler.fpsWeaponAlignmentParameters["Rotate y"] = "0";
         guiHandler.datGuiFPSWeaponAlignment.updateDisplay();
       }
     }catch (err){
@@ -623,7 +627,61 @@ GUIHandler.prototype.initializeFPSWeaponAlignmentGUI = function(){
         fpsWeaponAlignmentConfigurationObject.fpsWeaponAlignment.qz = fpsWeaponAlignmentConfigurationObject.mesh.quaternion.z;
         fpsWeaponAlignmentConfigurationObject.fpsWeaponAlignment.qw = fpsWeaponAlignmentConfigurationObject.mesh.quaternion.w;
         fpsWeaponAlignmentConfigurationObject.onFPSWeaponAlignmentUpdate();
-        guiHandler.fpsWeaponAlignmentParameters["Rotate z"] = 0;
+        guiHandler.fpsWeaponAlignmentParameters["Rotate z"] = "0";
+        guiHandler.datGuiFPSWeaponAlignment.updateDisplay();
+      }
+    }catch (err){
+    }
+  });
+  guiHandler.datGuiFPSWeaponAlignment.add(guiHandler.fpsWeaponAlignmentParameters, "Translate x").onFinishChange(function(val){
+    var translateVal;
+    try{
+      translateVal = parseFloat(eval(val));
+      if (!(typeof translateVal == UNDEFINED) && !isNaN(translateVal)){
+        fpsWeaponAlignmentConfigurationObject.mesh.translateX(translateVal);
+        REUSABLE_VECTOR.copy(fpsWeaponAlignmentConfigurationObject.mesh.position);
+        REUSABLE_VECTOR.project(camera);
+        fpsWeaponAlignmentConfigurationObject.fpsWeaponAlignment.x = REUSABLE_VECTOR.x;
+        fpsWeaponAlignmentConfigurationObject.fpsWeaponAlignment.y = REUSABLE_VECTOR.y;
+        fpsWeaponAlignmentConfigurationObject.fpsWeaponAlignment.z = REUSABLE_VECTOR.z;
+        fpsWeaponAlignmentConfigurationObject.onFPSWeaponAlignmentUpdate();
+        guiHandler.fpsWeaponAlignmentParameters["Translate x"] = "0";
+        guiHandler.datGuiFPSWeaponAlignment.updateDisplay();
+      }
+    }catch (err){
+    }
+  });
+  guiHandler.datGuiFPSWeaponAlignment.add(guiHandler.fpsWeaponAlignmentParameters, "Translate y").onFinishChange(function(val){
+    var translateVal;
+    try{
+      translateVal = parseFloat(eval(val));
+      if (!(typeof translateVal == UNDEFINED) && !isNaN(translateVal)){
+        fpsWeaponAlignmentConfigurationObject.mesh.translateY(translateVal);
+        REUSABLE_VECTOR.copy(fpsWeaponAlignmentConfigurationObject.mesh.position);
+        REUSABLE_VECTOR.project(camera);
+        fpsWeaponAlignmentConfigurationObject.fpsWeaponAlignment.x = REUSABLE_VECTOR.x;
+        fpsWeaponAlignmentConfigurationObject.fpsWeaponAlignment.y = REUSABLE_VECTOR.y;
+        fpsWeaponAlignmentConfigurationObject.fpsWeaponAlignment.z = REUSABLE_VECTOR.z;
+        fpsWeaponAlignmentConfigurationObject.onFPSWeaponAlignmentUpdate();
+        guiHandler.fpsWeaponAlignmentParameters["Translate y"] = "0";
+        guiHandler.datGuiFPSWeaponAlignment.updateDisplay();
+      }
+    }catch (err){
+    }
+  });
+  guiHandler.datGuiFPSWeaponAlignment.add(guiHandler.fpsWeaponAlignmentParameters, "Translate z").onFinishChange(function(val){
+    var translateVal;
+    try{
+      translateVal = parseFloat(eval(val));
+      if (!(typeof translateVal == UNDEFINED) && !isNaN(translateVal)){
+        fpsWeaponAlignmentConfigurationObject.mesh.translateZ(translateVal);
+        REUSABLE_VECTOR.copy(fpsWeaponAlignmentConfigurationObject.mesh.position);
+        REUSABLE_VECTOR.project(camera);
+        fpsWeaponAlignmentConfigurationObject.fpsWeaponAlignment.x = REUSABLE_VECTOR.x;
+        fpsWeaponAlignmentConfigurationObject.fpsWeaponAlignment.y = REUSABLE_VECTOR.y;
+        fpsWeaponAlignmentConfigurationObject.fpsWeaponAlignment.z = REUSABLE_VECTOR.z;
+        fpsWeaponAlignmentConfigurationObject.onFPSWeaponAlignmentUpdate();
+        guiHandler.fpsWeaponAlignmentParameters["Translate z"] = "0";
         guiHandler.datGuiFPSWeaponAlignment.updateDisplay();
       }
     }catch (err){

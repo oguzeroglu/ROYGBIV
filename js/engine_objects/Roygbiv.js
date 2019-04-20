@@ -4309,24 +4309,7 @@ Roygbiv.prototype.createCustomControl = function(parameters){
   preConditions.checkIfFunctionOnlyIfExists(ROYGBIV.createCustomControl, preConditions.onKeyDown, parameters.onKeyDown);
   preConditions.checkIfFunctionOnlyIfExists(ROYGBIV.createCustomControl, preConditions.onResize, parameters.onResize);
   preConditions.checkIfFunctionOnlyIfExists(ROYGBIV.createCustomControl, preConditions.onKeyUp, parameters.onKeyUp);
-  var params = {
-    onClick: (!(typeof parameters.onClick == UNDEFINED))? parameters.onClick: noop,
-    onTap: (!(typeof parameters.onTap == UNDEFINED))? parameters.onTap: noop,
-    onSwipe: (!(typeof parameters.onSwipe == UNDEFINED))? parameters.onSwipe: noop,
-    onPinch: (!(typeof parameters.onPinch == UNDEFINED))? parameters.onPinch: noop,
-    onMouseWheel: (!(typeof parameters.onMouseWheel == UNDEFINED))? parameters.onMouseWheel: noop,
-    onMouseMove: (!(typeof parameters.onMouseMove == UNDEFINED))? parameters.onMouseMove: noop,
-    onMouseDown: (!(typeof parameters.onMouseDown == UNDEFINED))? parameters.onMouseDown: noop,
-    onMouseUp: (!(typeof parameters.onMouseUp == UNDEFINED))? parameters.onMouseUp: noop,
-    onTouchStart: (!(typeof parameters.onTouchStart == UNDEFINED))? parameters.onTouchStart: noop,
-    onTouchMove: (!(typeof parameters.onTouchMove == UNDEFINED))? parameters.onTouchMove: noop,
-    onTouchEnd: (!(typeof parameters.onTouchEnd == UNDEFINED))? parameters.onTouchEnd: noop,
-    onUpdate: (!(typeof parameters.onUpdate == UNDEFINED))? parameters.onUpdate: noop,
-    onKeyDown: (!(typeof parameters.onKeyDown == UNDEFINED))? parameters.onKeyDown: noop,
-    onKeyUp: (!(typeof parameters.onKeyUp == UNDEFINED))? parameters.onKeyUp: noop,
-    onResize: (!(typeof parameters.onResize == UNDEFINED))? parameters.onResize: noop
-  }
-  return new CustomControls(params);
+  return new CustomControls(parameters);
 }
 
 // Sets the active control.
