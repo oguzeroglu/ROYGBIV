@@ -4281,6 +4281,8 @@ Roygbiv.prototype.createFreeControl = function(parameters){
 // onKeyUp (optional): Function to be executed with the key up event when the user performs a key up. Default
 // value is noop.
 // onResize (optional): Function to be executed when the screen is resized. Default value is noop.
+// onFullScreenChange (optional): Function to be executed with the isFullScreen parameter when the
+// fullscreen status of the screen is changed. Default value is noop.
 // onUpdate (optional): Function to be executed on each frame. Default value is noop.
 Roygbiv.prototype.createCustomControl = function(parameters){
   if (mode == 0){
@@ -4301,6 +4303,7 @@ Roygbiv.prototype.createCustomControl = function(parameters){
   preConditions.checkIfFunctionOnlyIfExists(ROYGBIV.createCustomControl, preConditions.onUpdate, parameters.onUpdate);
   preConditions.checkIfFunctionOnlyIfExists(ROYGBIV.createCustomControl, preConditions.onKeyDown, parameters.onKeyDown);
   preConditions.checkIfFunctionOnlyIfExists(ROYGBIV.createCustomControl, preConditions.onResize, parameters.onResize);
+  preConditions.checkIfFunctionOnlyIfExists(ROYGBIV.createCustomControl, preConditions.onFullScreenChange, parameters.onFullScreenChange);
   preConditions.checkIfFunctionOnlyIfExists(ROYGBIV.createCustomControl, preConditions.onKeyUp, parameters.onKeyUp);
   return new CustomControls(parameters);
 }

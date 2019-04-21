@@ -42,6 +42,7 @@ var FPSControls = function(params){
   this.shootableObjects = params.shootableObjects;
   this.onPause = params.onPause;
   this.onResume = params.onResume;
+  this.requestFullScreen = params.requestFullScreen;
   if (typeof this.mouseSpeed == UNDEFINED){
     this.mouseSpeed = 0.002;
   }
@@ -96,6 +97,10 @@ var FPSControls = function(params){
   if (typeof this.onResume == UNDEFINED){
     this.onResume = noop;
   }
+  if (typeof this.requestFullScreen == UNDEFINED){
+    this.requestFullScreen = true;
+    fullScreenRequested = true;
+  }
 }
 
 FPSControls.prototype.onClick = noop;
@@ -103,6 +108,12 @@ FPSControls.prototype.onSwipe = noop;
 FPSControls.prototype.onPinch = noop;
 FPSControls.prototype.onMouseWheel = noop;
 FPSControls.prototype.onKeyUp = noop;
+
+FPSControls.prototype.onFullScreenChange = function(isFullScreen){
+  if (activeControl.requestFullScreen && !isFullScreen){
+    fullScreenRequested = true;
+  }
+}
 
 FPSControls.prototype.jump = function(isDouble){
   if ((!isDouble && activeControl.canJump) || (isDouble && activeControl.canDoubleJump)){

@@ -965,6 +965,7 @@ this.ROYGBIV_SCRIPTING_API_CREATECUSTOMCONTROL = "Creates a CustomControl implem
                                                  "onTouchMove (optional): Function to be executed with the TouchEvent when the user performs a touch move. Default value is noop.\n"+
                                                  "onTouchEnd (optional): Function to be executed with the TouchEvent when the user performs a touch end. Default value is noop.\n"+
                                                  "onResize (optional): Function to be executed when the screen is resized. Default value is noop.\n"+
+                                                 "onFullScreenChange (optional): Function to be executed with the isFullScreen parameter when the fullscreen status of the screen is\nchanged. Default value is noop.\n"+
                                                  "onUpdate (optional): Function to be executed on each frame. Default value is noop.";
 this.ROYGBIV_SCRIPTING_API_SETACTIVECONTROL = "Sets the active control.";
 }

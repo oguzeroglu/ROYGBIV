@@ -15,7 +15,8 @@ window.onload = function() {
     var mandatoryControlMethods = [
       "update", "onMouseWheel", "onMouseMove", "onMouseDown", "onMouseUp",
       "onPinch", "onSwipe", "onTap", "onClick", "onActivated", "onDeactivated",
-      "onTouchStart", "onTouchMove", "onTouchEnd", "onKeyDown", "onKeyUp", "onResize"
+      "onTouchStart", "onTouchMove", "onTouchEnd", "onKeyDown", "onKeyUp", "onResize",
+      "onFullScreenChange"
     ];
     for (var i = 0; i<controlClasses.length; i++){
       for (var i2 = 0; i2<mandatoryControlMethods.length; i2++){
