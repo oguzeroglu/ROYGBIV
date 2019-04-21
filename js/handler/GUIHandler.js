@@ -579,7 +579,7 @@ GUIHandler.prototype.initializeFPSWeaponAlignmentGUI = function(){
     fpsWeaponAlignmentConfigurationObject.fpsWeaponAlignment.z = val;
     fpsWeaponAlignmentConfigurationObject.onFPSWeaponAlignmentUpdate();
   }).listen();
-  guiHandler.datGuiFPSWeaponAlignment.add(guiHandler.fpsWeaponAlignmentParameters, "scale").min(0.01).max(2).step(0.005).onChange(function(val){
+  guiHandler.datGuiFPSWeaponAlignment.add(guiHandler.fpsWeaponAlignmentParameters, "scale").min(0.001).max(1).step(0.001).onChange(function(val){
     fpsWeaponAlignmentConfigurationObject.fpsWeaponAlignment.scale = val;
     fpsWeaponAlignmentConfigurationObject.onFPSWeaponAlignmentUpdate();
   }).listen();
