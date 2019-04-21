@@ -4230,6 +4230,7 @@ Roygbiv.prototype.showText = function(text){
 // translateYAmount (optional): Translation amount on Y axis for E-Space keys. Default is 3.
 // mouseWheelSpeed (optional): Translation speed for mousewheel zoom in/out. Default is 1.
 // swipeSpeed (optional): Rotation speed for look with touch events on mobile. Default is 0.002.
+// requestFullScreen (optional): If true, fullscreen mode is requested automatically. Default is false.
 Roygbiv.prototype.createFreeControl = function(parameters){
   if (mode == 0){
     return;
@@ -4242,6 +4243,7 @@ Roygbiv.prototype.createFreeControl = function(parameters){
   preConditions.checkIfNumberOnlyIfExists(ROYGBIV.createFreeControl, preConditions.translateYAmount, parameters.translateYAmount);
   preConditions.checkIfNumberOnlyIfExists(ROYGBIV.createFreeControl, preConditions.mouseWheelSpeed, parameters.mouseWheelSpeed);
   preConditions.checkIfNumberOnlyIfExists(ROYGBIV.createFreeControl, preConditions.swipeSpeed, parameters.swipeSpeed);
+  preConditions.checkIfBooleanOnlyIfExists(ROYGBIV.createFreeControl, preConditions.requestFullScreen, parameters.requestFullScreen);
   var params = {
     rotationYDelta: (!(typeof parameters.rotationYDelta == UNDEFINED))? parameters.rotationYDelta: 0.07,
     rotationXDelta: (!(typeof parameters.rotationXDelta == UNDEFINED))? parameters.rotationXDelta: 0.07,
@@ -4249,7 +4251,8 @@ Roygbiv.prototype.createFreeControl = function(parameters){
     translateXAmount: (!(typeof parameters.translateXAmount == UNDEFINED))? parameters.translateXAmount: 3,
     translateYAmount: (!(typeof parameters.translateYAmount == UNDEFINED))? parameters.translateYAmount: 3,
     mouseWheelSpeed: (!(typeof parameters.mouseWheelSpeed == UNDEFINED))? parameters.mouseWheelSpeed: 1,
-    swipeSpeed: (!(typeof parameters.swipeSpeed == UNDEFINED))? parameters.swipeSpeed: 0.002
+    swipeSpeed: (!(typeof parameters.swipeSpeed == UNDEFINED))? parameters.swipeSpeed: 0.002,
+    requestFullScreen: (!(typeof parameters.requestFullScreen == UNDEFINED))? parameters.requestFullScreen: false
   }
   return new FreeControls(params);
 }

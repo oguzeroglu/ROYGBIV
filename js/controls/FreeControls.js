@@ -7,6 +7,7 @@ var FreeControls = function(params){
   this.translateYAmount = params.translateYAmount;
   this.mouseWheelSpeed = params.mouseWheelSpeed;
   this.swipeSpeed = params.swipeSpeed;
+  this.requestFullScreen = params.requestFullScreen;
   this.keyboardActions = [
     {key: "Left", action: this.incrRotationY},
     {key: "Right", action: this.decrRotationY},
@@ -28,7 +29,6 @@ FreeControls.prototype.onMouseUp = noop;
 FreeControls.prototype.onMouseDown = noop;
 FreeControls.prototype.onClick = noop;
 FreeControls.prototype.onTap = noop;
-FreeControls.prototype.onActivated = noop;
 FreeControls.prototype.onDeactivated = noop;
 FreeControls.prototype.onTouchStart = noop;
 FreeControls.prototype.onTouchMove = noop;
@@ -36,7 +36,18 @@ FreeControls.prototype.onTouchEnd = noop;
 FreeControls.prototype.onKeyUp = noop;
 FreeControls.prototype.onKeyDown = noop;
 FreeControls.prototype.onResize = noop;
-FreeControls.prototype.onFullScreenChange = noop;
+
+FreeControls.prototype.onActivated = function(){
+  if (this.requestFullScreen){
+    fullScreenRequested = true;
+  }
+}
+
+FreeControls.prototype.onFullScreenChange = function(isFullScreen){
+  if (!isFullScreen && activeControl.requestFullScreen){
+    fullScreenRequested = true;
+  }
+}
 
 FreeControls.prototype.incrRotationY = function(){
   camera.rotation.y += activeControl.rotationYDelta;

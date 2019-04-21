@@ -177,6 +177,7 @@ var Preconditions = function(){
   this.onKeyUp = "onKeyUp";
   this.onResize = "onResize";
   this.onFullScreenChange = "onFullScreenChange";
+  this.requestFullScreen = "requestFullScreen";
 }
 
 Preconditions.prototype.errorHeader = function(callerFunc){
