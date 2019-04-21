@@ -492,6 +492,9 @@ FPSControls.prototype.onTap = function(touch){
   if (activeControl.pausedDueToScreenOrientation){
     return;
   }
+  if (activeControl.requestFullScreen && !onFullScreen){
+    return;
+  }
   var isOnTheRightSide = activeControl.isTouchOnTheRightSide(touch);
   if (activeControl.hasDoubleJump && isOnTheRightSide){
     var now = performance.now();
