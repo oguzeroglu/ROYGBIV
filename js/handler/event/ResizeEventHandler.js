@@ -27,6 +27,10 @@ ResizeEventHandler.prototype.onResize = function(){
     if (particleSystemRefHeight){
       GLOBAL_PS_REF_HEIGHT_UNIFORM.value = ((renderer.getCurrentViewport().w / screenResolution) / particleSystemRefHeight);
     }
+  }else{
+    if (fpsWeaponAlignmentConfigurationObject){
+      fpsWeaponAlignmentConfigurationObject.onFPSWeaponAlignmentUpdate();
+    }
   }
   activeControl.onResize();
   if (mode == 0){
