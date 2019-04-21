@@ -20,23 +20,62 @@ var FPSControls = function(params){
     {key: "Down", action: this.goBackward},
     {key: "Space", action: this.jump}
   ];
-  this.playerBodyObject = params.playerBodyObject; // default: none
-  this.mouseSpeed = params.mouseSpeed; // default: 0.002
-  this.touchLookSpeed = params.touchLookSpeed; // default: 0.01
-  this.speed = params.speed; // default: 200
-  this.jumpSpeed = params.jumpSpeed; // default: 500
-  this.jumpableVelocityCoefficient = params.jumpableVelocityCoefficient; // default: 3.5
-  this.touchJoystickThreshold = params.touchJoystickThreshold; // default: 1.5
-  this.touchJoystickDegreeInterval = params.touchJoystickDegreeInterval; // default: 30
-  this.crosshairName = params.crosshairName; // default: none
-  this.crosshairExpandSize = params.crosshairExpandSize; // default: none
-  this.crosshairAnimationDelta = params.crosshairAnimationDelta; // default: none
-  this.doubleJumpTimeThresholdInMs = params.doubleJumpTimeThresholdInMs; // default: 500
-  this.weaponObject1 = params.weaponObject1; // default: none
-  this.weaponObject2 = params.weaponObject2; // default: none;
-  this.hasIdleGunAnimation = params.hasIdleGunAnimation; // default: none
-  this.idleGunAnimationSpeed = params.idleGunAnimationSpeed; // default: 0.05
-  this.rotationRandomnessOn = params.rotationRandomnessOn; // default: true
+  this.playerBodyObject = params.playerBodyObject;
+  this.mouseSpeed = params.mouseSpeed;
+  this.touchLookSpeed = params.touchLookSpeed;
+  this.speed = params.speed;
+  this.jumpSpeed = params.jumpSpeed;
+  this.jumpableVelocityCoefficient;
+  this.touchJoystickThreshold = params.touchJoystickThreshold;
+  this.touchJoystickDegreeInterval = params.touchJoystickDegreeInterval;
+  this.crosshairName = params.crosshairName;
+  this.crosshairExpandSize = params.crosshairExpandSize;
+  this.crosshairAnimationDelta = params.crosshairAnimationDelta;
+  this.doubleJumpTimeThresholdInMs = params.doubleJumpTimeThresholdInMs;
+  this.weaponObject1 = params.weaponObject1;
+  this.weaponObject2 = params.weaponObject2;
+  this.hasIdleGunAnimation = params.hasIdleGunAnimation;
+  this.idleGunAnimationSpeed = params.idleGunAnimationSpeed;
+  this.weaponRotationRandomnessOn = params.weaponRotationRandomnessOn;
+  if (typeof this.mouseSpeed == UNDEFINED){
+    this.mouseSpeed = 0.002;
+  }
+  if (typeof this.touchLookSpeed == UNDEFINED){
+    this.touchLookSpeed = 0.01;
+  }
+  if (typeof this.speed == UNDEFINED){
+    this.speed = 200;
+  }
+  if (typeof this.jumpSpeed == UNDEFINED){
+    this.jumpSpeed = 500;
+  }
+  if (typeof this.jumpableVelocityCoefficient == UNDEFINED){
+    this.jumpableVelocityCoefficient = 3.5;
+  }
+  if (typeof this.touchJoystickThreshold == UNDEFINED){
+    this.touchJoystickThreshold = 1.5;
+  }
+  if (typeof this.touchJoystickDegreeInterval == UNDEFINED){
+    this.touchJoystickDegreeInterval = 30;
+  }
+  if (typeof this.crosshairExpandSize == UNDEFINED){
+    this.crosshairExpandSize = 9;
+  }
+  if (typeof this.crosshairAnimationDelta == UNDEFINED){
+    this.crosshairAnimationDelta = 0.2;
+  }
+  if (typeof this.doubleJumpTimeThresholdInMs == UNDEFINED){
+    this.doubleJumpTimeThresholdInMs = 500;
+  }
+  if (typeof this.hasIdleGunAnimation == UNDEFINED){
+    this.hasIdleGunAnimation = true;
+  }
+  if (typeof this.idleGunAnimationSpeed == UNDEFINED){
+    this.idleGunAnimationSpeed = 0.05;
+  }
+  if (typeof this.weaponRotationRandomnessOn == UNDEFINED){
+    this.weaponRotationRandomnessOn = true;
+  }
 }
 
 FPSControls.prototype.onClick = noop;
@@ -99,7 +138,7 @@ FPSControls.prototype.onMouseMove = function(event){
   camera.rotation.y += dx;
   if (activeControl.hasWeapon1){
     var randomness = 0;
-    if (activeControl.rotationRandomnessOn){
+    if (activeControl.weaponRotationRandomnessOn){
       activeControl.weapon1RotationRandomnessCounter += 0.06 * Math.random();
       randomness = (Math.random() * (Math.sin(activeControl.weapon1RotationRandomnessCounter) / 400));
     }
@@ -107,7 +146,7 @@ FPSControls.prototype.onMouseMove = function(event){
   }
   if (activeControl.hasWeapon2){
     var randomness = 0;
-    if (activeControl.rotationRandomnessOn){
+    if (activeControl.weaponRotationRandomnessOn){
       activeControl.weapon2RotationRandomnessCounter += 0.06 * Math.random();
       randomness = (Math.random() * (Math.sin(activeControl.weapon2RotationRandomnessCounter) / 400));
     }
@@ -119,7 +158,7 @@ FPSControls.prototype.onMouseMove = function(event){
     camera.rotation.x += dy;
     if (activeControl.hasWeapon1){
       var randomness = 0;
-      if (activeControl.rotationRandomnessOn){
+      if (activeControl.weaponRotationRandomnessOn){
         activeControl.weapon1RotationRandomnessCounter2 += 0.06 * Math.random();
         randomness = (Math.random() * (Math.sin(activeControl.weapon1RotationRandomnessCounter2) / 400));
       }
@@ -127,7 +166,7 @@ FPSControls.prototype.onMouseMove = function(event){
     }
     if (activeControl.hasWeapon2){
       var randomness = 0;
-      if (activeControl.rotationRandomnessOn){
+      if (activeControl.weaponRotationRandomnessOn){
         activeControl.weapon2RotationRandomnessCounter2 += 0.06 * Math.random();
         randomness = (Math.random() * (Math.sin(activeControl.weapon2RotationRandomnessCounter2) / 400));
       }
@@ -203,7 +242,7 @@ FPSControls.prototype.onRightHandFinger = function(touch){
   camera.rotation.y += dx;
   if (activeControl.hasWeapon1){
     var randomness = 0;
-    if (activeControl.rotationRandomnessOn){
+    if (activeControl.weaponRotationRandomnessOn){
       activeControl.weapon1RotationRandomnessCounter += 0.06 * Math.random();
       randomness = (Math.random() * (Math.sin(activeControl.weapon1RotationRandomnessCounter) / 400));
     }
@@ -211,7 +250,7 @@ FPSControls.prototype.onRightHandFinger = function(touch){
   }
   if (activeControl.hasWeapon2){
     var randomness = 0;
-    if (activeControl.rotationRandomnessOn){
+    if (activeControl.weaponRotationRandomnessOn){
       activeControl.weapon2RotationRandomnessCounter += 0.06 * Math.random();
       randomness = (Math.random() * (Math.sin(activeControl.weapon2RotationRandomnessCounter) / 400));
     }
@@ -223,7 +262,7 @@ FPSControls.prototype.onRightHandFinger = function(touch){
     camera.rotation.x += dy;
     if (activeControl.hasWeapon1){
       var randomness = 0;
-      if (activeControl.rotationRandomnessOn){
+      if (activeControl.weaponRotationRandomnessOn){
         activeControl.weapon1RotationRandomnessCounter2 += 0.06 * Math.random();
         randomness = (Math.random() * (Math.sin(activeControl.weapon1RotationRandomnessCounter2) / 400));
       }
@@ -231,7 +270,7 @@ FPSControls.prototype.onRightHandFinger = function(touch){
     }
     if (activeControl.hasWeapon2){
       var randomness = 0;
-      if (activeControl.rotationRandomnessOn){
+      if (activeControl.weaponRotationRandomnessOn){
         activeControl.weapon2RotationRandomnessCounter2 += 0.06 * Math.random();
         randomness = (Math.random() * (Math.sin(activeControl.weapon2RotationRandomnessCounter2) / 400));
       }
