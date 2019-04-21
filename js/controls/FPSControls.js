@@ -25,7 +25,7 @@ var FPSControls = function(params){
   this.touchLookSpeed = params.touchLookSpeed;
   this.speed = params.speed;
   this.jumpSpeed = params.jumpSpeed;
-  this.jumpableVelocityCoefficient - params.jumpableVelocityCoefficient;
+  this.jumpableVelocityCoefficient = params.jumpableVelocityCoefficient;
   this.touchJoystickThreshold = params.touchJoystickThreshold;
   this.crosshairName = params.crosshairName;
   this.crosshairExpandSize = params.crosshairExpandSize;
