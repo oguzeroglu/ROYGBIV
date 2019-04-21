@@ -26,7 +26,11 @@ var GUIHandler = function(){
   };
   this.skyboxParameters = {
     "Name": "skyboxName",
-    "Color": "#ffffff"
+    "Color": "#ffffff",
+    "Done": function(){
+      terminal.clear();
+      parseCommand("skyboxConfigurations hide");
+    }
   };
   this.textManipulationParameters = {
     "Text": "textName",
@@ -51,7 +55,11 @@ var GUIHandler = function(){
   this.fogParameters = {
     "Density": 0.0,
     "Color": "#ffffff",
-    "Blend skybox": false
+    "Blend skybox": false,
+    "Done": function(){
+      terminal.clear();
+      parseCommand("fogConfigurations hide");
+    }
   };
   this.bloomParameters = {
     "Threshold": 0.0,
@@ -65,7 +73,11 @@ var GUIHandler = function(){
     "BlurPass2": {"Factor": 0.0, "Color": "#ffffff", "Quality": "high"},
     "BlurPass3": {"Factor": 0.0, "Color": "#ffffff", "Quality": "high"},
     "BlurPass4": {"Factor": 0.0, "Color": "#ffffff", "Quality": "high"},
-    "BlurPass5": {"Factor": 0.0, "Color": "#ffffff", "Quality": "high"}
+    "BlurPass5": {"Factor": 0.0, "Color": "#ffffff", "Quality": "high"},
+    "Done": function(){
+      terminal.clear();
+      parseCommand("postProcessing bloom hide");
+    }
   };
   this.fpsWeaponAlignmentParameters = {
     "x": 0.0,
@@ -1137,6 +1149,7 @@ GUIHandler.prototype.initializeSkyboxGUI = function(){
       );
     }
   }).listen();
+  guiHandler.datGuiSkybox.add(guiHandler.skyboxParameters, "Done");
 }
 
 GUIHandler.prototype.initializeBloomGUI = function(){
@@ -1210,6 +1223,7 @@ GUIHandler.prototype.initializeBloomGUI = function(){
       bloom.setBloomTintColor(this.index, REUSABLE_COLOR.r, REUSABLE_COLOR.g, REUSABLE_COLOR.b);
     }.bind({index: i})).listen();
   }
+  guiHandler.datGuiBloom.add(guiHandler.bloomParameters, "Done");
 }
 
 GUIHandler.prototype.initializeFogGUI = function(){
@@ -1267,4 +1281,5 @@ GUIHandler.prototype.initializeFogGUI = function(){
       autoInstancedObjects[objName].setFog();
     }
   }).listen();
+  guiHandler.datGuiFog.add(guiHandler.fogParameters, "Done");
 }
