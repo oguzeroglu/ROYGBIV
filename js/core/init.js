@@ -357,7 +357,6 @@ function onCanvasInitiated(){
   fullScreenEventHandler = new FullScreenEventHandler();
   visibilityChangeEventHandler = new VisibilityChangeEventHandler();
   resizeEventHandler = new ResizeEventHandler();
-  orientationChangeEventHandler = new OrientationChangeEventHandler();
   keyboardEventHandler = new KeyboardEventHandler();
 }
 

@@ -47,7 +47,6 @@ var fullScreenEventHandler;
 var visibilityChangeEventHandler;
 var mouseEventHandler;
 var resizeEventHandler;
-var orientationChangeEventHandler;
 var keyboardEventHandler;
 
 // THREE.JS VARIABLES
@@ -349,6 +348,7 @@ var defaultControlParameters = {
 var activeControl;
 var crosshairHandler;
 var fpsWeaponAlignmentConfigurationObject;
+var isOrientationLandscape = (window.innerWidth > window.innerHeight);
 
 // RENDER ORDERS
 var renderOrders = {

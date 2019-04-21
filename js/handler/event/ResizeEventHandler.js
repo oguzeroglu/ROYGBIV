@@ -3,6 +3,7 @@ var ResizeEventHandler = function(){
 }
 
 ResizeEventHandler.prototype.onResize = function(){
+  isOrientationLandscape = (window.innerWidth > window.innerHeight);
   if (!(renderer)){
     return;
   }

@@ -40,6 +40,8 @@ var FPSControls = function(params){
   this.onLook = params.onLook;
   this.onShoot = params.onShoot;
   this.shootableObjects = params.shootableObjects;
+  this.onPause = params.onPause;
+  this.onResume = params.onResume;
   if (typeof this.mouseSpeed == UNDEFINED){
     this.mouseSpeed = 0.002;
   }
@@ -87,6 +89,12 @@ var FPSControls = function(params){
   }
   if (typeof this.shootableObjects == UNDEFINED){
     this.shootableObjects = [];
+  }
+  if (typeof this.onPause == UNDEFINED){
+    this.onPause = noop;
+  }
+  if (typeof this.onResume == UNDEFINED){
+    this.onResume = noop;
   }
 }
 
@@ -196,6 +204,9 @@ FPSControls.prototype.onTouchStart = function(event){
 }
 
 FPSControls.prototype.onLeftHandFinger = function(touch){
+  if (activeControl.pausedDueToScreenOrientation){
+    return;
+  }
   var degreeInterval = activeControl.touchJoystickDegreeInterval;
   var oldTouch = activeControl.touchTrack.get(touch.identifier);
   activeControl.reusableVec2.set((touch.pageX - oldTouch.pageX), (touch.pageY - oldTouch.pageY));
@@ -247,6 +258,9 @@ FPSControls.prototype.onLeftHandFinger = function(touch){
 }
 
 FPSControls.prototype.onRightHandFinger = function(touch){
+  if (activeControl.pausedDueToScreenOrientation){
+    return;
+  }
   var oldTouch = activeControl.touchTrack.get(touch.identifier);
   var movementX = (touch.pageX - oldTouch.pageX);
   var movementY = (touch.pageY - oldTouch.pageY);
@@ -331,7 +345,39 @@ FPSControls.prototype.onTouchEnd = function(event){
   }
 }
 
+FPSControls.prototype.pauseDueToScreenOrientation = function(){
+  this.onPause();
+  this.pausedDueToScreenOrientation = true;
+  if (this.hasWeapon1){
+    this.weaponObject1.hide(false);
+  }
+  if (this.hasWeapon2){
+    this.weaponObject2.hide(false);
+  }
+}
+
+FPSControls.prototype.resume = function(){
+  this.onResume();
+  this.pausedDueToScreenOrientation = false;
+  if (this.hasWeapon1){
+    this.weaponObject1.show();
+  }
+  if (this.hasWeapon2){
+    this.weaponObject2.show();
+  }
+}
+
 FPSControls.prototype.update = function(){
+  if (isMobile && !isOrientationLandscape){
+    if (!this.pausedDueToScreenOrientation){
+      this.pauseDueToScreenOrientation();
+    }
+    return;
+  }else{
+    if (this.pausedDueToScreenOrientation){
+      this.resume();
+    }
+  }
   this.canJump = (this.playerBodyObject.physicsBody.velocity.y <= this.jumpableVelocityCoefficient && this.playerBodyObject.physicsBody.velocity.y >= -this.jumpableVelocityCoefficient);
   if (this.canJump){
     this.canDoubleJump = true;
@@ -432,6 +478,9 @@ FPSControls.prototype.onDoubleTap = function(touch){
 }
 
 FPSControls.prototype.onTap = function(touch){
+  if (activeControl.pausedDueToScreenOrientation){
+    return;
+  }
   var isOnTheRightSide = activeControl.isTouchOnTheRightSide(touch);
   if (activeControl.hasDoubleJump && isOnTheRightSide){
     var now = performance.now();
@@ -523,6 +572,7 @@ FPSControls.prototype.resetRotation = function(){
 
 FPSControls.prototype.onDeactivated = function(){
   if (this.hasWeapon1){
+    this.weaponObject1.show();
     this.weaponObject1.mesh.renderOrder = renderOrders.OBJECT;
     this.weaponObject1.unsetRotationPivot();
     this.weaponObject1.untrackObjectPosition();
@@ -531,6 +581,7 @@ FPSControls.prototype.onDeactivated = function(){
     this.weaponObject1.mesh.scale.set(1, 1, 1);
   }
   if (this.hasWeapon2){
+    this.weaponObject2.show();
     this.weaponObject2.mesh.renderOrder = renderOrders.OBJECT;
     this.weaponObject2.unsetRotationPivot();
     this.weaponObject2.untrackObjectPosition();
@@ -541,6 +592,7 @@ FPSControls.prototype.onDeactivated = function(){
 }
 
 FPSControls.prototype.onActivated = function(){
+  this.pausedDueToScreenOrientation = false;
   this.currentLookInfo = {x: 0, y: 0, z: 0, objName: null};
   if (isMobile){
     this.shootableMap = new Object();
@@ -576,6 +628,7 @@ FPSControls.prototype.onActivated = function(){
     this.hasDoubleJump = false;
   }
   if (!(typeof this.weaponObject1 == UNDEFINED)){
+    this.weaponObject1.show();
     this.weaponObject1.mesh.renderOrder = renderOrders.FPS_WEAPON;
     var pos = this.weaponObject1.mesh.position;
     var quat = this.weaponObject1.mesh.quaternion;
@@ -595,6 +648,7 @@ FPSControls.prototype.onActivated = function(){
     this.hasWeapon1 = false;
   }
   if (!(typeof this.weaponObject2 == UNDEFINED)){
+    this.weaponObject2.show();
     this.weaponObject2.mesh.renderOrder = renderOrders.FPS_WEAPON;
     var pos = this.weaponObject2.mesh.position;
     var quat = this.weaponObject2.mesh.quaternion;
