@@ -969,4 +969,39 @@ this.ROYGBIV_SCRIPTING_API_CREATECUSTOMCONTROL = "Creates a CustomControl implem
                                                  "onFullScreenChange (optional): Function to be executed with the isFullScreen parameter when the fullscreen status of the screen is\nchanged. Default value is noop.\n"+
                                                  "onUpdate (optional): Function to be executed on each frame. Default value is noop.";
 this.ROYGBIV_SCRIPTING_API_SETACTIVECONTROL = "Sets the active control.";
+this.ROYGBIV_SCRIPTING_API_CREATEFPSCONTROL = "Creates a new FPSControls object to be used in First Person Shooter games for both desktop and mobile devices. FPSControls automatically\nhandles the PointerLock as well. The controls are:\n"+
+                                              "For desktop:\n"+
+                                              "WSAD/ZQSD (French keyboard) / Arrow Keys: Move\n"+
+                                              "Mouse: Look\n"+
+                                              "Click: Shoot\n"+
+                                              "Space: Jump\n"+
+                                              "For mobile:\n"+
+                                              "Left side of the screen: Move\n"+
+                                              "Right side of the screen: Look around\n"+
+                                              "Tap on the right side of the screen: Jump\n"+
+                                              "For mobile devices controls are automatically paused for portrait orientation.\n"+
+                                              "Configurations are:\n"+
+                                              "playerBodyObject (mandatory): A dummy sphere type object to physically represent the player. The camera is placed on the\ncenter of the playerBodyObject. The playerBodyObject is graphically hidden when the FPSControls object is activated,\nshown again when deactivated. The playerBodyObject must be a dynamic object (mass > 0) and must be marked as changeable in order\nto be used by FPSControls class.\n"+
+                                              "mouseSpeed (optional): The speed of mouse based camera look-around event. Default value is 0.002.\n"+
+                                              "touchLookSpeed (optional): The speed of touch based camera look*around event. Default value is 0.01.\n"+
+                                              "speed (optional): The speed of motion. Default value is 200.\n"+
+                                              "jumpSpeed (optional): The jump speed. Default value is 500.\n"+
+                                              "jumpableVelocityCoefficient (optional): A coefficient used to decide if the object can jump based on its velocity on the axis y.\nThe object can jump if velocity.y <= jumpableVelocityCoefficient AND velocity.y >= -jumpableVelocityCoefficient. This parameter is used\nin order to prevent endless jumps by letting the gravity affect the velocity on the axis y. Default value is 3.5.\n"+
+                                              "touchJoystickThreshold (optional): For the left hand move controls on mobile devices, this parameter is used in order to filter out\nnegligible TouchEvents on finger move, thus preventing flickering moves. The TouchEvents are filtered if the length between the previous\nand the current (pageX, pageY) is less than or equals to touchJoystickThreshold. Default value is 1.5.\n"+
+                                              "crosshairName (optional): The name of the Crosshair.\n"+
+                                              "crosshairExpandSize (optional): The target size of the crosshair in order to be used for expand animation when the player is moving\nor shooting. Default value is 9.\n"+
+                                              "crosshairAnimationDelta (optional): The delta value of the crosshair expand animation. Default value is 0.2.\n"+
+                                              "hasDoubleJump (optional): If true, the user may double jump by pressing Space or tapping twice. Default value is true.\n"+
+                                              "doubleJumpTimeThresholdInMs (optional): This parameter define the max time in milliseconds between two Space key hits or taps in order\nto perform a double jump. Default value is 500.\n"+
+                                              "weaponObject1 (optional): The first weapon object. This might be any object or object group marked as FPS Weapon.\n"+
+                                              "weaponObject2 (optional): The second weapon object. This might be any object or object group marked as FPS Weapon.\n"+
+                                              "hasIdleGunAnimation (optional): If true weapon objects are animated in order to give the FPS controls a realistic feeling. Default value\nis true.\n"+
+                                              "idleGunAnimationSpeed (optional): The speed of the idle gun animation. Default value is 0.05.\n"+
+                                              "weaponRotationRandomnessOn (optional): If true the weapons rotate a bit more than the camera in order to give the FPS view more\nrealistic view. Default value is true.\n"+
+                                              "onLook (optional): A callback function executed each frame with x, y, z and objName parameters representing the intersected object\nfrom the FPS camera. If there is no intersected object the objName is set to null. Default value is noop.\n"+
+                                              "onShoot (optional): A callback function executed with x, y, z and objName parameters representing the intersected object from the FPS\ncamera on each click for Desktop devices. For mobile devices due to lack of mouse device this function is executed when the camera is\nlooking at one of the shootable objects defined with the shootableObjects parameter in order to help implementing the auto-shoot\nfunctionality. Default value is noop.\n"+
+                                              "shootableObjects (optional): An array of objects representing the objects that can be shot. This parameter is used inside the onShoot\nevent for mobile devices in order to decide if the object being looked at should trigger the onShoot function or not. Default value\nis an empty array.\n"+
+                                              "onPause (optional): A callback function to be executed when the FPS controls are paused on mobile devices due to switching to Portrait\norientation. Default value is noop.\n"+
+                                              "onResume (optional): A callback function to be executed on mobile devices when the FPS controls are resumed after switching back to the\nLandscape orientation. Default value is noop.\n"+
+                                              "requestFullScreen (optional): If true the FullScreen mode is requested if the screen is not on full screen. FPS Controls API\nalso automatically re-requests the FullScreen mode every time after the user cancels the FullScreen. Default value is true.";
 }

@@ -178,6 +178,28 @@ var Preconditions = function(){
   this.onResize = "onResize";
   this.onFullScreenChange = "onFullScreenChange";
   this.requestFullScreen = "requestFullScreen";
+  this.playerBodyObject = "playerBodyObject";
+  this.mouseSpeed = "mouseSpeed";
+  this.touchLookSpeed = "touchLookSpeed";
+  this.jumpSpeed = "jumpSpeed";
+  this.jumpableVelocityCoefficient = "jumpableVelocityCoefficient";
+  this.touchJoystickThreshold = "touchJoystickThreshold";
+  this.touchJoystickDegreeInterval = "touchJoystickDegreeInterval";
+  this.crosshairExpandSize = "crosshairExpandSize";
+  this.crosshairAnimationDelta = "crosshairAnimationDelta";
+  this.hasDoubleJump = "hasDoubleJump";
+  this.doubleJumpTimeThresholdInMs = "doubleJumpTimeThresholdInMs";
+  this.weaponObject1 = "weaponObject1";
+  this.weaponObject2 = "weaponObject2";
+  this.hasIdleGunAnimation = "hasIdleGunAnimation";
+  this.idleGunAnimationSpeed = "idleGunAnimationSpeed";
+  this.weaponRotationRandomnessOn = "weaponRotationRandomnessOn";
+  this.onLook = "onLook";
+  this.onShoot = "onShoot";
+  this.shootableObjects = "shootableObjects";
+  this.onPause = "onPause";
+  this.onResume = "onResume";
+
 }
 
 Preconditions.prototype.errorHeader = function(callerFunc){
@@ -186,6 +208,24 @@ Preconditions.prototype.errorHeader = function(callerFunc){
 
 Preconditions.prototype.throw = function(callerFunc, errorMsg){
   throw new Error(this.errorHeader(callerFunc)+" ["+errorMsg+"]");
+}
+
+Preconditions.prototype.checkIfArrayOfObjectsOnlyIfExists = function(callerFunc, parameterName, obj){
+  if (!(typeof obj == UNDEFINED)){
+    for (var i = 0; i<obj.length; i++){
+      if (!obj[i].isAddedObject && !obj[i].isObjectGroup){
+        this.throw(callerFunc, parameterName+" is not an Array of objects.");
+      }
+    }
+  }
+}
+
+Preconditions.prototype.checkIfArrayOnlyIfExists = function(callerFunc, parameterName, obj){
+  if (!(typeof obj == UNDEFINED)){
+    if (!Array.isArray(obj)){
+      this.throw(callerFunc, parameterName+" is not an Array.");
+    }
+  }
 }
 
 Preconditions.prototype.checkIfTrue = function(callerFunc, errorMsg, obj){
@@ -264,6 +304,14 @@ Preconditions.prototype.checkIfAddedObject = function(callerFunc, parameterName,
 Preconditions.prototype.checkIfAddedObjectOrObjectGroup = function(callerFunc, parameterName, obj){
   if (!obj.isAddedObject && !obj.isObjectGroup){
     this.throw(callerFunc, parameterName+" is not an object or an object group.");
+  }
+}
+
+Preconditions.prototype.checkIfAddedObjectOrObjectGroupOnlyIfExists = function(callerFunc, parameterName, obj){
+  if (!(typeof obj == UNDEFINED)){
+    if (!obj.isAddedObject && !obj.isObjectGroup){
+      this.throw(callerFunc, parameterName+" is not an object or an object group.");
+    }
   }
 }
 
@@ -373,6 +421,12 @@ Preconditions.prototype.checkIfNotDynamic = function(callerFunc, parameterName, 
 Preconditions.prototype.checkIfParentExists = function(callerFunc, parameterName, obj){
   if (!obj){
     this.throw(callerFunc, "Parent not defined.");
+  }
+}
+
+Preconditions.prototype.checkIfSphere = function(callerFunc, parameterName, obj){
+  if (obj.type != "sphere"){
+    this.throw(callerFunc, parameterName+" is not a sphere. Use dummy sphere objects for FPS control bodies.");
   }
 }
 

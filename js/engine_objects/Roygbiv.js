@@ -189,7 +189,8 @@ var Roygbiv = function(){
     "removeObjectPositionThresholdExceededListener",
     "createFreeControl",
     "createCustomControl",
-    "setActiveControl"
+    "setActiveControl",
+    "createFPSControl"
   ];
 
   this.globals = new Object();
@@ -4327,6 +4328,105 @@ Roygbiv.prototype.setActiveControl = function(control){
   if (callOnActivated){
     control.onActivated();
   }
+}
+
+// Creates a new FPSControls object to be used in First Person Shooter games for
+// both desktop and mobile devices. FPSControls automatically handles the PointerLock
+// as well. The controls are:
+// For desktop:
+// WSAD/ZQSD (French keyboard) / Arrow Keys: Move
+// Mouse: Look
+// Click: Shoot
+// Space: Jump
+// For mobile:
+// Left side of the screen: Move
+// Right side of the screen: Look around
+// Tap on the right side of the screen: Jump
+// For mobile devices controls are automatically paused for portrait orientation.
+// Configurations are:
+// playerBodyObject (mandatory): A dummy sphere type object to physically represent the player.
+// The camera is placed on the center of the playerBodyObject. The playerBodyObject is graphically hidden
+// when the FPSControls object is activated, shown again when deactivated. The playerBodyObject must be a
+// dynamic object (mass > 0) and must be marked as changeable in order to be used by FPSControls class.
+// mouseSpeed (optional): The speed of mouse based camera look-around event. Default value is 0.002.
+// touchLookSpeed (optional): The speed of touch based camera look*around event. Default value is 0.01.
+// speed (optional): The speed of motion. Default value is 200.
+// jumpSpeed (optional): The jump speed. Default value is 500.
+// jumpableVelocityCoefficient (optional): A coefficient used to decide if the object can jump based on
+// its velocity on the axis y. The object can jump if velocity.y <= jumpableVelocityCoefficient AND
+// velocity.y >= -jumpableVelocityCoefficient. This parameter is used in order to prevent
+// endless jumps by letting the gravity affect the velocity on the axis y. Default value is 3.5.
+// touchJoystickThreshold (optional): For the left hand move controls on mobile devices, this
+// parameter is used in order to filter out negligible TouchEvents on finger move, thus preventing
+// flickering moves. The TouchEvents are filtered if the length between the previous and the current
+// (pageX, pageY) is less than or equals to touchJoystickThreshold. Default value is 1.5.
+// crosshairName (optional): The name of the Crosshair.
+// crosshairExpandSize (optional): The target size of the crosshair in order to be used for expand animation
+// when the player is moving or shooting. Default value is 9.
+// crosshairAnimationDelta (optional): The delta value of the crosshair expand animation. Default value is 0.2.
+// hasDoubleJump (optional): If true, the user may double jump by pressing Space or tapping twice. Default value is true.
+// doubleJumpTimeThresholdInMs (optional): This parameter define the max time in milliseconds between two Space key hits or
+// taps in order to perform a double jump. Default value is 500.
+// weaponObject1 (optional): The first weapon object. This might be any object or object group marked as FPS Weapon.
+// weaponObject2 (optional): The second weapon object. This might be any object or object group marked as FPS Weapon.
+// hasIdleGunAnimation (optional): If true weapon objects are animated in order to give the FPS controls a realistic
+// feeling. Default value is true.
+// idleGunAnimationSpeed (optional): The speed of the idle gun animation. Default value is 0.05.
+// weaponRotationRandomnessOn (optional): If true the weapons rotate a bit more than the camera in order to
+// give the FPS view more realistic view. Default value is true.
+// onLook (optional): A callback function executed each frame with x, y, z and objName parameters
+// representing the intersected object from the FPS camera. If there is no intersected object
+// the objName is set to null. Default value is noop.
+// onShoot (optional): A callback function executed with x, y, z and objName parameters representing the intersected
+// object from the FPS camera on each click for Desktop devices. For mobile devices due to lack of mouse device
+// this function is executed when the camera is looking at one of the shootable objects defined with the shootableObjects
+// parameter in order to help implementing the auto-shoot functionality. Default value is noop.
+// shootableObjects (optional): An array of objects representing the objects that can be shot. This parameter is
+// used inside the onShoot event for mobile devices in order to decide if the object being looked at should
+// trigger the onShoot function or not. Default value is an empty array.
+// onPause (optional): A callback function to be executed when the FPS controls are paused on mobile devices
+// due to switching to Portrait orientation. Default value is noop.
+// onResume (optional): A callback function to be executed on mobile devices when the FPS controls are resumed
+// after switching back to the Landscape orientation. Default value is noop.
+// requestFullScreen (optional): If true the FullScreen mode is requested if the screen is not on full screen. FPS Controls
+// API also automatically re-requests the FullScreen mode every time after the user cancels the FullScreen. Default value
+// is true.
+Roygbiv.prototype.createFPSControl = function(parameters){
+  if (mode == 0){
+    return;
+  }
+  preConditions.checkIfDefined(ROYGBIV.createFPSControl, preConditions.parameters, parameters);
+  preConditions.checkIfDefined(ROYGBIV.createFPSControl, preConditions.playerBodyObject, parameters.playerBodyObject);
+  preConditions.checkIfAddedObject(ROYGBIV.createFPSControl, preConditions.playerBodyObject, parameters.playerBodyObject);
+  preConditions.checkIfSphere(ROYGBIV.createFPSControl, preConditions.playerBodyObject, parameters.playerBodyObject);
+  preConditions.checkIfDynamic(ROYGBIV.createFPSControl, preConditions.playerBodyObject, parameters.playerBodyObject);
+  preConditions.checkIfChangeable(ROYGBIV.createFPSControl, preConditions.playerBodyObject, parameters.playerBodyObject);
+  preConditions.checkIfNumberOnlyIfExists(ROYGBIV.createFPSControl, preConditions.mouseSpeed, parameters.mouseSpeed);
+  preConditions.checkIfNumberOnlyIfExists(ROYGBIV.createFPSControl, preConditions.touchLookSpeed, parameters.touchLookSpeed);
+  preConditions.checkIfNumberOnlyIfExists(ROYGBIV.createFPSControl, preConditions.speed, parameters.speed);
+  preConditions.checkIfNumberOnlyIfExists(ROYGBIV.createFPSControl, preConditions.jumpSpeed, parameters.jumpSpeed);
+  preConditions.checkIfNumberOnlyIfExists(ROYGBIV.createFPSControl, preConditions.jumpableVelocityCoefficient, parameters.jumpableVelocityCoefficient);
+  preConditions.checkIfNumberOnlyIfExists(ROYGBIV.createFPSControl, preConditions.touchJoystickThreshold, parameters.touchJoystickThreshold);
+  preConditions.checkIfTrueOnlyIfYExists(ROYGBIV.createFPSControl, "No such crosshair.", parameters.crosshairName, !crosshairs[parameters.crosshairName]);
+  preConditions.checkIfNumberOnlyIfExists(ROYGBIV.createFPSControl, preConditions.crosshairExpandSize, parameters.crosshairExpandSize);
+  preConditions.checkIfNumberOnlyIfExists(ROYGBIV.createFPSControl, preConditions.crosshairAnimationDelta, parameters.crosshairAnimationDelta);
+  preConditions.checkIfBooleanOnlyIfExists(ROYGBIV.createFPSControl, preConditions.hasDoubleJump, parameters.hasDoubleJump);
+  preConditions.checkIfNumberOnlyIfExists(ROYGBIV.createFPSControl, preConditions.doubleJumpTimeThresholdInMs, parameters.doubleJumpTimeThresholdInMs);
+  preConditions.checkIfAddedObjectOrObjectGroupOnlyIfExists(ROYGBIV.createFPSControl, preConditions.weaponObject1, parameters.weaponObject1);
+  preConditions.checkIfTrueOnlyIfYExists(ROYGBIV.createFPSControl, "Object is not marked as FPS weapon.", parameters.weaponObject1, !parameters.weaponObject1.isFPSWeapon);
+  preConditions.checkIfAddedObjectOrObjectGroupOnlyIfExists(ROYGBIV.createFPSControl, preConditions.weaponObject2, parameters.weaponObject2);
+  preConditions.checkIfTrueOnlyIfYExists(ROYGBIV.createFPSControl, "Object is not marked as FPS weapon.", parameters.weaponObject2, !parameters.weaponObject2.isFPSWeapon);
+  preConditions.checkIfBooleanOnlyIfExists(ROYGBIV.createFPSControl, preConditions.hasIdleGunAnimation, parameters.hasIdleGunAnimation);
+  preConditions.checkIfNumberOnlyIfExists(ROYGBIV.createFPSControl, preConditions.idleGunAnimationSpeed, parameters.idleGunAnimationSpeed);
+  preConditions.checkIfBooleanOnlyIfExists(ROYGBIV.createFPSControl, preConditions.weaponRotationRandomnessOn, parameters.weaponRotationRandomnessOn);
+  preConditions.checkIfFunctionOnlyIfExists(ROYGBIV.createFPSControl, preConditions.onLook, parameters.onLook);
+  preConditions.checkIfFunctionOnlyIfExists(ROYGBIV.createFPSControl, preConditions.onShoot, parameters.onShoot);
+  preConditions.checkIfArrayOnlyIfExists(ROYGBIV.createFPSControl, preConditions.shootableObjects, parameters.shootableObjects);
+  preConditions.checkIfArrayOfObjectsOnlyIfExists(ROYGBIV.createFPSControl, preConditions.shootableObjects, parameters.shootableObjects);
+  preConditions.checkIfFunctionOnlyIfExists(ROYGBIV.createFPSControl, preConditions.onPause, parameters.onPause);
+  preConditions.checkIfFunctionOnlyIfExists(ROYGBIV.createFPSControl, preConditions.onResume, parameters.onResume);
+  preConditions.checkIfBooleanOnlyIfExists(ROYGBIV.createFPSControl, preConditions.requestFullScreen, parameters.requestFullScreen);
+  return new FPSControls(parameters);
 }
 
 // UTILITY FUNCTIONS ***********************************************************

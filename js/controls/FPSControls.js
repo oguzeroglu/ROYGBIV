@@ -25,12 +25,12 @@ var FPSControls = function(params){
   this.touchLookSpeed = params.touchLookSpeed;
   this.speed = params.speed;
   this.jumpSpeed = params.jumpSpeed;
-  this.jumpableVelocityCoefficient;
+  this.jumpableVelocityCoefficient - params.jumpableVelocityCoefficient;
   this.touchJoystickThreshold = params.touchJoystickThreshold;
-  this.touchJoystickDegreeInterval = params.touchJoystickDegreeInterval;
   this.crosshairName = params.crosshairName;
   this.crosshairExpandSize = params.crosshairExpandSize;
   this.crosshairAnimationDelta = params.crosshairAnimationDelta;
+  this.hasDoubleJump = params.hasDoubleJump;
   this.doubleJumpTimeThresholdInMs = params.doubleJumpTimeThresholdInMs;
   this.weaponObject1 = params.weaponObject1;
   this.weaponObject2 = params.weaponObject2;
@@ -61,14 +61,14 @@ var FPSControls = function(params){
   if (typeof this.touchJoystickThreshold == UNDEFINED){
     this.touchJoystickThreshold = 1.5;
   }
-  if (typeof this.touchJoystickDegreeInterval == UNDEFINED){
-    this.touchJoystickDegreeInterval = 30;
-  }
   if (typeof this.crosshairExpandSize == UNDEFINED){
     this.crosshairExpandSize = 9;
   }
   if (typeof this.crosshairAnimationDelta == UNDEFINED){
     this.crosshairAnimationDelta = 0.2;
+  }
+  if (typeof this.hasDoubleJump == UNDEFINED){
+    this.hasDoubleJump = true;
   }
   if (typeof this.doubleJumpTimeThresholdInMs == UNDEFINED){
     this.doubleJumpTimeThresholdInMs = 500;
@@ -218,7 +218,7 @@ FPSControls.prototype.onLeftHandFinger = function(touch){
   if (activeControl.pausedDueToScreenOrientation){
     return;
   }
-  var degreeInterval = activeControl.touchJoystickDegreeInterval;
+  var degreeInterval = 30;
   var oldTouch = activeControl.touchTrack.get(touch.identifier);
   activeControl.reusableVec2.set((touch.pageX - oldTouch.pageX), (touch.pageY - oldTouch.pageY));
   if(activeControl.reusableVec2.length() <= activeControl.touchJoystickThreshold){
@@ -585,6 +585,7 @@ FPSControls.prototype.resetRotation = function(){
 }
 
 FPSControls.prototype.onDeactivated = function(){
+  this.playerBodyObject.show();
   if (this.hasWeapon1){
     this.weaponObject1.show();
     this.weaponObject1.mesh.renderOrder = renderOrders.OBJECT;
@@ -635,11 +636,6 @@ FPSControls.prototype.onActivated = function(){
     crosshairHandler.selectCrosshair(crosshairs[this.crosshairName]);
   }else{
     this.hasCrosshair = false;
-  }
-  if (!(typeof this.doubleJumpTimeThresholdInMs == UNDEFINED)){
-    this.hasDoubleJump = true;
-  }else{
-    this.hasDoubleJump = false;
   }
   if (!(typeof this.weaponObject1 == UNDEFINED)){
     this.weaponObject1.show();
