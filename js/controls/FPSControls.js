@@ -37,6 +37,9 @@ var FPSControls = function(params){
   this.hasIdleGunAnimation = params.hasIdleGunAnimation;
   this.idleGunAnimationSpeed = params.idleGunAnimationSpeed;
   this.weaponRotationRandomnessOn = params.weaponRotationRandomnessOn;
+  this.onLook = params.onLook;
+  this.onShoot = params.onShoot;
+  this.shootableObjects = params.shootableObjects;
   if (typeof this.mouseSpeed == UNDEFINED){
     this.mouseSpeed = 0.002;
   }
@@ -75,6 +78,15 @@ var FPSControls = function(params){
   }
   if (typeof this.weaponRotationRandomnessOn == UNDEFINED){
     this.weaponRotationRandomnessOn = true;
+  }
+  if (typeof this.onLook == UNDEFINED){
+    this.onLook = noop;
+  }
+  if (typeof this.onShoot == UNDEFINED){
+    this.onShoot = noop;
+  }
+  if (typeof this.shootableObjects == UNDEFINED){
+    this.shootableObjects = [];
   }
 }
 
@@ -382,6 +394,30 @@ FPSControls.prototype.update = function(){
     this.weaponObject2.handleRotation(activeControl.axisX, Math.sin(this.weapon2IdleAnimationInfo.x) / 1000 * Math.random());
     this.weaponObject2.handleRotation(activeControl.axisZ, Math.sin(this.weapon2IdleAnimationInfo.z) / 1000 * Math.random());
   }
+  this.lookIntersectionTest();
+}
+
+FPSControls.prototype.onlookRaycasterComplete = function(x, y, z, objName){
+  activeControl.currentLookInfo.x = x;
+  activeControl.currentLookInfo.y = y;
+  activeControl.currentLookInfo.z = z;
+  activeControl.currentLookInfo.objName = objName;
+  activeControl.onLook(x, y, z, objName);
+  if (!isMobile){
+    if (activeControl.isMouseDown){
+      activeControl.onShoot(x, y, z, objName);
+    }
+  }else{
+    if (objName != null && activeControl.shootableMap[objName]){
+      activeControl.onShoot(x, y, z, objName);
+    }
+  }
+}
+
+FPSControls.prototype.lookIntersectionTest = function(){
+  REUSABLE_VECTOR.copy(camera.position);
+  REUSABLE_VECTOR_2.set(0, 0, -1).applyQuaternion(camera.quaternion);
+  rayCaster.findIntersections(REUSABLE_VECTOR, REUSABLE_VECTOR_2, false, this.onlookRaycasterComplete);
 }
 
 FPSControls.prototype.resetJoystickStatus = function(){
@@ -505,6 +541,13 @@ FPSControls.prototype.onDeactivated = function(){
 }
 
 FPSControls.prototype.onActivated = function(){
+  this.currentLookInfo = {x: 0, y: 0, z: 0, objName: null};
+  if (isMobile){
+    this.shootableMap = new Object();
+    for (var i = 0; i<this.shootableObjects.length; i++){
+      this.shootableMap[this.shootableObjects[i].name] = this.shootableObjects[i];
+    }
+  }
   this.isMouseDown = false;
   this.lastTapTime = 0;
   this.lastSpaceKeydownTime = 0;
