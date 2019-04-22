@@ -152,17 +152,17 @@ FPSControls.prototype.init = function(){
       scene.add(this.autoInstancedObject.mesh);
     }
   }
-}
-
-FPSControls.prototype.onFullScreenChange = function(isFullScreen){
-  if (activeControl.requestFullScreen && !isFullScreen){
-    fullScreenRequested = true;
-  }
   if (isMobile){
     this.shootableMap = new Object();
     for (var i = 0; i<this.shootableObjects.length; i++){
       this.shootableMap[this.shootableObjects[i].name] = this.shootableObjects[i];
     }
+  }
+}
+
+FPSControls.prototype.onFullScreenChange = function(isFullScreen){
+  if (activeControl.requestFullScreen && !isFullScreen){
+    fullScreenRequested = true;
   }
 }
 
