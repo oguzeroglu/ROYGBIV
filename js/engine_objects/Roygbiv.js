@@ -4401,6 +4401,7 @@ Roygbiv.prototype.createFPSControl = function(parameters){
   preConditions.checkIfSphere(ROYGBIV.createFPSControl, preConditions.playerBodyObject, parameters.playerBodyObject);
   preConditions.checkIfDynamic(ROYGBIV.createFPSControl, preConditions.playerBodyObject, parameters.playerBodyObject);
   preConditions.checkIfChangeable(ROYGBIV.createFPSControl, preConditions.playerBodyObject, parameters.playerBodyObject);
+  preConditions.checkIfTrue(ROYGBIV.createFPSControl, "Player body object must be unintersectable", parameters.playerBodyObject.isIntersectable);
   preConditions.checkIfNumberOnlyIfExists(ROYGBIV.createFPSControl, preConditions.mouseSpeed, parameters.mouseSpeed);
   preConditions.checkIfNumberOnlyIfExists(ROYGBIV.createFPSControl, preConditions.touchLookSpeed, parameters.touchLookSpeed);
   preConditions.checkIfNumberOnlyIfExists(ROYGBIV.createFPSControl, preConditions.speed, parameters.speed);
