@@ -239,6 +239,15 @@ ModeSwitcher.prototype.switchFromDesignToPreview = function(){
 ModeSwitcher.prototype.switchFromPreviewToDesign = function(){
   mode = 0;
   autoInstancingHandler.reset();
+  var objsToRemove = [];
+  for (var i = 0; i<scene.children.length; i++){
+    if (scene.children[i].isFPSWeaponAutoInstancedObject){
+      objsToRemove.push(scene.children[i]);
+    }
+  }
+  for (var i = 0; i<objsToRemove.length; i++){
+    scene.remove(objsToRemove[i]);
+  }
   camera.oldAspect = camera.aspect;
   camera.aspect = window.innerWidth / window.innerHeight;
   camera.updateProjectionMatrix();

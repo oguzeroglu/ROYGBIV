@@ -144,6 +144,7 @@ FPSControls.prototype.init = function(){
       this.autoInstancedObject = new AutoInstancedObject(generateUniqueObjectName(), pseudoGroup);
       this.autoInstancedObject.init();
       this.autoInstancedObject.mesh.visible = false;
+      this.autoInstancedObject.mesh.isFPSWeaponAutoInstancedObject = true;
       macroHandler.injectMacro("FPS_WEAPON_SCALE "+this.weaponObject1.fpsWeaponAlignment.scale, this.autoInstancedObject.mesh.material, true, false);
       scene.add(this.autoInstancedObject.mesh);
     }
@@ -632,6 +633,11 @@ FPSControls.prototype.resetRotation = function(){
 }
 
 FPSControls.prototype.onDeactivated = function(){
+  if (this.autoInstancedObject){
+    this.autoInstancedObject.mesh.visible = false;
+    this.weaponObject1.mesh.visible = true;
+    this.weaponObject2.mesh.visible = true;
+  }
   this.playerBodyObject.show();
   if (this.hasWeapon1){
     this.weaponObject1.show();
