@@ -667,6 +667,7 @@ FPSControls.prototype.onDeactivated = function(){
 }
 
 FPSControls.prototype.onActivated = function(){
+  this.resetRotation();
   this.deactivated = false;
   this.pausedDueToScreenOrientation = false;
   this.currentLookInfo.x = 0;
