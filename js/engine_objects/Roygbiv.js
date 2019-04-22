@@ -4413,9 +4413,9 @@ Roygbiv.prototype.createFPSControl = function(parameters){
   preConditions.checkIfBooleanOnlyIfExists(ROYGBIV.createFPSControl, preConditions.hasDoubleJump, parameters.hasDoubleJump);
   preConditions.checkIfNumberOnlyIfExists(ROYGBIV.createFPSControl, preConditions.doubleJumpTimeThresholdInMs, parameters.doubleJumpTimeThresholdInMs);
   preConditions.checkIfAddedObjectOrObjectGroupOnlyIfExists(ROYGBIV.createFPSControl, preConditions.weaponObject1, parameters.weaponObject1);
-  preConditions.checkIfTrueOnlyIfYExists(ROYGBIV.createFPSControl, "Object is not marked as FPS weapon.", parameters.weaponObject1, !parameters.weaponObject1.isFPSWeapon);
+  preConditions.checkIfFPSWeaponOnlyIfExists(ROYGBIV.createFPSControl, preConditions.weaponObject1, parameters.weaponObject1);
   preConditions.checkIfAddedObjectOrObjectGroupOnlyIfExists(ROYGBIV.createFPSControl, preConditions.weaponObject2, parameters.weaponObject2);
-  preConditions.checkIfTrueOnlyIfYExists(ROYGBIV.createFPSControl, "Object is not marked as FPS weapon.", parameters.weaponObject2, !parameters.weaponObject2.isFPSWeapon);
+  preConditions.checkIfFPSWeaponOnlyIfExists(ROYGBIV.createFPSControl, preConditions.weaponObject2, parameters.weaponObject2);
   preConditions.checkIfBooleanOnlyIfExists(ROYGBIV.createFPSControl, preConditions.hasIdleGunAnimation, parameters.hasIdleGunAnimation);
   preConditions.checkIfNumberOnlyIfExists(ROYGBIV.createFPSControl, preConditions.idleGunAnimationSpeed, parameters.idleGunAnimationSpeed);
   preConditions.checkIfBooleanOnlyIfExists(ROYGBIV.createFPSControl, preConditions.weaponRotationRandomnessOn, parameters.weaponRotationRandomnessOn);

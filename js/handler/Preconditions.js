@@ -333,6 +333,14 @@ Preconditions.prototype.checkIfAddedObjectObjectGroupParticleSystemParticle = fu
   }
 }
 
+Preconditions.prototype.checkIfFPSWeaponOnlyIfExists = function(callerFunc, parameterName, obj){
+  if (!(typeof obj == UNDEFINED)){
+    if (!obj.isFPSWeapon){
+      this.throw(callerFunc, parameterName+" is not marked as a FPS weapon.");
+    }
+  }
+}
+
 Preconditions.prototype.checkIfAlreadyUsedAsFPSWeaponOnlyIfExists = function(callerFunc, parameterName, obj){
   if (!(typeof obj == UNDEFINED)){
     if (obj.isUsedInFPSControl){
