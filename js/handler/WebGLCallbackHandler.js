@@ -511,17 +511,6 @@ WebGLCallbackHandler.prototype.onBeforeVertexAttribPointer = function(index, siz
 }
 
 WebGLCallbackHandler.prototype.onBeforeBindBuffer = function(isElementArrayBuffer, buffer, lineID){
-  if (!this.doNotCache){
-    if (isElementArrayBuffer && this.lastBindElementArrayBuffer){
-      if (this.lastBindElementArrayBuffer == buffer){
-        return;
-      }
-    }else if (!isElementArrayBuffer && this.lastBindArrayBuffer){
-      if (this.lastBindArrayBuffer == buffer){
-        return;
-      }
-    }
-  }
   if (isElementArrayBuffer){
     if (this.record){
       var s = performance.now();
@@ -530,9 +519,6 @@ WebGLCallbackHandler.prototype.onBeforeBindBuffer = function(isElementArrayBuffe
     }else{
       this.gl.bindBuffer(this.gl.ELEMENT_ARRAY_BUFFER, buffer);
     }
-    if (!this.doNotCache){
-      this.lastBindElementArrayBuffer = buffer;
-    }
   }else{
     if (this.record){
       var s = performance.now();
@@ -540,9 +526,6 @@ WebGLCallbackHandler.prototype.onBeforeBindBuffer = function(isElementArrayBuffe
       this.performanceLogs.bindBuffer = performance.now() - s;
     }else{
       this.gl.bindBuffer(this.gl.ARRAY_BUFFER, buffer);
-    }
-    if (!this.doNotCache){
-      this.lastBindArrayBuffer = buffer;
     }
   }
 }
