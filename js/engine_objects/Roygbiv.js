@@ -4426,6 +4426,9 @@ Roygbiv.prototype.createFPSControl = function(parameters){
   preConditions.checkIfFunctionOnlyIfExists(ROYGBIV.createFPSControl, preConditions.onPause, parameters.onPause);
   preConditions.checkIfFunctionOnlyIfExists(ROYGBIV.createFPSControl, preConditions.onResume, parameters.onResume);
   preConditions.checkIfBooleanOnlyIfExists(ROYGBIV.createFPSControl, preConditions.requestFullScreen, parameters.requestFullScreen);
+  preConditions.checkIfTrueOnlyIfYAndZExists(ROYGBIV.createFPSControl, "Weapon objects are the same.", parameters.weaponObject1, parameters.weaponObject2, (parameters.weaponObject1 == parameters.weaponObject2));
+  preConditions.checkIfAlreadyUsedAsFPSWeaponOnlyIfExists(ROYGBIV.createFPSControl, preConditions.weaponObject1, parameters.weaponObject1);
+  preConditions.checkIfAlreadyUsedAsFPSWeaponOnlyIfExists(ROYGBIV.createFPSControl, preConditions.weaponObject2, parameters.weaponObject2);
   return new FPSControls(parameters);
 }
 

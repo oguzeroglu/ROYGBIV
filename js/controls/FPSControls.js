@@ -116,6 +116,7 @@ FPSControls.prototype.init = function(){
   this.joystickStatus = {right: false, left: false, up: false, down: false};
   this.touchTrack = new Map();
   if (!(typeof this.weaponObject1 == UNDEFINED)){
+    this.weaponObject1.isUsedInFPSControl = true;
     this.hasWeapon1 = true;
     this.weaponObject1.beforeFPSControlsInfo = {position: new THREE.Vector3(), quaternion: new THREE.Quaternion()};
     this.weapon1Position = new THREE.Vector3();
@@ -126,6 +127,7 @@ FPSControls.prototype.init = function(){
     this.hasWeapon1 = false;
   }
   if (!(typeof this.weaponObject2 == UNDEFINED)){
+    this.weaponObject2.isUsedInFPSControl = true;
     this.hasWeapon2 = true;
     this.weaponObject2.beforeFPSControlsInfo = {position: new THREE.Vector3(), quaternion: new THREE.Quaternion()};
     this.weapon2Position = new THREE.Vector3();

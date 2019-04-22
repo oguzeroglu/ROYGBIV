@@ -328,17 +328,15 @@ ModeSwitcher.prototype.switchFromPreviewToDesign = function(){
 
   for (var objectName in objectGroups){
     var object = objectGroups[objectName];
-
     object.loadState();
     object.resetColor();
-
+    object.isUsedInFPSControl = false;
     if (object.positionThresholdExceededListenerInfo){
       object.positionThresholdExceededListenerInfo.isActive = false;
     }
     delete object.clickCallbackFunction;
     delete object.mouseOverCallbackFunction;
     delete object.mouseOutCallbackFunction;
-
     if (!(typeof object.originalMass == UNDEFINED)){
       object.setMass(object.originalMass);
       if (object.originalMass == 0){
@@ -346,7 +344,6 @@ ModeSwitcher.prototype.switchFromPreviewToDesign = function(){
       }
       delete object.originalMass;
     }
-
     if (object.isHidden){
       object.mesh.visible = true;
       object.isHidden = false;
@@ -361,17 +358,14 @@ ModeSwitcher.prototype.switchFromPreviewToDesign = function(){
   }
   for (var objectName in addedObjects){
     var object = addedObjects[objectName];
-
     if (object.positionThresholdExceededListenerInfo){
       object.positionThresholdExceededListenerInfo.isActive = false;
     }
-
+    object.isUsedInFPSControl = false;
     delete object.clickCallbackFunction;
     delete object.mouseOverCallbackFunction;
     delete object.mouseOutCallbackFunction;
-
     object.resetColor();
-
     if (object.isHidden){
       object.mesh.visible = true;
       object.isHidden = false;
@@ -379,7 +373,6 @@ ModeSwitcher.prototype.switchFromPreviewToDesign = function(){
         physicsWorld.addBody(object.physicsBody);
       }
     }
-
     object.loadState();
     if (object.initOpacitySet){
       object.updateOpacity(object.initOpacity);
@@ -392,7 +385,6 @@ ModeSwitcher.prototype.switchFromPreviewToDesign = function(){
       }
       delete object.originalMass;
     }
-
   }
   var newScripts = new Object();
   for (var scriptName in scripts){
