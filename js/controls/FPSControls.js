@@ -332,7 +332,7 @@ FPSControls.prototype.onRightHandFinger = function(touch){
     var randomness = 0;
     if (activeControl.weaponRotationRandomnessOn){
       activeControl.weapon1RotationRandomnessCounter += 0.06 * Math.random();
-      randomness = (Math.random() * (Math.sin(activeControl.weapon1RotationRandomnessCounter) / 400));
+      randomness = (Math.random() * (Math.sin(activeControl.weapon1RotationRandomnessCounter) / 800));
     }
     activeControl.weaponObject1.handleRotation(activeControl.axisY, dx + randomness);
   }
@@ -340,7 +340,7 @@ FPSControls.prototype.onRightHandFinger = function(touch){
     var randomness = 0;
     if (activeControl.weaponRotationRandomnessOn){
       activeControl.weapon2RotationRandomnessCounter += 0.06 * Math.random();
-      randomness = (Math.random() * (Math.sin(activeControl.weapon2RotationRandomnessCounter) / 400));
+      randomness = (Math.random() * (Math.sin(activeControl.weapon2RotationRandomnessCounter) / 800));
     }
     activeControl.weaponObject2.handleRotation(activeControl.axisY, dx + randomness);
   }
@@ -352,7 +352,7 @@ FPSControls.prototype.onRightHandFinger = function(touch){
       var randomness = 0;
       if (activeControl.weaponRotationRandomnessOn){
         activeControl.weapon1RotationRandomnessCounter2 += 0.06 * Math.random();
-        randomness = (Math.random() * (Math.sin(activeControl.weapon1RotationRandomnessCounter2) / 400));
+        randomness = (Math.random() * (Math.sin(activeControl.weapon1RotationRandomnessCounter2) / 800));
       }
       activeControl.weaponObject1.handleRotation(activeControl.axisX, dy + randomness);
     }
@@ -360,7 +360,7 @@ FPSControls.prototype.onRightHandFinger = function(touch){
       var randomness = 0;
       if (activeControl.weaponRotationRandomnessOn){
         activeControl.weapon2RotationRandomnessCounter2 += 0.06 * Math.random();
-        randomness = (Math.random() * (Math.sin(activeControl.weapon2RotationRandomnessCounter2) / 400));
+        randomness = (Math.random() * (Math.sin(activeControl.weapon2RotationRandomnessCounter2) / 800));
       }
       activeControl.weaponObject2.handleRotation(activeControl.axisX, dy + randomness);
     }
