@@ -101,6 +101,7 @@ var FPSControls = function(params){
     this.requestFullScreen = true;
     fullScreenRequested = true;
   }
+  this.init();
 }
 
 FPSControls.prototype.onClick = noop;
@@ -109,9 +110,55 @@ FPSControls.prototype.onPinch = noop;
 FPSControls.prototype.onMouseWheel = noop;
 FPSControls.prototype.onKeyUp = noop;
 
+FPSControls.prototype.init = function(){
+  this.currentLookInfo = {x: 0, y: 0, z: 0, objName: null};
+  this.joystickStatus = {right: false, left: false, up: false, down: false};
+  this.touchTrack = new Map();
+  if (!(typeof this.weaponObject1 == UNDEFINED)){
+    this.hasWeapon1 = true;
+    this.weaponObject1.beforeFPSControlsInfo = {position: new THREE.Vector3(), quaternion: new THREE.Quaternion()};
+    this.weapon1Position = new THREE.Vector3();
+    if (this.hasIdleGunAnimation){
+      this.weapon1IdleAnimationInfo = {x: 0, z: 0};
+    }
+  }else{
+    this.hasWeapon1 = false;
+  }
+  if (!(typeof this.weaponObject2 == UNDEFINED)){
+    this.hasWeapon2 = true;
+    this.weaponObject2.beforeFPSControlsInfo = {position: new THREE.Vector3(), quaternion: new THREE.Quaternion()};
+    this.weapon2Position = new THREE.Vector3();
+    if (this.hasIdleGunAnimation){
+      this.weapon2IdleAnimationInfo = {x: 0, z: 0};
+    }
+  }else{
+    this.hasWeapon2 = false;
+  }
+  if (this.hasWeapon1 && this.hasWeapon2){
+    var sameGeom = (autoInstancingHandler.getObjectKey(this.weaponObject1) == autoInstancingHandler.getObjectKey(this.weaponObject2));
+    var sameScale = (this.weaponObject1.fpsWeaponAlignment.scale == this.weaponObject2.fpsWeaponAlignment.scale);
+    if (sameGeom && sameScale){
+      var pseudoGroup = new Object();
+      pseudoGroup[this.weaponObject1.name] = this.weaponObject1;
+      pseudoGroup[this.weaponObject2.name] = this.weaponObject2;
+      this.autoInstancedObject = new AutoInstancedObject(generateUniqueObjectName(), pseudoGroup);
+      this.autoInstancedObject.init();
+      this.autoInstancedObject.mesh.visible = false;
+      macroHandler.injectMacro("FPS_WEAPON_SCALE "+this.weaponObject1.fpsWeaponAlignment.scale, this.autoInstancedObject.mesh.material, true, false);
+      scene.add(this.autoInstancedObject.mesh);
+    }
+  }
+}
+
 FPSControls.prototype.onFullScreenChange = function(isFullScreen){
   if (activeControl.requestFullScreen && !isFullScreen){
     fullScreenRequested = true;
+  }
+  if (isMobile){
+    this.shootableMap = new Object();
+    for (var i = 0; i<this.shootableObjects.length; i++){
+      this.shootableMap[this.shootableObjects[i].name] = this.shootableObjects[i];
+    }
   }
 }
 
@@ -608,20 +655,18 @@ FPSControls.prototype.onDeactivated = function(){
 
 FPSControls.prototype.onActivated = function(){
   this.pausedDueToScreenOrientation = false;
-  this.currentLookInfo = {x: 0, y: 0, z: 0, objName: null};
-  if (isMobile){
-    this.shootableMap = new Object();
-    for (var i = 0; i<this.shootableObjects.length; i++){
-      this.shootableMap[this.shootableObjects[i].name] = this.shootableObjects[i];
-    }
-  }
+  this.currentLookInfo.x = 0;
+  this.currentLookInfo.y = 0;
+  this.currentLookInfo.z = 0;
+  this.currentLookInfo.objName = null;
   this.isMouseDown = false;
   this.lastTapTime = 0;
   this.lastSpaceKeydownTime = 0;
-  this.joystickStatus = {
-    right: false, left: false, up: false, down: false
-  };
-  this.touchTrack = new Map();
+  this.joystickStatus.right = false;
+  this.joystickStatus.left = false;
+  this.joystickStatus.up = false;
+  this.joystickStatus.down = false;
+  this.touchTrack.clear();
   camera.position.copy(this.playerBodyObject.mesh.position);
   this.playerBodyObject.show();
   this.playerBodyObject.hide(true);
@@ -637,44 +682,47 @@ FPSControls.prototype.onActivated = function(){
   }else{
     this.hasCrosshair = false;
   }
-  if (!(typeof this.weaponObject1 == UNDEFINED)){
+  if (this.hasWeapon1){
     this.weaponObject1.show();
     this.weaponObject1.mesh.renderOrder = renderOrders.FPS_WEAPON;
     var pos = this.weaponObject1.mesh.position;
     var quat = this.weaponObject1.mesh.quaternion;
-    this.weaponObject1.beforeFPSControlsInfo = {position: pos.clone(), quaternion: quat.clone()};
-    this.hasWeapon1 = true;
+    this.weaponObject1.beforeFPSControlsInfo.position.copy(pos);
+    this.weaponObject1.beforeFPSControlsInfo.quaternion.copy(quat);
     this.weaponObject1.mesh.quaternion.set(this.weaponObject1.fpsWeaponAlignment.qx, this.weaponObject1.fpsWeaponAlignment.qy, this.weaponObject1.fpsWeaponAlignment.qz, this.weaponObject1.fpsWeaponAlignment.qw);
     this.weapon1InitQuaternion.copy(this.weaponObject1.mesh.quaternion);
     this.weaponObject1.mesh.scale.set(this.weaponObject1.fpsWeaponAlignment.scale, this.weaponObject1.fpsWeaponAlignment.scale, this.weaponObject1.fpsWeaponAlignment.scale);
-    this.weapon1Position = new THREE.Vector3(this.weaponObject1.fpsWeaponAlignment.x, this.weaponObject1.fpsWeaponAlignment.y, this.weaponObject1.fpsWeaponAlignment.z);
+    this.weapon1Position.set(this.weaponObject1.fpsWeaponAlignment.x, this.weaponObject1.fpsWeaponAlignment.y, this.weaponObject1.fpsWeaponAlignment.z);
     this.updateGunAlignment(0, this.weapon1Position.x, this.weapon1Position.y, this.weapon1Position.z);
     if (this.hasIdleGunAnimation){
-      this.weapon1IdleAnimationInfo = {x: 0, z: 0};
+      this.weapon1IdleAnimationInfo.x = 0;
+      this.weapon1IdleAnimationInfo.z = 0;
     }
     this.weapon1RotationRandomnessCounter = 0;
     this.weapon1RotationRandomnessCounter2 = 0;
-  }else{
-    this.hasWeapon1 = false;
   }
-  if (!(typeof this.weaponObject2 == UNDEFINED)){
+  if (this.hasWeapon2){
     this.weaponObject2.show();
     this.weaponObject2.mesh.renderOrder = renderOrders.FPS_WEAPON;
     var pos = this.weaponObject2.mesh.position;
     var quat = this.weaponObject2.mesh.quaternion;
-    this.weaponObject2.beforeFPSControlsInfo = {position: pos.clone(), quaternion: quat.clone()};
-    this.hasWeapon2 = true;
+    this.weaponObject2.beforeFPSControlsInfo.position.copy(pos);
+    this.weaponObject2.beforeFPSControlsInfo.quaternion.copy(quat);
     this.weaponObject2.mesh.quaternion.set(this.weaponObject2.fpsWeaponAlignment.qx, this.weaponObject2.fpsWeaponAlignment.qy, this.weaponObject2.fpsWeaponAlignment.qz, this.weaponObject2.fpsWeaponAlignment.qw);
     this.weapon2InitQuaternion.copy(this.weaponObject2.mesh.quaternion);
     this.weaponObject2.mesh.scale.set(this.weaponObject2.fpsWeaponAlignment.scale, this.weaponObject2.fpsWeaponAlignment.scale, this.weaponObject2.fpsWeaponAlignment.scale);
-    this.weapon2Position = new THREE.Vector3(this.weaponObject2.fpsWeaponAlignment.x, this.weaponObject2.fpsWeaponAlignment.y, this.weaponObject2.fpsWeaponAlignment.z);
+    this.weapon2Position.set(this.weaponObject2.fpsWeaponAlignment.x, this.weaponObject2.fpsWeaponAlignment.y, this.weaponObject2.fpsWeaponAlignment.z);
     this.updateGunAlignment(1, this.weapon2Position.x, this.weapon2Position.y, this.weapon2Position.z);
     if (this.hasIdleGunAnimation){
-      this.weapon2IdleAnimationInfo = {x: 0, z: 0};
+      this.weapon2IdleAnimationInfo.x = 0;
+      this.weapon2IdleAnimationInfo.z = 0;
     }
     this.weapon2RotationRandomnessCounter = 0;
     this.weapon2RotationRandomnessCounter2 = 0;
-  }else{
-    this.hasWeapon2 = false;
+  }
+  if (this.autoInstancedObject){
+    this.weaponObject1.mesh.visible = false;
+    this.weaponObject2.mesh.visible = false;
+    this.autoInstancedObject.mesh.visible = true;
   }
 }

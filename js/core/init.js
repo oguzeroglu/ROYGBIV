@@ -184,6 +184,7 @@ window.onload = function() {
   }
   // AUTO INSTANCING HANDLER
   autoInstancingHandler = new AutoInstancingHandler();
+  // SHADER CONTENT
   ShaderContent = new ShaderContent();
   if (isDeployment){
     cliDiv.value = "";
@@ -344,7 +345,7 @@ function generateUniqueObjectName(){
     var nameInGridSystems = !(typeof gridSystems[generatedName] == UNDEFINED);
     nameFound = (nameInAddedObjects || nameInGluedObjects || nameInChildObjects || nameInAddedTexts || nameInGridSystems);
     if (nameFound){
-      console.error("[*] Object name generation collision happened: "+generatedName);
+      console.error("[!] Object name generation collision happened: "+generatedName);
       generatedName = (Date.now().toString(36) + Math.random().toString(36).substr(2, 5)).toUpperCase();
     }
   }
