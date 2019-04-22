@@ -20,7 +20,11 @@ AutoInstancingHandler.prototype.getObjectKey = function(obj){
   if (obj.hasEmissiveMap()){
     emissiveKey = obj.mesh.material.uniforms.emissiveMap.value.uuid;
   }
-  return geomKey + PIPE + diffuseKey + PIPE + alphaKey + PIPE + aoKey + PIPE + displacementKey + PIPE + emissiveKey;
+  var key = geomKey + PIPE + diffuseKey + PIPE + alphaKey + PIPE + aoKey + PIPE + displacementKey + PIPE + emissiveKey;
+  if (obj.isFPSWeapon){
+    key += PIPE + obj.fpsWeaponAlignment.scale;
+  }
+  return key;
 }
 
 AutoInstancingHandler.prototype.handle = function(){
@@ -32,7 +36,7 @@ AutoInstancingHandler.prototype.handle = function(){
   var countersByObjectKey = new Object();
   for (var objName in addedObjects){
     var obj = addedObjects[objName];
-    if (!obj.isFPSWeapon && (obj.isChangeable || (!obj.noMass && obj.physicsBody.mass > 0))){
+    if ((obj.isChangeable || (!obj.noMass && obj.physicsBody.mass > 0))){
       var objKey = this.getObjectKey(obj);
       if (typeof countersByObjectKey[objKey] == UNDEFINED){
         countersByObjectKey[objKey] = 0;
