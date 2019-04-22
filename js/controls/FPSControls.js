@@ -222,7 +222,7 @@ FPSControls.prototype.onMouseMove = function(event){
     var randomness = 0;
     if (activeControl.weaponRotationRandomnessOn){
       activeControl.weapon1RotationRandomnessCounter += 0.06 * Math.random();
-      randomness = (Math.random() * (Math.sin(activeControl.weapon1RotationRandomnessCounter) / 400));
+      randomness = (Math.random() * (Math.sin(activeControl.weapon1RotationRandomnessCounter) / 800));
     }
     activeControl.weaponObject1.handleRotation(activeControl.axisY, dx + randomness);
   }
@@ -230,7 +230,7 @@ FPSControls.prototype.onMouseMove = function(event){
     var randomness = 0;
     if (activeControl.weaponRotationRandomnessOn){
       activeControl.weapon2RotationRandomnessCounter += 0.06 * Math.random();
-      randomness = (Math.random() * (Math.sin(activeControl.weapon2RotationRandomnessCounter) / 400));
+      randomness = (Math.random() * (Math.sin(activeControl.weapon2RotationRandomnessCounter) / 800));
     }
     activeControl.weaponObject2.handleRotation(activeControl.axisY, dx + randomness);
   }
@@ -242,7 +242,7 @@ FPSControls.prototype.onMouseMove = function(event){
       var randomness = 0;
       if (activeControl.weaponRotationRandomnessOn){
         activeControl.weapon1RotationRandomnessCounter2 += 0.06 * Math.random();
-        randomness = (Math.random() * (Math.sin(activeControl.weapon1RotationRandomnessCounter2) / 400));
+        randomness = (Math.random() * (Math.sin(activeControl.weapon1RotationRandomnessCounter2) / 800));
       }
       activeControl.weaponObject1.handleRotation(activeControl.axisX, dy + randomness);
     }
@@ -250,7 +250,7 @@ FPSControls.prototype.onMouseMove = function(event){
       var randomness = 0;
       if (activeControl.weaponRotationRandomnessOn){
         activeControl.weapon2RotationRandomnessCounter2 += 0.06 * Math.random();
-        randomness = (Math.random() * (Math.sin(activeControl.weapon2RotationRandomnessCounter2) / 400));
+        randomness = (Math.random() * (Math.sin(activeControl.weapon2RotationRandomnessCounter2) / 800));
       }
       activeControl.weaponObject2.handleRotation(activeControl.axisX, dy + randomness);
     }
@@ -738,6 +738,7 @@ FPSControls.prototype.onActivated = function(){
   if (this.autoInstancedObject){
     this.weaponObject1.mesh.visible = false;
     this.weaponObject2.mesh.visible = false;
+    this.autoInstancedObject.mesh.renderOrder = renderOrders.FPS_WEAPON;
     this.autoInstancedObject.mesh.visible = true;
   }
 }

@@ -2601,6 +2601,7 @@ AddedObject.prototype.getEndPoint = function(axis){
       translationAmount = (this.metaData.topRadius + this.metaData.bottomRadius) / 2;
     }
   }
+  translationAmount *= this.mesh.scale.x;
   var quaternion, position;
   if (this.parentObjectName){
     var parentObject = objectGroups[this.parentObjectName];
