@@ -111,6 +111,7 @@ FPSControls.prototype.onMouseWheel = noop;
 FPSControls.prototype.onKeyUp = noop;
 
 FPSControls.prototype.init = function(){
+  this.deactivated = true;
   this.currentLookInfo = {x: 0, y: 0, z: 0, objName: null};
   this.joystickStatus = {right: false, left: false, up: false, down: false};
   this.touchTrack = new Map();
@@ -134,7 +135,7 @@ FPSControls.prototype.init = function(){
   }else{
     this.hasWeapon2 = false;
   }
-  if (this.hasWeapon1 && this.hasWeapon2){
+  if (this.hasWeapon1 && this.hasWeapon2 && this.weaponObject1.isAddedObject && this.weaponObject2.isAddedObject){
     var sameGeom = (autoInstancingHandler.getObjectKey(this.weaponObject1) == autoInstancingHandler.getObjectKey(this.weaponObject2));
     var sameScale = (this.weaponObject1.fpsWeaponAlignment.scale == this.weaponObject2.fpsWeaponAlignment.scale);
     if (sameGeom && sameScale){
@@ -503,6 +504,9 @@ FPSControls.prototype.update = function(){
 }
 
 FPSControls.prototype.onlookRaycasterComplete = function(x, y, z, objName){
+  if (activeControl.deactivated){
+    return;
+  }
   activeControl.currentLookInfo.x = x;
   activeControl.currentLookInfo.y = y;
   activeControl.currentLookInfo.z = z;
@@ -633,6 +637,7 @@ FPSControls.prototype.resetRotation = function(){
 }
 
 FPSControls.prototype.onDeactivated = function(){
+  this.deactivated = true;
   if (this.autoInstancedObject){
     this.autoInstancedObject.mesh.visible = false;
     this.weaponObject1.mesh.visible = true;
@@ -660,6 +665,7 @@ FPSControls.prototype.onDeactivated = function(){
 }
 
 FPSControls.prototype.onActivated = function(){
+  this.deactivated = false;
   this.pausedDueToScreenOrientation = false;
   this.currentLookInfo.x = 0;
   this.currentLookInfo.y = 0;
