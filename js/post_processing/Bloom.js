@@ -18,6 +18,19 @@ var Bloom = function(){
   this.setBlurStepCount(this.configurations.blurStepCount);
 }
 
+Bloom.prototype.getTapTextFromTapType = function(type){
+  if (type == 13){
+    return "high";
+  }
+  if (type == 9){
+    return "medium";
+  }
+  if (type == 5){
+    return "low";
+  }
+  throw new Error("Unknown tap type.");
+}
+
 Bloom.prototype.reset = function(){
   renderer.bloomOn = false;
   this.setBlurStepCount(5);
@@ -93,6 +106,7 @@ Bloom.prototype.showConfigurations = function(){
   for (var i=0; i<5; i++){
     guiHandler.bloomParameters["BlurPass"+(i+1)]["Factor"] = this.configurations.bloomFactors[i];
     guiHandler.bloomParameters["BlurPass"+(i+1)]["Color"] = "#" + (REUSABLE_COLOR.setRGB(this.configurations.bloomTintColors[i].x, this.configurations.bloomTintColors[i].y, this.configurations.bloomTintColors[i].z).getHexString());
+    guiHandler.bloomParameters["BlurPass"+(i+1)]["Quality"] = this.getTapTextFromTapType(this.configurations.tapTypes[i]);
     guiHandler.enableController(guiHandler["blurPassFactorController"+(i+1)]);
     guiHandler.enableController(guiHandler["blurPassTintColorController"+(i+1)]);
     guiHandler.enableController(guiHandler["blurPassTapController"+(i+1)]);
