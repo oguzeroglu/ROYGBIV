@@ -3189,6 +3189,9 @@ Roygbiv.prototype.mergeParticleSystems = function(){
   var size = 0;
   for (var psName in particleSystemPool){
     var ps = particleSystemPool[psName];
+    if (ps.psMerger){
+      continue;
+    }
     mergeObj[psName] = ps;
     size ++;
     if (size == chunkSize){
