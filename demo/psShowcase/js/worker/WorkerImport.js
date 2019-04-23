@@ -1067,13 +1067,13 @@ GridSystem.prototype.draw = function(){
   var boundingPlane = new THREE.Mesh(
     boundingPlaneGeometry, boundingPlaneMaterial
   );
-  boundingPlane.renderOrder = 10;
+  boundingPlane.renderOrder = renderOrders.GRID_SYSTEM_BOUNDING_PLANE;
 
   geometry.center();
   var gridSystemRepresentation = new THREE.LineSegments(
     geometry, material
   );
-  gridSystemRepresentation.renderOrder = 10;
+  gridSystemRepresentation.renderOrder = renderOrders.GRID_SYSTEM_REPRESENTATION;
 
   gridSystemRepresentation.position.set(
     this.centerX,
@@ -2302,6 +2302,180 @@ var AddedObject = function(name, type, metaData, material, mesh, physicsBody, de
 
 }
 
+AddedObject.prototype.removeCollisionListener = function(){
+  this.physicsBody.removeEventListener("collide", this.boundCallbackFunction);
+  collisionCallbackRequests.delete(this.name);
+  physicsWorld.removeCollisionListener(this);
+}
+
+AddedObject.prototype.setCollisionListener = function(callbackFunction){
+  this.physicsBody.addEventListener("collide", this.boundCallbackFunction);
+  collisionCallbackRequests.set(this.name, callbackFunction.bind(this));
+  physicsWorld.setCollisionListener(this);
+}
+
+AddedObject.prototype.setPositionThresholdExceededListener = function(axis, threshold, controlMode, callbackFunction){
+  if (!this.positionThresholdExceededListenerInfo){
+    this.positionThresholdExceededListenerInfo = new Object();
+  }
+  this.positionThresholdExceededListenerInfo.axis = axis.toLowerCase();
+  this.positionThresholdExceededListenerInfo.isActive = true;
+  this.positionThresholdExceededListenerInfo.threshold = threshold;
+  this.positionThresholdExceededListenerInfo.controlMode = controlMode;
+  this.positionThresholdExceededListenerInfo.callbackFunction = callbackFunction.bind(this);
+}
+
+AddedObject.prototype.onFPSWeaponAlignmentUpdate = function(){
+  REUSABLE_VECTOR.set(this.fpsWeaponAlignment.x, this.fpsWeaponAlignment.y, this.fpsWeaponAlignment.z);
+  REUSABLE_VECTOR.unproject(camera);
+  this.mesh.position.copy(REUSABLE_VECTOR);
+  this.mesh.quaternion.set(this.fpsWeaponAlignment.qx, this.fpsWeaponAlignment.qy, this.fpsWeaponAlignment.qz, this.fpsWeaponAlignment.qw);
+  this.mesh.scale.set(this.fpsWeaponAlignment.scale, this.fpsWeaponAlignment.scale, this.fpsWeaponAlignment.scale);
+}
+
+AddedObject.prototype.revertPositionAfterFPSWeaponConfigurations = function(){
+  this.mesh.position.copy(this.positionWhenUsedAsFPSWeapon);
+  this.mesh.quaternion.copy(this.quaternionBeforeFPSWeaponConfigurationPanelOpened);
+  this.mesh.scale.set(1, 1, 1);
+  delete this.quaternionBeforeFPSWeaponConfigurationPanelOpened;
+}
+
+AddedObject.prototype.setChangeableStatus = function(val){
+  this.isChangeable = val;
+}
+
+AddedObject.prototype.setIntersectableStatus = function(val){
+  this.isIntersectable = val;
+}
+
+AddedObject.prototype.setNoMass = function(val){
+  if (!val){
+    physicsWorld.addBody(this.physicsBody);
+  }else{
+    physicsWorld.remove(this.physicsBody);
+  }
+  this.noMass = val;
+}
+
+AddedObject.prototype.resetFPSWeaponProperties = function(){
+  this.setNoMass(false);
+  this.setIntersectableStatus(true);
+  this.setChangeableStatus(false);
+  this.isFPSWeapon = false;
+  this.mesh.position.copy(this.positionWhenUsedAsFPSWeapon);
+  this.mesh.quaternion.copy(this.quaternionWhenUsedAsFPSWeapon);
+  this.physicsBody.position.copy(this.physicsPositionWhenUsedAsFPSWeapon);
+  this.physicsBody.quaternion.copy(this.physicsQuaternionWhenUsedAsFPSWeapon);
+  delete this.positionWhenUsedAsFPSWeapon;
+  delete this.quaternionWhenUsedAsFPSWeapon;
+  delete this.physicsPositionWhenUsedAsFPSWeapon;
+  delete this.physicsQuaternionWhenUsedAsFPSWeapon;
+  delete this.fpsWeaponAlignment;
+}
+
+AddedObject.prototype.useAsFPSWeapon = function(){
+  this.setNoMass(true);
+  this.setIntersectableStatus(false);
+  this.setChangeableStatus(true);
+  this.isFPSWeapon = true;
+  this.positionWhenUsedAsFPSWeapon = this.mesh.position.clone();
+  this.quaternionWhenUsedAsFPSWeapon = this.mesh.quaternion.clone();
+  this.physicsPositionWhenUsedAsFPSWeapon = new THREE.Vector3().copy(this.physicsBody.position);
+  this.physicsQuaternionWhenUsedAsFPSWeapon = new THREE.Quaternion().copy(this.physicsBody.quaternion);
+  this.fpsWeaponAlignment = {x: 0, y: 0, z: 0, scale: 1, qx: 0, qy: 0, qz: 0, qw: 1};
+}
+
+AddedObject.prototype.handleRotation = function(axis, radians){
+  if (this.pivotObject){
+    this.prevPositionVector.copy(this.mesh.position);
+    this.rotateAroundPivotObject(axis, radians);
+    physicsWorld.updateObject(this, false, true);
+    if (this.autoInstancedParent){
+      this.autoInstancedParent.updateObject(this);
+    }
+    this.onPositionChange(this.prevPositionVector, this.mesh.position);
+    return;
+  }
+  this.rotate(axis, radians, true);
+  physicsWorld.updateObject(this, false, true);
+  if (this.autoInstancedParent){
+    this.autoInstancedParent.updateObject(this);
+  }
+}
+
+AddedObject.prototype.setVelocity = function(velocityVector){
+  this.physicsBody.velocity.set(velocityVector.x, velocityVector.y, velocityVector.z);
+  physicsWorld.setObjectVelocity(this, velocityVector);
+}
+
+AddedObject.prototype.setVelocityX = function(velocityX){
+  this.physicsBody.velocity.x = velocityX;
+  physicsWorld.setObjectVelocityX(this, velocityX);
+}
+
+AddedObject.prototype.setVelocityY = function(velocityY){
+  this.physicsBody.velocity.y = velocityY;
+  physicsWorld.setObjectVelocityY(this, velocityY);
+}
+
+AddedObject.prototype.setVelocityZ = function(velocityZ){
+  this.physicsBody.velocity.z = velocityZ;
+  physicsWorld.setObjectVelocityZ(this, velocityZ);
+}
+
+AddedObject.prototype.resetVelocity = function(){
+  this.physicsBody.velocity.set(0, 0, 0);
+  this.physicsBody.angularVelocity.set(0, 0, 0);
+  physicsWorld.resetObjectVelocity(this);
+}
+
+AddedObject.prototype.show = function(){
+  if (!this.isVisibleOnThePreviewScene()){
+    this.mesh.visible = true;
+    if (this.autoInstancedParent){
+      this.autoInstancedParent.showObject(this);
+    }
+    if (!this.physicsKeptWhenHidden){
+      if (!this.noMass){
+        setTimeout(function(){
+          physicsWorld.addBody(this.physicsBody);
+        });
+        physicsWorld.show(this);
+        if (physicsDebugMode){
+          debugRenderer.show(this);
+        }
+      }
+    }
+    this.isHidden = false;
+    rayCaster.show(this);
+  }
+}
+
+AddedObject.prototype.hide = function(keepPhysics){
+  if (this.isVisibleOnThePreviewScene()){
+    this.mesh.visible = false;
+    if (this.autoInstancedParent){
+      this.autoInstancedParent.hideObject(this);
+    }
+    if (!keepPhysics){
+      if (!this.noMass){
+        setTimeout(function(){
+          physicsWorld.remove(this.physicsBody);
+          this.physicsKeptWhenHidden = false;
+        });
+        physicsWorld.hide(this);
+        if (physicsDebugMode){
+          debugRenderer.hide(this);
+        }
+      }
+    }else{
+      this.physicsKeptWhenHidden = true;
+    }
+    this.isHidden = true;
+    rayCaster.hide(this);
+  }
+}
+
 AddedObject.prototype.onPositionChange = function(from, to){
   if(mode == 0){
     return;
@@ -2573,11 +2747,16 @@ AddedObject.prototype.export = function(){
       }
     }
   }
-
   if (this.softCopyParentName){
     exportObject.softCopyParentName = this.softCopyParentName;
   }
-
+  if (this.positionWhenUsedAsFPSWeapon){
+    exportObject.positionWhenUsedAsFPSWeapon = this.positionWhenUsedAsFPSWeapon;
+    exportObject.quaternionWhenUsedAsFPSWeapon = this.quaternionWhenUsedAsFPSWeapon;
+    exportObject.physicsPositionWhenUsedAsFPSWeapon = this.physicsPositionWhenUsedAsFPSWeapon;
+    exportObject.physicsQuaternionWhenUsedAsFPSWeapon = this.physicsQuaternionWhenUsedAsFPSWeapon;
+    exportObject.fpsWeaponAlignment = this.fpsWeaponAlignment;
+  }
   if (this.hasTexture()){
     exportObject.txtMatrix = this.mesh.material.uniforms.textureMatrix.value.elements;
   }
@@ -3217,6 +3396,34 @@ AddedObject.prototype.getPositionAtAxis = function(axis){
       return parseInt(this.metaData["positionZ"]);
     }
   }
+}
+
+AddedObject.prototype.untrackObjectPosition = function(){
+  delete this.trackedObject;
+  delete trackingObjects[this.name];
+}
+
+AddedObject.prototype.trackObjectPosition = function(targetObject){
+  this.trackedObject = targetObject;
+  targetObject.isTracked = true;
+  trackingObjects[this.name] = this;
+  targetObject.oldPX = targetObject.physicsBody.position.x;
+  targetObject.oldPY = targetObject.physicsBody.position.y;
+  targetObject.oldPZ = targetObject.physicsBody.position.z;
+}
+
+AddedObject.prototype.setPosition = function(x, y, z){
+  this.prevPositionVector.copy(this.mesh.position);
+  this.mesh.position.set(x, y, z);
+  this.physicsBody.position.set(x, y, z);
+  if (this.mesh.visible){
+    rayCaster.updateObject(this);
+  }
+  physicsWorld.updateObject(this, true, false);
+  if (this.autoInstancedParent){
+    this.autoInstancedParent.updateObject(this);
+  }
+  this.onPositionChange(this.prevPositionVector, this.mesh.position);
 }
 
 AddedObject.prototype.resetPosition = function(){
@@ -4480,6 +4687,25 @@ AddedObject.prototype.setFriction = function(val){
   }
 }
 
+AddedObject.prototype.unsetRotationPivot = function(){
+  delete this.pivotObject;
+  delete this.pivotOffsetX;
+  delete this.pivotOffsetY;
+  delete this.pivotOffsetZ;
+}
+
+AddedObject.prototype.setRotationPivot = function(rotationPivot){
+  if (this.pivotObject){
+    rotationPivot.position.copy(this.pivotObject.position);
+    rotationPivot.quaternion.copy(this.pivotObject.quaternion);
+    rotationPivot.rotation.copy(this.pivotObject.rotation);
+  }
+  this.pivotObject = rotationPivot;
+  this.pivotOffsetX = rotationPivot.offsetX;
+  this.pivotOffsetY = rotationPivot.offsetY;
+  this.pivotOffsetZ = rotationPivot.offsetZ;
+}
+
 AddedObject.prototype.makePivot = function(offsetX, offsetY, offsetZ){
   var obj = this;
   var pseudoMesh = new THREE.Mesh(obj.mesh.geometry, obj.mesh.material);
@@ -4622,6 +4848,7 @@ AddedObject.prototype.getEndPoint = function(axis){
       translationAmount = (this.metaData.topRadius + this.metaData.bottomRadius) / 2;
     }
   }
+  translationAmount *= this.mesh.scale.x;
   var quaternion, position;
   if (this.parentObjectName){
     var parentObject = objectGroups[this.parentObjectName];
@@ -4912,6 +5139,203 @@ var ObjectGroup = function(name, group){
   this.isIntersectable = true;
   this.lastUpdatePosition = new THREE.Vector3();
   this.lastUpdateQuaternion = new THREE.Quaternion();
+}
+
+ObjectGroup.prototype.removeCollisionListener = function(){
+  this.physicsBody.removeEventListener("collide", this.boundCallbackFunction);
+  collisionCallbackRequests.delete(this.name);
+  physicsWorld.removeCollisionListener(this);
+}
+
+ObjectGroup.prototype.setCollisionListener = function(callbackFunction){
+  this.physicsBody.addEventListener("collide", this.boundCallbackFunction);
+  collisionCallbackRequests.set(this.name, callbackFunction.bind(this));
+  physicsWorld.setCollisionListener(this);
+}
+
+ObjectGroup.prototype.setPositionThresholdExceededListener = function(axis, threshold, controlMode, callbackFunction){
+  if (!this.positionThresholdExceededListenerInfo){
+    this.positionThresholdExceededListenerInfo = new Object();
+  }
+  this.positionThresholdExceededListenerInfo.axis = axis.toLowerCase();
+  this.positionThresholdExceededListenerInfo.isActive = true;
+  this.positionThresholdExceededListenerInfo.threshold = threshold;
+  this.positionThresholdExceededListenerInfo.controlMode = controlMode;
+  this.positionThresholdExceededListenerInfo.callbackFunction = callbackFunction.bind(this);
+}
+
+ObjectGroup.prototype.onFPSWeaponAlignmentUpdate = function(){
+  REUSABLE_VECTOR.set(this.fpsWeaponAlignment.x, this.fpsWeaponAlignment.y, this.fpsWeaponAlignment.z);
+  REUSABLE_VECTOR.unproject(camera);
+  this.mesh.position.copy(REUSABLE_VECTOR);
+  this.mesh.quaternion.set(this.fpsWeaponAlignment.qx, this.fpsWeaponAlignment.qy, this.fpsWeaponAlignment.qz, this.fpsWeaponAlignment.qw);
+  this.mesh.scale.set(this.fpsWeaponAlignment.scale, this.fpsWeaponAlignment.scale, this.fpsWeaponAlignment.scale);
+}
+
+ObjectGroup.prototype.revertPositionAfterFPSWeaponConfigurations = function(){
+  this.mesh.position.copy(this.positionWhenUsedAsFPSWeapon);
+  this.mesh.quaternion.copy(this.quaternionBeforeFPSWeaponConfigurationPanelOpened);
+  this.mesh.scale.set(1, 1, 1);
+  delete this.quaternionBeforeFPSWeaponConfigurationPanelOpened;
+}
+
+ObjectGroup.prototype.setChangeableStatus = function(val){
+  this.isChangeable = val;
+}
+
+ObjectGroup.prototype.setIntersectableStatus = function(val){
+  this.isIntersectable = val;
+}
+
+ObjectGroup.prototype.setNoMass = function(val){
+  if (!val){
+    physicsWorld.addBody(this.physicsBody);
+  }else{
+    physicsWorld.remove(this.physicsBody);
+  }
+  this.noMass = val;
+}
+
+ObjectGroup.prototype.resetFPSWeaponProperties = function(){
+  this.setNoMass(false);
+  this.setIntersectableStatus(true);
+  this.setChangeableStatus(false);
+  this.isFPSWeapon = false;
+  this.mesh.position.copy(this.positionWhenUsedAsFPSWeapon);
+  this.mesh.quaternion.copy(this.quaternionWhenUsedAsFPSWeapon);
+  this.physicsBody.position.copy(this.physicsPositionWhenUsedAsFPSWeapon);
+  this.physicsBody.quaternion.copy(this.physicsQuaternionWhenUsedAsFPSWeapon);
+  delete this.positionWhenUsedAsFPSWeapon;
+  delete this.quaternionWhenUsedAsFPSWeapon;
+  delete this.physicsPositionWhenUsedAsFPSWeapon;
+  delete this.physicsQuaternionWhenUsedAsFPSWeapon;
+}
+
+ObjectGroup.prototype.useAsFPSWeapon = function(){
+  this.setNoMass(true);
+  this.setIntersectableStatus(false);
+  this.setChangeableStatus(true);
+  this.isFPSWeapon = true;
+  this.positionWhenUsedAsFPSWeapon = this.mesh.position.clone();
+  this.quaternionWhenUsedAsFPSWeapon = this.mesh.quaternion.clone();
+  this.physicsPositionWhenUsedAsFPSWeapon = new THREE.Vector3().copy(this.physicsBody.position);
+  this.physicsQuaternionWhenUsedAsFPSWeapon = new THREE.Quaternion().copy(this.physicsBody.quaternion);
+  this.fpsWeaponAlignment = {x: 0, y: 0, z: 0, scale: 1, qx: 0, qy: 0, qz: 0, qw: 1};
+}
+
+ObjectGroup.prototype.handleRotation = function(axis, radians){
+  if (this.pivotObject){
+    this.prevPositionVector.copy(this.mesh.position);
+    this.rotateAroundPivotObject(axis, radians);
+    physicsWorld.updateObject(this, false, true);
+    if (this.autoInstancedParent){
+      this.autoInstancedParent.updateObject(this);
+    }
+    this.onPositionChange(this.prevPositionVector, this.mesh.position);
+    return;
+  }
+  this.rotate(axis, radians, true);
+  physicsWorld.updateObject(this, false, true);
+  if (this.autoInstancedParent){
+    this.autoInstancedParent.updateObject(this);
+  }
+}
+
+ObjectGroup.prototype.untrackObjectPosition = function(){
+  delete this.trackedObject;
+  delete trackingObjects[this.name];
+}
+
+ObjectGroup.prototype.trackObjectPosition = function(targetObject){
+  this.trackedObject = targetObject;
+  targetObject.isTracked = true;
+  trackingObjects[this.name] = this;
+  targetObject.oldPX = targetObject.physicsBody.position.x;
+  targetObject.oldPY = targetObject.physicsBody.position.y;
+  targetObject.oldPZ = targetObject.physicsBody.position.z;
+}
+
+ObjectGroup.prototype.setPosition = function(x, y, z){
+  this.prevPositionVector.copy(this.mesh.position);
+  this.mesh.position.set(x, y, z);
+  this.graphicsGroup.position.set(x, y, z);
+  if (!this.isPhysicsSimplified){
+    this.physicsBody.position.set(x, y, z);
+  }else {
+    this.updateSimplifiedPhysicsBody();
+  }
+  if (this.mesh.visible){
+    rayCaster.updateObject(this);
+  }
+  physicsWorld.updateObject(this, true, false);
+  this.onPositionChange(this.prevPositionVector, this.mesh.position);
+}
+
+ObjectGroup.prototype.setVelocity = function(velocityVector){
+  this.physicsBody.velocity.set(velocityVector.x, velocityVector.y, velocityVector.z);
+  physicsWorld.setObjectVelocity(this, velocityVector);
+}
+
+ObjectGroup.prototype.setVelocityX = function(velocityX){
+  this.physicsBody.velocity.x = velocityX;
+  physicsWorld.setObjectVelocityX(this, velocityX);
+}
+
+ObjectGroup.prototype.setVelocityY = function(velocityY){
+  this.physicsBody.velocity.y = velocityY;
+  physicsWorld.setObjectVelocityY(this, velocityY);
+}
+
+ObjectGroup.prototype.setVelocityZ = function(velocityZ){
+  this.physicsBody.velocity.z = velocityZ;
+  physicsWorld.setObjectVelocityZ(this, velocityZ);
+}
+
+ObjectGroup.prototype.resetVelocity = function(){
+  this.physicsBody.velocity.set(0, 0, 0);
+  this.physicsBody.angularVelocity.set(0, 0, 0);
+  physicsWorld.resetObjectVelocity(this);
+}
+
+ObjectGroup.prototype.show = function(){
+  if (!this.isVisibleOnThePreviewScene()){
+    this.mesh.visible = true;
+    if (!this.physicsKeptWhenHidden){
+      if (!this.noMass){
+        setTimeout(function(){
+          physicsWorld.addBody(this.physicsBody);
+        });
+        physicsWorld.show(this);
+        if (physicsDebugMode){
+          debugRenderer.show(this);
+        }
+      }
+    }
+    this.isHidden = false;
+    rayCaster.show(this);
+  }
+}
+
+ObjectGroup.prototype.hide = function(keepPhysics){
+  if (this.isVisibleOnThePreviewScene()){
+    this.mesh.visible = false;
+    if (!keepPhysics){
+      if (!this.noMass){
+        setTimeout(function(){
+          physicsWorld.remove(this.physicsBody);
+          this.physicsKeptWhenHidden = false;
+        });
+        physicsWorld.hide(this);
+        if (physicsDebugMode){
+          debugRenderer.hide(this);
+        }
+      }
+    }else{
+      this.physicsKeptWhenHidden = true;
+    }
+    this.isHidden = true;
+    rayCaster.hide(this);
+  }
 }
 
 ObjectGroup.prototype.onPositionChange = function(from, to){
@@ -5929,6 +6353,9 @@ ObjectGroup.prototype.glue = function(){
   for (var objectName in group){
     var addedObject = group[objectName];
     addedObject.setAttachedProperties();
+    if (addedObject.isFPSWeapon){
+      addedObject.resetFPSWeaponProperties();
+    }
 
     this.totalVertexCount += addedObject.mesh.geometry.attributes.position.count;
     // GLUE PHYSICS ************************************************
@@ -6515,6 +6942,13 @@ ObjectGroup.prototype.export = function(){
     };
     exportObj.physicsSimplificationParameters = this.physicsSimplificationParameters;
   }
+  if (this.positionWhenUsedAsFPSWeapon){
+    exportObj.positionWhenUsedAsFPSWeapon = this.positionWhenUsedAsFPSWeapon;
+    exportObj.quaternionWhenUsedAsFPSWeapon = this.quaternionWhenUsedAsFPSWeapon;
+    exportObj.physicsPositionWhenUsedAsFPSWeapon = this.physicsPositionWhenUsedAsFPSWeapon;
+    exportObj.physicsQuaternionWhenUsedAsFPSWeapon = this.physicsQuaternionWhenUsedAsFPSWeapon;
+    exportObj.fpsWeaponAlignment = this.fpsWeaponAlignment;
+  }
   return exportObj;
 }
 
@@ -6709,6 +7143,25 @@ ObjectGroup.prototype.setFriction = function(val){
       physicsWorld.addContactMaterial(contact);
     }
   }
+}
+
+ObjectGroup.prototype.unsetRotationPivot = function(){
+  delete this.pivotObject;
+  delete this.pivotOffsetX;
+  delete this.pivotOffsetY;
+  delete this.pivotOffsetZ;
+}
+
+ObjectGroup.prototype.setRotationPivot = function(rotationPivot){
+  if (this.pivotObject){
+    rotationPivot.position.copy(this.pivotObject.position);
+    rotationPivot.quaternion.copy(this.pivotObject.quaternion);
+    rotationPivot.rotation.copy(this.pivotObject.rotation);
+  }
+  this.pivotObject = rotationPivot;
+  this.pivotOffsetX = rotationPivot.offsetX;
+  this.pivotOffsetY = rotationPivot.offsetY;
+  this.pivotOffsetZ = rotationPivot.offsetZ;
 }
 
 ObjectGroup.prototype.makePivot = function(offsetX, offsetY, offsetZ){
@@ -7154,6 +7607,7 @@ var AddedText = function(name, font, text, position, color, alpha, characterSize
   this.constructText();
   this.handleUVUniform();
   this.mesh = new THREE.Points(this.geometry, this.material);
+  this.mesh.renderOrder = renderOrders.TEXT_3D;
   this.mesh.position.copy(position);
   this.mesh.frustumCulled = false;
   scene.add(this.mesh);
@@ -7735,6 +8189,7 @@ AddedText.prototype.set2DStatus = function(is2D){
     }
     this.isClickable = false;
     addedTexts2D[this.name] = this;
+    this.mesh.renderOrder = renderOrders.TEXT_2D;
   }else{
     macroHandler.removeMacro("IS_TWO_DIMENSIONAL", this.material, true, false);
     delete this.mesh.material.uniforms.margin2D;
@@ -7749,6 +8204,7 @@ AddedText.prototype.set2DStatus = function(is2D){
       delete this.refLineOffset;
     }
     delete addedTexts2D[this.name];
+    this.mesh.renderOrder = renderOrders.TEXT_3D;
   }
   if (is2D){
     if (this.bbHelper){

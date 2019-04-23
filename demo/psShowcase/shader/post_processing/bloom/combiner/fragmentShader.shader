@@ -32,7 +32,7 @@ varying vec2 vUV;
 
 void main(){
   #ifdef BLEND_WITH_SKYBOX
-    vec3 skyboxColor = texture2D(skyboxColorTexture, vUV).rgb;
+    vec3 skyboxColor = texture2D(skyboxColorTexture, -vUV).rgb;
     vec3 tintColor0 = skyboxColor;
     vec3 tintColor1 = skyboxColor;
     vec3 tintColor2 = skyboxColor;

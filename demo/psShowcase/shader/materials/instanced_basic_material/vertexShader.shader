@@ -149,6 +149,9 @@ void main(){
     }
   #endif
   #ifdef IS_AUTO_INSTANCED
+    #ifdef FPS_WEAPON_SCALE
+      transformedPosition *= FPS_WEAPON_SCALE;
+    #endif
     vec3 positionOffset = autoInstanceOrientationArray[oi].yzw;
     vec4 quaternion = autoInstanceOrientationArray[oi+1];
   #endif

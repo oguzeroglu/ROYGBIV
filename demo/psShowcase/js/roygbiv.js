@@ -1295,7 +1295,6 @@ var fullScreenEventHandler;
 var visibilityChangeEventHandler;
 var mouseEventHandler;
 var resizeEventHandler;
-var orientationChangeEventHandler;
 var keyboardEventHandler;
 
 // THREE.JS VARIABLES
@@ -1592,9 +1591,28 @@ var defaultControlParameters = {
   translateYAmount: 3,
   mouseWheelSpeed: 1,
   swipeSpeed: 0.002,
-  
+
 };
 var activeControl;
+var crosshairHandler;
+var fpsWeaponAlignmentConfigurationObject;
+var isOrientationLandscape = (window.innerWidth > window.innerHeight);
+
+// RENDER ORDERS
+var renderOrders = {
+  FPS_WEAPON: -10,
+  SKYBOX: -1,
+  PARTICLE_SYSTEM: 0,
+  GRID: 10,
+  GRID_DOT: 10,
+  GRID_SYSTEM_BOUNDING_PLANE: 10,
+  GRID_SYSTEM_REPRESENTATION: 10,
+  OBJECT: 10,
+  TEXT_3D: 10,
+  TEXT_2D: 50,
+  CROSSHAIR: 60,
+  OBJECT_TRAIL: 100
+}
 
 // WORKER VARIABLES
 var WORKERS_SUPPORTED = (typeof(Worker) !== UNDEFINED) && (typeof(MessageChannel) !== UNDEFINED);
@@ -1724,7 +1742,7 @@ Grid.prototype.makeMesh = function(size, startX, startY, startZ){
     geometryCache[geomKey] = this.geometry;
   }
   this.mesh = new THREE.Mesh(this.geometry, this.material);
-  this.mesh.renderOrder = 10;
+  this.mesh.renderOrder = renderOrders.GRID;
   this.mesh.gridSystemName = this.parentName;
   if (this.axis == "XZ"){
 
@@ -1758,7 +1776,7 @@ Grid.prototype.makeMesh = function(size, startX, startY, startZ){
   this.centerDotGeometry.vertices.push(new THREE.Vector3(this.centerX, this.centerY, this.centerZ));
   this.centerDotMaterial = new THREE.PointsMaterial( { color: this.dotColor, size: 4, sizeAttenuation: false } );
   this.dot = new THREE.Points( this.centerDotGeometry, this.centerDotMaterial);
-  this.dot.renderOrder = 10;
+  this.dot.renderOrder = renderOrders.GRID_DOT;
   this.dot.gridSystemName = this.parentName;
 
   this.vertices = [];
@@ -2086,13 +2104,13 @@ GridSystem.prototype.draw = function(){
   var boundingPlane = new THREE.Mesh(
     boundingPlaneGeometry, boundingPlaneMaterial
   );
-  boundingPlane.renderOrder = 10;
+  boundingPlane.renderOrder = renderOrders.GRID_SYSTEM_BOUNDING_PLANE;
 
   geometry.center();
   var gridSystemRepresentation = new THREE.LineSegments(
     geometry, material
   );
-  gridSystemRepresentation.renderOrder = 10;
+  gridSystemRepresentation.renderOrder = renderOrders.GRID_SYSTEM_REPRESENTATION;
 
   gridSystemRepresentation.position.set(
     this.centerX,
@@ -3616,6 +3634,180 @@ var AddedObject = function(name, type, metaData, material, mesh, physicsBody, de
 
 }
 
+AddedObject.prototype.removeCollisionListener = function(){
+  this.physicsBody.removeEventListener("collide", this.boundCallbackFunction);
+  collisionCallbackRequests.delete(this.name);
+  physicsWorld.removeCollisionListener(this);
+}
+
+AddedObject.prototype.setCollisionListener = function(callbackFunction){
+  this.physicsBody.addEventListener("collide", this.boundCallbackFunction);
+  collisionCallbackRequests.set(this.name, callbackFunction.bind(this));
+  physicsWorld.setCollisionListener(this);
+}
+
+AddedObject.prototype.setPositionThresholdExceededListener = function(axis, threshold, controlMode, callbackFunction){
+  if (!this.positionThresholdExceededListenerInfo){
+    this.positionThresholdExceededListenerInfo = new Object();
+  }
+  this.positionThresholdExceededListenerInfo.axis = axis.toLowerCase();
+  this.positionThresholdExceededListenerInfo.isActive = true;
+  this.positionThresholdExceededListenerInfo.threshold = threshold;
+  this.positionThresholdExceededListenerInfo.controlMode = controlMode;
+  this.positionThresholdExceededListenerInfo.callbackFunction = callbackFunction.bind(this);
+}
+
+AddedObject.prototype.onFPSWeaponAlignmentUpdate = function(){
+  REUSABLE_VECTOR.set(this.fpsWeaponAlignment.x, this.fpsWeaponAlignment.y, this.fpsWeaponAlignment.z);
+  REUSABLE_VECTOR.unproject(camera);
+  this.mesh.position.copy(REUSABLE_VECTOR);
+  this.mesh.quaternion.set(this.fpsWeaponAlignment.qx, this.fpsWeaponAlignment.qy, this.fpsWeaponAlignment.qz, this.fpsWeaponAlignment.qw);
+  this.mesh.scale.set(this.fpsWeaponAlignment.scale, this.fpsWeaponAlignment.scale, this.fpsWeaponAlignment.scale);
+}
+
+AddedObject.prototype.revertPositionAfterFPSWeaponConfigurations = function(){
+  this.mesh.position.copy(this.positionWhenUsedAsFPSWeapon);
+  this.mesh.quaternion.copy(this.quaternionBeforeFPSWeaponConfigurationPanelOpened);
+  this.mesh.scale.set(1, 1, 1);
+  delete this.quaternionBeforeFPSWeaponConfigurationPanelOpened;
+}
+
+AddedObject.prototype.setChangeableStatus = function(val){
+  this.isChangeable = val;
+}
+
+AddedObject.prototype.setIntersectableStatus = function(val){
+  this.isIntersectable = val;
+}
+
+AddedObject.prototype.setNoMass = function(val){
+  if (!val){
+    physicsWorld.addBody(this.physicsBody);
+  }else{
+    physicsWorld.remove(this.physicsBody);
+  }
+  this.noMass = val;
+}
+
+AddedObject.prototype.resetFPSWeaponProperties = function(){
+  this.setNoMass(false);
+  this.setIntersectableStatus(true);
+  this.setChangeableStatus(false);
+  this.isFPSWeapon = false;
+  this.mesh.position.copy(this.positionWhenUsedAsFPSWeapon);
+  this.mesh.quaternion.copy(this.quaternionWhenUsedAsFPSWeapon);
+  this.physicsBody.position.copy(this.physicsPositionWhenUsedAsFPSWeapon);
+  this.physicsBody.quaternion.copy(this.physicsQuaternionWhenUsedAsFPSWeapon);
+  delete this.positionWhenUsedAsFPSWeapon;
+  delete this.quaternionWhenUsedAsFPSWeapon;
+  delete this.physicsPositionWhenUsedAsFPSWeapon;
+  delete this.physicsQuaternionWhenUsedAsFPSWeapon;
+  delete this.fpsWeaponAlignment;
+}
+
+AddedObject.prototype.useAsFPSWeapon = function(){
+  this.setNoMass(true);
+  this.setIntersectableStatus(false);
+  this.setChangeableStatus(true);
+  this.isFPSWeapon = true;
+  this.positionWhenUsedAsFPSWeapon = this.mesh.position.clone();
+  this.quaternionWhenUsedAsFPSWeapon = this.mesh.quaternion.clone();
+  this.physicsPositionWhenUsedAsFPSWeapon = new THREE.Vector3().copy(this.physicsBody.position);
+  this.physicsQuaternionWhenUsedAsFPSWeapon = new THREE.Quaternion().copy(this.physicsBody.quaternion);
+  this.fpsWeaponAlignment = {x: 0, y: 0, z: 0, scale: 1, qx: 0, qy: 0, qz: 0, qw: 1};
+}
+
+AddedObject.prototype.handleRotation = function(axis, radians){
+  if (this.pivotObject){
+    this.prevPositionVector.copy(this.mesh.position);
+    this.rotateAroundPivotObject(axis, radians);
+    physicsWorld.updateObject(this, false, true);
+    if (this.autoInstancedParent){
+      this.autoInstancedParent.updateObject(this);
+    }
+    this.onPositionChange(this.prevPositionVector, this.mesh.position);
+    return;
+  }
+  this.rotate(axis, radians, true);
+  physicsWorld.updateObject(this, false, true);
+  if (this.autoInstancedParent){
+    this.autoInstancedParent.updateObject(this);
+  }
+}
+
+AddedObject.prototype.setVelocity = function(velocityVector){
+  this.physicsBody.velocity.set(velocityVector.x, velocityVector.y, velocityVector.z);
+  physicsWorld.setObjectVelocity(this, velocityVector);
+}
+
+AddedObject.prototype.setVelocityX = function(velocityX){
+  this.physicsBody.velocity.x = velocityX;
+  physicsWorld.setObjectVelocityX(this, velocityX);
+}
+
+AddedObject.prototype.setVelocityY = function(velocityY){
+  this.physicsBody.velocity.y = velocityY;
+  physicsWorld.setObjectVelocityY(this, velocityY);
+}
+
+AddedObject.prototype.setVelocityZ = function(velocityZ){
+  this.physicsBody.velocity.z = velocityZ;
+  physicsWorld.setObjectVelocityZ(this, velocityZ);
+}
+
+AddedObject.prototype.resetVelocity = function(){
+  this.physicsBody.velocity.set(0, 0, 0);
+  this.physicsBody.angularVelocity.set(0, 0, 0);
+  physicsWorld.resetObjectVelocity(this);
+}
+
+AddedObject.prototype.show = function(){
+  if (!this.isVisibleOnThePreviewScene()){
+    this.mesh.visible = true;
+    if (this.autoInstancedParent){
+      this.autoInstancedParent.showObject(this);
+    }
+    if (!this.physicsKeptWhenHidden){
+      if (!this.noMass){
+        setTimeout(function(){
+          physicsWorld.addBody(this.physicsBody);
+        });
+        physicsWorld.show(this);
+        if (physicsDebugMode){
+          debugRenderer.show(this);
+        }
+      }
+    }
+    this.isHidden = false;
+    rayCaster.show(this);
+  }
+}
+
+AddedObject.prototype.hide = function(keepPhysics){
+  if (this.isVisibleOnThePreviewScene()){
+    this.mesh.visible = false;
+    if (this.autoInstancedParent){
+      this.autoInstancedParent.hideObject(this);
+    }
+    if (!keepPhysics){
+      if (!this.noMass){
+        setTimeout(function(){
+          physicsWorld.remove(this.physicsBody);
+          this.physicsKeptWhenHidden = false;
+        });
+        physicsWorld.hide(this);
+        if (physicsDebugMode){
+          debugRenderer.hide(this);
+        }
+      }
+    }else{
+      this.physicsKeptWhenHidden = true;
+    }
+    this.isHidden = true;
+    rayCaster.hide(this);
+  }
+}
+
 AddedObject.prototype.onPositionChange = function(from, to){
   if(mode == 0){
     return;
@@ -3887,11 +4079,16 @@ AddedObject.prototype.export = function(){
       }
     }
   }
-
   if (this.softCopyParentName){
     exportObject.softCopyParentName = this.softCopyParentName;
   }
-
+  if (this.positionWhenUsedAsFPSWeapon){
+    exportObject.positionWhenUsedAsFPSWeapon = this.positionWhenUsedAsFPSWeapon;
+    exportObject.quaternionWhenUsedAsFPSWeapon = this.quaternionWhenUsedAsFPSWeapon;
+    exportObject.physicsPositionWhenUsedAsFPSWeapon = this.physicsPositionWhenUsedAsFPSWeapon;
+    exportObject.physicsQuaternionWhenUsedAsFPSWeapon = this.physicsQuaternionWhenUsedAsFPSWeapon;
+    exportObject.fpsWeaponAlignment = this.fpsWeaponAlignment;
+  }
   if (this.hasTexture()){
     exportObject.txtMatrix = this.mesh.material.uniforms.textureMatrix.value.elements;
   }
@@ -4531,6 +4728,34 @@ AddedObject.prototype.getPositionAtAxis = function(axis){
       return parseInt(this.metaData["positionZ"]);
     }
   }
+}
+
+AddedObject.prototype.untrackObjectPosition = function(){
+  delete this.trackedObject;
+  delete trackingObjects[this.name];
+}
+
+AddedObject.prototype.trackObjectPosition = function(targetObject){
+  this.trackedObject = targetObject;
+  targetObject.isTracked = true;
+  trackingObjects[this.name] = this;
+  targetObject.oldPX = targetObject.physicsBody.position.x;
+  targetObject.oldPY = targetObject.physicsBody.position.y;
+  targetObject.oldPZ = targetObject.physicsBody.position.z;
+}
+
+AddedObject.prototype.setPosition = function(x, y, z){
+  this.prevPositionVector.copy(this.mesh.position);
+  this.mesh.position.set(x, y, z);
+  this.physicsBody.position.set(x, y, z);
+  if (this.mesh.visible){
+    rayCaster.updateObject(this);
+  }
+  physicsWorld.updateObject(this, true, false);
+  if (this.autoInstancedParent){
+    this.autoInstancedParent.updateObject(this);
+  }
+  this.onPositionChange(this.prevPositionVector, this.mesh.position);
 }
 
 AddedObject.prototype.resetPosition = function(){
@@ -5794,6 +6019,25 @@ AddedObject.prototype.setFriction = function(val){
   }
 }
 
+AddedObject.prototype.unsetRotationPivot = function(){
+  delete this.pivotObject;
+  delete this.pivotOffsetX;
+  delete this.pivotOffsetY;
+  delete this.pivotOffsetZ;
+}
+
+AddedObject.prototype.setRotationPivot = function(rotationPivot){
+  if (this.pivotObject){
+    rotationPivot.position.copy(this.pivotObject.position);
+    rotationPivot.quaternion.copy(this.pivotObject.quaternion);
+    rotationPivot.rotation.copy(this.pivotObject.rotation);
+  }
+  this.pivotObject = rotationPivot;
+  this.pivotOffsetX = rotationPivot.offsetX;
+  this.pivotOffsetY = rotationPivot.offsetY;
+  this.pivotOffsetZ = rotationPivot.offsetZ;
+}
+
 AddedObject.prototype.makePivot = function(offsetX, offsetY, offsetZ){
   var obj = this;
   var pseudoMesh = new THREE.Mesh(obj.mesh.geometry, obj.mesh.material);
@@ -5936,6 +6180,7 @@ AddedObject.prototype.getEndPoint = function(axis){
       translationAmount = (this.metaData.topRadius + this.metaData.bottomRadius) / 2;
     }
   }
+  translationAmount *= this.mesh.scale.x;
   var quaternion, position;
   if (this.parentObjectName){
     var parentObject = objectGroups[this.parentObjectName];
@@ -6207,7 +6452,7 @@ function render(){
   GLOBAL_ADDEDTEXT_VIEWPORT_UNIFORM.value.set(0, 0, window.innerWidth * screenResolution, window.innerHeight * screenResolution);
 
   activeControl.update();
-  
+
   cpuOperationsHandler.handleSkybox();
 
   if (!stopAreaConfigurationsHandler){
@@ -6220,8 +6465,8 @@ function render(){
 
   if (mode == 1){
     cpuOperationsHandler.stepPhysics();
-    cpuOperationsHandler.updateDynamicObjects();
     cpuOperationsHandler.updateTrackingObjects();
+    cpuOperationsHandler.updateDynamicObjects();
     cpuOperationsHandler.processCameraRotationBuffer();
     cpuOperationsHandler.runScripts();
     cpuOperationsHandler.updateParticleSystems();
@@ -6326,6 +6571,9 @@ function updateTrackingObjects(){
     if (!obj){
       obj = objectGroups[objName];
       isObjectGroup = true;
+    }
+    if (typeof obj.trackedObject.dx == UNDEFINED){
+      continue;
     }
     obj.prevPositionVector.copy(obj.mesh.position);
     obj.mesh.position.set(
@@ -7204,7 +7452,12 @@ window.onload = function() {
   // CONTROLS TEST
   if (!isDeployment){
     var controlClasses = [FreeControls, FPSControls, CustomControls];
-    var mandatoryControlMethods = ["update", "onMouseWheel", "onPinch", "onSwipe", "onTap", "onClick"];
+    var mandatoryControlMethods = [
+      "update", "onMouseWheel", "onMouseMove", "onMouseDown", "onMouseUp",
+      "onPinch", "onSwipe", "onTap", "onClick", "onActivated", "onDeactivated",
+      "onTouchStart", "onTouchMove", "onTouchEnd", "onKeyDown", "onKeyUp", "onResize",
+      "onFullScreenChange"
+    ];
     for (var i = 0; i<controlClasses.length; i++){
       for (var i2 = 0; i2<mandatoryControlMethods.length; i2++){
         if (!controlClasses[i].prototype[mandatoryControlMethods[i2]]){
@@ -7216,6 +7469,9 @@ window.onload = function() {
 
   // DEFAULT CONTROL
   activeControl = new FreeControls(defaultControlParameters);
+
+  // CROSSHAIR HANDLER
+  crosshairHandler = new CrosshairHandler();
 
   // SELECTION HANDLER
   if (!isDeployment){
@@ -7368,6 +7624,7 @@ window.onload = function() {
   }
   // AUTO INSTANCING HANDLER
   autoInstancingHandler = new AutoInstancingHandler();
+  // SHADER CONTENT
   ShaderContent = new ShaderContent();
   if (isDeployment){
     cliDiv.value = "";
@@ -7528,7 +7785,7 @@ function generateUniqueObjectName(){
     var nameInGridSystems = !(typeof gridSystems[generatedName] == UNDEFINED);
     nameFound = (nameInAddedObjects || nameInGluedObjects || nameInChildObjects || nameInAddedTexts || nameInGridSystems);
     if (nameFound){
-      console.error("[*] Object name generation collision happened: "+generatedName);
+      console.error("[!] Object name generation collision happened: "+generatedName);
       generatedName = (Date.now().toString(36) + Math.random().toString(36).substr(2, 5)).toUpperCase();
     }
   }
@@ -7542,7 +7799,6 @@ function onCanvasInitiated(){
   fullScreenEventHandler = new FullScreenEventHandler();
   visibilityChangeEventHandler = new VisibilityChangeEventHandler();
   resizeEventHandler = new ResizeEventHandler();
-  orientationChangeEventHandler = new OrientationChangeEventHandler();
   keyboardEventHandler = new KeyboardEventHandler();
 }
 
@@ -8659,6 +8915,18 @@ StateLoader.prototype.load = function(){
        if (!(typeof curAddedObjectExport.emissiveColor == UNDEFINED)){
          addedObjectInstance.setEmissiveColor = curAddedObjectExport.emissiveColor;
        }
+       if (!(typeof curAddedObjectExport.positionWhenUsedAsFPSWeapon == UNDEFINED)){
+         addedObjectInstance.isFPSWeapon = true;
+         var positionWhenUsedAsFPSWeapon = curAddedObjectExport.positionWhenUsedAsFPSWeapon;
+         var quaternionWhenUsedAsFPSWeapon = curAddedObjectExport.quaternionWhenUsedAsFPSWeapon;
+         var physicsPositionWhenUsedAsFPSWeapon = curAddedObjectExport.physicsPositionWhenUsedAsFPSWeapon;
+         var physicsQuaternionWhenUsedAsFPSWeapon = curAddedObjectExport.physicsQuaternionWhenUsedAsFPSWeapon;
+         addedObjectInstance.positionWhenUsedAsFPSWeapon = new THREE.Vector3(positionWhenUsedAsFPSWeapon.x, positionWhenUsedAsFPSWeapon.y, positionWhenUsedAsFPSWeapon.z);
+         addedObjectInstance.quaternionWhenUsedAsFPSWeapon = new THREE.Quaternion(quaternionWhenUsedAsFPSWeapon._x, quaternionWhenUsedAsFPSWeapon._y, quaternionWhenUsedAsFPSWeapon._z, quaternionWhenUsedAsFPSWeapon._w);
+         addedObjectInstance.physicsPositionWhenUsedAsFPSWeapon = new THREE.Vector3(physicsPositionWhenUsedAsFPSWeapon.x, physicsPositionWhenUsedAsFPSWeapon.y, physicsPositionWhenUsedAsFPSWeapon.z);
+         addedObjectInstance.physicsQuaternionWhenUsedAsFPSWeapon = new THREE.Quaternion(physicsQuaternionWhenUsedAsFPSWeapon._x, physicsQuaternionWhenUsedAsFPSWeapon._y, physicsQuaternionWhenUsedAsFPSWeapon._z, physicsQuaternionWhenUsedAsFPSWeapon._w);
+         addedObjectInstance.fpsWeaponAlignment = curAddedObjectExport.fpsWeaponAlignment;
+       }
     }
     for (var objName in addedObjects){
       if (addedObjects[objName].softCopyParentName){
@@ -8894,7 +9162,7 @@ StateLoader.prototype.load = function(){
                   geometryCache[geomKey] = skyboxBufferGeometry;
                 }
                 skyboxMesh = new MeshGenerator(skyboxBufferGeometry, null).generateSkybox(skybox);
-                skyboxMesh.renderOrder = -1;
+                skyboxMesh.renderOrder = renderOrders.SKYBOX;
               }
               if (skyboxVisible){
                 scene.add(skyboxMesh);
@@ -9318,6 +9586,18 @@ StateLoader.prototype.finalize = function(){
     if (curObjectGroupExport.noMass){
       objectGroupInstance.noMass = true;
       physicsWorld.remove(objectGroupInstance.physicsBody);
+    }
+    if (!(typeof curObjectGroupExport.positionWhenUsedAsFPSWeapon == UNDEFINED)){
+      objectGroupInstance.isFPSWeapon = true;
+      var positionWhenUsedAsFPSWeapon = curObjectGroupExport.positionWhenUsedAsFPSWeapon;
+      var quaternionWhenUsedAsFPSWeapon = curObjectGroupExport.quaternionWhenUsedAsFPSWeapon;
+      var physicsPositionWhenUsedAsFPSWeapon = curObjectGroupExport.physicsPositionWhenUsedAsFPSWeapon;
+      var physicsQuaternionWhenUsedAsFPSWeapon = curObjectGroupExport.physicsQuaternionWhenUsedAsFPSWeapon;
+      objectGroupInstance.positionWhenUsedAsFPSWeapon = new THREE.Vector3(positionWhenUsedAsFPSWeapon.x, positionWhenUsedAsFPSWeapon.y, positionWhenUsedAsFPSWeapon.z);
+      objectGroupInstance.quaternionWhenUsedAsFPSWeapon = new THREE.Quaternion(quaternionWhenUsedAsFPSWeapon._x, quaternionWhenUsedAsFPSWeapon._y, quaternionWhenUsedAsFPSWeapon._z, quaternionWhenUsedAsFPSWeapon._w);
+      objectGroupInstance.physicsPositionWhenUsedAsFPSWeapon = new THREE.Vector3(physicsPositionWhenUsedAsFPSWeapon.x, physicsPositionWhenUsedAsFPSWeapon.y, physicsPositionWhenUsedAsFPSWeapon.z);
+      objectGroupInstance.physicsQuaternionWhenUsedAsFPSWeapon = new THREE.Quaternion(physicsQuaternionWhenUsedAsFPSWeapon._x, physicsQuaternionWhenUsedAsFPSWeapon._y, physicsQuaternionWhenUsedAsFPSWeapon._z, physicsQuaternionWhenUsedAsFPSWeapon._w);
+      objectGroupInstance.fpsWeaponAlignment = curObjectGroupExport.fpsWeaponAlignment;
     }
   }
   for (var objName in objectGroups){
@@ -10510,6 +10790,203 @@ var ObjectGroup = function(name, group){
   this.lastUpdateQuaternion = new THREE.Quaternion();
 }
 
+ObjectGroup.prototype.removeCollisionListener = function(){
+  this.physicsBody.removeEventListener("collide", this.boundCallbackFunction);
+  collisionCallbackRequests.delete(this.name);
+  physicsWorld.removeCollisionListener(this);
+}
+
+ObjectGroup.prototype.setCollisionListener = function(callbackFunction){
+  this.physicsBody.addEventListener("collide", this.boundCallbackFunction);
+  collisionCallbackRequests.set(this.name, callbackFunction.bind(this));
+  physicsWorld.setCollisionListener(this);
+}
+
+ObjectGroup.prototype.setPositionThresholdExceededListener = function(axis, threshold, controlMode, callbackFunction){
+  if (!this.positionThresholdExceededListenerInfo){
+    this.positionThresholdExceededListenerInfo = new Object();
+  }
+  this.positionThresholdExceededListenerInfo.axis = axis.toLowerCase();
+  this.positionThresholdExceededListenerInfo.isActive = true;
+  this.positionThresholdExceededListenerInfo.threshold = threshold;
+  this.positionThresholdExceededListenerInfo.controlMode = controlMode;
+  this.positionThresholdExceededListenerInfo.callbackFunction = callbackFunction.bind(this);
+}
+
+ObjectGroup.prototype.onFPSWeaponAlignmentUpdate = function(){
+  REUSABLE_VECTOR.set(this.fpsWeaponAlignment.x, this.fpsWeaponAlignment.y, this.fpsWeaponAlignment.z);
+  REUSABLE_VECTOR.unproject(camera);
+  this.mesh.position.copy(REUSABLE_VECTOR);
+  this.mesh.quaternion.set(this.fpsWeaponAlignment.qx, this.fpsWeaponAlignment.qy, this.fpsWeaponAlignment.qz, this.fpsWeaponAlignment.qw);
+  this.mesh.scale.set(this.fpsWeaponAlignment.scale, this.fpsWeaponAlignment.scale, this.fpsWeaponAlignment.scale);
+}
+
+ObjectGroup.prototype.revertPositionAfterFPSWeaponConfigurations = function(){
+  this.mesh.position.copy(this.positionWhenUsedAsFPSWeapon);
+  this.mesh.quaternion.copy(this.quaternionBeforeFPSWeaponConfigurationPanelOpened);
+  this.mesh.scale.set(1, 1, 1);
+  delete this.quaternionBeforeFPSWeaponConfigurationPanelOpened;
+}
+
+ObjectGroup.prototype.setChangeableStatus = function(val){
+  this.isChangeable = val;
+}
+
+ObjectGroup.prototype.setIntersectableStatus = function(val){
+  this.isIntersectable = val;
+}
+
+ObjectGroup.prototype.setNoMass = function(val){
+  if (!val){
+    physicsWorld.addBody(this.physicsBody);
+  }else{
+    physicsWorld.remove(this.physicsBody);
+  }
+  this.noMass = val;
+}
+
+ObjectGroup.prototype.resetFPSWeaponProperties = function(){
+  this.setNoMass(false);
+  this.setIntersectableStatus(true);
+  this.setChangeableStatus(false);
+  this.isFPSWeapon = false;
+  this.mesh.position.copy(this.positionWhenUsedAsFPSWeapon);
+  this.mesh.quaternion.copy(this.quaternionWhenUsedAsFPSWeapon);
+  this.physicsBody.position.copy(this.physicsPositionWhenUsedAsFPSWeapon);
+  this.physicsBody.quaternion.copy(this.physicsQuaternionWhenUsedAsFPSWeapon);
+  delete this.positionWhenUsedAsFPSWeapon;
+  delete this.quaternionWhenUsedAsFPSWeapon;
+  delete this.physicsPositionWhenUsedAsFPSWeapon;
+  delete this.physicsQuaternionWhenUsedAsFPSWeapon;
+}
+
+ObjectGroup.prototype.useAsFPSWeapon = function(){
+  this.setNoMass(true);
+  this.setIntersectableStatus(false);
+  this.setChangeableStatus(true);
+  this.isFPSWeapon = true;
+  this.positionWhenUsedAsFPSWeapon = this.mesh.position.clone();
+  this.quaternionWhenUsedAsFPSWeapon = this.mesh.quaternion.clone();
+  this.physicsPositionWhenUsedAsFPSWeapon = new THREE.Vector3().copy(this.physicsBody.position);
+  this.physicsQuaternionWhenUsedAsFPSWeapon = new THREE.Quaternion().copy(this.physicsBody.quaternion);
+  this.fpsWeaponAlignment = {x: 0, y: 0, z: 0, scale: 1, qx: 0, qy: 0, qz: 0, qw: 1};
+}
+
+ObjectGroup.prototype.handleRotation = function(axis, radians){
+  if (this.pivotObject){
+    this.prevPositionVector.copy(this.mesh.position);
+    this.rotateAroundPivotObject(axis, radians);
+    physicsWorld.updateObject(this, false, true);
+    if (this.autoInstancedParent){
+      this.autoInstancedParent.updateObject(this);
+    }
+    this.onPositionChange(this.prevPositionVector, this.mesh.position);
+    return;
+  }
+  this.rotate(axis, radians, true);
+  physicsWorld.updateObject(this, false, true);
+  if (this.autoInstancedParent){
+    this.autoInstancedParent.updateObject(this);
+  }
+}
+
+ObjectGroup.prototype.untrackObjectPosition = function(){
+  delete this.trackedObject;
+  delete trackingObjects[this.name];
+}
+
+ObjectGroup.prototype.trackObjectPosition = function(targetObject){
+  this.trackedObject = targetObject;
+  targetObject.isTracked = true;
+  trackingObjects[this.name] = this;
+  targetObject.oldPX = targetObject.physicsBody.position.x;
+  targetObject.oldPY = targetObject.physicsBody.position.y;
+  targetObject.oldPZ = targetObject.physicsBody.position.z;
+}
+
+ObjectGroup.prototype.setPosition = function(x, y, z){
+  this.prevPositionVector.copy(this.mesh.position);
+  this.mesh.position.set(x, y, z);
+  this.graphicsGroup.position.set(x, y, z);
+  if (!this.isPhysicsSimplified){
+    this.physicsBody.position.set(x, y, z);
+  }else {
+    this.updateSimplifiedPhysicsBody();
+  }
+  if (this.mesh.visible){
+    rayCaster.updateObject(this);
+  }
+  physicsWorld.updateObject(this, true, false);
+  this.onPositionChange(this.prevPositionVector, this.mesh.position);
+}
+
+ObjectGroup.prototype.setVelocity = function(velocityVector){
+  this.physicsBody.velocity.set(velocityVector.x, velocityVector.y, velocityVector.z);
+  physicsWorld.setObjectVelocity(this, velocityVector);
+}
+
+ObjectGroup.prototype.setVelocityX = function(velocityX){
+  this.physicsBody.velocity.x = velocityX;
+  physicsWorld.setObjectVelocityX(this, velocityX);
+}
+
+ObjectGroup.prototype.setVelocityY = function(velocityY){
+  this.physicsBody.velocity.y = velocityY;
+  physicsWorld.setObjectVelocityY(this, velocityY);
+}
+
+ObjectGroup.prototype.setVelocityZ = function(velocityZ){
+  this.physicsBody.velocity.z = velocityZ;
+  physicsWorld.setObjectVelocityZ(this, velocityZ);
+}
+
+ObjectGroup.prototype.resetVelocity = function(){
+  this.physicsBody.velocity.set(0, 0, 0);
+  this.physicsBody.angularVelocity.set(0, 0, 0);
+  physicsWorld.resetObjectVelocity(this);
+}
+
+ObjectGroup.prototype.show = function(){
+  if (!this.isVisibleOnThePreviewScene()){
+    this.mesh.visible = true;
+    if (!this.physicsKeptWhenHidden){
+      if (!this.noMass){
+        setTimeout(function(){
+          physicsWorld.addBody(this.physicsBody);
+        });
+        physicsWorld.show(this);
+        if (physicsDebugMode){
+          debugRenderer.show(this);
+        }
+      }
+    }
+    this.isHidden = false;
+    rayCaster.show(this);
+  }
+}
+
+ObjectGroup.prototype.hide = function(keepPhysics){
+  if (this.isVisibleOnThePreviewScene()){
+    this.mesh.visible = false;
+    if (!keepPhysics){
+      if (!this.noMass){
+        setTimeout(function(){
+          physicsWorld.remove(this.physicsBody);
+          this.physicsKeptWhenHidden = false;
+        });
+        physicsWorld.hide(this);
+        if (physicsDebugMode){
+          debugRenderer.hide(this);
+        }
+      }
+    }else{
+      this.physicsKeptWhenHidden = true;
+    }
+    this.isHidden = true;
+    rayCaster.hide(this);
+  }
+}
+
 ObjectGroup.prototype.onPositionChange = function(from, to){
   if (mode == 0){
     return;
@@ -11525,6 +12002,9 @@ ObjectGroup.prototype.glue = function(){
   for (var objectName in group){
     var addedObject = group[objectName];
     addedObject.setAttachedProperties();
+    if (addedObject.isFPSWeapon){
+      addedObject.resetFPSWeaponProperties();
+    }
 
     this.totalVertexCount += addedObject.mesh.geometry.attributes.position.count;
     // GLUE PHYSICS ************************************************
@@ -12111,6 +12591,13 @@ ObjectGroup.prototype.export = function(){
     };
     exportObj.physicsSimplificationParameters = this.physicsSimplificationParameters;
   }
+  if (this.positionWhenUsedAsFPSWeapon){
+    exportObj.positionWhenUsedAsFPSWeapon = this.positionWhenUsedAsFPSWeapon;
+    exportObj.quaternionWhenUsedAsFPSWeapon = this.quaternionWhenUsedAsFPSWeapon;
+    exportObj.physicsPositionWhenUsedAsFPSWeapon = this.physicsPositionWhenUsedAsFPSWeapon;
+    exportObj.physicsQuaternionWhenUsedAsFPSWeapon = this.physicsQuaternionWhenUsedAsFPSWeapon;
+    exportObj.fpsWeaponAlignment = this.fpsWeaponAlignment;
+  }
   return exportObj;
 }
 
@@ -12305,6 +12792,25 @@ ObjectGroup.prototype.setFriction = function(val){
       physicsWorld.addContactMaterial(contact);
     }
   }
+}
+
+ObjectGroup.prototype.unsetRotationPivot = function(){
+  delete this.pivotObject;
+  delete this.pivotOffsetX;
+  delete this.pivotOffsetY;
+  delete this.pivotOffsetZ;
+}
+
+ObjectGroup.prototype.setRotationPivot = function(rotationPivot){
+  if (this.pivotObject){
+    rotationPivot.position.copy(this.pivotObject.position);
+    rotationPivot.quaternion.copy(this.pivotObject.quaternion);
+    rotationPivot.rotation.copy(this.pivotObject.rotation);
+  }
+  this.pivotObject = rotationPivot;
+  this.pivotOffsetX = rotationPivot.offsetX;
+  this.pivotOffsetY = rotationPivot.offsetY;
+  this.pivotOffsetZ = rotationPivot.offsetZ;
 }
 
 ObjectGroup.prototype.makePivot = function(offsetX, offsetY, offsetZ){
@@ -13958,6 +14464,7 @@ var ParticleSystem = function(copyPS, name, particles, x, y, z, vx, vy, vz, ax, 
   }
 
   this.mesh = new THREE.Points(this.geometry, this.material);
+  this.mesh.renderOrder = renderOrders.PARTICLE_SYSTEM;
   this.mesh.position.set(x, y, z);
   this.mesh.frustumCulled = false;
   this.mesh.visible = false;
@@ -14992,7 +15499,8 @@ var Roygbiv = function(){
     "removeObjectPositionThresholdExceededListener",
     "createFreeControl",
     "createCustomControl",
-    "setActiveControl"
+    "setActiveControl",
+    "createFPSControl"
   ];
 
   this.globals = new Object();
@@ -15265,54 +15773,11 @@ Roygbiv.prototype.hide = function(object, keepPhysics){
   if (object.isAddedObject){
     if (keepPhysicsValue){
     }
-    if (object.isVisibleOnThePreviewScene()){
-      object.mesh.visible = false;
-      if (object.autoInstancedParent){
-        object.autoInstancedParent.hideObject(object);
-      }
-      // The reason we use delayed execution here is that
-      // during the collision callback, cannon.js crashes if a body
-      // is removed. It is safe to remove the bodies after the
-      // physics iteration.
-      if (!keepPhysicsValue){
-        if (!object.noMass){
-          setTimeout(function(){
-            physicsWorld.remove(object.physicsBody);
-            object.physicsKeptWhenHidden = false;
-          });
-          physicsWorld.hide(object);
-          if (physicsDebugMode){
-            debugRenderer.hide(object);
-          }
-        }
-      }else{
-        object.physicsKeptWhenHidden = true;
-      }
-      object.isHidden = true;
-      rayCaster.hide(object);
-    }
+    object.hide(keepPhysicsValue);
   }else if (object.isObjectGroup){
     if (keepPhysicsValue){
     }
-    if (object.isVisibleOnThePreviewScene()){
-      object.mesh.visible = false;
-      if (!keepPhysicsValue){
-        if (!object.noMass){
-          setTimeout(function(){
-            physicsWorld.remove(object.physicsBody);
-            object.physicsKeptWhenHidden = false;
-          });
-          physicsWorld.hide(object);
-          if (physicsDebugMode){
-            debugRenderer.hide(object);
-          }
-        }
-      }else{
-        object.physicsKeptWhenHidden = true;
-      }
-      object.isHidden = true;
-      rayCaster.hide(object);
-    }
+    object.hide(keepPhysicsValue);
   }
 }
 
@@ -15321,42 +15786,9 @@ Roygbiv.prototype.show = function(object){
     return;
   }
   if (object.isAddedObject){
-    if (!object.isVisibleOnThePreviewScene()){
-      object.mesh.visible = true;
-      if (object.autoInstancedParent){
-        object.autoInstancedParent.showObject(object);
-      }
-      if (!object.physicsKeptWhenHidden){
-        if (!object.noMass){
-          setTimeout(function(){
-            physicsWorld.addBody(object.physicsBody);
-          });
-          physicsWorld.show(object);
-          if (physicsDebugMode){
-            debugRenderer.show(object);
-          }
-        }
-      }
-      object.isHidden = false;
-      rayCaster.show(object);
-    }
+    object.show();
   }else if (object.isObjectGroup){
-    if (!object.isVisibleOnThePreviewScene()){
-      object.mesh.visible = true;
-      if (!object.physicsKeptWhenHidden){
-        if (!object.noMass){
-          setTimeout(function(){
-            physicsWorld.addBody(object.physicsBody);
-          });
-          physicsWorld.show(object);
-          if (physicsDebugMode){
-            debugRenderer.show(object);
-          }
-        }
-      }
-      object.isHidden = false;
-      rayCaster.show(object);
-    }
+    object.show();
   }
 }
 
@@ -15378,10 +15810,6 @@ Roygbiv.prototype.rotate = function(object, axis, radians){
     return;
   }
   axis = axis.toLowerCase();
-  var isObject = false;
-  if ((object.isAddedObject) || (object.isObjectGroup)){
-    isObject = true;
-  }
   if (object.isAddedObject && object.parentObjectName){
     var parentObject = objectGroups[object.parentObjectName];
     if (parentObject){
@@ -15396,23 +15824,7 @@ Roygbiv.prototype.rotate = function(object, axis, radians){
       return;
     }
   }
-  if ((object.isAddedObject) || (object.isObjectGroup)){
-  }
-  if (object.pivotObject){
-    object.prevPositionVector.copy(object.mesh.position);
-    object.rotateAroundPivotObject(axis, radians);
-    physicsWorld.updateObject(object, false, true);
-    if (object.autoInstancedParent){
-      object.autoInstancedParent.updateObject(object);
-    }
-    object.onPositionChange(object.prevPositionVector, object.mesh.position);
-    return;
-  }
-  object.rotate(axis, radians, true);
-  physicsWorld.updateObject(object, false, true);
-  if (object.autoInstancedParent){
-    object.autoInstancedParent.updateObject(object);
-  }
+  object.handleRotation(axis, radians);
 }
 
 Roygbiv.prototype.rotateAroundXYZ = function(object, x, y, z, radians, axis){
@@ -15457,38 +15869,12 @@ Roygbiv.prototype.setPosition = function(obj, x, y, z){
   if (mode == 0){
     return;
   }
-  if (obj.isAddedObject){
-    if (obj.parentObjectName){
-      var objGroup = objectGroups[obj.parentObjectName];
-      this.setPosition(objGroup, x, y, z);
-      return;
-    }
-    obj.prevPositionVector.copy(obj.mesh.position);
-    obj.mesh.position.set(x, y, z);
-    obj.physicsBody.position.set(x, y, z);
-    if (obj.mesh.visible){
-      rayCaster.updateObject(obj);
-    }
-    physicsWorld.updateObject(obj, true, false);
-    if (obj.autoInstancedParent){
-      obj.autoInstancedParent.updateObject(obj);
-    }
-    obj.onPositionChange(obj.prevPositionVector, obj.mesh.position);
-  }else if (obj.isObjectGroup){
-    obj.prevPositionVector.copy(obj.mesh.position);
-    obj.mesh.position.set(x, y, z);
-    obj.graphicsGroup.position.set(x, y, z);
-    if (!obj.isPhysicsSimplified){
-      obj.physicsBody.position.set(x, y, z);
-    }else {
-      obj.updateSimplifiedPhysicsBody();
-    }
-    if (obj.mesh.visible){
-      rayCaster.updateObject(obj);
-    }
-    physicsWorld.updateObject(obj, true, false);
-    obj.onPositionChange(obj.prevPositionVector, obj.mesh.position);
+  if (obj.parentObjectName){
+    var objGroup = objectGroups[obj.parentObjectName];
+    this.setPosition(objGroup, x, y, z);
+    return;
   }
+  obj.setPosition(x, y, z);
 }
 
 Roygbiv.prototype.setMass = function(object, mass){
@@ -15576,19 +15962,15 @@ Roygbiv.prototype.setObjectVelocity = function(object, velocityVector, axis){
   if (!(typeof axis == UNDEFINED)){
     axis = axis.toLowerCase();
     if (axis == "x"){
-      object.physicsBody.velocity.x = velocityVector.x;
-      physicsWorld.setObjectVelocityX(object, velocityVector.x);
+      object.setVelocityX(velocityVector.x);
     }else if (axis == "y"){
-      object.physicsBody.velocity.y = velocityVector.y;
-      physicsWorld.setObjectVelocityY(object, velocityVector.y);
+      object.setVelocityY(velocityVector.y);
     }else if (axis == "z"){
-      object.physicsBody.velocity.z = velocityVector.z;
-      physicsWorld.setObjectVelocityZ(object, velocityVector.z);
+      object.setVelocityZ(velocityVector.z);
     }
     return;
   }
-  object.physicsBody.velocity.set(velocityVector.x, velocityVector.y, velocityVector.z);
-  physicsWorld.setObjectVelocity(object, velocityVector);
+  object.setVelocity(velocityVector);
 }
 
 Roygbiv.prototype.setObjectColor = function(object, colorName, alpha){
@@ -15621,34 +16003,21 @@ Roygbiv.prototype.setRotationPivot = function(rotationPivot){
     return;
   }
   var sourceObject = rotationPivot.sourceObject;
-  if (sourceObject.pivotObject){
-    rotationPivot.position.copy(sourceObject.pivotObject.position);
-    rotationPivot.quaternion.copy(sourceObject.pivotObject.quaternion);
-    rotationPivot.rotation.copy(sourceObject.pivotObject.rotation);
-  }
-  sourceObject.pivotObject = rotationPivot;
-  sourceObject.pivotOffsetX = rotationPivot.offsetX;
-  sourceObject.pivotOffsetY = rotationPivot.offsetY;
-  sourceObject.pivotOffsetZ = rotationPivot.offsetZ;
+  sourceObject.setRotationPivot(rotationPivot);
 }
 
 Roygbiv.prototype.unsetRotationPivot = function(object){
   if (mode == 0){
     return;
   }
-  delete object.pivotObject;
-  delete object.pivotOffsetX;
-  delete object.pivotOffsetY;
-  delete object.pivotOffsetZ;
+  object.unsetRotationPivot();
 }
 
 Roygbiv.prototype.resetObjectVelocity = function(object){
   if (mode == 0){
     return;
   }
-  object.physicsBody.velocity.set(0, 0, 0);
-  object.physicsBody.angularVelocity.set(0, 0, 0);
-  physicsWorld.resetObjectVelocity(object);
+  object.resetVelocity();
 }
 
 
@@ -17171,77 +17540,56 @@ Roygbiv.prototype.selectCrosshair = function(crosshairName){
     return;
   }
   var crosshair = crosshairs[crosshairName];
-  if (selectedCrosshair){
-    selectedCrosshair.mesh.visible = false;
-  }
-  crosshair.mesh.visible = true;
-  crosshair.handleResize();
-  selectedCrosshair = crosshair;
+  crosshairHandler.selectCrosshair(crosshair);
 }
 
 Roygbiv.prototype.changeCrosshairColor = function(colorName){
   if (mode == 0){
     return;
   }
-  REUSABLE_COLOR.set(colorName);
-  selectedCrosshair.material.uniforms.color.value.x = REUSABLE_COLOR.r;
-  selectedCrosshair.material.uniforms.color.value.y = REUSABLE_COLOR.g;
-  selectedCrosshair.material.uniforms.color.value.z = REUSABLE_COLOR.b;
+  crosshairHandler.changeCrosshairColor(colorName);
 }
 
 Roygbiv.prototype.hideCrosshair = function(){
   if (mode == 0){
     return;
   }
-  if (selectedCrosshair){
-    selectedCrosshair.mesh.visible = false;
-    selectedCrosshair = 0;
-  }
+  crosshairHandler.hideCrosshair();
 }
 
 Roygbiv.prototype.startCrosshairRotation = function(angularSpeed){
   if (mode == 0){
     return;
   }
-  selectedCrosshair.angularSpeed = angularSpeed;
+  crosshairHandler.startCrosshairRotation(angularSpeed);
 }
 
 Roygbiv.prototype.stopCrosshairRotation = function(){
   if (mode == 0){
     return;
   }
-  selectedCrosshair.rotationTime = 0;
-  selectedCrosshair.angularSpeed = 0;
-  selectedCrosshair.resetRotation();
+  crosshairHandler.stopCrosshairRotation();
 }
 
 Roygbiv.prototype.pauseCrosshairRotation = function(){
   if (mode == 0){
     return;
   }
-  selectedCrosshair.angularSpeed = 0;
+  crosshairHandler.pauseCrosshairRotation();
 }
 
 Roygbiv.prototype.expandCrosshair = function(targetSize, delta){
   if (mode == 0){
     return;
   }
-  selectedCrosshair.expandTick = 0;
-  selectedCrosshair.expandTargetSize = targetSize;
-  selectedCrosshair.expandDelta = delta;
-  selectedCrosshair.expand = true;
-  selectedCrosshair.shrink = false;
+  crosshairHandler.expandCrosshair(targetSize, delta);
 }
 
 Roygbiv.prototype.shrinkCrosshair = function(delta){
   if (mode == 0){
     return;
   }
-  selectedCrosshair.shrinkTick = 0;
-  selectedCrosshair.expandDelta = delta;
-  selectedCrosshair.material.uniforms.shrinkStartSize.value = selectedCrosshair.curSize;
-  selectedCrosshair.expand = false;
-  selectedCrosshair.shrink = true;
+  crosshairHandler.shrinkCrosshair(delta);
 }
 
 
@@ -17253,9 +17601,7 @@ Roygbiv.prototype.setCollisionListener = function(sourceObject, callbackFunction
     if (!collisionCallbackRequests.has(sourceObject.name)){
       TOTAL_OBJECT_COLLISION_LISTENER_COUNT ++;
     }
-    sourceObject.physicsBody.addEventListener("collide", sourceObject.boundCallbackFunction);
-    collisionCallbackRequests.set(sourceObject.name, callbackFunction.bind(sourceObject));
-    physicsWorld.setCollisionListener(sourceObject);
+    sourceObject.setCollisionListener(callbackFunction);
   }else if (sourceObject.isParticle){
     if (sourceObject.uuid && !particleCollisionCallbackRequests[sourceObject.uuid]){
     }
@@ -17313,10 +17659,8 @@ Roygbiv.prototype.removeCollisionListener = function(sourceObject){
   }
   if (curCallbackRequest){
     if ((sourceObject.isAddedObject) || (sourceObject.isObjectGroup)){
-      sourceObject.physicsBody.removeEventListener("collide", sourceObject.boundCallbackFunction);
-      collisionCallbackRequests.delete(sourceObject.name);
+      sourceObject.removeCollisionListener();
       TOTAL_OBJECT_COLLISION_LISTENER_COUNT --;
-      physicsWorld.removeCollisionListener(sourceObject);
     }else if (sourceObject.isParticle){
       delete particleCollisionCallbackRequests[sourceObject.uuid];
       TOTAL_PARTICLE_COLLISION_LISTEN_COUNT --;
@@ -17662,14 +18006,7 @@ Roygbiv.prototype.onObjectPositionThresholdExceeded = function(object, axis, thr
   if (mode == 0){
     return;
   }
-  if (!object.positionThresholdExceededListenerInfo){
-    object.positionThresholdExceededListenerInfo = new Object();
-  }
-  object.positionThresholdExceededListenerInfo.axis = axis.toLowerCase();
-  object.positionThresholdExceededListenerInfo.isActive = true;
-  object.positionThresholdExceededListenerInfo.threshold = threshold;
-  object.positionThresholdExceededListenerInfo.controlMode = controlMode;
-  object.positionThresholdExceededListenerInfo.callbackFunction = callbackFunction.bind(object);
+  object.setPositionThresholdExceededListener(axis, threshold, controlMode, callbackFunction);
 }
 
 Roygbiv.prototype.removeObjectPositionThresholdExceededListener = function(object){
@@ -17766,7 +18103,8 @@ Roygbiv.prototype.createFreeControl = function(parameters){
     translateXAmount: (!(typeof parameters.translateXAmount == UNDEFINED))? parameters.translateXAmount: 3,
     translateYAmount: (!(typeof parameters.translateYAmount == UNDEFINED))? parameters.translateYAmount: 3,
     mouseWheelSpeed: (!(typeof parameters.mouseWheelSpeed == UNDEFINED))? parameters.mouseWheelSpeed: 1,
-    swipeSpeed: (!(typeof parameters.swipeSpeed == UNDEFINED))? parameters.swipeSpeed: 0.002
+    swipeSpeed: (!(typeof parameters.swipeSpeed == UNDEFINED))? parameters.swipeSpeed: 0.002,
+    requestFullScreen: (!(typeof parameters.requestFullScreen == UNDEFINED))? parameters.requestFullScreen: false
   }
   return new FreeControls(params);
 }
@@ -17775,22 +18113,29 @@ Roygbiv.prototype.createCustomControl = function(parameters){
   if (mode == 0){
     return;
   }
-  var params = {
-    onClick: (!(typeof parameters.onClick == UNDEFINED))? parameters.onClick: noop,
-    onTap: (!(typeof parameters.onTap == UNDEFINED))? parameters.onTap: noop,
-    onSwipe: (!(typeof parameters.onSwipe == UNDEFINED))? parameters.onSwipe: noop,
-    onPinch: (!(typeof parameters.onPinch == UNDEFINED))? parameters.onPinch: noop,
-    onMouseWheel: (!(typeof parameters.onMouseWheel == UNDEFINED))? parameters.onMouseWheel: noop,
-    onUpdate: (!(typeof parameters.onUpdate == UNDEFINED))? parameters.onUpdate: noop
-  }
-  return new CustomControls(params);
+  return new CustomControls(parameters);
 }
 
 Roygbiv.prototype.setActiveControl = function(control){
   if (mode == 0){
     return;
   }
+  var callOnActivated = false;
+  if (activeControl !== control){
+    callOnActivated = true;
+    activeControl.onDeactivated();
+  }
   activeControl = control;
+  if (callOnActivated){
+    control.onActivated();
+  }
+}
+
+Roygbiv.prototype.createFPSControl = function(parameters){
+  if (mode == 0){
+    return;
+  }
+  return new FPSControls(parameters);
 }
 
 
@@ -18108,20 +18453,14 @@ Roygbiv.prototype.trackObjectPosition = function(sourceObject, targetObject){
   if (mode == 0){
     return;
   }
-  sourceObject.trackedObject = targetObject;
-  targetObject.isTracked = true;
-  trackingObjects[sourceObject.name] = sourceObject;
-  targetObject.oldPX = targetObject.physicsBody.position.x;
-  targetObject.oldPY = targetObject.physicsBody.position.y;
-  targetObject.oldPZ = targetObject.physicsBody.position.z;
+  sourceObject.trackObjectPosition(targetObject);
 }
 
 Roygbiv.prototype.untrackObjectPosition = function(sourceObject){
   if (mode == 0){
     return;
   }
-  delete sourceObject.trackedObject;
-  delete trackingObjects[sourceObject.name];
+  sourceObject.untrackObjectPosition();
 }
 
 Roygbiv.prototype.createRotationPivot = function(sourceObject, offsetX, offsetY, offsetZ){
@@ -18913,6 +19252,7 @@ var ParticleSystemMerger = function(psObj, name){
     this.material.uniforms.refHeightCoef = GLOBAL_PS_REF_HEIGHT_UNIFORM;
   }
   this.mesh = new THREE.Points(this.geometry, this.material);
+  this.mesh.renderOrder = renderOrders.PARTICLE_SYSTEM;
   this.mesh.frustumCulled = false;
   scene.add(this.mesh);
   this.clean();
@@ -19030,6 +19370,7 @@ var Crosshair = function(configurations){
     }
   });
   this.mesh = new THREE.Points(this.geometry, this.material);
+  this.mesh.renderOrder = renderOrders.CROSSHAIR;
   this.mesh.position.set(0, 0, 0);
   this.mesh.frustumCulled = false;
   this.mesh.visible = false;
@@ -19097,7 +19438,7 @@ Crosshair.prototype.resetRotation = function(){
 }
 
 Crosshair.prototype.destroy = function(){
-  this.mesh.visible = false;
+  scene.remove(this.mesh);
   this.mesh.geometry.dispose();
   this.mesh.material.dispose();
   this.mesh = 0;
@@ -19211,7 +19552,7 @@ MeshGenerator.prototype.generateObjectTrail = function(
     }
   });
   var mesh = new THREE.Mesh(this.geometry, material);
-  mesh.renderOrder = 100;
+  mesh.renderOrder = renderOrders.OBJECT_TRAIL;
   if (fogBlendWithSkybox){
     material.uniforms.worldMatrix = new THREE.Uniform(mesh.matrixWorld);
     material.uniforms.cameraPosition = GLOBAL_CAMERA_POSITION_UNIFORM;
@@ -19282,7 +19623,7 @@ MeshGenerator.prototype.generateInstancedMesh = function(graphicsGroup, objectGr
     uniforms: uniforms
   });
   var mesh = new THREE.Mesh(this.geometry, material);
-  mesh.renderOrder = 10;
+  mesh.renderOrder = renderOrders.OBJECT;
   mesh.position.copy(graphicsGroup.position);
   material.uniforms.modelViewMatrix.value = mesh.modelViewMatrix;
   return mesh;
@@ -19327,7 +19668,7 @@ MeshGenerator.prototype.generateMergedMesh = function(graphicsGroup, objectGroup
     uniforms: uniforms
   });
   var mesh = new THREE.Mesh(this.geometry, material);
-  mesh.renderOrder = 10;
+  mesh.renderOrder = renderOrders.OBJECT;
   mesh.position.copy(graphicsGroup.position);
   material.uniforms.modelViewMatrix.value = mesh.modelViewMatrix;
   return mesh;
@@ -19347,7 +19688,7 @@ MeshGenerator.prototype.generateBasicMesh = function(){
     }
   });
   var mesh = new THREE.Mesh(this.geometry, material);
-  mesh.renderOrder = 10;
+  mesh.renderOrder = renderOrders.OBJECT;
   material.uniforms.modelViewMatrix.value = mesh.modelViewMatrix;
   return mesh;
 }
@@ -19615,6 +19956,7 @@ var AddedText = function(name, font, text, position, color, alpha, characterSize
   this.constructText();
   this.handleUVUniform();
   this.mesh = new THREE.Points(this.geometry, this.material);
+  this.mesh.renderOrder = renderOrders.TEXT_3D;
   this.mesh.position.copy(position);
   this.mesh.frustumCulled = false;
   scene.add(this.mesh);
@@ -20196,6 +20538,7 @@ AddedText.prototype.set2DStatus = function(is2D){
     }
     this.isClickable = false;
     addedTexts2D[this.name] = this;
+    this.mesh.renderOrder = renderOrders.TEXT_2D;
   }else{
     macroHandler.removeMacro("IS_TWO_DIMENSIONAL", this.material, true, false);
     delete this.mesh.material.uniforms.margin2D;
@@ -20210,6 +20553,7 @@ AddedText.prototype.set2DStatus = function(is2D){
       delete this.refLineOffset;
     }
     delete addedTexts2D[this.name];
+    this.mesh.renderOrder = renderOrders.TEXT_3D;
   }
   if (is2D){
     if (this.bbHelper){
@@ -21462,6 +21806,9 @@ ModeSwitcher.prototype.commonSwitchFunctions = function(){
   objectsWithMouseOverListeners = new Map();
   objectsWithMouseOutListeners = new Map();
   currentMouseOverObjectName = 0;
+  if (activeControl){
+    activeControl.onDeactivated();
+  }
   activeControl = new FreeControls(defaultControlParameters);
   rayCaster.refresh();
   physicsWorld.refresh();
@@ -21476,6 +21823,10 @@ ModeSwitcher.prototype.switchFromDesignToPreview = function(){
   TOTAL_PARTICLE_COLLISION_LISTEN_COUNT = 0;
   TOTAL_PARTICLE_SYSTEM_COLLISION_LISTEN_COUNT = 0;
   TOTAL_PARTICLE_SYSTEMS_WITH_PARTICLE_COLLISIONS = 0;
+  if (fpsWeaponAlignmentConfigurationObject){
+    fpsWeaponAlignmentConfigurationObject.revertPositionAfterFPSWeaponConfigurations();
+    fpsWeaponAlignmentConfigurationObject = 0;
+  }
   for (var gsName in gridSystems){
     scene.remove(gridSystems[gsName].gridSystemRepresentation);
     scene.remove(gridSystems[gsName].boundingPlane);
@@ -21615,6 +21966,15 @@ ModeSwitcher.prototype.switchFromDesignToPreview = function(){
 ModeSwitcher.prototype.switchFromPreviewToDesign = function(){
   mode = 0;
   autoInstancingHandler.reset();
+  var objsToRemove = [];
+  for (var i = 0; i<scene.children.length; i++){
+    if (scene.children[i].isFPSWeaponAutoInstancedObject){
+      objsToRemove.push(scene.children[i]);
+    }
+  }
+  for (var i = 0; i<objsToRemove.length; i++){
+    scene.remove(objsToRemove[i]);
+  }
   camera.oldAspect = camera.aspect;
   camera.aspect = window.innerWidth / window.innerHeight;
   camera.updateProjectionMatrix();
@@ -21695,17 +22055,16 @@ ModeSwitcher.prototype.switchFromPreviewToDesign = function(){
 
   for (var objectName in objectGroups){
     var object = objectGroups[objectName];
-
     object.loadState();
     object.resetColor();
-
+    object.isUsedInFPSControl = false;
+    object.physicsBody.removeEventListener("collide", object.boundCallbackFunction);
     if (object.positionThresholdExceededListenerInfo){
       object.positionThresholdExceededListenerInfo.isActive = false;
     }
     delete object.clickCallbackFunction;
     delete object.mouseOverCallbackFunction;
     delete object.mouseOutCallbackFunction;
-
     if (!(typeof object.originalMass == UNDEFINED)){
       object.setMass(object.originalMass);
       if (object.originalMass == 0){
@@ -21713,7 +22072,6 @@ ModeSwitcher.prototype.switchFromPreviewToDesign = function(){
       }
       delete object.originalMass;
     }
-
     if (object.isHidden){
       object.mesh.visible = true;
       object.isHidden = false;
@@ -21728,17 +22086,15 @@ ModeSwitcher.prototype.switchFromPreviewToDesign = function(){
   }
   for (var objectName in addedObjects){
     var object = addedObjects[objectName];
-
     if (object.positionThresholdExceededListenerInfo){
       object.positionThresholdExceededListenerInfo.isActive = false;
     }
-
+    object.isUsedInFPSControl = false;
+    object.physicsBody.removeEventListener("collide", object.boundCallbackFunction);
     delete object.clickCallbackFunction;
     delete object.mouseOverCallbackFunction;
     delete object.mouseOutCallbackFunction;
-
     object.resetColor();
-
     if (object.isHidden){
       object.mesh.visible = true;
       object.isHidden = false;
@@ -21746,7 +22102,6 @@ ModeSwitcher.prototype.switchFromPreviewToDesign = function(){
         physicsWorld.addBody(object.physicsBody);
       }
     }
-
     object.loadState();
     if (object.initOpacitySet){
       object.updateOpacity(object.initOpacity);
@@ -21759,7 +22114,6 @@ ModeSwitcher.prototype.switchFromPreviewToDesign = function(){
       }
       delete object.originalMass;
     }
-
   }
   var newScripts = new Object();
   for (var scriptName in scripts){
@@ -22431,17 +22785,6 @@ WebGLCallbackHandler.prototype.onBeforeVertexAttribPointer = function(index, siz
 }
 
 WebGLCallbackHandler.prototype.onBeforeBindBuffer = function(isElementArrayBuffer, buffer, lineID){
-  if (!this.doNotCache){
-    if (isElementArrayBuffer && this.lastBindElementArrayBuffer){
-      if (this.lastBindElementArrayBuffer == buffer){
-        return;
-      }
-    }else if (!isElementArrayBuffer && this.lastBindArrayBuffer){
-      if (this.lastBindArrayBuffer == buffer){
-        return;
-      }
-    }
-  }
   if (isElementArrayBuffer){
     if (this.record){
       var s = performance.now();
@@ -22450,9 +22793,6 @@ WebGLCallbackHandler.prototype.onBeforeBindBuffer = function(isElementArrayBuffe
     }else{
       this.gl.bindBuffer(this.gl.ELEMENT_ARRAY_BUFFER, buffer);
     }
-    if (!this.doNotCache){
-      this.lastBindElementArrayBuffer = buffer;
-    }
   }else{
     if (this.record){
       var s = performance.now();
@@ -22460,9 +22800,6 @@ WebGLCallbackHandler.prototype.onBeforeBindBuffer = function(isElementArrayBuffe
       this.performanceLogs.bindBuffer = performance.now() - s;
     }else{
       this.gl.bindBuffer(this.gl.ARRAY_BUFFER, buffer);
-    }
-    if (!this.doNotCache){
-      this.lastBindArrayBuffer = buffer;
     }
   }
 }
@@ -23098,6 +23435,9 @@ PointerLockEventHandler.prototype.onPointerLock = function(event){
       screenPointerLockChangedCallbackFunction(false);
     }
   }
+  if (activeControl.isFPSControls){
+    activeControl.onPointerLockChange(isPointerLocked);
+  }
 }
 
 var TouchEventHandler = function(){
@@ -23116,10 +23456,17 @@ var TouchEventHandler = function(){
   this.tapStartTime = 0;
   this.isThereFingerTouched = false;
   this.currentTouchCount = 0;
+  this.tapThreshold = 110;
+  this.touchTrack = new Map();
 }
 
 TouchEventHandler.prototype.onTouchStart = function(event){
   event.preventDefault();
+  activeControl.onTouchStart(event);
+  for (var i = 0; i<event.changedTouches.length; i++){
+    var curTouch = event.changedTouches[i];
+    touchEventHandler.touchTrack.set(curTouch.identifier, curTouch);
+  }
   touchEventHandler.isZooming = false;
   touchEventHandler.isSwiping = false;
   touchEventHandler.isTapping = false;
@@ -23131,6 +23478,7 @@ TouchEventHandler.prototype.onTouchStart = function(event){
   }
   if (event.targetTouches.length == 2){
     touchEventHandler.isZooming = true;
+    touchEventHandler.isTapping = true;
   }
   if (!touchEventHandler.isZooming){
     touchEventHandler.distance = 0;
@@ -23148,6 +23496,11 @@ TouchEventHandler.prototype.onTouchStart = function(event){
 TouchEventHandler.prototype.onTouchMove = function(event){
   event.preventDefault();
   event.stopPropagation();
+  activeControl.onTouchMove(event);
+  for (var i = 0; i<event.changedTouches.length; i++){
+    var curTouch = event.changedTouches[i];
+    touchEventHandler.touchTrack.set(curTouch.identifier, curTouch);
+  }
   if (touchEventHandler.isZooming){
     if (event.changedTouches.length == 2){
       var t1 = event.changedTouches[0];
@@ -23190,8 +23543,12 @@ TouchEventHandler.prototype.onTap = function(touch){
 
 TouchEventHandler.prototype.onTouchEnd = function(event){
   event.preventDefault();
+  activeControl.onTouchEnd(event);
+  for (var i = 0; i<event.changedTouches.length; i++){
+    touchEventHandler.touchTrack.delete(event.changedTouches[i].identifier);
+  }
   if (touchEventHandler.isTapping){
-    if(performance.now() - touchEventHandler.tapStartTime < 250){
+    if(performance.now() - touchEventHandler.tapStartTime < touchEventHandler.tapThreshold){
       touchEventHandler.onTap(event.changedTouches[0]);
     }
   }
@@ -23214,11 +23571,13 @@ var FullScreenEventHandler = function(){
 FullScreenEventHandler.prototype.onFullScreenChange = function(event){
   if (document.fullscreenElement == canvas){
     onFullScreen = true;
+    activeControl.onFullScreenChange(true);
     if (mode == 1 && screenFullScreenChangeCallbackFunction){
       screenFullScreenChangeCallbackFunction(true);
     }
   }else{
     onFullScreen = false;
+    activeControl.onFullScreenChange(false);
     if (mode == 1 && screenFullScreenChangeCallbackFunction){
       screenFullScreenChangeCallbackFunction(false);
     }
@@ -23358,6 +23717,7 @@ MouseEventHandler.prototype.onMouseMove = function(event){
   if (mode == 1 && screenMouseMoveCallbackFunction){
     screenMouseMoveCallbackFunction(mouseEventHandler.coordX, mouseEventHandler.coordY, mouseEventHandler.movementX, mouseEventHandler.movementY);
   }
+  activeControl.onMouseMove(event);
 }
 
 MouseEventHandler.prototype.onMouseUp = function(event){
@@ -23369,6 +23729,7 @@ MouseEventHandler.prototype.onMouseUp = function(event){
     screenMouseUpCallbackFunction(coordX, coordY);
   }
   isMouseDown = false;
+  activeControl.onMouseUp(event);
 }
 
 MouseEventHandler.prototype.onMouseDown = function(event){
@@ -23380,6 +23741,7 @@ MouseEventHandler.prototype.onMouseDown = function(event){
     screenMouseDownCallbackFunction(coordX, coordY);
   }
   isMouseDown = true;
+  activeControl.onMouseDown(event);
 }
 
 MouseEventHandler.prototype.onClick = function(event, fromTap){
@@ -23388,6 +23750,9 @@ MouseEventHandler.prototype.onClick = function(event, fromTap){
   omGUIFocused = false;
   tmGUIFocused = false;
   if (windowLoaded){
+    if (mode == 0 && fpsWeaponAlignmentConfigurationObject){
+      return;
+    }
     var rect = renderer.getCurrentViewport();
     var rectX = rect.x, rectY = rect.y, rectZ = rect.z, rectW = rect.w;
     if (screenResolution != 1){
@@ -23446,6 +23811,7 @@ var ResizeEventHandler = function(){
 }
 
 ResizeEventHandler.prototype.onResize = function(){
+  isOrientationLandscape = (window.innerWidth > window.innerHeight);
   if (!(renderer)){
     return;
   }
@@ -23469,7 +23835,12 @@ ResizeEventHandler.prototype.onResize = function(){
     if (particleSystemRefHeight){
       GLOBAL_PS_REF_HEIGHT_UNIFORM.value = ((renderer.getCurrentViewport().w / screenResolution) / particleSystemRefHeight);
     }
+  }else{
+    if (fpsWeaponAlignmentConfigurationObject){
+      fpsWeaponAlignmentConfigurationObject.onFPSWeaponAlignmentUpdate();
+    }
   }
+  activeControl.onResize();
   if (mode == 0){
     for (var areaName in areas){
       if (areas[areaName].text){
@@ -23496,13 +23867,6 @@ ResizeEventHandler.prototype.onResize = function(){
   for (var textName in addedTexts){
     addedTexts[textName].handleResize();
   }
-}
-
-var OrientationChangeEventHandler = function(){
-  if (!isMobile){
-    return;
-  }
-  window.addEventListener('orientationchange', resizeEventHandler.onResize);
 }
 
 var KeyboardEventHandler = function(){
@@ -23535,6 +23899,7 @@ KeyboardEventHandler.prototype.onKeyUp = function(event){
       screenKeyupCallbackFunction(keyCodeToChar[event.keyCode]);
     }
   }
+  activeControl.onKeyUp(event);
   if (mode == 1 && isPaused){
     return;
   }
@@ -23550,7 +23915,7 @@ KeyboardEventHandler.prototype.onKeyUp = function(event){
       }
     break;
     case 16: //SHIFT
-      if (mode == 0){
+      if (mode == 0 && !fpsWeaponAlignmentConfigurationObject){
         for (var objName in addedObjects){
           addedObjects[objName].mesh.visible = true;
         }
@@ -23585,6 +23950,7 @@ KeyboardEventHandler.prototype.onKeyDown = function(event){
       screenKeydownCallbackFunction(keyCodeToChar[event.keyCode]);
     }
   }
+  activeControl.onKeyDown(event);
   if (mode == 0 && keyboardBuffer["."]){
     for (var gridName in gridSelections){
       gridSelections[gridName].renderCornerHelpers();
@@ -23595,7 +23961,7 @@ KeyboardEventHandler.prototype.onKeyDown = function(event){
   }
   switch(event.keyCode){
     case 16: //SHIFT
-      if (mode == 0 && !isDeployment){
+      if (mode == 0 && !isDeployment && !fpsWeaponAlignmentConfigurationObject){
         selectionHandler.resetCurrentSelection();
         for (var objName in addedObjects){
           addedObjects[objName].mesh.visible = false;
@@ -24010,6 +24376,9 @@ PhysicsWorkerBridge.prototype.step = function(stepAmount){
 }
 
 PhysicsWorkerBridge.prototype.updateObject = function(obj, isPositionUpdated, isRotationUpdated){
+  if (obj.noMass){
+    return;
+  }
   obj.isPositionDirty = isPositionUpdated;
   obj.isRotationDirty = isRotationUpdated;
   this.updateBuffer.set(obj.name, obj);
@@ -24428,7 +24797,7 @@ AutoInstancingHandler.prototype.handle = function(){
   var countersByObjectKey = new Object();
   for (var objName in addedObjects){
     var obj = addedObjects[objName];
-    if (obj.isChangeable || (!obj.noMass && obj.physicsBody.mass > 0)){
+    if (!obj.isFPSWeapon && (obj.isChangeable || (!obj.noMass && obj.physicsBody.mass > 0))){
       var objKey = this.getObjectKey(obj);
       if (typeof countersByObjectKey[objKey] == UNDEFINED){
         countersByObjectKey[objKey] = 0;
@@ -24578,6 +24947,19 @@ var Bloom = function(){
   this.setBlurStepCount(this.configurations.blurStepCount);
 }
 
+Bloom.prototype.getTapTextFromTapType = function(type){
+  if (type == 13){
+    return "high";
+  }
+  if (type == 9){
+    return "medium";
+  }
+  if (type == 5){
+    return "low";
+  }
+  throw new Error("Unknown tap type.");
+}
+
 Bloom.prototype.reset = function(){
   renderer.bloomOn = false;
   this.setBlurStepCount(5);
@@ -24653,6 +25035,7 @@ Bloom.prototype.showConfigurations = function(){
   for (var i=0; i<5; i++){
     guiHandler.bloomParameters["BlurPass"+(i+1)]["Factor"] = this.configurations.bloomFactors[i];
     guiHandler.bloomParameters["BlurPass"+(i+1)]["Color"] = "#" + (REUSABLE_COLOR.setRGB(this.configurations.bloomTintColors[i].x, this.configurations.bloomTintColors[i].y, this.configurations.bloomTintColors[i].z).getHexString());
+    guiHandler.bloomParameters["BlurPass"+(i+1)]["Quality"] = this.getTapTextFromTapType(this.configurations.tapTypes[i]);
     guiHandler.enableController(guiHandler["blurPassFactorController"+(i+1)]);
     guiHandler.enableController(guiHandler["blurPassTintColorController"+(i+1)]);
     guiHandler.enableController(guiHandler["blurPassTapController"+(i+1)]);
@@ -24807,7 +25190,7 @@ Bloom.prototype.directPass = function(){
 }
 
 Bloom.prototype.generateSkyboxPass = function(){
-  this.skyboxTarget = new THREE.WebGLRenderTarget(renderer.getCurrentViewport().z, renderer.getCurrentViewport().w, this.rtParameters);
+  this.skyboxTarget = new THREE.WebGLRenderTarget(renderer.getCurrentViewport().z / 10, renderer.getCurrentViewport().w / 10, this.rtParameters);
   this.skyboxPassScene = new THREE.Scene();
   this.skyboxMesh = new THREE.Mesh(skyboxMesh.geometry, skyboxMesh.material);
   this.skyboxPassScene.add(this.skyboxMesh);
@@ -24899,6 +25282,9 @@ Bloom.prototype.generateBrightPass = function(){
 Bloom.prototype.setSize = function(width, height){
   this.sceneTarget.setSize(width, height);
   this.brightTarget.setSize(width / 2, height / 2);
+  if (this.skyboxTarget){
+    this.skyboxTarget.setSize(width / 10, height / 10);
+  }
   var coef = 2;
   for (var i = 0; i<this.configurations.blurStepCount; i++){
     this.horizontalBlurTargets[i].setSize(width/coef, height/coef);
@@ -24927,18 +25313,6 @@ Bloom.prototype.render = function(){
 
 var FreeControls = function(params){
   this.isControl = true;
-  this.left = "Left";
-  this.right = "Right";
-  this.up = "Up";
-  this.down = "Down";
-  this.space = "Space";
-  this.w = "W";
-  this.s = "S";
-  this.d = "D";
-  this.a = "A";
-  this.e = "E";
-  this.z = "Z";
-  this.q = "Q";
   this.rotationYDelta = params.rotationYDelta;
   this.rotationXDelta = params.rotationXDelta;
   this.translateZAmount = params.translateZAmount;
@@ -24946,20 +25320,46 @@ var FreeControls = function(params){
   this.translateYAmount = params.translateYAmount;
   this.mouseWheelSpeed = params.mouseWheelSpeed;
   this.swipeSpeed = params.swipeSpeed;
+  this.requestFullScreen = params.requestFullScreen;
   this.keyboardActions = [
-    {key: this.left, action: this.incrRotationY},
-    {key: this.right, action: this.decrRotationY},
-    {key: this.up, action: this.incrRotationX},
-    {key: this.down, action: this.decrRotationX},
-    {key: this.w, action: this.translateZNegative},
-    {key: this.z, action: this.translateZNegative},
-    {key: this.s, action: this.translateZ},
-    {key: this.d, action: this.translateX},
-    {key: this.a, action: this.translateXNegative},
-    {key: this.q, action: this.translateXNegative},
-    {key: this.e, action: this.translateY},
-    {key: this.space, action: this.translateYNegative}
+    {key: "Left", action: this.incrRotationY},
+    {key: "Right", action: this.decrRotationY},
+    {key: "Up", action: this.incrRotationX},
+    {key: "Down", action: this.decrRotationX},
+    {key: "W", action: this.translateZNegative},
+    {key: "Z", action: this.translateZNegative},
+    {key: "S", action: this.translateZ},
+    {key: "D", action: this.translateX},
+    {key: "A", action: this.translateXNegative},
+    {key: "Q", action: this.translateXNegative},
+    {key: "E", action: this.translateY},
+    {key: "Space", action: this.translateYNegative}
   ];
+}
+
+FreeControls.prototype.onMouseMove = noop;
+FreeControls.prototype.onMouseUp = noop;
+FreeControls.prototype.onMouseDown = noop;
+FreeControls.prototype.onClick = noop;
+FreeControls.prototype.onTap = noop;
+FreeControls.prototype.onDeactivated = noop;
+FreeControls.prototype.onTouchStart = noop;
+FreeControls.prototype.onTouchMove = noop;
+FreeControls.prototype.onTouchEnd = noop;
+FreeControls.prototype.onKeyUp = noop;
+FreeControls.prototype.onKeyDown = noop;
+FreeControls.prototype.onResize = noop;
+
+FreeControls.prototype.onActivated = function(){
+  if (this.requestFullScreen){
+    fullScreenRequested = true;
+  }
+}
+
+FreeControls.prototype.onFullScreenChange = function(isFullScreen){
+  if (!isFullScreen && activeControl.requestFullScreen){
+    fullScreenRequested = true;
+  }
 }
 
 FreeControls.prototype.incrRotationY = function(){
@@ -25002,14 +25402,6 @@ FreeControls.prototype.translateYNegative = function(){
   camera.translateY(-1 * activeControl.translateYAmount);
 }
 
-FreeControls.prototype.onClick = function(event){
-
-}
-
-FreeControls.prototype.onTap = function(event){
-
-}
-
 FreeControls.prototype.onSwipe = function(diffX, diffY){
   camera.rotation.y += diffX * activeControl.swipeSpeed;
   camera.rotation.x += diffY * activeControl.swipeSpeed;
@@ -25045,42 +25437,786 @@ FreeControls.prototype.update = function(){
   }
 }
 
-var FPSControls = function(){
+var FPSControls = function(params){
   this.isControl = true;
+  this.isFPSControls = true;
+  this.reusableVec2 = new THREE.Vector2();
+  this.axisZ = "z";
+  this.axisY = "y";
+  this.axisX = "x";
+  this.weapon1InitQuaternion = new THREE.Quaternion();
+  this.weapon2InitQuaternion = new THREE.Quaternion();
+  this.keyboardActions = [
+    {key: "A", action: this.goLeft},
+    {key: "Q", action: this.goLeft},
+    {key: "D", action: this.goRight},
+    {key: "W", action: this.goForward},
+    {key: "Z", action: this.goForward},
+    {key: "S", action: this.goBackward},
+    {key: "Up", action: this.goForward},
+    {key: "Right", action: this.goRight},
+    {key: "Left", action: this.goLeft},
+    {key: "Down", action: this.goBackward},
+    {key: "Space", action: this.jump}
+  ];
+  this.playerBodyObject = params.playerBodyObject;
+  this.mouseSpeed = params.mouseSpeed;
+  this.touchLookSpeed = params.touchLookSpeed;
+  this.speed = params.speed;
+  this.jumpSpeed = params.jumpSpeed;
+  this.touchJoystickThreshold = params.touchJoystickThreshold;
+  this.crosshairName = params.crosshairName;
+  this.crosshairExpandSize = params.crosshairExpandSize;
+  this.crosshairAnimationDelta = params.crosshairAnimationDelta;
+  this.hasDoubleJump = params.hasDoubleJump;
+  this.doubleJumpTimeThresholdInMs = params.doubleJumpTimeThresholdInMs;
+  this.weaponObject1 = params.weaponObject1;
+  this.weaponObject2 = params.weaponObject2;
+  this.hasIdleGunAnimation = params.hasIdleGunAnimation;
+  this.idleGunAnimationSpeed = params.idleGunAnimationSpeed;
+  this.weaponRotationRandomnessOn = params.weaponRotationRandomnessOn;
+  this.onLook = params.onLook;
+  this.onShoot = params.onShoot;
+  this.shootableObjects = params.shootableObjects;
+  this.onPause = params.onPause;
+  this.onResume = params.onResume;
+  this.requestFullScreen = params.requestFullScreen;
+  if (typeof this.mouseSpeed == UNDEFINED){
+    this.mouseSpeed = 0.002;
+  }
+  if (typeof this.touchLookSpeed == UNDEFINED){
+    this.touchLookSpeed = 0.01;
+  }
+  if (typeof this.speed == UNDEFINED){
+    this.speed = 200;
+  }
+  if (typeof this.jumpSpeed == UNDEFINED){
+    this.jumpSpeed = 500;
+  }
+  if (typeof this.touchJoystickThreshold == UNDEFINED){
+    this.touchJoystickThreshold = 1.5;
+  }
+  if (typeof this.crosshairExpandSize == UNDEFINED){
+    this.crosshairExpandSize = 9;
+  }
+  if (typeof this.crosshairAnimationDelta == UNDEFINED){
+    this.crosshairAnimationDelta = 0.2;
+  }
+  if (typeof this.hasDoubleJump == UNDEFINED){
+    this.hasDoubleJump = true;
+  }
+  if (typeof this.doubleJumpTimeThresholdInMs == UNDEFINED){
+    this.doubleJumpTimeThresholdInMs = 500;
+  }
+  if (typeof this.hasIdleGunAnimation == UNDEFINED){
+    this.hasIdleGunAnimation = true;
+  }
+  if (typeof this.idleGunAnimationSpeed == UNDEFINED){
+    this.idleGunAnimationSpeed = 0.05;
+  }
+  if (typeof this.weaponRotationRandomnessOn == UNDEFINED){
+    this.weaponRotationRandomnessOn = true;
+  }
+  if (typeof this.onLook == UNDEFINED){
+    this.onLook = noop;
+  }
+  if (typeof this.onShoot == UNDEFINED){
+    this.onShoot = noop;
+  }
+  if (typeof this.shootableObjects == UNDEFINED){
+    this.shootableObjects = [];
+  }
+  if (typeof this.onPause == UNDEFINED){
+    this.onPause = noop;
+  }
+  if (typeof this.onResume == UNDEFINED){
+    this.onResume = noop;
+  }
+  if (typeof this.requestFullScreen == UNDEFINED){
+    this.requestFullScreen = true;
+    fullScreenRequested = true;
+  }
+  this.init();
 }
 
-FPSControls.prototype.onClick = function(event){
+FPSControls.prototype.onClick = noop;
+FPSControls.prototype.onSwipe = noop;
+FPSControls.prototype.onPinch = noop;
+FPSControls.prototype.onMouseWheel = noop;
+FPSControls.prototype.onKeyUp = noop;
 
+FPSControls.prototype.init = function(){
+  this.deactivated = true;
+  this.currentLookInfo = {x: 0, y: 0, z: 0, objName: null};
+  this.joystickStatus = {right: false, left: false, up: false, down: false};
+  this.touchTrack = new Map();
+  if (!(typeof this.weaponObject1 == UNDEFINED)){
+    this.weaponObject1.isUsedInFPSControl = true;
+    this.hasWeapon1 = true;
+    this.weaponObject1.beforeFPSControlsInfo = {position: new THREE.Vector3(), quaternion: new THREE.Quaternion()};
+    this.weapon1Position = new THREE.Vector3();
+    if (this.hasIdleGunAnimation){
+      this.weapon1IdleAnimationInfo = {x: 0, z: 0};
+    }
+  }else{
+    this.hasWeapon1 = false;
+  }
+  if (!(typeof this.weaponObject2 == UNDEFINED)){
+    this.weaponObject2.isUsedInFPSControl = true;
+    this.hasWeapon2 = true;
+    this.weaponObject2.beforeFPSControlsInfo = {position: new THREE.Vector3(), quaternion: new THREE.Quaternion()};
+    this.weapon2Position = new THREE.Vector3();
+    if (this.hasIdleGunAnimation){
+      this.weapon2IdleAnimationInfo = {x: 0, z: 0};
+    }
+  }else{
+    this.hasWeapon2 = false;
+  }
+  if (this.hasWeapon1 && this.hasWeapon2 && this.weaponObject1.isAddedObject && this.weaponObject2.isAddedObject){
+    var sameGeom = (autoInstancingHandler.getObjectKey(this.weaponObject1) == autoInstancingHandler.getObjectKey(this.weaponObject2));
+    var sameScale = (this.weaponObject1.fpsWeaponAlignment.scale == this.weaponObject2.fpsWeaponAlignment.scale);
+    if (sameGeom && sameScale){
+      var pseudoGroup = new Object();
+      pseudoGroup[this.weaponObject1.name] = this.weaponObject1;
+      pseudoGroup[this.weaponObject2.name] = this.weaponObject2;
+      this.autoInstancedObject = new AutoInstancedObject(generateUniqueObjectName(), pseudoGroup);
+      this.autoInstancedObject.init();
+      this.autoInstancedObject.mesh.visible = false;
+      this.autoInstancedObject.mesh.isFPSWeaponAutoInstancedObject = true;
+      macroHandler.injectMacro("FPS_WEAPON_SCALE "+this.weaponObject1.fpsWeaponAlignment.scale, this.autoInstancedObject.mesh.material, true, false);
+      scene.add(this.autoInstancedObject.mesh);
+    }
+  }
+  if (isMobile){
+    this.shootableMap = new Object();
+    for (var i = 0; i<this.shootableObjects.length; i++){
+      this.shootableMap[this.shootableObjects[i].name] = this.shootableObjects[i];
+    }
+  }
 }
 
-FPSControls.prototype.onTap = function(event){
-
+FPSControls.prototype.onFullScreenChange = function(isFullScreen){
+  if (activeControl.requestFullScreen && !isFullScreen){
+    fullScreenRequested = true;
+  }
 }
 
-FPSControls.prototype.onSwipe = function(diffX, diffY){
-
+FPSControls.prototype.jump = function(isDouble){
+  if ((!isDouble && activeControl.canJump) || (isDouble && activeControl.canDoubleJump)){
+    activeControl.playerBodyObject.setVelocityY(activeControl.jumpSpeed);
+    activeControl.canJump = false;
+    if (isDouble){
+      activeControl.canDoubleJump = false;
+    }
+  }
 }
 
-FPSControls.prototype.onPinch = function(diff){
-
+FPSControls.prototype.goBackward = function(){
+  if (activeControl.zVelocity == activeControl.speed){
+    return;
+  }
+  activeControl.zVelocity += activeControl.speed;
 }
 
-FPSControls.prototype.onMouseWheel = function(event){
+FPSControls.prototype.goForward = function(){
+  if (activeControl.zVelocity == -activeControl.speed){
+    return;
+  }
+  activeControl.zVelocity -= activeControl.speed;
+}
 
+FPSControls.prototype.goLeft = function(){
+  if (activeControl.xVelocity == -activeControl.speed){
+    return;
+  }
+  activeControl.xVelocity -= activeControl.speed;
+}
+
+FPSControls.prototype.goRight = function(){
+  if (activeControl.xVelocity == activeControl.speed){
+    return;
+  }
+  activeControl.xVelocity += activeControl.speed;
+}
+
+FPSControls.prototype.onPointerLockChange = function(isPointerLocked){
+  if (!isPointerLocked){
+    pointerLockRequested = true;
+  }
+  this.isPointerLocked = isPointerLocked;
+}
+
+FPSControls.prototype.onMouseMove = function(event){
+  if (!this.isPointerLocked){
+    return;
+  }
+  var movementX = event.movementX || event.mozMovementX || event.webkitMovementX || 0;
+  var movementY = event.movementY || event.mozMovementY || event.webkitMovementY || 0;
+  var dx = (-movementX * this.mouseSpeed);
+  camera.rotation.y += dx;
+  if (activeControl.hasWeapon1){
+    var randomness = 0;
+    if (activeControl.weaponRotationRandomnessOn){
+      activeControl.weapon1RotationRandomnessCounter += 0.06 * Math.random();
+      randomness = (Math.random() * (Math.sin(activeControl.weapon1RotationRandomnessCounter) / 800));
+    }
+    activeControl.weaponObject1.handleRotation(activeControl.axisY, dx + randomness);
+  }
+  if (activeControl.hasWeapon2){
+    var randomness = 0;
+    if (activeControl.weaponRotationRandomnessOn){
+      activeControl.weapon2RotationRandomnessCounter += 0.06 * Math.random();
+      randomness = (Math.random() * (Math.sin(activeControl.weapon2RotationRandomnessCounter) / 800));
+    }
+    activeControl.weaponObject2.handleRotation(activeControl.axisY, dx + randomness);
+  }
+  this.alpha -= dx;
+  var dy = -movementY * this.mouseSpeed;
+  if (!(dy > 0 && (this.totalXRotation + dy >= 1.10)) && !(dy <0 && (this.totalXRotation + dy <= -1.10))){
+    camera.rotation.x += dy;
+    if (activeControl.hasWeapon1){
+      var randomness = 0;
+      if (activeControl.weaponRotationRandomnessOn){
+        activeControl.weapon1RotationRandomnessCounter2 += 0.06 * Math.random();
+        randomness = (Math.random() * (Math.sin(activeControl.weapon1RotationRandomnessCounter2) / 800));
+      }
+      activeControl.weaponObject1.handleRotation(activeControl.axisX, dy + randomness);
+    }
+    if (activeControl.hasWeapon2){
+      var randomness = 0;
+      if (activeControl.weaponRotationRandomnessOn){
+        activeControl.weapon2RotationRandomnessCounter2 += 0.06 * Math.random();
+        randomness = (Math.random() * (Math.sin(activeControl.weapon2RotationRandomnessCounter2) / 800));
+      }
+      activeControl.weaponObject2.handleRotation(activeControl.axisX, dy + randomness);
+    }
+    this.totalXRotation += dy;
+  }
+}
+
+FPSControls.prototype.onTouchStart = function(event){
+  for (var i = 0; i<event.changedTouches.length; i++){
+    var curTouch = event.changedTouches[i];
+    activeControl.touchTrack.set(curTouch.identifier, curTouch);
+  }
+}
+
+FPSControls.prototype.onLeftHandFinger = function(touch){
+  if (activeControl.pausedDueToScreenOrientation){
+    return;
+  }
+  var degreeInterval = 30;
+  var oldTouch = activeControl.touchTrack.get(touch.identifier);
+  activeControl.reusableVec2.set((touch.pageX - oldTouch.pageX), (touch.pageY - oldTouch.pageY));
+  if(activeControl.reusableVec2.length() <= activeControl.touchJoystickThreshold){
+    return;
+  }
+  var angleInDegrees = THREE.Math.RAD2DEG * activeControl.reusableVec2.angle();
+  if (angleInDegrees <= degreeInterval || angleInDegrees >= (360 - degreeInterval)){
+    activeControl.joystickStatus.right = true;
+    activeControl.joystickStatus.left = false;
+    activeControl.joystickStatus.top = false;
+    activeControl.joystickStatus.down = false;
+  }else if (angleInDegrees >= (180 - degreeInterval) && angleInDegrees <= (180 + degreeInterval)){
+    activeControl.joystickStatus.left = true;
+    activeControl.joystickStatus.right = false;
+    activeControl.joystickStatus.top = false;
+    activeControl.joystickStatus.down = false;
+  }else if (angleInDegrees >= (270 - degreeInterval) && angleInDegrees <= (270 + degreeInterval)){
+    activeControl.joystickStatus.up = true;
+    activeControl.joystickStatus.right = false;
+    activeControl.joystickStatus.left = false;
+    activeControl.joystickStatus.down = false;
+  }else if (angleInDegrees >= (90 - degreeInterval) && angleInDegrees <= (90 + degreeInterval)){
+    activeControl.joystickStatus.down = true;
+    activeControl.joystickStatus.up = false;
+    activeControl.joystickStatus.right = false;
+    activeControl.joystickStatus.left = false;
+  }else if (angleInDegrees >= (270 + degreeInterval) && angleInDegrees <= (360 - degreeInterval)){
+    activeControl.joystickStatus.right = true;
+    activeControl.joystickStatus.up = true;
+    activeControl.joystickStatus.left = false;
+    activeControl.joystickStatus.down = false;
+  }else if (angleInDegrees >= (90 + degreeInterval) && angleInDegrees <= (180 - degreeInterval)){
+    activeControl.joystickStatus.left = true;
+    activeControl.joystickStatus.down = true;
+    activeControl.joystickStatus.up = false;
+    activeControl.joystickStatus.right = false;
+  }else if (angleInDegrees >= (180 + degreeInterval) && angleInDegrees <= (270 - degreeInterval)){
+    activeControl.joystickStatus.left = true;
+    activeControl.joystickStatus.up = true;
+    activeControl.joystickStatus.down = false;
+    activeControl.joystickStatus.right = false;
+  }else if (angleInDegrees >= (degreeInterval) && angleInDegrees <= (90 - degreeInterval)){
+    activeControl.joystickStatus.right = true;
+    activeControl.joystickStatus.down = true;
+    activeControl.joystickStatus.left = false;
+    activeControl.joystickStatus.up = false;
+  }
+}
+
+FPSControls.prototype.onRightHandFinger = function(touch){
+  if (activeControl.pausedDueToScreenOrientation){
+    return;
+  }
+  var oldTouch = activeControl.touchTrack.get(touch.identifier);
+  var movementX = (touch.pageX - oldTouch.pageX);
+  var movementY = (touch.pageY - oldTouch.pageY);
+  var dx = -(movementX * activeControl.touchLookSpeed);
+  camera.rotation.y += dx;
+  if (activeControl.hasWeapon1){
+    var randomness = 0;
+    if (activeControl.weaponRotationRandomnessOn){
+      activeControl.weapon1RotationRandomnessCounter += 0.06 * Math.random();
+      randomness = (Math.random() * (Math.sin(activeControl.weapon1RotationRandomnessCounter) / 800));
+    }
+    activeControl.weaponObject1.handleRotation(activeControl.axisY, dx + randomness);
+  }
+  if (activeControl.hasWeapon2){
+    var randomness = 0;
+    if (activeControl.weaponRotationRandomnessOn){
+      activeControl.weapon2RotationRandomnessCounter += 0.06 * Math.random();
+      randomness = (Math.random() * (Math.sin(activeControl.weapon2RotationRandomnessCounter) / 800));
+    }
+    activeControl.weaponObject2.handleRotation(activeControl.axisY, dx + randomness);
+  }
+  activeControl.alpha -= dx;
+  var dy = -movementY * activeControl.touchLookSpeed;
+  if (!(dy > 0 && (activeControl.totalXRotation + dy >= 1.10)) && !(dy <0 && (activeControl.totalXRotation + dy <= -1.10))){
+    camera.rotation.x += dy;
+    if (activeControl.hasWeapon1){
+      var randomness = 0;
+      if (activeControl.weaponRotationRandomnessOn){
+        activeControl.weapon1RotationRandomnessCounter2 += 0.06 * Math.random();
+        randomness = (Math.random() * (Math.sin(activeControl.weapon1RotationRandomnessCounter2) / 800));
+      }
+      activeControl.weaponObject1.handleRotation(activeControl.axisX, dy + randomness);
+    }
+    if (activeControl.hasWeapon2){
+      var randomness = 0;
+      if (activeControl.weaponRotationRandomnessOn){
+        activeControl.weapon2RotationRandomnessCounter2 += 0.06 * Math.random();
+        randomness = (Math.random() * (Math.sin(activeControl.weapon2RotationRandomnessCounter2) / 800));
+      }
+      activeControl.weaponObject2.handleRotation(activeControl.axisX, dy + randomness);
+    }
+    activeControl.totalXRotation += dy;
+  }
+}
+
+FPSControls.prototype.isTouchOnTheRightSide = function(touch){
+  var curViewport = renderer.getCurrentViewport();
+  var centerX = (curViewport.x + (curViewport.z / screenResolution)) / 2;
+  var centerY = (curViewport.y + (curViewport.w / screenResolution)) / 2;
+  var clientX = touch.clientX;
+  var clientY = touch.clientY;
+  return clientX >= centerX;
+}
+
+FPSControls.prototype.onTouchMove = function(event){
+  var size = activeControl.touchTrack.size;
+  if (size != 1 && size != 2){
+    return;
+  }
+  for (var i = 0; i<event.changedTouches.length; i++){
+    var curTouch = event.changedTouches[i];
+    if (!activeControl.touchTrack.has(curTouch.identifier)){
+      activeControl.touchTrack.set(curTouch.identifier, curTouch);
+      continue;
+    }
+    if (activeControl.isTouchOnTheRightSide(curTouch)){
+      activeControl.onRightHandFinger(curTouch);
+    }else{
+      activeControl.onLeftHandFinger(curTouch);
+    }
+    activeControl.touchTrack.set(curTouch.identifier, curTouch);
+  }
+}
+
+FPSControls.prototype.onTouchEnd = function(event){
+  for (var i = 0; i<event.changedTouches.length; i++){
+    var curTouch = event.changedTouches[i];
+    activeControl.touchTrack.delete(curTouch.identifier);
+    if (!activeControl.isTouchOnTheRightSide(curTouch)){
+      activeControl.resetJoystickStatus();
+    }
+  }
+}
+
+FPSControls.prototype.pauseDueToScreenOrientation = function(){
+  this.onPause();
+  this.pausedDueToScreenOrientation = true;
+  if (this.hasWeapon1){
+    this.weaponObject1.hide(false);
+  }
+  if (this.hasWeapon2){
+    this.weaponObject2.hide(false);
+  }
+}
+
+FPSControls.prototype.resume = function(){
+  this.onResume();
+  this.pausedDueToScreenOrientation = false;
+  if (this.hasWeapon1){
+    this.weaponObject1.show();
+  }
+  if (this.hasWeapon2){
+    this.weaponObject2.show();
+  }
 }
 
 FPSControls.prototype.update = function(){
+  if (isMobile && !isOrientationLandscape){
+    if (!this.pausedDueToScreenOrientation){
+      this.pauseDueToScreenOrientation();
+    }
+    return;
+  }else{
+    if (this.pausedDueToScreenOrientation){
+      this.resume();
+    }
+  }
+  camera.position.copy(this.playerBodyObject.mesh.position);
+  this.playerBodyObject.setVelocityX(0);
+  this.playerBodyObject.setVelocityZ(0);
+  this.xVelocity = 0;
+  this.zVelocity = 0;
+  var hasMotion = this.isMouseDown;
+  if (!isMobile){
+    var len = this.keyboardActions.length;
+    for (var i = 0; i<len; i++){
+      var curAction = this.keyboardActions[i];
+      if (keyboardBuffer[curAction.key]){
+        curAction.action();
+        hasMotion = true;
+      }
+    }
+  }else{
+    if (this.joystickStatus.up){
+      this.goForward();
+      hasMotion = true;
+    }
+    if (this.joystickStatus.down){
+      this.goBackward();
+      hasMotion = true;
+    }
+    if (this.joystickStatus.right){
+      this.goRight();
+      hasMotion = true;
+    }
+    if (this.joystickStatus.left){
+      this.goLeft();
+      hasMotion = true;
+    }
+  }
+  this.playerBodyObject.setVelocityX((this.xVelocity * Math.cos(this.alpha)) - (this.zVelocity * Math.sin(this.alpha)));
+  this.playerBodyObject.setVelocityZ((this.xVelocity * Math.sin(this.alpha)) + (this.zVelocity * Math.cos(this.alpha)));
+  if (this.hasCrosshair){
+    if (!hasMotion){
+      if (!selectedCrosshair.shrink){
+        crosshairHandler.shrinkCrosshair(this.crosshairAnimationDelta);
+      }
+    }else{
+      if (!selectedCrosshair.expand){
+        crosshairHandler.expandCrosshair(this.crosshairExpandSize, this.crosshairAnimationDelta);
+      }
+    }
+  }
+  if (this.weapon1IdleAnimationInfo){
+    this.weapon1IdleAnimationInfo.x += this.idleGunAnimationSpeed * Math.random();
+    this.weapon1IdleAnimationInfo.z += this.idleGunAnimationSpeed * Math.random();
+    this.weaponObject1.handleRotation(activeControl.axisX, Math.sin(this.weapon1IdleAnimationInfo.x) / 1000 * Math.random());
+    this.weaponObject1.handleRotation(activeControl.axisZ, Math.sin(this.weapon1IdleAnimationInfo.z) / 1000 * Math.random());
+  }
+  if (this.weapon2IdleAnimationInfo){
+    this.weapon2IdleAnimationInfo.x += this.idleGunAnimationSpeed * Math.random();
+    this.weapon2IdleAnimationInfo.z += this.idleGunAnimationSpeed * Math.random();
+    this.weaponObject2.handleRotation(activeControl.axisX, Math.sin(this.weapon2IdleAnimationInfo.x) / 1000 * Math.random());
+    this.weaponObject2.handleRotation(activeControl.axisZ, Math.sin(this.weapon2IdleAnimationInfo.z) / 1000 * Math.random());
+  }
+  this.lookIntersectionTest();
+}
 
+FPSControls.prototype.onlookRaycasterComplete = function(x, y, z, objName){
+  if (activeControl.deactivated){
+    return;
+  }
+  activeControl.currentLookInfo.x = x;
+  activeControl.currentLookInfo.y = y;
+  activeControl.currentLookInfo.z = z;
+  activeControl.currentLookInfo.objName = objName;
+  activeControl.onLook(x, y, z, objName);
+  if (!isMobile){
+    if (activeControl.isMouseDown){
+      activeControl.onShoot(x, y, z, objName);
+    }
+  }else{
+    if (objName != null && activeControl.shootableMap[objName]){
+      activeControl.onShoot(x, y, z, objName);
+    }
+  }
+}
+
+FPSControls.prototype.lookIntersectionTest = function(){
+  REUSABLE_VECTOR.copy(camera.position);
+  REUSABLE_VECTOR_2.set(0, 0, -1).applyQuaternion(camera.quaternion);
+  rayCaster.findIntersections(REUSABLE_VECTOR, REUSABLE_VECTOR_2, false, this.onlookRaycasterComplete);
+}
+
+FPSControls.prototype.resetJoystickStatus = function(){
+  activeControl.joystickStatus.left = false;
+  activeControl.joystickStatus.right = false;
+  activeControl.joystickStatus.up = false;
+  activeControl.joystickStatus.down = false;
+}
+
+FPSControls.prototype.onDoubleTap = function(touch){
+  activeControl.jump(true);
+}
+
+FPSControls.prototype.onTap = function(touch){
+  if (activeControl.pausedDueToScreenOrientation){
+    return;
+  }
+  if (activeControl.requestFullScreen && !onFullScreen){
+    return;
+  }
+  var isOnTheRightSide = activeControl.isTouchOnTheRightSide(touch);
+  if (activeControl.hasDoubleJump && isOnTheRightSide){
+    var now = performance.now();
+    if (activeControl.lastTapTime){
+      if (now - activeControl.lastTapTime < activeControl.doubleJumpTimeThresholdInMs){
+        activeControl.onDoubleTap(touch);
+        activeControl.lastTapTime = 0;
+        return;
+      }
+    }
+    activeControl.lastTapTime = now;
+  }
+  if (isOnTheRightSide){
+    activeControl.jump();
+  }
+}
+
+FPSControls.prototype.onKeyDown = function(event){
+  if (activeControl.hasDoubleJump){
+    if (event.keyCode == 32){
+      var now = performance.now();
+      if (activeControl.lastSpaceKeydownTime){
+        if (now - activeControl.lastSpaceKeydownTime < activeControl.doubleJumpTimeThresholdInMs){
+          activeControl.jump(true);
+          activeControl.lastTapTime = 0;
+          return;
+        }
+      }
+      activeControl.lastSpaceKeydownTime = now;
+    }
+  }
+}
+
+FPSControls.prototype.onMouseDown = function(){
+  activeControl.isMouseDown = true;
+}
+
+FPSControls.prototype.onMouseUp = function(){
+  activeControl.isMouseDown = false;
+}
+
+FPSControls.prototype.onResize = function(){
+  if (activeControl.hasWeapon1){
+    var pos = activeControl.weapon1Position;
+    activeControl.updateGunAlignment(0, pos.x, pos.y, pos.z);
+  }
+  if (activeControl.hasWeapon2){
+    var pos = activeControl.weapon2Position;
+    activeControl.updateGunAlignment(1, pos.x, pos.y, pos.z);
+  }
+}
+
+FPSControls.prototype.updateGunAlignment = function(gunIndex, x, y, z){
+  camera.position.copy(this.playerBodyObject.mesh.position);
+  this.resetRotation();
+  camera.updateMatrix();
+  camera.updateMatrixWorld(true);
+  camera.updateProjectionMatrix();
+  var obj;
+  if (gunIndex == 0){
+    obj = this.weaponObject1;
+  }
+  if (gunIndex == 1){
+    obj = this.weaponObject2;
+  }
+  if (obj.pivotObject){
+    obj.unsetRotationPivot();
+  }
+  obj.untrackObjectPosition();
+  REUSABLE_VECTOR.set(x, y, z);
+  REUSABLE_VECTOR.unproject(camera);
+  obj.setPosition(REUSABLE_VECTOR.x, REUSABLE_VECTOR.y, REUSABLE_VECTOR.z);
+  obj.trackObjectPosition(this.playerBodyObject);
+  var pivot = obj.makePivot(camera.position.x - obj.mesh.position.x, camera.position.y - obj.mesh.position.y, camera.position.z - obj.mesh.position.z);
+  obj.setRotationPivot(pivot);
+}
+
+FPSControls.prototype.resetRotation = function(){
+  camera.quaternion.set(0, 0, 0, 1);
+  this.totalXRotation = 0;
+  this.alpha = 0;
+  if (this.hasWeapon1){
+    this.weaponObject1.mesh.quaternion.copy(this.weapon1InitQuaternion);
+  }
+  if (this.hasWeapon2){
+    this.weaponObject2.mesh.quaternion.copy(this.weapon2InitQuaternion);
+  }
+}
+
+FPSControls.prototype.onDeactivated = function(){
+  this.deactivated = true;
+  this.playerBodyObject.usedAsFPSPlayerBody = false;
+  this.playerBodyObject.removeCollisionListener();
+  if (this.autoInstancedObject){
+    this.autoInstancedObject.mesh.visible = false;
+    this.weaponObject1.mesh.visible = true;
+    this.weaponObject2.mesh.visible = true;
+  }
+  this.playerBodyObject.show();
+  if (this.hasWeapon1){
+    this.weaponObject1.show();
+    this.weaponObject1.mesh.renderOrder = renderOrders.OBJECT;
+    this.weaponObject1.unsetRotationPivot();
+    this.weaponObject1.untrackObjectPosition();
+    this.weaponObject1.mesh.position.copy(this.weaponObject1.beforeFPSControlsInfo.position);
+    this.weaponObject1.mesh.quaternion.copy(this.weaponObject1.beforeFPSControlsInfo.quaternion);
+    this.weaponObject1.mesh.scale.set(1, 1, 1);
+  }
+  if (this.hasWeapon2){
+    this.weaponObject2.show();
+    this.weaponObject2.mesh.renderOrder = renderOrders.OBJECT;
+    this.weaponObject2.unsetRotationPivot();
+    this.weaponObject2.untrackObjectPosition();
+    this.weaponObject2.mesh.position.copy(this.weaponObject2.beforeFPSControlsInfo.position);
+    this.weaponObject2.mesh.quaternion.copy(this.weaponObject2.beforeFPSControlsInfo.quaternion);
+    this.weaponObject2.mesh.scale.set(1, 1, 1);
+  }
+}
+
+FPSControls.prototype.onPlayerBodyCollision = function(event){
+  if (event.y < this.physicsBody.position.y){
+    activeControl.canJump = true;
+    activeControl.canDoubleJump = true;
+  }
+}
+
+FPSControls.prototype.onActivated = function(){
+  this.resetRotation();
+  this.deactivated = false;
+  this.canJump = true;
+  this.canDoubleJump = true;
+  this.pausedDueToScreenOrientation = false;
+  this.currentLookInfo.x = 0;
+  this.currentLookInfo.y = 0;
+  this.currentLookInfo.z = 0;
+  this.currentLookInfo.objName = null;
+  this.isMouseDown = false;
+  this.lastTapTime = 0;
+  this.lastSpaceKeydownTime = 0;
+  this.joystickStatus.right = false;
+  this.joystickStatus.left = false;
+  this.joystickStatus.up = false;
+  this.joystickStatus.down = false;
+  this.touchTrack.clear();
+  camera.position.copy(this.playerBodyObject.mesh.position);
+  this.playerBodyObject.show();
+  this.playerBodyObject.hide(true);
+  this.playerBodyObject.usedAsFPSPlayerBody = true;
+  this.playerBodyObject.setCollisionListener(this.onPlayerBodyCollision);
+  if (!pointerLockEventHandler.isPointerLocked){
+    pointerLockRequested = true;
+    this.isPointerLocked = false;
+  }else{
+    this.isPointerLocked = true;
+  }
+  if (!(typeof this.crosshairName == UNDEFINED)){
+    this.hasCrosshair = true;
+    crosshairHandler.selectCrosshair(crosshairs[this.crosshairName]);
+  }else{
+    this.hasCrosshair = false;
+  }
+  if (this.hasWeapon1){
+    this.weaponObject1.show();
+    this.weaponObject1.mesh.renderOrder = renderOrders.FPS_WEAPON;
+    var pos = this.weaponObject1.mesh.position;
+    var quat = this.weaponObject1.mesh.quaternion;
+    this.weaponObject1.beforeFPSControlsInfo.position.copy(pos);
+    this.weaponObject1.beforeFPSControlsInfo.quaternion.copy(quat);
+    this.weaponObject1.mesh.quaternion.set(this.weaponObject1.fpsWeaponAlignment.qx, this.weaponObject1.fpsWeaponAlignment.qy, this.weaponObject1.fpsWeaponAlignment.qz, this.weaponObject1.fpsWeaponAlignment.qw);
+    this.weapon1InitQuaternion.copy(this.weaponObject1.mesh.quaternion);
+    this.weaponObject1.mesh.scale.set(this.weaponObject1.fpsWeaponAlignment.scale, this.weaponObject1.fpsWeaponAlignment.scale, this.weaponObject1.fpsWeaponAlignment.scale);
+    this.weapon1Position.set(this.weaponObject1.fpsWeaponAlignment.x, this.weaponObject1.fpsWeaponAlignment.y, this.weaponObject1.fpsWeaponAlignment.z);
+    this.updateGunAlignment(0, this.weapon1Position.x, this.weapon1Position.y, this.weapon1Position.z);
+    if (this.hasIdleGunAnimation){
+      this.weapon1IdleAnimationInfo.x = 0;
+      this.weapon1IdleAnimationInfo.z = 0;
+    }
+    this.weapon1RotationRandomnessCounter = 0;
+    this.weapon1RotationRandomnessCounter2 = 0;
+  }
+  if (this.hasWeapon2){
+    this.weaponObject2.show();
+    this.weaponObject2.mesh.renderOrder = renderOrders.FPS_WEAPON;
+    var pos = this.weaponObject2.mesh.position;
+    var quat = this.weaponObject2.mesh.quaternion;
+    this.weaponObject2.beforeFPSControlsInfo.position.copy(pos);
+    this.weaponObject2.beforeFPSControlsInfo.quaternion.copy(quat);
+    this.weaponObject2.mesh.quaternion.set(this.weaponObject2.fpsWeaponAlignment.qx, this.weaponObject2.fpsWeaponAlignment.qy, this.weaponObject2.fpsWeaponAlignment.qz, this.weaponObject2.fpsWeaponAlignment.qw);
+    this.weapon2InitQuaternion.copy(this.weaponObject2.mesh.quaternion);
+    this.weaponObject2.mesh.scale.set(this.weaponObject2.fpsWeaponAlignment.scale, this.weaponObject2.fpsWeaponAlignment.scale, this.weaponObject2.fpsWeaponAlignment.scale);
+    this.weapon2Position.set(this.weaponObject2.fpsWeaponAlignment.x, this.weaponObject2.fpsWeaponAlignment.y, this.weaponObject2.fpsWeaponAlignment.z);
+    this.updateGunAlignment(1, this.weapon2Position.x, this.weapon2Position.y, this.weapon2Position.z);
+    if (this.hasIdleGunAnimation){
+      this.weapon2IdleAnimationInfo.x = 0;
+      this.weapon2IdleAnimationInfo.z = 0;
+    }
+    this.weapon2RotationRandomnessCounter = 0;
+    this.weapon2RotationRandomnessCounter2 = 0;
+  }
+  if (this.autoInstancedObject){
+    this.weaponObject1.mesh.visible = false;
+    this.weaponObject2.mesh.visible = false;
+    this.autoInstancedObject.mesh.renderOrder = renderOrders.FPS_WEAPON;
+    this.autoInstancedObject.mesh.visible = true;
+  }
 }
 
 var CustomControls = function(params){
   this.isControl = true;
-  this.onClickFunc = params.onClick;
-  this.onTapFunc = params.onTap;
-  this.onSwipeFunc = params.onSwipe;
-  this.onPinchFunc = params.onPinch;
-  this.onMouseWheelFunc = params.onMouseWheel;
-  this.onUpdateFunc = params.onUpdate;
+  this.onClickFunc = params.onClick || noop;
+  this.onTapFunc = params.onTap || noop;
+  this.onSwipeFunc = params.onSwipe || noop;
+  this.onPinchFunc = params.onPinch || noop;
+  this.onMouseWheelFunc = params.onMouseWheel || noop;
+  this.onUpdateFunc = params.onUpdate || noop;
+  this.onMouseMoveFunc = params.onMouseMove || noop;
+  this.onMouseDownFunc = params.onMouseDown || noop;
+  this.onMouseUpFunc = params.onMouseUp || noop;
+  this.onTouchStartFunc = params.onTouchStart || noop;
+  this.onTouchMoveFunc = params.onTouchMove || noop;
+  this.onTouchEndFunc = params.onTouchEnd || noop;
+  this.onKeyUpFunc = params.onKeyUp || noop;
+  this.onKeyDownFunc = params.onKeyDown || noop;
+  this.onResizeFunc = params.onResize || noop;
+  this.onFullScreenChangeFunc = params.onFullScreenChange || noop;
+}
+
+CustomControls.prototype.onActivated = noop;
+CustomControls.prototype.onDeactivated = noop;
+
+CustomControls.prototype.onFullScreenChange = function(isFullScreen){
+  this.onFullScreenChangeFunc(isFullScreen);
+}
+
+CustomControls.prototype.onResize = function(){
+  this.onResizeFunc();
 }
 
 CustomControls.prototype.onClick = function(event){
@@ -25103,7 +26239,96 @@ CustomControls.prototype.onMouseWheel = function(event){
   this.onMouseWheelFunc(event);
 }
 
+CustomControls.prototype.onMouseMove = function(event){
+  this.onMouseMoveFunc(event);
+}
+
+CustomControls.prototype.onMouseDown = function(event){
+  this.onMouseDownFunc(event);
+}
+
+CustomControls.prototype.onMouseUp = function(event){
+  this.onMouseUpFunc(event);
+}
+
+CustomControls.prototype.onTouchStart = function(event){
+  this.onTouchStartFunc(event);
+}
+
+CustomControls.prototype.onTouchMove = function(event){
+  this.onTouchMoveFunc(event);
+}
+
+CustomControls.prototype.onTouchEnd = function(event){
+  this.onTouchEndFunc(event);
+}
+
+CustomControls.prototype.onKeyUp = function(event){
+  this.onKeyUpFunc(event);
+}
+
+CustomControls.prototype.onKeyDown = function(event){
+  this.onKeyDownFunc(event);
+}
+
 CustomControls.prototype.update = function(){
   this.onUpdateFunc();
+}
+
+var CrosshairHandler = function(){
+
+}
+
+CrosshairHandler.prototype.selectCrosshair = function(crosshair){
+  if (selectedCrosshair){
+    selectedCrosshair.mesh.visible = false;
+  }
+  crosshair.mesh.visible = true;
+  crosshair.handleResize();
+  selectedCrosshair = crosshair;
+}
+
+CrosshairHandler.prototype.changeCrosshairColor = function(colorName){
+  REUSABLE_COLOR.set(colorName);
+  selectedCrosshair.material.uniforms.color.value.x = REUSABLE_COLOR.r;
+  selectedCrosshair.material.uniforms.color.value.y = REUSABLE_COLOR.g;
+  selectedCrosshair.material.uniforms.color.value.z = REUSABLE_COLOR.b;
+}
+
+CrosshairHandler.prototype.hideCrosshair = function(){
+  if (selectedCrosshair){
+    selectedCrosshair.mesh.visible = false;
+    selectedCrosshair = 0;
+  }
+}
+
+CrosshairHandler.prototype.startCrosshairRotation = function(){
+  selectedCrosshair.angularSpeed = angularSpeed;
+}
+
+CrosshairHandler.prototype.stopCrosshairRotation = function(){
+  selectedCrosshair.rotationTime = 0;
+  selectedCrosshair.angularSpeed = 0;
+  selectedCrosshair.resetRotation();
+}
+
+CrosshairHandler.prototype.pauseCrosshairRotation = function(){
+  selectedCrosshair.angularSpeed = 0;
+}
+
+CrosshairHandler.prototype.expandCrosshair = function(targetSize, delta){
+  selectedCrosshair.expandTick = 0;
+  selectedCrosshair.expandTargetSize = targetSize;
+  selectedCrosshair.expandDelta = delta;
+  selectedCrosshair.expand = true;
+  selectedCrosshair.shrink = false;
+}
+
+CrosshairHandler.prototype.shrinkCrosshair = function(delta){
+  selectedCrosshair.shrinkTick = 0;
+  selectedCrosshair.expandDelta = delta;
+  selectedCrosshair.material.uniforms.shrinkStartSize.value = selectedCrosshair.curSize;
+  selectedCrosshair.expand = false;
+  selectedCrosshair.shrink = true;
 }
 
