@@ -240,6 +240,12 @@ Preconditions.prototype.checkIfTrueOnlyIfYExists = function(callerFunc, errorMsg
   }
 }
 
+Preconditions.prototype.checkIfTrueOnlyIfYAndZExists = function(callerFunc, errorMsg, y, z, obj){
+  if (!(typeof y == UNDEFINED) && !(typeof z == UNDEFINED) && obj){
+    this.throw(callerFunc, errorMsg);
+  }
+}
+
 Preconditions.prototype.checkIfDefined = function(callerFunc, parameterName, obj){
   if (typeof obj == UNDEFINED || obj == null){
     this.throw(callerFunc, parameterName+" is not defined.");
@@ -324,6 +330,22 @@ Preconditions.prototype.checkIfAddedObjectObjectGroupParticleSystem = function(c
 Preconditions.prototype.checkIfAddedObjectObjectGroupParticleSystemParticle = function(callerFunc, parameterName, obj){
   if (!(obj.isAddedObject) && !(obj.isObjectGroup) && !(obj.isParticle) && !(obj.isParticleSystem)){
     this.throw(callerFunc, parameterName+" must be an object, object group, particle system or particle.");
+  }
+}
+
+Preconditions.prototype.checkIfFPSWeaponOnlyIfExists = function(callerFunc, parameterName, obj){
+  if (!(typeof obj == UNDEFINED)){
+    if (!obj.isFPSWeapon){
+      this.throw(callerFunc, parameterName+" is not marked as a FPS weapon.");
+    }
+  }
+}
+
+Preconditions.prototype.checkIfAlreadyUsedAsFPSWeaponOnlyIfExists = function(callerFunc, parameterName, obj){
+  if (!(typeof obj == UNDEFINED)){
+    if (obj.isUsedInFPSControl){
+      this.throw(callerFunc, "Object already used as weapon in another FPS control.");
+    }
   }
 }
 

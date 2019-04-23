@@ -110,7 +110,7 @@ Crosshair.prototype.resetRotation = function(){
 }
 
 Crosshair.prototype.destroy = function(){
-  this.mesh.visible = false;
+  scene.remove(this.mesh);
   this.mesh.geometry.dispose();
   this.mesh.material.dispose();
   this.mesh = 0;

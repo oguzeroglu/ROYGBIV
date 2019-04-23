@@ -25,7 +25,6 @@ var FPSControls = function(params){
   this.touchLookSpeed = params.touchLookSpeed;
   this.speed = params.speed;
   this.jumpSpeed = params.jumpSpeed;
-  this.jumpableVelocityCoefficient = params.jumpableVelocityCoefficient;
   this.touchJoystickThreshold = params.touchJoystickThreshold;
   this.crosshairName = params.crosshairName;
   this.crosshairExpandSize = params.crosshairExpandSize;
@@ -54,9 +53,6 @@ var FPSControls = function(params){
   }
   if (typeof this.jumpSpeed == UNDEFINED){
     this.jumpSpeed = 500;
-  }
-  if (typeof this.jumpableVelocityCoefficient == UNDEFINED){
-    this.jumpableVelocityCoefficient = 3.5;
   }
   if (typeof this.touchJoystickThreshold == UNDEFINED){
     this.touchJoystickThreshold = 1.5;
@@ -101,6 +97,7 @@ var FPSControls = function(params){
     this.requestFullScreen = true;
     fullScreenRequested = true;
   }
+  this.init();
 }
 
 FPSControls.prototype.onClick = noop;
@@ -108,6 +105,56 @@ FPSControls.prototype.onSwipe = noop;
 FPSControls.prototype.onPinch = noop;
 FPSControls.prototype.onMouseWheel = noop;
 FPSControls.prototype.onKeyUp = noop;
+
+FPSControls.prototype.init = function(){
+  this.deactivated = true;
+  this.currentLookInfo = {x: 0, y: 0, z: 0, objName: null};
+  this.joystickStatus = {right: false, left: false, up: false, down: false};
+  this.touchTrack = new Map();
+  if (!(typeof this.weaponObject1 == UNDEFINED)){
+    this.weaponObject1.isUsedInFPSControl = true;
+    this.hasWeapon1 = true;
+    this.weaponObject1.beforeFPSControlsInfo = {position: new THREE.Vector3(), quaternion: new THREE.Quaternion()};
+    this.weapon1Position = new THREE.Vector3();
+    if (this.hasIdleGunAnimation){
+      this.weapon1IdleAnimationInfo = {x: 0, z: 0};
+    }
+  }else{
+    this.hasWeapon1 = false;
+  }
+  if (!(typeof this.weaponObject2 == UNDEFINED)){
+    this.weaponObject2.isUsedInFPSControl = true;
+    this.hasWeapon2 = true;
+    this.weaponObject2.beforeFPSControlsInfo = {position: new THREE.Vector3(), quaternion: new THREE.Quaternion()};
+    this.weapon2Position = new THREE.Vector3();
+    if (this.hasIdleGunAnimation){
+      this.weapon2IdleAnimationInfo = {x: 0, z: 0};
+    }
+  }else{
+    this.hasWeapon2 = false;
+  }
+  if (this.hasWeapon1 && this.hasWeapon2 && this.weaponObject1.isAddedObject && this.weaponObject2.isAddedObject){
+    var sameGeom = (autoInstancingHandler.getObjectKey(this.weaponObject1) == autoInstancingHandler.getObjectKey(this.weaponObject2));
+    var sameScale = (this.weaponObject1.fpsWeaponAlignment.scale == this.weaponObject2.fpsWeaponAlignment.scale);
+    if (sameGeom && sameScale){
+      var pseudoGroup = new Object();
+      pseudoGroup[this.weaponObject1.name] = this.weaponObject1;
+      pseudoGroup[this.weaponObject2.name] = this.weaponObject2;
+      this.autoInstancedObject = new AutoInstancedObject(generateUniqueObjectName(), pseudoGroup);
+      this.autoInstancedObject.init();
+      this.autoInstancedObject.mesh.visible = false;
+      this.autoInstancedObject.mesh.isFPSWeaponAutoInstancedObject = true;
+      macroHandler.injectMacro("FPS_WEAPON_SCALE "+this.weaponObject1.fpsWeaponAlignment.scale, this.autoInstancedObject.mesh.material, true, false);
+      scene.add(this.autoInstancedObject.mesh);
+    }
+  }
+  if (isMobile){
+    this.shootableMap = new Object();
+    for (var i = 0; i<this.shootableObjects.length; i++){
+      this.shootableMap[this.shootableObjects[i].name] = this.shootableObjects[i];
+    }
+  }
+}
 
 FPSControls.prototype.onFullScreenChange = function(isFullScreen){
   if (activeControl.requestFullScreen && !isFullScreen){
@@ -118,6 +165,7 @@ FPSControls.prototype.onFullScreenChange = function(isFullScreen){
 FPSControls.prototype.jump = function(isDouble){
   if ((!isDouble && activeControl.canJump) || (isDouble && activeControl.canDoubleJump)){
     activeControl.playerBodyObject.setVelocityY(activeControl.jumpSpeed);
+    activeControl.canJump = false;
     if (isDouble){
       activeControl.canDoubleJump = false;
     }
@@ -171,7 +219,7 @@ FPSControls.prototype.onMouseMove = function(event){
     var randomness = 0;
     if (activeControl.weaponRotationRandomnessOn){
       activeControl.weapon1RotationRandomnessCounter += 0.06 * Math.random();
-      randomness = (Math.random() * (Math.sin(activeControl.weapon1RotationRandomnessCounter) / 400));
+      randomness = (Math.random() * (Math.sin(activeControl.weapon1RotationRandomnessCounter) / 800));
     }
     activeControl.weaponObject1.handleRotation(activeControl.axisY, dx + randomness);
   }
@@ -179,7 +227,7 @@ FPSControls.prototype.onMouseMove = function(event){
     var randomness = 0;
     if (activeControl.weaponRotationRandomnessOn){
       activeControl.weapon2RotationRandomnessCounter += 0.06 * Math.random();
-      randomness = (Math.random() * (Math.sin(activeControl.weapon2RotationRandomnessCounter) / 400));
+      randomness = (Math.random() * (Math.sin(activeControl.weapon2RotationRandomnessCounter) / 800));
     }
     activeControl.weaponObject2.handleRotation(activeControl.axisY, dx + randomness);
   }
@@ -191,7 +239,7 @@ FPSControls.prototype.onMouseMove = function(event){
       var randomness = 0;
       if (activeControl.weaponRotationRandomnessOn){
         activeControl.weapon1RotationRandomnessCounter2 += 0.06 * Math.random();
-        randomness = (Math.random() * (Math.sin(activeControl.weapon1RotationRandomnessCounter2) / 400));
+        randomness = (Math.random() * (Math.sin(activeControl.weapon1RotationRandomnessCounter2) / 800));
       }
       activeControl.weaponObject1.handleRotation(activeControl.axisX, dy + randomness);
     }
@@ -199,7 +247,7 @@ FPSControls.prototype.onMouseMove = function(event){
       var randomness = 0;
       if (activeControl.weaponRotationRandomnessOn){
         activeControl.weapon2RotationRandomnessCounter2 += 0.06 * Math.random();
-        randomness = (Math.random() * (Math.sin(activeControl.weapon2RotationRandomnessCounter2) / 400));
+        randomness = (Math.random() * (Math.sin(activeControl.weapon2RotationRandomnessCounter2) / 800));
       }
       activeControl.weaponObject2.handleRotation(activeControl.axisX, dy + randomness);
     }
@@ -281,7 +329,7 @@ FPSControls.prototype.onRightHandFinger = function(touch){
     var randomness = 0;
     if (activeControl.weaponRotationRandomnessOn){
       activeControl.weapon1RotationRandomnessCounter += 0.06 * Math.random();
-      randomness = (Math.random() * (Math.sin(activeControl.weapon1RotationRandomnessCounter) / 400));
+      randomness = (Math.random() * (Math.sin(activeControl.weapon1RotationRandomnessCounter) / 800));
     }
     activeControl.weaponObject1.handleRotation(activeControl.axisY, dx + randomness);
   }
@@ -289,7 +337,7 @@ FPSControls.prototype.onRightHandFinger = function(touch){
     var randomness = 0;
     if (activeControl.weaponRotationRandomnessOn){
       activeControl.weapon2RotationRandomnessCounter += 0.06 * Math.random();
-      randomness = (Math.random() * (Math.sin(activeControl.weapon2RotationRandomnessCounter) / 400));
+      randomness = (Math.random() * (Math.sin(activeControl.weapon2RotationRandomnessCounter) / 800));
     }
     activeControl.weaponObject2.handleRotation(activeControl.axisY, dx + randomness);
   }
@@ -301,7 +349,7 @@ FPSControls.prototype.onRightHandFinger = function(touch){
       var randomness = 0;
       if (activeControl.weaponRotationRandomnessOn){
         activeControl.weapon1RotationRandomnessCounter2 += 0.06 * Math.random();
-        randomness = (Math.random() * (Math.sin(activeControl.weapon1RotationRandomnessCounter2) / 400));
+        randomness = (Math.random() * (Math.sin(activeControl.weapon1RotationRandomnessCounter2) / 800));
       }
       activeControl.weaponObject1.handleRotation(activeControl.axisX, dy + randomness);
     }
@@ -309,7 +357,7 @@ FPSControls.prototype.onRightHandFinger = function(touch){
       var randomness = 0;
       if (activeControl.weaponRotationRandomnessOn){
         activeControl.weapon2RotationRandomnessCounter2 += 0.06 * Math.random();
-        randomness = (Math.random() * (Math.sin(activeControl.weapon2RotationRandomnessCounter2) / 400));
+        randomness = (Math.random() * (Math.sin(activeControl.weapon2RotationRandomnessCounter2) / 800));
       }
       activeControl.weaponObject2.handleRotation(activeControl.axisX, dy + randomness);
     }
@@ -389,10 +437,6 @@ FPSControls.prototype.update = function(){
       this.resume();
     }
   }
-  this.canJump = (this.playerBodyObject.physicsBody.velocity.y <= this.jumpableVelocityCoefficient && this.playerBodyObject.physicsBody.velocity.y >= -this.jumpableVelocityCoefficient);
-  if (this.canJump){
-    this.canDoubleJump = true;
-  }
   camera.position.copy(this.playerBodyObject.mesh.position);
   this.playerBodyObject.setVelocityX(0);
   this.playerBodyObject.setVelocityZ(0);
@@ -455,6 +499,9 @@ FPSControls.prototype.update = function(){
 }
 
 FPSControls.prototype.onlookRaycasterComplete = function(x, y, z, objName){
+  if (activeControl.deactivated){
+    return;
+  }
   activeControl.currentLookInfo.x = x;
   activeControl.currentLookInfo.y = y;
   activeControl.currentLookInfo.z = z;
@@ -585,6 +632,14 @@ FPSControls.prototype.resetRotation = function(){
 }
 
 FPSControls.prototype.onDeactivated = function(){
+  this.deactivated = true;
+  this.playerBodyObject.usedAsFPSPlayerBody = false;
+  this.playerBodyObject.removeCollisionListener();
+  if (this.autoInstancedObject){
+    this.autoInstancedObject.mesh.visible = false;
+    this.weaponObject1.mesh.visible = true;
+    this.weaponObject2.mesh.visible = true;
+  }
   this.playerBodyObject.show();
   if (this.hasWeapon1){
     this.weaponObject1.show();
@@ -606,25 +661,36 @@ FPSControls.prototype.onDeactivated = function(){
   }
 }
 
-FPSControls.prototype.onActivated = function(){
-  this.pausedDueToScreenOrientation = false;
-  this.currentLookInfo = {x: 0, y: 0, z: 0, objName: null};
-  if (isMobile){
-    this.shootableMap = new Object();
-    for (var i = 0; i<this.shootableObjects.length; i++){
-      this.shootableMap[this.shootableObjects[i].name] = this.shootableObjects[i];
-    }
+FPSControls.prototype.onPlayerBodyCollision = function(event){
+  if (event.y < this.physicsBody.position.y){
+    activeControl.canJump = true;
+    activeControl.canDoubleJump = true;
   }
+}
+
+FPSControls.prototype.onActivated = function(){
+  this.resetRotation();
+  this.deactivated = false;
+  this.canJump = true;
+  this.canDoubleJump = true;
+  this.pausedDueToScreenOrientation = false;
+  this.currentLookInfo.x = 0;
+  this.currentLookInfo.y = 0;
+  this.currentLookInfo.z = 0;
+  this.currentLookInfo.objName = null;
   this.isMouseDown = false;
   this.lastTapTime = 0;
   this.lastSpaceKeydownTime = 0;
-  this.joystickStatus = {
-    right: false, left: false, up: false, down: false
-  };
-  this.touchTrack = new Map();
+  this.joystickStatus.right = false;
+  this.joystickStatus.left = false;
+  this.joystickStatus.up = false;
+  this.joystickStatus.down = false;
+  this.touchTrack.clear();
   camera.position.copy(this.playerBodyObject.mesh.position);
   this.playerBodyObject.show();
   this.playerBodyObject.hide(true);
+  this.playerBodyObject.usedAsFPSPlayerBody = true;
+  this.playerBodyObject.setCollisionListener(this.onPlayerBodyCollision);
   if (!pointerLockEventHandler.isPointerLocked){
     pointerLockRequested = true;
     this.isPointerLocked = false;
@@ -637,44 +703,48 @@ FPSControls.prototype.onActivated = function(){
   }else{
     this.hasCrosshair = false;
   }
-  if (!(typeof this.weaponObject1 == UNDEFINED)){
+  if (this.hasWeapon1){
     this.weaponObject1.show();
     this.weaponObject1.mesh.renderOrder = renderOrders.FPS_WEAPON;
     var pos = this.weaponObject1.mesh.position;
     var quat = this.weaponObject1.mesh.quaternion;
-    this.weaponObject1.beforeFPSControlsInfo = {position: pos.clone(), quaternion: quat.clone()};
-    this.hasWeapon1 = true;
+    this.weaponObject1.beforeFPSControlsInfo.position.copy(pos);
+    this.weaponObject1.beforeFPSControlsInfo.quaternion.copy(quat);
     this.weaponObject1.mesh.quaternion.set(this.weaponObject1.fpsWeaponAlignment.qx, this.weaponObject1.fpsWeaponAlignment.qy, this.weaponObject1.fpsWeaponAlignment.qz, this.weaponObject1.fpsWeaponAlignment.qw);
     this.weapon1InitQuaternion.copy(this.weaponObject1.mesh.quaternion);
     this.weaponObject1.mesh.scale.set(this.weaponObject1.fpsWeaponAlignment.scale, this.weaponObject1.fpsWeaponAlignment.scale, this.weaponObject1.fpsWeaponAlignment.scale);
-    this.weapon1Position = new THREE.Vector3(this.weaponObject1.fpsWeaponAlignment.x, this.weaponObject1.fpsWeaponAlignment.y, this.weaponObject1.fpsWeaponAlignment.z);
+    this.weapon1Position.set(this.weaponObject1.fpsWeaponAlignment.x, this.weaponObject1.fpsWeaponAlignment.y, this.weaponObject1.fpsWeaponAlignment.z);
     this.updateGunAlignment(0, this.weapon1Position.x, this.weapon1Position.y, this.weapon1Position.z);
     if (this.hasIdleGunAnimation){
-      this.weapon1IdleAnimationInfo = {x: 0, z: 0};
+      this.weapon1IdleAnimationInfo.x = 0;
+      this.weapon1IdleAnimationInfo.z = 0;
     }
     this.weapon1RotationRandomnessCounter = 0;
     this.weapon1RotationRandomnessCounter2 = 0;
-  }else{
-    this.hasWeapon1 = false;
   }
-  if (!(typeof this.weaponObject2 == UNDEFINED)){
+  if (this.hasWeapon2){
     this.weaponObject2.show();
     this.weaponObject2.mesh.renderOrder = renderOrders.FPS_WEAPON;
     var pos = this.weaponObject2.mesh.position;
     var quat = this.weaponObject2.mesh.quaternion;
-    this.weaponObject2.beforeFPSControlsInfo = {position: pos.clone(), quaternion: quat.clone()};
-    this.hasWeapon2 = true;
+    this.weaponObject2.beforeFPSControlsInfo.position.copy(pos);
+    this.weaponObject2.beforeFPSControlsInfo.quaternion.copy(quat);
     this.weaponObject2.mesh.quaternion.set(this.weaponObject2.fpsWeaponAlignment.qx, this.weaponObject2.fpsWeaponAlignment.qy, this.weaponObject2.fpsWeaponAlignment.qz, this.weaponObject2.fpsWeaponAlignment.qw);
     this.weapon2InitQuaternion.copy(this.weaponObject2.mesh.quaternion);
     this.weaponObject2.mesh.scale.set(this.weaponObject2.fpsWeaponAlignment.scale, this.weaponObject2.fpsWeaponAlignment.scale, this.weaponObject2.fpsWeaponAlignment.scale);
-    this.weapon2Position = new THREE.Vector3(this.weaponObject2.fpsWeaponAlignment.x, this.weaponObject2.fpsWeaponAlignment.y, this.weaponObject2.fpsWeaponAlignment.z);
+    this.weapon2Position.set(this.weaponObject2.fpsWeaponAlignment.x, this.weaponObject2.fpsWeaponAlignment.y, this.weaponObject2.fpsWeaponAlignment.z);
     this.updateGunAlignment(1, this.weapon2Position.x, this.weapon2Position.y, this.weapon2Position.z);
     if (this.hasIdleGunAnimation){
-      this.weapon2IdleAnimationInfo = {x: 0, z: 0};
+      this.weapon2IdleAnimationInfo.x = 0;
+      this.weapon2IdleAnimationInfo.z = 0;
     }
     this.weapon2RotationRandomnessCounter = 0;
     this.weapon2RotationRandomnessCounter2 = 0;
-  }else{
-    this.hasWeapon2 = false;
+  }
+  if (this.autoInstancedObject){
+    this.weaponObject1.mesh.visible = false;
+    this.weaponObject2.mesh.visible = false;
+    this.autoInstancedObject.mesh.renderOrder = renderOrders.FPS_WEAPON;
+    this.autoInstancedObject.mesh.visible = true;
   }
 }

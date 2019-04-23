@@ -864,6 +864,7 @@ GUIHandler.prototype.initializeObjectManipulationGUI = function(){
       guiHandler.disableController(guiHandler.omHasMassController);
       guiHandler.disableController(guiHandler.omChangeableController);
       guiHandler.disableController(guiHandler.omIntersectableController);
+      guiHandler.disableController(guiHandler.omMassController);
       guiHandler.objectManipulationParameters["Has mass"] = false;
       guiHandler.objectManipulationParameters["Changeable"] = true;
       guiHandler.objectManipulationParameters["Intersectable"] = false;
@@ -872,6 +873,9 @@ GUIHandler.prototype.initializeObjectManipulationGUI = function(){
       guiHandler.enableController(guiHandler.omHasMassController);
       guiHandler.enableController(guiHandler.omChangeableController);
       guiHandler.enableController(guiHandler.omIntersectableController);
+      if (!selectionHandler.getSelectedObject().noMass){
+        guiHandler.enableController(guiHandler.omMassController);
+      }
       guiHandler.objectManipulationParameters["Has mass"] = true;
       guiHandler.objectManipulationParameters["Changeable"] = false;
       guiHandler.objectManipulationParameters["Intersectable"] = true;

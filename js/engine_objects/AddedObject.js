@@ -67,6 +67,18 @@ var AddedObject = function(name, type, metaData, material, mesh, physicsBody, de
 
 }
 
+AddedObject.prototype.removeCollisionListener = function(){
+  this.physicsBody.removeEventListener("collide", this.boundCallbackFunction);
+  collisionCallbackRequests.delete(this.name);
+  physicsWorld.removeCollisionListener(this);
+}
+
+AddedObject.prototype.setCollisionListener = function(callbackFunction){
+  this.physicsBody.addEventListener("collide", this.boundCallbackFunction);
+  collisionCallbackRequests.set(this.name, callbackFunction.bind(this));
+  physicsWorld.setCollisionListener(this);
+}
+
 AddedObject.prototype.setPositionThresholdExceededListener = function(axis, threshold, controlMode, callbackFunction){
   if (!this.positionThresholdExceededListenerInfo){
     this.positionThresholdExceededListenerInfo = new Object();
@@ -2601,6 +2613,7 @@ AddedObject.prototype.getEndPoint = function(axis){
       translationAmount = (this.metaData.topRadius + this.metaData.bottomRadius) / 2;
     }
   }
+  translationAmount *= this.mesh.scale.x;
   var quaternion, position;
   if (this.parentObjectName){
     var parentObject = objectGroups[this.parentObjectName];
