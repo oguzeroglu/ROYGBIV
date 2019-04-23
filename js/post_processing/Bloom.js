@@ -247,7 +247,7 @@ Bloom.prototype.directPass = function(){
 }
 
 Bloom.prototype.generateSkyboxPass = function(){
-  this.skyboxTarget = new THREE.WebGLRenderTarget(renderer.getCurrentViewport().z, renderer.getCurrentViewport().w, this.rtParameters);
+  this.skyboxTarget = new THREE.WebGLRenderTarget(renderer.getCurrentViewport().z / 10, renderer.getCurrentViewport().w / 10, this.rtParameters);
   this.skyboxPassScene = new THREE.Scene();
   this.skyboxMesh = new THREE.Mesh(skyboxMesh.geometry, skyboxMesh.material);
   this.skyboxPassScene.add(this.skyboxMesh);
@@ -339,6 +339,9 @@ Bloom.prototype.generateBrightPass = function(){
 Bloom.prototype.setSize = function(width, height){
   this.sceneTarget.setSize(width, height);
   this.brightTarget.setSize(width / 2, height / 2);
+  if (this.skyboxTarget){
+    this.skyboxTarget.setSize(width / 10, height / 10);
+  }
   var coef = 2;
   for (var i = 0; i<this.configurations.blurStepCount; i++){
     this.horizontalBlurTargets[i].setSize(width/coef, height/coef);
