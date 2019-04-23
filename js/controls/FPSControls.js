@@ -25,7 +25,6 @@ var FPSControls = function(params){
   this.touchLookSpeed = params.touchLookSpeed;
   this.speed = params.speed;
   this.jumpSpeed = params.jumpSpeed;
-  this.jumpableVelocityCoefficient = params.jumpableVelocityCoefficient;
   this.touchJoystickThreshold = params.touchJoystickThreshold;
   this.crosshairName = params.crosshairName;
   this.crosshairExpandSize = params.crosshairExpandSize;
@@ -54,9 +53,6 @@ var FPSControls = function(params){
   }
   if (typeof this.jumpSpeed == UNDEFINED){
     this.jumpSpeed = 500;
-  }
-  if (typeof this.jumpableVelocityCoefficient == UNDEFINED){
-    this.jumpableVelocityCoefficient = 3.5;
   }
   if (typeof this.touchJoystickThreshold == UNDEFINED){
     this.touchJoystickThreshold = 1.5;
@@ -169,6 +165,7 @@ FPSControls.prototype.onFullScreenChange = function(isFullScreen){
 FPSControls.prototype.jump = function(isDouble){
   if ((!isDouble && activeControl.canJump) || (isDouble && activeControl.canDoubleJump)){
     activeControl.playerBodyObject.setVelocityY(activeControl.jumpSpeed);
+    activeControl.canJump = false;
     if (isDouble){
       activeControl.canDoubleJump = false;
     }
@@ -440,10 +437,6 @@ FPSControls.prototype.update = function(){
       this.resume();
     }
   }
-  this.canJump = (this.playerBodyObject.physicsBody.velocity.y <= this.jumpableVelocityCoefficient && this.playerBodyObject.physicsBody.velocity.y >= -this.jumpableVelocityCoefficient);
-  if (this.canJump){
-    this.canDoubleJump = true;
-  }
   camera.position.copy(this.playerBodyObject.mesh.position);
   this.playerBodyObject.setVelocityX(0);
   this.playerBodyObject.setVelocityZ(0);
@@ -640,6 +633,8 @@ FPSControls.prototype.resetRotation = function(){
 
 FPSControls.prototype.onDeactivated = function(){
   this.deactivated = true;
+  this.playerBodyObject.usedAsFPSPlayerBody = false;
+  this.playerBodyObject.removeCollisionListener();
   if (this.autoInstancedObject){
     this.autoInstancedObject.mesh.visible = false;
     this.weaponObject1.mesh.visible = true;
@@ -666,9 +661,18 @@ FPSControls.prototype.onDeactivated = function(){
   }
 }
 
+FPSControls.prototype.onPlayerBodyCollision = function(event){
+  if (event.y < this.physicsBody.position.y){
+    activeControl.canJump = true;
+    activeControl.canDoubleJump = true;
+  }
+}
+
 FPSControls.prototype.onActivated = function(){
   this.resetRotation();
   this.deactivated = false;
+  this.canJump = true;
+  this.canDoubleJump = true;
   this.pausedDueToScreenOrientation = false;
   this.currentLookInfo.x = 0;
   this.currentLookInfo.y = 0;
@@ -685,6 +689,8 @@ FPSControls.prototype.onActivated = function(){
   camera.position.copy(this.playerBodyObject.mesh.position);
   this.playerBodyObject.show();
   this.playerBodyObject.hide(true);
+  this.playerBodyObject.usedAsFPSPlayerBody = true;
+  this.playerBodyObject.setCollisionListener(this.onPlayerBodyCollision);
   if (!pointerLockEventHandler.isPointerLocked){
     pointerLockRequested = true;
     this.isPointerLocked = false;

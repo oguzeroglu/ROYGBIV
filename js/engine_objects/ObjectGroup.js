@@ -34,6 +34,18 @@ var ObjectGroup = function(name, group){
   this.lastUpdateQuaternion = new THREE.Quaternion();
 }
 
+ObjectGroup.prototype.removeCollisionListener = function(){
+  this.physicsBody.removeEventListener("collide", this.boundCallbackFunction);
+  collisionCallbackRequests.delete(this.name);
+  physicsWorld.removeCollisionListener(this);
+}
+
+ObjectGroup.prototype.setCollisionListener = function(callbackFunction){
+  this.physicsBody.addEventListener("collide", this.boundCallbackFunction);
+  collisionCallbackRequests.set(this.name, callbackFunction.bind(this));
+  physicsWorld.setCollisionListener(this);
+}
+
 ObjectGroup.prototype.setPositionThresholdExceededListener = function(axis, threshold, controlMode, callbackFunction){
   if (!this.positionThresholdExceededListenerInfo){
     this.positionThresholdExceededListenerInfo = new Object();

@@ -331,6 +331,7 @@ ModeSwitcher.prototype.switchFromPreviewToDesign = function(){
     object.loadState();
     object.resetColor();
     object.isUsedInFPSControl = false;
+    object.physicsBody.removeEventListener("collide", object.boundCallbackFunction);
     if (object.positionThresholdExceededListenerInfo){
       object.positionThresholdExceededListenerInfo.isActive = false;
     }
@@ -362,6 +363,7 @@ ModeSwitcher.prototype.switchFromPreviewToDesign = function(){
       object.positionThresholdExceededListenerInfo.isActive = false;
     }
     object.isUsedInFPSControl = false;
+    object.physicsBody.removeEventListener("collide", object.boundCallbackFunction);
     delete object.clickCallbackFunction;
     delete object.mouseOverCallbackFunction;
     delete object.mouseOutCallbackFunction;

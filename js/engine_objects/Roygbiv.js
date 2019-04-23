@@ -3455,13 +3455,12 @@ Roygbiv.prototype.setCollisionListener = function(sourceObject, callbackFunction
   preConditions.checkIfNumberOnlyIfExists(ROYGBIV.setCollisionListener, preConditions.timeOffset, timeOffset);
   if ((sourceObject.isAddedObject) || (sourceObject.isObjectGroup)){
     preConditions.checkIfTrue(ROYGBIV.setCollisionListener, "Cannot set collision listener for more than "+MAX_OBJECT_COLLISION_LISTENER_COUNT+" objects.", (TOTAL_OBJECT_COLLISION_LISTENER_COUNT >= MAX_OBJECT_COLLISION_LISTENER_COUNT));
+    preConditions.checkIfTrue(ROYGBIV.setCollisionListener, "Object used as FPS player body, cannot listen for collisions.", sourceObject.usedAsFPSPlayerBody);
     preConditions.checkIfNoMass(ROYGBIV.setCollisionListener, preConditions.sourceObject, sourceObject);
     if (!collisionCallbackRequests.has(sourceObject.name)){
       TOTAL_OBJECT_COLLISION_LISTENER_COUNT ++;
     }
-    sourceObject.physicsBody.addEventListener("collide", sourceObject.boundCallbackFunction);
-    collisionCallbackRequests.set(sourceObject.name, callbackFunction.bind(sourceObject));
-    physicsWorld.setCollisionListener(sourceObject);
+    sourceObject.setCollisionListener(callbackFunction);
   }else if (sourceObject.isParticle){
     preConditions.checkIfTrue(ROYGBIV.setCollisionListener, "Particle system is stopped.", (sourceObject.parent && sourceObject.parent.isStopped));
     if (sourceObject.uuid && !particleCollisionCallbackRequests[sourceObject.uuid]){
@@ -3534,10 +3533,8 @@ Roygbiv.prototype.removeCollisionListener = function(sourceObject){
   }
   if (curCallbackRequest){
     if ((sourceObject.isAddedObject) || (sourceObject.isObjectGroup)){
-      sourceObject.physicsBody.removeEventListener("collide", sourceObject.boundCallbackFunction);
-      collisionCallbackRequests.delete(sourceObject.name);
+      sourceObject.removeCollisionListener();
       TOTAL_OBJECT_COLLISION_LISTENER_COUNT --;
-      physicsWorld.removeCollisionListener(sourceObject);
     }else if (sourceObject.isParticle){
       delete particleCollisionCallbackRequests[sourceObject.uuid];
       TOTAL_PARTICLE_COLLISION_LISTEN_COUNT --;
@@ -4352,10 +4349,6 @@ Roygbiv.prototype.setActiveControl = function(control){
 // touchLookSpeed (optional): The speed of touch based camera look*around event. Default value is 0.01.
 // speed (optional): The speed of motion. Default value is 200.
 // jumpSpeed (optional): The jump speed. Default value is 500.
-// jumpableVelocityCoefficient (optional): A coefficient used to decide if the object can jump based on
-// its velocity on the axis y. The object can jump if velocity.y <= jumpableVelocityCoefficient AND
-// velocity.y >= -jumpableVelocityCoefficient. This parameter is used in order to prevent
-// endless jumps by letting the gravity affect the velocity on the axis y. Default value is 3.5.
 // touchJoystickThreshold (optional): For the left hand move controls on mobile devices, this
 // parameter is used in order to filter out negligible TouchEvents on finger move, thus preventing
 // flickering moves. The TouchEvents are filtered if the length between the previous and the current
@@ -4406,7 +4399,6 @@ Roygbiv.prototype.createFPSControl = function(parameters){
   preConditions.checkIfNumberOnlyIfExists(ROYGBIV.createFPSControl, preConditions.touchLookSpeed, parameters.touchLookSpeed);
   preConditions.checkIfNumberOnlyIfExists(ROYGBIV.createFPSControl, preConditions.speed, parameters.speed);
   preConditions.checkIfNumberOnlyIfExists(ROYGBIV.createFPSControl, preConditions.jumpSpeed, parameters.jumpSpeed);
-  preConditions.checkIfNumberOnlyIfExists(ROYGBIV.createFPSControl, preConditions.jumpableVelocityCoefficient, parameters.jumpableVelocityCoefficient);
   preConditions.checkIfNumberOnlyIfExists(ROYGBIV.createFPSControl, preConditions.touchJoystickThreshold, parameters.touchJoystickThreshold);
   preConditions.checkIfTrueOnlyIfYExists(ROYGBIV.createFPSControl, "No such crosshair.", parameters.crosshairName, !crosshairs[parameters.crosshairName]);
   preConditions.checkIfNumberOnlyIfExists(ROYGBIV.createFPSControl, preConditions.crosshairExpandSize, parameters.crosshairExpandSize);
@@ -4430,6 +4422,7 @@ Roygbiv.prototype.createFPSControl = function(parameters){
   preConditions.checkIfTrueOnlyIfYAndZExists(ROYGBIV.createFPSControl, "Weapon objects are the same.", parameters.weaponObject1, parameters.weaponObject2, (parameters.weaponObject1 == parameters.weaponObject2));
   preConditions.checkIfAlreadyUsedAsFPSWeaponOnlyIfExists(ROYGBIV.createFPSControl, preConditions.weaponObject1, parameters.weaponObject1);
   preConditions.checkIfAlreadyUsedAsFPSWeaponOnlyIfExists(ROYGBIV.createFPSControl, preConditions.weaponObject2, parameters.weaponObject2);
+  preConditions.checkIfTrue(ROYGBIV.createFPSControl, "Player body object cannot have set colllision listener.", collisionCallbackRequests.has(parameters.playerBodyObject.name));
   return new FPSControls(parameters);
 }
 

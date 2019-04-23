@@ -67,6 +67,18 @@ var AddedObject = function(name, type, metaData, material, mesh, physicsBody, de
 
 }
 
+AddedObject.prototype.removeCollisionListener = function(){
+  this.physicsBody.removeEventListener("collide", this.boundCallbackFunction);
+  collisionCallbackRequests.delete(this.name);
+  physicsWorld.removeCollisionListener(this);
+}
+
+AddedObject.prototype.setCollisionListener = function(callbackFunction){
+  this.physicsBody.addEventListener("collide", this.boundCallbackFunction);
+  collisionCallbackRequests.set(this.name, callbackFunction.bind(this));
+  physicsWorld.setCollisionListener(this);
+}
+
 AddedObject.prototype.setPositionThresholdExceededListener = function(axis, threshold, controlMode, callbackFunction){
   if (!this.positionThresholdExceededListenerInfo){
     this.positionThresholdExceededListenerInfo = new Object();
