@@ -1,15 +1,11 @@
 var ParticleSystem = function(copyPS, name, particles, x, y, z, vx, vy, vz, ax, ay, az, motionMode, updateFunction){
-
   this.isParticleSystem = true;
-
   this.copyPS = copyPS;
-
   this.name = name;
   this.particles = particles;
   this.x = x;
   this.y = y;
   this.z = z;
-
   this.motionMode = motionMode;
 
   this.collisionTimeOffset = 0;

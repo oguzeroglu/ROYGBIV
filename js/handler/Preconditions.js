@@ -199,7 +199,7 @@ var Preconditions = function(){
   this.shootableObjects = "shootableObjects";
   this.onPause = "onPause";
   this.onResume = "onResume";
-
+  this.skipList = "skipList";
 }
 
 Preconditions.prototype.errorHeader = function(callerFunc){
@@ -208,6 +208,16 @@ Preconditions.prototype.errorHeader = function(callerFunc){
 
 Preconditions.prototype.throw = function(callerFunc, errorMsg){
   throw new Error(this.errorHeader(callerFunc)+" ["+errorMsg+"]");
+}
+
+Preconditions.prototype.checkIfArrayOfParticleSystemsOnlyIfExists = function(callerFunc, parameterName, obj){
+  if (!(typeof obj == UNDEFINED)){
+    for (var i = 0; i<obj.length; i++){
+      if (!obj[i].isParticleSystem){
+        this.throw(callerFunc, parameterName+" is not an Array of ParticleSystems.");
+      }
+    }
+  }
 }
 
 Preconditions.prototype.checkIfArrayOfObjectsOnlyIfExists = function(callerFunc, parameterName, obj){
@@ -584,7 +594,7 @@ Preconditions.prototype.checkIfEmptyArray = function(callerFunc, parameterName, 
   }
 }
 
-Preconditions.prototype.checkIfBlending = function(callerFunc, parameterName, obj){
+Preconditions.prototype.checkIfBlending = function(callerFunc, parameterName, blendingMode){
   if (blendingMode != NO_BLENDING && blendingMode != NORMAL_BLENDING && blendingMode != ADDITIVE_BLENDING && blendingMode != SUBTRACTIVE_BLENDING && blendingMode != MULTIPLY_BLENDING){
     this.throw(callerFunc, parameterName+" must be one of NO_BLENDING, NORMAL_BLENDING, ADDITIVE_BLENDING, SUBTRACTIVE_BLENDING or MULTIPLY_BLENDING.");
   }

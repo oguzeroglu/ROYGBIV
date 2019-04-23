@@ -45,8 +45,8 @@ var Roygbiv = function(){
     "createParticleMaterial",
     "createParticle",
     "createParticleSystem",
-    "scale",
-    "setBlending",
+    "scaleParticleSystem",
+    "setParticleSystemBlending",
     "setParticleSystemRotation",
     "setParticleSystemQuaternion",
     "kill",
@@ -1223,28 +1223,29 @@ Roygbiv.prototype.createParticleSystem = function(configurations){
 }
 
 //  Modifies the scale of a particle system.
-Roygbiv.prototype.scale = function(object, scaleVector){
+Roygbiv.prototype.scaleParticleSystem = function(object, scaleVector){
   if (mode == 0){
     return;
   }
-  preConditions.checkIfDefined(ROYGBIV.scale, preConditions.scaleVector, scaleVector);
-  preConditions.checkIfVectorOnlyIfDefined(ROYGBIV.scale, preConditions.scaleVector, scaleVector);
-  preConditions.checkIfDefined(ROYGBIV.scale, preConditions.object, object);
-  preConditions.checkIfParticleSystem(ROYGBIV.scale, preConditions.object, object);
+  preConditions.checkIfDefined(ROYGBIV.scaleParticleSystem, preConditions.scaleVector, scaleVector);
+  preConditions.checkIfVectorOnlyIfDefined(ROYGBIV.scaleParticleSystem, preConditions.scaleVector, scaleVector);
+  preConditions.checkIfDefined(ROYGBIV.scaleParticleSystem, preConditions.object, object);
+  preConditions.checkIfParticleSystem(ROYGBIV.scaleParticleSystem, preConditions.object, object);
   object.mesh.scale.set(scaleVector.x, scaleVector.y, scaleVector.z);
 }
 
 //  Sets the blending mode of a particle system. Blending mode can be one of
 //  NO_BLENDING, NORMAL_BLENDING, ADDITIVE_BLENDING, SUBTRACTIVE_BLENDING or
 //  MULTIPLY_BLENDING
-Roygbiv.prototype.setBlending = function(particleSystem, blendingMode){
+Roygbiv.prototype.setParticleSystemBlending = function(particleSystem, blendingMode){
   if (mode == 0){
     return;
   }
-  preConditions.checkIfDefined(ROYGBIV.setBlending, preConditions.particleSystem, particleSystem);
-  preConditions.checkIfDefined(ROYGBIV.setBlending, preConditions.blendingMode, blendingMode);
-  preConditions.checkIfParticleSystem(ROYGBIV.setBlending, preConditions.particleSystem, particleSystem);
-  preConditions.checkIfBlending(ROYGBIV.setBlending, preConditions.blendingMode, blendingMode);
+  preConditions.checkIfDefined(ROYGBIV.setParticleSystemBlending, preConditions.particleSystem, particleSystem);
+  preConditions.checkIfDefined(ROYGBIV.setParticleSystemBlending, preConditions.blendingMode, blendingMode);
+  preConditions.checkIfParticleSystem(ROYGBIV.setParticleSystemBlending, preConditions.particleSystem, particleSystem);
+  preConditions.checkIfBlending(ROYGBIV.setParticleSystemBlending, preConditions.blendingMode, blendingMode);
+  preConditions.checkIfTrue(ROYGBIV.setParticleSystemBlending, "Cannot set blending of a merged particle system.", particleSystem.psMerger);
   particleSystem.setBlending(blendingMode);
 }
 
@@ -3175,14 +3176,17 @@ Roygbiv.prototype.fadeAway = function(particleSystem, coefficient){
   }
 }
 
-// Merges all created particle systems to improve render performance.
-Roygbiv.prototype.mergeParticleSystems = function(){
+// Merges all created particle systems to improve render performance. The skip
+// list parameter (array of particle systems) may be used in order to prevent certain particle systems from being merged.
+// This might be useful for particle systems that have separate blending modes.
+Roygbiv.prototype.mergeParticleSystems = function(skipList){
   if (mode == 0){
     return;
   }
   preConditions.checkIfTrue(ROYGBIV.mergeParticleSystems, "MAX_VERTEX_UNIFORM_VECTORS is not calcualted", (!MAX_VERTEX_UNIFORM_VECTORS));
   preConditions.checkIfTrue(ROYGBIV.mergeParticleSystems, "Mininmum 2 particle systems must be created in order to merge", (Object.keys(particleSystemPool).length < 2));
-
+  preConditions.checkIfArrayOnlyIfExists(ROYGBIV.mergeParticleSystems, preConditions.skipList, skipList);
+  preConditions.checkIfArrayOfParticleSystemsOnlyIfExists(ROYGBIV.mergeParticleSystems, preConditions.skipList, skipList);
   var diff = parseInt(4096 / MAX_VERTEX_UNIFORM_VECTORS);
   var chunkSize = parseInt(MAX_PS_COMPRESS_AMOUNT_4096 / diff);
   var mergeObj = new Object();
@@ -3190,6 +3194,18 @@ Roygbiv.prototype.mergeParticleSystems = function(){
   for (var psName in particleSystemPool){
     var ps = particleSystemPool[psName];
     if (ps.psMerger){
+      continue;
+    }
+    var skip = false;
+    if (skipList){
+      for (var i = 0; i<skipList.length; i++){
+        if (skipList[i].name == ps.name){
+          skip = true;
+          break;
+        }
+      }
+    }
+    if (skip){
       continue;
     }
     mergeObj[psName] = ps;

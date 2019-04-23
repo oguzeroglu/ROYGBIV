@@ -574,8 +574,8 @@ var Text = function(){
                                                     "initialAngle: The initial angle of the circular motion. This is used only if the motionMode is MOTION_MODE_CIRCULAR. (optional)\n"+
                                                     "motionMode: The motion mode of the particle system. This can be MOTION_MODE_NORMAL or MOTION_MODE_CIRCULAR.\nMOTION_MODE_NORMAL represents the motion with uniform accelerationa and the MOTION_MODE_CIRCULAR represents the circular motion with\nuniform acceleration. The default value is MOTION_MODE_NORMAL. (optional)\n"+
                                                     "updateFunction: The update function of this particle system that is executed on each render. (optional)";
-  this.ROYGBIV_SCRIPTING_API_SCALE = "Modifies the scale of a particle system.";
-  this.ROYGBIV_SCRIPTING_API_SETBLENDING = "Sets the blending mode of a particle system. Blending mode can be one of NO_BLENDING, NORMAL_BLENDING,\nADDITIVE_BLENDING, SUBTRACTIVE_BLENDING or MULTIPLY_BLENDING.";
+  this.ROYGBIV_SCRIPTING_API_SCALEPARTICLESYSTEM = "Modifies the scale of a particle system.";
+  this.ROYGBIV_SCRIPTING_API_SETPARTICLESYSTEMBLENDING = "Sets the blending mode of a particle system. Blending mode can be one of NO_BLENDING, NORMAL_BLENDING,\nADDITIVE_BLENDING, SUBTRACTIVE_BLENDING or MULTIPLY_BLENDING.";
   this.ROYGBIV_SCRIPTING_API_SETPARTICLESYSTEMROTATION = "Sets the rotation of a particle system around given axis.";
   this.ROYGBIV_SCRIPTING_API_SETPARTICLESYSTEMQUATERNION = "Sets the quaternion of given particle system.";
   this.ROYGBIV_SCRIPTING_API_KILL = "Destroys a particle or a particle system.";
@@ -831,7 +831,7 @@ var Text = function(){
    this.ROYGBIV_SCRIPTING_API_SETVECTOR = "Set the x, y, z components of a vector.";
    this.ROYGBIV_SCRIPTING_API_QUATERNION = "Returns a new THREE.Quaternion instance.";
    this.ROYGBIV_SCRIPTING_API_FADEAWAY = "Makes the particles of given particle system smaller on each frame. Greater the coefficient, faster the particles fade away.\nThis can be used for smoke like particle systems to make them dissapear smoothly.";
-   this.ROYGBIV_SCRIPTING_API_MERGEPARTICLESYSTEMS = "Merges all created particle systems to improve render performance.";
+   this.ROYGBIV_SCRIPTING_API_MERGEPARTICLESYSTEMS = "Merges all created particle systems to improve render performance. The skip list parameter (array of particle systems) may be used\nin order to prevent certain particle systems from being merged. This might be useful for particle systems that have\nseparate blending modes.";
    this.ROYGBIV_SCRIPTING_API_CREATECROSSHAIR = "Creates a new crosshair. Configurations are:\n"+
                                                 "name: The unique name of the crosshair. (mandatory)\n"+
                                                 "textureName: The texture name of the crosshair. (mandatory)\n"+
