@@ -18,6 +18,19 @@ var ShaderPrecisionHandler = function(){
   }
 }
 
+ShaderPrecisionHandler.prototype.getShaderPrecisionTextForType = function(type){
+  var precision = this.precisions[type];
+  switch (precision){
+    case this.precisionTypes.LOW:
+    return "low";
+    case this.precisionTypes.MEDIUM:
+    return "medium";
+    case this.precisionTypes.HIGH:
+    return "high";
+  }
+  throw new Error("Unknown type.");
+}
+
 ShaderPrecisionHandler.prototype.getCurrentPrecisionForType = function(type){
   switch (this.precisions[type]){
     case this.precisionTypes.LOW:

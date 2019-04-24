@@ -163,173 +163,175 @@ var CommandDescriptor = function(){
       0, //printRayStep
       4, //simplifyPhysics
       1, //unsimplifyPhysics
-      1 //fpsWeaponAlignment
+      1, //fpsWeaponAlignment
+      1 //shaderPrecision
   ];
 
   this.commandArgumentsExpectedExplanation = [
-    "help", //help
-    "newGridSystem name sizeX sizeZ centerX centerY centerZ color cellSize axis", //newGridSystem
-    "printCameraPosition", //printCameraPosition
-    "printCameraDirection", //printCameraDirection
-    "printGridSystems", //printGridSystems
-    "printGridSystemInfo name", //printGridSystemInfo
-    "destroyGridSystem name", //destroyGridSystem
-    "printKeyboardInfo", //printKeyboardInfo
-    "printSelectedGrids", //printSelectedGrids
-    "resetSelectedGrids", //resetSelectedGrids
-    "selectAllGrids name", //selectAllGrids
-    "cropGridSystem", // cropGridSystem
-    "pasteCroppedGridSystem name xTranslation yTranslation zTranslation outlineColor cellSize", //pasteCroppedGridSystem
-    "switchView", //switchView
-    "newBasicMaterial name color", //newBasicMaterial
-    "printMaterials", //printMaterials
-    "destroyMaterial name", //destroyMaterial
-    "newSurface name material", //newSurface
-    "printObjects", //printObjects
-    "printMetaData name", //printMetaData
-    "destroyObject name", //destroyObject
-    "newTexture name fileName", //newTexture
-    "printTextures", //printTextures
-    "destroyTexture name", //destroyTexture
-    "mapTexture textureName objectName", //mapTexture
-    "adjustTextureRepeat objectName repeatU repeatV", //adjustTextureRepeat
-    "newPhysicsBoxTest duration sizeX sizeY sizeZ mass positionX positionY positionZ", //newPhysicsBoxTest
-    "newPhysicsSphereTest duration radius mass positionX positionY positionZ", //newPhysicsSphereTest
-    "printPhysicsTests", //printPhysicsTests
-    "switchPhysicsDebugMode", //switchPhysicsDebugMode
-    "newRamp name material axis height", //newRamp
-    "setAnchor", //setAnchor
-    "restartPhysicsTest physicsTestIndex", //restartPhysicsTest
-    "mirror objectName on/off s/t/st", //mirror
-    "newBox name material height", //newBox
-    "newWallCollection name height outlineColor", //newWallCollection
-    "printWallCollections", //printWallCollections
-    "destroyWallCollection name", //destroyWallCollection
-    "destroySelectedGrids", //destroySelectedGrids
-    "remakeGridSystem name", //remakeGridSystem
-    "resetCamera", //resetCamera
-    "uploadImage name", //uploadImage
-    "printImages", //printImages
-    "mapSpecular textureName objectName", //mapSpecular
-    "mapEnvironment textureName objectName", //mapEnvironment
-    "mapAmbientOcculsion textureName objectName", //mapAmbientOcculsion
-    "mapAlpha textureName objectName", //mapAlpha
-    "setDefaultMaterial basic/phong", //setDefaultMaterial"
-    "newAmbientLight name color", //newAmbientLight
-    "printLights", //printLights
-    "selectLight name", //selectLight
-    "destroyLight name", //destroyLight
-    "newPhongMaterial name color", //newPhongMaterial
-    "mapNormal textureName objectName", //mapNormal
-    "mapEmissive textureName objectName", //mapEmissive
-    "newLambertMaterial name color", //newLambertMaterial
-    "newTexturePack name directoryName fileExtension", //newTexturePack
-    "printTexturePacks", //printTexturePacks
-    "printTexturePackInfo name", //printTexturePackInfo
-    "mapTexturePack texturePackName objectName", //mapTexturePack
-    "destroyTexturePack name", //destroyTexturePack
-    "refreshTexturePack name", //refreshTexturePack
-    "mapHeight textureName objectName", //mapHeight
-    "resetMaps name", //resetMaps
-    "segmentObject name count", //segmentObject
-    "superposeGridSystem gridSystemName outlineColor cellSize objectName", //superposeGridSystem
-    "postProcessing effectName hide/show", //postProcessing
-    "sliceGrid newName cellSize outlineColor", //sliceGrid
-    "newPointLight name color offsetX offsetY offsetZ", //newPointLight
-    "newSkybox name directory fileExtension", //newSkybox
-    "printSkyboxes", //printSkyboxes
-    "printSkyboxInfo name", //printSkyboxInfo
-    "mapSkybox name", //mapSkybox
-    "destroySkybox name", //destroySkybox
-    "skybox show/hide", //skybox
-    "scaleSkybox amount", //scaleSkybox
-    "save", //save
-    "load", //load
-    "undo", //undo
-    "redo", //redo
-    "selectObject name", //selectObject
-    "setMass name mass", //setMass
-    "rotateObject name axis radian", //rotateObject
-    "newScript name", //newScript
-    "runScript name", //runScript
-    "stopScript name", //stopScript
-    "printScripts", //printScripts
-    "editScript name", //editScript
-    "destroyScript name", //destroyScript
-    "translateObject name axis amount", //translateObject
-    "setFog fogColor fogDensity", //setFog
-    "removeFog", //removeFog
-    "glue newName objectName[1],objectName[2],...objectName[n]", //glue
-    "detach name", //detach
-    "mark name offsetX offsetY offsetZ", //mark
-    "unmark name", //unmark
-    "printMarkedPoints", //printMarkedPoints
-    "toggleMarkedPoints", //toggleMarkedPoints
-    "runAutomatically scriptName", //runAutomatically
-    "uploadScript scriptName filePath", //uploadScript
-    "runManually scriptName", //runManually
-    "physicsWorkerMode on/off", //physicsWorkerMode
-    "printPhysicsWorkerMode", //printPhysicsWorkerMode
-    "explain functionName", //explain
-    "printScriptingFunctions", //printScriptingFunctions
-    "printPerformance", //printPerformance
-    "search textToSearch", // search
-    "rescaleTexture textureName scale newTextureName", //rescaleTexture
-    "rescaleTexturePack texturePackName scale newTexturePackName", //rescaleTexturePack
-    "destroyImage imageName", //destroyImage
-    "setBlending objectName mode", //setBlending
-    "about", //about
-    "resetKeyboardBuffer", //resetKeyboardBuffer
-    "setWorldLimits minX minY minZ maxX maxY maxZ", //setWorldLimits
-    "setBinSize size", //setBinSize
-    "printWorldLimits", //printWorldLimits
-    "printBinSize", //printBinSize
-    "particleCollisionWorkerMode on/off", //particleCollisionWorkerMode
-    "printParticleCollisionWorkerMode", //printParticleCollisionWorkerMode
-    "particleSystemCollisionWorkerMode on/off", //particleSystemCollisionWorkerMode
-    "printParticleSystemCollisionWorkerMode", //printParticleSystemCollisionWorkerMode
-    "logFrameDrops", //logFrameDrops
-    "addPaddingToTexture textureName padding newTextureName", //addPaddingToTexture
-    "newSphere name material radius", //newSphere
-    "printFogInfo", //printFogInfo
-    "applyDisplacementMap objectName textureName scale bias", //applyDisplacementMap
-    "setSlipperiness objectName on/off", //setSlipperiness
-    "setAtlasTextureSize width height", //setAtlasTextureSize
-    "printAtlasTextureSize", //printAtlasTextureSize
-    "sync sourceObject targetObject", //sync
-    "newArea areaName height", //newArea
-    "toggleAreas", //toggleAreas
-    "destroyArea areaName", //destroyArea
-    "areaConfigurations show/hide", //areaConfigurations
-    "setResolution resolution", //setResolution
-    "configureArea areaName", //configureArea
-    "newAreaConfiguration areaName objectName isVisible sides", //newAreaConfiguration
-    "autoConfigureArea areaName", //autoConfigureArea
-    "stopAreaConfigurations", //stopAreaConfigurations
-    "startAreaConfigurations", //startAreaConfigurations
-    "newCylinder name materialName topRadius bottomRadius height isOpenEnded", //newCylinder
-    "setRotationPivot objectName offsetX offsetY offsetZ", //setRotationPivot
-    "printChildPosition objectName childObjectName", //printChildPosition
-    "unsetRotationPivot objectName", //unsetRotationPivot
-    "copyObject sourceName targetName offsetX offsetY offsetZ isHardCopy", //copyObject
-    "build projectName author", //build
-    "skyboxConfigurations show/hide", //skyboxConfigurations
-    "fogConfigurations show/hide", //fogConfigurations
-    "noMobile on/off", //noMobile
-    "setMaxViewport widthInPx heightInPx", //setMaxViewport
-    "keepAspect ratio", //keepAspect
-    "newFont fontName path", //newFont
-    "destroyFont fontName", //destroyFont
-    "printFonts", //printFonts
-    "newText textName fontName maxCharacterLength offsetX offsetY offsetZ", //newText
-    "selectText textName", //selectText
-    "destroyText textName", //destroyText
-    "printTexts", //printTexts
-    "setRayStep stepAmount", //setRayStep
-    "printRayStep", //printRayStep
-    "simplifyPhysics objName sizeX sizeY sizeZ", //simplifyPhysics
-    "unsimplifyPhysics objName", //unsimplifyPhysics
-    "fpsWeaponAlignment objName"
+    "help",
+    "newGridSystem name sizeX sizeZ centerX centerY centerZ color cellSize axis",
+    "printCameraPosition",
+    "printCameraDirection",
+    "printGridSystems",
+    "printGridSystemInfo name",
+    "destroyGridSystem name",
+    "printKeyboardInfo",
+    "printSelectedGrids",
+    "resetSelectedGrids",
+    "selectAllGrids name",
+    "cropGridSystem",
+    "pasteCroppedGridSystem name xTranslation yTranslation zTranslation outlineColor cellSize",
+    "switchView",
+    "newBasicMaterial name color",
+    "printMaterials",
+    "destroyMaterial name",
+    "newSurface name material",
+    "printObjects",
+    "printMetaData name",
+    "destroyObject name",
+    "newTexture name fileName",
+    "printTextures",
+    "destroyTexture name",
+    "mapTexture textureName objectName",
+    "adjustTextureRepeat objectName repeatU repeatV",
+    "newPhysicsBoxTest duration sizeX sizeY sizeZ mass positionX positionY positionZ",
+    "newPhysicsSphereTest duration radius mass positionX positionY positionZ",
+    "printPhysicsTests",
+    "switchPhysicsDebugMode",
+    "newRamp name material axis height",
+    "setAnchor",
+    "restartPhysicsTest physicsTestIndex",
+    "mirror objectName on/off s/t/st",
+    "newBox name material height",
+    "newWallCollection name height outlineColor",
+    "printWallCollections",
+    "destroyWallCollection name",
+    "destroySelectedGrids",
+    "remakeGridSystem name",
+    "resetCamera",
+    "uploadImage name",
+    "printImages",
+    "mapSpecular textureName objectName",
+    "mapEnvironment textureName objectName",
+    "mapAmbientOcculsion textureName objectName",
+    "mapAlpha textureName objectName",
+    "setDefaultMaterial basic/phong",
+    "newAmbientLight name color",
+    "printLights",
+    "selectLight name",
+    "destroyLight name",
+    "newPhongMaterial name color",
+    "mapNormal textureName objectName",
+    "mapEmissive textureName objectName",
+    "newLambertMaterial name color",
+    "newTexturePack name directoryName fileExtension",
+    "printTexturePacks",
+    "printTexturePackInfo name",
+    "mapTexturePack texturePackName objectName",
+    "destroyTexturePack name",
+    "refreshTexturePack name",
+    "mapHeight textureName objectName",
+    "resetMaps name",
+    "segmentObject name count",
+    "superposeGridSystem gridSystemName outlineColor cellSize objectName",
+    "postProcessing effectName hide/show",
+    "sliceGrid newName cellSize outlineColor",
+    "newPointLight name color offsetX offsetY offsetZ",
+    "newSkybox name directory fileExtension",
+    "printSkyboxes",
+    "printSkyboxInfo name",
+    "mapSkybox name",
+    "destroySkybox name",
+    "skybox show/hide",
+    "scaleSkybox amount",
+    "save",
+    "load",
+    "undo",
+    "redo",
+    "selectObject name",
+    "setMass name mass",
+    "rotateObject name axis radian",
+    "newScript name",
+    "runScript name",
+    "stopScript name",
+    "printScripts",
+    "editScript name",
+    "destroyScript name",
+    "translateObject name axis amount",
+    "setFog fogColor fogDensity",
+    "removeFog",
+    "glue newName objectName[1],objectName[2],...objectName[n]",
+    "detach name",
+    "mark name offsetX offsetY offsetZ",
+    "unmark name",
+    "printMarkedPoints",
+    "toggleMarkedPoints",
+    "runAutomatically scriptName",
+    "uploadScript scriptName filePath",
+    "runManually scriptName",
+    "physicsWorkerMode on/off",
+    "printPhysicsWorkerMode",
+    "explain functionName",
+    "printScriptingFunctions",
+    "printPerformance",
+    "search textToSearch",
+    "rescaleTexture textureName scale newTextureName",
+    "rescaleTexturePack texturePackName scale newTexturePackName",
+    "destroyImage imageName",
+    "setBlending objectName mode",
+    "about",
+    "resetKeyboardBuffer",
+    "setWorldLimits minX minY minZ maxX maxY maxZ",
+    "setBinSize size",
+    "printWorldLimits",
+    "printBinSize",
+    "particleCollisionWorkerMode on/off",
+    "printParticleCollisionWorkerMode",
+    "particleSystemCollisionWorkerMode on/off",
+    "printParticleSystemCollisionWorkerMode",
+    "logFrameDrops",
+    "addPaddingToTexture textureName padding newTextureName",
+    "newSphere name material radius",
+    "printFogInfo",
+    "applyDisplacementMap objectName textureName scale bias",
+    "setSlipperiness objectName on/off",
+    "setAtlasTextureSize width height",
+    "printAtlasTextureSize",
+    "sync sourceObject targetObject",
+    "newArea areaName height",
+    "toggleAreas",
+    "destroyArea areaName",
+    "areaConfigurations show/hide",
+    "setResolution resolution",
+    "configureArea areaName",
+    "newAreaConfiguration areaName objectName isVisible sides",
+    "autoConfigureArea areaName",
+    "stopAreaConfigurations",
+    "startAreaConfigurations",
+    "newCylinder name materialName topRadius bottomRadius height isOpenEnded",
+    "setRotationPivot objectName offsetX offsetY offsetZ",
+    "printChildPosition objectName childObjectName",
+    "unsetRotationPivot objectName",
+    "copyObject sourceName targetName offsetX offsetY offsetZ isHardCopy",
+    "build projectName author",
+    "skyboxConfigurations show/hide",
+    "fogConfigurations show/hide",
+    "noMobile on/off",
+    "setMaxViewport widthInPx heightInPx",
+    "keepAspect ratio",
+    "newFont fontName path",
+    "destroyFont fontName",
+    "printFonts",
+    "newText textName fontName maxCharacterLength offsetX offsetY offsetZ",
+    "selectText textName",
+    "destroyText textName",
+    "printTexts",
+    "setRayStep stepAmount",
+    "printRayStep",
+    "simplifyPhysics objName sizeX sizeY sizeZ",
+    "unsimplifyPhysics objName",
+    "fpsWeaponAlignment objName",
+    "shaderPrecision show/hide"
   ];
 
   this.commands = [
@@ -495,7 +497,8 @@ var CommandDescriptor = function(){
     "printRayStep",
     "simplifyPhysics",
     "unsimplifyPhysics",
-    "fpsWeaponAlignment"
+    "fpsWeaponAlignment",
+    "shaderPrecision"
   ];
 
   this.commandInfo = [
@@ -661,7 +664,8 @@ var CommandDescriptor = function(){
     "printRayStep: Prints the ray step amount.",
     "simplifyPhysics: Sets the physics of an object to a box shape of sizeX, sizeY, sizeZ sizes. This helps optimizing the performance of the\n  physics engine but causes physics precision loss.",
     "unsimplifyPhysics: Brings back the original physics for an object after the usage of simplifyPhysics command.",
-    "fpsWeaponAlignment: Shows the FPS weapon alignment GUI."
+    "fpsWeaponAlignment: Shows the FPS weapon alignment GUI.",
+    "shaderPrecision: Show the shader precision adjustment GUI."
   ];
 
   this.keyboardInfo = [
@@ -1325,6 +1329,11 @@ var CommandDescriptor = function(){
   this.fpsWeaponAlignment = new Object();
   this.fpsWeaponAlignment.types = [];
   this.fpsWeaponAlignment.types.push(this.FPS_WEAPON); // objName
+
+  // shaderPrecision
+  this.shaderPrecision = new Object();
+  this.shaderPrecision.types = [];
+  this.shaderPrecision.types.push(this.HIDE_SHOW); // show/hide
 
 };
 

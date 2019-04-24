@@ -621,42 +621,42 @@ GUIHandler.prototype.initializeShaderPrecisionGUI = function(){
     shaderPrecisionHandler.setShaderPrecisionForType(shaderPrecisionHandler.types.CROSSHAIR, guiHandler.getPrecisionType(val));
     terminal.clear();
     terminal.printInfo(Text.SHADER_PRECISION_ADJUSTED);
-  });
+  }).listen();
   guiHandler.datGuiShaderPrecision.add(guiHandler.shaderPrecisionParameters, "Basic material", ["low", "medium", "high"]).onChange(function(val){
     shaderPrecisionHandler.setShaderPrecisionForType(shaderPrecisionHandler.types.BASIC_MATERIAL, guiHandler.getPrecisionType(val));
     terminal.clear();
     terminal.printInfo(Text.SHADER_PRECISION_ADJUSTED);
-  });
+  }).listen();
   guiHandler.datGuiShaderPrecision.add(guiHandler.shaderPrecisionParameters, "Instanced basic material", ["low", "medium", "high"]).onChange(function(val){
     shaderPrecisionHandler.setShaderPrecisionForType(shaderPrecisionHandler.types.INSTANCED_BASIC_MATERIAL, guiHandler.getPrecisionType(val));
     terminal.clear();
     terminal.printInfo(Text.SHADER_PRECISION_ADJUSTED);
-  });
+  }).listen();
   guiHandler.datGuiShaderPrecision.add(guiHandler.shaderPrecisionParameters, "Merged basic material", ["low", "medium", "high"]).onChange(function(val){
     shaderPrecisionHandler.setShaderPrecisionForType(shaderPrecisionHandler.types.MERGED_BASIC_MATERIAL, guiHandler.getPrecisionType(val));
     terminal.clear();
     terminal.printInfo(Text.SHADER_PRECISION_ADJUSTED);
-  });
+  }).listen();
   guiHandler.datGuiShaderPrecision.add(guiHandler.shaderPrecisionParameters, "Object trail", ["low", "medium", "high"]).onChange(function(val){
     shaderPrecisionHandler.setShaderPrecisionForType(shaderPrecisionHandler.types.OBJECT_TRAIL, guiHandler.getPrecisionType(val));
     terminal.clear();
     terminal.printInfo(Text.SHADER_PRECISION_ADJUSTED);
-  });
+  }).listen();
   guiHandler.datGuiShaderPrecision.add(guiHandler.shaderPrecisionParameters, "Particle", ["low", "medium", "high"]).onChange(function(val){
     shaderPrecisionHandler.setShaderPrecisionForType(shaderPrecisionHandler.types.PARTICLE, guiHandler.getPrecisionType(val));
     terminal.clear();
     terminal.printInfo(Text.SHADER_PRECISION_ADJUSTED);
-  });
+  }).listen();
   guiHandler.datGuiShaderPrecision.add(guiHandler.shaderPrecisionParameters, "Skybox", ["low", "medium", "high"]).onChange(function(val){
     shaderPrecisionHandler.setShaderPrecisionForType(shaderPrecisionHandler.types.SKYBOX, guiHandler.getPrecisionType(val));
     terminal.clear();
     terminal.printInfo(Text.SHADER_PRECISION_ADJUSTED);
-  });
+  }).listen();
   guiHandler.datGuiShaderPrecision.add(guiHandler.shaderPrecisionParameters, "Text", ["low", "medium", "high"]).onChange(function(val){
     shaderPrecisionHandler.setShaderPrecisionForType(shaderPrecisionHandler.types.TEXT, guiHandler.getPrecisionType(val));
     terminal.clear();
     terminal.printInfo(Text.SHADER_PRECISION_ADJUSTED);
-  });
+  }).listen();
   guiHandler.datGuiShaderPrecision.add(guiHandler.shaderPrecisionParameters, "Done");
 }
 

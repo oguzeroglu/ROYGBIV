@@ -5024,6 +5024,41 @@ function parse(input){
           activeControl = new CustomControls({});
           return true;
         break;
+        case 163: //shaderPrecision
+          if (mode != 0){
+            terminal.printError(Text.WORKS_ONLY_IN_DESIGN_MODE);
+            return true;
+          }
+          var param = splitted[1].toLowerCase();
+          if (param != "show" && param != "hide"){
+            terminal.printError(Text.STATUS_MUST_BE_ONE_OF);
+            return true;
+          }
+          if (param == "show"){
+            if (guiHandler.datGuiShaderPrecision){
+              terminal.printError(Text.GUI_IS_ALREADY_VISIBLE);
+              return true;
+            }
+            guiHandler.shaderPrecisionParameters["Crosshair"] = shaderPrecisionHandler.getShaderPrecisionTextForType(shaderPrecisionHandler.types.CROSSHAIR);
+            guiHandler.shaderPrecisionParameters["Basic material"] = shaderPrecisionHandler.getShaderPrecisionTextForType(shaderPrecisionHandler.types.BASIC_MATERIAL);
+            guiHandler.shaderPrecisionParameters["Instanced basic material"] = shaderPrecisionHandler.getShaderPrecisionTextForType(shaderPrecisionHandler.types.INSTANCED_BASIC_MATERIAL);
+            guiHandler.shaderPrecisionParameters["Merged basic material"] = shaderPrecisionHandler.getShaderPrecisionTextForType(shaderPrecisionHandler.types.MERGED_BASIC_MATERIAL);
+            guiHandler.shaderPrecisionParameters["Object trail"] = shaderPrecisionHandler.getShaderPrecisionTextForType(shaderPrecisionHandler.types.OBJECT_TRAIL);
+            guiHandler.shaderPrecisionParameters["Particle"] = shaderPrecisionHandler.getShaderPrecisionTextForType(shaderPrecisionHandler.types.PARTICLE);
+            guiHandler.shaderPrecisionParameters["Skybox"] = shaderPrecisionHandler.getShaderPrecisionTextForType(shaderPrecisionHandler.types.SKYBOX);
+            guiHandler.shaderPrecisionParameters["Text"] = shaderPrecisionHandler.getShaderPrecisionTextForType(shaderPrecisionHandler.types.TEXT);
+            guiHandler.show(guiHandler.guiTypes.SHADER_PRECISION);
+            terminal.printInfo(Text.GUI_OPENED);
+          }else{
+            if (!guiHandler.datGuiShaderPrecision){
+              terminal.printError(Text.GUI_IS_ALREADY_HIDDEN);
+              return true;
+            }
+            guiHandler.hide(guiHandler.guiTypes.SHADER_PRECISION);
+            terminal.printInfo(Text.GUI_CLOSED);
+          }
+          return true;
+        break;
       }
       return true;
     }catch(err){
