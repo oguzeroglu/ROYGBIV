@@ -135,6 +135,7 @@ var Text = function(){
   this.COMMAND_EXECUTED_FOR_X_IMAGES = "Command executed for @@1 images.";
   this.NO_TEXTURE_FOUND = "No texture found.";
   this.NO_OBJECT_FOUND = "No object found.";
+  this.SHADER_PRECISION_ADJUSTED = "Shader precision adjusted.";
   this.COMMAND_EXECUTED_FOR_X_OBJECTS = "Command executed for @@1 objects.";
   this.TEXTURE_PACK_MAPPED_TO_X_OBJECTS = "Command executed for @@1 objects.";
   this.NO_GRID_SYSTEM_FOUND = "No grid system found.";

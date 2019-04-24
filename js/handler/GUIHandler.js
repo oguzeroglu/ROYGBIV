@@ -124,9 +124,25 @@ var GUIHandler = function(){
       activeControl = new FreeControls(defaultControlParameters);
     }
   };
+  this.shaderPrecisionParameters = {
+    "Crosshair": "low",
+    "Basic material": "low",
+    "Instanced basic material": "low",
+    "Merged basic material": "low",
+    "Object trail": "low",
+    "Particle": "low",
+    "Skybox": "low",
+    "Text": "low",
+    "Done": function(){
+      guiHandler.hide(guiHandler.guiTypes.SHADER_PRECISION);
+      terminal.clear();
+      terminal.printInfo(Text.DONE);
+      terminal.enable();
+    }
+  };
   // GUI TYPES DEFINITION
   this.guiTypes = {
-    FOG: 0, SKYBOX: 1, TEXT: 2, OBJECT: 3, BLOOM: 4, FPS_WEAPON_ALIGNMENT: 5
+    FOG: 0, SKYBOX: 1, TEXT: 2, OBJECT: 3, BLOOM: 4, FPS_WEAPON_ALIGNMENT: 5, SHADER_PRECISION: 6
   };
 }
 
@@ -490,6 +506,11 @@ GUIHandler.prototype.show = function(guiType){
         this.initializeFPSWeaponAlignmentGUI();
       }
     return;
+    case this.guiTypes.SHADER_PRECISION:
+      if (!this.datGuiShaderPrecision){
+        this.initializeShaderPrecisionGUI();
+      }
+    return;
   }
   throw new Error("Unknown guiType.");
 }
@@ -567,6 +588,10 @@ GUIHandler.prototype.hide = function(guiType){
         fpsWeaponAlignmentConfigurationObject = 0;
       }
     return;
+    case this.guiTypes.SHADER_PRECISION:
+      this.destroyGUI(this.datGuiShaderPrecision);
+      this.datGuiShaderPrecision = 0;
+    return;
   }
   throw new Error("Unknown guiType.");
 }
@@ -575,6 +600,64 @@ GUIHandler.prototype.hideAll = function(){
   for (var key in this.guiTypes){
     this.hide(this.guiTypes[key]);
   }
+}
+
+GUIHandler.prototype.getPrecisionType = function(key){
+  if (key == "low"){
+    return shaderPrecisionHandler.precisionTypes.LOW;
+  }
+  if (key == "medium"){
+    return shaderPrecisionHandler.precisionTypes.MEDIUM;
+  }
+  if (key == "high"){
+    return shaderPrecisionHandler.precisionTypes.HIGH;
+  }
+  throw new Error("Unknown type.");
+}
+
+GUIHandler.prototype.initializeShaderPrecisionGUI = function(){
+  guiHandler.datGuiShaderPrecision = new dat.GUI({hideable: false});
+  guiHandler.datGuiShaderPrecision.add(guiHandler.shaderPrecisionParameters, "Crosshair", ["low", "medium", "high"]).onChange(function(val){
+    shaderPrecisionHandler.setShaderPrecisionForType(shaderPrecisionHandler.types.CROSSHAIR, guiHandler.getPrecisionType(val));
+    terminal.clear();
+    terminal.printInfo(Text.SHADER_PRECISION_ADJUSTED);
+  });
+  guiHandler.datGuiShaderPrecision.add(guiHandler.shaderPrecisionParameters, "Basic material", ["low", "medium", "high"]).onChange(function(val){
+    shaderPrecisionHandler.setShaderPrecisionForType(shaderPrecisionHandler.types.BASIC_MATERIAL, guiHandler.getPrecisionType(val));
+    terminal.clear();
+    terminal.printInfo(Text.SHADER_PRECISION_ADJUSTED);
+  });
+  guiHandler.datGuiShaderPrecision.add(guiHandler.shaderPrecisionParameters, "Instanced basic material", ["low", "medium", "high"]).onChange(function(val){
+    shaderPrecisionHandler.setShaderPrecisionForType(shaderPrecisionHandler.types.INSTANCED_BASIC_MATERIAL, guiHandler.getPrecisionType(val));
+    terminal.clear();
+    terminal.printInfo(Text.SHADER_PRECISION_ADJUSTED);
+  });
+  guiHandler.datGuiShaderPrecision.add(guiHandler.shaderPrecisionParameters, "Merged basic material", ["low", "medium", "high"]).onChange(function(val){
+    shaderPrecisionHandler.setShaderPrecisionForType(shaderPrecisionHandler.types.MERGED_BASIC_MATERIAL, guiHandler.getPrecisionType(val));
+    terminal.clear();
+    terminal.printInfo(Text.SHADER_PRECISION_ADJUSTED);
+  });
+  guiHandler.datGuiShaderPrecision.add(guiHandler.shaderPrecisionParameters, "Object trail", ["low", "medium", "high"]).onChange(function(val){
+    shaderPrecisionHandler.setShaderPrecisionForType(shaderPrecisionHandler.types.OBJECT_TRAIL, guiHandler.getPrecisionType(val));
+    terminal.clear();
+    terminal.printInfo(Text.SHADER_PRECISION_ADJUSTED);
+  });
+  guiHandler.datGuiShaderPrecision.add(guiHandler.shaderPrecisionParameters, "Particle", ["low", "medium", "high"]).onChange(function(val){
+    shaderPrecisionHandler.setShaderPrecisionForType(shaderPrecisionHandler.types.PARTICLE, guiHandler.getPrecisionType(val));
+    terminal.clear();
+    terminal.printInfo(Text.SHADER_PRECISION_ADJUSTED);
+  });
+  guiHandler.datGuiShaderPrecision.add(guiHandler.shaderPrecisionParameters, "Skybox", ["low", "medium", "high"]).onChange(function(val){
+    shaderPrecisionHandler.setShaderPrecisionForType(shaderPrecisionHandler.types.SKYBOX, guiHandler.getPrecisionType(val));
+    terminal.clear();
+    terminal.printInfo(Text.SHADER_PRECISION_ADJUSTED);
+  });
+  guiHandler.datGuiShaderPrecision.add(guiHandler.shaderPrecisionParameters, "Text", ["low", "medium", "high"]).onChange(function(val){
+    shaderPrecisionHandler.setShaderPrecisionForType(shaderPrecisionHandler.types.TEXT, guiHandler.getPrecisionType(val));
+    terminal.clear();
+    terminal.printInfo(Text.SHADER_PRECISION_ADJUSTED);
+  });
+  guiHandler.datGuiShaderPrecision.add(guiHandler.shaderPrecisionParameters, "Done");
 }
 
 GUIHandler.prototype.initializeFPSWeaponAlignmentGUI = function(){
