@@ -21,20 +21,14 @@ var ShaderPrecisionHandler = function(){
 ShaderPrecisionHandler.prototype.getCurrentPrecisionForType = function(type){
   switch (this.precisions[type]){
     case this.precisionTypes.LOW:
-    return {
-      int: "precision lowp int;",
-      float: "precision lowp float;"
-    };
+    return {int: "precision lowp int;", float: "precision lowp float;"};
     case this.precisionTypes.MEDIUM:
-    return {
-      int: "precision mediump int;",
-      float: "precision mediump float;"
-    };
+    return {int: "precision mediump int;", float: "precision mediump float;"};
     case this.precisionTypes.HIGH:
-    return {
-      int: "precision highp int;",
-      float: "precision highp float;"
-    };
+    if (HIGH_PRECISION_SUPPORTED){
+      return{int: "precision highp int;", float: "precision highp float;"};
+    }
+    return {int: "precision mediump int;", float: "precision mediump float;"};
   }
   throw new Error("Unknown type.");
 }
@@ -51,28 +45,16 @@ ShaderPrecisionHandler.prototype.setShaderPrecisionForType = function(type, prec
   var newPrecisionForType = {};
   switch (precision){
     case this.precisionTypes.LOW:
-      newPrecisionForType = {
-        int: "precision lowp int;",
-        float: "precision lowp float;"
-      };
+      newPrecisionForType = {int: "precision lowp int;", float: "precision lowp float;"};
     break;
     case this.precisionTypes.MEDIUM:
-      newPrecisionForType = {
-        int: "precision mediump int;",
-        float: "precision mediump float;"
-      };
+      newPrecisionForType = {int: "precision mediump int;", float: "precision mediump float;"};
     break;
     case this.precisionTypes.HIGH:
       if (HIGH_PRECISION_SUPPORTED){
-        newPrecisionForType = {
-          int: "precision highp int;",
-          float: "precision highp float;"
-        };
+        newPrecisionForType = {int: "precision highp int;", float: "precision highp float;"};
       }else {
-        newPrecisionForType = {
-          int: "precision mediump int;",
-          float: "precision mediump float;"
-        };
+        newPrecisionForType = {int: "precision mediump int;", float: "precision mediump float;"};
       }
     break;
   }
