@@ -349,6 +349,7 @@ var activeControl;
 var crosshairHandler;
 var fpsWeaponAlignmentConfigurationObject;
 var isOrientationLandscape = (window.innerWidth > window.innerHeight);
+var shaderPrecisionHandler;
 
 // RENDER ORDERS
 var renderOrders = {

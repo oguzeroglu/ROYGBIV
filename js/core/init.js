@@ -44,6 +44,9 @@ window.onload = function() {
   // CPU OPERATIONS HANDLER
   cpuOperationsHandler = new CPUOperationsHandler();
 
+  // SHADER PRECISION HANDLER
+  shaderPrecisionHandler = new ShaderPrecisionHandler();
+
   // SCRIPTING UTILITY FUNCTIONS
   ROYGBIV = new Roygbiv();
   if (!isDeployment){
