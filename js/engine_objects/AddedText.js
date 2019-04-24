@@ -45,8 +45,8 @@ var AddedText = function(name, font, text, position, color, alpha, characterSize
   }
 
   this.material = new THREE.RawShaderMaterial({
-    vertexShader: this.setShaderPrecision(ShaderContent.textVertexShader.replace("#define STR_LEN 1", "#define STR_LEN "+strlen)),
-    fragmentShader: this.setShaderPrecision(ShaderContent.textFragmentShader),
+    vertexShader: ShaderContent.textVertexShader.replace("#define STR_LEN 1", "#define STR_LEN "+strlen),
+    fragmentShader: ShaderContent.textFragmentShader,
     transparent: true,
     side: THREE.DoubleSide,
     uniforms: {
@@ -820,11 +820,4 @@ AddedText.prototype.removeFog = function(){
   delete this.mesh.material.uniforms.worldMatrix;
   delete this.mesh.material.uniforms.cameraPosition;
   this.mesh.material.needsUpdate = true;
-}
-
-AddedText.prototype.setShaderPrecision = function(shaderCode){
-  if (isMobile && HIGH_PRECISION_SUPPORTED){
-    return shaderCode.replace("precision lowp float;", "precision highp float;").replace("precision lowp int;", "precision highp int;");
-  }
-  return shaderCode;
 }
