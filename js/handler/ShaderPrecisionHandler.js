@@ -81,6 +81,8 @@ ShaderPrecisionHandler.prototype.setCustomPrecisionForObject = function(obj, pre
     }
   }else if (obj.isAddedText){
     type = this.types.TEXT;
+  }else if (obj.isAutoInstancedObject){
+    type = this.types.INSTANCED_BASIC_MATERIAL;
   }
   if (obj.hasCustomPrecision){
     switch (obj.customPrecision){

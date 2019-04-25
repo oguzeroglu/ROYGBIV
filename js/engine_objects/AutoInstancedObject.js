@@ -5,6 +5,10 @@ var AutoInstancedObject = function(name, objects){
   this.pseudoObjectGroup = new ObjectGroup(null, objects);
 }
 
+AutoInstancedObject.prototype.useCustomShaderPrecision = function(precision){
+  shaderPrecisionHandler.setCustomPrecisionForObject(this, precision);
+}
+
 AutoInstancedObject.prototype.updateObject = function(object){
   var index = this.orientationIndicesByObjectName.get(object.name);
   var orientationAry = this.mesh.material.uniforms.autoInstanceOrientationArray.value;
@@ -117,7 +121,15 @@ AutoInstancedObject.prototype.init = function(){
     this.mesh.geometry.addAttribute("forcedColorIndex", forcedColorIndicesBufferAttribute);
     this.mesh.material.uniforms.autoInstanceForcedColorArray = new THREE.Uniform(forcedColorAry);
   }
-  this.mesh.material.needsUpdate = true;
+  for (var objName in this.objects){
+    var obj = this.objects[objName];
+    if (obj.hasCustomPrecision){
+      this.useCustomShaderPrecision(obj.customPrecision);
+    }else{
+      this.useCustomShaderPrecision(shaderPrecisionHandler.precisions[shaderPrecisionHandler.types.BASIC_MATERIAL]);
+    }
+    break;
+  }
 }
 
 AutoInstancedObject.prototype.setFog = function(){
