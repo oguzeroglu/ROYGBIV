@@ -38,12 +38,24 @@ ObjectGroup.prototype.useDefaultPrecision = function(){
   shaderPrecisionHandler.setDefaultPrecisionForObject(this);
   this.hasCustomPrecision = false;
   delete this.customPrecision;
+  for (var objName in objectGroups){
+    var obj = objectGroups[objName];
+    if (obj.softCopyParentName && obj.softCopyParentName == this.name){
+      obj.useDefaultPrecision();
+    }
+  }
 }
 
 ObjectGroup.prototype.useCustomShaderPrecision = function(precision){
   shaderPrecisionHandler.setCustomPrecisionForObject(this, precision);
   this.hasCustomPrecision = true;
   this.customPrecision = precision;
+  for (var objName in objectGroups){
+    var obj = objectGroups[objName];
+    if (obj.softCopyParentName && obj.softCopyParentName == this.name){
+      obj.useCustomShaderPrecision(precision);
+    }
+  }
 }
 
 ObjectGroup.prototype.removeCollisionListener = function(){
@@ -2163,7 +2175,7 @@ ObjectGroup.prototype.updatePivot = function(){
   this.pivotObject.translateZ(this.pivotOffsetZ);
 }
 
-ObjectGroup.prototype.copy = function(name, isHardCopy, copyPosition, gridSystem, fromScript){
+ObjectGroup.prototype.copy = function(name, isHardCopy, copyPosition, gridSystem){
   var positionBeforeDetached = this.mesh.position.clone();
   var quaternionBeforeDetached = this.mesh.quaternion.clone();
   var physicsPositionBeforeDetached = this.physicsBody.position.clone();
@@ -2206,9 +2218,7 @@ ObjectGroup.prototype.copy = function(name, isHardCopy, copyPosition, gridSystem
   var newGroup = new Object();
   for (var objName in this.group){
     this.group[objName].skipToggleGrid = true;
-    var copiedChild = this.group[objName].copy(
-      generateUniqueObjectName(), isHardCopy, REUSABLE_VECTOR.set(0, 0, 0), gridSystem, fromScript
-    );
+    var copiedChild = this.group[objName].copy(generateUniqueObjectName(), isHardCopy, REUSABLE_VECTOR.set(0, 0, 0), gridSystem);
     copiedChild.mesh.position.copy(this.group[objName].mesh.position);
     copiedChild.mesh.quaternion.copy(this.group[objName].mesh.quaternion);
     copiedChild.physicsBody.position.copy(this.group[objName].physicsBody.position);
@@ -2336,10 +2346,12 @@ ObjectGroup.prototype.copy = function(name, isHardCopy, copyPosition, gridSystem
     newObjGroup.pivotRemoved = false;
   }
 
-  newObjGroup.createdWithScript = fromScript;
   newObjGroup.copiedInitialCenter = {x: newObjGroup.mesh.position.x, y: newObjGroup.mesh.position.y, z: newObjGroup.mesh.position.z};
   if (newObjGroup.isPhysicsSimplified){
     newObjGroup.updateSimplifiedPhysicsBody();
+  }
+  if (this.hasCustomPrecision){
+    newObjGroup.useCustomShaderPrecision(this.customPrecision);
   }
   return newObjGroup;
 }

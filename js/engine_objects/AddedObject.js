@@ -71,12 +71,24 @@ AddedObject.prototype.useDefaultPrecision = function(){
   shaderPrecisionHandler.setDefaultPrecisionForObject(this);
   this.hasCustomPrecision = false;
   delete this.customPrecision;
+  for (var objName in addedObjects){
+    var obj = addedObjects[objName];
+    if (obj.softCopyParentName && obj.softCopyParentName == this.name){
+      obj.useDefaultPrecision();
+    }
+  }
 }
 
 AddedObject.prototype.useCustomShaderPrecision = function(precision){
   shaderPrecisionHandler.setCustomPrecisionForObject(this, precision);
   this.hasCustomPrecision = true;
   this.customPrecision = precision;
+  for (var objName in addedObjects){
+    var obj = addedObjects[objName];
+    if (obj.softCopyParentName && obj.softCopyParentName == this.name){
+      obj.useCustomShaderPrecision(precision);
+    }
+  }
 }
 
 AddedObject.prototype.removeCollisionListener = function(){
@@ -2651,7 +2663,7 @@ AddedObject.prototype.getEndPoint = function(axis){
   return position;
 }
 
-AddedObject.prototype.copy = function(name, isHardCopy, copyPosition, gridSystem, fromScript){
+AddedObject.prototype.copy = function(name, isHardCopy, copyPosition, gridSystem){
   var copyMesh;
   if (isHardCopy){
     copyMesh = new MeshGenerator(this.mesh.geometry, this.material).generateMesh();
@@ -2666,7 +2678,7 @@ AddedObject.prototype.copy = function(name, isHardCopy, copyPosition, gridSystem
   var copyMetaData = Object.assign({}, this.metaData);
 
   var destroyedGrids = new Object();
-  if (!fromScript && !jobHandlerWorking){
+  if (!jobHandlerWorking){
     var startRow, finalRow, startCol, finalCol;
     var grid1 = 0, grid2 = 0;
     for (var gridName in gridSelections){
@@ -2721,8 +2733,7 @@ AddedObject.prototype.copy = function(name, isHardCopy, copyPosition, gridSystem
   copyMesh.addedObject = copyInstance;
   copyInstance.updateMVMatrix();
   copyInstance.isCopied = true;
-  copyInstance.copiedWithScript = fromScript;
-  if (!fromScript && !jobHandlerWorking){
+  if (!jobHandlerWorking){
     copyInstance.metaData["grid1Name"] = grid1.name;
     copyInstance.metaData["grid2Name"] = grid2.name;
   }
@@ -2794,7 +2805,6 @@ AddedObject.prototype.copy = function(name, isHardCopy, copyPosition, gridSystem
       }
     }
   }
-
   if (this.pivotObject){
     var pivot = copyInstance.makePivot(this.pivotOffsetX, this.pivotOffsetY, this.pivotOffsetZ);
     copyInstance.pivotObject = pivot;
@@ -2803,15 +2813,13 @@ AddedObject.prototype.copy = function(name, isHardCopy, copyPosition, gridSystem
     copyInstance.pivotOffsetZ = this.pivotOffsetZ;
     copyInstance.pivotRemoved = false;
   }
-
   copyInstance.setBlending(this.mesh.material.blending);
-
   if (!isHardCopy){
     copyInstance.softCopyParentName = this.name;
   }
-
-  copyInstance.createdWithScript = fromScript;
-
+  if (this.hasCustomPrecision){
+    copyInstance.useCustomShaderPrecision(this.customPrecision);
+  }
   return copyInstance;
 }
 
