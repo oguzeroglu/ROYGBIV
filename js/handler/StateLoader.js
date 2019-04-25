@@ -1050,10 +1050,7 @@ StateLoader.prototype.finalize = function(){
     if (gridSystem){
       for (var gridName in curTextExport.destroyedGrids){
         var gridExport = curTextExport.destroyedGrids[gridName];
-        var grid = gridSystem.getGridByColRow(
-          gridExport.colNumber,
-          gridExport.rowNumber
-        );
+        var grid = gridSystem.getGridByColRow(gridExport.colNumber, gridExport.rowNumber);
         if (grid){
           addedTextInstance.destroyedGrids[gridName] = grid;
           grid.createdAddedTextName = addedTextInstance.name;

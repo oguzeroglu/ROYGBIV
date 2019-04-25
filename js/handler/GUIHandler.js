@@ -208,6 +208,21 @@ GUIHandler.prototype.afterTextSelection = function(){
     }else{
       guiHandler.disableController(guiHandler.textManipulationAffectedByFogController);
     }
+    if (curSelection.hasCustomPrecision){
+      switch(curSelection.customPrecision){
+        case shaderPrecisionHandler.precisionTypes.LOW:
+          guiHandler.textManipulationParameters["Shader precision"] = "low";
+        break;
+        case shaderPrecisionHandler.precisionTypes.MEDIUM:
+          guiHandler.textManipulationParameters["Shader precision"] = "medium";
+        break;
+        case shaderPrecisionHandler.precisionTypes.HIGH:
+          guiHandler.textManipulationParameters["Shader precision"] = "high";
+        break;
+      }
+    }else{
+      guiHandler.textManipulationParameters["Shader precision"] = "default";
+    }
   }else{
     guiHandler.hide(guiHandler.guiTypes.TEXT);
   }
@@ -462,6 +477,7 @@ GUIHandler.prototype.enableAllTMControllers = function(){
   guiHandler.enableController(guiHandler.textManipulationMarginYController);
   guiHandler.enableController(guiHandler.textManipulationMaxWidthPercentController);
   guiHandler.enableController(guiHandler.textManipulationMaxHeightPercentController);
+  guiHandler.enableController(guiHandler.textManipulationShaderPrecisionController);
 }
 
 GUIHandler.prototype.enableAllOMControllers = function(){
@@ -1195,7 +1211,7 @@ GUIHandler.prototype.initializeTextManipulationGUI = function(){
   guiHandler.textManipulationClickableController = guiHandler.datGuiTextManipulation.add(guiHandler.textManipulationParameters, "Clickable").onChange(function(val){
     selectionHandler.getSelectedObject().isClickable = val;
   }).listen();
-  guiHandler.textManipulationClickableController = guiHandler.datGuiTextManipulation.add(guiHandler.textManipulationParameters, "Shader precision", ["default", "low", "medium", "high"]).onChange(function(val){
+  guiHandler.textManipulationShaderPrecisionController = guiHandler.datGuiTextManipulation.add(guiHandler.textManipulationParameters, "Shader precision", ["default", "low", "medium", "high"]).onChange(function(val){
     switch(val){
       case "default":
         selectionHandler.getSelectedObject().useDefaultPrecision();
