@@ -20,7 +20,11 @@ AutoInstancingHandler.prototype.getObjectKey = function(obj){
   if (obj.hasEmissiveMap()){
     emissiveKey = obj.mesh.material.uniforms.emissiveMap.value.uuid;
   }
-  return geomKey + PIPE + diffuseKey + PIPE + alphaKey + PIPE + aoKey + PIPE + displacementKey + PIPE + emissiveKey;
+  var blendingKey = obj.blendingMode;
+  if (!blendingKey){
+    blendingKey = "NORMAL_BLENDING";
+  }
+  return geomKey + PIPE + diffuseKey + PIPE + alphaKey + PIPE + aoKey + PIPE + displacementKey + PIPE + emissiveKey + PIPE + blendingKey;
 }
 
 AutoInstancingHandler.prototype.handle = function(){
