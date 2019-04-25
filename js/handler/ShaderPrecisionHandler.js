@@ -12,10 +12,136 @@ var ShaderPrecisionHandler = function(){
     SKYBOX: 6,
     TEXT: 7
   }
+  this.reset();
+}
+
+ShaderPrecisionHandler.prototype.setDefaultPrecisionForObject = function(obj, precision){
+  var currentPrecisionForObj, newPrecisionForObj;
+  var type;
+  if (obj.isAddedObject){
+    type = this.types.BASIC_MATERIAL;
+  }else if (obj.isObjectGroup){
+    if (obj.isInstanced){
+      type = this.types.INSTANCED_BASIC_MATERIAL;
+    }else{
+      type = this.types.MERGED_BASIC_MATERIAL;
+    }
+  }else if (obj.isAddedText){
+    type = this.types.TEXT;
+  }
+  if (obj.hasCustomPrecision){
+    switch (obj.customPrecision){
+      case this.precisionTypes.LOW:
+        currentPrecisionForObj = {int: "precision lowp int;", float: "precision lowp float;"};
+      break;
+      case this.precisionTypes.MEDIUM:
+        currentPrecisionForObj = {int: "precision mediump int;", float: "precision mediump float;"};
+      break;
+      case this.precisionTypes.HIGH:
+        if (HIGH_PRECISION_SUPPORTED){
+          currentPrecisionForObj = {int: "precision highp int;", float: "precision highp float;"};
+        }else{
+          currentPrecisionForObj = {int: "precision mediump int;", float: "precision mediump float;"};
+        }
+      break;
+    }
+  }else{
+    currentPrecisionForObj = this.getCurrentPrecisionForType(type);
+  }
+  switch (this.precisions[type]){
+    case this.precisionTypes.LOW:
+      newPrecisionForObj = {int: "precision lowp int;", float: "precision lowp float;"};
+    break;
+    case this.precisionTypes.MEDIUM:
+      newPrecisionForObj = {int: "precision mediump int;", float: "precision mediump float;"};
+    break;
+    case this.precisionTypes.HIGH:
+      if (HIGH_PRECISION_SUPPORTED){
+        newPrecisionForObj = {int: "precision highp int;", float: "precision highp float;"};
+      }else{
+        newPrecisionForObj = {int: "precision mediump int;", float: "precision mediump float;"};
+      }
+    break;
+  }
+  obj.mesh.material.vertexShader = this.replace(obj.mesh.material.vertexShader, currentPrecisionForObj, newPrecisionForObj);
+  obj.mesh.material.fragmentShader = this.replace(obj.mesh.material.fragmentShader, currentPrecisionForObj, newPrecisionForObj);
+  obj.mesh.material.needsUpdate = true;
+}
+
+ShaderPrecisionHandler.prototype.setCustomPrecisionForObject = function(obj, precision){
+  var currentPrecisionForObj, newPrecisionForObj;
+  var type;
+  if (obj.isAddedObject){
+    type = this.types.BASIC_MATERIAL;
+  }else if (obj.isObjectGroup){
+    if (obj.isInstanced){
+      type = this.types.INSTANCED_BASIC_MATERIAL;
+    }else{
+      type = this.types.MERGED_BASIC_MATERIAL;
+    }
+  }else if (obj.isAddedText){
+    type = this.types.TEXT;
+  }
+  if (obj.hasCustomPrecision){
+    switch (obj.customPrecision){
+      case this.precisionTypes.LOW:
+        currentPrecisionForObj = {int: "precision lowp int;", float: "precision lowp float;"};
+      break;
+      case this.precisionTypes.MEDIUM:
+        currentPrecisionForObj = {int: "precision mediump int;", float: "precision mediump float;"};
+      break;
+      case this.precisionTypes.HIGH:
+        if (HIGH_PRECISION_SUPPORTED){
+          currentPrecisionForObj = {int: "precision highp int;", float: "precision highp float;"};
+        }else{
+          currentPrecisionForObj = {int: "precision mediump int;", float: "precision mediump float;"};
+        }
+      break;
+    }
+  }else{
+    currentPrecisionForObj = this.getCurrentPrecisionForType(type);
+  }
+  if (!currentPrecisionForObj){
+    throw new Error("Unknown type.");
+  }
+  switch (precision){
+    case this.precisionTypes.LOW:
+      newPrecisionForObj = {int: "precision lowp int;", float: "precision lowp float;"};
+    break;
+    case this.precisionTypes.MEDIUM:
+      newPrecisionForObj = {int: "precision mediump int;", float: "precision mediump float;"};
+    break;
+    case this.precisionTypes.HIGH:
+      if (HIGH_PRECISION_SUPPORTED){
+        newPrecisionForObj = {int: "precision highp int;", float: "precision highp float;"};
+      }else{
+        newPrecisionForObj = {int: "precision mediump int;", float: "precision mediump float;"};
+      }
+    break;
+  }
+  if (!newPrecisionForObj){
+    throw new Error("Unknown precision.");
+  }
+  obj.mesh.material.vertexShader = this.replace(obj.mesh.material.vertexShader, currentPrecisionForObj, newPrecisionForObj);
+  obj.mesh.material.fragmentShader = this.replace(obj.mesh.material.fragmentShader, currentPrecisionForObj, newPrecisionForObj);
+  obj.mesh.material.needsUpdate = true;
+}
+
+ShaderPrecisionHandler.prototype.reset = function(){
   this.precisions = {};
   for (var key in this.types){
     this.precisions[this.types[key]] = this.precisionTypes.LOW;
   }
+}
+
+ShaderPrecisionHandler.prototype.load = function(precisions){
+  for (var key in precisions){
+    this.setShaderPrecisionForType(parseInt(key), precisions[key]);
+  }
+}
+
+ShaderPrecisionHandler.prototype.export = function(){
+  return this.precisions;
 }
 
 ShaderPrecisionHandler.prototype.getShaderPrecisionTextForType = function(type){
@@ -86,6 +212,9 @@ ShaderPrecisionHandler.prototype.setShaderPrecisionForType = function(type, prec
       fragmentShaderName = "basicMaterialFragmentShader";
       for (var objName in addedObjects){
         var obj = addedObjects[objName];
+        if (obj.hasCustomPrecision){
+          continue;
+        }
         obj.mesh.material.vertexShader = this.replace(obj.mesh.material.vertexShader, currentPrecisionForType, newPrecisionForType);
         obj.mesh.material.fragmentShader = this.replace(obj.mesh.material.fragmentShader, currentPrecisionForType, newPrecisionForType);
         obj.mesh.material.needsUpdate = true;
@@ -98,7 +227,7 @@ ShaderPrecisionHandler.prototype.setShaderPrecisionForType = function(type, prec
       fragmentShaderName = "instancedBasicMaterialFragmentShader";
       for (var objName in objectGroups){
         var obj = objectGroups[objName];
-        if (!obj.isInstanced){
+        if (!obj.isInstanced || obj.hasCustomPrecision){
           continue;
         }
         obj.mesh.material.vertexShader = this.replace(obj.mesh.material.vertexShader, currentPrecisionForType, newPrecisionForType);
@@ -113,7 +242,7 @@ ShaderPrecisionHandler.prototype.setShaderPrecisionForType = function(type, prec
       fragmentShaderName = "mergedBasicMaterialFragmentShader";
       for (var objName in objectGroups){
         var obj = objectGroups[objName];
-        if (obj.isInstanced){
+        if (obj.isInstanced || obj.hasCustomPrecision){
           continue;
         }
         obj.mesh.material.vertexShader = this.replace(obj.mesh.material.vertexShader, currentPrecisionForType, newPrecisionForType);
@@ -151,6 +280,9 @@ ShaderPrecisionHandler.prototype.setShaderPrecisionForType = function(type, prec
       fragmentShaderName = "textFragmentShader";
       for (var textName in addedTexts){
         var text = addedTexts[textName];
+        if (text.hasCustomPrecision){
+          continue;
+        }
         text.mesh.material.vertexShader = this.replace(text.mesh.material.vertexShader, currentPrecisionForType, newPrecisionForType);
         text.mesh.material.fragmentShader = this.replace(text.mesh.material.fragmentShader, currentPrecisionForType, newPrecisionForType);
         text.mesh.material.needsUpdate = true;

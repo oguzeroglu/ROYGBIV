@@ -97,6 +97,18 @@ var AddedText = function(name, font, text, position, color, alpha, characterSize
   webglCallbackHandler.registerEngineObject(this);
 }
 
+AddedText.prototype.useDefaultPrecision = function(){
+  shaderPrecisionHandler.setDefaultPrecisionForObject(this);
+  this.hasCustomPrecision = false;
+  delete this.customPrecision;
+}
+
+AddedText.prototype.useCustomShaderPrecision = function(precision){
+  shaderPrecisionHandler.setCustomPrecisionForObject(this, precision);
+  this.hasCustomPrecision = true;
+  this.customPrecision = precision;
+}
+
 AddedText.prototype.destroy = function(skipRaycasterRefresh){
   for (var gridName in this.destroyedGrids){
     if (this.destroyedGrids[gridName].createdAddedTextName == this.name){
@@ -222,6 +234,10 @@ AddedText.prototype.export = function(){
     exportDestroyedGrids[gridName] = this.destroyedGrids[gridName].export();
   }
   exportObj["destroyedGrids"] = exportDestroyedGrids;
+  if (this.hasCustomPrecision){
+    exportObj.hasCustomPrecision = true;
+    exportObj.customPrecision = this.customPrecision;
+  }
   return exportObj;
 }
 

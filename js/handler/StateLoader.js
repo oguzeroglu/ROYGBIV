@@ -24,6 +24,8 @@ StateLoader.prototype.load = function(){
     if (!(typeof obj.fixedAspect == UNDEFINED)){
       fixedAspect = obj.fixedAspect;
     }
+    // SHADER PRECISIONS *******************************************
+    shaderPrecisionHandler.load(obj.shaderPrecisions);
     // GRID SYSTEMS ************************************************
     var gridSystemsExport = obj.gridSystems;
     for (var gridSystemName in gridSystemsExport){
@@ -574,6 +576,9 @@ StateLoader.prototype.load = function(){
          addedObjectInstance.physicsQuaternionWhenUsedAsFPSWeapon = new THREE.Quaternion(physicsQuaternionWhenUsedAsFPSWeapon._x, physicsQuaternionWhenUsedAsFPSWeapon._y, physicsQuaternionWhenUsedAsFPSWeapon._z, physicsQuaternionWhenUsedAsFPSWeapon._w);
          addedObjectInstance.fpsWeaponAlignment = curAddedObjectExport.fpsWeaponAlignment;
        }
+       if (curAddedObjectExport.hasCustomPrecision){
+         addedObjectInstance.useCustomShaderPrecision(curAddedObjectExport.customPrecision);
+       }
     }
     for (var objName in addedObjects){
       if (addedObjects[objName].softCopyParentName){
@@ -1060,6 +1065,9 @@ StateLoader.prototype.finalize = function(){
     if (addedTextInstance.is2D){
       addedTexts2D[addedTextInstance.name] = addedTextInstance;
     }
+    if (curTextExport.hasCustomPrecision){
+      addedTextInstance.useCustomShaderPrecision(curTextExport.customPrecision);
+    }
   }
 
   // ADDED OBJECTS EMISSIVE INTENSITY, EMISSIVE COLOR, AO INTENSITY, TEXTURE PROPERTIES
@@ -1245,6 +1253,9 @@ StateLoader.prototype.finalize = function(){
       objectGroupInstance.physicsPositionWhenUsedAsFPSWeapon = new THREE.Vector3(physicsPositionWhenUsedAsFPSWeapon.x, physicsPositionWhenUsedAsFPSWeapon.y, physicsPositionWhenUsedAsFPSWeapon.z);
       objectGroupInstance.physicsQuaternionWhenUsedAsFPSWeapon = new THREE.Quaternion(physicsQuaternionWhenUsedAsFPSWeapon._x, physicsQuaternionWhenUsedAsFPSWeapon._y, physicsQuaternionWhenUsedAsFPSWeapon._z, physicsQuaternionWhenUsedAsFPSWeapon._w);
       objectGroupInstance.fpsWeaponAlignment = curObjectGroupExport.fpsWeaponAlignment;
+    }
+    if (curObjectGroupExport.hasCustomPrecision){
+      curObjectGroupExport.useCustomShaderPrecision(curObjectGroupExport.customPrecision);
     }
   }
   for (var objName in objectGroups){
@@ -2285,7 +2296,6 @@ StateLoader.prototype.resetProject = function(){
   RAYCASTER_STEP_AMOUNT = 32;
   geometryCache = new Object();
   physicsShapeCache = new Object();
-
+  shaderPrecisionHandler.reset();
   previewSceneRendered = false;
-
 }

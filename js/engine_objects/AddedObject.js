@@ -67,6 +67,18 @@ var AddedObject = function(name, type, metaData, material, mesh, physicsBody, de
 
 }
 
+AddedObject.prototype.useDefaultPrecision = function(){
+  shaderPrecisionHandler.setDefaultPrecisionForObject(this);
+  this.hasCustomPrecision = false;
+  delete this.customPrecision;
+}
+
+AddedObject.prototype.useCustomShaderPrecision = function(precision){
+  shaderPrecisionHandler.setCustomPrecisionForObject(this, precision);
+  this.hasCustomPrecision = true;
+  this.customPrecision = precision;
+}
+
 AddedObject.prototype.removeCollisionListener = function(){
   this.physicsBody.removeEventListener("collide", this.boundCallbackFunction);
   collisionCallbackRequests.delete(this.name);
@@ -526,6 +538,10 @@ AddedObject.prototype.export = function(){
     exportObject.txtMatrix = this.mesh.material.uniforms.textureMatrix.value.elements;
   }
   exportObject.isRotationDirty = this.isRotationDirty;
+  if (this.hasCustomPrecision){
+    exportObject.hasCustomPrecision = true;
+    exportObject.customPrecision = this.customPrecision;
+  }
   return exportObject;
 }
 

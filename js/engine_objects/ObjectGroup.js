@@ -34,6 +34,18 @@ var ObjectGroup = function(name, group){
   this.lastUpdateQuaternion = new THREE.Quaternion();
 }
 
+ObjectGroup.prototype.useDefaultPrecision = function(){
+  shaderPrecisionHandler.setDefaultPrecisionForObject(this);
+  this.hasCustomPrecision = false;
+  delete this.customPrecision;
+}
+
+ObjectGroup.prototype.useCustomShaderPrecision = function(precision){
+  shaderPrecisionHandler.setCustomPrecisionForObject(this, precision);
+  this.hasCustomPrecision = true;
+  this.customPrecision = precision;
+}
+
 ObjectGroup.prototype.removeCollisionListener = function(){
   this.physicsBody.removeEventListener("collide", this.boundCallbackFunction);
   collisionCallbackRequests.delete(this.name);
@@ -1841,6 +1853,10 @@ ObjectGroup.prototype.export = function(){
     exportObj.physicsPositionWhenUsedAsFPSWeapon = this.physicsPositionWhenUsedAsFPSWeapon;
     exportObj.physicsQuaternionWhenUsedAsFPSWeapon = this.physicsQuaternionWhenUsedAsFPSWeapon;
     exportObj.fpsWeaponAlignment = this.fpsWeaponAlignment;
+  }
+  if (this.hasCustomPrecision){
+    exportObj.hasCustomPrecision = true;
+    exportObj.customPrecision = this.customPrecision;
   }
   return exportObj;
 }

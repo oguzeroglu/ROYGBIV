@@ -11,6 +11,7 @@ var GUIHandler = function(){
     "Intersectable": false,
     "Colorizable": false,
     "Has mass": true,
+    "Shader precision": "default",
     "FPS Weapon": false,
     "Side": "Both",
     "Hide half": "None",
@@ -44,6 +45,7 @@ var GUIHandler = function(){
     "Char margin": 0.0,
     "Line margin": 0.0,
     "Clickable": false,
+    "Shader precision": "default",
     "Aff. by fog": false,
     "is 2D": false,
     "Margin mode": "Top/Left",
@@ -392,6 +394,21 @@ GUIHandler.prototype.afterObjectSelection = function(){
     }else{
       guiHandler.objectManipulationParameters["FPS Weapon"] = false;
     }
+    if (obj.hasCustomPrecision){
+      switch(obj.customPrecision){
+        case shaderPrecisionHandler.precisionTypes.LOW:
+          guiHandler.objectManipulationParameters["Shader precision"] = "low";
+        break;
+        case shaderPrecisionHandler.precisionTypes.MEDIUM:
+          guiHandler.objectManipulationParameters["Shader precision"] = "medium";
+        break;
+        case shaderPrecisionHandler.precisionTypes.HIGH:
+          guiHandler.objectManipulationParameters["Shader precision"] = "high";
+        break;
+      }
+    }else{
+      guiHandler.objectManipulationParameters["Shader precision"] = "default";
+    }
   }else{
     guiHandler.hide(guiHandler.guiTypes.OBJECT);
   }
@@ -470,6 +487,7 @@ GUIHandler.prototype.enableAllOMControllers = function(){
   guiHandler.enableController(guiHandler.omBlendingController);
   guiHandler.enableController(guiHandler.omSideController);
   guiHandler.enableController(guiHandler.omFPSWeaponController);
+  guiHandler.enableController(guiHandler.omShaderPrecisionController);
 }
 
 GUIHandler.prototype.show = function(guiType){
@@ -589,8 +607,10 @@ GUIHandler.prototype.hide = function(guiType){
       }
     return;
     case this.guiTypes.SHADER_PRECISION:
-      this.destroyGUI(this.datGuiShaderPrecision);
-      this.datGuiShaderPrecision = 0;
+      if (this.datGuiShaderPrecision){
+        this.destroyGUI(this.datGuiShaderPrecision);
+        this.datGuiShaderPrecision = 0;
+      }
     return;
   }
   throw new Error("Unknown guiType.");
@@ -941,6 +961,24 @@ GUIHandler.prototype.initializeObjectManipulationGUI = function(){
     }
     guiHandler.omMassController.updateDisplay();
   }).listen();
+  guiHandler.omShaderPrecisionController = guiHandler.datGuiObjectManipulation.add(guiHandler.objectManipulationParameters, "Shader precision", ["default", "low", "medium", "high"]).onChange(function(val){
+    switch (val){
+      case "default":
+        selectionHandler.getSelectedObject().useDefaultPrecision();
+      break;
+      case "low":
+        selectionHandler.getSelectedObject().useCustomShaderPrecision(shaderPrecisionHandler.precisionTypes.LOW);
+      break;
+      case "medium":
+        selectionHandler.getSelectedObject().useCustomShaderPrecision(shaderPrecisionHandler.precisionTypes.MEDIUM);
+      break;
+      case "high":
+        selectionHandler.getSelectedObject().useCustomShaderPrecision(shaderPrecisionHandler.precisionTypes.HIGH);
+      break;
+    }
+    terminal.clear();
+    terminal.printInfo(Text.SHADER_PRECISION_ADJUSTED);
+  }).listen();
   guiHandler.omFPSWeaponController = guiHandler.datGuiObjectManipulation.add(guiHandler.objectManipulationParameters, "FPS Weapon").onChange(function(val){
     if (val){
       selectionHandler.getSelectedObject().useAsFPSWeapon();
@@ -1156,6 +1194,24 @@ GUIHandler.prototype.initializeTextManipulationGUI = function(){
   }).listen();
   guiHandler.textManipulationClickableController = guiHandler.datGuiTextManipulation.add(guiHandler.textManipulationParameters, "Clickable").onChange(function(val){
     selectionHandler.getSelectedObject().isClickable = val;
+  }).listen();
+  guiHandler.textManipulationClickableController = guiHandler.datGuiTextManipulation.add(guiHandler.textManipulationParameters, "Shader precision", ["default", "low", "medium", "high"]).onChange(function(val){
+    switch(val){
+      case "default":
+        selectionHandler.getSelectedObject().useDefaultPrecision();
+      break;
+      case "low":
+        selectionHandler.getSelectedObject().useCustomShaderPrecision(shaderPrecisionHandler.precisionTypes.LOW);
+      break;
+      case "medium":
+        selectionHandler.getSelectedObject().useCustomShaderPrecision(shaderPrecisionHandler.precisionTypes.MEDIUM);
+      break;
+      case "high":
+        selectionHandler.getSelectedObject().useCustomShaderPrecision(shaderPrecisionHandler.precisionTypes.HIGH);
+      break;
+    }
+    terminal.clear();
+    terminal.printInfo(Text.SHADER_PRECISION_ADJUSTED);
   }).listen();
   guiHandler.textManipulationAffectedByFogController = guiHandler.datGuiTextManipulation.add(guiHandler.textManipulationParameters, "Aff. by fog").onChange(function(val){
     selectionHandler.getSelectedObject().setAffectedByFog(val);

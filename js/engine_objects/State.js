@@ -13,6 +13,8 @@ var State = function(projectName, author){
   this.viewportMaxWidth = viewportMaxWidth;
   this.viewportMaxHeight = viewportMaxHeight;
   this.fixedAspect = fixedAspect;
+  // SHADER PRECISIONS *********************************************
+  this.shaderPrecisions = shaderPrecisionHandler.export();
   // GRID SYSTEMS **************************************************
   var gridSystemsExport = new Object();
   for (var gridSystemName in gridSystems){
