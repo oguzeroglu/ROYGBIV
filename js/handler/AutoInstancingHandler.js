@@ -24,7 +24,11 @@ AutoInstancingHandler.prototype.getObjectKey = function(obj){
   if (!blendingKey){
     blendingKey = "NORMAL_BLENDING";
   }
-  return geomKey + PIPE + diffuseKey + PIPE + alphaKey + PIPE + aoKey + PIPE + displacementKey + PIPE + emissiveKey + PIPE + blendingKey;
+  var shaderPrecisionKey = shaderPrecisionHandler.precisions[shaderPrecisionHandler.types.BASIC_MATERIAL];
+  if (obj.hasCustomPrecision){
+    shaderPrecisionKey = obj.customPrecision;
+  }
+  return geomKey + PIPE + diffuseKey + PIPE + alphaKey + PIPE + aoKey + PIPE + displacementKey + PIPE + emissiveKey + PIPE + blendingKey + PIPE + shaderPrecisionKey;
 }
 
 AutoInstancingHandler.prototype.handle = function(){
