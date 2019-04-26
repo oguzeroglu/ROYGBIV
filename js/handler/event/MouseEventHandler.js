@@ -94,6 +94,13 @@ MouseEventHandler.prototype.handleObjectMouseEvents = function(){
   }
 }
 
+MouseEventHandler.prototype.onDrag = function(x, y, movementX, movementY){
+  if (mode == 1 && screenDragCallbackFunction){
+    screenDragCallbackFunction(x, y, movementX, movementY);
+  }
+  activeControl.onDrag(x, y, movementX, movementY);
+}
+
 MouseEventHandler.prototype.onMouseMove = function(event){
   inactiveCounter = 0;
   var rect = boundingClientRect;
@@ -107,6 +114,9 @@ MouseEventHandler.prototype.onMouseMove = function(event){
     screenMouseMoveCallbackFunction(mouseEventHandler.coordX, mouseEventHandler.coordY, mouseEventHandler.movementX, mouseEventHandler.movementY);
   }
   activeControl.onMouseMove(event);
+  if (isMouseDown && !isMobile){
+    mouseEventHandler.onDrag(mouseEventHandler.x, mouseEventHandler.y, mouseEventHandler.movementX, mouseEventHandler.movementY);
+  }
 }
 
 MouseEventHandler.prototype.onMouseUp = function(event){

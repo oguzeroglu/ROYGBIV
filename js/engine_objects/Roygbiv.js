@@ -190,7 +190,9 @@ var Roygbiv = function(){
     "createFreeControl",
     "createCustomControl",
     "setActiveControl",
-    "createFPSControl"
+    "createFPSControl",
+    "setScreenDragListener",
+    "removeScreenDragListener"
   ];
 
   this.globals = new Object();
@@ -4102,6 +4104,25 @@ Roygbiv.prototype.removeObjectPositionThresholdExceededListener = function(objec
   }
 }
 
+// Sets a mouse drag listener for the screen. The callbackFunction is executed with x, y, movementX and movementY
+// parameters.
+Roygbiv.prototype.setScreenDragListener = function(callbackFunction){
+  if (mode == 0){
+    return;
+  }
+  preConditions.checkIfDefined(ROYGBIV.setScreenDragListener, preConditions.callbackFunction, callbackFunction);
+  preConditions.checkIfFunctionOnlyIfExists(ROYGBIV.setScreenDragListener, preConditions.callbackFunction, callbackFunction);
+  screenDragCallbackFunction = callbackFunction;
+}
+
+// Removes the screen drag listener.
+Roygbiv.prototype.removeScreenDragListener = function(){
+  if (mode == 0){
+    return;
+  }
+  screenDragCallbackFunction = noop;
+}
+
 // TEXT FUNCTIONS **************************************************************
 
 // Sets a text to a text object.
@@ -4303,6 +4324,8 @@ Roygbiv.prototype.createFreeControl = function(parameters){
 // onResize (optional): Function to be executed when the screen is resized. Default value is noop.
 // onFullScreenChange (optional): Function to be executed with the isFullScreen parameter when the
 // fullscreen status of the screen is changed. Default value is noop.
+// onDrag (optional): Function to be executed with x, y, movementX, movementY parameters when the user performs
+// a moue drag operation. Default value is noop.
 // onUpdate (optional): Function to be executed on each frame. Default value is noop.
 Roygbiv.prototype.createCustomControl = function(parameters){
   if (mode == 0){
@@ -4325,6 +4348,7 @@ Roygbiv.prototype.createCustomControl = function(parameters){
   preConditions.checkIfFunctionOnlyIfExists(ROYGBIV.createCustomControl, preConditions.onResize, parameters.onResize);
   preConditions.checkIfFunctionOnlyIfExists(ROYGBIV.createCustomControl, preConditions.onFullScreenChange, parameters.onFullScreenChange);
   preConditions.checkIfFunctionOnlyIfExists(ROYGBIV.createCustomControl, preConditions.onKeyUp, parameters.onKeyUp);
+  preConditions.checkIfFunctionOnlyIfExists(ROYGBIV.createCustomControl, preConditions.onDrag, parameters.onDrag);
   return new CustomControls(parameters);
 }
 

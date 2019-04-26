@@ -262,6 +262,7 @@ ModeSwitcher.prototype.switchFromPreviewToDesign = function(){
   screenFullScreenChangeCallbackFunction = 0;
   screenKeydownCallbackFunction = 0;
   screenKeyupCallbackFunction = 0;
+  screenDragCallbackFunction = 0;
   terminalTextInputCallbackFunction = 0;
   fpsDropCallbackFunction = 0;
   performanceDropCallbackFunction = 0;

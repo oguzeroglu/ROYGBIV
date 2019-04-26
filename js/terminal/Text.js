@@ -954,7 +954,7 @@ var Text = function(){
                                                   "mouseWheelSpeed (optional): Translation speed for mousewheel zoom in/out. Default is 1.\n"+
                                                   "swipeSpeed (optional): Rotation speed for look with touch events on mobile. Default is 0.002.\n"+
                                                   "requestFullScreen (optional): If true, fullscreen mode is requested automatically. Default is false.";
-this.ROYGBIV_SCRIPTING_API_CREATECUSTOMCONTROL = "Creates a CustomControl implementation. This API may be used to create custom controls by filling the related event handlers.\nParameters are:\n"+
+  this.ROYGBIV_SCRIPTING_API_CREATECUSTOMCONTROL = "Creates a CustomControl implementation. This API may be used to create custom controls by filling the related event handlers.\nParameters are:\n"+
                                                  "onClick (optional): Function to be executed with the click event when the user clicks. Default value is noop.\n"+
                                                  "onTap (optional): Function to be executed with the touch event when the user taps (mobile). Default value is noop.\n"+
                                                  "onSwipe (optional): Function to be executed with diffX and diffY parameters when the user moves their finger on the screen (mobile).\nDefault value is noop.\n"+
@@ -968,9 +968,10 @@ this.ROYGBIV_SCRIPTING_API_CREATECUSTOMCONTROL = "Creates a CustomControl implem
                                                  "onTouchEnd (optional): Function to be executed with the TouchEvent when the user performs a touch end. Default value is noop.\n"+
                                                  "onResize (optional): Function to be executed when the screen is resized. Default value is noop.\n"+
                                                  "onFullScreenChange (optional): Function to be executed with the isFullScreen parameter when the fullscreen status of the screen is\nchanged. Default value is noop.\n"+
+                                                 "onDrag (optional): Function to be executed with x, y, movementX, movementY parameters when the user performs a moue drag operation.\nDefault value is noop.\n"+
                                                  "onUpdate (optional): Function to be executed on each frame. Default value is noop.";
-this.ROYGBIV_SCRIPTING_API_SETACTIVECONTROL = "Sets the active control.";
-this.ROYGBIV_SCRIPTING_API_CREATEFPSCONTROL = "Creates a new FPSControls object to be used in First Person Shooter games for both desktop and mobile devices. FPSControls automatically\nhandles the PointerLock as well. The controls are:\n"+
+ this.ROYGBIV_SCRIPTING_API_SETACTIVECONTROL = "Sets the active control.";
+ this.ROYGBIV_SCRIPTING_API_CREATEFPSCONTROL = "Creates a new FPSControls object to be used in First Person Shooter games for both desktop and mobile devices. FPSControls automatically\nhandles the PointerLock as well. The controls are:\n"+
                                               "For desktop:\n"+
                                               "WSAD/ZQSD (French keyboard) / Arrow Keys: Move\n"+
                                               "Mouse: Look\n"+
@@ -1004,4 +1005,7 @@ this.ROYGBIV_SCRIPTING_API_CREATEFPSCONTROL = "Creates a new FPSControls object 
                                               "onPause (optional): A callback function to be executed when the FPS controls are paused on mobile devices due to switching to Portrait\norientation. Default value is noop.\n"+
                                               "onResume (optional): A callback function to be executed on mobile devices when the FPS controls are resumed after switching back to the\nLandscape orientation. Default value is noop.\n"+
                                               "requestFullScreen (optional): If true the FullScreen mode is requested if the screen is not on full screen. FPS Controls API\nalso automatically re-requests the FullScreen mode every time after the user cancels the FullScreen. Default value is true.";
+
+  this.ROYGBIV_SCRIPTING_API_SETSCREENDRAGLISTENER = "Sets a mouse drag listener for the screen. The callbackFunction is executed with x, y, movementX and movementY parameters.";
+  this.ROYGBIV_SCRIPTING_API_REMOVESCREENDRAGLISTENER = "Removes the screen drag listener.";
 }

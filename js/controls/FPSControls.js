@@ -105,6 +105,7 @@ FPSControls.prototype.onSwipe = noop;
 FPSControls.prototype.onPinch = noop;
 FPSControls.prototype.onMouseWheel = noop;
 FPSControls.prototype.onKeyUp = noop;
+FPSControls.prototype.onDrag = noop;
 
 FPSControls.prototype.init = function(){
   this.deactivated = true;

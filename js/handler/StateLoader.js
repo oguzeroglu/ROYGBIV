@@ -2228,6 +2228,7 @@ StateLoader.prototype.resetProject = function(){
   userInactivityCallbackFunction = 0;
   screenMouseWheelCallbackFunction = 0;
   screenPinchCallbackFunction = 0;
+  screenDragCallbackFunction = 0;
   fpsHandler.reset();
   fonts = new Object();
   NO_MOBILE = false;

@@ -37,6 +37,10 @@ FreeControls.prototype.onKeyUp = noop;
 FreeControls.prototype.onKeyDown = noop;
 FreeControls.prototype.onResize = noop;
 
+FreeControls.prototype.onDrag = function(x, y, movementX, movementY){
+  
+}
+
 FreeControls.prototype.onActivated = function(){
   if (this.requestFullScreen){
     fullScreenRequested = true;

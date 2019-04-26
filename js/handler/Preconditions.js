@@ -200,6 +200,7 @@ var Preconditions = function(){
   this.onPause = "onPause";
   this.onResume = "onResume";
   this.skipList = "skipList";
+  this.onDrag = "onDrag";
 }
 
 Preconditions.prototype.errorHeader = function(callerFunc){

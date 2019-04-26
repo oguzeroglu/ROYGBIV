@@ -16,10 +16,15 @@ var CustomControls = function(params){
   this.onKeyDownFunc = params.onKeyDown || noop;
   this.onResizeFunc = params.onResize || noop;
   this.onFullScreenChangeFunc = params.onFullScreenChange || noop;
+  this.onDragFunc = params.onDrag || noop;
 }
 
 CustomControls.prototype.onActivated = noop;
 CustomControls.prototype.onDeactivated = noop;
+
+CustomControls.prototype.onDrag = function(x, y, movementX, movementY){
+  this.onDragFunc(x, y, movementX, movementY);
+}
 
 CustomControls.prototype.onFullScreenChange = function(isFullScreen){
   this.onFullScreenChangeFunc(isFullScreen);
