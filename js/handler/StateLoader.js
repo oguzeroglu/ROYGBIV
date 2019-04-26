@@ -2243,7 +2243,7 @@ StateLoader.prototype.resetProject = function(){
   fullScreenRequested = false;
   isMouseDown = false;
   modeSwitcher = new ModeSwitcher();
-  activeControl = new FreeControls(defaultControlParameters);
+  activeControl = new FreeControls({});
 
   // FOG
   fogActive = false;

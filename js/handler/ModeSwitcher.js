@@ -82,7 +82,7 @@ ModeSwitcher.prototype.commonSwitchFunctions = function(){
   if (activeControl){
     activeControl.onDeactivated();
   }
-  activeControl = new FreeControls(defaultControlParameters);
+  activeControl = new FreeControls({});
   rayCaster.refresh();
   physicsWorld.refresh();
   if (oldIsPaused){

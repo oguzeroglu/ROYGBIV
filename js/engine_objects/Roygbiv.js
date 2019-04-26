@@ -4284,17 +4284,6 @@ Roygbiv.prototype.createFreeControl = function(parameters){
   preConditions.checkIfNumberOnlyIfExists(ROYGBIV.createFreeControl, preConditions.swipeSpeed, parameters.swipeSpeed);
   preConditions.checkIfNumberOnlyIfExists(ROYGBIV.createFreeControl, preConditions.mouseDragSpeed, parameters.mouseDragSpeed);
   preConditions.checkIfBooleanOnlyIfExists(ROYGBIV.createFreeControl, preConditions.requestFullScreen, parameters.requestFullScreen);
-  var params = {
-    rotationYDelta: (!(typeof parameters.rotationYDelta == UNDEFINED))? parameters.rotationYDelta: 0.07,
-    rotationXDelta: (!(typeof parameters.rotationXDelta == UNDEFINED))? parameters.rotationXDelta: 0.07,
-    translateZAmount: (!(typeof parameters.translateZAmount == UNDEFINED))? parameters.translateZAmount: 3,
-    translateXAmount: (!(typeof parameters.translateXAmount == UNDEFINED))? parameters.translateXAmount: 3,
-    translateYAmount: (!(typeof parameters.translateYAmount == UNDEFINED))? parameters.translateYAmount: 3,
-    mouseWheelSpeed: (!(typeof parameters.mouseWheelSpeed == UNDEFINED))? parameters.mouseWheelSpeed: 1,
-    swipeSpeed: (!(typeof parameters.swipeSpeed == UNDEFINED))? parameters.swipeSpeed: 0.002,
-    mouseDragSpeed: (!(typeof parameters.mouseDragSpeed == UNDEFINED))? parameters.mouseDragSpeed: 15,
-    requestFullScreen: (!(typeof parameters.requestFullScreen == UNDEFINED))? parameters.requestFullScreen: false
-  }
   return new FreeControls(params);
 }
 

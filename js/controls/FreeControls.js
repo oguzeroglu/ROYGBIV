@@ -1,14 +1,14 @@
 var FreeControls = function(params){
   this.isControl = true;
-  this.rotationYDelta = params.rotationYDelta;
-  this.rotationXDelta = params.rotationXDelta;
-  this.translateZAmount = params.translateZAmount;
-  this.translateXAmount = params.translateXAmount;
-  this.translateYAmount = params.translateYAmount;
-  this.mouseWheelSpeed = params.mouseWheelSpeed;
-  this.swipeSpeed = params.swipeSpeed;
-  this.mouseDragSpeed = params.mouseDragSpeed;
-  this.requestFullScreen = params.requestFullScreen;
+  this.rotationYDelta = (!(typeof params.rotationYDelta == UNDEFINED))? params.rotationYDelta: 0.07;
+  this.rotationXDelta = (!(typeof params.rotationXDelta == UNDEFINED))? params.rotationXDelta: 0.07;
+  this.translateZAmount = (!(typeof params.translateZAmount == UNDEFINED))? params.translateZAmount: 3;
+  this.translateXAmount = (!(typeof params.translateXAmount == UNDEFINED))? params.translateXAmount: 3;
+  this.translateYAmount = (!(typeof params.translateYAmount == UNDEFINED))? params.translateYAmount: 3;
+  this.mouseWheelSpeed = (!(typeof params.mouseWheelSpeed == UNDEFINED))? params.mouseWheelSpeed: 1;
+  this.swipeSpeed = (!(typeof params.swipeSpeed == UNDEFINED))? params.swipeSpeed: 0.002;
+  this.mouseDragSpeed = (!(typeof params.mouseDragSpeed == UNDEFINED))? params.mouseDragSpeed: 15;
+  this.requestFullScreen = (!(typeof params.requestFullScreen == UNDEFINED))? params.requestFullScreen: false;
   this.keyboardActions = [
     {key: "Left", action: this.incrRotationY},
     {key: "Right", action: this.decrRotationY},

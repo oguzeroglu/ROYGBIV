@@ -123,7 +123,7 @@ var GUIHandler = function(){
       terminal.clear();
       terminal.printInfo(Text.DONE);
       terminal.enable();
-      activeControl = new FreeControls(defaultControlParameters);
+      activeControl = new FreeControls({});
     }
   };
   this.shaderPrecisionParameters = {

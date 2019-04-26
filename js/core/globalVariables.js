@@ -336,16 +336,6 @@ var currentMouseOverObjectName;
 var renderer;
 var bloom;
 var macroHandler = new MacroHandler();
-var defaultControlParameters = {
-  rotationYDelta: 0.07,
-  rotationXDelta: 0.07,
-  translateZAmount: 3,
-  translateXAmount: 3,
-  translateYAmount: 3,
-  mouseWheelSpeed: 1,
-  swipeSpeed: 0.002,
-
-};
 var activeControl;
 var crosshairHandler;
 var fpsWeaponAlignmentConfigurationObject;

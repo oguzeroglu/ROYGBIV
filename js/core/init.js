@@ -28,7 +28,7 @@ window.onload = function() {
   }
 
   // DEFAULT CONTROL
-  activeControl = new FreeControls(defaultControlParameters);
+  activeControl = new FreeControls({});
 
   // CROSSHAIR HANDLER
   crosshairHandler = new CrosshairHandler();
