@@ -201,6 +201,7 @@ var Preconditions = function(){
   this.onResume = "onResume";
   this.skipList = "skipList";
   this.onDrag = "onDrag";
+  this.mouseDragSpeed = "mouseDragSpeed";
 }
 
 Preconditions.prototype.errorHeader = function(callerFunc){

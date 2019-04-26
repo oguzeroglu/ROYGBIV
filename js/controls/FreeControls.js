@@ -7,6 +7,7 @@ var FreeControls = function(params){
   this.translateYAmount = params.translateYAmount;
   this.mouseWheelSpeed = params.mouseWheelSpeed;
   this.swipeSpeed = params.swipeSpeed;
+  this.mouseDragSpeed = params.mouseDragSpeed;
   this.requestFullScreen = params.requestFullScreen;
   this.keyboardActions = [
     {key: "Left", action: this.incrRotationY},
@@ -38,7 +39,8 @@ FreeControls.prototype.onKeyDown = noop;
 FreeControls.prototype.onResize = noop;
 
 FreeControls.prototype.onDrag = function(x, y, movementX, movementY){
-  
+  camera.rotation.y += (movementX / 10000) * activeControl.mouseDragSpeed;
+  camera.rotation.x += (movementY / 10000) * activeControl.mouseDragSpeed;
 }
 
 FreeControls.prototype.onActivated = function(){

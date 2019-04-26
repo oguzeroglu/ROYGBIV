@@ -953,6 +953,7 @@ var Text = function(){
                                                   "translateYAmount (optional): Translation amount on Y axis for E-Space keys. Default is 3.\n"+
                                                   "mouseWheelSpeed (optional): Translation speed for mousewheel zoom in/out. Default is 1.\n"+
                                                   "swipeSpeed (optional): Rotation speed for look with touch events on mobile. Default is 0.002.\n"+
+                                                  "mouseDragSpeed (optional): Rotation speed for mouse drag events on desktop devices. Default is 15.\n"+
                                                   "requestFullScreen (optional): If true, fullscreen mode is requested automatically. Default is false.";
   this.ROYGBIV_SCRIPTING_API_CREATECUSTOMCONTROL = "Creates a CustomControl implementation. This API may be used to create custom controls by filling the related event handlers.\nParameters are:\n"+
                                                  "onClick (optional): Function to be executed with the click event when the user clicks. Default value is noop.\n"+
