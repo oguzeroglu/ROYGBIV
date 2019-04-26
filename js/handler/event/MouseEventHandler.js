@@ -132,6 +132,9 @@ MouseEventHandler.prototype.onMouseUp = function(event){
 }
 
 MouseEventHandler.prototype.onMouseDown = function(event){
+  if (!isMobile){
+    mouseEventHandler.lastMouseDownTime = performance.now();
+  }
   inactiveCounter = 0;
   if (mode == 1 && screenMouseDownCallbackFunction){
     var rect = boundingClientRect;
@@ -192,6 +195,11 @@ MouseEventHandler.prototype.onClick = function(event, fromTap){
     }
     if (mode == 1 && objectsWithOnClickListeners.size == 0){
       return;
+    }
+    if (!isMobile && mouseEventHandler.lastMouseDownTime){
+      if (performance.now() - mouseEventHandler.lastMouseDownTime >= 500){
+        return;
+      }
     }
     // TRY TO PICK 2D OBJECTS FIRST
     objectPicker2D.find(event.clientX, event.clientY);
