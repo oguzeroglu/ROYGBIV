@@ -49,6 +49,9 @@ window.onload = function() {
   // SHADER PRECISION HANDLER
   shaderPrecisionHandler = new ShaderPrecisionHandler();
 
+  // PARTICLE SYSTEM GENERATOR
+  particleSystemGenerator = new ParticleSystemGenerator();
+
   // SCRIPTING UTILITY FUNCTIONS
   ROYGBIV = new Roygbiv();
   if (!isDeployment){
