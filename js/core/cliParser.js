@@ -5022,6 +5022,14 @@ function parse(input){
           terminal.printInfo(Text.PRESS_DONE_BUTTON_TO);
           terminal.disable();
           activeControl = new CustomControls({});
+          window.hiddenObjectsDueToFPSWeaponAlignmentConfiguration = [];
+          for (var i = 0; i<scene.children.length; i++){
+            var child = scene.children[i];
+            if (child.id != obj.mesh.id && child.visible){
+              child.visible = false;
+              window.hiddenObjectsDueToFPSWeaponAlignmentConfiguration.push(child);
+            }
+          }
           return true;
         break;
         case 163: //shaderPrecision

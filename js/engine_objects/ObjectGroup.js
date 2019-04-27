@@ -82,6 +82,8 @@ ObjectGroup.prototype.setPositionThresholdExceededListener = function(axis, thre
 }
 
 ObjectGroup.prototype.onFPSWeaponAlignmentUpdate = function(){
+  camera.updateMatrix();
+  camera.updateMatrixWorld();
   REUSABLE_VECTOR.set(this.fpsWeaponAlignment.x, this.fpsWeaponAlignment.y, this.fpsWeaponAlignment.z);
   REUSABLE_VECTOR.unproject(camera);
   this.mesh.position.copy(REUSABLE_VECTOR);

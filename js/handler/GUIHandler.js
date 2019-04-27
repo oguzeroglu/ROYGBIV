@@ -124,6 +124,9 @@ var GUIHandler = function(){
       terminal.printInfo(Text.DONE);
       terminal.enable();
       activeControl = new FreeControls({});
+      for (var i = 0; i<window.hiddenObjectsDueToFPSWeaponAlignmentConfiguration.length; i++){
+        window.hiddenObjectsDueToFPSWeaponAlignmentConfiguration[i].visible = true;
+      }
     }
   };
   this.shaderPrecisionParameters = {
