@@ -5075,7 +5075,7 @@ function parse(input){
           }
           var psName = splitted[1];
           if (preConfiguredParticleSystems[psName]){
-            terminal.printError(TEXTURE_NAME_MUST_BE_UNIQUE);
+            terminal.printError(Text.NAME_MUST_BE_UNIQUE);
             return true;
           }
           particleSystemCreatorGUIHandler.show(psName);

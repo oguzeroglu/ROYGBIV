@@ -386,8 +386,101 @@ ParticleSystemCreatorGUIHandler.prototype.showTrail = function(){
 
 ParticleSystemCreatorGUIHandler.prototype.showSmoke = function(){
   guiHandler.datGuiPSCreator = new dat.GUI({hideable: false});
+  var smokeParameters = {expireTime: 0, smokeSize: 10, particleSize: 5, particleCount: 100, colorName: "#ffffff", velocity: 10, acceleration: 0, randomness: 5, lifetime: 3, alphaVariation: -0.5, startDelay: 1.5, hasTexture: false, textureName: "", rgbFilter: "r,g,b"};
   particleSystemCreatorGUIHandler.addTypeController("SMOKE");
+  guiHandler.datGuiPSCreator.add(smokeParameters, "expireTime").min(0).max(50).step(0.1).onFinishChange(function(val){
+    particleSystemCreatorGUIHandler.smokeGeneratorFunc();
+  }).listen();
+  guiHandler.datGuiPSCreator.add(smokeParameters, "smokeSize").min(1).max(200).step(0.1).onFinishChange(function(val){
+    particleSystemCreatorGUIHandler.smokeGeneratorFunc();
+  }).listen();
+  guiHandler.datGuiPSCreator.add(smokeParameters, "particleSize").min(0.1).max(20).step(0.01).onFinishChange(function(val){
+    particleSystemCreatorGUIHandler.smokeGeneratorFunc();
+  }).listen();
+  guiHandler.datGuiPSCreator.add(smokeParameters, "particleCount").min(1).max(5000).step(1).onFinishChange(function(val){
+    particleSystemCreatorGUIHandler.smokeGeneratorFunc();
+  }).listen();
+  guiHandler.datGuiPSCreator.addColor(smokeParameters, "colorName").onFinishChange(function(val){
+    particleSystemCreatorGUIHandler.smokeGeneratorFunc();
+  }).listen();
+  guiHandler.datGuiPSCreator.add(smokeParameters, "velocity").min(0.1).max(500).step(0.1).onFinishChange(function(val){
+    particleSystemCreatorGUIHandler.smokeGeneratorFunc();
+  }).listen();
+  guiHandler.datGuiPSCreator.add(smokeParameters, "acceleration").min(0).max(500).step(0.1).onFinishChange(function(val){
+    particleSystemCreatorGUIHandler.smokeGeneratorFunc();
+  }).listen();
+  guiHandler.datGuiPSCreator.add(smokeParameters, "randomness").min(0).max(500).step(0.1).onFinishChange(function(val){
+    particleSystemCreatorGUIHandler.smokeGeneratorFunc();
+  }).listen();
+  guiHandler.datGuiPSCreator.add(smokeParameters, "lifetime").min(0.1).max(20).step(0.01).onFinishChange(function(val){
+    particleSystemCreatorGUIHandler.smokeGeneratorFunc();
+  }).listen();
+  guiHandler.datGuiPSCreator.add(smokeParameters, "alphaVariation").min(-1).max(0).step(0.01).onFinishChange(function(val){
+    particleSystemCreatorGUIHandler.smokeGeneratorFunc();
+  }).listen();
+  guiHandler.datGuiPSCreator.add(smokeParameters, "startDelay").min(0).max(20).step(0.01).onFinishChange(function(val){
+    particleSystemCreatorGUIHandler.smokeGeneratorFunc();
+  }).listen();
+  particleSystemCreatorGUIHandler.smokeHasTextureController = guiHandler.datGuiPSCreator.add(smokeParameters, "hasTexture").onChange(function(val){
+    if (particleSystemCreatorGUIHandler.usableTextureNames.length == 0){
+      particleSystemCreatorGUIHandler.smokeParameters.hasTexture = false;
+      return;
+    }
+    if (val){
+      guiHandler.enableController(particleSystemCreatorGUIHandler.smokeTextureNameController);
+      guiHandler.enableController(particleSystemCreatorGUIHandler.smokeRGBFilterController);
+    }else{
+      guiHandler.disableController(particleSystemCreatorGUIHandler.smokeTextureNameController);
+      guiHandler.disableController(particleSystemCreatorGUIHandler.smokeRGBFilterController);
+    }
+    particleSystemCreatorGUIHandler.smokeGeneratorFunc();
+  }).listen();
+  particleSystemCreatorGUIHandler.smokeTextureNameController = guiHandler.datGuiPSCreator.add(smokeParameters, "textureName", particleSystemCreatorGUIHandler.usableTextureNames).onChange(function(val){
+    particleSystemCreatorGUIHandler.smokeGeneratorFunc();
+  }).listen();
+  particleSystemCreatorGUIHandler.smokeRGBFilterController = guiHandler.datGuiPSCreator.add(smokeParameters, "rgbFilter").onFinishChange(function(val){
+    var splitted = val.split(",");
+    if (splitted.length == 3){
+      for (var i = 0; i<3; i++){
+        if (isNaN(splitted[i])){
+          return;
+        }
+      }
+    }
+    particleSystemCreatorGUIHandler.smokeGeneratorFunc();
+  }).listen();
+  guiHandler.disableController(particleSystemCreatorGUIHandler.smokeTextureNameController);
+  guiHandler.disableController(particleSystemCreatorGUIHandler.smokeRGBFilterController);
+  if (particleSystemCreatorGUIHandler.usableTextureNames.length == 0){
+    guiHandler.disableController(particleSystemCreatorGUIHandler.smokeHasTextureController);
+  }
+  particleSystemCreatorGUIHandler.smokeParameters = smokeParameters;
+  particleSystemCreatorGUIHandler.smokeGeneratorFunc = function(){
+    if (particleSystemCreatorGUIHandler.particleSystem){
+      scene.remove(particleSystemCreatorGUIHandler.particleSystem.mesh);
+      particleSystemCreatorGUIHandler.particleSystem = 0;
+    }
+    var params = {name: particleSystemCreatorGUIHandler.psName, position: new THREE.Vector3(0, 0, 0)};
+    for (var key in particleSystemCreatorGUIHandler.smokeParameters){
+      params[key] = particleSystemCreatorGUIHandler.smokeParameters[key];
+    }
+    if (!particleSystemCreatorGUIHandler.smokeParameters.hasTexture || particleSystemCreatorGUIHandler.smokeParameters.textureName == ""){
+      delete params.textureName;
+    }
+    if (params.rgbFilter){
+      var splitted = params.rgbFilter.split(",");
+      params.rgbFilter = new THREE.Vector3(parseFloat(splitted[0]), parseFloat(splitted[1]), parseFloat(splitted[2]));
+    }
+    particleSystemCreatorGUIHandler.particleSystem = particleSystemGenerator.generateSmoke(params);
+    particleSystemCreatorGUIHandler.particleSystem.mesh.visible = true;
+    scene.add(particleSystemCreatorGUIHandler.particleSystem.mesh);
+    particleSystemCreatorGUIHandler.preConfiguredParticleSystem = new PreconfiguredParticleSystem(particleSystemCreatorGUIHandler.psName, "SMOKE", params);
+  }
+  guiHandler.datGuiPSCreator.add({"Restart": function(){
+    particleSystemCreatorGUIHandler.smokeGeneratorFunc();
+  }}, "Restart");
   particleSystemCreatorGUIHandler.addButtonsController();
+  particleSystemCreatorGUIHandler.smokeGeneratorFunc();
 }
 
 ParticleSystemCreatorGUIHandler.prototype.showCustom = function(){
