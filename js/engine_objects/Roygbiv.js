@@ -4860,6 +4860,9 @@ Roygbiv.prototype.setVector = function(vector, x, y, z){
 
 // Returns a new THREE.Quaternion instance.
 Roygbiv.prototype.quaternion = function(){
+  if (mode == 0){
+    return;
+  }
   return new THREE.Quaternion();
 }
 
