@@ -1465,101 +1465,36 @@ Roygbiv.prototype.createPlasma = function(configurations){
     return;
   }
   preConditions.checkIfDefined(ROYGBIV.createPlasma, preConditions.configurations, configurations);
-  var name = configurations.name;
-  var position = configurations.position;
-  var expireTime = configurations.expireTime;
-  var velocity = configurations.velocity;
-  var acceleration = configurations.acceleration;
-  var radius = configurations.radius;
-  var avgParticleSpeed = configurations.avgParticleSpeed;
-  var particleCount = configurations.particleCount;
-  var particleSize = configurations.particleSize;
-  var alpha = configurations.alpha;
-  var colorName = configurations.colorName;
-  var textureName = configurations.textureName;
-  var rgbFilter = configurations.rgbFilter;
-  var alphaVariation = configurations.alphaVariation;
-
-  preConditions.checkIfMandatoryParameterExists(ROYGBIV.createPlasma, preConditions.name, name);
-  preConditions.checkIfMandatoryParameterExists(ROYGBIV.createPlasma, preConditions.position, position);
-  preConditions.checkIfVectorOnlyIfDefined(ROYGBIV.createPlasma, preConditions.position, position);
-  preConditions.checkIfMandatoryParameterExists(ROYGBIV.createPlasma, preConditions.expireTime, expireTime);
-  preConditions.checkIfNumber(ROYGBIV.createPlasma, preConditions.expireTime, expireTime);
-  preConditions.checkIfLessThanExclusive(ROYGBIV.createPlasma, preConditions.expireTime, expireTime, 0);
-  preConditions.checkIfMandatoryParameterExists(ROYGBIV.createPlasma, preConditions.velocity, velocity);
-  preConditions.checkIfVectorOnlyIfDefined(ROYGBIV.createPlasma, preConditions.velocity, velocity);
-  preConditions.checkIfMandatoryParameterExists(ROYGBIV.createPlasma, preConditions.acceleration, acceleration);
-  preConditions.checkIfVectorOnlyIfDefined(ROYGBIV.createPlasma, preConditions.acceleration, acceleration);
-  preConditions.checkIfDefined(ROYGBIV.createPlasma, preConditions.radius, radius);
-  preConditions.checkIfNumber(ROYGBIV.createPlasma, preConditions.radius, radius);
-  preConditions.checkIfLessThan(ROYGBIV.createPlasma, preConditions.radius, radius, 0);
-  preConditions.checkIfMandatoryParameterExists(ROYGBIV.createPlasma, preConditions.avgParticleSpeed, avgParticleSpeed);
-  preConditions.checkIfNumber(ROYGBIV.createPlasma, preConditions.avgParticleSpeed, avgParticleSpeed);
-  preConditions.checkIfMandatoryParameterExists(ROYGBIV.createPlasma, preConditions.particleCount, particleCount);
-  preConditions.checkIfNumber(ROYGBIV.createPlasma, preConditions.particleCount, particleCount);
-  preConditions.checkIfLessThan(ROYGBIV.createPlasma, preConditions.particleCount, particleCount, 0);
-  preConditions.checkIfMandatoryParameterExists(ROYGBIV.createPlasma, preConditions.colorName, colorName);
-  var isTextured = false;
-  if (!(typeof textureName == UNDEFINED)){
-    var texture = textures[textureName];
+  preConditions.checkIfMandatoryParameterExists(ROYGBIV.createPlasma, preConditions.name, configurations.name);
+  preConditions.checkIfMandatoryParameterExists(ROYGBIV.createPlasma, preConditions.position, configurations.position);
+  preConditions.checkIfVectorOnlyIfDefined(ROYGBIV.createPlasma, preConditions.position, configurations.position);
+  preConditions.checkIfMandatoryParameterExists(ROYGBIV.createPlasma, preConditions.expireTime, configurations.expireTime);
+  preConditions.checkIfNumber(ROYGBIV.createPlasma, preConditions.expireTime, configurations.expireTime);
+  preConditions.checkIfLessThanExclusive(ROYGBIV.createPlasma, preConditions.expireTime, configurations.expireTime, 0);
+  preConditions.checkIfMandatoryParameterExists(ROYGBIV.createPlasma, preConditions.velocity, configurations.velocity);
+  preConditions.checkIfVectorOnlyIfDefined(ROYGBIV.createPlasma, preConditions.velocity, configurations.velocity);
+  preConditions.checkIfMandatoryParameterExists(ROYGBIV.createPlasma, preConditions.acceleration, configurations.acceleration);
+  preConditions.checkIfVectorOnlyIfDefined(ROYGBIV.createPlasma, preConditions.acceleration, configurations.acceleration);
+  preConditions.checkIfDefined(ROYGBIV.createPlasma, preConditions.radius, configurations.radius);
+  preConditions.checkIfNumber(ROYGBIV.createPlasma, preConditions.radius, configurations.radius);
+  preConditions.checkIfLessThan(ROYGBIV.createPlasma, preConditions.radius, configurations.radius, 0);
+  preConditions.checkIfMandatoryParameterExists(ROYGBIV.createPlasma, preConditions.avgParticleSpeed, configurations.avgParticleSpeed);
+  preConditions.checkIfNumber(ROYGBIV.createPlasma, preConditions.avgParticleSpeed, configurations.avgParticleSpeed);
+  preConditions.checkIfMandatoryParameterExists(ROYGBIV.createPlasma, preConditions.particleCount, configurations.particleCount);
+  preConditions.checkIfNumber(ROYGBIV.createPlasma, preConditions.particleCount, configurations.particleCount);
+  preConditions.checkIfLessThan(ROYGBIV.createPlasma, preConditions.particleCount, configurations.particleCount, 0);
+  preConditions.checkIfMandatoryParameterExists(ROYGBIV.createPlasma, preConditions.colorName, configurations.colorName);
+  if (!(typeof configurations.textureName == UNDEFINED)){
+    var texture = textures[configurations.textureName];
     preConditions.checkIfTextureExists(ROYGBIV.createPlasma, preConditions.texture, texture);
     preConditions.checkIfTextureReady(ROYGBIV.createPlasma, preConditions.texture, texture);
-    isTextured = true;
   }
-  preConditions.checkIfMandatoryParameterExists(ROYGBIV.createPlasma, preConditions.particleSize, particleSize);
-  preConditions.checkIfNumberOnlyIfExists(ROYGBIV.createPlasma, preConditions.alpha, alpha);
-  preConditions.checkIfInRangeOnlyIfDefined(ROYGBIV.createPlasma, preConditions.alpha, alpha, 0, 1);
-  preConditions.checkIfVectorOnlyIfDefined(ROYGBIV.createPlasma, preConditions.rgbFilter, rgbFilter);
-  if (typeof alpha == UNDEFINED){
-    alpha = 1;
-  }
-  var alphaVariationSet = false;
-  if (!(typeof alphaVariation == UNDEFINED)){
-    preConditions.checkIfNumber(ROYGBIV.createPlasma, preConditions.alphaVariation, alphaVariation);
-    alphaVariationSet = true;
-  }
-  var particleMaterialConfigurations = new Object();
-  particleMaterialConfigurations.color = colorName;
-  particleMaterialConfigurations.size = particleSize;
-  particleMaterialConfigurations.alpha = alpha;
-  if (isTextured){
-    particleMaterialConfigurations.textureName = textureName;
-  }
-  if (rgbFilter){
-    particleMaterialConfigurations.rgbFilter = rgbFilter;
-  }
-
-  var particleMaterial = this.createParticleMaterial(particleMaterialConfigurations);
-  var particles = [];
-  var particleConfigurations = new Object();
-  if (alphaVariationSet){
-    particleConfigurations.alphaVariationMode = ALPHA_VARIATION_MODE_SIN;
-    particleConfigurations.alphaVariation = alphaVariation;
-  }
-  particleConfigurations.motionMode = MOTION_MODE_CIRCULAR;
-  particleConfigurations.angularMotionRadius = radius;
-  var tmpVec = ROYGBIV.vector(0, 1, 0);
-  for (var i = 0; i < particleCount; i++){
-    particleConfigurations.angularVelocity = avgParticleSpeed * (Math.random() - 0.5);
-    particleConfigurations.initialAngle = 360 * Math.random();
-    particleConfigurations.angularQuaternion = ROYGBIV.computeQuaternionFromVectors(
-      tmpVec, ROYGBIV.vector(
-        radius * (Math.random() - 0.5), radius * (Math.random() - 0.5) , radius * (Math.random() - 0.5)
-      ));
-    particleConfigurations.material = particleMaterial;
-    particleConfigurations.lifetime = 0;
-    particleConfigurations.respawn = false;
-    particles.push(this.createParticle(particleConfigurations));
-  }
-
-  var particleSystemConfigurations = new Object();
-  particleSystemConfigurations.name = name;
-  particleSystemConfigurations.particles = particles;
-  particleSystemConfigurations.position = position;
-  particleSystemConfigurations.velocity = velocity;
-  particleSystemConfigurations.acceleration = acceleration;
-  particleSystemConfigurations.lifetime = expireTime;
-  return this.createParticleSystem(particleSystemConfigurations);
+  preConditions.checkIfMandatoryParameterExists(ROYGBIV.createPlasma, preConditions.particleSize, configurations.particleSize);
+  preConditions.checkIfNumberOnlyIfExists(ROYGBIV.createPlasma, preConditions.alpha, configurations.alpha);
+  preConditions.checkIfInRangeOnlyIfDefined(ROYGBIV.createPlasma, preConditions.alpha, configurations.alpha, 0, 1);
+  preConditions.checkIfVectorOnlyIfDefined(ROYGBIV.createPlasma, preConditions.rgbFilter, configurations.rgbFilter);
+  preConditions.checkIfNumberOnlyIfExists(ROYGBIV.createPlasma, preConditions.alphaVariation, configurations.alphaVariation);
+  return particleSystemGenerator.generatePlasma(configurations);
 }
 
 // Returns a fire explosion particle system. The configurations are:

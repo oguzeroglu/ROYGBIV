@@ -2,6 +2,60 @@ var ParticleSystemGenerator = function(){
 
 }
 
+ParticleSystemGenerator.prototype.generatePlasma = function(configurations){
+  var name = configurations.name;
+  var position = configurations.position;
+  var expireTime = configurations.expireTime;
+  var velocity = configurations.velocity;
+  var acceleration = configurations.acceleration;
+  var radius = configurations.radius;
+  var avgParticleSpeed = configurations.avgParticleSpeed;
+  var particleCount = configurations.particleCount;
+  var particleSize = configurations.particleSize;
+  var alpha = (!(typeof configurations.alpha == UNDEFINED))? configurations.alpha: 1;
+  var colorName = configurations.colorName;
+  var textureName = configurations.textureName;
+  var rgbFilter = configurations.rgbFilter;
+  var alphaVariation = configurations.alphaVariation;
+  var particleMaterialConfigurations = new Object();
+  particleMaterialConfigurations.color = colorName;
+  particleMaterialConfigurations.size = particleSize;
+  particleMaterialConfigurations.alpha = alpha;
+  if (!(typeof textureName == UNDEFINED)){
+    particleMaterialConfigurations.textureName = textureName;
+  }
+  if (rgbFilter){
+    particleMaterialConfigurations.rgbFilter = rgbFilter;
+  }
+  var particleMaterial = this.generateParticleMaterial(particleMaterialConfigurations);
+  var particles = [];
+  var particleConfigurations = new Object();
+  if (!(typeof alphaVariation == UNDEFINED)){
+    particleConfigurations.alphaVariationMode = ALPHA_VARIATION_MODE_SIN;
+    particleConfigurations.alphaVariation = alphaVariation;
+  }
+  particleConfigurations.motionMode = MOTION_MODE_CIRCULAR;
+  particleConfigurations.angularMotionRadius = radius;
+  var tmpVec = new THREE.Vector3(0, 1, 0);
+  for (var i = 0; i < particleCount; i++){
+    particleConfigurations.angularVelocity = avgParticleSpeed * (Math.random() - 0.5);
+    particleConfigurations.initialAngle = 360 * Math.random();
+    particleConfigurations.angularQuaternion = ROYGBIV.computeQuaternionFromVectors(tmpVec, new THREE.Vector3(radius * (Math.random() - 0.5), radius * (Math.random() - 0.5) , radius * (Math.random() - 0.5)));
+    particleConfigurations.material = particleMaterial;
+    particleConfigurations.lifetime = 0;
+    particleConfigurations.respawn = false;
+    particles.push(this.generateParticle(particleConfigurations));
+  }
+  var particleSystemConfigurations = new Object();
+  particleSystemConfigurations.name = name;
+  particleSystemConfigurations.particles = particles;
+  particleSystemConfigurations.position = position;
+  particleSystemConfigurations.velocity = velocity;
+  particleSystemConfigurations.acceleration = acceleration;
+  particleSystemConfigurations.lifetime = expireTime;
+  return this.generateParticleSystem(particleSystemConfigurations);
+}
+
 ParticleSystemGenerator.prototype.generateParticleMaterial = function(configurations){
   var color = configurations.color;
   var size = configurations.size;
