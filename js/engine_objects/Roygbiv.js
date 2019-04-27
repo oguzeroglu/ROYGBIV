@@ -192,7 +192,8 @@ var Roygbiv = function(){
     "setActiveControl",
     "createFPSControl",
     "setScreenDragListener",
-    "removeScreenDragListener"
+    "removeScreenDragListener",
+    "createOrbitControl"
   ];
 
   this.globals = new Object();
@@ -4459,6 +4460,44 @@ Roygbiv.prototype.createFPSControl = function(parameters){
   preConditions.checkIfAlreadyUsedAsFPSWeaponOnlyIfExists(ROYGBIV.createFPSControl, preConditions.weaponObject2, parameters.weaponObject2);
   preConditions.checkIfTrue(ROYGBIV.createFPSControl, "Player body object cannot have set colllision listener.", collisionCallbackRequests.has(parameters.playerBodyObject.name));
   return new FPSControls(parameters);
+}
+
+// Creates a new OrbitControl object. Using the OrbitControl, camera can orbit
+// around a specified point by looking at it on each frame. Camera can move freely
+// around the surface of an imaginary sphere. Controls are:
+// For desktop:
+// Mouse wheel/Mouse drag: Rotate
+// Right/Left/D/A/Q: Rotate
+// Up/Down/W/S/Z: Zoom in/out
+// Space: Zoom in/out
+// For mobile:
+// Finger pinch zoom: Zoom in/out
+// Finger touch: Rotate
+// Configurations are:
+// lookPosition (optional): A vector defining the look position and the center of the imaginary sphere. Default value is (0, 0, 0).
+// maxRadius (optional): The maximum radius of the imaginary sphere that the camera can zoom out to. Default
+// value is 150.
+// minRadius (optional): The minimum radius of the imaginary sphere that the camera can zoom in to. Default
+// value is 50.
+// zoomDelta (optional): The difference of radius when the user performs a zoom in/out. Default value is 1.
+// mouseWheelRotationSpeed (optional): The speed of mouse wheel rotation. Default value is 3.
+// mouseDragRotationSpeed (optional): The speed of mouse drag rotation. Default value is 20.
+// fingerSwipeRotationSpeed (optional): The speed of finger touch rotation for mobile devices. Default value is 20.
+// keyboardRotationSpeed (optional): The speed of rotation using keyboard events. Default value is 10.
+Roygbiv.prototype.createOrbitControl = function(parameters){
+  if (mode == 0){
+    return;
+  }
+  preConditions.checkIfDefined(ROYGBIV.createOrbitControl, preConditions.parameters, parameters);
+  preConditions.checkIfVectorOnlyIfDefined(ROYGBIV.createOrbitControl, preConditions.lookPosition, parameters.lookPosition);
+  preConditions.checkIfNumberOnlyIfExists(ROYGBIV.createOrbitControl, preConditions.maxRadius, parameters.maxRadius);
+  preConditions.checkIfNumberOnlyIfExists(ROYGBIV.createOrbitControl, preConditions.minRadius, parameters.minRadius);
+  preConditions.checkIfNumberOnlyIfExists(ROYGBIV.createOrbitControl, preConditions.zoomDelta, parameters.zoomDelta);
+  preConditions.checkIfNumberOnlyIfExists(ROYGBIV.createOrbitControl, preConditions.mouseWheelRotationSpeed, parameters.mouseWheelRotationSpeed);
+  preConditions.checkIfNumberOnlyIfExists(ROYGBIV.createOrbitControl, preConditions.mouseDragRotationSpeed, parameters.mouseDragRotationSpeed);
+  preConditions.checkIfNumberOnlyIfExists(ROYGBIV.createOrbitControl, preConditions.fingerSwipeRotationSpeed, parameters.fingerSwipeRotationSpeed);
+  preConditions.checkIfNumberOnlyIfExists(ROYGBIV.createOrbitControl, preConditions.keyboardRotationSpeed, parameters.keyboardRotationSpeed);
+  return new OrbitControls(parameters);
 }
 
 // UTILITY FUNCTIONS ***********************************************************

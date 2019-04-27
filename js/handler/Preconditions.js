@@ -202,6 +202,14 @@ var Preconditions = function(){
   this.skipList = "skipList";
   this.onDrag = "onDrag";
   this.mouseDragSpeed = "mouseDragSpeed";
+  this.lookPosition = "lookPosition";
+  this.maxRadius = "maxRadius";
+  this.minRadius = "minRadius";
+  this.zoomDelta = "zoomDelta";
+  this.mouseWheelRotationSpeed = "mouseWheelRotationSpeed";
+  this.mouseDragRotationSpeed = "mouseDragRotationSpeed";
+  this.fingerSwipeRotationSpeed = "fingerSwipeRotationSpeed";
+  this.keyboardRotationSpeed = "keyboardRotationSpeed";
 }
 
 Preconditions.prototype.errorHeader = function(callerFunc){

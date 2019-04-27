@@ -1009,4 +1009,22 @@ var Text = function(){
 
   this.ROYGBIV_SCRIPTING_API_SETSCREENDRAGLISTENER = "Sets a mouse drag listener for the screen. The callbackFunction is executed with x, y, movementX and movementY parameters.";
   this.ROYGBIV_SCRIPTING_API_REMOVESCREENDRAGLISTENER = "Removes the screen drag listener.";
+  this.ROYGBIV_SCRIPTING_API_CREATEORBITCONTROL = "Creates a new OrbitControl object. Using the OrbitControl, camera can orbit around a specified point by looking at it on each frame.\nCamera can move freely around the surface of an imaginary sphere. Controls are:\n"+
+                                                  "For desktop:\n"+
+                                                  "Mouse wheel/Mouse drag: Rotate\n"+
+                                                  "Right/Left/D/A/Q: Rotate\n"+
+                                                  "Up/Down/W/S/Z: Zoom in/out\n"+
+                                                  "Space: Zoom in/out\n"+
+                                                  "For mobile:\n"+
+                                                  "Finger pinch zoom: Zoom in/out\n"+
+                                                  "Finger touch: Rotate\n"+
+                                                  "Configurations are:\n"+
+                                                  "lookPosition (optional): A vector defining the look position and the center of the imaginary sphere. Default value is (0, 0, 0).\n"+
+                                                  "maxRadius (optional): The maximum radius of the imaginary sphere that the camera can zoom out to. Default value is 150.\n"+
+                                                  "minRadius (optional): The minimum radius of the imaginary sphere that the camera can zoom in to. Default value is 50.\n"+
+                                                  "zoomDelta (optional): The difference of radius when the user performs a zoom in/out. Default value is 1.\n"+
+                                                  "mouseWheelRotationSpeed (optional): The speed of mouse wheel rotation. Default value is 3.\n"+
+                                                  "mouseDragRotationSpeed (optional): The speed of mouse drag rotation. Default value is 20.\n"+
+                                                  "fingerSwipeRotationSpeed (optional): The speed of finger touch rotation for mobile devices. Default value is 20.\n"+
+                                                  "keyboardRotationSpeed (optional): The speed of rotation using keyboard events. Default value is 10.";
 }
