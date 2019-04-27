@@ -1680,130 +1680,46 @@ Roygbiv.prototype.createMagicCircle = function(configurations){
     return;
   }
   preConditions.checkIfDefined(ROYGBIV.createMagicCircle, preConditions.configurations, configurations);
-  var name = configurations.name;
-  var position = configurations.position;
-  var particleCount = configurations.particleCount;
-  var expireTime = configurations.expireTime;
-  var speed = configurations.speed;
-  var acceleration = configurations.acceleration;
-  var radius = configurations.radius;
-  var circleNormal = configurations.circleNormal;
-  var circleDistortionCoefficient = configurations.circleDistortionCoefficient;
-  var lifetime = configurations.lifetime;
-  var angleStep = configurations.angleStep;
-  var particleSize = configurations.particleSize;
-  var colorName = configurations.colorName;
-  var targetColorName = configurations.targetColorName;
-  var colorStep = configurations.colorStep;
-  var alpha = configurations.alpha;
-  var alphaVariation = configurations.alphaVariation;
-  var alphaVariationMode = configurations.alphaVariationMode;
-  var textureName = configurations.textureName;
-  var rgbFilter = configurations.rgbFilter;
-  var updateFunction = configurations.updateFunction;
-
-  preConditions.checkIfMandatoryParameterExists(ROYGBIV.createMagicCircle, preConditions.name, name);
-  preConditions.checkIfTrue(ROYGBIV.createMagicCircle, "name must be unique.", (particleSystemPool[name]));
-  preConditions.checkIfMandatoryParameterExists(ROYGBIV.createMagicCircle, preConditions.position, position);
-  preConditions.checkIfVectorOnlyIfDefined(ROYGBIV.createMagicCircle, preConditions.position, position);
-  preConditions.checkIfMandatoryParameterExists(ROYGBIV.createMagicCircle, preConditions.particleCount, particleCount);
-  preConditions.checkIfNumber(ROYGBIV.createMagicCircle, preConditions.particleCount, particleCount);
-  preConditions.checkIfLessThan(ROYGBIV.createMagicCircle, preConditions.particleCount, particleCount);
-  preConditions.checkIfMandatoryParameterExists(ROYGBIV.createMagicCircle, preConditions.expireTime, expireTime);
-  preConditions.checkIfNumber(ROYGBIV.createMagicCircle, preConditions.expireTime, expireTime);
-  preConditions.checkIfLessThanExclusive(ROYGBIV.createMagicCircle, preConditions.expireTime, expireTime);
-  preConditions.checkIfMandatoryParameterExists(ROYGBIV.createMagicCircle, preConditions.speed, speed);
-  preConditions.checkIfNumber(ROYGBIV.createMagicCircle, preConditions.speed, speed);
-  preConditions.checkIfMandatoryParameterExists(ROYGBIV.createMagicCircle, preConditions.acceleration, acceleration);
-  preConditions.checkIfNumber(ROYGBIV.createMagicCircle, preConditions.acceleration, acceleration);
-  preConditions.checkIfMandatoryParameterExists(ROYGBIV.createMagicCircle, preConditions.radius, radius);
-  preConditions.checkIfNumber(ROYGBIV.createMagicCircle, preConditions.radius, radius);
-  preConditions.checkIfVectorOnlyIfDefined(ROYGBIV.createMagicCircle, preConditions.circleNormal, circleNormal);
-  preConditions.checkIfNumberOnlyIfExists(ROYGBIV.createMagicCircle, preConditions.circleDistortionCoefficient, circleDistortionCoefficient);
-  preConditions.checkIfNumberOnlyIfExists(ROYGBIV.createMagicCircle, preConditions.lifetime, lifetime);
-  preConditions.checkIfLessThanExclusiveOnlyIfExists(ROYGBIV.createMagicCircle, preConditions.lifetime, lifetime, 0);
-  preConditions.checkIfNumberOnlyIfExists(ROYGBIV.createMagicCircle, preConditions.angleStep, angleStep);
-  preConditions.checkIfMandatoryParameterExists(ROYGBIV.createMagicCircle, preConditions.particleSize, particleSize);
-  preConditions.checkIfNumber(ROYGBIV.createMagicCircle, preConditions.particleSize, particleSize);
-  preConditions.checkIfLessThan(ROYGBIV.createMagicCircle, preConditions.particleSize, particleSize);
-  preConditions.checkIfMandatoryParameterExists(ROYGBIV.createMagicCircle, preConditions.colorName, colorName);
-  preConditions.checkIfNumberOnlyIfExists(ROYGBIV.createMagicCircle, preConditions.colorStep, colorStep);
-  preConditions.checkIfInRangeOnlyIfDefined(ROYGBIV.createMagicCircle, preConditions.colorStep, colorStep, 0, 1);
-  preConditions.checkIfMandatoryParameterExists(ROYGBIV.createMagicCircle, preConditions.alpha, alpha);
-  preConditions.checkIfNumber(ROYGBIV.createMagicCircle, preConditions.alpha, alpha);
-  preConditions.checkIfInRange(ROYGBIV.createMagicCircle, preConditions.alpha, alpha, 0, 1);
-  preConditions.checkIfNumberOnlyIfExists(ROYGBIV.createMagicCircle, preConditions.alphaVariation, alphaVariation);
-  preConditions.checkIfAlphaVariationModeOnlyIfExists(ROYGBIV.createMagicCircle, preConditions.alphaVariationMode, alphaVariationMode);
-  preConditions.checkIfVectorOnlyIfDefined(ROYGBIV.createMagicCircle, preConditions.rgbFilter, rgbFilter);
-  preConditions.checkIfFunctionOnlyIfExists(ROYGBIV.createMagicCircle, preConditions.updateFunction, updateFunction);
-  if (typeof circleNormal == UNDEFINED){
-    circleNormal = this.vector(0, 1, 0);
-  }
-  if (typeof circleDistortionCoefficient == UNDEFINED){
-    circleDistortionCoefficient = 1;
-  }
-  if (typeof lifetime == UNDEFINED){
-    lifetime = 0;
-  }
-  if (typeof angleStep == UNDEFINED){
-    angleStep = 0;
-  }
-  if (typeof alphaVariation == UNDEFINED){
-    alphaVariation = 0;
-  }
-  if (typeof alphaVariationMode == UNDEFINED){
-    alphaVariationMode = ALPHA_VARIATION_MODE_NORMAL;
-  }
-  if (!(typeof textureName == UNDEFINED)){
-    var texture = textures[textureName];
+  preConditions.checkIfMandatoryParameterExists(ROYGBIV.createMagicCircle, preConditions.name, configurations.name);
+  preConditions.checkIfTrue(ROYGBIV.createMagicCircle, "name must be unique.", (particleSystemPool[configurations.name]));
+  preConditions.checkIfMandatoryParameterExists(ROYGBIV.createMagicCircle, preConditions.position, configurations.position);
+  preConditions.checkIfVectorOnlyIfDefined(ROYGBIV.createMagicCircle, preConditions.position, configurations.position);
+  preConditions.checkIfMandatoryParameterExists(ROYGBIV.createMagicCircle, preConditions.particleCount, configurations.particleCount);
+  preConditions.checkIfNumber(ROYGBIV.createMagicCircle, preConditions.particleCount, configurations.particleCount);
+  preConditions.checkIfLessThan(ROYGBIV.createMagicCircle, preConditions.particleCount, configurations.particleCount);
+  preConditions.checkIfMandatoryParameterExists(ROYGBIV.createMagicCircle, preConditions.expireTime, configurations.expireTime);
+  preConditions.checkIfNumber(ROYGBIV.createMagicCircle, preConditions.expireTime, configurations.expireTime);
+  preConditions.checkIfLessThanExclusive(ROYGBIV.createMagicCircle, preConditions.expireTime, configurations.expireTime);
+  preConditions.checkIfMandatoryParameterExists(ROYGBIV.createMagicCircle, preConditions.speed, configurations.speed);
+  preConditions.checkIfNumber(ROYGBIV.createMagicCircle, preConditions.speed, configurations.speed);
+  preConditions.checkIfMandatoryParameterExists(ROYGBIV.createMagicCircle, preConditions.acceleration, configurations.acceleration);
+  preConditions.checkIfNumber(ROYGBIV.createMagicCircle, preConditions.acceleration, configurations.acceleration);
+  preConditions.checkIfMandatoryParameterExists(ROYGBIV.createMagicCircle, preConditions.radius, configurations.radius);
+  preConditions.checkIfNumber(ROYGBIV.createMagicCircle, preConditions.radius, configurations.radius);
+  preConditions.checkIfVectorOnlyIfDefined(ROYGBIV.createMagicCircle, preConditions.circleNormal, configurations.circleNormal);
+  preConditions.checkIfNumberOnlyIfExists(ROYGBIV.createMagicCircle, preConditions.circleDistortionCoefficient, configurations.circleDistortionCoefficient);
+  preConditions.checkIfNumberOnlyIfExists(ROYGBIV.createMagicCircle, preConditions.lifetime, configurations.lifetime);
+  preConditions.checkIfLessThanExclusiveOnlyIfExists(ROYGBIV.createMagicCircle, preConditions.lifetime, configurations.lifetime, 0);
+  preConditions.checkIfNumberOnlyIfExists(ROYGBIV.createMagicCircle, preConditions.angleStep, configurations.angleStep);
+  preConditions.checkIfMandatoryParameterExists(ROYGBIV.createMagicCircle, preConditions.particleSize, configurations.particleSize);
+  preConditions.checkIfNumber(ROYGBIV.createMagicCircle, preConditions.particleSize, configurations.particleSize);
+  preConditions.checkIfLessThan(ROYGBIV.createMagicCircle, preConditions.particleSize, configurations.particleSize, 0);
+  preConditions.checkIfMandatoryParameterExists(ROYGBIV.createMagicCircle, preConditions.colorName, configurations.colorName);
+  preConditions.checkIfNumberOnlyIfExists(ROYGBIV.createMagicCircle, preConditions.colorStep, configurations.colorStep);
+  preConditions.checkIfInRangeOnlyIfDefined(ROYGBIV.createMagicCircle, preConditions.colorStep, configurations.colorStep, 0, 1);
+  preConditions.checkIfMandatoryParameterExists(ROYGBIV.createMagicCircle, preConditions.alpha, configurations.alpha);
+  preConditions.checkIfNumber(ROYGBIV.createMagicCircle, preConditions.alpha, configurations.alpha);
+  preConditions.checkIfInRange(ROYGBIV.createMagicCircle, preConditions.alpha, configurations.alpha, 0, 1);
+  preConditions.checkIfNumberOnlyIfExists(ROYGBIV.createMagicCircle, preConditions.alphaVariation, configurations.alphaVariation);
+  preConditions.checkIfAlphaVariationModeOnlyIfExists(ROYGBIV.createMagicCircle, preConditions.alphaVariationMode, configurations.alphaVariationMode);
+  preConditions.checkIfVectorOnlyIfDefined(ROYGBIV.createMagicCircle, preConditions.rgbFilter, configurations.rgbFilter);
+  preConditions.checkIfFunctionOnlyIfExists(ROYGBIV.createMagicCircle, preConditions.updateFunction, configurations.updateFunction);
+  if (!(typeof configurations.textureName == UNDEFINED)){
+    var texture = textures[configurations.textureName];
     preConditions.checkIfTextureExists(ROYGBIV.createMagicCircle, preConditions.texture, texture);
     preConditions.checkIfTextureReady(ROYGBIV.createMagicCircle, preConditions.texture, texture);
   }
-
-  var particleMaterialConfigurations = new Object();
-  particleMaterialConfigurations.color = colorName;
-  particleMaterialConfigurations.size = particleSize;
-  particleMaterialConfigurations.alpha = alpha;
-  particleMaterialConfigurations.textureName = textureName;
-  particleMaterialConfigurations.rgbFilter = rgbFilter;
-  particleMaterialConfigurations.targetColor = targetColorName;
-  particleMaterialConfigurations.colorStep = colorStep;
-  var particleMaterial = this.createParticleMaterial(particleMaterialConfigurations);
-  var particles = [];
-  var particleConfigurations = new Object();
-  particleConfigurations.material = particleMaterial;
-  particleConfigurations.angularVelocity = speed;
-  particleConfigurations.angularAcceleration = acceleration;
-  particleConfigurations.lifetime = lifetime;
-  particleConfigurations.respawn = true;
-  particleConfigurations.motionMode = MOTION_MODE_CIRCULAR;
-  particleConfigurations.alphaVariation = alphaVariation;
-  particleConfigurations.alphaVariationMode = alphaVariationMode;
-  var referenceQuaternion = this.computeQuaternionFromVectors(
-    this.vector(0, 1, 0), circleNormal
-  );
-  var angularCounter = 0;
-  for (var i = 0; i<particleCount; i++){
-    particleConfigurations.angularMotionRadius = radius +
-                      (circleDistortionCoefficient * (Math.random() - 0.5));
-    if (angleStep == 0){
-      particleConfigurations.initialAngle = 1000 * Math.random();
-    }else{
-      particleConfigurations.initialAngle = angularCounter;
-      angularCounter += angleStep;
-    }
-    particleConfigurations.angularQuaternion = referenceQuaternion;
-    particles.push(this.createParticle(particleConfigurations));
-  }
-
-  var particleSystemConfigurations = new Object();
-  particleSystemConfigurations.name = name;
-  particleSystemConfigurations.particles = particles;
-  particleSystemConfigurations.position = position;
-  particleSystemConfigurations.lifetime = expireTime;
-  particleSystemConfigurations.updateFunction = updateFunction;
-  return this.createParticleSystem(particleSystemConfigurations);
-
+  return particleSystemGenerator.generateMagicCircle(configurations);
 }
 
 // Creates a circular explosion effect. The configurations are:

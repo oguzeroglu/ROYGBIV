@@ -18,6 +18,69 @@ ParticleSystemGenerator.prototype.computeQuaternionFromVectors = function(vec1, 
   return REUSABLE_QUATERNION.clone();
 }
 
+ParticleSystemGenerator.prototype.generateMagicCircle = function(configurations){
+  var name = configurations.name;
+  var position = configurations.position;
+  var particleCount = configurations.particleCount;
+  var expireTime = configurations.expireTime;
+  var speed = configurations.speed;
+  var acceleration = configurations.acceleration;
+  var radius = configurations.radius;
+  var circleNormal = (!(typeof configurations.circleNormal == UNDEFINED))? configurations.circleNormal: new THREE.Vector3(0, 1, 0);
+  var circleDistortionCoefficient = (!(typeof configurations.circleDistortionCoefficient == UNDEFINED))? configurations.circleDistortionCoefficient: 1;
+  var lifetime = (!(typeof configurations.lifetime == UNDEFINED))? configurations.lifetime: 0;
+  var angleStep = (!(typeof configurations.angleStep == UNDEFINED))? configurations.angleStep: 0;
+  var particleSize = configurations.particleSize;
+  var colorName = configurations.colorName;
+  var targetColorName = configurations.targetColorName;
+  var colorStep = configurations.colorStep;
+  var alpha = configurations.alpha;
+  var alphaVariation = (!(typeof configurations.alphaVariation == UNDEFINED))? configurations.alphaVariation: 0;
+  var alphaVariationMode = (!(typeof configurations.alphaVariationMode == UNDEFINED))? configurations.alphaVariationMode: ALPHA_VARIATION_MODE_NORMAL;
+  var textureName = configurations.textureName;
+  var rgbFilter = configurations.rgbFilter;
+  var updateFunction = configurations.updateFunction;
+  var particleMaterialConfigurations = new Object();
+  particleMaterialConfigurations.color = colorName;
+  particleMaterialConfigurations.size = particleSize;
+  particleMaterialConfigurations.alpha = alpha;
+  particleMaterialConfigurations.textureName = textureName;
+  particleMaterialConfigurations.rgbFilter = rgbFilter;
+  particleMaterialConfigurations.targetColor = targetColorName;
+  particleMaterialConfigurations.colorStep = colorStep;
+  var particleMaterial = this.generateParticleMaterial(particleMaterialConfigurations);
+  var particles = [];
+  var particleConfigurations = new Object();
+  particleConfigurations.material = particleMaterial;
+  particleConfigurations.angularVelocity = speed;
+  particleConfigurations.angularAcceleration = acceleration;
+  particleConfigurations.lifetime = lifetime;
+  particleConfigurations.respawn = true;
+  particleConfigurations.motionMode = MOTION_MODE_CIRCULAR;
+  particleConfigurations.alphaVariation = alphaVariation;
+  particleConfigurations.alphaVariationMode = alphaVariationMode;
+  var referenceQuaternion = this.computeQuaternionFromVectors(new THREE.Vector3(0, 1, 0), circleNormal);
+  var angularCounter = 0;
+  for (var i = 0; i<particleCount; i++){
+    particleConfigurations.angularMotionRadius = radius + (circleDistortionCoefficient * (Math.random() - 0.5));
+    if (angleStep == 0){
+      particleConfigurations.initialAngle = 1000 * Math.random();
+    }else{
+      particleConfigurations.initialAngle = angularCounter;
+      angularCounter += angleStep;
+    }
+    particleConfigurations.angularQuaternion = referenceQuaternion;
+    particles.push(this.generateParticle(particleConfigurations));
+  }
+  var particleSystemConfigurations = new Object();
+  particleSystemConfigurations.name = name;
+  particleSystemConfigurations.particles = particles;
+  particleSystemConfigurations.position = position;
+  particleSystemConfigurations.lifetime = expireTime;
+  particleSystemConfigurations.updateFunction = updateFunction;
+  return this.generateParticleSystem(particleSystemConfigurations);
+}
+
 ParticleSystemGenerator.prototype.generatePlasma = function(configurations){
   var name = configurations.name;
   var position = configurations.position;

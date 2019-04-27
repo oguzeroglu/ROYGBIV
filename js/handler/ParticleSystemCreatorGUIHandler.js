@@ -72,7 +72,7 @@ ParticleSystemCreatorGUIHandler.prototype.addTypeController = function(type){
   this.typeParam["Type"] = type;
   this.typeController = guiHandler.datGuiPSCreator.add(this.typeParam, "Type", this.typesAry).onChange(function(val){
     if (particleSystemCreatorGUIHandler.particleSystem){
-      scene.remove(particleSystemCreatorGUIHandler.particleSystem);
+      scene.remove(particleSystemCreatorGUIHandler.particleSystem.mesh);
       particleSystemCreatorGUIHandler.particleSystem = 0;
     }
     guiHandler.hideAll();
@@ -121,7 +121,69 @@ ParticleSystemCreatorGUIHandler.prototype.showCircularExplosion = function(){
 ParticleSystemCreatorGUIHandler.prototype.showMagicCircle = function(){
   guiHandler.datGuiPSCreator = new dat.GUI({hideable: false});
   particleSystemCreatorGUIHandler.addTypeController("MAGIC_CIRCLE");
+  var magicCircleParameters = {particleCount: 100, expireTime: 0, speed: 10, acceleration: 0, radius: 10, circleDistortionCoefficient: 0, lifetime: 0, angleStep: 0, particleSize: 5, colorName: "#ffffff", hasTargetColor: false, alpha: 1, hasAlphaVariation: false, hasTexture: false};
+  guiHandler.datGuiPSCreator.add(magicCircleParameters, "particleCount").min(1).max(5000).step(1).onFinishChange(function(val){
+    particleSystemCreatorGUIHandler.magicCircleGeneratorFunc();
+  }).listen();
+  guiHandler.datGuiPSCreator.add(magicCircleParameters, "expireTime").min(0).max(50).step(0.1).onFinishChange(function(val){
+    particleSystemCreatorGUIHandler.magicCircleGeneratorFunc();
+  }).listen();
+  guiHandler.datGuiPSCreator.add(magicCircleParameters, "speed").min(0.1).max(5000).step(0.1).onFinishChange(function(val){
+    particleSystemCreatorGUIHandler.magicCircleGeneratorFunc();
+  }).listen();
+  guiHandler.datGuiPSCreator.add(magicCircleParameters, "acceleration").min(0).max(1000).step(0.1).onFinishChange(function(val){
+    particleSystemCreatorGUIHandler.magicCircleGeneratorFunc();
+  }).listen();
+  guiHandler.datGuiPSCreator.add(magicCircleParameters, "radius").min(0.1).max(1000).step(0.1).onFinishChange(function(val){
+    particleSystemCreatorGUIHandler.magicCircleGeneratorFunc();
+  }).listen();
+  guiHandler.datGuiPSCreator.add(magicCircleParameters, "circleDistortionCoefficient").min(0).max(1000).onFinishChange(function(val){
+    particleSystemCreatorGUIHandler.magicCircleGeneratorFunc();
+  }).listen();
+  guiHandler.datGuiPSCreator.add(magicCircleParameters, "lifetime").min(0).max(100).step(0.1).onFinishChange(function(val){
+    particleSystemCreatorGUIHandler.magicCircleGeneratorFunc();
+  }).listen();
+  guiHandler.datGuiPSCreator.add(magicCircleParameters, "angleStep").min(0).max(100).step(0.1).onFinishChange(function(val){
+    particleSystemCreatorGUIHandler.magicCircleGeneratorFunc();
+  }).listen();
+  guiHandler.datGuiPSCreator.add(magicCircleParameters, "particleSize").min(0.1).max(100).step(0.1).onFinishChange(function(val){
+    particleSystemCreatorGUIHandler.magicCircleGeneratorFunc();
+  }).listen();
+  guiHandler.datGuiPSCreator.addColor(magicCircleParameters, "colorName").onFinishChange(function(val){
+    particleSystemCreatorGUIHandler.magicCircleGeneratorFunc();
+  }).listen();
+  guiHandler.datGuiPSCreator.add(magicCircleParameters, "alpha").min(0).max(1).step(0.1).onFinishChange(function(val){
+    particleSystemCreatorGUIHandler.magicCircleGeneratorFunc();
+  }).listen();
+  guiHandler.datGuiPSCreator.add(magicCircleParameters, "hasTargetColor").onChange(function(val){
+
+  }).listen();
+  guiHandler.datGuiPSCreator.add(magicCircleParameters, "hasAlphaVariation").onChange(function(val){
+
+  }).listen();
+  guiHandler.datGuiPSCreator.add(magicCircleParameters, "hasTexture").onChange(function(val){
+
+  }).listen();
+  guiHandler.datGuiPSCreator.add({"Restart": function(){
+    particleSystemCreatorGUIHandler.magicCircleGeneratorFunc();
+  }}, "Restart");
   particleSystemCreatorGUIHandler.addButtonsController();
+  particleSystemCreatorGUIHandler.magicCircleGeneratorFunc = function(){
+    if (particleSystemCreatorGUIHandler.particleSystem){
+      scene.remove(particleSystemCreatorGUIHandler.particleSystem.mesh);
+      particleSystemCreatorGUIHandler.particleSystem = 0;
+    }
+    var params = {name: particleSystemCreatorGUIHandler.psName, position: new THREE.Vector3(0, 0, 0)};
+    for (var key in particleSystemCreatorGUIHandler.magicCircleParameters){
+      params[key] = particleSystemCreatorGUIHandler.magicCircleParameters[key];
+    }
+    particleSystemCreatorGUIHandler.particleSystem = particleSystemGenerator.generateMagicCircle(params);
+    particleSystemCreatorGUIHandler.particleSystem.mesh.visible = true;
+    scene.add(particleSystemCreatorGUIHandler.particleSystem.mesh);
+    particleSystemCreatorGUIHandler.preConfiguredParticleSystem = new PreconfiguredParticleSystem(particleSystemCreatorGUIHandler.psName, "MAGIC_CIRCLE", params);
+  }
+  particleSystemCreatorGUIHandler.magicCircleParameters = magicCircleParameters;
+  particleSystemCreatorGUIHandler.magicCircleGeneratorFunc();
 }
 
 ParticleSystemCreatorGUIHandler.prototype.showFireExplosion = function(){
