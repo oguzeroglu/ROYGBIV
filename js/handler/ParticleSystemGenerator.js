@@ -18,6 +18,102 @@ ParticleSystemGenerator.prototype.computeQuaternionFromVectors = function(vec1, 
   return REUSABLE_QUATERNION.clone();
 }
 
+ParticleSystemGenerator.prototype.circularDistribution = function(radius, quaternion){
+  REUSABLE_VECTOR_3.set(Math.random() - 0.5, Math.random() - 0.5, 0);
+  REUSABLE_VECTOR_3.normalize();
+  REUSABLE_VECTOR_3.multiplyScalar(radius);
+  if (!(typeof quaternion == UNDEFINED)){
+    REUSABLE_VECTOR_3.applyQuaternion(quaternion);
+  }
+  return new THREE.Vector3(REUSABLE_VECTOR_3.x, REUSABLE_VECTOR_3.y, REUSABLE_VECTOR_3.z);
+}
+
+ParticleSystemGenerator.prototype.applyNoise = function(vec){
+  var toNormalize = REUSABLE_VECTOR.set(vec.x, vec.y, vec.z);
+  toNormalize.normalize();
+  var noiseAmount = noise.perlin3(toNormalize.x, toNormalize.y, toNormalize.z);
+  var vector3 = REUSABLE_VECTOR_2.set(vec.x, vec.y, vec.z);
+  var toMultiplyScalar = REUSABLE_VECTOR_3.set(vec.x, vec.y, vec.z);
+  toMultiplyScalar.multiplyScalar(noiseAmount);
+  vector3.add(toMultiplyScalar);
+  return new THREE.Vector3(vector3.x, vector3.y, vector3.z);
+}
+
+ParticleSystemGenerator.prototype.generateSmoke = function(configurations){
+  var smokeSize = configurations.smokeSize;
+  var name = configurations.name;
+  var position = configurations.position;
+  var expireTime = configurations.expireTime;
+  var smokeSize = configurations.smokeSize;
+  var particleSize = configurations.particleSize;
+  var particleCount = configurations.particleCount;
+  var colorName = configurations.colorName;
+  var textureName = configurations.textureName;
+  var movementAxis = (!(typeof configurations.movementAxis == UNDEFINED))? configurations.movementAxis: new THREE.Vector3(0, 1, 0);
+  var velocity = configurations.velocity;
+  var acceleration = configurations.acceleration;
+  var randomness = configurations.randomness;
+  var lifetime = configurations.lifetime;
+  var alphaVariation = configurations.alphaVariation;
+  var updateFunction = configurations.updateFunction;
+  var startDelay = (!(typeof configurations.startDelay == UNDEFINED))? configurations.startDelay: 0;
+  var rgbFilter = configurations.rgbFilter;
+  var accelerationDirection = configurations.accelerationDirection;
+  var particleMaterialConfigurations = new Object();
+  particleMaterialConfigurations.color = colorName;
+  particleMaterialConfigurations.size = particleSize;
+  particleMaterialConfigurations.alpha = 1;
+  if (!(typeof textureName == UNDEFINED)){
+    particleMaterialConfigurations.textureName = textureName;
+  }
+  if (rgbFilter){
+    particleMaterialConfigurations.rgbFilter = rgbFilter;
+  }
+  var quat = this.computeQuaternionFromVectors(new THREE.Vector3(0, 1, 0), movementAxis);
+  var quaternion2, quaternionInverse;
+  var referenceVector = new THREE.Vector3(0, 1, 0);
+  var referenceQuaternion = this.computeQuaternionFromVectors(new THREE.Vector3(0, 0, 1), referenceVector);
+  if (accelerationDirection){
+    quaternion2 = this.computeQuaternionFromVectors(referenceVector, accelerationDirection);
+    quaternionInverse = quat.clone().inverse();
+  }
+  var particleMaterial = this.generateParticleMaterial(particleMaterialConfigurations);
+  var particles = [];
+  var particleConfigurations = new Object();
+  for (var i = 0; i<particleCount; i++){
+    particleConfigurations.position = this.applyNoise(this.circularDistribution(smokeSize, referenceQuaternion));
+    particleConfigurations.material = particleMaterial;
+    particleConfigurations.lifetime = lifetime * Math.random();
+    particleConfigurations.respawn = true;
+    particleConfigurations.alphaVariation = alphaVariation;
+    particleConfigurations.startDelay = startDelay * Math.random();
+    var decidedVelocity = new THREE.Vector3(0, velocity * Math.random(), 0);
+    var decidedAcceleration = new THREE.Vector3(randomness * (Math.random() - 0.5), acceleration * Math.random(), randomness * (Math.random() - 0.5));
+    if (!accelerationDirection){
+      particleConfigurations.velocity = decidedVelocity;
+      particleConfigurations.acceleration = decidedAcceleration;
+    }else{
+      REUSABLE_VECTOR_4.set(decidedAcceleration.x, decidedAcceleration.y, decidedAcceleration.z);
+      REUSABLE_VECTOR_4.applyQuaternion(quaternionInverse);
+      REUSABLE_VECTOR_4.applyQuaternion(quaternion2);
+      particleConfigurations.velocity = decidedVelocity;
+      particleConfigurations.acceleration = new THREE.Vector3(REUSABLE_VECTOR_4.x, REUSABLE_VECTOR_4.y, REUSABLE_VECTOR_4.z);
+    }
+    particles.push(this.generateParticle(particleConfigurations));
+  }
+  var particleSystemConfigurations = new Object();
+  particleSystemConfigurations.name = name;
+  particleSystemConfigurations.particles = particles;
+  particleSystemConfigurations.position = position;
+  particleSystemConfigurations.lifetime = expireTime;
+  if (updateFunction){
+    particleSystemConfigurations.updateFunction = updateFunction;
+  }
+  var smoke = this.generateParticleSystem(particleSystemConfigurations);
+  smoke.mesh.applyQuaternion(quat);
+  return smoke;
+}
+
 ParticleSystemGenerator.prototype.generateMagicCircle = function(configurations){
   var name = configurations.name;
   var position = configurations.position;

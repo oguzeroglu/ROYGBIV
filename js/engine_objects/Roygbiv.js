@@ -1188,141 +1188,44 @@ Roygbiv.prototype.createSmoke = function(configurations){
     return;
   }
   preConditions.checkIfDefined(ROYGBIV.createSmoke, preConditions.configurations, configurations);
-  var smokeSize = configurations.smokeSize;
-  var name = configurations.name;
-  preConditions.checkIfMandatoryParameterExists(ROYGBIV.createSmoke, preConditions.name, name);
-  preConditions.checkIfTrue(ROYGBIV.createSmoke, "name must be unique", particleSystemPool[name]);
-  var position = configurations.position;
-  preConditions.checkIfMandatoryParameterExists(ROYGBIV.createSmoke, preConditions.position, position);
-  preConditions.checkIfVectorOnlyIfDefined(ROYGBIV.createSmoke, preConditions.position, position);
-  var expireTime = configurations.expireTime;
-  preConditions.checkIfMandatoryParameterExists(ROYGBIV.createSmoke, preConditions.expireTime, expireTime);
-  preConditions.checkIfNumber(ROYGBIV.createSmoke, preConditions.expireTime, expireTime);
-  preConditions.checkIfLessThanExclusive(ROYGBIV.createSmoke, preConditions.expireTime, expireTime, 0);
-  var smokeSize = configurations.smokeSize;
-  preConditions.checkIfMandatoryParameterExists(ROYGBIV.createSmoke, preConditions.smokeSize, smokeSize);
-  preConditions.checkIfNumber(ROYGBIV.createSmoke, preConditions.smokeSize, smokeSize);
-  var particleSize = configurations.particleSize;
-  preConditions.checkIfMandatoryParameterExists(ROYGBIV.createSmoke, preConditions.particleSize, particleSize);
-  preConditions.checkIfNumber(ROYGBIV.createSmoke, preConditions.particleSize, particleSize);
-  var particleCount = configurations.particleCount;
-  preConditions.checkIfMandatoryParameterExists(ROYGBIV.createSmoke, preConditions.particleCount, particleCount);
-  preConditions.checkIfNumber(ROYGBIV.createSmoke, preConditions.particleCount, particleCount);
-  preConditions.checkIfLessThan(ROYGBIV.createSmoke, preConditions.particleCount, particleCount);
-  var colorName = configurations.colorName;
-  preConditions.checkIfMandatoryParameterExists(ROYGBIV.createSmoke, preConditions.colorName, colorName);
-  var textureName = configurations.textureName;
-  var isTextured = false;
-  var texture;
-  if (!(typeof textureName == UNDEFINED)){
-    preConditions.checkIfTrue(ROYGBIV.createSmoke, "No such texture", (!textures[textureName]));
-    texture = textures[textureName];
+  preConditions.checkIfMandatoryParameterExists(ROYGBIV.createSmoke, preConditions.name, configurations.name);
+  preConditions.checkIfTrue(ROYGBIV.createSmoke, "name must be unique", particleSystemPool[configurations.name]);
+  preConditions.checkIfMandatoryParameterExists(ROYGBIV.createSmoke, preConditions.position, configurations.position);
+  preConditions.checkIfVectorOnlyIfDefined(ROYGBIV.createSmoke, preConditions.position, configurations.position);
+  preConditions.checkIfMandatoryParameterExists(ROYGBIV.createSmoke, preConditions.expireTime, configurations.expireTime);
+  preConditions.checkIfNumber(ROYGBIV.createSmoke, preConditions.expireTime, configurations.expireTime);
+  preConditions.checkIfLessThanExclusive(ROYGBIV.createSmoke, preConditions.expireTime, configurations.expireTime, 0);
+  preConditions.checkIfMandatoryParameterExists(ROYGBIV.createSmoke, preConditions.smokeSize, configurations.smokeSize);
+  preConditions.checkIfNumber(ROYGBIV.createSmoke, preConditions.smokeSize, configurations.smokeSize);
+  preConditions.checkIfMandatoryParameterExists(ROYGBIV.createSmoke, preConditions.particleSize, configurations.particleSize);
+  preConditions.checkIfNumber(ROYGBIV.createSmoke, preConditions.particleSize, configurations.particleSize);
+  preConditions.checkIfMandatoryParameterExists(ROYGBIV.createSmoke, preConditions.particleCount, configurations.particleCount);
+  preConditions.checkIfNumber(ROYGBIV.createSmoke, preConditions.particleCount, configurations.particleCount);
+  preConditions.checkIfLessThan(ROYGBIV.createSmoke, preConditions.particleCount, configurations.particleCount);
+  preConditions.checkIfMandatoryParameterExists(ROYGBIV.createSmoke, preConditions.colorName, configurations.colorName);
+  if (!(typeof configurations.textureName == UNDEFINED)){
+    var texture = textures[configurations.textureName];
+    preConditions.checkIfTrue(ROYGBIV.createSmoke, "No such texture", (!texture));
     preConditions.checkIfTextureReady(ROYGBIV.createSmoke, preConditions.texture, texture);
-    isTextured = true;
   }
-  var movementAxis = configurations.movementAxis;
-  preConditions.checkIfVectorOnlyIfDefined(ROYGBIV.createSmoke, preConditions.movementAxis, movementAxis);
-  if ((typeof movementAxis == UNDEFINED)){
-    movementAxis = ROYGBIV.vector(0, 1, 0);
-  }
-  var velocity = configurations.velocity;
-  preConditions.checkIfMandatoryParameterExists(ROYGBIV.createSmoke, preConditions.velocity, velocity);
-  preConditions.checkIfNumber(ROYGBIV.createSmoke, preConditions.velocity, velocity);
-  var acceleration = configurations.acceleration;
-  preConditions.checkIfMandatoryParameterExists(ROYGBIV.createSmoke, preConditions.acceleration, acceleration);
-  preConditions.checkIfNumber(ROYGBIV.createSmoke, preConditions.acceleration, acceleration);
-  var randomness = configurations.randomness;
-  preConditions.checkIfMandatoryParameterExists(ROYGBIV.createSmoke, preConditions.randomness, randomness);
-  preConditions.checkIfNumber(ROYGBIV.createSmoke, preConditions.randomness, randomness);
-  var lifetime = configurations.lifetime;
-  preConditions.checkIfMandatoryParameterExists(ROYGBIV.createSmoke, preConditions.lifetime, lifetime);
-  preConditions.checkIfNumber(ROYGBIV.createSmoke, preConditions.lifetime, lifetime);
-  preConditions.checkIfLessThan(ROYGBIV.createSmoke, preConditions.lifetime, lifetime, 0);
-  var alphaVariation = configurations.alphaVariation;
-  preConditions.checkIfMandatoryParameterExists(ROYGBIV.createSmoke, preConditions.alphaVariation, alphaVariation);
-  preConditions.checkIfNumber(ROYGBIV.createSmoke, preConditions.alphaVariation, alphaVariation);
-  preConditions.checkIfInRange(ROYGBIV.createSmoke, preConditions.alphaVariation, alphaVariation, -1, 1);
-  var updateFunction = configurations.updateFunction;
-  preConditions.checkIfFunctionOnlyIfExists(ROYGBIV.createSmoke, preConditions.updateFunction, updateFunction);
-  var startDelay = configurations.startDelay;
-  preConditions.checkIfNumberOnlyIfExists(ROYGBIV.createSmoke, preConditions.startDelay, startDelay);
-  if (typeof startDelay == UNDEFINED){
-    startDelay = 0;
-  }
-  var rgbFilter = configurations.rgbFilter;
-  preConditions.checkIfVectorOnlyIfDefined(ROYGBIV.createSmoke, preConditions.rgbFilter, rgbFilter);
-  var accelerationDirection = configurations.accelerationDirection;
-  preConditions.checkIfVectorOnlyIfDefined(ROYGBIV.createSmoke, preConditions.accelerationDirection, accelerationDirection);
-
-  var particleMaterialConfigurations = new Object();
-  particleMaterialConfigurations.color = colorName;
-  particleMaterialConfigurations.size = particleSize;
-  particleMaterialConfigurations.alpha = 1;
-  if (isTextured){
-    particleMaterialConfigurations.textureName = textureName;
-  }
-  if (rgbFilter){
-    particleMaterialConfigurations.rgbFilter = rgbFilter;
-  }
-
-  var quat = ROYGBIV.computeQuaternionFromVectors(
-    ROYGBIV.vector(0, 1, 0),
-    movementAxis
-  );
-  var quaternion2, quaternionInverse;
-  var referenceVector = ROYGBIV.vector(0, 1, 0);
-  var referenceQuaternion = this.computeQuaternionFromVectors(
-    this.vector(0, 0, 1), referenceVector
-  );
-  if (accelerationDirection){
-    quaternion2 = this.computeQuaternionFromVectors(referenceVector, accelerationDirection);
-    quaternionInverse = quat.clone().inverse();
-  }
-
-  var particleMaterial = this.createParticleMaterial(particleMaterialConfigurations);
-
-  var particles = [];
-  var particleConfigurations = new Object();
-  for (var i = 0; i<particleCount; i++){
-    particleConfigurations.position = this.applyNoise(this.circularDistribution(smokeSize, referenceQuaternion));
-    particleConfigurations.material = particleMaterial;
-    particleConfigurations.lifetime = lifetime * Math.random();
-    particleConfigurations.respawn = true;
-    particleConfigurations.alphaVariation = alphaVariation;
-    particleConfigurations.startDelay = startDelay * Math.random();
-    var decidedVelocity = this.vector(0, velocity * Math.random(), 0);
-    var decidedAcceleration = this.vector(
-      randomness * (Math.random() - 0.5),
-      acceleration * Math.random(),
-      randomness * (Math.random() - 0.5)
-    );
-    if (!accelerationDirection){
-      particleConfigurations.velocity = decidedVelocity;
-      particleConfigurations.acceleration = decidedAcceleration;
-    }else{
-      REUSABLE_VECTOR_4.set(decidedAcceleration.x, decidedAcceleration.y, decidedAcceleration.z);
-      REUSABLE_VECTOR_4.applyQuaternion(quaternionInverse);
-      REUSABLE_VECTOR_4.applyQuaternion(quaternion2);
-      particleConfigurations.velocity = decidedVelocity;
-      particleConfigurations.acceleration = this.vector(
-        REUSABLE_VECTOR_4.x, REUSABLE_VECTOR_4.y, REUSABLE_VECTOR_4.z
-      );
-    }
-    particles.push(this.createParticle(particleConfigurations));
-  }
-
-  var particleSystemConfigurations = new Object();
-  particleSystemConfigurations.name = name;
-  particleSystemConfigurations.particles = particles;
-  particleSystemConfigurations.position = position;
-  particleSystemConfigurations.lifetime = expireTime;
-  if (updateFunction){
-    particleSystemConfigurations.updateFunction = updateFunction;
-  }
-
-  var smoke = this.createParticleSystem(particleSystemConfigurations);
-  smoke.mesh.applyQuaternion(quat);
-  return smoke;
+  preConditions.checkIfVectorOnlyIfDefined(ROYGBIV.createSmoke, preConditions.movementAxis, configurations.movementAxis);
+  preConditions.checkIfMandatoryParameterExists(ROYGBIV.createSmoke, preConditions.velocity, configurations.velocity);
+  preConditions.checkIfNumber(ROYGBIV.createSmoke, preConditions.velocity, configurations.velocity);
+  preConditions.checkIfMandatoryParameterExists(ROYGBIV.createSmoke, preConditions.acceleration, configurations.acceleration);
+  preConditions.checkIfNumber(ROYGBIV.createSmoke, preConditions.acceleration, configurations.acceleration);
+  preConditions.checkIfMandatoryParameterExists(ROYGBIV.createSmoke, preConditions.randomness, configurations.randomness);
+  preConditions.checkIfNumber(ROYGBIV.createSmoke, preConditions.randomness, configurations.randomness);
+  preConditions.checkIfMandatoryParameterExists(ROYGBIV.createSmoke, preConditions.lifetime, configurations.lifetime);
+  preConditions.checkIfNumber(ROYGBIV.createSmoke, preConditions.lifetime, configurations.lifetime);
+  preConditions.checkIfLessThan(ROYGBIV.createSmoke, preConditions.lifetime, configurations.lifetime, 0);
+  preConditions.checkIfMandatoryParameterExists(ROYGBIV.createSmoke, preConditions.alphaVariation, configurations.alphaVariation);
+  preConditions.checkIfNumber(ROYGBIV.createSmoke, preConditions.alphaVariation, configurations.alphaVariation);
+  preConditions.checkIfInRange(ROYGBIV.createSmoke, preConditions.alphaVariation, configurations.alphaVariation, -1, 1);
+  preConditions.checkIfFunctionOnlyIfExists(ROYGBIV.createSmoke, preConditions.updateFunction, configurations.updateFunction);
+  preConditions.checkIfNumberOnlyIfExists(ROYGBIV.createSmoke, preConditions.startDelay, configurations.startDelay);
+  preConditions.checkIfVectorOnlyIfDefined(ROYGBIV.createSmoke, preConditions.rgbFilter, configurations.rgbFilter);
+  preConditions.checkIfVectorOnlyIfDefined(ROYGBIV.createSmoke, preConditions.accelerationDirection, configurations.accelerationDirection);
+  return particleSystemGenerator.generateSmoke(configurations);
 }
 
 //  Creates a trail particle system. The configurations are:
@@ -4311,9 +4214,7 @@ Roygbiv.prototype.applyNoise = function(vec, amount){
   preConditions.checkIfVectorOnlyIfDefined(ROYGBIV.applyNoise, preConditions.vec, vec);
   var toNormalize = REUSABLE_VECTOR.set(vec.x, vec.y, vec.z);
   toNormalize.normalize();
-  var noiseAmount = noise.perlin3(
-    toNormalize.x, toNormalize.y, toNormalize.z
-  );
+  var noiseAmount = noise.perlin3(toNormalize.x, toNormalize.y, toNormalize.z);
   var vector3 = REUSABLE_VECTOR_2.set(vec.x, vec.y, vec.z);
   var toMultiplyScalar = REUSABLE_VECTOR_3.set(vec.x, vec.y, vec.z);
   toMultiplyScalar.multiplyScalar(noiseAmount);
@@ -4494,11 +4395,7 @@ Roygbiv.prototype.circularDistribution = function(radius, quaternion){
   preConditions.checkIfNumber(ROYGBIV.circularDistribution, preConditions.radius, radius);
   preConditions.checkIfLessThan(ROYGBIV.circularDistribution, preConditions.radius, radius, 0);
   preConditions.checkIfQuaternionOnlyIfDefined(ROYGBIV.circularDistribution, preConditions.quaternion, quaternion);
-  REUSABLE_VECTOR_3.set(
-    Math.random() - 0.5,
-    Math.random() - 0.5,
-    0
-  );
+  REUSABLE_VECTOR_3.set(Math.random() - 0.5, Math.random() - 0.5, 0);
   REUSABLE_VECTOR_3.normalize();
   REUSABLE_VECTOR_3.multiplyScalar(radius);
   if (!(typeof quaternion == UNDEFINED)){
