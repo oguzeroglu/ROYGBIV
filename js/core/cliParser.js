@@ -5068,6 +5068,22 @@ function parse(input){
           }
           return true;
         break;
+        case 164:
+          if (mode != 0){
+            terminal.printError(Text.WORKS_ONLY_IN_DESIGN_MODE);
+            return true;
+          }
+          var psName = splitted[1];
+          if (preConfiguredParticleSystems[psName]){
+            terminal.printError(TEXTURE_NAME_MUST_BE_UNIQUE);
+            return true;
+          }
+          particleSystemCreatorGUIHandler.show(psName);
+          terminal.clear();
+          terminal.disable();
+          terminal.printInfo(Text.AFTER_PS_CREATION);
+          return true;
+        break;
       }
       return true;
     }catch(err){

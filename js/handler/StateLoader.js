@@ -2170,6 +2170,7 @@ StateLoader.prototype.resetProject = function(){
   markedPoints = new Object();
   areas = new Object();
   autoInstancedObjects = new Object();
+  preConfiguredParticleSystems = new Object();
   areaBinHandler = new WorldBinHandler(true);
   webglCallbackHandler = new WebGLCallbackHandler();
   threejsRenderMonitoringHandler = new THREEJSRenderMonitoringHandler();

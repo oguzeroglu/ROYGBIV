@@ -164,7 +164,8 @@ var CommandDescriptor = function(){
       4, //simplifyPhysics
       1, //unsimplifyPhysics
       1, //fpsWeaponAlignment
-      1 //shaderPrecision
+      1, //shaderPrecision
+      1 //newParticleSystem
   ];
 
   this.commandArgumentsExpectedExplanation = [
@@ -331,7 +332,8 @@ var CommandDescriptor = function(){
     "simplifyPhysics objName sizeX sizeY sizeZ",
     "unsimplifyPhysics objName",
     "fpsWeaponAlignment objName",
-    "shaderPrecision show/hide"
+    "shaderPrecision show/hide",
+    "newParticleSystem psName"
   ];
 
   this.commands = [
@@ -498,7 +500,8 @@ var CommandDescriptor = function(){
     "simplifyPhysics",
     "unsimplifyPhysics",
     "fpsWeaponAlignment",
-    "shaderPrecision"
+    "shaderPrecision",
+    "newParticleSystem"
   ];
 
   this.commandInfo = [
@@ -665,7 +668,8 @@ var CommandDescriptor = function(){
     "simplifyPhysics: Sets the physics of an object to a box shape of sizeX, sizeY, sizeZ sizes. This helps optimizing the performance of the\n  physics engine but causes physics precision loss.",
     "unsimplifyPhysics: Brings back the original physics for an object after the usage of simplifyPhysics command.",
     "fpsWeaponAlignment: Shows the FPS weapon alignment GUI.",
-    "shaderPrecision: Show the shader precision adjustment GUI."
+    "shaderPrecision: Show the shader precision adjustment GUI.",
+    "newParticleSystem: Opens the Particle System Creation GUI."
   ];
 
   this.keyboardInfo = [
@@ -1334,6 +1338,11 @@ var CommandDescriptor = function(){
   this.shaderPrecision = new Object();
   this.shaderPrecision.types = [];
   this.shaderPrecision.types.push(this.HIDE_SHOW); // show/hide
+
+  // newParticleSystem
+  this.newParticleSystem = new Object();
+  this.newParticleSystem.types = [];
+  this.newParticleSystem.types.push(this.UNKNOWN_INDICATOR); // psName
 
 };
 

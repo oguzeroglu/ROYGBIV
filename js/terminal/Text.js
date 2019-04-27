@@ -376,6 +376,7 @@ var Text = function(){
   this.HEIGHT_MAP_BIAS = "Height map bias: @@1";
   this.GUI_IS_ALREADY_OPEN_FOR_THIS_OBJECT = "GUI is already open for this object.";
   this.PRESS_DONE_BUTTON_TO = "Press Done button to quit FPS weapon alignment mode.";
+  this.AFTER_PS_CREATION = "Press Done button to create particle system.\nUse mouse wheel/mouse drag to rotate.\nUp/Down or W/S (Z/S - French keyboard) to zoom in/out.";
   this.DONE = "Done.";
   this.GS_CREATION_ERROR_1 = "sizeX and sizeZ must be greater than zero.";
   this.GS_CREATION_ERROR_2 = "sizeX is not multiple of cellSize";
