@@ -6,3 +6,11 @@ var PreconfiguredParticleSystem = function(name, type, params){
     this.params[key] = params[key];
   }
 }
+
+PreconfiguredParticleSystem.prototype.export = function(){
+  var exportObj = new Object();
+  exportObj.name = this.name;
+  exportObj.type = this.type;
+  exportObj.params = this.params;
+  return exportObj;
+}

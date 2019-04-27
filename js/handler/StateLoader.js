@@ -969,6 +969,17 @@ StateLoader.prototype.load = function(){
       });
       font.load();
     }
+    // PRECONFIGURED PARTICLE SYSTEMS ******************************
+    for (var psName in obj.preConfiguredParticleSystems){
+      var curExport = obj.preConfiguredParticleSystems[psName];
+      for (var key in curExport.params){
+        var elem = curExport.params[key];
+        if (!(typeof elem.x == UNDEFINED) && !(typeof elem.y == UNDEFINED) && !(typeof elem.z == UNDEFINED)){
+          curExport.params[key] = new THREE.Vector3(elem.x, elem.y, elem.z);
+        }
+      }
+      preConfiguredParticleSystems[psName] = new PreconfiguredParticleSystem(curExport.name, curExport.type, curExport.params);
+    }
     // TEXTS *******************************************************
     // NOT HERE -> SEE: finalize
     // EFFECTS *****************************************************

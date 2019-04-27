@@ -766,6 +766,21 @@ function parse(input){
               }
             }
           }
+          for (var psName in preConfiguredParticleSystems){
+            var params = preConfiguredParticleSystems[psName].params;
+            if (!(typeof params.textureName == UNDEFINED)){
+              if (params.textureName == textureName){
+                terminal.printError(Text.TEXTURE_USED_IN_A_PARTICLE_SYSTEM.replace(Text.PARAM1, psName));
+                return true;
+              }
+            }
+            if (!(typeof params.texture == UNDEFINED)){
+              if (params.texture == textureName){
+                terminal.printError(Text.TEXTURE_USED_IN_A_PARTICLE_SYSTEM.replace(Text.PARAM1, psName));
+                return true;
+              }
+            }
+          }
           if (textures[textureName] instanceof THREE.Texture){
             textures[textureName].dispose();
           }

@@ -195,4 +195,9 @@ var State = function(projectName, author){
   for (var effectName in renderer.effects){
     this.effects[effectName] = renderer.effects[effectName].export();
   }
+  // PRECONFIGURED PARTICLE SYSTEMS ********************************
+  this.preConfiguredParticleSystems = new Object();
+  for (var psName in preConfiguredParticleSystems){
+    this.preConfiguredParticleSystems[psName] = preConfiguredParticleSystems[psName];
+  }
 }
