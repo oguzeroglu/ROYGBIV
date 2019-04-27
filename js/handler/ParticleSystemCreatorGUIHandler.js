@@ -82,43 +82,43 @@ ParticleSystemCreatorGUIHandler.prototype.addTypeController = function(type){
   }).listen();
 }
 
-ParticleSystemCreatorGUIHandler.prototype.showConfetti = function(){
+ParticleSystemCreatorGUIHandler.prototype.showConfetti = function(prevParams){
   guiHandler.datGuiPSCreator = new dat.GUI({hideable: false});
   particleSystemCreatorGUIHandler.addTypeController("CONFETTI");
   particleSystemCreatorGUIHandler.addButtonsController();
 }
 
-ParticleSystemCreatorGUIHandler.prototype.showSnow = function(){
+ParticleSystemCreatorGUIHandler.prototype.showSnow = function(prevParams){
   guiHandler.datGuiPSCreator = new dat.GUI({hideable: false});
   particleSystemCreatorGUIHandler.addTypeController("SNOW");
   particleSystemCreatorGUIHandler.addButtonsController();
 }
 
-ParticleSystemCreatorGUIHandler.prototype.showWaterfall = function(){
+ParticleSystemCreatorGUIHandler.prototype.showWaterfall = function(prevParams){
   guiHandler.datGuiPSCreator = new dat.GUI({hideable: false});
   particleSystemCreatorGUIHandler.addTypeController("WATERFALL");
   particleSystemCreatorGUIHandler.addButtonsController();
 }
 
-ParticleSystemCreatorGUIHandler.prototype.showLaser = function(){
+ParticleSystemCreatorGUIHandler.prototype.showLaser = function(prevParams){
   guiHandler.datGuiPSCreator = new dat.GUI({hideable: false});
   particleSystemCreatorGUIHandler.addTypeController("LASER");
   particleSystemCreatorGUIHandler.addButtonsController();
 }
 
-ParticleSystemCreatorGUIHandler.prototype.showDynamicTrail = function(){
+ParticleSystemCreatorGUIHandler.prototype.showDynamicTrail = function(prevParams){
   guiHandler.datGuiPSCreator = new dat.GUI({hideable: false});
   particleSystemCreatorGUIHandler.addTypeController("DYNAMIC_TRAIL");
   particleSystemCreatorGUIHandler.addButtonsController();
 }
 
-ParticleSystemCreatorGUIHandler.prototype.showCircularExplosion = function(){
+ParticleSystemCreatorGUIHandler.prototype.showCircularExplosion = function(prevParams){
   guiHandler.datGuiPSCreator = new dat.GUI({hideable: false});
   particleSystemCreatorGUIHandler.addTypeController("CIRC_EXPLOSION");
   particleSystemCreatorGUIHandler.addButtonsController();
 }
 
-ParticleSystemCreatorGUIHandler.prototype.showMagicCircle = function(){
+ParticleSystemCreatorGUIHandler.prototype.showMagicCircle = function(prevParams){
   guiHandler.datGuiPSCreator = new dat.GUI({hideable: false});
   particleSystemCreatorGUIHandler.addTypeController("MAGIC_CIRCLE");
   var magicCircleParameters = {
@@ -128,6 +128,14 @@ ParticleSystemCreatorGUIHandler.prototype.showMagicCircle = function(){
     hasTexture: false, targetColorName: "#ffffff", colorStep: 0.5, alphaVariation: 0.5,
     alphaVariationMode: "NORMAL", textureName: "", rgbThreshold: "r,g,b"
   };
+  if (prevParams){
+    for (var key in prevParams){
+      magicCircleParameters[key] = prevParams[key];
+      if (key == "rgbFilter"){
+        magicCircleParameters[key] = magicCircleParameters[key].x+","+magicCircleParameters[key].y+","+magicCircleParameters[key].z;
+      }
+    }
+  }
   guiHandler.datGuiPSCreator.add(magicCircleParameters, "particleCount").min(1).max(5000).step(1).onFinishChange(function(val){
     particleSystemCreatorGUIHandler.magicCircleGeneratorFunc();
   }).listen();
@@ -279,16 +287,24 @@ ParticleSystemCreatorGUIHandler.prototype.showMagicCircle = function(){
   particleSystemCreatorGUIHandler.magicCircleGeneratorFunc();
 }
 
-ParticleSystemCreatorGUIHandler.prototype.showFireExplosion = function(){
+ParticleSystemCreatorGUIHandler.prototype.showFireExplosion = function(prevParams){
   guiHandler.datGuiPSCreator = new dat.GUI({hideable: false});
   particleSystemCreatorGUIHandler.addTypeController("FIRE_EXPLOSION");
   particleSystemCreatorGUIHandler.addButtonsController();
 }
 
-ParticleSystemCreatorGUIHandler.prototype.showPlasma = function(){
+ParticleSystemCreatorGUIHandler.prototype.showPlasma = function(prevParams){
   guiHandler.datGuiPSCreator = new dat.GUI({hideable: false});
   particleSystemCreatorGUIHandler.addTypeController("PLASMA");
   var plasmaParameters = {expireTime: 0, radius: 10, avgParticleSpeed: 20, particleCount: 100, particleSize: 1, alpha: 1, color: "#ffffff", alphaVariation: 0, hasTexture: false, textureName: "", rgbFilter: "r,g,b"};
+  if (prevParams){
+    for (var key in prevParams){
+      plasmaParameters[key] = prevParams[key];
+      if (key == "rgbFilter"){
+        plasmaParameters[key] = plasmaParameters[key].x+","+plasmaParameters[key].y+","+plasmaParameters[key].z;
+      }
+    }
+  }
   guiHandler.datGuiPSCreator.add(plasmaParameters, "expireTime").min(0).max(50).step(0.1).onFinishChange(function(val){
     particleSystemCreatorGUIHandler.plasmaGeneratorFunc();
   }).listen();
@@ -378,15 +394,23 @@ ParticleSystemCreatorGUIHandler.prototype.showPlasma = function(){
   particleSystemCreatorGUIHandler.plasmaGeneratorFunc();
 }
 
-ParticleSystemCreatorGUIHandler.prototype.showTrail = function(){
+ParticleSystemCreatorGUIHandler.prototype.showTrail = function(prevParams){
   guiHandler.datGuiPSCreator = new dat.GUI({hideable: false});
   particleSystemCreatorGUIHandler.addTypeController("TRAIL");
   particleSystemCreatorGUIHandler.addButtonsController();
 }
 
-ParticleSystemCreatorGUIHandler.prototype.showSmoke = function(){
+ParticleSystemCreatorGUIHandler.prototype.showSmoke = function(prevParams){
   guiHandler.datGuiPSCreator = new dat.GUI({hideable: false});
   var smokeParameters = {expireTime: 0, smokeSize: 10, particleSize: 5, particleCount: 100, colorName: "#ffffff", velocity: 10, acceleration: 0, randomness: 5, lifetime: 3, alphaVariation: -0.5, startDelay: 1.5, hasTexture: false, textureName: "", rgbFilter: "r,g,b"};
+  if (prevParams){
+    for (var key in prevParams){
+      smokeParameters[key] = prevParams[key];
+      if (key == "rgbFilter"){
+        smokeParameters[key] = smokeParameters[key].x+","+smokeParameters[key].y+","+smokeParameters[key].z;
+      }
+    }
+  }
   particleSystemCreatorGUIHandler.addTypeController("SMOKE");
   guiHandler.datGuiPSCreator.add(smokeParameters, "expireTime").min(0).max(50).step(0.1).onFinishChange(function(val){
     particleSystemCreatorGUIHandler.smokeGeneratorFunc();
@@ -483,13 +507,13 @@ ParticleSystemCreatorGUIHandler.prototype.showSmoke = function(){
   particleSystemCreatorGUIHandler.smokeGeneratorFunc();
 }
 
-ParticleSystemCreatorGUIHandler.prototype.showCustom = function(){
+ParticleSystemCreatorGUIHandler.prototype.showCustom = function(prevParams){
   guiHandler.datGuiPSCreator = new dat.GUI({hideable: false});
   particleSystemCreatorGUIHandler.addTypeController("CUSTOM");
   particleSystemCreatorGUIHandler.addButtonsController();
 }
 
-ParticleSystemCreatorGUIHandler.prototype.show = function(psName){
+ParticleSystemCreatorGUIHandler.prototype.commonStartFunctions = function(psName){
   this.hiddenEngineObjects = [];
   this.usableTextureNames = [];
   for (var textureName in textures){
@@ -509,5 +533,16 @@ ParticleSystemCreatorGUIHandler.prototype.show = function(psName){
   guiHandler.hideAll();
   activeControl = new OrbitControls({});
   activeControl.onActivated();
+}
+
+ParticleSystemCreatorGUIHandler.prototype.edit = function(psName){
+  this.commonStartFunctions(psName);
+  var preConfiguredParticleSystem = preConfiguredParticleSystems[psName];
+  var action = this.actionsByTypes[preConfiguredParticleSystem.type];
+  action(preConfiguredParticleSystem.params);
+}
+
+ParticleSystemCreatorGUIHandler.prototype.show = function(psName){
+  this.commonStartFunctions(psName);
   this.showCustom();
 }
