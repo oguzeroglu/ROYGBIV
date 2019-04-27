@@ -203,6 +203,9 @@ ModeSwitcher.prototype.switchFromDesignToPreview = function(){
   }else{
     GLOBAL_FOG_UNIFORM.value.set(-100.0, 0, 0, 0);
   }
+  for (var psName in preConfiguredParticleSystems){
+    preConfiguredParticleSystems[psName].getParticleSystem();
+  }
   ROYGBIV.globals = new Object();
   $("#cliDivheader").text("ROYGBIV 3D Engine - CLI (Preview mode)");
   mode = 1;

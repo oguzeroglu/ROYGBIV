@@ -14,3 +14,12 @@ PreconfiguredParticleSystem.prototype.export = function(){
   exportObj.params = this.params;
   return exportObj;
 }
+
+PreconfiguredParticleSystem.prototype.getParticleSystem = function(){
+  switch(this.type){
+    case "MAGIC_CIRCLE": return particleSystemGenerator.generateMagicCircle(this.params);
+    case "PLASMA": return particleSystemGenerator.generatePlasma(this.params);
+    case "SMOKE": return particleSystemGenerator.generateSmoke(this.params);
+  }
+  throw new Error("Unknown type.");
+}
