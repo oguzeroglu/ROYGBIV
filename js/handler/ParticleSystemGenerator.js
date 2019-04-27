@@ -2,6 +2,22 @@ var ParticleSystemGenerator = function(){
 
 }
 
+ParticleSystemGenerator.prototype.normalizeVector = function(vector){
+  var len = Math.sqrt((vector.x * vector.x) + (vector.y * vector.y) + (vector.z * vector.z));
+  vector.x = vector.x / len;
+  vector.y = vector.y / len;
+  vector.z = vector.z / len;
+}
+
+ParticleSystemGenerator.prototype.computeQuaternionFromVectors = function(vec1, vec2){
+  this.normalizeVector(vec1);
+  this.normalizeVector(vec2);
+  REUSABLE_VECTOR.set(vec1.x, vec1.y, vec1.z);
+  REUSABLE_VECTOR_2.set(vec2.x, vec2.y, vec2.z);
+  REUSABLE_QUATERNION.setFromUnitVectors(REUSABLE_VECTOR, REUSABLE_VECTOR_2);
+  return REUSABLE_QUATERNION.clone();
+}
+
 ParticleSystemGenerator.prototype.generatePlasma = function(configurations){
   var name = configurations.name;
   var position = configurations.position;
@@ -40,7 +56,7 @@ ParticleSystemGenerator.prototype.generatePlasma = function(configurations){
   for (var i = 0; i < particleCount; i++){
     particleConfigurations.angularVelocity = avgParticleSpeed * (Math.random() - 0.5);
     particleConfigurations.initialAngle = 360 * Math.random();
-    particleConfigurations.angularQuaternion = ROYGBIV.computeQuaternionFromVectors(tmpVec, new THREE.Vector3(radius * (Math.random() - 0.5), radius * (Math.random() - 0.5) , radius * (Math.random() - 0.5)));
+    particleConfigurations.angularQuaternion = this.computeQuaternionFromVectors(tmpVec, new THREE.Vector3(radius * (Math.random() - 0.5), radius * (Math.random() - 0.5) , radius * (Math.random() - 0.5)));
     particleConfigurations.material = particleMaterial;
     particleConfigurations.lifetime = 0;
     particleConfigurations.respawn = false;

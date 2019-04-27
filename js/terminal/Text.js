@@ -164,6 +164,7 @@ var Text = function(){
   this.POSITION_X_MUST_BE_A_NUMBER = "PositionX must be a number.";
   this.POSITION_Y_MUST_BE_A_NUMBER = "PositionY must be a number.";
   this.POSITION_Z_MUST_BE_A_NUMBER = "PositionZ must be a number.";
+  this.PARTICLE_SYSTEM_CREATED = "Particle system created.";
   this.OBJECT_MARKED_AS = "Object marked as @@1.";
   this.OBJECT_INTERSECTABLE = "Object set as intersectable. It means that the object can be collided with particles/particle systems and be picked with mouse.";
   this.OBJECT_UNINTERSECTABLE = "Object set as unintersectable. It means that the object cannot be collided with particles/particle systems and be picked with mouse.";
