@@ -4995,6 +4995,8 @@ function parse(input){
             terminal.printError(Text.OBJECT_IS_NOT_MARKED_AS_FPS_WEAPON);
             return true;
           }
+          selectionHandler.resetCurrentSelection();
+          guiHandler.hideAll();
           if (fpsWeaponAlignmentConfigurationObject){
             if (fpsWeaponAlignmentConfigurationObject.name == objName){
               terminal.printError(Text.GUI_IS_ALREADY_OPEN_FOR_THIS_OBJECT);
@@ -5017,7 +5019,6 @@ function parse(input){
           guiHandler.fpsWeaponAlignmentParameters["Translate y"] = "0";
           guiHandler.fpsWeaponAlignmentParameters["Translate z"] = "0";
           guiHandler.fpsWeaponAlignmentParameters["Load from"] = "";
-          selectionHandler.resetCurrentSelection();
           guiHandler.show(guiHandler.guiTypes.FPS_WEAPON_ALIGNMENT);
           terminal.printInfo(Text.PRESS_DONE_BUTTON_TO);
           terminal.disable();

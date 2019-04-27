@@ -33,9 +33,11 @@ window.onload = function() {
   // CROSSHAIR HANDLER
   crosshairHandler = new CrosshairHandler();
 
-  // SELECTION HANDLER
   if (!isDeployment){
+    // SELECTION HANDLER
     selectionHandler = new SelectionHandler();
+    // PARTICLE SYSTEM CREATOR GUI HANDLER
+    particleSystemCreatorGUIHandler = new ParticleSystemCreatorGUIHandler();
   }
 
   // PHYSICS BODY GENERATOR

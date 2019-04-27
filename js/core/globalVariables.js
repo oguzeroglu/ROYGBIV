@@ -341,6 +341,7 @@ var crosshairHandler;
 var fpsWeaponAlignmentConfigurationObject;
 var isOrientationLandscape = (window.innerWidth > window.innerHeight);
 var shaderPrecisionHandler;
+var particleSystemCreatorGUIHandler;
 
 // RENDER ORDERS
 var renderOrders = {
