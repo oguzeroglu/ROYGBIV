@@ -121,7 +121,13 @@ ParticleSystemCreatorGUIHandler.prototype.showCircularExplosion = function(){
 ParticleSystemCreatorGUIHandler.prototype.showMagicCircle = function(){
   guiHandler.datGuiPSCreator = new dat.GUI({hideable: false});
   particleSystemCreatorGUIHandler.addTypeController("MAGIC_CIRCLE");
-  var magicCircleParameters = {particleCount: 100, expireTime: 0, speed: 10, acceleration: 0, radius: 10, circleDistortionCoefficient: 0, lifetime: 0, angleStep: 0, particleSize: 5, colorName: "#ffffff", hasTargetColor: false, alpha: 1, hasAlphaVariation: false, hasTexture: false};
+  var magicCircleParameters = {
+    particleCount: 100, expireTime: 0, speed: 10, acceleration: 0, radius: 10,
+    circleDistortionCoefficient: 0, lifetime: 0, angleStep: 0, particleSize: 5,
+    colorName: "#ffffff", hasTargetColor: false, alpha: 1, hasAlphaVariation: false,
+    hasTexture: false, targetColorName: "#ffffff", colorStep: 0.5, alphaVariation: 0.5,
+    alphaVariationMode: "NORMAL", textureName: "", rgbThreshold: "r,g,b"
+  };
   guiHandler.datGuiPSCreator.add(magicCircleParameters, "particleCount").min(1).max(5000).step(1).onFinishChange(function(val){
     particleSystemCreatorGUIHandler.magicCircleGeneratorFunc();
   }).listen();
@@ -137,7 +143,7 @@ ParticleSystemCreatorGUIHandler.prototype.showMagicCircle = function(){
   guiHandler.datGuiPSCreator.add(magicCircleParameters, "radius").min(0.1).max(1000).step(0.1).onFinishChange(function(val){
     particleSystemCreatorGUIHandler.magicCircleGeneratorFunc();
   }).listen();
-  guiHandler.datGuiPSCreator.add(magicCircleParameters, "circleDistortionCoefficient").min(0).max(1000).onFinishChange(function(val){
+  guiHandler.datGuiPSCreator.add(magicCircleParameters, "circleDistortionCoefficient").min(0).max(100).step(0.1).onFinishChange(function(val){
     particleSystemCreatorGUIHandler.magicCircleGeneratorFunc();
   }).listen();
   guiHandler.datGuiPSCreator.add(magicCircleParameters, "lifetime").min(0).max(100).step(0.1).onFinishChange(function(val){
@@ -146,7 +152,7 @@ ParticleSystemCreatorGUIHandler.prototype.showMagicCircle = function(){
   guiHandler.datGuiPSCreator.add(magicCircleParameters, "angleStep").min(0).max(100).step(0.1).onFinishChange(function(val){
     particleSystemCreatorGUIHandler.magicCircleGeneratorFunc();
   }).listen();
-  guiHandler.datGuiPSCreator.add(magicCircleParameters, "particleSize").min(0.1).max(100).step(0.1).onFinishChange(function(val){
+  guiHandler.datGuiPSCreator.add(magicCircleParameters, "particleSize").min(0.1).max(20).step(0.01).onFinishChange(function(val){
     particleSystemCreatorGUIHandler.magicCircleGeneratorFunc();
   }).listen();
   guiHandler.datGuiPSCreator.addColor(magicCircleParameters, "colorName").onFinishChange(function(val){
@@ -156,18 +162,78 @@ ParticleSystemCreatorGUIHandler.prototype.showMagicCircle = function(){
     particleSystemCreatorGUIHandler.magicCircleGeneratorFunc();
   }).listen();
   guiHandler.datGuiPSCreator.add(magicCircleParameters, "hasTargetColor").onChange(function(val){
-
+    if (val){
+      guiHandler.enableController(particleSystemCreatorGUIHandler.magicCircleTargetColorController);
+      guiHandler.enableController(particleSystemCreatorGUIHandler.magicCircleColorStepController);
+    }else{
+      guiHandler.disableController(particleSystemCreatorGUIHandler.magicCircleTargetColorController);
+      guiHandler.disableController(particleSystemCreatorGUIHandler.magicCircleColorStepController);
+    }
+    particleSystemCreatorGUIHandler.magicCircleGeneratorFunc();
+  }).listen();
+  particleSystemCreatorGUIHandler.magicCircleTargetColorController = guiHandler.datGuiPSCreator.addColor(magicCircleParameters, "targetColorName").onFinishChange(function(val){
+    particleSystemCreatorGUIHandler.magicCircleGeneratorFunc();
+  }).listen();
+  particleSystemCreatorGUIHandler.magicCircleColorStepController = guiHandler.datGuiPSCreator.add(magicCircleParameters, "colorStep").min(0).max(1).step(0.001).onFinishChange(function(val){
+    particleSystemCreatorGUIHandler.magicCircleGeneratorFunc();
   }).listen();
   guiHandler.datGuiPSCreator.add(magicCircleParameters, "hasAlphaVariation").onChange(function(val){
-
+    if (val){
+      guiHandler.enableController(particleSystemCreatorGUIHandler.magicCircleAlphaVariationController);
+      guiHandler.enableController(particleSystemCreatorGUIHandler.magicCircleAlphaVariationModeController);
+    }else{
+      guiHandler.disableController(particleSystemCreatorGUIHandler.magicCircleAlphaVariationController);
+      guiHandler.disableController(particleSystemCreatorGUIHandler.magicCircleAlphaVariationModeController);
+    }
+    particleSystemCreatorGUIHandler.magicCircleGeneratorFunc();
   }).listen();
-  guiHandler.datGuiPSCreator.add(magicCircleParameters, "hasTexture").onChange(function(val){
-
+  particleSystemCreatorGUIHandler.magicCircleAlphaVariationController = guiHandler.datGuiPSCreator.add(magicCircleParameters, "alphaVariation").min(-10).max(10).step(0.1).onFinishChange(function(val){
+    particleSystemCreatorGUIHandler.magicCircleGeneratorFunc();
+  }).listen();
+  particleSystemCreatorGUIHandler.magicCircleAlphaVariationModeController = guiHandler.datGuiPSCreator.add(magicCircleParameters, "alphaVariationMode", ["NORMAL", "SIN", "COS"]).onChange(function(val){
+    particleSystemCreatorGUIHandler.magicCircleGeneratorFunc();
+  }).listen();
+  particleSystemCreatorGUIHandler.magicCircleHasTextureController = guiHandler.datGuiPSCreator.add(magicCircleParameters, "hasTexture").onChange(function(val){
+    if (particleSystemCreatorGUIHandler.usableTextureNames.length == 0){
+      particleSystemCreatorGUIHandler.magicCircleParameters.hasTexture = false;
+      return;
+    }
+    if (val){
+      guiHandler.enableController(particleSystemCreatorGUIHandler.magicCircleTextureNameController);
+      guiHandler.enableController(particleSystemCreatorGUIHandler.magicCircleRGBThresholdController);
+    }else{
+      guiHandler.disableController(particleSystemCreatorGUIHandler.magicCircleTextureNameController);
+      guiHandler.disableController(particleSystemCreatorGUIHandler.magicCircleRGBThresholdController);
+    }
+    particleSystemCreatorGUIHandler.magicCircleGeneratorFunc();
+  }).listen();
+  particleSystemCreatorGUIHandler.magicCircleTextureNameController = guiHandler.datGuiPSCreator.add(magicCircleParameters, "textureName", particleSystemCreatorGUIHandler.usableTextureNames).onChange(function(val){
+    particleSystemCreatorGUIHandler.magicCircleGeneratorFunc();
+  }).listen();
+  particleSystemCreatorGUIHandler.magicCircleRGBThresholdController = guiHandler.datGuiPSCreator.add(magicCircleParameters, "rgbThreshold").onFinishChange(function(val){
+    var splitted = val.split(",");
+    if (splitted.length == 3){
+      for (var i = 0; i<3; i++){
+        if (isNaN(splitted[i])){
+          return;
+        }
+      }
+    }
+    particleSystemCreatorGUIHandler.magicCircleGeneratorFunc();
   }).listen();
   guiHandler.datGuiPSCreator.add({"Restart": function(){
     particleSystemCreatorGUIHandler.magicCircleGeneratorFunc();
   }}, "Restart");
   particleSystemCreatorGUIHandler.addButtonsController();
+  guiHandler.disableController(particleSystemCreatorGUIHandler.magicCircleTargetColorController);
+  guiHandler.disableController(particleSystemCreatorGUIHandler.magicCircleColorStepController);
+  guiHandler.disableController(particleSystemCreatorGUIHandler.magicCircleAlphaVariationController);
+  guiHandler.disableController(particleSystemCreatorGUIHandler.magicCircleAlphaVariationModeController);
+  guiHandler.disableController(particleSystemCreatorGUIHandler.magicCircleTextureNameController);
+  guiHandler.disableController(particleSystemCreatorGUIHandler.magicCircleRGBThresholdController);
+  if (particleSystemCreatorGUIHandler.usableTextureNames.length == 0){
+    guiHandler.disableController(particleSystemCreatorGUIHandler.magicCircleHasTextureController);
+  }
   particleSystemCreatorGUIHandler.magicCircleGeneratorFunc = function(){
     if (particleSystemCreatorGUIHandler.particleSystem){
       scene.remove(particleSystemCreatorGUIHandler.particleSystem.mesh);
@@ -176,6 +242,33 @@ ParticleSystemCreatorGUIHandler.prototype.showMagicCircle = function(){
     var params = {name: particleSystemCreatorGUIHandler.psName, position: new THREE.Vector3(0, 0, 0)};
     for (var key in particleSystemCreatorGUIHandler.magicCircleParameters){
       params[key] = particleSystemCreatorGUIHandler.magicCircleParameters[key];
+    }
+    if (!particleSystemCreatorGUIHandler.magicCircleParameters.hasTexture || particleSystemCreatorGUIHandler.magicCircleParameters.textureName == ""){
+      delete params.textureName;
+      delete params.rgbThreshold;
+    }else{
+      var splitted = params.rgbThreshold.split(",");
+      params.rgbFilter = new THREE.Vector3(parseFloat(splitted[0]), parseFloat(splitted[1]), parseFloat(splitted[2]));
+    }
+    if (!particleSystemCreatorGUIHandler.magicCircleParameters.hasTargetColor){
+      delete params.targetColorName;
+      delete params.colorStep;
+    }
+    if (!particleSystemCreatorGUIHandler.magicCircleParameters.hasAlphaVariation){
+      delete params.alphaVariation;
+      delete params.alphaVariationMode;
+    }else{
+      switch (params.alphaVariationMode){
+        case "NORMAL":
+          params.alphaVariationMode = ALPHA_VARIATION_MODE_NORMAL;
+        break;
+        case "SIN":
+          params.alphaVariationMode = ALPHA_VARIATION_MODE_SIN;
+        break;
+        case "COS":
+          params.alphaVariationMode = ALPHA_VARIATION_MODE_COS;
+        break;
+      }
     }
     particleSystemCreatorGUIHandler.particleSystem = particleSystemGenerator.generateMagicCircle(params);
     particleSystemCreatorGUIHandler.particleSystem.mesh.visible = true;
@@ -208,7 +301,7 @@ ParticleSystemCreatorGUIHandler.prototype.showPlasma = function(){
   guiHandler.datGuiPSCreator.add(plasmaParameters, "particleCount").min(1).max(5000).step(1).onFinishChange(function(val){
     particleSystemCreatorGUIHandler.plasmaGeneratorFunc();
   }).listen();
-  guiHandler.datGuiPSCreator.add(plasmaParameters, "particleSize").min(0.1).max(100).step(0.1).onFinishChange(function(val){
+  guiHandler.datGuiPSCreator.add(plasmaParameters, "particleSize").min(0.1).max(20).step(0.01).onFinishChange(function(val){
     particleSystemCreatorGUIHandler.plasmaGeneratorFunc();
   }).listen();
   guiHandler.datGuiPSCreator.add(plasmaParameters, "alpha").min(0).max(1).step(0.1).onFinishChange(function(val){
@@ -241,7 +334,7 @@ ParticleSystemCreatorGUIHandler.prototype.showPlasma = function(){
     var splitted = val.split(",");
     if (splitted.length == 3){
       for (var i = 0; i<3; i++){
-        if (isNaN(splitted[0])){
+        if (isNaN(splitted[i])){
           return;
         }
       }
