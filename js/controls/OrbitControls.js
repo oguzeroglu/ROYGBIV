@@ -6,6 +6,7 @@ var OrbitControls = function(params){
   this.zoomDelta = (!(typeof params.zoomDelta == UNDEFINED))? params.zoomDelta: 1;
   this.mouseWheelRotationSpeed = (!(typeof params.mouseWheelRotationSpeed == UNDEFINED))? params.mouseWheelRotationSpeed: 3;
   this.mouseDragRotationSpeed = (!(typeof params.mouseDragRotationSpeed == UNDEFINED))? params.mouseDragRotationSpeed: 20;
+  this.fingerSwipeRotationSpeed = (!(typeof params.fingerSwipeRotationSpeed == UNDEFINED))? params.fingerSwipeRotationSpeed: 20;
   this.keyboardRotationSpeed = (!(typeof params.keyboardRotationSpeed == UNDEFINED))? params.keyboardRotationSpeed: 10;
   this.keyboardActions = [
     {key: "Right", action: this.rotateAroundYPositiveKeyboard},
@@ -25,8 +26,6 @@ var OrbitControls = function(params){
 OrbitControls.prototype.onMouseMove = noop;
 OrbitControls.prototype.onMouseDown = noop;
 OrbitControls.prototype.onMouseUp = noop;
-OrbitControls.prototype.onPinch = noop;
-OrbitControls.prototype.onSwipe = noop;
 OrbitControls.prototype.onTap = noop;
 OrbitControls.prototype.onClick = noop;
 OrbitControls.prototype.onDeactivated = noop;
@@ -113,6 +112,19 @@ OrbitControls.prototype.onMouseWheel = function(event){
 OrbitControls.prototype.onDrag = function(x, y, moveX, moveY){
   activeControl.spherical.theta += (moveX / 10000) * activeControl.mouseDragRotationSpeed;
   activeControl.spherical.phi -= (moveY / 10000) * activeControl.mouseDragRotationSpeed;
+}
+
+OrbitControls.prototype.onPinch = function(diff){
+  if (diff > 0){
+    activeControl.zoomIn();
+  }else{
+    activeControl.zoomOut();
+  }
+}
+
+OrbitControls.prototype.onSwipe = function(diffX, diffY){
+  activeControl.spherical.theta += (diffX / 10000) * activeControl.fingerSwipeRotationSpeed;
+  activeControl.spherical.phi -= (diffY / 10000) * activeControl.fingerSwipeRotationSpeed;
 }
 
 OrbitControls.prototype.resetStatus = function(){
