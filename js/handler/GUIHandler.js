@@ -127,6 +127,7 @@ var GUIHandler = function(){
       for (var i = 0; i<window.hiddenObjectsDueToFPSWeaponAlignmentConfiguration.length; i++){
         window.hiddenObjectsDueToFPSWeaponAlignmentConfiguration[i].visible = true;
       }
+      delete window.hiddenObjectsDueToFPSWeaponAlignmentConfiguration;
     }
   };
   this.shaderPrecisionParameters = {
