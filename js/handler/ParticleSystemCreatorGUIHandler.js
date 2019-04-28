@@ -133,6 +133,18 @@ ParticleSystemCreatorGUIHandler.prototype.showMagicCircle = function(prevParams)
       magicCircleParameters[key] = prevParams[key];
       if (key == "rgbFilter"){
         magicCircleParameters[key] = magicCircleParameters[key].x+","+magicCircleParameters[key].y+","+magicCircleParameters[key].z;
+      }else if (key == "alphaVariationMode"){
+        switch(magicCircleParameters[key]){
+          case ALPHA_VARIATION_MODE_NORMAL:
+            magicCircleParameters[key] = "NORMAL";
+          break;
+          case ALPHA_VARIATION_MODE_SIN:
+            magicCircleParameters[key] = "SIN";
+          break;
+          case ALPHA_VARIATION_MODE_COS:
+            magicCircleParameters[key] = "COS";
+          break;
+        }
       }
     }
   }
@@ -233,12 +245,18 @@ ParticleSystemCreatorGUIHandler.prototype.showMagicCircle = function(prevParams)
     particleSystemCreatorGUIHandler.magicCircleGeneratorFunc();
   }}, "Restart");
   particleSystemCreatorGUIHandler.addButtonsController();
-  guiHandler.disableController(particleSystemCreatorGUIHandler.magicCircleTargetColorController);
-  guiHandler.disableController(particleSystemCreatorGUIHandler.magicCircleColorStepController);
-  guiHandler.disableController(particleSystemCreatorGUIHandler.magicCircleAlphaVariationController);
-  guiHandler.disableController(particleSystemCreatorGUIHandler.magicCircleAlphaVariationModeController);
-  guiHandler.disableController(particleSystemCreatorGUIHandler.magicCircleTextureNameController);
-  guiHandler.disableController(particleSystemCreatorGUIHandler.magicCircleRGBThresholdController);
+  if (!magicCircleParameters.hasTargetColor){
+    guiHandler.disableController(particleSystemCreatorGUIHandler.magicCircleTargetColorController);
+    guiHandler.disableController(particleSystemCreatorGUIHandler.magicCircleColorStepController);
+  }
+  if (!magicCircleParameters.hasAlphaVariation){
+    guiHandler.disableController(particleSystemCreatorGUIHandler.magicCircleAlphaVariationController);
+    guiHandler.disableController(particleSystemCreatorGUIHandler.magicCircleAlphaVariationModeController);
+  }
+  if (!magicCircleParameters.hasTexture){
+    guiHandler.disableController(particleSystemCreatorGUIHandler.magicCircleTextureNameController);
+    guiHandler.disableController(particleSystemCreatorGUIHandler.magicCircleRGBThresholdController);
+  }
   if (particleSystemCreatorGUIHandler.usableTextureNames.length == 0){
     guiHandler.disableController(particleSystemCreatorGUIHandler.magicCircleHasTextureController);
   }
@@ -357,8 +375,10 @@ ParticleSystemCreatorGUIHandler.prototype.showPlasma = function(prevParams){
     }
     particleSystemCreatorGUIHandler.plasmaGeneratorFunc();
   }).listen();
-  guiHandler.disableController(particleSystemCreatorGUIHandler.plasmaTextureNameController);
-  guiHandler.disableController(particleSystemCreatorGUIHandler.plasmaRGBThresholdController);
+  if (!plasmaParameters.hasTexture){
+    guiHandler.disableController(particleSystemCreatorGUIHandler.plasmaTextureNameController);
+    guiHandler.disableController(particleSystemCreatorGUIHandler.plasmaRGBThresholdController);
+  }
   if (particleSystemCreatorGUIHandler.usableTextureNames.length == 0){
     guiHandler.disableController(guiHandler.plasmaHasTextureController);
   }
@@ -473,8 +493,10 @@ ParticleSystemCreatorGUIHandler.prototype.showSmoke = function(prevParams){
     }
     particleSystemCreatorGUIHandler.smokeGeneratorFunc();
   }).listen();
-  guiHandler.disableController(particleSystemCreatorGUIHandler.smokeTextureNameController);
-  guiHandler.disableController(particleSystemCreatorGUIHandler.smokeRGBFilterController);
+  if (!smokeParameters.hasTexture){
+    guiHandler.disableController(particleSystemCreatorGUIHandler.smokeTextureNameController);
+    guiHandler.disableController(particleSystemCreatorGUIHandler.smokeRGBFilterController);
+  }
   if (particleSystemCreatorGUIHandler.usableTextureNames.length == 0){
     guiHandler.disableController(particleSystemCreatorGUIHandler.smokeHasTextureController);
   }
