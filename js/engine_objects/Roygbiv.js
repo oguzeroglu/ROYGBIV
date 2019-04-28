@@ -974,6 +974,7 @@ Roygbiv.prototype.createParticleMaterial = function(configurations){
 //  MOTION_MODE_NORMAL. (optional)
 //  collisionAction: One of PARTICLE_REWIND_ON_COLLIDED or PARTICLE_DISSAPEAR_ON_COLLIDED. This parameter decides what to do when the particle
 //  is collided with one of the intersectable objects of the scene. If not set, particles are not listened for collisions. (optional)
+//  collisionTimeOffset: By pre-calculating the future collision, this parameter can be used to prevent visual errors of collisions of rather fast particles. (optional)
 Roygbiv.prototype.createParticle = function(configurations){
   if (mode == 0){
     return;
@@ -1015,6 +1016,9 @@ Roygbiv.prototype.createParticle = function(configurations){
   preConditions.checkIfNumberOnlyIfExists(ROYGBIV.createParticle, preConditions.angularMotionRadius, configurations.angularMotionRadius);
   preConditions.checkIfQuaternionOnlyIfDefined(ROYGBIV.createParticle, preConditions.angularQuaternion, configurations.angularQuaternion);
   preConditions.checkIfBooleanOnlyIfExists(ROYGBIV.createParticle, preConditions.useWorldPosition, configurations.useWorldPosition);
+  preConditions.checkIfCollisionActionOnlyIfExists(ROYGBIV.createParticle, preConditions.collisionAction, configurations.collisionAction);
+  preConditions.checkIfTrueOnlyIfYExists(ROYGBIV.createParticle, "Rewindable particles must have respawn = true and lifetime != 0 as configurations.", configurations.collisionAction, (configurations.collisionAction == PARTICLE_REWIND_ON_COLLIDED && (configurations.respawn != true || configurations.lifetime == 0)));
+  preConditions.checkIfNumberOnlyIfExists(ROYGBIV.createParticle, preConditions.collisionTimeOffset, configurations.collisionTimeOffset);
   return particleSystemGenerator.generateParticle(configurations);
 }
 
@@ -2562,10 +2566,9 @@ Roygbiv.prototype.destroyParticleSystemPool = function(pool){
 // particleSize: The size of particles. (mandatory)
 // colorName: The color name of particles. (mandatory)
 // alpha: The alpha value of particles. (mandatory)
-// collisionMethod: 0 -> Nothing happens when particles are collided with objects.
-//                  1 -> Particles are destroyed when collided with objects.
-//                  2 -> Particles are respawned when collided with objects.
-//                  Default value is 0. (optional)
+// collisionMethod: PARTICLE_DISSAPEAR_ON_COLLIDED -> Particles are dissapeared when collided with objects.
+//                  PARTICLE_REWIND_ON_COLLIDED -> Particles are respawned when collided with objects.
+//                  If not set, particles are not listened for collisions.
 // normal: The normal vector of the particle system. Default value is (0, 1, 0) (optional)
 // collisionTimeOffset: The time offset of collision listener if the collisionMethod is 1 or 2. Default value is 0. (optional)
 // startDelay: The average start delay of particles. Default value is 0. (optional)
@@ -2610,9 +2613,7 @@ Roygbiv.prototype.createConfettiExplosion = function(configurations){
   preConditions.checkIfNumberOnlyIfExists(ROYGBIV.createConfettiExplosion, preConditions.startDelay, configurations.startDelay);
   preConditions.checkIfLessThanExclusiveOnlyIfExists(ROYGBIV.createConfettiExplosion, preConditions.startDelay, configurations.startDelay, 0);
   preConditions.checkIfVectorOnlyIfDefined(ROYGBIV.createConfettiExplosion, preConditions.normal, configurations.normal);
-  if (!(typeof configurations.collisionMethod == UNDEFINED)){
-    preConditions.checkIfTrue(ROYGBIV.createConfettiExplosion, "collisionMethod method must be one of 0, 1 or 2", (configurations.collisionMethod != 0 && configurations.collisionMethod != 1 && configurations.collisionMethod != 2));
-  }
+  preConditions.checkIfCollisionActionOnlyIfExists(ROYGBIV.createConfettiExplosion, preConditions.collisionMethod, configurations.collisionMethod);
   return particleSystemGenerator.generateConfettiExplosion(configurations);
 }
 

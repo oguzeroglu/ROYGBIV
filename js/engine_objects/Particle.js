@@ -25,26 +25,8 @@ var Particle = function(x, y, z, material, lifetime){
 
 }
 
-Particle.prototype.setCollisionListener = function(callbackFunction, timeOffset){
-  if (!this.uuid){
-    this.assignUUID();
-  }
-  var incrCounter = false;
-  if (!particleCollisionCallbackRequests[this.uuid]){
-    incrCounter = true;
-  }
-  particleCollisionCallbackRequests[this.uuid] = callbackFunction.bind(this);
-  if (incrCounter){
-    TOTAL_PARTICLE_COLLISION_LISTEN_COUNT ++;
-  }
-  this.checkForCollisions = true;
-  if (!(typeof timeOffset == UNDEFINED)){
-    this.collisionTimeOffset = timeOffset;
-  }
-  if (this.parent){
-    this.parent.hasParticleCollision = true;
-    this.parent.notifyParticleCollisionCallbackChange(this);
-  }
+Particle.prototype.setCollisionListener = function(collisionAction, timeOffset){
+  
 }
 
 Particle.prototype.kill = function(){

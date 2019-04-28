@@ -78,7 +78,7 @@ ParticleSystemGenerator.prototype.generateConfettiExplosion = function(configura
   particleConfigurations.position = new THREE.Vector3(0, 0, 0);
   particleConfigurations.material = particleMaterial;
   particleConfigurations.alphaVariation = alphaVariation;
-  if (collisionMethod == 2){
+  if (collisionMethod == PARTICLE_REWIND_ON_COLLIDED){
     particleConfigurations.respawn = true;
   }else{
     particleConfigurations.respawn = false;
@@ -93,10 +93,10 @@ ParticleSystemGenerator.prototype.generateConfettiExplosion = function(configura
     particleConfigurations.acceleration = new THREE.Vector3(0, verticalAcceleration, 0);
     var particle = this.generateParticle(particleConfigurations);
     particles.push(particle);
-    if (collisionMethod == 1){
-      particle.setCollisionListener(function(info){this.kill();}, collisionTimeOffset);
-    }else if (collisionMethod == 2){
-      particle.setCollisionListener(function(info){this.parent.rewindParticle(this, Math.random());}, collisionTimeOffset);
+    if (collisionMethod == PARTICLE_DISSAPEAR_ON_COLLIDED){
+      particle.setCollisionListener(PARTICLE_DISSAPEAR_ON_COLLIDED, collisionTimeOffset);
+    }else if (collisionMethod == PARTICLE_REWIND_ON_COLLIDED){
+      particle.setCollisionListener(PARTICLE_REWIND_ON_COLLIDED, collisionTimeOffset);
     }
   }
   var ps = this.generateParticleSystem({name: name, particles: particles, position: position, lifetime: expireTime});
@@ -328,6 +328,8 @@ ParticleSystemGenerator.prototype.generateParticle = function(configurations){
   var angularMotionRadius = (!(typeof configurations.angularMotionRadius == UNDEFINED))? configurations.angularMotionRadius: 0;
   var angularQuaternion = (!(typeof configurations.angularQuaternion == UNDEFINED))? configurations.angularQuaternion: REUSABLE_QUATERNION.set(0, 0, 0, 1);
   var motionMode = (!(typeof configurations.motionMode == UNDEFINED))? configurations.motionMode: MOTION_MODE_NORMAL;
+  var collisionAction = configurations.collisionAction;
+  var collisionTimeOffset = (!(typeof configurations.collisionTimeOffset == UNDEFINED))? configurations.collisionTimeOffset: 0;
   if (motionMode == MOTION_MODE_NORMAL){
     initialAngle = 0;
   }
@@ -364,6 +366,9 @@ ParticleSystemGenerator.prototype.generateParticle = function(configurations){
   particle.angularQuaternionY = angularQuaternion.y;
   particle.angularQuaternionZ = angularQuaternion.z;
   particle.angularQuaternionW = angularQuaternion.w;
+  if (!(typeof collisionAction == UNDEFINED)){
+    particle.setCollisionListener(collisionAction, collisionTimeOffset);
+  }
   return particle;
 }
 

@@ -210,6 +210,7 @@ var Preconditions = function(){
   this.mouseDragRotationSpeed = "mouseDragRotationSpeed";
   this.fingerSwipeRotationSpeed = "fingerSwipeRotationSpeed";
   this.keyboardRotationSpeed = "keyboardRotationSpeed";
+  this.collisionAction = "collisionAction";
 }
 
 Preconditions.prototype.errorHeader = function(callerFunc){
@@ -218,6 +219,14 @@ Preconditions.prototype.errorHeader = function(callerFunc){
 
 Preconditions.prototype.throw = function(callerFunc, errorMsg){
   throw new Error(this.errorHeader(callerFunc)+" ["+errorMsg+"]");
+}
+
+Preconditions.prototype.checkIfCollisionActionOnlyIfExists = function(callerFunc, parameterName, obj){
+  if (!(typeof obj == UNDEFINED)){
+    if (obj !== PARTICLE_REWIND_ON_COLLIDED && obj !== PARTICLE_DISSAPEAR_ON_COLLIDED){
+      this.throw(callerFunc, parameterName+" must be one of PARTICLE_REWIND_ON_COLLIDED or PARTICLE_DISSAPEAR_ON_COLLIDED.");
+    }
+  }
 }
 
 Preconditions.prototype.checkIfArrayOfParticleSystemsOnlyIfExists = function(callerFunc, parameterName, obj){
