@@ -660,6 +660,9 @@ FPSControls.prototype.onDeactivated = function(){
     this.weaponObject2.mesh.quaternion.copy(this.weaponObject2.beforeFPSControlsInfo.quaternion);
     this.weaponObject2.mesh.scale.set(1, 1, 1);
   }
+  if (isMobile){
+    touchEventHandler.tapThreshold = 310;
+  }
 }
 
 FPSControls.prototype.onPlayerBodyCollision = function(event){
@@ -747,5 +750,8 @@ FPSControls.prototype.onActivated = function(){
     this.weaponObject2.mesh.visible = false;
     this.autoInstancedObject.mesh.renderOrder = renderOrders.FPS_WEAPON;
     this.autoInstancedObject.mesh.visible = true;
+  }
+  if (isMobile){
+    touchEventHandler.tapThreshold = 110;
   }
 }
