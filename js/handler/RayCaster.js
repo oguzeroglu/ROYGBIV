@@ -166,5 +166,5 @@ RayCaster.prototype.show = function(object){
 }
 
 RayCaster.prototype.query = function(point){
-  this.binHandler.query(point);
+  return this.binHandler.query(point);
 }
