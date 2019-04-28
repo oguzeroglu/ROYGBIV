@@ -14,7 +14,7 @@ var TouchEventHandler = function(){
   this.tapStartTime = 0;
   this.isThereFingerTouched = false;
   this.currentTouchCount = 0;
-  this.tapThreshold = 110;
+  this.tapThreshold = 310;
   this.touchTrack = new Map();
 }
 

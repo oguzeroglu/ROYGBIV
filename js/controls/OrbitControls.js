@@ -8,6 +8,7 @@ var OrbitControls = function(params){
   this.mouseDragRotationSpeed = (!(typeof params.mouseDragRotationSpeed == UNDEFINED))? params.mouseDragRotationSpeed: 20;
   this.fingerSwipeRotationSpeed = (!(typeof params.fingerSwipeRotationSpeed == UNDEFINED))? params.fingerSwipeRotationSpeed: 20;
   this.keyboardRotationSpeed = (!(typeof params.keyboardRotationSpeed == UNDEFINED))? params.keyboardRotationSpeed: 10;
+  this.requestFullScreen = (!(typeof params.requestFullScreen == UNDEFINED))? params.requestFullScreen: false;
   this.keyboardActions = [
     {key: "Right", action: this.rotateAroundYPositiveKeyboard},
     {key: "D", action: this.rotateAroundYPositiveKeyboard},
@@ -35,7 +36,12 @@ OrbitControls.prototype.onTouchEnd = noop;
 OrbitControls.prototype.onKeyDown = noop;
 OrbitControls.prototype.onKeyUp = noop;
 OrbitControls.prototype.onResize = noop;
-OrbitControls.prototype.onFullScreenChange = noop;
+
+OrbitControls.prototype.onFullScreenChange = function(isFullScreen){
+  if (!isFullScreen && activeControl.requestFullScreen){
+    fullScreenRequested = true;
+  }
+}
 
 OrbitControls.prototype.zoom = function(){
   if (activeControl.zoomDirectionIn){
@@ -139,6 +145,9 @@ OrbitControls.prototype.onActivated = function(){
   this.spherical = new THREE.Spherical(this.maxRadius, Math.PI/4, Math.PI/4);
   this.resetStatus();
   this.zoomDirectionIn = true;
+  if (this.requestFullScreen){
+    fullScreenRequested = true;
+  }
 }
 
 OrbitControls.prototype.update = function(){
