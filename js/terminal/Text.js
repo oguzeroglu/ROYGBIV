@@ -532,8 +532,9 @@ var Text = function(){
   this.ROYGBIV_SCRIPTING_API_GETPOSITION = "Returns the (x, y, z) coordinates of an object, glued object or a particle system.\nIf a specific axis is specified, only the position on the specified axis is returned.";
   this.ROYGBIV_SCRIPTING_API_OPACITY = "Increases/decreases the opacity of given object.";
   this.ROYGBIV_SCRIPTING_API_GETOPACITY = "Returns the opacity of given object.";
-  this.ROYGBIV_SCRIPTING_API_SETCOLLISIONLISTENER = "Sets a collision listener for an object, glued object, particle or a particle system. Using this with loads of particles\nmay cause performance issues if web worker usage is not enabled or supported. Callback function given as the second parameter is fired\nwith a CollisionInfo instance (except for particle collisions) when the sourceObject is collided with other objects or\nglued objects of the scene." +
-                                                    " The additional timeOffset parameter can be used for particles/particle systems to pre-calculate\nfuture collisions. This can help to prevent visual errors of collisions of rather fast particles/particle systems.";
+  this.ROYGBIV_SCRIPTING_API_SETCOLLISIONLISTENER = "Sets a collision listener for an object, glued object or a particle system."+
+                                                    "Callback function given as the second parameter is\nfired with a CollisionInfo instance when the sourceObject is collided with other objects or glued objects of the scene.\n"+
+                                                    "The additional timeOffset parameter can be used for particle systems to pre-calculate future collisions. This can help to\nprevent visual errors of collisions of rather fast particle systems.";
   this.ROYGBIV_SCRIPTING_API_REMOVECOLLISIONLISTENER = "Removes collision listeners of an object, glued object, particle or a particle system. Use this for performance improvements if\ncollision callbacks are no longer necessary for particles or particle systems.";
   this.ROYGBIV_SCRIPTING_API_CREATEPARTICLEMATERIAL = "Returns a material for a particle. The configurations are:\n"+
                                                       "color: The HTML color name of the particle. (mandatory)\n"+

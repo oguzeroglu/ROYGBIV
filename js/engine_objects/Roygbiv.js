@@ -2937,19 +2937,18 @@ Roygbiv.prototype.shrinkCrosshair = function(delta){
 
 // LISTENER FUNCTIONS **********************************************************
 
-//  Sets a collision listener for an object, glued object, particle or a particle system. Using
-//  this with loads of particles may cause performance issues if web worker usage is not enabled or supported.
-//  Callback function given as the second parameter is fired with a CollisionInfo instance (except for particle collisions) when
+//  Sets a collision listener for an object, glued object or a particle system.
+//  Callback function given as the second parameter is fired with a CollisionInfo instance when
 //  the sourceObject is collided with other objects or glued objects of the scene.
-//  The additional timeOffset parameter can be used for particles/particle systems to
+//  The additional timeOffset parameter can be used for particle systems to
 //  pre-calculate future collisions. This can help to prevent visual errors of collisions
-//  of rather fast particles/particle systems.
+//  of rather fast particle systems.
 Roygbiv.prototype.setCollisionListener = function(sourceObject, callbackFunction, timeOffset){
   if (mode == 0){
     return;
   }
   preConditions.checkIfDefined(ROYGBIV.setCollisionListener, preConditions.sourceObject, sourceObject);
-  preConditions.checkIfAddedObjectObjectGroupParticleSystemParticle(ROYGBIV.setCollisionListener, preConditions.sourceObject, sourceObject);
+  preConditions.checkIfAddedObjectObjectGroupParticleSystem(ROYGBIV.setCollisionListener, preConditions.sourceObject, sourceObject);
   preConditions.checkIfDefined(ROYGBIV.setCollisionListener, preConditions.callbackFunction, callbackFunction);
   preConditions.checkIfFunctionOnlyIfExists(ROYGBIV.setCollisionListener, preConditions.callbackFunction, callbackFunction);
   preConditions.checkIfNumberOnlyIfExists(ROYGBIV.setCollisionListener, preConditions.timeOffset, timeOffset);
@@ -2961,21 +2960,6 @@ Roygbiv.prototype.setCollisionListener = function(sourceObject, callbackFunction
       TOTAL_OBJECT_COLLISION_LISTENER_COUNT ++;
     }
     sourceObject.setCollisionListener(callbackFunction);
-  }else if (sourceObject.isParticle){
-    preConditions.checkIfTrue(ROYGBIV.setCollisionListener, "Particle system is stopped.", (sourceObject.parent && sourceObject.parent.isStopped));
-    if (sourceObject.uuid && !particleCollisionCallbackRequests[sourceObject.uuid]){
-      preConditions.checkIfTrue(ROYGBIV.setCollisionListener, "Cannot set collision lsitener for more than "+MAX_PARTICLE_COLLISION_LISTEN_COUNT+" particles.", (TOTAL_PARTICLE_COLLISION_LISTEN_COUNT >= MAX_PARTICLE_COLLISION_LISTEN_COUNT));
-    }
-    if (sourceObject.parent){
-      preConditions.checkIfTrue(ROYGBIV.setCollisionListener, "A position is manually set to the parent particle system. Cannot listen for collisions.", (sourceObject.parent.hasManualPositionSet));
-      preConditions.checkIfTrue(ROYGBIV.setCollisionListener, "A rotation is manually set to the parent particle system. Cannot listen for collisions.", (sourceObject.parent.hasManualRotationSet));
-      preConditions.checkIfTrue(ROYGBIV.setCollisionListener, "A quaternion is manually set to the parent particle system. Cannot listen for collisions.", (sourceObject.parent.hasManualQuaternionSet));
-      if (!sourceObject.parent.hasParticleCollision){
-        preConditions.checkIfTrue(ROYGBIV.setCollisionListener, "Maximum "+MAX_PARTICLE_SYSTEMS_WITH_PARTICLE_COLLISIONS+" can have collisions particles.", (TOTAL_PARTICLE_SYSTEMS_WITH_PARTICLE_COLLISIONS >= MAX_PARTICLE_SYSTEMS_WITH_PARTICLE_COLLISIONS));
-        TOTAL_PARTICLE_SYSTEMS_WITH_PARTICLE_COLLISIONS ++;
-      }
-    }
-    sourceObject.setCollisionListener(callbackFunction, timeOffset);
   }else if (sourceObject.isParticleSystem){
     preConditions.checkIfTrue(ROYGBIV.setCollisionListener, "A position is set manually to the particle system. Cannot listen for collisions.", (sourceObject.hasManualPositionSet));
     preConditions.checkIfTrue(ROYGBIV.setCollisionListener, "A rotation is set manually to the particle system. Cannot listen for collisions.", (sourceObject.hasManualRotationSet));
