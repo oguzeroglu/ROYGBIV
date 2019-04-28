@@ -3,9 +3,13 @@ var ResizeEventHandler = function(){
 }
 
 ResizeEventHandler.prototype.onResize = function(){
+  var oldOrientation = isOrientationLandscape;
   isOrientationLandscape = (window.innerWidth > window.innerHeight);
   if (!(renderer)){
     return;
+  }
+  if (oldOrientation != isOrientationLandscape && isMobile && screenOrientationChangeCallbackFunction){
+    screenOrientationChangeCallbackFunction(isOrientationLandscape);
   }
   renderer.setSize(window.innerWidth, window.innerHeight);
   camera.oldAspect = camera.aspect;

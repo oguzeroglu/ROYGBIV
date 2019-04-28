@@ -293,6 +293,7 @@ var screenKeyupCallbackFunction = 0;
 var screenMouseWheelCallbackFunction = 0;
 var screenPinchCallbackFunction = 0;
 var screenDragCallbackFunction = 0;
+var screenOrientationChangeCallbackFunction = 0;
 var userInactivityCallbackFunction = 0;
 var fpsDropCallbackFunction = 0;
 var performanceDropCallbackFunction = 0;

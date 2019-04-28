@@ -2238,6 +2238,7 @@ StateLoader.prototype.resetProject = function(){
   screenFullScreenChangeCallbackFunction = 0;
   screenKeydownCallbackFunction = 0;
   screenKeyupCallbackFunction = 0;
+  screenOrientationChangeCallbackFunction = 0;
   fpsDropCallbackFunction = 0;
   performanceDropCallbackFunction = 0;
   userInactivityCallbackFunction = 0;

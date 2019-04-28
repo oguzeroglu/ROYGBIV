@@ -192,7 +192,10 @@ var Roygbiv = function(){
     "createFPSControl",
     "setScreenDragListener",
     "removeScreenDragListener",
-    "createOrbitControl"
+    "createOrbitControl",
+    "isOrientationLandscape",
+    "setScreenOrientationChangeListener",
+    "removeScreenOrientationChangeListener"
   ];
 
   this.globals = new Object();
@@ -3697,6 +3700,25 @@ Roygbiv.prototype.removeScreenDragListener = function(){
   screenDragCallbackFunction = noop;
 }
 
+// Sets a listener for orientation change events. For mobile devices, the callbackFunction is executed with
+// isLandscape parameter when the orientation is changed.
+Roygbiv.prototype.setScreenOrientationChangeListener = function(callbackFunction){
+  if (mode == 0 || !isMobile){
+    return;
+  }
+  preConditions.checkIfDefined(ROYGBIV.setScreenOrientationChangeListener, preConditions.callbackFunction, callbackFunction);
+  preConditions.checkIfFunctionOnlyIfExists(ROYGBIV.setScreenOrientationChangeListener, preConditions.callbackFunction, callbackFunction);
+  screenOrientationChangeCallbackFunction = callbackFunction;
+}
+
+// Removes the listener for orientation change events.
+Roygbiv.prototype.removeScreenOrientationChangeListener = function(){
+  if (mode == 0 || !isMobile){
+    return;
+  }
+  screenOrientationChangeCallbackFunction = noop;
+}
+
 // TEXT FUNCTIONS **************************************************************
 
 // Sets a text to a text object.
@@ -4732,4 +4754,16 @@ Roygbiv.prototype.getCurrentTouchCount = function(){
     return;
   }
   return touchEventHandler.currentTouchCount;
+}
+
+// For mobile devices returns if the orientation is landscape for mobile devices. Returns
+// false for desktop devices.
+Roygbiv.prototype.isOrientationLandscape = function(){
+  if (mode == 0){
+    return;
+  }
+  if (!isMobile){
+    return false;
+  }
+  return isOrientationLandscape;
 }
