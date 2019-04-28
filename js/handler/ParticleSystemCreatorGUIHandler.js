@@ -40,7 +40,11 @@ var ParticleSystemCreatorGUIHandler = function(){
       guiHandler.hideAll();
       terminal.enable();
       terminal.clear();
-      terminal.printInfo(Text.PARTICLE_SYSTEM_CREATED);
+      if (particleSystemCreatorGUIHandler.isEdit){
+        terminal.printInfo(Text.PARTICLE_SYSTEM_EDITED);
+      }else{
+        terminal.printInfo(Text.PARTICLE_SYSTEM_CREATED);
+      }
       scene.remove(particleSystemCreatorGUIHandler.particleSystem.mesh);
       if (particleSystemCreatorGUIHandler.hiddenEngineObjects){
         for (var i = 0; i<particleSystemCreatorGUIHandler.hiddenEngineObjects.length; i++){
@@ -562,9 +566,11 @@ ParticleSystemCreatorGUIHandler.prototype.edit = function(psName){
   var preConfiguredParticleSystem = preConfiguredParticleSystems[psName];
   var action = this.actionsByTypes[preConfiguredParticleSystem.type];
   action(preConfiguredParticleSystem.params);
+  this.isEdit = true;
 }
 
 ParticleSystemCreatorGUIHandler.prototype.show = function(psName){
   this.commonStartFunctions(psName);
   this.showCustom();
+  this.isEdit = false;
 }
