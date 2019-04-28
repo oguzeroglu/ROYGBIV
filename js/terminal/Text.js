@@ -37,6 +37,7 @@ var Text = function(){
   this.NO_SUCH_GRID_SYSTEM = "No such grid system.";
   this.GRID_SYSTEM_IS_OUT_OF = "Grid system is out of world limits. Use setWorldLimits command to increase the limit.";
   this.NO_SUCH_FONT = "No such font.";
+  this.NO_SUCH_PARTICLE_SYSTEM = "No such particle system.";
   this.TREE_NAME = "|____Name: @@1";
   this.TREE_SIZEX = "|____SizeX: @@1";
   this.TREE_SIZEZ = "|____SizeZ: @@1";
