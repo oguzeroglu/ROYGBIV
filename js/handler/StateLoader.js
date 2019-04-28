@@ -26,7 +26,7 @@ StateLoader.prototype.load = function(){
     }
     // PS REF HEIGHT ***********************************************
     particleSystemRefHeight = obj.particleSystemRefHeight;
-    GLOBAL_PS_REF_HEIGHT_UNIFORM.value = obj.globalPsRefHeightUniformValue;
+    GLOBAL_PS_REF_HEIGHT_UNIFORM.value = ((renderer.getCurrentViewport().w / screenResolution) / particleSystemRefHeight);
     // SHADER PRECISIONS *******************************************
     shaderPrecisionHandler.load(obj.shaderPrecisions);
     // GRID SYSTEMS ************************************************

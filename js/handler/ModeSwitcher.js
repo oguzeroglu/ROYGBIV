@@ -94,6 +94,9 @@ ModeSwitcher.prototype.switchFromDesignToPreview = function(){
   TOTAL_PARTICLE_COLLISION_LISTEN_COUNT = 0;
   TOTAL_PARTICLE_SYSTEM_COLLISION_LISTEN_COUNT = 0;
   TOTAL_PARTICLE_SYSTEMS_WITH_PARTICLE_COLLISIONS = 0;
+  if (particleSystemRefHeight){
+    GLOBAL_PS_REF_HEIGHT_UNIFORM.value = ((renderer.getCurrentViewport().w / screenResolution) / particleSystemRefHeight);
+  }
   if (fpsWeaponAlignmentConfigurationObject){
     fpsWeaponAlignmentConfigurationObject.revertPositionAfterFPSWeaponConfigurations();
     fpsWeaponAlignmentConfigurationObject = 0;

@@ -4457,6 +4457,14 @@ function parse(input){
           }else{
             build(projectName, author);
           }
+          var hasParticleSystems = false;
+          for (var key in preConfiguredParticleSystems){
+            hasParticleSystems = true;
+            break;
+          }
+          if (hasParticleSystems && !particleSystemRefHeight){
+            console.warn("[!] Consider using makeParticleSystemsResponsive CLI command.")
+          }
           return true;
         break;
         case 146: //skyboxConfigurations
