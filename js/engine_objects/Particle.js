@@ -25,6 +25,42 @@ var Particle = function(x, y, z, material, lifetime){
 
 }
 
+Particle.prototype.setCollisionListener = function(callbackFunction, timeOffset){
+  if (!this.uuid){
+    this.assignUUID();
+  }
+  var incrCounter = false;
+  if (!particleCollisionCallbackRequests[this.uuid]){
+    incrCounter = true;
+  }
+  particleCollisionCallbackRequests[this.uuid] = callbackFunction.bind(this);
+  if (incrCounter){
+    TOTAL_PARTICLE_COLLISION_LISTEN_COUNT ++;
+  }
+  this.checkForCollisions = true;
+  if (!(typeof timeOffset == UNDEFINED)){
+    this.collisionTimeOffset = timeOffset;
+  }
+  if (this.parent){
+    this.parent.hasParticleCollision = true;
+    this.parent.notifyParticleCollisionCallbackChange(this);
+  }
+}
+
+Particle.prototype.kill = function(){
+  this.isExpired = true;
+  if (this.parent){
+    this.parent.removeParticle(this);
+    this.parent.destroyedChildCount ++;
+    if (this.parent.destroyedChildCount == this.parent.particles.length){
+      this.parent.destroy();
+      delete particleSystems[this.parent.name];
+      delete particleSystemPool[this.parent.name];
+      TOTAL_PARTICLE_SYSTEM_COUNT --;
+    }
+  }
+}
+
 // WORLD COORDINATES OF THIS PARTICLE
 Particle.prototype.getPosition = function(axis, targetVector){
   if (this.isExpired || !this.parent || this.isParticleExpired() || (this.parent && !this.parent.mesh)){

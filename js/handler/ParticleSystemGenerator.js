@@ -39,6 +39,74 @@ ParticleSystemGenerator.prototype.applyNoise = function(vec){
   return new THREE.Vector3(vector3.x, vector3.y, vector3.z);
 }
 
+ParticleSystemGenerator.prototype.generateConfettiExplosion = function(configurations){
+  var name = configurations.name;
+  var position = configurations.position;
+  var expireTime = configurations.expireTime;
+  var lifetime = configurations.lifetime;
+  var verticalSpeed = configurations.verticalSpeed;
+  var horizontalSpeed = configurations.horizontalSpeed;
+  var verticalAcceleration = configurations.verticalAcceleration;
+  var particleCount = configurations.particleCount;
+  var particleSize = configurations.particleSize;
+  var colorName = configurations.colorName;
+  var alpha = configurations.alpha;
+  var collisionMethod = (!(typeof configurations.collisionMethod == UNDEFINED))? configurations.collisionMethod: 0;
+  var normal = configurations.normal;
+  var collisionTimeOffset= (!(typeof configurations.collisionTimeOffset == UNDEFINED))? configurations.collisionTimeOffset: 0;
+  var startDelay = (!(typeof configurations.startDelay == UNDEFINED))? configurations.startDelay: 0;
+  var targetColorName = configurations.targetColorName;
+  var colorStep = configurations.colorStep;
+  var alphaVariation = configurations.alphaVariation;
+  var textureName = configurations.textureName;
+  var rgbFilter = configurations.rgbFilter;
+  var normalSet = false;
+  if (!(typeof normal == UNDEFINED)){
+    normalSet = true;
+  }
+  var particleMaterial = this.generateParticleMaterial({
+    color: colorName,
+    size: particleSize,
+    alpha: alpha,
+    textureName: textureName,
+    rgbFilter: rgbFilter,
+    targetColor: targetColorName,
+    colorStep: colorStep
+  });
+  var particles = [];
+  var particleConfigurations = new Object();
+  particleConfigurations.position = new THREE.Vector3(0, 0, 0);
+  particleConfigurations.material = particleMaterial;
+  particleConfigurations.alphaVariation = alphaVariation;
+  if (collisionMethod == 2){
+    particleConfigurations.respawn = true;
+  }else{
+    particleConfigurations.respawn = false;
+  }
+  for (var i = 0; i<particleCount; i++){
+    particleConfigurations.startDelay = startDelay * Math.random();
+    particleConfigurations.lifetime = lifetime;
+    var v1 = horizontalSpeed * (Math.random() - 0.5);
+    var v2 = horizontalSpeed * (Math.random() - 0.5);
+    var v3 = verticalSpeed * Math.random();
+    particleConfigurations.velocity = new THREE.Vector3(v1, v3, v2);
+    particleConfigurations.acceleration = new THREE.Vector3(0, verticalAcceleration, 0);
+    var particle = this.generateParticle(particleConfigurations);
+    particles.push(particle);
+    if (collisionMethod == 1){
+      particle.setCollisionListener(function(info){this.kill();}, collisionTimeOffset);
+    }else if (collisionMethod == 2){
+      particle.setCollisionListener(function(info){this.parent.rewindParticle(this, Math.random());}, collisionTimeOffset);
+    }
+  }
+  var ps = this.generateParticleSystem({name: name, particles: particles, position: position, lifetime: expireTime});
+  if (normalSet){
+    var quat = this.computeQuaternionFromVectors(new THREE.Vector3(0, 1, 0), normal);
+    ps.mesh.quaternion.set(quat.x, quat.y, quat.z, quat.w);
+  }
+  return ps;
+}
+
 ParticleSystemGenerator.prototype.generateSmoke = function(configurations){
   var smokeSize = configurations.smokeSize;
   var name = configurations.name;

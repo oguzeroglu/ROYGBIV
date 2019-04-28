@@ -1145,17 +1145,7 @@ Roygbiv.prototype.kill = function(object){
   preConditions.checkIfDefined(ROYGBIV.kill, preConditions.object, object);
   preConditions.checkIfParticleOrParticleSystem(ROYGBIV.kill, preConditions.object, object);
   if (object.isParticle){
-    object.isExpired = true;
-    if (object.parent){
-      object.parent.removeParticle(object);
-      object.parent.destroyedChildCount ++;
-      if (object.parent.destroyedChildCount == object.parent.particles.length){
-        object.parent.destroy();
-        delete particleSystems[object.parent.name];
-        delete particleSystemPool[object.parent.name];
-        TOTAL_PARTICLE_SYSTEM_COUNT --;
-      }
-    }
+    object.kill();
   }else if (object.isParticleSystem){
     object.destroy();
     delete particleSystems[object.name];
@@ -2587,129 +2577,41 @@ Roygbiv.prototype.createConfettiExplosion = function(configurations){
     return;
   }
   preConditions.checkIfDefined(ROYGBIV.createConfettiExplosion, preConditions.configurations, configurations);
-  var name = configurations.name;
-  var position = configurations.position;
-  var expireTime = configurations.expireTime;
-  var lifetime = configurations.lifetime;
-  var verticalSpeed = configurations.verticalSpeed;
-  var horizontalSpeed = configurations.horizontalSpeed;
-  var verticalAcceleration = configurations.verticalAcceleration;
-  var particleCount = configurations.particleCount;
-  var particleSize = configurations.particleSize;
-  var colorName = configurations.colorName;
-  var alpha = configurations.alpha;
-  var collisionMethod = configurations.collisionMethod;
-  var normal = configurations.normal;
-  var collisionTimeOffset= configurations.collisionTimeOffset;
-  var startDelay = configurations.startDelay;
-  var targetColorName = configurations.targetColorName;
-  var colorStep = configurations.colorStep;
-  var alphaVariation = configurations.alphaVariation;
-  var textureName = configurations.textureName;
-  var rgbFilter = configurations.rgbFilter;
-
-  preConditions.checkIfMandatoryParameterExists(ROYGBIV.createConfettiExplosion, preConditions.name, name);
-  preConditions.checkIfTrue(ROYGBIV.createConfettiExplosion, "name must be unique", particleSystemPool[name]);
-  preConditions.checkIfMandatoryParameterExists(ROYGBIV.createConfettiExplosion, preConditions.position, position);
-  preConditions.checkIfVectorOnlyIfDefined(ROYGBIV.createConfettiExplosion, preConditions.position, position);
-  preConditions.checkIfMandatoryParameterExists(ROYGBIV.createConfettiExplosion, preConditions.expireTime, expireTime);
-  preConditions.checkIfNumber(ROYGBIV.createConfettiExplosion, preConditions.expireTime, expireTime);
-  preConditions.checkIfLessThanExclusive(ROYGBIV.createConfettiExplosion, preConditions.expireTime, expireTime, 0);
-  preConditions.checkIfMandatoryParameterExists(ROYGBIV.createConfettiExplosion, preConditions.lifetime, lifetime);
-  preConditions.checkIfNumber(ROYGBIV.createConfettiExplosion, preConditions.lifetime, lifetime);
-  preConditions.checkIfLessThanExclusive(ROYGBIV.createConfettiExplosion, preConditions.life, lifetime, 0);
-  preConditions.checkIfMandatoryParameterExists(ROYGBIV.createConfettiExplosion, preConditions.verticalSpeed, verticalSpeed);
-  preConditions.checkIfNumber(ROYGBIV.createConfettiExplosion, preConditions.verticalSpeed, verticalSpeed);
-  preConditions.checkIfMandatoryParameterExists(ROYGBIV.createConfettiExplosion, preConditions.horizontalSpeed, horizontalSpeed);
-  preConditions.checkIfNumber(ROYGBIV.createConfettiExplosion, preConditions.horizontalSpeed, horizontalSpeed);
-  preConditions.checkIfMandatoryParameterExists(ROYGBIV.createConfettiExplosion, preConditions.verticalAcceleration, verticalAcceleration);
-  preConditions.checkIfNumber(ROYGBIV.createConfettiExplosion, preConditions.verticalAcceleration, verticalAcceleration);
-  preConditions.checkIfTrue(ROYGBIV.createConfettiExplosion, "verticalAcceleration is expected to be less than zero", (verticalAcceleration >= 0));
-  preConditions.checkIfMandatoryParameterExists(ROYGBIV.createConfettiExplosion, preConditions.particleCount, particleCount);
-  preConditions.checkIfNumber(ROYGBIV.createConfettiExplosion, preConditions.particleCount, particleCount);
-  preConditions.checkIfLessThan(ROYGBIV.createConfettiExplosion, preConditions.particleCount, particleCount, 0);
-  preConditions.checkIfMandatoryParameterExists(ROYGBIV.createConfettiExplosion, preConditions.particleSize, particleSize);
-  preConditions.checkIfNumber(ROYGBIV.createConfettiExplosion, preConditions.particleSize, particleSize);
-  preConditions.checkIfLessThan(ROYGBIV.createConfettiExplosion, preConditions.particleSize, particleSize, 0);
-  preConditions.checkIfMandatoryParameterExists(ROYGBIV.createConfettiExplosion, preConditions.colorName, colorName);
-  preConditions.checkIfMandatoryParameterExists(ROYGBIV.createConfettiExplosion, preConditions.alpha, alpha);
-  preConditions.checkIfNumber(ROYGBIV.createConfettiExplosion, preConditions.alpha, alpha);
-  preConditions.checkIfInRange(ROYGBIV.createConfettiExplosion, preConditions.alpha, alpha, 0, 1);
-  preConditions.checkIfNumberOnlyIfExists(ROYGBIV.createConfettiExplosion, preConditions.collisionTimeOffset, collisionTimeOffset);
-  preConditions.checkIfNumberOnlyIfExists(ROYGBIV.createConfettiExplosion, preConditions.startDelay, startDelay);
-  preConditions.checkIfLessThanExclusiveOnlyIfExists(ROYGBIV.createConfettiExplosion, preConditions.startDelay, startDelay, 0);
-  preConditions.checkIfVectorOnlyIfDefined(ROYGBIV.createConfettiExplosion, preConditions.normal, normal);
-  if (!(typeof collisionMethod == UNDEFINED)){
-    preConditions.checkIfTrue(ROYGBIV.createConfettiExplosion, "collisionMethod method must be one of 0, 1 or 2", (collisionMethod != 0 && collisionMethod != 1 && collisionMethod != 2));
-  }else{
-    collisionMethod = 0;
+  preConditions.checkIfMandatoryParameterExists(ROYGBIV.createConfettiExplosion, preConditions.name, configurations.name);
+  preConditions.checkIfTrue(ROYGBIV.createConfettiExplosion, "name must be unique", particleSystemPool[configurations.name]);
+  preConditions.checkIfMandatoryParameterExists(ROYGBIV.createConfettiExplosion, preConditions.position, configurations.position);
+  preConditions.checkIfVectorOnlyIfDefined(ROYGBIV.createConfettiExplosion, preConditions.position, configurations.position);
+  preConditions.checkIfMandatoryParameterExists(ROYGBIV.createConfettiExplosion, preConditions.expireTime, configurations.expireTime);
+  preConditions.checkIfNumber(ROYGBIV.createConfettiExplosion, preConditions.expireTime, configurations.expireTime);
+  preConditions.checkIfLessThanExclusive(ROYGBIV.createConfettiExplosion, preConditions.expireTime, configurations.expireTime, 0);
+  preConditions.checkIfMandatoryParameterExists(ROYGBIV.createConfettiExplosion, preConditions.lifetime, configurations.lifetime);
+  preConditions.checkIfNumber(ROYGBIV.createConfettiExplosion, preConditions.lifetime, configurations.lifetime);
+  preConditions.checkIfLessThanExclusive(ROYGBIV.createConfettiExplosion, preConditions.life, configurations.lifetime, 0);
+  preConditions.checkIfMandatoryParameterExists(ROYGBIV.createConfettiExplosion, preConditions.verticalSpeed, configurations.verticalSpeed);
+  preConditions.checkIfNumber(ROYGBIV.createConfettiExplosion, preConditions.verticalSpeed, configurations.verticalSpeed);
+  preConditions.checkIfMandatoryParameterExists(ROYGBIV.createConfettiExplosion, preConditions.horizontalSpeed, configurations.horizontalSpeed);
+  preConditions.checkIfNumber(ROYGBIV.createConfettiExplosion, preConditions.horizontalSpeed, configurations.horizontalSpeed);
+  preConditions.checkIfMandatoryParameterExists(ROYGBIV.createConfettiExplosion, preConditions.verticalAcceleration, configurations.verticalAcceleration);
+  preConditions.checkIfNumber(ROYGBIV.createConfettiExplosion, preConditions.verticalAcceleration, configurations.verticalAcceleration);
+  preConditions.checkIfTrue(ROYGBIV.createConfettiExplosion, "verticalAcceleration is expected to be less than zero", (configurations.verticalAcceleration >= 0));
+  preConditions.checkIfMandatoryParameterExists(ROYGBIV.createConfettiExplosion, preConditions.particleCount, configurations.particleCount);
+  preConditions.checkIfNumber(ROYGBIV.createConfettiExplosion, preConditions.particleCount, configurations.particleCount);
+  preConditions.checkIfLessThan(ROYGBIV.createConfettiExplosion, preConditions.particleCount, configurations.particleCount, 0);
+  preConditions.checkIfMandatoryParameterExists(ROYGBIV.createConfettiExplosion, preConditions.particleSize, configurations.particleSize);
+  preConditions.checkIfNumber(ROYGBIV.createConfettiExplosion, preConditions.particleSize, configurations.particleSize);
+  preConditions.checkIfLessThan(ROYGBIV.createConfettiExplosion, preConditions.particleSize, configurations.particleSize, 0);
+  preConditions.checkIfMandatoryParameterExists(ROYGBIV.createConfettiExplosion, preConditions.colorName, configurations.colorName);
+  preConditions.checkIfMandatoryParameterExists(ROYGBIV.createConfettiExplosion, preConditions.alpha, configurations.alpha);
+  preConditions.checkIfNumber(ROYGBIV.createConfettiExplosion, preConditions.alpha, configurations.alpha);
+  preConditions.checkIfInRange(ROYGBIV.createConfettiExplosion, preConditions.alpha, configurations.alpha, 0, 1);
+  preConditions.checkIfNumberOnlyIfExists(ROYGBIV.createConfettiExplosion, preConditions.collisionTimeOffset, configurations.collisionTimeOffset);
+  preConditions.checkIfNumberOnlyIfExists(ROYGBIV.createConfettiExplosion, preConditions.startDelay, configurations.startDelay);
+  preConditions.checkIfLessThanExclusiveOnlyIfExists(ROYGBIV.createConfettiExplosion, preConditions.startDelay, configurations.startDelay, 0);
+  preConditions.checkIfVectorOnlyIfDefined(ROYGBIV.createConfettiExplosion, preConditions.normal, configurations.normal);
+  if (!(typeof configurations.collisionMethod == UNDEFINED)){
+    preConditions.checkIfTrue(ROYGBIV.createConfettiExplosion, "collisionMethod method must be one of 0, 1 or 2", (configurations.collisionMethod != 0 && configurations.collisionMethod != 1 && configurations.collisionMethod != 2));
   }
-  if ((typeof collisionTimeOffset == UNDEFINED)){
-    collisionTimeOffset = 0;
-  }
-  if ((typeof startDelay == UNDEFINED)){
-    startDelay = 0;
-  }
-  var normalSet = false;
-  if (!(typeof normal == UNDEFINED)){
-    normalSet = true;
-  }
-
-  var particleMaterial = this.createParticleMaterial({
-    color: colorName,
-    size: particleSize,
-    alpha: alpha,
-    textureName: textureName,
-    rgbFilter: rgbFilter,
-    targetColor: targetColorName,
-    colorStep: colorStep
-  });
-
-  var particles = [];
-  var particleConfigurations = new Object();
-  particleConfigurations.position = this.vector(0, 0, 0);
-  particleConfigurations.material = particleMaterial;
-  particleConfigurations.alphaVariation = alphaVariation;
-  if (collisionMethod == 2){
-    particleConfigurations.respawn = true;
-  }else{
-    particleConfigurations.respawn = false;
-  }
-  for (var i = 0; i<particleCount; i++){
-    particleConfigurations.startDelay = startDelay * Math.random();
-    particleConfigurations.lifetime = lifetime;
-    var v1 = horizontalSpeed * (Math.random() - 0.5);
-    var v2 = horizontalSpeed * (Math.random() - 0.5);
-    var v3 = verticalSpeed * Math.random();
-    particleConfigurations.velocity = this.vector(v1, v3, v2);
-    particleConfigurations.acceleration = this.vector(0, verticalAcceleration, 0);
-    var particle = this.createParticle(particleConfigurations);
-    particles.push(particle);
-    if (collisionMethod == 1){
-      var roygbivContext = this;
-      this.setCollisionListener(particle, function(info){
-        roygbivContext.kill(this);
-      }, collisionTimeOffset);
-    }else if (collisionMethod == 2){
-      var roygbivContext = this;
-      this.setCollisionListener(particle, function(info){
-        roygbivContext.rewindParticle(this, Math.random());
-      }, collisionTimeOffset);
-    }
-  }
-
-  var ps = this.createParticleSystem({
-    name: name,
-    particles: particles,
-    position: position,
-    lifetime: expireTime
-  });
-  if (normalSet){
-    var quat = this.computeQuaternionFromVectors(this.vector(0, 1, 0), normal);
-    ps.mesh.quaternion.set(quat.x, quat.y, quat.z, quat.w);
-  }
-  return ps;
-
+  return particleSystemGenerator.generateConfettiExplosion(configurations);
 }
 
 // Returns a new copy of given particle system. This function can be used to
@@ -3073,25 +2975,7 @@ Roygbiv.prototype.setCollisionListener = function(sourceObject, callbackFunction
         TOTAL_PARTICLE_SYSTEMS_WITH_PARTICLE_COLLISIONS ++;
       }
     }
-    if (!sourceObject.uuid){
-      sourceObject.assignUUID();
-    }
-    var incrCounter = false;
-    if (!particleCollisionCallbackRequests[sourceObject.uuid]){
-      incrCounter = true;
-    }
-    particleCollisionCallbackRequests[sourceObject.uuid] = callbackFunction.bind(sourceObject);
-    if (incrCounter){
-      TOTAL_PARTICLE_COLLISION_LISTEN_COUNT ++;
-    }
-    sourceObject.checkForCollisions = true;
-    if (!(typeof timeOffset == UNDEFINED)){
-      sourceObject.collisionTimeOffset = timeOffset;
-    }
-    if (sourceObject.parent){
-      sourceObject.parent.hasParticleCollision = true;
-      sourceObject.parent.notifyParticleCollisionCallbackChange(sourceObject);
-    }
+    sourceObject.setCollisionListener(callbackFunction, timeOffset);
   }else if (sourceObject.isParticleSystem){
     preConditions.checkIfTrue(ROYGBIV.setCollisionListener, "A position is set manually to the particle system. Cannot listen for collisions.", (sourceObject.hasManualPositionSet));
     preConditions.checkIfTrue(ROYGBIV.setCollisionListener, "A rotation is set manually to the particle system. Cannot listen for collisions.", (sourceObject.hasManualRotationSet));
