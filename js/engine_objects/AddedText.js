@@ -350,7 +350,7 @@ AddedText.prototype.setBackground = function(backgroundColorString, backgroundAl
   if (fromScript && (typeof this.oldBackgroundStatus == UNDEFINED)){
     this.oldBackgroundStatus = this.hasBackground ? this.hasBackground: false;
   }
-  if (!this.material.uniforms.backgroundColor){
+  if (!this.hasBackground){
     macroHandler.injectMacro("HAS_BACKGROUND", this.material, false, true);
     this.material.uniforms.backgroundColor = new THREE.Uniform(new THREE.Color(backgroundColorString));
     this.material.uniforms.backgroundAlpha = new THREE.Uniform(backgroundAlpha);
@@ -377,7 +377,7 @@ AddedText.prototype.removeBackground = function(fromScript){
       this.oldBackgroundAlpha = this.material.uniforms.backgroundAlpha.value;
     }
   }
-  if (this.material.uniforms.backgroundColor){
+  if (this.hasBackground){
     macroHandler.removeMacro("HAS_BACKGROUND", this.material, false, true);
     if (fromScript){
       this.isBGRemoved = true;

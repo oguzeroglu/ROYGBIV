@@ -3,15 +3,14 @@ var MacroHandler = function(){
 }
 
 MacroHandler.prototype.injectMacro = function(macro, material, insertVertexShader, insertFragmentShader){
+  var macroText = "#define "+macro;
   if (insertVertexShader){
-    material.vertexShader = material.vertexShader.replace(
-      "#define INSERTION", "#define INSERTION\n#define "+macro
-    )
+    material.vertexShader = material.vertexShader.replace("\n"+macroText, "");
+    material.vertexShader = material.vertexShader.replace("#define INSERTION", "#define INSERTION\n"+macroText);
   }
   if (insertFragmentShader){
-    material.fragmentShader = material.fragmentShader.replace(
-      "#define INSERTION", "#define INSERTION\n#define "+macro
-    )
+    material.fragmentShader = material.fragmentShader.replace("\n"+macroText, "");
+    material.fragmentShader = material.fragmentShader.replace("#define INSERTION", "#define INSERTION\n"+macroText);
   }
   material.needsUpdate = true;
 }
