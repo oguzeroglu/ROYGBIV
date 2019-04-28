@@ -363,7 +363,7 @@ var renderOrders = {
 }
 
 // WORKER VARIABLES
-var WORKERS_SUPPORTED = (typeof(Worker) !== UNDEFINED) && (typeof(MessageChannel) !== UNDEFINED);
+var WORKERS_SUPPORTED = (typeof(Worker) !== UNDEFINED);
 
 // TEXT POOL
 var Text = (!isDeployment)? new Text(): 0;
