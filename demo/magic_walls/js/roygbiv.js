@@ -6683,7 +6683,8 @@ function handleSkybox(){
 
 function deploymentScripts(){
   if(deploymentScriptsStatus.SCRIPT_EXECUTION_STATUS_init){if (cpuOperationsHandler.record){cpuOperationsHandler.scriptPerformances.init = performance.now()}ROYGBIV.startParticleSystem({particleSystem: ROYGBIV.getParticleSystem("ps1")});
-ROYGBIV.setActiveControl(ROYGBIV.createOrbitControl({maxRadius: 500, minRadius: 100, requestFullScreen: true, zoomDelta: 5}));
+var requestFullScreenParam = ROYGBIV.isMobile()? true: false;
+ROYGBIV.setActiveControl(ROYGBIV.createOrbitControl({maxRadius: 500, minRadius: 100, requestFullScreen: requestFullScreenParam, zoomDelta: 5}));
 var info = ROYGBIV.getText("info");
 var github = ROYGBIV.getText("github");
 ROYGBIV.setTextColor(info, "lime");
