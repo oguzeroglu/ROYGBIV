@@ -653,6 +653,14 @@ Terminal.prototype.autocomplete = function(command){
 				}
 				helpString = "[FPS weapons]: ";
 			break;
+			case commandDescriptor.PRECONFIGURED_PS_NAME:
+				for (var psName in preConfiguredParticleSystems){
+					if (psName.toLowerCase().startsWith(curEntry.toLowerCase())){
+						possibilities.push(psName);
+					}
+				}
+				helpString = "[Particle systems]: ";
+			break;
 		}
 
 		//  **********************************************************

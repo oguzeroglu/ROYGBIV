@@ -34,6 +34,9 @@ function render(){
     cpuOperationsHandler.updateCrosshair();
     cpuOperationsHandler.handleObjectMouseEvents();
   }else{
+    if (!isDeployment){
+      particleSystemCreatorGUIHandler.update();
+    }
     cameraOperationsDone = false;
   }
 

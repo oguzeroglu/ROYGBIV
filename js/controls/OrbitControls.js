@@ -142,6 +142,12 @@ OrbitControls.prototype.onActivated = function(){
 }
 
 OrbitControls.prototype.update = function(){
+  if (this.spherical.phi > 2.66){
+    this.spherical.phi = 2.66;
+  }
+  if (this.spherical.phi < 0.41){
+    this.spherical.phi = 0.41;
+  }
   if (!isMobile){
     for (var i = 0; i<this.keyboardActions.length; i++){
       var curAction = this.keyboardActions[i];

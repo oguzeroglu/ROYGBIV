@@ -56,9 +56,6 @@ var ParticleSystem = function(copyPS, name, particles, x, y, z, vx, vy, vz, ax, 
 
   this.particlesWithCollisionCallbacks = new Map();
 
-  this.gpuMotionUpdateBuffer = [];
-
-
   this.REUSABLE_VECTOR = new THREE.Vector3();
   this.REUSABLE_VELOCITY_VECTOR = new THREE.Vector3();
   this.REUSABLE_ACCELERATION_VECTOR = new THREE.Vector3();
@@ -207,23 +204,12 @@ var ParticleSystem = function(copyPS, name, particles, x, y, z, vx, vy, vz, ax, 
       }else{
         this.flags1[i5++] = 0;
       }
-
-      if (particle.gpuMotion){
-        this.accelerations[i3] = particle.gpuAcceleration.x;
-        this.velocities[i3++] = particle.gpuVelocity.x;
-        this.accelerations[i3] = particle.gpuAcceleration.y;
-        this.velocities[i3++] = particle.gpuVelocity.y;
-        this.accelerations[i3] = particle.gpuAcceleration.z;
-        this.velocities[i3++] = particle.gpuVelocity.z;
-      }else{
-        this.accelerations[i3] = 0;
-        this.velocities[i3++] = 0;
-        this.accelerations[i3] = 0;
-        this.velocities[i3++] = 0;
-        this.accelerations[i3] = 0;
-        this.velocities[i3++] = 0;
-      }
-
+      this.accelerations[i3] = particle.gpuAcceleration.x;
+      this.velocities[i3++] = particle.gpuVelocity.x;
+      this.accelerations[i3] = particle.gpuAcceleration.y;
+      this.velocities[i3++] = particle.gpuVelocity.y;
+      this.accelerations[i3] = particle.gpuAcceleration.z;
+      this.velocities[i3++] = particle.gpuVelocity.z;
       if (!(typeof particle.alphaDelta == UNDEFINED)){
         this.flags1[i5++] = particle.alphaDelta;
       }else{
@@ -593,13 +579,10 @@ ParticleSystem.prototype.calculatePseudoPosition = function(){
 }
 
 ParticleSystem.prototype.update = function(){
-
   if (this.destroyed){
     return;
   }
-
   this.tick += (1/60);
-
   if (isMobile){
     if (this.tick > 20){
       this.tick =  0;
@@ -609,7 +592,6 @@ ParticleSystem.prototype.update = function(){
       this.tick = 0;
     }
   }
-
   if (!this.psMerger){
     this.material.uniforms.time.value = this.tick;
     this.material.uniforms.modelViewMatrix.value = this.mesh.modelViewMatrix;
@@ -620,27 +602,21 @@ ParticleSystem.prototype.update = function(){
     this.psMerger.material.uniforms.modelViewMatrixArray.value[this.mergedIndex] = this.mesh.modelViewMatrix;
     this.psMerger.material.uniforms.timeArray.value[this.mergedIndex] = this.tick;
   }
-
-
   var vx = 0, vy = 0, vz = 0, ax = 0, ay = 0, az = 0;
-
   if (this.velocity){
     vx = this.velocity.x;
     vy = this.velocity.y;
     vz = this.velocity.z;
   }
-
   if (this.acceleration){
     ax = this.acceleration.x;
     ay = this.acceleration.y;
     az = this.acceleration.z;
   }
-
   if (this.motionMode == MOTION_MODE_NORMAL && !this.stopped){
     var dx = (vx * this.tick) + (0.5 * ax * this.tick * this.tick);
     var dy = (vy * this.tick) + (0.5 * ay * this.tick * this.tick);
     var dz = (vz * this.tick) + (0.5 * az * this.tick * this.tick);
-
     if (dx != 0 || dy != 0 || dz != 0){
       this.mesh.position.set(
         (this.x + dx),
@@ -668,29 +644,13 @@ ParticleSystem.prototype.update = function(){
       this.mesh.position.z + this.z
     );
   }
-
   if (this.stopped){
     this.mesh.position.set(this.stoppedX, this.stoppedY, this.stoppedZ);
   }
-
   if (this.updateFunction){
     this.updateFunction();
   }
-
   this.particlesWithCollisionCallbacks.forEach(this.particleIterationCollisionFunc);
-
-  if (this.gpuMotionUpdateBuffer.length > 0){
-    var firstIndex = this.gpuMotionUpdateBuffer[0].index;
-    for (var i = 0; i<this.gpuMotionUpdateBuffer.length; i++){
-      this.updateGPUMotion(this.gpuMotionUpdateBuffer[i]);
-      if (this.gpuMotionUpdateBuffer[i].index < firstIndex){
-        firstIndex = this.gpuMotionUpdateBuffer[i].index;
-      }
-    }
-    this.partialGPUMotionBufferUpdate(firstIndex);
-    this.gpuMotionUpdateBuffer = [];
-  }
-
   if (this.tick >= this.lifetime && this.lifetime > 0){
     if (this.expirationFunction){
       this.expirationFunction(this.name);
@@ -706,7 +666,6 @@ ParticleSystem.prototype.update = function(){
       particleSystemPools[this.psPool].notifyPSAvailable(this);
     }
   }
-
   if (this.checkForCollisions && this.mesh && this.mesh.visible){
     this.handleCollisions();
   }
@@ -717,15 +676,6 @@ ParticleSystem.prototype.particleIterationCollisionFunc = function(value){
   if (!particle.isExpired){
     particle.handleCollisions();
   }
-}
-
-ParticleSystem.prototype.partialGPUMotionBufferUpdate = function(firstIndex){
-  this.geometry.attributes.velocity.updateRange.offset = 3 * firstIndex;
-  this.geometry.attributes.velocity.updateRange.count = this.particles.length * 3;
-  this.geometry.attributes.acceleration.updateRange.offset = 3 * firstIndex;
-  this.geometry.attributes.acceleration.updateRange.count = this.particles.length * 3;
-  this.geometry.attributes.velocity.needsUpdate = true;
-  this.geometry.attributes.acceleration.needsUpdate = true;
 }
 
 ParticleSystem.prototype.rotate = function(axis, radians, fromScript){

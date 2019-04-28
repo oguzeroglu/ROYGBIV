@@ -13,6 +13,8 @@ var State = function(projectName, author){
   this.viewportMaxWidth = viewportMaxWidth;
   this.viewportMaxHeight = viewportMaxHeight;
   this.fixedAspect = fixedAspect;
+  // PS REF HEIGHT *************************************************
+  this.particleSystemRefHeight = particleSystemRefHeight;
   // SHADER PRECISIONS *********************************************
   this.shaderPrecisions = shaderPrecisionHandler.export();
   // GRID SYSTEMS **************************************************
@@ -194,5 +196,10 @@ var State = function(projectName, author){
   this.effects = new Object();
   for (var effectName in renderer.effects){
     this.effects[effectName] = renderer.effects[effectName].export();
+  }
+  // PRECONFIGURED PARTICLE SYSTEMS ********************************
+  this.preConfiguredParticleSystems = new Object();
+  for (var psName in preConfiguredParticleSystems){
+    this.preConfiguredParticleSystems[psName] = preConfiguredParticleSystems[psName];
   }
 }

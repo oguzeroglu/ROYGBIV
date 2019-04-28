@@ -201,6 +201,11 @@ MouseEventHandler.prototype.onClick = function(event, fromTap){
         return;
       }
     }
+    if (mode == 0){
+      if (guiHandler.datGuiPSCreator || guiHandler.datGuiFPSWeaponAlignment){
+        return;
+      }
+    }
     // TRY TO PICK 2D OBJECTS FIRST
     objectPicker2D.find(event.clientX, event.clientY);
     if (!intersectionPoint){

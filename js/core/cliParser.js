@@ -766,6 +766,21 @@ function parse(input){
               }
             }
           }
+          for (var psName in preConfiguredParticleSystems){
+            var params = preConfiguredParticleSystems[psName].params;
+            if (!(typeof params.textureName == UNDEFINED)){
+              if (params.textureName == textureName){
+                terminal.printError(Text.TEXTURE_USED_IN_A_PARTICLE_SYSTEM.replace(Text.PARAM1, psName));
+                return true;
+              }
+            }
+            if (!(typeof params.texture == UNDEFINED)){
+              if (params.texture == textureName){
+                terminal.printError(Text.TEXTURE_USED_IN_A_PARTICLE_SYSTEM.replace(Text.PARAM1, psName));
+                return true;
+              }
+            }
+          }
           if (textures[textureName] instanceof THREE.Texture){
             textures[textureName].dispose();
           }
@@ -4442,6 +4457,14 @@ function parse(input){
           }else{
             build(projectName, author);
           }
+          var hasParticleSystems = false;
+          for (var key in preConfiguredParticleSystems){
+            hasParticleSystems = true;
+            break;
+          }
+          if (hasParticleSystems && !particleSystemRefHeight){
+            console.warn("[!] Consider using makeParticleSystemsResponsive CLI command.")
+          }
           return true;
         break;
         case 146: //skyboxConfigurations
@@ -4995,6 +5018,8 @@ function parse(input){
             terminal.printError(Text.OBJECT_IS_NOT_MARKED_AS_FPS_WEAPON);
             return true;
           }
+          selectionHandler.resetCurrentSelection();
+          guiHandler.hideAll();
           if (fpsWeaponAlignmentConfigurationObject){
             if (fpsWeaponAlignmentConfigurationObject.name == objName){
               terminal.printError(Text.GUI_IS_ALREADY_OPEN_FOR_THIS_OBJECT);
@@ -5017,7 +5042,6 @@ function parse(input){
           guiHandler.fpsWeaponAlignmentParameters["Translate y"] = "0";
           guiHandler.fpsWeaponAlignmentParameters["Translate z"] = "0";
           guiHandler.fpsWeaponAlignmentParameters["Load from"] = "";
-          selectionHandler.resetCurrentSelection();
           guiHandler.show(guiHandler.guiTypes.FPS_WEAPON_ALIGNMENT);
           terminal.printInfo(Text.PRESS_DONE_BUTTON_TO);
           terminal.disable();
@@ -5065,6 +5089,48 @@ function parse(input){
             guiHandler.hide(guiHandler.guiTypes.SHADER_PRECISION);
             terminal.printInfo(Text.GUI_CLOSED);
           }
+          return true;
+        break;
+        case 164: //newParticleSystem
+          if (mode != 0){
+            terminal.printError(Text.WORKS_ONLY_IN_DESIGN_MODE);
+            return true;
+          }
+          var psName = splitted[1];
+          if (preConfiguredParticleSystems[psName]){
+            terminal.printError(Text.NAME_MUST_BE_UNIQUE);
+            return true;
+          }
+          particleSystemCreatorGUIHandler.show(psName);
+          terminal.clear();
+          terminal.disable();
+          terminal.printInfo(Text.AFTER_PS_CREATION);
+          return true;
+        break;
+        case 165: //editParticleSystem
+          if (mode != 0){
+            terminal.printError(Text.WORKS_ONLY_IN_DESIGN_MODE);
+            return true;
+          }
+          var psName = splitted[1];
+          if (!preConfiguredParticleSystems[psName]){
+            terminal.printError(Text.NO_SUCH_PARTICLE_SYSTEM);
+            return true;
+          }
+          particleSystemCreatorGUIHandler.edit(psName);
+          terminal.clear();
+          terminal.disable();
+          terminal.printInfo(Text.AFTER_PS_CREATION);
+          return true;
+        break;
+        case 166: //makeParticleSystemsResponsive
+          if (mode != 0){
+            terminal.printError(Text.WORKS_ONLY_IN_DESIGN_MODE);
+            return true;
+          }
+          particleSystemRefHeight = renderer.getCurrentViewport().w / screenResolution;
+          GLOBAL_PS_REF_HEIGHT_UNIFORM.value = 1;
+          terminal.printInfo(Text.OK);
           return true;
         break;
       }

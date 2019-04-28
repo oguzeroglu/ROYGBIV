@@ -148,7 +148,7 @@ var GUIHandler = function(){
   };
   // GUI TYPES DEFINITION
   this.guiTypes = {
-    FOG: 0, SKYBOX: 1, TEXT: 2, OBJECT: 3, BLOOM: 4, FPS_WEAPON_ALIGNMENT: 5, SHADER_PRECISION: 6
+    FOG: 0, SKYBOX: 1, TEXT: 2, OBJECT: 3, BLOOM: 4, FPS_WEAPON_ALIGNMENT: 5, SHADER_PRECISION: 6, PARTICLE_SYSTEM: 7
   };
 }
 
@@ -630,6 +630,12 @@ GUIHandler.prototype.hide = function(guiType){
       if (this.datGuiShaderPrecision){
         this.destroyGUI(this.datGuiShaderPrecision);
         this.datGuiShaderPrecision = 0;
+      }
+    return;
+    case this.guiTypes.PARTICLE_SYSTEM:
+      if (this.datGuiPSCreator){
+        this.destroyGUI(this.datGuiPSCreator);
+        this.datGuiPSCreator = 0;
       }
     return;
   }

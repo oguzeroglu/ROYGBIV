@@ -33,9 +33,11 @@ window.onload = function() {
   // CROSSHAIR HANDLER
   crosshairHandler = new CrosshairHandler();
 
-  // SELECTION HANDLER
   if (!isDeployment){
+    // SELECTION HANDLER
     selectionHandler = new SelectionHandler();
+    // PARTICLE SYSTEM CREATOR GUI HANDLER
+    particleSystemCreatorGUIHandler = new ParticleSystemCreatorGUIHandler();
   }
 
   // PHYSICS BODY GENERATOR
@@ -46,6 +48,9 @@ window.onload = function() {
 
   // SHADER PRECISION HANDLER
   shaderPrecisionHandler = new ShaderPrecisionHandler();
+
+  // PARTICLE SYSTEM GENERATOR
+  particleSystemGenerator = new ParticleSystemGenerator();
 
   // SCRIPTING UTILITY FUNCTIONS
   ROYGBIV = new Roygbiv();

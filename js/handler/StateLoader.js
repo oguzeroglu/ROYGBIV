@@ -24,6 +24,9 @@ StateLoader.prototype.load = function(){
     if (!(typeof obj.fixedAspect == UNDEFINED)){
       fixedAspect = obj.fixedAspect;
     }
+    // PS REF HEIGHT ***********************************************
+    particleSystemRefHeight = obj.particleSystemRefHeight;
+    GLOBAL_PS_REF_HEIGHT_UNIFORM.value = ((renderer.getCurrentViewport().w / screenResolution) / particleSystemRefHeight);
     // SHADER PRECISIONS *******************************************
     shaderPrecisionHandler.load(obj.shaderPrecisions);
     // GRID SYSTEMS ************************************************
@@ -968,6 +971,17 @@ StateLoader.prototype.load = function(){
         terminal.printError("Error loading font: "+fontName);
       });
       font.load();
+    }
+    // PRECONFIGURED PARTICLE SYSTEMS ******************************
+    for (var psName in obj.preConfiguredParticleSystems){
+      var curExport = obj.preConfiguredParticleSystems[psName];
+      for (var key in curExport.params){
+        var elem = curExport.params[key];
+        if (!(typeof elem.x == UNDEFINED) && !(typeof elem.y == UNDEFINED) && !(typeof elem.z == UNDEFINED)){
+          curExport.params[key] = new THREE.Vector3(elem.x, elem.y, elem.z);
+        }
+      }
+      preConfiguredParticleSystems[psName] = new PreconfiguredParticleSystem(curExport.name, curExport.type, curExport.params);
     }
     // TEXTS *******************************************************
     // NOT HERE -> SEE: finalize
@@ -2170,6 +2184,7 @@ StateLoader.prototype.resetProject = function(){
   markedPoints = new Object();
   areas = new Object();
   autoInstancedObjects = new Object();
+  preConfiguredParticleSystems = new Object();
   areaBinHandler = new WorldBinHandler(true);
   webglCallbackHandler = new WebGLCallbackHandler();
   threejsRenderMonitoringHandler = new THREEJSRenderMonitoringHandler();
@@ -2237,6 +2252,8 @@ StateLoader.prototype.resetProject = function(){
   roygbivBufferAttributeCounter = 1;
   roygbivSkippedArrayBufferUpdates = 0;
   roygbivSkippedElementArrayBufferUpdates = 0;
+  particleSystemRefHeight = 0;
+  GLOBAL_PS_REF_HEIGHT_UNIFORM.value = 0;
 
   boundingClientRect = renderer.getBoundingClientRect();
   pointerLockRequested = false;

@@ -72,8 +72,6 @@ ModeSwitcher.prototype.commonSwitchFunctions = function(){
   isPaused = false;
   maxInactiveTime = 0;
   inactiveCounter = 0;
-  particleSystemRefHeight = 0;
-  GLOBAL_PS_REF_HEIGHT_UNIFORM.value = 0;
   trackingObjects = new Object();
   objectsWithOnClickListeners = new Map();
   objectsWithMouseOverListeners = new Map();
@@ -96,6 +94,9 @@ ModeSwitcher.prototype.switchFromDesignToPreview = function(){
   TOTAL_PARTICLE_COLLISION_LISTEN_COUNT = 0;
   TOTAL_PARTICLE_SYSTEM_COLLISION_LISTEN_COUNT = 0;
   TOTAL_PARTICLE_SYSTEMS_WITH_PARTICLE_COLLISIONS = 0;
+  if (particleSystemRefHeight){
+    GLOBAL_PS_REF_HEIGHT_UNIFORM.value = ((renderer.getCurrentViewport().w / screenResolution) / particleSystemRefHeight);
+  }
   if (fpsWeaponAlignmentConfigurationObject){
     fpsWeaponAlignmentConfigurationObject.revertPositionAfterFPSWeaponConfigurations();
     fpsWeaponAlignmentConfigurationObject = 0;
@@ -202,6 +203,9 @@ ModeSwitcher.prototype.switchFromDesignToPreview = function(){
     }
   }else{
     GLOBAL_FOG_UNIFORM.value.set(-100.0, 0, 0, 0);
+  }
+  for (var psName in preConfiguredParticleSystems){
+    preConfiguredParticleSystems[psName].getParticleSystem();
   }
   ROYGBIV.globals = new Object();
   $("#cliDivheader").text("ROYGBIV 3D Engine - CLI (Preview mode)");

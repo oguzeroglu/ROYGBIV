@@ -164,7 +164,10 @@ var CommandDescriptor = function(){
       4, //simplifyPhysics
       1, //unsimplifyPhysics
       1, //fpsWeaponAlignment
-      1 //shaderPrecision
+      1, //shaderPrecision
+      1, //newParticleSystem
+      1, //editParticleSystem
+      0 //makeParticleSystemsResponsive
   ];
 
   this.commandArgumentsExpectedExplanation = [
@@ -331,7 +334,10 @@ var CommandDescriptor = function(){
     "simplifyPhysics objName sizeX sizeY sizeZ",
     "unsimplifyPhysics objName",
     "fpsWeaponAlignment objName",
-    "shaderPrecision show/hide"
+    "shaderPrecision show/hide",
+    "newParticleSystem psName",
+    "editParticleSystem psName",
+    "makeParticleSystemsResponsive"
   ];
 
   this.commands = [
@@ -498,7 +504,10 @@ var CommandDescriptor = function(){
     "simplifyPhysics",
     "unsimplifyPhysics",
     "fpsWeaponAlignment",
-    "shaderPrecision"
+    "shaderPrecision",
+    "newParticleSystem",
+    "editParticleSystem",
+    "makeParticleSystemsResponsive"
   ];
 
   this.commandInfo = [
@@ -665,7 +674,10 @@ var CommandDescriptor = function(){
     "simplifyPhysics: Sets the physics of an object to a box shape of sizeX, sizeY, sizeZ sizes. This helps optimizing the performance of the\n  physics engine but causes physics precision loss.",
     "unsimplifyPhysics: Brings back the original physics for an object after the usage of simplifyPhysics command.",
     "fpsWeaponAlignment: Shows the FPS weapon alignment GUI.",
-    "shaderPrecision: Show the shader precision adjustment GUI."
+    "shaderPrecision: Show the shader precision adjustment GUI.",
+    "newParticleSystem: Opens the Particle System Creation GUI.",
+    "editParticleSystem: Shows the GUI for editing a particle system.",
+    "makeParticleSystemsResponsive: Calculates a reference height based on the height and resolution of the device that runs this command\nin order to make the particle systems look responsive on different devices."
   ];
 
   this.keyboardInfo = [
@@ -764,6 +776,7 @@ var CommandDescriptor = function(){
   this.TEXT_NAME                =   32;
   this.EFFECT_NAME              =   33;
   this.FPS_WEAPON               =   34;
+  this.PRECONFIGURED_PS_NAME    =   35;
 
   // newGridSystem
   this.newGridSystem = new Object();
@@ -1334,6 +1347,16 @@ var CommandDescriptor = function(){
   this.shaderPrecision = new Object();
   this.shaderPrecision.types = [];
   this.shaderPrecision.types.push(this.HIDE_SHOW); // show/hide
+
+  // newParticleSystem
+  this.newParticleSystem = new Object();
+  this.newParticleSystem.types = [];
+  this.newParticleSystem.types.push(this.UNKNOWN_INDICATOR); // psName
+
+  // editParticleSystem
+  this.editParticleSystem = new Object();
+  this.editParticleSystem.types = [];
+  this.editParticleSystem.types.push(this.PRECONFIGURED_PS_NAME); // psName
 
 };
 
