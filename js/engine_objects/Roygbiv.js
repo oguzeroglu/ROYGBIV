@@ -4057,6 +4057,9 @@ Roygbiv.prototype.createFPSControl = function(parameters){
 // mouseDragRotationSpeed (optional): The speed of mouse drag rotation. Default value is 20.
 // fingerSwipeRotationSpeed (optional): The speed of finger touch rotation for mobile devices. Default value is 20.
 // keyboardRotationSpeed (optional): The speed of rotation using keyboard events. Default value is 10.
+// requestFullScreen (optional): If true the FullScreen mode is requested if the screen is not on full screen. Orbit Controls
+// API also automatically re-requests the FullScreen mode every time after the user cancels the FullScreen. Default value
+// is false.
 Roygbiv.prototype.createOrbitControl = function(parameters){
   if (mode == 0){
     return;
@@ -4070,6 +4073,7 @@ Roygbiv.prototype.createOrbitControl = function(parameters){
   preConditions.checkIfNumberOnlyIfExists(ROYGBIV.createOrbitControl, preConditions.mouseDragRotationSpeed, parameters.mouseDragRotationSpeed);
   preConditions.checkIfNumberOnlyIfExists(ROYGBIV.createOrbitControl, preConditions.fingerSwipeRotationSpeed, parameters.fingerSwipeRotationSpeed);
   preConditions.checkIfNumberOnlyIfExists(ROYGBIV.createOrbitControl, preConditions.keyboardRotationSpeed, parameters.keyboardRotationSpeed);
+  preConditions.checkIfBooleanOnlyIfExists(ROYGBIV.createOrbitControl, preConditions.requestFullScreen, parameters.requestFullScreen);
   return new OrbitControls(parameters);
 }
 
