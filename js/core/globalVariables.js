@@ -345,6 +345,8 @@ var shaderPrecisionHandler;
 var particleSystemCreatorGUIHandler;
 var preConfiguredParticleSystems = new Object();
 var particleSystemGenerator;
+var PARTICLE_REWIND_ON_COLLIDED = 0;
+var PARTICLE_DISSAPEAR_ON_COLLIDED = 1;
 
 // RENDER ORDERS
 var renderOrders = {

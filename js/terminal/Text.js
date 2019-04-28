@@ -535,7 +535,7 @@ var Text = function(){
   this.ROYGBIV_SCRIPTING_API_SETCOLLISIONLISTENER = "Sets a collision listener for an object, glued object or a particle system."+
                                                     "Callback function given as the second parameter is\nfired with a CollisionInfo instance when the sourceObject is collided with other objects or glued objects of the scene.\n"+
                                                     "The additional timeOffset parameter can be used for particle systems to pre-calculate future collisions. This can help to\nprevent visual errors of collisions of rather fast particle systems.";
-  this.ROYGBIV_SCRIPTING_API_REMOVECOLLISIONLISTENER = "Removes collision listeners of an object, glued object, particle or a particle system. Use this for performance improvements if\ncollision callbacks are no longer necessary for particles or particle systems.";
+  this.ROYGBIV_SCRIPTING_API_REMOVECOLLISIONLISTENER = "Removes collision listeners of an object, glued object or a particle system.";
   this.ROYGBIV_SCRIPTING_API_CREATEPARTICLEMATERIAL = "Returns a material for a particle. The configurations are:\n"+
                                                       "color: The HTML color name of the particle. (mandatory)\n"+
                                                       "size: The size of the particle. (mandatory)\n"+

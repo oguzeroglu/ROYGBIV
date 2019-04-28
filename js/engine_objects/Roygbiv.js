@@ -972,6 +972,8 @@ Roygbiv.prototype.createParticleMaterial = function(configurations){
 //  motionMode: The motion mode of the particle. This can be MOTION_MODE_NORMAL or MOTION_MODE_CIRCULAR. MOTION_MODE_NORMAL represents
 //  the motion with uniform acceleration and the MOTION_MODE_CIRCULAR represents the uniform circular motion. The default value is
 //  MOTION_MODE_NORMAL. (optional)
+//  collisionAction: One of PARTICLE_REWIND_ON_COLLIDED or PARTICLE_DISSAPEAR_ON_COLLIDED. This parameter decides what to do when the particle
+//  is collided with one of the intersectable objects of the scene. If not set, particles are not listened for collisions. (optional)
 Roygbiv.prototype.createParticle = function(configurations){
   if (mode == 0){
     return;
@@ -2980,9 +2982,7 @@ Roygbiv.prototype.setCollisionListener = function(sourceObject, callbackFunction
   }
 }
 
-//  Removes collision listeners of an object, glued object, particle or a particle system.. Use this
-//  for performance improvements if collision callbacks are no longer necessary
-//  for particles or particle systems.
+//  Removes collision listeners of an object, glued object or a particle system.
 Roygbiv.prototype.removeCollisionListener = function(sourceObject){
   if (mode == 0){
     return;
@@ -2992,8 +2992,6 @@ Roygbiv.prototype.removeCollisionListener = function(sourceObject){
   var curCallbackRequest;
   if ((sourceObject.isAddedObject) || (sourceObject.isObjectGroup)){
     curCallbackRequest = collisionCallbackRequests.get(sourceObject.name);
-  }else if (sourceObject.isParticle){
-    curCallbackRequest = particleCollisionCallbackRequests[sourceObject.uuid];
   }else if (sourceObject.isParticleSystem){
     curCallbackRequest = particleSystemCollisionCallbackRequests[sourceObject.name];
   }
@@ -3001,13 +2999,6 @@ Roygbiv.prototype.removeCollisionListener = function(sourceObject){
     if ((sourceObject.isAddedObject) || (sourceObject.isObjectGroup)){
       sourceObject.removeCollisionListener();
       TOTAL_OBJECT_COLLISION_LISTENER_COUNT --;
-    }else if (sourceObject.isParticle){
-      delete particleCollisionCallbackRequests[sourceObject.uuid];
-      TOTAL_PARTICLE_COLLISION_LISTEN_COUNT --;
-      sourceObject.checkForCollisions = false;
-      if (sourceObject.parent){
-        sourceObject.parent.notifyParticleCollisionCallbackChange(sourceObject);
-      }
     }else if (sourceObject.isParticleSystem){
       TOTAL_PARTICLE_SYSTEM_COLLISION_LISTEN_COUNT --;
       delete particleSystemCollisionCallbackRequests[sourceObject.name];
