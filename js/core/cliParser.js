@@ -5083,7 +5083,7 @@ function parse(input){
           }
           return true;
         break;
-        case 164:
+        case 164: //newParticleSystem
           if (mode != 0){
             terminal.printError(Text.WORKS_ONLY_IN_DESIGN_MODE);
             return true;
@@ -5099,7 +5099,7 @@ function parse(input){
           terminal.printInfo(Text.AFTER_PS_CREATION);
           return true;
         break;
-        case 165:
+        case 165: //editParticleSystem
           if (mode != 0){
             terminal.printError(Text.WORKS_ONLY_IN_DESIGN_MODE);
             return true;
@@ -5113,6 +5113,16 @@ function parse(input){
           terminal.clear();
           terminal.disable();
           terminal.printInfo(Text.AFTER_PS_CREATION);
+          return true;
+        break;
+        case 166: //makeParticleSystemsResponsive
+          if (mode != 0){
+            terminal.printError(Text.WORKS_ONLY_IN_DESIGN_MODE);
+            return true;
+          }
+          particleSystemRefHeight = renderer.getCurrentViewport().w / screenResolution;
+          GLOBAL_PS_REF_HEIGHT_UNIFORM.value = 1;
+          terminal.printInfo(Text.OK);
           return true;
         break;
       }

@@ -168,7 +168,6 @@ var Roygbiv = function(){
     "hideText",
     "showText",
     "getFPS",
-    "makeParticleSystemsResponsive",
     "executeForEachObject",
     "getRandomInteger",
     "isAnyFingerTouching",
@@ -2884,23 +2883,6 @@ Roygbiv.prototype.createInitializedParticleSystemPool = function(poolName, refPa
     this.addParticleSystemToPool(pool, this.copyParticleSystem(refParticleSystem, this.generateParticleSystemName()));
   }
   return pool;
-}
-
-// Makes the particle systems responsive for different screens. This function
-// should be used before any particle system creation. The referenceHeight can
-// be calculated by dividing the design screen viewport height by the screen resolution
-// (renderer.getCurrentViewport().w / screenResolution). The referenceHeight should
-// be a constant (not to be calculated during runtime).
-Roygbiv.prototype.makeParticleSystemsResponsive = function(referenceHeight){
-  if (mode == 0){
-    return;
-  }
-  preConditions.checkIfDefined(ROYGBIV.makeParticleSystemsResponsive, preConditions.referenceHeight, referenceHeight);
-  preConditions.checkIfNumber(ROYGBIV.makeParticleSystemsResponsive, preConditions.referenceHeight, referenceHeight);
-  preConditions.checkIfLessThan(ROYGBIV.makeParticleSystemsResponsive, preConditions.referenceHeight, referenceHeight, 0);
-  preConditions.checkIfTrue(ROYGBIV.makeParticleSystemsResponsive, "This API should be used before any particle system creation.", (TOTAL_PARTICLE_SYSTEM_COUNT > 0));
-  particleSystemRefHeight = referenceHeight;
-  GLOBAL_PS_REF_HEIGHT_UNIFORM.value = ((renderer.getCurrentViewport().w / screenResolution) / particleSystemRefHeight);
 }
 
 // CROSSHAIR FUNCTIONS *********************************************************

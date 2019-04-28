@@ -13,6 +13,9 @@ var State = function(projectName, author){
   this.viewportMaxWidth = viewportMaxWidth;
   this.viewportMaxHeight = viewportMaxHeight;
   this.fixedAspect = fixedAspect;
+  // PS REF HEIGHT *************************************************
+  this.particleSystemRefHeight = particleSystemRefHeight;
+  this.globalPsRefHeightUniformValue = GLOBAL_PS_REF_HEIGHT_UNIFORM.value;
   // SHADER PRECISIONS *********************************************
   this.shaderPrecisions = shaderPrecisionHandler.export();
   // GRID SYSTEMS **************************************************

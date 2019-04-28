@@ -24,6 +24,9 @@ StateLoader.prototype.load = function(){
     if (!(typeof obj.fixedAspect == UNDEFINED)){
       fixedAspect = obj.fixedAspect;
     }
+    // PS REF HEIGHT ***********************************************
+    particleSystemRefHeight = obj.particleSystemRefHeight;
+    GLOBAL_PS_REF_HEIGHT_UNIFORM.value = obj.globalPsRefHeightUniformValue;
     // SHADER PRECISIONS *******************************************
     shaderPrecisionHandler.load(obj.shaderPrecisions);
     // GRID SYSTEMS ************************************************
@@ -2249,6 +2252,8 @@ StateLoader.prototype.resetProject = function(){
   roygbivBufferAttributeCounter = 1;
   roygbivSkippedArrayBufferUpdates = 0;
   roygbivSkippedElementArrayBufferUpdates = 0;
+  particleSystemRefHeight = 0;
+  GLOBAL_PS_REF_HEIGHT_UNIFORM.value = 0;
 
   boundingClientRect = renderer.getBoundingClientRect();
   pointerLockRequested = false;

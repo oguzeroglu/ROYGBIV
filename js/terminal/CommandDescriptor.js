@@ -166,7 +166,8 @@ var CommandDescriptor = function(){
       1, //fpsWeaponAlignment
       1, //shaderPrecision
       1, //newParticleSystem
-      1 //editParticleSystem
+      1, //editParticleSystem
+      0 //makeParticleSystemsResponsive
   ];
 
   this.commandArgumentsExpectedExplanation = [
@@ -335,7 +336,8 @@ var CommandDescriptor = function(){
     "fpsWeaponAlignment objName",
     "shaderPrecision show/hide",
     "newParticleSystem psName",
-    "editParticleSystem psName"
+    "editParticleSystem psName",
+    "makeParticleSystemsResponsive"
   ];
 
   this.commands = [
@@ -504,7 +506,8 @@ var CommandDescriptor = function(){
     "fpsWeaponAlignment",
     "shaderPrecision",
     "newParticleSystem",
-    "editParticleSystem"
+    "editParticleSystem",
+    "makeParticleSystemsResponsive"
   ];
 
   this.commandInfo = [
@@ -673,7 +676,8 @@ var CommandDescriptor = function(){
     "fpsWeaponAlignment: Shows the FPS weapon alignment GUI.",
     "shaderPrecision: Show the shader precision adjustment GUI.",
     "newParticleSystem: Opens the Particle System Creation GUI.",
-    "editParticleSystem: Shows the GUI for editing a particle system."
+    "editParticleSystem: Shows the GUI for editing a particle system.",
+    "makeParticleSystemsResponsive: Calculates a reference height based on the height and resolution of the device that runs this command\nin order to make the particle systems look responsive on different devices."
   ];
 
   this.keyboardInfo = [
