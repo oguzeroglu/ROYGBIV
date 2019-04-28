@@ -824,10 +824,9 @@ var Text = function(){
                                                          "particleSize: The size of particles. (mandatory)\n"+
                                                          "colorName: The color name of particles. (mandatory)\n"+
                                                          "alpha: The alpha value of particles. (mandatory)\n"+
-                                                         "collisionMethod: 0 -> Nothing happens when particles are collided with objects.\n"+
-                                                         "                 1 -> Particles are destroyed when collided with objects.\n"+
-                                                         "                 2 -> Particles are respawned when collided with objects.\n"+
-                                                         "                 Default value is 0. (optional)\n"+
+                                                         "collisionMethod: PARTICLE_DISSAPEAR_ON_COLLIDED -> Particles are dissapeared when collided with objects.\n"+
+                                                         "                 PARTICLE_REWIND_ON_COLLIDED -> Particles are respawned when collided with objects.\n"+
+                                                         "                 If not set, particles are not listened for collisions.\n"+
                                                          "normal: The normal vector of the particle system. Default value is (0, 1, 0) (optional)\n"+
                                                          "collisionTimeOffset: The time offset of collision listener if the collisionMethod is 1 or 2. Default value is 0. (optional)\n"+
                                                          "startDelay: The average start delay of particles. Default value is 0. (optional)\n"+
