@@ -7950,6 +7950,10 @@ AddedText.prototype.setBackground = function(backgroundColorString, backgroundAl
     this.material.uniforms.backgroundColor.value.set(backgroundColorString);
     this.material.uniforms.backgroundAlpha.value = backgroundAlpha;
   }
+  if (fromScript && this.isBGRemoved){
+    macroHandler.injectMacro("HAS_BACKGROUND", this.material, false, true);
+    this.isBGRemoved = false;
+  }
   if (!fromScript){
     this.hasBackground = true;
   }
@@ -7957,12 +7961,19 @@ AddedText.prototype.setBackground = function(backgroundColorString, backgroundAl
 
 AddedText.prototype.removeBackground = function(fromScript){
   if (fromScript && (typeof this.oldBackgroundStatus == UNDEFINED)){
-    this.oldBackgroundStatus = this.material.uniforms.hasBackgroundColorFlag.value;
+    this.oldBackgroundStatus = this.hasBackground ? this.hasBackground: false;
+    if (this.oldBackgroundStatus){
+      this.oldBackgroundR = this.material.uniforms.backgroundColor.value.r;
+      this.oldBackgroundG = this.material.uniforms.backgroundColor.value.g;
+      this.oldBackgroundB = this.material.uniforms.backgroundColor.value.b;
+      this.oldBackgroundAlpha = this.material.uniforms.backgroundAlpha.value;
+    }
   }
   if (this.material.uniforms.backgroundColor){
     macroHandler.removeMacro("HAS_BACKGROUND", this.material, false, true);
-    delete this.material.uniforms.backgroundColor;
-    delete this.material.uniforms.backgroundAlpha;
+    if (fromScript){
+      this.isBGRemoved = true;
+    }
   }
   if (!fromScript){
     this.hasBackground = false;
@@ -8240,6 +8251,10 @@ AddedText.prototype.restore = function(){
     delete this.oldBackgroundG;
     delete this.oldBackgroundB;
     delete this.oldBackgroundAlpha;
+    if (this.isBGRemoved){
+      macroHandler.injectMacro("HAS_BACKGROUND", this.material, false, true);
+      this.isBGRemoved = false;
+    }
   }
   this.mesh.position.copy(this.position);
 }

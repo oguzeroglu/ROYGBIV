@@ -1541,6 +1541,7 @@ var screenKeyupCallbackFunction = 0;
 var screenMouseWheelCallbackFunction = 0;
 var screenPinchCallbackFunction = 0;
 var screenDragCallbackFunction = 0;
+var screenOrientationChangeCallbackFunction = 0;
 var userInactivityCallbackFunction = 0;
 var fpsDropCallbackFunction = 0;
 var performanceDropCallbackFunction = 0;
@@ -6683,13 +6684,20 @@ function handleSkybox(){
 
 function deploymentScripts(){
   if(deploymentScriptsStatus.SCRIPT_EXECUTION_STATUS_init){if (cpuOperationsHandler.record){cpuOperationsHandler.scriptPerformances.init = performance.now()}ROYGBIV.startParticleSystem({particleSystem: ROYGBIV.getParticleSystem("ps1")});
-ROYGBIV.setActiveControl(ROYGBIV.createOrbitControl({maxRadius: 300, minRadius: 100, requestFullScreen: true}));
+ROYGBIV.setActiveControl(ROYGBIV.createOrbitControl({maxRadius: 300, minRadius: 100, requestFullScreen: true, zoomDelta: 5}));
 var info = ROYGBIV.getText("info");
 var github = ROYGBIV.getText("github");
 ROYGBIV.setTextColor(info, "lime");
 ROYGBIV.setTextColor(github, "lime");
+ROYGBIV.removeTextBackground(info);
 if (ROYGBIV.isMobile()){
-  ROYGBIV.setText(info, "touch: rotate\npinch: zoom");
+  if (ROYGBIV.isOrientationLandscape()){
+    ROYGBIV.setText(info, "touch: rotate\npinch: zoom");
+  }else{
+    ROYGBIV.setTextColor(info, "red");
+    ROYGBIV.setTextBackground(info, "black", 1);
+    ROYGBIV.setText(info, "Rotate your\ndevice.");
+  }
 }else{
   ROYGBIV.setText(info, "mouse wheel: rotate\nup/down: zoom");
   ROYGBIV.onTextMouseOver(github, function(){
@@ -6699,10 +6707,20 @@ if (ROYGBIV.isMobile()){
     ROYGBIV.setTextColor(this, "lime");
   });
 }
-
 ROYGBIV.onTextClick(github, function(){
   var redirectWindow = window.open('https://github.com/oguzeroglu/ROYGBIV', '_blank');
   redirectWindow.location;
+});
+ROYGBIV.setScreenOrientationChangeListener(function(isLandscape){
+  if (isLandscape){
+    ROYGBIV.removeTextBackground(info);
+    ROYGBIV.setTextColor(info, "lime");
+    ROYGBIV.setText(info, "touch: rotate\npinch: zoom");
+  }else{
+    ROYGBIV.setTextBackground(info, "black", 1);
+    ROYGBIV.setTextColor(info, "red");
+    ROYGBIV.setText(info, "Rotate your\ndevice.");
+  }
 });
 deploymentScriptsStatus.SCRIPT_EXECUTION_STATUS_init = false;
 if (cpuOperationsHandler.record){cpuOperationsHandler.scriptPerformances.init = performance.now() - cpuOperationsHandler.scriptPerformances.init}}
@@ -10521,6 +10539,7 @@ StateLoader.prototype.resetProject = function(){
   screenFullScreenChangeCallbackFunction = 0;
   screenKeydownCallbackFunction = 0;
   screenKeyupCallbackFunction = 0;
+  screenOrientationChangeCallbackFunction = 0;
   fpsDropCallbackFunction = 0;
   performanceDropCallbackFunction = 0;
   userInactivityCallbackFunction = 0;
@@ -15433,7 +15452,10 @@ var Roygbiv = function(){
     "createFPSControl",
     "setScreenDragListener",
     "removeScreenDragListener",
-    "createOrbitControl"
+    "createOrbitControl",
+    "isOrientationLandscape",
+    "setScreenOrientationChangeListener",
+    "removeScreenOrientationChangeListener"
   ];
 
   this.globals = new Object();
@@ -17561,6 +17583,20 @@ Roygbiv.prototype.removeScreenDragListener = function(){
   screenDragCallbackFunction = noop;
 }
 
+Roygbiv.prototype.setScreenOrientationChangeListener = function(callbackFunction){
+  if (mode == 0 || !isMobile){
+    return;
+  }
+  screenOrientationChangeCallbackFunction = callbackFunction;
+}
+
+Roygbiv.prototype.removeScreenOrientationChangeListener = function(){
+  if (mode == 0 || !isMobile){
+    return;
+  }
+  screenOrientationChangeCallbackFunction = noop;
+}
+
 
 Roygbiv.prototype.setText = function(textObject, text){
   if (mode == 0){
@@ -18123,6 +18159,16 @@ Roygbiv.prototype.getCurrentTouchCount = function(){
     return;
   }
   return touchEventHandler.currentTouchCount;
+}
+
+Roygbiv.prototype.isOrientationLandscape = function(){
+  if (mode == 0){
+    return;
+  }
+  if (!isMobile){
+    return false;
+  }
+  return isOrientationLandscape;
 }
 
 
@@ -19780,6 +19826,10 @@ AddedText.prototype.setBackground = function(backgroundColorString, backgroundAl
     this.material.uniforms.backgroundColor.value.set(backgroundColorString);
     this.material.uniforms.backgroundAlpha.value = backgroundAlpha;
   }
+  if (fromScript && this.isBGRemoved){
+    macroHandler.injectMacro("HAS_BACKGROUND", this.material, false, true);
+    this.isBGRemoved = false;
+  }
   if (!fromScript){
     this.hasBackground = true;
   }
@@ -19787,12 +19837,19 @@ AddedText.prototype.setBackground = function(backgroundColorString, backgroundAl
 
 AddedText.prototype.removeBackground = function(fromScript){
   if (fromScript && (typeof this.oldBackgroundStatus == UNDEFINED)){
-    this.oldBackgroundStatus = this.material.uniforms.hasBackgroundColorFlag.value;
+    this.oldBackgroundStatus = this.hasBackground ? this.hasBackground: false;
+    if (this.oldBackgroundStatus){
+      this.oldBackgroundR = this.material.uniforms.backgroundColor.value.r;
+      this.oldBackgroundG = this.material.uniforms.backgroundColor.value.g;
+      this.oldBackgroundB = this.material.uniforms.backgroundColor.value.b;
+      this.oldBackgroundAlpha = this.material.uniforms.backgroundAlpha.value;
+    }
   }
   if (this.material.uniforms.backgroundColor){
     macroHandler.removeMacro("HAS_BACKGROUND", this.material, false, true);
-    delete this.material.uniforms.backgroundColor;
-    delete this.material.uniforms.backgroundAlpha;
+    if (fromScript){
+      this.isBGRemoved = true;
+    }
   }
   if (!fromScript){
     this.hasBackground = false;
@@ -20070,6 +20127,10 @@ AddedText.prototype.restore = function(){
     delete this.oldBackgroundG;
     delete this.oldBackgroundB;
     delete this.oldBackgroundAlpha;
+    if (this.isBGRemoved){
+      macroHandler.injectMacro("HAS_BACKGROUND", this.material, false, true);
+      this.isBGRemoved = false;
+    }
   }
   this.mesh.position.copy(this.position);
 }
@@ -21546,6 +21607,7 @@ ModeSwitcher.prototype.switchFromPreviewToDesign = function(){
   userInactivityCallbackFunction = 0;
   screenMouseWheelCallbackFunction = 0;
   screenPinchCallbackFunction = 0;
+  screenOrientationChangeCallbackFunction = 0;
   fpsHandler.reset();
   pointerLockRequested = false;
   fullScreenRequested = false;
@@ -23385,9 +23447,13 @@ var ResizeEventHandler = function(){
 }
 
 ResizeEventHandler.prototype.onResize = function(){
+  var oldOrientation = isOrientationLandscape;
   isOrientationLandscape = (window.innerWidth > window.innerHeight);
   if (!(renderer)){
     return;
+  }
+  if (oldOrientation != isOrientationLandscape && isMobile && screenOrientationChangeCallbackFunction){
+    screenOrientationChangeCallbackFunction(isOrientationLandscape);
   }
   renderer.setSize(window.innerWidth, window.innerHeight);
   camera.oldAspect = camera.aspect;
@@ -25709,6 +25775,9 @@ FPSControls.prototype.onDeactivated = function(){
     this.weaponObject2.mesh.quaternion.copy(this.weaponObject2.beforeFPSControlsInfo.quaternion);
     this.weaponObject2.mesh.scale.set(1, 1, 1);
   }
+  if (isMobile){
+    touchEventHandler.tapThreshold = 310;
+  }
 }
 
 FPSControls.prototype.onPlayerBodyCollision = function(event){
@@ -25796,6 +25865,9 @@ FPSControls.prototype.onActivated = function(){
     this.weaponObject2.mesh.visible = false;
     this.autoInstancedObject.mesh.renderOrder = renderOrders.FPS_WEAPON;
     this.autoInstancedObject.mesh.visible = true;
+  }
+  if (isMobile){
+    touchEventHandler.tapThreshold = 110;
   }
 }
 
