@@ -623,9 +623,7 @@ ParticleSystem.prototype.removeParticle = function(particle){
   }else{
     selectedGeometry = this.geometry;
   }
-  selectedGeometry.attributes.expiredFlag.updateRange.push({
-    offset: selectedOffset, count: 1
-  });
+  selectedGeometry.attributes.expiredFlag.updateRange.set(selectedOffset, 1);
   selectedGeometry.attributes.expiredFlag.array[particle.index] = 7;
   selectedGeometry.attributes.expiredFlag.needsUpdate = true;
   particle.isExpired = true;
@@ -643,7 +641,7 @@ ParticleSystem.prototype.rewindParticle = function(particle, delay){
   }else{
     selectedGeometry = this.geometry;
   }
-  selectedGeometry.attributes.flags2.updateRange.push({offset: sIndex, count: 1});
+  selectedGeometry.attributes.flags2.updateRange.set(sIndex, 1);
   particle.startDelay = this.tick + delay;
   selectedGeometry.attributes.flags2.array[sIndex] = particle.startDelay;
   selectedGeometry.attributes.flags2.needsUpdate = true;

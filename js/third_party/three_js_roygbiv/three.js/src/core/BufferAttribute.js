@@ -23,7 +23,7 @@ function BufferAttribute( array, itemSize, normalized ) {
 	this.normalized = normalized === true;
 
 	this.dynamic = false;
-	this.updateRange = [];
+	this.updateRange = new Map();
 
 	this.version = 0;
 

@@ -365,7 +365,7 @@ var renderOrders = {
 }
 
 // WORKER VARIABLES
-var WORKERS_SUPPORTED = false; //(typeof(Worker) !== UNDEFINED);
+var WORKERS_SUPPORTED = (typeof(Worker) !== UNDEFINED);
 if (!WORKERS_SUPPORTED){
   console.warn("[!] Workers are not supported for this browser.");
 }
