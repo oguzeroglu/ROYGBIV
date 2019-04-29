@@ -49,7 +49,6 @@ var Roygbiv = function(){
     "setParticleSystemBlending",
     "setParticleSystemRotation",
     "setParticleSystemQuaternion",
-    "kill",
     "createSmoke",
     "getMarkedPosition",
     "createTrail",
@@ -67,7 +66,6 @@ var Roygbiv = function(){
     "createObjectTrail",
     "destroyObjectTrail",
     "generateParticleSystemName",
-    "rewindParticle",
     "createLaser",
     "createWaterfall",
     "createSnow",
@@ -1143,23 +1141,6 @@ Roygbiv.prototype.setParticleSystemQuaternion = function(particleSystem, quatX, 
   particleSystem.hasManualQuaternionSet = true;
 }
 
-//  Destroys a particle or a particle system.
-Roygbiv.prototype.kill = function(object){
-  if (mode == 0){
-    return;
-  }
-  preConditions.checkIfDefined(ROYGBIV.kill, preConditions.object, object);
-  preConditions.checkIfParticleOrParticleSystem(ROYGBIV.kill, preConditions.object, object);
-  if (object.isParticle){
-    object.kill();
-  }else if (object.isParticleSystem){
-    object.destroy();
-    delete particleSystems[object.name];
-    delete particleSystemPool[object.name];
-    TOTAL_PARTICLE_SYSTEM_COUNT --;
-  }
-}
-
 //  Returns a new smoke like particle system based on following configurations:
 //  name: The unique name of the particle system (mandatory)
 //  position: The initial position of the particle system (mandatory)
@@ -1917,28 +1898,7 @@ Roygbiv.prototype.generateParticleSystemName = function(){
   return generatedName;
 }
 
-// Rewinds a particle and restarts its motion. Particles using this functionality
-// must have respawn = true and lifetime != 0 as configuration. The additional
-// delay parameter may be used to delay the rewind process in seconds.
-Roygbiv.prototype.rewindParticle = function(particle, delay){
-  if (mode == 0){
-    return;
-  }
-  preConditions.checkIfDefined(ROYGBIV.rewindParticle, preConditions.particle, particle);
-  preConditions.checkIfTrue(ROYGBIV.rewindParticle, "particle is not a Particle.", (!particle.isParticle));
-  preConditions.checkIfTrue(ROYGBIV.rewindParticle, "Particles using this API must have respawn = true as configuration.", (!particle.respawnSet));
-  preConditions.checkIfTrue(ROYGBIV.rewindParticle, "Particles using this API must have lifetime != 0 as configuration.", (particle.lifetime == 0));
-  preConditions.checkIfNumberOnlyIfExists(ROYGBIV.rewindParticle, preConditions.delay, delay);
-  if ((typeof delay == UNDEFINED)){
-    delay = 0;
-  }
-  if (!particle.parent){
-    return;
-  }
-  particle.parent.rewindParticle(particle, delay);
-}
-
-// Creates a laser like particle system. Configurations are:
+// Creates a laser like particle system. Configfurations are:
 // name: The unique name of the particle system. (mandatory)
 // position: The initial position of the particle system. (mandatory)
 // particleCount: The count of laser particles. (mandatory)
@@ -2356,128 +2316,16 @@ Roygbiv.prototype.startParticleSystem = function(configurations){
     return;
   }
   preConditions.checkIfDefined(ROYGBIV.startParticleSystem, preConditions.configurations, configurations);
-  var particleSystem = configurations.particleSystem;
-  var startPosition = configurations.startPosition;
-  var startVelocity = configurations.startVelocity;
-  var startAcceleration = configurations.startAcceleration;
-  var startQuaternion = configurations.startQuaternion;
-
-  preConditions.checkIfMandatoryParameterExists(ROYGBIV.startParticleSystem, preConditions.particleSystem, particleSystem);
-  preConditions.checkIfParticleSystem(ROYGBIV.startParticleSystem, preConditions.particleSystem, particleSystem);
-  preConditions.checkIfVectorOnlyIfDefined(ROYGBIV.startParticleSystem, preConditions.startPosition, startPosition);
-  preConditions.checkIfVectorOnlyIfDefined(ROYGBIV.startParticleSystem, preConditions.startVelocity, startVelocity);
-  preConditions.checkIfVectorOnlyIfDefined(ROYGBIV.startParticleSystem, preConditions.startAcceleration, startAcceleration);
-  preConditions.checkIfVectorOnlyIfDefined(ROYGBIV.startParticleSystem, preConditions.startQuaternion, startQuaternion);
-
-  var startPositionSet = false, startVelocitySet = false, startAccelerationSet = false, startQuaternionSet = false;
-  if (!(typeof startPosition == UNDEFINED)){
-    startPositionSet = true;
-  }
-  if (!(typeof startVelocity == UNDEFINED)){
-    startVelocitySet = true;
-  }
-  if (!(typeof startAcceleration == UNDEFINED)){
-    startAccelerationSet = true;
-  }
-  if (!(typeof startQuaternion == UNDEFINED)){
-    startQuaternionSet = true;
-  }
-
-  particleSystem.tick = 0;
-  particleSystem.motionTimer = 0;
-  if (startVelocitySet){
-    particleSystem.vx = startVelocity.x;
-    particleSystem.vy = startVelocity.y;
-    particleSystem.vz = startVelocity.z;
-    if (!particleSystem.velocity){
-      particleSystem.velocity = this.vector(particleSystem.vx, particleSystem.vy, particleSystem.vz);
-    }else{
-      particleSystem.velocity.x = particleSystem.vx;
-      particleSystem.velocity.y = particleSystem.vy;
-      particleSystem.velocity.z = particleSystem.vz;
-    }
-    if (!particleSystem.psMerger){
-      particleSystem.material.uniforms.parentMotionMatrix.value.elements[3] = startVelocity.x;
-      particleSystem.material.uniforms.parentMotionMatrix.value.elements[4] = startVelocity.y;
-      particleSystem.material.uniforms.parentMotionMatrix.value.elements[5] = startVelocity.z;
-    }else{
-      var matrix = particleSystem.psMerger.material.uniforms.parentMotionMatrixArray.value[particleSystem.mergedIndex];
-      matrix.elements[3] = startVelocity.x;
-      matrix.elements[4] = startVelocity.y;
-      matrix.elements[5] = startVelocity.z;
-    }
-  }
-  if (startAccelerationSet){
-    particleSystem.ax = startAcceleration.x;
-    particleSystem.ay = startAcceleration.y;
-    particleSystem.az = startAcceleration.z;
-    if (!particleSystem.acceleration){
-      particleSystem.acceleration = this.vector(particleSystem.ax, particleSystem.ay, particleSystem.az);
-    }else{
-      particleSystem.acceleration.x = particleSystem.ax;
-      particleSystem.acceleration.y = particleSystem.ay;
-      particleSystem.acceleration.z = particleSystem.az;
-    }
-    if (!particleSystem.psMerger){
-      particleSystem.material.uniforms.parentMotionMatrix.value.elements[6] = startAcceleration.x;
-      particleSystem.material.uniforms.parentMotionMatrix.value.elements[7] = startAcceleration.y;
-      particleSystem.material.uniforms.parentMotionMatrix.value.elements[8] = startAcceleration.z;
-    }else{
-      var matrix = particleSystem.psMerger.material.uniforms.parentMotionMatrixArray.value[particleSystem.mergedIndex];
-      matrix.elements[6] = startAcceleration.x;
-      matrix.elements[7] = startAcceleration.y;
-      matrix.elements[8] = startAcceleration.z;
-    }
-  }
-  if (startQuaternionSet){
-    particleSystem.mesh.quaternion.set(startQuaternion.x, startQuaternion.y, startQuaternion.z, startQuaternion.w);
-  }
-  if (startPositionSet){
-    particleSystem.x = startPosition.x;
-    particleSystem.y = startPosition.y;
-    particleSystem.z = startPosition.z;
-    particleSystem.mesh.position.set(particleSystem.x, particleSystem.y, particleSystem.z);
-    if (!particleSystem.psMerger){
-      particleSystem.material.uniforms.parentMotionMatrix.value.elements[0] = startPosition.x;
-      particleSystem.material.uniforms.parentMotionMatrix.value.elements[1] = startPosition.y;
-      particleSystem.material.uniforms.parentMotionMatrix.value.elements[2] = startPosition.z;
-    }else{
-      var matrix = particleSystem.psMerger.material.uniforms.parentMotionMatrixArray.value[particleSystem.mergedIndex];
-      matrix.elements[0] = startPosition.x;
-      matrix.elements[1] = startPosition.y;
-      matrix.elements[2] = startPosition.z;
-    }
-  }
-  if (!particleSystem.psMerger){
-    particleSystem.material.uniforms.stopInfo.value.set(-10, -10, -10);
-  }else{
-    particleSystem.psMerger.material.uniforms.hiddenArray.value[particleSystem.mergedIndex] = (-20.0);
-    particleSystem.psMerger.material.uniforms.stopInfoArray.value[particleSystem.mergedIndex].set(-10, -10, -10);
-  }
-  particleSystem.stoppedX = undefined;
-  particleSystem.stoppedY = undefined;
-  particleSystem.stoppedZ = undefined;
-  particleSystem.stopped = false;
-  if (!(typeof particleSystem.originalCheckForCollisions == UNDEFINED)){
-    particleSystem.checkForCollisions = particleSystem.originalCheckForCollisions;
-    particleSystem.originalCheckForCollisions = undefined;
-  }
-  if (!(typeof particleSystem.originalLifetime == UNDEFINED)){
-    particleSystem.lifetime = particleSystem.originalLifetime;
-    particleSystem.originalLifetime = undefined;
-  }
-  particleSystem.mesh.visible = true;
-  if (!particleSystem.psMerger){
-    particleSystems[particleSystem.name] = particleSystem;
-    particleSystem.material.uniforms.dissapearCoef.value = 0;
-  }else{
-    particleSystem.psMerger.notifyPSVisibilityChange(particleSystem, true);
-    particleSystem.psMerger.material.uniforms.dissapearCoefArray.value[particleSystem.mergedIndex] = 0;
-  }
+  preConditions.checkIfMandatoryParameterExists(ROYGBIV.startParticleSystem, preConditions.particleSystem, configurations.particleSystem);
+  preConditions.checkIfParticleSystem(ROYGBIV.startParticleSystem, preConditions.particleSystem, configurations.particleSystem);
+  preConditions.checkIfVectorOnlyIfDefined(ROYGBIV.startParticleSystem, preConditions.startPosition, configurations.startPosition);
+  preConditions.checkIfVectorOnlyIfDefined(ROYGBIV.startParticleSystem, preConditions.startVelocity, configurations.startVelocity);
+  preConditions.checkIfVectorOnlyIfDefined(ROYGBIV.startParticleSystem, preConditions.startAcceleration, configurations.startAcceleration);
+  preConditions.checkIfVectorOnlyIfDefined(ROYGBIV.startParticleSystem, preConditions.startQuaternion, configurations.startQuaternion);
+  configurations.particleSystem.start(configurations);
 }
 
-// Removes a particle system from the scene. Use this instead of ROYGBIV.kill() for
-// reusable particle systems.
+// Makes a particle system invisible.
 Roygbiv.prototype.hideParticleSystem = function(particleSystem){
   if (mode == 0){
     return;

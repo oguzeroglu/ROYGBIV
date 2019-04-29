@@ -587,7 +587,6 @@ var Text = function(){
   this.ROYGBIV_SCRIPTING_API_SETPARTICLESYSTEMBLENDING = "Sets the blending mode of a particle system. Blending mode can be one of NO_BLENDING, NORMAL_BLENDING,\nADDITIVE_BLENDING, SUBTRACTIVE_BLENDING or MULTIPLY_BLENDING.";
   this.ROYGBIV_SCRIPTING_API_SETPARTICLESYSTEMROTATION = "Sets the rotation of a particle system around given axis.";
   this.ROYGBIV_SCRIPTING_API_SETPARTICLESYSTEMQUATERNION = "Sets the quaternion of given particle system.";
-  this.ROYGBIV_SCRIPTING_API_KILL = "Destroys a particle or a particle system.";
   this.ROYGBIV_SCRIPTING_API_CREATESMOKE = "Returns a new smoke like particle system at (0,0,0) based on following configurations:\n"+
                                           "position: The initial position of the particle system (mandatory)\n"+
                                           "expireTime: The maximum lifetime of the particle system in seconds. This can be set to 0 for infinite particle systems. (mandatory)\n"+
@@ -731,7 +730,6 @@ var Text = function(){
                                                   "maxTimeInSeconds: Maximum trail time in seconds. The default value is 0.25 (optional)";
   this.ROYGBIV_SCRIPTING_API_DESTROYOBJECTTRAIL = "Destroys the trail effect of an object created using the createObjectTrail function.";
   this.ROYGBIV_SCRIPTING_API_GENERATEPARTICLESYSTEMNAME = "Generates a unique name for a particle system.";
-  this.ROYGBIV_SCRIPTING_API_REWINDPARTICLE = "Rewinds a particle and restarts its motion. Particles using this functionality must have respawn = true and\nlifetime != 0 as configuration. The additional delay parameter may be used to delay the rewind process in seconds.";
   this.ROYGBIV_SCRIPTING_API_CREATELASER = "Creates a laser like particle system. Configurations are:\n"+
                                            "name: The unique name of the particle system. (mandatory)\n"+
                                            "position: The initial position of the particle system. (mandatory)\n"+
@@ -803,7 +801,7 @@ var Text = function(){
                                                      "startVelocity: The initial velocity vector of the particle system. (optional)\n"+
                                                      "startAcceleration: The initial acceleration vector of the particle system. (optional)\n"+
                                                      "startQuaternion: The initial quaternion of the particle system. Use ROYGBIV.computeQuaternionFromVectors (optional)";
-    this.ROYGBIV_SCRIPTING_API_HIDEPARTICLESYSTEM = "Removes a particle system from the scene. Use this instead of ROYGBIV.kill() for reusable particle systems.";
+    this.ROYGBIV_SCRIPTING_API_HIDEPARTICLESYSTEM = "Makes a particle system invisible.";
     this.ROYGBIV_SCRIPTING_API_GETCAMERADIRECTION = "Returns the direction vector of the camera.";
     this.ROYGBIV_SCRIPTING_API_GETCAMERAPOSITION = "Returns the position of the camera.";
     this.ROYGBIV_SCRIPTING_API_CREATEPARTICLESYSTEMPOOL = "Creates a new particle system pool. Particle system pools are used to hold and keep track of particle systems.\nFor instance, for a plasma gun it is suggested to create the plasma particle systems, put them inside a pool and\nget them from the pool every time the player shoots.";

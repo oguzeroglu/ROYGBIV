@@ -25,8 +25,30 @@ var Particle = function(x, y, z, material, lifetime){
 
 }
 
+Particle.prototype.dissapearCollisionCallback = function(){
+
+}
+
+Particle.prototype.rewindCollisionCallback = function(){
+  var particle = this.obj;
+  if (!this.randomize){
+    particle.parent.rewindParticle(particle, 0);
+  }else{
+    particle.parent.rewindParticle(particle, Math.random());
+  }
+}
+
 Particle.prototype.setCollisionListener = function(collisionAction, timeOffset){
-  
+  if (!this.uuid){
+    this.assignUUID();
+  }
+  if (!particleCollisionCallbackRequests[this.uuid]){
+    TOTAL_PARTICLE_COLLISION_LISTEN_COUNT ++;
+  }
+  var callbackFunc = (collisionAction == PARTICLE_REWIND_ON_COLLIDED)? this.rewindCollisionCallback: this.dissapearCollisionCallback;
+  particleCollisionCallbackRequests[this.uuid] = callbackFunc.bind({obj: this, randomize: true});
+  this.checkForCollisions = true;
+  this.collisionTimeOffset = (typeof timeOffset == UNDEFINED)? 0: timeOffset;
 }
 
 Particle.prototype.kill = function(){
