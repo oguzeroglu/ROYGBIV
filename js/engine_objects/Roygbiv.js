@@ -2332,21 +2332,7 @@ Roygbiv.prototype.hideParticleSystem = function(particleSystem){
   }
   preConditions.checkIfDefined(ROYGBIV.hideParticleSystem, preConditions.particleSystem, particleSystem);
   preConditions.checkIfParticleSystem(ROYGBIV.hideParticleSystem, preConditions.particleSystem, particleSystem);
-
-  particleSystem.tick = 0;
-  particleSystem.motionMode = 0;
-  particleSystem.mesh.visible = false;
-  if (!particleSystem.psMerger){
-    delete particleSystems[particleSystems.name];
-  }
-  if (!(typeof particleSystem.psPool == UNDEFINED)){
-    var psPool = particleSystemPools[particleSystem.psPool];
-    psPool.notifyPSAvailable(particleSystem);
-  }
-  if (particleSystem.psMerger){
-    particleSystem.psMerger.material.uniforms.hiddenArray.value[particleSystem.mergedIndex] = (20.0);
-    particleSystem.psMerger.notifyPSVisibilityChange(particleSystem, false);
-  }
+  particleSystem.hide();
 }
 
 // Creates a new particle system pool. Particle system pools are used to hold

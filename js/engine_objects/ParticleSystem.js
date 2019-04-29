@@ -455,6 +455,23 @@ ParticleSystem.prototype.destroy = function(){
   }
 }
 
+ParticleSystem.prototype.hide = function(){
+  this.tick = 0;
+  this.motionMode = 0;
+  this.mesh.visible = false;
+  if (!this.psMerger){
+    delete particleSystems[this.name];
+  }
+  if (!(typeof this.psPool == UNDEFINED)){
+    var psPool = particleSystemPools[this.psPool];
+    psPool.notifyPSAvailable(this);
+  }
+  if (this.psMerger){
+    this.psMerger.material.uniforms.hiddenArray.value[this.mergedIndex] = (20.0);
+    this.psMerger.notifyPSVisibilityChange(this, false);
+  }
+}
+
 ParticleSystem.prototype.start = function(configurations){
   var particleSystem = configurations.particleSystem;
   var startPosition = configurations.startPosition;
@@ -552,6 +569,11 @@ ParticleSystem.prototype.start = function(configurations){
     this.psMerger.notifyPSVisibilityChange(this, true);
     this.psMerger.material.uniforms.dissapearCoefArray.value[this.mergedIndex] = 0;
   }
+  if (this.rewindNeededOnNextStart){
+    for (var i = 0; i<this.particles.length; i++){
+      this.rewindParticle(this.particles[i], 0);
+    }
+  }
 }
 
 ParticleSystem.prototype.stop = function(newLifetime){
@@ -625,6 +647,7 @@ ParticleSystem.prototype.rewindParticle = function(particle, delay){
   particle.startDelay = this.tick + delay;
   selectedGeometry.attributes.flags2.array[sIndex] = particle.startDelay;
   selectedGeometry.attributes.flags2.needsUpdate = true;
+  this.rewindNeededOnNextStart = true;
 }
 
 ParticleSystem.prototype.calculatePseudoPosition = function(){

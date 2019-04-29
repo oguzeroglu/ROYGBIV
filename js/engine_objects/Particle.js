@@ -186,7 +186,6 @@ Particle.prototype.generateLine = function(){
 }
 
 Particle.prototype.handleCollisions = function(){
-  var timer1 = performance.now();
   this.updatePositionHistory();
   if (!this.readyForCollisionCheckFlag){
     return;
@@ -228,7 +227,6 @@ Particle.prototype.handleCollisions = function(){
       }
     }
   }
-  this.lastUpdatetime = performance.now() - timer1;
 }
 
 
