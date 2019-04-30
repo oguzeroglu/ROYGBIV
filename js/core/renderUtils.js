@@ -93,13 +93,14 @@ function updateCrosshair(){
   }
 }
 
-function updateParticleSystems(){
-  for (var particleSystemName in particleSystems){
-    var particleSystem = particleSystems[particleSystemName];
-    if (particleSystem && !particleSystem.destroyed){
-      particleSystem.update();
-    }
+function particleSystemsUpdateFunction(particleSystem, psName){
+  if (particleSystem && !particleSystem.destroyed){
+    particleSystem.update();
   }
+}
+
+function updateParticleSystems(){
+  particleSystems.forEach(particleSystemsUpdateFunction);
   for (var mergedParticleSystemName in mergedParticleSystems){
     mergedParticleSystems[mergedParticleSystemName].update();
   }

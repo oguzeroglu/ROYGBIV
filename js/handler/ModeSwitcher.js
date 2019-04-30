@@ -324,7 +324,7 @@ ModeSwitcher.prototype.switchFromPreviewToDesign = function(){
     }
   }
 
-  particleSystems = new Object();
+  particleSystems = new Map();
   particleSystemPool = new Object();
   particleSystemPools = new Object();
   objectTrails = new Object();

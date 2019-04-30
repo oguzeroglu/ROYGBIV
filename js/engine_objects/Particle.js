@@ -58,7 +58,7 @@ Particle.prototype.kill = function(){
     this.parent.destroyedChildCount ++;
     if (this.parent.destroyedChildCount == this.parent.particles.length){
       this.parent.destroy();
-      delete particleSystems[this.parent.name];
+      particleSystems.delete(this.parent.name);
       delete particleSystemPool[this.parent.name];
       TOTAL_PARTICLE_SYSTEM_COUNT --;
     }

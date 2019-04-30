@@ -460,7 +460,7 @@ ParticleSystem.prototype.hide = function(){
   this.motionMode = 0;
   this.mesh.visible = false;
   if (!this.psMerger){
-    delete particleSystems[this.name];
+    particleSystems.delete(this.name);
   }
   if (!(typeof this.psPool == UNDEFINED)){
     var psPool = particleSystemPools[this.psPool];
@@ -563,7 +563,7 @@ ParticleSystem.prototype.start = function(configurations){
   }
   this.mesh.visible = true;
   if (!this.psMerger){
-    particleSystems[this.name] = this;
+    particleSystems.set(this.name, this);
     this.material.uniforms.dissapearCoef.value = 0;
   }else{
     this.psMerger.notifyPSVisibilityChange(this, true);
@@ -766,7 +766,7 @@ ParticleSystem.prototype.update = function(){
       this.expirationFunction(this.name);
     }
     if (!this.psMerger){
-      delete particleSystems[this.name];
+      particleSystems.delete(this.name);
     }else{
       this.psMerger.material.uniforms.hiddenArray.value[this.mergedIndex] = 20.0;
       this.psMerger.notifyPSVisibilityChange(this, false);

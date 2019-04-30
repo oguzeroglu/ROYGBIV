@@ -2140,10 +2140,10 @@ StateLoader.prototype.resetProject = function(){
 
   collisionCallbackRequests = new Map();
   particleCollisionCallbackRequests = new Object();
-  for (var particleSystemName in particleSystems){
-    particleSystems[particleSystemName].destroy();
-  }
-  particleSystems = new Object();
+  particleSystems.forEach(function(ps, psName){
+    ps.destroy();
+  })
+  particleSystems = new Map();
   particleSystemPool = new Object();
   particleSystemPools = new Object();
 
