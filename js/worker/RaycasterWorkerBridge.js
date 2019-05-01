@@ -183,6 +183,8 @@ var RaycasterWorkerBridge = function(){
   }
 }
 
+RaycasterWorkerBridge.prototype.query = noop;
+
 RaycasterWorkerBridge.prototype.onReady = function(){
   this.ready = true;
   if (this.onReadyCallback){
@@ -335,6 +337,10 @@ RaycasterWorkerBridge.prototype.show = function(object){
   this.updateBuffer.set(object.name, object);
 }
 
-RaycasterWorkerBridge.prototype.query = function(point){
-  throw new Error("not implemented.");
+RaycasterWorkerBridge.prototype.onParticleSystemGeneration = function(particleSystem){
+  var message = {isParticleSystemCreation: true, particleSystemDescription: particleSystem.creationConfigurations, particleDescription: {}};
+  particleSystem.particlesWithCollisionCallbacks.forEach(function(particle, uuid){
+    message.particleDescription[uuid] = particle.creationConfigurations;
+  });
+  this.worker.postMessage(message);
 }

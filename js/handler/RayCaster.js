@@ -7,6 +7,8 @@ var RayCaster = function(){
   this.ready = false;
 }
 
+RayCaster.prototype.onParticleSystemGeneration = noop;
+
 RayCaster.prototype.onReady = function(){
   this.ready = true;
   if (this.onReadyCallback){

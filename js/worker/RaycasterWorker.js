@@ -194,6 +194,8 @@ self.onmessage = function(msg){
     }else{
       keyboardBuffer["Shift"] = false;
     }
+  }else if(msg.data.isParticleSystemCreation){
+
   }else{
     worker.update(msg.data);
     worker.transferableMessageBody = msg.data;

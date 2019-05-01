@@ -257,7 +257,7 @@ var ParticleSystem = function(copyPS, name, particles, x, y, z, vx, vy, vz, ax, 
       if (particle.checkForCollisions){
         if (!this.hasParticleCollision){
           if (TOTAL_PARTICLE_SYSTEMS_WITH_PARTICLE_COLLISIONS >= MAX_PARTICLE_SYSTEMS_WITH_PARTICLE_COLLISIONS){
-            throw new Error("Maximum "+MAX_PARTICLE_SYSTEMS_WITH_PARTICLE_COLLISIONS+" particles can have collidable particles.");
+            throw new Error("Maximum "+MAX_PARTICLE_SYSTEMS_WITH_PARTICLE_COLLISIONS+" particle systems can have collidable particles.");
             return;
           }
           TOTAL_PARTICLE_SYSTEMS_WITH_PARTICLE_COLLISIONS ++;

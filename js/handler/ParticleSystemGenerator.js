@@ -367,6 +367,9 @@ ParticleSystemGenerator.prototype.generateParticle = function(configurations){
     particle.setCollisionListener(collisionAction, collisionTimeOffset);
     particle.creationConfigurations = new Object();
     for (var key in configurations){
+      if (key == "material"){
+        continue;
+      }
       particle.creationConfigurations[key] = configurations[key];
     }
   }
@@ -412,5 +415,15 @@ ParticleSystemGenerator.prototype.generateParticleSystem = function(configuratio
   particleSystem.angularQuaternionW = angularQuaternion.w;
   particleSystem.initialAngle = initialAngle;
   TOTAL_PARTICLE_SYSTEM_COUNT ++;
+  if (particleSystem.hasParticleCollision){
+    particleSystem.creationConfigurations = new Object();
+    for (var key in configurations){
+      if (key == "particles"){
+        continue;
+      }
+      particleSystem.creationConfigurations[key] = configurations[key];
+    }
+    rayCaster.onParticleSystemGeneration(particleSystem);
+  }
   return particleSystem;
 }

@@ -90,7 +90,7 @@ window.onload = function() {
   // AREA CONFIGURATIONS HANDLER
   areaConfigurationsHandler = new AreaConfigurationsHandler();
 
-  // RAYCASTER
+  // RAYCASTER AND PHYSICS WORLD
   if (!WORKERS_SUPPORTED){
     rayCaster = new RayCaster();
     physicsWorld = new CANNON.World();
