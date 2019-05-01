@@ -716,12 +716,6 @@ ParticleSystemGenerator.prototype.generateParticleSystemMesh = function(ps){
   ps.geometry.setDrawRange(0, particles.length);
   ps.velocity = new THREE.Vector3(ps.vx, ps.vy, ps.vz);
   ps.acceleration = new THREE.Vector3(ps.ax, ps.ay, ps.az);
-  var motionModeFlag = -10.0;
-  if (ps.motionMode == MOTION_MODE_NORMAL){
-    motionModeFlag = 5.0;
-  }else if (ps.motionMode == MOTION_MODE_CIRCULAR){
-    motionModeFlag = 20.0;
-  }
   var texture;
   if (textureMerger){
     texture = textureMerger.mergedTexture;
