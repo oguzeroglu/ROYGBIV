@@ -6,23 +6,18 @@ var Particle = function(x, y, z, material, lifetime){
   this.material = material;
   this.lifetime = lifetime;
   this.isExpired = false;
-
   this.positionHistoryCounter = 0;
   this.readyForCollisionCheckFlag = false;
-
   this.positionHistoryArray = new Array(PARTICLE_POSITION_HISTORY_SIZE);
   for (var i = 0; i<this.positionHistoryArray.length; i++){
     this.positionHistoryArray[i] = new THREE.Vector3();
   }
-
   this.collisionTimeOffset = 0;
-
   if (!(typeof lifetime == "undefined")){
     var vect = this.positionHistoryArray[this.positionHistoryCounter];
     this.getPosition(null, vect);
     this.positionHistoryCounter ++;
   }
-
 }
 
 Particle.prototype.dissapearCollisionCallback = function(){
