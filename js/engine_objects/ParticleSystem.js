@@ -573,6 +573,13 @@ ParticleSystem.prototype.start = function(configurations){
     for (var i = 0; i<this.particles.length; i++){
       this.rewindParticle(this.particles[i], 0);
     }
+    this.rewindNeededOnNextStart = false;
+  }
+  if (this.updateExpiredStatusOnNextStart){
+    for (var i = 0; i<this.particles.length; i++){
+      this.undoRemoveParticle(this.particles[i]);
+    }
+    this.updateExpiredStatusOnNextStart = false;
   }
 }
 
@@ -614,6 +621,28 @@ ParticleSystem.prototype.setBlending = function(mode){
   this.material.blending = mode;
 }
 
+ParticleSystem.prototype.undoRemoveParticle = function(particle){
+  var selectedGeometry;
+  var selectedOffset = particle.index;
+  if (this.psMerger){
+    selectedOffset += this.expiredFlagOffset;
+    selectedGeometry = this.psMerger.geometry;
+  }else{
+    selectedGeometry = this.geometry;
+  }
+  selectedGeometry.attributes.expiredFlag.updateRange.set(selectedOffset, 1);
+  selectedGeometry.attributes.expiredFlag.array[particle.index] = 0;
+  selectedGeometry.attributes.expiredFlag.needsUpdate = true;
+  particle.isExpired = false;
+  if (particle.checkForCollisions){
+    if (typeof particle.uuid == UNDEFINED){
+      particle.assignUUID();
+    }
+    this.particlesWithCollisionCallbacks.set(particle.uuid, particle);
+  }
+  this.destroyedChildCount --;
+}
+
 ParticleSystem.prototype.removeParticle = function(particle){
   var selectedGeometry;
   var selectedOffset = particle.index;
@@ -627,9 +656,11 @@ ParticleSystem.prototype.removeParticle = function(particle){
   selectedGeometry.attributes.expiredFlag.array[particle.index] = 7;
   selectedGeometry.attributes.expiredFlag.needsUpdate = true;
   particle.isExpired = true;
-  if (particle.uuid){
+  if (!(typeof particle.uuid == UNDEFINED)){
     this.particlesWithCollisionCallbacks.delete(particle.uuid);
   }
+  this.destroyedChildCount ++;
+  this.updateExpiredStatusOnNextStart = true;
 }
 
 ParticleSystem.prototype.rewindParticle = function(particle, delay){

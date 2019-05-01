@@ -26,7 +26,8 @@ var Particle = function(x, y, z, material, lifetime){
 }
 
 Particle.prototype.dissapearCollisionCallback = function(){
-
+  var particle = this.obj;
+  particle.parent.removeParticle(particle);
 }
 
 Particle.prototype.rewindCollisionCallback = function(){
@@ -39,7 +40,7 @@ Particle.prototype.rewindCollisionCallback = function(){
 }
 
 Particle.prototype.setCollisionListener = function(collisionAction, timeOffset){
-  if (!this.uuid){
+  if (typeof this.uuid == UNDEFINED){
     this.assignUUID();
   }
   if (!particleCollisionCallbackRequests[this.uuid]){
@@ -49,20 +50,6 @@ Particle.prototype.setCollisionListener = function(collisionAction, timeOffset){
   particleCollisionCallbackRequests[this.uuid] = callbackFunc.bind({obj: this, randomize: true});
   this.checkForCollisions = true;
   this.collisionTimeOffset = (typeof timeOffset == UNDEFINED)? 0: timeOffset;
-}
-
-Particle.prototype.kill = function(){
-  this.isExpired = true;
-  if (this.parent){
-    this.parent.removeParticle(this);
-    this.parent.destroyedChildCount ++;
-    if (this.parent.destroyedChildCount == this.parent.particles.length){
-      this.parent.destroy();
-      particleSystems.delete(this.parent.name);
-      delete particleSystemPool[this.parent.name];
-      TOTAL_PARTICLE_SYSTEM_COUNT --;
-    }
-  }
 }
 
 // WORLD COORDINATES OF THIS PARTICLE
