@@ -91,13 +91,10 @@ ParticleSystemGenerator.prototype.generateConfettiExplosion = function(configura
     var v3 = verticalSpeed * Math.random();
     particleConfigurations.velocity = new THREE.Vector3(v1, v3, v2);
     particleConfigurations.acceleration = new THREE.Vector3(0, verticalAcceleration, 0);
+    particleConfigurations.collisionAction = collisionMethod;
+    particleConfigurations.collisionTimeOffset = collisionTimeOffset;
     var particle = this.generateParticle(particleConfigurations);
     particles.push(particle);
-    if (collisionMethod == PARTICLE_DISSAPEAR_ON_COLLIDED){
-      particle.setCollisionListener(PARTICLE_DISSAPEAR_ON_COLLIDED, collisionTimeOffset);
-    }else if (collisionMethod == PARTICLE_REWIND_ON_COLLIDED){
-      particle.setCollisionListener(PARTICLE_REWIND_ON_COLLIDED, collisionTimeOffset);
-    }
   }
   var ps = this.generateParticleSystem({name: name, particles: particles, position: position, lifetime: expireTime});
   if (normalSet){
@@ -368,6 +365,10 @@ ParticleSystemGenerator.prototype.generateParticle = function(configurations){
   particle.angularQuaternionW = angularQuaternion.w;
   if (!(typeof collisionAction == UNDEFINED)){
     particle.setCollisionListener(collisionAction, collisionTimeOffset);
+    particle.creationConfigurations = new Object();
+    for (var key in configurations){
+      particle.creationConfigurations[key] = configurations[key];
+    }
   }
   return particle;
 }
