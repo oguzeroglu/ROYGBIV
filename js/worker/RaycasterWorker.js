@@ -152,6 +152,9 @@ RaycasterWorker.prototype.update = function(transferableMessageBody){
       }
     }
   }
+  //
+  // UPDATE ALL PARTICLE SYSTEMS AND HANDLE PARTICLE COLLISIONS - FILL particleIntersectionDescription BUFFER HERE
+  // ary -> transferableMessageBody.particleIntersectionDescription
   if (this.record){
     this.performanceLogs.updateTime = performance.now() - updateStartTime;
   }
@@ -204,6 +207,7 @@ self.onmessage = function(msg){
     worker.transferableList[2] = worker.transferableMessageBody.flagsDescription.buffer;
     worker.transferableList[3] = worker.transferableMessageBody.cameraOrientationDescription.buffer;
     worker.transferableList[4] = worker.transferableMessageBody.addedTextScaleDescription.buffer;
+    worker.transferableList[5] = worker.transferableMessageBody.particleIntersectionDescription.buffer;
     postMessage(worker.transferableMessageBody);
   }
 }
