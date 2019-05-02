@@ -207,3 +207,54 @@ MeshGenerator.prototype.generateSkybox = function(skybox){
   }
   return mesh;
 }
+
+MeshGenerator.prototype.generateParticleSystemMesh = function(ps, texture, noTargetColor){
+  if (!ps.copyPS){
+    ps.material = new THREE.RawShaderMaterial({
+      vertexShader: ShaderContent.particleVertexShader,
+      fragmentShader: ShaderContent.particleFragmentShader,
+      transparent: true,
+      side: THREE.DoubleSide,
+      uniforms:{
+        modelViewMatrix: new THREE.Uniform(new THREE.Matrix4()),
+        projectionMatrix: GLOBAL_PROJECTION_UNIFORM,
+        worldMatrix: new THREE.Uniform(new THREE.Matrix4()),
+        viewMatrix: GLOBAL_VIEW_UNIFORM,
+        time: new THREE.Uniform(0.0),
+        dissapearCoef: new THREE.Uniform(0.0),
+        stopInfo: new THREE.Uniform(new THREE.Vector3(-10, -10, -10)),
+        parentMotionMatrix: new THREE.Uniform(new THREE.Matrix3().fromArray([ps.x, ps.y, ps.z, ps.vx, ps.vy, ps.vz, ps.ax, ps.ay, ps.az]))
+      }
+    });
+  }else{
+    ps.material = this.copyPS.material.clone();
+    ps.material.uniforms.projectionMatrix = GLOBAL_PROJECTION_UNIFORM;
+    ps.material.uniforms.viewMatrix = GLOBAL_VIEW_UNIFORM;
+  }
+  if (fogBlendWithSkybox){
+    ps.material.uniforms.cameraPosition = GLOBAL_CAMERA_POSITION_UNIFORM;
+    ps.material.uniforms.cubeTexture = GLOBAL_CUBE_TEXTURE_UNIFORM;
+    macroHandler.injectMacro("HAS_SKYBOX_FOG", ps.material, true, true);
+  }
+  if (fogActive){
+    ps.material.uniforms.fogInfo = GLOBAL_FOG_UNIFORM;
+    macroHandler.injectMacro("HAS_FOG", ps.material, false, true);
+  }
+  if (texture){
+    ps.material.uniforms.texture = new THREE.Uniform(texture);
+    macroHandler.injectMacro("HAS_TEXTURE", ps.material, true, true);
+  }
+  if (!noTargetColor){
+    macroHandler.injectMacro("HAS_TARGET_COLOR", ps.material, true, false);
+  }
+  if (particleSystemRefHeight){
+    macroHandler.injectMacro("HAS_REF_HEIGHT", ps.material, true, false);
+    ps.material.uniforms.refHeightCoef = GLOBAL_PS_REF_HEIGHT_UNIFORM;
+  }
+  var mesh = new THREE.Points(ps.geometry, ps.material);
+  mesh.renderOrder = renderOrders.PARTICLE_SYSTEM;
+  mesh.position.set(ps.x, ps.y, ps.z);
+  mesh.frustumCulled = false;
+  mesh.visible = false;
+  return mesh;
+}

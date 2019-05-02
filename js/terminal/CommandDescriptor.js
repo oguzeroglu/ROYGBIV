@@ -167,7 +167,9 @@ var CommandDescriptor = function(){
       1, //shaderPrecision
       1, //newParticleSystem
       1, //editParticleSystem
-      0 //makeParticleSystemsResponsive
+      0, //makeParticleSystemsResponsive
+      1, //setMaxCollidableParticleCount
+      0 //printMaxCollidableParticleCount
   ];
 
   this.commandArgumentsExpectedExplanation = [
@@ -337,7 +339,9 @@ var CommandDescriptor = function(){
     "shaderPrecision show/hide",
     "newParticleSystem psName",
     "editParticleSystem psName",
-    "makeParticleSystemsResponsive"
+    "makeParticleSystemsResponsive",
+    "setMaxCollidableParticleCount maxCollidableParticleCount",
+    "printMaxCollidableParticleCount"
   ];
 
   this.commands = [
@@ -507,7 +511,9 @@ var CommandDescriptor = function(){
     "shaderPrecision",
     "newParticleSystem",
     "editParticleSystem",
-    "makeParticleSystemsResponsive"
+    "makeParticleSystemsResponsive",
+    "setMaxCollidableParticleCount",
+    "printMaxCollidableParticleCount"
   ];
 
   this.commandInfo = [
@@ -677,7 +683,9 @@ var CommandDescriptor = function(){
     "shaderPrecision: Show the shader precision adjustment GUI.",
     "newParticleSystem: Opens the Particle System Creation GUI.",
     "editParticleSystem: Shows the GUI for editing a particle system.",
-    "makeParticleSystemsResponsive: Calculates a reference height based on the height and resolution of the device that runs this command\nin order to make the particle systems look responsive on different devices."
+    "makeParticleSystemsResponsive: Calculates a reference height based on the height and resolution of the device that runs this command\nin order to make the particle systems look responsive on different devices.",
+    "setMaxCollidableParticleCount: Sets the maximum number of collidable particles.",
+    "printMaxCollidableParticleCount: Prints the maximum number of collidable particles set using setMaxCollidableParticleCount CLI command."
   ];
 
   this.keyboardInfo = [
@@ -1357,6 +1365,11 @@ var CommandDescriptor = function(){
   this.editParticleSystem = new Object();
   this.editParticleSystem.types = [];
   this.editParticleSystem.types.push(this.PRECONFIGURED_PS_NAME); // psName
+
+  // setMaxCollidableParticleCount
+  this.setMaxCollidableParticleCount = new Object();
+  this.setMaxCollidableParticleCount.types = [];
+  this.setMaxCollidableParticleCount.types.push(this.UNKNOWN_INDICATOR); // maxCollidableParticleCount
 
 };
 

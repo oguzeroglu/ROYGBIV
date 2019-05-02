@@ -487,6 +487,8 @@ var Text = function(){
   this.OBJECT_COPIED = "Object copied.";
   this.MIN = "Min";
   this.MAX = "Max";
+  this.MAX_COLLIDABLE_PARTICLE_COUNT = "maxCollidableParticleCount";
+  this.MAX_COLLIDABLE_PARTICLE_COUNT_SET = "Maximum number of collidable particles is set to @@1.";
   this.THIS_TEXT_IS_ALLOCATED_FOR = "This text is allocated for @@1 characters maximum.";
   this.AREA_CREATED = "Area created.";
   this.AREA_HEIGHT_MUST_BE_DIVISABLE = "Area height must be divisable by grid size.";
@@ -532,9 +534,10 @@ var Text = function(){
   this.ROYGBIV_SCRIPTING_API_GETPOSITION = "Returns the (x, y, z) coordinates of an object, glued object or a particle system.\nIf a specific axis is specified, only the position on the specified axis is returned.";
   this.ROYGBIV_SCRIPTING_API_OPACITY = "Increases/decreases the opacity of given object.";
   this.ROYGBIV_SCRIPTING_API_GETOPACITY = "Returns the opacity of given object.";
-  this.ROYGBIV_SCRIPTING_API_SETCOLLISIONLISTENER = "Sets a collision listener for an object, glued object, particle or a particle system. Using this with loads of particles\nmay cause performance issues if web worker usage is not enabled or supported. Callback function given as the second parameter is fired\nwith a CollisionInfo instance (except for particle collisions) when the sourceObject is collided with other objects or\nglued objects of the scene." +
-                                                    " The additional timeOffset parameter can be used for particles/particle systems to pre-calculate\nfuture collisions. This can help to prevent visual errors of collisions of rather fast particles/particle systems.";
-  this.ROYGBIV_SCRIPTING_API_REMOVECOLLISIONLISTENER = "Removes collision listeners of an object, glued object, particle or a particle system. Use this for performance improvements if\ncollision callbacks are no longer necessary for particles or particle systems.";
+  this.ROYGBIV_SCRIPTING_API_SETCOLLISIONLISTENER = "Sets a collision listener for an object, glued object or a particle system."+
+                                                    "Callback function given as the second parameter is\nfired with a CollisionInfo instance when the sourceObject is collided with other objects or glued objects of the scene.\n"+
+                                                    "The additional timeOffset parameter can be used for particle systems to pre-calculate future collisions. This can help to\nprevent visual errors of collisions of rather fast particle systems.";
+  this.ROYGBIV_SCRIPTING_API_REMOVECOLLISIONLISTENER = "Removes collision listeners of an object, glued object or a particle system.";
   this.ROYGBIV_SCRIPTING_API_CREATEPARTICLEMATERIAL = "Returns a material for a particle. The configurations are:\n"+
                                                       "color: The HTML color name of the particle. (mandatory)\n"+
                                                       "size: The size of the particle. (mandatory)\n"+
@@ -564,7 +567,9 @@ var Text = function(){
                                               "angularMotionRadius: The radius value of the angular motion. This is used only if the motionMode is MOTION_MODE_CIRCULAR. (optional)\n"+
                                               "angularQuaternion: If set this quaternion value is applied to particles with circular motion (motionMode = MOTION_MODE_CIRCULAR).\nBy default the particles that have MOTION_MODE_CIRCULAR as motionMode are initially created on the XZ plane, so the angularQuaternion\nparameter is used to change the initial rotation of the circular motion. This value can be calculated this way:\n"+
                                               "angularQuaternion = ROYGBIV.computeQuaternionFromVectors(ROYGBIV.vector(0,1,0), [desired normal value]) (optional)\n"+
-                                              "motionMode: The motion mode of the particle. This can be MOTION_MODE_NORMAL or MOTION_MODE_CIRCULAR.\nMOTION_MODE_NORMAL represents the motion with uniform acceleration and the MOTION_MODE_CIRCULAR represents the uniform circular motion.\nThe default value is MOTION_MODE_NORMAL. (optional)";
+                                              "motionMode: The motion mode of the particle. This can be MOTION_MODE_NORMAL or MOTION_MODE_CIRCULAR.\nMOTION_MODE_NORMAL represents the motion with uniform acceleration and the MOTION_MODE_CIRCULAR represents the uniform circular motion.\nThe default value is MOTION_MODE_NORMAL. (optional)\n"+
+                                              "collisionAction: One of PARTICLE_REWIND_ON_COLLIDED or PARTICLE_DISSAPEAR_ON_COLLIDED. This parameter decides what to do\nwhen the particle is collided with one of the intersectable objects of the scene. If not set, particles are not\nlistened for collisions. (optional)\n"+
+                                              "collisionTimeOffset: By pre-calculating the future collision, this parameter can be used to prevent visual errors of collisions of\nrather fast particles. (optional)";
   this.ROYGBIV_SCRIPTING_API_CREATEPARTICLESYSTEM = "Creates a new particle system based on following configurations:\n"+
                                                     "name: The unique name of the particle system. (mandatory)\n"+
                                                     "particles: An array of particles created using createParticle function. (mandatory)\n"+
@@ -584,7 +589,6 @@ var Text = function(){
   this.ROYGBIV_SCRIPTING_API_SETPARTICLESYSTEMBLENDING = "Sets the blending mode of a particle system. Blending mode can be one of NO_BLENDING, NORMAL_BLENDING,\nADDITIVE_BLENDING, SUBTRACTIVE_BLENDING or MULTIPLY_BLENDING.";
   this.ROYGBIV_SCRIPTING_API_SETPARTICLESYSTEMROTATION = "Sets the rotation of a particle system around given axis.";
   this.ROYGBIV_SCRIPTING_API_SETPARTICLESYSTEMQUATERNION = "Sets the quaternion of given particle system.";
-  this.ROYGBIV_SCRIPTING_API_KILL = "Destroys a particle or a particle system.";
   this.ROYGBIV_SCRIPTING_API_CREATESMOKE = "Returns a new smoke like particle system at (0,0,0) based on following configurations:\n"+
                                           "position: The initial position of the particle system (mandatory)\n"+
                                           "expireTime: The maximum lifetime of the particle system in seconds. This can be set to 0 for infinite particle systems. (mandatory)\n"+
@@ -728,7 +732,6 @@ var Text = function(){
                                                   "maxTimeInSeconds: Maximum trail time in seconds. The default value is 0.25 (optional)";
   this.ROYGBIV_SCRIPTING_API_DESTROYOBJECTTRAIL = "Destroys the trail effect of an object created using the createObjectTrail function.";
   this.ROYGBIV_SCRIPTING_API_GENERATEPARTICLESYSTEMNAME = "Generates a unique name for a particle system.";
-  this.ROYGBIV_SCRIPTING_API_REWINDPARTICLE = "Rewinds a particle and restarts its motion. Particles using this functionality must have respawn = true and\nlifetime != 0 as configuration. The additional delay parameter may be used to delay the rewind process in seconds.";
   this.ROYGBIV_SCRIPTING_API_CREATELASER = "Creates a laser like particle system. Configurations are:\n"+
                                            "name: The unique name of the particle system. (mandatory)\n"+
                                            "position: The initial position of the particle system. (mandatory)\n"+
@@ -800,7 +803,7 @@ var Text = function(){
                                                      "startVelocity: The initial velocity vector of the particle system. (optional)\n"+
                                                      "startAcceleration: The initial acceleration vector of the particle system. (optional)\n"+
                                                      "startQuaternion: The initial quaternion of the particle system. Use ROYGBIV.computeQuaternionFromVectors (optional)";
-    this.ROYGBIV_SCRIPTING_API_HIDEPARTICLESYSTEM = "Removes a particle system from the scene. Use this instead of ROYGBIV.kill() for reusable particle systems.";
+    this.ROYGBIV_SCRIPTING_API_HIDEPARTICLESYSTEM = "Makes a particle system invisible.";
     this.ROYGBIV_SCRIPTING_API_GETCAMERADIRECTION = "Returns the direction vector of the camera.";
     this.ROYGBIV_SCRIPTING_API_GETCAMERAPOSITION = "Returns the position of the camera.";
     this.ROYGBIV_SCRIPTING_API_CREATEPARTICLESYSTEMPOOL = "Creates a new particle system pool. Particle system pools are used to hold and keep track of particle systems.\nFor instance, for a plasma gun it is suggested to create the plasma particle systems, put them inside a pool and\nget them from the pool every time the player shoots.";
@@ -821,10 +824,9 @@ var Text = function(){
                                                          "particleSize: The size of particles. (mandatory)\n"+
                                                          "colorName: The color name of particles. (mandatory)\n"+
                                                          "alpha: The alpha value of particles. (mandatory)\n"+
-                                                         "collisionMethod: 0 -> Nothing happens when particles are collided with objects.\n"+
-                                                         "                 1 -> Particles are destroyed when collided with objects.\n"+
-                                                         "                 2 -> Particles are respawned when collided with objects.\n"+
-                                                         "                 Default value is 0. (optional)\n"+
+                                                         "collisionMethod: PARTICLE_DISSAPEAR_ON_COLLIDED -> Particles are dissapeared when collided with objects.\n"+
+                                                         "                 PARTICLE_REWIND_ON_COLLIDED -> Particles are respawned when collided with objects.\n"+
+                                                         "                 If not set, particles are not listened for collisions.\n"+
                                                          "normal: The normal vector of the particle system. Default value is (0, 1, 0) (optional)\n"+
                                                          "collisionTimeOffset: The time offset of collision listener if the collisionMethod is 1 or 2. Default value is 0. (optional)\n"+
                                                          "startDelay: The average start delay of particles. Default value is 0. (optional)\n"+

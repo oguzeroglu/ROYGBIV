@@ -144,7 +144,7 @@ var ParticleSystemMerger = function(psObj, name){
     offset1 += ps.positions.length;
     offset2 += ps.flags2.length;
     offset3 += ps.expiredFlags.length;
-    delete particleSystems[psName];
+    particleSystems.delete(psName);
     mergedParticleSystems[this.name] = this;
   }
 

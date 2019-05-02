@@ -122,7 +122,7 @@ var markedPoints = new Object();
 var collisionCallbackRequests = new Map();
 var particleCollisionCallbackRequests = new Object();
 var particleSystemCollisionCallbackRequests = new Object();
-var particleSystems = new Object();
+var particleSystems = new Map();
 var mergedParticleSystems = new Object();
 var particleSystemPool = new Object();
 var particleSystemPools = new Object();
@@ -215,14 +215,11 @@ var BIN_SIZE = 50;
 var RAYCASTER_STEP_AMOUNT = 32;
 var INTERSECTION_NORMAL = new THREE.Vector3();
 var MAX_PARTICLE_SYSTEM_COUNT = 1000; // MUST BE DIVISIBLE BY 10
-var MAX_PARTICLE_COLLISION_LISTEN_COUNT = 10000;
 var TOTAL_PARTICLE_SYSTEM_COUNT = 0;
 var TOTAL_PARTICLE_COLLISION_LISTEN_COUNT = 0;
 var TOTAL_PARTICLE_SYSTEM_COLLISION_LISTEN_COUNT = 0;
 var PARTICLE_POSITION_HISTORY_SIZE = 2;
 var MAX_OBJECT_SEGMENT_COUNT = 200;
-var MAX_PARTICLE_SYSTEMS_WITH_PARTICLE_COLLISIONS = 50;
-var TOTAL_PARTICLE_SYSTEMS_WITH_PARTICLE_COLLISIONS = 0;
 var SCRIPT_STATUS_STARTED = 1;
 var SCRIPT_STATUS_STOPPED = 2;
 var SCRIPT_STATUS_ERROR = 0;
@@ -345,6 +342,9 @@ var shaderPrecisionHandler;
 var particleSystemCreatorGUIHandler;
 var preConfiguredParticleSystems = new Object();
 var particleSystemGenerator;
+var PARTICLE_REWIND_ON_COLLIDED = 2;
+var PARTICLE_DISSAPEAR_ON_COLLIDED = 1;
+var MAX_COLLIDABLE_PARTICLE_COUNT = 0;
 
 // RENDER ORDERS
 var renderOrders = {
@@ -364,6 +364,9 @@ var renderOrders = {
 
 // WORKER VARIABLES
 var WORKERS_SUPPORTED = (typeof(Worker) !== UNDEFINED);
+if (!WORKERS_SUPPORTED){
+  console.warn("[!] Workers are not supported for this browser.");
+}
 
 // TEXT POOL
 var Text = (!isDeployment)? new Text(): 0;

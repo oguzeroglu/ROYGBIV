@@ -6,59 +6,49 @@ var Particle = function(x, y, z, material, lifetime){
   this.material = material;
   this.lifetime = lifetime;
   this.isExpired = false;
-
   this.positionHistoryCounter = 0;
   this.readyForCollisionCheckFlag = false;
-
   this.positionHistoryArray = new Array(PARTICLE_POSITION_HISTORY_SIZE);
   for (var i = 0; i<this.positionHistoryArray.length; i++){
     this.positionHistoryArray[i] = new THREE.Vector3();
   }
-
   this.collisionTimeOffset = 0;
-
   if (!(typeof lifetime == "undefined")){
     var vect = this.positionHistoryArray[this.positionHistoryCounter];
     this.getPosition(null, vect);
     this.positionHistoryCounter ++;
   }
-
 }
 
-Particle.prototype.setCollisionListener = function(callbackFunction, timeOffset){
-  if (!this.uuid){
+Particle.prototype.dissapearCollisionCallback = function(){
+  var particle = this.obj;
+  particle.parent.removeParticle(particle);
+}
+
+Particle.prototype.rewindCollisionCallback = function(){
+  var particle = this.obj;
+  if (!this.randomize){
+    particle.parent.rewindParticle(particle, 0);
+  }else{
+    particle.parent.rewindParticle(particle, Math.random());
+  }
+}
+
+Particle.prototype.setCollisionListener = function(collisionAction, timeOffset){
+  if (typeof this.uuid == UNDEFINED){
     this.assignUUID();
   }
-  var incrCounter = false;
   if (!particleCollisionCallbackRequests[this.uuid]){
-    incrCounter = true;
-  }
-  particleCollisionCallbackRequests[this.uuid] = callbackFunction.bind(this);
-  if (incrCounter){
+    if (mode == 1 && TOTAL_PARTICLE_COLLISION_LISTEN_COUNT >= MAX_COLLIDABLE_PARTICLE_COUNT){
+      console.error("Max collidable particle count exceeded. Use setMaxCollidableParticleCount CLI command to allocate more space.");
+      return;
+    }
     TOTAL_PARTICLE_COLLISION_LISTEN_COUNT ++;
   }
+  var callbackFunc = (collisionAction == PARTICLE_REWIND_ON_COLLIDED)? this.rewindCollisionCallback: this.dissapearCollisionCallback;
+  particleCollisionCallbackRequests[this.uuid] = callbackFunc.bind({obj: this, randomize: true});
   this.checkForCollisions = true;
-  if (!(typeof timeOffset == UNDEFINED)){
-    this.collisionTimeOffset = timeOffset;
-  }
-  if (this.parent){
-    this.parent.hasParticleCollision = true;
-    this.parent.notifyParticleCollisionCallbackChange(this);
-  }
-}
-
-Particle.prototype.kill = function(){
-  this.isExpired = true;
-  if (this.parent){
-    this.parent.removeParticle(this);
-    this.parent.destroyedChildCount ++;
-    if (this.parent.destroyedChildCount == this.parent.particles.length){
-      this.parent.destroy();
-      delete particleSystems[this.parent.name];
-      delete particleSystemPool[this.parent.name];
-      TOTAL_PARTICLE_SYSTEM_COUNT --;
-    }
-  }
+  this.collisionTimeOffset = (typeof timeOffset == UNDEFINED)? 0: timeOffset;
 }
 
 // WORLD COORDINATES OF THIS PARTICLE
@@ -182,7 +172,6 @@ Particle.prototype.generateLine = function(){
 }
 
 Particle.prototype.handleCollisions = function(){
-  var timer1 = performance.now();
   this.updatePositionHistory();
   if (!this.readyForCollisionCheckFlag){
     return;
@@ -224,7 +213,6 @@ Particle.prototype.handleCollisions = function(){
       }
     }
   }
-  this.lastUpdatetime = performance.now() - timer1;
 }
 
 

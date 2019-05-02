@@ -15,6 +15,8 @@ var State = function(projectName, author){
   this.fixedAspect = fixedAspect;
   // PS REF HEIGHT *************************************************
   this.particleSystemRefHeight = particleSystemRefHeight;
+  // MAX_COLLIDABLE_PARTICLE_COUNT
+  this.MAX_COLLIDABLE_PARTICLE_COUNT = MAX_COLLIDABLE_PARTICLE_COUNT;
   // SHADER PRECISIONS *********************************************
   this.shaderPrecisions = shaderPrecisionHandler.export();
   // GRID SYSTEMS **************************************************

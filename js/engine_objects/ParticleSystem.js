@@ -7,438 +7,27 @@ var ParticleSystem = function(copyPS, name, particles, x, y, z, vx, vy, vz, ax, 
   this.y = y;
   this.z = z;
   this.motionMode = motionMode;
-
   this.collisionTimeOffset = 0;
   this.positionHistoryCounter = 0;
   this.positionLine = new THREE.Line3(new THREE.Vector3(x, y, z), new THREE.Vector3(x, y, z));
-
   this.vx = vx, this.vy = vy, this.vz = vz, this.ax = ax, this.ay = ay, this.az = az;
-
-  var textureMerger = 0;
-
-  var texturesObj = new Object();
-  var textureCount = 0;
-  var mergedTextureHash = "";
-  var noTargetColor = true;
-  for (var i = 0; i<particles.length; i++){
-    if (!particles[i].material.noTargetColor){
-      noTargetColor = false;
-    }
-    if (particles[i].material.texture){
-      if (!texturesObj[particles[i].material.texture]){
-        mergedTextureHash = particles[i].material.texture + PIPE;
-      }
-      texturesObj[particles[i].material.texture] = textures[particles[i].material.texture];
-      textureCount ++;
-    }
-  }
-  this.noTargetColor = noTargetColor;
-  this.texturesObj = texturesObj;
-
-  if (textureCount > 0 && !mergedTextureCache[mergedTextureHash]){
-    textureMerger = new TextureMerger(texturesObj);
-    mergedTextureCache[mergedTextureHash] = textureMerger;
-  }else if (textureCount > 0 && mergedTextureCache[mergedTextureHash]){
-    textureMerger = mergedTextureCache[mergedTextureHash];
-  }
-
   this.performanceCounter1 = 0;
   this.performanceCounter2 = 0;
   this.lastUpdatePerformance = 0;
-
-  this.totalParticleCount = 0;
-
   this.destroyedChildCount = 0;
-
   this.tick = 0;
-
   this.updateFunction = updateFunction;
-
   this.particlesWithCollisionCallbacks = new Map();
-
   this.REUSABLE_VECTOR = new THREE.Vector3();
   this.REUSABLE_VELOCITY_VECTOR = new THREE.Vector3();
   this.REUSABLE_ACCELERATION_VECTOR = new THREE.Vector3();
-
-  var len = this.particles.length;
-
-  this.geometry = new THREE.BufferGeometry();
-  this.expiredFlags = new Float32Array(len); // This is dynamic
-  this.flags2 = new Float32Array(len * 4); // sizes - transparencies - textureFlag - times
-  if (!this.copyPS){
-    this.positions = new Float32Array(len * 3); // This is used to store initialAngle and angularAcceleration info for MOTION_MODE_CIRCULAR
-    if (textureCount > 0){
-      this.rgbThresholds = new Float32Array(len * 3);
-      this.uvCoordinates = new Float32Array(len * 4); // startU - startV - endU - endV
-    }
-    this.velocities = new Float32Array(len * 3);
-    this.accelerations = new Float32Array(len * 3);
-    this.flags1 = new Float32Array(len * 4); // respawn - alphaDelta - trailFlag - lifeTimes
-    this.flags3 = new Float32Array(len * 4); // alphaVariationMode - motionMode - angularVelocity - angularMotionRadius
-    this.flags4 = new Float32Array(len * 4); // color.r - color.g - color.b - useWorldPositionFlag
-    if (!noTargetColor){
-      this.targetColors = new Float32Array(len * 4);
-    }
-    this.angularQuaternions = new Float32Array(len * 4);
-  }else{
-    this.positions = this.copyPS.positions;
-    if (textureCount > 0){
-      this.rgbThresholds = this.copyPS.rgbThresholds;
-      this.uvCoordinates = this.copyPS.uvCoordinates;
-    }
-    this.velocities = this.copyPS.velocities
-    this.accelerations = this.copyPS.accelerations
-    this.flags1 = this.copyPS.flags1;
-    this.flags3 = this.copyPS.flags3;
-    this.flags4 = this.copyPS.flags4;
-    if (!noTargetColor){
-      this.targetColors = this.copyPS.targetColors;
-    }
-    this.angularQuaternions = this.copyPS.angularQuaternions;
+  if (IS_WORKER_CONTEXT){
+    return this;
   }
-
-  var i2 = 0;
-  var i3 = 0;
-  var i4 = 0;
-  var i5 = 0;
-  var i6 = 0;
-  var i7 = 0;
-  var i8 = 0;
-  var i9 = 0;
-  var i10 = 0;
-
-  if (!this.copyPS){
-    for (var i = 0; i<particles.length; i++){
-      var particle = particles[i];
-
-      particle.parent = this;
-
-      if (particle.trailMode){
-        this.hasTrailedParticle = true;
-      }
-
-      var rgbFilterX = 0;
-      var rgbFilterY = 0;
-      var rgbFilterZ = 0;
-
-      if (particle.material.rgbFilter){
-        rgbFilterX = particle.material.rgbFilter.x;
-        rgbFilterY = particle.material.rgbFilter.y;
-        rgbFilterZ = particle.material.rgbFilter.z;
-      }
-
-      if (particle.motionMode == MOTION_MODE_NORMAL){
-        this.positions[i2] = particle.x;
-      }else{
-        this.positions[i2] = particle.initialAngle;
-      }
-      if (this.rgbThresholds){
-        this.rgbThresholds[i2] = rgbFilterX;
-      }
-      i2++;
-      if (particle.motionMode == MOTION_MODE_NORMAL){
-        this.positions[i2] = particle.y;
-      }else{
-        this.positions[i2] = particle.angularAcceleration;
-      }
-      if (this.rgbThresholds){
-        this.rgbThresholds[i2] = rgbFilterY;
-      }
-      i2++;
-      this.positions[i2] = particle.z;
-      if (this.rgbThresholds){
-        this.rgbThresholds[i2] = rgbFilterZ;
-      }
-      i2++;
-
-      if (!noTargetColor){
-        this.targetColors[i4++] = particle.material.targetRed;
-        this.targetColors[i4++] = particle.material.targetGreen;
-        this.targetColors[i4++] = particle.material.targetBlue;
-        this.targetColors[i4++] = particle.material.colorStep;
-      }
-
-      this.flags4[i9++] = particle.material.red;
-      this.flags4[i9++] = particle.material.green;
-      this.flags4[i9++] = particle.material.blue;
-      if (particle.useWorldPositionFlag){
-        this.flags4[i9++] = 20;
-      }else{
-        this.flags4[i9++] = 0;
-      }
-
-      particle.parent = this;
-      particle.index = this.totalParticleCount;
-      this.totalParticleCount ++;
-
-      this.flags2[i6++] = particle.material.size;
-      this.flags2[i6++] = particle.material.alpha;
-      this.expiredFlags[i] = 0;
-      if (textureCount > 0){
-        if (particle.material.texture){
-          this.flags2[i6++] = 10;
-          var range = textureMerger.ranges[particle.material.texture];
-          this.uvCoordinates[i10++] = range.startU;
-          this.uvCoordinates[i10++] = range.startV;
-          this.uvCoordinates[i10++] = range.endU;
-          this.uvCoordinates[i10++] = range.endV;
-        }else{
-          this.flags2[i6++] = -10;
-          this.uvCoordinates[i10++] = -10;
-          this.uvCoordinates[i10++] = -10;
-          this.uvCoordinates[i10++] = -10;
-          this.uvCoordinates[i10++] = -10;
-        }
-      }else{
-        this.flags2[i6++] = -10;
-      }
-
-      var startDelay = 0;
-      if (!(typeof particle.startDelay == UNDEFINED)){
-        startDelay = particle.startDelay;
-      }
-      this.flags2[i6++] = startDelay;
-
-      if (particle.respawnSet){
-        this.flags1[i5++] = 7;
-      }else{
-        this.flags1[i5++] = 0;
-      }
-      this.accelerations[i3] = particle.gpuAcceleration.x;
-      this.velocities[i3++] = particle.gpuVelocity.x;
-      this.accelerations[i3] = particle.gpuAcceleration.y;
-      this.velocities[i3++] = particle.gpuVelocity.y;
-      this.accelerations[i3] = particle.gpuAcceleration.z;
-      this.velocities[i3++] = particle.gpuVelocity.z;
-      if (!(typeof particle.alphaDelta == UNDEFINED)){
-        this.flags1[i5++] = particle.alphaDelta;
-      }else{
-        this.flags1[i5++] = 0;
-      }
-
-      if (!particle.trailFlag){
-        this.flags1[i5++] = 0.0;
-      }else{
-        if (this.motionMode == MOTION_MODE_CIRCULAR){
-          this.flags1[i5++] = 0.0;
-        }else{
-          this.flags1[i5++] = 7.0;
-        }
-      }
-
-      this.flags1[i5++] = particle.lifetime;
-
-      if (particle.alphaVariationMode == ALPHA_VARIATION_MODE_NORMAL){
-        this.flags3[i7++] = 5;
-      }else if (particle.alphaVariationMode == ALPHA_VARIATION_MODE_SIN){
-        this.flags3[i7++] = 15;
-      }else if (particle.alphaVariationMode == ALPHA_VARIATION_MODE_COS){
-        this.flags3[i7++] = 25;
-      }else{
-        this.flags3[i7++] = -20;
-      }
-
-      if (particle.motionMode == MOTION_MODE_NORMAL){
-        this.flags3[i7++] = 5;
-      }else if (particle.motionMode == MOTION_MODE_CIRCULAR){
-        this.flags3[i7++] = 15;
-      }else{
-        this.flags3[i7++] = -20;
-      }
-
-      this.flags3[i7++] = particle.angularVelocity;
-      this.flags3[i7++] = particle.angularMotionRadius;
-
-      this.angularQuaternions[i8++] = particle.angularQuaternionX;
-      this.angularQuaternions[i8++] = particle.angularQuaternionY;
-      this.angularQuaternions[i8++] = particle.angularQuaternionZ;
-      this.angularQuaternions[i8++] = particle.angularQuaternionW;
-
-      if (particle.checkForCollisions){
-        if (!this.hasParticleCollision){
-          if (TOTAL_PARTICLE_SYSTEMS_WITH_PARTICLE_COLLISIONS >= MAX_PARTICLE_SYSTEMS_WITH_PARTICLE_COLLISIONS){
-            throw new Error("Maximum "+MAX_PARTICLE_SYSTEMS_WITH_PARTICLE_COLLISIONS+" particles can have collidable particles.");
-            return;
-          }
-          TOTAL_PARTICLE_SYSTEMS_WITH_PARTICLE_COLLISIONS ++;
-          this.hasParticleCollision = true;
-        }
-        this.particlesWithCollisionCallbacks.set(particle.uuid, particle);
-      }
-
-    }
-  }else{
-    for (var i = 0; i<this.particles.length; i++){
-      var particle = this.particles[i];
-      this.expiredFlags[i] = 0;
-      this.flags2[i6++] = particle.material.size;
-      this.flags2[i6++] = particle.material.alpha;
-      if (particle.material.texture){
-        this.flags2[i6++] = 10;
-      }else{
-        this.flags2[i6++] = -10;
-      }
-      this.flags2[i6++] = particle.originalStartDelay;
-    }
-  }
-
-  if (this.copyPS){
-
-    this.positionBufferAttribute = this.copyPS.positionBufferAttribute;
-    if (this.copyPS.rgbThresholdBufferAttribute){
-      this.rgbThresholdBufferAttribute = this.copyPS.rgbThresholdBufferAttribute;
-    }
-    this.velocityBufferAttribute = this.copyPS.velocityBufferAttribute;
-    this.accelerationBufferAttribute = this.copyPS.accelerationBufferAttribute;
-    if (!noTargetColor){
-      this.targetColorBufferAttribute = this.copyPS.targetColorBufferAttribute;
-    }
-    this.flags1BufferAttribute = this.copyPS.flags1BufferAttribute;
-    this.flags3BufferAttribute = this.copyPS.flags3BufferAttribute;
-    this.flags4BufferAttribute = this.copyPS.flags4BufferAttribute;
-    this.angularQuaternionsBufferAttribute = this.copyPS.angularQuaternionsBufferAttribute;
-    if (this.copyPS.uvCoordinatesBufferAttribute){
-      this.uvCoordinatesBufferAttribute = this.copyPS.uvCoordinatesBufferAttribute;
-    }
-
-    this.expiredFlagBufferAttribute = new THREE.BufferAttribute(this.expiredFlags, 1);
-    this.flags2BufferAttribute = new THREE.BufferAttribute(this.flags2, 4);
-    this.expiredFlagBufferAttribute.setDynamic(true);
-    this.flags2BufferAttribute.setDynamic(true);
-  }else{
-    this.positionBufferAttribute = new THREE.BufferAttribute(this.positions, 3);
-    if (this.rgbThresholds){
-      this.rgbThresholdBufferAttribute = new THREE.BufferAttribute(this.rgbThresholds, 3);
-      this.rgbThresholdBufferAttribute.setDynamic(false);
-    }
-    this.expiredFlagBufferAttribute = new THREE.BufferAttribute(this.expiredFlags, 1);
-    this.velocityBufferAttribute = new THREE.BufferAttribute(this.velocities, 3);
-    this.accelerationBufferAttribute = new THREE.BufferAttribute(this.accelerations, 3);
-    if (!noTargetColor){
-      this.targetColorBufferAttribute = new THREE.BufferAttribute(this.targetColors, 4);
-      this.targetColorBufferAttribute.setDynamic(false);
-    }
-    this.flags1BufferAttribute = new THREE.BufferAttribute(this.flags1, 4);
-    this.flags2BufferAttribute = new THREE.BufferAttribute(this.flags2, 4);
-    this.flags3BufferAttribute = new THREE.BufferAttribute(this.flags3, 4);
-    this.flags4BufferAttribute = new THREE.BufferAttribute(this.flags4, 4);
-    this.angularQuaternionsBufferAttribute = new THREE.BufferAttribute(this.angularQuaternions, 4);
-    if (this.uvCoordinates){
-      this.uvCoordinatesBufferAttribute = new THREE.BufferAttribute(this.uvCoordinates, 4);
-      this.uvCoordinatesBufferAttribute.setDynamic(false);
-    }
-
-    this.positionBufferAttribute.setDynamic(false);
-    this.expiredFlagBufferAttribute.setDynamic(true);
-    this.velocityBufferAttribute.setDynamic(false);
-    this.accelerationBufferAttribute.setDynamic(false);
-    this.flags1BufferAttribute.setDynamic(false);
-    this.flags2BufferAttribute.setDynamic(true);
-    this.flags3BufferAttribute.setDynamic(false);
-    this.flags4BufferAttribute.setDynamic(false);
-    this.angularQuaternionsBufferAttribute.setDynamic(false);
-
-  }
-
-  this.geometry.addAttribute('position', this.positionBufferAttribute);
-  if (this.rgbThresholdBufferAttribute){
-    this.geometry.addAttribute('rgbThreshold', this.rgbThresholdBufferAttribute);
-  }
-  this.geometry.addAttribute('expiredFlag', this.expiredFlagBufferAttribute);
-  this.geometry.addAttribute('velocity', this.velocityBufferAttribute);
-  this.geometry.addAttribute('acceleration', this.accelerationBufferAttribute);
-  if (!noTargetColor){
-    this.geometry.addAttribute('targetColor', this.targetColorBufferAttribute);
-  }
-  this.geometry.addAttribute('flags1', this.flags1BufferAttribute);
-  this.geometry.addAttribute('flags2', this.flags2BufferAttribute);
-  this.geometry.addAttribute('flags3', this.flags3BufferAttribute);
-  this.geometry.addAttribute('flags4', this.flags4BufferAttribute);
-  this.geometry.addAttribute('angularQuaternion', this.angularQuaternionsBufferAttribute);
-  if (this.uvCoordinatesBufferAttribute){
-    this.geometry.addAttribute('uvCoordinates', this.uvCoordinatesBufferAttribute);
-  }
-  this.geometry.setDrawRange(0, particles.length);
-
-
-  this.velocity = new THREE.Vector3(vx, vy, vz);
-  this.acceleration = new THREE.Vector3(ax, ay, az);
-  var motionModeFlag = -10.0;
-  if (this.motionMode == MOTION_MODE_NORMAL){
-    motionModeFlag = 5.0;
-  }else if (this.motionMode == MOTION_MODE_CIRCULAR){
-    motionModeFlag = 20.0;
-  }
-
-  var texture;
-  if (textureMerger){
-    texture = textureMerger.mergedTexture;
-  }
-
-  if (!this.copyPS){
-    this.material = new THREE.RawShaderMaterial({
-      vertexShader: ShaderContent.particleVertexShader,
-      fragmentShader: ShaderContent.particleFragmentShader,
-      transparent: true,
-      side: THREE.DoubleSide,
-      uniforms:{
-        modelViewMatrix: new THREE.Uniform(new THREE.Matrix4()),
-        projectionMatrix: GLOBAL_PROJECTION_UNIFORM,
-        worldMatrix: new THREE.Uniform(new THREE.Matrix4()),
-        viewMatrix: GLOBAL_VIEW_UNIFORM,
-        time: new THREE.Uniform(0.0),
-        dissapearCoef: new THREE.Uniform(0.0),
-        stopInfo: new THREE.Uniform(new THREE.Vector3(-10, -10, -10)),
-        parentMotionMatrix: new THREE.Uniform(new THREE.Matrix3().fromArray([
-          x, y, z, vx, vy, vz, ax, ay, az
-        ])),
-      }
-    });
-  }else{
-    this.material = this.copyPS.material.clone();
-    this.material.uniforms.projectionMatrix = GLOBAL_PROJECTION_UNIFORM;
-    this.material.uniforms.viewMatrix = GLOBAL_VIEW_UNIFORM;
-  }
-
-  if (fogBlendWithSkybox){
-    this.material.uniforms.cameraPosition = GLOBAL_CAMERA_POSITION_UNIFORM;
-    this.material.uniforms.cubeTexture = GLOBAL_CUBE_TEXTURE_UNIFORM;
-    macroHandler.injectMacro("HAS_SKYBOX_FOG", this.material, true, true);
-  }
-  if (fogActive){
-    this.material.uniforms.fogInfo = GLOBAL_FOG_UNIFORM;
-    macroHandler.injectMacro("HAS_FOG", this.material, false, true);
-  }
-  if (texture){
-    this.material.uniforms.texture = new THREE.Uniform(texture);
-    macroHandler.injectMacro("HAS_TEXTURE", this.material, true, true);
-  }
-  if (!noTargetColor){
-    macroHandler.injectMacro("HAS_TARGET_COLOR", this.material, true, false);
-  }
-  if (particleSystemRefHeight){
-    macroHandler.injectMacro("HAS_REF_HEIGHT", this.material, true, false);
-    this.material.uniforms.refHeightCoef = GLOBAL_PS_REF_HEIGHT_UNIFORM;
-  }
-
-  this.mesh = new THREE.Points(this.geometry, this.material);
-  this.mesh.renderOrder = renderOrders.PARTICLE_SYSTEM;
-  this.mesh.position.set(x, y, z);
-  this.mesh.frustumCulled = false;
-  this.mesh.visible = false;
-
+  this.mesh = particleSystemGenerator.generateParticleSystemMesh(this);
   scene.add(this.mesh);
   particleSystemPool[name] = this;
-
   webglCallbackHandler.registerEngineObject(this);
-}
-
-ParticleSystem.prototype.notifyParticleCollisionCallbackChange = function(particle){
-  if (particle.checkForCollisions){
-    this.particlesWithCollisionCallbacks.set(particle.uuid, particle);
-  }else{
-    this.particlesWithCollisionCallbacks.delete(particle.uuid);
-  }
 }
 
 ParticleSystem.prototype.destroy = function(){
@@ -460,6 +49,134 @@ ParticleSystem.prototype.destroy = function(){
     if (this.psMerger){
       this.psMerger.removePS(this);
     }
+  }
+}
+
+ParticleSystem.prototype.hide = function(){
+  this.tick = 0;
+  this.motionMode = 0;
+  this.mesh.visible = false;
+  if (!this.psMerger){
+    particleSystems.delete(this.name);
+  }
+  if (!(typeof this.psPool == UNDEFINED)){
+    var psPool = particleSystemPools[this.psPool];
+    psPool.notifyPSAvailable(this);
+  }
+  if (this.psMerger){
+    this.psMerger.material.uniforms.hiddenArray.value[this.mergedIndex] = (20.0);
+    this.psMerger.notifyPSVisibilityChange(this, false);
+  }
+}
+
+ParticleSystem.prototype.start = function(configurations){
+  var particleSystem = configurations.particleSystem;
+  var startPosition = configurations.startPosition;
+  var startVelocity = configurations.startVelocity;
+  var startAcceleration = configurations.startAcceleration;
+  var startQuaternion = configurations.startQuaternion;
+  this.tick = 0;
+  this.motionTimer = 0;
+  if (!(typeof startVelocity == UNDEFINED)){
+    this.vx = startVelocity.x;
+    this.vy = startVelocity.y;
+    this.vz = startVelocity.z;
+    if (!this.velocity){
+      this.velocity = new THREE.Vector3(this.vx, this.vy, this.vz);
+    }else{
+      this.velocity.x = this.vx;
+      this.velocity.y = this.vy;
+      this.velocity.z = this.vz;
+    }
+    if (!this.psMerger){
+      this.material.uniforms.parentMotionMatrix.value.elements[3] = startVelocity.x;
+      this.material.uniforms.parentMotionMatrix.value.elements[4] = startVelocity.y;
+      this.material.uniforms.parentMotionMatrix.value.elements[5] = startVelocity.z;
+    }else{
+      var matrix = this.psMerger.material.uniforms.parentMotionMatrixArray.value[this.mergedIndex];
+      matrix.elements[3] = startVelocity.x;
+      matrix.elements[4] = startVelocity.y;
+      matrix.elements[5] = startVelocity.z;
+    }
+  }
+  if (!(typeof startAcceleration == UNDEFINED)){
+    this.ax = startAcceleration.x;
+    this.ay = startAcceleration.y;
+    this.az = startAcceleration.z;
+    if (!this.acceleration){
+      this.acceleration = new THREE.Vector3(this.ax, this.ay, this.az);
+    }else{
+      this.acceleration.x = this.ax;
+      this.acceleration.y = this.ay;
+      this.acceleration.z = this.az;
+    }
+    if (!this.psMerger){
+      this.material.uniforms.parentMotionMatrix.value.elements[6] = startAcceleration.x;
+      this.material.uniforms.parentMotionMatrix.value.elements[7] = startAcceleration.y;
+      this.material.uniforms.parentMotionMatrix.value.elements[8] = startAcceleration.z;
+    }else{
+      var matrix = this.psMerger.material.uniforms.parentMotionMatrixArray.value[this.mergedIndex];
+      matrix.elements[6] = startAcceleration.x;
+      matrix.elements[7] = startAcceleration.y;
+      matrix.elements[8] = startAcceleration.z;
+    }
+  }
+  if (!(typeof startQuaternion == UNDEFINED)){
+    this.mesh.quaternion.set(startQuaternion.x, startQuaternion.y, startQuaternion.z, startQuaternion.w);
+  }
+  if (!(typeof startPosition == UNDEFINED)){
+    this.x = startPosition.x;
+    this.y = startPosition.y;
+    this.z = startPosition.z;
+    this.mesh.position.set(this.x, this.y, this.z);
+    if (!this.psMerger){
+      this.material.uniforms.parentMotionMatrix.value.elements[0] = startPosition.x;
+      this.material.uniforms.parentMotionMatrix.value.elements[1] = startPosition.y;
+      this.material.uniforms.parentMotionMatrix.value.elements[2] = startPosition.z;
+    }else{
+      var matrix = this.psMerger.material.uniforms.parentMotionMatrixArray.value[this.mergedIndex];
+      matrix.elements[0] = startPosition.x;
+      matrix.elements[1] = startPosition.y;
+      matrix.elements[2] = startPosition.z;
+    }
+  }
+  if (!this.psMerger){
+    this.material.uniforms.stopInfo.value.set(-10, -10, -10);
+  }else{
+    this.psMerger.material.uniforms.hiddenArray.value[this.mergedIndex] = (-20.0);
+    this.psMerger.material.uniforms.stopInfoArray.value[this.mergedIndex].set(-10, -10, -10);
+  }
+  this.stoppedX = undefined;
+  this.stoppedY = undefined;
+  this.stoppedZ = undefined;
+  this.stopped = false;
+  if (!(typeof this.originalCheckForCollisions == UNDEFINED)){
+    this.checkForCollisions = this.originalCheckForCollisions;
+    this.originalCheckForCollisions = undefined;
+  }
+  if (!(typeof this.originalLifetime == UNDEFINED)){
+    this.lifetime = this.originalLifetime;
+    this.originalLifetime = undefined;
+  }
+  this.mesh.visible = true;
+  if (!this.psMerger){
+    particleSystems.set(this.name, this);
+    this.material.uniforms.dissapearCoef.value = 0;
+  }else{
+    this.psMerger.notifyPSVisibilityChange(this, true);
+    this.psMerger.material.uniforms.dissapearCoefArray.value[this.mergedIndex] = 0;
+  }
+  if (this.rewindNeededOnNextStart){
+    for (var i = 0; i<this.particles.length; i++){
+      this.rewindParticle(this.particles[i], 0);
+    }
+    this.rewindNeededOnNextStart = false;
+  }
+  if (this.updateExpiredStatusOnNextStart){
+    for (var i = 0; i<this.particles.length; i++){
+      this.undoRemoveParticle(this.particles[i]);
+    }
+    this.updateExpiredStatusOnNextStart = false;
   }
 }
 
@@ -488,17 +205,39 @@ ParticleSystem.prototype.stop = function(newLifetime){
 
 ParticleSystem.prototype.particleIterationStopFunc = function(value, key){
   var particle = value;
-  particle.stopLifetime = newLifetime;
+  particle.stopLifetime = particle.parent.lifetime;
   particle.respawnSet = false;
-  particle.stopTick = this.tick;
-  particle.lifetime = newLifetime;
-  if (particle.startDelay > this.tick){
-    particle.startDelay = this.tick;
+  particle.stopTick = particle.parent.tick;
+  particle.lifetime = particle.parent.lifetime;
+  if (particle.startDelay > particle.parent.tick){
+    particle.startDelay = particle.parent.tick;
   }
 }
 
 ParticleSystem.prototype.setBlending = function(mode){
   this.material.blending = mode;
+}
+
+ParticleSystem.prototype.undoRemoveParticle = function(particle){
+  var selectedGeometry;
+  var selectedOffset = particle.index;
+  if (this.psMerger){
+    selectedOffset += this.expiredFlagOffset;
+    selectedGeometry = this.psMerger.geometry;
+  }else{
+    selectedGeometry = this.geometry;
+  }
+  selectedGeometry.attributes.expiredFlag.updateRange.set(selectedOffset, 1);
+  selectedGeometry.attributes.expiredFlag.array[particle.index] = 0;
+  selectedGeometry.attributes.expiredFlag.needsUpdate = true;
+  particle.isExpired = false;
+  if (particle.checkForCollisions){
+    if (typeof particle.uuid == UNDEFINED){
+      particle.assignUUID();
+    }
+    this.particlesWithCollisionCallbacks.set(particle.uuid, particle);
+  }
+  this.destroyedChildCount --;
 }
 
 ParticleSystem.prototype.removeParticle = function(particle){
@@ -510,15 +249,15 @@ ParticleSystem.prototype.removeParticle = function(particle){
   }else{
     selectedGeometry = this.geometry;
   }
-  selectedGeometry.attributes.expiredFlag.updateRange.push({
-    offset: selectedOffset, count: 1
-  });
+  selectedGeometry.attributes.expiredFlag.updateRange.set(selectedOffset, 1);
   selectedGeometry.attributes.expiredFlag.array[particle.index] = 7;
   selectedGeometry.attributes.expiredFlag.needsUpdate = true;
   particle.isExpired = true;
-  if (particle.uuid){
+  if (!(typeof particle.uuid == UNDEFINED)){
     this.particlesWithCollisionCallbacks.delete(particle.uuid);
   }
+  this.destroyedChildCount ++;
+  this.updateExpiredStatusOnNextStart = true;
 }
 
 ParticleSystem.prototype.rewindParticle = function(particle, delay){
@@ -530,12 +269,11 @@ ParticleSystem.prototype.rewindParticle = function(particle, delay){
   }else{
     selectedGeometry = this.geometry;
   }
-  selectedGeometry.attributes.flags2.updateRange.push({
-    offset: sIndex, count: 1
-  });
+  selectedGeometry.attributes.flags2.updateRange.set(sIndex, 1);
   particle.startDelay = this.tick + delay;
   selectedGeometry.attributes.flags2.array[sIndex] = particle.startDelay;
   selectedGeometry.attributes.flags2.needsUpdate = true;
+  this.rewindNeededOnNextStart = true;
 }
 
 ParticleSystem.prototype.calculatePseudoPosition = function(){
@@ -656,7 +394,7 @@ ParticleSystem.prototype.update = function(){
       this.expirationFunction(this.name);
     }
     if (!this.psMerger){
-      delete particleSystems[this.name];
+      particleSystems.delete(this.name);
     }else{
       this.psMerger.material.uniforms.hiddenArray.value[this.mergedIndex] = 20.0;
       this.psMerger.notifyPSVisibilityChange(this, false);

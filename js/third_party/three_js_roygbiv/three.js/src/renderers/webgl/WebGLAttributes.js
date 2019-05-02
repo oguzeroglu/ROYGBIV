@@ -63,6 +63,13 @@ function WebGLAttributes( gl ) {
 
 	}
 
+	function updateFunc(curCount, curOffset){
+		gl.bufferSubData(
+			window.bufferTypeForBufferUpdate, curOffset * window.arrayForBufferUpdate.BYTES_PER_ELEMENT,
+			window.arrayForBufferUpdate.subarray( curOffset, curOffset + curCount )
+		);
+	}
+
 	function updateBuffer( buffer, attribute, bufferType ) {
 
 		var array = attribute.array;
@@ -74,47 +81,14 @@ function WebGLAttributes( gl ) {
 
 			gl.bufferData( bufferType, array, gl.STATIC_DRAW );
 
-		} else if ( typeof updateRange.offset == "undefined" &&
-																	typeof updateRange.count == "undefined" ) {
+		} else if ( updateRange instanceof Map ) {
 
-			// updateRange is an array of {offset: x, count: y}
-
-			for ( var i = 0; i < updateRange.length; i ++ ) {
-
-				var curCount = updateRange[ i ].count;
-				var curOffset = updateRange[ i ].offset;
-
-				if ( curCount != 0 && curCount != - 1 ) {
-
-					if ( curOffset >= array.length || curCount > array.length ) {
-
-						console.error( 'THREE.WebGLObjects.updateBuffer: Buffer overflow.' );
-
-					} else {
-
-						gl.bufferSubData(
-							bufferType, curOffset * array.BYTES_PER_ELEMENT,
-							array.subarray( curOffset, curOffset + curCount )
-						);
-
-					}
-
-				} else if ( updateRange == 0 ) {
-
-					console.error( 'THREE.WebGLObjects.updateBuffer: dynamic THREE.BufferAttribute marked as needsUpdate but updateRange.count is 0 for index ' + i + ', ensure you are using set methods or updating manually.' );
-
-				}
-
+			if (updateRange.size >= 0){
+				window.bufferTypeForBufferUpdate = bufferType;
+				window.arrayForBufferUpdate = array;
+				updateRange.forEach(updateFunc);
+				updateRange.clear();
 			}
-
-			if ( ! updateRange ) {
-
-				gl.bufferSubData( bufferType, 0, array );
-
-			}
-
-			// Reset update ranges
-			attribute.updateRange.length = 0;
 
 		} else {
 

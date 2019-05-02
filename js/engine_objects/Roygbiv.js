@@ -49,7 +49,6 @@ var Roygbiv = function(){
     "setParticleSystemBlending",
     "setParticleSystemRotation",
     "setParticleSystemQuaternion",
-    "kill",
     "createSmoke",
     "getMarkedPosition",
     "createTrail",
@@ -67,7 +66,6 @@ var Roygbiv = function(){
     "createObjectTrail",
     "destroyObjectTrail",
     "generateParticleSystemName",
-    "rewindParticle",
     "createLaser",
     "createWaterfall",
     "createSnow",
@@ -972,6 +970,9 @@ Roygbiv.prototype.createParticleMaterial = function(configurations){
 //  motionMode: The motion mode of the particle. This can be MOTION_MODE_NORMAL or MOTION_MODE_CIRCULAR. MOTION_MODE_NORMAL represents
 //  the motion with uniform acceleration and the MOTION_MODE_CIRCULAR represents the uniform circular motion. The default value is
 //  MOTION_MODE_NORMAL. (optional)
+//  collisionAction: One of PARTICLE_REWIND_ON_COLLIDED or PARTICLE_DISSAPEAR_ON_COLLIDED. This parameter decides what to do when the particle
+//  is collided with one of the intersectable objects of the scene. If not set, particles are not listened for collisions. (optional)
+//  collisionTimeOffset: By pre-calculating the future collision, this parameter can be used to prevent visual errors of collisions of rather fast particles. (optional)
 Roygbiv.prototype.createParticle = function(configurations){
   if (mode == 0){
     return;
@@ -1013,6 +1014,10 @@ Roygbiv.prototype.createParticle = function(configurations){
   preConditions.checkIfNumberOnlyIfExists(ROYGBIV.createParticle, preConditions.angularMotionRadius, configurations.angularMotionRadius);
   preConditions.checkIfQuaternionOnlyIfDefined(ROYGBIV.createParticle, preConditions.angularQuaternion, configurations.angularQuaternion);
   preConditions.checkIfBooleanOnlyIfExists(ROYGBIV.createParticle, preConditions.useWorldPosition, configurations.useWorldPosition);
+  preConditions.checkIfCollisionActionOnlyIfExists(ROYGBIV.createParticle, preConditions.collisionAction, configurations.collisionAction);
+  preConditions.checkParticleCollisionActionValidityOnlyIfExists(ROYGBIV.createParticle, true, configurations.collisionAction);
+  preConditions.checkIfTrueOnlyIfYExists(ROYGBIV.createParticle, "Rewindable particles must have respawn = true and lifetime != 0 as configurations.", configurations.collisionAction, (configurations.collisionAction == PARTICLE_REWIND_ON_COLLIDED && (configurations.respawn != true || configurations.lifetime == 0)));
+  preConditions.checkIfNumberOnlyIfExists(ROYGBIV.createParticle, preConditions.collisionTimeOffset, configurations.collisionTimeOffset);
   return particleSystemGenerator.generateParticle(configurations);
 }
 
@@ -1135,23 +1140,6 @@ Roygbiv.prototype.setParticleSystemQuaternion = function(particleSystem, quatX, 
   preConditions.checkIfTrue(ROYGBIV.setParticleSystemQuaternion, "particleSystem has a defined motion. Cannot set quaternion.", (particleSystem.velocity.x != 0 || particleSystem.velocity.y != 0 || particleSystem.velocity.z != 0 || particleSystem.acceleration.x != 0 || particleSystem.acceleration.y != 0 || particleSystem.acceleration.z != 0));
   particleSystem.mesh.quaternion.set(quatX, quatY, quatZ, quatW);
   particleSystem.hasManualQuaternionSet = true;
-}
-
-//  Destroys a particle or a particle system.
-Roygbiv.prototype.kill = function(object){
-  if (mode == 0){
-    return;
-  }
-  preConditions.checkIfDefined(ROYGBIV.kill, preConditions.object, object);
-  preConditions.checkIfParticleOrParticleSystem(ROYGBIV.kill, preConditions.object, object);
-  if (object.isParticle){
-    object.kill();
-  }else if (object.isParticleSystem){
-    object.destroy();
-    delete particleSystems[object.name];
-    delete particleSystemPool[object.name];
-    TOTAL_PARTICLE_SYSTEM_COUNT --;
-  }
 }
 
 //  Returns a new smoke like particle system based on following configurations:
@@ -1911,28 +1899,7 @@ Roygbiv.prototype.generateParticleSystemName = function(){
   return generatedName;
 }
 
-// Rewinds a particle and restarts its motion. Particles using this functionality
-// must have respawn = true and lifetime != 0 as configuration. The additional
-// delay parameter may be used to delay the rewind process in seconds.
-Roygbiv.prototype.rewindParticle = function(particle, delay){
-  if (mode == 0){
-    return;
-  }
-  preConditions.checkIfDefined(ROYGBIV.rewindParticle, preConditions.particle, particle);
-  preConditions.checkIfTrue(ROYGBIV.rewindParticle, "particle is not a Particle.", (!particle.isParticle));
-  preConditions.checkIfTrue(ROYGBIV.rewindParticle, "Particles using this API must have respawn = true as configuration.", (!particle.respawnSet));
-  preConditions.checkIfTrue(ROYGBIV.rewindParticle, "Particles using this API must have lifetime != 0 as configuration.", (particle.lifetime == 0));
-  preConditions.checkIfNumberOnlyIfExists(ROYGBIV.rewindParticle, preConditions.delay, delay);
-  if ((typeof delay == UNDEFINED)){
-    delay = 0;
-  }
-  if (!particle.parent){
-    return;
-  }
-  particle.parent.rewindParticle(particle, delay);
-}
-
-// Creates a laser like particle system. Configurations are:
+// Creates a laser like particle system. Configfurations are:
 // name: The unique name of the particle system. (mandatory)
 // position: The initial position of the particle system. (mandatory)
 // particleCount: The count of laser particles. (mandatory)
@@ -2117,6 +2084,9 @@ Roygbiv.prototype.createWaterfall = function(configurations){
   preConditions.checkIfVectorOnlyIfDefined(ROYGBIV.createWaterfall, preConditions.normal, normal);
   preConditions.checkIfNumberOnlyIfExists(ROYGBIV.createWaterfall, preConditions.randomness, randomness);
   preConditions.checkIfNumberOnlyIfExists(ROYGBIV.createWaterfall, preConditions.collisionTimeOffset, collisionTimeOffset);
+  if (rewindOnCollided){
+    preConditions.checkParticleCollisionActionValidityOnlyIfExists(ROYGBIV.createWaterfall, false, true, configurations.particleCount);
+  }
   if ((typeof rewindOnCollided == UNDEFINED)){
     rewindOnCollided = false;
   }
@@ -2264,6 +2234,9 @@ Roygbiv.prototype.createSnow = function(configurations){
   preConditions.checkIfVectorOnlyIfDefined(ROYGBIV.createSnow, preConditions.normal, normal);
   preConditions.checkIfNumberOnlyIfExists(ROYGBIV.createSnow, preConditions.randomness, randomness);
   preConditions.checkIfNumberOnlyIfExists(ROYGBIV.createSnow, preConditions.collisionTimeOffset, collisionTimeOffset);
+  if (rewindOnCollided){
+    preConditions.checkParticleCollisionActionValidityOnlyIfExists(ROYGBIV.createSnow, false, true, configurations.particleCount);
+  }
   if ((typeof rewindOnCollided == UNDEFINED)){
     rewindOnCollided = false;
   }
@@ -2350,149 +2323,23 @@ Roygbiv.prototype.startParticleSystem = function(configurations){
     return;
   }
   preConditions.checkIfDefined(ROYGBIV.startParticleSystem, preConditions.configurations, configurations);
-  var particleSystem = configurations.particleSystem;
-  var startPosition = configurations.startPosition;
-  var startVelocity = configurations.startVelocity;
-  var startAcceleration = configurations.startAcceleration;
-  var startQuaternion = configurations.startQuaternion;
-
-  preConditions.checkIfMandatoryParameterExists(ROYGBIV.startParticleSystem, preConditions.particleSystem, particleSystem);
-  preConditions.checkIfParticleSystem(ROYGBIV.startParticleSystem, preConditions.particleSystem, particleSystem);
-  preConditions.checkIfVectorOnlyIfDefined(ROYGBIV.startParticleSystem, preConditions.startPosition, startPosition);
-  preConditions.checkIfVectorOnlyIfDefined(ROYGBIV.startParticleSystem, preConditions.startVelocity, startVelocity);
-  preConditions.checkIfVectorOnlyIfDefined(ROYGBIV.startParticleSystem, preConditions.startAcceleration, startAcceleration);
-  preConditions.checkIfVectorOnlyIfDefined(ROYGBIV.startParticleSystem, preConditions.startQuaternion, startQuaternion);
-
-  var startPositionSet = false, startVelocitySet = false, startAccelerationSet = false, startQuaternionSet = false;
-  if (!(typeof startPosition == UNDEFINED)){
-    startPositionSet = true;
-  }
-  if (!(typeof startVelocity == UNDEFINED)){
-    startVelocitySet = true;
-  }
-  if (!(typeof startAcceleration == UNDEFINED)){
-    startAccelerationSet = true;
-  }
-  if (!(typeof startQuaternion == UNDEFINED)){
-    startQuaternionSet = true;
-  }
-
-  particleSystem.tick = 0;
-  particleSystem.motionTimer = 0;
-  if (startVelocitySet){
-    particleSystem.vx = startVelocity.x;
-    particleSystem.vy = startVelocity.y;
-    particleSystem.vz = startVelocity.z;
-    if (!particleSystem.velocity){
-      particleSystem.velocity = this.vector(particleSystem.vx, particleSystem.vy, particleSystem.vz);
-    }else{
-      particleSystem.velocity.x = particleSystem.vx;
-      particleSystem.velocity.y = particleSystem.vy;
-      particleSystem.velocity.z = particleSystem.vz;
-    }
-    if (!particleSystem.psMerger){
-      particleSystem.material.uniforms.parentMotionMatrix.value.elements[3] = startVelocity.x;
-      particleSystem.material.uniforms.parentMotionMatrix.value.elements[4] = startVelocity.y;
-      particleSystem.material.uniforms.parentMotionMatrix.value.elements[5] = startVelocity.z;
-    }else{
-      var matrix = particleSystem.psMerger.material.uniforms.parentMotionMatrixArray.value[particleSystem.mergedIndex];
-      matrix.elements[3] = startVelocity.x;
-      matrix.elements[4] = startVelocity.y;
-      matrix.elements[5] = startVelocity.z;
-    }
-  }
-  if (startAccelerationSet){
-    particleSystem.ax = startAcceleration.x;
-    particleSystem.ay = startAcceleration.y;
-    particleSystem.az = startAcceleration.z;
-    if (!particleSystem.acceleration){
-      particleSystem.acceleration = this.vector(particleSystem.ax, particleSystem.ay, particleSystem.az);
-    }else{
-      particleSystem.acceleration.x = particleSystem.ax;
-      particleSystem.acceleration.y = particleSystem.ay;
-      particleSystem.acceleration.z = particleSystem.az;
-    }
-    if (!particleSystem.psMerger){
-      particleSystem.material.uniforms.parentMotionMatrix.value.elements[6] = startAcceleration.x;
-      particleSystem.material.uniforms.parentMotionMatrix.value.elements[7] = startAcceleration.y;
-      particleSystem.material.uniforms.parentMotionMatrix.value.elements[8] = startAcceleration.z;
-    }else{
-      var matrix = particleSystem.psMerger.material.uniforms.parentMotionMatrixArray.value[particleSystem.mergedIndex];
-      matrix.elements[6] = startAcceleration.x;
-      matrix.elements[7] = startAcceleration.y;
-      matrix.elements[8] = startAcceleration.z;
-    }
-  }
-  if (startQuaternionSet){
-    particleSystem.mesh.quaternion.set(startQuaternion.x, startQuaternion.y, startQuaternion.z, startQuaternion.w);
-  }
-  if (startPositionSet){
-    particleSystem.x = startPosition.x;
-    particleSystem.y = startPosition.y;
-    particleSystem.z = startPosition.z;
-    particleSystem.mesh.position.set(particleSystem.x, particleSystem.y, particleSystem.z);
-    if (!particleSystem.psMerger){
-      particleSystem.material.uniforms.parentMotionMatrix.value.elements[0] = startPosition.x;
-      particleSystem.material.uniforms.parentMotionMatrix.value.elements[1] = startPosition.y;
-      particleSystem.material.uniforms.parentMotionMatrix.value.elements[2] = startPosition.z;
-    }else{
-      var matrix = particleSystem.psMerger.material.uniforms.parentMotionMatrixArray.value[particleSystem.mergedIndex];
-      matrix.elements[0] = startPosition.x;
-      matrix.elements[1] = startPosition.y;
-      matrix.elements[2] = startPosition.z;
-    }
-  }
-  if (!particleSystem.psMerger){
-    particleSystem.material.uniforms.stopInfo.value.set(-10, -10, -10);
-  }else{
-    particleSystem.psMerger.material.uniforms.hiddenArray.value[particleSystem.mergedIndex] = (-20.0);
-    particleSystem.psMerger.material.uniforms.stopInfoArray.value[particleSystem.mergedIndex].set(-10, -10, -10);
-  }
-  particleSystem.stoppedX = undefined;
-  particleSystem.stoppedY = undefined;
-  particleSystem.stoppedZ = undefined;
-  particleSystem.stopped = false;
-  if (!(typeof particleSystem.originalCheckForCollisions == UNDEFINED)){
-    particleSystem.checkForCollisions = particleSystem.originalCheckForCollisions;
-    particleSystem.originalCheckForCollisions = undefined;
-  }
-  if (!(typeof particleSystem.originalLifetime == UNDEFINED)){
-    particleSystem.lifetime = particleSystem.originalLifetime;
-    particleSystem.originalLifetime = undefined;
-  }
-  particleSystem.mesh.visible = true;
-  if (!particleSystem.psMerger){
-    particleSystems[particleSystem.name] = particleSystem;
-    particleSystem.material.uniforms.dissapearCoef.value = 0;
-  }else{
-    particleSystem.psMerger.notifyPSVisibilityChange(particleSystem, true);
-    particleSystem.psMerger.material.uniforms.dissapearCoefArray.value[particleSystem.mergedIndex] = 0;
-  }
+  preConditions.checkIfMandatoryParameterExists(ROYGBIV.startParticleSystem, preConditions.particleSystem, configurations.particleSystem);
+  preConditions.checkIfParticleSystem(ROYGBIV.startParticleSystem, preConditions.particleSystem, configurations.particleSystem);
+  preConditions.checkIfVectorOnlyIfDefined(ROYGBIV.startParticleSystem, preConditions.startPosition, configurations.startPosition);
+  preConditions.checkIfVectorOnlyIfDefined(ROYGBIV.startParticleSystem, preConditions.startVelocity, configurations.startVelocity);
+  preConditions.checkIfVectorOnlyIfDefined(ROYGBIV.startParticleSystem, preConditions.startAcceleration, configurations.startAcceleration);
+  preConditions.checkIfVectorOnlyIfDefined(ROYGBIV.startParticleSystem, preConditions.startQuaternion, configurations.startQuaternion);
+  configurations.particleSystem.start(configurations);
 }
 
-// Removes a particle system from the scene. Use this instead of ROYGBIV.kill() for
-// reusable particle systems.
+// Makes a particle system invisible.
 Roygbiv.prototype.hideParticleSystem = function(particleSystem){
   if (mode == 0){
     return;
   }
   preConditions.checkIfDefined(ROYGBIV.hideParticleSystem, preConditions.particleSystem, particleSystem);
   preConditions.checkIfParticleSystem(ROYGBIV.hideParticleSystem, preConditions.particleSystem, particleSystem);
-
-  particleSystem.tick = 0;
-  particleSystem.motionMode = 0;
-  particleSystem.mesh.visible = false;
-  if (!particleSystem.psMerger){
-    delete particleSystems[particleSystems.name];
-  }
-  if (!(typeof particleSystem.psPool == UNDEFINED)){
-    var psPool = particleSystemPools[particleSystem.psPool];
-    psPool.notifyPSAvailable(particleSystem);
-  }
-  if (particleSystem.psMerger){
-    particleSystem.psMerger.material.uniforms.hiddenArray.value[particleSystem.mergedIndex] = (20.0);
-    particleSystem.psMerger.notifyPSVisibilityChange(particleSystem, false);
-  }
+  particleSystem.hide();
 }
 
 // Creates a new particle system pool. Particle system pools are used to hold
@@ -2560,10 +2407,9 @@ Roygbiv.prototype.destroyParticleSystemPool = function(pool){
 // particleSize: The size of particles. (mandatory)
 // colorName: The color name of particles. (mandatory)
 // alpha: The alpha value of particles. (mandatory)
-// collisionMethod: 0 -> Nothing happens when particles are collided with objects.
-//                  1 -> Particles are destroyed when collided with objects.
-//                  2 -> Particles are respawned when collided with objects.
-//                  Default value is 0. (optional)
+// collisionMethod: PARTICLE_DISSAPEAR_ON_COLLIDED -> Particles are dissapeared when collided with objects.
+//                  PARTICLE_REWIND_ON_COLLIDED -> Particles are respawned when collided with objects.
+//                  If not set, particles are not listened for collisions.
 // normal: The normal vector of the particle system. Default value is (0, 1, 0) (optional)
 // collisionTimeOffset: The time offset of collision listener if the collisionMethod is 1 or 2. Default value is 0. (optional)
 // startDelay: The average start delay of particles. Default value is 0. (optional)
@@ -2608,9 +2454,8 @@ Roygbiv.prototype.createConfettiExplosion = function(configurations){
   preConditions.checkIfNumberOnlyIfExists(ROYGBIV.createConfettiExplosion, preConditions.startDelay, configurations.startDelay);
   preConditions.checkIfLessThanExclusiveOnlyIfExists(ROYGBIV.createConfettiExplosion, preConditions.startDelay, configurations.startDelay, 0);
   preConditions.checkIfVectorOnlyIfDefined(ROYGBIV.createConfettiExplosion, preConditions.normal, configurations.normal);
-  if (!(typeof configurations.collisionMethod == UNDEFINED)){
-    preConditions.checkIfTrue(ROYGBIV.createConfettiExplosion, "collisionMethod method must be one of 0, 1 or 2", (configurations.collisionMethod != 0 && configurations.collisionMethod != 1 && configurations.collisionMethod != 2));
-  }
+  preConditions.checkIfCollisionActionOnlyIfExists(ROYGBIV.createConfettiExplosion, preConditions.collisionMethod, configurations.collisionMethod);
+  preConditions.checkParticleCollisionActionValidityOnlyIfExists(ROYGBIV.createConfettiExplosion, false, configurations.collisionMethod, configurations.particleCount);
   return particleSystemGenerator.generateConfettiExplosion(configurations);
 }
 
@@ -2937,19 +2782,18 @@ Roygbiv.prototype.shrinkCrosshair = function(delta){
 
 // LISTENER FUNCTIONS **********************************************************
 
-//  Sets a collision listener for an object, glued object, particle or a particle system. Using
-//  this with loads of particles may cause performance issues if web worker usage is not enabled or supported.
-//  Callback function given as the second parameter is fired with a CollisionInfo instance (except for particle collisions) when
+//  Sets a collision listener for an object, glued object or a particle system.
+//  Callback function given as the second parameter is fired with a CollisionInfo instance when
 //  the sourceObject is collided with other objects or glued objects of the scene.
-//  The additional timeOffset parameter can be used for particles/particle systems to
+//  The additional timeOffset parameter can be used for particle systems to
 //  pre-calculate future collisions. This can help to prevent visual errors of collisions
-//  of rather fast particles/particle systems.
+//  of rather fast particle systems.
 Roygbiv.prototype.setCollisionListener = function(sourceObject, callbackFunction, timeOffset){
   if (mode == 0){
     return;
   }
   preConditions.checkIfDefined(ROYGBIV.setCollisionListener, preConditions.sourceObject, sourceObject);
-  preConditions.checkIfAddedObjectObjectGroupParticleSystemParticle(ROYGBIV.setCollisionListener, preConditions.sourceObject, sourceObject);
+  preConditions.checkIfAddedObjectObjectGroupParticleSystem(ROYGBIV.setCollisionListener, preConditions.sourceObject, sourceObject);
   preConditions.checkIfDefined(ROYGBIV.setCollisionListener, preConditions.callbackFunction, callbackFunction);
   preConditions.checkIfFunctionOnlyIfExists(ROYGBIV.setCollisionListener, preConditions.callbackFunction, callbackFunction);
   preConditions.checkIfNumberOnlyIfExists(ROYGBIV.setCollisionListener, preConditions.timeOffset, timeOffset);
@@ -2961,21 +2805,6 @@ Roygbiv.prototype.setCollisionListener = function(sourceObject, callbackFunction
       TOTAL_OBJECT_COLLISION_LISTENER_COUNT ++;
     }
     sourceObject.setCollisionListener(callbackFunction);
-  }else if (sourceObject.isParticle){
-    preConditions.checkIfTrue(ROYGBIV.setCollisionListener, "Particle system is stopped.", (sourceObject.parent && sourceObject.parent.isStopped));
-    if (sourceObject.uuid && !particleCollisionCallbackRequests[sourceObject.uuid]){
-      preConditions.checkIfTrue(ROYGBIV.setCollisionListener, "Cannot set collision lsitener for more than "+MAX_PARTICLE_COLLISION_LISTEN_COUNT+" particles.", (TOTAL_PARTICLE_COLLISION_LISTEN_COUNT >= MAX_PARTICLE_COLLISION_LISTEN_COUNT));
-    }
-    if (sourceObject.parent){
-      preConditions.checkIfTrue(ROYGBIV.setCollisionListener, "A position is manually set to the parent particle system. Cannot listen for collisions.", (sourceObject.parent.hasManualPositionSet));
-      preConditions.checkIfTrue(ROYGBIV.setCollisionListener, "A rotation is manually set to the parent particle system. Cannot listen for collisions.", (sourceObject.parent.hasManualRotationSet));
-      preConditions.checkIfTrue(ROYGBIV.setCollisionListener, "A quaternion is manually set to the parent particle system. Cannot listen for collisions.", (sourceObject.parent.hasManualQuaternionSet));
-      if (!sourceObject.parent.hasParticleCollision){
-        preConditions.checkIfTrue(ROYGBIV.setCollisionListener, "Maximum "+MAX_PARTICLE_SYSTEMS_WITH_PARTICLE_COLLISIONS+" can have collisions particles.", (TOTAL_PARTICLE_SYSTEMS_WITH_PARTICLE_COLLISIONS >= MAX_PARTICLE_SYSTEMS_WITH_PARTICLE_COLLISIONS));
-        TOTAL_PARTICLE_SYSTEMS_WITH_PARTICLE_COLLISIONS ++;
-      }
-    }
-    sourceObject.setCollisionListener(callbackFunction, timeOffset);
   }else if (sourceObject.isParticleSystem){
     preConditions.checkIfTrue(ROYGBIV.setCollisionListener, "A position is set manually to the particle system. Cannot listen for collisions.", (sourceObject.hasManualPositionSet));
     preConditions.checkIfTrue(ROYGBIV.setCollisionListener, "A rotation is set manually to the particle system. Cannot listen for collisions.", (sourceObject.hasManualRotationSet));
@@ -2996,9 +2825,7 @@ Roygbiv.prototype.setCollisionListener = function(sourceObject, callbackFunction
   }
 }
 
-//  Removes collision listeners of an object, glued object, particle or a particle system.. Use this
-//  for performance improvements if collision callbacks are no longer necessary
-//  for particles or particle systems.
+//  Removes collision listeners of an object, glued object or a particle system.
 Roygbiv.prototype.removeCollisionListener = function(sourceObject){
   if (mode == 0){
     return;
@@ -3008,8 +2835,6 @@ Roygbiv.prototype.removeCollisionListener = function(sourceObject){
   var curCallbackRequest;
   if ((sourceObject.isAddedObject) || (sourceObject.isObjectGroup)){
     curCallbackRequest = collisionCallbackRequests.get(sourceObject.name);
-  }else if (sourceObject.isParticle){
-    curCallbackRequest = particleCollisionCallbackRequests[sourceObject.uuid];
   }else if (sourceObject.isParticleSystem){
     curCallbackRequest = particleSystemCollisionCallbackRequests[sourceObject.name];
   }
@@ -3017,13 +2842,6 @@ Roygbiv.prototype.removeCollisionListener = function(sourceObject){
     if ((sourceObject.isAddedObject) || (sourceObject.isObjectGroup)){
       sourceObject.removeCollisionListener();
       TOTAL_OBJECT_COLLISION_LISTENER_COUNT --;
-    }else if (sourceObject.isParticle){
-      delete particleCollisionCallbackRequests[sourceObject.uuid];
-      TOTAL_PARTICLE_COLLISION_LISTEN_COUNT --;
-      sourceObject.checkForCollisions = false;
-      if (sourceObject.parent){
-        sourceObject.parent.notifyParticleCollisionCallbackChange(sourceObject);
-      }
     }else if (sourceObject.isParticleSystem){
       TOTAL_PARTICLE_SYSTEM_COLLISION_LISTEN_COUNT --;
       delete particleSystemCollisionCallbackRequests[sourceObject.name];
