@@ -1015,6 +1015,7 @@ Roygbiv.prototype.createParticle = function(configurations){
   preConditions.checkIfQuaternionOnlyIfDefined(ROYGBIV.createParticle, preConditions.angularQuaternion, configurations.angularQuaternion);
   preConditions.checkIfBooleanOnlyIfExists(ROYGBIV.createParticle, preConditions.useWorldPosition, configurations.useWorldPosition);
   preConditions.checkIfCollisionActionOnlyIfExists(ROYGBIV.createParticle, preConditions.collisionAction, configurations.collisionAction);
+  preConditions.checkParticleCollisionActionValidityOnlyIfExists(ROYGBIV.createParticle, true, configurations.collisionAction);
   preConditions.checkIfTrueOnlyIfYExists(ROYGBIV.createParticle, "Rewindable particles must have respawn = true and lifetime != 0 as configurations.", configurations.collisionAction, (configurations.collisionAction == PARTICLE_REWIND_ON_COLLIDED && (configurations.respawn != true || configurations.lifetime == 0)));
   preConditions.checkIfNumberOnlyIfExists(ROYGBIV.createParticle, preConditions.collisionTimeOffset, configurations.collisionTimeOffset);
   return particleSystemGenerator.generateParticle(configurations);
@@ -2083,6 +2084,9 @@ Roygbiv.prototype.createWaterfall = function(configurations){
   preConditions.checkIfVectorOnlyIfDefined(ROYGBIV.createWaterfall, preConditions.normal, normal);
   preConditions.checkIfNumberOnlyIfExists(ROYGBIV.createWaterfall, preConditions.randomness, randomness);
   preConditions.checkIfNumberOnlyIfExists(ROYGBIV.createWaterfall, preConditions.collisionTimeOffset, collisionTimeOffset);
+  if (rewindOnCollided){
+    preConditions.checkParticleCollisionActionValidityOnlyIfExists(ROYGBIV.createWaterfall, false, true, configurations.particleCount);
+  }
   if ((typeof rewindOnCollided == UNDEFINED)){
     rewindOnCollided = false;
   }
@@ -2230,6 +2234,9 @@ Roygbiv.prototype.createSnow = function(configurations){
   preConditions.checkIfVectorOnlyIfDefined(ROYGBIV.createSnow, preConditions.normal, normal);
   preConditions.checkIfNumberOnlyIfExists(ROYGBIV.createSnow, preConditions.randomness, randomness);
   preConditions.checkIfNumberOnlyIfExists(ROYGBIV.createSnow, preConditions.collisionTimeOffset, collisionTimeOffset);
+  if (rewindOnCollided){
+    preConditions.checkParticleCollisionActionValidityOnlyIfExists(ROYGBIV.createSnow, false, true, configurations.particleCount);
+  }
   if ((typeof rewindOnCollided == UNDEFINED)){
     rewindOnCollided = false;
   }
@@ -2448,6 +2455,7 @@ Roygbiv.prototype.createConfettiExplosion = function(configurations){
   preConditions.checkIfLessThanExclusiveOnlyIfExists(ROYGBIV.createConfettiExplosion, preConditions.startDelay, configurations.startDelay, 0);
   preConditions.checkIfVectorOnlyIfDefined(ROYGBIV.createConfettiExplosion, preConditions.normal, configurations.normal);
   preConditions.checkIfCollisionActionOnlyIfExists(ROYGBIV.createConfettiExplosion, preConditions.collisionMethod, configurations.collisionMethod);
+  preConditions.checkParticleCollisionActionValidityOnlyIfExists(ROYGBIV.createConfettiExplosion, false, configurations.collisionMethod, configurations.particleCount);
   return particleSystemGenerator.generateConfettiExplosion(configurations);
 }
 

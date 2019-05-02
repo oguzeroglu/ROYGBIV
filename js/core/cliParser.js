@@ -7,7 +7,6 @@ function parseCommand(userInput){
 }
 
 function parse(input){
-
     try{
       var splitted = input.trim().split(" ");
       var commandIndex;
@@ -21,22 +20,16 @@ function parse(input){
       if (!found){
         return false;
       }
-
-      // COMMAND FOUND
-
-      //CHECK IF DEPRECATED
       for (var i = 0; i<commandDescriptor.deprecatedCommandIndices.length; i++){
         if (commandDescriptor.deprecatedCommandIndices[i] == commandIndex){
           terminal.printError(Text.COMMAND_DEPRECATED);
           return true;
         }
       }
-
       if (splitted.length -1 != commandDescriptor.commandArgumentsExpectedCount[commandIndex]){
         terminal.printFunctionArguments(commandIndex);
         return true;
       }
-
       switch (commandIndex){
         case 0: //help
           var commandInfos = [];
@@ -5132,6 +5125,28 @@ function parse(input){
           GLOBAL_PS_REF_HEIGHT_UNIFORM.value = 1;
           terminal.printInfo(Text.OK);
           return true;
+        break;
+        case 167: //setMaxCollidableParticleCount
+          if (mode != 0){
+            terminal.printError(Text.WORKS_ONLY_IN_DESIGN_MODE);
+            return true;
+          }
+          var maxCollidableParticleCount = parseInt(splitted[1]);
+          if (isNaN(maxCollidableParticleCount)){
+            terminal.printError(Text.IS_NOT_A_NUMBER.replace(Text.PARAM1, "maxCollidableParticleCount"));
+            return true;
+          }
+          if (maxCollidableParticleCount < 0){
+            terminal.printError(Text.MUST_BE_GREATER_THAN.replace(Text.PARAM1, "maxCollidableParticleCount").replace(Text.PARAM2, "0"));
+            return true;
+          }
+          MAX_COLLIDABLE_PARTICLE_COUNT = maxCollidableParticleCount;
+          terminal.printInfo(Text.MAX_COLLIDABLE_PARTICLE_COUNT_SET.replace(Text.PARAM1, MAX_COLLIDABLE_PARTICLE_COUNT));
+          return true;
+        break;
+        case 168: //printMaxCollidableParticleCount
+          terminal.printHeader(Text.MAX_COLLIDABLE_PARTICLE_COUNT);
+          terminal.printInfo(Text.TREE.replace(Text.PARAM1, MAX_COLLIDABLE_PARTICLE_COUNT));
         break;
       }
       return true;

@@ -617,14 +617,7 @@ ParticleSystemGenerator.prototype.generateParticleSystemMesh = function(ps){
       ps.angularQuaternions[i8++] = particle.angularQuaternionZ;
       ps.angularQuaternions[i8++] = particle.angularQuaternionW;
       if (particle.checkForCollisions){
-        if (!ps.hasParticleCollision){
-          if (TOTAL_PARTICLE_SYSTEMS_WITH_PARTICLE_COLLISIONS >= MAX_PARTICLE_SYSTEMS_WITH_PARTICLE_COLLISIONS){
-            throw new Error("Maximum "+MAX_PARTICLE_SYSTEMS_WITH_PARTICLE_COLLISIONS+" particle systems can have collidable particles.");
-            return;
-          }
-          TOTAL_PARTICLE_SYSTEMS_WITH_PARTICLE_COLLISIONS ++;
-          ps.hasParticleCollision = true;
-        }
+        ps.hasParticleCollision = true;
         ps.particlesWithCollisionCallbacks.set(particle.uuid, particle);
       }
     }

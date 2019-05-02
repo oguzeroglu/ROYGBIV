@@ -221,6 +221,24 @@ Preconditions.prototype.throw = function(callerFunc, errorMsg){
   throw new Error(this.errorHeader(callerFunc)+" ["+errorMsg+"]");
 }
 
+Preconditions.prototype.checkParticleCollisionActionValidityOnlyIfExists = function(callerFunc, isInclusive, collisionAction, particleCount){
+  if (!(typeof collisionAction == UNDEFINED)){
+    var amount = 0;
+    if (particleCount){
+      amount = particleCount;
+    }
+    if (isInclusive){
+      if ((TOTAL_PARTICLE_COLLISION_LISTEN_COUNT + amount) >= MAX_COLLIDABLE_PARTICLE_COUNT){
+        this.throw(callerFunc, "Maximum number of collidable particles exceeded. Use setMaxCollidableParticleCount CLI command to allocate more space.");
+      }
+    }else{
+      if ((TOTAL_PARTICLE_COLLISION_LISTEN_COUNT + amount) > MAX_COLLIDABLE_PARTICLE_COUNT){
+        this.throw(callerFunc, "Maximum number of collidable particles exceeded. Use setMaxCollidableParticleCount CLI command to allocate more space.");
+      }
+    }
+  }
+}
+
 Preconditions.prototype.checkIfCollisionActionOnlyIfExists = function(callerFunc, parameterName, obj){
   if (!(typeof obj == UNDEFINED)){
     if (obj !== PARTICLE_REWIND_ON_COLLIDED && obj !== PARTICLE_DISSAPEAR_ON_COLLIDED){
