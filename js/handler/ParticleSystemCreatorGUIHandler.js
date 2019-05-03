@@ -89,7 +89,119 @@ ParticleSystemCreatorGUIHandler.prototype.addTypeController = function(type){
 ParticleSystemCreatorGUIHandler.prototype.showConfetti = function(prevParams){
   guiHandler.datGuiPSCreator = new dat.GUI({hideable: false});
   particleSystemCreatorGUIHandler.addTypeController("CONFETTI");
+  var confettiParameters = {
+    expireTime: 0, lifetime: 0, verticalSpeed: 100, horizontalSpeed: 50, verticalAcceleration: -80,
+    particleCount: 100, particleSize: 5, colorName: "#ffffff", alpha: 1, hasParticleCollision: false,
+    hasTargetColor: false, hasAlphaVariation: false, hasTexture: false, collisionMethod: "", normal: "0,1,0",
+    collisionTimeOffset: 0, startDelay: 3, targetColorName: "#ffffff", colorStep: 0, alphaVariation: 0, textureName: "",
+    rgbFilter: "r,g,b"
+  };
+  guiHandler.datGuiPSCreator.add(confettiParameters, "expireTime").min(0).max(50).step(0.1).onFinishChange(function(val){
+    particleSystemCreatorGUIHandler.confettiExplosionGeneratorFunc();
+  }).listen();
+  guiHandler.datGuiPSCreator.add(confettiParameters, "lifetime").min(0).max(100).step(0.1).onFinishChange(function(val){
+    particleSystemCreatorGUIHandler.confettiExplosionGeneratorFunc();
+  }).listen();
+  guiHandler.datGuiPSCreator.add(confettiParameters, "verticalSpeed").min(0.1).max(5000).step(0.5).onFinishChange(function(val){
+    particleSystemCreatorGUIHandler.confettiExplosionGeneratorFunc();
+  }).listen();
+  guiHandler.datGuiPSCreator.add(confettiParameters, "horizontalSpeed").min(0.1).max(5000).step(0.5).onFinishChange(function(val){
+    particleSystemCreatorGUIHandler.confettiExplosionGeneratorFunc();
+  }).listen();
+  guiHandler.datGuiPSCreator.add(confettiParameters, "verticalAcceleration").min(-5000).max(-0.1).step(0.1).onFinishChange(function(val){
+    particleSystemCreatorGUIHandler.confettiExplosionGeneratorFunc();
+  }).listen();
+  guiHandler.datGuiPSCreator.add(confettiParameters, "particleCount").min(1).max(5000).step(1).onFinishChange(function(val){
+    particleSystemCreatorGUIHandler.confettiExplosionGeneratorFunc();
+  }).listen();
+  guiHandler.datGuiPSCreator.add(confettiParameters, "particleSize").min(0.1).max(20).step(0.01).onFinishChange(function(val){
+    particleSystemCreatorGUIHandler.confettiExplosionGeneratorFunc();
+  }).listen();
+  guiHandler.datGuiPSCreator.addColor(confettiParameters, "colorName").onFinishChange(function(val){
+    particleSystemCreatorGUIHandler.confettiExplosionGeneratorFunc();
+  }).listen();
+  guiHandler.datGuiPSCreator.add(confettiParameters, "alpha").min(0).max(1).step(0.1).onFinishChange(function(val){
+    particleSystemCreatorGUIHandler.confettiExplosionGeneratorFunc();
+  }).listen();
+  guiHandler.datGuiPSCreator.add(confettiParameters, "hasParticleCollision").onChange(function(val){
+
+  }).listen();
+  guiHandler.datGuiPSCreator.add(confettiParameters, "collisionMethod", ["none", "rewind", "dissapear"]).onFinishChange(function(val){
+    particleSystemCreatorGUIHandler.confettiExplosionGeneratorFunc();
+  }).listen();
+  guiHandler.datGuiPSCreator.add(confettiParameters, "collisionTimeOffset").min(0).max(1000).step(0.1).onFinishChange(function(val){
+    particleSystemCreatorGUIHandler.confettiExplosionGeneratorFunc();
+  }).listen();
+  guiHandler.datGuiPSCreator.add(confettiParameters, "normal").onFinishChange(function(val){
+
+  }).listen();
+  guiHandler.datGuiPSCreator.add(confettiParameters, "startDelay").min(0).max(10).step(0.1).onFinishChange(function(val){
+    particleSystemCreatorGUIHandler.confettiExplosionGeneratorFunc();
+  }).listen();
+  guiHandler.datGuiPSCreator.add(confettiParameters, "hasTargetColor").onChange(function(val){
+
+  }).listen();
+  guiHandler.datGuiPSCreator.addColor(confettiParameters, "targetColorName").onFinishChange(function(val){
+    particleSystemCreatorGUIHandler.confettiExplosionGeneratorFunc();
+  }).listen();
+  guiHandler.datGuiPSCreator.add(confettiParameters, "colorStep").min(0).max(1).step(0.001).onFinishChange(function(val){
+    particleSystemCreatorGUIHandler.confettiExplosionGeneratorFunc();
+  }).listen();
+  guiHandler.datGuiPSCreator.add(confettiParameters, "hasAlphaVariation").onChange(function(val){
+
+  }).listen();
+  guiHandler.datGuiPSCreator.add(confettiParameters, "alphaVariation").min(-10).max(10).step(0.1).onFinishChange(function(val){
+    particleSystemCreatorGUIHandler.confettiExplosionGeneratorFunc();
+  }).listen();
+  guiHandler.datGuiPSCreator.add(confettiParameters, "hasTexture").onChange(function(val){
+
+  }).listen();
+  guiHandler.datGuiPSCreator.add(confettiParameters, "textureName", particleSystemCreatorGUIHandler.usableTextureNames).onChange(function(val){
+    particleSystemCreatorGUIHandler.confettiExplosionGeneratorFunc();
+  }).listen();
+  guiHandler.datGuiPSCreator.add(confettiParameters, "rgbFilter").onFinishChange(function(val){
+
+  }).listen();
+  guiHandler.datGuiPSCreator.add({"Restart": function(){
+    particleSystemCreatorGUIHandler.confettiExplosionGeneratorFunc();
+  }}, "Restart");
   particleSystemCreatorGUIHandler.addButtonsController();
+  particleSystemCreatorGUIHandler.confettiExplosionGeneratorFunc = function(){
+    if (particleSystemCreatorGUIHandler.particleSystem){
+      scene.remove(particleSystemCreatorGUIHandler.particleSystem.mesh);
+      particleSystemCreatorGUIHandler.particleSystem = 0;
+    }
+    var params = {name: particleSystemCreatorGUIHandler.psName, position: new THREE.Vector3(0, 0, 0)};
+    for (var key in particleSystemCreatorGUIHandler.confettiParameters){
+      params[key] = particleSystemCreatorGUIHandler.confettiParameters[key];
+    }
+    if (!particleSystemCreatorGUIHandler.confettiParameters.hasTexture || particleSystemCreatorGUIHandler.confettiParameters.textureName == ""){
+      delete params.textureName;
+      delete params.rgbFilter;
+    }else{
+      var splitted = params.rgbThreshold.split(",");
+      params.rgbFilter = new THREE.Vector3(parseFloat(splitted[0]), parseFloat(splitted[1]), parseFloat(splitted[2]));
+    }
+    if (particleSystemCreatorGUIHandler.confettiParameters.collisionMethod == ""){
+      delete params.collisionMethod;
+    }
+    var splitted = params.normal.split(",");
+    if (splitted.length != 3){
+      if (isNaN(splitted[0]) || isNaN(splitted[1]) || isNaN(splitted[2])){
+        params.normal = new THREE.Vector3(0, 1, 0);
+      }else{
+        params.normal = new THREE.Vector3(parseFloat(splitted[0], parseFloat(splitted[1]), parseFloat(splitted[2])));
+      }
+    }else{
+      params.normal = new THREE.Vector3(0, 1, 0);
+    }
+    particleSystemCreatorGUIHandler.particleSystem = particleSystemGenerator.generateConfettiExplosion(params);
+    particleSystemCreatorGUIHandler.particleSystem.mesh.visible = true;
+    scene.add(particleSystemCreatorGUIHandler.particleSystem.mesh);
+    particleSystemCreatorGUIHandler.preConfiguredParticleSystem = new PreconfiguredParticleSystem(particleSystemCreatorGUIHandler.psName, "CONFETTI", params);
+  }
+  particleSystemCreatorGUIHandler.confettiParameters = confettiParameters;
+  particleSystemCreatorGUIHandler.confettiExplosionGeneratorFunc();
 }
 
 ParticleSystemCreatorGUIHandler.prototype.showSnow = function(prevParams){
