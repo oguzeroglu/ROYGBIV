@@ -21,12 +21,14 @@ var ParticleSystem = function(copyPS, name, particles, x, y, z, vx, vy, vz, ax, 
   this.REUSABLE_VECTOR = new THREE.Vector3();
   this.REUSABLE_VELOCITY_VECTOR = new THREE.Vector3();
   this.REUSABLE_ACCELERATION_VECTOR = new THREE.Vector3();
+  TOTAL_PARTICLE_SYSTEM_COUNT ++;
+  particleSystemPool[name] = this;
+  this.statusDescription = {type: -1, isStartPositionDefined: false, isStartVelocityDefined: false, isStartAccelerationDefined: false, isStartQuaternionDefined: false, startPosition: new THREE.Vector3(), startVelocity: new THREE.Vector3(), startAcceleration: new THREE.Vector3(), startQuaternion: new THREE.Quaternion(), stopDuration: 0};
   if (IS_WORKER_CONTEXT){
     return this;
   }
   this.mesh = particleSystemGenerator.generateParticleSystemMesh(this);
   scene.add(this.mesh);
-  particleSystemPool[name] = this;
   webglCallbackHandler.registerEngineObject(this);
 }
 
@@ -67,6 +69,7 @@ ParticleSystem.prototype.hide = function(){
     this.psMerger.material.uniforms.hiddenArray.value[this.mergedIndex] = (20.0);
     this.psMerger.notifyPSVisibilityChange(this, false);
   }
+  rayCaster.onParticleSystemHide(this);
 }
 
 ParticleSystem.prototype.start = function(configurations){
@@ -178,6 +181,7 @@ ParticleSystem.prototype.start = function(configurations){
     }
     this.updateExpiredStatusOnNextStart = false;
   }
+  rayCaster.onParticleSystemStart(this, configurations);
 }
 
 ParticleSystem.prototype.stop = function(newLifetime){
@@ -201,6 +205,7 @@ ParticleSystem.prototype.stop = function(newLifetime){
   this.stoppedY = this.mesh.position.y;
   this.stoppedZ = this.mesh.position.z;
   this.particlesWithCollisionCallbacks.forEach(this.particleIterationStopFunc);
+  rayCaster.onParticleSystemStop(this, newLifetime);
 }
 
 ParticleSystem.prototype.particleIterationStopFunc = function(value, key){

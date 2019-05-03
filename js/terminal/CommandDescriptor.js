@@ -169,7 +169,9 @@ var CommandDescriptor = function(){
       1, //editParticleSystem
       0, //makeParticleSystemsResponsive
       1, //setMaxCollidableParticleCount
-      0 //printMaxCollidableParticleCount
+      0, //printMaxCollidableParticleCount
+      1, //setMaxParticleSystemCount
+      0 //printMaxParticleSystemCount
   ];
 
   this.commandArgumentsExpectedExplanation = [
@@ -341,7 +343,9 @@ var CommandDescriptor = function(){
     "editParticleSystem psName",
     "makeParticleSystemsResponsive",
     "setMaxCollidableParticleCount maxCollidableParticleCount",
-    "printMaxCollidableParticleCount"
+    "printMaxCollidableParticleCount",
+    "setMaxParticleSystemCount maxParticleSystemCount",
+    "printMaxParticleSystemCount"
   ];
 
   this.commands = [
@@ -513,7 +517,9 @@ var CommandDescriptor = function(){
     "editParticleSystem",
     "makeParticleSystemsResponsive",
     "setMaxCollidableParticleCount",
-    "printMaxCollidableParticleCount"
+    "printMaxCollidableParticleCount",
+    "setMaxParticleSystemCount",
+    "printMaxParticleSystemCount"
   ];
 
   this.commandInfo = [
@@ -685,7 +691,9 @@ var CommandDescriptor = function(){
     "editParticleSystem: Shows the GUI for editing a particle system.",
     "makeParticleSystemsResponsive: Calculates a reference height based on the height and resolution of the device that runs this command\nin order to make the particle systems look responsive on different devices.",
     "setMaxCollidableParticleCount: Sets the maximum number of collidable particles.",
-    "printMaxCollidableParticleCount: Prints the maximum number of collidable particles set using setMaxCollidableParticleCount CLI command."
+    "printMaxCollidableParticleCount: Prints the maximum number of collidable particles set using setMaxCollidableParticleCount CLI command.",
+    "setMaxParticleSystemCount: Sets the maximum number of particle systems.",
+    "printMaxParticleSystemCount: Prints the maximum number of particle systems."
   ];
 
   this.keyboardInfo = [
@@ -1370,6 +1378,11 @@ var CommandDescriptor = function(){
   this.setMaxCollidableParticleCount = new Object();
   this.setMaxCollidableParticleCount.types = [];
   this.setMaxCollidableParticleCount.types.push(this.UNKNOWN_INDICATOR); // maxCollidableParticleCount
+
+  // setMaxParticleSystemCount
+  this.setMaxParticleSystemCount = new Object();
+  this.setMaxParticleSystemCount.types = [];
+  this.setMaxParticleSystemCount.types.push(this.UNKNOWN_INDICATOR); // setMaxParticleSystemCount
 
 };
 

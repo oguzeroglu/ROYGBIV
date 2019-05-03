@@ -8,6 +8,9 @@ var RayCaster = function(){
 }
 
 RayCaster.prototype.onParticleSystemGeneration = noop;
+RayCaster.prototype.onParticleSystemStart = noop;
+RayCaster.prototype.onParticleSystemStop = noop;
+RayCaster.prototype.onParticleSystemHide = noop;
 
 RayCaster.prototype.onReady = function(){
   this.ready = true;

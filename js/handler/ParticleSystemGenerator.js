@@ -377,6 +377,10 @@ ParticleSystemGenerator.prototype.generateParticle = function(configurations){
 }
 
 ParticleSystemGenerator.prototype.generateParticleSystem = function(configurations){
+  if (TOTAL_PARTICLE_SYSTEM_COUNT == MAX_PARTICLE_SYSTEM_COUNT){
+    console.error("Maximum particle system cound exceeded. Use setMaxParticleSystemCount CLI command to allocate more space.");
+    return;
+  }
   var name = configurations.name;
   var particles = configurations.particles;
   var position = configurations.position;
@@ -414,7 +418,6 @@ ParticleSystemGenerator.prototype.generateParticleSystem = function(configuratio
   particleSystem.angularQuaternionZ = angularQuaternion.z;
   particleSystem.angularQuaternionW = angularQuaternion.w;
   particleSystem.initialAngle = initialAngle;
-  TOTAL_PARTICLE_SYSTEM_COUNT ++;
   if (particleSystem.hasParticleCollision){
     particleSystem.creationConfigurations = new Object();
     for (var key in configurations){

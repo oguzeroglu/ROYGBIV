@@ -30,6 +30,8 @@ var RaycasterWorkerBridge = function(){
     }else if (msg.data.type){
       rayCaster.objectsByWorkerID = new Object();
       rayCaster.idsByObjectNames = new Object();
+      rayCaster.particleSystemsByWorkerID = new Object();
+      rayCaster.idsByParticleSystemNames = new Object();
       for (var i = 0; i<msg.data.ids.length; i++){
         if (msg.data.ids[i].type == "gridSystem"){
           rayCaster.objectsByWorkerID[msg.data.ids[i].id] = gridSystems[msg.data.ids[i].name];
@@ -133,6 +135,9 @@ var RaycasterWorkerBridge = function(){
       rayCaster.transferableList.push(particleIntersectionDescription.buffer);
       rayCaster.hasOwnership = true;
       rayCaster.onReady();
+    }else if (msg.data.isParticleSystemIDResponse){
+      rayCaster.particleSystemsByWorkerID[msg.data.id] = particleSystemPool[msg.data.name];
+      rayCaster.idsByParticleSystemNames[msg.data.name] = msg.data.id;
     }else{
       rayCaster.transferableMessageBody= msg.data;
       rayCaster.transferableList[0] = rayCaster.transferableMessageBody.intersectableObjDescription.buffer;
@@ -351,4 +356,41 @@ RaycasterWorkerBridge.prototype.onParticleSystemGeneration = function(particleSy
     message.particleDescription[uuid] = particle.creationConfigurations;
   });
   this.worker.postMessage(message);
+}
+
+RaycasterWorkerBridge.prototype.onParticleSystemStart = function(particleSystem, startConfigurations){
+  particleSystem.statusDescription.type = PARTICLE_SYSTEM_ACTION_TYPE_START;
+  if (typeof startConfigurations.startPosition == UNDEFINED){
+    particleSystem.statusDescription.isStartPositionDefined = false;
+  }else{
+    particleSystem.statusDescription.isStartPositionDefined = true;
+    particleSystem.statusDescription.startPosition.copy(startConfigurations.startPosition);
+  }
+  if (typeof startConfigurations.startVelocity == UNDEFINED){
+    particleSystem.statusDescription.isStartVelocityDefined = false;
+  }else{
+    particleSystem.statusDescription.isStartVelocityDefined = true;
+    particleSystem.statusDescription.startVelocity.copy(startConfigurations.startVelocity);
+  }
+  if (typeof startConfigurations.startAcceleration == UNDEFINED){
+    particleSystem.statusDescription.isStartAccelerationDefined = false;
+  }else{
+    particleSystem.statusDescription.isStartAccelerationDefined = true;
+    particleSystem.statusDescription.startAcceleration.copy(startConfigurations.startAcceleration);
+  }
+  if (typeof startConfigurations.startQuaternion == UNDEFINED){
+    particleSystem.statusDescription.isStartQuaternionDefined = false;
+  }else{
+    particleSystem.statusDescription.isStartQuaternionDefined = true;
+    particleSystem.statusDescription.startQuaternion.copy(startConfigurations.startQuaternion);
+  }
+}
+
+RaycasterWorkerBridge.prototype.onParticleSystemStop = function(particleSystem, stopDuration){
+  particleSystem.statusDescription.type = PARTICLE_SYSTEM_ACTION_TYPE_STOP;
+  particleSystem.statusDescription.stopDuration = stopDuration;
+}
+
+RaycasterWorkerBridge.prototype.onParticleSystemHide = function(particleSystem){
+  particleSystem.statusDescription.type = PARTICLE_SYSTEM_ACTION_TYPE_HIDE;
 }

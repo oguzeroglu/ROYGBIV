@@ -29,6 +29,8 @@ StateLoader.prototype.load = function(){
     GLOBAL_PS_REF_HEIGHT_UNIFORM.value = ((renderer.getCurrentViewport().w / screenResolution) / particleSystemRefHeight);
     // MAX_COLLIDABLE_PARTICLE_COUNT
     MAX_COLLIDABLE_PARTICLE_COUNT = (!(typeof obj.MAX_COLLIDABLE_PARTICLE_COUNT == UNDEFINED))? obj.MAX_COLLIDABLE_PARTICLE_COUNT: 0;
+    // MAX_PARTICLE_SYSTEM_COUNT
+    MAX_PARTICLE_SYSTEM_COUNT = (!(typeof obj.MAX_PARTICLE_SYSTEM_COUNT == UNDEFINED))? obj.MAX_PARTICLE_SYSTEM_COUNT: 0;
     // SHADER PRECISIONS *******************************************
     shaderPrecisionHandler.load(obj.shaderPrecisions);
     // GRID SYSTEMS ************************************************
@@ -2258,6 +2260,7 @@ StateLoader.prototype.resetProject = function(){
   particleSystemRefHeight = 0;
   GLOBAL_PS_REF_HEIGHT_UNIFORM.value = 0;
   MAX_COLLIDABLE_PARTICLE_COUNT = 0;
+  MAX_PARTICLE_SYSTEM_COUNT = 0;
 
   boundingClientRect = renderer.getBoundingClientRect();
   pointerLockRequested = false;

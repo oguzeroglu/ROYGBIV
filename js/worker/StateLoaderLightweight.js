@@ -2,6 +2,11 @@ var StateLoaderLightweight = function(state){
   this.state = state;
 }
 
+StateLoaderLightweight.prototype.loadParticleSystemLimits = function(){
+  MAX_COLLIDABLE_PARTICLE_COUNT = this.state.MAX_COLLIDABLE_PARTICLE_COUNT;
+  MAX_PARTICLE_SYSTEM_COUNT = this.state.MAX_PARTICLE_SYSTEM_COUNT;
+}
+
 StateLoaderLightweight.prototype.loadCamera = function(){
   camera = new THREE.PerspectiveCamera( this.state.camera.fov, this.state.camera.aspect, 1, 10000 );
   camera.position.set(this.state.camera.position.x, this.state.camera.position.y, this.state.camera.position.z);
@@ -336,4 +341,6 @@ StateLoaderLightweight.prototype.reset = function(){
   objectGroups = new Object();
   gridSystems = new Object();
   addedTexts = new Object();
+  TOTAL_PARTICLE_COLLISION_LISTEN_COUNT = 0;
+  TOTAL_PARTICLE_SYSTEM_COUNT = 0;
 }

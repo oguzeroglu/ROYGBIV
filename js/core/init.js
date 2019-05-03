@@ -1,5 +1,21 @@
 window.onload = function() {
+  // TERMINAL
+  if (!isDeployment){
+    terminal = new Terminal();
+  }
+  // TGA and DDS LOADERS
+  tgaLoader = new THREE.TGALoader();
+  ddsLoader = new THREE.DDSLoader();
+  // FPS HANDLER
   fpsHandler = new FPSHandler();
+  // REUSABLE COLLISION INFO
+  reusableCollisionInfo = new CollisionInfo();
+  GLOBAL_ADDEDTEXT_VIEWPORT_UNIFORM = new THREE.Uniform(new THREE.Vector4(0, 0, window.innerWidth, window.innerHeight));
+  isOrientationLandscape = (window.innerWidth > window.innerHeight);
+  // MACRO HANDLER
+  macroHandler = new MacroHandler();
+  // TEXT POOL
+  Text = (!isDeployment)? new Text(): 0;
   // DRAGABLE CLI
   var cliDiv = document.getElementById("cliDiv");
   cliDivheader = document.getElementById("cliDivheader");

@@ -9,9 +9,6 @@ var scriptCreatorDiv;
 var scriptCreatorCancelButton;
 var scriptCreatorSaveButton;
 var scriptCreatorTextArea;
-if (!isDeployment){
-  terminal = new Terminal();
-}
 
 // VERSION
 var ROYGBIV_ENGINE_VERSION = 1;
@@ -56,8 +53,8 @@ var orthographicCamera;
 var canvas;
 var sceneBackgroundColor = 0x000000 ;
 var textureLoader = new THREE.TextureLoader();
-var tgaLoader = new THREE.TGALoader();
-var ddsLoader = new THREE.DDSLoader();
+var tgaLoader;
+var ddsLoader;
 var axesHelper = new THREE.AxesHelper(20000);
 var pointerLockRequested = false;
 var fullScreenRequested = false;
@@ -214,7 +211,6 @@ var DEFAULT_OCTREE_MAX_DEPTH = 8;
 var BIN_SIZE = 50;
 var RAYCASTER_STEP_AMOUNT = 32;
 var INTERSECTION_NORMAL = new THREE.Vector3();
-var MAX_PARTICLE_SYSTEM_COUNT = 1000; // MUST BE DIVISIBLE BY 10
 var TOTAL_PARTICLE_SYSTEM_COUNT = 0;
 var TOTAL_PARTICLE_COLLISION_LISTEN_COUNT = 0;
 var TOTAL_PARTICLE_SYSTEM_COLLISION_LISTEN_COUNT = 0;
@@ -228,7 +224,7 @@ var MESSAGE_TYPE_BUFFER = 1;
 var UNDEFINED = "undefined";
 var PIPE = "|";
 var mergedTextureCache = new Object();
-var reusableCollisionInfo = new CollisionInfo();
+var reusableCollisionInfo;
 var TOTAL_OBJECT_COLLISION_LISTENER_COUNT = 0;
 var MAX_OBJECT_COLLISION_LISTENER_COUNT = 50;
 var MAX_VERTEX_UNIFORM_VECTORS;
@@ -244,7 +240,7 @@ var GLOBAL_VIEW_UNIFORM = new THREE.Uniform(new THREE.Matrix4());
 var GLOBAL_CAMERA_POSITION_UNIFORM = new THREE.Uniform(new THREE.Vector3());
 var GLOBAL_CAMERA_QUATERNION_UNIFORM = new THREE.Uniform(new THREE.Quaternion());
 var GLOBAL_CUBE_TEXTURE_UNIFORM;
-var GLOBAL_ADDEDTEXT_VIEWPORT_UNIFORM = new THREE.Uniform(new THREE.Vector4(0, 0, window.innerWidth, window.innerHeight));
+var GLOBAL_ADDEDTEXT_VIEWPORT_UNIFORM;
 var GLOBAL_SCREEN_RESOLUTION_UNIFORM = new THREE.Uniform(1);
 var GLOBAL_PS_REF_HEIGHT_UNIFORM = new THREE.Uniform(0);
 var VERTEX_SHADER_TEXTURE_FETCH_SUPPORTED;
@@ -333,11 +329,11 @@ var objectsWithMouseOutListeners = new Map();
 var currentMouseOverObjectName;
 var renderer;
 var bloom;
-var macroHandler = new MacroHandler();
+var macroHandler;
 var activeControl;
 var crosshairHandler;
 var fpsWeaponAlignmentConfigurationObject;
-var isOrientationLandscape = (window.innerWidth > window.innerHeight);
+var isOrientationLandscape;
 var shaderPrecisionHandler;
 var particleSystemCreatorGUIHandler;
 var preConfiguredParticleSystems = new Object();
@@ -345,6 +341,10 @@ var particleSystemGenerator;
 var PARTICLE_REWIND_ON_COLLIDED = 2;
 var PARTICLE_DISSAPEAR_ON_COLLIDED = 1;
 var MAX_COLLIDABLE_PARTICLE_COUNT = 0;
+var MAX_PARTICLE_SYSTEM_COUNT = 0;
+var PARTICLE_SYSTEM_ACTION_TYPE_START = 0;
+var PARTICLE_SYSTEM_ACTION_TYPE_STOP = 1;
+var PARTICLE_SYSTEM_ACTION_TYPE_HIDE = 2;
 
 // RENDER ORDERS
 var renderOrders = {
@@ -369,7 +369,7 @@ if (!WORKERS_SUPPORTED){
 }
 
 // TEXT POOL
-var Text = (!isDeployment)? new Text(): 0;
+var Text;
 
 // SCRIPTING UTILITY FUNCTIONS
 var ROYGBIV;

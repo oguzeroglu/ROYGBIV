@@ -1,11 +1,16 @@
+importScripts("../third_party/three.min.js");
+importScripts("../third_party/cannon.min.js");
+importScripts("../core/globalVariables.js");
 importScripts("../handler/RayCaster.js");
 importScripts("../handler/WorldBinHandler.js");
-importScripts("../third_party/three.min.js");
 importScripts("../worker/StateLoaderLightweight.js");
 importScripts("../engine_objects/GridSystem.js");
 importScripts("../engine_objects/AddedObject.js");
 importScripts("../engine_objects/ObjectGroup.js");
 importScripts("../engine_objects/AddedText.js");
+importScripts("../handler/ParticleSystemGenerator.js");
+importScripts("../engine_objects/Particle.js");
+importScripts("../engine_objects/ParticleSystem.js");
 
 var IS_WORKER_CONTEXT = true;
 
@@ -30,10 +35,12 @@ RaycasterWorker.prototype.refresh = function(state){
   stateLoader.loadCamera();
   stateLoader.loadRenderer();
   stateLoader.loadBoundingBoxes();
+  stateLoader.loadParticleSystemLimits();
   var idCounter = 0;
   var idResponse = [];
   this.workerIDsByObjectName = new Object();
   this.objectsByWorkerID = new Object();
+  this.particleSystemsByWorkerID = new Object();
   for (var gsName in gridSystems){
     gridSystems[gsName].workerID = idCounter ++;
     idResponse.push({type: "gridSystem", name: gsName, id: gridSystems[gsName].workerID});
@@ -159,29 +166,24 @@ RaycasterWorker.prototype.update = function(transferableMessageBody){
     this.performanceLogs.updateTime = performance.now() - updateStartTime;
   }
 }
+RaycasterWorker.prototype.handleParticleSystemCreation = function(description){
+  var particles = [];
+  for (var uuid in description.particleDescription){
+    var particle = particleSystemGenerator.generateParticle(description.particleDescription[uuid]);
+    particle.assignUUID(uuid);
+    particles.push(particle);
+  }
+  description.particleSystemDescription.particles = particles;
+  var particleSystem = particleSystemGenerator.generateParticleSystem(description.particleSystemDescription);
+  particleSystem.workerID = TOTAL_PARTICLE_SYSTEM_COUNT;
+  this.particleSystemsByWorkerID[particleSystem.workerID] = particleSystem;
+  postMessage({isParticleSystemIDResponse: true, name: particleSystem.name, id: particleSystem.workerID});
+}
 
 // START
-var noop = function(){}
-var keyboardBuffer = new Object();
+var particleSystemGenerator = new ParticleSystemGenerator();
 var renderer = new Object();
-var screenResolution = 1;
 var camera = new Object();
-var LIMIT_BOUNDING_BOX = new THREE.Box3(new THREE.Vector3(-4000, -4000, -4000), new THREE.Vector3(4000, 4000, 4000));
-var BIN_SIZE = 50;
-var RAYCASTER_STEP_AMOUNT = 32;
-var REUSABLE_LINE = new THREE.Line3();
-var REUSABLE_VECTOR = new THREE.Vector3();
-var REUSABLE_VECTOR_2 = new THREE.Vector3();
-var REUSABLE_VECTOR_3 = new THREE.Vector3();
-var REUSABLE_VECTOR_4 = new THREE.Vector3();
-var INTERSECTION_NORMAL = new THREE.Vector3();
-var REUSABLE_MATRIX_4 = new THREE.Matrix4();
-var mode = 0;
-var projectLoaded = true;
-var addedObjects = new Object();
-var objectGroups = new Object();
-var gridSystems = new Object();
-var addedTexts = new Object();
 var worker = new RaycasterWorker();
 
 self.onmessage = function(msg){
@@ -198,7 +200,7 @@ self.onmessage = function(msg){
       keyboardBuffer["Shift"] = false;
     }
   }else if(msg.data.isParticleSystemCreation){
-
+    worker.handleParticleSystemCreation(msg.data);
   }else{
     worker.update(msg.data);
     worker.transferableMessageBody = msg.data;

@@ -17,6 +17,8 @@ var State = function(projectName, author){
   this.particleSystemRefHeight = particleSystemRefHeight;
   // MAX_COLLIDABLE_PARTICLE_COUNT
   this.MAX_COLLIDABLE_PARTICLE_COUNT = MAX_COLLIDABLE_PARTICLE_COUNT;
+  // MAX_PARTICLE_SYSTEM_COUNT *************************************
+  this.MAX_PARTICLE_SYSTEM_COUNT = MAX_PARTICLE_SYSTEM_COUNT;
   // SHADER PRECISIONS *********************************************
   this.shaderPrecisions = shaderPrecisionHandler.export();
   // GRID SYSTEMS **************************************************

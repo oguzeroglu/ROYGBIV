@@ -1044,7 +1044,6 @@ Roygbiv.prototype.createParticleSystem = function(configurations){
   if (mode == 0){
     return;
   }
-  preConditions.checkIfTrue(ROYGBIV.createParticleSystem, "Cannot create more than "+MAX_PARTICLE_SYSTEM_COUNT+" particle systems.", (TOTAL_PARTICLE_SYSTEM_COUNT >= MAX_PARTICLE_SYSTEM_COUNT));
   preConditions.checkIfDefined(ROYGBIV.createParticleSystem, preConditions.configurations, configurations);
   preConditions.checkIfMandatoryParameterExists(ROYGBIV.createParticleSystem, preConditions.name, configurations.name);
   preConditions.checkIfTrue(ROYGBIV.createParticleSystem, "name cannot contain coma.", (configurations.name.indexOf(',') !== -1));
@@ -2467,7 +2466,6 @@ Roygbiv.prototype.copyParticleSystem = function(particleSystem, newParticleSyste
   if (mode == 0){
     return;
   }
-  preConditions.checkIfTrue(ROYGBIV.copyParticleSystem, "Cannot create more than "+MAX_PARTICLE_SYSTEM_COUNT+" particle systems.", (TOTAL_PARTICLE_SYSTEM_COUNT >= MAX_PARTICLE_SYSTEM_COUNT));
   preConditions.checkIfDefined(ROYGBIV.copyParticleSystem, preConditions.particleSystem, particleSystem);
   preConditions.checkIfParticleSystem(ROYGBIV.copyParticleSystem, preConditions.particleSystem, particleSystem);
   preConditions.checkIfDefined(ROYGBIV.copyParticleSystem, preConditions.newParticleSystemName, newParticleSystemName);
@@ -2493,8 +2491,6 @@ Roygbiv.prototype.copyParticleSystem = function(particleSystem, newParticleSyste
     copyParticleSystem.angularQuaternionW = particleSystem.angularQuaternion.w;
   }
   copyParticleSystem.initialAngle = particleSystem.initialAngle;
-
-  TOTAL_PARTICLE_SYSTEM_COUNT ++;
 
   return copyParticleSystem;
 
@@ -2811,7 +2807,6 @@ Roygbiv.prototype.setCollisionListener = function(sourceObject, callbackFunction
     preConditions.checkIfTrue(ROYGBIV.setCollisionListener, "A quaternion is set manually to the particle system. Cannot listen for collisions.", (sourceObject.hasManualQuaternionSet));
     var incrCounter = false;
     if (!particleSystemCollisionCallbackRequests[sourceObject.name]){
-      preConditions.checkIfTrue(ROYGBIV.setCollisionListener, "Cannot set collision listener for more than "+MAX_PARTICLE_SYSTEM_COUNT+" particle systems.", (TOTAL_PARTICLE_SYSTEM_COLLISION_LISTEN_COUNT >= MAX_PARTICLE_SYSTEM_COUNT));
       incrCounter = true;
     }
     particleSystemCollisionCallbackRequests[sourceObject.name] = callbackFunction.bind(sourceObject);

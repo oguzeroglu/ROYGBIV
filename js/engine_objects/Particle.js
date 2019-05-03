@@ -216,8 +216,12 @@ Particle.prototype.handleCollisions = function(){
 }
 
 
-Particle.prototype.assignUUID = function(){
-  this.uuid = TOTAL_PARTICLE_COLLISION_LISTEN_COUNT;
+Particle.prototype.assignUUID = function(uuid){
+  if (typeof uuid == UNDEFINED){
+    this.uuid = TOTAL_PARTICLE_COLLISION_LISTEN_COUNT;
+  }else{
+    this.uuid = uuid;
+  }
 }
 
 // CONVERTED FROM THE GPU GLSL CODE
