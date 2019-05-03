@@ -345,14 +345,6 @@ RaycasterWorkerBridge.prototype.show = function(object){
   this.updateBuffer.set(object.name, object);
 }
 
-RaycasterWorkerBridge.prototype.onParticleSystemGeneration = function(particleSystem){
-  var message = {isParticleSystemCreation: true, particleSystemDescription: particleSystem.creationConfigurations, particleDescription: {}};
-  particleSystem.particlesWithCollisionCallbacks.forEach(function(particle, uuid){
-    message.particleDescription[uuid] = particle.creationConfigurations;
-  });
-  this.worker.postMessage(message);
-}
-
 RaycasterWorkerBridge.prototype.onParticleSystemStart = function(particleSystem, startConfigurations){
   particleSystem.statusDescription.type = PARTICLE_SYSTEM_ACTION_TYPE_START;
   if (typeof startConfigurations.startPosition == UNDEFINED){

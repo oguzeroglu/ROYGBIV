@@ -422,7 +422,6 @@ ParticleSystemGenerator.prototype.generateParticleSystem = function(configuratio
       }
       particleSystem.creationConfigurations[key] = configurations[key];
     }
-    rayCaster.onParticleSystemGeneration(particleSystem);
   }
   return particleSystem;
 }

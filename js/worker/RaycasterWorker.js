@@ -198,8 +198,6 @@ self.onmessage = function(msg){
     }else{
       keyboardBuffer["Shift"] = false;
     }
-  }else if(msg.data.isParticleSystemCreation){
-    worker.handleParticleSystemCreation(msg.data);
   }else{
     worker.update(msg.data);
     worker.transferableMessageBody = msg.data;
@@ -208,7 +206,6 @@ self.onmessage = function(msg){
     worker.transferableList[2] = worker.transferableMessageBody.flagsDescription.buffer;
     worker.transferableList[3] = worker.transferableMessageBody.cameraOrientationDescription.buffer;
     worker.transferableList[4] = worker.transferableMessageBody.addedTextScaleDescription.buffer;
-    worker.transferableList[5] = worker.transferableMessageBody.particleIntersectionDescription.buffer;
     postMessage(worker.transferableMessageBody);
   }
 }
