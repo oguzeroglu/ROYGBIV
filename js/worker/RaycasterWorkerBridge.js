@@ -5,6 +5,7 @@ var RaycasterWorkerBridge = function(){
   this.ready = false;
   this.updateBuffer = new Map();
   this.addedTextScaleUpdateBuffer = new Map();
+  this.particleSystemUpdateBuffer = new Map();
   this.hasOwnership = false;
   this.maxIntersectionCountInAFrame = 10;
   this.curIntersectionTestRequestCount = 0;
@@ -111,16 +112,11 @@ var RaycasterWorkerBridge = function(){
           addedTextScaleDescriptionIndex += 11;
         }
       }
-      var particleIntersectionAry = [];
-      for (var i = 0; i<MAX_COLLIDABLE_PARTICLE_COUNT; i++){
-        particleIntersectionAry.push(-1);
-      }
       var intersectableObjectDescriptionArray = new Float32Array(intersectablesAry);
       var intersectionTestDescription = new Float32Array(8 * rayCaster.maxIntersectionCountInAFrame);
       var cameraOrientationDescription = new Float32Array(8);
       var flagsDescription = new Float32Array(3);
       var addedTextScaleDescription = new Float32Array(addedTextScaleDescriptionArray);
-      var particleIntersectionDescription = new Float32Array(particleIntersectionAry);
       rayCaster.transferableMessageBody.intersectableObjDescription = intersectableObjectDescriptionArray;
       rayCaster.transferableList.push(intersectableObjectDescriptionArray.buffer);
       rayCaster.transferableMessageBody.intersectionTestDescription = intersectionTestDescription;
@@ -131,8 +127,6 @@ var RaycasterWorkerBridge = function(){
       rayCaster.transferableList.push(cameraOrientationDescription.buffer);
       rayCaster.transferableMessageBody.addedTextScaleDescription = addedTextScaleDescription;
       rayCaster.transferableList.push(addedTextScaleDescription.buffer);
-      rayCaster.transferableMessageBody.particleIntersectionDescription = particleIntersectionDescription;
-      rayCaster.transferableList.push(particleIntersectionDescription.buffer);
       rayCaster.hasOwnership = true;
       rayCaster.onReady();
     }else if (msg.data.isParticleSystemIDResponse){
@@ -145,7 +139,6 @@ var RaycasterWorkerBridge = function(){
       rayCaster.transferableList[2] = rayCaster.transferableMessageBody.flagsDescription.buffer;
       rayCaster.transferableList[3] = rayCaster.transferableMessageBody.cameraOrientationDescription.buffer;
       rayCaster.transferableList[4] = rayCaster.transferableMessageBody.addedTextScaleDescription.buffer;
-      rayCaster.transferableList[5] = rayCaster.transferableMessageBody.particleIntersectionDescription.buffer;
       var intersectionTestDescription = rayCaster.transferableMessageBody.intersectionTestDescription;
       if (rayCaster.transferableMessageBody.flagsDescription[1] > 0){
         for (var i = 0; i<intersectionTestDescription.length; i+=8){
@@ -218,7 +211,7 @@ RaycasterWorkerBridge.prototype.flush = function(){
     this.performanceLogs.cameraOrientationDescriptionLen = this.transferableMessageBody.cameraOrientationDescription.length;
     this.performanceLogs.addedTextScaleDescriptionLen = this.transferableMessageBody.addedTextScaleDescription.length;
   }
-  var sendMessage = (MAX_COLLIDABLE_PARTICLE_COUNT > 0);
+  var sendMessage = false;
   if (this.updateBuffer.size > 0){
     this.updateBuffer.forEach(this.issueUpdate);
     this.updateBuffer.clear();
@@ -280,6 +273,8 @@ RaycasterWorkerBridge.prototype.refresh = function(){
   this.ready = false;
   this.hasOwnership = false;
   this.updateBuffer = new Map();
+  this.addedTextScaleUpdateBuffer = new Map();
+  this.particleSystemUpdateBuffer = new Map();
   this.intersectionTestBuffer = {
     isActive: false, fromVectors: [] , directionVectors: [],
     intersectGridSystems: [], callbackFunctions: []
@@ -384,13 +379,19 @@ RaycasterWorkerBridge.prototype.onParticleSystemStart = function(particleSystem,
     particleSystem.statusDescription.isStartQuaternionDefined = true;
     particleSystem.statusDescription.startQuaternion.copy(startConfigurations.startQuaternion);
   }
+  var workerID = this.idsByParticleSystemNames[particleSystem.name];
+  this.particleSystemUpdateBuffer.set(workerID, particleSystem);
 }
 
 RaycasterWorkerBridge.prototype.onParticleSystemStop = function(particleSystem, stopDuration){
   particleSystem.statusDescription.type = PARTICLE_SYSTEM_ACTION_TYPE_STOP;
   particleSystem.statusDescription.stopDuration = stopDuration;
+  var workerID = this.idsByParticleSystemNames[particleSystem.name];
+  this.particleSystemUpdateBuffer.set(workerID, particleSystem);
 }
 
 RaycasterWorkerBridge.prototype.onParticleSystemHide = function(particleSystem){
   particleSystem.statusDescription.type = PARTICLE_SYSTEM_ACTION_TYPE_HIDE;
+  var workerID = this.idsByParticleSystemNames[particleSystem.name];
+  this.particleSystemUpdateBuffer.set(workerID, particleSystem);
 }

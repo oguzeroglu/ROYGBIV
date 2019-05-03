@@ -35,7 +35,6 @@ RaycasterWorker.prototype.refresh = function(state){
   stateLoader.loadCamera();
   stateLoader.loadRenderer();
   stateLoader.loadBoundingBoxes();
-  stateLoader.loadParticleSystemLimits();
   var idCounter = 0;
   var idResponse = [];
   this.workerIDsByObjectName = new Object();

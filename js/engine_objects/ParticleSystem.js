@@ -23,7 +23,7 @@ var ParticleSystem = function(copyPS, name, particles, x, y, z, vx, vy, vz, ax, 
   this.REUSABLE_ACCELERATION_VECTOR = new THREE.Vector3();
   TOTAL_PARTICLE_SYSTEM_COUNT ++;
   particleSystemPool[name] = this;
-  this.statusDescription = {type: -1, isStartPositionDefined: false, isStartVelocityDefined: false, isStartAccelerationDefined: false, isStartQuaternionDefined: false, startPosition: new THREE.Vector3(), startVelocity: new THREE.Vector3(), startAcceleration: new THREE.Vector3(), startQuaternion: new THREE.Quaternion(), stopDuration: 0};
+  this.statusDescription = {type: PARTICLE_SYSTEM_ACTION_TYPE_NONE, isStartPositionDefined: false, isStartVelocityDefined: false, isStartAccelerationDefined: false, isStartQuaternionDefined: false, startPosition: new THREE.Vector3(), startVelocity: new THREE.Vector3(), startAcceleration: new THREE.Vector3(), startQuaternion: new THREE.Quaternion(), stopDuration: 0};
   if (IS_WORKER_CONTEXT){
     return this;
   }

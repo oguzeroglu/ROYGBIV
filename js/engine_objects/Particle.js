@@ -39,10 +39,6 @@ Particle.prototype.setCollisionListener = function(collisionAction, timeOffset){
     this.assignUUID();
   }
   if (!particleCollisionCallbackRequests[this.uuid]){
-    if (mode == 1 && TOTAL_PARTICLE_COLLISION_LISTEN_COUNT >= MAX_COLLIDABLE_PARTICLE_COUNT){
-      console.error("Max collidable particle count exceeded. Use setMaxCollidableParticleCount CLI command to allocate more space.");
-      return;
-    }
     TOTAL_PARTICLE_COLLISION_LISTEN_COUNT ++;
   }
   var callbackFunc = (collisionAction == PARTICLE_REWIND_ON_COLLIDED)? this.rewindCollisionCallback: this.dissapearCollisionCallback;

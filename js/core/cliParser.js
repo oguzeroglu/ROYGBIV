@@ -5126,52 +5126,6 @@ function parse(input){
           terminal.printInfo(Text.OK);
           return true;
         break;
-        case 167: //setMaxCollidableParticleCount
-          if (mode != 0){
-            terminal.printError(Text.WORKS_ONLY_IN_DESIGN_MODE);
-            return true;
-          }
-          var maxCollidableParticleCount = parseInt(splitted[1]);
-          if (isNaN(maxCollidableParticleCount)){
-            terminal.printError(Text.IS_NOT_A_NUMBER.replace(Text.PARAM1, "maxCollidableParticleCount"));
-            return true;
-          }
-          if (maxCollidableParticleCount < 0){
-            terminal.printError(Text.MUST_BE_GREATER_THAN.replace(Text.PARAM1, "maxCollidableParticleCount").replace(Text.PARAM2, "0"));
-            return true;
-          }
-          MAX_COLLIDABLE_PARTICLE_COUNT = maxCollidableParticleCount;
-          terminal.printInfo(Text.MAX_COLLIDABLE_PARTICLE_COUNT_SET.replace(Text.PARAM1, MAX_COLLIDABLE_PARTICLE_COUNT));
-          return true;
-        break;
-        case 168: //printMaxCollidableParticleCount
-          terminal.printHeader(Text.MAX_COLLIDABLE_PARTICLE_COUNT);
-          terminal.printInfo(Text.TREE.replace(Text.PARAM1, MAX_COLLIDABLE_PARTICLE_COUNT));
-          return true;
-        break;
-        case 169: //setMaxParticleSystemCount
-          if (mode != 0){
-            terminal.printError(Text.WORKS_ONLY_IN_DESIGN_MODE);
-            return true;
-          }
-          var maxParticleSystemCount = parseInt(splitted[1]);
-          if (isNaN(maxParticleSystemCount)){
-            terminal.printError(Text.IS_NOT_A_NUMBER.replace(Text.PARAM1, "maxParticleSystemCount"));
-            return true;
-          }
-          if (maxParticleSystemCount < 0){
-            terminal.printError(Text.MUST_BE_GREATER_THAN.replace(Text.PARAM1, "maxParticleSystemCount").replace(Text.PARAM2, "0"));
-            return true;
-          }
-          MAX_PARTICLE_SYSTEM_COUNT = maxParticleSystemCount;
-          terminal.printInfo(Text.MAX_PARTICLE_SYSTEM_COUNT_SET.replace(Text.PARAM1, MAX_PARTICLE_SYSTEM_COUNT));
-          return true;
-        break;
-        case 170: //printMaxParticleSystemCount
-          terminal.printHeader(Text.MAX_PARTICLE_SYSTEM_COUNT);
-          terminal.printInfo(Text.TREE.replace(Text.PARAM1, MAX_PARTICLE_SYSTEM_COUNT));
-          return true;
-        break;
       }
       return true;
     }catch(err){
