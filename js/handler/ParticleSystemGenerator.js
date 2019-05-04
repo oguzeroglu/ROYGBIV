@@ -363,6 +363,9 @@ ParticleSystemGenerator.prototype.generateParticle = function(configurations){
   particle.angularQuaternionY = angularQuaternion.y;
   particle.angularQuaternionZ = angularQuaternion.z;
   particle.angularQuaternionW = angularQuaternion.w;
+  if (!(typeof configurations.presetUUID == UNDEFINED)){
+    particle.assignUUID(configurations.presetUUID);
+  }
   if (!(typeof collisionAction == UNDEFINED)){
     particle.setCollisionListener(collisionAction, collisionTimeOffset);
     particle.creationConfigurations = new Object();
