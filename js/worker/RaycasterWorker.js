@@ -44,6 +44,7 @@ RaycasterWorker.prototype.refresh = function(state){
   this.workerIDsByParticleSystemName = new Object();
   this.objectsByWorkerID = new Object();
   this.particleSystemsByWorkerID = new Object();
+  this.particleCollisionCallbackBuffer = new Map();
   for (var gsName in gridSystems){
     gridSystems[gsName].workerID = idCounter ++;
     idResponse.push({type: "gridSystem", name: gsName, id: gridSystems[gsName].workerID});
@@ -221,6 +222,10 @@ RaycasterWorker.prototype.update = function(transferableMessageBody){
     }
   }
   particleSystems.forEach(worker.psCollisionHandlerFunc);
+  worker.particleCollisionBufferIndex = 0;
+  worker.particleCollisionBuffer = transferableMessageBody.particleCollisionCallbackDescription;
+  worker.particleCollisionCallbackBuffer.forEach(worker.particleCollisionSetBufferFunc);
+  worker.particleCollisionCallbackBuffer.clear();
   if (this.record){
     this.performanceLogs.updateTime = performance.now() - updateStartTime;
   }
@@ -232,8 +237,12 @@ RaycasterWorker.prototype.psCollisionHandlerFunc = function(particleSystem, psNa
   }
 }
 
+RaycasterWorker.prototype.particleCollisionSetBufferFunc = function(particle, uuid){
+  worker.particleCollisionBuffer[worker.particleCollisionBufferIndex++] = uuid;
+}
+
 RaycasterWorker.prototype.onParticleCollision = function(particle){
-  
+  this.particleCollisionCallbackBuffer.set(particle.uuid, particle);
 }
 
 // START
@@ -266,6 +275,7 @@ self.onmessage = function(msg){
     worker.transferableList[3] = worker.transferableMessageBody.cameraOrientationDescription.buffer;
     worker.transferableList[4] = worker.transferableMessageBody.addedTextScaleDescription.buffer;
     worker.transferableList[5] = worker.transferableMessageBody.particleSystemStatusDescription.buffer;
+    worker.transferableList[6] = worker.transferableMessageBody.particleCollisionCallbackDescription.buffer;
     postMessage(worker.transferableMessageBody);
   }
 }

@@ -12,7 +12,7 @@ var RaycasterWorkerBridge = function(){
   this.performanceLogs = {
     intersectableObjDescriptionLen: 0, intersectionTestDescriptionLen: 0,
     flagsDescriptionLen: 0, cameraOrientationDescriptionLen: 0, addedTextScaleDescriptionLen: 0,
-    flushTime: 0
+    particleCollisionCallbackDescriptionLen: 0,flushTime: 0
   };
   this.intersectionTestBuffer = {
     isActive: false, fromVectors: [] , directionVectors: [],
@@ -134,12 +134,17 @@ var RaycasterWorkerBridge = function(){
           particleSystemStatusDescriptionIndex += 20;
         }
       }
+      var particleCollisionCallbackArray = [];
+      for (var uuid in particleCollisionCallbackRequests){
+        particleCollisionCallbackArray.push(-1);
+      }
       var intersectableObjectDescriptionArray = new Float32Array(intersectablesAry);
       var intersectionTestDescription = new Float32Array(8 * rayCaster.maxIntersectionCountInAFrame);
       var particleSystemStatusDescription = new Float32Array(particleSystemStatusDescriptionArray);
       var cameraOrientationDescription = new Float32Array(8);
       var flagsDescription = new Float32Array(4);
       var addedTextScaleDescription = new Float32Array(addedTextScaleDescriptionArray);
+      var particleCollisionCallbackDescription = new Float32Array(particleCollisionCallbackArray);
       rayCaster.transferableMessageBody.intersectableObjDescription = intersectableObjectDescriptionArray;
       rayCaster.transferableList.push(intersectableObjectDescriptionArray.buffer);
       rayCaster.transferableMessageBody.intersectionTestDescription = intersectionTestDescription;
@@ -152,6 +157,8 @@ var RaycasterWorkerBridge = function(){
       rayCaster.transferableList.push(addedTextScaleDescription.buffer);
       rayCaster.transferableMessageBody.particleSystemStatusDescription = particleSystemStatusDescription;
       rayCaster.transferableList.push(particleSystemStatusDescription.buffer);
+      rayCaster.transferableMessageBody.particleCollisionCallbackDescription = particleCollisionCallbackDescription;
+      rayCaster.transferableList.push(particleCollisionCallbackDescription.buffer);
       rayCaster.hasOwnership = true;
       rayCaster.onReady();
     }else{
@@ -162,6 +169,7 @@ var RaycasterWorkerBridge = function(){
       rayCaster.transferableList[3] = rayCaster.transferableMessageBody.cameraOrientationDescription.buffer;
       rayCaster.transferableList[4] = rayCaster.transferableMessageBody.addedTextScaleDescription.buffer;
       rayCaster.transferableList[5] = rayCaster.transferableMessageBody.particleSystemStatusDescription.buffer;
+      rayCaster.transferableList[6] = rayCaster.transferableMessageBody.particleCollisionCallbackDescription.buffer;
       var intersectionTestDescription = rayCaster.transferableMessageBody.intersectionTestDescription;
       if (rayCaster.transferableMessageBody.flagsDescription[1] > 0){
         for (var i = 0; i<intersectionTestDescription.length; i+=8){
@@ -180,6 +188,14 @@ var RaycasterWorkerBridge = function(){
             callbackFunc(0, 0, 0, null);
           }
         }
+      }
+      for (var i = 0; i<rayCaster.transferableMessageBody.particleCollisionCallbackDescription.length; i++){
+        var uuid = rayCaster.transferableMessageBody.particleCollisionCallbackDescription[i];
+        if (uuid == -1){
+          break;
+        }
+        particleCollisionCallbackRequests[uuid]();
+        rayCaster.transferableMessageBody.particleCollisionCallbackDescription[i] = -1;
       }
       rayCaster.hasOwnership = true;
     }
@@ -208,6 +224,7 @@ var RaycasterWorkerBridge = function(){
     console.log("%cAdded text scale description length: "+this.performanceLogs.addedTextScaleDescriptionLen, "background: black; color: magenta");
     console.log("%cIntersection test description length: "+this.performanceLogs.intersectionTestDescriptionLen, "background: black; color: magenta");
     console.log("%cFlags description length: "+this.performanceLogs.flagsDescriptionLen, "background: black; color: magenta");
+    console.log("%cParticle collision callback description length: "+this.performanceLogs.particleCollisionCallbackDescriptionLen, "background: black; color: magenta");
     console.log("%cCamera orientation description length: "+this.performanceLogs.cameraOrientationDescriptionLen, "background: black; color: magenta");
   }
 }
@@ -234,6 +251,7 @@ RaycasterWorkerBridge.prototype.flush = function(){
     this.performanceLogs.cameraOrientationDescriptionLen = this.transferableMessageBody.cameraOrientationDescription.length;
     this.performanceLogs.addedTextScaleDescriptionLen = this.transferableMessageBody.addedTextScaleDescription.length;
     this.performanceLogs.particleSystemStatusDescriptionLen = this.transferableMessageBody.particleSystemStatusDescription.length;
+    this.performanceLogs.particleCollisionCallbackDescriptionLen = this.transferableMessageBody.particleCollisionCallbackDescription.length;
   }
   if (this.updateBuffer.size > 0){
     this.updateBuffer.forEach(this.issueUpdate);

@@ -35,7 +35,7 @@ StateLoaderLightweight.prototype.loadParticleSystems = function(){
     var hasParticleCollision = false;
     for (var uuid in curPSExport.particles){
       var particle = particleSystemGenerator.generateParticle(curPSExport.particles[uuid]);
-      particle.assignUUID(uuid);
+      particle.assignUUID(parseInt(uuid));
       particles.push(particle);
       particlesWithCollisionCallbacks.set(particle.uuid, particle);
       hasParticleCollision = true;

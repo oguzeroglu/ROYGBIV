@@ -27,11 +27,7 @@ Particle.prototype.dissapearCollisionCallback = function(){
 
 Particle.prototype.rewindCollisionCallback = function(){
   var particle = this.obj;
-  if (!this.randomize){
-    particle.parent.rewindParticle(particle, 0);
-  }else{
-    particle.parent.rewindParticle(particle, Math.random());
-  }
+  particle.parent.rewindParticle(particle, 0);
 }
 
 Particle.prototype.setCollisionListener = function(collisionAction, timeOffset){
@@ -42,7 +38,7 @@ Particle.prototype.setCollisionListener = function(collisionAction, timeOffset){
     TOTAL_PARTICLE_COLLISION_LISTEN_COUNT ++;
   }
   var callbackFunc = (collisionAction == PARTICLE_REWIND_ON_COLLIDED)? this.rewindCollisionCallback: this.dissapearCollisionCallback;
-  particleCollisionCallbackRequests[this.uuid] = callbackFunc.bind({obj: this, randomize: true});
+  particleCollisionCallbackRequests[this.uuid] = callbackFunc.bind({obj: this});
   this.checkForCollisions = true;
   this.collisionTimeOffset = (typeof timeOffset == UNDEFINED)? 0: timeOffset;
 }
