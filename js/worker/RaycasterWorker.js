@@ -155,6 +155,52 @@ RaycasterWorker.prototype.update = function(transferableMessageBody){
     var particleSystemStatusDescription = transferableMessageBody.particleSystemStatusDescription;
     for (var i = 0; i<particleSystemStatusDescription.length; i+= 20){
       var particleSystem = this.particleSystemsByWorkerID[particleSystemStatusDescription[i]];
+      var statusType = particleSystemStatusDescription[i+1];
+      switch (statusType){
+        case PARTICLE_SYSTEM_ACTION_TYPE_START:
+          var isStartPositionDefined = (particleSystemStatusDescription[i+2] > 0);
+          var isStartVelocityDefined = (particleSystemStatusDescription[i+3] > 0);
+          var isStartAccelerationDefined = (particleSystemStatusDescription[i+4] > 0);
+          var isStartQuaternionDefined = (particleSystemStatusDescription[i+5] > 0);
+          if (isStartPositionDefined){
+            var startPositionX = particleSystemStatusDescription[i+6]; var startPositionY = particleSystemStatusDescription[i+7]; var startPositionZ = particleSystemStatusDescription[i+8];
+            REUSABLE_VECTOR.set(startPositionX, startPositionY, startPositionZ);
+            reusableParticleSystemStartConfiguration.startPosition = REUSABLE_VECTOR;
+          }else{
+            reusableParticleSystemStartConfiguration.startPosition = undefined;
+          }
+          if (isStartVelocityDefined){
+            var startVelocityX = particleSystemStatusDescription[i+9]; var startVelocityY = particleSystemStatusDescription[i+10]; var startVelocityZ = particleSystemStatusDescription[i+11];
+            REUSABLE_VECTOR_2.set(startVelocityX, startVelocityY, startVelocityZ);
+            reusableParticleSystemStartConfiguration.startVelocity = REUSABLE_VECTOR_2;
+          }else{
+            reusableParticleSystemStartConfiguration.startVelocity = undefined;
+          }
+          if (isStartAccelerationDefined){
+            var startAccelerationX = particleSystemStatusDescription[i+12]; var startAccelerationY = particleSystemStatusDescription[i+13]; var startAccelerationZ = particleSystemStatusDescription[i+14];
+            REUSABLE_VECTOR_3.set(startAccelerationX, startAccelerationY, startAccelerationZ);
+            reusableParticleSystemStartConfiguration.startAcceleration = REUSABLE_VECTOR_3;
+          }else{
+            reusableParticleSystemStartConfiguration.startAcceleration = undefined;
+          }
+          if (isStartQuaternionDefined){
+            var startQuaternionX = particleSystemStatusDescription[i+15]; var startQuaternionY = particleSystemStatusDescription[i+16]; var startQuaternionZ = particleSystemStatusDescription[i+17]; var startQuaternionW = particleSystemStatusDescription[i+18];
+            REUSABLE_QUATERNION.set(startQuaternionX, startQuaternionY, startQuaternionZ, startQuaternionW);
+            reusableParticleSystemStartConfiguration.startQuaternion = REUSABLE_QUATERNION;
+          }else{
+            reusableParticleSystemStartConfiguration.startQuaternion = undefined;
+          }
+          particleSystem.start(reusableParticleSystemStartConfiguration);
+        break;
+        case PARTICLE_SYSTEM_ACTION_TYPE_HIDE:
+          particleSystem.hide();
+        break;
+        case PARTICLE_SYSTEM_ACTION_TYPE_STOP:
+          var stopDuration = particleSystemStatusDescription[i+19];
+          particleSystem.stop(stopDuration);
+        break;
+      }
+      particleSystemStatusDescription[i+1] = PARTICLE_SYSTEM_ACTION_TYPE_NONE;
     }
   }
   if (transferableMessageBody.flagsDescription[1] > 0){
@@ -187,6 +233,8 @@ var particleSystemGenerator = new ParticleSystemGenerator();
 var renderer = new Object();
 var camera = new Object();
 var worker = new RaycasterWorker();
+rayCaster = worker.rayCaster;
+var reusableParticleSystemStartConfiguration = {};
 
 self.onmessage = function(msg){
   if (msg.data.startRecording){

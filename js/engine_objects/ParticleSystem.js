@@ -25,6 +25,7 @@ var ParticleSystem = function(copyPS, name, particles, x, y, z, vx, vy, vz, ax, 
   particleSystemPool[name] = this;
   this.statusDescription = {type: PARTICLE_SYSTEM_ACTION_TYPE_NONE, isStartPositionDefined: false, isStartVelocityDefined: false, isStartAccelerationDefined: false, isStartQuaternionDefined: false, startPosition: new THREE.Vector3(), startVelocity: new THREE.Vector3(), startAcceleration: new THREE.Vector3(), startQuaternion: new THREE.Quaternion(), stopDuration: 0};
   if (IS_WORKER_CONTEXT){
+    this.mesh = new THREE.Object3D();
     return this;
   }
   this.mesh = particleSystemGenerator.generateParticleSystemMesh(this);
@@ -77,7 +78,6 @@ ParticleSystem.prototype.hide = function(){
 }
 
 ParticleSystem.prototype.start = function(configurations){
-  var particleSystem = configurations.particleSystem;
   var startPosition = configurations.startPosition;
   var startVelocity = configurations.startVelocity;
   var startAcceleration = configurations.startAcceleration;
@@ -96,9 +96,11 @@ ParticleSystem.prototype.start = function(configurations){
       this.velocity.z = this.vz;
     }
     if (!this.psMerger){
-      this.material.uniforms.parentMotionMatrix.value.elements[3] = startVelocity.x;
-      this.material.uniforms.parentMotionMatrix.value.elements[4] = startVelocity.y;
-      this.material.uniforms.parentMotionMatrix.value.elements[5] = startVelocity.z;
+      if (this.material){
+        this.material.uniforms.parentMotionMatrix.value.elements[3] = startVelocity.x;
+        this.material.uniforms.parentMotionMatrix.value.elements[4] = startVelocity.y;
+        this.material.uniforms.parentMotionMatrix.value.elements[5] = startVelocity.z;
+      }
     }else{
       var matrix = this.psMerger.material.uniforms.parentMotionMatrixArray.value[this.mergedIndex];
       matrix.elements[3] = startVelocity.x;
@@ -118,9 +120,11 @@ ParticleSystem.prototype.start = function(configurations){
       this.acceleration.z = this.az;
     }
     if (!this.psMerger){
-      this.material.uniforms.parentMotionMatrix.value.elements[6] = startAcceleration.x;
-      this.material.uniforms.parentMotionMatrix.value.elements[7] = startAcceleration.y;
-      this.material.uniforms.parentMotionMatrix.value.elements[8] = startAcceleration.z;
+      if (this.material){
+        this.material.uniforms.parentMotionMatrix.value.elements[6] = startAcceleration.x;
+        this.material.uniforms.parentMotionMatrix.value.elements[7] = startAcceleration.y;
+        this.material.uniforms.parentMotionMatrix.value.elements[8] = startAcceleration.z;
+      }
     }else{
       var matrix = this.psMerger.material.uniforms.parentMotionMatrixArray.value[this.mergedIndex];
       matrix.elements[6] = startAcceleration.x;
@@ -137,9 +141,11 @@ ParticleSystem.prototype.start = function(configurations){
     this.z = startPosition.z;
     this.mesh.position.set(this.x, this.y, this.z);
     if (!this.psMerger){
-      this.material.uniforms.parentMotionMatrix.value.elements[0] = startPosition.x;
-      this.material.uniforms.parentMotionMatrix.value.elements[1] = startPosition.y;
-      this.material.uniforms.parentMotionMatrix.value.elements[2] = startPosition.z;
+      if (this.material){
+        this.material.uniforms.parentMotionMatrix.value.elements[0] = startPosition.x;
+        this.material.uniforms.parentMotionMatrix.value.elements[1] = startPosition.y;
+        this.material.uniforms.parentMotionMatrix.value.elements[2] = startPosition.z;
+      }
     }else{
       var matrix = this.psMerger.material.uniforms.parentMotionMatrixArray.value[this.mergedIndex];
       matrix.elements[0] = startPosition.x;
@@ -148,7 +154,9 @@ ParticleSystem.prototype.start = function(configurations){
     }
   }
   if (!this.psMerger){
-    this.material.uniforms.stopInfo.value.set(-10, -10, -10);
+    if (this.material){
+      this.material.uniforms.stopInfo.value.set(-10, -10, -10);
+    }
   }else{
     this.psMerger.material.uniforms.hiddenArray.value[this.mergedIndex] = (-20.0);
     this.psMerger.material.uniforms.stopInfoArray.value[this.mergedIndex].set(-10, -10, -10);
@@ -165,10 +173,14 @@ ParticleSystem.prototype.start = function(configurations){
     this.lifetime = this.originalLifetime;
     this.originalLifetime = undefined;
   }
-  this.mesh.visible = true;
+  if (this.mesh){
+    this.mesh.visible = true;
+  }
   if (!this.psMerger){
     particleSystems.set(this.name, this);
-    this.material.uniforms.dissapearCoef.value = 0;
+    if (this.material){
+      this.material.uniforms.dissapearCoef.value = 0;
+    }
   }else{
     this.psMerger.notifyPSVisibilityChange(this, true);
     this.psMerger.material.uniforms.dissapearCoefArray.value[this.mergedIndex] = 0;
@@ -189,16 +201,22 @@ ParticleSystem.prototype.start = function(configurations){
 }
 
 ParticleSystem.prototype.stop = function(newLifetime){
-  this.velocity.x = 0;
-  this.velocity.y = 0;
-  this.velocity.z = 0;
-  this.acceleration.x = 0;
-  this.acceleration.y = 0;
-  this.acceleration.z = 0;
+  if (this.velocity){
+    this.velocity.x = 0;
+    this.velocity.y = 0;
+    this.velocity.z = 0;
+  }
+  if (this.acceleration){
+    this.acceleration.x = 0;
+    this.acceleration.y = 0;
+    this.acceleration.z = 0;
+  }
   this.originalCheckForCollisions = this.checkForCollisions;
   this.checkForCollisions = false;
   if (!this.psMerger){
-    this.material.uniforms.stopInfo.value.set(10.0, this.tick, newLifetime);
+    if (this.material){
+      this.material.uniforms.stopInfo.value.set(10.0, this.tick, newLifetime);
+    }
   }else{
     this.psMerger.material.uniforms.stopInfoArray.value[this.mergedIndex].set(10.0, this.tick, newLifetime);
   }
