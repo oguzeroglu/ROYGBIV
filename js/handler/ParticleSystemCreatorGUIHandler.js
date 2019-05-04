@@ -18,6 +18,7 @@ var ParticleSystemCreatorGUIHandler = function(){
     this.typesAry.push(key);
   }
   this.typeParam = {"Type": "CUSTOM"};
+  this.collidableParam = {"Collidable": false};
   this.buttonsParam = {
     "Cancel": function(){
       activeControl = new FreeControls({});
@@ -60,6 +61,18 @@ var ParticleSystemCreatorGUIHandler = function(){
   };
 }
 
+ParticleSystemCreatorGUIHandler.prototype.onAfterShown = function(){
+  if (particleSystemCreatorGUIHandler.preConfiguredParticleSystem){
+    if (particleSystemCreatorGUIHandler.preConfiguredParticleSystem.isCollidable){
+      particleSystemCreatorGUIHandler.collidableParam["Collidable"] = true;
+    }else{
+      particleSystemCreatorGUIHandler.collidableParam["Collidable"] = false;
+    }
+  }else{
+    particleSystemCreatorGUIHandler.collidableParam["Collidable"] = false;
+  }
+}
+
 ParticleSystemCreatorGUIHandler.prototype.update = function(){
   if (!this.particleSystem){
     return;
@@ -68,6 +81,9 @@ ParticleSystemCreatorGUIHandler.prototype.update = function(){
 }
 
 ParticleSystemCreatorGUIHandler.prototype.addCommonControllers = function(){
+  this.collidableController = guiHandler.datGuiPSCreator.add(this.collidableParam, "Collidable").onChange(function(val){
+    particleSystemCreatorGUIHandler.preConfiguredParticleSystem.setCollidableStatus(val);
+  }).listen();
   this.cancelController = guiHandler.datGuiPSCreator.add(this.buttonsParam, "Cancel");
   this.doneController = guiHandler.datGuiPSCreator.add(this.buttonsParam, "Done");
 }
@@ -276,36 +292,42 @@ ParticleSystemCreatorGUIHandler.prototype.showConfetti = function(prevParams){
   }
   particleSystemCreatorGUIHandler.confettiParameters = confettiParameters;
   particleSystemCreatorGUIHandler.confettiExplosionGeneratorFunc();
+  particleSystemCreatorGUIHandler.onAfterShown();
 }
 
 ParticleSystemCreatorGUIHandler.prototype.showSnow = function(prevParams){
   guiHandler.datGuiPSCreator = new dat.GUI({hideable: false});
   particleSystemCreatorGUIHandler.addTypeController("SNOW");
   particleSystemCreatorGUIHandler.addCommonControllers();
+  particleSystemCreatorGUIHandler.onAfterShown();
 }
 
 ParticleSystemCreatorGUIHandler.prototype.showWaterfall = function(prevParams){
   guiHandler.datGuiPSCreator = new dat.GUI({hideable: false});
   particleSystemCreatorGUIHandler.addTypeController("WATERFALL");
   particleSystemCreatorGUIHandler.addCommonControllers();
+  particleSystemCreatorGUIHandler.onAfterShown();
 }
 
 ParticleSystemCreatorGUIHandler.prototype.showLaser = function(prevParams){
   guiHandler.datGuiPSCreator = new dat.GUI({hideable: false});
   particleSystemCreatorGUIHandler.addTypeController("LASER");
   particleSystemCreatorGUIHandler.addCommonControllers();
+  particleSystemCreatorGUIHandler.onAfterShown();
 }
 
 ParticleSystemCreatorGUIHandler.prototype.showDynamicTrail = function(prevParams){
   guiHandler.datGuiPSCreator = new dat.GUI({hideable: false});
   particleSystemCreatorGUIHandler.addTypeController("DYNAMIC_TRAIL");
   particleSystemCreatorGUIHandler.addCommonControllers();
+  particleSystemCreatorGUIHandler.onAfterShown();
 }
 
 ParticleSystemCreatorGUIHandler.prototype.showCircularExplosion = function(prevParams){
   guiHandler.datGuiPSCreator = new dat.GUI({hideable: false});
   particleSystemCreatorGUIHandler.addTypeController("CIRC_EXPLOSION");
   particleSystemCreatorGUIHandler.addCommonControllers();
+  particleSystemCreatorGUIHandler.onAfterShown();
 }
 
 ParticleSystemCreatorGUIHandler.prototype.showMagicCircle = function(prevParams){
@@ -493,12 +515,14 @@ ParticleSystemCreatorGUIHandler.prototype.showMagicCircle = function(prevParams)
   }
   particleSystemCreatorGUIHandler.magicCircleParameters = magicCircleParameters;
   particleSystemCreatorGUIHandler.magicCircleGeneratorFunc();
+  particleSystemCreatorGUIHandler.onAfterShown();
 }
 
 ParticleSystemCreatorGUIHandler.prototype.showFireExplosion = function(prevParams){
   guiHandler.datGuiPSCreator = new dat.GUI({hideable: false});
   particleSystemCreatorGUIHandler.addTypeController("FIRE_EXPLOSION");
   particleSystemCreatorGUIHandler.addCommonControllers();
+  particleSystemCreatorGUIHandler.onAfterShown();
 }
 
 ParticleSystemCreatorGUIHandler.prototype.showPlasma = function(prevParams){
@@ -602,12 +626,14 @@ ParticleSystemCreatorGUIHandler.prototype.showPlasma = function(prevParams){
     particleSystemCreatorGUIHandler.preConfiguredParticleSystem = new PreconfiguredParticleSystem(particleSystemCreatorGUIHandler.psName, "PLASMA", params);
   };
   particleSystemCreatorGUIHandler.plasmaGeneratorFunc();
+  particleSystemCreatorGUIHandler.onAfterShown();
 }
 
 ParticleSystemCreatorGUIHandler.prototype.showTrail = function(prevParams){
   guiHandler.datGuiPSCreator = new dat.GUI({hideable: false});
   particleSystemCreatorGUIHandler.addTypeController("TRAIL");
   particleSystemCreatorGUIHandler.addCommonControllers();
+  particleSystemCreatorGUIHandler.onAfterShown();
 }
 
 ParticleSystemCreatorGUIHandler.prototype.showSmoke = function(prevParams){
@@ -717,12 +743,14 @@ ParticleSystemCreatorGUIHandler.prototype.showSmoke = function(prevParams){
   }}, "Restart");
   particleSystemCreatorGUIHandler.addCommonControllers();
   particleSystemCreatorGUIHandler.smokeGeneratorFunc();
+  particleSystemCreatorGUIHandler.onAfterShown();
 }
 
 ParticleSystemCreatorGUIHandler.prototype.showCustom = function(prevParams){
   guiHandler.datGuiPSCreator = new dat.GUI({hideable: false});
   particleSystemCreatorGUIHandler.addTypeController("CUSTOM");
   particleSystemCreatorGUIHandler.addCommonControllers();
+  particleSystemCreatorGUIHandler.onAfterShown();
 }
 
 ParticleSystemCreatorGUIHandler.prototype.commonStartFunctions = function(psName){
@@ -753,6 +781,7 @@ ParticleSystemCreatorGUIHandler.prototype.edit = function(psName){
   var action = this.actionsByTypes[preConfiguredParticleSystem.type];
   action(preConfiguredParticleSystem.params);
   particleSystemCreatorGUIHandler.preConfiguredParticleSystem.setCollidableStatus(preConfiguredParticleSystem.isCollidable);
+  particleSystemCreatorGUIHandler.onAfterShown();
   this.isEdit = true;
 }
 
