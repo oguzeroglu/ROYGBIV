@@ -18,7 +18,6 @@ var ParticleSystemCreatorGUIHandler = function(){
     this.typesAry.push(key);
   }
   this.typeParam = {"Type": "CUSTOM"};
-  this.collidableParam = {"Collidable": false};
   this.buttonsParam = {
     "Cancel": function(){
       activeControl = new FreeControls({});
@@ -69,9 +68,6 @@ ParticleSystemCreatorGUIHandler.prototype.update = function(){
 }
 
 ParticleSystemCreatorGUIHandler.prototype.addCommonControllers = function(){
-  this.isCollidableController = guiHandler.datGuiPSCreator.add(this.collidableParam, "Collidable").onChange(function(val){
-    particleSystemCreatorGUIHandler.preConfiguredParticleSystem.setCollidableStatus(val);
-  }).listen();
   this.cancelController = guiHandler.datGuiPSCreator.add(this.buttonsParam, "Cancel");
   this.doneController = guiHandler.datGuiPSCreator.add(this.buttonsParam, "Done");
 }
@@ -753,10 +749,10 @@ ParticleSystemCreatorGUIHandler.prototype.commonStartFunctions = function(psName
 
 ParticleSystemCreatorGUIHandler.prototype.edit = function(psName){
   var preConfiguredParticleSystem = preConfiguredParticleSystems[psName];
-  this.collidableParam["Collidable"] = preConfiguredParticleSystem.isCollidable;
   this.commonStartFunctions(psName);
   var action = this.actionsByTypes[preConfiguredParticleSystem.type];
   action(preConfiguredParticleSystem.params);
+  particleSystemCreatorGUIHandler.preConfiguredParticleSystem.setCollidableStatus(preConfiguredParticleSystem.isCollidable);
   this.isEdit = true;
 }
 

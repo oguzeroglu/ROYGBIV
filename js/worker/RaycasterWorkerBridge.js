@@ -5,6 +5,7 @@ var RaycasterWorkerBridge = function(){
   this.ready = false;
   this.updateBuffer = new Map();
   this.addedTextScaleUpdateBuffer = new Map();
+  this.particleSystemStatusUpdateBuffer = new Map();
   this.hasOwnership = false;
   this.maxIntersectionCountInAFrame = 10;
   this.curIntersectionTestRequestCount = 0;
@@ -116,10 +117,28 @@ var RaycasterWorkerBridge = function(){
           addedTextScaleDescriptionIndex += 11;
         }
       }
+      var particleSystemStatusDescriptionArray = [];
+      var particleSystemStatusDescriptionIndex = 0;
+      for (var psName in particleSystemPool){
+        var particleSystem = particleSystemPool[psName];
+        if (particleSystem.shouldSendToWorker()){
+          particleSystemStatusDescriptionArray.push(rayCaster.idsByParticleSystemNames[particleSystem.name]);
+          particleSystemStatusDescriptionArray.push(PARTICLE_SYSTEM_ACTION_TYPE_NONE);
+          particleSystemStatusDescriptionArray.push(-1); particleSystemStatusDescriptionArray.push(-1); particleSystemStatusDescriptionArray.push(-1); particleSystemStatusDescriptionArray.push(-1);
+          particleSystemStatusDescriptionArray.push(0); particleSystemStatusDescriptionArray.push(0); particleSystemStatusDescriptionArray.push(0);
+          particleSystemStatusDescriptionArray.push(0); particleSystemStatusDescriptionArray.push(0); particleSystemStatusDescriptionArray.push(0);
+          particleSystemStatusDescriptionArray.push(0); particleSystemStatusDescriptionArray.push(0); particleSystemStatusDescriptionArray.push(0);
+          particleSystemStatusDescriptionArray.push(0); particleSystemStatusDescriptionArray.push(0); particleSystemStatusDescriptionArray.push(0); particleSystemStatusDescriptionArray.push(0);
+          particleSystemStatusDescriptionArray.push(0);
+          particleSystem.indexInStatusDescriptionArray = particleSystemStatusDescriptionIndex;
+          particleSystemStatusDescriptionIndex += 20;
+        }
+      }
       var intersectableObjectDescriptionArray = new Float32Array(intersectablesAry);
       var intersectionTestDescription = new Float32Array(8 * rayCaster.maxIntersectionCountInAFrame);
+      var particleSystemStatusDescription = new Float32Array(particleSystemStatusDescriptionArray);
       var cameraOrientationDescription = new Float32Array(8);
-      var flagsDescription = new Float32Array(3);
+      var flagsDescription = new Float32Array(4);
       var addedTextScaleDescription = new Float32Array(addedTextScaleDescriptionArray);
       rayCaster.transferableMessageBody.intersectableObjDescription = intersectableObjectDescriptionArray;
       rayCaster.transferableList.push(intersectableObjectDescriptionArray.buffer);
@@ -131,6 +150,8 @@ var RaycasterWorkerBridge = function(){
       rayCaster.transferableList.push(cameraOrientationDescription.buffer);
       rayCaster.transferableMessageBody.addedTextScaleDescription = addedTextScaleDescription;
       rayCaster.transferableList.push(addedTextScaleDescription.buffer);
+      rayCaster.transferableMessageBody.particleSystemStatusDescription = particleSystemStatusDescription;
+      rayCaster.transferableList.push(particleSystemStatusDescription.buffer);
       rayCaster.hasOwnership = true;
       rayCaster.onReady();
     }else{
@@ -140,6 +161,7 @@ var RaycasterWorkerBridge = function(){
       rayCaster.transferableList[2] = rayCaster.transferableMessageBody.flagsDescription.buffer;
       rayCaster.transferableList[3] = rayCaster.transferableMessageBody.cameraOrientationDescription.buffer;
       rayCaster.transferableList[4] = rayCaster.transferableMessageBody.addedTextScaleDescription.buffer;
+      rayCaster.transferableList[5] = rayCaster.transferableMessageBody.particleSystemStatusDescription.buffer;
       var intersectionTestDescription = rayCaster.transferableMessageBody.intersectionTestDescription;
       if (rayCaster.transferableMessageBody.flagsDescription[1] > 0){
         for (var i = 0; i<intersectionTestDescription.length; i+=8){
@@ -211,6 +233,7 @@ RaycasterWorkerBridge.prototype.flush = function(){
     this.performanceLogs.flagsDescriptionLen = this.transferableMessageBody.flagsDescription.length;
     this.performanceLogs.cameraOrientationDescriptionLen = this.transferableMessageBody.cameraOrientationDescription.length;
     this.performanceLogs.addedTextScaleDescriptionLen = this.transferableMessageBody.addedTextScaleDescription.length;
+    this.performanceLogs.particleSystemStatusDescriptionLen = this.transferableMessageBody.particleSystemStatusDescription.length;
   }
   var sendMessage = false;
   if (this.updateBuffer.size > 0){
@@ -228,6 +251,14 @@ RaycasterWorkerBridge.prototype.flush = function(){
     this.transferableMessageBody.flagsDescription[2] = 1;
   }else{
     this.transferableMessageBody.flagsDescription[2] = -1;
+  }
+  if (this.particleSystemStatusUpdateBuffer.size > 0){
+    this.particleSystemStatusUpdateBuffer.forEach(this.issueParticleSystemStatusUpdate);
+    this.particleSystemStatusUpdateBuffer.clear();
+    sendMessage = true;
+    this.transferableMessageBody.flagsDescription[3] = 1;
+  }else{
+    this.transferableMessageBody.flagsDescription[3] = -1;
   }
   if (this.intersectionTestBuffer.isActive){
     sendMessage = true;
@@ -275,6 +306,7 @@ RaycasterWorkerBridge.prototype.refresh = function(){
   this.hasOwnership = false;
   this.updateBuffer = new Map();
   this.addedTextScaleUpdateBuffer = new Map();
+  this.particleSystemStatusUpdateBuffer = new Map();
   this.intersectionTestBuffer = {
     isActive: false, fromVectors: [] , directionVectors: [],
     intersectGridSystems: [], callbackFunctions: []
@@ -298,6 +330,50 @@ RaycasterWorkerBridge.prototype.onAddedTextResize = function(addedText){
   if (!addedText.is2D){
     if (mode == 0 || (mode == 1 && addedText.isClickable)){
       rayCaster.addedTextScaleUpdateBuffer.set(addedText.name, addedText);
+    }
+  }
+}
+
+RaycasterWorkerBridge.prototype.issueParticleSystemStatusUpdate = function(ps){
+  var descriptionBuffer = rayCaster.transferableMessageBody.particleSystemStatusDescription;
+  var statusDescription = ps.statusDescription;
+  var index = ps.indexInStatusDescriptionArray;
+  descriptionBuffer[index+1] = statusDescription.type;
+  if (statusDescription.type == PARTICLE_SYSTEM_ACTION_TYPE_STOP){
+    descriptionBuffer[index+19] = statusDescription.stopDuration;
+  }else if (statusDescription.type == PARTICLE_SYSTEM_ACTION_TYPE_START){
+    if (statusDescription.isStartPositionDefined){
+      descriptionBuffer[index+2] = 1;
+      descriptionBuffer[index+6] = statusDescription.startPosition.x;
+      descriptionBuffer[index+7] = statusDescription.startPosition.y;
+      descriptionBuffer[index+8] = statusDescription.startPosition.z;
+    }else{
+      descriptionBuffer[index+2] = -1;
+    }
+    if (statusDescription.isStartVelocityDefined){
+      descriptionBuffer[index+3] = 1;
+      descriptionBuffer[index+9] = statusDescription.startVelocity.x;
+      descriptionBuffer[index+10] = statusDescription.startVelocity.y;
+      descriptionBuffer[index+11] = statusDescription.startVelocity.z;
+    }else{
+      descriptionBuffer[index+3] = -1;
+    }
+    if (statusDescription.isStartAccelerationDefined){
+      descriptionBuffer[index+4] = 1;
+      descriptionBuffer[index+12] = statusDescription.startAcceleration.x;
+      descriptionBuffer[index+13] = statusDescription.startAcceleration.y;
+      descriptionBuffer[index+14] = statusDescription.startAcceleration.z;
+    }else{
+      descriptionBuffer[index+4] = -1;
+    }
+    if (statusDescription.isStartQuaternionDefined){
+      descriptionBuffer[index+5] = 1;
+      descriptionBuffer[index+15] = statusDescription.startQuaternion.x;
+      descriptionBuffer[index+16] = statusDescription.startQuaternion.y;
+      descriptionBuffer[index+17] = statusDescription.startQuaternion.z;
+      descriptionBuffer[index+18] = statusDescription.startQuaternion.z;
+    }else{
+      descriptionBuffer[index+5] = -1;
     }
   }
 }
@@ -371,13 +447,16 @@ RaycasterWorkerBridge.prototype.onParticleSystemStart = function(particleSystem,
     particleSystem.statusDescription.isStartQuaternionDefined = true;
     particleSystem.statusDescription.startQuaternion.copy(startConfigurations.startQuaternion);
   }
+  rayCaster.particleSystemStatusUpdateBuffer.set(particleSystem.name, particleSystem);
 }
 
 RaycasterWorkerBridge.prototype.onParticleSystemStop = function(particleSystem, stopDuration){
   particleSystem.statusDescription.type = PARTICLE_SYSTEM_ACTION_TYPE_STOP;
   particleSystem.statusDescription.stopDuration = stopDuration;
+  rayCaster.particleSystemStatusUpdateBuffer.set(particleSystem.name, particleSystem);
 }
 
 RaycasterWorkerBridge.prototype.onParticleSystemHide = function(particleSystem){
   particleSystem.statusDescription.type = PARTICLE_SYSTEM_ACTION_TYPE_HIDE;
+  rayCaster.particleSystemStatusUpdateBuffer.set(particleSystem.name, particleSystem);
 }

@@ -151,6 +151,12 @@ RaycasterWorker.prototype.update = function(transferableMessageBody){
       this.rayCaster.updateObject(text, true);
     }
   }
+  if (transferableMessageBody.flagsDescription[3] > 0){
+    var particleSystemStatusDescription = transferableMessageBody.particleSystemStatusDescription;
+    for (var i = 0; i<particleSystemStatusDescription.length; i+= 20){
+      var particleSystem = this.particleSystemsByWorkerID[particleSystemStatusDescription[i]];
+    }
+  }
   if (transferableMessageBody.flagsDescription[1] > 0){
     var intersectionTestDescription = transferableMessageBody.intersectionTestDescription;
     for (var i = 0; i<intersectionTestDescription.length; i+= 8){
@@ -203,6 +209,7 @@ self.onmessage = function(msg){
     worker.transferableList[2] = worker.transferableMessageBody.flagsDescription.buffer;
     worker.transferableList[3] = worker.transferableMessageBody.cameraOrientationDescription.buffer;
     worker.transferableList[4] = worker.transferableMessageBody.addedTextScaleDescription.buffer;
+    worker.transferableList[5] = worker.transferableMessageBody.particleSystemStatusDescription.buffer;
     postMessage(worker.transferableMessageBody);
   }
 }
