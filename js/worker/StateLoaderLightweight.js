@@ -31,13 +31,22 @@ StateLoaderLightweight.prototype.loadParticleSystems = function(){
   for (var psName in psExport){
     var curPSExport = psExport[psName];
     var particles = [];
+    var particlesWithCollisionCallbacks = new Map();
+    var hasParticleCollision = false;
     for (var uuid in curPSExport.particles){
       var particle = particleSystemGenerator.generateParticle(curPSExport.particles[uuid]);
       particle.assignUUID(uuid);
       particles.push(particle);
+      particlesWithCollisionCallbacks.set(particle.uuid, particle);
+      hasParticleCollision = true;
     }
     curPSExport.particles = particles;
-    particleSystemGenerator.generateParticleSystem(curPSExport);
+    var ps = particleSystemGenerator.generateParticleSystem(curPSExport);
+    ps.particlesWithCollisionCallbacks = particlesWithCollisionCallbacks;
+    ps.hasParticleCollision = hasParticleCollision;
+    for (var i = 0; i<particles.length; i++){
+      particles[i].parent = ps;
+    }
   }
 }
 

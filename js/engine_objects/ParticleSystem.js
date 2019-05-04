@@ -276,9 +276,11 @@ ParticleSystem.prototype.removeParticle = function(particle){
   }else{
     selectedGeometry = this.geometry;
   }
-  selectedGeometry.attributes.expiredFlag.updateRange.set(selectedOffset, 1);
-  selectedGeometry.attributes.expiredFlag.array[particle.index] = 7;
-  selectedGeometry.attributes.expiredFlag.needsUpdate = true;
+  if (selectedGeometry){
+    selectedGeometry.attributes.expiredFlag.updateRange.set(selectedOffset, 1);
+    selectedGeometry.attributes.expiredFlag.array[particle.index] = 7;
+    selectedGeometry.attributes.expiredFlag.needsUpdate = true;
+  }
   particle.isExpired = true;
   if (!(typeof particle.uuid == UNDEFINED)){
     this.particlesWithCollisionCallbacks.delete(particle.uuid);
@@ -296,10 +298,13 @@ ParticleSystem.prototype.rewindParticle = function(particle, delay){
   }else{
     selectedGeometry = this.geometry;
   }
-  selectedGeometry.attributes.flags2.updateRange.set(sIndex, 1);
-  particle.startDelay = this.tick + delay;
-  selectedGeometry.attributes.flags2.array[sIndex] = particle.startDelay;
-  selectedGeometry.attributes.flags2.needsUpdate = true;
+  var val = this.tick + delay;
+  if (selectedGeometry){
+    selectedGeometry.attributes.flags2.updateRange.set(sIndex, 1);
+    selectedGeometry.attributes.flags2.array[sIndex] = val;
+    selectedGeometry.attributes.flags2.needsUpdate = true;
+  }
+  particle.startDelay = val;
   this.rewindNeededOnNextStart = true;
 }
 
@@ -358,9 +363,11 @@ ParticleSystem.prototype.update = function(){
     }
   }
   if (!this.psMerger){
-    this.material.uniforms.time.value = this.tick;
-    this.material.uniforms.modelViewMatrix.value = this.mesh.modelViewMatrix;
-    this.material.uniforms.worldMatrix.value = this.mesh.matrixWorld;
+    if (this.material){
+      this.material.uniforms.time.value = this.tick;
+      this.material.uniforms.modelViewMatrix.value = this.mesh.modelViewMatrix;
+      this.material.uniforms.worldMatrix.value = this.mesh.matrixWorld;
+    }
   }else{
     this.mesh.updateMatrixWorld(true);
     this.mesh.modelViewMatrix.multiplyMatrices(camera.matrixWorldInverse, this.mesh.matrixWorld);

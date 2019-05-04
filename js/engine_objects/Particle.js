@@ -114,6 +114,7 @@ Particle.prototype.getPosition = function(axis, targetVector){
     }
   }
   if (!this.useWorldPositionFlag){
+    this.parent.mesh.updateMatrixWorld();
     REUSABLE_VECTOR.applyMatrix4(this.parent.mesh.matrixWorld);
   }
   if (axis){
@@ -139,6 +140,9 @@ Particle.prototype.fireCollisionCallback = function(){
     return;
   }
   request();
+  if (IS_WORKER_CONTEXT){
+    worker.onParticleCollision(this);
+  }
 }
 
 Particle.prototype.updatePositionHistory = function(){

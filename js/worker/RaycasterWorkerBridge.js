@@ -235,11 +235,9 @@ RaycasterWorkerBridge.prototype.flush = function(){
     this.performanceLogs.addedTextScaleDescriptionLen = this.transferableMessageBody.addedTextScaleDescription.length;
     this.performanceLogs.particleSystemStatusDescriptionLen = this.transferableMessageBody.particleSystemStatusDescription.length;
   }
-  var sendMessage = false;
   if (this.updateBuffer.size > 0){
     this.updateBuffer.forEach(this.issueUpdate);
     this.updateBuffer.clear();
-    sendMessage = true;
     this.transferableMessageBody.flagsDescription[0] = 1;
   }else{
     this.transferableMessageBody.flagsDescription[0] = -1;
@@ -247,7 +245,6 @@ RaycasterWorkerBridge.prototype.flush = function(){
   if (this.addedTextScaleUpdateBuffer.size > 0){
     this.addedTextScaleUpdateBuffer.forEach(this.issueAddedTextScaleUpdate);
     this.addedTextScaleUpdateBuffer.clear();
-    sendMessage = true;
     this.transferableMessageBody.flagsDescription[2] = 1;
   }else{
     this.transferableMessageBody.flagsDescription[2] = -1;
@@ -255,13 +252,11 @@ RaycasterWorkerBridge.prototype.flush = function(){
   if (this.particleSystemStatusUpdateBuffer.size > 0){
     this.particleSystemStatusUpdateBuffer.forEach(this.issueParticleSystemStatusUpdate);
     this.particleSystemStatusUpdateBuffer.clear();
-    sendMessage = true;
     this.transferableMessageBody.flagsDescription[3] = 1;
   }else{
     this.transferableMessageBody.flagsDescription[3] = -1;
   }
   if (this.intersectionTestBuffer.isActive){
-    sendMessage = true;
     var intersectionTestDescription = this.transferableMessageBody.intersectionTestDescription;
     this.transferableMessageBody.flagsDescription[1] = 1;
     var i2 = 0;
@@ -285,14 +280,12 @@ RaycasterWorkerBridge.prototype.flush = function(){
   }else{
     this.transferableMessageBody.flagsDescription[1] = -1;
   }
-  if (sendMessage){
-    var cameraOrientationDescription = this.transferableMessageBody.cameraOrientationDescription;
-    cameraOrientationDescription[0] = camera.position.x; cameraOrientationDescription[1] = camera.position.y; cameraOrientationDescription[2] = camera.position.z;
-    cameraOrientationDescription[3] = camera.quaternion.x; cameraOrientationDescription[4] = camera.quaternion.y; cameraOrientationDescription[5] = camera.quaternion.z; cameraOrientationDescription[6] = camera.quaternion.w;
-    cameraOrientationDescription[7] = camera.aspect;
-    this.worker.postMessage(this.transferableMessageBody, this.transferableList);
-    this.hasOwnership = false;
-  }
+  var cameraOrientationDescription = this.transferableMessageBody.cameraOrientationDescription;
+  cameraOrientationDescription[0] = camera.position.x; cameraOrientationDescription[1] = camera.position.y; cameraOrientationDescription[2] = camera.position.z;
+  cameraOrientationDescription[3] = camera.quaternion.x; cameraOrientationDescription[4] = camera.quaternion.y; cameraOrientationDescription[5] = camera.quaternion.z; cameraOrientationDescription[6] = camera.quaternion.w;
+  cameraOrientationDescription[7] = camera.aspect;
+  this.worker.postMessage(this.transferableMessageBody, this.transferableList);
+  this.hasOwnership = false;
   if (this.record){
     this.performanceLogs.flushTime = performance.now() - flushStartTime;
   }

@@ -220,12 +220,20 @@ RaycasterWorker.prototype.update = function(transferableMessageBody){
       }
     }
   }
-  //
-  // UPDATE ALL PARTICLE SYSTEMS AND HANDLE PARTICLE COLLISIONS - FILL particleIntersectionDescription BUFFER HERE
-  // ary -> transferableMessageBody.particleIntersectionDescription
+  particleSystems.forEach(worker.psCollisionHandlerFunc);
   if (this.record){
     this.performanceLogs.updateTime = performance.now() - updateStartTime;
   }
+}
+
+RaycasterWorker.prototype.psCollisionHandlerFunc = function(particleSystem, psName){
+  if (particleSystem && !particleSystem.destroyed){
+    particleSystem.update();
+  }
+}
+
+RaycasterWorker.prototype.onParticleCollision = function(particle){
+  
 }
 
 // START
