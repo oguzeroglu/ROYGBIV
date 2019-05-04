@@ -393,7 +393,11 @@ ParticleSystem.prototype.update = function(){
   if (this.updateFunction){
     this.updateFunction();
   }
-  this.particlesWithCollisionCallbacks.forEach(this.particleIterationCollisionFunc);
+  if ((!WORKERS_SUPPORTED) || (WORKERS_SUPPORTED && IS_WORKER_CONTEXT)){
+    if (mode == 1){
+      this.particlesWithCollisionCallbacks.forEach(this.particleIterationCollisionFunc);
+    }
+  }
   if (this.tick >= this.lifetime && this.lifetime > 0){
     if (this.expirationFunction){
       this.expirationFunction(this.name);
@@ -409,8 +413,10 @@ ParticleSystem.prototype.update = function(){
       particleSystemPools[this.psPool].notifyPSAvailable(this);
     }
   }
-  if (this.checkForCollisions && this.mesh && this.mesh.visible){
-    this.handleCollisions();
+  if (this.checkForCollisions && this.mesh && this.mesh.visible && ((!WORKERS_SUPPORTED) || (WORKERS_SUPPORTED && IS_WORKER_CONTEXT))){
+    if (mode == 1){
+      this.handleCollisions();
+    }
   }
 }
 
