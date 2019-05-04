@@ -61,7 +61,7 @@ var LightweightState = function(){
   this.particleSystems = new Object();
   for (var psName in particleSystemPool){
     var ps = particleSystemPool[psName];
-    if (ps.creationConfigurations){
+    if (ps.shouldSendToWorker()){
       this.particleSystems[psName] = ps.creationConfigurations;
       var particles = new Object();
       ps.particlesWithCollisionCallbacks.forEach(function(particle, uuid){

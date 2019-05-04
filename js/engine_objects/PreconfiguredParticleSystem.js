@@ -12,15 +12,25 @@ PreconfiguredParticleSystem.prototype.export = function(){
   exportObj.name = this.name;
   exportObj.type = this.type;
   exportObj.params = this.params;
+  exportObj.isCollidable = this.isCollidable;
   return exportObj;
 }
 
 PreconfiguredParticleSystem.prototype.getParticleSystem = function(){
+  var ps;
   switch(this.type){
-    case "MAGIC_CIRCLE": return particleSystemGenerator.generateMagicCircle(this.params);
-    case "PLASMA": return particleSystemGenerator.generatePlasma(this.params);
-    case "SMOKE": return particleSystemGenerator.generateSmoke(this.params);
-    case "CONFETTI": return particleSystemGenerator.generateConfettiExplosion(this.params);
+    case "MAGIC_CIRCLE": ps = particleSystemGenerator.generateMagicCircle(this.params); break;
+    case "PLASMA": ps = particleSystemGenerator.generatePlasma(this.params); break;
+    case "SMOKE": ps = particleSystemGenerator.generateSmoke(this.params); break;
+    case "CONFETTI": ps = particleSystemGenerator.generateConfettiExplosion(this.params); break;
+  }
+  if (ps){
+    ps.isCollidable = this.isCollidable;
+    return ps;
   }
   throw new Error("Unknown type.");
+}
+
+PreconfiguredParticleSystem.prototype.setCollidableStatus = function(isCollidable){
+  this.isCollidable = isCollidable;
 }

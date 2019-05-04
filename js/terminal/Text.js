@@ -587,25 +587,6 @@ var Text = function(){
   this.ROYGBIV_SCRIPTING_API_SETPARTICLESYSTEMBLENDING = "Sets the blending mode of a particle system. Blending mode can be one of NO_BLENDING, NORMAL_BLENDING,\nADDITIVE_BLENDING, SUBTRACTIVE_BLENDING or MULTIPLY_BLENDING.";
   this.ROYGBIV_SCRIPTING_API_SETPARTICLESYSTEMROTATION = "Sets the rotation of a particle system around given axis.";
   this.ROYGBIV_SCRIPTING_API_SETPARTICLESYSTEMQUATERNION = "Sets the quaternion of given particle system.";
-  this.ROYGBIV_SCRIPTING_API_CREATESMOKE = "Returns a new smoke like particle system at (0,0,0) based on following configurations:\n"+
-                                          "position: The initial position of the particle system (mandatory)\n"+
-                                          "expireTime: The maximum lifetime of the particle system in seconds. This can be set to 0 for infinite particle systems. (mandatory)\n"+
-                                          "name: The unique name of the particle system (mandatory)\n"+
-                                          "smokeSize: Size of the smoke source (mandatory)\n"+
-                                          "particleSize: The size of each smoke particle (mandatory)\n"+
-                                          "particleCount: Count of smoke particles (mandatory)\n"+
-                                          "colorName: Color name of each particle (mandatory)\n"+
-                                          "textureName: Name of the smoke texture (optional)\n"+
-                                          "movementAxis: The axis vector on which the smoke particles move. Default value is (0,1,0) (optional)\n"+
-                                          "velocity: The averag" +"e velocity of particles on the movementAxis (mandatory)\n"+
-                                          "acceleration: The average acceleration of particles on the movementAxis (mandatory)\n"+
-                                          "randomness: A number representing the turbulence factor of the smoke particles (mandatory)\n"+
-                                          "lifetime: The average lifetime of particles (mandatory)\n"+
-                                          "alphaVariation: A number between -1 and 0 represents the variaton of alpha of the smoke particles on each frame (mandatory)\n"+
-                                          "accelerationDirection: The direction vector of acceleration. If set, the smoke is accelerated along this vector\ninstead of the movementAxis. This can be used to achieve realistic smoke movement on inclined surfaces or\nto simulate winds. (optional)\n"+
-                                          "updateFunction: The update function of the particle system that will be executed on each frame render. (optional)\n"+
-                                          "startDelay: The average delay in seconds before the particles are visible on the screen. (optional)\n"+
-                                          "rgbFilter: This can be used to eliminate texture background colors. (optional)";
   this.ROYGBIV_SCRIPTING_API_GETMARKEDPOSITION = "Returns (x,y,z) coordinates of a point marked using the mark command.";
   this.ROYGBIV_SCRIPTING_API_CREATETRAIL = "Creates a trail particle system. The configurations are:\n"+
                                            "name: The unique name of the particle system. (mandatory)\n"+
@@ -625,21 +606,6 @@ var Text = function(){
                                            "targetColor: Target color name of the particle. If set, the color of the particle changes between the color\nand the targetColor by colorStep in each frame render. (optional)\n"+
                                            "colorStep: A float between [0,1] that represents the variation of color between the color and the targetColor. (optional)\n"+
                                            "updateFunction: The update function of the particle system that is executed on each frame render. (optional)";
-  this.ROYGBIV_SCRIPTING_API_CREATEPLASMA = "Returns a plasma like particle system (see Doom 4 - plasma rifle). The configurations are:\n"+
-                                            "name: The unique name of the particle system. (mandatory)\n"+
-                                            "position: The initial position of the particle system. (mandatory)\n"+
-                                            "expireTime: The maximum lifetime of the particle system in seconds. This can be set to 0 for infinite particle systems. (mandatory)\n"+
-                                            "velocity: The velocity of the particle system. (mandatory)\n"+
-                                            "acceleration: The acceleration of the particle system. (mandatory)\n"+
-                                            "radius: The radius of the plasma. (mandatory)\n"+
-                                            "avgParticleSpeed: The average circular velocity of particles. (mandatory)\n"+
-                                            "particleCount: The count of particles. (mandatory)\n"+
-                                            "particleSize: The size of particles. (mandatory)\n"+
-                                            "alpha: The alpha value of particles. Default value is 1.(optional)\n"+
-                                            "colorName: The HTML color name of plasma particles. (mandatory)\n"+
-                                            "textureName: The texture name of plasma particles. (optional)\n"+
-                                            "rgbFilter: This can be used to eliminate texture background colors. (optional)\n"+
-                                            "alphaVariation: If set, the alpha value of particles would change according to the formula: sin(alphaVariation * t) (optional)";
   this.ROYGBIV_SCRIPTING_API_SETEXPIRELISTENER = "Sets an expiration listener for a particle system. The parameter callbackFunction is executed when sourceObject is expired.\nThe name of the particle system is passed to the callbackFunction as a parameter.";
   this.ROYGBIV_SCRIPTING_API_REMOVEEXPIRELISTENER = "Removes the expiration listener function of a particle system.";
   this.ROYGBIV_SCRIPTING_API_NORMALIZEVECTOR = "Normalizes the vector given in the parameter. Note that this function modifies directly the parameter and returns nothing.";
@@ -664,30 +630,6 @@ var Text = function(){
                                                    "textureName: Name of the explosion fire texture. (optional)\n"+
                                                    "rgbFilter: This can be used to eliminate texture background colors. (optional)\n"+
                                                    "updateFunction: The update function of the particle system that will be executed on each frame render. (optional)";
-  this.ROYGBIV_SCRIPTING_API_CREATEMAGICCIRCLE = "Creates a magic circle effect. Configurations are:\n"+
-                                                 "name: The unique name of the circle. (mandatory)\n"+
-                                                 "position: The center position of the circle. (mandatory)\n"+
-                                                 "particleCount: The count of particles. (mandatory)\n"+
-                                                 "expireTime: The expiration time of the circle. (mandatory)\n"+
-                                                 "speed: The turning speed value of the particles. (mandatory)\n"+
-                                                 "acceleration: The turning acceleration value of the particles. (mandatory)\n"+
-                                                 "radius: The radius of the circle. (mandatory)\n"+
-                                                 "circleNormal: The normal vector of the circle. By default the circle is located on the XZ plane (normal: (0,1,0)). (optional)\n"+
-                                                 "circleDistortionCoefficient: The average distortion value of the circle. If this is not set, the particles form a\nperfect circle. (optional)\n"+
-                                                 "lifetime: The lifetime of the particles. For the magic circles the respawn flag is always true so the lifetime value can be used to\nachieve color changes from target color to the initial color. In that case the period value of the circular motion can be used:\nT = (2 * PI) / (angular velocity) (optional)\n"+
-                                                 "angleStep: The angular difference between the particles (Math.PI/k). This can be set to zero for randomly distributed particles.\nDefault value is 0. angleStep can be useful to achieve circular trail effects. (optional)\n"+
-                                                 "particleSize: The size of particles. (mandatory)\n"+
-                                                 "colorName: The HTML color name of the particles. (mandatory)\n"+
-                                                 "targetColorName: The target color name of the particles. (optional)\n"+
-                                                 "colorStep: The color step value of the particles between [0,1]. (optional)\n"+
-                                                 "alpha: The alpha value of the particles. (mandatory)\n"+
-                                                 "alphaVariation: The variaton of alpha value of the particle on each frame. (optional)\n"+
-                                                 "alphaVariationMode: The alpha variation formula. This can be one of ALPHA_VARIATION_MODE_NORMAL, ALPHA_VARIATION_MODE_SIN or\nALPHA_VARIATION_MODE_COS. For ALPHA_VARIATION_MODE_NORMAL the alpha value changes linearly (t * alphaVariation), for\nALPHA_VARIATION_MODE_SIN the alpha changes according to the sine function (sin(alphaVariation * t)) and for ALPHA_VARIATION_MODE_COS\nthe alpha value changes according to the cos function"+
-                                                 " (cos(alphaVariation * t)). Default value is ALPHA_VARIATION_MODE_NORMAL. (optional)\n"+
-                                                 "textureName: The name of texture of the particles. (optional)\n"+
-                                                 "rgbFilter: This can be used to eliminate texture background colors. (optional)\n"+
-                                                 "updateFunction: The update function of the particle system that is executed on each frame render. (optional)";
-
   this.ROYGBIV_SCRIPTING_API_CREATECIRCULAREXPLOSION = "Creates a circular explosion effect. The configurations are:\n"+
                                                        "name: The unique name of the particle system. (mandatory)\n"+
                                                        "particleCount: The count of particles. (mandatory)\n"+
@@ -810,29 +752,6 @@ var Text = function(){
     this.ROYGBIV_SCRIPTING_API_GETPARTICLESYSTEMFROMPOOL = "Returns an available particle system from the pool, or false if there is not an available particle system inside the pool.\nThe particle systems become available when hidden or expired.";
     this.ROYGBIV_SCRIPTING_API_REMOVEPARTICLESYSTEMFROMPOOL = "Removes a particle system from its particle system pool.";
     this.ROYGBIV_SCRIPTING_API_DESTROYPARTICLESYSTEMPOOL = "Destroys a particle system pool.";
-    this.ROYGBIV_SCRIPTING_API_CREATECONFETTIEXPLOSION = "Creates a confetti like explosion. This function initially puts the particles to the same position on the XZ plane and defines\nparabolic motion for each particle. The configurations are:\n"+
-                                                         "name: The unique name of the particle system. (mandatory)\n"+
-                                                         "position: The start position of the confetti. (mandatory)\n"+
-                                                         "expireTime: The expiration time of particle system in seconds. This can be set 0 for inifinite particle systems. (mandatory)\n"+
-                                                         "lifetime: The average lifetime of particles in seconds. (mandatory)\n"+
-                                                         "verticalSpeed: The average vertical speed of particles. (mandatory)\n"+
-                                                         "horizontalSpeed: The average horizontal speed of particles. (mandatory)\n"+
-                                                         "verticalAcceleration: The average vertial acceleration (gravity) of particles. Expected value is less than zero. (mandatory)\n"+
-                                                         "particleCount: The count of particles. (mandatory)\n"+
-                                                         "particleSize: The size of particles. (mandatory)\n"+
-                                                         "colorName: The color name of particles. (mandatory)\n"+
-                                                         "alpha: The alpha value of particles. (mandatory)\n"+
-                                                         "collisionMethod: PARTICLE_DISSAPEAR_ON_COLLIDED -> Particles are dissapeared when collided with objects.\n"+
-                                                         "                 PARTICLE_REWIND_ON_COLLIDED -> Particles are respawned when collided with objects.\n"+
-                                                         "                 If not set, particles are not listened for collisions.\n"+
-                                                         "normal: The normal vector of the particle system. Default value is (0, 1, 0) (optional)\n"+
-                                                         "collisionTimeOffset: The time offset of collision listener if the collisionMethod is 1 or 2. Default value is 0. (optional)\n"+
-                                                         "startDelay: The average start delay of particles. Default value is 0. (optional)\n"+
-                                                         "targetColorName: The target color name of particles. (optional)\n"+
-                                                         "colorStep: A float between [0, 1] that represents the variation of color between the colorName and targetColorName each frame.(optional)\n"+
-                                                         "alphaVariation: The variation of alpha of particles on each frame. (optional)\n"+
-                                                         "textureName: The name of texture of particles. (optional)\n"+
-                                                         "rgbFilter: This can be used to eliminate background colors of textures. (optional)";
    this.ROYGBIV_SCRIPTING_API_COPYPARTICLESYSTEM = "Returns a new copy of given particle system. This function can be used to improve memory usage of particle system pools.\nFor instance, given a plasma gun with X plasma particle systems it is better to create one plasma particle system then create\n(X-1) copies of it than to create X plasma particle systems.";
    this.ROYGBIV_SCRIPTING_API_SETVECTOR = "Set the x, y, z components of a vector.";
    this.ROYGBIV_SCRIPTING_API_QUATERNION = "Returns a new THREE.Quaternion instance.";

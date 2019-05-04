@@ -414,14 +414,12 @@ ParticleSystemGenerator.prototype.generateParticleSystem = function(configuratio
   particleSystem.angularQuaternionZ = angularQuaternion.z;
   particleSystem.angularQuaternionW = angularQuaternion.w;
   particleSystem.initialAngle = initialAngle;
-  if (particleSystem.hasParticleCollision){
-    particleSystem.creationConfigurations = new Object();
-    for (var key in configurations){
-      if (key == "particles"){
-        continue;
-      }
-      particleSystem.creationConfigurations[key] = configurations[key];
+  particleSystem.creationConfigurations = new Object();
+  for (var key in configurations){
+    if (key == "particles"){
+      continue;
     }
+    particleSystem.creationConfigurations[key] = configurations[key];
   }
   return particleSystem;
 }

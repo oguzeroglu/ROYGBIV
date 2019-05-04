@@ -49,10 +49,8 @@ var Roygbiv = function(){
     "setParticleSystemBlending",
     "setParticleSystemRotation",
     "setParticleSystemQuaternion",
-    "createSmoke",
     "getMarkedPosition",
     "createTrail",
-    "createPlasma",
     "setExpireListener",
     "removeExpireListener",
     "normalizeVector",
@@ -60,7 +58,6 @@ var Roygbiv = function(){
     "circularDistribution",
     "multiplyScalar",
     "createFireExplosion",
-    "createMagicCircle",
     "createCircularExplosion",
     "createDynamicTrail",
     "createObjectTrail",
@@ -81,7 +78,6 @@ var Roygbiv = function(){
     "getParticleSystemFromPool",
     "removeParticleSystemFromPool",
     "destroyParticleSystemPool",
-    "createConfettiExplosion",
     "copyParticleSystem",
     "setVector",
     "quaternion",
@@ -1140,72 +1136,6 @@ Roygbiv.prototype.setParticleSystemQuaternion = function(particleSystem, quatX, 
   particleSystem.hasManualQuaternionSet = true;
 }
 
-//  Returns a new smoke like particle system based on following configurations:
-//  name: The unique name of the particle system (mandatory)
-//  position: The initial position of the particle system (mandatory)
-//  expireTime: The maximum lifetime of the particle system in seconds. This can be set to 0 for infinite particle systems. (mandatory)
-//  smokeSize: Size of the smoke source (mandatory)
-//  particleSize: The size of each smoke particle (mandatory)
-//  particleCount: Count of smoke particles (mandatory)
-//  colorName: Color name of each particle (mandatory)
-//  textureName: Name of the smoke texture (optional)
-//  movementAxis: The axis vector on which the smoke particles move. Default value is (0,1,0) (optional)
-//  velocity: The average velocity of particles on the movementAxis (mandatory)
-//  acceleration: The average acceleration of particles on the movementAxis (mandatory)
-//  randomness: A number representing the turbulence factor of the smoke particles (mandatory)
-//  lifetime: The average lifetime of particles (mandatory)
-//  alphaVariation: A number between -1 and 0 represents the variaton of alpha of the smoke particles on each frame (mandatory)
-//  accelerationDirection: The direction vector of acceleration. If set, the smoke is accelerated
-//  along this vector instead of the movementAxis This can be used to achieve
-//  realistic smoke movement on inclined surfaces or to simulate winds. (optional)
-//  updateFunction: The update function of the particle system that will be executed on each frame render. (optional)
-//  startDelay: The average delay in seconds before the particles are visible on the screen. (optional)
-//  rgbFilter: This can be used to eliminate texture background colors. (optional)
-Roygbiv.prototype.createSmoke = function(configurations){
-  if (mode == 0){
-    return;
-  }
-  preConditions.checkIfDefined(ROYGBIV.createSmoke, preConditions.configurations, configurations);
-  preConditions.checkIfMandatoryParameterExists(ROYGBIV.createSmoke, preConditions.name, configurations.name);
-  preConditions.checkIfTrue(ROYGBIV.createSmoke, "name must be unique", particleSystemPool[configurations.name]);
-  preConditions.checkIfMandatoryParameterExists(ROYGBIV.createSmoke, preConditions.position, configurations.position);
-  preConditions.checkIfVectorOnlyIfDefined(ROYGBIV.createSmoke, preConditions.position, configurations.position);
-  preConditions.checkIfMandatoryParameterExists(ROYGBIV.createSmoke, preConditions.expireTime, configurations.expireTime);
-  preConditions.checkIfNumber(ROYGBIV.createSmoke, preConditions.expireTime, configurations.expireTime);
-  preConditions.checkIfLessThanExclusive(ROYGBIV.createSmoke, preConditions.expireTime, configurations.expireTime, 0);
-  preConditions.checkIfMandatoryParameterExists(ROYGBIV.createSmoke, preConditions.smokeSize, configurations.smokeSize);
-  preConditions.checkIfNumber(ROYGBIV.createSmoke, preConditions.smokeSize, configurations.smokeSize);
-  preConditions.checkIfMandatoryParameterExists(ROYGBIV.createSmoke, preConditions.particleSize, configurations.particleSize);
-  preConditions.checkIfNumber(ROYGBIV.createSmoke, preConditions.particleSize, configurations.particleSize);
-  preConditions.checkIfMandatoryParameterExists(ROYGBIV.createSmoke, preConditions.particleCount, configurations.particleCount);
-  preConditions.checkIfNumber(ROYGBIV.createSmoke, preConditions.particleCount, configurations.particleCount);
-  preConditions.checkIfLessThan(ROYGBIV.createSmoke, preConditions.particleCount, configurations.particleCount);
-  preConditions.checkIfMandatoryParameterExists(ROYGBIV.createSmoke, preConditions.colorName, configurations.colorName);
-  if (!(typeof configurations.textureName == UNDEFINED)){
-    var texture = textures[configurations.textureName];
-    preConditions.checkIfTrue(ROYGBIV.createSmoke, "No such texture", (!texture));
-    preConditions.checkIfTextureReady(ROYGBIV.createSmoke, preConditions.texture, texture);
-  }
-  preConditions.checkIfVectorOnlyIfDefined(ROYGBIV.createSmoke, preConditions.movementAxis, configurations.movementAxis);
-  preConditions.checkIfMandatoryParameterExists(ROYGBIV.createSmoke, preConditions.velocity, configurations.velocity);
-  preConditions.checkIfNumber(ROYGBIV.createSmoke, preConditions.velocity, configurations.velocity);
-  preConditions.checkIfMandatoryParameterExists(ROYGBIV.createSmoke, preConditions.acceleration, configurations.acceleration);
-  preConditions.checkIfNumber(ROYGBIV.createSmoke, preConditions.acceleration, configurations.acceleration);
-  preConditions.checkIfMandatoryParameterExists(ROYGBIV.createSmoke, preConditions.randomness, configurations.randomness);
-  preConditions.checkIfNumber(ROYGBIV.createSmoke, preConditions.randomness, configurations.randomness);
-  preConditions.checkIfMandatoryParameterExists(ROYGBIV.createSmoke, preConditions.lifetime, configurations.lifetime);
-  preConditions.checkIfNumber(ROYGBIV.createSmoke, preConditions.lifetime, configurations.lifetime);
-  preConditions.checkIfLessThan(ROYGBIV.createSmoke, preConditions.lifetime, configurations.lifetime, 0);
-  preConditions.checkIfMandatoryParameterExists(ROYGBIV.createSmoke, preConditions.alphaVariation, configurations.alphaVariation);
-  preConditions.checkIfNumber(ROYGBIV.createSmoke, preConditions.alphaVariation, configurations.alphaVariation);
-  preConditions.checkIfInRange(ROYGBIV.createSmoke, preConditions.alphaVariation, configurations.alphaVariation, -1, 1);
-  preConditions.checkIfFunctionOnlyIfExists(ROYGBIV.createSmoke, preConditions.updateFunction, configurations.updateFunction);
-  preConditions.checkIfNumberOnlyIfExists(ROYGBIV.createSmoke, preConditions.startDelay, configurations.startDelay);
-  preConditions.checkIfVectorOnlyIfDefined(ROYGBIV.createSmoke, preConditions.rgbFilter, configurations.rgbFilter);
-  preConditions.checkIfVectorOnlyIfDefined(ROYGBIV.createSmoke, preConditions.accelerationDirection, configurations.accelerationDirection);
-  return particleSystemGenerator.generateSmoke(configurations);
-}
-
 //  Creates a trail particle system. The configurations are:
 //  name: The unique name of the particle system. (mandatory)
 //  position: The initial position of the particle system. (mandatory)
@@ -1324,58 +1254,6 @@ Roygbiv.prototype.createTrail = function(configurations){
   particleSystemConfigurations.lifetime = expireTime;
   particleSystemConfigurations.updateFunction = updateFunction;
   return this.createParticleSystem(particleSystemConfigurations);
-}
-
-// Returns a plasma like particle system (see Doom 4 - plasma rifle). The configurations are:
-// name: The unique name of the particle system. (mandatory)
-// position: The initial position of the particle system. (mandatory)
-// expireTime: The maximum lifetime of the particle system in seconds. This can be set to 0 for infinite particle systems. (mandatory)
-// velocity: The velocity of the particle system. (mandatory)
-// acceleration: The acceleration of the particle system. (mandatory)
-// radius: The radius of the plasma. (mandatory)
-// avgParticleSpeed: The average circular velocity of particles. (mandatory)
-// particleCount: The count of particles. (mandatory)
-// particleSize: The size of particles. (mandatory)
-// alpha: The alpha value of particles. Default value is 1.(optional)
-// colorName: The HTML color name of plasma particles. (mandatory)
-// textureName: The texture name of plasma particles. (optional)
-// rgbFilter: This can be used to eliminate texture background colors. (optional)
-// alphaVariation: If set, the alpha value of particles would change according to the formula: sin(alphaVariation * t) (optional)
-Roygbiv.prototype.createPlasma = function(configurations){
-  if (mode == 0){
-    return;
-  }
-  preConditions.checkIfDefined(ROYGBIV.createPlasma, preConditions.configurations, configurations);
-  preConditions.checkIfMandatoryParameterExists(ROYGBIV.createPlasma, preConditions.name, configurations.name);
-  preConditions.checkIfMandatoryParameterExists(ROYGBIV.createPlasma, preConditions.position, configurations.position);
-  preConditions.checkIfVectorOnlyIfDefined(ROYGBIV.createPlasma, preConditions.position, configurations.position);
-  preConditions.checkIfMandatoryParameterExists(ROYGBIV.createPlasma, preConditions.expireTime, configurations.expireTime);
-  preConditions.checkIfNumber(ROYGBIV.createPlasma, preConditions.expireTime, configurations.expireTime);
-  preConditions.checkIfLessThanExclusive(ROYGBIV.createPlasma, preConditions.expireTime, configurations.expireTime, 0);
-  preConditions.checkIfMandatoryParameterExists(ROYGBIV.createPlasma, preConditions.velocity, configurations.velocity);
-  preConditions.checkIfVectorOnlyIfDefined(ROYGBIV.createPlasma, preConditions.velocity, configurations.velocity);
-  preConditions.checkIfMandatoryParameterExists(ROYGBIV.createPlasma, preConditions.acceleration, configurations.acceleration);
-  preConditions.checkIfVectorOnlyIfDefined(ROYGBIV.createPlasma, preConditions.acceleration, configurations.acceleration);
-  preConditions.checkIfDefined(ROYGBIV.createPlasma, preConditions.radius, configurations.radius);
-  preConditions.checkIfNumber(ROYGBIV.createPlasma, preConditions.radius, configurations.radius);
-  preConditions.checkIfLessThan(ROYGBIV.createPlasma, preConditions.radius, configurations.radius, 0);
-  preConditions.checkIfMandatoryParameterExists(ROYGBIV.createPlasma, preConditions.avgParticleSpeed, configurations.avgParticleSpeed);
-  preConditions.checkIfNumber(ROYGBIV.createPlasma, preConditions.avgParticleSpeed, configurations.avgParticleSpeed);
-  preConditions.checkIfMandatoryParameterExists(ROYGBIV.createPlasma, preConditions.particleCount, configurations.particleCount);
-  preConditions.checkIfNumber(ROYGBIV.createPlasma, preConditions.particleCount, configurations.particleCount);
-  preConditions.checkIfLessThan(ROYGBIV.createPlasma, preConditions.particleCount, configurations.particleCount, 0);
-  preConditions.checkIfMandatoryParameterExists(ROYGBIV.createPlasma, preConditions.colorName, configurations.colorName);
-  if (!(typeof configurations.textureName == UNDEFINED)){
-    var texture = textures[configurations.textureName];
-    preConditions.checkIfTextureExists(ROYGBIV.createPlasma, preConditions.texture, texture);
-    preConditions.checkIfTextureReady(ROYGBIV.createPlasma, preConditions.texture, texture);
-  }
-  preConditions.checkIfMandatoryParameterExists(ROYGBIV.createPlasma, preConditions.particleSize, configurations.particleSize);
-  preConditions.checkIfNumberOnlyIfExists(ROYGBIV.createPlasma, preConditions.alpha, configurations.alpha);
-  preConditions.checkIfInRangeOnlyIfDefined(ROYGBIV.createPlasma, preConditions.alpha, configurations.alpha, 0, 1);
-  preConditions.checkIfVectorOnlyIfDefined(ROYGBIV.createPlasma, preConditions.rgbFilter, configurations.rgbFilter);
-  preConditions.checkIfNumberOnlyIfExists(ROYGBIV.createPlasma, preConditions.alphaVariation, configurations.alphaVariation);
-  return particleSystemGenerator.generatePlasma(configurations);
 }
 
 // Returns a fire explosion particle system. The configurations are:
@@ -1526,81 +1404,6 @@ Roygbiv.prototype.createFireExplosion = function(configurations){
   var explosion = this.createParticleSystem(particleSystemConfigurations);
   explosion.mesh.applyQuaternion(quaternion);
   return explosion;
-}
-
-// Creates a magic circle effect. Configurations are:
-// name: The unique name of the circle. (mandatory)
-// position: The center position of the circle. (mandatory)
-// particleCount: The count of particles. (mandatory)
-// expireTime: The expiration time of the circle. (mandatory)
-// speed: The turning speed value of the particles. (mandatory)
-// acceleration: The turning acceleration value of the particles. (mandatory)
-// radius: The radius of the circle. (mandatory)
-// circleNormal: The normal vector of the circle. By default the circle is located on the XZ plane (normal: (0,1,0)). (optional)
-// circleDistortionCoefficient: The average distortion value of the circle. If this is not set, the particles form a perfect circle. (optional)
-// lifetime: The lifetime of the particles. For the magic circles the respawn flag is always true so the lifetime value can be used to achieve
-// color changes from target color to the initial color. In that case the period value of the circular motion can be used:
-// T = (2 * PI) / (angular velocity) (optional)
-// angleStep: The angular difference between the particles (Math.PI/k). This can be set to zero for randomly distributed particles. Default value is 0.
-// angleStep can be useful to achieve circular trail effects. (optional)
-// particleSize: The size of particles. (mandatory)
-// colorName: The HTML color name of the particles. (mandatory)
-// targetColorName: The target color name of the particles. (optional)
-// colorStep: The color step value of the particles between [0,1]. (optional)
-// alpha: The alpha value of the particles. (mandatory)
-// alphaVariation: The variaton of alpha value of the particle on each frame. (optional)
-// alphaVariationMode: The alpha variation formula. This can be one of ALPHA_VARIATION_MODE_NORMAL, ALPHA_VARIATION_MODE_SIN or ALPHA_VARIATION_MODE_COS.
-// For ALPHA_VARIATION_MODE_NORMAL the alpha value changes linearly (t * alphaVariation), for ALPHA_VARIATION_MODE_SIN the alpha changes according to
-// the sine function (sin(alphaVariation * t)) and for ALPHA_VARIATION_MODE_COS the alpha value changes according to the cos function
-// (cos(alphaVariation * t)). Default value is ALPHA_VARIATION_MODE_NORMAL. (optional)
-// textureName: The name of texture of the particles. (optional)
-// rgbFilter: This can be used to eliminate texture background colors. (optional)
-// updateFunction: The update function of the particle system that is executed on each frame render. (optional)
-Roygbiv.prototype.createMagicCircle = function(configurations){
-  if (mode == 0){
-    return;
-  }
-  preConditions.checkIfDefined(ROYGBIV.createMagicCircle, preConditions.configurations, configurations);
-  preConditions.checkIfMandatoryParameterExists(ROYGBIV.createMagicCircle, preConditions.name, configurations.name);
-  preConditions.checkIfTrue(ROYGBIV.createMagicCircle, "name must be unique.", (particleSystemPool[configurations.name]));
-  preConditions.checkIfMandatoryParameterExists(ROYGBIV.createMagicCircle, preConditions.position, configurations.position);
-  preConditions.checkIfVectorOnlyIfDefined(ROYGBIV.createMagicCircle, preConditions.position, configurations.position);
-  preConditions.checkIfMandatoryParameterExists(ROYGBIV.createMagicCircle, preConditions.particleCount, configurations.particleCount);
-  preConditions.checkIfNumber(ROYGBIV.createMagicCircle, preConditions.particleCount, configurations.particleCount);
-  preConditions.checkIfLessThan(ROYGBIV.createMagicCircle, preConditions.particleCount, configurations.particleCount);
-  preConditions.checkIfMandatoryParameterExists(ROYGBIV.createMagicCircle, preConditions.expireTime, configurations.expireTime);
-  preConditions.checkIfNumber(ROYGBIV.createMagicCircle, preConditions.expireTime, configurations.expireTime);
-  preConditions.checkIfLessThanExclusive(ROYGBIV.createMagicCircle, preConditions.expireTime, configurations.expireTime);
-  preConditions.checkIfMandatoryParameterExists(ROYGBIV.createMagicCircle, preConditions.speed, configurations.speed);
-  preConditions.checkIfNumber(ROYGBIV.createMagicCircle, preConditions.speed, configurations.speed);
-  preConditions.checkIfMandatoryParameterExists(ROYGBIV.createMagicCircle, preConditions.acceleration, configurations.acceleration);
-  preConditions.checkIfNumber(ROYGBIV.createMagicCircle, preConditions.acceleration, configurations.acceleration);
-  preConditions.checkIfMandatoryParameterExists(ROYGBIV.createMagicCircle, preConditions.radius, configurations.radius);
-  preConditions.checkIfNumber(ROYGBIV.createMagicCircle, preConditions.radius, configurations.radius);
-  preConditions.checkIfVectorOnlyIfDefined(ROYGBIV.createMagicCircle, preConditions.circleNormal, configurations.circleNormal);
-  preConditions.checkIfNumberOnlyIfExists(ROYGBIV.createMagicCircle, preConditions.circleDistortionCoefficient, configurations.circleDistortionCoefficient);
-  preConditions.checkIfNumberOnlyIfExists(ROYGBIV.createMagicCircle, preConditions.lifetime, configurations.lifetime);
-  preConditions.checkIfLessThanExclusiveOnlyIfExists(ROYGBIV.createMagicCircle, preConditions.lifetime, configurations.lifetime, 0);
-  preConditions.checkIfNumberOnlyIfExists(ROYGBIV.createMagicCircle, preConditions.angleStep, configurations.angleStep);
-  preConditions.checkIfMandatoryParameterExists(ROYGBIV.createMagicCircle, preConditions.particleSize, configurations.particleSize);
-  preConditions.checkIfNumber(ROYGBIV.createMagicCircle, preConditions.particleSize, configurations.particleSize);
-  preConditions.checkIfLessThan(ROYGBIV.createMagicCircle, preConditions.particleSize, configurations.particleSize, 0);
-  preConditions.checkIfMandatoryParameterExists(ROYGBIV.createMagicCircle, preConditions.colorName, configurations.colorName);
-  preConditions.checkIfNumberOnlyIfExists(ROYGBIV.createMagicCircle, preConditions.colorStep, configurations.colorStep);
-  preConditions.checkIfInRangeOnlyIfDefined(ROYGBIV.createMagicCircle, preConditions.colorStep, configurations.colorStep, 0, 1);
-  preConditions.checkIfMandatoryParameterExists(ROYGBIV.createMagicCircle, preConditions.alpha, configurations.alpha);
-  preConditions.checkIfNumber(ROYGBIV.createMagicCircle, preConditions.alpha, configurations.alpha);
-  preConditions.checkIfInRange(ROYGBIV.createMagicCircle, preConditions.alpha, configurations.alpha, 0, 1);
-  preConditions.checkIfNumberOnlyIfExists(ROYGBIV.createMagicCircle, preConditions.alphaVariation, configurations.alphaVariation);
-  preConditions.checkIfAlphaVariationModeOnlyIfExists(ROYGBIV.createMagicCircle, preConditions.alphaVariationMode, configurations.alphaVariationMode);
-  preConditions.checkIfVectorOnlyIfDefined(ROYGBIV.createMagicCircle, preConditions.rgbFilter, configurations.rgbFilter);
-  preConditions.checkIfFunctionOnlyIfExists(ROYGBIV.createMagicCircle, preConditions.updateFunction, configurations.updateFunction);
-  if (!(typeof configurations.textureName == UNDEFINED)){
-    var texture = textures[configurations.textureName];
-    preConditions.checkIfTextureExists(ROYGBIV.createMagicCircle, preConditions.texture, texture);
-    preConditions.checkIfTextureReady(ROYGBIV.createMagicCircle, preConditions.texture, texture);
-  }
-  return particleSystemGenerator.generateMagicCircle(configurations);
 }
 
 // Creates a circular explosion effect. The configurations are:
@@ -2385,71 +2188,6 @@ Roygbiv.prototype.destroyParticleSystemPool = function(pool){
   pool.destroy();
 }
 
-// Creates a confetti like explosion. This function initially puts the particles
-// to the same position on the XZ plane and defines parabolic motion for each particle.
-// The configurations are:
-// name: The unique name of the particle system. (mandatory)
-// position: The start position of the confetti. (mandatory)
-// expireTime: The expiration time of particle system in seconds. This can be set 0 for inifinite particle systems. (mandatory)
-// lifetime: The average lifetime of particles in seconds. (mandatory)
-// verticalSpeed: The average vertical speed of particles. (mandatory)
-// horizontalSpeed: The average horizontal speed of particles. (mandatory)
-// verticalAcceleration: The average vertial acceleration (gravity) of particles. Expected value is less than zero. (mandatory)
-// particleCount: The count of particles. (mandatory)
-// particleSize: The size of particles. (mandatory)
-// colorName: The color name of particles. (mandatory)
-// alpha: The alpha value of particles. (mandatory)
-// collisionMethod: PARTICLE_DISSAPEAR_ON_COLLIDED -> Particles are dissapeared when collided with objects.
-//                  PARTICLE_REWIND_ON_COLLIDED -> Particles are respawned when collided with objects.
-//                  If not set, particles are not listened for collisions.
-// normal: The normal vector of the particle system. Default value is (0, 1, 0) (optional)
-// collisionTimeOffset: The time offset of collision listener if the collisionMethod is 1 or 2. Default value is 0. (optional)
-// startDelay: The average start delay of particles. Default value is 0. (optional)
-// targetColorName: The target color name of particles. (optional)
-// colorStep: A float between [0, 1] that represents the variation of color between the colorName and targetColorName each frame. (optional)
-// alphaVariation: The variation of alpha of particles on each frame. (optional)
-// textureName: The name of texture of particles. (optional)
-// rgbFilter: This can be used to eliminate background colors of textures. (optional)
-Roygbiv.prototype.createConfettiExplosion = function(configurations){
-  if (mode == 0){
-    return;
-  }
-  preConditions.checkIfDefined(ROYGBIV.createConfettiExplosion, preConditions.configurations, configurations);
-  preConditions.checkIfMandatoryParameterExists(ROYGBIV.createConfettiExplosion, preConditions.name, configurations.name);
-  preConditions.checkIfTrue(ROYGBIV.createConfettiExplosion, "name must be unique", particleSystemPool[configurations.name]);
-  preConditions.checkIfMandatoryParameterExists(ROYGBIV.createConfettiExplosion, preConditions.position, configurations.position);
-  preConditions.checkIfVectorOnlyIfDefined(ROYGBIV.createConfettiExplosion, preConditions.position, configurations.position);
-  preConditions.checkIfMandatoryParameterExists(ROYGBIV.createConfettiExplosion, preConditions.expireTime, configurations.expireTime);
-  preConditions.checkIfNumber(ROYGBIV.createConfettiExplosion, preConditions.expireTime, configurations.expireTime);
-  preConditions.checkIfLessThanExclusive(ROYGBIV.createConfettiExplosion, preConditions.expireTime, configurations.expireTime, 0);
-  preConditions.checkIfMandatoryParameterExists(ROYGBIV.createConfettiExplosion, preConditions.lifetime, configurations.lifetime);
-  preConditions.checkIfNumber(ROYGBIV.createConfettiExplosion, preConditions.lifetime, configurations.lifetime);
-  preConditions.checkIfLessThanExclusive(ROYGBIV.createConfettiExplosion, preConditions.life, configurations.lifetime, 0);
-  preConditions.checkIfMandatoryParameterExists(ROYGBIV.createConfettiExplosion, preConditions.verticalSpeed, configurations.verticalSpeed);
-  preConditions.checkIfNumber(ROYGBIV.createConfettiExplosion, preConditions.verticalSpeed, configurations.verticalSpeed);
-  preConditions.checkIfMandatoryParameterExists(ROYGBIV.createConfettiExplosion, preConditions.horizontalSpeed, configurations.horizontalSpeed);
-  preConditions.checkIfNumber(ROYGBIV.createConfettiExplosion, preConditions.horizontalSpeed, configurations.horizontalSpeed);
-  preConditions.checkIfMandatoryParameterExists(ROYGBIV.createConfettiExplosion, preConditions.verticalAcceleration, configurations.verticalAcceleration);
-  preConditions.checkIfNumber(ROYGBIV.createConfettiExplosion, preConditions.verticalAcceleration, configurations.verticalAcceleration);
-  preConditions.checkIfTrue(ROYGBIV.createConfettiExplosion, "verticalAcceleration is expected to be less than zero", (configurations.verticalAcceleration >= 0));
-  preConditions.checkIfMandatoryParameterExists(ROYGBIV.createConfettiExplosion, preConditions.particleCount, configurations.particleCount);
-  preConditions.checkIfNumber(ROYGBIV.createConfettiExplosion, preConditions.particleCount, configurations.particleCount);
-  preConditions.checkIfLessThan(ROYGBIV.createConfettiExplosion, preConditions.particleCount, configurations.particleCount, 0);
-  preConditions.checkIfMandatoryParameterExists(ROYGBIV.createConfettiExplosion, preConditions.particleSize, configurations.particleSize);
-  preConditions.checkIfNumber(ROYGBIV.createConfettiExplosion, preConditions.particleSize, configurations.particleSize);
-  preConditions.checkIfLessThan(ROYGBIV.createConfettiExplosion, preConditions.particleSize, configurations.particleSize, 0);
-  preConditions.checkIfMandatoryParameterExists(ROYGBIV.createConfettiExplosion, preConditions.colorName, configurations.colorName);
-  preConditions.checkIfMandatoryParameterExists(ROYGBIV.createConfettiExplosion, preConditions.alpha, configurations.alpha);
-  preConditions.checkIfNumber(ROYGBIV.createConfettiExplosion, preConditions.alpha, configurations.alpha);
-  preConditions.checkIfInRange(ROYGBIV.createConfettiExplosion, preConditions.alpha, configurations.alpha, 0, 1);
-  preConditions.checkIfNumberOnlyIfExists(ROYGBIV.createConfettiExplosion, preConditions.collisionTimeOffset, configurations.collisionTimeOffset);
-  preConditions.checkIfNumberOnlyIfExists(ROYGBIV.createConfettiExplosion, preConditions.startDelay, configurations.startDelay);
-  preConditions.checkIfLessThanExclusiveOnlyIfExists(ROYGBIV.createConfettiExplosion, preConditions.startDelay, configurations.startDelay, 0);
-  preConditions.checkIfVectorOnlyIfDefined(ROYGBIV.createConfettiExplosion, preConditions.normal, configurations.normal);
-  preConditions.checkIfCollisionActionOnlyIfExists(ROYGBIV.createConfettiExplosion, preConditions.collisionMethod, configurations.collisionMethod);
-  return particleSystemGenerator.generateConfettiExplosion(configurations);
-}
-
 // Returns a new copy of given particle system. This function can be used to
 // improve memory usage of particle system pools. For instance, given a plasma
 // gun with X plasma particle systems it is better to create one plasma particle system
@@ -2794,6 +2532,7 @@ Roygbiv.prototype.setCollisionListener = function(sourceObject, callbackFunction
     }
     sourceObject.setCollisionListener(callbackFunction);
   }else if (sourceObject.isParticleSystem){
+    preConditions.checkIfTrue(ROYGBIV.setCollisionListener, "Particle system is not marked as collidable.", (!sourceObject.isCollidable));
     preConditions.checkIfTrue(ROYGBIV.setCollisionListener, "A position is set manually to the particle system. Cannot listen for collisions.", (sourceObject.hasManualPositionSet));
     preConditions.checkIfTrue(ROYGBIV.setCollisionListener, "A rotation is set manually to the particle system. Cannot listen for collisions.", (sourceObject.hasManualRotationSet));
     preConditions.checkIfTrue(ROYGBIV.setCollisionListener, "A quaternion is set manually to the particle system. Cannot listen for collisions.", (sourceObject.hasManualQuaternionSet));

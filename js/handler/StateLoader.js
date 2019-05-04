@@ -982,6 +982,7 @@ StateLoader.prototype.load = function(){
         }
       }
       preConfiguredParticleSystems[psName] = new PreconfiguredParticleSystem(curExport.name, curExport.type, curExport.params);
+      preConfiguredParticleSystems[psName].setCollidableStatus(curExport.isCollidable);
     }
     // TEXTS *******************************************************
     // NOT HERE -> SEE: finalize

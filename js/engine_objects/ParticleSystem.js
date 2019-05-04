@@ -32,6 +32,10 @@ var ParticleSystem = function(copyPS, name, particles, x, y, z, vx, vy, vz, ax, 
   webglCallbackHandler.registerEngineObject(this);
 }
 
+ParticleSystem.prototype.shouldSendToWorker = function(){
+  return this.hasParticleCollision || this.isCollidable;
+}
+
 ParticleSystem.prototype.destroy = function(){
   if (this.mesh){
     scene.remove(this.mesh);
