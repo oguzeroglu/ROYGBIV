@@ -194,7 +194,9 @@ var RaycasterWorkerBridge = function(){
         if (uuid == -1){
           break;
         }
-        particleCollisionCallbackRequests[uuid]();
+        if (particleCollisionCallbackRequests[uuid]){
+          particleCollisionCallbackRequests[uuid]();
+        }
         rayCaster.transferableMessageBody.particleCollisionCallbackDescription[i] = -1;
       }
       rayCaster.hasOwnership = true;
