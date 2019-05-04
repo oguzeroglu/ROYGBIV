@@ -203,6 +203,10 @@ ModeSwitcher.prototype.switchFromDesignToPreview = function(){
   }else{
     GLOBAL_FOG_UNIFORM.value.set(-100.0, 0, 0, 0);
   }
+  TOTAL_PARTICLE_SYSTEM_COLLISION_LISTEN_COUNT = 0;
+  TOTAL_PARTICLE_COLLISION_LISTEN_COUNT = 0;
+  TOTAL_PARTICLE_SYSTEM_COUNT = 0;
+  particleCollisionCallbackRequests = new Object();
   for (var psName in preConfiguredParticleSystems){
     preConfiguredParticleSystems[psName].getParticleSystem();
   }

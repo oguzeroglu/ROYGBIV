@@ -8,6 +8,7 @@ importScripts("../engine_objects/GridSystem.js");
 importScripts("../engine_objects/AddedObject.js");
 importScripts("../engine_objects/ObjectGroup.js");
 importScripts("../engine_objects/AddedText.js");
+importScripts("../engine_objects/PreconfiguredParticleSystem.js");
 importScripts("../handler/ParticleSystemGenerator.js");
 importScripts("../engine_objects/Particle.js");
 importScripts("../engine_objects/ParticleSystem.js");
@@ -35,9 +36,12 @@ RaycasterWorker.prototype.refresh = function(state){
   stateLoader.loadCamera();
   stateLoader.loadRenderer();
   stateLoader.loadBoundingBoxes();
+  stateLoader.loadParticleSystems();
   var idCounter = 0;
+  var psIDCounter = 0;
   var idResponse = [];
   this.workerIDsByObjectName = new Object();
+  this.workerIDsByParticleSystemName = new Object();
   this.objectsByWorkerID = new Object();
   this.particleSystemsByWorkerID = new Object();
   for (var gsName in gridSystems){
@@ -63,6 +67,12 @@ RaycasterWorker.prototype.refresh = function(state){
     idResponse.push({type: "addedText", name: textName, id: addedTexts[textName].workerID});
     this.workerIDsByObjectName[textName] = addedTexts[textName].workerID;
     this.objectsByWorkerID[addedTexts[textName].workerID] = addedTexts[textName];
+  }
+  for (var psName in particleSystemPool){
+    particleSystemPool[psName].workerID = psIDCounter ++;
+    idResponse.push({type: "particleSystem", name: psName, id: particleSystemPool[psName].workerID});
+    this.workerIDsByParticleSystemName[psName] = particleSystemPool[psName].workerID;
+    this.particleSystemsByWorkerID[particleSystemPool[psName].workerID] = particleSystemPool[psName];
   }
   this.rayCaster.refresh();
   postMessage({type: "idResponse", ids: idResponse});
@@ -164,19 +174,6 @@ RaycasterWorker.prototype.update = function(transferableMessageBody){
   if (this.record){
     this.performanceLogs.updateTime = performance.now() - updateStartTime;
   }
-}
-RaycasterWorker.prototype.handleParticleSystemCreation = function(description){
-  var particles = [];
-  for (var uuid in description.particleDescription){
-    var particle = particleSystemGenerator.generateParticle(description.particleDescription[uuid]);
-    particle.assignUUID(uuid);
-    particles.push(particle);
-  }
-  description.particleSystemDescription.particles = particles;
-  var particleSystem = particleSystemGenerator.generateParticleSystem(description.particleSystemDescription);
-  particleSystem.workerID = TOTAL_PARTICLE_SYSTEM_COUNT;
-  this.particleSystemsByWorkerID[particleSystem.workerID] = particleSystem;
-  postMessage({isParticleSystemIDResponse: true, name: particleSystem.name, id: particleSystem.workerID});
 }
 
 // START

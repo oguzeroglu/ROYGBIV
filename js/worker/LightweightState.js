@@ -57,4 +57,17 @@ var LightweightState = function(){
       this.addedTexts3D[textName] = addedTexts[textName].exportLightweight();
     }
   }
+  // PARTICLE SYSTEMS
+  this.particleSystems = new Object();
+  for (var psName in particleSystemPool){
+    var ps = particleSystemPool[psName];
+    if (ps.creationConfigurations){
+      this.particleSystems[psName] = ps.creationConfigurations;
+      var particles = new Object();
+      ps.particlesWithCollisionCallbacks.forEach(function(particle, uuid){
+        particles[uuid] = particle.creationConfigurations;
+      });
+      this.particleSystems[psName].particles = particles;
+    }
+  }
 }

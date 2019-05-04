@@ -30,6 +30,8 @@ var RaycasterWorkerBridge = function(){
     }else if (msg.data.type){
       rayCaster.objectsByWorkerID = new Object();
       rayCaster.idsByObjectNames = new Object();
+      rayCaster.particleSystemsByWorkerID = new Object();
+      rayCaster.idsByParticleSystemNames = new Object();
       for (var i = 0; i<msg.data.ids.length; i++){
         if (msg.data.ids[i].type == "gridSystem"){
           rayCaster.objectsByWorkerID[msg.data.ids[i].id] = gridSystems[msg.data.ids[i].name];
@@ -49,6 +51,11 @@ var RaycasterWorkerBridge = function(){
           var textWorkerID = msg.data.ids[i].id;
           rayCaster.objectsByWorkerID[textWorkerID] = text;
           rayCaster.idsByObjectNames[text.name] = textWorkerID;
+        }else if (msg.data.ids[i].type == "particleSystem"){
+          var particleSystem = particleSystemPool[msg.data.ids[i].name];
+          var particleSystemWorkerID = msg.data.ids[i].id;
+          rayCaster.particleSystemsByWorkerID[particleSystemWorkerID] = particleSystem;
+          rayCaster.idsByParticleSystemNames[particleSystem.name] = particleSystemWorkerID;
         }else{
           throw new Error("Not implemented.");
         }

@@ -26,6 +26,21 @@ StateLoaderLightweight.prototype.loadWorldLimits = function(){
   RAYCASTER_STEP_AMOUNT = this.state.raycasterStepAmount;
 }
 
+StateLoaderLightweight.prototype.loadParticleSystems = function(){
+  var psExport = this.state.particleSystems;
+  for (var psName in psExport){
+    var curPSExport = psExport[psName];
+    var particles = [];
+    for (var uuid in curPSExport.particles){
+      var particle = particleSystemGenerator.generateParticle(curPSExport.particles[uuid]);
+      particle.assignUUID(uuid);
+      particles.push(particle);
+    }
+    curPSExport.particles = particles;
+    particleSystemGenerator.generateParticleSystem(curPSExport);
+  }
+}
+
 StateLoaderLightweight.prototype.loadBoundingBoxes = function(){
   var gridSystemExports = this.state.gridSystems;
   var addedObjectExports = this.state.addedObjects;
@@ -336,6 +351,10 @@ StateLoaderLightweight.prototype.reset = function(){
   objectGroups = new Object();
   gridSystems = new Object();
   addedTexts = new Object();
+  particleSystemPool = new Object();
+  particleSystems = new Map();
+  particlesWithCollisionCallbacks = new Object();
+  TOTAL_PARTICLE_SYSTEM_COLLISION_LISTEN_COUNT = 0;
   TOTAL_PARTICLE_COLLISION_LISTEN_COUNT = 0;
   TOTAL_PARTICLE_SYSTEM_COUNT = 0;
 }

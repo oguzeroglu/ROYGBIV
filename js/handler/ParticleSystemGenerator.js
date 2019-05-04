@@ -51,7 +51,7 @@ ParticleSystemGenerator.prototype.generateConfettiExplosion = function(configura
   var particleSize = configurations.particleSize;
   var colorName = configurations.colorName;
   var alpha = configurations.alpha;
-  var collisionMethod = (!(typeof configurations.collisionMethod == UNDEFINED))? configurations.collisionMethod: 0;
+  var collisionMethod = configurations.collisionMethod;
   var normal = configurations.normal;
   var collisionTimeOffset= (!(typeof configurations.collisionTimeOffset == UNDEFINED))? configurations.collisionTimeOffset: 0;
   var startDelay = (!(typeof configurations.startDelay == UNDEFINED))? configurations.startDelay: 0;
