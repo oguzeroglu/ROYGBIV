@@ -92,10 +92,28 @@ ParticleSystemCreatorGUIHandler.prototype.showConfetti = function(prevParams){
   var confettiParameters = {
     expireTime: 0, lifetime: 0, verticalSpeed: 100, horizontalSpeed: 50, verticalAcceleration: -80,
     particleCount: 100, particleSize: 5, colorName: "#ffffff", alpha: 1, hasParticleCollision: false,
-    hasTargetColor: false, hasAlphaVariation: false, hasTexture: false, collisionMethod: "", normal: "0,1,0",
+    hasTargetColor: false, hasAlphaVariation: false, hasTexture: false, collisionMethod: "none",
     collisionTimeOffset: 0, startDelay: 3, targetColorName: "#ffffff", colorStep: 0, alphaVariation: 0, textureName: "",
     rgbFilter: "r,g,b"
   };
+  if (prevParams){
+    for (var key in prevParams){
+      confettiParameters[key] = prevParams[key];
+      if (key == "collisionMethod"){
+        confettiParameters[key] = "none";
+        switch(prevParams[key]){
+          case PARTICLE_REWIND_ON_COLLIDED:
+            confettiParameters[key] = "rewind";
+          break;
+          case PARTICLE_DISSAPEAR_ON_COLLIDED:
+            confettiParameters[key] = "dissapear";
+          break;
+        }
+      }else if (key == "rgbFilter"){
+        confettiParameters[key] = prevParams[key].x+","+prevParams[key].y+","+prevParams[key].z;
+      }
+    }
+  }
   guiHandler.datGuiPSCreator.add(confettiParameters, "expireTime").min(0).max(50).step(0.1).onFinishChange(function(val){
     particleSystemCreatorGUIHandler.confettiExplosionGeneratorFunc();
   }).listen();
@@ -124,43 +142,78 @@ ParticleSystemCreatorGUIHandler.prototype.showConfetti = function(prevParams){
     particleSystemCreatorGUIHandler.confettiExplosionGeneratorFunc();
   }).listen();
   guiHandler.datGuiPSCreator.add(confettiParameters, "hasParticleCollision").onChange(function(val){
-
-  }).listen();
-  guiHandler.datGuiPSCreator.add(confettiParameters, "collisionMethod", ["none", "rewind", "dissapear"]).onFinishChange(function(val){
+    if(val){
+      guiHandler.enableController(particleSystemCreatorGUIHandler.confettiCollisionMethodController);
+      guiHandler.enableController(particleSystemCreatorGUIHandler.confettiCollisionTimeOffsetController);
+    }else{
+      guiHandler.disableController(particleSystemCreatorGUIHandler.confettiCollisionMethodController);
+      guiHandler.disableController(particleSystemCreatorGUIHandler.confettiCollisionTimeOffsetController);
+    }
     particleSystemCreatorGUIHandler.confettiExplosionGeneratorFunc();
   }).listen();
-  guiHandler.datGuiPSCreator.add(confettiParameters, "collisionTimeOffset").min(0).max(1000).step(0.1).onFinishChange(function(val){
+  particleSystemCreatorGUIHandler.confettiCollisionMethodController = guiHandler.datGuiPSCreator.add(confettiParameters, "collisionMethod", ["none", "rewind", "dissapear"]).onFinishChange(function(val){
     particleSystemCreatorGUIHandler.confettiExplosionGeneratorFunc();
   }).listen();
-  guiHandler.datGuiPSCreator.add(confettiParameters, "normal").onFinishChange(function(val){
-
+  particleSystemCreatorGUIHandler.confettiCollisionTimeOffsetController = guiHandler.datGuiPSCreator.add(confettiParameters, "collisionTimeOffset").min(0).max(1000).step(0.1).onFinishChange(function(val){
+    particleSystemCreatorGUIHandler.confettiExplosionGeneratorFunc();
   }).listen();
   guiHandler.datGuiPSCreator.add(confettiParameters, "startDelay").min(0).max(10).step(0.1).onFinishChange(function(val){
     particleSystemCreatorGUIHandler.confettiExplosionGeneratorFunc();
   }).listen();
   guiHandler.datGuiPSCreator.add(confettiParameters, "hasTargetColor").onChange(function(val){
-
-  }).listen();
-  guiHandler.datGuiPSCreator.addColor(confettiParameters, "targetColorName").onFinishChange(function(val){
+    if (val){
+      guiHandler.enableController(particleSystemCreatorGUIHandler.confettiTargetColorController);
+      guiHandler.enableController(particleSystemCreatorGUIHandler.confettiColorStepController);
+    }else{
+      guiHandler.disableController(particleSystemCreatorGUIHandler.confettiTargetColorController);
+      guiHandler.disableController(particleSystemCreatorGUIHandler.confettiColorStepController);
+    }
     particleSystemCreatorGUIHandler.confettiExplosionGeneratorFunc();
   }).listen();
-  guiHandler.datGuiPSCreator.add(confettiParameters, "colorStep").min(0).max(1).step(0.001).onFinishChange(function(val){
+  particleSystemCreatorGUIHandler.confettiTargetColorController = guiHandler.datGuiPSCreator.addColor(confettiParameters, "targetColorName").onFinishChange(function(val){
+    particleSystemCreatorGUIHandler.confettiExplosionGeneratorFunc();
+  }).listen();
+  particleSystemCreatorGUIHandler.confettiColorStepController = guiHandler.datGuiPSCreator.add(confettiParameters, "colorStep").min(0).max(1).step(0.001).onFinishChange(function(val){
     particleSystemCreatorGUIHandler.confettiExplosionGeneratorFunc();
   }).listen();
   guiHandler.datGuiPSCreator.add(confettiParameters, "hasAlphaVariation").onChange(function(val){
-
-  }).listen();
-  guiHandler.datGuiPSCreator.add(confettiParameters, "alphaVariation").min(-10).max(10).step(0.1).onFinishChange(function(val){
+    if (val){
+      guiHandler.enableController(particleSystemCreatorGUIHandler.confettiAlphaVariationController);
+    }else{
+      guiHandler.disableController(particleSystemCreatorGUIHandler.confettiAlphaVariationController);
+    }
     particleSystemCreatorGUIHandler.confettiExplosionGeneratorFunc();
   }).listen();
-  guiHandler.datGuiPSCreator.add(confettiParameters, "hasTexture").onChange(function(val){
-
-  }).listen();
-  guiHandler.datGuiPSCreator.add(confettiParameters, "textureName", particleSystemCreatorGUIHandler.usableTextureNames).onChange(function(val){
+  particleSystemCreatorGUIHandler.confettiAlphaVariationController = guiHandler.datGuiPSCreator.add(confettiParameters, "alphaVariation").min(-10).max(0).step(0.1).onFinishChange(function(val){
     particleSystemCreatorGUIHandler.confettiExplosionGeneratorFunc();
   }).listen();
-  guiHandler.datGuiPSCreator.add(confettiParameters, "rgbFilter").onFinishChange(function(val){
-
+  particleSystemCreatorGUIHandler.confettiHasTextureController = guiHandler.datGuiPSCreator.add(confettiParameters, "hasTexture").onChange(function(val){
+    if (particleSystemCreatorGUIHandler.usableTextureNames.length == 0){
+      particleSystemCreatorGUIHandler.confettiParameters.hasTexture = false;
+      return;
+    }
+    if (val){
+      guiHandler.enableController(particleSystemCreatorGUIHandler.confettiTextureNameController);
+      guiHandler.enableController(particleSystemCreatorGUIHandler.confettiRGBFilterController);
+    }else{
+      guiHandler.disableController(particleSystemCreatorGUIHandler.confettiTextureNameController);
+      guiHandler.disableController(particleSystemCreatorGUIHandler.confettiRGBFilterController);
+    }
+    particleSystemCreatorGUIHandler.confettiExplosionGeneratorFunc();
+  }).listen();
+  particleSystemCreatorGUIHandler.confettiTextureNameController = guiHandler.datGuiPSCreator.add(confettiParameters, "textureName", particleSystemCreatorGUIHandler.usableTextureNames).onChange(function(val){
+    particleSystemCreatorGUIHandler.confettiExplosionGeneratorFunc();
+  }).listen();
+  particleSystemCreatorGUIHandler.confettiRGBFilterController = guiHandler.datGuiPSCreator.add(confettiParameters, "rgbFilter").onFinishChange(function(val){
+    var splitted = val.split(",");
+    if (splitted.length == 3){
+      for (var i = 0; i<3; i++){
+        if (isNaN(splitted[i])){
+          return;
+        }
+      }
+    }
+    particleSystemCreatorGUIHandler.confettiExplosionGeneratorFunc();
   }).listen();
   guiHandler.datGuiPSCreator.add({"Restart": function(){
     particleSystemCreatorGUIHandler.confettiExplosionGeneratorFunc();
@@ -179,26 +232,47 @@ ParticleSystemCreatorGUIHandler.prototype.showConfetti = function(prevParams){
       delete params.textureName;
       delete params.rgbFilter;
     }else{
-      var splitted = params.rgbThreshold.split(",");
+      var splitted = params.rgbFilter.split(",");
       params.rgbFilter = new THREE.Vector3(parseFloat(splitted[0]), parseFloat(splitted[1]), parseFloat(splitted[2]));
     }
-    if (particleSystemCreatorGUIHandler.confettiParameters.collisionMethod == ""){
+    if (!particleSystemCreatorGUIHandler.confettiParameters.hasParticleCollision || particleSystemCreatorGUIHandler.confettiParameters.collisionMethod == "none"){
       delete params.collisionMethod;
-    }
-    var splitted = params.normal.split(",");
-    if (splitted.length != 3){
-      if (isNaN(splitted[0]) || isNaN(splitted[1]) || isNaN(splitted[2])){
-        params.normal = new THREE.Vector3(0, 1, 0);
-      }else{
-        params.normal = new THREE.Vector3(parseFloat(splitted[0], parseFloat(splitted[1]), parseFloat(splitted[2])));
+    }else if (particleSystemCreatorGUIHandler.confettiParameters.hasParticleCollision){
+      if (particleSystemCreatorGUIHandler.confettiParameters.collisionMethod == "rewind"){
+        params.collisionMethod = PARTICLE_REWIND_ON_COLLIDED;
+      }else if (particleSystemCreatorGUIHandler.confettiParameters.collisionMethod == "dissapear"){
+        params.collisionMethod = PARTICLE_DISSAPEAR_ON_COLLIDED;
       }
-    }else{
-      params.normal = new THREE.Vector3(0, 1, 0);
+    }
+    if (!particleSystemCreatorGUIHandler.confettiParameters.hasAlphaVariation){
+      delete params.alphaVariation;
+    }
+    if (!particleSystemCreatorGUIHandler.confettiParameters.hasTargetColor){
+      delete params.targetColorName;
+      delete params.colorStep;
     }
     particleSystemCreatorGUIHandler.particleSystem = particleSystemGenerator.generateConfettiExplosion(params);
     particleSystemCreatorGUIHandler.particleSystem.mesh.visible = true;
     scene.add(particleSystemCreatorGUIHandler.particleSystem.mesh);
     particleSystemCreatorGUIHandler.preConfiguredParticleSystem = new PreconfiguredParticleSystem(particleSystemCreatorGUIHandler.psName, "CONFETTI", params);
+  }
+  if (!confettiParameters.hasParticleCollision){
+    guiHandler.disableController(particleSystemCreatorGUIHandler.confettiCollisionMethodController);
+    guiHandler.disableController(particleSystemCreatorGUIHandler.confettiCollisionTimeOffsetController);
+  }
+  if (!confettiParameters.hasAlphaVariation){
+    guiHandler.disableController(particleSystemCreatorGUIHandler.confettiAlphaVariationController);
+  }
+  if (!confettiParameters.hasTargetColor){
+    guiHandler.disableController(particleSystemCreatorGUIHandler.confettiTargetColorController);
+    guiHandler.disableController(particleSystemCreatorGUIHandler.confettiColorStepController);
+  }
+  if (!confettiParameters.hasTexture){
+    guiHandler.disableController(particleSystemCreatorGUIHandler.confettiTextureNameController);
+    guiHandler.disableController(particleSystemCreatorGUIHandler.confettiRGBFilterController);
+  }
+  if (particleSystemCreatorGUIHandler.usableTextureNames.length == 0){
+    guiHandler.disableController(particleSystemCreatorGUIHandler.confettiHasTextureController);
   }
   particleSystemCreatorGUIHandler.confettiParameters = confettiParameters;
   particleSystemCreatorGUIHandler.confettiExplosionGeneratorFunc();

@@ -20,6 +20,7 @@ PreconfiguredParticleSystem.prototype.getParticleSystem = function(){
     case "MAGIC_CIRCLE": return particleSystemGenerator.generateMagicCircle(this.params);
     case "PLASMA": return particleSystemGenerator.generatePlasma(this.params);
     case "SMOKE": return particleSystemGenerator.generateSmoke(this.params);
+    case "CONFETTI": return particleSystemGenerator.generateConfettiExplosion(this.params);
   }
   throw new Error("Unknown type.");
 }
