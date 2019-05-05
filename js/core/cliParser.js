@@ -5166,6 +5166,10 @@ function parse(input){
             terminal.printError(Text.WORKS_ONLY_IN_DESIGN_MODE);
             return true;
           }
+          if (!(splitted[1].indexOf("*") == -1)){
+            new JobHandler(splitted).handle();
+            return true;
+          }
           var preConfiguredParticleSystem = preConfiguredParticleSystems[splitted[1]];
           if (!preConfiguredParticleSystem){
             terminal.printError(Text.NO_SUCH_PARTICLE_SYSTEM);
@@ -5176,12 +5180,18 @@ function parse(input){
             return true;
           }
           preConfiguredParticleSystem.destroy();
-          terminal.printInfo(Text.PARTICLE_SYSTEM_DESTROYED);
+          if (!jobHandlerWorking){
+            terminal.printInfo(Text.PARTICLE_SYSTEM_DESTROYED);
+          }
           return true;
         break;
         case 169: //destroyParticleSystemPool
           if (mode != 0){
             terminal.printError(Text.WORKS_ONLY_IN_DESIGN_MODE);
+            return true;
+          }
+          if (!(splitted[1].indexOf("*") == -1)){
+            new JobHandler(splitted).handle();
             return true;
           }
           var preConfiguredParticleSystemPool = preConfiguredParticleSystemPools[splitted[1]];
@@ -5190,7 +5200,9 @@ function parse(input){
             return true;
           }
           preConfiguredParticleSystemPool.destroy();
-          terminal.printInfo(Text.PARTICLE_SYSTEM_POOL_DESTROYED);
+          if (!jobHandlerWorking){
+            terminal.printInfo(Text.PARTICLE_SYSTEM_POOL_DESTROYED);
+          }
           return true;
         break;
         case 170: //printParticleSystems

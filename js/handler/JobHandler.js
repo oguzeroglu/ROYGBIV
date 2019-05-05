@@ -117,6 +117,10 @@ JobHandler.prototype.handle = function(previewModeCommand){
       this.handleSimplifyPhysicsCommand();
     }else if (this.splitted[0] == "unsimplifyphysics"){
       this.handleUnsimplifyPhysicsCommand();
+    }else if (this.splitted[0] == "destroyparticlesystem"){
+      this.handleDestroyParticleSystemCommand();
+    }else if (this.splitted[0] == "destroyparticlesystempool"){
+      this.handleDestroyParticleSystemPoolCommand();
     }
     if (jobHandlerRaycasterRefresh){
       refreshRaycaster(Text.JOB_COMPLETED, true);
@@ -127,6 +131,38 @@ JobHandler.prototype.handle = function(previewModeCommand){
   // because async
   if (this.splitted[0] != "autoConfigureArea".toLowerCase()){
     jobHandlerWorking = false;
+  }
+}
+
+JobHandler.prototype.handleDestroyParticleSystemPoolCommand = function(){
+  var psPoolNamePrefix = this.splitted[1].split("*")[0];
+  var ctr = 0;
+  for (var psPoolName in preConfiguredParticleSystemPools){
+    if (psPoolName.startsWith(psPoolNamePrefix)){
+      parseCommand("destroyParticleSystemPool "+psPoolName);
+      ctr ++;
+    }
+  }
+  if (ctr == 0){
+    terminal.printError(Text.NO_PARTICLE_SYSTEM_POOLS_FOUND);
+  }else{
+    terminal.printInfo(Text.COMMAND_EXECUTED_FOR_X_PARTICLE_SYSTEM_POOLS.replace(Text.PARAM1, ctr));
+  }
+}
+
+JobHandler.prototype.handleDestroyParticleSystemCommand = function(){
+  var psNamePrefix = this.splitted[1].split("*")[0];
+  var ctr = 0;
+  for (var psName in preConfiguredParticleSystems){
+    if (psName.startsWith(psNamePrefix)){
+      parseCommand("destroyParticleSystem "+psName);
+      ctr ++;
+    }
+  }
+  if (ctr == 0){
+    terminal.printError(Text.NO_PARTICLE_SYSTEMS_FOUND);
+  }else{
+    terminal.printInfo(Text.COMMAND_EXECUTED_FOR_X_PARTICLE_SYSTEMS.replace(Text.PARAM1, ctr));
   }
 }
 
