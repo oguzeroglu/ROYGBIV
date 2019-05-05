@@ -5193,6 +5193,40 @@ function parse(input){
           terminal.printInfo(Text.PARTICLE_SYSTEM_POOL_DESTROYED);
           return true;
         break;
+        case 170: //printParticleSystems
+          var len = Object.keys(preConfiguredParticleSystems).length;
+          terminal.printHeader(Text.PARTICLE_SYSTEMS);
+          var ctr = 1;
+          for (var psName in preConfiguredParticleSystems){
+            var opts = true;
+            if (ctr == len){
+              opts = false;
+            }
+            ctr ++;
+            terminal.printInfo(Text.TREE2.replace(Text.PARAM1, psName).replace(Text.PARAM2, preConfiguredParticleSystems[psName].type), opts);
+          }
+          if (len == 0){
+            terminal.printError(Text.NO_PARTICLE_SYSTEMS_CREATED);
+          }
+          return true;
+        break;
+        case 171: //printParticleSystemPools
+          var len = Object.keys(preConfiguredParticleSystemPools).length;
+          terminal.printHeader(Text.PARTICLE_SYSTEM_POOLS);
+          var ctr = 1;
+          for (var poolName in preConfiguredParticleSystemPools){
+            var opts = true;
+            if (ctr == len){
+              opts = false;
+            }
+            ctr ++;
+            terminal.printInfo(Text.TREE2.replace(Text.PARAM1, poolName).replace(Text.PARAM2, preConfiguredParticleSystemPools[poolName].refParticleSystemName+" x "+preConfiguredParticleSystemPools[poolName].poolSize), opts);
+          }
+          if (len == 0){
+            terminal.printError(Text.NO_PARTICLE_SYSTEM_POOLS_CREATED);
+          }
+          return true;
+        break;
       }
       return true;
     }catch(err){

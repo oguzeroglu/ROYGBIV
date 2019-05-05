@@ -170,7 +170,9 @@ var CommandDescriptor = function(){
       0, //makeParticleSystemsResponsive
       3, //newParticleSystemPool
       1, //destroyParticleSystem
-      1 //destroyParticleSystemPool
+      1, //destroyParticleSystemPool
+      0, //printParticleSystems
+      0 //printParticleSystemPools
   ];
 
   this.commandArgumentsExpectedExplanation = [
@@ -343,7 +345,9 @@ var CommandDescriptor = function(){
     "makeParticleSystemsResponsive",
     "newParticleSystemPool poolName refPSName poolSize",
     "destroyParticleSystem psName",
-    "destroyParticleSystemPool poolName"
+    "destroyParticleSystemPool poolName",
+    "printParticleSystems",
+    "printParticleSystemPools"
   ];
 
   this.commands = [
@@ -516,7 +520,9 @@ var CommandDescriptor = function(){
     "makeParticleSystemsResponsive",
     "newParticleSystemPool",
     "destroyParticleSystem",
-    "destroyParticleSystemPool"
+    "destroyParticleSystemPool",
+    "printParticleSystems",
+    "printParticleSystemPools"
   ];
 
   this.commandInfo = [
@@ -689,7 +695,9 @@ var CommandDescriptor = function(){
     "makeParticleSystemsResponsive: Calculates a reference height based on the height and resolution of the device that runs this command\nin order to make the particle systems look responsive on different devices.",
     "newParticleSystemPool: Generates a new particle system pool of given size filled with copies of refParticleSystem.",
     "destroyParticleSystem: Destroys a particle system.",
-    "destroyParticleSystemPool: Destroys a particle system pool."
+    "destroyParticleSystemPool: Destroys a particle system pool.",
+    "printParticleSystems: Prints created particle systems.",
+    "printParticleSystemPools: Prints created particle system pools."
   ];
 
   this.keyboardInfo = [
