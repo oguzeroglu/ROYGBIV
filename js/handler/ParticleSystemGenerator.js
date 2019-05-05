@@ -394,6 +394,7 @@ ParticleSystemGenerator.prototype.generateParticleSystem = function(configuratio
   var angularQuaternion = (!(typeof configurations.angularQuaternion == UNDEFINED))? configurations.angularQuaternion: REUSABLE_QUATERNION.set(0, 0, 0, 1);
   var initialAngle = (!(typeof configurations.initialAngle == UNDEFINED))? configurations.initialAngle: 0;
   var motionMode = (!(typeof configurations.motionMode == UNDEFINED))? configurations.motionMode: MOTION_MODE_NORMAL;
+  var maxPSTime = (!(typeof configurations.maxPSTime == UNDEFINED))? configurations.maxPSTime: DEFAULT_MAX_PS_TIME;
   var vx = 0, vy = 0, vz = 0, ax = 0, ay = 0, az = 0;
   if (velocity){
     vx = velocity.x;
@@ -418,6 +419,7 @@ ParticleSystemGenerator.prototype.generateParticleSystem = function(configuratio
   particleSystem.angularQuaternionZ = angularQuaternion.z;
   particleSystem.angularQuaternionW = angularQuaternion.w;
   particleSystem.initialAngle = initialAngle;
+  particleSystem.maxPSTime = maxPSTime;
   particleSystem.creationConfigurations = new Object();
   for (var key in configurations){
     if (key == "particles"){

@@ -5,6 +5,7 @@ var PreconfiguredParticleSystem = function(name, type, params){
   for (var key in params){
     this.params[key] = params[key];
   }
+  this.setMaxPSTime(params.maxPSTime);
 }
 
 PreconfiguredParticleSystem.prototype.export = function(){
@@ -13,6 +14,7 @@ PreconfiguredParticleSystem.prototype.export = function(){
   exportObj.type = this.type;
   exportObj.params = this.params;
   exportObj.isCollidable = this.isCollidable;
+  exportObj.maxPSTime = this.maxPSTime;
   return exportObj;
 }
 
@@ -26,9 +28,18 @@ PreconfiguredParticleSystem.prototype.getParticleSystem = function(){
   }
   if (ps){
     ps.isCollidable = this.isCollidable;
+    ps.maxPSTime = (!(typeof this.maxPSTime == UNDEFINED))? this.maxPSTime: DEFAULT_MAX_PS_TIME;
+    if (ps.creationConfigurations){
+      ps.creationConfigurations.maxPSTime = ps.maxPSTime;
+    }
     return ps;
   }
   throw new Error("Unknown type.");
+}
+
+PreconfiguredParticleSystem.prototype.setMaxPSTime = function(maxPSTime){
+  this.maxPSTime = isNaN(maxPSTime)? DEFAULT_MAX_PS_TIME: maxPSTime;
+  this.params.maxPSTime = this.maxPSTime;
 }
 
 PreconfiguredParticleSystem.prototype.setCollidableStatus = function(isCollidable){

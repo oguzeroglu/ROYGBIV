@@ -19,6 +19,7 @@ var ParticleSystemCreatorGUIHandler = function(){
   }
   this.typeParam = {"Type": "CUSTOM"};
   this.collidableParam = {"Collidable": false};
+  this.maxPSTimeParam = {"Max time": DEFAULT_MAX_PS_TIME};
   this.buttonsParam = {
     "Cancel": function(){
       activeControl = new FreeControls({});
@@ -68,8 +69,14 @@ ParticleSystemCreatorGUIHandler.prototype.onAfterShown = function(){
     }else{
       particleSystemCreatorGUIHandler.collidableParam["Collidable"] = false;
     }
+    if (particleSystemCreatorGUIHandler.preConfiguredParticleSystem.maxPSTime){
+      particleSystemCreatorGUIHandler.maxPSTimeParam["Max time"] = particleSystemCreatorGUIHandler.preConfiguredParticleSystem.maxPSTime;
+    }else{
+      particleSystemCreatorGUIHandler.maxPSTimeParam["Max time"] = DEFAULT_MAX_PS_TIME;
+    }
   }else{
     particleSystemCreatorGUIHandler.collidableParam["Collidable"] = false;
+    particleSystemCreatorGUIHandler.maxPSTimeParam["Max time"] = DEFAULT_MAX_PS_TIME;
   }
 }
 
@@ -81,6 +88,9 @@ ParticleSystemCreatorGUIHandler.prototype.update = function(){
 }
 
 ParticleSystemCreatorGUIHandler.prototype.addCommonControllers = function(){
+  this.maxPSTimeController = guiHandler.datGuiPSCreator.add(this.maxPSTimeParam, "Max time").min(1).max(DEFAULT_MAX_PS_TIME).step(1).onChange(function(val){
+    particleSystemCreatorGUIHandler.preConfiguredParticleSystem.setMaxPSTime(val);
+  }).listen();
   this.collidableController = guiHandler.datGuiPSCreator.add(this.collidableParam, "Collidable").onChange(function(val){
     particleSystemCreatorGUIHandler.preConfiguredParticleSystem.setCollidableStatus(val);
   }).listen();

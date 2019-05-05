@@ -353,7 +353,7 @@ ParticleSystem.prototype.update = function(){
     return;
   }
   this.tick += (1/60);
-  if (this.tick > MAX_PS_TIME){
+  if (this.tick > this.maxPSTime){
     this.start(EMPTY_OBJECT);
   }
   if (!this.psMerger){

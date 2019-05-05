@@ -73,13 +73,13 @@ Crosshair.prototype.update = function(){
   this.rotationTime += (1/60);
   this.expandTick ++;
   this.shrinkTick ++;
-  if (this.rotationTime > MAX_PS_TIME){
+  if (this.rotationTime > DEFAULT_MAX_PS_TIME){
     this.rotationTime = 0;
   }
-  if (this.expandTick > MAX_PS_TIME){
+  if (this.expandTick > DEFAULT_MAX_PS_TIME){
     this.expandTick = 0;
   }
-  if (this.shrinkTick > MAX_PS_TIME){
+  if (this.shrinkTick > DEFAULT_MAX_PS_TIME){
     this.shrinkTick = 0;
   }
 

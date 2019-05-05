@@ -231,7 +231,7 @@ var MAX_VERTEX_UNIFORM_VECTORS;
 var MAX_PS_COMPRESS_AMOUNT_4096 = 200;
 var TOTAL_MERGED_COUNT = 0;
 var MAX_TEXTURE_SIZE = 4096;
-var MAX_PS_TIME = 100000;
+var DEFAULT_MAX_PS_TIME = 100000;
 var EMPTY_OBJECT = {};
 var crosshairs = new Object();
 var selectedCrosshair;
