@@ -168,6 +168,9 @@ var CommandDescriptor = function(){
       1, //newParticleSystem
       1, //editParticleSystem
       0, //makeParticleSystemsResponsive
+      3, //newParticleSystemPool
+      1, //destroyParticleSystem
+      1 //destroyParticleSystemPool
   ];
 
   this.commandArgumentsExpectedExplanation = [
@@ -337,7 +340,10 @@ var CommandDescriptor = function(){
     "shaderPrecision show/hide",
     "newParticleSystem psName",
     "editParticleSystem psName",
-    "makeParticleSystemsResponsive"
+    "makeParticleSystemsResponsive",
+    "newParticleSystemPool poolName refPSName poolSize",
+    "destroyParticleSystem psName",
+    "destroyParticleSystemPool poolName"
   ];
 
   this.commands = [
@@ -507,7 +513,10 @@ var CommandDescriptor = function(){
     "shaderPrecision",
     "newParticleSystem",
     "editParticleSystem",
-    "makeParticleSystemsResponsive"
+    "makeParticleSystemsResponsive",
+    "newParticleSystemPool",
+    "destroyParticleSystem",
+    "destroyParticleSystemPool"
   ];
 
   this.commandInfo = [
@@ -677,7 +686,10 @@ var CommandDescriptor = function(){
     "shaderPrecision: Show the shader precision adjustment GUI.",
     "newParticleSystem: Opens the Particle System Creation GUI.",
     "editParticleSystem: Shows the GUI for editing a particle system.",
-    "makeParticleSystemsResponsive: Calculates a reference height based on the height and resolution of the device that runs this command\nin order to make the particle systems look responsive on different devices."
+    "makeParticleSystemsResponsive: Calculates a reference height based on the height and resolution of the device that runs this command\nin order to make the particle systems look responsive on different devices.",
+    "newParticleSystemPool: Generates a new particle system pool of given size filled with copies of refParticleSystem.",
+    "destroyParticleSystem: Destroys a particle system.",
+    "destroyParticleSystemPool: Destroys a particle system pool."
   ];
 
   this.keyboardInfo = [
@@ -741,42 +753,43 @@ var CommandDescriptor = function(){
     }
   }
 
-  this.UNKNOWN_INDICATOR        =   0;
-  this.GRID_SYSTEM_AXIS         =   1;
-  this.GRID_SYSTEM_NAME         =   2;
-  this.COLOR                    =   3;
-  this.BOOLEAN                  =   4;
-  this.MATERIAL_NAME            =   5;
-  this.MATERIAL_NAME_WITH_NULL  =   6;
-  this.OBJECT_NAME              =   7;
-  this.UPLOADED_IMAGE_NAME      =   8;
-  this.TEXTURE_NAME             =   9;
-  this.OBJECT_AXIS              =   10;
-  this.PHYSICS_TEST_INDEX       =   11;
-  this.STATE_ON_OFF             =   12;
-  this.S_T_ST                   =   13;
-  this.WALL_COLLECTION_NAME     =   14;
-  this.DEFAULT_MATERIAL_TYPE    =   15;
-  this.FILE_EXTENSION           =   16;
-  this.TEXTURE_PACK_NAME        =   17;
-  this.HIDE_SHOW                =   18;
-  this.SKYBOX_NAME              =   29;
-  this.SCRIPT_NAME              =   20;
-  this.ANY_OBJECT               =   21;
-  this.GLUED_OBJECT_NAME        =   22;
-  this.MARKED_POINT_NAME        =   23;
-  this.API_FUNCTION_NAME        =   24;
-  this.BLENDING_MODE            =   25;
-  this.OBJECT_CREATION_NAME     =   26;
-  this.AREA_NAME                =   27;
-  this.AREA_NAME_WITH_DEFAULT   =   28;
-  this.RENDER_SIDE              =   29;
-  this.CHILD_OBJECT_NAME        =   30;
-  this.FONT_NAME                =   31;
-  this.TEXT_NAME                =   32;
-  this.EFFECT_NAME              =   33;
-  this.FPS_WEAPON               =   34;
-  this.PRECONFIGURED_PS_NAME    =   35;
+  this.UNKNOWN_INDICATOR          =   0;
+  this.GRID_SYSTEM_AXIS           =   1;
+  this.GRID_SYSTEM_NAME           =   2;
+  this.COLOR                      =   3;
+  this.BOOLEAN                    =   4;
+  this.MATERIAL_NAME              =   5;
+  this.MATERIAL_NAME_WITH_NULL    =   6;
+  this.OBJECT_NAME                =   7;
+  this.UPLOADED_IMAGE_NAME        =   8;
+  this.TEXTURE_NAME               =   9;
+  this.OBJECT_AXIS                =   10;
+  this.PHYSICS_TEST_INDEX         =   11;
+  this.STATE_ON_OFF               =   12;
+  this.S_T_ST                     =   13;
+  this.WALL_COLLECTION_NAME       =   14;
+  this.DEFAULT_MATERIAL_TYPE      =   15;
+  this.FILE_EXTENSION             =   16;
+  this.TEXTURE_PACK_NAME          =   17;
+  this.HIDE_SHOW                  =   18;
+  this.SKYBOX_NAME                =   29;
+  this.SCRIPT_NAME                =   20;
+  this.ANY_OBJECT                 =   21;
+  this.GLUED_OBJECT_NAME          =   22;
+  this.MARKED_POINT_NAME          =   23;
+  this.API_FUNCTION_NAME          =   24;
+  this.BLENDING_MODE              =   25;
+  this.OBJECT_CREATION_NAME       =   26;
+  this.AREA_NAME                  =   27;
+  this.AREA_NAME_WITH_DEFAULT     =   28;
+  this.RENDER_SIDE                =   29;
+  this.CHILD_OBJECT_NAME          =   30;
+  this.FONT_NAME                  =   31;
+  this.TEXT_NAME                  =   32;
+  this.EFFECT_NAME                =   33;
+  this.FPS_WEAPON                 =   34;
+  this.PRECONFIGURED_PS_NAME      =   35;
+  this.PRECONFOGURED_PS_POOL_NAME =   36;
 
   // newGridSystem
   this.newGridSystem = new Object();
@@ -1358,6 +1371,22 @@ var CommandDescriptor = function(){
   this.editParticleSystem.types = [];
   this.editParticleSystem.types.push(this.PRECONFIGURED_PS_NAME); // psName
 
+  // newParticleSystemPool
+  this.newParticleSystemPool = new Object();
+  this.newParticleSystemPool.types = [];
+  this.newParticleSystemPool.types.push(this.UNKNOWN_INDICATOR); // poolName
+  this.newParticleSystemPool.types.push(this.PRECONFIGURED_PS_NAME); // refPSName
+  this.newParticleSystemPool.types.push(this.UNKNOWN_INDICATOR); // poolSize
+
+  // destroyParticleSystem
+  this.destroyParticleSystem = new Object();
+  this.destroyParticleSystem.types = [];
+  this.destroyParticleSystem.types.push(this.PRECONFIGURED_PS_NAME); // psName
+
+  // destroyParticleSystemPool
+  this.destroyParticleSystemPool = new Object();
+  this.destroyParticleSystemPool.types = [];
+  this.destroyParticleSystemPool.types.push(this.PRECONFOGURED_PS_POOL_NAME); // poolName
 };
 
 CommandDescriptor.prototype.test = function(){

@@ -62,7 +62,6 @@ var Roygbiv = function(){
     "createDynamicTrail",
     "createObjectTrail",
     "destroyObjectTrail",
-    "generateParticleSystemName",
     "createLaser",
     "createWaterfall",
     "createSnow",
@@ -72,13 +71,8 @@ var Roygbiv = function(){
     "hideParticleSystem",
     "getCameraDirection",
     "getCameraPosition",
-    "createParticleSystemPool",
     "getParticleSystemPool",
-    "addParticleSystemToPool",
     "getParticleSystemFromPool",
-    "removeParticleSystemFromPool",
-    "destroyParticleSystemPool",
-    "copyParticleSystem",
     "setVector",
     "quaternion",
     "fadeAway",
@@ -131,7 +125,6 @@ var Roygbiv = function(){
     "setFullScreenChangeCallbackFunction",
     "removeFullScreenChangeCallbackFunction",
     "isMouseDown",
-    "createInitializedParticleSystemPool",
     "intersectionTest",
     "getEndPoint",
     "isMobile",
@@ -1684,22 +1677,6 @@ Roygbiv.prototype.destroyObjectTrail = function(object){
   return;
 }
 
-// Generates a unique name for a particle system.
-Roygbiv.prototype.generateParticleSystemName = function(){
-  if (mode == 0){
-    return;
-  }
-  var generatedName = (Date.now().toString(36) + Math.random().toString(36).substr(2, 5)).toUpperCase();
-  var nameFound = true;
-  while (nameFound){
-    nameFound = !(typeof particleSystemPool[generatedName] == UNDEFINED);
-    if (nameFound){
-      generatedName = (Date.now().toString(36) + Math.random().toString(36).substr(2, 5)).toUpperCase();
-    }
-  }
-  return generatedName;
-}
-
 // Creates a laser like particle system. Configfurations are:
 // name: The unique name of the particle system. (mandatory)
 // position: The initial position of the particle system. (mandatory)
@@ -2137,95 +2114,6 @@ Roygbiv.prototype.hideParticleSystem = function(particleSystem){
   particleSystem.hide();
 }
 
-// Creates a new particle system pool. Particle system pools are used to hold
-// and keep track of particle systems. For instance, for a plasma gun it is suggested
-// to create the plasma particle systems, put them inside a pool and get them from
-// the pool every time the player shoots.
-Roygbiv.prototype.createParticleSystemPool = function(name){
-  if (mode == 0){
-    return;
-  }
-  preConditions.checkIfDefined(ROYGBIV.createParticleSystemPool, preConditions.name, name);
-  preConditions.checkIfTrue(ROYGBIV.createParticleSystemPool, "name must be unique", (particleSystemPools[name]));
-
-  var psPool = new ParticleSystemPool(name);
-  particleSystemPools[name] = psPool;
-  return psPool;
-}
-
-// Puts a particle system to a particle system pool.
-Roygbiv.prototype.addParticleSystemToPool = function(pool, particleSystem){
-  if (mode == 0){
-    return;
-  }
-  preConditions.checkIfDefined(ROYGBIV.addParticleSystemToPool, preConditions.pool, pool);
-  preConditions.checkIfDefined(ROYGBIV.addParticleSystemToPool, preConditions.particleSystem, particleSystem);
-  preConditions.checkIfParticleSystemPool(ROYGBIV.addParticleSystemToPool, preConditions.pool, pool);
-  preConditions.checkIfParticleSystem(ROYGBIV.addParticleSystemToPool, preConditions.particleSystem, particleSystem);
-  preConditions.checkIfTrue(ROYGBIV.addParticleSystemToPool, "Particle system belongs to another pool", (!(typeof particleSystem.psPool == UNDEFINED)));
-  pool.add(particleSystem);
-}
-
-// Removes a particle system from its particle system pool.
-Roygbiv.prototype.removeParticleSystemFromPool = function(particleSystem){
-  if (mode == 0){
-    return;
-  }
-  preConditions.checkIfDefined(ROYGBIV.removeParticleSystemFromPool, preConditions.particleSystem, particleSystem);
-  preConditions.checkIfParticleSystem(ROYGBIV.removeParticleSystemFromPool, preConditions.particleSystem, particleSystem);
-  preConditions.checkIfTrue(ROYGBIV.removeParticleSystemFromPool, "particleSystem does not belong to any pool", (typeof particleSystem.psPool == UNDEFINED));
-  var psPool = particleSystemPools[particleSystem.psPool];
-  psPool.remove(particleSystem);
-}
-
-// Destroys a particle system pool.
-Roygbiv.prototype.destroyParticleSystemPool = function(pool){
-  if (mode == 0){
-    return;
-  }
-  preConditions.checkIfDefined(ROYGBIV.destroyParticleSystemPool, preConditions.pool, pool);
-  preConditions.checkIfParticleSystemPool(ROYGBIV.destroyParticleSystemPool, preConditions.pool, pool);
-  pool.destroy();
-}
-
-// Returns a new copy of given particle system. This function can be used to
-// improve memory usage of particle system pools. For instance, given a plasma
-// gun with X plasma particle systems it is better to create one plasma particle system
-// then create (X-1) copies of it than to create X plasma particle systems.
-Roygbiv.prototype.copyParticleSystem = function(particleSystem, newParticleSystemName){
-  if (mode == 0){
-    return;
-  }
-  preConditions.checkIfDefined(ROYGBIV.copyParticleSystem, preConditions.particleSystem, particleSystem);
-  preConditions.checkIfParticleSystem(ROYGBIV.copyParticleSystem, preConditions.particleSystem, particleSystem);
-  preConditions.checkIfDefined(ROYGBIV.copyParticleSystem, preConditions.newParticleSystemName, newParticleSystemName);
-  preConditions.checkIfTrue(ROYGBIV.copyParticleSystem, "name must be unique", particleSystemPool[newParticleSystemName]);
-
-  var copyParticleSystem = new ParticleSystem(
-    particleSystem, newParticleSystemName, particleSystem.particles,
-    particleSystem.x, particleSystem.y, particleSystem.z,
-    particleSystem.vx, particleSystem.vy, particleSystem.vz,
-    particleSystem.ax, particleSystem.ay, particleSystem.az, particleSystem.motionMode,
-    particleSystem.updateFunction
-  );
-
-  copyParticleSystem.lifetime = particleSystem.lifetime;
-
-  copyParticleSystem.angularVelocity = particleSystem.angularVelocity;
-  copyParticleSystem.angularAcceleration = particleSystem.angularAcceleration;
-  copyParticleSystem.angularMotionRadius = particleSystem.angularMotionRadius;
-  if (particleSystem.angularQuaternion){
-    copyParticleSystem.angularQuaternionX = particleSystem.angularQuaternion.x;
-    copyParticleSystem.angularQuaternionY = particleSystem.angularQuaternion.y;
-    copyParticleSystem.angularQuaternionZ = particleSystem.angularQuaternion.z;
-    copyParticleSystem.angularQuaternionW = particleSystem.angularQuaternion.w;
-  }
-  copyParticleSystem.initialAngle = particleSystem.initialAngle;
-
-  return copyParticleSystem;
-
-}
-
 // Makes the particles of given particle system smaller on each frame. Greater
 // the coefficient, faster the particles fade away. This can be used for
 // smoke like particle systems to make them dissapear smoothly.
@@ -2339,26 +2227,6 @@ Roygbiv.prototype.stopObjectTrail = function(object){
   var objectTrail = objectTrails[object.name];
   preConditions.checkIfTrue(ROYGBIV.stopObjectTrail, "No trail attached to object.", (!objectTrail));
   objectTrail.stop();
-}
-
-// Creates a particle system pool and fills it with poolSize copies of refParticleSystem.
-Roygbiv.prototype.createInitializedParticleSystemPool = function(poolName, refParticleSystem, poolSize){
-  if (mode == 0){
-    return;
-  }
-  preConditions.checkIfDefined(ROYGBIV.createInitializedParticleSystemPool, preConditions.refParticleSystem, refParticleSystem);
-  preConditions.checkIfParticleSystem(ROYGBIV.createInitializedParticleSystemPool, preConditions.refParticleSystem, refParticleSystem);
-  preConditions.checkIfDefined(ROYGBIV.createInitializedParticleSystemPool, preConditions.poolName, poolName);
-  preConditions.checkIfTrue(ROYGBIV.createInitializedParticleSystemPool, "poolName must be unique.", particleSystemPools[poolName]);
-  preConditions.checkIfDefined(ROYGBIV.createInitializedParticleSystemPool, preConditions.poolSize, poolSize);
-  preConditions.checkIfNumber(ROYGBIV.createInitializedParticleSystemPool, preConditions.poolSize, poolSize);
-  preConditions.checkIfLessThan(ROYGBIV.createInitializedParticleSystemPool, preConditions.poolSize, poolSize, 1);
-  var pool = this.createParticleSystemPool(poolName);
-  this.addParticleSystemToPool(pool, refParticleSystem);
-  for (var i = 0; i<poolSize - 1; i++){
-    this.addParticleSystemToPool(pool, this.copyParticleSystem(refParticleSystem, this.generateParticleSystemName()));
-  }
-  return pool;
 }
 
 // CROSSHAIR FUNCTIONS *********************************************************

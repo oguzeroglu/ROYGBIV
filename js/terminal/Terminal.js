@@ -661,6 +661,14 @@ Terminal.prototype.autocomplete = function(command){
 				}
 				helpString = "[Particle systems]: ";
 			break;
+			case commandDescriptor.PRECONFOGURED_PS_POOL_NAME:
+				for (var poolName in preConfiguredParticleSystemPools){
+					if (poolName.toLowerCase().startsWith(curEntry.toLowerCase())){
+						possibilities.push(poolName);
+					}
+				}
+				helpString = "[Particle system pools]: ";
+			break;
 		}
 
 		//  **********************************************************

@@ -33,6 +33,23 @@ var ParticleSystem = function(copyPS, name, particles, x, y, z, vx, vy, vz, ax, 
   webglCallbackHandler.registerEngineObject(this);
 }
 
+ParticleSystem.prototype.createCopy = function(newParticleSystemName){
+  var copyParticleSystem = new ParticleSystem(this, newParticleSystemName, this.particles, this.x, this.y, this.z, this.vx, this.vy, this.vz, this.ax, this.ay, this.az, this.motionMode, this.updateFunction);
+  copyParticleSystem.lifetime = this.lifetime;
+  copyParticleSystem.angularVelocity = this.angularVelocity;
+  copyParticleSystem.angularAcceleration = this.angularAcceleration;
+  copyParticleSystem.angularMotionRadius = this.angularMotionRadius;
+  if (this.angularQuaternion){
+    copyParticleSystem.angularQuaternionX = this.angularQuaternion.x;
+    copyParticleSystem.angularQuaternionY = this.angularQuaternion.y;
+    copyParticleSystem.angularQuaternionZ = this.angularQuaternion.z;
+    copyParticleSystem.angularQuaternionW = this.angularQuaternion.w;
+  }
+  copyParticleSystem.initialAngle = this.initialAngle;
+  copyParticleSystem.isCollidable = this.isCollidable;
+  return copyParticleSystem;
+}
+
 ParticleSystem.prototype.shouldSendToWorker = function(){
   return this.hasParticleCollision || this.isCollidable;
 }

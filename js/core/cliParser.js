@@ -5126,6 +5126,73 @@ function parse(input){
           terminal.printInfo(Text.OK);
           return true;
         break;
+        case 167: //newParticleSystemPool
+          if (mode != 0){
+            terminal.printInfo(Text.WORKS_ONLY_IN_DESIGN_MODE);
+            return true;
+          }
+          var poolName = splitted[1];
+          var psName = splitted[2];
+          var poolSize = parseInt(splitted[3]);
+          if (preConfiguredParticleSystemPools[poolName]){
+            terminal.printError(Text.NAME_MUST_BE_UNIQUE);
+            return true;
+          }
+          var ps = preConfiguredParticleSystems[psName];
+          if (!ps){
+            terminal.printError(Text.NO_SUCH_PARTICLE_SYSTEM);
+            return true;
+          }
+          if (!(typeof ps.preConfiguredParticleSystemPoolName == UNDEFINED)){
+            terminal.printError(Text.PARTICLE_SYSTEM_BELONGS_TO_ANOTHER_POOL);
+            return true;
+          }
+          if (isNaN(poolSize)){
+            terminal.printError(Text.IS_NOT_A_NUMBER.replace(Text.PARAM1, "poolSize"));
+            return true;
+          }
+          if (poolSize <= 0){
+            terminal.printError(Text.MUST_BE_GREATER_THAN.replace(Text.PARAM1, "poolSize").replace(Text.PARAM2, "0"));
+            return true;
+          }
+          var preConfiguredParticleSystemPool = new PreconfiguredParticleSystemPool(psName, poolName, poolSize);
+          preConfiguredParticleSystemPools[poolName] = preConfiguredParticleSystemPool;
+          ps.preConfiguredParticleSystemPoolName = poolName;
+          terminal.printInfo(Text.PARTICLE_SYSTEM_POOL_CREATED);
+          return true;
+        break;
+        case 168: //destroyParticleSystem
+          if (mode != 0){
+            terminal.printError(Text.WORKS_ONLY_IN_DESIGN_MODE);
+            return true;
+          }
+          var preConfiguredParticleSystem = preConfiguredParticleSystems[splitted[1]];
+          if (!preConfiguredParticleSystem){
+            terminal.printError(Text.NO_SUCH_PARTICLE_SYSTEM);
+            return true;
+          }
+          if (!(typeof preConfiguredParticleSystem.preConfiguredParticleSystemPoolName == UNDEFINED)){
+            terminal.printError(Text.PARTICLE_SYSTEM_USED_IN_A_POOL);
+            return true;
+          }
+          preConfiguredParticleSystem.destroy();
+          terminal.printInfo(Text.PARTICLE_SYSTEM_DESTROYED);
+          return true;
+        break;
+        case 169: //destroyParticleSystemPool
+          if (mode != 0){
+            terminal.printError(Text.WORKS_ONLY_IN_DESIGN_MODE);
+            return true;
+          }
+          var preConfiguredParticleSystemPool = preConfiguredParticleSystemPools[splitted[1]];
+          if (!preConfiguredParticleSystemPool){
+            terminal.printError(Text.NO_SUCH_PARTICLE_SYSTEM_POOL);
+            return true;
+          }
+          preConfiguredParticleSystemPool.destroy();
+          terminal.printInfo(Text.PARTICLE_SYSTEM_POOL_DESTROYED);
+          return true;
+        break;
       }
       return true;
     }catch(err){

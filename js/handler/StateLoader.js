@@ -984,6 +984,12 @@ StateLoader.prototype.load = function(){
       preConfiguredParticleSystems[psName] = new PreconfiguredParticleSystem(curExport.name, curExport.type, curExport.params);
       preConfiguredParticleSystems[psName].setCollidableStatus(curExport.isCollidable);
       preConfiguredParticleSystems[psName].setMaxPSTime(curExport.maxPSTime);
+      preConfiguredParticleSystems[psName].preConfiguredParticleSystemPoolName = curExport.preConfiguredParticleSystemPoolName;
+    }
+    // PRECONFIGURED PARTICLE SYSTEM POOLS *************************
+    for (var poolName in obj.preConfiguredParticleSystemPools){
+      var curExport = obj.preConfiguredParticleSystemPools[poolName];
+      preConfiguredParticleSystemPools[poolName] = new PreconfiguredParticleSystemPool(curExport.psName, curExport.poolName, curExport.poolSize);
     }
     // TEXTS *******************************************************
     // NOT HERE -> SEE: finalize
@@ -2187,6 +2193,7 @@ StateLoader.prototype.resetProject = function(){
   areas = new Object();
   autoInstancedObjects = new Object();
   preConfiguredParticleSystems = new Object();
+  preConfiguredParticleSystemPools = new Object();
   areaBinHandler = new WorldBinHandler(true);
   webglCallbackHandler = new WebGLCallbackHandler();
   threejsRenderMonitoringHandler = new THREEJSRenderMonitoringHandler();

@@ -227,7 +227,7 @@ MeshGenerator.prototype.generateParticleSystemMesh = function(ps, texture, noTar
       }
     });
   }else{
-    ps.material = this.copyPS.material.clone();
+    ps.material = ps.copyPS.material.clone();
     ps.material.uniforms.projectionMatrix = GLOBAL_PROJECTION_UNIFORM;
     ps.material.uniforms.viewMatrix = GLOBAL_VIEW_UNIFORM;
   }

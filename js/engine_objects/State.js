@@ -200,6 +200,11 @@ var State = function(projectName, author){
   // PRECONFIGURED PARTICLE SYSTEMS ********************************
   this.preConfiguredParticleSystems = new Object();
   for (var psName in preConfiguredParticleSystems){
-    this.preConfiguredParticleSystems[psName] = preConfiguredParticleSystems[psName];
+    this.preConfiguredParticleSystems[psName] = preConfiguredParticleSystems[psName].export();
+  }
+  // PRECONFIGURED PARTICLE SYSTEM POOLS ***************************
+  this.preConfiguredParticleSystemPools = new Object();
+  for (var poolName in preConfiguredParticleSystemPools){
+    this.preConfiguredParticleSystemPools[poolName] = preConfiguredParticleSystemPools[poolName].export();
   }
 }

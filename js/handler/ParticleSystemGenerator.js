@@ -2,6 +2,16 @@ var ParticleSystemGenerator = function(){
 
 }
 
+ParticleSystemGenerator.prototype.handleModeSwitch = function(){
+  for (var psName in preConfiguredParticleSystems){
+    preConfiguredParticleSystems[psName].getParticleSystem();
+  }
+  for (var poolName in preConfiguredParticleSystemPools){
+    var pool = preConfiguredParticleSystemPools[poolName];
+    this.generateInitializedParticleSystemPool(pool.poolName, particleSystemPool[pool.refParticleSystemName], pool.poolSize);
+  }
+}
+
 ParticleSystemGenerator.prototype.normalizeVector = function(vector){
   var len = Math.sqrt((vector.x * vector.x) + (vector.y * vector.y) + (vector.z * vector.z));
   vector.x = vector.x / len;
@@ -37,6 +47,33 @@ ParticleSystemGenerator.prototype.applyNoise = function(vec){
   toMultiplyScalar.multiplyScalar(noiseAmount);
   vector3.add(toMultiplyScalar);
   return new THREE.Vector3(vector3.x, vector3.y, vector3.z);
+}
+
+ParticleSystemGenerator.prototype.generateParticleSystemName = function(){
+  var generatedName = (Date.now().toString(36) + Math.random().toString(36).substr(2, 5)).toUpperCase();
+  var nameFound = true;
+  while (nameFound){
+    nameFound = !(typeof particleSystemPool[generatedName] == UNDEFINED);
+    if (nameFound){
+      generatedName = (Date.now().toString(36) + Math.random().toString(36).substr(2, 5)).toUpperCase();
+    }
+  }
+  return generatedName;
+}
+
+ParticleSystemGenerator.prototype.generateInitializedParticleSystemPool = function(poolName, refParticleSystem, poolSize){
+  var pool = this.generateParticleSystemPool(poolName);
+  pool.add(refParticleSystem);
+  for (var i = 0; i<poolSize - 1; i++){
+    pool.add(refParticleSystem.createCopy(this.generateParticleSystemName()));
+  }
+  return pool;
+}
+
+ParticleSystemGenerator.prototype.generateParticleSystemPool = function(poolName){
+  var psPool = new ParticleSystemPool(poolName);
+  particleSystemPools[poolName] = psPool;
+  return psPool;
 }
 
 ParticleSystemGenerator.prototype.generateConfettiExplosion = function(configurations){

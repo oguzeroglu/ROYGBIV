@@ -8,6 +8,10 @@ var PreconfiguredParticleSystem = function(name, type, params){
   this.setMaxPSTime(params.maxPSTime);
 }
 
+PreconfiguredParticleSystem.prototype.destroy = function(){
+  delete preConfiguredParticleSystems[this.name];
+}
+
 PreconfiguredParticleSystem.prototype.export = function(){
   var exportObj = new Object();
   exportObj.name = this.name;
@@ -15,6 +19,7 @@ PreconfiguredParticleSystem.prototype.export = function(){
   exportObj.params = this.params;
   exportObj.isCollidable = this.isCollidable;
   exportObj.maxPSTime = this.maxPSTime;
+  exportObj.preConfiguredParticleSystemPoolName = this.preConfiguredParticleSystemPoolName;
   return exportObj;
 }
 
