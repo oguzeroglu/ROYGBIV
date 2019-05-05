@@ -298,7 +298,7 @@ ParticleSystem.prototype.rewindParticle = function(particle, delay){
   }else{
     selectedGeometry = this.geometry;
   }
-  var val = this.tick + delay;
+  var val = this.tick + delay + particle.originalStartDelay;
   if (selectedGeometry){
     selectedGeometry.attributes.flags2.updateRange.set(sIndex, 1);
     selectedGeometry.attributes.flags2.array[sIndex] = val;
@@ -353,14 +353,8 @@ ParticleSystem.prototype.update = function(){
     return;
   }
   this.tick += (1/60);
-  if (isMobile){
-    if (this.tick > 20){
-      this.tick =  0;
-    }
-  }else{
-    if (this.tick > MAX_PS_TIME){
-      this.tick = 0;
-    }
+  if (this.tick > MAX_PS_TIME){
+    this.start(EMPTY_OBJECT);
   }
   if (!this.psMerger){
     if (this.material){

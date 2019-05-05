@@ -349,6 +349,7 @@ ParticleSystemGenerator.prototype.generateParticle = function(configurations){
   }
   particle.startDelay = startDelay;
   particle.originalStartDelay = startDelay;
+  particle.originalStartDelay = startDelay;
   particle.trailFlag = trailMode;
   particle.useWorldPositionFlag = useWorldPosition;
   particle.gpuVelocity = velocity;

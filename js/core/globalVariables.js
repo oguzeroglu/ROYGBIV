@@ -232,6 +232,7 @@ var MAX_PS_COMPRESS_AMOUNT_4096 = 200;
 var TOTAL_MERGED_COUNT = 0;
 var MAX_TEXTURE_SIZE = 4096;
 var MAX_PS_TIME = 100000;
+var EMPTY_OBJECT = {};
 var crosshairs = new Object();
 var selectedCrosshair;
 var GLOBAL_FOG_UNIFORM = new THREE.Uniform(new THREE.Vector4(-100.0, 0, 0, 0));
