@@ -28,6 +28,7 @@ var RaycasterWorkerBridge = function(){
     if (msg.data.isPerformanceLog){
       console.log("%c                    RAYCASTER WORKER                  ", "background: black; color: lime");
       console.log("%cUpdate time: "+msg.data.updateTime+" ms", "background: black; color: magenta");
+      console.log("%cBinhandler cache hit count: "+msg.data.binHandlerCacheHitCount, "background: black; color: magenta");
     }else if (msg.data.type){
       rayCaster.objectsByWorkerID = new Object();
       rayCaster.idsByObjectNames = new Object();

@@ -18,7 +18,7 @@ var IS_WORKER_CONTEXT = true;
 // CLASS DEFINITION
 var RaycasterWorker = function(){
   this.record = false;
-  this.performanceLogs = {isPerformanceLog: true, updateTime: 0}
+  this.performanceLogs = {isPerformanceLog: true, updateTime: 0, binHandlerCacheHitCount: 0}
   this.reusableVector1 = new THREE.Vector3();
   this.reusableVector2 = new THREE.Vector3();
   this.reusableQuaternion = new THREE.Quaternion();
@@ -228,6 +228,7 @@ RaycasterWorker.prototype.update = function(transferableMessageBody){
   worker.particleCollisionCallbackBuffer.clear();
   if (this.record){
     this.performanceLogs.updateTime = performance.now() - updateStartTime;
+    this.performanceLogs.binHandlerCacheHitCount = rayCaster.binHandler.cacheHitCount;
   }
 }
 
