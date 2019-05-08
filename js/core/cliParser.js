@@ -5239,6 +5239,33 @@ function parse(input){
           }
           return true;
         break;
+        case 172: //workerConfigurations
+          if (mode != 0){
+            terminal.printError(Text.WORKS_ONLY_IN_DESIGN_MODE);
+            return true;
+          }
+          var workerConfigurationsStatus = splitted[1].toLowerCase();
+          if (workerConfigurationsStatus != "show" && workerConfigurationsStatus != "hide"){
+            terminal.printError(Text.STATUS_MUST_BE_ONE_OF);
+            return true;
+          }
+          if (workerConfigurationsStatus == "show"){
+            if (guiHandler.datGuiWorkerStatus){
+              terminal.printError(Text.GUI_IS_ALREADY_VISIBLE);
+              return true;
+            }
+            guiHandler.show(guiHandler.guiTypes.WORKER_STATUS);
+            terminal.printInfo(Text.GUI_OPENED);
+          }else{
+            if (!guiHandler.datGuiWorkerStatus){
+              terminal.printError(Text.GUI_IS_ALREADY_HIDDEN);
+              return true;
+            }
+            guiHandler.hide(guiHandler.guiTypes.WORKER_STATUS);
+            terminal.printInfo(Text.GUI_CLOSED);
+          }
+          return true;
+        break;
       }
       return true;
     }catch(err){

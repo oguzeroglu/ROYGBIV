@@ -172,7 +172,8 @@ var CommandDescriptor = function(){
       1, //destroyParticleSystem
       1, //destroyParticleSystemPool
       0, //printParticleSystems
-      0 //printParticleSystemPools
+      0, //printParticleSystemPools
+      1 //workerConfigurations
   ];
 
   this.commandArgumentsExpectedExplanation = [
@@ -347,7 +348,8 @@ var CommandDescriptor = function(){
     "destroyParticleSystem psName",
     "destroyParticleSystemPool poolName",
     "printParticleSystems",
-    "printParticleSystemPools"
+    "printParticleSystemPools",
+    "workerConfigurations show/hide"
   ];
 
   this.commands = [
@@ -522,7 +524,8 @@ var CommandDescriptor = function(){
     "destroyParticleSystem",
     "destroyParticleSystemPool",
     "printParticleSystems",
-    "printParticleSystemPools"
+    "printParticleSystemPools",
+    "workerConfigurations"
   ];
 
   this.commandInfo = [
@@ -697,7 +700,8 @@ var CommandDescriptor = function(){
     "destroyParticleSystem: Destroys a particle system.",
     "destroyParticleSystemPool: Destroys a particle system pool.",
     "printParticleSystems: Prints created particle systems.",
-    "printParticleSystemPools: Prints created particle system pools."
+    "printParticleSystemPools: Prints created particle system pools.",
+    "workerConfigurations: Shows/hides the GUI for configuring worker availibility."
   ];
 
   this.keyboardInfo = [
@@ -1395,6 +1399,11 @@ var CommandDescriptor = function(){
   this.destroyParticleSystemPool = new Object();
   this.destroyParticleSystemPool.types = [];
   this.destroyParticleSystemPool.types.push(this.PRECONFOGURED_PS_POOL_NAME); // poolName
+
+  // workerConfigurations
+  this.workerConfigurations = new Object();
+  this.workerConfigurations.types = [];
+  this.workerConfigurations.types.push(this.HIDE_SHOW); // show/hide
 };
 
 CommandDescriptor.prototype.test = function(){

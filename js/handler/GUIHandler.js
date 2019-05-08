@@ -146,9 +146,17 @@ var GUIHandler = function(){
       terminal.enable();
     }
   };
+  this.workerStatusParameters = {
+    "Raycaster": "ON",
+    "Physics": "ON",
+    "Done": function(){
+      terminal.clear();
+      parseCommand("workerConfigurations hide");
+    }
+  }
   // GUI TYPES DEFINITION
   this.guiTypes = {
-    FOG: 0, SKYBOX: 1, TEXT: 2, OBJECT: 3, BLOOM: 4, FPS_WEAPON_ALIGNMENT: 5, SHADER_PRECISION: 6, PARTICLE_SYSTEM: 7
+    FOG: 0, SKYBOX: 1, TEXT: 2, OBJECT: 3, BLOOM: 4, FPS_WEAPON_ALIGNMENT: 5, SHADER_PRECISION: 6, PARTICLE_SYSTEM: 7, WORKER_STATUS: 8
   };
 }
 
@@ -549,6 +557,11 @@ GUIHandler.prototype.show = function(guiType){
         this.initializeShaderPrecisionGUI();
       }
     return;
+    case this.guiTypes.WORKER_STATUS:
+      if (!this.datGuiWorkerStatus){
+        this.initializeWorkerStatusGUI();
+      }
+    return;
   }
   throw new Error("Unknown guiType.");
 }
@@ -638,6 +651,12 @@ GUIHandler.prototype.hide = function(guiType){
         this.datGuiPSCreator = 0;
       }
     return;
+    case this.guiTypes.WORKER_STATUS:
+      if (this.datGuiWorkerStatus){
+        this.destroyGUI(this.datGuiWorkerStatus);
+        this.datGuiWorkerStatus = 0;
+      }
+    return;
   }
   throw new Error("Unknown guiType.");
 }
@@ -659,6 +678,26 @@ GUIHandler.prototype.getPrecisionType = function(key){
     return shaderPrecisionHandler.precisionTypes.HIGH;
   }
   throw new Error("Unknown type.");
+}
+
+GUIHandler.prototype.initializeWorkerStatusGUI = function(){
+  if (!guiHandler.onOff){
+    guiHandler.onOff = ["ON", "OFF"];
+  }
+  guiHandler.workerStatusParameters["Raycaster"] = (RAYCASTER_WORKER_ON)? "ON": "OFF";
+  guiHandler.workerStatusParameters["Physics"] = (PHYSICS_WORKER_ON)? "ON": "OFF";
+  guiHandler.datGuiWorkerStatus = new dat.GUI({hideable: false});
+  guiHandler.datGuiWorkerStatus.add(guiHandler.workerStatusParameters, "Raycaster", guiHandler.onOff).onChange(function(val){
+    RAYCASTER_WORKER_ON = (val == "ON");
+    raycasterFactory.refresh();
+    rayCaster = raycasterFactory.get();
+  }).listen();
+  guiHandler.datGuiWorkerStatus.add(guiHandler.workerStatusParameters, "Physics", guiHandler.onOff).onChange(function(val){
+    PHYSICS_WORKER_ON = (val == "ON");
+    physicsFactory.refresh();
+    physicsWorld = physicsFactory.get();
+  }).listen();
+  guiHandler.datGuiWorkerStatus.add(guiHandler.workerStatusParameters, "Done");
 }
 
 GUIHandler.prototype.initializeShaderPrecisionGUI = function(){

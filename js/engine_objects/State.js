@@ -13,6 +13,9 @@ var State = function(projectName, author){
   this.viewportMaxWidth = viewportMaxWidth;
   this.viewportMaxHeight = viewportMaxHeight;
   this.fixedAspect = fixedAspect;
+  // WORKER STATUS ***********************************************
+  this.RAYCASTER_WORKER_ON = RAYCASTER_WORKER_ON;
+  this.PHYSICS_WORKER_ON = PHYSICS_WORKER_ON;
   // PS REF HEIGHT *************************************************
   this.particleSystemRefHeight = particleSystemRefHeight;
   // SHADER PRECISIONS *********************************************

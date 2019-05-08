@@ -6,6 +6,10 @@ var RaycasterFactory = function(){
   this.init();
 }
 
+RaycasterFactory.prototype.refresh = function(){
+  this.get().refresh();
+}
+
 RaycasterFactory.prototype.test = function(){
   var raycasterMethodCount = (Object.keys(RayCaster.prototype).length);
   var raycasterWorkerBridgeMethodCount = (Object.keys(RaycasterWorkerBridge.prototype).length);
@@ -40,8 +44,8 @@ RaycasterFactory.prototype.reset = function(){
   if (WORKERS_SUPPORTED){
     this.raycasterWorkerBridge.worker.terminate();
     this.raycasterWorkerBridge = new RaycasterWorkerBridge();
-    this.raycaster = new RayCaster();
   }
+  this.raycaster = new RayCaster();
 }
 
 RaycasterFactory.prototype.get = function(){

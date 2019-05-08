@@ -24,6 +24,11 @@ StateLoader.prototype.load = function(){
     if (!(typeof obj.fixedAspect == UNDEFINED)){
       fixedAspect = obj.fixedAspect;
     }
+    // WORKER STATUS ***********************************************
+    RAYCASTER_WORKER_ON = (!(typeof obj.RAYCASTER_WORKER_ON == UNDEFINED))? obj.RAYCASTER_WORKER_ON: true;
+    PHYSICS_WORKER_ON = (!(typeof obj.PHYSICS_WORKER_ON == UNDEFINED))? obj.PHYSICS_WORKER_ON: true;
+    rayCaster = raycasterFactory.get();
+    physicsWorld = physicsFactory.get();
     // PS REF HEIGHT ***********************************************
     particleSystemRefHeight = obj.particleSystemRefHeight;
     GLOBAL_PS_REF_HEIGHT_UNIFORM.value = ((renderer.getCurrentViewport().w / screenResolution) / particleSystemRefHeight);
@@ -2270,12 +2275,8 @@ StateLoader.prototype.resetProject = function(){
   }
   skyboxVisible = false;
   croppedGridSystemBuffer = 0;
-
   scriptEditorShowing = false;
-
   physicsSolver = new CANNON.GSSolver();
-  initPhysics();
-
   // PHYSICS DEBUG MODE
   var objectsToRemove = [];
   var children = scene.children;

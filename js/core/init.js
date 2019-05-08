@@ -166,7 +166,6 @@ window.onload = function() {
   }
   renderer.setSize(window.innerWidth, window.innerHeight);
   boundingClientRect = renderer.getBoundingClientRect();
-  initPhysics();
   render();
   windowLoaded = true;
   MAX_VERTEX_UNIFORM_VECTORS = renderer.getMaxVertexUniformVectors();
@@ -191,23 +190,6 @@ window.onload = function() {
     );
   }
 };
-
-function initPhysics(){
- if (physicsWorld.init){
-   physicsWorld.init();
-   return;
- }
- physicsWorld.quatNormalizeSkip = quatNormalizeSkip;
- physicsWorld.quatNormalizeFast = quatNormalizeFast;
- physicsWorld.defaultContactMaterial.contactEquationStiffness = contactEquationStiffness;
- physicsWorld.defaultContactMaterial.contactEquationRelaxation = contactEquationRelaxation;
- physicsWorld.defaultContactMaterial.friction = friction;
- physicsSolver.iterations = physicsIterations;
- physicsSolver.tolerance = physicsTolerance;
- physicsWorld.solver = physicsSolver;
- physicsWorld.gravity.set(0, gravityY, 0);
- physicsWorld.broadphase = new CANNON.SAPBroadphase(physicsWorld);
-}
 
 function processCameraRotationBuffer(){
   camera.rotation.x += cameraRotationBuffer.x;

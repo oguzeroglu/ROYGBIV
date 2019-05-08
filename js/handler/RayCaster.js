@@ -30,8 +30,12 @@ RayCaster.prototype.refresh = function(){
     if (mode == 1 && !addedObject.isIntersectable){
       continue;
     }
+    addedObject.mesh.updateMatrix();
+    addedObject.mesh.updateMatrixWorld();
     if (!addedObject.boundingBoxes){
       addedObject.generateBoundingBoxes();
+    }else{
+      addedObject.updateBoundingBoxes();
     }
     this.binHandler.insert(addedObject.boundingBoxes[0], objName);
   }
@@ -40,8 +44,12 @@ RayCaster.prototype.refresh = function(){
     if (mode == 1 && !objectGroup.isIntersectable){
       continue;
     }
+    objectGroup.mesh.updateMatrix();
+    objectGroup.mesh.updateMatrixWorld();
     if (!objectGroup.boundingBoxes){
       objectGroup.generateBoundingBoxes();
+    }else{
+      objectGroup.updateBoundingBoxes();
     }
     for (var i = 0; i<objectGroup.boundingBoxes.length; i++){
       this.binHandler.insert(objectGroup.boundingBoxes[i], objectGroup.boundingBoxes[i].roygbivObjectName, objName);

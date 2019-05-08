@@ -6,6 +6,42 @@ var PhysicsFactory = function(){
   this.init();
 }
 
+PhysicsFactory.prototype.refresh = function(){
+  this.cannonWorld = new CANNON.World();
+  this.init();
+  var elem = this.get();
+  if (elem instanceof CANNON.World){
+    for (var objName in addedObjects){
+      if (!addedObjects[objName].noMass){
+        elem.add(addedObjects[objName].physicsBody);
+      }
+    }
+    for (var objName in objectGroups){
+      if (!objectGroups[objName].noMass){
+        elem.add(objectGroups[objName].physicsBody);
+      }
+    }
+  }else{
+    elem.refresh();
+  }
+}
+
+PhysicsFactory.prototype.initPhysics = function(){
+  if (this.bridge){
+    this.bridge.init();
+  }
+  this.cannonWorld.quatNormalizeSkip = quatNormalizeSkip;
+  this.cannonWorld.quatNormalizeFast = quatNormalizeFast;
+  this.cannonWorld.defaultContactMaterial.contactEquationStiffness = contactEquationStiffness;
+  this.cannonWorld.defaultContactMaterial.contactEquationRelaxation = contactEquationRelaxation;
+  this.cannonWorld.defaultContactMaterial.friction = friction;
+  this.cannonWorld.iterations = physicsIterations;
+  this.cannonWorld.tolerance = physicsTolerance;
+  this.cannonWorld.solver = physicsSolver;
+  this.cannonWorld.gravity.set(0, gravityY, 0);
+  this.cannonWorld.broadphase = new CANNON.SAPBroadphase(this.cannonWorld);
+}
+
 PhysicsFactory.prototype.init = function(){
   this.cannonWorld.refresh = noop;
   this.cannonWorld.updateObject = noop;
@@ -21,6 +57,7 @@ PhysicsFactory.prototype.init = function(){
   this.cannonWorld.setCollisionListener = noop;
   this.cannonWorld.removeCollisionListener = noop;
   this.cannonWorld.ready = true;
+  this.initPhysics();
 }
 
 PhysicsFactory.prototype.reset = function(){
