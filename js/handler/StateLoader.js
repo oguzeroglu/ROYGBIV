@@ -2202,29 +2202,10 @@ StateLoader.prototype.resetProject = function(){
   objectsWithMouseOutListeners = new Map();
   postProcessiongConfigurationsVisibility = new Object();
   currentMouseOverObjectName = 0;
-  if (!WORKERS_SUPPORTED){
-    rayCaster = new RayCaster();
-    physicsWorld = new CANNON.World();
-    physicsWorld.refresh = noop;
-    physicsWorld.updateObject = noop;
-    physicsWorld.resetObjectVelocity = noop;
-    physicsWorld.setObjectVelocity = noop;
-    physicsWorld.setObjectVelocityX = noop;
-    physicsWorld.setObjectVelocityY = noop;
-    physicsWorld.setObjectVelocityZ = noop;
-    physicsWorld.applyImpulse = noop;
-    physicsWorld.show = noop;
-    physicsWorld.hide = noop;
-    physicsWorld.setMass = noop;
-    physicsWorld.setCollisionListener = noop;
-    physicsWorld.removeCollisionListener = noop;
-    physicsWorld.ready = true;
-  }else{
-    rayCaster.worker.terminate();
-    physicsWorld.worker.terminate();
-    rayCaster = new RaycasterWorkerBridge();
-    physicsWorld = new PhysicsWorkerBridge();
-  }
+  raycasterFactory.reset();
+  physicsFactory.reset();
+  rayCaster = raycasterFactory.get();
+  physicsWorld = physicsFactory.get();
   areaBinHandler.isAreaBinHandler = true;
   anchorGrid = 0;
   areasVisible = true;

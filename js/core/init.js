@@ -3,6 +3,9 @@ window.onload = function() {
   if (!isDeployment){
     terminal = new Terminal();
   }
+  // FACTORIES
+  raycasterFactory = new RaycasterFactory();
+  physicsFactory = new PhysicsFactory();
   // TGA and DDS LOADERS
   tgaLoader = new THREE.TGALoader();
   ddsLoader = new THREE.DDSLoader();
@@ -107,43 +110,11 @@ window.onload = function() {
   areaConfigurationsHandler = new AreaConfigurationsHandler();
 
   // RAYCASTER AND PHYSICS WORLD
-  if (!WORKERS_SUPPORTED){
-    rayCaster = new RayCaster();
-    physicsWorld = new CANNON.World();
-    physicsWorld.refresh = noop;
-    physicsWorld.updateObject = noop;
-    physicsWorld.resetObjectVelocity = noop;
-    physicsWorld.setObjectVelocity = noop;
-    physicsWorld.setObjectVelocityX = noop;
-    physicsWorld.setObjectVelocityY = noop;
-    physicsWorld.setObjectVelocityZ = noop;
-    physicsWorld.applyImpulse = noop;
-    physicsWorld.show = noop;
-    physicsWorld.hide = noop;
-    physicsWorld.setMass = noop;
-    physicsWorld.setCollisionListener = noop;
-    physicsWorld.removeCollisionListener = noop;
-    physicsWorld.ready = true;
-  }else{
-    rayCaster = new RaycasterWorkerBridge();
-    physicsWorld = new PhysicsWorkerBridge();
-  }
+  rayCaster = raycasterFactory.get();
+  physicsWorld = physicsFactory.get();
+
   if (!isDeployment){
-    var raycasterMethodCount = (Object.keys(RayCaster.prototype).length);
-    var raycasterWorkerBridgeMethodCount = (Object.keys(RaycasterWorkerBridge.prototype).length);
-    if (raycasterMethodCount != raycasterWorkerBridgeMethodCount){
-      console.error("[!] Method count mismatch between RayCaster and RaycasterWorkerBridge.");
-    }
-    for (var api in RayCaster.prototype){
-      if (!RaycasterWorkerBridge.prototype[api]){
-        console.error("[!] API: "+api+" is missing in RaycasterWorkerBridge.");
-      }
-    }
-    for (var api in RaycasterWorkerBridge.prototype){
-      if (!RayCaster.prototype[api]){
-        console.error("[!] API: "+api+" is missing in RayCaster.");
-      }
-    }
+    raycasterFactory.test();
   }
 
   // OBJECT PICKER 2D
@@ -642,12 +613,8 @@ function startPerformanceAnalysis(){
   cpuOperationsHandler.startRecording();
   webglCallbackHandler.startRecording();
   threejsRenderMonitoringHandler.startRecording();
-  if (WORKERS_SUPPORTED){
-    physicsWorld.startRecording();
-    rayCaster.startRecording();
-    physicsWorld.worker.postMessage({startRecording: true});
-    rayCaster.worker.postMessage({startRecording: true});
-  }
+  raycasterFactory.startRecording();
+  physicsFactory.startRecording();
 }
 
 function dumpPerformance(){
@@ -661,14 +628,8 @@ function dumpPerformance(){
   webglCallbackHandler.dumpPerformanceLogs();
   console.log("%c                    THREEJS RENDER                    ", "background: black; color: lime");
   threejsRenderMonitoringHandler.dumpPerformanceLogs();
-  if (WORKERS_SUPPORTED){
-    physicsWorld.worker.postMessage({dumpPerformanceLogs: true});
-    rayCaster.worker.postMessage({dumpPerformanceLogs: true});
-    console.log("%c                  PHYSICS WORKER BRIDGE             ", "background: black; color: lime");
-    physicsWorld.dumpPerformanceLogs();
-    console.log("%c                  RAYCASTER WORKER BRIDGE           ", "background: black; color: lime");
-    rayCaster.dumpPerformanceLogs();
-  }
+  raycasterFactory.dumpPerformance();
+  physicsFactory.dumpPerformance();
 }
 
 //******************************************************************

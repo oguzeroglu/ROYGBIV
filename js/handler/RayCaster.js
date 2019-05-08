@@ -7,19 +7,11 @@ var RayCaster = function(){
   this.ready = false;
 }
 
-RayCaster.prototype.onParticleSystemStart = noop;
-RayCaster.prototype.onParticleSystemStop = noop;
-RayCaster.prototype.onParticleSystemHide = noop;
-RayCaster.prototype.issueParticleSystemStatusUpdate = noop;
-
 RayCaster.prototype.onReady = function(){
   this.ready = true;
   if (this.onReadyCallback){
     this.onReadyCallback();
   }
-}
-
-RayCaster.prototype.onAddedTextResize = function(){
 }
 
 RayCaster.prototype.flush = function(){

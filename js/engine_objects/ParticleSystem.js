@@ -433,7 +433,7 @@ ParticleSystem.prototype.update = function(){
   if (this.updateFunction){
     this.updateFunction();
   }
-  if ((!WORKERS_SUPPORTED) || (WORKERS_SUPPORTED && IS_WORKER_CONTEXT)){
+  if (!raycasterFactory.isWorkerActive()){
     if (mode == 1){
       this.particlesWithCollisionCallbacks.forEach(this.particleIterationCollisionFunc);
     }
@@ -453,7 +453,7 @@ ParticleSystem.prototype.update = function(){
       particleSystemPools[this.psPool].notifyPSAvailable(this);
     }
   }
-  if (this.checkForCollisions && this.mesh && this.mesh.visible && ((!WORKERS_SUPPORTED) || (WORKERS_SUPPORTED && IS_WORKER_CONTEXT))){
+  if (this.checkForCollisions && this.mesh && this.mesh.visible && !raycasterFactory.isWorkerActive()){
     if (mode == 1){
       this.handleCollisions();
     }

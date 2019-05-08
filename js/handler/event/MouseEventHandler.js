@@ -43,9 +43,7 @@ MouseEventHandler.prototype.onCliDivClick = function(event){
     for (var textName in addedTexts){
       addedTexts[textName].show();
     }
-    if (WORKERS_SUPPORTED){
-      rayCaster.onShiftPress(false);
-    }
+    raycasterFactory.onShiftPress(false);
   }
 }
 

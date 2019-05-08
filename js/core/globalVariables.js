@@ -363,8 +363,14 @@ var renderOrders = {
   OBJECT_TRAIL: 100
 }
 
+// FACTORIES
+var raycasterFactory;
+var physicsFactory;
+
 // WORKER VARIABLES
 var WORKERS_SUPPORTED = (typeof(Worker) !== UNDEFINED);
+var RAYCASTER_WORKER_ON = true;
+var PHYSICS_WORKER_ON = true;
 if (!WORKERS_SUPPORTED){
   console.warn("[!] Workers are not supported for this browser.");
 }

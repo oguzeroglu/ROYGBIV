@@ -12,6 +12,7 @@ importScripts("../engine_objects/PreconfiguredParticleSystem.js");
 importScripts("../handler/ParticleSystemGenerator.js");
 importScripts("../engine_objects/Particle.js");
 importScripts("../engine_objects/ParticleSystem.js");
+importScripts("../handler/factory/RaycasterFactory.js");
 
 var IS_WORKER_CONTEXT = true;
 
@@ -24,7 +25,7 @@ var RaycasterWorker = function(){
   this.reusableQuaternion = new THREE.Quaternion();
   this.reusableMatrix = new THREE.Matrix4();
   this.reusableArray16 = new Array();
-  this.rayCaster = new RayCaster();
+  this.rayCaster = raycasterFactory.get();
 }
 RaycasterWorker.prototype.refresh = function(state){
   this.transferableMessageBody = {};
@@ -247,11 +248,12 @@ RaycasterWorker.prototype.onParticleCollision = function(particle){
 }
 
 // START
+raycasterFactory = new RaycasterFactory();
 var particleSystemGenerator = new ParticleSystemGenerator();
 var renderer = new Object();
 var camera = new Object();
 var worker = new RaycasterWorker();
-rayCaster = worker.rayCaster;
+rayCaster = raycasterFactory.get();
 var reusableParticleSystemStartConfiguration = {};
 
 self.onmessage = function(msg){

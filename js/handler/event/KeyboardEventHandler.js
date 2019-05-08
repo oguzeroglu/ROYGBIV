@@ -59,9 +59,7 @@ KeyboardEventHandler.prototype.onKeyUp = function(event){
         for (var textName in addedTexts){
           addedTexts[textName].show();
         }
-        if (WORKERS_SUPPORTED){
-          rayCaster.onShiftPress(false);
-        }
+        raycasterFactory.onShiftPress(false);
       }
     break;
   }
@@ -111,9 +109,7 @@ KeyboardEventHandler.prototype.onKeyDown = function(event){
         for (var textName in addedTexts){
           addedTexts[textName].hide();
         }
-        if (WORKERS_SUPPORTED){
-          rayCaster.onShiftPress(true);
-        }
+        raycasterFactory.onShiftPress(true);
       }
     break;
     case 8: //BACKSPACE
