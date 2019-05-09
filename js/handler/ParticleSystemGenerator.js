@@ -117,6 +117,72 @@ ParticleSystemGenerator.prototype.generateParticleSystemPool = function(poolName
   return psPool;
 }
 
+ParticleSystemGenerator.prototype.generateSnow = function(configurations){
+  var name = configurations.name;
+  var position = configurations.position;
+  var particleCount = configurations.particleCount;
+  var sizeX = configurations.sizeX;
+  var sizeZ = configurations.sizeZ;
+  var particleSize = configurations.particleSize;
+  var particleExpireTime = configurations.particleExpireTime;
+  var speed = configurations.speed;
+  var acceleration = configurations.acceleration;
+  var avgStartDelay = configurations.avgStartDelay;
+  var colorName = configurations.colorName;
+  var alpha = configurations.alpha;
+  var textureName = configurations.textureName;
+  var rewindOnCollided = (!(typeof configurations.rewindOnCollided == UNDEFINED))? configurations.rewindOnCollided: false;
+  var normal = (!(typeof configurations.normal == UNDEFINED))? configurations.normal: new THREE.Vector3(0, -1, 0);
+  var randomness = (!(typeof configurations.randomness == UNDEFINED))? configurations.randomness: 0;
+  var alphaVariation = configurations.alphaVariation;
+  var targetColorName = configurations.targetColorName;
+  var colorStep = configurations.colorStep;
+  var rgbFilter = configurations.rgbFilter;
+  var updateFunction = configurations.updateFunction;
+  var collisionTimeOffset = (!(typeof configurations.collisionTimeOffset == UNDEFINED))? configurations.collisionTimeOffset: 0;
+  var particleMaterialConfigurations = new Object();
+  particleMaterialConfigurations.color = colorName;
+  particleMaterialConfigurations.size = particleSize;
+  particleMaterialConfigurations.alpha = alpha;
+  particleMaterialConfigurations.textureName = textureName;
+  particleMaterialConfigurations.rgbFilter = rgbFilter;
+  particleMaterialConfigurations.targetColor = targetColorName;
+  particleMaterialConfigurations.colorStep = colorStep;
+  var particleMaterial = this.generateParticleMaterial(particleMaterialConfigurations);
+  var particleConfigurations = new Object();
+  var particles = [];
+  particleConfigurations.material = particleMaterial;
+  particleConfigurations.lifetime = particleExpireTime;
+  particleConfigurations.respawn = true;
+  particleConfigurations.alphaVariation = alphaVariation;
+  particleConfigurations.velocity = new THREE.Vector3(0, -1 * speed, 0);
+  for (var i = 0; i < particleCount; i++){
+    particleConfigurations.acceleration = new THREE.Vector3(0, -1 * acceleration, 0);
+    particleConfigurations.position = this.boxDistribution(sizeX, 0 ,sizeZ, 2);
+    particleConfigurations.startDelay = avgStartDelay * Math.random();
+    if (randomness != 0){
+      particleConfigurations.acceleration.x = randomness * (Math.random() - 0.5);
+      particleConfigurations.acceleration.z = randomness * (Math.random() - 0.5);
+    }
+    if (rewindOnCollided){
+      particleConfigurations.collisionAction = PARTICLE_REWIND_ON_COLLIDED;
+      particleConfigurations.collisionTimeOffset = collisionTimeOffset;
+    }
+    var particle = this.generateParticle(particleConfigurations);
+    particles.push(particle);
+  }
+  var particleSystemConfigurations = new Object();
+  particleSystemConfigurations.name = name;
+  particleSystemConfigurations.particles = particles;
+  particleSystemConfigurations.position = position;
+  particleSystemConfigurations.lifetime = 0;
+  particleSystemConfigurations.updateFunction = updateFunction;
+  var snow = this.generateParticleSystem(particleSystemConfigurations);
+  var quat = this.computeQuaternionFromVectors(new THREE.Vector3(0, -1, 0), normal);
+  snow.mesh.quaternion.set(quat.x, quat.y, quat.z, quat.w);
+  return snow;
+}
+
 ParticleSystemGenerator.prototype.generateWaterfall = function(configurations){
   var name = configurations.name;
   var position = configurations.position;
@@ -165,6 +231,7 @@ ParticleSystemGenerator.prototype.generateWaterfall = function(configurations){
     }
     if (rewindOnCollided){
       particleConfigurations.collisionAction = PARTICLE_REWIND_ON_COLLIDED;
+      particleConfigurations.collisionTimeOffset = collisionTimeOffset;
     }
     var particle = this.generateParticle(particleConfigurations);
     particles.push(particle);

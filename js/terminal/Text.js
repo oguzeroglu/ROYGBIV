@@ -702,29 +702,6 @@ var Text = function(){
                                            "textureName: The name of texture of laser particles. (optional)\n"+
                                            "rgbFilter: This can be used to eliminate texture background colors. (optional)\n"+
                                            "updateFunction: The update function of the particle system that is executed on each frame render. (optional)";
-    this.ROYGBIV_SCRIPTING_API_CREATESNOW = "Creates a snow or rain like particle system. Particles are initially created on an imaginary rectangle on XZ plane.\nThe normal vector and width/height values of this rectangle are configurable. Configurations are:\n"+
-                                            "name: The unique name of the particle system. (mandatory)\n"+
-                                            "position: The initial position of the particle system. (mandatory)\n"+
-                                            "particleCount: The count of snow particles. (mandatory)\n"+
-                                            "sizeX: The width of the particle system. (mandatory)\n"+
-                                            "sizeZ: The depth of the particle system. (mandatory)\n"+
-                                            "particleSize: The size of snow particles. (mandatory)\n"+
-                                            "particleExpireTime: The maximum expiration time in seconds of particles. (mandatory)\n"+
-                                            "speed: A number representing the speed of snow particles. (mandatory)\n"+
-                                            "acceleration: A number representing the acceleration of snow particles. (mandatory)\n"+
-                                            "avgStartDelay: The average start delay of snow particles. Expected value is greater than zero.(mandatory)\n"+
-                                            "colorName: The name of color of particles. (mandatory)\n"+
-                                            "alpha: The alpha value between [0, 1] of each particle. (mandatory)\n"+
-                                            "textureName: The name of texture of particles. (optional)\n"+
-                                            "rewindOnCollided: If true, the particles that are collided are rewinded. This parameter can be a performance issue if\nweb workers are not supported. (optional)\n"+
-                                            "normal: The normal vector of the snow. Default value is (0, -1, 0). (optional)\n"+
-                                            "randomness: The randomness of snow particles. (optional)\n"+
-                                            "alphaVariation: The alpha variaton of particles. The expected value is between [-1, 0] (optional)\n"+
-                                            "targetColorName: The target color name of trail particles. (optional)\n"+
-                                            "colorStep: A float between [0,1] that represents the variaton of color betwen the initial color and the target color. (optional)\n"+
-                                            "rgbFilter: This can be used to eliminate the background colors of textures. (optional)\n"+
-                                            "updateFunction: The update function of the particle system that is executed on each frame render. (optional)\n"+
-                                            "collisionTimeOffset: This can be used to pre-calculate collisions of particles to prevent visuals errors caused by\nfast particles. (optional)";
     this.ROYGBIV_SCRIPTING_API_GETPARTICLESYSTEMVELOCITYATTIME = "Calcualtes and returns the velocity vector of a particle system at given time. For particles with circular motion, this function returns\nthe angular velocity at given time.";
     this.ROYGBIV_SCRIPTING_API_STOPPARTICLESYSTEM = "Stops the motion of a particle system. This can be useful for smooth after collision effects of particle systems as it lets particles\nto dissapear smoothly. The particle system is killed after stopDuration seconds.If particle systems have collision listener attached,\nthe collision listener needs to be reset when starting the particle system after stopping.";
     this.ROYGBIV_SCRIPTING_API_STARTPARTICLESYSTEM = "Starts a particle system after its creation. Configurations are:\n"+
