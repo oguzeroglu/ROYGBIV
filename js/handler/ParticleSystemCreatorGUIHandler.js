@@ -93,7 +93,7 @@ ParticleSystemCreatorGUIHandler.prototype.update = function(){
 }
 
 ParticleSystemCreatorGUIHandler.prototype.addCommonControllers = function(){
-  this.maxPSTimeController = guiHandler.datGuiPSCreator.add(this.maxPSTimeParam, "Max time").min(1).max(DEFAULT_MAX_PS_TIME).step(1).onChange(function(val){
+  this.maxPSTimeController = guiHandler.datGuiPSCreator.add(this.maxPSTimeParam, "Max time").min(0.001).max(DEFAULT_MAX_PS_TIME).step(0.01).onChange(function(val){
     particleSystemCreatorGUIHandler.preConfiguredParticleSystem.setMaxPSTime(val);
   }).listen();
   this.collidableController = guiHandler.datGuiPSCreator.add(this.collidableParam, "Collidable").onChange(function(val){
