@@ -128,10 +128,10 @@ ParticleSystemGenerator.prototype.generateFireExplosion = function(configuration
   var smokeColorName = (!(typeof configurations.smokeColorName == UNDEFINED))? configurations.smokeColorName: "black";
   var colorStep = configurations.colorStep;
   var alphaVariationCoef = configurations.alphaVariationCoef;
-  var explosionDirection = configurations.explosionDirection;
+  var explosionDirection = (!(typeof configurations.explosionDirection == UNDEFINED))? configurations.explosionDirection: new THREE.Vector3(0, 1, 0);
   var explosionSpeed = configurations.explosionSpeed;
   var lifetime = configurations.lifetime;
-  var accelerationDirection = configurations.accelerationDirection;
+  var accelerationDirection = (!(typeof configurations.accelerationDirection == UNDEFINED))? configurations.accelerationDirection: new THREE.Vector3(0, 1, 0);
   var textureName = configurations.textureName;
   var rgbFilter = configurations.rgbFilter;
   var updateFunction = configurations.updateFunction;
@@ -146,7 +146,7 @@ ParticleSystemGenerator.prototype.generateFireExplosion = function(configuration
   var particleMaterial = this.generateParticleMaterial(particleMaterialConfigurations);
   var particles = [];
   var particleConfigurations = new Object();
-  var defaultNormal = this.vector(0, 1, 0);
+  var defaultNormal = new THREE.Vector3(0, 1, 0);
   var referenceQuaternion = this.computeQuaternionFromVectors(new THREE.Vector3(0, 0, 1), defaultNormal);
   var quaternion = this.computeQuaternionFromVectors(defaultNormal, explosionDirection);
   var quaternionInverse;
@@ -175,7 +175,7 @@ ParticleSystemGenerator.prototype.generateFireExplosion = function(configuration
       REUSABLE_VECTOR_4.applyQuaternion(quaternionInverse);
       REUSABLE_VECTOR_4.applyQuaternion(quaternion2);
       particleConfigurations.velocity = velocity;
-      particleConfigurations.acceleration = this.vector(REUSABLE_VECTOR_4.x, REUSABLE_VECTOR_4.y, REUSABLE_VECTOR_4.z);
+      particleConfigurations.acceleration = new THREE.Vector3(REUSABLE_VECTOR_4.x, REUSABLE_VECTOR_4.y, REUSABLE_VECTOR_4.z);
     }else{
       particleConfigurations.velocity = velocity;
       particleConfigurations.acceleration = acceleration;

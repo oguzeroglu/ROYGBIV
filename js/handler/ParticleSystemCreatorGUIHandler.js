@@ -111,7 +111,7 @@ ParticleSystemCreatorGUIHandler.prototype.addTypeController = function(type){
       particleSystemCreatorGUIHandler.particleSystem = 0;
     }
     guiHandler.hideAll();
-    activeControl = new OrbitControls({maxRadius: 300});
+    activeControl = new OrbitControls({maxRadius: 500, zoomDelta: 5});
     activeControl.onActivated();
     particleSystemCreatorGUIHandler.actionsByTypes[val]();
   }).listen();
@@ -813,7 +813,119 @@ ParticleSystemCreatorGUIHandler.prototype.showMagicCircle = function(prevParams)
 ParticleSystemCreatorGUIHandler.prototype.showFireExplosion = function(prevParams){
   guiHandler.datGuiPSCreator = new dat.GUI({hideable: false});
   particleSystemCreatorGUIHandler.addTypeController("FIRE_EXPLOSION");
+  var fireExplosionParameters = {expireTime: 0, radius: 10, particleSize: 5, particleCount: 100, fireColorName: "#ffffff", smokeColorName: "#000000", colorStep: 0.5, alphaVariationCoef: 0.5, explosionSpeed: 20, lifetime: 3, accelerationDirection: "0,1,0", hasTexture: false, textureName: "", rgbFilter: "r,g,b"};
+  if (prevParams){
+    for (var key in prevParams){
+      fireExplosionParameters[key] = prevParams[key];
+      if (key == "rgbFilter" || key == "accelerationDirection"){
+        fireExplosionParameters[key] = fireExplosionParameters[key].x+","+fireExplosionParameters[key].y+","+fireExplosionParameters[key].z;
+      }
+    }
+  }
+  guiHandler.datGuiPSCreator.add(fireExplosionParameters, "expireTime").min(0).max(50).step(0.1).onFinishChange(function(val){
+    particleSystemCreatorGUIHandler.fireExplosionGeneratorFunc();
+  }).listen();
+  guiHandler.datGuiPSCreator.add(fireExplosionParameters, "radius").min(0.1).max(500).step(0.1).onFinishChange(function(val){
+    particleSystemCreatorGUIHandler.fireExplosionGeneratorFunc();
+  }).listen();
+  guiHandler.datGuiPSCreator.add(fireExplosionParameters, "particleSize").min(0.1).max(20).step(0.01).onFinishChange(function(val){
+    particleSystemCreatorGUIHandler.fireExplosionGeneratorFunc();
+  }).listen();
+  guiHandler.datGuiPSCreator.add(fireExplosionParameters, "particleCount").min(1).max(5000).step(1).onFinishChange(function(val){
+    particleSystemCreatorGUIHandler.fireExplosionGeneratorFunc();
+  }).listen();
+  guiHandler.datGuiPSCreator.addColor(fireExplosionParameters, "fireColorName").onFinishChange(function(val){
+    particleSystemCreatorGUIHandler.fireExplosionGeneratorFunc();
+  }).listen();
+  guiHandler.datGuiPSCreator.addColor(fireExplosionParameters, "smokeColorName").onFinishChange(function(val){
+    particleSystemCreatorGUIHandler.fireExplosionGeneratorFunc();
+  }).listen();
+  guiHandler.datGuiPSCreator.add(fireExplosionParameters, "colorStep").min(0).max(1).step(0.01).onFinishChange(function(val){
+    particleSystemCreatorGUIHandler.fireExplosionGeneratorFunc();
+  }).listen();
+  guiHandler.datGuiPSCreator.add(fireExplosionParameters, "alphaVariationCoef").min(-1000).max(1000).step(0.1).onFinishChange(function(val){
+    particleSystemCreatorGUIHandler.fireExplosionGeneratorFunc();
+  }).listen();
+  guiHandler.datGuiPSCreator.add(fireExplosionParameters, "explosionSpeed").min(0.1).max(1000).step(0.1).onFinishChange(function(val){
+    particleSystemCreatorGUIHandler.fireExplosionGeneratorFunc();
+  }).listen();
+  guiHandler.datGuiPSCreator.add(fireExplosionParameters, "lifetime").min(0).max(50).step(0.1).onFinishChange(function(val){
+    particleSystemCreatorGUIHandler.fireExplosionGeneratorFunc();
+  }).listen();
+  guiHandler.datGuiPSCreator.add(fireExplosionParameters, "accelerationDirection").onFinishChange(function(val){
+    var splitted = val.split(",");
+    if (splitted.length == 3){
+      for (var i = 0; i<3; i++){
+        if (isNaN(splitted[i])){
+          return;
+        }
+      }
+    }
+    particleSystemCreatorGUIHandler.fireExplosionGeneratorFunc();
+  }).listen();
+  particleSystemCreatorGUIHandler.fireExplosionHasTextureController = guiHandler.datGuiPSCreator.add(fireExplosionParameters, "hasTexture").onChange(function(val){
+    if (particleSystemCreatorGUIHandler.usableTextureNames.length == 0){
+      particleSystemCreatorGUIHandler.plasmaParameters["hasTexture"] = false;
+      return;
+    }
+    if (val){
+      guiHandler.enableController(particleSystemCreatorGUIHandler.fireExplosionTextureNameController);
+      guiHandler.enableController(particleSystemCreatorGUIHandler.fireExplosionRGBThresholdController);
+    }else{
+      guiHandler.disableController(particleSystemCreatorGUIHandler.fireExplosionTextureNameController);
+      guiHandler.disableController(particleSystemCreatorGUIHandler.fireExplosionRGBThresholdController);
+    }
+    particleSystemCreatorGUIHandler.fireExplosionGeneratorFunc();
+  }).listen();
+  particleSystemCreatorGUIHandler.fireExplosionTextureNameController = guiHandler.datGuiPSCreator.add(fireExplosionParameters, "textureName", particleSystemCreatorGUIHandler.usableTextureNames).onChange(function(val){
+    particleSystemCreatorGUIHandler.fireExplosionGeneratorFunc();
+  }).listen();
+  particleSystemCreatorGUIHandler.fireExplosionRGBThresholdController = guiHandler.datGuiPSCreator.add(fireExplosionParameters, "rgbFilter").onFinishChange(function(val){
+    var splitted = val.split(",");
+    if (splitted.length == 3){
+      for (var i = 0; i<3; i++){
+        if (isNaN(splitted[i])){
+          return;
+        }
+      }
+    }
+    particleSystemCreatorGUIHandler.fireExplosionGeneratorFunc();
+  }).listen();
+  if (!fireExplosionParameters.hasTexture){
+    guiHandler.disableController(particleSystemCreatorGUIHandler.fireExplosionTextureNameController);
+    guiHandler.disableController(particleSystemCreatorGUIHandler.fireExplosionRGBThresholdController);
+  }
+  if (particleSystemCreatorGUIHandler.usableTextureNames.length == 0){
+    guiHandler.disableController(particleSystemCreatorGUIHandler.fireExplosionHasTextureController);
+  }
+  guiHandler.datGuiPSCreator.add({"Restart": function(){
+    particleSystemCreatorGUIHandler.fireExplosionGeneratorFunc();
+  }}, "Restart");
   particleSystemCreatorGUIHandler.addCommonControllers();
+  particleSystemCreatorGUIHandler.fireExplosionParameters = fireExplosionParameters;
+  particleSystemCreatorGUIHandler.fireExplosionGeneratorFunc = function(){
+    if (particleSystemCreatorGUIHandler.particleSystem){
+      scene.remove(particleSystemCreatorGUIHandler.particleSystem.mesh);
+      particleSystemCreatorGUIHandler.particleSystem = 0;
+    }
+    var params = {name: particleSystemCreatorGUIHandler.psName, position: new THREE.Vector3(0, 0, 0)};
+    for (var key in particleSystemCreatorGUIHandler.fireExplosionParameters){
+      if (key == "rgbFilter" || key == "accelerationDirection"){
+        var splitted = particleSystemCreatorGUIHandler.fireExplosionParameters[key].split(",");
+        params[key] = new THREE.Vector3(parseFloat(splitted[0]), parseFloat(splitted[1]), parseFloat(splitted[2]));
+      }else{
+        params[key] = particleSystemCreatorGUIHandler.fireExplosionParameters[key];
+      }
+    }
+    if (!particleSystemCreatorGUIHandler.fireExplosionParameters.hasTexture || particleSystemCreatorGUIHandler.fireExplosionParameters.textureName == ""){
+      delete params.textureName;
+    }
+    particleSystemCreatorGUIHandler.particleSystem = particleSystemGenerator.generateFireExplosion(params);
+    particleSystemCreatorGUIHandler.particleSystem.mesh.visible = true;
+    scene.add(particleSystemCreatorGUIHandler.particleSystem.mesh);
+    particleSystemCreatorGUIHandler.preConfiguredParticleSystem = new PreconfiguredParticleSystem(particleSystemCreatorGUIHandler.psName, "FIRE_EXPLOSION", params);
+  };
+  particleSystemCreatorGUIHandler.fireExplosionGeneratorFunc();
   particleSystemCreatorGUIHandler.onAfterShown();
 }
 
@@ -853,7 +965,7 @@ ParticleSystemCreatorGUIHandler.prototype.showPlasma = function(prevParams){
   guiHandler.datGuiPSCreator.addColor(plasmaParameters, "color").onFinishChange(function(val){
     particleSystemCreatorGUIHandler.plasmaGeneratorFunc();
   }).listen();
-  guiHandler.plasmaHasTextureController = guiHandler.datGuiPSCreator.add(plasmaParameters, "hasTexture").onChange(function(val){
+  particleSystemCreatorGUIHandler.plasmaHasTextureController = guiHandler.datGuiPSCreator.add(plasmaParameters, "hasTexture").onChange(function(val){
     if (particleSystemCreatorGUIHandler.usableTextureNames.length == 0){
       particleSystemCreatorGUIHandler.plasmaParameters["hasTexture"] = false;
       return;
@@ -886,7 +998,7 @@ ParticleSystemCreatorGUIHandler.prototype.showPlasma = function(prevParams){
     guiHandler.disableController(particleSystemCreatorGUIHandler.plasmaRGBThresholdController);
   }
   if (particleSystemCreatorGUIHandler.usableTextureNames.length == 0){
-    guiHandler.disableController(guiHandler.plasmaHasTextureController);
+    guiHandler.disableController(particleSystemCreatorGUIHandler.plasmaHasTextureController);
   }
   guiHandler.datGuiPSCreator.add({"Restart": function(){
     particleSystemCreatorGUIHandler.plasmaGeneratorFunc();
@@ -1063,7 +1175,7 @@ ParticleSystemCreatorGUIHandler.prototype.commonStartFunctions = function(psName
   this.psName = psName;
   selectionHandler.resetCurrentSelection();
   guiHandler.hideAll();
-  activeControl = new OrbitControls({maxRadius: 300});
+  activeControl = new OrbitControls({maxRadius: 500, zoomDelta: 5});
   activeControl.onActivated();
 }
 
