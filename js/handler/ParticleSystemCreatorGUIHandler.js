@@ -313,7 +313,146 @@ ParticleSystemCreatorGUIHandler.prototype.showConfetti = function(prevParams){
 ParticleSystemCreatorGUIHandler.prototype.showSnow = function(prevParams){
   guiHandler.datGuiPSCreator = new dat.GUI({hideable: false});
   particleSystemCreatorGUIHandler.addTypeController("SNOW");
+  var snowParameters = {
+    particleCount: 100, sizeX: 50, sizeZ: 50, particleSize: 5, particleExpireTime: 10,
+    speed: 200, acceleration: 10, avgStartDelay: 3, colorName: "#ffffff", alpha: 1,
+    hasTexture: false, textureName: "", rgbFilter: "r,g,b", rewindOnCollided: false,
+    collisionTimeOffset: 0, randomness: 5, alphaVariation: 0, hasTargetColor: false,
+    targetColorName: "#ffffff", colorStep: 0
+  };
+  if (prevParams){
+    for (var key in prevParams){
+      snowParameters[key] = prevParams[key];
+      if (key == "rgbFilter"){
+        snowParameters[key] = snowParameters[key].x+","+snowParameters[key].y+","+snowParameters[key].z;
+      }
+    }
+  }
+  guiHandler.datGuiPSCreator.add(snowParameters, "particleCount").min(1).max(5000).step(1).onFinishChange(function(val){
+    particleSystemCreatorGUIHandler.snowGeneratorFunc();
+  }).listen();
+  guiHandler.datGuiPSCreator.add(snowParameters, "sizeX").min(1).max(5000).step(0.1).onFinishChange(function(val){
+    particleSystemCreatorGUIHandler.snowGeneratorFunc();
+  }).listen();
+  guiHandler.datGuiPSCreator.add(snowParameters, "sizeZ").min(1).max(5000).step(0.1).onFinishChange(function(val){
+    particleSystemCreatorGUIHandler.snowGeneratorFunc();
+  }).listen();
+  guiHandler.datGuiPSCreator.add(snowParameters, "particleSize").min(0.1).max(20).step(0.01).onFinishChange(function(val){
+    particleSystemCreatorGUIHandler.snowGeneratorFunc();
+  }).listen();
+  guiHandler.datGuiPSCreator.add(snowParameters, "particleExpireTime").min(0).max(200).step(0.01).onFinishChange(function(val){
+    particleSystemCreatorGUIHandler.snowGeneratorFunc();
+  }).listen();
+  guiHandler.datGuiPSCreator.add(snowParameters, "speed").min(0.1).max(5000).step(0.01).onFinishChange(function(val){
+    particleSystemCreatorGUIHandler.snowGeneratorFunc();
+  }).listen();
+  guiHandler.datGuiPSCreator.add(snowParameters, "acceleration").min(0).max(5000).step(0.01).onFinishChange(function(val){
+    particleSystemCreatorGUIHandler.snowGeneratorFunc();
+  }).listen();
+  guiHandler.datGuiPSCreator.add(snowParameters, "avgStartDelay").min(0).max(100).step(0.1).onFinishChange(function(val){
+    particleSystemCreatorGUIHandler.snowGeneratorFunc();
+  }).listen();
+  guiHandler.datGuiPSCreator.addColor(snowParameters, "colorName").onFinishChange(function(val){
+    particleSystemCreatorGUIHandler.snowGeneratorFunc();
+  }).listen();
+  guiHandler.datGuiPSCreator.add(snowParameters, "alpha").min(0).max(1).step(0.1).onFinishChange(function(val){
+    particleSystemCreatorGUIHandler.snowGeneratorFunc();
+  }).listen();
+  particleSystemCreatorGUIHandler.snowHasTextureController = guiHandler.datGuiPSCreator.add(snowParameters, "hasTexture").onChange(function(val){
+    if (particleSystemCreatorGUIHandler.usableTextureNames.length == 0){
+      particleSystemCreatorGUIHandler.snowParameters.hasTexture = false;
+      return;
+    }
+    if (val){
+      guiHandler.enableController(particleSystemCreatorGUIHandler.snowTextureNameController);
+      guiHandler.enableController(particleSystemCreatorGUIHandler.snowRGBFilterController);
+    }else{
+      guiHandler.disableController(particleSystemCreatorGUIHandler.snowTextureNameController);
+      guiHandler.disableController(particleSystemCreatorGUIHandler.snowRGBFilterController);
+    }
+    particleSystemCreatorGUIHandler.snowGeneratorFunc();
+  }).listen();
+  particleSystemCreatorGUIHandler.snowTextureNameController = guiHandler.datGuiPSCreator.add(snowParameters, "textureName", particleSystemCreatorGUIHandler.usableTextureNames).onChange(function(val){
+    particleSystemCreatorGUIHandler.snowGeneratorFunc();
+  }).listen();
+  particleSystemCreatorGUIHandler.snowRGBFilterController = guiHandler.datGuiPSCreator.add(snowParameters, "rgbFilter").onFinishChange(function(val){
+    var splitted = val.split(",");
+    if (splitted.length == 3){
+      for (var i = 0; i<3; i++){
+        if (isNaN(splitted[i])){
+          return;
+        }
+      }
+    }
+    particleSystemCreatorGUIHandler.snowGeneratorFunc();
+  }).listen();
+  guiHandler.datGuiPSCreator.add(snowParameters, "rewindOnCollided").onChange(function(val){
+    particleSystemCreatorGUIHandler.snowGeneratorFunc();
+  }).listen();
+  guiHandler.datGuiPSCreator.add(snowParameters, "collisionTimeOffset").min(0).max(1000).step(0.1).onFinishChange(function(val){
+    particleSystemCreatorGUIHandler.snowGeneratorFunc();
+  }).listen();
+  guiHandler.datGuiPSCreator.add(snowParameters, "randomness").min(0).max(1000).step(0.1).onFinishChange(function(val){
+    particleSystemCreatorGUIHandler.snowGeneratorFunc();
+  }).listen();
+  guiHandler.datGuiPSCreator.add(snowParameters, "alphaVariation").min(-1).max(0).step(0.01).onFinishChange(function(val){
+    particleSystemCreatorGUIHandler.snowGeneratorFunc();
+  }).listen();
+  guiHandler.datGuiPSCreator.add(snowParameters, "hasTargetColor").onChange(function(val){
+    if (val){
+      guiHandler.enableController(particleSystemCreatorGUIHandler.snowTargetColorController);
+      guiHandler.enableController(particleSystemCreatorGUIHandler.snowColorStepController);
+    }else{
+      guiHandler.disableController(particleSystemCreatorGUIHandler.snowTargetColorController);
+      guiHandler.disableController(particleSystemCreatorGUIHandler.snowColorStepController);
+    }
+    particleSystemCreatorGUIHandler.snowGeneratorFunc();
+  }).listen();
+  particleSystemCreatorGUIHandler.snowTargetColorController = guiHandler.datGuiPSCreator.addColor(snowParameters, "targetColorName").onFinishChange(function(val){
+    particleSystemCreatorGUIHandler.snowGeneratorFunc();
+  }).listen();
+  particleSystemCreatorGUIHandler.snowColorStepController = guiHandler.datGuiPSCreator.add(snowParameters, "colorStep").min(0).max(1).step(0.001).onFinishChange(function(val){
+    particleSystemCreatorGUIHandler.snowGeneratorFunc();
+  }).listen();
   particleSystemCreatorGUIHandler.addCommonControllers();
+  if (!snowParameters.hasTexture){
+    guiHandler.disableController(particleSystemCreatorGUIHandler.snowTextureNameController);
+    guiHandler.disableController(particleSystemCreatorGUIHandler.snowRGBFilterController);
+  }
+  if (particleSystemCreatorGUIHandler.usableTextureNames.length == 0){
+    guiHandler.disableController(particleSystemCreatorGUIHandler.snowHasTextureController);
+  }
+  if (!snowParameters.hasTargetColor){
+    guiHandler.disableController(particleSystemCreatorGUIHandler.snowTargetColorController);
+    guiHandler.disableController(particleSystemCreatorGUIHandler.snowColorStepController);
+  }
+  particleSystemCreatorGUIHandler.snowGeneratorFunc = function(){
+    if (particleSystemCreatorGUIHandler.particleSystem){
+      scene.remove(particleSystemCreatorGUIHandler.particleSystem.mesh);
+      particleSystemCreatorGUIHandler.particleSystem = 0;
+    }
+    var params = {name: particleSystemCreatorGUIHandler.psName, position: new THREE.Vector3(0, 0, 0)};
+    for (var key in particleSystemCreatorGUIHandler.snowParameters){
+      params[key] = particleSystemCreatorGUIHandler.snowParameters[key];
+    }
+    if (!particleSystemCreatorGUIHandler.snowParameters.hasTexture){
+      delete params.textureName;
+      delete params.rgbFilter;
+    }else{
+      var splitted = params.rgbFilter.split(",");
+      params.rgbFilter = new THREE.Vector3(parseFloat(splitted[0]), parseFloat(splitted[1]), parseFloat(splitted[2]));
+    }
+    if (!particleSystemCreatorGUIHandler.snowParameters.hasTargetColor){
+      delete params.targetColorName;
+      delete params.colorStep;
+    }
+    particleSystemCreatorGUIHandler.particleSystem = particleSystemGenerator.generateSnow(params);
+    particleSystemCreatorGUIHandler.particleSystem.mesh.visible = true;
+    scene.add(particleSystemCreatorGUIHandler.particleSystem.mesh);
+    particleSystemCreatorGUIHandler.preConfiguredParticleSystem = new PreconfiguredParticleSystem(particleSystemCreatorGUIHandler.psName, "SNOW", params);
+  }
+  particleSystemCreatorGUIHandler.snowParameters = snowParameters;
+  particleSystemCreatorGUIHandler.snowGeneratorFunc();
   particleSystemCreatorGUIHandler.onAfterShown();
 }
 
