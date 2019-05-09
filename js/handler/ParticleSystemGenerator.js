@@ -28,6 +28,47 @@ ParticleSystemGenerator.prototype.computeQuaternionFromVectors = function(vec1, 
   return REUSABLE_QUATERNION.clone();
 }
 
+ParticleSystemGenerator.prototype.boxDistribution = function(sizeX, sizeY, sizeZ, side){
+  var randomSide = Math.floor(Math.random() * 6) + 1;
+  if (typeof side != UNDEFINED && !isNaN(side) && side <= 6 && side >= 1){
+    randomSide = side;
+  }
+  var x, y, z;
+  var maxX = sizeX / 2, minX = -1 * sizeX / 2;
+  var maxY = sizeY / 2, minY = -1 * sizeY / 2;
+  var maxZ = sizeZ / 2, minZ = -1 * sizeZ / 2;
+  switch (randomSide){
+    case 1:
+      y = sizeY / 2;
+    break;
+    case 2:
+      y = -1 * sizeY / 2;
+    break;
+    case 3:
+      z = sizeZ / 2;
+    break;
+    case 4:
+      z = -1 * sizeZ / 2;
+    break;
+    case 5:
+      x = sizeX / 2;
+    break;
+    case 6:
+      x = -1 * sizeX / 2;
+    break;
+  }
+  if (typeof x == UNDEFINED){
+    x = Math.random () * (maxX - minX) + minX;
+  }
+  if (typeof y == UNDEFINED){
+    y = Math.random () * (maxY - minY) + minY;
+  }
+  if (typeof z == UNDEFINED){
+    z = Math.random () * (maxZ - minZ) + minZ;
+  }
+  return new THREE.Vector3(x, y, z);
+}
+
 ParticleSystemGenerator.prototype.circularDistribution = function(radius, quaternion){
   REUSABLE_VECTOR_3.set(Math.random() - 0.5, Math.random() - 0.5, 0);
   REUSABLE_VECTOR_3.normalize();
@@ -74,6 +115,69 @@ ParticleSystemGenerator.prototype.generateParticleSystemPool = function(poolName
   var psPool = new ParticleSystemPool(poolName);
   particleSystemPools[poolName] = psPool;
   return psPool;
+}
+
+ParticleSystemGenerator.prototype.generateWaterfall = function(configurations){
+  var name = configurations.name;
+  var position = configurations.position;
+  var particleCount = configurations.particleCount;
+  var size = configurations.size;
+  var particleSize = configurations.particleSize;
+  var particleExpireTime = configurations.particleExpireTime;
+  var speed = configurations.speed;
+  var acceleration = configurations.acceleration;
+  var avgStartDelay = configurations.avgStartDelay;
+  var colorName = configurations.colorName;
+  var alpha = configurations.alpha;
+  var textureName = configurations.textureName;
+  var rewindOnCollided = (!(typeof configurations.rewindOnCollided == UNDEFINED))? configurations.rewindOnCollided: false;
+  var normal = (!(typeof configurations.normal == UNDEFINED))? configurations.normal: new THREE.Vector3(0, 0, 1);
+  var randomness = (!(typeof configurations.randomness == UNDEFINED))? configurations.randomness: 0;
+  var alphaVariation = configurations.alphaVariation;
+  var targetColorName = configurations.targetColorName;
+  var colorStep = configurations.colorStep;
+  var rgbFilter = configurations.rgbFilter;
+  var updateFunction = configurations.updateFunction;
+  var collisionTimeOffset = (!(typeof configurations.collisionTimeOffset == UNDEFINED))? configurations.collisionTimeOffset: 0;
+  var particleMaterialConfigurations = new Object();
+  particleMaterialConfigurations.color = colorName;
+  particleMaterialConfigurations.size = particleSize;
+  particleMaterialConfigurations.alpha = alpha;
+  particleMaterialConfigurations.textureName = textureName;
+  particleMaterialConfigurations.rgbFilter = rgbFilter;
+  particleMaterialConfigurations.targetColor = targetColorName;
+  particleMaterialConfigurations.colorStep = colorStep;
+  var particleMaterial = this.generateParticleMaterial(particleMaterialConfigurations);
+  var particleConfigurations = new Object();
+  particleConfigurations.material = particleMaterial;
+  particleConfigurations.lifetime = particleExpireTime;
+  particleConfigurations.respawn = true;
+  particleConfigurations.alphaVariation = alphaVariation;
+  particleConfigurations.velocity = new THREE.Vector3(0, -1 * speed, 0);
+  var particles = [];
+  for (var i = 0; i < particleCount; i++){
+    particleConfigurations.position = this.boxDistribution(size, 0, 0, 3);
+    particleConfigurations.startDelay = avgStartDelay * Math.random();
+    particleConfigurations.acceleration = new THREE.Vector3(0, -1 * acceleration, 0);
+    if (randomness != 0){
+      particleConfigurations.acceleration.z += randomness * (Math.random() - 0.5);
+      particleConfigurations.acceleration.x += randomness * (Math.random() - 0.5);
+    }
+    if (rewindOnCollided){
+      particleConfigurations.collisionAction = PARTICLE_REWIND_ON_COLLIDED;
+    }
+    var particle = this.generateParticle(particleConfigurations);
+    particles.push(particle);
+  }
+  var particleSystemConfigurations = new Object();
+  particleSystemConfigurations.name = name;
+  particleSystemConfigurations.particles = particles;
+  particleSystemConfigurations.position = position;
+  particleSystemConfigurations.lifetime = 0;
+  var waterfall = this.generateParticleSystem(particleSystemConfigurations);
+  var quat = this.computeQuaternionFromVectors(new THREE.Vector3(0, 0, 1), normal);
+  waterfall.mesh.quaternion.set(quat.x, quat.y, quat.z, quat.w);
+  return waterfall;
 }
 
 ParticleSystemGenerator.prototype.generateConfettiExplosion = function(configurations){

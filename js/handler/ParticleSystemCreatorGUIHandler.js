@@ -111,7 +111,7 @@ ParticleSystemCreatorGUIHandler.prototype.addTypeController = function(type){
       particleSystemCreatorGUIHandler.particleSystem = 0;
     }
     guiHandler.hideAll();
-    activeControl = new OrbitControls({});
+    activeControl = new OrbitControls({maxRadius: 300});
     activeControl.onActivated();
     particleSystemCreatorGUIHandler.actionsByTypes[val]();
   }).listen();
@@ -320,7 +320,97 @@ ParticleSystemCreatorGUIHandler.prototype.showSnow = function(prevParams){
 ParticleSystemCreatorGUIHandler.prototype.showWaterfall = function(prevParams){
   guiHandler.datGuiPSCreator = new dat.GUI({hideable: false});
   particleSystemCreatorGUIHandler.addTypeController("WATERFALL");
-  particleSystemCreatorGUIHandler.addCommonControllers();
+  var waterfallParameters = {
+    particleCount: 100, size: 50, particleSize: 5, particleExpireTime: 10, speed: 200,
+    acceleration: 10, avgStartDelay: 1, colorName: "#ffffff", alpha: 1, hasTexture: false,
+    textureName: "", rewindOnCollided: false, randomness: 5, alphaVariation: 0, hasTargetColor: false,
+    targetColorName: "#ffffff", colorStep: 0, rgbFilter: "r,g,b", collisionTimeOffset: 0
+  };
+  guiHandler.datGuiPSCreator.add(waterfallParameters, "particleCount").min(1).max(5000).step(1).onFinishChange(function(val){
+
+  }).listen();
+  guiHandler.datGuiPSCreator.add(waterfallParameters, "size").min(1).max(5000).step(0.1).onFinishChange(function(val){
+
+  }).listen();
+  guiHandler.datGuiPSCreator.add(waterfallParameters, "particleSize").min(0.1).max(20).step(0.01).onFinishChange(function(val){
+
+  }).listen();
+  guiHandler.datGuiPSCreator.add(waterfallParameters, "particleExpireTime").min(0).max(200).step(0.01).onFinishChange(function(val){
+
+  }).listen();
+  guiHandler.datGuiPSCreator.add(waterfallParameters, "speed").min(0.1).max(5000).step(0.01).onFinishChange(function(val){
+
+  }).listen();
+  guiHandler.datGuiPSCreator.add(waterfallParameters, "acceleration").min(0).max(5000).step(0.01).onFinishChange(function(val){
+
+  }).listen();
+  guiHandler.datGuiPSCreator.add(waterfallParameters, "avgStartDelay").min(0).max(100).step(0.1).onFinishChange(function(val){
+
+  }).listen();
+  guiHandler.datGuiPSCreator.addColor(waterfallParameters, "colorName").onFinishChange(function(val){
+
+  }).listen();
+  guiHandler.datGuiPSCreator.add(waterfallParameters, "alpha").min(0).max(1).step(0.1).onFinishChange(function(val){
+
+  }).listen();
+  guiHandler.datGuiPSCreator.add(waterfallParameters, "hasTexture").onFinishChange(function(val){
+
+  }).listen();
+  guiHandler.datGuiPSCreator.add(waterfallParameters, "textureName", particleSystemCreatorGUIHandler.usableTextureNames).onChange(function(val){
+
+  }).listen();
+  guiHandler.datGuiPSCreator.add(waterfallParameters, "rgbFilter").onFinishChange(function(val){
+
+  }).listen();
+  guiHandler.datGuiPSCreator.add(waterfallParameters, "rewindOnCollided").onChange(function(val){
+
+  }).listen();
+  guiHandler.datGuiPSCreator.add(waterfallParameters, "collisionTimeOffset").min(0).max(1000).step(0.1).onFinishChange(function(val){
+
+  }).listen();
+  guiHandler.datGuiPSCreator.add(waterfallParameters, "randomness").min(0).max(1000).step(0.1).onFinishChange(function(val){
+
+  }).listen();
+  guiHandler.datGuiPSCreator.add(waterfallParameters, "alphaVariation").min(-1).max(0).step(0.01).onFinishChange(function(val){
+
+  }).listen();
+  guiHandler.datGuiPSCreator.add(waterfallParameters, "hasTargetColor").onChange(function(val){
+
+  }).listen();
+  guiHandler.datGuiPSCreator.addColor(waterfallParameters, "targetColorName").onFinishChange(function(val){
+
+  }).listen();
+  guiHandler.datGuiPSCreator.add(waterfallParameters, "colorStep").min(0).max(1).step(0.001).onFinishChange(function(val){
+
+  }).listen();
+  guiHandler.datGuiPSCreator.add({"Restart": function(){
+    particleSystemCreatorGUIHandler.waterfallGeneratorFunc();
+  }}, "Restart");
+  particleSystemCreatorGUIHandler.addCommonControllers
+  particleSystemCreatorGUIHandler.waterfallGeneratorFunc = function(){
+    if (particleSystemCreatorGUIHandler.particleSystem){
+      scene.remove(particleSystemCreatorGUIHandler.particleSystem.mesh);
+      particleSystemCreatorGUIHandler.particleSystem = 0;
+    }
+    var params = {name: particleSystemCreatorGUIHandler.psName, position: new THREE.Vector3(0, 0, 0)};
+    for (var key in particleSystemCreatorGUIHandler.waterfallParameters){
+      params[key] = particleSystemCreatorGUIHandler.waterfallParameters[key];
+    }
+    if (!particleSystemCreatorGUIHandler.waterfallParameters.hasTexture){
+      delete params.textureName;
+      delete params.rgbFilter;
+    }
+    if (!particleSystemCreatorGUIHandler.waterfallParameters.hasTargetColor){
+      delete params.targetColorName;
+      delete params.colorStep;
+    }
+    particleSystemCreatorGUIHandler.particleSystem = particleSystemGenerator.generateWaterfall(params);
+    particleSystemCreatorGUIHandler.particleSystem.mesh.visible = true;
+    scene.add(particleSystemCreatorGUIHandler.particleSystem.mesh);
+    particleSystemCreatorGUIHandler.preConfiguredParticleSystem = new PreconfiguredParticleSystem(particleSystemCreatorGUIHandler.psName, "WATERFALL", params);
+  }
+  particleSystemCreatorGUIHandler.waterfallParameters = waterfallParameters;
+  particleSystemCreatorGUIHandler.waterfallGeneratorFunc();
   particleSystemCreatorGUIHandler.onAfterShown();
 }
 
@@ -786,7 +876,7 @@ ParticleSystemCreatorGUIHandler.prototype.commonStartFunctions = function(psName
   this.psName = psName;
   selectionHandler.resetCurrentSelection();
   guiHandler.hideAll();
-  activeControl = new OrbitControls({});
+  activeControl = new OrbitControls({maxRadius: 300});
   activeControl.onActivated();
 }
 

@@ -702,29 +702,6 @@ var Text = function(){
                                            "textureName: The name of texture of laser particles. (optional)\n"+
                                            "rgbFilter: This can be used to eliminate texture background colors. (optional)\n"+
                                            "updateFunction: The update function of the particle system that is executed on each frame render. (optional)";
-   this.ROYGBIV_SCRIPTING_API_CREATEWATERFALL = "Creates a waterfall like particle system. This function initially puts the particles on an imaginary line on the X axis.\nSize and normal of this line are configurable. Configurations are:\n"+
-                                                "name: The unique name of the particle system. (mandatory)\n"+
-                                                "position: The initial position of the particle system. (mandatory)\n"+
-                                                "particleCount: The count of waterfall particles. (mandatory)\n"+
-                                                "size: The size of the waterfall. (mandatory)\n"+
-                                                "particleSize: The size of waterfall particles. (mandatory)\n"+
-                                                "particleExpireTime: The maximum expiration time in seconds of particles. (mandatory)\n"+
-                                                "speed: A number representing the speed of waterfall particles. (mandatory)\n"+
-                                                "acceleration: A number representing the acceleration of waterfall particles. (mandatory)\n"+
-                                                "avgStartDelay: The average start delay of waterfall particles. Expected value is greater than zero.(mandatory)\n"+
-                                                "colorName: The name of color of particles. (mandatory)\n"+
-                                                "alpha: The alpha value between [0, 1] of each particle. (mandatory)\n"+
-                                                "textureName: The name of texture of particles. (optional)\n"+
-                                                "rewindOnCollided: If true, the particles that are collided are rewinded. This parameter can be a performance issue if\nnweb workers are not supported. (optional)\n"+
-                                                "normal: The normal vector of the waterfall. Default value is (0, 0, 1). (optional)\n"+
-                                                "randomness: The randomness of waterfall particles. (optional)\n"+
-                                                "alphaVariation: The alpha variaton of particles. The expected value is between [-1, 0] (optional)\n"+
-                                                "targetColorName: The target color name of trail particles. (optional)\n"+
-                                                "colorStep: A float between [0,1] that represents the variaton of color betwen the initial color and the target color. (optional)\n"+
-                                                "rgbFilter: This can be used to eliminate the background colors of textures. (optional)\n"+
-                                                "updateFunction: The update function of the particle system that is executed on each frame render. (optional)\n"+
-                                                "collisionTimeOffset: This can be used to pre-calculate collisions of particles to prevent visuals errors caused by\nfast particles. (optional)";
-
     this.ROYGBIV_SCRIPTING_API_CREATESNOW = "Creates a snow or rain like particle system. Particles are initially created on an imaginary rectangle on XZ plane.\nThe normal vector and width/height values of this rectangle are configurable. Configurations are:\n"+
                                             "name: The unique name of the particle system. (mandatory)\n"+
                                             "position: The initial position of the particle system. (mandatory)\n"+
