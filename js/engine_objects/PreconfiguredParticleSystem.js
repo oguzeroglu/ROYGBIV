@@ -30,6 +30,7 @@ PreconfiguredParticleSystem.prototype.getParticleSystem = function(){
     case "PLASMA": ps = particleSystemGenerator.generatePlasma(this.params); break;
     case "SMOKE": ps = particleSystemGenerator.generateSmoke(this.params); break;
     case "CONFETTI": ps = particleSystemGenerator.generateConfettiExplosion(this.params); break;
+    case "WATERFALL": ps = particleSystemGenerator.generateWaterfall(this.params); break;
   }
   if (ps){
     ps.isCollidable = this.isCollidable;

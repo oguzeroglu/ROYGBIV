@@ -326,67 +326,112 @@ ParticleSystemCreatorGUIHandler.prototype.showWaterfall = function(prevParams){
     textureName: "", rewindOnCollided: false, randomness: 5, alphaVariation: 0, hasTargetColor: false,
     targetColorName: "#ffffff", colorStep: 0, rgbFilter: "r,g,b", collisionTimeOffset: 0
   };
+  if (prevParams){
+    for (var key in prevParams){
+      waterfallParameters[key] = prevParams[key];
+      if (key == "rgbFilter"){
+        waterfallParameters[key] = waterfallParameters[key].x+","+waterfallParameters[key].y+","+waterfallParameters[key].z;
+      }
+    }
+  }
   guiHandler.datGuiPSCreator.add(waterfallParameters, "particleCount").min(1).max(5000).step(1).onFinishChange(function(val){
-
+    particleSystemCreatorGUIHandler.waterfallGeneratorFunc();
   }).listen();
   guiHandler.datGuiPSCreator.add(waterfallParameters, "size").min(1).max(5000).step(0.1).onFinishChange(function(val){
-
+    particleSystemCreatorGUIHandler.waterfallGeneratorFunc();
   }).listen();
   guiHandler.datGuiPSCreator.add(waterfallParameters, "particleSize").min(0.1).max(20).step(0.01).onFinishChange(function(val){
-
+    particleSystemCreatorGUIHandler.waterfallGeneratorFunc();
   }).listen();
   guiHandler.datGuiPSCreator.add(waterfallParameters, "particleExpireTime").min(0).max(200).step(0.01).onFinishChange(function(val){
-
+    particleSystemCreatorGUIHandler.waterfallGeneratorFunc();
   }).listen();
   guiHandler.datGuiPSCreator.add(waterfallParameters, "speed").min(0.1).max(5000).step(0.01).onFinishChange(function(val){
-
+    particleSystemCreatorGUIHandler.waterfallGeneratorFunc();
   }).listen();
   guiHandler.datGuiPSCreator.add(waterfallParameters, "acceleration").min(0).max(5000).step(0.01).onFinishChange(function(val){
-
+    particleSystemCreatorGUIHandler.waterfallGeneratorFunc();
   }).listen();
   guiHandler.datGuiPSCreator.add(waterfallParameters, "avgStartDelay").min(0).max(100).step(0.1).onFinishChange(function(val){
-
+    particleSystemCreatorGUIHandler.waterfallGeneratorFunc();
   }).listen();
   guiHandler.datGuiPSCreator.addColor(waterfallParameters, "colorName").onFinishChange(function(val){
-
+    particleSystemCreatorGUIHandler.waterfallGeneratorFunc();
   }).listen();
   guiHandler.datGuiPSCreator.add(waterfallParameters, "alpha").min(0).max(1).step(0.1).onFinishChange(function(val){
-
+    particleSystemCreatorGUIHandler.waterfallGeneratorFunc();
   }).listen();
-  guiHandler.datGuiPSCreator.add(waterfallParameters, "hasTexture").onFinishChange(function(val){
-
+  particleSystemCreatorGUIHandler.waterfallHasTextureController = guiHandler.datGuiPSCreator.add(waterfallParameters, "hasTexture").onFinishChange(function(val){
+    if (particleSystemCreatorGUIHandler.usableTextureNames.length == 0){
+      particleSystemCreatorGUIHandler.waterfallParameters.hasTexture = false;
+      return;
+    }
+    if (val){
+      guiHandler.enableController(particleSystemCreatorGUIHandler.waterfallTextureNameController);
+      guiHandler.enableController(particleSystemCreatorGUIHandler.waterfallRGBFilterController);
+    }else{
+      guiHandler.disableController(particleSystemCreatorGUIHandler.waterfallTextureNameController);
+      guiHandler.disableController(particleSystemCreatorGUIHandler.waterfallRGBFilterController);
+    }
+    particleSystemCreatorGUIHandler.waterfallGeneratorFunc();
   }).listen();
-  guiHandler.datGuiPSCreator.add(waterfallParameters, "textureName", particleSystemCreatorGUIHandler.usableTextureNames).onChange(function(val){
-
+  particleSystemCreatorGUIHandler.waterfallTextureNameController = guiHandler.datGuiPSCreator.add(waterfallParameters, "textureName", particleSystemCreatorGUIHandler.usableTextureNames).onChange(function(val){
+    particleSystemCreatorGUIHandler.waterfallGeneratorFunc();
   }).listen();
-  guiHandler.datGuiPSCreator.add(waterfallParameters, "rgbFilter").onFinishChange(function(val){
-
+  particleSystemCreatorGUIHandler.waterfallRGBFilterController = guiHandler.datGuiPSCreator.add(waterfallParameters, "rgbFilter").onFinishChange(function(val){
+    var splitted = val.split(",");
+    if (splitted.length == 3){
+      for (var i = 0; i<3; i++){
+        if (isNaN(splitted[i])){
+          return;
+        }
+      }
+    }
+    particleSystemCreatorGUIHandler.waterfallGeneratorFunc();
   }).listen();
   guiHandler.datGuiPSCreator.add(waterfallParameters, "rewindOnCollided").onChange(function(val){
-
+    particleSystemCreatorGUIHandler.waterfallGeneratorFunc();
   }).listen();
   guiHandler.datGuiPSCreator.add(waterfallParameters, "collisionTimeOffset").min(0).max(1000).step(0.1).onFinishChange(function(val){
-
+    particleSystemCreatorGUIHandler.waterfallGeneratorFunc();
   }).listen();
   guiHandler.datGuiPSCreator.add(waterfallParameters, "randomness").min(0).max(1000).step(0.1).onFinishChange(function(val){
-
+    particleSystemCreatorGUIHandler.waterfallGeneratorFunc();
   }).listen();
   guiHandler.datGuiPSCreator.add(waterfallParameters, "alphaVariation").min(-1).max(0).step(0.01).onFinishChange(function(val){
-
+    particleSystemCreatorGUIHandler.waterfallGeneratorFunc();
   }).listen();
   guiHandler.datGuiPSCreator.add(waterfallParameters, "hasTargetColor").onChange(function(val){
-
+    if (val){
+      guiHandler.enableController(particleSystemCreatorGUIHandler.waterfallTargetColorController);
+      guiHandler.enableController(particleSystemCreatorGUIHandler.waterfallColorStepController);
+    }else{
+      guiHandler.disableController(particleSystemCreatorGUIHandler.waterfallTargetColorController);
+      guiHandler.disableController(particleSystemCreatorGUIHandler.waterfallColorStepController);
+    }
+    particleSystemCreatorGUIHandler.waterfallGeneratorFunc();
   }).listen();
-  guiHandler.datGuiPSCreator.addColor(waterfallParameters, "targetColorName").onFinishChange(function(val){
-
+  particleSystemCreatorGUIHandler.waterfallTargetColorController = guiHandler.datGuiPSCreator.addColor(waterfallParameters, "targetColorName").onFinishChange(function(val){
+    particleSystemCreatorGUIHandler.waterfallGeneratorFunc();
   }).listen();
-  guiHandler.datGuiPSCreator.add(waterfallParameters, "colorStep").min(0).max(1).step(0.001).onFinishChange(function(val){
-
+  particleSystemCreatorGUIHandler.waterfallColorStepController = guiHandler.datGuiPSCreator.add(waterfallParameters, "colorStep").min(0).max(1).step(0.001).onFinishChange(function(val){
+    particleSystemCreatorGUIHandler.waterfallGeneratorFunc();
   }).listen();
   guiHandler.datGuiPSCreator.add({"Restart": function(){
     particleSystemCreatorGUIHandler.waterfallGeneratorFunc();
   }}, "Restart");
-  particleSystemCreatorGUIHandler.addCommonControllers
+  particleSystemCreatorGUIHandler.addCommonControllers();
+  if (!waterfallParameters.hasTexture){
+    guiHandler.disableController(particleSystemCreatorGUIHandler.waterfallTextureNameController);
+    guiHandler.disableController(particleSystemCreatorGUIHandler.waterfallRGBFilterController);
+  }
+  if (particleSystemCreatorGUIHandler.usableTextureNames.length == 0){
+    guiHandler.disableController(particleSystemCreatorGUIHandler.waterfallHasTextureController);
+  }
+  if (!waterfallParameters.hasTargetColor){
+    guiHandler.disableController(particleSystemCreatorGUIHandler.waterfallTargetColorController);
+    guiHandler.disableController(particleSystemCreatorGUIHandler.waterfallColorStepController);
+  }
   particleSystemCreatorGUIHandler.waterfallGeneratorFunc = function(){
     if (particleSystemCreatorGUIHandler.particleSystem){
       scene.remove(particleSystemCreatorGUIHandler.particleSystem.mesh);
@@ -399,6 +444,9 @@ ParticleSystemCreatorGUIHandler.prototype.showWaterfall = function(prevParams){
     if (!particleSystemCreatorGUIHandler.waterfallParameters.hasTexture){
       delete params.textureName;
       delete params.rgbFilter;
+    }else{
+      var splitted = params.rgbFilter.split(",");
+      params.rgbFilter = new THREE.Vector3(parseFloat(splitted[0]), parseFloat(splitted[1]), parseFloat(splitted[2]));
     }
     if (!particleSystemCreatorGUIHandler.waterfallParameters.hasTargetColor){
       delete params.targetColorName;
