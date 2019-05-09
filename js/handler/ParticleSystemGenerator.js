@@ -117,6 +117,80 @@ ParticleSystemGenerator.prototype.generateParticleSystemPool = function(poolName
   return psPool;
 }
 
+ParticleSystemGenerator.prototype.generateFireExplosion = function(configurations){
+  var position = configurations.position;
+  var expireTime = configurations.expireTime;
+  var name = configurations.name;
+  var radius = configurations.radius;
+  var particleSize = configurations.particleSize;
+  var particleCount = configurations.particleCount;
+  var fireColorName = (!(typeof configurations.fireColorName == UNDEFINED))? configurations.fireColorName: "white";
+  var smokeColorName = (!(typeof configurations.smokeColorName == UNDEFINED))? configurations.smokeColorName: "black";
+  var colorStep = configurations.colorStep;
+  var alphaVariationCoef = configurations.alphaVariationCoef;
+  var explosionDirection = configurations.explosionDirection;
+  var explosionSpeed = configurations.explosionSpeed;
+  var lifetime = configurations.lifetime;
+  var accelerationDirection = configurations.accelerationDirection;
+  var textureName = configurations.textureName;
+  var rgbFilter = configurations.rgbFilter;
+  var updateFunction = configurations.updateFunction;
+  var particleMaterialConfigurations = new Object();
+  particleMaterialConfigurations.color = fireColorName;
+  particleMaterialConfigurations.size = particleSize;
+  particleMaterialConfigurations.alpha = 0;
+  particleMaterialConfigurations.targetColor = smokeColorName;
+  particleMaterialConfigurations.colorStep = colorStep;
+  particleMaterialConfigurations.textureName = textureName;
+  particleMaterialConfigurations.rgbFilter = rgbFilter;
+  var particleMaterial = this.generateParticleMaterial(particleMaterialConfigurations);
+  var particles = [];
+  var particleConfigurations = new Object();
+  var defaultNormal = this.vector(0, 1, 0);
+  var referenceQuaternion = this.computeQuaternionFromVectors(new THREE.Vector3(0, 0, 1), defaultNormal);
+  var quaternion = this.computeQuaternionFromVectors(defaultNormal, explosionDirection);
+  var quaternionInverse;
+  var quaternion2;
+  if (accelerationDirection){
+    quaternion2 = this.computeQuaternionFromVectors(defaultNormal, accelerationDirection);
+    quaternionInverse = quaternion.clone().inverse();
+  }
+  particleConfigurations.material = particleMaterial;
+  particleConfigurations.respawn = true;
+  particleConfigurations.alphaVariation = alphaVariationCoef;
+  particleConfigurations.alphaVariationMode = ALPHA_VARIATION_MODE_SIN;
+  for (var i = 0; i < particleCount; i++){
+    particleConfigurations.position = this.applyNoise(this.circularDistribution(radius));
+    particleConfigurations.lifetime = lifetime * Math.random();
+    particleConfigurations.startDelay = (Math.random() / 5);
+    var particle = this.generateParticle(particleConfigurations);
+    particles.push(particle);
+    var x = explosionSpeed * (Math.random() - 0.5);
+    var y = (explosionSpeed / 2) * Math.random();
+    var z = explosionSpeed * (Math.random() - 0.5);
+    var velocity = new THREE.Vector3(x, y, z);
+    var acceleration = new THREE.Vector3((-1 * x / 1.5), (Math.random() * explosionSpeed), (-1 * z / 1.5));
+    if (accelerationDirection){
+      REUSABLE_VECTOR_4.set(acceleration.x, acceleration.y, acceleration.z);
+      REUSABLE_VECTOR_4.applyQuaternion(quaternionInverse);
+      REUSABLE_VECTOR_4.applyQuaternion(quaternion2);
+      particleConfigurations.velocity = velocity;
+      particleConfigurations.acceleration = this.vector(REUSABLE_VECTOR_4.x, REUSABLE_VECTOR_4.y, REUSABLE_VECTOR_4.z);
+    }else{
+      particleConfigurations.velocity = velocity;
+      particleConfigurations.acceleration = acceleration;
+    }
+  }
+  var particleSystemConfigurations = new Object();
+  particleSystemConfigurations.name = name;
+  particleSystemConfigurations.position = position;
+  particleSystemConfigurations.particles = particles;
+  particleSystemConfigurations.lifetime = expireTime;
+  var explosion = this.generateParticleSystem(particleSystemConfigurations);
+  explosion.mesh.applyQuaternion(quaternion);
+  return explosion;
+}
+
 ParticleSystemGenerator.prototype.generateSnow = function(configurations){
   var name = configurations.name;
   var position = configurations.position;

@@ -626,24 +626,6 @@ var Text = function(){
   this.ROYGBIV_SCRIPTING_API_COMPUTEQUATERNIONFROMVECTORS = "Returns the quaternion between two vectors.";
   this.ROYGBIV_SCRIPTING_API_CIRCULARDISTRIBUTION = "Returns a random point sampled around an imaginary circle with given radius and given quaternion in 3D space.\nIf no quaternion is specified the circle is sampled on the XY plane.";
   this.ROYGBIV_SCRIPTING_API_MULTIPLYSCALAR = "Multiplies a vector by a scalar.";
-  this.ROYGBIV_SCRIPTING_API_CREATEFIREEXPLOSION = "Returns a fire explosion particle system. The configurations are:\n"+
-                                                   "position: The initial position of the particle system. (mandatory)\n"+
-                                                   "expireTime: The maximum lifetime of the particle system in seconds. This can be set to 0 for infinite particle systems. (mandatory)\n"+
-                                                   "name: The unique name of the particle system. (mandatory)\n"+
-                                                   "radius: The radius of the explosion. (mandatory)\n"+
-                                                   "particleSize: The size of each explosion particles. (mandatory)\n"+
-                                                   "particleCount: Count of explosion particles. (mandatory)\n"+
-                                                   "fireColorName: The fire color name of the explosion. Default value is white. (optional)\n"+
-                                                   "smokeColorName: The smoke color name of the explosion. Default value is black. (optional)\n"+
-                                                   "colorStep: The variaton of color between the fire color and the smoke color on each frame. The value is expected to be\nbetween [0, 1]. (mandatory)\n"+
-                                                   "alphaVariationCoef: The alpha variation coefficient of the particle system. The alpha value of the explosion particles vary\nby sin(alphaVariationCoef * time) on each frame. (mandatory)\n"+
-                                                   "explosionDirection: The direction vector of the explosion. (mandatory)\n"+
-                                                   "explosionSpeed: The speed coefficient of explosion. (mandatory)\n"+
-                                                   "lifetime: The average lifetime of the explosion particles. (mandatory)\n"+
-                                                   "accelerationDirection: The direction vector of acceleration. If set, the explosion is accelerated along this vector\ninstead of the explosionDirection. This can be used to achieve realistic smoke movement for explosions on inclined surfaces\nor to simulate winds. (optional)\n"+
-                                                   "textureName: Name of the explosion fire texture. (optional)\n"+
-                                                   "rgbFilter: This can be used to eliminate texture background colors. (optional)\n"+
-                                                   "updateFunction: The update function of the particle system that will be executed on each frame render. (optional)";
   this.ROYGBIV_SCRIPTING_API_CREATECIRCULAREXPLOSION = "Creates a circular explosion effect. The configurations are:\n"+
                                                        "name: The unique name of the particle system. (mandatory)\n"+
                                                        "particleCount: The count of particles. (mandatory)\n"+
