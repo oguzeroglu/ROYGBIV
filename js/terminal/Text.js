@@ -602,66 +602,12 @@ var Text = function(){
   this.ROYGBIV_SCRIPTING_API_SETPARTICLESYSTEMROTATION = "Sets the rotation of a particle system around given axis.";
   this.ROYGBIV_SCRIPTING_API_SETPARTICLESYSTEMQUATERNION = "Sets the quaternion of given particle system.";
   this.ROYGBIV_SCRIPTING_API_GETMARKEDPOSITION = "Returns (x,y,z) coordinates of a point marked using the mark command.";
-  this.ROYGBIV_SCRIPTING_API_CREATETRAIL = "Creates a trail particle system. The configurations are:\n"+
-                                           "name: The unique name of the particle system. (mandatory)\n"+
-                                           "position: The initial position of the particle system. (mandatory)\n"+
-                                           "expireTime: The maximum lifetime of the particle system in seconds. This can be set to 0 for infinite particle systems. (mandatory)\n"+
-                                           "particleCount: The count of particles in the particle system. (mandatory)\n"+
-                                           "velocity: The velocity of the particle system. (mandatory)\n"+
-                                           "acceleration: The acceleration of the particle system. (mandatory)\n"+
-                                           "lifetime: The average lifetime of the particles. This can be set to zero for infinite particles (mandatory)\n"+
-                                           "alphaVariation: The average variation of alpha of particles on each frame. Expected value is between [-1,0] (mandatory)\n"+
-                                           "startDelay: The average start delay of particles. (mandatory)\n"+
-                                           "colorName: The HTML color name of particles. (mandatory)\n"+
-                                           "particleSize: The size of each particle. (mandatory)\n"+
-                                           "size: The size of the particle system. (mandatory)\n"+
-                                           "textureName: Name of the texture mapped to particles. (optional)\n"+
-                                           "rgbFilter: This can be used to eliminate texture background colors. (optional)\n"+
-                                           "targetColor: Target color name of the particle. If set, the color of the particle changes between the color\nand the targetColor by colorStep in each frame render. (optional)\n"+
-                                           "colorStep: A float between [0,1] that represents the variation of color between the color and the targetColor. (optional)\n"+
-                                           "updateFunction: The update function of the particle system that is executed on each frame render. (optional)";
   this.ROYGBIV_SCRIPTING_API_SETEXPIRELISTENER = "Sets an expiration listener for a particle system. The parameter callbackFunction is executed when sourceObject is expired.\nThe name of the particle system is passed to the callbackFunction as a parameter.";
   this.ROYGBIV_SCRIPTING_API_REMOVEEXPIRELISTENER = "Removes the expiration listener function of a particle system.";
   this.ROYGBIV_SCRIPTING_API_NORMALIZEVECTOR = "Normalizes the vector given in the parameter. Note that this function modifies directly the parameter and returns nothing.";
   this.ROYGBIV_SCRIPTING_API_COMPUTEQUATERNIONFROMVECTORS = "Returns the quaternion between two vectors.";
   this.ROYGBIV_SCRIPTING_API_CIRCULARDISTRIBUTION = "Returns a random point sampled around an imaginary circle with given radius and given quaternion in 3D space.\nIf no quaternion is specified the circle is sampled on the XY plane.";
   this.ROYGBIV_SCRIPTING_API_MULTIPLYSCALAR = "Multiplies a vector by a scalar.";
-  this.ROYGBIV_SCRIPTING_API_CREATECIRCULAREXPLOSION = "Creates a circular explosion effect. The configurations are:\n"+
-                                                       "name: The unique name of the particle system. (mandatory)\n"+
-                                                       "particleCount: The count of particles. (mandatory)\n"+
-                                                       "position: The center position of the explosion. (mandatory)\n"+
-                                                       "radius: The initial radius of the explosion. (mandatory)\n"+
-                                                       "colorName: The color name of the particles. (mandatory)\n"+
-                                                       "targetColorName: The target color name of the particles. (optional)\n"+
-                                                       "colorStep: The variation of color between colorName and targetColorName on each frame. The expected value is between [0, 1]. (optional)\n"+
-                                                       "particleSize: The size of particles. (mandatory)\n"+
-                                                       "alpha: The alpha value of particles. (mandatory)\n"+
-                                                       "textureName: The name of texture of the particles. (optional)\n"+
-                                                       "rgbFilter: This can be used to eliminate texture background colors. (optional)\n"+
-                                                       "alphaVariation: The alpha variaton of particles. The expected value is between [-1, 0] (mandatory)\n"+
-                                                       "speed: The speed value of explosion. (mandatory)\n"+
-                                                       "normal: The normal vector of the explosion. The default value is (0, 1, 0) (optional)\n"+
-                                                       "expireTime: The expiration time of the particle system. This can be set 0 for infinite particle systems. (mandatory)\n"+
-                                                       "updateFunction: The update function of the particle system that is executed on each frame render. (optional)";
-   this.ROYGBIV_SCRIPTING_API_CREATEDYNAMICTRAIL = "Creates a dynamic trail effect. Unlike normal trails, the particles of dynamic trails may have their unique velocities and\naccelerations. This may be useful to achieve smoke trails and fireballs that follow a linear path. Configurations are:\n"+
-                                                   "name: The unique name of the particle system. (mandatory)\n"+
-                                                   "position: The initial position of the trail. (mandatory)\n"+
-                                                   "expireTime: The maximum lifetime of the trail in seconds. Expected value is greater than zero. (mandatory)\n"+
-                                                   "particleCount: The particle count of the trail. (mandatory)\n"+
-                                                   "size: The size of the trail. (mandatory)\n"+
-                                                   "particleSize: The size of each trail particles. (mandatory)\n"+
-                                                   "startDelay: The average delay of creation of trail particles in seconds. (mandatory)\n"+
-                                                   "lifetime: The time passed in seconds before the particles are respawned. If set to 0 the trail would eventually\nbe disappeared. (mandatory)\n"+
-                                                   "velocity: The velocity vector of the trail. (mandatory)\n"+
-                                                   "acceleration: The acceleration vector of the trail. (mandatory)\n"+
-                                                   "randomness: The randomness of trail particles. (mandatory)\n"+
-                                                   "alphaVariation: The average alpha variaton of trail particles. Expected value is between [-1, 0] (mandatory)\n"+
-                                                   "colorName: The initial color name of trail particles. (mandatory)\n"+
-                                                   "targetColorName: The target color name of trail particles. (optional)\n"+
-                                                   "colorStep: A float between [0,1] that represents the variaton of color betwen the initial color and the target color. (optional)\n"+
-                                                   "textureName: The texture name of trail particles. (optional)\n"+
-                                                   "rgbFilter: This can be used to eliminate texture background colors. (optional)\n"+
-                                                   "updateFunction: The update function of the particle system that is executed on each frame render. (optional)";
   this.ROYGBIV_SCRIPTING_API_CREATEOBJECTTRAIL = "Creates an object trail effect based on following configurations:\n"+
                                                   "object: The object or object group to which the trail effect is added. (mandatory)\n"+
                                                   "alpha: The alpha value of trails between [0,1]. (mandatory)\n"+

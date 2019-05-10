@@ -2,6 +2,24 @@ var ParticleSystemGenerator = function(){
 
 }
 
+ParticleSystemGenerator.prototype.sub = function(vec1, vec2, targetVector){
+  if (!(typeof targetVector == UNDEFINED)){
+    targetVector.set(vec1.x - vec2.x, vec1.x - vec2.x, vec1.z - vec2.z);
+    return targetVector;
+  }
+  return new THREE.Vector3(vec1.x - vec2.x, vec1.y - vec2.y, vec1.z - vec2.z);
+}
+
+ParticleSystemGenerator.prototype.moveTowards = function(vec1, vec2, amount, targetVector){
+  if (!(typeof targetVector == UNDEFINED)){
+    var diff = this.sub(vec2, vec1, targetVector);
+    targetVector.set(vec1.x + (amount * diff.x), vec1.y + (amount * diff.y), vec1.z + (amount * diff.z));
+    return targetVector;
+  }
+  var diff = this.sub(vec2, vec1);
+  return new THREE.Vector3(vec1.x + (amount * diff.x), vec1.y + (amount * diff.y), vec1.z + (amount * diff.z));
+}
+
 ParticleSystemGenerator.prototype.handleModeSwitch = function(){
   for (var psName in preConfiguredParticleSystems){
     preConfiguredParticleSystems[psName].getParticleSystem();
@@ -9,6 +27,15 @@ ParticleSystemGenerator.prototype.handleModeSwitch = function(){
   for (var poolName in preConfiguredParticleSystemPools){
     var pool = preConfiguredParticleSystemPools[poolName];
     this.generateInitializedParticleSystemPool(pool.poolName, particleSystemPool[pool.refParticleSystemName], pool.poolSize);
+  }
+}
+
+ParticleSystemGenerator.prototype.multiplyScalar = function(vector, scalar, targetVector){
+  if (!targetVector){
+    return new THREE.Vector3(vector.x * scalar, vector.y * scalar, vector.z * scalar);
+  }else{
+    targetVector.set(vector.x * scalar, vector.y * scalar, vector.z * scalar);
+    return targetVector;
   }
 }
 
@@ -26,6 +53,17 @@ ParticleSystemGenerator.prototype.computeQuaternionFromVectors = function(vec1, 
   REUSABLE_VECTOR_2.set(vec2.x, vec2.y, vec2.z);
   REUSABLE_QUATERNION.setFromUnitVectors(REUSABLE_VECTOR, REUSABLE_VECTOR_2);
   return REUSABLE_QUATERNION.clone();
+}
+
+ParticleSystemGenerator.prototype.sphericalDistribution = function(radius){
+  REUSABLE_VECTOR.set(
+    Math.random() - 0.5,
+    Math.random() - 0.5,
+    Math.random() - 0.5
+  );
+  REUSABLE_VECTOR.normalize();
+  REUSABLE_VECTOR.multiplyScalar(radius);
+  return REUSABLE_VECTOR.clone();
 }
 
 ParticleSystemGenerator.prototype.boxDistribution = function(sizeX, sizeY, sizeZ, side){
@@ -115,6 +153,163 @@ ParticleSystemGenerator.prototype.generateParticleSystemPool = function(poolName
   var psPool = new ParticleSystemPool(poolName);
   particleSystemPools[poolName] = psPool;
   return psPool;
+}
+
+ParticleSystemGenerator.prototype.generateDynamicTrail = function(configurations){
+  var name = configurations.name;
+  var position = configurations.position;
+  var expireTime = configurations.expireTime;
+  var particleCount = configurations.particleCount;
+  var size = configurations.size;
+  var particleSize = configurations.particleSize;
+  var startDelay = configurations.startDelay;
+  var lifetime = configurations.lifetime;
+  var velocity = configurations.velocity;
+  var acceleration = configurations.acceleration;
+  var randomness = configurations.randomness;
+  var alphaVariation = configurations.alphaVariation;
+  var colorName = configurations.colorName;
+  var targetColorName = configurations.targetColorName;
+  var colorStep = configurations.colorStep;
+  var textureName = configurations.textureName;
+  var rgbFilter = configurations.rgbFilter;
+  var updateFunction = configurations.updateFunction;
+  var particleMaterialConfigurations = new Object();
+  particleMaterialConfigurations.color = colorName;
+  particleMaterialConfigurations.size = particleSize;
+  particleMaterialConfigurations.alpha = 1;
+  particleMaterialConfigurations.textureName = textureName;
+  particleMaterialConfigurations.rgbFilter = rgbFilter;
+  particleMaterialConfigurations.targetColor = targetColorName;
+  particleMaterialConfigurations.colorStep = colorStep;
+  var particleMaterial = this.generateParticleMaterial(particleMaterialConfigurations);
+  var particles = [];
+  var particleConfigurations = new Object();
+  particleConfigurations.material = particleMaterial;
+  particleConfigurations.lifetime = lifetime;
+  particleConfigurations.respawn = true;
+  particleConfigurations.useWorldPosition = true;
+  for (var i = 0; i < particleCount; i++){
+    particleConfigurations.position = this.sphericalDistribution(size);
+    particleConfigurations.startDelay = startDelay * Math.random();
+    particleConfigurations.velocity = new THREE.Vector3(randomness * (Math.random() - 0.5), randomness * (Math.random() - 0.5), randomness * (Math.random() - 0.5));
+    particleConfigurations.acceleration = new THREE.Vector3(randomness * (Math.random() - 0.5), randomness * (Math.random() - 0.5), randomness * (Math.random() - 0.5));
+    particleConfigurations.alphaVariation = alphaVariation;
+    particles.push(this.generateParticle(particleConfigurations));
+  }
+  var particleSystemConfigurations = new Object();
+  particleSystemConfigurations.name = name;
+  particleSystemConfigurations.particles = particles;
+  particleSystemConfigurations.position = position;
+  particleSystemConfigurations.lifetime = expireTime;
+  particleSystemConfigurations.velocity = velocity;
+  particleSystemConfigurations.acceleration = acceleration;
+  particleSystemConfigurations.updateFunction = updateFunction;
+  return this.generateParticleSystem(particleSystemConfigurations);
+}
+
+ParticleSystemGenerator.prototype.generateCircularExplosion = function(configurations){
+  var name = configurations.name;
+  var particleCount = configurations.particleCount;
+  var position = configurations.position;
+  var radius = configurations.radius;
+  var colorName = configurations.colorName;
+  var targetColorName = configurations.targetColorName;
+  var colorStep = configurations.colorStep;
+  var particleSize = configurations.particleSize;
+  var alpha = configurations.alpha;
+  var textureName = configurations.textureName;
+  var rgbFilter = configurations.rgbFilter;
+  var alphaVariation = configurations.alphaVariation;
+  var speed = configurations.speed;
+  var normal = (!(typeof configurations.normal == UNDEFINED))? configurations.normal: new THREE.Vector3(0, 1, 0);
+  var expireTime = configurations.expireTime;
+  var updateFunction = configurations.updateFunction;
+  var particleMaterialConfigurations = new Object();
+  particleMaterialConfigurations.color = colorName;
+  particleMaterialConfigurations.size = particleSize;
+  particleMaterialConfigurations.alpha = alpha;
+  particleMaterialConfigurations.textureName = textureName;
+  particleMaterialConfigurations.rgbFilter = rgbFilter;
+  particleMaterialConfigurations.targetColor = targetColorName;
+  particleMaterialConfigurations.colorStep = colorStep;
+  var particleMaterial = this.generateParticleMaterial(particleMaterialConfigurations);
+  var particles = [];
+  var particleConfigurations = new Object();
+  particleConfigurations.material = particleMaterial;
+  particleConfigurations.lifetime = 0;
+  particleConfigurations.alphaVariation = alphaVariation;
+  particleConfigurations.respawn = false;
+  var quat = this.computeQuaternionFromVectors(new THREE.Vector3(0, 0, 1), normal);
+  for (var i = 0; i < particleCount; i++){
+    particleConfigurations.position = this.circularDistribution(radius, quat);
+    var velocity = this.moveTowards(position, particleConfigurations.position, 1);
+    particleConfigurations.velocity = this.multiplyScalar(velocity, speed);
+    particleConfigurations.acceleration = particleConfigurations.velocity;
+    particles.push(this.generateParticle(particleConfigurations));
+  }
+  var particleSystemConfigurations = new Object();
+  particleSystemConfigurations.name = name;
+  particleSystemConfigurations.particles = particles;
+  particleSystemConfigurations.position = position;
+  particleSystemConfigurations.lifetime = expireTime;
+  particleSystemConfigurations.updateFunction = updateFunction;
+  return this.generateParticleSystem(particleSystemConfigurations);
+}
+
+ParticleSystemGenerator.prototype.generateTrail = function(configurations){
+  var name = configurations.name;
+  var position = configurations.position;
+  var expireTime = configurations.expireTime;
+  var particleCount = configurations.particleCount;
+  var velocity = configurations.velocity;
+  var acceleration = configurations.acceleration;
+  var lifetime = configurations.lifetime;
+  var alphaVariation = configurations.alphaVariation;
+  var startDelay = configurations.startDelay;
+  var colorName = configurations.colorName;
+  var particleSize = configurations.particleSize;
+  var size = configurations.size;
+  var textureName = configurations.textureName;
+  var rgbFilter = configurations.rgbFilter;
+  var targetColor = configurations.targetColor;
+  var colorStep = configurations.colorStep;
+  var updateFunction = configurations.updateFunction;
+  var particleMaterialConfigurations = new Object();
+  particleMaterialConfigurations.color = colorName;
+  particleMaterialConfigurations.size = particleSize;
+  particleMaterialConfigurations.alpha = 1;
+  particleMaterialConfigurations.targetColor = targetColor;
+  particleMaterialConfigurations.colorStep = colorStep;
+  if (textureName){
+    particleMaterialConfigurations.textureName = textureName;
+  }
+  if (rgbFilter){
+    particleMaterialConfigurations.rgbFilter = rgbFilter;
+  }
+  var particleMaterial = this.generateParticleMaterial(particleMaterialConfigurations);
+  var particles = [];
+  var particleConfigurations = new Object();
+  for (var i = 0; i < particleCount; i++){
+    particleConfigurations.position = this.applyNoise(this.sphericalDistribution(size));
+    particleConfigurations.material = particleMaterial;
+    particleConfigurations.lifetime = lifetime * Math.random();
+    particleConfigurations.respawn = true;
+    particleConfigurations.alphaVariation = alphaVariation;
+    particleConfigurations.startDelay = startDelay * Math.random();
+    particleConfigurations.trailMode = true;
+    particleConfigurations.useWorldPosition = true;
+    particles.push(this.generateParticle(particleConfigurations));
+  }
+  var particleSystemConfigurations = new Object();
+  particleSystemConfigurations.name = name;
+  particleSystemConfigurations.particles = particles;
+  particleSystemConfigurations.position = position;
+  particleSystemConfigurations.velocity = velocity;
+  particleSystemConfigurations.acceleration = acceleration;
+  particleSystemConfigurations.lifetime = expireTime;
+  particleSystemConfigurations.updateFunction = updateFunction;
+  return this.generateParticleSystem(particleSystemConfigurations);
 }
 
 ParticleSystemGenerator.prototype.generateFireExplosion = function(configurations){

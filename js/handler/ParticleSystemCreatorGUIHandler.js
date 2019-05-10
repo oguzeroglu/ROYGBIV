@@ -611,6 +611,149 @@ ParticleSystemCreatorGUIHandler.prototype.showLaser = function(prevParams){
 ParticleSystemCreatorGUIHandler.prototype.showDynamicTrail = function(prevParams){
   guiHandler.datGuiPSCreator = new dat.GUI({hideable: false});
   particleSystemCreatorGUIHandler.addTypeController("DYNAMIC_TRAIL");
+  var dynamicTrailParameters = {expireTime: 0, particleCount: 100, size: 20, particleSize: 5, startDelay: 3, lifetime: 2, velocity: "0,100,0", acceleration: "0,0,0", randomness: 10, alphaVariation: 0, colorName: "#ffffff", hasTargetColor: false, targetColorName: "#ffffff", colorStep: 0, hasTexture: false, textureName: "", rgbFilter: "r,g,b" };
+  if (prevParams){
+    for (var key in prevParams){
+      dynamicTrailParameters[key] = prevParams[key];
+      if (key == "rgbFilter" || key == "velocity" || key == "acceleration"){
+        dynamicTrailParameters[key] = dynamicTrailParameters[key].x+","+dynamicTrailParameters[key].y+","+dynamicTrailParameters[key].z;
+      }
+    }
+  }
+  guiHandler.datGuiPSCreator.add(dynamicTrailParameters, "expireTime").min(0).max(50).step(0.1).onFinishChange(function(val){
+    particleSystemCreatorGUIHandler.dynamicTrailGeneratorFunc();
+  }).listen();
+  guiHandler.datGuiPSCreator.add(dynamicTrailParameters, "particleCount").min(1).max(5000).step(1).onFinishChange(function(val){
+    particleSystemCreatorGUIHandler.dynamicTrailGeneratorFunc();
+  }).listen();
+  guiHandler.datGuiPSCreator.add(dynamicTrailParameters, "size").min(0.1).max(500).step(0.1).onFinishChange(function(val){
+    particleSystemCreatorGUIHandler.dynamicTrailGeneratorFunc();
+  }).listen();
+  guiHandler.datGuiPSCreator.add(dynamicTrailParameters, "particleSize").min(0.1).max(20).step(0.01).onFinishChange(function(val){
+    particleSystemCreatorGUIHandler.dynamicTrailGeneratorFunc();
+  }).listen();
+  guiHandler.datGuiPSCreator.add(dynamicTrailParameters, "startDelay").min(0).max(20).step(0.01).onFinishChange(function(val){
+    particleSystemCreatorGUIHandler.dynamicTrailGeneratorFunc();
+  }).listen();
+  guiHandler.datGuiPSCreator.add(dynamicTrailParameters, "lifetime").min(0).max(100).step(0.1).onFinishChange(function(val){
+    particleSystemCreatorGUIHandler.dynamicTrailGeneratorFunc();
+  }).listen();
+  guiHandler.datGuiPSCreator.add(dynamicTrailParameters, "velocity").onFinishChange(function(val){
+    var splitted = val.split(",");
+    if (splitted.length == 3){
+      for (var i = 0; i<3; i++){
+        if (isNaN(splitted[i])){
+          return;
+        }
+      }
+    }
+    particleSystemCreatorGUIHandler.dynamicTrailGeneratorFunc();
+  }).listen();
+  guiHandler.datGuiPSCreator.add(dynamicTrailParameters, "acceleration").onFinishChange(function(val){
+    var splitted = val.split(",");
+    if (splitted.length == 3){
+      for (var i = 0; i<3; i++){
+        if (isNaN(splitted[i])){
+          return;
+        }
+      }
+    }
+    particleSystemCreatorGUIHandler.dynamicTrailGeneratorFunc();
+  }).listen();
+  guiHandler.datGuiPSCreator.add(dynamicTrailParameters, "randomness").min(0).max(500).step(0.1).onFinishChange(function(val){
+    particleSystemCreatorGUIHandler.dynamicTrailGeneratorFunc();
+  }).listen();
+  guiHandler.datGuiPSCreator.add(dynamicTrailParameters, "alphaVariation").min(-1).max(0).step(0.01).onFinishChange(function(val){
+    particleSystemCreatorGUIHandler.dynamicTrailGeneratorFunc();
+  }).listen();
+  guiHandler.datGuiPSCreator.addColor(dynamicTrailParameters, "colorName").onFinishChange(function(val){
+    particleSystemCreatorGUIHandler.dynamicTrailGeneratorFunc();
+  }).listen();
+  guiHandler.datGuiPSCreator.add(dynamicTrailParameters, "hasTargetColor").onChange(function(val){
+    if (val){
+      guiHandler.enableController(particleSystemCreatorGUIHandler.dynamicTrailTargetColorController);
+      guiHandler.enableController(particleSystemCreatorGUIHandler.dynamicTrailColorStepController);
+    }else{
+      guiHandler.disableController(particleSystemCreatorGUIHandler.dynamicTrailTargetColorController);
+      guiHandler.disableController(particleSystemCreatorGUIHandler.dynamicTrailColorStepController);
+    }
+    particleSystemCreatorGUIHandler.dynamicTrailGeneratorFunc();
+  }).listen();
+  particleSystemCreatorGUIHandler.dynamicTrailTargetColorController = guiHandler.datGuiPSCreator.addColor(dynamicTrailParameters, "targetColorName").onFinishChange(function(val){
+    particleSystemCreatorGUIHandler.dynamicTrailGeneratorFunc();
+  }).listen();
+  particleSystemCreatorGUIHandler.dynamicTrailColorStepController = guiHandler.datGuiPSCreator.add(dynamicTrailParameters, "colorStep").min(0).max(1).step(0.001).onFinishChange(function(val){
+    particleSystemCreatorGUIHandler.dynamicTrailGeneratorFunc();
+  }).listen();
+  particleSystemCreatorGUIHandler.dynamicTrailHasTextureController = guiHandler.datGuiPSCreator.add(dynamicTrailParameters, "hasTexture").onChange(function(val){
+    if (val){
+      guiHandler.enableController(particleSystemCreatorGUIHandler.dynamicTrailTextureNameController);
+      guiHandler.enableController(particleSystemCreatorGUIHandler.dynamicTrailRGBFilterController);
+    }else{
+      guiHandler.disableController(particleSystemCreatorGUIHandler.dynamicTrailTextureNameController);
+      guiHandler.disableController(particleSystemCreatorGUIHandler.dynamicTrailRGBFilterController);
+    }
+    particleSystemCreatorGUIHandler.dynamicTrailGeneratorFunc();
+  }).listen();
+  particleSystemCreatorGUIHandler.dynamicTrailTextureNameController = guiHandler.datGuiPSCreator.add(dynamicTrailParameters, "textureName", particleSystemCreatorGUIHandler.usableTextureNames).onChange(function(val){
+    particleSystemCreatorGUIHandler.dynamicTrailGeneratorFunc();
+  }).listen();
+  particleSystemCreatorGUIHandler.dynamicTrailRGBFilterController = guiHandler.datGuiPSCreator.add(dynamicTrailParameters, "rgbFilter").onFinishChange(function(val){
+    var splitted = val.split(",");
+    if (splitted.length == 3){
+      for (var i = 0; i<3; i++){
+        if (isNaN(splitted[i])){
+          return;
+        }
+      }
+    }
+    particleSystemCreatorGUIHandler.dynamicTrailGeneratorFunc();
+  }).listen();
+  if (particleSystemCreatorGUIHandler.usableTextureNames.length == 0){
+    guiHandler.disableController(particleSystemCreatorGUIHandler.dynamicTrailHasTextureController);
+  }
+  if (!dynamicTrailParameters.hasTexture){
+    guiHandler.disableController(particleSystemCreatorGUIHandler.dynamicTrailTextureNameController);
+    guiHandler.disableController(particleSystemCreatorGUIHandler.dynamicTrailRGBFilterController);
+  }
+  if (!dynamicTrailParameters.hasTargetColor){
+    guiHandler.disableController(particleSystemCreatorGUIHandler.dynamicTrailTargetColorController);
+    guiHandler.disableController(particleSystemCreatorGUIHandler.dynamicTrailColorStepController);
+  }
+  particleSystemCreatorGUIHandler.dynamicTrailParameters = dynamicTrailParameters;
+  guiHandler.datGuiPSCreator.add({"Restart": function(){
+    particleSystemCreatorGUIHandler.dynamicTrailGeneratorFunc();
+  }}, "Restart");
+  particleSystemCreatorGUIHandler.dynamicTrailGeneratorFunc = function(){
+    if (particleSystemCreatorGUIHandler.particleSystem){
+      scene.remove(particleSystemCreatorGUIHandler.particleSystem.mesh);
+      particleSystemCreatorGUIHandler.particleSystem = 0;
+    }
+    var params = {name: particleSystemCreatorGUIHandler.psName, position: new THREE.Vector3(0, 0, 0)};
+    for (var key in particleSystemCreatorGUIHandler.dynamicTrailParameters){
+      params[key] = particleSystemCreatorGUIHandler.dynamicTrailParameters[key];
+    }
+    if (!particleSystemCreatorGUIHandler.dynamicTrailParameters.hasTexture || particleSystemCreatorGUIHandler.dynamicTrailParameters.textureName == ""){
+      delete params.textureName;
+      delete params.rgbFilter;
+    }else{
+      var splitted = params.rgbFilter.split(",");
+      params.rgbFilter = new THREE.Vector3(parseFloat(splitted[0]), parseFloat(splitted[1]), parseFloat(splitted[2]));
+    }
+    if (!particleSystemCreatorGUIHandler.dynamicTrailParameters.hasTargetColor){
+      delete params.targetColorName;
+      delete params.colorStep;
+    }
+    var velocitySplitted = params.velocity.split(",");
+    var accelerationSplitted = params.acceleration.split(",");
+    params.velocity = new THREE.Vector3(parseFloat(velocitySplitted[0]), parseFloat(velocitySplitted[1]), parseFloat(velocitySplitted[2]));
+    params.acceleration = new THREE.Vector3(parseFloat(accelerationSplitted[0]), parseFloat(accelerationSplitted[1]), parseFloat(accelerationSplitted[2]));
+    particleSystemCreatorGUIHandler.particleSystem = particleSystemGenerator.generateDynamicTrail(params);
+    particleSystemCreatorGUIHandler.particleSystem.mesh.visible = true;
+    scene.add(particleSystemCreatorGUIHandler.particleSystem.mesh);
+    particleSystemCreatorGUIHandler.preConfiguredParticleSystem = new PreconfiguredParticleSystem(particleSystemCreatorGUIHandler.psName, "DYNAMIC_TRAIL", params);
+  }
+  particleSystemCreatorGUIHandler.dynamicTrailGeneratorFunc();
   particleSystemCreatorGUIHandler.addCommonControllers();
   particleSystemCreatorGUIHandler.onAfterShown();
 }
@@ -618,7 +761,122 @@ ParticleSystemCreatorGUIHandler.prototype.showDynamicTrail = function(prevParams
 ParticleSystemCreatorGUIHandler.prototype.showCircularExplosion = function(prevParams){
   guiHandler.datGuiPSCreator = new dat.GUI({hideable: false});
   particleSystemCreatorGUIHandler.addTypeController("CIRC_EXPLOSION");
+  var circularExplosionParameters = {particleCount: 100, radius: 10, colorName: "#ffffff", hasTargetColor: false, targetColorName: "#ffffff", colorStep: 0, particleSize: 5, alpha: 1, hasTexture: false, textureName: "", rgbFilter: "r,g,b", alphaVariation: 0, speed: 100, expireTime: 0};
+  if (prevParams){
+    for (var key in prevParams){
+      circularExplosionParameters[key] = prevParams[key];
+      if (key == "rgbFilter"){
+        circularExplosionParameters[key] = circularExplosionParameters[key].x+","+circularExplosionParameters[key].y+","+circularExplosionParameters[key].z;
+      }
+    }
+  }
+  guiHandler.datGuiPSCreator.add(circularExplosionParameters, "particleCount").min(1).max(5000).step(1).onFinishChange(function(val){
+    particleSystemCreatorGUIHandler.circularExplosionGeneratorFunc();
+  }).listen();
+  guiHandler.datGuiPSCreator.add(circularExplosionParameters, "radius").min(0.1).max(1000).step(0.1).onFinishChange(function(val){
+    particleSystemCreatorGUIHandler.circularExplosionGeneratorFunc();
+  }).listen();
+  guiHandler.datGuiPSCreator.addColor(circularExplosionParameters, "colorName").onFinishChange(function(val){
+    particleSystemCreatorGUIHandler.circularExplosionGeneratorFunc();
+  }).listen();
+  guiHandler.datGuiPSCreator.add(circularExplosionParameters, "hasTargetColor").onChange(function(val){
+    if (val){
+      guiHandler.enableController(particleSystemCreatorGUIHandler.circularExplosionTargetColorNameController);
+      guiHandler.enableController(particleSystemCreatorGUIHandler.circularExplosionColorStepController);
+    }else{
+      guiHandler.disableController(particleSystemCreatorGUIHandler.circularExplosionTargetColorNameController);
+      guiHandler.disableController(particleSystemCreatorGUIHandler.circularExplosionColorStepController);
+    }
+    particleSystemCreatorGUIHandler.circularExplosionGeneratorFunc();
+  }).listen();
+  particleSystemCreatorGUIHandler.circularExplosionTargetColorNameController = guiHandler.datGuiPSCreator.addColor(circularExplosionParameters, "targetColorName").onFinishChange(function(val){
+    particleSystemCreatorGUIHandler.circularExplosionGeneratorFunc();
+  }).listen();
+  particleSystemCreatorGUIHandler.circularExplosionColorStepController = guiHandler.datGuiPSCreator.add(circularExplosionParameters, "colorStep").min(0).max(1).step(0.001).onFinishChange(function(val){
+    particleSystemCreatorGUIHandler.circularExplosionGeneratorFunc();
+  }).listen();
+  guiHandler.datGuiPSCreator.add(circularExplosionParameters, "particleSize").min(0.1).max(20).step(0.01).onFinishChange(function(val){
+    particleSystemCreatorGUIHandler.circularExplosionGeneratorFunc();
+  }).listen();
+  guiHandler.datGuiPSCreator.add(circularExplosionParameters, "alpha").min(0).max(1).step(0.1).onFinishChange(function(val){
+    particleSystemCreatorGUIHandler.circularExplosionGeneratorFunc();
+  }).listen();
+  particleSystemCreatorGUIHandler.circularExplosionHasTextureController = guiHandler.datGuiPSCreator.add(circularExplosionParameters, "hasTexture").onChange(function(val){
+    if (val){
+      guiHandler.enableController(particleSystemCreatorGUIHandler.circularExplosionTextureNameController);
+      guiHandler.enableController(particleSystemCreatorGUIHandler.circularExplosionRGBFilterController);
+    }else{
+      guiHandler.disableController(particleSystemCreatorGUIHandler.circularExplosionTextureNameController);
+      guiHandler.disableController(particleSystemCreatorGUIHandler.circularExplosionRGBFilterController);
+    }
+    particleSystemCreatorGUIHandler.circularExplosionGeneratorFunc();
+  }).listen();
+  particleSystemCreatorGUIHandler.circularExplosionTextureNameController = guiHandler.datGuiPSCreator.add(circularExplosionParameters, "textureName", particleSystemCreatorGUIHandler.usableTextureNames).onChange(function(val){
+    particleSystemCreatorGUIHandler.circularExplosionGeneratorFunc();
+  }).listen();
+  particleSystemCreatorGUIHandler.circularExplosionRGBFilterController = guiHandler.datGuiPSCreator.add(circularExplosionParameters, "rgbFilter").onFinishChange(function(val){
+    var splitted = val.split(",");
+    if (splitted.length == 3){
+      for (var i = 0; i<3; i++){
+        if (isNaN(splitted[i])){
+          return;
+        }
+      }
+    }
+    particleSystemCreatorGUIHandler.circularExplosionGeneratorFunc();
+  }).listen();
+  guiHandler.datGuiPSCreator.add(circularExplosionParameters, "alphaVariation").min(-1).max(0).step(0.01).onFinishChange(function(val){
+    particleSystemCreatorGUIHandler.circularExplosionGeneratorFunc();
+  }).listen();
+  guiHandler.datGuiPSCreator.add(circularExplosionParameters, "speed").min(0.1).max(5000).step(0.01).onFinishChange(function(val){
+    particleSystemCreatorGUIHandler.circularExplosionGeneratorFunc();
+  }).listen();
+  guiHandler.datGuiPSCreator.add(circularExplosionParameters, "expireTime").min(0).max(50).step(0.1).onFinishChange(function(val){
+    particleSystemCreatorGUIHandler.circularExplosionGeneratorFunc();
+  }).listen();
+  guiHandler.datGuiPSCreator.add({"Restart": function(){
+    particleSystemCreatorGUIHandler.circularExplosionGeneratorFunc();
+  }}, "Restart");
+  particleSystemCreatorGUIHandler.circularExplosionParameters = circularExplosionParameters;
+  if (!circularExplosionParameters.hasTargetColor){
+    guiHandler.disableController(particleSystemCreatorGUIHandler.circularExplosionTargetColorNameController);
+    guiHandler.disableController(particleSystemCreatorGUIHandler.circularExplosionColorStepController);
+  }
+  if (!circularExplosionParameters.hasTexture){
+    guiHandler.disableController(particleSystemCreatorGUIHandler.circularExplosionTextureNameController);
+    guiHandler.disableController(particleSystemCreatorGUIHandler.circularExplosionRGBFilterController);
+  }
+  if (particleSystemCreatorGUIHandler.usableTextureNames.length == 0){
+    guiHandler.disableController(particleSystemCreatorGUIHandler.circularExplosionHasTextureController);
+  }
+  particleSystemCreatorGUIHandler.circularExplosionGeneratorFunc = function(){
+    if (particleSystemCreatorGUIHandler.particleSystem){
+      scene.remove(particleSystemCreatorGUIHandler.particleSystem.mesh);
+      particleSystemCreatorGUIHandler.particleSystem = 0;
+    }
+    var params = {name: particleSystemCreatorGUIHandler.psName, position: new THREE.Vector3(0, 0, 0)};
+    for (var key in particleSystemCreatorGUIHandler.circularExplosionParameters){
+      params[key] = particleSystemCreatorGUIHandler.circularExplosionParameters[key];
+    }
+    if (!particleSystemCreatorGUIHandler.circularExplosionParameters.hasTexture || particleSystemCreatorGUIHandler.circularExplosionParameters.textureName == ""){
+      delete params.textureName;
+      delete params.rgbFilter;
+    }else{
+      var splitted = params.rgbFilter.split(",");
+      params.rgbFilter = new THREE.Vector3(parseFloat(splitted[0]), parseFloat(splitted[1]), parseFloat(splitted[2]));
+    }
+    if (!particleSystemCreatorGUIHandler.circularExplosionParameters.hasTargetColor){
+      delete params.targetColorName;
+      delete params.colorStep;
+    }
+    particleSystemCreatorGUIHandler.particleSystem = particleSystemGenerator.generateCircularExplosion(params);
+    particleSystemCreatorGUIHandler.particleSystem.mesh.visible = true;
+    scene.add(particleSystemCreatorGUIHandler.particleSystem.mesh);
+    particleSystemCreatorGUIHandler.preConfiguredParticleSystem = new PreconfiguredParticleSystem(particleSystemCreatorGUIHandler.psName, "CIRC_EXPLOSION", params);
+  }
   particleSystemCreatorGUIHandler.addCommonControllers();
+  particleSystemCreatorGUIHandler.circularExplosionParameters = circularExplosionParameters;
+  particleSystemCreatorGUIHandler.circularExplosionGeneratorFunc();
   particleSystemCreatorGUIHandler.onAfterShown();
 }
 
@@ -1036,7 +1294,155 @@ ParticleSystemCreatorGUIHandler.prototype.showPlasma = function(prevParams){
 ParticleSystemCreatorGUIHandler.prototype.showTrail = function(prevParams){
   guiHandler.datGuiPSCreator = new dat.GUI({hideable: false});
   particleSystemCreatorGUIHandler.addTypeController("TRAIL");
+  var trailParameters = {expireTime: 0, particleCount: 100, velocity: "0,100,0", acceleration: "0,0,0", lifetime: 3, alphaVariation: -0.5, startDelay: 2, colorName: "#ffffff", particleSize: 5, size: 10, hasTexture: false, textureName: "", rgbFilter: "r,g,b", hasTargetColor: false, targetColor: "#ffffff", colorStep: 0};
+  if (prevParams){
+    for (var key in prevParams){
+      trailParameters[key] = prevParams[key];
+      if (key == "rgbFilter" || key == "velocity" || key == "acceleration"){
+        trailParameters[key] = trailParameters[key].x+","+trailParameters[key].y+","+trailParameters[key].z;
+      }
+    }
+  }
+  guiHandler.datGuiPSCreator.add(trailParameters, "expireTime").min(0).max(50).step(0.1).onFinishChange(function(val){
+    particleSystemCreatorGUIHandler.trailGeneratorFunc();
+  }).listen();
+  guiHandler.datGuiPSCreator.add(trailParameters, "particleCount").min(1).max(5000).step(1).onFinishChange(function(val){
+    particleSystemCreatorGUIHandler.trailGeneratorFunc();
+  }).listen();
+  guiHandler.datGuiPSCreator.add(trailParameters, "velocity").onFinishChange(function(val){
+    var splitted = val.split(",");
+    if (splitted.length == 3){
+      for (var i = 0; i<3; i++){
+        if (isNaN(splitted[i])){
+          return;
+        }
+      }
+    }
+    particleSystemCreatorGUIHandler.trailGeneratorFunc();
+  }).listen();
+  guiHandler.datGuiPSCreator.add(trailParameters, "acceleration").onFinishChange(function(val){
+    var splitted = val.split(",");
+    if (splitted.length == 3){
+      for (var i = 0; i<3; i++){
+        if (isNaN(splitted[i])){
+          return;
+        }
+      }
+    }
+    particleSystemCreatorGUIHandler.trailGeneratorFunc();
+  }).listen();
+  guiHandler.datGuiPSCreator.add(trailParameters, "lifetime").min(0).max(20).step(0.01).onFinishChange(function(val){
+    particleSystemCreatorGUIHandler.trailGeneratorFunc();
+  }).listen();
+  guiHandler.datGuiPSCreator.add(trailParameters, "alphaVariation").min(-1).max(0).step(0.01).onFinishChange(function(val){
+    particleSystemCreatorGUIHandler.trailGeneratorFunc();
+  }).listen();
+  guiHandler.datGuiPSCreator.add(trailParameters, "startDelay").min(0).max(20).step(0.01).onFinishChange(function(val){
+    particleSystemCreatorGUIHandler.trailGeneratorFunc();
+  }).listen();
+  guiHandler.datGuiPSCreator.addColor(trailParameters, "colorName").onFinishChange(function(val){
+    particleSystemCreatorGUIHandler.trailGeneratorFunc();
+  }).listen();
+  guiHandler.datGuiPSCreator.add(trailParameters, "particleSize").min(0.1).max(20).step(0.01).onFinishChange(function(val){
+    particleSystemCreatorGUIHandler.trailGeneratorFunc();
+  }).listen();
+  guiHandler.datGuiPSCreator.add(trailParameters, "size").min(0.1).max(500).step(0.1).onFinishChange(function(val){
+    particleSystemCreatorGUIHandler.trailGeneratorFunc();
+  }).listen();
+  particleSystemCreatorGUIHandler.trailHasTextureController = guiHandler.datGuiPSCreator.add(trailParameters, "hasTexture").onChange(function(val){
+    if (particleSystemCreatorGUIHandler.usableTextureNames.length == 0){
+      particleSystemCreatorGUIHandler.trailParameters["hasTexture"] = false;
+      return;
+    }
+    if (val){
+      guiHandler.enableController(particleSystemCreatorGUIHandler.trailTextureNameController);
+      guiHandler.enableController(particleSystemCreatorGUIHandler.trailRGBFilterController);
+    }else{
+      guiHandler.disableController(particleSystemCreatorGUIHandler.trailTextureNameController);
+      guiHandler.disableController(particleSystemCreatorGUIHandler.trailRGBFilterController);
+    }
+    particleSystemCreatorGUIHandler.trailGeneratorFunc();
+  }).listen();
+  particleSystemCreatorGUIHandler.trailTextureNameController = guiHandler.datGuiPSCreator.add(trailParameters, "textureName", particleSystemCreatorGUIHandler.usableTextureNames).onChange(function(val){
+    particleSystemCreatorGUIHandler.trailGeneratorFunc();
+  }).listen();
+  particleSystemCreatorGUIHandler.trailRGBFilterController = guiHandler.datGuiPSCreator.add(trailParameters, "rgbFilter").onFinishChange(function(val){
+    var splitted = val.split(",");
+    if (splitted.length == 3){
+      for (var i = 0; i<3; i++){
+        if (isNaN(splitted[i])){
+          return;
+        }
+      }
+    }
+    particleSystemCreatorGUIHandler.trailGeneratorFunc();
+  }).listen();
+  guiHandler.datGuiPSCreator.add(trailParameters, "hasTargetColor").onChange(function(val){
+    if (val){
+      guiHandler.enableController(particleSystemCreatorGUIHandler.trailTargetColorController);
+      guiHandler.enableController(particleSystemCreatorGUIHandler.trailColorStepController);
+    }else{
+      guiHandler.disableController(particleSystemCreatorGUIHandler.trailTargetColorController);
+      guiHandler.disableController(particleSystemCreatorGUIHandler.trailColorStepController);
+    }
+    particleSystemCreatorGUIHandler.trailGeneratorFunc();
+  }).listen();
+  particleSystemCreatorGUIHandler.trailTargetColorController = guiHandler.datGuiPSCreator.addColor(trailParameters, "targetColor").onFinishChange(function(val){
+    particleSystemCreatorGUIHandler.trailGeneratorFunc();
+  }).listen();
+  particleSystemCreatorGUIHandler.trailColorStepController = guiHandler.datGuiPSCreator.add(trailParameters, "colorStep").min(0).max(1).step(0.001).onFinishChange(function(val){
+    particleSystemCreatorGUIHandler.trailGeneratorFunc();
+  }).listen();
+  particleSystemCreatorGUIHandler.trailParameters = trailParameters;
+  particleSystemCreatorGUIHandler.trailGeneratorFunc = function(){
+    if (particleSystemCreatorGUIHandler.particleSystem){
+      scene.remove(particleSystemCreatorGUIHandler.particleSystem.mesh);
+      particleSystemCreatorGUIHandler.particleSystem = 0;
+    }
+    var params = {name: particleSystemCreatorGUIHandler.psName, position: new THREE.Vector3(0, 0, 0)};
+    for (var key in particleSystemCreatorGUIHandler.trailParameters){
+      params[key] = particleSystemCreatorGUIHandler.trailParameters[key];
+    }
+    if (!particleSystemCreatorGUIHandler.trailParameters.hasTexture || particleSystemCreatorGUIHandler.trailParameters.textureName == ""){
+      delete params.textureName;
+    }
+    if (!particleSystemCreatorGUIHandler.trailParameters.hasTargetColor){
+      delete params.targetColor;
+      delete params.colorStep;
+    }
+    if (params.rgbFilter){
+      var splitted = params.rgbFilter.split(",");
+      params.rgbFilter = new THREE.Vector3(parseFloat(splitted[0]), parseFloat(splitted[1]), parseFloat(splitted[2]));
+    }
+    if (params.velocity){
+      var splitted = params.velocity.split(",");
+      params.velocity = new THREE.Vector3(parseFloat(splitted[0]), parseFloat(splitted[1]), parseFloat(splitted[2]));
+    }
+    if (params.acceleration){
+      var splitted = params.acceleration.split(",");
+      params.acceleration = new THREE.Vector3(parseFloat(splitted[0]), parseFloat(splitted[1]), parseFloat(splitted[2]));
+    }
+    if (!trailParameters.hasTexture){
+      guiHandler.disableController(particleSystemCreatorGUIHandler.trailTextureNameController);
+      guiHandler.disableController(particleSystemCreatorGUIHandler.trailRGBFilterController);
+    }
+    if (particleSystemCreatorGUIHandler.usableTextureNames.length == 0){
+      guiHandler.disableController(particleSystemCreatorGUIHandler.trailHasTextureController);
+    }
+    if (!trailParameters.hasTargetColor){
+      guiHandler.disableController(particleSystemCreatorGUIHandler.trailTargetColorController);
+      guiHandler.disableController(particleSystemCreatorGUIHandler.trailColorStepController);
+    }
+    particleSystemCreatorGUIHandler.particleSystem = particleSystemGenerator.generateTrail(params);
+    particleSystemCreatorGUIHandler.particleSystem.mesh.visible = true;
+    scene.add(particleSystemCreatorGUIHandler.particleSystem.mesh);
+    particleSystemCreatorGUIHandler.preConfiguredParticleSystem = new PreconfiguredParticleSystem(particleSystemCreatorGUIHandler.psName, "TRAIL", params);
+  }
+  guiHandler.datGuiPSCreator.add({"Restart": function(){
+    particleSystemCreatorGUIHandler.trailGeneratorFunc();
+  }}, "Restart");
   particleSystemCreatorGUIHandler.addCommonControllers();
+  particleSystemCreatorGUIHandler.trailGeneratorFunc();
   particleSystemCreatorGUIHandler.onAfterShown();
 }
 
