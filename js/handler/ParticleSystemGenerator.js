@@ -190,7 +190,10 @@ ParticleSystemGenerator.prototype.generateCustomParticleSystem = function(config
   var reusableVec2 = new THREE.Vector3();
   var particles = [];
   for (var i = 0; i<configurations.particleCount; i++){
-    var particleConfigurations = {material: particleMaterial, lifetime: 0};
+    var particleConfigurations = {material: particleMaterial, startDelay: configurations.motion.startDelay, lifetime: configurations.motion.lifetime, respawn: configurations.motion.respawn};
+    if (configurations.motion.randomizeStartDelay){
+      particleConfigurations.startDelay = particleConfigurations.startDelay * Math.random();
+    }
     switch(configurations.distribution.type){
       case "SINGLE_POINT":
         var splitted = configurations.distribution.coordinate.split(",");
@@ -232,6 +235,21 @@ ParticleSystemGenerator.prototype.generateCustomParticleSystem = function(config
     }
     if (configurations.distribution.applyNoise){
       this.applyNoise(particleConfigurations.position, particleConfigurations.position);
+    }
+    switch(configurations.motion.type){
+      case "NORMAL":
+        var velocitySplitted = configurations.motion.velocity.split(",");
+        var accelerationSplitted = configurations.motion.acceleration.split(",");
+        var velocityRandomnessSplitted = configurations.motion.velocityRandomness.split(",");
+        var accelerationRandomnessSplitted = configurations.motion.accelerationRandomness.split(",");
+        particleConfigurations.trailMode = configurations.motion.trailMode;
+        particleConfigurations.useWorldPosition = configurations.motion.useWorldPosition;
+        particleConfigurations.motionMode = MOTION_MODE_NORMAL;
+        particleConfigurations.velocity = new THREE.Vector3(parseFloat(velocitySplitted[0]) + (parseFloat(velocityRandomnessSplitted[0]) * (Math.random() - 0.5)), parseFloat(velocitySplitted[1]) + (parseFloat(velocityRandomnessSplitted[1]) * (Math.random() - 0.5)), parseFloat(velocitySplitted[2]) + (parseFloat(velocityRandomnessSplitted[2]) * (Math.random() - 0.5)));
+        particleConfigurations.acceleration = new THREE.Vector3(parseFloat(accelerationSplitted[0]) + (parseFloat(accelerationRandomnessSplitted[0]) * (Math.random() - 0.5)), parseFloat(accelerationSplitted[1]) + (parseFloat(accelerationRandomnessSplitted[1]) * (Math.random() - 0.5)), parseFloat(accelerationSplitted[2]) + (parseFloat(accelerationRandomnessSplitted[2]) * (Math.random() - 0.5)));
+      break;
+      case "CIRCULAR":
+      break;
     }
     particles.push(this.generateParticle(particleConfigurations));
   }
