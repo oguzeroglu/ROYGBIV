@@ -531,9 +531,6 @@ var Text = function(){
   this.ROYGBIV_SCRIPTING_API_SUB = "Returns the substraction of two vectors.";
   this.ROYGBIV_SCRIPTING_API_ADD = "Returns the summation of two vectors.";
   this.ROYGBIV_SCRIPTING_API_MOVETOWARDS = "Moves vec1 towards vec2 by given amount and returns the new position of vec1. If amount is 1, vec1 goes all the way towards vec2.";
-  this.ROYGBIV_SCRIPTING_API_APPLYNOISE = "Applies Perlin noise to given vector [amount] times and returns the distorted value. The default amount is 1.\nSetting the amount too high can cause performance issues.";
-  this.ROYGBIV_SCRIPTING_API_SPHERICALDISTRIBUTION = "Returns a vector sampled around an imaginary sphere of given radius centered at (0, 0, 0)";
-  this.ROYGBIV_SCRIPTING_API_BOXDISTRIBUTION = "Returns a vector sampled on a face of a box centered at (0, 0, 0).\nThe size of the boxis specified with the parameters sizeX, sizeY and sizeZ.\nThe optional parameter [side] can be used to generate the point on a specific face.\nside = 1 -> UP\nside = 2 -> DOWN\nside = 3 -> FRONT\nside = 4 -> BACK\nside = 5 -> RIGHT\nside = 6 -> LEFT";
   this.ROYGBIV_SCRIPTING_API_APPLYFORCE = "Applies a physical force to an object or a glued object from a given point.";
   this.ROYGBIV_SCRIPTING_API_ROTATE = "Rotates an object or a glued object around a given world axis by given radians. The parameter axis must be one of x, y or z.\nObjects are rotated around their own centers, so their positions do not change when rotated using this function.";
   this.ROYGBIV_SCRIPTING_API_ROTATEAROUNDXYZ = "Rotates an object or a glued object around the given (x, y, z). Unlike the rotate function, the positions of the objects\ncan change when rotated using this function.";
@@ -606,7 +603,6 @@ var Text = function(){
   this.ROYGBIV_SCRIPTING_API_REMOVEEXPIRELISTENER = "Removes the expiration listener function of a particle system.";
   this.ROYGBIV_SCRIPTING_API_NORMALIZEVECTOR = "Normalizes the vector given in the parameter. Note that this function modifies directly the parameter and returns nothing.";
   this.ROYGBIV_SCRIPTING_API_COMPUTEQUATERNIONFROMVECTORS = "Returns the quaternion between two vectors.";
-  this.ROYGBIV_SCRIPTING_API_CIRCULARDISTRIBUTION = "Returns a random point sampled around an imaginary circle with given radius and given quaternion in 3D space.\nIf no quaternion is specified the circle is sampled on the XY plane.";
   this.ROYGBIV_SCRIPTING_API_MULTIPLYSCALAR = "Multiplies a vector by a scalar.";
   this.ROYGBIV_SCRIPTING_API_CREATEOBJECTTRAIL = "Creates an object trail effect based on following configurations:\n"+
                                                   "object: The object or object group to which the trail effect is added. (mandatory)\n"+

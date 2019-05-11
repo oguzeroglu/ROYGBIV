@@ -46,27 +46,32 @@ ParticleSystemGenerator.prototype.normalizeVector = function(vector){
   vector.z = vector.z / len;
 }
 
-ParticleSystemGenerator.prototype.computeQuaternionFromVectors = function(vec1, vec2){
+ParticleSystemGenerator.prototype.computeQuaternionFromVectors = function(vec1, vec2, targetQuaternion){
   this.normalizeVector(vec1);
   this.normalizeVector(vec2);
   REUSABLE_VECTOR.set(vec1.x, vec1.y, vec1.z);
   REUSABLE_VECTOR_2.set(vec2.x, vec2.y, vec2.z);
   REUSABLE_QUATERNION.setFromUnitVectors(REUSABLE_VECTOR, REUSABLE_VECTOR_2);
-  return REUSABLE_QUATERNION.clone();
+  if (!targetQuaternion){
+    return REUSABLE_QUATERNION.clone();
+  }else{
+    return targetQuaternion.copy(REUSABLE_QUATERNION);
+  }
 }
 
-ParticleSystemGenerator.prototype.sphericalDistribution = function(radius){
-  REUSABLE_VECTOR.set(
-    Math.random() - 0.5,
-    Math.random() - 0.5,
-    Math.random() - 0.5
-  );
+ParticleSystemGenerator.prototype.sphericalDistribution = function(radius, targetVector){
+  REUSABLE_VECTOR.set(Math.random() - 0.5, Math.random() - 0.5, Math.random() - 0.5);
   REUSABLE_VECTOR.normalize();
   REUSABLE_VECTOR.multiplyScalar(radius);
-  return REUSABLE_VECTOR.clone();
+  if (!targetVector){
+    return REUSABLE_VECTOR.clone();
+  }else{
+    targetVector.copy(REUSABLE_VECTOR);
+    return targetVector;
+  }
 }
 
-ParticleSystemGenerator.prototype.boxDistribution = function(sizeX, sizeY, sizeZ, side){
+ParticleSystemGenerator.prototype.boxDistribution = function(sizeX, sizeY, sizeZ, side, targetVector){
   var randomSide = Math.floor(Math.random() * 6) + 1;
   if (typeof side != UNDEFINED && !isNaN(side) && side <= 6 && side >= 1){
     randomSide = side;
@@ -104,20 +109,28 @@ ParticleSystemGenerator.prototype.boxDistribution = function(sizeX, sizeY, sizeZ
   if (typeof z == UNDEFINED){
     z = Math.random () * (maxZ - minZ) + minZ;
   }
-  return new THREE.Vector3(x, y, z);
+  if (!targetVector){
+    return new THREE.Vector3(x, y, z);
+  }else{
+    return targetVector.set(x, y, z);
+  }
 }
 
-ParticleSystemGenerator.prototype.circularDistribution = function(radius, quaternion){
+ParticleSystemGenerator.prototype.circularDistribution = function(radius, quaternion, targetVector){
   REUSABLE_VECTOR_3.set(Math.random() - 0.5, Math.random() - 0.5, 0);
   REUSABLE_VECTOR_3.normalize();
   REUSABLE_VECTOR_3.multiplyScalar(radius);
   if (!(typeof quaternion == UNDEFINED)){
     REUSABLE_VECTOR_3.applyQuaternion(quaternion);
   }
-  return new THREE.Vector3(REUSABLE_VECTOR_3.x, REUSABLE_VECTOR_3.y, REUSABLE_VECTOR_3.z);
+  if (!targetVector){
+    return REUSABLE_VECTOR_3.clone();
+  }else{
+    return targetVector.copy(REUSABLE_VECTOR_3);
+  }
 }
 
-ParticleSystemGenerator.prototype.applyNoise = function(vec){
+ParticleSystemGenerator.prototype.applyNoise = function(vec, targetVector){
   var toNormalize = REUSABLE_VECTOR.set(vec.x, vec.y, vec.z);
   toNormalize.normalize();
   var noiseAmount = noise.perlin3(toNormalize.x, toNormalize.y, toNormalize.z);
@@ -125,7 +138,11 @@ ParticleSystemGenerator.prototype.applyNoise = function(vec){
   var toMultiplyScalar = REUSABLE_VECTOR_3.set(vec.x, vec.y, vec.z);
   toMultiplyScalar.multiplyScalar(noiseAmount);
   vector3.add(toMultiplyScalar);
-  return new THREE.Vector3(vector3.x, vector3.y, vector3.z);
+  if (!targetVector){
+    return new THREE.Vector3(vector3.x, vector3.y, vector3.z);
+  }else{
+    return targetVector.copy(vector3);
+  }
 }
 
 ParticleSystemGenerator.prototype.generateParticleSystemName = function(){
@@ -153,6 +170,73 @@ ParticleSystemGenerator.prototype.generateParticleSystemPool = function(poolName
   var psPool = new ParticleSystemPool(poolName);
   particleSystemPools[poolName] = psPool;
   return psPool;
+}
+
+ParticleSystemGenerator.prototype.generateCustomParticleSystem = function(configurations){
+  var particleMaterialConfigurations = {color: configurations.material.color, size: configurations.material.size, alpha: configurations.material.alpha};
+  if (configurations.material.hasTexture && configurations.material.textureName != ""){
+    particleMaterialConfigurations.textureName = configurations.material.textureName;
+    var splitted = configurations.material.rgbFilter.split(",");
+    particleMaterialConfigurations.rgbFilter = new THREE.Vector3(parseFloat(splitted[0]), parseFloat(splitted[1]), parseFloat(splitted[2]));
+  }
+  if (configurations.material.hasTargetColor){
+    particleMaterialConfigurations.targetColor = configurations.material.targetColor;
+    particleMaterialConfigurations.colorStep = configurations.material.colorStep;
+  }
+  var particleMaterial = this.generateParticleMaterial(particleMaterialConfigurations);
+  var positionVect = new THREE.Vector3();
+  var reusableQuaternion = new THREE.Quaternion();
+  var reusableVec1 = new THREE.Vector3();
+  var reusableVec2 = new THREE.Vector3();
+  var particles = [];
+  for (var i = 0; i<configurations.particleCount; i++){
+    var particleConfigurations = {material: particleMaterial, lifetime: 0};
+    switch(configurations.distribution.type){
+      case "SINGLE_POINT":
+        var splitted = configurations.distribution.coordinate.split(",");
+        particleConfigurations.position = positionVect.set(parseFloat(splitted[0]), parseFloat(splitted[1]), parseFloat(splitted[2]));
+      break;
+      case "SPHERICAL":
+        particleConfigurations.position = this.sphericalDistribution(configurations.distribution.radius, positionVect);
+      break;
+      case "BOX":
+        var splitted = configurations.distribution.boxSize.split(",");
+        var side = -1;
+        switch(configurations.distribution.boxSide){
+          case "UP": side = 1; break;
+          case "DOWN": side = 2; break;
+          case "FRONT": side = 3; break;
+          case "BACK": side = 4; break;
+          case "RIGHT": side = 5; break;
+          case "LEFT": side = 6; break;
+          case "RANDOM": side = -1; break;
+        }
+        particleConfigurations.position = this.boxDistribution(parseFloat(splitted[0]), parseFloat(splitted[1]), parseFloat(splitted[2]), side, positionVect);
+      break;
+      case "CIRCULAR":
+        var splitted = configurations.distribution.circleNormal.split(",");
+        this.computeQuaternionFromVectors(reusableVec1.set(0, 0, 1), reusableVec2.set(parseFloat(splitted[0]), parseFloat(splitted[1]), parseFloat(splitted[2])), reusableQuaternion);
+        particleConfigurations.position = this.circularDistribution(configurations.distribution.circleRadius, reusableQuaternion, positionVect);
+      break;
+      case "LINEAR":
+        var splitted1 = configurations.distribution.linearPoint1.split(",");
+        var splitted2 = configurations.distribution.linearPoint2.split(",");
+        reusableVec1.set(parseFloat(splitted1[0]), parseFloat(splitted1[1]), parseFloat(splitted1[2]));
+        reusableVec2.set(parseFloat(splitted2[0]), parseFloat(splitted2[1]), parseFloat(splitted2[2]));
+        reusableVec1.lerp(reusableVec2, Math.random());
+        particleConfigurations.position = positionVect.copy(reusableVec1);
+      break;
+      default:
+        throw new Error("Unknown distribution type.");
+      break;
+    }
+    if (configurations.distribution.applyNoise){
+      this.applyNoise(particleConfigurations.position, particleConfigurations.position);
+    }
+    particles.push(this.generateParticle(particleConfigurations));
+  }
+  var particleSystemConfigurations = {name: configurations.name, position: configurations.position, particles: particles, lifetime: 0};
+  return this.generateParticleSystem(particleSystemConfigurations);
 }
 
 ParticleSystemGenerator.prototype.generateLaser = function(configurations){

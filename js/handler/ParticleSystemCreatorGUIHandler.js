@@ -1688,10 +1688,207 @@ ParticleSystemCreatorGUIHandler.prototype.showSmoke = function(prevParams){
   particleSystemCreatorGUIHandler.onAfterShown();
 }
 
+ParticleSystemCreatorGUIHandler.prototype.handleCustomMaterialFolder = function(folder){
+  var customPSMaterialParameters = particleSystemCreatorGUIHandler.customParameters.material;
+  folder.addColor(customPSMaterialParameters, "color").onFinishChange(function(val){ particleSystemCreatorGUIHandler.customPSGeneratorFunc(); }).listen();
+  folder.add(customPSMaterialParameters, "size").min(0.1).max(20).step(0.01).onFinishChange(function(val){ particleSystemCreatorGUIHandler.customPSGeneratorFunc(); }).listen();
+  folder.add(customPSMaterialParameters, "alpha").min(0).max(1).step(0.1).onFinishChange(function(val){ particleSystemCreatorGUIHandler.customPSGeneratorFunc(); }).listen();
+  var hasTextureController = folder.add(customPSMaterialParameters, "hasTexture").onChange(function(val){
+    if (val){
+      guiHandler.enableController(particleSystemCreatorGUIHandler.customTextureNameController);
+      guiHandler.enableController(particleSystemCreatorGUIHandler.customRGBFilterController);
+    }else{
+      guiHandler.disableController(particleSystemCreatorGUIHandler.customTextureNameController);
+      guiHandler.disableController(particleSystemCreatorGUIHandler.customRGBFilterController);
+    }
+    particleSystemCreatorGUIHandler.customPSGeneratorFunc();
+  }).listen();
+  var textureNameController = folder.add(customPSMaterialParameters, "textureName", particleSystemCreatorGUIHandler.usableTextureNames).onChange(function(val){ particleSystemCreatorGUIHandler.customPSGeneratorFunc(); }).listen();
+  var rgbFilterController = folder.add(customPSMaterialParameters, "rgbFilter").onFinishChange(function(val){
+    var splitted = val.split(",");
+    if (splitted.length == 3){
+      for (var i = 0; i<3; i++){
+        if (isNaN(splitted[i])){
+          return;
+        }
+      }
+    }
+    particleSystemCreatorGUIHandler.customPSGeneratorFunc();
+  }).listen();
+  folder.add(customPSMaterialParameters, "hasTargetColor").onChange(function(val){
+    if (val){
+      guiHandler.enableController(particleSystemCreatorGUIHandler.customTargetColorController);
+      guiHandler.enableController(particleSystemCreatorGUIHandler.customColorStepController);
+    }else{
+      guiHandler.disableController(particleSystemCreatorGUIHandler.customTargetColorController);
+      guiHandler.disableController(particleSystemCreatorGUIHandler.customColorStepController);
+    }
+    particleSystemCreatorGUIHandler.customPSGeneratorFunc();
+  }).listen();
+  var targetColorController = folder.addColor(customPSMaterialParameters, "targetColor").onFinishChange(function(val){ particleSystemCreatorGUIHandler.customPSGeneratorFunc(); }).listen();
+  var colorStepController = folder.add(customPSMaterialParameters, "colorStep").min(0).max(1).step(0.001).onFinishChange(function(val){ particleSystemCreatorGUIHandler.customPSGeneratorFunc(); }).listen();
+  if (!customPSMaterialParameters.hasTexture){
+    guiHandler.disableController(textureNameController);
+    guiHandler.disableController(rgbFilterController);
+  }
+  if (particleSystemCreatorGUIHandler.usableTextureNames.length == 0){
+    guiHandler.disableController(hasTextureController);
+  }
+  if (!customPSMaterialParameters.hasTargetColor){
+    guiHandler.disableController(targetColorController);
+    guiHandler.disableController(colorStepController);
+  }
+  particleSystemCreatorGUIHandler.customTextureNameController = textureNameController;
+  particleSystemCreatorGUIHandler.customRGBFilterController = rgbFilterController;
+  particleSystemCreatorGUIHandler.customTargetColorController = targetColorController;
+  particleSystemCreatorGUIHandler.customColorStepController = colorStepController;
+}
+
+ParticleSystemCreatorGUIHandler.prototype.handleDistributionFolder = function(folder){
+  var distributionTypes = ["SINGLE_POINT", "SPHERICAL", "BOX", "CIRCULAR", "LINEAR"];
+  var boxSideTypes = ["RANDOM", "UP", "DOWN", "FRONT", "BACK", "RIGHT", "LEFT"];
+  var customPSDistributionParameters = particleSystemCreatorGUIHandler.customParameters.distribution;
+  var subControllerNames = ["singlePointCoordinateController", "sphericalCoordinateRadiusController", "boxSizeController", "boxSideController", "circleRadiusController", "circleNormalController", "linearPoint1Controller", "linearPoint2Controller"];
+  folder.add(customPSDistributionParameters, "type", distributionTypes).onChange(function(val){
+    for (var i = 0; i<subControllerNames.length; i++){
+      if (particleSystemCreatorGUIHandler[subControllerNames[i]]){
+        folder.remove(particleSystemCreatorGUIHandler[subControllerNames[i]]);
+        delete particleSystemCreatorGUIHandler[subControllerNames[i]];
+      }
+    }
+    controllerHandler();
+    particleSystemCreatorGUIHandler.customPSGeneratorFunc();
+  }).listen();
+  var controllerHandler = function(){
+    switch(customPSDistributionParameters.type){
+      case "SINGLE_POINT":
+        particleSystemCreatorGUIHandler.singlePointCoordinateController = folder.add(customPSDistributionParameters, "coordinate").onFinishChange(function(val){
+          var splitted = val.split(",");
+          if (splitted.length == 3){
+            for (var i = 0; i<3; i++){
+              if (isNaN(splitted[i])){
+                return;
+              }
+            }
+          }
+          particleSystemCreatorGUIHandler.customPSGeneratorFunc();
+        }).listen();
+      break;
+      case "SPHERICAL":
+        particleSystemCreatorGUIHandler.sphericalCoordinateRadiusController = folder.add(customPSDistributionParameters, "radius").min(0.1).max(500).step(0.1).onFinishChange(function(val){
+          particleSystemCreatorGUIHandler.customPSGeneratorFunc();
+        }).listen();
+      break;
+      case "BOX":
+        particleSystemCreatorGUIHandler.boxSizeController = folder.add(customPSDistributionParameters, "boxSize").onFinishChange(function(val){
+          var splitted = val.split(",");
+          if (splitted.length == 3){
+            for (var i = 0; i<3; i++){
+              if (isNaN(splitted[i])){
+                return;
+              }
+            }
+          }
+          particleSystemCreatorGUIHandler.customPSGeneratorFunc();
+        }).listen();
+        particleSystemCreatorGUIHandler.boxSideController = folder.add(customPSDistributionParameters, "boxSide", boxSideTypes).onChange(function(val){particleSystemCreatorGUIHandler.customPSGeneratorFunc();}).listen();
+      break;
+      case "CIRCULAR":
+        particleSystemCreatorGUIHandler.circleRadiusController = folder.add(customPSDistributionParameters, "circleRadius").min(0.1).max(500).step(0.1).onFinishChange(function(val){particleSystemCreatorGUIHandler.customPSGeneratorFunc();}).listen();
+        particleSystemCreatorGUIHandler.circleNormalController = folder.add(customPSDistributionParameters, "circleNormal").onFinishChange(function(val){
+          var splitted = val.split(",");
+          if (splitted.length == 3){
+            for (var i = 0; i<3; i++){
+              if (isNaN(splitted[i])){
+                return;
+              }
+            }
+          }
+          particleSystemCreatorGUIHandler.customPSGeneratorFunc();
+        }).listen();
+      break;
+      case "LINEAR":
+        particleSystemCreatorGUIHandler.linearPoint1Controller = folder.add(customPSDistributionParameters, "linearPoint1").onFinishChange(function(val){
+          var splitted = val.split(",");
+          if (splitted.length == 3){
+            for (var i = 0; i<3; i++){
+              if (isNaN(splitted[i])){
+                return;
+              }
+            }
+          }
+          particleSystemCreatorGUIHandler.customPSGeneratorFunc();
+        }).listen();
+        particleSystemCreatorGUIHandler.linearPoint2Controller = folder.add(customPSDistributionParameters, "linearPoint2").onFinishChange(function(val){
+          var splitted = val.split(",");
+          if (splitted.length == 3){
+            for (var i = 0; i<3; i++){
+              if (isNaN(splitted[i])){
+                return;
+              }
+            }
+          }
+          particleSystemCreatorGUIHandler.customPSGeneratorFunc();
+        }).listen();
+      break;
+    }
+  }
+  controllerHandler();
+  folder.add(customPSDistributionParameters, "applyNoise").onChange(function(val){particleSystemCreatorGUIHandler.customPSGeneratorFunc();}).listen();
+}
+
+ParticleSystemCreatorGUIHandler.prototype.handleMotionFolder = function(folder){
+  var motionTypes = ["NORMAL", "CIRCULAR"];
+  particleSystemCreatorGUIHandler.customPSMotionParameters = {type: "NORMAL"};
+  folder.add(particleSystemCreatorGUIHandler.customPSMotionParameters, "type", motionTypes).onChange(function(val){}).listen();
+}
+
+ParticleSystemCreatorGUIHandler.prototype.handleCollisionFolder = function(folder){
+  var collisionTypes = ["NONE", "REWIND", "DISSAPEAR"];
+  particleSystemCreatorGUIHandler.customPSCollisionParameters = {type: "NONE"};
+  folder.add(particleSystemCreatorGUIHandler.customPSCollisionParameters, "type", collisionTypes).onChange(function(val){}).listen();
+}
+
+ParticleSystemCreatorGUIHandler.prototype.handleAlphaVariationFolder = function(folder){
+  var alphaVariationTypes = ["NORMAL", "SIN", "COS"];
+  particleSystemCreatorGUIHandler.customPSAlphaVariationtypes = {type: "NORMAL"};
+  folder.add(particleSystemCreatorGUIHandler.customPSAlphaVariationtypes, "type", alphaVariationTypes).onChange(function(val){}).listen();
+}
+
 ParticleSystemCreatorGUIHandler.prototype.showCustom = function(prevParams){
   guiHandler.datGuiPSCreator = new dat.GUI({hideable: false});
   particleSystemCreatorGUIHandler.addTypeController("CUSTOM");
+  particleSystemCreatorGUIHandler.customParameters = {
+    name: particleSystemCreatorGUIHandler.psName,
+    position: new THREE.Vector3(0, 0, 0),
+    particleCount: 100,
+    material: {color: "#ffffff", size: 5, alpha: 1, hasTexture: false, textureName: "", rgbFilter: "r,g,b", hasTargetColor: false, targetColor: "#ffffff", colorStep: 0},
+    distribution: {type: "SINGLE_POINT", applyNoise: false, coordinate: "0,0,0", radius: 5, boxSize: "5,5,5", boxSide: "RANDOM", circleRadius: 5, circleNormal: "0,0,1", linearPoint1: "0,0,0", linearPoint2: "0,0,0"}
+  };
+  var particleMaterialFolder = guiHandler.datGuiPSCreator.addFolder("Material");
+  var particleDistributionFolder = guiHandler.datGuiPSCreator.addFolder("Distribution");
+  var particleMotionFolder = guiHandler.datGuiPSCreator.addFolder("Motion");
+  var particleCollisionFolder = guiHandler.datGuiPSCreator.addFolder("Collision");
+  var particleAlphaVariationFolder = guiHandler.datGuiPSCreator.addFolder("Alpha variation");
+  guiHandler.datGuiPSCreator.add(particleSystemCreatorGUIHandler.customParameters, "particleCount").min(1).max(5000).step(1).onFinishChange(function(val){ particleSystemCreatorGUIHandler.customPSGeneratorFunc(); });
+  particleSystemCreatorGUIHandler.handleCustomMaterialFolder(particleMaterialFolder);
+  particleSystemCreatorGUIHandler.handleDistributionFolder(particleDistributionFolder);
+  particleSystemCreatorGUIHandler.handleMotionFolder(particleMotionFolder);
+  particleSystemCreatorGUIHandler.handleCollisionFolder(particleCollisionFolder);
+  particleSystemCreatorGUIHandler.handleAlphaVariationFolder(particleAlphaVariationFolder);
+  particleSystemCreatorGUIHandler.customPSGeneratorFunc = function(){
+    if (particleSystemCreatorGUIHandler.particleSystem){
+      scene.remove(particleSystemCreatorGUIHandler.particleSystem.mesh);
+      particleSystemCreatorGUIHandler.particleSystem = 0;
+    }
+    particleSystemCreatorGUIHandler.particleSystem = particleSystemGenerator.generateCustomParticleSystem(particleSystemCreatorGUIHandler.customParameters);
+    particleSystemCreatorGUIHandler.particleSystem.mesh.visible = true;
+    scene.add(particleSystemCreatorGUIHandler.particleSystem.mesh);
+    particleSystemCreatorGUIHandler.preConfiguredParticleSystem = new PreconfiguredParticleSystem(particleSystemCreatorGUIHandler.psName, "CUSTOM", particleSystemCreatorGUIHandler.customParameters);
+  };
+  guiHandler.datGuiPSCreator.add({"Restart": function(){particleSystemCreatorGUIHandler.customPSGeneratorFunc();}}, "Restart");
   particleSystemCreatorGUIHandler.addCommonControllers();
+  particleSystemCreatorGUIHandler.customPSGeneratorFunc();
   particleSystemCreatorGUIHandler.onAfterShown();
 }
 

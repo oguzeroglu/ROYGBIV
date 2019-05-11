@@ -1,10 +1,7 @@
 var PreconfiguredParticleSystem = function(name, type, params){
   this.name = name;
   this.type = type;
-  this.params = {}
-  for (var key in params){
-    this.params[key] = params[key];
-  }
+  this.params = JSON.parse(JSON.stringify(params));
   this.setMaxPSTime(params.maxPSTime);
 }
 
@@ -26,6 +23,7 @@ PreconfiguredParticleSystem.prototype.export = function(){
 PreconfiguredParticleSystem.prototype.getParticleSystem = function(){
   var ps;
   switch(this.type){
+    case "CUSTOM": ps = particleSystemGenerator.generateCustomParticleSystem(this.params); break;
     case "MAGIC_CIRCLE": ps = particleSystemGenerator.generateMagicCircle(this.params); break;
     case "PLASMA": ps = particleSystemGenerator.generatePlasma(this.params); break;
     case "SMOKE": ps = particleSystemGenerator.generateSmoke(this.params); break;

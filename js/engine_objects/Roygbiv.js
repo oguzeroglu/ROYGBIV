@@ -25,9 +25,6 @@ var Roygbiv = function(){
     "sub",
     "add",
     "moveTowards",
-    "applyNoise",
-    "sphericalDistribution",
-    "boxDistribution",
     "applyForce",
     "rotate",
     "rotateAroundXYZ",
@@ -54,7 +51,6 @@ var Roygbiv = function(){
     "removeExpireListener",
     "normalizeVector",
     "computeQuaternionFromVectors",
-    "circularDistribution",
     "multiplyScalar",
     "createObjectTrail",
     "destroyObjectTrail",
@@ -2604,118 +2600,6 @@ Roygbiv.prototype.moveTowards = function(vec1, vec2, amount, targetVector){
   return newVec;
 }
 
-//  Applies Perlin noise to given vector [amount] times and returns the
-//  distorted value. The default amount is 1. Setting the amount too high can
-//  cause performance issues.
-Roygbiv.prototype.applyNoise = function(vec, amount){
-  if (mode == 0){
-    return;
-  }
-  preConditions.checkIfDefined(ROYGBIV.applyNoise, preConditions.vec, vec);
-  preConditions.checkIfVectorOnlyIfDefined(ROYGBIV.applyNoise, preConditions.vec, vec);
-  var toNormalize = REUSABLE_VECTOR.set(vec.x, vec.y, vec.z);
-  toNormalize.normalize();
-  var noiseAmount = noise.perlin3(toNormalize.x, toNormalize.y, toNormalize.z);
-  var vector3 = REUSABLE_VECTOR_2.set(vec.x, vec.y, vec.z);
-  var toMultiplyScalar = REUSABLE_VECTOR_3.set(vec.x, vec.y, vec.z);
-  toMultiplyScalar.multiplyScalar(noiseAmount);
-  vector3.add(toMultiplyScalar);
-  if (!amount){
-    return this.vector(vector3.x, vector3.y, vector3.z);
-  }else if (amount && !isNaN(amount) && amount > 1){
-    var noised = this.vector(vector3.x, vector3.y, vector3.z);
-    for (var i = 0; i<amount; i++){
-      noised = this.applyNoise(noised);
-    }
-    return noised;
-  }
-}
-
-//  Returns a vector sampled around an imaginary sphere of given radius centered
-//  at (0, 0, 0)
-Roygbiv.prototype.sphericalDistribution = function(radius){
-  if (mode == 0){
-    return;
-  }
-  preConditions.checkIfDefined(ROYGBIV.sphericalDistribution, preConditions.radius, radius);
-  preConditions.checkIfNumber(ROYGBIV.sphericalDistribution, preConditions.radius, radius);
-  preConditions.checkIfLessThan(ROYGBIV.sphericalDistribution, preConditions.radius, radius, 0);
-  REUSABLE_VECTOR.set(
-    Math.random() - 0.5,
-    Math.random() - 0.5,
-    Math.random() - 0.5
-  );
-  REUSABLE_VECTOR.normalize();
-  REUSABLE_VECTOR.multiplyScalar(radius);
-  return this.vector(REUSABLE_VECTOR.x, REUSABLE_VECTOR.y, REUSABLE_VECTOR.z);
-}
-
-//  Returns a vector sampled on a face of a box centered at (0, 0, 0).
-//  The size of the boxis specified with the parameters sizeX, sizeY and sizeZ.
-//  The optional parameter side can be used to generate the point on a
-//  specific face.
-//  side = 1 -> UP
-//  side = 2 -> DOWN
-//  side = 3 -> FRONT
-//  side = 4 -> BACK
-//  side = 5 -> RIGHT
-//  side = 6 -> LEFT
-Roygbiv.prototype.boxDistribution = function(sizeX, sizeY, sizeZ, side){
-  if (mode == 0){
-    return;
-  }
-  preConditions.checkIfDefined(ROYGBIV.boxDistribution, preConditions.sizeX, sizeX);
-  preConditions.checkIfDefined(ROYGBIV.boxDistribution, preConditions.sizeY, sizeY);
-  preConditions.checkIfDefined(ROYGBIV.boxDistribution, preConditions.sizeZ, sizeZ);
-  preConditions.checkIfNumber(ROYGBIV.boxDistribution, preConditions.sizeX, sizeX);
-  preConditions.checkIfNumber(ROYGBIV.boxDistribution, preConditions.sizeY, sizeY);
-  preConditions.checkIfNumber(ROYGBIV.boxDistribution, preConditions.sizeZ, sizeZ);
-  preConditions.checkIfLessThanExclusive(ROYGBIV.boxDistribution, preConditions.sizeX, sizeX, 0);
-  preConditions.checkIfLessThanExclusive(ROYGBIV.boxDistribution, preConditions.sizeY, sizeY, 0);
-  preConditions.checkIfLessThanExclusive(ROYGBIV.boxDistribution, preConditions.sizeZ, sizeZ, 0);
-  var randomSide = Math.floor(Math.random() * 6) + 1;
-  if (typeof side != UNDEFINED &&!isNaN(side) && side <= 6 && side >= 1){
-    randomSide = side;
-  }
-  var x, y, z;
-  var maxX = sizeX / 2, minX = -1 * sizeX / 2;
-  var maxY = sizeY / 2, minY = -1 * sizeY / 2;
-  var maxZ = sizeZ / 2, minZ = -1 * sizeZ / 2;
-  // 1, 2 -> XZ
-  // 3, 4 -> XY
-  // 5, 6 -> YZ
-  switch (randomSide){
-    case 1:
-      y = sizeY / 2;
-    break;
-    case 2:
-      y = -1 * sizeY / 2;
-    break;
-    case 3:
-      z = sizeZ / 2;
-    break;
-    case 4:
-      z = -1 * sizeZ / 2;
-    break;
-    case 5:
-      x = sizeX / 2;
-    break;
-    case 6:
-      x = -1 * sizeX / 2;
-    break;
-  }
-  if (typeof x == UNDEFINED){
-    x = Math.random () * (maxX - minX) + minX;
-  }
-  if (typeof y == UNDEFINED){
-    y = Math.random () * (maxY - minY) + minY;
-  }
-  if (typeof z == UNDEFINED){
-    z = Math.random () * (maxZ - minZ) + minZ;
-  }
-  return this.vector(x, y, z);
-}
-
 //  Creates a new color object from the given HTML color name.
 Roygbiv.prototype.color = function(colorName){
   if (mode == 0){
@@ -2784,25 +2668,6 @@ Roygbiv.prototype.computeQuaternionFromVectors = function(vec1, vec2, targetQuat
     );
     return targetQuaternion;
   }
-}
-
-//  Returns a random point sampled around an imaginary circle with given radius and given
-//  quaternion in 3D space. If no quaternion is specified the circle is sampled on the XY plane.
-Roygbiv.prototype.circularDistribution = function(radius, quaternion){
-  if (mode == 0){
-    return;
-  }
-  preConditions.checkIfDefined(ROYGBIV.circularDistribution, preConditions.radius, radius);
-  preConditions.checkIfNumber(ROYGBIV.circularDistribution, preConditions.radius, radius);
-  preConditions.checkIfLessThan(ROYGBIV.circularDistribution, preConditions.radius, radius, 0);
-  preConditions.checkIfQuaternionOnlyIfDefined(ROYGBIV.circularDistribution, preConditions.quaternion, quaternion);
-  REUSABLE_VECTOR_3.set(Math.random() - 0.5, Math.random() - 0.5, 0);
-  REUSABLE_VECTOR_3.normalize();
-  REUSABLE_VECTOR_3.multiplyScalar(radius);
-  if (!(typeof quaternion == UNDEFINED)){
-    REUSABLE_VECTOR_3.applyQuaternion(quaternion);
-  }
-  return this.vector(REUSABLE_VECTOR_3.x, REUSABLE_VECTOR_3.y, REUSABLE_VECTOR_3.z);
 }
 
 //  Multiplies a vector by a scalar.

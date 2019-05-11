@@ -7,17 +7,14 @@ var ParticleMaterial = function(configurations){
   this.alpha = configurations.alpha;
   this.rgbFilter = configurations.rgbFilter;
   this.colorStep = configurations.colorStep;
-
   this.noTargetColor = false;
   if (!this.targetColor){
     this.noTargetColor = true;
     this.targetColor = this.color;
   }
-
   if (!(typeof this.colorStep == UNDEFINED)){
     this.colorStep *= 2;
   }
-
   this.color = this.color.toLowerCase();
   var threeColor = REUSABLE_COLOR.set(this.color);
   this.red = threeColor.r;
