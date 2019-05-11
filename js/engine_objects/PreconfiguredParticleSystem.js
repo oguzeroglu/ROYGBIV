@@ -36,6 +36,7 @@ PreconfiguredParticleSystem.prototype.getParticleSystem = function(){
     case "TRAIL": ps = particleSystemGenerator.generateTrail(this.params); break;
     case "CIRC_EXPLOSION": ps = particleSystemGenerator.generateCircularExplosion(this.params); break;
     case "DYNAMIC_TRAIL": ps = particleSystemGenerator.generateDynamicTrail(this.params); break;
+    case "LASER": ps = particleSystemGenerator.generateLaser(this.params); break;
   }
   if (ps){
     ps.isCollidable = this.isCollidable;

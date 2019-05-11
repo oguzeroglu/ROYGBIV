@@ -604,7 +604,139 @@ ParticleSystemCreatorGUIHandler.prototype.showWaterfall = function(prevParams){
 ParticleSystemCreatorGUIHandler.prototype.showLaser = function(prevParams){
   guiHandler.datGuiPSCreator = new dat.GUI({hideable: false});
   particleSystemCreatorGUIHandler.addTypeController("LASER");
+  var laserParameters = {particleCount: 10, particleSize: 5, timeDiff: 0.01, expireTime: 0, velocity: "0,0,100", acceleration: "0,0,0", alpha: 1, colorName: "#ffffff", hasTargetColor: false, targetColorName: "#ffffff", colorStep: 0, hasTexture: false, textureName: "", rgbFilter: "r,g,b"};
+  for (var key in prevParams){
+    laserParameters[key] = prevParams[key];
+    if (key == "rgbFilter" || key == "direction" || key == "velocity" || key == "acceleration"){
+      laserParameters[key] = laserParameters[key].x+","+laserParameters[key].y+","+laserParameters[key].z;
+    }
+  }
+  guiHandler.datGuiPSCreator.add(laserParameters, "particleCount").min(1).max(5000).step(1).onFinishChange(function(val){
+    particleSystemCreatorGUIHandler.laserGeneratorFunc();
+  }).listen();
+  guiHandler.datGuiPSCreator.add(laserParameters, "particleSize").min(0.1).max(20).step(0.01).onFinishChange(function(val){
+    particleSystemCreatorGUIHandler.laserGeneratorFunc();
+  }).listen();
+  guiHandler.datGuiPSCreator.add(laserParameters, "timeDiff").min(0.001).max(1).step(0.001).onFinishChange(function(val){
+    particleSystemCreatorGUIHandler.laserGeneratorFunc();
+  }).listen();
+  guiHandler.datGuiPSCreator.add(laserParameters, "expireTime").min(0).max(50).step(0.1).onFinishChange(function(val){
+    particleSystemCreatorGUIHandler.laserGeneratorFunc();
+  }).listen();
+  guiHandler.datGuiPSCreator.add(laserParameters, "velocity").onFinishChange(function(val){
+    var splitted = val.split(",");
+    if (splitted.length == 3){
+      for (var i = 0; i<3; i++){
+        if (isNaN(splitted[i])){
+          return;
+        }
+      }
+    }
+    particleSystemCreatorGUIHandler.laserGeneratorFunc();
+  }).listen();
+  guiHandler.datGuiPSCreator.add(laserParameters, "acceleration").onFinishChange(function(val){
+    var splitted = val.split(",");
+    if (splitted.length == 3){
+      for (var i = 0; i<3; i++){
+        if (isNaN(splitted[i])){
+          return;
+        }
+      }
+    }
+    particleSystemCreatorGUIHandler.laserGeneratorFunc();
+  }).listen();
+  guiHandler.datGuiPSCreator.add(laserParameters, "alpha").min(0).max(1).step(0.1).onFinishChange(function(val){
+    particleSystemCreatorGUIHandler.laserGeneratorFunc();
+  }).listen();
+  guiHandler.datGuiPSCreator.addColor(laserParameters, "colorName").onFinishChange(function(val){
+    particleSystemCreatorGUIHandler.laserGeneratorFunc();
+  }).listen();
+  guiHandler.datGuiPSCreator.add(laserParameters, "hasTargetColor").onChange(function(val){
+    if (val){
+      guiHandler.enableController(particleSystemCreatorGUIHandler.laserTargetColorNameController);
+      guiHandler.enableController(particleSystemCreatorGUIHandler.laserColorStepController);
+    }else{
+      guiHandler.disableController(particleSystemCreatorGUIHandler.laserTargetColorNameController);
+      guiHandler.disableController(particleSystemCreatorGUIHandler.laserColorStepController);
+    }
+    particleSystemCreatorGUIHandler.laserGeneratorFunc();
+  }).listen();
+  particleSystemCreatorGUIHandler.laserTargetColorNameController = guiHandler.datGuiPSCreator.addColor(laserParameters, "targetColorName").onFinishChange(function(val){
+    particleSystemCreatorGUIHandler.laserGeneratorFunc();
+  }).listen();
+  particleSystemCreatorGUIHandler.laserColorStepController = guiHandler.datGuiPSCreator.add(laserParameters, "colorStep").min(0).max(1).step(0.001).onFinishChange(function(val){
+    particleSystemCreatorGUIHandler.laserGeneratorFunc();
+  }).listen();
+  particleSystemCreatorGUIHandler.laserHasTextureController = guiHandler.datGuiPSCreator.add(laserParameters, "hasTexture").onChange(function(val){
+    if (val){
+      guiHandler.enableController(particleSystemCreatorGUIHandler.laserTextureNameController);
+      guiHandler.enableController(particleSystemCreatorGUIHandler.laserRGBFilterController);
+    }else{
+      guiHandler.disableController(particleSystemCreatorGUIHandler.laserTextureNameController);
+      guiHandler.disableController(particleSystemCreatorGUIHandler.laserRGBFilterController);
+    }
+    particleSystemCreatorGUIHandler.laserGeneratorFunc();
+  }).listen();
+  particleSystemCreatorGUIHandler.laserTextureNameController = guiHandler.datGuiPSCreator.add(laserParameters, "textureName", particleSystemCreatorGUIHandler.usableTextureNames).onFinishChange(function(val){
+    particleSystemCreatorGUIHandler.laserGeneratorFunc();
+  }).listen();
+  particleSystemCreatorGUIHandler.laserRGBFilterController = guiHandler.datGuiPSCreator.add(laserParameters, "rgbFilter").onFinishChange(function(val){
+    var splitted = val.split(",");
+    if (splitted.length == 3){
+      for (var i = 0; i<3; i++){
+        if (isNaN(splitted[i])){
+          return;
+        }
+      }
+    }
+    particleSystemCreatorGUIHandler.laserGeneratorFunc();
+  }).listen();
+  if (!particleSystemCreatorGUIHandler.hasTexture){
+    guiHandler.disableController(particleSystemCreatorGUIHandler.laserTextureNameController);
+    guiHandler.disableController(particleSystemCreatorGUIHandler.laserRGBFilterController);
+  }
+  if (particleSystemCreatorGUIHandler.usableTextureNames.length == 0){
+    guiHandler.disableController(particleSystemCreatorGUIHandler.laserHasTextureController);
+  }
+  if (!particleSystemCreatorGUIHandler.hasTargetColor){
+    guiHandler.disableController(particleSystemCreatorGUIHandler.laserTargetColorNameController);
+    guiHandler.disableController(particleSystemCreatorGUIHandler.laserRGBFilterController);
+  }
+  particleSystemCreatorGUIHandler.laserGeneratorFunc = function(){
+    if (particleSystemCreatorGUIHandler.particleSystem){
+      scene.remove(particleSystemCreatorGUIHandler.particleSystem.mesh);
+      particleSystemCreatorGUIHandler.particleSystem = 0;
+    }
+    var params = {name: particleSystemCreatorGUIHandler.psName, position: new THREE.Vector3(0, 0, 0)};
+    for (var key in particleSystemCreatorGUIHandler.laserParameters){
+      params[key] = particleSystemCreatorGUIHandler.laserParameters[key];
+    }
+    if (!particleSystemCreatorGUIHandler.laserParameters.hasTexture || particleSystemCreatorGUIHandler.laserParameters.textureName == ""){
+      delete params.textureName;
+      delete params.rgbFilter;
+    }else{
+      var splitted = params.rgbFilter.split(",");
+      params.rgbFilter = new THREE.Vector3(parseFloat(splitted[0]), parseFloat(splitted[1]), parseFloat(splitted[2]));
+    }
+    if (!particleSystemCreatorGUIHandler.laserParameters.hasTargetColor){
+      delete params.targetColorName;
+      delete params.colorStep;
+    }
+    var velocitySplitted = params.velocity.split(",");
+    var accelerationSplitted = params.acceleration.split(",");
+    params.velocity = new THREE.Vector3(parseFloat(velocitySplitted[0]), parseFloat(velocitySplitted[1]), parseFloat(velocitySplitted[2]));
+    params.acceleration = new THREE.Vector3(parseFloat(accelerationSplitted[0]), parseFloat(accelerationSplitted[1]), parseFloat(accelerationSplitted[2]));
+    particleSystemCreatorGUIHandler.particleSystem = particleSystemGenerator.generateLaser(params);
+    particleSystemCreatorGUIHandler.particleSystem.mesh.visible = true;
+    scene.add(particleSystemCreatorGUIHandler.particleSystem.mesh);
+    particleSystemCreatorGUIHandler.preConfiguredParticleSystem = new PreconfiguredParticleSystem(particleSystemCreatorGUIHandler.psName, "LASER", params);
+  }
   particleSystemCreatorGUIHandler.addCommonControllers();
+  particleSystemCreatorGUIHandler.laserParameters = laserParameters;
+  guiHandler.datGuiPSCreator.add({"Restart": function(){
+    particleSystemCreatorGUIHandler.laserGeneratorFunc();
+  }}, "Restart");
+  particleSystemCreatorGUIHandler.laserGeneratorFunc();
   particleSystemCreatorGUIHandler.onAfterShown();
 }
 

@@ -613,23 +613,6 @@ var Text = function(){
                                                   "alpha: The alpha value of trails between [0,1]. (mandatory)\n"+
                                                   "maxTimeInSeconds: Maximum trail time in seconds. The default value is 0.25 (optional)";
   this.ROYGBIV_SCRIPTING_API_DESTROYOBJECTTRAIL = "Destroys the trail effect of an object created using the createObjectTrail function.";
-  this.ROYGBIV_SCRIPTING_API_CREATELASER = "Creates a laser like particle system. Configurations are:\n"+
-                                           "name: The unique name of the particle system. (mandatory)\n"+
-                                           "position: The initial position of the particle system. (mandatory)\n"+
-                                           "particleCount: The count of laser particles. (mandatory)\n"+
-                                           "particleSize: The size of laser particles. (mandatory)\n"+
-                                           "direction: The direction vector of the laser. (mandatory)\n"+
-                                           "timeDiff: The difference between startDelay attribute of each laser particle in seconds. (mandatory)\n"+
-                                           "expireTime: The maximum lifetime of the laser. Set this 0 for infinite laser. (mandatory)\n"+
-                                           "velocity: The velocity vector of the laser. (mandatory)\n"+
-                                           "acceleration: The acceleration vector of the laser. (mandatory)\n"+
-                                           "alpha: The opacity of laser particles. Expected value is between [0, 1]. (mandatory)\n"+
-                                           "colorName: The color name of laser particles. (mandatory)\n"+
-                                           "targetColorName: The target color name of trail particles. (optional)\n"+
-                                           "colorStep: A float between [0,1] that represents the variaton of color betwen the initial color and the target color. (optional)\n"+
-                                           "textureName: The name of texture of laser particles. (optional)\n"+
-                                           "rgbFilter: This can be used to eliminate texture background colors. (optional)\n"+
-                                           "updateFunction: The update function of the particle system that is executed on each frame render. (optional)";
     this.ROYGBIV_SCRIPTING_API_GETPARTICLESYSTEMVELOCITYATTIME = "Calcualtes and returns the velocity vector of a particle system at given time. For particles with circular motion, this function returns\nthe angular velocity at given time.";
     this.ROYGBIV_SCRIPTING_API_STOPPARTICLESYSTEM = "Stops the motion of a particle system. This can be useful for smooth after collision effects of particle systems as it lets particles\nto dissapear smoothly. The particle system is killed after stopDuration seconds.If particle systems have collision listener attached,\nthe collision listener needs to be reset when starting the particle system after stopping.";
     this.ROYGBIV_SCRIPTING_API_STARTPARTICLESYSTEM = "Starts a particle system after its creation. Configurations are:\n"+

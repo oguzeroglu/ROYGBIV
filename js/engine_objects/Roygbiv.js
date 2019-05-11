@@ -58,7 +58,6 @@ var Roygbiv = function(){
     "multiplyScalar",
     "createObjectTrail",
     "destroyObjectTrail",
-    "createLaser",
     "getParticleSystemVelocityAtTime",
     "stopParticleSystem",
     "startParticleSystem",
@@ -1163,108 +1162,6 @@ Roygbiv.prototype.destroyObjectTrail = function(object){
   delete objectTrails[object.name];
   delete activeObjectTrails[object.name];
   return;
-}
-
-// Creates a laser like particle system. Configfurations are:
-// name: The unique name of the particle system. (mandatory)
-// position: The initial position of the particle system. (mandatory)
-// particleCount: The count of laser particles. (mandatory)
-// particleSize: The size of laser particles. (mandatory)
-// direction: The direction vector of the laser. (mandatory)
-// timeDiff: The difference between startDelay attribute of each laser particles in seconds. Expected value is greater than zero. (mandatory)
-// expireTime: The maximum lifetime of the laser. Set this 0 for infinite laser. (mandatory)
-// velocity: The velocity vector of the laser. (mandatory)
-// acceleration: The acceleration vector of the laser. (mandatory)
-// alpha: The opacity of laser particles. Expected value is between [0, 1]. (mandatory)
-// colorName: The color name of laser particles. (mandatory)
-// targetColorName: The target color name of trail particles. (optional)
-// colorStep: A float between [0,1] that represents the variaton of color betwen the initial color and the target color. (optional)
-// textureName: The name of texture of laser particles. (optional)
-// rgbFilter: This can be used to eliminate texture background colors. (optional)
-// updateFunction: The update function of the particle system that is executed on each frame render. (optional)
-Roygbiv.prototype.createLaser = function(configurations){
-  if (mode == 0){
-    return;
-  }
-  preConditions.checkIfDefined(ROYGBIV.createLaser, preConditions.configurations, configurations);
-  var name = configurations.name;
-  var position = configurations.position;
-  var particleCount = configurations.particleCount;
-  var particleSize = configurations.particleSize;
-  var direction = configurations.direction;
-  var timeDiff = configurations.timeDiff;
-  var expireTime = configurations.expireTime;
-  var velocity = configurations.velocity;
-  var acceleration = configurations.acceleration;
-  var alpha = configurations.alpha;
-  var colorName = configurations.colorName;
-  var targetColorName = configurations.targetColorName;
-  var colorStep = configurations.colorStep;
-  var textureName = configurations.textureName;
-  var rgbFilter = configurations.rgbFilter;
-  var updateFunction = configurations.updateFunction;
-
-  preConditions.checkIfMandatoryParameterExists(ROYGBIV.createLaser, preConditions.name, name);
-  preConditions.checkIfTrue(ROYGBIV.createLaser, "name must be unique", (particleSystemPool[name]));
-  preConditions.checkIfMandatoryParameterExists(ROYGBIV.createLaser, preConditions.position, position);
-  preConditions.checkIfVectorOnlyIfDefined(ROYGBIV.createLaser, preConditions.position, position);
-  preConditions.checkIfMandatoryParameterExists(ROYGBIV.createLaser, preConditions.particleCount, particleCount);
-  preConditions.checkIfNumber(ROYGBIV.createLaser, preConditions.particleCount, particleCount);
-  preConditions.checkIfLessThan(ROYGBIV.createLaser, preConditions.particleCount, particleCount, 0);
-  preConditions.checkIfMandatoryParameterExists(ROYGBIV.createLaser, preConditions.particleSize, particleSize);
-  preConditions.checkIfNumber(ROYGBIV.createLaser, preConditions.particleSize, particleSize);
-  preConditions.checkIfLessThan(ROYGBIV.createLaser, preConditions.particleSize, particleSize, 0);
-  preConditions.checkIfMandatoryParameterExists(ROYGBIV.createLaser, preConditions.direction, direction);
-  preConditions.checkIfVectorOnlyIfDefined(ROYGBIV.createLaser, preConditions.direction, direction);
-  preConditions.checkIfMandatoryParameterExists(ROYGBIV.createLaser, preConditions.timeDiff, timeDiff);
-  preConditions.checkIfNumber(ROYGBIV.createLaser, preConditions.timeDiff, timeDiff);
-  preConditions.checkIfMandatoryParameterExists(ROYGBIV.createLaser, preConditions.expireTime, expireTime);
-  preConditions.checkIfNumber(ROYGBIV.createLaser, preConditions.expireTime, expireTime);
-  preConditions.checkIfLessThanExclusive(ROYGBIV.createLaser, preConditions.expireTime, expireTime, 0);
-  preConditions.checkIfMandatoryParameterExists(ROYGBIV.createLaser, preConditions.velocity, velocity);
-  preConditions.checkIfVectorOnlyIfDefined(ROYGBIV.createLaser, preConditions.velocity, velocity);
-  preConditions.checkIfMandatoryParameterExists(ROYGBIV.createLaser, preConditions.acceleration, acceleration);
-  preConditions.checkIfVectorOnlyIfDefined(ROYGBIV.createLaser, preConditions.acceleration, acceleration);
-  preConditions.checkIfMandatoryParameterExists(ROYGBIV.createLaser, preConditions.alpha, alpha);
-  preConditions.checkIfNumber(ROYGBIV.createLaser, preConditions.alpha, alpha);
-  preConditions.checkIfInRange(ROYGBIV.createLaser, preConditions.alpha, alpha, 0, 1);
-  preConditions.checkIfMandatoryParameterExists(ROYGBIV.createLaser, preConditions.colorName, colorName);
-
-  var particleMaterialConfigurations = new Object();
-  particleMaterialConfigurations.color = colorName;
-  particleMaterialConfigurations.size = particleSize;
-  particleMaterialConfigurations.alpha = alpha;
-  particleMaterialConfigurations.textureName = textureName;
-  particleMaterialConfigurations.rgbFilter = rgbFilter;
-  particleMaterialConfigurations.targetColor = targetColorName;
-  particleMaterialConfigurations.colorStep = colorStep;
-  var particleMaterial = this.createParticleMaterial(particleMaterialConfigurations);
-
-  var particles = [];
-  var particleConfigurations = new Object();
-  particleConfigurations.material = particleMaterial;
-  particleConfigurations.lifetime = 0;
-  particleConfigurations.respawn = false;
-  var c2 = 0;
-  for (var i = 0; i < particleCount; i++){
-    var dx = (direction.x * c2);
-    var dy = (direction.y * c2);
-    var dz = (direction.z * c2);
-    particleConfigurations.startDelay = c2;
-    particleConfigurations.position = this.vector(dx, dy, dz);
-    c2 += timeDiff;
-    particles.push(this.createParticle(particleConfigurations));
-  }
-
-  var particleSystemConfigurations = new Object();
-  particleSystemConfigurations.name = name;
-  particleSystemConfigurations.particles = particles;
-  particleSystemConfigurations.position = position;
-  particleSystemConfigurations.lifetime = expireTime;
-  particleSystemConfigurations.velocity = velocity;
-  particleSystemConfigurations.acceleration = acceleration;
-  particleSystemConfigurations.updateFunction = updateFunction;
-  return this.createParticleSystem(particleSystemConfigurations);
 }
 
 // Stops the motion of a particle system. This can be useful for smooth after collision

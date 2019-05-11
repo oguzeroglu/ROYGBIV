@@ -155,6 +155,58 @@ ParticleSystemGenerator.prototype.generateParticleSystemPool = function(poolName
   return psPool;
 }
 
+ParticleSystemGenerator.prototype.generateLaser = function(configurations){
+  var name = configurations.name;
+  var position = configurations.position;
+  var particleCount = configurations.particleCount;
+  var particleSize = configurations.particleSize;
+  var timeDiff = configurations.timeDiff;
+  var expireTime = configurations.expireTime;
+  var velocity = configurations.velocity;
+  var direction = velocity.clone();
+  var acceleration = configurations.acceleration;
+  var alpha = configurations.alpha;
+  var colorName = configurations.colorName;
+  var targetColorName = configurations.targetColorName;
+  var colorStep = configurations.colorStep;
+  var textureName = configurations.textureName;
+  var rgbFilter = configurations.rgbFilter;
+  var updateFunction = configurations.updateFunction;
+  var particleMaterialConfigurations = new Object();
+  particleMaterialConfigurations.color = colorName;
+  particleMaterialConfigurations.size = particleSize;
+  particleMaterialConfigurations.alpha = alpha;
+  particleMaterialConfigurations.textureName = textureName;
+  particleMaterialConfigurations.rgbFilter = rgbFilter;
+  particleMaterialConfigurations.targetColor = targetColorName;
+  particleMaterialConfigurations.colorStep = colorStep;
+  var particleMaterial = this.generateParticleMaterial(particleMaterialConfigurations);
+  var particles = [];
+  var particleConfigurations = new Object();
+  particleConfigurations.material = particleMaterial;
+  particleConfigurations.lifetime = 0;
+  particleConfigurations.respawn = false;
+  var c2 = 0;
+  for (var i = 0; i < particleCount; i++){
+    var dx = (direction.x * c2);
+    var dy = (direction.y * c2);
+    var dz = (direction.z * c2);
+    particleConfigurations.startDelay = c2;
+    particleConfigurations.position = new THREE.Vector3(dx, dy, dz);
+    c2 += timeDiff;
+    particles.push(this.generateParticle(particleConfigurations));
+  }
+  var particleSystemConfigurations = new Object();
+  particleSystemConfigurations.name = name;
+  particleSystemConfigurations.particles = particles;
+  particleSystemConfigurations.position = position;
+  particleSystemConfigurations.lifetime = expireTime;
+  particleSystemConfigurations.velocity = velocity;
+  particleSystemConfigurations.acceleration = acceleration;
+  particleSystemConfigurations.updateFunction = updateFunction;
+  return this.generateParticleSystem(particleSystemConfigurations);
+}
+
 ParticleSystemGenerator.prototype.generateDynamicTrail = function(configurations){
   var name = configurations.name;
   var position = configurations.position;
