@@ -190,7 +190,7 @@ ParticleSystemGenerator.prototype.generateCustomParticleSystem = function(config
   var reusableVec2 = new THREE.Vector3();
   var particles = [];
   for (var i = 0; i<configurations.particleCount; i++){
-    var particleConfigurations = {material: particleMaterial, startDelay: configurations.motion.startDelay, lifetime: configurations.motion.lifetime, respawn: configurations.motion.respawn, alphaVariation: configurations.alphaVariation.alphaVariation};
+    var particleConfigurations = {material: particleMaterial, startDelay: configurations.motion.startDelay, lifetime: configurations.motion.lifetime, respawn: configurations.motion.respawn, alphaVariation: configurations.alphaVariation.alphaVariation, collisionTimeOffset: configurations.collision.collisionTimeOffset};
     if (configurations.motion.randomizeStartDelay){
       particleConfigurations.startDelay = particleConfigurations.startDelay * Math.random();
     }
@@ -272,6 +272,13 @@ ParticleSystemGenerator.prototype.generateCustomParticleSystem = function(config
       case "SIN": particleConfigurations.alphaVariationMode = ALPHA_VARIATION_MODE_SIN; break;
       case "COS": particleConfigurations.alphaVariationMode = ALPHA_VARIATION_MODE_COS; break;
       default: throw new Error("Unknown alphaVariation type."); break;
+    }
+    if (configurations.collision.type != "NONE"){
+      switch(configurations.collision.type){
+        case "REWIND": particleConfigurations.collisionAction = PARTICLE_REWIND_ON_COLLIDED; break;
+        case "DISSAPEAR": particleConfigurations.collisionAction = PARTICLE_DISSAPEAR_ON_COLLIDED; break;
+        default: throw new Error("Unknown collision action."); break;
+      }
     }
     particles.push(this.generateParticle(particleConfigurations));
   }

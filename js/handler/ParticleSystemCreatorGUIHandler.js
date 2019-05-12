@@ -1749,6 +1749,9 @@ ParticleSystemCreatorGUIHandler.prototype.handleDistributionFolder = function(fo
   var boxSideTypes = ["RANDOM", "UP", "DOWN", "FRONT", "BACK", "RIGHT", "LEFT"];
   var customPSDistributionParameters = particleSystemCreatorGUIHandler.customParameters.distribution;
   var subControllerNames = ["singlePointCoordinateController", "sphericalCoordinateRadiusController", "boxSizeController", "boxSideController", "circleRadiusController", "circleNormalController", "linearPoint1Controller", "linearPoint2Controller"];
+  for (var i = 0; i<subControllerNames.length; i++){
+    delete particleSystemCreatorGUIHandler[subControllerNames[i]];
+  }
   folder.add(customPSDistributionParameters, "type", distributionTypes).onChange(function(val){
     for (var i = 0; i<subControllerNames.length; i++){
       if (particleSystemCreatorGUIHandler[subControllerNames[i]]){
@@ -1841,6 +1844,9 @@ ParticleSystemCreatorGUIHandler.prototype.handleMotionFolder = function(folder){
   var motionTypes = ["NORMAL", "CIRCULAR"];
   var customPSMotionParameters = particleSystemCreatorGUIHandler.customParameters.motion;
   var subControllerNames = ["trailModeController", "useWorldPositionController", "velocityController", "accelerationController", "velocityRandomnessController", "accelerationRandomnessController", "initialAngleController", "angularMotionRadiusController", "hasAngleStepController", "angleStepController", "angularVelocityController", "angularAccelerationController", "circularMotionNormalController", "randomizeNormal"];
+  for (var i = 0; i<subControllerNames.length; i++){
+    delete particleSystemCreatorGUIHandler[subControllerNames[i]];
+  }
   folder.add(customPSMotionParameters, "type", motionTypes).onChange(function(val){
     for (var i = 0; i<subControllerNames.length; i++){
       if (particleSystemCreatorGUIHandler[subControllerNames[i]]){
@@ -1955,8 +1961,9 @@ ParticleSystemCreatorGUIHandler.prototype.handleMotionFolder = function(folder){
 
 ParticleSystemCreatorGUIHandler.prototype.handleCollisionFolder = function(folder){
   var collisionTypes = ["NONE", "REWIND", "DISSAPEAR"];
-  particleSystemCreatorGUIHandler.customPSCollisionParameters = {type: "NONE"};
-  folder.add(particleSystemCreatorGUIHandler.customPSCollisionParameters, "type", collisionTypes).onChange(function(val){particleSystemCreatorGUIHandler.customPSGeneratorFunc();}).listen();
+  var customPSCollisionParameters = particleSystemCreatorGUIHandler.customParameters.collision;
+  folder.add(customPSCollisionParameters, "type", collisionTypes).onChange(function(val){particleSystemCreatorGUIHandler.customPSGeneratorFunc();}).listen();
+  folder.add(customPSCollisionParameters, "collisionTimeOffset").min(0).max(1000).step(0.1).onFinishChange(function(val){particleSystemCreatorGUIHandler.customPSGeneratorFunc();}).listen();
 }
 
 ParticleSystemCreatorGUIHandler.prototype.handleAlphaVariationFolder = function(folder){
@@ -1976,7 +1983,8 @@ ParticleSystemCreatorGUIHandler.prototype.showCustom = function(prevParams){
     material: {color: "#ffffff", size: 5, alpha: 1, hasTexture: false, textureName: "", rgbFilter: "r,g,b", hasTargetColor: false, targetColor: "#ffffff", colorStep: 0},
     distribution: {type: "SINGLE_POINT", applyNoise: false, coordinate: "0,0,0", radius: 5, boxSize: "5,5,5", boxSide: "RANDOM", circleRadius: 5, circleNormal: "0,0,1", linearPoint1: "0,0,0", linearPoint2: "0,0,0"},
     motion: {type: "NORMAL", lifetime: 0, respawn: false, startDelay: 0, randomizeStartDelay: true, trailMode: false, useWorldPosition: false, velocity: "0,0,0", acceleration: "0,0,0", velocityRandomness: "0,0,0", accelerationRandomness: "0,0,0", initialAngle: 0, hasAngleStep: false, angleStep: 0,angularVelocity: 0, angularAcceleration: 0, angularMotionRadius: 5, circularMotionNormal: "0,1,0", randomizeNormal: false},
-    alphaVariation: {type: "NORMAL", alphaVariation: 0}
+    alphaVariation: {type: "NORMAL", alphaVariation: 0},
+    collision: {type: "NONE", collisionTimeOffset: 0}
   };
   var particleMaterialFolder = guiHandler.datGuiPSCreator.addFolder("Material");
   var particleDistributionFolder = guiHandler.datGuiPSCreator.addFolder("Distribution");

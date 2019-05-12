@@ -271,9 +271,11 @@ ParticleSystem.prototype.undoRemoveParticle = function(particle){
   }else{
     selectedGeometry = this.geometry;
   }
-  selectedGeometry.attributes.expiredFlag.updateRange.set(selectedOffset, 1);
-  selectedGeometry.attributes.expiredFlag.array[particle.index] = 0;
-  selectedGeometry.attributes.expiredFlag.needsUpdate = true;
+  if (selectedGeometry){
+    selectedGeometry.attributes.expiredFlag.updateRange.set(selectedOffset, 1);
+    selectedGeometry.attributes.expiredFlag.array[particle.index] = 0;
+    selectedGeometry.attributes.expiredFlag.needsUpdate = true;
+  }
   particle.isExpired = false;
   if (particle.checkForCollisions){
     if (typeof particle.uuid == UNDEFINED){
