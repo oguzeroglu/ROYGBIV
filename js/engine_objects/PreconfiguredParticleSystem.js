@@ -17,6 +17,8 @@ PreconfiguredParticleSystem.prototype.export = function(){
   exportObj.isCollidable = this.isCollidable;
   exportObj.maxPSTime = this.maxPSTime;
   exportObj.preConfiguredParticleSystemPoolName = this.preConfiguredParticleSystemPoolName;
+  exportObj.blendingIntVal = this.blendingIntVal;
+  exportObj.blendingStrVal = this.blendingStrVal;
   return exportObj;
 }
 
@@ -42,9 +44,17 @@ PreconfiguredParticleSystem.prototype.getParticleSystem = function(){
     if (ps.creationConfigurations){
       ps.creationConfigurations.maxPSTime = ps.maxPSTime;
     }
+    if (!(typeof this.blendingIntVal == UNDEFINED)){
+      ps.setBlending(this.blendingIntVal);
+    }
     return ps;
   }
   throw new Error("Unknown type.");
+}
+
+PreconfiguredParticleSystem.prototype.setBlending = function(intVal, strVal){
+  this.blendingIntVal = intVal;
+  this.blendingStrVal = strVal;
 }
 
 PreconfiguredParticleSystem.prototype.setMaxPSTime = function(maxPSTime){

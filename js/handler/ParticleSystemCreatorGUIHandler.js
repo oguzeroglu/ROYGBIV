@@ -19,6 +19,7 @@ var ParticleSystemCreatorGUIHandler = function(){
   }
   this.typeParam = {"Type": "CUSTOM"};
   this.collidableParam = {"Collidable": false};
+  this.blendingParam = {"Blending": "NORMAL_BLENDING"};
   this.maxPSTimeParam = {"Max time": DEFAULT_MAX_PS_TIME};
   this.buttonsParam = {
     "Cancel": function(){
@@ -67,6 +68,21 @@ var ParticleSystemCreatorGUIHandler = function(){
   };
 }
 
+ParticleSystemCreatorGUIHandler.prototype.onAfterRefresh = function(){
+  particleSystemCreatorGUIHandler.preConfiguredParticleSystem.setMaxPSTime(particleSystemCreatorGUIHandler.maxPSTimeParam["Max time"]);
+  particleSystemCreatorGUIHandler.preConfiguredParticleSystem.setCollidableStatus(particleSystemCreatorGUIHandler.collidableParam["Collidable"]);
+  var blendingValStr = this.blendingParam["Blending"];
+  var blendingValInt;
+  switch (blendingValStr){
+    case "NO_BLENDING": blendingValInt = NO_BLENDING; break;
+    case "NORMAL_BLENDING": blendingValInt = NORMAL_BLENDING; break;
+    case "ADDITIVE_BLENDING": blendingValInt = ADDITIVE_BLENDING; break;
+    case "SUBTRACTIVE_BLENDING": blendingValInt = SUBTRACTIVE_BLENDING; break;
+    case "MULTIPLY_BLENDING": blendingValInt = MULTIPLY_BLENDING; break;
+  }
+  particleSystemCreatorGUIHandler.preConfiguredParticleSystem.setBlending(blendingValInt, blendingValStr);
+}
+
 ParticleSystemCreatorGUIHandler.prototype.onAfterShown = function(){
   if (particleSystemCreatorGUIHandler.preConfiguredParticleSystem){
     if (particleSystemCreatorGUIHandler.preConfiguredParticleSystem.isCollidable){
@@ -79,9 +95,15 @@ ParticleSystemCreatorGUIHandler.prototype.onAfterShown = function(){
     }else{
       particleSystemCreatorGUIHandler.maxPSTimeParam["Max time"] = DEFAULT_MAX_PS_TIME;
     }
+    if (typeof particleSystemCreatorGUIHandler.preConfiguredParticleSystem.blendingStrVal == UNDEFINED){
+      particleSystemCreatorGUIHandler.blendingParam["Blending"] = "NORMAL_BLENDING";
+    }else{
+      particleSystemCreatorGUIHandler.blendingParam["Blending"] = particleSystemCreatorGUIHandler.preConfiguredParticleSystem.blendingStrVal;
+    }
   }else{
     particleSystemCreatorGUIHandler.collidableParam["Collidable"] = false;
     particleSystemCreatorGUIHandler.maxPSTimeParam["Max time"] = DEFAULT_MAX_PS_TIME;
+    particleSystemCreatorGUIHandler.blendingParam["Blending"] = "NORMAL_BLENDING";
   }
 }
 
@@ -93,11 +115,23 @@ ParticleSystemCreatorGUIHandler.prototype.update = function(){
 }
 
 ParticleSystemCreatorGUIHandler.prototype.addCommonControllers = function(){
+  var blendingTypes = ["NO_BLENDING", "NORMAL_BLENDING", "ADDITIVE_BLENDING", "SUBTRACTIVE_BLENDING", "MULTIPLY_BLENDING"];
   this.maxPSTimeController = guiHandler.datGuiPSCreator.add(this.maxPSTimeParam, "Max time").min(0.001).max(DEFAULT_MAX_PS_TIME).step(0.01).onChange(function(val){
     particleSystemCreatorGUIHandler.preConfiguredParticleSystem.setMaxPSTime(val);
   }).listen();
   this.collidableController = guiHandler.datGuiPSCreator.add(this.collidableParam, "Collidable").onChange(function(val){
     particleSystemCreatorGUIHandler.preConfiguredParticleSystem.setCollidableStatus(val);
+  }).listen();
+  this.blendingController = guiHandler.datGuiPSCreator.add(this.blendingParam, "Blending", blendingTypes).onChange(function(val){
+    var intVal;
+    switch (val){
+      case "NO_BLENDING": intVal = NO_BLENDING; break;
+      case "NORMAL_BLENDING": intVal = NORMAL_BLENDING; break;
+      case "ADDITIVE_BLENDING": intVal = ADDITIVE_BLENDING; break;
+      case "SUBTRACTIVE_BLENDING": intVal = SUBTRACTIVE_BLENDING; break;
+      case "MULTIPLY_BLENDING": intVal = MULTIPLY_BLENDING; break;
+    }
+    particleSystemCreatorGUIHandler.preConfiguredParticleSystem.setBlending(intVal, val);
   }).listen();
   this.cancelController = guiHandler.datGuiPSCreator.add(this.buttonsParam, "Cancel");
   this.doneController = guiHandler.datGuiPSCreator.add(this.buttonsParam, "Done");
@@ -286,6 +320,7 @@ ParticleSystemCreatorGUIHandler.prototype.showConfetti = function(prevParams){
     particleSystemCreatorGUIHandler.particleSystem.mesh.visible = true;
     scene.add(particleSystemCreatorGUIHandler.particleSystem.mesh);
     particleSystemCreatorGUIHandler.preConfiguredParticleSystem = new PreconfiguredParticleSystem(particleSystemCreatorGUIHandler.psName, "CONFETTI", params);
+    particleSystemCreatorGUIHandler.onAfterRefresh();
   }
   if (!confettiParameters.hasParticleCollision){
     guiHandler.disableController(particleSystemCreatorGUIHandler.confettiCollisionMethodController);
@@ -450,6 +485,7 @@ ParticleSystemCreatorGUIHandler.prototype.showSnow = function(prevParams){
     particleSystemCreatorGUIHandler.particleSystem.mesh.visible = true;
     scene.add(particleSystemCreatorGUIHandler.particleSystem.mesh);
     particleSystemCreatorGUIHandler.preConfiguredParticleSystem = new PreconfiguredParticleSystem(particleSystemCreatorGUIHandler.psName, "SNOW", params);
+    particleSystemCreatorGUIHandler.onAfterRefresh();
   }
   particleSystemCreatorGUIHandler.snowParameters = snowParameters;
   particleSystemCreatorGUIHandler.snowGeneratorFunc();
@@ -595,6 +631,7 @@ ParticleSystemCreatorGUIHandler.prototype.showWaterfall = function(prevParams){
     particleSystemCreatorGUIHandler.particleSystem.mesh.visible = true;
     scene.add(particleSystemCreatorGUIHandler.particleSystem.mesh);
     particleSystemCreatorGUIHandler.preConfiguredParticleSystem = new PreconfiguredParticleSystem(particleSystemCreatorGUIHandler.psName, "WATERFALL", params);
+    particleSystemCreatorGUIHandler.onAfterRefresh();
   }
   particleSystemCreatorGUIHandler.waterfallParameters = waterfallParameters;
   particleSystemCreatorGUIHandler.waterfallGeneratorFunc();
@@ -730,6 +767,7 @@ ParticleSystemCreatorGUIHandler.prototype.showLaser = function(prevParams){
     particleSystemCreatorGUIHandler.particleSystem.mesh.visible = true;
     scene.add(particleSystemCreatorGUIHandler.particleSystem.mesh);
     particleSystemCreatorGUIHandler.preConfiguredParticleSystem = new PreconfiguredParticleSystem(particleSystemCreatorGUIHandler.psName, "LASER", params);
+    particleSystemCreatorGUIHandler.onAfterRefresh();
   }
   particleSystemCreatorGUIHandler.addCommonControllers();
   particleSystemCreatorGUIHandler.laserParameters = laserParameters;
@@ -884,6 +922,7 @@ ParticleSystemCreatorGUIHandler.prototype.showDynamicTrail = function(prevParams
     particleSystemCreatorGUIHandler.particleSystem.mesh.visible = true;
     scene.add(particleSystemCreatorGUIHandler.particleSystem.mesh);
     particleSystemCreatorGUIHandler.preConfiguredParticleSystem = new PreconfiguredParticleSystem(particleSystemCreatorGUIHandler.psName, "DYNAMIC_TRAIL", params);
+    particleSystemCreatorGUIHandler.onAfterRefresh();
   }
   particleSystemCreatorGUIHandler.dynamicTrailGeneratorFunc();
   particleSystemCreatorGUIHandler.addCommonControllers();
@@ -1005,6 +1044,7 @@ ParticleSystemCreatorGUIHandler.prototype.showCircularExplosion = function(prevP
     particleSystemCreatorGUIHandler.particleSystem.mesh.visible = true;
     scene.add(particleSystemCreatorGUIHandler.particleSystem.mesh);
     particleSystemCreatorGUIHandler.preConfiguredParticleSystem = new PreconfiguredParticleSystem(particleSystemCreatorGUIHandler.psName, "CIRC_EXPLOSION", params);
+    particleSystemCreatorGUIHandler.onAfterRefresh();
   }
   particleSystemCreatorGUIHandler.addCommonControllers();
   particleSystemCreatorGUIHandler.circularExplosionParameters = circularExplosionParameters;
@@ -1194,6 +1234,7 @@ ParticleSystemCreatorGUIHandler.prototype.showMagicCircle = function(prevParams)
     particleSystemCreatorGUIHandler.particleSystem.mesh.visible = true;
     scene.add(particleSystemCreatorGUIHandler.particleSystem.mesh);
     particleSystemCreatorGUIHandler.preConfiguredParticleSystem = new PreconfiguredParticleSystem(particleSystemCreatorGUIHandler.psName, "MAGIC_CIRCLE", params);
+    particleSystemCreatorGUIHandler.onAfterRefresh();
   }
   particleSystemCreatorGUIHandler.magicCircleParameters = magicCircleParameters;
   particleSystemCreatorGUIHandler.magicCircleGeneratorFunc();
@@ -1314,6 +1355,7 @@ ParticleSystemCreatorGUIHandler.prototype.showFireExplosion = function(prevParam
     particleSystemCreatorGUIHandler.particleSystem.mesh.visible = true;
     scene.add(particleSystemCreatorGUIHandler.particleSystem.mesh);
     particleSystemCreatorGUIHandler.preConfiguredParticleSystem = new PreconfiguredParticleSystem(particleSystemCreatorGUIHandler.psName, "FIRE_EXPLOSION", params);
+    particleSystemCreatorGUIHandler.onAfterRefresh();
   };
   particleSystemCreatorGUIHandler.fireExplosionGeneratorFunc();
   particleSystemCreatorGUIHandler.onAfterShown();
@@ -1418,6 +1460,7 @@ ParticleSystemCreatorGUIHandler.prototype.showPlasma = function(prevParams){
     particleSystemCreatorGUIHandler.particleSystem.mesh.visible = true;
     scene.add(particleSystemCreatorGUIHandler.particleSystem.mesh);
     particleSystemCreatorGUIHandler.preConfiguredParticleSystem = new PreconfiguredParticleSystem(particleSystemCreatorGUIHandler.psName, "PLASMA", params);
+    particleSystemCreatorGUIHandler.onAfterRefresh();
   };
   particleSystemCreatorGUIHandler.plasmaGeneratorFunc();
   particleSystemCreatorGUIHandler.onAfterShown();
@@ -1569,6 +1612,7 @@ ParticleSystemCreatorGUIHandler.prototype.showTrail = function(prevParams){
     particleSystemCreatorGUIHandler.particleSystem.mesh.visible = true;
     scene.add(particleSystemCreatorGUIHandler.particleSystem.mesh);
     particleSystemCreatorGUIHandler.preConfiguredParticleSystem = new PreconfiguredParticleSystem(particleSystemCreatorGUIHandler.psName, "TRAIL", params);
+    particleSystemCreatorGUIHandler.onAfterRefresh();
   }
   guiHandler.datGuiPSCreator.add({"Restart": function(){
     particleSystemCreatorGUIHandler.trailGeneratorFunc();
@@ -1679,6 +1723,7 @@ ParticleSystemCreatorGUIHandler.prototype.showSmoke = function(prevParams){
     particleSystemCreatorGUIHandler.particleSystem.mesh.visible = true;
     scene.add(particleSystemCreatorGUIHandler.particleSystem.mesh);
     particleSystemCreatorGUIHandler.preConfiguredParticleSystem = new PreconfiguredParticleSystem(particleSystemCreatorGUIHandler.psName, "SMOKE", params);
+    particleSystemCreatorGUIHandler.onAfterRefresh();
   }
   guiHandler.datGuiPSCreator.add({"Restart": function(){
     particleSystemCreatorGUIHandler.smokeGeneratorFunc();
@@ -2030,6 +2075,7 @@ ParticleSystemCreatorGUIHandler.prototype.showCustom = function(prevParams){
     particleSystemCreatorGUIHandler.particleSystem.mesh.visible = true;
     scene.add(particleSystemCreatorGUIHandler.particleSystem.mesh);
     particleSystemCreatorGUIHandler.preConfiguredParticleSystem = new PreconfiguredParticleSystem(particleSystemCreatorGUIHandler.psName, "CUSTOM", particleSystemCreatorGUIHandler.customParameters);
+    particleSystemCreatorGUIHandler.onAfterRefresh();
   };
   guiHandler.datGuiPSCreator.add({"Restart": function(){particleSystemCreatorGUIHandler.customPSGeneratorFunc();}}, "Restart");
   particleSystemCreatorGUIHandler.addCommonControllers();
@@ -2064,7 +2110,10 @@ ParticleSystemCreatorGUIHandler.prototype.edit = function(psName){
   this.commonStartFunctions(psName);
   var action = this.actionsByTypes[preConfiguredParticleSystem.type];
   action(preConfiguredParticleSystem.params);
+  particleSystemCreatorGUIHandler.preConfiguredParticleSystem.setBlending(preConfiguredParticleSystem.blendingIntVal, preConfiguredParticleSystem.blendingStrVal);
+  particleSystemCreatorGUIHandler.preConfiguredParticleSystem.setMaxPSTime(preConfiguredParticleSystem.maxPSTime);
   particleSystemCreatorGUIHandler.preConfiguredParticleSystem.setCollidableStatus(preConfiguredParticleSystem.isCollidable);
+  particleSystemCreatorGUIHandler.preConfiguredParticleSystem.setBlending(preConfiguredParticleSystem.blendingIntVal, preConfiguredParticleSystem.blendingStrVal);
   particleSystemCreatorGUIHandler.onAfterShown();
   this.isEdit = true;
 }

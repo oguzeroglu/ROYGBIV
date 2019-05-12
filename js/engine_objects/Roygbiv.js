@@ -40,7 +40,6 @@ var Roygbiv = function(){
     "setCollisionListener",
     "removeCollisionListener",
     "scaleParticleSystem",
-    "setParticleSystemBlending",
     "setParticleSystemRotation",
     "setParticleSystemQuaternion",
     "getMarkedPosition",
@@ -890,21 +889,6 @@ Roygbiv.prototype.scaleParticleSystem = function(object, scaleVector){
   preConditions.checkIfDefined(ROYGBIV.scaleParticleSystem, preConditions.object, object);
   preConditions.checkIfParticleSystem(ROYGBIV.scaleParticleSystem, preConditions.object, object);
   object.mesh.scale.set(scaleVector.x, scaleVector.y, scaleVector.z);
-}
-
-//  Sets the blending mode of a particle system. Blending mode can be one of
-//  NO_BLENDING, NORMAL_BLENDING, ADDITIVE_BLENDING, SUBTRACTIVE_BLENDING or
-//  MULTIPLY_BLENDING
-Roygbiv.prototype.setParticleSystemBlending = function(particleSystem, blendingMode){
-  if (mode == 0){
-    return;
-  }
-  preConditions.checkIfDefined(ROYGBIV.setParticleSystemBlending, preConditions.particleSystem, particleSystem);
-  preConditions.checkIfDefined(ROYGBIV.setParticleSystemBlending, preConditions.blendingMode, blendingMode);
-  preConditions.checkIfParticleSystem(ROYGBIV.setParticleSystemBlending, preConditions.particleSystem, particleSystem);
-  preConditions.checkIfBlending(ROYGBIV.setParticleSystemBlending, preConditions.blendingMode, blendingMode);
-  preConditions.checkIfTrue(ROYGBIV.setParticleSystemBlending, "Cannot set blending of a merged particle system.", particleSystem.psMerger);
-  particleSystem.setBlending(blendingMode);
 }
 
 //  Sets the rotation of a particle system around given axis.

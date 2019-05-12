@@ -47,6 +47,7 @@ ParticleSystem.prototype.createCopy = function(newParticleSystemName){
   }
   copyParticleSystem.initialAngle = this.initialAngle;
   copyParticleSystem.isCollidable = this.isCollidable;
+  copyParticleSystem.setBlending(this.getBlending());
   return copyParticleSystem;
 }
 
@@ -256,6 +257,10 @@ ParticleSystem.prototype.particleIterationStopFunc = function(value, key){
   if (particle.startDelay > particle.parent.tick){
     particle.startDelay = particle.parent.tick;
   }
+}
+
+ParticleSystem.prototype.getBlending = function(){
+  return this.material.blending;
 }
 
 ParticleSystem.prototype.setBlending = function(mode){
