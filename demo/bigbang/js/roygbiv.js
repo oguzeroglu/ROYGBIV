@@ -6869,9 +6869,7 @@ function handleSkybox(){
 
 function deploymentScripts(){
   if(deploymentScriptsStatus.SCRIPT_EXECUTION_STATUS_init){if (cpuOperationsHandler.record){cpuOperationsHandler.scriptPerformances.init = performance.now()}ROYGBIV.startParticleSystem({particleSystem: ROYGBIV.getParticleSystem("ps1")});
-ROYGBIV.setCameraPosition(0, 0, -800);
-ROYGBIV.lookAt(0, 0, 0);
-ROYGBIV.setActiveControl(ROYGBIV.createCustomControl({}));
+ROYGBIV.setActiveControl(ROYGBIV.createOrbitControl({maxRadius: -800}));
 var gitText = ROYGBIV.getText("github");
 ROYGBIV.onTextClick(gitText, function(){
   var redirectWindow = window.open('https://github.com/oguzeroglu/ROYGBIV', '_blank');
@@ -6887,13 +6885,13 @@ if (!ROYGBIV.isMobile()){
   });
 }else{
   if (!ROYGBIV.isOrientationLandscape()){
-    ROYGBIV.setCameraPosition(0, 0, -1200);
+    ROYGBIV.setActiveControl(ROYGBIV.createOrbitControl({maxRadius: -1200}));
   }
   ROYGBIV.setScreenOrientationChangeListener(function(isLandscape){
     if (isLandscape){
-      ROYGBIV.setCameraPosition(0, 0, -800);
+      ROYGBIV.setActiveControl(ROYGBIV.createOrbitControl({maxRadius: -800}));
     }else{
-      ROYGBIV.setCameraPosition(0, 0, -1200);
+      ROYGBIV.setActiveControl(ROYGBIV.createOrbitControl({maxRadius: -1200}));
     }
   })
 }
