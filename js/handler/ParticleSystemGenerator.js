@@ -249,6 +249,19 @@ ParticleSystemGenerator.prototype.generateCustomParticleSystem = function(config
         particleConfigurations.acceleration = new THREE.Vector3(parseFloat(accelerationSplitted[0]) + (parseFloat(accelerationRandomnessSplitted[0]) * (Math.random() - 0.5)), parseFloat(accelerationSplitted[1]) + (parseFloat(accelerationRandomnessSplitted[1]) * (Math.random() - 0.5)), parseFloat(accelerationSplitted[2]) + (parseFloat(accelerationRandomnessSplitted[2]) * (Math.random() - 0.5)));
       break;
       case "CIRCULAR":
+        particleConfigurations.motionMode = MOTION_MODE_CIRCULAR;
+        particleConfigurations.initialAngle = configurations.motion.initialAngle;
+        particleConfigurations.angularMotionRadius = configurations.motion.angularMotionRadius;
+        particleConfigurations.angularVelocity = configurations.motion.angularVelocity;
+        particleConfigurations.angularAcceleration = configurations.motion.angularAcceleration;
+        var circularMotionNormalSplitted = configurations.motion.circularMotionNormal.split(",");
+        reusableVec1.set(parseFloat(circularMotionNormalSplitted[0]), parseFloat(circularMotionNormalSplitted[1]), parseFloat(circularMotionNormalSplitted[2]));
+        reusableVec2.set(0, 1, 0);
+        this.computeQuaternionFromVectors(reusableVec2, reusableVec1, reusableQuaternion);
+        particleConfigurations.angularQuaternion = reusableQuaternion;
+        if (configurations.motion.hasAngleStep){
+          particleConfigurations.initialAngle += (i * configurations.motion.angleStep);
+        }
       break;
     }
     particles.push(this.generateParticle(particleConfigurations));
