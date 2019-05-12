@@ -1840,13 +1840,19 @@ ParticleSystemCreatorGUIHandler.prototype.handleDistributionFolder = function(fo
   folder.add(customPSDistributionParameters, "applyNoise").onChange(function(val){particleSystemCreatorGUIHandler.customPSGeneratorFunc();}).listen();
 }
 
-ParticleSystemCreatorGUIHandler.prototype.handleMotionFolder = function(folder){
+ParticleSystemCreatorGUIHandler.prototype.handleMotionFolder = function(folder, isPS){
   var motionTypes = ["NORMAL", "CIRCULAR"];
-  var customPSMotionParameters = particleSystemCreatorGUIHandler.customParameters.motion;
+  var customPSMotionParameters = isPS? particleSystemCreatorGUIHandler.customParameters.motionPS: particleSystemCreatorGUIHandler.customParameters.motion;
   var subControllerNames = ["trailModeController", "useWorldPositionController", "velocityController", "accelerationController", "velocityRandomnessController", "accelerationRandomnessController", "initialAngleController", "angularMotionRadiusController", "hasAngleStepController", "angleStepController", "angularVelocityController", "angularAccelerationController", "circularMotionNormalController", "randomizeNormal"];
+  if (isPS){
+    for (var i = 0; i<subControllerNames.length; i++){
+      subControllerNames[i] = subControllerNames[i] + "_PS";
+    }
+  }
   for (var i = 0; i<subControllerNames.length; i++){
     delete particleSystemCreatorGUIHandler[subControllerNames[i]];
   }
+  var postfix = isPS? "_PS": "";
   folder.add(customPSMotionParameters, "type", motionTypes).onChange(function(val){
     for (var i = 0; i<subControllerNames.length; i++){
       if (particleSystemCreatorGUIHandler[subControllerNames[i]]){
@@ -1860,9 +1866,11 @@ ParticleSystemCreatorGUIHandler.prototype.handleMotionFolder = function(folder){
   var controllerHandler = function(){
     switch (customPSMotionParameters.type){
       case "NORMAL":
-        particleSystemCreatorGUIHandler.trailModeController = folder.add(customPSMotionParameters, "trailMode").onChange(function(val){particleSystemCreatorGUIHandler.customPSGeneratorFunc();}).listen();
-        particleSystemCreatorGUIHandler.useWorldPositionController = folder.add(customPSMotionParameters, "useWorldPosition").onChange(function(val){particleSystemCreatorGUIHandler.customPSGeneratorFunc();}).listen();
-        particleSystemCreatorGUIHandler.velocityController = folder.add(customPSMotionParameters, "velocity").onFinishChange(function(val){
+        if (!isPS){
+          particleSystemCreatorGUIHandler["trailModeController"+postfix] = folder.add(customPSMotionParameters, "trailMode").onChange(function(val){particleSystemCreatorGUIHandler.customPSGeneratorFunc();}).listen();
+          particleSystemCreatorGUIHandler["useWorldPositionController"+postfix] = folder.add(customPSMotionParameters, "useWorldPosition").onChange(function(val){particleSystemCreatorGUIHandler.customPSGeneratorFunc();}).listen();
+        }
+        particleSystemCreatorGUIHandler["velocityController"+postfix] = folder.add(customPSMotionParameters, "velocity").onFinishChange(function(val){
           var splitted = val.split(",");
           if (splitted.length == 3){
             for (var i = 0; i<3; i++){
@@ -1873,7 +1881,7 @@ ParticleSystemCreatorGUIHandler.prototype.handleMotionFolder = function(folder){
           }
           particleSystemCreatorGUIHandler.customPSGeneratorFunc();
         }).listen();
-        particleSystemCreatorGUIHandler.accelerationController = folder.add(customPSMotionParameters, "acceleration").onFinishChange(function(val){
+        particleSystemCreatorGUIHandler["accelerationController"+postfix] = folder.add(customPSMotionParameters, "acceleration").onFinishChange(function(val){
           var splitted = val.split(",");
           if (splitted.length == 3){
             for (var i = 0; i<3; i++){
@@ -1884,7 +1892,7 @@ ParticleSystemCreatorGUIHandler.prototype.handleMotionFolder = function(folder){
           }
           particleSystemCreatorGUIHandler.customPSGeneratorFunc();
         }).listen();
-        particleSystemCreatorGUIHandler.velocityRandomnessController = folder.add(customPSMotionParameters, "velocityRandomness").onFinishChange(function(val){
+        particleSystemCreatorGUIHandler["velocityRandomnessController"+postfix] = folder.add(customPSMotionParameters, "velocityRandomness").onFinishChange(function(val){
           var splitted = val.split(",");
           if (splitted.length == 3){
             for (var i = 0; i<3; i++){
@@ -1895,7 +1903,7 @@ ParticleSystemCreatorGUIHandler.prototype.handleMotionFolder = function(folder){
           }
           particleSystemCreatorGUIHandler.customPSGeneratorFunc();
         }).listen();
-        particleSystemCreatorGUIHandler.accelerationRandomnessController = folder.add(customPSMotionParameters, "accelerationRandomness").onFinishChange(function(val){
+        particleSystemCreatorGUIHandler["accelerationRandomnessController"+postfix] = folder.add(customPSMotionParameters, "accelerationRandomness").onFinishChange(function(val){
           var splitted = val.split(",");
           if (splitted.length == 3){
             for (var i = 0; i<3; i++){
@@ -1908,19 +1916,21 @@ ParticleSystemCreatorGUIHandler.prototype.handleMotionFolder = function(folder){
         }).listen();
       break;
       case "CIRCULAR":
-        particleSystemCreatorGUIHandler.initialAngleController = folder.add(customPSMotionParameters, "initialAngle").min(0).max(2*Math.PI).step(Math.PI/5000).onFinishChange(function(val){particleSystemCreatorGUIHandler.customPSGeneratorFunc();}).listen();
-        particleSystemCreatorGUIHandler.angularMotionRadiusController = folder.add(customPSMotionParameters, "angularMotionRadius").min(0.1).max(500).step(0.1).onFinishChange(function(val){particleSystemCreatorGUIHandler.customPSGeneratorFunc();}).listen();
-        particleSystemCreatorGUIHandler.hasAngleStepController = folder.add(customPSMotionParameters, "hasAngleStep").onChange(function(val){
+        particleSystemCreatorGUIHandler["initialAngleController"+postfix] = folder.add(customPSMotionParameters, "initialAngle").min(0).max(2*Math.PI).step(Math.PI/5000).onFinishChange(function(val){particleSystemCreatorGUIHandler.customPSGeneratorFunc();}).listen();
+        particleSystemCreatorGUIHandler["angularMotionRadiusController"+postfix] = folder.add(customPSMotionParameters, "angularMotionRadius").min(0.1).max(500).step(0.1).onFinishChange(function(val){particleSystemCreatorGUIHandler.customPSGeneratorFunc();}).listen();
+        if (!isPS){
+          particleSystemCreatorGUIHandler["hasAngleStepController"+postfix] = folder.add(customPSMotionParameters, "hasAngleStep").onChange(function(val){
           if (val){
             guiHandler.enableController(particleSystemCreatorGUIHandler.angleStepController);
           }else{
             guiHandler.disableController(particleSystemCreatorGUIHandler.angleStepController);
           }
         }).listen();
-        particleSystemCreatorGUIHandler.angleStepController = folder.add(customPSMotionParameters, "angleStep").min(0).max(2*Math.PI).step(Math.PI/5000).onFinishChange(function(val){particleSystemCreatorGUIHandler.customPSGeneratorFunc();}).listen();
-        particleSystemCreatorGUIHandler.angularVelocityController = folder.add(customPSMotionParameters, "angularVelocity").min(0).max(500).step(0.1).onFinishChange(function(val){particleSystemCreatorGUIHandler.customPSGeneratorFunc();}).listen();
-        particleSystemCreatorGUIHandler.angularAccelerationController = folder.add(customPSMotionParameters, "angularAcceleration").min(0).max(500).step(0.1).onFinishChange(function(val){particleSystemCreatorGUIHandler.customPSGeneratorFunc();}).listen();
-        particleSystemCreatorGUIHandler.circularMotionNormalController = folder.add(customPSMotionParameters, "circularMotionNormal").onFinishChange(function(val){
+          particleSystemCreatorGUIHandler["angleStepController"+postfix] = folder.add(customPSMotionParameters, "angleStep").min(0).max(2*Math.PI).step(Math.PI/5000).onFinishChange(function(val){particleSystemCreatorGUIHandler.customPSGeneratorFunc();}).listen();
+        }
+        particleSystemCreatorGUIHandler["angularVelocityController"+postfix] = folder.add(customPSMotionParameters, "angularVelocity").min(0).max(500).step(0.1).onFinishChange(function(val){particleSystemCreatorGUIHandler.customPSGeneratorFunc();}).listen();
+        particleSystemCreatorGUIHandler["angularAccelerationController+postfix"] = folder.add(customPSMotionParameters, "angularAcceleration").min(0).max(500).step(0.1).onFinishChange(function(val){particleSystemCreatorGUIHandler.customPSGeneratorFunc();}).listen();
+        particleSystemCreatorGUIHandler["circularMotionNormalController"+postfix] = folder.add(customPSMotionParameters, "circularMotionNormal").onFinishChange(function(val){
           var splitted = val.split(",");
           if (splitted.length == 3){
             for (var i = 0; i<3; i++){
@@ -1931,7 +1941,8 @@ ParticleSystemCreatorGUIHandler.prototype.handleMotionFolder = function(folder){
           }
           particleSystemCreatorGUIHandler.customPSGeneratorFunc();
         }).listen();
-        particleSystemCreatorGUIHandler.randomizeNormalController = folder.add(customPSMotionParameters, "randomizeNormal").onFinishChange(function(val){
+        if (!isPS){
+          particleSystemCreatorGUIHandler["randomizeNormalController"+postfix] = folder.add(customPSMotionParameters, "randomizeNormal").onFinishChange(function(val){
           if (val){
             guiHandler.disableController(particleSystemCreatorGUIHandler.circularMotionNormalController);
           }else{
@@ -1939,23 +1950,28 @@ ParticleSystemCreatorGUIHandler.prototype.handleMotionFolder = function(folder){
           }
           particleSystemCreatorGUIHandler.customPSGeneratorFunc();
         }).listen();
-        if (customPSMotionParameters.hasAngleStep){
-          guiHandler.enableController(particleSystemCreatorGUIHandler.angleStepController);
-        }else{
-          guiHandler.disableController(particleSystemCreatorGUIHandler.angleStepController);
         }
-        if (customPSMotionParameters.randomizeNormal){
-          guiHandler.disableController(particleSystemCreatorGUIHandler.circularMotionNormalController);
-        }else{
-          guiHandler.enableController(particleSystemCreatorGUIHandler.circularMotionNormalController);
+        if (!isPS){
+          if (customPSMotionParameters.hasAngleStep){
+            guiHandler.enableController(particleSystemCreatorGUIHandler["angleStepController"+postfix]);
+          }else{
+            guiHandler.disableController(particleSystemCreatorGUIHandler["angleStepController"+postfix]);
+          }
+          if (customPSMotionParameters.randomizeNormal){
+            guiHandler.disableController(particleSystemCreatorGUIHandler["circularMotionNormalController"+postfix]);
+          }else{
+            guiHandler.enableController(particleSystemCreatorGUIHandler["circularMotionNormalController"+postfix]);
+          }
         }
       break;
     }
   }
   folder.add(customPSMotionParameters, "lifetime").min(0).max(100).step(0.1).onFinishChange(function(val){particleSystemCreatorGUIHandler.customPSGeneratorFunc();}).listen();
-  folder.add(customPSMotionParameters, "respawn").onChange(function(val){particleSystemCreatorGUIHandler.customPSGeneratorFunc();}).listen();
-  folder.add(customPSMotionParameters, "startDelay").min(0).max(10).step(0.1).onFinishChange(function(val){particleSystemCreatorGUIHandler.customPSGeneratorFunc();}).listen();
-  folder.add(customPSMotionParameters, "randomizeStartDelay").onChange(function(val){particleSystemCreatorGUIHandler.customPSGeneratorFunc();}).listen();
+  if (!isPS){
+    folder.add(customPSMotionParameters, "respawn").onChange(function(val){particleSystemCreatorGUIHandler.customPSGeneratorFunc();}).listen();
+    folder.add(customPSMotionParameters, "startDelay").min(0).max(10).step(0.1).onFinishChange(function(val){particleSystemCreatorGUIHandler.customPSGeneratorFunc();}).listen();
+    folder.add(customPSMotionParameters, "randomizeStartDelay").onChange(function(val){particleSystemCreatorGUIHandler.customPSGeneratorFunc();}).listen();
+  }
   controllerHandler();
 }
 
@@ -1982,21 +1998,26 @@ ParticleSystemCreatorGUIHandler.prototype.showCustom = function(prevParams){
     particleCount: 100,
     material: {color: "#ffffff", size: 5, alpha: 1, hasTexture: false, textureName: "", rgbFilter: "r,g,b", hasTargetColor: false, targetColor: "#ffffff", colorStep: 0},
     distribution: {type: "SINGLE_POINT", applyNoise: false, coordinate: "0,0,0", radius: 5, boxSize: "5,5,5", boxSide: "RANDOM", circleRadius: 5, circleNormal: "0,0,1", linearPoint1: "0,0,0", linearPoint2: "0,0,0"},
-    motion: {type: "NORMAL", lifetime: 0, respawn: false, startDelay: 0, randomizeStartDelay: true, trailMode: false, useWorldPosition: false, velocity: "0,0,0", acceleration: "0,0,0", velocityRandomness: "0,0,0", accelerationRandomness: "0,0,0", initialAngle: 0, hasAngleStep: false, angleStep: 0,angularVelocity: 0, angularAcceleration: 0, angularMotionRadius: 5, circularMotionNormal: "0,1,0", randomizeNormal: false},
+    motion: {type: "NORMAL", lifetime: 0, respawn: false, startDelay: 0, randomizeStartDelay: true, trailMode: false, useWorldPosition: false, velocity: "0,0,0", acceleration: "0,0,0", velocityRandomness: "0,0,0", accelerationRandomness: "0,0,0", initialAngle: 0, hasAngleStep: false, angleStep: 0, angularVelocity: 0, angularAcceleration: 0, angularMotionRadius: 5, circularMotionNormal: "0,1,0", randomizeNormal: false},
+    motionPS: {type: "NORMAL", lifetime: 0, velocity: "0,0,0", acceleration: "0,0,0", velocityRandomness: "0,0,0", accelerationRandomness: "0,0,0", initialAngle: 0, angularVelocity: 0, angularAcceleration: 0, angularMotionRadius: 5, circularMotionNormal: "0,1,0"},
     alphaVariation: {type: "NORMAL", alphaVariation: 0},
     collision: {type: "NONE", collisionTimeOffset: 0}
   };
-  var particleMaterialFolder = guiHandler.datGuiPSCreator.addFolder("Material");
-  var particleDistributionFolder = guiHandler.datGuiPSCreator.addFolder("Distribution");
-  var particleMotionFolder = guiHandler.datGuiPSCreator.addFolder("Motion");
-  var particleCollisionFolder = guiHandler.datGuiPSCreator.addFolder("Collision");
-  var particleAlphaVariationFolder = guiHandler.datGuiPSCreator.addFolder("Alpha variation");
+  var particleFolder = guiHandler.datGuiPSCreator.addFolder("Particle");
+  var particleSystemFolder = guiHandler.datGuiPSCreator.addFolder("Particle system");
+  var particleMaterialFolder = particleFolder.addFolder("Material");
+  var particleDistributionFolder = particleFolder.addFolder("Distribution");
+  var particleMotionFolder = particleFolder.addFolder("Motion");
+  var particleCollisionFolder = particleFolder.addFolder("Collision");
+  var particleAlphaVariationFolder = particleFolder.addFolder("Alpha variation");
+  var particleSystemMotionFolder = particleSystemFolder.addFolder("Motion");
   guiHandler.datGuiPSCreator.add(particleSystemCreatorGUIHandler.customParameters, "particleCount").min(1).max(5000).step(1).onFinishChange(function(val){ particleSystemCreatorGUIHandler.customPSGeneratorFunc(); });
   particleSystemCreatorGUIHandler.handleCustomMaterialFolder(particleMaterialFolder);
   particleSystemCreatorGUIHandler.handleDistributionFolder(particleDistributionFolder);
   particleSystemCreatorGUIHandler.handleMotionFolder(particleMotionFolder);
   particleSystemCreatorGUIHandler.handleCollisionFolder(particleCollisionFolder);
   particleSystemCreatorGUIHandler.handleAlphaVariationFolder(particleAlphaVariationFolder);
+  particleSystemCreatorGUIHandler.handleMotionFolder(particleSystemMotionFolder, true);
   particleSystemCreatorGUIHandler.customPSGeneratorFunc = function(){
     if (particleSystemCreatorGUIHandler.particleSystem){
       scene.remove(particleSystemCreatorGUIHandler.particleSystem.mesh);

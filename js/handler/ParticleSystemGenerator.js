@@ -282,7 +282,33 @@ ParticleSystemGenerator.prototype.generateCustomParticleSystem = function(config
     }
     particles.push(this.generateParticle(particleConfigurations));
   }
-  var particleSystemConfigurations = {name: configurations.name, position: configurations.position, particles: particles, lifetime: 0};
+  var particleSystemConfigurations = {name: configurations.name, position: configurations.position, particles: particles, lifetime: configurations.motionPS.lifetime};
+  switch(configurations.motionPS.type){
+    case "NORMAL":
+      var velocitySplitted = configurations.motionPS.velocity.split(",");
+      var accelerationSplitted = configurations.motionPS.acceleration.split(",");
+      var velocityRandomnessSplitted = configurations.motionPS.velocityRandomness.split(",");
+      var accelerationRandomnessSplitted = configurations.motionPS.accelerationRandomness.split(",");
+      particleSystemConfigurations.motionMode = MOTION_MODE_NORMAL;
+      particleSystemConfigurations.velocity = new THREE.Vector3(parseFloat(velocitySplitted[0]) + (parseFloat(velocityRandomnessSplitted[0]) * (Math.random() - 0.5)), parseFloat(velocitySplitted[1]) + (parseFloat(velocityRandomnessSplitted[1]) * (Math.random() - 0.5)), parseFloat(velocitySplitted[2]) + (parseFloat(velocityRandomnessSplitted[2]) * (Math.random() - 0.5)));
+      particleSystemConfigurations.acceleration = new THREE.Vector3(parseFloat(accelerationSplitted[0]) + (parseFloat(accelerationRandomnessSplitted[0]) * (Math.random() - 0.5)), parseFloat(accelerationSplitted[1]) + (parseFloat(accelerationRandomnessSplitted[1]) * (Math.random() - 0.5)), parseFloat(accelerationSplitted[2]) + (parseFloat(accelerationRandomnessSplitted[2]) * (Math.random() - 0.5)));
+    break;
+    case "CIRCULAR":
+      particleSystemConfigurations.motionMode = MOTION_MODE_CIRCULAR;
+      particleSystemConfigurations.initialAngle = configurations.motionPS.initialAngle;
+      particleSystemConfigurations.angularMotionRadius = configurations.motionPS.angularMotionRadius;
+      particleSystemConfigurations.angularVelocity = configurations.motionPS.angularVelocity;
+      particleSystemConfigurations.angularAcceleration = configurations.motionPS.angularAcceleration;
+      var circularMotionNormalSplitted = configurations.motionPS.circularMotionNormal.split(",");
+      reusableVec1.set(parseFloat(circularMotionNormalSplitted[0]), parseFloat(circularMotionNormalSplitted[1]), parseFloat(circularMotionNormalSplitted[2]));
+      if (configurations.motionPS.randomizeNormal){
+        reusableVec1.set((Math.random() - 0.5), (Math.random() - 0.5), (Math.random() - 0.5));
+      }
+      reusableVec2.set(0, 1, 0);
+      this.computeQuaternionFromVectors(reusableVec2, reusableVec1, reusableQuaternion);
+      particleSystemConfigurations.angularQuaternion = reusableQuaternion;
+    break;
+  }
   return this.generateParticleSystem(particleSystemConfigurations);
 }
 
