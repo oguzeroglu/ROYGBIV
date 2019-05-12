@@ -1943,13 +1943,14 @@ ParticleSystemCreatorGUIHandler.prototype.handleMotionFolder = function(folder){
 ParticleSystemCreatorGUIHandler.prototype.handleCollisionFolder = function(folder){
   var collisionTypes = ["NONE", "REWIND", "DISSAPEAR"];
   particleSystemCreatorGUIHandler.customPSCollisionParameters = {type: "NONE"};
-  folder.add(particleSystemCreatorGUIHandler.customPSCollisionParameters, "type", collisionTypes).onChange(function(val){}).listen();
+  folder.add(particleSystemCreatorGUIHandler.customPSCollisionParameters, "type", collisionTypes).onChange(function(val){particleSystemCreatorGUIHandler.customPSGeneratorFunc();}).listen();
 }
 
 ParticleSystemCreatorGUIHandler.prototype.handleAlphaVariationFolder = function(folder){
   var alphaVariationTypes = ["NORMAL", "SIN", "COS"];
-  particleSystemCreatorGUIHandler.customPSAlphaVariationtypes = {type: "NORMAL"};
-  folder.add(particleSystemCreatorGUIHandler.customPSAlphaVariationtypes, "type", alphaVariationTypes).onChange(function(val){}).listen();
+  var customPSAlphaVariationtypes = particleSystemCreatorGUIHandler.customParameters.alphaVariation;
+  folder.add(customPSAlphaVariationtypes, "type", alphaVariationTypes).onChange(function(val){particleSystemCreatorGUIHandler.customPSGeneratorFunc();}).listen();
+  folder.add(customPSAlphaVariationtypes, "alphaVariation").min(-5).max(5).step(0.01).onFinishChange(function(val){particleSystemCreatorGUIHandler.customPSGeneratorFunc();}).listen();
 }
 
 ParticleSystemCreatorGUIHandler.prototype.showCustom = function(prevParams){
@@ -1961,7 +1962,8 @@ ParticleSystemCreatorGUIHandler.prototype.showCustom = function(prevParams){
     particleCount: 100,
     material: {color: "#ffffff", size: 5, alpha: 1, hasTexture: false, textureName: "", rgbFilter: "r,g,b", hasTargetColor: false, targetColor: "#ffffff", colorStep: 0},
     distribution: {type: "SINGLE_POINT", applyNoise: false, coordinate: "0,0,0", radius: 5, boxSize: "5,5,5", boxSide: "RANDOM", circleRadius: 5, circleNormal: "0,0,1", linearPoint1: "0,0,0", linearPoint2: "0,0,0"},
-    motion: {type: "NORMAL", lifetime: 0, respawn: false, startDelay: 0, randomizeStartDelay: true, trailMode: false, useWorldPosition: false, velocity: "0,0,0", acceleration: "0,0,0", velocityRandomness: "0,0,0", accelerationRandomness: "0,0,0", initialAngle: 0, hasAngleStep: false, angleStep: 0,angularVelocity: 0, angularAcceleration: 0, angularMotionRadius: 5, circularMotionNormal: "0,1,0"}
+    motion: {type: "NORMAL", lifetime: 0, respawn: false, startDelay: 0, randomizeStartDelay: true, trailMode: false, useWorldPosition: false, velocity: "0,0,0", acceleration: "0,0,0", velocityRandomness: "0,0,0", accelerationRandomness: "0,0,0", initialAngle: 0, hasAngleStep: false, angleStep: 0,angularVelocity: 0, angularAcceleration: 0, angularMotionRadius: 5, circularMotionNormal: "0,1,0"},
+    alphaVariation: {type: "NORMAL", alphaVariation: 0}
   };
   var particleMaterialFolder = guiHandler.datGuiPSCreator.addFolder("Material");
   var particleDistributionFolder = guiHandler.datGuiPSCreator.addFolder("Distribution");
