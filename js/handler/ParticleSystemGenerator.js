@@ -256,6 +256,9 @@ ParticleSystemGenerator.prototype.generateCustomParticleSystem = function(config
         particleConfigurations.angularAcceleration = configurations.motion.angularAcceleration;
         var circularMotionNormalSplitted = configurations.motion.circularMotionNormal.split(",");
         reusableVec1.set(parseFloat(circularMotionNormalSplitted[0]), parseFloat(circularMotionNormalSplitted[1]), parseFloat(circularMotionNormalSplitted[2]));
+        if (configurations.motion.randomizeNormal){
+          reusableVec1.set((Math.random() - 0.5), (Math.random() - 0.5), (Math.random() - 0.5));
+        }
         reusableVec2.set(0, 1, 0);
         this.computeQuaternionFromVectors(reusableVec2, reusableVec1, reusableQuaternion);
         particleConfigurations.angularQuaternion = reusableQuaternion;
