@@ -1929,7 +1929,7 @@ ParticleSystemCreatorGUIHandler.prototype.handleMotionFolder = function(folder, 
           particleSystemCreatorGUIHandler["angleStepController"+postfix] = folder.add(customPSMotionParameters, "angleStep").min(0).max(2*Math.PI).step(Math.PI/5000).onFinishChange(function(val){particleSystemCreatorGUIHandler.customPSGeneratorFunc();}).listen();
         }
         particleSystemCreatorGUIHandler["angularVelocityController"+postfix] = folder.add(customPSMotionParameters, "angularVelocity").min(0).max(500).step(0.1).onFinishChange(function(val){particleSystemCreatorGUIHandler.customPSGeneratorFunc();}).listen();
-        particleSystemCreatorGUIHandler["angularAccelerationController+postfix"] = folder.add(customPSMotionParameters, "angularAcceleration").min(0).max(500).step(0.1).onFinishChange(function(val){particleSystemCreatorGUIHandler.customPSGeneratorFunc();}).listen();
+        particleSystemCreatorGUIHandler["angularAccelerationController"+postfix] = folder.add(customPSMotionParameters, "angularAcceleration").min(0).max(500).step(0.1).onFinishChange(function(val){particleSystemCreatorGUIHandler.customPSGeneratorFunc();}).listen();
         particleSystemCreatorGUIHandler["circularMotionNormalController"+postfix] = folder.add(customPSMotionParameters, "circularMotionNormal").onFinishChange(function(val){
           var splitted = val.split(",");
           if (splitted.length == 3){
@@ -2003,6 +2003,9 @@ ParticleSystemCreatorGUIHandler.prototype.showCustom = function(prevParams){
     alphaVariation: {type: "NORMAL", alphaVariation: 0},
     collision: {type: "NONE", collisionTimeOffset: 0}
   };
+  if (prevParams){
+    particleSystemCreatorGUIHandler.customParameters = JSON.parse(JSON.stringify(prevParams));
+  }
   var particleFolder = guiHandler.datGuiPSCreator.addFolder("Particle");
   var particleSystemFolder = guiHandler.datGuiPSCreator.addFolder("Particle system");
   var particleMaterialFolder = particleFolder.addFolder("Material");
