@@ -547,53 +547,6 @@ var Text = function(){
                                                     "Callback function given as the second parameter is\nfired with a CollisionInfo instance when the sourceObject is collided with other objects or glued objects of the scene.\n"+
                                                     "The additional timeOffset parameter can be used for particle systems to pre-calculate future collisions. This can help to\nprevent visual errors of collisions of rather fast particle systems.";
   this.ROYGBIV_SCRIPTING_API_REMOVECOLLISIONLISTENER = "Removes collision listeners of an object, glued object or a particle system.";
-  this.ROYGBIV_SCRIPTING_API_CREATEPARTICLEMATERIAL = "Returns a material for a particle. The configurations are:\n"+
-                                                      "color: The HTML color name of the particle. (mandatory)\n"+
-                                                      "size: The size of the particle. (mandatory)\n"+
-                                                      "alpha: The alpha value of the particle. (mandatory)\n"+
-                                                      "textureName: The texture name of the particle, if the particle has any texture. (optional)\n"+
-                                                      "rgbFilter: A vector containing RGB threshold values. Pixels that have RGB values below the rgbFilter values are discarded.\nThis can be used to eliminate texture background colors etc. (optional)\n"+
-                                                      "targetColor: Target color name of the particle. If set, the color of the particle changes between the color and the targetColor\nby colorStep in each frame render. (optional)\n"+
-                                                      "colorStep: A float between [0,1] that represents the variation of color between the color and the targetColor. (optional)";
-  this.ROYGBIV_SCRIPTING_API_CREATEPARTICLE = "Creates and returns a new particle based on following configurations:\n"+
-                                              "position: The initial local coordinates of the particle. This is mandatory unless the motionMode is MOTION_MODE_CIRCULAR.(optional)\n"+
-                                              "material: The material of the particle created using createParticleMaterial function. (mandatory)\n"+
-                                              "lifetime: The expiration time in seconds of the particle. Set this to 0 for unexpirable particles. (mandatory)\n"+
-                                              "respawn:  The particle will be respawned to its initial position after its expiration if this parameter is set to true. (mandatory)\n"+
-                                              "alphaVariation: The variation of the alpha value of the paramter on each frame. (optional)\n"+
-                                              "alphaVariationMode: The alpha variation formula. This can be one of ALPHA_VARIATION_MODE_NORMAL, ALPHA_VARIATION_MODE_SIN\nor ALPHA_VARIATION_MODE_COS."+
-                                              " For ALPHA_VARIATION_MODE_NORMAL the alpha value changes linearly (t * alphaVariation),\nfor ALPHA_VARIATION_MODE_SIN the alpha changes according to"+
-                                              " the sine function (sin(alphaVariation * t)) and for\nALPHA_VARIATION_MODE_COS the alpha value changes according to the cos function"+
-                                              " (cos(alphaVariation * t)). Default value is\nALPHA_VARIATION_MODE_NORMAL. (optional)\n"+
-                                              "startDelay: The amount of delay in seconds before the particle is created. (optional)\n"+
-                                              "trailMode: This can be set to true to achieve trail effect. Default is false. The velocity and acceleration of particles\nare redundant for the trail mode. This is used only if the motionMode is MOTION_MODE_NORMAL. (optional)\n"+
-                                              "useWorldPosition: If set to true, the particle uses the world coordinates instead of local coordinates of its parent.\nCircular motion of particles are ignored in this case. (optional)\n"+
-                                              "velocity: The velocity vector of the particle. This is used only if the motionMode is MOTION_MODE_NORMAL. (optional)\n"+
-                                              "acceleration: The acceleration vector of the particle. This is used only if the motionMode is MOTION_MODE_NORMAL. (optional)\n"+
-                                              "initialAngle: The initial angle value (radians) of the particle. This is mandatory unless\nthe motionMode is MOTION_MODE_NORMAL. (optional)\n"+
-                                              "angularVelocity: The angular velocity (w) value of the particle. This is used only if the motionMode is MOTION_MODE_CIRCULAR. (optional)\n"+
-                                              "angularAcceleration: The angular acceleration value of the particle. This is used only if the motionMode is\nMOTION_MODE_CIRCULAR. (optional)\n"+
-                                              "angularMotionRadius: The radius value of the angular motion. This is used only if the motionMode is MOTION_MODE_CIRCULAR. (optional)\n"+
-                                              "angularQuaternion: If set this quaternion value is applied to particles with circular motion (motionMode = MOTION_MODE_CIRCULAR).\nBy default the particles that have MOTION_MODE_CIRCULAR as motionMode are initially created on the XZ plane, so the angularQuaternion\nparameter is used to change the initial rotation of the circular motion. This value can be calculated this way:\n"+
-                                              "angularQuaternion = ROYGBIV.computeQuaternionFromVectors(ROYGBIV.vector(0,1,0), [desired normal value]) (optional)\n"+
-                                              "motionMode: The motion mode of the particle. This can be MOTION_MODE_NORMAL or MOTION_MODE_CIRCULAR.\nMOTION_MODE_NORMAL represents the motion with uniform acceleration and the MOTION_MODE_CIRCULAR represents the uniform circular motion.\nThe default value is MOTION_MODE_NORMAL. (optional)\n"+
-                                              "collisionAction: One of PARTICLE_REWIND_ON_COLLIDED or PARTICLE_DISSAPEAR_ON_COLLIDED. This parameter decides what to do\nwhen the particle is collided with one of the intersectable objects of the scene. If not set, particles are not\nlistened for collisions. (optional)\n"+
-                                              "collisionTimeOffset: By pre-calculating the future collision, this parameter can be used to prevent visual errors of collisions of\nrather fast particles. (optional)";
-  this.ROYGBIV_SCRIPTING_API_CREATEPARTICLESYSTEM = "Creates a new particle system based on following configurations:\n"+
-                                                    "name: The unique name of the particle system. (mandatory)\n"+
-                                                    "particles: An array of particles created using createParticle function. (mandatory)\n"+
-                                                    "position: The initial position of the particle system. (mandatory)\n"+
-                                                    "lifetime: The maximum lifetime of the particle system in seconds. This can be set to 0 for infinite particle systems. (mandatory)\n"+
-                                                    "velocity: The velocity vector of the particle system. This is used only if the motionMode is MOTION_MODE_NORMAL. (optional)\n"+
-                                                    "acceleration: The acceleration vector of the particle system. This is used only if the motionMode is MOTION_MODE_NORMAL. (optional)\n"+
-                                                    "angularVelocity: The angular velocity (w) of the particle. This is used only if the motionMode is MOTION_MODE_CIRCULAR. (optional)\n"+
-                                                    "angularAcceleration: The angular acceleration of the particle. This is used only if the motionMode is MOTION_MODE_CIRCULAR. (optional)\n"+
-                                                    "angularMotionRadius: The radius value of the imaginary circlie on which the angular motion is performed.\nThis is used only if the motionMode is MOTION_MODE_CIRCULAR. (optional)\n"+
-                                                    "angularQuaternion: If set this quaternion value is applied to the position of this particle system if the motionMode is\nMOTION_MODE_CIRCULAR. By default the particle systems that have MOTION_MODE_CIRCULAR as motionMode are initially created on the XZ plane,\nso the angularQuaternion parameter is used to change the initial rotation of the circular motion. This value can be calculated this way:\n"+
-                                                    "angularQuaternion = ROYGBIV.computeQuaternionFromVectors(ROYGBIV.vector(0,1,0), [desired normal value]) (optional)\n"+
-                                                    "initialAngle: The initial angle of the circular motion. This is used only if the motionMode is MOTION_MODE_CIRCULAR. (optional)\n"+
-                                                    "motionMode: The motion mode of the particle system. This can be MOTION_MODE_NORMAL or MOTION_MODE_CIRCULAR.\nMOTION_MODE_NORMAL represents the motion with uniform accelerationa and the MOTION_MODE_CIRCULAR represents the circular motion with\nuniform acceleration. The default value is MOTION_MODE_NORMAL. (optional)\n"+
-                                                    "updateFunction: The update function of this particle system that is executed on each render. (optional)";
   this.ROYGBIV_SCRIPTING_API_SCALEPARTICLESYSTEM = "Modifies the scale of a particle system.";
   this.ROYGBIV_SCRIPTING_API_SETPARTICLESYSTEMBLENDING = "Sets the blending mode of a particle system. Blending mode can be one of NO_BLENDING, NORMAL_BLENDING,\nADDITIVE_BLENDING, SUBTRACTIVE_BLENDING or MULTIPLY_BLENDING.";
   this.ROYGBIV_SCRIPTING_API_SETPARTICLESYSTEMROTATION = "Sets the rotation of a particle system around given axis.";
