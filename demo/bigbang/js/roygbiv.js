@@ -1841,7 +1841,8 @@ var BANNERL5 = "|_| \\_\\\\___/ |_| \\____|____/___|  \\_/    ";
 
 // DEPLOYED SCRIPTS
 var deploymentScriptsStatus = {
-SCRIPT_EXECUTION_STATUS_init: false
+SCRIPT_EXECUTION_STATUS_init: false,
+SCRIPT_EXECUTION_STATUS_loop: false
 
 };
 
@@ -6869,7 +6870,7 @@ function handleSkybox(){
 
 function deploymentScripts(){
   if(deploymentScriptsStatus.SCRIPT_EXECUTION_STATUS_init){if (cpuOperationsHandler.record){cpuOperationsHandler.scriptPerformances.init = performance.now()}ROYGBIV.startParticleSystem({particleSystem: ROYGBIV.getParticleSystem("ps1")});
-ROYGBIV.setActiveControl(ROYGBIV.createOrbitControl({maxRadius: -800}));
+ROYGBIV.setActiveControl(ROYGBIV.createOrbitControl({minRadius: 100, maxRadius: 800}));
 var gitText = ROYGBIV.getText("github");
 ROYGBIV.onTextClick(gitText, function(){
   var redirectWindow = window.open('https://github.com/oguzeroglu/ROYGBIV', '_blank');
@@ -6885,18 +6886,27 @@ if (!ROYGBIV.isMobile()){
   });
 }else{
   if (!ROYGBIV.isOrientationLandscape()){
-    ROYGBIV.setActiveControl(ROYGBIV.createOrbitControl({maxRadius: -1200}));
+    ROYGBIV.setActiveControl(ROYGBIV.createOrbitControl({minRadius: 100, maxRadius: 800}));
   }
   ROYGBIV.setScreenOrientationChangeListener(function(isLandscape){
     if (isLandscape){
-      ROYGBIV.setActiveControl(ROYGBIV.createOrbitControl({maxRadius: -800}));
+      ROYGBIV.setActiveControl(ROYGBIV.createOrbitControl({minRadius: 100, maxRadius: 800}));
     }else{
-      ROYGBIV.setActiveControl(ROYGBIV.createOrbitControl({maxRadius: -1200}));
+      ROYGBIV.setActiveControl(ROYGBIV.createOrbitControl({minRadius: 100, maxRadius: 800}));
     }
   })
 }
+ROYGBIV.globals.ps = ROYGBIV.getParticleSystem("ps1");
+ROYGBIV.globals.deg = 0;
+ROYGBIV.globals.deg2 = 0;
+ROYGBIV.globals.axisZ = "z";
+ROYGBIV.globals.axisY = "y";
+ROYGBIV.runScript("loop");
 deploymentScriptsStatus.SCRIPT_EXECUTION_STATUS_init = false;
 if (cpuOperationsHandler.record){cpuOperationsHandler.scriptPerformances.init = performance.now() - cpuOperationsHandler.scriptPerformances.init}}
+if(deploymentScriptsStatus.SCRIPT_EXECUTION_STATUS_loop){if (cpuOperationsHandler.record){cpuOperationsHandler.scriptPerformances.loop = performance.now()}ROYGBIV.setParticleSystemRotation(ROYGBIV.globals.ps, ROYGBIV.globals.axisY, ROYGBIV.globals.deg += 0.009);
+ROYGBIV.setParticleSystemRotation(ROYGBIV.globals.ps, ROYGBIV.globals.axisZ, ROYGBIV.globals.deg2 += 0.006);
+if (cpuOperationsHandler.record){cpuOperationsHandler.scriptPerformances.loop = performance.now() - cpuOperationsHandler.scriptPerformances.loop}}
 
 }
 
