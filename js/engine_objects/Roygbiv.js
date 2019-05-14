@@ -61,7 +61,6 @@ var Roygbiv = function(){
     "setVector",
     "quaternion",
     "fadeAway",
-    "mergeParticleSystems",
     "createCrosshair",
     "selectCrosshair",
     "changeCrosshairColor",
@@ -1042,53 +1041,6 @@ Roygbiv.prototype.fadeAway = function(particleSystem, coefficient){
     particleSystem.material.uniforms.dissapearCoef.value = coefficient;
   }else{
     particleSystem.psMerger.material.uniforms.dissapearCoefArray.value[particleSystem.mergedIndex] = coefficient;
-  }
-}
-
-// Merges all created particle systems to improve render performance. The skip
-// list parameter (array of particle systems) may be used in order to prevent certain particle systems from being merged.
-// This might be useful for particle systems that have separate blending modes.
-Roygbiv.prototype.mergeParticleSystems = function(skipList){
-  if (mode == 0){
-    return;
-  }
-  preConditions.checkIfTrue(ROYGBIV.mergeParticleSystems, "MAX_VERTEX_UNIFORM_VECTORS is not calcualted", (!MAX_VERTEX_UNIFORM_VECTORS));
-  preConditions.checkIfTrue(ROYGBIV.mergeParticleSystems, "Mininmum 2 particle systems must be created in order to merge", (Object.keys(particleSystemPool).length < 2));
-  preConditions.checkIfArrayOnlyIfExists(ROYGBIV.mergeParticleSystems, preConditions.skipList, skipList);
-  preConditions.checkIfArrayOfParticleSystemsOnlyIfExists(ROYGBIV.mergeParticleSystems, preConditions.skipList, skipList);
-  var diff = parseInt(4096 / MAX_VERTEX_UNIFORM_VECTORS);
-  var chunkSize = parseInt(MAX_PS_COMPRESS_AMOUNT_4096 / diff);
-  var mergeObj = new Object();
-  var size = 0;
-  for (var psName in particleSystemPool){
-    var ps = particleSystemPool[psName];
-    if (ps.psMerger){
-      continue;
-    }
-    var skip = false;
-    if (skipList){
-      for (var i = 0; i<skipList.length; i++){
-        if (skipList[i].name == ps.name){
-          skip = true;
-          break;
-        }
-      }
-    }
-    if (skip){
-      continue;
-    }
-    mergeObj[psName] = ps;
-    size ++;
-    if (size == chunkSize){
-      new ParticleSystemMerger(mergeObj, TOTAL_MERGED_COUNT);
-      TOTAL_MERGED_COUNT ++;
-      mergeObj = new Object();
-      size = 0;
-    }
-  }
-  if (size > 1){
-    new ParticleSystemMerger(mergeObj, TOTAL_MERGED_COUNT);
-    TOTAL_MERGED_COUNT ++;
   }
 }
 

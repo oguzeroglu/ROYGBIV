@@ -988,6 +988,7 @@ StateLoader.prototype.load = function(){
       }
       preConfiguredParticleSystems[psName] = new PreconfiguredParticleSystem(curExport.name, curExport.type, curExport.params);
       preConfiguredParticleSystems[psName].setCollidableStatus(curExport.isCollidable);
+      preConfiguredParticleSystems[psName].setExcludeFromMergeStatus(curExport.excludeFromMerge);
       preConfiguredParticleSystems[psName].setMaxPSTime(curExport.maxPSTime);
       preConfiguredParticleSystems[psName].setBlending(curExport.blendingIntVal, curExport.blendingStrVal);
       preConfiguredParticleSystems[psName].preConfiguredParticleSystemPoolName = curExport.preConfiguredParticleSystemPoolName;

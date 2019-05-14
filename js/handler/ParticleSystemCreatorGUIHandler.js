@@ -17,10 +17,7 @@ var ParticleSystemCreatorGUIHandler = function(){
   for (var key in this.actionsByTypes){
     this.typesAry.push(key);
   }
-  this.typeParam = {"Type": "CUSTOM"};
-  this.collidableParam = {"Collidable": false};
-  this.blendingParam = {"Blending": "NORMAL_BLENDING"};
-  this.maxPSTimeParam = {"Max time": DEFAULT_MAX_PS_TIME};
+  this.initCommonParameters();
   this.buttonsParam = {
     "Cancel": function(){
       activeControl = new FreeControls({});
@@ -37,6 +34,7 @@ var ParticleSystemCreatorGUIHandler = function(){
       }
       camera.quaternion.set(0, 0, 0, 1);
       camera.position.set(initialCameraX, initialCameraY, initialCameraZ);
+      particleSystemCreatorGUIHandler.initCommonParameters();
     },
     "Done": function(){
       activeControl = new FreeControls({});
@@ -64,13 +62,23 @@ var ParticleSystemCreatorGUIHandler = function(){
           preConfiguredParticleSystem.preConfiguredParticleSystemPoolName = poolName;
         }
       }
+      particleSystemCreatorGUIHandler.initCommonParameters();
     }
   };
+}
+
+ParticleSystemCreatorGUIHandler.prototype.initCommonParameters = function(){
+  this.typeParam = {"Type": "CUSTOM"};
+  this.collidableParam = {"Collidable": false};
+  this.blendingParam = {"Blending": "NORMAL_BLENDING"};
+  this.maxPSTimeParam = {"Max time": DEFAULT_MAX_PS_TIME};
+  this.excludeFromMergeParam = {"No merge": false};
 }
 
 ParticleSystemCreatorGUIHandler.prototype.onAfterRefresh = function(){
   particleSystemCreatorGUIHandler.preConfiguredParticleSystem.setMaxPSTime(particleSystemCreatorGUIHandler.maxPSTimeParam["Max time"]);
   particleSystemCreatorGUIHandler.preConfiguredParticleSystem.setCollidableStatus(particleSystemCreatorGUIHandler.collidableParam["Collidable"]);
+  particleSystemCreatorGUIHandler.preConfiguredParticleSystem.setExcludeFromMergeStatus(particleSystemCreatorGUIHandler.excludeFromMergeParam["No merge"]);
   var blendingValStr = this.blendingParam["Blending"];
   var blendingValInt;
   switch (blendingValStr){
@@ -90,6 +98,11 @@ ParticleSystemCreatorGUIHandler.prototype.onAfterShown = function(){
     }else{
       particleSystemCreatorGUIHandler.collidableParam["Collidable"] = false;
     }
+    if (particleSystemCreatorGUIHandler.preConfiguredParticleSystem.excludeFromMerge){
+      particleSystemCreatorGUIHandler.excludeFromMergeParam["No merge"] = true;
+    }else{
+      particleSystemCreatorGUIHandler.excludeFromMergeParam["No merge"] = false;
+    }
     if (particleSystemCreatorGUIHandler.preConfiguredParticleSystem.maxPSTime){
       particleSystemCreatorGUIHandler.maxPSTimeParam["Max time"] = particleSystemCreatorGUIHandler.preConfiguredParticleSystem.maxPSTime;
     }else{
@@ -102,6 +115,7 @@ ParticleSystemCreatorGUIHandler.prototype.onAfterShown = function(){
     }
   }else{
     particleSystemCreatorGUIHandler.collidableParam["Collidable"] = false;
+    particleSystemCreatorGUIHandler.excludeFromMergeParam["No merge"] = false;
     particleSystemCreatorGUIHandler.maxPSTimeParam["Max time"] = DEFAULT_MAX_PS_TIME;
     particleSystemCreatorGUIHandler.blendingParam["Blending"] = "NORMAL_BLENDING";
   }
@@ -132,6 +146,9 @@ ParticleSystemCreatorGUIHandler.prototype.addCommonControllers = function(){
       case "MULTIPLY_BLENDING": intVal = MULTIPLY_BLENDING; break;
     }
     particleSystemCreatorGUIHandler.preConfiguredParticleSystem.setBlending(intVal, val);
+  }).listen();
+  this.excludeFromMergeController = guiHandler.datGuiPSCreator.add(this.excludeFromMergeParam, "No merge").onChange(function(val){
+    particleSystemCreatorGUIHandler.preConfiguredParticleSystem.setExcludeFromMergeStatus(val);
   }).listen();
   this.cancelController = guiHandler.datGuiPSCreator.add(this.buttonsParam, "Cancel");
   this.doneController = guiHandler.datGuiPSCreator.add(this.buttonsParam, "Done");
@@ -2113,6 +2130,7 @@ ParticleSystemCreatorGUIHandler.prototype.edit = function(psName){
   particleSystemCreatorGUIHandler.preConfiguredParticleSystem.setBlending(preConfiguredParticleSystem.blendingIntVal, preConfiguredParticleSystem.blendingStrVal);
   particleSystemCreatorGUIHandler.preConfiguredParticleSystem.setMaxPSTime(preConfiguredParticleSystem.maxPSTime);
   particleSystemCreatorGUIHandler.preConfiguredParticleSystem.setCollidableStatus(preConfiguredParticleSystem.isCollidable);
+  particleSystemCreatorGUIHandler.preConfiguredParticleSystem.setExcludeFromMergeStatus(preConfiguredParticleSystem.excludeFromMerge);
   particleSystemCreatorGUIHandler.preConfiguredParticleSystem.setBlending(preConfiguredParticleSystem.blendingIntVal, preConfiguredParticleSystem.blendingStrVal);
   particleSystemCreatorGUIHandler.onAfterShown();
   this.isEdit = true;

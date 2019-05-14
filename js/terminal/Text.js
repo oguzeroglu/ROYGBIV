@@ -577,7 +577,6 @@ var Text = function(){
    this.ROYGBIV_SCRIPTING_API_SETVECTOR = "Set the x, y, z components of a vector.";
    this.ROYGBIV_SCRIPTING_API_QUATERNION = "Returns a new THREE.Quaternion instance.";
    this.ROYGBIV_SCRIPTING_API_FADEAWAY = "Makes the particles of given particle system smaller on each frame. Greater the coefficient, faster the particles fade away.\nThis can be used for smoke like particle systems to make them dissapear smoothly.";
-   this.ROYGBIV_SCRIPTING_API_MERGEPARTICLESYSTEMS = "Merges all created particle systems to improve render performance. The skip list parameter (array of particle systems) may be used\nin order to prevent certain particle systems from being merged. This might be useful for particle systems that have\nseparate blending modes.";
    this.ROYGBIV_SCRIPTING_API_CREATECROSSHAIR = "Creates a new crosshair. Configurations are:\n"+
                                                 "name: The unique name of the crosshair. (mandatory)\n"+
                                                 "textureName: The texture name of the crosshair. (mandatory)\n"+

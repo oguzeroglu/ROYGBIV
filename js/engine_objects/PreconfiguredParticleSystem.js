@@ -15,6 +15,7 @@ PreconfiguredParticleSystem.prototype.export = function(){
   exportObj.type = this.type;
   exportObj.params = this.params;
   exportObj.isCollidable = this.isCollidable;
+  exportObj.excludeFromMerge = this.excludeFromMerge;
   exportObj.maxPSTime = this.maxPSTime;
   exportObj.preConfiguredParticleSystemPoolName = this.preConfiguredParticleSystemPoolName;
   exportObj.blendingIntVal = this.blendingIntVal;
@@ -40,6 +41,7 @@ PreconfiguredParticleSystem.prototype.getParticleSystem = function(){
   }
   if (ps){
     ps.isCollidable = this.isCollidable;
+    ps.excludeFromMerge = this.excludeFromMerge;
     ps.maxPSTime = (!(typeof this.maxPSTime == UNDEFINED))? this.maxPSTime: DEFAULT_MAX_PS_TIME;
     if (ps.creationConfigurations){
       ps.creationConfigurations.maxPSTime = ps.maxPSTime;
@@ -64,4 +66,8 @@ PreconfiguredParticleSystem.prototype.setMaxPSTime = function(maxPSTime){
 
 PreconfiguredParticleSystem.prototype.setCollidableStatus = function(isCollidable){
   this.isCollidable = isCollidable;
+}
+
+PreconfiguredParticleSystem.prototype.setExcludeFromMergeStatus = function(excludeFromMerge){
+  this.excludeFromMerge = excludeFromMerge;
 }

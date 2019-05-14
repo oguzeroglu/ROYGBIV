@@ -28,6 +28,13 @@ ParticleSystemGenerator.prototype.handleModeSwitch = function(){
     var pool = preConfiguredParticleSystemPools[poolName];
     this.generateInitializedParticleSystemPool(pool.poolName, particleSystemPool[pool.refParticleSystemName], pool.poolSize);
   }
+  var psMergeSkipList = [];
+  for (var psName in particleSystemPool){
+    if (particleSystemPool[psName].excludeFromMerge){
+      psMergeSkipList.push(particleSystemPool[psName]);
+    }
+  }
+  this.mergeParticleSystems(psMergeSkipList);
 }
 
 ParticleSystemGenerator.prototype.multiplyScalar = function(vector, scalar, targetVector){
@@ -142,6 +149,46 @@ ParticleSystemGenerator.prototype.applyNoise = function(vec, targetVector){
     return new THREE.Vector3(vector3.x, vector3.y, vector3.z);
   }else{
     return targetVector.copy(vector3);
+  }
+}
+
+ParticleSystemGenerator.prototype.mergeParticleSystems = function(skipList){
+  if ((Object.keys(particleSystemPool).length < 2) || (!MAX_VERTEX_UNIFORM_VECTORS)){
+    return;
+  }
+  var diff = parseInt(4096 / MAX_VERTEX_UNIFORM_VECTORS);
+  var chunkSize = parseInt(MAX_PS_COMPRESS_AMOUNT_4096 / diff);
+  var mergeObj = new Object();
+  var size = 0;
+  for (var psName in particleSystemPool){
+    var ps = particleSystemPool[psName];
+    if (ps.psMerger){
+      continue;
+    }
+    var skip = false;
+    if (skipList){
+      for (var i = 0; i<skipList.length; i++){
+        if (skipList[i].name == ps.name){
+          skip = true;
+          break;
+        }
+      }
+    }
+    if (skip){
+      continue;
+    }
+    mergeObj[psName] = ps;
+    size ++;
+    if (size == chunkSize){
+      new ParticleSystemMerger(mergeObj, TOTAL_MERGED_COUNT);
+      TOTAL_MERGED_COUNT ++;
+      mergeObj = new Object();
+      size = 0;
+    }
+  }
+  if (size > 1){
+    new ParticleSystemMerger(mergeObj, TOTAL_MERGED_COUNT);
+    TOTAL_MERGED_COUNT ++;
   }
 }
 

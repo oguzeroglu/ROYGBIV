@@ -47,6 +47,7 @@ ParticleSystem.prototype.createCopy = function(newParticleSystemName){
   }
   copyParticleSystem.initialAngle = this.initialAngle;
   copyParticleSystem.isCollidable = this.isCollidable;
+  copyParticleSystem.excludeFromMerge = this.excludeFromMerge;
   copyParticleSystem.setBlending(this.getBlending());
   return copyParticleSystem;
 }
