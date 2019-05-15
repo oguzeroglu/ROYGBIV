@@ -46,6 +46,7 @@ RaycasterWorker.prototype.refresh = function(state){
   this.objectsByWorkerID = new Object();
   this.particleSystemsByWorkerID = new Object();
   this.particleCollisionCallbackBuffer = new Map();
+  this.particleSystemCollisionCallbackBuffer = new Map();
   for (var gsName in gridSystems){
     gridSystems[gsName].workerID = idCounter ++;
     idResponse.push({type: "gridSystem", name: gsName, id: gridSystems[gsName].workerID});
@@ -227,6 +228,10 @@ RaycasterWorker.prototype.update = function(transferableMessageBody){
   worker.particleCollisionBuffer = transferableMessageBody.particleCollisionCallbackDescription;
   worker.particleCollisionCallbackBuffer.forEach(worker.particleCollisionSetBufferFunc);
   worker.particleCollisionCallbackBuffer.clear();
+  worker.particleSystemCollisionBufferIndex = 0;
+  worker.particleSystemCollisionBuffer = transferableMessageBody.particleSystemCollisionCallbackDescription;
+  worker.particleSystemCollisionCallbackBuffer.forEach(worker.particleSystemCollisionSetBufferFunc);
+  worker.particleSystemCollisionCallbackBuffer.clear();
   if (this.record){
     this.performanceLogs.updateTime = performance.now() - updateStartTime;
     this.performanceLogs.binHandlerCacheHitCount = rayCaster.binHandler.cacheHitCount;
@@ -241,6 +246,10 @@ RaycasterWorker.prototype.psCollisionHandlerFunc = function(particleSystem, psNa
 
 RaycasterWorker.prototype.particleCollisionSetBufferFunc = function(particle, uuid){
   worker.particleCollisionBuffer[worker.particleCollisionBufferIndex++] = uuid;
+}
+
+RaycasterWorker.prototype.particleSystemCollisionSetBufferFunc = function(){
+
 }
 
 RaycasterWorker.prototype.onParticleCollision = function(particle){
@@ -279,6 +288,7 @@ self.onmessage = function(msg){
     worker.transferableList[4] = worker.transferableMessageBody.addedTextScaleDescription.buffer;
     worker.transferableList[5] = worker.transferableMessageBody.particleSystemStatusDescription.buffer;
     worker.transferableList[6] = worker.transferableMessageBody.particleCollisionCallbackDescription.buffer;
+    worker.transferableList[7] = worker.transferableMessageBody.particleSystemCollisionCallbackDescription.buffer;
     postMessage(worker.transferableMessageBody);
   }
 }
