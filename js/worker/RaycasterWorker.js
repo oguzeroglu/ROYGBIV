@@ -13,6 +13,7 @@ importScripts("../handler/ParticleSystemGenerator.js");
 importScripts("../engine_objects/Particle.js");
 importScripts("../engine_objects/ParticleSystem.js");
 importScripts("../handler/factory/RaycasterFactory.js");
+importScripts("../engine_objects/CollisionInfo.js");
 
 var IS_WORKER_CONTEXT = true;
 
@@ -46,7 +47,6 @@ RaycasterWorker.prototype.refresh = function(state){
   this.objectsByWorkerID = new Object();
   this.particleSystemsByWorkerID = new Object();
   this.particleCollisionCallbackBuffer = new Map();
-  this.particleSystemCollisionCallbackBuffer = new Map();
   for (var gsName in gridSystems){
     gridSystems[gsName].workerID = idCounter ++;
     idResponse.push({type: "gridSystem", name: gsName, id: gridSystems[gsName].workerID});
@@ -223,15 +223,13 @@ RaycasterWorker.prototype.update = function(transferableMessageBody){
       }
     }
   }
+  worker.particleSystemCollisionBufferIndex = 0;
+  worker.particleSystemCollisionBuffer = transferableMessageBody.particleSystemCollisionCallbackDescription;
   particleSystems.forEach(worker.psCollisionHandlerFunc);
   worker.particleCollisionBufferIndex = 0;
   worker.particleCollisionBuffer = transferableMessageBody.particleCollisionCallbackDescription;
   worker.particleCollisionCallbackBuffer.forEach(worker.particleCollisionSetBufferFunc);
   worker.particleCollisionCallbackBuffer.clear();
-  worker.particleSystemCollisionBufferIndex = 0;
-  worker.particleSystemCollisionBuffer = transferableMessageBody.particleSystemCollisionCallbackDescription;
-  worker.particleSystemCollisionCallbackBuffer.forEach(worker.particleSystemCollisionSetBufferFunc);
-  worker.particleSystemCollisionCallbackBuffer.clear();
   if (this.record){
     this.performanceLogs.updateTime = performance.now() - updateStartTime;
     this.performanceLogs.binHandlerCacheHitCount = rayCaster.binHandler.cacheHitCount;
@@ -248,12 +246,22 @@ RaycasterWorker.prototype.particleCollisionSetBufferFunc = function(particle, uu
   worker.particleCollisionBuffer[worker.particleCollisionBufferIndex++] = uuid;
 }
 
-RaycasterWorker.prototype.particleSystemCollisionSetBufferFunc = function(){
-
-}
-
 RaycasterWorker.prototype.onParticleSystemCollision = function(particleSystem, collisionInfo){
-  console.log("SDF");
+  var index = worker.particleSystemCollisionBufferIndex;
+  worker.particleSystemCollisionBuffer[index++] = worker.workerIDsByParticleSystemName[particleSystem.name];
+  worker.particleSystemCollisionBuffer[index++] = worker.workerIDsByObjectName[collisionInfo.targetObjectName];
+  worker.particleSystemCollisionBuffer[index++] = collisionInfo.x;
+  worker.particleSystemCollisionBuffer[index++] = collisionInfo.y;
+  worker.particleSystemCollisionBuffer[index++] = collisionInfo.z;
+  worker.particleSystemCollisionBuffer[index++] = collisionInfo.quaternionX;
+  worker.particleSystemCollisionBuffer[index++] = collisionInfo.quaternionY;
+  worker.particleSystemCollisionBuffer[index++] = collisionInfo.quaternionZ;
+  worker.particleSystemCollisionBuffer[index++] = collisionInfo.quaternionW;
+  worker.particleSystemCollisionBuffer[index++] = collisionInfo.faceNormalX;
+  worker.particleSystemCollisionBuffer[index++] = collisionInfo.faceNormalY;
+  worker.particleSystemCollisionBuffer[index++] = collisionInfo.faceNormalZ;
+  worker.particleSystemCollisionBuffer[index++] = collisionInfo.time;
+  worker.particleSystemCollisionBufferIndex += 13;
 }
 
 RaycasterWorker.prototype.onParticleCollision = function(particle){
@@ -261,11 +269,13 @@ RaycasterWorker.prototype.onParticleCollision = function(particle){
 }
 
 RaycasterWorker.prototype.onParticleSystemSetCollisionListener = function(data){
-
+  var particleSystem = particleSystemPool[data.psName];
+  particleSystem.setCollisionListener(noop, data.collisionTimeOffset);
 }
 
 RaycasterWorker.prototype.onParticleSystemRemoveCollisionListener = function(data){
-
+  var particleSystem = particleSystemPool[data.psName];
+  particleSystem.removeCollisionListener();
 }
 
 // START
@@ -276,6 +286,7 @@ var camera = new Object();
 var worker = new RaycasterWorker();
 rayCaster = raycasterFactory.get();
 var reusableParticleSystemStartConfiguration = {};
+reusableCollisionInfo = new CollisionInfo();
 
 self.onmessage = function(msg){
   if (msg.data.startRecording){

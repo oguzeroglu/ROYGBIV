@@ -213,7 +213,16 @@ var RaycasterWorkerBridge = function(){
         rayCaster.transferableMessageBody.particleCollisionCallbackDescription[i] = -1;
       }
       for (var i = 0; i<rayCaster.transferableMessageBody.particleSystemCollisionCallbackDescription.length; i+=13){
-
+        var psID = rayCaster.transferableMessageBody.particleSystemCollisionCallbackDescription[i];
+        if (psID < 0){
+          break;
+        }
+        var buf = rayCaster.transferableMessageBody.particleSystemCollisionCallbackDescription;
+        var particleSystem = rayCaster.particleSystemsByWorkerID[psID];
+        var targetObjectName = rayCaster.objectsByWorkerID[buf[i+1]].name;
+        reusableCollisionInfo.set(targetObjectName, buf[i+2], buf[i+3], buf[i+4], 0, buf[i+5], buf[i+6], buf[i+7], buf[i+8], REUSABLE_VECTOR.set(buf[i+9], buf[i+10], buf[i+11]), buf[i+12]);
+        particleSystem.fireCollisionCallback(reusableCollisionInfo);
+        rayCaster.transferableMessageBody.particleSystemCollisionCallbackDescription[i] = -1;
       }
       rayCaster.hasOwnership = true;
     }
