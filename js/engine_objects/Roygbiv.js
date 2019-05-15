@@ -166,7 +166,8 @@ var Roygbiv = function(){
     "createOrbitControl",
     "isOrientationLandscape",
     "setScreenOrientationChangeListener",
-    "removeScreenOrientationChangeListener"
+    "removeScreenOrientationChangeListener",
+    "executeForEachParticleSystem"
   ];
 
   this.globals = new Object();
@@ -1091,6 +1092,21 @@ Roygbiv.prototype.stopObjectTrail = function(object){
   var objectTrail = objectTrails[object.name];
   preConditions.checkIfTrue(ROYGBIV.stopObjectTrail, "No trail attached to object.", (!objectTrail));
   objectTrail.stop();
+}
+
+// Runs the provided function for each particle system of given particle system pool. The callbackFunction
+// is executed with particleSystem parameter.
+Roygbiv.prototype.executeForEachParticleSystem = function(psPool, callbackFunction){
+  if (mode == 0){
+    return;
+  }
+  preConditions.checkIfDefined(ROYGBIV.executeForEachParticleSystem, preConditions.psPool, psPool);
+  preConditions.checkIfDefined(ROYGBIV.executeForEachParticleSystem, preConditions.callbackFunction, callbackFunction);
+  preConditions.checkIfFunctionOnlyIfExists(ROYGBIV.executeForEachParticleSystem, preConditions.callbackFunction, callbackFunction);
+  preConditions.checkIfParticleSystemPool(ROYGBIV.executeForEachParticleSystem, preConditions.psPool, psPool);
+  for (var psName in psPool.particleSystems){
+    callbackFunction(psPool.particleSystems[psName]);
+  }
 }
 
 // CROSSHAIR FUNCTIONS *********************************************************

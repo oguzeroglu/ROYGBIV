@@ -773,4 +773,5 @@ var Text = function(){
   this.ROYGBIV_SCRIPTING_API_ISORIENTATIONLANDSCAPE = "For mobile devices returns if the orientation is landscape for mobile devices. Returns false for desktop devices";
   this.ROYGBIV_SCRIPTING_API_SETSCREENORIENTATIONCHANGELISTENER = "Sets a listener for orientation change events. For mobile devices, the callbackFunction is executed with isLandscape parameter\nwhen the orientation is changed.";
   this.ROYGBIV_SCRIPTING_API_REMOVESCREENORIENTATIONCHANGELISTENER = "Removes the listener for orientation change events.";
+  this.ROYGBIV_SCRIPTING_API_EXECUTEFOREACHPARTICLESYSTEM = "Runs the provided function for each particle system of given particle system pool. The callbackFunction is executed with\nparticleSystem parameter.";
 }
