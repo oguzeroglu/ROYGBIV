@@ -253,7 +253,7 @@ RaycasterWorker.prototype.onParticleSystemCollision = function(particleSystem, c
   worker.particleSystemCollisionBuffer[index++] = collisionInfo.faceNormalX;
   worker.particleSystemCollisionBuffer[index++] = collisionInfo.faceNormalY;
   worker.particleSystemCollisionBuffer[index++] = collisionInfo.faceNormalZ;
-  worker.particleSystemCollisionBuffer[index++] = collisionInfo.time;
+  worker.particleSystemCollisionBuffer[index++] = collisionInfo.particleSystemTime;
   worker.particleSystemCollisionBufferIndex += 13;
 }
 
