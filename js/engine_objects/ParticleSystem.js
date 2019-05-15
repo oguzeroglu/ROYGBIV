@@ -33,6 +33,19 @@ var ParticleSystem = function(copyPS, name, particles, x, y, z, vx, vy, vz, ax, 
   webglCallbackHandler.registerEngineObject(this);
 }
 
+ParticleSystem.prototype.removeCollisionListener = function(){
+  delete particleSystemCollisionCallbackRequests[this.name];
+  this.checkForCollisions = false;
+}
+
+ParticleSystem.prototype.setCollisionListener = function(callbackFunction, timeOffset){
+  particleSystemCollisionCallbackRequests[this.name] = callbackFunction.bind(this);
+  this.checkForCollisions = true;
+  if (!(typeof timeOffset == UNDEFINED)){
+    this.collisionTimeOffset = timeOffset;
+  }
+}
+
 ParticleSystem.prototype.createCopy = function(newParticleSystemName){
   var copyParticleSystem = new ParticleSystem(this, newParticleSystemName, this.particles, this.x, this.y, this.z, this.vx, this.vy, this.vz, this.ax, this.ay, this.az, this.motionMode, this.updateFunction);
   copyParticleSystem.lifetime = this.lifetime;
@@ -510,6 +523,9 @@ ParticleSystem.prototype.fireCollisionCallback = function(collisionInfo){
     return;
   }
   request(collisionInfo);
+  if (IS_WORKER_CONTEXT){
+    worker.onParticleSystemCollision(this, collisionInfo);
+  }
 }
 
 ParticleSystem.prototype.handleCollisions = function(){

@@ -1272,11 +1272,7 @@ Roygbiv.prototype.setCollisionListener = function(sourceObject, callbackFunction
     if (!particleSystemCollisionCallbackRequests[sourceObject.name]){
       incrCounter = true;
     }
-    particleSystemCollisionCallbackRequests[sourceObject.name] = callbackFunction.bind(sourceObject);
-    sourceObject.checkForCollisions = true;
-    if (!(typeof timeOffset == UNDEFINED)){
-      sourceObject.collisionTimeOffset = timeOffset;
-    }
+    sourceObject.setCollisionListener(callbackFunction, timeOffset);
     if (incrCounter){
       TOTAL_PARTICLE_SYSTEM_COLLISION_LISTEN_COUNT ++;
     }
@@ -1302,8 +1298,7 @@ Roygbiv.prototype.removeCollisionListener = function(sourceObject){
       TOTAL_OBJECT_COLLISION_LISTENER_COUNT --;
     }else if (sourceObject.isParticleSystem){
       TOTAL_PARTICLE_SYSTEM_COLLISION_LISTEN_COUNT --;
-      delete particleSystemCollisionCallbackRequests[sourceObject.name];
-      sourceObject.checkForCollisions = false;
+      sourceObject.removeCollisionListener();
     }
   }
 }

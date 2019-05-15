@@ -252,6 +252,10 @@ RaycasterWorker.prototype.particleSystemCollisionSetBufferFunc = function(){
 
 }
 
+RaycasterWorker.prototype.onParticleSystemCollision = function(particleSystem, collisionInfo){
+  console.log("SDF");
+}
+
 RaycasterWorker.prototype.onParticleCollision = function(particle){
   this.particleCollisionCallbackBuffer.set(particle.uuid, particle);
 }

@@ -142,7 +142,7 @@ var RaycasterWorkerBridge = function(){
       }
       for (var psName in particleSystemPool){
         if (particleSystemPool[psName].isCollidable){
-          for (var i = 0; i<12; i++){
+          for (var i = 0; i<13; i++){
             particleSystemCollisionCallbackArray.push(-1);
           }
         }
@@ -212,7 +212,7 @@ var RaycasterWorkerBridge = function(){
         }
         rayCaster.transferableMessageBody.particleCollisionCallbackDescription[i] = -1;
       }
-      for (var i = 0; i<rayCaster.transferableMessageBody.particleSystemCollisionCallbackDescription.length; i+=12){
+      for (var i = 0; i<rayCaster.transferableMessageBody.particleSystemCollisionCallbackDescription.length; i+=13){
 
       }
       rayCaster.hasOwnership = true;
