@@ -46,7 +46,6 @@ RaycasterWorker.prototype.refresh = function(state){
   this.workerIDsByParticleSystemName = new Object();
   this.objectsByWorkerID = new Object();
   this.particleSystemsByWorkerID = new Object();
-  this.particleCollisionCallbackBuffer = new Map();
   for (var gsName in gridSystems){
     gridSystems[gsName].workerID = idCounter ++;
     idResponse.push({type: "gridSystem", name: gsName, id: gridSystems[gsName].workerID});
@@ -224,12 +223,10 @@ RaycasterWorker.prototype.update = function(transferableMessageBody){
     }
   }
   worker.particleSystemCollisionBufferIndex = 0;
-  worker.particleSystemCollisionBuffer = transferableMessageBody.particleSystemCollisionCallbackDescription;
-  particleSystems.forEach(worker.psCollisionHandlerFunc);
   worker.particleCollisionBufferIndex = 0;
+  worker.particleSystemCollisionBuffer = transferableMessageBody.particleSystemCollisionCallbackDescription;
   worker.particleCollisionBuffer = transferableMessageBody.particleCollisionCallbackDescription;
-  worker.particleCollisionCallbackBuffer.forEach(worker.particleCollisionSetBufferFunc);
-  worker.particleCollisionCallbackBuffer.clear();
+  particleSystems.forEach(worker.psCollisionHandlerFunc);
   if (this.record){
     this.performanceLogs.updateTime = performance.now() - updateStartTime;
     this.performanceLogs.binHandlerCacheHitCount = rayCaster.binHandler.cacheHitCount;
@@ -240,10 +237,6 @@ RaycasterWorker.prototype.psCollisionHandlerFunc = function(particleSystem, psNa
   if (particleSystem && !particleSystem.destroyed){
     particleSystem.update();
   }
-}
-
-RaycasterWorker.prototype.particleCollisionSetBufferFunc = function(particle, uuid){
-  worker.particleCollisionBuffer[worker.particleCollisionBufferIndex++] = uuid;
 }
 
 RaycasterWorker.prototype.onParticleSystemCollision = function(particleSystem, collisionInfo){
@@ -265,7 +258,7 @@ RaycasterWorker.prototype.onParticleSystemCollision = function(particleSystem, c
 }
 
 RaycasterWorker.prototype.onParticleCollision = function(particle){
-  this.particleCollisionCallbackBuffer.set(particle.uuid, particle);
+  worker.particleCollisionBuffer[worker.particleCollisionBufferIndex++] = particle.uuid;
 }
 
 RaycasterWorker.prototype.onParticleSystemSetCollisionListener = function(data){
