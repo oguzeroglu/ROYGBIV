@@ -452,6 +452,17 @@ RaycasterWorkerBridge.prototype.show = function(object){
   this.updateBuffer.set(object.name, object);
 }
 
+RaycasterWorkerBridge.prototype.onParticleSystemRemoveCollisionListener = function(particleSystem){
+  this.worker.postMessage({"particleSystemRemoveCollisionListener": {psName: particleSystem.name}});
+}
+
+RaycasterWorkerBridge.prototype.onParticleSystemSetCollisionListener = function(particleSystem, collisionTimeOffset){
+  if (typeof collisionTimeOffset == UNDEFINED){
+    collisionTimeOffset = 0;
+  }
+  this.worker.postMessage({"particleSystemSetCollisionListener": {psName: particleSystem.name, collisionTimeOffset: collisionTimeOffset}});
+}
+
 RaycasterWorkerBridge.prototype.onParticleSystemStart = function(particleSystem, startConfigurations){
   particleSystem.statusDescription.type = PARTICLE_SYSTEM_ACTION_TYPE_START;
   if (typeof startConfigurations.startPosition == UNDEFINED){

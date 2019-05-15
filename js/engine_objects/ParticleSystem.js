@@ -36,6 +36,7 @@ var ParticleSystem = function(copyPS, name, particles, x, y, z, vx, vy, vz, ax, 
 ParticleSystem.prototype.removeCollisionListener = function(){
   delete particleSystemCollisionCallbackRequests[this.name];
   this.checkForCollisions = false;
+  rayCaster.onParticleSystemRemoveCollisionListener(this);
 }
 
 ParticleSystem.prototype.setCollisionListener = function(callbackFunction, timeOffset){
@@ -44,6 +45,7 @@ ParticleSystem.prototype.setCollisionListener = function(callbackFunction, timeO
   if (!(typeof timeOffset == UNDEFINED)){
     this.collisionTimeOffset = timeOffset;
   }
+  rayCaster.onParticleSystemSetCollisionListener(this, timeOffset);
 }
 
 ParticleSystem.prototype.createCopy = function(newParticleSystemName){

@@ -260,6 +260,14 @@ RaycasterWorker.prototype.onParticleCollision = function(particle){
   this.particleCollisionCallbackBuffer.set(particle.uuid, particle);
 }
 
+RaycasterWorker.prototype.onParticleSystemSetCollisionListener = function(data){
+
+}
+
+RaycasterWorker.prototype.onParticleSystemRemoveCollisionListener = function(data){
+
+}
+
 // START
 raycasterFactory = new RaycasterFactory();
 var particleSystemGenerator = new ParticleSystemGenerator();
@@ -282,6 +290,10 @@ self.onmessage = function(msg){
     }else{
       keyboardBuffer["Shift"] = false;
     }
+  }else if (msg.data.particleSystemSetCollisionListener){
+    worker.onParticleSystemSetCollisionListener(msg.data.particleSystemSetCollisionListener);
+  }else if (msg.data.particleSystemRemoveCollisionListener){
+    worker.onParticleSystemRemoveCollisionListener(msg.data.particleSystemRemoveCollisionListener);
   }else{
     worker.update(msg.data);
     worker.transferableMessageBody = msg.data;

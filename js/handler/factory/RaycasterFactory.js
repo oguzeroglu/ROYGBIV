@@ -38,6 +38,8 @@ RaycasterFactory.prototype.init = function(){
   RayCaster.prototype.onParticleSystemHide = noop;
   RayCaster.prototype.issueParticleSystemStatusUpdate = noop;
   RayCaster.prototype.onAddedTextResize = noop;
+  RayCaster.prototype.onParticleSystemSetCollisionListener = noop;
+  RayCaster.prototype.onParticleSystemRemoveCollisionListener = noop;
 }
 
 RaycasterFactory.prototype.reset = function(){
