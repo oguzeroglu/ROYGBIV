@@ -64,6 +64,8 @@ ParticleSystem.prototype.createCopy = function(newParticleSystemName){
   copyParticleSystem.isCollidable = this.isCollidable;
   copyParticleSystem.excludeFromMerge = this.excludeFromMerge;
   copyParticleSystem.setBlending(this.getBlending());
+  copyParticleSystem.creationConfigurations = JSON.parse(JSON.stringify(this.creationConfigurations));
+  copyParticleSystem.creationConfigurations.name = newParticleSystemName;
   return copyParticleSystem;
 }
 
