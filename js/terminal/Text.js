@@ -547,7 +547,6 @@ var Text = function(){
                                                     "Callback function given as the second parameter is\nfired with a CollisionInfo instance when the sourceObject is collided with other objects or glued objects of the scene.\n"+
                                                     "The additional timeOffset parameter can be used for particle systems to pre-calculate future collisions. This can help to\nprevent visual errors of collisions of rather fast particle systems.";
   this.ROYGBIV_SCRIPTING_API_REMOVECOLLISIONLISTENER = "Removes collision listeners of an object, glued object or a particle system.";
-  this.ROYGBIV_SCRIPTING_API_SCALEPARTICLESYSTEM = "Modifies the scale of a particle system.";
   this.ROYGBIV_SCRIPTING_API_SETPARTICLESYSTEMROTATION = "Sets the rotation of a particle system around given axis.";
   this.ROYGBIV_SCRIPTING_API_SETPARTICLESYSTEMQUATERNION = "Sets the quaternion of given particle system.";
   this.ROYGBIV_SCRIPTING_API_GETMARKEDPOSITION = "Returns (x,y,z) coordinates of a point marked using the mark command.";

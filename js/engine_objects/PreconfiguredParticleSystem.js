@@ -16,6 +16,7 @@ PreconfiguredParticleSystem.prototype.export = function(){
   exportObj.params = this.params;
   exportObj.isCollidable = this.isCollidable;
   exportObj.excludeFromMerge = this.excludeFromMerge;
+  exportObj.scale = this.scale;
   exportObj.maxPSTime = this.maxPSTime;
   exportObj.preConfiguredParticleSystemPoolName = this.preConfiguredParticleSystemPoolName;
   exportObj.blendingIntVal = this.blendingIntVal;
@@ -49,6 +50,9 @@ PreconfiguredParticleSystem.prototype.getParticleSystem = function(){
     if (!(typeof this.blendingIntVal == UNDEFINED)){
       ps.setBlending(this.blendingIntVal);
     }
+    if (!(typeof this.scale == UNDEFINED)){
+      ps.mesh.scale.set(this.scale, this.scale, this.scale);
+    }
     return ps;
   }
   throw new Error("Unknown type.");
@@ -70,4 +74,8 @@ PreconfiguredParticleSystem.prototype.setCollidableStatus = function(isCollidabl
 
 PreconfiguredParticleSystem.prototype.setExcludeFromMergeStatus = function(excludeFromMerge){
   this.excludeFromMerge = excludeFromMerge;
+}
+
+PreconfiguredParticleSystem.prototype.setScale = function(scale){
+  this.scale = (typeof scale == UNDEFINED)? 1: scale;
 }

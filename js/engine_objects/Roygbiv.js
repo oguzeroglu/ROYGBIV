@@ -40,7 +40,6 @@ var Roygbiv = function(){
     "getOpacity",
     "setCollisionListener",
     "removeCollisionListener",
-    "scaleParticleSystem",
     "setParticleSystemRotation",
     "setParticleSystemQuaternion",
     "getMarkedPosition",
@@ -877,18 +876,6 @@ Roygbiv.prototype.resetObjectVelocity = function(object){
 }
 
 // PARTICLE SYSTEM FUNCTIONS ***************************************************
-
-//  Modifies the scale of a particle system.
-Roygbiv.prototype.scaleParticleSystem = function(object, scaleVector){
-  if (mode == 0){
-    return;
-  }
-  preConditions.checkIfDefined(ROYGBIV.scaleParticleSystem, preConditions.scaleVector, scaleVector);
-  preConditions.checkIfVectorOnlyIfDefined(ROYGBIV.scaleParticleSystem, preConditions.scaleVector, scaleVector);
-  preConditions.checkIfDefined(ROYGBIV.scaleParticleSystem, preConditions.object, object);
-  preConditions.checkIfParticleSystem(ROYGBIV.scaleParticleSystem, preConditions.object, object);
-  object.mesh.scale.set(scaleVector.x, scaleVector.y, scaleVector.z);
-}
 
 //  Sets the rotation of a particle system around given axis.
 Roygbiv.prototype.setParticleSystemRotation = function(particleSystem, axis, radians){

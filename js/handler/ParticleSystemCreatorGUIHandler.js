@@ -73,12 +73,14 @@ ParticleSystemCreatorGUIHandler.prototype.initCommonParameters = function(){
   this.blendingParam = {"Blending": "NORMAL_BLENDING"};
   this.maxPSTimeParam = {"Max time": DEFAULT_MAX_PS_TIME};
   this.excludeFromMergeParam = {"No merge": false};
+  this.scaleParam = {"Scale": 1};
 }
 
 ParticleSystemCreatorGUIHandler.prototype.onAfterRefresh = function(){
   particleSystemCreatorGUIHandler.preConfiguredParticleSystem.setMaxPSTime(particleSystemCreatorGUIHandler.maxPSTimeParam["Max time"]);
   particleSystemCreatorGUIHandler.preConfiguredParticleSystem.setCollidableStatus(particleSystemCreatorGUIHandler.collidableParam["Collidable"]);
   particleSystemCreatorGUIHandler.preConfiguredParticleSystem.setExcludeFromMergeStatus(particleSystemCreatorGUIHandler.excludeFromMergeParam["No merge"]);
+  particleSystemCreatorGUIHandler.preConfiguredParticleSystem.setScale(particleSystemCreatorGUIHandler.scaleParam["Scale"]);
   var blendingValStr = this.blendingParam["Blending"];
   var blendingValInt;
   switch (blendingValStr){
@@ -103,6 +105,12 @@ ParticleSystemCreatorGUIHandler.prototype.onAfterShown = function(){
     }else{
       particleSystemCreatorGUIHandler.excludeFromMergeParam["No merge"] = false;
     }
+    if (typeof particleSystemCreatorGUIHandler.preConfiguredParticleSystem.scale == UNDEFINED){
+      particleSystemCreatorGUIHandler.scaleParam["Scale"] = 1;
+    }else{
+      particleSystemCreatorGUIHandler.scaleParam["Scale"] = particleSystemCreatorGUIHandler.preConfiguredParticleSystem.scale;
+    }
+    particleSystemCreatorGUIHandler.particleSystem.mesh.scale.set(particleSystemCreatorGUIHandler.scaleParam["Scale"], particleSystemCreatorGUIHandler.scaleParam["Scale"], particleSystemCreatorGUIHandler.scaleParam["Scale"]);
     if (particleSystemCreatorGUIHandler.preConfiguredParticleSystem.maxPSTime){
       particleSystemCreatorGUIHandler.maxPSTimeParam["Max time"] = particleSystemCreatorGUIHandler.preConfiguredParticleSystem.maxPSTime;
     }else{
@@ -116,6 +124,7 @@ ParticleSystemCreatorGUIHandler.prototype.onAfterShown = function(){
   }else{
     particleSystemCreatorGUIHandler.collidableParam["Collidable"] = false;
     particleSystemCreatorGUIHandler.excludeFromMergeParam["No merge"] = false;
+    particleSystemCreatorGUIHandler.scaleParam["Scale"] = 1;
     particleSystemCreatorGUIHandler.maxPSTimeParam["Max time"] = DEFAULT_MAX_PS_TIME;
     particleSystemCreatorGUIHandler.blendingParam["Blending"] = "NORMAL_BLENDING";
   }
@@ -149,6 +158,10 @@ ParticleSystemCreatorGUIHandler.prototype.addCommonControllers = function(){
   }).listen();
   this.excludeFromMergeController = guiHandler.datGuiPSCreator.add(this.excludeFromMergeParam, "No merge").onChange(function(val){
     particleSystemCreatorGUIHandler.preConfiguredParticleSystem.setExcludeFromMergeStatus(val);
+  }).listen();
+  this.scaleController = guiHandler.datGuiPSCreator.add(this.scaleParam, "Scale").min(0.01).max(10).step(0.01).onChange(function(val){
+    particleSystemCreatorGUIHandler.preConfiguredParticleSystem.setScale(val);
+    particleSystemCreatorGUIHandler.particleSystem.mesh.scale.set(val, val, val);
   }).listen();
   this.cancelController = guiHandler.datGuiPSCreator.add(this.buttonsParam, "Cancel");
   this.doneController = guiHandler.datGuiPSCreator.add(this.buttonsParam, "Done");
@@ -2131,6 +2144,7 @@ ParticleSystemCreatorGUIHandler.prototype.edit = function(psName){
   particleSystemCreatorGUIHandler.preConfiguredParticleSystem.setMaxPSTime(preConfiguredParticleSystem.maxPSTime);
   particleSystemCreatorGUIHandler.preConfiguredParticleSystem.setCollidableStatus(preConfiguredParticleSystem.isCollidable);
   particleSystemCreatorGUIHandler.preConfiguredParticleSystem.setExcludeFromMergeStatus(preConfiguredParticleSystem.excludeFromMerge);
+  particleSystemCreatorGUIHandler.preConfiguredParticleSystem.setScale(preConfiguredParticleSystem.scale);
   particleSystemCreatorGUIHandler.preConfiguredParticleSystem.setBlending(preConfiguredParticleSystem.blendingIntVal, preConfiguredParticleSystem.blendingStrVal);
   particleSystemCreatorGUIHandler.onAfterShown();
   this.isEdit = true;
