@@ -405,12 +405,12 @@ ObjectTrail.prototype.setFog = function(){
 
 ObjectTrail.prototype.stop = function(){
   this.mesh.visible = false;
-  delete activeObjectTrails[this.object.name];
+  activeObjectTrails.delete(this.object.name);
 }
 
 ObjectTrail.prototype.start = function(){
   this.mesh.visible = true;
-  activeObjectTrails[this.object.name] = this;
+  activeObjectTrails.set(this.object.name, this);
 }
 
 ObjectTrail.prototype.update = function(){

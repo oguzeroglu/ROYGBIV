@@ -975,7 +975,7 @@ Roygbiv.prototype.destroyObjectTrail = function(object){
   var objectTrail = objectTrails[object.name];
   objectTrail.destroy();
   delete objectTrails[object.name];
-  delete activeObjectTrails[object.name];
+  activeObjectTrails.delete(object.name);
   return;
 }
 

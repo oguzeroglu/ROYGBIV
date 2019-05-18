@@ -106,13 +106,14 @@ function updateParticleSystems(){
   }
 }
 
-function updateObjectTrails(){
-  for (var objectName in activeObjectTrails){
-    var objectTrail = activeObjectTrails[objectName];
-    if (objectTrail && !objectTrail.destroyed){
-      objectTrail.update();
-    }
+function objectTrailsUpdateFunction(objectTrail, objName){
+  if (objectTrail && !objectTrail.destroyed){
+    objectTrail.update();
   }
+}
+
+function updateObjectTrails(){
+  activeObjectTrails.forEach(objectTrailsUpdateFunction);
 }
 
 function runScripts(){
