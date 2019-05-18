@@ -1496,6 +1496,10 @@ GUIHandler.prototype.initializeFogGUI = function(){
       mergedParticleSystems[psName].removeFog();
       mergedParticleSystems[psName].setFog();
     }
+    for (var objTrailName in objectTrails){
+      objectTrails[objTrailName].removeFog();
+      objectTrails[objTrailName].setFog();
+    }
   }).listen();
   guiHandler.datGuiFog.add(guiHandler.fogParameters, "Done");
 }
