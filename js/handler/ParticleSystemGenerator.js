@@ -2,6 +2,14 @@ var ParticleSystemGenerator = function(){
 
 }
 
+ParticleSystemGenerator.prototype.generateSimilarCopies = function(refPreconfiguredParticleSystem, copyCount){
+  var retAry = [];
+  for (var i = 0; i<copyCount; i++){
+    retAry.push(refPreconfiguredParticleSystem.getParticleSystem());
+  }
+  return retAry;
+}
+
 ParticleSystemGenerator.prototype.sub = function(vec1, vec2, targetVector){
   if (!(typeof targetVector == UNDEFINED)){
     targetVector.set(vec1.x - vec2.x, vec1.x - vec2.x, vec1.z - vec2.z);
