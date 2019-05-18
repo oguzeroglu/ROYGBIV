@@ -13,7 +13,7 @@ var ParticleMaterial = function(configurations){
     this.targetColor = this.color;
   }
   if (!(typeof this.colorStep == UNDEFINED)){
-    this.colorStep *= 2;
+    this.colorStep *= 4;
   }
   this.color = this.color.toLowerCase();
   var threeColor = REUSABLE_COLOR.set(this.color);
