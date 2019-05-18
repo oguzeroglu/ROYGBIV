@@ -9,6 +9,7 @@
 //  * Utility functions
 //  * Listener functions
 //  * Particle system functions
+//  * Motion blur functions
 //  * Crosshair functions
 //  * Text functions
 //  * Control functions
@@ -69,8 +70,8 @@ var Roygbiv = function(){
     "expandCrosshair",
     "shrinkCrosshair",
     "setParticleSystemPosition",
-    "startObjectTrail",
-    "stopObjectTrail",
+    "startMotionBlur",
+    "stopMotionBlur",
     "setObjectVelocity",
     "setObjectClickListener",
     "removeObjectClickListener",
@@ -1026,30 +1027,6 @@ Roygbiv.prototype.setParticleSystemPosition = function(particleSystem, x, y, z){
   particleSystem.hasManualPositionSet = true;
 }
 
-// Starts the trail effect of an object create with createObjectTrail command.
-Roygbiv.prototype.startObjectTrail = function(object){
-  if (mode == 0){
-    return;
-  }
-  preConditions.checkIfDefined(ROYGBIV.startObjectTrail, preConditions.object, object);
-  preConditions.checkIfAddedObjectOrObjectGroup(ROYGBIV.startObjectTrail, preConditions.object, object);
-  var objectTrail = objectTrails[object.name];
-  preConditions.checkIfTrue(ROYGBIV.startObjectTrail, "No trail attached to object.", (!objectTrail));
-  objectTrail.start();
-}
-
-// Stops the trail effect of an object. The effect can be restarted using the startObjectTrail command.
-Roygbiv.prototype.stopObjectTrail = function(object){
-  if (mode == 0){
-    return;
-  }
-  preConditions.checkIfDefined(ROYGBIV.stopObjectTrail, preConditions.object, object);
-  preConditions.checkIfAddedObjectOrObjectGroup(ROYGBIV.stopObjectTrail, preConditions.object, object);
-  var objectTrail = objectTrails[object.name];
-  preConditions.checkIfTrue(ROYGBIV.stopObjectTrail, "No trail attached to object.", (!objectTrail));
-  objectTrail.stop();
-}
-
 // Runs the provided function for each particle system of given particle system pool. The callbackFunction
 // is executed with particleSystem parameter.
 Roygbiv.prototype.executeForEachParticleSystem = function(psPool, callbackFunction){
@@ -1063,6 +1040,32 @@ Roygbiv.prototype.executeForEachParticleSystem = function(psPool, callbackFuncti
   for (var psName in psPool.particleSystems){
     callbackFunction(psPool.particleSystems[psName]);
   }
+}
+
+// MOTION BLUR FUNCTIONS *******************************************************
+
+// Starts the motion blur effect of an object.
+Roygbiv.prototype.startMotionBlur = function(object){
+  if (mode == 0){
+    return;
+  }
+  preConditions.checkIfDefined(ROYGBIV.startMotionBlur, preConditions.object, object);
+  preConditions.checkIfAddedObjectOrObjectGroup(ROYGBIV.startMotionBlur, preConditions.object, object);
+  var objectTrail = objectTrails[object.name];
+  preConditions.checkIfTrue(ROYGBIV.startMotionBlur, "No effect attached to object.", (!objectTrail));
+  objectTrail.start();
+}
+
+// Stops the motion blur effect of an object. The effect can be restarted using the startMotionBlur command.
+Roygbiv.prototype.stopMotionBlur = function(object){
+  if (mode == 0){
+    return;
+  }
+  preConditions.checkIfDefined(ROYGBIV.stopMotionBlur, preConditions.object, object);
+  preConditions.checkIfAddedObjectOrObjectGroup(ROYGBIV.stopMotionBlur, preConditions.object, object);
+  var objectTrail = objectTrails[object.name];
+  preConditions.checkIfTrue(ROYGBIV.stopMotionBlur, "No effect attached to object.", (!objectTrail));
+  objectTrail.stop();
 }
 
 // CROSSHAIR FUNCTIONS *********************************************************

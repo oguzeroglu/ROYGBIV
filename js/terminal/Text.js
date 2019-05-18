@@ -590,8 +590,8 @@ var Text = function(){
    this.ROYGBIV_SCRIPTING_API_EXPANDCROSSHAIR = "Expands a crosshair. This can be used while shooting or walking for fps games. The crosshair expands by delta while\nits size is less than targetSize on each frame. This function is designed to be called inside onmousedown or onkeydown like events.";
    this.ROYGBIV_SCRIPTING_API_SHRINKCROSSHAIR = "Shrinks a crosshair. This can be used after calling the expandCrosshair function. The crosshair shrinks by delta while its size is\ngreater than its initial size. This function is designed to be called inside onmouseup or onkeyup like events.";
    this.ROYGBIV_SCRIPTING_API_SETPARTICLESYSTEMPOSITION = "Sets the position of a particle system. This function is designed for magic circle like particle systems which may follow players.\nThis function should not be used for particle systems with collision callbacks or particle systems with defined motions in general.";
-   this.ROYGBIV_SCRIPTING_API_STARTOBJECTTRAIL = "Starts the trail effect of an object create with createObjectTrail command.";
-   this.ROYGBIV_SCRIPTING_API_STOPOBJECTTRAIL = "Stops the trail effect of an object. The effect can be restarted using the startObjectTrail command.";
+   this.ROYGBIV_SCRIPTING_API_STARTMOTIONBLUR = "Starts the motion blur effect of an object.";
+   this.ROYGBIV_SCRIPTING_API_STOPMOTIONBLUR = "Stops the motion blur effect of an object. The effect can be restarted using the startMotionBlur command.";
    this.ROYGBIV_SCRIPTING_API_SETOBJECTVELOCITY = "Sets the velocity of an object or a glued object. The object must be a dynamic object (mass > 0) in order to have a velocity.";
    this.ROYGBIV_SCRIPTING_API_SETOBJECTCLICKLISTENER = "Sets a click listener for an object or an object group. The callbackFunction is executed with\nx, y, z coordinates of the clicked point. The callbackFunction is bound to object (this = object inside the function).";
    this.ROYGBIV_SCRIPTING_API_REMOVEOBJECTCLICKLISTENER = "Removes the click listener of an object or an object group.";
