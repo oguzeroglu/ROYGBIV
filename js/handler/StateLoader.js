@@ -2210,6 +2210,7 @@ StateLoader.prototype.resetProject = function(){
   autoInstancedObjects = new Object();
   preConfiguredParticleSystems = new Object();
   preConfiguredParticleSystemPools = new Object();
+  muzzleFlashes = new Object();
   areaBinHandler = new WorldBinHandler(true);
   webglCallbackHandler = new WebGLCallbackHandler();
   threejsRenderMonitoringHandler = new THREEJSRenderMonitoringHandler();

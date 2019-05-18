@@ -7,6 +7,7 @@ var MuzzleFlash = function(refPreconfiguredPS, psCount, psTime){
   this.particleSystems = particleSystemGenerator.generateSimilarCopies(refPreconfiguredPS, psCount);
   for (var i = 0; i<this.particleSystems.length; i++){
     this.particleSystems[i].maxPSTime = psTime;
+    this.particleSystems[i].mesh.position.set(0, 0, 0);
   }
 }
 
