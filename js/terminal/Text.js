@@ -556,28 +556,23 @@ var Text = function(){
   this.ROYGBIV_SCRIPTING_API_NORMALIZEVECTOR = "Normalizes the vector given in the parameter. Note that this function modifies directly the parameter and returns nothing.";
   this.ROYGBIV_SCRIPTING_API_COMPUTEQUATERNIONFROMVECTORS = "Returns the quaternion between two vectors.";
   this.ROYGBIV_SCRIPTING_API_MULTIPLYSCALAR = "Multiplies a vector by a scalar.";
-  this.ROYGBIV_SCRIPTING_API_CREATEOBJECTTRAIL = "Creates an object trail effect based on following configurations:\n"+
-                                                  "object: The object or object group to which the trail effect is added. (mandatory)\n"+
-                                                  "alpha: The alpha value of trails between [0,1]. (mandatory)\n"+
-                                                  "maxTimeInSeconds: Maximum trail time in seconds. The default value is 0.25 (optional)";
-  this.ROYGBIV_SCRIPTING_API_DESTROYOBJECTTRAIL = "Destroys the trail effect of an object created using the createObjectTrail function.";
-    this.ROYGBIV_SCRIPTING_API_GETPARTICLESYSTEMVELOCITYATTIME = "Calcualtes and returns the velocity vector of a particle system at given time. For particles with circular motion, this function returns\nthe angular velocity at given time.";
-    this.ROYGBIV_SCRIPTING_API_STOPPARTICLESYSTEM = "Stops the motion of a particle system. This can be useful for smooth after collision effects of particle systems as it lets particles\nto dissapear smoothly. The particle system is killed after stopDuration seconds.If particle systems have collision listener attached,\nthe collision listener needs to be reset when starting the particle system after stopping.";
-    this.ROYGBIV_SCRIPTING_API_STARTPARTICLESYSTEM = "Starts a particle system after its creation. Configurations are:\n"+
+  this.ROYGBIV_SCRIPTING_API_GETPARTICLESYSTEMVELOCITYATTIME = "Calcualtes and returns the velocity vector of a particle system at given time. For particles with circular motion, this function returns\nthe angular velocity at given time.";
+  this.ROYGBIV_SCRIPTING_API_STOPPARTICLESYSTEM = "Stops the motion of a particle system. This can be useful for smooth after collision effects of particle systems as it lets particles\nto dissapear smoothly. The particle system is killed after stopDuration seconds.If particle systems have collision listener attached,\nthe collision listener needs to be reset when starting the particle system after stopping.";
+  this.ROYGBIV_SCRIPTING_API_STARTPARTICLESYSTEM = "Starts a particle system after its creation. Configurations are:\n"+
                                                      "particleSystem: The particle system to start. (mandatory)\n"+
                                                      "startPosition: The initial position vector of the particle system. (optional)\n"+
                                                      "startVelocity: The initial velocity vector of the particle system. (optional)\n"+
                                                      "startAcceleration: The initial acceleration vector of the particle system. (optional)\n"+
                                                      "startQuaternion: The initial quaternion of the particle system. Use ROYGBIV.computeQuaternionFromVectors (optional)";
-    this.ROYGBIV_SCRIPTING_API_HIDEPARTICLESYSTEM = "Makes a particle system invisible.";
-    this.ROYGBIV_SCRIPTING_API_GETCAMERADIRECTION = "Returns the direction vector of the camera.";
-    this.ROYGBIV_SCRIPTING_API_GETCAMERAPOSITION = "Returns the position of the camera.";
-    this.ROYGBIV_SCRIPTING_API_GETPARTICLESYSTEMPOOL = "Finds a particle system pool by name and returns it.";
-    this.ROYGBIV_SCRIPTING_API_GETPARTICLESYSTEMFROMPOOL = "Returns an available particle system from the pool, or false if there is not an available particle system inside the pool.\nThe particle systems become available when hidden or expired.";
-   this.ROYGBIV_SCRIPTING_API_SETVECTOR = "Set the x, y, z components of a vector.";
-   this.ROYGBIV_SCRIPTING_API_QUATERNION = "Returns a new THREE.Quaternion instance.";
-   this.ROYGBIV_SCRIPTING_API_FADEAWAY = "Makes the particles of given particle system smaller on each frame. Greater the coefficient, faster the particles fade away.\nThis can be used for smoke like particle systems to make them dissapear smoothly.";
-   this.ROYGBIV_SCRIPTING_API_CREATECROSSHAIR = "Creates a new crosshair. Configurations are:\n"+
+  this.ROYGBIV_SCRIPTING_API_HIDEPARTICLESYSTEM = "Makes a particle system invisible.";
+  this.ROYGBIV_SCRIPTING_API_GETCAMERADIRECTION = "Returns the direction vector of the camera.";
+  this.ROYGBIV_SCRIPTING_API_GETCAMERAPOSITION = "Returns the position of the camera.";
+  this.ROYGBIV_SCRIPTING_API_GETPARTICLESYSTEMPOOL = "Finds a particle system pool by name and returns it.";
+  this.ROYGBIV_SCRIPTING_API_GETPARTICLESYSTEMFROMPOOL = "Returns an available particle system from the pool, or false if there is not an available particle system inside the pool.\nThe particle systems become available when hidden or expired.";
+  this.ROYGBIV_SCRIPTING_API_SETVECTOR = "Set the x, y, z components of a vector.";
+  this.ROYGBIV_SCRIPTING_API_QUATERNION = "Returns a new THREE.Quaternion instance.";
+  this.ROYGBIV_SCRIPTING_API_FADEAWAY = "Makes the particles of given particle system smaller on each frame. Greater the coefficient, faster the particles fade away.\nThis can be used for smoke like particle systems to make them dissapear smoothly.";
+  this.ROYGBIV_SCRIPTING_API_CREATECROSSHAIR = "Creates a new crosshair. Configurations are:\n"+
                                                 "name: The unique name of the crosshair. (mandatory)\n"+
                                                 "textureName: The texture name of the crosshair. (mandatory)\n"+
                                                 "colorName: The color name of the crosshair. (mandatory)\n"+

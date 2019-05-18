@@ -160,6 +160,9 @@ ModeSwitcher.prototype.switchFromDesignToPreview = function(){
       object.updateOpacity(object.initOpacity);
       object.initOpacitySet = false;
     }
+    if (object.objectTrailConfigurations){
+      new ObjectTrail({object: object, alpha: object.objectTrailConfigurations.alpha, maxTimeInSeconds: object.objectTrailConfigurations.time});
+    }
   }
   for (var objectName in addedObjects){
     var object = addedObjects[objectName];
@@ -175,6 +178,9 @@ ModeSwitcher.prototype.switchFromDesignToPreview = function(){
     if (object.initOpacitySet){
       object.updateOpacity(object.initOpacity);
       object.initOpacitySet = false;
+    }
+    if (object.objectTrailConfigurations){
+      new ObjectTrail({object: object, alpha: object.objectTrailConfigurations.alpha, maxTimeInSeconds: object.objectTrailConfigurations.time});
     }
   }
   autoInstancingHandler.handle();

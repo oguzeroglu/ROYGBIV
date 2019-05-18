@@ -48,8 +48,6 @@ var Roygbiv = function(){
     "normalizeVector",
     "computeQuaternionFromVectors",
     "multiplyScalar",
-    "createObjectTrail",
-    "destroyObjectTrail",
     "getParticleSystemVelocityAtTime",
     "stopParticleSystem",
     "startParticleSystem",
@@ -935,48 +933,6 @@ Roygbiv.prototype.setParticleSystemQuaternion = function(particleSystem, quatX, 
   preConditions.checkIfTrue(ROYGBIV.setParticleSystemQuaternion, "particleSystem has a defined motion. Cannot set quaternion.", (particleSystem.velocity.x != 0 || particleSystem.velocity.y != 0 || particleSystem.velocity.z != 0 || particleSystem.acceleration.x != 0 || particleSystem.acceleration.y != 0 || particleSystem.acceleration.z != 0));
   particleSystem.mesh.quaternion.set(quatX, quatY, quatZ, quatW);
   particleSystem.hasManualQuaternionSet = true;
-}
-
-// Creates an object trail effect based on following configurations:
-// object: The object or object group to which the trail effect is added. (mandatory)
-// alpha: The alpha value of trails between [0,1]. (mandatory)
-// maxTimeInSeconds: Maximum trail time in seconds. The default value is 0.25 (optional)
-Roygbiv.prototype.createObjectTrail = function(configurations){
-  if (mode == 0){
-    return;
-  }
-  preConditions.checkIfDefined(ROYGBIV.createObjectTrail, preConditions.configurations, configurations);
-  var object = configurations.object;
-  var alpha = configurations.alpha;
-
-  preConditions.checkIfMandatoryParameterExists(ROYGBIV.createObjectTrail, preConditions.object, object);
-  preConditions.checkIfAddedObjectOrObjectGroup(ROYGBIV.createObjectTrail, preConditions.object, object);
-  preConditions.checkIfChildObjectOnlyIfExists(ROYGBIV.createObjectTrail, preConditions.object, object);
-  preConditions.checkIfMandatoryParameterExists(ROYGBIV.createObjectTrail, preConditions.alpha, alpha);
-  preConditions.checkIfNumber(ROYGBIV.createObjectTrail, preConditions.alpha, alpha);
-  preConditions.checkIfInRange(ROYGBIV.createObjectTrail, preConditions.alpha, alpha, 0, 1);
-  preConditions.checkIfTrue(ROYGBIV.createObjectTrail, "A trail is already added to object.", (objectTrails[object.name]));
-  preConditions.checkIfNumberOnlyIfExists(ROYGBIV.createObjectTrail, preConditions.maxTimeInSeconds, configurations.maxTimeInSeconds);
-  preConditions.checkIfLessThanOnlyIfExists(ROYGBIV.createObjectTrail, preConditions.maxTimeInSeconds, configurations.maxTimeInSeconds, 0);
-  preConditions.checkIfLessThanExclusiveOnlyIfExists(ROYGBIV.createObjectTrail, preConditions.maxTimeInSeconds, configurations.maxTimeInSeconds, (1/60));
-  preConditions.checkIfTrueOnlyIfYExists(ROYGBIV.createObjectTrail, "maxTimeInSeconds must not be greater than one", configurations.maxTimeInSeconds, (configurations.maxTimeInSeconds > 1));
-  new ObjectTrail(configurations);
-  return;
-}
-
-// Destroys the trail effect of an object created using the createObjectTrail function.
-Roygbiv.prototype.destroyObjectTrail = function(object){
-  if (mode == 0){
-    return;
-  }
-  preConditions.checkIfDefined(ROYGBIV.destroyObjectTrail, preConditions.object, object);
-  preConditions.checkIfAddedObjectOrObjectGroup(ROYGBIV.destroyObjectTrail, preConditions.object, object);
-  preConditions.checkIfTrue(ROYGBIV.destroyObjectTrail, "No trail effect is added to object", (!objectTrails[object.name]));
-  var objectTrail = objectTrails[object.name];
-  objectTrail.destroy();
-  delete objectTrails[object.name];
-  activeObjectTrails.delete(object.name);
-  return;
 }
 
 // Stops the motion of a particle system. This can be useful for smooth after collision

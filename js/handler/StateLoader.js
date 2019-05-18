@@ -587,6 +587,9 @@ StateLoader.prototype.load = function(){
        if (curAddedObjectExport.hasCustomPrecision){
          addedObjectInstance.useCustomShaderPrecision(curAddedObjectExport.customPrecision);
        }
+       if (curAddedObjectExport.objectTrailConfigurations){
+         addedObjectInstance.objectTrailConfigurations = {alpha: curAddedObjectExport.objectTrailConfigurations.alpha, time: curAddedObjectExport.objectTrailConfigurations.time};
+       }
     }
     for (var objName in addedObjects){
       if (addedObjects[objName].softCopyParentName){
@@ -1282,6 +1285,9 @@ StateLoader.prototype.finalize = function(){
     }
     if (curObjectGroupExport.hasCustomPrecision){
       curObjectGroupExport.useCustomShaderPrecision(curObjectGroupExport.customPrecision);
+    }
+    if (curObjectGroupExport.objectTrailConfigurations){
+      objectGroupInstance.objectTrailConfigurations = {alpha: curObjectGroupExport.objectTrailConfigurations.alpha, time: curObjectGroupExport.objectTrailConfigurations.time};
     }
   }
   for (var objName in objectGroups){

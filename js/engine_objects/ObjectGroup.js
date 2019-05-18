@@ -1872,6 +1872,9 @@ ObjectGroup.prototype.export = function(){
     exportObj.hasCustomPrecision = true;
     exportObj.customPrecision = this.customPrecision;
   }
+  if (this.objectTrailConfigurations){
+    exportObj.objectTrailConfigurations = {alpha: this.objectTrailConfigurations.alpha, time: this.objectTrailConfigurations.time};
+  }
   return exportObj;
 }
 

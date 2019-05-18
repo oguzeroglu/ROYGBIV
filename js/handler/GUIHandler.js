@@ -23,7 +23,10 @@ var GUIHandler = function(){
     "Emissive int.": 0.0,
     "Emissive col.": "#ffffff",
     "Disp. scale": 0.0,
-    "Disp. bias": 0.0
+    "Disp. bias": 0.0,
+    "Motion blur": false,
+    "mb alpha": 1.0,
+    "mb time": OBJECT_TRAIL_MAX_TIME_IN_SECS_DEFAULT
   };
   this.skyboxParameters = {
     "Name": "skyboxName",
@@ -403,6 +406,16 @@ GUIHandler.prototype.afterObjectSelection = function(){
       }
       obj.mesh.add(axesHelper);
     }
+    guiHandler.objectManipulationParameters["Motion blur"] = !(typeof obj.objectTrailConfigurations == UNDEFINED);
+    if (obj.objectTrailConfigurations){
+      guiHandler.objectManipulationParameters["mb alpha"] = obj.objectTrailConfigurations.alpha;
+      guiHandler.objectManipulationParameters["mb time"] = obj.objectTrailConfigurations.time;
+    }else{
+      guiHandler.objectManipulationParameters["mb alpha"] = 1.0;
+      guiHandler.objectManipulationParameters["mb time"] = OBJECT_TRAIL_MAX_TIME_IN_SECS_DEFAULT;
+      guiHandler.disableController(guiHandler.omObjectTrailAlphaController);
+      guiHandler.disableController(guiHandler.omObjectTrailTimeController);
+    }
     guiHandler.objectManipulationParameters["Mass"] = obj.physicsBody.mass;
     if (obj.noMass){
       guiHandler.disableController(guiHandler.omMassController);
@@ -516,6 +529,9 @@ GUIHandler.prototype.enableAllOMControllers = function(){
   guiHandler.enableController(guiHandler.omSideController);
   guiHandler.enableController(guiHandler.omFPSWeaponController);
   guiHandler.enableController(guiHandler.omShaderPrecisionController);
+  guiHandler.enableController(guiHandler.omHasObjectTrailController);
+  guiHandler.enableController(guiHandler.omObjectTrailAlphaController);
+  guiHandler.enableController(guiHandler.omObjectTrailTimeController);
 }
 
 GUIHandler.prototype.show = function(guiType){
@@ -1194,6 +1210,23 @@ GUIHandler.prototype.initializeObjectManipulationGUI = function(){
   }).listen();
   guiHandler.omDisplacementBiasController = guiHandler.datGuiObjectManipulation.add(guiHandler.objectManipulationParameters, "Disp. bias").min(-50).max(50).step(0.1).onChange(function(val){
     selectionHandler.getSelectedObject().mesh.material.uniforms.displacementInfo.value.y = val;
+  }).listen();
+  guiHandler.omHasObjectTrailController = guiHandler.datGuiObjectManipulation.add(guiHandler.objectManipulationParameters, "Motion blur").onChange(function(val){
+    if (val){
+      selectionHandler.getSelectedObject().objectTrailConfigurations = {alpha: guiHandler.objectManipulationParameters["mb alpha"], time: guiHandler.objectManipulationParameters["mb time"]};
+      guiHandler.enableController(guiHandler.omObjectTrailAlphaController);
+      guiHandler.enableController(guiHandler.omObjectTrailTimeController);
+    }else{
+      delete selectionHandler.getSelectedObject().objectTrailConfigurations;
+      guiHandler.disableController(guiHandler.omObjectTrailAlphaController);
+      guiHandler.disableController(guiHandler.omObjectTrailTimeController);
+    }
+  }).listen();
+  guiHandler.omObjectTrailAlphaController = guiHandler.datGuiObjectManipulation.add(guiHandler.objectManipulationParameters, "mb alpha").min(0.01).max(1).step(0.01).onChange(function(val){
+    selectionHandler.getSelectedObject().objectTrailConfigurations.alpha = val;
+  }).listen();
+  guiHandler.omObjectTrailTimeController = guiHandler.datGuiObjectManipulation.add(guiHandler.objectManipulationParameters, "mb time").min(1/15).max(OBJECT_TRAIL_MAX_TIME_IN_SECS_DEFAULT).step(1/60).onChange(function(val){
+    selectionHandler.getSelectedObject().objectTrailConfigurations.time = val;
   }).listen();
 }
 

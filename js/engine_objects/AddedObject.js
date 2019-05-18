@@ -556,6 +556,9 @@ AddedObject.prototype.export = function(){
     exportObject.hasCustomPrecision = true;
     exportObject.customPrecision = this.customPrecision;
   }
+  if (this.objectTrailConfigurations){
+    exportObject.objectTrailConfigurations = {alpha: this.objectTrailConfigurations.alpha, time: this.objectTrailConfigurations.time};
+  }
   return exportObject;
 }
 
