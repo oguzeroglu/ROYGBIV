@@ -2119,7 +2119,7 @@ Roygbiv.prototype.setActiveControl = function(control){
 // representing the intersected object from the FPS camera. If there is no intersected object
 // the objName is set to null. Default value is noop.
 // onShoot (optional): A callback function executed with x, y, z and objName parameters representing the intersected
-// object from the FPS camera on each click for Desktop devices. For mobile devices due to lack of mouse device
+// object from the FPS camera while the mouse is down for Desktop devices. For mobile devices due to lack of mouse device
 // this function is executed when the camera is looking at one of the shootable objects defined with the shootableObjects
 // parameter in order to help implementing the auto-shoot functionality. Default value is noop.
 // shootableObjects (optional): An array of objects representing the objects that can be shot. This parameter is
