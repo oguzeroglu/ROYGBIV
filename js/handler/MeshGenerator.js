@@ -231,12 +231,12 @@ MeshGenerator.prototype.generateParticleSystemMesh = function(ps, texture, noTar
     ps.material.uniforms.projectionMatrix = GLOBAL_PROJECTION_UNIFORM;
     ps.material.uniforms.viewMatrix = GLOBAL_VIEW_UNIFORM;
   }
-  if (fogBlendWithSkybox){
+  if (fogBlendWithSkybox && mode != 0){
     ps.material.uniforms.cameraPosition = GLOBAL_CAMERA_POSITION_UNIFORM;
     ps.material.uniforms.cubeTexture = GLOBAL_CUBE_TEXTURE_UNIFORM;
     macroHandler.injectMacro("HAS_SKYBOX_FOG", ps.material, true, true);
   }
-  if (fogActive){
+  if (fogActive && mode != 0){
     ps.material.uniforms.fogInfo = GLOBAL_FOG_UNIFORM;
     macroHandler.injectMacro("HAS_FOG", ps.material, false, true);
   }

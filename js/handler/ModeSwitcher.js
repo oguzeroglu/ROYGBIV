@@ -207,10 +207,10 @@ ModeSwitcher.prototype.switchFromDesignToPreview = function(){
   TOTAL_PARTICLE_COLLISION_LISTEN_COUNT = 0;
   TOTAL_PARTICLE_SYSTEM_COUNT = 0;
   particleCollisionCallbackRequests = new Object();
-  particleSystemGenerator.handleModeSwitch();
   ROYGBIV.globals = new Object();
   $("#cliDivheader").text("ROYGBIV 3D Engine - CLI (Preview mode)");
   mode = 1;
+  particleSystemGenerator.handleModeSwitch();
   var that = this;
   if (!canvas.ready && !isDeployment){
     terminal.printInfo(Text.INITIALIZING_WORKERS);

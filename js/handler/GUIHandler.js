@@ -1488,6 +1488,14 @@ GUIHandler.prototype.initializeFogGUI = function(){
       autoInstancedObjects[objName].removeFog();
       autoInstancedObjects[objName].setFog();
     }
+    for (var psName in particleSystemPool){
+      particleSystemPool[psName].removeFog();
+      particleSystemPool[psName].setFog();
+    }
+    for (var psName in mergedParticleSystems){
+      mergedParticleSystems[psName].removeFog();
+      mergedParticleSystems[psName].setFog();
+    }
   }).listen();
   guiHandler.datGuiFog.add(guiHandler.fogParameters, "Done");
 }

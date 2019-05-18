@@ -265,6 +265,32 @@ var ParticleSystemMerger = function(psObj, name){
   webglCallbackHandler.registerEngineObject(this);
 }
 
+ParticleSystemMerger.prototype.removeFog = function(){
+  macroHandler.removeMacro("HAS_FOG", this.mesh.material, false, true);
+  macroHandler.removeMacro("HAS_SKYBOX_FOG", this.mesh.material, true, true);
+  delete this.mesh.material.uniforms.fogInfo;
+  delete this.mesh.material.uniforms.cubeTexture;
+  delete this.mesh.material.uniforms.worldMatrix;
+  delete this.mesh.material.uniforms.cameraPosition;
+  this.mesh.material.needsUpdate = true;
+}
+
+ParticleSystemMerger.prototype.setFog = function(){
+  if (!this.mesh.material.uniforms.fogInfo){
+    macroHandler.injectMacro("HAS_FOG", this.mesh.material, false, true);
+    this.mesh.material.uniforms.fogInfo = GLOBAL_FOG_UNIFORM;
+  }
+  if (fogBlendWithSkybox){
+    if (!this.mesh.material.uniforms.cubeTexture){
+      macroHandler.injectMacro("HAS_SKYBOX_FOG", this.mesh.material, true, true);
+      this.mesh.material.uniforms.worldMatrix = new THREE.Uniform(this.mesh.matrixWorld);
+      this.mesh.material.uniforms.cubeTexture = GLOBAL_CUBE_TEXTURE_UNIFORM;
+      this.mesh.material.uniforms.cameraPosition = GLOBAL_CAMERA_POSITION_UNIFORM;
+    }
+  }
+  this.mesh.material.needsUpdate = true;
+}
+
 ParticleSystemMerger.prototype.destroy = function(){
   for (var psName in this.psObj){
     this.psObj[psName].destroy();
