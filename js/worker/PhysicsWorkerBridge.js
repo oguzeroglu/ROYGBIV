@@ -245,8 +245,8 @@ PhysicsWorkerBridge.prototype.updateObject = function(obj, isPositionUpdated, is
   if (obj.noMass){
     return;
   }
-  obj.isPositionDirty = isPositionUpdated;
-  obj.isRotationDirty = isRotationUpdated;
+  obj.isPositionDirty = isPositionUpdated || obj.isPositionDirty;
+  obj.isRotationDirty = isRotationUpdated || obj.isRotationDirty;
   this.updateBuffer.set(obj.name, obj);
 }
 
