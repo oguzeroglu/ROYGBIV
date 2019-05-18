@@ -337,6 +337,7 @@ var fpsWeaponAlignmentConfigurationObject;
 var isOrientationLandscape;
 var shaderPrecisionHandler;
 var particleSystemCreatorGUIHandler;
+var muzzleFlashCreatorGUIHandler;
 var preConfiguredParticleSystems = new Object();
 var preConfiguredParticleSystemPools = new Object();
 var particleSystemGenerator;

@@ -30,7 +30,7 @@ KeyboardEventHandler.prototype.onKeyUp = function(event){
   }
   activeControl.onKeyUp(event);
   if (mode == 0){
-    if (guiHandler.datGuiPSCreator || guiHandler.datGuiFPSWeaponAlignment){
+    if (guiHandler.datGuiMuzzleFlashCreator || guiHandler.datGuiPSCreator || guiHandler.datGuiFPSWeaponAlignment){
       return;
     }
   }
@@ -84,7 +84,7 @@ KeyboardEventHandler.prototype.onKeyDown = function(event){
   }
   activeControl.onKeyDown(event);
   if (mode == 0){
-    if (guiHandler.datGuiPSCreator || guiHandler.datGuiFPSWeaponAlignment){
+    if (guiHandler.datGuiMuzzleFlashCreator || guiHandler.datGuiPSCreator || guiHandler.datGuiFPSWeaponAlignment){
       return;
     }
   }

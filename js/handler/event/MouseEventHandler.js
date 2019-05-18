@@ -200,7 +200,7 @@ MouseEventHandler.prototype.onClick = function(event, fromTap){
       }
     }
     if (mode == 0){
-      if (guiHandler.datGuiPSCreator || guiHandler.datGuiFPSWeaponAlignment){
+      if (guiHandler.datGuiMuzzleFlashCreator || guiHandler.datGuiPSCreator || guiHandler.datGuiFPSWeaponAlignment){
         return;
       }
     }

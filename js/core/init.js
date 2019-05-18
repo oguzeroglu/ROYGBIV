@@ -57,6 +57,8 @@ window.onload = function() {
     selectionHandler = new SelectionHandler();
     // PARTICLE SYSTEM CREATOR GUI HANDLER
     particleSystemCreatorGUIHandler = new ParticleSystemCreatorGUIHandler();
+    // MUZZLE FLASH CREATOR GUI HANDLER
+    muzzleFlashCreatorGUIHandler = new MuzzleFlashCreatorGUIHandler();
   }
 
   // PHYSICS BODY GENERATOR
