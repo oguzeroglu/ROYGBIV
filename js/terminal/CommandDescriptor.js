@@ -173,7 +173,9 @@ var CommandDescriptor = function(){
       1, //destroyParticleSystemPool
       0, //printParticleSystems
       0, //printParticleSystemPools
-      1 //workerConfigurations
+      1, //workerConfigurations
+      2, //newMuzzleFlash
+      1 //editMuzzleFlash
   ];
 
   this.commandArgumentsExpectedExplanation = [
@@ -349,7 +351,9 @@ var CommandDescriptor = function(){
     "destroyParticleSystemPool poolName",
     "printParticleSystems",
     "printParticleSystemPools",
-    "workerConfigurations show/hide"
+    "workerConfigurations show/hide",
+    "newMuzzleFlash name refPSName",
+    "editMuzzleFlash muzzleFlashName"
   ];
 
   this.commands = [
@@ -525,7 +529,9 @@ var CommandDescriptor = function(){
     "destroyParticleSystemPool",
     "printParticleSystems",
     "printParticleSystemPools",
-    "workerConfigurations"
+    "workerConfigurations",
+    "newMuzzleFlash",
+    "editMuzzleFlash"
   ];
 
   this.commandInfo = [
@@ -701,7 +707,9 @@ var CommandDescriptor = function(){
     "destroyParticleSystemPool: Destroys a particle system pool.",
     "printParticleSystems: Prints created particle systems.",
     "printParticleSystemPools: Prints created particle system pools.",
-    "workerConfigurations: Shows/hides the GUI for configuring worker availibility."
+    "workerConfigurations: Shows/hides the GUI for configuring worker availibility.",
+    "newMuzzleFlash: Creates a new MuzzleFlash object from given particle system in order to be used with FPS weapons.",
+    "editMuzzleFlash: Shows the GUI for editing a muzzle flash."
   ];
 
   this.keyboardInfo = [
@@ -802,6 +810,7 @@ var CommandDescriptor = function(){
   this.FPS_WEAPON                 =   34;
   this.PRECONFIGURED_PS_NAME      =   35;
   this.PRECONFOGURED_PS_POOL_NAME =   36;
+  this.MUZZLE_FLASH_NAME          =   37;
 
   // newGridSystem
   this.newGridSystem = new Object();
@@ -1404,6 +1413,17 @@ var CommandDescriptor = function(){
   this.workerConfigurations = new Object();
   this.workerConfigurations.types = [];
   this.workerConfigurations.types.push(this.HIDE_SHOW); // show/hide
+
+  // newMuzzleFlash
+  this.newMuzzleFlash = new Object();
+  this.newMuzzleFlash.types = [];
+  this.newMuzzleFlash.types.push(this.UNKNOWN_INDICATOR); // name
+  this.newMuzzleFlash.types.push(this.PRECONFIGURED_PS_NAME); // refPSName
+
+  // editMuzzleFlash
+  this.editMuzzleFlash = new Object();
+  this.editMuzzleFlash.types = [];
+  this.editMuzzleFlash.types.push(this.MUZZLE_FLASH_NAME); // muzzleFlashName
 };
 
 CommandDescriptor.prototype.test = function(){

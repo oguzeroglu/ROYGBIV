@@ -5237,6 +5237,45 @@ function parse(input){
           }
           return true;
         break;
+        case 173: //newMuzzleFlash
+          if (mode != 0){
+            terminal.printError(Text.WORKS_ONLY_IN_DESIGN_MODE);
+            return true;
+          }
+          var muzzleFlashName = splitted[1];
+          var refPSName = splitted[2];
+          if (muzzleFlashes[muzzleFlashName]){
+            terminal.printError(Text.NAME_MUST_BE_UNIQUE);
+            return true;
+          }
+          var ps = preConfiguredParticleSystems[refPSName];
+          if (!ps){
+            terminal.printError(Text.NO_SUCH_PARTICLE_SYSTEM);
+            return true;
+          }
+          muzzleFlashCreatorGUIHandler.show(muzzleFlashName, ps);
+          terminal.clear();
+          terminal.disable();
+          terminal.printInfo(Text.AFTER_MUZZLE_FLASH_CREATION);
+          return true;
+        break;
+        case 174:
+          if (mode != 0){
+            terminal.printError(Text.WORKS_ONLY_IN_DESIGN_MODE);
+            return true;
+          }
+          var muzzleFlashName = splitted[1];
+          var muzzleFlash = muzzleFlashes[muzzleFlashName];
+          if (!muzzleFlash){
+            terminal.printError(Text.NO_SUCH_MUZZLE_FLASH);
+            return true;
+          }
+          muzzleFlashCreatorGUIHandler.edit(muzzleFlash);
+          terminal.clear();
+          terminal.disable();
+          terminal.printInfo(Text.AFTER_MUZZLE_FLASH_CREATION);
+          return true;
+        break;
       }
       return true;
     }catch(err){

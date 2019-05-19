@@ -669,6 +669,17 @@ Terminal.prototype.autocomplete = function(command){
 				}
 				helpString = "[Particle system pools]: ";
 			break;
+			case commandDescriptor.MUZZLE_FLASH_NAME:
+				for (var muzzleFlashName in muzzleFlashes){
+					if (muzzleFlashName.toLowerCase().startsWith(curEntry.toLowerCase())){
+						possibilities.push(muzzleFlashName);
+					}
+				}
+				helpString = "[Muzzle flashes]: ";
+			break;
+			default:
+				throw new Error("Not implemented.");
+			break;
 		}
 
 		//  **********************************************************

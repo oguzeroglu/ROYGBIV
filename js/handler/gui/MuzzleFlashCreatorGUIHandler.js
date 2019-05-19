@@ -2,8 +2,25 @@ var MuzzleFlashCreatorGUIHandler = function(){
 
 }
 
+MuzzleFlashCreatorGUIHandler.prototype.commonInitFunctions = function(muzzleflashName){
+  this.hiddenEngineObjects = [];
+  for (var i = 0; i<scene.children.length; i++){
+    if (scene.children[i].visible){
+      scene.children[i].visible = false;
+      this.hiddenEngineObjects.push(scene.children[i]);
+    }
+  }
+  this.init(muzzleflashName);
+}
+
 MuzzleFlashCreatorGUIHandler.prototype.init = function(muzzleflashName){
-  this.parameters = {psCount: 1, psTime: 0.5}
+  if (!muzzleFlashes[muzzleflashName]){
+    this.isEdit = false;
+    this.parameters = {psCount: 1, psTime: 0.5};
+  }else{
+    this.isEdit = true;
+    this.parameters = {psCount: muzzleFlashes[muzzleflashName].psCount, psTime: muzzleFlashes[muzzleflashName].psTime};
+  }
   this.buttonParameters = {
     "Cancel": function(){
       activeControl = new FreeControls({});
@@ -27,7 +44,7 @@ MuzzleFlashCreatorGUIHandler.prototype.init = function(muzzleflashName){
       guiHandler.hideAll();
       terminal.enable();
       terminal.clear();
-      if (particleSystemCreatorGUIHandler.isEdit){
+      if (muzzleFlashCreatorGUIHandler.isEdit){
         terminal.printInfo(Text.MUZZLEFLASH_EDITED);
       }else{
         terminal.printInfo(Text.MUZZLEFLASH_CREATED);
@@ -56,7 +73,7 @@ MuzzleFlashCreatorGUIHandler.prototype.createMuzzleFlash = function(muzzleflashN
 }
 
 MuzzleFlashCreatorGUIHandler.prototype.show = function(muzzleflashName, refPreconfiguredPS){
-  this.init(muzzleflashName);
+  this.commonInitFunctions(muzzleflashName);
   guiHandler.datGuiMuzzleFlashCreator = new dat.GUI({hideable: false});
   guiHandler.datGuiMuzzleFlashCreator.add(this.parameters, "psCount").min(1).max(10).step(1).onFinishChange(function(val){
     muzzleFlashCreatorGUIHandler.createMuzzleFlash(muzzleflashName, refPreconfiguredPS, val, muzzleFlashCreatorGUIHandler.parameters.psTime);
@@ -76,4 +93,8 @@ MuzzleFlashCreatorGUIHandler.prototype.update = function(){
     return;
   }
   this.muzzleFlash.update();
+}
+
+MuzzleFlashCreatorGUIHandler.prototype.edit = function(muzzleFlash){
+  this.show(muzzleFlash.name, muzzleFlash.refPreconfiguredPS);
 }
