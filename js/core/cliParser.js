@@ -5011,42 +5011,7 @@ function parse(input){
             terminal.printError(Text.OBJECT_IS_NOT_MARKED_AS_FPS_WEAPON);
             return true;
           }
-          selectionHandler.resetCurrentSelection();
-          guiHandler.hideAll();
-          if (fpsWeaponAlignmentConfigurationObject){
-            if (fpsWeaponAlignmentConfigurationObject.name == objName){
-              terminal.printError(Text.GUI_IS_ALREADY_OPEN_FOR_THIS_OBJECT);
-              return true;
-            }
-            fpsWeaponAlignmentConfigurationObject.revertPositionAfterFPSWeaponConfigurations();
-          }
-          obj.quaternionBeforeFPSWeaponConfigurationPanelOpened = obj.mesh.quaternion.clone();
-          camera.quaternion.set(0, 0, 0, 1);
-          fpsWeaponAlignmentConfigurationObject = obj;
-          obj.onFPSWeaponAlignmentUpdate();
-          guiHandler.fpsWeaponAlignmentParameters.x = obj.fpsWeaponAlignment.x;
-          guiHandler.fpsWeaponAlignmentParameters.y = obj.fpsWeaponAlignment.y;
-          guiHandler.fpsWeaponAlignmentParameters.z = obj.fpsWeaponAlignment.z;
-          guiHandler.fpsWeaponAlignmentParameters.scale = obj.fpsWeaponAlignment.scale;
-          guiHandler.fpsWeaponAlignmentParameters["Rotate x"] = "0";
-          guiHandler.fpsWeaponAlignmentParameters["Rotate y"] = "0";
-          guiHandler.fpsWeaponAlignmentParameters["Rotate z"] = "0";
-          guiHandler.fpsWeaponAlignmentParameters["Translate x"] = "0";
-          guiHandler.fpsWeaponAlignmentParameters["Translate y"] = "0";
-          guiHandler.fpsWeaponAlignmentParameters["Translate z"] = "0";
-          guiHandler.fpsWeaponAlignmentParameters["Load from"] = "";
-          guiHandler.show(guiHandler.guiTypes.FPS_WEAPON_ALIGNMENT);
-          terminal.printInfo(Text.PRESS_DONE_BUTTON_TO);
-          terminal.disable();
-          activeControl = new CustomControls({});
-          window.hiddenObjectsDueToFPSWeaponAlignmentConfiguration = [];
-          for (var i = 0; i<scene.children.length; i++){
-            var child = scene.children[i];
-            if (child.id != obj.mesh.id && child.visible){
-              child.visible = false;
-              window.hiddenObjectsDueToFPSWeaponAlignmentConfiguration.push(child);
-            }
-          }
+          fpsWeaponGUIHandler.show(obj);
           return true;
         break;
         case 163: //shaderPrecision

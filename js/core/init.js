@@ -59,6 +59,8 @@ window.onload = function() {
     particleSystemCreatorGUIHandler = new ParticleSystemCreatorGUIHandler();
     // MUZZLE FLASH CREATOR GUI HANDLER
     muzzleFlashCreatorGUIHandler = new MuzzleFlashCreatorGUIHandler();
+    // FPS WEAPON GUI HANDLER
+    fpsWeaponGUIHandler = new FPSWeaponGUIHandler();
   }
 
   // PHYSICS BODY GENERATOR
