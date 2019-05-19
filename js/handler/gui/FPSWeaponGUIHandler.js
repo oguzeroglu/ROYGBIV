@@ -46,8 +46,25 @@ FPSWeaponGUIHandler.prototype.init = function(){
       guiHandler.datGuiFPSWeaponAlignment.updateDisplay();
     },
     "Done": function(){
+      if (fpsWeaponGUIHandler.muzzleFlashParameters["Has muz. flash"] && fpsWeaponGUIHandler.muzzleFlashParameters["Muzzle flash"] != ""){
+        fpsWeaponGUIHandler.fpsWeaponAlignmentConfigurationObject.muzzleFlashParameters = {
+          muzzleFlashName: fpsWeaponGUIHandler.muzzleFlashParameters["Muzzle flash"],
+          scale: fpsWeaponGUIHandler.muzzleFlashParameters["Scale"],
+          childObj: fpsWeaponGUIHandler.muzzleFlashParameters["Child obj"],
+          endpoint: fpsWeaponGUIHandler.muzzleFlashParameters["Endpoint"],
+          rotationX: fpsWeaponGUIHandler.muzzleFlash.getRotationX(),
+          rotationY: fpsWeaponGUIHandler.muzzleFlash.getRotationY(),
+          rotationZ: fpsWeaponGUIHandler.muzzleFlash.getRotationZ()
+        }
+      }else{
+        delete fpsWeaponGUIHandler.fpsWeaponAlignmentConfigurationObject.muzzleFlashParameters;
+      }
       fpsWeaponGUIHandler.fpsWeaponAlignmentConfigurationObject.revertPositionAfterFPSWeaponConfigurations();
       fpsWeaponGUIHandler.fpsWeaponAlignmentConfigurationObject = 0;
+      if (fpsWeaponGUIHandler.muzzleFlash){
+        fpsWeaponGUIHandler.muzzleFlash.hide();
+        fpsWeaponGUIHandler.muzzleFlash = 0;
+      }
       guiHandler.hide(guiHandler.guiTypes.FPS_WEAPON_ALIGNMENT);
       terminal.clear();
       terminal.printInfo(Text.DONE);
@@ -93,6 +110,41 @@ FPSWeaponGUIHandler.prototype.show = function(obj){
   this.fpsWeaponAlignmentParameters["Translate y"] = "0";
   this.fpsWeaponAlignmentParameters["Translate z"] = "0";
   this.fpsWeaponAlignmentParameters["Load from"] = "";
+  if (obj.muzzleFlashParameters){
+    this.muzzleFlashParameters = {
+      "Muzzle flash": obj.muzzleFlashParameters.muzzleFlashName,
+      "Has muz. flash": true,
+      "Scale": obj.muzzleFlashParameters.scale,
+      "Child obj": obj.muzzleFlashParameters.childObj,
+      "Endpoint": obj.muzzleFlashParameters.endpoint,
+      "RotateX": "0",
+      "RotateY": "0",
+      "RotateZ": "0"
+    }
+    var muzzleFlash = muzzleFlashes[obj.muzzleFlashParameters.muzzleFlashName];
+    if (muzzleFlash){
+      var childObjParam = null;
+      if (obj.muzzleFlashParameters.childObj != ""){
+        childObjParam = obj.muzzleFlashParameters.childObj;
+      }
+      muzzleFlash.init();
+      muzzleFlash.attachToFPSWeapon(obj, childObjParam, obj.muzzleFlashParameters.endpoint);
+      muzzleFlash.setRotation(obj.muzzleFlashParameters.rotationX, obj.muzzleFlashParameters.rotationY, obj.muzzleFlashParameters.rotationZ);
+      muzzleFlash.setScale(obj.muzzleFlashParameters.scale);
+      this.muzzleFlash = muzzleFlash;
+    }
+  }else{
+    this.muzzleFlashParameters = {
+      "Muzzle flash": "",
+      "Has muz. flash": false,
+      "Scale": 1.0,
+      "Child obj": "",
+      "Endpoint": "+x",
+      "RotateX": "0",
+      "RotateY": "0",
+      "RotateZ": "0"
+    }
+  }
   this.prepareGUI();
   terminal.printInfo(Text.PRESS_DONE_BUTTON_TO);
   terminal.disable();
@@ -261,13 +313,34 @@ FPSWeaponGUIHandler.prototype.prepareGUI = function(){
       guiHandler.enableController(muzzleFlashRotateXController);
       guiHandler.enableController(muzzleFlashRotateYController);
       guiHandler.enableController(muzzleFlashRotateZController);
+      if (muzzleFlashChildObjectController){
+        guiHandler.enableController(muzzleFlashChildObjectController);
+      }
+      if (fpsWeaponGUIHandler.muzzleFlashParameters["Muzzle flash"] != ""){
+        var childObjParam = null;
+        if (fpsWeaponGUIHandler.muzzleFlashParameters["Child obj"] != ""){
+          childObjParam = fpsWeaponGUIHandler.muzzleFlashParameters["Child obj"];
+        }
+        var muzzleFlash = muzzleFlashes[fpsWeaponGUIHandler.muzzleFlashParameters["Muzzle flash"]];
+        muzzleFlash.init();
+        muzzleFlash.attachToFPSWeapon(fpsWeaponGUIHandler.fpsWeaponAlignmentConfigurationObject, childObjParam, fpsWeaponGUIHandler.muzzleFlashParameters["Endpoint"]);
+        muzzleFlash.setScale(fpsWeaponGUIHandler.muzzleFlashParameters["Scale"]);
+        fpsWeaponGUIHandler.muzzleFlash = muzzleFlash;
+      }
     }else{
+      if (fpsWeaponGUIHandler.muzzleFlash){
+        fpsWeaponGUIHandler.muzzleFlash.hide();
+        fpsWeaponGUIHandler.muzzleFlash = 0;
+      }
       guiHandler.disableController(muzzleFlashNameController);
       guiHandler.disableController(muzzleFlashScaleController);
       guiHandler.disableController(muzzleFlashEndPointController);
       guiHandler.disableController(muzzleFlashRotateXController);
       guiHandler.disableController(muzzleFlashRotateYController);
       guiHandler.disableController(muzzleFlashRotateZController);
+      if (muzzleFlashChildObjectController){
+        guiHandler.disableController(muzzleFlashChildObjectController);
+      }
     }
   }).listen();
   var muzzleFlashNameController = muzzleFlashFolder.add(this.muzzleFlashParameters, "Muzzle flash", muzzleFlashAry).onChange(function(val){
@@ -338,6 +411,9 @@ FPSWeaponGUIHandler.prototype.prepareGUI = function(){
     guiHandler.disableController(muzzleFlashRotateXController);
     guiHandler.disableController(muzzleFlashRotateYController);
     guiHandler.disableController(muzzleFlashRotateZController);
+    if (muzzleFlashChildObjectController){
+      guiHandler.disableController(muzzleFlashChildObjectController);
+    }
   }
   if (!this.muzzleFlashParameters["Has muz. flash"]){
     guiHandler.disableController(muzzleFlashNameController);
@@ -346,6 +422,9 @@ FPSWeaponGUIHandler.prototype.prepareGUI = function(){
     guiHandler.disableController(muzzleFlashRotateXController);
     guiHandler.disableController(muzzleFlashRotateYController);
     guiHandler.disableController(muzzleFlashRotateZController);
+    if (muzzleFlashChildObjectController){
+      guiHandler.disableController(muzzleFlashChildObjectController);
+    }
   }
   guiHandler.datGuiFPSWeaponAlignment.add(this.fpsWeaponAlignmentParameters, "Load from", otherWeaponsArray).onChange(function(val){
     var obj = addedObjects[val] || objectGroups[val];

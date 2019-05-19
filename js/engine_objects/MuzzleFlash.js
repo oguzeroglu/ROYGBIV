@@ -20,6 +20,24 @@ MuzzleFlash.prototype.export = function(){
   return exportObj;
 }
 
+MuzzleFlash.prototype.setRotation = function(rotX, rotY, rotZ){
+  for (var i = 0; i<this.particleSystems.length; i++){
+    this.particleSystems[i].mesh.rotation.set(rotX, rotY, rotZ);
+  }
+}
+
+MuzzleFlash.prototype.getRotationX = function(){
+  return this.particleSystems[0].mesh.rotation.x;
+}
+
+MuzzleFlash.prototype.getRotationY = function(){
+  return this.particleSystems[0].mesh.rotation.y;
+}
+
+MuzzleFlash.prototype.getRotationZ = function(){
+  return this.particleSystems[0].mesh.rotation.z;
+}
+
 MuzzleFlash.prototype.rotateX = function(rotation){
   for (var i = 0; i<this.particleSystems.length; i++){
     this.particleSystems[i].mesh.rotateX(rotation);
