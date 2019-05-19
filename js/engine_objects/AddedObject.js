@@ -2567,7 +2567,7 @@ AddedObject.prototype.updatePivot = function(){
 
 AddedObject.prototype.getEndPoint = function(axis){
   var translationAmount = 0;
-  if (axis == "+x"){
+  if (axis == plusX){
     REUSABLE_VECTOR_6.set(1, 0, 0);
     if (this.type == "surface"){
       translationAmount = this.metaData.width / 2;
@@ -2580,7 +2580,7 @@ AddedObject.prototype.getEndPoint = function(axis){
     }else if (this.type == "cylinder"){
       translationAmount = (this.metaData.topRadius + this.metaData.bottomRadius) / 2;
     }
-  }else if (axis == "-x"){
+  }else if (axis == minusX){
     REUSABLE_VECTOR_6.set(-1, 0, 0);
     if (this.type == "surface"){
       translationAmount = this.metaData.width / 2;
@@ -2593,7 +2593,7 @@ AddedObject.prototype.getEndPoint = function(axis){
     }else if (this.type == "cylinder"){
       translationAmount = (this.metaData.topRadius + this.metaData.bottomRadius) / 2;
     }
-  }else if (axis == "+y"){
+  }else if (axis == plusY){
     REUSABLE_VECTOR_6.set(0, 1, 0);
     if (this.type == "surface"){
       translationAmount = this.metaData.height / 2;
@@ -2606,7 +2606,7 @@ AddedObject.prototype.getEndPoint = function(axis){
     }else if (this.type == "cylinder"){
       translationAmount = this.metaData.height / 2;
     }
-  }else if (axis == "-y"){
+  }else if (axis == minusY){
     REUSABLE_VECTOR_6.set(0, -1, 0);
     if (this.type == "surface"){
       translationAmount = this.metaData.height / 2;
@@ -2619,7 +2619,7 @@ AddedObject.prototype.getEndPoint = function(axis){
     }else if (this.type == "cylinder"){
       translationAmount = this.metaData.height / 2;
     }
-  }else if (axis == "+z"){
+  }else if (axis == plusZ){
     REUSABLE_VECTOR_6.set(0, 0, 1);
     if (this.type == "surface"){
       translationAmount = 0;
@@ -2632,7 +2632,7 @@ AddedObject.prototype.getEndPoint = function(axis){
     }else if (this.type == "cylinder"){
       translationAmount = (this.metaData.topRadius + this.metaData.bottomRadius) / 2;
     }
-  }else if (axis == "-z"){
+  }else if (axis == minusZ){
     REUSABLE_VECTOR_6.set(0, 0, -1);
     if (this.type == "surface"){
       translationAmount = 0;

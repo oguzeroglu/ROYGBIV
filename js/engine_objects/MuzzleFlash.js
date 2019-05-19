@@ -20,6 +20,41 @@ MuzzleFlash.prototype.export = function(){
   return exportObj;
 }
 
+MuzzleFlash.prototype.rotateX = function(rotation){
+  for (var i = 0; i<this.particleSystems.length; i++){
+    this.particleSystems[i].mesh.rotateX(rotation);
+  }
+}
+
+MuzzleFlash.prototype.rotateY = function(rotation){
+  for (var i = 0; i<this.particleSystems.length; i++){
+    this.particleSystems[i].mesh.rotateY(rotation);
+  }
+}
+
+MuzzleFlash.prototype.rotateZ = function(rotation){
+  for (var i = 0; i<this.particleSystems.length; i++){
+    this.particleSystems[i].mesh.rotateZ(rotation);
+  }
+}
+
+MuzzleFlash.prototype.setScale = function(scale){
+  for (var i = 0; i<this.particleSystems.length; i++){
+    this.particleSystems[i].mesh.scale.set(scale, scale, scale);
+  }
+}
+
+MuzzleFlash.prototype.handlePosition = function(ps){
+  var position = this.fpsWeaponConfigurations.weaponObj.getEndPoint(this.fpsWeaponConfigurations.endpoint);
+  position.add(REUSABLE_VECTOR.set(this.fpsWeaponConfigurations.offsetX, this.fpsWeaponConfigurations.offsetY, this.fpsWeaponConfigurations.offsetZ));
+  ps.mesh.position.copy(position);
+}
+
+MuzzleFlash.prototype.attachToFPSWeapon = function(weaponObj, childObjName, endpoint, offsetX, offsetY, offsetZ){
+  this.fpsWeaponConfigurations = {weaponObj: weaponObj, childObjName: childObjName, endpoint: endpoint, offsetX: offsetX, offsetY: offsetY, offsetZ: offsetZ};
+  this.attachedToFPSWeapon = true;
+}
+
 MuzzleFlash.prototype.init = function(){
   this.tick = 0;
   for (var i = 0; i<this.particleSystems.length; i++){
@@ -41,6 +76,9 @@ MuzzleFlash.prototype.destroy = function(){
 
 MuzzleFlash.prototype.update = function(){
   var ps = this.particleSystems[this.particleIndex];
+  if (this.attachedToFPSWeapon){
+    this.handlePosition(ps);
+  }
   ps.mesh.visible = true;
   ps.update();
   this.tick += (1/60);

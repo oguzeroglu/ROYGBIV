@@ -1,4 +1,5 @@
 var FPSWeaponGUIHandler = function(){
+  this.endPoints = ["+x", "+y", "+z", "-x", "-y", "-z"];
 }
 
 FPSWeaponGUIHandler.prototype.onHidden = function(){
@@ -58,6 +59,18 @@ FPSWeaponGUIHandler.prototype.init = function(){
       delete fpsWeaponGUIHandler.hiddenObjectsDueToFPSWeaponAlignmentConfiguration;
     }
   };
+  this.muzzleFlashParameters = {
+    "Muzzle flash": "",
+    "Has muz. flash": false,
+    "Scale": 1.0,
+    "Endpoint": "+x",
+    "offsetX": 0,
+    "offsetY": 0,
+    "offsetZ": 0,
+    "RotateX": "",
+    "RotateY": "",
+    "RotateZ": ""
+  }
 }
 
 FPSWeaponGUIHandler.prototype.show = function(obj){
@@ -233,6 +246,111 @@ FPSWeaponGUIHandler.prototype.prepareGUI = function(){
       otherWeaponsArray.push(objName);
     }
   }
+  var muzzleFlashAry = [];
+  for (var muzzleFlashName in muzzleFlashes){
+    muzzleFlashAry.push(muzzleFlashName);
+  }
+  var muzzleFlashFolder = guiHandler.datGuiFPSWeaponAlignment.addFolder("Muzzle flash");
+  var hasMuzzleFlashController = muzzleFlashFolder.add(this.muzzleFlashParameters, "Has muz. flash").onChange(function(val){
+    if (muzzleFlashAry.length == 0){
+      fpsWeaponGUIHandler.muzzleFlashParameters["Has muz. flash"] = false;
+      return;
+    }
+    if (val){
+      guiHandler.enableController(muzzleFlashNameController);
+      guiHandler.enableController(muzzleFlashScaleController);
+      guiHandler.enableController(muzzleFlashEndPointController);
+      guiHandler.enableController(muzzleFlashOffsetXController);
+      guiHandler.enableController(muzzleFlashOffsetYController);
+      guiHandler.enableController(muzzleFlashOffsetZController);
+      guiHandler.enableController(muzzleFlashRotateXController);
+      guiHandler.enableController(muzzleFlashRotateYController);
+      guiHandler.enableController(muzzleFlashRotateZController);
+    }else{
+      guiHandler.disableController(muzzleFlashNameController);
+      guiHandler.disableController(muzzleFlashScaleController);
+      guiHandler.disableController(muzzleFlashEndPointController);
+      guiHandler.disableController(muzzleFlashOffsetXController);
+      guiHandler.disableController(muzzleFlashOffsetYController);
+      guiHandler.disableController(muzzleFlashOffsetZController);
+      guiHandler.disableController(muzzleFlashRotateXController);
+      guiHandler.disableController(muzzleFlashRotateYController);
+      guiHandler.disableController(muzzleFlashRotateZController);
+    }
+  }).listen();
+  var muzzleFlashNameController = muzzleFlashFolder.add(this.muzzleFlashParameters, "Muzzle flash", muzzleFlashAry).onChange(function(val){
+    fpsWeaponGUIHandler.muzzleFlash = muzzleFlashes[val];
+    fpsWeaponGUIHandler.muzzleFlash.init();
+    fpsWeaponGUIHandler.muzzleFlash.attachToFPSWeapon(fpsWeaponGUIHandler.fpsWeaponAlignmentConfigurationObject, null, fpsWeaponGUIHandler.muzzleFlashParameters["Endpoint"], fpsWeaponGUIHandler.muzzleFlashParameters["offsetX"], fpsWeaponGUIHandler.muzzleFlashParameters["offsetY"], fpsWeaponGUIHandler.muzzleFlashParameters["offsetZ"]);
+  }).listen();
+  var muzzleFlashScaleController = muzzleFlashFolder.add(this.muzzleFlashParameters, "Scale").min(0.001).max(1).step(0.001).onChange(function(val){
+    fpsWeaponGUIHandler.muzzleFlash.setScale(val);
+  }).listen();
+  var muzzleFlashEndPointController = muzzleFlashFolder.add(this.muzzleFlashParameters, "Endpoint", this.endPoints).onChange(function(val){
+    fpsWeaponGUIHandler.muzzleFlash.attachToFPSWeapon(fpsWeaponGUIHandler.fpsWeaponAlignmentConfigurationObject, null, val, fpsWeaponGUIHandler.muzzleFlashParameters["offsetX"], fpsWeaponGUIHandler.muzzleFlashParameters["offsetY"], fpsWeaponGUIHandler.muzzleFlashParameters["offsetZ"]);
+  }).listen();
+  var muzzleFlashOffsetXController = muzzleFlashFolder.add(this.muzzleFlashParameters, "offsetX").min(-2).max(2).step(0.01).onChange(function(val){
+    fpsWeaponGUIHandler.muzzleFlash.attachToFPSWeapon(fpsWeaponGUIHandler.fpsWeaponAlignmentConfigurationObject, null, fpsWeaponGUIHandler.muzzleFlashParameters["Endpoint"], val, fpsWeaponGUIHandler.muzzleFlashParameters["offsetY"], fpsWeaponGUIHandler.muzzleFlashParameters["offsetZ"]);
+  }).listen();
+  var muzzleFlashOffsetYController = muzzleFlashFolder.add(this.muzzleFlashParameters, "offsetY").min(-2).max(2).step(0.01).onChange(function(val){
+    fpsWeaponGUIHandler.muzzleFlash.attachToFPSWeapon(fpsWeaponGUIHandler.fpsWeaponAlignmentConfigurationObject, null, fpsWeaponGUIHandler.muzzleFlashParameters["Endpoint"], fpsWeaponGUIHandler.muzzleFlashParameters["offsetX"], val, fpsWeaponGUIHandler.muzzleFlashParameters["offsetZ"]);
+  }).listen();
+  var muzzleFlashOffsetZController = muzzleFlashFolder.add(this.muzzleFlashParameters, "offsetZ").min(-2).max(2).step(0.01).onChange(function(val){
+    fpsWeaponGUIHandler.muzzleFlash.attachToFPSWeapon(fpsWeaponGUIHandler.fpsWeaponAlignmentConfigurationObject, null, fpsWeaponGUIHandler.muzzleFlashParameters["Endpoint"], fpsWeaponGUIHandler.muzzleFlashParameters["offsetX"], fpsWeaponGUIHandler.muzzleFlashParameters["offsetY"], val);
+  }).listen();
+  var muzzleFlashRotateXController = muzzleFlashFolder.add(this.muzzleFlashParameters, "RotateX").onFinishChange(function(val){
+    var rotVal;
+    try{
+      rotVal = parseFloat(eval(val));
+      if (!(typeof rotVal == UNDEFINED) && !isNaN(rotVal)){
+        fpsWeaponGUIHandler.muzzleFlash.rotateX(rotVal);
+      }
+    }catch (err){
+    }
+  });
+  var muzzleFlashRotateYController = muzzleFlashFolder.add(this.muzzleFlashParameters, "RotateY").onFinishChange(function(val){
+    var rotVal;
+    try{
+      rotVal = parseFloat(eval(val));
+      if (!(typeof rotVal == UNDEFINED) && !isNaN(rotVal)){
+        fpsWeaponGUIHandler.muzzleFlash.rotateY(rotVal);
+      }
+    }catch (err){
+    }
+  });
+  var muzzleFlashRotateZController = muzzleFlashFolder.add(this.muzzleFlashParameters, "RotateZ").onFinishChange(function(val){
+    var rotVal;
+    try{
+      rotVal = parseFloat(eval(val));
+      if (!(typeof rotVal == UNDEFINED) && !isNaN(rotVal)){
+        fpsWeaponGUIHandler.muzzleFlash.rotateZ(rotVal);
+      }
+    }catch (err){
+    }
+  });
+  if (muzzleFlashAry.length == 0){
+    guiHandler.disableController(hasMuzzleFlashController);
+    guiHandler.disableController(muzzleFlashNameController);
+    guiHandler.disableController(muzzleFlashScaleController);
+    guiHandler.disableController(muzzleFlashEndPointController);
+    guiHandler.disableController(muzzleFlashOffsetXController);
+    guiHandler.disableController(muzzleFlashOffsetYController);
+    guiHandler.disableController(muzzleFlashOffsetZController);
+    guiHandler.disableController(muzzleFlashRotateXController);
+    guiHandler.disableController(muzzleFlashRotateYController);
+    guiHandler.disableController(muzzleFlashRotateZController);
+  }
+  if (!this.muzzleFlashParameters["Has muz. flash"]){
+    guiHandler.disableController(muzzleFlashNameController);
+    guiHandler.disableController(muzzleFlashScaleController);
+    guiHandler.disableController(muzzleFlashEndPointController);
+    guiHandler.disableController(muzzleFlashOffsetXController);
+    guiHandler.disableController(muzzleFlashOffsetYController);
+    guiHandler.disableController(muzzleFlashOffsetZController);
+    guiHandler.disableController(muzzleFlashRotateXController);
+    guiHandler.disableController(muzzleFlashRotateYController);
+    guiHandler.disableController(muzzleFlashRotateZController);
+  }
   guiHandler.datGuiFPSWeaponAlignment.add(this.fpsWeaponAlignmentParameters, "Load from", otherWeaponsArray).onChange(function(val){
     var obj = addedObjects[val] || objectGroups[val];
     for (var key in obj.fpsWeaponAlignment){
@@ -252,5 +370,7 @@ FPSWeaponGUIHandler.prototype.prepareGUI = function(){
 }
 
 FPSWeaponGUIHandler.prototype.update = function(){
-
+  if (this.muzzleFlash){
+    this.muzzleFlash.update();
+  }
 }
