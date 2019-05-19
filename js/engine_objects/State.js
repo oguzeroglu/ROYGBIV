@@ -210,4 +210,9 @@ var State = function(projectName, author){
   for (var poolName in preConfiguredParticleSystemPools){
     this.preConfiguredParticleSystemPools[poolName] = preConfiguredParticleSystemPools[poolName].export();
   }
+  // MUZZLE FLASHES ************************************************
+  this.muzzleFlashes = new Object();
+  for (var muzzleFlashName in muzzleFlashes){
+    this.muzzleFlashes[muzzleFlashName] = muzzleFlashes[muzzleFlashName].export();
+  }
 }

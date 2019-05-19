@@ -1002,6 +1002,11 @@ StateLoader.prototype.load = function(){
       var curExport = obj.preConfiguredParticleSystemPools[poolName];
       preConfiguredParticleSystemPools[poolName] = new PreconfiguredParticleSystemPool(curExport.psName, curExport.poolName, curExport.poolSize);
     }
+    // MUZZLE FLASHES **********************************************
+    for (var muzzleFlashName in obj.muzzleFlashes){
+      var curMuzzleFlashExport = obj.muzzleFlashes[muzzleFlashName];
+      muzzleFlashes[muzzleFlashName] = new MuzzleFlash(muzzleFlashName, preConfiguredParticleSystems[curMuzzleFlashExport.refPreconfiguredPSName], curMuzzleFlashExport.psCount, curMuzzleFlashExport.psTime);
+    }
     // TEXTS *******************************************************
     // NOT HERE -> SEE: finalize
     // EFFECTS *****************************************************

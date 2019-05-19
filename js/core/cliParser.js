@@ -5179,6 +5179,12 @@ function parse(input){
             terminal.printError(Text.PARTICLE_SYSTEM_USED_IN_A_POOL);
             return true;
           }
+          for (var muzzleFlashName in muzzleFlashes){
+            if (muzzleFlashes[muzzleFlashName].refPreconfiguredPS.name == preConfiguredParticleSystem.name){
+              terminal.printError(Text.PARTICLE_SYSTEM_USED_IN_A_MUZZLEFLASH);
+              return true;
+            }
+          }
           preConfiguredParticleSystem.destroy();
           if (!jobHandlerWorking){
             terminal.printInfo(Text.PARTICLE_SYSTEM_DESTROYED);
