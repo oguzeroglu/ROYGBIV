@@ -2646,12 +2646,14 @@ AddedObject.prototype.getEndPoint = function(axis){
       translationAmount = (this.metaData.topRadius + this.metaData.bottomRadius) / 2;
     }
   }
-  translationAmount *= this.mesh.scale.x;
   var quaternion, position;
   if (this.parentObjectName){
     var parentObject = objectGroups[this.parentObjectName];
+    translationAmount *= parentObject.mesh.scale.x;
+    var oldScaleX = parentObject.graphicsGroup.scale.x; var oldScaleY = parentObject.graphicsGroup.scale.y; var oldScaleZ = parentObject.graphicsGroup.scale.z;
     parentObject.graphicsGroup.position.copy(parentObject.mesh.position);
     parentObject.graphicsGroup.quaternion.copy(parentObject.mesh.quaternion);
+    parentObject.graphicsGroup.scale.copy(parentObject.mesh.scale);
     parentObject.graphicsGroup.updateMatrix();
     parentObject.graphicsGroup.updateMatrixWorld();
     var child = parentObject.graphicsGroup.children[this.indexInParent];
@@ -2659,7 +2661,9 @@ AddedObject.prototype.getEndPoint = function(axis){
     child.getWorldQuaternion(REUSABLE_QUATERNION);
     position = REUSABLE_VECTOR_7;
     quaternion = REUSABLE_QUATERNION;
+    parentObject.graphicsGroup.scale.set(oldScaleX, oldScaleY, oldScaleZ);
   }else{
+    translationAmount *= this.mesh.scale.x;
     quaternion = this.mesh.quaternion;
     position = REUSABLE_VECTOR_7.copy(this.mesh.position);
   }

@@ -45,13 +45,17 @@ MuzzleFlash.prototype.setScale = function(scale){
 }
 
 MuzzleFlash.prototype.handlePosition = function(ps){
-  var position = this.fpsWeaponConfigurations.weaponObj.getEndPoint(this.fpsWeaponConfigurations.endpoint);
-  position.add(REUSABLE_VECTOR.set(this.fpsWeaponConfigurations.offsetX, this.fpsWeaponConfigurations.offsetY, this.fpsWeaponConfigurations.offsetZ));
+  var position
+  if (this.fpsWeaponConfigurations.weaponObj.isAddedObject){
+    position = this.fpsWeaponConfigurations.weaponObj.getEndPoint(this.fpsWeaponConfigurations.endpoint);
+  }else{
+    position = this.fpsWeaponConfigurations.weaponObj.group[this.fpsWeaponConfigurations.childObjName].getEndPoint(this.fpsWeaponConfigurations.endpoint);
+  }
   ps.mesh.position.copy(position);
 }
 
-MuzzleFlash.prototype.attachToFPSWeapon = function(weaponObj, childObjName, endpoint, offsetX, offsetY, offsetZ){
-  this.fpsWeaponConfigurations = {weaponObj: weaponObj, childObjName: childObjName, endpoint: endpoint, offsetX: offsetX, offsetY: offsetY, offsetZ: offsetZ};
+MuzzleFlash.prototype.attachToFPSWeapon = function(weaponObj, childObjName, endpoint){
+  this.fpsWeaponConfigurations = {weaponObj: weaponObj, childObjName: childObjName, endpoint: endpoint};
   this.attachedToFPSWeapon = true;
   this.fpsWeaponQuaternion = weaponObj.mesh.quaternion.clone();
 }
