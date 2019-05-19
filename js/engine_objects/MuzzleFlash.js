@@ -53,6 +53,7 @@ MuzzleFlash.prototype.handlePosition = function(ps){
 MuzzleFlash.prototype.attachToFPSWeapon = function(weaponObj, childObjName, endpoint, offsetX, offsetY, offsetZ){
   this.fpsWeaponConfigurations = {weaponObj: weaponObj, childObjName: childObjName, endpoint: endpoint, offsetX: offsetX, offsetY: offsetY, offsetZ: offsetZ};
   this.attachedToFPSWeapon = true;
+  this.fpsWeaponQuaternion = weaponObj.mesh.quaternion.clone();
 }
 
 MuzzleFlash.prototype.init = function(){
@@ -78,6 +79,12 @@ MuzzleFlash.prototype.update = function(){
   var ps = this.particleSystems[this.particleIndex];
   if (this.attachedToFPSWeapon){
     this.handlePosition(ps);
+    REUSABLE_QUATERNION.copy(this.fpsWeaponConfigurations.weaponObj.mesh.quaternion);
+    var qDiff = REUSABLE_QUATERNION.multiply(this.fpsWeaponQuaternion.inverse());
+    for (var i = 0; i<this.particleSystems.length; i++){
+      this.particleSystems[i].mesh.quaternion.multiply(qDiff);
+    }
+    this.fpsWeaponQuaternion.copy(this.fpsWeaponConfigurations.weaponObj.mesh.quaternion);
   }
   ps.mesh.visible = true;
   ps.update();
