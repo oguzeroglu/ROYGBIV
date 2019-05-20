@@ -59,6 +59,10 @@ StateLoader.prototype.load = function(){
         var gridNumber = slicedGridsExport[i];
         gs.grids[gridNumber].sliced = true;
         gs.grids[gridNumber].slicedGridSystemName = slicedGridSystemNamesExport[i];
+        if (!gs.slicedGrids){
+          gs.slicedGrids = new Object();
+        }
+        gs.slicedGrids[gs.grids[gridNumber].name] = gs.grids[gridNumber];
       }
       gs.markedPointNames = exportObject.markedPointNames;
     }
