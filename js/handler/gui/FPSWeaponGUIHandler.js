@@ -344,6 +344,10 @@ FPSWeaponGUIHandler.prototype.prepareGUI = function(){
     }
   }).listen();
   var muzzleFlashNameController = muzzleFlashFolder.add(this.muzzleFlashParameters, "Muzzle flash", muzzleFlashAry).onChange(function(val){
+    if (fpsWeaponGUIHandler.muzzleFlash){
+      fpsWeaponGUIHandler.muzzleFlash.hide();
+      fpsWeaponGUIHandler.muzzleFlash = 0;
+    }
     fpsWeaponGUIHandler.muzzleFlash = muzzleFlashes[val];
     fpsWeaponGUIHandler.muzzleFlash.init();
     fpsWeaponGUIHandler.muzzleFlash.attachToFPSWeapon(fpsWeaponGUIHandler.fpsWeaponAlignmentConfigurationObject, fpsWeaponGUIHandler.muzzleFlashParameters["Child obj"], fpsWeaponGUIHandler.muzzleFlashParameters["Endpoint"]);
