@@ -1875,6 +1875,9 @@ ObjectGroup.prototype.export = function(){
   if (this.objectTrailConfigurations){
     exportObj.objectTrailConfigurations = {alpha: this.objectTrailConfigurations.alpha, time: this.objectTrailConfigurations.time};
   }
+  if (this.muzzleFlashParameters){
+    exportObj.muzzleFlashParameters = this.muzzleFlashParameters;
+  }
   return exportObj;
 }
 

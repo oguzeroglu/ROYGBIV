@@ -559,6 +559,9 @@ AddedObject.prototype.export = function(){
   if (this.objectTrailConfigurations){
     exportObject.objectTrailConfigurations = {alpha: this.objectTrailConfigurations.alpha, time: this.objectTrailConfigurations.time};
   }
+  if (this.muzzleFlashParameters){
+    exportObject.muzzleFlashParameters = this.muzzleFlashParameters;
+  }
   return exportObject;
 }
 

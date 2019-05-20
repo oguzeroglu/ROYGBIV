@@ -56,6 +56,10 @@ MuzzleFlash.prototype.rotateZ = function(rotation){
   }
 }
 
+MuzzleFlash.prototype.getScale = function(){
+  return this.particleSystems[0].mesh.scale.x;
+}
+
 MuzzleFlash.prototype.setScale = function(scale){
   for (var i = 0; i<this.particleSystems.length; i++){
     this.particleSystems[i].mesh.scale.set(scale, scale, scale);

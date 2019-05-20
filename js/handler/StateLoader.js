@@ -590,6 +590,9 @@ StateLoader.prototype.load = function(){
        if (curAddedObjectExport.objectTrailConfigurations){
          addedObjectInstance.objectTrailConfigurations = {alpha: curAddedObjectExport.objectTrailConfigurations.alpha, time: curAddedObjectExport.objectTrailConfigurations.time};
        }
+       if (curAddedObjectExport.muzzleFlashParameters){
+         addedObjectInstance.muzzleFlashParameters = curAddedObjectExport.muzzleFlashParameters;
+       }
     }
     for (var objName in addedObjects){
       if (addedObjects[objName].softCopyParentName){
@@ -1294,6 +1297,9 @@ StateLoader.prototype.finalize = function(){
     }
     if (curObjectGroupExport.objectTrailConfigurations){
       objectGroupInstance.objectTrailConfigurations = {alpha: curObjectGroupExport.objectTrailConfigurations.alpha, time: curObjectGroupExport.objectTrailConfigurations.time};
+    }
+    if (curObjectGroupExport.muzzleFlashParameters){
+      objectGroupInstance.muzzleFlashParameters = curObjectGroupExport.muzzleFlashParameters;
     }
   }
   for (var objName in objectGroups){
