@@ -495,6 +495,12 @@ function onRaycasterIntersection(){
          var sgs = gridSystems[selectedGrid.slicedGridSystemName];
          if (sgs){
            selectedGrid = sgs.getGridFromPoint(point);
+           while (sgs && selectedGrid && selectedGrid.sliced && selectedGrid.slicedGridSystemName){
+             var sgs = gridSystems[selectedGrid.slicedGridSystemName];
+             if (sgs){
+               selectedGrid = sgs.getGridFromPoint(point);
+             }
+           }
            if (selectedGrid){
              object = sgs;
              intersectionObject = sgs.name;
