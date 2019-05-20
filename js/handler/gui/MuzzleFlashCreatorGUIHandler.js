@@ -78,7 +78,7 @@ MuzzleFlashCreatorGUIHandler.prototype.show = function(muzzleflashName, refPreco
   guiHandler.datGuiMuzzleFlashCreator.add(this.parameters, "psCount").min(1).max(10).step(1).onFinishChange(function(val){
     muzzleFlashCreatorGUIHandler.createMuzzleFlash(muzzleflashName, refPreconfiguredPS, val, muzzleFlashCreatorGUIHandler.parameters.psTime);
   }).listen();
-  guiHandler.datGuiMuzzleFlashCreator.add(this.parameters, "psTime").min(0.02).max(4).step(0.01).onFinishChange(function(val){
+  guiHandler.datGuiMuzzleFlashCreator.add(this.parameters, "psTime").min(0.02).max(10000).step(0.01).onFinishChange(function(val){
     muzzleFlashCreatorGUIHandler.createMuzzleFlash(muzzleflashName, refPreconfiguredPS, muzzleFlashCreatorGUIHandler.parameters.psCount, val);
   }).listen();
   guiHandler.datGuiMuzzleFlashCreator.add(this.buttonParameters, "Cancel");
