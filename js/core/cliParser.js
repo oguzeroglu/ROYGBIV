@@ -5309,6 +5309,23 @@ function parse(input){
           }
           return true;
         break;
+        case 176: //printMuzzleFlashes
+          var len = Object.keys(muzzleFlashes).length;
+          terminal.printHeader(Text.MUZZLE_FLASHES);
+          var ctr = 1;
+          for (var muzzleFlashName in muzzleFlashes){
+            var opts = true;
+            if (ctr == len){
+              opts = false;
+            }
+            ctr ++;
+            terminal.printInfo(Text.TREE2.replace(Text.PARAM1, muzzleFlashName).replace(Text.PARAM2, muzzleFlashes[muzzleFlashName].refPreconfiguredPS.name), opts);
+          }
+          if (len == 0){
+            terminal.printError(Text.NO_MUZZLE_FLASHES_CREATED);
+          }
+          return true;
+        break;
       }
       return true;
     }catch(err){
