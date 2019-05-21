@@ -5284,12 +5284,16 @@ function parse(input){
           terminal.printInfo(Text.AFTER_MUZZLE_FLASH_CREATION);
           return true;
         break;
-        case 175:
+        case 175: //destroyMuzzleFlash
           if (mode != 0){
             terminal.printInfo(Text.WORKS_ONLY_IN_DESIGN_MODE);
             return true;
           }
           var muzzleFlashName = splitted[1];
+          if (!(muzzleFlashName.indexOf("*") == -1)){
+            new JobHandler(splitted).handle();
+            return true;
+          }
           var muzzleFlash = muzzleFlashes[muzzleFlashName];
           if (!muzzleFlash){
             terminal.printError(Text.NO_SUCH_MUZZLE_FLASH);
@@ -5300,7 +5304,9 @@ function parse(input){
             return true;
           }
           muzzleFlash.destroy();
-          terminal.printInfo(Text.MUZZLE_FLASH_DESTROYED);
+          if (!jobHandlerWorking){
+            terminal.printInfo(Text.MUZZLE_FLASH_DESTROYED);
+          }
           return true;
         break;
       }
