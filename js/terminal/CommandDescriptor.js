@@ -175,7 +175,8 @@ var CommandDescriptor = function(){
       0, //printParticleSystemPools
       1, //workerConfigurations
       2, //newMuzzleFlash
-      1 //editMuzzleFlash
+      1, //editMuzzleFlash
+      1 //destroyMuzzleFlash
   ];
 
   this.commandArgumentsExpectedExplanation = [
@@ -353,7 +354,8 @@ var CommandDescriptor = function(){
     "printParticleSystemPools",
     "workerConfigurations show/hide",
     "newMuzzleFlash name refPSName",
-    "editMuzzleFlash muzzleFlashName"
+    "editMuzzleFlash muzzleFlashName",
+    "destroyMuzzleFlash muzzleFlashName"
   ];
 
   this.commands = [
@@ -531,7 +533,8 @@ var CommandDescriptor = function(){
     "printParticleSystemPools",
     "workerConfigurations",
     "newMuzzleFlash",
-    "editMuzzleFlash"
+    "editMuzzleFlash",
+    "destroyMuzzleFlash"
   ];
 
   this.commandInfo = [
@@ -709,7 +712,8 @@ var CommandDescriptor = function(){
     "printParticleSystemPools: Prints created particle system pools.",
     "workerConfigurations: Shows/hides the GUI for configuring worker availibility.",
     "newMuzzleFlash: Creates a new MuzzleFlash object from given particle system in order to be used with FPS weapons.",
-    "editMuzzleFlash: Shows the GUI for editing a muzzle flash."
+    "editMuzzleFlash: Shows the GUI for editing a muzzle flash.",
+    "destroyMuzzleFlash: Destroys a muzzle flash."
   ];
 
   this.keyboardInfo = [
@@ -1424,6 +1428,11 @@ var CommandDescriptor = function(){
   this.editMuzzleFlash = new Object();
   this.editMuzzleFlash.types = [];
   this.editMuzzleFlash.types.push(this.MUZZLE_FLASH_NAME); // muzzleFlashName
+
+  // destroyMuzzleFlash
+  this.destroyMuzzleFlash = new Object();
+  this.destroyMuzzleFlash.types = [];
+  this.destroyMuzzleFlash.types.push(this.MUZZLE_FLASH_NAME); // muzzleFlashName
 };
 
 CommandDescriptor.prototype.test = function(){

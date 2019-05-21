@@ -12,6 +12,33 @@ var MuzzleFlash = function(name, refPreconfiguredPS, psCount, psTime){
   }
 }
 
+MuzzleFlash.prototype.destroy = function(){
+  delete muzzleFlashes[this.name];
+  for (var i = 0; i<this.particleSystems.length; i++){
+    this.particleSystems[i].destroy();
+  }
+}
+
+MuzzleFlash.prototype.getUsingWeaponName = function(){
+  for (var objName in addedObjects){
+    var obj = addedObjects[objName];
+    if (obj.isFPSWeapon && obj.muzzleFlashParameters && obj.muzzleFlashParameters.muzzleFlashName){
+      if (obj.muzzleFlashParameters.muzzleFlashName == this.name){
+        return objName;
+      }
+    }
+  }
+  for (var objName in objectGroups){
+    var obj = objectGroups[objName];
+    if (obj.isFPSWeapon && obj.muzzleFlashParameters && obj.muzzleFlashParameters.muzzleFlashName){
+      if (obj.muzzleFlashParameters.muzzleFlashName == this.name){
+        return objName;
+      }
+    }
+  }
+  return null;
+}
+
 MuzzleFlash.prototype.export = function(){
   var exportObj = new Object();
   exportObj.refPreconfiguredPSName = this.refPreconfiguredPS.name;
@@ -92,12 +119,6 @@ MuzzleFlash.prototype.init = function(){
 MuzzleFlash.prototype.hide = function(){
   for (var i = 0; i<this.particleSystems.length; i++){
     this.particleSystems[i].mesh.visible = false;
-  }
-}
-
-MuzzleFlash.prototype.destroy = function(){
-  for (var i = 0 ;i<this.particleSystems.length; i++){
-    this.particleSystems[i].destroy();
   }
 }
 

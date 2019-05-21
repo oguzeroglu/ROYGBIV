@@ -5267,7 +5267,7 @@ function parse(input){
           terminal.printInfo(Text.AFTER_MUZZLE_FLASH_CREATION);
           return true;
         break;
-        case 174:
+        case 174: //editMuzzleFlash
           if (mode != 0){
             terminal.printError(Text.WORKS_ONLY_IN_DESIGN_MODE);
             return true;
@@ -5282,6 +5282,25 @@ function parse(input){
           terminal.clear();
           terminal.disable();
           terminal.printInfo(Text.AFTER_MUZZLE_FLASH_CREATION);
+          return true;
+        break;
+        case 175:
+          if (mode != 0){
+            terminal.printInfo(Text.WORKS_ONLY_IN_DESIGN_MODE);
+            return true;
+          }
+          var muzzleFlashName = splitted[1];
+          var muzzleFlash = muzzleFlashes[muzzleFlashName];
+          if (!muzzleFlash){
+            terminal.printError(Text.NO_SUCH_MUZZLE_FLASH);
+            return true;
+          }
+          if (muzzleFlash.getUsingWeaponName() != null){
+            terminal.printError(Text.MUZZLE_FLASH_USED_IN.replace(Text.PARAM1, muzzleFlash.getUsingWeaponName()));
+            return true;
+          }
+          muzzleFlash.destroy();
+          terminal.printInfo(Text.MUZZLE_FLASH_DESTROYED);
           return true;
         break;
       }
