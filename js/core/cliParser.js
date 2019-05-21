@@ -5253,6 +5253,14 @@ function parse(input){
             terminal.printError(Text.NO_SUCH_PARTICLE_SYSTEM);
             return true;
           }
+          if (ps.isCollidable){
+            terminal.printError(Text.CANNOT_CREATE_MUZZLEFLASH_COLLIDABLE_PS);
+            return true;
+          }
+          if (ps.hasParticleCollision){
+            terminal.printError(Text.CANNOT_CREATE_MUZZLEFLASH_COLLIDABLE_PARTICLES);
+            return true;
+          }
           muzzleFlashCreatorGUIHandler.show(muzzleFlashName, ps);
           terminal.clear();
           terminal.disable();
