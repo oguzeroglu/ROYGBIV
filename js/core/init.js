@@ -57,6 +57,10 @@ window.onload = function() {
     selectionHandler = new SelectionHandler();
     // PARTICLE SYSTEM CREATOR GUI HANDLER
     particleSystemCreatorGUIHandler = new ParticleSystemCreatorGUIHandler();
+    // MUZZLE FLASH CREATOR GUI HANDLER
+    muzzleFlashCreatorGUIHandler = new MuzzleFlashCreatorGUIHandler();
+    // FPS WEAPON GUI HANDLER
+    fpsWeaponGUIHandler = new FPSWeaponGUIHandler();
   }
 
   // PHYSICS BODY GENERATOR
@@ -491,6 +495,12 @@ function onRaycasterIntersection(){
          var sgs = gridSystems[selectedGrid.slicedGridSystemName];
          if (sgs){
            selectedGrid = sgs.getGridFromPoint(point);
+           while (sgs && selectedGrid && selectedGrid.sliced && selectedGrid.slicedGridSystemName){
+             var sgs = gridSystems[selectedGrid.slicedGridSystemName];
+             if (sgs){
+               selectedGrid = sgs.getGridFromPoint(point);
+             }
+           }
            if (selectedGrid){
              object = sgs;
              intersectionObject = sgs.name;

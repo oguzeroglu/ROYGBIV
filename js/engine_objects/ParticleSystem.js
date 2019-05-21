@@ -22,7 +22,9 @@ var ParticleSystem = function(copyPS, name, particles, x, y, z, vx, vy, vz, ax, 
   this.REUSABLE_VELOCITY_VECTOR = new THREE.Vector3();
   this.REUSABLE_ACCELERATION_VECTOR = new THREE.Vector3();
   TOTAL_PARTICLE_SYSTEM_COUNT ++;
-  particleSystemPool[name] = this;
+  if (mode != 0){
+    particleSystemPool[name] = this;
+  }
   this.statusDescription = {type: PARTICLE_SYSTEM_ACTION_TYPE_NONE, isStartPositionDefined: false, isStartVelocityDefined: false, isStartAccelerationDefined: false, isStartQuaternionDefined: false, startPosition: new THREE.Vector3(), startVelocity: new THREE.Vector3(), startAcceleration: new THREE.Vector3(), startQuaternion: new THREE.Quaternion(), stopDuration: 0};
   if (IS_WORKER_CONTEXT){
     this.mesh = new THREE.Object3D();

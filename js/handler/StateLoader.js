@@ -59,6 +59,10 @@ StateLoader.prototype.load = function(){
         var gridNumber = slicedGridsExport[i];
         gs.grids[gridNumber].sliced = true;
         gs.grids[gridNumber].slicedGridSystemName = slicedGridSystemNamesExport[i];
+        if (!gs.slicedGrids){
+          gs.slicedGrids = new Object();
+        }
+        gs.slicedGrids[gs.grids[gridNumber].name] = gs.grids[gridNumber];
       }
       gs.markedPointNames = exportObject.markedPointNames;
     }
@@ -590,6 +594,9 @@ StateLoader.prototype.load = function(){
        if (curAddedObjectExport.objectTrailConfigurations){
          addedObjectInstance.objectTrailConfigurations = {alpha: curAddedObjectExport.objectTrailConfigurations.alpha, time: curAddedObjectExport.objectTrailConfigurations.time};
        }
+       if (curAddedObjectExport.muzzleFlashParameters){
+         addedObjectInstance.muzzleFlashParameters = curAddedObjectExport.muzzleFlashParameters;
+       }
     }
     for (var objName in addedObjects){
       if (addedObjects[objName].softCopyParentName){
@@ -1002,6 +1009,11 @@ StateLoader.prototype.load = function(){
       var curExport = obj.preConfiguredParticleSystemPools[poolName];
       preConfiguredParticleSystemPools[poolName] = new PreconfiguredParticleSystemPool(curExport.psName, curExport.poolName, curExport.poolSize);
     }
+    // MUZZLE FLASHES **********************************************
+    for (var muzzleFlashName in obj.muzzleFlashes){
+      var curMuzzleFlashExport = obj.muzzleFlashes[muzzleFlashName];
+      muzzleFlashes[muzzleFlashName] = new MuzzleFlash(muzzleFlashName, preConfiguredParticleSystems[curMuzzleFlashExport.refPreconfiguredPSName], curMuzzleFlashExport.psCount, curMuzzleFlashExport.psTime);
+    }
     // TEXTS *******************************************************
     // NOT HERE -> SEE: finalize
     // EFFECTS *****************************************************
@@ -1289,6 +1301,9 @@ StateLoader.prototype.finalize = function(){
     }
     if (curObjectGroupExport.objectTrailConfigurations){
       objectGroupInstance.objectTrailConfigurations = {alpha: curObjectGroupExport.objectTrailConfigurations.alpha, time: curObjectGroupExport.objectTrailConfigurations.time};
+    }
+    if (curObjectGroupExport.muzzleFlashParameters){
+      objectGroupInstance.muzzleFlashParameters = curObjectGroupExport.muzzleFlashParameters;
     }
   }
   for (var objName in objectGroups){
@@ -2210,6 +2225,7 @@ StateLoader.prototype.resetProject = function(){
   autoInstancedObjects = new Object();
   preConfiguredParticleSystems = new Object();
   preConfiguredParticleSystemPools = new Object();
+  muzzleFlashes = new Object();
   areaBinHandler = new WorldBinHandler(true);
   webglCallbackHandler = new WebGLCallbackHandler();
   threejsRenderMonitoringHandler = new THREEJSRenderMonitoringHandler();

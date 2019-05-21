@@ -121,6 +121,8 @@ JobHandler.prototype.handle = function(previewModeCommand){
       this.handleDestroyParticleSystemCommand();
     }else if (this.splitted[0] == "destroyparticlesystempool"){
       this.handleDestroyParticleSystemPoolCommand();
+    }else if (this.splitted[0] == "destroymuzzleflash"){
+      this.handleDestroyMuzzleFlashCommand();
     }
     if (jobHandlerRaycasterRefresh){
       refreshRaycaster(Text.JOB_COMPLETED, true);
@@ -131,6 +133,22 @@ JobHandler.prototype.handle = function(previewModeCommand){
   // because async
   if (this.splitted[0] != "autoConfigureArea".toLowerCase()){
     jobHandlerWorking = false;
+  }
+}
+
+JobHandler.prototype.handleDestroyMuzzleFlashCommand = function(){
+  var muzzleFlashNamePrefix = this.splitted[1].split("*")[0];
+  var ctr = 0;
+  for (var muzzleFlashName in muzzleFlashes){
+    if (muzzleFlashName.startsWith(muzzleFlashNamePrefix)){
+      parseCommand("destroyMuzzleFlash "+muzzleFlashName);
+      ctr ++;
+    }
+  }
+  if (ctr == 0){
+    terminal.printError(Text.NO_MUZZLE_FLASHES_FOUND);
+  }else{
+    terminal.printInfo(Text.COMMAND_EXECUTED_FOR_X_MUZZLE_FLASHES.replace(Text.PARAM1, ctr));
   }
 }
 

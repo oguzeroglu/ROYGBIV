@@ -32,8 +32,10 @@ var Text = function(){
   this.COMMAND_EXECUTED_FOR_X_PARTICLE_SYSTEM_POOLS = "Command executed for @@1 particle system pools.";
   this.NO_PARTICLE_SYSTEMS_FOUND = "No particle systems found.";
   this.NO_PARTICLE_SYSTEM_POOLS_FOUND = "No particle system pools found.";
+  this.NO_MUZZLE_FLASHES_FOUND = "No muzzleflashes found.";
   this.COMMAND_EXECUTED_FOR_X_TEXTS = "Command executed for @@1 texts.";
   this.COMMAND_EXECUTED_FOR_X_FONTS = "Command executed for @@1 fonts.";
+  this.COMMAND_EXECUTED_FOR_X_MUZZLE_FLASHES = "Command executed for @@1 muzzleflashes.";
   this.NO_TEXT_FOUND = "No text found.";
   this.NO_TEXTS_CREATED = "No texts created.";
   this.NO_FONTS_FOUND = "No fonts found.";
@@ -43,6 +45,7 @@ var Text = function(){
   this.NO_SUCH_FONT = "No such font.";
   this.NO_SUCH_PARTICLE_SYSTEM = "No such particle system.";
   this.NO_SUCH_PARTICLE_SYSTEM_POOL = "No such particle system pool.";
+  this.NO_SUCH_MUZZLE_FLASH = "No such muzzle flash.";
   this.PARTICLE_SYSTEM_BELONGS_TO_ANOTHER_POOL = "Particle system belongs to another pool.";
   this.PARTICLE_SYSTEM_POOL_CREATED = "Particle system pool created.";
   this.TREE_NAME = "|____Name: @@1";
@@ -145,8 +148,10 @@ var Text = function(){
   this.NO_OBJECT_FOUND = "No object found.";
   this.PARTICLE_SYSTEMS = "Particle systems";
   this.PARTICLE_SYSTEM_POOLS = "Particle system pools.";
+  this.MUZZLE_FLASHES = "Muzzleflashes.";
   this.NO_PARTICLE_SYSTEMS_CREATED = "No particle systems created.";
   this.NO_PARTICLE_SYSTEM_POOLS_CREATED = "No particle system pools created.";
+  this.NO_MUZZLE_FLASHES_CREATED = "No muzzleflashes created.";
   this.SHADER_PRECISION_ADJUSTED = "Shader precision adjusted.";
   this.COMMAND_EXECUTED_FOR_X_OBJECTS = "Command executed for @@1 objects.";
   this.TEXTURE_PACK_MAPPED_TO_X_OBJECTS = "Command executed for @@1 objects.";
@@ -178,6 +183,8 @@ var Text = function(){
   this.POSITION_Z_MUST_BE_A_NUMBER = "PositionZ must be a number.";
   this.PARTICLE_SYSTEM_CREATED = "Particle system created.";
   this.PARTICLE_SYSTEM_EDITED = "Particle system edited.";
+  this.MUZZLEFLASH_CREATED = "Muzzle flash created.";
+  this.MUZZLEFLASH_EDITED = "Muzzle flash edited.";
   this.OBJECT_MARKED_AS = "Object marked as @@1.";
   this.OBJECT_INTERSECTABLE = "Object set as intersectable. It means that the object can be collided with particles/particle systems and be picked with mouse.";
   this.OBJECT_UNINTERSECTABLE = "Object set as unintersectable. It means that the object cannot be collided with particles/particle systems and be picked with mouse.";
@@ -218,6 +225,8 @@ var Text = function(){
   this.MIRRORED_REPEAT_SET = "Mirrored repeat set @@1 for @@2.";
   this.BOX_CREATED = "Box created.";
   this.AN_ERROR_HAPPENED_CHOOSE_ANOTHER_NAME = "An error happened. Choose another name.";
+  this.MUZZLE_FLASH_USED_IN = "Muzzleflash used in FPS weapon @@1. Cannot destroy.";
+  this.MUZZLE_FLASH_DESTROYED = "Muzzleflash destroyed."
   this.HEIGHT_CANNOT_BE_0 = "Height cannot be 0.";
   this.WALL_COLLECTION_CREATED = "Wall collection created.";
   this.WALL_COLLECTIONS = "Wall collections";
@@ -288,6 +297,8 @@ var Text = function(){
   this.OFFSETY_MUST_BE_A_NUMBER = "OffsetY must be a number.";
   this.OFFSETZ_MUST_BE_A_NUMBER = "OffsetZ must be a number.";
   this.SKYBOX_CREATED = "Skybox created.";
+  this.CANNOT_CREATE_MUZZLEFLASH_COLLIDABLE_PS = "Cannot create muzzleflash from a collidable particle system.";
+  this.CANNOT_CREATE_MUZZLEFLASH_COLLIDABLE_PARTICLES = "Cannot create muzzleflash from a particle system with collidable particles.";
   this.SKYBOXES = "Skyboxes";
   this.PIVOT_SET = "Pivot set.";
   this.NO_SKYBOXES_CREATED = "No skyboxes created.";
@@ -341,6 +352,7 @@ var Text = function(){
   this.SCRIPT_STOPPED = "Script stopped.";
   this.NO_SCRIPTS_CREATED = "No scripts created.";
   this.PARTICLE_SYSTEM_USED_IN_A_POOL = "Particle system is used in a pool. Cannot delete.";
+  this.PARTICLE_SYSTEM_USED_IN_A_MUZZLEFLASH = "Particle system is used in a muzzle flash. Cannot delete.";
   this.PARTICLE_SYSTEM_DESTROYED = "Particle system destroyed.";
   this.PARTICLE_SYSTEM_POOL_DESTROYED = "Particle system pool destroyed.";
   this.SCRIPTS = "Scripts";
@@ -394,6 +406,7 @@ var Text = function(){
   this.GUI_IS_ALREADY_OPEN_FOR_THIS_OBJECT = "GUI is already open for this object.";
   this.PRESS_DONE_BUTTON_TO = "Press Done button to quit FPS weapon alignment mode.";
   this.AFTER_PS_CREATION = "Press Done button to create particle system.\nUse mouse wheel/mouse drag to rotate.\nUp/Down or W/S (Z/S - French keyboard) to zoom in/out.";
+  this.AFTER_MUZZLE_FLASH_CREATION = "Press Done button to create muzzle flash.\nUse mouse wheel/mouse drag to rotate.\nUp/Down or W/S (Z/S - French keyboard) to zoom in/out.";
   this.DONE = "Done.";
   this.GS_CREATION_ERROR_1 = "sizeX and sizeZ must be greater than zero.";
   this.GS_CREATION_ERROR_2 = "sizeX is not multiple of cellSize";
@@ -737,7 +750,7 @@ var Text = function(){
                                               "idleGunAnimationSpeed (optional): The speed of the idle gun animation. Default value is 0.05.\n"+
                                               "weaponRotationRandomnessOn (optional): If true the weapons rotate a bit more than the camera in order to give the FPS view more\nrealistic view. Default value is true.\n"+
                                               "onLook (optional): A callback function executed each frame with x, y, z and objName parameters representing the intersected object\nfrom the FPS camera. If there is no intersected object the objName is set to null. Default value is noop.\n"+
-                                              "onShoot (optional): A callback function executed with x, y, z and objName parameters representing the intersected object from the FPS\ncamera on each click for Desktop devices. For mobile devices due to lack of mouse device this function is executed when the camera is\nlooking at one of the shootable objects defined with the shootableObjects parameter in order to help implementing the auto-shoot\nfunctionality. Default value is noop.\n"+
+                                              "onShoot (optional): A callback function executed with x, y, z and objName parameters representing the intersected object from the FPS\ncamera while the mouse is down for Desktop devices. For mobile devices due to lack of mouse device this function is executed when the\ncamera is looking at one of the shootable objects defined with the shootableObjects parameter in order to help implementing the\nauto-shoot functionality. Default value is noop.\n"+
                                               "shootableObjects (optional): An array of objects representing the objects that can be shot. This parameter is used inside the onShoot\nevent for mobile devices in order to decide if the object being looked at should trigger the onShoot function or not. Default value\nis an empty array.\n"+
                                               "onPause (optional): A callback function to be executed when the FPS controls are paused on mobile devices due to switching to Portrait\norientation. Default value is noop.\n"+
                                               "onResume (optional): A callback function to be executed on mobile devices when the FPS controls are resumed after switching back to the\nLandscape orientation. Default value is noop.\n"+

@@ -3,6 +3,25 @@ var PreconfiguredParticleSystem = function(name, type, params){
   this.type = type;
   this.params = JSON.parse(JSON.stringify(params));
   this.setMaxPSTime(params.maxPSTime);
+  this.hasParticleCollision = this.hasCollidableParticles();
+}
+
+PreconfiguredParticleSystem.prototype.hasCollidableParticles = function(){
+  switch(this.type){
+    case "SMOKE": return false;
+    case "TRAIL": return false;
+    case "PLASMA": return false;
+    case "FIRE_EXPLOSION": return false;
+    case "MAGIC_CIRCLE": return false;
+    case "CIRC_EXPLOSION": return false;
+    case "DYNAMIC_TRAIL": return false;
+    case "LASER": return false;
+    case "CUSTOM": return this.params.collision.type != "NONE";
+    case "WATERFALL": return this.params.rewindOnCollided;
+    case "SNOW": return this.params.rewindOnCollided;
+    case "CONFETTI": return this.params.hasParticleCollision;
+    default: throw new Error("Not implemented.");
+  }
 }
 
 PreconfiguredParticleSystem.prototype.destroy = function(){

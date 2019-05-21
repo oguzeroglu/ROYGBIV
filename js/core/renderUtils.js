@@ -36,6 +36,8 @@ function render(){
   }else{
     if (!isDeployment){
       particleSystemCreatorGUIHandler.update();
+      muzzleFlashCreatorGUIHandler.update();
+      fpsWeaponGUIHandler.update();
     }
     cameraOperationsDone = false;
   }

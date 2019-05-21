@@ -150,7 +150,7 @@ MouseEventHandler.prototype.onClick = function(event, fromTap){
   omGUIFocused = false;
   tmGUIFocused = false;
   if (windowLoaded){
-    if (mode == 0 && fpsWeaponAlignmentConfigurationObject){
+    if (mode == 0 && fpsWeaponGUIHandler.fpsWeaponAlignmentConfigurationObject){
       return;
     }
     var rect = renderer.getCurrentViewport();
@@ -200,7 +200,7 @@ MouseEventHandler.prototype.onClick = function(event, fromTap){
       }
     }
     if (mode == 0){
-      if (guiHandler.datGuiPSCreator || guiHandler.datGuiFPSWeaponAlignment){
+      if (guiHandler.datGuiMuzzleFlashCreator || guiHandler.datGuiPSCreator || guiHandler.datGuiFPSWeaponAlignment){
         return;
       }
     }

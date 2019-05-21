@@ -333,12 +333,14 @@ var bloom;
 var macroHandler;
 var activeControl;
 var crosshairHandler;
-var fpsWeaponAlignmentConfigurationObject;
 var isOrientationLandscape;
 var shaderPrecisionHandler;
 var particleSystemCreatorGUIHandler;
+var muzzleFlashCreatorGUIHandler;
+var fpsWeaponGUIHandler;
 var preConfiguredParticleSystems = new Object();
 var preConfiguredParticleSystemPools = new Object();
+var muzzleFlashes = new Object();
 var particleSystemGenerator;
 var PARTICLE_REWIND_ON_COLLIDED = 2;
 var PARTICLE_DISSAPEAR_ON_COLLIDED = 1;
@@ -346,6 +348,12 @@ var PARTICLE_SYSTEM_ACTION_TYPE_NONE = -1;
 var PARTICLE_SYSTEM_ACTION_TYPE_START = 0;
 var PARTICLE_SYSTEM_ACTION_TYPE_STOP = 1;
 var PARTICLE_SYSTEM_ACTION_TYPE_HIDE = 2;
+var plusX = "+x";
+var plusY = "+y";
+var plusZ = "+z";
+var minusX = "-x";
+var minusY = "-y";
+var minusZ = "-z";
 
 // RENDER ORDERS
 var renderOrders = {

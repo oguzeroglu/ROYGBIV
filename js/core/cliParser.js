@@ -5011,42 +5011,7 @@ function parse(input){
             terminal.printError(Text.OBJECT_IS_NOT_MARKED_AS_FPS_WEAPON);
             return true;
           }
-          selectionHandler.resetCurrentSelection();
-          guiHandler.hideAll();
-          if (fpsWeaponAlignmentConfigurationObject){
-            if (fpsWeaponAlignmentConfigurationObject.name == objName){
-              terminal.printError(Text.GUI_IS_ALREADY_OPEN_FOR_THIS_OBJECT);
-              return true;
-            }
-            fpsWeaponAlignmentConfigurationObject.revertPositionAfterFPSWeaponConfigurations();
-          }
-          obj.quaternionBeforeFPSWeaponConfigurationPanelOpened = obj.mesh.quaternion.clone();
-          camera.quaternion.set(0, 0, 0, 1);
-          fpsWeaponAlignmentConfigurationObject = obj;
-          obj.onFPSWeaponAlignmentUpdate();
-          guiHandler.fpsWeaponAlignmentParameters.x = obj.fpsWeaponAlignment.x;
-          guiHandler.fpsWeaponAlignmentParameters.y = obj.fpsWeaponAlignment.y;
-          guiHandler.fpsWeaponAlignmentParameters.z = obj.fpsWeaponAlignment.z;
-          guiHandler.fpsWeaponAlignmentParameters.scale = obj.fpsWeaponAlignment.scale;
-          guiHandler.fpsWeaponAlignmentParameters["Rotate x"] = "0";
-          guiHandler.fpsWeaponAlignmentParameters["Rotate y"] = "0";
-          guiHandler.fpsWeaponAlignmentParameters["Rotate z"] = "0";
-          guiHandler.fpsWeaponAlignmentParameters["Translate x"] = "0";
-          guiHandler.fpsWeaponAlignmentParameters["Translate y"] = "0";
-          guiHandler.fpsWeaponAlignmentParameters["Translate z"] = "0";
-          guiHandler.fpsWeaponAlignmentParameters["Load from"] = "";
-          guiHandler.show(guiHandler.guiTypes.FPS_WEAPON_ALIGNMENT);
-          terminal.printInfo(Text.PRESS_DONE_BUTTON_TO);
-          terminal.disable();
-          activeControl = new CustomControls({});
-          window.hiddenObjectsDueToFPSWeaponAlignmentConfiguration = [];
-          for (var i = 0; i<scene.children.length; i++){
-            var child = scene.children[i];
-            if (child.id != obj.mesh.id && child.visible){
-              child.visible = false;
-              window.hiddenObjectsDueToFPSWeaponAlignmentConfiguration.push(child);
-            }
-          }
+          fpsWeaponGUIHandler.show(obj);
           return true;
         break;
         case 163: //shaderPrecision
@@ -5179,6 +5144,12 @@ function parse(input){
             terminal.printError(Text.PARTICLE_SYSTEM_USED_IN_A_POOL);
             return true;
           }
+          for (var muzzleFlashName in muzzleFlashes){
+            if (muzzleFlashes[muzzleFlashName].refPreconfiguredPS.name == preConfiguredParticleSystem.name){
+              terminal.printError(Text.PARTICLE_SYSTEM_USED_IN_A_MUZZLEFLASH);
+              return true;
+            }
+          }
           preConfiguredParticleSystem.destroy();
           if (!jobHandlerWorking){
             terminal.printInfo(Text.PARTICLE_SYSTEM_DESTROYED);
@@ -5263,6 +5234,95 @@ function parse(input){
             }
             guiHandler.hide(guiHandler.guiTypes.WORKER_STATUS);
             terminal.printInfo(Text.GUI_CLOSED);
+          }
+          return true;
+        break;
+        case 173: //newMuzzleFlash
+          if (mode != 0){
+            terminal.printError(Text.WORKS_ONLY_IN_DESIGN_MODE);
+            return true;
+          }
+          var muzzleFlashName = splitted[1];
+          var refPSName = splitted[2];
+          if (muzzleFlashes[muzzleFlashName]){
+            terminal.printError(Text.NAME_MUST_BE_UNIQUE);
+            return true;
+          }
+          var ps = preConfiguredParticleSystems[refPSName];
+          if (!ps){
+            terminal.printError(Text.NO_SUCH_PARTICLE_SYSTEM);
+            return true;
+          }
+          if (ps.isCollidable){
+            terminal.printError(Text.CANNOT_CREATE_MUZZLEFLASH_COLLIDABLE_PS);
+            return true;
+          }
+          if (ps.hasParticleCollision){
+            terminal.printError(Text.CANNOT_CREATE_MUZZLEFLASH_COLLIDABLE_PARTICLES);
+            return true;
+          }
+          muzzleFlashCreatorGUIHandler.show(muzzleFlashName, ps);
+          terminal.clear();
+          terminal.disable();
+          terminal.printInfo(Text.AFTER_MUZZLE_FLASH_CREATION);
+          return true;
+        break;
+        case 174: //editMuzzleFlash
+          if (mode != 0){
+            terminal.printError(Text.WORKS_ONLY_IN_DESIGN_MODE);
+            return true;
+          }
+          var muzzleFlashName = splitted[1];
+          var muzzleFlash = muzzleFlashes[muzzleFlashName];
+          if (!muzzleFlash){
+            terminal.printError(Text.NO_SUCH_MUZZLE_FLASH);
+            return true;
+          }
+          muzzleFlashCreatorGUIHandler.edit(muzzleFlash);
+          terminal.clear();
+          terminal.disable();
+          terminal.printInfo(Text.AFTER_MUZZLE_FLASH_CREATION);
+          return true;
+        break;
+        case 175: //destroyMuzzleFlash
+          if (mode != 0){
+            terminal.printInfo(Text.WORKS_ONLY_IN_DESIGN_MODE);
+            return true;
+          }
+          var muzzleFlashName = splitted[1];
+          if (!(muzzleFlashName.indexOf("*") == -1)){
+            new JobHandler(splitted).handle();
+            return true;
+          }
+          var muzzleFlash = muzzleFlashes[muzzleFlashName];
+          if (!muzzleFlash){
+            terminal.printError(Text.NO_SUCH_MUZZLE_FLASH);
+            return true;
+          }
+          if (muzzleFlash.getUsingWeaponName() != null){
+            terminal.printError(Text.MUZZLE_FLASH_USED_IN.replace(Text.PARAM1, muzzleFlash.getUsingWeaponName()));
+            return true;
+          }
+          muzzleFlash.destroy();
+          if (!jobHandlerWorking){
+            terminal.printInfo(Text.MUZZLE_FLASH_DESTROYED);
+          }
+          return true;
+        break;
+        case 176: //printMuzzleFlashes
+          var len = Object.keys(muzzleFlashes).length;
+          terminal.printHeader(Text.MUZZLE_FLASHES);
+          var ctr = 1;
+          for (var muzzleFlashName in muzzleFlashes){
+            var opts = true;
+            if (ctr == len){
+              opts = false;
+            }
+            ctr ++;
+            terminal.printInfo(Text.TREE2.replace(Text.PARAM1, muzzleFlashName).replace(Text.PARAM2, muzzleFlashes[muzzleFlashName].refPreconfiguredPS.name), opts);
+          }
+          if (len == 0){
+            terminal.printError(Text.NO_MUZZLE_FLASHES_CREATED);
           }
           return true;
         break;

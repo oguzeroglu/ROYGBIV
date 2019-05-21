@@ -96,10 +96,6 @@ ModeSwitcher.prototype.switchFromDesignToPreview = function(){
   if (particleSystemRefHeight){
     GLOBAL_PS_REF_HEIGHT_UNIFORM.value = ((renderer.getCurrentViewport().w / screenResolution) / particleSystemRefHeight);
   }
-  if (fpsWeaponAlignmentConfigurationObject){
-    fpsWeaponAlignmentConfigurationObject.revertPositionAfterFPSWeaponConfigurations();
-    fpsWeaponAlignmentConfigurationObject = 0;
-  }
   for (var gsName in gridSystems){
     scene.remove(gridSystems[gsName].gridSystemRepresentation);
     scene.remove(gridSystems[gsName].boundingPlane);
