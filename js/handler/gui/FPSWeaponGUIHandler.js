@@ -298,7 +298,30 @@ FPSWeaponGUIHandler.prototype.prepareGUI = function(){
   }
   var muzzleFlashAry = [];
   for (var muzzleFlashName in muzzleFlashes){
-    muzzleFlashAry.push(muzzleFlashName);
+    var muzzleFlashUsed = false;
+    for (var objName in addedObjects){
+      if (objName != fpsWeaponGUIHandler.fpsWeaponAlignmentConfigurationObject.name){
+        var obj = addedObjects[objName];
+        if (obj.isFPSWeapon && obj.muzzleFlashParameters && obj.muzzleFlashParameters.muzzleFlashName){
+          if (obj.muzzleFlashParameters.muzzleFlashName == muzzleFlashName){
+            muzzleFlashUsed = true;
+          }
+        }
+      }
+    }
+    for (var objName in objectGroups){
+      if (objName != fpsWeaponGUIHandler.fpsWeaponAlignmentConfigurationObject.name){
+        var obj = objectGroups[objName];
+        if (obj.isFPSWeapon && obj.muzzleFlashParameters && obj.muzzleFlashParameters.muzzleFlashName){
+          if (obj.muzzleFlashParameters.muzzleFlashName == muzzleFlashName){
+            muzzleFlashUsed = true;
+          }
+        }
+      }
+    }
+    if (!muzzleFlashUsed){
+      muzzleFlashAry.push(muzzleFlashName);
+    }
   }
   var muzzleFlashFolder = guiHandler.datGuiFPSWeaponAlignment.addFolder("Muzzle flash");
   var hasMuzzleFlashController = muzzleFlashFolder.add(this.muzzleFlashParameters, "Has muz. flash").onChange(function(val){
