@@ -196,3 +196,51 @@ ImportHandler.prototype.importParticleSystems = function(obj){
     muzzleFlashes[muzzleFlashName] = new MuzzleFlash(muzzleFlashName, preConfiguredParticleSystems[curMuzzleFlashExport.refPreconfiguredPSName], curMuzzleFlashExport.psCount, curMuzzleFlashExport.psTime);
   }
 }
+
+ImportHandler.prototype.importAreas = function(obj){
+  areasVisible = obj.areasVisible && !isDeployment;
+  for (var areaName in obj.areas){
+    var curAreaExport = obj.areas[areaName];
+    areas[areaName] = new Area(
+      areaName,
+      new THREE.Box3(
+        new THREE.Vector3(curAreaExport.bbMinX, curAreaExport.bbMinY, curAreaExport.bbMinZ),
+        new THREE.Vector3(curAreaExport.bbMaxX, curAreaExport.bbMaxY, curAreaExport.bbMaxZ)
+      ),
+      curAreaExport.color,
+      curAreaExport.gridSize
+    );
+    areaBinHandler.insert(areas[areaName].boundingBox, areaName);
+    if (areasVisible){
+      areas[areaName].renderToScreen();
+    }
+  }
+}
+
+ImportHandler.prototype.importScripts = function(obj){
+  for (var scriptName in obj.scripts){
+    var curScriptExport = obj.scripts[scriptName];
+    scripts[scriptName] = new Script(curScriptExport.name, curScriptExport.script);
+    if (curScriptExport.runAutomatically){
+      scripts[scriptName].runAutomatically = true;
+    }else{
+      scripts[scriptName].runAutomatically = false;
+    }
+    if (curScriptExport.localFilePath && !isDeployment){
+      modeSwitcher.totalScriptsToLoad ++;
+      scripts[scriptName].localFilePath = curScriptExport.localFilePath;
+    }
+  }
+}
+
+ImportHandler.prototype.importFog = function(obj){
+  var fogObj = obj.fogObj;
+  fogActive = fogObj.fogActive;
+  fogColor = fogObj.fogColor;
+  fogDensity = fogObj.fogDensity;
+  fogColorRGB = new THREE.Color(fogColor);
+  fogBlendWithSkybox = fogObj.blendWithSkybox;
+  if (fogActive){
+    fogColorRGB.setRGB(fogObj.r, fogObj.g, fogObj.b);
+  }
+}

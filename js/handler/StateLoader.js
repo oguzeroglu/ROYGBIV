@@ -17,14 +17,9 @@ StateLoader.prototype.load = function(){
     this.importHandler.importGridSystems(obj);
     this.importHandler.importMaterials(obj);
     this.importHandler.importParticleSystems(obj);
-
-    // GRID SYSTEMS ************************************************
-
-    // WALL COLLECTIONS ********************************************
-
-    // MATERIALS ***************************************************
-
-    // DEFAULT MATERIAL ********************************************
+    this.importHandler.importAreas(obj);
+    this.importHandler.importScripts(obj);
+    this.importHandler.importFog(obj);
 
     // ADDED OBJECTS ***********************************************
     var addedObjectsExport = obj.addedObjects;
@@ -763,66 +758,6 @@ StateLoader.prototype.load = function(){
       }
       skyBoxes[skyboxName] = skybox;
     }
-    // ANCHOR GRID *************************************************
-
-    // CROPPED GRID SYSTEM BUFFER **********************************
-
-    // SCRIPTS *****************************************************
-    for (var scriptName in obj.scripts){
-      var curScriptExport = obj.scripts[scriptName];
-      scripts[scriptName] = new Script(
-        curScriptExport.name, curScriptExport.script
-      );
-      if (curScriptExport.runAutomatically){
-        scripts[scriptName].runAutomatically = true;
-      }else{
-        scripts[scriptName].runAutomatically = false;
-      }
-      if (curScriptExport.localFilePath && !isDeployment){
-        modeSwitcher.totalScriptsToLoad ++;
-        scripts[scriptName].localFilePath = curScriptExport.localFilePath;
-      }
-    }
-
-    // OBJECT GROUPS ***********************************************
-    // NOT HERE -> SEE: finalize
-
-    // MARKED PONTS ************************************************
-
-    // OCTREE LIMIT ************************************************
-
-    // BIN SIZE AND STEP AMOUNT*************************************
-
-    // FOG *********************************************************
-    var fogObj = obj.fogObj;
-    fogActive = fogObj.fogActive;
-    fogColor = fogObj.fogColor;
-    fogDensity = fogObj.fogDensity;
-    fogColorRGB = new THREE.Color(fogColor);
-    fogBlendWithSkybox = fogObj.blendWithSkybox;
-    if (fogActive){
-      fogColorRGB.setRGB(fogObj.r, fogObj.g, fogObj.b);
-    }
-    // AREAS *******************************************************
-    areasVisible = obj.areasVisible;
-    for (var areaName in obj.areas){
-      var curAreaExport = obj.areas[areaName];
-      areas[areaName] = new Area(
-        areaName,
-        new THREE.Box3(
-          new THREE.Vector3(curAreaExport.bbMinX, curAreaExport.bbMinY, curAreaExport.bbMinZ),
-          new THREE.Vector3(curAreaExport.bbMaxX, curAreaExport.bbMaxY, curAreaExport.bbMaxZ)
-        ),
-        curAreaExport.color,
-        curAreaExport.gridSize
-      );
-      areaBinHandler.insert(areas[areaName].boundingBox, areaName);
-      if (areasVisible){
-        areas[areaName].renderToScreen();
-      }
-    }
-    // RESOLUTION **************************************************
-
     // FONTS *******************************************************
     this.hasFonts = false;
     var that = this;
@@ -839,16 +774,6 @@ StateLoader.prototype.load = function(){
       });
       font.load();
     }
-    // PRECONFIGURED PARTICLE SYSTEMS ******************************
-
-    // PRECONFIGURED PARTICLE SYSTEM POOLS *************************
-
-    // MUZZLE FLASHES **********************************************
-
-    // TEXTS *******************************************************
-    // NOT HERE -> SEE: finalize
-    // EFFECTS *****************************************************
-    // NOT HERE -> SEE: finalize
 
     if (!this.hasTextures && !this.hasTexturePacks && !this.hasSkyboxes && !this.hasFonts){
       this.finalize();
@@ -1147,6 +1072,7 @@ StateLoader.prototype.finalize = function(){
       }
     }
   }
+  // EFFECTS *******************************************************
   for (var effecName in obj.effects){
     renderer.effects[effecName].load(obj.effects[effecName]);
   }
