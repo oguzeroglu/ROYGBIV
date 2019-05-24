@@ -588,8 +588,6 @@ StateLoader.prototype.load = function(){
     var texturePacksExport = obj.texturePacks;
     for (var texturePackName in texturePacksExport){
       var curTexturePackExport = texturePacksExport[texturePackName];
-      var scaleFactor = curTexturePackExport.scaleFactor;
-      var refTexturePackName = curTexturePackExport.refTexturePackName;
       var texturePack = new TexturePack(
         texturePackName,
         curTexturePackExport.directoryName,
@@ -598,11 +596,8 @@ StateLoader.prototype.load = function(){
           this.that.totalLoadedTexturePackCount ++;
           this.that.mapLoadedTexturePack(this.texturePackName, this.objj);
           this.that.finalize();
-        }.bind({texturePackName: texturePackName, that: this, objj: obj, scaleFactorX: scaleFactor}),
-        true,
-        null,
-        scaleFactor,
-        refTexturePackName
+        }.bind({texturePackName: texturePackName, that: this, objj: obj}),
+        true
       );
       texturePacks[texturePackName] = texturePack;
       this.hasTexturePacks = true;

@@ -759,6 +759,7 @@ var CommandDescriptor = function(){
     102, //printPhysicsWorkerMode -> Physics workers are now always enabled if the web workers are supported.
     105, //printPerformance -> Deprecated because calling performance.now() multiple times on each render is costly.
     107, //rescaleTexture -> Deprecated due to lack of usecases.
+    108, //rescaleTexturePack -> Deprecated due to lack of usecases.
     109, //destroyImage -> Deprecated as uploadImage is also deprecated.
     117, //particleCollisionWorkerMode  -> Workers will be re-implemented.
     118, //printParticleCollisionWorkerMode -> Workers will be re-implemented.
@@ -1153,13 +1154,6 @@ var CommandDescriptor = function(){
   this.search = new Object();
   this.search.types = [];
   this.search.types.push(this.UNKNOWN_INDICATOR); //textToSearch
-
-  // rescaleTexturePack
-  this.rescaleTexturePack = new Object();
-  this.rescaleTexturePack.types = [];
-  this.rescaleTexturePack.types.push(this.TEXTURE_PACK_NAME); //texturePackName
-  this.rescaleTexturePack.types.push(this.UNKNOWN_INDICATOR); //scale
-  this.rescaleTexturePack.types.push(this.UNKNOWN_INDICATOR); //newTexturePackName
 
   // setBlending
   this.setBlending = new Object();
