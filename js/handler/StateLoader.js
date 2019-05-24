@@ -526,18 +526,6 @@ StateLoader.prototype.load = function(){
     }
     // TEXTURE URLS ************************************************
     textureURLs = Object.assign({}, obj.textureURLs);
-    // UPLOADED IMAGES *********************************************
-    var uploadedImagesExport = obj.uploadedImages;
-    for (var imgName in uploadedImagesExport){
-      var src = uploadedImagesExport[imgName];
-      var imageDom = document.createElement("img");
-      imageDom.src = src;
-      if (obj.uploadedImageSizes && obj.uploadedImageSizes[imgName]){
-        imageDom.width = obj.uploadedImageSizes[imgName].width;
-        imageDom.height = obj.uploadedImageSizes[imgName].height;
-      }
-      uploadedImages[imgName] = imageDom;
-    }
     // TEXTURES ****************************************************
     this.loaders = new Object();
     var uploadedTextures = obj.textures;
@@ -572,49 +560,6 @@ StateLoader.prototype.load = function(){
           that.mapLoadedTexture(this.textureX, this.textureNameX);
           that.finalize();
         }.bind({textureX: texture, textureNameX: textureName});
-      }else if (uploadedImages[textureURL]){
-        var texture = new THREE.Texture(uploadedImages[textureURL]);
-        texture.repeat.set(repeatU, repeatV);
-        texture.offset.x = offsetX;
-        texture.offset.y = offsetY;
-        texture.isLoaded = true;
-        texture.fromUploadedImage = true;
-        var skip = false;
-        if (texture.image.width && texture.image.height){
-          if (obj.textureSizes && obj.textureSizes[textureName]){
-            var imgW = texture.image.width;
-            var imgH = texture.image.height;
-            var newW = obj.textureSizes[textureName].width;
-            var newH = obj.textureSizes[textureName].height;
-            if (imgW != newW || imgH != newH){
-              var that = this;
-              texture.image.onload = function(){
-                var imgW = this.textureX.image.width;
-                var imgH = this.textureX.image.height;
-                var newW = obj.textureSizes[this.textureNameX].width;
-                var newH = obj.textureSizes[this.textureNameX].height;
-                var tmpCanvas = document.createElement("canvas");
-                tmpCanvas.width = newW;
-                tmpCanvas.height = newH;
-                tmpCanvas.getContext("2d").drawImage(this.textureX.image, 0, 0, imgW, imgH, 0, 0, newW, newH);
-                this.textureX.image = tmpCanvas;
-                this.textureX.needsUpdate = true;
-                textures[this.textureNameX] = this.textureX;
-                that.totalLoadedTextureCount ++;
-                that.mapLoadedTexture(this.textureX, this.textureNameX);
-                that.finalize();
-              }.bind({textureX: texture, textureNameX: textureName})
-              skip = true;
-            }
-          }
-        }
-        if (!skip){
-          textures[textureName] = texture;
-          that.totalLoadedTextureCount ++;
-          texture.needsUpdate = true;
-          this.mapLoadedTexture(texture, textureName);
-          this.finalize();
-        }
       }else{
         if (textureURL.toUpperCase().endsWith("DDS")){
           if (!DDS_SUPPORTED){
@@ -1309,7 +1254,6 @@ StateLoader.prototype.mapLoadedTexture = function(texture, textureName){
         var repeatU = curAddedObjectExport["textureRepeatU"];
         var repeatV = curAddedObjectExport["textureRepeatV"];
         var cloneTexture = texture;
-        cloneTexture.fromUploadedImage = texture.fromUploadedImage;
         cloneTexture.roygbivTextureName = textureName;
         cloneTexture.roygbivTexturePackName = 0;
 
@@ -1355,7 +1299,6 @@ StateLoader.prototype.mapLoadedTexture = function(texture, textureName){
         var repeatV = curAddedObjectExport["textureRepeatV"];
 
         var cloneTexture = texture;
-        cloneTexture.fromUploadedImage = texture.fromUploadedImage;
         cloneTexture.roygbivTextureName = textureName;
         cloneTexture.roygbivTexturePackName = 0;
 
@@ -1391,7 +1334,6 @@ StateLoader.prototype.mapLoadedTexture = function(texture, textureName){
         var repeatV = curAddedObjectExport["textureRepeatV"];
 
         var cloneTexture = texture;
-        cloneTexture.fromUploadedImage = texture.fromUploadedImage;
         cloneTexture.roygbivTextureName = textureName;
         cloneTexture.roygbivTexturePackName = 0;
 
@@ -1427,7 +1369,6 @@ StateLoader.prototype.mapLoadedTexture = function(texture, textureName){
         var repeatV = curAddedObjectExport["textureRepeatV"];
 
         var cloneTexture = texture;
-        cloneTexture.fromUploadedImage = texture.fromUploadedImage;
         cloneTexture.roygbivTextureName = textureName;
         cloneTexture.roygbivTexturePackName = 0;
 
@@ -1463,7 +1404,6 @@ StateLoader.prototype.mapLoadedTexture = function(texture, textureName){
         var repeatV = curAddedObjectExport["textureRepeatV"];
 
         var cloneTexture = texture;
-        cloneTexture.fromUploadedImage = texture.fromUploadedImage;
         cloneTexture.roygbivTextureName = textureName;
         cloneTexture.roygbivTexturePackName = 0;
 
@@ -1566,7 +1506,6 @@ StateLoader.prototype.resetProject = function(){
   textureURLs = new Object();
   physicsTests = new Object();
   wallCollections = new Object();
-  uploadedImages = new Object();
   modifiedTextures = new Object();
   texturePacks = new Object();
   skyBoxes = new Object();

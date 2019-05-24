@@ -608,23 +608,7 @@ function parse(input){
             terminal.printError(Text.TEXTURE_NAME_NOT_VALID);
             return true;
           }
-
           var fileName = splitted[2];
-
-          if (uploadedImages[fileName]){
-            var imageDom = uploadedImages[fileName];
-            var texture = new THREE.Texture(imageDom);
-            texture.wrapS = THREE.RepeatWrapping;
-            texture.wrapT = THREE.RepeatWrapping;
-            texture.needsUpdate = true;
-            textures[textureName] = texture;
-            textureURLs[textureName] = fileName;
-            texture.isLoaded = true;
-            texture.fromUploadedImage = true;
-            terminal.printInfo(Text.TEXTURE_CREATED);
-            return true;
-          }
-
           var textureUrl = "textures/"+fileName;
           var texture;
           var found = false;
@@ -816,7 +800,6 @@ function parse(input){
           }
 
           var cloneTexture = texture;
-          cloneTexture.fromUploadedImage = texture.fromUploadedImage;
 
           cloneTexture.roygbivTextureName = textureName;
           cloneTexture.roygbivTexturePackName = 0;
@@ -1362,70 +1345,10 @@ function parse(input){
           terminal.printInfo(Text.CAMERA_RESET);
         break;
         case 41: //uploadImage
-          var name = splitted[1];
-          if (mode != 0){
-            terminal.printError(Text.WORKS_ONLY_IN_DESIGN_MODE);
-            return true;
-          }
-          if (!FileReader){
-            terminal.printError(Text.THIS_FUNCTION_IS_NOT_SUPPORTED_IN_YOUR_BROWSER);
-            return true;
-          }
-          if (uploadedImages[name]){
-            terminal.printError(Text.NAME_MUST_BE_UNIQUE);
-            return true;
-          }
-          if (name.trim() == ""){
-            terminal.printError(Text.NAME_CANNOT_BE_EMPTY);
-            return true;
-          }
-          document.getElementById("imageUploaderInput").onclick = function(){
-            this.value = "";
-            document.getElementById("imageUploaderInput").onchange = function(event){
-              terminal.clear();
-              terminal.printInfo(Text.LOADING_IMAGE);
-              var target = event.target || window.event.srcElement;
-              var files = target.files;
-              if (files && files.length){
-                var fileReader = new FileReader();
-                fileReader.onload = function(e){
-                  var url = e.target.result;
-                  var imageDom = document.createElement("img");
-                  imageDom.src = url;
-                  uploadedImages[name] = imageDom;
-                  terminal.clear();
-                  terminal.printInfo(Text.IMAGE_CREATED.replace(
-                    Text.PARAM1, name
-                  ));
-                };
-                fileReader.readAsDataURL(files[0]);
-              }else{
-                terminal.printError(Text.NO_FILE_SELECTED_OPERATION_CANCELLED);
-              }
-              return true;
-            };
-          }
-          imageUploaderInput.click();
-          terminal.printInfo(Text.DIALOG_OPENED_CHOOSE_AN_IMAGE);
+          // DEPRECATED
         break;
         case 42: //printImages
-          var count = 0;
-          var length = Object.keys(uploadedImages).length;
-          terminal.printHeader(Text.IMAGES);
-          for (var imageName in uploadedImages){
-            count ++;
-            var options = true;
-            if (count == length){
-              options = false;
-            }
-            terminal.printInfo(Text.TREE.replace(
-              Text.PARAM1, imageName
-            ), options);
-          }
-          if (count == 0){
-            terminal.printError(Text.NO_UPLOADED_IMAGES);
-          }
-          return true;
+          // DEPRECATED
         break;
         case 43: //mapSpecular
           // DEPRECATED
@@ -1464,7 +1387,6 @@ function parse(input){
           }
 
           var cloneTexture = texture;
-          cloneTexture.fromUploadedImage = texture.fromUploadedImage;
 
           cloneTexture.roygbivTextureName = textureName;
           cloneTexture.roygbivTexturePackName = 0;
@@ -1512,7 +1434,6 @@ function parse(input){
           }
 
           var cloneTexture = texture;
-          cloneTexture.fromUploadedImage = texture.fromUploadedImage;
 
           cloneTexture.roygbivTextureName = textureName;
           cloneTexture.roygbivTexturePackName = 0;
@@ -1581,7 +1502,6 @@ function parse(input){
           }
 
           var cloneTexture = texture;
-          cloneTexture.fromUploadedImage = texture.fromUploadedImage;
 
           cloneTexture.roygbivTextureName = textureName;
           cloneTexture.roygbivTexturePackName = 0;
@@ -1807,7 +1727,6 @@ function parse(input){
           }
 
           var cloneTexture = texture;
-          cloneTexture.fromUploadedImage = texture.fromUploadedImage;
 
           cloneTexture.roygbivTextureName = textureName;
           cloneTexture.roygbivTexturePackName = 0;
@@ -3175,7 +3094,6 @@ function parse(input){
           resizedTexture.wrapT = texture.wrapT;
           resizedTexture.repeat.set(texture.repeat.x, texture.repeat.y);
           resizedTexture.isLoaded = texture.isLoaded;
-          resizedTexture.fromUploadedImage = texture.fromUploadedImage;
           textures[newTextureName] = resizedTexture;
           textureURLs[newTextureName] = textureURLs[textureName];
           modifiedTextures[newTextureName] = resizedTexture.image.toDataURL();
@@ -3260,30 +3178,7 @@ function parse(input){
           return true;
         break;
         case 109: //destroyImage
-          var imgName = splitted[1];
-          if (mode == 1){
-            terminal.printError(Text.WORKS_ONLY_IN_DESIGN_MODE);
-            return true;
-          }
-          if (!(imgName.indexOf("*") == -1)){
-            new JobHandler(splitted).handle();
-            return true;
-          }
-          if (!uploadedImages[imgName]){
-            terminal.printError(Text.NO_SUCH_IMAGE);
-            return true;
-          }
-          for (var textureName in textureURLs){
-            if (textureURLs[textureName] == imgName){
-              terminal.printError(Text.IMAGE_USED_IN_TEXTURE.replace(Text.PARAM1, textureName));
-              return true;
-            }
-          }
-          delete uploadedImages[imgName];
-          if (!jobHandlerWorking){
-            terminal.printInfo(Text.IMAGE_DESTROYED);
-          }
-          return true;
+          // DEPRECATED
         break;
         case 110: //setBlending
           if (mode != 0){
@@ -3519,7 +3414,6 @@ function parse(input){
           );
           var newTexture = new THREE.CanvasTexture(tmpCanvas);
           newTexture.isLoaded = srcTexture.isLoaded;
-          newTexture.fromUploadedImage = srcTexture.fromUploadedImage;
           textures[newTextureName] = newTexture;
           textureURLs[newTextureName] = textureURLs[textureName];
           newTexture.paddingInfo = padding+","+srcWidth+","+srcHeight;

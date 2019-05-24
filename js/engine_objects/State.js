@@ -57,16 +57,6 @@ var State = function(projectName, author){
     addedbObjectsExport[objectName] = addedObjects[objectName].export();
   }
   this.addedObjects = addedbObjectsExport;
-  // UPLOADED IMAGE SIZES ******************************************
-  var uploadedImageSizes = new Object();
-  for (var uploadedImageName in uploadedImages){
-    var img = uploadedImages[uploadedImageName];
-    var size = new Object();
-    size.width = img.width;
-    size.height = img.height;
-    uploadedImageSizes[uploadedImageName] = size;
-  }
-  this.uploadedImageSizes = uploadedImageSizes;
   // TEXTURE SIZES AND PADDING *************************************
   var textureSizes = new Object();
   var texturePaddings = new Object();
@@ -94,12 +84,6 @@ var State = function(projectName, author){
     wallCollectionsExport[wallCollectionName] = wallCollections[wallCollectionName].export();
   }
   this.wallCollections = wallCollectionsExport;
-  // UPLOADED IMAGES ***********************************************
-  var uploadedImagesExport = new Object();
-  for (var imageName in uploadedImages){
-    uploadedImagesExport[imageName] = uploadedImages[imageName].src;
-  }
-  this.uploadedImages = uploadedImagesExport;
   // MODIFIED TEXTURES *********************************************
   var modifiedTexturesExport = new Object();
   for (var textureName in modifiedTextures){

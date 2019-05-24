@@ -140,8 +140,6 @@ window.onload = function() {
     guiHandler = new GUIHandler();
   }
 
-  // IMAGE UPLOADER
-  imageUploaderInput = $("#imageUploaderInput");
   // LOAD
   loadInput = $("#loadInput");
   // 3D CANVAS

@@ -13,9 +13,6 @@ var scriptCreatorTextArea;
 // VERSION
 var ROYGBIV_ENGINE_VERSION = 1;
 
-//IMAGE UPLOADER
-var imageUploaderInput;
-
 // LOAD
 var loadInput;
 
@@ -107,7 +104,6 @@ var clickableAddedTexts2D = new Object();
 var textures = new Object();
 var textureURLs = new Object();
 var wallCollections = new Object();
-var uploadedImages = new Object();
 var modifiedTextures = new Object();
 var texturePacks = new Object();
 var skyBoxes = new Object();
