@@ -104,7 +104,6 @@ var clickableAddedTexts2D = new Object();
 var textures = new Object();
 var textureURLs = new Object();
 var wallCollections = new Object();
-var modifiedTextures = new Object();
 var texturePacks = new Object();
 var skyBoxes = new Object();
 var scripts = new Object();

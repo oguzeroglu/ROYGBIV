@@ -763,7 +763,6 @@ function parse(input){
           }
           delete textures[textureName];
           delete textureURLs[textureName];
-          delete modifiedTextures[textureName];
           if (!jobHandlerWorking){
             terminal.printInfo(Text.TEXTURE_DESTROYED);
           }
@@ -3045,60 +3044,7 @@ function parse(input){
           return true;
         break;
         case 107: //rescaleTexture
-          var textureName = splitted[1];
-          var scale = splitted[2];
-          var newTextureName = splitted[3];
-          if (mode == 1){
-            terminal.printError(Text.WORKS_ONLY_IN_DESIGN_MODE);
-            return true;
-          }
-
-          if (newTextureName.indexOf(PIPE) != -1){
-            terminal.printError(Text.TEXTURE_NAME_NOT_VALID);
-            return true;
-          }
-          var texture = textures[textureName];
-          if (typeof texture == "undefined"){
-            terminal.printError(Text.NO_SUCH_TEXTURE);
-            return true;
-          }else{
-            if (!(texture instanceof THREE.Texture)){
-              terminal.printError(Text.TEXTURE_NOT_READY);
-              return true;
-            }
-          }
-          if (texture instanceof THREE.CompressedTexture){
-            terminal.printError(Text.COMPRESSED_TEXTURES_DO_NOT_SUPPORT);
-            return true;
-          }
-          if (!(typeof textures[newTextureName] == "undefined")){
-            terminal.printError(Text.TEXTURE_NAME_MUST_BE_UNIQUE);
-            return true;
-          }
-          if (isNaN(scale)){
-            terminal.printError(Text.IS_NOT_A_NUMBER.replace(Text.PARAM1, "scale parameter"));
-            return true;
-          }
-          if (texture.image.width * scale < 1 || texture.image.height * scale < 1){
-            terminal.printError(Text.TEXTURE_SIZE_TOO_SMALL);
-            return true;
-          }
-          var stdCanvas = document.createElement("canvas");
-          stdCanvas.width = texture.image.width;
-          stdCanvas.height = texture.image.height;
-          var stdContext = stdCanvas.getContext("2d");
-          stdContext.drawImage(texture.image, 0, 0, stdCanvas.width, stdCanvas.height);
-          var resizedCanvas = rescale(stdCanvas, scale);
-          var resizedTexture = new THREE.CanvasTexture(resizedCanvas);
-          resizedTexture.wrapS = texture.wrapS;
-          resizedTexture.wrapT = texture.wrapT;
-          resizedTexture.repeat.set(texture.repeat.x, texture.repeat.y);
-          resizedTexture.isLoaded = texture.isLoaded;
-          textures[newTextureName] = resizedTexture;
-          textureURLs[newTextureName] = textureURLs[textureName];
-          modifiedTextures[newTextureName] = resizedTexture.image.toDataURL();
-          terminal.printInfo(Text.TEXTURE_RESCALED);
-          return true;
+          // DEPRECATED
         break;
         case 108: //rescaleTexturePack
           var texturePackName = splitted[1];
@@ -3374,53 +3320,7 @@ function parse(input){
           // DEPRECATED
         break;
         case 122: //addPaddingToTexture
-          if (mode != 0){
-            terminal.printError(Text.WORKS_ONLY_IN_DESIGN_MODE);
-            return true;
-          }
-          var textureName = splitted[1];
-          var padding = parseFloat(splitted[2]);
-          var newTextureName = splitted[3];
-          var srcTexture = textures[textureName];
-          if (!srcTexture){
-            terminal.printError(Text.NO_SUCH_TEXTURE);
-            return true;
-          }
-          if (srcTexture instanceof THREE.CompressedTexture){
-            terminal.printError(Text.COMPRESSED_TEXTURES_DO_NOT_SUPPORT);
-            return true;
-          }
-          if (textures[newTextureName]){
-            terminal.printError(Text.TEXTURE_NAME_MUST_BE_UNIQUE);
-            return true;
-          }
-          if (isNaN(padding)){
-            terminal.printError(Text.PADDING_MUST_BE_A_NUMBER);
-            return true;
-          }
-          if (padding <= 0){
-            terminal.printError(Text.PADDING_MUST_BE_POSITIVE);
-            return true;
-          }
-          var srcWidth = srcTexture.image.width;
-          var srcHeight = srcTexture.image.height;
-          var newWidth = srcWidth + (2 * padding);
-          var newHeight = srcHeight + (2 * padding);
-          var tmpCanvas = document.createElement("canvas");
-          tmpCanvas.width = newWidth;
-          tmpCanvas.height = newHeight;
-          tmpCanvas.getContext("2d").drawImage(
-            srcTexture.image, 0, 0, srcWidth, srcHeight, padding, padding, srcWidth, srcHeight
-          );
-          var newTexture = new THREE.CanvasTexture(tmpCanvas);
-          newTexture.isLoaded = srcTexture.isLoaded;
-          textures[newTextureName] = newTexture;
-          textureURLs[newTextureName] = textureURLs[textureName];
-          newTexture.paddingInfo = padding+","+srcWidth+","+srcHeight;
-          newTexture.hasPadding = true;
-          modifiedTextures[newTextureName] = tmpCanvas.toDataURL();
-          terminal.printInfo(Text.PADDING_ADDED_TO_TEXTURE);
-          return true;
+          // DEPRECATED;
         break;
         case 123: //newSphere
           if (mode != 0){

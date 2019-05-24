@@ -758,12 +758,14 @@ var CommandDescriptor = function(){
     101, //physicsWorkerMode -> Physics workers are now always enabled if the web workers are supported.
     102, //printPhysicsWorkerMode -> Physics workers are now always enabled if the web workers are supported.
     105, //printPerformance -> Deprecated because calling performance.now() multiple times on each render is costly.
+    107, //rescaleTexture -> Deprecated due to lack of usecases.
     109, //destroyImage -> Deprecated as uploadImage is also deprecated.
     117, //particleCollisionWorkerMode  -> Workers will be re-implemented.
     118, //printParticleCollisionWorkerMode -> Workers will be re-implemented.
     119, //particleSystemCollisionWorkerMode -> Workers will be re-implemented.
     120, //printParticleCollisionWorkerMode -> Workers will be re-implemented.
     121, //logFrameDrops -> No need for such functionality after the usage of Stats.js
+    122, //addPaddingToTexture -> Deprecated due to lack of usecases.
     125, //applyDisplacementMap -> Deprecated because causes problems with geometry caching.
     127, //setAtlasTextureSize -> Deprecated because has no use cases after deprecation of TextureMerger class
     128 //printAtlasTextureSize -> Deprecated due to same reasons as setAtlasTextureSize
@@ -1152,13 +1154,6 @@ var CommandDescriptor = function(){
   this.search.types = [];
   this.search.types.push(this.UNKNOWN_INDICATOR); //textToSearch
 
-  // rescaleTexture
-  this.rescaleTexture = new Object();
-  this.rescaleTexture.types = [];
-  this.rescaleTexture.types.push(this.TEXTURE_NAME); //textureName
-  this.rescaleTexture.types.push(this.UNKNOWN_INDICATOR); //scale
-  this.rescaleTexture.types.push(this.UNKNOWN_INDICATOR); //newTextureName
-
   // rescaleTexturePack
   this.rescaleTexturePack = new Object();
   this.rescaleTexturePack.types = [];
@@ -1186,13 +1181,6 @@ var CommandDescriptor = function(){
   this.setBinSize = new Object();
   this.setBinSize.types = [];
   this.setBinSize.types.push(this.UNKNOWN_INDICATOR); //size
-
-  // addPaddingToTexture
-  this.addPaddingToTexture = new Object();
-  this.addPaddingToTexture.types = [];
-  this.addPaddingToTexture.types.push(this.TEXTURE_NAME); // textureName
-  this.addPaddingToTexture.types.push(this.UNKNOWN_INDICATOR); // padding
-  this.addPaddingToTexture.types.push(this.UNKNOWN_INDICATOR); // newTextureName
 
   // newSphere
   this.newSphere = new Object();

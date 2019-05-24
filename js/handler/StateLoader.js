@@ -542,80 +542,46 @@ StateLoader.prototype.load = function(){
       var repeatU = curTexture.repeat[0];
       var repeatV = curTexture.repeat[1];
       var textureURL = textureURLs[textureName];
-      if (obj.modifiedTextures[textureName]){
-        var img = new Image();
-        img.src = obj.modifiedTextures[textureName];
-        var texture = new THREE.Texture(img);
-        texture.needsUpdate = true;
-        texture.repeat.set(repeatU, repeatV);
-        texture.offset.x = offsetX;
-        texture.offset.y = offsetY;
-        texture.isLoaded = true;
-        modifiedTextures[textureName] = obj.modifiedTextures[textureName];
-        var that = this;
-        texture.image.onload = function(){
-          textures[this.textureNameX] = this.textureX;
-          that.totalLoadedTextureCount ++;
-          this.textureX.needsUpdate = true;
-          that.mapLoadedTexture(this.textureX, this.textureNameX);
-          that.finalize();
-        }.bind({textureX: texture, textureNameX: textureName});
-      }else{
-        if (textureURL.toUpperCase().endsWith("DDS")){
-          if (!DDS_SUPPORTED){
-            textureURL = textureURL.replace(
-              ".dds", compressedTextureFallbackFormat
-            ).replace(
-              ".DDS", compressedTextureFallbackFormat
-            );
-            this.loaders[textureName] = textureLoader;
-          }else{
-            this.loaders[textureName] = ddsLoader;
-          }
-        }else if (textureURL.toUpperCase().endsWith("TGA")){
-          this.loaders[textureName] = tgaLoader;
-        }else{
+      if (textureURL.toUpperCase().endsWith("DDS")){
+        if (!DDS_SUPPORTED){
+          textureURL = textureURL.replace(
+            ".dds", compressedTextureFallbackFormat
+          ).replace(
+            ".DDS", compressedTextureFallbackFormat
+          );
           this.loaders[textureName] = textureLoader;
+        }else{
+          this.loaders[textureName] = ddsLoader;
         }
-        textures[textureName] = 1;
-        var that = this;
-        this.loaders[textureName].load(textureURL,
-          function(textureData){
-            var textureNameX = this.textureNameX;
-            textures[textureNameX] = textureData;
-            that.totalLoadedTextureCount ++;
-            var hasPadding = (obj.texturePaddings[textureNameX] !== undefined);
-            if (obj.textureSizes && obj.textureSizes[textureNameX]){
-              var size = obj.textureSizes[textureNameX];
-              if (!this.isCompressed){
-                if (size.width != textureData.image.width || size.height != textureData.image.height){
-                  var tmpCanvas = document.createElement("canvas");
-                  tmpCanvas.width = size.width;
-                  tmpCanvas.height = size.height;
-                  tmpCanvas.getContext("2d").drawImage(textureData.image, 0, 0, textureData.image.width, textureData.image.height, 0, 0, size.width, size.height);
-                  textureData.image = tmpCanvas;
-                  textureData.needsUpdate = true;
-                }
-              }
-            }
-            textures[textureNameX].needsUpdate = true;
-            textures[textureNameX].isLoaded = true;
-            textures[textureNameX].repeat.set(this.repeatUU, this.repeatVV);
-            textures[textureNameX].offset.x = this.offsetXX;
-            textures[textureNameX].offset.y = this.offsetYY;
-            that.mapLoadedTexture(textures[textureNameX], textureNameX);
-            that.finalize();
-          }.bind({textureNameX: textureName, offsetXX: offsetX, offsetYY: offsetY, repeatUU: repeatU, repeatVV: repeatV, isCompressed: (
-            this.loaders[textureName] instanceof THREE.DDSLoader
-          )}), function(xhr){
-            textures[this.textureNameX] = 2;
-          }.bind({textureNameX: textureName}), function(xhr){
-            textures[this.textureNameX] = 3;
-            that.totalLoadedTextureCount ++;
-            that.finalize();
-          }.bind({textureNameX: textureName})
-        );
+      }else if (textureURL.toUpperCase().endsWith("TGA")){
+        this.loaders[textureName] = tgaLoader;
+      }else{
+        this.loaders[textureName] = textureLoader;
       }
+      textures[textureName] = 1;
+      var that = this;
+      this.loaders[textureName].load(textureURL,
+        function(textureData){
+          var textureNameX = this.textureNameX;
+          textures[textureNameX] = textureData;
+          that.totalLoadedTextureCount ++;
+          textures[textureNameX].needsUpdate = true;
+          textures[textureNameX].isLoaded = true;
+          textures[textureNameX].repeat.set(this.repeatUU, this.repeatVV);
+          textures[textureNameX].offset.x = this.offsetXX;
+          textures[textureNameX].offset.y = this.offsetYY;
+          that.mapLoadedTexture(textures[textureNameX], textureNameX);
+          that.finalize();
+        }.bind({textureNameX: textureName, offsetXX: offsetX, offsetYY: offsetY, repeatUU: repeatU, repeatVV: repeatV, isCompressed: (
+          this.loaders[textureName] instanceof THREE.DDSLoader
+        )}), function(xhr){
+          textures[this.textureNameX] = 2;
+        }.bind({textureNameX: textureName}), function(xhr){
+          textures[this.textureNameX] = 3;
+          that.totalLoadedTextureCount ++;
+          that.finalize();
+        }.bind({textureNameX: textureName})
+      );
       this.hasTextures = true;
     }
     // TEXTURE PACKS ***********************************************
@@ -1506,7 +1472,6 @@ StateLoader.prototype.resetProject = function(){
   textureURLs = new Object();
   physicsTests = new Object();
   wallCollections = new Object();
-  modifiedTextures = new Object();
   texturePacks = new Object();
   skyBoxes = new Object();
   scripts = new Object();
