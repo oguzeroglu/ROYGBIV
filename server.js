@@ -1,8 +1,9 @@
 var express = require("express");
 var http = require("http");
-var bodyParser = require('body-parser');
-var fs = require('fs');
-var path = require('path');
+var bodyParser = require("body-parser");
+var fs = require("fs");
+var path = require("path");
+var textureCompressor = require("texture-compressor");
 
 console.log("*******************************************")
 console.log( " ____   _____   ______ ____ _____     __ ");
@@ -72,12 +73,82 @@ app.post("/getTexturePackFolders", function(req, res){
   res.send(JSON.stringify(folders));
 });
 
-app.post("/prepareTexturePack", function(req, res){
+app.post("/prepareTexturePack", async function(req, res){
   console.log("[*] Preparing texture pack: "+req.body.texturePackName);
-  var info = {};
+  var info = {hasDiffuse: false, hasAlpha: false, hasAO: false, hasEmissive: false, hasHeight: false};
   res.setHeader('Content-Type', 'application/json');
+  var mainPath = "./texture_packs/"+req.body.texturePackName;
+  if (fs.existsSync(mainPath+"/diffuse.png")){
+    info.hasDiffuse = true;
+    await compressTexture("astc", "diffuse", mainPath);
+    await compressTexture("etc", "diffuse", mainPath);
+    await compressTexture("pvrtc", "diffuse", mainPath);
+    await compressTexture("s3tc", "diffuse", mainPath);
+  }
+  if (fs.existsSync(mainPath+"/alpha.png")){
+    info.hasAlpha = true;
+    await compressTexture("astc", "alpha", mainPath);
+    await compressTexture("etc", "alpha", mainPath);
+    await compressTexture("pvrtc", "alpha", mainPath);
+    await compressTexture("s3tc", "alpha", mainPath);
+  }
+  if (fs.existsSync(mainPath+"/ao.png")){
+    info.hasAO = true;
+    await compressTexture("astc", "ao", mainPath);
+    await compressTexture("etc", "ao", mainPath);
+    await compressTexture("pvrtc", "ao", mainPath);
+    await compressTexture("s3tc", "ao", mainPath);
+  }
+  if (fs.existsSync(mainPath+"/emissive.png")){
+    info.hasEmissive = true;
+    await compressTexture("astc", "emissive", mainPath);
+    await compressTexture("etc", "emissive", mainPath);
+    await compressTexture("pvrtc", "emissive", mainPath);
+    await compressTexture("s3tc", "emissive", mainPath);
+  }
+  if (fs.existsSync(mainPath+"/height.png")){
+    info.hasHeight = true;
+    await compressTexture("astc", "height", mainPath);
+    await compressTexture("etc", "height", mainPath);
+    await compressTexture("pvrtc", "height", mainPath);
+    await compressTexture("s3tc", "height", mainPath);
+  }
   res.send(JSON.stringify(info));
 });
+
+function compressTexture(type, fileName, mainPath){
+  var quality, compression;
+  var output = mainPath+"/"+fileName+"-"+type+".ktx";
+  if (fs.existsSync(output)){
+    return new Promise(function(resolve, reject){resolve();});
+  }
+  switch(type){
+    case "astc":
+      quality = "astcmedium";
+      compression = "ASTC_4x4";
+    break;
+    case "etc":
+      quality = "etcfast";
+      compression = "ETC2_RGBA";
+    break;
+    case "pvrtc":
+      quality = "pvrtcnormal";
+      compression = "PVRTC1_4";
+    break;
+    case "s3tc":
+      quality = "normal";
+      compression = "DXT1A";
+    break;
+  }
+  return textureCompressor.pack({
+    type: type,
+    input: mainPath+"/"+fileName+".png",
+    output: output,
+    compression: compression,
+    quality: quality,
+    verbose: true,
+  });
+}
 
 function copyWorkers(application){
   fs.mkdirSync("deploy/"+application.projectName+"/js/worker/");

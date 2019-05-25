@@ -22,7 +22,7 @@ TexturePackCreatorGUIHandler.prototype.init = function(){
 TexturePackCreatorGUIHandler.prototype.loadTexturePack = function(){
   this.isLoading = true;
   terminal.clear();
-  terminal.printInfo(Text.LOADING);
+  terminal.printInfo(Text.COMPRESSING_TEXTURE);
   if (this.testMesh){
     this.testMesh.visible = false;
   }
@@ -35,7 +35,8 @@ TexturePackCreatorGUIHandler.prototype.loadTexturePack = function(){
   xhr.setRequestHeader("Content-type", "application/json");
   xhr.onreadystatechange = function (){
     if (xhr.readyState == 4 && xhr.status == 200){
-      
+      var resp = JSON.parse(xhr.responseText);
+      console.log(resp);
     }
   }
   xhr.send(JSON.stringify({texturePackName: texturePackCreatorGUIHandler.configurations["Texture pack"]}));
