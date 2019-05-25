@@ -365,7 +365,7 @@ function startDeployment(){
     var stateLoader = new StateLoader(data);
     var result = stateLoader.load();
     if (result){
-      if (stateLoader.hasTextures || stateLoader.hasTexturePacks || stateLoader.hasSkyboxes || stateLoader.hasFonts){
+      if (stateLoader.hasTexturePacks || stateLoader.hasSkyboxes || stateLoader.hasFonts){
         appendtoDeploymentConsole("Loading assets.");
       }
     }else{
@@ -623,19 +623,6 @@ function dumpPerformance(){
 }
 
 //******************************************************************
-// WARNING: FOR TEST PURPOSES - WORKS ONLY FOR CANVAS TEXTURES
-function debugTexture(textureName){
-  var texture = textures[textureName];
-  if (!texture){
-    texture = textureName;
-  }
-  var context = texture.image.getContext("2d");
-  var newTab = window.open();
-  var img = new Image(texture.image.width, texture.image.height);
-  img.src = texture.image.toDataURL();
-  newTab.document.body.appendChild(img);
-}
-
 // WARNING: FOR TEST PURPOSES
 function debugCanvas(dbgCanvas){
   var context = dbgCanvas.getContext("2d");

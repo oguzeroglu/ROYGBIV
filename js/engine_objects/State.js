@@ -57,14 +57,6 @@ var State = function(projectName, author){
     addedbObjectsExport[objectName] = addedObjects[objectName].export();
   }
   this.addedObjects = addedbObjectsExport;
-  // TEXTURES ******************************************************
-  this.totalTextureCount = 0;
-  for (var textureName in textures){
-    this.totalTextureCount ++;
-  }
-  this.textures = JSON.parse(JSON.stringify(textures));
-  // TEXTURE URLS **************************************************
-  this.textureURLs = Object.assign({}, textureURLs);
   // WALL COLLECTIONS **********************************************
   var wallCollectionsExport = new Object();
   for (var wallCollectionName in wallCollections){

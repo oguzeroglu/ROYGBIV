@@ -465,9 +465,6 @@ ObjectGroup.prototype.handleRenderSide = function(val){
 }
 
 ObjectGroup.prototype.textureCompare = function(txt1, txt2){
-  if (txt1.roygbivTextureName != txt2.roygbivTextureName){
-    return false;
-  }
   if (txt1.roygbivTexturePackName != txt2.roygbivTexturePackName){
     return false;
   }

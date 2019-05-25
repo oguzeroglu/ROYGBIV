@@ -59,7 +59,6 @@ var Roygbiv = function(){
     "setVector",
     "quaternion",
     "fadeAway",
-    "createCrosshair",
     "selectCrosshair",
     "changeCrosshairColor",
     "hideCrosshair",
@@ -1056,58 +1055,6 @@ Roygbiv.prototype.stopMotionBlur = function(object){
 }
 
 // CROSSHAIR FUNCTIONS *********************************************************
-
-// Creates a new crosshair. Configurations are:
-// name: The unique name of the crosshair. (mandatory)
-// textureName: The texture name of the crosshair. (mandatory)
-// colorName: The color name of the crosshair. (mandatory)
-// alpha: The alpha value of the crosshair. (mandatory)
-// size: The size of the crosshair. (mandatory)
-// maxWidthPercent: If set the crosshair width cannot be more than maxWidthPercent% of the screen width. (optional)
-// maxHeightPercent: If set the crosshair height cannot be more than maxHeightPercent% of the screen height. (optional)
-Roygbiv.prototype.createCrosshair = function(configurations){
-  if (mode == 0){
-    return;
-  }
-  preConditions.checkIfDefined(ROYGBIV.createCrosshair, preConditions.configurations, configurations);
-  var name = configurations.name;
-  var textureName = configurations.textureName;
-  var colorName = configurations.colorName;
-  var alpha = configurations.alpha;
-  var size = configurations.size;
-  var maxWidthPercent = configurations.maxWidthPercent;
-  var maxHeightPercent = configurations.maxHeightPercent;
-  preConditions.checkIfMandatoryParameterExists(ROYGBIV.createCrosshair, preConditions.name, name);
-  preConditions.checkIfTrue(ROYGBIV.createCrosshair, "name must be unique", crosshairs[name]);
-  preConditions.checkIfMandatoryParameterExists(ROYGBIV.createCrosshair, preConditions.textureName, textureName);
-  var texture = textures[textureName];
-  preConditions.checkIfTextureExists(ROYGBIV.createCrosshair, preConditions.texture, texture);
-  preConditions.checkIfTextureReady(ROYGBIV.createCrosshair, preConditions.texture, texture);
-  preConditions.checkIfMandatoryParameterExists(ROYGBIV.createCrosshair, preConditions.alpha, alpha);
-  preConditions.checkIfNumber(ROYGBIV.createCrosshair, preConditions.alpha, alpha);
-  preConditions.checkIfInRange(ROYGBIV.createCrosshair, preConditions.alpha, alpha, 0, 1);
-  preConditions.checkIfMandatoryParameterExists(ROYGBIV.createCrosshair, preConditions.size, size);
-  preConditions.checkIfNumber(ROYGBIV.createCrosshair, preConditions.size, size);
-  preConditions.checkIfLessThan(ROYGBIV.createCrosshair, preConditions.size, size, 0);
-  preConditions.checkIfNumberOnlyIfExists(ROYGBIV.createCrosshair, preConditions.maxWidthPercent, maxWidthPercent);
-  preConditions.checkIfLessThanOnlyIfExists(ROYGBIV.createCrosshair, preConditions.maxWidthPercent, maxWidthPercent);
-  preConditions.checkIfTrueOnlyIfYExists(ROYGBIV.createCrosshair, "maxWidthPercent must be less than 100", (maxWidthPercent), (maxWidthPercent > 100));
-  preConditions.checkIfNumberOnlyIfExists(ROYGBIV.createCrosshair, preConditions.maxHeightPercent, maxHeightPercent);
-  preConditions.checkIfLessThanOnlyIfExists(ROYGBIV.createCrosshair, preConditions.maxHeightPercent, maxHeightPercent);
-  preConditions.checkIfTrueOnlyIfYExists(ROYGBIV.createCrosshair, "maxHeightPercent must be less than 100", (maxHeightPercent), (maxHeightPercent > 100));
-  var color = new THREE.Color(colorName);
-  new Crosshair({
-    name: name,
-    texture: texture,
-    colorR: color.r,
-    colorB: color.b,
-    colorG: color.g,
-    alpha: alpha,
-    size: size,
-    maxWidthPercent: maxWidthPercent,
-    maxHeightPercent: maxHeightPercent
-  });
-}
 
 // Selects a crosshair. Only the selected crosshair is visible on the screen.
 Roygbiv.prototype.selectCrosshair = function(crosshairName){
