@@ -732,6 +732,10 @@ var CommandDescriptor = function(){
   ];
 
   this.deprecatedCommandIndices = [
+    21, //newTexture -> Deprecated due to architectural changes in texture handling logic.
+    22, //printTextures -> Deprecated as newTexture is also deprecated.
+    23, //destroyTexture -> Deprecated as newTexture is also deprecated.
+    24, //mapTexture -> Deprecated due to architectural changes in texture handling logic.
     26, //newPhysicsBoxTest -> Deprecated due to lack of use cases. This command is implemented to test if the physics bodies fit the meshes. After the implementation of switchPhysicsDebugMode, this command is no longer needed.
     27, //newPhysicsSphereTest -> Deprecated due to lack of use cases. This command is implemented to test if the physics bodies fit the meshes. After the implementation of switchPhysicsDebugMode, this command is no longer needed.
     28, //printPhysicsTests -> Since box and sphere physics tests are deprecated, this command is no longer needed.
@@ -742,6 +746,8 @@ var CommandDescriptor = function(){
     42, //printImages -> Deprecated as uploadImage is also deprecated.
     43, //mapSpecular -> Specular maps are not supported for now.
     44, //mapEnvironment -> Deprecated due to lack of use cases of environment maps in the ROYGBIV engine. Will implement mirror materials for better visual effects.
+    45, //mapAmbientOcculsion -> Deprecated due to architectural changes in texture handling logic.
+    46, //mapAlpha -> Deprecated due to architectural changes in texture handling logic.
     47, //setDefaultMaterial -> Only BASIC materials are supported for now.
     48, //newAmbientLight -> Lights are not supported for now.
     49, //printLights -> Lights are not supported for now.
@@ -749,7 +755,9 @@ var CommandDescriptor = function(){
     51, //destroyLight -> Lights are not supported for now.
     52, //newPhongMaterial -> Phong materials are not supported for now.
     53, //mapNormal -> Normal maps are not supported for now.
+    54, //mapEmissive -> Deprecated due to architectural changes in texture handling logic.
     55, //newLambertMaterial -> Deprecated due to lack of uses cases. Phong is fine for light affected objects.
+    62, //mapHeight -> Deprecated due to architectural changes int exture handling logic.
     65, //superposeGridSystem -> Deprecated due to lack of uses cases after grid selection mode implementation.
     68, //newPointLight -> Lights are not supported for now.
     78, //undo -> Deprecated because causes memory issues for big projects.
@@ -795,7 +803,6 @@ var CommandDescriptor = function(){
   this.MATERIAL_NAME              =   5;
   this.MATERIAL_NAME_WITH_NULL    =   6;
   this.OBJECT_NAME                =   7;
-  this.TEXTURE_NAME               =   9;
   this.OBJECT_AXIS                =   10;
   this.PHYSICS_TEST_INDEX         =   11;
   this.STATE_ON_OFF               =   12;
@@ -890,23 +897,6 @@ var CommandDescriptor = function(){
   this.destroyObject.types = [];
   this.destroyObject.types.push(this.OBJECT_NAME); //name
 
-  // newTexture
-  this.newTexture = new Object();
-  this.newTexture.types = [];
-  this.newTexture.types.push(this.UNKNOWN_INDICATOR); //name
-  this.newTexture.types.push(this.UNKNOWN_INDICATOR); //fileName
-
-  // destroyTexture
-  this.destroyTexture = new Object();
-  this.destroyTexture.types = [];
-  this.destroyTexture.types.push(this.TEXTURE_NAME); //name
-
-  // mapTexture
-  this.mapTexture = new Object();
-  this.mapTexture.types = [];
-  this.mapTexture.types.push(this.TEXTURE_NAME); //textureName
-  this.mapTexture.types.push(this.OBJECT_NAME); // objectName
-
   // adjustTextureRepeat
   this.adjustTextureRepeat = new Object();
   this.adjustTextureRepeat.types = [];
@@ -948,24 +938,6 @@ var CommandDescriptor = function(){
   this.destroyWallCollection.types = [];
   this.destroyWallCollection.types.push(this.WALL_COLLECTION_NAME); //name
 
-  // mapAmbientOcculsion
-  this.mapAmbientOcculsion = new Object();
-  this.mapAmbientOcculsion.types = [];
-  this.mapAmbientOcculsion.types.push(this.TEXTURE_NAME); //textureName
-  this.mapAmbientOcculsion.types.push(this.OBJECT_NAME); //objectName
-
-  // mapAlpha
-  this.mapAlpha = new Object();
-  this.mapAlpha.types = [];
-  this.mapAlpha.types.push(this.TEXTURE_NAME); //textureName
-  this.mapAlpha.types.push(this.OBJECT_NAME); //objectName
-
-  // mapEmissive
-  this.mapEmissive = new Object();
-  this.mapEmissive.types = [];
-  this.mapEmissive.types.push(this.TEXTURE_NAME); //textureName
-  this.mapEmissive.types.push(this.OBJECT_NAME); //objectName
-
   // newTexturePack
   this.newTexturePack = new Object();
   this.newTexturePack.types = [];
@@ -993,12 +965,6 @@ var CommandDescriptor = function(){
   this.refreshTexturePack = new Object();
   this.refreshTexturePack.types = [];
   this.refreshTexturePack.types.push(this.TEXTURE_PACK_NAME); //name
-
-  // mapHeight
-  this.mapHeight = new Object();
-  this.mapHeight.types = [];
-  this.mapHeight.types.push(this.TEXTURE_NAME); //textureName
-  this.mapHeight.types.push(this.OBJECT_NAME); //objectName
 
   // resetMaps
   this.resetMaps = new Object();

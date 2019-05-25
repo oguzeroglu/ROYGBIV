@@ -2207,17 +2207,6 @@ AddedObject.prototype.isVisibleOnThePreviewScene = function(parentName){
   }
 }
 
-AddedObject.prototype.isTextureUsed = function(textureName){
-  var textureStack = this.getTextureStack();
-  for (var i = 0; i<textureStack.length; i++){
-    if (!(textureStack[i].roygbivTextureName == "undefined")){
-      if (textureStack[i].roygbivTextureName == textureName){
-        return true;
-      }
-    }
-  }
-}
-
 AddedObject.prototype.isTexturePackUsed = function(texturePackName){
   var textureStack = this.getTextureStack();
   for (var i = 0; i<textureStack.length; i++){

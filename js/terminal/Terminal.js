@@ -369,14 +369,6 @@ Terminal.prototype.autocomplete = function(command){
 				}
 				helpString = "[Objects]: "
 			break;
-			case commandDescriptor.TEXTURE_NAME:
-				for (textureName in textures){
-					if (textureName.startsWith(curEntry)){
-						possibilities.push(textureName);
-					}
-				}
-				helpString = "[Textures]: ";
-			break;
 			case commandDescriptor.OBJECT_AXIS:
 				if ("x".startsWith(curEntry.toLowerCase())){
 					possibilities.push("x");

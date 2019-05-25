@@ -595,228 +595,16 @@ function parse(input){
           return true;
         break;
         case 21: //newTexture
-          var textureName = splitted[1];
-          if (mode != 0){
-            terminal.printError(Text.WORKS_ONLY_IN_DESIGN_MODE);
-            return true;
-          }
-          if (textures[textureName]){
-            terminal.printError(Text.TEXTURE_NAME_MUST_BE_UNIQUE);
-            return true;
-          }
-          if (textureName.indexOf(PIPE) != -1){
-            terminal.printError(Text.TEXTURE_NAME_NOT_VALID);
-            return true;
-          }
-          var fileName = splitted[2];
-          var textureUrl = "textures/"+fileName;
-          var texture;
-          var found = false;
-          var compressionSupportIssue = false;
-          for (var textureNameX in textureURLs){
-            if (textureURLs[textureNameX] == textureUrl){
-              if (textures[textureNameX] && textures[textureNameX].isLoaded){
-                found = true;
-                texture = textures[textureNameX];
-                texture.wrapS = THREE.RepeatWrapping;
-                texture.wrapT = THREE.RepeatWrapping;
-                texture.needsUpdate = true;
-                textures[textureName] = texture;
-                texture.isLoaded = true;
-              }
-            }
-          }
-          textureURLs[textureName] = textureUrl;
-          if (!found){
-            var loader;
-            if (textureUrl.toUpperCase().endsWith("DDS")){
-              if (!DDS_SUPPORTED){
-                textureUrl = textureUrl.replace(
-                  ".dds", compressedTextureFallbackFormat
-                ).replace(
-                  ".DDS", compressedTextureFallbackFormat
-                );
-                loader = textureLoader;
-                compressionSupportIssue = true;
-              }else{
-                loader = ddsLoader;
-              }
-            }else if (textureUrl.toUpperCase().endsWith("TGA")){
-              loader = tgaLoader;
-            }else{
-              loader = textureLoader;
-            }
-            loader.load(textureUrl,
-              function (textureData){
-                texture = textureData;
-                texture.wrapS = THREE.RepeatWrapping;
-                texture.wrapT = THREE.RepeatWrapping;
-                texture.isLoaded = true;
-                textures[textureName] = texture;
-              },
-              function (xhr){
-                textures[textureName] = 2;
-              },
-              function (xhr){
-                textures[textureName] =  3;
-              }
-            );
-            textures[textureName] = 1;
-          }else{
-            terminal.printInfo(Text.TEXTURE_CLONED);
-          }
-          if (!compressionSupportIssue){
-            terminal.printInfo(Text.TEXTURE_CREATED);
-          }else {
-            terminal.printInfo(Text.TEXTURE_CREATED_DDS_SUPPORT_ISSUE);
-          }
+          // DEPRECATED
         break;
         case 22: //printTextures
-          var count = 0;
-          var length = Object.keys(textures).length;
-          terminal.printHeader(Text.TEXTURES);
-          for (var textureName in textures){
-            count ++;
-            var texture = textures[textureName];
-            var status;
-            var sizeText = "";
-            if (texture == 1){
-              status = Text.STATUS_PENDING;
-            }else if (texture == 2){
-              status = Text.STATUS_DOWNLOADING;
-            }else if (texture == 3){
-              status = Text.STATUS_ERROR;
-            }else if (texture && texture.isLoaded){
-              status = Text.STATUS_LOADED;
-            }
-
-            if (!(typeof texture == "undefined") && texture instanceof THREE.Texture){
-              sizeText = " [" + texture.image.width + "x" + texture.image.height + "]";
-            }
-            var options = true;
-            if (count == length){
-              options = false;
-            }
-            terminal.printInfo(Text.TREE_TEXTURE.replace(
-              Text.PARAM1, textureName
-            ).replace(
-              Text.PARAM2, status
-            ).replace(
-              Text.PARAM3, textureURLs[textureName] + sizeText
-            ), options);
-          }
-          if (count == 0){
-            terminal.printError(Text.THERE_ARE_NO_TEXTURES);
-          }
-          return true;
+          // DEPRECATED
         break;
         case 23: //destroyTexture
-          var textureName = splitted[1];
-          var texture = textures[textureName];
-          if (mode != 0){
-            terminal.printError(Text.WORKS_ONLY_IN_DESIGN_MODE);
-            return true;
-          }
-          if (!(textureName.indexOf("*") == -1)){
-            new JobHandler(splitted).handle();
-            return true;
-          }
-          if (!texture){
-            terminal.printError(Text.NO_SUCH_TEXTURE);
-            return true;
-          }
-          for (var addedObjectName in addedObjects){
-            var addedObject = addedObjects[addedObjectName];
-            if (addedObject.isTextureUsed(textureName)){
-              terminal.printError(Text.TEXTURE_USED_IN_AN_OBJECT.replace(Text.PARAM1, addedObjectName));
-              return true;
-            }
-          }
-          for (var objectGroupName in objectGroups){
-            var objectGroup = objectGroups[objectGroupName];
-            var group = objectGroup.group;
-            for (var objectName in group){
-              var childObject = group[objectName];
-              if (childObject.isTextureUsed(textureName)){
-                terminal.printError(Text.TEXTURE_USED_IN_AN_OBJECT.replace(Text.PARAM1, objectGroupName + "->" + objectName));
-                return true;
-              }
-            }
-          }
-          for (var psName in preConfiguredParticleSystems){
-            var params = preConfiguredParticleSystems[psName].params;
-            if (!(typeof params.textureName == UNDEFINED)){
-              if (params.textureName == textureName){
-                terminal.printError(Text.TEXTURE_USED_IN_A_PARTICLE_SYSTEM.replace(Text.PARAM1, psName));
-                return true;
-              }
-            }
-            if (!(typeof params.texture == UNDEFINED)){
-              if (params.texture == textureName){
-                terminal.printError(Text.TEXTURE_USED_IN_A_PARTICLE_SYSTEM.replace(Text.PARAM1, psName));
-                return true;
-              }
-            }
-          }
-          if (textures[textureName] instanceof THREE.Texture){
-            textures[textureName].dispose();
-          }
-          delete textures[textureName];
-          delete textureURLs[textureName];
-          if (!jobHandlerWorking){
-            terminal.printInfo(Text.TEXTURE_DESTROYED);
-          }
-          return true;
+          // DEPRECATED
         break;
         case 24: //mapTexture
-          var textureName = splitted[1];
-          var objectName = splitted[2];
-          var texture = textures[textureName];
-          if (mode != 0){
-            terminal.printError(Text.WORKS_ONLY_IN_DESIGN_MODE);
-            return true;
-          }
-          if (!(objectName.indexOf("*") == -1)){
-            new JobHandler(splitted).handle();
-            return true;
-          }
-          if (!texture){
-            terminal.printError(Text.NO_SUCH_TEXTURE);
-            return true;
-          }
-          if (!texture || !texture.isLoaded){
-            terminal.printError(Text.TEXTURE_NOT_READY);
-            return true;
-          }
-          var addedObject = addedObjects[objectName];
-          if (objectGroups[objectName]){
-            terminal.printError(Text.CANNOT_MAP_TEXTURE_TO_A_GLUED_OBJECT);
-            return true;
-          }
-          if (!addedObject){
-            terminal.printError(Text.NO_SUCH_OBJECT);
-            return true;
-          }
-
-          var cloneTexture = texture;
-
-          cloneTexture.roygbivTextureName = textureName;
-          cloneTexture.roygbivTexturePackName = 0;
-
-          addedObject.mapDiffuse(cloneTexture);
-
-          cloneTexture.needsUpdate = true;
-
-          addedObject.metaData["textureRepeatU"] = cloneTexture.repeat.x;
-          addedObject.metaData["textureRepeatV"] = cloneTexture.repeat.y;
-
-          cloneTexture.wrapS = THREE.RepeatWrapping;
-          cloneTexture.wrapT = THREE.RepeatWrapping;
-
-          addedObject.resetAssociatedTexturePack();
-          if (!jobHandlerWorking){
-            terminal.printInfo(Text.TEXTURE_MAPPED);
-          }
+          // DEPRECATED
         break;
         case 25: //adjustTextureRepeat
           var objectName = splitted[1];
@@ -828,12 +616,10 @@ function parse(input){
             terminal.printError(Text.WORKS_ONLY_IN_DESIGN_MODE);
             return true;
           }
-
           if (!(objectName.indexOf("*") == -1)){
             new JobHandler(splitted).handle();
             return true;
           }
-
           if (objectGroups[objectName]){
             terminal.printError(Text.GLUED_OBJECTS_DO_NOT_SUPPORT_THIS_FUNCTION);
             return true;
@@ -843,7 +629,6 @@ function parse(input){
             terminal.printError(Text.NO_SUCH_OBJECT);
             return true;
           }
-
           repeatU = parseInt(repeatU);
           repeatV = parseInt(repeatV);
           if (isNaN(repeatU)){
@@ -1356,98 +1141,10 @@ function parse(input){
           // DEPRECATED
         break;
         case 45: //mapAmbientOcculsion
-          var textureName = splitted[1];
-          var objectName = splitted[2];
-          var texture = textures[textureName];
-          if (mode != 0){
-            terminal.printError(Text.WORKS_ONLY_IN_DESIGN_MODE);
-            return true;
-          }
-          if (!(objectName.indexOf("*") == -1)){
-            new JobHandler(splitted).handle();
-            return true;
-          }
-          if (objectGroups[objectName]){
-            terminal.printError(Text.GLUED_OBJECTS_DO_NOT_SUPPORT_THIS_FUNCTION);
-            return true;
-          }
-          if (!texture){
-            terminal.printError(Text.NO_SUCH_TEXTURE);
-            return true;
-          }
-          if (!texture || !texture.isLoaded){
-            terminal.printError(Text.TEXTURE_NOT_READY);
-            return true;
-          }
-          var addedObject = addedObjects[objectName];
-          if (!addedObject){
-            terminal.printError(Text.NO_SUCH_OBJECT);
-            return true;
-          }
-
-          var cloneTexture = texture;
-
-          cloneTexture.roygbivTextureName = textureName;
-          cloneTexture.roygbivTexturePackName = 0;
-
-          cloneTexture.wrapS = THREE.RepeatWrapping;
-          cloneTexture.wrapT = THREE.RepeatWrapping;
-
-          addedObject.mapAO(cloneTexture);
-
-          cloneTexture.needsUpdate = true;
-
-          addedObject.resetAssociatedTexturePack();
-          if (!jobHandlerWorking){
-            terminal.printInfo(Text.AMBIENT_OCCULSION_TEXTURE_MAPPED);
-          }
+          // DEPRECATED
         break;
         case 46: //mapAlpha
-          var textureName = splitted[1];
-          var objectName = splitted[2];
-          var texture = textures[textureName];
-          if (mode != 0){
-            terminal.printError(Text.WORKS_ONLY_IN_DESIGN_MODE);
-            return true;
-          }
-          if (!(objectName.indexOf("*") == -1)){
-            new JobHandler(splitted).handle();
-            return true;
-          }
-          if (objectGroups[objectName]){
-            terminal.printError(Text.GLUED_OBJECTS_DO_NOT_SUPPORT_THIS_FUNCTION);
-            return true;
-          }
-          if (!texture){
-            terminal.printError(Text.NO_SUCH_TEXTURE);
-            return true;
-          }
-          if (!texture || !texture.isLoaded){
-            terminal.printError(Text.TEXTURE_NOT_READY);
-            return true;
-          }
-          var addedObject = addedObjects[objectName];
-          if (!addedObject){
-            terminal.printError(Text.NO_SUCH_OBJECT);
-            return true;
-          }
-
-          var cloneTexture = texture;
-
-          cloneTexture.roygbivTextureName = textureName;
-          cloneTexture.roygbivTexturePackName = 0;
-
-          addedObject.mapAlpha(cloneTexture);
-
-          cloneTexture.wrapS = THREE.RepeatWrapping;
-          cloneTexture.wrapT = THREE.RepeatWrapping;
-
-          cloneTexture.needsUpdate = true;
-
-          addedObject.resetAssociatedTexturePack();
-          if (!jobHandlerWorking){
-            terminal.printInfo(Text.ALPHA_TEXTURE_MAPPED);
-          }
+          // DEPRECATED
         break;
         case 47: //setDefaultMaterial
           // DEPRECATED
@@ -1471,51 +1168,7 @@ function parse(input){
           // DEPRECATED
         break;
         case 54: //mapEmissive
-          var textureName = splitted[1];
-          var objectName = splitted[2];
-          var texture = textures[textureName];
-          if (mode != 0){
-            terminal.printError(Text.WORKS_ONLY_IN_DESIGN_MODE);
-            return true;
-          }
-          if (!(objectName.indexOf("*") == -1)){
-            new JobHandler(splitted).handle();
-            return true;
-          }
-          if (objectGroups[objectName]){
-            terminal.printError(Text.GLUED_OBJECTS_DO_NOT_SUPPORT_THIS_FUNCTION);
-            return true;
-          }
-          if (!texture){
-            terminal.printError(Text.NO_SUCH_TEXTURE);
-            return true;
-          }
-          if (!texture || !texture.isLoaded){
-            terminal.printError(Text.TEXTURE_NOT_READY);
-            return true;
-          }
-          var addedObject = addedObjects[objectName];
-          if (!addedObject){
-            terminal.printError(Text.NO_SUCH_OBJECT);
-            return true;
-          }
-
-          var cloneTexture = texture;
-
-          cloneTexture.roygbivTextureName = textureName;
-          cloneTexture.roygbivTexturePackName = 0;
-
-          cloneTexture.wrapS = THREE.RepeatWrapping;
-          cloneTexture.wrapT = THREE.RepeatWrapping;
-
-          addedObject.mapEmissive(cloneTexture);
-
-          cloneTexture.needsUpdate = true;
-
-          addedObject.resetAssociatedTexturePack();
-          if (!jobHandlerWorking){
-            terminal.printInfo(Text.EMISSIVE_TEXTURE_MAPPED);
-          }
+          // DEPRECATED
         break;
         case 55: //newLambertMaterial
           //DEPRECATED
@@ -1692,54 +1345,7 @@ function parse(input){
           return true;
         break;
         case 62: //mapHeight
-          var textureName = splitted[1];
-          var objectName = splitted[2];
-          var texture = textures[textureName];
-          if (mode != 0){
-            terminal.printError(Text.WORKS_ONLY_IN_DESIGN_MODE);
-            return true;
-          }
-          if (!(objectName.indexOf("*") == -1)){
-            new JobHandler(splitted).handle();
-            return true;
-          }
-          if (objectGroups[objectName]){
-            terminal.printError(Text.GLUED_OBJECTS_DO_NOT_SUPPORT_THIS_FUNCTION);
-            return true;
-          }
-          if (!texture){
-            terminal.printError(Text.NO_SUCH_TEXTURE);
-            return true;
-          }
-          if (!texture || !texture.isLoaded){
-            terminal.printError(Text.TEXTURE_NOT_READY);
-            return true;
-          }
-          var addedObject = addedObjects[objectName];
-          if (!addedObject){
-            terminal.printError(Text.NO_SUCH_OBJECT);
-            return true;
-          }
-
-          if (addedObject.metaData["widthSegments"] == 1){
-            addedObject.segmentGeometry(false, undefined);
-          }
-
-          var cloneTexture = texture;
-
-          cloneTexture.roygbivTextureName = textureName;
-          cloneTexture.roygbivTexturePackName = 0;
-
-          cloneTexture.wrapS = THREE.RepeatWrapping;
-          cloneTexture.wrapT = THREE.RepeatWrapping;
-
-          addedObject.mapDisplacement(cloneTexture);
-          cloneTexture.needsUpdate = true;
-
-          addedObject.resetAssociatedTexturePack();
-          if (!jobHandlerWorking){
-            terminal.printInfo(Text.HEIGHT_TEXTURE_MAPPED);
-          }
+          // DEPRECATED
         break;
         case 63: //resetMaps
           var name = splitted[1];
