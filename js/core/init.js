@@ -6,6 +6,7 @@ window.onload = function() {
   // FACTORIES
   raycasterFactory = new RaycasterFactory();
   physicsFactory = new PhysicsFactory();
+  textureLoaderFactory = new TextureLoaderFactory();
   // FPS HANDLER
   fpsHandler = new FPSHandler();
   // REUSABLE COLLISION INFO
@@ -171,7 +172,9 @@ window.onload = function() {
   windowLoaded = true;
   MAX_VERTEX_UNIFORM_VECTORS = renderer.getMaxVertexUniformVectors();
   VERTEX_SHADER_TEXTURE_FETCH_SUPPORTED = renderer.isVertexShaderTextureFetchSupported();
-  DDS_SUPPORTED = renderer.isDDSSupported();
+  ASTC_SUPPORTED = renderer.isASTCSupported();
+  S3TC_SUPPORTED = renderer.isS3TCSupported();
+  PVRTC_SUPPORTED = renderer.isPVRTCSupported();
   INSTANCING_SUPPORTED = renderer.isInstancingSupported();
   HIGH_PRECISION_SUPPORTED = renderer.isHighPrecisionSupported();
   if (!isDeployment){

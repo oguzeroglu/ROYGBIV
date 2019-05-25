@@ -3,12 +3,6 @@ var SkyBox = function(name, directoryName, fileExtension, color, callback){
   this.name = name;
   this.directoryName = directoryName;
 
-  if (!DDS_SUPPORTED){
-    if (fileExtension.toUpperCase() == "DDS"){
-      fileExtension = compressedTextureFallbackFormat.replace(".", "");
-    }
-  }
-
   this.fileExtension = fileExtension;
 
   this.color = color;
@@ -31,7 +25,7 @@ var SkyBox = function(name, directoryName, fileExtension, color, callback){
   this.rightFilePath = skyBoxRootDirectory+directoryName+"/"+"right."+fileExtension;
   this.upFilePath = skyBoxRootDirectory+directoryName+"/"+"up."+fileExtension;
 
-  this.loader = textureLoader;
+  this.loader = textureLoaderFactory.get();
 
   this.loadTextures();
 }

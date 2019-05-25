@@ -1468,34 +1468,25 @@ function parse(input){
           var name = splitted[1];
           var directoryName = splitted[2];
           var fileExtension = splitted[3];
-
           if (mode != 0){
             terminal.printError(Text.WORKS_ONLY_IN_DESIGN_MODE);
             return true;
           }
-
           if (skyBoxes[name]){
             terminal.printError(Text.NAME_MUST_BE_UNIQUE);
             return true;
           }
-
           if (directoryName.trim() == ""){
             terminal.printError(Text.DIRECTORY_NAME_CANNOT_BE_EMPTY);
             return true;
           }
-
           if (fileExtension.trim() == ""){
             terminal.printError(Text.FILE_EXTENSION_CANNOT_BE_EMPTY);
             return true;
           }
-
           var skyBox = new SkyBox(name, directoryName, fileExtension, "#ffffff");
           skyBoxes[name] = skyBox;
-          if (!DDS_SUPPORTED && fileExtension.toUpperCase() == "DDS"){
-            terminal.printInfo(Text.TEXTURE_CREATED_DDS_SUPPORT_ISSUE);
-          }else{
-            terminal.printInfo(Text.SKYBOX_CREATED);
-          }
+          terminal.printInfo(Text.SKYBOX_CREATED);
           return true;
         break;
         case 70: //printSkyboxes

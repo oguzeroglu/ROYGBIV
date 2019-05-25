@@ -49,7 +49,6 @@ var camera;
 var orthographicCamera;
 var canvas;
 var sceneBackgroundColor = 0x000000 ;
-var textureLoader = new THREE.TextureLoader();
 var axesHelper = new THREE.AxesHelper(20000);
 var pointerLockRequested = false;
 var fullScreenRequested = false;
@@ -236,7 +235,9 @@ var GLOBAL_ADDEDTEXT_VIEWPORT_UNIFORM;
 var GLOBAL_SCREEN_RESOLUTION_UNIFORM = new THREE.Uniform(1);
 var GLOBAL_PS_REF_HEIGHT_UNIFORM = new THREE.Uniform(0);
 var VERTEX_SHADER_TEXTURE_FETCH_SUPPORTED;
-var DDS_SUPPORTED;
+var ASTC_SUPPORTED;
+var S3TC_SUPPORTED;
+var PVRTC_SUPPORTED;
 var INSTANCING_SUPPORTED;
 var jobHandlerSelectedGrid = 0;
 var jobHandlerWorking = false;
@@ -366,6 +367,7 @@ var renderOrders = {
 // FACTORIES
 var raycasterFactory;
 var physicsFactory;
+var textureLoaderFactory;
 
 // WORKER VARIABLES
 var WORKERS_SUPPORTED = (typeof(Worker) !== UNDEFINED);

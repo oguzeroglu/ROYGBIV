@@ -46,8 +46,8 @@ app.post("/build", function(req, res){
     copyAssets(req.body);
     copyWorkers(req.body);
   }catch (err){
-    console.log("[*] Error building project: "+err.message);
     res.send(JSON.stringify({"error": "Build error: "+err.message}));
+    throw new Error(err);
     return;
   }
   res.send(JSON.stringify({"path": __dirname+"/deploy/"+req.body.projectName+"/"}));
@@ -81,35 +81,30 @@ app.post("/prepareTexturePack", async function(req, res){
   if (fs.existsSync(mainPath+"/diffuse.png")){
     info.hasDiffuse = true;
     await compressTexture("astc", "diffuse", mainPath);
-    await compressTexture("etc", "diffuse", mainPath);
     await compressTexture("pvrtc", "diffuse", mainPath);
     await compressTexture("s3tc", "diffuse", mainPath);
   }
   if (fs.existsSync(mainPath+"/alpha.png")){
     info.hasAlpha = true;
     await compressTexture("astc", "alpha", mainPath);
-    await compressTexture("etc", "alpha", mainPath);
     await compressTexture("pvrtc", "alpha", mainPath);
     await compressTexture("s3tc", "alpha", mainPath);
   }
   if (fs.existsSync(mainPath+"/ao.png")){
     info.hasAO = true;
     await compressTexture("astc", "ao", mainPath);
-    await compressTexture("etc", "ao", mainPath);
     await compressTexture("pvrtc", "ao", mainPath);
     await compressTexture("s3tc", "ao", mainPath);
   }
   if (fs.existsSync(mainPath+"/emissive.png")){
     info.hasEmissive = true;
     await compressTexture("astc", "emissive", mainPath);
-    await compressTexture("etc", "emissive", mainPath);
     await compressTexture("pvrtc", "emissive", mainPath);
     await compressTexture("s3tc", "emissive", mainPath);
   }
   if (fs.existsSync(mainPath+"/height.png")){
     info.hasHeight = true;
     await compressTexture("astc", "height", mainPath);
-    await compressTexture("etc", "height", mainPath);
     await compressTexture("pvrtc", "height", mainPath);
     await compressTexture("s3tc", "height", mainPath);
   }
@@ -126,10 +121,6 @@ function compressTexture(type, fileName, mainPath){
     case "astc":
       quality = "astcmedium";
       compression = "ASTC_4x4";
-    break;
-    case "etc":
-      quality = "etcfast";
-      compression = "ETC2_RGBA";
     break;
     case "pvrtc":
       quality = "pvrtcnormal";
@@ -221,18 +212,6 @@ function copyAssets(application){
   fs.writeFileSync("deploy/"+application.projectName+"/application.html", htmlContent);
   var readmeContent = fs.readFileSync("template/README", "utf8");
   fs.writeFileSync("deploy/"+application.projectName+"/README", readmeContent);
-  for (var textureName in application.textureURLs){
-    var splitted = application.textureURLs[textureName].split("/");
-    var textureFileName = splitted[splitted.length -1];
-    var texturePrefix = textureFileName.split(".")[0];
-    fs.readdirSync("textures").forEach(file => {
-      var prefix = file.split(".")[0];
-      if (texturePrefix == prefix){
-        copyFileSync("textures/"+file, "deploy/"+application.projectName+"/textures/");
-        console.log("[*] Copied a texture: "+file);
-      }
-    });
-  }
   copyFolderRecursiveSync("third_party_licenses", "deploy/"+application.projectName+"/");
   fs.unlinkSync("deploy/"+application.projectName+"/third_party_licenses/LICENSE_JQUERY_TERMINAL");
   fs.unlinkSync("deploy/"+application.projectName+"/third_party_licenses/LICENSE_DATGUI");
@@ -289,16 +268,9 @@ function generateDeployDirectory(projectName, application){
   fs.mkdirSync("deploy/"+projectName+"/js");
   fs.mkdirSync("deploy/"+projectName+"/css");
   copyFolderRecursiveSync("shader", "deploy/"+projectName);
-  var hasTextures = (Object.keys(application.textureURLs).length != 0);
   var hasTexturePacks = (Object.keys(application.texturePacks).length != 0);
   var hasSkyBoxes = (Object.keys(application.skyBoxes).length != 0);
   var hasFonts = (Object.keys(application.fonts).length != 0);
-  if (hasTextures){
-    fs.mkdirSync("deploy/"+projectName+"/textures");
-    console.log("[*] Project has textures to load.");
-  }else{
-    console.log("[*] Project has no textures to load.");
-  }
   if (hasTexturePacks){
     fs.mkdirSync("deploy/"+projectName+"/texture_packs");
     console.log("[*] Project has texture packs to load.");
