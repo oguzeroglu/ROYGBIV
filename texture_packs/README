@@ -7,8 +7,6 @@ diffuse.png -> For diffuse maps
 alpha.png -> For alpha maps (black: invisible, white: visible)
 ao.png -> For ambient occulsion maps
 emissive.png -> For emissive maps
-normal.png -> For normal maps
-specular.png -> For specular maps
 height.png -> For height/displacement maps
 
 PNG is the supported default file extension. Texture compressions are handled automatically by ROYGBIV engine.
