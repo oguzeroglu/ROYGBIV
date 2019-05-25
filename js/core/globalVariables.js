@@ -50,8 +50,6 @@ var orthographicCamera;
 var canvas;
 var sceneBackgroundColor = 0x000000 ;
 var textureLoader = new THREE.TextureLoader();
-var tgaLoader;
-var ddsLoader;
 var axesHelper = new THREE.AxesHelper(20000);
 var pointerLockRequested = false;
 var fullScreenRequested = false;

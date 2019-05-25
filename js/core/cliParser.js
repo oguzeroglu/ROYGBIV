@@ -1228,51 +1228,33 @@ function parse(input){
           return true;
         break;
         case 58: //printTexturePackInfo
-          var name = splitted[1];
-          var texturePack = texturePacks[name];
-          if (!texturePack){
-            terminal.printError(Text.NO_SUCH_TEXTURE_PACK);
-            return true;
-          }
-          texturePack.printInfo();
-          return true;
+          // DEPRECATED
         break;
         case 59: //mapTexturePack
           var texturePackName = splitted[1];
           var objectName = splitted[2];
           var texturePack = texturePacks[texturePackName];
           var addedObject = addedObjects[objectName];
-
           if (mode != 0){
             terminal.printError(Text.WORKS_ONLY_IN_DESIGN_MODE);
             return true;
           }
-
           if (!(objectName.indexOf("*") == -1)){
             new JobHandler(splitted).handle();
             return true;
           }
-
           if (objectGroups[objectName]){
             terminal.printError(Text.GLUED_OBJECTS_DO_NOT_SUPPORT_THIS_FUNCTION);
             return true;
           }
-
           if (!texturePack){
             terminal.printError(Text.NO_SUCH_TEXTURE_PACK);
             return true;
           }
-
           if (!addedObject){
             terminal.printError(Text.NO_SUCH_OBJECT);
             return true;
           }
-
-          if (!texturePack.isUsable()){
-            terminal.printError(Text.TEXTURE_PACK_NOT_USABLE);
-            return true;
-          }
-
           addedObject.mapTexturePack(texturePack);
           if (!jobHandlerWorking){
             terminal.printInfo(Text.TEXTURE_PACK_MAPPED);
@@ -1282,7 +1264,6 @@ function parse(input){
         case 60: //destroyTexturePack
           var name = splitted[1];
           var texturePack = texturePacks[name];
-
           if (mode != 0){
             terminal.printError(Text.WORKS_ONLY_IN_DESIGN_MODE);
             return true;
@@ -1320,25 +1301,7 @@ function parse(input){
           return true;
         break;
         case 61: //refreshTexturePack
-          var name = splitted[1];
-          var texturePack = texturePacks[name];
-          if (mode != 0){
-            terminal.printError(Text.WORKS_ONLY_IN_DESIGN_MODE);
-            return true;
-          }
-          if (!(name.indexOf("*") == -1)){
-            new JobHandler(splitted).handle();
-            return true;
-          }
-          if (!texturePack){
-            terminal.printError(Text.NO_SUCH_TEXTURE_PACK);
-            return true;
-          }
-          texturePack.refresh();
-          if (!jobHandlerWorking){
-            terminal.printInfo(Text.TEXTURE_PACK_REFRESHED);
-          }
-          return true;
+          // DEPRECATED
         break;
         case 62: //mapHeight
           // DEPRECATED

@@ -31,13 +31,7 @@ var SkyBox = function(name, directoryName, fileExtension, color, callback){
   this.rightFilePath = skyBoxRootDirectory+directoryName+"/"+"right."+fileExtension;
   this.upFilePath = skyBoxRootDirectory+directoryName+"/"+"up."+fileExtension;
 
-  if (this.fileExtension.toUpperCase() == "DDS"){
-    this.loader = ddsLoader;
-  }else if (this.fileExtension.toUpperCase() == "TGA"){
-    this.loader = tgaLoader;
-  }else{
-    this.loader = textureLoader;
-  }
+  this.loader = textureLoader;
 
   this.loadTextures();
 }

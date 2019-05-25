@@ -330,6 +330,7 @@ var Text = function(){
   this.LOADING_FONT = "Loading font.";
   this.LOADING = "Loading.";
   this.COMPRESSING_TEXTURE = "Compressing texture.";
+  this.TEXTURES_COMPRESSED = "Textures compressed.";
   this.CONFIGURING_AREA = "Configuring area.";
   this.CONFIGURING_AREAS = "Configuring areas.";
   this.AREA_CONFIGURED = "Area configured. Please check the area for manual corrections.";

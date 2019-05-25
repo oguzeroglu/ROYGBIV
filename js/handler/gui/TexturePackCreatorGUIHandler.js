@@ -36,7 +36,8 @@ TexturePackCreatorGUIHandler.prototype.loadTexturePack = function(){
   xhr.onreadystatechange = function (){
     if (xhr.readyState == 4 && xhr.status == 200){
       var resp = JSON.parse(xhr.responseText);
-      console.log(resp);
+      terminal.printInfo(Text.TEXTURES_COMPRESSED);
+      terminal.printInfo(Text.LOADING);
     }
   }
   xhr.send(JSON.stringify({texturePackName: texturePackCreatorGUIHandler.configurations["Texture pack"]}));

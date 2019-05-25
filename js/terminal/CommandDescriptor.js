@@ -757,6 +757,8 @@ var CommandDescriptor = function(){
     53, //mapNormal -> Normal maps are not supported for now.
     54, //mapEmissive -> Deprecated due to architectural changes in texture handling logic.
     55, //newLambertMaterial -> Deprecated due to lack of uses cases. Phong is fine for light affected objects.
+    58, //printTexturePackInfo -> Deprecated due to architectural changes of texture pack handling.
+    61, //refreshTexturePack -> Deprecated due to architectural changes of texture pack handling.
     62, //mapHeight -> Deprecated due to architectural changes int exture handling logic.
     65, //superposeGridSystem -> Deprecated due to lack of uses cases after grid selection mode implementation.
     68, //newPointLight -> Lights are not supported for now.
@@ -943,11 +945,6 @@ var CommandDescriptor = function(){
   this.newTexturePack.types = [];
   this.newTexturePack.types.push(this.UNKNOWN_INDICATOR); //name
 
-  // printTexturePackInfo
-  this.printTexturePackInfo = new Object();
-  this.printTexturePackInfo.types = [];
-  this.printTexturePackInfo.types.push(this.TEXTURE_PACK_NAME); //name
-
   // mapTexturePack
   this.mapTexturePack = new Object();
   this.mapTexturePack.types = [];
@@ -958,11 +955,6 @@ var CommandDescriptor = function(){
   this.destroyTexturePack = new Object();
   this.destroyTexturePack.types = [];
   this.destroyTexturePack.types.push(this.TEXTURE_PACK_NAME); //name
-
-  // refreshTexturePack
-  this.refreshTexturePack = new Object();
-  this.refreshTexturePack.types = [];
-  this.refreshTexturePack.types.push(this.TEXTURE_PACK_NAME); //name
 
   // resetMaps
   this.resetMaps = new Object();

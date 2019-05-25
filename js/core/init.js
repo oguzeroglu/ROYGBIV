@@ -6,9 +6,6 @@ window.onload = function() {
   // FACTORIES
   raycasterFactory = new RaycasterFactory();
   physicsFactory = new PhysicsFactory();
-  // TGA and DDS LOADERS
-  tgaLoader = new THREE.TGALoader();
-  ddsLoader = new THREE.DDSLoader();
   // FPS HANDLER
   fpsHandler = new FPSHandler();
   // REUSABLE COLLISION INFO
