@@ -369,14 +369,6 @@ Terminal.prototype.autocomplete = function(command){
 				}
 				helpString = "[Objects]: "
 			break;
-			case commandDescriptor.UPLOADED_IMAGE_NAME:
-				for (imgName in uploadedImages){
-					if (imgName.startsWith(curEntry)){
-						possibilities.push(imgName);
-					}
-				}
-				helpString = "[Uploaded images]: ";
-			break;
 			case commandDescriptor.TEXTURE_NAME:
 				for (textureName in textures){
 					if (textureName.startsWith(curEntry)){

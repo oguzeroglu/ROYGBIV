@@ -1,38 +1,27 @@
-var TexturePack = function(name, directoryName, fileExtension, mapCallback, isPreLoaded, refTexturePack, scaleFactor, refTexturePackName){
+var TexturePack = function(name, directoryName, fileExtension, mapCallback, isPreLoaded){
   this.directoryName = directoryName;
   this.name = name;
-
-
   if (!DDS_SUPPORTED){
     if (fileExtension.toUpperCase() == "DDS"){
       fileExtension = compressedTextureFallbackFormat.replace(".", "");
     }
   }
-
   this.fileExtension = fileExtension;
-
-  this.scaleFactor = scaleFactor;
-  this.refTexturePackName = refTexturePackName;
-
   this.maxAttemptCount = 5;
   this.totalLoadedCount = 0;
-
   this.hasDiffuse = false;
   this.hasAlpha = false;
   this.hasAO = false;
   this.hasEmissive = false;
   this.hasHeight = false;
-
   if (isPreLoaded){
     this.isPreLoaded = isPreLoaded;
   }
-
   this.diffuseFilePath = texturePackRootDirectory+directoryName+"/"+"diffuse."+fileExtension.toLowerCase();
   this.alphaFilePath = texturePackRootDirectory+directoryName+"/"+"alpha."+fileExtension.toLowerCase();
   this.aoFilePath = texturePackRootDirectory+directoryName+"/"+"ao."+fileExtension.toLowerCase();
   this.emissiveFilePath = texturePackRootDirectory+directoryName+"/"+"emissive."+fileExtension.toLowerCase();
   this.heightFilePath = texturePackRootDirectory+directoryName+"/"+"height."+fileExtension.toLowerCase();
-
   if (fileExtension.toUpperCase() == "DDS"){
     this.loader = ddsLoader;
   }else if (fileExtension.toUpperCase() == "TGA"){
@@ -40,42 +29,15 @@ var TexturePack = function(name, directoryName, fileExtension, mapCallback, isPr
   }else{
     this.loader = textureLoader;
   }
-
   this.diffuseCanMapFlag = false;
   this.alphaCanMapFlag = false;
   this.aoCanMapFlag = false;
   this.emissiveCanMapFlag = false;
   this.heightCanMapFlag = false;
-
   if (mapCallback){
     this.mapCallback = mapCallback;
   }
-
-  if (!refTexturePack){
-    this.loadTextures();
-  }else{
-    if (refTexturePack.hasDiffuse){
-      this.diffuseTexture = refTexturePack.diffuseTexture.clone();
-      this.hasDiffuse = true;
-    }
-    if (refTexturePack.hasAlpha){
-      this.alphaTexture = refTexturePack.alphaTexture.clone();
-      this.hasAlpha = true;
-    }
-    if (refTexturePack.hasAO){
-      this.aoTexture = refTexturePack.aoTexture.clone();
-      this.hasAO = true;
-    }
-    if (refTexturePack.hasEmissive){
-      this.emissiveTexture = refTexturePack.emissiveTexture.clone();
-      this.hasEmissive = true;
-    }
-    if (refTexturePack.hasHeight){
-      this.heightTexture = refTexturePack.heightTexture.clone();
-      this.hasHeight = true;
-    }
-  }
-
+  this.loadTextures();
 }
 
 TexturePack.prototype.export = function(){
@@ -93,12 +55,6 @@ TexturePack.prototype.export = function(){
   exportObject.aoFilePath = this.aoFilePath;
   exportObject.emissiveFilePath = this.emissiveFilePath;
   exportObject.heightFilePath = this.heightFilePath;
-  if (this.scaleFactor){
-    exportObject.scaleFactor = this.scaleFactor;
-  }
-  if (this.refTexturePackName){
-    exportObject.refTexturePackName = this.refTexturePackName;
-  }
   return exportObject;
 }
 
@@ -186,9 +142,6 @@ TexturePack.prototype.loadTextures = function(){
   //DIFFUSE
   this.loader.load(this.diffuseFilePath,
     function(textureData){
-      if (that.scaleFactor){
-        textureData.image = that.rescaleTextureImage(textureData, that.scaleFactor);
-      }
       that.mapDiffuse(that, textureData);
     },
     function(xhr){
@@ -203,9 +156,6 @@ TexturePack.prototype.loadTextures = function(){
   //ALPHA
   this.loader.load(this.alphaFilePath,
     function(textureData){
-      if (that.scaleFactor){
-        textureData.image = that.rescaleTextureImage(textureData, that.scaleFactor);
-      }
       that.mapAlpha(that, textureData);
     },
     function(xhr){
@@ -220,9 +170,6 @@ TexturePack.prototype.loadTextures = function(){
   //AO
   this.loader.load(this.aoFilePath,
     function(textureData){
-      if (that.scaleFactor){
-        textureData.image = that.rescaleTextureImage(textureData, that.scaleFactor);
-      }
       that.mapAmbientOcculsion(that, textureData);
     },
     function(xhr){
@@ -237,9 +184,6 @@ TexturePack.prototype.loadTextures = function(){
   //EMISSIVE
   this.loader.load(this.emissiveFilePath,
     function(textureData){
-      if (that.scaleFactor){
-        textureData.image = that.rescaleTextureImage(textureData, that.scaleFactor);
-      }
       that.mapEmissive(that, textureData);
     },
     function(xhr){
@@ -254,9 +198,6 @@ TexturePack.prototype.loadTextures = function(){
   //HEIGHT
   this.loader.load(this.heightFilePath,
     function(textureData){
-      if (that.scaleFactor){
-        textureData.image = that.rescaleTextureImage(textureData, that.scaleFactor);
-      }
       that.mapHeight(that, textureData);
     },
     function(xhr){
@@ -363,36 +304,4 @@ TexturePack.prototype.refreshMap = function(){
     }
   }
   this.readyCallback();
-}
-
-TexturePack.prototype.rescaleTextureImage = function(texture, scale){
-  var tmpCanvas = document.createElement("canvas");
-  tmpCanvas.width = texture.image.width * scale;
-  tmpCanvas.height = texture.image.height * scale;
-  tmpCanvas.getContext("2d").drawImage(texture.image, 0, 0, texture.image.width, texture.image.height, 0, 0, tmpCanvas.width, tmpCanvas.height);
-  return tmpCanvas;
-}
-
-TexturePack.prototype.rescale = function(scale){
-  if (this.hasDiffuse){
-    this.diffuseTexture.image = this.rescaleTextureImage(this.diffuseTexture, scale);
-    this.diffuseTexture.needsUpdate = true;
-  }
-  if (this.hasAlpha){
-    this.alphaTexture.image = this.rescaleTextureImage(this.alphaTexture, scale);
-    this.alphaTexture.needsUpdate = true;
-  }
-  if (this.hasAO){
-    this.aoTexture.image = this.rescaleTextureImage(this.aoTexture, scale);
-    this.aoTexture.needsUpdate = true;
-  }
-  if (this.hasEmissive){
-    this.emissiveTexture.image = this.rescaleTextureImage(this.emissiveTexture, scale);
-    this.emissiveTexture.needsUpdate = true;
-  }
-  if (this.hasHeight){
-    this.heightTexture.image = this.rescaleTextureImage(this.heightTexture, scale);
-    this.heightTexture.needsUpdate = true;
-  }
-  this.scaleFactor = scale;
 }

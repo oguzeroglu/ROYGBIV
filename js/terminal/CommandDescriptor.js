@@ -738,6 +738,8 @@ var CommandDescriptor = function(){
     32, //restartPhysicsTest -> Since box and sphere physics tests are deprecated, this command is no longer needed.
     38, //destroySelectedGrids -> Deprecated due to architectural changes during development. Grids are no longer rendered as seperate objects due to performance issues.
     39, //remakeGridSystem -> Deprecated due to architectural changes during development. Since grids are no longer destroyable, this command has no use case anymore.
+    41, //uploadImage -> Deprecated due to lack of usecases.
+    42, //printImages -> Deprecated as uploadImage is also deprecated.
     43, //mapSpecular -> Specular maps are not supported for now.
     44, //mapEnvironment -> Deprecated due to lack of use cases of environment maps in the ROYGBIV engine. Will implement mirror materials for better visual effects.
     47, //setDefaultMaterial -> Only BASIC materials are supported for now.
@@ -756,11 +758,15 @@ var CommandDescriptor = function(){
     101, //physicsWorkerMode -> Physics workers are now always enabled if the web workers are supported.
     102, //printPhysicsWorkerMode -> Physics workers are now always enabled if the web workers are supported.
     105, //printPerformance -> Deprecated because calling performance.now() multiple times on each render is costly.
+    107, //rescaleTexture -> Deprecated due to lack of usecases.
+    108, //rescaleTexturePack -> Deprecated due to lack of usecases.
+    109, //destroyImage -> Deprecated as uploadImage is also deprecated.
     117, //particleCollisionWorkerMode  -> Workers will be re-implemented.
     118, //printParticleCollisionWorkerMode -> Workers will be re-implemented.
     119, //particleSystemCollisionWorkerMode -> Workers will be re-implemented.
     120, //printParticleCollisionWorkerMode -> Workers will be re-implemented.
     121, //logFrameDrops -> No need for such functionality after the usage of Stats.js
+    122, //addPaddingToTexture -> Deprecated due to lack of usecases.
     125, //applyDisplacementMap -> Deprecated because causes problems with geometry caching.
     127, //setAtlasTextureSize -> Deprecated because has no use cases after deprecation of TextureMerger class
     128 //printAtlasTextureSize -> Deprecated due to same reasons as setAtlasTextureSize
@@ -789,7 +795,6 @@ var CommandDescriptor = function(){
   this.MATERIAL_NAME              =   5;
   this.MATERIAL_NAME_WITH_NULL    =   6;
   this.OBJECT_NAME                =   7;
-  this.UPLOADED_IMAGE_NAME        =   8;
   this.TEXTURE_NAME               =   9;
   this.OBJECT_AXIS                =   10;
   this.PHYSICS_TEST_INDEX         =   11;
@@ -889,7 +894,7 @@ var CommandDescriptor = function(){
   this.newTexture = new Object();
   this.newTexture.types = [];
   this.newTexture.types.push(this.UNKNOWN_INDICATOR); //name
-  this.newTexture.types.push(this.UPLOADED_IMAGE_NAME); //fileName
+  this.newTexture.types.push(this.UNKNOWN_INDICATOR); //fileName
 
   // destroyTexture
   this.destroyTexture = new Object();
@@ -942,11 +947,6 @@ var CommandDescriptor = function(){
   this.destroyWallCollection = new Object();
   this.destroyWallCollection.types = [];
   this.destroyWallCollection.types.push(this.WALL_COLLECTION_NAME); //name
-
-  // uploadImage
-  this.uploadImage = new Object();
-  this.uploadImage.types = [];
-  this.uploadImage.types.push(this.UNKNOWN_INDICATOR); //name
 
   // mapAmbientOcculsion
   this.mapAmbientOcculsion = new Object();
@@ -1155,25 +1155,6 @@ var CommandDescriptor = function(){
   this.search.types = [];
   this.search.types.push(this.UNKNOWN_INDICATOR); //textToSearch
 
-  // rescaleTexture
-  this.rescaleTexture = new Object();
-  this.rescaleTexture.types = [];
-  this.rescaleTexture.types.push(this.TEXTURE_NAME); //textureName
-  this.rescaleTexture.types.push(this.UNKNOWN_INDICATOR); //scale
-  this.rescaleTexture.types.push(this.UNKNOWN_INDICATOR); //newTextureName
-
-  // rescaleTexturePack
-  this.rescaleTexturePack = new Object();
-  this.rescaleTexturePack.types = [];
-  this.rescaleTexturePack.types.push(this.TEXTURE_PACK_NAME); //texturePackName
-  this.rescaleTexturePack.types.push(this.UNKNOWN_INDICATOR); //scale
-  this.rescaleTexturePack.types.push(this.UNKNOWN_INDICATOR); //newTexturePackName
-
-  // destroyImage
-  this.destroyImage = new Object();
-  this.destroyImage.types = [];
-  this.destroyImage.types.push(this.UPLOADED_IMAGE_NAME); //imageName
-
   // setBlending
   this.setBlending = new Object();
   this.setBlending.types = [];
@@ -1194,13 +1175,6 @@ var CommandDescriptor = function(){
   this.setBinSize = new Object();
   this.setBinSize.types = [];
   this.setBinSize.types.push(this.UNKNOWN_INDICATOR); //size
-
-  // addPaddingToTexture
-  this.addPaddingToTexture = new Object();
-  this.addPaddingToTexture.types = [];
-  this.addPaddingToTexture.types.push(this.TEXTURE_NAME); // textureName
-  this.addPaddingToTexture.types.push(this.UNKNOWN_INDICATOR); // padding
-  this.addPaddingToTexture.types.push(this.UNKNOWN_INDICATOR); // newTextureName
 
   // newSphere
   this.newSphere = new Object();

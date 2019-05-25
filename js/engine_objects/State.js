@@ -57,34 +57,11 @@ var State = function(projectName, author){
     addedbObjectsExport[objectName] = addedObjects[objectName].export();
   }
   this.addedObjects = addedbObjectsExport;
-  // UPLOADED IMAGE SIZES ******************************************
-  var uploadedImageSizes = new Object();
-  for (var uploadedImageName in uploadedImages){
-    var img = uploadedImages[uploadedImageName];
-    var size = new Object();
-    size.width = img.width;
-    size.height = img.height;
-    uploadedImageSizes[uploadedImageName] = size;
-  }
-  this.uploadedImageSizes = uploadedImageSizes;
-  // TEXTURE SIZES AND PADDING *************************************
-  var textureSizes = new Object();
-  var texturePaddings = new Object();
+  // TEXTURES ******************************************************
   this.totalTextureCount = 0;
   for (var textureName in textures){
     this.totalTextureCount ++;
-    if (textures[textureName].image){
-      textureSizes[textureName] = new Object();
-      textureSizes[textureName].width = textures[textureName].image.width;
-      textureSizes[textureName].height = textures[textureName].image.height;
-      if (textures[textureName].hasPadding){
-        texturePaddings[textureName] = textures[textureName].paddingInfo;
-      }
-    }
   }
-  this.textureSizes = textureSizes;
-  this.texturePaddings = texturePaddings;
-  // TEXTURES ******************************************************
   this.textures = JSON.parse(JSON.stringify(textures));
   // TEXTURE URLS **************************************************
   this.textureURLs = Object.assign({}, textureURLs);
@@ -94,18 +71,6 @@ var State = function(projectName, author){
     wallCollectionsExport[wallCollectionName] = wallCollections[wallCollectionName].export();
   }
   this.wallCollections = wallCollectionsExport;
-  // UPLOADED IMAGES ***********************************************
-  var uploadedImagesExport = new Object();
-  for (var imageName in uploadedImages){
-    uploadedImagesExport[imageName] = uploadedImages[imageName].src;
-  }
-  this.uploadedImages = uploadedImagesExport;
-  // MODIFIED TEXTURES *********************************************
-  var modifiedTexturesExport = new Object();
-  for (var textureName in modifiedTextures){
-    modifiedTexturesExport[textureName] = modifiedTextures[textureName];
-  }
-  this.modifiedTextures = modifiedTexturesExport;
   // TEXTURE PACKS *************************************************
   var texturePacksExport = new Object();
   this.totalTexturePackCount = 0;

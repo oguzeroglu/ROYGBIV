@@ -83,8 +83,6 @@ JobHandler.prototype.handle = function(previewModeCommand){
       this.handleRunAutomaticallyCommand();
     }else if (this.splitted[0] == "runmanually"){
       this.handleRunManuallyCommand();
-    }else if (this.splitted[0] == "destroyimage"){
-      this.handleDestroyImageCommand();
     }else if (this.splitted[0] == "setblending"){
       this.handleSetBlendingCommand();
     }else if (this.splitted[0] == "applydisplacementmap"){
@@ -551,25 +549,6 @@ JobHandler.prototype.handleSetBlendingCommand = function(){
     terminal.printError(Text.NO_OBJECT_FOUND);
   }else{
     terminal.printInfo(Text.COMMAND_EXECUTED_FOR_X_OBJECTS.replace(Text.PARAM1, ctr));
-  }
-}
-
-JobHandler.prototype.handleDestroyImageCommand = function(){
-  var imgNamePrefix = this.splitted[1].split("*")[0];
-  var ctr = 0;
-  for (var imageName in uploadedImages){
-    if (imageName.startsWith(imgNamePrefix)){
-      parseCommand(
-        "destroyImage "+imageName
-      );
-      ctr ++;
-    }
-  }
-  if (ctr == 0){
-
-    terminal.printError(Text.NO_IMAGES_FOUND);
-  }else{
-    terminal.printInfo(Text.COMMAND_EXECUTED_FOR_X_IMAGES.replace(Text.PARAM1, ctr));
   }
 }
 
