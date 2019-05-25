@@ -61,6 +61,8 @@ window.onload = function() {
     muzzleFlashCreatorGUIHandler = new MuzzleFlashCreatorGUIHandler();
     // FPS WEAPON GUI HANDLER
     fpsWeaponGUIHandler = new FPSWeaponGUIHandler();
+    // TEXTURE PACK CREATOR GUI HANDLER
+    texturePackCreatorGUIHandler = new TexturePackCreatorGUIHandler();
   }
 
   // PHYSICS BODY GENERATOR

@@ -1,15 +1,19 @@
-This folder holds the Texture Packs, do NOT delete this folder.
+This folder holds the Texture Packs, do not delete this folder.
 
 Each Texture Pack is a directory containing different type of maps/textures
-for the same object. Use (Note that * is the extension of each image file):
+for the same object:
 
-diffuse.* -> For diffuse maps
-alpha.* -> For alpha maps (black: invisible, white: visible)
-ao.* -> For ambient occulsion maps
-emissive.* -> For emissive maps
-normal.* -> For normal maps
-specular.* -> For specular maps
-height.* -> For height/displacement maps
+diffuse.png -> For diffuse maps
+alpha.png -> For alpha maps (black: invisible, white: visible)
+ao.png -> For ambient occulsion maps
+emissive.png -> For emissive maps
+normal.png -> For normal maps
+specular.png -> For specular maps
+height.png -> For height/displacement maps
+
+PNG is the supported default file extension. Texture compressions are handled automatically by ROYGBIV engine.
+So all you need to do is to put PNG images into folders. Note that a texture pack folder is only valid
+if it at least contains a "diffuse.png".
 
 You can load Texture Packs using the command:
-  "newTexturePack name directory fileExtension"
+  "newTexturePack name"

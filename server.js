@@ -52,6 +52,25 @@ app.post("/build", function(req, res){
   res.send(JSON.stringify({"path": __dirname+"/deploy/"+req.body.projectName+"/"}));
 });
 
+app.post("/getTexturePackFolders", function(req, res){
+  console.log("[*] Getting texture pack folders.");
+  var folders = [];
+  var dirs = fs.readdirSync("texture_packs").filter(f => {
+    var joined = path.join("./texture_packs/", f);
+    if (fs.existsSync(joined)){
+      return fs.statSync(joined).isDirectory();
+    }
+  });
+  for (var i = 0; i<dirs.length; i++){
+    var texturePackFolder = path.join("./texture_packs/"+dirs[i]);
+    if (fs.readdirSync(texturePackFolder).indexOf("diffuse.png") > -1){
+      folders.push(dirs[i]);
+    }
+  }
+  console.log("[*] Found "+folders.length+" texture packs.");
+  res.send(JSON.stringify(folders));
+})
+
 function copyWorkers(application){
   fs.mkdirSync("deploy/"+application.projectName+"/js/worker/");
   var raycasterWorkerContent = fs.readFileSync("./js/worker/RaycasterWorker.js", "utf8");
@@ -280,6 +299,7 @@ function readEngineScripts(projectName, author, noMobile){
         console.log("[*] Skipping ParticleSystemCreatorGUIHandler.");
         console.log("[*] Skipping MuzzleFlashCreatorGUIHandler.");
         console.log("[*] Skipping FPSWeaponGUIHandler.");
+        console.log("[*] Skipping TexturePackCreatorGUIHandler.");
         continue;
       }else if (scriptPath.includes("dat.gui.min.js")){
         console.log("[*] Skipping DAT gui.");

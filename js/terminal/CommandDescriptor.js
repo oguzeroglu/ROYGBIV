@@ -57,7 +57,7 @@ var CommandDescriptor = function(){
       2, //mapNormal
       2, //mapEmissive
       2, //newLambertMaterial
-      3, //newTexturePack
+      1, //newTexturePack
       0, //printTexturePacks
       1, //printTexturePackInfo
       2, //mapTexturePack
@@ -237,7 +237,7 @@ var CommandDescriptor = function(){
     "mapNormal textureName objectName",
     "mapEmissive textureName objectName",
     "newLambertMaterial name color",
-    "newTexturePack name directoryName fileExtension",
+    "newTexturePack name",
     "printTexturePacks",
     "printTexturePackInfo name",
     "mapTexturePack texturePackName objectName",
@@ -942,8 +942,6 @@ var CommandDescriptor = function(){
   this.newTexturePack = new Object();
   this.newTexturePack.types = [];
   this.newTexturePack.types.push(this.UNKNOWN_INDICATOR); //name
-  this.newTexturePack.types.push(this.UNKNOWN_INDICATOR); //directoryName
-  this.newTexturePack.types.push(this.FILE_EXTENSION); //fileExtension
 
   // printTexturePackInfo
   this.printTexturePackInfo = new Object();

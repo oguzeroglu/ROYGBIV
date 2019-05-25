@@ -1174,41 +1174,37 @@ function parse(input){
           //DEPRECATED
         break;
         case 56: //newTexturePack
-          var name = splitted[1];
-          var directoryName = splitted[2];
-          var fileExtension = splitted[3];
-
           if (mode != 0){
             terminal.printError(Text.WORKS_ONLY_IN_DESIGN_MODE);
             return true;
           }
-
-          if (texturePacks[name]){
+          var texturePackName = splitted[1];
+          if (texturePacks[texturePackName]){
             terminal.printError(Text.NAME_MUST_BE_UNIQUE);
             return true;
           }
-
-          if (directoryName.trim() == ""){
-            terminal.printError(Text.DIRECTORY_NAME_CANNOT_BE_EMPTY);
-            return true;
+          terminal.printInfo(Text.LOADING);
+          canvas.style.visibility = "hidden";
+          terminal.disable();
+          var xhr = new XMLHttpRequest();
+          xhr.open("POST", "/getTexturePackFolders", true);
+          xhr.setRequestHeader("Content-type", "application/json");
+          xhr.onreadystatechange = function (){
+            if (xhr.readyState == 4 && xhr.status == 200){
+              var folders = JSON.parse(xhr.responseText);
+              canvas.style.visibility = "";
+              terminal.clear();
+              if (folders.length == 0){
+                terminal.enable();
+                terminal.printError(Text.NO_VALID_TEXTURE_PACK_FOLDER);
+              }else{
+                terminal.disable();
+                terminal.printInfo(Text.AFTER_TEXTURE_PACK_CREATION);
+                texturePackCreatorGUIHandler.show(texturePackName, folders);
+              }
+            }
           }
-
-          if (fileExtension.trim() == ""){
-            terminal.printError(Text.FILE_EXTENSION_CANNOT_BE_EMPTY);
-            return true;
-          }
-
-          var texturePack = new TexturePack(
-            name,
-            directoryName,
-            fileExtension
-          );
-          texturePacks[name] = texturePack;
-          if (!DDS_SUPPORTED && fileExtension.toUpperCase() == "DDS"){
-            terminal.printInfo(Text.TEXTURE_CREATED_DDS_SUPPORT_ISSUE);
-          }else{
-            terminal.printInfo(Text.TEXTURE_PACK_CREATED);
-          }
+          xhr.send();
           return true;
         break;
         case 57: //printTexturePacks
