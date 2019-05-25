@@ -54,6 +54,7 @@ app.post("/build", function(req, res){
 
 app.post("/getTexturePackFolders", function(req, res){
   console.log("[*] Getting texture pack folders.");
+  res.setHeader('Content-Type', 'application/json');
   var folders = [];
   var dirs = fs.readdirSync("texture_packs").filter(f => {
     var joined = path.join("./texture_packs/", f);
@@ -69,7 +70,14 @@ app.post("/getTexturePackFolders", function(req, res){
   }
   console.log("[*] Found "+folders.length+" texture packs.");
   res.send(JSON.stringify(folders));
-})
+});
+
+app.post("/prepareTexturePack", function(req, res){
+  console.log("[*] Preparing texture pack: "+req.body.texturePackName);
+  var info = {};
+  res.setHeader('Content-Type', 'application/json');
+  res.send(JSON.stringify(info));
+});
 
 function copyWorkers(application){
   fs.mkdirSync("deploy/"+application.projectName+"/js/worker/");
