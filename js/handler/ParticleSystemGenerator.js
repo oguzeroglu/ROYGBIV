@@ -1172,32 +1172,20 @@ ParticleSystemGenerator.prototype.generateParticleSystem = function(configuratio
 }
 
 ParticleSystemGenerator.prototype.generateParticleSystemMesh = function(ps){
-  var textureMerger = 0;
-  var texturesObj = new Object();
-  var textureCount = 0;
-  var mergedTextureHash = "";
   var noTargetColor = true;
   var particles = ps.particles;
+  var hasTexture = false;
+  var textureName;
   for (var i = 0; i<particles.length; i++){
     if (!particles[i].material.noTargetColor){
       noTargetColor = false;
     }
     if (particles[i].material.texture){
-      if (!texturesObj[particles[i].material.texture]){
-        mergedTextureHash = particles[i].material.texture + PIPE;
-      }
-      texturesObj[particles[i].material.texture] = textures[particles[i].material.texture];
-      textureCount ++;
+      hasTexture = true;
+      textureName = particles[i].material.texture;
     }
   }
   ps.noTargetColor = noTargetColor;
-  ps.texturesObj = texturesObj;
-  if (textureCount > 0 && !mergedTextureCache[mergedTextureHash]){
-    textureMerger = new TextureMerger(texturesObj);
-    mergedTextureCache[mergedTextureHash] = textureMerger;
-  }else if (textureCount > 0 && mergedTextureCache[mergedTextureHash]){
-    textureMerger = mergedTextureCache[mergedTextureHash];
-  }
   ps.totalParticleCount = 0;
   var len = ps.particles.length;
   ps.geometry = new THREE.BufferGeometry();
@@ -1205,7 +1193,7 @@ ParticleSystemGenerator.prototype.generateParticleSystemMesh = function(ps){
   ps.flags2 = new Float32Array(len * 4);
   if (!ps.copyPS){
     ps.positions = new Float32Array(len * 3);
-    if (textureCount > 0){
+    if (hasTexture){
       ps.rgbThresholds = new Float32Array(len * 3);
       ps.uvCoordinates = new Float32Array(len * 4);
     }
@@ -1220,7 +1208,7 @@ ParticleSystemGenerator.prototype.generateParticleSystemMesh = function(ps){
     ps.angularQuaternions = new Float32Array(len * 4);
   }else{
     ps.positions = ps.copyPS.positions;
-    if (textureCount > 0){
+    if (hasTexture){
       ps.rgbThresholds = ps.copyPS.rgbThresholds;
       ps.uvCoordinates = ps.copyPS.uvCoordinates;
     }
@@ -1291,14 +1279,13 @@ ParticleSystemGenerator.prototype.generateParticleSystemMesh = function(ps){
       ps.flags2[i6++] = particle.material.size;
       ps.flags2[i6++] = particle.material.alpha;
       ps.expiredFlags[i] = 0;
-      if (textureCount > 0){
+      if (hasTexture){
         if (particle.material.texture){
           ps.flags2[i6++] = 10;
-          var range = textureMerger.ranges[particle.material.texture];
-          ps.uvCoordinates[i10++] = range.startU;
-          ps.uvCoordinates[i10++] = range.startV;
-          ps.uvCoordinates[i10++] = range.endU;
-          ps.uvCoordinates[i10++] = range.endV;
+          ps.uvCoordinates[i10++] = 0;
+          ps.uvCoordinates[i10++] = 0;
+          ps.uvCoordinates[i10++] = 1;
+          ps.uvCoordinates[i10++] = 1;
         }else{
           ps.flags2[i6++] = -10;
           ps.uvCoordinates[i10++] = -10;
@@ -1453,8 +1440,8 @@ ParticleSystemGenerator.prototype.generateParticleSystemMesh = function(ps){
   ps.velocity = new THREE.Vector3(ps.vx, ps.vy, ps.vz);
   ps.acceleration = new THREE.Vector3(ps.ax, ps.ay, ps.az);
   var texture;
-  if (textureMerger){
-    texture = textureMerger.mergedTexture;
+  if (hasTexture){
+    texture = texturePacks[textureName].diffuseTexture;
   }else{
     texture = false;
   }

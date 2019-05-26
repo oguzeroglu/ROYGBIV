@@ -6,6 +6,10 @@ var fileName = process.argv[3];
 var mainPath = process.argv[4];
 var useJPG = process.argv[5];
 
+if (typeof useJPG == "string"){
+  useJPG = useJPG.toLowerCase() == "true" 
+}
+
 compressTexture(type, fileName, mainPath);
 
 function compressTexture(type, fileName, mainPath){

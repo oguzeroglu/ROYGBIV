@@ -2122,11 +2122,9 @@ ParticleSystemCreatorGUIHandler.prototype.showCustom = function(prevParams){
 ParticleSystemCreatorGUIHandler.prototype.commonStartFunctions = function(psName){
   this.hiddenEngineObjects = [];
   this.usableTextureNames = [];
-  for (var textureName in textures){
-    var txt = textures[textureName];
-    if (txt instanceof THREE.Texture && !(txt instanceof THREE.CompressedTexture)){
-      this.usableTextureNames.push(textureName);
-    }
+  for (var textureName in texturePacks){
+    var txt = texturePacks[textureName];
+    this.usableTextureNames.push(textureName);
   }
   for (var i = 0; i<scene.children.length; i++){
     if (scene.children[i].visible){
