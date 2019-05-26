@@ -1,4 +1,4 @@
-var TexturePack = function(name, directoryName, textureDescription, onLoaded){
+var TexturePack = function(name, directoryName, textureDescription){
   this.directoryName = directoryName;
   this.name = name;
   this.textureDescription = textureDescription;
@@ -24,15 +24,16 @@ var TexturePack = function(name, directoryName, textureDescription, onLoaded){
   if (this.hasHeight){
     this.maxAttemptCount ++;
   }
-  if (onLoaded){
-    this.onLoaded = onLoaded;
-  }
   this.diffuseFilePath = texturePackRootDirectory+directoryName+"/diffuse"+textureLoaderFactory.getFilePostfix();
   this.alphaFilePath = texturePackRootDirectory+directoryName+"/alpha"+textureLoaderFactory.getFilePostfix();
   this.aoFilePath = texturePackRootDirectory+directoryName+"/ao"+textureLoaderFactory.getFilePostfix();
   this.emissiveFilePath = texturePackRootDirectory+directoryName+"/emissive"+textureLoaderFactory.getFilePostfix();
   this.heightFilePath = texturePackRootDirectory+directoryName+"/height"+textureLoaderFactory.getFilePostfix();
   this.loader = textureLoaderFactory.get();
+}
+
+TexturePack.prototype.clone = function(){
+  return new TexturePack(this.name, this.directoryName, this.textureDescription);
 }
 
 TexturePack.prototype.export = function(){
@@ -62,43 +63,43 @@ TexturePack.prototype.destroy = function(){
   delete texturePacks[this.name];
 }
 
-TexturePack.prototype.onTextureLoaded = function(){
+TexturePack.prototype.onTextureLoaded = function(onLoaded){
   this.totalLoadedCount ++;
-  if (this.maxAttemptCount == this.totalLoadedCount && this.onLoaded){
-    this.onLoaded();
+  if (this.maxAttemptCount == this.totalLoadedCount && onLoaded){
+    onLoaded();
   }
 }
 
-TexturePack.prototype.loadTexture = function(filePath, textureAttrName, textureAvailibilityAttrName){
+TexturePack.prototype.loadTexture = function(filePath, textureAttrName, textureAvailibilityAttrName, onLoaded){
   this.loader.load(filePath, function(textureData){
     this[textureAttrName] = textureData;
     this[textureAttrName].wrapS = THREE.RepeatWrapping;
     this[textureAttrName].wrapT = THREE.RepeatWrapping;
     this[textureAttrName].needsUpdate = true;
-    this.onTextureLoaded();
+    this.onTextureLoaded(onLoaded);
   }.bind(this), function(xhr){
 
   }, function(xhr){
     this[textureAvailibilityAttrName] = false;
-    this.onTextureLoaded();
+    this.onTextureLoaded(onLoaded);
     console.error("[!] "+textureAttrName+" could not be loaded --> "+this.name);
   }.bind(this));
 }
 
-TexturePack.prototype.loadTextures = function(){
+TexturePack.prototype.loadTextures = function(onLoaded){
   if (this.hasDiffuse){
-    this.loadTexture(this.diffuseFilePath, "diffuseTexture", "hasDiffuse");
+    this.loadTexture(this.diffuseFilePath, "diffuseTexture", "hasDiffuse", onLoaded);
   }
   if (this.hasAlpha){
-    this.loadTexture(this.alphaFilePath, "alphaTexture", "hasAlpha");
+    this.loadTexture(this.alphaFilePath, "alphaTexture", "hasAlpha", onLoaded);
   }
   if (this.hasAO){
-    this.loadTexture(this.aoFilePath, "aoTexture", "hasAO");
+    this.loadTexture(this.aoFilePath, "aoTexture", "hasAO", onLoaded);
   }
   if (this.hasEmissive){
-    this.loadTexture(this.emissiveFilePath, "emissiveTexture", "hasEmissive");
+    this.loadTexture(this.emissiveFilePath, "emissiveTexture", "hasEmissive", onLoaded);
   }
   if (this.hasHeight){
-    this.loadTexture(this.heightFilePath, "heightTexture", "hasHeight");
+    this.loadTexture(this.heightFilePath, "heightTexture", "hasHeight", onLoaded);
   }
 }

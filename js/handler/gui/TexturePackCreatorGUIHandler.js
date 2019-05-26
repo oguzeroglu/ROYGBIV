@@ -13,6 +13,17 @@ TexturePackCreatorGUIHandler.prototype.init = function(){
       if (texturePackCreatorGUIHandler.isLoading){
         return;
       }
+      var tp = texturePackCreatorGUIHandler.texturePack.clone();
+      texturePackCreatorGUIHandler.close(Text.TEXTURE_PACK_CREATED, false);
+      terminal.disable();
+      terminal.clear();
+      terminal.printInfo(Text.LOADING);
+      texturePacks[tp.name] = tp;
+      tp.loadTextures(function(){
+        terminal.enable();
+        terminal.clear();
+        terminal.printInfo(Text.TEXTURE_PACK_CREATED);
+      });
     },
     "Cancel": function(){
       if (texturePackCreatorGUIHandler.isLoading){
@@ -46,6 +57,10 @@ TexturePackCreatorGUIHandler.prototype.close = function(message, isError){
   }else{
     terminal.printError(message);
   }
+  activeControl = new FreeControls({});
+  activeControl.onActivated();
+  camera.quaternion.set(0, 0, 0, 1);
+  camera.position.set(initialCameraX, initialCameraY, initialCameraZ);
 }
 
 TexturePackCreatorGUIHandler.prototype.mapTexturePack = function(){
@@ -83,7 +98,8 @@ TexturePackCreatorGUIHandler.prototype.loadTexturePack = function(texturePackNam
       if (texturePackCreatorGUIHandler.texturePack){
         texturePackCreatorGUIHandler.texturePack.destroy();
       }
-      texturePackCreatorGUIHandler.texturePack = new TexturePack(texturePackName, dirName, resp, function(){
+      texturePackCreatorGUIHandler.texturePack = new TexturePack(texturePackName, dirName, resp);
+      texturePackCreatorGUIHandler.texturePack.loadTextures(function(){
         terminal.clear();
         terminal.printInfo(Text.AFTER_TEXTURE_PACK_CREATION);
         guiHandler.enableController(texturePackCreatorGUIHandler.texturePackController);
@@ -96,7 +112,6 @@ TexturePackCreatorGUIHandler.prototype.loadTexturePack = function(texturePackNam
         texturePackCreatorGUIHandler.mapTexturePack();
         texturePackCreatorGUIHandler.isLoading = false;
       });
-      texturePackCreatorGUIHandler.texturePack.loadTextures();
     }
   }
   xhr.onerror = function(e){
