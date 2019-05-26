@@ -3,7 +3,7 @@ var http = require("http");
 var bodyParser = require("body-parser");
 var fs = require("fs");
 var path = require("path");
-var textureCompressor = require("texture-compressor");
+var childProcess = require('child_process');
 
 console.log("*******************************************")
 console.log( " ____   _____   ______ ____ _____     __ ");
@@ -78,72 +78,68 @@ app.post("/prepareTexturePack", async function(req, res){
   var info = {hasDiffuse: false, hasAlpha: false, hasAO: false, hasEmissive: false, hasHeight: false};
   res.setHeader('Content-Type', 'application/json');
   var mainPath = "./texture_packs/"+req.body.texturePackName;
+  var compressInfo = [];
   if (fs.existsSync(mainPath+"/diffuse.png")){
     info.hasDiffuse = true;
-    await compressTexture("astc", "diffuse", mainPath);
-    await compressTexture("pvrtc", "diffuse", mainPath);
-    await compressTexture("s3tc", "diffuse", mainPath);
+    compressInfo.push(["astc", "diffuse", mainPath]);
+    compressInfo.push(["pvrtc", "diffuse", mainPath]);
+    compressInfo.push(["s3tc", "diffuse", mainPath]);
   }
   if (fs.existsSync(mainPath+"/alpha.png")){
     info.hasAlpha = true;
-    await compressTexture("astc", "alpha", mainPath);
-    await compressTexture("pvrtc", "alpha", mainPath);
-    await compressTexture("s3tc", "alpha", mainPath);
+    compressInfo.push(["astc", "alpha", mainPath]);
+    compressInfo.push(["pvrtc", "alpha", mainPath]);
+    compressInfo.push(["s3tc", "alpha", mainPath]);
   }
   if (fs.existsSync(mainPath+"/ao.png")){
     info.hasAO = true;
-    await compressTexture("astc", "ao", mainPath);
-    await compressTexture("pvrtc", "ao", mainPath);
-    await compressTexture("s3tc", "ao", mainPath);
+    compressInfo.push(["astc", "ao", mainPath]);
+    compressInfo.push(["pvrtc", "ao", mainPath]);
+    compressInfo.push(["s3tc", "ao", mainPath]);
   }
   if (fs.existsSync(mainPath+"/emissive.png")){
     info.hasEmissive = true;
-    await compressTexture("astc", "emissive", mainPath);
-    await compressTexture("pvrtc", "emissive", mainPath);
-    await compressTexture("s3tc", "emissive", mainPath);
+    compressInfo.push(["astc", "emissive", mainPath]);
+    compressInfo.push(["pvrtc", "emissive", mainPath]);
+    compressInfo.push(["s3tc", "emissive", mainPath]);
   }
   if (fs.existsSync(mainPath+"/height.png")){
     info.hasHeight = true;
-    await compressTexture("astc", "height", mainPath);
-    await compressTexture("pvrtc", "height", mainPath);
-    await compressTexture("s3tc", "height", mainPath);
+    compressInfo.push(["astc", "height", mainPath]);
+    compressInfo.push(["pvrtc", "height", mainPath]);
+    compressInfo.push(["s3tc", "height", mainPath]);
+  }
+  for (var i = 0; i<compressInfo.length; i++){
+    var result = await compressTexture(compressInfo[i][0], compressInfo[i][1], compressInfo[i][2], false);
+    if (result == "UNSUCC"){
+      console.log("[!] Error happened trying to compress: "+compressInfo[i][1]+" with "+compressInfo[i][0]);
+      result = await compressTexture(compressInfo[i][0], compressInfo[i][1], compressInfo[i][2], true);
+      if (result == "UNSUCC"){
+        res.send(JSON.stringify({error: true, texture: compressInfo[i][1]}));
+        return;
+      }else{
+        console.log("[*] Compressed "+compressInfo[i][1]+" texture using fallback format.");
+      }
+    }
   }
   res.send(JSON.stringify(info));
 });
 
-function compressTexture(type, fileName, mainPath){
-  try{
-    var quality, compression;
-    var output = mainPath+"/"+fileName+"-"+type+".ktx";
-    if (fs.existsSync(output)){
-      return new Promise(function(resolve, reject){resolve();});
-    }
-    switch(type){
-      case "astc":
-        quality = "astcmedium";
-        compression = "ASTC_4x4";
-      break;
-      case "pvrtc":
-        quality = "pvrtcnormal";
-        compression = "PVRTC1_4";
-      break;
-      case "s3tc":
-        quality = "normal";
-        compression = "DXT1A";
-      break;
-    }
-    return textureCompressor.pack({
-      type: type,
-      input: mainPath+"/"+fileName+".png",
-      output: output,
-      compression: compression,
-      quality: quality,
-      verbose: true,
-    });
-  }catch (err){
-    console.error("[!] Error compressing texture: "+fileName+" with type: "+type);
-    return new Promise(function(resolve, reject){resolve();});
+function compressTexture(type, fileName, mainPath, useJPG){
+  var output = mainPath+"/"+fileName+"-"+type+".ktx";
+  if (fs.existsSync(output)){
+    return new Promise(function(resolve, reject){resolve("SUCC");});
   }
+  return new Promise(function(resolve, reject){
+    console.log("[*] Running textureCompressor script for: "+type+", "+fileName);
+    runScript("./textureCompressor.js", [type, fileName, mainPath, useJPG], function(err){
+      if (err){
+        resolve("UNSUCC");
+      }else{
+        resolve("SUCC");
+      }
+    })
+  });
 }
 
 function copyWorkers(application){
@@ -404,6 +400,23 @@ function copyFolderRecursiveSync( source, target ) {
       }
     } );
   }
+}
+
+
+function runScript(scriptPath, params, callback) {
+  var invoked = false;
+  var process = childProcess.fork(scriptPath, params);
+  process.on('error', function (err) {
+      if (invoked) return;
+      invoked = true;
+      callback(err);
+  });
+  process.on('exit', function (code) {
+      if (invoked) return;
+      invoked = true;
+      var err = code === 0 ? null : new Error('exit code ' + code);
+      callback(err);
+  });
 }
 
 app.use(express.static('./'));

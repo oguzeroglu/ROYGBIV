@@ -73,6 +73,11 @@ TexturePackCreatorGUIHandler.prototype.loadTexturePack = function(texturePackNam
   xhr.onreadystatechange = function (){
     if (xhr.readyState == 4 && xhr.status == 200){
       var resp = JSON.parse(xhr.responseText);
+      if (resp.error){
+        texturePackCreatorGUIHandler.isLoading = false;
+        texturePackCreatorGUIHandler.close(Text.TEXTURE_COMPRESSION_ENCODE_ERROR.replace(Text.PARAM1, resp.texture).replace(Text.PARAM2, dirName), true);
+        return;
+      }
       terminal.printInfo(Text.TEXTURES_COMPRESSED);
       terminal.printInfo(Text.LOADING);
       if (texturePackCreatorGUIHandler.texturePack){
