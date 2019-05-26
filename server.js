@@ -112,33 +112,38 @@ app.post("/prepareTexturePack", async function(req, res){
 });
 
 function compressTexture(type, fileName, mainPath){
-  var quality, compression;
-  var output = mainPath+"/"+fileName+"-"+type+".ktx";
-  if (fs.existsSync(output)){
+  try{
+    var quality, compression;
+    var output = mainPath+"/"+fileName+"-"+type+".ktx";
+    if (fs.existsSync(output)){
+      return new Promise(function(resolve, reject){resolve();});
+    }
+    switch(type){
+      case "astc":
+        quality = "astcmedium";
+        compression = "ASTC_4x4";
+      break;
+      case "pvrtc":
+        quality = "pvrtcnormal";
+        compression = "PVRTC1_4";
+      break;
+      case "s3tc":
+        quality = "normal";
+        compression = "DXT1A";
+      break;
+    }
+    return textureCompressor.pack({
+      type: type,
+      input: mainPath+"/"+fileName+".png",
+      output: output,
+      compression: compression,
+      quality: quality,
+      verbose: true,
+    });
+  }catch (err){
+    console.error("[!] Error compressing texture: "+fileName+" with type: "+type);
     return new Promise(function(resolve, reject){resolve();});
   }
-  switch(type){
-    case "astc":
-      quality = "astcmedium";
-      compression = "ASTC_4x4";
-    break;
-    case "pvrtc":
-      quality = "pvrtcnormal";
-      compression = "PVRTC1_4";
-    break;
-    case "s3tc":
-      quality = "normal";
-      compression = "DXT1A";
-    break;
-  }
-  return textureCompressor.pack({
-    type: type,
-    input: mainPath+"/"+fileName+".png",
-    output: output,
-    compression: compression,
-    quality: quality,
-    verbose: true,
-  });
 }
 
 function copyWorkers(application){

@@ -27,6 +27,12 @@ var TexturePack = function(name, directoryName, textureDescription, onLoaded){
   if (onLoaded){
     this.onLoaded = onLoaded;
   }
+  this.diffuseFilePath = texturePackRootDirectory+directoryName+"/diffuse"+textureLoaderFactory.getFilePostfix();
+  this.alphaFilePath = texturePackRootDirectory+directoryName+"/alpha"+textureLoaderFactory.getFilePostfix();
+  this.aoFilePath = texturePackRootDirectory+directoryName+"/ao"+textureLoaderFactory.getFilePostfix();
+  this.emissiveFilePath = texturePackRootDirectory+directoryName+"/emissive"+textureLoaderFactory.getFilePostfix();
+  this.heightFilePath = texturePackRootDirectory+directoryName+"/height"+textureLoaderFactory.getFilePostfix();
+  this.loader = textureLoaderFactory.get();
 }
 
 TexturePack.prototype.export = function(){
@@ -63,96 +69,36 @@ TexturePack.prototype.onTextureLoaded = function(){
   }
 }
 
+TexturePack.prototype.loadTexture = function(filePath, textureAttrName, textureAvailibilityAttrName){
+  this.loader.load(filePath, function(textureData){
+    this[textureAttrName] = textureData;
+    this[textureAttrName].wrapS = THREE.RepeatWrapping;
+    this[textureAttrName].wrapT = THREE.RepeatWrapping;
+    this[textureAttrName].needsUpdate = true;
+    this.onTextureLoaded();
+  }.bind(this), function(xhr){
+
+  }, function(xhr){
+    this[textureAvailibilityAttrName] = false;
+    this.onTextureLoaded();
+    console.error("[!] "+textureAttrName+" could not be loaded --> "+this.name);
+  }.bind(this));
+}
+
 TexturePack.prototype.loadTextures = function(){
-  var that = this;
-  //DIFFUSE
-  this.loader.load(this.diffuseFilePath,
-    function(textureData){
-      that.diffuseTexture = textureData;
-      that.diffuseTexture.wrapS = THREE.RepeatWrapping;
-      that.diffuseTexture.wrapT = THREE.RepeatWrapping;
-      that.diffuseTexture.needsUpdate = true;
-      that.hasDiffuse = true;
-      that.onTextureLoaded();
-    },
-    function(xhr){
-
-    },
-    function(xhr){
-      that.hasDiffuse = false;
-      that.onTextureLoaded();
-    }
-  );
-  //ALPHA
-  this.loader.load(this.alphaFilePath,
-    function(textureData){
-      that.alphaTexture = textureData;
-      that.alphaTexture.wrapS = THREE.RepeatWrapping;
-      that.alphaTexture.wrapT = THREE.RepeatWrapping;
-      that.hasAlpha = true;
-      that.alphaTexture.needsUpdate = true;
-      that.onTextureLoaded();
-    },
-    function(xhr){
-
-    },
-    function(xhr){
-      that.hasAlpha = false;
-      that.onTextureLoaded();
-    }
-  );
-  //AO
-  this.loader.load(this.aoFilePath,
-    function(textureData){
-      that.aoTexture = textureData;
-      that.aoTexture.wrapS = THREE.RepeatWrapping;
-      that.aoTexture.wrapT = THREE.RepeatWrapping;
-      that.hasAO = true;
-      that.aoTexture.needsUpdate = true;
-      that.onTextureLoaded();
-    },
-    function(xhr){
-
-    },
-    function(xhr){
-      that.hasAo = false;
-      that.onTextureLoaded();
-    }
-  );
-  //EMISSIVE
-  this.loader.load(this.emissiveFilePath,
-    function(textureData){
-      that.emissiveTexture = textureData;
-      that.emissiveTexture.wrapS = THREE.RepeatWrapping;
-      that.emissiveTexture.wrapT = THREE.RepeatWrapping;
-      that.hasEmissive = true;
-      that.emissiveTexture.needsUpdate = true;
-      that.onTextureLoaded();
-    },
-    function(xhr){
-
-    },
-    function(xhr){
-      that.hasEmissive = false;
-      that.onTextureLoaded();
-    }
-  );
-  //HEIGHT
-  this.loader.load(this.heightFilePath,
-    function(textureData){
-      that.heightTexture = textureData;
-      that.heightTexture.wrapS = THREE.RepeatWrapping;
-      that.heightTexture.wrapT = THREE.RepeatWrapping;
-      that.hasHeight = true;
-      that.heightTexture.needsUpdate = true;
-      that.onTextureLoaded();
-    },
-    function(xhr){
-
-    },
-    function(xhr){
-      that.hasHeight = false;
-      that.onTextureLoaded();
-    }
-  );
+  if (this.hasDiffuse){
+    this.loadTexture(this.diffuseFilePath, "diffuseTexture", "hasDiffuse");
+  }
+  if (this.hasAlpha){
+    this.loadTexture(this.alphaFilePath, "alphaTexture", "hasAlpha");
+  }
+  if (this.hasAO){
+    this.loadTexture(this.aoFilePath, "aoTexture", "hasAO");
+  }
+  if (this.hasEmissive){
+    this.loadTexture(this.emissiveFilePath, "emissiveTexture", "hasEmissive");
+  }
+  if (this.hasHeight){
+    this.loadTexture(this.heightFilePath, "heightTexture", "hasHeight");
+  }
 }

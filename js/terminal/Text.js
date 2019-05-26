@@ -275,6 +275,7 @@ var Text = function(){
   this.NO_TEXTURE_PACKS_CREATED = "No texture packs created.";
   this.NO_SUCH_TEXTURE_PACK = "No such texture pack.";
   this.NO_SUCH_TEXT = "No such text.";
+  this.TEXTURE_COMPRESSION_ERROR = "Error happened while compressing texture pack @@1. Try to use smaller PNGs.";
   this.TEXTURE_PACK_NOT_USABLE = "Texture pack not usable.";
   this.TEXTURE_PACK_MAPPED = "Texture pack mapped.";
   this.TEXTURE_PACK_DESTROYED = "Texture pack destroyed.";

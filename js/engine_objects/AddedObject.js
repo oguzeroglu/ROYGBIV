@@ -1,6 +1,6 @@
 var AddedObject = function(name, type, metaData, material, mesh, physicsBody, destroyedGrids){
   this.isAddedObject = true;
-  if (IS_WORKER_CONTEXT){
+  if (IS_WORKER_CONTEXT || type == "MOCK"){
     return this;
   }
   this.name = name;
