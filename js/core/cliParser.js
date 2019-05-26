@@ -1217,10 +1217,7 @@ function parse(input){
             if (count == length){
               options = false;
             }
-            terminal.printInfo(
-              Text.TREE.replace(Text.PARAM1, texturePackName),
-              options
-            );
+            terminal.printInfo(Text.TREE2.replace(Text.PARAM1, texturePackName).replace(Text.PARAM2, texturePacks[texturePackName].directoryName), options);
           }
           if (count == 0){
             terminal.printError(Text.NO_TEXTURE_PACKS_CREATED);
