@@ -15,6 +15,8 @@ window.onload = function() {
   isOrientationLandscape = (window.innerWidth > window.innerHeight);
   // MACRO HANDLER
   macroHandler = new MacroHandler();
+  // TEXTURE ATLAS HANDLER
+  textureAtlasHandler = new TextureAtlasHandler();
   // TEXT POOL
   Text = (!isDeployment)? new Text(): 0;
   // DRAGABLE CLI
@@ -625,6 +627,14 @@ function dumpPerformance(){
 }
 
 //******************************************************************
+// WARNING: FOR TEST PURPOSES
+function debugTexture(texture){
+  var context = texture.image.getContext("2d");
+  var newTab = window.open();
+  var img = new Image(texture.image.width, texture.image.height);
+  img.src = texture.image.toDataURL();
+  newTab.document.body.appendChild(img);
+}
 // WARNING: FOR TEST PURPOSES
 function debugCanvas(dbgCanvas){
   var context = dbgCanvas.getContext("2d");

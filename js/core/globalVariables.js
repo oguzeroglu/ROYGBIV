@@ -142,6 +142,7 @@ var cylinderWidthSegments = 10;
 var cylinderHeightSegments = 10;
 var defaultMaterialType = "BASIC"; //BASIC / PHONG
 var texturePackRootDirectory = "texture_packs/";
+var atlasRootDirectory = "texture_atlas/";
 var skyBoxRootDirectory = "skybox/";
 var dataPrefix = "text/json;charset=utf-8,";
 var skyboxDistance = 4000;
@@ -253,6 +254,7 @@ var areas = new Object();
 var areasVisible = true;
 var areaConfigurationsVisible = false;
 var areaConfigurationsHandler;
+var textureAtlasHandler;
 var markedPointsVisible = true;
 var frustum = new THREE.Frustum();
 var SIDE_BOTH = "Both";

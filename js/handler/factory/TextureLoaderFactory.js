@@ -22,3 +22,7 @@ TextureLoaderFactory.prototype.get = function(){
   }
   return this.textureLoader;
 }
+
+TextureLoaderFactory.prototype.getDefault = function(){
+  return this.textureLoader;
+}

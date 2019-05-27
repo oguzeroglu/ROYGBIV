@@ -496,6 +496,8 @@ StateLoader.prototype.resetProject = function(){
   muzzleFlashes = new Object();
   areaBinHandler = new WorldBinHandler(true);
   webglCallbackHandler = new WebGLCallbackHandler();
+  textureAtlasHandler.dispose();
+  textureAtlasHandler = new TextureAtlasHandler();
   threejsRenderMonitoringHandler = new THREEJSRenderMonitoringHandler();
   objectsWithOnClickListeners = new Map();
   objectsWithMouseOverListeners = new Map();

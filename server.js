@@ -110,10 +110,10 @@ app.post("/prepareTexturePack", async function(req, res){
     compressInfo.push(["s3tc", "height", mainPath]);
   }
   for (var i = 0; i<compressInfo.length; i++){
-    var result = await compressTexture(compressInfo[i][0], compressInfo[i][1], compressInfo[i][2], false);
+    var result = await compressTexture(compressInfo[i][0], compressInfo[i][1], compressInfo[i][2], false, false);
     if (result == "UNSUCC"){
       console.log("[!] Error happened trying to compress: "+compressInfo[i][1]+" with "+compressInfo[i][0]);
-      result = await compressTexture(compressInfo[i][0], compressInfo[i][1], compressInfo[i][2], true);
+      result = await compressTexture(compressInfo[i][0], compressInfo[i][1], compressInfo[i][2], true, false);
       if (result == "UNSUCC"){
         res.send(JSON.stringify({error: true, texture: compressInfo[i][1]}));
         return;
@@ -125,9 +125,87 @@ app.post("/prepareTexturePack", async function(req, res){
   res.send(JSON.stringify(info));
 });
 
-function compressTexture(type, fileName, mainPath, useJPG){
+app.post("/compressTextureAtlas", async function(req, res){
+  console.log("[*] Compressing texture atlas.");
+  var hasPNGBackup = false;
+  var hasASTCBackup = false;
+  var hasPVRTCBackup = false;
+  var hasS3TCBackup = false;
+  if (fs.existsSync("./texture_atlas/textureAtlas.png")){
+    console.log("[*] Backing up PNG atlas.");
+    fs.renameSync("./texture_atlas/textureAtlas.png", "./texture_atlas/textureAtlas-backup.png");
+    hasPNGBackup = true;
+  }
+  if (fs.existsSync("./texture_atlas/textureAtlas-astc.ktx")){
+    console.log("[*] Backing up ASTC atlas.");
+    fs.renameSync("./texture_atlas/textureAtlas-astc.ktx", "./texture_atlas/textureAtlas-astc-backup.ktx");
+    hasASTCBackup = true;
+  }
+  if (fs.existsSync("./texture_atlas/textureAtlas-pvrtc.ktx")){
+    console.log("[*] Backing up PVRTC atlas.");
+    fs.renameSync("./texture_atlas/textureAtlas-pvrtc.ktx", "./texture_atlas/textureAtlas-pvrtc-backup.ktx");
+    hasPVRTCBackup = true;
+  }
+  if (fs.existsSync("./texture_atlas/textureAtlas-s3tc.ktx")){
+    console.log("[*] Backing up S3TC atlas.");
+    fs.renameSync("./texture_atlas/textureAtlas-s3tc.ktx", "./texture_atlas/textureAtlas-s3tc-backup.ktx");
+    hasS3TCBackup = true;
+  }
+  try{
+    var base64Data = req.body.image.replace(/^data:image\/png;base64,/, "");
+    fs.writeFileSync("./texture_atlas/textureAtlas.png", base64Data, "base64");
+    console.log("[*] PNG saved to disk.");
+    res.setHeader('Content-Type', 'application/json');
+    var compressInfo = [];
+    compressInfo.push(["astc", "textureAtlas", "./texture_atlas"]);
+    compressInfo.push(["pvrtc", "textureAtlas", "./texture_atlas"]);
+    compressInfo.push(["s3tc", "textureAtlas", "./texture_atlas"]);
+    for (var i = 0; i<compressInfo.length; i++){
+      var result = await compressTexture(compressInfo[i][0], compressInfo[i][1], compressInfo[i][2], false, true);
+      if (result == "UNSUCC"){
+        res.send(JSON.stringify({error: true}));
+        handleAtlasBackup(true, hasPNGBackup, hasASTCBackup, hasPVRTCBackup, hasS3TCBackup);
+        return;
+      }
+    }
+    handleAtlasBackup(false, hasPNGBackup, hasASTCBackup, hasPVRTCBackup, hasS3TCBackup);
+    res.send(JSON.stringify({error: false}));
+  }catch (err){
+    console.log(err);
+    res.send(JSON.stringify({error: true}));
+    handleAtlasBackup(true, hasPNGBackup, hasASTCBackup, hasPVRTCBackup, hasS3TCBackup);
+  }
+});
+
+function handleBackup(restore, filePath, backupFilePath){
+  if (restore){
+    if (fs.existsSync(filePath)){
+      fs.unlinkSync(filePath);
+    }
+    fs.renameSync(backupFilePath, filePath);
+  }else{
+    fs.unlinkSync(backupFilePath);
+  }
+}
+
+function handleAtlasBackup(restore, hasPNGBackup, hasASTCBackup, hasPVRTCBackup, hasS3TCBackup){
+  if (hasPNGBackup){
+    handleBackup(restore, "./texture_atlas/textureAtlas.png", "./texture_atlas/textureAtlas-backup.png");
+  }
+  if (hasASTCBackup){
+    handleBackup(restore, "./texture_atlas/textureAtlas-astc.ktx", "./texture_atlas/textureAtlas-astc-backup.ktx");
+  }
+  if (hasPVRTCBackup){
+    handleBackup(restore, "./texture_atlas/textureAtlas-pvrtc.ktx", "./texture_atlas/textureAtlas-pvrtc-backup.ktx");
+  }
+  if (hasS3TCBackup){
+    handleBackup(restore, "./texture_atlas/textureAtlas-s3tc.ktx", "./texture_atlas/textureAtlas-s3tc-backup.ktx");
+  }
+}
+
+function compressTexture(type, fileName, mainPath, useJPG, overwrite){
   var output = mainPath+"/"+fileName+"-"+type+".ktx";
-  if (fs.existsSync(output)){
+  if (fs.existsSync(output) && !overwrite){
     return new Promise(function(resolve, reject){resolve("SUCC");});
   }
   return new Promise(function(resolve, reject){
