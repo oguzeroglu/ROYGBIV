@@ -18,6 +18,8 @@ var State = function(projectName, author){
   this.PHYSICS_WORKER_ON = PHYSICS_WORKER_ON;
   // PS REF HEIGHT *************************************************
   this.particleSystemRefHeight = particleSystemRefHeight;
+  // TEXTURE ATLAS *************************************************
+  this.textureAtlas = textureAtlasHandler.export();
   // SHADER PRECISIONS *********************************************
   this.shaderPrecisions = shaderPrecisionHandler.export();
   // GRID SYSTEMS **************************************************

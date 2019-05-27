@@ -20,7 +20,7 @@ TextureAtlasHandler.prototype.compressTexture = function(base64Data, readyCallba
       if (resp.error){
         errorCallback();
       }else{
-        textureAtlasHandler.atlas = new TexturePack(null, null, {isAtlas: true})
+        textureAtlasHandler.atlas = new TexturePack(null, null, {isAtlas: true});
         textureAtlasHandler.atlas.loadTextures(function(){
           readyCallback();
         });
@@ -55,5 +55,29 @@ TextureAtlasHandler.prototype.onTexturePackChange = function(readyCallback, erro
       return;
     }
     this.compressTexture(textureMerger.mergedTexture.image.toDataURL(), readyCallback, errorCallback);
+  }
+}
+
+TextureAtlasHandler.prototype.export = function(){
+  var exportObject = new Object();
+  if (this.atlas){
+    exportObject.hasTextureAtlas = true;
+    exportObject.ranges = this.textureMerger.ranges;
+  }else{
+    exportObject.hasTextureAtlas = false;
+  }
+  return exportObject;
+}
+
+TextureAtlasHandler.prototype.import = function(exportObject, readyCallback){
+  if (isDeployment){
+    this.textureMerger = new TextureMerger();
+    this.textureMerger.ranges = JSON.parse(JSON.stringify(exportObject.ranges));
+    textureAtlasHandler.atlas = new TexturePack(null, null, {isAtlas: true});
+    textureAtlasHandler.atlas.loadTextures(function(){
+      readyCallback();
+    });
+  }else{
+    this.onTexturePackChange(readyCallback, readyCallback);
   }
 }

@@ -943,3 +943,12 @@ ImportHandler.prototype.mapLoadedTexturePack = function(texturePackName, exportO
     }
   }
 }
+
+ImportHandler.prototype.importTextureAtlas = function(obj, callback){
+  if (obj.textureAtlas && obj.textureAtlas.hasTextureAtlas){
+    textureAtlasHandler.import(obj.textureAtlas, callback);
+    if (!isDeployment){
+      terminal.printInfo(Text.GENERATING_TEXTURE_ATLAS);
+    }
+  }
+}

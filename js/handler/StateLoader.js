@@ -8,11 +8,17 @@ var StateLoader = function(stateObj){
   this.importHandler = new ImportHandler();
 }
 
-StateLoader.prototype.onTexturePackLoaded = function(obj){
+StateLoader.prototype.onTextureAtlasLoaded = function(){
+  this.textureAtlasReady = true;
+  this.finalize();
+}
+
+StateLoader.prototype.onTexturePackLoaded = function(){
   this.totalLoadedTexturePackCount ++;
-  if (parseInt(this.totalLoadedTexturePackCount) == parseInt(this.stateObj.totalTexturePackCount)){
-    this.finalize();
+  if (this.totalLoadedTexturePackCount == this.stateObj.totalTexturePackCount){
+    this.importHandler.importTextureAtlas(this.stateObj, this.onTextureAtlasLoaded.bind(this));
   }
+  this.finalize();
 }
 
 StateLoader.prototype.load = function(){
@@ -21,6 +27,8 @@ StateLoader.prototype.load = function(){
     this.resetProject();
     var obj = this.stateObj;
     this.hasTexturePacks = this.stateObj.totalTexturePackCount > 0;
+    this.hasTextureAtlas = this.stateObj.textureAtlas? this.stateObj.textureAtlas.hasTextureAtlas: false;
+    this.textureAtlasReady = false;
 
     this.importHandler.importEngineVariables(obj);
     this.importHandler.importGridSystems(obj);
@@ -110,11 +118,9 @@ StateLoader.prototype.load = function(){
       });
       font.load();
     }
-
-    if (!this.hasTexturePacks && !this.hasSkyboxes && !this.hasFonts){
+    if (!this.hasTexturePacks && !this.hasSkyboxes && !this.hasFonts && !this.hasTextureAtlas){
       this.finalize();
     }
-
     return true;
   }catch (err){
     projectLoaded = true;
@@ -126,8 +132,10 @@ StateLoader.prototype.load = function(){
 
 StateLoader.prototype.finalize = function(){
   var obj = this.stateObj;
-  if (parseInt(this.totalLoadedSkyboxCount) < parseInt(obj.totalSkyboxCount) ||
-        parseInt(this.totalLoadedFontCount) < parseInt(obj.totalFontCount)){
+  if ((this.hasTextureAtlas && !this.textureAtlasReady) ||
+      parseInt(this.totalLoadedTexturePackCount) < parseInt(this.stateObj.totalTexturePackCount) ||
+        parseInt(this.totalLoadedSkyboxCount) < parseInt(obj.totalSkyboxCount) ||
+          parseInt(this.totalLoadedFontCount) < parseInt(obj.totalFontCount)){
       return;
   }
 
