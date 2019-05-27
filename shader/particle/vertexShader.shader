@@ -283,7 +283,7 @@ void main(){
       mvPosition = viewMatrix * vec4(newPosition, 1.0);
     }
 
-    gl_PointSize = (500.0 - (selectedDissapearCoef * selectedTime)) * size / length(mvPosition.xyz) * selectedMVMatrix[0][0];
+    gl_PointSize = (500.0 - (selectedDissapearCoef * selectedTime)) * size / length(mvPosition.xyz) * selectedWorldMatrix[0][0];
     #ifdef HAS_REF_HEIGHT
       gl_PointSize = gl_PointSize * refHeightCoef;
     #endif
