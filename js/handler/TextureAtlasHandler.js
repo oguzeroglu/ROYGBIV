@@ -48,6 +48,7 @@ TextureAtlasHandler.prototype.onTexturePackChange = function(readyCallback, erro
     var textureMerger;
     try{
       textureMerger = new TextureMerger(texturesObj);
+      this.textureMerger = textureMerger;
     }catch (err){
       console.error(err);
       errorCallback();

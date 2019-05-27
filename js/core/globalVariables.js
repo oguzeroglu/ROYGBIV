@@ -214,7 +214,6 @@ var MESSAGE_TYPE_BASIC = 0;
 var MESSAGE_TYPE_BUFFER = 1;
 var UNDEFINED = "undefined";
 var PIPE = "|";
-var mergedTextureCache = new Object();
 var reusableCollisionInfo;
 var TOTAL_OBJECT_COLLISION_LISTENER_COUNT = 0;
 var MAX_OBJECT_COLLISION_LISTENER_COUNT = 50;

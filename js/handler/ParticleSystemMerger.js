@@ -12,7 +12,6 @@ var ParticleSystemMerger = function(psObj, name){
 
   var texturesObj = new Object();
   var textureCount = 0;
-  var textureMergerHash = "";
   var len = 0;
   var noTargetColor = true;
   for (var psName in this.psObj){
@@ -22,24 +21,16 @@ var ParticleSystemMerger = function(psObj, name){
       noTargetColor = false;
     }
     len += ps.particles.length;
-    for (var textureName in ps.texturesObj){
-      if (!texturesObj[textureName]){
-        textureMergerHash += textureName + PIPE;
-      }
-      texturesObj[textureName] = textures[textureName];
+    if (!(typeof ps.textureName == UNDEFINED)){
+      texturesObj[ps.textureName] = texturePacks[ps.textureName];
       textureCount ++;
     }
   }
   this.noTargetColor = noTargetColor;
   var textureMerger = 0;
-
-  if (textureCount > 0 && !(mergedTextureCache[textureMergerHash])){
-    textureMerger = new TextureMerger(texturesObj);
-    mergedTextureCache[textureMergerHash] = textureMerger;
-  }else if (textureCount > 0 && mergedTextureCache[textureMergerHash]){
-    textureMerger = mergedTextureCache[textureMergerHash];
+  if (textureCount > 0){
+    textureMerger = textureAtlasHandler.textureMerger;
   }
-
   var mvMatrixArray = [];
   var worldMatrixArray = [];
   var timeArray = [];
@@ -148,10 +139,9 @@ var ParticleSystemMerger = function(psObj, name){
     mergedParticleSystems[this.name] = this;
   }
 
-
   var texture;
   if (textureMerger){
-    texture = textureMerger.mergedTexture;
+    texture = textureAtlasHandler.atlas.diffuseTexture;
   }
 
   this.mergedIndicesBufferAttribute = new THREE.BufferAttribute(this.mergedIndices, 1);

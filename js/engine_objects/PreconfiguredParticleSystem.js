@@ -85,6 +85,9 @@ PreconfiguredParticleSystem.prototype.getParticleSystem = function(){
     if (!(typeof this.scale == UNDEFINED)){
       ps.mesh.scale.set(this.scale, this.scale, this.scale);
     }
+    if (this.getUsedTextureName() != null){
+      ps.textureName = this.getUsedTextureName();
+    }
     return ps;
   }
   throw new Error("Unknown type.");

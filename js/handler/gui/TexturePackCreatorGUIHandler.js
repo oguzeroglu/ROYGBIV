@@ -115,6 +115,7 @@ TexturePackCreatorGUIHandler.prototype.loadTexturePack = function(texturePackNam
         texturePackCreatorGUIHandler.texturePack.destroy();
       }
       texturePackCreatorGUIHandler.texturePack = new TexturePack(texturePackName, dirName, resp);
+      texturePackCreatorGUIHandler.texturePack.isParticleTexture = texturePackCreatorGUIHandler.configurations["Particle texture"];
       texturePackCreatorGUIHandler.texturePack.loadTextures(function(){
         terminal.clear();
         terminal.printInfo(Text.AFTER_TEXTURE_PACK_CREATION);
