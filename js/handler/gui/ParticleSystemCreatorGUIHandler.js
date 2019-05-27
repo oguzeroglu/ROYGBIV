@@ -1775,6 +1775,10 @@ ParticleSystemCreatorGUIHandler.prototype.handleCustomMaterialFolder = function(
   folder.add(customPSMaterialParameters, "size").min(0.1).max(20).step(0.01).onFinishChange(function(val){ particleSystemCreatorGUIHandler.customPSGeneratorFunc(); }).listen();
   folder.add(customPSMaterialParameters, "alpha").min(0).max(1).step(0.1).onFinishChange(function(val){ particleSystemCreatorGUIHandler.customPSGeneratorFunc(); }).listen();
   var hasTextureController = folder.add(customPSMaterialParameters, "hasTexture").onChange(function(val){
+    if (particleSystemCreatorGUIHandler.usableTextureNames.length == 0){
+      customPSMaterialParameters["hasTexture"] = false;
+      return;
+    }
     if (val){
       guiHandler.enableController(particleSystemCreatorGUIHandler.customTextureNameController);
       guiHandler.enableController(particleSystemCreatorGUIHandler.customRGBFilterController);
@@ -2124,7 +2128,9 @@ ParticleSystemCreatorGUIHandler.prototype.commonStartFunctions = function(psName
   this.usableTextureNames = [];
   for (var textureName in texturePacks){
     var txt = texturePacks[textureName];
-    this.usableTextureNames.push(textureName);
+    if (txt.isParticleTexture){
+      this.usableTextureNames.push(textureName);
+    }
   }
   for (var i = 0; i<scene.children.length; i++){
     if (scene.children[i].visible){

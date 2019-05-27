@@ -499,6 +499,7 @@ var Text = function(){
   this.TEXTURE_USED_IN_A_PARTICLE_SYSTEM = "Texture used in a particle system [@@1]. Cannot delete.";
   this.TEXTURE_USED_IN_AN_OBJECT = "Texture used in object [@@1]. Cannot delete.";
   this.TEXTURE_PACK_USED_IN_AN_OBJECT = "Texture pack used in object [@@1]. Cannot delete.";
+  this.TEXTURE_PACK_USED_IN_A_PARTICLE_SYSTEM = "Texture pack used in a particle system [@@1]. Cannot delete.";
   this.MATERIAL_USED_IN_AN_OBJECT = "Material used in an object [@@1]. Cannot delete.";
   this.NO_SUCH_IMAGE = "No such image.";
   this.IMAGE_DESTROYED = "Image destroyed.";

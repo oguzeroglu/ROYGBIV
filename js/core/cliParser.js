@@ -1291,6 +1291,15 @@ function parse(input){
               }
             }
           }
+          if (texturePack.isParticleTexture){
+            for (var psName in preConfiguredParticleSystems){
+              var usedTextureName = preConfiguredParticleSystems[psName].getUsedTextureName();
+              if (usedTextureName != null && usedTextureName == texturePack.name){
+                terminal.printError(Text.TEXTURE_PACK_USED_IN_A_PARTICLE_SYSTEM.replace(Text.PARAM1, psName));
+                return true;
+              }
+            }
+          }
           texturePack.destroy();
           if (!jobHandlerWorking){
             terminal.printInfo(Text.TEXTURE_PACK_DESTROYED);
