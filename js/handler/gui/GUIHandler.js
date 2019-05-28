@@ -110,7 +110,7 @@ var GUIHandler = function(){
   }
   // GUI TYPES DEFINITION
   this.guiTypes = {
-    FOG: 0, SKYBOX: 1, TEXT: 2, OBJECT: 3, BLOOM: 4, FPS_WEAPON_ALIGNMENT: 5, SHADER_PRECISION: 6, PARTICLE_SYSTEM: 7, WORKER_STATUS: 8, MUZZLE_FLASH: 9, TEXTURE_PACK: 10, SKYBOX_CREATION: 11
+    FOG: 0, TEXT: 1, OBJECT: 2, BLOOM: 3, FPS_WEAPON_ALIGNMENT: 4, SHADER_PRECISION: 5, PARTICLE_SYSTEM: 6, WORKER_STATUS: 7, MUZZLE_FLASH: 8, TEXTURE_PACK: 9, SKYBOX_CREATION: 10
   };
 }
 
@@ -497,12 +497,6 @@ GUIHandler.prototype.show = function(guiType){
         this.initializeTextManipulationGUI();
       }
     return;
-    case this.guiTypes.SKYBOX:
-      if (!this.datGuiSkybox){
-        this.initializeSkyboxGUI();
-        skyboxConfigurationsVisible = true;
-      }
-    return;
     case this.guiTypes.FOG:
       if (!this.datGuiFog){
         this.initializeFogGUI();
@@ -565,13 +559,6 @@ GUIHandler.prototype.hide = function(guiType){
       if (this.datGuiTextManipulation){
         this.destroyGUI(this.datGuiTextManipulation);
         this.datGuiTextManipulation = 0;
-      }
-    return;
-    case this.guiTypes.SKYBOX:
-      if (this.datGuiSkybox){
-        this.destroyGUI(this.datGuiSkybox);
-        skyboxConfigurationsVisible = false;
-        this.datGuiSkybox = 0;
       }
     return;
     case this.guiTypes.FOG:
@@ -1179,25 +1166,6 @@ GUIHandler.prototype.initializeTextManipulationGUI = function(){
     selectionHandler.getSelectedObject().maxHeightPercent = val;
     selectionHandler.getSelectedObject().handleResize();
   }).listen();
-}
-
-GUIHandler.prototype.initializeSkyboxGUI = function(){
-  guiHandler.datGuiSkybox = new dat.GUI({hideable: false});
-  guiHandler.skyboxNameController = guiHandler.datGuiSkybox.add(guiHandler.skyboxParameters, "Name").listen();
-  guiHandler.disableController(guiHandler.skyboxNameController, true);
-  guiHandler.skyboxColorController = guiHandler.datGuiSkybox.addColor(guiHandler.skyboxParameters, "Color").onChange(function(val){
-    skyboxMesh.material.uniforms.color.value.set(val);
-    skyBoxes[mappedSkyboxName].color = val;
-    if (fogBlendWithSkybox){
-      GLOBAL_FOG_UNIFORM.value.set(
-        -fogDensity,
-        skyboxMesh.material.uniforms.color.value.r,
-        skyboxMesh.material.uniforms.color.value.g,
-        skyboxMesh.material.uniforms.color.value.b
-      );
-    }
-  }).listen();
-  guiHandler.datGuiSkybox.add(guiHandler.skyboxParameters, "Done");
 }
 
 GUIHandler.prototype.initializeBloomGUI = function(){

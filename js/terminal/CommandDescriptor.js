@@ -780,7 +780,8 @@ var CommandDescriptor = function(){
     122, //addPaddingToTexture -> Deprecated due to lack of usecases.
     125, //applyDisplacementMap -> Deprecated because causes problems with geometry caching.
     127, //setAtlasTextureSize -> Deprecated because has no use cases after deprecation of TextureMerger class
-    128 //printAtlasTextureSize -> Deprecated due to same reasons as setAtlasTextureSize
+    128, //printAtlasTextureSize -> Deprecated due to same reasons as setAtlasTextureSize
+    146 //skyboxConfigurations -> Deprecated due to architectural changes in Skybox creation process.
   ];
 
   if (this.commandInfo.length != this.commands.length){
@@ -1227,11 +1228,6 @@ var CommandDescriptor = function(){
   this.build.types = [];
   this.build.types.push(this.UNKNOWN_INDICATOR); // projectName
   this.build.types.push(this.UNKNOWN_INDICATOR); // author
-
-  // skyboxConfigurations
-  this.skyboxConfigurations = new Object();
-  this.skyboxConfigurations.types = [];
-  this.skyboxConfigurations.types.push(this.HIDE_SHOW); // hide/show
 
   // fogConfigurations
   this.fogConfigurations = new Object();

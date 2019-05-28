@@ -525,7 +525,6 @@ StateLoader.prototype.resetProject = function(){
   trackingObjects = new Object();
   screenResolution = 1;
   renderer.setPixelRatio(screenResolution);
-  skyboxConfigurationsVisible = false;
   fogConfigurationsVisible = false;
   stopAreaConfigurationsHandler = false;
   screenClickCallbackFunction = 0;

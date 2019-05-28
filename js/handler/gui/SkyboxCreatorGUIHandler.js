@@ -19,6 +19,7 @@ SkyboxCreatorGUIHandler.prototype.generateSkyboxMesh = function(skybox){
 SkyboxCreatorGUIHandler.prototype.init = function(skyboxName){
   this.configurations = {
     "Skybox": "",
+    "Color": "#ffffff",
     "Cancel": function(){
       if (skyboxCreatorGUIHandler.isLoading){
         return;
@@ -33,12 +34,14 @@ SkyboxCreatorGUIHandler.prototype.init = function(skyboxName){
       terminal.clear();
       terminal.printInfo(Text.LOADING);
       guiHandler.disableController(skyboxCreatorGUIHandler.skyboxController);
+      guiHandler.disableController(skyboxCreatorGUIHandler.colorController);
       skyboxCreatorGUIHandler.isLoading = true;
       skyBoxes[skyboxName] = skyboxCreatorGUIHandler.skybox.clone();
       skyBoxes[skyboxName].loadTextures(function(){
         terminal.enable();
         terminal.clear();
         guiHandler.enableController(skyboxCreatorGUIHandler.skyboxController);
+        guiHandler.enableController(skyboxCreatorGUIHandler.colorController);
         skyboxCreatorGUIHandler.isLoading = false;
         skyboxCreatorGUIHandler.close(Text.SKYBOX_CREATED);
       });
@@ -83,12 +86,13 @@ SkyboxCreatorGUIHandler.prototype.loadSkybox = function(skyboxName, dirName){
   terminal.disable();
   terminal.printInfo(Text.LOADING);
   guiHandler.disableController(this.skyboxController);
+  guiHandler.disableController(this.colorController);
   this.isLoading = true;
   if (this.testMesh){
     scene.remove(this.testMesh);
   }
   this.dispose();
-  this.skybox = new SkyBox(skyboxName, dirName, "#ffffff");
+  this.skybox = new SkyBox(skyboxName, dirName, this.configurations["Color"]);
   this.skybox.loadTextures(function(){
     this.testMesh = this.generateSkyboxMesh(this.skybox);
     scene.add(this.testMesh);
@@ -96,6 +100,7 @@ SkyboxCreatorGUIHandler.prototype.loadSkybox = function(skyboxName, dirName){
     terminal.enable();
     terminal.printInfo(Text.AFTER_SKYBOX_CREATION);
     guiHandler.enableController(this.skyboxController);
+    guiHandler.enableController(this.colorController);
     this.isLoading = false;
   }.bind(this));
 }
@@ -117,6 +122,14 @@ SkyboxCreatorGUIHandler.prototype.show = function(skyboxName, folders){
   guiHandler.datGuiSkyboxCreation = new dat.GUI({hideable: false});
   this.skyboxController = guiHandler.datGuiSkyboxCreation.add(this.configurations, "Skybox", folders).onChange(function(val){
     skyboxCreatorGUIHandler.loadSkybox(skyboxName, val);
+  }).listen();
+  this.colorController = guiHandler.datGuiSkyboxCreation.addColor(this.configurations, "Color").onChange(function(val){
+    skyboxCreatorGUIHandler.testMesh.material.uniforms.color.value.set(val);
+    skyboxCreatorGUIHandler.skybox.color = val;
+    if (fogBlendWithSkybox && !(typeof mappedSkyboxName == UNDEFINED) && mappedSkyboxName == skyboxName){
+      REUSABLE_COLOR.set(val);
+      GLOBAL_FOG_UNIFORM.value.set(-fogDensity, REUSABLE_COLOR.r, REUSABLE_COLOR.g, REUSABLE_COLOR.b);
+    }
   }).listen();
   this.cancelController = guiHandler.datGuiSkyboxCreation.add(this.configurations, "Cancel");
   this.doneController = guiHandler.datGuiSkyboxCreation.add(this.configurations, "Done");

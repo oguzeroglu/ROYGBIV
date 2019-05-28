@@ -148,7 +148,6 @@ var dataPrefix = "text/json;charset=utf-8,";
 var skyboxDistance = 4000;
 var skyboxMesh;
 var skyboxVisible = false;
-var skyboxConfigurationsVisible = false;
 var fogConfigurationsVisible = false;
 var postProcessiongConfigurationsVisibility = new Object();
 var mappedSkyboxName = 0;

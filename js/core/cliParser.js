@@ -3743,37 +3743,7 @@ function parse(input){
           return true;
         break;
         case 146: //skyboxConfigurations
-          var parameter = splitted[1].toLowerCase();
-          if (!mappedSkyboxName){
-            terminal.printError(Text.NO_SKYBOX_MAPPED);
-            return true;
-          }
-          if (!skyboxVisible){
-            terminal.printError(Text.SKYBOX_NOT_VISIBLE);
-            return true;
-          }
-          if (parameter == "show"){
-            if (skyboxConfigurationsVisible){
-              terminal.printError(Text.GUI_IS_ALREADY_VISIBLE);
-              return true;
-            }
-            guiHandler.show(guiHandler.guiTypes.SKYBOX);
-            skyboxConfigurationsVisible = true;
-            guiHandler.skyboxParameters["Name"] = mappedSkyboxName;
-            guiHandler.skyboxParameters["Color"] = "#" + skyboxMesh.material.uniforms.color.value.getHexString();
-            terminal.printInfo(Text.GUI_OPENED);
-          }else if (parameter == "hide"){
-            if (!skyboxConfigurationsVisible){
-              terminal.printError(Text.GUI_IS_ALREADY_HIDDEN);
-              return true;
-            }
-            guiHandler.hide(guiHandler.guiTypes.SKYBOX);
-            skyboxConfigurationsVisible = false;
-            terminal.printInfo(Text.GUI_CLOSED);
-          }else{
-            terminal.printError(Text.STATUS_MUST_BE_ONE_OF);
-          }
-          return true;
+          // DEPRECATED
         break;
         case 147: //fogConfigurations
           if (mode != 1){
