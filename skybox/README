@@ -1,13 +1,16 @@
-This folder holds the Skybox textures, do NOT delete this folder.
+This folder holds the Skybox textures, do not delete this folder.
 
 Each Skybox texture MUST contain the following images:
 
-back.* -> the back face of the cube
-down.* -> the down face of the cube
-front.* -> the front face of the cube
-left.* -> the left face of the cube
-right.* -> the right face of the cube
-up.* -> the up face of the cube
+back.png -> the back face of the cube
+down.png -> the down face of the cube
+front.png -> the front face of the cube
+left.png -> the left face of the cube
+right.png -> the right face of the cube
+up.png -> the up face of the cube
+
+The engine automatically handles the texture compression, so only put PNGs
+under this folder.
 
 You can load Skybox textures using the command:
-  "newSkybox name directory fileExtension"
+  "newSkybox name"

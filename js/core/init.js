@@ -63,6 +63,8 @@ window.onload = function() {
     fpsWeaponGUIHandler = new FPSWeaponGUIHandler();
     // TEXTURE PACK CREATOR GUI HANDLER
     texturePackCreatorGUIHandler = new TexturePackCreatorGUIHandler();
+    // SKYBOX CREATOR GUI HANDLER
+    skyboxCreatorGUIHandler = new SkyboxCreatorGUIHandler();
   }
 
   // PHYSICS BODY GENERATOR

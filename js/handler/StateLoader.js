@@ -54,7 +54,6 @@ StateLoader.prototype.load = function(){
         skybox = new SkyBox(
           skyboxExport.name,
           skyboxExport.directoryName,
-          skyboxExport.fileExtension,
           skyboxExport.color,
           function(){
             that.totalLoadedSkyboxCount ++;
@@ -65,7 +64,6 @@ StateLoader.prototype.load = function(){
         skybox = new SkyBox(
           skyboxExport.name,
           skyboxExport.directoryName,
-          skyboxExport.fileExtension,
           skyboxExport.color,
           function(){
             that.totalLoadedSkyboxCount ++;

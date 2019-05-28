@@ -1471,28 +1471,37 @@ function parse(input){
           // DEPRECATED
         break;
         case 69: //newSkybox
-          var name = splitted[1];
-          var directoryName = splitted[2];
-          var fileExtension = splitted[3];
           if (mode != 0){
             terminal.printError(Text.WORKS_ONLY_IN_DESIGN_MODE);
             return true;
           }
-          if (skyBoxes[name]){
+          var skyboxName = splitted[1];
+          if (skyBoxes[skyboxName]){
             terminal.printError(Text.NAME_MUST_BE_UNIQUE);
             return true;
           }
-          if (directoryName.trim() == ""){
-            terminal.printError(Text.DIRECTORY_NAME_CANNOT_BE_EMPTY);
-            return true;
+          terminal.printInfo(Text.LOADING);
+          canvas.style.visibility = "hidden";
+          terminal.disable();
+          var xhr = new XMLHttpRequest();
+          xhr.open("POST", "/getSkyboxFolders", true);
+          xhr.setRequestHeader("Content-type", "application/json");
+          xhr.onreadystatechange = function (){
+            if (xhr.readyState == 4 && xhr.status == 200){
+              var folders = JSON.parse(xhr.responseText);
+              canvas.style.visibility = "";
+              terminal.clear();
+              if (folders.length == 0){
+                terminal.enable();
+                terminal.printError(Text.NO_VALID_SKYBOX_FOLDER);
+              }else{
+                terminal.disable();
+                terminal.printInfo(Text.AFTER_SKYBOX_CREATION);
+                skyboxCreatorGUIHandler.show(skyboxName, folders);
+              }
+            }
           }
-          if (fileExtension.trim() == ""){
-            terminal.printError(Text.FILE_EXTENSION_CANNOT_BE_EMPTY);
-            return true;
-          }
-          var skyBox = new SkyBox(name, directoryName, fileExtension, "#ffffff");
-          skyBoxes[name] = skyBox;
-          terminal.printInfo(Text.SKYBOX_CREATED);
+          xhr.send();
           return true;
         break;
         case 70: //printSkyboxes
@@ -1515,14 +1524,7 @@ function parse(input){
           return true;
         break;
         case 71: //printSkyboxInfo
-          var name = splitted[1];
-          var skybox = skyBoxes[name];
-          if (!skybox){
-            terminal.printError(Text.NO_SUCH_SKYBOX);
-            return true;
-          }
-          skybox.printInfo();
-          return true;
+          // DEPRECATED
         break;
         case 72: //mapSkybox
           var name = splitted[1];

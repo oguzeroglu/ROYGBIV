@@ -11,7 +11,6 @@ console.log( "|  _ \\ / _ \\ \\ / / ___| __ )_ _\\ \\   / / ");
 console.log( "| |_) | | | \\ V / |  _|  _ \\| | \\ \\ / /  ");
 console.log( "|  _ <| |_| || || |_| | |_) | |  \\   /   ");
 console.log( "|_| \\_\\\\___/ |_| \\____|____/___|  \\_/    ");
-
 console.log("\n*******************************************");
 
 app = express();
@@ -64,12 +63,40 @@ app.post("/getTexturePackFolders", function(req, res){
     }
   });
   for (var i = 0; i<dirs.length; i++){
-    var texturePackFolder = path.join("./texture_packs/"+dirs[i]);
+    var texturePackFolder = path.join("./texture_packs/", dirs[i]);
     if (fs.readdirSync(texturePackFolder).indexOf("diffuse.png") > -1){
       folders.push(dirs[i]);
     }
   }
   console.log("[*] Found "+folders.length+" texture packs.");
+  res.send(JSON.stringify(folders));
+});
+
+app.post("/getSkyboxFolders", function(req, res){
+  console.log("[*] Getting skybox folders.");
+  res.setHeader("Content-Type", "application/json");
+  var textureNames = ["back.png", "down.png", "front.png", "left.png", "right.png", "up.png"];
+  var folders = [];
+  var dirs = fs.readdirSync("skybox").filter(f => {
+    var joined = path.join("./skybox/", f);
+    if (fs.existsSync(joined)){
+      return fs.statSync(joined).isDirectory();
+    }
+  });
+  for (var i = 0; i<dirs.length; i++){
+    var skyboxFolder = path.join("./skybox/", dirs[i]);
+    var files = fs.readdirSync(skyboxFolder);
+    var put = true;
+    for (var i2 = 0; i2<textureNames.length; i2++){
+      if (files.indexOf(textureNames[i2]) <= -1){
+        put = false;
+      }
+    }
+    if (put){
+      folders.push(dirs[i]);
+    }
+  }
+  console.log("[*] Found "+folders.length+" skyboxes.");
   res.send(JSON.stringify(folders));
 });
 
@@ -434,6 +461,7 @@ function readEngineScripts(projectName, author, noMobile){
         console.log("[*] Skipping MuzzleFlashCreatorGUIHandler.");
         console.log("[*] Skipping FPSWeaponGUIHandler.");
         console.log("[*] Skipping TexturePackCreatorGUIHandler.");
+        console.log("[*] Skipping SkyboxCreatorGUIHandler.");
         continue;
       }else if (scriptPath.includes("dat.gui.min.js")){
         console.log("[*] Skipping DAT gui.");

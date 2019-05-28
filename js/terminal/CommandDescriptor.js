@@ -70,7 +70,7 @@ var CommandDescriptor = function(){
       2, //postProcessing
       3, //sliceGrid
       5, //newPointLight
-      3, //newSkybox
+      1, //newSkybox
       0, //printSkyboxes
       1, //printSkyboxInfo
       1, //mapSkybox
@@ -250,7 +250,7 @@ var CommandDescriptor = function(){
     "postProcessing effectName hide/show",
     "sliceGrid newName cellSize outlineColor",
     "newPointLight name color offsetX offsetY offsetZ",
-    "newSkybox name directory fileExtension",
+    "newSkybox name",
     "printSkyboxes",
     "printSkyboxInfo name",
     "mapSkybox name",
@@ -762,6 +762,7 @@ var CommandDescriptor = function(){
     62, //mapHeight -> Deprecated due to architectural changes int exture handling logic.
     65, //superposeGridSystem -> Deprecated due to lack of uses cases after grid selection mode implementation.
     68, //newPointLight -> Lights are not supported for now.
+    71, //printSkyboxInfo -> Deprecated due to lack of use cases after changes in Skybox creation logic.
     78, //undo -> Deprecated because causes memory issues for big projects.
     79, //redo -> Deprecated because causes memory issues for big projects.
     89, //translateObject -> Deprecated due to architectural conflicts. Objects can only be translated using animations. Instead of translating the object in the design mode, a new grid system should be created at the specific position. Every object should be associated with certain grids.
@@ -811,7 +812,6 @@ var CommandDescriptor = function(){
   this.S_T_ST                     =   13;
   this.WALL_COLLECTION_NAME       =   14;
   this.DEFAULT_MATERIAL_TYPE      =   15;
-  this.FILE_EXTENSION             =   16;
   this.TEXTURE_PACK_NAME          =   17;
   this.HIDE_SHOW                  =   18;
   this.SKYBOX_NAME                =   29;
@@ -984,13 +984,6 @@ var CommandDescriptor = function(){
   this.newSkybox = new Object();
   this.newSkybox.types = [];
   this.newSkybox.types.push(this.UNKNOWN_INDICATOR); //name
-  this.newSkybox.types.push(this.UNKNOWN_INDICATOR); //directory
-  this.newSkybox.types.push(this.FILE_EXTENSION); //fileExtension
-
-  // printSkyboxInfo
-  this.printSkyboxInfo = new Object();
-  this.printSkyboxInfo.types = [];
-  this.printSkyboxInfo.types.push(this.SKYBOX_NAME); //name
 
   // mapSkybox
   this.mapSkybox = new Object();

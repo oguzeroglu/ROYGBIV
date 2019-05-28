@@ -430,19 +430,6 @@ Terminal.prototype.autocomplete = function(command){
 				}
 				helpString = "[Types]: ";
 			break;
-			case commandDescriptor.FILE_EXTENSION:
-				var knownExtensions = [
-					"tga", "TGA", "jpg", "JPG", "jpeg",
-					"JPEG", "png", "PNG", "gif", "GIF",
-					"bmp", "BMP"
-				];
-				for (var i = 0; i < knownExtensions.length; i++){
-					if (knownExtensions[i].startsWith(curEntry)){
-						possibilities.push(knownExtensions[i]);
-					}
-				}
-				helpString = "[File extensions]: ";
-			break;
 			case commandDescriptor.TEXTURE_PACK_NAME:
 				for (var texturePackName in texturePacks){
 					if (texturePackName.startsWith(curEntry)){

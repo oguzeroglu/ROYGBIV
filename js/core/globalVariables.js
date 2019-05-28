@@ -332,6 +332,7 @@ var particleSystemCreatorGUIHandler;
 var muzzleFlashCreatorGUIHandler;
 var fpsWeaponGUIHandler;
 var texturePackCreatorGUIHandler;
+var skyboxCreatorGUIHandler;
 var preConfiguredParticleSystems = new Object();
 var preConfiguredParticleSystemPools = new Object();
 var muzzleFlashes = new Object();
