@@ -306,6 +306,10 @@ function copyAssets(application){
       }
     });
   }
+  if (application.textureAtlas.hasTextureAtlas){
+    copyFolderRecursiveSync("texture_atlas", "deploy/"+application.projectName);
+    console.log("[*] Copied texture atlas folder.");
+  }
   for (var skyboxName in application.skyBoxes){
     var dirName = application.skyBoxes[skyboxName].directoryName;
     fs.readdirSync("skybox").forEach(file => {
