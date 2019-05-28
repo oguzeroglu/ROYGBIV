@@ -1,4 +1,4 @@
-var SkyBox = function(name, directoryName, color, callback){
+var SkyBox = function(name, directoryName, color){
   this.name = name;
   this.directoryName = directoryName;
   this.color = color;
@@ -8,9 +8,19 @@ var SkyBox = function(name, directoryName, color, callback){
   this.hasLeft = false;
   this.hasRight = false;
   this.hasUp = false;
-  if (callback){
-    this.callback = callback;
-  }
+}
+
+SkyBox.prototype.clone = function(){
+  return new SkyBox(this.name, this.directoryName, this.color);
+}
+
+SkyBox.prototype.dispose = function(){
+  this.backTexture.dispose();
+  this.downTexture.dispose();
+  this.frontTexture.dispose();
+  this.leftTexture.dispose();
+  this.rightTexture.dispose();
+  this.upTexture.dispose();
 }
 
 SkyBox.prototype.export = function(){
@@ -21,23 +31,23 @@ SkyBox.prototype.export = function(){
   return exportObject;
 }
 
-SkyBox.prototype.loadTexture = function(textureName, textureObjectName, textureAvailibilityObjectName){
-  var loader = textureLoaderFactory.get();
-  var path = skyBoxRootDirectory + "/" + this.directoryName + "/" +textureName + textureLoaderFactory.getFilePostfix();
+SkyBox.prototype.loadTexture = function(textureName, textureObjectName, textureAvailibilityObjectName, callback){
+  var loader = textureLoaderFactory.getDefault();
+  var path = skyBoxRootDirectory + "/" + this.directoryName + "/" +textureName + ".png";
   var that = this;
   loader.load(path, function(textureData){
     that[textureObjectName] = textureData;
     that[textureAvailibilityObjectName] = true;
-    that.callbackCheck();
+    that.callbackCheck(callback);
   }, function(xhr){
 
   }, function(xhr){
     that[textureAvailibilityObjectName] = false;
-    that.callbackCheck();
+    that.callbackCheck(callback);
   });
 }
 
-SkyBox.prototype.loadTextures = function(){
+SkyBox.prototype.loadTextures = function(callback){
   var textureInfos = [
     ["back", "backTexture", "hasBack"],
     ["down", "downTexture", "hasDown"],
@@ -47,7 +57,7 @@ SkyBox.prototype.loadTextures = function(){
     ["up", "upTexture", "hasUp"]
   ];
   for (var i = 0; i<textureInfos.length; i++){
-    this.loadTexture(textureInfos[i][0], textureInfos[i][1], textureInfos[i][2]);
+    this.loadTexture(textureInfos[i][0], textureInfos[i][1], textureInfos[i][2], callback);
   }
 }
 
@@ -62,7 +72,7 @@ SkyBox.prototype.isUsable = function(){
   );
 }
 
-SkyBox.prototype.callbackCheck = function(){
+SkyBox.prototype.callbackCheck = function(callback){
   if (this.isUsable()){
     this.cubeTexture = new THREE.CubeTexture([
       this.rightTexture.image, this.leftTexture.image,
@@ -70,8 +80,8 @@ SkyBox.prototype.callbackCheck = function(){
       this.frontTexture.image, this.backTexture.image
     ]);
     this.cubeTexture.needsUpdate = true;
-    if (this.callback){
-      this.callback();
+    if (callback){
+      callback();
     }
   }
 }

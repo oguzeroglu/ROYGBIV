@@ -1514,9 +1514,7 @@ function parse(input){
             if (length == count){
               options = false;
             }
-            terminal.printInfo(Text.TREE.replace(
-              Text.PARAM1, skyboxName
-            ), options);
+            terminal.printInfo(Text.TREE2.replace(Text.PARAM1, skyboxName).replace(Text.PARAM2, skyBoxes[skyboxName].directoryName), options);
           }
           if (count == 0){
             terminal.printError(Text.NO_SKYBOXES_CREATED);
