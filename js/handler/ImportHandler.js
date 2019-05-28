@@ -952,3 +952,40 @@ ImportHandler.prototype.importTextureAtlas = function(obj, callback){
     }
   }
 }
+
+ImportHandler.prototype.importSkyboxes = function(obj, callback){
+  var skyBoxScale = obj.skyBoxScale;
+  var skyboxExports = obj.skyBoxes;
+  skyboxVisible = obj.skyboxVisible;
+  mappedSkyboxName = obj.mappedSkyboxName;
+  for (var skyboxName in skyboxExports){
+    var skyboxExport = skyboxExports[skyboxName];
+    var skybox = new SkyBox(skyboxExport.name, skyboxExport.directoryName, skyboxExport.color);
+    skyBoxes[skyboxExport.name] = skybox;
+    skybox.loadTextures(function(){
+      if (!(typeof mappedSkyboxName == UNDEFINED) && (this.skyboxName == mappedSkyboxName)){
+        if (skyboxMesh){
+          scene.remove(skyboxMesh);
+        }else{
+          var geomKey = ("BoxBufferGeometry" + PIPE + skyboxDistance + PIPE + skyboxDistance + PIPE + skyboxDistance + PIPE + "1" + PIPE + "1" + PIPE + "1");
+          var skyboxBufferGeometry = geometryCache[geomKey];
+          if (!skyboxBufferGeometry){
+            skyboxBufferGeometry = new THREE.BoxBufferGeometry(skyboxDistance, skyboxDistance, skyboxDistance);
+            geometryCache[geomKey] = skyboxBufferGeometry;
+          }
+          skyboxMesh = new MeshGenerator(skyboxBufferGeometry, null).generateSkybox(skyBoxes[this.skyboxName], false);
+          skyboxMesh.renderOrder = renderOrders.SKYBOX;
+        }
+        if (skyboxVisible){
+          scene.add(skyboxMesh);
+        }
+        if (this.skyBoxScale){
+          skyboxMesh.scale.x = this.skyBoxScale;
+          skyboxMesh.scale.y = this.skyBoxScale;
+          skyboxMesh.scale.z = this.skyBoxScale;
+        }
+      }
+      callback();
+    }.bind({skyboxName: skyboxName, skyBoxScale: skyBoxScale}));
+  }
+}

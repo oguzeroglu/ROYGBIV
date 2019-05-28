@@ -13,6 +13,11 @@ StateLoader.prototype.onTextureAtlasLoaded = function(){
   this.finalize();
 }
 
+StateLoader.prototype.onSkyboxLoaded = function(){
+  this.totalLoadedSkyboxCount ++;
+  this.finalize();
+}
+
 StateLoader.prototype.onTexturePackLoaded = function(){
   this.totalLoadedTexturePackCount ++;
   if (this.totalLoadedTexturePackCount == this.stateObj.totalTexturePackCount){
@@ -28,6 +33,7 @@ StateLoader.prototype.load = function(){
     var obj = this.stateObj;
     this.hasTexturePacks = this.stateObj.totalTexturePackCount > 0;
     this.hasTextureAtlas = this.stateObj.textureAtlas? this.stateObj.textureAtlas.hasTextureAtlas: false;
+    this.hasSkyboxes = this.stateObj.totalSkyboxCount > 0;
     this.textureAtlasReady = false;
 
     this.importHandler.importEngineVariables(obj);
@@ -39,67 +45,8 @@ StateLoader.prototype.load = function(){
     this.importHandler.importFog(obj);
     this.importHandler.importAddedObjects(obj);
     this.importHandler.importTexturePacks(obj, this.onTexturePackLoaded.bind(this));
+    this.importHandler.importSkyboxes(obj, this.onSkyboxLoaded.bind(this));
 
-    // SKYBOXES ****************************************************
-    var skyBoxScale = obj.skyBoxScale;
-    var skyboxExports = obj.skyBoxes;
-    skyboxVisible = obj.skyboxVisible;
-    mappedSkyboxName = obj.mappedSkyboxName;
-    var that = this;
-    for (var skyboxName in skyboxExports){
-      this.hasSkyboxes = true;
-      var skyboxExport = skyboxExports[skyboxName];
-      var skybox;
-      if (!mappedSkyboxName){
-        skybox = new SkyBox(
-          skyboxExport.name,
-          skyboxExport.directoryName,
-          skyboxExport.color,
-          function(){
-            that.totalLoadedSkyboxCount ++;
-            that.finalize();
-          }
-        );
-      }else{
-        skybox = new SkyBox(
-          skyboxExport.name,
-          skyboxExport.directoryName,
-          skyboxExport.color,
-          function(){
-            that.totalLoadedSkyboxCount ++;
-            if (this.skyboxName == mappedSkyboxName){
-              var skybox = skyBoxes[this.skyboxName];
-              if (skyboxMesh){
-                scene.remove(skyboxMesh);
-              }else{
-                var geomKey = (
-                  "BoxBufferGeometry" + PIPE +
-                  skyboxDistance + PIPE + skyboxDistance + PIPE + skyboxDistance + PIPE +
-                  "1" + PIPE + "1" + PIPE + "1"
-                );
-                var skyboxBufferGeometry = geometryCache[geomKey];
-                if (!skyboxBufferGeometry){
-                  skyboxBufferGeometry = new THREE.BoxBufferGeometry(skyboxDistance, skyboxDistance, skyboxDistance);
-                  geometryCache[geomKey] = skyboxBufferGeometry;
-                }
-                skyboxMesh = new MeshGenerator(skyboxBufferGeometry, null).generateSkybox(skybox);
-                skyboxMesh.renderOrder = renderOrders.SKYBOX;
-              }
-              if (skyboxVisible){
-                scene.add(skyboxMesh);
-              }
-              if (this.skyBoxScale){
-                skyboxMesh.scale.x = this.skyBoxScale;
-                skyboxMesh.scale.y = this.skyBoxScale;
-                skyboxMesh.scale.z = this.skyBoxScale;
-              }
-            }
-            that.finalize();
-          }.bind({skyboxName: skyboxName, skyBoxScale: skyBoxScale})
-        );
-      }
-      skyBoxes[skyboxName] = skybox;
-    }
     // FONTS *******************************************************
     this.hasFonts = false;
     var that = this;

@@ -1551,7 +1551,7 @@ function parse(input){
               skyboxBufferGeometry = new THREE.BoxBufferGeometry(skyboxDistance, skyboxDistance, skyboxDistance);
               geometryCache[geomKey] = skyboxBufferGeometry;
             }
-            skyboxMesh = new MeshGenerator(skyboxBufferGeometry, null).generateSkybox(skybox);
+            skyboxMesh = new MeshGenerator(skyboxBufferGeometry, null).generateSkybox(skybox, false);
           }else{
             skyboxMesh.material.uniforms.cubeTexture.value = skybox.cubeTexture;
             skyboxMesh.material.uniforms.color.value.set(skybox.color);

@@ -3,17 +3,13 @@ var SkyboxCreatorGUIHandler = function(){
 }
 
 SkyboxCreatorGUIHandler.prototype.generateSkyboxMesh = function(skybox){
-  var geomKey = (
-    "BoxBufferGeometry" + PIPE +
-    skyboxDistance + PIPE + skyboxDistance + PIPE + skyboxDistance + PIPE +
-    "1" + PIPE + "1" + PIPE + "1"
-  );
+  var geomKey = ("BoxBufferGeometry" + PIPE + skyboxDistance + PIPE + skyboxDistance + PIPE + skyboxDistance + PIPE + "1" + PIPE + "1" + PIPE + "1");
   var skyboxBufferGeometry = geometryCache[geomKey];
   if (!skyboxBufferGeometry){
     skyboxBufferGeometry = new THREE.BoxBufferGeometry(skyboxDistance, skyboxDistance, skyboxDistance);
     geometryCache[geomKey] = skyboxBufferGeometry;
   }
-  return new MeshGenerator(skyboxBufferGeometry, null).generateSkybox(skybox);
+  return new MeshGenerator(skyboxBufferGeometry, null).generateSkybox(skybox, true);
 }
 
 SkyboxCreatorGUIHandler.prototype.init = function(skyboxName){
