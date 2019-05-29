@@ -847,7 +847,7 @@ JobHandler.prototype.handleDestroyTexturePackCommand = function(){
         terminal.clear();
         terminal.printError(Text.ERROR_HAPPENED_COMPRESSING_TEXTURE_ATLAS);
         terminal.enable();
-      });
+      }, false);
     }
   }
 }

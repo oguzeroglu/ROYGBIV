@@ -264,6 +264,7 @@ var Text = function(){
   this.DIRECTORY_NAME_CANNOT_BE_EMPTY = "Directory name must not be empty.";
   this.FILE_EXTENSION_CANNOT_BE_EMPTY = "File extension must not be empty.";
   this.TEXTURE_PACK_CREATED = "Texture pack created.";
+  this.TEXTURE_PACK_EDITED = "Texture pack edited.";
   this.TEXTURE_PACKS = "Texture packs";
   this.NO_TEXTURE_PACK_FOUND = "No texture pack found.";
   this.COMMAND_EXECUTED_FOR_X_TEXTURES = "Command executed for @@1 textures.";

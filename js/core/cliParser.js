@@ -1316,7 +1316,7 @@ function parse(input){
                 terminal.clear();
                 terminal.printError(Text.ERROR_HAPPENED_COMPRESSING_TEXTURE_ATLAS);
                 terminal.enable();
-              });
+              }, false);
             }
           }
           return true;
@@ -4541,6 +4541,40 @@ function parse(input){
                 terminal.disable();
                 terminal.printInfo(Text.AFTER_SKYBOX_CREATION);
                 skyboxCreatorGUIHandler.edit(skybox, folders);
+              }
+            }
+          }
+          xhr.send();
+          return true;
+        break;
+        case 179: //editTexturePack
+          if (mode != 0){
+            terminal.printError(Text.WORKS_ONLY_IN_DESIGN_MODE);
+            return true;
+          }
+          var texturePack = texturePacks[splitted[1]];
+          if (!texturePack){
+            terminal.printError(Text.NO_SUCH_TEXTURE_PACK);
+            return true;
+          }
+          terminal.printInfo(Text.LOADING);
+          canvas.style.visibility = "hidden";
+          terminal.disable();
+          var xhr = new XMLHttpRequest();
+          xhr.open("POST", "/getTexturePackFolders", true);
+          xhr.setRequestHeader("Content-type", "application/json");
+          xhr.onreadystatechange = function (){
+            if (xhr.readyState == 4 && xhr.status == 200){
+              var folders = JSON.parse(xhr.responseText);
+              canvas.style.visibility = "";
+              terminal.clear();
+              if (folders.length == 0){
+                terminal.enable();
+                terminal.printError(Text.NO_VALID_TEXTURE_PACK_FOLDER);
+              }else{
+                terminal.disable();
+                terminal.printInfo(Text.AFTER_TEXTURE_PACK_CREATION);
+                texturePackCreatorGUIHandler.edit(texturePack, folders);
               }
             }
           }

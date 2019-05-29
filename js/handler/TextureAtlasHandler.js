@@ -34,7 +34,7 @@ TextureAtlasHandler.prototype.compressTexture = function(base64Data, readyCallba
   postRequest.send(data);
 }
 
-TextureAtlasHandler.prototype.onTexturePackChange = function(readyCallback, errorCallback){
+TextureAtlasHandler.prototype.onTexturePackChange = function(readyCallback, errorCallback, force){
   var refreshNeeded = false;
   var particleTextureCount = 0;
   var texturesObj = new Object();
@@ -44,7 +44,7 @@ TextureAtlasHandler.prototype.onTexturePackChange = function(readyCallback, erro
       texturesObj[texturePackName] = texturePacks[texturePackName].diffuseTexture;
     }
   }
-  if (this.currentParticleTextureCount != particleTextureCount){
+  if (force || this.currentParticleTextureCount != particleTextureCount){
     this.dispose();
     if (particleTextureCount == 0){
       this.currentParticleTextureCount = 0;
