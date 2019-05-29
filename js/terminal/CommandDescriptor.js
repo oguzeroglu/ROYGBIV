@@ -177,7 +177,8 @@ var CommandDescriptor = function(){
       2, //newMuzzleFlash
       1, //editMuzzleFlash
       1, //destroyMuzzleFlash
-      0 //printMuzzleFlashes
+      0, //printMuzzleFlashes
+      0 //unmapSkybox
   ];
 
   this.commandArgumentsExpectedExplanation = [
@@ -357,7 +358,8 @@ var CommandDescriptor = function(){
     "newMuzzleFlash name refPSName",
     "editMuzzleFlash muzzleFlashName",
     "destroyMuzzleFlash muzzleFlashName",
-    "printMuzzleFlashes"
+    "printMuzzleFlashes",
+    "unmapSkybox"
   ];
 
   this.commands = [
@@ -537,7 +539,8 @@ var CommandDescriptor = function(){
     "newMuzzleFlash",
     "editMuzzleFlash",
     "destroyMuzzleFlash",
-    "printMuzzleFlashes"
+    "printMuzzleFlashes",
+    "unmapSkybox"
   ];
 
   this.commandInfo = [
@@ -717,7 +720,8 @@ var CommandDescriptor = function(){
     "newMuzzleFlash: Creates a new MuzzleFlash object from given particle system in order to be used with FPS weapons.",
     "editMuzzleFlash: Shows the GUI for editing a muzzle flash.",
     "destroyMuzzleFlash: Destroys a muzzle flash.",
-    "printMuzzleFlashes: Prints created muzzleflashes."
+    "printMuzzleFlashes: Prints created muzzleflashes.",
+    "unmapSkybox: Removes the mapped skybox."
   ];
 
   this.keyboardInfo = [

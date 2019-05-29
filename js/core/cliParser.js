@@ -4499,6 +4499,19 @@ function parse(input){
           }
           return true;
         break;
+        case 177: //unmapSkybox
+          if (mode != 0){
+            terminal.printError(Text.WORKS_ONLY_IN_DESIGN_MODE);
+            return true;
+          }
+          if (!skyboxHandler.isVisible()){
+            terminal.printError(Text.NO_SKYBOX_MAPPED);
+            return true;
+          }
+          skyboxHandler.unmap();
+          terminal.printInfo(Text.SKYBOX_HIDDEN);
+          return true;
+        break;
       }
       return true;
     }catch(err){

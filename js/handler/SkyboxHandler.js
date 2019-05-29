@@ -13,12 +13,19 @@ SkyboxHandler.prototype.export = function(){
   return {isVisible: this.isVisible(), mappedSkyboxName: this.mappedSkyboxName};
 }
 
+SkyboxHandler.prototype.unmap = function(){
+  scene.remove(this.skyboxMesh);
+  skyBoxes[this.mappedSkyboxName].dispose();
+  this.skyboxMesh.geometry.dispose();
+  this.skyboxMesh.material.dispose();
+  this.visible = false;
+  delete this.mappedSkyboxName;
+  fogBlendWithSkybox = false;
+}
+
 SkyboxHandler.prototype.map = function(skybox){
   if (this.isVisible()){
-    scene.remove(this.skyboxMesh);
-    skyBoxes[this.mappedSkyboxName].dispose();
-    this.skyboxMesh.geometry.dispose();
-    this.skyboxMesh.material.dispose();
+    this.unmap();
   }
   this.generateMesh(skybox);
   scene.add(this.getMesh());
@@ -50,10 +57,7 @@ SkyboxHandler.prototype.getMesh = function(){
 
 SkyboxHandler.prototype.reset = function(){
   if (this.isVisible()){
-    scene.remove(this.skyboxMesh);
-    this.skyboxMesh.geometry.dispose();
-    this.skyboxMesh.material.dispose();
-    this.visible = false;
+    this.unmap();
     delete this.mappedSkyboxName;
   }
 }
@@ -67,12 +71,7 @@ SkyboxHandler.prototype.update = function(){
 SkyboxHandler.prototype.destroySkybox = function(skybox){
   skybox.dispose();
   if (skybox.name == this.getMappedSkyboxName()){
-    scene.remove(this.skyboxMesh);
-    this.skyboxMesh.geometry.dispose();
-    this.skyboxMesh.material.dispose();
-    this.visible = false;
-    fogBlendWithSkybox = false;
-    delete this.mappedSkyboxName;
+    this.unmap();
   }
   delete skyBoxes[skybox.name];
 }
