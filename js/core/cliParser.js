@@ -4557,6 +4557,10 @@ function parse(input){
             terminal.printError(Text.NO_SUCH_TEXTURE_PACK);
             return true;
           }
+          if (texturePack.isUsed()){
+            terminal.printError(Text.TEXTURE_PACK_ALREADY_USED);
+            return true;
+          }
           terminal.printInfo(Text.LOADING);
           canvas.style.visibility = "hidden";
           terminal.disable();

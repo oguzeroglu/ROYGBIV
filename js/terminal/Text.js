@@ -156,6 +156,7 @@ var Text = function(){
   this.SHADER_PRECISION_ADJUSTED = "Shader precision adjusted.";
   this.COMMAND_EXECUTED_FOR_X_OBJECTS = "Command executed for @@1 objects.";
   this.TEXTURE_PACK_MAPPED_TO_X_OBJECTS = "Command executed for @@1 objects.";
+  this.TEXTURE_PACK_ALREADY_USED = "Texture pack already mapped, cannot be edited.";
   this.NO_GRID_SYSTEM_FOUND = "No grid system found.";
   this.DESTROYED_X_GRID_SYTEMS = "Command executed for @@1 grid systems.";
   this.NO_WALL_COLLECTION_FOUND = "No wall collection found."

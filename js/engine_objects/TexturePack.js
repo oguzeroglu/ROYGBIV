@@ -139,3 +139,19 @@ TexturePack.prototype.setParticleTextureStatus = function(val){
   }
   this.isParticleTexture = val;
 }
+
+TexturePack.prototype.isUsed = function(){
+  for (var objName in addedObjects){
+    if (addedObjects[objName].associatedTexturePack == this.name){
+      return true;
+    }
+  }
+  for (var objName in objectGroups){
+    for (var childObjName in objectGroups[objName].group){
+      if (objectGroups[objName].group[childObjName].associatedTexturePack == this.name){
+        return true;
+      }
+    }
+  }
+  return false;
+}

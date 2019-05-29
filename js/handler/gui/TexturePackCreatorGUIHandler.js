@@ -29,7 +29,11 @@ TexturePackCreatorGUIHandler.prototype.init = function(isEdit){
         terminal.clear();
         if (!tp.isParticleTexture && !force){
           terminal.enable();
-          terminal.printInfo(Text.TEXTURE_PACK_CREATED);
+          if (!isEdit){
+            terminal.printInfo(Text.TEXTURE_PACK_CREATED);
+          }else{
+            terminal.printInfo(Text.TEXTURE_PACK_EDITED);
+          }
         }else{
           terminal.printInfo(Text.GENERATING_TEXTURE_ATLAS);
           textureAtlasHandler.onTexturePackChange(function(){
