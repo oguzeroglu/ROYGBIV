@@ -4509,6 +4509,7 @@ function parse(input){
             return true;
           }
           skyboxHandler.unmap();
+          fogBlendWithSkybox = false;
           terminal.printInfo(Text.SKYBOX_HIDDEN);
           return true;
         break;

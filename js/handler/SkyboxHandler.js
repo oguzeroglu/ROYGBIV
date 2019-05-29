@@ -20,7 +20,6 @@ SkyboxHandler.prototype.unmap = function(){
   this.skyboxMesh.material.dispose();
   this.visible = false;
   delete this.mappedSkyboxName;
-  fogBlendWithSkybox = false;
 }
 
 SkyboxHandler.prototype.map = function(skybox){
