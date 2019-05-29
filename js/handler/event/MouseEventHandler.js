@@ -150,7 +150,7 @@ MouseEventHandler.prototype.onClick = function(event, fromTap){
   omGUIFocused = false;
   tmGUIFocused = false;
   if (windowLoaded){
-    if (mode == 0 && fpsWeaponGUIHandler.fpsWeaponAlignmentConfigurationObject){
+    if (mode == 0 && (guiHandler.datGuiFPSWeaponAlignment || guiHandler.datGuiPSCreator || guiHandler.datGuiMuzzleFlashCreator || guiHandler.datGuiTexturePack || guiHandler.datGuiSkyboxCreation)){
       return;
     }
     var rect = renderer.getCurrentViewport();
