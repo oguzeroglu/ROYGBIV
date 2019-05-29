@@ -12,7 +12,7 @@ SkyboxCreatorGUIHandler.prototype.generateSkyboxMesh = function(skybox){
   return new MeshGenerator(skyboxBufferGeometry, null).generateSkybox(skybox, true);
 }
 
-SkyboxCreatorGUIHandler.prototype.init = function(skyboxName){
+SkyboxCreatorGUIHandler.prototype.init = function(skyboxName, isEdit){
   this.configurations = {
     "Skybox": "",
     "Color": "#ffffff",
@@ -39,7 +39,14 @@ SkyboxCreatorGUIHandler.prototype.init = function(skyboxName){
         guiHandler.enableController(skyboxCreatorGUIHandler.skyboxController);
         guiHandler.enableController(skyboxCreatorGUIHandler.colorController);
         skyboxCreatorGUIHandler.isLoading = false;
-        skyboxCreatorGUIHandler.close(Text.SKYBOX_CREATED);
+        if (!isEdit){
+          skyboxCreatorGUIHandler.close(Text.SKYBOX_CREATED);
+        }else{
+          skyboxCreatorGUIHandler.close(Text.SKYBOX_EDITED);
+          if (skyboxHandler.isVisible() && skyboxHandler.getMappedSkyboxName() == skyboxName){
+            skyboxHandler.map(skyBoxes[skyboxName]);
+          }
+        }
       });
     }
   };
@@ -101,8 +108,8 @@ SkyboxCreatorGUIHandler.prototype.loadSkybox = function(skyboxName, dirName){
   }.bind(this));
 }
 
-SkyboxCreatorGUIHandler.prototype.show = function(skyboxName, folders){
-  this.init(skyboxName);
+SkyboxCreatorGUIHandler.prototype.commonStartFunctions = function(skyboxName, isEdit){
+  this.init(skyboxName, isEdit);
   selectionHandler.resetCurrentSelection();
   guiHandler.hideAll();
   this.hiddenEngineObjects = [];
@@ -115,6 +122,9 @@ SkyboxCreatorGUIHandler.prototype.show = function(skyboxName, folders){
   }
   activeControl = new OrbitControls({maxRadius: 500, zoomDelta: 5});
   activeControl.onActivated();
+}
+
+SkyboxCreatorGUIHandler.prototype.createGUI = function(skyboxName, folders){
   guiHandler.datGuiSkyboxCreation = new dat.GUI({hideable: false});
   this.skyboxController = guiHandler.datGuiSkyboxCreation.add(this.configurations, "Skybox", folders).onChange(function(val){
     skyboxCreatorGUIHandler.loadSkybox(skyboxName, val);
@@ -122,13 +132,22 @@ SkyboxCreatorGUIHandler.prototype.show = function(skyboxName, folders){
   this.colorController = guiHandler.datGuiSkyboxCreation.addColor(this.configurations, "Color").onChange(function(val){
     skyboxCreatorGUIHandler.testMesh.material.uniforms.color.value.set(val);
     skyboxCreatorGUIHandler.skybox.color = val;
-    if (fogBlendWithSkybox && !(typeof skyboxHandler.getMappedSkyboxName() == UNDEFINED) && skyboxHandler.getMappedSkyboxName() == skyboxName){
-      REUSABLE_COLOR.set(val);
-      GLOBAL_FOG_UNIFORM.value.set(-fogDensity, REUSABLE_COLOR.r, REUSABLE_COLOR.g, REUSABLE_COLOR.b);
-    }
   }).listen();
   this.cancelController = guiHandler.datGuiSkyboxCreation.add(this.configurations, "Cancel");
   this.doneController = guiHandler.datGuiSkyboxCreation.add(this.configurations, "Done");
+}
+
+SkyboxCreatorGUIHandler.prototype.show = function(skyboxName, folders){
+  this.commonStartFunctions(skyboxName, false);
+  this.createGUI(skyboxName, folders);
   this.configurations["Skybox"] = folders[0];
   this.loadSkybox(skyboxName, folders[0]);
+}
+
+SkyboxCreatorGUIHandler.prototype.edit = function(skybox, folders){
+  this.commonStartFunctions(skybox.name, true);
+  this.createGUI(skybox.name, folders);
+  this.configurations["Skybox"] = skybox.directoryName;
+  this.configurations["Color"] = skybox.color;
+  this.loadSkybox(skybox.name, skybox.directoryName);
 }

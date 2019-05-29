@@ -301,6 +301,7 @@ var Text = function(){
   this.OFFSETY_MUST_BE_A_NUMBER = "OffsetY must be a number.";
   this.OFFSETZ_MUST_BE_A_NUMBER = "OffsetZ must be a number.";
   this.SKYBOX_CREATED = "Skybox created.";
+  this.SKYBOX_EDITED = "Skybox edited.";
   this.CANNOT_CREATE_MUZZLEFLASH_COLLIDABLE_PS = "Cannot create muzzleflash from a collidable particle system.";
   this.CANNOT_CREATE_MUZZLEFLASH_COLLIDABLE_PARTICLES = "Cannot create muzzleflash from a particle system with collidable particles.";
   this.SKYBOXES = "Skyboxes";

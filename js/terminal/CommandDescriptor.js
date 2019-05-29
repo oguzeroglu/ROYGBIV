@@ -178,7 +178,8 @@ var CommandDescriptor = function(){
       1, //editMuzzleFlash
       1, //destroyMuzzleFlash
       0, //printMuzzleFlashes
-      0 //unmapSkybox
+      0, //unmapSkybox
+      1 //editSkybox
   ];
 
   this.commandArgumentsExpectedExplanation = [
@@ -359,7 +360,8 @@ var CommandDescriptor = function(){
     "editMuzzleFlash muzzleFlashName",
     "destroyMuzzleFlash muzzleFlashName",
     "printMuzzleFlashes",
-    "unmapSkybox"
+    "unmapSkybox",
+    "editSkybox skyboxName"
   ];
 
   this.commands = [
@@ -540,7 +542,8 @@ var CommandDescriptor = function(){
     "editMuzzleFlash",
     "destroyMuzzleFlash",
     "printMuzzleFlashes",
-    "unmapSkybox"
+    "unmapSkybox",
+    "editSkybox"
   ];
 
   this.commandInfo = [
@@ -721,7 +724,8 @@ var CommandDescriptor = function(){
     "editMuzzleFlash: Shows the GUI for editing a muzzle flash.",
     "destroyMuzzleFlash: Destroys a muzzle flash.",
     "printMuzzleFlashes: Prints created muzzleflashes.",
-    "unmapSkybox: Removes the mapped skybox."
+    "unmapSkybox: Removes the mapped skybox.",
+    "editScript: Opens the Skybox editing GUI."
   ];
 
   this.keyboardInfo = [
@@ -1352,6 +1356,11 @@ var CommandDescriptor = function(){
   this.destroyMuzzleFlash = new Object();
   this.destroyMuzzleFlash.types = [];
   this.destroyMuzzleFlash.types.push(this.MUZZLE_FLASH_NAME); // muzzleFlashName
+
+  // editSkybox
+  this.editSkybox = new Object();
+  this.editSkybox.types = [];
+  this.editSkybox.types.push(this.SKYBOX_NAME); //skyboxName
 };
 
 CommandDescriptor.prototype.test = function(){

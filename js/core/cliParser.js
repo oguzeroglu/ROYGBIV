@@ -4512,6 +4512,40 @@ function parse(input){
           terminal.printInfo(Text.SKYBOX_HIDDEN);
           return true;
         break;
+        case 178: //editSkybox
+          if (mode != 0){
+            terminal.printError(Text.WORKS_ONLY_IN_DESIGN_MODE);
+            return true;
+          }
+          var skybox = skyBoxes[splitted[1]];
+          if (!skybox){
+            terminal.printError(Text.NO_SUCH_SKYBOX);
+            return true;
+          }
+          terminal.printInfo(Text.LOADING);
+          canvas.style.visibility = "hidden";
+          terminal.disable();
+          var xhr = new XMLHttpRequest();
+          xhr.open("POST", "/getSkyboxFolders", true);
+          xhr.setRequestHeader("Content-type", "application/json");
+          xhr.onreadystatechange = function (){
+            if (xhr.readyState == 4 && xhr.status == 200){
+              var folders = JSON.parse(xhr.responseText);
+              canvas.style.visibility = "";
+              terminal.clear();
+              if (folders.length == 0){
+                terminal.enable();
+                terminal.printError(Text.NO_VALID_SKYBOX_FOLDER);
+              }else{
+                terminal.disable();
+                terminal.printInfo(Text.AFTER_SKYBOX_CREATION);
+                skyboxCreatorGUIHandler.edit(skybox, folders);
+              }
+            }
+          }
+          xhr.send();
+          return true;
+        break;
       }
       return true;
     }catch(err){
