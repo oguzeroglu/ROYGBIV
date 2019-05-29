@@ -24,9 +24,6 @@ SkyboxHandler.prototype.map = function(skybox){
   scene.add(this.getMesh());
   this.visible = true;
   this.mappedSkyboxName = skybox.name;
-  if (bloom){
-    bloom.onSkyboxVisibilityChange();
-  }
 }
 
 SkyboxHandler.prototype.generateMesh = function(skybox){

@@ -65,7 +65,6 @@ var GUIHandler = function(){
     "Exposure": 0.0,
     "Gamma": 0.0,
     "BlurStepAmount": 0,
-    "Blend skybox": false,
     "BlurPass1": {"Factor": 0.0, "Color": "#ffffff", "Quality": "high"},
     "BlurPass2": {"Factor": 0.0, "Color": "#ffffff", "Quality": "high"},
     "BlurPass3": {"Factor": 0.0, "Color": "#ffffff", "Quality": "high"},
@@ -1178,9 +1177,7 @@ GUIHandler.prototype.initializeBloomGUI = function(){
     bloom.setBlurStepCount(val);
     for (var i = 0; i < 5; i++){
       guiHandler.enableController(guiHandler["blurPassFactorController"+(i+1)]);
-      if (!bloom.configurations.blendWithSkybox){
-        guiHandler.enableController(guiHandler["blurPassTintColorController"+(i+1)]);
-      }
+      guiHandler.enableController(guiHandler["blurPassTintColorController"+(i+1)]);
       guiHandler.enableController(guiHandler["blurPassTapController"+(i+1)]);
     }
     for (var i = val; i < 5; i++){
@@ -1191,22 +1188,6 @@ GUIHandler.prototype.initializeBloomGUI = function(){
   }).listen();
   guiHandler.bloomActiveController = guiHandler.datGuiBloom.add(guiHandler.bloomParameters, "Active").onChange(function(val){
     renderer.bloomOn = val;
-  }).listen();
-  guiHandler.bloomBlendWithSkyboxController = guiHandler.datGuiBloom.add(guiHandler.bloomParameters, "Blend skybox").onChange(function(val){
-    if (!skyboxHandler.isVisible()){
-      guiHandler.bloomParameters["Blend skybox"] = false;
-      return;
-    }
-    bloom.setBlendWithSkyboxStatus(val);
-    if (val){
-      for (var i = 0; i<bloom.configurations.blurStepCount; i++){
-        guiHandler.disableController(guiHandler["blurPassTintColorController"+(i+1)]);
-      }
-    }else{
-      for (var i = 0; i<bloom.configurations.blurStepCount; i++){
-        guiHandler.enableController(guiHandler["blurPassTintColorController"+(i+1)]);
-      }
-    }
   }).listen();
   for (var i = 0; i<5; i++){
     var blurPassFolder = guiHandler.datGuiBloom.addFolder("BlurPass"+(i+1));

@@ -31,20 +31,11 @@ uniform vec3 bloomTintColors[5];
 varying vec2 vUV;
 
 void main(){
-  #ifdef BLEND_WITH_SKYBOX
-    vec3 skyboxColor = texture2D(skyboxColorTexture, -vUV).rgb;
-    vec3 tintColor0 = skyboxColor;
-    vec3 tintColor1 = skyboxColor;
-    vec3 tintColor2 = skyboxColor;
-    vec3 tintColor3 = skyboxColor;
-    vec3 tintColor4 = skyboxColor;
-  #else
-    vec3 tintColor0 = bloomTintColors[0];
-    vec3 tintColor1 = bloomTintColors[1];
-    vec3 tintColor2 = bloomTintColors[2];
-    vec3 tintColor3 = bloomTintColors[3];
-    vec3 tintColor4 = bloomTintColors[4];
-  #endif
+  vec3 tintColor0 = bloomTintColors[0];
+  vec3 tintColor1 = bloomTintColors[1];
+  vec3 tintColor2 = bloomTintColors[2];
+  vec3 tintColor3 = bloomTintColors[3];
+  vec3 tintColor4 = bloomTintColors[4];
   vec4 hdrColor = texture2D(sceneTexture, vUV);
   #ifdef BLUR_STEP_1_ACTIVE
     hdrColor = hdrColor + (bloomStrength * bloomFactors[0] * vec4(tintColor0.rgb, 1.0) * texture2D(blurTexture1, vUV));

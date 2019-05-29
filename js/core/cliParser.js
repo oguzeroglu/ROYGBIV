@@ -1536,9 +1536,6 @@ function parse(input){
             return true;
           }
           skyboxHandler.map(skybox);
-          if (bloom){
-            bloom.onSkyboxVisibilityChange();
-          }
           terminal.printError(Text.SKYBOX_MAPPED);
           return true;
         break;

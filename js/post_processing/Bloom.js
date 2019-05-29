@@ -7,8 +7,7 @@ var Bloom = function(){
     gamma: 1,
     tapTypes: [13, 13, 13, 13, 13],
     bloomFactors: [1, 1, 1, 1, 1],
-    bloomTintColors: [new THREE.Vector3(1, 1, 1), new THREE.Vector3(1, 1, 1), new THREE.Vector3(1, 1, 1), new THREE.Vector3(1, 1, 1), new THREE.Vector3(1, 1, 1)],
-    blendWithSkybox: false
+    bloomTintColors: [new THREE.Vector3(1, 1, 1), new THREE.Vector3(1, 1, 1), new THREE.Vector3(1, 1, 1), new THREE.Vector3(1, 1, 1), new THREE.Vector3(1, 1, 1)]
   }
   this.rtParameters = {minFilter: THREE.LinearFilter, magFilter: THREE.LinearFilter, format: THREE.RGBAFormat};
   this.generateDirectPass();
@@ -43,7 +42,6 @@ Bloom.prototype.reset = function(){
     this.setBloomFactor(i, 1);
     this.setBloomTintColor(i, 1, 1, 1);
   }
-  this.setBlendWithSkyboxStatus(false);
 }
 
 Bloom.prototype.load = function(configs){
@@ -58,7 +56,6 @@ Bloom.prototype.load = function(configs){
     var curBloomTintColor = configs.bloomTintColors[i];
     this.setBloomTintColor(i, curBloomTintColor.x, curBloomTintColor.y, curBloomTintColor.z);
   }
-  this.setBlendWithSkyboxStatus(configs.blendWithSkybox);
   renderer.bloomOn = configs.isOn;
 }
 
@@ -71,26 +68,6 @@ Bloom.prototype.export = function(){
   return exportObj;
 }
 
-Bloom.prototype.onSkyboxVisibilityChange = function(){
-  if (!this.configurationsOpen){
-    return;
-  }
-  if (!skyboxHandler.isVisible()){
-    if (this.configurations.blendWithSkybox){
-      for (var i = 0; i<this.configurations.blurStepCount; i++){
-        guiHandler.enableController(guiHandler["blurPassTintColorController"+(i+1)]);
-      }
-    }
-    if (this.configurationsOpen.blendWithSkybox){
-      this.setBlendWithSkyboxStatus(false);
-    }
-    guiHandler.disableController(guiHandler.bloomBlendWithSkyboxController);
-    guiHandler.bloomParameters["Blend skybox"] = false;
-  }else{
-    guiHandler.enableController(guiHandler.bloomBlendWithSkyboxController);
-  }
-}
-
 Bloom.prototype.showConfigurations = function(){
   guiHandler.show(guiHandler.guiTypes.BLOOM);
   guiHandler.bloomParameters["Active"] = renderer.bloomOn;
@@ -101,7 +78,6 @@ Bloom.prototype.showConfigurations = function(){
   guiHandler.bloomParameters["Strength"] = this.configurations.bloomStrength;
   guiHandler.bloomParameters["Exposure"] = this.configurations.exposure;
   guiHandler.bloomParameters["Gamma"] = this.configurations.gamma;
-  guiHandler.bloomParameters["Blend skybox"] = this.configurations.blendWithSkybox;
   guiHandler.bloomParameters["BlurStepAmount"] = this.configurations.blurStepCount;
   for (var i=0; i<5; i++){
     guiHandler.bloomParameters["BlurPass"+(i+1)]["Factor"] = this.configurations.bloomFactors[i];
@@ -116,38 +92,12 @@ Bloom.prototype.showConfigurations = function(){
     guiHandler.disableController(guiHandler["blurPassTintColorController"+(i+1)]);
     guiHandler.disableController(guiHandler["blurPassTapController"+(i+1)]);
   }
-  if (skyboxHandler.isVisible()){
-    if (this.configurations.blendWithSkybox){
-      for (var i = 0; i<this.configurations.blurStepCount; i++){
-        guiHandler.disableController(guiHandler["blurPassTintColorController"+(i+1)]);
-      }
-    }
-    guiHandler.enableController(guiHandler.bloomBlendWithSkyboxController);
-  }else{
-    guiHandler.disableController(guiHandler.bloomBlendWithSkyboxController);
-    guiHandler.bloomParameters["Blend skybox"] = false;
-  }
   this.configurationsOpen = true;
 }
 
 Bloom.prototype.hideConfigurations = function(){
   guiHandler.hide(guiHandler.guiTypes.BLOOM);
   this.configurationsOpen = false;
-}
-
-Bloom.prototype.setBlendWithSkyboxStatus = function(status){
-  if (status){
-    if (!this.skyboxMesh){
-      this.generateSkyboxPass();
-    }
-    macroHandler.injectMacro("BLEND_WITH_SKYBOX", this.combinerMaterial, false, true);
-    this.combinerMaterial.uniforms.skyboxColorTexture = new THREE.Uniform(this.skyboxTarget.texture);
-    this.configurations.blendWithSkybox = true;
-  }else{
-    macroHandler.removeMacro("BLEND_WITH_SKYBOX", this.combinerMaterial, false, true);
-    delete this.combinerMaterial.uniforms.skyboxColorTexture;
-    this.configurations.blendWithSkybox = false;
-  }
 }
 
 Bloom.prototype.setBloomTintColor = function(levelIndex, r, g, b){
@@ -224,12 +174,6 @@ Bloom.prototype.setBlurDirection = function(isX){
   }
 }
 
-Bloom.prototype.skyboxPass = function(){
-  this.skyboxMesh.position.copy(skyboxHandler.getMesh().position);
-  this.skyboxMesh.quaternion.copy(skyboxHandler.getMesh().quaternion);
-  renderer.webglRenderer.render(this.skyboxPassScene, camera, this.skyboxTarget);
-}
-
 Bloom.prototype.combinerPass = function(){
   renderer.webglRenderer.render(this.combinerScene, orthographicCamera);
 }
@@ -258,13 +202,6 @@ Bloom.prototype.brightPass = function(){
 
 Bloom.prototype.directPass = function(){
   renderer.webglRenderer.render(scene, camera, this.sceneTarget);
-}
-
-Bloom.prototype.generateSkyboxPass = function(){
-  this.skyboxTarget = new THREE.WebGLRenderTarget(renderer.getCurrentViewport().z / 10, renderer.getCurrentViewport().w / 10, this.rtParameters);
-  this.skyboxPassScene = new THREE.Scene();
-  this.skyboxMesh = new THREE.Mesh(skyboxHandler.getMesh().geometry, skyboxHandler.getMesh().material);
-  this.skyboxPassScene.add(this.skyboxMesh);
 }
 
 Bloom.prototype.generateCombinerPass = function(){
@@ -353,9 +290,6 @@ Bloom.prototype.generateBrightPass = function(){
 Bloom.prototype.setSize = function(width, height){
   this.sceneTarget.setSize(width, height);
   this.brightTarget.setSize(width / 2, height / 2);
-  if (this.skyboxTarget){
-    this.skyboxTarget.setSize(width / 10, height / 10);
-  }
   var coef = 2;
   for (var i = 0; i<this.configurations.blurStepCount; i++){
     this.horizontalBlurTargets[i].setSize(width/coef, height/coef);
@@ -376,8 +310,5 @@ Bloom.prototype.render = function(){
   this.directPass();
   this.brightPass();
   this.blurPass();
-  if (this.configurations.blendWithSkybox){
-    this.skyboxPass();
-  }
   this.combinerPass();
 }
