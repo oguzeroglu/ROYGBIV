@@ -9,7 +9,7 @@ TextureAtlasHandler.prototype.dispose = function(){
   }
 }
 
-TextureAtlasHandler.prototype.compressTexture = function(base64Data, readyCallback, errorCallback){
+TextureAtlasHandler.prototype.compressTexture = function(base64Data, readyCallback, errorCallback, particleTextureCount){
   var postRequest = new XMLHttpRequest();
   var data = JSON.stringify({image: base64Data});
   postRequest.open("POST", "/compressTextureAtlas", true);
@@ -22,6 +22,7 @@ TextureAtlasHandler.prototype.compressTexture = function(base64Data, readyCallba
       }else{
         textureAtlasHandler.atlas = new TexturePack(null, null, {isAtlas: true});
         textureAtlasHandler.atlas.loadTextures(function(){
+          textureAtlasHandler.currentParticleTextureCount = particleTextureCount;
           readyCallback();
         });
       }
@@ -45,6 +46,11 @@ TextureAtlasHandler.prototype.onTexturePackChange = function(readyCallback, erro
   }
   if (this.currentParticleTextureCount != particleTextureCount){
     this.dispose();
+    if (particleTextureCount == 0){
+      this.currentParticleTextureCount = 0;
+      readyCallback();
+      return;
+    }
     var textureMerger;
     try{
       textureMerger = new TextureMerger(texturesObj);
@@ -54,7 +60,7 @@ TextureAtlasHandler.prototype.onTexturePackChange = function(readyCallback, erro
       errorCallback();
       return;
     }
-    this.compressTexture(textureMerger.mergedTexture.image.toDataURL(), readyCallback, errorCallback);
+    this.compressTexture(textureMerger.mergedTexture.image.toDataURL(), readyCallback, errorCallback, particleTextureCount);
   }
 }
 

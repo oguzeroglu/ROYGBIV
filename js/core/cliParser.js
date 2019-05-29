@@ -1302,7 +1302,22 @@ function parse(input){
           }
           texturePack.destroy();
           if (!jobHandlerWorking){
-            terminal.printInfo(Text.TEXTURE_PACK_DESTROYED);
+            if (!texturePack.isParticleTexture){
+              terminal.printInfo(Text.TEXTURE_PACK_DESTROYED);
+            }else{
+              terminal.clear();
+              terminal.disable();
+              terminal.printInfo(Text.GENERATING_TEXTURE_ATLAS);
+              textureAtlasHandler.onTexturePackChange(function(){
+                terminal.clear();
+                terminal.enable();
+                terminal.print(Text.SKYBOX_DESTROYED);
+              }, function(){
+                terminal.clear();
+                terminal.printError(Text.ERROR_HAPPENED_COMPRESSING_TEXTURE_ATLAS);
+                terminal.enable();
+              });
+            }
           }
           return true;
         break;
