@@ -763,6 +763,8 @@ var CommandDescriptor = function(){
     65, //superposeGridSystem -> Deprecated due to lack of uses cases after grid selection mode implementation.
     68, //newPointLight -> Lights are not supported for now.
     71, //printSkyboxInfo -> Deprecated due to lack of use cases after changes in Skybox creation logic.
+    74, //skybox -> Deprecated due to architectural changes in Skybox handling logic.
+    75, //scaleSkybox -> Deprecated due to lack of usecases.
     78, //undo -> Deprecated because causes memory issues for big projects.
     79, //redo -> Deprecated because causes memory issues for big projects.
     89, //translateObject -> Deprecated due to architectural conflicts. Objects can only be translated using animations. Instead of translating the object in the design mode, a new grid system should be created at the specific position. Every object should be associated with certain grids.
@@ -995,16 +997,6 @@ var CommandDescriptor = function(){
   this.destroySkybox = new Object();
   this.destroySkybox.types = [];
   this.destroySkybox.types.push(this.SKYBOX_NAME); //name
-
-  // skybox
-  this.skybox = new Object();
-  this.skybox.types = [];
-  this.skybox.types.push(this.HIDE_SHOW); //hide/show
-
-  // scaleSkybox
-  this.scaleSkybox = new Object();
-  this.scaleSkybox.types = [];
-  this.scaleSkybox.types.push(this.UNKNOWN_INDICATOR); //amount
 
   // selectObject
   this.selectObject = new Object();

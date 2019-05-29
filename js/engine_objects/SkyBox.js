@@ -21,6 +21,7 @@ SkyBox.prototype.dispose = function(){
   this.leftTexture.dispose();
   this.rightTexture.dispose();
   this.upTexture.dispose();
+  this.cubeTexture.dispose();
 }
 
 SkyBox.prototype.export = function(){

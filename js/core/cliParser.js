@@ -1525,45 +1525,17 @@ function parse(input){
           // DEPRECATED
         break;
         case 72: //mapSkybox
-          var name = splitted[1];
-          var skybox = skyBoxes[name];
-
           if (mode != 0){
             terminal.printError(Text.WORKS_ONLY_IN_DESIGN_MODE);
             return true;
           }
+          var name = splitted[1];
+          var skybox = skyBoxes[name];
           if (!skybox){
             terminal.printError(Text.NO_SUCH_SKYBOX);
             return true;
           }
-          if (!skybox.isUsable()){
-            terminal.printError(Text.SKYBOX_NOT_USABLE);
-            return true;
-          }
-          if (!skyboxMesh){
-            var geomKey = (
-              "BoxBufferGeometry" + PIPE +
-              skyboxDistance + PIPE + skyboxDistance + PIPE + skyboxDistance + PIPE +
-              "1" + PIPE + "1" + PIPE + "1"
-            );
-            var skyboxBufferGeometry = geometryCache[geomKey];
-            if (!skyboxBufferGeometry){
-              skyboxBufferGeometry = new THREE.BoxBufferGeometry(skyboxDistance, skyboxDistance, skyboxDistance);
-              geometryCache[geomKey] = skyboxBufferGeometry;
-            }
-            skyboxMesh = new MeshGenerator(skyboxBufferGeometry, null).generateSkybox(skybox, false);
-          }else{
-            skyboxMesh.material.uniforms.cubeTexture.value = skybox.cubeTexture;
-            skyboxMesh.material.uniforms.color.value.set(skybox.color);
-          }
-          scene.add(skyboxMesh);
-          skyboxVisible = true;
-          mappedSkyboxName = name;
-          if (guiHandler.skyboxParameters){
-            guiHandler.skyboxParameters["Name"] = mappedSkyboxName;
-            guiHandler.skyboxParameters["Color"] = "#" + skyboxMesh.material.uniforms.color.value.getHexString();
-          }
-          skyboxMesh.renderOrder = renderOrders.SKYBOX;
+          skyboxHandler.map(skybox);
           if (bloom){
             bloom.onSkyboxVisibilityChange();
           }
@@ -1571,12 +1543,12 @@ function parse(input){
           return true;
         break;
         case 73: //destroySkybox
-          var name = splitted[1];
-          var skybox = skyBoxes[name];
           if (mode != 0){
             terminal.printError(Text.WORKS_ONLY_IN_DESIGN_MODE);
             return true;
           }
+          var name = splitted[1];
+          var skybox = skyBoxes[name];
           if (!(name.indexOf("*") == -1)){
             new JobHandler(splitted).handle();
             return true;
@@ -1585,80 +1557,17 @@ function parse(input){
             terminal.printError(Text.NO_SUCH_SKYBOX);
             return true;
           }
-          if (name == mappedSkyboxName){
-            scene.remove(skyboxMesh);
-            skyboxVisible = false;
-            fogBlendWithSkybox = false;
-            skyboxMesh.material.dispose();
-            skyboxMesh.geometry.dispose();
-            skyboxMesh.material.uniforms.cubeTexture.value.dispose();
-          }
-          delete skyBoxes[name];
+          skyboxHandler.destroySkybox(skybox);
           if (!jobHandlerWorking){
             terminal.printInfo(Text.SKYBOX_DESTROYED);
           }
           return true;
         break;
         case 74: //skybox
-          var param = splitted[1].toUpperCase();
-          if (mode != 0){
-            terminal.printError(Text.WORKS_ONLY_IN_DESIGN_MODE);
-            return true;
-          }
-          if (!skyboxMesh){
-            terminal.printError(Text.NO_SKYBOX_MAPPED);
-            return true;
-          }
-          if (param != "HIDE" && param != "SHOW"){
-            terminal.printError(Text.STATUS_MUST_BE_ONE_OF);
-            return true;
-          }
-          if (param == "HIDE"){
-            if (!skyboxVisible){
-              terminal.printError(Text.SKYBOX_NOT_VISIBLE);
-              return true;
-            }
-            scene.remove(skyboxMesh);
-            skyboxVisible = false;
-            fogBlendWithSkybox = false;
-            terminal.printInfo(Text.SKYBOX_HIDDEN);
-          }else{
-            if (skyboxVisible){
-              terminal.printError(Text.SKYBOX_ALREADY_VISIBLE);
-              return true;
-            }
-            scene.add(skyboxMesh);
-            skyboxVisible = true;
-            terminal.printInfo(Text.SKYBOX_SHOWN);
-          }
-          if (bloom){
-            bloom.onSkyboxVisibilityChange();
-          }
-          return true;
+          // DEPRECATED
         break;
         case 75: //scaleSkybox
-          var amount = parseFloat(splitted[1]);
-          if (mode != 0){
-            terminal.printError(Text.WORKS_ONLY_IN_DESIGN_MODE);
-            return true;
-          }
-          if (!skyboxMesh){
-            terminal.printError(Text.SKYBOX_NOT_DEFINED);
-            return true;
-          }
-          if (!skyboxVisible){
-            terminal.printError(Text.SKYBOX_NOT_VISIBLE);
-            return true;
-          }
-          if (isNaN(amount)){
-            terminal.printError(Text.AMOUNT_MUST_HAVE_A_NUMERICAL_VALUE);
-            return true;
-          }
-          skyboxMesh.scale.x = amount;
-          skyboxMesh.scale.y = amount;
-          skyboxMesh.scale.z = amount;
-          terminal.printInfo(Text.SKYBOX_SCALE_ADJUSTED);
-          return true;
+          // DEPRECATED
         break;
         case 76: //save
           if (mode != 0){
@@ -3764,7 +3673,7 @@ function parse(input){
             guiHandler.fogParameters["Color"] = "#"+fogColorRGB.getHexString();
             guiHandler.fogParameters["Density"] = fogDensity * 100;
             guiHandler.fogParameters["Blend skybox"] = fogBlendWithSkybox;
-            if (!skyboxVisible){
+            if (!skyboxHandler.isVisible()){
               guiHandler.enableController(guiHandler.fogColorController);
               guiHandler.disableController(guiHandler.fogBlendWithSkyboxController);
             }else{

@@ -17,6 +17,8 @@ window.onload = function() {
   macroHandler = new MacroHandler();
   // TEXTURE ATLAS HANDLER
   textureAtlasHandler = new TextureAtlasHandler();
+  // SKYBOX HANDLER
+  skyboxHandler = new SkyboxHandler();
   // TEXT POOL
   Text = (!isDeployment)? new Text(): 0;
   // DRAGABLE CLI

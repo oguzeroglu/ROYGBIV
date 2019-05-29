@@ -74,8 +74,6 @@ var State = function(projectName, author){
   }
   this.texturePacks = texturePacksExport;
   // SKYBOXES ******************************************************
-  this.mappedSkyboxName = mappedSkyboxName;
-  this.skyboxVisible = skyboxVisible;
   var skyBoxExport = new Object();
   this.totalSkyboxCount = 0;
   for (var skyBoxName in skyBoxes){
@@ -83,9 +81,7 @@ var State = function(projectName, author){
     skyBoxExport[skyBoxName] = skyBoxes[skyBoxName].export();
   }
   this.skyBoxes = skyBoxExport;
-  if (skyboxMesh){
-    this.skyBoxScale = skyboxMesh.scale.x;
-  }
+  this.skyboxHandlerInfo = skyboxHandler.export();
   // ANCHOR GRID ***************************************************
   if (anchorGrid){
     this.anchorGrid = anchorGrid.export();

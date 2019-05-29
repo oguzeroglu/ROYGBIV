@@ -15,6 +15,9 @@ StateLoader.prototype.onTextureAtlasLoaded = function(){
 
 StateLoader.prototype.onSkyboxLoaded = function(){
   this.totalLoadedSkyboxCount ++;
+  if (this.totalLoadedSkyboxCount == this.stateObj.totalSkyboxCount){
+    skyboxHandler.import(this.stateObj.skyboxHandlerInfo);
+  }
   this.finalize();
 }
 
@@ -396,9 +399,7 @@ StateLoader.prototype.resetProject = function(){
     addedTexts[textName].destroy();
   }
 
-  if (skyboxMesh){
-    scene.remove(skyboxMesh);
-  }
+  skyboxHandler.reset();
 
   collisionCallbackRequests = new Map();
   particleCollisionCallbackRequests = new Object();
@@ -521,7 +522,6 @@ StateLoader.prototype.resetProject = function(){
   if (!isDeployment){
     selectionHandler.resetCurrentSelection();
   }
-  skyboxVisible = false;
   croppedGridSystemBuffer = 0;
   scriptEditorShowing = false;
   physicsSolver = new CANNON.GSSolver();

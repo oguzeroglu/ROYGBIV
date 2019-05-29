@@ -269,10 +269,10 @@ ShaderPrecisionHandler.prototype.setShaderPrecisionForType = function(type, prec
       fragmentShader = ShaderContent.skyboxFragmentShader;
       vertexShaderName = "skyboxVertexShader";
       fragmentShaderName = "skyboxFragmentShader";
-      if (skyboxMesh){
-        skyboxMesh.material.vertexShader = this.replace(skyboxMesh.material.vertexShader, currentPrecisionForType, newPrecisionForType);
-        skyboxMesh.material.fragmentShader = this.replace(skyboxMesh.material.fragmentShader, currentPrecisionForType, newPrecisionForType);
-        skyboxMesh.material.needsUpdate = true;
+      if (skyboxHandler.isVisible()){
+        skyboxHandler.getMesh().material.vertexShader = this.replace(skyboxHandler.getMesh().material.vertexShader, currentPrecisionForType, newPrecisionForType);
+        skyboxHandler.getMesh().material.fragmentShader = this.replace(skyboxHandler.getMesh().material.fragmentShader, currentPrecisionForType, newPrecisionForType);
+        skyboxHandler.getMesh().material.needsUpdate = true;
       }
     break;
     case this.types.TEXT:

@@ -185,9 +185,9 @@ ModeSwitcher.prototype.switchFromDesignToPreview = function(){
     if (fogBlendWithSkybox){
       GLOBAL_FOG_UNIFORM.value.set(
         -fogDensity,
-        skyboxMesh.material.uniforms.color.value.r,
-        skyboxMesh.material.uniforms.color.value.g,
-        skyboxMesh.material.uniforms.color.value.b
+        skyboxHandler.getMesh().material.uniforms.color.value.r,
+        skyboxHandler.getMesh().material.uniforms.color.value.g,
+        skyboxHandler.getMesh().material.uniforms.color.value.b
       );
     }
     for (var objName in addedObjects){

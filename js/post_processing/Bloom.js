@@ -75,7 +75,7 @@ Bloom.prototype.onSkyboxVisibilityChange = function(){
   if (!this.configurationsOpen){
     return;
   }
-  if (!skyboxVisible){
+  if (!skyboxHandler.isVisible()){
     if (this.configurations.blendWithSkybox){
       for (var i = 0; i<this.configurations.blurStepCount; i++){
         guiHandler.enableController(guiHandler["blurPassTintColorController"+(i+1)]);
@@ -116,7 +116,7 @@ Bloom.prototype.showConfigurations = function(){
     guiHandler.disableController(guiHandler["blurPassTintColorController"+(i+1)]);
     guiHandler.disableController(guiHandler["blurPassTapController"+(i+1)]);
   }
-  if (skyboxVisible){
+  if (skyboxHandler.isVisible()){
     if (this.configurations.blendWithSkybox){
       for (var i = 0; i<this.configurations.blurStepCount; i++){
         guiHandler.disableController(guiHandler["blurPassTintColorController"+(i+1)]);
@@ -225,8 +225,8 @@ Bloom.prototype.setBlurDirection = function(isX){
 }
 
 Bloom.prototype.skyboxPass = function(){
-  this.skyboxMesh.position.copy(skyboxMesh.position);
-  this.skyboxMesh.quaternion.copy(skyboxMesh.quaternion);
+  this.skyboxMesh.position.copy(skyboxHandler.getMesh().position);
+  this.skyboxMesh.quaternion.copy(skyboxHandler.getMesh().quaternion);
   renderer.webglRenderer.render(this.skyboxPassScene, camera, this.skyboxTarget);
 }
 
@@ -263,7 +263,7 @@ Bloom.prototype.directPass = function(){
 Bloom.prototype.generateSkyboxPass = function(){
   this.skyboxTarget = new THREE.WebGLRenderTarget(renderer.getCurrentViewport().z / 10, renderer.getCurrentViewport().w / 10, this.rtParameters);
   this.skyboxPassScene = new THREE.Scene();
-  this.skyboxMesh = new THREE.Mesh(skyboxMesh.geometry, skyboxMesh.material);
+  this.skyboxMesh = new THREE.Mesh(skyboxHandler.getMesh().geometry, skyboxHandler.getMesh().material);
   this.skyboxPassScene.add(this.skyboxMesh);
 }
 

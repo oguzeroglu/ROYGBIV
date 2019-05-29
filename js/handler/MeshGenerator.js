@@ -185,11 +185,7 @@ MeshGenerator.prototype.generateBasicMesh = function(){
 MeshGenerator.prototype.generateSkybox = function(skybox, isMock){
   var cubeTextureUniform;
   if (!isMock){
-    if (GLOBAL_CUBE_TEXTURE_UNIFORM){
-      GLOBAL_CUBE_TEXTURE_UNIFORM.value = skybox.cubeTexture;
-    }else{
-      GLOBAL_CUBE_TEXTURE_UNIFORM = new THREE.Uniform(skybox.cubeTexture);
-    }
+    GLOBAL_CUBE_TEXTURE_UNIFORM.value = skybox.cubeTexture;
     cubeTextureUniform = GLOBAL_CUBE_TEXTURE_UNIFORM;
   }else{
     cubeTextureUniform = new THREE.Uniform(skybox.cubeTexture);
@@ -207,6 +203,7 @@ MeshGenerator.prototype.generateSkybox = function(skybox, isMock){
     }
   });
   var mesh = new THREE.Mesh(this.geometry, material);
+  mesh.renderOrder = renderOrders.SKYBOX;
   material.uniforms.modelViewMatrix.value = mesh.modelViewMatrix;
   mesh.onBeforeRender = function(){
     webglCallbackHandler.onBeforeRender(skybox);

@@ -122,10 +122,7 @@ SkyboxCreatorGUIHandler.prototype.show = function(skyboxName, folders){
   this.colorController = guiHandler.datGuiSkyboxCreation.addColor(this.configurations, "Color").onChange(function(val){
     skyboxCreatorGUIHandler.testMesh.material.uniforms.color.value.set(val);
     skyboxCreatorGUIHandler.skybox.color = val;
-    if (!(typeof mappedSkyboxName == UNDEFINED) && mappedSkyboxName == skyboxName){
-      skyboxMesh.material.uniforms.color.value.set(val);
-    }
-    if (fogBlendWithSkybox && !(typeof mappedSkyboxName == UNDEFINED) && mappedSkyboxName == skyboxName){
+    if (fogBlendWithSkybox && !(typeof skyboxHandler.getMappedSkyboxName() == UNDEFINED) && skyboxHandler.getMappedSkyboxName() == skyboxName){
       REUSABLE_COLOR.set(val);
       GLOBAL_FOG_UNIFORM.value.set(-fogDensity, REUSABLE_COLOR.r, REUSABLE_COLOR.g, REUSABLE_COLOR.b);
     }

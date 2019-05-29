@@ -28,14 +28,6 @@ var GUIHandler = function(){
     "mb alpha": 1.0,
     "mb time": OBJECT_TRAIL_MAX_TIME_IN_SECS_DEFAULT
   };
-  this.skyboxParameters = {
-    "Name": "skyboxName",
-    "Color": "#ffffff",
-    "Done": function(){
-      terminal.clear();
-      parseCommand("skyboxConfigurations hide");
-    }
-  };
   this.textManipulationParameters = {
     "Text": "textName",
     "Content": "",
@@ -1201,7 +1193,7 @@ GUIHandler.prototype.initializeBloomGUI = function(){
     renderer.bloomOn = val;
   }).listen();
   guiHandler.bloomBlendWithSkyboxController = guiHandler.datGuiBloom.add(guiHandler.bloomParameters, "Blend skybox").onChange(function(val){
-    if (!skyboxVisible){
+    if (!skyboxHandler.isVisible()){
       guiHandler.bloomParameters["Blend skybox"] = false;
       return;
     }
@@ -1251,9 +1243,9 @@ GUIHandler.prototype.initializeFogGUI = function(){
     }else{
       GLOBAL_FOG_UNIFORM.value.set(
         -fogDensity,
-        skyboxMesh.material.uniforms.color.value.r,
-        skyboxMesh.material.uniforms.color.value.g,
-        skyboxMesh.material.uniforms.color.value.b
+        skyboxHandler.getMesh().material.uniforms.color.value.r,
+        skyboxHandler.getMesh().material.uniforms.color.value.g,
+        skyboxHandler.getMesh().material.uniforms.color.value.b
       );
     }
   }).listen();
@@ -1262,7 +1254,7 @@ GUIHandler.prototype.initializeFogGUI = function(){
     GLOBAL_FOG_UNIFORM.value.set(fogDensity, fogColorRGB.r, fogColorRGB.g, fogColorRGB.b);
   }).listen();
   guiHandler.fogBlendWithSkyboxController = guiHandler.datGuiFog.add(guiHandler.fogParameters, "Blend skybox").onChange(function(val){
-    if (!skyboxVisible){
+    if (!skyboxHandler.isVisible()){
       guiHandler.fogParameters["Blend skybox"] = false;
       return;
     }
@@ -1270,9 +1262,9 @@ GUIHandler.prototype.initializeFogGUI = function(){
       fogBlendWithSkybox = true;
       GLOBAL_FOG_UNIFORM.value.set(
         -fogDensity,
-        skyboxMesh.material.uniforms.color.value.r,
-        skyboxMesh.material.uniforms.color.value.g,
-        skyboxMesh.material.uniforms.color.value.b
+        skyboxHandler.getMesh().material.uniforms.color.value.r,
+        skyboxHandler.getMesh().material.uniforms.color.value.g,
+        skyboxHandler.getMesh().material.uniforms.color.value.b
       );
       guiHandler.disableController(guiHandler.fogColorController);
     }else{
