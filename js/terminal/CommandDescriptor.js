@@ -152,7 +152,7 @@ var CommandDescriptor = function(){
       1, //noMobile
       2, //setMaxViewport
       1, //keepAspect
-      2, //newFont
+      1, //newFont
       1, //destroyFont
       0, //printFonts
       6, //newText
@@ -336,7 +336,7 @@ var CommandDescriptor = function(){
     "noMobile on/off",
     "setMaxViewport widthInPx heightInPx",
     "keepAspect ratio",
-    "newFont fontName path",
+    "newFont fontName",
     "destroyFont fontName",
     "printFonts",
     "newText textName fontName maxCharacterLength offsetX offsetY offsetZ",
@@ -1255,7 +1255,6 @@ var CommandDescriptor = function(){
   this.newFont = new Object();
   this.newFont.types = [];
   this.newFont.types.push(this.UNKNOWN_INDICATOR); // fontName
-  this.newFont.types.push(this.UNKNOWN_INDICATOR); // path
 
   // destroyFont
   this.destroyFont = new Object();

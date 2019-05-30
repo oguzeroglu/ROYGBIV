@@ -323,6 +323,7 @@ var fpsWeaponGUIHandler;
 var texturePackCreatorGUIHandler;
 var skyboxCreatorGUIHandler;
 var fogCreatorGUIHandler;
+var fontCreatorGUIHandler;
 var skyboxHandler;
 var fogHandler;
 var preConfiguredParticleSystems = new Object();

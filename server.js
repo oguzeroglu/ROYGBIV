@@ -107,7 +107,7 @@ app.post("/getFonts", function(req, res){
     return !fs.statSync(path.join("./fonts/", f)).isDirectory() && (f.toLowerCase().endsWith(".ttf"));
   });
   res.send(JSON.stringify(fonts));
-})
+});
 
 app.post("/prepareTexturePack", async function(req, res){
   console.log("[*] Preparing texture pack: "+req.body.texturePackName);
@@ -211,6 +211,12 @@ app.post("/compressTextureAtlas", async function(req, res){
     res.send(JSON.stringify({error: true}));
     handleAtlasBackup(true, hasPNGBackup, hasASTCBackup, hasPVRTCBackup, hasS3TCBackup);
   }
+});
+
+app.post("/compressFont", async function(req, res){
+  console.log("[*] Compressing font.");
+  var response = new Object();
+  res.send(JSON.stringify({response}));
 });
 
 function handleBackup(restore, filePath, backupFilePath){
@@ -472,6 +478,7 @@ function readEngineScripts(projectName, author, noMobile){
         console.log("[*] Skipping TexturePackCreatorGUIHandler.");
         console.log("[*] Skipping SkyboxCreatorGUIHandler.");
         console.log("[*] Skipping FogCreatorGUIHandler.");
+        console.log("[*] Skipping FontCreatorGUIHandler.");
         continue;
       }else if (scriptPath.includes("dat.gui.min.js")){
         console.log("[*] Skipping DAT gui.");

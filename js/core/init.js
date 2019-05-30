@@ -71,6 +71,8 @@ window.onload = function() {
     skyboxCreatorGUIHandler = new SkyboxCreatorGUIHandler();
     // FOG GUI HANDLER
     fogCreatorGUIHandler = new FogCreatorGUIHandler();
+    // FONT CREATOR GUI HANDLER
+    fontCreatorGUIHandler = new FontCreatorGUIHandler();
   }
 
   // PHYSICS BODY GENERATOR

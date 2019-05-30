@@ -3712,27 +3712,32 @@ function parse(input){
             return true;
           }
           var fontName = splitted[1];
-          var fontPath = "fonts/"+splitted[2];
           if (fonts[fontName]){
             terminal.printError(Text.FONT_NAME_MUST_BE_UNIQUE);
             return true;
           }
-          var fontObject = new Font(fontName, fontPath, function(){
-            canvas.style.visibility = "";
-            terminal.enable();
-            terminal.clear();
-            terminal.printInfo(Text.FONT_CREATED);
-            fonts[fontName] = fontObject;
-          }, function(){
-            canvas.style.visibility = "";
-            terminal.enable();
-            terminal.clear();
-            terminal.printInfo(Text.ERROR_CREATING_FONT.replace(Text.PARAM1, fontPath));
-          });
-          fontObject.load();
-          terminal.printInfo(Text.LOADING_FONT);
+          terminal.printInfo(Text.LOADING);
           canvas.style.visibility = "hidden";
           terminal.disable();
+          var xhr = new XMLHttpRequest();
+          xhr.open("POST", "/getFonts", true);
+          xhr.setRequestHeader("Content-type", "application/json");
+          xhr.onreadystatechange = function (){
+            if (xhr.readyState == 4 && xhr.status == 200){
+              var typefaces = JSON.parse(xhr.responseText);
+              canvas.style.visibility = "";
+              terminal.clear();
+              if (typefaces.length == 0){
+                terminal.enable();
+                terminal.printError(Text.NO_VALID_FONTS);
+              }else{
+                terminal.disable();
+                terminal.printInfo(Text.AFTER_FONT_CREATION);
+                fontCreatorGUIHandler.show(fontName, typefaces);
+              }
+            }
+          }
+          xhr.send();
           return true;
         break;
         case 152: //destroyFont
