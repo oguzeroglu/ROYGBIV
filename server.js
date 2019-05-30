@@ -100,6 +100,15 @@ app.post("/getSkyboxFolders", function(req, res){
   res.send(JSON.stringify(folders));
 });
 
+app.post("/getFonts", function(req, res){
+  console.log("[*] Getting fonts.");
+  res.setHeader("Content-Type", "application/json");
+  var fonts = fs.readdirSync("fonts").filter(f => {
+    return !fs.statSync(path.join("./fonts/", f)).isDirectory() && (f.toLowerCase().endsWith(".ttf"));
+  });
+  res.send(JSON.stringify(fonts));
+})
+
 app.post("/prepareTexturePack", async function(req, res){
   console.log("[*] Preparing texture pack: "+req.body.texturePackName);
   var info = {hasDiffuse: false, hasAlpha: false, hasAO: false, hasEmissive: false, hasHeight: false};
