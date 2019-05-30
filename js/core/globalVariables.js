@@ -345,6 +345,8 @@ var minusZ = "-z";
 
 // RENDER ORDERS
 var renderOrders = {
+  MARKED_POINT: -30,
+  GRID_HELPER: -20,
   FPS_WEAPON: -10,
   SKYBOX: -1,
   PARTICLE_SYSTEM: 0,

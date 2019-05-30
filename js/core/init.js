@@ -105,7 +105,7 @@ window.onload = function() {
   // DEFAULT FONT
   document.fonts.forEach(function(font){
     if (font.family == "hack"){
-      defaultFont = new Font(null, null, null, null, font);
+      defaultFont = new Font(null, null, font);
     }
   });
 

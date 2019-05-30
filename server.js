@@ -215,8 +215,25 @@ app.post("/compressTextureAtlas", async function(req, res){
 
 app.post("/compressFont", async function(req, res){
   console.log("[*] Compressing font.");
-  var response = new Object();
-  res.send(JSON.stringify({response}));
+  var fontName = req.body.name;
+  var base64Data = req.body.image.replace(/^data:image\/png;base64,/, "");
+  if (!fs.existsSync("./texture_atlas/fonts/"+fontName)){
+    fs.mkdirSync("./texture_atlas/fonts/"+fontName);
+  }
+  fs.writeFileSync("./texture_atlas/fonts/"+fontName+"/pack.png", base64Data, "base64");
+  console.log("[*] PNG saved to disk.");
+  var compressInfo = [];
+  compressInfo.push(["astc", "pack", "./texture_atlas/fonts/"+fontName]);
+  compressInfo.push(["pvrtc", "pack", "./texture_atlas/fonts/"+fontName]);
+  compressInfo.push(["s3tc", "pack", "./texture_atlas/fonts/"+fontName]);
+  for (var i = 0; i<compressInfo.length; i++){
+    var result = await compressTexture(compressInfo[i][0], compressInfo[i][1], compressInfo[i][2], false, true);
+    if (result == "UNSUCC"){
+      res.send(JSON.stringify({error: true}));
+      return;
+    }
+  }
+  res.send(JSON.stringify({error: false}));
 });
 
 function handleBackup(restore, filePath, backupFilePath){

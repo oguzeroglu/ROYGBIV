@@ -204,6 +204,7 @@ Grid.prototype.renderCornerHelpers = function(){
     addedText.refInnerHeight = 569;
     addedText.refCharSize = 6;
     addedText.handleResize();
+    addedText.mesh.renderOrder = renderOrders.GRID_HELPER;
     this.texts.push(addedText);
   }
 }

@@ -6,12 +6,13 @@ var Font = function(name, path, customFontFace){
   }else{
     this.fontFace = customFontFace
     this.generateFontTexture();
+    this.texture = this.textureMerger.mergedTexture;
   }
 }
 
 Font.prototype.compress = function(onLoaded, onError){
   var postRequest = new XMLHttpRequest();
-  var data = JSON.stringify({image: this.textureMerger.mergedTexture.image.toDataURL()});
+  var data = JSON.stringify({name: this.name, image: this.textureMerger.mergedTexture.image.toDataURL()});
   postRequest.open("POST", "/compressFont", true);
   postRequest.setRequestHeader('Content-Type', 'application/json');
   var that = this;
@@ -21,7 +22,13 @@ Font.prototype.compress = function(onLoaded, onError){
       if (resp.error){
         onError(that.name);
       }else{
-        console.log("SDFSD");
+        var textureLoader = textureLoaderFactory.get();
+        var texturePostfix = textureLoaderFactory.getFilePostfix();
+        textureLoader.load("/texture_atlas/fonts/"+that.name+"/pack"+texturePostfix, function(textureData){
+          that.texture = textureData;
+          that.texture.needsUpdate = true;
+          onLoaded();
+        });
       }
     }
   };

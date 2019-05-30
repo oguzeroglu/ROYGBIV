@@ -46,6 +46,17 @@ FontCreatorGUIHandler.prototype.createGUI = function(fontName, typefaces){
   guiHandler.datGuiFontCreation.add(this.configurations, "Done");
 }
 
+FontCreatorGUIHandler.prototype.handleTestMesh = function(){
+  if (this.text){
+    this.text.destroy();
+  }
+  this.text = new AddedText(null, this.font, this.configurations["Test letter"], new THREE.Vector3(0, 0, 0), new THREE.Color("lime"), 50, 1);
+  this.text.isEditorHelper = true;
+  this.text.refInnerHeight = 569;
+  this.text.refCharSize = 50;
+  this.text.handleResize();
+}
+
 FontCreatorGUIHandler.prototype.loadFont = function(fontName, typeface){
   terminal.clear();
   terminal.disable();
@@ -55,7 +66,7 @@ FontCreatorGUIHandler.prototype.loadFont = function(fontName, typeface){
   this.isLoading = true;
   this.font = new Font(fontName, "fonts/"+typeface, false);
   this.font.load(function(){
-
+    fontCreatorGUIHandler.handleTestMesh();
   }, function(){
     fontCreatorGUIHandler.close(Text.ERROR_HAPPENED_COMPRESSING_FONT, true);
   });

@@ -242,11 +242,11 @@ AddedText.prototype.export = function(){
 }
 
 AddedText.prototype.getGlyphUniform = function(){
-  var uuid = this.font.textureMerger.mergedTexture.uuid;
+  var uuid = this.font.texture.uuid;
   if (textureUniformCache[uuid]){
     return textureUniformCache[uuid];
   }
-  var glyphUniform = new THREE.Uniform(this.font.textureMerger.mergedTexture);
+  var glyphUniform = new THREE.Uniform(this.font.texture);
   textureUniformCache[uuid] = glyphUniform;
   return glyphUniform;
 }
