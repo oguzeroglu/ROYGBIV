@@ -49,15 +49,6 @@ var GUIHandler = function(){
     "Max width%": 100,
     "Max height%": 100
   };
-  this.fogParameters = {
-    "Density": 0.0,
-    "Color": "#ffffff",
-    "Blend skybox": false,
-    "Done": function(){
-      terminal.clear();
-      parseCommand("fogConfigurations hide");
-    }
-  };
   this.bloomParameters = {
     "Threshold": 0.0,
     "Active": false,
@@ -101,7 +92,7 @@ var GUIHandler = function(){
   }
   // GUI TYPES DEFINITION
   this.guiTypes = {
-    FOG: 0, TEXT: 1, OBJECT: 2, BLOOM: 3, FPS_WEAPON_ALIGNMENT: 4, SHADER_PRECISION: 5, PARTICLE_SYSTEM: 6, WORKER_STATUS: 7, MUZZLE_FLASH: 8, TEXTURE_PACK: 9, SKYBOX_CREATION: 10
+    TEXT: 0, OBJECT: 1, BLOOM: 2, FPS_WEAPON_ALIGNMENT: 3, SHADER_PRECISION: 4, PARTICLE_SYSTEM: 5, WORKER_STATUS: 6, MUZZLE_FLASH: 7, TEXTURE_PACK: 8, SKYBOX_CREATION: 9
   };
 }
 
@@ -488,11 +479,6 @@ GUIHandler.prototype.show = function(guiType){
         this.initializeTextManipulationGUI();
       }
     return;
-    case this.guiTypes.FOG:
-      if (!this.datGuiFog){
-        this.initializeFogGUI();
-      }
-    return;
     case this.guiTypes.BLOOM:
       if (!this.datGuiBloom){
         this.initializeBloomGUI();
@@ -550,12 +536,6 @@ GUIHandler.prototype.hide = function(guiType){
       if (this.datGuiTextManipulation){
         this.destroyGUI(this.datGuiTextManipulation);
         this.datGuiTextManipulation = 0;
-      }
-    return;
-    case this.guiTypes.FOG:
-      if (this.datGuiFog){
-        this.destroyGUI(this.datGuiFog);
-        this.datGuiFog = 0;
       }
     return;
     case this.guiTypes.BLOOM:
@@ -1213,74 +1193,4 @@ GUIHandler.prototype.initializeBloomGUI = function(){
     }.bind({index: i})).listen();
   }
   guiHandler.datGuiBloom.add(guiHandler.bloomParameters, "Done");
-}
-
-GUIHandler.prototype.initializeFogGUI = function(){
-  guiHandler.datGuiFog = new dat.GUI({hideable: false});
-  guiHandler.fogDensityController = guiHandler.datGuiFog.add(guiHandler.fogParameters, "Density").min(0).max(1).step(0.01).onChange(function(val){
-    fogDensity = val / 100;
-    if (!fogBlendWithSkybox){
-      GLOBAL_FOG_UNIFORM.value.set(fogDensity, fogColorRGB.r, fogColorRGB.g, fogColorRGB.b);
-    }else{
-      GLOBAL_FOG_UNIFORM.value.set(
-        -fogDensity,
-        skyboxHandler.getMesh().material.uniforms.color.value.r,
-        skyboxHandler.getMesh().material.uniforms.color.value.g,
-        skyboxHandler.getMesh().material.uniforms.color.value.b
-      );
-    }
-  }).listen();
-  guiHandler.fogColorController = guiHandler.datGuiFog.addColor(guiHandler.fogParameters, "Color").onChange(function(val){
-    fogColorRGB.set(val);
-    GLOBAL_FOG_UNIFORM.value.set(fogDensity, fogColorRGB.r, fogColorRGB.g, fogColorRGB.b);
-  }).listen();
-  guiHandler.fogBlendWithSkyboxController = guiHandler.datGuiFog.add(guiHandler.fogParameters, "Blend skybox").onChange(function(val){
-    if (!skyboxHandler.isVisible()){
-      guiHandler.fogParameters["Blend skybox"] = false;
-      return;
-    }
-    if (val){
-      fogBlendWithSkybox = true;
-      GLOBAL_FOG_UNIFORM.value.set(
-        -fogDensity,
-        skyboxHandler.getMesh().material.uniforms.color.value.r,
-        skyboxHandler.getMesh().material.uniforms.color.value.g,
-        skyboxHandler.getMesh().material.uniforms.color.value.b
-      );
-      guiHandler.disableController(guiHandler.fogColorController);
-    }else{
-      fogBlendWithSkybox = false;
-      GLOBAL_FOG_UNIFORM.value.set(fogDensity, fogColorRGB.r, fogColorRGB.g, fogColorRGB.b);
-      guiHandler.enableController(guiHandler.fogColorController);
-    }
-    for (var objName in addedObjects){
-      addedObjects[objName].removeFog();
-      addedObjects[objName].setFog();
-    }
-    for (var objName in objectGroups){
-      objectGroups[objName].removeFog();
-      objectGroups[objName].setFog();
-    }
-    for (var textName in addedTexts){
-      addedTexts[textName].removeFog();
-      addedTexts[textName].setFog();
-    }
-    for (var objName in autoInstancedObjects){
-      autoInstancedObjects[objName].removeFog();
-      autoInstancedObjects[objName].setFog();
-    }
-    for (var psName in particleSystemPool){
-      particleSystemPool[psName].removeFog();
-      particleSystemPool[psName].setFog();
-    }
-    for (var psName in mergedParticleSystems){
-      mergedParticleSystems[psName].removeFog();
-      mergedParticleSystems[psName].setFog();
-    }
-    for (var objTrailName in objectTrails){
-      objectTrails[objTrailName].removeFog();
-      objectTrails[objTrailName].setFog();
-    }
-  }).listen();
-  guiHandler.datGuiFog.add(guiHandler.fogParameters, "Done");
 }

@@ -76,13 +76,6 @@ var initialCameraX = 0;
 var initialCameraY = 50;
 var initialCameraZ = 0;
 
-// FOG
-var fogActive = false;
-var fogColor = "black";
-var fogDensity = 0;
-var fogColorRGB = new THREE.Color(fogColor);
-var fogBlendWithSkybox = false;
-
 // ENGINE VARIABLES
 var keyboardBuffer = new Object();
 var cameraRotationBuffer = {
@@ -330,6 +323,7 @@ var fpsWeaponGUIHandler;
 var texturePackCreatorGUIHandler;
 var skyboxCreatorGUIHandler;
 var skyboxHandler;
+var fogHandler;
 var preConfiguredParticleSystems = new Object();
 var preConfiguredParticleSystemPools = new Object();
 var muzzleFlashes = new Object();

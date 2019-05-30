@@ -508,14 +508,8 @@ StateLoader.prototype.resetProject = function(){
   modeSwitcher = new ModeSwitcher();
   activeControl = new FreeControls({});
 
-  // FOG
-  fogActive = false;
-  fogColor = "black";
-  fogDensity = 0;
-  fogColorRGB = new THREE.Color(fogColor);
-  fogBlendWithSkybox = false;
-  GLOBAL_FOG_UNIFORM.value.set(-100.0, 0, 0, 0);
-
+  fogHandler.reset();
+  
   mode = 0; // 0 -> DESIGN, 1-> PREVIEW
 
   physicsDebugMode = false;

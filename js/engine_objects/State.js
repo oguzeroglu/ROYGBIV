@@ -119,17 +119,7 @@ var State = function(projectName, author){
   this.binSize = BIN_SIZE;
   this.raycasterStepAmount = RAYCASTER_STEP_AMOUNT;
   // FOG ***********************************************************
-  this.fogObj = {
-    fogActive: fogActive,
-    fogColor: fogColor,
-    fogDensity: fogDensity,
-    blendWithSkybox: fogBlendWithSkybox
-  };
-  if (fogActive){
-    this.fogObj.r = fogColorRGB.r;
-    this.fogObj.g = fogColorRGB.g;
-    this.fogObj.b = fogColorRGB.b;
-  }
+  this.fog = fogHandler.export();
   // AREAS *********************************************************
   this.areasVisible = areasVisible;
   this.areas = new Object();

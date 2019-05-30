@@ -234,15 +234,7 @@ ImportHandler.prototype.importScripts = function(obj){
 }
 
 ImportHandler.prototype.importFog = function(obj){
-  var fogObj = obj.fogObj;
-  fogActive = fogObj.fogActive;
-  fogColor = fogObj.fogColor;
-  fogDensity = fogObj.fogDensity;
-  fogColorRGB = new THREE.Color(fogColor);
-  fogBlendWithSkybox = fogObj.blendWithSkybox;
-  if (fogActive){
-    fogColorRGB.setRGB(fogObj.r, fogObj.g, fogObj.b);
-  }
+  fogHandler.import(obj.jog);
 }
 
 ImportHandler.prototype.importAddedObjects = function(obj){

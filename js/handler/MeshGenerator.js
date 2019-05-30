@@ -42,13 +42,13 @@ MeshGenerator.prototype.generateObjectTrail = function(
   });
   var mesh = new THREE.Mesh(this.geometry, material);
   mesh.renderOrder = renderOrders.OBJECT_TRAIL;
-  if (fogBlendWithSkybox){
+  if (fogHandler.isFogBlendingWithSkybox()){
     material.uniforms.worldMatrix = new THREE.Uniform(mesh.matrixWorld);
     material.uniforms.cameraPosition = GLOBAL_CAMERA_POSITION_UNIFORM;
     material.uniforms.cubeTexture = GLOBAL_CUBE_TEXTURE_UNIFORM;
     macroHandler.injectMacro("HAS_SKYBOX_FOG", material, true, true);
   }
-  if (fogActive){
+  if (fogHandler.isFogActive()){
     material.uniforms.fogInfo = GLOBAL_FOG_UNIFORM;
     macroHandler.injectMacro("HAS_FOG", material, false, true);
   }
@@ -234,12 +234,12 @@ MeshGenerator.prototype.generateParticleSystemMesh = function(ps, texture, noTar
     ps.material.uniforms.projectionMatrix = GLOBAL_PROJECTION_UNIFORM;
     ps.material.uniforms.viewMatrix = GLOBAL_VIEW_UNIFORM;
   }
-  if (fogBlendWithSkybox && mode != 0){
+  if (fogHandler.isFogBlendingWithSkybox() && mode != 0){
     ps.material.uniforms.cameraPosition = GLOBAL_CAMERA_POSITION_UNIFORM;
     ps.material.uniforms.cubeTexture = GLOBAL_CUBE_TEXTURE_UNIFORM;
     macroHandler.injectMacro("HAS_SKYBOX_FOG", ps.material, true, true);
   }
-  if (fogActive && mode != 0){
+  if (fogHandler.isFogActive() && mode != 0){
     ps.material.uniforms.fogInfo = GLOBAL_FOG_UNIFORM;
     macroHandler.injectMacro("HAS_FOG", ps.material, false, true);
   }

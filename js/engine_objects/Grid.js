@@ -1,15 +1,3 @@
-/*
-  CONSTRUCTOR PARAMETERS
-    name -> name of this grid.
-    parentName -> name of the GridSystem to which this Grid belongs
-    startX -> upper left corner X coordinate
-    startY -> upper left corner Y coordinate
-    startZ -> upper left corner Z coordinate
-    size -> size of this grid
-    outlineColor -> X11 color name
-    colNumber -> column number inside the grid system
-    rowNumber -> row number inside the grid system
-*/
 var Grid = function(name, parentName, startX, startY, startZ, size,
                               outlineColor, colNumber, rowNumber, axis){
   this.name = name;

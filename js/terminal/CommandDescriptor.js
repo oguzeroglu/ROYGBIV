@@ -780,6 +780,8 @@ var CommandDescriptor = function(){
     78, //undo -> Deprecated because causes memory issues for big projects.
     79, //redo -> Deprecated because causes memory issues for big projects.
     89, //translateObject -> Deprecated due to architectural conflicts. Objects can only be translated using animations. Instead of translating the object in the design mode, a new grid system should be created at the specific position. Every object should be associated with certain grids.
+    90, //setFog -> Deprecated due to architectural changes in fog creation process.
+    91, //removeFog -> Deprecated due to architectural changes in fog creation process.
     101, //physicsWorkerMode -> Physics workers are now always enabled if the web workers are supported.
     102, //printPhysicsWorkerMode -> Physics workers are now always enabled if the web workers are supported.
     105, //printPerformance -> Deprecated because calling performance.now() multiple times on each render is costly.
@@ -792,10 +794,12 @@ var CommandDescriptor = function(){
     120, //printParticleCollisionWorkerMode -> Workers will be re-implemented.
     121, //logFrameDrops -> No need for such functionality after the usage of Stats.js
     122, //addPaddingToTexture -> Deprecated due to lack of usecases.
+    124, //printFogInfo -> Deprecated due to architectural changes in fog creation process.
     125, //applyDisplacementMap -> Deprecated because causes problems with geometry caching.
     127, //setAtlasTextureSize -> Deprecated because has no use cases after deprecation of TextureMerger class
     128, //printAtlasTextureSize -> Deprecated due to same reasons as setAtlasTextureSize
-    146 //skyboxConfigurations -> Deprecated due to architectural changes in Skybox creation process.
+    146, //skyboxConfigurations -> Deprecated due to architectural changes in Skybox creation process.
+    147 //fogConfigurations -> Deprecated due to architectural changes in fog creation process.
   ];
 
   if (this.commandInfo.length != this.commands.length){
@@ -1053,12 +1057,6 @@ var CommandDescriptor = function(){
   this.destroyScript.types = [];
   this.destroyScript.types.push(this.SCRIPT_NAME); //nane
 
-  // setFog
-  this.setFog = new Object();
-  this.setFog.types = [];
-  this.setFog.types.push(this.COLOR); //fogColor
-  this.setFog.types.push(this.UNKNOWN_INDICATOR); //fogDensity
-
   // glue
   this.glue = new Object();
   this.glue.types = [];
@@ -1232,11 +1230,6 @@ var CommandDescriptor = function(){
   this.build.types = [];
   this.build.types.push(this.UNKNOWN_INDICATOR); // projectName
   this.build.types.push(this.UNKNOWN_INDICATOR); // author
-
-  // fogConfigurations
-  this.fogConfigurations = new Object();
-  this.fogConfigurations.types = [];
-  this.fogConfigurations.types.push(this.HIDE_SHOW); // hide/show
 
   // noMobile
   this.noMobile = new Object();

@@ -19,6 +19,8 @@ window.onload = function() {
   textureAtlasHandler = new TextureAtlasHandler();
   // SKYBOX HANDLER
   skyboxHandler = new SkyboxHandler();
+  // FOG HANDLER
+  fogHandler = new FogHandler();
   // TEXT POOL
   Text = (!isDeployment)? new Text(): 0;
   // DRAGABLE CLI

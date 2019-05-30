@@ -2005,39 +2005,10 @@ function parse(input){
           // DEPRECATED
         break;
         case 90: //setFog
-          if (mode != 0){
-            terminal.printError(Text.WORKS_ONLY_IN_DESIGN_MODE);
-            return true;
-          }
-          var fogColorStr = splitted[1];
-          var fogDensityVal = parseFloat(splitted[2]);
-          if (isNaN(fogDensityVal)){
-            terminal.printError(Text.IS_NOT_A_NUMBER.replace(Text.PARAM1, "fogDensity"));
-            return true;
-          }
-          if (fogDensityVal <= 0){
-            terminal.printError(Text.MUST_BE_GREATER_THAN.replace(
-              Text.PARAM1, "fogDensity").replace(Text.PARAM2, "0"
-            ));
-            return true;
-          }
-          fogDensity = fogDensityVal / 100;
-          fogColor = fogColorStr;
-          fogActive = true;
-          fogColorRGB = new THREE.Color(fogColor);
-          terminal.printInfo(Text.FOG_SET);
-          return true;
+          // DEPRECATED
         break;
         case 91: //removeFog
-          if (mode != 0){
-            terminal.printError(Text.WORKS_ONLY_IN_DESIGN_MODE);
-            return true;
-          }
-          fogActive = false;
-          fogBlendWithSkybox = false;
-          terminal.printInfo(Text.FOG_REMOVED);
-          guiHandler.afterObjectSelection();
-          return true;
+          // DEPRECATED
         break;
         case 92: //glue
           var groupName = splitted[1];
@@ -2833,14 +2804,7 @@ function parse(input){
           return true;
         break;
         case 124: //printFogInfo
-          if (fogActive){
-            terminal.printHeader(Text.FOG_INFO);
-            terminal.printInfo(Text.TREE2.replace(Text.PARAM1, "Fog color").replace(Text.PARAM2, fogColor), true);
-            terminal.printInfo(Text.TREE2.replace(Text.PARAM1, "Fog density").replace(Text.PARAM2, fogDensity * 100));
-          }else{
-            terminal.printInfo(Text.FOG_IS_NOT_SET);
-          }
-          return true;
+          // DEPRECATED
         break;
         case 125: //applyDisplacementMap
           // DEPRECATED
@@ -3667,49 +3631,7 @@ function parse(input){
           // DEPRECATED
         break;
         case 147: //fogConfigurations
-          if (mode != 1){
-            terminal.printError(Text.WORKS_ONLY_IN_PREVIEW_MODE);
-            return true;
-          }
-          if (!fogActive){
-            terminal.printError(Text.NO_FOG_SET);
-            return true;
-          }
-          var fogConfigurationMode = splitted[1].toLowerCase();
-          if (fogConfigurationMode == "show"){
-            if (fogConfigurationsVisible){
-              terminal.printError(Text.GUI_IS_ALREADY_VISIBLE);
-              return true;
-            }
-            guiHandler.show(guiHandler.guiTypes.FOG);
-            guiHandler.fogParameters["Color"] = "#"+fogColorRGB.getHexString();
-            guiHandler.fogParameters["Density"] = fogDensity * 100;
-            guiHandler.fogParameters["Blend skybox"] = fogBlendWithSkybox;
-            if (!skyboxHandler.isVisible()){
-              guiHandler.enableController(guiHandler.fogColorController);
-              guiHandler.disableController(guiHandler.fogBlendWithSkyboxController);
-            }else{
-              if (fogBlendWithSkybox){
-                guiHandler.disableController(guiHandler.fogColorController);
-              }else{
-                guiHandler.enableController(guiHandler.fogColorController);
-              }
-              guiHandler.enableController(guiHandler.fogBlendWithSkyboxController);
-            }
-            fogConfigurationsVisible = true;
-            terminal.printInfo(Text.GUI_OPENED);
-          }else if (fogConfigurationMode == "hide"){
-            if (!fogConfigurationsVisible){
-              terminal.printError(Text.GUI_IS_ALREADY_HIDDEN);
-              return true;
-            }
-            guiHandler.hide(guiHandler.guiTypes.FOG);
-            fogConfigurationsVisible = false;
-            terminal.printInfo(Text.GUI_CLOSED);
-          }else{
-            terminal.printError(Text.STATUS_MUST_BE_ONE_OF);
-            return true;
-          }
+          // DEPRECATED
         break;
         case 148: //noMobile
           if (mode != 0){
@@ -4509,7 +4431,7 @@ function parse(input){
             return true;
           }
           skyboxHandler.unmap();
-          fogBlendWithSkybox = false;
+          fogHandler.setBlendWithSkyboxStatus(false);
           terminal.printInfo(Text.SKYBOX_HIDDEN);
           return true;
         break;
