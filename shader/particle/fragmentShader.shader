@@ -35,7 +35,7 @@ float discardDueToTextureColor;
       float endV = vUVCoordinates[3];
       float coordX = ((gl_PointCoord.x) * (endU - startU)) + startU;
       float coordY = ((1.0 - gl_PointCoord.y) * (endV - startV)) + startV;
-      textureColor = texture2D(texture, vec2(coordX, 1.0 - coordY));
+      textureColor = texture2D(texture, vec2(coordX, coordY));
     }else{
       textureColor = vec4(1, 1, 1, 1);
     }

@@ -26,6 +26,8 @@ Font.prototype.compress = function(onLoaded, onError){
         var texturePostfix = textureLoaderFactory.getFilePostfix();
         textureLoader.load("/texture_atlas/fonts/"+that.name+"/pack"+texturePostfix, function(textureData){
           that.texture = textureData;
+          that.texture.wrapS = THREE.RepeatWrapping;
+          that.texture.wrapT = THREE.RepeatWrapping;
           that.texture.needsUpdate = true;
           onLoaded();
         });
