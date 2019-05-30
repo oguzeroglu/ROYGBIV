@@ -4507,6 +4507,17 @@ function parse(input){
           xhr.send();
           return true;
         break;
+        case 180: //fog
+          if (mode != 0){
+            terminal.printError(Text.WORKS_ONLY_IN_DESIGN_MODE);
+            return true;
+          }
+          terminal.clear();
+          terminal.disable();
+          terminal.printInfo(Text.AFTER_FOG_CREATION);
+          fogCreatorGUIHandler.show();
+          return true;
+        break;
       }
       return true;
     }catch(err){

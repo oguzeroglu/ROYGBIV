@@ -462,6 +462,7 @@ function readEngineScripts(projectName, author, noMobile){
         console.log("[*] Skipping FPSWeaponGUIHandler.");
         console.log("[*] Skipping TexturePackCreatorGUIHandler.");
         console.log("[*] Skipping SkyboxCreatorGUIHandler.");
+        console.log("[*] Skipping FogCreatorGUIHandler.");
         continue;
       }else if (scriptPath.includes("dat.gui.min.js")){
         console.log("[*] Skipping DAT gui.");

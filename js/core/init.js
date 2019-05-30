@@ -69,6 +69,8 @@ window.onload = function() {
     texturePackCreatorGUIHandler = new TexturePackCreatorGUIHandler();
     // SKYBOX CREATOR GUI HANDLER
     skyboxCreatorGUIHandler = new SkyboxCreatorGUIHandler();
+    // FOG GUI HANDLER
+    fogCreatorGUIHandler = new FogCreatorGUIHandler();
   }
 
   // PHYSICS BODY GENERATOR

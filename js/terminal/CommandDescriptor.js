@@ -180,7 +180,8 @@ var CommandDescriptor = function(){
       0, //printMuzzleFlashes
       0, //unmapSkybox
       1, //editSkybox
-      1 //editTexturePack
+      1, //editTexturePack
+      0 //fog
   ];
 
   this.commandArgumentsExpectedExplanation = [
@@ -363,7 +364,8 @@ var CommandDescriptor = function(){
     "printMuzzleFlashes",
     "unmapSkybox",
     "editSkybox skyboxName",
-    "editTexturePack texturePackName"
+    "editTexturePack texturePackName",
+    "fog"
   ];
 
   this.commands = [
@@ -546,7 +548,8 @@ var CommandDescriptor = function(){
     "printMuzzleFlashes",
     "unmapSkybox",
     "editSkybox",
-    "editTexturePack"
+    "editTexturePack",
+    "fog"
   ];
 
   this.commandInfo = [
@@ -729,7 +732,8 @@ var CommandDescriptor = function(){
     "printMuzzleFlashes: Prints created muzzleflashes.",
     "unmapSkybox: Removes the mapped skybox.",
     "editScript: Opens the Skybox editing GUI.",
-    "editTexturePack: Opens the texture pack editing GUI."
+    "editTexturePack: Opens the texture pack editing GUI.",
+    "fog: Opens the fog configuration GUI."
   ];
 
   this.keyboardInfo = [

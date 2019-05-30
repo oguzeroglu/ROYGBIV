@@ -234,7 +234,7 @@ ImportHandler.prototype.importScripts = function(obj){
 }
 
 ImportHandler.prototype.importFog = function(obj){
-  fogHandler.import(obj.jog);
+  fogHandler.import(obj.fog);
 }
 
 ImportHandler.prototype.importAddedObjects = function(obj){
@@ -952,5 +952,276 @@ ImportHandler.prototype.importSkyboxes = function(obj, callback){
     var skybox = new SkyBox(skyboxExport.name, skyboxExport.directoryName, skyboxExport.color);
     skyBoxes[skyboxExport.name] = skybox;
     skybox.loadTextures(callback);
+  }
+}
+
+ImportHandler.prototype.importAddedTexts = function(obj){
+  for (var textName in obj.texts){
+    var curTextExport = obj.texts[textName];
+    var addedTextInstance = new AddedText(
+      textName, fonts[curTextExport.fontName], curTextExport.text,
+      new THREE.Vector3(curTextExport.positionX, curTextExport.positionY, curTextExport.positionZ),
+      new THREE.Color(curTextExport.colorR, curTextExport.colorG, curTextExport.colorB),
+      curTextExport.alpha, curTextExport.charSize, curTextExport.strlen
+    );
+    addedTextInstance.isClickable = curTextExport.isClickable;
+    addedTextInstance.setAffectedByFog(curTextExport.isAffectedByFog);
+    if (curTextExport.hasBackground){
+      addedTextInstance.setBackground("#" + new THREE.Color(curTextExport.backgroundColorR, curTextExport.backgroundColorG, curTextExport.backgroundColorB).getHexString(), curTextExport.backgroundAlpha);
+    }
+    addedTextInstance.setMarginBetweenChars(curTextExport.offsetBetweenChars);
+    addedTextInstance.setMarginBetweenLines(curTextExport.offsetBetweenLines);
+    addedTextInstance.refCharSize = curTextExport.refCharSize;
+    addedTextInstance.refInnerHeight = curTextExport.refInnerHeight;
+    if (!(typeof curTextExport.refCharOffset == UNDEFINED)){
+      addedTextInstance.refCharOffset = curTextExport.refCharOffset;
+    }
+    if (!(typeof curTextExport.refLineOffset == UNDEFINED)){
+      addedTextInstance.refLineOffset = curTextExport.refLineOffset;
+    }
+    addedTextInstance.handleBoundingBox();
+    addedTextInstance.gsName = curTextExport.gsName;
+    addedTextInstance.is2D = curTextExport.is2D;
+    if (addedTextInstance.is2D){
+      macroHandler.injectMacro("IS_TWO_DIMENSIONAL", addedTextInstance.material, true, false);
+    }
+    if (!(typeof curTextExport.marginMode == UNDEFINED)){
+      addedTextInstance.marginMode = curTextExport.marginMode;
+      addedTextInstance.marginPercentWidth = curTextExport.marginPercentWidth;
+      addedTextInstance.marginPercentHeight = curTextExport.marginPercentHeight;
+      if (addedTextInstance.is2D){
+        addedTextInstance.set2DCoordinates(addedTextInstance.marginPercentWidth,addedTextInstance.marginPercentHeight);
+      }
+    }
+    addedTextInstance.maxWidthPercent = curTextExport.maxWidthPercent;
+    addedTextInstance.maxHeightPercent = curTextExport.maxHeightPercent;
+    var gridSystem = gridSystems[addedTextInstance.gsName];
+    if (gridSystem){
+      for (var gridName in curTextExport.destroyedGrids){
+        var gridExport = curTextExport.destroyedGrids[gridName];
+        var grid = gridSystem.getGridByColRow(gridExport.colNumber, gridExport.rowNumber);
+        if (grid){
+          addedTextInstance.destroyedGrids[gridName] = grid;
+          grid.createdAddedTextName = addedTextInstance.name;
+        }
+      }
+    }
+    addedTexts[textName] = addedTextInstance;
+    addedTextInstance.handleResize();
+    if (addedTextInstance.is2D){
+      addedTexts2D[addedTextInstance.name] = addedTextInstance;
+    }
+    if (curTextExport.hasCustomPrecision){
+      addedTextInstance.useCustomShaderPrecision(curTextExport.customPrecision);
+    }
+  }
+}
+
+ImportHandler.prototype.importAddedObjectGraphicsProperties = function(){
+  for (var objName in addedObjects){
+    var addedObject = addedObjects[objName];
+    if (addedObject.setTxtMatrix && addedObject.mesh.material.uniforms.textureMatrix){
+      for (var ix = 0; ix<addedObject.setTxtMatrix.length; ix++){
+        addedObject.mesh.material.uniforms.textureMatrix.value.elements[ix] = addedObject.setTxtMatrix[ix];
+      }
+      delete addedObject.setTxtMatrix;
+    }
+    if (addedObject.hasEmissiveMap()){
+      if (!(typeof addedObject.setEmissiveIntensity == UNDEFINED)){
+        addedObject.mesh.material.uniforms.emissiveIntensity.value = addedObject.setEmissiveIntensity;
+        delete addedObject.setEmissiveIntensity;
+      }
+      if (!(typeof addedObject.setEmissiveColor == UNDEFINED)){
+        addedObject.mesh.material.uniforms.emissiveColor.value.set(addedObject.setEmissiveColor);
+        delete addedObject.setEmissiveColor;
+      }
+    }
+    if (addedObject.hasAOMap()){
+      if (!(typeof addedObject.setAOIntensity == UNDEFINED)){
+        addedObject.mesh.material.uniforms.aoIntensity.value = addedObject.setAOIntensity;
+        delete addedObject.setAOIntensity;
+      }
+    }
+  }
+}
+
+ImportHandler.prototype.importObjectGroups = function(obj){
+  for (var objectName in obj.objectGroups){
+    var curObjectGroupExport = obj.objectGroups[objectName];
+    var group = new Object();
+    for (var name in curObjectGroupExport.group){
+      group[name] = addedObjects[name];
+    }
+    var objectGroupInstance = new ObjectGroup(objectName, group);
+    objectGroups[objectName] = objectGroupInstance;
+    if (curObjectGroupExport.isRotationDirty){
+      objectGroupInstance.isRotationDirty = true;
+    }
+    objectGroupInstance.glue();
+    if (curObjectGroupExport.mass){
+      objectGroupInstance.setMass(curObjectGroupExport.mass);
+    }
+    objectGroupInstance.initQuaternion = new THREE.Quaternion(
+      curObjectGroupExport.quaternionX, curObjectGroupExport.quaternionY,
+      curObjectGroupExport.quaternionZ, curObjectGroupExport.quaternionW
+    );
+    objectGroupInstance.mesh.quaternion.copy(objectGroupInstance.initQuaternion.clone());
+    objectGroupInstance.graphicsGroup.quaternion.copy(objectGroupInstance.initQuaternion.clone());
+    objectGroupInstance.physicsBody.quaternion.copy(objectGroupInstance.graphicsGroup.quaternion);
+    objectGroupInstance.physicsBody.initQuaternion = new CANNON.Quaternion().copy(objectGroupInstance.graphicsGroup.quaternion);
+    var isDynamicObject = false;
+    if (curObjectGroupExport.isDynamicObject){
+      isDynamicObject = curObjectGroupExport.isDynamicObject;
+    }
+    if (curObjectGroupExport.isSlippery){
+      objectGroupInstance.setSlippery(true);
+    }
+    objectGroupInstance.isChangeable = curObjectGroupExport.isChangeable;
+    objectGroupInstance.isIntersectable = curObjectGroupExport.isIntersectable;
+    if (typeof objectGroupInstance.isIntersectable == UNDEFINED){
+      objectGroupInstance.isIntersectable = true;
+    }
+    objectGroupInstance.isColorizable = curObjectGroupExport.isColorizable;
+    if (objectGroupInstance.isColorizable){
+      macroHandler.injectMacro("HAS_FORCED_COLOR", objectGroupInstance.mesh.material, false, true);
+      objectGroupInstance.mesh.material.uniforms.forcedColor = new THREE.Uniform(new THREE.Vector4(-50, 0, 0, 0));
+    }
+    objectGroupInstance.isDynamicObject = isDynamicObject;
+    objectGroupInstance.isBasicMaterial = curObjectGroupExport.isBasicMaterial;
+    if (curObjectGroupExport.blendingMode == "NO_BLENDING"){
+      objectGroupInstance.setBlending(NO_BLENDING);
+    }else if (curObjectGroupExport.blendingMode == "ADDITIVE_BLENDING"){
+      objectGroupInstance.setBlending(ADDITIVE_BLENDING);
+    }else if (curObjectGroupExport.blendingMode == "SUBTRACTIVE_BLENDING"){
+      objectGroupInstance.setBlending(SUBTRACTIVE_BLENDING);
+    }else if (curObjectGroupExport.blendingMode == "MULTIPLY_BLENDING"){
+      objectGroupInstance.setBlending(MULTIPLY_BLENDING);
+    }else if (curObjectGroupExport.blending == "NORMAL_BLENDING"){
+      objectGroupInstance.setBlending(NORMAL_BLENDING);
+    }
+    objectGroupInstance.areaVisibilityConfigurations = curObjectGroupExport.areaVisibilityConfigurations;
+    objectGroupInstance.areaSideConfigurations = curObjectGroupExport.areaSideConfigurations;
+    if (curObjectGroupExport.renderSide){
+      objectGroupInstance.handleRenderSide(curObjectGroupExport.renderSide);
+    }
+    if (curObjectGroupExport.hasPivot){
+      var pivot = objectGroupInstance.makePivot(
+        curObjectGroupExport.pivotOffsetX,
+        curObjectGroupExport.pivotOffsetY,
+        curObjectGroupExport.pivotOffsetZ
+      );
+      pivot.quaternion.set(
+        curObjectGroupExport.pivotQX, curObjectGroupExport.pivotQY,
+        curObjectGroupExport.pivotQZ, curObjectGroupExport.pivotQW
+      );
+      pivot.children[0].quaternion.set(
+        curObjectGroupExport.insidePivotQX, curObjectGroupExport.insidePivotQY,
+        curObjectGroupExport.insidePivotQZ, curObjectGroupExport.insidePivotQW
+      );
+      objectGroupInstance.pivotObject = pivot;
+      objectGroupInstance.pivotOffsetX = curObjectGroupExport.pivotOffsetX;
+      objectGroupInstance.pivotOffsetY = curObjectGroupExport.pivotOffsetY;
+      objectGroupInstance.pivotOffsetZ = curObjectGroupExport.pivotOffsetZ;
+      objectGroupInstance.mesh.position.set(
+        curObjectGroupExport.positionX, curObjectGroupExport.positionY, curObjectGroupExport.positionZ
+      );
+      objectGroupInstance.physicsBody.position.copy(objectGroupInstance.mesh.position);
+    }else if (curObjectGroupExport.pivotRemoved){
+      objectGroupInstance.mesh.position.set(
+        curObjectGroupExport.positionX, curObjectGroupExport.positionY, curObjectGroupExport.positionZ
+      );
+      objectGroupInstance.physicsBody.position.copy(objectGroupInstance.mesh.position);
+    }
+    if (curObjectGroupExport.softCopyParentName){
+      objectGroupInstance.softCopyParentName = curObjectGroupExport.softCopyParentName;
+    }
+    objectGroupInstance.updateOpacity(curObjectGroupExport.totalAlpha);
+    for (var childName in objectGroupInstance.group){
+      objectGroupInstance.group[childName].updateOpacity(curObjectGroupExport.totalAlpha * objectGroupInstance.group[childName].opacityWhenAttached);
+    }
+    if (objectGroupInstance.mesh.material.uniforms.totalAOIntensity){
+      objectGroupInstance.mesh.material.uniforms.totalAOIntensity.value = curObjectGroupExport.totalAOIntensity;
+      for (var childName in objectGroupInstance.group){
+        if (!(typeof objectGroupInstance.group[childName].aoIntensityWhenAttached == UNDEFINED)){
+          objectGroupInstance.group[childName].mesh.material.uniforms.aoIntensity.value = objectGroupInstance.group[childName].aoIntensityWhenAttached * curObjectGroupExport.totalAOIntensity;
+        }
+      }
+    }
+    if (objectGroupInstance.mesh.material.uniforms.totalEmissiveIntensity){
+      objectGroupInstance.mesh.material.uniforms.totalEmissiveIntensity.value = curObjectGroupExport.totalEmissiveIntensity;
+      for (var childName in objectGroupInstance.group){
+        if (!(typeof objectGroupInstance.group[childName].emissiveIntensityWhenAttached == UNDEFINED)){
+          objectGroupInstance.group[childName].mesh.material.uniforms.emissiveIntensity.value = objectGroupInstance.group[childName].emissiveIntensityWhenAttached * curObjectGroupExport.totalEmissiveIntensity;
+        }
+      }
+    }
+    if (objectGroupInstance.mesh.material.uniforms.totalEmissiveColor){
+      objectGroupInstance.mesh.material.uniforms.totalEmissiveColor.value.set(curObjectGroupExport.totalEmissiveColor);
+      for (var childName in objectGroupInstance.group){
+        if (!(typeof objectGroupInstance.group[childName].emissiveColorWhenAttached == UNDEFINED)){
+          REUSABLE_COLOR.set(objectGroupInstance.group[childName].emissiveColorWhenAttached);
+          REUSABLE_COLOR.multiply(objectGroupInstance.mesh.material.uniforms.totalEmissiveColor.value);
+          objectGroupInstance.group[childName].mesh.material.uniforms.emissiveColor.value.copy(REUSABLE_COLOR);
+        }
+      }
+    }
+    if (curObjectGroupExport.isPhysicsSimplified){
+      var params = curObjectGroupExport.physicsSimplificationParameters;
+      objectGroupInstance.simplifyPhysics(params.sizeX, params.sizeY, params.sizeZ);
+      objectGroupInstance.physicsBody.position.copy(params.pbodyPosition);
+      objectGroupInstance.physicsBody.quaternion.copy(params.pbodyQuaternion);
+      objectGroupInstance.physicsSimplificationObject3D.position.copy(params.physicsSimplificationObject3DPosition);
+      objectGroupInstance.physicsSimplificationObject3D.quaternion.copy(params.physicsSimplificationObject3DQuaternion);
+      objectGroupInstance.physicsSimplificationObject3DContainer.position.copy(params.physicsSimplificationObject3DContainerPosition);
+      objectGroupInstance.physicsSimplificationObject3DContainer.quaternion.copy(params.physicsSimplificationObject3DContainerQuaternion);
+    }
+    if (curObjectGroupExport.noMass){
+      objectGroupInstance.noMass = true;
+      physicsWorld.remove(objectGroupInstance.physicsBody);
+    }
+    if (!(typeof curObjectGroupExport.positionWhenUsedAsFPSWeapon == UNDEFINED)){
+      objectGroupInstance.isFPSWeapon = true;
+      var positionWhenUsedAsFPSWeapon = curObjectGroupExport.positionWhenUsedAsFPSWeapon;
+      var quaternionWhenUsedAsFPSWeapon = curObjectGroupExport.quaternionWhenUsedAsFPSWeapon;
+      var physicsPositionWhenUsedAsFPSWeapon = curObjectGroupExport.physicsPositionWhenUsedAsFPSWeapon;
+      var physicsQuaternionWhenUsedAsFPSWeapon = curObjectGroupExport.physicsQuaternionWhenUsedAsFPSWeapon;
+      objectGroupInstance.positionWhenUsedAsFPSWeapon = new THREE.Vector3(positionWhenUsedAsFPSWeapon.x, positionWhenUsedAsFPSWeapon.y, positionWhenUsedAsFPSWeapon.z);
+      objectGroupInstance.quaternionWhenUsedAsFPSWeapon = new THREE.Quaternion(quaternionWhenUsedAsFPSWeapon._x, quaternionWhenUsedAsFPSWeapon._y, quaternionWhenUsedAsFPSWeapon._z, quaternionWhenUsedAsFPSWeapon._w);
+      objectGroupInstance.physicsPositionWhenUsedAsFPSWeapon = new THREE.Vector3(physicsPositionWhenUsedAsFPSWeapon.x, physicsPositionWhenUsedAsFPSWeapon.y, physicsPositionWhenUsedAsFPSWeapon.z);
+      objectGroupInstance.physicsQuaternionWhenUsedAsFPSWeapon = new THREE.Quaternion(physicsQuaternionWhenUsedAsFPSWeapon._x, physicsQuaternionWhenUsedAsFPSWeapon._y, physicsQuaternionWhenUsedAsFPSWeapon._z, physicsQuaternionWhenUsedAsFPSWeapon._w);
+      objectGroupInstance.fpsWeaponAlignment = curObjectGroupExport.fpsWeaponAlignment;
+    }
+    if (curObjectGroupExport.hasCustomPrecision){
+      curObjectGroupExport.useCustomShaderPrecision(curObjectGroupExport.customPrecision);
+    }
+    if (curObjectGroupExport.objectTrailConfigurations){
+      objectGroupInstance.objectTrailConfigurations = {alpha: curObjectGroupExport.objectTrailConfigurations.alpha, time: curObjectGroupExport.objectTrailConfigurations.time};
+    }
+    if (curObjectGroupExport.muzzleFlashParameters){
+      objectGroupInstance.muzzleFlashParameters = curObjectGroupExport.muzzleFlashParameters;
+    }
+  }
+  for (var objName in objectGroups){
+    if (objectGroups[objName].softCopyParentName){
+      var softCopyParent = objectGroups[objectGroups[objName].softCopyParentName];
+      if (softCopyParent){
+        objectGroups[objName].mesh.material = softCopyParent.mesh.material;
+      }else{
+        for (var objName2 in objectGroups){
+          if (objName2 != objName){
+            if (objectGroups[objName2].softCopyParentName &&
+              objectGroups[objName2].softCopyParentName == objectGroups[objName].softCopyParentName){
+              objectGroups[objName].mesh.material = objectGroups[objName2].mesh.material;
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+ImportHandler.prototype.importEffects = function(obj){
+  for (var effecName in obj.effects){
+    renderer.effects[effecName].load(obj.effects[effecName]);
   }
 }
