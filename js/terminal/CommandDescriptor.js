@@ -184,7 +184,8 @@ var CommandDescriptor = function(){
       0, //fog
       1, //newCrosshair
       1, //editCrosshair
-      1 //destroyCrosshair
+      1, //destroyCrosshair
+      0 //printCrosshairs
   ];
 
   this.commandArgumentsExpectedExplanation = [
@@ -371,7 +372,8 @@ var CommandDescriptor = function(){
     "fog",
     "newCrosshair crosshairName",
     "editCrosshair crosshairName",
-    "destroyCrosshair crosshairName"
+    "destroyCrosshair crosshairName",
+    "printCrosshairs"
   ];
 
   this.commands = [
@@ -558,7 +560,8 @@ var CommandDescriptor = function(){
     "fog",
     "newCrosshair",
     "editCrosshair",
-    "destroyCrosshair"
+    "destroyCrosshair",
+    "printCrosshairs"
   ];
 
   this.commandInfo = [
@@ -745,7 +748,8 @@ var CommandDescriptor = function(){
     "fog: Opens the fog configuration GUI.",
     "newCrosshair: Creates a new Crosshair object.",
     "editCrosshair: Opens the Crosshair editing GUI.",
-    "destroyCrosshair: Destroys a Crosshair object."
+    "destroyCrosshair: Destroys a Crosshair object.",
+    "printCrosshairs: Prints created crosshairs."
   ];
 
   this.keyboardInfo = [

@@ -4587,6 +4587,23 @@ function parse(input){
           terminal.printInfo(Text.CROSSHAIR_EDITED);
           return true;
         break;
+        case 184: //printCrosshairs
+          var count = 0;
+          var length = Object.keys(crosshairs).length;
+          terminal.printHeader(Text.CROSSHAIRS);
+          for (var crosshairName in crosshairs){
+            count ++;
+            var options = true;
+            if (count == length){
+              options = false;
+            }
+            terminal.printInfo(Text.TREE2.replace(Text.PARAM1, crosshairName).replace(Text.PARAM2, crosshairs[crosshairName].configurations.texture), options);
+          }
+          if (count == 0){
+            terminal.printError(Text.NO_CROSSHAIRS_CREATED);
+          }
+          return true;
+        break;
       }
       return true;
     }catch(err){
