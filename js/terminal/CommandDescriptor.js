@@ -183,7 +183,8 @@ var CommandDescriptor = function(){
       1, //editTexturePack
       0, //fog
       1, //newCrosshair
-      1 //editCrosshair
+      1, //editCrosshair
+      1 //destroyCrosshair
   ];
 
   this.commandArgumentsExpectedExplanation = [
@@ -369,7 +370,8 @@ var CommandDescriptor = function(){
     "editTexturePack texturePackName",
     "fog",
     "newCrosshair crosshairName",
-    "editCrosshair crosshairName"
+    "editCrosshair crosshairName",
+    "destroyCrosshair crosshairName"
   ];
 
   this.commands = [
@@ -555,7 +557,8 @@ var CommandDescriptor = function(){
     "editTexturePack",
     "fog",
     "newCrosshair",
-    "editCrosshair"
+    "editCrosshair",
+    "destroyCrosshair"
   ];
 
   this.commandInfo = [
@@ -741,7 +744,8 @@ var CommandDescriptor = function(){
     "editTexturePack: Opens the texture pack editing GUI.",
     "fog: Opens the fog configuration GUI.",
     "newCrosshair: Creates a new Crosshair object.",
-    "editCrosshair: Opens the Crosshair editing GUI."
+    "editCrosshair: Opens the Crosshair editing GUI.",
+    "destroyCrosshair: Destroys a Crosshair object."
   ];
 
   this.keyboardInfo = [
@@ -1385,6 +1389,11 @@ var CommandDescriptor = function(){
   this.editCrosshair = new Object();
   this.editCrosshair.types = [];
   this.editCrosshair.types.push(this.CROSSHAIR_NAME); //crosshairName
+
+  // destroyCrosshair
+  this.destroyCrosshair = new Object();
+  this.destroyCrosshair.types = [];
+  this.destroyCrosshair.types.push(this.CROSSHAIR_NAME); //crosshairName
 };
 
 CommandDescriptor.prototype.test = function(){

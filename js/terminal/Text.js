@@ -253,6 +253,7 @@ var Text = function(){
   this.IMAGES = "Images";
   this.CROSSHAIR_CREATED = "Crosshair created.";
   this.CROSSHAIR_EDITED = "Crosshair edited.";
+  this.CROSSHAIR_DESTROYED = "Crosshair destroyed.";
   this.OBJECTS_HAVE_TOO_MANY_FACES = "Objects have too many faces. Cannot glue.";
   this.TOO_MANY_GRIDS = "Too many grids.";
   this.NO_UPLOADED_IMAGES = "No uploaded images.";

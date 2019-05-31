@@ -4572,6 +4572,21 @@ function parse(input){
           terminal.printInfo(Text.AFTER_CROSSHAIR_CREATION);
           return true;
         break;
+        case 183: //destroyCrosshair
+          if (mode != 0){
+            terminal.printError(Text.WORKS_ONLY_IN_DESIGN_MODE);
+            return true;
+          }
+          var crosshair = crosshairs[splitted[1]];
+          if (!crosshair){
+            terminal.printError(Text.NO_SUCH_CROSSHAIR);
+            return true;
+          }
+          crosshair.destroy();
+          delete crosshairs[crosshair.name];
+          terminal.printInfo(Text.CROSSHAIR_EDITED);
+          return true;
+        break;
       }
       return true;
     }catch(err){
