@@ -427,6 +427,7 @@ var Text = function(){
   this.AFTER_SKYBOX_CREATION = "Press Done button to create skybox.\nUse mouse wheel/mouse drag to rotate.";
   this.AFTER_FONT_CREATION = "Press Done button to create font.\nUp/Down or W/S (Z/S - French keyboard) to zoom in/out.";
   this.AFTER_FOG_CREATION = "Press Done button to close.";
+  this.AFTER_CROSSHAIR_CREATION = "Press Done button to create crosshair.";
   this.DONE = "Done.";
   this.GS_CREATION_ERROR_1 = "sizeX and sizeZ must be greater than zero.";
   this.GS_CREATION_ERROR_2 = "sizeX is not multiple of cellSize";

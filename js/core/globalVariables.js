@@ -324,6 +324,7 @@ var texturePackCreatorGUIHandler;
 var skyboxCreatorGUIHandler;
 var fogCreatorGUIHandler;
 var fontCreatorGUIHandler;
+var crosshairCreatorGUIHandler;
 var skyboxHandler;
 var fogHandler;
 var preConfiguredParticleSystems = new Object();

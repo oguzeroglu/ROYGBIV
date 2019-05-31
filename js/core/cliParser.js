@@ -4523,6 +4523,29 @@ function parse(input){
           fogCreatorGUIHandler.show();
           return true;
         break;
+        case 181: //newCrosshair
+          if (mode != 0){
+            terminal.printError(Text.WORKS_ONLY_IN_DESIGN_MODE);
+            return true;
+          }
+          if (crosshairs[splitted[1]]){
+            terminal.printError(Text.NAME_MUST_BE_UNIQUE);
+            return true;
+          }
+          var texturePackNames = [];
+          for (var texturePackName in texturePacks){
+            texturePackNames.push(texturePackName);
+          }
+          if (texturePackNames.length == 0){
+            terminal.printError(Text.NO_TEXTURE_PACKS_CREATED);
+            return true;
+          }
+          crosshairCreatorGUIHandler.show(splitted[1], texturePackNames);
+          terminal.disable();
+          terminal.clear();
+          terminal.printInfo(Text.AFTER_CROSSHAIR_CREATION);
+          return true;
+        break;
       }
       return true;
     }catch(err){

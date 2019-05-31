@@ -57,22 +57,15 @@ window.onload = function() {
   crosshairHandler = new CrosshairHandler();
 
   if (!isDeployment){
-    // SELECTION HANDLER
     selectionHandler = new SelectionHandler();
-    // PARTICLE SYSTEM CREATOR GUI HANDLER
     particleSystemCreatorGUIHandler = new ParticleSystemCreatorGUIHandler();
-    // MUZZLE FLASH CREATOR GUI HANDLER
     muzzleFlashCreatorGUIHandler = new MuzzleFlashCreatorGUIHandler();
-    // FPS WEAPON GUI HANDLER
     fpsWeaponGUIHandler = new FPSWeaponGUIHandler();
-    // TEXTURE PACK CREATOR GUI HANDLER
     texturePackCreatorGUIHandler = new TexturePackCreatorGUIHandler();
-    // SKYBOX CREATOR GUI HANDLER
     skyboxCreatorGUIHandler = new SkyboxCreatorGUIHandler();
-    // FOG GUI HANDLER
     fogCreatorGUIHandler = new FogCreatorGUIHandler();
-    // FONT CREATOR GUI HANDLER
     fontCreatorGUIHandler = new FontCreatorGUIHandler();
+    crosshairCreatorGUIHandler = new CrosshairCreatorGUIHandler();
   }
 
   // PHYSICS BODY GENERATOR

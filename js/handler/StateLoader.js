@@ -155,6 +155,7 @@ StateLoader.prototype.resetProject = function(){
   wallCollections = new Object();
   texturePacks = new Object();
   skyBoxes = new Object();
+  crosshairs = new Object();
   scripts = new Object();
   objectGroups = new Object();
   disabledObjectNames = new Object();

@@ -181,7 +181,8 @@ var CommandDescriptor = function(){
       0, //unmapSkybox
       1, //editSkybox
       1, //editTexturePack
-      0 //fog
+      0, //fog
+      1 //newCrosshair
   ];
 
   this.commandArgumentsExpectedExplanation = [
@@ -365,7 +366,8 @@ var CommandDescriptor = function(){
     "unmapSkybox",
     "editSkybox skyboxName",
     "editTexturePack texturePackName",
-    "fog"
+    "fog",
+    "newCrosshair crosshairName"
   ];
 
   this.commands = [
@@ -549,7 +551,8 @@ var CommandDescriptor = function(){
     "unmapSkybox",
     "editSkybox",
     "editTexturePack",
-    "fog"
+    "fog",
+    "newCrosshair"
   ];
 
   this.commandInfo = [
@@ -733,7 +736,8 @@ var CommandDescriptor = function(){
     "unmapSkybox: Removes the mapped skybox.",
     "editScript: Opens the Skybox editing GUI.",
     "editTexturePack: Opens the texture pack editing GUI.",
-    "fog: Opens the fog configuration GUI."
+    "fog: Opens the fog configuration GUI.",
+    "newCrosshair crosshairName: Creates a new Crosshair object."
   ];
 
   this.keyboardInfo = [
@@ -1366,6 +1370,11 @@ var CommandDescriptor = function(){
   this.editTexturePack = new Object();
   this.editTexturePack.types = [];
   this.editTexturePack.types.push(this.TEXTURE_PACK_NAME); //texturePackName
+
+  // newCrosshair
+  this.newCrosshair = new Object();
+  this.newCrosshair.types = [];
+  this.newCrosshair.types.push(this.UNKNOWN_INDICATOR); //crosshairName
 };
 
 CommandDescriptor.prototype.test = function(){

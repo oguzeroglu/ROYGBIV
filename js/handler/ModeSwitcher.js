@@ -309,7 +309,6 @@ ModeSwitcher.prototype.switchFromPreviewToDesign = function(){
   objectTrails = new Object();
   activeObjectTrails = new Map();
   mergedParticleSystems = new Object();
-  crosshairs = new Object();
   selectedCrosshair = 0;
 
   for (var objectName in objectGroups){
