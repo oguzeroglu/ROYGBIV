@@ -366,8 +366,11 @@ function copyAssets(application){
     });
   }
   if (application.textureAtlas.hasTextureAtlas){
-    copyFolderRecursiveSync("texture_atlas", "deploy/"+application.projectName);
-    console.log("[*] Copied texture atlas folder.");
+    copyFileSync("texture_atlas/textureAtlas.png", "deploy/"+application.projectName+"/texture_atlas/");
+    copyFileSync("texture_atlas/textureAtlas-astc.ktx", "deploy/"+application.projectName+"/texture_atlas/");
+    copyFileSync("texture_atlas/textureAtlas-pvrtc.ktx", "deploy/"+application.projectName+"/texture_atlas/");
+    copyFileSync("texture_atlas/textureAtlas-s3tc.ktx", "deploy/"+application.projectName+"/texture_atlas/");
+    console.log("[*] Copied texture atlas.");
   }
   for (var skyboxName in application.skyBoxes){
     var dirName = application.skyBoxes[skyboxName].directoryName;
@@ -379,6 +382,7 @@ function copyAssets(application){
     });
   }
   for (var fontName in application.fonts){
+    copyFolderRecursiveSync("texture_atlas/fonts/"+fontName, "deploy/"+application.projectName+"/texture_atlas/fonts/");
     var dirName = "fonts/"+application.fonts[fontName].path;
     fs.readdirSync("fonts").forEach(file => {
       var dirFileName = file.split(".")[0];
@@ -396,6 +400,7 @@ function copyAssets(application){
         console.log("[*] Copied a font: "+application.fonts[fontName].path);
       }
     });
+    console.log("[*] Copied a font: "+fontName);
   }
 }
 
@@ -413,6 +418,7 @@ function generateDeployDirectory(projectName, application){
   var hasTexturePacks = (Object.keys(application.texturePacks).length != 0);
   var hasSkyBoxes = (Object.keys(application.skyBoxes).length != 0);
   var hasFonts = (Object.keys(application.fonts).length != 0);
+  var hasTextureAtlas = application.textureAtlas.hasTextureAtlas;
   if (hasTexturePacks){
     fs.mkdirSync("deploy/"+projectName+"/texture_packs");
     console.log("[*] Project has texture packs to load.");
@@ -425,11 +431,15 @@ function generateDeployDirectory(projectName, application){
   }else{
     console.log("[*] Project has no skyboxes to load.");
   }
-  if (hasFonts){
+  if (hasFonts || hasTextureAtlas){
     fs.mkdirSync("deploy/"+projectName+"/fonts");
-    console.log("[*] Project has fonts to load.");
+    fs.mkdirSync("deploy/"+projectName+"/texture_atlas");
+    if (hasFonts){
+      fs.mkdirSync("deploy/"+projectName+"/texture_atlas/fonts");
+    }
+    console.log("[*] Project has merged textures to load.");
   }else{
-    console.log("[*] Project has no fonts to load.")
+    console.log("[*] Project has no fonts or texture atlas.");
   }
   return true;
 }

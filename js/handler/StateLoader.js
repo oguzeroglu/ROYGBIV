@@ -29,6 +29,11 @@ StateLoader.prototype.onTexturePackLoaded = function(){
   this.finalize();
 }
 
+StateLoader.prototype.onFontLoaded = function(){
+  this.totalLoadedFontCount ++;
+  this.finalize();
+}
+
 StateLoader.prototype.load = function(){
   try{
     projectLoaded = false;
@@ -37,6 +42,7 @@ StateLoader.prototype.load = function(){
     this.hasTexturePacks = this.stateObj.totalTexturePackCount > 0;
     this.hasTextureAtlas = this.stateObj.textureAtlas? this.stateObj.textureAtlas.hasTextureAtlas: false;
     this.hasSkyboxes = this.stateObj.totalSkyboxCount > 0;
+    this.hasFonts = this.stateObj.totalFontCount > 0;
     this.textureAtlasReady = false;
 
     this.importHandler.importEngineVariables(obj);
@@ -48,23 +54,8 @@ StateLoader.prototype.load = function(){
     this.importHandler.importAddedObjects(obj);
     this.importHandler.importTexturePacks(obj, this.onTexturePackLoaded.bind(this));
     this.importHandler.importSkyboxes(obj, this.onSkyboxLoaded.bind(this));
+    this.importHandler.importFonts(obj, this.onFontLoaded.bind(this));
 
-    // FONTS *******************************************************
-    this.hasFonts = false;
-    var that = this;
-    for (var fontName in obj.fonts){
-      this.hasFonts = true;
-      var curFontExport = obj.fonts[fontName];
-      var font = new Font(curFontExport.name, curFontExport.path, function(fontInstance){
-        fonts[fontInstance.name] = fontInstance;
-        that.totalLoadedFontCount ++;
-        that.finalize();
-      }, function(fontName){
-        console.error("Error loading font: "+fontName);
-        terminal.printError("Error loading font: "+fontName);
-      });
-      font.load();
-    }
     if (!this.hasTexturePacks && !this.hasSkyboxes && !this.hasFonts && !this.hasTextureAtlas){
       this.finalize();
     }

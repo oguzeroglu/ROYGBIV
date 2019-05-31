@@ -1225,3 +1225,16 @@ ImportHandler.prototype.importEffects = function(obj){
     renderer.effects[effecName].load(obj.effects[effecName]);
   }
 }
+
+ImportHandler.prototype.importFonts = function(obj, callbackSuccess, callbackError){
+  for (var fontName in obj.fonts){
+    var curFontExport = obj.fonts[fontName];
+    var font = new Font(curFontExport.name, curFontExport.path, false);
+    fonts[font.name] = font;
+    font.load(function(){
+      callbackSuccess();
+    }, function(errFontName){
+      throw new Error("Error loading font: "+errFontName);
+    });
+  }
+}

@@ -22,15 +22,7 @@ Font.prototype.compress = function(onLoaded, onError){
       if (resp.error){
         onError(that.name);
       }else{
-        var textureLoader = textureLoaderFactory.get();
-        var texturePostfix = textureLoaderFactory.getFilePostfix();
-        textureLoader.load("/texture_atlas/fonts/"+that.name+"/pack"+texturePostfix, function(textureData){
-          that.texture = textureData;
-          that.texture.wrapS = THREE.RepeatWrapping;
-          that.texture.wrapT = THREE.RepeatWrapping;
-          that.texture.needsUpdate = true;
-          onLoaded();
-        });
+        that.loadCompressedTexture(onLoaded);
       }
     }
   };
@@ -40,12 +32,29 @@ Font.prototype.compress = function(onLoaded, onError){
   postRequest.send(data);
 }
 
+Font.prototype.loadCompressedTexture = function(onLoaded){
+  var textureLoader = textureLoaderFactory.get();
+  var texturePostfix = textureLoaderFactory.getFilePostfix();
+  var that = this;
+  textureLoader.load("/texture_atlas/fonts/"+that.name+"/pack"+texturePostfix, function(textureData){
+    that.texture = textureData;
+    that.texture.wrapS = THREE.RepeatWrapping;
+    that.texture.wrapT = THREE.RepeatWrapping;
+    that.texture.needsUpdate = true;
+    onLoaded(that);
+  });
+}
+
 Font.prototype.load = function(onLoaded, onError){
   var that = this;
   this.fontFace.load().then(function(loadedFace) {
   	document.fonts.add(loadedFace);
     that.generateFontTexture();
-    that.compress(onLoaded, onError);
+    if (!isDeployment){
+      that.compress(onLoaded, onError);
+    }else{
+      that.loadCompressedTexture(onLoaded);
+    }
   }).catch(function(error) {
     console.error(error);
     onError(that.name);
