@@ -51,7 +51,7 @@ FontCreatorGUIHandler.prototype.createGUI = function(fontName, typefaces){
 
 FontCreatorGUIHandler.prototype.handleTestMesh = function(){
   if (this.text){
-    this.text.destroy();
+    this.text.destroy(true);
   }
   this.text = new AddedText(null, this.font, this.configurations["Test letter"], new THREE.Vector3(0, 0, 0), new THREE.Color("lime"), 50, 1);
   this.text.isEditorHelper = true;
@@ -98,7 +98,7 @@ FontCreatorGUIHandler.prototype.close = function(message, isError){
   camera.quaternion.set(0, 0, 0, 1);
   camera.position.set(initialCameraX, initialCameraY, initialCameraZ);
   if (this.text){
-    this.text.destroy();
+    this.text.destroy(true);
   }
 }
 
