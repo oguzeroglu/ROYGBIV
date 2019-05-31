@@ -1238,3 +1238,9 @@ ImportHandler.prototype.importFonts = function(obj, callbackSuccess, callbackErr
     });
   }
 }
+
+ImportHandler.prototype.importCrosshairs = function(obj){
+  for (var crosshairName in obj.crosshairs){
+    crosshairs[crosshairName] = new Crosshair(obj.crosshairs[crosshairName]);
+  }
+}

@@ -19,7 +19,6 @@ var Crosshair = function(configurations){
   this.size = new Float32Array(1);
   this.size[0] = size;
 
-
   this.sizeBufferAttribute = new THREE.BufferAttribute(this.size, 1);
   this.sizeBufferAttribute.setDynamic(false);
 

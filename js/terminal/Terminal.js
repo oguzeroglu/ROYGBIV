@@ -648,6 +648,14 @@ Terminal.prototype.autocomplete = function(command){
 				}
 				helpString = "[Muzzle flashes]: ";
 			break;
+			case commandDescriptor.CROSSHAIR_NAME:
+				for (var crosshairName in crosshairs){
+					if (crosshairName.toLowerCase().startsWith(curEntry.toLowerCase())){
+						possibilities.push(crosshairName);
+					}
+				}
+				helpString = "[Crosshairs]: ";
+			break;
 			default:
 				throw new Error("Not implemented.");
 			break;

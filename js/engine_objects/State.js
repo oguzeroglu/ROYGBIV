@@ -160,4 +160,9 @@ var State = function(projectName, author){
   for (var muzzleFlashName in muzzleFlashes){
     this.muzzleFlashes[muzzleFlashName] = muzzleFlashes[muzzleFlashName].export();
   }
+  // CROSSHAIRS ****************************************************
+  this.crosshairs = new Object();
+  for (var crosshairName in crosshairs){
+    this.crosshairs[crosshairName] = crosshairs[crosshairName].export();
+  }
 }

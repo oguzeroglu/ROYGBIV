@@ -182,7 +182,8 @@ var CommandDescriptor = function(){
       1, //editSkybox
       1, //editTexturePack
       0, //fog
-      1 //newCrosshair
+      1, //newCrosshair
+      1 //editCrosshair
   ];
 
   this.commandArgumentsExpectedExplanation = [
@@ -367,7 +368,8 @@ var CommandDescriptor = function(){
     "editSkybox skyboxName",
     "editTexturePack texturePackName",
     "fog",
-    "newCrosshair crosshairName"
+    "newCrosshair crosshairName",
+    "editCrosshair crosshairName"
   ];
 
   this.commands = [
@@ -552,7 +554,8 @@ var CommandDescriptor = function(){
     "editSkybox",
     "editTexturePack",
     "fog",
-    "newCrosshair"
+    "newCrosshair",
+    "editCrosshair"
   ];
 
   this.commandInfo = [
@@ -737,7 +740,8 @@ var CommandDescriptor = function(){
     "editScript: Opens the Skybox editing GUI.",
     "editTexturePack: Opens the texture pack editing GUI.",
     "fog: Opens the fog configuration GUI.",
-    "newCrosshair crosshairName: Creates a new Crosshair object."
+    "newCrosshair: Creates a new Crosshair object.",
+    "editCrosshair: Opens the Crosshair editing GUI."
   ];
 
   this.keyboardInfo = [
@@ -860,6 +864,7 @@ var CommandDescriptor = function(){
   this.PRECONFIGURED_PS_NAME      =   35;
   this.PRECONFOGURED_PS_POOL_NAME =   36;
   this.MUZZLE_FLASH_NAME          =   37;
+  this.CROSSHAIR_NAME             =   38;
 
   // newGridSystem
   this.newGridSystem = new Object();
@@ -1375,6 +1380,11 @@ var CommandDescriptor = function(){
   this.newCrosshair = new Object();
   this.newCrosshair.types = [];
   this.newCrosshair.types.push(this.UNKNOWN_INDICATOR); //crosshairName
+
+  // editCrosshair
+  this.editCrosshair = new Object();
+  this.editCrosshair.types = [];
+  this.editCrosshair.types.push(this.CROSSHAIR_NAME); //crosshairName
 };
 
 CommandDescriptor.prototype.test = function(){

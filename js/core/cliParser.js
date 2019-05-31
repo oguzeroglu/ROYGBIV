@@ -1300,6 +1300,12 @@ function parse(input){
               }
             }
           }
+          for (var crosshairName in crosshairs){
+            if (crosshairs[crosshairName].configurations.texture == texturePack.name){
+              terminal.printError(Text.TEXTURE_PACK_USED_IN_A_CROSSHAIR.replace(Text.PARAM1, crosshairName));
+              return true;
+            }
+          }
           texturePack.destroy();
           if (!jobHandlerWorking){
             if (!texturePack.isParticleTexture){
@@ -4541,6 +4547,26 @@ function parse(input){
             return true;
           }
           crosshairCreatorGUIHandler.show(splitted[1], texturePackNames);
+          terminal.disable();
+          terminal.clear();
+          terminal.printInfo(Text.AFTER_CROSSHAIR_CREATION);
+          return true;
+        break;
+        case 182: //editCrosshair
+          if (mode != 0){
+            terminal.printError(Text.WORKS_ONLY_IN_DESIGN_MODE);
+            return true;
+          }
+          var crosshair = crosshairs[splitted[1]];
+          if (!crosshair){
+            terminal.printError(Text.NO_SUCH_CROSSHAIR);
+            return true;
+          }
+          var texturePackNames = [];
+          for (var texturePackName in texturePacks){
+            texturePackNames.push(texturePackName);
+          }
+          crosshairCreatorGUIHandler.edit(crosshair, texturePackNames);
           terminal.disable();
           terminal.clear();
           terminal.printInfo(Text.AFTER_CROSSHAIR_CREATION);

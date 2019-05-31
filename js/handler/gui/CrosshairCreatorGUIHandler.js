@@ -22,7 +22,7 @@ CrosshairCreatorGUIHandler.prototype.handleTestCrosshair = function(crosshairNam
   this.crosshair.mesh.visible = true;
 }
 
-CrosshairCreatorGUIHandler.prototype.init = function(crosshairName){
+CrosshairCreatorGUIHandler.prototype.init = function(crosshairName, isEdit){
   this.configurations = {
     "Texture": "",
     "Color": "#ffffff",
@@ -34,8 +34,11 @@ CrosshairCreatorGUIHandler.prototype.init = function(crosshairName){
       crosshairCreatorGUIHandler.close(Text.OPERATION_CANCELLED);
     },
     "Done": function(){
+      if (crosshairs[crosshairName]){
+        crosshairs[crosshairName].destroy();
+      }
       crosshairs[crosshairName] = crosshairCreatorGUIHandler.crosshair.clone();
-      crosshairCreatorGUIHandler.close(Text.CROSSHAIR_CREATED);
+      crosshairCreatorGUIHandler.close(isEdit? Text.CROSSHAIR_EDITED: Text.CROSSHAIR_CREATED);
     }
   };
 }
@@ -99,8 +102,21 @@ CrosshairCreatorGUIHandler.prototype.createGUI = function(crosshairName, texture
 
 CrosshairCreatorGUIHandler.prototype.show = function(crosshairName, texturePackNames){
   this.commonStartFunctions();
-  this.init(crosshairName);
+  this.init(crosshairName, false);
   this.createGUI(crosshairName, texturePackNames);
   this.configurations["Texture"] = texturePackNames[0];
   this.handleTestCrosshair(crosshairName);
+}
+
+CrosshairCreatorGUIHandler.prototype.edit = function(crosshair, texturePackNames){
+  this.commonStartFunctions();
+  this.init(crosshair.name, true);
+  this.configurations["Texture"] = crosshair.configurations.texture;
+  this.configurations["Color"] = "#" + REUSABLE_COLOR.setRGB(crosshair.configurations.colorR, crosshair.configurations.colorG, crosshair.configurations.colorB).getHexString();
+  this.configurations["Alpha"] = crosshair.configurations.alpha;
+  this.configurations["Size"] = crosshair.configurations.size;
+  this.configurations["maxWidthPercent"] = crosshair.configurations.maxWidthPercent;
+  this.configurations["maxHeightPercent"] = crosshair.configurations.maxHeightPercent;
+  this.createGUI(crosshair.name, texturePackNames);
+  this.handleTestCrosshair(crosshair.name);
 }
