@@ -109,6 +109,15 @@ app.post("/getFonts", function(req, res){
   res.send(JSON.stringify(fonts));
 });
 
+app.post("/getScripts", function(req, res){
+  console.log("[*] Getting scripts.");
+  res.setHeader("Content-Type", "application/json");
+  var scriptDescription = new Object();
+  getScriptsInFolder("./scripts/", scriptDescription);
+  console.log(scriptDescription);
+  res.send(JSON.stringify(scriptDescription));
+});
+
 app.post("/prepareTexturePack", async function(req, res){
   console.log("[*] Preparing texture pack: "+req.body.texturePackName);
   var info = {hasDiffuse: false, hasAlpha: false, hasAO: false, hasEmissive: false, hasHeight: false};
@@ -235,6 +244,23 @@ app.post("/compressFont", async function(req, res){
   }
   res.send(JSON.stringify({error: false}));
 });
+
+function getScriptsInFolder(curPath, obj){
+  var files = fs.readdirSync(curPath);
+  for (var i = 0; i<files.length; i++){
+    var f = files[i];
+    var joined = path.join(curPath, f);
+    var key = joined.substr(8);
+    if (fs.statSync(joined).isDirectory()){
+      if (!obj[key]){
+        obj[key] = new Object();
+      }
+      getScriptsInFolder(joined, obj[key]);
+    }else if (f.toLowerCase().endsWith(".js")){
+      obj[f] = true;
+    }
+  }
+}
 
 function handleBackup(restore, filePath, backupFilePath){
   if (restore){
