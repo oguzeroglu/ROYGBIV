@@ -4577,6 +4577,10 @@ function parse(input){
             terminal.printError(Text.WORKS_ONLY_IN_DESIGN_MODE);
             return true;
           }
+          if (!(splitted[1].indexOf("*") == -1)){
+            new JobHandler(splitted).handle();
+            return true;
+          }
           var crosshair = crosshairs[splitted[1]];
           if (!crosshair){
             terminal.printError(Text.NO_SUCH_CROSSHAIR);
@@ -4584,7 +4588,9 @@ function parse(input){
           }
           crosshair.destroy();
           delete crosshairs[crosshair.name];
-          terminal.printInfo(Text.CROSSHAIR_EDITED);
+          if (!jobHandlerWorking){
+            terminal.printInfo(Text.CROSSHAIR_EDITED);
+          }
           return true;
         break;
         case 184: //printCrosshairs

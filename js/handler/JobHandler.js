@@ -101,6 +101,8 @@ JobHandler.prototype.handle = function(previewModeCommand){
       this.handleDestroyParticleSystemPoolCommand();
     }else if (this.splitted[0] == "destroymuzzleflash"){
       this.handleDestroyMuzzleFlashCommand();
+    }else if (this.splitted[0] == "destroycrosshair"){
+      this.handleDestroyCrosshairCommand();
     }
     if (jobHandlerRaycasterRefresh){
       refreshRaycaster(Text.JOB_COMPLETED, true);
@@ -111,6 +113,22 @@ JobHandler.prototype.handle = function(previewModeCommand){
   // because async
   if (this.splitted[0] != "autoConfigureArea".toLowerCase()){
     jobHandlerWorking = false;
+  }
+}
+
+JobHandler.prototype.handleDestroyCrosshairCommand = function(){
+  var crosshairNamePrefix = this.splitted[1].split("*")[0];
+  var ctr = 0;
+  for (var crosshairName in crosshairs){
+    if (crosshairName.startsWith(crosshairNamePrefix)){
+      parseCommand("destroyCrosshair "+crosshairName);
+      ctr ++;
+    }
+  }
+  if (ctr == 0){
+    terminal.printError(Text.NO_CROSSHAIRS_FOUND);
+  }else{
+    terminal.printInfo(Text.COMMAND_EXECUTED_FOR_X_CROSSHAIRS.replace(Text.PARAM1, ctr));
   }
 }
 
