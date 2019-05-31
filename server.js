@@ -114,7 +114,6 @@ app.post("/getScripts", function(req, res){
   res.setHeader("Content-Type", "application/json");
   var scriptDescription = new Object();
   getScriptsInFolder("./scripts/", scriptDescription);
-  console.log(scriptDescription);
   res.send(JSON.stringify(scriptDescription));
 });
 
