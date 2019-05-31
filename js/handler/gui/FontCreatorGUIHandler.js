@@ -2,7 +2,7 @@ var FontCreatorGUIHandler = function(){
 
 }
 
-FontCreatorGUIHandler.prototype.init = function(){
+FontCreatorGUIHandler.prototype.init = function(fontName){
   this.configurations = {
     "Typeface": "",
     "Test letter": "x",
@@ -10,11 +10,14 @@ FontCreatorGUIHandler.prototype.init = function(){
       if (fontCreatorGUIHandler.isLoading){
         return;
       }
+      fontCreatorGUIHandler.close(Text.OPERATION_CANCELLED, false);
     },
     "Done": function(){
       if (fontCreatorGUIHandler.isLoading){
         return;
       }
+      fonts[fontName] = fontCreatorGUIHandler.font;
+      fontCreatorGUIHandler.close(Text.FONT_CREATED, false);
     }
   };
 }
@@ -37,10 +40,10 @@ FontCreatorGUIHandler.prototype.commonStartFunctions = function(){
 FontCreatorGUIHandler.prototype.createGUI = function(fontName, typefaces){
   guiHandler.datGuiFontCreation = new dat.GUI({hideable: false});
   this.typefaceController = guiHandler.datGuiFontCreation.add(this.configurations, "Typeface", typefaces).onChange(function(val){
-
+    fontCreatorGUIHandler.loadFont(fontName, val);
   }).listen();
   this.testController = guiHandler.datGuiFontCreation.add(this.configurations, "Test letter", supportedFontAtlasChars).onChange(function(val){
-
+    fontCreatorGUIHandler.text.setText(val);
   }).listen();
   guiHandler.datGuiFontCreation.add(this.configurations, "Cancel");
   guiHandler.datGuiFontCreation.add(this.configurations, "Done");
@@ -59,7 +62,6 @@ FontCreatorGUIHandler.prototype.handleTestMesh = function(){
 
 FontCreatorGUIHandler.prototype.loadFont = function(fontName, typeface){
   terminal.clear();
-  terminal.disable();
   terminal.printInfo(Text.COMPRESSING_FONT);
   guiHandler.disableController(this.typefaceController);
   guiHandler.disableController(this.testController);
@@ -67,6 +69,11 @@ FontCreatorGUIHandler.prototype.loadFont = function(fontName, typeface){
   this.font = new Font(fontName, "fonts/"+typeface, false);
   this.font.load(function(){
     fontCreatorGUIHandler.handleTestMesh();
+    terminal.clear();
+    terminal.printInfo(Text.AFTER_FONT_CREATION);
+    guiHandler.enableController(fontCreatorGUIHandler.typefaceController);
+    guiHandler.enableController(fontCreatorGUIHandler.testController);
+    fontCreatorGUIHandler.isLoading = false;
   }, function(){
     fontCreatorGUIHandler.close(Text.ERROR_HAPPENED_COMPRESSING_FONT, true);
   });
@@ -90,11 +97,14 @@ FontCreatorGUIHandler.prototype.close = function(message, isError){
   activeControl.onActivated();
   camera.quaternion.set(0, 0, 0, 1);
   camera.position.set(initialCameraX, initialCameraY, initialCameraZ);
+  if (this.text){
+    this.text.destroy();
+  }
 }
 
 FontCreatorGUIHandler.prototype.show = function(fontName, typefaces){
   this.commonStartFunctions();
-  this.init();
+  this.init(fontName);
   this.createGUI(fontName, typefaces);
   this.configurations["Typeface"] = typefaces[0];
   this.loadFont(fontName, typefaces[0]);

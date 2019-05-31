@@ -150,7 +150,7 @@ MouseEventHandler.prototype.onClick = function(event, fromTap){
   omGUIFocused = false;
   tmGUIFocused = false;
   if (windowLoaded){
-    if (mode == 0 && (guiHandler.datGuiFPSWeaponAlignment || guiHandler.datGuiPSCreator || guiHandler.datGuiMuzzleFlashCreator || guiHandler.datGuiTexturePack || guiHandler.datGuiSkyboxCreation)){
+    if (mode == 0 && (guiHandler.datGuiFPSWeaponAlignment || guiHandler.datGuiPSCreator || guiHandler.datGuiMuzzleFlashCreator || guiHandler.datGuiTexturePack || guiHandler.datGuiSkyboxCreation || guiHandler.datGuiFog || guiHandler.datGuiFontCreation)){
       return;
     }
     var rect = renderer.getCurrentViewport();
