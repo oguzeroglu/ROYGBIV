@@ -489,6 +489,7 @@ var Text = function(){
   this.TEXTURE_REPEAT_V_MUST_BE_A_POSITIVE_NUMBER = "repeatV must be a positive number.";
   this.WORKS_ONLY_IN_DESIGN_MODE = "This command works only in Design mode.";
   this.INVALID_CHARACTER_IN_OBJECT_NAME = "Invalid character in object name.";
+  this.INVALID_CHARACTER_IN_NAME = "Invalid character in name.";
   this.PARAMETER_MUST_BE_ON_OFF = "Parameter must be on or off.";
   this.FOR_MOBILE = "Application is @@1 for mobile devices.";
   this.CANNOT_SIMPLIFY_PHYISCS_DYNAMIC_OBJECTS = "Cannot simplify physics of dynamic objects.";

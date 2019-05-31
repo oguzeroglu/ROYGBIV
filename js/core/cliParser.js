@@ -295,6 +295,10 @@ function parse(input){
             terminal.printError(Text.WORKS_ONLY_IN_DESIGN_MODE);
             return true;
           }
+          if (name.indexOf("*") > -1){
+            terminal.printError(Text.INVALID_CHARACTER_IN_NAME);
+            return true;
+          }
           if (name == "NULL_BASIC"){
             terminal.printError(Text.NAME_RESERVED);
             return true;
@@ -979,14 +983,15 @@ function parse(input){
           var name = splitted[1];
           var height = splitted[2];
           var outlineColor = splitted[3];
-
           height = parseInt(height);
-
           if (mode != 0){
             terminal.printError(Text.WORKS_ONLY_IN_DESIGN_MODE);
             return true;
           }
-
+          if (name.indexOf("*") > -1){
+            terminal.printError(Text.INVALID_CHARACTER_IN_NAME);
+            return true;
+          }
           if (wallCollections[name]){
             terminal.printError(Text.NAME_MUST_BE_UNIQUE);
             return true;
@@ -1179,6 +1184,10 @@ function parse(input){
             return true;
           }
           var texturePackName = splitted[1];
+          if (texturePackName.indexOf("*") > -1){
+            terminal.printError(Text.INVALID_CHARACTER_IN_NAME);
+            return true;
+          }
           if (texturePacks[texturePackName]){
             terminal.printError(Text.NAME_MUST_BE_UNIQUE);
             return true;
@@ -1497,6 +1506,10 @@ function parse(input){
             return true;
           }
           var skyboxName = splitted[1];
+          if(skyboxName.indexOf("*") > -1){
+            terminal.printError(Text.INVALID_CHARACTER_IN_NAME);
+            return true;
+          }
           if (skyBoxes[skyboxName]){
             terminal.printError(Text.NAME_MUST_BE_UNIQUE);
             return true;
@@ -1807,6 +1820,10 @@ function parse(input){
         break;
         case 83: //newScript
           var name = splitted[1];
+          if (name.indexOf("*") > -1){
+            terminal.printError(Text.INVALID_CHARACTER_IN_NAME);
+            return true;
+          }
           if (scripts[name]){
             terminal.printError(Text.NAME_MUST_BE_UNIQUE);
             return true;
@@ -2018,6 +2035,10 @@ function parse(input){
         break;
         case 92: //glue
           var groupName = splitted[1];
+          if (groupName.indexOf("*") > -1){
+            terminal.printError(Text.INVALID_CHARACTER_IN_NAME);
+            return true;
+          }
           if (!groupName){
             terminal.printError(Text.INVALID_CHARACTER_IN_OBJECT_NAME);
             return true;
@@ -2353,6 +2374,10 @@ function parse(input){
         break;
         case 99: //uploadScript
           var scriptName = splitted[1];
+          if (scriptName.indexOf("*") > -1){
+            terminal.printError(Text.INVALID_CHARACTER_IN_NAME);
+            return true;
+          }
           var filePath = "scripts/"+splitted[2];
           if (mode != 0){
             terminal.printError(Text.WORKS_ONLY_IN_DESIGN_MODE);
@@ -3718,6 +3743,10 @@ function parse(input){
             return true;
           }
           var fontName = splitted[1];
+          if (fontName.indexOf("*") > -1){
+            terminal.printError(Text.INVALID_CHARACTER_IN_NAME);
+            return true;
+          }
           if (fonts[fontName]){
             terminal.printError(Text.FONT_NAME_MUST_BE_UNIQUE);
             return true;
@@ -4161,6 +4190,10 @@ function parse(input){
             return true;
           }
           var psName = splitted[1];
+          if (psName.indexOf("*") > -1){
+            terminal.printError(Text.INVALID_CHARACTER_IN_NAME);
+            return true;
+          }
           if (preConfiguredParticleSystems[psName]){
             terminal.printError(Text.NAME_MUST_BE_UNIQUE);
             return true;
@@ -4205,6 +4238,10 @@ function parse(input){
           var poolName = splitted[1];
           var psName = splitted[2];
           var poolSize = parseInt(splitted[3]);
+          if (poolName.indexOf("*") > -1){
+            terminal.printError(Text.INVALID_CHARACTER_IN_NAME);
+            return true;
+          }
           if (preConfiguredParticleSystemPools[poolName]){
             terminal.printError(Text.NAME_MUST_BE_UNIQUE);
             return true;
@@ -4350,6 +4387,10 @@ function parse(input){
           }
           var muzzleFlashName = splitted[1];
           var refPSName = splitted[2];
+          if (muzzleFlashName.indexOf("*") > -1){
+            terminal.printError(Text.INVALID_CHARACTER_IN_NAME);
+            return true;
+          }
           if (muzzleFlashes[muzzleFlashName]){
             terminal.printError(Text.NAME_MUST_BE_UNIQUE);
             return true;
@@ -4534,6 +4575,10 @@ function parse(input){
             terminal.printError(Text.WORKS_ONLY_IN_DESIGN_MODE);
             return true;
           }
+          if (splitted[1].indexOf("*") > -1){
+            terminal.printError(Text.INVALID_CHARACTER_IN_NAME);
+            return true;
+          }
           if (crosshairs[splitted[1]]){
             terminal.printError(Text.NAME_MUST_BE_UNIQUE);
             return true;
@@ -4632,6 +4677,10 @@ function pickRandomMaterial(){
 }
 
 function processNewGridSystemCommand(name, sizeX, sizeZ, centerX, centerY, centerZ, outlineColor, cellSize, axis, slicedGrid){
+  if (name.indexOf("*") > -1){
+    terminal.printError(Text.INVALID_CHARACTER_IN_NAME);
+    return true;
+  }
   if (addedObjects[name] || objectGroups[name]){
     terminal.printError(Text.NAME_MUST_BE_UNIQUE);
     return true;
