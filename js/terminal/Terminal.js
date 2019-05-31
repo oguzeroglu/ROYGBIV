@@ -369,14 +369,6 @@ Terminal.prototype.autocomplete = function(command){
 				}
 				helpString = "[Objects]: "
 			break;
-			case commandDescriptor.TEXTURE_NAME:
-				for (textureName in textures){
-					if (textureName.startsWith(curEntry)){
-						possibilities.push(textureName);
-					}
-				}
-				helpString = "[Textures]: ";
-			break;
 			case commandDescriptor.OBJECT_AXIS:
 				if ("x".startsWith(curEntry.toLowerCase())){
 					possibilities.push("x");
@@ -437,19 +429,6 @@ Terminal.prototype.autocomplete = function(command){
 					possibilities.push("PHONG");
 				}
 				helpString = "[Types]: ";
-			break;
-			case commandDescriptor.FILE_EXTENSION:
-				var knownExtensions = [
-					"tga", "TGA", "jpg", "JPG", "jpeg",
-					"JPEG", "png", "PNG", "gif", "GIF",
-					"bmp", "BMP"
-				];
-				for (var i = 0; i < knownExtensions.length; i++){
-					if (knownExtensions[i].startsWith(curEntry)){
-						possibilities.push(knownExtensions[i]);
-					}
-				}
-				helpString = "[File extensions]: ";
 			break;
 			case commandDescriptor.TEXTURE_PACK_NAME:
 				for (var texturePackName in texturePacks){
@@ -668,6 +647,14 @@ Terminal.prototype.autocomplete = function(command){
 					}
 				}
 				helpString = "[Muzzle flashes]: ";
+			break;
+			case commandDescriptor.CROSSHAIR_NAME:
+				for (var crosshairName in crosshairs){
+					if (crosshairName.toLowerCase().startsWith(curEntry.toLowerCase())){
+						possibilities.push(crosshairName);
+					}
+				}
+				helpString = "[Crosshairs]: ";
 			break;
 			default:
 				throw new Error("Not implemented.");

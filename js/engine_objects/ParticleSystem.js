@@ -40,7 +40,6 @@ ParticleSystem.prototype.removeFog = function(){
   macroHandler.removeMacro("HAS_SKYBOX_FOG", this.mesh.material, true, true);
   delete this.mesh.material.uniforms.fogInfo;
   delete this.mesh.material.uniforms.cubeTexture;
-  delete this.mesh.material.uniforms.worldMatrix;
   delete this.mesh.material.uniforms.cameraPosition;
   this.mesh.material.needsUpdate = true;
 }
@@ -50,10 +49,9 @@ ParticleSystem.prototype.setFog = function(){
     macroHandler.injectMacro("HAS_FOG", this.mesh.material, false, true);
     this.mesh.material.uniforms.fogInfo = GLOBAL_FOG_UNIFORM;
   }
-  if (fogBlendWithSkybox){
+  if (fogHandler.isFogBlendingWithSkybox()){
     if (!this.mesh.material.uniforms.cubeTexture){
       macroHandler.injectMacro("HAS_SKYBOX_FOG", this.mesh.material, true, true);
-      this.mesh.material.uniforms.worldMatrix = new THREE.Uniform(this.mesh.matrixWorld);
       this.mesh.material.uniforms.cubeTexture = GLOBAL_CUBE_TEXTURE_UNIFORM;
       this.mesh.material.uniforms.cameraPosition = GLOBAL_CAMERA_POSITION_UNIFORM;
     }

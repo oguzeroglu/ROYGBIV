@@ -180,31 +180,7 @@ ModeSwitcher.prototype.switchFromDesignToPreview = function(){
     }
   }
   autoInstancingHandler.handle();
-  if (fogActive){
-    GLOBAL_FOG_UNIFORM.value.set(fogDensity, fogColorRGB.r, fogColorRGB.g, fogColorRGB.b);
-    if (fogBlendWithSkybox){
-      GLOBAL_FOG_UNIFORM.value.set(
-        -fogDensity,
-        skyboxMesh.material.uniforms.color.value.r,
-        skyboxMesh.material.uniforms.color.value.g,
-        skyboxMesh.material.uniforms.color.value.b
-      );
-    }
-    for (var objName in addedObjects){
-      addedObjects[objName].setFog();
-    }
-    for (var objName in objectGroups){
-      objectGroups[objName].setFog();
-    }
-    for (var textName in addedTexts){
-      addedTexts[textName].setFog();
-    }
-    for (var objName in autoInstancedObjects){
-      autoInstancedObjects[objName].setFog();
-    }
-  }else{
-    GLOBAL_FOG_UNIFORM.value.set(-100.0, 0, 0, 0);
-  }
+  fogHandler.onFromDesignToPreview();
   TOTAL_PARTICLE_SYSTEM_COLLISION_LISTEN_COUNT = 0;
   TOTAL_PARTICLE_COLLISION_LISTEN_COUNT = 0;
   TOTAL_PARTICLE_SYSTEM_COUNT = 0;
@@ -333,7 +309,6 @@ ModeSwitcher.prototype.switchFromPreviewToDesign = function(){
   objectTrails = new Object();
   activeObjectTrails = new Map();
   mergedParticleSystems = new Object();
-  crosshairs = new Object();
   selectedCrosshair = 0;
 
   for (var objectName in objectGroups){
@@ -412,7 +387,7 @@ ModeSwitcher.prototype.switchFromPreviewToDesign = function(){
     scripts[scriptName].runAutomatically = newScripts[scriptName].runAutomatically;
   }
   newScripts = undefined;
-  GLOBAL_FOG_UNIFORM.value.set(-100.0, 0, 0, 0);
+  fogHandler.onFromPreviewToDesign();
   renderer.setViewport(0, 0, window.innerWidth, window.innerHeight);
 
   clickableAddedTexts = new Object();
@@ -422,15 +397,6 @@ ModeSwitcher.prototype.switchFromPreviewToDesign = function(){
     var text = addedTexts[txtName];
     text.restore();
     text.handleResize();
-  }
-  for (var objName in addedObjects){
-    addedObjects[objName].removeFog();
-  }
-  for (var objName in objectGroups){
-    objectGroups[objName].removeFog();
-  }
-  for (var textName in addedTexts){
-    addedTexts[textName].removeFog();
   }
   if (!rayCaster.ready){
     terminal.printInfo(Text.INITIALIZING_WORKERS);

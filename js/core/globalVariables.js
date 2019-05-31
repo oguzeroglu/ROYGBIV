@@ -49,9 +49,6 @@ var camera;
 var orthographicCamera;
 var canvas;
 var sceneBackgroundColor = 0x000000 ;
-var textureLoader = new THREE.TextureLoader();
-var tgaLoader;
-var ddsLoader;
 var axesHelper = new THREE.AxesHelper(20000);
 var pointerLockRequested = false;
 var fullScreenRequested = false;
@@ -79,13 +76,6 @@ var initialCameraX = 0;
 var initialCameraY = 50;
 var initialCameraZ = 0;
 
-// FOG
-var fogActive = false;
-var fogColor = "black";
-var fogDensity = 0;
-var fogColorRGB = new THREE.Color(fogColor);
-var fogBlendWithSkybox = false;
-
 // ENGINE VARIABLES
 var keyboardBuffer = new Object();
 var cameraRotationBuffer = {
@@ -101,8 +91,6 @@ var addedTexts = new Object();
 var addedTexts2D = new Object();
 var clickableAddedTexts = new Object();
 var clickableAddedTexts2D = new Object();
-var textures = new Object();
-var textureURLs = new Object();
 var wallCollections = new Object();
 var texturePacks = new Object();
 var skyBoxes = new Object();
@@ -147,15 +135,12 @@ var cylinderWidthSegments = 10;
 var cylinderHeightSegments = 10;
 var defaultMaterialType = "BASIC"; //BASIC / PHONG
 var texturePackRootDirectory = "texture_packs/";
+var atlasRootDirectory = "texture_atlas/";
 var skyBoxRootDirectory = "skybox/";
 var dataPrefix = "text/json;charset=utf-8,";
 var skyboxDistance = 4000;
-var skyboxMesh;
-var skyboxVisible = false;
-var skyboxConfigurationsVisible = false;
 var fogConfigurationsVisible = false;
 var postProcessiongConfigurationsVisibility = new Object();
-var mappedSkyboxName = 0;
 var gridCounter = 0;
 var MAX_GRIDS_ALLOWED = 1000000;
 var MIN_CELLSIZE_ALLOWED = 5;
@@ -218,7 +203,6 @@ var MESSAGE_TYPE_BASIC = 0;
 var MESSAGE_TYPE_BUFFER = 1;
 var UNDEFINED = "undefined";
 var PIPE = "|";
-var mergedTextureCache = new Object();
 var reusableCollisionInfo;
 var TOTAL_OBJECT_COLLISION_LISTENER_COUNT = 0;
 var MAX_OBJECT_COLLISION_LISTENER_COUNT = 50;
@@ -240,7 +224,9 @@ var GLOBAL_ADDEDTEXT_VIEWPORT_UNIFORM;
 var GLOBAL_SCREEN_RESOLUTION_UNIFORM = new THREE.Uniform(1);
 var GLOBAL_PS_REF_HEIGHT_UNIFORM = new THREE.Uniform(0);
 var VERTEX_SHADER_TEXTURE_FETCH_SUPPORTED;
-var DDS_SUPPORTED;
+var ASTC_SUPPORTED;
+var S3TC_SUPPORTED;
+var PVRTC_SUPPORTED;
 var INSTANCING_SUPPORTED;
 var jobHandlerSelectedGrid = 0;
 var jobHandlerWorking = false;
@@ -256,6 +242,7 @@ var areas = new Object();
 var areasVisible = true;
 var areaConfigurationsVisible = false;
 var areaConfigurationsHandler;
+var textureAtlasHandler;
 var markedPointsVisible = true;
 var frustum = new THREE.Frustum();
 var SIDE_BOTH = "Both";
@@ -333,6 +320,13 @@ var shaderPrecisionHandler;
 var particleSystemCreatorGUIHandler;
 var muzzleFlashCreatorGUIHandler;
 var fpsWeaponGUIHandler;
+var texturePackCreatorGUIHandler;
+var skyboxCreatorGUIHandler;
+var fogCreatorGUIHandler;
+var fontCreatorGUIHandler;
+var crosshairCreatorGUIHandler;
+var skyboxHandler;
+var fogHandler;
 var preConfiguredParticleSystems = new Object();
 var preConfiguredParticleSystemPools = new Object();
 var muzzleFlashes = new Object();
@@ -352,6 +346,8 @@ var minusZ = "-z";
 
 // RENDER ORDERS
 var renderOrders = {
+  MARKED_POINT: -30,
+  GRID_HELPER: -20,
   FPS_WEAPON: -10,
   SKYBOX: -1,
   PARTICLE_SYSTEM: 0,
@@ -369,6 +365,7 @@ var renderOrders = {
 // FACTORIES
 var raycasterFactory;
 var physicsFactory;
+var textureLoaderFactory;
 
 // WORKER VARIABLES
 var WORKERS_SUPPORTED = (typeof(Worker) !== UNDEFINED);

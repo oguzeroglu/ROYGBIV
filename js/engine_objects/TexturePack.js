@@ -1,70 +1,51 @@
-var TexturePack = function(name, directoryName, fileExtension, mapCallback, isPreLoaded){
+var TexturePack = function(name, directoryName, textureDescription){
+  this.totalLoadedCount = 0
+  this.textureDescription = textureDescription;
+  if (this.textureDescription.isAtlas){
+    this.maxAttemptCount = 1;
+    return this;
+  }
   this.directoryName = directoryName;
   this.name = name;
-  if (!DDS_SUPPORTED){
-    if (fileExtension.toUpperCase() == "DDS"){
-      fileExtension = compressedTextureFallbackFormat.replace(".", "");
-    }
+  this.maxAttemptCount = 0;
+  this.hasDiffuse = textureDescription.hasDiffuse;
+  this.hasAlpha = textureDescription.hasAlpha;
+  this.hasAO = textureDescription.hasAO;
+  this.hasEmissive = textureDescription.hasEmissive;
+  this.hasHeight = textureDescription.hasHeight;
+  if (this.hasDiffuse){
+    this.maxAttemptCount ++;
   }
-  this.fileExtension = fileExtension;
-  this.maxAttemptCount = 5;
-  this.totalLoadedCount = 0;
-  this.hasDiffuse = false;
-  this.hasAlpha = false;
-  this.hasAO = false;
-  this.hasEmissive = false;
-  this.hasHeight = false;
-  if (isPreLoaded){
-    this.isPreLoaded = isPreLoaded;
+  if (this.hasAlpha){
+    this.maxAttemptCount ++;
   }
-  this.diffuseFilePath = texturePackRootDirectory+directoryName+"/"+"diffuse."+fileExtension.toLowerCase();
-  this.alphaFilePath = texturePackRootDirectory+directoryName+"/"+"alpha."+fileExtension.toLowerCase();
-  this.aoFilePath = texturePackRootDirectory+directoryName+"/"+"ao."+fileExtension.toLowerCase();
-  this.emissiveFilePath = texturePackRootDirectory+directoryName+"/"+"emissive."+fileExtension.toLowerCase();
-  this.heightFilePath = texturePackRootDirectory+directoryName+"/"+"height."+fileExtension.toLowerCase();
-  if (fileExtension.toUpperCase() == "DDS"){
-    this.loader = ddsLoader;
-  }else if (fileExtension.toUpperCase() == "TGA"){
-    this.loader = tgaLoader;
-  }else{
-    this.loader = textureLoader;
+  if (this.hasAO){
+    this.maxAttemptCount ++;
   }
-  this.diffuseCanMapFlag = false;
-  this.alphaCanMapFlag = false;
-  this.aoCanMapFlag = false;
-  this.emissiveCanMapFlag = false;
-  this.heightCanMapFlag = false;
-  if (mapCallback){
-    this.mapCallback = mapCallback;
+  if (this.hasEmissive){
+    this.maxAttemptCount ++;
   }
-  this.loadTextures();
+  if (this.hasHeight){
+    this.maxAttemptCount ++;
+  }
+}
+
+TexturePack.prototype.clone = function(){
+  var tp = new TexturePack(this.name, this.directoryName, this.textureDescription);
+  tp.isParticleTexture = this.isParticleTexture;
+  return tp;
 }
 
 TexturePack.prototype.export = function(){
   var exportObject = new Object();
   exportObject.directoryName = this.directoryName;
   exportObject.name = this.name;
-  exportObject.fileExtension = this.fileExtension;
-  exportObject.hasDiffuse = this.hasDiffuse;
-  exportObject.hasAlpha = this.hasAlpha;
-  exportObject.hasAO = this.hasAO;
-  exportObject.hasEmissive = this.hasEmissive;
-  exportObject.hasHeight = this.hasHeight;
-  exportObject.diffuseFilePath = this.diffuseFilePath;
-  exportObject.alphaFilePath = this.alphaFilePath;
-  exportObject.aoFilePath = this.aoFilePath;
-  exportObject.emissiveFilePath = this.emissiveFilePath;
-  exportObject.heightFilePath = this.heightFilePath;
+  exportObject.textureDescription = this.textureDescription;
+  exportObject.isParticleTexture = (!(typeof this.isParticleTexture == UNDEFINED))? this.isParticleTexture: false;
   return exportObject;
 }
 
 TexturePack.prototype.destroy = function(){
-  for (var addedObjectName in addedObjects){
-    var addedObject = addedObjects[addedObjectName];
-    if (addedObject.associatedTexturePack == name){
-      addedObject.resetAssociatedTexturePack();
-    }
-  }
   if (this.hasDiffuse){
     this.diffuseTexture.dispose();
   }
@@ -80,228 +61,97 @@ TexturePack.prototype.destroy = function(){
   if (this.hasHeight){
     this.heightTexture.dispose();
   }
-  delete texturePacks[this.name];
-}
-
-TexturePack.prototype.readyCallback = function(){
-  this.totalLoadedCount ++;
-  if (this.maxAttemptCount == this.totalLoadedCount && this.mapCallback){
-    this.mapCallback();
+  if (!this.textureDescription.isAtlas){
+    delete texturePacks[this.name];
   }
 }
 
-TexturePack.prototype.mapDiffuse = function (that, textureData){
-  that.diffuseTexture = textureData;
-  that.diffuseTexture.wrapS = THREE.RepeatWrapping;
-  that.diffuseTexture.wrapT = THREE.RepeatWrapping;
-  that.hasDiffuse = true;
-  that.diffuseCanMapFlag = true;
-  that.refreshMap();
+TexturePack.prototype.onTextureLoaded = function(onLoaded){
+  this.totalLoadedCount ++;
+  if (this.maxAttemptCount == this.totalLoadedCount && onLoaded){
+    onLoaded();
+  }
 }
 
-TexturePack.prototype.mapHeight = function (that, textureData){
-  that.heightTexture = textureData;
-  that.heightTexture.wrapS = THREE.RepeatWrapping;
-  that.heightTexture.wrapT = THREE.RepeatWrapping;
-  that.hasHeight = true;
-  that.heightCanMapFlag = true;
-  that.refreshMap();
+TexturePack.prototype.loadTexture = function(filePath, textureAttrName, textureAvailibilityAttrName, onLoaded){
+  var loader = (this.isParticleTexture)? textureLoaderFactory.getDefault(): textureLoaderFactory.get();
+  loader.load(filePath, function(textureData){
+    this[textureAttrName] = textureData;
+    this[textureAttrName].wrapS = THREE.RepeatWrapping;
+    this[textureAttrName].wrapT = THREE.RepeatWrapping;
+    this[textureAttrName].needsUpdate = true;
+    this.onTextureLoaded(onLoaded);
+  }.bind(this), function(xhr){
+
+  }, function(xhr){
+    this[textureAvailibilityAttrName] = false;
+    this.onTextureLoaded(onLoaded);
+    console.error("[!] "+textureAttrName+" could not be loaded --> "+this.name);
+  }.bind(this));
 }
 
-TexturePack.prototype.mapAmbientOcculsion = function(that, textureData){
-  that.aoTexture = textureData;
-  that.aoTexture.wrapS = THREE.RepeatWrapping;
-  that.aoTexture.wrapT = THREE.RepeatWrapping;
-  that.hasAO = true;
-  that.aoCanMapFlag = true;
-  that.refreshMap();
+TexturePack.prototype.loadAtlas = function(onLoaded){
+  var postfix = textureLoaderFactory.getFilePostfix();
+  var atlasPath = atlasRootDirectory + "textureAtlas" + postfix;
+  this.loadTexture(atlasPath, "diffuseTexture", "hasDiffuse", onLoaded);
 }
 
-TexturePack.prototype.mapAlpha = function(that, textureData){
-  that.alphaTexture = textureData;
-  that.alphaTexture.wrapS = THREE.RepeatWrapping;
-  that.alphaTexture.wrapT = THREE.RepeatWrapping;
-  that.hasAlpha = true;
-  that.alphaCanMapFlag = true;
-  that.refreshMap();
-}
-
-TexturePack.prototype.mapEmissive = function(that, textureData){
-  that.emissiveTexture = textureData;
-  that.emissiveTexture.wrapS = THREE.RepeatWrapping;
-  that.emissiveTexture.wrapT = THREE.RepeatWrapping;
-  that.hasEmissive = true;
-  that.emissiveCanMapFlag = true;
-  that.refreshMap();
-}
-
-TexturePack.prototype.loadTextures = function(){
-
-  var that = this;
-
-  //DIFFUSE
-  this.loader.load(this.diffuseFilePath,
-    function(textureData){
-      that.mapDiffuse(that, textureData);
-    },
-    function(xhr){
-
-    },
-    function(xhr){
-      that.hasDiffuse = false;
-      that.diffuseCanMapFlag = true;
-      that.refreshMap();
-    }
-  );
-  //ALPHA
-  this.loader.load(this.alphaFilePath,
-    function(textureData){
-      that.mapAlpha(that, textureData);
-    },
-    function(xhr){
-
-    },
-    function(xhr){
-      that.hasAlpha = false;
-      that.alphaCanMapFlag = true;
-      that.refreshMap();
-    }
-  );
-  //AO
-  this.loader.load(this.aoFilePath,
-    function(textureData){
-      that.mapAmbientOcculsion(that, textureData);
-    },
-    function(xhr){
-
-    },
-    function(xhr){
-      that.hasAo = false;
-      that.aoCanMapFlag = true;
-      that.refreshMap();
-    }
-  );
-  //EMISSIVE
-  this.loader.load(this.emissiveFilePath,
-    function(textureData){
-      that.mapEmissive(that, textureData);
-    },
-    function(xhr){
-
-    },
-    function(xhr){
-      that.hasEmissive = false;
-      that.emissiveCanMapFlag = true;
-      that.refreshMap();
-    }
-  );
-  //HEIGHT
-  this.loader.load(this.heightFilePath,
-    function(textureData){
-      that.mapHeight(that, textureData);
-    },
-    function(xhr){
-
-    },
-    function(xhr){
-      that.hasHeight = false;
-      that.heightCanMapFlag = true;
-      that.refreshMap();
-    }
-  );
-}
-
-TexturePack.prototype.printInfo = function(){
-  var diffuseSizeText = "";
-  var alphaSizeText = "";
-  var ambientOcculsionSizeText = "";
-  var emissiveSizeText = "";
-  var heightSizeText = "";
+TexturePack.prototype.loadTextures = function(onLoaded){
+  if (this.textureDescription.isAtlas){
+    this.loadAtlas(onLoaded);
+    return;
+  }
+  this.totalLoadedCount = 0;
+  var postfix = this.isParticleTexture? ".png": textureLoaderFactory.getFilePostfix();
+  var diffuseFilePath = texturePackRootDirectory+this.directoryName+"/diffuse"+postfix;
+  var alphaFilePath = texturePackRootDirectory+this.directoryName+"/alpha"+postfix;
+  var aoFilePath = texturePackRootDirectory+this.directoryName+"/ao"+postfix;
+  var emissiveFilePath = texturePackRootDirectory+this.directoryName+"/emissive"+postfix;
+  var heightFilePath = texturePackRootDirectory+this.directoryName+"/height"+postfix;
   if (this.hasDiffuse){
-    var img = this.diffuseTexture.image;
-    diffuseSizeText = " ["+img.width+"x"+img.height+"]";
+    this.loadTexture(diffuseFilePath, "diffuseTexture", "hasDiffuse", onLoaded);
+  }
+  if (this.isParticleTexture){
+    this.hasAlpha = false;
+    this.hasAO = false;
+    this.hasEmissive = false;
+    this.hasHeight = false;
+    this.maxAttemptCount = 1;
+    return;
   }
   if (this.hasAlpha){
-    var img = this.alphaTexture.image;
-    alphaSizeText = " ["+img.width+"x"+img.height+"]";  }
+    this.loadTexture(alphaFilePath, "alphaTexture", "hasAlpha", onLoaded);
+  }
   if (this.hasAO){
-    var img = this.aoTexture.image;
-    ambientOcculsionSizeText = " ["+img.width+"x"+img.height+"]";
+    this.loadTexture(aoFilePath, "aoTexture", "hasAO", onLoaded);
   }
   if (this.hasEmissive){
-    var img = this.emissiveTexture.image;
-    emissiveSizeText = " ["+img.width+"x"+img.height+"]";
+    this.loadTexture(emissiveFilePath, "emissiveTexture", "hasEmissive", onLoaded);
   }
   if (this.hasHeight){
-    var img = this.heightTexture.image;
-    heightSizeText = " ["+img.width+"x"+img.height+"]";
+    this.loadTexture(heightFilePath, "heightTexture", "hasHeight", onLoaded);
   }
-  terminal.printHeader(Text.TEXTUREPACK_INFO_HEADER, true);
-  terminal.printInfo(Text.TEXTUREPACK_NAME.replace(
-    Text.PARAM1, this.name
-  ), true);
-  terminal.printInfo(Text.TEXTUREPACK_DIRNAME.replace(
-    Text.PARAM1, this.directoryName
-  ), true);
-  terminal.printInfo(Text.TEXTUREPACK_FILEEXTENSION.replace(
-    Text.PARAM1, this.fileExtension
-  ), true);
-  terminal.printInfo(Text.TEXTUREPACK_FILEPATHS, true);
-  terminal.printInfo(Text.TEXTUREPACK_INFO_TREE_DIFFUSE.replace(
-    Text.PARAM1, this.diffuseFilePath
-  ), true);
-  terminal.printInfo(Text.TEXTUREPACK_INFO_TREE_ALPHA.replace(
-    Text.PARAM1, this.alphaFilePath
-  ), true);
-  terminal.printInfo(Text.TEXTUREPACK_INFO_TREE_AO.replace(
-    Text.PARAM1, this.aoFilePath
-  ), true);
-  terminal.printInfo(Text.TEXTUREPACK_INFO_TREE_EMISSIVE.replace(
-    Text.PARAM1, this.emissiveFilePath
-  ), true);
-  terminal.printInfo(Text.TEXTUREPACK_INFO_TREE_HEIGHT.replace(
-    Text.PARAM1, this.heightFilePath
-  ), true);
-  terminal.printInfo(Text.TEXTUREPACK_TEXTURES, true);
-  terminal.printInfo(Text.TEXTUREPACK_INFO_TREE_DIFFUSE.replace(
-    Text.PARAM1, this.hasDiffuse + diffuseSizeText
-  ), true);
-  terminal.printInfo(Text.TEXTUREPACK_INFO_TREE_ALPHA.replace(
-    Text.PARAM1, this.hasAlpha + alphaSizeText
-  ), true);
-  terminal.printInfo(Text.TEXTUREPACK_INFO_TREE_AO.replace(
-    Text.PARAM1, this.hasAO + ambientOcculsionSizeText
-  ), true);
-  terminal.printInfo(Text.TEXTUREPACK_INFO_TREE_EMISSIVE.replace(
-    Text.PARAM1, this.hasEmissive + emissiveSizeText
-  ), true);
-  terminal.printInfo(Text.TEXTUREPACK_INFO_TREE_HEIGHT.replace(
-    Text.PARAM1, this.hasHeight + heightSizeText
-  ), false);
 }
 
-TexturePack.prototype.isUsable = function(){
-  return (
-    this.hasDiffuse ||
-    this.hasAlpha ||
-    this.hasAO ||
-    this.hasEmissive ||
-    this.hasHeight
-  );
+TexturePack.prototype.setParticleTextureStatus = function(val){
+  if (typeof val == UNDEFINED){
+    val = false;
+  }
+  this.isParticleTexture = val;
 }
 
-TexturePack.prototype.refresh = function(){
-  this.loadTextures();
-}
-
-TexturePack.prototype.refreshMap = function(){
-  if (!this.isPreLoaded){
-    for (var addedObjectName in addedObjects){
-      var addedObject = addedObjects[addedObjectName];
-      if (addedObject.associatedTexturePack == this.name){
-        addedObject.mapTexturePack(this);
+TexturePack.prototype.isUsed = function(){
+  for (var objName in addedObjects){
+    if (addedObjects[objName].associatedTexturePack == this.name){
+      return true;
+    }
+  }
+  for (var objName in objectGroups){
+    for (var childObjName in objectGroups[objName].group){
+      if (objectGroups[objName].group[childObjName].associatedTexturePack == this.name){
+        return true;
       }
     }
   }
-  this.readyCallback();
+  return false;
 }

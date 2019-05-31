@@ -45,8 +45,16 @@ Renderer.prototype.isInstancingSupported = function(){
   return (!(this.webglRenderer.context.getExtension("ANGLE_instanced_arrays") == null));
 }
 
-Renderer.prototype.isDDSSupported = function(){
+Renderer.prototype.isASTCSupported = function(){
+  return (!(this.webglRenderer.context.getExtension("WEBGL_compressed_texture_astc") == null));
+}
+
+Renderer.prototype.isS3TCSupported = function(){
   return (!(this.webglRenderer.context.getExtension("WEBGL_compressed_texture_s3tc") == null));
+}
+
+Renderer.prototype.isPVRTCSupported = function(){
+  return (!(this.webglRenderer.context.getExtension("WEBGL_compressed_texture_pvrtc") == null));
 }
 
 Renderer.prototype.isVertexShaderTextureFetchSupported = function(){

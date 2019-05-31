@@ -1,0 +1,3 @@
+This folder is used internally by the engine in order to store compressed 
+texture atlases used by particle systems and fonts. Do not remove this folder
+and do not modify its content.

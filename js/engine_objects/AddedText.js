@@ -242,11 +242,11 @@ AddedText.prototype.export = function(){
 }
 
 AddedText.prototype.getGlyphUniform = function(){
-  var uuid = this.font.textureMerger.mergedTexture.uuid;
+  var uuid = this.font.texture.uuid;
   if (textureUniformCache[uuid]){
     return textureUniformCache[uuid];
   }
-  var glyphUniform = new THREE.Uniform(this.font.textureMerger.mergedTexture);
+  var glyphUniform = new THREE.Uniform(this.font.texture);
   textureUniformCache[uuid] = glyphUniform;
   return glyphUniform;
 }
@@ -829,7 +829,7 @@ AddedText.prototype.setFog = function(){
     macroHandler.injectMacro("HAS_FOG", this.material, false, true);
     this.mesh.material.uniforms.fogInfo = GLOBAL_FOG_UNIFORM;
   }
-  if (fogBlendWithSkybox){
+  if (fogHandler.isFogBlendingWithSkybox()){
     if (!this.mesh.material.uniforms.cubeTexture){
       macroHandler.injectMacro("HAS_SKYBOX_FOG", this.material, true, true);
       this.mesh.material.uniforms.worldMatrix = new THREE.Uniform(this.mesh.matrixWorld);

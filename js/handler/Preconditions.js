@@ -553,24 +553,6 @@ Preconditions.prototype.checkIfScriptExists = function(callerFunc, parameterName
   }
 }
 
-Preconditions.prototype.checkIfTextureExists = function(callerFunc, parameterName, obj){
-  if (!obj){
-    this.throw(callerFunc, "No such texture.");
-  }
-}
-
-Preconditions.prototype.checkIfTextureReady = function(callerFunc, parameter, obj){
-  if (!(obj instanceof THREE.Texture)){
-    this.throw(callerFunc, "Texture not ready.");
-  }
-}
-
-Preconditions.prototype.checkIfTextureCompressed = function(callerFunc, parameter, obj){
-  if (obj instanceof THREE.CompressedTexture){
-    this.throw(callerFunc, "Compressed textures are not supported for this API.");
-  }
-}
-
 Preconditions.prototype.checkIfXExistsOnlyIfYExists = function(callerFunc, xName, yName, x, y){
   if (!(typeof y == UNDEFINED)){
     if (typeof x == UNDEFINED){

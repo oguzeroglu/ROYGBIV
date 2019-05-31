@@ -219,9 +219,7 @@ function setTHREEQuaternionFromCANNON(mesh, physicsBody, axis, type, gridSystemA
 }
 
 function handleSkybox(){
-  if (skyboxMesh){
-    skyboxMesh.position.copy(camera.position);
-  }
+  skyboxHandler.update();
 }
 
 function deploymentScripts(){

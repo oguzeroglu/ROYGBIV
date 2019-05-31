@@ -42,13 +42,13 @@ MeshGenerator.prototype.generateObjectTrail = function(
   });
   var mesh = new THREE.Mesh(this.geometry, material);
   mesh.renderOrder = renderOrders.OBJECT_TRAIL;
-  if (fogBlendWithSkybox){
+  if (fogHandler.isFogBlendingWithSkybox()){
     material.uniforms.worldMatrix = new THREE.Uniform(mesh.matrixWorld);
     material.uniforms.cameraPosition = GLOBAL_CAMERA_POSITION_UNIFORM;
     material.uniforms.cubeTexture = GLOBAL_CUBE_TEXTURE_UNIFORM;
     macroHandler.injectMacro("HAS_SKYBOX_FOG", material, true, true);
   }
-  if (fogActive){
+  if (fogHandler.isFogActive()){
     material.uniforms.fogInfo = GLOBAL_FOG_UNIFORM;
     macroHandler.injectMacro("HAS_FOG", material, false, true);
   }
@@ -182,11 +182,13 @@ MeshGenerator.prototype.generateBasicMesh = function(){
   return mesh;
 }
 
-MeshGenerator.prototype.generateSkybox = function(skybox){
-  if (GLOBAL_CUBE_TEXTURE_UNIFORM){
+MeshGenerator.prototype.generateSkybox = function(skybox, isMock){
+  var cubeTextureUniform;
+  if (!isMock){
     GLOBAL_CUBE_TEXTURE_UNIFORM.value = skybox.cubeTexture;
+    cubeTextureUniform = GLOBAL_CUBE_TEXTURE_UNIFORM;
   }else{
-    GLOBAL_CUBE_TEXTURE_UNIFORM = new THREE.Uniform(skybox.cubeTexture);
+    cubeTextureUniform = new THREE.Uniform(skybox.cubeTexture);
   }
   var material = new THREE.RawShaderMaterial({
     vertexShader: ShaderContent.skyboxVertexShader,
@@ -196,11 +198,12 @@ MeshGenerator.prototype.generateSkybox = function(skybox){
     uniforms: {
       projectionMatrix: GLOBAL_PROJECTION_UNIFORM,
       modelViewMatrix: new THREE.Uniform(new THREE.Matrix4()),
-      cubeTexture: GLOBAL_CUBE_TEXTURE_UNIFORM,
+      cubeTexture: cubeTextureUniform,
       color: new THREE.Uniform(new THREE.Color(skybox.color))
     }
   });
   var mesh = new THREE.Mesh(this.geometry, material);
+  mesh.renderOrder = renderOrders.SKYBOX;
   material.uniforms.modelViewMatrix.value = mesh.modelViewMatrix;
   mesh.onBeforeRender = function(){
     webglCallbackHandler.onBeforeRender(skybox);
@@ -231,12 +234,12 @@ MeshGenerator.prototype.generateParticleSystemMesh = function(ps, texture, noTar
     ps.material.uniforms.projectionMatrix = GLOBAL_PROJECTION_UNIFORM;
     ps.material.uniforms.viewMatrix = GLOBAL_VIEW_UNIFORM;
   }
-  if (fogBlendWithSkybox && mode != 0){
+  if (fogHandler.isFogBlendingWithSkybox() && mode != 0){
     ps.material.uniforms.cameraPosition = GLOBAL_CAMERA_POSITION_UNIFORM;
     ps.material.uniforms.cubeTexture = GLOBAL_CUBE_TEXTURE_UNIFORM;
     macroHandler.injectMacro("HAS_SKYBOX_FOG", ps.material, true, true);
   }
-  if (fogActive && mode != 0){
+  if (fogHandler.isFogActive() && mode != 0){
     ps.material.uniforms.fogInfo = GLOBAL_FOG_UNIFORM;
     macroHandler.injectMacro("HAS_FOG", ps.material, false, true);
   }

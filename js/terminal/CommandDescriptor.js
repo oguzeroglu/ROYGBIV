@@ -57,7 +57,7 @@ var CommandDescriptor = function(){
       2, //mapNormal
       2, //mapEmissive
       2, //newLambertMaterial
-      3, //newTexturePack
+      1, //newTexturePack
       0, //printTexturePacks
       1, //printTexturePackInfo
       2, //mapTexturePack
@@ -70,7 +70,7 @@ var CommandDescriptor = function(){
       2, //postProcessing
       3, //sliceGrid
       5, //newPointLight
-      3, //newSkybox
+      1, //newSkybox
       0, //printSkyboxes
       1, //printSkyboxInfo
       1, //mapSkybox
@@ -152,7 +152,7 @@ var CommandDescriptor = function(){
       1, //noMobile
       2, //setMaxViewport
       1, //keepAspect
-      2, //newFont
+      1, //newFont
       1, //destroyFont
       0, //printFonts
       6, //newText
@@ -177,7 +177,15 @@ var CommandDescriptor = function(){
       2, //newMuzzleFlash
       1, //editMuzzleFlash
       1, //destroyMuzzleFlash
-      0 //printMuzzleFlashes
+      0, //printMuzzleFlashes
+      0, //unmapSkybox
+      1, //editSkybox
+      1, //editTexturePack
+      0, //fog
+      1, //newCrosshair
+      1, //editCrosshair
+      1, //destroyCrosshair
+      0 //printCrosshairs
   ];
 
   this.commandArgumentsExpectedExplanation = [
@@ -237,7 +245,7 @@ var CommandDescriptor = function(){
     "mapNormal textureName objectName",
     "mapEmissive textureName objectName",
     "newLambertMaterial name color",
-    "newTexturePack name directoryName fileExtension",
+    "newTexturePack name",
     "printTexturePacks",
     "printTexturePackInfo name",
     "mapTexturePack texturePackName objectName",
@@ -250,7 +258,7 @@ var CommandDescriptor = function(){
     "postProcessing effectName hide/show",
     "sliceGrid newName cellSize outlineColor",
     "newPointLight name color offsetX offsetY offsetZ",
-    "newSkybox name directory fileExtension",
+    "newSkybox name",
     "printSkyboxes",
     "printSkyboxInfo name",
     "mapSkybox name",
@@ -332,7 +340,7 @@ var CommandDescriptor = function(){
     "noMobile on/off",
     "setMaxViewport widthInPx heightInPx",
     "keepAspect ratio",
-    "newFont fontName path",
+    "newFont fontName",
     "destroyFont fontName",
     "printFonts",
     "newText textName fontName maxCharacterLength offsetX offsetY offsetZ",
@@ -357,7 +365,15 @@ var CommandDescriptor = function(){
     "newMuzzleFlash name refPSName",
     "editMuzzleFlash muzzleFlashName",
     "destroyMuzzleFlash muzzleFlashName",
-    "printMuzzleFlashes"
+    "printMuzzleFlashes",
+    "unmapSkybox",
+    "editSkybox skyboxName",
+    "editTexturePack texturePackName",
+    "fog",
+    "newCrosshair crosshairName",
+    "editCrosshair crosshairName",
+    "destroyCrosshair crosshairName",
+    "printCrosshairs"
   ];
 
   this.commands = [
@@ -537,7 +553,15 @@ var CommandDescriptor = function(){
     "newMuzzleFlash",
     "editMuzzleFlash",
     "destroyMuzzleFlash",
-    "printMuzzleFlashes"
+    "printMuzzleFlashes",
+    "unmapSkybox",
+    "editSkybox",
+    "editTexturePack",
+    "fog",
+    "newCrosshair",
+    "editCrosshair",
+    "destroyCrosshair",
+    "printCrosshairs"
   ];
 
   this.commandInfo = [
@@ -717,7 +741,15 @@ var CommandDescriptor = function(){
     "newMuzzleFlash: Creates a new MuzzleFlash object from given particle system in order to be used with FPS weapons.",
     "editMuzzleFlash: Shows the GUI for editing a muzzle flash.",
     "destroyMuzzleFlash: Destroys a muzzle flash.",
-    "printMuzzleFlashes: Prints created muzzleflashes."
+    "printMuzzleFlashes: Prints created muzzleflashes.",
+    "unmapSkybox: Removes the mapped skybox.",
+    "editScript: Opens the Skybox editing GUI.",
+    "editTexturePack: Opens the texture pack editing GUI.",
+    "fog: Opens the fog configuration GUI.",
+    "newCrosshair: Creates a new Crosshair object.",
+    "editCrosshair: Opens the Crosshair editing GUI.",
+    "destroyCrosshair: Destroys a Crosshair object.",
+    "printCrosshairs: Prints created crosshairs."
   ];
 
   this.keyboardInfo = [
@@ -732,6 +764,10 @@ var CommandDescriptor = function(){
   ];
 
   this.deprecatedCommandIndices = [
+    21, //newTexture -> Deprecated due to architectural changes in texture handling logic.
+    22, //printTextures -> Deprecated as newTexture is also deprecated.
+    23, //destroyTexture -> Deprecated as newTexture is also deprecated.
+    24, //mapTexture -> Deprecated due to architectural changes in texture handling logic.
     26, //newPhysicsBoxTest -> Deprecated due to lack of use cases. This command is implemented to test if the physics bodies fit the meshes. After the implementation of switchPhysicsDebugMode, this command is no longer needed.
     27, //newPhysicsSphereTest -> Deprecated due to lack of use cases. This command is implemented to test if the physics bodies fit the meshes. After the implementation of switchPhysicsDebugMode, this command is no longer needed.
     28, //printPhysicsTests -> Since box and sphere physics tests are deprecated, this command is no longer needed.
@@ -742,6 +778,8 @@ var CommandDescriptor = function(){
     42, //printImages -> Deprecated as uploadImage is also deprecated.
     43, //mapSpecular -> Specular maps are not supported for now.
     44, //mapEnvironment -> Deprecated due to lack of use cases of environment maps in the ROYGBIV engine. Will implement mirror materials for better visual effects.
+    45, //mapAmbientOcculsion -> Deprecated due to architectural changes in texture handling logic.
+    46, //mapAlpha -> Deprecated due to architectural changes in texture handling logic.
     47, //setDefaultMaterial -> Only BASIC materials are supported for now.
     48, //newAmbientLight -> Lights are not supported for now.
     49, //printLights -> Lights are not supported for now.
@@ -749,12 +787,21 @@ var CommandDescriptor = function(){
     51, //destroyLight -> Lights are not supported for now.
     52, //newPhongMaterial -> Phong materials are not supported for now.
     53, //mapNormal -> Normal maps are not supported for now.
+    54, //mapEmissive -> Deprecated due to architectural changes in texture handling logic.
     55, //newLambertMaterial -> Deprecated due to lack of uses cases. Phong is fine for light affected objects.
+    58, //printTexturePackInfo -> Deprecated due to architectural changes of texture pack handling.
+    61, //refreshTexturePack -> Deprecated due to architectural changes of texture pack handling.
+    62, //mapHeight -> Deprecated due to architectural changes int exture handling logic.
     65, //superposeGridSystem -> Deprecated due to lack of uses cases after grid selection mode implementation.
     68, //newPointLight -> Lights are not supported for now.
+    71, //printSkyboxInfo -> Deprecated due to lack of use cases after changes in Skybox creation logic.
+    74, //skybox -> Deprecated due to architectural changes in Skybox handling logic.
+    75, //scaleSkybox -> Deprecated due to lack of usecases.
     78, //undo -> Deprecated because causes memory issues for big projects.
     79, //redo -> Deprecated because causes memory issues for big projects.
     89, //translateObject -> Deprecated due to architectural conflicts. Objects can only be translated using animations. Instead of translating the object in the design mode, a new grid system should be created at the specific position. Every object should be associated with certain grids.
+    90, //setFog -> Deprecated due to architectural changes in fog creation process.
+    91, //removeFog -> Deprecated due to architectural changes in fog creation process.
     101, //physicsWorkerMode -> Physics workers are now always enabled if the web workers are supported.
     102, //printPhysicsWorkerMode -> Physics workers are now always enabled if the web workers are supported.
     105, //printPerformance -> Deprecated because calling performance.now() multiple times on each render is costly.
@@ -767,9 +814,12 @@ var CommandDescriptor = function(){
     120, //printParticleCollisionWorkerMode -> Workers will be re-implemented.
     121, //logFrameDrops -> No need for such functionality after the usage of Stats.js
     122, //addPaddingToTexture -> Deprecated due to lack of usecases.
+    124, //printFogInfo -> Deprecated due to architectural changes in fog creation process.
     125, //applyDisplacementMap -> Deprecated because causes problems with geometry caching.
     127, //setAtlasTextureSize -> Deprecated because has no use cases after deprecation of TextureMerger class
-    128 //printAtlasTextureSize -> Deprecated due to same reasons as setAtlasTextureSize
+    128, //printAtlasTextureSize -> Deprecated due to same reasons as setAtlasTextureSize
+    146, //skyboxConfigurations -> Deprecated due to architectural changes in Skybox creation process.
+    147 //fogConfigurations -> Deprecated due to architectural changes in fog creation process.
   ];
 
   if (this.commandInfo.length != this.commands.length){
@@ -795,14 +845,12 @@ var CommandDescriptor = function(){
   this.MATERIAL_NAME              =   5;
   this.MATERIAL_NAME_WITH_NULL    =   6;
   this.OBJECT_NAME                =   7;
-  this.TEXTURE_NAME               =   9;
   this.OBJECT_AXIS                =   10;
   this.PHYSICS_TEST_INDEX         =   11;
   this.STATE_ON_OFF               =   12;
   this.S_T_ST                     =   13;
   this.WALL_COLLECTION_NAME       =   14;
   this.DEFAULT_MATERIAL_TYPE      =   15;
-  this.FILE_EXTENSION             =   16;
   this.TEXTURE_PACK_NAME          =   17;
   this.HIDE_SHOW                  =   18;
   this.SKYBOX_NAME                =   29;
@@ -824,6 +872,7 @@ var CommandDescriptor = function(){
   this.PRECONFIGURED_PS_NAME      =   35;
   this.PRECONFOGURED_PS_POOL_NAME =   36;
   this.MUZZLE_FLASH_NAME          =   37;
+  this.CROSSHAIR_NAME             =   38;
 
   // newGridSystem
   this.newGridSystem = new Object();
@@ -890,23 +939,6 @@ var CommandDescriptor = function(){
   this.destroyObject.types = [];
   this.destroyObject.types.push(this.OBJECT_NAME); //name
 
-  // newTexture
-  this.newTexture = new Object();
-  this.newTexture.types = [];
-  this.newTexture.types.push(this.UNKNOWN_INDICATOR); //name
-  this.newTexture.types.push(this.UNKNOWN_INDICATOR); //fileName
-
-  // destroyTexture
-  this.destroyTexture = new Object();
-  this.destroyTexture.types = [];
-  this.destroyTexture.types.push(this.TEXTURE_NAME); //name
-
-  // mapTexture
-  this.mapTexture = new Object();
-  this.mapTexture.types = [];
-  this.mapTexture.types.push(this.TEXTURE_NAME); //textureName
-  this.mapTexture.types.push(this.OBJECT_NAME); // objectName
-
   // adjustTextureRepeat
   this.adjustTextureRepeat = new Object();
   this.adjustTextureRepeat.types = [];
@@ -948,35 +980,10 @@ var CommandDescriptor = function(){
   this.destroyWallCollection.types = [];
   this.destroyWallCollection.types.push(this.WALL_COLLECTION_NAME); //name
 
-  // mapAmbientOcculsion
-  this.mapAmbientOcculsion = new Object();
-  this.mapAmbientOcculsion.types = [];
-  this.mapAmbientOcculsion.types.push(this.TEXTURE_NAME); //textureName
-  this.mapAmbientOcculsion.types.push(this.OBJECT_NAME); //objectName
-
-  // mapAlpha
-  this.mapAlpha = new Object();
-  this.mapAlpha.types = [];
-  this.mapAlpha.types.push(this.TEXTURE_NAME); //textureName
-  this.mapAlpha.types.push(this.OBJECT_NAME); //objectName
-
-  // mapEmissive
-  this.mapEmissive = new Object();
-  this.mapEmissive.types = [];
-  this.mapEmissive.types.push(this.TEXTURE_NAME); //textureName
-  this.mapEmissive.types.push(this.OBJECT_NAME); //objectName
-
   // newTexturePack
   this.newTexturePack = new Object();
   this.newTexturePack.types = [];
   this.newTexturePack.types.push(this.UNKNOWN_INDICATOR); //name
-  this.newTexturePack.types.push(this.UNKNOWN_INDICATOR); //directoryName
-  this.newTexturePack.types.push(this.FILE_EXTENSION); //fileExtension
-
-  // printTexturePackInfo
-  this.printTexturePackInfo = new Object();
-  this.printTexturePackInfo.types = [];
-  this.printTexturePackInfo.types.push(this.TEXTURE_PACK_NAME); //name
 
   // mapTexturePack
   this.mapTexturePack = new Object();
@@ -988,17 +995,6 @@ var CommandDescriptor = function(){
   this.destroyTexturePack = new Object();
   this.destroyTexturePack.types = [];
   this.destroyTexturePack.types.push(this.TEXTURE_PACK_NAME); //name
-
-  // refreshTexturePack
-  this.refreshTexturePack = new Object();
-  this.refreshTexturePack.types = [];
-  this.refreshTexturePack.types.push(this.TEXTURE_PACK_NAME); //name
-
-  // mapHeight
-  this.mapHeight = new Object();
-  this.mapHeight.types = [];
-  this.mapHeight.types.push(this.TEXTURE_NAME); //textureName
-  this.mapHeight.types.push(this.OBJECT_NAME); //objectName
 
   // resetMaps
   this.resetMaps = new Object();
@@ -1028,13 +1024,6 @@ var CommandDescriptor = function(){
   this.newSkybox = new Object();
   this.newSkybox.types = [];
   this.newSkybox.types.push(this.UNKNOWN_INDICATOR); //name
-  this.newSkybox.types.push(this.UNKNOWN_INDICATOR); //directory
-  this.newSkybox.types.push(this.FILE_EXTENSION); //fileExtension
-
-  // printSkyboxInfo
-  this.printSkyboxInfo = new Object();
-  this.printSkyboxInfo.types = [];
-  this.printSkyboxInfo.types.push(this.SKYBOX_NAME); //name
 
   // mapSkybox
   this.mapSkybox = new Object();
@@ -1045,16 +1034,6 @@ var CommandDescriptor = function(){
   this.destroySkybox = new Object();
   this.destroySkybox.types = [];
   this.destroySkybox.types.push(this.SKYBOX_NAME); //name
-
-  // skybox
-  this.skybox = new Object();
-  this.skybox.types = [];
-  this.skybox.types.push(this.HIDE_SHOW); //hide/show
-
-  // scaleSkybox
-  this.scaleSkybox = new Object();
-  this.scaleSkybox.types = [];
-  this.scaleSkybox.types.push(this.UNKNOWN_INDICATOR); //amount
 
   // selectObject
   this.selectObject = new Object();
@@ -1098,12 +1077,6 @@ var CommandDescriptor = function(){
   this.destroyScript = new Object();
   this.destroyScript.types = [];
   this.destroyScript.types.push(this.SCRIPT_NAME); //nane
-
-  // setFog
-  this.setFog = new Object();
-  this.setFog.types = [];
-  this.setFog.types.push(this.COLOR); //fogColor
-  this.setFog.types.push(this.UNKNOWN_INDICATOR); //fogDensity
 
   // glue
   this.glue = new Object();
@@ -1279,16 +1252,6 @@ var CommandDescriptor = function(){
   this.build.types.push(this.UNKNOWN_INDICATOR); // projectName
   this.build.types.push(this.UNKNOWN_INDICATOR); // author
 
-  // skyboxConfigurations
-  this.skyboxConfigurations = new Object();
-  this.skyboxConfigurations.types = [];
-  this.skyboxConfigurations.types.push(this.HIDE_SHOW); // hide/show
-
-  // fogConfigurations
-  this.fogConfigurations = new Object();
-  this.fogConfigurations.types = [];
-  this.fogConfigurations.types.push(this.HIDE_SHOW); // hide/show
-
   // noMobile
   this.noMobile = new Object();
   this.noMobile.types = [];
@@ -1309,7 +1272,6 @@ var CommandDescriptor = function(){
   this.newFont = new Object();
   this.newFont.types = [];
   this.newFont.types.push(this.UNKNOWN_INDICATOR); // fontName
-  this.newFont.types.push(this.UNKNOWN_INDICATOR); // path
 
   // destroyFont
   this.destroyFont = new Object();
@@ -1411,6 +1373,31 @@ var CommandDescriptor = function(){
   this.destroyMuzzleFlash = new Object();
   this.destroyMuzzleFlash.types = [];
   this.destroyMuzzleFlash.types.push(this.MUZZLE_FLASH_NAME); // muzzleFlashName
+
+  // editSkybox
+  this.editSkybox = new Object();
+  this.editSkybox.types = [];
+  this.editSkybox.types.push(this.SKYBOX_NAME); //skyboxName
+
+  // editTexturePack
+  this.editTexturePack = new Object();
+  this.editTexturePack.types = [];
+  this.editTexturePack.types.push(this.TEXTURE_PACK_NAME); //texturePackName
+
+  // newCrosshair
+  this.newCrosshair = new Object();
+  this.newCrosshair.types = [];
+  this.newCrosshair.types.push(this.UNKNOWN_INDICATOR); //crosshairName
+
+  // editCrosshair
+  this.editCrosshair = new Object();
+  this.editCrosshair.types = [];
+  this.editCrosshair.types.push(this.CROSSHAIR_NAME); //crosshairName
+
+  // destroyCrosshair
+  this.destroyCrosshair = new Object();
+  this.destroyCrosshair.types = [];
+  this.destroyCrosshair.types.push(this.CROSSHAIR_NAME); //crosshairName
 };
 
 CommandDescriptor.prototype.test = function(){

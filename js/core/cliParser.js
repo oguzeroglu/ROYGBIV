@@ -595,228 +595,16 @@ function parse(input){
           return true;
         break;
         case 21: //newTexture
-          var textureName = splitted[1];
-          if (mode != 0){
-            terminal.printError(Text.WORKS_ONLY_IN_DESIGN_MODE);
-            return true;
-          }
-          if (textures[textureName]){
-            terminal.printError(Text.TEXTURE_NAME_MUST_BE_UNIQUE);
-            return true;
-          }
-          if (textureName.indexOf(PIPE) != -1){
-            terminal.printError(Text.TEXTURE_NAME_NOT_VALID);
-            return true;
-          }
-          var fileName = splitted[2];
-          var textureUrl = "textures/"+fileName;
-          var texture;
-          var found = false;
-          var compressionSupportIssue = false;
-          for (var textureNameX in textureURLs){
-            if (textureURLs[textureNameX] == textureUrl){
-              if (textures[textureNameX] && textures[textureNameX].isLoaded){
-                found = true;
-                texture = textures[textureNameX];
-                texture.wrapS = THREE.RepeatWrapping;
-                texture.wrapT = THREE.RepeatWrapping;
-                texture.needsUpdate = true;
-                textures[textureName] = texture;
-                texture.isLoaded = true;
-              }
-            }
-          }
-          textureURLs[textureName] = textureUrl;
-          if (!found){
-            var loader;
-            if (textureUrl.toUpperCase().endsWith("DDS")){
-              if (!DDS_SUPPORTED){
-                textureUrl = textureUrl.replace(
-                  ".dds", compressedTextureFallbackFormat
-                ).replace(
-                  ".DDS", compressedTextureFallbackFormat
-                );
-                loader = textureLoader;
-                compressionSupportIssue = true;
-              }else{
-                loader = ddsLoader;
-              }
-            }else if (textureUrl.toUpperCase().endsWith("TGA")){
-              loader = tgaLoader;
-            }else{
-              loader = textureLoader;
-            }
-            loader.load(textureUrl,
-              function (textureData){
-                texture = textureData;
-                texture.wrapS = THREE.RepeatWrapping;
-                texture.wrapT = THREE.RepeatWrapping;
-                texture.isLoaded = true;
-                textures[textureName] = texture;
-              },
-              function (xhr){
-                textures[textureName] = 2;
-              },
-              function (xhr){
-                textures[textureName] =  3;
-              }
-            );
-            textures[textureName] = 1;
-          }else{
-            terminal.printInfo(Text.TEXTURE_CLONED);
-          }
-          if (!compressionSupportIssue){
-            terminal.printInfo(Text.TEXTURE_CREATED);
-          }else {
-            terminal.printInfo(Text.TEXTURE_CREATED_DDS_SUPPORT_ISSUE);
-          }
+          // DEPRECATED
         break;
         case 22: //printTextures
-          var count = 0;
-          var length = Object.keys(textures).length;
-          terminal.printHeader(Text.TEXTURES);
-          for (var textureName in textures){
-            count ++;
-            var texture = textures[textureName];
-            var status;
-            var sizeText = "";
-            if (texture == 1){
-              status = Text.STATUS_PENDING;
-            }else if (texture == 2){
-              status = Text.STATUS_DOWNLOADING;
-            }else if (texture == 3){
-              status = Text.STATUS_ERROR;
-            }else if (texture && texture.isLoaded){
-              status = Text.STATUS_LOADED;
-            }
-
-            if (!(typeof texture == "undefined") && texture instanceof THREE.Texture){
-              sizeText = " [" + texture.image.width + "x" + texture.image.height + "]";
-            }
-            var options = true;
-            if (count == length){
-              options = false;
-            }
-            terminal.printInfo(Text.TREE_TEXTURE.replace(
-              Text.PARAM1, textureName
-            ).replace(
-              Text.PARAM2, status
-            ).replace(
-              Text.PARAM3, textureURLs[textureName] + sizeText
-            ), options);
-          }
-          if (count == 0){
-            terminal.printError(Text.THERE_ARE_NO_TEXTURES);
-          }
-          return true;
+          // DEPRECATED
         break;
         case 23: //destroyTexture
-          var textureName = splitted[1];
-          var texture = textures[textureName];
-          if (mode != 0){
-            terminal.printError(Text.WORKS_ONLY_IN_DESIGN_MODE);
-            return true;
-          }
-          if (!(textureName.indexOf("*") == -1)){
-            new JobHandler(splitted).handle();
-            return true;
-          }
-          if (!texture){
-            terminal.printError(Text.NO_SUCH_TEXTURE);
-            return true;
-          }
-          for (var addedObjectName in addedObjects){
-            var addedObject = addedObjects[addedObjectName];
-            if (addedObject.isTextureUsed(textureName)){
-              terminal.printError(Text.TEXTURE_USED_IN_AN_OBJECT.replace(Text.PARAM1, addedObjectName));
-              return true;
-            }
-          }
-          for (var objectGroupName in objectGroups){
-            var objectGroup = objectGroups[objectGroupName];
-            var group = objectGroup.group;
-            for (var objectName in group){
-              var childObject = group[objectName];
-              if (childObject.isTextureUsed(textureName)){
-                terminal.printError(Text.TEXTURE_USED_IN_AN_OBJECT.replace(Text.PARAM1, objectGroupName + "->" + objectName));
-                return true;
-              }
-            }
-          }
-          for (var psName in preConfiguredParticleSystems){
-            var params = preConfiguredParticleSystems[psName].params;
-            if (!(typeof params.textureName == UNDEFINED)){
-              if (params.textureName == textureName){
-                terminal.printError(Text.TEXTURE_USED_IN_A_PARTICLE_SYSTEM.replace(Text.PARAM1, psName));
-                return true;
-              }
-            }
-            if (!(typeof params.texture == UNDEFINED)){
-              if (params.texture == textureName){
-                terminal.printError(Text.TEXTURE_USED_IN_A_PARTICLE_SYSTEM.replace(Text.PARAM1, psName));
-                return true;
-              }
-            }
-          }
-          if (textures[textureName] instanceof THREE.Texture){
-            textures[textureName].dispose();
-          }
-          delete textures[textureName];
-          delete textureURLs[textureName];
-          if (!jobHandlerWorking){
-            terminal.printInfo(Text.TEXTURE_DESTROYED);
-          }
-          return true;
+          // DEPRECATED
         break;
         case 24: //mapTexture
-          var textureName = splitted[1];
-          var objectName = splitted[2];
-          var texture = textures[textureName];
-          if (mode != 0){
-            terminal.printError(Text.WORKS_ONLY_IN_DESIGN_MODE);
-            return true;
-          }
-          if (!(objectName.indexOf("*") == -1)){
-            new JobHandler(splitted).handle();
-            return true;
-          }
-          if (!texture){
-            terminal.printError(Text.NO_SUCH_TEXTURE);
-            return true;
-          }
-          if (!texture || !texture.isLoaded){
-            terminal.printError(Text.TEXTURE_NOT_READY);
-            return true;
-          }
-          var addedObject = addedObjects[objectName];
-          if (objectGroups[objectName]){
-            terminal.printError(Text.CANNOT_MAP_TEXTURE_TO_A_GLUED_OBJECT);
-            return true;
-          }
-          if (!addedObject){
-            terminal.printError(Text.NO_SUCH_OBJECT);
-            return true;
-          }
-
-          var cloneTexture = texture;
-
-          cloneTexture.roygbivTextureName = textureName;
-          cloneTexture.roygbivTexturePackName = 0;
-
-          addedObject.mapDiffuse(cloneTexture);
-
-          cloneTexture.needsUpdate = true;
-
-          addedObject.metaData["textureRepeatU"] = cloneTexture.repeat.x;
-          addedObject.metaData["textureRepeatV"] = cloneTexture.repeat.y;
-
-          cloneTexture.wrapS = THREE.RepeatWrapping;
-          cloneTexture.wrapT = THREE.RepeatWrapping;
-
-          addedObject.resetAssociatedTexturePack();
-          if (!jobHandlerWorking){
-            terminal.printInfo(Text.TEXTURE_MAPPED);
-          }
+          // DEPRECATED
         break;
         case 25: //adjustTextureRepeat
           var objectName = splitted[1];
@@ -828,12 +616,10 @@ function parse(input){
             terminal.printError(Text.WORKS_ONLY_IN_DESIGN_MODE);
             return true;
           }
-
           if (!(objectName.indexOf("*") == -1)){
             new JobHandler(splitted).handle();
             return true;
           }
-
           if (objectGroups[objectName]){
             terminal.printError(Text.GLUED_OBJECTS_DO_NOT_SUPPORT_THIS_FUNCTION);
             return true;
@@ -843,7 +629,6 @@ function parse(input){
             terminal.printError(Text.NO_SUCH_OBJECT);
             return true;
           }
-
           repeatU = parseInt(repeatU);
           repeatV = parseInt(repeatV);
           if (isNaN(repeatU)){
@@ -1356,98 +1141,10 @@ function parse(input){
           // DEPRECATED
         break;
         case 45: //mapAmbientOcculsion
-          var textureName = splitted[1];
-          var objectName = splitted[2];
-          var texture = textures[textureName];
-          if (mode != 0){
-            terminal.printError(Text.WORKS_ONLY_IN_DESIGN_MODE);
-            return true;
-          }
-          if (!(objectName.indexOf("*") == -1)){
-            new JobHandler(splitted).handle();
-            return true;
-          }
-          if (objectGroups[objectName]){
-            terminal.printError(Text.GLUED_OBJECTS_DO_NOT_SUPPORT_THIS_FUNCTION);
-            return true;
-          }
-          if (!texture){
-            terminal.printError(Text.NO_SUCH_TEXTURE);
-            return true;
-          }
-          if (!texture || !texture.isLoaded){
-            terminal.printError(Text.TEXTURE_NOT_READY);
-            return true;
-          }
-          var addedObject = addedObjects[objectName];
-          if (!addedObject){
-            terminal.printError(Text.NO_SUCH_OBJECT);
-            return true;
-          }
-
-          var cloneTexture = texture;
-
-          cloneTexture.roygbivTextureName = textureName;
-          cloneTexture.roygbivTexturePackName = 0;
-
-          cloneTexture.wrapS = THREE.RepeatWrapping;
-          cloneTexture.wrapT = THREE.RepeatWrapping;
-
-          addedObject.mapAO(cloneTexture);
-
-          cloneTexture.needsUpdate = true;
-
-          addedObject.resetAssociatedTexturePack();
-          if (!jobHandlerWorking){
-            terminal.printInfo(Text.AMBIENT_OCCULSION_TEXTURE_MAPPED);
-          }
+          // DEPRECATED
         break;
         case 46: //mapAlpha
-          var textureName = splitted[1];
-          var objectName = splitted[2];
-          var texture = textures[textureName];
-          if (mode != 0){
-            terminal.printError(Text.WORKS_ONLY_IN_DESIGN_MODE);
-            return true;
-          }
-          if (!(objectName.indexOf("*") == -1)){
-            new JobHandler(splitted).handle();
-            return true;
-          }
-          if (objectGroups[objectName]){
-            terminal.printError(Text.GLUED_OBJECTS_DO_NOT_SUPPORT_THIS_FUNCTION);
-            return true;
-          }
-          if (!texture){
-            terminal.printError(Text.NO_SUCH_TEXTURE);
-            return true;
-          }
-          if (!texture || !texture.isLoaded){
-            terminal.printError(Text.TEXTURE_NOT_READY);
-            return true;
-          }
-          var addedObject = addedObjects[objectName];
-          if (!addedObject){
-            terminal.printError(Text.NO_SUCH_OBJECT);
-            return true;
-          }
-
-          var cloneTexture = texture;
-
-          cloneTexture.roygbivTextureName = textureName;
-          cloneTexture.roygbivTexturePackName = 0;
-
-          addedObject.mapAlpha(cloneTexture);
-
-          cloneTexture.wrapS = THREE.RepeatWrapping;
-          cloneTexture.wrapT = THREE.RepeatWrapping;
-
-          cloneTexture.needsUpdate = true;
-
-          addedObject.resetAssociatedTexturePack();
-          if (!jobHandlerWorking){
-            terminal.printInfo(Text.ALPHA_TEXTURE_MAPPED);
-          }
+          // DEPRECATED
         break;
         case 47: //setDefaultMaterial
           // DEPRECATED
@@ -1471,91 +1168,43 @@ function parse(input){
           // DEPRECATED
         break;
         case 54: //mapEmissive
-          var textureName = splitted[1];
-          var objectName = splitted[2];
-          var texture = textures[textureName];
-          if (mode != 0){
-            terminal.printError(Text.WORKS_ONLY_IN_DESIGN_MODE);
-            return true;
-          }
-          if (!(objectName.indexOf("*") == -1)){
-            new JobHandler(splitted).handle();
-            return true;
-          }
-          if (objectGroups[objectName]){
-            terminal.printError(Text.GLUED_OBJECTS_DO_NOT_SUPPORT_THIS_FUNCTION);
-            return true;
-          }
-          if (!texture){
-            terminal.printError(Text.NO_SUCH_TEXTURE);
-            return true;
-          }
-          if (!texture || !texture.isLoaded){
-            terminal.printError(Text.TEXTURE_NOT_READY);
-            return true;
-          }
-          var addedObject = addedObjects[objectName];
-          if (!addedObject){
-            terminal.printError(Text.NO_SUCH_OBJECT);
-            return true;
-          }
-
-          var cloneTexture = texture;
-
-          cloneTexture.roygbivTextureName = textureName;
-          cloneTexture.roygbivTexturePackName = 0;
-
-          cloneTexture.wrapS = THREE.RepeatWrapping;
-          cloneTexture.wrapT = THREE.RepeatWrapping;
-
-          addedObject.mapEmissive(cloneTexture);
-
-          cloneTexture.needsUpdate = true;
-
-          addedObject.resetAssociatedTexturePack();
-          if (!jobHandlerWorking){
-            terminal.printInfo(Text.EMISSIVE_TEXTURE_MAPPED);
-          }
+          // DEPRECATED
         break;
         case 55: //newLambertMaterial
           //DEPRECATED
         break;
         case 56: //newTexturePack
-          var name = splitted[1];
-          var directoryName = splitted[2];
-          var fileExtension = splitted[3];
-
           if (mode != 0){
             terminal.printError(Text.WORKS_ONLY_IN_DESIGN_MODE);
             return true;
           }
-
-          if (texturePacks[name]){
+          var texturePackName = splitted[1];
+          if (texturePacks[texturePackName]){
             terminal.printError(Text.NAME_MUST_BE_UNIQUE);
             return true;
           }
-
-          if (directoryName.trim() == ""){
-            terminal.printError(Text.DIRECTORY_NAME_CANNOT_BE_EMPTY);
-            return true;
+          terminal.printInfo(Text.LOADING);
+          canvas.style.visibility = "hidden";
+          terminal.disable();
+          var xhr = new XMLHttpRequest();
+          xhr.open("POST", "/getTexturePackFolders", true);
+          xhr.setRequestHeader("Content-type", "application/json");
+          xhr.onreadystatechange = function (){
+            if (xhr.readyState == 4 && xhr.status == 200){
+              var folders = JSON.parse(xhr.responseText);
+              canvas.style.visibility = "";
+              terminal.clear();
+              if (folders.length == 0){
+                terminal.enable();
+                terminal.printError(Text.NO_VALID_TEXTURE_PACK_FOLDER);
+              }else{
+                terminal.disable();
+                terminal.printInfo(Text.AFTER_TEXTURE_PACK_CREATION);
+                texturePackCreatorGUIHandler.show(texturePackName, folders);
+              }
+            }
           }
-
-          if (fileExtension.trim() == ""){
-            terminal.printError(Text.FILE_EXTENSION_CANNOT_BE_EMPTY);
-            return true;
-          }
-
-          var texturePack = new TexturePack(
-            name,
-            directoryName,
-            fileExtension
-          );
-          texturePacks[name] = texturePack;
-          if (!DDS_SUPPORTED && fileExtension.toUpperCase() == "DDS"){
-            terminal.printInfo(Text.TEXTURE_CREATED_DDS_SUPPORT_ISSUE);
-          }else{
-            terminal.printInfo(Text.TEXTURE_PACK_CREATED);
-          }
+          xhr.send();
           return true;
         break;
         case 57: //printTexturePacks
@@ -1568,10 +1217,7 @@ function parse(input){
             if (count == length){
               options = false;
             }
-            terminal.printInfo(
-              Text.TREE.replace(Text.PARAM1, texturePackName),
-              options
-            );
+            terminal.printInfo(Text.TREE2.replace(Text.PARAM1, texturePackName).replace(Text.PARAM2, texturePacks[texturePackName].directoryName), options);
           }
           if (count == 0){
             terminal.printError(Text.NO_TEXTURE_PACKS_CREATED);
@@ -1579,51 +1225,33 @@ function parse(input){
           return true;
         break;
         case 58: //printTexturePackInfo
-          var name = splitted[1];
-          var texturePack = texturePacks[name];
-          if (!texturePack){
-            terminal.printError(Text.NO_SUCH_TEXTURE_PACK);
-            return true;
-          }
-          texturePack.printInfo();
-          return true;
+          // DEPRECATED
         break;
         case 59: //mapTexturePack
           var texturePackName = splitted[1];
           var objectName = splitted[2];
           var texturePack = texturePacks[texturePackName];
           var addedObject = addedObjects[objectName];
-
           if (mode != 0){
             terminal.printError(Text.WORKS_ONLY_IN_DESIGN_MODE);
             return true;
           }
-
           if (!(objectName.indexOf("*") == -1)){
             new JobHandler(splitted).handle();
             return true;
           }
-
           if (objectGroups[objectName]){
             terminal.printError(Text.GLUED_OBJECTS_DO_NOT_SUPPORT_THIS_FUNCTION);
             return true;
           }
-
           if (!texturePack){
             terminal.printError(Text.NO_SUCH_TEXTURE_PACK);
             return true;
           }
-
           if (!addedObject){
             terminal.printError(Text.NO_SUCH_OBJECT);
             return true;
           }
-
-          if (!texturePack.isUsable()){
-            terminal.printError(Text.TEXTURE_PACK_NOT_USABLE);
-            return true;
-          }
-
           addedObject.mapTexturePack(texturePack);
           if (!jobHandlerWorking){
             terminal.printInfo(Text.TEXTURE_PACK_MAPPED);
@@ -1633,7 +1261,6 @@ function parse(input){
         case 60: //destroyTexturePack
           var name = splitted[1];
           var texturePack = texturePacks[name];
-
           if (mode != 0){
             terminal.printError(Text.WORKS_ONLY_IN_DESIGN_MODE);
             return true;
@@ -1664,82 +1291,47 @@ function parse(input){
               }
             }
           }
+          if (texturePack.isParticleTexture){
+            for (var psName in preConfiguredParticleSystems){
+              var usedTextureName = preConfiguredParticleSystems[psName].getUsedTextureName();
+              if (usedTextureName != null && usedTextureName == texturePack.name){
+                terminal.printError(Text.TEXTURE_PACK_USED_IN_A_PARTICLE_SYSTEM.replace(Text.PARAM1, psName));
+                return true;
+              }
+            }
+          }
+          for (var crosshairName in crosshairs){
+            if (crosshairs[crosshairName].configurations.texture == texturePack.name){
+              terminal.printError(Text.TEXTURE_PACK_USED_IN_A_CROSSHAIR.replace(Text.PARAM1, crosshairName));
+              return true;
+            }
+          }
           texturePack.destroy();
           if (!jobHandlerWorking){
-            terminal.printInfo(Text.TEXTURE_PACK_DESTROYED);
+            if (!texturePack.isParticleTexture){
+              terminal.printInfo(Text.TEXTURE_PACK_DESTROYED);
+            }else{
+              terminal.clear();
+              terminal.disable();
+              terminal.printInfo(Text.GENERATING_TEXTURE_ATLAS);
+              textureAtlasHandler.onTexturePackChange(function(){
+                terminal.clear();
+                terminal.enable();
+                terminal.print(Text.SKYBOX_DESTROYED);
+              }, function(){
+                terminal.clear();
+                terminal.printError(Text.ERROR_HAPPENED_COMPRESSING_TEXTURE_ATLAS);
+                terminal.enable();
+              }, false);
+            }
           }
           return true;
         break;
         case 61: //refreshTexturePack
-          var name = splitted[1];
-          var texturePack = texturePacks[name];
-          if (mode != 0){
-            terminal.printError(Text.WORKS_ONLY_IN_DESIGN_MODE);
-            return true;
-          }
-          if (!(name.indexOf("*") == -1)){
-            new JobHandler(splitted).handle();
-            return true;
-          }
-          if (!texturePack){
-            terminal.printError(Text.NO_SUCH_TEXTURE_PACK);
-            return true;
-          }
-          texturePack.refresh();
-          if (!jobHandlerWorking){
-            terminal.printInfo(Text.TEXTURE_PACK_REFRESHED);
-          }
-          return true;
+          // DEPRECATED
         break;
         case 62: //mapHeight
-          var textureName = splitted[1];
-          var objectName = splitted[2];
-          var texture = textures[textureName];
-          if (mode != 0){
-            terminal.printError(Text.WORKS_ONLY_IN_DESIGN_MODE);
-            return true;
-          }
-          if (!(objectName.indexOf("*") == -1)){
-            new JobHandler(splitted).handle();
-            return true;
-          }
-          if (objectGroups[objectName]){
-            terminal.printError(Text.GLUED_OBJECTS_DO_NOT_SUPPORT_THIS_FUNCTION);
-            return true;
-          }
-          if (!texture){
-            terminal.printError(Text.NO_SUCH_TEXTURE);
-            return true;
-          }
-          if (!texture || !texture.isLoaded){
-            terminal.printError(Text.TEXTURE_NOT_READY);
-            return true;
-          }
-          var addedObject = addedObjects[objectName];
-          if (!addedObject){
-            terminal.printError(Text.NO_SUCH_OBJECT);
-            return true;
-          }
-
-          if (addedObject.metaData["widthSegments"] == 1){
-            addedObject.segmentGeometry(false, undefined);
-          }
-
-          var cloneTexture = texture;
-
-          cloneTexture.roygbivTextureName = textureName;
-          cloneTexture.roygbivTexturePackName = 0;
-
-          cloneTexture.wrapS = THREE.RepeatWrapping;
-          cloneTexture.wrapT = THREE.RepeatWrapping;
-
-          addedObject.mapDisplacement(cloneTexture);
-          cloneTexture.needsUpdate = true;
-
-          addedObject.resetAssociatedTexturePack();
-          if (!jobHandlerWorking){
-            terminal.printInfo(Text.HEIGHT_TEXTURE_MAPPED);
-          }
+          // DEPRECATED
         break;
         case 63: //resetMaps
           var name = splitted[1];
@@ -1900,37 +1492,37 @@ function parse(input){
           // DEPRECATED
         break;
         case 69: //newSkybox
-          var name = splitted[1];
-          var directoryName = splitted[2];
-          var fileExtension = splitted[3];
-
           if (mode != 0){
             terminal.printError(Text.WORKS_ONLY_IN_DESIGN_MODE);
             return true;
           }
-
-          if (skyBoxes[name]){
+          var skyboxName = splitted[1];
+          if (skyBoxes[skyboxName]){
             terminal.printError(Text.NAME_MUST_BE_UNIQUE);
             return true;
           }
-
-          if (directoryName.trim() == ""){
-            terminal.printError(Text.DIRECTORY_NAME_CANNOT_BE_EMPTY);
-            return true;
+          terminal.printInfo(Text.LOADING);
+          canvas.style.visibility = "hidden";
+          terminal.disable();
+          var xhr = new XMLHttpRequest();
+          xhr.open("POST", "/getSkyboxFolders", true);
+          xhr.setRequestHeader("Content-type", "application/json");
+          xhr.onreadystatechange = function (){
+            if (xhr.readyState == 4 && xhr.status == 200){
+              var folders = JSON.parse(xhr.responseText);
+              canvas.style.visibility = "";
+              terminal.clear();
+              if (folders.length == 0){
+                terminal.enable();
+                terminal.printError(Text.NO_VALID_SKYBOX_FOLDER);
+              }else{
+                terminal.disable();
+                terminal.printInfo(Text.AFTER_SKYBOX_CREATION);
+                skyboxCreatorGUIHandler.show(skyboxName, folders);
+              }
+            }
           }
-
-          if (fileExtension.trim() == ""){
-            terminal.printError(Text.FILE_EXTENSION_CANNOT_BE_EMPTY);
-            return true;
-          }
-
-          var skyBox = new SkyBox(name, directoryName, fileExtension, "#ffffff");
-          skyBoxes[name] = skyBox;
-          if (!DDS_SUPPORTED && fileExtension.toUpperCase() == "DDS"){
-            terminal.printInfo(Text.TEXTURE_CREATED_DDS_SUPPORT_ISSUE);
-          }else{
-            terminal.printInfo(Text.SKYBOX_CREATED);
-          }
+          xhr.send();
           return true;
         break;
         case 70: //printSkyboxes
@@ -1943,9 +1535,7 @@ function parse(input){
             if (length == count){
               options = false;
             }
-            terminal.printInfo(Text.TREE.replace(
-              Text.PARAM1, skyboxName
-            ), options);
+            terminal.printInfo(Text.TREE2.replace(Text.PARAM1, skyboxName).replace(Text.PARAM2, skyBoxes[skyboxName].directoryName), options);
           }
           if (count == 0){
             terminal.printError(Text.NO_SKYBOXES_CREATED);
@@ -1953,68 +1543,30 @@ function parse(input){
           return true;
         break;
         case 71: //printSkyboxInfo
-          var name = splitted[1];
-          var skybox = skyBoxes[name];
-          if (!skybox){
-            terminal.printError(Text.NO_SUCH_SKYBOX);
-            return true;
-          }
-          skybox.printInfo();
-          return true;
+          // DEPRECATED
         break;
         case 72: //mapSkybox
-          var name = splitted[1];
-          var skybox = skyBoxes[name];
-
           if (mode != 0){
             terminal.printError(Text.WORKS_ONLY_IN_DESIGN_MODE);
             return true;
           }
+          var name = splitted[1];
+          var skybox = skyBoxes[name];
           if (!skybox){
             terminal.printError(Text.NO_SUCH_SKYBOX);
             return true;
           }
-          if (!skybox.isUsable()){
-            terminal.printError(Text.SKYBOX_NOT_USABLE);
-            return true;
-          }
-          if (!skyboxMesh){
-            var geomKey = (
-              "BoxBufferGeometry" + PIPE +
-              skyboxDistance + PIPE + skyboxDistance + PIPE + skyboxDistance + PIPE +
-              "1" + PIPE + "1" + PIPE + "1"
-            );
-            var skyboxBufferGeometry = geometryCache[geomKey];
-            if (!skyboxBufferGeometry){
-              skyboxBufferGeometry = new THREE.BoxBufferGeometry(skyboxDistance, skyboxDistance, skyboxDistance);
-              geometryCache[geomKey] = skyboxBufferGeometry;
-            }
-            skyboxMesh = new MeshGenerator(skyboxBufferGeometry, null).generateSkybox(skybox);
-          }else{
-            skyboxMesh.material.uniforms.cubeTexture.value = skybox.cubeTexture;
-            skyboxMesh.material.uniforms.color.value.set(skybox.color);
-          }
-          scene.add(skyboxMesh);
-          skyboxVisible = true;
-          mappedSkyboxName = name;
-          if (guiHandler.skyboxParameters){
-            guiHandler.skyboxParameters["Name"] = mappedSkyboxName;
-            guiHandler.skyboxParameters["Color"] = "#" + skyboxMesh.material.uniforms.color.value.getHexString();
-          }
-          skyboxMesh.renderOrder = renderOrders.SKYBOX;
-          if (bloom){
-            bloom.onSkyboxVisibilityChange();
-          }
+          skyboxHandler.map(skybox);
           terminal.printError(Text.SKYBOX_MAPPED);
           return true;
         break;
         case 73: //destroySkybox
-          var name = splitted[1];
-          var skybox = skyBoxes[name];
           if (mode != 0){
             terminal.printError(Text.WORKS_ONLY_IN_DESIGN_MODE);
             return true;
           }
+          var name = splitted[1];
+          var skybox = skyBoxes[name];
           if (!(name.indexOf("*") == -1)){
             new JobHandler(splitted).handle();
             return true;
@@ -2023,80 +1575,17 @@ function parse(input){
             terminal.printError(Text.NO_SUCH_SKYBOX);
             return true;
           }
-          if (name == mappedSkyboxName){
-            scene.remove(skyboxMesh);
-            skyboxVisible = false;
-            fogBlendWithSkybox = false;
-            skyboxMesh.material.dispose();
-            skyboxMesh.geometry.dispose();
-            skyboxMesh.material.uniforms.cubeTexture.value.dispose();
-          }
-          delete skyBoxes[name];
+          skyboxHandler.destroySkybox(skybox);
           if (!jobHandlerWorking){
             terminal.printInfo(Text.SKYBOX_DESTROYED);
           }
           return true;
         break;
         case 74: //skybox
-          var param = splitted[1].toUpperCase();
-          if (mode != 0){
-            terminal.printError(Text.WORKS_ONLY_IN_DESIGN_MODE);
-            return true;
-          }
-          if (!skyboxMesh){
-            terminal.printError(Text.NO_SKYBOX_MAPPED);
-            return true;
-          }
-          if (param != "HIDE" && param != "SHOW"){
-            terminal.printError(Text.STATUS_MUST_BE_ONE_OF);
-            return true;
-          }
-          if (param == "HIDE"){
-            if (!skyboxVisible){
-              terminal.printError(Text.SKYBOX_NOT_VISIBLE);
-              return true;
-            }
-            scene.remove(skyboxMesh);
-            skyboxVisible = false;
-            fogBlendWithSkybox = false;
-            terminal.printInfo(Text.SKYBOX_HIDDEN);
-          }else{
-            if (skyboxVisible){
-              terminal.printError(Text.SKYBOX_ALREADY_VISIBLE);
-              return true;
-            }
-            scene.add(skyboxMesh);
-            skyboxVisible = true;
-            terminal.printInfo(Text.SKYBOX_SHOWN);
-          }
-          if (bloom){
-            bloom.onSkyboxVisibilityChange();
-          }
-          return true;
+          // DEPRECATED
         break;
         case 75: //scaleSkybox
-          var amount = parseFloat(splitted[1]);
-          if (mode != 0){
-            terminal.printError(Text.WORKS_ONLY_IN_DESIGN_MODE);
-            return true;
-          }
-          if (!skyboxMesh){
-            terminal.printError(Text.SKYBOX_NOT_DEFINED);
-            return true;
-          }
-          if (!skyboxVisible){
-            terminal.printError(Text.SKYBOX_NOT_VISIBLE);
-            return true;
-          }
-          if (isNaN(amount)){
-            terminal.printError(Text.AMOUNT_MUST_HAVE_A_NUMERICAL_VALUE);
-            return true;
-          }
-          skyboxMesh.scale.x = amount;
-          skyboxMesh.scale.y = amount;
-          skyboxMesh.scale.z = amount;
-          terminal.printInfo(Text.SKYBOX_SCALE_ADJUSTED);
-          return true;
+          // DEPRECATED
         break;
         case 76: //save
           if (mode != 0){
@@ -2146,7 +1635,7 @@ function parse(input){
                   var stateLoader = new StateLoader(loadedState);
                   var result = stateLoader.load();
                   if (result){
-                    if (stateLoader.hasTextures || stateLoader.hasTexturePacks || stateLoader.hasSkyboxes || stateLoader.hasFonts){
+                    if (stateLoader.hasTexturePacks || stateLoader.hasSkyboxes || stateLoader.hasFonts){
                       terminal.printInfo(Text.LOADING_PROJECT);
                       canvas.style.visibility = "hidden";
                       terminal.disable();
@@ -2522,39 +2011,10 @@ function parse(input){
           // DEPRECATED
         break;
         case 90: //setFog
-          if (mode != 0){
-            terminal.printError(Text.WORKS_ONLY_IN_DESIGN_MODE);
-            return true;
-          }
-          var fogColorStr = splitted[1];
-          var fogDensityVal = parseFloat(splitted[2]);
-          if (isNaN(fogDensityVal)){
-            terminal.printError(Text.IS_NOT_A_NUMBER.replace(Text.PARAM1, "fogDensity"));
-            return true;
-          }
-          if (fogDensityVal <= 0){
-            terminal.printError(Text.MUST_BE_GREATER_THAN.replace(
-              Text.PARAM1, "fogDensity").replace(Text.PARAM2, "0"
-            ));
-            return true;
-          }
-          fogDensity = fogDensityVal / 100;
-          fogColor = fogColorStr;
-          fogActive = true;
-          fogColorRGB = new THREE.Color(fogColor);
-          terminal.printInfo(Text.FOG_SET);
-          return true;
+          // DEPRECATED
         break;
         case 91: //removeFog
-          if (mode != 0){
-            terminal.printError(Text.WORKS_ONLY_IN_DESIGN_MODE);
-            return true;
-          }
-          fogActive = false;
-          fogBlendWithSkybox = false;
-          terminal.printInfo(Text.FOG_REMOVED);
-          guiHandler.afterObjectSelection();
-          return true;
+          // DEPRECATED
         break;
         case 92: //glue
           var groupName = splitted[1];
@@ -3350,14 +2810,7 @@ function parse(input){
           return true;
         break;
         case 124: //printFogInfo
-          if (fogActive){
-            terminal.printHeader(Text.FOG_INFO);
-            terminal.printInfo(Text.TREE2.replace(Text.PARAM1, "Fog color").replace(Text.PARAM2, fogColor), true);
-            terminal.printInfo(Text.TREE2.replace(Text.PARAM1, "Fog density").replace(Text.PARAM2, fogDensity * 100));
-          }else{
-            terminal.printInfo(Text.FOG_IS_NOT_SET);
-          }
-          return true;
+          // DEPRECATED
         break;
         case 125: //applyDisplacementMap
           // DEPRECATED
@@ -4181,82 +3634,10 @@ function parse(input){
           return true;
         break;
         case 146: //skyboxConfigurations
-          var parameter = splitted[1].toLowerCase();
-          if (!mappedSkyboxName){
-            terminal.printError(Text.NO_SKYBOX_MAPPED);
-            return true;
-          }
-          if (!skyboxVisible){
-            terminal.printError(Text.SKYBOX_NOT_VISIBLE);
-            return true;
-          }
-          if (parameter == "show"){
-            if (skyboxConfigurationsVisible){
-              terminal.printError(Text.GUI_IS_ALREADY_VISIBLE);
-              return true;
-            }
-            guiHandler.show(guiHandler.guiTypes.SKYBOX);
-            skyboxConfigurationsVisible = true;
-            guiHandler.skyboxParameters["Name"] = mappedSkyboxName;
-            guiHandler.skyboxParameters["Color"] = "#" + skyboxMesh.material.uniforms.color.value.getHexString();
-            terminal.printInfo(Text.GUI_OPENED);
-          }else if (parameter == "hide"){
-            if (!skyboxConfigurationsVisible){
-              terminal.printError(Text.GUI_IS_ALREADY_HIDDEN);
-              return true;
-            }
-            guiHandler.hide(guiHandler.guiTypes.SKYBOX);
-            skyboxConfigurationsVisible = false;
-            terminal.printInfo(Text.GUI_CLOSED);
-          }else{
-            terminal.printError(Text.STATUS_MUST_BE_ONE_OF);
-          }
-          return true;
+          // DEPRECATED
         break;
         case 147: //fogConfigurations
-          if (mode != 1){
-            terminal.printError(Text.WORKS_ONLY_IN_PREVIEW_MODE);
-            return true;
-          }
-          if (!fogActive){
-            terminal.printError(Text.NO_FOG_SET);
-            return true;
-          }
-          var fogConfigurationMode = splitted[1].toLowerCase();
-          if (fogConfigurationMode == "show"){
-            if (fogConfigurationsVisible){
-              terminal.printError(Text.GUI_IS_ALREADY_VISIBLE);
-              return true;
-            }
-            guiHandler.show(guiHandler.guiTypes.FOG);
-            guiHandler.fogParameters["Color"] = "#"+fogColorRGB.getHexString();
-            guiHandler.fogParameters["Density"] = fogDensity * 100;
-            guiHandler.fogParameters["Blend skybox"] = fogBlendWithSkybox;
-            if (!skyboxVisible){
-              guiHandler.enableController(guiHandler.fogColorController);
-              guiHandler.disableController(guiHandler.fogBlendWithSkyboxController);
-            }else{
-              if (fogBlendWithSkybox){
-                guiHandler.disableController(guiHandler.fogColorController);
-              }else{
-                guiHandler.enableController(guiHandler.fogColorController);
-              }
-              guiHandler.enableController(guiHandler.fogBlendWithSkyboxController);
-            }
-            fogConfigurationsVisible = true;
-            terminal.printInfo(Text.GUI_OPENED);
-          }else if (fogConfigurationMode == "hide"){
-            if (!fogConfigurationsVisible){
-              terminal.printError(Text.GUI_IS_ALREADY_HIDDEN);
-              return true;
-            }
-            guiHandler.hide(guiHandler.guiTypes.FOG);
-            fogConfigurationsVisible = false;
-            terminal.printInfo(Text.GUI_CLOSED);
-          }else{
-            terminal.printError(Text.STATUS_MUST_BE_ONE_OF);
-            return true;
-          }
+          // DEPRECATED
         break;
         case 148: //noMobile
           if (mode != 0){
@@ -4337,27 +3718,32 @@ function parse(input){
             return true;
           }
           var fontName = splitted[1];
-          var fontPath = "fonts/"+splitted[2];
           if (fonts[fontName]){
             terminal.printError(Text.FONT_NAME_MUST_BE_UNIQUE);
             return true;
           }
-          var fontObject = new Font(fontName, fontPath, function(){
-            canvas.style.visibility = "";
-            terminal.enable();
-            terminal.clear();
-            terminal.printInfo(Text.FONT_CREATED);
-            fonts[fontName] = fontObject;
-          }, function(){
-            canvas.style.visibility = "";
-            terminal.enable();
-            terminal.clear();
-            terminal.printInfo(Text.ERROR_CREATING_FONT.replace(Text.PARAM1, fontPath));
-          });
-          fontObject.load();
-          terminal.printInfo(Text.LOADING_FONT);
+          terminal.printInfo(Text.LOADING);
           canvas.style.visibility = "hidden";
           terminal.disable();
+          var xhr = new XMLHttpRequest();
+          xhr.open("POST", "/getFonts", true);
+          xhr.setRequestHeader("Content-type", "application/json");
+          xhr.onreadystatechange = function (){
+            if (xhr.readyState == 4 && xhr.status == 200){
+              var typefaces = JSON.parse(xhr.responseText);
+              canvas.style.visibility = "";
+              terminal.clear();
+              if (typefaces.length == 0){
+                terminal.enable();
+                terminal.printError(Text.NO_VALID_FONTS);
+              }else{
+                terminal.disable();
+                terminal.printInfo(Text.AFTER_FONT_CREATION);
+                fontCreatorGUIHandler.show(fontName, typefaces);
+              }
+            }
+          }
+          xhr.send();
           return true;
         break;
         case 152: //destroyFont
@@ -5043,6 +4429,184 @@ function parse(input){
           }
           if (len == 0){
             terminal.printError(Text.NO_MUZZLE_FLASHES_CREATED);
+          }
+          return true;
+        break;
+        case 177: //unmapSkybox
+          if (mode != 0){
+            terminal.printError(Text.WORKS_ONLY_IN_DESIGN_MODE);
+            return true;
+          }
+          if (!skyboxHandler.isVisible()){
+            terminal.printError(Text.NO_SKYBOX_MAPPED);
+            return true;
+          }
+          skyboxHandler.unmap();
+          fogHandler.setBlendWithSkyboxStatus(false);
+          terminal.printInfo(Text.SKYBOX_HIDDEN);
+          return true;
+        break;
+        case 178: //editSkybox
+          if (mode != 0){
+            terminal.printError(Text.WORKS_ONLY_IN_DESIGN_MODE);
+            return true;
+          }
+          var skybox = skyBoxes[splitted[1]];
+          if (!skybox){
+            terminal.printError(Text.NO_SUCH_SKYBOX);
+            return true;
+          }
+          terminal.printInfo(Text.LOADING);
+          canvas.style.visibility = "hidden";
+          terminal.disable();
+          var xhr = new XMLHttpRequest();
+          xhr.open("POST", "/getSkyboxFolders", true);
+          xhr.setRequestHeader("Content-type", "application/json");
+          xhr.onreadystatechange = function (){
+            if (xhr.readyState == 4 && xhr.status == 200){
+              var folders = JSON.parse(xhr.responseText);
+              canvas.style.visibility = "";
+              terminal.clear();
+              if (folders.length == 0){
+                terminal.enable();
+                terminal.printError(Text.NO_VALID_SKYBOX_FOLDER);
+              }else{
+                terminal.disable();
+                terminal.printInfo(Text.AFTER_SKYBOX_CREATION);
+                skyboxCreatorGUIHandler.edit(skybox, folders);
+              }
+            }
+          }
+          xhr.send();
+          return true;
+        break;
+        case 179: //editTexturePack
+          if (mode != 0){
+            terminal.printError(Text.WORKS_ONLY_IN_DESIGN_MODE);
+            return true;
+          }
+          var texturePack = texturePacks[splitted[1]];
+          if (!texturePack){
+            terminal.printError(Text.NO_SUCH_TEXTURE_PACK);
+            return true;
+          }
+          if (texturePack.isUsed()){
+            terminal.printError(Text.TEXTURE_PACK_ALREADY_USED);
+            return true;
+          }
+          terminal.printInfo(Text.LOADING);
+          canvas.style.visibility = "hidden";
+          terminal.disable();
+          var xhr = new XMLHttpRequest();
+          xhr.open("POST", "/getTexturePackFolders", true);
+          xhr.setRequestHeader("Content-type", "application/json");
+          xhr.onreadystatechange = function (){
+            if (xhr.readyState == 4 && xhr.status == 200){
+              var folders = JSON.parse(xhr.responseText);
+              canvas.style.visibility = "";
+              terminal.clear();
+              if (folders.length == 0){
+                terminal.enable();
+                terminal.printError(Text.NO_VALID_TEXTURE_PACK_FOLDER);
+              }else{
+                terminal.disable();
+                terminal.printInfo(Text.AFTER_TEXTURE_PACK_CREATION);
+                texturePackCreatorGUIHandler.edit(texturePack, folders);
+              }
+            }
+          }
+          xhr.send();
+          return true;
+        break;
+        case 180: //fog
+          if (mode != 0){
+            terminal.printError(Text.WORKS_ONLY_IN_DESIGN_MODE);
+            return true;
+          }
+          terminal.clear();
+          terminal.disable();
+          terminal.printInfo(Text.AFTER_FOG_CREATION);
+          fogCreatorGUIHandler.show();
+          return true;
+        break;
+        case 181: //newCrosshair
+          if (mode != 0){
+            terminal.printError(Text.WORKS_ONLY_IN_DESIGN_MODE);
+            return true;
+          }
+          if (crosshairs[splitted[1]]){
+            terminal.printError(Text.NAME_MUST_BE_UNIQUE);
+            return true;
+          }
+          var texturePackNames = [];
+          for (var texturePackName in texturePacks){
+            texturePackNames.push(texturePackName);
+          }
+          if (texturePackNames.length == 0){
+            terminal.printError(Text.NO_TEXTURE_PACKS_CREATED);
+            return true;
+          }
+          crosshairCreatorGUIHandler.show(splitted[1], texturePackNames);
+          terminal.disable();
+          terminal.clear();
+          terminal.printInfo(Text.AFTER_CROSSHAIR_CREATION);
+          return true;
+        break;
+        case 182: //editCrosshair
+          if (mode != 0){
+            terminal.printError(Text.WORKS_ONLY_IN_DESIGN_MODE);
+            return true;
+          }
+          var crosshair = crosshairs[splitted[1]];
+          if (!crosshair){
+            terminal.printError(Text.NO_SUCH_CROSSHAIR);
+            return true;
+          }
+          var texturePackNames = [];
+          for (var texturePackName in texturePacks){
+            texturePackNames.push(texturePackName);
+          }
+          crosshairCreatorGUIHandler.edit(crosshair, texturePackNames);
+          terminal.disable();
+          terminal.clear();
+          terminal.printInfo(Text.AFTER_CROSSHAIR_CREATION);
+          return true;
+        break;
+        case 183: //destroyCrosshair
+          if (mode != 0){
+            terminal.printError(Text.WORKS_ONLY_IN_DESIGN_MODE);
+            return true;
+          }
+          if (!(splitted[1].indexOf("*") == -1)){
+            new JobHandler(splitted).handle();
+            return true;
+          }
+          var crosshair = crosshairs[splitted[1]];
+          if (!crosshair){
+            terminal.printError(Text.NO_SUCH_CROSSHAIR);
+            return true;
+          }
+          crosshair.destroy();
+          delete crosshairs[crosshair.name];
+          if (!jobHandlerWorking){
+            terminal.printInfo(Text.CROSSHAIR_EDITED);
+          }
+          return true;
+        break;
+        case 184: //printCrosshairs
+          var count = 0;
+          var length = Object.keys(crosshairs).length;
+          terminal.printHeader(Text.CROSSHAIRS);
+          for (var crosshairName in crosshairs){
+            count ++;
+            var options = true;
+            if (count == length){
+              options = false;
+            }
+            terminal.printInfo(Text.TREE2.replace(Text.PARAM1, crosshairName).replace(Text.PARAM2, crosshairs[crosshairName].configurations.texture), options);
+          }
+          if (count == 0){
+            terminal.printError(Text.NO_CROSSHAIRS_CREATED);
           }
           return true;
         break;

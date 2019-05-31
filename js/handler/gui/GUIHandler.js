@@ -28,14 +28,6 @@ var GUIHandler = function(){
     "mb alpha": 1.0,
     "mb time": OBJECT_TRAIL_MAX_TIME_IN_SECS_DEFAULT
   };
-  this.skyboxParameters = {
-    "Name": "skyboxName",
-    "Color": "#ffffff",
-    "Done": function(){
-      terminal.clear();
-      parseCommand("skyboxConfigurations hide");
-    }
-  };
   this.textManipulationParameters = {
     "Text": "textName",
     "Content": "",
@@ -57,15 +49,6 @@ var GUIHandler = function(){
     "Max width%": 100,
     "Max height%": 100
   };
-  this.fogParameters = {
-    "Density": 0.0,
-    "Color": "#ffffff",
-    "Blend skybox": false,
-    "Done": function(){
-      terminal.clear();
-      parseCommand("fogConfigurations hide");
-    }
-  };
   this.bloomParameters = {
     "Threshold": 0.0,
     "Active": false,
@@ -73,7 +56,6 @@ var GUIHandler = function(){
     "Exposure": 0.0,
     "Gamma": 0.0,
     "BlurStepAmount": 0,
-    "Blend skybox": false,
     "BlurPass1": {"Factor": 0.0, "Color": "#ffffff", "Quality": "high"},
     "BlurPass2": {"Factor": 0.0, "Color": "#ffffff", "Quality": "high"},
     "BlurPass3": {"Factor": 0.0, "Color": "#ffffff", "Quality": "high"},
@@ -110,7 +92,7 @@ var GUIHandler = function(){
   }
   // GUI TYPES DEFINITION
   this.guiTypes = {
-    FOG: 0, SKYBOX: 1, TEXT: 2, OBJECT: 3, BLOOM: 4, FPS_WEAPON_ALIGNMENT: 5, SHADER_PRECISION: 6, PARTICLE_SYSTEM: 7, WORKER_STATUS: 8, MUZZLE_FLASH: 9
+    TEXT: 0, OBJECT: 1, BLOOM: 2, FPS_WEAPON_ALIGNMENT: 3, SHADER_PRECISION: 4, PARTICLE_SYSTEM: 5, WORKER_STATUS: 6, MUZZLE_FLASH: 7, TEXTURE_PACK: 8, SKYBOX_CREATION: 9, FOG: 10, FONT: 11, CROSSHAIR_CREATION: 12
   };
 }
 
@@ -497,17 +479,6 @@ GUIHandler.prototype.show = function(guiType){
         this.initializeTextManipulationGUI();
       }
     return;
-    case this.guiTypes.SKYBOX:
-      if (!this.datGuiSkybox){
-        this.initializeSkyboxGUI();
-        skyboxConfigurationsVisible = true;
-      }
-    return;
-    case this.guiTypes.FOG:
-      if (!this.datGuiFog){
-        this.initializeFogGUI();
-      }
-    return;
     case this.guiTypes.BLOOM:
       if (!this.datGuiBloom){
         this.initializeBloomGUI();
@@ -567,19 +538,6 @@ GUIHandler.prototype.hide = function(guiType){
         this.datGuiTextManipulation = 0;
       }
     return;
-    case this.guiTypes.SKYBOX:
-      if (this.datGuiSkybox){
-        this.destroyGUI(this.datGuiSkybox);
-        skyboxConfigurationsVisible = false;
-        this.datGuiSkybox = 0;
-      }
-    return;
-    case this.guiTypes.FOG:
-      if (this.datGuiFog){
-        this.destroyGUI(this.datGuiFog);
-        this.datGuiFog = 0;
-      }
-    return;
     case this.guiTypes.BLOOM:
       if (this.datGuiBloom){
         this.destroyGUI(this.datGuiBloom);
@@ -620,6 +578,36 @@ GUIHandler.prototype.hide = function(guiType){
       if (this.datGuiMuzzleFlashCreator){
         this.destroyGUI(this.datGuiMuzzleFlashCreator);
         this.datGuiMuzzleFlashCreator = 0;
+      }
+    return;
+    case this.guiTypes.TEXTURE_PACK:
+      if (this.datGuiTexturePack){
+        this.destroyGUI(this.datGuiTexturePack);
+        this.datGuiTexturePack = 0;
+      }
+    return;
+    case this.guiTypes.SKYBOX_CREATION:
+      if (this.datGuiSkyboxCreation){
+        this.destroyGUI(this.datGuiSkyboxCreation);
+        this.datGuiSkyboxCreation = 0;
+      }
+    return;
+    case this.guiTypes.FOG:
+      if (this.datGuiFog){
+        this.destroyGUI(this.datGuiFog);
+        this.datGuiFog = 0;
+      }
+    return;
+    case this.guiTypes.FONT:
+      if (this.datGuiFontCreation){
+        this.destroyGUI(this.datGuiFontCreation);
+        this.datGuiFontCreation = 0;
+      }
+    return;
+    case this.guiTypes.CROSSHAIR_CREATION:
+      if (this.datGuiCrosshairCreation){
+        this.destroyGUI(this.datGuiCrosshairCreation);
+        this.datGuiCrosshairCreation = 0;
       }
     return;
   }
@@ -1169,25 +1157,6 @@ GUIHandler.prototype.initializeTextManipulationGUI = function(){
   }).listen();
 }
 
-GUIHandler.prototype.initializeSkyboxGUI = function(){
-  guiHandler.datGuiSkybox = new dat.GUI({hideable: false});
-  guiHandler.skyboxNameController = guiHandler.datGuiSkybox.add(guiHandler.skyboxParameters, "Name").listen();
-  guiHandler.disableController(guiHandler.skyboxNameController, true);
-  guiHandler.skyboxColorController = guiHandler.datGuiSkybox.addColor(guiHandler.skyboxParameters, "Color").onChange(function(val){
-    skyboxMesh.material.uniforms.color.value.set(val);
-    skyBoxes[mappedSkyboxName].color = val;
-    if (fogBlendWithSkybox){
-      GLOBAL_FOG_UNIFORM.value.set(
-        -fogDensity,
-        skyboxMesh.material.uniforms.color.value.r,
-        skyboxMesh.material.uniforms.color.value.g,
-        skyboxMesh.material.uniforms.color.value.b
-      );
-    }
-  }).listen();
-  guiHandler.datGuiSkybox.add(guiHandler.skyboxParameters, "Done");
-}
-
 GUIHandler.prototype.initializeBloomGUI = function(){
   guiHandler.datGuiBloom = new dat.GUI({hideable: false});
   guiHandler.bloomThresholdController = guiHandler.datGuiBloom.add(guiHandler.bloomParameters, "Threshold").min(0).max(1).step(0.01).onChange(function(val){
@@ -1206,9 +1175,7 @@ GUIHandler.prototype.initializeBloomGUI = function(){
     bloom.setBlurStepCount(val);
     for (var i = 0; i < 5; i++){
       guiHandler.enableController(guiHandler["blurPassFactorController"+(i+1)]);
-      if (!bloom.configurations.blendWithSkybox){
-        guiHandler.enableController(guiHandler["blurPassTintColorController"+(i+1)]);
-      }
+      guiHandler.enableController(guiHandler["blurPassTintColorController"+(i+1)]);
       guiHandler.enableController(guiHandler["blurPassTapController"+(i+1)]);
     }
     for (var i = val; i < 5; i++){
@@ -1219,22 +1186,6 @@ GUIHandler.prototype.initializeBloomGUI = function(){
   }).listen();
   guiHandler.bloomActiveController = guiHandler.datGuiBloom.add(guiHandler.bloomParameters, "Active").onChange(function(val){
     renderer.bloomOn = val;
-  }).listen();
-  guiHandler.bloomBlendWithSkyboxController = guiHandler.datGuiBloom.add(guiHandler.bloomParameters, "Blend skybox").onChange(function(val){
-    if (!skyboxVisible){
-      guiHandler.bloomParameters["Blend skybox"] = false;
-      return;
-    }
-    bloom.setBlendWithSkyboxStatus(val);
-    if (val){
-      for (var i = 0; i<bloom.configurations.blurStepCount; i++){
-        guiHandler.disableController(guiHandler["blurPassTintColorController"+(i+1)]);
-      }
-    }else{
-      for (var i = 0; i<bloom.configurations.blurStepCount; i++){
-        guiHandler.enableController(guiHandler["blurPassTintColorController"+(i+1)]);
-      }
-    }
   }).listen();
   for (var i = 0; i<5; i++){
     var blurPassFolder = guiHandler.datGuiBloom.addFolder("BlurPass"+(i+1));
@@ -1260,74 +1211,4 @@ GUIHandler.prototype.initializeBloomGUI = function(){
     }.bind({index: i})).listen();
   }
   guiHandler.datGuiBloom.add(guiHandler.bloomParameters, "Done");
-}
-
-GUIHandler.prototype.initializeFogGUI = function(){
-  guiHandler.datGuiFog = new dat.GUI({hideable: false});
-  guiHandler.fogDensityController = guiHandler.datGuiFog.add(guiHandler.fogParameters, "Density").min(0).max(1).step(0.01).onChange(function(val){
-    fogDensity = val / 100;
-    if (!fogBlendWithSkybox){
-      GLOBAL_FOG_UNIFORM.value.set(fogDensity, fogColorRGB.r, fogColorRGB.g, fogColorRGB.b);
-    }else{
-      GLOBAL_FOG_UNIFORM.value.set(
-        -fogDensity,
-        skyboxMesh.material.uniforms.color.value.r,
-        skyboxMesh.material.uniforms.color.value.g,
-        skyboxMesh.material.uniforms.color.value.b
-      );
-    }
-  }).listen();
-  guiHandler.fogColorController = guiHandler.datGuiFog.addColor(guiHandler.fogParameters, "Color").onChange(function(val){
-    fogColorRGB.set(val);
-    GLOBAL_FOG_UNIFORM.value.set(fogDensity, fogColorRGB.r, fogColorRGB.g, fogColorRGB.b);
-  }).listen();
-  guiHandler.fogBlendWithSkyboxController = guiHandler.datGuiFog.add(guiHandler.fogParameters, "Blend skybox").onChange(function(val){
-    if (!skyboxVisible){
-      guiHandler.fogParameters["Blend skybox"] = false;
-      return;
-    }
-    if (val){
-      fogBlendWithSkybox = true;
-      GLOBAL_FOG_UNIFORM.value.set(
-        -fogDensity,
-        skyboxMesh.material.uniforms.color.value.r,
-        skyboxMesh.material.uniforms.color.value.g,
-        skyboxMesh.material.uniforms.color.value.b
-      );
-      guiHandler.disableController(guiHandler.fogColorController);
-    }else{
-      fogBlendWithSkybox = false;
-      GLOBAL_FOG_UNIFORM.value.set(fogDensity, fogColorRGB.r, fogColorRGB.g, fogColorRGB.b);
-      guiHandler.enableController(guiHandler.fogColorController);
-    }
-    for (var objName in addedObjects){
-      addedObjects[objName].removeFog();
-      addedObjects[objName].setFog();
-    }
-    for (var objName in objectGroups){
-      objectGroups[objName].removeFog();
-      objectGroups[objName].setFog();
-    }
-    for (var textName in addedTexts){
-      addedTexts[textName].removeFog();
-      addedTexts[textName].setFog();
-    }
-    for (var objName in autoInstancedObjects){
-      autoInstancedObjects[objName].removeFog();
-      autoInstancedObjects[objName].setFog();
-    }
-    for (var psName in particleSystemPool){
-      particleSystemPool[psName].removeFog();
-      particleSystemPool[psName].setFog();
-    }
-    for (var psName in mergedParticleSystems){
-      mergedParticleSystems[psName].removeFog();
-      mergedParticleSystems[psName].setFog();
-    }
-    for (var objTrailName in objectTrails){
-      objectTrails[objTrailName].removeFog();
-      objectTrails[objTrailName].setFog();
-    }
-  }).listen();
-  guiHandler.datGuiFog.add(guiHandler.fogParameters, "Done");
 }

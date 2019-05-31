@@ -15,6 +15,7 @@ var MarkedPoint = function(name, x, y, z, fromX, fromY, fromZ, gridDestroyed){
     this.text.setMarginBetweenChars(7);
     this.text.refInnerHeight = 569;
     this.text.refCharSize = 15;
+    this.text.mesh.renderOrder = renderOrders.MARKED_POINT;
     this.text.handleResize();
     if (!gridDestroyed){
       var lineMaterial = new THREE.LineBasicMaterial({

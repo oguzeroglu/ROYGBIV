@@ -1,6 +1,6 @@
 var AddedObject = function(name, type, metaData, material, mesh, physicsBody, destroyedGrids){
   this.isAddedObject = true;
-  if (IS_WORKER_CONTEXT){
+  if (IS_WORKER_CONTEXT || type == "MOCK"){
     return this;
   }
   this.name = name;
@@ -408,27 +408,22 @@ AddedObject.prototype.export = function(){
   if (this.hasDiffuseMap()){
     var diffuseMap = this.mesh.material.uniforms.diffuseMap.value;
     exportObject["diffuseRoygbivTexturePackName"] = diffuseMap.roygbivTexturePackName;
-    exportObject["diffuseRoygbivTextureName"] =  diffuseMap.roygbivTextureName;
   }
   if (this.hasAlphaMap()){
     var alphaMap = this.mesh.material.uniforms.alphaMap.value;
     exportObject["alphaRoygbivTexturePackName"] = alphaMap.roygbivTexturePackName;
-    exportObject["alphaRoygbivTextureName"] = alphaMap.roygbivTextureName;
   }
   if (this.hasAOMap()){
     var aoMap = this.mesh.material.uniforms.aoMap.value;
     exportObject["aoRoygbivTexturePackName"] = aoMap.roygbivTexturePackName;
-    exportObject["aoRoygbivTextureName"] = aoMap.roygbivTextureName;
   }
   if (this.hasEmissiveMap()){
     var emissiveMap = this.mesh.material.uniforms.emissiveMap.value;
     exportObject["emissiveRoygbivTexturePackName"] = emissiveMap.roygbivTexturePackName;
-    exportObject["emissiveRoygbivTextureName"] = emissiveMap.roygbivTextureName;
   }
   if (this.hasDisplacementMap()){
     var displacementMap = this.mesh.material.uniforms.displacementMap.value;
     exportObject["displacementRoygbivTexturePackName"] = displacementMap.roygbivTexturePackName;
-    exportObject["displacementRoygbivTextureName"] = displacementMap.roygbivTextureName;
     exportObject["displacementScale"] = this.mesh.material.uniforms.displacementInfo.value.x;
     exportObject["displacementBias"] = this.mesh.material.uniforms.displacementInfo.value.y;
   }
@@ -1664,31 +1659,26 @@ AddedObject.prototype.mapTexturePack = function(texturePack){
   if (texturePack.hasDiffuse){
     this.mapDiffuse(texturePack.diffuseTexture);
     this.mesh.material.uniforms.diffuseMap.value.roygbivTexturePackName = texturePack.name;
-    this.mesh.material.uniforms.diffuseMap.value.roygbivTextureName = 0;
     this.mesh.material.uniforms.diffuseMap.value.needsUpdate = true;
   }
   if (texturePack.hasAlpha){
     this.mapAlpha(texturePack.alphaTexture);
     this.mesh.material.uniforms.alphaMap.value.roygbivTexturePackName = texturePack.name;
-    this.mesh.material.uniforms.alphaMap.value.roygbivTextureName = 0;
     this.mesh.material.uniforms.alphaMap.value.needsUpdate = true;
   }
   if (texturePack.hasAO){
     this.mapAO(texturePack.aoTexture);
     this.mesh.material.uniforms.aoMap.value.roygbivTexturePackName = texturePack.name;
-    this.mesh.material.uniforms.aoMap.value.roygbivTextureName = 0;
     this.mesh.material.uniforms.aoMap.value.needsUpdate = true;
   }
   if (texturePack.hasEmissive){
     this.mapEmissive(texturePack.emissiveTexture);
     this.mesh.material.uniforms.emissiveMap.value.roygbivTexturePackName = texturePack.name;
-    this.mesh.material.uniforms.emissiveMap.value.roygbivTextureName = 0;
     this.mesh.material.uniforms.emissiveMap.value.needsUpdate = true;
   }
   if (texturePack.hasHeight && VERTEX_SHADER_TEXTURE_FETCH_SUPPORTED){
     this.mapDisplacement(texturePack.heightTexture);
     this.mesh.material.uniforms.displacementMap.value.roygbivTexturePackName = texturePack.name;
-    this.mesh.material.uniforms.displacementMap.value.roygbivTextureName = 0;
     this.mesh.material.uniforms.displacementMap.value.needsUpdate = true;
   }
   this.associatedTexturePack = texturePack.name;
@@ -2204,17 +2194,6 @@ AddedObject.prototype.isVisibleOnThePreviewScene = function(parentName){
     return !(this.isHidden);
   }else{
     return objectGroups[parentName].isVisibleOnThePreviewScene();
-  }
-}
-
-AddedObject.prototype.isTextureUsed = function(textureName){
-  var textureStack = this.getTextureStack();
-  for (var i = 0; i<textureStack.length; i++){
-    if (!(textureStack[i].roygbivTextureName == "undefined")){
-      if (textureStack[i].roygbivTextureName == textureName){
-        return true;
-      }
-    }
   }
 }
 
@@ -2886,7 +2865,7 @@ AddedObject.prototype.setFog = function(){
     macroHandler.injectMacro("HAS_FOG", this.mesh.material, false, true);
     this.mesh.material.uniforms.fogInfo = GLOBAL_FOG_UNIFORM;
   }
-  if (fogBlendWithSkybox){
+  if (fogHandler.isFogBlendingWithSkybox()){
     if (!this.mesh.material.uniforms.cubeTexture){
       macroHandler.injectMacro("HAS_SKYBOX_FOG", this.mesh.material, true, true);
       this.mesh.material.uniforms.worldMatrix = new THREE.Uniform(this.mesh.matrixWorld);

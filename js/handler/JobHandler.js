@@ -27,40 +27,20 @@ JobHandler.prototype.handle = function(previewModeCommand){
       this.handleDestroyMaterialCommand();
     }else if (this.splitted[0] == "destroyobject"){
       this.handleDestroyObjectCommand();
-    }else if (this.splitted[0] == "destroytexture"){
-      this.handleDestroyTextureCommand();
-    }else if (this.splitted[0] == "maptexture"){
-      this.handleMapTextureCommand();
     }else if (this.splitted[0] == "adjusttexturerepeat"){
       this.handleAdjustTextureRepeatCommand();
     }else if (this.splitted[0] == "mirror"){
       this.handleMirrorCommand();
     }else if (this.splitted[0] == "destroywallcollection"){
       this.handleDestroyWallCollectionCommand();
-    }else if (this.splitted[0] == "mapspecular"){
-      this.handleMapSpecularCommand();
-    }else if (this.splitted[0] == "mapambientocculsion"){
-      this.handleMapAmbientOcculsionCommand();
-    }else if (this.splitted[0] == "mapalpha"){
-      this.handleMapAlphaCommand();
-    }else if (this.splitted[0] == "destroylight"){
-      this.handleDestroyLightCommand();
-    }else if (this.splitted[0] == "mapnormal"){
-      this.handleMapNormalCommand();
-    }else if (this.splitted[0] == "mapemissive"){
-      this.handleMapEmissiveCommand();
     }else if (this.splitted[0] == "destroytexturepack"){
       this.handleDestroyTexturePackCommand();
     }else if (this.splitted[0] == "refreshtexturepack"){
       this.handleRefreshTexturePackCommand();
-    }else if (this.splitted[0] == "mapheight"){
-      this.handleMapHeightCommand();
     }else if (this.splitted[0] == "resetmaps"){
       this.handleResetMapsCommand();
     }else if (this.splitted[0] == "segmentobject"){
       this.handleSegmentObjectCommand();
-    }else if (this.splitted[0] == "newpointlight"){
-      this.handleNewPointLightCommnand();
     }else if (this.splitted[0] == "destroyskybox"){
       this.handleDestroySkyboxCommand();
     }else if (this.splitted[0] == "setmass"){
@@ -121,6 +101,8 @@ JobHandler.prototype.handle = function(previewModeCommand){
       this.handleDestroyParticleSystemPoolCommand();
     }else if (this.splitted[0] == "destroymuzzleflash"){
       this.handleDestroyMuzzleFlashCommand();
+    }else if (this.splitted[0] == "destroycrosshair"){
+      this.handleDestroyCrosshairCommand();
     }
     if (jobHandlerRaycasterRefresh){
       refreshRaycaster(Text.JOB_COMPLETED, true);
@@ -131,6 +113,22 @@ JobHandler.prototype.handle = function(previewModeCommand){
   // because async
   if (this.splitted[0] != "autoConfigureArea".toLowerCase()){
     jobHandlerWorking = false;
+  }
+}
+
+JobHandler.prototype.handleDestroyCrosshairCommand = function(){
+  var crosshairNamePrefix = this.splitted[1].split("*")[0];
+  var ctr = 0;
+  for (var crosshairName in crosshairs){
+    if (crosshairName.startsWith(crosshairNamePrefix)){
+      parseCommand("destroyCrosshair "+crosshairName);
+      ctr ++;
+    }
+  }
+  if (ctr == 0){
+    terminal.printError(Text.NO_CROSSHAIRS_FOUND);
+  }else{
+    terminal.printInfo(Text.COMMAND_EXECUTED_FOR_X_CROSSHAIRS.replace(Text.PARAM1, ctr));
   }
 }
 
@@ -777,26 +775,6 @@ JobHandler.prototype.handleDestroySkyboxCommand = function(){
   }
 }
 
-JobHandler.prototype.handleNewPointLightCommnand = function(){
-  var plNamePrefix = this.splitted[1].split("*")[0];
-  var ctr = 0;
-  for (var gridName in gridSelections){
-    jobHandlerSelectedGrid = gridSelections[gridName];
-    parseCommand(
-      "newPointLight "+plNamePrefix+"_"+ctr+" "+this.splitted[2]+" "+this.splitted[3]+" "
-                            +this.splitted[4]+" "+this.splitted[5]
-    );
-    ctr ++;
-  }
-  jobHandlerSelectedGrid = 0;
-  if (ctr != 0){
-    terminal.printInfo(Text.CREATED_X_POINT_LIGHTS.replace(Text.PARAM1, ctr));
-  }else{
-    terminal.printError(Text.MUST_HAVE_AT_LEAST_ONE_GRID_SELECTED);
-
-  }
-}
-
 JobHandler.prototype.handleSegmentObjectCommand = function(){
   var objNamePrefix = this.splitted[1].split("*")[0];
   var ctr = 0;
@@ -835,25 +813,6 @@ JobHandler.prototype.handleResetMapsCommand = function(){
   }
 }
 
-JobHandler.prototype.handleMapHeightCommand = function(){
-  var objNamePrefix = this.splitted[2].split("*")[0];
-  var ctr = 0;
-  for (var objName in addedObjects){
-    if (objName.startsWith(objNamePrefix)){
-      parseCommand(
-        "mapHeight "+this.splitted[1]+" "+objName
-      );
-      ctr ++;
-    }
-  }
-  if (ctr == 0){
-
-    terminal.printError(Text.NO_OBJECT_FOUND);
-  }else{
-    terminal.printInfo(Text.COMMAND_EXECUTED_FOR_X_OBJECTS.replace(Text.PARAM1, ctr));
-  }
-}
-
 JobHandler.prototype.handleRefreshTexturePackCommand = function(){
 
   var texturePackNamePrefix = this.splitted[1].split("*")[0];
@@ -876,8 +835,12 @@ JobHandler.prototype.handleRefreshTexturePackCommand = function(){
 JobHandler.prototype.handleDestroyTexturePackCommand = function(){
   var texturePackNamePrefix = this.splitted[1].split("*")[0];
   var ctr = 0;
+  var hasParticleTexture = false;
   for (var texturePackName in texturePacks){
     if (texturePackName.startsWith(texturePackNamePrefix)){
+      if (texturePacks[texturePackName].isParticleTexture){
+        hasParticleTexture = true;
+      }
       parseCommand(
         "destroyTexturePack "+texturePackName
       );
@@ -888,121 +851,22 @@ JobHandler.prototype.handleDestroyTexturePackCommand = function(){
     terminal.printError(Text.NO_TEXTURE_PACK_FOUND);
 
   }else{
-    terminal.printInfo(Text.COMMAND_EXECUTED_FOR_X_TEXTURE_PACKS.replace(Text.PARAM1, ctr));
-  }
-}
-
-JobHandler.prototype.handleMapEmissiveCommand = function(){
-  var objNamePrefix = this.splitted[2].split("*")[0];
-  var ctr = 0;
-  for (var objName in addedObjects){
-    if (objName.startsWith(objNamePrefix)){
-      parseCommand(
-        "mapEmissive "+this.splitted[1]+" "+objName
-      );
-      ctr ++;
+    if (!hasParticleTexture){
+      terminal.printInfo(Text.COMMAND_EXECUTED_FOR_X_TEXTURE_PACKS.replace(Text.PARAM1, ctr));
+    }else{
+      terminal.clear();
+      terminal.disable();
+      terminal.printInfo(Text.GENERATING_TEXTURE_ATLAS);
+      textureAtlasHandler.onTexturePackChange(function(){
+        terminal.clear();
+        terminal.enable();
+        terminal.printInfo(Text.COMMAND_EXECUTED_FOR_X_TEXTURE_PACKS.replace(Text.PARAM1, ctr));
+      }, function(){
+        terminal.clear();
+        terminal.printError(Text.ERROR_HAPPENED_COMPRESSING_TEXTURE_ATLAS);
+        terminal.enable();
+      }, false);
     }
-  }
-  if (ctr == 0){
-
-    terminal.printError(Text.NO_OBJECT_FOUND);
-  }else{
-    terminal.printInfo(Text.COMMAND_EXECUTED_FOR_X_OBJECTS.replace(Text.PARAM1, ctr));
-  }
-}
-
-JobHandler.prototype.handleMapNormalCommand = function(){
-  var objNamePrefix = this.splitted[2].split("*")[0];
-  var ctr = 0;
-  for (var objName in addedObjects){
-    if (objName.startsWith(objNamePrefix)){
-      parseCommand(
-        "mapNormal "+this.splitted[1]+" "+objName
-      );
-      ctr ++;
-    }
-  }
-  if (ctr == 0){
-
-    terminal.printError(Text.NO_OBJECT_FOUND);
-  }else{
-    terminal.printInfo(Text.COMMAND_EXECUTED_FOR_X_OBJECTS.replace(Text.PARAM1, ctr));
-  }
-}
-
-JobHandler.prototype.handleDestroyLightCommand = function(){
-  var lightNamePrefix = this.splitted[1].split("*")[0];
-  var ctr = 0;
-  for (var lightName in lights){
-    if (lightName.startsWith(lightNamePrefix)){
-      parseCommand(
-        "destroyLight "+lightName
-      );
-      ctr ++;
-    }
-  }
-  if (ctr == 0){
-    terminal.printError(Text.NO_LIGHT_FOUND);
-
-  }else{
-    terminal.printInfo(Text.COMMAND_EXECUTED_FOR_X_LIGHTS.replace(Text.PARAM1, ctr));
-  }
-}
-
-JobHandler.prototype.handleMapAlphaCommand = function(){
-  var objNamePrefix = this.splitted[2].split("*")[0];
-  var ctr = 0;
-  for (var objName in addedObjects){
-    if (objName.startsWith(objNamePrefix)){
-      parseCommand(
-        "mapAlpha "+this.splitted[1]+" "+objName
-      );
-      ctr ++;
-    }
-  }
-  if (ctr == 0){
-
-    terminal.printError(Text.NO_OBJECT_FOUND);
-  }else{
-    terminal.printInfo(Text.COMMAND_EXECUTED_FOR_X_OBJECTS.replace(Text.PARAM1, ctr));
-  }
-}
-
-JobHandler.prototype.handleMapAmbientOcculsionCommand = function(){
-  var objNamePrefix = this.splitted[2].split("*")[0];
-  var ctr = 0;
-  for (var objName in addedObjects){
-    if (objName.startsWith(objNamePrefix)){
-      parseCommand(
-        "mapAmbientOcculsion "+this.splitted[1]+" "+objName
-      );
-      ctr ++;
-    }
-  }
-  if (ctr == 0){
-
-    terminal.printError(Text.NO_OBJECT_FOUND);
-  }else{
-    terminal.printInfo(Text.COMMAND_EXECUTED_FOR_X_OBJECTS.replace(Text.PARAM1, ctr));
-  }
-}
-
-JobHandler.prototype.handleMapSpecularCommand = function(){
-  var objNamePrefix = this.splitted[2].split("*")[0];
-  var ctr = 0;
-  for (var objName in addedObjects){
-    if (objName.startsWith(objNamePrefix)){
-      parseCommand(
-        "mapSpecular "+this.splitted[1]+" "+objName
-      );
-      ctr ++;
-    }
-  }
-  if (ctr == 0){
-
-    terminal.printError(Text.NO_OBJECT_FOUND);
-  }else{
-    terminal.printInfo(Text.COMMAND_EXECUTED_FOR_X_OBJECTS.replace(Text.PARAM1, ctr));
   }
 }
 
@@ -1079,25 +943,6 @@ JobHandler.prototype.handleMapTextureCommand = function(){
     terminal.printError(Text.NO_OBJECT_FOUND);
   }else{
     terminal.printInfo(Text.COMMAND_EXECUTED_FOR_X_OBJECTS.replace(Text.PARAM1, ctr));
-  }
-}
-
-JobHandler.prototype.handleDestroyTextureCommand = function(){
-  var txtNamePrefix = this.splitted[1].split("*")[0];
-  var ctr = 0;
-  for (var textureName in textures){
-    if (textureName.startsWith(txtNamePrefix)){
-      parseCommand(
-        "destroyTexture "+textureName
-      );
-      ctr ++;
-    }
-  }
-  if (ctr == 0){
-
-    terminal.printError(Text.NO_TEXTURE_FOUND);
-  }else{
-    terminal.printInfo(Text.DESTROYED_X_TEXTURES.replace(Text.PARAM1, ctr));
   }
 }
 

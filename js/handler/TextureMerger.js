@@ -296,6 +296,7 @@ var TextureMerger = function(texturesObj){
     throw new Error("TextureMerger error: Max texture size exceeded. ("+MAX_TEXTURE_SIZE+"x"+MAX_TEXTURE_SIZE+")");
     return;
   }
+  this.makeCanvasPowerOfTwo();
   this.mergedTexture = new THREE.CanvasTexture(this.canvas);
   this.mergedTexture.wrapS = THREE.ClampToEdgeWrapping;
   this.mergedTexture.wrapT = THREE.ClampToEdgeWrapping;

@@ -6,6 +6,19 @@ var PreconfiguredParticleSystem = function(name, type, params){
   this.hasParticleCollision = this.hasCollidableParticles();
 }
 
+PreconfiguredParticleSystem.prototype.getUsedTextureName = function(){
+  if (this.type == "CUSTOM"){
+    if (this.params.material.textureName != ""){
+      return this.params.material.textureName;
+    }
+    return null;
+  }
+  if (this.params.textureName != ""){
+    return this.params.textureName;
+  }
+  return null;
+}
+
 PreconfiguredParticleSystem.prototype.hasCollidableParticles = function(){
   switch(this.type){
     case "SMOKE": return false;
@@ -71,6 +84,9 @@ PreconfiguredParticleSystem.prototype.getParticleSystem = function(){
     }
     if (!(typeof this.scale == UNDEFINED)){
       ps.mesh.scale.set(this.scale, this.scale, this.scale);
+    }
+    if (this.getUsedTextureName() != null){
+      ps.textureName = this.getUsedTextureName();
     }
     return ps;
   }

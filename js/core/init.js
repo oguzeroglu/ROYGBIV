@@ -6,9 +6,7 @@ window.onload = function() {
   // FACTORIES
   raycasterFactory = new RaycasterFactory();
   physicsFactory = new PhysicsFactory();
-  // TGA and DDS LOADERS
-  tgaLoader = new THREE.TGALoader();
-  ddsLoader = new THREE.DDSLoader();
+  textureLoaderFactory = new TextureLoaderFactory();
   // FPS HANDLER
   fpsHandler = new FPSHandler();
   // REUSABLE COLLISION INFO
@@ -17,6 +15,12 @@ window.onload = function() {
   isOrientationLandscape = (window.innerWidth > window.innerHeight);
   // MACRO HANDLER
   macroHandler = new MacroHandler();
+  // TEXTURE ATLAS HANDLER
+  textureAtlasHandler = new TextureAtlasHandler();
+  // SKYBOX HANDLER
+  skyboxHandler = new SkyboxHandler();
+  // FOG HANDLER
+  fogHandler = new FogHandler();
   // TEXT POOL
   Text = (!isDeployment)? new Text(): 0;
   // DRAGABLE CLI
@@ -53,14 +57,15 @@ window.onload = function() {
   crosshairHandler = new CrosshairHandler();
 
   if (!isDeployment){
-    // SELECTION HANDLER
     selectionHandler = new SelectionHandler();
-    // PARTICLE SYSTEM CREATOR GUI HANDLER
     particleSystemCreatorGUIHandler = new ParticleSystemCreatorGUIHandler();
-    // MUZZLE FLASH CREATOR GUI HANDLER
     muzzleFlashCreatorGUIHandler = new MuzzleFlashCreatorGUIHandler();
-    // FPS WEAPON GUI HANDLER
     fpsWeaponGUIHandler = new FPSWeaponGUIHandler();
+    texturePackCreatorGUIHandler = new TexturePackCreatorGUIHandler();
+    skyboxCreatorGUIHandler = new SkyboxCreatorGUIHandler();
+    fogCreatorGUIHandler = new FogCreatorGUIHandler();
+    fontCreatorGUIHandler = new FontCreatorGUIHandler();
+    crosshairCreatorGUIHandler = new CrosshairCreatorGUIHandler();
   }
 
   // PHYSICS BODY GENERATOR
@@ -93,7 +98,7 @@ window.onload = function() {
   // DEFAULT FONT
   document.fonts.forEach(function(font){
     if (font.family == "hack"){
-      defaultFont = new Font(null, null, null, null, font);
+      defaultFont = new Font(null, null, font);
     }
   });
 
@@ -172,7 +177,9 @@ window.onload = function() {
   windowLoaded = true;
   MAX_VERTEX_UNIFORM_VECTORS = renderer.getMaxVertexUniformVectors();
   VERTEX_SHADER_TEXTURE_FETCH_SUPPORTED = renderer.isVertexShaderTextureFetchSupported();
-  DDS_SUPPORTED = renderer.isDDSSupported();
+  ASTC_SUPPORTED = renderer.isASTCSupported();
+  S3TC_SUPPORTED = renderer.isS3TCSupported();
+  PVRTC_SUPPORTED = renderer.isPVRTCSupported();
   INSTANCING_SUPPORTED = renderer.isInstancingSupported();
   HIGH_PRECISION_SUPPORTED = renderer.isHighPrecisionSupported();
   if (!isDeployment){
@@ -365,7 +372,7 @@ function startDeployment(){
     var stateLoader = new StateLoader(data);
     var result = stateLoader.load();
     if (result){
-      if (stateLoader.hasTextures || stateLoader.hasTexturePacks || stateLoader.hasSkyboxes || stateLoader.hasFonts){
+      if (stateLoader.hasTexturePacks || stateLoader.hasSkyboxes || stateLoader.hasFonts){
         appendtoDeploymentConsole("Loading assets.");
       }
     }else{
@@ -623,19 +630,14 @@ function dumpPerformance(){
 }
 
 //******************************************************************
-// WARNING: FOR TEST PURPOSES - WORKS ONLY FOR CANVAS TEXTURES
-function debugTexture(textureName){
-  var texture = textures[textureName];
-  if (!texture){
-    texture = textureName;
-  }
+// WARNING: FOR TEST PURPOSES
+function debugTexture(texture){
   var context = texture.image.getContext("2d");
   var newTab = window.open();
   var img = new Image(texture.image.width, texture.image.height);
   img.src = texture.image.toDataURL();
   newTab.document.body.appendChild(img);
 }
-
 // WARNING: FOR TEST PURPOSES
 function debugCanvas(dbgCanvas){
   var context = dbgCanvas.getContext("2d");

@@ -18,6 +18,8 @@ var State = function(projectName, author){
   this.PHYSICS_WORKER_ON = PHYSICS_WORKER_ON;
   // PS REF HEIGHT *************************************************
   this.particleSystemRefHeight = particleSystemRefHeight;
+  // TEXTURE ATLAS *************************************************
+  this.textureAtlas = textureAtlasHandler.export();
   // SHADER PRECISIONS *********************************************
   this.shaderPrecisions = shaderPrecisionHandler.export();
   // GRID SYSTEMS **************************************************
@@ -57,14 +59,6 @@ var State = function(projectName, author){
     addedbObjectsExport[objectName] = addedObjects[objectName].export();
   }
   this.addedObjects = addedbObjectsExport;
-  // TEXTURES ******************************************************
-  this.totalTextureCount = 0;
-  for (var textureName in textures){
-    this.totalTextureCount ++;
-  }
-  this.textures = JSON.parse(JSON.stringify(textures));
-  // TEXTURE URLS **************************************************
-  this.textureURLs = Object.assign({}, textureURLs);
   // WALL COLLECTIONS **********************************************
   var wallCollectionsExport = new Object();
   for (var wallCollectionName in wallCollections){
@@ -80,8 +74,6 @@ var State = function(projectName, author){
   }
   this.texturePacks = texturePacksExport;
   // SKYBOXES ******************************************************
-  this.mappedSkyboxName = mappedSkyboxName;
-  this.skyboxVisible = skyboxVisible;
   var skyBoxExport = new Object();
   this.totalSkyboxCount = 0;
   for (var skyBoxName in skyBoxes){
@@ -89,9 +81,7 @@ var State = function(projectName, author){
     skyBoxExport[skyBoxName] = skyBoxes[skyBoxName].export();
   }
   this.skyBoxes = skyBoxExport;
-  if (skyboxMesh){
-    this.skyBoxScale = skyboxMesh.scale.x;
-  }
+  this.skyboxHandlerInfo = skyboxHandler.export();
   // ANCHOR GRID ***************************************************
   if (anchorGrid){
     this.anchorGrid = anchorGrid.export();
@@ -129,17 +119,7 @@ var State = function(projectName, author){
   this.binSize = BIN_SIZE;
   this.raycasterStepAmount = RAYCASTER_STEP_AMOUNT;
   // FOG ***********************************************************
-  this.fogObj = {
-    fogActive: fogActive,
-    fogColor: fogColor,
-    fogDensity: fogDensity,
-    blendWithSkybox: fogBlendWithSkybox
-  };
-  if (fogActive){
-    this.fogObj.r = fogColorRGB.r;
-    this.fogObj.g = fogColorRGB.g;
-    this.fogObj.b = fogColorRGB.b;
-  }
+  this.fog = fogHandler.export();
   // AREAS *********************************************************
   this.areasVisible = areasVisible;
   this.areas = new Object();
@@ -179,5 +159,10 @@ var State = function(projectName, author){
   this.muzzleFlashes = new Object();
   for (var muzzleFlashName in muzzleFlashes){
     this.muzzleFlashes[muzzleFlashName] = muzzleFlashes[muzzleFlashName].export();
+  }
+  // CROSSHAIRS ****************************************************
+  this.crosshairs = new Object();
+  for (var crosshairName in crosshairs){
+    this.crosshairs[crosshairName] = crosshairs[crosshairName].export();
   }
 }

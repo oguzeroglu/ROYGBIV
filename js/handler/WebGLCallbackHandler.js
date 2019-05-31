@@ -447,25 +447,12 @@ WebGLCallbackHandler.prototype.onBeforeActiveTexture = function(slot){
 }
 
 WebGLCallbackHandler.prototype.onBeforeBindTexture = function(type, texture, lineID){
-  var curCachedElement;
-  var isCubeTexture = type == this.gl.TEXTURE_CUBE_MAP;
-  if (!this.doNotCache && this.activeTextureSlot && isCubeTexture){
-    curCachedElement = this.bindedCubeTextureCache.get(this.activeTextureSlot);
-    if (curCachedElement){
-      if (texture == curCachedElement){
-        return;
-      }
-    }
-  }
   if (this.record){
     var s = performance.now();
     this.gl.bindTexture(type, texture);
     this.performanceLogs.bindTexture = performance.now() - s;
   }else{
     this.gl.bindTexture(type, texture);
-  }
-  if (!this.doNotCache && !curCachedElement && this.activeTextureSlot && isCubeTexture){
-    this.bindedCubeTextureCache.set(this.activeTextureSlot, texture);
   }
 }
 
