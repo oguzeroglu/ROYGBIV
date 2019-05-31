@@ -1,9 +1,8 @@
 var Crosshair = function(configurations){
-
   this.isCrosshair = true;
-
+  this.configurations = JSON.parse(JSON.stringify(configurations));
   var name = configurations.name;
-  var texture = configurations.texture;
+  var texture = texturePacks[configurations.texture].diffuseTexture;
   var colorR = configurations.colorR;
   var colorB = configurations.colorB;
   var colorG = configurations.colorG;
@@ -46,16 +45,11 @@ var Crosshair = function(configurations){
   this.mesh.position.set(0, 0, 0);
   this.mesh.frustumCulled = false;
   this.mesh.visible = false;
-
   if (!(typeof this.maxWidthPercent == UNDEFINED) || !(typeof this.maxHeightPercent == UNDEFINED)){
     this.mesh.material.uniforms.sizeScale = new THREE.Uniform(1);
     macroHandler.injectMacro("HAS_SIZE_SCALE", this.material, true, false);
   }
-
   scene.add(this.mesh);
-
-  crosshairs[this.name] = this;
-
   this.texture.center.set(0.5, 0.5);
   this.angularSpeed = 0;
   this.rotationTime = 0;
@@ -63,10 +57,16 @@ var Crosshair = function(configurations){
   this.shrinkTick = 0;
   this.curSize = this.sizeAmount;
   this.shrinkStartSize = this.sizeAmount;
-
   this.handleResize();
-
   webglCallbackHandler.registerEngineObject(this);
+}
+
+Crosshair.prototype.export = function(){
+  return this.configurations;
+}
+
+Crosshair.prototype.clone = function(){
+  return new Crosshair(this.configurations);
 }
 
 Crosshair.prototype.update = function(){

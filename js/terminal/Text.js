@@ -250,6 +250,7 @@ var Text = function(){
   this.IMAGE_CREATED = "@@1 created.";
   this.NO_FILE_SELECTED_OPERATION_CANCELLED = "No file selected, operation canceled.";
   this.IMAGES = "Images";
+  this.CROSSHAIR_CREATED = "Crosshair created.";
   this.OBJECTS_HAVE_TOO_MANY_FACES = "Objects have too many faces. Cannot glue.";
   this.TOO_MANY_GRIDS = "Too many grids.";
   this.NO_UPLOADED_IMAGES = "No uploaded images.";
