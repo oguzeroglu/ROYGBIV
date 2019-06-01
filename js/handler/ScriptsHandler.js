@@ -1,9 +1,32 @@
 var ScriptsHandler = function(){
   this.configurations = {};
+  this.includedScripts = [];
 }
 
 ScriptsHandler.prototype.export = function(){
   return JSON.parse(JSON.stringify(this.configurations));
+}
+
+ScriptsHandler.prototype.resetNode = function(parent){
+  parent.listen = false;
+  for (var key in parent){
+    if (!key.startsWith("/")){
+      continue;
+    }
+    var node = parent[key];
+    if (node.isFolder){
+      node.listen = false;
+      this.resetNode(node);
+    }else{
+      node.include = false;
+      node.runAutomatically = false;
+    }
+  }
+}
+
+ScriptsHandler.prototype.reset = function(){
+  this.resetNode(this.configurations["/"]);
+  this.onConfigurationsRefreshed();
 }
 
 ScriptsHandler.prototype.import = function(obj){
@@ -21,6 +44,7 @@ ScriptsHandler.prototype.includeAllSubScripts = function(node){
       this.includeAllSubScripts(child);
     }else{
       child.include = true;
+      this.includedScripts.push(key);
     }
   }
 }
@@ -37,6 +61,8 @@ ScriptsHandler.prototype.refreshFolder = function(parent){
       }else{
         this.refreshFolder(node);
       }
+    }else if (node.include){
+      this.includedScripts.push(key);
     }
   }
 }

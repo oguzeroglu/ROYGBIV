@@ -4402,7 +4402,6 @@ function parse(input){
           terminal.printInfo(Text.LOADING);
           scriptsHandler.getFiles(function(scriptDescriptions){
             terminal.clear();
-            terminal.printInfo(Text.AFTER_SCRIPT_CREATION);
             scriptsGUIHandler.show(scriptDescriptions);
           });
           return true;
