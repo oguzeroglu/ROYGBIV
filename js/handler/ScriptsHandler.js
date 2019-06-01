@@ -3,6 +3,14 @@ var ScriptsHandler = function(){
   this.includedScripts = [];
 }
 
+ScriptsHandler.prototype.onModeSwitch = function(){
+  for (var scriptName in scripts){
+    if (scripts[scriptName].shouldRunAutomatically()){
+      scripts[scriptName].start();
+    }
+  }
+}
+
 ScriptsHandler.prototype.import = function(obj){
   this.configurations = JSON.parse(JSON.stringify(obj.scripts.configurations));
   this.onConfigurationsRefreshed();
@@ -143,6 +151,7 @@ ScriptsHandler.prototype.loadNode = function(parent, successCallback, errorCallb
     var node = parent[key];
     if (!node.isFolder && node.include){
       var script = new Script(key);
+      script.setRunAutomaticallyStatus(node.runAutomatically);
       scripts[this.getScriptNameFromPath(key)] = script;
       if (!isDeployment){
         script.load(successCallback, errorCallback, compilationErrorCallback);

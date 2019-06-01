@@ -83,3 +83,11 @@ Script.prototype.isRunning = function(){
   }
   return (this.status == SCRIPT_STATUS_STARTED);
 }
+
+Script.prototype.shouldRunAutomatically = function(){
+  return this.runAutomatically;
+}
+
+Script.prototype.setRunAutomaticallyStatus = function(val){
+  this.runAutomatically = val;
+}
