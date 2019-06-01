@@ -1,6 +1,5 @@
 var ScriptsHandler = function(){
   this.configurations = {};
-  this.scriptsToLoad = [];
 }
 
 ScriptsHandler.prototype.export = function(){
@@ -9,10 +8,42 @@ ScriptsHandler.prototype.export = function(){
 
 ScriptsHandler.prototype.import = function(obj){
   this.configurations = JSON.parse(JSON.stringify(obj));
+  this.onConfigurationsRefreshed();
+}
+
+ScriptsHandler.prototype.includeAllSubScripts = function(node){
+  for (var key in node){
+    if (!key.startsWith("/")){
+      continue;
+    }
+    var child = node[key];
+    if (child.isFolder){
+      this.includeAllSubScripts(child);
+    }else{
+      child.include = true;
+    }
+  }
+}
+
+ScriptsHandler.prototype.refreshFolder = function(parent){
+  for (var key in parent){
+    if (!key.startsWith("/")){
+      continue;
+    }
+    var node = parent[key];
+    if (node.isFolder){
+      if (node.listen){
+        this.includeAllSubScripts(node);
+      }else{
+        this.refreshFolder(node);
+      }
+    }
+  }
 }
 
 ScriptsHandler.prototype.onConfigurationsRefreshed = function(){
-  
+  this.includedScripts = [];
+  this.refreshFolder(this.configurations);
 }
 
 ScriptsHandler.prototype.handleScript = function(node, parentName, scriptName){
@@ -42,14 +73,14 @@ ScriptsHandler.prototype.handleFolder = function(node, folderName, children){
 }
 
 ScriptsHandler.prototype.updateConfigurations = function(scriptDescriptions){
-  if (!this.configurations["root"]){
-    this.configurations["root"] = {listen: false};
+  if (!this.configurations["/"]){
+    this.configurations["/"] = {listen: false, isFolder: true};
   }
   for (var key in scriptDescriptions){
     if (scriptDescriptions[key]){
-      this.handleFolder(this.configurations["root"], key, scriptDescriptions[key])
+      this.handleFolder(this.configurations["/"], key, scriptDescriptions[key])
     }else{
-      this.handleScript(this.configurations["root"], "", key);
+      this.handleScript(this.configurations["/"], "", key);
     }
   }
 }

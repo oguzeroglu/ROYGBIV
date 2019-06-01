@@ -41,6 +41,6 @@ ScriptsGUIHandler.prototype.handleFolder = function(folder, node){
 ScriptsGUIHandler.prototype.show = function(configurations){
   this.commonStartFunction();
   guiHandler.datGuiScripts = new dat.GUI({hideable: false});
-  var rootFolder = guiHandler.datGuiScripts.addFolder("root");
-  this.handleFolder(rootFolder, configurations.root);
+  var rootFolder = guiHandler.datGuiScripts.addFolder("/");
+  this.handleFolder(rootFolder, configurations["/"]);
 }
