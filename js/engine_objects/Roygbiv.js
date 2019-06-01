@@ -13,6 +13,7 @@
 //  * Crosshair functions
 //  * Text functions
 //  * Control functions
+//  * Script related functions
 var Roygbiv = function(){
   this.functionNames = [
     "getObject",
@@ -32,8 +33,6 @@ var Roygbiv = function(){
     "setPosition",
     "color",
     "setMass",
-    "runScript",
-    "isRunning",
     "translate",
     "getPosition",
     "opacity",
@@ -164,7 +163,9 @@ var Roygbiv = function(){
     "isOrientationLandscape",
     "setScreenOrientationChangeListener",
     "removeScreenOrientationChangeListener",
-    "executeForEachParticleSystem"
+    "executeForEachParticleSystem",
+    "startScript",
+    "stopScript"
   ];
 
   this.globals = new Object();
@@ -2284,28 +2285,6 @@ Roygbiv.prototype.color = function(colorName){
   return new THREE.Color(colorName.toLowerCase());
 }
 
-//  Starts a script of the given name.
-Roygbiv.prototype.runScript = function(name){
-  if (mode == 0){
-    return;
-  }
-  preConditions.checkIfDefined(ROYGBIV.runScript, preConditions.name, name);
-  var script = scripts[name];
-  preConditions.checkIfScriptExists(ROYGBIV.runScript, null, script);
-  script.start();
-}
-
-//  Returns whether a script of the given name is running or not.
-Roygbiv.prototype.isRunning = function(name){
-  if (mode == 0){
-    return;
-  }
-  preConditions.checkIfDefined(ROYGBIV.isRunning, preConditions.name, name);
-  var script = scripts[name];
-  preConditions.checkIfScriptExists(ROYGBIV.isRunning, null, script);
-  return script.isRunning();
-}
-
 //  Normalizes the vector given in the parameter. Note that this function modifies directly the
 //  parameter and returns nothing.
 Roygbiv.prototype.normalizeVector = function(vector){
@@ -2699,4 +2678,33 @@ Roygbiv.prototype.isOrientationLandscape = function(){
     return false;
   }
   return isOrientationLandscape;
+}
+
+// SCRIPT RELATED FUNCTIONS ****************************************************
+
+// Starts a script. To get scripts use this format as scriptName:
+// parentdir1_parentdir2_....._parentdirX_scriptFileName
+// For example in order to get a script under the scripts/ root folder
+// example.js, the scriptName parameter should be example. However, to get
+// a script under scripts/testFolder/test.js, the scriptName parameter should be
+// testFolder_test.
+Roygbiv.prototype.startScript = function(scriptName){
+  if (mode == 0){
+    return;
+  }
+  preConditions.checkIfDefined(ROYGBIV.startScript, preConditions.scriptName, scriptName);
+  var script = scripts[scriptName];
+  preConditions.checkIfScriptExists(ROYGBIV.startScript, null, script);
+  script.start();
+}
+
+// Stops a script. The scriptName parameter is explained with startScript API.
+Roygbiv.prototype.stopScript = function(scriptName){
+  if (mode == 0){
+    return;
+  }
+  preConditions.checkIfDefined(ROYGBIV.stopScript, preConditions.scriptName, scriptName);
+  var script = scripts[scriptName];
+  preConditions.checkIfScriptExists(ROYGBIV.startScript, null, script);
+  script.stop();
 }

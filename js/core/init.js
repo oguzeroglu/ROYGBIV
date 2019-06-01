@@ -21,16 +21,14 @@ window.onload = function() {
   skyboxHandler = new SkyboxHandler();
   // FOG HANDLER
   fogHandler = new FogHandler();
+  // SCRIPTS HANDLER
+  scriptsHandler = new ScriptsHandler();
   // TEXT POOL
   Text = (!isDeployment)? new Text(): 0;
   // DRAGABLE CLI
   var cliDiv = document.getElementById("cliDiv");
   cliDivheader = document.getElementById("cliDivheader");
   var terminalDiv = document.getElementById("terminalDiv");
-  scriptCreatorDiv = document.getElementById("scriptCreatorDiv");
-  scriptCreatorCancelButton = document.getElementById("scriptCreatorCancelButton");
-  scriptCreatorSaveButton = document.getElementById("scriptCreatorSaveButton");
-  scriptCreatorTextArea = document.getElementById("scriptCreatorTextArea");
 
   // CONTROLS TEST
   if (!isDeployment){
@@ -66,6 +64,7 @@ window.onload = function() {
     fogCreatorGUIHandler = new FogCreatorGUIHandler();
     fontCreatorGUIHandler = new FontCreatorGUIHandler();
     crosshairCreatorGUIHandler = new CrosshairCreatorGUIHandler();
+    scriptsGUIHandler = new ScriptsGUIHandler();
   }
 
   // PHYSICS BODY GENERATOR

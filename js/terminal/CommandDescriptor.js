@@ -185,7 +185,8 @@ var CommandDescriptor = function(){
       1, //newCrosshair
       1, //editCrosshair
       1, //destroyCrosshair
-      0 //printCrosshairs
+      0, //printCrosshairs
+      0 //scripts
   ];
 
   this.commandArgumentsExpectedExplanation = [
@@ -373,7 +374,8 @@ var CommandDescriptor = function(){
     "newCrosshair crosshairName",
     "editCrosshair crosshairName",
     "destroyCrosshair crosshairName",
-    "printCrosshairs"
+    "printCrosshairs",
+    "scripts"
   ];
 
   this.commands = [
@@ -561,7 +563,8 @@ var CommandDescriptor = function(){
     "newCrosshair",
     "editCrosshair",
     "destroyCrosshair",
-    "printCrosshairs"
+    "printCrosshairs",
+    "scripts"
   ];
 
   this.commandInfo = [
@@ -749,7 +752,8 @@ var CommandDescriptor = function(){
     "newCrosshair: Creates a new Crosshair object.",
     "editCrosshair: Opens the Crosshair editing GUI.",
     "destroyCrosshair: Destroys a Crosshair object.",
-    "printCrosshairs: Prints created crosshairs."
+    "printCrosshairs: Prints created crosshairs.",
+    "scripts: Opens the script handler GUI."
   ];
 
   this.keyboardInfo = [
@@ -799,9 +803,18 @@ var CommandDescriptor = function(){
     75, //scaleSkybox -> Deprecated due to lack of usecases.
     78, //undo -> Deprecated because causes memory issues for big projects.
     79, //redo -> Deprecated because causes memory issues for big projects.
+    83, //newScript -> Deprecated due to changes in script creation logic.
+    84, //runScript -> Deprecated due to changes in script creation logic.
+    85, //stopScript -> Deprecated due to changes in script creation logic.
+    86, //printScripts -> Deprecated due to changes in script creation logic.
+    87, //editScript -> Deprecated due to changes in script creation logic.
+    88, //destroyScript -> Deprecated due to changes in script creation logic.
     89, //translateObject -> Deprecated due to architectural conflicts. Objects can only be translated using animations. Instead of translating the object in the design mode, a new grid system should be created at the specific position. Every object should be associated with certain grids.
     90, //setFog -> Deprecated due to architectural changes in fog creation process.
     91, //removeFog -> Deprecated due to architectural changes in fog creation process.
+    98, //runAutomatically -> Deprecated due to changes in script creation logic.
+    99, //uploadScript -> Deprecated due to changes in script creation logic.
+    100, //runManually -> Deprecated due to changes in script creation logic.
     101, //physicsWorkerMode -> Physics workers are now always enabled if the web workers are supported.
     102, //printPhysicsWorkerMode -> Physics workers are now always enabled if the web workers are supported.
     105, //printPerformance -> Deprecated because calling performance.now() multiple times on each render is costly.
@@ -853,8 +866,7 @@ var CommandDescriptor = function(){
   this.DEFAULT_MATERIAL_TYPE      =   15;
   this.TEXTURE_PACK_NAME          =   17;
   this.HIDE_SHOW                  =   18;
-  this.SKYBOX_NAME                =   29;
-  this.SCRIPT_NAME                =   20;
+  this.SKYBOX_NAME                =   19;
   this.ANY_OBJECT                 =   21;
   this.GLUED_OBJECT_NAME          =   22;
   this.MARKED_POINT_NAME          =   23;
@@ -1053,31 +1065,6 @@ var CommandDescriptor = function(){
   this.rotateObject.types.push(this.OBJECT_AXIS); //axis
   this.rotateObject.types.push(this.UNKNOWN_INDICATOR); //radian
 
-  // newScript
-  this.newScript = new Object();
-  this.newScript.types = [];
-  this.newScript.types.push(this.UNKNOWN_INDICATOR); //name
-
-  // runScript
-  this.runScript = new Object();
-  this.runScript.types = [];
-  this.runScript.types.push(this.SCRIPT_NAME); //name
-
-  // stopScript
-  this.stopScript = new Object();
-  this.stopScript.types = [];
-  this.stopScript.types.push(this.SCRIPT_NAME); //name
-
-  // editScript
-  this.editScript = new Object();
-  this.editScript.types = [];
-  this.editScript.types.push(this.SCRIPT_NAME); //name
-
-  // destroyScript
-  this.destroyScript = new Object();
-  this.destroyScript.types = [];
-  this.destroyScript.types.push(this.SCRIPT_NAME); //nane
-
   // glue
   this.glue = new Object();
   this.glue.types = [];
@@ -1101,22 +1088,6 @@ var CommandDescriptor = function(){
   this.unmark = new Object();
   this.unmark.types = [];
   this.unmark.types.push(this.MARKED_POINT_NAME); //name
-
-  // runAutomatically
-  this.runAutomatically = new Object();
-  this.runAutomatically.types = [];
-  this.runAutomatically.types.push(this.SCRIPT_NAME); //scriptName
-
-  // uploadScript
-  this.uploadScript = new Object();
-  this.uploadScript.types = [];
-  this.uploadScript.types.push(this.UNKNOWN_INDICATOR); //scriptName
-  this.uploadScript.types.push(this.UNKNOWN_INDICATOR); //filePath
-
-  // runManually
-  this.runManually = new Object();
-  this.runManually.types = [];
-  this.runManually.types.push(this.SCRIPT_NAME); //scriptName
 
   // explain
   this.explain = new Object();

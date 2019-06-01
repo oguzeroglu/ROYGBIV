@@ -1,14 +1,7 @@
-var Script = function(name, script){
-  this.name = name;
-  this.script = script;
+var Script = function(path){
+  this.name = scriptsHandler.getScriptNameFromPath(path);
+  this.path = path;
   this.status = SCRIPT_STATUS_STOPPED;
-  if (!isDeployment){
-    try{
-      this.func = new Function(this.script);
-    }catch(err){
-      this.status = SCRIPT_STATUS_ERROR;
-    }
-  }
   if (isDeployment){
     this.deploymentStatusVariableName = "SCRIPT_EXECUTION_STATUS_"+this.name;
   }
@@ -41,47 +34,29 @@ Script.prototype.execute = function(){
   }
 }
 
-Script.prototype.reload = function(onSuccess, onLoadError, onCompilationError){
-  if (this.localFilePath){
-    var that = this;
-    $.ajax({
-      url: this.localFilePath,
-      converters:{
-        'text script': function(text){
-          return text;
-        }
-      },
-      success: function(data){
-        that.script = data;
-        try{
-          that.func = new Function(that.script);
-        }catch (err){
-          onCompilationError(that.name, err.message);
-          return;
-        }
-        onSuccess(that.name);
+Script.prototype.load = function(onSuccess, onLoadError, onCompilationError){
+  var that = this;
+  $.ajax({
+    url: "./scripts/" + this.path,
+    converters:{
+      'text script': function(text){
+        return text;
       }
-    }).fail(function(){
-      onLoadError(that.name, that.localFilePath);
-    });
-    return;
-  }
-}
-
-Script.prototype.export = function(){
-  var exportObject = new Object();
-  exportObject["name"] = this.name;
-  exportObject["script"] = this.script;
-  exportObject["status"] = this.status;
-  if (this.localFilePath){
-    exportObject["localFilePath"] = this.localFilePath;
-  }
-  if (this.runAutomatically){
-    exportObject["runAutomatically"] = true;
-  }else{
-    exportObject["runAutomatically"] = false;
-  }
-  return exportObject;
+    },
+    success: function(data){
+      that.script = data;
+      try{
+        that.func = new Function(that.script);
+      }catch (err){
+        onCompilationError(that.name, err.message);
+        return;
+      }
+      onSuccess(that.name);
+    }
+  }).fail(function(){
+    onLoadError(that.name, that.localFilePath);
+  });
+  return;
 }
 
 Script.prototype.stop = function(){
@@ -90,7 +65,7 @@ Script.prototype.stop = function(){
     return;
   }
   this.status = SCRIPT_STATUS_STOPPED;
-  delete scriptsToRun[this.name];
+  scriptsToRun.delete(this.name);
 }
 
 Script.prototype.start = function(){
@@ -99,7 +74,7 @@ Script.prototype.start = function(){
     return;
   }
   this.status = SCRIPT_STATUS_STARTED;
-  scriptsToRun[this.name] = this;
+  scriptsToRun.set(this.name, this);
 }
 
 Script.prototype.isRunning = function(){
@@ -107,4 +82,12 @@ Script.prototype.isRunning = function(){
     return deploymentScriptsStatus[this.deploymentStatusVariableName];
   }
   return (this.status == SCRIPT_STATUS_STARTED);
+}
+
+Script.prototype.shouldRunAutomatically = function(){
+  return this.runAutomatically;
+}
+
+Script.prototype.setRunAutomaticallyStatus = function(val){
+  this.runAutomatically = val;
 }

@@ -211,6 +211,7 @@ var Preconditions = function(){
   this.fingerSwipeRotationSpeed = "fingerSwipeRotationSpeed";
   this.keyboardRotationSpeed = "keyboardRotationSpeed";
   this.collisionAction = "collisionAction";
+  this.scriptName = "scriptName";
 }
 
 Preconditions.prototype.errorHeader = function(callerFunc){

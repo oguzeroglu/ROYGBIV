@@ -109,6 +109,14 @@ app.post("/getFonts", function(req, res){
   res.send(JSON.stringify(fonts));
 });
 
+app.post("/getScripts", function(req, res){
+  console.log("[*] Getting scripts.");
+  res.setHeader("Content-Type", "application/json");
+  var scriptDescription = new Object();
+  getScriptsInFolder("./scripts/", scriptDescription);
+  res.send(JSON.stringify(scriptDescription));
+});
+
 app.post("/prepareTexturePack", async function(req, res){
   console.log("[*] Preparing texture pack: "+req.body.texturePackName);
   var info = {hasDiffuse: false, hasAlpha: false, hasAO: false, hasEmissive: false, hasHeight: false};
@@ -236,6 +244,23 @@ app.post("/compressFont", async function(req, res){
   res.send(JSON.stringify({error: false}));
 });
 
+function getScriptsInFolder(curPath, obj){
+  var files = fs.readdirSync(curPath);
+  for (var i = 0; i<files.length; i++){
+    var f = files[i];
+    var joined = path.join(curPath, f);
+    var key = joined.substr(8);
+    if (fs.statSync(joined).isDirectory()){
+      if (!obj[key]){
+        obj[key] = new Object();
+      }
+      getScriptsInFolder(joined, obj[key]);
+    }else if (f.toLowerCase().endsWith(".js")){
+      obj[f] = false;
+    }
+  }
+}
+
 function handleBackup(restore, filePath, backupFilePath){
   if (restore){
     if (fs.existsSync(filePath)){
@@ -317,10 +342,10 @@ function copyWorkers(application){
 function handleScripts(application, engineScriptsConcatted){
   var statusText = "";
   var scriptsText = "";
-  var len = Object.keys(application.scripts).length;
+  var len = application.scripts.totalCount;
   var i = 0;
-  for (var scriptName in application.scripts){
-    var script = application.scripts[scriptName].script.replace("this.stop()", "deploymentScriptsStatus.SCRIPT_EXECUTION_STATUS_"+scriptName+" = false")
+  for (var scriptName in application.scripts.scripts){
+    var script = application.scripts.scripts[scriptName];
     if (i != len -1){
       statusText += "SCRIPT_EXECUTION_STATUS_"+scriptName+": false,\n";
     }else{
@@ -507,6 +532,7 @@ function readEngineScripts(projectName, author, noMobile){
         console.log("[*] Skipping FogCreatorGUIHandler.");
         console.log("[*] Skipping FontCreatorGUIHandler.");
         console.log("[*] Skipping CrosshairCreatorGUIHandler.");
+        console.log("[*] Skipping ScriptsGUIHandler.");
         continue;
       }else if (scriptPath.includes("dat.gui.min.js")){
         console.log("[*] Skipping DAT gui.");

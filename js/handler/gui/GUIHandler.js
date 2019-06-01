@@ -92,7 +92,7 @@ var GUIHandler = function(){
   }
   // GUI TYPES DEFINITION
   this.guiTypes = {
-    TEXT: 0, OBJECT: 1, BLOOM: 2, FPS_WEAPON_ALIGNMENT: 3, SHADER_PRECISION: 4, PARTICLE_SYSTEM: 5, WORKER_STATUS: 6, MUZZLE_FLASH: 7, TEXTURE_PACK: 8, SKYBOX_CREATION: 9, FOG: 10, FONT: 11, CROSSHAIR_CREATION: 12
+    TEXT: 0, OBJECT: 1, BLOOM: 2, FPS_WEAPON_ALIGNMENT: 3, SHADER_PRECISION: 4, PARTICLE_SYSTEM: 5, WORKER_STATUS: 6, MUZZLE_FLASH: 7, TEXTURE_PACK: 8, SKYBOX_CREATION: 9, FOG: 10, FONT: 11, CROSSHAIR_CREATION: 12, SCRIPTS: 13
   };
 }
 
@@ -608,6 +608,12 @@ GUIHandler.prototype.hide = function(guiType){
       if (this.datGuiCrosshairCreation){
         this.destroyGUI(this.datGuiCrosshairCreation);
         this.datGuiCrosshairCreation = 0;
+      }
+    return;
+    case this.guiTypes.SCRIPTS:
+      if (this.datGuiScripts){
+        this.destroyGUI(this.datGuiScripts);
+        this.datGuiScripts = 0;
       }
     return;
   }

@@ -455,14 +455,6 @@ Terminal.prototype.autocomplete = function(command){
 				}
 				helpString = "[Skyboxes]: ";
 			break;
-			case commandDescriptor.SCRIPT_NAME:
-				for (var scriptName in scripts){
-					if (scriptName.startsWith(curEntry)){
-						possibilities.push(scriptName);
-					}
-				}
-				helpString = "[Scripts]: ";
-			break;
 			case commandDescriptor.ANY_OBJECT:
 				var splittedEntry = curEntry.split(",");
 				for (var objectName in addedObjects){

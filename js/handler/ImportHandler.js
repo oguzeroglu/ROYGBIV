@@ -218,19 +218,7 @@ ImportHandler.prototype.importAreas = function(obj){
 }
 
 ImportHandler.prototype.importScripts = function(obj){
-  for (var scriptName in obj.scripts){
-    var curScriptExport = obj.scripts[scriptName];
-    scripts[scriptName] = new Script(curScriptExport.name, curScriptExport.script);
-    if (curScriptExport.runAutomatically){
-      scripts[scriptName].runAutomatically = true;
-    }else{
-      scripts[scriptName].runAutomatically = false;
-    }
-    if (curScriptExport.localFilePath && !isDeployment){
-      modeSwitcher.totalScriptsToLoad ++;
-      scripts[scriptName].localFilePath = curScriptExport.localFilePath;
-    }
-  }
+  scriptsHandler.import(obj);
 }
 
 ImportHandler.prototype.importFog = function(obj){

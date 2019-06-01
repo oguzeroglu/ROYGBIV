@@ -47,22 +47,12 @@ JobHandler.prototype.handle = function(previewModeCommand){
       this.handleSetMassCommand();
     }else if (this.splitted[0] == "rotateobject"){
       this.handleRotateObjectCommand();
-    }else if (this.splitted[0] == "runscript"){
-      this.handleRunScriptCommand();
-    }else if (this.splitted[0] == "stopscript"){
-      this.handleStopScriptCommand();
-    }else if (this.splitted[0] == "destroyscript"){
-      this.handleDestroyScriptCommand();
     }else if (this.splitted[0] == "detach"){
       this.handleDetachCommand();
     }else if (this.splitted[0] == "mark"){
       this.handleMarkCommand();
     }else if (this.splitted[0] == "unmark"){
       this.handleUnmarkCommand();
-    }else if (this.splitted[0] == "runautomatically"){
-      this.handleRunAutomaticallyCommand();
-    }else if (this.splitted[0] == "runmanually"){
-      this.handleRunManuallyCommand();
     }else if (this.splitted[0] == "setblending"){
       this.handleSetBlendingCommand();
     }else if (this.splitted[0] == "applydisplacementmap"){
@@ -550,44 +540,6 @@ JobHandler.prototype.handleSetBlendingCommand = function(){
   }
 }
 
-JobHandler.prototype.handleRunManuallyCommand = function(){
-  var scriptPrefix = this.splitted[1].split("*")[0];
-  var ctr = 0;
-  for (var scriptName in scripts){
-    if (scriptName.startsWith(scriptPrefix)){
-      parseCommand(
-        "runManually "+scriptName
-      );
-      ctr ++;
-    }
-  }
-  if (ctr == 0){
-    terminal.printError(Text.NO_SCRIPTS_FOUND);
-
-  }else{
-    terminal.printInfo(Text.COMMAND_EXECUTED_FOR_X_SCRIPTS.replace(Text.PARAM1, ctr));
-  }
-}
-
-JobHandler.prototype.handleRunAutomaticallyCommand = function(){
-  var scriptPrefix = this.splitted[1].split("*")[0];
-  var ctr = 0;
-  for (var scriptName in scripts){
-    if (scriptName.startsWith(scriptPrefix)){
-      parseCommand(
-        "runAutomatically "+scriptName
-      );
-      ctr ++;
-    }
-  }
-  if (ctr == 0){
-    terminal.printError(Text.NO_SCRIPTS_FOUND);
-
-  }else{
-    terminal.printInfo(Text.COMMAND_EXECUTED_FOR_X_SCRIPTS.replace(Text.PARAM1, ctr));
-  }
-}
-
 JobHandler.prototype.handleUnmarkCommand = function(){
   var ptPrefix = this.splitted[1].split("*")[0];
   var ctr = 0;
@@ -642,63 +594,6 @@ JobHandler.prototype.handleDetachCommand = function(){
     terminal.printError(Text.NO_OBJECT_FOUND);
   }else{
     terminal.printError(Text.COMMAND_EXECUTED_FOR_X_OBJECTS.replace(Text.PARAM1, ctr));
-  }
-}
-
-JobHandler.prototype.handleDestroyScriptCommand = function(){
-  var scriptNamePrefix = this.splitted[1].split("*")[0];
-  var ctr = 0;
-  for (var scriptName in scripts){
-    if (scriptName.startsWith(scriptNamePrefix)){
-      parseCommand(
-        "destroyScript "+scriptName
-      );
-      ctr ++;
-    }
-  }
-  if (ctr == 0){
-    terminal.printError(Text.NO_SCRIPTS_FOUND);
-
-  }else{
-    terminal.printInfo(Text.COMMAND_EXECUTED_FOR_X_SCRIPTS.replace(Text.PARAM1, ctr));
-  }
-}
-
-JobHandler.prototype.handleStopScriptCommand = function(){
-
-  var scriptNamePrefix = this.splitted[1].split("*")[0];
-  var ctr = 0;
-  for (var scriptName in scripts){
-    if (scriptName.startsWith(scriptNamePrefix)){
-      parseCommand(
-        "stopScript "+scriptName
-      );
-      ctr ++;
-    }
-  }
-  if (ctr == 0){
-    terminal.printError(Text.NO_SCRIPTS_FOUND);
-  }else{
-    terminal.printInfo(Text.COMMAND_EXECUTED_FOR_X_SCRIPTS.replace(Text.PARAM1, ctr));
-  }
-}
-
-JobHandler.prototype.handleRunScriptCommand = function(){
-
-  var scriptNamePrefix = this.splitted[1].split("*")[0];
-  var ctr = 0;
-  for (var scriptName in scripts){
-    if (scriptName.startsWith(scriptNamePrefix)){
-      parseCommand(
-        "runScript "+scriptName
-      );
-      ctr ++;
-    }
-  }
-  if (ctr == 0){
-    terminal.printError(Text.NO_SCRIPTS_FOUND);
-  }else{
-    terminal.printInfo(Text.COMMAND_EXECUTED_FOR_X_SCRIPTS.replace(Text.PARAM1, ctr));
   }
 }
 

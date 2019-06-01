@@ -233,7 +233,6 @@ StateLoader.prototype.resetProject = function(){
     selectionHandler.resetCurrentSelection();
   }
   croppedGridSystemBuffer = 0;
-  scriptEditorShowing = false;
   physicsSolver = new CANNON.GSSolver();
   // PHYSICS DEBUG MODE
   var objectsToRemove = [];

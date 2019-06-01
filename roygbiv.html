@@ -103,9 +103,11 @@
     <script src="./js/handler/gui/FogCreatorGUIHandler.js"></script>
     <script src="./js/handler/gui/FontCreatorGUIHandler.js"></script>
     <script src="./js/handler/gui/CrosshairCreatorGUIHandler.js"></script>
+    <script src="./js/handler/gui/ScriptsGUIHandler.js"></script>
     <script src="./js/handler/TextureAtlasHandler.js"></script>
     <script src="./js/handler/SkyboxHandler.js"></script>
     <script src="./js/handler/FogHandler.js"></script>
+    <script src="./js/handler/ScriptsHandler.js"></script>
     <style>
 		  body { margin: 0; position: fixed;}
 			canvas {display: block;}
@@ -192,13 +194,6 @@
     <div id="cliDiv">
       <div id="cliDivheader" class = "noselect">ROYGBIV 3D Engine - CLI (Design mode)</div>
       <div id="terminalDiv" class="terminal noselect"></div>
-      <div id="scriptCreatorDiv">
-        <textarea autofocus id="scriptCreatorTextArea" rows="8" cols="50" spellcheck="false"></textarea>
-        <div id="scriptCreatorButtonsDiv">
-          <button id="scriptCreatorCancelButton" class="scriptCreatorButton">CANCEL</script>
-          <button id="scriptCreatorSaveButton" class="scriptCreatorButton">SAVE</script>
-        </div>
-      </div>
     </div>
      <!-- 3D CONTENT -->
     <canvas id="rendererCanvas"></canvas>

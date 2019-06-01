@@ -1,6 +1,5 @@
 var ModeSwitcher = function(){
   this.loadedScriptsCounter = 0;
-  this.totalScriptsToLoad = 0;
   var that = this;
   this.scriptReloadSuccessFunction = function(scriptName){
     that.loadedScriptsCounter ++;
@@ -34,23 +33,13 @@ var ModeSwitcher = function(){
 ModeSwitcher.prototype.switchMode = function(){
   if (mode == 0){
     this.loadedScriptsCounter = 0;
+    this.totalScriptsToLoad = scriptsHandler.getTotalScriptsToLoadCount();
     if (this.totalScriptsToLoad > 0){
       terminal.clear();
-      if (!isDeployment){
-        terminal.printInfo(Text.LOADING_SCRIPTS);
-      }
+      terminal.printInfo(Text.LOADING_SCRIPTS);
       canvas.style.visibility = "hidden";
       terminal.disable();
-      for (var scriptName in scripts){
-        var script = scripts[scriptName];
-        if (script.localFilePath){
-          script.reload(
-            this.scriptReloadSuccessFunction,
-            this.scriptReloadErrorFunction,
-            this.scriptReloadCompilationErrorFunction
-          );
-        }
-      }
+      scriptsHandler.loadScripts(this.scriptReloadSuccessFunction, this.scriptReloadErrorFunction, this.scriptReloadCompilationErrorFunction);
     }else{
       this.switchFromDesignToPreview();
     }
@@ -105,23 +94,14 @@ ModeSwitcher.prototype.switchFromDesignToPreview = function(){
     scene.remove(gridSelections[gridName].mesh);
     scene.remove(gridSelections[gridName].dot);
   }
-  scriptsToRun = new Object();
+  scriptsToRun = new Map();
+  scriptsHandler.onModeSwitch();
   for (var markedPointName in markedPoints){
     markedPoints[markedPointName].hide(true);
   }
   if (areasVisible){
     for (var areaName in areas){
       areas[areaName].hide();
-    }
-  }
-  for (var scriptName in scripts){
-    var script = scripts[scriptName];
-    if (script.runAutomatically){
-      var script2 = new Script(scriptName, script.script);
-      script2.localFilePath = script.localFilePath;
-      script2.start();
-      scripts[scriptName] = script2;
-      script2.runAutomatically = true;
     }
   }
   for (var textName in addedTexts){
@@ -373,20 +353,6 @@ ModeSwitcher.prototype.switchFromPreviewToDesign = function(){
       delete object.originalMass;
     }
   }
-  var newScripts = new Object();
-  for (var scriptName in scripts){
-    newScripts[scriptName] = new Script(
-      scriptName,
-      scripts[scriptName].script
-    );
-    newScripts[scriptName].runAutomatically = scripts[scriptName].runAutomatically;
-    newScripts[scriptName].localFilePath = scripts[scriptName].localFilePath;
-  }
-  for (var scriptName in newScripts){
-    scripts[scriptName] =  newScripts[scriptName];
-    scripts[scriptName].runAutomatically = newScripts[scriptName].runAutomatically;
-  }
-  newScripts = undefined;
   fogHandler.onFromPreviewToDesign();
   renderer.setViewport(0, 0, window.innerWidth, window.innerHeight);
 
