@@ -118,6 +118,10 @@ function updateObjectTrails(){
   activeObjectTrails.forEach(objectTrailsUpdateFunction);
 }
 
+function scriptRunFunction(script, scriptName){
+  script.execute();
+}
+
 function runScripts(){
   if(!rayCaster.ready || !physicsWorld.ready){
     return;
@@ -126,9 +130,7 @@ function runScripts(){
     deploymentScripts();
     return;
   }
-  for (var scriptName in scriptsToRun){
-    scripts[scriptName].execute();
-  }
+  scriptsToRun.forEach(scriptRunFunction);
 }
 
 function updateTrackingObjects(){

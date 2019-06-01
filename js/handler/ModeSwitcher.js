@@ -94,7 +94,7 @@ ModeSwitcher.prototype.switchFromDesignToPreview = function(){
     scene.remove(gridSelections[gridName].mesh);
     scene.remove(gridSelections[gridName].dot);
   }
-  scriptsToRun = new Object();
+  scriptsToRun = new Map();
   for (var markedPointName in markedPoints){
     markedPoints[markedPointName].hide(true);
   }

@@ -65,7 +65,7 @@ Script.prototype.stop = function(){
     return;
   }
   this.status = SCRIPT_STATUS_STOPPED;
-  delete scriptsToRun[this.name];
+  scriptsToRun.delete(this.name);
 }
 
 Script.prototype.start = function(){
@@ -74,7 +74,7 @@ Script.prototype.start = function(){
     return;
   }
   this.status = SCRIPT_STATUS_STARTED;
-  scriptsToRun[this.name] = this;
+  scriptsToRun.set(this.name, this);
 }
 
 Script.prototype.isRunning = function(){
