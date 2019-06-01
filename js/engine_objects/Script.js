@@ -1,5 +1,6 @@
-var Script = function(name){
-  this.name = name;
+var Script = function(path){
+  this.name = scriptsHandler.getScriptNameFromPath(path);
+  this.path = path;
   this.status = SCRIPT_STATUS_STOPPED;
   if (isDeployment){
     this.deploymentStatusVariableName = "SCRIPT_EXECUTION_STATUS_"+this.name;
@@ -36,7 +37,7 @@ Script.prototype.execute = function(){
 Script.prototype.load = function(onSuccess, onLoadError, onCompilationError){
   var that = this;
   $.ajax({
-    url: "./scripts/" + this.name,
+    url: "./scripts/" + this.path,
     converters:{
       'text script': function(text){
         return text;

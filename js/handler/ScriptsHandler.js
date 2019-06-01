@@ -14,6 +14,11 @@ ScriptsHandler.prototype.import = function(obj){
 ScriptsHandler.prototype.export = function(){
   var exportObj = new Object();
   exportObj.configurations = JSON.parse(JSON.stringify(this.configurations));
+  exportObj.scripts = new Object();
+  exportObj.totalCount = this.getTotalScriptsToLoadCount();
+  for (var scriptName in scripts){
+    exportObj.scripts[scriptName] = scripts[scriptName].script;
+  }
   return exportObj;
 }
 
@@ -138,7 +143,7 @@ ScriptsHandler.prototype.loadNode = function(parent, successCallback, errorCallb
     var node = parent[key];
     if (!node.isFolder && node.include){
       var script = new Script(key);
-      scripts[key] = script;
+      scripts[this.getScriptNameFromPath(key)] = script;
       if (!isDeployment){
         script.load(successCallback, errorCallback, compilationErrorCallback);
       }
@@ -158,4 +163,17 @@ ScriptsHandler.prototype.getTotalScriptsToLoadCount = function(){
     return 0;
   }
   return this.includedScripts.length;
+}
+
+ScriptsHandler.prototype.getScriptNameFromPath = function(path){
+  var splitted = path.split("/");
+  var name = "";
+  for (var i = 1; i<splitted.length; i++){
+    if (i == splitted.length -1){
+      name += splitted[i];
+    }else{
+      name += splitted[i] + "_"
+    }
+  }
+  return name.replace(".js", "");
 }

@@ -342,10 +342,10 @@ function copyWorkers(application){
 function handleScripts(application, engineScriptsConcatted){
   var statusText = "";
   var scriptsText = "";
-  var len = Object.keys(application.scripts).length;
+  var len = application.scripts.totalCount;
   var i = 0;
-  for (var scriptName in application.scripts){
-    var script = application.scripts[scriptName].script.replace("this.stop()", "deploymentScriptsStatus.SCRIPT_EXECUTION_STATUS_"+scriptName+" = false")
+  for (var scriptName in application.scripts.scripts){
+    var script = application.scripts.scripts[scriptName];
     if (i != len -1){
       statusText += "SCRIPT_EXECUTION_STATUS_"+scriptName+": false,\n";
     }else{
