@@ -1,2 +1,4 @@
-This folder holds the scripts, do NOT delete this folder. The "newScript"
-CLI command considers this folder as the root folder.
+This folder is used to store the scripts. Do not delete this folder and
+put your game scripts here.
+
+Use "scripts" CLI command to handle script creation.

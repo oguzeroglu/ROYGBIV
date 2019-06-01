@@ -185,7 +185,8 @@ var CommandDescriptor = function(){
       1, //newCrosshair
       1, //editCrosshair
       1, //destroyCrosshair
-      0 //printCrosshairs
+      0, //printCrosshairs
+      0 //scripts
   ];
 
   this.commandArgumentsExpectedExplanation = [
@@ -373,7 +374,8 @@ var CommandDescriptor = function(){
     "newCrosshair crosshairName",
     "editCrosshair crosshairName",
     "destroyCrosshair crosshairName",
-    "printCrosshairs"
+    "printCrosshairs",
+    "scripts"
   ];
 
   this.commands = [
@@ -561,7 +563,8 @@ var CommandDescriptor = function(){
     "newCrosshair",
     "editCrosshair",
     "destroyCrosshair",
-    "printCrosshairs"
+    "printCrosshairs",
+    "scripts"
   ];
 
   this.commandInfo = [
@@ -749,7 +752,8 @@ var CommandDescriptor = function(){
     "newCrosshair: Creates a new Crosshair object.",
     "editCrosshair: Opens the Crosshair editing GUI.",
     "destroyCrosshair: Destroys a Crosshair object.",
-    "printCrosshairs: Prints created crosshairs."
+    "printCrosshairs: Prints created crosshairs.",
+    "scripts: Opens the script handler GUI."
   ];
 
   this.keyboardInfo = [
@@ -862,8 +866,7 @@ var CommandDescriptor = function(){
   this.DEFAULT_MATERIAL_TYPE      =   15;
   this.TEXTURE_PACK_NAME          =   17;
   this.HIDE_SHOW                  =   18;
-  this.SKYBOX_NAME                =   29;
-  this.SCRIPT_NAME                =   20;
+  this.SKYBOX_NAME                =   19;
   this.ANY_OBJECT                 =   21;
   this.GLUED_OBJECT_NAME          =   22;
   this.MARKED_POINT_NAME          =   23;

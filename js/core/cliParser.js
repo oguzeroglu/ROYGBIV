@@ -4392,6 +4392,21 @@ function parse(input){
           }
           return true;
         break;
+        case 185: //scripts
+          if (mode != 0){
+            terminal.printError(Text.WORKS_ONLY_IN_DESIGN_MODE);
+            return true;
+          }
+          terminal.disable();
+          terminal.clear();
+          terminal.printInfo(Text.LOADING);
+          scriptsHandler.getFiles(function(scriptDescriptions){
+            terminal.clear();
+            terminal.printInfo(Text.AFTER_SCRIPT_CREATION);
+            scriptsGUIHandler.show(scriptDescriptions);
+          });
+          return true;
+        break;
       }
       return true;
     }catch(err){

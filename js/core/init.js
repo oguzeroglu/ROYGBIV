@@ -21,6 +21,8 @@ window.onload = function() {
   skyboxHandler = new SkyboxHandler();
   // FOG HANDLER
   fogHandler = new FogHandler();
+  // SCRIPTS HANDLER
+  scriptsHandler = new ScriptsHandler();
   // TEXT POOL
   Text = (!isDeployment)? new Text(): 0;
   // DRAGABLE CLI
@@ -62,6 +64,7 @@ window.onload = function() {
     fogCreatorGUIHandler = new FogCreatorGUIHandler();
     fontCreatorGUIHandler = new FontCreatorGUIHandler();
     crosshairCreatorGUIHandler = new CrosshairCreatorGUIHandler();
+    scriptsGUIHandler = new ScriptsGUIHandler();
   }
 
   // PHYSICS BODY GENERATOR

@@ -256,7 +256,7 @@ function getScriptsInFolder(curPath, obj){
       }
       getScriptsInFolder(joined, obj[key]);
     }else if (f.toLowerCase().endsWith(".js")){
-      obj[f] = true;
+      obj[f] = false;
     }
   }
 }
@@ -532,6 +532,7 @@ function readEngineScripts(projectName, author, noMobile){
         console.log("[*] Skipping FogCreatorGUIHandler.");
         console.log("[*] Skipping FontCreatorGUIHandler.");
         console.log("[*] Skipping CrosshairCreatorGUIHandler.");
+        console.log("[*] Skipping ScriptsGUIHandler.");
         continue;
       }else if (scriptPath.includes("dat.gui.min.js")){
         console.log("[*] Skipping DAT gui.");
