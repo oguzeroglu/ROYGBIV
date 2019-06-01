@@ -27,10 +27,6 @@ window.onload = function() {
   var cliDiv = document.getElementById("cliDiv");
   cliDivheader = document.getElementById("cliDivheader");
   var terminalDiv = document.getElementById("terminalDiv");
-  scriptCreatorDiv = document.getElementById("scriptCreatorDiv");
-  scriptCreatorCancelButton = document.getElementById("scriptCreatorCancelButton");
-  scriptCreatorSaveButton = document.getElementById("scriptCreatorSaveButton");
-  scriptCreatorTextArea = document.getElementById("scriptCreatorTextArea");
 
   // CONTROLS TEST
   if (!isDeployment){

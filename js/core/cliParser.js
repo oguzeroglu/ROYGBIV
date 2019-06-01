@@ -1819,210 +1819,22 @@ function parse(input){
           return true;
         break;
         case 83: //newScript
-          var name = splitted[1];
-          if (name.indexOf("*") > -1){
-            terminal.printError(Text.INVALID_CHARACTER_IN_NAME);
-            return true;
-          }
-          if (scripts[name]){
-            terminal.printError(Text.NAME_MUST_BE_UNIQUE);
-            return true;
-          }
-          cliInnerDiv.style.display = "none";
-          scriptCreatorDiv.style.display = "block";
-          scriptEditorShowing = true;
-          $("#cliDivheader").text("Script Editor - "+name);
-          scriptCreatorCancelButton.addEventListener("click", function(e){
-            scriptEditorShowing = false;
-            scriptCreatorDiv.style.display = "none";
-            cliInnerDiv.style.display = "block";
-            terminal.clear();
-            terminal.printError(Text.OPERATION_CANCELLED);
-            scriptCreatorTextArea.value = "";
-          });
-          scriptCreatorSaveButton.onclick = function(){
-            scriptEditorShowing = false;
-            scriptCreatorDiv.style.display = "none";
-            cliInnerDiv.style.display = "block";
-            var script = scriptCreatorTextArea.value;
-            var scriptObject;
-            try{
-              scriptObject = new Script(this.name, script);
-            }catch (err){
-              terminal.printError(Text.INVALID_SCRIPT.replace(Text.PARAM1, err.message));
-              return true;
-            }
-            scripts[this.name] = scriptObject;
-            terminal.clear();
-            terminal.printError(Text.SCRIPT_CREATED);
-            scriptCreatorTextArea.value = "";
-          }.bind({name: name});
-          scriptCreatorTextArea.focus();
-          return true;
+          // DEPRECATED
         break;
         case 84: //runScript
-          var name = splitted[1];
-          if (mode == 0){
-            terminal.printError(Text.WORKS_ONLY_IN_PREVIEW_MODE);
-            return true;
-          }
-          if (!(name.indexOf("*") == -1)){
-            new JobHandler(splitted).handle(true);
-            return true;
-          }
-          var script = scripts[name];
-          if (!script){
-            terminal.printError(Text.NO_SUCH_SCRIPT);
-            return true;
-          }
-          if (script.isRunning()){
-            terminal.printError(Text.SCRIPT_ALREADY_RUNNING);
-            return true;
-          }
-          var script2 = new Script(name, script.script);
-          if (script.runAutomatically){
-            script2.runAutomatically = script.runAutomatically;
-          }else{
-            script2.runAutomatically = false;
-          }
-          if (script.localFilePath){
-            script2.localFilePath = script.localFilePath;
-            script2.start();
-          }else{
-            script2.start();
-          }
-          if (!jobHandlerWorking){
-            terminal.printInfo(Text.SCRIPT_STARTED_RUNNING);
-          }
-          scripts[name] = script2;
-          return true;
+          // DEPRECATED
         break;
         case 85: //stopScript
-          var name = splitted[1];
-          if (mode == 0){
-            terminal.printError(Text.WORKS_ONLY_IN_PREVIEW_MODE);
-            return true;
-          }
-          if (!(name.indexOf("*") == -1)){
-            new JobHandler(splitted).handle(true);
-            return true;
-          }
-          var script = scripts[name];
-          if (!script){
-            terminal.printError(Text.NO_SUCH_SCRIPT);
-            return true;
-          }
-          if (!script.isRunning()){
-            terminal.printError(Text.SCRIPT_IS_NOT_RUNNING);
-            return true;
-          }
-          script.stop();
-          if (!jobHandlerWorking){
-            terminal.printInfo(Text.SCRIPT_STOPPED);
-          }
+          // DEPRECATED
         break;
         case 86: //printScripts
-          var count = 0;
-          var length = Object.keys(scripts).length;
-          terminal.printHeader(Text.SCRIPTS);
-          for (var scriptName in scripts){
-            var curScript = scripts[scriptName];
-            count ++;
-            var statusText = "";
-            if (curScript.status == SCRIPT_STATUS_ERROR){
-              statusText = "ERROR";
-            }else if (curScript.status == SCRIPT_STATUS_STOPPED){
-              statusText = "STOPPED";
-            }else if (curScript.status == SCRIPT_STATUS_STARTED){
-              statusText = "STARTED";
-            }
-            var options = true;
-            if (length == count){
-              options = false;
-            }
-            terminal.printInfo(Text.TREE_SCRIPTS.replace(
-              Text.PARAM1, curScript.name
-            ).replace(
-              Text.PARAM2, statusText
-            ), options);
-          }
-          if (count == 0){
-            terminal.printError(Text.NO_SCRIPTS_CREATED);
-          }
-          return true;
+          // DEPRECATED
         break;
         case 87: //editScript
-          var name = splitted[1];
-          var script = scripts[name];
-          if (!script){
-            terminal.printError(Text.NO_SUCH_SCRIPT);
-            return true;
-          }
-          var localFilePath = script.localFilePath;
-          if (localFilePath){
-            terminal.printError(Text.THIS_SCRIPT_IS_UPLOADED);
-            return true;
-          }
-          var runAutomatically = script.runAutomatically;
-          scriptCreatorTextArea.value = script.script;
-          cliInnerDiv.style.display = "none";
-          scriptCreatorDiv.style.display = "block";
-          scriptEditorShowing = true;
-          $("#cliDivheader").text("Script Editor - "+name);
-          scriptCreatorCancelButton.addEventListener("click", function(e){
-            scriptEditorShowing = false;
-            scriptCreatorDiv.style.display = "none";
-            cliInnerDiv.style.display = "block";
-            terminal.clear();
-            terminal.printError(Text.OPERATION_CANCELLED);
-            scriptCreatorTextArea.value = "";
-          });
-          scriptCreatorSaveButton.onclick = function(){
-            scriptEditorShowing = false;
-            scriptCreatorDiv.style.display = "none";
-            cliInnerDiv.style.display = "block";
-            var script = scriptCreatorTextArea.value;
-            var scriptObject;
-            try{
-              scriptObject = new Script(this.name, script);
-            }catch (err){
-              terminal.printError(Text.INVALID_SCRIPT.replace(Text.PARAM1, err.message));
-              return true;
-            }
-            scripts[this.name] = scriptObject;
-            scripts[this.name].runAutomatically = this.runAutomatically;
-            if (this.localFilePath){
-              scripts[this.name].localFilePath = this.localFilePath;
-            }
-            terminal.clear();
-            terminal.printInfo(Text.SCRIPT_MODIFIED);
-            scriptCreatorTextArea.value = "";
-          }.bind({name: name, runAutomatically: runAutomatically, localFilePath: localFilePath});
-          scriptCreatorTextArea.focus();
-          return true;
+          // DEPRECATED
         break;
         case 88: //destroyScript
-          var name = splitted[1];
-          if (mode == 1){
-            terminal.printError(Text.WORKS_ONLY_IN_DESIGN_MODE);
-            return true;
-          }
-          if (!(name.indexOf("*") == -1)){
-            new JobHandler(splitted).handle();
-            return true;
-          }
-          if (!scripts[name]){
-            terminal.printError(Text.NO_SUCH_SCRIPT);
-            return true;
-          }
-          if (scripts[name].localFilePath){
-            modeSwitcher.totalScriptsToLoad --;
-          }
-          delete scripts[name];
-          if (!jobHandlerWorking){
-            terminal.printInfo(Text.SCRIPT_DESTROYED);
-          }
-          return true;
+          // DEPRECATED
         break;
         case 89: //translateObject
           // DEPRECATED
@@ -2352,88 +2164,13 @@ function parse(input){
           return true;
         break;
         case 98: //runAutomatically
-          var scriptName = splitted[1];
-          var script = scripts[scriptName];
-          if (mode != 0){
-            terminal.printError(Text.WORKS_ONLY_IN_DESIGN_MODE);
-            return true;
-          }
-          if (!(scriptName.indexOf("*") == -1)){
-            new JobHandler(splitted).handle();
-            return true;
-          }
-          if (!script){
-            terminal.printError(Text.NO_SUCH_SCRIPT);
-            return true;
-          }
-          script.runAutomatically = true;
-          if (!jobHandlerWorking){
-            terminal.printInfo(Text.OK);
-          }
-          return true;
+          // DEPRECATED
         break;
         case 99: //uploadScript
-          var scriptName = splitted[1];
-          if (scriptName.indexOf("*") > -1){
-            terminal.printError(Text.INVALID_CHARACTER_IN_NAME);
-            return true;
-          }
-          var filePath = "scripts/"+splitted[2];
-          if (mode != 0){
-            terminal.printError(Text.WORKS_ONLY_IN_DESIGN_MODE);
-            return true;
-          }
-          if (scripts[scriptName]){
-            terminal.printError(Text.NAME_MUST_BE_UNIQUE);
-            return true;
-          }
-          $.ajax({
-            url: filePath,
-            converters: {
-              'text script': function (text){
-                return text;
-              }
-            },
-            success: function(data){
-              try{
-                var script = new Script(scriptName, data);
-              }catch (err){
-                terminal.printError(Text.INVALID_SCRIPT.replace(Text.PARAM1, err.message).replace(Text.PARAM2, scriptName));
-                return true;
-              }
-              script.localFilePath = filePath;
-              scripts[scriptName] = script;
-              modeSwitcher.totalScriptsToLoad ++;
-              terminal.printInfo(Text.SCRIPT_UPLOADED);
-            }
-          }).fail(function(){
-            terminal.printError(Text.FAILED_TO_LOAD_SCRIPT.replace(
-              Text.PARAM1, scriptName
-            ).replace(
-              Text.PARAM2, filePath
-            ))
-          });
+          // DEPRECATED
         break;
         case 100: //runManually
-          var scriptName = splitted[1];
-          var script = scripts[scriptName];
-          if (mode != 0){
-            terminal.printError(Text.WORKS_ONLY_IN_DESIGN_MODE);
-            return true;
-          }
-          if (!(scriptName.indexOf("*") == -1)){
-            new JobHandler(splitted).handle();
-            return true;
-          }
-          if (!script){
-            terminal.printError(Text.NO_SUCH_SCRIPT);
-            return true;
-          }
-          script.runAutomatically = false;
-          if (!jobHandlerWorking){
-            terminal.printInfo(Text.OK);
-          }
-          return true;
+          // DEPRECATED
         break;
         case 101: //physicsWorkerMode
           // DEPRECATED

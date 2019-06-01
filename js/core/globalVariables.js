@@ -5,10 +5,6 @@ var IS_WORKER_CONTEXT = false;
 var terminal;
 var cliInnerDiv;
 var cliDivheader;
-var scriptCreatorDiv;
-var scriptCreatorCancelButton;
-var scriptCreatorSaveButton;
-var scriptCreatorTextArea;
 
 // VERSION
 var ROYGBIV_ENGINE_VERSION = 1;
@@ -154,7 +150,6 @@ var CANNON_ZERO_VECTOR = new CANNON.Vec3(0, 0, 0);
 var REUSABLE_CANNON_QUATERNION = new CANNON.Quaternion();
 var REUSABLE_CANNON_QUATERNION_2 = new CANNON.Quaternion();
 var REUSABLE_QUAD_GEOMETRY = new THREE.PlaneBufferGeometry(2, 2);
-var scriptEditorShowing = false;
 var NO_BLENDING = THREE.NoBlending;
 var NORMAL_BLENDING = THREE.NormalBlending;
 var ADDITIVE_BLENDING = THREE.AdditiveBlending;

@@ -2,9 +2,6 @@ var KeyboardEventHandler = function(){
   if (isMobile){
     return;
   }
-  if (!isDeployment){
-    scriptCreatorTextArea.onkeydown = this.onScriptCreatorTextAreaKeyDown;
-  }
   window.addEventListener('keydown', this.onKeyDown);
   window.addEventListener('keyup', this.onKeyUp);
 }
@@ -129,14 +126,5 @@ KeyboardEventHandler.prototype.onKeyDown = function(event){
       }
       guiHandler.afterObjectSelection();
     break;
-  }
-}
-
-KeyboardEventHandler.prototype.onScriptCreatorTextAreaKeyDown = function(event){
-  if(event.keyCode==9 || event.which==9){
-    event.preventDefault();
-    var s = this.selectionStart;
-    this.value = this.value.substring(0,this.selectionStart) + "    " + this.value.substring(this.selectionEnd);
-    this.selectionEnd = s+1;
   }
 }
