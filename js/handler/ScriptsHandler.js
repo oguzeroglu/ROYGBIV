@@ -3,8 +3,18 @@ var ScriptsHandler = function(){
   this.includedScripts = [];
 }
 
+ScriptsHandler.prototype.import = function(obj){
+  this.configurations = JSON.parse(JSON.stringify(obj.scripts.configurations));
+  this.onConfigurationsRefreshed();
+  if (isDeployment){
+    this.loadScripts();
+  }
+}
+
 ScriptsHandler.prototype.export = function(){
-  return JSON.parse(JSON.stringify(this.configurations));
+  var exportObj = new Object();
+  exportObj.configurations = JSON.parse(JSON.stringify(this.configurations));
+  return exportObj;
 }
 
 ScriptsHandler.prototype.resetNode = function(parent){
@@ -26,11 +36,6 @@ ScriptsHandler.prototype.resetNode = function(parent){
 
 ScriptsHandler.prototype.reset = function(){
   this.resetNode(this.configurations["/"]);
-  this.onConfigurationsRefreshed();
-}
-
-ScriptsHandler.prototype.import = function(obj){
-  this.configurations = JSON.parse(JSON.stringify(obj));
   this.onConfigurationsRefreshed();
 }
 
@@ -123,4 +128,34 @@ ScriptsHandler.prototype.getFiles = function(callback){
     }
   }
   xhr.send();
+}
+
+ScriptsHandler.prototype.loadNode = function(parent, successCallback, errorCallback, compilationErrorCallback){
+  for (var key in parent){
+    if (!key.startsWith("/")){
+      continue;
+    }
+    var node = parent[key];
+    if (!node.isFolder && node.include){
+      var script = new Script(key);
+      scripts[key] = script;
+      if (!isDeployment){
+        script.load(successCallback, errorCallback, compilationErrorCallback);
+      }
+    }else if (node.isFolder){
+      this.loadNode(node, successCallback, errorCallback, compilationErrorCallback);
+    }
+  }
+}
+
+ScriptsHandler.prototype.loadScripts = function(successCallback, errorCallback, compilationErrorCallback){
+  scripts = new Object();
+  this.loadNode(this.configurations["/"], successCallback, errorCallback, compilationErrorCallback);
+}
+
+ScriptsHandler.prototype.getTotalScriptsToLoadCount = function(){
+  if (isDeployment){
+    return 0;
+  }
+  return this.includedScripts.length;
 }

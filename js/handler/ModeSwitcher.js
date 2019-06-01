@@ -1,6 +1,5 @@
 var ModeSwitcher = function(){
   this.loadedScriptsCounter = 0;
-  this.totalScriptsToLoad = 0;
   var that = this;
   this.scriptReloadSuccessFunction = function(scriptName){
     that.loadedScriptsCounter ++;
@@ -34,23 +33,13 @@ var ModeSwitcher = function(){
 ModeSwitcher.prototype.switchMode = function(){
   if (mode == 0){
     this.loadedScriptsCounter = 0;
+    this.totalScriptsToLoad = scriptsHandler.getTotalScriptsToLoadCount();
     if (this.totalScriptsToLoad > 0){
       terminal.clear();
-      if (!isDeployment){
-        terminal.printInfo(Text.LOADING_SCRIPTS);
-      }
+      terminal.printInfo(Text.LOADING_SCRIPTS);
       canvas.style.visibility = "hidden";
       terminal.disable();
-      for (var scriptName in scripts){
-        var script = scripts[scriptName];
-        if (script.localFilePath){
-          script.reload(
-            this.scriptReloadSuccessFunction,
-            this.scriptReloadErrorFunction,
-            this.scriptReloadCompilationErrorFunction
-          );
-        }
-      }
+      scriptsHandler.loadScripts(this.scriptReloadSuccessFunction, this.scriptReloadErrorFunction, this.scriptReloadCompilationErrorFunction);
     }else{
       this.switchFromDesignToPreview();
     }

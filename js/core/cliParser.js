@@ -1606,22 +1606,7 @@ function parse(input){
             return true;
           }
           selectionHandler.resetCurrentSelection();
-          var state = new State();
-          var json = JSON.stringify(state);
-          var blob = new Blob([json], {type: "application/json"});
-          var url  = URL.createObjectURL(blob);
-          var anchor = document.createElement('a');
-          anchor.download = "ROYGBIV_SAVE_"+new Date()+".json";
-          anchor.href = url;
-          if (typeof InstallTrigger !== 'undefined') {
-            // F I R E F O X
-            anchor.dispatchEvent(new MouseEvent("click", {
-              bubbles: true, cancelable: true, view: window
-            }));
-          }else{
-            anchor.click();
-          }
-          terminal.printInfo(Text.DOWNLOAD_PROCESS_INITIATED);
+          save();
           return true;
         break;
         case 77: //load
@@ -3351,37 +3336,25 @@ function parse(input){
           while (author.includes("/")){
             author = author.replace("/", " ");
           }
-          if (modeSwitcher.totalScriptsToLoad > 0){
+          var totalScriptsToLoad = scriptsHandler.getTotalScriptsToLoadCount();
+          if (totalScriptsToLoad > 0){
             loadedScriptsCounter = 0;
             terminal.clear();
             terminal.printInfo(Text.LOADING_SCRIPTS);
             canvas.style.visibility = "hidden";
             terminal.disable();
-            for (var scriptName in scripts){
-              var script = scripts[scriptName];
-              if (script.localFilePath){
-                script.reload(
-                  function(scriptName){
-                    loadedScriptsCounter ++;
-                    if (loadedScriptsCounter == modeSwitcher.totalScriptsToLoad){
-                      build(projectName, author);
-                    }
-                  },
-                  function(scriptName, filePath){
-                    modeSwitcher.enableTerminal();
-                    terminal.printError(Text.FAILED_TO_LOAD_SCRIPT.replace(
-                      Text.PARAM1, scriptName
-                    ).replace(
-                      Text.PARAM2, filePath
-                    ));
-                  },
-                  function(scriptName, errorMessage){
-                    modeSwitcher.enableTerminal();
-                    terminal.printError(Text.INVALID_SCRIPT.replace(Text.PARAM1, errorMessage).replace(Text.PARAM2, scriptName));
-                  }
-                );
+            scriptsHandler.loadScripts(function(scriptName){
+              loadedScriptsCounter ++;
+              if (loadedScriptsCounter == totalScriptsToLoad){
+                build(projectName, author);
               }
-            }
+            }, function(scriptName, filePath){
+              modeSwitcher.enableTerminal();
+              terminal.printError(Text.FAILED_TO_LOAD_SCRIPT.replace(Text.PARAM1, scriptName).replace(Text.PARAM2, filePath));
+            }, function(scriptName, errorMessage){
+              modeSwitcher.enableTerminal();
+              terminal.printError(Text.INVALID_SCRIPT.replace(Text.PARAM1, errorMessage).replace(Text.PARAM2, scriptName));
+            });
           }else{
             build(projectName, author);
           }
@@ -4555,4 +4528,23 @@ function isNameUsedAsSoftCopyParentName(name){
     }
   }
   return false;
+}
+
+function save(){
+  var state = new State();
+  var json = JSON.stringify(state);
+  var blob = new Blob([json], {type: "application/json"});
+  var url  = URL.createObjectURL(blob);
+  var anchor = document.createElement('a');
+  anchor.download = "ROYGBIV_SAVE_"+new Date()+".json";
+  anchor.href = url;
+  if (typeof InstallTrigger !== 'undefined') {
+    // F I R E F O X
+    anchor.dispatchEvent(new MouseEvent("click", {
+      bubbles: true, cancelable: true, view: window
+    }));
+  }else{
+    anchor.click();
+  }
+  terminal.printInfo(Text.DOWNLOAD_PROCESS_INITIATED);
 }

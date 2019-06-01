@@ -89,11 +89,7 @@ var State = function(projectName, author){
     this.anchorGrid = 0;
   }
   // SCRIPTS *******************************************************
-  var scriptsExport = new Object();
-  for (var scriptName in scripts){
-    scriptsExport[scriptName] = scripts[scriptName].export();
-  }
-  this.scripts = scriptsExport;
+  this.scripts = scriptsHandler.export();
   // OBJECT GROUPS *************************************************
   var objectGroupsExport = new Object();
   for (var objectName in objectGroups){
