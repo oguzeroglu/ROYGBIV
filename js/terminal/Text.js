@@ -585,8 +585,6 @@ var Text = function(){
   this.ROYGBIV_SCRIPTING_API_SETPOSITION = "Puts an object or glued object to the specified (x, y, z) coordinate.";
   this.ROYGBIV_SCRIPTING_API_COLOR = "Creates a new color object from the given HTML color name.";
   this.ROYGBIV_SCRIPTING_API_SETMASS = "Sets the mass property of an object or a glued object. Objects are considered dynamic if and only if their mass is greater than zero.";
-  this.ROYGBIV_SCRIPTING_API_RUNSCRIPT = "Starts a script of the given name.";
-  this.ROYGBIV_SCRIPTING_API_ISRUNNING = "Returns whether a script of the given name is running or not.";
   this.ROYGBIV_SCRIPTING_API_TRANSLATE = "Translates an object or glued object on the given axis by the given amount.\nAxis must be one of x, y or z.";
   this.ROYGBIV_SCRIPTING_API_GETPOSITION = "Returns the (x, y, z) coordinates of an object, glued object or a particle system.\nIf a specific axis is specified, only the position on the specified axis is returned.";
   this.ROYGBIV_SCRIPTING_API_OPACITY = "Increases/decreases the opacity of given object.";
@@ -807,4 +805,8 @@ var Text = function(){
   this.ROYGBIV_SCRIPTING_API_SETSCREENORIENTATIONCHANGELISTENER = "Sets a listener for orientation change events. For mobile devices, the callbackFunction is executed with isLandscape parameter\nwhen the orientation is changed.";
   this.ROYGBIV_SCRIPTING_API_REMOVESCREENORIENTATIONCHANGELISTENER = "Removes the listener for orientation change events.";
   this.ROYGBIV_SCRIPTING_API_EXECUTEFOREACHPARTICLESYSTEM = "Runs the provided function for each particle system of given particle system pool. The callbackFunction is executed with\nparticleSystem parameter.";
+  this.ROYGBIV_SCRIPTING_API_STARTSCRIPT = "Starts a script. To get scripts use this format as scriptName:\n"+
+                                           "parentdir1_parentdir2_....._parentdirX_scriptFileName\n"+
+                                           "For example in order to get a script under the scripts/ root folder example.js, the scriptName parameter should be example. However,\nto get a script under scripts/testFolder/test.js, the scriptName parameter should be testFolder_test.";
+  this.ROYGBIV_SCRIPTING_API_STOPSCRIPT = "Stops a script. The scriptName parameter is explained with startScript API.";
 }
