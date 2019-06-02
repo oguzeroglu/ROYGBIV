@@ -34,6 +34,19 @@ var ObjectGroup = function(name, group){
   this.lastUpdateQuaternion = new THREE.Quaternion();
 }
 
+ObjectGroup.prototype.getEmissiveIntensity = function(){
+  return this.mesh.material.uniforms.totalEmissiveIntensity.value;
+}
+
+ObjectGroup.prototype.setEmissiveIntensity = function(val){
+  this.mesh.material.uniforms.totalEmissiveIntensity.value = val;
+  for (var objName in this.group){
+    if (!(typeof this.group[objName].emissiveIntensityWhenAttached == UNDEFINED)){
+      this.group[objName].mesh.material.uniforms.emissiveIntensity.value = this.group[objName].emissiveIntensityWhenAttached * val;
+    }
+  }
+}
+
 ObjectGroup.prototype.useDefaultPrecision = function(){
   shaderPrecisionHandler.setDefaultPrecisionForObject(this);
   this.hasCustomPrecision = false;

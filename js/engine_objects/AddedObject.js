@@ -67,6 +67,14 @@ var AddedObject = function(name, type, metaData, material, mesh, physicsBody, de
 
 }
 
+AddedObject.prototype.getEmissiveIntensity = function(){
+  return this.mesh.material.uniforms.emissiveIntensity.value;
+}
+
+AddedObject.prototype.setEmissiveIntensity = function(val){
+  this.mesh.material.uniforms.emissiveIntensity.value = val;
+}
+
 AddedObject.prototype.useDefaultPrecision = function(){
   shaderPrecisionHandler.setDefaultPrecisionForObject(this);
   this.hasCustomPrecision = false;

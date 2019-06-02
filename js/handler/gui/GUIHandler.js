@@ -235,7 +235,7 @@ GUIHandler.prototype.afterObjectSelection = function(){
         guiHandler.disableController(guiHandler.omEmissiveIntensityController);
         guiHandler.disableController(guiHandler.omEmissiveColorController);
       }else{
-        guiHandler.objectManipulationParameters["Emissive int."] = obj.mesh.material.uniforms.emissiveIntensity.value;
+        guiHandler.objectManipulationParameters["Emissive int."] = obj.getEmissiveIntensity();
         guiHandler.objectManipulationParameters["Emissive col."] = "#"+obj.mesh.material.uniforms.emissiveColor.value.getHexString();
       }
       if (!obj.isSlicable()){
@@ -309,7 +309,7 @@ GUIHandler.prototype.afterObjectSelection = function(){
         guiHandler.disableController(guiHandler.omEmissiveIntensityController);
         guiHandler.disableController(guiHandler.omEmissiveColorController);
       }else{
-        guiHandler.objectManipulationParameters["Emissive int."] = obj.mesh.material.uniforms.totalEmissiveIntensity.value;
+        guiHandler.objectManipulationParameters["Emissive int."] = obj.getEmissiveIntensity();
         guiHandler.objectManipulationParameters["Emissive col."] = "#"+obj.mesh.material.uniforms.totalEmissiveColor.value.getHexString();
       }
       guiHandler.disableController(guiHandler.omTextureOffsetXController);
@@ -981,18 +981,7 @@ GUIHandler.prototype.initializeObjectManipulationGUI = function(){
   }).listen();
   guiHandler.omEmissiveIntensityController = guiHandler.datGuiObjectManipulation.add(guiHandler.objectManipulationParameters, "Emissive int.").min(0).max(100).step(0.01).onChange(function(val){
     var obj = selectionHandler.getSelectedObject();
-    if (obj.isAddedObject){
-      var material = obj.mesh.material;
-      material.uniforms.emissiveIntensity.value = val;
-    }else if (obj.isObjectGroup){
-      var material = obj.mesh.material;
-      material.uniforms.totalEmissiveIntensity.value = val;
-      for (var objName in obj.group){
-        if (!(typeof obj.group[objName].emissiveIntensityWhenAttached == UNDEFINED)){
-          obj.group[objName].mesh.material.uniforms.emissiveIntensity.value = obj.group[objName].emissiveIntensityWhenAttached * val;
-        }
-      }
-    }
+    obj.setEmissiveIntensity(val);
   }).listen();
   guiHandler.omDisplacementScaleController = guiHandler.datGuiObjectManipulation.add(guiHandler.objectManipulationParameters, "Disp. scale").min(-50).max(50).step(0.1).onChange(function(val){
     selectionHandler.getSelectedObject().mesh.material.uniforms.displacementInfo.value.x = val;
