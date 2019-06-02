@@ -154,10 +154,10 @@ app.post("/prepareTexturePack", async function(req, res){
     compressInfo.push(["s3tc", "height", mainPath]);
   }
   for (var i = 0; i<compressInfo.length; i++){
-    var result = await compressTexture(compressInfo[i][0], compressInfo[i][1], compressInfo[i][2], false, false);
+    var result = await compressTexture(compressInfo[i][0], compressInfo[i][1], compressInfo[i][2], true, false, false);
     if (result == "UNSUCC"){
       console.log("[!] Error happened trying to compress: "+compressInfo[i][1]+" with "+compressInfo[i][0]);
-      result = await compressTexture(compressInfo[i][0], compressInfo[i][1], compressInfo[i][2], true, false);
+      result = await compressTexture(compressInfo[i][0], compressInfo[i][1], compressInfo[i][2], true, true, false);
       if (result == "UNSUCC"){
         res.send(JSON.stringify({error: true, texture: compressInfo[i][1]}));
         return;
@@ -167,6 +167,34 @@ app.post("/prepareTexturePack", async function(req, res){
     }
   }
   res.send(JSON.stringify(info));
+});
+
+app.post("/prepareSkybox", async function(req, res){
+  console.log("Preparing skybox: "+req.body.skyboxFolderName);
+  res.setHeader('Content-Type', 'application/json');
+  var mainPath = "./skybox/"+req.body.skyboxFolderName;
+  var compressInfo = [
+    ["astc", "back", mainPath], ["pvrtc", "back", mainPath], ["s3tc", "back", mainPath],
+    ["astc", "down", mainPath], ["pvrtc", "down", mainPath], ["s3tc", "down", mainPath],
+    ["astc", "front", mainPath], ["pvrtc", "front", mainPath], ["s3tc", "front", mainPath],
+    ["astc", "left", mainPath], ["pvrtc", "left", mainPath], ["s3tc", "left", mainPath],
+    ["astc", "right", mainPath], ["pvrtc", "right", mainPath], ["s3tc", "right", mainPath],
+    ["astc", "up", mainPath], ["pvrtc", "up", mainPath], ["s3tc", "up", mainPath],
+  ];
+  for (var i = 0; i<compressInfo.length; i++){
+    var result = await compressTexture(compressInfo[i][0], compressInfo[i][1], compressInfo[i][2], false, false, false);
+    if (result == "UNSUCC"){
+      console.log("[!] Error happened trying to compress: "+compressInfo[i][1]+" with "+compressInfo[i][0]);
+      result = await compressTexture(compressInfo[i][0], compressInfo[i][1], compressInfo[i][2], false, true, false);
+      if (result == "UNSUCC"){
+        res.send(JSON.stringify({error: true, texture: compressInfo[i][1]}));
+        return;
+      }else{
+        console.log("[*] Compressed "+compressInfo[i][1]+" texture using fallback format.");
+      }
+    }
+  }
+  res.send(JSON.stringify({error: false}));
 });
 
 app.post("/compressTextureAtlas", async function(req, res){
@@ -205,7 +233,7 @@ app.post("/compressTextureAtlas", async function(req, res){
     compressInfo.push(["pvrtc", "textureAtlas", "./texture_atlas"]);
     compressInfo.push(["s3tc", "textureAtlas", "./texture_atlas"]);
     for (var i = 0; i<compressInfo.length; i++){
-      var result = await compressTexture(compressInfo[i][0], compressInfo[i][1], compressInfo[i][2], false, true);
+      var result = await compressTexture(compressInfo[i][0], compressInfo[i][1], compressInfo[i][2], true, false, true);
       if (result == "UNSUCC"){
         res.send(JSON.stringify({error: true}));
         handleAtlasBackup(true, hasPNGBackup, hasASTCBackup, hasPVRTCBackup, hasS3TCBackup);
@@ -235,7 +263,7 @@ app.post("/compressFont", async function(req, res){
   compressInfo.push(["pvrtc", "pack", "./texture_atlas/fonts/"+fontName]);
   compressInfo.push(["s3tc", "pack", "./texture_atlas/fonts/"+fontName]);
   for (var i = 0; i<compressInfo.length; i++){
-    var result = await compressTexture(compressInfo[i][0], compressInfo[i][1], compressInfo[i][2], false, true);
+    var result = await compressTexture(compressInfo[i][0], compressInfo[i][1], compressInfo[i][2], true, false, true);
     if (result == "UNSUCC"){
       res.send(JSON.stringify({error: true}));
       return;
@@ -287,14 +315,14 @@ function handleAtlasBackup(restore, hasPNGBackup, hasASTCBackup, hasPVRTCBackup,
   }
 }
 
-function compressTexture(type, fileName, mainPath, useJPG, overwrite){
+function compressTexture(type, fileName, mainPath, flipY, useJPG, overwrite){
   var output = mainPath+"/"+fileName+"-"+type+".ktx";
   if (fs.existsSync(output) && !overwrite){
     return new Promise(function(resolve, reject){resolve("SUCC");});
   }
   return new Promise(function(resolve, reject){
     console.log("[*] Running textureCompressor script for: "+type+", "+fileName);
-    runScript("./textureCompressor.js", [type, fileName, mainPath, useJPG], function(err){
+    runScript("./textureCompressor.js", [type, fileName, mainPath, flipY, useJPG], function(err){
       if (err){
         resolve("UNSUCC");
       }else{

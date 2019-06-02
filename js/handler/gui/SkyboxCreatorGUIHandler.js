@@ -20,7 +20,7 @@ SkyboxCreatorGUIHandler.prototype.init = function(skyboxName, isEdit){
       if (skyboxCreatorGUIHandler.isLoading){
         return;
       }
-      skyboxCreatorGUIHandler.close(Text.OPERATION_CANCELLED);
+      skyboxCreatorGUIHandler.close(Text.OPERATION_CANCELLED, false);
     },
     "Done": function(){
       if (skyboxCreatorGUIHandler.isLoading){
@@ -40,9 +40,9 @@ SkyboxCreatorGUIHandler.prototype.init = function(skyboxName, isEdit){
         guiHandler.enableController(skyboxCreatorGUIHandler.colorController);
         skyboxCreatorGUIHandler.isLoading = false;
         if (!isEdit){
-          skyboxCreatorGUIHandler.close(Text.SKYBOX_CREATED);
+          skyboxCreatorGUIHandler.close(Text.SKYBOX_CREATED, false);
         }else{
-          skyboxCreatorGUIHandler.close(Text.SKYBOX_EDITED);
+          skyboxCreatorGUIHandler.close(Text.SKYBOX_EDITED, false);
           if (skyboxHandler.isVisible() && skyboxHandler.getMappedSkyboxName() == skyboxName){
             skyboxHandler.map(skyBoxes[skyboxName]);
           }
@@ -52,7 +52,7 @@ SkyboxCreatorGUIHandler.prototype.init = function(skyboxName, isEdit){
   };
 }
 
-SkyboxCreatorGUIHandler.prototype.close = function(message){
+SkyboxCreatorGUIHandler.prototype.close = function(message, isError){
   guiHandler.hideAll();
   if (this.hiddenEngineObjects){
     for (var i = 0; i<this.hiddenEngineObjects.length; i++){
@@ -65,7 +65,11 @@ SkyboxCreatorGUIHandler.prototype.close = function(message){
   this.dispose();
   terminal.clear();
   terminal.enable();
-  terminal.printInfo(message);
+  if (isError){
+    terminal.printError(message);
+  }else{
+    terminal.printInfo(message);
+  }
   activeControl = new FreeControls({});
   activeControl.onActivated();
   camera.quaternion.set(0, 0, 0, 1);
@@ -87,7 +91,7 @@ SkyboxCreatorGUIHandler.prototype.dispose = function(){
 SkyboxCreatorGUIHandler.prototype.loadSkybox = function(skyboxName, dirName){
   terminal.clear();
   terminal.disable();
-  terminal.printInfo(Text.LOADING);
+  terminal.printInfo(Text.COMPRESSING_TEXTURE);
   guiHandler.disableController(this.skyboxController);
   guiHandler.disableController(this.colorController);
   this.isLoading = true;
@@ -95,17 +99,37 @@ SkyboxCreatorGUIHandler.prototype.loadSkybox = function(skyboxName, dirName){
     scene.remove(this.testMesh);
   }
   this.dispose();
-  this.skybox = new SkyBox(skyboxName, dirName, this.configurations["Color"]);
-  this.skybox.loadTextures(function(){
-    this.testMesh = this.generateSkyboxMesh(this.skybox);
-    scene.add(this.testMesh);
-    terminal.clear();
-    terminal.enable();
-    terminal.printInfo(Text.AFTER_SKYBOX_CREATION);
-    guiHandler.enableController(this.skyboxController);
-    guiHandler.enableController(this.colorController);
-    this.isLoading = false;
-  }.bind(this));
+  var xhr = new XMLHttpRequest();
+  xhr.open("POST", "/prepareSkybox", true);
+  xhr.setRequestHeader("Content-type", "application/json");
+  xhr.onreadystatechange = function (){
+    if (xhr.readyState == 4 && xhr.status == 200){
+      var resp = JSON.parse(xhr.responseText);
+      if (resp.error){
+        skyboxCreatorGUIHandler.isLoading = false;
+        skyboxCreatorGUIHandler.close(Text.TEXTURE_COMPRESSION_ENCODE_ERROR.replace(Text.PARAM1, resp.texture).replace(Text.PARAM2, dirName), true);
+        return;
+      }
+      terminal.printInfo(Text.TEXTURES_COMPRESSED);
+      terminal.printInfo(Text.LOADING);
+      skyboxCreatorGUIHandler.skybox = new SkyBox(skyboxName, dirName, skyboxCreatorGUIHandler.configurations["Color"]);
+      skyboxCreatorGUIHandler.skybox.loadTextures(function(){
+        skyboxCreatorGUIHandler.testMesh = skyboxCreatorGUIHandler.generateSkyboxMesh(skyboxCreatorGUIHandler.skybox);
+        scene.add(skyboxCreatorGUIHandler.testMesh);
+        terminal.clear();
+        terminal.enable();
+        terminal.printInfo(Text.AFTER_SKYBOX_CREATION);
+        guiHandler.enableController(skyboxCreatorGUIHandler.skyboxController);
+        guiHandler.enableController(skyboxCreatorGUIHandler.colorController);
+        skyboxCreatorGUIHandler.isLoading = false;
+      });
+    }
+  }
+  xhr.onerror = function(e){
+    skyboxCreatorGUIHandler.isLoading = false;
+    skyboxCreatorGUIHandler.close(Text.TEXTURE_COMPRESSION_ERROR.replace(Text.PARAM1, dirName), true);
+  }
+  xhr.send(JSON.stringify({skyboxFolderName: this.configurations["Skybox"]}));
 }
 
 SkyboxCreatorGUIHandler.prototype.commonStartFunctions = function(skyboxName, isEdit){

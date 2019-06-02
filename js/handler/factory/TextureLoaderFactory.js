@@ -3,6 +3,10 @@ var TextureLoaderFactory = function(){
   this.ktxLoader = new THREE.KTXLoader();
 }
 
+TextureLoaderFactory.prototype.isCompressionSupported = function(){
+  return ASTC_SUPPORTED || PVRTC_SUPPORTED || S3TC_SUPPORTED;
+}
+
 TextureLoaderFactory.prototype.getFilePostfix = function(){
   if (ASTC_SUPPORTED){
     return "-astc.ktx";

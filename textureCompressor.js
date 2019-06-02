@@ -4,8 +4,12 @@ var fs = require("fs");
 var type = process.argv[2];
 var fileName = process.argv[3];
 var mainPath = process.argv[4];
-var useJPG = process.argv[5];
+var flipY = process.argv[5];
+var useJPG = process.argv[6];
 
+if (typeof flipY == "string"){
+  flipY = flipY.toLowerCase() == "true";
+}
 if (typeof useJPG == "string"){
   useJPG = useJPG.toLowerCase() == "true"
 }
@@ -48,6 +52,6 @@ function compressTexture(type, fileName, mainPath){
     compression: compression,
     quality: quality,
     verbose: true,
-    flipY: true
+    flipY: flipY
   });
 }
