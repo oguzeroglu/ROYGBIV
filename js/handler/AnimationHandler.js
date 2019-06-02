@@ -16,7 +16,9 @@ var AnimationHandler = function(){
   };
   this.actionTypes = {
     OBJECT: {
-      TRANSPARENCY: 0, SCALE: 1, SCALE_X: 2, SCALE_Y: 3, SCALE_Z: 4
+      TRANSPARENCY: 0, SCALE: 1, SCALE_X: 2, SCALE_Y: 3, SCALE_Z: 4,
+      ROTATION_X: 5, ROTATION_Y: 6, ROTATION_Z: 7, POSITION_X: 8,
+      POSITION_Y: 9, POSITION_Z: 10
     }
   };
   // ACTION FUNCTIONS **********************************************
@@ -26,6 +28,12 @@ var AnimationHandler = function(){
   this.actionFunctionsByType[this.actionTypes.OBJECT.SCALE_X] = this.updateObjectScaleXFunc;
   this.actionFunctionsByType[this.actionTypes.OBJECT.SCALE_Y] = this.updateObjectScaleYFunc;
   this.actionFunctionsByType[this.actionTypes.OBJECT.SCALE_Z] = this.updateObjectScaleZFunc;
+  this.actionFunctionsByType[this.actionTypes.OBJECT.ROTATION_X] = this.updateObjectRotationXFunc;
+  this.actionFunctionsByType[this.actionTypes.OBJECT.ROTATION_Y] = this.updateObjectRotationYFunc;
+  this.actionFunctionsByType[this.actionTypes.OBJECT.ROTATION_Z] = this.updateObjectRotationZFunc;
+  this.actionFunctionsByType[this.actionTypes.OBJECT.POSITION_X] = this.updateObjectPositionXFunc;
+  this.actionFunctionsByType[this.actionTypes.OBJECT.POSITION_Y] = this.updateObjectPositionYFunc;
+  this.actionFunctionsByType[this.actionTypes.OBJECT.POSITION_Z] = this.updateObjectPositionZFunc;
   // UPDATE FUNCTIONS **********************************************
   this.updateFunctionsByType = new Object();
   this.updateFunctionsByType[this.animationTypes.LINEAR] = this.linearFunc;
@@ -99,6 +107,24 @@ AnimationHandler.prototype.updateObjectScaleYFunc = function(object, value){
 }
 AnimationHandler.prototype.updateObjectScaleZFunc = function(object, value){
   object.mesh.scale.z = value;
+}
+AnimationHandler.prototype.updateObjectRotationXFunc = function(object, value){
+  object.mesh.rotation.x = value;
+}
+AnimationHandler.prototype.updateObjectRotationYFunc = function(object, value){
+  object.mesh.rotation.y = value;
+}
+AnimationHandler.prototype.updateObjectRotationZFunc = function(object, value){
+  object.mesh.rotation.z = value;
+}
+AnimationHandler.prototype.updateObjectPositionXFunc = function(object, value){
+  object.mesh.position.x = value;
+}
+AnimationHandler.prototype.updateObjectPositionYFunc = function(object, value){
+  object.mesh.position.y = value;
+}
+AnimationHandler.prototype.updateObjectPositionZFunc = function(object, value){
+  object.mesh.position.z = value;
 }
 // UPDATE FUNCTIONS ************************************************
 AnimationHandler.prototype.linearFunc = function(curTime, startVal, changeInVal, totalTime){
