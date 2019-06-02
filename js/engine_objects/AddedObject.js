@@ -67,6 +67,14 @@ var AddedObject = function(name, type, metaData, material, mesh, physicsBody, de
 
 }
 
+AddedObject.prototype.getDisplacementScale = function(){
+  return this.mesh.material.uniforms.displacementInfo.value.x;
+}
+
+AddedObject.prototype.setDisplacementScale = function(val){
+  this.mesh.material.uniforms.displacementInfo.value.x = val;
+}
+
 AddedObject.prototype.getEmissiveIntensity = function(){
   return this.mesh.material.uniforms.emissiveIntensity.value;
 }

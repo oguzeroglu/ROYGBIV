@@ -213,7 +213,7 @@ GUIHandler.prototype.afterObjectSelection = function(){
         guiHandler.objectManipulationParameters["Colorizable"] = false;
       }
       if (obj.hasDisplacementMap()){
-        guiHandler.objectManipulationParameters["Disp. scale"] = obj.mesh.material.uniforms.displacementInfo.value.x;
+        guiHandler.objectManipulationParameters["Disp. scale"] = obj.getDisplacementScale();
         guiHandler.objectManipulationParameters["Disp. bias"] = obj.mesh.material.uniforms.displacementInfo.value.y;
       }else{
         guiHandler.disableController(guiHandler.omDisplacementScaleController);
@@ -984,7 +984,7 @@ GUIHandler.prototype.initializeObjectManipulationGUI = function(){
     obj.setEmissiveIntensity(val);
   }).listen();
   guiHandler.omDisplacementScaleController = guiHandler.datGuiObjectManipulation.add(guiHandler.objectManipulationParameters, "Disp. scale").min(-50).max(50).step(0.1).onChange(function(val){
-    selectionHandler.getSelectedObject().mesh.material.uniforms.displacementInfo.value.x = val;
+    selectionHandler.getSelectedObject().setDisplacementScale(val);
   }).listen();
   guiHandler.omDisplacementBiasController = guiHandler.datGuiObjectManipulation.add(guiHandler.objectManipulationParameters, "Disp. bias").min(-50).max(50).step(0.1).onChange(function(val){
     selectionHandler.getSelectedObject().mesh.material.uniforms.displacementInfo.value.y = val;

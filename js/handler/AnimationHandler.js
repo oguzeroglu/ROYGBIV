@@ -18,7 +18,7 @@ var AnimationHandler = function(){
     OBJECT: {
       TRANSPARENCY: 0, SCALE: 1, SCALE_X: 2, SCALE_Y: 3, SCALE_Z: 4,
       ROTATION_X: 5, ROTATION_Y: 6, ROTATION_Z: 7, POSITION_X: 8,
-      POSITION_Y: 9, POSITION_Z: 10, EMISSIVE_INTENSITY: 11
+      POSITION_Y: 9, POSITION_Z: 10, EMISSIVE_INTENSITY: 11, DISPLACEMENT_SCALE: 12
     }
   };
   // ACTION FUNCTIONS **********************************************
@@ -34,7 +34,8 @@ var AnimationHandler = function(){
   this.actionFunctionsByType[this.actionTypes.OBJECT.POSITION_X] = this.updateObjectPositionXFunc;
   this.actionFunctionsByType[this.actionTypes.OBJECT.POSITION_Y] = this.updateObjectPositionYFunc;
   this.actionFunctionsByType[this.actionTypes.OBJECT.POSITION_Z] = this.updateObjectPositionZFunc;
-  this.actionFunctionsByType[this.actionTypes.EMISSIVE_INTENSITY] = this.updateObjectEmissiveIntensity;
+  this.actionFunctionsByType[this.actionTypes.OBJECT.EMISSIVE_INTENSITY] = this.updateObjectEmissiveIntensity;
+  this.actionFunctionsByType[this.actionTypes.OBJECT.DISPLACEMENT_SCALE] = this.updateObjectDisplacementScale;
   // UPDATE FUNCTIONS **********************************************
   this.updateFunctionsByType = new Object();
   this.updateFunctionsByType[this.animationTypes.LINEAR] = this.linearFunc;
@@ -129,6 +130,13 @@ AnimationHandler.prototype.updateObjectPositionZFunc = function(object, value){
 }
 AnimationHandler.prototype.updateObjectEmissiveIntensity = function(object, value){
   object.setEmissiveIntensity(value);
+}
+AnimationHandler.prototype.updateObjectDisplacementScale = function(object, value){
+  if (!object.isAddedObject){
+    console.error("[!] Displacement scale animations work only for AddedObjects.");
+    return;
+  }
+  object.setDisplacementScale(value);
 }
 // UPDATE FUNCTIONS ************************************************
 AnimationHandler.prototype.linearFunc = function(curTime, startVal, changeInVal, totalTime){
