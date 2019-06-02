@@ -33,8 +33,8 @@ SkyBox.prototype.export = function(){
 }
 
 SkyBox.prototype.loadTexture = function(textureName, textureObjectName, textureAvailibilityObjectName, callback){
-  var loader = textureLoaderFactory.getDefault();
-  var path = skyBoxRootDirectory + "/" + this.directoryName + "/" +textureName + ".png";
+  var loader = textureLoaderFactory.get()
+  var path = skyBoxRootDirectory + "/" + this.directoryName + "/" +textureName + textureLoaderFactory.getFilePostfix();
   var that = this;
   loader.load(path, function(textureData){
     that[textureObjectName] = textureData;
@@ -73,13 +73,29 @@ SkyBox.prototype.isUsable = function(){
   );
 }
 
+SkyBox.prototype.handleCompressedCubemap = function(cubemap){
+  cubemap.format = cubemap.images[0].format;
+  cubemap.generateMipmaps = false;
+  cubemap.minFilter = THREE.LinearFilter;
+  cubemap.needsUpdate = true;
+}
+
 SkyBox.prototype.callbackCheck = function(callback){
   if (this.isUsable()){
-    this.cubeTexture = new THREE.CubeTexture([
-      this.rightTexture.image, this.leftTexture.image,
-      this.upTexture.image, this.downTexture.image,
-      this.frontTexture.image, this.backTexture.image
-    ]);
+    if (textureLoaderFactory.isCompressionSupported()){
+      this.cubeTexture = new THREE.CubeTexture([
+        this.rightTexture, this.leftTexture,
+        this.upTexture, this.downTexture,
+        this.frontTexture, this.backTexture
+      ]);
+      this.handleCompressedCubemap(this.cubeTexture);
+    }else{
+      this.cubeTexture = new THREE.CubeTexture([
+        this.rightTexture.image, this.leftTexture.image,
+        this.upTexture.image, this.downTexture.image,
+        this.frontTexture.image, this.backTexture.image
+      ]);
+    }
     this.cubeTexture.needsUpdate = true;
     if (callback){
       callback();
