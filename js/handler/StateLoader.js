@@ -211,6 +211,7 @@ StateLoader.prototype.resetProject = function(){
   screenPinchCallbackFunction = 0;
   screenDragCallbackFunction = 0;
   fpsHandler.reset();
+  animationHandler.reset();
   fonts = new Object();
   NO_MOBILE = false;
   fixedAspect = 0;

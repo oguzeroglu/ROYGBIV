@@ -147,7 +147,7 @@ Particle.prototype.updatePositionHistory = function(){
   }
   var vect = this.positionHistoryArray[this.positionHistoryCounter];
   var tmp = this.parent.tick;
-  this.parent.tick += (this.collisionTimeOffset * (1/60));
+  this.parent.tick += (this.collisionTimeOffset * (STEP));
   this.getPosition(null, vect);
   this.parent.tick = tmp;
   this.positionHistoryCounter ++;

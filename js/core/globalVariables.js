@@ -53,6 +53,8 @@ var viewportMaxHeight = 0;
 var currentViewport = new Object();
 var fixedAspect = 0;
 
+var STEP = 1/60;
+
 // PHYSICS
 var debugRenderer;
 var physicsWorld;
@@ -64,7 +66,7 @@ var contactEquationRelaxation = 4;
 var physicsIterations = 7;
 var physicsTolerance = 0.1;
 var gravityY = -900;
-var physicsStepAmount = 1/60;
+var physicsStepAmount = STEP;
 var friction = 1;
 var surfacePhysicalThickness = 1;
 

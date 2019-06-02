@@ -1,4 +1,6 @@
 var AnimationHandler = function(){
+  this.animations = new Object();
+  this.activeAnimations = new Map();
   this.animationTypes = {
     LINEAR: 0,
     QUAD_EASE_IN: 1, QUAD_EASE_OUT: 2, QUAD_EASE_INOUT: 3,
@@ -44,6 +46,29 @@ var AnimationHandler = function(){
   this.updateFunctionsByType[this.animationTypes.BOUNCE_EASE_IN] = this.bounceEaseInFunc;
   this.updateFunctionsByType[this.animationTypes.BOUNCE_EASE_OUT] = this.bounceEaseOutFunc;
   this.updateFunctionsByType[this.animationTypes.BOUNCE_EASE_INOUT] = this.bounceEaseInOutFunc;
+}
+
+AnimationHandler.prototype.onAnimationFinished = function(animation){
+  if (!animation.rewind){
+    this.activeAnimations.delete(animation.name);
+  }
+}
+
+AnimationHandler.prototype.animationUpdateFunc = function(animation, animationName){
+  animation.update();
+}
+
+AnimationHandler.prototype.update = function(){
+  this.activeAnimations.forEach(this.animationUpdateFunc);
+}
+
+AnimationHandler.prototype.startAnimation = function(animation){
+  this.activeAnimations.set(animation.name, animation);
+}
+
+AnimationHandler.prototype.reset = function(){
+  this.animations = new Object();
+  this.activeAnimations = new Map();
 }
 
 AnimationHandler.prototype.linearFunc = function(curTime, startVal, changeInVal, totalTime){
@@ -181,7 +206,7 @@ AnimationHandler.prototype.backEaseInOutFunc = function(curTime, startVal, chang
 }
 
 AnimationHandler.prototype.bounceEaseInFunc = function(curTime, startVal, changeInVal, totalTime){
-  var easeOutBounceFunc = Animation.updateFunctionsByType[this.animationTypes.BOUNCE_EASE_OUT];
+  var easeOutBounceFunc = animationHandler.updateFunctionsByType[animationHandler.animationTypes.BOUNCE_EASE_OUT];
   return changeInVal - easeOutBounceFunc(totalTime-curTime, 0, changeInVal, totalTime) + startVal;
 }
 
@@ -198,8 +223,8 @@ AnimationHandler.prototype.bounceEaseOutFunc = function(curTime, startVal, chang
 }
 
 AnimationHandler.prototype.bounceEaseInOutFunc = function(curTime, startVal, changeInVal, totalTime){
-  var easeInBounceFunc = Animation.updateFunctionsByType[this.animationTypes.BOUNCE_EASE_IN];
-  var easeOutBounceFunc = Animation.updateFunctionsByType[this.animationTypes.BOUNCE_EASE_OUT];
+  var easeInBounceFunc = animationHandler.updateFunctionsByType[animationHandler.animationTypes.BOUNCE_EASE_IN];
+  var easeOutBounceFunc = animationHandler.updateFunctionsByType[animationHandler.animationTypes.BOUNCE_EASE_OUT];
   if (curTime < totalTime/2) return easeInBounceFunc(curTime*2, 0, changeInVal, totalTime) * .5 + startVal;
   return easeOutBounceFunc(curTime*2-totalTime, 0, changeInVal, totalTime) * .5 + changeInVal*.5 + startVal;
 }

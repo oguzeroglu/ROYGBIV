@@ -24,6 +24,7 @@ function render(){
   }
 
   if (mode == 1){
+    cpuOperationsHandler.updateAnimations();
     cpuOperationsHandler.stepPhysics();
     cpuOperationsHandler.updateTrackingObjects();
     cpuOperationsHandler.updateDynamicObjects();

@@ -14,6 +14,7 @@ var CPUOperationsHandler = function(){
     renderScene: 0,
     updateAddedTexts: 0,
     updateRaycaster: 0,
+    updateAnimations: 0,
     objectMouseEvents: 0
   }
   this.scriptPerformances = {};
@@ -64,6 +65,16 @@ CPUOperationsHandler.prototype.handleObjectMouseEvents = function(){
     this.performanceLogs.objectMouseEvents = performance.now() - s;
   }else{
     mouseEventHandler.handleObjectMouseEvents();
+  }
+}
+
+CPUOperationsHandler.prototype.updateAnimations = function(){
+  if (this.record){
+    var s = performance.now();
+    animationHandler.update();
+    this.performanceLogs.updateAnimations = performance.now() - s;
+  }else{
+    animationHandler.update();
   }
 }
 

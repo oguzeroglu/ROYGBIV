@@ -69,7 +69,7 @@ Crosshair.prototype.clone = function(){
 }
 
 Crosshair.prototype.update = function(){
-  this.rotationTime += (1/60);
+  this.rotationTime += (STEP);
   this.expandTick ++;
   this.shrinkTick ++;
   if (this.rotationTime > DEFAULT_MAX_PS_TIME){

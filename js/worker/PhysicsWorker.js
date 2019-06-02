@@ -174,7 +174,7 @@ PhysicsWorker.prototype.step = function(data){
       }
     }
   }
-  physicsWorld.step(1/60);
+  physicsWorld.step(STEP);
   for (var i = 0; i<ary.length; i+=19){
     var obj = worker.objectsByID[ary[i]];
     ary[i+1] = obj.physicsBody.position.x; ary[i+2] = obj.physicsBody.position.y; ary[i+3] = obj.physicsBody.position.z;
@@ -228,6 +228,7 @@ PhysicsWorker.prototype.removeCollisionListener = function(objName){
   this.removeCollisionListenerBuffer.set(objName, obj);
 }
 // START
+var STEP = 1/60;
 var PIPE = "|";
 var UNDEFINED = "undefined";
 var physicsShapeCache = new Object();
