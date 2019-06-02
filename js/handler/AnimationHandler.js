@@ -13,7 +13,20 @@ var AnimationHandler = function(){
     ELASTIC_EASE_IN: 22, ELASTIC_EASE_OUT: 23, ELASTIC_EASE_INOUT: 24,
     BACK_EASE_IN: 25, BACK_EASE_OUT: 26, BACK_EASE_INOUT: 27,
     BOUNCE_EASE_IN: 28, BOUNCE_EASE_OUT: 29, BOUNCE_EASE_INOUT: 30
-  }
+  };
+  this.actionTypes = {
+    OBJECT: {
+      TRANSPARENCY: 0, SCALE: 1, SCALE_X: 2, SCALE_Y: 3, SCALE_Z: 4
+    }
+  };
+  // ACTION FUNCTIONS **********************************************
+  this.actionFunctionsByType = new Object();
+  this.actionFunctionsByType[this.actionTypes.OBJECT.TRANSPARENCY] = this.updateObjectTransparencyFunc;
+  this.actionFunctionsByType[this.actionTypes.OBJECT.SCALE] = this.updateObjectScaleFunc;
+  this.actionFunctionsByType[this.actionTypes.OBJECT.SCALE_X] = this.updateObjectScaleXFunc;
+  this.actionFunctionsByType[this.actionTypes.OBJECT.SCALE_Y] = this.updateObjectScaleYFunc;
+  this.actionFunctionsByType[this.actionTypes.OBJECT.SCALE_Z] = this.updateObjectScaleZFunc;
+  // UPDATE FUNCTIONS **********************************************
   this.updateFunctionsByType = new Object();
   this.updateFunctionsByType[this.animationTypes.LINEAR] = this.linearFunc;
   this.updateFunctionsByType[this.animationTypes.QUAD_EASE_IN] = this.quadEaseInFunc;
@@ -71,6 +84,23 @@ AnimationHandler.prototype.reset = function(){
   this.activeAnimations = new Map();
 }
 
+// ACTION FUNCTIONS ************************************************
+AnimationHandler.prototype.updateObjectTransparencyFunc = function(object, value){
+  object.updateOpacity(value);
+}
+AnimationHandler.prototype.updateObjectScaleFunc = function(object, value){
+  object.mesh.scale.set(value, value, value);
+}
+AnimationHandler.prototype.updateObjectScaleXFunc = function(object, value){
+  object.mesh.scale.x = value;
+}
+AnimationHandler.prototype.updateObjectScaleYFunc = function(object, value){
+  object.mesh.scale.y = value;
+}
+AnimationHandler.prototype.updateObjectScaleZFunc = function(object, value){
+  object.mesh.scale.z = value;
+}
+// UPDATE FUNCTIONS ************************************************
 AnimationHandler.prototype.linearFunc = function(curTime, startVal, changeInVal, totalTime){
   return (changeInVal * curTime / totalTime) + startVal;
 }
