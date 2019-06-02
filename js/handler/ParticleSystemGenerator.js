@@ -1282,10 +1282,11 @@ ParticleSystemGenerator.prototype.generateParticleSystemMesh = function(ps){
       if (hasTexture){
         if (particle.material.texture){
           ps.flags2[i6++] = 10;
-          ps.uvCoordinates[i10++] = 0;
-          ps.uvCoordinates[i10++] = 0;
-          ps.uvCoordinates[i10++] = 1;
-          ps.uvCoordinates[i10++] = 1;
+          var range = textureAtlasHandler.textureMerger.ranges[particle.material.texture];
+          ps.uvCoordinates[i10++] = range.startU;
+          ps.uvCoordinates[i10++] = range.startV;
+          ps.uvCoordinates[i10++] = range.endU;
+          ps.uvCoordinates[i10++] = range.endV;
         }else{
           ps.flags2[i6++] = -10;
           ps.uvCoordinates[i10++] = -10;
@@ -1441,7 +1442,7 @@ ParticleSystemGenerator.prototype.generateParticleSystemMesh = function(ps){
   ps.acceleration = new THREE.Vector3(ps.ax, ps.ay, ps.az);
   var texture;
   if (hasTexture){
-    texture = texturePacks[textureName].diffuseTexture;
+    texture = textureAtlasHandler.atlas.diffuseTexture;
   }else{
     texture = false;
   }
