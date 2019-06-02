@@ -23,6 +23,8 @@ window.onload = function() {
   fogHandler = new FogHandler();
   // SCRIPTS HANDLER
   scriptsHandler = new ScriptsHandler();
+  // ANIMATION HANDLER
+  animationHandler = new AnimationHandler();
   // TEXT POOL
   Text = (!isDeployment)? new Text(): 0;
   // DRAGABLE CLI

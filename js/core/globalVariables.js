@@ -324,6 +324,7 @@ var scriptsGUIHandler;
 var skyboxHandler;
 var fogHandler;
 var scriptsHandler;
+var animationHandler;
 var preConfiguredParticleSystems = new Object();
 var preConfiguredParticleSystemPools = new Object();
 var muzzleFlashes = new Object();
