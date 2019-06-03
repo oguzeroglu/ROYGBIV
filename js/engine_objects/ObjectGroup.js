@@ -34,6 +34,32 @@ var ObjectGroup = function(name, group){
   this.lastUpdateQuaternion = new THREE.Quaternion();
 }
 
+ObjectGroup.prototype.getDisplacementBias = function(){
+  return this.mesh.material.uniforms.totalDisplacementInfo.value.y;
+}
+
+ObjectGroup.prototype.setDisplacementBias = function(val){
+  this.mesh.material.uniforms.totalDisplacementInfo.value.y = val;
+  for (var objName in this.group){
+    if (!typeof this.group[objName].displacementBiasWhenAttached == UNDEFINED){
+      this.group[objName].mesh.material.uniforms.displacementInfo.value.y = this.group[objName].displacementBiasWhenAttached * val;
+    }
+  }
+}
+
+ObjectGroup.prototype.getDisplacementScale = function(){
+  return this.mesh.material.uniforms.totalDisplacementInfo.value.x;
+}
+
+ObjectGroup.prototype.setDisplacementScale = function(val){
+  this.mesh.material.uniforms.totalDisplacementInfo.value.x = val;
+  for (var objName in this.group){
+    if (!(typeof this.group[objName].displacementScaleWhenAttached == UNDEFINED)){
+      this.group[objName].mesh.material.uniforms.displacementInfo.value.x = this.group[objName].displacementScaleWhenAttached * val;
+    }
+  }
+}
+
 ObjectGroup.prototype.getEmissiveIntensity = function(){
   return this.mesh.material.uniforms.totalEmissiveIntensity.value;
 }
@@ -1489,6 +1515,19 @@ ObjectGroup.prototype.detach = function(){
       addedObject.pqzWhenAttached,
       addedObject.pqwWhenAttached
     );
+    if (addedObject.hasEmissiveMap()){
+      addedObject.setEmissiveIntensity(addedObject.emissiveIntensityWhenAttached);
+      REUSABLE_COLOR.set(addedObject.emissiveColorWhenAttached);
+      addedObject.setEmissiveColor(REUSABLE_COLOR);
+    }
+    if (addedObject.hasDisplacementMap()){
+      addedObject.setDisplacementScale(addedObject.displacementScaleWhenAttached);
+      addedObject.setDisplacementBias(addedObject.displacementBiasWhenAttached);
+    }
+    if (addedObject.hasAOMap()){
+      addedObject.setAOIntensity(addedObject.aoIntensityWhenAttached);
+    }
+    addedObject.updateOpacity(addedObject.opacityWhenAttached);
     addedObject.physicsBody.initQuaternion.copy(addedObject.physicsBody.quaternion);
 
     delete addedObject.positionXWhenAttached;
@@ -1504,6 +1543,8 @@ ObjectGroup.prototype.detach = function(){
     delete addedObject.pqwWhenAttached;
     delete addedObject.opacityWhenAttached;
     delete addedObject.emissiveIntensityWhenAttached;
+    delete addedObject.displacementScaleWhenAttached;
+    delete addedObject.displacementBiasWhenAttached;
     delete addedObject.emissiveColorWhenAttached;
     delete addedObject.aoIntensityWhenAttached;
   }
@@ -1852,6 +1893,10 @@ ObjectGroup.prototype.export = function(){
   }
   if (this.mesh.material.uniforms.totalEmissiveIntensity){
     exportObj.totalEmissiveIntensity = this.mesh.material.uniforms.totalEmissiveIntensity.value;
+  }
+  if (this.mesh.material.uniforms.totalDisplacementInfo){
+    exportObj.totalDisplacementScale = this.mesh.material.uniforms.totalDisplacementInfo.value.x;
+    exportObj.totalDisplacementBias = this.mesh.material.uniforms.totalDisplacementInfo.value.y;
   }
   if (this.mesh.material.uniforms.totalEmissiveColor){
     exportObj.totalEmissiveColor = "#"+this.mesh.material.uniforms.totalEmissiveColor.value.getHexString();
@@ -2210,6 +2255,7 @@ ObjectGroup.prototype.copy = function(name, isHardCopy, copyPosition, gridSystem
   var totalAlphaBeforeDetached = this.mesh.material.uniforms.totalAlpha.value;
   var totalAOIntensityBeforeDetached;
   var totalEmissiveIntensityBeforeDetached;
+  var totalDisplacementInfoBeforeDetached;
   var totalEmissiveColorBeforeDetached;
   var oldMaterial = this.mesh.material;
   var phsimplObj3DPos;
@@ -2227,6 +2273,9 @@ ObjectGroup.prototype.copy = function(name, isHardCopy, copyPosition, gridSystem
   }
   if (this.mesh.material.uniforms.totalEmissiveIntensity){
     totalEmissiveIntensityBeforeDetached = this.mesh.material.uniforms.totalEmissiveIntensity.value;
+  }
+  if (this.mesh.material.uniforms.totalDisplacementInfo){
+    totalDisplacementInfoBeforeDetached = this.mesh.material.uniforms.totalDisplacementInfo.value.clone();
   }
   if (this.mesh.material.uniforms.totalEmissiveColor){
     totalEmissiveColorBeforeDetached = this.mesh.material.uniforms.totalEmissiveColor.value;
@@ -2333,6 +2382,9 @@ ObjectGroup.prototype.copy = function(name, isHardCopy, copyPosition, gridSystem
   if (this.mesh.material.uniforms.totalEmissiveIntensity){
     this.mesh.material.uniforms.totalEmissiveIntensity.value = totalEmissiveIntensityBeforeDetached;
   }
+  if (this.mesh.material.uniforms.totalDisplacementInfo){
+    this.mesh.material.uniforms.totalDisplacementInfo.value.copy(totalDisplacementInfoBeforeDetached);
+  }
   if (this.mesh.material.uniforms.totalEmissiveColor){
     this.mesh.material.uniforms.totalEmissiveColor.value = totalEmissiveColorBeforeDetached;
   }
@@ -2349,6 +2401,9 @@ ObjectGroup.prototype.copy = function(name, isHardCopy, copyPosition, gridSystem
     }
     if (newObjGroup.mesh.material.uniforms.totalEmissiveIntensity){
       newObjGroup.mesh.material.uniforms.totalEmissiveIntensity.value = this.mesh.material.uniforms.totalEmissiveIntensity.value;
+    }
+    if (newObjGroup.mesh.material.uniforms.totalDisplacementInfo){
+      newObjGroup.mesh.material.uniforms.totalDisplacementInfo.value.copy(this.mesh.material.uniforms.totalDisplacementInfo.value);
     }
     if (newObjGroup.mesh.material.uniforms.totalEmissiveColor){
       newObjGroup.mesh.material.uniforms.totalEmissiveColor.value = new THREE.Color().copy(this.mesh.material.uniforms.totalEmissiveColor.value);

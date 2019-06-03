@@ -25,6 +25,7 @@ varying float vAlpha;
   attribute vec3 normal;
   attribute vec2 displacementInfo;
   uniform sampler2D displacementMap;
+  uniform vec2 totalDisplacementInfo;
 #endif
 #ifdef HAS_TEXTURE
   attribute vec2 uv;
@@ -95,7 +96,9 @@ void main(){
   #ifdef HAS_DISPLACEMENT
     if (displacementInfo.x > -60.0 && displacementInfo.y > -60.0){
       vec3 objNormal = normalize(normal);
-      transformedPosition += objNormal * (texture2D(displacementMap, vUV).r * displacementInfo.x + displacementInfo.y);
+      float totalDisplacementScale = displacementInfo.x * totalDisplacementInfo.x;
+      float totalDisplacementBias = displacementInfo.y * totalDisplacementInfo.y;
+      transformedPosition += objNormal * (texture2D(displacementMap, vUV).r * totalDisplacementScale + totalDisplacementBias);
     }
   #endif
   gl_Position = projectionMatrix * modelViewMatrix * vec4(transformedPosition, 1.0);

@@ -168,6 +168,11 @@ var ObjectTrail = function(configurations){
       if (obj.hasDisplacementMap()){
         displacementInfo.x = obj.mesh.material.uniforms.displacementInfo.value.x;
         displacementInfo.y = obj.mesh.material.uniforms.displacementInfo.value.y;
+        if (!(typeof obj.parentObjectName == UNDEFINED)){
+          var parentObject = objectGroups[obj.parentObjectName];
+          displacementInfo.x *= parentObject.mesh.material.uniforms.totalDisplacementInfo.value.x;
+          displacementInfo.y *= parentObject.mesh.material.uniforms.totalDisplacementInfo.value.y;
+        }
       }
       objDisplacementInfos.push(displacementInfo);
       objDisplacementInfos.push(displacementInfo);

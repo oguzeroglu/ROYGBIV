@@ -67,6 +67,18 @@ var AddedObject = function(name, type, metaData, material, mesh, physicsBody, de
 
 }
 
+AddedObject.prototype.setAOIntensity = function(val){
+  this.mesh.material.uniforms.aoIntensity.value = val;
+}
+
+AddedObject.prototype.getDisplacementBias = function(){
+  return this.mesh.material.uniforms.displacementInfo.value.y;
+}
+
+AddedObject.prototype.setDisplacementBias = function(val){
+  this.mesh.material.uniforms.displacementInfo.value.y = val;
+}
+
 AddedObject.prototype.getDisplacementScale = function(){
   return this.mesh.material.uniforms.displacementInfo.value.x;
 }
@@ -81,6 +93,10 @@ AddedObject.prototype.getEmissiveIntensity = function(){
 
 AddedObject.prototype.setEmissiveIntensity = function(val){
   this.mesh.material.uniforms.emissiveIntensity.value = val;
+}
+
+AddedObject.prototype.setEmissiveColor = function(val){
+  this.mesh.material.uniforms.emissiveColor.value.copy(val);
 }
 
 AddedObject.prototype.useDefaultPrecision = function(){
@@ -440,8 +456,13 @@ AddedObject.prototype.export = function(){
   if (this.hasDisplacementMap()){
     var displacementMap = this.mesh.material.uniforms.displacementMap.value;
     exportObject["displacementRoygbivTexturePackName"] = displacementMap.roygbivTexturePackName;
-    exportObject["displacementScale"] = this.mesh.material.uniforms.displacementInfo.value.x;
-    exportObject["displacementBias"] = this.mesh.material.uniforms.displacementInfo.value.y;
+    if (!this.parentObjectName){
+      exportObject["displacementScale"] = this.mesh.material.uniforms.displacementInfo.value.x;
+      exportObject["displacementBias"] = this.mesh.material.uniforms.displacementInfo.value.y;
+    }else{
+      exportObject["displacementScale"] = this.displacementScaleWhenAttached;
+      exportObject["displacementBias"] = this.displacementBiasWhenAttached;
+    }
   }
 
   exportObject.rotationX = this.rotationX;
@@ -922,6 +943,10 @@ AddedObject.prototype.setAttachedProperties = function(){
   if (this.hasEmissiveMap()){
     this.emissiveIntensityWhenAttached = this.mesh.material.uniforms.emissiveIntensity.value;
     this.emissiveColorWhenAttached = this.mesh.material.uniforms.emissiveColor.value.clone();
+  }
+  if (this.hasDisplacementMap()){
+    this.displacementScaleWhenAttached = this.mesh.material.uniforms.displacementInfo.value.x;
+    this.displacementBiasWhenAttached = this.mesh.material.uniforms.displacementInfo.value.y;
   }
 }
 

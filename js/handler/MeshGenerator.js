@@ -103,6 +103,7 @@ MeshGenerator.prototype.generateInstancedMesh = function(graphicsGroup, objectGr
   }
   if (displacementTexture && VERTEX_SHADER_TEXTURE_FETCH_SUPPORTED){
     uniforms.displacementMap = this.getTextureUniform(displacementTexture);
+    uniforms.totalDisplacementInfo = new THREE.Uniform(new THREE.Vector2(1, 1));
   }
   var material = new THREE.RawShaderMaterial({
     vertexShader: ShaderContent.instancedBasicMaterialVertexShader,
@@ -147,6 +148,7 @@ MeshGenerator.prototype.generateMergedMesh = function(graphicsGroup, objectGroup
   }
   if (displacementTexture){
     uniforms.displacementMap = this.getTextureUniform(displacementTexture);
+    uniforms.totalDisplacementInfo = new THREE.Uniform(new THREE.Vector2(1, 1));
   }
 
   var material = new THREE.RawShaderMaterial({

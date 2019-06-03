@@ -59,6 +59,7 @@ varying float vAlpha;
   attribute vec2 displacementInfo;
   attribute vec3 normal;
   uniform sampler2D displacementMap;
+  uniform vec2 totalDisplacementInfo;
 #endif
 #ifdef HAS_SKYBOX_FOG
   uniform mat4 worldMatrix;
@@ -145,7 +146,9 @@ void main(){
   #ifdef HAS_DISPLACEMENT
     if (displacementInfo.x > -60.0 && displacementInfo.y > -60.0){
       vec3 objNormal = normalize(normal);
-      transformedPosition += objNormal * (texture2D(displacementMap, vUV).r * displacementInfo.x + displacementInfo.y);
+      float totalDisplacementScale = displacementInfo.x * totalDisplacementInfo.x;
+      float totalDisplacementBias = displacementInfo.y * totalDisplacementInfo.y;
+      transformedPosition += objNormal * (texture2D(displacementMap, vUV).r * totalDisplacementScale + totalDisplacementBias);
     }
   #endif
   #ifdef IS_AUTO_INSTANCED

@@ -1153,6 +1153,17 @@ ImportHandler.prototype.importObjectGroups = function(obj){
         }
       }
     }
+    if (objectGroupInstance.mesh.material.uniforms.totalDisplacementInfo){
+      objectGroupInstance.mesh.material.uniforms.totalDisplacementInfo.value.set(curObjectGroupExport.totalDisplacementScale, curObjectGroupExport.totalDisplacementBias);
+      for (var childName in objectGroupInstance.group){
+        if (!(typeof objectGroupInstance.group[childName].displacementScaleWhenAttached == UNDEFINED)){
+          objectGroupInstance.group[childName].mesh.material.uniforms.displacementInfo.value.x = objectGroupInstance.group[childName].displacementScaleWhenAttached * curObjectGroupExport.totalDisplacementScale;
+        }
+        if (!(typeof objectGroupInstance.group[childName].displacementBiasWhenAttached == UNDEFINED)){
+          objectGroupInstance.group[childName].mesh.material.uniforms.displacementInfo.value.y = objectGroupInstance.group[childName].displacementBiasWhenAttached * curObjectGroupExport.totalDisplacementBias;
+        }
+      }
+    }
     if (curObjectGroupExport.isPhysicsSimplified){
       var params = curObjectGroupExport.physicsSimplificationParameters;
       objectGroupInstance.simplifyPhysics(params.sizeX, params.sizeY, params.sizeZ);
