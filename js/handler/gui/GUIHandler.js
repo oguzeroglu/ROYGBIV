@@ -292,12 +292,16 @@ GUIHandler.prototype.afterObjectSelection = function(){
       guiHandler.objectManipulationParameters["Opacity"] = obj.mesh.material.uniforms.totalAlpha.value;
       var hasAOMap = false;
       var hasEmissiveMap = false;
+      var hasDisplacementMap = false;
       for (var childObjName in obj.group){
         if (obj.group[childObjName].hasAOMap()){
           hasAOMap = true;
         }
         if (obj.group[childObjName].hasEmissiveMap()){
           hasEmissiveMap = true;
+        }
+        if (obj.group[childObjName].hasDisplacementMap()){
+          hasDisplacementMap = true;
         }
       }
       if (!hasAOMap){
@@ -312,10 +316,15 @@ GUIHandler.prototype.afterObjectSelection = function(){
         guiHandler.objectManipulationParameters["Emissive int."] = obj.getEmissiveIntensity();
         guiHandler.objectManipulationParameters["Emissive col."] = "#"+obj.mesh.material.uniforms.totalEmissiveColor.value.getHexString();
       }
+      if (!hasDisplacementMap){
+        guiHandler.disableController(guiHandler.omDisplacementScaleController);
+        guiHandler.disableController(guiHandler.omDisplacementBiasController);
+      }else{
+        guiHandler.objectManipulationParameters["Disp. scale"] = obj.getDisplacementScale();
+        guiHandler.objectManipulationParameters["Disp. bias"] = obj.getDisplacementBias();
+      }
       guiHandler.disableController(guiHandler.omTextureOffsetXController);
       guiHandler.disableController(guiHandler.omTextureOffsetYController);
-      guiHandler.disableController(guiHandler.omDisplacementScaleController);
-      guiHandler.disableController(guiHandler.omDisplacementBiasController);
       guiHandler.disableController(guiHandler.omHideHalfController);
       if (obj.cannotSetMass){
         guiHandler.disableController(guiHandler.omHasMassController);
@@ -987,7 +996,7 @@ GUIHandler.prototype.initializeObjectManipulationGUI = function(){
     selectionHandler.getSelectedObject().setDisplacementScale(val);
   }).listen();
   guiHandler.omDisplacementBiasController = guiHandler.datGuiObjectManipulation.add(guiHandler.objectManipulationParameters, "Disp. bias").min(-50).max(50).step(0.1).onChange(function(val){
-    selectionHandler.getSelectedObject().mesh.material.uniforms.displacementInfo.value.y = val;
+    selectionHandler.getSelectedObject().setDisplacementBias(val);
   }).listen();
   guiHandler.omHasObjectTrailController = guiHandler.datGuiObjectManipulation.add(guiHandler.objectManipulationParameters, "Motion blur").onChange(function(val){
     if (val){
