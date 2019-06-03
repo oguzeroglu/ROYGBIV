@@ -132,10 +132,6 @@ AnimationHandler.prototype.updateObjectEmissiveIntensity = function(object, valu
   object.setEmissiveIntensity(value);
 }
 AnimationHandler.prototype.updateObjectDisplacementScale = function(object, value){
-  if (!object.isAddedObject){
-    console.error("[!] Displacement scale animations work only for AddedObjects.");
-    return;
-  }
   object.setDisplacementScale(value);
 }
 // UPDATE FUNCTIONS ************************************************
