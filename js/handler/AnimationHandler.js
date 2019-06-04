@@ -19,7 +19,7 @@ var AnimationHandler = function(){
       TRANSPARENCY: 0, SCALE: 1, SCALE_X: 2, SCALE_Y: 3, SCALE_Z: 4,
       ROTATION_X: 5, ROTATION_Y: 6, ROTATION_Z: 7, POSITION_X: 8,
       POSITION_Y: 9, POSITION_Z: 10, EMISSIVE_INTENSITY: 11, DISPLACEMENT_SCALE: 12,
-      DISPLACEMENT_BIAS: 13
+      DISPLACEMENT_BIAS: 13, EMISSIVE_COLOR: 14
     }
   };
   // ACTION FUNCTIONS **********************************************
@@ -38,6 +38,7 @@ var AnimationHandler = function(){
   this.actionFunctionsByType[this.actionTypes.OBJECT.EMISSIVE_INTENSITY] = this.updateObjectEmissiveIntensity;
   this.actionFunctionsByType[this.actionTypes.OBJECT.DISPLACEMENT_SCALE] = this.updateObjectDisplacementScale;
   this.actionFunctionsByType[this.actionTypes.OBJECT.DISPLACEMENT_BIAS] = this.updateObjectDisplacementBias;
+  this.actionFunctionsByType[this.actionTypes.OBJECT.EMISSIVE_COLOR] = this.updateObjectEmissiveColor;
   // UPDATE FUNCTIONS **********************************************
   this.updateFunctionsByType = new Object();
   this.updateFunctionsByType[this.animationTypes.LINEAR] = this.linearFunc;
@@ -97,47 +98,50 @@ AnimationHandler.prototype.reset = function(){
 }
 
 // ACTION FUNCTIONS ************************************************
-AnimationHandler.prototype.updateObjectTransparencyFunc = function(object, value){
-  object.updateOpacity(value);
+AnimationHandler.prototype.updateObjectTransparencyFunc = function(params){
+  params.object.updateOpacity(params.value);
 }
-AnimationHandler.prototype.updateObjectScaleFunc = function(object, value){
-  object.mesh.scale.set(value, value, value);
+AnimationHandler.prototype.updateObjectScaleFunc = function(params){
+  params.object.mesh.scale.set(params.value, params.value, params.value);
 }
-AnimationHandler.prototype.updateObjectScaleXFunc = function(object, value){
-  object.mesh.scale.x = value;
+AnimationHandler.prototype.updateObjectScaleXFunc = function(params){
+  params.object.mesh.scale.x = params.value;
 }
-AnimationHandler.prototype.updateObjectScaleYFunc = function(object, value){
-  object.mesh.scale.y = value;
+AnimationHandler.prototype.updateObjectScaleYFunc = function(params){
+  params.object.mesh.scale.y = params.value;
 }
-AnimationHandler.prototype.updateObjectScaleZFunc = function(object, value){
-  object.mesh.scale.z = value;
+AnimationHandler.prototype.updateObjectScaleZFunc = function(params){
+  params.object.mesh.scale.z = params.value;
 }
-AnimationHandler.prototype.updateObjectRotationXFunc = function(object, value){
-  object.mesh.rotation.x = value;
+AnimationHandler.prototype.updateObjectRotationXFunc = function(params){
+  params.object.mesh.rotation.x = params.value;
 }
-AnimationHandler.prototype.updateObjectRotationYFunc = function(object, value){
-  object.mesh.rotation.y = value;
+AnimationHandler.prototype.updateObjectRotationYFunc = function(params){
+  params.object.mesh.rotation.y = params.value;
 }
-AnimationHandler.prototype.updateObjectRotationZFunc = function(object, value){
-  object.mesh.rotation.z = value;
+AnimationHandler.prototype.updateObjectRotationZFunc = function(params){
+  params.object.mesh.rotation.z = params.value;
 }
-AnimationHandler.prototype.updateObjectPositionXFunc = function(object, value){
-  object.mesh.position.x = value;
+AnimationHandler.prototype.updateObjectPositionXFunc = function(params){
+  params.object.mesh.position.x = params.value;
 }
-AnimationHandler.prototype.updateObjectPositionYFunc = function(object, value){
-  object.mesh.position.y = value;
+AnimationHandler.prototype.updateObjectPositionYFunc = function(params){
+  params.object.mesh.position.y = params.value;
 }
-AnimationHandler.prototype.updateObjectPositionZFunc = function(object, value){
-  object.mesh.position.z = value;
+AnimationHandler.prototype.updateObjectPositionZFunc = function(params){
+  params.object.mesh.position.z = params.value;
 }
-AnimationHandler.prototype.updateObjectEmissiveIntensity = function(object, value){
-  object.setEmissiveIntensity(value);
+AnimationHandler.prototype.updateObjectEmissiveIntensity = function(params){
+  params.object.setEmissiveIntensity(params.value);
 }
-AnimationHandler.prototype.updateObjectDisplacementScale = function(object, value){
-  object.setDisplacementScale(value);
+AnimationHandler.prototype.updateObjectDisplacementScale = function(params){
+  params.object.setDisplacementScale(params.value);
 }
-AnimationHandler.prototype.updateObjectDisplacementBias = function(object, value){
-  object.setDisplacementBias(value);
+AnimationHandler.prototype.updateObjectDisplacementBias = function(params){
+  params.object.setDisplacementBias(params.value);
+}
+AnimationHandler.prototype.updateObjectEmissiveColor = function(params){
+  params.object.setEmissiveColor(params.sourceColor.lerp(params.targetColor, params.value));
 }
 // UPDATE FUNCTIONS ************************************************
 AnimationHandler.prototype.linearFunc = function(curTime, startVal, changeInVal, totalTime){

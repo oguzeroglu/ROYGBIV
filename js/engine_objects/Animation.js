@@ -8,6 +8,11 @@ var Animation = function(name, type, attachedObject, description, rewind){
   this.actionFunction = animationHandler.actionFunctionsByType[description.action];
   this.tick = 0;
   this.changeInValue = this.description.targetValue - this.description.initialValue;
+  this.params = {object: this.attachedObject};
+  if (description.action == animationHandler.actionTypes.OBJECT.EMISSIVE_COLOR){
+    this.params.sourceColor = description.sourceColor; 
+    this.params.targetColor = description.targetColor;
+  }
 }
 
 Animation.prototype.onFinished = function(){
@@ -15,8 +20,8 @@ Animation.prototype.onFinished = function(){
 }
 
 Animation.prototype.update = function(){
-  var newVal = this.updateFunction(this.tick, this.description.initialValue, this.changeInValue, this.description.totalTimeInSeconds);
-  this.actionFunction(this.attachedObject, newVal);
+  this.params.value = this.updateFunction(this.tick, this.description.initialValue, this.changeInValue, this.description.totalTimeInSeconds);
+  this.actionFunction(this.params);
   this.tick +=  STEP;
   if (this.tick >= this.description.totalTimeInSeconds){
     if (this.rewind){
