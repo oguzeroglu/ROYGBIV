@@ -712,8 +712,8 @@ ObjectGroup.prototype.mergeInstanced = function(){
         textureInfos.push(-10);
       }
       if (obj.hasDisplacementMap()){
-        displacementInfos.push(obj.mesh.material.uniforms.displacementInfo.value.x);
-        displacementInfos.push(obj.mesh.material.uniforms.displacementInfo.value.y);
+        displacementInfos.push(obj.getDisplacementScale());
+        displacementInfos.push(obj.getDisplacementBias());
       }else{
         displacementInfos.push(-100);
         displacementInfos.push(-100);
@@ -1013,13 +1013,13 @@ ObjectGroup.prototype.merge = function(){
         if (addedObject.hasDisplacementMap()){
           this.push(
             displacementInfos,
-            addedObject.mesh.material.uniforms.displacementInfo.value.x,
+            addedObject.getDisplacementScale(),
             (2*a),
             isIndexed
           );
           this.push(
             displacementInfos,
-            addedObject.mesh.material.uniforms.displacementInfo.value.y,
+            addedObject.getDisplacementBias(),
             ((2*a) + 1),
             isIndexed
           );
@@ -1032,13 +1032,13 @@ ObjectGroup.prototype.merge = function(){
         if (addedObject.hasDisplacementMap()){
           this.push(
             displacementInfos,
-            addedObject.mesh.material.uniforms.displacementInfo.value.x,
+            addedObject.getDisplacementScale(),
             (2*b),
             isIndexed
           );
           this.push(
             displacementInfos,
-            addedObject.mesh.material.uniforms.displacementInfo.value.y,
+            addedObject.getDisplacementBias(),
             ((2*b) + 1),
             isIndexed
           );
@@ -1051,13 +1051,13 @@ ObjectGroup.prototype.merge = function(){
         if (addedObject.hasDisplacementMap()){
           this.push(
             displacementInfos,
-            addedObject.mesh.material.uniforms.displacementInfo.value.x,
+            addedObject.getDisplacementScale(),
             (2*c),
             isIndexed
           );
           this.push(
             displacementInfos,
-            addedObject.mesh.material.uniforms.displacementInfo.value.y,
+            addedObject.getDisplacementBias(),
             ((2*c) + 1),
             isIndexed
           );
@@ -1924,8 +1924,8 @@ ObjectGroup.prototype.export = function(){
     exportObj.totalEmissiveIntensity = this.getEmissiveIntensity();
   }
   if (this.mesh.material.uniforms.totalDisplacementInfo){
-    exportObj.totalDisplacementScale = this.mesh.material.uniforms.totalDisplacementInfo.value.x;
-    exportObj.totalDisplacementBias = this.mesh.material.uniforms.totalDisplacementInfo.value.y;
+    exportObj.totalDisplacementScale = this.getDisplacementScale();
+    exportObj.totalDisplacementBias = this.getDisplacementBias();
   }
   if (this.mesh.material.uniforms.totalEmissiveColor){
     exportObj.totalEmissiveColor = "#"+this.getEmissiveColor().getHexString();
@@ -2304,7 +2304,7 @@ ObjectGroup.prototype.copy = function(name, isHardCopy, copyPosition, gridSystem
     totalEmissiveIntensityBeforeDetached = this.getEmissiveIntensity();
   }
   if (this.mesh.material.uniforms.totalDisplacementInfo){
-    totalDisplacementInfoBeforeDetached = this.mesh.material.uniforms.totalDisplacementInfo.value.clone();
+    totalDisplacementInfoBeforeDetached = new THREE.Vector2(this.getDisplacementScale(), this.getDisplacementBias());
   }
   if (this.mesh.material.uniforms.totalEmissiveColor){
     totalEmissiveColorBeforeDetached = this.getEmissiveColor().clone();
@@ -2412,7 +2412,8 @@ ObjectGroup.prototype.copy = function(name, isHardCopy, copyPosition, gridSystem
     this.setEmissiveIntensity(totalEmissiveIntensityBeforeDetached);
   }
   if (this.mesh.material.uniforms.totalDisplacementInfo){
-    this.mesh.material.uniforms.totalDisplacementInfo.value.copy(totalDisplacementInfoBeforeDetached);
+    this.setDisplacementScale(totalDisplacementInfoBeforeDetached.x);
+    this.setDisplacementBias(totalDisplacementInfoBeforeDetached.y);
   }
   if (this.mesh.material.uniforms.totalEmissiveColor){
     this.setEmissiveColor(totalEmissiveColorBeforeDetached);
@@ -2432,7 +2433,8 @@ ObjectGroup.prototype.copy = function(name, isHardCopy, copyPosition, gridSystem
       newObjGroup.setEmissiveIntensity(this.getEmissiveIntensity());
     }
     if (newObjGroup.mesh.material.uniforms.totalDisplacementInfo){
-      newObjGroup.mesh.material.uniforms.totalDisplacementInfo.value.copy(this.mesh.material.uniforms.totalDisplacementInfo.value);
+      newObjGroup.setDisplacementScale(this.getDisplacementScale());
+      newObjGroup.setDisplacementBias(this.getDisplacementBias());
     }
     if (newObjGroup.mesh.material.uniforms.totalEmissiveColor){
       newObjGroup.setEmissiveColor(this.getEmissiveColor());

@@ -214,7 +214,7 @@ GUIHandler.prototype.afterObjectSelection = function(){
       }
       if (obj.hasDisplacementMap()){
         guiHandler.objectManipulationParameters["Disp. scale"] = obj.getDisplacementScale();
-        guiHandler.objectManipulationParameters["Disp. bias"] = obj.mesh.material.uniforms.displacementInfo.value.y;
+        guiHandler.objectManipulationParameters["Disp. bias"] = obj.getDisplacementBias();
       }else{
         guiHandler.disableController(guiHandler.omDisplacementScaleController);
         guiHandler.disableController(guiHandler.omDisplacementBiasController);

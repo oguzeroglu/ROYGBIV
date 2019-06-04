@@ -465,8 +465,8 @@ AddedObject.prototype.export = function(){
     var displacementMap = this.mesh.material.uniforms.displacementMap.value;
     exportObject["displacementRoygbivTexturePackName"] = displacementMap.roygbivTexturePackName;
     if (!this.parentObjectName){
-      exportObject["displacementScale"] = this.mesh.material.uniforms.displacementInfo.value.x;
-      exportObject["displacementBias"] = this.mesh.material.uniforms.displacementInfo.value.y;
+      exportObject["displacementScale"] = this.getDisplacementScale();
+      exportObject["displacementBias"] = this.getDisplacementBias();
     }else{
       exportObject["displacementScale"] = this.displacementScaleWhenAttached;
       exportObject["displacementBias"] = this.displacementBiasWhenAttached;
@@ -916,11 +916,9 @@ AddedObject.prototype.syncProperties = function(refObject){
     this.setEmissiveColor(refObject.getEmissiveColor());
   }
   // DISPLACEMENT
-    if (refObject.hasDisplacementMap() && this.hasDisplacementMap()){
-    var refDispX = refObject.mesh.material.uniforms.displacementInfo.value.x;
-    var refDispY = refObject.mesh.material.uniforms.displacementInfo.value.y;
-    this.mesh.material.uniforms.displacementInfo.value.x = refDispX;
-    this.mesh.material.uniforms.displacementInfo.value.y = refDispY;
+  if (refObject.hasDisplacementMap() && this.hasDisplacementMap()){
+    this.setDisplacementScale(refObject.getDisplacementScale());
+    this.setDisplacementBias(refObject.getDisplacementBias());
   }
 }
 
@@ -947,8 +945,8 @@ AddedObject.prototype.setAttachedProperties = function(){
     this.emissiveColorWhenAttached = this.getEmissiveColor().clone();
   }
   if (this.hasDisplacementMap()){
-    this.displacementScaleWhenAttached = this.mesh.material.uniforms.displacementInfo.value.x;
-    this.displacementBiasWhenAttached = this.mesh.material.uniforms.displacementInfo.value.y;
+    this.displacementScaleWhenAttached = this.getDisplacementScale();
+    this.displacementBiasWhenAttached = this.getDisplacementBias();
   }
 }
 
@@ -2823,8 +2821,8 @@ AddedObject.prototype.copy = function(name, isHardCopy, copyPosition, gridSystem
       }
       if (this.hasDisplacementMap()){
         copyInstance.mapDisplacement(this.mesh.material.uniforms.displacementMap.value);
-        copyInstance.mesh.material.uniforms.displacementInfo.value.x = this.mesh.material.uniforms.displacementInfo.value.x;
-        copyInstance.mesh.material.uniforms.displacementInfo.value.y = this.mesh.material.uniforms.displacementInfo.value.y;
+        copyInstance.setDisplacementScale(this.getDisplacementScale());
+        copyInstance.setDisplacementBias(this.getDisplacementBias());
       }
       if (this.hasEmissiveMap()){
         copyInstance.mapEmissive(this.mesh.material.uniforms.emissiveMap.value);

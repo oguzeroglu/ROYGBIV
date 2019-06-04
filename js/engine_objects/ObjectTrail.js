@@ -166,12 +166,12 @@ var ObjectTrail = function(configurations){
     if (this.displacementTexture){
       var displacementInfo = new THREE.Vector2(-100, -100);
       if (obj.hasDisplacementMap()){
-        displacementInfo.x = obj.mesh.material.uniforms.displacementInfo.value.x;
-        displacementInfo.y = obj.mesh.material.uniforms.displacementInfo.value.y;
+        displacementInfo.x = obj.getDisplacementScale();
+        displacementInfo.y = obj.getDisplacementBias();
         if (!(typeof obj.parentObjectName == UNDEFINED)){
           var parentObject = objectGroups[obj.parentObjectName];
-          displacementInfo.x *= parentObject.mesh.material.uniforms.totalDisplacementInfo.value.x;
-          displacementInfo.y *= parentObject.mesh.material.uniforms.totalDisplacementInfo.value.y;
+          displacementInfo.x *= parentObject.getDisplacementScale();
+          displacementInfo.y *= parentObject.getDisplacementBias();
         }
       }
       objDisplacementInfos.push(displacementInfo);

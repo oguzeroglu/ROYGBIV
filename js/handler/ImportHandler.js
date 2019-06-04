@@ -892,10 +892,10 @@ ImportHandler.prototype.mapLoadedTexturePack = function(texturePackName, exportO
             material.uniforms.displacementMap.value.repeat.y = textureRepeatV;
           }
           if (!(typeof displacementScale == UNDEFINED)){
-            material.uniforms.displacementInfo.value.x = displacementScale;
+            addedObject.setDisplacementScale(displacementScale);
           }
           if (!(typeof displacementBias == UNDEFINED)){
-            material.uniforms.displacementInfo.value.y = displacementBias;
+            addedObject.setDisplacementBias(displacementBias);
           }
           material.uniforms.displacementMap.value.needsUpdate = true;
           material.uniforms.displacementMap.value.updateMatrix();
@@ -1135,15 +1135,8 @@ ImportHandler.prototype.importObjectGroups = function(obj){
       objectGroupInstance.setEmissiveColor(REUSABLE_COLOR);
     }
     if (objectGroupInstance.mesh.material.uniforms.totalDisplacementInfo){
-      objectGroupInstance.mesh.material.uniforms.totalDisplacementInfo.value.set(curObjectGroupExport.totalDisplacementScale, curObjectGroupExport.totalDisplacementBias);
-      for (var childName in objectGroupInstance.group){
-        if (!(typeof objectGroupInstance.group[childName].displacementScaleWhenAttached == UNDEFINED)){
-          objectGroupInstance.group[childName].mesh.material.uniforms.displacementInfo.value.x = objectGroupInstance.group[childName].displacementScaleWhenAttached * curObjectGroupExport.totalDisplacementScale;
-        }
-        if (!(typeof objectGroupInstance.group[childName].displacementBiasWhenAttached == UNDEFINED)){
-          objectGroupInstance.group[childName].mesh.material.uniforms.displacementInfo.value.y = objectGroupInstance.group[childName].displacementBiasWhenAttached * curObjectGroupExport.totalDisplacementBias;
-        }
-      }
+      objectGroupInstance.setDisplacementScale(curObjectGroupExport.totalDisplacementScale);
+      objectGroupInstance.setDisplacementBias(curObjectGroupExport.totalDisplacementBias);
     }
     if (curObjectGroupExport.isPhysicsSimplified){
       var params = curObjectGroupExport.physicsSimplificationParameters;
