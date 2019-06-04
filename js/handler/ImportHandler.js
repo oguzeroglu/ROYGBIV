@@ -677,7 +677,7 @@ ImportHandler.prototype.importAddedObjects = function(obj){
      }
      addedObjectInstance.mesh.material.uniforms.alpha.value = curAddedObjectExport.opacity;
      if (!(typeof curAddedObjectExport.aoMapIntensity == UNDEFINED)){
-       addedObjectInstance.setAOIntensity = curAddedObjectExport.aoMapIntensity;
+       addedObjectInstance.setAOIntensityValue = curAddedObjectExport.aoMapIntensity;
      }
      if (!(typeof curAddedObjectExport.emissiveIntensity == UNDEFINED)){
        addedObjectInstance.setEmissiveIntensityValue = curAddedObjectExport.emissiveIntensity;
@@ -1022,9 +1022,9 @@ ImportHandler.prototype.importAddedObjectGraphicsProperties = function(){
       }
     }
     if (addedObject.hasAOMap()){
-      if (!(typeof addedObject.setAOIntensity == UNDEFINED)){
-        addedObject.mesh.material.uniforms.aoIntensity.value = addedObject.setAOIntensity;
-        delete addedObject.setAOIntensity;
+      if (!(typeof addedObject.setAOIntensityValue == UNDEFINED)){
+        addedObject.setAOIntensity(addedObject.setAOIntensityValue);
+        delete addedObject.setAOIntensityValue;
       }
     }
   }
@@ -1125,12 +1125,7 @@ ImportHandler.prototype.importObjectGroups = function(obj){
       objectGroupInstance.group[childName].updateOpacity(curObjectGroupExport.totalAlpha * objectGroupInstance.group[childName].opacityWhenAttached);
     }
     if (objectGroupInstance.mesh.material.uniforms.totalAOIntensity){
-      objectGroupInstance.mesh.material.uniforms.totalAOIntensity.value = curObjectGroupExport.totalAOIntensity;
-      for (var childName in objectGroupInstance.group){
-        if (!(typeof objectGroupInstance.group[childName].aoIntensityWhenAttached == UNDEFINED)){
-          objectGroupInstance.group[childName].mesh.material.uniforms.aoIntensity.value = objectGroupInstance.group[childName].aoIntensityWhenAttached * curObjectGroupExport.totalAOIntensity;
-        }
-      }
+      objectGroupInstance.setAOIntensity(curObjectGroupExport.totalAOIntensity);
     }
     if (objectGroupInstance.mesh.material.uniforms.totalEmissiveIntensity){
       objectGroupInstance.setEmissiveIntensity(curObjectGroupExport.totalEmissiveIntensity);

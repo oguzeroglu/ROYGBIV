@@ -34,6 +34,19 @@ var ObjectGroup = function(name, group){
   this.lastUpdateQuaternion = new THREE.Quaternion();
 }
 
+ObjectGroup.prototype.getAOIntensity = function(){
+  return this.mesh.material.uniforms.totalAOIntensity.value;
+}
+
+ObjectGroup.prototype.setAOIntensity = function(val){
+  this.mesh.material.uniforms.totalAOIntensity.value = val;
+  for (var objName in this.group){
+    if (!(typeof this.group[objName].aoIntensityWhenAttached == UNDEFINED)){
+      this.group[objName].setAOIntensity(this.group[objName].aoIntensityWhenAttached * val);
+    }
+  }
+}
+
 ObjectGroup.prototype.getEmissiveColor = function(){
   REUSABLE_COLOR.copy(this.mesh.material.uniforms.totalEmissiveColor.value);
   return REUSABLE_COLOR;
@@ -661,7 +674,7 @@ ObjectGroup.prototype.mergeInstanced = function(){
     }
     if (this.aoTexture){
       if (obj.hasAOMap()){
-        aoIntensities.push(obj.mesh.material.uniforms.aoIntensity.value);
+        aoIntensities.push(obj.getAOIntensity());
       }else{
         aoIntensities.push(1);
       }
@@ -1108,7 +1121,7 @@ ObjectGroup.prototype.merge = function(){
     if (this.aoTexture){
       var aoIntensity;
       if (addedObject.hasAOMap()){
-        aoIntensity = addedObject.mesh.material.uniforms.aoIntensity.value;
+        aoIntensity = addedObject.getAOIntensity();
       }else{
         aoIntensity = 0;
       }
@@ -1905,7 +1918,7 @@ ObjectGroup.prototype.export = function(){
 
   exportObj.totalAlpha = this.mesh.material.uniforms.totalAlpha.value;
   if (this.mesh.material.uniforms.totalAOIntensity){
-    exportObj.totalAOIntensity = this.mesh.material.uniforms.totalAOIntensity.value;
+    exportObj.totalAOIntensity = this.getAOIntensity();
   }
   if (this.mesh.material.uniforms.totalEmissiveIntensity){
     exportObj.totalEmissiveIntensity = this.getEmissiveIntensity();
@@ -2285,7 +2298,7 @@ ObjectGroup.prototype.copy = function(name, isHardCopy, copyPosition, gridSystem
     phsimplContQuat = this.physicsSimplificationObject3DContainer.quaternion.clone();
   }
   if (this.mesh.material.uniforms.totalAOIntensity){
-    totalAOIntensityBeforeDetached = this.mesh.material.uniforms.totalAOIntensity.value;
+    totalAOIntensityBeforeDetached = this.getAOIntensity();
   }
   if (this.mesh.material.uniforms.totalEmissiveIntensity){
     totalEmissiveIntensityBeforeDetached = this.getEmissiveIntensity();
@@ -2393,7 +2406,7 @@ ObjectGroup.prototype.copy = function(name, isHardCopy, copyPosition, gridSystem
   newObjGroup.mesh.material.transparent = isTransparentBeforeDetached;
   this.mesh.material.uniforms.totalAlpha.value = totalAlphaBeforeDetached;
   if (this.mesh.material.uniforms.totalAOIntensity){
-    this.mesh.material.uniforms.totalAOIntensity.value = totalAOIntensityBeforeDetached;
+    this.setAOIntensity(totalAOIntensityBeforeDetached);
   }
   if (this.mesh.material.uniforms.totalEmissiveIntensity){
     this.setEmissiveIntensity(totalEmissiveIntensityBeforeDetached);
@@ -2413,7 +2426,7 @@ ObjectGroup.prototype.copy = function(name, isHardCopy, copyPosition, gridSystem
   }else{
     newObjGroup.mesh.material.uniforms.totalAlpha.value = this.mesh.material.uniforms.totalAlpha.value;
     if (newObjGroup.mesh.material.uniforms.totalAOIntensity){
-      newObjGroup.mesh.material.uniforms.totalAOIntensity.value = this.mesh.material.uniforms.totalAOIntensity.value;
+      newObjGroup.setAOIntensity(this.getAOIntensity());
     }
     if (newObjGroup.mesh.material.uniforms.totalEmissiveIntensity){
       newObjGroup.setEmissiveIntensity(this.getEmissiveIntensity());

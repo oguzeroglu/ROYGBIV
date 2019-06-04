@@ -229,7 +229,7 @@ GUIHandler.prototype.afterObjectSelection = function(){
       if (!obj.hasAOMap()){
         guiHandler.disableController(guiHandler.omAOIntensityController);
       }else{
-        guiHandler.objectManipulationParameters["AO intensity"] = obj.mesh.material.uniforms.aoIntensity.value;
+        guiHandler.objectManipulationParameters["AO intensity"] = obj.getAOIntensity();
       }
       if (!obj.hasEmissiveMap()){
         guiHandler.disableController(guiHandler.omEmissiveIntensityController);
@@ -307,7 +307,7 @@ GUIHandler.prototype.afterObjectSelection = function(){
       if (!hasAOMap){
         guiHandler.disableController(guiHandler.omAOIntensityController);
       }else{
-        guiHandler.objectManipulationParameters["AO intensity"] = obj.mesh.material.uniforms.totalAOIntensity.value;
+        guiHandler.objectManipulationParameters["AO intensity"] = obj.getAOIntensity();
       }
       if (!hasEmissiveMap){
         guiHandler.disableController(guiHandler.omEmissiveIntensityController);
@@ -963,21 +963,10 @@ GUIHandler.prototype.initializeObjectManipulationGUI = function(){
     }
   }).listen();
   guiHandler.omAOIntensityController = guiHandler.datGuiObjectManipulation.add(guiHandler.objectManipulationParameters, "AO intensity").min(0).max(10).step(0.1).onChange(function(val){
-    var obj = selectionHandler.getSelectedObject();
-    if (obj.isAddedObject){
-      obj.mesh.material.uniforms.aoIntensity.value = val;
-    }else if (obj.isObjectGroup){
-      obj.mesh.material.uniforms.totalAOIntensity.value = val;
-      for (var objName in obj.group){
-        if (!(typeof obj.group[objName].aoIntensityWhenAttached == UNDEFINED)){
-          obj.group[objName].mesh.material.uniforms.aoIntensity.value = obj.group[objName].aoIntensityWhenAttached * val;
-        }
-      }
-    }
+    selectionHandler.getSelectedObject().setAOIntensity(val);
   }).listen();
   guiHandler.omEmissiveIntensityController = guiHandler.datGuiObjectManipulation.add(guiHandler.objectManipulationParameters, "Emissive int.").min(0).max(100).step(0.01).onChange(function(val){
-    var obj = selectionHandler.getSelectedObject();
-    obj.setEmissiveIntensity(val);
+    selectionHandler.getSelectedObject().setEmissiveIntensity(val);
   }).listen();
   guiHandler.omDisplacementScaleController = guiHandler.datGuiObjectManipulation.add(guiHandler.objectManipulationParameters, "Disp. scale").min(-50).max(50).step(0.1).onChange(function(val){
     selectionHandler.getSelectedObject().setDisplacementScale(val);

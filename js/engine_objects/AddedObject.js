@@ -66,6 +66,10 @@ var AddedObject = function(name, type, metaData, material, mesh, physicsBody, de
   webglCallbackHandler.registerEngineObject(this);
 }
 
+AddedObject.prototype.getAOIntensity = function(){
+  return this.mesh.material.uniforms.aoIntensity.value;
+}
+
 AddedObject.prototype.setAOIntensity = function(val){
   this.mesh.material.uniforms.aoIntensity.value = val;
 }
@@ -416,7 +420,7 @@ AddedObject.prototype.export = function(){
   }
   if (this.hasAOMap()){
     if (!this.parentObjectName){
-      exportObject["aoMapIntensity"] = this.mesh.material.uniforms.aoIntensity.value;
+      exportObject["aoMapIntensity"] = this.getAOIntensity();
     }else{
       exportObject["aoMapIntensity"] = this.aoIntensityWhenAttached;
     }
@@ -905,8 +909,7 @@ AddedObject.prototype.syncProperties = function(refObject){
   this.initOpacitySet = false;
   // AO INTENSITY
   if (refObject.hasAOMap() && this.hasAOMap()){
-    var refAOIntensity = refObject.mesh.material.uniforms.aoIntensity.value;
-    this.mesh.material.uniforms.aoIntensity.value = refAOIntensity
+    this.setAOIntensity(refObject.getAOIntensity());
   }
   if (refObject.hasEmissiveMap() && this.hasEmissiveMap()){
     this.setEmissiveIntensity(refObject.getEmissiveIntensity());
@@ -937,7 +940,7 @@ AddedObject.prototype.setAttachedProperties = function(){
   this.physicsQuaternionWhenAttached = {x: this.physicsBody.quaternion.x, y: this.physicsBody.quaternion.y, z: this.physicsBody.quaternion.z, w: this.physicsBody.quaternion.w};
   this.opacityWhenAttached = this.mesh.material.uniforms.alpha.value;
   if (this.hasAOMap()){
-    this.aoIntensityWhenAttached = this.mesh.material.uniforms.aoIntensity.value;
+    this.aoIntensityWhenAttached = this.getAOIntensity();
   }
   if (this.hasEmissiveMap()){
     this.emissiveIntensityWhenAttached = this.getEmissiveIntensity();
@@ -2816,7 +2819,7 @@ AddedObject.prototype.copy = function(name, isHardCopy, copyPosition, gridSystem
       }
       if (this.hasAOMap()){
         copyInstance.mapAO(this.mesh.material.uniforms.aoMap.value);
-        copyInstance.mesh.material.uniforms.aoIntensity.value = this.mesh.material.uniforms.aoIntensity.value;
+        copyInstance.setAOIntensity(this.getAOIntensity());
       }
       if (this.hasDisplacementMap()){
         copyInstance.mapDisplacement(this.mesh.material.uniforms.displacementMap.value);
