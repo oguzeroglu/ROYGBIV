@@ -624,10 +624,6 @@ ImportHandler.prototype.importAddedObjects = function(obj){
       addedObjectInstance.softCopyParentName = curAddedObjectExport.softCopyParentName;
     }
 
-    addedObjectInstance.mesh.material.setEmissiveIntensity = curAddedObjectExport.emissiveIntensity;
-    addedObjectInstance.mesh.material.setEmissiveColor = curAddedObjectExport.emissiveColor;
-    addedObjectInstance.mesh.material.uniforms.setAOIntensity = curAddedObjectExport.aoMapIntensity;
-
     addedObjects[addedObjectName] = addedObjectInstance;
     if (curAddedObjectExport.isRotationDirty){
       addedObjectInstance.isRotationDirty = true;
@@ -684,10 +680,10 @@ ImportHandler.prototype.importAddedObjects = function(obj){
        addedObjectInstance.setAOIntensity = curAddedObjectExport.aoMapIntensity;
      }
      if (!(typeof curAddedObjectExport.emissiveIntensity == UNDEFINED)){
-       addedObjectInstance.setEmissiveIntensity = curAddedObjectExport.emissiveIntensity;
+       addedObjectInstance.setEmissiveIntensityValue = curAddedObjectExport.emissiveIntensity;
      }
      if (!(typeof curAddedObjectExport.emissiveColor == UNDEFINED)){
-       addedObjectInstance.setEmissiveColor = curAddedObjectExport.emissiveColor;
+       addedObjectInstance.setEmissiveColorValue = curAddedObjectExport.emissiveColor;
      }
      if (!(typeof curAddedObjectExport.positionWhenUsedAsFPSWeapon == UNDEFINED)){
        addedObjectInstance.isFPSWeapon = true;
@@ -1015,13 +1011,14 @@ ImportHandler.prototype.importAddedObjectGraphicsProperties = function(){
       delete addedObject.setTxtMatrix;
     }
     if (addedObject.hasEmissiveMap()){
-      if (!(typeof addedObject.setEmissiveIntensity == UNDEFINED)){
-        addedObject.mesh.material.uniforms.emissiveIntensity.value = addedObject.setEmissiveIntensity;
-        delete addedObject.setEmissiveIntensity;
+      if (!(typeof addedObject.setEmissiveIntensityValue == UNDEFINED)){
+        addedObject.setEmissiveIntensity(addedObject.setEmissiveIntensityValue);
+        delete addedObject.setEmissiveIntensityValue;
       }
-      if (!(typeof addedObject.setEmissiveColor == UNDEFINED)){
-        addedObject.mesh.material.uniforms.emissiveColor.value.set(addedObject.setEmissiveColor);
-        delete addedObject.setEmissiveColor;
+      if (!(typeof addedObject.setEmissiveColorValue == UNDEFINED)){
+        REUSABLE_COLOR.set(addedObject.setEmissiveColorValue);
+        addedObject.setEmissiveColor(REUSABLE_COLOR);
+        delete addedObject.setEmissiveColorValue;
       }
     }
     if (addedObject.hasAOMap()){
@@ -1136,22 +1133,11 @@ ImportHandler.prototype.importObjectGroups = function(obj){
       }
     }
     if (objectGroupInstance.mesh.material.uniforms.totalEmissiveIntensity){
-      objectGroupInstance.mesh.material.uniforms.totalEmissiveIntensity.value = curObjectGroupExport.totalEmissiveIntensity;
-      for (var childName in objectGroupInstance.group){
-        if (!(typeof objectGroupInstance.group[childName].emissiveIntensityWhenAttached == UNDEFINED)){
-          objectGroupInstance.group[childName].mesh.material.uniforms.emissiveIntensity.value = objectGroupInstance.group[childName].emissiveIntensityWhenAttached * curObjectGroupExport.totalEmissiveIntensity;
-        }
-      }
+      objectGroupInstance.setEmissiveIntensity(curObjectGroupExport.totalEmissiveIntensity);
     }
     if (objectGroupInstance.mesh.material.uniforms.totalEmissiveColor){
-      objectGroupInstance.mesh.material.uniforms.totalEmissiveColor.value.set(curObjectGroupExport.totalEmissiveColor);
-      for (var childName in objectGroupInstance.group){
-        if (!(typeof objectGroupInstance.group[childName].emissiveColorWhenAttached == UNDEFINED)){
-          REUSABLE_COLOR.set(objectGroupInstance.group[childName].emissiveColorWhenAttached);
-          REUSABLE_COLOR.multiply(objectGroupInstance.mesh.material.uniforms.totalEmissiveColor.value);
-          objectGroupInstance.group[childName].mesh.material.uniforms.emissiveColor.value.copy(REUSABLE_COLOR);
-        }
-      }
+      REUSABLE_COLOR.set(curObjectGroupExport.totalEmissiveColor);
+      objectGroupInstance.setEmissiveColor(REUSABLE_COLOR);
     }
     if (objectGroupInstance.mesh.material.uniforms.totalDisplacementInfo){
       objectGroupInstance.mesh.material.uniforms.totalDisplacementInfo.value.set(curObjectGroupExport.totalDisplacementScale, curObjectGroupExport.totalDisplacementBias);

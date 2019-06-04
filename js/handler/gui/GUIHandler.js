@@ -236,7 +236,7 @@ GUIHandler.prototype.afterObjectSelection = function(){
         guiHandler.disableController(guiHandler.omEmissiveColorController);
       }else{
         guiHandler.objectManipulationParameters["Emissive int."] = obj.getEmissiveIntensity();
-        guiHandler.objectManipulationParameters["Emissive col."] = "#"+obj.mesh.material.uniforms.emissiveColor.value.getHexString();
+        guiHandler.objectManipulationParameters["Emissive col."] = "#"+obj.getEmissiveColor().getHexString();
       }
       if (!obj.isSlicable()){
         guiHandler.objectManipulationParameters["Hide half"] = "None";
@@ -314,7 +314,7 @@ GUIHandler.prototype.afterObjectSelection = function(){
         guiHandler.disableController(guiHandler.omEmissiveColorController);
       }else{
         guiHandler.objectManipulationParameters["Emissive int."] = obj.getEmissiveIntensity();
-        guiHandler.objectManipulationParameters["Emissive col."] = "#"+obj.mesh.material.uniforms.totalEmissiveColor.value.getHexString();
+        guiHandler.objectManipulationParameters["Emissive col."] = "#"+obj.getEmissiveColor().getHexString();
       }
       if (!hasDisplacementMap){
         guiHandler.disableController(guiHandler.omDisplacementScaleController);
@@ -942,21 +942,8 @@ GUIHandler.prototype.initializeObjectManipulationGUI = function(){
     }
   }).listen();
   guiHandler.omEmissiveColorController = guiHandler.datGuiObjectManipulation.addColor(guiHandler.objectManipulationParameters, "Emissive col.").onChange(function(val){
-    var obj = selectionHandler.getSelectedObject();
-    if (obj.isAddedObject){
-      var material = obj.mesh.material;
-      material.uniforms.emissiveColor.value.set(val);
-    }else if (obj.isObjectGroup){
-      var material = obj.mesh.material;
-      material.uniforms.totalEmissiveColor.value.set(val);
-      for (var objName in obj.group){
-        if (!(typeof obj.group[objName].emissiveColorWhenAttached == UNDEFINED)){
-          REUSABLE_COLOR.set(obj.group[objName].emissiveColorWhenAttached);
-          REUSABLE_COLOR.multiply(material.uniforms.totalEmissiveColor.value);
-          obj.group[objName].mesh.material.uniforms.emissiveColor.value.copy(REUSABLE_COLOR);
-        }
-      }
-    }
+    REUSABLE_COLOR.set(val);
+    selectionHandler.getSelectedObject().setEmissiveColor(REUSABLE_COLOR);
   }).listen();
   guiHandler.omTextureOffsetXController = guiHandler.datGuiObjectManipulation.add(guiHandler.objectManipulationParameters, "Texture offset x").min(-2).max(2).step(0.001).onChange(function(val){
     selectionHandler.getSelectedObject().setTextureOffsetX(val);

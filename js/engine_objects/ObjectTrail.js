@@ -15,8 +15,8 @@ var ObjectTrail = function(configurations){
     for (var i = 0; i<geometry.faces.length; i++){
       geometry.faces[i].roygbivObjectName = this.object.name;
       if (this.object.hasEmissiveMap()){
-        geometry.faces[i].faceEmissiveIntensity = this.object.mesh.material.uniforms.emissiveIntensity.value;
-        geometry.faces[i].faceEmissiveColor = this.object.mesh.material.uniforms.emissiveColor.value;
+        geometry.faces[i].faceEmissiveIntensity = this.object.getEmissiveIntensity();
+        geometry.faces[i].faceEmissiveColor = this.object.getEmissiveColor().clone();
       }else{
         geometry.faces[i].faceEmissiveIntensity = 0;
         geometry.faces[i].faceEmissiveColor = WHITE_COLOR;
@@ -46,8 +46,8 @@ var ObjectTrail = function(configurations){
       geometry.faces[i].roygbivObjectName = objName;
       var childObj = this.object.group[objName];
       if (childObj.hasEmissiveMap()){
-        geometry.faces[i].faceEmissiveIntensity = childObj.mesh.material.uniforms.emissiveIntensity.value * this.object.mesh.material.uniforms.totalEmissiveIntensity.value;
-        geometry.faces[i].faceEmissiveColor = childObj.mesh.material.uniforms.emissiveColor.value;
+        geometry.faces[i].faceEmissiveIntensity = childObj.getEmissiveIntensity() * this.object.getEmissiveIntensity();
+        geometry.faces[i].faceEmissiveColor = childObj.getEmissiveColor().clone();
       }else{
         geometry.faces[i].faceEmissiveIntensity = 0;
         geometry.faces[i].faceEmissiveColor = WHITE_COLOR;

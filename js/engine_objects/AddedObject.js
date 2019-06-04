@@ -64,7 +64,6 @@ var AddedObject = function(name, type, metaData, material, mesh, physicsBody, de
   this.lastUpdateQuaternion = new THREE.Quaternion();
 
   webglCallbackHandler.registerEngineObject(this);
-
 }
 
 AddedObject.prototype.setAOIntensity = function(val){
@@ -93,6 +92,11 @@ AddedObject.prototype.getEmissiveIntensity = function(){
 
 AddedObject.prototype.setEmissiveIntensity = function(val){
   this.mesh.material.uniforms.emissiveIntensity.value = val;
+}
+
+AddedObject.prototype.getEmissiveColor = function(){
+  REUSABLE_COLOR.copy(this.mesh.material.uniforms.emissiveColor.value);
+  return REUSABLE_COLOR;
 }
 
 AddedObject.prototype.setEmissiveColor = function(val){
@@ -421,8 +425,8 @@ AddedObject.prototype.export = function(){
   }
   if (this.hasEmissiveMap()){
     if (!this.parentObjectName){
-      exportObject["emissiveIntensity"] = this.mesh.material.uniforms.emissiveIntensity.value;
-      exportObject["emissiveColor"] = "#"+this.mesh.material.uniforms.emissiveColor.value.getHexString();
+      exportObject["emissiveIntensity"] = this.getEmissiveIntensity();
+      exportObject["emissiveColor"] = "#"+this.getEmissiveColor().getHexString();
     }else{
       exportObject["emissiveIntensity"] = this.emissiveIntensityWhenAttached;
       exportObject["emissiveColor"] = "#"+this.emissiveColorWhenAttached.getHexString();
@@ -904,14 +908,9 @@ AddedObject.prototype.syncProperties = function(refObject){
     var refAOIntensity = refObject.mesh.material.uniforms.aoIntensity.value;
     this.mesh.material.uniforms.aoIntensity.value = refAOIntensity
   }
-  // EMISSIVE INTENSITY
   if (refObject.hasEmissiveMap() && this.hasEmissiveMap()){
-    var refMaterial = refObject.mesh.material;
-    var refEmissiveIntensity = refMaterial.uniforms.emissiveIntensity.value;
-    this.mesh.material.uniforms.emissiveIntensity.value = refEmissiveIntensity;
-    // EMISSIVE COLOR
-    var refEmissiveColor = refMaterial.uniforms.emissiveColor.value;
-    this.mesh.material.uniforms.emissiveColor.value.copy(refEmissiveColor);
+    this.setEmissiveIntensity(refObject.getEmissiveIntensity());
+    this.setEmissiveColor(refObject.getEmissiveColor());
   }
   // DISPLACEMENT
     if (refObject.hasDisplacementMap() && this.hasDisplacementMap()){
@@ -941,8 +940,8 @@ AddedObject.prototype.setAttachedProperties = function(){
     this.aoIntensityWhenAttached = this.mesh.material.uniforms.aoIntensity.value;
   }
   if (this.hasEmissiveMap()){
-    this.emissiveIntensityWhenAttached = this.mesh.material.uniforms.emissiveIntensity.value;
-    this.emissiveColorWhenAttached = this.mesh.material.uniforms.emissiveColor.value.clone();
+    this.emissiveIntensityWhenAttached = this.getEmissiveIntensity();
+    this.emissiveColorWhenAttached = this.getEmissiveColor().clone();
   }
   if (this.hasDisplacementMap()){
     this.displacementScaleWhenAttached = this.mesh.material.uniforms.displacementInfo.value.x;
@@ -2826,8 +2825,8 @@ AddedObject.prototype.copy = function(name, isHardCopy, copyPosition, gridSystem
       }
       if (this.hasEmissiveMap()){
         copyInstance.mapEmissive(this.mesh.material.uniforms.emissiveMap.value);
-        copyInstance.mesh.material.uniforms.emissiveIntensity.value = this.mesh.material.uniforms.emissiveIntensity.value;
-        copyInstance.mesh.material.uniforms.emissiveColor.value = new THREE.Color().copy(this.mesh.material.uniforms.emissiveColor.value);
+        copyInstance.setEmissiveIntensity(this.getEmissiveIntensity());
+        copyInstance.setEmissiveColor(this.getEmissiveColor());
       }
     }
     copyInstance.updateOpacity(this.mesh.material.uniforms.alpha.value);

@@ -34,6 +34,22 @@ var ObjectGroup = function(name, group){
   this.lastUpdateQuaternion = new THREE.Quaternion();
 }
 
+ObjectGroup.prototype.getEmissiveColor = function(){
+  REUSABLE_COLOR.copy(this.mesh.material.uniforms.totalEmissiveColor.value);
+  return REUSABLE_COLOR;
+}
+
+ObjectGroup.prototype.setEmissiveColor = function(val){
+  this.mesh.material.uniforms.totalEmissiveColor.value.copy(val);
+  for (var objName in this.group){
+    if (!(typeof this.group[objName].emissiveColorWhenAttached == UNDEFINED)){
+      REUSABLE_COLOR.copy(this.group[objName].emissiveColorWhenAttached);
+      REUSABLE_COLOR.multiply(this.mesh.material.uniforms.totalEmissiveColor.value);
+      this.group[objName].setEmissiveColor(REUSABLE_COLOR);
+    }
+  }
+}
+
 ObjectGroup.prototype.getDisplacementBias = function(){
   return this.mesh.material.uniforms.totalDisplacementInfo.value.y;
 }
@@ -68,7 +84,7 @@ ObjectGroup.prototype.setEmissiveIntensity = function(val){
   this.mesh.material.uniforms.totalEmissiveIntensity.value = val;
   for (var objName in this.group){
     if (!(typeof this.group[objName].emissiveIntensityWhenAttached == UNDEFINED)){
-      this.group[objName].mesh.material.uniforms.emissiveIntensity.value = this.group[objName].emissiveIntensityWhenAttached * val;
+      this.group[objName].setEmissiveIntensity(this.group[objName].emissiveIntensityWhenAttached * val);
     }
   }
 }
@@ -632,10 +648,10 @@ ObjectGroup.prototype.mergeInstanced = function(){
     colors.push(obj.material.color.b);
     if (this.emissiveTexture){
       if (obj.hasEmissiveMap()){
-        emissiveIntensities.push(obj.mesh.material.uniforms.emissiveIntensity.value);
-        emissiveColors.push(obj.mesh.material.uniforms.emissiveColor.value.r);
-        emissiveColors.push(obj.mesh.material.uniforms.emissiveColor.value.g);
-        emissiveColors.push(obj.mesh.material.uniforms.emissiveColor.value.b);
+        emissiveIntensities.push(obj.getEmissiveIntensity());
+        emissiveColors.push(obj.getEmissiveColor().r);
+        emissiveColors.push(obj.getEmissiveColor().g);
+        emissiveColors.push(obj.getEmissiveColor().b);
       }else{
         emissiveIntensities.push(1);
         emissiveColors.push(1);
@@ -1053,7 +1069,7 @@ ObjectGroup.prototype.merge = function(){
     if (this.emissiveTexture){
       var emissiveIntensity;
       if (addedObject.hasEmissiveMap()){
-        emissiveIntensity = addedObject.mesh.material.uniforms.emissiveIntensity.value;
+        emissiveIntensity = addedObject.getEmissiveIntensity();
       }else{
         emissiveIntensity = 0;
       }
@@ -1068,7 +1084,7 @@ ObjectGroup.prototype.merge = function(){
       }
       var emissiveColor;
       if (addedObject.hasEmissiveMap()){
-        emissiveColor = addedObject.mesh.material.uniforms.emissiveColor.value;
+        emissiveColor = addedObject.getEmissiveColor();
       }else{
         emissiveColor = WHITE_COLOR;
       }
@@ -1892,14 +1908,14 @@ ObjectGroup.prototype.export = function(){
     exportObj.totalAOIntensity = this.mesh.material.uniforms.totalAOIntensity.value;
   }
   if (this.mesh.material.uniforms.totalEmissiveIntensity){
-    exportObj.totalEmissiveIntensity = this.mesh.material.uniforms.totalEmissiveIntensity.value;
+    exportObj.totalEmissiveIntensity = this.getEmissiveIntensity();
   }
   if (this.mesh.material.uniforms.totalDisplacementInfo){
     exportObj.totalDisplacementScale = this.mesh.material.uniforms.totalDisplacementInfo.value.x;
     exportObj.totalDisplacementBias = this.mesh.material.uniforms.totalDisplacementInfo.value.y;
   }
   if (this.mesh.material.uniforms.totalEmissiveColor){
-    exportObj.totalEmissiveColor = "#"+this.mesh.material.uniforms.totalEmissiveColor.value.getHexString();
+    exportObj.totalEmissiveColor = "#"+this.getEmissiveColor().getHexString();
   }
   exportObj.isRotationDirty = this.isRotationDirty;
   if (this.isPhysicsSimplified){
@@ -2272,13 +2288,13 @@ ObjectGroup.prototype.copy = function(name, isHardCopy, copyPosition, gridSystem
     totalAOIntensityBeforeDetached = this.mesh.material.uniforms.totalAOIntensity.value;
   }
   if (this.mesh.material.uniforms.totalEmissiveIntensity){
-    totalEmissiveIntensityBeforeDetached = this.mesh.material.uniforms.totalEmissiveIntensity.value;
+    totalEmissiveIntensityBeforeDetached = this.getEmissiveIntensity();
   }
   if (this.mesh.material.uniforms.totalDisplacementInfo){
     totalDisplacementInfoBeforeDetached = this.mesh.material.uniforms.totalDisplacementInfo.value.clone();
   }
   if (this.mesh.material.uniforms.totalEmissiveColor){
-    totalEmissiveColorBeforeDetached = this.mesh.material.uniforms.totalEmissiveColor.value;
+    totalEmissiveColorBeforeDetached = this.getEmissiveColor().clone();
   }
   var isTransparentBeforeDetached = this.mesh.material.transparent;
   this.detach();
@@ -2380,13 +2396,13 @@ ObjectGroup.prototype.copy = function(name, isHardCopy, copyPosition, gridSystem
     this.mesh.material.uniforms.totalAOIntensity.value = totalAOIntensityBeforeDetached;
   }
   if (this.mesh.material.uniforms.totalEmissiveIntensity){
-    this.mesh.material.uniforms.totalEmissiveIntensity.value = totalEmissiveIntensityBeforeDetached;
+    this.setEmissiveIntensity(totalEmissiveIntensityBeforeDetached);
   }
   if (this.mesh.material.uniforms.totalDisplacementInfo){
     this.mesh.material.uniforms.totalDisplacementInfo.value.copy(totalDisplacementInfoBeforeDetached);
   }
   if (this.mesh.material.uniforms.totalEmissiveColor){
-    this.mesh.material.uniforms.totalEmissiveColor.value = totalEmissiveColorBeforeDetached;
+    this.setEmissiveColor(totalEmissiveColorBeforeDetached);
   }
 
   this.mesh.material = oldMaterial;
@@ -2400,13 +2416,13 @@ ObjectGroup.prototype.copy = function(name, isHardCopy, copyPosition, gridSystem
       newObjGroup.mesh.material.uniforms.totalAOIntensity.value = this.mesh.material.uniforms.totalAOIntensity.value;
     }
     if (newObjGroup.mesh.material.uniforms.totalEmissiveIntensity){
-      newObjGroup.mesh.material.uniforms.totalEmissiveIntensity.value = this.mesh.material.uniforms.totalEmissiveIntensity.value;
+      newObjGroup.setEmissiveIntensity(this.getEmissiveIntensity());
     }
     if (newObjGroup.mesh.material.uniforms.totalDisplacementInfo){
       newObjGroup.mesh.material.uniforms.totalDisplacementInfo.value.copy(this.mesh.material.uniforms.totalDisplacementInfo.value);
     }
     if (newObjGroup.mesh.material.uniforms.totalEmissiveColor){
-      newObjGroup.mesh.material.uniforms.totalEmissiveColor.value = new THREE.Color().copy(this.mesh.material.uniforms.totalEmissiveColor.value);
+      newObjGroup.setEmissiveColor(this.getEmissiveColor());
     }
   }
 
