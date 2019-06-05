@@ -32,6 +32,7 @@ varying float vAlpha;
   attribute vec4 textureInfo;
   attribute vec4 textureMatrixInfo;
   varying vec2 vUV;
+  uniform vec2 totalTextureOffset;
   #ifdef HAS_AO
     varying float hasAOMap;
   #endif
@@ -58,7 +59,7 @@ void main(){
       mat3(
         textureMatrixInfo.z, 0.0, 0.0,
         0.0, textureMatrixInfo.w, 0.0,
-        textureMatrixInfo.x, textureMatrixInfo.y, 1.0
+        textureMatrixInfo.x + totalTextureOffset.x, textureMatrixInfo.y + totalTextureOffset.y, 1.0
       ) * vec3(uv, 1.0)
     ).xy;
     #ifdef HAS_DIFFUSE

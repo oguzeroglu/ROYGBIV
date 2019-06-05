@@ -89,6 +89,32 @@ ObjectGroup.prototype.setDisplacementScale = function(val){
   }
 }
 
+ObjectGroup.prototype.getTextureOffsetY = function(){
+  return this.mesh.material.uniforms.totalTextureOffset.value.y;
+}
+
+ObjectGroup.prototype.setTextureOffsetY = function(val){
+  this.mesh.material.uniforms.totalTextureOffset.value.y = val;
+  for (var objName in this.group){
+    if (!(typeof this.group[objName].textureOffsetYWhenAttached == UNDEFINED)){
+      this.group[objName].setTextureOffsetY(this.group[objName].textureOffsetYWhenAttached + val);
+    }
+  }
+}
+
+ObjectGroup.prototype.getTextureOffsetX = function(){
+  return this.mesh.material.uniforms.totalTextureOffset.value.x;
+}
+
+ObjectGroup.prototype.setTextureOffsetX = function(val){
+  this.mesh.material.uniforms.totalTextureOffset.value.x = val;
+  for (var objName in this.group){
+    if (!(typeof this.group[objName].textureOffsetXWhenAttached == UNDEFINED)){
+      this.group[objName].setTextureOffsetX(this.group[objName].textureOffsetXWhenAttached + val);
+    }
+  }
+}
+
 ObjectGroup.prototype.getEmissiveIntensity = function(){
   return this.mesh.material.uniforms.totalEmissiveIntensity.value;
 }
@@ -1544,6 +1570,10 @@ ObjectGroup.prototype.detach = function(){
       addedObject.pqzWhenAttached,
       addedObject.pqwWhenAttached
     );
+    if (addedObject.hasTexture()){
+      addedObject.setTextureOffsetX(addedObject.textureOffsetXWhenAttached);
+      addedObject.setTextureOffsetY(addedObject.textureOffsetYWhenAttached);
+    }
     if (addedObject.hasEmissiveMap()){
       addedObject.setEmissiveIntensity(addedObject.emissiveIntensityWhenAttached);
       REUSABLE_COLOR.set(addedObject.emissiveColorWhenAttached);
@@ -1576,6 +1606,8 @@ ObjectGroup.prototype.detach = function(){
     delete addedObject.displacementBiasWhenAttached;
     delete addedObject.emissiveColorWhenAttached;
     delete addedObject.aoIntensityWhenAttached;
+    delete addedObject.textureOffsetXWhenAttached;
+    delete addedObject.textureOffsetYWhenAttached;
   }
 }
 
@@ -1919,6 +1951,10 @@ ObjectGroup.prototype.export = function(){
   exportObj.totalAlpha = this.mesh.material.uniforms.totalAlpha.value;
   if (this.mesh.material.uniforms.totalAOIntensity){
     exportObj.totalAOIntensity = this.getAOIntensity();
+  }
+  if (this.mesh.material.uniforms.totalTextureOffset){
+    exportObj.totalTextureOffsetX = this.getTextureOffsetX();
+    exportObj.totalTextureOffsetY = this.getTextureOffsetY();
   }
   if (this.mesh.material.uniforms.totalEmissiveIntensity){
     exportObj.totalEmissiveIntensity = this.getEmissiveIntensity();
@@ -2285,6 +2321,7 @@ ObjectGroup.prototype.copy = function(name, isHardCopy, copyPosition, gridSystem
   var totalAOIntensityBeforeDetached;
   var totalEmissiveIntensityBeforeDetached;
   var totalDisplacementInfoBeforeDetached;
+  var totalTextureOffsetBeforeDetached;
   var totalEmissiveColorBeforeDetached;
   var oldMaterial = this.mesh.material;
   var phsimplObj3DPos;
@@ -2296,6 +2333,9 @@ ObjectGroup.prototype.copy = function(name, isHardCopy, copyPosition, gridSystem
     phsimplObj3DQuat = this.physicsSimplificationObject3D.quaternion.clone();
     phsimplContPos = this.physicsSimplificationObject3DContainer.position.clone();
     phsimplContQuat = this.physicsSimplificationObject3DContainer.quaternion.clone();
+  }
+  if (this.mesh.material.uniforms.totalTextureOffset){
+    totalTextureOffsetBeforeDetached = new THREE.Vector2(this.getTextureOffsetX(), this.getTextureOffsetY());
   }
   if (this.mesh.material.uniforms.totalAOIntensity){
     totalAOIntensityBeforeDetached = this.getAOIntensity();
@@ -2405,6 +2445,10 @@ ObjectGroup.prototype.copy = function(name, isHardCopy, copyPosition, gridSystem
   this.mesh.material.transparent = isTransparentBeforeDetached;
   newObjGroup.mesh.material.transparent = isTransparentBeforeDetached;
   this.mesh.material.uniforms.totalAlpha.value = totalAlphaBeforeDetached;
+  if (this.mesh.material.uniforms.totalTextureOffset){
+    this.setTextureOffsetX(totalTextureOffsetBeforeDetached.x);
+    this.setTextureOffsetY(totalTextureOffsetBeforeDetached.y);
+  }
   if (this.mesh.material.uniforms.totalAOIntensity){
     this.setAOIntensity(totalAOIntensityBeforeDetached);
   }
@@ -2426,6 +2470,10 @@ ObjectGroup.prototype.copy = function(name, isHardCopy, copyPosition, gridSystem
     newObjGroup.softCopyParentName = this.name;
   }else{
     newObjGroup.mesh.material.uniforms.totalAlpha.value = this.mesh.material.uniforms.totalAlpha.value;
+    if (newObjGroup.mesh.material.uniforms.totalTextureOffset){
+      newObjGroup.setTextureOffsetX(this.getTextureOffsetX());
+      newObjGroup.setTextureOffsetY(this.getTextureOffsetY());
+    }
     if (newObjGroup.mesh.material.uniforms.totalAOIntensity){
       newObjGroup.setAOIntensity(this.getAOIntensity());
     }

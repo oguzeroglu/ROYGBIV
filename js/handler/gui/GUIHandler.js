@@ -323,8 +323,13 @@ GUIHandler.prototype.afterObjectSelection = function(){
         guiHandler.objectManipulationParameters["Disp. scale"] = obj.getDisplacementScale();
         guiHandler.objectManipulationParameters["Disp. bias"] = obj.getDisplacementBias();
       }
-      guiHandler.disableController(guiHandler.omTextureOffsetXController);
-      guiHandler.disableController(guiHandler.omTextureOffsetYController);
+      if (!obj.hasTexture){
+        guiHandler.disableController(guiHandler.omTextureOffsetXController);
+        guiHandler.disableController(guiHandler.omTextureOffsetYController);
+      }else{
+        guiHandler.objectManipulationParameters["Texture offset x"] = obj.getTextureOffsetX();
+        guiHandler.objectManipulationParameters["Texture offset y"] = obj.getTextureOffsetY();
+      }
       guiHandler.disableController(guiHandler.omHideHalfController);
       if (obj.cannotSetMass){
         guiHandler.disableController(guiHandler.omHasMassController);

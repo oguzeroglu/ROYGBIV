@@ -440,8 +440,16 @@ AddedObject.prototype.export = function(){
     exportObject["emissiveColor"] = this.material.emissiveColor;
   }
 
-  exportObject["textureOffsetX"] = this.getTextureOffsetX();
-  exportObject["textureOffsetY"] = this.getTextureOffsetY();
+  if (!this.parentObjectName || (typeof this.textureOffsetXWhenAttached == UNDEFINED)){
+    exportObject["textureOffsetX"] = this.getTextureOffsetX();
+  }else{
+    exportObject["textureOffsetX"] = this.textureOffsetXWhenAttached;
+  }
+  if (!this.parentObjectName || (typeof this.textureOffsetYWhenAttached == UNDEFINED)){
+    exportObject["textureOffsetY"] = this.getTextureOffsetY();
+  }else{
+    exportObject["textureOffsetY"] = this.textureOffsetYWhenAttached;
+  }
   exportObject["textureRepeatU"] = this.getTextureRepeatX();
   exportObject["textureRepeatV"] = this.getTextureRepeatY();
 
@@ -948,6 +956,8 @@ AddedObject.prototype.setAttachedProperties = function(){
     this.displacementScaleWhenAttached = this.getDisplacementScale();
     this.displacementBiasWhenAttached = this.getDisplacementBias();
   }
+  this.textureOffsetXWhenAttached = this.getTextureOffsetX();
+  this.textureOffsetYWhenAttached = this.getTextureOffsetY();
 }
 
 AddedObject.prototype.getTextureUniform = function(texture){

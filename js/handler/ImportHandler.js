@@ -674,6 +674,8 @@ ImportHandler.prototype.importAddedObjects = function(obj){
 
      if (curAddedObjectExport.txtMatrix){
        addedObjectInstance.setTxtMatrix = curAddedObjectExport.txtMatrix;
+       addedObjectInstance.setTxtOffsetX = curAddedObjectExport.textureOffsetX;
+       addedObjectInstance.setTxtOffsetY = curAddedObjectExport.textureOffsetY;
      }
      addedObjectInstance.mesh.material.uniforms.alpha.value = curAddedObjectExport.opacity;
      if (!(typeof curAddedObjectExport.aoMapIntensity == UNDEFINED)){
@@ -1008,7 +1010,11 @@ ImportHandler.prototype.importAddedObjectGraphicsProperties = function(){
       for (var ix = 0; ix<addedObject.setTxtMatrix.length; ix++){
         addedObject.mesh.material.uniforms.textureMatrix.value.elements[ix] = addedObject.setTxtMatrix[ix];
       }
+      addedObject.setTextureOffsetX(addedObject.setTxtOffsetX);
+      addedObject.setTextureOffsetY(addedObject.setTxtOffsetY);
       delete addedObject.setTxtMatrix;
+      delete addedObject.setTxtOffsetX;
+      delete addedObject.setTxtOffsetY;
     }
     if (addedObject.hasEmissiveMap()){
       if (!(typeof addedObject.setEmissiveIntensityValue == UNDEFINED)){
@@ -1123,6 +1129,10 @@ ImportHandler.prototype.importObjectGroups = function(obj){
     objectGroupInstance.updateOpacity(curObjectGroupExport.totalAlpha);
     for (var childName in objectGroupInstance.group){
       objectGroupInstance.group[childName].updateOpacity(curObjectGroupExport.totalAlpha * objectGroupInstance.group[childName].opacityWhenAttached);
+    }
+    if (objectGroupInstance.mesh.material.uniforms.totalTextureOffset){
+      objectGroupInstance.setTextureOffsetX(curObjectGroupExport.totalTextureOffsetX);
+      objectGroupInstance.setTextureOffsetY(curObjectGroupExport.totalTextureOffsetY);
     }
     if (objectGroupInstance.mesh.material.uniforms.totalAOIntensity){
       objectGroupInstance.setAOIntensity(curObjectGroupExport.totalAOIntensity);
