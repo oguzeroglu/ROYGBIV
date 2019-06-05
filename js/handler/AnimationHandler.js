@@ -19,7 +19,7 @@ var AnimationHandler = function(){
       TRANSPARENCY: 0, SCALE: 1, SCALE_X: 2, SCALE_Y: 3, SCALE_Z: 4,
       ROTATION_X: 5, ROTATION_Y: 6, ROTATION_Z: 7, POSITION_X: 8,
       POSITION_Y: 9, POSITION_Z: 10, EMISSIVE_INTENSITY: 11, DISPLACEMENT_SCALE: 12,
-      DISPLACEMENT_BIAS: 13, EMISSIVE_COLOR: 14
+      DISPLACEMENT_BIAS: 13, EMISSIVE_COLOR: 14, TEXTURE_OFFSET_X: 15, TEXTURE_OFFSET_Y: 16
     }
   };
   // ACTION FUNCTIONS **********************************************
@@ -39,6 +39,8 @@ var AnimationHandler = function(){
   this.actionFunctionsByType[this.actionTypes.OBJECT.DISPLACEMENT_SCALE] = this.updateObjectDisplacementScale;
   this.actionFunctionsByType[this.actionTypes.OBJECT.DISPLACEMENT_BIAS] = this.updateObjectDisplacementBias;
   this.actionFunctionsByType[this.actionTypes.OBJECT.EMISSIVE_COLOR] = this.updateObjectEmissiveColor;
+  this.actionFunctionsByType[this.actionTypes.OBJECT.TEXTURE_OFFSET_X] = this.updateObjectTextureOffsetX;
+  this.actionFunctionsByType[this.actionTypes.OBJECT.TEXTURE_OFFSET_Y] = this.updateObjectTextureOffsetY;
   // UPDATE FUNCTIONS **********************************************
   this.updateFunctionsByType = new Object();
   this.updateFunctionsByType[this.animationTypes.LINEAR] = this.linearFunc;
@@ -142,6 +144,20 @@ AnimationHandler.prototype.updateObjectDisplacementBias = function(params){
 }
 AnimationHandler.prototype.updateObjectEmissiveColor = function(params){
   params.object.setEmissiveColor(params.sourceColor.lerp(params.targetColor, params.value));
+}
+AnimationHandler.prototype.updateObjectTextureOffsetX = function(params){
+  if (!params.object.isAddedObject){
+    console.error("Texture offset X animation works only for AddedObjects");
+    return;
+  }
+  params.object.setTextureOffsetX(params.value);
+}
+AnimationHandler.prototype.updateObjectTextureOffsetY = function(params){
+  if (!params.object.isAddedObject){
+    console.error("Texture offset Y animation works only for AddedObjects");
+    return;
+  }
+  params.object.setTextureOffsetY(params.value);
 }
 // UPDATE FUNCTIONS ************************************************
 AnimationHandler.prototype.linearFunc = function(curTime, startVal, changeInVal, totalTime){
