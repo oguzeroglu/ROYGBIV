@@ -146,17 +146,9 @@ AnimationHandler.prototype.updateObjectEmissiveColor = function(params){
   params.object.setEmissiveColor(params.sourceColor.lerp(params.targetColor, params.value));
 }
 AnimationHandler.prototype.updateObjectTextureOffsetX = function(params){
-  if (!params.object.isAddedObject){
-    console.error("Texture offset X animation works only for AddedObjects");
-    return;
-  }
   params.object.setTextureOffsetX(params.value);
 }
 AnimationHandler.prototype.updateObjectTextureOffsetY = function(params){
-  if (!params.object.isAddedObject){
-    console.error("Texture offset Y animation works only for AddedObjects");
-    return;
-  }
   params.object.setTextureOffsetY(params.value);
 }
 // UPDATE FUNCTIONS ************************************************
