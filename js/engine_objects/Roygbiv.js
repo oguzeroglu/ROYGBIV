@@ -1822,21 +1822,21 @@ Roygbiv.prototype.setTextAlpha = function(text, alpha){
   text.setAlpha(alpha, true);
 }
 
-// Sets the position of a text object.
+// Sets the position of a text object. If text is 2D only x and y parameters are
+// necessary representing the marginX and marginY.
 Roygbiv.prototype.setTextPosition = function(text, x, y, z){
   if (mode == 0){
     return;
   }
   preConditions.checkIfDefined(ROYGBIV.setTextPosition, preConditions.text, text);
   preConditions.checkIfAddedText(ROYGBIV.setTextPosition, preConditions.text, text);
-  preConditions.checkIfText2D(ROYGBIV.setTextPosition, preConditions.text, text);
   preConditions.checkIfDefined(ROYGBIV.setTextPosition, preConditions.x, x);
   preConditions.checkIfDefined(ROYGBIV.setTextPosition, preConditions.y, y);
-  preConditions.checkIfDefined(ROYGBIV.setTextPosition, preConditions.z, z);
+  preConditions.checkIfDefinedOnlyIfYTrue(ROYGBIV.setTextPosition, "z is mandatory parameter for 3D texts.", !text.is2D, z);
   preConditions.checkIfNumber(ROYGBIV.setTextPosition, preConditions.x, x);
   preConditions.checkIfNumber(ROYGBIV.setTextPosition, preConditions.y, y);
-  preConditions.checkIfNumber(ROYGBIV.setTextPosition, preConditions.z, z);
-  text.mesh.position.set(x, y, z);
+  preConditions.checkIfNumberOnlyIfExists(ROYGBIV.setTextPosition, preConditions.z, z);
+  text.setPosition(x, y, z);
 }
 
 // Sets the background color/alpha of a text object.
@@ -1880,11 +1880,7 @@ Roygbiv.prototype.setTextCenterPosition = function(text, x, y, z){
   preConditions.checkIfNumber(ROYGBIV.setTextCenterPosition, preConditions.y, y);
   preConditions.checkIfNumber(ROYGBIV.setTextCenterPosition, preConditions.z, z);
   var centerPos = text.getCenterCoordinates();
-  text.mesh.position.set(
-    text.mesh.position.x + (x - centerPos.x),
-    text.mesh.position.y + (y - centerPos.y),
-    text.mesh.position.z + (z - centerPos.z)
-  );
+  text.mesh.position.set(text.mesh.position.x + (x - centerPos.x), text.mesh.position.y + (y - centerPos.y), text.mesh.position.z + (z - centerPos.z));
 }
 
 // Makes the given text object invisible. Does nothing if the text is already

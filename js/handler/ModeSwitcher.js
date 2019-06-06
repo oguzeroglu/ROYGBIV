@@ -106,6 +106,10 @@ ModeSwitcher.prototype.switchFromDesignToPreview = function(){
   }
   for (var textName in addedTexts){
     var addedText = addedTexts[textName];
+    if (addedText.is2D){
+      addedText.originalMarginX = addedText.marginPercentWidth;
+      addedText.originalMarginY = addedText.marginPercentHeight;
+    }
     if (addedText.bbHelper){
       scene.remove(addedText.bbHelper);
     }

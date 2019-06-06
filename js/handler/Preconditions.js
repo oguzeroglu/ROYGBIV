@@ -282,6 +282,14 @@ Preconditions.prototype.checkIfDefined = function(callerFunc, parameterName, obj
   }
 }
 
+Preconditions.prototype.checkIfDefinedOnlyIfYTrue = function(callerFunc, errorMsg, y, obj){
+  if (y){
+    if (typeof obj == UNDEFINED){
+      this.throw(callerFunc, errorMsg);
+    }
+  }
+}
+
 Preconditions.prototype.checkIfObjectGroup = function(callerFunc, parameterName, obj){
   if (!obj.isObjectGroup){
     this.throw(callerFunc, parameterName+" is not an object group.");

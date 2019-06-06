@@ -97,6 +97,14 @@ var AddedText = function(name, font, text, position, color, alpha, characterSize
   webglCallbackHandler.registerEngineObject(this);
 }
 
+AddedText.prototype.setPosition = function(x, y, z){
+  if (this.is2D){
+    this.set2DCoordinates(x, y);
+  }else{
+    text.mesh.position.set(x, y, z);
+  }
+}
+
 AddedText.prototype.useDefaultPrecision = function(){
   shaderPrecisionHandler.setDefaultPrecisionForObject(this);
   this.hasCustomPrecision = false;
@@ -664,7 +672,13 @@ AddedText.prototype.restore = function(){
       this.isBGRemoved = false;
     }
   }
-  this.mesh.position.copy(this.position);
+  if (!this.is2D){
+    this.setPosition(this.position.x, this.position.y, this.position.z);
+  }else{
+    this.setPosition(this.originalMarginX, this.originalMarginY);
+    delete this.originalMarginX;
+    delete this.originalMarginY;
+  }
 }
 
 AddedText.prototype.setAffectedByFog = function(val){
