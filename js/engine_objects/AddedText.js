@@ -712,10 +712,12 @@ AddedText.prototype.set2DCoordinates = function(marginPercentWidth, marginPercen
   GLOBAL_ADDEDTEXT_VIEWPORT_UNIFORM.value.set(0, 0, window.innerWidth * screenResolution, window.innerHeight * screenResolution);
   this.marginPercentWidth = marginPercentWidth;
   this.marginPercentHeight = marginPercentHeight;
-  var isFromLeft = false, isFromTop = false;
+  var isFromLeft = false, isFromTop = false, isFromCenter = false;
   if (this.marginMode == MARGIN_MODE_2D_TEXT_TOP_LEFT){
     isFromLeft = true;
     isFromTop = true;
+  }else if (this.marginMode == MARGIN_MODE_2D_TEXT_CENTER){
+    isFromCenter = true;
   }
   var curViewport = REUSABLE_QUATERNION.set(0, 0, window.innerWidth, window.innerHeight);
   if (isFromLeft){
@@ -729,7 +731,7 @@ AddedText.prototype.set2DCoordinates = function(marginPercentWidth, marginPercen
       marginX = 1 - widthX - cSizeX;
     }
     this.setShaderMargin(true, marginX);
-  }else{
+  }else if (!isFromCenter){
     marginPercentWidth = marginPercentWidth + 100;
     var tmpX = ((curViewport.z - curViewport.x) / 2.0) + curViewport.x + this.twoDimensionalParameters.x;
     var widthX = (((tmpX - curViewport.x) * 2.0) / curViewport.z) - 1.0;
@@ -737,6 +739,19 @@ AddedText.prototype.set2DCoordinates = function(marginPercentWidth, marginPercen
     var cSizeX = (this.characterSize / (renderer.getCurrentViewport().z / screenResolution));
     this.cSizeX = cSizeX;
     marginX += cSizeX + widthX;
+    marginX = 2 - marginX;
+    if (marginX < -1){
+      marginX = -1 + cSizeX;
+    }
+    this.setShaderMargin(true, marginX);
+  }else{
+    marginPercentWidth = marginPercentWidth + 100;
+    var tmpX = ((curViewport.z - curViewport.x) / 2.0) + curViewport.x + this.twoDimensionalParameters.x;
+    var widthX = (((tmpX - curViewport.x) * 2.0) / curViewport.z) - 1.0;
+    var marginX = (((marginPercentWidth) * (2)) / (100)) -1;
+    var cSizeX = (this.characterSize / (renderer.getCurrentViewport().z / screenResolution));
+    this.cSizeX = cSizeX;
+    marginX += (widthX / 2);
     marginX = 2 - marginX;
     if (marginX < -1){
       marginX = -1 + cSizeX;
@@ -755,13 +770,23 @@ AddedText.prototype.set2DCoordinates = function(marginPercentWidth, marginPercen
       marginY = -1 - heightY + cSizeY;
     }
     this.setShaderMargin(false, marginY);
-  }else{
+  }else if (!isFromCenter){
     var tmpY = ((curViewport.w - curViewport.y) / 2.0) + curViewport.y + this.twoDimensionalParameters.y;
     var heightY = (((tmpY - curViewport.y) * 2.0) / curViewport.w) - 1.0;
     var marginY = (((marginPercentHeight) * (2)) / (100)) -1;
     var cSizeY = (this.characterSize / (renderer.getCurrentViewport().w / screenResolution));
     this.cSizeY = cSizeY;
     marginY -= cSizeY;
+    if (marginY + heightY < -1){
+      marginY = -1 - heightY + cSizeY;
+    }
+    this.setShaderMargin(false, marginY);
+  }else{
+    var tmpY = ((curViewport.w - curViewport.y) / 2.0) + curViewport.y + this.twoDimensionalParameters.y;
+    var heightY = (((tmpY - curViewport.y) * 2.0) / curViewport.w) - 1.0;
+    var marginY = (((marginPercentHeight) * (2)) / (100)) -1;
+    var cSizeY = (this.characterSize / (renderer.getCurrentViewport().w / screenResolution));
+    this.cSizeY = cSizeY;
     if (marginY + heightY < -1){
       marginY = -1 - heightY + cSizeY;
     }

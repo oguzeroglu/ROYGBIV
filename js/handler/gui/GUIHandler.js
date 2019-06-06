@@ -1110,15 +1110,15 @@ GUIHandler.prototype.initializeTextManipulationGUI = function(){
     selectionHandler.resetCurrentSelection();
     selectionHandler.select(obj);
   }).listen();
-  guiHandler.textManipulationMarginModeController = guiHandler.datGuiTextManipulation.add(guiHandler.textManipulationParameters, "Margin mode", ["Top/Left", "Bottom/Right"]).onChange(function(val){
+  guiHandler.textManipulationMarginModeController = guiHandler.datGuiTextManipulation.add(guiHandler.textManipulationParameters, "Margin mode", ["Top/Left", "Bottom/Right", "Center"]).onChange(function(val){
     if (val == "Top/Left"){
       selectionHandler.getSelectedObject().marginMode = MARGIN_MODE_2D_TEXT_TOP_LEFT;
-    }else{
+    }else if (val == "Bottom/Right"){
       selectionHandler.getSelectedObject().marginMode = MARGIN_MODE_2D_TEXT_BOTTOM_RIGHT;
+    }else{
+      selectionHandler.getSelectedObject().marginMode = MARGIN_MODE_2D_TEXT_CENTER;
     }
-    selectionHandler.getSelectedObject().set2DCoordinates(
-      selectionHandler.getSelectedObject().marginPercentWidth, selectionHandler.getSelectedObject().marginPercentHeight
-    );
+    selectionHandler.getSelectedObject().set2DCoordinates(selectionHandler.getSelectedObject().marginPercentWidth, selectionHandler.getSelectedObject().marginPercentHeight);
   }).listen();
   guiHandler.textManipulationMarginXController = guiHandler.datGuiTextManipulation.add(guiHandler.textManipulationParameters, "Margin X").min(0).max(100).step(0.1).onChange(function(val){
     selectionHandler.getSelectedObject().set2DCoordinates(
