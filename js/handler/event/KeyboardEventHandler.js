@@ -26,8 +26,8 @@ KeyboardEventHandler.prototype.onKeyUp = function(event){
     }
   }
   activeControl.onKeyUp(event);
-  if (mode == 0){
-    if (guiHandler.datGuiMuzzleFlashCreator || guiHandler.datGuiPSCreator || guiHandler.datGuiFPSWeaponAlignment){
+  if (mode == 0 && !isDeployment){
+    if (guiHandler.isOneOfBlockingGUIActive()){
       return;
     }
   }
@@ -46,7 +46,7 @@ KeyboardEventHandler.prototype.onKeyUp = function(event){
       }
     break;
     case 16: //SHIFT
-      if (mode == 0 && !fpsWeaponGUIHandler.fpsWeaponAlignmentConfigurationObject){
+      if (mode == 0 && !isDeployment){
         for (var objName in addedObjects){
           addedObjects[objName].mesh.visible = true;
         }
@@ -80,8 +80,8 @@ KeyboardEventHandler.prototype.onKeyDown = function(event){
     }
   }
   activeControl.onKeyDown(event);
-  if (mode == 0){
-    if (guiHandler.datGuiMuzzleFlashCreator || guiHandler.datGuiPSCreator || guiHandler.datGuiFPSWeaponAlignment){
+  if (mode == 0 && isDeployment){
+    if (guiHandler.isOneOfBlockingGUIActive()){
       return;
     }
   }
@@ -95,7 +95,7 @@ KeyboardEventHandler.prototype.onKeyDown = function(event){
   }
   switch(event.keyCode){
     case 16: //SHIFT
-      if (mode == 0 && !isDeployment && !fpsWeaponGUIHandler.fpsWeaponAlignmentConfigurationObject){
+      if (mode == 0 && !isDeployment){
         selectionHandler.resetCurrentSelection();
         for (var objName in addedObjects){
           addedObjects[objName].mesh.visible = false;

@@ -90,10 +90,72 @@ var GUIHandler = function(){
       parseCommand("workerConfigurations hide");
     }
   }
-  // GUI TYPES DEFINITION
   this.guiTypes = {
-    TEXT: 0, OBJECT: 1, BLOOM: 2, FPS_WEAPON_ALIGNMENT: 3, SHADER_PRECISION: 4, PARTICLE_SYSTEM: 5, WORKER_STATUS: 6, MUZZLE_FLASH: 7, TEXTURE_PACK: 8, SKYBOX_CREATION: 9, FOG: 10, FONT: 11, CROSSHAIR_CREATION: 12, SCRIPTS: 13
+    TEXT: 0, OBJECT: 1, BLOOM: 2, FPS_WEAPON_ALIGNMENT: 3, SHADER_PRECISION: 4, PARTICLE_SYSTEM: 5,
+    WORKER_STATUS: 6, MUZZLE_FLASH: 7, TEXTURE_PACK: 8, SKYBOX_CREATION: 9, FOG: 10, FONT: 11,
+    CROSSHAIR_CREATION: 12, SCRIPTS: 13
   };
+  this.blockingGUITypes = [
+    this.guiTypes.FPS_WEAPON_ALIGNMENT, this.guiTypes.PARTICLE_SYSTEM, this.guiTypes.MUZZLE_FLASH,
+    this.guiTypes.TEXTURE_PACK, this.guiTypes.SKYBOX_CREATION, this.guiTypes.FOG, this.guiTypes.FONT,
+    this.guiTypes.CROSSHAIR_CREATION, this.guiTypes.SCRIPTS
+  ];
+}
+
+GUIHandler.prototype.isOneOfBlockingGUIActive = function(){
+  for (var i = 0; i<this.blockingGUITypes.length; i++){
+    switch (this.blockingGUITypes[i]){
+      case this.guiTypes.FPS_WEAPON_ALIGNMENT:
+        if (this.datGuiFPSWeaponAlignment){
+          return true;
+        }
+      break;
+      case this.guiTypes.PARTICLE_SYSTEM:
+        if (this.datGuiPSCreator){
+          return true;
+        }
+      break;
+      case this.guiTypes.MUZZLE_FLASH:
+        if (this.datGuiMuzzleFlashCreator){
+          return true;
+        }
+      break;
+      case this.guiTypes.TEXTURE_PACK:
+        if (this.datGuiTexturePack){
+          return true;
+        }
+      break;
+      case this.guiTypes.SKYBOX_CREATION:
+        if (this.datGuiSkyboxCreation){
+          return true;
+        }
+      break;
+      case this.guiTypes.FOG:
+        if (this.datGuiFog){
+          return true;
+        }
+      break;
+      case this.guiTypes.FONT:
+        if (this.datGuiFontCreation){
+          return true;
+        }
+      break;
+      case this.guiTypes.CROSSHAIR_CREATION:
+        if (this.datGuiCrosshairCreation){
+          return true;
+        }
+      break;
+      case this.guiTypes.SCRIPTS:
+        if (this.datGuiScripts){
+          return true;
+        }
+      break;
+      default:
+        throw new Error("Not implemented.")
+      break;
+    }
+  }
+  return false;
 }
 
 GUIHandler.prototype.afterTextSelection = function(){
