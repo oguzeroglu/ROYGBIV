@@ -1,5 +1,5 @@
 var AnimationHandler = function(){
-  this.animations = new Object();
+  this.uuidCounter = 0;
   this.activeAnimations = new Map();
   this.animationTypes = {
     LINEAR: "LINEAR",
@@ -16,17 +16,116 @@ var AnimationHandler = function(){
   };
   this.actionTypes = {
     OBJECT: {
-      TRANSPARENCY: "TRANSPARENCY", SCALE: "SCALE", SCALE_X: "SCALE_X", SCALE_Y: "SCALE_Y", SCALE_Z: "SCALE_Z",
+      TRANSPARENCY: "TRANSPARENCY", SCALE_X: "SCALE_X", SCALE_Y: "SCALE_Y", SCALE_Z: "SCALE_Z",
       ROTATION_X: "ROTATION_X", ROTATION_Y: "ROTATION_Y", ROTATION_Z: "ROTATION_Z", POSITION_X: "POSITION_X",
       POSITION_Y: "POSITION_Y", POSITION_Z: "POSITION_Z", EMISSIVE_INTENSITY: "EMISSIVE_INTENSITY", DISPLACEMENT_SCALE: "DISPLACEMENT_SCALE",
       DISPLACEMENT_BIAS: "DISPLACEMENT_BIAS", EMISSIVE_COLOR: "EMISSIVE_COLOR", TEXTURE_OFFSET_X: "TEXTURE_OFFSET_X",
       TEXTURE_OFFSET_Y: "TEXTURE_OFFSET_Y"
     }
   };
+  // INITIAL VALUE GETTERS
+  this.initialValueGetterFunctionsByType = new Object();
+  this.initialValueGetterFunctionsByType[this.actionTypes.OBJECT.TRANSPARENCY] = function(object){
+    return object.getOpacity();
+  };
+  this.initialValueGetterFunctionsByType[this.actionTypes.OBJECT.SCALE_X] = function(object){
+    return object.mesh.scale.x;
+  };
+  this.initialValueGetterFunctionsByType[this.actionTypes.OBJECT.SCALE_Y] = function(object){
+    return object.mesh.scale.y;
+  };
+  this.initialValueGetterFunctionsByType[this.actionTypes.OBJECT.SCALE_Z] = function(object){
+    return object.mesh.scale.z;
+  };
+  this.initialValueGetterFunctionsByType[this.actionTypes.OBJECT.ROTATION_X] = function(object){
+    return object.mesh.rotation.x;
+  };
+  this.initialValueGetterFunctionsByType[this.actionTypes.OBJECT.ROTATION_Y] = function(object){
+    return object.mesh.rotation.y;
+  };
+  this.initialValueGetterFunctionsByType[this.actionTypes.OBJECT.ROTATION_Z] = function(object){
+    return object.mesh.rotation.z;
+  };
+  this.initialValueGetterFunctionsByType[this.actionTypes.OBJECT.POSITION_X] = function(object){
+    return object.mesh.position.x;
+  };
+  this.initialValueGetterFunctionsByType[this.actionTypes.OBJECT.POSITION_Y] = function(object){
+    return object.mesh.position.y;
+  };
+  this.initialValueGetterFunctionsByType[this.actionTypes.OBJECT.POSITION_Z] = function(object){
+    return object.mesh.position.z;
+  };
+  this.initialValueGetterFunctionsByType[this.actionTypes.OBJECT.EMISSIVE_INTENSITY] = function(object){
+    return object.getEmissiveIntensity();
+  };
+  this.initialValueGetterFunctionsByType[this.actionTypes.OBJECT.DISPLACEMENT_SCALE] = function(object){
+    return object.getDisplacementScale();
+  };
+  this.initialValueGetterFunctionsByType[this.actionTypes.OBJECT.DISPLACEMENT_BIAS] = function(object){
+    return object.getDisplacementBias();
+  };
+  this.initialValueGetterFunctionsByType[this.actionTypes.OBJECT.EMISSIVE_COLOR] = function(object){
+    return 0;
+  };
+  this.initialValueGetterFunctionsByType[this.actionTypes.OBJECT.TEXTURE_OFFSET_X] = function(object){
+    return object.getTextureOffsetX();
+  };
+  this.initialValueGetterFunctionsByType[this.actionTypes.OBJECT.TEXTURE_OFFSET_Y] = function(object){
+    return object.getTextureOffsetY();
+  };
+  // AFTER ANIMATION SETTER FUNCTIONS
+  this.afterAnimationSettersByType = new Object();
+  this.afterAnimationSettersByType[this.actionTypes.OBJECT.TRANSPARENCY] = function(animation){
+    animation.attachedObject.updateOpacity(animation.initialValue);
+  };
+  this.afterAnimationSettersByType[this.actionTypes.OBJECT.SCALE_X] = function(animation){
+    animation.attachedObject.mesh.scale.x = animation.initialValue;
+  };
+  this.afterAnimationSettersByType[this.actionTypes.OBJECT.SCALE_Y] = function(animation){
+    animation.attachedObject.mesh.scale.y = animation.initialValue;
+  };
+  this.afterAnimationSettersByType[this.actionTypes.OBJECT.SCALE_Z] = function(animation){
+    animation.attachedObject.mesh.scale.z = animation.initialValue;
+  };
+  this.afterAnimationSettersByType[this.actionTypes.OBJECT.ROTATION_X] = function(animation){
+    animation.attachedObject.mesh.rotation.x = animation.initialValue;
+  };
+  this.afterAnimationSettersByType[this.actionTypes.OBJECT.ROTATION_Y] = function(animation){
+    animation.attachedObject.mesh.rotation.y = animation.initialValue;
+  };
+  this.afterAnimationSettersByType[this.actionTypes.OBJECT.ROTATION_Z] = function(animation){
+    animation.attachedObject.mesh.rotation.z = animation.initialValue;
+  };
+  this.afterAnimationSettersByType[this.actionTypes.OBJECT.POSITION_X] = function(animation){
+    animation.attachedObject.mesh.position.x = animation.initialValue;
+  };
+  this.afterAnimationSettersByType[this.actionTypes.OBJECT.POSITION_Y] = function(animation){
+    animation.attachedObject.mesh.position.y = animation.initialValue;
+  };
+  this.afterAnimationSettersByType[this.actionTypes.OBJECT.POSITION_Z] = function(animation){
+    animation.attachedObject.mesh.position.z = animation.initialValue;
+  };
+  this.afterAnimationSettersByType[this.actionTypes.OBJECT.EMISSIVE_INTENSITY] = function(animation){
+    animation.attachedObject.setEmissiveIntensity(animation.initialValue);
+  };
+  this.afterAnimationSettersByType[this.actionTypes.OBJECT.DISPLACEMENT_SCALE] = function(animation){
+    animation.attachedObject.setDisplacementScale(animation.initialValue);
+  };
+  this.afterAnimationSettersByType[this.actionTypes.OBJECT.DISPLACEMENT_BIAS] = function(animation){
+    animation.attachedObject.setDisplacementBias(animation.initialValue);
+  };
+  this.afterAnimationSettersByType[this.actionTypes.OBJECT.EMISSIVE_COLOR] = function(animation){
+    animation.attachedObject.setEmissiveColor(animation.params.sourceColor);
+  };
+  this.afterAnimationSettersByType[this.actionTypes.OBJECT.TEXTURE_OFFSET_X] = function(animation){
+    animation.attachedObject.setTextureOffsetX(animation.initialValue);
+  };
+  this.afterAnimationSettersByType[this.actionTypes.OBJECT.TEXTURE_OFFSET_Y] = function(animation){
+    animation.attachedObject.setTextureOffsetY(animation.initialValue);
+  };
   // ACTION FUNCTIONS **********************************************
   this.actionFunctionsByType = new Object();
   this.actionFunctionsByType[this.actionTypes.OBJECT.TRANSPARENCY] = this.updateObjectTransparencyFunc;
-  this.actionFunctionsByType[this.actionTypes.OBJECT.SCALE] = this.updateObjectScaleFunc;
   this.actionFunctionsByType[this.actionTypes.OBJECT.SCALE_X] = this.updateObjectScaleXFunc;
   this.actionFunctionsByType[this.actionTypes.OBJECT.SCALE_Y] = this.updateObjectScaleYFunc;
   this.actionFunctionsByType[this.actionTypes.OBJECT.SCALE_Z] = this.updateObjectScaleZFunc;
@@ -77,10 +176,21 @@ var AnimationHandler = function(){
   this.updateFunctionsByType[this.animationTypes.BOUNCE_EASE_INOUT] = this.bounceEaseInOutFunc;
 }
 
+AnimationHandler.prototype.assignUUIDToAnimation = function(animation){
+  animation.uuid = this.uuidCounter ++;
+}
+
 AnimationHandler.prototype.onAnimationFinished = function(animation){
   if (!animation.rewind){
-    this.activeAnimations.delete(animation.name);
+    this.activeAnimations.delete(animation.uuid);
+    this.afterAnimationSettersByType[animation.description.action](animation);
   }
+}
+
+AnimationHandler.prototype.purgeAnimation = function(animation){
+  animation.rewind = false;
+  this.onAnimationFinished(animation);
+  delete animation.attachedObject.animations[animation.name];
 }
 
 AnimationHandler.prototype.animationUpdateFunc = function(animation, animationName){
@@ -92,20 +202,17 @@ AnimationHandler.prototype.update = function(){
 }
 
 AnimationHandler.prototype.startAnimation = function(animation){
-  this.activeAnimations.set(animation.name, animation);
+  this.activeAnimations.set(animation.uuid, animation);
+  animation.onStart(this.initialValueGetterFunctionsByType[animation.description.action](animation.attachedObject));
 }
 
 AnimationHandler.prototype.reset = function(){
-  this.animations = new Object();
   this.activeAnimations = new Map();
 }
 
 // ACTION FUNCTIONS ************************************************
 AnimationHandler.prototype.updateObjectTransparencyFunc = function(params){
   params.object.updateOpacity(params.value);
-}
-AnimationHandler.prototype.updateObjectScaleFunc = function(params){
-  params.object.mesh.scale.set(params.value, params.value, params.value);
 }
 AnimationHandler.prototype.updateObjectScaleXFunc = function(params){
   params.object.mesh.scale.x = params.value;

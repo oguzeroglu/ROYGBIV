@@ -99,6 +99,14 @@ var AddedText = function(name, font, text, position, color, alpha, characterSize
   webglCallbackHandler.registerEngineObject(this);
 }
 
+AddedText.prototype.addAnimation = function(animation){
+  this.animations[animation.name] = animation;
+}
+
+AddedText.prototype.removeAnimation = function(animation){
+  delete this.animations[animation.name];
+}
+
 AddedText.prototype.setPosition = function(x, y, z){
   if (this.is2D){
     this.set2DCoordinates(x, y);

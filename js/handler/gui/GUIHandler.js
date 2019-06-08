@@ -258,7 +258,7 @@ GUIHandler.prototype.afterObjectSelection = function(){
       guiHandler.objectManipulationParameters["Rotate x"] = 0;
       guiHandler.objectManipulationParameters["Rotate y"] = 0;
       guiHandler.objectManipulationParameters["Rotate z"] = 0;
-      guiHandler.objectManipulationParameters["Opacity"] = obj.mesh.material.uniforms.alpha.value;
+      guiHandler.objectManipulationParameters["Opacity"] = obj.getOpacity();
       if (obj.metaData.isSlippery){
         guiHandler.objectManipulationParameters["Slippery"] = true;
       }else{
@@ -356,7 +356,7 @@ GUIHandler.prototype.afterObjectSelection = function(){
       if (obj.isPhysicsSimplified){
         guiHandler.disableController(guiHandler.omMassController);
       }
-      guiHandler.objectManipulationParameters["Opacity"] = obj.mesh.material.uniforms.totalAlpha.value;
+      guiHandler.objectManipulationParameters["Opacity"] = obj.getOpacity();
       var hasAOMap = false;
       var hasEmissiveMap = false;
       var hasDisplacementMap = false;

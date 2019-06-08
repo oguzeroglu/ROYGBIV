@@ -145,8 +145,10 @@ MouseEventHandler.prototype.onClick = function(event, fromTap){
   omGUIFocused = false;
   tmGUIFocused = false;
   if (windowLoaded){
-    if (mode == 0 && (guiHandler.datGuiFPSWeaponAlignment || guiHandler.datGuiPSCreator || guiHandler.datGuiMuzzleFlashCreator || guiHandler.datGuiTexturePack || guiHandler.datGuiSkyboxCreation || guiHandler.datGuiFog || guiHandler.datGuiFontCreation || guiHandler.datGuiCrosshairCreation || guiHandler.datGuiScripts)){
-      return;
+    if (mode == 0){
+      if (!isDeployment && guiHandler.isOneOfBlockingGUIActive()){
+        return;
+      }
     }
     var rect = renderer.getCurrentViewport();
     var rectX = rect.x, rectY = rect.y, rectZ = rect.z, rectW = rect.w;
@@ -195,7 +197,7 @@ MouseEventHandler.prototype.onClick = function(event, fromTap){
       }
     }
     if (mode == 0){
-      if (guiHandler.datGuiMuzzleFlashCreator || guiHandler.datGuiPSCreator || guiHandler.datGuiFPSWeaponAlignment){
+      if (!isDeployment && guiHandler.isOneOfBlockingGUIActive()){
         return;
       }
     }

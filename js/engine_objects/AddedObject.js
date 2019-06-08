@@ -68,6 +68,14 @@ var AddedObject = function(name, type, metaData, material, mesh, physicsBody, de
   webglCallbackHandler.registerEngineObject(this);
 }
 
+AddedObject.prototype.addAnimation = function(animation){
+  this.animations[animation.name] = animation;
+}
+
+AddedObject.prototype.removeAnimation = function(animation){
+  delete this.animations[animation.name];
+}
+
 AddedObject.prototype.getAOIntensity = function(){
   return this.mesh.material.uniforms.aoIntensity.value;
 }
@@ -416,7 +424,7 @@ AddedObject.prototype.export = function(){
   exportObject["isIntersectable"] = this.isIntersectable;
 
   if (!this.parentObjectName){
-    exportObject["opacity"] = this.mesh.material.uniforms.alpha.value;
+    exportObject["opacity"] = this.getOpacity();
   }else{
     exportObject["opacity"] = this.opacityWhenAttached;
   }
@@ -914,7 +922,7 @@ AddedObject.prototype.syncProperties = function(refObject){
     }
   }
   // OPACITY
-  var refOpacity = refObject.mesh.material.uniforms.alpha.value;
+  var refOpacity = refObject.getOpacity();
   this.updateOpacity(refOpacity);
   this.initOpacitySet = false;
   // AO INTENSITY
@@ -946,7 +954,7 @@ AddedObject.prototype.setAttachedProperties = function(){
   this.positionZWhenAttached = this.mesh.position.z;
   this.physicsPositionWhenAttached = {x: this.physicsBody.position.x, y: this.physicsBody.position.y, z: this.physicsBody.position.z};
   this.physicsQuaternionWhenAttached = {x: this.physicsBody.quaternion.x, y: this.physicsBody.quaternion.y, z: this.physicsBody.quaternion.z, w: this.physicsBody.quaternion.w};
-  this.opacityWhenAttached = this.mesh.material.uniforms.alpha.value;
+  this.opacityWhenAttached = this.getOpacity();
   if (this.hasAOMap()){
     this.aoIntensityWhenAttached = this.getAOIntensity();
   }
@@ -1150,6 +1158,10 @@ AddedObject.prototype.mapDiffuse = function(diffuseTexture){
     this.mesh.material.uniformsNeedUpdate = true;
   }
   diffuseTexture.updateMatrix();
+}
+
+AddedObject.prototype.getOpacity = function(){
+  return this.mesh.material.uniforms.alpha.value;
 }
 
 AddedObject.prototype.incrementOpacity = function(val){
@@ -2842,7 +2854,7 @@ AddedObject.prototype.copy = function(name, isHardCopy, copyPosition, gridSystem
         copyInstance.setEmissiveColor(this.getEmissiveColor());
       }
     }
-    copyInstance.updateOpacity(this.mesh.material.uniforms.alpha.value);
+    copyInstance.updateOpacity(this.getOpacity());
     if (this.hasTexture()){
       for (var ix = 0; ix<this.mesh.material.uniforms.textureMatrix.value.elements.length; ix++){
         copyInstance.mesh.material.uniforms.textureMatrix.value.elements[ix] = this.mesh.material.uniforms.textureMatrix.value.elements[ix];

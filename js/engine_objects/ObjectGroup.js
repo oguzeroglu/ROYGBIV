@@ -36,6 +36,14 @@ var ObjectGroup = function(name, group){
   this.animations = new Object();
 }
 
+ObjectGroup.prototype.addAnimation = function(animation){
+  this.animations[animation.name] = animation;
+}
+
+ObjectGroup.prototype.removeAnimation = function(animation){
+  delete this.animations[animation.name];
+}
+
 ObjectGroup.prototype.getAOIntensity = function(){
   return this.mesh.material.uniforms.totalAOIntensity.value;
 }
@@ -1950,7 +1958,7 @@ ObjectGroup.prototype.export = function(){
     exportObj.softCopyParentName = this.softCopyParentName;
   }
 
-  exportObj.totalAlpha = this.mesh.material.uniforms.totalAlpha.value;
+  exportObj.totalAlpha = this.getOpacity();
   if (this.mesh.material.uniforms.totalAOIntensity){
     exportObj.totalAOIntensity = this.getAOIntensity();
   }
@@ -2319,7 +2327,7 @@ ObjectGroup.prototype.copy = function(name, isHardCopy, copyPosition, gridSystem
   var isColorizable = this.isColorizable;
   var renderSide = this.renderSide;
   var blending = this.mesh.material.blending;
-  var totalAlphaBeforeDetached = this.mesh.material.uniforms.totalAlpha.value;
+  var totalAlphaBeforeDetached = this.getOpacity();
   var totalAOIntensityBeforeDetached;
   var totalEmissiveIntensityBeforeDetached;
   var totalDisplacementInfoBeforeDetached;
@@ -2446,7 +2454,7 @@ ObjectGroup.prototype.copy = function(name, isHardCopy, copyPosition, gridSystem
 
   this.mesh.material.transparent = isTransparentBeforeDetached;
   newObjGroup.mesh.material.transparent = isTransparentBeforeDetached;
-  this.mesh.material.uniforms.totalAlpha.value = totalAlphaBeforeDetached;
+  this.updateOpacity(totalAlphaBeforeDetached);
   if (this.mesh.material.uniforms.totalTextureOffset){
     this.setTextureOffsetX(totalTextureOffsetBeforeDetached.x);
     this.setTextureOffsetY(totalTextureOffsetBeforeDetached.y);
@@ -2471,7 +2479,7 @@ ObjectGroup.prototype.copy = function(name, isHardCopy, copyPosition, gridSystem
     newObjGroup.mesh.material = this.mesh.material;
     newObjGroup.softCopyParentName = this.name;
   }else{
-    newObjGroup.mesh.material.uniforms.totalAlpha.value = this.mesh.material.uniforms.totalAlpha.value;
+    newObjGroup.updateOpacity(this.getOpacity());
     if (newObjGroup.mesh.material.uniforms.totalTextureOffset){
       newObjGroup.setTextureOffsetX(this.getTextureOffsetX());
       newObjGroup.setTextureOffsetY(this.getTextureOffsetY());
@@ -2508,6 +2516,10 @@ ObjectGroup.prototype.copy = function(name, isHardCopy, copyPosition, gridSystem
     newObjGroup.useCustomShaderPrecision(this.customPrecision);
   }
   return newObjGroup;
+}
+
+ObjectGroup.prototype.getOpacity = function(){
+  return this.mesh.material.uniforms.totalAlpha.value;
 }
 
 ObjectGroup.prototype.updateOpacity = function(val){

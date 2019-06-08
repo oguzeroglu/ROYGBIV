@@ -39,6 +39,7 @@ function render(){
       particleSystemCreatorGUIHandler.update();
       muzzleFlashCreatorGUIHandler.update();
       fpsWeaponGUIHandler.update();
+      animationCreatorGUIHandler.update();
     }
     cameraOperationsDone = false;
   }
