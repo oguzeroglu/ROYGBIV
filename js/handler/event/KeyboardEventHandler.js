@@ -47,16 +47,12 @@ KeyboardEventHandler.prototype.onKeyUp = function(event){
     break;
     case 16: //SHIFT
       if (mode == 0 && !isDeployment){
-        for (var objName in addedObjects){
-          addedObjects[objName].mesh.visible = true;
-        }
-        for (var objName in objectGroups){
-          objectGroups[objName].mesh.visible = true;
-        }
-        for (var textName in addedTexts){
-          addedTexts[textName].show();
-        }
-        raycasterFactory.onShiftPress(false);
+        keyboardEventHandler.deactivateGridSelectionMode();
+      }
+    break;
+    case 18: // ALT
+      if (mode == 0 && !isDeployment){
+        keyboardEventHandler.deactivateObjectSelectionMode();
       }
     break;
   }
@@ -96,26 +92,21 @@ KeyboardEventHandler.prototype.onKeyDown = function(event){
   switch(event.keyCode){
     case 16: //SHIFT
       if (mode == 0 && !isDeployment){
-        selectionHandler.resetCurrentSelection();
-        for (var objName in addedObjects){
-          addedObjects[objName].mesh.visible = false;
-        }
-        for (var objName in objectGroups){
-          objectGroups[objName].mesh.visible = false;
-        }
-        for (var textName in addedTexts){
-          addedTexts[textName].hide();
-        }
-        raycasterFactory.onShiftPress(true);
+        keyboardEventHandler.activateGridSelectionMode();
+      }
+    break;
+    case 18: // ALT
+      if (mode == 0 && !isDeployment){
+        keyboardEventHandler.activateObjectSelectionMode();
       }
     break;
     case 8: //BACKSPACE
+      if (mode == 1 || isDeployment){
+        return;
+      }
       //FIREFOX GO BACK FIX
       if (selectionHandler.getSelectedObject() && !cliFocused){
         event.preventDefault();
-      }
-      if (mode == 1 || isDeployment){
-        return;
       }
       var currentSelection = selectionHandler.getSelectedObject();
       if (currentSelection.isAddedObject || currentSelection.isObjectGroup){
@@ -127,4 +118,51 @@ KeyboardEventHandler.prototype.onKeyDown = function(event){
       guiHandler.afterObjectSelection();
     break;
   }
+}
+
+KeyboardEventHandler.prototype.activateGridSelectionMode = function(){
+  selectionHandler.resetCurrentSelection();
+  for (var objName in addedObjects){
+    addedObjects[objName].mesh.visible = false;
+  }
+  for (var objName in objectGroups){
+    objectGroups[objName].mesh.visible = false;
+  }
+  for (var textName in addedTexts){
+    addedTexts[textName].hide();
+  }
+  raycasterFactory.onShiftPress(true);
+}
+
+KeyboardEventHandler.prototype.deactivateGridSelectionMode = function(){
+  for (var objName in addedObjects){
+    addedObjects[objName].mesh.visible = true;
+  }
+  for (var objName in objectGroups){
+    objectGroups[objName].mesh.visible = true;
+  }
+  for (var textName in addedTexts){
+    addedTexts[textName].show();
+  }
+  raycasterFactory.onShiftPress(false);
+}
+
+KeyboardEventHandler.prototype.activateObjectSelectionMode = function(){
+  for (var gsName in gridSystems){
+    gridSystems[gsName].hide();
+  }
+  for (var gridName in gridSelections){
+    gridSelections[gridName].hide();
+  }
+  raycasterFactory.onAltPress(true);
+}
+
+KeyboardEventHandler.prototype.deactivateObjectSelectionMode = function(){
+  for (var gsName in gridSystems){
+    gridSystems[gsName].show();
+  }
+  for (var gridName in gridSelections){
+    gridSelections[gridName].show();
+  }
+  raycasterFactory.onAltPress(false);
 }

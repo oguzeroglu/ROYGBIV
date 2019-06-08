@@ -764,7 +764,8 @@ var CommandDescriptor = function(){
     "Left/Right : Rotates the camera around axis Y.",
     "Backspace: Destroys selected object.",
     ". : Shows corner coordinates of selected grids.",
-    "SHIFT: Activates grid selection mode."
+    "SHIFT: Activates grid selection mode.",
+    "ALT: Activates object selection mode."
   ];
 
   this.deprecatedCommandIndices = [

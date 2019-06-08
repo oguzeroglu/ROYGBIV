@@ -133,11 +133,18 @@ var GridSystem = function(name, sizeX, sizeZ, centerX, centerY, centerZ, outline
     }
     return;
   }
-
   gridSystems[name] = this;
-
   gridCounter = gridCounter + totalGridCount;
+}
 
+GridSystem.prototype.hide = function(){
+  this.gridSystemRepresentation.visible = false;
+  this.boundingPlane.visible = false;
+}
+
+GridSystem.prototype.show = function(){
+  this.gridSystemRepresentation.visible = true;
+  this.boundingPlane.visible = true;
 }
 
 GridSystem.prototype.draw = function(){

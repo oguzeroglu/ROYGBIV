@@ -294,6 +294,12 @@ self.onmessage = function(msg){
     }else{
       keyboardBuffer["Shift"] = false;
     }
+  }else if (msg.data.altPress){
+    if (msg.data.altPress.isPressed){
+      keyboardBuffer["Alt"] = true;
+    }else{
+      keyboardBuffer["Alt"] = false;
+    }
   }else if (msg.data.particleSystemSetCollisionListener){
     worker.onParticleSystemSetCollisionListener(msg.data.particleSystemSetCollisionListener);
   }else if (msg.data.particleSystemRemoveCollisionListener){

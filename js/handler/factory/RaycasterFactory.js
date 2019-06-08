@@ -80,3 +80,9 @@ RaycasterFactory.prototype.onShiftPress = function(param){
     this.raycasterWorkerBridge.onShiftPress(param);
   }
 }
+
+RaycasterFactory.prototype.onAltPress = function(param){
+  if (!IS_WORKER_CONTEXT && WORKERS_SUPPORTED && RAYCASTER_WORKER_ON){
+    this.raycasterWorkerBridge.onAltPress(param);
+  }
+}

@@ -34,16 +34,11 @@ MouseEventHandler.prototype.onCliDivClick = function(event){
   inactiveCounter = 0;
   if (keyboardBuffer["Shift"] && mode == 0){
     keyboardBuffer["Shift"] = false;
-    for (var objName in addedObjects){
-      addedObjects[objName].mesh.visible = true;
-    }
-    for (var objName in objectGroups){
-      objectGroups[objName].mesh.visible = true;
-    }
-    for (var textName in addedTexts){
-      addedTexts[textName].show();
-    }
-    raycasterFactory.onShiftPress(false);
+    keyboardEventHandler.deactivateGridSelectionMode();
+  }
+  if (keyboardBuffer["Alt"] && mode == 0){
+    keyboardBuffer["Alt"] = false;
+    keyboardEventHandler.deactivateObjectSelectionMode();
   }
 }
 
