@@ -63,6 +63,8 @@ var AddedObject = function(name, type, metaData, material, mesh, physicsBody, de
   this.lastUpdatePosition = new THREE.Vector3();
   this.lastUpdateQuaternion = new THREE.Quaternion();
 
+  this.animations = new Object();
+
   webglCallbackHandler.registerEngineObject(this);
 }
 

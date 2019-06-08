@@ -32,6 +32,8 @@ var ObjectGroup = function(name, group){
   this.isIntersectable = true;
   this.lastUpdatePosition = new THREE.Vector3();
   this.lastUpdateQuaternion = new THREE.Quaternion();
+
+  this.animations = new Object();
 }
 
 ObjectGroup.prototype.getAOIntensity = function(){

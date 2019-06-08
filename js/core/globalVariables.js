@@ -324,6 +324,7 @@ var fogCreatorGUIHandler;
 var fontCreatorGUIHandler;
 var crosshairCreatorGUIHandler;
 var scriptsGUIHandler;
+var animationCreatorGUIHandler;
 var skyboxHandler;
 var fogHandler;
 var scriptsHandler;

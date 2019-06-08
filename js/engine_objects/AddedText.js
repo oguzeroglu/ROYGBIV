@@ -94,6 +94,8 @@ var AddedText = function(name, font, text, position, color, alpha, characterSize
   this.maxWidthPercent = 100;
   this.maxHeightPercent = 100;
 
+  this.animations = new Object();
+
   webglCallbackHandler.registerEngineObject(this);
 }
 
