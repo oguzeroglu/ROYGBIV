@@ -18,8 +18,14 @@ AnimationCreatorGUIHandler.prototype.update = function(){
 
 AnimationCreatorGUIHandler.prototype.refreshAnimations = function(object){
   for (var key in animationCreatorGUIHandler.folderConfigurationsByID){
+    var animation = object.animations[animationCreatorGUIHandler.folderConfigurationsByID[key]["Name"]];
+    if (!(typeof animation.initialValue == UNDEFINED)){
+      animationHandler.resetAnimation(animation);
+    }
     if (animationCreatorGUIHandler.folderConfigurationsByID[key]["Play"]){
-      animationHandler.startAnimation(object.animations[animationCreatorGUIHandler.folderConfigurationsByID[key]["Name"]]);
+      animationHandler.startAnimation(animation);
+    }else if (!(typeof animation.initialValue == UNDEFINED)){
+      animationHandler.forceFinish(animation);
     }
   }
 }
@@ -83,7 +89,9 @@ AnimationCreatorGUIHandler.prototype.addAnimationFolder = function(animation, ob
     animationCreatorGUIHandler.refreshAnimations(this.object);
     animationCreatorGUIHandler.handleTerminal(null, Text.ANIMATION_UPDATED);
   }.bind({folderID: folderID, object: object})).listen();
-  folder.add(folderConfigurations, "Play");
+  folder.add(folderConfigurations, "Play").onChange(function(val){
+    animationCreatorGUIHandler.refreshAnimations(this.object);
+  }.bind({object: object})).listen();
   folder.add(folderConfigurations, "Delete");
   this.folderConfigurationsByID[folderID] = folderConfigurations;
   this.foldersByID[folderID] = folder;
@@ -116,6 +124,7 @@ AnimationCreatorGUIHandler.prototype.init = function(object){
       var animation = animationCreatorGUIHandler.createAnimation(object, name, animationHandler.animationTypes.LINEAR, animationHandler.actionTypes.OBJECT.TRANSPARENCY, 3, -1, false);
       animationCreatorGUIHandler.addAnimationFolder(animation, object);
       animationCreatorGUIHandler.refreshAnimations(object);
+      animationCreatorGUIHandler.newAnimationConfigurations["Name"] = "";
     }
   }
 }

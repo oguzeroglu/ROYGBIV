@@ -180,11 +180,20 @@ AnimationHandler.prototype.assignUUIDToAnimation = function(animation){
   animation.uuid = this.uuidCounter ++;
 }
 
+AnimationHandler.prototype.forceFinish = function(animation){
+  this.activeAnimations.delete(animation.uuid);
+  this.afterAnimationSettersByType[animation.description.action](animation);
+}
+
 AnimationHandler.prototype.onAnimationFinished = function(animation){
   if (!animation.rewind){
     this.activeAnimations.delete(animation.uuid);
     this.afterAnimationSettersByType[animation.description.action](animation);
   }
+}
+
+AnimationHandler.prototype.resetAnimation = function(animation){
+  this.afterAnimationSettersByType[animation.description.action](animation);
 }
 
 AnimationHandler.prototype.purgeAnimation = function(animation){
