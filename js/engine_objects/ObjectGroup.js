@@ -587,6 +587,41 @@ ObjectGroup.prototype.textureCompare = function(txt1, txt2){
   return true;
 }
 
+ObjectGroup.prototype.hasDiffuseMap = function(){
+  if (this.diffuseTexture){
+    return true;
+  }
+  return false;
+}
+
+ObjectGroup.prototype.hasEmissiveMap = function(){
+  if (this.emissiveTexture){
+    return true;
+  }
+  return false;
+}
+
+ObjectGroup.prototype.hasAlphaMap = function(){
+  if (this.alphaTexture){
+    return true;
+  }
+  return false;
+}
+
+ObjectGroup.prototype.hasAOMap = function(){
+  if (this.aoTexture){
+    return true;
+  }
+  return false;
+}
+
+ObjectGroup.prototype.hasDisplacementMap = function(){
+  if (this.displacementTexture){
+    return true;
+  }
+  return false;
+}
+
 ObjectGroup.prototype.handleTextures = function(){
   this.diffuseTexture = 0;
   this.emissiveTexture = 0;

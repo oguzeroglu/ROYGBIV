@@ -4,9 +4,6 @@ var AnimationCreatorGUIHandler = function(){
   for (var key in animationHandler.animationTypes){
     this.animationTypesAry.push(animationHandler.animationTypes[key]);
   }
-  for (var key in animationHandler.actionTypes.OBJECT){
-    this.objectAnimationActionsAry.push(animationHandler.actionTypes.OBJECT[key]);
-  }
 }
 
 AnimationCreatorGUIHandler.prototype.update = function(){
@@ -98,6 +95,28 @@ AnimationCreatorGUIHandler.prototype.addAnimationFolder = function(animation, ob
 }
 
 AnimationCreatorGUIHandler.prototype.init = function(object){
+  this.objectAnimationActionsAry = [];
+  for (var key in animationHandler.actionTypes.OBJECT){
+    if (key == "TEXTURE_OFFSET_X" || key == "TEXTURE_OFFSET_Y"){
+      if (object.isAddedObject && !object.hasTexture()){
+        continue;
+      }
+      if (object.isObjectGroup && !object.hasTexture){
+        continue;
+      }
+    }
+    if (key == "EMISSIVE_INTENSITY" || key == "EMISSIVE_COLOR"){
+      if (!object.hasEmissiveMap()){
+        continue;
+      }
+    }
+    if (key == "DISPLACEMENT_SCALE" || key == "DISPLACEMENT_BIAS"){
+      if (!object.hasDisplacementMap()){
+        continue;
+      }
+    }
+    this.objectAnimationActionsAry.push(animationHandler.actionTypes.OBJECT[key]);
+  }
   this.folderIDCounter = 0;
   this.folderConfigurationsByID = new Object();
   this.foldersByID = new Object();
