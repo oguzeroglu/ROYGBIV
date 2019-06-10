@@ -122,7 +122,7 @@ AnimationCreatorGUIHandler.prototype.init = function(object){
   this.foldersByID = new Object();
   this.buttonConfigurations = {
     "Done": function(){
-
+      animationCreatorGUIHandler.close(object);
     }
   };
   this.newAnimationConfigurations = {
@@ -199,12 +199,37 @@ AnimationCreatorGUIHandler.prototype.handleTerminal = function(errorMsg, infoMsg
   terminal.printInfo(Text.AFTER_ANIMATION_CREATION);
 }
 
+AnimationCreatorGUIHandler.prototype.close = function(object){
+  for (var key in animationCreatorGUIHandler.folderConfigurationsByID){
+    var animation = object.animations[animationCreatorGUIHandler.folderConfigurationsByID[key]["Name"]];
+    if (animationCreatorGUIHandler.folderConfigurationsByID[key]["Play"]){
+      animationHandler.forceFinish(animation);
+    }
+  }
+  guiHandler.hideAll();
+  if (this.hiddenEngineObjects){
+    for (var i = 0; i<this.hiddenEngineObjects.length; i++){
+      this.hiddenEngineObjects[i].visible = true;
+    }
+  }
+  object.mesh.position.copy(object.beforeAnimationCreatorGUIHandlerPosition);
+  delete object.beforeAnimationCreatorGUIHandlerPosition;
+  terminal.clear();
+  terminal.enable();
+  terminal.printInfo(Text.OK);
+  activeControl = new FreeControls({});
+  activeControl.onActivated();
+  camera.quaternion.set(0, 0, 0, 1);
+  camera.position.set(initialCameraX, initialCameraY, initialCameraZ);
+}
+
 AnimationCreatorGUIHandler.prototype.show = function(object){
   this.init(object);
   this.commonStartFunctions();
   this.createGUI(object);
   this.handleTerminal(null, null);
   object.mesh.visible = true;
+  object.beforeAnimationCreatorGUIHandlerPosition = object.mesh.position.clone();
   object.mesh.position.set(0, 0, 0);
   this.refreshAnimations(object);
 }
