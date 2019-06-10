@@ -12,6 +12,7 @@ var Animation = function(name, type, attachedObject, description, rewind){
     this.changeInValue = 1;
     this.params.targetColor = description.targetColor;
     this.params.sourceColor = new THREE.Color();
+    this.params.originalSourceColor = new THREE.Color();
   }else{
     this.changeInValue = this.description.changeInValue;
   }
@@ -27,6 +28,7 @@ Animation.prototype.onStart = function(initialValue){
   this.tick = 0;
   if (this.description.action == animationHandler.actionTypes.OBJECT.EMISSIVE_COLOR){
     this.params.sourceColor.copy(this.attachedObject.getEmissiveColor());
+    this.params.originalSourceColor.copy(this.attachedObject.getEmissiveColor());
   }
 }
 
@@ -37,6 +39,9 @@ Animation.prototype.update = function(){
   if (this.tick >= this.totalTimeInSeconds){
     if (this.rewind){
       this.tick = 0;
+      if (this.description.action == animationHandler.actionTypes.OBJECT.EMISSIVE_COLOR){
+        this.params.sourceColor.copy(this.params.originalSourceColor);
+      }
     }else{
       this.onFinished();
     }

@@ -28,6 +28,10 @@ AnimationCreatorGUIHandler.prototype.refreshAnimations = function(object){
 }
 
 AnimationCreatorGUIHandler.prototype.addAnimationFolder = function(animation, object){
+  var targetColorVal = "#ffffff";
+  if (animation.description.action == animationHandler.actionTypes.OBJECT.EMISSIVE_COLOR){
+    targetColorVal = "#" + animation.params.targetColor.getHexString();
+  }
   var folderID = this.folderIDCounter ++;
   this.animationsByFolderID[folderID] = animation;
   var folderConfigurations = {
@@ -36,6 +40,7 @@ AnimationCreatorGUIHandler.prototype.addAnimationFolder = function(animation, ob
     "Action": animation.description.action,
     "Seconds": animation.description.totalTimeInSeconds.toString(),
     "Total delta": animation.description.changeInValue.toString(),
+    "Target color": targetColorVal,
     "Rewind": animation.rewind,
     "Play": true,
     "Delete": function(){
@@ -45,20 +50,32 @@ AnimationCreatorGUIHandler.prototype.addAnimationFolder = function(animation, ob
       guiHandler.datGuiAnimationCreation.removeFolder(animationCreatorGUIHandler.foldersByID[this.folderID]);
       delete animationCreatorGUIHandler.foldersByID[this.folderID];
       delete animationCreatorGUIHandler.folderConfigurationsByID[this.folderID];
+      delete animationCreatorGUIHandler.animationsByFolderID[this.folderID];
+      delete animationCreatorGUIHandler.deltaControllersByFolderID[this.folderID];
+      delete animationCreatorGUIHandler.colorControllersByFolderID[this.folderID];
       animationCreatorGUIHandler.refreshAnimations(this.object);
     }.bind({object: object, folderID: folderID})
   }
   var folder = guiHandler.datGuiAnimationCreation.addFolder(animation.name);
   folder.add(folderConfigurations, "Type", this.animationTypesAry).onChange(function(val){
     var confs = animationCreatorGUIHandler.folderConfigurationsByID[this.folderID];
-    var animation = animationCreatorGUIHandler.createAnimation(object, confs["Name"], val, confs["Action"], confs["Seconds"], confs["Total delta"], confs["Rewind"]);
+    var animation = animationCreatorGUIHandler.createAnimation(object, confs["Name"], val, confs["Action"], confs["Seconds"], confs["Total delta"], confs["Rewind"], confs["Target color"]);
     animationCreatorGUIHandler.animationsByFolderID[this.folderID] = animation;
     animationCreatorGUIHandler.refreshAnimations(this.object);
     animationCreatorGUIHandler.handleTerminal(null, Text.ANIMATION_UPDATED);
   }.bind({folderID: folderID, object: object})).listen();
   folder.add(folderConfigurations, "Action", this.objectAnimationActionsAry).onChange(function(val){
+    var colorController = animationCreatorGUIHandler.colorControllersByFolderID[this.folderID];
+    var deltaController = animationCreatorGUIHandler.deltaControllersByFolderID[this.folderID];
+    if (val == animationHandler.actionTypes.OBJECT.EMISSIVE_COLOR){
+      guiHandler.disableController(deltaController);
+      guiHandler.enableController(colorController);
+    }else{
+      guiHandler.enableController(deltaController);
+      guiHandler.disableController(colorController);
+    }
     var confs = animationCreatorGUIHandler.folderConfigurationsByID[this.folderID];
-    var animation = animationCreatorGUIHandler.createAnimation(object, confs["Name"], confs["Type"], val, confs["Seconds"], confs["Total delta"], confs["Rewind"]);
+    var animation = animationCreatorGUIHandler.createAnimation(object, confs["Name"], confs["Type"], val, confs["Seconds"], confs["Total delta"], confs["Rewind"], confs["Target color"]);
     animationCreatorGUIHandler.animationsByFolderID[this.folderID] = animation;
     animationCreatorGUIHandler.refreshAnimations(this.object);
     animationCreatorGUIHandler.handleTerminal(null, Text.ANIMATION_UPDATED);
@@ -70,26 +87,35 @@ AnimationCreatorGUIHandler.prototype.addAnimationFolder = function(animation, ob
     }
     val = parseFloat(val);
     var confs = animationCreatorGUIHandler.folderConfigurationsByID[this.folderID];
-    var animation = animationCreatorGUIHandler.createAnimation(object, confs["Name"], confs["Type"], confs["Action"], val, confs["Total delta"], confs["Rewind"]);
+    var animation = animationCreatorGUIHandler.createAnimation(object, confs["Name"], confs["Type"], confs["Action"], val, confs["Total delta"], confs["Rewind"], confs["Target color"]);
     animationCreatorGUIHandler.animationsByFolderID[this.folderID] = animation;
     animationCreatorGUIHandler.refreshAnimations(this.object);
     animationCreatorGUIHandler.handleTerminal(null, Text.ANIMATION_UPDATED);
   }.bind({folderID: folderID, object: object})).listen();
-  folder.add(folderConfigurations, "Total delta").onFinishChange(function(val){
+  var deltaController = folder.add(folderConfigurations, "Total delta").onFinishChange(function(val){
     if (isNaN(val)){
       animationCreatorGUIHandler.handleTerminal(Text.INVALID_PARAMETER.replace(Text.PARAM1, "Total delta"), null);
       return;
     }
     val = parseFloat(val);
     var confs = animationCreatorGUIHandler.folderConfigurationsByID[this.folderID];
-    var animation = animationCreatorGUIHandler.createAnimation(object, confs["Name"], confs["Type"], confs["Action"], confs["Seconds"], val, confs["Rewind"]);
+    var animation = animationCreatorGUIHandler.createAnimation(object, confs["Name"], confs["Type"], confs["Action"], confs["Seconds"], val, confs["Rewind"], confs["Target color"]);
     animationCreatorGUIHandler.animationsByFolderID[this.folderID] = animation;
     animationCreatorGUIHandler.refreshAnimations(this.object);
     animationCreatorGUIHandler.handleTerminal(null, Text.ANIMATION_UPDATED);
   }.bind({folderID: folderID, object: object})).listen();
+  this.deltaControllersByFolderID[folderID] = deltaController;
+  var colorController = folder.addColor(folderConfigurations, "Target color").onFinishChange(function(val){
+    var confs = animationCreatorGUIHandler.folderConfigurationsByID[this.folderID];
+    var animation = animationCreatorGUIHandler.createAnimation(object, confs["Name"], confs["Type"], confs["Action"], confs["Seconds"], confs["Total delta"], confs["Rewind"], val);
+    animationCreatorGUIHandler.animationsByFolderID[this.folderID] = animation;
+    animationCreatorGUIHandler.refreshAnimations(this.object);
+    animationCreatorGUIHandler.handleTerminal(null, Text.ANIMATION_UPDATED);
+  }.bind({folderID: folderID, object: object})).listen();
+  this.colorControllersByFolderID[folderID] = colorController;
   folder.add(folderConfigurations, "Rewind").onChange(function(val){
     var confs = animationCreatorGUIHandler.folderConfigurationsByID[this.folderID];
-    var animation = animationCreatorGUIHandler.createAnimation(object, confs["Name"], confs["Type"], confs["Action"], confs["Seconds"], confs["Total delta"], val);
+    var animation = animationCreatorGUIHandler.createAnimation(object, confs["Name"], confs["Type"], confs["Action"], confs["Seconds"], confs["Total delta"], val, confs["Target color"]);
     animationCreatorGUIHandler.animationsByFolderID[this.folderID] = animation;
     animationCreatorGUIHandler.refreshAnimations(this.object);
     animationCreatorGUIHandler.handleTerminal(null, Text.ANIMATION_UPDATED);
@@ -100,6 +126,13 @@ AnimationCreatorGUIHandler.prototype.addAnimationFolder = function(animation, ob
   folder.add(folderConfigurations, "Delete");
   this.folderConfigurationsByID[folderID] = folderConfigurations;
   this.foldersByID[folderID] = folder;
+  if (animation.description.action == animationHandler.actionTypes.OBJECT.EMISSIVE_COLOR){
+    guiHandler.disableController(deltaController);
+    guiHandler.enableController(colorController);
+  }else{
+    guiHandler.enableController(deltaController);
+    guiHandler.disableController(colorController);
+  }
 }
 
 AnimationCreatorGUIHandler.prototype.init = function(object){
@@ -129,6 +162,8 @@ AnimationCreatorGUIHandler.prototype.init = function(object){
   this.folderConfigurationsByID = new Object();
   this.foldersByID = new Object();
   this.animationsByFolderID = new Object();
+  this.deltaControllersByFolderID = new Object();
+  this.colorControllersByFolderID = new Object();
   this.buttonConfigurations = {
     "Done": function(){
       animationCreatorGUIHandler.close(object);
@@ -149,7 +184,7 @@ AnimationCreatorGUIHandler.prototype.init = function(object){
         }
       }
       var name = animationCreatorGUIHandler.newAnimationConfigurations["Name"];
-      var animation = animationCreatorGUIHandler.createAnimation(object, name, animationHandler.animationTypes.LINEAR, animationHandler.actionTypes.OBJECT.TRANSPARENCY, 3, -1, false);
+      var animation = animationCreatorGUIHandler.createAnimation(object, name, animationHandler.animationTypes.LINEAR, animationHandler.actionTypes.OBJECT.TRANSPARENCY, 3, -1, false, "#ffffff");
       animationCreatorGUIHandler.addAnimationFolder(animation, object);
       animationCreatorGUIHandler.refreshAnimations(object);
       animationCreatorGUIHandler.newAnimationConfigurations["Name"] = "";
@@ -157,11 +192,12 @@ AnimationCreatorGUIHandler.prototype.init = function(object){
   }
 }
 
-AnimationCreatorGUIHandler.prototype.createAnimation = function(object, name, updateType, actionType, totalTimeInSeconds, changeInValue, rewind){
+AnimationCreatorGUIHandler.prototype.createAnimation = function(object, name, updateType, actionType, totalTimeInSeconds, changeInValue, rewind, targetColor){
   var animation = new Animation(name, updateType, object, {
     action: actionType,
     totalTimeInSeconds: totalTimeInSeconds,
-    changeInValue: changeInValue
+    changeInValue: changeInValue,
+    targetColor: new THREE.Color(targetColor)
   }, rewind);
   if (object.animations[name]){
     animationHandler.purgeAnimation(object.animations[name]);

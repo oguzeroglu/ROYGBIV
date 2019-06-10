@@ -115,7 +115,7 @@ var AnimationHandler = function(){
     animation.attachedObject.setDisplacementBias(animation.initialValue);
   };
   this.afterAnimationSettersByType[this.actionTypes.OBJECT.EMISSIVE_COLOR] = function(animation){
-    animation.attachedObject.setEmissiveColor(animation.params.sourceColor);
+    animation.attachedObject.setEmissiveColor(animation.params.originalSourceColor);
   };
   this.afterAnimationSettersByType[this.actionTypes.OBJECT.TEXTURE_OFFSET_X] = function(animation){
     animation.attachedObject.setTextureOffsetX(animation.initialValue);
