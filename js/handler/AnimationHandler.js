@@ -210,6 +210,14 @@ AnimationHandler.prototype.update = function(){
   this.activeAnimations.forEach(this.animationUpdateFunc);
 }
 
+AnimationHandler.prototype.assignInitialValue = function(animation){
+  animation.initialValue = this.initialValueGetterFunctionsByType[animation.description.action](animation.attachedObject);
+  if (animation.description.action == this.actionTypes.OBJECT.EMISSIVE_COLOR){
+    animation.params.sourceColor.copy(animation.attachedObject.getEmissiveColor());
+    animation.params.originalSourceColor.copy(animation.attachedObject.getEmissiveColor());
+  }
+}
+
 AnimationHandler.prototype.startAnimation = function(animation){
   this.activeAnimations.set(animation.uuid, animation);
   animation.onStart(this.initialValueGetterFunctionsByType[animation.description.action](animation.attachedObject));

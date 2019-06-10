@@ -16,12 +16,11 @@ AnimationCreatorGUIHandler.prototype.update = function(){
 AnimationCreatorGUIHandler.prototype.refreshAnimations = function(object){
   for (var key in animationCreatorGUIHandler.folderConfigurationsByID){
     var animation = object.animations[animationCreatorGUIHandler.folderConfigurationsByID[key]["Name"]];
-    if (!(typeof animation.initialValue == UNDEFINED)){
-      animationHandler.resetAnimation(animation);
-    }
+    animationHandler.assignInitialValue(animation);
+    animationHandler.resetAnimation(animation);
     if (animationCreatorGUIHandler.folderConfigurationsByID[key]["Play"]){
       animationHandler.startAnimation(animation);
-    }else if (!(typeof animation.initialValue == UNDEFINED)){
+    }else{
       animationHandler.forceFinish(animation);
     }
   }
