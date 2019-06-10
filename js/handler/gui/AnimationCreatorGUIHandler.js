@@ -62,7 +62,7 @@ AnimationCreatorGUIHandler.prototype.addAnimationFolder = function(animation, ob
     var animation = animationCreatorGUIHandler.createAnimation(object, confs["Name"], val, confs["Action"], confs["Seconds"], confs["Total delta"], confs["Rewind"], confs["Target color"]);
     animationCreatorGUIHandler.animationsByFolderID[this.folderID] = animation;
     animationCreatorGUIHandler.refreshAnimations(this.object);
-    animationCreatorGUIHandler.handleTerminal(null, Text.ANIMATION_UPDATED);
+    animationCreatorGUIHandler.handleTerminal(null, Text.ANIMATION_UPDATED, object);
   }.bind({folderID: folderID, object: object})).listen();
   folder.add(folderConfigurations, "Action", this.objectAnimationActionsAry).onChange(function(val){
     var colorController = animationCreatorGUIHandler.colorControllersByFolderID[this.folderID];
@@ -78,11 +78,11 @@ AnimationCreatorGUIHandler.prototype.addAnimationFolder = function(animation, ob
     var animation = animationCreatorGUIHandler.createAnimation(object, confs["Name"], confs["Type"], val, confs["Seconds"], confs["Total delta"], confs["Rewind"], confs["Target color"]);
     animationCreatorGUIHandler.animationsByFolderID[this.folderID] = animation;
     animationCreatorGUIHandler.refreshAnimations(this.object);
-    animationCreatorGUIHandler.handleTerminal(null, Text.ANIMATION_UPDATED);
+    animationCreatorGUIHandler.handleTerminal(null, Text.ANIMATION_UPDATED, object);
   }.bind({folderID: folderID, object: object})).listen();
   folder.add(folderConfigurations, "Seconds").onFinishChange(function(val){
     if (isNaN(val) || (!isNaN(val) && val <= 0)){
-      animationCreatorGUIHandler.handleTerminal(Text.INVALID_PARAMETER.replace(Text.PARAM1, "Seconds"), null);
+      animationCreatorGUIHandler.handleTerminal(Text.INVALID_PARAMETER.replace(Text.PARAM1, "Seconds"), null, object);
       return;
     }
     val = parseFloat(val);
@@ -90,11 +90,11 @@ AnimationCreatorGUIHandler.prototype.addAnimationFolder = function(animation, ob
     var animation = animationCreatorGUIHandler.createAnimation(object, confs["Name"], confs["Type"], confs["Action"], val, confs["Total delta"], confs["Rewind"], confs["Target color"]);
     animationCreatorGUIHandler.animationsByFolderID[this.folderID] = animation;
     animationCreatorGUIHandler.refreshAnimations(this.object);
-    animationCreatorGUIHandler.handleTerminal(null, Text.ANIMATION_UPDATED);
+    animationCreatorGUIHandler.handleTerminal(null, Text.ANIMATION_UPDATED, object);
   }.bind({folderID: folderID, object: object})).listen();
   var deltaController = folder.add(folderConfigurations, "Total delta").onFinishChange(function(val){
     if (isNaN(val)){
-      animationCreatorGUIHandler.handleTerminal(Text.INVALID_PARAMETER.replace(Text.PARAM1, "Total delta"), null);
+      animationCreatorGUIHandler.handleTerminal(Text.INVALID_PARAMETER.replace(Text.PARAM1, "Total delta"), null, object);
       return;
     }
     val = parseFloat(val);
@@ -102,7 +102,7 @@ AnimationCreatorGUIHandler.prototype.addAnimationFolder = function(animation, ob
     var animation = animationCreatorGUIHandler.createAnimation(object, confs["Name"], confs["Type"], confs["Action"], confs["Seconds"], val, confs["Rewind"], confs["Target color"]);
     animationCreatorGUIHandler.animationsByFolderID[this.folderID] = animation;
     animationCreatorGUIHandler.refreshAnimations(this.object);
-    animationCreatorGUIHandler.handleTerminal(null, Text.ANIMATION_UPDATED);
+    animationCreatorGUIHandler.handleTerminal(null, Text.ANIMATION_UPDATED, object);
   }.bind({folderID: folderID, object: object})).listen();
   this.deltaControllersByFolderID[folderID] = deltaController;
   var colorController = folder.addColor(folderConfigurations, "Target color").onFinishChange(function(val){
@@ -110,7 +110,7 @@ AnimationCreatorGUIHandler.prototype.addAnimationFolder = function(animation, ob
     var animation = animationCreatorGUIHandler.createAnimation(object, confs["Name"], confs["Type"], confs["Action"], confs["Seconds"], confs["Total delta"], confs["Rewind"], val);
     animationCreatorGUIHandler.animationsByFolderID[this.folderID] = animation;
     animationCreatorGUIHandler.refreshAnimations(this.object);
-    animationCreatorGUIHandler.handleTerminal(null, Text.ANIMATION_UPDATED);
+    animationCreatorGUIHandler.handleTerminal(null, Text.ANIMATION_UPDATED, object);
   }.bind({folderID: folderID, object: object})).listen();
   this.colorControllersByFolderID[folderID] = colorController;
   folder.add(folderConfigurations, "Rewind").onChange(function(val){
@@ -118,7 +118,7 @@ AnimationCreatorGUIHandler.prototype.addAnimationFolder = function(animation, ob
     var animation = animationCreatorGUIHandler.createAnimation(object, confs["Name"], confs["Type"], confs["Action"], confs["Seconds"], confs["Total delta"], val, confs["Target color"]);
     animationCreatorGUIHandler.animationsByFolderID[this.folderID] = animation;
     animationCreatorGUIHandler.refreshAnimations(this.object);
-    animationCreatorGUIHandler.handleTerminal(null, Text.ANIMATION_UPDATED);
+    animationCreatorGUIHandler.handleTerminal(null, Text.ANIMATION_UPDATED, object);
   }.bind({folderID: folderID, object: object})).listen();
   folder.add(folderConfigurations, "Play").onChange(function(val){
     animationCreatorGUIHandler.refreshAnimations(this.object);
@@ -174,12 +174,12 @@ AnimationCreatorGUIHandler.prototype.init = function(object){
     "Add": function(){
       var name = animationCreatorGUIHandler.newAnimationConfigurations["Name"];
       if (!name){
-        animationCreatorGUIHandler.handleTerminal(Text.ANIMATION_NAME_MUST_BE_A_NON_EMPTY_STRING);
+        animationCreatorGUIHandler.handleTerminal(Text.ANIMATION_NAME_MUST_BE_A_NON_EMPTY_STRING, null, object);
         return;
       }
       for (var key in animationCreatorGUIHandler.folderConfigurationsByID){
         if (animationCreatorGUIHandler.folderConfigurationsByID[key]["Name"] == name){
-          animationCreatorGUIHandler.handleTerminal(Text.ANIMATION_NAME_MUST_BE_UNIQUE);
+          animationCreatorGUIHandler.handleTerminal(Text.ANIMATION_NAME_MUST_BE_UNIQUE, null, object);
           return;
         }
       }
@@ -206,7 +206,7 @@ AnimationCreatorGUIHandler.prototype.createAnimation = function(object, name, up
   return animation;
 }
 
-AnimationCreatorGUIHandler.prototype.commonStartFunctions = function(){
+AnimationCreatorGUIHandler.prototype.commonStartFunctions = function(object){
   selectionHandler.resetCurrentSelection();
   guiHandler.hideAll();
   this.hiddenEngineObjects = [];
@@ -217,7 +217,11 @@ AnimationCreatorGUIHandler.prototype.commonStartFunctions = function(){
       this.hiddenEngineObjects.push(child);
     }
   }
-  activeControl = new OrbitControls({maxRadius: 500, zoomDelta: 5});
+  if (!object.isFPSWeapon){
+    activeControl = new OrbitControls({maxRadius: 500, zoomDelta: 5});
+  }else{
+    activeControl = new CustomControls({});
+  }
   activeControl.onActivated();
 }
 
@@ -232,7 +236,7 @@ AnimationCreatorGUIHandler.prototype.createGUI = function(object){
   guiHandler.datGuiAnimationCreation.add(this.buttonConfigurations, "Done");
 }
 
-AnimationCreatorGUIHandler.prototype.handleTerminal = function(errorMsg, infoMsg){
+AnimationCreatorGUIHandler.prototype.handleTerminal = function(errorMsg, infoMsg, object){
   terminal.clear();
   terminal.disable();
   if (errorMsg != null){
@@ -241,7 +245,11 @@ AnimationCreatorGUIHandler.prototype.handleTerminal = function(errorMsg, infoMsg
   if (infoMsg != null){
     terminal.printInfo(infoMsg);
   }
-  terminal.printInfo(Text.AFTER_ANIMATION_CREATION);
+  if (!object.isFPSWeapon){
+    terminal.printInfo(Text.AFTER_ANIMATION_CREATION);
+  }else{
+    terminal.printInfo(Text.AFTER_ANIMATION_CREATION_FPS_WEAPON);
+  }
 }
 
 AnimationCreatorGUIHandler.prototype.close = function(object){
@@ -257,8 +265,12 @@ AnimationCreatorGUIHandler.prototype.close = function(object){
       this.hiddenEngineObjects[i].visible = true;
     }
   }
-  object.mesh.position.copy(object.beforeAnimationCreatorGUIHandlerPosition);
-  delete object.beforeAnimationCreatorGUIHandlerPosition;
+  if (!object.isFPSWeapon){
+    object.mesh.position.copy(object.beforeAnimationCreatorGUIHandlerPosition);
+    delete object.beforeAnimationCreatorGUIHandlerPosition;
+  }else{
+    object.revertPositionAfterFPSWeaponConfigurations();
+  }
   terminal.clear();
   terminal.enable();
   terminal.printInfo(Text.OK);
@@ -270,11 +282,17 @@ AnimationCreatorGUIHandler.prototype.close = function(object){
 
 AnimationCreatorGUIHandler.prototype.show = function(object){
   this.init(object);
-  this.commonStartFunctions();
+  this.commonStartFunctions(object);
   this.createGUI(object);
-  this.handleTerminal(null, null);
+  this.handleTerminal(null, null, object);
   object.mesh.visible = true;
-  object.beforeAnimationCreatorGUIHandlerPosition = object.mesh.position.clone();
-  object.mesh.position.set(0, 0, 0);
+  if (!object.isFPSWeapon){
+    object.beforeAnimationCreatorGUIHandlerPosition = object.mesh.position.clone();
+    object.mesh.position.set(0, 0, 0);
+  }else{
+    camera.quaternion.set(0, 0, 0, 1);
+    object.quaternionBeforeFPSWeaponConfigurationPanelOpened = object.mesh.quaternion.clone();
+    object.onFPSWeaponAlignmentUpdate();
+  }
   this.refreshAnimations(object);
 }

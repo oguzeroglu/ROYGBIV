@@ -442,6 +442,7 @@ var Text = function(){
   this.AFTER_CROSSHAIR_CREATION = "Press Done button to create crosshair.";
   this.AFTER_SCRIPT_CREATION = "Press Done button to close.";
   this.AFTER_ANIMATION_CREATION = "Press Done button to close.\nUse mouse wheel/mouse drag to rotate.\nUp/Down or W/S (Z/S - French keyboard) to zoom in/out.";
+  this.AFTER_ANIMATION_CREATION_FPS_WEAPON = "Press Done button close.";
   this.ANIMATION_NAME_MUST_BE_A_NON_EMPTY_STRING = "Animation name must be a non empty string.";
   this.ANIMATION_NAME_MUST_BE_UNIQUE = "Animation name must be unique.";
   this.DONE = "Done.";
