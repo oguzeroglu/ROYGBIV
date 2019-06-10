@@ -234,6 +234,9 @@ AnimationCreatorGUIHandler.prototype.commonStartFunctions = function(object){
 
 AnimationCreatorGUIHandler.prototype.createGUI = function(object){
   guiHandler.datGuiAnimationCreation = new dat.GUI({hideable: false});
+  guiHandler.datGuiAnimationCreation.domElement.addEventListener("mousedown", function(e){
+    acGUIFocused = true;
+  });
   for (var animationName in object.animations){
     this.addAnimationFolder(object.animations[animationName], object);
   }

@@ -11,7 +11,7 @@ KeyboardEventHandler.prototype.onKeyUp = function(event){
   if (!windowLoaded){
     return;
   }
-  if (cliFocused || omGUIFocused || tmGUIFocused){
+  if (cliFocused || omGUIFocused || tmGUIFocused || acGUIFocused){
     return;
   }
   if (keyCodeToChar[event.keyCode]){
@@ -63,7 +63,7 @@ KeyboardEventHandler.prototype.onKeyDown = function(event){
   if (!windowLoaded){
     return;
   }
-  if (cliFocused || omGUIFocused || tmGUIFocused){
+  if (cliFocused || omGUIFocused || tmGUIFocused || acGUIFocused){
     return;
   }
   if (keyCodeToChar[event.keyCode]){

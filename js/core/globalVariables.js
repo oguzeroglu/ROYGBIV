@@ -20,6 +20,7 @@ var windowLoaded;
 var cliFocused = true;
 var omGUIFocused = false;
 var tmGUIFocused = false;
+var acGUIFocused = false;
 var cliIsBeingDragged = false;
 var requestID;
 var boundingClientRect;
