@@ -115,7 +115,7 @@ var AnimationHandler = function(){
     animation.attachedObject.setDisplacementBias(animation.initialValue);
   };
   this.afterAnimationSettersByType[this.actionTypes.OBJECT.EMISSIVE_COLOR] = function(animation){
-    animation.attachedObject.setEmissiveColor(animation.params.originalSourceColor);
+    animation.attachedObject.setEmissiveColor(animation.params.sourceColor);
   };
   this.afterAnimationSettersByType[this.actionTypes.OBJECT.TEXTURE_OFFSET_X] = function(animation){
     animation.attachedObject.setTextureOffsetX(animation.initialValue);
@@ -214,7 +214,6 @@ AnimationHandler.prototype.assignInitialValue = function(animation){
   animation.initialValue = this.initialValueGetterFunctionsByType[animation.description.action](animation.attachedObject);
   if (animation.description.action == this.actionTypes.OBJECT.EMISSIVE_COLOR){
     animation.params.sourceColor.copy(animation.attachedObject.getEmissiveColor());
-    animation.params.originalSourceColor.copy(animation.attachedObject.getEmissiveColor());
   }
 }
 
@@ -268,7 +267,8 @@ AnimationHandler.prototype.updateObjectDisplacementBias = function(params){
   params.object.setDisplacementBias(params.value);
 }
 AnimationHandler.prototype.updateObjectEmissiveColor = function(params){
-  params.object.setEmissiveColor(params.sourceColor.lerp(params.targetColor, params.value));
+  REUSABLE_COLOR.copy(params.sourceColor);
+  params.object.setEmissiveColor(REUSABLE_COLOR.lerp(params.targetColor, params.value));
 }
 AnimationHandler.prototype.updateObjectTextureOffsetX = function(params){
   params.object.setTextureOffsetX(params.value);

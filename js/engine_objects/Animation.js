@@ -12,7 +12,6 @@ var Animation = function(name, type, attachedObject, description, rewind){
     this.changeInValue = 1;
     this.params.targetColor = description.targetColor;
     this.params.sourceColor = new THREE.Color();
-    this.params.originalSourceColor = new THREE.Color();
   }else{
     this.changeInValue = this.description.changeInValue;
   }
@@ -28,7 +27,6 @@ Animation.prototype.onStart = function(initialValue){
   this.tick = 0;
   if (this.description.action == animationHandler.actionTypes.OBJECT.EMISSIVE_COLOR){
     this.params.sourceColor.copy(this.attachedObject.getEmissiveColor());
-    this.params.originalSourceColor.copy(this.attachedObject.getEmissiveColor());
   }
   this.increaseTick = true;
 }
@@ -44,13 +42,7 @@ Animation.prototype.update = function(){
   if (this.increaseTick && this.tick >= this.totalTimeInSeconds){
     if (this.rewind){
       this.increaseTick = false;
-      if (this.description.action == animationHandler.actionTypes.OBJECT.EMISSIVE_COLOR){
-        this.params.sourceColor.copy(this.params.originalSourceColor);
-      }
     }else if (!this.repeat){
-      if (this.description.action == animationHandler.actionTypes.OBJECT.EMISSIVE_COLOR){
-        this.params.sourceColor.copy(this.params.originalSourceColor);
-      }
       this.onFinished();
     }
   }else if (!this.increaseTick && this.tick <= 0){
@@ -58,9 +50,6 @@ Animation.prototype.update = function(){
       this.increaseTick = true;
     }
     if (!this.repeat){
-      if (this.description.action == animationHandler.actionTypes.OBJECT.EMISSIVE_COLOR){
-        this.params.sourceColor.copy(this.params.originalSourceColor);
-      }
       this.onFinished();
     }
   }
