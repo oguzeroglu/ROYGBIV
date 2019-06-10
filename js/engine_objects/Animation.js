@@ -30,19 +30,37 @@ Animation.prototype.onStart = function(initialValue){
     this.params.sourceColor.copy(this.attachedObject.getEmissiveColor());
     this.params.originalSourceColor.copy(this.attachedObject.getEmissiveColor());
   }
+  this.increaseTick = true;
 }
 
 Animation.prototype.update = function(){
   this.params.value = this.updateFunction(this.tick, this.initialValue, this.changeInValue, this.totalTimeInSeconds);
   this.actionFunction(this.params);
-  this.tick +=  STEP;
-  if (this.tick >= this.totalTimeInSeconds){
+  if (this.increaseTick){
+    this.tick += STEP;
+  }else{
+    this.tick -= STEP;
+  }
+  if (this.increaseTick && this.tick >= this.totalTimeInSeconds){
     if (this.rewind){
-      this.tick = 0;
+      this.increaseTick = false;
       if (this.description.action == animationHandler.actionTypes.OBJECT.EMISSIVE_COLOR){
         this.params.sourceColor.copy(this.params.originalSourceColor);
       }
-    }else{
+    }else if (!this.repeat){
+      if (this.description.action == animationHandler.actionTypes.OBJECT.EMISSIVE_COLOR){
+        this.params.sourceColor.copy(this.params.originalSourceColor);
+      }
+      this.onFinished();
+    }
+  }else if (!this.increaseTick && this.tick <= 0){
+    if (this.rewind){
+      this.increaseTick = true;
+    }
+    if (!this.repeat){
+      if (this.description.action == animationHandler.actionTypes.OBJECT.EMISSIVE_COLOR){
+        this.params.sourceColor.copy(this.params.originalSourceColor);
+      }
       this.onFinished();
     }
   }

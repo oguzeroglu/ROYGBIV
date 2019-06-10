@@ -186,7 +186,7 @@ AnimationHandler.prototype.forceFinish = function(animation){
 }
 
 AnimationHandler.prototype.onAnimationFinished = function(animation){
-  if (!animation.rewind){
+  if (!animation.repeat){
     this.activeAnimations.delete(animation.uuid);
     this.afterAnimationSettersByType[animation.description.action](animation);
   }
@@ -197,7 +197,7 @@ AnimationHandler.prototype.resetAnimation = function(animation){
 }
 
 AnimationHandler.prototype.purgeAnimation = function(animation){
-  animation.rewind = false;
+  animation.repeat = false;
   this.onAnimationFinished(animation);
   delete animation.attachedObject.animations[animation.name];
 }
