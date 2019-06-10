@@ -4379,6 +4379,26 @@ function parse(input){
           });
           return true;
         break;
+        case 186: //animations
+          if (mode != 0){
+            terminal.printError(Text.WORKS_ONLY_IN_DESIGN_MODE);
+            return true;
+          }
+          var objName = splitted[1];
+          var obj = addedObjects[objName];
+          if (!obj){
+            obj = objectGroups[objName];
+            if (!obj){
+              obj = addedTexts[objName];
+              if (!obj){
+                terminal.printError(Text.NO_SUCH_OBJECT);
+                return true;
+              }
+            }
+          }
+          animationCreatorGUIHandler.show(obj);
+          return true;
+        break;
       }
       return true;
     }catch(err){

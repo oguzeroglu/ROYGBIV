@@ -29,6 +29,7 @@ AnimationCreatorGUIHandler.prototype.refreshAnimations = function(object){
 
 AnimationCreatorGUIHandler.prototype.addAnimationFolder = function(animation, object){
   var folderID = this.folderIDCounter ++;
+  this.animationsByFolderID[folderID] = animation;
   var folderConfigurations = {
     "Name": animation.name,
     "Type": animation.type,
@@ -38,23 +39,27 @@ AnimationCreatorGUIHandler.prototype.addAnimationFolder = function(animation, ob
     "Rewind": animation.rewind,
     "Play": true,
     "Delete": function(){
-      this.object.removeAnimation(this.animation);
+      var anim = animationCreatorGUIHandler.animationsByFolderID[this.folderID];
+      animationHandler.purgeAnimation(anim);
+      this.object.removeAnimation(anim);
       guiHandler.datGuiAnimationCreation.removeFolder(animationCreatorGUIHandler.foldersByID[this.folderID]);
       delete animationCreatorGUIHandler.foldersByID[this.folderID];
       delete animationCreatorGUIHandler.folderConfigurationsByID[this.folderID];
       animationCreatorGUIHandler.refreshAnimations(this.object);
-    }.bind({animation: animation, object: object, folderID: folderID})
+    }.bind({object: object, folderID: folderID})
   }
   var folder = guiHandler.datGuiAnimationCreation.addFolder(animation.name);
   folder.add(folderConfigurations, "Type", this.animationTypesAry).onChange(function(val){
     var confs = animationCreatorGUIHandler.folderConfigurationsByID[this.folderID];
     var animation = animationCreatorGUIHandler.createAnimation(object, confs["Name"], val, confs["Action"], confs["Seconds"], confs["Total delta"], confs["Rewind"]);
+    animationCreatorGUIHandler.animationsByFolderID[this.folderID] = animation;
     animationCreatorGUIHandler.refreshAnimations(this.object);
     animationCreatorGUIHandler.handleTerminal(null, Text.ANIMATION_UPDATED);
   }.bind({folderID: folderID, object: object})).listen();
   folder.add(folderConfigurations, "Action", this.objectAnimationActionsAry).onChange(function(val){
     var confs = animationCreatorGUIHandler.folderConfigurationsByID[this.folderID];
     var animation = animationCreatorGUIHandler.createAnimation(object, confs["Name"], confs["Type"], val, confs["Seconds"], confs["Total delta"], confs["Rewind"]);
+    animationCreatorGUIHandler.animationsByFolderID[this.folderID] = animation;
     animationCreatorGUIHandler.refreshAnimations(this.object);
     animationCreatorGUIHandler.handleTerminal(null, Text.ANIMATION_UPDATED);
   }.bind({folderID: folderID, object: object})).listen();
@@ -66,6 +71,7 @@ AnimationCreatorGUIHandler.prototype.addAnimationFolder = function(animation, ob
     val = parseFloat(val);
     var confs = animationCreatorGUIHandler.folderConfigurationsByID[this.folderID];
     var animation = animationCreatorGUIHandler.createAnimation(object, confs["Name"], confs["Type"], confs["Action"], val, confs["Total delta"], confs["Rewind"]);
+    animationCreatorGUIHandler.animationsByFolderID[this.folderID] = animation;
     animationCreatorGUIHandler.refreshAnimations(this.object);
     animationCreatorGUIHandler.handleTerminal(null, Text.ANIMATION_UPDATED);
   }.bind({folderID: folderID, object: object})).listen();
@@ -77,12 +83,14 @@ AnimationCreatorGUIHandler.prototype.addAnimationFolder = function(animation, ob
     val = parseFloat(val);
     var confs = animationCreatorGUIHandler.folderConfigurationsByID[this.folderID];
     var animation = animationCreatorGUIHandler.createAnimation(object, confs["Name"], confs["Type"], confs["Action"], confs["Seconds"], val, confs["Rewind"]);
+    animationCreatorGUIHandler.animationsByFolderID[this.folderID] = animation;
     animationCreatorGUIHandler.refreshAnimations(this.object);
     animationCreatorGUIHandler.handleTerminal(null, Text.ANIMATION_UPDATED);
   }.bind({folderID: folderID, object: object})).listen();
   folder.add(folderConfigurations, "Rewind").onChange(function(val){
     var confs = animationCreatorGUIHandler.folderConfigurationsByID[this.folderID];
     var animation = animationCreatorGUIHandler.createAnimation(object, confs["Name"], confs["Type"], confs["Action"], confs["Seconds"], confs["Total delta"], val);
+    animationCreatorGUIHandler.animationsByFolderID[this.folderID] = animation;
     animationCreatorGUIHandler.refreshAnimations(this.object);
     animationCreatorGUIHandler.handleTerminal(null, Text.ANIMATION_UPDATED);
   }.bind({folderID: folderID, object: object})).listen();
@@ -120,6 +128,7 @@ AnimationCreatorGUIHandler.prototype.init = function(object){
   this.folderIDCounter = 0;
   this.folderConfigurationsByID = new Object();
   this.foldersByID = new Object();
+  this.animationsByFolderID = new Object();
   this.buttonConfigurations = {
     "Done": function(){
       animationCreatorGUIHandler.close(object);
