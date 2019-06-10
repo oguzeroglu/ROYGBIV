@@ -1,4 +1,4 @@
-var Animation = function(name, type, attachedObject, description, rewind){
+var Animation = function(name, type, attachedObject, description, rewind, repeat){
   this.name = name;
   this.type = type;
   this.attachedObject = attachedObject;
@@ -7,6 +7,7 @@ var Animation = function(name, type, attachedObject, description, rewind){
   this.updateFunction = animationHandler.updateFunctionsByType[type];
   this.actionFunction = animationHandler.actionFunctionsByType[description.action];
   this.totalTimeInSeconds = this.description.totalTimeInSeconds;
+  this.repeat = repeat;
   this.params = {object: this.attachedObject};
   if (description.action == animationHandler.actionTypes.OBJECT.EMISSIVE_COLOR){
     this.changeInValue = 1;
@@ -44,11 +45,11 @@ Animation.prototype.update = function(){
       this.increaseTick = false;
     }else if (!this.repeat){
       this.onFinished();
+    }else{
+      this.tick = 0;
     }
   }else if (!this.increaseTick && this.tick <= 0){
-    if (this.rewind){
-      this.increaseTick = true;
-    }
+    this.increaseTick = true;
     if (!this.repeat){
       this.onFinished();
     }
