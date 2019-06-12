@@ -107,11 +107,59 @@ AddedText.prototype.removeAnimation = function(animation){
   delete this.animations[animation.name];
 }
 
+AddedText.prototype.getPositionZ = function(){
+  if (this.is2D){
+    return 0;
+  }else{
+    return this.mesh.position.z;
+  }
+}
+
+AddedText.prototype.getPositionY = function(){
+  if (this.is2D){
+    return this.marginPercentHeight;
+  }else{
+    return this.mesh.position.y;
+  }
+}
+
+AddedText.prototype.getPositionX = function(){
+  if (this.is2D){
+    return this.marginPercentWidth;
+  }else{
+    return this.mesh.position.x;
+  }
+}
+
+AddedText.prototype.setPositionX = function(val){
+  if (this.is2D){
+    this.set2DCoordinates(val, this.getPositionY());
+  }else{
+    this.mesh.position.x = val;
+  }
+}
+
+AddedText.prototype.setPositionY = function(val){
+  if (this.is2D){
+    this.set2DCoordinates(this.getPositionX(), val);
+  }else{
+    this.mesh.position.y = val;
+  }
+}
+
+AddedText.prototype.setPositionZ = function(val){
+  if (this.is2D){
+    return;
+  }else{
+    this.mesh.position.z = val;
+  }
+}
+
 AddedText.prototype.setPosition = function(x, y, z){
   if (this.is2D){
     this.set2DCoordinates(x, y);
   }else{
-    text.mesh.position.set(x, y, z);
+    this.mesh.position.set(x, y, z);
   }
 }
 
