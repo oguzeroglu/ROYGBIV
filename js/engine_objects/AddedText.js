@@ -340,6 +340,10 @@ AddedText.prototype.setColor = function(colorString, fromScript){
   this.material.uniforms.color.value.set(colorString);
 }
 
+AddedText.prototype.getAlpha = function(){
+  return this.alpha;
+}
+
 AddedText.prototype.setAlpha = function(alpha, fromScript){
   if (fromScript && (typeof this.oldAlpha == UNDEFINED)){
     this.oldAlpha = this.alpha;

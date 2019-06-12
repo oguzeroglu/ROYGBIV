@@ -174,7 +174,7 @@ GUIHandler.prototype.afterTextSelection = function(){
     guiHandler.textManipulationParameters["Text"] = curSelection.name;
     guiHandler.textManipulationParameters["Content"] = curSelection.text;
     guiHandler.textManipulationParameters["Text color"] = "#" + curSelection.material.uniforms.color.value.getHexString();
-    guiHandler.textManipulationParameters["Alpha"] = curSelection.material.uniforms.alpha.value;
+    guiHandler.textManipulationParameters["Alpha"] = curSelection.getAlpha();
     guiHandler.textManipulationParameters["Has bg"] = (curSelection.hasBackground);
     if (curSelection.hasBackground){
       guiHandler.textManipulationParameters["Bg color"] = "#" + curSelection.material.uniforms.backgroundColor.value.getHexString();

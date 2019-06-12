@@ -144,26 +144,34 @@ AnimationCreatorGUIHandler.prototype.addAnimationFolder = function(animation, ob
 
 AnimationCreatorGUIHandler.prototype.init = function(object){
   this.objectAnimationActionsAry = [];
-  for (var key in animationHandler.actionTypes.OBJECT){
-    if (key == "TEXTURE_OFFSET_X" || key == "TEXTURE_OFFSET_Y"){
-      if (object.isAddedObject && !object.hasTexture()){
-        continue;
+  if (object.isAddedObject || object.isObjectGroup){
+    for (var key in animationHandler.actionTypes.OBJECT){
+      if (key == "TEXTURE_OFFSET_X" || key == "TEXTURE_OFFSET_Y"){
+        if (object.isAddedObject && !object.hasTexture()){
+          continue;
+        }
+        if (object.isObjectGroup && !object.hasTexture){
+          continue;
+        }
       }
-      if (object.isObjectGroup && !object.hasTexture){
-        continue;
+      if (key == "EMISSIVE_INTENSITY" || key == "EMISSIVE_COLOR"){
+        if (!object.hasEmissiveMap()){
+          continue;
+        }
       }
+      if (key == "DISPLACEMENT_SCALE" || key == "DISPLACEMENT_BIAS"){
+        if (!object.hasDisplacementMap()){
+          continue;
+        }
+      }
+      this.objectAnimationActionsAry.push(animationHandler.actionTypes.OBJECT[key]);
     }
-    if (key == "EMISSIVE_INTENSITY" || key == "EMISSIVE_COLOR"){
-      if (!object.hasEmissiveMap()){
-        continue;
-      }
+  }else if (object.isAddedText){
+    for (var key in animationHandler.actionTypes.TEXT){
+      this.objectAnimationActionsAry.push(animationHandler.actionTypes.TEXT[key]);
     }
-    if (key == "DISPLACEMENT_SCALE" || key == "DISPLACEMENT_BIAS"){
-      if (!object.hasDisplacementMap()){
-        continue;
-      }
-    }
-    this.objectAnimationActionsAry.push(animationHandler.actionTypes.OBJECT[key]);
+  }else{
+    throw new Error("Not implemented.");
   }
   this.folderIDCounter = 0;
   this.folderConfigurationsByID = new Object();
@@ -191,7 +199,12 @@ AnimationCreatorGUIHandler.prototype.init = function(object){
         }
       }
       var name = animationCreatorGUIHandler.newAnimationConfigurations["Name"];
-      var animation = animationCreatorGUIHandler.createAnimation(object, name, animationHandler.animationTypes.LINEAR, animationHandler.actionTypes.OBJECT.TRANSPARENCY, 3, -1, false, "#ffffff", false);
+      var animation;
+      if (object.isAddedText || object.isObjectGroup){
+        animation = animationCreatorGUIHandler.createAnimation(object, name, animationHandler.animationTypes.LINEAR, animationHandler.actionTypes.OBJECT.TRANSPARENCY, 3, -1, false, "#ffffff", false);
+      }else{
+        animation = animationCreatorGUIHandler.createAnimation(object, name, animationHandler.animationTypes.LINEAR, animationHandler.actionTypes.TEXT.TRANSPARENCY, 3, -1, false, "#ffffff", false);
+      }
       animationCreatorGUIHandler.addAnimationFolder(animation, object);
       animationCreatorGUIHandler.refreshAnimations(object);
       animationCreatorGUIHandler.newAnimationConfigurations["Name"] = "";
