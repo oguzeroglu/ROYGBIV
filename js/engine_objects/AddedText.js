@@ -293,6 +293,10 @@ AddedText.prototype.handleUVUniform = function(){
   }
 }
 
+AddedText.prototype.getMarginBetweenChars = function(){
+  return this.offsetBetweenChars;
+}
+
 AddedText.prototype.setMarginBetweenChars = function(value){
   this.offsetBetweenChars = value;
   this.constructText();
@@ -302,6 +306,10 @@ AddedText.prototype.setMarginBetweenChars = function(value){
   }else{
     this.handleBoundingBox();
   }
+}
+
+AddedText.prototype.getMarginBetweenLines = function(){
+  return this.offsetBetweenLines;
 }
 
 AddedText.prototype.setMarginBetweenLines = function(value){

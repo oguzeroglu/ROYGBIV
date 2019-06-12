@@ -183,8 +183,8 @@ GUIHandler.prototype.afterTextSelection = function(){
       guiHandler.textManipulationParameters["Bg color"] = "#000000"
       guiHandler.textManipulationParameters["Bg alpha"] = 1;
     }
-    guiHandler.textManipulationParameters["Char margin"] = curSelection.offsetBetweenChars;
-    guiHandler.textManipulationParameters["Line margin"] = curSelection.offsetBetweenLines;
+    guiHandler.textManipulationParameters["Char margin"] = curSelection.getMarginBetweenChars();
+    guiHandler.textManipulationParameters["Line margin"] = curSelection.getMarginBetweenLines();
     guiHandler.textManipulationParameters["Aff. by fog"] = curSelection.isAffectedByFog;
     guiHandler.textManipulationParameters["is 2D"] = curSelection.is2D;
     if (typeof guiHandler.textManipulationParameters["is 2D"] == UNDEFINED){

@@ -23,7 +23,8 @@ var AnimationHandler = function(){
       TEXTURE_OFFSET_Y: "TEXTURE_OFFSET_Y"
     },
     TEXT: {
-      TRANSPARENCY: "TRANSPARENCY", CHAR_SIZE: "CHAR_SIZE"
+      TRANSPARENCY: "TRANSPARENCY", CHAR_SIZE: "CHAR_SIZE", MARGIN_BETWEEN_CHARS: "MARGIN_BETWEEN_CHARS",
+      MARGIN_BETWEEN_LINES: "MARGIN_BETWEEN_LINES"
     }
   };
   // INITIAL VALUE GETTERS
@@ -82,6 +83,12 @@ var AnimationHandler = function(){
   this.initialValueGetterFunctionsByType[this.actionTypes.TEXT.CHAR_SIZE] = function(object){
     return object.getCharSize();
   }
+  this.initialValueGetterFunctionsByType[this.actionTypes.TEXT.MARGIN_BETWEEN_CHARS] = function(object){
+    return object.getMarginBetweenChars();
+  }
+  this.initialValueGetterFunctionsByType[this.actionTypes.TEXT.MARGIN_BETWEEN_LINES] = function(object){
+    return object.getMarginBetweenLines();
+  }
   // AFTER ANIMATION SETTER FUNCTIONS
   this.afterAnimationSettersByType = new Object();
   this.afterAnimationSettersByType[this.actionTypes.OBJECT.TRANSPARENCY] = function(animation){
@@ -134,9 +141,15 @@ var AnimationHandler = function(){
   };
   this.afterAnimationSettersByType[this.actionTypes.TEXT.TRANSPARENCY] = function(animation){
     animation.attachedObject.setAlpha(animation.initialValue);
-  }
+  };
   this.afterAnimationSettersByType[this.actionTypes.TEXT.CHAR_SIZE] = function(animation){
     animation.attachedObject.setCharSize(animation.initialValue);
+  };
+  this.afterAnimationSettersByType[this.actionTypes.TEXT.MARGIN_BETWEEN_CHARS] = function(animation){
+    animation.attachedObject.setMarginBetweenChars(animation.initialValue);
+  }
+  this.afterAnimationSettersByType[this.actionTypes.TEXT.MARGIN_BETWEEN_LINES] = function(animation){
+    animation.attachedObject.setMarginBetweenLines(animation.initialValue);
   }
   // ACTION FUNCTIONS **********************************************
   this.actionFunctionsByType = new Object();
@@ -158,6 +171,8 @@ var AnimationHandler = function(){
   this.actionFunctionsByType[this.actionTypes.OBJECT.TEXTURE_OFFSET_Y] = this.updateObjectTextureOffsetY;
   this.actionFunctionsByType[this.actionTypes.TEXT.TRANSPARENCY] = this.updateTextTransparencyFunc;
   this.actionFunctionsByType[this.actionTypes.TEXT.CHAR_SIZE] = this.updateTextCharSizeFunc;
+  this.actionFunctionsByType[this.actionTypes.TEXT.MARGIN_BETWEEN_CHARS] = this.updateTextMarginBetweenCharsFunc;
+  this.actionFunctionsByType[this.actionTypes.TEXT.MARGIN_BETWEEN_LINES] = this.updateTextMarginBetweenLinesFunc;
   // UPDATE FUNCTIONS **********************************************
   this.updateFunctionsByType = new Object();
   this.updateFunctionsByType[this.animationTypes.LINEAR] = this.linearFunc;
@@ -298,6 +313,12 @@ AnimationHandler.prototype.updateTextTransparencyFunc = function(params){
 }
 AnimationHandler.prototype.updateTextCharSizeFunc = function(params){
   params.object.setCharSize(params.value);
+}
+AnimationHandler.prototype.updateTextMarginBetweenCharsFunc = function(params){
+  params.object.setMarginBetweenChars(params.value);
+}
+AnimationHandler.prototype.updateTextMarginBetweenLinesFunc = function(params){
+  params.object.setMarginBetweenLines(params.value);
 }
 // UPDATE FUNCTIONS ************************************************
 AnimationHandler.prototype.linearFunc = function(curTime, startVal, changeInVal, totalTime){
