@@ -14,6 +14,11 @@ AnimationCreatorGUIHandler.prototype.update = function(){
 }
 
 AnimationCreatorGUIHandler.prototype.refreshAnimations = function(object){
+  for (var key in object.animations){
+    if (!(typeof object.animations[key].initialValue == UNDEFINED)){
+      animationHandler.resetAnimation(object.animations[key]);
+    }
+  }
   for (var key in animationCreatorGUIHandler.folderConfigurationsByID){
     var animation = object.animations[animationCreatorGUIHandler.folderConfigurationsByID[key]["Name"]];
     animationHandler.assignInitialValue(animation);
