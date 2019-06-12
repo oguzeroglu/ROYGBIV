@@ -194,7 +194,7 @@ GUIHandler.prototype.afterTextSelection = function(){
       guiHandler.disableController(guiHandler.textManipulationBackgroundColorController);
       guiHandler.disableController(guiHandler.textManipulationBackgroundAlphaController);
     }
-    guiHandler.textManipulationParameters["Char size"] = curSelection.characterSize;
+    guiHandler.textManipulationParameters["Char size"] = curSelection.getCharSize();
     guiHandler.textManipulationParameters["Clickable"] = curSelection.isClickable;
     if (typeof guiHandler.textManipulationParameters["Clickable"] == UNDEFINED){
       guiHandler.textManipulationParameters["Clickable"] = false;

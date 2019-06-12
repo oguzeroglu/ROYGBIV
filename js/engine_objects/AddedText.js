@@ -410,6 +410,10 @@ AddedText.prototype.removeBackground = function(fromScript){
   }
 }
 
+AddedText.prototype.getCharSize = function(value){
+  return this.characterSize;
+}
+
 AddedText.prototype.setCharSize = function(value){
   this.material.uniforms.charSize.value = value;
   this.characterSize = value;

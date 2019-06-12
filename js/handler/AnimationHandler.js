@@ -23,7 +23,7 @@ var AnimationHandler = function(){
       TEXTURE_OFFSET_Y: "TEXTURE_OFFSET_Y"
     },
     TEXT: {
-      TRANSPARENCY: "TRANSPARENCY"
+      TRANSPARENCY: "TRANSPARENCY", CHAR_SIZE: "CHAR_SIZE"
     }
   };
   // INITIAL VALUE GETTERS
@@ -79,6 +79,9 @@ var AnimationHandler = function(){
   this.initialValueGetterFunctionsByType[this.actionTypes.TEXT.TRANSPARENCY] = function(object){
     return object.getAlpha();
   }
+  this.initialValueGetterFunctionsByType[this.actionTypes.TEXT.CHAR_SIZE] = function(object){
+    return object.getCharSize();
+  }
   // AFTER ANIMATION SETTER FUNCTIONS
   this.afterAnimationSettersByType = new Object();
   this.afterAnimationSettersByType[this.actionTypes.OBJECT.TRANSPARENCY] = function(animation){
@@ -132,6 +135,9 @@ var AnimationHandler = function(){
   this.afterAnimationSettersByType[this.actionTypes.TEXT.TRANSPARENCY] = function(animation){
     animation.attachedObject.setAlpha(animation.initialValue);
   }
+  this.afterAnimationSettersByType[this.actionTypes.TEXT.CHAR_SIZE] = function(animation){
+    animation.attachedObject.setCharSize(animation.initialValue);
+  }
   // ACTION FUNCTIONS **********************************************
   this.actionFunctionsByType = new Object();
   this.actionFunctionsByType[this.actionTypes.OBJECT.TRANSPARENCY] = this.updateObjectTransparencyFunc;
@@ -151,6 +157,7 @@ var AnimationHandler = function(){
   this.actionFunctionsByType[this.actionTypes.OBJECT.TEXTURE_OFFSET_X] = this.updateObjectTextureOffsetX;
   this.actionFunctionsByType[this.actionTypes.OBJECT.TEXTURE_OFFSET_Y] = this.updateObjectTextureOffsetY;
   this.actionFunctionsByType[this.actionTypes.TEXT.TRANSPARENCY] = this.updateTextTransparencyFunc;
+  this.actionFunctionsByType[this.actionTypes.TEXT.CHAR_SIZE] = this.updateTextCharSizeFunc;
   // UPDATE FUNCTIONS **********************************************
   this.updateFunctionsByType = new Object();
   this.updateFunctionsByType[this.animationTypes.LINEAR] = this.linearFunc;
@@ -288,6 +295,9 @@ AnimationHandler.prototype.updateObjectTextureOffsetY = function(params){
 }
 AnimationHandler.prototype.updateTextTransparencyFunc = function(params){
   params.object.setAlpha(params.value);
+}
+AnimationHandler.prototype.updateTextCharSizeFunc = function(params){
+  params.object.setCharSize(params.value);
 }
 // UPDATE FUNCTIONS ************************************************
 AnimationHandler.prototype.linearFunc = function(curTime, startVal, changeInVal, totalTime){
