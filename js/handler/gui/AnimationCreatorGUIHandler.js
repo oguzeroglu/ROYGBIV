@@ -320,6 +320,10 @@ AnimationCreatorGUIHandler.prototype.close = function(object){
 }
 
 AnimationCreatorGUIHandler.prototype.show = function(object){
+  if (object.isFPSWeapon){
+    object.quaternionBeforeFPSWeaponConfigurationPanelOpened = object.mesh.quaternion.clone();
+    object.onFPSWeaponAlignmentUpdate();
+  }
   for (var animationName in object.animations){
     animationHandler.assignInitialValue(object.animations[animationName]);
   }
@@ -333,8 +337,6 @@ AnimationCreatorGUIHandler.prototype.show = function(object){
     object.mesh.position.set(0, 0, 0);
   }else{
     camera.quaternion.set(0, 0, 0, 1);
-    object.quaternionBeforeFPSWeaponConfigurationPanelOpened = object.mesh.quaternion.clone();
-    object.onFPSWeaponAlignmentUpdate();
   }
   this.refreshAnimations(object);
 }
