@@ -25,7 +25,7 @@ var AnimationHandler = function(){
     TEXT: {
       TRANSPARENCY: "TRANSPARENCY", CHAR_SIZE: "CHAR_SIZE", MARGIN_BETWEEN_CHARS: "MARGIN_BETWEEN_CHARS",
       MARGIN_BETWEEN_LINES: "MARGIN_BETWEEN_LINES", POSITION_X: "POSITION_X", POSITION_Y: "POSITION_Y",
-      POSITION_Z: "POSITION_Z"
+      POSITION_Z: "POSITION_Z", TEXT_COLOR: "TEXT_COLOR"
     }
   };
   // INITIAL VALUE GETTERS
@@ -99,6 +99,9 @@ var AnimationHandler = function(){
   this.initialValueGetterFunctionsByType[this.actionTypes.TEXT.POSITION_Z] = function(object){
     return object.getPositionZ();
   }
+  this.initialValueGetterFunctionsByType[this.actionTypes.TEXT.TEXT_COLOR] = function(object){
+    return 0;
+  }
   // AFTER ANIMATION SETTER FUNCTIONS
   this.afterAnimationSettersByType = new Object();
   this.afterAnimationSettersByType[this.actionTypes.OBJECT.TRANSPARENCY] = function(animation){
@@ -170,6 +173,9 @@ var AnimationHandler = function(){
   this.afterAnimationSettersByType[this.actionTypes.TEXT.POSITION_Z] = function(animation){
     animation.attachedObject.setPositionZ(animation.initialValue);
   }
+  this.afterAnimationSettersByType[this.actionTypes.TEXT.TEXT_COLOR] = function(animation){
+    animation.attachedObject.setColor(animation.params.sourceColor.getHex(), false);
+  }
   // ACTION FUNCTIONS **********************************************
   this.actionFunctionsByType = new Object();
   this.actionFunctionsByType[this.actionTypes.OBJECT.TRANSPARENCY] = this.updateObjectTransparencyFunc;
@@ -195,6 +201,7 @@ var AnimationHandler = function(){
   this.actionFunctionsByType[this.actionTypes.TEXT.POSITION_X] = this.updateTextPositionXFunc;
   this.actionFunctionsByType[this.actionTypes.TEXT.POSITION_Y] = this.updateTextPositionYFunc;
   this.actionFunctionsByType[this.actionTypes.TEXT.POSITION_Z] = this.updateTextPositionZFunc;
+  this.actionFunctionsByType[this.actionTypes.TEXT.TEXT_COLOR] = this.updateTextColorFunc;
   // UPDATE FUNCTIONS **********************************************
   this.updateFunctionsByType = new Object();
   this.updateFunctionsByType[this.animationTypes.LINEAR] = this.linearFunc;
@@ -350,6 +357,10 @@ AnimationHandler.prototype.updateTextPositionYFunc = function(params){
 }
 AnimationHandler.prototype.updateTextPositionZFunc = function(params){
   params.object.setPositionZ(params.value);
+}
+AnimationHandler.prototype.updateTextColorFunc = function(params){
+  REUSABLE_COLOR.copy(params.sourceColor);
+  params.object.setColor(REUSABLE_COLOR.lerp(params.targetColor, params.value), false);
 }
 // UPDATE FUNCTIONS ************************************************
 AnimationHandler.prototype.linearFunc = function(curTime, startVal, changeInVal, totalTime){

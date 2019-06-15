@@ -9,7 +9,7 @@ var Animation = function(name, type, attachedObject, description, rewind, repeat
   this.totalTimeInSeconds = this.description.totalTimeInSeconds;
   this.repeat = repeat;
   this.params = {object: this.attachedObject};
-  if (description.action == animationHandler.actionTypes.OBJECT.EMISSIVE_COLOR){
+  if (description.action == animationHandler.actionTypes.OBJECT.EMISSIVE_COLOR || description.action == animationHandler.actionTypes.TEXT.TEXT_COLOR){
     this.changeInValue = 1;
     this.params.targetColor = description.targetColor;
     this.params.sourceColor = new THREE.Color();
@@ -28,6 +28,8 @@ Animation.prototype.onStart = function(initialValue){
   this.tick = 0;
   if (this.description.action == animationHandler.actionTypes.OBJECT.EMISSIVE_COLOR){
     this.params.sourceColor.copy(this.attachedObject.getEmissiveColor());
+  }else if (this.description.action == animationHandler.actionTypes.TEXT.TEXT_COLOR){
+    this.params.sourceColor.copy(this.attachedObject.getColor());
   }
   this.increaseTick = true;
 }

@@ -173,7 +173,7 @@ GUIHandler.prototype.afterTextSelection = function(){
     guiHandler.enableAllTMControllers();
     guiHandler.textManipulationParameters["Text"] = curSelection.name;
     guiHandler.textManipulationParameters["Content"] = curSelection.text;
-    guiHandler.textManipulationParameters["Text color"] = "#" + curSelection.material.uniforms.color.value.getHexString();
+    guiHandler.textManipulationParameters["Text color"] = "#" + curSelection.getColor().getHexString();
     guiHandler.textManipulationParameters["Alpha"] = curSelection.getAlpha();
     guiHandler.textManipulationParameters["Has bg"] = (curSelection.hasBackground);
     if (curSelection.hasBackground){

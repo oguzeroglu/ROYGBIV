@@ -387,6 +387,11 @@ AddedText.prototype.setText = function(newText, fromScript){
   }
 }
 
+AddedText.prototype.getColor = function(){
+  REUSABLE_COLOR.copy(this.material.uniforms.color.value);
+  return REUSABLE_COLOR;
+}
+
 AddedText.prototype.setColor = function(colorString, fromScript){
   if (fromScript && (typeof this.oldColorR == UNDEFINED)){
     this.oldColorR = this.material.uniforms.color.value.r;
