@@ -255,6 +255,9 @@ ModeSwitcher.prototype.switchFromPreviewToDesign = function(){
     delete addedText.clickCallbackFunction;
     delete addedText.mouseOverCallbackFunction;
     delete addedText.mouseOutCallbackFunction;
+    for (var animationName in addedText.animations){
+      animationHandler.forceFinish(addedText.animations[animationName]);
+    }
   }
   collisionCallbackRequests = new Map();
   particleCollisionCallbackRequests = new Object();
@@ -325,6 +328,9 @@ ModeSwitcher.prototype.switchFromPreviewToDesign = function(){
       object.updateOpacity(object.initOpacity);
       object.initOpacitySet = false;
     }
+    for (var animationName in object.animations){
+      animationHandler.forceFinish(object.animations[animationName]);
+    }
   }
   for (var objectName in addedObjects){
     var object = addedObjects[objectName];
@@ -355,6 +361,9 @@ ModeSwitcher.prototype.switchFromPreviewToDesign = function(){
         dynamicObjects.delete(object.name);
       }
       delete object.originalMass;
+    }
+    for (var animationName in object.animations){
+      animationHandler.forceFinish(object.animations[animationName]);
     }
   }
   fogHandler.onFromPreviewToDesign();

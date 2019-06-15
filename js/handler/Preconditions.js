@@ -212,6 +212,7 @@ var Preconditions = function(){
   this.keyboardRotationSpeed = "keyboardRotationSpeed";
   this.collisionAction = "collisionAction";
   this.scriptName = "scriptName";
+  this.animationName = "animationName";
 }
 
 Preconditions.prototype.errorHeader = function(callerFunc){
@@ -220,6 +221,12 @@ Preconditions.prototype.errorHeader = function(callerFunc){
 
 Preconditions.prototype.throw = function(callerFunc, errorMsg){
   throw new Error(this.errorHeader(callerFunc)+" ["+errorMsg+"]");
+}
+
+Preconditions.prototype.checkIfAnimationExists = function(callerFunc, obj, animationName){
+  if (!obj.animations[animationName]){
+    this.throw(callerFunc, "Object does not have such animation: "+animationName);
+  }
 }
 
 Preconditions.prototype.checkIfCollisionActionOnlyIfExists = function(callerFunc, parameterName, obj){
@@ -368,6 +375,12 @@ Preconditions.prototype.checkIfAddedObjectObjectGroupParticleSystem = function(c
 Preconditions.prototype.checkIfAddedObjectObjectGroupParticleSystemParticle = function(callerFunc, parameterName, obj){
   if (!(obj.isAddedObject) && !(obj.isObjectGroup) && !(obj.isParticle) && !(obj.isParticleSystem)){
     this.throw(callerFunc, parameterName+" must be an object, object group, particle system or particle.");
+  }
+}
+
+Preconditions.prototype.checkIfAddedObjectObjectGroupAddedText = function(callerFunc, parameterName, obj){
+  if (!(obj.isAddedObject) && !(obj.isObjectGroup) && !(obj.isAddedText)){
+    this.throw(callerFunc, parameterName+" must be an object, object group or text.");
   }
 }
 

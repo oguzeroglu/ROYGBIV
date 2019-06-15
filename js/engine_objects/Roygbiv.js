@@ -13,6 +13,7 @@
 //  * Crosshair functions
 //  * Text functions
 //  * Control functions
+//  * Animation functions
 //  * Script related functions
 var Roygbiv = function(){
   this.functionNames = [
@@ -165,7 +166,8 @@ var Roygbiv = function(){
     "removeScreenOrientationChangeListener",
     "executeForEachParticleSystem",
     "startScript",
-    "stopScript"
+    "stopScript",
+    "startAnimation"
   ];
 
   this.globals = new Object();
@@ -2158,6 +2160,22 @@ Roygbiv.prototype.createOrbitControl = function(parameters){
   preConditions.checkIfNumberOnlyIfExists(ROYGBIV.createOrbitControl, preConditions.keyboardRotationSpeed, parameters.keyboardRotationSpeed);
   preConditions.checkIfBooleanOnlyIfExists(ROYGBIV.createOrbitControl, preConditions.requestFullScreen, parameters.requestFullScreen);
   return new OrbitControls(parameters);
+}
+
+// ANIMATION FUNCTIONS *********************************************************
+
+// Starts an animation of given object, object group or text.
+Roygbiv.prototype.startAnimation = function(object, animationName){
+  if (mode == 0){
+    return;
+  }
+  preConditions.checkIfDefined(ROYGBIV.startAnimation, preConditions.object, object);
+  preConditions.checkIfAddedObjectObjectGroupAddedText(ROYGBIV.startAnimation, preConditions.object, object);
+  preConditions.checkIfDefined(ROYGBIV.startAnimation, preConditions.animationName, animationName);
+  preConditions.checkIfAnimationExists(ROYGBIV.startAnimation, object, animationName);
+  var animation = object.animations[animationName];
+  animationHandler.forceFinish(animation);
+  animationHandler.startAnimation(animation);
 }
 
 // UTILITY FUNCTIONS ***********************************************************
