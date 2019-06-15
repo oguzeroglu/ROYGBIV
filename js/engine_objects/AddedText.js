@@ -304,6 +304,10 @@ AddedText.prototype.export = function(){
     exportObj.hasCustomPrecision = true;
     exportObj.customPrecision = this.customPrecision;
   }
+  exportObj.animations = new Object();
+  for (var animationName in this.animations){
+    exportObj.animations[animationName] = this.animations[animationName].export();
+  }
   return exportObj;
 }
 

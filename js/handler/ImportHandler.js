@@ -708,6 +708,10 @@ ImportHandler.prototype.importAddedObjects = function(obj){
      if (curAddedObjectExport.muzzleFlashParameters){
        addedObjectInstance.muzzleFlashParameters = curAddedObjectExport.muzzleFlashParameters;
      }
+     for (var animationName in curAddedObjectExport.animations){
+       var curAnimationExport = curAddedObjectExport.animations[animationName];
+       addedObjectInstance.addAnimation(new Animation(animationName, curAnimationExport.type, addedObjectInstance, curAnimationExport.description, curAnimationExport.rewind, curAnimationExport.repeat));
+     }
   }
   for (var objName in addedObjects){
     if (addedObjects[objName].softCopyParentName){
@@ -1000,6 +1004,10 @@ ImportHandler.prototype.importAddedTexts = function(obj){
     if (curTextExport.hasCustomPrecision){
       addedTextInstance.useCustomShaderPrecision(curTextExport.customPrecision);
     }
+    for (var animationName in curTextExport.animations){
+      var curAnimationExport = curTextExport.animations[animationName];
+      addedTextInstance.addAnimation(new Animation(animationName, curAnimationExport.type, addedTextInstance, curAnimationExport.description, curAnimationExport.rewind, curAnimationExport.repeat));
+    }
   }
 }
 
@@ -1182,6 +1190,10 @@ ImportHandler.prototype.importObjectGroups = function(obj){
     }
     if (curObjectGroupExport.muzzleFlashParameters){
       objectGroupInstance.muzzleFlashParameters = curObjectGroupExport.muzzleFlashParameters;
+    }
+    for (var animationName in curObjectGroupExport.animations){
+      var curAnimationExport = curObjectGroupExport.animations[animationName];
+      objectGroupInstance.addAnimation(new Animation(animationName, curAnimationExport.type, objectGroupInstance, curAnimationExport.description, curAnimationExport.rewind, curAnimationExport.repeat));
     }
   }
   for (var objName in objectGroups){

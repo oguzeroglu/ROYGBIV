@@ -216,7 +216,7 @@ AnimationCreatorGUIHandler.prototype.init = function(object){
       }
       var name = animationCreatorGUIHandler.newAnimationConfigurations["Name"];
       var animation;
-      if (object.isAddedText || object.isObjectGroup){
+      if (object.isAddedObject || object.isObjectGroup){
         animation = animationCreatorGUIHandler.createAnimation(object, name, animationHandler.animationTypes.LINEAR, animationHandler.actionTypes.OBJECT.TRANSPARENCY, 3, -1, false, "#ffffff", false);
       }else{
         animation = animationCreatorGUIHandler.createAnimation(object, name, animationHandler.animationTypes.LINEAR, animationHandler.actionTypes.TEXT.TRANSPARENCY, 3, -1, false, "#ffffff", false);
@@ -236,7 +236,7 @@ AnimationCreatorGUIHandler.prototype.createAnimation = function(object, name, up
     action: actionType,
     totalTimeInSeconds: totalTimeInSeconds,
     changeInValue: changeInValue,
-    targetColor: new THREE.Color(targetColor)
+    targetColor: targetColor
   }, rewind, repeat);
   object.addAnimation(animation);
   return animation;

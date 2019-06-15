@@ -2043,6 +2043,10 @@ ObjectGroup.prototype.export = function(){
   if (this.muzzleFlashParameters){
     exportObj.muzzleFlashParameters = this.muzzleFlashParameters;
   }
+  exportObj.animations = new Object();
+  for (var animationName in this.animations){
+    exportObj.animations[animationName] = this.animations[animationName].export();
+  }
   return exportObj;
 }
 

@@ -11,7 +11,7 @@ var Animation = function(name, type, attachedObject, description, rewind, repeat
   this.params = {object: this.attachedObject};
   if (description.action == animationHandler.actionTypes.OBJECT.EMISSIVE_COLOR || description.action == animationHandler.actionTypes.TEXT.TEXT_COLOR || description.action == animationHandler.actionTypes.TEXT.BACKGROUND_COLOR){
     this.changeInValue = 1;
-    this.params.targetColor = description.targetColor;
+    this.params.targetColor = new THREE.Color(description.targetColor);
     this.params.sourceColor = new THREE.Color();
   }else if (description.action == animationHandler.actionTypes.TEXT.TYPING){
     this.changeInValue = attachedObject.text.length + 1;
@@ -20,6 +20,12 @@ var Animation = function(name, type, attachedObject, description, rewind, repeat
     this.changeInValue = this.description.changeInValue;
   }
   animationHandler.assignUUIDToAnimation(this);
+}
+
+Animation.prototype.export = function(){
+  return {
+    name: this.name, type: this.type, description: this.description, rewind: this.rewind, repeat: this.repeat
+  };
 }
 
 Animation.prototype.onFinished = function(){

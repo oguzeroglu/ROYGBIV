@@ -620,6 +620,10 @@ AddedObject.prototype.export = function(){
   if (this.muzzleFlashParameters){
     exportObject.muzzleFlashParameters = this.muzzleFlashParameters;
   }
+  exportObject.animations = new Object();
+  for (var animationName in this.animations){
+    exportObject.animations[animationName] = this.animations[animationName].export();
+  }
   return exportObject;
 }
 
