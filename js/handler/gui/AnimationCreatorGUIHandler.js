@@ -76,7 +76,11 @@ AnimationCreatorGUIHandler.prototype.addAnimationFolder = function(animation, ob
       guiHandler.disableController(deltaController);
       guiHandler.enableController(colorController);
     }else{
-      guiHandler.enableController(deltaController);
+      if (val == animationHandler.actionTypes.TEXT.TYPING){
+        guiHandler.disableController(deltaController);
+      }else{
+        guiHandler.enableController(deltaController);
+      }
       guiHandler.disableController(colorController);
     }
     var confs = animationCreatorGUIHandler.folderConfigurationsByID[this.folderID];
@@ -142,7 +146,11 @@ AnimationCreatorGUIHandler.prototype.addAnimationFolder = function(animation, ob
     guiHandler.disableController(deltaController);
     guiHandler.enableController(colorController);
   }else{
-    guiHandler.enableController(deltaController);
+    if (animation.description.action == animationHandler.actionTypes.TEXT.TYPING){
+      guiHandler.disableController(deltaController);
+    }else{
+      guiHandler.enableController(deltaController);
+    }
     guiHandler.disableController(colorController);
   }
 }
@@ -221,15 +229,15 @@ AnimationCreatorGUIHandler.prototype.init = function(object){
 }
 
 AnimationCreatorGUIHandler.prototype.createAnimation = function(object, name, updateType, actionType, totalTimeInSeconds, changeInValue, rewind, targetColor, repeat){
+  if (object.animations[name]){
+    animationHandler.purgeAnimation(object.animations[name]);
+  }
   var animation = new Animation(name, updateType, object, {
     action: actionType,
     totalTimeInSeconds: totalTimeInSeconds,
     changeInValue: changeInValue,
     targetColor: new THREE.Color(targetColor)
   }, rewind, repeat);
-  if (object.animations[name]){
-    animationHandler.purgeAnimation(object.animations[name]);
-  }
   object.addAnimation(animation);
   return animation;
 }

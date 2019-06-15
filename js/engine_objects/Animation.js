@@ -13,14 +13,17 @@ var Animation = function(name, type, attachedObject, description, rewind, repeat
     this.changeInValue = 1;
     this.params.targetColor = description.targetColor;
     this.params.sourceColor = new THREE.Color();
+  }else if (description.action == animationHandler.actionTypes.TEXT.TYPING){
+    this.changeInValue = attachedObject.text.length + 1;
+    this.params.sourceText = attachedObject.text;
   }else{
     this.changeInValue = this.description.changeInValue;
   }
   animationHandler.assignUUIDToAnimation(this);
 }
 
-Animation.prototype.onFinished = function(force){
-  animationHandler.onAnimationFinished(this, force);
+Animation.prototype.onFinished = function(){
+  animationHandler.onAnimationFinished(this);
 }
 
 Animation.prototype.onStart = function(initialValue){
@@ -32,6 +35,8 @@ Animation.prototype.onStart = function(initialValue){
     this.params.sourceColor.copy(this.attachedObject.getColor());
   }else if (this.description.action == animationHandler.actionTypes.TEXT.BACKGROUND_COLOR){
     this.params.sourceColor.copy(this.attachedObject.getBackgroundColor());
+  }else if (this.description.action == animationHandler.actionTypes.TEXT.TYPING){
+    this.params.sourceText = this.attachedObject.text;
   }
   this.increaseTick = true;
 }
@@ -44,21 +49,18 @@ Animation.prototype.update = function(){
   }else{
     this.tick -= STEP;
   }
-  if (this.increaseTick && this.tick >= this.totalTimeInSeconds){
+  if (this.increaseTick && this.tick > this.totalTimeInSeconds){
     if (this.rewind){
       this.increaseTick = false;
     }else if (!this.repeat){
       this.onFinished();
     }else{
-      this.onFinished(true);
       this.tick = 0;
     }
   }else if (!this.increaseTick && this.tick <= 0){
     this.increaseTick = true;
     if (!this.repeat){
       this.onFinished();
-    }else{
-      this.onFinished(true);
     }
   }
 }

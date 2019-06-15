@@ -769,6 +769,11 @@ AddedText.prototype.restore = function(){
   }
 }
 
+AddedText.prototype.firstNChars = function(originalText, n){
+  n = parseInt(n);
+  this.setText(originalText.substring(0, n), false);
+}
+
 AddedText.prototype.setAffectedByFog = function(val){
   this.isAffectedByFog = val;
 }
