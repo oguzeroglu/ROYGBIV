@@ -169,7 +169,8 @@ var Roygbiv = function(){
     "stopScript",
     "startAnimation",
     "stopAnimation",
-    "onAnimationFinished"
+    "onAnimationFinished",
+    "removeAnimationFinishListener"
   ];
 
   this.globals = new Object();
@@ -1802,6 +1803,18 @@ Roygbiv.prototype.onAnimationFinished = function(object, animationName, callback
   preConditions.checkIfAnimationExists(ROYGBIV.onAnimationFinished, object, animationName);
   preConditions.checkIfFunctionOnlyIfExists(ROYGBIV.onAnimationFinished, preConditions.callbackFunction, callbackFunction);
   object.animations[animationName].setFinishCallbackFunction(callbackFunction);
+}
+
+// Removes the finish listener for an animation of given object, object group or text.
+Roygbiv.prototype.removeAnimationFinishListener = function(object, animationName){
+  if (mode == 0){
+    return;
+  }
+  preConditions.checkIfDefined(ROYGBIV.removeAnimationFinishListener, preConditions.object, object);
+  preConditions.checkIfDefined(ROYGBIV.removeAnimationFinishListener, preConditions.animationName, animationName);
+  preConditions.checkIfAddedObjectObjectGroupAddedText(ROYGBIV.removeAnimationFinishListener, preConditions.object, object);
+  preConditions.checkIfAnimationExists(ROYGBIV.removeAnimationFinishListener, object, animationName);
+  object.animations[animationName].finishCallbackFunction = 0;
 }
 
 // TEXT FUNCTIONS **************************************************************
