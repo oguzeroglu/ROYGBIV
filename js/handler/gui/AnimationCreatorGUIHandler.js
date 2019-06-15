@@ -320,6 +320,9 @@ AnimationCreatorGUIHandler.prototype.close = function(object){
 }
 
 AnimationCreatorGUIHandler.prototype.show = function(object){
+  for (var animationName in object.animations){
+    animationHandler.assignInitialValue(object.animations[animationName]);
+  }
   this.init(object);
   this.commonStartFunctions(object);
   this.createGUI(object);
