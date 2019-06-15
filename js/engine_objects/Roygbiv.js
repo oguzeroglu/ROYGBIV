@@ -167,7 +167,8 @@ var Roygbiv = function(){
     "executeForEachParticleSystem",
     "startScript",
     "stopScript",
-    "startAnimation"
+    "startAnimation",
+    "stopAnimation"
   ];
 
   this.globals = new Object();
@@ -2176,6 +2177,19 @@ Roygbiv.prototype.startAnimation = function(object, animationName){
   var animation = object.animations[animationName];
   animationHandler.forceFinish(animation);
   animationHandler.startAnimation(animation);
+}
+
+// Stops an animation of given object, object group or text.
+Roygbiv.prototype.stopAnimation = function(object, animationName){
+  if (mode == 0){
+    return;
+  }
+  preConditions.checkIfDefined(ROYGBIV.stopAnimation, preConditions.object, object);
+  preConditions.checkIfAddedObjectObjectGroupAddedText(ROYGBIV.stopAnimation, preConditions.object, object);
+  preConditions.checkIfDefined(ROYGBIV.stopAnimation, preConditions.animationName, animationName);
+  preConditions.checkIfAnimationExists(ROYGBIV.stopAnimation, object, animationName);
+  var animation = object.animations[animationName];
+  animationHandler.forceFinish(animation);
 }
 
 // UTILITY FUNCTIONS ***********************************************************
