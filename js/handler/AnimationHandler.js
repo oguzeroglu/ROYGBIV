@@ -502,7 +502,7 @@ AnimationHandler.prototype.elasticEaseOutFunc = function(curTime, startVal, chan
 
 AnimationHandler.prototype.elasticEaseInOutFunc = function(curTime, startVal, changeInVal, totalTime){
   var s=1.70158;var p=0;var a=changeInVal;
-  if (curTime==0) return b;  if ((curTime/=totalTime/2)==2) return b+changeInVal;  if (!p) p=totalTime*(.3*1.5);
+  if (curTime==0) return startVal;  if ((curTime/=totalTime/2)==2) return startVal+changeInVal;  if (!p) p=totalTime*(.3*1.5);
   if (a < Math.abs(changeInVal)) { a=changeInVal; var s=p/4; }
   else var s = p/(2*Math.PI) * Math.asin (changeInVal/a);
   if (curTime < 1) return -.5*(a*Math.pow(2,10*(curTime-=1)) * Math.sin( (curTime*totalTime-s)*(2*Math.PI)/p )) + startVal;
