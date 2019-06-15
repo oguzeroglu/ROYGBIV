@@ -25,7 +25,7 @@ var AnimationHandler = function(){
     TEXT: {
       TRANSPARENCY: "TRANSPARENCY", CHAR_SIZE: "CHAR_SIZE", MARGIN_BETWEEN_CHARS: "MARGIN_BETWEEN_CHARS",
       MARGIN_BETWEEN_LINES: "MARGIN_BETWEEN_LINES", POSITION_X: "POSITION_X", POSITION_Y: "POSITION_Y",
-      POSITION_Z: "POSITION_Z", TEXT_COLOR: "TEXT_COLOR"
+      POSITION_Z: "POSITION_Z", TEXT_COLOR: "TEXT_COLOR", BACKGROUND_COLOR: "BACKGROUND_COLOR"
     }
   };
   // INITIAL VALUE GETTERS
@@ -102,6 +102,9 @@ var AnimationHandler = function(){
   this.initialValueGetterFunctionsByType[this.actionTypes.TEXT.TEXT_COLOR] = function(object){
     return 0;
   }
+  this.initialValueGetterFunctionsByType[this.actionTypes.TEXT.BACKGROUND_COLOR] = function(object){
+    return 0;
+  }
   // AFTER ANIMATION SETTER FUNCTIONS
   this.afterAnimationSettersByType = new Object();
   this.afterAnimationSettersByType[this.actionTypes.OBJECT.TRANSPARENCY] = function(animation){
@@ -176,6 +179,9 @@ var AnimationHandler = function(){
   this.afterAnimationSettersByType[this.actionTypes.TEXT.TEXT_COLOR] = function(animation){
     animation.attachedObject.setColor(animation.params.sourceColor.getHex(), false);
   }
+  this.afterAnimationSettersByType[this.actionTypes.TEXT.BACKGROUND_COLOR] = function(animation){
+    animation.attachedObject.setBackground(animation.params.sourceColor.getHex(), animation.attachedObject.getBackgroundAlpha(), false);
+  }
   // ACTION FUNCTIONS **********************************************
   this.actionFunctionsByType = new Object();
   this.actionFunctionsByType[this.actionTypes.OBJECT.TRANSPARENCY] = this.updateObjectTransparencyFunc;
@@ -202,6 +208,7 @@ var AnimationHandler = function(){
   this.actionFunctionsByType[this.actionTypes.TEXT.POSITION_Y] = this.updateTextPositionYFunc;
   this.actionFunctionsByType[this.actionTypes.TEXT.POSITION_Z] = this.updateTextPositionZFunc;
   this.actionFunctionsByType[this.actionTypes.TEXT.TEXT_COLOR] = this.updateTextColorFunc;
+  this.actionFunctionsByType[this.actionTypes.TEXT.BACKGROUND_COLOR] = this.updateTextBackgroundColorFunc;
   // UPDATE FUNCTIONS **********************************************
   this.updateFunctionsByType = new Object();
   this.updateFunctionsByType[this.animationTypes.LINEAR] = this.linearFunc;
@@ -246,7 +253,11 @@ AnimationHandler.prototype.forceFinish = function(animation){
   this.afterAnimationSettersByType[animation.description.action](animation);
 }
 
-AnimationHandler.prototype.onAnimationFinished = function(animation){
+AnimationHandler.prototype.onAnimationFinished = function(animation, force){
+  if (force){
+    this.afterAnimationSettersByType[animation.description.action](animation);
+    return;
+  }
   if (!animation.repeat){
     this.activeAnimations.delete(animation.uuid);
     this.afterAnimationSettersByType[animation.description.action](animation);
@@ -275,6 +286,10 @@ AnimationHandler.prototype.assignInitialValue = function(animation){
   animation.initialValue = this.initialValueGetterFunctionsByType[animation.description.action](animation.attachedObject);
   if (animation.description.action == this.actionTypes.OBJECT.EMISSIVE_COLOR){
     animation.params.sourceColor.copy(animation.attachedObject.getEmissiveColor());
+  }else if (animation.description.action == this.actionTypes.TEXT.TEXT_COLOR){
+    animation.params.sourceColor.copy(animation.attachedObject.getColor());
+  }else if (animation.description.action == this.actionTypes.TEXT.BACKGROUND_COLOR){
+    animation.params.sourceColor.copy(animation.attachedObject.getBackgroundColor());
   }
 }
 
@@ -360,7 +375,11 @@ AnimationHandler.prototype.updateTextPositionZFunc = function(params){
 }
 AnimationHandler.prototype.updateTextColorFunc = function(params){
   REUSABLE_COLOR.copy(params.sourceColor);
-  params.object.setColor(REUSABLE_COLOR.lerp(params.targetColor, params.value), false);
+  params.object.setColor(REUSABLE_COLOR.lerp(params.targetColor, params.value).getHex(), false);
+}
+AnimationHandler.prototype.updateTextBackgroundColorFunc = function(params){
+  REUSABLE_COLOR.copy(params.sourceColor);
+  params.object.setBackground(REUSABLE_COLOR.lerp(params.targetColor, params.value).getHex(), params.object.getBackgroundAlpha(), false);
 }
 // UPDATE FUNCTIONS ************************************************
 AnimationHandler.prototype.linearFunc = function(curTime, startVal, changeInVal, totalTime){

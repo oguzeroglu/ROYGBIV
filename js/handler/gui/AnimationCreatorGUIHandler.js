@@ -33,7 +33,7 @@ AnimationCreatorGUIHandler.prototype.refreshAnimations = function(object){
 
 AnimationCreatorGUIHandler.prototype.addAnimationFolder = function(animation, object){
   var targetColorVal = "#ffffff";
-  if (animation.description.action == animationHandler.actionTypes.OBJECT.EMISSIVE_COLOR || animation.description.action == animationHandler.actionTypes.TEXT.TEXT_COLOR){
+  if (animation.description.action == animationHandler.actionTypes.OBJECT.EMISSIVE_COLOR || animation.description.action == animationHandler.actionTypes.TEXT.TEXT_COLOR || animation.description.action == animationHandler.actionTypes.TEXT.BACKGROUND_COLOR){
     targetColorVal = "#" + animation.params.targetColor.getHexString();
   }
   var folderID = this.folderIDCounter ++;
@@ -72,7 +72,7 @@ AnimationCreatorGUIHandler.prototype.addAnimationFolder = function(animation, ob
   folder.add(folderConfigurations, "Action", this.objectAnimationActionsAry).onChange(function(val){
     var colorController = animationCreatorGUIHandler.colorControllersByFolderID[this.folderID];
     var deltaController = animationCreatorGUIHandler.deltaControllersByFolderID[this.folderID];
-    if (val == animationHandler.actionTypes.OBJECT.EMISSIVE_COLOR || val == animationHandler.actionTypes.TEXT.TEXT_COLOR){
+    if (val == animationHandler.actionTypes.OBJECT.EMISSIVE_COLOR || val == animationHandler.actionTypes.TEXT.TEXT_COLOR || val == animationHandler.actionTypes.TEXT.BACKGROUND_COLOR){
       guiHandler.disableController(deltaController);
       guiHandler.enableController(colorController);
     }else{
@@ -138,7 +138,7 @@ AnimationCreatorGUIHandler.prototype.addAnimationFolder = function(animation, ob
   folder.add(folderConfigurations, "Delete");
   this.folderConfigurationsByID[folderID] = folderConfigurations;
   this.foldersByID[folderID] = folder;
-  if (animation.description.action == animationHandler.actionTypes.OBJECT.EMISSIVE_COLOR || animation.description.action == animationHandler.actionTypes.TEXT.TEXT_COLOR){
+  if (animation.description.action == animationHandler.actionTypes.OBJECT.EMISSIVE_COLOR || animation.description.action == animationHandler.actionTypes.TEXT.TEXT_COLOR || animation.description.action == animationHandler.actionTypes.TEXT.BACKGROUND_COLOR){
     guiHandler.disableController(deltaController);
     guiHandler.enableController(colorController);
   }else{
@@ -173,6 +173,9 @@ AnimationCreatorGUIHandler.prototype.init = function(object){
     }
   }else if (object.isAddedText){
     for (var key in animationHandler.actionTypes.TEXT){
+      if (!object.hasBackground && key == "BACKGROUND_COLOR"){
+        continue;
+      }
       this.objectAnimationActionsAry.push(animationHandler.actionTypes.TEXT[key]);
     }
   }else{

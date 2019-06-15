@@ -418,6 +418,15 @@ AddedText.prototype.setAlpha = function(alpha, fromScript){
   this.alpha = alpha;
 }
 
+AddedText.prototype.getBackgroundColor = function(){
+  REUSABLE_COLOR.copy(this.material.uniforms.backgroundColor.value);
+  return REUSABLE_COLOR;
+}
+
+AddedText.prototype.getBackgroundAlpha = function(){
+  return this.material.uniforms.backgroundAlpha.value;
+}
+
 AddedText.prototype.setBackground = function(backgroundColorString, backgroundAlpha, fromScript){
   if (backgroundAlpha > 1){
     backgroundAlpha = 1;

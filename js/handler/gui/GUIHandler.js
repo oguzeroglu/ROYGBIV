@@ -177,8 +177,8 @@ GUIHandler.prototype.afterTextSelection = function(){
     guiHandler.textManipulationParameters["Alpha"] = curSelection.getAlpha();
     guiHandler.textManipulationParameters["Has bg"] = (curSelection.hasBackground);
     if (curSelection.hasBackground){
-      guiHandler.textManipulationParameters["Bg color"] = "#" + curSelection.material.uniforms.backgroundColor.value.getHexString();
-      guiHandler.textManipulationParameters["Bg alpha"] = curSelection.material.uniforms.backgroundAlpha.value;
+      guiHandler.textManipulationParameters["Bg color"] = "#" + curSelection.getBackgroundColor().getHexString();
+      guiHandler.textManipulationParameters["Bg alpha"] = curSelection.getBackgroundAlpha();
     }else{
       guiHandler.textManipulationParameters["Bg color"] = "#000000"
       guiHandler.textManipulationParameters["Bg alpha"] = 1;
@@ -1109,11 +1109,11 @@ GUIHandler.prototype.initializeTextManipulationGUI = function(){
     guiHandler.textManipulationParameters["Alpha"] = 1;
   }).listen();
   guiHandler.textManipulationBackgroundColorController = guiHandler.datGuiTextManipulation.addColor(guiHandler.textManipulationParameters, "Bg color").onChange(function(val){
-    selectionHandler.getSelectedObject().setBackground(val, selectionHandler.getSelectedObject().material.uniforms.backgroundAlpha.value);
+    selectionHandler.getSelectedObject().setBackground(val, selectionHandler.getSelectedObject().getBackgroundAlpha());
   }).listen();
   guiHandler.textManipulationBackgroundAlphaController = guiHandler.datGuiTextManipulation.add(guiHandler.textManipulationParameters, "Bg alpha").min(0).max(1).step(0.01).onChange(function(val){
     selectionHandler.getSelectedObject().setBackground(
-      "#" + selectionHandler.getSelectedObject().material.uniforms.backgroundColor.value.getHexString(),
+      "#" + selectionHandler.getSelectedObject().getBackgroundColor().getHexString(),
       val
     );
   }).listen();
