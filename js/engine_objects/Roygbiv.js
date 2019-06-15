@@ -168,7 +168,8 @@ var Roygbiv = function(){
     "startScript",
     "stopScript",
     "startAnimation",
-    "stopAnimation"
+    "stopAnimation",
+    "onAnimationFinished"
   ];
 
   this.globals = new Object();
@@ -1785,6 +1786,22 @@ Roygbiv.prototype.removeScreenOrientationChangeListener = function(){
     return;
   }
   screenOrientationChangeCallbackFunction = noop;
+}
+
+// Sets a finish listener for an animation of given object, object group or text.
+// For repeating animations the callbackFunction is executed before each repeat.
+// For rewinding animations the callbackFunction is executed when the rewind is finished.
+Roygbiv.prototype.onAnimationFinished = function(object, animationName, callbackFunction){
+  if (mode ==  0){
+    return;
+  }
+  preConditions.checkIfDefined(ROYGBIV.onAnimationFinished, preConditions.object, object);
+  preConditions.checkIfDefined(ROYGBIV.onAnimationFinished, preConditions.animationName, animationName);
+  preConditions.checkIfDefined(ROYGBIV.onAnimationFinished, preConditions.callbackFunction, callbackFunction);
+  preConditions.checkIfAddedObjectObjectGroupAddedText(ROYGBIV.onAnimationFinished, preConditions.object, object);
+  preConditions.checkIfAnimationExists(ROYGBIV.onAnimationFinished, object, animationName);
+  preConditions.checkIfFunctionOnlyIfExists(ROYGBIV.onAnimationFinished, preConditions.callbackFunction, callbackFunction);
+  object.animations[animationName].setFinishCallbackFunction(callbackFunction);
 }
 
 // TEXT FUNCTIONS **************************************************************

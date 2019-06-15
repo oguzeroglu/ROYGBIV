@@ -22,6 +22,10 @@ var Animation = function(name, type, attachedObject, description, rewind, repeat
   animationHandler.assignUUIDToAnimation(this);
 }
 
+Animation.prototype.setFinishCallbackFunction = function(callbackFunction){
+  this.finishCallbackFunction = callbackFunction;
+}
+
 Animation.prototype.export = function(){
   return {
     name: this.name, type: this.type, description: this.description, rewind: this.rewind, repeat: this.repeat
@@ -63,10 +67,16 @@ Animation.prototype.update = function(){
     }else{
       this.tick = 0;
     }
+    if (!this.rewind && this.finishCallbackFunction){
+      this.finishCallbackFunction();
+    }
   }else if (!this.increaseTick && this.tick <= 0){
     this.increaseTick = true;
     if (!this.repeat){
       this.onFinished();
+    }
+    if (this.finishCallbackFunction){
+      this.finishCallbackFunction();
     }
   }
 }
