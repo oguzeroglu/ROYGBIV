@@ -2205,6 +2205,7 @@ Roygbiv.prototype.startAnimation = function(object, animationName){
   preConditions.checkIfDefined(ROYGBIV.startAnimation, preConditions.animationName, animationName);
   preConditions.checkIfAnimationExists(ROYGBIV.startAnimation, object, animationName);
   var animation = object.animations[animationName];
+  animationHandler.assignInitialValue(animation);
   animationHandler.forceFinish(animation);
   animationHandler.startAnimation(animation);
 }
