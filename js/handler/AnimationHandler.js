@@ -256,6 +256,9 @@ AnimationHandler.prototype.assignUUIDToAnimation = function(animation){
 }
 
 AnimationHandler.prototype.forceFinish = function(animation){
+  if (!animation.initialValue){
+    return;
+  }
   this.activeAnimations.delete(animation.uuid);
   this.afterAnimationSettersByType[animation.description.action](animation);
 }
