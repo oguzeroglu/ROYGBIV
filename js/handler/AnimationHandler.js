@@ -43,12 +43,30 @@ var AnimationHandler = function(){
     return object.mesh.scale.z;
   };
   this.initialValueGetterFunctionsByType[this.actionTypes.OBJECT.ROTATION_X] = function(object){
+    if (object.pivotObject){
+      object.updatePivot();
+      object.pivotObject.pseudoMesh.updateMatrix();
+      object.pivotObject.pseudoMesh.updateMatrixWorld();
+      return object.pivotObject.pseudoMesh.rotation.x;
+    }
     return object.mesh.rotation.x;
   };
   this.initialValueGetterFunctionsByType[this.actionTypes.OBJECT.ROTATION_Y] = function(object){
+    if (object.pivotObject){
+      object.updatePivot();
+      object.pivotObject.pseudoMesh.updateMatrix();
+      object.pivotObject.pseudoMesh.updateMatrixWorld();
+      return object.pivotObject.pseudoMesh.rotation.y;
+    }
     return object.mesh.rotation.y;
   };
   this.initialValueGetterFunctionsByType[this.actionTypes.OBJECT.ROTATION_Z] = function(object){
+    if (object.pivotObject){
+      object.updatePivot();
+      object.pivotObject.pseudoMesh.updateMatrix();
+      object.pivotObject.pseudoMesh.updateMatrixWorld();
+      return object.pivotObject.pseudoMesh.rotation.z;
+    }
     return object.mesh.rotation.z;
   };
   this.initialValueGetterFunctionsByType[this.actionTypes.OBJECT.POSITION_X] = function(object){
@@ -123,12 +141,36 @@ var AnimationHandler = function(){
     animation.attachedObject.mesh.scale.z = animation.initialValue;
   };
   this.afterAnimationSettersByType[this.actionTypes.OBJECT.ROTATION_X] = function(animation){
+    if (animation.attachedObject.pivotObject){
+      animation.attachedObject.pivotObject.pseudoMesh.rotation.x = animation.initialValue;
+      animation.attachedObject.updatePivot();
+      animation.attachedObject.pivotObject.updateMatrix();
+      animation.attachedObject.pivotObject.updateMatrixWorld();
+      animation.attachedObject.updateTransformBasedOnPivot();
+      return;
+    }
     animation.attachedObject.mesh.rotation.x = animation.initialValue;
   };
   this.afterAnimationSettersByType[this.actionTypes.OBJECT.ROTATION_Y] = function(animation){
+    if (animation.attachedObject.pivotObject){
+      animation.attachedObject.pivotObject.pseudoMesh.rotation.y = animation.initialValue;
+      animation.attachedObject.updatePivot();
+      animation.attachedObject.pivotObject.updateMatrix();
+      animation.attachedObject.pivotObject.updateMatrixWorld();
+      animation.attachedObject.updateTransformBasedOnPivot();
+      return;
+    }
     animation.attachedObject.mesh.rotation.y = animation.initialValue;
   };
   this.afterAnimationSettersByType[this.actionTypes.OBJECT.ROTATION_Z] = function(animation){
+    if (animation.attachedObject.pivotObject){
+      animation.attachedObject.pivotObject.pseudoMesh.rotation.z = animation.initialValue;
+      animation.attachedObject.updatePivot();
+      animation.attachedObject.pivotObject.updateMatrix();
+      animation.attachedObject.pivotObject.updateMatrixWorld();
+      animation.attachedObject.updateTransformBasedOnPivot();
+      return;
+    }
     animation.attachedObject.mesh.rotation.z = animation.initialValue;
   };
   this.afterAnimationSettersByType[this.actionTypes.OBJECT.POSITION_X] = function(animation){
@@ -325,12 +367,36 @@ AnimationHandler.prototype.updateObjectScaleZFunc = function(params){
   params.object.mesh.scale.z = params.value;
 }
 AnimationHandler.prototype.updateObjectRotationXFunc = function(params){
+  if (params.object.pivotObject){
+    params.object.pivotObject.pseudoMesh.rotation.x = params.value;
+    params.object.updatePivot();
+    params.object.pivotObject.updateMatrix();
+    params.object.pivotObject.updateMatrixWorld();
+    params.object.updateTransformBasedOnPivot();
+    return;
+  }
   params.object.mesh.rotation.x = params.value;
 }
 AnimationHandler.prototype.updateObjectRotationYFunc = function(params){
+  if (params.object.pivotObject){
+    params.object.pivotObject.pseudoMesh.rotation.y = params.value;
+    params.object.updatePivot();
+    params.object.pivotObject.updateMatrix();
+    params.object.pivotObject.updateMatrixWorld();
+    params.object.updateTransformBasedOnPivot();
+    return;
+  }
   params.object.mesh.rotation.y = params.value;
 }
 AnimationHandler.prototype.updateObjectRotationZFunc = function(params){
+  if (params.object.pivotObject){
+    params.object.pivotObject.pseudoMesh.rotation.z = params.value;
+    params.object.updatePivot();
+    params.object.pivotObject.updateMatrix();
+    params.object.pivotObject.updateMatrixWorld();
+    params.object.updateTransformBasedOnPivot();
+    return;
+  }
   params.object.mesh.rotation.z = params.value;
 }
 AnimationHandler.prototype.updateObjectPositionXFunc = function(params){

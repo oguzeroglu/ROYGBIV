@@ -2579,6 +2579,16 @@ AddedObject.prototype.makePivot = function(offsetX, offsetY, offsetZ){
   return pivot;
 }
 
+AddedObject.prototype.updateTransformBasedOnPivot = function(){
+  this.pivotObject.updateMatrix();
+  this.pivotObject.updateMatrixWorld();
+  this.pivotObject.pseudoMesh.updateMatrix();
+  this.pivotObject.pseudoMesh.updateMatrixWorld();
+  this.pivotObject.pseudoMesh.matrixWorld.decompose(REUSABLE_VECTOR, REUSABLE_QUATERNION, REUSABLE_VECTOR_2);
+  this.mesh.position.copy(REUSABLE_VECTOR);
+  this.mesh.quaternion.copy(REUSABLE_QUATERNION);
+}
+
 AddedObject.prototype.rotateAroundPivotObject = function(axis, radians){
   if (!this.pivotObject){
     return;
@@ -2593,13 +2603,7 @@ AddedObject.prototype.rotateAroundPivotObject = function(axis, radians){
   }else if (axis == "z"){
     this.pivotObject.rotation.z += radians;
   }
-  this.pivotObject.updateMatrix();
-  this.pivotObject.updateMatrixWorld();
-  this.pivotObject.pseudoMesh.updateMatrix();
-  this.pivotObject.pseudoMesh.updateMatrixWorld();
-  this.pivotObject.pseudoMesh.matrixWorld.decompose(REUSABLE_VECTOR, REUSABLE_QUATERNION, REUSABLE_VECTOR_2);
-  this.mesh.position.copy(REUSABLE_VECTOR);
-  this.mesh.quaternion.copy(REUSABLE_QUATERNION);
+  this.updateTransformBasedOnPivot();
   this.setPhysicsAfterRotationAroundPoint(axis, radians);
   if (this.mesh.visible){
     rayCaster.updateObject(this);
