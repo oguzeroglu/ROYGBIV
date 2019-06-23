@@ -298,17 +298,19 @@ AnimationHandler.prototype.assignUUIDToAnimation = function(animation){
 }
 
 AnimationHandler.prototype.forceFinish = function(animation){
-  if (typeof animation.initialValue == UNDEFINED){
+  if (!animation.isInitialValueAssigned()){
     return;
   }
   this.activeAnimations.delete(animation.uuid);
   this.afterAnimationSettersByType[animation.description.action](animation);
+  animation.invalidateInitialValue();
 }
 
 AnimationHandler.prototype.onAnimationFinished = function(animation){
   if (!animation.repeat){
     this.activeAnimations.delete(animation.uuid);
     this.afterAnimationSettersByType[animation.description.action](animation);
+    animation.invalidateInitialValue();
   }
 }
 
@@ -341,6 +343,7 @@ AnimationHandler.prototype.assignInitialValue = function(animation){
   }else if (animation.description.action == this.actionTypes.TEXT.TYPING){
     animation.params.sourceText = animation.attachedObject.text;
   }
+  animation.hasInitialValue = true;
 }
 
 AnimationHandler.prototype.startAnimation = function(animation){

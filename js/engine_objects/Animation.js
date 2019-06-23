@@ -22,6 +22,14 @@ var Animation = function(name, type, attachedObject, description, rewind, repeat
   animationHandler.assignUUIDToAnimation(this);
 }
 
+Animation.prototype.isInitialValueAssigned = function(){
+  return this.hasInitialValue;
+}
+
+Animation.prototype.invalidateInitialValue = function(){
+  this.hasInitialValue = false;
+}
+
 Animation.prototype.setFinishCallbackFunction = function(callbackFunction){
   this.finishCallbackFunction = callbackFunction;
 }
