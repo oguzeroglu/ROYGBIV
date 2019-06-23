@@ -28,6 +28,13 @@ Animation.prototype.isInitialValueAssigned = function(){
 
 Animation.prototype.invalidateInitialValue = function(){
   this.hasInitialValue = false;
+  if (this.description.action == animationHandler.actionTypes.OBJECT.TRANSLATE_X){
+    this.params.totalTranslationX = 0;
+  }else if (this.description.action == animationHandler.actionTypes.OBJECT.TRANSLATE_Y){
+    this.params.totalTranslationY = 0;
+  }else if (this.description.action == animationHandler.actionTypes.OBJECT.TRANSLATE_Z){
+    this.params.totalTranslationZ = 0;
+  }
 }
 
 Animation.prototype.setFinishCallbackFunction = function(callbackFunction){
@@ -55,13 +62,32 @@ Animation.prototype.onStart = function(initialValue){
     this.params.sourceColor.copy(this.attachedObject.getBackgroundColor());
   }else if (this.description.action == animationHandler.actionTypes.TEXT.TYPING){
     this.params.sourceText = this.attachedObject.text;
+  }else if (this.description.action == animationHandler.actionTypes.OBJECT.TRANSLATE_X){
+    this.params.totalTranslationX = 0;
+  }else if (this.description.action == animationHandler.actionTypes.OBJECT.TRANSLATE_Y){
+    this.params.totalTranslationY = 0;
+  }else if (this.description.action == animationHandler.actionTypes.OBJECT.TRANSLATE_Z){
+    this.params.totalTranslationZ = 0;
   }
   this.increaseTick = true;
 }
 
+Animation.prototype.onRepeat = function(){
+  if (this.description.action == animationHandler.actionTypes.OBJECT.TRANSLATE_X){
+    this.attachedObject.mesh.translateX(-1 * this.params.totalTranslationX);
+    this.params.totalTranslationX = 0;
+  }else if (this.description.action == animationHandler.actionTypes.OBJECT.TRANSLATE_Y){
+    this.attachedObject.mesh.translateY(-1 * this.params.totalTranslationY);
+    this.params.totalTranslationY = 0;
+  }else if (this.description.action == animationHandler.actionTypes.OBJECT.TRANSLATE_Z){
+    this.attachedObject.mesh.translateZ(-1 * this.params.totalTranslationZ);
+    this.params.totalTranslationZ = 0;
+  }
+}
+
 Animation.prototype.update = function(){
   this.params.value = this.updateFunction(this.tick, this.initialValue, this.changeInValue, this.totalTimeInSeconds);
-  this.actionFunction(this.params);
+  this.actionFunction(this.params, this.increaseTick);
   if (this.increaseTick){
     this.tick += STEP;
   }else{
@@ -74,6 +100,9 @@ Animation.prototype.update = function(){
       this.onFinished();
     }else{
       this.tick = 0;
+      if (!this.rewind){
+        this.onRepeat();
+      }
     }
     if (!this.rewind && this.finishCallbackFunction){
       this.finishCallbackFunction();

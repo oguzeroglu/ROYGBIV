@@ -20,7 +20,7 @@ var AnimationHandler = function(){
       ROTATION_X: "OBJECT_ROTATION_X", ROTATION_Y: "OBJECT_ROTATION_Y", ROTATION_Z: "OBJECT_ROTATION_Z", POSITION_X: "OBJECT_POSITION_X",
       POSITION_Y: "OBJECT_POSITION_Y", POSITION_Z: "OBJECT_POSITION_Z", EMISSIVE_INTENSITY: "OBJECT_EMISSIVE_INTENSITY", DISPLACEMENT_SCALE: "OBJECT_DISPLACEMENT_SCALE",
       DISPLACEMENT_BIAS: "OBJECT_DISPLACEMENT_BIAS", EMISSIVE_COLOR: "OBJECT_EMISSIVE_COLOR", TEXTURE_OFFSET_X: "OBJECT_TEXTURE_OFFSET_X",
-      TEXTURE_OFFSET_Y: "OBJECT_TEXTURE_OFFSET_Y"
+      TEXTURE_OFFSET_Y: "OBJECT_TEXTURE_OFFSET_Y", TRANSLATE_X: "OBJECT_TRANSLATE_X", TRANSLATE_Y: "OBJECT_TRANSLATE_Y", TRANSLATE_Z: "OBJECT_TRANSLATE_Z"
     },
     TEXT: {
       TRANSPARENCY: "TEXT_TRANSPARENCY", CHAR_SIZE: "TEXT_CHAR_SIZE", MARGIN_BETWEEN_CHARS: "TEXT_MARGIN_BETWEEN_CHARS",
@@ -96,36 +96,45 @@ var AnimationHandler = function(){
   this.initialValueGetterFunctionsByType[this.actionTypes.OBJECT.TEXTURE_OFFSET_Y] = function(object){
     return object.getTextureOffsetY();
   };
+  this.initialValueGetterFunctionsByType[this.actionTypes.OBJECT.TRANSLATE_X] = function(object){
+    return 0;
+  };
+  this.initialValueGetterFunctionsByType[this.actionTypes.OBJECT.TRANSLATE_Y] = function(object){
+    return 0;
+  };
+  this.initialValueGetterFunctionsByType[this.actionTypes.OBJECT.TRANSLATE_Z] = function(object){
+    return 0;
+  };
   this.initialValueGetterFunctionsByType[this.actionTypes.TEXT.TRANSPARENCY] = function(object){
     return object.getAlpha();
-  }
+  };
   this.initialValueGetterFunctionsByType[this.actionTypes.TEXT.CHAR_SIZE] = function(object){
     return object.getCharSize();
-  }
+  };
   this.initialValueGetterFunctionsByType[this.actionTypes.TEXT.MARGIN_BETWEEN_CHARS] = function(object){
     return object.getMarginBetweenChars();
-  }
+  };
   this.initialValueGetterFunctionsByType[this.actionTypes.TEXT.MARGIN_BETWEEN_LINES] = function(object){
     return object.getMarginBetweenLines();
-  }
+  };
   this.initialValueGetterFunctionsByType[this.actionTypes.TEXT.POSITION_X] = function(object){
     return object.getPositionX();
-  }
+  };
   this.initialValueGetterFunctionsByType[this.actionTypes.TEXT.POSITION_Y] = function(object){
     return object.getPositionY();
-  }
+  };
   this.initialValueGetterFunctionsByType[this.actionTypes.TEXT.POSITION_Z] = function(object){
     return object.getPositionZ();
-  }
+  };
   this.initialValueGetterFunctionsByType[this.actionTypes.TEXT.TEXT_COLOR] = function(object){
     return 0;
-  }
+  };
   this.initialValueGetterFunctionsByType[this.actionTypes.TEXT.BACKGROUND_COLOR] = function(object){
     return 0;
-  }
+  };
   this.initialValueGetterFunctionsByType[this.actionTypes.TEXT.TYPING] = function(object){
     return 0;
-  }
+  };
   // AFTER ANIMATION SETTER FUNCTIONS
   this.afterAnimationSettersByType = new Object();
   this.afterAnimationSettersByType[this.actionTypes.OBJECT.TRANSPARENCY] = function(animation){
@@ -200,6 +209,15 @@ var AnimationHandler = function(){
   this.afterAnimationSettersByType[this.actionTypes.OBJECT.TEXTURE_OFFSET_Y] = function(animation){
     animation.attachedObject.setTextureOffsetY(animation.initialValue);
   };
+  this.afterAnimationSettersByType[this.actionTypes.OBJECT.TRANSLATE_X] = function(animation){
+    animation.attachedObject.mesh.translateX(-1 * animation.params.totalTranslationX);
+  };
+  this.afterAnimationSettersByType[this.actionTypes.OBJECT.TRANSLATE_Y] = function(animation){
+    animation.attachedObject.mesh.translateY(-1 * animation.params.totalTranslationY);
+  };
+  this.afterAnimationSettersByType[this.actionTypes.OBJECT.TRANSLATE_Z] = function(animation){
+    animation.attachedObject.mesh.translateZ(-1 * animation.params.totalTranslationZ);
+  };
   this.afterAnimationSettersByType[this.actionTypes.TEXT.TRANSPARENCY] = function(animation){
     animation.attachedObject.setAlpha(animation.initialValue);
   };
@@ -248,6 +266,9 @@ var AnimationHandler = function(){
   this.actionFunctionsByType[this.actionTypes.OBJECT.EMISSIVE_COLOR] = this.updateObjectEmissiveColor;
   this.actionFunctionsByType[this.actionTypes.OBJECT.TEXTURE_OFFSET_X] = this.updateObjectTextureOffsetX;
   this.actionFunctionsByType[this.actionTypes.OBJECT.TEXTURE_OFFSET_Y] = this.updateObjectTextureOffsetY;
+  this.actionFunctionsByType[this.actionTypes.OBJECT.TRANSLATE_X] = this.updateObjectTranslationX;
+  this.actionFunctionsByType[this.actionTypes.OBJECT.TRANSLATE_Y] = this.updateObjectTranslationY;
+  this.actionFunctionsByType[this.actionTypes.OBJECT.TRANSLATE_Z] = this.updateObjectTranslationZ;
   this.actionFunctionsByType[this.actionTypes.TEXT.TRANSPARENCY] = this.updateTextTransparencyFunc;
   this.actionFunctionsByType[this.actionTypes.TEXT.CHAR_SIZE] = this.updateTextCharSizeFunc;
   this.actionFunctionsByType[this.actionTypes.TEXT.MARGIN_BETWEEN_CHARS] = this.updateTextMarginBetweenCharsFunc;
@@ -342,6 +363,12 @@ AnimationHandler.prototype.assignInitialValue = function(animation){
     animation.params.sourceColor.copy(animation.attachedObject.getBackgroundColor());
   }else if (animation.description.action == this.actionTypes.TEXT.TYPING){
     animation.params.sourceText = animation.attachedObject.text;
+  }else if (animation.description.action == this.actionTypes.OBJECT.TRANSLATE_X){
+    animation.params.totalTranslationX = 0;
+  }else if (animation.description.action == this.actionTypes.OBJECT.TRANSLATE_Y){
+    animation.params.totalTranslationY = 0;
+  }else if (animation.description.action == this.actionTypes.OBJECT.TRANSLATE_Z){
+    animation.params.totalTranslationZ = 0;
   }
   animation.hasInitialValue = true;
 }
@@ -429,6 +456,21 @@ AnimationHandler.prototype.updateObjectTextureOffsetX = function(params){
 }
 AnimationHandler.prototype.updateObjectTextureOffsetY = function(params){
   params.object.setTextureOffsetY(params.value);
+}
+AnimationHandler.prototype.updateObjectTranslationX = function(params, increaseTick){
+  var coef = increaseTick? 1: -1;
+  params.object.mesh.translateX(coef * params.value);
+  params.totalTranslationX += coef * params.value;
+}
+AnimationHandler.prototype.updateObjectTranslationY = function(params, increaseTick){
+  var coef = increaseTick? 1: -1;
+  params.object.mesh.translateY(coef * params.value);
+  params.totalTranslationY += coef * params.value;
+}
+AnimationHandler.prototype.updateObjectTranslationZ = function(params, increaseTick){
+  var coef = increaseTick? 1: -1;
+  params.object.mesh.translateZ(coef * params.value);
+  params.totalTranslationZ += coef * params.value;
 }
 AnimationHandler.prototype.updateTextTransparencyFunc = function(params){
   params.object.setAlpha(params.value);
