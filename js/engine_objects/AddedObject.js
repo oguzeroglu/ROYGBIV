@@ -2593,6 +2593,16 @@ AddedObject.prototype.rotateAroundPivotObject = function(axis, radians){
   if (!this.pivotObject){
     return;
   }
+  for (var animName in this.animations){
+    var anim = this.animations[animName];
+    if (!anim.isActive){
+      continue;
+    }
+    var action = anim.description.action;
+    if (action == animationHandler.actionTypes.OBJECT.TRANSLATE_X || action == animationHandler.actionTypes.OBJECT.TRANSLATE_Y || action == animationHandler.actionTypes.OBJECT.TRANSLATE_Z){
+      animationHandler.onBeforePivotRotation(anim);
+    }
+  }
   this.updatePivot();
   this.pivotObject.updateMatrix();
   this.pivotObject.updateMatrixWorld();
@@ -2607,6 +2617,16 @@ AddedObject.prototype.rotateAroundPivotObject = function(axis, radians){
   this.setPhysicsAfterRotationAroundPoint(axis, radians);
   if (this.mesh.visible){
     rayCaster.updateObject(this);
+  }
+  for (var animName in this.animations){
+    var anim = this.animations[animName];
+    if (!anim.isActive){
+      continue;
+    }
+    var action = anim.description.action;
+    if (action == animationHandler.actionTypes.OBJECT.TRANSLATE_X || action == animationHandler.actionTypes.OBJECT.TRANSLATE_Y || action == animationHandler.actionTypes.OBJECT.TRANSLATE_Z){
+      animationHandler.onAfterPivotRotation(anim);
+    }
   }
 }
 

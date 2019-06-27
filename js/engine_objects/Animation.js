@@ -20,6 +20,39 @@ var Animation = function(name, type, attachedObject, description, rewind, repeat
     this.changeInValue = this.description.changeInValue;
   }
   animationHandler.assignUUIDToAnimation(this);
+  this.savedState = {
+    initialValue: 0, tick: 0, increaseTick: false, totalTranslationX: 0, totalTranslationY: 0, totalTranslationZ: 0
+  }
+  this.isActive = false;
+}
+
+Animation.prototype.restore = function(){
+  this.initialValue = this.savedState.initialValue;
+  this.tick = this.savedState.tick;
+  this.increaseTick = this.savedState.increaseTick;
+  if (this.description.action == animationHandler.actionTypes.OBJECT.TRANSLATE_X){
+    this.params.totalTranslationX = this.savedState.totalTranslationX;
+    this.attachedObject.mesh.translateX(this.savedState.totalTranslationX);
+  }else if (this.description.action == animationHandler.actionTypes.OBJECT.TRANSLATE_Y){
+    this.params.totalTranslationY = this.savedState.totalTranslationY;
+    this.attachedObject.mesh.translateY(this.savedState.totalTranslationY);
+  }else if (this.description.action == animationHandler.actionTypes.OBJECT.TRANSLATE_Z){
+    this.params.totalTranslationZ = this.savedState.totalTranslationZ;
+    this.attachedObject.mesh.translateZ(this.savedState.totalTranslationZ);
+  }
+}
+
+Animation.prototype.saveState = function(){
+  this.savedState.initialValue = this.initialValue;
+  this.savedState.tick = this.tick;
+  this.savedState.increaseTick = this.increaseTick;
+  if (this.description.action == animationHandler.actionTypes.OBJECT.TRANSLATE_X){
+    this.savedState.totalTranslationX = this.params.totalTranslationX;
+  }else if (this.description.action == animationHandler.actionTypes.OBJECT.TRANSLATE_Y){
+    this.savedState.totalTranslationY = this.params.totalTranslationY;
+  }else if (this.description.action == animationHandler.actionTypes.OBJECT.TRANSLATE_Z){
+    this.savedState.totalTranslationZ = this.params.totalTranslationZ;
+  }
 }
 
 Animation.prototype.isInitialValueAssigned = function(){
@@ -49,6 +82,7 @@ Animation.prototype.export = function(){
 
 Animation.prototype.onFinished = function(){
   animationHandler.onAnimationFinished(this);
+  this.isActive = false;
 }
 
 Animation.prototype.onStart = function(initialValue){
@@ -70,6 +104,7 @@ Animation.prototype.onStart = function(initialValue){
     this.params.totalTranslationZ = 0;
   }
   this.increaseTick = true;
+  this.isActive = true;
 }
 
 Animation.prototype.onRepeat = function(){

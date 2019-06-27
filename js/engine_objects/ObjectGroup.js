@@ -2301,9 +2301,29 @@ ObjectGroup.prototype.makePivot = function(offsetX, offsetY, offsetZ){
   return pivot;
 }
 
+ObjectGroup.prototype.updateTransformBasedOnPivot = function(){
+  this.pivotObject.updateMatrix();
+  this.pivotObject.updateMatrixWorld();
+  this.pivotObject.pseudoMesh.updateMatrix();
+  this.pivotObject.pseudoMesh.updateMatrixWorld();
+  this.pivotObject.pseudoMesh.matrixWorld.decompose(REUSABLE_VECTOR, REUSABLE_QUATERNION, REUSABLE_VECTOR_2);
+  this.mesh.position.copy(REUSABLE_VECTOR);
+  this.mesh.quaternion.copy(REUSABLE_QUATERNION);
+}
+
 ObjectGroup.prototype.rotateAroundPivotObject = function(axis, radians){
   if (!this.pivotObject){
     return;
+  }
+  for (var animName in this.animations){
+    var anim = this.animations[animName];
+    if (!anim.isActive){
+      continue;
+    }
+    var action = anim.description.action;
+    if (action == animationHandler.actionTypes.OBJECT.TRANSLATE_X || action == animationHandler.actionTypes.OBJECT.TRANSLATE_Y || action == animationHandler.actionTypes.OBJECT.TRANSLATE_Z){
+      animationHandler.onBeforePivotRotation(anim);
+    }
   }
   this.updatePivot();
   this.pivotObject.updateMatrix();
@@ -2319,14 +2339,7 @@ ObjectGroup.prototype.rotateAroundPivotObject = function(axis, radians){
     axisVector = THREE_AXIS_VECTOR_Z;
     this.pivotObject.rotation.z += radians;
   }
-  this.pivotObject.updateMatrix();
-  this.pivotObject.updateMatrixWorld();
-  this.pivotObject.pseudoMesh.updateMatrix();
-  this.pivotObject.pseudoMesh.updateMatrixWorld();
-  this.pivotObject.pseudoMesh.matrixWorld.decompose(REUSABLE_VECTOR, REUSABLE_QUATERNION, REUSABLE_VECTOR_2);
-  this.mesh.position.copy(REUSABLE_VECTOR);
-  this.mesh.quaternion.copy(REUSABLE_QUATERNION);
-
+  this.updateTransformBasedOnPivot();
   this.physicsBody.quaternion.copy(this.mesh.quaternion);
   this.physicsBody.position.copy(this.mesh.position);
   if (this.isPhysicsSimplified){
@@ -2339,6 +2352,16 @@ ObjectGroup.prototype.rotateAroundPivotObject = function(axis, radians){
 
   if (this.mesh.visible){
     rayCaster.updateObject(this);
+  }
+  for (var animName in this.animations){
+    var anim = this.animations[animName];
+    if (!anim.isActive){
+      continue;
+    }
+    var action = anim.description.action;
+    if (action == animationHandler.actionTypes.OBJECT.TRANSLATE_X || action == animationHandler.actionTypes.OBJECT.TRANSLATE_Y || action == animationHandler.actionTypes.OBJECT.TRANSLATE_Z){
+      animationHandler.onAfterPivotRotation(anim);
+    }
   }
 }
 

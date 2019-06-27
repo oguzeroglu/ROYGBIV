@@ -318,6 +318,15 @@ AnimationHandler.prototype.assignUUIDToAnimation = function(animation){
   animation.uuid = this.uuidCounter ++;
 }
 
+AnimationHandler.prototype.onBeforePivotRotation = function(animation){
+  animation.saveState();
+  this.afterAnimationSettersByType[animation.description.action](animation);
+}
+
+AnimationHandler.prototype.onAfterPivotRotation = function(animation){
+  animation.restore();
+}
+
 AnimationHandler.prototype.forceFinish = function(animation){
   if (!animation.isInitialValueAssigned()){
     return;
