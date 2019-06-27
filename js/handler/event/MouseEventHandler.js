@@ -21,6 +21,32 @@ var MouseEventHandler = function(){
     cliDiv.addEventListener("click", this.onCliDivClick);
     cliDiv.addEventListener("mousemove", this.onCliDivMouseMove);
   }
+  this.eventBuffer = {
+    mouseMove: {
+      needsFlush: false, event: null
+    },
+    mouseDown: {
+      needsFlush: false, event: null
+    },
+    mouseUp: {
+      needsFlush: false, event: null
+    }
+  };
+}
+
+MouseEventHandler.prototype.flush = function(){
+  if (this.eventBuffer.mouseMove.needsFlush){
+    activeControl.onMouseMove(this.eventBuffer.mouseMove.event);
+    this.eventBuffer.mouseMove.needsFlush = false;
+  }
+  if (this.eventBuffer.mouseDown.needsFlush){
+    activeControl.onMouseDown(this.eventBuffer.mouseDown.event);
+    this.eventBuffer.mouseDown.needsFlush = false;
+  }
+  if (this.eventBuffer.mouseUp.needsFlush){
+    activeControl.onMouseUp(this.eventBuffer.mouseUp.event);
+    this.eventBuffer.mouseUp.needsFlush = false;
+  }
 }
 
 MouseEventHandler.prototype.onCliDivMouseMove = function(event){
@@ -107,7 +133,8 @@ MouseEventHandler.prototype.onMouseMove = function(event){
   if (mode == 1 && screenMouseMoveCallbackFunction){
     screenMouseMoveCallbackFunction(mouseEventHandler.coordX, mouseEventHandler.coordY, mouseEventHandler.movementX, mouseEventHandler.movementY);
   }
-  activeControl.onMouseMove(event);
+  mouseEventHandler.eventBuffer.mouseMove.needsFlush = true;
+  mouseEventHandler.eventBuffer.mouseMove.event = event;
   if (isMouseDown && !isMobile){
     mouseEventHandler.onDrag(mouseEventHandler.x, mouseEventHandler.y, mouseEventHandler.movementX, mouseEventHandler.movementY);
   }
@@ -122,7 +149,8 @@ MouseEventHandler.prototype.onMouseUp = function(event){
     screenMouseUpCallbackFunction(coordX, coordY);
   }
   isMouseDown = false;
-  activeControl.onMouseUp(event);
+  mouseEventHandler.eventBuffer.mouseUp.event = event;
+  mouseEventHandler.eventBuffer.mouseUp.needsFlush = true;
 }
 
 MouseEventHandler.prototype.onMouseDown = function(event){
@@ -137,7 +165,8 @@ MouseEventHandler.prototype.onMouseDown = function(event){
     screenMouseDownCallbackFunction(coordX, coordY);
   }
   isMouseDown = true;
-  activeControl.onMouseDown(event);
+  mouseEventHandler.eventBuffer.mouseDown.event = event;
+  mouseEventHandler.eventBuffer.mouseDown.needsFlush = true;
 }
 
 MouseEventHandler.prototype.onClick = function(event, fromTap){

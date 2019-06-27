@@ -50,6 +50,9 @@ function render(){
     previewSceneRendered = true;
   }
   cpuOperationsHandler.updateRaycaster();
+  if (!isMobile){
+    cpuOperationsHandler.flushMouseEventHandler();
+  }
   fpsHandler.end();
 }
 
