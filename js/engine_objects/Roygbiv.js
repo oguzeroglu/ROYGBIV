@@ -765,14 +765,14 @@ Roygbiv.prototype.opacity = function(object, delta){
     object.initOpacitySet = true;
   }
   object.incrementOpacity(delta);
-  if (isAddedObject){
+  if (object.isAddedObject){
     if (object.mesh.material.uniforms.alpha.value < 0){
       object.updateOpacity(0);
     }
     if (object.mesh.material.uniforms.alpha.value > 1){
       object.updateOpacity(1);
     }
-  }else if (isObjectGroup){
+  }else if (object.isObjectGroup){
     if (object.mesh.material.uniforms.totalAlpha.value < 0){
       object.updateOpacity(0);
     }
