@@ -1170,14 +1170,23 @@ AddedObject.prototype.getOpacity = function(){
 
 AddedObject.prototype.incrementOpacity = function(val){
   this.mesh.material.uniforms.alpha.value += val;
+  if (this.autoInstancedParent){
+    this.autoInstancedParent.updateObject(this);
+  }
 }
 
 AddedObject.prototype.updateOpacity = function(val){
   this.mesh.material.uniforms.alpha.value = val;
+  if (this.autoInstancedParent){
+    this.autoInstancedParent.updateObject(this);
+  }
 }
 
 AddedObject.prototype.multiplyOpacity = function(val){
   this.mesh.material.uniforms.alpha.value *= val;
+  if (this.autoInstancedParent){
+    this.autoInstancedParent.updateObject(this);
+  }
 }
 
 AddedObject.prototype.updateMVMatrix = function(){

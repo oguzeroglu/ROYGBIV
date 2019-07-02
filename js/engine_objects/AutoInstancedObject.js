@@ -11,11 +11,18 @@ AutoInstancedObject.prototype.useCustomShaderPrecision = function(precision){
 
 AutoInstancedObject.prototype.updateObject = function(object){
   var index = this.orientationIndicesByObjectName.get(object.name);
+  var alphaIndex = this.alphaIndicesByObjectName.get(object.name);
   var orientationAry = this.mesh.material.uniforms.autoInstanceOrientationArray.value;
+  var alphaAry = this.mesh.material.uniforms.autoInstanceAlphaArray.value;
   var position = object.mesh.position;
   var quaternion = object.mesh.quaternion;
+  var alpha = object.getOpacity();
   orientationAry[index].set(orientationAry[index].x, position.x, position.y, position.z);
   orientationAry[index+1].set(quaternion.x, quaternion.y, quaternion.z, quaternion.w);
+  alphaAry[alphaIndex] = alpha;
+  if (alpha != 1){
+    this.mesh.material.transparent = true;
+  }
 }
 
 AutoInstancedObject.prototype.hideObject = function(object){
@@ -60,6 +67,7 @@ AutoInstancedObject.prototype.init = function(){
   this.mesh = meshGenerator.generateInstancedMesh(pseudoGraphicsGroup, this.pseudoObjectGroup);
   this.mesh.geometry.removeAttribute("positionOffset");
   this.mesh.geometry.removeAttribute("quaternion");
+  this.mesh.geometry.removeAttribute("alpha");
   this.mesh.frustumCulled = false;
   webglCallbackHandler.registerEngineObject(this);
   if (this.pseudoObjectGroup.aoTexture){
@@ -85,20 +93,26 @@ AutoInstancedObject.prototype.init = function(){
   var curIndex = 0;
   var forcedColorIndex = 0;
   this.orientationIndicesByObjectName = new Map();
+  this.alphaIndicesByObjectName = new Map();
   this.forcedColorIndicesByObjectName = new Map();
   var orientationIndices = [];
+  var alphaIndices = [];
   var orientationAry = [];
+  var alphaAry = [];
   var forcedColorAry = [];
   var forcedColorIndices = [];
   var hasColorizableMember = false;
   for (var objName in this.objects){
     var obj = this.objects[objName];
     this.orientationIndicesByObjectName.set(objName, curIndex);
+    this.alphaIndicesByObjectName.set(objName, objCount);
     orientationIndices.push(curIndex);
+    alphaIndices.push(objCount);
     curIndex += 2;
     objCount ++;
     orientationAry.push(new THREE.Vector4(10, obj.mesh.position.x, obj.mesh.position.y, obj.mesh.position.z));
     orientationAry.push(new THREE.Vector4(obj.mesh.quaternion.x, obj.mesh.quaternion.y, obj.mesh.quaternion.z, obj.mesh.quaternion.w));
+    alphaAry.push(obj.getOpacity());
     obj.autoInstancedParent = this;
     if (obj.isColorizable){
       hasColorizableMember = true;
@@ -109,10 +123,15 @@ AutoInstancedObject.prototype.init = function(){
     forcedColorIndex ++;
   }
   var orientationIndicesBufferAttribute = new THREE.InstancedBufferAttribute(new Float32Array(orientationIndices), 1);
+  var alphaIndicesBufferAttribute = new THREE.InstancedBufferAttribute(new Float32Array(alphaIndices), 1);
   orientationIndicesBufferAttribute.setDynamic(false);
+  alphaIndicesBufferAttribute.setDynamic(false);
   this.mesh.geometry.addAttribute("orientationIndex", orientationIndicesBufferAttribute);
+  this.mesh.geometry.addAttribute("alphaIndex", alphaIndicesBufferAttribute);
   macroHandler.injectMacro("AUTO_INSTANCE_ORIENTATION_ARRAY_SIZE "+(objCount * 2), this.mesh.material, true, false);
+  macroHandler.injectMacro("AUTO_INSTANCE_ALPHA_ARRAY_SIZE "+objCount, this.mesh.material, true, false);
   this.mesh.material.uniforms.autoInstanceOrientationArray = new THREE.Uniform(orientationAry);
+  this.mesh.material.uniforms.autoInstanceAlphaArray = new THREE.Uniform(alphaAry);
   if (hasColorizableMember){
     macroHandler.injectMacro("AUTO_INSTANCE_FORCED_COLOR_ARRAY_SIZE "+(objCount), this.mesh.material, true, false);
     macroHandler.injectMacro("AUTO_INSTANCE_HAS_COLORIZABLE_MEMBER", this.mesh.material, true, true);

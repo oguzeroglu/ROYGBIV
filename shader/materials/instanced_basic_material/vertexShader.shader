@@ -1,7 +1,6 @@
 precision lowp float;
 precision lowp int;
 
-attribute float alpha;
 attribute vec3 color;
 attribute vec3 position;
 
@@ -15,7 +14,9 @@ varying float vAlpha;
 
 #ifdef IS_AUTO_INSTANCED
   attribute float orientationIndex;
+  attribute float alphaIndex;
   uniform vec4 autoInstanceOrientationArray[AUTO_INSTANCE_ORIENTATION_ARRAY_SIZE];
+  uniform float autoInstanceAlphaArray[AUTO_INSTANCE_ALPHA_ARRAY_SIZE];
   varying float vDiscardFlag;
   #ifdef AUTO_INSTANCE_HAS_COLORIZABLE_MEMBER
     attribute float forcedColorIndex;
@@ -25,6 +26,7 @@ varying float vAlpha;
 #else
   attribute vec3 positionOffset;
   attribute vec4 quaternion;
+  attribute float alpha;
 #endif
 
 #ifdef HAS_EMISSIVE
@@ -100,7 +102,11 @@ void main(){
     #endif
   #endif
 
-  vAlpha = alpha;
+  #ifdef IS_AUTO_INSTANCED
+    vAlpha = autoInstanceAlphaArray[int(alphaIndex)];
+  #else
+    vAlpha = alpha;
+  #endif
   vColor = color;
   #ifdef HAS_TEXTURE
     vUV = (
