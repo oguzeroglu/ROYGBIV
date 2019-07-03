@@ -211,12 +211,21 @@ var AnimationHandler = function(){
   };
   this.afterAnimationSettersByType[this.actionTypes.OBJECT.POSITION_X] = function(animation){
     animation.attachedObject.mesh.position.x = animation.initialValue;
+    if (animation.attachedObject.autoInstancedParent){
+      animation.attachedObject.autoInstancedParent.updateObject(animation.attachedObject);
+    }
   };
   this.afterAnimationSettersByType[this.actionTypes.OBJECT.POSITION_Y] = function(animation){
     animation.attachedObject.mesh.position.y = animation.initialValue;
+    if (animation.attachedObject.autoInstancedParent){
+      animation.attachedObject.autoInstancedParent.updateObject(animation.attachedObject);
+    }
   };
   this.afterAnimationSettersByType[this.actionTypes.OBJECT.POSITION_Z] = function(animation){
     animation.attachedObject.mesh.position.z = animation.initialValue;
+    if (animation.attachedObject.autoInstancedParent){
+      animation.attachedObject.autoInstancedParent.updateObject(animation.attachedObject);
+    }
   };
   this.afterAnimationSettersByType[this.actionTypes.OBJECT.EMISSIVE_INTENSITY] = function(animation){
     animation.attachedObject.setEmissiveIntensity(animation.initialValue);
@@ -494,12 +503,21 @@ AnimationHandler.prototype.updateObjectRotationZFunc = function(params){
 }
 AnimationHandler.prototype.updateObjectPositionXFunc = function(params){
   params.object.mesh.position.x = params.value;
+  if (params.object.autoInstancedParent){
+    params.object.autoInstancedParent.updateObject(params.object);
+  }
 }
 AnimationHandler.prototype.updateObjectPositionYFunc = function(params){
   params.object.mesh.position.y = params.value;
+  if (params.object.autoInstancedParent){
+    params.object.autoInstancedParent.updateObject(params.object);
+  }
 }
 AnimationHandler.prototype.updateObjectPositionZFunc = function(params){
   params.object.mesh.position.z = params.value;
+  if (params.object.autoInstancedParent){
+    params.object.autoInstancedParent.updateObject(params.object);
+  }
 }
 AnimationHandler.prototype.updateObjectEmissiveIntensity = function(params){
   params.object.setEmissiveIntensity(params.value);
