@@ -15,7 +15,9 @@ varying float vAlpha;
 #ifdef IS_AUTO_INSTANCED
   attribute float orientationIndex;
   attribute float alphaIndex;
+  attribute float scaleIndex;
   uniform vec4 autoInstanceOrientationArray[AUTO_INSTANCE_ORIENTATION_ARRAY_SIZE];
+  uniform vec3 autoInstanceScaleArray[AUTO_INSTANCE_SCALE_ARRAY_SIZE];
   uniform float autoInstanceAlphaArray[AUTO_INSTANCE_ALPHA_ARRAY_SIZE];
   varying float vDiscardFlag;
   #ifdef AUTO_INSTANCE_HAS_COLORIZABLE_MEMBER
@@ -161,6 +163,8 @@ void main(){
   #ifdef IS_AUTO_INSTANCED
     #ifdef FPS_WEAPON_SCALE
       transformedPosition *= FPS_WEAPON_SCALE;
+    #else
+      transformedPosition *= autoInstanceScaleArray[int(scaleIndex)];
     #endif
     vec3 positionOffset = autoInstanceOrientationArray[oi].yzw;
     vec4 quaternion = autoInstanceOrientationArray[oi+1];

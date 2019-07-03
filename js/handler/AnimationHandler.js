@@ -142,12 +142,21 @@ var AnimationHandler = function(){
   };
   this.afterAnimationSettersByType[this.actionTypes.OBJECT.SCALE_X] = function(animation){
     animation.attachedObject.mesh.scale.x = animation.initialValue;
+    if (animation.attachedObject.autoInstancedParent){
+      animation.attachedObject.autoInstancedParent.updateObject(animation.attachedObject);
+    }
   };
   this.afterAnimationSettersByType[this.actionTypes.OBJECT.SCALE_Y] = function(animation){
     animation.attachedObject.mesh.scale.y = animation.initialValue;
+    if (animation.attachedObject.autoInstancedParent){
+      animation.attachedObject.autoInstancedParent.updateObject(animation.attachedObject);
+    }
   };
   this.afterAnimationSettersByType[this.actionTypes.OBJECT.SCALE_Z] = function(animation){
     animation.attachedObject.mesh.scale.z = animation.initialValue;
+    if (animation.attachedObject.autoInstancedParent){
+      animation.attachedObject.autoInstancedParent.updateObject(animation.attachedObject);
+    }
   };
   this.afterAnimationSettersByType[this.actionTypes.OBJECT.ROTATION_X] = function(animation){
     if (animation.attachedObject.pivotObject){
@@ -398,12 +407,21 @@ AnimationHandler.prototype.updateObjectTransparencyFunc = function(params){
 }
 AnimationHandler.prototype.updateObjectScaleXFunc = function(params){
   params.object.mesh.scale.x = params.value;
+  if (params.object.autoInstancedParent){
+    params.object.autoInstancedParent.updateObject(params.object);
+  }
 }
 AnimationHandler.prototype.updateObjectScaleYFunc = function(params){
   params.object.mesh.scale.y = params.value;
+  if (params.object.autoInstancedParent){
+    params.object.autoInstancedParent.updateObject(params.object);
+  }
 }
 AnimationHandler.prototype.updateObjectScaleZFunc = function(params){
   params.object.mesh.scale.z = params.value;
+  if (params.object.autoInstancedParent){
+    params.object.autoInstancedParent.updateObject(params.object);
+  }
 }
 AnimationHandler.prototype.updateObjectRotationXFunc = function(params){
   if (params.object.pivotObject){
