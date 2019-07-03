@@ -165,9 +165,15 @@ var AnimationHandler = function(){
       animation.attachedObject.pivotObject.updateMatrix();
       animation.attachedObject.pivotObject.updateMatrixWorld();
       animation.attachedObject.updateTransformBasedOnPivot();
+      if (animation.attachedObject.autoInstancedParent){
+        animation.attachedObject.autoInstancedParent.updateObject(animation.attachedObject);
+      }
       return;
     }
     animation.attachedObject.mesh.rotation.x = animation.initialValue;
+    if (animation.attachedObject.autoInstancedParent){
+      animation.attachedObject.autoInstancedParent.updateObject(animation.attachedObject);
+    }
   };
   this.afterAnimationSettersByType[this.actionTypes.OBJECT.ROTATION_Y] = function(animation){
     if (animation.attachedObject.pivotObject){
@@ -176,9 +182,15 @@ var AnimationHandler = function(){
       animation.attachedObject.pivotObject.updateMatrix();
       animation.attachedObject.pivotObject.updateMatrixWorld();
       animation.attachedObject.updateTransformBasedOnPivot();
+      if (animation.attachedObject.autoInstancedParent){
+        animation.attachedObject.autoInstancedParent.updateObject(animation.attachedObject);
+      }
       return;
     }
     animation.attachedObject.mesh.rotation.y = animation.initialValue;
+    if (animation.attachedObject.autoInstancedParent){
+      animation.attachedObject.autoInstancedParent.updateObject(animation.attachedObject);
+    }
   };
   this.afterAnimationSettersByType[this.actionTypes.OBJECT.ROTATION_Z] = function(animation){
     if (animation.attachedObject.pivotObject){
@@ -187,9 +199,15 @@ var AnimationHandler = function(){
       animation.attachedObject.pivotObject.updateMatrix();
       animation.attachedObject.pivotObject.updateMatrixWorld();
       animation.attachedObject.updateTransformBasedOnPivot();
+      if (animation.attachedObject.autoInstancedParent){
+        animation.attachedObject.autoInstancedParent.updateObject(animation.attachedObject);
+      }
       return;
     }
     animation.attachedObject.mesh.rotation.z = animation.initialValue;
+    if (animation.attachedObject.autoInstancedParent){
+      animation.attachedObject.autoInstancedParent.updateObject(animation.attachedObject);
+    }
   };
   this.afterAnimationSettersByType[this.actionTypes.OBJECT.POSITION_X] = function(animation){
     animation.attachedObject.mesh.position.x = animation.initialValue;
@@ -430,9 +448,15 @@ AnimationHandler.prototype.updateObjectRotationXFunc = function(params){
     params.object.pivotObject.updateMatrix();
     params.object.pivotObject.updateMatrixWorld();
     params.object.updateTransformBasedOnPivot();
+    if (params.object.autoInstancedParent){
+      params.object.autoInstancedParent.updateObject(params.object);
+    }
     return;
   }
   params.object.mesh.rotation.x = params.value;
+  if (params.object.autoInstancedParent){
+    params.object.autoInstancedParent.updateObject(params.object);
+  }
 }
 AnimationHandler.prototype.updateObjectRotationYFunc = function(params){
   if (params.object.pivotObject){
@@ -441,9 +465,15 @@ AnimationHandler.prototype.updateObjectRotationYFunc = function(params){
     params.object.pivotObject.updateMatrix();
     params.object.pivotObject.updateMatrixWorld();
     params.object.updateTransformBasedOnPivot();
+    if (params.object.autoInstancedParent){
+      params.object.autoInstancedParent.updateObject(params.object);
+    }
     return;
   }
   params.object.mesh.rotation.y = params.value;
+  if (params.object.autoInstancedParent){
+    params.object.autoInstancedParent.updateObject(params.object);
+  }
 }
 AnimationHandler.prototype.updateObjectRotationZFunc = function(params){
   if (params.object.pivotObject){
@@ -452,9 +482,15 @@ AnimationHandler.prototype.updateObjectRotationZFunc = function(params){
     params.object.pivotObject.updateMatrix();
     params.object.pivotObject.updateMatrixWorld();
     params.object.updateTransformBasedOnPivot();
+    if (params.object.autoInstancedParent){
+      params.object.autoInstancedParent.updateObject(params.object);
+    }
     return;
   }
   params.object.mesh.rotation.z = params.value;
+  if (params.object.autoInstancedParent){
+    params.object.autoInstancedParent.updateObject(params.object);
+  }
 }
 AnimationHandler.prototype.updateObjectPositionXFunc = function(params){
   params.object.mesh.position.x = params.value;
