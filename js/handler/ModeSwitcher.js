@@ -250,14 +250,14 @@ ModeSwitcher.prototype.switchFromPreviewToDesign = function(){
   }
   for (var textName in addedTexts){
     var addedText = addedTexts[textName];
+    for (var animationName in addedText.animations){
+      animationHandler.forceFinish(addedText.animations[animationName]);
+    }
     addedText.show();
     addedText.handleResize();
     delete addedText.clickCallbackFunction;
     delete addedText.mouseOverCallbackFunction;
     delete addedText.mouseOutCallbackFunction;
-    for (var animationName in addedText.animations){
-      animationHandler.forceFinish(addedText.animations[animationName]);
-    }
   }
   collisionCallbackRequests = new Map();
   particleCollisionCallbackRequests = new Object();
@@ -300,6 +300,9 @@ ModeSwitcher.prototype.switchFromPreviewToDesign = function(){
 
   for (var objectName in objectGroups){
     var object = objectGroups[objectName];
+    for (var animationName in object.animations){
+      animationHandler.forceFinish(object.animations[animationName]);
+    }
     object.loadState();
     object.resetColor();
     object.isUsedInFPSControl = false;
@@ -328,12 +331,12 @@ ModeSwitcher.prototype.switchFromPreviewToDesign = function(){
       object.updateOpacity(object.initOpacity);
       object.initOpacitySet = false;
     }
-    for (var animationName in object.animations){
-      animationHandler.forceFinish(object.animations[animationName]);
-    }
   }
   for (var objectName in addedObjects){
     var object = addedObjects[objectName];
+    for (var animationName in object.animations){
+      animationHandler.forceFinish(object.animations[animationName]);
+    }
     if (object.positionThresholdExceededListenerInfo){
       object.positionThresholdExceededListenerInfo.isActive = false;
     }
@@ -361,9 +364,6 @@ ModeSwitcher.prototype.switchFromPreviewToDesign = function(){
         dynamicObjects.delete(object.name);
       }
       delete object.originalMass;
-    }
-    for (var animationName in object.animations){
-      animationHandler.forceFinish(object.animations[animationName]);
     }
   }
   fogHandler.onFromPreviewToDesign();
