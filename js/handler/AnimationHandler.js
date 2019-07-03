@@ -247,12 +247,21 @@ var AnimationHandler = function(){
   };
   this.afterAnimationSettersByType[this.actionTypes.OBJECT.TRANSLATE_X] = function(animation){
     animation.attachedObject.mesh.translateX(-1 * animation.params.totalTranslationX);
+    if (animation.attachedObject.autoInstancedParent){
+      animation.attachedObject.autoInstancedParent.updateObject(animation.attachedObject);
+    }
   };
   this.afterAnimationSettersByType[this.actionTypes.OBJECT.TRANSLATE_Y] = function(animation){
     animation.attachedObject.mesh.translateY(-1 * animation.params.totalTranslationY);
+    if (animation.attachedObject.autoInstancedParent){
+      animation.attachedObject.autoInstancedParent.updateObject(animation.attachedObject);
+    }
   };
   this.afterAnimationSettersByType[this.actionTypes.OBJECT.TRANSLATE_Z] = function(animation){
     animation.attachedObject.mesh.translateZ(-1 * animation.params.totalTranslationZ);
+    if (animation.attachedObject.autoInstancedParent){
+      animation.attachedObject.autoInstancedParent.updateObject(animation.attachedObject);
+    }
   };
   this.afterAnimationSettersByType[this.actionTypes.TEXT.TRANSPARENCY] = function(animation){
     animation.attachedObject.setAlpha(animation.initialValue);
@@ -542,16 +551,25 @@ AnimationHandler.prototype.updateObjectTranslationX = function(params, increaseT
   var coef = increaseTick? 1: -1;
   params.object.mesh.translateX(coef * params.value);
   params.totalTranslationX += coef * params.value;
+  if (params.object.autoInstancedParent){
+    params.object.autoInstancedParent.updateObject(params.object);
+  }
 }
 AnimationHandler.prototype.updateObjectTranslationY = function(params, increaseTick){
   var coef = increaseTick? 1: -1;
   params.object.mesh.translateY(coef * params.value);
   params.totalTranslationY += coef * params.value;
+  if (params.object.autoInstancedParent){
+    params.object.autoInstancedParent.updateObject(params.object);
+  }
 }
 AnimationHandler.prototype.updateObjectTranslationZ = function(params, increaseTick){
   var coef = increaseTick? 1: -1;
   params.object.mesh.translateZ(coef * params.value);
   params.totalTranslationZ += coef * params.value;
+  if (params.object.autoInstancedParent){
+    params.object.autoInstancedParent.updateObject(params.object);
+  }
 }
 AnimationHandler.prototype.updateTextTransparencyFunc = function(params){
   params.object.setAlpha(params.value);
