@@ -2951,12 +2951,18 @@ AddedObject.prototype.getTextureOffsetY = function(){
 AddedObject.prototype.setTextureOffsetX = function(val){
   if (this.hasTexture()){
     this.mesh.material.uniforms.textureMatrix.value.elements[6] = val;
+    if (this.autoInstancedParent){
+      this.autoInstancedParent.updateObject(this);
+    }
   }
 }
 
 AddedObject.prototype.setTextureOffsetY = function(val){
   if (this.hasTexture()){
     this.mesh.material.uniforms.textureMatrix.value.elements[7] = val;
+    if (this.autoInstancedParent){
+      this.autoInstancedParent.updateObject(this);
+    }
   }
 }
 

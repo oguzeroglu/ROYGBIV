@@ -22,6 +22,7 @@ varying float vAlpha;
   uniform float autoInstanceEmissiveIntensityArray[AUTO_INSTANCE_EMISSIVE_INTENSITY_ARRAY_SIZE];
   uniform vec3 autoInstanceEmissiveColorArray[AUTO_INSTANCE_EMISSIVE_COLOR_ARRAY_SIZE];
   uniform vec2 autoInstanceDisplacementInfoArray[AUTO_INSTANCE_DISPLACEMENT_INFO_ARRAY_SIZE];
+  uniform vec2 autoInstanceTextureOffsetInfoArray[AUTO_INSTANCE_TEXTURE_OFFSET_INFO_ARRAY_SIZE];
   varying float vDiscardFlag;
   #ifdef AUTO_INSTANCE_HAS_COLORIZABLE_MEMBER
     attribute float forcedColorIndex;
@@ -114,13 +115,25 @@ void main(){
   #endif
   vColor = color;
   #ifdef HAS_TEXTURE
-    vUV = (
-      mat3(
-        textureMatrixInfo.z, 0.0, 0.0,
-        0.0, textureMatrixInfo.w, 0.0,
-        textureMatrixInfo.x + totalTextureOffset.x, textureMatrixInfo.y + totalTextureOffset.y, 1.0
-      ) * vec3(uv, 1.0)
-    ).xy;
+    #ifdef IS_AUTO_INSTANCED
+      int textureOffsetInfoIndex = int(alphaIndex);
+      vec2 textureOffsetInfo = autoInstanceTextureOffsetInfoArray[textureOffsetInfoIndex];
+      vUV = (
+        mat3(
+          textureMatrixInfo.z, 0.0, 0.0,
+          0.0, textureMatrixInfo.w, 0.0,
+          textureOffsetInfo.x + totalTextureOffset.x, textureOffsetInfo.y + totalTextureOffset.y, 1.0
+        ) * vec3(uv, 1.0)
+      ).xy;
+    #else
+      vUV = (
+        mat3(
+          textureMatrixInfo.z, 0.0, 0.0,
+          0.0, textureMatrixInfo.w, 0.0,
+          textureMatrixInfo.x + totalTextureOffset.x, textureMatrixInfo.y + totalTextureOffset.y, 1.0
+        ) * vec3(uv, 1.0)
+      ).xy;
+    #endif
     #ifdef HAS_DIFFUSE
       hasDiffuseMap = -10.0;
       if (textureInfo[0] > 0.0){
