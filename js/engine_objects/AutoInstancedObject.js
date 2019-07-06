@@ -31,6 +31,10 @@ AutoInstancedObject.prototype.updateObject = function(object){
     var emissiveColor = object.getEmissiveColor();
     this.mesh.material.uniforms.autoInstanceEmissiveColorArray.value[alphaIndex].set(emissiveColor.r, emissiveColor.g, emissiveColor.b);
   }
+  if (object.hasDisplacementMap()){
+    this.mesh.material.uniforms.autoInstanceDisplacementInfoArray.value[alphaIndex].x = object.getDisplacementScale();
+    this.mesh.material.uniforms.autoInstanceDisplacementInfoArray.value[alphaIndex].y = object.getDisplacementBias();
+  }
 }
 
 AutoInstancedObject.prototype.hideObject = function(object){
@@ -114,6 +118,7 @@ AutoInstancedObject.prototype.init = function(){
   var forcedColorIndices = [];
   var emissiveIntensityAry = [];
   var emissiveColorAry = [];
+  var displacementInfoAry = [];
   var hasColorizableMember = false;
   for (var objName in this.objects){
     var obj = this.objects[objName];
@@ -144,6 +149,11 @@ AutoInstancedObject.prototype.init = function(){
       emissiveIntensityAry.push(0);
       emissiveColorAry.push(new THREE.Vector3(WHITE_COLOR.r, WHITE_COLOR.g, WHITE_COLOR.b));
     }
+    if (obj.hasDisplacementMap()){
+      displacementInfoAry.push(new THREE.Vector2(obj.getDisplacementScale(), obj.getDisplacementBias()));
+    }else{
+      displacementInfoAry.push(new THREE.Vector2(0, 0));
+    }
   }
   var orientationIndicesBufferAttribute = new THREE.InstancedBufferAttribute(new Float32Array(orientationIndices), 1);
   var alphaIndicesBufferAttribute = new THREE.InstancedBufferAttribute(new Float32Array(alphaIndices), 1);
@@ -159,11 +169,13 @@ AutoInstancedObject.prototype.init = function(){
   macroHandler.injectMacro("AUTO_INSTANCE_SCALE_ARRAY_SIZE "+objCount, this.mesh.material, true, false);
   macroHandler.injectMacro("AUTO_INSTANCE_EMISSIVE_INTENSITY_ARRAY_SIZE "+objCount, this.mesh.material, true, false);
   macroHandler.injectMacro("AUTO_INSTANCE_EMISSIVE_COLOR_ARRAY_SIZE "+objCount, this.mesh.material, true, false);
+  macroHandler.injectMacro("AUTO_INSTANCE_DISPLACEMENT_INFO_ARRAY_SIZE "+objCount, this.mesh.material, true, false);
   this.mesh.material.uniforms.autoInstanceOrientationArray = new THREE.Uniform(orientationAry);
   this.mesh.material.uniforms.autoInstanceAlphaArray = new THREE.Uniform(alphaAry);
   this.mesh.material.uniforms.autoInstanceScaleArray = new THREE.Uniform(scaleAry);
   this.mesh.material.uniforms.autoInstanceEmissiveIntensityArray = new THREE.Uniform(emissiveIntensityAry);
   this.mesh.material.uniforms.autoInstanceEmissiveColorArray = new THREE.Uniform(emissiveColorAry);
+  this.mesh.material.uniforms.autoInstanceDisplacementInfoArray = new THREE.Uniform(displacementInfoAry);
   if (hasColorizableMember){
     macroHandler.injectMacro("AUTO_INSTANCE_FORCED_COLOR_ARRAY_SIZE "+(objCount), this.mesh.material, true, false);
     macroHandler.injectMacro("AUTO_INSTANCE_HAS_COLORIZABLE_MEMBER", this.mesh.material, true, true);

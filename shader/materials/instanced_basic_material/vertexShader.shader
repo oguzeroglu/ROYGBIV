@@ -21,6 +21,7 @@ varying float vAlpha;
   uniform float autoInstanceAlphaArray[AUTO_INSTANCE_ALPHA_ARRAY_SIZE];
   uniform float autoInstanceEmissiveIntensityArray[AUTO_INSTANCE_EMISSIVE_INTENSITY_ARRAY_SIZE];
   uniform vec3 autoInstanceEmissiveColorArray[AUTO_INSTANCE_EMISSIVE_COLOR_ARRAY_SIZE];
+  uniform vec2 autoInstanceDisplacementInfoArray[AUTO_INSTANCE_DISPLACEMENT_INFO_ARRAY_SIZE];
   varying float vDiscardFlag;
   #ifdef AUTO_INSTANCE_HAS_COLORIZABLE_MEMBER
     attribute float forcedColorIndex;
@@ -163,8 +164,14 @@ void main(){
   #ifdef HAS_DISPLACEMENT
     if (displacementInfo.x > -60.0 && displacementInfo.y > -60.0){
       vec3 objNormal = normalize(normal);
-      float totalDisplacementScale = displacementInfo.x * totalDisplacementInfo.x;
-      float totalDisplacementBias = displacementInfo.y * totalDisplacementInfo.y;
+      #ifdef IS_AUTO_INSTANCED
+        vec2 autoInstanceDisplacementInfo = autoInstanceDisplacementInfoArray[int(alphaIndex)];
+        float totalDisplacementScale = autoInstanceDisplacementInfo.x * totalDisplacementInfo.x;
+        float totalDisplacementBias = autoInstanceDisplacementInfo.y * totalDisplacementInfo.y;
+      #else
+        float totalDisplacementScale = displacementInfo.x * totalDisplacementInfo.x;
+        float totalDisplacementBias = displacementInfo.y * totalDisplacementInfo.y;
+      #endif
       transformedPosition += objNormal * (texture2D(displacementMap, vUV).r * totalDisplacementScale + totalDisplacementBias);
     }
   #endif

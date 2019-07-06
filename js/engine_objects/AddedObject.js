@@ -90,6 +90,9 @@ AddedObject.prototype.getDisplacementBias = function(){
 
 AddedObject.prototype.setDisplacementBias = function(val){
   this.mesh.material.uniforms.displacementInfo.value.y = val;
+  if (this.autoInstancedParent){
+    this.autoInstancedParent.updateObject(this);
+  }
 }
 
 AddedObject.prototype.getDisplacementScale = function(){
@@ -98,6 +101,9 @@ AddedObject.prototype.getDisplacementScale = function(){
 
 AddedObject.prototype.setDisplacementScale = function(val){
   this.mesh.material.uniforms.displacementInfo.value.x = val;
+  if (this.autoInstancedParent){
+    this.autoInstancedParent.updateObject(this);
+  }
 }
 
 AddedObject.prototype.getEmissiveIntensity = function(){
