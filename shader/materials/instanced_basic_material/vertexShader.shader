@@ -20,6 +20,7 @@ varying float vAlpha;
   uniform vec3 autoInstanceScaleArray[AUTO_INSTANCE_SCALE_ARRAY_SIZE];
   uniform float autoInstanceAlphaArray[AUTO_INSTANCE_ALPHA_ARRAY_SIZE];
   uniform float autoInstanceEmissiveIntensityArray[AUTO_INSTANCE_EMISSIVE_INTENSITY_ARRAY_SIZE];
+  uniform vec3 autoInstanceEmissiveColorArray[AUTO_INSTANCE_EMISSIVE_COLOR_ARRAY_SIZE];
   varying float vDiscardFlag;
   #ifdef AUTO_INSTANCE_HAS_COLORIZABLE_MEMBER
     attribute float forcedColorIndex;
@@ -146,11 +147,13 @@ void main(){
   #endif
   #ifdef HAS_EMISSIVE
     #ifdef IS_AUTO_INSTANCED
-      vEmissiveIntensity = autoInstanceEmissiveIntensityArray[int(alphaIndex)];
+      int iai = int(alphaIndex);
+      vEmissiveIntensity = autoInstanceEmissiveIntensityArray[iai];
+      vEmissiveColor = autoInstanceEmissiveColorArray[iai];
     #else
       vEmissiveIntensity = emissiveIntensity;
+      vEmissiveColor = emissiveColor;
     #endif
-    vEmissiveColor = emissiveColor;
   #endif
   #ifdef HAS_AO
     vAOIntensity = aoIntensity;

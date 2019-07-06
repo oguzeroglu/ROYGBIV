@@ -118,6 +118,9 @@ AddedObject.prototype.getEmissiveColor = function(){
 
 AddedObject.prototype.setEmissiveColor = function(val){
   this.mesh.material.uniforms.emissiveColor.value.copy(val);
+  if (this.autoInstancedParent){
+    this.autoInstancedParent.updateObject(this);
+  }
 }
 
 AddedObject.prototype.useDefaultPrecision = function(){
