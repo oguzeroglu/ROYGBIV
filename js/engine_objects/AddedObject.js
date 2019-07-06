@@ -106,6 +106,9 @@ AddedObject.prototype.getEmissiveIntensity = function(){
 
 AddedObject.prototype.setEmissiveIntensity = function(val){
   this.mesh.material.uniforms.emissiveIntensity.value = val;
+  if (this.autoInstancedParent){
+    this.autoInstancedParent.updateObject(this);
+  }
 }
 
 AddedObject.prototype.getEmissiveColor = function(){

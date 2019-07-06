@@ -26,6 +26,9 @@ AutoInstancedObject.prototype.updateObject = function(object){
   if (alpha != 1){
     this.mesh.material.transparent = true;
   }
+  if (object.hasEmissiveMap()){
+    this.mesh.material.uniforms.autoInstanceEmissiveIntensityArray.value[alphaIndex] = object.getEmissiveIntensity();
+  }
 }
 
 AutoInstancedObject.prototype.hideObject = function(object){
@@ -107,6 +110,7 @@ AutoInstancedObject.prototype.init = function(){
   var alphaAry = [];
   var forcedColorAry = [];
   var forcedColorIndices = [];
+  var emissiveIntensityAry = [];
   var hasColorizableMember = false;
   for (var objName in this.objects){
     var obj = this.objects[objName];
@@ -130,6 +134,11 @@ AutoInstancedObject.prototype.init = function(){
     forcedColorIndices.push(forcedColorIndex);
     this.forcedColorIndicesByObjectName.set(objName, forcedColorIndex);
     forcedColorIndex ++;
+    if (obj.hasEmissiveMap()){
+      emissiveIntensityAry.push(obj.getEmissiveIntensity());
+    }else{
+      emissiveIntensityAry.push(0);
+    }
   }
   var orientationIndicesBufferAttribute = new THREE.InstancedBufferAttribute(new Float32Array(orientationIndices), 1);
   var alphaIndicesBufferAttribute = new THREE.InstancedBufferAttribute(new Float32Array(alphaIndices), 1);
@@ -143,9 +152,11 @@ AutoInstancedObject.prototype.init = function(){
   macroHandler.injectMacro("AUTO_INSTANCE_ORIENTATION_ARRAY_SIZE "+(objCount * 2), this.mesh.material, true, false);
   macroHandler.injectMacro("AUTO_INSTANCE_ALPHA_ARRAY_SIZE "+objCount, this.mesh.material, true, false);
   macroHandler.injectMacro("AUTO_INSTANCE_SCALE_ARRAY_SIZE "+objCount, this.mesh.material, true, false);
+  macroHandler.injectMacro("AUTO_INSTANCE_EMISSIVE_INTENSITY_ARRAY_SIZE "+objCount, this.mesh.material, true, false);
   this.mesh.material.uniforms.autoInstanceOrientationArray = new THREE.Uniform(orientationAry);
   this.mesh.material.uniforms.autoInstanceAlphaArray = new THREE.Uniform(alphaAry);
   this.mesh.material.uniforms.autoInstanceScaleArray = new THREE.Uniform(scaleAry);
+  this.mesh.material.uniforms.autoInstanceEmissiveIntensityArray = new THREE.Uniform(emissiveIntensityAry);
   if (hasColorizableMember){
     macroHandler.injectMacro("AUTO_INSTANCE_FORCED_COLOR_ARRAY_SIZE "+(objCount), this.mesh.material, true, false);
     macroHandler.injectMacro("AUTO_INSTANCE_HAS_COLORIZABLE_MEMBER", this.mesh.material, true, true);

@@ -19,6 +19,7 @@ varying float vAlpha;
   uniform vec4 autoInstanceOrientationArray[AUTO_INSTANCE_ORIENTATION_ARRAY_SIZE];
   uniform vec3 autoInstanceScaleArray[AUTO_INSTANCE_SCALE_ARRAY_SIZE];
   uniform float autoInstanceAlphaArray[AUTO_INSTANCE_ALPHA_ARRAY_SIZE];
+  uniform float autoInstanceEmissiveIntensityArray[AUTO_INSTANCE_EMISSIVE_INTENSITY_ARRAY_SIZE];
   varying float vDiscardFlag;
   #ifdef AUTO_INSTANCE_HAS_COLORIZABLE_MEMBER
     attribute float forcedColorIndex;
@@ -144,7 +145,11 @@ void main(){
     #endif
   #endif
   #ifdef HAS_EMISSIVE
-    vEmissiveIntensity = emissiveIntensity;
+    #ifdef IS_AUTO_INSTANCED
+      vEmissiveIntensity = autoInstanceEmissiveIntensityArray[int(alphaIndex)];
+    #else
+      vEmissiveIntensity = emissiveIntensity;
+    #endif
     vEmissiveColor = emissiveColor;
   #endif
   #ifdef HAS_AO
