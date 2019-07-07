@@ -1112,7 +1112,7 @@ function parse(input){
           if (wallCollection){
             wallCollection.destroy();
             if (!jobHandlerWorking){
-              terminal.printInfo(Text.WALL_COLLECTION_DESTROYED);
+              refreshRaycaster(Text.WALL_COLLECTION_DESTROYED);
             }
           }else{
             terminal.printError(Text.NO_SUCH_WALL_COLLECTION);
