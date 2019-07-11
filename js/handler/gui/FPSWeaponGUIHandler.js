@@ -64,6 +64,7 @@ FPSWeaponGUIHandler.prototype.init = function(){
       if (fpsWeaponGUIHandler.muzzleFlash){
         fpsWeaponGUIHandler.muzzleFlash.hide();
         fpsWeaponGUIHandler.muzzleFlash = 0;
+        particleSystems = new Map();
       }
       guiHandler.hide(guiHandler.guiTypes.FPS_WEAPON_ALIGNMENT);
       terminal.clear();

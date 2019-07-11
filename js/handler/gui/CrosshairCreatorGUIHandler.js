@@ -35,7 +35,7 @@ CrosshairCreatorGUIHandler.prototype.init = function(crosshairName, isEdit){
     },
     "Done": function(){
       if (crosshairs[crosshairName]){
-        crosshairs[crosshairName].destroy();
+        crosshairs[crosshairName].destroy(true);
       }
       crosshairs[crosshairName] = crosshairCreatorGUIHandler.crosshair.clone();
       crosshairCreatorGUIHandler.close(isEdit? Text.CROSSHAIR_EDITED: Text.CROSSHAIR_CREATED);
@@ -79,22 +79,22 @@ CrosshairCreatorGUIHandler.prototype.commonStartFunctions = function(){
 CrosshairCreatorGUIHandler.prototype.createGUI = function(crosshairName, texturePackNames){
   guiHandler.datGuiCrosshairCreation = new dat.GUI({hideable: false});
   guiHandler.datGuiCrosshairCreation.add(this.configurations, "Texture", texturePackNames).onChange(function(val){
-    crosshairCreatorGUIHandler.handleTestCrosshair();
+    crosshairCreatorGUIHandler.handleTestCrosshair(crosshairName);
   }).listen();
   guiHandler.datGuiCrosshairCreation.addColor(this.configurations, "Color").onChange(function(val){
-    crosshairCreatorGUIHandler.handleTestCrosshair();
+    crosshairCreatorGUIHandler.handleTestCrosshair(crosshairName);
   }).listen();
   guiHandler.datGuiCrosshairCreation.add(this.configurations, "Alpha").min(0.01).max(1).step(0.01).onChange(function(val){
-    crosshairCreatorGUIHandler.handleTestCrosshair();
+    crosshairCreatorGUIHandler.handleTestCrosshair(crosshairName);
   }).listen();
   guiHandler.datGuiCrosshairCreation.add(this.configurations, "Size").min(0.01).max(100).step(0.01).onChange(function(val){
-    crosshairCreatorGUIHandler.handleTestCrosshair();
+    crosshairCreatorGUIHandler.handleTestCrosshair(crosshairName);
   }).listen();
   guiHandler.datGuiCrosshairCreation.add(this.configurations, "maxWidthPercent").min(0.01).max(100).step(0.01).onChange(function(val){
-    crosshairCreatorGUIHandler.handleTestCrosshair();
+    crosshairCreatorGUIHandler.handleTestCrosshair(crosshairName);
   }).listen();
   guiHandler.datGuiCrosshairCreation.add(this.configurations, "maxHeightPercent").min(0.01).max(100).step(0.01).onChange(function(val){
-    crosshairCreatorGUIHandler.handleTestCrosshair();
+    crosshairCreatorGUIHandler.handleTestCrosshair(crosshairName);
   }).listen();
   guiHandler.datGuiCrosshairCreation.add(this.configurations, "Cancel");
   guiHandler.datGuiCrosshairCreation.add(this.configurations, "Done");

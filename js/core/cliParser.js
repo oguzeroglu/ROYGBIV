@@ -4341,7 +4341,7 @@ function parse(input){
             terminal.printError(Text.NO_SUCH_CROSSHAIR);
             return true;
           }
-          crosshair.destroy();
+          crosshair.destroy(true);
           delete crosshairs[crosshair.name];
           if (!jobHandlerWorking){
             terminal.printInfo(Text.CROSSHAIR_EDITED);

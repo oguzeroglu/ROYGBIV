@@ -108,11 +108,15 @@ Crosshair.prototype.resetRotation = function(){
   this.material.uniforms.uvTransform.value.copy(this.texture.matrix);
 }
 
-Crosshair.prototype.destroy = function(){
-  scene.remove(this.mesh);
+Crosshair.prototype.destroy = function(destroyMesh){
   this.mesh.geometry.dispose();
   this.mesh.material.dispose();
-  this.mesh = 0;
+  if (destroyMesh){
+    this.mesh = 0;
+    scene.remove(this.mesh);
+  }else{
+    this.mesh.visible = false;
+  }
 }
 
 Crosshair.prototype.debugCornerPoints = function(representativeCharacter, cornerIndex){
