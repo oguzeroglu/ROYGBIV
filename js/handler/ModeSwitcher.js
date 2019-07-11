@@ -106,6 +106,10 @@ ModeSwitcher.prototype.switchFromDesignToPreview = function(){
   }
   for (var textName in addedTexts){
     var addedText = addedTexts[textName];
+    if (addedText.is2D){
+      addedText.originalMarginX = addedText.marginPercentWidth;
+      addedText.originalMarginY = addedText.marginPercentHeight;
+    }
     if (addedText.bbHelper){
       scene.remove(addedText.bbHelper);
     }
@@ -246,6 +250,9 @@ ModeSwitcher.prototype.switchFromPreviewToDesign = function(){
   }
   for (var textName in addedTexts){
     var addedText = addedTexts[textName];
+    for (var animationName in addedText.animations){
+      animationHandler.forceFinish(addedText.animations[animationName]);
+    }
     addedText.show();
     addedText.handleResize();
     delete addedText.clickCallbackFunction;
@@ -293,6 +300,9 @@ ModeSwitcher.prototype.switchFromPreviewToDesign = function(){
 
   for (var objectName in objectGroups){
     var object = objectGroups[objectName];
+    for (var animationName in object.animations){
+      animationHandler.forceFinish(object.animations[animationName]);
+    }
     object.loadState();
     object.resetColor();
     object.isUsedInFPSControl = false;
@@ -324,6 +334,9 @@ ModeSwitcher.prototype.switchFromPreviewToDesign = function(){
   }
   for (var objectName in addedObjects){
     var object = addedObjects[objectName];
+    for (var animationName in object.animations){
+      animationHandler.forceFinish(object.animations[animationName]);
+    }
     if (object.positionThresholdExceededListenerInfo){
       object.positionThresholdExceededListenerInfo.isActive = false;
     }

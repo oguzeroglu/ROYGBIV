@@ -13,6 +13,7 @@
 //  * Crosshair functions
 //  * Text functions
 //  * Control functions
+//  * Animation functions
 //  * Script related functions
 var Roygbiv = function(){
   this.functionNames = [
@@ -165,7 +166,11 @@ var Roygbiv = function(){
     "removeScreenOrientationChangeListener",
     "executeForEachParticleSystem",
     "startScript",
-    "stopScript"
+    "stopScript",
+    "startAnimation",
+    "stopAnimation",
+    "onAnimationFinished",
+    "removeAnimationFinishListener"
   ];
 
   this.globals = new Object();
@@ -760,14 +765,14 @@ Roygbiv.prototype.opacity = function(object, delta){
     object.initOpacitySet = true;
   }
   object.incrementOpacity(delta);
-  if (isAddedObject){
+  if (object.isAddedObject){
     if (object.mesh.material.uniforms.alpha.value < 0){
       object.updateOpacity(0);
     }
     if (object.mesh.material.uniforms.alpha.value > 1){
       object.updateOpacity(1);
     }
-  }else if (isObjectGroup){
+  }else if (object.isObjectGroup){
     if (object.mesh.material.uniforms.totalAlpha.value < 0){
       object.updateOpacity(0);
     }
@@ -1784,6 +1789,34 @@ Roygbiv.prototype.removeScreenOrientationChangeListener = function(){
   screenOrientationChangeCallbackFunction = noop;
 }
 
+// Sets a finish listener for an animation of given object, object group or text.
+// For repeating animations the callbackFunction is executed before each repeat.
+// For rewinding animations the callbackFunction is executed when the rewind is finished.
+Roygbiv.prototype.onAnimationFinished = function(object, animationName, callbackFunction){
+  if (mode ==  0){
+    return;
+  }
+  preConditions.checkIfDefined(ROYGBIV.onAnimationFinished, preConditions.object, object);
+  preConditions.checkIfDefined(ROYGBIV.onAnimationFinished, preConditions.animationName, animationName);
+  preConditions.checkIfDefined(ROYGBIV.onAnimationFinished, preConditions.callbackFunction, callbackFunction);
+  preConditions.checkIfAddedObjectObjectGroupAddedText(ROYGBIV.onAnimationFinished, preConditions.object, object);
+  preConditions.checkIfAnimationExists(ROYGBIV.onAnimationFinished, object, animationName);
+  preConditions.checkIfFunctionOnlyIfExists(ROYGBIV.onAnimationFinished, preConditions.callbackFunction, callbackFunction);
+  object.animations[animationName].setFinishCallbackFunction(callbackFunction);
+}
+
+// Removes the finish listener for an animation of given object, object group or text.
+Roygbiv.prototype.removeAnimationFinishListener = function(object, animationName){
+  if (mode == 0){
+    return;
+  }
+  preConditions.checkIfDefined(ROYGBIV.removeAnimationFinishListener, preConditions.object, object);
+  preConditions.checkIfDefined(ROYGBIV.removeAnimationFinishListener, preConditions.animationName, animationName);
+  preConditions.checkIfAddedObjectObjectGroupAddedText(ROYGBIV.removeAnimationFinishListener, preConditions.object, object);
+  preConditions.checkIfAnimationExists(ROYGBIV.removeAnimationFinishListener, object, animationName);
+  object.animations[animationName].finishCallbackFunction = 0;
+}
+
 // TEXT FUNCTIONS **************************************************************
 
 // Sets a text to a text object.
@@ -1822,21 +1855,21 @@ Roygbiv.prototype.setTextAlpha = function(text, alpha){
   text.setAlpha(alpha, true);
 }
 
-// Sets the position of a text object.
+// Sets the position of a text object. If text is 2D only x and y parameters are
+// necessary representing the marginX and marginY.
 Roygbiv.prototype.setTextPosition = function(text, x, y, z){
   if (mode == 0){
     return;
   }
   preConditions.checkIfDefined(ROYGBIV.setTextPosition, preConditions.text, text);
   preConditions.checkIfAddedText(ROYGBIV.setTextPosition, preConditions.text, text);
-  preConditions.checkIfText2D(ROYGBIV.setTextPosition, preConditions.text, text);
   preConditions.checkIfDefined(ROYGBIV.setTextPosition, preConditions.x, x);
   preConditions.checkIfDefined(ROYGBIV.setTextPosition, preConditions.y, y);
-  preConditions.checkIfDefined(ROYGBIV.setTextPosition, preConditions.z, z);
+  preConditions.checkIfDefinedOnlyIfYTrue(ROYGBIV.setTextPosition, "z is mandatory parameter for 3D texts.", !text.is2D, z);
   preConditions.checkIfNumber(ROYGBIV.setTextPosition, preConditions.x, x);
   preConditions.checkIfNumber(ROYGBIV.setTextPosition, preConditions.y, y);
-  preConditions.checkIfNumber(ROYGBIV.setTextPosition, preConditions.z, z);
-  text.mesh.position.set(x, y, z);
+  preConditions.checkIfNumberOnlyIfExists(ROYGBIV.setTextPosition, preConditions.z, z);
+  text.setPosition(x, y, z);
 }
 
 // Sets the background color/alpha of a text object.
@@ -1880,11 +1913,7 @@ Roygbiv.prototype.setTextCenterPosition = function(text, x, y, z){
   preConditions.checkIfNumber(ROYGBIV.setTextCenterPosition, preConditions.y, y);
   preConditions.checkIfNumber(ROYGBIV.setTextCenterPosition, preConditions.z, z);
   var centerPos = text.getCenterCoordinates();
-  text.mesh.position.set(
-    text.mesh.position.x + (x - centerPos.x),
-    text.mesh.position.y + (y - centerPos.y),
-    text.mesh.position.z + (z - centerPos.z)
-  );
+  text.mesh.position.set(text.mesh.position.x + (x - centerPos.x), text.mesh.position.y + (y - centerPos.y), text.mesh.position.z + (z - centerPos.z));
 }
 
 // Makes the given text object invisible. Does nothing if the text is already
@@ -2162,6 +2191,35 @@ Roygbiv.prototype.createOrbitControl = function(parameters){
   preConditions.checkIfNumberOnlyIfExists(ROYGBIV.createOrbitControl, preConditions.keyboardRotationSpeed, parameters.keyboardRotationSpeed);
   preConditions.checkIfBooleanOnlyIfExists(ROYGBIV.createOrbitControl, preConditions.requestFullScreen, parameters.requestFullScreen);
   return new OrbitControls(parameters);
+}
+
+// ANIMATION FUNCTIONS *********************************************************
+
+// Starts an animation of given object, object group or text.
+Roygbiv.prototype.startAnimation = function(object, animationName){
+  if (mode == 0){
+    return;
+  }
+  preConditions.checkIfDefined(ROYGBIV.startAnimation, preConditions.object, object);
+  preConditions.checkIfAddedObjectObjectGroupAddedText(ROYGBIV.startAnimation, preConditions.object, object);
+  preConditions.checkIfDefined(ROYGBIV.startAnimation, preConditions.animationName, animationName);
+  preConditions.checkIfAnimationExists(ROYGBIV.startAnimation, object, animationName);
+  var animation = object.animations[animationName];
+  animationHandler.forceFinish(animation);
+  animationHandler.startAnimation(animation);
+}
+
+// Stops an animation of given object, object group or text.
+Roygbiv.prototype.stopAnimation = function(object, animationName){
+  if (mode == 0){
+    return;
+  }
+  preConditions.checkIfDefined(ROYGBIV.stopAnimation, preConditions.object, object);
+  preConditions.checkIfAddedObjectObjectGroupAddedText(ROYGBIV.stopAnimation, preConditions.object, object);
+  preConditions.checkIfDefined(ROYGBIV.stopAnimation, preConditions.animationName, animationName);
+  preConditions.checkIfAnimationExists(ROYGBIV.stopAnimation, object, animationName);
+  var animation = object.animations[animationName];
+  animationHandler.forceFinish(animation);
 }
 
 // UTILITY FUNCTIONS ***********************************************************

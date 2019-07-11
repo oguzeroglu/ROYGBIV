@@ -135,7 +135,7 @@ MuzzleFlash.prototype.update = function(){
   }
   ps.mesh.visible = true;
   ps.update();
-  this.tick += (1/60);
+  this.tick += (STEP);
   if (this.tick > this.psTime){
     this.tick = 0;
     ps.mesh.visible = false;

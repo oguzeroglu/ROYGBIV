@@ -219,6 +219,8 @@ var Text = function(){
   this.ANCHOR_SET = "Anchor set: @@1";
   this.INVALID_INDEX = "Invalid index.";
   this.TEST_RESTARTED = "Test restarted.";
+  this.INVALID_PARAMETER = "Invalid parameter: @@1";
+  this.ANIMATION_UPDATED = "Animation updated.";
   this.AXIS_MUST_BE_ONE_OF_S_T = "Axis must be one of s, t or st.";
   this.OBJECT_IS_ALREADY_SLIPPERY = "Object is already slippery.";
   this.SLIPPERINESS_ADJUSTED = "Slipperiness adjusted.";
@@ -439,6 +441,10 @@ var Text = function(){
   this.AFTER_FOG_CREATION = "Press Done button to close.";
   this.AFTER_CROSSHAIR_CREATION = "Press Done button to create crosshair.";
   this.AFTER_SCRIPT_CREATION = "Press Done button to close.";
+  this.AFTER_ANIMATION_CREATION = "Press Done button to close.\nUse mouse wheel/mouse drag to rotate.\nUp/Down or W/S (Z/S - French keyboard) to zoom in/out.";
+  this.AFTER_ANIMATION_CREATION_FPS_WEAPON = "Press Done button close.";
+  this.ANIMATION_NAME_MUST_BE_A_NON_EMPTY_STRING = "Animation name must be a non empty string.";
+  this.ANIMATION_NAME_MUST_BE_UNIQUE = "Animation name must be unique.";
   this.DONE = "Done.";
   this.GS_CREATION_ERROR_1 = "sizeX and sizeZ must be greater than zero.";
   this.GS_CREATION_ERROR_2 = "sizeX is not multiple of cellSize";
@@ -685,7 +691,7 @@ var Text = function(){
    this.ROYGBIV_SCRIPTING_API_SETTEXT = "Sets a text to a text object.";
    this.ROYGBIV_SCRIPTING_API_SETTEXTCOLOR = "Sets the color of a text. colorName can be a color name like red or an hex string like #afef54.";
    this.ROYGBIV_SCRIPTING_API_SETTEXTALPHA = "Sets the alpha of a text.";
-   this.ROYGBIV_SCRIPTING_API_SETTEXTPOSITION = "Sets the position of a text object.";
+   this.ROYGBIV_SCRIPTING_API_SETTEXTPOSITION = "Sets the position of a text object. If text is 2D only x and y parameters are necessary representing the marginX and marginY.";
    this.ROYGBIV_SCRIPTING_API_SETTEXTBACKGROUND = "Sets the background color/alpha of a text object.";
    this.ROYGBIV_SCRIPTING_API_REMOVETEXTBACKGROUND = "Removes the background of a text object.";
    this.ROYGBIV_SCRIPTING_API_ONTEXTCLICK = "Sets a click listener for a text object. The callbackFunction is executed with textName parameter when the text object is clicked.";
@@ -809,4 +815,8 @@ var Text = function(){
                                            "parentdir1_parentdir2_....._parentdirX_scriptFileName\n"+
                                            "For example in order to get a script under the scripts/ root folder example.js, the scriptName parameter should be example. However,\nto get a script under scripts/testFolder/test.js, the scriptName parameter should be testFolder_test.";
   this.ROYGBIV_SCRIPTING_API_STOPSCRIPT = "Stops a script. The scriptName parameter is explained with startScript API.";
+  this.ROYGBIV_SCRIPTING_API_STARTANIMATION = "Starts an animation of given object, object group or text.";
+  this.ROYGBIV_SCRIPTING_API_STOPANIMATION = "Stops an animation of given object, object group or text.";
+  this.ROYGBIV_SCRIPTING_API_ONANIMATIONFINISHED = "Sets a finish listener for an animation of given object, object group or text. For repeating animations the callbackFunction is\nexecuted before each repeat. For rewinding animations the callbackFunction is executed when the rewind is finished.";
+  this.ROYGBIV_SCRIPTING_API_REMOVEANIMATIONFINISHLISTENER = "Removes the finish listener for an animation of given object, object group or text.";
 }

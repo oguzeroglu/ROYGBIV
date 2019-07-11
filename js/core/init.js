@@ -23,6 +23,8 @@ window.onload = function() {
   fogHandler = new FogHandler();
   // SCRIPTS HANDLER
   scriptsHandler = new ScriptsHandler();
+  // ANIMATION HANDLER
+  animationHandler = new AnimationHandler();
   // TEXT POOL
   Text = (!isDeployment)? new Text(): 0;
   // DRAGABLE CLI
@@ -65,6 +67,7 @@ window.onload = function() {
     fontCreatorGUIHandler = new FontCreatorGUIHandler();
     crosshairCreatorGUIHandler = new CrosshairCreatorGUIHandler();
     scriptsGUIHandler = new ScriptsGUIHandler();
+    animationCreatorGUIHandler = new AnimationCreatorGUIHandler();
   }
 
   // PHYSICS BODY GENERATOR
@@ -371,7 +374,7 @@ function startDeployment(){
     var stateLoader = new StateLoader(data);
     var result = stateLoader.load();
     if (result){
-      if (stateLoader.hasTexturePacks || stateLoader.hasSkyboxes || stateLoader.hasFonts){
+      if (stateLoader.hasTexturePacks || stateLoader.hasSkyboxes || stateLoader.hasFonts || stateLoader.hasTextureAtlas){
         appendtoDeploymentConsole("Loading assets.");
       }
     }else{
@@ -457,7 +460,10 @@ function onRaycasterIntersection(){
          terminal.clear();
        }
        var point = intersectionPoint;
-       var coordStr = " ("+point.x.toFixed(2)+", "+point.y.toFixed(2)+", "+point.z.toFixed(2)+")";
+       var coordStr;
+       if (!isDeployment && mode == 0){
+         coordStr = " ("+point.x.toFixed(2)+", "+point.y.toFixed(2)+", "+point.z.toFixed(2)+")";
+       }
        if (object.isAddedObject){
          if (!isDeployment){
            terminal.printInfo(Text.CLICKED_ON.replace(

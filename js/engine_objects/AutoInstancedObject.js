@@ -11,11 +11,34 @@ AutoInstancedObject.prototype.useCustomShaderPrecision = function(precision){
 
 AutoInstancedObject.prototype.updateObject = function(object){
   var index = this.orientationIndicesByObjectName.get(object.name);
+  var alphaIndex = this.alphaIndicesByObjectName.get(object.name);
+  var scaleIndex = this.scaleIndicesByObjectName.get(object.name);
   var orientationAry = this.mesh.material.uniforms.autoInstanceOrientationArray.value;
+  var alphaAry = this.mesh.material.uniforms.autoInstanceAlphaArray.value;
+  var scaleAry = this.mesh.material.uniforms.autoInstanceScaleArray.value;
   var position = object.mesh.position;
   var quaternion = object.mesh.quaternion;
+  var alpha = object.getOpacity();
   orientationAry[index].set(orientationAry[index].x, position.x, position.y, position.z);
   orientationAry[index+1].set(quaternion.x, quaternion.y, quaternion.z, quaternion.w);
+  alphaAry[alphaIndex] = alpha;
+  scaleAry[scaleIndex].set(object.mesh.scale.x, object.mesh.scale.y, object.mesh.scale.z);
+  if (alpha != 1){
+    this.mesh.material.transparent = true;
+  }
+  if (object.hasEmissiveMap()){
+    this.mesh.material.uniforms.autoInstanceEmissiveIntensityArray.value[alphaIndex] = object.getEmissiveIntensity();
+    var emissiveColor = object.getEmissiveColor();
+    this.mesh.material.uniforms.autoInstanceEmissiveColorArray.value[alphaIndex].set(emissiveColor.r, emissiveColor.g, emissiveColor.b);
+  }
+  if (object.hasDisplacementMap()){
+    this.mesh.material.uniforms.autoInstanceDisplacementInfoArray.value[alphaIndex].x = object.getDisplacementScale();
+    this.mesh.material.uniforms.autoInstanceDisplacementInfoArray.value[alphaIndex].y = object.getDisplacementBias();
+  }
+  if (object.hasTexture()){
+    this.mesh.material.uniforms.autoInstanceTextureOffsetInfoArray.value[alphaIndex].x = object.getTextureOffsetX();
+    this.mesh.material.uniforms.autoInstanceTextureOffsetInfoArray.value[alphaIndex].y = object.getTextureOffsetY();
+  }
 }
 
 AutoInstancedObject.prototype.hideObject = function(object){
@@ -60,6 +83,7 @@ AutoInstancedObject.prototype.init = function(){
   this.mesh = meshGenerator.generateInstancedMesh(pseudoGraphicsGroup, this.pseudoObjectGroup);
   this.mesh.geometry.removeAttribute("positionOffset");
   this.mesh.geometry.removeAttribute("quaternion");
+  this.mesh.geometry.removeAttribute("alpha");
   this.mesh.frustumCulled = false;
   webglCallbackHandler.registerEngineObject(this);
   if (this.pseudoObjectGroup.aoTexture){
@@ -85,20 +109,36 @@ AutoInstancedObject.prototype.init = function(){
   var curIndex = 0;
   var forcedColorIndex = 0;
   this.orientationIndicesByObjectName = new Map();
+  this.alphaIndicesByObjectName = new Map();
   this.forcedColorIndicesByObjectName = new Map();
+  this.scaleIndicesByObjectName = new Map();
   var orientationIndices = [];
+  var alphaIndices = [];
+  var scaleIndices = [];
+  var scaleAry = [];
   var orientationAry = [];
+  var alphaAry = [];
   var forcedColorAry = [];
   var forcedColorIndices = [];
+  var emissiveIntensityAry = [];
+  var emissiveColorAry = [];
+  var displacementInfoAry = [];
+  var textureOffsetInfoAry = [];
   var hasColorizableMember = false;
   for (var objName in this.objects){
     var obj = this.objects[objName];
     this.orientationIndicesByObjectName.set(objName, curIndex);
+    this.alphaIndicesByObjectName.set(objName, objCount);
+    this.scaleIndicesByObjectName.set(objName, objCount);
     orientationIndices.push(curIndex);
+    alphaIndices.push(objCount);
+    scaleIndices.push(objCount);
     curIndex += 2;
     objCount ++;
     orientationAry.push(new THREE.Vector4(10, obj.mesh.position.x, obj.mesh.position.y, obj.mesh.position.z));
     orientationAry.push(new THREE.Vector4(obj.mesh.quaternion.x, obj.mesh.quaternion.y, obj.mesh.quaternion.z, obj.mesh.quaternion.w));
+    alphaAry.push(obj.getOpacity());
+    scaleAry.push(obj.mesh.scale.clone());
     obj.autoInstancedParent = this;
     if (obj.isColorizable){
       hasColorizableMember = true;
@@ -107,12 +147,47 @@ AutoInstancedObject.prototype.init = function(){
     forcedColorIndices.push(forcedColorIndex);
     this.forcedColorIndicesByObjectName.set(objName, forcedColorIndex);
     forcedColorIndex ++;
+    if (obj.hasEmissiveMap()){
+      emissiveIntensityAry.push(obj.getEmissiveIntensity());
+      emissiveColorAry.push(new THREE.Vector3(obj.getEmissiveColor().r, obj.getEmissiveColor().g, obj.getEmissiveColor().b));
+    }else{
+      emissiveIntensityAry.push(0);
+      emissiveColorAry.push(new THREE.Vector3(WHITE_COLOR.r, WHITE_COLOR.g, WHITE_COLOR.b));
+    }
+    if (obj.hasDisplacementMap()){
+      displacementInfoAry.push(new THREE.Vector2(obj.getDisplacementScale(), obj.getDisplacementBias()));
+    }else{
+      displacementInfoAry.push(new THREE.Vector2(0, 0));
+    }
+    if (obj.hasTexture()){
+      textureOffsetInfoAry.push(new THREE.Vector2(obj.getTextureOffsetX(), obj.getTextureOffsetY()));
+    }else{
+      textureOffsetInfoAry.push(new THREE.Vector2(0, 0));
+    }
   }
   var orientationIndicesBufferAttribute = new THREE.InstancedBufferAttribute(new Float32Array(orientationIndices), 1);
+  var alphaIndicesBufferAttribute = new THREE.InstancedBufferAttribute(new Float32Array(alphaIndices), 1);
+  var scaleIndicesBufferAttribute = new THREE.InstancedBufferAttribute(new Float32Array(scaleIndices), 1);
   orientationIndicesBufferAttribute.setDynamic(false);
+  alphaIndicesBufferAttribute.setDynamic(false);
+  scaleIndicesBufferAttribute.setDynamic(false);
   this.mesh.geometry.addAttribute("orientationIndex", orientationIndicesBufferAttribute);
+  this.mesh.geometry.addAttribute("alphaIndex", alphaIndicesBufferAttribute);
+  this.mesh.geometry.addAttribute("scaleIndex", scaleIndicesBufferAttribute);
   macroHandler.injectMacro("AUTO_INSTANCE_ORIENTATION_ARRAY_SIZE "+(objCount * 2), this.mesh.material, true, false);
+  macroHandler.injectMacro("AUTO_INSTANCE_ALPHA_ARRAY_SIZE "+objCount, this.mesh.material, true, false);
+  macroHandler.injectMacro("AUTO_INSTANCE_SCALE_ARRAY_SIZE "+objCount, this.mesh.material, true, false);
+  macroHandler.injectMacro("AUTO_INSTANCE_EMISSIVE_INTENSITY_ARRAY_SIZE "+objCount, this.mesh.material, true, false);
+  macroHandler.injectMacro("AUTO_INSTANCE_EMISSIVE_COLOR_ARRAY_SIZE "+objCount, this.mesh.material, true, false);
+  macroHandler.injectMacro("AUTO_INSTANCE_DISPLACEMENT_INFO_ARRAY_SIZE "+objCount, this.mesh.material, true, false);
+  macroHandler.injectMacro("AUTO_INSTANCE_TEXTURE_OFFSET_INFO_ARRAY_SIZE "+objCount, this.mesh.material, true, false);
   this.mesh.material.uniforms.autoInstanceOrientationArray = new THREE.Uniform(orientationAry);
+  this.mesh.material.uniforms.autoInstanceAlphaArray = new THREE.Uniform(alphaAry);
+  this.mesh.material.uniforms.autoInstanceScaleArray = new THREE.Uniform(scaleAry);
+  this.mesh.material.uniforms.autoInstanceEmissiveIntensityArray = new THREE.Uniform(emissiveIntensityAry);
+  this.mesh.material.uniforms.autoInstanceEmissiveColorArray = new THREE.Uniform(emissiveColorAry);
+  this.mesh.material.uniforms.autoInstanceDisplacementInfoArray = new THREE.Uniform(displacementInfoAry);
+  this.mesh.material.uniforms.autoInstanceTextureOffsetInfoArray = new THREE.Uniform(textureOffsetInfoAry);
   if (hasColorizableMember){
     macroHandler.injectMacro("AUTO_INSTANCE_FORCED_COLOR_ARRAY_SIZE "+(objCount), this.mesh.material, true, false);
     macroHandler.injectMacro("AUTO_INSTANCE_HAS_COLORIZABLE_MEMBER", this.mesh.material, true, true);

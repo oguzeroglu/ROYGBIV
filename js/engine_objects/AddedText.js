@@ -94,7 +94,73 @@ var AddedText = function(name, font, text, position, color, alpha, characterSize
   this.maxWidthPercent = 100;
   this.maxHeightPercent = 100;
 
+  this.animations = new Object();
+
   webglCallbackHandler.registerEngineObject(this);
+}
+
+AddedText.prototype.addAnimation = function(animation){
+  this.animations[animation.name] = animation;
+}
+
+AddedText.prototype.removeAnimation = function(animation){
+  delete this.animations[animation.name];
+}
+
+AddedText.prototype.getPositionZ = function(){
+  if (this.is2D){
+    return 0;
+  }else{
+    return this.mesh.position.z;
+  }
+}
+
+AddedText.prototype.getPositionY = function(){
+  if (this.is2D){
+    return this.marginPercentHeight;
+  }else{
+    return this.mesh.position.y;
+  }
+}
+
+AddedText.prototype.getPositionX = function(){
+  if (this.is2D){
+    return this.marginPercentWidth;
+  }else{
+    return this.mesh.position.x;
+  }
+}
+
+AddedText.prototype.setPositionX = function(val){
+  if (this.is2D){
+    this.set2DCoordinates(val, this.getPositionY());
+  }else{
+    this.mesh.position.x = val;
+  }
+}
+
+AddedText.prototype.setPositionY = function(val){
+  if (this.is2D){
+    this.set2DCoordinates(this.getPositionX(), val);
+  }else{
+    this.mesh.position.y = val;
+  }
+}
+
+AddedText.prototype.setPositionZ = function(val){
+  if (this.is2D){
+    return;
+  }else{
+    this.mesh.position.z = val;
+  }
+}
+
+AddedText.prototype.setPosition = function(x, y, z){
+  if (this.is2D){
+    this.set2DCoordinates(x, y);
+  }else{
+    this.mesh.position.set(x, y, z);
+  }
 }
 
 AddedText.prototype.useDefaultPrecision = function(){
@@ -238,6 +304,10 @@ AddedText.prototype.export = function(){
     exportObj.hasCustomPrecision = true;
     exportObj.customPrecision = this.customPrecision;
   }
+  exportObj.animations = new Object();
+  for (var animationName in this.animations){
+    exportObj.animations[animationName] = this.animations[animationName].export();
+  }
   return exportObj;
 }
 
@@ -275,6 +345,10 @@ AddedText.prototype.handleUVUniform = function(){
   }
 }
 
+AddedText.prototype.getMarginBetweenChars = function(){
+  return this.offsetBetweenChars;
+}
+
 AddedText.prototype.setMarginBetweenChars = function(value){
   this.offsetBetweenChars = value;
   this.constructText();
@@ -284,6 +358,10 @@ AddedText.prototype.setMarginBetweenChars = function(value){
   }else{
     this.handleBoundingBox();
   }
+}
+
+AddedText.prototype.getMarginBetweenLines = function(){
+  return this.offsetBetweenLines;
 }
 
 AddedText.prototype.setMarginBetweenLines = function(value){
@@ -313,6 +391,11 @@ AddedText.prototype.setText = function(newText, fromScript){
   }
 }
 
+AddedText.prototype.getColor = function(){
+  REUSABLE_COLOR.copy(this.material.uniforms.color.value);
+  return REUSABLE_COLOR;
+}
+
 AddedText.prototype.setColor = function(colorString, fromScript){
   if (fromScript && (typeof this.oldColorR == UNDEFINED)){
     this.oldColorR = this.material.uniforms.color.value.r;
@@ -320,6 +403,10 @@ AddedText.prototype.setColor = function(colorString, fromScript){
     this.oldColorB = this.material.uniforms.color.value.b;
   }
   this.material.uniforms.color.value.set(colorString);
+}
+
+AddedText.prototype.getAlpha = function(){
+  return this.alpha;
 }
 
 AddedText.prototype.setAlpha = function(alpha, fromScript){
@@ -333,6 +420,15 @@ AddedText.prototype.setAlpha = function(alpha, fromScript){
   }
   this.material.uniforms.alpha.value = alpha;
   this.alpha = alpha;
+}
+
+AddedText.prototype.getBackgroundColor = function(){
+  REUSABLE_COLOR.copy(this.material.uniforms.backgroundColor.value);
+  return REUSABLE_COLOR;
+}
+
+AddedText.prototype.getBackgroundAlpha = function(){
+  return this.material.uniforms.backgroundAlpha.value;
 }
 
 AddedText.prototype.setBackground = function(backgroundColorString, backgroundAlpha, fromScript){
@@ -386,6 +482,10 @@ AddedText.prototype.removeBackground = function(fromScript){
   if (!fromScript){
     this.hasBackground = false;
   }
+}
+
+AddedText.prototype.getCharSize = function(value){
+  return this.characterSize;
 }
 
 AddedText.prototype.setCharSize = function(value){
@@ -664,7 +764,18 @@ AddedText.prototype.restore = function(){
       this.isBGRemoved = false;
     }
   }
-  this.mesh.position.copy(this.position);
+  if (!this.is2D){
+    this.setPosition(this.position.x, this.position.y, this.position.z);
+  }else{
+    this.setPosition(this.originalMarginX, this.originalMarginY);
+    delete this.originalMarginX;
+    delete this.originalMarginY;
+  }
+}
+
+AddedText.prototype.firstNChars = function(originalText, n){
+  n = parseInt(n);
+  this.setText(originalText.substring(0, n), false);
 }
 
 AddedText.prototype.setAffectedByFog = function(val){
@@ -712,10 +823,12 @@ AddedText.prototype.set2DCoordinates = function(marginPercentWidth, marginPercen
   GLOBAL_ADDEDTEXT_VIEWPORT_UNIFORM.value.set(0, 0, window.innerWidth * screenResolution, window.innerHeight * screenResolution);
   this.marginPercentWidth = marginPercentWidth;
   this.marginPercentHeight = marginPercentHeight;
-  var isFromLeft = false, isFromTop = false;
+  var isFromLeft = false, isFromTop = false, isFromCenter = false;
   if (this.marginMode == MARGIN_MODE_2D_TEXT_TOP_LEFT){
     isFromLeft = true;
     isFromTop = true;
+  }else if (this.marginMode == MARGIN_MODE_2D_TEXT_CENTER){
+    isFromCenter = true;
   }
   var curViewport = REUSABLE_QUATERNION.set(0, 0, window.innerWidth, window.innerHeight);
   if (isFromLeft){
@@ -729,7 +842,7 @@ AddedText.prototype.set2DCoordinates = function(marginPercentWidth, marginPercen
       marginX = 1 - widthX - cSizeX;
     }
     this.setShaderMargin(true, marginX);
-  }else{
+  }else if (!isFromCenter){
     marginPercentWidth = marginPercentWidth + 100;
     var tmpX = ((curViewport.z - curViewport.x) / 2.0) + curViewport.x + this.twoDimensionalParameters.x;
     var widthX = (((tmpX - curViewport.x) * 2.0) / curViewport.z) - 1.0;
@@ -737,6 +850,19 @@ AddedText.prototype.set2DCoordinates = function(marginPercentWidth, marginPercen
     var cSizeX = (this.characterSize / (renderer.getCurrentViewport().z / screenResolution));
     this.cSizeX = cSizeX;
     marginX += cSizeX + widthX;
+    marginX = 2 - marginX;
+    if (marginX < -1){
+      marginX = -1 + cSizeX;
+    }
+    this.setShaderMargin(true, marginX);
+  }else{
+    marginPercentWidth = marginPercentWidth + 100;
+    var tmpX = ((curViewport.z - curViewport.x) / 2.0) + curViewport.x + this.twoDimensionalParameters.x;
+    var widthX = (((tmpX - curViewport.x) * 2.0) / curViewport.z) - 1.0;
+    var marginX = (((marginPercentWidth) * (2)) / (100)) -1;
+    var cSizeX = (this.characterSize / (renderer.getCurrentViewport().z / screenResolution));
+    this.cSizeX = cSizeX;
+    marginX += (widthX / 2);
     marginX = 2 - marginX;
     if (marginX < -1){
       marginX = -1 + cSizeX;
@@ -755,13 +881,23 @@ AddedText.prototype.set2DCoordinates = function(marginPercentWidth, marginPercen
       marginY = -1 - heightY + cSizeY;
     }
     this.setShaderMargin(false, marginY);
-  }else{
+  }else if (!isFromCenter){
     var tmpY = ((curViewport.w - curViewport.y) / 2.0) + curViewport.y + this.twoDimensionalParameters.y;
     var heightY = (((tmpY - curViewport.y) * 2.0) / curViewport.w) - 1.0;
     var marginY = (((marginPercentHeight) * (2)) / (100)) -1;
     var cSizeY = (this.characterSize / (renderer.getCurrentViewport().w / screenResolution));
     this.cSizeY = cSizeY;
     marginY -= cSizeY;
+    if (marginY + heightY < -1){
+      marginY = -1 - heightY + cSizeY;
+    }
+    this.setShaderMargin(false, marginY);
+  }else{
+    var tmpY = ((curViewport.w - curViewport.y) / 2.0) + curViewport.y + this.twoDimensionalParameters.y;
+    var heightY = (((tmpY - curViewport.y) * 2.0) / curViewport.w) - 1.0;
+    var marginY = (((marginPercentHeight) * (2)) / (100)) -1;
+    var cSizeY = (this.characterSize / (renderer.getCurrentViewport().w / screenResolution));
+    this.cSizeY = cSizeY;
     if (marginY + heightY < -1){
       marginY = -1 - heightY + cSizeY;
     }

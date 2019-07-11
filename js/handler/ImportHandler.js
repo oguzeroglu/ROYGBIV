@@ -624,10 +624,6 @@ ImportHandler.prototype.importAddedObjects = function(obj){
       addedObjectInstance.softCopyParentName = curAddedObjectExport.softCopyParentName;
     }
 
-    addedObjectInstance.mesh.material.setEmissiveIntensity = curAddedObjectExport.emissiveIntensity;
-    addedObjectInstance.mesh.material.setEmissiveColor = curAddedObjectExport.emissiveColor;
-    addedObjectInstance.mesh.material.uniforms.setAOIntensity = curAddedObjectExport.aoMapIntensity;
-
     addedObjects[addedObjectName] = addedObjectInstance;
     if (curAddedObjectExport.isRotationDirty){
       addedObjectInstance.isRotationDirty = true;
@@ -678,16 +674,18 @@ ImportHandler.prototype.importAddedObjects = function(obj){
 
      if (curAddedObjectExport.txtMatrix){
        addedObjectInstance.setTxtMatrix = curAddedObjectExport.txtMatrix;
+       addedObjectInstance.setTxtOffsetX = curAddedObjectExport.textureOffsetX;
+       addedObjectInstance.setTxtOffsetY = curAddedObjectExport.textureOffsetY;
      }
      addedObjectInstance.mesh.material.uniforms.alpha.value = curAddedObjectExport.opacity;
      if (!(typeof curAddedObjectExport.aoMapIntensity == UNDEFINED)){
-       addedObjectInstance.setAOIntensity = curAddedObjectExport.aoMapIntensity;
+       addedObjectInstance.setAOIntensityValue = curAddedObjectExport.aoMapIntensity;
      }
      if (!(typeof curAddedObjectExport.emissiveIntensity == UNDEFINED)){
-       addedObjectInstance.setEmissiveIntensity = curAddedObjectExport.emissiveIntensity;
+       addedObjectInstance.setEmissiveIntensityValue = curAddedObjectExport.emissiveIntensity;
      }
      if (!(typeof curAddedObjectExport.emissiveColor == UNDEFINED)){
-       addedObjectInstance.setEmissiveColor = curAddedObjectExport.emissiveColor;
+       addedObjectInstance.setEmissiveColorValue = curAddedObjectExport.emissiveColor;
      }
      if (!(typeof curAddedObjectExport.positionWhenUsedAsFPSWeapon == UNDEFINED)){
        addedObjectInstance.isFPSWeapon = true;
@@ -709,6 +707,10 @@ ImportHandler.prototype.importAddedObjects = function(obj){
      }
      if (curAddedObjectExport.muzzleFlashParameters){
        addedObjectInstance.muzzleFlashParameters = curAddedObjectExport.muzzleFlashParameters;
+     }
+     for (var animationName in curAddedObjectExport.animations){
+       var curAnimationExport = curAddedObjectExport.animations[animationName];
+       addedObjectInstance.addAnimation(new Animation(animationName, curAnimationExport.type, addedObjectInstance, curAnimationExport.description, curAnimationExport.rewind, curAnimationExport.repeat));
      }
   }
   for (var objName in addedObjects){
@@ -896,10 +898,10 @@ ImportHandler.prototype.mapLoadedTexturePack = function(texturePackName, exportO
             material.uniforms.displacementMap.value.repeat.y = textureRepeatV;
           }
           if (!(typeof displacementScale == UNDEFINED)){
-            material.uniforms.displacementInfo.value.x = displacementScale;
+            addedObject.setDisplacementScale(displacementScale);
           }
           if (!(typeof displacementBias == UNDEFINED)){
-            material.uniforms.displacementInfo.value.y = displacementBias;
+            addedObject.setDisplacementBias(displacementBias);
           }
           material.uniforms.displacementMap.value.needsUpdate = true;
           material.uniforms.displacementMap.value.updateMatrix();
@@ -1002,6 +1004,10 @@ ImportHandler.prototype.importAddedTexts = function(obj){
     if (curTextExport.hasCustomPrecision){
       addedTextInstance.useCustomShaderPrecision(curTextExport.customPrecision);
     }
+    for (var animationName in curTextExport.animations){
+      var curAnimationExport = curTextExport.animations[animationName];
+      addedTextInstance.addAnimation(new Animation(animationName, curAnimationExport.type, addedTextInstance, curAnimationExport.description, curAnimationExport.rewind, curAnimationExport.repeat));
+    }
   }
 }
 
@@ -1012,22 +1018,27 @@ ImportHandler.prototype.importAddedObjectGraphicsProperties = function(){
       for (var ix = 0; ix<addedObject.setTxtMatrix.length; ix++){
         addedObject.mesh.material.uniforms.textureMatrix.value.elements[ix] = addedObject.setTxtMatrix[ix];
       }
+      addedObject.setTextureOffsetX(addedObject.setTxtOffsetX);
+      addedObject.setTextureOffsetY(addedObject.setTxtOffsetY);
       delete addedObject.setTxtMatrix;
+      delete addedObject.setTxtOffsetX;
+      delete addedObject.setTxtOffsetY;
     }
     if (addedObject.hasEmissiveMap()){
-      if (!(typeof addedObject.setEmissiveIntensity == UNDEFINED)){
-        addedObject.mesh.material.uniforms.emissiveIntensity.value = addedObject.setEmissiveIntensity;
-        delete addedObject.setEmissiveIntensity;
+      if (!(typeof addedObject.setEmissiveIntensityValue == UNDEFINED)){
+        addedObject.setEmissiveIntensity(addedObject.setEmissiveIntensityValue);
+        delete addedObject.setEmissiveIntensityValue;
       }
-      if (!(typeof addedObject.setEmissiveColor == UNDEFINED)){
-        addedObject.mesh.material.uniforms.emissiveColor.value.set(addedObject.setEmissiveColor);
-        delete addedObject.setEmissiveColor;
+      if (!(typeof addedObject.setEmissiveColorValue == UNDEFINED)){
+        REUSABLE_COLOR.set(addedObject.setEmissiveColorValue);
+        addedObject.setEmissiveColor(REUSABLE_COLOR);
+        delete addedObject.setEmissiveColorValue;
       }
     }
     if (addedObject.hasAOMap()){
-      if (!(typeof addedObject.setAOIntensity == UNDEFINED)){
-        addedObject.mesh.material.uniforms.aoIntensity.value = addedObject.setAOIntensity;
-        delete addedObject.setAOIntensity;
+      if (!(typeof addedObject.setAOIntensityValue == UNDEFINED)){
+        addedObject.setAOIntensity(addedObject.setAOIntensityValue);
+        delete addedObject.setAOIntensityValue;
       }
     }
   }
@@ -1127,31 +1138,23 @@ ImportHandler.prototype.importObjectGroups = function(obj){
     for (var childName in objectGroupInstance.group){
       objectGroupInstance.group[childName].updateOpacity(curObjectGroupExport.totalAlpha * objectGroupInstance.group[childName].opacityWhenAttached);
     }
+    if (objectGroupInstance.mesh.material.uniforms.totalTextureOffset){
+      objectGroupInstance.setTextureOffsetX(curObjectGroupExport.totalTextureOffsetX);
+      objectGroupInstance.setTextureOffsetY(curObjectGroupExport.totalTextureOffsetY);
+    }
     if (objectGroupInstance.mesh.material.uniforms.totalAOIntensity){
-      objectGroupInstance.mesh.material.uniforms.totalAOIntensity.value = curObjectGroupExport.totalAOIntensity;
-      for (var childName in objectGroupInstance.group){
-        if (!(typeof objectGroupInstance.group[childName].aoIntensityWhenAttached == UNDEFINED)){
-          objectGroupInstance.group[childName].mesh.material.uniforms.aoIntensity.value = objectGroupInstance.group[childName].aoIntensityWhenAttached * curObjectGroupExport.totalAOIntensity;
-        }
-      }
+      objectGroupInstance.setAOIntensity(curObjectGroupExport.totalAOIntensity);
     }
     if (objectGroupInstance.mesh.material.uniforms.totalEmissiveIntensity){
-      objectGroupInstance.mesh.material.uniforms.totalEmissiveIntensity.value = curObjectGroupExport.totalEmissiveIntensity;
-      for (var childName in objectGroupInstance.group){
-        if (!(typeof objectGroupInstance.group[childName].emissiveIntensityWhenAttached == UNDEFINED)){
-          objectGroupInstance.group[childName].mesh.material.uniforms.emissiveIntensity.value = objectGroupInstance.group[childName].emissiveIntensityWhenAttached * curObjectGroupExport.totalEmissiveIntensity;
-        }
-      }
+      objectGroupInstance.setEmissiveIntensity(curObjectGroupExport.totalEmissiveIntensity);
     }
     if (objectGroupInstance.mesh.material.uniforms.totalEmissiveColor){
-      objectGroupInstance.mesh.material.uniforms.totalEmissiveColor.value.set(curObjectGroupExport.totalEmissiveColor);
-      for (var childName in objectGroupInstance.group){
-        if (!(typeof objectGroupInstance.group[childName].emissiveColorWhenAttached == UNDEFINED)){
-          REUSABLE_COLOR.set(objectGroupInstance.group[childName].emissiveColorWhenAttached);
-          REUSABLE_COLOR.multiply(objectGroupInstance.mesh.material.uniforms.totalEmissiveColor.value);
-          objectGroupInstance.group[childName].mesh.material.uniforms.emissiveColor.value.copy(REUSABLE_COLOR);
-        }
-      }
+      REUSABLE_COLOR.set(curObjectGroupExport.totalEmissiveColor);
+      objectGroupInstance.setEmissiveColor(REUSABLE_COLOR);
+    }
+    if (objectGroupInstance.mesh.material.uniforms.totalDisplacementInfo){
+      objectGroupInstance.setDisplacementScale(curObjectGroupExport.totalDisplacementScale);
+      objectGroupInstance.setDisplacementBias(curObjectGroupExport.totalDisplacementBias);
     }
     if (curObjectGroupExport.isPhysicsSimplified){
       var params = curObjectGroupExport.physicsSimplificationParameters;
@@ -1187,6 +1190,10 @@ ImportHandler.prototype.importObjectGroups = function(obj){
     }
     if (curObjectGroupExport.muzzleFlashParameters){
       objectGroupInstance.muzzleFlashParameters = curObjectGroupExport.muzzleFlashParameters;
+    }
+    for (var animationName in curObjectGroupExport.animations){
+      var curAnimationExport = curObjectGroupExport.animations[animationName];
+      objectGroupInstance.addAnimation(new Animation(animationName, curAnimationExport.type, objectGroupInstance, curAnimationExport.description, curAnimationExport.rewind, curAnimationExport.repeat));
     }
   }
   for (var objName in objectGroups){

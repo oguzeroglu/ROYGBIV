@@ -63,4 +63,7 @@ SelectionHandler.prototype.resetCurrentSelection = function(){
     selectedAddedText = 0;
   }
   this.currentSelection = 0;
+  if (!isDeployment){
+    guiHandler.afterObjectSelection();
+  }
 }

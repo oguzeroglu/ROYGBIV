@@ -24,6 +24,7 @@ function render(){
   }
 
   if (mode == 1){
+    cpuOperationsHandler.updateAnimations();
     cpuOperationsHandler.stepPhysics();
     cpuOperationsHandler.updateTrackingObjects();
     cpuOperationsHandler.updateDynamicObjects();
@@ -38,6 +39,7 @@ function render(){
       particleSystemCreatorGUIHandler.update();
       muzzleFlashCreatorGUIHandler.update();
       fpsWeaponGUIHandler.update();
+      animationCreatorGUIHandler.update();
     }
     cameraOperationsDone = false;
   }
@@ -48,6 +50,9 @@ function render(){
     previewSceneRendered = true;
   }
   cpuOperationsHandler.updateRaycaster();
+  if (!isMobile){
+    cpuOperationsHandler.flushMouseEventHandler();
+  }
   fpsHandler.end();
 }
 

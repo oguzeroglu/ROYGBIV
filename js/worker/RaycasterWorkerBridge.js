@@ -231,9 +231,16 @@ var RaycasterWorkerBridge = function(){
     if (mode == 0){
       rayCaster.worker.postMessage({
         "shiftPress": {isPressed: isPressed}
-      })
+      });
     }
   };
+  this.onAltPress = function(isPressed){
+    if (mode == 0){
+      rayCaster.worker.postMessage({
+        "altPress": {isPressed: isPressed}
+      });
+    }
+  }
   this.issueAddedTextScaleUpdate = function(text){
     var addedTextScaleDescription = rayCaster.transferableMessageBody.addedTextScaleDescription;
     var i = text.indexInTextScaleDescriptionArray;

@@ -1112,7 +1112,7 @@ function parse(input){
           if (wallCollection){
             wallCollection.destroy();
             if (!jobHandlerWorking){
-              terminal.printInfo(Text.WALL_COLLECTION_DESTROYED);
+              refreshRaycaster(Text.WALL_COLLECTION_DESTROYED);
             }
           }else{
             terminal.printError(Text.NO_SUCH_WALL_COLLECTION);
@@ -4377,6 +4377,26 @@ function parse(input){
             terminal.clear();
             scriptsGUIHandler.show(scriptDescriptions);
           });
+          return true;
+        break;
+        case 186: //animations
+          if (mode != 0){
+            terminal.printError(Text.WORKS_ONLY_IN_DESIGN_MODE);
+            return true;
+          }
+          var objName = splitted[1];
+          var obj = addedObjects[objName];
+          if (!obj){
+            obj = objectGroups[objName];
+            if (!obj){
+              obj = addedTexts[objName];
+              if (!obj){
+                terminal.printError(Text.NO_SUCH_OBJECT);
+                return true;
+              }
+            }
+          }
+          animationCreatorGUIHandler.show(obj);
           return true;
         break;
       }

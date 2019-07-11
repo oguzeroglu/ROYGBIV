@@ -648,6 +648,24 @@ Terminal.prototype.autocomplete = function(command){
 				}
 				helpString = "[Crosshairs]: ";
 			break;
+			case commandDescriptor.OBJECT_AND_TEXT_NAME:
+				for (var objName in addedObjects){
+					if (objName.toLowerCase().startsWith(curEntry.toLowerCase())){
+						possibilities.push(objName);
+					}
+				}
+				for (var objName in objectGroups){
+					if (objName.toLowerCase().startsWith(curEntry.toLowerCase())){
+						possibilities.push(objName);
+					}
+				}
+				for (var textName in addedTexts){
+					if (textName.toLowerCase().startsWith(curEntry.toLowerCase())){
+						possibilities.push(textName);
+					}
+				}
+				helpString = "[Objects]: ";
+			break;
 			default:
 				throw new Error("Not implemented.");
 			break;

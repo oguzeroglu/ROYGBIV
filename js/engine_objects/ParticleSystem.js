@@ -377,7 +377,7 @@ ParticleSystem.prototype.rewindParticle = function(particle, delay){
 }
 
 ParticleSystem.prototype.calculatePseudoPosition = function(){
-  var pseudoTick = this.tick + (this.collisionTimeOffset * (1/60));
+  var pseudoTick = this.tick + (this.collisionTimeOffset * (STEP));
   var vx = 0, vy = 0, vz = 0, ax = 0, ay = 0, az = 0;
   if (this.velocity){
     vx = this.velocity.x;
@@ -420,7 +420,7 @@ ParticleSystem.prototype.update = function(){
   if (this.destroyed){
     return;
   }
-  this.tick += (1/60);
+  this.tick += (STEP);
   if (this.tick > this.maxPSTime){
     this.start(EMPTY_OBJECT);
   }

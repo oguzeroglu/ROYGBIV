@@ -20,6 +20,7 @@ var windowLoaded;
 var cliFocused = true;
 var omGUIFocused = false;
 var tmGUIFocused = false;
+var acGUIFocused = false;
 var cliIsBeingDragged = false;
 var requestID;
 var boundingClientRect;
@@ -53,6 +54,8 @@ var viewportMaxHeight = 0;
 var currentViewport = new Object();
 var fixedAspect = 0;
 
+var STEP = 1/60;
+
 // PHYSICS
 var debugRenderer;
 var physicsWorld;
@@ -64,7 +67,7 @@ var contactEquationRelaxation = 4;
 var physicsIterations = 7;
 var physicsTolerance = 0.1;
 var gravityY = -900;
-var physicsStepAmount = 1/60;
+var physicsStepAmount = STEP;
 var friction = 1;
 var surfacePhysicalThickness = 1;
 
@@ -286,6 +289,7 @@ var DEFAULT_OFFSET_BETWEEN_CHARS = 20;
 var DEFAULT_OFFSET_BETWEEN_LINES = 20;
 var MARGIN_MODE_2D_TEXT_TOP_LEFT = 0;
 var MARGIN_MODE_2D_TEXT_BOTTOM_RIGHT = 1;
+var MARGIN_MODE_2D_TEXT_CENTER = 2;
 var roygbivAttributeCounter = 1;
 var roygbivBufferAttributeCounter = 1;
 var roygbivSkippedArrayBufferUpdates = 0;
@@ -321,9 +325,11 @@ var fogCreatorGUIHandler;
 var fontCreatorGUIHandler;
 var crosshairCreatorGUIHandler;
 var scriptsGUIHandler;
+var animationCreatorGUIHandler;
 var skyboxHandler;
 var fogHandler;
 var scriptsHandler;
+var animationHandler;
 var preConfiguredParticleSystems = new Object();
 var preConfiguredParticleSystemPools = new Object();
 var muzzleFlashes = new Object();

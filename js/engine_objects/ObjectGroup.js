@@ -32,6 +32,110 @@ var ObjectGroup = function(name, group){
   this.isIntersectable = true;
   this.lastUpdatePosition = new THREE.Vector3();
   this.lastUpdateQuaternion = new THREE.Quaternion();
+
+  this.animations = new Object();
+}
+
+ObjectGroup.prototype.addAnimation = function(animation){
+  this.animations[animation.name] = animation;
+}
+
+ObjectGroup.prototype.removeAnimation = function(animation){
+  delete this.animations[animation.name];
+}
+
+ObjectGroup.prototype.getAOIntensity = function(){
+  return this.mesh.material.uniforms.totalAOIntensity.value;
+}
+
+ObjectGroup.prototype.setAOIntensity = function(val){
+  this.mesh.material.uniforms.totalAOIntensity.value = val;
+  for (var objName in this.group){
+    if (!(typeof this.group[objName].aoIntensityWhenAttached == UNDEFINED)){
+      this.group[objName].setAOIntensity(this.group[objName].aoIntensityWhenAttached * val);
+    }
+  }
+}
+
+ObjectGroup.prototype.getEmissiveColor = function(){
+  REUSABLE_COLOR.copy(this.mesh.material.uniforms.totalEmissiveColor.value);
+  return REUSABLE_COLOR;
+}
+
+ObjectGroup.prototype.setEmissiveColor = function(val){
+  this.mesh.material.uniforms.totalEmissiveColor.value.copy(val);
+  for (var objName in this.group){
+    if (!(typeof this.group[objName].emissiveColorWhenAttached == UNDEFINED)){
+      REUSABLE_COLOR.copy(this.group[objName].emissiveColorWhenAttached);
+      REUSABLE_COLOR.multiply(this.mesh.material.uniforms.totalEmissiveColor.value);
+      this.group[objName].setEmissiveColor(REUSABLE_COLOR);
+    }
+  }
+}
+
+ObjectGroup.prototype.getDisplacementBias = function(){
+  return this.mesh.material.uniforms.totalDisplacementInfo.value.y;
+}
+
+ObjectGroup.prototype.setDisplacementBias = function(val){
+  this.mesh.material.uniforms.totalDisplacementInfo.value.y = val;
+  for (var objName in this.group){
+    if (!typeof this.group[objName].displacementBiasWhenAttached == UNDEFINED){
+      this.group[objName].mesh.material.uniforms.displacementInfo.value.y = this.group[objName].displacementBiasWhenAttached * val;
+    }
+  }
+}
+
+ObjectGroup.prototype.getDisplacementScale = function(){
+  return this.mesh.material.uniforms.totalDisplacementInfo.value.x;
+}
+
+ObjectGroup.prototype.setDisplacementScale = function(val){
+  this.mesh.material.uniforms.totalDisplacementInfo.value.x = val;
+  for (var objName in this.group){
+    if (!(typeof this.group[objName].displacementScaleWhenAttached == UNDEFINED)){
+      this.group[objName].mesh.material.uniforms.displacementInfo.value.x = this.group[objName].displacementScaleWhenAttached * val;
+    }
+  }
+}
+
+ObjectGroup.prototype.getTextureOffsetY = function(){
+  return this.mesh.material.uniforms.totalTextureOffset.value.y;
+}
+
+ObjectGroup.prototype.setTextureOffsetY = function(val){
+  this.mesh.material.uniforms.totalTextureOffset.value.y = val;
+  for (var objName in this.group){
+    if (!(typeof this.group[objName].textureOffsetYWhenAttached == UNDEFINED)){
+      this.group[objName].setTextureOffsetY(this.group[objName].textureOffsetYWhenAttached + val);
+    }
+  }
+}
+
+ObjectGroup.prototype.getTextureOffsetX = function(){
+  return this.mesh.material.uniforms.totalTextureOffset.value.x;
+}
+
+ObjectGroup.prototype.setTextureOffsetX = function(val){
+  this.mesh.material.uniforms.totalTextureOffset.value.x = val;
+  for (var objName in this.group){
+    if (!(typeof this.group[objName].textureOffsetXWhenAttached == UNDEFINED)){
+      this.group[objName].setTextureOffsetX(this.group[objName].textureOffsetXWhenAttached + val);
+    }
+  }
+}
+
+ObjectGroup.prototype.getEmissiveIntensity = function(){
+  return this.mesh.material.uniforms.totalEmissiveIntensity.value;
+}
+
+ObjectGroup.prototype.setEmissiveIntensity = function(val){
+  this.mesh.material.uniforms.totalEmissiveIntensity.value = val;
+  for (var objName in this.group){
+    if (!(typeof this.group[objName].emissiveIntensityWhenAttached == UNDEFINED)){
+      this.group[objName].setEmissiveIntensity(this.group[objName].emissiveIntensityWhenAttached * val);
+    }
+  }
 }
 
 ObjectGroup.prototype.useDefaultPrecision = function(){
@@ -483,6 +587,41 @@ ObjectGroup.prototype.textureCompare = function(txt1, txt2){
   return true;
 }
 
+ObjectGroup.prototype.hasDiffuseMap = function(){
+  if (this.diffuseTexture){
+    return true;
+  }
+  return false;
+}
+
+ObjectGroup.prototype.hasEmissiveMap = function(){
+  if (this.emissiveTexture){
+    return true;
+  }
+  return false;
+}
+
+ObjectGroup.prototype.hasAlphaMap = function(){
+  if (this.alphaTexture){
+    return true;
+  }
+  return false;
+}
+
+ObjectGroup.prototype.hasAOMap = function(){
+  if (this.aoTexture){
+    return true;
+  }
+  return false;
+}
+
+ObjectGroup.prototype.hasDisplacementMap = function(){
+  if (this.displacementTexture){
+    return true;
+  }
+  return false;
+}
+
 ObjectGroup.prototype.handleTextures = function(){
   this.diffuseTexture = 0;
   this.emissiveTexture = 0;
@@ -593,10 +732,10 @@ ObjectGroup.prototype.mergeInstanced = function(){
     colors.push(obj.material.color.b);
     if (this.emissiveTexture){
       if (obj.hasEmissiveMap()){
-        emissiveIntensities.push(obj.mesh.material.uniforms.emissiveIntensity.value);
-        emissiveColors.push(obj.mesh.material.uniforms.emissiveColor.value.r);
-        emissiveColors.push(obj.mesh.material.uniforms.emissiveColor.value.g);
-        emissiveColors.push(obj.mesh.material.uniforms.emissiveColor.value.b);
+        emissiveIntensities.push(obj.getEmissiveIntensity());
+        emissiveColors.push(obj.getEmissiveColor().r);
+        emissiveColors.push(obj.getEmissiveColor().g);
+        emissiveColors.push(obj.getEmissiveColor().b);
       }else{
         emissiveIntensities.push(1);
         emissiveColors.push(1);
@@ -606,7 +745,7 @@ ObjectGroup.prototype.mergeInstanced = function(){
     }
     if (this.aoTexture){
       if (obj.hasAOMap()){
-        aoIntensities.push(obj.mesh.material.uniforms.aoIntensity.value);
+        aoIntensities.push(obj.getAOIntensity());
       }else{
         aoIntensities.push(1);
       }
@@ -644,8 +783,8 @@ ObjectGroup.prototype.mergeInstanced = function(){
         textureInfos.push(-10);
       }
       if (obj.hasDisplacementMap()){
-        displacementInfos.push(obj.mesh.material.uniforms.displacementInfo.value.x);
-        displacementInfos.push(obj.mesh.material.uniforms.displacementInfo.value.y);
+        displacementInfos.push(obj.getDisplacementScale());
+        displacementInfos.push(obj.getDisplacementBias());
       }else{
         displacementInfos.push(-100);
         displacementInfos.push(-100);
@@ -945,13 +1084,13 @@ ObjectGroup.prototype.merge = function(){
         if (addedObject.hasDisplacementMap()){
           this.push(
             displacementInfos,
-            addedObject.mesh.material.uniforms.displacementInfo.value.x,
+            addedObject.getDisplacementScale(),
             (2*a),
             isIndexed
           );
           this.push(
             displacementInfos,
-            addedObject.mesh.material.uniforms.displacementInfo.value.y,
+            addedObject.getDisplacementBias(),
             ((2*a) + 1),
             isIndexed
           );
@@ -964,13 +1103,13 @@ ObjectGroup.prototype.merge = function(){
         if (addedObject.hasDisplacementMap()){
           this.push(
             displacementInfos,
-            addedObject.mesh.material.uniforms.displacementInfo.value.x,
+            addedObject.getDisplacementScale(),
             (2*b),
             isIndexed
           );
           this.push(
             displacementInfos,
-            addedObject.mesh.material.uniforms.displacementInfo.value.y,
+            addedObject.getDisplacementBias(),
             ((2*b) + 1),
             isIndexed
           );
@@ -983,13 +1122,13 @@ ObjectGroup.prototype.merge = function(){
         if (addedObject.hasDisplacementMap()){
           this.push(
             displacementInfos,
-            addedObject.mesh.material.uniforms.displacementInfo.value.x,
+            addedObject.getDisplacementScale(),
             (2*c),
             isIndexed
           );
           this.push(
             displacementInfos,
-            addedObject.mesh.material.uniforms.displacementInfo.value.y,
+            addedObject.getDisplacementBias(),
             ((2*c) + 1),
             isIndexed
           );
@@ -1014,7 +1153,7 @@ ObjectGroup.prototype.merge = function(){
     if (this.emissiveTexture){
       var emissiveIntensity;
       if (addedObject.hasEmissiveMap()){
-        emissiveIntensity = addedObject.mesh.material.uniforms.emissiveIntensity.value;
+        emissiveIntensity = addedObject.getEmissiveIntensity();
       }else{
         emissiveIntensity = 0;
       }
@@ -1029,7 +1168,7 @@ ObjectGroup.prototype.merge = function(){
       }
       var emissiveColor;
       if (addedObject.hasEmissiveMap()){
-        emissiveColor = addedObject.mesh.material.uniforms.emissiveColor.value;
+        emissiveColor = addedObject.getEmissiveColor();
       }else{
         emissiveColor = WHITE_COLOR;
       }
@@ -1053,7 +1192,7 @@ ObjectGroup.prototype.merge = function(){
     if (this.aoTexture){
       var aoIntensity;
       if (addedObject.hasAOMap()){
-        aoIntensity = addedObject.mesh.material.uniforms.aoIntensity.value;
+        aoIntensity = addedObject.getAOIntensity();
       }else{
         aoIntensity = 0;
       }
@@ -1476,6 +1615,23 @@ ObjectGroup.prototype.detach = function(){
       addedObject.pqzWhenAttached,
       addedObject.pqwWhenAttached
     );
+    if (addedObject.hasTexture()){
+      addedObject.setTextureOffsetX(addedObject.textureOffsetXWhenAttached);
+      addedObject.setTextureOffsetY(addedObject.textureOffsetYWhenAttached);
+    }
+    if (addedObject.hasEmissiveMap()){
+      addedObject.setEmissiveIntensity(addedObject.emissiveIntensityWhenAttached);
+      REUSABLE_COLOR.set(addedObject.emissiveColorWhenAttached);
+      addedObject.setEmissiveColor(REUSABLE_COLOR);
+    }
+    if (addedObject.hasDisplacementMap()){
+      addedObject.setDisplacementScale(addedObject.displacementScaleWhenAttached);
+      addedObject.setDisplacementBias(addedObject.displacementBiasWhenAttached);
+    }
+    if (addedObject.hasAOMap()){
+      addedObject.setAOIntensity(addedObject.aoIntensityWhenAttached);
+    }
+    addedObject.updateOpacity(addedObject.opacityWhenAttached);
     addedObject.physicsBody.initQuaternion.copy(addedObject.physicsBody.quaternion);
 
     delete addedObject.positionXWhenAttached;
@@ -1491,8 +1647,12 @@ ObjectGroup.prototype.detach = function(){
     delete addedObject.pqwWhenAttached;
     delete addedObject.opacityWhenAttached;
     delete addedObject.emissiveIntensityWhenAttached;
+    delete addedObject.displacementScaleWhenAttached;
+    delete addedObject.displacementBiasWhenAttached;
     delete addedObject.emissiveColorWhenAttached;
     delete addedObject.aoIntensityWhenAttached;
+    delete addedObject.textureOffsetXWhenAttached;
+    delete addedObject.textureOffsetYWhenAttached;
   }
 }
 
@@ -1833,15 +1993,23 @@ ObjectGroup.prototype.export = function(){
     exportObj.softCopyParentName = this.softCopyParentName;
   }
 
-  exportObj.totalAlpha = this.mesh.material.uniforms.totalAlpha.value;
+  exportObj.totalAlpha = this.getOpacity();
   if (this.mesh.material.uniforms.totalAOIntensity){
-    exportObj.totalAOIntensity = this.mesh.material.uniforms.totalAOIntensity.value;
+    exportObj.totalAOIntensity = this.getAOIntensity();
+  }
+  if (this.mesh.material.uniforms.totalTextureOffset){
+    exportObj.totalTextureOffsetX = this.getTextureOffsetX();
+    exportObj.totalTextureOffsetY = this.getTextureOffsetY();
   }
   if (this.mesh.material.uniforms.totalEmissiveIntensity){
-    exportObj.totalEmissiveIntensity = this.mesh.material.uniforms.totalEmissiveIntensity.value;
+    exportObj.totalEmissiveIntensity = this.getEmissiveIntensity();
+  }
+  if (this.mesh.material.uniforms.totalDisplacementInfo){
+    exportObj.totalDisplacementScale = this.getDisplacementScale();
+    exportObj.totalDisplacementBias = this.getDisplacementBias();
   }
   if (this.mesh.material.uniforms.totalEmissiveColor){
-    exportObj.totalEmissiveColor = "#"+this.mesh.material.uniforms.totalEmissiveColor.value.getHexString();
+    exportObj.totalEmissiveColor = "#"+this.getEmissiveColor().getHexString();
   }
   exportObj.isRotationDirty = this.isRotationDirty;
   if (this.isPhysicsSimplified){
@@ -1874,6 +2042,10 @@ ObjectGroup.prototype.export = function(){
   }
   if (this.muzzleFlashParameters){
     exportObj.muzzleFlashParameters = this.muzzleFlashParameters;
+  }
+  exportObj.animations = new Object();
+  for (var animationName in this.animations){
+    exportObj.animations[animationName] = this.animations[animationName].export();
   }
   return exportObj;
 }
@@ -2129,9 +2301,29 @@ ObjectGroup.prototype.makePivot = function(offsetX, offsetY, offsetZ){
   return pivot;
 }
 
+ObjectGroup.prototype.updateTransformBasedOnPivot = function(){
+  this.pivotObject.updateMatrix();
+  this.pivotObject.updateMatrixWorld();
+  this.pivotObject.pseudoMesh.updateMatrix();
+  this.pivotObject.pseudoMesh.updateMatrixWorld();
+  this.pivotObject.pseudoMesh.matrixWorld.decompose(REUSABLE_VECTOR, REUSABLE_QUATERNION, REUSABLE_VECTOR_2);
+  this.mesh.position.copy(REUSABLE_VECTOR);
+  this.mesh.quaternion.copy(REUSABLE_QUATERNION);
+}
+
 ObjectGroup.prototype.rotateAroundPivotObject = function(axis, radians){
   if (!this.pivotObject){
     return;
+  }
+  for (var animName in this.animations){
+    var anim = this.animations[animName];
+    if (!anim.isActive){
+      continue;
+    }
+    var action = anim.description.action;
+    if (action == animationHandler.actionTypes.OBJECT.TRANSLATE_X || action == animationHandler.actionTypes.OBJECT.TRANSLATE_Y || action == animationHandler.actionTypes.OBJECT.TRANSLATE_Z){
+      animationHandler.onBeforePivotRotation(anim);
+    }
   }
   this.updatePivot();
   this.pivotObject.updateMatrix();
@@ -2147,14 +2339,7 @@ ObjectGroup.prototype.rotateAroundPivotObject = function(axis, radians){
     axisVector = THREE_AXIS_VECTOR_Z;
     this.pivotObject.rotation.z += radians;
   }
-  this.pivotObject.updateMatrix();
-  this.pivotObject.updateMatrixWorld();
-  this.pivotObject.pseudoMesh.updateMatrix();
-  this.pivotObject.pseudoMesh.updateMatrixWorld();
-  this.pivotObject.pseudoMesh.matrixWorld.decompose(REUSABLE_VECTOR, REUSABLE_QUATERNION, REUSABLE_VECTOR_2);
-  this.mesh.position.copy(REUSABLE_VECTOR);
-  this.mesh.quaternion.copy(REUSABLE_QUATERNION);
-
+  this.updateTransformBasedOnPivot();
   this.physicsBody.quaternion.copy(this.mesh.quaternion);
   this.physicsBody.position.copy(this.mesh.position);
   if (this.isPhysicsSimplified){
@@ -2167,6 +2352,16 @@ ObjectGroup.prototype.rotateAroundPivotObject = function(axis, radians){
 
   if (this.mesh.visible){
     rayCaster.updateObject(this);
+  }
+  for (var animName in this.animations){
+    var anim = this.animations[animName];
+    if (!anim.isActive){
+      continue;
+    }
+    var action = anim.description.action;
+    if (action == animationHandler.actionTypes.OBJECT.TRANSLATE_X || action == animationHandler.actionTypes.OBJECT.TRANSLATE_Y || action == animationHandler.actionTypes.OBJECT.TRANSLATE_Z){
+      animationHandler.onAfterPivotRotation(anim);
+    }
   }
 }
 
@@ -2194,9 +2389,11 @@ ObjectGroup.prototype.copy = function(name, isHardCopy, copyPosition, gridSystem
   var isColorizable = this.isColorizable;
   var renderSide = this.renderSide;
   var blending = this.mesh.material.blending;
-  var totalAlphaBeforeDetached = this.mesh.material.uniforms.totalAlpha.value;
+  var totalAlphaBeforeDetached = this.getOpacity();
   var totalAOIntensityBeforeDetached;
   var totalEmissiveIntensityBeforeDetached;
+  var totalDisplacementInfoBeforeDetached;
+  var totalTextureOffsetBeforeDetached;
   var totalEmissiveColorBeforeDetached;
   var oldMaterial = this.mesh.material;
   var phsimplObj3DPos;
@@ -2209,14 +2406,20 @@ ObjectGroup.prototype.copy = function(name, isHardCopy, copyPosition, gridSystem
     phsimplContPos = this.physicsSimplificationObject3DContainer.position.clone();
     phsimplContQuat = this.physicsSimplificationObject3DContainer.quaternion.clone();
   }
+  if (this.mesh.material.uniforms.totalTextureOffset){
+    totalTextureOffsetBeforeDetached = new THREE.Vector2(this.getTextureOffsetX(), this.getTextureOffsetY());
+  }
   if (this.mesh.material.uniforms.totalAOIntensity){
-    totalAOIntensityBeforeDetached = this.mesh.material.uniforms.totalAOIntensity.value;
+    totalAOIntensityBeforeDetached = this.getAOIntensity();
   }
   if (this.mesh.material.uniforms.totalEmissiveIntensity){
-    totalEmissiveIntensityBeforeDetached = this.mesh.material.uniforms.totalEmissiveIntensity.value;
+    totalEmissiveIntensityBeforeDetached = this.getEmissiveIntensity();
+  }
+  if (this.mesh.material.uniforms.totalDisplacementInfo){
+    totalDisplacementInfoBeforeDetached = new THREE.Vector2(this.getDisplacementScale(), this.getDisplacementBias());
   }
   if (this.mesh.material.uniforms.totalEmissiveColor){
-    totalEmissiveColorBeforeDetached = this.mesh.material.uniforms.totalEmissiveColor.value;
+    totalEmissiveColorBeforeDetached = this.getEmissiveColor().clone();
   }
   var isTransparentBeforeDetached = this.mesh.material.transparent;
   this.detach();
@@ -2313,15 +2516,23 @@ ObjectGroup.prototype.copy = function(name, isHardCopy, copyPosition, gridSystem
 
   this.mesh.material.transparent = isTransparentBeforeDetached;
   newObjGroup.mesh.material.transparent = isTransparentBeforeDetached;
-  this.mesh.material.uniforms.totalAlpha.value = totalAlphaBeforeDetached;
+  this.updateOpacity(totalAlphaBeforeDetached);
+  if (this.mesh.material.uniforms.totalTextureOffset){
+    this.setTextureOffsetX(totalTextureOffsetBeforeDetached.x);
+    this.setTextureOffsetY(totalTextureOffsetBeforeDetached.y);
+  }
   if (this.mesh.material.uniforms.totalAOIntensity){
-    this.mesh.material.uniforms.totalAOIntensity.value = totalAOIntensityBeforeDetached;
+    this.setAOIntensity(totalAOIntensityBeforeDetached);
   }
   if (this.mesh.material.uniforms.totalEmissiveIntensity){
-    this.mesh.material.uniforms.totalEmissiveIntensity.value = totalEmissiveIntensityBeforeDetached;
+    this.setEmissiveIntensity(totalEmissiveIntensityBeforeDetached);
+  }
+  if (this.mesh.material.uniforms.totalDisplacementInfo){
+    this.setDisplacementScale(totalDisplacementInfoBeforeDetached.x);
+    this.setDisplacementBias(totalDisplacementInfoBeforeDetached.y);
   }
   if (this.mesh.material.uniforms.totalEmissiveColor){
-    this.mesh.material.uniforms.totalEmissiveColor.value = totalEmissiveColorBeforeDetached;
+    this.setEmissiveColor(totalEmissiveColorBeforeDetached);
   }
 
   this.mesh.material = oldMaterial;
@@ -2330,15 +2541,23 @@ ObjectGroup.prototype.copy = function(name, isHardCopy, copyPosition, gridSystem
     newObjGroup.mesh.material = this.mesh.material;
     newObjGroup.softCopyParentName = this.name;
   }else{
-    newObjGroup.mesh.material.uniforms.totalAlpha.value = this.mesh.material.uniforms.totalAlpha.value;
+    newObjGroup.updateOpacity(this.getOpacity());
+    if (newObjGroup.mesh.material.uniforms.totalTextureOffset){
+      newObjGroup.setTextureOffsetX(this.getTextureOffsetX());
+      newObjGroup.setTextureOffsetY(this.getTextureOffsetY());
+    }
     if (newObjGroup.mesh.material.uniforms.totalAOIntensity){
-      newObjGroup.mesh.material.uniforms.totalAOIntensity.value = this.mesh.material.uniforms.totalAOIntensity.value;
+      newObjGroup.setAOIntensity(this.getAOIntensity());
     }
     if (newObjGroup.mesh.material.uniforms.totalEmissiveIntensity){
-      newObjGroup.mesh.material.uniforms.totalEmissiveIntensity.value = this.mesh.material.uniforms.totalEmissiveIntensity.value;
+      newObjGroup.setEmissiveIntensity(this.getEmissiveIntensity());
+    }
+    if (newObjGroup.mesh.material.uniforms.totalDisplacementInfo){
+      newObjGroup.setDisplacementScale(this.getDisplacementScale());
+      newObjGroup.setDisplacementBias(this.getDisplacementBias());
     }
     if (newObjGroup.mesh.material.uniforms.totalEmissiveColor){
-      newObjGroup.mesh.material.uniforms.totalEmissiveColor.value = new THREE.Color().copy(this.mesh.material.uniforms.totalEmissiveColor.value);
+      newObjGroup.setEmissiveColor(this.getEmissiveColor());
     }
   }
 
@@ -2359,6 +2578,10 @@ ObjectGroup.prototype.copy = function(name, isHardCopy, copyPosition, gridSystem
     newObjGroup.useCustomShaderPrecision(this.customPrecision);
   }
   return newObjGroup;
+}
+
+ObjectGroup.prototype.getOpacity = function(){
+  return this.mesh.material.uniforms.totalAlpha.value;
 }
 
 ObjectGroup.prototype.updateOpacity = function(val){

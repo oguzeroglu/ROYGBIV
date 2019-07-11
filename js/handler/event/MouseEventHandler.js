@@ -21,6 +21,32 @@ var MouseEventHandler = function(){
     cliDiv.addEventListener("click", this.onCliDivClick);
     cliDiv.addEventListener("mousemove", this.onCliDivMouseMove);
   }
+  this.eventBuffer = {
+    mouseMove: {
+      needsFlush: false, event: null
+    },
+    mouseDown: {
+      needsFlush: false, event: null
+    },
+    mouseUp: {
+      needsFlush: false, event: null
+    }
+  };
+}
+
+MouseEventHandler.prototype.flush = function(){
+  if (this.eventBuffer.mouseMove.needsFlush){
+    activeControl.onMouseMove(this.eventBuffer.mouseMove.event);
+    this.eventBuffer.mouseMove.needsFlush = false;
+  }
+  if (this.eventBuffer.mouseDown.needsFlush){
+    activeControl.onMouseDown(this.eventBuffer.mouseDown.event);
+    this.eventBuffer.mouseDown.needsFlush = false;
+  }
+  if (this.eventBuffer.mouseUp.needsFlush){
+    activeControl.onMouseUp(this.eventBuffer.mouseUp.event);
+    this.eventBuffer.mouseUp.needsFlush = false;
+  }
 }
 
 MouseEventHandler.prototype.onCliDivMouseMove = function(event){
@@ -31,19 +57,15 @@ MouseEventHandler.prototype.onCliDivClick = function(event){
   cliFocused = true;
   omGUIFocused = false;
   tmGUIFocused = false;
+  acGUIFocused = false;
   inactiveCounter = 0;
   if (keyboardBuffer["Shift"] && mode == 0){
     keyboardBuffer["Shift"] = false;
-    for (var objName in addedObjects){
-      addedObjects[objName].mesh.visible = true;
-    }
-    for (var objName in objectGroups){
-      objectGroups[objName].mesh.visible = true;
-    }
-    for (var textName in addedTexts){
-      addedTexts[textName].show();
-    }
-    raycasterFactory.onShiftPress(false);
+    keyboardEventHandler.deactivateGridSelectionMode();
+  }
+  if (keyboardBuffer["Alt"] && mode == 0){
+    keyboardBuffer["Alt"] = false;
+    keyboardEventHandler.deactivateObjectSelectionMode();
   }
 }
 
@@ -111,7 +133,8 @@ MouseEventHandler.prototype.onMouseMove = function(event){
   if (mode == 1 && screenMouseMoveCallbackFunction){
     screenMouseMoveCallbackFunction(mouseEventHandler.coordX, mouseEventHandler.coordY, mouseEventHandler.movementX, mouseEventHandler.movementY);
   }
-  activeControl.onMouseMove(event);
+  mouseEventHandler.eventBuffer.mouseMove.needsFlush = true;
+  mouseEventHandler.eventBuffer.mouseMove.event = event;
   if (isMouseDown && !isMobile){
     mouseEventHandler.onDrag(mouseEventHandler.x, mouseEventHandler.y, mouseEventHandler.movementX, mouseEventHandler.movementY);
   }
@@ -126,7 +149,8 @@ MouseEventHandler.prototype.onMouseUp = function(event){
     screenMouseUpCallbackFunction(coordX, coordY);
   }
   isMouseDown = false;
-  activeControl.onMouseUp(event);
+  mouseEventHandler.eventBuffer.mouseUp.event = event;
+  mouseEventHandler.eventBuffer.mouseUp.needsFlush = true;
 }
 
 MouseEventHandler.prototype.onMouseDown = function(event){
@@ -141,7 +165,8 @@ MouseEventHandler.prototype.onMouseDown = function(event){
     screenMouseDownCallbackFunction(coordX, coordY);
   }
   isMouseDown = true;
-  activeControl.onMouseDown(event);
+  mouseEventHandler.eventBuffer.mouseDown.event = event;
+  mouseEventHandler.eventBuffer.mouseDown.needsFlush = true;
 }
 
 MouseEventHandler.prototype.onClick = function(event, fromTap){
@@ -149,9 +174,12 @@ MouseEventHandler.prototype.onClick = function(event, fromTap){
   cliFocused = false;
   omGUIFocused = false;
   tmGUIFocused = false;
+  acGUIFocused = false;
   if (windowLoaded){
-    if (mode == 0 && (guiHandler.datGuiFPSWeaponAlignment || guiHandler.datGuiPSCreator || guiHandler.datGuiMuzzleFlashCreator || guiHandler.datGuiTexturePack || guiHandler.datGuiSkyboxCreation || guiHandler.datGuiFog || guiHandler.datGuiFontCreation || guiHandler.datGuiCrosshairCreation || guiHandler.datGuiScripts)){
-      return;
+    if (mode == 0){
+      if (!isDeployment && guiHandler.isOneOfBlockingGUIActive()){
+        return;
+      }
     }
     var rect = renderer.getCurrentViewport();
     var rectX = rect.x, rectY = rect.y, rectZ = rect.z, rectW = rect.w;
@@ -200,7 +228,7 @@ MouseEventHandler.prototype.onClick = function(event, fromTap){
       }
     }
     if (mode == 0){
-      if (guiHandler.datGuiMuzzleFlashCreator || guiHandler.datGuiPSCreator || guiHandler.datGuiFPSWeaponAlignment){
+      if (!isDeployment && guiHandler.isOneOfBlockingGUIActive()){
         return;
       }
     }

@@ -97,6 +97,11 @@ RayCaster.prototype.findIntersections = function(from, direction, intersectGridS
   this.direction.copy(direction);
   this.oldPosition.copy(this.origin);
   var iterate = true;
+  if (!isDeployment && mode == 0){
+    if (keyboardBuffer["Alt"]){
+      intersectGridSystems = false;
+    }
+  }
   while (iterate){
     REUSABLE_LINE.set(this.oldPosition, this.origin);
     var results = this.binHandler.query(this.origin);

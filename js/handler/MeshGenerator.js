@@ -75,6 +75,7 @@ MeshGenerator.prototype.generateObjectTrail = function(
 }
 
 MeshGenerator.prototype.generateInstancedMesh = function(graphicsGroup, objectGroup){
+  var hasTexture = objectGroup.hasTexture;
   var diffuseTexture = objectGroup.diffuseTexture;
   var emissiveTexture = objectGroup.emissiveTexture;
   var alphaTexture = objectGroup.alphaTexture;
@@ -86,6 +87,9 @@ MeshGenerator.prototype.generateInstancedMesh = function(graphicsGroup, objectGr
     modelViewMatrix: new THREE.Uniform(new THREE.Matrix4()),
     totalAlpha: new THREE.Uniform(1)
   };
+  if (hasTexture){
+    uniforms.totalTextureOffset = new THREE.Uniform(new THREE.Vector2(0, 0));
+  }
   if (aoTexture){
     uniforms.aoMap = this.getTextureUniform(aoTexture);
     uniforms.totalAOIntensity = new THREE.Uniform(1);
@@ -103,6 +107,7 @@ MeshGenerator.prototype.generateInstancedMesh = function(graphicsGroup, objectGr
   }
   if (displacementTexture && VERTEX_SHADER_TEXTURE_FETCH_SUPPORTED){
     uniforms.displacementMap = this.getTextureUniform(displacementTexture);
+    uniforms.totalDisplacementInfo = new THREE.Uniform(new THREE.Vector2(1, 1));
   }
   var material = new THREE.RawShaderMaterial({
     vertexShader: ShaderContent.instancedBasicMaterialVertexShader,
@@ -119,6 +124,7 @@ MeshGenerator.prototype.generateInstancedMesh = function(graphicsGroup, objectGr
 }
 
 MeshGenerator.prototype.generateMergedMesh = function(graphicsGroup, objectGroup){
+  var hasTexture = objectGroup.hasTexture;
   var diffuseTexture = objectGroup.diffuseTexture;
   var emissiveTexture = objectGroup.emissiveTexture;
   var alphaTexture = objectGroup.alphaTexture;
@@ -129,6 +135,9 @@ MeshGenerator.prototype.generateMergedMesh = function(graphicsGroup, objectGroup
     projectionMatrix: GLOBAL_PROJECTION_UNIFORM,
     modelViewMatrix: new THREE.Uniform(new THREE.Matrix4()),
     totalAlpha: new THREE.Uniform(1)
+  }
+  if (hasTexture){
+    uniforms.totalTextureOffset = new THREE.Uniform(new THREE.Vector2(0, 0));
   }
   if (aoTexture){
     uniforms.aoMap = this.getTextureUniform(aoTexture);
@@ -147,6 +156,7 @@ MeshGenerator.prototype.generateMergedMesh = function(graphicsGroup, objectGroup
   }
   if (displacementTexture){
     uniforms.displacementMap = this.getTextureUniform(displacementTexture);
+    uniforms.totalDisplacementInfo = new THREE.Uniform(new THREE.Vector2(1, 1));
   }
 
   var material = new THREE.RawShaderMaterial({

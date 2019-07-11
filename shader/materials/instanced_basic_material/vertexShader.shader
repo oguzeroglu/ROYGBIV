@@ -1,7 +1,6 @@
 precision lowp float;
 precision lowp int;
 
-attribute float alpha;
 attribute vec3 color;
 attribute vec3 position;
 
@@ -15,7 +14,15 @@ varying float vAlpha;
 
 #ifdef IS_AUTO_INSTANCED
   attribute float orientationIndex;
+  attribute float alphaIndex;
+  attribute float scaleIndex;
   uniform vec4 autoInstanceOrientationArray[AUTO_INSTANCE_ORIENTATION_ARRAY_SIZE];
+  uniform vec3 autoInstanceScaleArray[AUTO_INSTANCE_SCALE_ARRAY_SIZE];
+  uniform float autoInstanceAlphaArray[AUTO_INSTANCE_ALPHA_ARRAY_SIZE];
+  uniform float autoInstanceEmissiveIntensityArray[AUTO_INSTANCE_EMISSIVE_INTENSITY_ARRAY_SIZE];
+  uniform vec3 autoInstanceEmissiveColorArray[AUTO_INSTANCE_EMISSIVE_COLOR_ARRAY_SIZE];
+  uniform vec2 autoInstanceDisplacementInfoArray[AUTO_INSTANCE_DISPLACEMENT_INFO_ARRAY_SIZE];
+  uniform vec2 autoInstanceTextureOffsetInfoArray[AUTO_INSTANCE_TEXTURE_OFFSET_INFO_ARRAY_SIZE];
   varying float vDiscardFlag;
   #ifdef AUTO_INSTANCE_HAS_COLORIZABLE_MEMBER
     attribute float forcedColorIndex;
@@ -25,6 +32,7 @@ varying float vAlpha;
 #else
   attribute vec3 positionOffset;
   attribute vec4 quaternion;
+  attribute float alpha;
 #endif
 
 #ifdef HAS_EMISSIVE
@@ -41,6 +49,7 @@ varying float vAlpha;
   attribute vec2 uv;
   attribute vec4 textureInfo;
   attribute vec4 textureMatrixInfo;
+  uniform vec2 totalTextureOffset;
   varying vec2 vUV;
   #ifdef HAS_DIFFUSE
     varying float hasDiffuseMap;
@@ -59,6 +68,7 @@ varying float vAlpha;
   attribute vec2 displacementInfo;
   attribute vec3 normal;
   uniform sampler2D displacementMap;
+  uniform vec2 totalDisplacementInfo;
 #endif
 #ifdef HAS_SKYBOX_FOG
   uniform mat4 worldMatrix;
@@ -98,16 +108,32 @@ void main(){
     #endif
   #endif
 
-  vAlpha = alpha;
+  #ifdef IS_AUTO_INSTANCED
+    vAlpha = autoInstanceAlphaArray[int(alphaIndex)];
+  #else
+    vAlpha = alpha;
+  #endif
   vColor = color;
   #ifdef HAS_TEXTURE
-    vUV = (
-      mat3(
-        textureMatrixInfo.z, 0.0, 0.0,
-        0.0, textureMatrixInfo.w, 0.0,
-        textureMatrixInfo.x, textureMatrixInfo.y, 1.0
-      ) * vec3(uv, 1.0)
-    ).xy;
+    #ifdef IS_AUTO_INSTANCED
+      int textureOffsetInfoIndex = int(alphaIndex);
+      vec2 textureOffsetInfo = autoInstanceTextureOffsetInfoArray[textureOffsetInfoIndex];
+      vUV = (
+        mat3(
+          textureMatrixInfo.z, 0.0, 0.0,
+          0.0, textureMatrixInfo.w, 0.0,
+          textureOffsetInfo.x + totalTextureOffset.x, textureOffsetInfo.y + totalTextureOffset.y, 1.0
+        ) * vec3(uv, 1.0)
+      ).xy;
+    #else
+      vUV = (
+        mat3(
+          textureMatrixInfo.z, 0.0, 0.0,
+          0.0, textureMatrixInfo.w, 0.0,
+          textureMatrixInfo.x + totalTextureOffset.x, textureMatrixInfo.y + totalTextureOffset.y, 1.0
+        ) * vec3(uv, 1.0)
+      ).xy;
+    #endif
     #ifdef HAS_DIFFUSE
       hasDiffuseMap = -10.0;
       if (textureInfo[0] > 0.0){
@@ -134,8 +160,14 @@ void main(){
     #endif
   #endif
   #ifdef HAS_EMISSIVE
-    vEmissiveIntensity = emissiveIntensity;
-    vEmissiveColor = emissiveColor;
+    #ifdef IS_AUTO_INSTANCED
+      int iai = int(alphaIndex);
+      vEmissiveIntensity = autoInstanceEmissiveIntensityArray[iai];
+      vEmissiveColor = autoInstanceEmissiveColorArray[iai];
+    #else
+      vEmissiveIntensity = emissiveIntensity;
+      vEmissiveColor = emissiveColor;
+    #endif
   #endif
   #ifdef HAS_AO
     vAOIntensity = aoIntensity;
@@ -145,12 +177,22 @@ void main(){
   #ifdef HAS_DISPLACEMENT
     if (displacementInfo.x > -60.0 && displacementInfo.y > -60.0){
       vec3 objNormal = normalize(normal);
-      transformedPosition += objNormal * (texture2D(displacementMap, vUV).r * displacementInfo.x + displacementInfo.y);
+      #ifdef IS_AUTO_INSTANCED
+        vec2 autoInstanceDisplacementInfo = autoInstanceDisplacementInfoArray[int(alphaIndex)];
+        float totalDisplacementScale = autoInstanceDisplacementInfo.x * totalDisplacementInfo.x;
+        float totalDisplacementBias = autoInstanceDisplacementInfo.y * totalDisplacementInfo.y;
+      #else
+        float totalDisplacementScale = displacementInfo.x * totalDisplacementInfo.x;
+        float totalDisplacementBias = displacementInfo.y * totalDisplacementInfo.y;
+      #endif
+      transformedPosition += objNormal * (texture2D(displacementMap, vUV).r * totalDisplacementScale + totalDisplacementBias);
     }
   #endif
   #ifdef IS_AUTO_INSTANCED
     #ifdef FPS_WEAPON_SCALE
       transformedPosition *= FPS_WEAPON_SCALE;
+    #else
+      transformedPosition *= autoInstanceScaleArray[int(scaleIndex)];
     #endif
     vec3 positionOffset = autoInstanceOrientationArray[oi].yzw;
     vec4 quaternion = autoInstanceOrientationArray[oi+1];

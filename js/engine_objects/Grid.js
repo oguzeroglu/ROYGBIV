@@ -46,6 +46,16 @@ var Grid = function(name, parentName, startX, startY, startZ, size,
 
 }
 
+Grid.prototype.hide = function(){
+  this.mesh.visible = false;
+  this.dot.visible = false;
+}
+
+Grid.prototype.show = function(){
+  this.mesh.visible = true;
+  this.dot.visible = true;
+}
+
 Grid.prototype.makeMesh = function(size, startX, startY, startZ){
   this.material = new THREE.MeshBasicMaterial({color: this.outlineColor,
     side: THREE.DoubleSide,

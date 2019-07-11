@@ -186,7 +186,8 @@ var CommandDescriptor = function(){
       1, //editCrosshair
       1, //destroyCrosshair
       0, //printCrosshairs
-      0 //scripts
+      0, //scripts
+      1 //animations
   ];
 
   this.commandArgumentsExpectedExplanation = [
@@ -375,7 +376,8 @@ var CommandDescriptor = function(){
     "editCrosshair crosshairName",
     "destroyCrosshair crosshairName",
     "printCrosshairs",
-    "scripts"
+    "scripts",
+    "animations objectName"
   ];
 
   this.commands = [
@@ -564,7 +566,8 @@ var CommandDescriptor = function(){
     "editCrosshair",
     "destroyCrosshair",
     "printCrosshairs",
-    "scripts"
+    "scripts",
+    "animations"
   ];
 
   this.commandInfo = [
@@ -753,7 +756,8 @@ var CommandDescriptor = function(){
     "editCrosshair: Opens the Crosshair editing GUI.",
     "destroyCrosshair: Destroys a Crosshair object.",
     "printCrosshairs: Prints created crosshairs.",
-    "scripts: Opens the script handler GUI."
+    "scripts: Opens the script handler GUI.",
+    "animations: Opens the Animation editor GUI for an object or a text."
   ];
 
   this.keyboardInfo = [
@@ -764,7 +768,8 @@ var CommandDescriptor = function(){
     "Left/Right : Rotates the camera around axis Y.",
     "Backspace: Destroys selected object.",
     ". : Shows corner coordinates of selected grids.",
-    "SHIFT: Activates grid selection mode."
+    "SHIFT: Activates grid selection mode.",
+    "ALT: Activates object selection mode."
   ];
 
   this.deprecatedCommandIndices = [
@@ -885,6 +890,7 @@ var CommandDescriptor = function(){
   this.PRECONFOGURED_PS_POOL_NAME =   36;
   this.MUZZLE_FLASH_NAME          =   37;
   this.CROSSHAIR_NAME             =   38;
+  this.OBJECT_AND_TEXT_NAME       =   39;
 
   // newGridSystem
   this.newGridSystem = new Object();
@@ -1369,6 +1375,11 @@ var CommandDescriptor = function(){
   this.destroyCrosshair = new Object();
   this.destroyCrosshair.types = [];
   this.destroyCrosshair.types.push(this.CROSSHAIR_NAME); //crosshairName
+
+  // animations
+  this.animations = new Object();
+  this.animations.types = [];
+  this.animations.types.push(this.OBJECT_AND_TEXT_NAME); //animations
 };
 
 CommandDescriptor.prototype.test = function(){
