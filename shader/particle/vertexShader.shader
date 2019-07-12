@@ -157,6 +157,30 @@ float findRepeatTime(){
   return selectedTime;
 }
 
+float determinant(mat4 m) {
+  float b00 = m[0][0] * m[1][1] - m[0][1] * m[1][0];
+  float b01 = m[0][0] * m[1][2] - m[0][2] * m[1][0];
+  float b02 = m[0][0] * m[1][3] - m[0][3] * m[1][0];
+  float b03 = m[0][1] * m[1][2] - m[0][2] * m[1][1];
+  float b04 = m[0][1] * m[1][3] - m[0][3] * m[1][1];
+  float b05 = m[0][2] * m[1][3] - m[0][3] * m[1][2];
+  float b06 = m[2][0] * m[3][1] - m[2][1] * m[3][0];
+  float b07 = m[2][0] * m[3][2] - m[2][2] * m[3][0];
+  float b08 = m[2][0] * m[3][3] - m[2][3] * m[3][0];
+  float b09 = m[2][1] * m[3][2] - m[2][2] * m[3][1];
+  float b10 = m[2][1] * m[3][3] - m[2][3] * m[3][1];
+  float b11 = m[2][2] * m[3][3] - m[2][3] * m[3][2];
+  return b00 * b11 - b01 * b10 + b02 * b09 + b03 * b08 - b04 * b07 + b05 * b06;
+}
+
+float decomposeScaleFromWorldMatrix(mat4 worldMatrix){
+  float sx = length(vec3(worldMatrix[0][0], worldMatrix[0][1], worldMatrix[0][2]));
+  if (determinant(worldMatrix) < 0.0){
+    sx = -1.0 * sx;
+  }
+  return sx;
+}
+
 void main(){
 
   float respawnFlag = flags1[0];
@@ -283,7 +307,7 @@ void main(){
       mvPosition = viewMatrix * vec4(newPosition, 1.0);
     }
 
-    gl_PointSize = (500.0 - (selectedDissapearCoef * selectedTime)) * size / length(mvPosition.xyz) * selectedWorldMatrix[0][0];
+    gl_PointSize = (500.0 - (selectedDissapearCoef * selectedTime)) * size / length(mvPosition.xyz) * decomposeScaleFromWorldMatrix(selectedWorldMatrix);
     #ifdef HAS_REF_HEIGHT
       gl_PointSize = gl_PointSize * refHeightCoef;
     #endif

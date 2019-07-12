@@ -125,6 +125,7 @@ ModeSwitcher.prototype.switchFromDesignToPreview = function(){
   }
   dynamicObjects = new Map();
   dynamicObjectGroups = new Map();
+  activeMuzzleFlashes = new Map();
   for (var objectName in objectGroups){
     var object = objectGroups[objectName];
     object.mesh.remove(axesHelper);

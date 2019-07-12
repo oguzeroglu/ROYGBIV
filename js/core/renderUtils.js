@@ -34,6 +34,7 @@ function render(){
     cpuOperationsHandler.updateObjectTrails();
     cpuOperationsHandler.updateCrosshair();
     cpuOperationsHandler.handleObjectMouseEvents();
+    cpuOperationsHandler.handleActiveMuzzleFlashes();
   }else{
     if (!isDeployment){
       particleSystemCreatorGUIHandler.update();
@@ -111,6 +112,14 @@ function updateParticleSystems(){
   for (var mergedParticleSystemName in mergedParticleSystems){
     mergedParticleSystems[mergedParticleSystemName].update();
   }
+}
+
+function muzzleFlashesUpdateFunction(muzzleFlash, muzzleFlashName){
+  muzzleFlash.update();
+}
+
+function handleActiveMuzzleFlashes(){
+  activeMuzzleFlashes.forEach(muzzleFlashesUpdateFunction);
 }
 
 function objectTrailsUpdateFunction(objectTrail, objName){
