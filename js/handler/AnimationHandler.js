@@ -259,17 +259,26 @@ var AnimationHandler = function(){
     if (animation.attachedObject.autoInstancedParent){
       animation.attachedObject.autoInstancedParent.updateObject(animation.attachedObject);
     }
+    if (mode == 1 && animation.attachedObject.isChangeable){
+      animation.attachedObject.setPosition(animation.attachedObject.mesh.position.x, animation.attachedObject.mesh.position.y, animation.attachedObject.mesh.position.z);
+    }
   };
   this.afterAnimationSettersByType[this.actionTypes.OBJECT.TRANSLATE_Y] = function(animation){
     animation.attachedObject.mesh.translateY(-1 * animation.params.totalTranslationY);
     if (animation.attachedObject.autoInstancedParent){
       animation.attachedObject.autoInstancedParent.updateObject(animation.attachedObject);
     }
+    if (mode == 1 && animation.attachedObject.isChangeable){
+      animation.attachedObject.setPosition(animation.attachedObject.mesh.position.x, animation.attachedObject.mesh.position.y, animation.attachedObject.mesh.position.z);
+    }
   };
   this.afterAnimationSettersByType[this.actionTypes.OBJECT.TRANSLATE_Z] = function(animation){
     animation.attachedObject.mesh.translateZ(-1 * animation.params.totalTranslationZ);
     if (animation.attachedObject.autoInstancedParent){
       animation.attachedObject.autoInstancedParent.updateObject(animation.attachedObject);
+    }
+    if (mode == 1 && animation.attachedObject.isChangeable){
+      animation.attachedObject.setPosition(animation.attachedObject.mesh.position.x, animation.attachedObject.mesh.position.y, animation.attachedObject.mesh.position.z);
     }
   };
   this.afterAnimationSettersByType[this.actionTypes.TEXT.TRANSPARENCY] = function(animation){
@@ -572,6 +581,9 @@ AnimationHandler.prototype.updateObjectTranslationX = function(params, increaseT
   if (params.object.autoInstancedParent){
     params.object.autoInstancedParent.updateObject(params.object);
   }
+  if (mode == 1 && params.object.isChangeable){
+    params.object.setPosition(params.object.mesh.position.x, params.object.mesh.position.y, params.object.mesh.position.z);
+  }
 }
 AnimationHandler.prototype.updateObjectTranslationY = function(params, increaseTick){
   var coef = increaseTick? 1: -1;
@@ -580,6 +592,9 @@ AnimationHandler.prototype.updateObjectTranslationY = function(params, increaseT
   if (params.object.autoInstancedParent){
     params.object.autoInstancedParent.updateObject(params.object);
   }
+  if (mode == 1 && params.object.isChangeable){
+    params.object.setPosition(params.object.mesh.position.x, params.object.mesh.position.y, params.object.mesh.position.z);
+  }
 }
 AnimationHandler.prototype.updateObjectTranslationZ = function(params, increaseTick){
   var coef = increaseTick? 1: -1;
@@ -587,6 +602,9 @@ AnimationHandler.prototype.updateObjectTranslationZ = function(params, increaseT
   params.totalTranslationZ += coef * params.value;
   if (params.object.autoInstancedParent){
     params.object.autoInstancedParent.updateObject(params.object);
+  }
+  if (mode == 1 && params.object.isChangeable){
+    params.object.setPosition(params.object.mesh.position.x, params.object.mesh.position.y, params.object.mesh.position.z);
   }
 }
 AnimationHandler.prototype.updateTextTransparencyFunc = function(params){
