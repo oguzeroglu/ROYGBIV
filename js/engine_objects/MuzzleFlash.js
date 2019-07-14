@@ -128,8 +128,11 @@ MuzzleFlash.prototype.update = function(){
     this.handlePosition(ps);
     REUSABLE_QUATERNION.copy(this.fpsWeaponConfigurations.weaponObj.mesh.quaternion);
     var qDiff = REUSABLE_QUATERNION.multiply(this.fpsWeaponQuaternion.inverse());
+    REUSABLE_QUATERNION2.copy(qDiff);
     for (var i = 0; i<this.particleSystems.length; i++){
-      this.particleSystems[i].mesh.quaternion.multiply(qDiff);
+      qDiff.copy(REUSABLE_QUATERNION2);
+      qDiff.multiply(this.particleSystems[i].mesh.quaternion);
+      this.particleSystems[i].mesh.quaternion.copy(qDiff);
     }
     this.fpsWeaponQuaternion.copy(this.fpsWeaponConfigurations.weaponObj.mesh.quaternion);
   }
