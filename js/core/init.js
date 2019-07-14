@@ -456,7 +456,7 @@ function onRaycasterIntersection(){
        object = addedTexts[intersectionObject];
      }
      if (object.isAddedObject || object.isObjectGroup){
-       if (!isDeployment){
+       if (!isDeployment && mode == 0){
          terminal.clear();
        }
        var point = intersectionPoint;
@@ -465,7 +465,7 @@ function onRaycasterIntersection(){
          coordStr = " ("+point.x.toFixed(2)+", "+point.y.toFixed(2)+", "+point.z.toFixed(2)+")";
        }
        if (object.isAddedObject){
-         if (!isDeployment){
+         if (!isDeployment && mode == 0){
            terminal.printInfo(Text.CLICKED_ON.replace(
              Text.PARAM1, object.name + coordStr
            ));
@@ -481,7 +481,7 @@ function onRaycasterIntersection(){
            object.clickCallbackFunction(point.x, point.y, point.z);
          }
        }else if (object.isObjectGroup){
-         if (!isDeployment){
+         if (!isDeployment && mode == 0){
            terminal.printInfo(Text.CLICKED_ON.replace(
              Text.PARAM1, object.name+coordStr
            ));
@@ -560,7 +560,7 @@ function onRaycasterIntersection(){
              }
            }else if (selectedGrid.createdAddedTextName && !(keyboardBuffer["Shift"])){
               var addedText = addedTexts[selectedGrid.createdAddedTextName];
-              if (!isDeployment){
+              if (!isDeployment && mode == 0){
                 terminal.clear();
                 terminal.printInfo(Text.SELECTED.replace(Text.PARAM1, addedText.name));
               }
@@ -585,7 +585,7 @@ function onRaycasterIntersection(){
        if (mode == 0){
          selectionHandler.resetCurrentSelection();
        }
-       if (!isDeployment){
+       if (!isDeployment && mode == 0){
          terminal.clear();
          terminal.printInfo(Text.SELECTED.replace(Text.PARAM1, object.name));
        }

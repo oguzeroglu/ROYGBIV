@@ -214,17 +214,26 @@ var AnimationHandler = function(){
     if (animation.attachedObject.autoInstancedParent){
       animation.attachedObject.autoInstancedParent.updateObject(animation.attachedObject);
     }
+    if (mode == 1 && animation.attachedObject.isChangeable){
+      animation.attachedObject.setPosition(animation.attachedObject.mesh.position.x, animation.attachedObject.mesh.position.y, animation.attachedObject.mesh.position.z);
+    }
   };
   this.afterAnimationSettersByType[this.actionTypes.OBJECT.POSITION_Y] = function(animation){
     animation.attachedObject.mesh.position.y = animation.initialValue;
     if (animation.attachedObject.autoInstancedParent){
       animation.attachedObject.autoInstancedParent.updateObject(animation.attachedObject);
     }
+    if (mode == 1 && animation.attachedObject.isChangeable){
+      animation.attachedObject.setPosition(animation.attachedObject.mesh.position.x, animation.attachedObject.mesh.position.y, animation.attachedObject.mesh.position.z);
+    }
   };
   this.afterAnimationSettersByType[this.actionTypes.OBJECT.POSITION_Z] = function(animation){
     animation.attachedObject.mesh.position.z = animation.initialValue;
     if (animation.attachedObject.autoInstancedParent){
       animation.attachedObject.autoInstancedParent.updateObject(animation.attachedObject);
+    }
+    if (mode == 1 && animation.attachedObject.isChangeable){
+      animation.attachedObject.setPosition(animation.attachedObject.mesh.position.x, animation.attachedObject.mesh.position.y, animation.attachedObject.mesh.position.z);
     }
   };
   this.afterAnimationSettersByType[this.actionTypes.OBJECT.EMISSIVE_INTENSITY] = function(animation){
@@ -515,17 +524,26 @@ AnimationHandler.prototype.updateObjectPositionXFunc = function(params){
   if (params.object.autoInstancedParent){
     params.object.autoInstancedParent.updateObject(params.object);
   }
+  if (mode == 1 && params.object.isChangeable){
+    params.object.setPosition(params.object.mesh.position.x, params.object.mesh.position.y, params.object.mesh.position.z);
+  }
 }
 AnimationHandler.prototype.updateObjectPositionYFunc = function(params){
   params.object.mesh.position.y = params.value;
   if (params.object.autoInstancedParent){
     params.object.autoInstancedParent.updateObject(params.object);
   }
+  if (mode == 1 && params.object.isChangeable){
+    params.object.setPosition(params.object.mesh.position.x, params.object.mesh.position.y, params.object.mesh.position.z);
+  }
 }
 AnimationHandler.prototype.updateObjectPositionZFunc = function(params){
   params.object.mesh.position.z = params.value;
   if (params.object.autoInstancedParent){
     params.object.autoInstancedParent.updateObject(params.object);
+  }
+  if (mode == 1 && params.object.isChangeable){
+    params.object.setPosition(params.object.mesh.position.x, params.object.mesh.position.y, params.object.mesh.position.z);
   }
 }
 AnimationHandler.prototype.updateObjectEmissiveIntensity = function(params){
