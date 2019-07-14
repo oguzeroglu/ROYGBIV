@@ -9,6 +9,7 @@ var MuzzleFlash = function(name, refPreconfiguredPS, psCount, psTime){
   for (var i = 0; i<this.particleSystems.length; i++){
     this.particleSystems[i].maxPSTime = psTime;
     this.particleSystems[i].mesh.position.set(0, 0, 0);
+    this.particleSystems[i].muzzleFlashName = this.name;
   }
 }
 
@@ -16,6 +17,7 @@ MuzzleFlash.prototype.destroy = function(){
   delete muzzleFlashes[this.name];
   for (var i = 0; i<this.particleSystems.length; i++){
     this.particleSystems[i].destroy();
+    delete this.particleSystems[i].muzzleFlashName;
   }
 }
 
@@ -114,12 +116,30 @@ MuzzleFlash.prototype.init = function(){
   for (var i = 0; i<this.particleSystems.length; i++){
     this.particleSystems[i].tick = 0;
   }
+  this.isShown = false;
 }
 
 MuzzleFlash.prototype.hide = function(){
   for (var i = 0; i<this.particleSystems.length; i++){
     this.particleSystems[i].mesh.visible = false;
   }
+}
+
+MuzzleFlash.prototype.onShow = function(){
+  this.isShown = true;
+}
+
+MuzzleFlash.prototype.onWeaponDeactivated = function(){
+  this.isActivated = false;
+}
+
+MuzzleFlash.prototype.onWeaponActivated = function(weaponObj){
+  this.init();
+  this.attachToFPSWeapon(weaponObj, weaponObj.muzzleFlashParameters.childObj, weaponObj.muzzleFlashParameters.endpoint);
+  this.setScale(weaponObj.muzzleFlashParameters.scale);
+  this.setRotation(weaponObj.muzzleFlashParameters.rotationX, weaponObj.muzzleFlashParameters.rotationY, weaponObj.muzzleFlashParameters.rotationZ);
+  activeMuzzleFlashes.set(this.name, this);
+  this.isActivated = true;
 }
 
 MuzzleFlash.prototype.update = function(){
@@ -136,6 +156,9 @@ MuzzleFlash.prototype.update = function(){
     }
     this.fpsWeaponQuaternion.copy(this.fpsWeaponConfigurations.weaponObj.mesh.quaternion);
   }
+  if (mode == 1 && !this.isShown){
+    return;
+  }
   ps.mesh.visible = true;
   ps.update();
   this.tick += (STEP);
@@ -145,6 +168,9 @@ MuzzleFlash.prototype.update = function(){
     this.particleIndex ++;
     if (this.particleIndex >= this.psCount){
       this.particleIndex = 0;
+    }
+    if (mode == 1){
+      this.isShown = false;
     }
   }
 }

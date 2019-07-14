@@ -213,6 +213,7 @@ var Preconditions = function(){
   this.collisionAction = "collisionAction";
   this.scriptName = "scriptName";
   this.animationName = "animationName";
+  this.muzzleflashName = "muzzleflashName";
 }
 
 Preconditions.prototype.errorHeader = function(callerFunc){
@@ -397,6 +398,24 @@ Preconditions.prototype.checkIfAlreadyUsedAsFPSWeaponOnlyIfExists = function(cal
     if (obj.isUsedInFPSControl){
       this.throw(callerFunc, "Object already used as weapon in another FPS control.");
     }
+  }
+}
+
+Preconditions.prototype.checkIfMuzzleFlashActivated = function(callerFunc, obj){
+  if (!obj.isActivated){
+    this.throw(callerFunc, "FPS control related to this muzzle flash is not active.");
+  }
+}
+
+Preconditions.prototype.checkIfMuzzleFlashAttached = function(callerFunc, obj){
+  if (!obj.attachedToFPSWeapon){
+    this.throw(callerFunc, "Muzzleflash is not attached to any FPS weapon.");
+  }
+}
+
+Preconditions.prototype.checkIfMuzzleFlashExists = function(callerFunc, obj){
+  if (!obj){
+    this.throw(callerFunc, "No such muzzleflash.");
   }
 }
 

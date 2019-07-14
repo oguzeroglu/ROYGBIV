@@ -239,7 +239,9 @@ ParticleSystem.prototype.start = function(configurations){
     this.mesh.visible = true;
   }
   if (!this.psMerger){
-    particleSystems.set(this.name, this);
+    if (!this.muzzleFlashName){
+      particleSystems.set(this.name, this);
+    }
     if (this.material){
       this.material.uniforms.dissapearCoef.value = 0;
     }

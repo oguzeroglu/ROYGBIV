@@ -819,4 +819,5 @@ var Text = function(){
   this.ROYGBIV_SCRIPTING_API_STOPANIMATION = "Stops an animation of given object, object group or text.";
   this.ROYGBIV_SCRIPTING_API_ONANIMATIONFINISHED = "Sets a finish listener for an animation of given object, object group or text. For repeating animations the callbackFunction is\nexecuted before each repeat. For rewinding animations the callbackFunction is executed when the rewind is finished.";
   this.ROYGBIV_SCRIPTING_API_REMOVEANIMATIONFINISHLISTENER = "Removes the finish listener for an animation of given object, object group or text.";
+  this.ROYGBIV_SCRIPTING_API_SHOWMUZZLEFLASH = "Shows a muzzle flash. This function may be called each time a FPS weapon is shooting.";
 }

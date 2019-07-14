@@ -14,6 +14,7 @@
 //  * Text functions
 //  * Control functions
 //  * Animation functions
+//  * Muzzleflash functions
 //  * Script related functions
 var Roygbiv = function(){
   this.functionNames = [
@@ -170,7 +171,8 @@ var Roygbiv = function(){
     "startAnimation",
     "stopAnimation",
     "onAnimationFinished",
-    "removeAnimationFinishListener"
+    "removeAnimationFinishListener",
+    "showMuzzleFlash"
   ];
 
   this.globals = new Object();
@@ -2220,6 +2222,22 @@ Roygbiv.prototype.stopAnimation = function(object, animationName){
   preConditions.checkIfAnimationExists(ROYGBIV.stopAnimation, object, animationName);
   var animation = object.animations[animationName];
   animationHandler.forceFinish(animation);
+}
+
+// MUZZLEFLASH FUNCTIONS *******************************************************
+
+// Shows a muzzle flash. This function may be called each time a FPS weapon
+// is shooting.
+Roygbiv.prototype.showMuzzleFlash = function(muzzleflashName){
+  if (mode == 0){
+    return;
+  }
+  preConditions.checkIfDefined(ROYGBIV.showMuzzleFlash, preConditions.muzzleflashName, muzzleflashName);
+  var muzzleFlash = muzzleFlashes[muzzleflashName];
+  preConditions.checkIfMuzzleFlashExists(ROYGBIV.showMuzzleFlash, muzzleFlash);
+  preConditions.checkIfMuzzleFlashAttached(ROYGBIV.showMuzzleFlash, muzzleFlash);
+  preConditions.checkIfMuzzleFlashActivated(ROYGBIV.showMuzzleFlash, muzzleFlash);
+  muzzleFlash.onShow();
 }
 
 // UTILITY FUNCTIONS ***********************************************************

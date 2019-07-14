@@ -650,6 +650,9 @@ FPSControls.prototype.onDeactivated = function(){
     this.weaponObject1.mesh.position.copy(this.weaponObject1.beforeFPSControlsInfo.position);
     this.weaponObject1.mesh.quaternion.copy(this.weaponObject1.beforeFPSControlsInfo.quaternion);
     this.weaponObject1.mesh.scale.set(1, 1, 1);
+    if (this.weaponObject1.muzzleFlashParameters){
+      muzzleFlashes[this.weaponObject1.muzzleFlashParameters.muzzleFlashName].onWeaponDeactivated();
+    }
   }
   if (this.hasWeapon2){
     this.weaponObject2.show();
@@ -659,6 +662,9 @@ FPSControls.prototype.onDeactivated = function(){
     this.weaponObject2.mesh.position.copy(this.weaponObject2.beforeFPSControlsInfo.position);
     this.weaponObject2.mesh.quaternion.copy(this.weaponObject2.beforeFPSControlsInfo.quaternion);
     this.weaponObject2.mesh.scale.set(1, 1, 1);
+    if (this.weaponObject2.muzzleFlashParameters){
+      muzzleFlashes[this.weaponObject2.muzzleFlashParameters.muzzleFlashName].onWeaponDeactivated();
+    }
   }
   if (isMobile){
     touchEventHandler.tapThreshold = 310;
@@ -725,6 +731,9 @@ FPSControls.prototype.onActivated = function(){
     }
     this.weapon1RotationRandomnessCounter = 0;
     this.weapon1RotationRandomnessCounter2 = 0;
+    if (this.weaponObject1.muzzleFlashParameters){
+      muzzleFlashes[this.weaponObject1.muzzleFlashParameters.muzzleFlashName].onWeaponActivated(this.weaponObject1);
+    }
   }
   if (this.hasWeapon2){
     this.weaponObject2.show();
@@ -744,6 +753,9 @@ FPSControls.prototype.onActivated = function(){
     }
     this.weapon2RotationRandomnessCounter = 0;
     this.weapon2RotationRandomnessCounter2 = 0;
+    if (this.weaponObject2.muzzleFlashParameters){
+      muzzleFlashes[this.weaponObject2.muzzleFlashParameters.muzzleFlashName].onWeaponActivated(this.weaponObject2);
+    }
   }
   if (this.autoInstancedObject){
     this.weaponObject1.mesh.visible = false;
