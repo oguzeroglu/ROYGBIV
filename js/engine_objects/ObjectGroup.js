@@ -40,6 +40,18 @@ ObjectGroup.prototype.onAfterRotationAnimation = function(){
   if (!(mode == 1 && this.isChangeable)){
     return;
   }
+  if (!this.isPhysicsSimplified){
+    this.physicsBody.quaternion.copy(this.mesh.quaternion);
+    this.graphicsGroup.quaternion.copy(this.mesh.quaternion);
+  }else{
+    this.updateSimplifiedPhysicsBody();
+  }
+  if (!this.pivotObject && !this.isPhysicsSimplified){
+    physicsWorld.updateObject(this, false, true);
+  }else{
+    physicsWorld.updateObject(this, true, true);
+  }
+  rayCaster.updateObject(this);
 }
 
 ObjectGroup.prototype.addAnimation = function(animation){
@@ -1753,14 +1765,12 @@ ObjectGroup.prototype.rotate = function(axis, radian, fromScript){
     axisVector = THREE_AXIS_VECTOR_Z;
   }
   this.mesh.rotateOnWorldAxis(axisVector, radian);
-
   if (!this.isPhysicsSimplified){
     this.physicsBody.quaternion.copy(this.mesh.quaternion);
     this.graphicsGroup.quaternion.copy(this.mesh.quaternion);
   }else{
     this.updateSimplifiedPhysicsBody();
   }
-
   if (!fromScript){
     this.initQuaternion = this.mesh.quaternion.clone();
     this.physicsBody.initQuaternion.copy(
@@ -1774,11 +1784,9 @@ ObjectGroup.prototype.rotate = function(axis, radian, fromScript){
       this.rotationZ += radian;
     }
   }
-
   if (this.mesh.visible){
     rayCaster.updateObject(this);
   }
-
 }
 
 ObjectGroup.prototype.updateSimplifiedPhysicsBody = function(){
