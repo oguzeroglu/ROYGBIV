@@ -256,7 +256,7 @@ ObjectGroup.prototype.handleRotation = function(axis, radians){
   if (this.pivotObject){
     this.prevPositionVector.copy(this.mesh.position);
     this.rotateAroundPivotObject(axis, radians);
-    physicsWorld.updateObject(this, false, true);
+    physicsWorld.updateObject(this, true, true);
     if (this.autoInstancedParent){
       this.autoInstancedParent.updateObject(this);
     }
