@@ -238,6 +238,87 @@ AddedObject.prototype.useAsFPSWeapon = function(){
   this.fpsWeaponAlignment = {x: 0, y: 0, z: 0, scale: 1, qx: 0, qy: 0, qz: 0, qw: 1};
 }
 
+AddedObject.prototype.syncBoxPhysicsRotation = function(){
+  this.physicsBody.quaternion.copy(this.mesh.quaternion);
+}
+
+AddedObject.prototype.syncSurfacePhysicsRotation = function(){
+  var gridSystemAxis = this.metaData.gridSystemAxis;
+  var physicsBody = this.physicsBody;
+  var mesh = this.mesh;
+  if (gridSystemAxis == "XY"){
+    physicsBody.quaternion.copy(mesh.quaternion);
+  }else if (gridSystemAxis == "XZ"){
+    REUSABLE_QUATERNION.copy(mesh.quaternion);
+    REUSABLE_QUATERNION2.setFromAxisAngle(THREE_AXIS_VECTOR_X, Math.PI / 2);
+    REUSABLE_QUATERNION.multiply(REUSABLE_QUATERNION2);
+    physicsBody.quaternion.copy(REUSABLE_QUATERNION);
+  }else if (gridSystemAxis == "YZ"){
+    REUSABLE_QUATERNION.copy(mesh.quaternion);
+    REUSABLE_QUATERNION2.setFromAxisAngle(THREE_AXIS_VECTOR_Y, Math.PI / 2);
+    REUSABLE_QUATERNION.multiply(REUSABLE_QUATERNION2);
+    physicsBody.quaternion.copy(REUSABLE_QUATERNION);
+  }
+}
+
+AddedObject.prototype.syncRampPhysicsRotation = function(){
+  var gridSystemAxis = this.metaData.gridSystemAxis;
+  var physicsBody = this.physicsBody;
+  var mesh = this.mesh;
+  if (gridSystemAxis == "XY"){
+    REUSABLE_QUATERNION.copy(mesh.quaternion);
+    REUSABLE_QUATERNION2.setFromAxisAngle(THREE_AXIS_VECTOR_X, Math.PI / 2);
+    REUSABLE_QUATERNION.multiply(REUSABLE_QUATERNION2);
+    physicsBody.quaternion.copy(REUSABLE_QUATERNION);
+  }else if (gridSystemAxis == "XZ"){
+    REUSABLE_QUATERNION.copy(mesh.quaternion);
+    REUSABLE_QUATERNION2.setFromAxisAngle(THREE_AXIS_VECTOR_X, Math.PI / 2);
+    REUSABLE_QUATERNION.multiply(REUSABLE_QUATERNION2);
+    physicsBody.quaternion.copy(REUSABLE_QUATERNION);
+  }else if (gridSystemAxis == "YZ"){
+    REUSABLE_QUATERNION.copy(mesh.quaternion);
+    REUSABLE_QUATERNION2.setFromAxisAngle(THREE_AXIS_VECTOR_X, Math.PI / 2);
+    REUSABLE_QUATERNION.multiply(REUSABLE_QUATERNION2);
+    physicsBody.quaternion.copy(REUSABLE_QUATERNION);
+  }
+}
+
+AddedObject.prototype.syncSpherePhysicsRotation = function(){
+  this.physicsBody.quaternion.copy(this.mesh.quaternion);
+}
+
+AddedObject.prototype.syncCylinderPhysicsRotation = function(){
+  var physicsBody = this.physicsBody;
+  var gridSystemAxis = this.metaData.gridSystemAxis;
+  if (gridSystemAxis == "XZ"){
+    physicsBody.quaternion.copy(this.mesh.quaternion);
+  }else if (gridSystemAxis == "XY"){
+    REUSABLE_QUATERNION.copy(this.mesh.quaternion);
+    REUSABLE_QUATERNION2.setFromAxisAngle(THREE_AXIS_VECTOR_X, -Math.PI/2);
+    REUSABLE_QUATERNION.multiply(REUSABLE_QUATERNION2);
+    physicsBody.quaternion.copy(REUSABLE_QUATERNION);
+  }else if (gridSystemAxis == "YZ"){
+    REUSABLE_QUATERNION.copy(this.mesh.quaternion);
+    REUSABLE_QUATERNION2.setFromAxisAngle(THREE_AXIS_VECTOR_Z, Math.PI/2);
+    REUSABLE_QUATERNION.multiply(REUSABLE_QUATERNION2);
+    physicsBody.quaternion.copy(REUSABLE_QUATERNION);
+  }
+}
+
+AddedObject.prototype.syncPhysicsRotation = function(axis, radians){
+  if (this.type == "surface"){
+    this.syncSurfacePhysicsRotation();
+  }else if (this.type == "box"){
+    this.syncBoxPhysicsRotation();
+  }else if (this.type == "ramp"){
+    this.syncRampPhysicsRotation();
+  }else if (this.type == "sphere"){
+    this.syncSpherePhysicsRotation();
+  }else if (this.type == "cylinder"){
+    this.syncCylinderPhysicsRotation();
+  }
+}
+
 AddedObject.prototype.handleRotation = function(axis, radians){
   if (this.pivotObject){
     this.prevPositionVector.copy(this.mesh.position);
@@ -1388,7 +1469,6 @@ AddedObject.prototype.rotateAroundXYZ = function(x, y, z, axis, axisVector, radi
 }
 
 AddedObject.prototype.rotate = function(axis, radians, fromScript){
-
   if (this.type == "surface"){
     this.rotateSurface(axis, radians, fromScript);
   }else if (this.type == "box"){
@@ -1400,7 +1480,6 @@ AddedObject.prototype.rotate = function(axis, radians, fromScript){
   }else if (this.type == "cylinder"){
     this.rotateCylinder(axis, radians, fromScript);
   }
-
   if (!fromScript){
     if (axis == "x"){
       this.rotationX += radians;
@@ -1411,7 +1490,6 @@ AddedObject.prototype.rotate = function(axis, radians, fromScript){
     }
     this.initQuaternion.copy(this.mesh.quaternion);
   }
-
   if (this.mesh.visible){
     rayCaster.updateObject(this);
   }
@@ -1430,6 +1508,7 @@ AddedObject.prototype.setPhysicsAfterRotationAroundPoint = function(axis, radian
     this.setCylinderPhysicsAfterRotationAroundPoint(axis, radians);
   }
   this.physicsBody.position.copy(this.mesh.position);
+  physicsWorld.updateObject(this, true, true);
 }
 
 AddedObject.prototype.setSurfacePhysicsAfterRotationAroundPoint = function(axis, radians){
@@ -1503,26 +1582,15 @@ AddedObject.prototype.rotateSphere = function(axis, radians, fromScript){
   var mesh = this.mesh;
   var physicsBody = this.physicsBody;
   if (axis == "x"){
-    mesh.rotateOnWorldAxis(
-      THREE_AXIS_VECTOR_X,
-      radians
-    );
+    mesh.rotateOnWorldAxis(THREE_AXIS_VECTOR_X, radians);
   }else if (axis == "y"){
-    mesh.rotateOnWorldAxis(
-      THREE_AXIS_VECTOR_Y,
-      radians
-    );
+    mesh.rotateOnWorldAxis(THREE_AXIS_VECTOR_Y, radians);
   }else if (axis == "z"){
-    mesh.rotateOnWorldAxis(
-      THREE_AXIS_VECTOR_Z,
-      radians
-    );
+    mesh.rotateOnWorldAxis(THREE_AXIS_VECTOR_Z, radians);
   }
-  physicsBody.quaternion.copy(mesh.quaternion);
+  this.syncPhysicsRotation();
   if (!fromScript){
-    physicsBody.initQuaternion.copy(
-      physicsBody.quaternion
-    );
+    physicsBody.initQuaternion.copy(physicsBody.quaternion);
   }
 }
 
@@ -1531,26 +1599,15 @@ AddedObject.prototype.rotateCylinder = function(axis, radians, fromScript){
   var physicsBody = this.physicsBody;
   var gridSystemAxis = this.metaData.gridSystemAxis;
   if (axis == "x"){
-    mesh.rotateOnWorldAxis(
-      THREE_AXIS_VECTOR_X,
-      radians
-    );
+    mesh.rotateOnWorldAxis(THREE_AXIS_VECTOR_X, radians);
   }else if (axis == "y"){
-    mesh.rotateOnWorldAxis(
-      THREE_AXIS_VECTOR_Y,
-      radians
-    );
+    mesh.rotateOnWorldAxis(THREE_AXIS_VECTOR_Y, radians);
   }else if (axis == "z"){
-    mesh.rotateOnWorldAxis(
-      THREE_AXIS_VECTOR_Z,
-      radians
-    );
+    mesh.rotateOnWorldAxis(THREE_AXIS_VECTOR_Z, radians);
   }
-  this.rotatePhysicsBody(axis, radians);
+  this.syncPhysicsRotation();
   if (!fromScript){
-    physicsBody.initQuaternion.copy(
-      physicsBody.quaternion
-    );
+    physicsBody.initQuaternion.copy(physicsBody.quaternion);
   }
 }
 
@@ -1559,42 +1616,15 @@ AddedObject.prototype.rotateRamp = function(axis, radians, fromScript){
   var physicsBody = this.physicsBody;
   var gridSystemAxis = this.metaData.gridSystemAxis;
   if (axis == "x"){
-    mesh.rotateOnWorldAxis(
-      THREE_AXIS_VECTOR_X,
-      radians
-    );
+    mesh.rotateOnWorldAxis(THREE_AXIS_VECTOR_X, radians);
   }else if (axis == "y"){
-    mesh.rotateOnWorldAxis(
-      THREE_AXIS_VECTOR_Y,
-      radians
-    );
+    mesh.rotateOnWorldAxis(THREE_AXIS_VECTOR_Y, radians);
   }else if (axis == "z"){
-    mesh.rotateOnWorldAxis(
-      THREE_AXIS_VECTOR_Z,
-      radians
-    );
+    mesh.rotateOnWorldAxis(THREE_AXIS_VECTOR_Z, radians);
   }
-  if (gridSystemAxis == "XY"){
-    REUSABLE_QUATERNION.copy(mesh.quaternion);
-    REUSABLE_QUATERNION2.setFromAxisAngle(THREE_AXIS_VECTOR_X, Math.PI / 2);
-    REUSABLE_QUATERNION.multiply(REUSABLE_QUATERNION2);
-    physicsBody.quaternion.copy(REUSABLE_QUATERNION);
-  }else if (gridSystemAxis == "XZ"){
-    REUSABLE_QUATERNION.copy(mesh.quaternion);
-    REUSABLE_QUATERNION2.setFromAxisAngle(THREE_AXIS_VECTOR_X, Math.PI / 2);
-    REUSABLE_QUATERNION.multiply(REUSABLE_QUATERNION2);
-    physicsBody.quaternion.copy(REUSABLE_QUATERNION);
-  }else if (gridSystemAxis == "YZ"){
-    REUSABLE_QUATERNION.copy(mesh.quaternion);
-    REUSABLE_QUATERNION2.setFromAxisAngle(THREE_AXIS_VECTOR_X, Math.PI / 2);
-    REUSABLE_QUATERNION.multiply(REUSABLE_QUATERNION2);
-    physicsBody.quaternion.copy(REUSABLE_QUATERNION);
-  }
+  this.syncPhysicsRotation();
   if (!fromScript){
-    physicsBody.initQuaternion.copy(
-      physicsBody.quaternion
-    );
-    this.initQuaternion.copy(this.mesh.quaternion);
+    physicsBody.initQuaternion.copy(physicsBody.quaternion);
   }
 }
 
@@ -1602,41 +1632,16 @@ AddedObject.prototype.rotateSurface = function(axis, radians, fromScript){
   var mesh = this.mesh;
   var physicsBody = this.physicsBody;
   var gridSystemAxis = this.metaData.gridSystemAxis;
-
   if (axis == "x"){
-    mesh.rotateOnWorldAxis(
-      THREE_AXIS_VECTOR_X,
-      radians
-    );
+    mesh.rotateOnWorldAxis(THREE_AXIS_VECTOR_X, radians);
   }else if (axis == "y"){
-    mesh.rotateOnWorldAxis(
-      THREE_AXIS_VECTOR_Y,
-      radians
-    );
+    mesh.rotateOnWorldAxis(THREE_AXIS_VECTOR_Y, radians);
   }else if (axis == "z"){
-    mesh.rotateOnWorldAxis(
-      THREE_AXIS_VECTOR_Z,
-      radians
-    );
+    mesh.rotateOnWorldAxis(THREE_AXIS_VECTOR_Z, radians);
   }
-  if (gridSystemAxis == "XY"){
-    physicsBody.quaternion.copy(mesh.quaternion);
-  }else if (gridSystemAxis == "XZ"){
-    REUSABLE_QUATERNION.copy(mesh.quaternion);
-    REUSABLE_QUATERNION2.setFromAxisAngle(THREE_AXIS_VECTOR_X, Math.PI / 2);
-    REUSABLE_QUATERNION.multiply(REUSABLE_QUATERNION2);
-    physicsBody.quaternion.copy(REUSABLE_QUATERNION);
-  }else if (gridSystemAxis == "YZ"){
-    REUSABLE_QUATERNION.copy(mesh.quaternion);
-    REUSABLE_QUATERNION2.setFromAxisAngle(THREE_AXIS_VECTOR_Y, Math.PI / 2);
-    REUSABLE_QUATERNION.multiply(REUSABLE_QUATERNION2);
-    physicsBody.quaternion.copy(REUSABLE_QUATERNION);
-  }
+  this.syncPhysicsRotation();
   if (!fromScript){
-    physicsBody.initQuaternion.copy(
-      physicsBody.quaternion
-    );
-    this.initQuaternion.copy(this.mesh.quaternion);
+    physicsBody.initQuaternion.copy(physicsBody.quaternion);
   }
 }
 
@@ -1644,26 +1649,15 @@ AddedObject.prototype.rotateBox = function(axis, radians, fromScript){
   var mesh = this.mesh;
   var physicsBody = this.physicsBody;
   if (axis == "x"){
-    mesh.rotateOnWorldAxis(
-      THREE_AXIS_VECTOR_X,
-      radians
-    );
+    mesh.rotateOnWorldAxis(THREE_AXIS_VECTOR_X, radians);
   }else if (axis == "y"){
-    mesh.rotateOnWorldAxis(
-      THREE_AXIS_VECTOR_Y,
-      radians
-    );
+    mesh.rotateOnWorldAxis(THREE_AXIS_VECTOR_Y, radians);
   }else if (axis == "z"){
-    mesh.rotateOnWorldAxis(
-      THREE_AXIS_VECTOR_Z,
-      radians
-    );
+    mesh.rotateOnWorldAxis(THREE_AXIS_VECTOR_Z, radians);
   }
-  physicsBody.quaternion.copy(mesh.quaternion);
+  this.syncPhysicsRotation();
   if (!fromScript){
-    physicsBody.initQuaternion.copy(
-      physicsBody.quaternion
-    );
+    physicsBody.initQuaternion.copy(physicsBody.quaternion);
   }
 }
 
@@ -1677,21 +1671,6 @@ AddedObject.prototype.rotatePhysicsBody = function(axis, radians){
   }
   REUSABLE_CANNON_QUATERNION.mult(this.physicsBody.quaternion, REUSABLE_CANNON_QUATERNION_2);
   this.physicsBody.quaternion.copy(REUSABLE_CANNON_QUATERNION_2);
-}
-
-AddedObject.prototype.setCannonQuaternionFromTHREE = function(){
-  this.physicsBody.quaternion.copy(this.mesh.quaternion);
-  if (this.type == "ramp" || this.type == "surface"){
-    if (this.gridSystemAxis == "XZ" || this.gridSystemAxis == "XY" || this.gridSystemAxis == "YZ"){
-      if (!(this.type == "surface" && (this.gridSystemAxis == "XY" || this.gridSystemAxis == "YZ"))){
-        this.physicsBody.rotation.y += (Math.PI / 2);
-      }else{
-        if (this.type == "surface" && this.gridSystemAxis == "YZ"){
-          this.mesh.rotation.y -= (Math.PI / 2);
-        }
-      }
-    }
-  }
 }
 
 AddedObject.prototype.setMass = function(mass){
