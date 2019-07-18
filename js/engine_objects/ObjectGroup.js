@@ -36,6 +36,12 @@ var ObjectGroup = function(name, group){
   this.animations = new Object();
 }
 
+ObjectGroup.prototype.onAfterRotationAnimation = function(){
+  if (!(mode == 1 && this.isChangeable)){
+    return;
+  }
+}
+
 ObjectGroup.prototype.addAnimation = function(animation){
   this.animations[animation.name] = animation;
 }

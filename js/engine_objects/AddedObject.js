@@ -305,7 +305,20 @@ AddedObject.prototype.syncCylinderPhysicsRotation = function(){
   }
 }
 
-AddedObject.prototype.syncPhysicsRotation = function(axis, radians){
+AddedObject.prototype.onAfterRotationAnimation = function(){
+  if (!(mode == 1 && this.isChangeable)){
+    return;
+  }
+  this.syncPhysicsRotation();
+  if (!this.pivotObject){
+    physicsWorld.updateObject(this, false, true);
+  }else{
+    physicsWorld.updateObject(this, true, true);
+  }
+  rayCaster.updateObject(this);
+}
+
+AddedObject.prototype.syncPhysicsRotation = function(){
   if (this.type == "surface"){
     this.syncSurfacePhysicsRotation();
   }else if (this.type == "box"){

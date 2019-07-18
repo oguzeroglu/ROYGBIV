@@ -168,12 +168,14 @@ var AnimationHandler = function(){
       if (animation.attachedObject.autoInstancedParent){
         animation.attachedObject.autoInstancedParent.updateObject(animation.attachedObject);
       }
+      animation.attachedObject.onAfterRotationAnimation();
       return;
     }
     animation.attachedObject.mesh.rotation.x = animation.initialValue;
     if (animation.attachedObject.autoInstancedParent){
       animation.attachedObject.autoInstancedParent.updateObject(animation.attachedObject);
     }
+    animation.attachedObject.onAfterRotationAnimation();
   };
   this.afterAnimationSettersByType[this.actionTypes.OBJECT.ROTATION_Y] = function(animation){
     if (animation.attachedObject.pivotObject){
@@ -185,12 +187,14 @@ var AnimationHandler = function(){
       if (animation.attachedObject.autoInstancedParent){
         animation.attachedObject.autoInstancedParent.updateObject(animation.attachedObject);
       }
+      animation.attachedObject.onAfterRotationAnimation();
       return;
     }
     animation.attachedObject.mesh.rotation.y = animation.initialValue;
     if (animation.attachedObject.autoInstancedParent){
       animation.attachedObject.autoInstancedParent.updateObject(animation.attachedObject);
     }
+    animation.attachedObject.onAfterRotationAnimation();
   };
   this.afterAnimationSettersByType[this.actionTypes.OBJECT.ROTATION_Z] = function(animation){
     if (animation.attachedObject.pivotObject){
@@ -202,12 +206,14 @@ var AnimationHandler = function(){
       if (animation.attachedObject.autoInstancedParent){
         animation.attachedObject.autoInstancedParent.updateObject(animation.attachedObject);
       }
+      animation.attachedObject.onAfterRotationAnimation();
       return;
     }
     animation.attachedObject.mesh.rotation.z = animation.initialValue;
     if (animation.attachedObject.autoInstancedParent){
       animation.attachedObject.autoInstancedParent.updateObject(animation.attachedObject);
     }
+    animation.attachedObject.onAfterRotationAnimation();
   };
   this.afterAnimationSettersByType[this.actionTypes.OBJECT.POSITION_X] = function(animation){
     animation.attachedObject.mesh.position.x = animation.initialValue;
@@ -487,12 +493,14 @@ AnimationHandler.prototype.updateObjectRotationXFunc = function(params){
     if (params.object.autoInstancedParent){
       params.object.autoInstancedParent.updateObject(params.object);
     }
+    params.object.onAfterRotationAnimation();
     return;
   }
   params.object.mesh.rotation.x = params.value;
   if (params.object.autoInstancedParent){
     params.object.autoInstancedParent.updateObject(params.object);
   }
+  params.object.onAfterRotationAnimation();
 }
 AnimationHandler.prototype.updateObjectRotationYFunc = function(params){
   if (params.object.pivotObject){
@@ -504,12 +512,14 @@ AnimationHandler.prototype.updateObjectRotationYFunc = function(params){
     if (params.object.autoInstancedParent){
       params.object.autoInstancedParent.updateObject(params.object);
     }
+    params.object.onAfterRotationAnimation();
     return;
   }
   params.object.mesh.rotation.y = params.value;
   if (params.object.autoInstancedParent){
     params.object.autoInstancedParent.updateObject(params.object);
   }
+  params.object.onAfterRotationAnimation();
 }
 AnimationHandler.prototype.updateObjectRotationZFunc = function(params){
   if (params.object.pivotObject){
@@ -521,12 +531,14 @@ AnimationHandler.prototype.updateObjectRotationZFunc = function(params){
     if (params.object.autoInstancedParent){
       params.object.autoInstancedParent.updateObject(params.object);
     }
+    params.object.onAfterRotationAnimation();
     return;
   }
   params.object.mesh.rotation.z = params.value;
   if (params.object.autoInstancedParent){
     params.object.autoInstancedParent.updateObject(params.object);
   }
+  params.object.onAfterRotationAnimation();
 }
 AnimationHandler.prototype.updateObjectPositionXFunc = function(params){
   params.object.mesh.position.x = params.value;
