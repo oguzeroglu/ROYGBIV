@@ -2781,6 +2781,6 @@ Roygbiv.prototype.stopScript = function(scriptName){
   }
   preConditions.checkIfDefined(ROYGBIV.stopScript, preConditions.scriptName, scriptName);
   var script = scripts[scriptName];
-  preConditions.checkIfScriptExists(ROYGBIV.startScript, null, script);
+  preConditions.checkIfScriptExists(ROYGBIV.stopScript, null, script);
   script.stop();
 }
