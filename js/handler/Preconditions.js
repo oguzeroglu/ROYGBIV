@@ -214,6 +214,9 @@ var Preconditions = function(){
   this.scriptName = "scriptName";
   this.animationName = "animationName";
   this.muzzleflashName = "muzzleflashName";
+  this.delayInMS = "delayInMS";
+  this.repeat = "repeat";
+  this.delayedExecutionID = "delayedExecutionID";
 }
 
 Preconditions.prototype.errorHeader = function(callerFunc){

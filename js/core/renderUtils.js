@@ -12,7 +12,6 @@ function render(){
   GLOBAL_ADDEDTEXT_VIEWPORT_UNIFORM.value.set(0, 0, window.innerWidth * screenResolution, window.innerHeight * screenResolution);
 
   activeControl.update();
-
   cpuOperationsHandler.handleSkybox();
 
   if (!stopAreaConfigurationsHandler){
@@ -35,6 +34,7 @@ function render(){
     cpuOperationsHandler.updateCrosshair();
     cpuOperationsHandler.handleObjectMouseEvents();
     cpuOperationsHandler.handleActiveMuzzleFlashes();
+    delayedExecutionHandler.tick();
   }else{
     if (!isDeployment){
       particleSystemCreatorGUIHandler.update();

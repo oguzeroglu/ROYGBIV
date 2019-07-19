@@ -820,4 +820,6 @@ var Text = function(){
   this.ROYGBIV_SCRIPTING_API_ONANIMATIONFINISHED = "Sets a finish listener for an animation of given object, object group or text. For repeating animations the callbackFunction is\nexecuted before each repeat. For rewinding animations the callbackFunction is executed when the rewind is finished.";
   this.ROYGBIV_SCRIPTING_API_REMOVEANIMATIONFINISHLISTENER = "Removes the finish listener for an animation of given object, object group or text.";
   this.ROYGBIV_SCRIPTING_API_SHOWMUZZLEFLASH = "Shows a muzzle flash. This function may be called each time a FPS weapon is shooting.";
+  this.ROYGBIV_SCRIPTING_API_EXECUTEDELAYED = "Runs a function after delayInMS milliseconds. If the repeat parameter is set to true runs the function in every delayInMS milliseconds.\nThis function returns a delayedExecutionID. This ID may provided to stopDelayedExecution API\nin order to stop a function to get executed.";
+  this.ROYGBIV_SCRIPTING_API_STOPDELAYEDEXECUTION = "Stops a function to get executed with executeDelayed API. The delayedExecutionID parameter should be the return value of\nexecuteDelayed API. This API returns true if a function is found associated with the provided delayedExecutionID parameter,\nreturns false otherwise.";
 }

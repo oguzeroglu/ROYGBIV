@@ -25,6 +25,8 @@ window.onload = function() {
   scriptsHandler = new ScriptsHandler();
   // ANIMATION HANDLER
   animationHandler = new AnimationHandler();
+  // DELAYED EXECUTION HANDLER
+  delayedExecutionHandler = new DelayedExecutionHandler();
   // TEXT POOL
   Text = (!isDeployment)? new Text(): 0;
   // DRAGABLE CLI
