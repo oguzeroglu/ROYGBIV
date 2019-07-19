@@ -172,7 +172,9 @@ var Roygbiv = function(){
     "stopAnimation",
     "onAnimationFinished",
     "removeAnimationFinishListener",
-    "showMuzzleFlash"
+    "showMuzzleFlash",
+    "executeDelayed",
+    "stopDelayedExecution"
   ];
 
   this.globals = new Object();
@@ -2754,6 +2756,34 @@ Roygbiv.prototype.isOrientationLandscape = function(){
     return false;
   }
   return isOrientationLandscape;
+}
+
+// Runs a function after delayInMS milliseconds. If the repeat parameter is set to true runs
+// the function in every delayInMS milliseconds. This function returns a delayedExecutionID.
+// This ID may provided to stopDelayedExecution API in order to stop a function to get executed.
+Roygbiv.prototype.executeDelayed = function(func, delayInMS, repeat){
+  if (mode == 0){
+    return;
+  }
+  preConditions.checkIfDefined(ROYGBIV.executeDelayed, preConditions.func, func);
+  preConditions.checkIfDefined(ROYGBIV.executeDelayed, preConditions.delayInMS, delayInMS);
+  preConditions.checkIfDefined(ROYGBIV.executeDelayed, preConditions.repeat, repeat);
+  preConditions.checkIfFunctionOnlyIfExists(ROYGBIV.executeDelayed, preConditions.func, func);
+  preConditions.checkIfNumberOnlyIfExists(ROYGBIV.executeDelayed, preConditions.delayInMS, delayInMS);
+  preConditions.checkIfLessThan(ROYGBIV.executeDelayed, preConditions.delayInMS, delayInMS, 0);
+  preConditions.checkIfBooleanOnlyIfExists(ROYGBIV.executeDelayed, preConditions.repeat, repeat);
+  return delayedExecutionHandler.requestDelayedExecution(delayInMS, func, repeat);
+}
+
+// Stops a function to get executed with executeDelayed API. The delayedExecutionID parameter
+// should be the return value of executeDelayed API. This API returns true if a function is
+// found associated with the provided delayedExecutionID parameter, returns false otherwise.
+Roygbiv.prototype.stopDelayedExecution = function(delayedExecutionID){
+  if (mode == 0){
+    return;
+  }
+  preConditions.checkIfDefined(ROYGBIV.stopDelayedExecution, preConditions.delayedExecutionID, delayedExecutionID);
+  return delayedExecutionHandler.stopDelayedExecution(delayedExecutionID);
 }
 
 // SCRIPT RELATED FUNCTIONS ****************************************************
