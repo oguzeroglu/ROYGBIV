@@ -3,6 +3,10 @@ var DelayedExecutionHandler = function(){
   this.initializePool();
 }
 
+DelayedExecutionHandler.prototype.reset = function(){
+  this.initializePool();
+}
+
 DelayedExecutionHandler.prototype.pushNewElementToPool = function(){
   this.pool.push({
     isAvailable: true, triggerTimeInMS: 0, func: null, repeat: false, delayInMS: 0

@@ -299,6 +299,8 @@ ModeSwitcher.prototype.switchFromPreviewToDesign = function(){
   mergedParticleSystems = new Object();
   selectedCrosshair = 0;
 
+  delayedExecutionHandler.reset();
+
   for (var objectName in objectGroups){
     var object = objectGroups[objectName];
     for (var animationName in object.animations){
