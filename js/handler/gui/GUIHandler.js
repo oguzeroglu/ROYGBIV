@@ -211,8 +211,10 @@ GUIHandler.prototype.afterTextSelection = function(){
     }
     if (curSelection.marginMode == MARGIN_MODE_2D_TEXT_TOP_LEFT){
       guiHandler.textManipulationParameters["Margin mode"] = "Top/Left";
-    }else{
+    }else if (curSelection.marginMode == MARGIN_MODE_2D_TEXT_BOTTOM_RIGHT){
       guiHandler.textManipulationParameters["Margin mode"] = "Bottom/Right";
+    }else{
+      guiHandler.textManipulationParameters["Margin mode"] = "Center";
     }
     if (!curSelection.is2D){
       guiHandler.disableController(guiHandler.textManipulationMarginModeController);
