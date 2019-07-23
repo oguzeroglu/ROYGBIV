@@ -4531,6 +4531,9 @@ function refreshRaycaster(messageOnFinished, noClear){
       }
       terminal.printInfo(messageOnFinished);
       terminal.enable();
+      if (mode == 0){
+        guiHandler.afterObjectSelection();
+      }
     }
   }
   rayCaster.refresh();
