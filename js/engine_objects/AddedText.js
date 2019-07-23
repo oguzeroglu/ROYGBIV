@@ -893,11 +893,13 @@ AddedText.prototype.set2DCoordinates = function(marginPercentWidth, marginPercen
     }
     this.setShaderMargin(false, marginY);
   }else{
+    marginPercentHeight = 100 - marginPercentHeight;
     var tmpY = ((curViewport.w - curViewport.y) / 2.0) + curViewport.y + this.twoDimensionalParameters.y;
     var heightY = (((tmpY - curViewport.y) * 2.0) / curViewport.w) - 1.0;
     var marginY = (((marginPercentHeight) * (2)) / (100)) -1;
     var cSizeY = (this.characterSize / (renderer.getCurrentViewport().w / screenResolution));
     this.cSizeY = cSizeY;
+    marginY -= heightY / 2;
     if (marginY + heightY < -1){
       marginY = -1 - heightY + cSizeY;
     }
