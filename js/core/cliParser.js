@@ -1064,6 +1064,7 @@ function parse(input){
           for (var gridName in gridSelections){
             gridSelections[gridName].toggleSelect(false, false, false, true);
           }
+          sceneHandler.onWallCollectionCreation(wcObject);
           refreshRaycaster(Text.WALL_COLLECTION_CREATED);
           return true;
         break;

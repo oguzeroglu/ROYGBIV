@@ -31,6 +31,10 @@ SceneHandler.prototype.onGridSystemCreation = function(gridSystem){
   this.scenes[this.activeSceneName].registerGridSystem(gridSystem);
 }
 
+SceneHandler.prototype.onWallCollectionCreation = function(wallCollection){
+  this.scenes[this.activeSceneName].registerWallCollection(wallCollection);
+}
+
 SceneHandler.prototype.getActiveSceneName = function(){
   return this.activeSceneName;
 }

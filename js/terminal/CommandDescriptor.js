@@ -188,7 +188,7 @@ var CommandDescriptor = function(){
       0, //printCrosshairs
       0, //scripts
       1, //animations
-      1, //createScene
+      1, //newScene
       1 //switchScene
   ];
 
@@ -380,7 +380,7 @@ var CommandDescriptor = function(){
     "printCrosshairs",
     "scripts",
     "animations objectName",
-    "createScene sceneName",
+    "newScene sceneName",
     "switchScene sceneName"
   ];
 
@@ -572,7 +572,7 @@ var CommandDescriptor = function(){
     "printCrosshairs",
     "scripts",
     "animations",
-    "createScene",
+    "newScene",
     "switchScene"
   ];
 
@@ -764,7 +764,7 @@ var CommandDescriptor = function(){
     "printCrosshairs: Prints created crosshairs.",
     "scripts: Opens the script handler GUI.",
     "animations: Opens the Animation editor GUI for an object or a text.",
-    "createScene: Creates a new scene.",
+    "newScene: Creates a new scene.",
     "switchScene: Switches the active scene."
   ];
 
@@ -1390,10 +1390,10 @@ var CommandDescriptor = function(){
   this.animations.types = [];
   this.animations.types.push(this.OBJECT_AND_TEXT_NAME); //animations
 
-  // createScene
-  this.createScene = new Object();
-  this.createScene.types = [];
-  this.createScene.types.push(this.UNKNOWN_INDICATOR); //sceneName
+  // newScene
+  this.newScene = new Object();
+  this.newScene.types = [];
+  this.newScene.types.push(this.UNKNOWN_INDICATOR); //sceneName
 
   // switchScene
   this.switchScene = new Object();
