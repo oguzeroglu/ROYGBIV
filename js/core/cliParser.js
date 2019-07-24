@@ -4390,6 +4390,38 @@ function parse(input){
           animationCreatorGUIHandler.show(obj);
           return true;
         break;
+        case 187: //createScene
+          if (mode != 0){
+            terminal.printError(Text.WORKS_ONLY_IN_DESIGN_MODE);
+            return true;
+          }
+          var sceneName = splitted[1];
+          if (sceneHandler.scenes[sceneName]){
+            terminal.printError(Text.NAME_MUST_BE_UNIQUE);
+            return true;
+          }
+          sceneHandler.createScene(sceneName);
+          terminal.printInfo(Text.SCENE_CREATED);
+          return true;
+        break;
+        case 188: //switchScene
+          if (mode != 0){
+            terminal.printError(Text.WORKS_ONLY_IN_DESIGN_MODE);
+            return true;
+          }
+          var sceneName = splitted[1];
+          if (!sceneHandler.scenes[sceneName]){
+            terminal.printError(Text.NO_SUCH_SCENE);
+            return true;
+          }
+          if (sceneName == sceneHandler.activeSceneName){
+            terminal.printError(Text.SCENE_IS_ALREADY_ACTIVE);
+            return true;
+          }
+          sceneHandler.changeScene(sceneName);
+          refreshRaycaster(Text.SCENE_SWITCHED);
+          return true;
+        break;
       }
       return true;
     }catch(err){

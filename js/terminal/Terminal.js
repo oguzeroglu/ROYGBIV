@@ -666,6 +666,14 @@ Terminal.prototype.autocomplete = function(command){
 				}
 				helpString = "[Objects]: ";
 			break;
+			case commandDescriptor.SCENE_NAME:
+				for (var sceneName in sceneHandler.scenes){
+					if (sceneName.toLowerCase().startsWith(curEntry.toLowerCase())){
+						possibilities.push(sceneName);
+					}
+				}
+				helpString = "[Scenes]: ";
+			break;
 			default:
 				throw new Error("Not implemented.");
 			break;

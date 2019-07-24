@@ -33,7 +33,7 @@ var LightweightState = function(){
   }
   // GRID SYSTEMS
   this.gridSystems = new Object();
-  for (var gsName in gridSystems){
+  for (var gsName in sceneHandler.getGridSystems()){
     this.gridSystems[gsName] = gridSystems[gsName].exportLightweight();
   }
   // ADDED OBJECTS

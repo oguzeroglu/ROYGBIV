@@ -56,7 +56,7 @@ RayCaster.prototype.refresh = function(){
     }
   }
   if (mode == 0){
-    for (var gsName in gridSystems){
+    for (var gsName in this.getGridSystems()){
       var gridSystem = gridSystems[gsName];
       this.binHandler.insert(gridSystem.boundingBox, gridSystem.name);
     }
@@ -177,4 +177,11 @@ RayCaster.prototype.show = function(object){
 
 RayCaster.prototype.query = function(point){
   return this.binHandler.query(point);
+}
+
+RayCaster.prototype.getGridSystems = function(){
+  if (IS_WORKER_CONTEXT){
+    return gridSystems;
+  }
+  return sceneHandler.getGridSystems();
 }

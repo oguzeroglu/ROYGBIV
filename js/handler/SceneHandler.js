@@ -30,3 +30,7 @@ SceneHandler.prototype.onGridSystemCreation = function(gridSystem){
 SceneHandler.prototype.getActiveSceneName = function(){
   return this.activeSceneName;
 }
+
+SceneHandler.prototype.getGridSystems = function(){
+  return this.scenes[this.activeSceneName].gridSystems;
+}

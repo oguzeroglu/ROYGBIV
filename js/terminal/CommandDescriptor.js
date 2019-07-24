@@ -187,7 +187,9 @@ var CommandDescriptor = function(){
       1, //destroyCrosshair
       0, //printCrosshairs
       0, //scripts
-      1 //animations
+      1, //animations
+      1, //createScene
+      1 //switchScene
   ];
 
   this.commandArgumentsExpectedExplanation = [
@@ -377,7 +379,9 @@ var CommandDescriptor = function(){
     "destroyCrosshair crosshairName",
     "printCrosshairs",
     "scripts",
-    "animations objectName"
+    "animations objectName",
+    "createScene sceneName",
+    "switchScene sceneName"
   ];
 
   this.commands = [
@@ -567,7 +571,9 @@ var CommandDescriptor = function(){
     "destroyCrosshair",
     "printCrosshairs",
     "scripts",
-    "animations"
+    "animations",
+    "createScene",
+    "switchScene"
   ];
 
   this.commandInfo = [
@@ -757,7 +763,9 @@ var CommandDescriptor = function(){
     "destroyCrosshair: Destroys a Crosshair object.",
     "printCrosshairs: Prints created crosshairs.",
     "scripts: Opens the script handler GUI.",
-    "animations: Opens the Animation editor GUI for an object or a text."
+    "animations: Opens the Animation editor GUI for an object or a text.",
+    "createScene: Creates a new scene.",
+    "switchScene: Switches the active scene."
   ];
 
   this.keyboardInfo = [
@@ -891,6 +899,7 @@ var CommandDescriptor = function(){
   this.MUZZLE_FLASH_NAME          =   37;
   this.CROSSHAIR_NAME             =   38;
   this.OBJECT_AND_TEXT_NAME       =   39;
+  this.SCENE_NAME                 =   40;
 
   // newGridSystem
   this.newGridSystem = new Object();
@@ -1380,6 +1389,17 @@ var CommandDescriptor = function(){
   this.animations = new Object();
   this.animations.types = [];
   this.animations.types.push(this.OBJECT_AND_TEXT_NAME); //animations
+
+  // createScene
+  this.createScene = new Object();
+  this.createScene.types = [];
+  this.createScene.types.push(this.UNKNOWN_INDICATOR); //sceneName
+
+  // switchScene
+  this.switchScene = new Object();
+  this.switchScene.types = [];
+  this.switchScene.types.push(this.SCENE_NAME); //sceneName
+
 };
 
 CommandDescriptor.prototype.test = function(){
