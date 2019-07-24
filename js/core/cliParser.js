@@ -1003,14 +1003,12 @@ function parse(input){
               }
             }
           }
-
           var gridSelectionSize = Object.keys(gridSelections).length;
           if (gridSelectionSize != 2 && gridSelectionSize != 1){
             terminal.printError(Text.MUST_HAVE_1_OR_2_GRIDS_SELECTED);
             return true;
           }
           var grid1 = gridSelections[Object.keys(gridSelections)[0]];
-
           var sideNames = [];
           if (grid1.axis == "XZ"){
             sideName = [
@@ -1037,39 +1035,32 @@ function parse(input){
               name + "_"+"YZ_ROOF"
             ];
           }
-
           for (var i = 0; i<sideNames.length; i++){
             if (gridSystems[sideNames[i]] || addedObjects[sideNames[i]] || objectGroups[sideNames[i]]){
               terminal.printInfo(Text.AN_ERROR_HAPPENED_CHOOSE_ANOTHER_NAME);
               return true;
             }
           }
-
           if (isNaN(height)){
             terminal.printError(Text.HEIGHT_MUST_BE_A_NUMBER);
             return true;
           }
-
           if (height == 0){
             terminal.printError(Text.HEIGHT_CANNOT_BE_0);
             return true;
           }
-
           var grid2 = undefined;
           if (gridSelectionSize == 2){
             grid2 = gridSelections[Object.keys(gridSelections)[1]];
           }
-
           if (gridSelectionSize == 2){
             if (grid1.parentName != grid2.parentName){
               terminal.printError(Text.SELECTED_GRIDS_SAME_GRIDSYSTEM);
               return true;
             }
           }
-
           var baseGridSystem = gridSystems[grid1.parentName];
-
-          new WallCollection(name, height, outlineColor, grid1, grid2);
+          var wcObject = new WallCollection(name, height, outlineColor, grid1, grid2);
           for (var gridName in gridSelections){
             gridSelections[gridName].toggleSelect(false, false, false, true);
           }
@@ -4512,9 +4503,8 @@ function processNewGridSystemCommand(name, sizeX, sizeZ, centerX, centerY, cente
     slicedGrid.toggleSelect(true, false, false, true);
     slicedGrid.slicedGridSystemName = name;
   }
-
+  sceneHandler.onGridSystemCreation(gsObject);
   refreshRaycaster(Text.GS_CREATED);
-
   return true;
 }
 

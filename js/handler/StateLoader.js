@@ -252,7 +252,7 @@ StateLoader.prototype.resetProject = function(){
   }
   if (!isDeployment){
     guiHandler.hideAll();
-    $("#cliDivheader").text("ROYGBIV Scene Creator - CLI (Design mode)");
+    $("#cliDivheader").text("ROYGBIV Scene Creator - CLI (Design mode - "+sceneHandler.getActiveSceneName()+")");
   }
   LIMIT_BOUNDING_BOX = new THREE.Box3(new THREE.Vector3(-4000, -4000, -4000), new THREE.Vector3(4000, 4000, 4000));
   BIN_SIZE = 50;

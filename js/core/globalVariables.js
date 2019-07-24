@@ -348,6 +348,7 @@ var minusY = "-y";
 var minusZ = "-z";
 var activeMuzzleFlashes = new Map();
 var delayedExecutionHandler;
+var sceneHandler;
 
 // RENDER ORDERS
 var renderOrders = {

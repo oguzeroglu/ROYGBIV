@@ -386,7 +386,7 @@ ModeSwitcher.prototype.switchFromPreviewToDesign = function(){
     canvas.style.visibility = "hidden";
     terminal.disable();
     rayCaster.onReadyCallback = function(){
-      $("#cliDivheader").text("ROYGBIV 3D Engine - CLI (Design mode)");
+      $("#cliDivheader").text("ROYGBIV 3D Engine - CLI (Design mode - "+sceneHandler.getActiveSceneName()+")");
       that.enableTerminal();
       canvas.style.visibility = "";
       terminal.printInfo(Text.SWITCHED_TO_DESIGN_MODE);

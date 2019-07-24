@@ -1,19 +1,14 @@
-var WallCollection = function(name, height, outlineColor,
-                            grid1, grid2, isLoaded, exportObj){
-
+var WallCollection = function(name, height, outlineColor, grid1, grid2, isLoaded, exportObj){
   this.name = name;
   this.height = height;
   this.outlineColor = outlineColor;
-
   if (isLoaded){
     this.createPreloadedWallCollection(exportObj);
     return;
   }
-
   if (!grid2){
     grid2 = grid1;
   }
-
   if (grid1.axis == "XZ"){
     this.sizeX = (Math.abs(grid1.colNumber - grid2.colNumber) + 1) * grid1.size;
     this.sizeZ = (Math.abs(grid1.rowNumber - grid2.rowNumber) + 1) * grid1.size;
@@ -24,7 +19,6 @@ var WallCollection = function(name, height, outlineColor,
     this.sizeZ = (Math.abs(grid1.colNumber - grid2.colNumber) + 1) * grid1.size;
     this.sizeY = (Math.abs(grid1.rowNumber - grid2.rowNumber) + 1) * grid1.size;
   }
-
   var centerX, centerY, centerZ;
   if (grid1.axis == "XZ"){
     centerX = (grid1.centerX + grid2.centerX) / 2;
@@ -39,9 +33,7 @@ var WallCollection = function(name, height, outlineColor,
     centerY = (grid1.centerY + grid2.centerY) / 2;
     centerZ = (grid1.centerZ + grid2.centerZ) / 2;
   }
-
   var gridSystem1Name, gridSystem2Name, gridSystem3Name, gridSystem4Name, gridSystemRoofName;
-
   if (grid1.axis == "XZ"){
     gridSystem1Name = this.name + "_"+"YZ_1";
     gridSystem2Name = this.name + "_"+"YZ_2";
@@ -61,7 +53,6 @@ var WallCollection = function(name, height, outlineColor,
     gridSystem4Name = this.name + "_"+"XY_2",
     gridSystemRoofName = this.name+ "_"+"YZ_ROOF"
   }
-
   this.gridSystemNames = [
     gridSystem1Name,
     gridSystem2Name,
@@ -69,7 +60,6 @@ var WallCollection = function(name, height, outlineColor,
     gridSystem4Name,
     gridSystemRoofName
   ]
-
   var gridSystem1CenterCoordinates, gridSystem2CenterCoordinates,
       gridSystem3CenterCoordinates, gridSystem4CenterCoordinates,
       gridSystemRoofCenterCoordinates;
