@@ -15,6 +15,10 @@ SceneHandler.prototype.changeScene = function(sceneName){
       gridSelections[gridName].toggleSelect();
     }
     gridSelections = new Object();
+    for (var gsName in this.scenes[sceneName].gridSystems){
+      var gs = this.scenes[sceneName].gridSystems[gsName];
+      gs.show();
+    }
   }
   this.activeSceneName = sceneName;
 }
