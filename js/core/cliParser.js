@@ -2066,6 +2066,7 @@ function parse(input){
             markedPoint.hide();
           }
           selectedGrid.toggleSelect(false, false, false, true);
+          sceneHandler.onMarkedPointCreation(markedPoint);
           if (!jobHandlerWorking){
             terminal.printInfo(Text.POINT_MARKED);
           }
@@ -2124,7 +2125,7 @@ function parse(input){
             terminal.printError(Text.WORKS_ONLY_IN_DESIGN_MODE);
             return true;
           }
-          for (var markedPointName in markedPoints){
+          for (var markedPointName in sceneHandler.getMarkedPoints()){
             count++;
             if (markedPoints[markedPointName].isHidden){
               markedPoints[markedPointName].show();
