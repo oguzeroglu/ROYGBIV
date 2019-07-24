@@ -377,7 +377,7 @@ Roygbiv.prototype.getMarkedPosition = function(markedPointName, targetVector){
   preConditions.checkIfDefined(ROYGBIV.getMarkedPosition, preConditions.markedPointName, markedPointName);
   preConditions.checkIfDefined(ROYGBIV.getMarkedPosition, preConditions.targetVector, targetVector);
   preConditions.checkIfVectorOnlyIfDefined(ROYGBIV.getMarkedPosition, preConditions.targetVector, targetVector);
-  var markedPoint = markedPoints[markedPointName];
+  var markedPoint = sceneHandler.getMarkedPoints()[markedPointName];
   preConditions.checkIfMarkedPointExists(ROYGBIV.getMarkedPosition, null, markedPoint);
   targetVector.x = markedPoint.x;
   targetVector.y = markedPoint.y;
