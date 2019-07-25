@@ -2087,6 +2087,7 @@ function parse(input){
             terminal.printError(Text.NO_SUCH_POINT);
             return true;
           }
+          sceneHandler.onMarkedPointDeletion(markedPoint);
           markedPoint.destroy();
           delete markedPoints[name];
           if (!jobHandlerWorking){

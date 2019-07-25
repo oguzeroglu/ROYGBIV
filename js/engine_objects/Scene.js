@@ -30,4 +30,10 @@ Scene.prototype.unregisterWallCollection = function(wallCollection){
 
 Scene.prototype.registerMarkedPoint = function(markedPoint){
   this.markedPoints[markedPoint.name] = markedPoint;
+  markedPoint.registeredSceneName = this.name;
+}
+
+Scene.prototype.unregisterMarkedPoint = function(markedPoint){
+  delete this.markedPoints[markedPoint.name];
+  delete markedPoint.registeredSceneName;
 }

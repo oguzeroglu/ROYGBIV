@@ -66,6 +66,10 @@ SceneHandler.prototype.onMarkedPointCreation = function(markedPoint){
   this.scenes[this.activeSceneName].registerMarkedPoint(markedPoint);
 }
 
+SceneHandler.prototype.onMarkedPointDeletion = function(markedPoint){
+  this.scenes[markedPoint.registeredSceneName].unregisterMarkedPoint(markedPoint);
+}
+
 SceneHandler.prototype.getActiveSceneName = function(){
   return this.activeSceneName;
 }

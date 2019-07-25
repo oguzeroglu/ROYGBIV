@@ -148,7 +148,7 @@ KeyboardEventHandler.prototype.deactivateGridSelectionMode = function(){
 }
 
 KeyboardEventHandler.prototype.activateObjectSelectionMode = function(){
-  for (var gsName in gridSystems){
+  for (var gsName in sceneHandler.getGridSystems()){
     gridSystems[gsName].hide();
   }
   for (var gridName in gridSelections){
@@ -158,7 +158,7 @@ KeyboardEventHandler.prototype.activateObjectSelectionMode = function(){
 }
 
 KeyboardEventHandler.prototype.deactivateObjectSelectionMode = function(){
-  for (var gsName in gridSystems){
+  for (var gsName in sceneHandler.getGridSystems()){
     gridSystems[gsName].show();
   }
   for (var gridName in gridSelections){
