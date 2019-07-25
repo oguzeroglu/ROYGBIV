@@ -50,8 +50,16 @@ SceneHandler.prototype.onGridSystemCreation = function(gridSystem){
   this.scenes[this.activeSceneName].registerGridSystem(gridSystem);
 }
 
+SceneHandler.prototype.onGridSystemDeletion = function(gridSystem){
+  this.scenes[gridSystem.registeredSceneName].unregisterGridSystem(gridSystem);
+}
+
 SceneHandler.prototype.onWallCollectionCreation = function(wallCollection){
   this.scenes[this.activeSceneName].registerWallCollection(wallCollection);
+}
+
+SceneHandler.prototype.onWallCollectionDeletion = function(wallCollection){
+  this.scenes[wallCollection.registeredSceneName].unregisterWallCollection(wallCollection);
 }
 
 SceneHandler.prototype.onMarkedPointCreation = function(markedPoint){

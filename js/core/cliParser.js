@@ -128,20 +128,18 @@ function parse(input){
         break;
         case 6: //destroyGridSystem
           var name = splitted[1];
-
           if (mode != 0){
             terminal.printError(Text.WORKS_ONLY_IN_DESIGN_MODE);
             return true;
           }
-
           if (!(name.indexOf("*") == -1)){
             new JobHandler(splitted).handle();
             return true;
           }
-
           if (!gridSystems[name]){
             terminal.printError(Text.NO_SUCH_GRID_SYSTEM);
           }else{
+            sceneHandler.onGridSystemDeletion(gridSystems[name]);
             gridSystems[name].destroy();
             if (!jobHandlerWorking){
               refreshRaycaster(Text.GRID_SYSTEM_DESTROYED);
@@ -1102,9 +1100,12 @@ function parse(input){
           }
           var wallCollection = wallCollections[name];
           if (wallCollection){
+            sceneHandler.onWallCollectionDeletion(wallCollection);
             wallCollection.destroy();
             if (!jobHandlerWorking){
               refreshRaycaster(Text.WALL_COLLECTION_DESTROYED);
+            }else{
+              jobHandlerRaycasterRefresh = true;
             }
           }else{
             terminal.printError(Text.NO_SUCH_WALL_COLLECTION);
