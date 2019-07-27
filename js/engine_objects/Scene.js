@@ -2,6 +2,17 @@ var Scene = function(name){
   this.name = name;
   this.gridSystems = new Object();
   this.markedPoints = new Object();
+  this.areas = new Object();
+}
+
+Scene.prototype.registerArea = function(area){
+  this.areas[area.name] = area;
+  area.registeredSceneName = this.name;
+}
+
+Scene.prototype.unregisterArea = function(area){
+  delete this.areas[area.name];
+  delete area.registeredSceneName;
 }
 
 Scene.prototype.registerGridSystem = function(gridSystem){

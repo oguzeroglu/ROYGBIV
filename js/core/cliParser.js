@@ -2708,6 +2708,7 @@ function parse(input){
             guiHandler.hide(guiHandler.guiTypes.AREA);
             areaConfigurationsVisible = false;
           }
+          sceneHandler.onAreaCreation(result);
           return true;
         break;
         case 131: //toggleAreas
@@ -2740,6 +2741,7 @@ function parse(input){
             terminal.printError(Text.NO_SUCH_AREA);
             return true;
           }
+          sceneHandler.onAreaDeletion(area);
           area.destroy();
           delete areas[area.name];
           terminal.printInfo(Text.AREA_DESTROYED);

@@ -22,6 +22,11 @@ SceneHandler.prototype.changeScene = function(sceneName){
         }
       }
     }
+    if (areasVisible){
+      for (var areaName in curActiveScene.areas){
+        curActiveScene.areas[areaName].hide();
+      }
+    }
     gridSelections = new Object();
     for (var gsName in this.scenes[sceneName].gridSystems){
       var gs = this.scenes[sceneName].gridSystems[gsName];
@@ -35,6 +40,11 @@ SceneHandler.prototype.changeScene = function(sceneName){
         }
       }
     }
+    if (areasVisible){
+      for (var areaName in this.scenes[sceneName].areas){
+        this.scenes[sceneName].areas[areaName].renderToScreen();
+      }
+    }
   }
   this.activeSceneName = sceneName;
   if (mode == 0){
@@ -44,6 +54,14 @@ SceneHandler.prototype.changeScene = function(sceneName){
 
 SceneHandler.prototype.createScene = function(sceneName){
   this.scenes[sceneName] = new Scene(sceneName);
+}
+
+SceneHandler.prototype.onAreaCreation = function(area){
+  this.scenes[this.activeSceneName].registerArea(area);
+}
+
+SceneHandler.prototype.onAreaDeletion = function(area){
+  this.scenes[area.registeredSceneName].unregisterArea(area);
 }
 
 SceneHandler.prototype.onGridSystemCreation = function(gridSystem){

@@ -616,23 +616,19 @@ GridSystem.prototype.newArea = function(name, height, selections){
       boxCenterX = grid1.centerX + (height / 2);
     }
   }
-
   var boundingBox = new THREE.Box3().setFromCenterAndSize(
     new THREE.Vector3(boxCenterX, boxCenterY, boxCenterZ),
     new THREE.Vector3(boxSizeX, boxSizeY, boxSizeZ)
   );
-
   areas[name] = new Area(name, boundingBox, this.outlineColor, selections[0].size);
   if (areasVisible){
     areas[name].renderToScreen();
   }
-
   for (var i = 0; i<selections.length; i++){
     selections[i].toggleSelect(false, false, false, true);
   }
-
   areaBinHandler.insert(boundingBox, name);
-
+  return areas[name];
 }
 
 GridSystem.prototype.newSurface = function(name, grid1, grid2, material){
