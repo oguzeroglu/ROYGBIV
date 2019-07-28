@@ -168,7 +168,6 @@ StateLoader.prototype.resetProject = function(){
   preConfiguredParticleSystems = new Object();
   preConfiguredParticleSystemPools = new Object();
   muzzleFlashes = new Object();
-  areaBinHandler = new WorldBinHandler(true);
   webglCallbackHandler = new WebGLCallbackHandler();
   textureAtlasHandler.dispose();
   textureAtlasHandler = new TextureAtlasHandler();
@@ -182,7 +181,6 @@ StateLoader.prototype.resetProject = function(){
   physicsFactory.reset();
   rayCaster = raycasterFactory.get();
   physicsWorld = physicsFactory.get();
-  areaBinHandler.isAreaBinHandler = true;
   anchorGrid = 0;
   areasVisible = true;
   areaConfigurationsVisible = false;

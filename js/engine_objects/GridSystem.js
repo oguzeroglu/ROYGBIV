@@ -627,7 +627,7 @@ GridSystem.prototype.newArea = function(name, height, selections){
   for (var i = 0; i<selections.length; i++){
     selections[i].toggleSelect(false, false, false, true);
   }
-  areaBinHandler.insert(boundingBox, name);
+  sceneHandler.getAreaBinHandler().insert(boundingBox, name);
   return areas[name];
 }
 

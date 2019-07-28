@@ -4424,6 +4424,8 @@ function parse(input){
             terminal.printError(Text.SCENE_IS_ALREADY_ACTIVE);
             return true;
           }
+          selectionHandler.resetCurrentSelection();
+          guiHandler.hideAll();
           sceneHandler.changeScene(sceneName);
           refreshRaycaster(Text.SCENE_SWITCHED);
           return true;

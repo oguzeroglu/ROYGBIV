@@ -36,7 +36,7 @@ Area.prototype.destroy = function(){
     this.text.mesh.geometry.dispose();
     this.text.mesh.material.dispose();
   }
-  areaBinHandler.deleteObjectFromBin(this.binInfo, this.name);
+  sceneHandler.getAreaBinHandler().deleteObjectFromBin(this.binInfo, this.name);
   for (var objName in addedObjects){
     if (addedObjects[objName].areaVisibilityConfigurations){
       if (!(typeof addedObjects[objName].areaVisibilityConfigurations[this.name] == UNDEFINED)){

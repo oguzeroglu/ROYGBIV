@@ -117,10 +117,6 @@ window.onload = function() {
   // COLOR NAMES
   ColorNames = new ColorNames();
 
-  // AREA BIN HANDLER
-  areaBinHandler = new WorldBinHandler();
-  areaBinHandler.isAreaBinHandler = true;
-
   // AREA CONFIGURATIONS HANDLER
   areaConfigurationsHandler = new AreaConfigurationsHandler();
 

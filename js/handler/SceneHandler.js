@@ -99,3 +99,11 @@ SceneHandler.prototype.getGridSystems = function(){
 SceneHandler.prototype.getMarkedPoints = function(){
   return this.scenes[this.activeSceneName].markedPoints;
 }
+
+SceneHandler.prototype.getAreaBinHandler = function(){
+  return this.scenes[this.activeSceneName].areaBinHandler;
+}
+
+SceneHandler.prototype.getAreas = function(){
+  return this.scenes[this.activeSceneName].areas;
+}

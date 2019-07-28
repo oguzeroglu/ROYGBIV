@@ -3,6 +3,8 @@ var Scene = function(name){
   this.gridSystems = new Object();
   this.markedPoints = new Object();
   this.areas = new Object();
+  this.areaBinHandler = new WorldBinHandler(true);
+  this.areaBinHandler.isAreaBinHandler = true;
 }
 
 Scene.prototype.registerArea = function(area){

@@ -5,7 +5,7 @@ var AreaConfigurationsHandler = function(){
 }
 
 AreaConfigurationsHandler.prototype.handle = function(){
-  var result = areaBinHandler.queryArea(camera.position);
+  var result = sceneHandler.getAreaBinHandler().queryArea(camera.position);
   if (result){
     if (result != this.currentArea){
       this.currentArea = result;
@@ -81,7 +81,7 @@ AreaConfigurationsHandler.prototype.generateConfigurations = function(singleArea
 AreaConfigurationsHandler.prototype.show = function(singleAreaName){
   this.generateConfigurations(singleAreaName);
   guiHandler.datGuiAreaConfigurations = new dat.GUI({hideable: false});
-  var pseudoAreas = areas;
+  var pseudoAreas = sceneHandler.getAreas();
   if (singleAreaName){
     pseudoAreas = new Object();
     if (singleAreaName.toLowerCase() != "default"){
