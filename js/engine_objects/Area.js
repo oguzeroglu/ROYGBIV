@@ -29,6 +29,13 @@ Area.prototype.destroy = function(){
     this.helper.geometry.dispose();
     this.helper.material.dispose();
   }
+  if (this.text){
+    if (areasVisible){
+      scene.remove(this.text.mesh);
+    }
+    this.text.mesh.geometry.dispose();
+    this.text.mesh.material.dispose();
+  }
   areaBinHandler.deleteObjectFromBin(this.binInfo, this.name);
   for (var objName in addedObjects){
     if (addedObjects[objName].areaVisibilityConfigurations){
