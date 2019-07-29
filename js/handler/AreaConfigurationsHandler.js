@@ -81,6 +81,7 @@ AreaConfigurationsHandler.prototype.generateConfigurations = function(singleArea
 AreaConfigurationsHandler.prototype.show = function(singleAreaName){
   this.generateConfigurations(singleAreaName);
   guiHandler.datGuiAreaConfigurations = new dat.GUI({hideable: false});
+  areaConfigurationsVisible = true;
   var pseudoAreas = sceneHandler.getAreas();
   if (singleAreaName){
     pseudoAreas = new Object();

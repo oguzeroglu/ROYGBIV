@@ -451,7 +451,6 @@ function parse(input){
           gridSystems[selectedGridSystemName].newSurface(objectName, selectedGrid1, selectedGrid2, selectedMaterial);
           if (areaConfigurationsVisible){
             guiHandler.hide(guiHandler.guiTypes.AREA);
-            areaConfigurationsVisible = false;
           }
           if (!jobHandlerWorking){
             refreshRaycaster(Text.OBJECT_ADDED);
@@ -585,7 +584,6 @@ function parse(input){
           }
           if (areaConfigurationsVisible){
             guiHandler.hide(guiHandler.guiTypes.AREA);
-            areaConfigurationsVisible = false;
           }
           if (!jobHandlerWorking){
             refreshRaycaster(Text.OBJECT_DESTROYED);
@@ -793,7 +791,6 @@ function parse(input){
           anchorGrid = 0;
           if (areaConfigurationsVisible){
             guiHandler.hide(guiHandler.guiTypes.AREA);
-            areaConfigurationsVisible = false;
           }
           refreshRaycaster(Text.RAMP_CREATED);
           return true;
@@ -966,7 +963,6 @@ function parse(input){
           gridSystem.newBox(selections, height, material, name);
           if (areaConfigurationsVisible){
             guiHandler.hide(guiHandler.guiTypes.AREA);
-            areaConfigurationsVisible = false;
           }
           if (!jobHandlerWorking){
             refreshRaycaster(Text.BOX_CREATED);
@@ -1949,7 +1945,6 @@ function parse(input){
             guiHandler.hide(guiHandler.guiTypes.OBJECT);
             if (areaConfigurationsVisible){
               guiHandler.hide(guiHandler.guiTypes.AREA);
-              areaConfigurationsVisible = false;
             }
             refreshRaycaster(Text.OBJECTS_GLUED_TOGETHER);
             return true;
@@ -1983,7 +1978,6 @@ function parse(input){
           selectionHandler.resetCurrentSelection();
           if (areaConfigurationsVisible){
             guiHandler.hide(guiHandler.guiTypes.AREA);
-            areaConfigurationsVisible = false;
           }
           if (!jobHandlerWorking){
             refreshRaycaster(Text.OBJECT_DETACHED);
@@ -2539,7 +2533,6 @@ function parse(input){
           gridSystem.newSphere(sphereName, material, radius, selections);
           if (areaConfigurationsVisible){
             guiHandler.hide(guiHandler.guiTypes.AREA);
-            areaConfigurationsVisible = false;
           }
           if (!jobHandlerWorking){
             refreshRaycaster(Text.SPHERE_CREATED);
@@ -2703,7 +2696,6 @@ function parse(input){
           terminal.printInfo(Text.AREA_CREATED);
           if (areaConfigurationsVisible){
             guiHandler.hide(guiHandler.guiTypes.AREA);
-            areaConfigurationsVisible = false;
           }
           sceneHandler.onAreaCreation(result);
           return true;
@@ -2744,7 +2736,6 @@ function parse(input){
           terminal.printInfo(Text.AREA_DESTROYED);
           if (areaConfigurationsVisible){
             guiHandler.hide(guiHandler.guiTypes.AREA);
-            areaConfigurationsVisible = false;
           }
           return true;
         break;
@@ -2793,7 +2784,6 @@ function parse(input){
             }
             guiHandler.hide(guiHandler.guiTypes.AREA);
           }
-          areaConfigurationsVisible = ! areaConfigurationsVisible;
           terminal.printInfo(Text.OK);
         break;
         case 134: //setResolution
@@ -2845,7 +2835,6 @@ function parse(input){
             guiHandler.hide(guiHandler.guiTypes.AREA);
           }
           areaConfigurationsHandler.show(areaName);
-          areaConfigurationsVisible = true;
           terminal.printInfo(Text.OK);
           return true;
         break;
@@ -3072,7 +3061,6 @@ function parse(input){
           );
           if (areaConfigurationsVisible){
             guiHandler.hide(guiHandler.guiTypes.AREA);
-            areaConfigurationsVisible = false;
           }
           if (!jobHandlerWorking){
             refreshRaycaster(Text.CYLINDER_CREATED);
