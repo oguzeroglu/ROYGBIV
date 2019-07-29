@@ -3302,6 +3302,7 @@ function parse(input){
           }
           if (sourceObj instanceof AddedObject){
             addedObjects[targetName] = copiedObj;
+            sceneHandler.onAddedObjectCreation(copiedObj);
           }else{
             objectGroups[targetName] = copiedObj;
             if (!jobHandlerWorking){
