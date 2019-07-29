@@ -9,6 +9,16 @@ var Scene = function(name){
   this.areaBinHandler.isAreaBinHandler = true;
 }
 
+Scene.prototype.registerObjectGroup = function(objectGroup){
+  this.objectGroups[objectGroup.name] = objectGroup;
+  objectGroup.registeredSceneName = this.name;
+}
+
+Scene.prototype.unregisterObjectGroup = function(objectGroup){
+  delete this.objectGroups[objectGroup.name];
+  delete objectGroup.registeredSceneName;
+}
+
 Scene.prototype.registerAddedObject = function(addedObject){
   this.addedObjects[addedObject.name] = addedObject;
   addedObject.registeredSceneName = this.name;

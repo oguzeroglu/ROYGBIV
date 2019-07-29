@@ -357,6 +357,14 @@ ObjectGroup.prototype.show = function(){
   }
 }
 
+ObjectGroup.prototype.hideOnDesignMode = function(){
+  this.mesh.visible = false;
+}
+
+ObjectGroup.prototype.showOnDesignMode = function(){
+  this.mesh.visible = true;
+}
+
 ObjectGroup.prototype.hide = function(keepPhysics){
   if (this.isVisibleOnThePreviewScene()){
     this.mesh.visible = false;

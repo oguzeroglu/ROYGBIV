@@ -15,6 +15,10 @@ SceneHandler.prototype.changeScene = function(sceneName){
       var obj = curActiveScene.addedObjects[objName];
       obj.hideOnDesignMode();
     }
+    for (var objName in curActiveScene.objectGroups){
+      var obj = curActiveScene.objectGroups[objName];
+      obj.hideOnDesignMode();
+    }
     for (var gridName in gridSelections){
       gridSelections[gridName].toggleSelect();
     }
@@ -38,6 +42,10 @@ SceneHandler.prototype.changeScene = function(sceneName){
     }
     for (var objName in this.scenes[sceneName].addedObjects){
       var obj = this.scenes[sceneName].addedObjects[objName];
+      obj.showOnDesignMode();
+    }
+    for (var objName in this.scenes[sceneName].objectGroups){
+      var obj = this.scenes[sceneName].objectGroups[objName];
       obj.showOnDesignMode();
     }
     if (markedPointsVisible){
@@ -64,12 +72,24 @@ SceneHandler.prototype.createScene = function(sceneName){
   this.scenes[sceneName] = new Scene(sceneName);
 }
 
+SceneHandler.prototype.onObjectGroupCreation = function(objectGroup){
+  this.scenes[this.activeSceneName].registerObjectGroup(objectGroup);
+}
+
+SceneHandler.prototype.onObjectGroupDeletion = function(objectGroup){
+  this.scenes[objectGroup.registeredSceneName].unregisterObjectGroup(objectGroup);
+}
+
 SceneHandler.prototype.onAddedObjectCreation = function(addedObject){
   this.scenes[this.activeSceneName].registerAddedObject(addedObject);
 }
 
 SceneHandler.prototype.onAddedObjectDeletion = function(addedObject){
-  this.scenes[addedObject.registeredSceneName].unregisterAddedObject(addedObject);
+  var sceneName = addedObject.registeredSceneName;
+  if (typeof sceneName == UNDEFINED){
+    sceneName = objectGroups[addedObject.parentObjectName].registeredSceneName;
+  }
+  this.scenes[sceneName].unregisterAddedObject(addedObject);
 }
 
 SceneHandler.prototype.onAreaCreation = function(area){

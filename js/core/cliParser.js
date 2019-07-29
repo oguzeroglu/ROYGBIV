@@ -1835,12 +1835,10 @@ function parse(input){
             groupName = generateUniqueObjectName();
           }
           var objects = splitted[2];
-
           if (groupName.indexOf(Text.COMMA) != -1){
             terminal.printError(Text.INVALID_CHARACTER_IN_OBJECT_NAME);
             return true;
           }
-
           if (mode == 1){
             terminal.printError(Text.WORKS_ONLY_IN_DESIGN_MODE);
             return true;
@@ -1878,7 +1876,6 @@ function parse(input){
               terminal.printError(Text.MUST_GLUE_AT_LEAST_2_OBJECTS);
               return true;
             }
-
             for (var i = 0; i<objectNamesArray.length; i++){
               var object = addedObjects[objectNamesArray[i]];
               if (!object){
@@ -1891,7 +1888,6 @@ function parse(input){
                 }
               }
             }
-
             var detachedObjectGroups = new Object();
             for (var i = 0; i<objectNamesArray.length; i++){
               var object = addedObjects[objectNamesArray[i]];
@@ -1905,7 +1901,6 @@ function parse(input){
                 group[objectNamesArray[i]] = object;
               }
             }
-
             var materialUsed = 0;
             for (var objName in group){
               if (!materialUsed){
@@ -1919,9 +1914,7 @@ function parse(input){
               }
             }
             selectionHandler.resetCurrentSelection();
-
             var objectGroup = new ObjectGroup(groupName, group);
-
             if (!objectGroup.areGeometriesIdentical()){
               var ctr = 0;
               for (var objName in group){
@@ -1932,25 +1925,27 @@ function parse(input){
                 }
               }
             }
-
             try{
               objectGroup.handleTextures();
             }catch (textureMergerErr){
               terminal.printError(textureMergerErr.message);
               return true;
             }
-
             for (var objGroupName in detachedObjectGroups){
               var gluedObject = detachedObjectGroups[objGroupName];
+              sceneHandler.onObjectGroupDeletion(gluedObject);
               gluedObject.detach();
               delete objectGroups[gluedObject.name];
             }
-
             if (materialUsed == 1){
               objectGroup.isBasicMaterial = true;
             }
             objectGroup.glue();
+            sceneHandler.onObjectGroupCreation(objectGroup);
             objectGroups[groupName] = objectGroup;
+            for (var childObjName in objectGroup.group){
+              sceneHandler.onAddedObjectDeletion(objectGroup.group[childObjName]);
+            }
             guiHandler.hide(guiHandler.guiTypes.OBJECT);
             if (areaConfigurationsVisible){
               guiHandler.hide(guiHandler.guiTypes.AREA);
@@ -1979,7 +1974,11 @@ function parse(input){
             terminal.printError(Text.NO_SUCH_OBJECT);
             return true;
           }
+          for (var childObjName in objectGroup.group){
+            sceneHandler.onAddedObjectCreation(objectGroup.group[childObjName]);
+          }
           objectGroup.detach();
+          sceneHandler.onObjectGroupDeletion(objectGroup);
           delete objectGroups[name];
           selectionHandler.resetCurrentSelection();
           if (areaConfigurationsVisible){
@@ -3305,6 +3304,7 @@ function parse(input){
             sceneHandler.onAddedObjectCreation(copiedObj);
           }else{
             objectGroups[targetName] = copiedObj;
+            sceneHandler.onObjectGroupCreation(copiedObj);
             if (!jobHandlerWorking){
               for (var gridName in gridSelections){
                 gridSelections[gridName].toggleSelect(false, false, false, true);
