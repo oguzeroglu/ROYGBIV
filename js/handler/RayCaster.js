@@ -25,7 +25,7 @@ RayCaster.prototype.refresh = function(){
   }
   this.ready = false;
   this.binHandler = new WorldBinHandler();
-  for (var objName in addedObjects){
+  for (var objName in this.getAddedObjects()){
     var addedObject = addedObjects[objName];
     if (mode == 1 && !addedObject.isIntersectable){
       continue;
@@ -39,7 +39,7 @@ RayCaster.prototype.refresh = function(){
     }
     this.binHandler.insert(addedObject.boundingBoxes[0], objName);
   }
-  for (var objName in objectGroups){
+  for (var objName in this.getObjectGroups()){
     var objectGroup = objectGroups[objName];
     if (mode == 1 && !objectGroup.isIntersectable){
       continue;
@@ -184,4 +184,18 @@ RayCaster.prototype.getGridSystems = function(){
     return gridSystems;
   }
   return sceneHandler.getGridSystems();
+}
+
+RayCaster.prototype.getAddedObjects = function(){
+  if (IS_WORKER_CONTEXT){
+    return addedObjects;
+  }
+  return sceneHandler.getAddedObjects();
+}
+
+RayCaster.prototype.getObjectGroups = function(){
+  if (IS_WORKER_CONTEXT){
+    return objectGroups;
+  }
+  return sceneHandler.getObjectGroups();
 }

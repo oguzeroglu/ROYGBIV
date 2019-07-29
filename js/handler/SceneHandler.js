@@ -11,6 +11,10 @@ SceneHandler.prototype.changeScene = function(sceneName){
       var gs = curActiveScene.gridSystems[gsName];
       gs.hide();
     }
+    for (var objName in curActiveScene.addedObjects){
+      var obj = curActiveScene.addedObjects[objName];
+      obj.hideOnDesignMode();
+    }
     for (var gridName in gridSelections){
       gridSelections[gridName].toggleSelect();
     }
@@ -31,6 +35,10 @@ SceneHandler.prototype.changeScene = function(sceneName){
     for (var gsName in this.scenes[sceneName].gridSystems){
       var gs = this.scenes[sceneName].gridSystems[gsName];
       gs.show();
+    }
+    for (var objName in this.scenes[sceneName].addedObjects){
+      var obj = this.scenes[sceneName].addedObjects[objName];
+      obj.showOnDesignMode();
     }
     if (markedPointsVisible){
       for (var markedPointName in this.scenes[sceneName].markedPoints){
@@ -54,6 +62,14 @@ SceneHandler.prototype.changeScene = function(sceneName){
 
 SceneHandler.prototype.createScene = function(sceneName){
   this.scenes[sceneName] = new Scene(sceneName);
+}
+
+SceneHandler.prototype.onAddedObjectCreation = function(addedObject){
+  this.scenes[this.activeSceneName].registerAddedObject(addedObject);
+}
+
+SceneHandler.prototype.onAddedObjectDeletion = function(addedObject){
+  this.scenes[addedObject.registeredSceneName].unregisterAddedObject(addedObject);
 }
 
 SceneHandler.prototype.onAreaCreation = function(area){
@@ -106,4 +122,12 @@ SceneHandler.prototype.getAreaBinHandler = function(){
 
 SceneHandler.prototype.getAreas = function(){
   return this.scenes[this.activeSceneName].areas;
+}
+
+SceneHandler.prototype.getAddedObjects = function(){
+  return this.scenes[this.activeSceneName].addedObjects;
+}
+
+SceneHandler.prototype.getObjectGroups = function(){
+  return this.scenes[this.activeSceneName].objectGroups;
 }

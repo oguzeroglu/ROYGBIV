@@ -382,12 +382,10 @@ function parse(input){
             terminal.printError(Text.WORKS_ONLY_IN_DESIGN_MODE);
             return;
           }
-
           if (!(splitted[1].indexOf("*") == -1)){
             new JobHandler(splitted).handle();
             return true;
           }
-
           var selectedGrid1, selectedGrid2;
           if (!jobHandlerSelectedGrid){
             var gridSelectionSize = Object.keys(gridSelections).length;
@@ -409,7 +407,6 @@ function parse(input){
           }else{
             selectedGrid1 = jobHandlerSelectedGrid;
           }
-
           var selectedGridSystemName = selectedGrid1.parentName;
           var materialName = splitted[2];
           var selectedMaterial = materials[materialName];
@@ -579,6 +576,7 @@ function parse(input){
           }
           selectionHandler.resetCurrentSelection();
           if (object){
+            sceneHandler.onAddedObjectDeletion(object);
             object.destroy(true);
             delete addedObjects[objectName];
           }else if (objectGroup){
@@ -4427,6 +4425,9 @@ function parse(input){
           selectionHandler.resetCurrentSelection();
           guiHandler.hideAll();
           sceneHandler.changeScene(sceneName);
+          if (physicsDebugMode){
+            debugRenderer.refresh();
+          }
           refreshRaycaster(Text.SCENE_SWITCHED);
           return true;
         break;

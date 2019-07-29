@@ -757,6 +757,7 @@ GridSystem.prototype.newSurface = function(name, grid1, grid2, material){
 
   surface.addedObject = addedObjectInstance;
   addedObjectInstance.updateMVMatrix();
+  sceneHandler.onAddedObjectCreation(addedObjectInstance);
 }
 
 GridSystem.prototype.newRamp = function(anchorGrid, otherGrid, axis, height, material, name){
@@ -981,7 +982,7 @@ GridSystem.prototype.newRamp = function(anchorGrid, otherGrid, axis, height, mat
   }
   delete gridSelections[anchorGrid.name];
   delete gridSelections[otherGrid.name];
-
+  sceneHandler.onAddedObjectCreation(addedObjectInstance);
 }
 
 GridSystem.prototype.newBox = function(selections, height, material, name){
@@ -1127,6 +1128,7 @@ GridSystem.prototype.newBox = function(selections, height, material, name){
 
   boxMesh.addedObject = addedObjectInstance;
   addedObjectInstance.updateMVMatrix();
+  sceneHandler.onAddedObjectCreation(addedObjectInstance);
 }
 
 GridSystem.prototype.newSphere = function(sphereName, material, radius, selections){
@@ -1248,6 +1250,7 @@ GridSystem.prototype.newSphere = function(sphereName, material, radius, selectio
   addedObjects[sphereName] = addedObjectInstance;
   sphereMesh.addedObject = addedObjectInstance;
   addedObjectInstance.updateMVMatrix();
+  sceneHandler.onAddedObjectCreation(addedObjectInstance);
 }
 
 GridSystem.prototype.newCylinder = function(cylinderName, material, topRadius, bottomRadius, height, isOpenEnded, selections){
@@ -1373,4 +1376,5 @@ GridSystem.prototype.newCylinder = function(cylinderName, material, topRadius, b
 
   cylinderMesh.addedObject = addedObjectInstance;
   addedObjectInstance.updateMVMatrix();
+  sceneHandler.onAddedObjectCreation(addedObjectInstance);
 }

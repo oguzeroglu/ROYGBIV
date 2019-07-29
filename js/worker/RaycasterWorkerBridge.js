@@ -266,6 +266,8 @@ var RaycasterWorkerBridge = function(){
 
 RaycasterWorkerBridge.prototype.query = noop;
 RaycasterWorkerBridge.prototype.getGridSystems = noop;
+RaycasterWorkerBridge.prototype.getAddedObjects = noop;
+RaycasterWorkerBridge.prototype.getObjectGroups = noop;
 
 RaycasterWorkerBridge.prototype.onReady = function(){
   this.ready = true;

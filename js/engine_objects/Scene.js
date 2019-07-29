@@ -1,10 +1,22 @@
 var Scene = function(name){
   this.name = name;
+  this.addedObjects = new Object();
+  this.objectGroups = new Object();
   this.gridSystems = new Object();
   this.markedPoints = new Object();
   this.areas = new Object();
   this.areaBinHandler = new WorldBinHandler(true);
   this.areaBinHandler.isAreaBinHandler = true;
+}
+
+Scene.prototype.registerAddedObject = function(addedObject){
+  this.addedObjects[addedObject.name] = addedObject;
+  addedObject.registeredSceneName = this.name;
+}
+
+Scene.prototype.unregisterAddedObject = function(addedObject){
+  delete this.addedObjects[addedObject.name];
+  delete addedObject.registeredSceneName;
 }
 
 Scene.prototype.registerArea = function(area){

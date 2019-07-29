@@ -398,6 +398,14 @@ AddedObject.prototype.show = function(){
   }
 }
 
+AddedObject.prototype.hideOnDesignMode = function(){
+  this.mesh.visible = false;
+}
+
+AddedObject.prototype.showOnDesignMode = function(){
+  this.mesh.visible = true;
+}
+
 AddedObject.prototype.hide = function(keepPhysics){
   if (this.isVisibleOnThePreviewScene()){
     this.mesh.visible = false;

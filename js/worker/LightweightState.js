@@ -38,7 +38,7 @@ var LightweightState = function(){
   }
   // ADDED OBJECTS
   this.addedObjects = new Object();
-  for (var objName in addedObjects){
+  for (var objName in sceneHandler.getAddedObjects()){
     this.addedObjects[objName] = addedObjects[objName].exportLightweight();
   }
   // OBJECT GROUPS
