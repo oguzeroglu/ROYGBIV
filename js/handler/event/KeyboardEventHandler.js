@@ -122,10 +122,10 @@ KeyboardEventHandler.prototype.onKeyDown = function(event){
 
 KeyboardEventHandler.prototype.activateGridSelectionMode = function(){
   selectionHandler.resetCurrentSelection();
-  for (var objName in addedObjects){
+  for (var objName in sceneHandler.getAddedObjects()){
     addedObjects[objName].mesh.visible = false;
   }
-  for (var objName in objectGroups){
+  for (var objName in sceneHandler.getObjectGroups()){
     objectGroups[objName].mesh.visible = false;
   }
   for (var textName in addedTexts){
@@ -135,10 +135,10 @@ KeyboardEventHandler.prototype.activateGridSelectionMode = function(){
 }
 
 KeyboardEventHandler.prototype.deactivateGridSelectionMode = function(){
-  for (var objName in addedObjects){
+  for (var objName in sceneHandler.getAddedObjects()){
     addedObjects[objName].mesh.visible = true;
   }
-  for (var objName in objectGroups){
+  for (var objName in sceneHandler.getObjectGroups()){
     objectGroups[objName].mesh.visible = true;
   }
   for (var textName in addedTexts){
