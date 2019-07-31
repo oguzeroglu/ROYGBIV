@@ -3611,6 +3611,7 @@ function parse(input){
           var addedText = new AddedText(
             textName, selectedFont, txt, textCoord, new THREE.Color("white"), 1, 20
           );
+          sceneHandler.onAddedTextCreation(addedText);
           addedTexts[textName] = addedText;
           addedText.refCharSize = 20;
           addedText.refInnerHeight = window.innerHeight;
@@ -3668,6 +3669,7 @@ function parse(input){
             return true;
           }
           selectionHandler.resetCurrentSelection();
+          sceneHandler.onAddedTextDeletion(textToDestroy);
           textToDestroy.destroy(true);
           if (!jobHandlerWorking){
             refreshRaycaster(Text.TEXT_DESTROYED);

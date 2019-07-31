@@ -60,14 +60,14 @@ RayCaster.prototype.refresh = function(){
       var gridSystem = gridSystems[gsName];
       this.binHandler.insert(gridSystem.boundingBox, gridSystem.name);
     }
-    for (var txtName in addedTexts){
+    for (var txtName in this.getAddedTexts()){
       var addedText = addedTexts[txtName];
       if (!addedText.is2D){
         this.binHandler.insert(addedText.boundingBox, txtName);
       }
     }
   }else{
-    for (var txtName in addedTexts){
+    for (var txtName in this.getAddedTexts()){
       var addedText = addedTexts[txtName];
       if (addedText.isClickable && !addedText.is2D){
         this.binHandler.insert(addedText.boundingBox, txtName);
@@ -198,4 +198,11 @@ RayCaster.prototype.getObjectGroups = function(){
     return objectGroups;
   }
   return sceneHandler.getObjectGroups();
+}
+
+RayCaster.prototype.getAddedTexts = function(){
+  if (IS_WORKER_CONTEXT){
+    return addedTexts;
+  }
+  return sceneHandler.getAddedTexts();
 }

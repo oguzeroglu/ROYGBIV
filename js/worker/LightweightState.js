@@ -52,7 +52,7 @@ var LightweightState = function(){
   }
   // 3D ADDED TEXTS
   this.addedTexts3D = new Object();
-  for (var textName in addedTexts){
+  for (var textName in sceneHandler.getAddedTexts()){
     if (!addedTexts[textName].is2D){
       this.addedTexts3D[textName] = addedTexts[textName].exportLightweight();
     }

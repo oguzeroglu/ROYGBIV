@@ -19,6 +19,10 @@ SceneHandler.prototype.changeScene = function(sceneName){
       var obj = curActiveScene.objectGroups[objName];
       obj.hideOnDesignMode();
     }
+    for (var textName in curActiveScene.addedTexts){
+      var text = curActiveScene.addedTexts[textName];
+      text.hideOnDesignMode();
+    }
     for (var gridName in gridSelections){
       gridSelections[gridName].toggleSelect();
     }
@@ -48,6 +52,10 @@ SceneHandler.prototype.changeScene = function(sceneName){
       var obj = this.scenes[sceneName].objectGroups[objName];
       obj.showOnDesignMode();
     }
+    for (var textName in this.scenes[sceneName].addedTexts){
+      var text = this.scenes[sceneName].addedTexts[textName];
+      text.showOnDesignMode();
+    }
     if (markedPointsVisible){
       for (var markedPointName in this.scenes[sceneName].markedPoints){
         var markedPoint = this.scenes[sceneName].markedPoints[markedPointName];
@@ -70,6 +78,14 @@ SceneHandler.prototype.changeScene = function(sceneName){
 
 SceneHandler.prototype.createScene = function(sceneName){
   this.scenes[sceneName] = new Scene(sceneName);
+}
+
+SceneHandler.prototype.onAddedTextCreation = function(addedText){
+  this.scenes[this.activeSceneName].registerAddedText(addedText);
+}
+
+SceneHandler.prototype.onAddedTextDeletion = function(addedText){
+  this.scenes[addedText.registeredSceneName].unregisterAddedText(addedText);
 }
 
 SceneHandler.prototype.onObjectGroupCreation = function(objectGroup){
@@ -150,4 +166,8 @@ SceneHandler.prototype.getAddedObjects = function(){
 
 SceneHandler.prototype.getObjectGroups = function(){
   return this.scenes[this.activeSceneName].objectGroups;
+}
+
+SceneHandler.prototype.getAddedTexts = function(){
+  return this.scenes[this.activeSceneName].addedTexts;
 }
