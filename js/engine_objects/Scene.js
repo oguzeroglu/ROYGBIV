@@ -8,6 +8,17 @@ var Scene = function(name){
   this.areas = new Object();
   this.areaBinHandler = new WorldBinHandler(true);
   this.areaBinHandler.isAreaBinHandler = true;
+  this.isSkyboxMapped = false;
+}
+
+Scene.prototype.mapSkybox = function(skybox){
+  this.isSkyboxMapped = true;
+  this.mappedSkyboxName = skybox.name;
+}
+
+Scene.prototype.unmapSkybox = function(){
+  this.isSkyboxMapped = false;
+  delete this.mappedSkyboxName;
 }
 
 Scene.prototype.registerAddedText = function(addedText){

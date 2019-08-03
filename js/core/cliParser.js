@@ -1556,6 +1556,7 @@ function parse(input){
             terminal.printError(Text.NO_SUCH_SKYBOX);
             return true;
           }
+          sceneHandler.onMapSkybox(skybox);
           skyboxHandler.map(skybox);
           terminal.printError(Text.SKYBOX_MAPPED);
           return true;
@@ -1575,6 +1576,7 @@ function parse(input){
             terminal.printError(Text.NO_SUCH_SKYBOX);
             return true;
           }
+          sceneHandler.onSkyboxDeletion(skybox);
           skyboxHandler.destroySkybox(skybox);
           if (!jobHandlerWorking){
             terminal.printInfo(Text.SKYBOX_DESTROYED);
@@ -4178,6 +4180,7 @@ function parse(input){
             terminal.printError(Text.NO_SKYBOX_MAPPED);
             return true;
           }
+          sceneHandler.onUnmapSkybox();
           skyboxHandler.unmap();
           fogHandler.setBlendWithSkyboxStatus(false);
           terminal.printInfo(Text.SKYBOX_HIDDEN);

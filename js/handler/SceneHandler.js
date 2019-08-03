@@ -7,6 +7,12 @@ var SceneHandler = function(){
 SceneHandler.prototype.changeScene = function(sceneName){
   var curActiveScene = this.scenes[this.activeSceneName];
   if (mode == 0){
+    if (curActiveScene.isSkyboxMapped){
+      skyboxHandler.unmap();
+    }
+    if (this.scenes[sceneName].isSkyboxMapped){
+      skyboxHandler.map(skyBoxes[this.scenes[sceneName].mappedSkyboxName]);
+    }
     for (var gsName in curActiveScene.gridSystems){
       var gs = curActiveScene.gridSystems[gsName];
       gs.hide();
@@ -78,6 +84,23 @@ SceneHandler.prototype.changeScene = function(sceneName){
 
 SceneHandler.prototype.createScene = function(sceneName){
   this.scenes[sceneName] = new Scene(sceneName);
+}
+
+SceneHandler.prototype.onMapSkybox = function(skybox){
+  this.scenes[this.activeSceneName].mapSkybox(skybox);
+}
+
+SceneHandler.prototype.onUnmapSkybox = function(){
+  this.scenes[this.activeSceneName].unmapSkybox();
+}
+
+SceneHandler.prototype.onSkyboxDeletion = function(skybox){
+  for (var sceneName in this.scenes){
+    var scene = this.scenes[sceneName];
+    if (scene.isSkyboxMapped && scene.mappedSkyboxName == skybox.name){
+      scene.unmapSkybox();
+    }
+  }
 }
 
 SceneHandler.prototype.onAddedTextCreation = function(addedText){
