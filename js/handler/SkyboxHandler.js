@@ -14,6 +14,9 @@ SkyboxHandler.prototype.export = function(){
 }
 
 SkyboxHandler.prototype.unmap = function(){
+  if (!this.skyboxMesh){
+    return;
+  }
   scene.remove(this.skyboxMesh);
   skyBoxes[this.mappedSkyboxName].dispose();
   this.skyboxMesh.geometry.dispose();

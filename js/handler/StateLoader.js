@@ -104,6 +104,7 @@ StateLoader.prototype.finalize = function(){
   this.importHandler.importFog(this.stateObj);
   this.importHandler.importCrosshairs(this.stateObj);
   this.importHandler.importEffects(this.stateObj);
+  this.importHandler.importScenes(this.stateObj);
   projectLoaded = true;
   this.onAfterFinalized();
 }

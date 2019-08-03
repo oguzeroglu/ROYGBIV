@@ -102,6 +102,7 @@ var State = function(projectName, author){
     markedPointsExport[markedPointName] = markedPoints[markedPointName].export();
   }
   this.markedPointsExport = markedPointsExport;
+  this.markedPointsVisible = markedPointsVisible;
   // OCTREE LIMITS *************************************************
   var octreeMinX = LIMIT_BOUNDING_BOX.min.x;
   var octreeMinY = LIMIT_BOUNDING_BOX.min.y;
@@ -161,4 +162,6 @@ var State = function(projectName, author){
   for (var crosshairName in crosshairs){
     this.crosshairs[crosshairName] = crosshairs[crosshairName].export();
   }
+  // SCENES ********************************************************
+  this.scenes = sceneHandler.export();
 }

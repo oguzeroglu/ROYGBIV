@@ -4,48 +4,70 @@ var SceneHandler = function(){
   this.scenes[this.activeSceneName] = new Scene("scene1");
 }
 
-SceneHandler.prototype.changeScene = function(sceneName){
-  var curActiveScene = this.scenes[this.activeSceneName];
+SceneHandler.prototype.import = function(exportObj){
+  this.scenes = new Object();
+  for (var sceneName in exportObj.scenes){
+    this.scenes[sceneName] = new Scene(sceneName);
+    this.scenes[sceneName].import(exportObj.scenes[sceneName]);
+  }
+  sceneHandler.hideAll();
+  sceneHandler.changeScene(exportObj.activeSceneName);
+}
+
+SceneHandler.prototype.export = function(){
+  var exportObj = new Object();
+  exportObj.scenes = new Object();
+  for (var sceneName in this.scenes){
+    exportObj.scenes[sceneName] = this.scenes[sceneName].export();
+  }
+  exportObj.activeSceneName = this.activeSceneName;
+  return exportObj;
+}
+
+SceneHandler.prototype.hideAll = function(){
+  skyboxHandler.unmap();
   if (mode == 0){
-    if (curActiveScene.isSkyboxMapped){
-      skyboxHandler.unmap();
+    for (var gsName in gridSystems){
+      gridSystems[gsName].hide();
     }
-    if (this.scenes[sceneName].isSkyboxMapped){
-      skyboxHandler.map(skyBoxes[this.scenes[sceneName].mappedSkyboxName]);
-    }
-    for (var gsName in curActiveScene.gridSystems){
-      var gs = curActiveScene.gridSystems[gsName];
-      gs.hide();
-    }
-    for (var objName in curActiveScene.addedObjects){
-      var obj = curActiveScene.addedObjects[objName];
+    for (var objName in addedObjects){
+      var obj = addedObjects[objName];
       obj.hideOnDesignMode();
     }
-    for (var objName in curActiveScene.objectGroups){
-      var obj = curActiveScene.objectGroups[objName];
+    for (var objName in objectGroups){
+      var obj = objectGroups[objName];
       obj.hideOnDesignMode();
     }
-    for (var textName in curActiveScene.addedTexts){
-      var text = curActiveScene.addedTexts[textName];
+    for (var textName in addedTexts){
+      var text = addedTexts[textName];
       text.hideOnDesignMode();
     }
     for (var gridName in gridSelections){
       gridSelections[gridName].toggleSelect();
     }
     if (markedPointsVisible){
-      for (var markedPointName in curActiveScene.markedPoints){
-        var markedPoint = curActiveScene.markedPoints[markedPointName];
+      for (var markedPointName in markedPoints){
+        var markedPoint = markedPoints[markedPointName];
         if (!markedPoint.isHidden){
           markedPoint.hide();
         }
       }
     }
     if (areasVisible){
-      for (var areaName in curActiveScene.areas){
-        curActiveScene.areas[areaName].hide();
+      for (var areaName in areas){
+        areas[areaName].hide();
       }
     }
     gridSelections = new Object();
+  }
+}
+
+SceneHandler.prototype.changeScene = function(sceneName){
+  if (mode == 0){
+    this.hideAll();
+    if (this.scenes[sceneName].isSkyboxMapped){
+      skyboxHandler.map(skyBoxes[this.scenes[sceneName].mappedSkyboxName]);
+    }
     for (var gsName in this.scenes[sceneName].gridSystems){
       var gs = this.scenes[sceneName].gridSystems[gsName];
       gs.show();

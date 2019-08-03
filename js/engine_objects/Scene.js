@@ -4,11 +4,57 @@ var Scene = function(name){
   this.objectGroups = new Object();
   this.addedTexts = new Object();
   this.gridSystems = new Object();
+  this.wallCollections = new Object();
   this.markedPoints = new Object();
   this.areas = new Object();
   this.areaBinHandler = new WorldBinHandler(true);
   this.areaBinHandler.isAreaBinHandler = true;
   this.isSkyboxMapped = false;
+}
+
+Scene.prototype.import = function(exportObj){
+  for (var i = 0; i<exportObj.addedObjectNames.length; i++){
+    this.registerAddedObject(addedObjects[exportObj.addedObjectNames[i]]);
+  }
+  for (var i = 0; i<exportObj.objectGroupNames.length; i++){
+    this.registerObjectGroup(objectGroups[exportObj.objectGroupNames[i]]);
+  }
+  for (var i = 0; i<exportObj.addedTextNames.length; i++){
+    this.registerAddedText(addedTexts[exportObj.addedTextNames[i]]);
+  }
+  for (var i = 0; i<exportObj.gridSystemNames.length; i++){
+    this.registerGridSystem(gridSystems[exportObj.gridSystemNames[i]]);
+  }
+  for (var i = 0; i<exportObj.wallCollectionNames.length; i++){
+    this.registerWallCollection(wallCollections[exportObj.wallCollectionNames[i]]);
+  }
+  for (var i = 0; i<exportObj.markedPointNames.length; i++){
+    this.registerMarkedPoint(markedPoints[exportObj.markedPointNames[i]]);
+  }
+  for (var i = 0; i<exportObj.areaNames.length; i++){
+    this.registerArea(areas[exportObj.areaNames[i]]);
+    this.areaBinHandler.insert(areas[exportObj.areaNames[i]].boundingBox, exportObj.areaNames[i]);
+  }
+  this.isSkyboxMapped = exportObj.isSkyboxMapped;
+  if (this.isSkyboxMapped){
+    this.mappedSkyboxName = exportObj.mappedSkyboxName;
+  }
+}
+
+Scene.prototype.export = function(){
+  var exportObj = new Object();
+  exportObj.addedObjectNames = Object.keys(this.addedObjects);
+  exportObj.objectGroupNames = Object.keys(this.objectGroups);
+  exportObj.addedTextNames = Object.keys(this.addedTexts);
+  exportObj.gridSystemNames = Object.keys(this.gridSystems);
+  exportObj.wallCollectionNames = Object.keys(this.wallCollections);
+  exportObj.markedPointNames = Object.keys(this.markedPoints);
+  exportObj.areaNames = Object.keys(this.areas);
+  exportObj.isSkyboxMapped = this.isSkyboxMapped;
+  if (this.isSkyboxMapped){
+    exportObj.mappedSkyboxName = this.mappedSkyboxName;
+  }
+  return exportObj;
 }
 
 Scene.prototype.mapSkybox = function(skybox){
@@ -75,6 +121,7 @@ Scene.prototype.registerWallCollection = function(wallCollection){
   for (var i = 0; i<wallCollection.gridSystemNames.length; i++){
     this.registerGridSystem(gridSystems[wallCollection.gridSystemNames[i]]);
   }
+  this.wallCollections[wallCollection.name] = wallCollection;
   wallCollection.registeredSceneName = this.name;
 }
 
@@ -82,6 +129,7 @@ Scene.prototype.unregisterWallCollection = function(wallCollection){
   for (var i = 0; i<wallCollection.gridSystemNames.length; i++){
     this.unregisterGridSystem(gridSystems[wallCollection.gridSystemNames[i]]);
   }
+  delete this.wallCollection[wallCollection.name];
   delete wallCollection.registeredSceneName;
 }
 
