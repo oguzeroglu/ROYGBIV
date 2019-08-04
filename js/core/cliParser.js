@@ -2358,6 +2358,7 @@ function parse(input){
           var lowerBound = new THREE.Vector3(minX, minY, minZ);
           var upperBound = new THREE.Vector3(maxX, maxY, maxZ);
           LIMIT_BOUNDING_BOX = new THREE.Box3(lowerBound, upperBound);
+          sceneHandler.onWorldLimitsChange();
           refreshRaycaster(Text.OCTREE_LIMIT_SET);
           return true;
         break;
@@ -2390,11 +2391,7 @@ function parse(input){
             return true;
           }
           BIN_SIZE = binSize;
-          areaBinHandler = new WorldBinHandler(true);
-          areaBinHandler.isAreaBinHandler = true;
-          for (var areaName in areas){
-            areaBinHandler.insert(areas[areaName].boundingBox, areaName);
-          }
+          sceneHandler.onBinSizeChange();
           refreshRaycaster(Text.BIN_SIZE_SET);
           return true;
         break;

@@ -63,6 +63,14 @@ Scene.prototype.export = function(){
   return exportObj;
 }
 
+Scene.prototype.refreshAreaBinHandler = function(){
+  this.areaBinHandler = new WorldBinHandler(true);
+  this.areaBinHandler.isAreaBinHandler = true;
+  for (var areaName in this.areas){
+    this.areaBinHandler.insert(areas[areaName].boundingBox, areaName);
+  }
+}
+
 Scene.prototype.registerFog = function(fogConfigurations){
   this.fogConfigurations = fogConfigurations;
 }

@@ -114,6 +114,18 @@ SceneHandler.prototype.createScene = function(sceneName){
   this.scenes[sceneName] = new Scene(sceneName);
 }
 
+SceneHandler.prototype.onWorldLimitsChange = function(){
+  for (var sceneName in this.scenes){
+    this.scenes[sceneName].refreshAreaBinHandler();
+  }
+}
+
+SceneHandler.prototype.onBinSizeChange = function(){
+  for (var sceneName in this.scenes){
+    this.scenes[sceneName].refreshAreaBinHandler();
+  }
+}
+
 SceneHandler.prototype.onFogChange = function(){
   this.scenes[this.activeSceneName].registerFog(fogHandler.export());
 }
