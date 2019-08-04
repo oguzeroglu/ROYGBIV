@@ -14,7 +14,7 @@ SkyboxHandler.prototype.export = function(){
 }
 
 SkyboxHandler.prototype.unmap = function(){
-  if (!this.skyboxMesh){
+  if (!this.skyboxMesh || typeof this.getMappedSkyboxName() == UNDEFINED){
     return;
   }
   scene.remove(this.skyboxMesh);
