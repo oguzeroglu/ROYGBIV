@@ -39,6 +39,9 @@ Scene.prototype.import = function(exportObj){
   if (this.isSkyboxMapped){
     this.mappedSkyboxName = exportObj.mappedSkyboxName;
   }
+  if (exportObj.fogConfigurations){
+    this.fogConfigurations = exportObj.fogConfigurations;
+  }
 }
 
 Scene.prototype.export = function(){
@@ -54,7 +57,14 @@ Scene.prototype.export = function(){
   if (this.isSkyboxMapped){
     exportObj.mappedSkyboxName = this.mappedSkyboxName;
   }
+  if (this.fogConfigurations){
+    exportObj.fogConfigurations = this.fogConfigurations;
+  }
   return exportObj;
+}
+
+Scene.prototype.registerFog = function(fogConfigurations){
+  this.fogConfigurations = fogConfigurations;
 }
 
 Scene.prototype.mapSkybox = function(skybox){

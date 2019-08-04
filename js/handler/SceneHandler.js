@@ -65,6 +65,12 @@ SceneHandler.prototype.hideAll = function(){
 SceneHandler.prototype.changeScene = function(sceneName){
   if (mode == 0){
     this.hideAll();
+    if (this.scenes[sceneName].fogConfigurations){
+      fogHandler.import(this.scenes[sceneName].fogConfigurations);
+    }else{
+      fogHandler.reset();
+    }
+    fogHandler.removeFogFromObjects();
     if (this.scenes[sceneName].isSkyboxMapped){
       skyboxHandler.map(skyBoxes[this.scenes[sceneName].mappedSkyboxName]);
     }
@@ -106,6 +112,10 @@ SceneHandler.prototype.changeScene = function(sceneName){
 
 SceneHandler.prototype.createScene = function(sceneName){
   this.scenes[sceneName] = new Scene(sceneName);
+}
+
+SceneHandler.prototype.onFogChange = function(){
+  this.scenes[this.activeSceneName].registerFog(fogHandler.export());
 }
 
 SceneHandler.prototype.onMapSkybox = function(skybox){
