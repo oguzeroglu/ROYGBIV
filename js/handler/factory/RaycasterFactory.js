@@ -6,6 +6,11 @@ var RaycasterFactory = function(){
   this.init();
 }
 
+RaycasterFactory.prototype.getNonWorker = function(){
+  this.raycaster.refresh();
+  return this.raycaster;
+}
+
 RaycasterFactory.prototype.refresh = function(){
   this.get().refresh();
 }

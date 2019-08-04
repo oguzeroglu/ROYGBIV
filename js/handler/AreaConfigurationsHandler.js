@@ -153,6 +153,7 @@ AreaConfigurationsHandler.prototype.getRandomPointInsideArea = function(area){
 }
 
 AreaConfigurationsHandler.prototype.autoConfigureArea = function(areaName){
+  var pseudoRaycaster = raycasterFactory.getNonWorker();
   var area = areas[areaName];
   for (var objName in sceneHandler.getAddedObjects()){
     addedObjects[objName].setVisibilityInArea(areaName, false);
@@ -177,7 +178,7 @@ AreaConfigurationsHandler.prototype.autoConfigureArea = function(areaName){
     for (var i = 0; i<200; i++){
       var vec = this.sphericalDistribution(1);
       REUSABLE_VECTOR_4.set(vec.x , vec.y, vec.z);
-      rayCaster.findIntersections(REUSABLE_VECTOR_5, REUSABLE_VECTOR_4, false);
+      pseudoRaycaster.findIntersections(REUSABLE_VECTOR_5, REUSABLE_VECTOR_4, false, noop);
       if (intersectionPoint){
         visibleObjects[intersectionObject] = true;
       }
