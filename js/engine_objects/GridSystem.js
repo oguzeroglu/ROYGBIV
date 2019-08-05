@@ -423,7 +423,7 @@ GridSystem.prototype.getGridByColRow = function(col, row){
 }
 
 GridSystem.prototype.printInfo = function(){
-  terminal.printHeader(this.name);
+  terminal.printHeader(this.name + " ["+this.registeredSceneName+"]");
   terminal.printInfo(
     Text.TREE_NAME.replace(Text.PARAM1, this.name),
     true

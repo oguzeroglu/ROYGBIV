@@ -108,10 +108,10 @@ function parse(input){
             count ++;
             if (count == keysLength){
               terminal.printInfo(Text.TREE.replace(
-                Text.PARAM1, gs));
+                Text.PARAM1, gs + " ["+gridSystems[gs].registeredSceneName+"]"));
             }else{
               terminal.printInfo(Text.TREE.replace(
-                Text.PARAM1, gs), true);
+                Text.PARAM1, gs + " ["+gridSystems[gs].registeredSceneName+"]"), true);
             }
           }
           if (count == 0){
