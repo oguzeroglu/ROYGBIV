@@ -12,6 +12,28 @@ var Scene = function(name){
   this.isSkyboxMapped = false;
 }
 
+Scene.prototype.loadPostProcessing = function(){
+  if (this.postProcessing){
+    for (var effecName in this.postProcessing){
+      renderer.effects[effecName].load(this.postProcessing[effecName]);
+    }
+  }else{
+    for (var effecName in this.postProcessing){
+      renderer.effects[effecName].reset();
+    }
+  }
+}
+
+Scene.prototype.savePostProcessing = function(){
+  if (!projectLoaded){
+    return;
+  }
+  this.postProcessing = new Object();
+  for (var effectName in renderer.effects){
+    this.postProcessing[effectName] = renderer.effects[effectName].export();
+  }
+}
+
 Scene.prototype.import = function(exportObj){
   for (var i = 0; i<exportObj.addedObjectNames.length; i++){
     this.registerAddedObject(addedObjects[exportObj.addedObjectNames[i]]);
@@ -42,6 +64,7 @@ Scene.prototype.import = function(exportObj){
   if (exportObj.fogConfigurations){
     this.fogConfigurations = exportObj.fogConfigurations;
   }
+  this.postProcessing = exportObj.postProcessing;
 }
 
 Scene.prototype.export = function(){
@@ -54,6 +77,7 @@ Scene.prototype.export = function(){
   exportObj.markedPointNames = Object.keys(this.markedPoints);
   exportObj.areaNames = Object.keys(this.areas);
   exportObj.isSkyboxMapped = this.isSkyboxMapped;
+  exportObj.postProcessing = this.postProcessing;
   if (this.isSkyboxMapped){
     exportObj.mappedSkyboxName = this.mappedSkyboxName;
   }

@@ -1216,12 +1216,6 @@ ImportHandler.prototype.importObjectGroups = function(obj){
   }
 }
 
-ImportHandler.prototype.importEffects = function(obj){
-  for (var effecName in obj.effects){
-    renderer.effects[effecName].load(obj.effects[effecName]);
-  }
-}
-
 ImportHandler.prototype.importFonts = function(obj, callbackSuccess, callbackError){
   for (var fontName in obj.fonts){
     var curFontExport = obj.fonts[fontName];

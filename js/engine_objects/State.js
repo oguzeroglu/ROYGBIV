@@ -137,11 +137,6 @@ var State = function(projectName, author){
   for (var textName in addedTexts){
     this.texts[textName] = addedTexts[textName].export();
   }
-  // POST PROCESSING ***********************************************
-  this.effects = new Object();
-  for (var effectName in renderer.effects){
-    this.effects[effectName] = renderer.effects[effectName].export();
-  }
   // PRECONFIGURED PARTICLE SYSTEMS ********************************
   this.preConfiguredParticleSystems = new Object();
   for (var psName in preConfiguredParticleSystems){

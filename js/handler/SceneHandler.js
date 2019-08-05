@@ -4,6 +4,10 @@ var SceneHandler = function(){
   this.scenes[this.activeSceneName] = new Scene("scene1");
 }
 
+SceneHandler.prototype.onBeforeSave = function(){
+  this.scenes[this.getActiveSceneName()].savePostProcessing();
+}
+
 SceneHandler.prototype.import = function(exportObj){
   this.scenes = new Object();
   for (var sceneName in exportObj.scenes){
@@ -65,6 +69,8 @@ SceneHandler.prototype.hideAll = function(){
 SceneHandler.prototype.changeScene = function(sceneName){
   if (mode == 0){
     this.hideAll();
+    this.scenes[this.getActiveSceneName()].savePostProcessing();
+    this.scenes[sceneName].loadPostProcessing();
     croppedGridSystemBuffer = 0;
     anchorGrid = 0;
     if (this.scenes[sceneName].isSkyboxMapped){

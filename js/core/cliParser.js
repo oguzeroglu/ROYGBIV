@@ -1618,6 +1618,7 @@ function parse(input){
             return true;
           }
           selectionHandler.resetCurrentSelection();
+          sceneHandler.onBeforeSave();
           save();
           return true;
         break;
