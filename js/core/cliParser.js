@@ -478,7 +478,7 @@ function parse(input){
             terminal.printInfo(Text.OBJECT_INFO_TREE.replace(
               Text.PARAM1, addedObject.type
             ).replace(
-              Text.PARAM2, objectName
+              Text.PARAM2, objectName + " ["+addedObject.registeredSceneName+"]"
             ).replace(
               Text.PARAM3, addedObject.mesh.position.x
             ).replace(
@@ -500,7 +500,7 @@ function parse(input){
             }
             childStr = childStr.substring(0, childStr.length - 1);
             terminal.printInfo(Text.OBJECT_GROUP_INFO_TREE.replace(
-              Text.PARAM1, objectName
+              Text.PARAM1, objectName + " ["+grouppedObject.registeredSceneName+"]"
             ).replace(
               Text.PARAM2, childStr
             ).replace(
@@ -530,7 +530,7 @@ function parse(input){
           }
           var metaData = object.metaData;
           terminal.printHeader(Text.METADATA_OF.replace(
-            Text.PARAM1, objectName
+            Text.PARAM1, objectName + " ["+object.registeredSceneName+"]"
           ));
           for (var metaDataKey in metaData){
             terminal.printInfo(Text.TREE2.replace(
