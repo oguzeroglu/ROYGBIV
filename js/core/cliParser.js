@@ -206,6 +206,10 @@ function parse(input){
             terminal.printError(Text.NO_SUCH_GRID_SYSTEM);
             return true;
           }
+          if (gs.registeredSceneName != sceneHandler.getActiveSceneName()){
+            terminal.printError(Text.GRID_SYSTEM_NOT_IN_SCENE);
+            return true;
+          }
           if (Object.keys(gs.grids).length > 100){
             terminal.printError(Text.TOO_MANY_GRIDS);
             return true;

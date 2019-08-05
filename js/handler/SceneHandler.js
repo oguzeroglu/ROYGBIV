@@ -65,6 +65,7 @@ SceneHandler.prototype.hideAll = function(){
 SceneHandler.prototype.changeScene = function(sceneName){
   if (mode == 0){
     this.hideAll();
+    croppedGridSystemBuffer = 0;
     if (this.scenes[sceneName].isSkyboxMapped){
       skyboxHandler.map(skyBoxes[this.scenes[sceneName].mappedSkyboxName]);
     }
