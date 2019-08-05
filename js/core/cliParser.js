@@ -583,6 +583,7 @@ function parse(input){
             object.destroy(true);
             delete addedObjects[objectName];
           }else if (objectGroup){
+            sceneHandler.onObjectGroupDeletion(objectGroup);
             objectGroup.destroy(true);
             delete objectGroups[objectName];
           }
@@ -629,6 +630,10 @@ function parse(input){
 
           if (!object){
             terminal.printError(Text.NO_SUCH_OBJECT);
+            return true;
+          }
+          if (sceneHandler.getActiveSceneName() != object.registeredSceneName){
+            terminal.printError(Text.OBJECT_NOT_IN_SCENE);
             return true;
           }
           repeatU = parseInt(repeatU);
@@ -800,12 +805,10 @@ function parse(input){
           return true;
         break;
         case 31: //setAnchor
-
           if (mode != 0){
             terminal.printError(Text.WORKS_ONLY_IN_DESIGN_MODE);
             return;
           }
-
           if (Object.keys(gridSelections).length != 1){
             terminal.printError(Text.MUST_HAVE_ONE_GRID_SELECTED);
             return true;
@@ -841,6 +844,10 @@ function parse(input){
           }
           if (!addedObject){
             terminal.printError(Text.NO_SUCH_OBJECT);
+            return true;
+          }
+          if (addedObject.registeredSceneName != sceneHandler.getActiveSceneName()){
+            terminal.printError(Text.OBJECT_NOT_IN_SCENE);
             return true;
           }
           if (axis.toUpperCase() == "S"){
@@ -1076,7 +1083,7 @@ function parse(input){
             }
             var wallCollection = wallCollections[wallCollectionName];
             terminal.printInfo(Text.TREE_WALL_COLLECTIONS.replace(
-              Text.PARAM1, wallCollectionName
+              Text.PARAM1, wallCollectionName + " ["+wallCollections[wallCollectionName].registeredSceneName+"]"
             ).replace(
               Text.PARAM2, wallCollection.outlineColor
             ), options);
@@ -1252,6 +1259,10 @@ function parse(input){
             terminal.printError(Text.NO_SUCH_OBJECT);
             return true;
           }
+          if (addedObject.registeredSceneName != sceneHandler.getActiveSceneName()){
+            terminal.printError(Text.OBJECT_NOT_IN_SCENE);
+            return true;
+          }
           addedObject.mapTexturePack(texturePack);
           if (!jobHandlerWorking){
             terminal.printInfo(Text.TEXTURE_PACK_MAPPED);
@@ -1352,6 +1363,10 @@ function parse(input){
             terminal.printError(Text.NO_SUCH_OBJECT);
             return true;
           }
+          if (addedObject.registeredSceneName != sceneHandler.getActiveSceneName()){
+            terminal.printError(Text.OBJECT_NOT_IN_SCENE);
+            return true;
+          }
           addedObject.resetMaps(true);
           if (!jobHandlerWorking){
             terminal.printInfo(Text.MAPS_RESET);
@@ -1376,6 +1391,10 @@ function parse(input){
           }
           if (!addedObject){
             terminal.printError(Text.NO_SUCH_OBJECT);
+            return true;
+          }
+          if (addedObject.registeredSceneName != sceneHandler.getActiveSceneName()){
+            terminal.printError(Text.OBJECT_NOT_IN_SCENE);
             return true;
           }
           if (isNaN(count)){
@@ -1663,15 +1682,21 @@ function parse(input){
           }
           selectionHandler.resetCurrentSelection();
           if (objSelection){
+            if (objSelection.registeredSceneName != sceneHandler.getActiveSceneName()){
+              terminal.printError(Text.OBJECT_NOT_IN_SCENE);
+              return true;
+            }
             selectionHandler.select(objSelection);
             camera.lookAt(objSelection.mesh.position);
           }else if (objGroupSelection){
+            if (objGroupSelection.registeredSceneName != sceneHandler.getActiveSceneName()){
+              terminal.printError(Text.OBJECT_NOT_IN_SCENE);
+              return true;
+            }
             selectionHandler.select(objGroupSelection);
             camera.lookAt(objGroupSelection.graphicsGroup.position);
           }
-          terminal.printInfo(Text.OBJECT_SELECTED.replace(
-              Text.PARAM1, name
-          ));
+          terminal.printInfo(Text.OBJECT_SELECTED.replace(Text.PARAM1, name));
           return true;
         break;
         case 81: //setMass
@@ -1701,6 +1726,10 @@ function parse(input){
             return true;
           }
           if (addedObject){
+            if (addedObject.registeredSceneName != sceneHandler.getActiveSceneName()){
+              terminal.printError(Text.OBJECT_NOT_IN_SCENE);
+              return true;
+            }
             if (addedObject.noMass){
               terminal.printError(Text.OBJECT_HAS_NO_MASS);
               return true;
@@ -1716,6 +1745,10 @@ function parse(input){
               guiHandler.omMassController.updateDisplay();
             }
           }else if (grouppedObject){
+            if (grouppedObject.registeredSceneName != sceneHandler.getActiveSceneName()){
+              terminal.printError(Text.OBJECT_NOT_IN_SCENE);
+              return true;
+            }
             if (grouppedObject.noMass){
               terminal.printError(Text.OBJECT_HAS_NO_MASS);
               return true;
@@ -1774,6 +1807,10 @@ function parse(input){
             return true;
           }
           if (addedObject){
+            if (addedObject.registeredSceneName != sceneHandler.getActiveSceneName()){
+              terminal.printError(Text.OBJECT_NOT_IN_SCENE);
+              return true;
+            }
             if (addedObject.pivotObject){
               addedObject.rotateAroundPivotObject(axis, radian);
             }else{
@@ -1783,6 +1820,10 @@ function parse(input){
             addedObject.updateBoundingBoxes();
             addedObject.isRotationDirty = true;
           }else if (objectGroup){
+            if (objectGroup.registeredSceneName != sceneHandler.getActiveSceneName()){
+              terminal.printError(Text.OBJECT_NOT_IN_SCENE);
+              return true;
+            }
             if (objectGroup.pivotObject){
               objectGroup.rotateAroundPivotObject(axis, radian);
             }else{
@@ -1858,12 +1899,12 @@ function parse(input){
             for (var i = 0; i<objectNamesArray.length; i++){
               if (!(objectNamesArray[i].indexOf("*") == -1)){
                 var tmpPrefix = objectNamesArray[i].split("*")[0];
-                for (var addedObjName in addedObjects){
+                for (var addedObjName in sceneHandler.getAddedObjects()){
                   if (addedObjName.startsWith(tmpPrefix)){
                     objectNamesArray.push(addedObjName);
                   }
                 }
-                for (var objGroupName in objectGroups){
+                for (var objGroupName in sceneHandler.getObjectGroups()){
                   if (objGroupName.startsWith(tmpPrefix)){
                     objectNamesArray.push(objGroupName);
                   }
@@ -1883,11 +1924,13 @@ function parse(input){
               if (!object){
                 object = objectGroups[objectNamesArray[i]];
                 if (!object){
-                  terminal.printError(Text.OBJECT_NR_DOES_NOT_EXIST.replace(
-                    Text.PARAM1, (i+1)
-                  ));
+                  terminal.printError(Text.OBJECT_NR_DOES_NOT_EXIST.replace(Text.PARAM1, (i+1)));
                   return true;
                 }
+              }
+              if (object.registeredSceneName != sceneHandler.getActiveSceneName()){
+                terminal.printError(Text.OBJECT_NR_X_NOT_IN_SCENE.replace(Text.PARAM1, (i+1)));
+                return true;
               }
             }
             var detachedObjectGroups = new Object();
@@ -1973,6 +2016,10 @@ function parse(input){
           var objectGroup = objectGroups[name];
           if (!objectGroup){
             terminal.printError(Text.NO_SUCH_OBJECT);
+            return true;
+          }
+          if (objectGroup.registeredSceneName != sceneHandler.getActiveSceneName()){
+            terminal.printError(Text.OBJECT_NOT_IN_SCENE);
             return true;
           }
           for (var childObjName in objectGroup.group){
@@ -2084,6 +2131,10 @@ function parse(input){
             terminal.printError(Text.NO_SUCH_POINT);
             return true;
           }
+          if (markedPoint.registeredSceneName != sceneHandler.getActiveSceneName()){
+            terminal.printError(Text.MARKED_POINT_NOT_IN_SCENE);
+            return true;
+          }
           sceneHandler.onMarkedPointDeletion(markedPoint);
           markedPoint.destroy();
           delete markedPoints[name];
@@ -2104,7 +2155,7 @@ function parse(input){
               options = false;
             }
             terminal.printInfo(Text.TREE_POINT.replace(
-              Text.PARAM1, curPoint.name
+              Text.PARAM1, curPoint.name + " ["+curPoint.registeredSceneName+"]"
             ).replace(
               Text.PARAM2, curPoint.x
             ).replace(
@@ -2286,6 +2337,10 @@ function parse(input){
             return true;
           }
           if (obj instanceof AddedObject || obj instanceof ObjectGroup){
+            if (obj.registeredSceneName != sceneHandler.getActiveSceneName()){
+              terminal.printError(Text.OBJECT_NOT_IN_SCENE);
+              return true;
+            }
             obj.setBlending(blendingModeInt);
           }
           if (!jobHandlerWorking){
@@ -2569,6 +2624,10 @@ function parse(input){
               return true;
             }
           }
+          if (obj.registeredSceneName != sceneHandler.getActiveSceneName()){
+            terminal.printError(Text.OBJECT_NOT_IN_SCENE);
+            return true;
+          }
           if (onOff != "ON" && onOff != "OFF"){
             terminal.printError(Text.SLIPPERINESS_STATE_MUST_BE_ON_OR_OFF);
             return true;
@@ -2647,6 +2706,14 @@ function parse(input){
             terminal.printError(Text.SOURCE_AND_TARGET_OBJECTS_ARE_THE_SAME);
             return true;
           }
+          if (sourceObject.registeredSceneName != sceneHandler.getActiveSceneName()){
+            terminal.printError(Text.SOURCE_OBJECT_NOT_IN_SCENE);
+            return true;
+          }
+          if (targetObject.registeredSceneName != sceneHandler.getActiveSceneName()){
+            terminal.printError(Text.TARGET_OBJECT_NOT_IN_SCENE);
+            return true;
+          }
           targetObject.syncProperties(sourceObject);
           if (!jobHandlerWorking){
             terminal.printInfo(Text.OBJECTS_SYNCED);
@@ -2710,12 +2777,12 @@ function parse(input){
           }
           areasVisible = !areasVisible;
           if (areasVisible){
-            for (var areaName in areas){
+            for (var areaName in sceneHandler.getAreas()){
               areas[areaName].renderToScreen();
             }
             terminal.printInfo(Text.AREAS_ARE_VISIBLE);
           }else{
-            for (var areaName in areas){
+            for (var areaName in sceneHandler.getAreas()){
               areas[areaName].hide();
             }
             terminal.printInfo(Text.AREAS_ARE_INVISIBLE);
@@ -2753,7 +2820,7 @@ function parse(input){
             return true;
           }
           var count = 0;
-          for (var areaName in areas){
+          for (var areaName in sceneHandler.getAreas()){
             count ++;
             break;
           }
@@ -2762,11 +2829,11 @@ function parse(input){
             return true;
           }
           count = 0;
-          for (var objName in addedObjects){
+          for (var objName in sceneHandler.getAddedObjects()){
             count ++;
             break;
           }
-          for (var objName in objectGroups){
+          for (var objName in sceneHandler.getObjectGroups()){
             count ++;
             break;
           }
