@@ -4,6 +4,25 @@ var AreaConfigurationsHandler = function(){
   this.updateNeeded = false;
 }
 
+AreaConfigurationsHandler.prototype.onAfterSceneChange = function(){
+  var result = sceneHandler.getAreaBinHandler().queryArea(camera.position);
+  if (result){
+    for (var objName in sceneHandler.getAddedObjects()){
+      addedObjects[objName].applyAreaConfiguration(result);
+    }
+    for (var objName in sceneHandler.getObjectGroups()){
+      objectGroups[objName].applyAreaConfiguration(result);
+    }
+  }else{
+    for (var objName in sceneHandler.getAddedObjects()){
+      addedObjects[objName].applyAreaConfiguration("default");
+    }
+    for (var objName in sceneHandler.getObjectGroups()){
+      objectGroups[objName].applyAreaConfiguration("default");
+    }
+  }
+}
+
 AreaConfigurationsHandler.prototype.handle = function(){
   var result = sceneHandler.getAreaBinHandler().queryArea(camera.position);
   if (result){

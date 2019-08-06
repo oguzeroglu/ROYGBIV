@@ -131,6 +131,7 @@ var Text = function(){
   this.STATUS_ERROR = "(ERROR)";
   this.STATUS_LOADED = "(LOADED)";
   this.GRID_SYSTEM_NOT_IN_SCENE = "Gridsystem is not inside the active scene.";
+  this.AREA_NOT_IN_SCENE = "Area is not inside the active scene.";
   this.OBJECT_NOT_IN_SCENE = "Object is not inside the active scene.";
   this.MARKED_POINT_NOT_IN_SCENE = "Marked point not inside the active scene.";
   this.OBJECT_NR_X_NOT_IN_SCENE = "Object nr. @@1 is not inside the active scene.";

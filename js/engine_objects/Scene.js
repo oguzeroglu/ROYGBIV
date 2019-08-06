@@ -18,7 +18,7 @@ Scene.prototype.loadPostProcessing = function(){
       renderer.effects[effecName].load(this.postProcessing[effecName]);
     }
   }else{
-    for (var effecName in this.postProcessing){
+    for (var effecName in renderer.effects){
       renderer.effects[effecName].reset();
     }
   }

@@ -433,6 +433,9 @@ ObjectGroup.prototype.resetColor = function(){
 }
 
 ObjectGroup.prototype.applyAreaConfiguration = function(areaName){
+  if (sceneHandler.getActiveSceneName() != this.registeredSceneName){
+    return;
+  }
   if (this.areaVisibilityConfigurations){
     var configurations = this.areaVisibilityConfigurations[areaName];
     if (!(typeof configurations == UNDEFINED)){

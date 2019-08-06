@@ -2821,15 +2821,6 @@ function parse(input){
             return true;
           }
           var count = 0;
-          for (var areaName in sceneHandler.getAreas()){
-            count ++;
-            break;
-          }
-          if (count == 0){
-            terminal.printError(Text.NO_AREAS_CREATED);
-            return true;
-          }
-          count = 0;
           for (var objName in sceneHandler.getAddedObjects()){
             count ++;
             break;
@@ -2889,12 +2880,16 @@ function parse(input){
             terminal.printError(Text.NO_SUCH_AREA);
             return true;
           }
+          if (areaName.toLowerCase() != "default" && areas[areaName].registeredSceneName != sceneHandler.getActiveSceneName()){
+            terminal.printError(Text.AREA_NOT_IN_SCENE);
+            return true;
+          }
           var count = 0;
-          for (var objName in addedObjects){
+          for (var objName in sceneHandler.getAddedObjects()){
             count ++;
             break;
           }
-          for (var objName in objectGroups){
+          for (var objName in sceneHandler.getObjectGroups()){
             count ++;
             break;
           }

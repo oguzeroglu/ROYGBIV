@@ -113,6 +113,7 @@ SceneHandler.prototype.changeScene = function(sceneName){
     }
   }
   this.activeSceneName = sceneName;
+  areaConfigurationsHandler.onAfterSceneChange();
   if (mode == 0){
     $("#cliDivheader").text("ROYGBIV 3D Engine - CLI (Design mode - "+sceneHandler.getActiveSceneName()+")");
   }
