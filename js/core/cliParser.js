@@ -2922,6 +2922,10 @@ function parse(input){
             terminal.printError(Text.NO_SUCH_AREA);
             return true;
           }
+          if (areaName != "default" && area.registeredSceneName != sceneHandler.getActiveSceneName()){
+            terminal.printError(Text.AREA_NOT_IN_SCENE);
+            return true;
+          }
           var obj = addedObjects[objName];
           if (!obj){
             obj = objectGroups[objName];
@@ -2929,6 +2933,10 @@ function parse(input){
               terminal.printError(Text.NO_SUCH_OBJECT);
               return true;
             }
+          }
+          if (obj.registeredSceneName != sceneHandler.getActiveSceneName()){
+            terminal.printError(Text.OBJECT_NOT_IN_SCENE);
+            return true;
           }
           if (isVisible != "true" && isVisible != "false"){
             terminal.printError(Text.ISVISIBLE_MUST_BE_TRUE_OR_FALSE);
@@ -2964,6 +2972,10 @@ function parse(input){
           }
           if (!areas[areaName]){
             terminal.printError(Text.NO_SUCH_AREA);
+            return true;
+          }
+          if (areas[areaName].registeredSceneName != sceneHandler.getActiveSceneName()){
+            terminal.printError(Text.AREA_NOT_IN_SCENE);
             return true;
           }
           if (!jobHandlerWorking){
