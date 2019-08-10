@@ -123,6 +123,14 @@ SceneHandler.prototype.createScene = function(sceneName){
   this.scenes[sceneName] = new Scene(sceneName);
 }
 
+SceneHandler.prototype.onParticleSystemDeletion = function(preConfiguredParticleSystem){
+  this.scenes[preConfiguredParticleSystem.registeredSceneName].unregisterParticleSystem(preConfiguredParticleSystem);
+}
+
+SceneHandler.prototype.onParticleSystemCreation = function(preConfiguredParticleSystem){
+  this.scenes[this.activeSceneName].registerParticleSystem(preConfiguredParticleSystem);
+}
+
 SceneHandler.prototype.onWorldLimitsChange = function(){
   for (var sceneName in this.scenes){
     this.scenes[sceneName].refreshAreaBinHandler();

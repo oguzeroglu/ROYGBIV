@@ -7,6 +7,7 @@ var Scene = function(name){
   this.wallCollections = new Object();
   this.markedPoints = new Object();
   this.areas = new Object();
+  this.particleSystems = new Object();
   this.areaBinHandler = new WorldBinHandler(true);
   this.areaBinHandler.isAreaBinHandler = true;
   this.isSkyboxMapped = false;
@@ -57,6 +58,9 @@ Scene.prototype.import = function(exportObj){
     this.registerArea(areas[exportObj.areaNames[i]]);
     this.areaBinHandler.insert(areas[exportObj.areaNames[i]].boundingBox, exportObj.areaNames[i]);
   }
+  for (var i = 0; i<exportObj.particleSystemNames.length; i++){
+    this.registerParticleSystem(preConfiguredParticleSystems[exportObj.particleSystemNames[i]]);
+  }
   this.isSkyboxMapped = exportObj.isSkyboxMapped;
   if (this.isSkyboxMapped){
     this.mappedSkyboxName = exportObj.mappedSkyboxName;
@@ -76,6 +80,7 @@ Scene.prototype.export = function(){
   exportObj.wallCollectionNames = Object.keys(this.wallCollections);
   exportObj.markedPointNames = Object.keys(this.markedPoints);
   exportObj.areaNames = Object.keys(this.areas);
+  exportObj.particleSystemNames = Object.keys(this.particleSystems);
   exportObj.isSkyboxMapped = this.isSkyboxMapped;
   exportObj.postProcessing = this.postProcessing;
   if (this.isSkyboxMapped){
@@ -93,6 +98,16 @@ Scene.prototype.refreshAreaBinHandler = function(){
   for (var areaName in this.areas){
     this.areaBinHandler.insert(areas[areaName].boundingBox, areaName);
   }
+}
+
+Scene.prototype.registerParticleSystem = function(preConfiguredParticleSystem){
+  this.particleSystems[preConfiguredParticleSystem.name] = preConfiguredParticleSystem;
+  preConfiguredParticleSystem.registeredSceneName = this.name;
+}
+
+Scene.prototype.unregisterParticleSystem = function(preConfiguredParticleSystem){
+  delete this.particleSystems[preConfiguredParticleSystem.name];
+  delete preConfiguredParticleSystem.registeredSceneName;
 }
 
 Scene.prototype.registerFog = function(fogConfigurations){

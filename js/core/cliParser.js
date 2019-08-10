@@ -4020,6 +4020,10 @@ function parse(input){
             terminal.printError(Text.NO_SUCH_PARTICLE_SYSTEM);
             return true;
           }
+          if (preConfiguredParticleSystems[psName].registeredSceneName != sceneHandler.getActiveSceneName()){
+            terminal.printError(Text.PS_NOT_IN_SCENE);
+            return true;
+          }
           particleSystemCreatorGUIHandler.edit(psName);
           terminal.clear();
           terminal.disable();
@@ -4099,6 +4103,7 @@ function parse(input){
               return true;
             }
           }
+          sceneHandler.onParticleSystemDeletion(preConfiguredParticleSystem);
           preConfiguredParticleSystem.destroy();
           if (!jobHandlerWorking){
             terminal.printInfo(Text.PARTICLE_SYSTEM_DESTROYED);
