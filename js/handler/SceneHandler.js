@@ -123,6 +123,14 @@ SceneHandler.prototype.createScene = function(sceneName){
   this.scenes[sceneName] = new Scene(sceneName);
 }
 
+SceneHandler.prototype.onMuzzleFlashCreation = function(muzzleFlash){
+  this.scenes[this.activeSceneName].registerMuzzleFlash(muzzleFlash);
+}
+
+SceneHandler.prototype.onMuzzleFlashDeletion = function(muzzleFlash){
+  this.scenes[muzzleFlash.registeredSceneName].unregisterMuzzleFlash(muzzleFlash);
+}
+
 SceneHandler.prototype.onParticleSystemPoolCreation = function(preConfiguredParticleSystemPool){
   this.scenes[this.activeSceneName].registerParticleSystemPool(preConfiguredParticleSystemPool);
 }
@@ -262,4 +270,8 @@ SceneHandler.prototype.getObjectGroups = function(){
 
 SceneHandler.prototype.getAddedTexts = function(){
   return this.scenes[this.activeSceneName].addedTexts;
+}
+
+SceneHandler.prototype.getMuzzleFlashes = function(){
+  return this.scenes[this.activeSceneName].muzzleFlashes;
 }

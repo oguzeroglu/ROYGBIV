@@ -59,6 +59,7 @@ MuzzleFlashCreatorGUIHandler.prototype.init = function(muzzleflashName){
       camera.quaternion.set(0, 0, 0, 1);
       camera.position.set(initialCameraX, initialCameraY, initialCameraZ);
       muzzleFlashes[muzzleflashName] = muzzleFlashCreatorGUIHandler.muzzleFlash;
+      sceneHandler.onMuzzleFlashCreation(muzzleFlashes[muzzleflashName]);
       delete muzzleFlashCreatorGUIHandler.muzzleFlash;
     }
   }

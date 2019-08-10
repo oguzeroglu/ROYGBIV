@@ -298,7 +298,7 @@ FPSWeaponGUIHandler.prototype.prepareGUI = function(){
     }
   }
   var muzzleFlashAry = [];
-  for (var muzzleFlashName in muzzleFlashes){
+  for (var muzzleFlashName in sceneHandler.getMuzzleFlashes()){
     var muzzleFlashUsed = false;
     for (var objName in addedObjects){
       if (objName != fpsWeaponGUIHandler.fpsWeaponAlignmentConfigurationObject.name){

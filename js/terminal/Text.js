@@ -137,6 +137,7 @@ var Text = function(){
   this.OBJECT_NR_X_NOT_IN_SCENE = "Object nr. @@1 is not inside the active scene.";
   this.SOURCE_OBJECT_NOT_IN_SCENE = "Source object is not inside the active scene.";
   this.TARGET_OBJECT_NOT_IN_SCENE = "Target object is not inside the active scene.";
+  this.MUZZLE_FLASH_NOT_IN_SCENE = "Muzzle flash is not inside the active scene.";
   this.PS_NOT_IN_SCENE = "Particle system is not inside the active scene.";
   this.TEXT_NOT_IN_SCENE = "Text not inside the active scene.";
   this.TEXTURES = "Textures";

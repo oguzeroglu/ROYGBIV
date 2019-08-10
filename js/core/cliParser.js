@@ -4217,6 +4217,10 @@ function parse(input){
             terminal.printError(Text.NO_SUCH_PARTICLE_SYSTEM);
             return true;
           }
+          if (ps.registeredSceneName != sceneHandler.getActiveSceneName()){
+            terminal.printError(Text.PS_NOT_IN_SCENE);
+            return true;
+          }
           if (ps.isCollidable){
             terminal.printError(Text.CANNOT_CREATE_MUZZLEFLASH_COLLIDABLE_PS);
             return true;
@@ -4240,6 +4244,10 @@ function parse(input){
           var muzzleFlash = muzzleFlashes[muzzleFlashName];
           if (!muzzleFlash){
             terminal.printError(Text.NO_SUCH_MUZZLE_FLASH);
+            return true;
+          }
+          if (muzzleFlash.registeredSceneName != sceneHandler.getActiveSceneName()){
+            terminal.printError(Text.MUZZLE_FLASH_NOT_IN_SCENE);
             return true;
           }
           muzzleFlashCreatorGUIHandler.edit(muzzleFlash);
@@ -4267,6 +4275,7 @@ function parse(input){
             terminal.printError(Text.MUZZLE_FLASH_USED_IN.replace(Text.PARAM1, muzzleFlash.getUsingWeaponName()));
             return true;
           }
+          sceneHandler.onMuzzleFlashDeletion(muzzleFlash);
           muzzleFlash.destroy();
           if (!jobHandlerWorking){
             terminal.printInfo(Text.MUZZLE_FLASH_DESTROYED);
@@ -4283,7 +4292,7 @@ function parse(input){
               opts = false;
             }
             ctr ++;
-            terminal.printInfo(Text.TREE2.replace(Text.PARAM1, muzzleFlashName).replace(Text.PARAM2, muzzleFlashes[muzzleFlashName].refPreconfiguredPS.name), opts);
+            terminal.printInfo(Text.TREE2.replace(Text.PARAM1, muzzleFlashName + " ["+muzzleFlashes[muzzleFlashName].registeredSceneName+"]").replace(Text.PARAM2, muzzleFlashes[muzzleFlashName].refPreconfiguredPS.name), opts);
           }
           if (len == 0){
             terminal.printError(Text.NO_MUZZLE_FLASHES_CREATED);

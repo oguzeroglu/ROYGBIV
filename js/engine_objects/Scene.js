@@ -9,6 +9,7 @@ var Scene = function(name){
   this.areas = new Object();
   this.particleSystems = new Object();
   this.particleSystemPools = new Object();
+  this.muzzleFlashes = new Object();
   this.areaBinHandler = new WorldBinHandler(true);
   this.areaBinHandler.isAreaBinHandler = true;
   this.isSkyboxMapped = false;
@@ -65,6 +66,9 @@ Scene.prototype.import = function(exportObj){
   for (var i = 0; i<exportObj.particleSystemPoolNames.length; i++){
     this.registerParticleSystemPool(preConfiguredParticleSystemPools[exportObj.particleSystemPoolNames[i]]);
   }
+  for (var i = 0; i<exportObj.muzzleFlashNames.length; i++){
+    this.registerMuzzleFlash(muzzleFlashes[exportObj.muzzleFlashNames[i]]);
+  }
   this.isSkyboxMapped = exportObj.isSkyboxMapped;
   if (this.isSkyboxMapped){
     this.mappedSkyboxName = exportObj.mappedSkyboxName;
@@ -86,6 +90,7 @@ Scene.prototype.export = function(){
   exportObj.areaNames = Object.keys(this.areas);
   exportObj.particleSystemNames = Object.keys(this.particleSystems);
   exportObj.particleSystemPoolNames = Object.keys(this.particleSystemPools);
+  exportObj.muzzleFlashNames = Object.keys(this.muzzleFlashes);
   exportObj.isSkyboxMapped = this.isSkyboxMapped;
   exportObj.postProcessing = this.postProcessing;
   if (this.isSkyboxMapped){
@@ -103,6 +108,16 @@ Scene.prototype.refreshAreaBinHandler = function(){
   for (var areaName in this.areas){
     this.areaBinHandler.insert(areas[areaName].boundingBox, areaName);
   }
+}
+
+Scene.prototype.registerMuzzleFlash = function(muzzleFlash){
+  this.muzzleFlashes[muzzleFlash.name] = muzzleFlash;
+  muzzleFlash.registeredSceneName = this.name;
+}
+
+Scene.prototype.unregisterMuzzleFlash = function(muzzleFlash){
+  delete this.muzzleFlashes[muzzleFlash.name];
+  delete muzzleFlash.registeredSceneName;
 }
 
 Scene.prototype.registerParticleSystemPool = function(preConfiguredParticleSystemPool){
