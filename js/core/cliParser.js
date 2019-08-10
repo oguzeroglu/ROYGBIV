@@ -4140,7 +4140,7 @@ function parse(input){
               opts = false;
             }
             ctr ++;
-            terminal.printInfo(Text.TREE2.replace(Text.PARAM1, psName).replace(Text.PARAM2, preConfiguredParticleSystems[psName].type), opts);
+            terminal.printInfo(Text.TREE2.replace(Text.PARAM1, psName + " ["+preConfiguredParticleSystems[psName].registeredSceneName+"]").replace(Text.PARAM2, preConfiguredParticleSystems[psName].type), opts);
           }
           if (len == 0){
             terminal.printError(Text.NO_PARTICLE_SYSTEMS_CREATED);
