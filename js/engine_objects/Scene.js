@@ -10,6 +10,7 @@ var Scene = function(name){
   this.particleSystems = new Object();
   this.particleSystemPools = new Object();
   this.muzzleFlashes = new Object();
+  this.crosshairs = new Object();
   this.areaBinHandler = new WorldBinHandler(true);
   this.areaBinHandler.isAreaBinHandler = true;
   this.isSkyboxMapped = false;
@@ -69,6 +70,9 @@ Scene.prototype.import = function(exportObj){
   for (var i = 0; i<exportObj.muzzleFlashNames.length; i++){
     this.registerMuzzleFlash(muzzleFlashes[exportObj.muzzleFlashNames[i]]);
   }
+  for (var i = 0; i<exportObj.crosshairNames.length; i++){
+    this.registerCrosshair(crosshairs[exportObj.crosshairNames[i]]);
+  }
   this.isSkyboxMapped = exportObj.isSkyboxMapped;
   if (this.isSkyboxMapped){
     this.mappedSkyboxName = exportObj.mappedSkyboxName;
@@ -91,6 +95,7 @@ Scene.prototype.export = function(){
   exportObj.particleSystemNames = Object.keys(this.particleSystems);
   exportObj.particleSystemPoolNames = Object.keys(this.particleSystemPools);
   exportObj.muzzleFlashNames = Object.keys(this.muzzleFlashes);
+  exportObj.crosshairNames = Object.keys(this.crosshairs);
   exportObj.isSkyboxMapped = this.isSkyboxMapped;
   exportObj.postProcessing = this.postProcessing;
   if (this.isSkyboxMapped){
@@ -108,6 +113,16 @@ Scene.prototype.refreshAreaBinHandler = function(){
   for (var areaName in this.areas){
     this.areaBinHandler.insert(areas[areaName].boundingBox, areaName);
   }
+}
+
+Scene.prototype.registerCrosshair = function(crosshair){
+  this.crosshairs[crosshair.name] = crosshair;
+  crosshair.registeredSceneName = this.name;
+}
+
+Scene.prototype.unregisterCrosshair = function(crosshair){
+  delete this.crosshairs[crosshair.name];
+  delete crosshair.registeredSceneName;
 }
 
 Scene.prototype.registerMuzzleFlash = function(muzzleFlash){

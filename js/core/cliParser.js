@@ -4458,10 +4458,11 @@ function parse(input){
             terminal.printError(Text.NO_SUCH_CROSSHAIR);
             return true;
           }
+          sceneHandler.onCrosshairDeletion(crosshair);
           crosshair.destroy(true);
           delete crosshairs[crosshair.name];
           if (!jobHandlerWorking){
-            terminal.printInfo(Text.CROSSHAIR_EDITED);
+            terminal.printInfo(Text.CROSSHAIR_DESTROYED);
           }
           return true;
         break;
@@ -4475,7 +4476,7 @@ function parse(input){
             if (count == length){
               options = false;
             }
-            terminal.printInfo(Text.TREE2.replace(Text.PARAM1, crosshairName).replace(Text.PARAM2, crosshairs[crosshairName].configurations.texture), options);
+            terminal.printInfo(Text.TREE2.replace(Text.PARAM1, crosshairName + " ["+crosshairs[crosshairName].registeredSceneName+"]").replace(Text.PARAM2, crosshairs[crosshairName].configurations.texture), options);
           }
           if (count == 0){
             terminal.printError(Text.NO_CROSSHAIRS_CREATED);

@@ -123,6 +123,14 @@ SceneHandler.prototype.createScene = function(sceneName){
   this.scenes[sceneName] = new Scene(sceneName);
 }
 
+SceneHandler.prototype.onCrosshairCreation = function(crosshair){
+  this.scenes[this.activeSceneName].registerCrosshair(crosshair);
+}
+
+SceneHandler.prototype.onCrosshairDeletion = function(crosshair){
+  this.scenes[crosshair.registeredSceneName].unregisterCrosshair(crosshair);
+}
+
 SceneHandler.prototype.onMuzzleFlashCreation = function(muzzleFlash){
   this.scenes[this.activeSceneName].registerMuzzleFlash(muzzleFlash);
 }
