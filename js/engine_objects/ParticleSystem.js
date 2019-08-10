@@ -92,6 +92,7 @@ ParticleSystem.prototype.createCopy = function(newParticleSystemName){
   copyParticleSystem.setBlending(this.getBlending());
   copyParticleSystem.creationConfigurations = JSON.parse(JSON.stringify(this.creationConfigurations));
   copyParticleSystem.creationConfigurations.name = newParticleSystemName;
+  copyParticleSystem.registeredSceneName = this.registeredSceneName;
   return copyParticleSystem;
 }
 

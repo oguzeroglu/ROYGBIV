@@ -123,6 +123,14 @@ SceneHandler.prototype.createScene = function(sceneName){
   this.scenes[sceneName] = new Scene(sceneName);
 }
 
+SceneHandler.prototype.onParticleSystemPoolCreation = function(preConfiguredParticleSystemPool){
+  this.scenes[this.activeSceneName].registerParticleSystemPool(preConfiguredParticleSystemPool);
+}
+
+SceneHandler.prototype.onParticleSystemPoolDeletion = function(preConfiguredParticleSystemPool){
+  this.scenes[preConfiguredParticleSystemPool.registeredSceneName].unregisterParticleSystemPool(preConfiguredParticleSystemPool);
+}
+
 SceneHandler.prototype.onParticleSystemDeletion = function(preConfiguredParticleSystem){
   this.scenes[preConfiguredParticleSystem.registeredSceneName].unregisterParticleSystem(preConfiguredParticleSystem);
 }

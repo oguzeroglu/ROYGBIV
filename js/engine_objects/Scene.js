@@ -8,6 +8,7 @@ var Scene = function(name){
   this.markedPoints = new Object();
   this.areas = new Object();
   this.particleSystems = new Object();
+  this.particleSystemPools = new Object();
   this.areaBinHandler = new WorldBinHandler(true);
   this.areaBinHandler.isAreaBinHandler = true;
   this.isSkyboxMapped = false;
@@ -61,6 +62,9 @@ Scene.prototype.import = function(exportObj){
   for (var i = 0; i<exportObj.particleSystemNames.length; i++){
     this.registerParticleSystem(preConfiguredParticleSystems[exportObj.particleSystemNames[i]]);
   }
+  for (var i = 0; i<exportObj.particleSystemPoolNames.length; i++){
+    this.registerParticleSystemPool(preConfiguredParticleSystemPools[exportObj.particleSystemPoolNames[i]]);
+  }
   this.isSkyboxMapped = exportObj.isSkyboxMapped;
   if (this.isSkyboxMapped){
     this.mappedSkyboxName = exportObj.mappedSkyboxName;
@@ -81,6 +85,7 @@ Scene.prototype.export = function(){
   exportObj.markedPointNames = Object.keys(this.markedPoints);
   exportObj.areaNames = Object.keys(this.areas);
   exportObj.particleSystemNames = Object.keys(this.particleSystems);
+  exportObj.particleSystemPoolNames = Object.keys(this.particleSystemPools);
   exportObj.isSkyboxMapped = this.isSkyboxMapped;
   exportObj.postProcessing = this.postProcessing;
   if (this.isSkyboxMapped){
@@ -98,6 +103,16 @@ Scene.prototype.refreshAreaBinHandler = function(){
   for (var areaName in this.areas){
     this.areaBinHandler.insert(areas[areaName].boundingBox, areaName);
   }
+}
+
+Scene.prototype.registerParticleSystemPool = function(preConfiguredParticleSystemPool){
+  this.particleSystemPools[preConfiguredParticleSystemPool.poolName] = preConfiguredParticleSystemPool;
+  preConfiguredParticleSystemPool.registeredSceneName = this.name;
+}
+
+Scene.prototype.unregisterParticleSystemPool = function(preConfiguredParticleSystemPool){
+  delete this.particleSystemPools[preConfiguredParticleSystemPool.poolName];
+  delete preConfiguredParticleSystemPool.registeredSceneName;
 }
 
 Scene.prototype.registerParticleSystem = function(preConfiguredParticleSystem){

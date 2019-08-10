@@ -4061,6 +4061,10 @@ function parse(input){
             terminal.printError(Text.NO_SUCH_PARTICLE_SYSTEM);
             return true;
           }
+          if (ps.registeredSceneName != sceneHandler.getActiveSceneName()){
+            terminal.printError(Text.PS_NOT_IN_SCENE);
+            return true;
+          }
           if (!(typeof ps.preConfiguredParticleSystemPoolName == UNDEFINED)){
             terminal.printError(Text.PARTICLE_SYSTEM_BELONGS_TO_ANOTHER_POOL);
             return true;
@@ -4074,6 +4078,7 @@ function parse(input){
             return true;
           }
           var preConfiguredParticleSystemPool = new PreconfiguredParticleSystemPool(psName, poolName, poolSize);
+          sceneHandler.onParticleSystemPoolCreation(preConfiguredParticleSystemPool);
           preConfiguredParticleSystemPools[poolName] = preConfiguredParticleSystemPool;
           ps.preConfiguredParticleSystemPoolName = poolName;
           terminal.printInfo(Text.PARTICLE_SYSTEM_POOL_CREATED);
@@ -4124,6 +4129,7 @@ function parse(input){
             terminal.printError(Text.NO_SUCH_PARTICLE_SYSTEM_POOL);
             return true;
           }
+          sceneHandler.onParticleSystemPoolDeletion(preConfiguredParticleSystemPool);
           preConfiguredParticleSystemPool.destroy();
           if (!jobHandlerWorking){
             terminal.printInfo(Text.PARTICLE_SYSTEM_POOL_DESTROYED);
@@ -4157,7 +4163,7 @@ function parse(input){
               opts = false;
             }
             ctr ++;
-            terminal.printInfo(Text.TREE2.replace(Text.PARAM1, poolName).replace(Text.PARAM2, preConfiguredParticleSystemPools[poolName].refParticleSystemName+" x "+preConfiguredParticleSystemPools[poolName].poolSize), opts);
+            terminal.printInfo(Text.TREE2.replace(Text.PARAM1, poolName + " ["+preConfiguredParticleSystemPools[poolName].registeredSceneName+"]").replace(Text.PARAM2, preConfiguredParticleSystemPools[poolName].refParticleSystemName+" x "+preConfiguredParticleSystemPools[poolName].poolSize), opts);
           }
           if (len == 0){
             terminal.printError(Text.NO_PARTICLE_SYSTEM_POOLS_CREATED);
