@@ -4514,6 +4514,14 @@ function parse(input){
               }
             }
           }
+          if (obj.registeredSceneName != sceneHandler.getActiveSceneName()){
+            if (obj.isAddedObject || obj.isObjectGroup){
+              terminal.printError(Text.OBJECT_NOT_IN_SCENE);
+            }else{
+              terminal.printError(Text.TEXT_NOT_IN_SCENE);
+            }
+            return true;
+          }
           animationCreatorGUIHandler.show(obj);
           return true;
         break;
