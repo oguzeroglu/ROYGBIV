@@ -256,6 +256,10 @@ SceneHandler.prototype.getGridSystems = function(){
   return this.scenes[this.activeSceneName].gridSystems;
 }
 
+SceneHandler.prototype.getWallCollections = function(){
+  return this.scenes[this.activeSceneName].wallCollections;
+}
+
 SceneHandler.prototype.getMarkedPoints = function(){
   return this.scenes[this.activeSceneName].markedPoints;
 }
@@ -282,4 +286,16 @@ SceneHandler.prototype.getAddedTexts = function(){
 
 SceneHandler.prototype.getMuzzleFlashes = function(){
   return this.scenes[this.activeSceneName].muzzleFlashes;
+}
+
+SceneHandler.prototype.getParticleSystems = function(){
+  return this.scenes[this.activeSceneName].particleSystems;
+}
+
+SceneHandler.prototype.getParticleSystemPools = function(){
+  return this.scenes[this.activeSceneName].particleSystemPools;
+}
+
+SceneHandler.prototype.getCrosshairs = function(){
+  return this.scenes[this.activeSceneName].crosshairs;
 }

@@ -55,8 +55,6 @@ JobHandler.prototype.handle = function(previewModeCommand){
       this.handleUnmarkCommand();
     }else if (this.splitted[0] == "setblending"){
       this.handleSetBlendingCommand();
-    }else if (this.splitted[0] == "applydisplacementmap"){
-      this.handleApplyDisplacementMapCommand();
     }else if (this.splitted[0] == "setslipperiness"){
       this.handleSetSlipperinessCommand();
     }else if (this.splitted[0] == "sync"){
@@ -109,7 +107,7 @@ JobHandler.prototype.handle = function(previewModeCommand){
 JobHandler.prototype.handleDestroyCrosshairCommand = function(){
   var crosshairNamePrefix = this.splitted[1].split("*")[0];
   var ctr = 0;
-  for (var crosshairName in crosshairs){
+  for (var crosshairName in sceneHandler.getCrosshairs()){
     if (crosshairName.startsWith(crosshairNamePrefix)){
       parseCommand("destroyCrosshair "+crosshairName);
       ctr ++;
@@ -125,7 +123,7 @@ JobHandler.prototype.handleDestroyCrosshairCommand = function(){
 JobHandler.prototype.handleDestroyMuzzleFlashCommand = function(){
   var muzzleFlashNamePrefix = this.splitted[1].split("*")[0];
   var ctr = 0;
-  for (var muzzleFlashName in muzzleFlashes){
+  for (var muzzleFlashName in sceneHandler.getMuzzleFlashes()){
     if (muzzleFlashName.startsWith(muzzleFlashNamePrefix)){
       parseCommand("destroyMuzzleFlash "+muzzleFlashName);
       ctr ++;
@@ -141,7 +139,7 @@ JobHandler.prototype.handleDestroyMuzzleFlashCommand = function(){
 JobHandler.prototype.handleDestroyParticleSystemPoolCommand = function(){
   var psPoolNamePrefix = this.splitted[1].split("*")[0];
   var ctr = 0;
-  for (var psPoolName in preConfiguredParticleSystemPools){
+  for (var psPoolName in sceneHandler.getParticleSystemPools()){
     if (psPoolName.startsWith(psPoolNamePrefix)){
       parseCommand("destroyParticleSystemPool "+psPoolName);
       ctr ++;
@@ -157,7 +155,7 @@ JobHandler.prototype.handleDestroyParticleSystemPoolCommand = function(){
 JobHandler.prototype.handleDestroyParticleSystemCommand = function(){
   var psNamePrefix = this.splitted[1].split("*")[0];
   var ctr = 0;
-  for (var psName in preConfiguredParticleSystems){
+  for (var psName in sceneHandler.getParticleSystems()){
     if (psName.startsWith(psNamePrefix)){
       parseCommand("destroyParticleSystem "+psName);
       ctr ++;
@@ -173,7 +171,7 @@ JobHandler.prototype.handleDestroyParticleSystemCommand = function(){
 JobHandler.prototype.handleUnsimplifyPhysicsCommand = function(){
   var objNamePrefix = this.splitted[1].split("*")[0];
   var ctr = 0;
-  for (var objName in objectGroups){
+  for (var objName in sceneHandler.getObjectGroups()){
     if (objName.startsWith(objNamePrefix)){
       parseCommand("unsimplifyPhysics "+objName);
       ctr ++;
@@ -189,7 +187,7 @@ JobHandler.prototype.handleUnsimplifyPhysicsCommand = function(){
 JobHandler.prototype.handleSimplifyPhysicsCommand = function(){
   var objNamePrefix = this.splitted[1].split("*")[0];
   var ctr = 0;
-  for (var objName in objectGroups){
+  for (var objName in sceneHandler.getObjectGroups()){
     if (objName.startsWith(objNamePrefix)){
       parseCommand("simplifyPhysics "+objName+" "+this.splitted[2]+" "+this.splitted[3]+" "+this.splitted[4]);
       ctr ++;
@@ -223,7 +221,7 @@ JobHandler.prototype.handleDestroyFontCommand = function(){
 JobHandler.prototype.handleDestroyTextCommand = function(){
   var textNamePrefix = this.splitted[1].split("*")[0];
   var ctr = 0;
-  for (var textName in addedTexts){
+  for (var textName in sceneHandler.getAddedTexts()){
     if (textName.startsWith(textNamePrefix)){
       parseCommand(
         "destroyText "+textName
@@ -287,13 +285,13 @@ JobHandler.prototype.handleCopyObjectCommand = function(){
 JobHandler.prototype.handleUnsetRotationPivotCommand = function(){
   var objNamePrefix = this.splitted[1].split("*")[0];
   var ctr = 0;
-  for (var objName in addedObjects){
+  for (var objName in sceneHandler.getAddedObjects()){
     if (objName.startsWith(objNamePrefix)){
       parseCommand("unsetRotationPivot "+objName);
       ctr ++;
     }
   }
-  for (var objName in objectGroups){
+  for (var objName in sceneHandler.getObjectGroups()){
     if (objName.startsWith(objNamePrefix)){
       parseCommand("unsetRotationPivot "+objName);
       ctr ++;
@@ -309,13 +307,13 @@ JobHandler.prototype.handleUnsetRotationPivotCommand = function(){
 JobHandler.prototype.handleSetRotationPivotCommand = function(){
   var objNamePrefix = this.splitted[1].split("*")[0];
   var ctr = 0;
-  for (var objName in addedObjects){
+  for (var objName in sceneHandler.getAddedObjects()){
     if (objName.startsWith(objNamePrefix)){
       parseCommand("setRotationPivot "+objName+" "+this.splitted[2]+" "+this.splitted[3]+" "+this.splitted[4]);
       ctr ++;
     }
   }
-  for (var objName in objectGroups){
+  for (var objName in sceneHandler.getObjectGroups()){
     if (objName.startsWith(objNamePrefix)){
       parseCommand("setRotationPivot "+objName+" "+this.splitted[2]+" "+this.splitted[3]+" "+this.splitted[4]);
       ctr ++;
@@ -354,13 +352,13 @@ JobHandler.prototype.handleAutoConfigureAreaCommand = function(){
   canvas.style.visibility = "hidden";
   terminal.disable();
   setTimeout(function(){
-    for (var areaName in areas){
+    for (var areaName in sceneHandler.getAreas()){
       if (areaName.startsWith(areaNamePrefix)){
         areaCount ++;
       }
     }
     jobHandlerInternalMaxExecutionCount = areaCount;
-    for (var areaName in areas){
+    for (var areaName in sceneHandler.getAreas()){
       if (areaName.startsWith(areaNamePrefix)){
         parseCommand(
           "autoConfigureArea "+areaName
@@ -378,10 +376,10 @@ JobHandler.prototype.handleNewAreaConfigurationCommand = function(){
   var objNamePrefix = this.splitted[2].split("*")[0];
   var areaNamePrefix = this.splitted[1].split("*")[0];
   var areaCount = 0, objCount = 0;
-  for (var areaName in areas){
+  for (var areaName in sceneHandler.getAreas()){
     areaCount ++;
     if (areaName.startsWith(areaNamePrefix)){
-      for (var objName in addedObjects){
+      for (var objName in sceneHandler.getAddedObjects()){
         if (objName.startsWith(objNamePrefix)){
           parseCommand(
             "newAreaConfiguration "+areaName+" "+objName+" "+this.splitted[3]+" "+this.splitted[4]
@@ -389,7 +387,7 @@ JobHandler.prototype.handleNewAreaConfigurationCommand = function(){
           objCount ++;
         }
       }
-      for (var objName in objectGroups){
+      for (var objName in sceneHandler.getObjectGroups()){
         if (objName.startsWith(objNamePrefix)){
           parseCommand(
             "newAreaConfiguration "+areaName+" "+objName+" "+this.splitted[3]+" "+this.splitted[4]
@@ -401,7 +399,7 @@ JobHandler.prototype.handleNewAreaConfigurationCommand = function(){
   }
   if ("default".startsWith(areaNamePrefix)){
     areaCount ++;
-    for (var objName in addedObjects){
+    for (var objName in sceneHandler.getAddedObjects()){
       if (objName.startsWith(objNamePrefix)){
         parseCommand(
           "newAreaConfiguration default"+" "+objName+" "+this.splitted[3]+" "+this.splitted[4]
@@ -409,7 +407,7 @@ JobHandler.prototype.handleNewAreaConfigurationCommand = function(){
         objCount ++;
       }
     }
-    for (var objName in objectGroups){
+    for (var objName in sceneHandler.getObjectGroups()){
       if (objName.startsWith(objNamePrefix)){
         parseCommand(
           "newAreaConfiguration default"+" "+objName+" "+this.splitted[3]+" "+this.splitted[4]
@@ -432,7 +430,7 @@ JobHandler.prototype.handleNewAreaConfigurationCommand = function(){
 JobHandler.prototype.handleSelectAllGridsCommand = function(){
   var gsNamePrefix = this.splitted[1].split("*")[0];
   var ctr = 0;
-  for (var gsName in gridSystems){
+  for (var gsName in sceneHandler.getGridSystems()){
     if (gsName.startsWith(gsNamePrefix)){
       parseCommand(
         "selectAllGrids "+gsName
@@ -451,7 +449,7 @@ JobHandler.prototype.handleSelectAllGridsCommand = function(){
 JobHandler.prototype.handleSyncCommand = function(){
   var objNamePrefix = this.splitted[2].split("*")[0];
   var ctr = 0;
-  for (var objName in addedObjects){
+  for (var objName in sceneHandler.getAddedObjects()){
     if (objName.startsWith(objNamePrefix)){
       parseCommand(
         "sync "+this.splitted[1]+" "+objName
@@ -470,7 +468,7 @@ JobHandler.prototype.handleSyncCommand = function(){
 JobHandler.prototype.handleSetSlipperinessCommand = function(){
   var objNamePrefix = this.splitted[1].split("*")[0];
   var ctr = 0;
-  for (var objName in addedObjects){
+  for (var objName in sceneHandler.getAddedObjects()){
     if (objName.startsWith(objNamePrefix)){
       parseCommand(
         "setSlipperiness "+objName+" "+this.splitted[2]
@@ -478,29 +476,10 @@ JobHandler.prototype.handleSetSlipperinessCommand = function(){
       ctr ++;
     }
   }
-  for (var objName in objectGroups){
+  for (var objName in sceneHandler.getObjectGroups()){
     if (objName.startsWith(objNamePrefix)){
       parseCommand(
         "setSlipperiness "+objName+" "+this.splitted[2]
-      );
-      ctr ++;
-    }
-  }
-  if (ctr == 0){
-
-    terminal.printError(Text.NO_OBJECT_FOUND);
-  }else{
-    terminal.printInfo(Text.COMMAND_EXECUTED_FOR_X_OBJECTS.replace(Text.PARAM1, ctr));
-  }
-}
-
-JobHandler.prototype.handleApplyDisplacementMapCommand = function(){
-  var objNamePrefix = this.splitted[1].split("*")[0];
-  var ctr = 0;
-  for (var objName in addedObjects){
-    if (objName.startsWith(objNamePrefix)){
-      parseCommand(
-        "applyDisplacementMap "+objName+" "+this.splitted[2]+" "+this.splitted[3]+" "+this.splitted[4]
       );
       ctr ++;
     }
@@ -516,7 +495,7 @@ JobHandler.prototype.handleApplyDisplacementMapCommand = function(){
 JobHandler.prototype.handleSetBlendingCommand = function(){
   var objNamePrefix = this.splitted[1].split("*")[0];
   var ctr = 0;
-  for (var objName in addedObjects){
+  for (var objName in sceneHandler.getAddedObjects()){
     if (objName.startsWith(objNamePrefix)){
       parseCommand(
         "setBlending "+objName+" "+this.splitted[2]
@@ -524,7 +503,7 @@ JobHandler.prototype.handleSetBlendingCommand = function(){
       ctr ++;
     }
   }
-  for (var objName in objectGroups){
+  for (var objName in sceneHandler.getObjectGroups()){
     if (objName.startsWith(objNamePrefix)){
       parseCommand(
         "setBlending "+objName+" "+this.splitted[2]
@@ -543,7 +522,7 @@ JobHandler.prototype.handleSetBlendingCommand = function(){
 JobHandler.prototype.handleUnmarkCommand = function(){
   var ptPrefix = this.splitted[1].split("*")[0];
   var ctr = 0;
-  for (var ptName in markedPoints){
+  for (var ptName in sceneHandler.getMarkedPoints()){
     if (ptName.startsWith(ptPrefix)){
       parseCommand(
         "unmark "+ptName
@@ -581,7 +560,7 @@ JobHandler.prototype.handleMarkCommand = function(){
 JobHandler.prototype.handleDetachCommand = function(){
   var objGroupPrefix = this.splitted[1].split("*")[0];
   var ctr = 0;
-  for (var objGroupName in objectGroups){
+  for (var objGroupName in sceneHandler.getObjectGroups()){
     if (objGroupName.startsWith(objGroupPrefix)){
       parseCommand(
         "detach "+objGroupName
@@ -600,7 +579,7 @@ JobHandler.prototype.handleDetachCommand = function(){
 JobHandler.prototype.handleRotateObjectCommand = function(){
   var objNamePrefix = this.splitted[1].split("*")[0];
   var ctr = 0;
-  for (var objName in addedObjects){
+  for (var objName in sceneHandler.getAddedObjects()){
     if (objName.startsWith(objNamePrefix)){
       parseCommand(
         "rotateObject "+objName+" "+this.splitted[2]+" "+this.splitted[3]
@@ -608,7 +587,7 @@ JobHandler.prototype.handleRotateObjectCommand = function(){
       ctr ++;
     }
   }
-  for (var objGroupName in objectGroups){
+  for (var objGroupName in sceneHandler.getObjectGroups()){
     if (objGroupName.startsWith(objNamePrefix)){
       parseCommand(
         "rotateObject "+objGroupName+" "+this.splitted[2]+" "+this.splitted[3]
@@ -627,7 +606,7 @@ JobHandler.prototype.handleRotateObjectCommand = function(){
 JobHandler.prototype.handleSetMassCommand = function(){
   var objNamePrefix = this.splitted[1].split("*")[0];
   var ctr = 0;
-  for (var objName in addedObjects){
+  for (var objName in sceneHandler.getAddedObjects()){
     if (objName.startsWith(objNamePrefix)){
       parseCommand(
         "setMass "+objName+" "+this.splitted[2]
@@ -635,7 +614,7 @@ JobHandler.prototype.handleSetMassCommand = function(){
       ctr ++;
     }
   }
-  for (var objGroupName in objectGroups){
+  for (var objGroupName in sceneHandler.getObjectGroups()){
     if (objGroupName.startsWith(objNamePrefix)){
       parseCommand(
         "setMass "+objGroupName+" "+this.splitted[2]
@@ -673,7 +652,7 @@ JobHandler.prototype.handleDestroySkyboxCommand = function(){
 JobHandler.prototype.handleSegmentObjectCommand = function(){
   var objNamePrefix = this.splitted[1].split("*")[0];
   var ctr = 0;
-  for (var objName in addedObjects){
+  for (var objName in sceneHandler.getAddedObjects()){
     if (objName.startsWith(objNamePrefix)){
       parseCommand(
         "segmentObject "+objName+" "+this.splitted[2]
@@ -692,7 +671,7 @@ JobHandler.prototype.handleSegmentObjectCommand = function(){
 JobHandler.prototype.handleResetMapsCommand = function(){
   var objNamePrefix = this.splitted[1].split("*")[0];
   var ctr = 0;
-  for (var objName in addedObjects){
+  for (var objName in sceneHandler.getAddedObjects()){
     if (objName.startsWith(objNamePrefix)){
       parseCommand(
         "resetMaps "+ objName
@@ -768,7 +747,7 @@ JobHandler.prototype.handleDestroyTexturePackCommand = function(){
 JobHandler.prototype.handleDestroyWallCollectionCommand = function(){
   var wallCollectionNamePrefix = this.splitted[1].split("*")[0];
   var ctr = 0;
-  for (var wallCollectionName in wallCollections){
+  for (var wallCollectionName in sceneHandler.getWallCollections()){
     if (wallCollectionName.startsWith(wallCollectionNamePrefix)){
       parseCommand(
         "destroyWallCollection "+wallCollectionName
@@ -787,7 +766,7 @@ JobHandler.prototype.handleDestroyWallCollectionCommand = function(){
 JobHandler.prototype.handleMirrorCommand = function(){
   var objNamePrefix = this.splitted[1].split("*")[0];
   var ctr = 0;
-  for (var objName in addedObjects){
+  for (var objName in sceneHandler.getAddedObjects()){
     if (objName.startsWith(objNamePrefix)){
       parseCommand(
         "mirror "+objName+" "+this.splitted[2]+" "+this.splitted[3]
@@ -806,7 +785,7 @@ JobHandler.prototype.handleMirrorCommand = function(){
 JobHandler.prototype.handleAdjustTextureRepeatCommand = function(){
   var objNamePrefix = this.splitted[1].split("*")[0];
   var ctr = 0;
-  for (var objName in addedObjects){
+  for (var objName in sceneHandler.getAddedObjects()){
     if (objName.startsWith(objNamePrefix)){
       parseCommand(
         "adjustTextureRepeat "+objName+" "+this.splitted[2]+" "+this.splitted[3]
@@ -844,7 +823,7 @@ JobHandler.prototype.handleMapTextureCommand = function(){
 JobHandler.prototype.handleDestroyObjectCommand = function(){
   var objNamePrefix = this.splitted[1].split("*")[0];
   var ctr = 0;
-  for (var objName in addedObjects){
+  for (var objName in sceneHandler.getAddedObjects()){
     if (objName.startsWith(objNamePrefix)){
       parseCommand(
         "destroyObject "+objName
@@ -852,7 +831,7 @@ JobHandler.prototype.handleDestroyObjectCommand = function(){
       ctr ++;
     }
   }
-  for (var gluedObjectName in objectGroups){
+  for (var gluedObjectName in sceneHandler.getObjectGroups()){
     if (gluedObjectName.startsWith(objNamePrefix)){
       parseCommand(
         "destroyObject "+gluedObjectName
@@ -890,7 +869,7 @@ JobHandler.prototype.handleDestroyMaterialCommand = function(){
 JobHandler.prototype.handleDestroyGridSystemCommand = function(){
   var gridSystemPrefix = this.splitted[1].split("*")[0];
   var ctr = 0;
-  for (var gridSystemName in gridSystems){
+  for (var gridSystemName in sceneHandler.getGridSystems()){
     if (gridSystemName.startsWith(gridSystemPrefix)){
       parseCommand(
         "destroyGridSystem "+gridSystemName
@@ -911,7 +890,7 @@ JobHandler.prototype.handleDestroyGridSystemCommand = function(){
 JobHandler.prototype.handleMapTexturePackCommand = function(){
   var objNamePrefix = this.splitted[2].split("*")[0];
   var ctr = 0;
-  for (var objName in addedObjects){
+  for (var objName in sceneHandler.getAddedObjects()){
     if (objName.startsWith(objNamePrefix)){
       parseCommand(
         "mapTexturePack "+this.splitted[1]+" "+objName
