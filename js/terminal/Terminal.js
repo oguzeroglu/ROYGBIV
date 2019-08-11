@@ -313,7 +313,7 @@ Terminal.prototype.autocomplete = function(command){
 				helpString = "[Axis]: ";
 			break;
 			case commandDescriptor.GRID_SYSTEM_NAME:
-				for (var gridSystemName in gridSystems){
+				for (var gridSystemName in sceneHandler.getGridSystems()){
 					if (gridSystemName.startsWith(curEntry)){
 						possibilities.push(gridSystemName);
 					}
@@ -357,12 +357,12 @@ Terminal.prototype.autocomplete = function(command){
 				helpString = "[Materials]: ";
 			break;
 			case commandDescriptor.OBJECT_NAME:
-				for (objectName in addedObjects){
+				for (objectName in sceneHandler.getAddedObjects()){
 					if (objectName.startsWith(curEntry)){
 						possibilities.push(objectName);
 					}
 				}
-				for (gluedObjectName in objectGroups){
+				for (gluedObjectName in sceneHandler.getObjectGroups()){
 					if (gluedObjectName.startsWith(curEntry)){
 						possibilities.push(gluedObjectName);
 					}
@@ -380,17 +380,6 @@ Terminal.prototype.autocomplete = function(command){
 					possibilities.push("z");
 				}
 				helpString = "[Axis]: ";
-			break;
-			case commandDescriptor.PHYSICS_TEST_INDEX:
-				var physicsTestCount = Object.keys(physicsTests).length;
-				if (physicsTestCount > 0){
-					for (var i = 1; i <= physicsTestCount; i++){
-						if (i.toString().startsWith(curEntry)){
-							possibilities.push(i.toString());
-						}
-					}
-				}
-				helpString = "[Physics tests]: ";
 			break;
 			case commandDescriptor.STATE_ON_OFF:
 				if ("on".startsWith(curEntry.toLowerCase())){
@@ -414,7 +403,7 @@ Terminal.prototype.autocomplete = function(command){
 				helpString = "[Axis]: ";
 			break;
 			case commandDescriptor.WALL_COLLECTION_NAME:
-				for (var wallCollectionName in wallCollections){
+				for (var wallCollectionName in sceneHandler.getWallCollections()){
 					if (wallCollectionName.startsWith(curEntry)){
 						possibilities.push(wallCollectionName);
 					}
@@ -457,7 +446,7 @@ Terminal.prototype.autocomplete = function(command){
 			break;
 			case commandDescriptor.ANY_OBJECT:
 				var splittedEntry = curEntry.split(",");
-				for (var objectName in addedObjects){
+				for (var objectName in sceneHandler.getAddedObjects()){
 					var found = false;
 					for (var i = 0; i<splittedEntry.length; i++){
 						if (splittedEntry[i] == objectName){
@@ -468,7 +457,7 @@ Terminal.prototype.autocomplete = function(command){
 						possibilities.push(objectName);
 					}
 				}
-				for (var gluedObjectName in objectGroups){
+				for (var gluedObjectName in sceneHandler.getObjectGroups()){
 					var found = false;
 					for (var i = 0; i<splittedEntry.length; i++){
 						if (splittedEntry[i] == gluedObjectName){
@@ -483,7 +472,7 @@ Terminal.prototype.autocomplete = function(command){
 				helpString = "[Objects]: ";
 			break;
 			case commandDescriptor.GLUED_OBJECT_NAME:
-				for (var gluedObjectName in objectGroups){
+				for (var gluedObjectName in sceneHandler.getObjectGroups()){
 					if (gluedObjectName.startsWith(curEntry)){
 						possibilities.push(gluedObjectName);
 					}
@@ -491,7 +480,7 @@ Terminal.prototype.autocomplete = function(command){
 				helpString = "[Glued objects]: ";
 			break;
 			case commandDescriptor.MARKED_POINT_NAME:
-				for (var markedPointName in markedPoints){
+				for (var markedPointName in sceneHandler.getMarkedPoints()){
 					if (markedPointName.startsWith(curEntry)){
 						possibilities.push(markedPointName);
 					}
@@ -528,7 +517,7 @@ Terminal.prototype.autocomplete = function(command){
 				helpString = "[Name]: Use NULL to generate a random name.";
 			break;
 			case commandDescriptor.AREA_NAME:
-				for (var areaName in areas){
+				for (var areaName in sceneHandler.getAreas()){
 					if (areaName.startsWith(curEntry)){
 						possibilities.push(areaName);
 					}
@@ -536,7 +525,7 @@ Terminal.prototype.autocomplete = function(command){
 				helpString = "[Area names]: ";
 			break;
 			case commandDescriptor.AREA_NAME_WITH_DEFAULT:
-				for (var areaName in areas){
+				for (var areaName in sceneHandler.getAreas()){
 					if (areaName.startsWith(curEntry)){
 						possibilities.push(areaName);
 					}
@@ -580,7 +569,7 @@ Terminal.prototype.autocomplete = function(command){
 				helpString = "[Fonts]: ";
 			break;
 			case commandDescriptor.TEXT_NAME:
-				for (var textName in addedTexts){
+				for (var textName in sceneHandler.getAddedTexts()){
 					if (textName.startsWith(curEntry)){
 						possibilities.push(textName);
 					}
@@ -596,7 +585,7 @@ Terminal.prototype.autocomplete = function(command){
 				helpString = "[Effects]: ";
 			break;
 			case commandDescriptor.FPS_WEAPON:
-				for (var objName in addedObjects){
+				for (var objName in sceneHandler.getAddedObjects()){
 					var obj = addedObjects[objName];
 					if (!obj.isFPSWeapon){
 						continue;
@@ -605,7 +594,7 @@ Terminal.prototype.autocomplete = function(command){
 						possibilities.push(objName);
 					}
 				}
-				for (var objName in objectGroups){
+				for (var objName in sceneHandler.getObjectGroups()){
 					var obj = objectGroups[objName];
 					if (!obj.isFPSWeapon){
 						continue;
@@ -617,7 +606,7 @@ Terminal.prototype.autocomplete = function(command){
 				helpString = "[FPS weapons]: ";
 			break;
 			case commandDescriptor.PRECONFIGURED_PS_NAME:
-				for (var psName in preConfiguredParticleSystems){
+				for (var psName in sceneHandler.getParticleSystems()){
 					if (psName.toLowerCase().startsWith(curEntry.toLowerCase())){
 						possibilities.push(psName);
 					}
@@ -625,7 +614,7 @@ Terminal.prototype.autocomplete = function(command){
 				helpString = "[Particle systems]: ";
 			break;
 			case commandDescriptor.PRECONFOGURED_PS_POOL_NAME:
-				for (var poolName in preConfiguredParticleSystemPools){
+				for (var poolName in sceneHandler.getParticleSystemPools()){
 					if (poolName.toLowerCase().startsWith(curEntry.toLowerCase())){
 						possibilities.push(poolName);
 					}
@@ -633,7 +622,7 @@ Terminal.prototype.autocomplete = function(command){
 				helpString = "[Particle system pools]: ";
 			break;
 			case commandDescriptor.MUZZLE_FLASH_NAME:
-				for (var muzzleFlashName in muzzleFlashes){
+				for (var muzzleFlashName in sceneHandler.getMuzzleFlashes()){
 					if (muzzleFlashName.toLowerCase().startsWith(curEntry.toLowerCase())){
 						possibilities.push(muzzleFlashName);
 					}
@@ -641,7 +630,7 @@ Terminal.prototype.autocomplete = function(command){
 				helpString = "[Muzzle flashes]: ";
 			break;
 			case commandDescriptor.CROSSHAIR_NAME:
-				for (var crosshairName in crosshairs){
+				for (var crosshairName in sceneHandler.getCrosshairs()){
 					if (crosshairName.toLowerCase().startsWith(curEntry.toLowerCase())){
 						possibilities.push(crosshairName);
 					}
@@ -649,17 +638,17 @@ Terminal.prototype.autocomplete = function(command){
 				helpString = "[Crosshairs]: ";
 			break;
 			case commandDescriptor.OBJECT_AND_TEXT_NAME:
-				for (var objName in addedObjects){
+				for (var objName in sceneHandler.getAddedObjects()){
 					if (objName.toLowerCase().startsWith(curEntry.toLowerCase())){
 						possibilities.push(objName);
 					}
 				}
-				for (var objName in objectGroups){
+				for (var objName in sceneHandler.getObjectGroups()){
 					if (objName.toLowerCase().startsWith(curEntry.toLowerCase())){
 						possibilities.push(objName);
 					}
 				}
-				for (var textName in addedTexts){
+				for (var textName in sceneHandler.getAddedTexts()){
 					if (textName.toLowerCase().startsWith(curEntry.toLowerCase())){
 						possibilities.push(textName);
 					}
@@ -673,9 +662,6 @@ Terminal.prototype.autocomplete = function(command){
 					}
 				}
 				helpString = "[Scenes]: ";
-			break;
-			default:
-				throw new Error("Not implemented.");
 			break;
 		}
 
