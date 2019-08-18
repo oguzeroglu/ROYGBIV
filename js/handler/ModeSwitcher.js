@@ -249,7 +249,7 @@ ModeSwitcher.prototype.switchFromPreviewToDesign = function(){
     scene.add(gridSelections[gridName].mesh);
     scene.add(gridSelections[gridName].dot);
   }
-  for (var textName in addedTexts){
+  for (var textName in sceneHandler.getAddedTexts()){
     var addedText = addedTexts[textName];
     for (var animationName in addedText.animations){
       animationHandler.forceFinish(addedText.animations[animationName]);

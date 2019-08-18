@@ -702,11 +702,11 @@ AddedText.prototype.debugTriangles = function(triangleIndex){
   sCenter.position.copy(this.getCenterCoordinates());
 }
 
-AddedText.prototype.hideOnDesignMode = function(){
+AddedText.prototype.hideVisually = function(){
   this.mesh.visible = false;
 }
 
-AddedText.prototype.showOnDesignMode = function(){
+AddedText.prototype.showVisually = function(){
   this.mesh.visible = true;
 }
 

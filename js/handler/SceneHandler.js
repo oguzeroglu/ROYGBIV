@@ -38,13 +38,13 @@ SceneHandler.prototype.hideAll = function(){
     var obj = objectGroups[objName];
     obj.hideVisually();
   }
+  for (var textName in addedTexts){
+    var text = addedTexts[textName];
+    text.hideVisually();
+  }
   if (mode == 0){
     for (var gsName in gridSystems){
       gridSystems[gsName].hide();
-    }
-    for (var textName in addedTexts){
-      var text = addedTexts[textName];
-      text.hideOnDesignMode();
     }
     for (var gridName in gridSelections){
       gridSelections[gridName].toggleSelect();
@@ -96,7 +96,7 @@ SceneHandler.prototype.changeScene = function(sceneName){
     }
     for (var textName in this.scenes[sceneName].addedTexts){
       var text = this.scenes[sceneName].addedTexts[textName];
-      text.showOnDesignMode();
+      text.showVisually();
     }
     if (markedPointsVisible){
       for (var markedPointName in this.scenes[sceneName].markedPoints){
@@ -121,6 +121,10 @@ SceneHandler.prototype.changeScene = function(sceneName){
     for (var objName in this.scenes[sceneName].objectGroups){
       var obj = this.scenes[sceneName].objectGroups[objName];
       obj.showVisually();
+    }
+    for (var textName in this.scenes[sceneName].addedTexts){
+      var text = this.scenes[sceneName].addedTexts[textName];
+      text.showVisually();
     }
     this.activeSceneName = sceneName;
     rayCaster.onReadyCallback = noop;
