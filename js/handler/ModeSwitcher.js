@@ -96,11 +96,11 @@ ModeSwitcher.prototype.switchFromDesignToPreview = function(){
   }
   scriptsToRun = new Map();
   scriptsHandler.onModeSwitch();
-  for (var markedPointName in markedPoints){
+  for (var markedPointName in sceneHandler.getMarkedPoints()){
     markedPoints[markedPointName].hide(true);
   }
   if (areasVisible){
-    for (var areaName in areas){
+    for (var areaName in sceneHandler.getAreas()){
       areas[areaName].hide();
     }
   }
@@ -278,7 +278,7 @@ ModeSwitcher.prototype.switchFromPreviewToDesign = function(){
     crosshairs[crosshairName].destroy();
   }
 
-  for (var markedPointName in markedPoints){
+  for (var markedPointName in sceneHandler.getMarkedPoints()){
     if (markedPoints[markedPointName].showAgainOnTheNextModeSwitch){
       markedPoints[markedPointName].show();
       markedPoints[markedPointName].showAgainOnTheNextModeSwitch = false;
@@ -286,7 +286,7 @@ ModeSwitcher.prototype.switchFromPreviewToDesign = function(){
   }
 
   if (areasVisible){
-    for (var areaName in areas){
+    for (var areaName in sceneHandler.getAreas()){
       areas[areaName].renderToScreen();
     }
   }
