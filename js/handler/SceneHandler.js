@@ -2,6 +2,20 @@ var SceneHandler = function(){
   this.activeSceneName = "scene1";
   this.scenes = new Object();
   this.scenes[this.activeSceneName] = new Scene("scene1");
+  this.entrySceneName = "scene1";
+}
+
+SceneHandler.prototype.onSwitchFromDesignToPreview = function(){
+  this.sceneNameBeforeSwitchToPreviewMode = this.getActiveSceneName();
+  this.changeScene(this.entrySceneName);
+}
+
+SceneHandler.prototype.onSwitchFromPreviewToDesign = function(){
+  for (var sceneName in this.scenes){
+    this.scenes[sceneName].resetAutoInstancedObjects();
+  }
+  this.changeScene(this.sceneNameBeforeSwitchToPreviewMode);
+  delete this.sceneNameBeforeSwitchToPreviewMode;
 }
 
 SceneHandler.prototype.onBeforeSave = function(){
@@ -63,6 +77,11 @@ SceneHandler.prototype.hideAll = function(){
       }
     }
     gridSelections = new Object();
+  }else{
+    for (var objName in autoInstancedObjects){
+      var obj = autoInstancedObjects[objName];
+      obj.hideVisually();
+    }
   }
 }
 
@@ -126,6 +145,10 @@ SceneHandler.prototype.changeScene = function(sceneName){
       var text = this.scenes[sceneName].addedTexts[textName];
       text.showVisually();
     }
+    for (var objName in this.scenes[sceneName].autoInstancedObjects){
+      var obj = this.scenes[sceneName].autoInstancedObjects[objName];
+      obj.showVisually();
+    }
     this.activeSceneName = sceneName;
     rayCaster.onReadyCallback = noop;
     raycasterFactory.refresh();
@@ -138,6 +161,10 @@ SceneHandler.prototype.changeScene = function(sceneName){
 
 SceneHandler.prototype.createScene = function(sceneName){
   this.scenes[sceneName] = new Scene(sceneName);
+}
+
+SceneHandler.prototype.onAutoInstancedObjectCreation = function(autoInstancedObject){
+  this.scenes[autoInstancedObject.getRegisteredSceneName()].registerAutoInstancedObject(autoInstancedObject);
 }
 
 SceneHandler.prototype.onCrosshairCreation = function(crosshair){

@@ -5,6 +5,14 @@ var AutoInstancedObject = function(name, objects){
   this.pseudoObjectGroup = new ObjectGroup(null, objects);
 }
 
+AutoInstancedObject.prototype.hideVisually = function(){
+  this.mesh.visible = false;
+}
+
+AutoInstancedObject.prototype.showVisually = function(){
+  this.mesh.visible = true;
+}
+
 AutoInstancedObject.prototype.useCustomShaderPrecision = function(precision){
   shaderPrecisionHandler.setCustomPrecisionForObject(this, precision);
 }
@@ -231,4 +239,10 @@ AutoInstancedObject.prototype.removeFog = function(){
   delete this.mesh.material.uniforms.worldMatrix;
   delete this.mesh.material.uniforms.cameraPosition;
   this.mesh.material.needsUpdate = true;
+}
+
+AutoInstancedObject.prototype.getRegisteredSceneName = function(){
+  for (var objName in this.objects){
+    return this.objects[objName].registeredSceneName;
+  }
 }

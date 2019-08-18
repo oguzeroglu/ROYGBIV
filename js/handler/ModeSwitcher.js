@@ -190,6 +190,7 @@ ModeSwitcher.prototype.switchFromDesignToPreview = function(){
       }
     }
   }
+  sceneHandler.onSwitchFromDesignToPreview();
   this.commonSwitchFunctions();
   handleViewport();
   for (var txtName in addedTexts){
@@ -374,6 +375,7 @@ ModeSwitcher.prototype.switchFromPreviewToDesign = function(){
 
   clickableAddedTexts = new Object();
   clickableAddedTexts2D = new Object();
+  sceneHandler.onSwitchFromPreviewToDesign();
   this.commonSwitchFunctions();
   for (var txtName in addedTexts){
     var text = addedTexts[txtName];

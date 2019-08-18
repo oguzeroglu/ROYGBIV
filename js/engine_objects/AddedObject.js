@@ -403,6 +403,9 @@ AddedObject.prototype.hideVisually = function(){
 }
 
 AddedObject.prototype.showVisually = function(){
+  if (this.autoInstancedParent){
+    return;
+  }
   this.mesh.visible = true;
 }
 

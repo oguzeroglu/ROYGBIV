@@ -11,6 +11,7 @@ var Scene = function(name){
   this.particleSystemPools = new Object();
   this.muzzleFlashes = new Object();
   this.crosshairs = new Object();
+  this.autoInstancedObjects = new Object();
   this.areaBinHandler = new WorldBinHandler(true);
   this.areaBinHandler.isAreaBinHandler = true;
   this.isSkyboxMapped = false;
@@ -113,6 +114,14 @@ Scene.prototype.refreshAreaBinHandler = function(){
   for (var areaName in this.areas){
     this.areaBinHandler.insert(areas[areaName].boundingBox, areaName);
   }
+}
+
+Scene.prototype.resetAutoInstancedObjects = function(){
+  this.autoInstancedObjects = new Object();
+}
+
+Scene.prototype.registerAutoInstancedObject = function(autoInstancedObject){
+  this.autoInstancedObjects[autoInstancedObject.name] = autoInstancedObject;
 }
 
 Scene.prototype.registerCrosshair = function(crosshair){
