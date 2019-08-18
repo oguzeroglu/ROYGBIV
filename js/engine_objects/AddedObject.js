@@ -398,11 +398,11 @@ AddedObject.prototype.show = function(){
   }
 }
 
-AddedObject.prototype.hideOnDesignMode = function(){
+AddedObject.prototype.hideVisually = function(){
   this.mesh.visible = false;
 }
 
-AddedObject.prototype.showOnDesignMode = function(){
+AddedObject.prototype.showVisually = function(){
   this.mesh.visible = true;
 }
 

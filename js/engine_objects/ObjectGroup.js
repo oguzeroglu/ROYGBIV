@@ -357,11 +357,11 @@ ObjectGroup.prototype.show = function(){
   }
 }
 
-ObjectGroup.prototype.hideOnDesignMode = function(){
+ObjectGroup.prototype.hideVisually = function(){
   this.mesh.visible = false;
 }
 
-ObjectGroup.prototype.showOnDesignMode = function(){
+ObjectGroup.prototype.showVisually = function(){
   this.mesh.visible = true;
 }
 

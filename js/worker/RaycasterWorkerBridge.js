@@ -278,7 +278,7 @@ RaycasterWorkerBridge.prototype.onReady = function(){
 }
 
 RaycasterWorkerBridge.prototype.flush = function(){
-  if (!this.hasOwnership){
+  if (!this.hasOwnership || !this.ready){
     return;
   }
   var flushStartTime;
@@ -443,6 +443,9 @@ RaycasterWorkerBridge.prototype.issueUpdate = function(obj){
 }
 
 RaycasterWorkerBridge.prototype.updateObject = function(obj){
+  if (!this.ready){
+    return;
+  }
   if (mode == 1 && (obj.isAddedObject || obj.isObjectGroup) && !obj.isIntersectable){
     return;
   }

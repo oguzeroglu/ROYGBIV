@@ -30,17 +30,17 @@ SceneHandler.prototype.export = function(){
 
 SceneHandler.prototype.hideAll = function(){
   skyboxHandler.unmap();
+  for (var objName in addedObjects){
+    var obj = addedObjects[objName];
+    obj.hideVisually();
+  }
+  for (var objName in objectGroups){
+    var obj = objectGroups[objName];
+    obj.hideVisually();
+  }
   if (mode == 0){
     for (var gsName in gridSystems){
       gridSystems[gsName].hide();
-    }
-    for (var objName in addedObjects){
-      var obj = addedObjects[objName];
-      obj.hideOnDesignMode();
-    }
-    for (var objName in objectGroups){
-      var obj = objectGroups[objName];
-      obj.hideOnDesignMode();
     }
     for (var textName in addedTexts){
       var text = addedTexts[textName];
@@ -67,8 +67,8 @@ SceneHandler.prototype.hideAll = function(){
 }
 
 SceneHandler.prototype.changeScene = function(sceneName){
+  this.hideAll();
   if (mode == 0){
-    this.hideAll();
     this.scenes[this.getActiveSceneName()].savePostProcessing();
     this.scenes[sceneName].loadPostProcessing();
     croppedGridSystemBuffer = 0;
@@ -88,11 +88,11 @@ SceneHandler.prototype.changeScene = function(sceneName){
     }
     for (var objName in this.scenes[sceneName].addedObjects){
       var obj = this.scenes[sceneName].addedObjects[objName];
-      obj.showOnDesignMode();
+      obj.showVisually();
     }
     for (var objName in this.scenes[sceneName].objectGroups){
       var obj = this.scenes[sceneName].objectGroups[objName];
-      obj.showOnDesignMode();
+      obj.showVisually();
     }
     for (var textName in this.scenes[sceneName].addedTexts){
       var text = this.scenes[sceneName].addedTexts[textName];
@@ -111,9 +111,22 @@ SceneHandler.prototype.changeScene = function(sceneName){
         this.scenes[sceneName].areas[areaName].renderToScreen();
       }
     }
+    this.activeSceneName = sceneName;
+    areaConfigurationsHandler.onAfterSceneChange();
+  }else{
+    for (var objName in this.scenes[sceneName].addedObjects){
+      var obj = this.scenes[sceneName].addedObjects[objName];
+      obj.showVisually();
+    }
+    for (var objName in this.scenes[sceneName].objectGroups){
+      var obj = this.scenes[sceneName].objectGroups[objName];
+      obj.showVisually();
+    }
+    this.activeSceneName = sceneName;
+    rayCaster.onReadyCallback = noop;
+    raycasterFactory.refresh();
+    physicsFactory.refresh();
   }
-  this.activeSceneName = sceneName;
-  areaConfigurationsHandler.onAfterSceneChange();
   if (mode == 0){
     $("#cliDivheader").text("ROYGBIV 3D Engine - CLI (Design mode - "+sceneHandler.getActiveSceneName()+")");
   }

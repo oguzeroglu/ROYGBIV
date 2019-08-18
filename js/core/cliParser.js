@@ -4698,7 +4698,7 @@ function refreshRaycaster(messageOnFinished, noClear){
       }
     }
   }
-  rayCaster.refresh();
+  raycasterFactory.refresh();
 }
 
 function isNameUsedAsSoftCopyParentName(name){
