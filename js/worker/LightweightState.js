@@ -61,6 +61,9 @@ var LightweightState = function(){
   this.particleSystems = new Object();
   for (var psName in particleSystemPool){
     var ps = particleSystemPool[psName];
+    if (ps.registeredSceneName != sceneHandler.getActiveSceneName()){
+      continue;
+    }
     if (ps.shouldSendToWorker()){
       this.particleSystems[psName] = ps.creationConfigurations;
       var particles = new Object();

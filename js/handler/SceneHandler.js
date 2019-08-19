@@ -82,6 +82,10 @@ SceneHandler.prototype.hideAll = function(){
       var obj = autoInstancedObjects[objName];
       obj.hideVisually();
     }
+    for (var psName in particleSystemPool){
+      var ps = particleSystemPool[psName];
+      ps.hide();
+    }
   }
 }
 
