@@ -46,14 +46,29 @@ SceneHandler.prototype.hideAll = function(){
   skyboxHandler.unmap();
   for (var objName in addedObjects){
     var obj = addedObjects[objName];
+    if (mode == 1){
+      for (var animName in obj.animations){
+        animationHandler.forceFinish(obj.animations[animName]);
+      }
+    }
     obj.hideVisually();
   }
   for (var objName in objectGroups){
     var obj = objectGroups[objName];
+    if (mode == 1){
+      for (var animName in obj.animations){
+        animationHandler.forceFinish(obj.animations[animName]);
+      }
+    }
     obj.hideVisually();
   }
   for (var textName in addedTexts){
     var text = addedTexts[textName];
+    if (mode == 1){
+      for (var animName in text.animations){
+        animationHandler.forceFinish(text.animations[animName]);
+      }
+    }
     text.hideVisually();
   }
   if (mode == 0){
