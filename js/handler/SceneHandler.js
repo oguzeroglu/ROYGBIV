@@ -137,6 +137,9 @@ SceneHandler.prototype.changeScene = function(sceneName){
     this.activeSceneName = sceneName;
     areaConfigurationsHandler.onAfterSceneChange();
   }else{
+    activeControl.onDeactivated();
+    activeControl = new FreeControls({});
+    activeControl.onActivated();
     for (var objName in this.scenes[sceneName].addedObjects){
       var obj = this.scenes[sceneName].addedObjects[objName];
       obj.showVisually();
