@@ -169,6 +169,7 @@ SceneHandler.prototype.changeScene = function(sceneName){
     activeControl.onDeactivated();
     activeControl = new FreeControls({});
     activeControl.onActivated();
+    crosshairHandler.hideCrosshair();
     for (var objName in this.scenes[sceneName].addedObjects){
       var obj = this.scenes[sceneName].addedObjects[objName];
       obj.showVisually();
