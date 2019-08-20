@@ -209,8 +209,8 @@ function dynamicObjectUpdateFunction(object, objectName){
 }
 
 function updateDynamicObjects(){
-  dynamicObjects.forEach(dynamicObjectUpdateFunction);
-  dynamicObjectGroups.forEach(dynamicObjectUpdateFunction);
+  sceneHandler.getDynamicObjects().forEach(dynamicObjectUpdateFunction);
+  sceneHandler.getDynamicObjectGroups().forEach(dynamicObjectUpdateFunction);
 }
 
 function setTHREEQuaternionFromCANNON(mesh, physicsBody, axis, type, gridSystemAxis){

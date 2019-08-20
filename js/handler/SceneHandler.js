@@ -22,6 +22,14 @@ SceneHandler.prototype.onBeforeSave = function(){
   this.scenes[this.getActiveSceneName()].savePostProcessing();
 }
 
+SceneHandler.prototype.onDynamicObjectAddition = function(obj){
+  this.scenes[obj.registeredSceneName].registerDynamicObject(obj);
+}
+
+SceneHandler.prototype.onDynamicObjectDeletion = function(obj) {
+  this.scenes[obj.registeredSceneName].unregisterDynamicObject(obj);
+}
+
 SceneHandler.prototype.import = function(exportObj){
   this.scenes = new Object();
   for (var sceneName in exportObj.scenes){
@@ -47,6 +55,9 @@ SceneHandler.prototype.hideAll = function(){
   for (var objName in addedObjects){
     var obj = addedObjects[objName];
     if (mode == 1){
+      if (objectTrails[obj.name]){
+        objectTrails[obj.name].stop();
+      }
       for (var animName in obj.animations){
         animationHandler.forceFinish(obj.animations[animName]);
       }
@@ -56,6 +67,9 @@ SceneHandler.prototype.hideAll = function(){
   for (var objName in objectGroups){
     var obj = objectGroups[objName];
     if (mode == 1){
+      if (objectTrails[obj.name]){
+        objectTrails[obj.name].stop();
+      }
       for (var animName in obj.animations){
         animationHandler.forceFinish(obj.animations[animName]);
       }
@@ -364,4 +378,12 @@ SceneHandler.prototype.getParticleSystemPools = function(){
 
 SceneHandler.prototype.getCrosshairs = function(){
   return this.scenes[this.activeSceneName].crosshairs;
+}
+
+SceneHandler.prototype.getDynamicObjects = function(){
+  return this.scenes[this.activeSceneName].dynamicObjects;
+}
+
+SceneHandler.prototype.getDynamicObjectGroups = function(){
+  return this.scenes[this.activeSceneName].dynamicObjectGroups;
 }

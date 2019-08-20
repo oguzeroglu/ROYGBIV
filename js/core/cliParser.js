@@ -1738,6 +1738,7 @@ function parse(input){
             addedObject.setMass(mass);
             if (mode == 1 && mass > 0){
               dynamicObjects.set(addedObject.name, addedObject);
+              sceneHandler.onDynamicObjectAddition(addedObject);
             }
             if (selectionHandler.getSelectedObject() &&
                   selectionHandler.getSelectedObject().isAddedObject &&
@@ -1761,6 +1762,7 @@ function parse(input){
             grouppedObject.setMass(mass);
             if (mode == 1 && mass > 0){
               dynamicObjectGroups.set(grouppedObject.name, grouppedObject);
+              sceneHandler.onDynamicObjectAddition(grouppedObject);
             }
             if (selectionHandler.getSelectedObject() &&
                   selectionHandler.getSelectedObject().isObjectGroup &&

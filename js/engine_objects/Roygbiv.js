@@ -709,14 +709,18 @@ Roygbiv.prototype.setMass = function(object, mass){
   if (object.isAddedObject){
     if (mass > 0){
       dynamicObjects.set(object.name,  object);
+      sceneHandler.onDynamicObjectAddition(object);
     }else{
       dynamicObjects.delete(object.name);
+      sceneHandler.onDynamicObjectDeletion(object);
     }
   }else if (object.isObjectGroup){
     if (mass > 0){
       dynamicObjectGroups.set(object.name, object);
+      sceneHandler.onDynamicObjectAddition(object);
     }else{
       dynamicObjectGroups.delete(object.name);
+      sceneHandler.onDynamicObjectDeletion(object);
     }
   }
 }

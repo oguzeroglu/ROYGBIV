@@ -13,6 +13,8 @@ var Scene = function(name){
   this.crosshairs = new Object();
   this.autoInstancedObjects = new Object();
   this.areaBinHandler = new WorldBinHandler(true);
+  this.dynamicObjects = new Map();
+  this.dynamicObjectGroups = new Map();
   this.areaBinHandler.isAreaBinHandler = true;
   this.isSkyboxMapped = false;
 }
@@ -118,6 +120,22 @@ Scene.prototype.refreshAreaBinHandler = function(){
 
 Scene.prototype.resetAutoInstancedObjects = function(){
   this.autoInstancedObjects = new Object();
+}
+
+Scene.prototype.registerDynamicObject = function(obj){
+  if (obj.isAddedObject){
+    this.dynamicObjects.set(obj.name, obj);
+  }else{
+    this.dynamicObjectGroups.set(obj.name, obj);
+  }
+}
+
+Scene.prototype.unregisterDynamicObject = function(obj){
+  if (obj.isAddedObject){
+    this.dynamicObjects.delete(obj.name);
+  }else{
+    this.dynamicObjectGroups.delete(obj.name);
+  }
 }
 
 Scene.prototype.registerAutoInstancedObject = function(autoInstancedObject){

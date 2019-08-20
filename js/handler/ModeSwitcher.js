@@ -136,6 +136,7 @@ ModeSwitcher.prototype.switchFromDesignToPreview = function(){
     object.saveState();
     if (object.isDynamicObject && !object.noMass){
       dynamicObjectGroups.set(objectName, object);
+      sceneHandler.onDynamicObjectAddition(object);
     }
     if (object.initOpacitySet){
       object.updateOpacity(object.initOpacity);
@@ -154,6 +155,7 @@ ModeSwitcher.prototype.switchFromDesignToPreview = function(){
     }
     if (object.isDynamicObject && !object.noMass){
       dynamicObjects.set(objectName, object);
+      sceneHandler.onDynamicObjectAddition(object);
     }
     object.saveState();
     if (object.initOpacitySet){
@@ -321,6 +323,7 @@ ModeSwitcher.prototype.switchFromPreviewToDesign = function(){
       object.setMass(object.originalMass);
       if (object.originalMass == 0){
         dynamicObjectGroups.delete(object.name);
+        sceneHandler.onDynamicObjectDeletion(object);
       }
       delete object.originalMass;
     }
@@ -366,6 +369,7 @@ ModeSwitcher.prototype.switchFromPreviewToDesign = function(){
       object.setMass(object.originalMass);
       if (object.originalMass == 0){
         dynamicObjects.delete(object.name);
+        sceneHandler.onDynamicObjectDeletion(object);
       }
       delete object.originalMass;
     }
