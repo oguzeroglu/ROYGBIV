@@ -166,7 +166,7 @@ SceneHandler.prototype.changeScene = function(sceneName){
     this.activeSceneName = sceneName;
     areaConfigurationsHandler.onAfterSceneChange();
   }else{
-    activeControl.onDeactivated();
+    activeControl.onDeactivated(true);
     activeControl = new FreeControls({});
     activeControl.onActivated();
     crosshairHandler.hideCrosshair();

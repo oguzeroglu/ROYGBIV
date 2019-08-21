@@ -127,10 +127,13 @@ MuzzleFlash.prototype.hide = function(){
 
 MuzzleFlash.prototype.onShow = function(){
   this.isShown = true;
+  activeMuzzleFlashes.set(this.name, this);
 }
 
 MuzzleFlash.prototype.onWeaponDeactivated = function(){
   this.isActivated = false;
+  this.hide();
+  activeMuzzleFlashes.delete(this.name);
 }
 
 MuzzleFlash.prototype.onWeaponActivated = function(weaponObj){
@@ -138,7 +141,6 @@ MuzzleFlash.prototype.onWeaponActivated = function(weaponObj){
   this.attachToFPSWeapon(weaponObj, weaponObj.muzzleFlashParameters.childObj, weaponObj.muzzleFlashParameters.endpoint);
   this.setScale(weaponObj.muzzleFlashParameters.scale);
   this.setRotation(weaponObj.muzzleFlashParameters.rotationX, weaponObj.muzzleFlashParameters.rotationY, weaponObj.muzzleFlashParameters.rotationZ);
-  activeMuzzleFlashes.set(this.name, this);
   this.isActivated = true;
 }
 
@@ -171,6 +173,7 @@ MuzzleFlash.prototype.update = function(){
     }
     if (mode == 1){
       this.isShown = false;
+      activeMuzzleFlashes.delete(this.name);
     }
   }
 }
