@@ -200,8 +200,10 @@ ModeSwitcher.prototype.switchFromDesignToPreview = function(){
     if (addedTexts[txtName].isClickable){
       if (!addedTexts[txtName].is2D){
         clickableAddedTexts[txtName] = addedTexts[txtName];
+        sceneHandler.onClickableAddedTextAddition(addedTexts[txtName]);
       }else{
         clickableAddedTexts2D[txtName] = addedTexts[txtName];
+        sceneHandler.onClickableAddedText2DAddition(addedTexts[txtName]);
       }
     }
   }

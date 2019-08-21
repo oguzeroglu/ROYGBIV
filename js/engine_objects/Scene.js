@@ -15,8 +15,15 @@ var Scene = function(name){
   this.areaBinHandler = new WorldBinHandler(true);
   this.dynamicObjects = new Map();
   this.dynamicObjectGroups = new Map();
+  this.clickableAddedTexts = new Object();
+  this.clickableAddedTexts2D = new Object();
   this.areaBinHandler.isAreaBinHandler = true;
   this.isSkyboxMapped = false;
+}
+
+Scene.prototype.resetClickableTexts = function(){
+  this.clickableAddedTexts = new Object();
+  this.clickableAddedTexts2D = new Object();
 }
 
 Scene.prototype.loadPostProcessing = function(){
@@ -120,6 +127,14 @@ Scene.prototype.refreshAreaBinHandler = function(){
 
 Scene.prototype.resetAutoInstancedObjects = function(){
   this.autoInstancedObjects = new Object();
+}
+
+Scene.prototype.registerClickableText = function(addedText){
+  this.clickableAddedTexts[addedText.name] = addedText;
+}
+
+Scene.prototype.registerClickableText2D = function(addedText){
+  this.clickableAddedTexts2D[addedText.name] = addedText;
 }
 
 Scene.prototype.registerDynamicObject = function(obj){

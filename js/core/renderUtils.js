@@ -85,7 +85,7 @@ function updateAddedTexts(){
       }
     }
   }else{
-    for (var addedTextName in clickableAddedTexts){
+    for (var addedTextName in sceneHandler.getClickableAddedTexts()){
       var addedText = addedTexts[addedTextName];
       if (addedText.needsUpdate() && !addedText.is2D){
         addedText.handleBoundingBox();

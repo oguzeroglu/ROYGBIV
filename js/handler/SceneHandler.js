@@ -13,6 +13,7 @@ SceneHandler.prototype.onSwitchFromDesignToPreview = function(){
 SceneHandler.prototype.onSwitchFromPreviewToDesign = function(){
   for (var sceneName in this.scenes){
     this.scenes[sceneName].resetAutoInstancedObjects();
+    this.scenes[sceneName].resetClickableTexts();
   }
   this.changeScene(this.sceneNameBeforeSwitchToPreviewMode);
   delete this.sceneNameBeforeSwitchToPreviewMode;
@@ -20,6 +21,14 @@ SceneHandler.prototype.onSwitchFromPreviewToDesign = function(){
 
 SceneHandler.prototype.onBeforeSave = function(){
   this.scenes[this.getActiveSceneName()].savePostProcessing();
+}
+
+SceneHandler.prototype.onClickableAddedTextAddition = function(addedText){
+  this.scenes[addedText.registeredSceneName].registerClickableText(addedText);
+}
+
+SceneHandler.prototype.onClickableAddedText2DAddition = function(addedText){
+  this.scenes[addedText.registeredSceneName].registerClickableText2D(addedText);
 }
 
 SceneHandler.prototype.onDynamicObjectAddition = function(obj){
@@ -387,4 +396,12 @@ SceneHandler.prototype.getDynamicObjects = function(){
 
 SceneHandler.prototype.getDynamicObjectGroups = function(){
   return this.scenes[this.activeSceneName].dynamicObjectGroups;
+}
+
+SceneHandler.prototype.getClickableAddedTexts = function(){
+  return this.scenes[this.activeSceneName].clickableAddedTexts;
+}
+
+SceneHandler.prototype.getClickableAddedTexts2D = function(){
+  return this.scenes[this.activeSceneName].clickableAddedTexts2D;
 }
