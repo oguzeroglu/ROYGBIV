@@ -189,7 +189,8 @@ var CommandDescriptor = function(){
       0, //scripts
       1, //animations
       1, //newScene
-      1 //switchScene
+      1, //switchScene
+      0 //printScenes
   ];
 
   this.commandArgumentsExpectedExplanation = [
@@ -381,7 +382,8 @@ var CommandDescriptor = function(){
     "scripts",
     "animations objectName",
     "newScene sceneName",
-    "switchScene sceneName"
+    "switchScene sceneName",
+    "printScenes"
   ];
 
   this.commands = [
@@ -573,7 +575,8 @@ var CommandDescriptor = function(){
     "scripts",
     "animations",
     "newScene",
-    "switchScene"
+    "switchScene",
+    "printScenes"
   ];
 
   this.commandInfo = [
@@ -765,7 +768,8 @@ var CommandDescriptor = function(){
     "scripts: Opens the script handler GUI.",
     "animations: Opens the Animation editor GUI for an object or a text.",
     "newScene: Creates a new scene.",
-    "switchScene: Switches the active scene."
+    "switchScene: Switches the active scene.",
+    "printScenes: Prints created scenes."
   ];
 
   this.keyboardInfo = [
@@ -923,7 +927,7 @@ var CommandDescriptor = function(){
   this.destroyGridSystem.types = [];
   this.destroyGridSystem.types.push(this.GRID_SYSTEM_NAME); //name
 
-  // selectAllGrids --> DEPRECATED
+  // selectAllGrids 
   this.selectAllGrids = new Object();
   this.selectAllGrids.types = [];
   this.selectAllGrids.types.push(this.GRID_SYSTEM_NAME); //name

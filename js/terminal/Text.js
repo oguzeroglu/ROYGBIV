@@ -292,6 +292,7 @@ var Text = function(){
   this.TEXTURE_PACKS = "Texture packs";
   this.INCLUDED_SCRIPTS = "Included scripts";
   this.CROSSHAIRS = "Crosshairs";
+  this.SCENES = "Scenes";
   this.NO_TEXTURE_PACK_FOUND = "No texture pack found.";
   this.COMMAND_EXECUTED_FOR_X_TEXTURES = "Command executed for @@1 textures.";
   this.COMMAND_EXECUTED_FOR_X_TEXTURE_PACKS = "Command executed for @@1 texture packs.";

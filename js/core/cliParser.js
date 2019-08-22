@@ -4564,6 +4564,20 @@ function parse(input){
           refreshRaycaster(Text.SCENE_SWITCHED);
           return true;
         break;
+        case 189: //printScenes
+          var count = 0;
+          var length = Object.keys(sceneHandler.scenes).length;
+          terminal.printHeader(Text.SCENES);
+          for (var sceneName in sceneHandler.scenes){
+            count ++;
+            var options = true;
+            if (count == length){
+              options = false;
+            }
+            terminal.printInfo(Text.TREE.replace(Text.PARAM1, sceneName), options);
+          }
+          return true;
+        break;
       }
       return true;
     }catch(err){
