@@ -1,4 +1,8 @@
 var SceneHandler = function(){
+  this.reset();
+}
+
+SceneHandler.prototype.reset = function(){
   this.activeSceneName = "scene1";
   this.scenes = new Object();
   this.scenes[this.activeSceneName] = new Scene("scene1");

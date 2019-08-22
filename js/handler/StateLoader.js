@@ -259,4 +259,5 @@ StateLoader.prototype.resetProject = function(){
   physicsShapeCache = new Object();
   shaderPrecisionHandler.reset();
   previewSceneRendered = false;
+  sceneHandler.reset();
 }
