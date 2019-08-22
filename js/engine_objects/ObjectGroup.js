@@ -285,6 +285,7 @@ ObjectGroup.prototype.handleRotation = function(axis, radians){
 ObjectGroup.prototype.untrackObjectPosition = function(){
   delete this.trackedObject;
   delete trackingObjects[this.name];
+  sceneHandler.onTrackingObjectDeletion(this);
 }
 
 ObjectGroup.prototype.trackObjectPosition = function(targetObject){
@@ -294,6 +295,7 @@ ObjectGroup.prototype.trackObjectPosition = function(targetObject){
   targetObject.oldPX = targetObject.physicsBody.position.x;
   targetObject.oldPY = targetObject.physicsBody.position.y;
   targetObject.oldPZ = targetObject.physicsBody.position.z;
+  sceneHandler.onTrackingObjectAddition(this);
 }
 
 ObjectGroup.prototype.setPosition = function(x, y, z){

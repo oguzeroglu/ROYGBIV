@@ -17,8 +17,13 @@ var Scene = function(name){
   this.dynamicObjectGroups = new Map();
   this.clickableAddedTexts = new Object();
   this.clickableAddedTexts2D = new Object();
+  this.trackingObjects = new Object();
   this.areaBinHandler.isAreaBinHandler = true;
   this.isSkyboxMapped = false;
+}
+
+Scene.prototype.resetTrackingObjects = function(){
+  this.trackingObjects = new Object();
 }
 
 Scene.prototype.resetClickableTexts = function(){
@@ -127,6 +132,14 @@ Scene.prototype.refreshAreaBinHandler = function(){
 
 Scene.prototype.resetAutoInstancedObjects = function(){
   this.autoInstancedObjects = new Object();
+}
+
+Scene.prototype.registerTrackingObject = function(obj){
+  this.trackingObjects[obj.name] = obj;
+}
+
+Scene.prototype.unregisterTrackingObject = function(obj){
+  delete this.trackingObjects[obj.name];
 }
 
 Scene.prototype.registerClickableText = function(addedText){

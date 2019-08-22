@@ -1395,6 +1395,7 @@ AddedObject.prototype.getPositionAtAxis = function(axis){
 AddedObject.prototype.untrackObjectPosition = function(){
   delete this.trackedObject;
   delete trackingObjects[this.name];
+  sceneHandler.onTrackingObjectDeletion(this);
 }
 
 AddedObject.prototype.trackObjectPosition = function(targetObject){
@@ -1404,6 +1405,7 @@ AddedObject.prototype.trackObjectPosition = function(targetObject){
   targetObject.oldPX = targetObject.physicsBody.position.x;
   targetObject.oldPY = targetObject.physicsBody.position.y;
   targetObject.oldPZ = targetObject.physicsBody.position.z;
+  sceneHandler.onTrackingObjectAddition(this);
 }
 
 AddedObject.prototype.setPosition = function(x, y, z){

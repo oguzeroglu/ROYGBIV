@@ -14,6 +14,7 @@ SceneHandler.prototype.onSwitchFromPreviewToDesign = function(){
   for (var sceneName in this.scenes){
     this.scenes[sceneName].resetAutoInstancedObjects();
     this.scenes[sceneName].resetClickableTexts();
+    this.scenes[sceneName].resetTrackingObjects();
   }
   this.changeScene(this.sceneNameBeforeSwitchToPreviewMode);
   delete this.sceneNameBeforeSwitchToPreviewMode;
@@ -21,6 +22,14 @@ SceneHandler.prototype.onSwitchFromPreviewToDesign = function(){
 
 SceneHandler.prototype.onBeforeSave = function(){
   this.scenes[this.getActiveSceneName()].savePostProcessing();
+}
+
+SceneHandler.prototype.onTrackingObjectAddition = function(obj){
+  this.scenes[obj.registeredSceneName].registerTrackingObject(obj);
+}
+
+SceneHandler.prototype.onTrackingObjectDeletion = function(obj){
+  this.scenes[obj.registeredSceneName].unregisterTrackingObject(obj);
 }
 
 SceneHandler.prototype.onClickableAddedTextAddition = function(addedText){
@@ -404,4 +413,8 @@ SceneHandler.prototype.getClickableAddedTexts = function(){
 
 SceneHandler.prototype.getClickableAddedTexts2D = function(){
   return this.scenes[this.activeSceneName].clickableAddedTexts2D;
+}
+
+SceneHandler.prototype.getTrackingObjects = function(){
+  return this.scenes[this.activeSceneName].trackingObjects;
 }

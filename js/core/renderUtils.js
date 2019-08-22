@@ -148,7 +148,7 @@ function runScripts(){
 }
 
 function updateTrackingObjects(){
-  for (var objName in trackingObjects){
+  for (var objName in sceneHandler.getTrackingObjects()){
     var obj = addedObjects[objName];
     var isObjectGroup = false;
     if (!obj){
