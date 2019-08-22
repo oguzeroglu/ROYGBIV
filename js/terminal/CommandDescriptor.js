@@ -190,7 +190,8 @@ var CommandDescriptor = function(){
       1, //animations
       1, //newScene
       1, //switchScene
-      0 //printScenes
+      0, //printScenes
+      1 //setEntryScene
   ];
 
   this.commandArgumentsExpectedExplanation = [
@@ -383,7 +384,8 @@ var CommandDescriptor = function(){
     "animations objectName",
     "newScene sceneName",
     "switchScene sceneName",
-    "printScenes"
+    "printScenes",
+    "setEntryScene sceneName"
   ];
 
   this.commands = [
@@ -576,7 +578,8 @@ var CommandDescriptor = function(){
     "animations",
     "newScene",
     "switchScene",
-    "printScenes"
+    "printScenes",
+    "setEntryScene"
   ];
 
   this.commandInfo = [
@@ -769,7 +772,8 @@ var CommandDescriptor = function(){
     "animations: Opens the Animation editor GUI for an object or a text.",
     "newScene: Creates a new scene.",
     "switchScene: Switches the active scene.",
-    "printScenes: Prints created scenes."
+    "printScenes: Prints created scenes.",
+    "setEntryScene: Sets the entry scene."
   ];
 
   this.keyboardInfo = [
@@ -927,7 +931,7 @@ var CommandDescriptor = function(){
   this.destroyGridSystem.types = [];
   this.destroyGridSystem.types.push(this.GRID_SYSTEM_NAME); //name
 
-  // selectAllGrids 
+  // selectAllGrids
   this.selectAllGrids = new Object();
   this.selectAllGrids.types = [];
   this.selectAllGrids.types.push(this.GRID_SYSTEM_NAME); //name
@@ -1402,6 +1406,11 @@ var CommandDescriptor = function(){
   this.switchScene = new Object();
   this.switchScene.types = [];
   this.switchScene.types.push(this.SCENE_NAME); //sceneName
+
+  // setEntryScene
+  this.setEntryScene = new Object();
+  this.setEntryScene.types = [];
+  this.setEntryScene.types.push(this.SCENE_NAME); //sceneName
 
 };
 

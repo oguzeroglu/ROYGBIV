@@ -58,6 +58,7 @@ SceneHandler.prototype.import = function(exportObj){
     this.scenes[sceneName] = new Scene(sceneName);
     this.scenes[sceneName].import(exportObj.scenes[sceneName]);
   }
+  this.entrySceneName = exportObj.entrySceneName;
   sceneHandler.hideAll();
   sceneHandler.changeScene(exportObj.activeSceneName);
 }
@@ -69,6 +70,7 @@ SceneHandler.prototype.export = function(){
     exportObj.scenes[sceneName] = this.scenes[sceneName].export();
   }
   exportObj.activeSceneName = this.activeSceneName;
+  exportObj.entrySceneName = this.entrySceneName;
   return exportObj;
 }
 

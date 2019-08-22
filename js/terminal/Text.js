@@ -190,6 +190,7 @@ var Text = function(){
   this.CANNOT_MAP_TEXTURE_TO_A_GLUED_OBJECT = "Cannot map texture to a glued object.";
   this.GLUED_OBJECTS_DO_NOT_SUPPORT_THIS_FUNCTION = "Glued objects do not support this function.";
   this.NO_TEXTURE_MAPPED_TO_OBJECT = "No texture mapped to object.";
+  this.ENTRY_SCENE_SET = "Entry scene is @@1.";
   this.REPEAT_AMOUNT_MODIFIED = "Repeat amount modified.";
   this.WORKS_ONLY_IN_PREVIEW_MODE = "This command works only in preview mode.";
   this.DURATION_MUST_BE_A_NUMBER = "Duration must be a number.";

@@ -4578,6 +4578,20 @@ function parse(input){
           }
           return true;
         break;
+        case 190: //setEntryScene
+          if (mode != 0){
+            terminal.printError(Text.WORKS_ONLY_IN_DESIGN_MODE);
+            return true;
+          }
+          var sceneName = splitted[1];
+          if (!sceneHandler.scenes[sceneName]){
+            terminal.printError(Text.NO_SUCH_SCENE);
+            return true;
+          }
+          sceneHandler.entrySceneName = sceneName;
+          terminal.printInfo(Text.ENTRY_SCENE_SET.replace(Text.PARAM1, sceneName));
+          return true;
+        break;
       }
       return true;
     }catch(err){
