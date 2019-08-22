@@ -139,6 +139,15 @@ function parse(input){
           if (!gridSystems[name]){
             terminal.printError(Text.NO_SUCH_GRID_SYSTEM);
           }else{
+            for (var wcName in wallCollections){
+              var gsNames = wallCollections[wcName].gridSystemNames;
+              for (var i = 0; i<gsNames.length; i++){
+                if (gsNames[i] == name){
+                  terminal.printError(Text.GS_ATTACHED_TO_A_WC);
+                  return true;
+                }
+              }
+            }
             sceneHandler.onGridSystemDeletion(gridSystems[name]);
             gridSystems[name].destroy();
             if (!jobHandlerWorking){

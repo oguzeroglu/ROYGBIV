@@ -907,6 +907,7 @@ var CommandDescriptor = function(){
   this.CROSSHAIR_NAME             =   33;
   this.OBJECT_AND_TEXT_NAME       =   34;
   this.SCENE_NAME                 =   35;
+  this.GS_NAME_NO_WC              =   36;
 
   // newGridSystem
   this.newGridSystem = new Object();
@@ -929,7 +930,7 @@ var CommandDescriptor = function(){
   // destroyGridSystem
   this.destroyGridSystem = new Object();
   this.destroyGridSystem.types = [];
-  this.destroyGridSystem.types.push(this.GRID_SYSTEM_NAME); //name
+  this.destroyGridSystem.types.push(this.GS_NAME_NO_WC); //name
 
   // selectAllGrids
   this.selectAllGrids = new Object();

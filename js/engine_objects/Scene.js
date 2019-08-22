@@ -22,6 +22,30 @@ var Scene = function(name){
   this.isSkyboxMapped = false;
 }
 
+Scene.prototype.destroy = function(){
+  for (var objName in this.addedObjects){
+    parseCommand("destroyObject "+objName);
+  }
+  for (var objName in this.objectGroups){
+    parseCommand("destroyObject "+objName);
+  }
+  for (var textName in this.addedTexts){
+    parseCommand("destroyText "+textName);
+  }
+  for (var gsName in this.gridSystems){
+    parseCommand("destroyGridSystem "+gsName);
+  }
+  for (var wcName in this.wallCollections){
+    parseCommand("destroyWallCollection "+wcName);
+  }
+  for (var mpName in this.markedPoints){
+    parseCommand("unmark "+mpName);
+  }
+  for (var areaName in this.areas){
+    parseCommand("destroyArea "+areaName);
+  }
+}
+
 Scene.prototype.resetTrackingObjects = function(){
   this.trackingObjects = new Object();
 }
@@ -286,7 +310,7 @@ Scene.prototype.unregisterWallCollection = function(wallCollection){
   for (var i = 0; i<wallCollection.gridSystemNames.length; i++){
     this.unregisterGridSystem(gridSystems[wallCollection.gridSystemNames[i]]);
   }
-  delete this.wallCollection[wallCollection.name];
+  delete this.wallCollections[wallCollection.name];
   delete wallCollection.registeredSceneName;
 }
 

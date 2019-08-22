@@ -108,6 +108,7 @@ var Text = function(){
   this.NO_OBJECT_ADDED_TO_THE_SCENE = "No objects added to scene.";
   this.OBJECTS = "Objects";
   this.FONTS = "Fonts";
+  this.GS_ATTACHED_TO_A_WC = "Gridsystem attached to a wall collection. Use destroyWallCollection command instead.";
   this.NO_SUCH_OBJECT = "No such object.";
   this.NO_SUCH_OBJECT_GROUP = "No such object group.";
   this.NO_SUCH_CHILD_OBJECT_IN_THE_GROUP = "No such child object in the group.";

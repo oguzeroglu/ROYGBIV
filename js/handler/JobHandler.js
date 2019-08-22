@@ -871,10 +871,19 @@ JobHandler.prototype.handleDestroyGridSystemCommand = function(){
   var ctr = 0;
   for (var gridSystemName in sceneHandler.getGridSystems()){
     if (gridSystemName.startsWith(gridSystemPrefix)){
-      parseCommand(
-        "destroyGridSystem "+gridSystemName
-      )
-      ctr ++;
+      var found = false;
+      for (var wcName in wallCollections){
+        var gsNames = wallCollections[wcName].gridSystemNames;
+        for (var i = 0; i<gsNames.length; i++){
+          if (gsNames[i] == gridSystemName){
+            found = true;
+          }
+        }
+      }
+      if (!found){
+        parseCommand("destroyGridSystem "+gridSystemName);
+        ctr ++;
+      }
     }
   }
 

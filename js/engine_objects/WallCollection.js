@@ -147,87 +147,25 @@ var WallCollection = function(name, height, outlineColor, grid1, grid2, isLoaded
   height = Math.abs(height);
 
   if (grid1.axis == "XZ"){
-    new GridSystem(
-      gridSystem1Name, height, this.sizeZ,
-      gridSystem1CenterCoordinates[0], gridSystem1CenterCoordinates[1],
-      gridSystem1CenterCoordinates[2], outlineColor, grid1.size, "YZ"
-    );
-    new GridSystem(
-      gridSystem2Name, height, this.sizeZ,
-      gridSystem2CenterCoordinates[0], gridSystem2CenterCoordinates[1],
-      gridSystem2CenterCoordinates[2], outlineColor, grid1.size, "YZ"
-    );
-    new GridSystem(
-      gridSystem3Name, this.sizeX, height,
-      gridSystem3CenterCoordinates[0], gridSystem3CenterCoordinates[1],
-      gridSystem3CenterCoordinates[2], outlineColor, grid1.size, "XY"
-    );
-    new GridSystem(
-      gridSystem4Name, this.sizeX, height,
-      gridSystem4CenterCoordinates[0], gridSystem4CenterCoordinates[1],
-      gridSystem4CenterCoordinates[2], outlineColor, grid1.size, "XY"
-    );
-    new GridSystem(
-      gridSystemRoofName, this.sizeX, this.sizeZ,
-      gridSystemRoofCenterCoordinates[0], gridSystemRoofCenterCoordinates[1],
-      gridSystemRoofCenterCoordinates[2], outlineColor, grid1.size, "XZ"
-    );
+    new GridSystem(gridSystem1Name, height, this.sizeZ, gridSystem1CenterCoordinates[0], gridSystem1CenterCoordinates[1], gridSystem1CenterCoordinates[2], outlineColor, grid1.size, "YZ");
+    new GridSystem(gridSystem2Name, height, this.sizeZ, gridSystem2CenterCoordinates[0], gridSystem2CenterCoordinates[1], gridSystem2CenterCoordinates[2], outlineColor, grid1.size, "YZ");
+    new GridSystem(gridSystem3Name, this.sizeX, height, gridSystem3CenterCoordinates[0], gridSystem3CenterCoordinates[1], gridSystem3CenterCoordinates[2], outlineColor, grid1.size, "XY");
+    new GridSystem(gridSystem4Name, this.sizeX, height, gridSystem4CenterCoordinates[0], gridSystem4CenterCoordinates[1], gridSystem4CenterCoordinates[2], outlineColor, grid1.size, "XY");
+    new GridSystem(gridSystemRoofName, this.sizeX, this.sizeZ, gridSystemRoofCenterCoordinates[0], gridSystemRoofCenterCoordinates[1], gridSystemRoofCenterCoordinates[2], outlineColor, grid1.size, "XZ");
   }else if (grid1.axis == "XY"){
-    new GridSystem(
-      gridSystem1Name, this.sizeX, height,
-      gridSystem1CenterCoordinates[0], gridSystem1CenterCoordinates[1],
-      gridSystem1CenterCoordinates[2], outlineColor, grid1.size, "XZ"
-    );
-    new GridSystem(
-      gridSystem2Name, this.sizeX, height,
-      gridSystem2CenterCoordinates[0], gridSystem2CenterCoordinates[1],
-      gridSystem2CenterCoordinates[2], outlineColor, grid1.size, "XZ"
-    );
-    new GridSystem(
-      gridSystem3Name, this.sizeY, height,
-      gridSystem3CenterCoordinates[0], gridSystem3CenterCoordinates[1],
-      gridSystem3CenterCoordinates[2], outlineColor, grid1.size, "YZ"
-    );
-    new GridSystem(
-      gridSystem4Name, this.sizeY, height,
-      gridSystem4CenterCoordinates[0], gridSystem4CenterCoordinates[1],
-      gridSystem4CenterCoordinates[2], outlineColor, grid1.size, "YZ"
-    );
-    new GridSystem(
-      gridSystemRoofName, this.sizeX, this.sizeY,
-      gridSystemRoofCenterCoordinates[0], gridSystemRoofCenterCoordinates[1],
-      gridSystemRoofCenterCoordinates[2], outlineColor, grid1.size, "XY"
-    );
-  } else if (grid1.axis == "YZ"){
-    new GridSystem(
-      gridSystem1Name, height, this.sizeZ,
-      gridSystem1CenterCoordinates[0], gridSystem1CenterCoordinates[1],
-      gridSystem1CenterCoordinates[2], outlineColor, grid1.size, "XZ"
-    );
-    new GridSystem(
-      gridSystem2Name, height, this.sizeZ,
-      gridSystem2CenterCoordinates[0], gridSystem2CenterCoordinates[1],
-      gridSystem2CenterCoordinates[2], outlineColor, grid1.size, "XZ"
-    );
-    new GridSystem(
-      gridSystem3Name, height, this.sizeY,
-      gridSystem3CenterCoordinates[0], gridSystem3CenterCoordinates[1],
-      gridSystem3CenterCoordinates[2], outlineColor, grid1.size, "XY"
-    );
-    new GridSystem(
-      gridSystem4Name, height, this.sizeY,
-      gridSystem4CenterCoordinates[0], gridSystem4CenterCoordinates[1],
-      gridSystem4CenterCoordinates[2], outlineColor, grid1.size, "XY"
-    );
-    new GridSystem(
-      gridSystemRoofName, this.sizeY, this.sizeZ,
-      gridSystemRoofCenterCoordinates[0], gridSystemRoofCenterCoordinates[1],
-      gridSystemRoofCenterCoordinates[2], outlineColor, grid1.size, "YZ"
-    );
+    new GridSystem(gridSystem1Name, this.sizeX, height, gridSystem1CenterCoordinates[0], gridSystem1CenterCoordinates[1], gridSystem1CenterCoordinates[2], outlineColor, grid1.size, "XZ");
+    new GridSystem(gridSystem2Name, this.sizeX, height, gridSystem2CenterCoordinates[0], gridSystem2CenterCoordinates[1], gridSystem2CenterCoordinates[2], outlineColor, grid1.size, "XZ");
+    new GridSystem(gridSystem3Name, this.sizeY, height, gridSystem3CenterCoordinates[0], gridSystem3CenterCoordinates[1], gridSystem3CenterCoordinates[2], outlineColor, grid1.size, "YZ");
+    new GridSystem(gridSystem4Name, this.sizeY, height, gridSystem4CenterCoordinates[0], gridSystem4CenterCoordinates[1], gridSystem4CenterCoordinates[2], outlineColor, grid1.size, "YZ");
+    new GridSystem(gridSystemRoofName, this.sizeX, this.sizeY, gridSystemRoofCenterCoordinates[0], gridSystemRoofCenterCoordinates[1], gridSystemRoofCenterCoordinates[2], outlineColor, grid1.size, "XY");
+  }else if (grid1.axis == "YZ"){
+    new GridSystem(gridSystem1Name, height, this.sizeZ, gridSystem1CenterCoordinates[0], gridSystem1CenterCoordinates[1], gridSystem1CenterCoordinates[2], outlineColor, grid1.size, "XZ");
+    new GridSystem(gridSystem2Name, height, this.sizeZ, gridSystem2CenterCoordinates[0], gridSystem2CenterCoordinates[1], gridSystem2CenterCoordinates[2], outlineColor, grid1.size, "XZ");
+    new GridSystem(gridSystem3Name, height, this.sizeY, gridSystem3CenterCoordinates[0], gridSystem3CenterCoordinates[1], gridSystem3CenterCoordinates[2], outlineColor, grid1.size, "XY");
+    new GridSystem(gridSystem4Name, height, this.sizeY, gridSystem4CenterCoordinates[0], gridSystem4CenterCoordinates[1], gridSystem4CenterCoordinates[2], outlineColor, grid1.size, "XY");
+    new GridSystem(gridSystemRoofName, this.sizeY, this.sizeZ, gridSystemRoofCenterCoordinates[0], gridSystemRoofCenterCoordinates[1], gridSystemRoofCenterCoordinates[2], outlineColor, grid1.size, "YZ");
   }
-
   wallCollections[this.name] = this;
-
 };
 
 WallCollection.prototype.createPreloadedWallCollection = function(exportObj){
