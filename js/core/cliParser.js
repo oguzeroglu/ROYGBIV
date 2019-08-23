@@ -2143,10 +2143,6 @@ function parse(input){
             terminal.printError(Text.NO_SUCH_POINT);
             return true;
           }
-          if (markedPoint.registeredSceneName != sceneHandler.getActiveSceneName()){
-            terminal.printError(Text.MARKED_POINT_NOT_IN_SCENE);
-            return true;
-          }
           sceneHandler.onMarkedPointDeletion(markedPoint);
           markedPoint.destroy();
           delete markedPoints[name];

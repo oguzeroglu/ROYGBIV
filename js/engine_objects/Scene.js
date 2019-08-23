@@ -1,5 +1,9 @@
 var Scene = function(name){
   this.name = name;
+  this.reset();
+}
+
+Scene.prototype.reset = function(){
   this.addedObjects = new Object();
   this.objectGroups = new Object();
   this.addedTexts = new Object();
@@ -44,6 +48,19 @@ Scene.prototype.destroy = function(){
   for (var areaName in this.areas){
     parseCommand("destroyArea "+areaName);
   }
+  for (var psPoolName in this.particleSystemPools){
+    parseCommand("destroyParticleSystemPool "+psPoolName);
+  }
+  for (var muzzleFlashName in this.muzzleFlashes){
+    parseCommand("destroyMuzzleFlash "+muzzleFlashName);
+  }
+  for (var psName in this.particleSystems){
+    parseCommand("destroyParticleSystem "+psName);
+  }
+  for (var chName in this.crosshairs){
+    parseCommand("destroyCrosshair "+chName);
+  }
+  this.reset();
 }
 
 Scene.prototype.resetTrackingObjects = function(){

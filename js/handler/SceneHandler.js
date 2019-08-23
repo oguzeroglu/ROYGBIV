@@ -2,6 +2,11 @@ var SceneHandler = function(){
   this.reset();
 }
 
+SceneHandler.prototype.destroyScene = function(sceneName){
+  this.scenes[sceneName].destroy();
+  delete this.scenes[sceneName];
+}
+
 SceneHandler.prototype.reset = function(){
   this.activeSceneName = "scene1";
   this.scenes = new Object();
