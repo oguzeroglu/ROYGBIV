@@ -4603,6 +4603,10 @@ function parse(input){
             return true;
           }
           var sceneName = splitted[1];
+          if (!(sceneName.indexOf("*") == -1)){
+            new JobHandler(splitted).handle();
+            return true;
+          }
           if (!sceneHandler.scenes[sceneName]){
             terminal.printError(Text.NO_SUCH_SCENE);
             return true;
@@ -4616,7 +4620,9 @@ function parse(input){
             return true;
           }
           sceneHandler.destroyScene(sceneName);
-          terminal.printInfo(Text.SCENE_DESTROYED);
+          if (!jobHandlerWorking){
+            terminal.printInfo(Text.SCENE_DESTROYED);
+          }
           return true;
         break;
       }
