@@ -191,7 +191,8 @@ var CommandDescriptor = function(){
       1, //newScene
       1, //switchScene
       0, //printScenes
-      1 //setEntryScene
+      1, //setEntryScene
+      1 //destroyScene
   ];
 
   this.commandArgumentsExpectedExplanation = [
@@ -385,7 +386,8 @@ var CommandDescriptor = function(){
     "newScene sceneName",
     "switchScene sceneName",
     "printScenes",
-    "setEntryScene sceneName"
+    "setEntryScene sceneName",
+    "destroyScene sceneName"
   ];
 
   this.commands = [
@@ -579,7 +581,8 @@ var CommandDescriptor = function(){
     "newScene",
     "switchScene",
     "printScenes",
-    "setEntryScene"
+    "setEntryScene",
+    "destroyScene"
   ];
 
   this.commandInfo = [
@@ -773,7 +776,8 @@ var CommandDescriptor = function(){
     "newScene: Creates a new scene.",
     "switchScene: Switches the active scene.",
     "printScenes: Prints created scenes.",
-    "setEntryScene: Sets the entry scene."
+    "setEntryScene: Sets the entry scene.",
+    "destroyScene: Destroys a scene."
   ];
 
   this.keyboardInfo = [
@@ -1412,6 +1416,11 @@ var CommandDescriptor = function(){
   this.setEntryScene = new Object();
   this.setEntryScene.types = [];
   this.setEntryScene.types.push(this.SCENE_NAME); //sceneName
+
+  // destroyScene
+  this.destroyScene = new Object();
+  this.destroyScene.types = [];
+  this.destroyScene.types.push(this.SCENE_NAME); //sceneName
 
 };
 

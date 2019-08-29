@@ -4597,6 +4597,28 @@ function parse(input){
           terminal.printInfo(Text.ENTRY_SCENE_SET.replace(Text.PARAM1, sceneName));
           return true;
         break;
+        case 191: //destroyScene
+          if (mode != 0){
+            terminal.printError(Tetx.WORKS_ONLY_IN_DESIGN_MODE);
+            return true;
+          }
+          var sceneName = splitted[1];
+          if (!sceneHandler.scenes[sceneName]){
+            terminal.printError(Text.NO_SUCH_SCENE);
+            return true;
+          }
+          if (sceneHandler.getActiveSceneName() == sceneName){
+            terminal.printError(Text.SCENE_IS_ACTIVE_CANNOT_DELETE);
+            return true;
+          }
+          if (sceneHandler.entrySceneName == sceneName){
+            terminal.printError(Text.CANNOT_DELETE_ENTRY_SCENE);
+            return true;
+          }
+          sceneHandler.destroyScene(sceneName);
+          terminal.printInfo(Text.SCENE_DESTROYED);
+          return true;
+        break;
       }
       return true;
     }catch(err){
