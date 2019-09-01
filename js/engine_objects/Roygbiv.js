@@ -249,6 +249,7 @@ Roygbiv.prototype.getPosition = function(object, targetVector, axis){
   preConditions.checkIfAxisOnlyIfDefined(ROYGBIV.getPosition, preConditions.axis, axis);
   preConditions.checkIfVectorOnlyIfDefined(ROYGBIV.getPosition, preConditions.targetVector, targetVector);
   preConditions.checkIfAddedObjectObjectGroupParticleSystem(ROYGBIV.getPosition, preConditions.object, object);
+  preConditions.checkIfObjectInsideActiveScene(ROYGBIV.getPosition, object);
   if (object.isAddedObject){
     if (axis){
       if (object.parentObjectName){
@@ -363,6 +364,7 @@ Roygbiv.prototype.getOpacity = function(object){
   }
   preConditions.checkIfDefined(ROYGBIV.getOpacity, preConditions.object, object);
   preConditions.checkIfAddedObjectOrObjectGroup(ROYGBIV.getOpacity, preConditions.object, object);
+  preConditions.checkIfObjectInsideActiveScene(ROYGBIV.getOpacity, object);
   if (object.isAddedObject){
     return object.mesh.material.uniforms.alpha.value;
   }
@@ -377,8 +379,9 @@ Roygbiv.prototype.getMarkedPosition = function(markedPointName, targetVector){
   preConditions.checkIfDefined(ROYGBIV.getMarkedPosition, preConditions.markedPointName, markedPointName);
   preConditions.checkIfDefined(ROYGBIV.getMarkedPosition, preConditions.targetVector, targetVector);
   preConditions.checkIfVectorOnlyIfDefined(ROYGBIV.getMarkedPosition, preConditions.targetVector, targetVector);
-  var markedPoint = sceneHandler.getMarkedPoints()[markedPointName];
+  var markedPoint = markedPoints[markedPointName];
   preConditions.checkIfMarkedPointExists(ROYGBIV.getMarkedPosition, null, markedPoint);
+  preConditions.checkIfMarkedPointInsideActiveScene(ROYGBIV.getMarkedPosition, markedPoint);
   targetVector.x = markedPoint.x;
   targetVector.y = markedPoint.y;
   targetVector.z = markedPoint.z;
@@ -398,6 +401,7 @@ Roygbiv.prototype.getParticleSystemVelocityAtTime = function(particleSystem, tim
   preConditions.checkIfNumber(ROYGBIV.getParticleSystemVelocityAtTime, preConditions.time, time);
   preConditions.checkIfDefined(ROYGBIV.getParticleSystemVelocityAtTime, preConditions.targetVector, targetVector);
   preConditions.checkIfVectorOnlyIfDefined(ROYGBIV.getParticleSystemVelocityAtTime, preConditions.targetVector, targetVector);
+  preConditions.checkIfParticleSystemInsideActiveScene(ROYGBIV.getParticleSystemVelocityAtTime, particleSystem);
   return particleSystem.getVelocityAtTime(time, targetVector);
 }
 
@@ -436,6 +440,7 @@ Roygbiv.prototype.getParticleSystemPool = function(name){
   preConditions.checkIfDefined(ROYGBIV.getParticleSystemPool, preConditions.name, name);
   var psPool = particleSystemPools[name];
   preConditions.checkIfParticleSystemPoolExists(ROYGBIV.getParticleSystemPool, null, psPool);
+  preConditions.checkIfParticleSystemPoolInsideActiveScene(ROYGBIV.getParticleSystemPool, psPool);
   return psPool;
 }
 
@@ -449,6 +454,7 @@ Roygbiv.prototype.getParticleSystemFromPool = function(pool){
   preConditions.checkIfDefined(ROYGBIV.getParticleSystemFromPool, preConditions.pool, pool);
   preConditions.checkIfParticleSystemPool(ROYGBIV.getParticleSystemFromPool, preConditions.pool, pool);
   preConditions.checkIfPoolDestroyed(ROYGBIV.getParticleSystemFromPool, null, pool);
+  preConditions.checkIfParticleSystemPoolInsideActiveScene(ROYGBIV.getParticleSystemPool, pool);
   return pool.get();
 }
 
@@ -465,6 +471,7 @@ Roygbiv.prototype.getEndPoint = function(object, axis, targetVector){
   preConditions.checkIfDefined(ROYGBIV.getEndPoint, preConditions.axis, axis);
   preConditions.checkIfDefined(ROYGBIV.getEndPoint, preConditions.targetVector, targetVector);
   preConditions.checkIfVectorOnlyIfDefined(ROYGBIV.getEndPoint, preConditions.targetVector, targetVector);
+  preConditions.checkIfObjectInsideActiveScene(ROYGBIV.getEndPoint, object);
   axis = axis.toLowerCase();
   preConditions.checkIfEndPointAxis(ROYGBIV.getEndPoint, preConditions.axis, axis);
   var endPoint = object.getEndPoint(axis);
@@ -490,6 +497,7 @@ Roygbiv.prototype.getText = function(textName){
   }
   preConditions.checkIfDefined(ROYGBIV.getText, preConditions.textName, textName);
   var text = addedTexts[textName];
+  preConditions.checkIfTextInsideActiveScene(ROYGBIV.getText, text);
   if (text){
     return text;
   }

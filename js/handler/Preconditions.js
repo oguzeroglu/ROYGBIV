@@ -227,6 +227,36 @@ Preconditions.prototype.throw = function(callerFunc, errorMsg){
   throw new Error(this.errorHeader(callerFunc)+" ["+errorMsg+"]");
 }
 
+Preconditions.prototype.checkIfTextInsideActiveScene = function(callerFunc, text){
+  if (text.registeredSceneName != sceneHandler.getActiveSceneName()){
+    this.throw(callerFunc, "Text not inside the active scene.");
+  }
+}
+
+Preconditions.prototype.checkIfParticleSystemPoolInsideActiveScene = function(callerFunc, psPool){
+  if (psPool.registeredSceneName != sceneHandler.getActiveSceneName()){
+    this.throw(callerFunc, "Particlesystem pool not inside the active scene.");
+  }
+}
+
+Preconditions.prototype.checkIfParticleSystemInsideActiveScene = function(callerFunc, ps){
+  if (ps.registeredSceneName != sceneHandler.getActiveSceneName()){
+    this.throw(callerFunc, "Particlesystem not inside the active scene.");
+  }
+}
+
+Preconditions.prototype.checkIfMarkedPointInsideActiveScene = function(callerFunc, mp){
+  if (mp.registeredSceneName != sceneHandler.getActiveSceneName()){
+    this.throw(callerFunc, "Marked point not inside the active scene.");
+  }
+}
+
+Preconditions.prototype.checkIfObjectInsideActiveScene = function(callerFunc, obj){
+  if (obj.registeredSceneName != sceneHandler.getActiveSceneName()){
+    this.throw(callerFunc, "Object not inside active scene.");
+  }
+}
+
 Preconditions.prototype.checkIfAnimationExists = function(callerFunc, obj, animationName){
   if (!obj.animations[animationName]){
     this.throw(callerFunc, "Object does not have such animation: "+animationName);
