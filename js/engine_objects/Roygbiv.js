@@ -2285,6 +2285,7 @@ Roygbiv.prototype.startAnimation = function(object, animationName){
   preConditions.checkIfAddedObjectObjectGroupAddedText(ROYGBIV.startAnimation, preConditions.object, object);
   preConditions.checkIfDefined(ROYGBIV.startAnimation, preConditions.animationName, animationName);
   preConditions.checkIfAnimationExists(ROYGBIV.startAnimation, object, animationName);
+  preConditions.checkIfObjectInsideActiveScene(ROYGBIV.startAnimation, object);
   var animation = object.animations[animationName];
   animationHandler.forceFinish(animation);
   animationHandler.startAnimation(animation);
@@ -2299,6 +2300,7 @@ Roygbiv.prototype.stopAnimation = function(object, animationName){
   preConditions.checkIfAddedObjectObjectGroupAddedText(ROYGBIV.stopAnimation, preConditions.object, object);
   preConditions.checkIfDefined(ROYGBIV.stopAnimation, preConditions.animationName, animationName);
   preConditions.checkIfAnimationExists(ROYGBIV.stopAnimation, object, animationName);
+  preConditions.checkIfObjectInsideActiveScene(ROYGBIV.stopAnimation, object);
   var animation = object.animations[animationName];
   animationHandler.forceFinish(animation);
 }
