@@ -1215,6 +1215,7 @@ Roygbiv.prototype.setCollisionListener = function(sourceObject, callbackFunction
   if ((sourceObject.isAddedObject) || (sourceObject.isObjectGroup)){
     preConditions.checkIfTrue(ROYGBIV.setCollisionListener, "Cannot set collision listener for more than "+MAX_OBJECT_COLLISION_LISTENER_COUNT+" objects.", (TOTAL_OBJECT_COLLISION_LISTENER_COUNT >= MAX_OBJECT_COLLISION_LISTENER_COUNT));
     preConditions.checkIfTrue(ROYGBIV.setCollisionListener, "Object used as FPS player body, cannot listen for collisions.", sourceObject.usedAsFPSPlayerBody);
+    preConditions.checkIfObjectInsideActiveScene(ROYGBIV.setCollisionListener, sourceObject);
     preConditions.checkIfNoMass(ROYGBIV.setCollisionListener, preConditions.sourceObject, sourceObject);
     if (!collisionCallbackRequests.has(sourceObject.name)){
       TOTAL_OBJECT_COLLISION_LISTENER_COUNT ++;
@@ -1225,6 +1226,7 @@ Roygbiv.prototype.setCollisionListener = function(sourceObject, callbackFunction
     preConditions.checkIfTrue(ROYGBIV.setCollisionListener, "A position is set manually to the particle system. Cannot listen for collisions.", (sourceObject.hasManualPositionSet));
     preConditions.checkIfTrue(ROYGBIV.setCollisionListener, "A rotation is set manually to the particle system. Cannot listen for collisions.", (sourceObject.hasManualRotationSet));
     preConditions.checkIfTrue(ROYGBIV.setCollisionListener, "A quaternion is set manually to the particle system. Cannot listen for collisions.", (sourceObject.hasManualQuaternionSet));
+    preConditions.checkIfParticleSystemInsideActiveScene(ROYGBIV.setCollisionListener, sourceObject);
     var incrCounter = false;
     if (!particleSystemCollisionCallbackRequests[sourceObject.name]){
       incrCounter = true;
@@ -1245,8 +1247,10 @@ Roygbiv.prototype.removeCollisionListener = function(sourceObject){
   preConditions.checkIfAddedObjectObjectGroupParticleSystemParticle(ROYGBIV.removeCollisionListener, preConditions.sourceObject, sourceObject);
   var curCallbackRequest;
   if ((sourceObject.isAddedObject) || (sourceObject.isObjectGroup)){
+    preConditions.checkIfObjectInsideActiveScene(ROYGBIV.removeCollisionListener, sourceObject);
     curCallbackRequest = collisionCallbackRequests.get(sourceObject.name);
   }else if (sourceObject.isParticleSystem){
+    preConditions.checkIfParticleSystemInsideActiveScene(ROYGBIV.removeCollisionListener, sourceObject);
     curCallbackRequest = particleSystemCollisionCallbackRequests[sourceObject.name];
   }
   if (curCallbackRequest){
@@ -1272,6 +1276,7 @@ Roygbiv.prototype.setExpireListener = function(sourceObject, callbackFunction){
   preConditions.checkIfDefined(ROYGBIV.setExpireListener, preConditions.callbackFunction, callbackFunction);
   preConditions.checkIfFunctionOnlyIfExists(ROYGBIV.setExpireListener, preConditions.callbackFunction, callbackFunction);
   preConditions.checkIfTrue(ROYGBIV.setExpireListener, "sourceObject is already expired.", (sourceObject.destroyed));
+  preConditions.checkIfParticleSystemInsideActiveScene(ROYGBIV.setExpireListener, sourceObject);
   sourceObject.expirationFunction = callbackFunction;
 }
 
@@ -1283,6 +1288,7 @@ Roygbiv.prototype.removeExpireListener = function(sourceObject){
   preConditions.checkIfDefined(ROYGBIV.removeExpireListener, preConditions.sourceObject, sourceObject);
   preConditions.checkIfParticleSystem(ROYGBIV.removeExpireListener, preConditions.sourceObject, sourceObject);
   preConditions.checkIfTrue(ROYGBIV.removeExpireListener, "sourceObject is already expired", (sourceObject.destroyed));
+  preConditions.checkIfParticleSystemInsideActiveScene(ROYGBIV.removeExpireListener, sourceObject);
   delete sourceObject.expirationFunction;
 }
 
@@ -1297,6 +1303,7 @@ Roygbiv.prototype.setObjectClickListener = function(sourceObject, callbackFuncti
   preConditions.checkIfAddedObjectOrObjectGroup(ROYGBIV.setObjectClickListener, preConditions.sourceObject, sourceObject);
   preConditions.checkIfTrue(ROYGBIV.setObjectClickListener, "sourceObject marked as unintersectable, cannot be clicked on.", (!sourceObject.isIntersectable));
   preConditions.checkIfFunctionOnlyIfExists(ROYGBIV.setObjectClickListener, preConditions.callbackFunction, callbackFunction);
+  preConditions.checkIfObjectInsideActiveScene(ROYGBIV.setObjectClickListener, sourceObject);
   sourceObject.clickCallbackFunction = callbackFunction;
   objectsWithOnClickListeners.set(sourceObject.name, sourceObject);
 }
@@ -1309,6 +1316,7 @@ Roygbiv.prototype.removeObjectClickListener = function(sourceObject){
   preConditions.checkIfDefined(ROYGBIV.removeObjectClickListener, preConditions.sourceObject, sourceObject);
   preConditions.checkIfAddedObjectOrObjectGroup(ROYGBIV.removeObjectClickListener, preConditions.sourceObject, sourceObject);
   preConditions.checkIfTrue(ROYGBIV.removeObjectClickListener, "sourceObject is marked as unintersectable.", (!sourceObject.isIntersectable));
+  preConditions.checkIfObjectInsideActiveScene(ROYGBIV.removeObjectClickListener, sourceObject);
   delete sourceObject.clickCallbackFunction;
   objectsWithOnClickListeners.delete(sourceObject.name);
 }
@@ -1418,6 +1426,7 @@ Roygbiv.prototype.setParticleSystemPoolConsumedListener = function(psPool, callb
   preConditions.checkIfParticleSystemPool(ROYGBIV.setParticleSystemPoolConsumedListener, preConditions.psPool, psPool);
   preConditions.checkIfDefined(ROYGBIV.setParticleSystemPoolConsumedListener, preConditions.callbackFunction, callbackFunction);
   preConditions.checkIfFunctionOnlyIfExists(ROYGBIV.setParticleSystemPoolConsumedListener, preConditions.callbackFunction, callbackFunction);
+  preConditions.checkIfParticleSystemPoolInsideActiveScene(ROYGBIV.setParticleSystemPoolConsumedListener, psPool);
   psPool.consumedCallback = callbackFunction;
 }
 
@@ -1428,6 +1437,7 @@ Roygbiv.prototype.removeParticleSystemPoolConsumedListener = function(psPool){
   }
   preConditions.checkIfDefined(ROYGBIV.removeParticleSystemPoolConsumedListener, preConditions.psPool, psPool);
   preConditions.checkIfParticleSystemPool(ROYGBIV.removeParticleSystemPoolConsumedListener, preConditions.psPool, psPool);
+  preConditions.checkIfParticleSystemPoolInsideActiveScene(ROYGBIV.removeParticleSystemPoolConsumedListener, psPool);
   psPool.consumedCallback = noop;
 }
 
@@ -1441,6 +1451,7 @@ Roygbiv.prototype.setParticleSystemPoolAvailableListener = function(psPool, call
   preConditions.checkIfParticleSystemPool(ROYGBIV.setParticleSystemPoolAvailableListener, preConditions.psPool, psPool);
   preConditions.checkIfDefined(ROYGBIV.setParticleSystemPoolAvailableListener, preConditions.callbackFunction, callbackFunction);
   preConditions.checkIfFunctionOnlyIfExists(ROYGBIV.setParticleSystemPoolAvailableListener, preConditions.callbackFunction, callbackFunction);
+  preConditions.checkIfParticleSystemPoolInsideActiveScene(ROYGBIV.setParticleSystemPoolAvailableListener, psPool);
   psPool.availableCallback = callbackFunction;
 }
 
@@ -1451,6 +1462,7 @@ Roygbiv.prototype.removeParticleSystemPoolAvailableListener = function(psPool){
   }
   preConditions.checkIfDefined(ROYGBIV.removeParticleSystemPoolAvailableListener, preConditions.psPool, psPool);
   preConditions.checkIfParticleSystemPool(ROYGBIV.removeParticleSystemPoolAvailableListener, preConditions.psPool, psPool);
+  preConditions.checkIfParticleSystemPoolInsideActiveScene(ROYGBIV.removeParticleSystemPoolAvailableListener, psPool);
   psPool.availableCallback = noop;
 }
 
@@ -1601,6 +1613,7 @@ Roygbiv.prototype.onTextClick = function(text, callbackFunction){
   preConditions.checkIfTextClickable(ROYGBIV.onTextClick, preConditions.text, text);
   preConditions.checkIfDefined(ROYGBIV.onTextClick, preConditions.callbackFunction, callbackFunction);
   preConditions.checkIfFunctionOnlyIfExists(ROYGBIV.onTextClick, preConditions.callbackFunction, callbackFunction);
+  preConditions.checkIfTextInsideActiveScene(ROYGBIV.onTextClick, text);
   text.clickCallbackFunction = callbackFunction;
   objectsWithOnClickListeners.set(text.name, text);
 }
@@ -1612,6 +1625,7 @@ Roygbiv.prototype.removeTextClickListener = function(text){
   }
   preConditions.checkIfDefined(ROYGBIV.removeTextClickListener, preConditions.text, text);
   preConditions.checkIfAddedText(ROYGBIV.removeTextClickListener, preConditions.text, text);
+  preConditions.checkIfTextInsideActiveScene(ROYGBIV.removeTextClickListener, text);
   text.clickCallbackFunction = noop;
   objectsWithOnClickListeners.delete(text.name);
 }
@@ -1665,6 +1679,7 @@ Roygbiv.prototype.setObjectMouseOverListener = function(sourceObject, callbackFu
   preConditions.checkIfAddedObjectOrObjectGroup(ROYGBIV.setObjectMouseOverListener, preConditions.sourceObject, sourceObject);
   preConditions.checkIfTrue(ROYGBIV.setObjectMouseOverListener, "sourceObject marked as unintersectable, cannot be selected.", (!sourceObject.isIntersectable));
   preConditions.checkIfFunctionOnlyIfExists(ROYGBIV.setObjectMouseOverListener, preConditions.callbackFunction, callbackFunction);
+  preConditions.checkIfObjectInsideActiveScene(ROYGBIV.setObjectMouseOverListener, sourceObject);
   sourceObject.mouseOverCallbackFunction = callbackFunction;
   objectsWithMouseOverListeners.set(sourceObject.name, sourceObject);
 }
@@ -1677,6 +1692,7 @@ Roygbiv.prototype.removeObjectMouseOverListener = function(sourceObject){
   preConditions.checkIfDefined(ROYGBIV.removeObjectMouseOverListener, preConditions.sourceObject, sourceObject);
   preConditions.checkIfAddedObjectOrObjectGroup(ROYGBIV.removeObjectMouseOverListener, preConditions.sourceObject, sourceObject);
   preConditions.checkIfTrue(ROYGBIV.removeObjectMouseOverListener, "sourceObject is marked as unintersectable.", (!sourceObject.isIntersectable));
+  preConditions.checkIfObjectInsideActiveScene(ROYGBIV.removeObjectMouseOverListener, sourceObject);
   delete sourceObject.mouseOverCallbackFunction;
   objectsWithMouseOverListeners.delete(sourceObject.name);
 }
@@ -1692,6 +1708,7 @@ Roygbiv.prototype.setObjectMouseOutListener = function(sourceObject, callbackFun
   preConditions.checkIfAddedObjectOrObjectGroup(ROYGBIV.setObjectMouseOutListener, preConditions.sourceObject, sourceObject);
   preConditions.checkIfTrue(ROYGBIV.setObjectMouseOutListener, "sourceObject marked as unintersectable, cannot be selected.", (!sourceObject.isIntersectable));
   preConditions.checkIfFunctionOnlyIfExists(ROYGBIV.setObjectMouseOutListener, preConditions.callbackFunction, callbackFunction);
+  preConditions.checkIfObjectInsideActiveScene(ROYGBIV.setObjectMouseOutListener, sourceObject);
   sourceObject.mouseOutCallbackFunction = callbackFunction;
   objectsWithMouseOutListeners.set(sourceObject.name, sourceObject);
 }
@@ -1704,6 +1721,7 @@ Roygbiv.prototype.removeObjectMouseOutListener = function(sourceObject){
   preConditions.checkIfDefined(ROYGBIV.removeObjectMouseOutListener, preConditions.sourceObject, sourceObject);
   preConditions.checkIfAddedObjectOrObjectGroup(ROYGBIV.removeObjectMouseOutListener, preConditions.sourceObject, sourceObject);
   preConditions.checkIfTrue(ROYGBIV.removeObjectMouseOutListener, "sourceObject is marked as unintersectable.", (!sourceObject.isIntersectable));
+  preConditions.checkIfObjectInsideActiveScene(ROYGBIV.removeObjectMouseOutListener, sourceObject);
   delete sourceObject.mouseOutCallbackFunction;
   objectsWithMouseOutListeners.delete(sourceObject.name);
 }
@@ -1718,6 +1736,7 @@ Roygbiv.prototype.onTextMouseOver = function(text, callbackFunction){
   preConditions.checkIfTextClickable(ROYGBIV.onTextMouseOver, preConditions.text, text);
   preConditions.checkIfDefined(ROYGBIV.onTextMouseOver, preConditions.callbackFunction, callbackFunction);
   preConditions.checkIfFunctionOnlyIfExists(ROYGBIV.onTextMouseOver, preConditions.callbackFunction, callbackFunction);
+  preConditions.checkIfTextInsideActiveScene(ROYGBIV.onTextMouseOver, text);
   text.mouseOverCallbackFunction = callbackFunction;
   objectsWithMouseOverListeners.set(text.name, text);
 }
@@ -1729,6 +1748,7 @@ Roygbiv.prototype.removeTextMouseOverListener = function(text){
   }
   preConditions.checkIfDefined(ROYGBIV.removeTextMouseOverListener, preConditions.text, text);
   preConditions.checkIfAddedText(ROYGBIV.removeTextMouseOverListener, preConditions.text, text);
+  preConditions.checkIfTextInsideActiveScene(ROYGBIV.removeTextMouseOverListener, text);
   delete text.mouseOverCallbackFunction;
   objectsWithMouseOverListeners.delete(text.name);
 }
@@ -1743,6 +1763,7 @@ Roygbiv.prototype.onTextMouseOut = function(text, callbackFunction){
   preConditions.checkIfTextClickable(ROYGBIV.onTextMouseOut, preConditions.text, text);
   preConditions.checkIfDefined(ROYGBIV.onTextMouseOut, preConditions.callbackFunction, callbackFunction);
   preConditions.checkIfFunctionOnlyIfExists(ROYGBIV.onTextMouseOut, preConditions.callbackFunction, callbackFunction);
+  preConditions.checkIfTextInsideActiveScene(ROYGBIV.onTextMouseOut, text);
   text.mouseOutCallbackFunction = callbackFunction;
   objectsWithMouseOutListeners.set(text.name, text);
 }
@@ -1754,6 +1775,7 @@ Roygbiv.prototype.removeTextMouseOutListener = function(text){
   }
   preConditions.checkIfDefined(ROYGBIV.removeTextMouseOutListener, preConditions.text, text);
   preConditions.checkIfAddedText(ROYGBIV.removeTextMouseOutListener, preConditions.text, text);
+  preConditions.checkIfTextInsideActiveScene(ROYGBIV.removeTextMouseOutListener, text);
   delete text.mouseOutCallbackFunction;
   objectsWithMouseOutListeners.delete(text.name);
 }
@@ -1777,6 +1799,7 @@ Roygbiv.prototype.onObjectPositionThresholdExceeded = function(object, axis, thr
   preConditions.checkIfNumber(ROYGBIV.onObjectPositionThresholdExceeded, preConditions.threshold, threshold);
   preConditions.checkIfFunctionOnlyIfExists(ROYGBIV.onObjectPositionThresholdExceeded, preConditions.callbackFunction, callbackFunction);
   preConditions.checkIfTrue(ROYGBIV.onObjectPositionThresholdExceeded, "controlMode must be 1 or 2", (controlMode != 1 && controlMode != 2));
+  preConditions.checkIfObjectInsideActiveScene(ROYGBIV.onObjectPositionThresholdExceeded, object);
   object.setPositionThresholdExceededListener(axis, threshold, controlMode, callbackFunction);
 }
 
@@ -1788,6 +1811,7 @@ Roygbiv.prototype.removeObjectPositionThresholdExceededListener = function(objec
   }
   preConditions.checkIfDefined(ROYGBIV.removeObjectPositionThresholdExceededListener, preConditions.object, object);
   preConditions.checkIfAddedObjectOrObjectGroup(ROYGBIV.removeObjectPositionThresholdExceededListener, preConditions.object, object);
+  preConditions.checkIfObjectInsideActiveScene(ROYGBIV.removeObjectPositionThresholdExceededListener, object);
   if (object.positionThresholdExceededListenerInfo){
     object.positionThresholdExceededListenerInfo.isActive = false;
   }
@@ -1844,6 +1868,7 @@ Roygbiv.prototype.onAnimationFinished = function(object, animationName, callback
   preConditions.checkIfAddedObjectObjectGroupAddedText(ROYGBIV.onAnimationFinished, preConditions.object, object);
   preConditions.checkIfAnimationExists(ROYGBIV.onAnimationFinished, object, animationName);
   preConditions.checkIfFunctionOnlyIfExists(ROYGBIV.onAnimationFinished, preConditions.callbackFunction, callbackFunction);
+  preConditions.checkIfObjectInsideActiveScene(ROYGBIV.onAnimationFinished, object);
   object.animations[animationName].setFinishCallbackFunction(callbackFunction);
 }
 
@@ -1856,6 +1881,7 @@ Roygbiv.prototype.removeAnimationFinishListener = function(object, animationName
   preConditions.checkIfDefined(ROYGBIV.removeAnimationFinishListener, preConditions.animationName, animationName);
   preConditions.checkIfAddedObjectObjectGroupAddedText(ROYGBIV.removeAnimationFinishListener, preConditions.object, object);
   preConditions.checkIfAnimationExists(ROYGBIV.removeAnimationFinishListener, object, animationName);
+  preConditions.checkIfObjectInsideActiveScene(ROYGBIV.removeAnimationFinishListener, object);
   object.animations[animationName].finishCallbackFunction = 0;
 }
 
