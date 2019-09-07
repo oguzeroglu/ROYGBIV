@@ -76,7 +76,7 @@ function updateRaycaster(){
 function updateAddedTexts(){
   if (mode == 0){
     if (!keyboardBuffer["Shift"]){
-      for (var addedTextName in addedTexts){
+      for (var addedTextName in sceneHandler.getAddedTexts()){
         var addedText = addedTexts[addedTextName];
         if (addedText.needsUpdate() && !addedText.is2D){
           addedText.handleBoundingBox();
@@ -85,7 +85,7 @@ function updateAddedTexts(){
       }
     }
   }else{
-    for (var addedTextName in clickableAddedTexts){
+    for (var addedTextName in sceneHandler.getClickableAddedTexts()){
       var addedText = addedTexts[addedTextName];
       if (addedText.needsUpdate() && !addedText.is2D){
         addedText.handleBoundingBox();
@@ -148,7 +148,7 @@ function runScripts(){
 }
 
 function updateTrackingObjects(){
-  for (var objName in trackingObjects){
+  for (var objName in sceneHandler.getTrackingObjects()){
     var obj = addedObjects[objName];
     var isObjectGroup = false;
     if (!obj){
@@ -209,8 +209,8 @@ function dynamicObjectUpdateFunction(object, objectName){
 }
 
 function updateDynamicObjects(){
-  dynamicObjects.forEach(dynamicObjectUpdateFunction);
-  dynamicObjectGroups.forEach(dynamicObjectUpdateFunction);
+  sceneHandler.getDynamicObjects().forEach(dynamicObjectUpdateFunction);
+  sceneHandler.getDynamicObjectGroups().forEach(dynamicObjectUpdateFunction);
 }
 
 function setTHREEQuaternionFromCANNON(mesh, physicsBody, axis, type, gridSystemAxis){

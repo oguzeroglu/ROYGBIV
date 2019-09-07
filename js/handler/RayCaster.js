@@ -25,7 +25,7 @@ RayCaster.prototype.refresh = function(){
   }
   this.ready = false;
   this.binHandler = new WorldBinHandler();
-  for (var objName in addedObjects){
+  for (var objName in this.getAddedObjects()){
     var addedObject = addedObjects[objName];
     if (mode == 1 && !addedObject.isIntersectable){
       continue;
@@ -39,7 +39,7 @@ RayCaster.prototype.refresh = function(){
     }
     this.binHandler.insert(addedObject.boundingBoxes[0], objName);
   }
-  for (var objName in objectGroups){
+  for (var objName in this.getObjectGroups()){
     var objectGroup = objectGroups[objName];
     if (mode == 1 && !objectGroup.isIntersectable){
       continue;
@@ -56,18 +56,18 @@ RayCaster.prototype.refresh = function(){
     }
   }
   if (mode == 0){
-    for (var gsName in gridSystems){
+    for (var gsName in this.getGridSystems()){
       var gridSystem = gridSystems[gsName];
       this.binHandler.insert(gridSystem.boundingBox, gridSystem.name);
     }
-    for (var txtName in addedTexts){
+    for (var txtName in this.getAddedTexts()){
       var addedText = addedTexts[txtName];
       if (!addedText.is2D){
         this.binHandler.insert(addedText.boundingBox, txtName);
       }
     }
   }else{
-    for (var txtName in addedTexts){
+    for (var txtName in this.getAddedTexts()){
       var addedText = addedTexts[txtName];
       if (addedText.isClickable && !addedText.is2D){
         this.binHandler.insert(addedText.boundingBox, txtName);
@@ -177,4 +177,32 @@ RayCaster.prototype.show = function(object){
 
 RayCaster.prototype.query = function(point){
   return this.binHandler.query(point);
+}
+
+RayCaster.prototype.getGridSystems = function(){
+  if (IS_WORKER_CONTEXT){
+    return gridSystems;
+  }
+  return sceneHandler.getGridSystems();
+}
+
+RayCaster.prototype.getAddedObjects = function(){
+  if (IS_WORKER_CONTEXT){
+    return addedObjects;
+  }
+  return sceneHandler.getAddedObjects();
+}
+
+RayCaster.prototype.getObjectGroups = function(){
+  if (IS_WORKER_CONTEXT){
+    return objectGroups;
+  }
+  return sceneHandler.getObjectGroups();
+}
+
+RayCaster.prototype.getAddedTexts = function(){
+  if (IS_WORKER_CONTEXT){
+    return addedTexts;
+  }
+  return sceneHandler.getAddedTexts();
 }

@@ -96,11 +96,11 @@ ModeSwitcher.prototype.switchFromDesignToPreview = function(){
   }
   scriptsToRun = new Map();
   scriptsHandler.onModeSwitch();
-  for (var markedPointName in markedPoints){
+  for (var markedPointName in sceneHandler.getMarkedPoints()){
     markedPoints[markedPointName].hide(true);
   }
   if (areasVisible){
-    for (var areaName in areas){
+    for (var areaName in sceneHandler.getAreas()){
       areas[areaName].hide();
     }
   }
@@ -136,6 +136,7 @@ ModeSwitcher.prototype.switchFromDesignToPreview = function(){
     object.saveState();
     if (object.isDynamicObject && !object.noMass){
       dynamicObjectGroups.set(objectName, object);
+      sceneHandler.onDynamicObjectAddition(object);
     }
     if (object.initOpacitySet){
       object.updateOpacity(object.initOpacity);
@@ -154,6 +155,7 @@ ModeSwitcher.prototype.switchFromDesignToPreview = function(){
     }
     if (object.isDynamicObject && !object.noMass){
       dynamicObjects.set(objectName, object);
+      sceneHandler.onDynamicObjectAddition(object);
     }
     object.saveState();
     if (object.initOpacitySet){
@@ -190,6 +192,7 @@ ModeSwitcher.prototype.switchFromDesignToPreview = function(){
       }
     }
   }
+  sceneHandler.onSwitchFromDesignToPreview();
   this.commonSwitchFunctions();
   handleViewport();
   for (var txtName in addedTexts){
@@ -197,8 +200,10 @@ ModeSwitcher.prototype.switchFromDesignToPreview = function(){
     if (addedTexts[txtName].isClickable){
       if (!addedTexts[txtName].is2D){
         clickableAddedTexts[txtName] = addedTexts[txtName];
+        sceneHandler.onClickableAddedTextAddition(addedTexts[txtName]);
       }else{
         clickableAddedTexts2D[txtName] = addedTexts[txtName];
+        sceneHandler.onClickableAddedText2DAddition(addedTexts[txtName]);
       }
     }
   }
@@ -249,7 +254,7 @@ ModeSwitcher.prototype.switchFromPreviewToDesign = function(){
     scene.add(gridSelections[gridName].mesh);
     scene.add(gridSelections[gridName].dot);
   }
-  for (var textName in addedTexts){
+  for (var textName in sceneHandler.getAddedTexts()){
     var addedText = addedTexts[textName];
     for (var animationName in addedText.animations){
       animationHandler.forceFinish(addedText.animations[animationName]);
@@ -278,7 +283,7 @@ ModeSwitcher.prototype.switchFromPreviewToDesign = function(){
     crosshairs[crosshairName].destroy();
   }
 
-  for (var markedPointName in markedPoints){
+  for (var markedPointName in sceneHandler.getMarkedPoints()){
     if (markedPoints[markedPointName].showAgainOnTheNextModeSwitch){
       markedPoints[markedPointName].show();
       markedPoints[markedPointName].showAgainOnTheNextModeSwitch = false;
@@ -286,7 +291,7 @@ ModeSwitcher.prototype.switchFromPreviewToDesign = function(){
   }
 
   if (areasVisible){
-    for (var areaName in areas){
+    for (var areaName in sceneHandler.getAreas()){
       areas[areaName].renderToScreen();
     }
   }
@@ -320,6 +325,7 @@ ModeSwitcher.prototype.switchFromPreviewToDesign = function(){
       object.setMass(object.originalMass);
       if (object.originalMass == 0){
         dynamicObjectGroups.delete(object.name);
+        sceneHandler.onDynamicObjectDeletion(object);
       }
       delete object.originalMass;
     }
@@ -365,6 +371,7 @@ ModeSwitcher.prototype.switchFromPreviewToDesign = function(){
       object.setMass(object.originalMass);
       if (object.originalMass == 0){
         dynamicObjects.delete(object.name);
+        sceneHandler.onDynamicObjectDeletion(object);
       }
       delete object.originalMass;
     }
@@ -374,6 +381,7 @@ ModeSwitcher.prototype.switchFromPreviewToDesign = function(){
 
   clickableAddedTexts = new Object();
   clickableAddedTexts2D = new Object();
+  sceneHandler.onSwitchFromPreviewToDesign();
   this.commonSwitchFunctions();
   for (var txtName in addedTexts){
     var text = addedTexts[txtName];
@@ -386,7 +394,7 @@ ModeSwitcher.prototype.switchFromPreviewToDesign = function(){
     canvas.style.visibility = "hidden";
     terminal.disable();
     rayCaster.onReadyCallback = function(){
-      $("#cliDivheader").text("ROYGBIV 3D Engine - CLI (Design mode)");
+      $("#cliDivheader").text("ROYGBIV 3D Engine - CLI (Design mode - "+sceneHandler.getActiveSceneName()+")");
       that.enableTerminal();
       canvas.style.visibility = "";
       terminal.printInfo(Text.SWITCHED_TO_DESIGN_MODE);

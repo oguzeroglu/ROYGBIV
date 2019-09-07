@@ -28,7 +28,7 @@ AutoInstancingHandler.prototype.getObjectKey = function(obj){
   if (obj.hasCustomPrecision){
     shaderPrecisionKey = obj.customPrecision;
   }
-  return geomKey + PIPE + diffuseKey + PIPE + alphaKey + PIPE + aoKey + PIPE + displacementKey + PIPE + emissiveKey + PIPE + blendingKey + PIPE + shaderPrecisionKey;
+  return geomKey + PIPE + obj.registeredSceneName + PIPE + diffuseKey + PIPE + alphaKey + PIPE + aoKey + PIPE + displacementKey + PIPE + emissiveKey + PIPE + blendingKey + PIPE + shaderPrecisionKey;
 }
 
 AutoInstancingHandler.prototype.handle = function(){
@@ -68,7 +68,9 @@ AutoInstancingHandler.prototype.handle = function(){
       var autoInstancedObject = new AutoInstancedObject("autoInstancedObject_"+(ctr++), pseudoGroup);
       autoInstancedObject.init();
       scene.add(autoInstancedObject.mesh);
+      autoInstancedObject.mesh.visible = false;
       autoInstancedObjects[autoInstancedObject.name] = autoInstancedObject;
+      sceneHandler.onAutoInstancedObjectCreation(autoInstancedObject);
     }
   }
 }

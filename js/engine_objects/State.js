@@ -102,6 +102,7 @@ var State = function(projectName, author){
     markedPointsExport[markedPointName] = markedPoints[markedPointName].export();
   }
   this.markedPointsExport = markedPointsExport;
+  this.markedPointsVisible = markedPointsVisible;
   // OCTREE LIMITS *************************************************
   var octreeMinX = LIMIT_BOUNDING_BOX.min.x;
   var octreeMinY = LIMIT_BOUNDING_BOX.min.y;
@@ -136,11 +137,6 @@ var State = function(projectName, author){
   for (var textName in addedTexts){
     this.texts[textName] = addedTexts[textName].export();
   }
-  // POST PROCESSING ***********************************************
-  this.effects = new Object();
-  for (var effectName in renderer.effects){
-    this.effects[effectName] = renderer.effects[effectName].export();
-  }
   // PRECONFIGURED PARTICLE SYSTEMS ********************************
   this.preConfiguredParticleSystems = new Object();
   for (var psName in preConfiguredParticleSystems){
@@ -161,4 +157,6 @@ var State = function(projectName, author){
   for (var crosshairName in crosshairs){
     this.crosshairs[crosshairName] = crosshairs[crosshairName].export();
   }
+  // SCENES ********************************************************
+  this.scenes = sceneHandler.export();
 }

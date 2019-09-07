@@ -57,6 +57,7 @@ var ParticleSystemCreatorGUIHandler = function(){
       camera.position.set(initialCameraX, initialCameraY, initialCameraZ);
       var preConfiguredParticleSystem = particleSystemCreatorGUIHandler.preConfiguredParticleSystem;
       preConfiguredParticleSystems[preConfiguredParticleSystem.name] = preConfiguredParticleSystem;
+      sceneHandler.onParticleSystemCreation(preConfiguredParticleSystem);
       for (var poolName in preConfiguredParticleSystemPools){
         if (preConfiguredParticleSystemPools[poolName].refParticleSystemName == preConfiguredParticleSystem.name){
           preConfiguredParticleSystem.preConfiguredParticleSystemPoolName = poolName;

@@ -632,7 +632,7 @@ FPSControls.prototype.resetRotation = function(){
   }
 }
 
-FPSControls.prototype.onDeactivated = function(){
+FPSControls.prototype.onDeactivated = function(doNotShowElements){
   this.deactivated = true;
   this.playerBodyObject.usedAsFPSPlayerBody = false;
   this.playerBodyObject.removeCollisionListener();
@@ -641,9 +641,13 @@ FPSControls.prototype.onDeactivated = function(){
     this.weaponObject1.mesh.visible = true;
     this.weaponObject2.mesh.visible = true;
   }
-  this.playerBodyObject.show();
+  if (!doNotShowElements){
+    this.playerBodyObject.show();
+  }
   if (this.hasWeapon1){
-    this.weaponObject1.show();
+    if (!doNotShowElements){
+      this.weaponObject1.show();
+    }
     this.weaponObject1.mesh.renderOrder = renderOrders.OBJECT;
     this.weaponObject1.unsetRotationPivot();
     this.weaponObject1.untrackObjectPosition();
@@ -655,7 +659,9 @@ FPSControls.prototype.onDeactivated = function(){
     }
   }
   if (this.hasWeapon2){
-    this.weaponObject2.show();
+    if (!doNotShowElements){
+      this.weaponObject2.show();
+    }
     this.weaponObject2.mesh.renderOrder = renderOrders.OBJECT;
     this.weaponObject2.unsetRotationPivot();
     this.weaponObject2.untrackObjectPosition();

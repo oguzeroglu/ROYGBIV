@@ -398,6 +398,17 @@ AddedObject.prototype.show = function(){
   }
 }
 
+AddedObject.prototype.hideVisually = function(){
+  this.mesh.visible = false;
+}
+
+AddedObject.prototype.showVisually = function(){
+  if (this.autoInstancedParent){
+    return;
+  }
+  this.mesh.visible = true;
+}
+
 AddedObject.prototype.hide = function(keepPhysics){
   if (this.isVisibleOnThePreviewScene()){
     this.mesh.visible = false;
@@ -755,6 +766,9 @@ AddedObject.prototype.resetColor = function(){
 }
 
 AddedObject.prototype.applyAreaConfiguration = function(areaName){
+  if (sceneHandler.getActiveSceneName() != this.registeredSceneName){
+    return;
+  }
   if (this.areaVisibilityConfigurations){
     var configurations = this.areaVisibilityConfigurations[areaName];
     if (!(typeof configurations == UNDEFINED)){
@@ -1381,6 +1395,7 @@ AddedObject.prototype.getPositionAtAxis = function(axis){
 AddedObject.prototype.untrackObjectPosition = function(){
   delete this.trackedObject;
   delete trackingObjects[this.name];
+  sceneHandler.onTrackingObjectDeletion(this);
 }
 
 AddedObject.prototype.trackObjectPosition = function(targetObject){
@@ -1390,6 +1405,7 @@ AddedObject.prototype.trackObjectPosition = function(targetObject){
   targetObject.oldPX = targetObject.physicsBody.position.x;
   targetObject.oldPY = targetObject.physicsBody.position.y;
   targetObject.oldPZ = targetObject.physicsBody.position.z;
+  sceneHandler.onTrackingObjectAddition(this);
 }
 
 AddedObject.prototype.setPosition = function(x, y, z){

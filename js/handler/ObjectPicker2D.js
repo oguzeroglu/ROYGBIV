@@ -13,7 +13,7 @@ ObjectPicker2D.prototype.find = function(screenSpaceX, screenSpaceY){
   intersectionPoint = 0, intersectionObject = 0;
   var totalObj = addedTexts2D;
   if (mode == 1){
-    totalObj = clickableAddedTexts2D;
+    totalObj = sceneHandler.getClickableAddedTexts2D();
   }
   for (var textName in totalObj){
     var textObject = addedTexts2D[textName];

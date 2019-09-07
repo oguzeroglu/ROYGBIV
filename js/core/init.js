@@ -27,6 +27,8 @@ window.onload = function() {
   animationHandler = new AnimationHandler();
   // DELAYED EXECUTION HANDLER
   delayedExecutionHandler = new DelayedExecutionHandler();
+  // SCENE HANDLER
+  sceneHandler = new SceneHandler();
   // TEXT POOL
   Text = (!isDeployment)? new Text(): 0;
   // DRAGABLE CLI
@@ -114,10 +116,6 @@ window.onload = function() {
 
   // COLOR NAMES
   ColorNames = new ColorNames();
-
-  // AREA BIN HANDLER
-  areaBinHandler = new WorldBinHandler();
-  areaBinHandler.isAreaBinHandler = true;
 
   // AREA CONFIGURATIONS HANDLER
   areaConfigurationsHandler = new AreaConfigurationsHandler();

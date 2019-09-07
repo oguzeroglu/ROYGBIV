@@ -67,7 +67,7 @@ var RaycasterWorkerBridge = function(){
       rayCaster.transferableList = [];
       var intersectablesAry = [];
       var intersectableArrayIndex = 0;
-      for (var objName in addedObjects){
+      for (var objName in sceneHandler.getAddedObjects()){
         var obj = addedObjects[objName];
         var insertObjectToBuffer = (mode == 0) || (mode == 1 && obj.isIntersectable && (obj.isChangeable || (!obj.noMass && obj.physicsBody.mass > 0)));
         if (insertObjectToBuffer){
@@ -81,7 +81,7 @@ var RaycasterWorkerBridge = function(){
           intersectableArrayIndex += obj.mesh.matrixWorld.elements.length + 2;
         }
       }
-      for (var objName in objectGroups){
+      for (var objName in sceneHandler.getObjectGroups()){
         var obj = objectGroups[objName];
         var insertObjectToBuffer = (mode == 0) || (mode == 1 && obj.isIntersectable && (obj.isChangeable || (!obj.noMass && obj.physicsBody.mass > 0)));
         if (insertObjectToBuffer){
@@ -97,7 +97,7 @@ var RaycasterWorkerBridge = function(){
       }
       var addedTextScaleDescriptionArray = [];
       var addedTextScaleDescriptionIndex = 0;
-      for (var textName in addedTexts){
+      for (var textName in sceneHandler.getAddedTexts()){
         var text = addedTexts[textName];
         var insertTextToBuffer = (!text.is2D) && ((mode == 0) || (mode == 1 && text.isClickable));
         if (insertTextToBuffer){
@@ -265,6 +265,10 @@ var RaycasterWorkerBridge = function(){
 }
 
 RaycasterWorkerBridge.prototype.query = noop;
+RaycasterWorkerBridge.prototype.getGridSystems = noop;
+RaycasterWorkerBridge.prototype.getAddedObjects = noop;
+RaycasterWorkerBridge.prototype.getObjectGroups = noop;
+RaycasterWorkerBridge.prototype.getAddedTexts = noop;
 
 RaycasterWorkerBridge.prototype.onReady = function(){
   this.ready = true;
@@ -274,7 +278,7 @@ RaycasterWorkerBridge.prototype.onReady = function(){
 }
 
 RaycasterWorkerBridge.prototype.flush = function(){
-  if (!this.hasOwnership){
+  if (!this.hasOwnership || !this.ready){
     return;
   }
   var flushStartTime;
@@ -439,6 +443,9 @@ RaycasterWorkerBridge.prototype.issueUpdate = function(obj){
 }
 
 RaycasterWorkerBridge.prototype.updateObject = function(obj){
+  if (!this.ready){
+    return;
+  }
   if (mode == 1 && (obj.isAddedObject || obj.isObjectGroup) && !obj.isIntersectable){
     return;
   }

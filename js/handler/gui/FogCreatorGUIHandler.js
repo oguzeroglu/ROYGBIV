@@ -11,6 +11,7 @@ FogCreatorGUIHandler.prototype.init = function(){
     "Done": function(){
       fogHandler.removeFogFromObjects();
       fogCreatorGUIHandler.hide();
+      sceneHandler.onFogChange();
     }
   }
 }

@@ -67,6 +67,12 @@ MouseEventHandler.prototype.onCliDivClick = function(event){
     keyboardBuffer["Alt"] = false;
     keyboardEventHandler.deactivateObjectSelectionMode();
   }
+  if (keyboardBuffer["."] && mode == 0){
+    keyboardBuffer["."] = false;
+    for (var gridName in gridSelections){
+      gridSelections[gridName].removeCornerHelpers();
+    }
+  }
 }
 
 MouseEventHandler.prototype.onTerminalMouseWheel = function(event){

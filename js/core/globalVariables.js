@@ -233,7 +233,6 @@ var geometryCache = new Object();
 var physicsShapeCache = new Object();
 var MAX_TEXTURE_COUNT = 8;
 var compressedTextureFallbackFormat = ".png";
-var areaBinHandler;
 var webglCallbackHandler;
 var threejsRenderMonitoringHandler;
 var areas = new Object();
@@ -348,6 +347,7 @@ var minusY = "-y";
 var minusZ = "-z";
 var activeMuzzleFlashes = new Map();
 var delayedExecutionHandler;
+var sceneHandler;
 
 // RENDER ORDERS
 var renderOrders = {

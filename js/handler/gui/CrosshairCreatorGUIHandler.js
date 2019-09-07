@@ -38,6 +38,7 @@ CrosshairCreatorGUIHandler.prototype.init = function(crosshairName, isEdit){
         crosshairs[crosshairName].destroy(true);
       }
       crosshairs[crosshairName] = crosshairCreatorGUIHandler.crosshair.clone();
+      sceneHandler.onCrosshairCreation(crosshairs[crosshairName]);
       crosshairCreatorGUIHandler.close(isEdit? Text.CROSSHAIR_EDITED: Text.CROSSHAIR_CREATED);
     }
   };

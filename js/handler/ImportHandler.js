@@ -2,6 +2,10 @@ var ImportHandler = function(){
 
 }
 
+ImportHandler.prototype.importScenes = function(obj){
+  sceneHandler.import(obj.scenes);
+}
+
 ImportHandler.prototype.importEngineVariables = function(obj){
   NO_MOBILE = obj.noMobile;
   if (!(typeof obj.viewportMaxWidth == UNDEFINED)){
@@ -40,7 +44,7 @@ ImportHandler.prototype.importEngineVariables = function(obj){
   screenResolution = obj.screenResolution;
   renderer.setPixelRatio(screenResolution);
   defaultMaterialType = obj.defaultMaterialType;
-  markedPointsVisible = false;
+  markedPointsVisible = obj.markedPointsVisible;
   for (var markedPointName in obj.markedPointsExport){
     var curMarkedPointExport = obj.markedPointsExport[markedPointName];
     var markedPoint = new MarkedPoint(
@@ -53,9 +57,7 @@ ImportHandler.prototype.importEngineVariables = function(obj){
       curMarkedPointExport["fromZ"],
       curMarkedPointExport["gridDestroyed"]
     );
-    if (!curMarkedPointExport.isHidden && mode == 0){
-      markedPointsVisible = true;
-    }else{
+    if (!(markedPointsVisible && mode == 0)){
       markedPoint.hide();
     }
     markedPoint.showAgainOnTheNextModeSwitch = curMarkedPointExport.showAgainOnTheNextModeSwitch;
@@ -210,7 +212,6 @@ ImportHandler.prototype.importAreas = function(obj){
       curAreaExport.color,
       curAreaExport.gridSize
     );
-    areaBinHandler.insert(areas[areaName].boundingBox, areaName);
     if (areasVisible){
       areas[areaName].renderToScreen();
     }
@@ -1212,12 +1213,6 @@ ImportHandler.prototype.importObjectGroups = function(obj){
         }
       }
     }
-  }
-}
-
-ImportHandler.prototype.importEffects = function(obj){
-  for (var effecName in obj.effects){
-    renderer.effects[effecName].load(obj.effects[effecName]);
   }
 }
 

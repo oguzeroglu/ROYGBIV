@@ -108,10 +108,10 @@ function parse(input){
             count ++;
             if (count == keysLength){
               terminal.printInfo(Text.TREE.replace(
-                Text.PARAM1, gs));
+                Text.PARAM1, gs + " ["+gridSystems[gs].registeredSceneName+"]"));
             }else{
               terminal.printInfo(Text.TREE.replace(
-                Text.PARAM1, gs), true);
+                Text.PARAM1, gs + " ["+gridSystems[gs].registeredSceneName+"]"), true);
             }
           }
           if (count == 0){
@@ -128,20 +128,27 @@ function parse(input){
         break;
         case 6: //destroyGridSystem
           var name = splitted[1];
-
           if (mode != 0){
             terminal.printError(Text.WORKS_ONLY_IN_DESIGN_MODE);
             return true;
           }
-
           if (!(name.indexOf("*") == -1)){
             new JobHandler(splitted).handle();
             return true;
           }
-
           if (!gridSystems[name]){
             terminal.printError(Text.NO_SUCH_GRID_SYSTEM);
           }else{
+            for (var wcName in wallCollections){
+              var gsNames = wallCollections[wcName].gridSystemNames;
+              for (var i = 0; i<gsNames.length; i++){
+                if (gsNames[i] == name){
+                  terminal.printError(Text.GS_ATTACHED_TO_A_WC);
+                  return true;
+                }
+              }
+            }
+            sceneHandler.onGridSystemDeletion(gridSystems[name]);
             gridSystems[name].destroy();
             if (!jobHandlerWorking){
               refreshRaycaster(Text.GRID_SYSTEM_DESTROYED);
@@ -206,6 +213,10 @@ function parse(input){
           var gs = gridSystems[gsName];
           if (!gs){
             terminal.printError(Text.NO_SUCH_GRID_SYSTEM);
+            return true;
+          }
+          if (gs.registeredSceneName != sceneHandler.getActiveSceneName()){
+            terminal.printError(Text.GRID_SYSTEM_NOT_IN_SCENE);
             return true;
           }
           if (Object.keys(gs.grids).length > 100){
@@ -384,12 +395,10 @@ function parse(input){
             terminal.printError(Text.WORKS_ONLY_IN_DESIGN_MODE);
             return;
           }
-
           if (!(splitted[1].indexOf("*") == -1)){
             new JobHandler(splitted).handle();
             return true;
           }
-
           var selectedGrid1, selectedGrid2;
           if (!jobHandlerSelectedGrid){
             var gridSelectionSize = Object.keys(gridSelections).length;
@@ -411,7 +420,6 @@ function parse(input){
           }else{
             selectedGrid1 = jobHandlerSelectedGrid;
           }
-
           var selectedGridSystemName = selectedGrid1.parentName;
           var materialName = splitted[2];
           var selectedMaterial = materials[materialName];
@@ -456,7 +464,6 @@ function parse(input){
           gridSystems[selectedGridSystemName].newSurface(objectName, selectedGrid1, selectedGrid2, selectedMaterial);
           if (areaConfigurationsVisible){
             guiHandler.hide(guiHandler.guiTypes.AREA);
-            areaConfigurationsVisible = false;
           }
           if (!jobHandlerWorking){
             refreshRaycaster(Text.OBJECT_ADDED);
@@ -480,7 +487,7 @@ function parse(input){
             terminal.printInfo(Text.OBJECT_INFO_TREE.replace(
               Text.PARAM1, addedObject.type
             ).replace(
-              Text.PARAM2, objectName
+              Text.PARAM2, objectName + " ["+addedObject.registeredSceneName+"]"
             ).replace(
               Text.PARAM3, addedObject.mesh.position.x
             ).replace(
@@ -502,7 +509,7 @@ function parse(input){
             }
             childStr = childStr.substring(0, childStr.length - 1);
             terminal.printInfo(Text.OBJECT_GROUP_INFO_TREE.replace(
-              Text.PARAM1, objectName
+              Text.PARAM1, objectName + " ["+grouppedObject.registeredSceneName+"]"
             ).replace(
               Text.PARAM2, childStr
             ).replace(
@@ -532,7 +539,7 @@ function parse(input){
           }
           var metaData = object.metaData;
           terminal.printHeader(Text.METADATA_OF.replace(
-            Text.PARAM1, objectName
+            Text.PARAM1, objectName + " ["+object.registeredSceneName+"]"
           ));
           for (var metaDataKey in metaData){
             terminal.printInfo(Text.TREE2.replace(
@@ -581,15 +588,16 @@ function parse(input){
           }
           selectionHandler.resetCurrentSelection();
           if (object){
+            sceneHandler.onAddedObjectDeletion(object);
             object.destroy(true);
             delete addedObjects[objectName];
           }else if (objectGroup){
+            sceneHandler.onObjectGroupDeletion(objectGroup);
             objectGroup.destroy(true);
             delete objectGroups[objectName];
           }
           if (areaConfigurationsVisible){
             guiHandler.hide(guiHandler.guiTypes.AREA);
-            areaConfigurationsVisible = false;
           }
           if (!jobHandlerWorking){
             refreshRaycaster(Text.OBJECT_DESTROYED);
@@ -631,6 +639,10 @@ function parse(input){
 
           if (!object){
             terminal.printError(Text.NO_SUCH_OBJECT);
+            return true;
+          }
+          if (sceneHandler.getActiveSceneName() != object.registeredSceneName){
+            terminal.printError(Text.OBJECT_NOT_IN_SCENE);
             return true;
           }
           repeatU = parseInt(repeatU);
@@ -797,18 +809,15 @@ function parse(input){
           anchorGrid = 0;
           if (areaConfigurationsVisible){
             guiHandler.hide(guiHandler.guiTypes.AREA);
-            areaConfigurationsVisible = false;
           }
           refreshRaycaster(Text.RAMP_CREATED);
           return true;
         break;
         case 31: //setAnchor
-
           if (mode != 0){
             terminal.printError(Text.WORKS_ONLY_IN_DESIGN_MODE);
             return;
           }
-
           if (Object.keys(gridSelections).length != 1){
             terminal.printError(Text.MUST_HAVE_ONE_GRID_SELECTED);
             return true;
@@ -844,6 +853,10 @@ function parse(input){
           }
           if (!addedObject){
             terminal.printError(Text.NO_SUCH_OBJECT);
+            return true;
+          }
+          if (addedObject.registeredSceneName != sceneHandler.getActiveSceneName()){
+            terminal.printError(Text.OBJECT_NOT_IN_SCENE);
             return true;
           }
           if (axis.toUpperCase() == "S"){
@@ -970,7 +983,6 @@ function parse(input){
           gridSystem.newBox(selections, height, material, name);
           if (areaConfigurationsVisible){
             guiHandler.hide(guiHandler.guiTypes.AREA);
-            areaConfigurationsVisible = false;
           }
           if (!jobHandlerWorking){
             refreshRaycaster(Text.BOX_CREATED);
@@ -1003,14 +1015,12 @@ function parse(input){
               }
             }
           }
-
           var gridSelectionSize = Object.keys(gridSelections).length;
           if (gridSelectionSize != 2 && gridSelectionSize != 1){
             terminal.printError(Text.MUST_HAVE_1_OR_2_GRIDS_SELECTED);
             return true;
           }
           var grid1 = gridSelections[Object.keys(gridSelections)[0]];
-
           var sideNames = [];
           if (grid1.axis == "XZ"){
             sideName = [
@@ -1037,42 +1047,36 @@ function parse(input){
               name + "_"+"YZ_ROOF"
             ];
           }
-
           for (var i = 0; i<sideNames.length; i++){
             if (gridSystems[sideNames[i]] || addedObjects[sideNames[i]] || objectGroups[sideNames[i]]){
               terminal.printInfo(Text.AN_ERROR_HAPPENED_CHOOSE_ANOTHER_NAME);
               return true;
             }
           }
-
           if (isNaN(height)){
             terminal.printError(Text.HEIGHT_MUST_BE_A_NUMBER);
             return true;
           }
-
           if (height == 0){
             terminal.printError(Text.HEIGHT_CANNOT_BE_0);
             return true;
           }
-
           var grid2 = undefined;
           if (gridSelectionSize == 2){
             grid2 = gridSelections[Object.keys(gridSelections)[1]];
           }
-
           if (gridSelectionSize == 2){
             if (grid1.parentName != grid2.parentName){
               terminal.printError(Text.SELECTED_GRIDS_SAME_GRIDSYSTEM);
               return true;
             }
           }
-
           var baseGridSystem = gridSystems[grid1.parentName];
-
-          new WallCollection(name, height, outlineColor, grid1, grid2);
+          var wcObject = new WallCollection(name, height, outlineColor, grid1, grid2);
           for (var gridName in gridSelections){
             gridSelections[gridName].toggleSelect(false, false, false, true);
           }
+          sceneHandler.onWallCollectionCreation(wcObject);
           refreshRaycaster(Text.WALL_COLLECTION_CREATED);
           return true;
         break;
@@ -1088,7 +1092,7 @@ function parse(input){
             }
             var wallCollection = wallCollections[wallCollectionName];
             terminal.printInfo(Text.TREE_WALL_COLLECTIONS.replace(
-              Text.PARAM1, wallCollectionName
+              Text.PARAM1, wallCollectionName + " ["+wallCollections[wallCollectionName].registeredSceneName+"]"
             ).replace(
               Text.PARAM2, wallCollection.outlineColor
             ), options);
@@ -1110,9 +1114,12 @@ function parse(input){
           }
           var wallCollection = wallCollections[name];
           if (wallCollection){
+            sceneHandler.onWallCollectionDeletion(wallCollection);
             wallCollection.destroy();
             if (!jobHandlerWorking){
               refreshRaycaster(Text.WALL_COLLECTION_DESTROYED);
+            }else{
+              jobHandlerRaycasterRefresh = true;
             }
           }else{
             terminal.printError(Text.NO_SUCH_WALL_COLLECTION);
@@ -1261,6 +1268,10 @@ function parse(input){
             terminal.printError(Text.NO_SUCH_OBJECT);
             return true;
           }
+          if (addedObject.registeredSceneName != sceneHandler.getActiveSceneName()){
+            terminal.printError(Text.OBJECT_NOT_IN_SCENE);
+            return true;
+          }
           addedObject.mapTexturePack(texturePack);
           if (!jobHandlerWorking){
             terminal.printInfo(Text.TEXTURE_PACK_MAPPED);
@@ -1361,6 +1372,10 @@ function parse(input){
             terminal.printError(Text.NO_SUCH_OBJECT);
             return true;
           }
+          if (addedObject.registeredSceneName != sceneHandler.getActiveSceneName()){
+            terminal.printError(Text.OBJECT_NOT_IN_SCENE);
+            return true;
+          }
           addedObject.resetMaps(true);
           if (!jobHandlerWorking){
             terminal.printInfo(Text.MAPS_RESET);
@@ -1385,6 +1400,10 @@ function parse(input){
           }
           if (!addedObject){
             terminal.printError(Text.NO_SUCH_OBJECT);
+            return true;
+          }
+          if (addedObject.registeredSceneName != sceneHandler.getActiveSceneName()){
+            terminal.printError(Text.OBJECT_NOT_IN_SCENE);
             return true;
           }
           if (isNaN(count)){
@@ -1569,6 +1588,7 @@ function parse(input){
             terminal.printError(Text.NO_SUCH_SKYBOX);
             return true;
           }
+          sceneHandler.onMapSkybox(skybox);
           skyboxHandler.map(skybox);
           terminal.printError(Text.SKYBOX_MAPPED);
           return true;
@@ -1588,6 +1608,7 @@ function parse(input){
             terminal.printError(Text.NO_SUCH_SKYBOX);
             return true;
           }
+          sceneHandler.onSkyboxDeletion(skybox);
           skyboxHandler.destroySkybox(skybox);
           if (!jobHandlerWorking){
             terminal.printInfo(Text.SKYBOX_DESTROYED);
@@ -1606,6 +1627,7 @@ function parse(input){
             return true;
           }
           selectionHandler.resetCurrentSelection();
+          sceneHandler.onBeforeSave();
           save();
           return true;
         break;
@@ -1670,15 +1692,21 @@ function parse(input){
           }
           selectionHandler.resetCurrentSelection();
           if (objSelection){
+            if (objSelection.registeredSceneName != sceneHandler.getActiveSceneName()){
+              terminal.printError(Text.OBJECT_NOT_IN_SCENE);
+              return true;
+            }
             selectionHandler.select(objSelection);
             camera.lookAt(objSelection.mesh.position);
           }else if (objGroupSelection){
+            if (objGroupSelection.registeredSceneName != sceneHandler.getActiveSceneName()){
+              terminal.printError(Text.OBJECT_NOT_IN_SCENE);
+              return true;
+            }
             selectionHandler.select(objGroupSelection);
             camera.lookAt(objGroupSelection.graphicsGroup.position);
           }
-          terminal.printInfo(Text.OBJECT_SELECTED.replace(
-              Text.PARAM1, name
-          ));
+          terminal.printInfo(Text.OBJECT_SELECTED.replace(Text.PARAM1, name));
           return true;
         break;
         case 81: //setMass
@@ -1708,6 +1736,10 @@ function parse(input){
             return true;
           }
           if (addedObject){
+            if (addedObject.registeredSceneName != sceneHandler.getActiveSceneName()){
+              terminal.printError(Text.OBJECT_NOT_IN_SCENE);
+              return true;
+            }
             if (addedObject.noMass){
               terminal.printError(Text.OBJECT_HAS_NO_MASS);
               return true;
@@ -1715,6 +1747,7 @@ function parse(input){
             addedObject.setMass(mass);
             if (mode == 1 && mass > 0){
               dynamicObjects.set(addedObject.name, addedObject);
+              sceneHandler.onDynamicObjectAddition(addedObject);
             }
             if (selectionHandler.getSelectedObject() &&
                   selectionHandler.getSelectedObject().isAddedObject &&
@@ -1723,6 +1756,10 @@ function parse(input){
               guiHandler.omMassController.updateDisplay();
             }
           }else if (grouppedObject){
+            if (grouppedObject.registeredSceneName != sceneHandler.getActiveSceneName()){
+              terminal.printError(Text.OBJECT_NOT_IN_SCENE);
+              return true;
+            }
             if (grouppedObject.noMass){
               terminal.printError(Text.OBJECT_HAS_NO_MASS);
               return true;
@@ -1734,6 +1771,7 @@ function parse(input){
             grouppedObject.setMass(mass);
             if (mode == 1 && mass > 0){
               dynamicObjectGroups.set(grouppedObject.name, grouppedObject);
+              sceneHandler.onDynamicObjectAddition(grouppedObject);
             }
             if (selectionHandler.getSelectedObject() &&
                   selectionHandler.getSelectedObject().isObjectGroup &&
@@ -1781,6 +1819,10 @@ function parse(input){
             return true;
           }
           if (addedObject){
+            if (addedObject.registeredSceneName != sceneHandler.getActiveSceneName()){
+              terminal.printError(Text.OBJECT_NOT_IN_SCENE);
+              return true;
+            }
             if (addedObject.pivotObject){
               addedObject.rotateAroundPivotObject(axis, radian);
             }else{
@@ -1790,6 +1832,10 @@ function parse(input){
             addedObject.updateBoundingBoxes();
             addedObject.isRotationDirty = true;
           }else if (objectGroup){
+            if (objectGroup.registeredSceneName != sceneHandler.getActiveSceneName()){
+              terminal.printError(Text.OBJECT_NOT_IN_SCENE);
+              return true;
+            }
             if (objectGroup.pivotObject){
               objectGroup.rotateAroundPivotObject(axis, radian);
             }else{
@@ -1844,12 +1890,10 @@ function parse(input){
             groupName = generateUniqueObjectName();
           }
           var objects = splitted[2];
-
           if (groupName.indexOf(Text.COMMA) != -1){
             terminal.printError(Text.INVALID_CHARACTER_IN_OBJECT_NAME);
             return true;
           }
-
           if (mode == 1){
             terminal.printError(Text.WORKS_ONLY_IN_DESIGN_MODE);
             return true;
@@ -1867,12 +1911,12 @@ function parse(input){
             for (var i = 0; i<objectNamesArray.length; i++){
               if (!(objectNamesArray[i].indexOf("*") == -1)){
                 var tmpPrefix = objectNamesArray[i].split("*")[0];
-                for (var addedObjName in addedObjects){
+                for (var addedObjName in sceneHandler.getAddedObjects()){
                   if (addedObjName.startsWith(tmpPrefix)){
                     objectNamesArray.push(addedObjName);
                   }
                 }
-                for (var objGroupName in objectGroups){
+                for (var objGroupName in sceneHandler.getObjectGroups()){
                   if (objGroupName.startsWith(tmpPrefix)){
                     objectNamesArray.push(objGroupName);
                   }
@@ -1887,20 +1931,20 @@ function parse(input){
               terminal.printError(Text.MUST_GLUE_AT_LEAST_2_OBJECTS);
               return true;
             }
-
             for (var i = 0; i<objectNamesArray.length; i++){
               var object = addedObjects[objectNamesArray[i]];
               if (!object){
                 object = objectGroups[objectNamesArray[i]];
                 if (!object){
-                  terminal.printError(Text.OBJECT_NR_DOES_NOT_EXIST.replace(
-                    Text.PARAM1, (i+1)
-                  ));
+                  terminal.printError(Text.OBJECT_NR_DOES_NOT_EXIST.replace(Text.PARAM1, (i+1)));
                   return true;
                 }
               }
+              if (object.registeredSceneName != sceneHandler.getActiveSceneName()){
+                terminal.printError(Text.OBJECT_NR_X_NOT_IN_SCENE.replace(Text.PARAM1, (i+1)));
+                return true;
+              }
             }
-
             var detachedObjectGroups = new Object();
             for (var i = 0; i<objectNamesArray.length; i++){
               var object = addedObjects[objectNamesArray[i]];
@@ -1914,7 +1958,6 @@ function parse(input){
                 group[objectNamesArray[i]] = object;
               }
             }
-
             var materialUsed = 0;
             for (var objName in group){
               if (!materialUsed){
@@ -1928,9 +1971,7 @@ function parse(input){
               }
             }
             selectionHandler.resetCurrentSelection();
-
             var objectGroup = new ObjectGroup(groupName, group);
-
             if (!objectGroup.areGeometriesIdentical()){
               var ctr = 0;
               for (var objName in group){
@@ -1941,29 +1982,30 @@ function parse(input){
                 }
               }
             }
-
             try{
               objectGroup.handleTextures();
             }catch (textureMergerErr){
               terminal.printError(textureMergerErr.message);
               return true;
             }
-
             for (var objGroupName in detachedObjectGroups){
               var gluedObject = detachedObjectGroups[objGroupName];
+              sceneHandler.onObjectGroupDeletion(gluedObject);
               gluedObject.detach();
               delete objectGroups[gluedObject.name];
             }
-
             if (materialUsed == 1){
               objectGroup.isBasicMaterial = true;
             }
             objectGroup.glue();
+            sceneHandler.onObjectGroupCreation(objectGroup);
             objectGroups[groupName] = objectGroup;
+            for (var childObjName in objectGroup.group){
+              sceneHandler.onAddedObjectDeletion(objectGroup.group[childObjName]);
+            }
             guiHandler.hide(guiHandler.guiTypes.OBJECT);
             if (areaConfigurationsVisible){
               guiHandler.hide(guiHandler.guiTypes.AREA);
-              areaConfigurationsVisible = false;
             }
             refreshRaycaster(Text.OBJECTS_GLUED_TOGETHER);
             return true;
@@ -1988,12 +2030,19 @@ function parse(input){
             terminal.printError(Text.NO_SUCH_OBJECT);
             return true;
           }
+          if (objectGroup.registeredSceneName != sceneHandler.getActiveSceneName()){
+            terminal.printError(Text.OBJECT_NOT_IN_SCENE);
+            return true;
+          }
+          for (var childObjName in objectGroup.group){
+            sceneHandler.onAddedObjectCreation(objectGroup.group[childObjName]);
+          }
           objectGroup.detach();
+          sceneHandler.onObjectGroupDeletion(objectGroup);
           delete objectGroups[name];
           selectionHandler.resetCurrentSelection();
           if (areaConfigurationsVisible){
             guiHandler.hide(guiHandler.guiTypes.AREA);
-            areaConfigurationsVisible = false;
           }
           if (!jobHandlerWorking){
             refreshRaycaster(Text.OBJECT_DETACHED);
@@ -2074,6 +2123,7 @@ function parse(input){
             markedPoint.hide();
           }
           selectedGrid.toggleSelect(false, false, false, true);
+          sceneHandler.onMarkedPointCreation(markedPoint);
           if (!jobHandlerWorking){
             terminal.printInfo(Text.POINT_MARKED);
           }
@@ -2093,6 +2143,7 @@ function parse(input){
             terminal.printError(Text.NO_SUCH_POINT);
             return true;
           }
+          sceneHandler.onMarkedPointDeletion(markedPoint);
           markedPoint.destroy();
           delete markedPoints[name];
           if (!jobHandlerWorking){
@@ -2112,7 +2163,7 @@ function parse(input){
               options = false;
             }
             terminal.printInfo(Text.TREE_POINT.replace(
-              Text.PARAM1, curPoint.name
+              Text.PARAM1, curPoint.name + " ["+curPoint.registeredSceneName+"]"
             ).replace(
               Text.PARAM2, curPoint.x
             ).replace(
@@ -2132,7 +2183,7 @@ function parse(input){
             terminal.printError(Text.WORKS_ONLY_IN_DESIGN_MODE);
             return true;
           }
-          for (var markedPointName in markedPoints){
+          for (var markedPointName in sceneHandler.getMarkedPoints()){
             count++;
             if (markedPoints[markedPointName].isHidden){
               markedPoints[markedPointName].show();
@@ -2294,6 +2345,10 @@ function parse(input){
             return true;
           }
           if (obj instanceof AddedObject || obj instanceof ObjectGroup){
+            if (obj.registeredSceneName != sceneHandler.getActiveSceneName()){
+              terminal.printError(Text.OBJECT_NOT_IN_SCENE);
+              return true;
+            }
             obj.setBlending(blendingModeInt);
           }
           if (!jobHandlerWorking){
@@ -2370,6 +2425,7 @@ function parse(input){
           var lowerBound = new THREE.Vector3(minX, minY, minZ);
           var upperBound = new THREE.Vector3(maxX, maxY, maxZ);
           LIMIT_BOUNDING_BOX = new THREE.Box3(lowerBound, upperBound);
+          sceneHandler.onWorldLimitsChange();
           refreshRaycaster(Text.OCTREE_LIMIT_SET);
           return true;
         break;
@@ -2402,11 +2458,7 @@ function parse(input){
             return true;
           }
           BIN_SIZE = binSize;
-          areaBinHandler = new WorldBinHandler(true);
-          areaBinHandler.isAreaBinHandler = true;
-          for (var areaName in areas){
-            areaBinHandler.insert(areas[areaName].boundingBox, areaName);
-          }
+          sceneHandler.onBinSizeChange();
           refreshRaycaster(Text.BIN_SIZE_SET);
           return true;
         break;
@@ -2547,7 +2599,6 @@ function parse(input){
           gridSystem.newSphere(sphereName, material, radius, selections);
           if (areaConfigurationsVisible){
             guiHandler.hide(guiHandler.guiTypes.AREA);
-            areaConfigurationsVisible = false;
           }
           if (!jobHandlerWorking){
             refreshRaycaster(Text.SPHERE_CREATED);
@@ -2580,6 +2631,10 @@ function parse(input){
               terminal.printError(Text.NO_SUCH_OBJECT);
               return true;
             }
+          }
+          if (obj.registeredSceneName != sceneHandler.getActiveSceneName()){
+            terminal.printError(Text.OBJECT_NOT_IN_SCENE);
+            return true;
           }
           if (onOff != "ON" && onOff != "OFF"){
             terminal.printError(Text.SLIPPERINESS_STATE_MUST_BE_ON_OR_OFF);
@@ -2659,6 +2714,14 @@ function parse(input){
             terminal.printError(Text.SOURCE_AND_TARGET_OBJECTS_ARE_THE_SAME);
             return true;
           }
+          if (sourceObject.registeredSceneName != sceneHandler.getActiveSceneName()){
+            terminal.printError(Text.SOURCE_OBJECT_NOT_IN_SCENE);
+            return true;
+          }
+          if (targetObject.registeredSceneName != sceneHandler.getActiveSceneName()){
+            terminal.printError(Text.TARGET_OBJECT_NOT_IN_SCENE);
+            return true;
+          }
           targetObject.syncProperties(sourceObject);
           if (!jobHandlerWorking){
             terminal.printInfo(Text.OBJECTS_SYNCED);
@@ -2711,8 +2774,8 @@ function parse(input){
           terminal.printInfo(Text.AREA_CREATED);
           if (areaConfigurationsVisible){
             guiHandler.hide(guiHandler.guiTypes.AREA);
-            areaConfigurationsVisible = false;
           }
+          sceneHandler.onAreaCreation(result);
           return true;
         break;
         case 131: //toggleAreas
@@ -2722,12 +2785,12 @@ function parse(input){
           }
           areasVisible = !areasVisible;
           if (areasVisible){
-            for (var areaName in areas){
+            for (var areaName in sceneHandler.getAreas()){
               areas[areaName].renderToScreen();
             }
             terminal.printInfo(Text.AREAS_ARE_VISIBLE);
           }else{
-            for (var areaName in areas){
+            for (var areaName in sceneHandler.getAreas()){
               areas[areaName].hide();
             }
             terminal.printInfo(Text.AREAS_ARE_INVISIBLE);
@@ -2745,12 +2808,12 @@ function parse(input){
             terminal.printError(Text.NO_SUCH_AREA);
             return true;
           }
+          sceneHandler.onAreaDeletion(area);
           area.destroy();
           delete areas[area.name];
           terminal.printInfo(Text.AREA_DESTROYED);
           if (areaConfigurationsVisible){
             guiHandler.hide(guiHandler.guiTypes.AREA);
-            areaConfigurationsVisible = false;
           }
           return true;
         break;
@@ -2765,20 +2828,11 @@ function parse(input){
             return true;
           }
           var count = 0;
-          for (var areaName in areas){
+          for (var objName in sceneHandler.getAddedObjects()){
             count ++;
             break;
           }
-          if (count == 0){
-            terminal.printError(Text.NO_AREAS_CREATED);
-            return true;
-          }
-          count = 0;
-          for (var objName in addedObjects){
-            count ++;
-            break;
-          }
-          for (var objName in objectGroups){
+          for (var objName in sceneHandler.getObjectGroups()){
             count ++;
             break;
           }
@@ -2799,7 +2853,6 @@ function parse(input){
             }
             guiHandler.hide(guiHandler.guiTypes.AREA);
           }
-          areaConfigurationsVisible = ! areaConfigurationsVisible;
           terminal.printInfo(Text.OK);
         break;
         case 134: //setResolution
@@ -2834,12 +2887,16 @@ function parse(input){
             terminal.printError(Text.NO_SUCH_AREA);
             return true;
           }
+          if (areaName.toLowerCase() != "default" && areas[areaName].registeredSceneName != sceneHandler.getActiveSceneName()){
+            terminal.printError(Text.AREA_NOT_IN_SCENE);
+            return true;
+          }
           var count = 0;
-          for (var objName in addedObjects){
+          for (var objName in sceneHandler.getAddedObjects()){
             count ++;
             break;
           }
-          for (var objName in objectGroups){
+          for (var objName in sceneHandler.getObjectGroups()){
             count ++;
             break;
           }
@@ -2851,7 +2908,6 @@ function parse(input){
             guiHandler.hide(guiHandler.guiTypes.AREA);
           }
           areaConfigurationsHandler.show(areaName);
-          areaConfigurationsVisible = true;
           terminal.printInfo(Text.OK);
           return true;
         break;
@@ -2873,6 +2929,10 @@ function parse(input){
             terminal.printError(Text.NO_SUCH_AREA);
             return true;
           }
+          if (areaName != "default" && area.registeredSceneName != sceneHandler.getActiveSceneName()){
+            terminal.printError(Text.AREA_NOT_IN_SCENE);
+            return true;
+          }
           var obj = addedObjects[objName];
           if (!obj){
             obj = objectGroups[objName];
@@ -2880,6 +2940,10 @@ function parse(input){
               terminal.printError(Text.NO_SUCH_OBJECT);
               return true;
             }
+          }
+          if (obj.registeredSceneName != sceneHandler.getActiveSceneName()){
+            terminal.printError(Text.OBJECT_NOT_IN_SCENE);
+            return true;
           }
           if (isVisible != "true" && isVisible != "false"){
             terminal.printError(Text.ISVISIBLE_MUST_BE_TRUE_OR_FALSE);
@@ -2915,6 +2979,10 @@ function parse(input){
           }
           if (!areas[areaName]){
             terminal.printError(Text.NO_SUCH_AREA);
+            return true;
+          }
+          if (areas[areaName].registeredSceneName != sceneHandler.getActiveSceneName()){
+            terminal.printError(Text.AREA_NOT_IN_SCENE);
             return true;
           }
           if (!jobHandlerWorking){
@@ -3078,7 +3146,6 @@ function parse(input){
           );
           if (areaConfigurationsVisible){
             guiHandler.hide(guiHandler.guiTypes.AREA);
-            areaConfigurationsVisible = false;
           }
           if (!jobHandlerWorking){
             refreshRaycaster(Text.CYLINDER_CREATED);
@@ -3107,6 +3174,10 @@ function parse(input){
               terminal.printError(Text.NO_SUCH_OBJECT);
               return true;
             }
+          }
+          if (obj.registeredSceneName != sceneHandler.getActiveSceneName()){
+            terminal.printError(Text.OBJECT_NOT_IN_SCENE);
+            return true;
           }
           if (isNaN(offsetX)){
             terminal.printError(Text.IS_NOT_A_NUMBER.replace(Text.PARAM1, "offsetX"));
@@ -3137,6 +3208,10 @@ function parse(input){
           var objGroup = objectGroups[objName];
           if (!objGroup){
             terminal.printError(Text.NO_SUCH_OBJECT_GROUP);
+            return true;
+          }
+          if (objGroup.registeredSceneName != sceneHandler.getActiveSceneName()){
+            terminal.printError(Text.OBJECT_NOT_IN_SCENE);
             return true;
           }
           var childObj = objGroup.group[childObjName];
@@ -3173,6 +3248,10 @@ function parse(input){
               terminal.printError(Text.NO_SUCH_OBJECT);
               return true;
             }
+          }
+          if (obj.registeredSceneName != sceneHandler.getActiveSceneName()){
+            terminal.printError(Text.OBJECT_NOT_IN_SCENE);
+            return true;
           }
           if (!obj.pivotObject){
             terminal.printError(Text.OBJECT_DOES_NOT_HAVE_A_PIVOT);
@@ -3300,6 +3379,10 @@ function parse(input){
           if (!sourceObj){
             sourceObj = objectGroups[sourceName];
           }
+          if (sourceObj.registeredSceneName != sceneHandler.getActiveSceneName()){
+            terminal.printError(Text.OBJECT_NOT_IN_SCENE);
+            return true;
+          }
           var copiedObj = sourceObj.copy(targetName, isHardCopyBoolean, copyPosition, gs, false);
           scene.add(copiedObj.mesh);
           if (!copiedObj.noMass && (copiedObj instanceof AddedObject)){
@@ -3307,8 +3390,10 @@ function parse(input){
           }
           if (sourceObj instanceof AddedObject){
             addedObjects[targetName] = copiedObj;
+            sceneHandler.onAddedObjectCreation(copiedObj);
           }else{
             objectGroups[targetName] = copiedObj;
+            sceneHandler.onObjectGroupCreation(copiedObj);
             if (!jobHandlerWorking){
               for (var gridName in gridSelections){
                 gridSelections[gridName].toggleSelect(false, false, false, true);
@@ -3627,6 +3712,7 @@ function parse(input){
           var addedText = new AddedText(
             textName, selectedFont, txt, textCoord, new THREE.Color("white"), 1, 20
           );
+          sceneHandler.onAddedTextCreation(addedText);
           addedTexts[textName] = addedText;
           addedText.refCharSize = 20;
           addedText.refInnerHeight = window.innerHeight;
@@ -3661,6 +3747,10 @@ function parse(input){
             terminal.printError(Text.NO_SUCH_TEXT);
             return true;
           }
+          if (textSelection.registeredSceneName != sceneHandler.getActiveSceneName()){
+            terminal.printError(Text.TEXT_NOT_IN_SCENE);
+            return true;
+          }
           selectionHandler.resetCurrentSelection();
           selectionHandler.select(textSelection);
           guiHandler.afterObjectSelection();
@@ -3684,6 +3774,7 @@ function parse(input){
             return true;
           }
           selectionHandler.resetCurrentSelection();
+          sceneHandler.onAddedTextDeletion(textToDestroy);
           textToDestroy.destroy(true);
           if (!jobHandlerWorking){
             refreshRaycaster(Text.TEXT_DESTROYED);
@@ -3703,7 +3794,7 @@ function parse(input){
               options = false;
             }
             terminal.printInfo(Text.TREE2.replace(
-              Text.PARAM1, textName
+              Text.PARAM1, textName + " ["+addedTexts[textName].registeredSceneName+"]"
             ).replace(
               Text.PARAM2, addedTexts[textName].text
             ), options);
@@ -3751,6 +3842,10 @@ function parse(input){
           var obj = objectGroups[objName];
           if (!obj){
             terminal.printError(Text.NO_SUCH_OBJECT_GROUP);
+            return true;
+          }
+          if (obj.registeredSceneName != sceneHandler.getActiveSceneName()){
+            terminal.printError(Text.OBJECT_NOT_IN_SCENE);
             return true;
           }
           if (obj.noMass){
@@ -3824,6 +3919,10 @@ function parse(input){
             terminal.printError(Text.NO_SUCH_OBJECT_GROUP);
             return true;
           }
+          if (obj.registeredSceneName != sceneHandler.getActiveSceneName()){
+            terminal.printError(Text.OBJECT_NOT_IN_SCENE);
+            return true;
+          }
           if (obj.noMass){
             terminal.printError(Text.OBJECT_HAS_NO_MASS);
             return true;
@@ -3851,6 +3950,10 @@ function parse(input){
               terminal.printError(Text.NO_SUCH_OBJECT);
               return true;
             }
+          }
+          if (obj.registeredSceneName != sceneHandler.getActiveSceneName()){
+            terminal.printError(Text.OBJECT_NOT_IN_SCENE);
+            return true;
           }
           if (!obj.isFPSWeapon){
             terminal.printError(Text.OBJECT_IS_NOT_MARKED_AS_FPS_WEAPON);
@@ -3924,6 +4027,10 @@ function parse(input){
             terminal.printError(Text.NO_SUCH_PARTICLE_SYSTEM);
             return true;
           }
+          if (preConfiguredParticleSystems[psName].registeredSceneName != sceneHandler.getActiveSceneName()){
+            terminal.printError(Text.PS_NOT_IN_SCENE);
+            return true;
+          }
           particleSystemCreatorGUIHandler.edit(psName);
           terminal.clear();
           terminal.disable();
@@ -3961,6 +4068,10 @@ function parse(input){
             terminal.printError(Text.NO_SUCH_PARTICLE_SYSTEM);
             return true;
           }
+          if (ps.registeredSceneName != sceneHandler.getActiveSceneName()){
+            terminal.printError(Text.PS_NOT_IN_SCENE);
+            return true;
+          }
           if (!(typeof ps.preConfiguredParticleSystemPoolName == UNDEFINED)){
             terminal.printError(Text.PARTICLE_SYSTEM_BELONGS_TO_ANOTHER_POOL);
             return true;
@@ -3974,6 +4085,7 @@ function parse(input){
             return true;
           }
           var preConfiguredParticleSystemPool = new PreconfiguredParticleSystemPool(psName, poolName, poolSize);
+          sceneHandler.onParticleSystemPoolCreation(preConfiguredParticleSystemPool);
           preConfiguredParticleSystemPools[poolName] = preConfiguredParticleSystemPool;
           ps.preConfiguredParticleSystemPoolName = poolName;
           terminal.printInfo(Text.PARTICLE_SYSTEM_POOL_CREATED);
@@ -4003,6 +4115,7 @@ function parse(input){
               return true;
             }
           }
+          sceneHandler.onParticleSystemDeletion(preConfiguredParticleSystem);
           preConfiguredParticleSystem.destroy();
           if (!jobHandlerWorking){
             terminal.printInfo(Text.PARTICLE_SYSTEM_DESTROYED);
@@ -4023,6 +4136,7 @@ function parse(input){
             terminal.printError(Text.NO_SUCH_PARTICLE_SYSTEM_POOL);
             return true;
           }
+          sceneHandler.onParticleSystemPoolDeletion(preConfiguredParticleSystemPool);
           preConfiguredParticleSystemPool.destroy();
           if (!jobHandlerWorking){
             terminal.printInfo(Text.PARTICLE_SYSTEM_POOL_DESTROYED);
@@ -4039,7 +4153,7 @@ function parse(input){
               opts = false;
             }
             ctr ++;
-            terminal.printInfo(Text.TREE2.replace(Text.PARAM1, psName).replace(Text.PARAM2, preConfiguredParticleSystems[psName].type), opts);
+            terminal.printInfo(Text.TREE2.replace(Text.PARAM1, psName + " ["+preConfiguredParticleSystems[psName].registeredSceneName+"]").replace(Text.PARAM2, preConfiguredParticleSystems[psName].type), opts);
           }
           if (len == 0){
             terminal.printError(Text.NO_PARTICLE_SYSTEMS_CREATED);
@@ -4056,7 +4170,7 @@ function parse(input){
               opts = false;
             }
             ctr ++;
-            terminal.printInfo(Text.TREE2.replace(Text.PARAM1, poolName).replace(Text.PARAM2, preConfiguredParticleSystemPools[poolName].refParticleSystemName+" x "+preConfiguredParticleSystemPools[poolName].poolSize), opts);
+            terminal.printInfo(Text.TREE2.replace(Text.PARAM1, poolName + " ["+preConfiguredParticleSystemPools[poolName].registeredSceneName+"]").replace(Text.PARAM2, preConfiguredParticleSystemPools[poolName].refParticleSystemName+" x "+preConfiguredParticleSystemPools[poolName].poolSize), opts);
           }
           if (len == 0){
             terminal.printError(Text.NO_PARTICLE_SYSTEM_POOLS_CREATED);
@@ -4110,6 +4224,10 @@ function parse(input){
             terminal.printError(Text.NO_SUCH_PARTICLE_SYSTEM);
             return true;
           }
+          if (ps.registeredSceneName != sceneHandler.getActiveSceneName()){
+            terminal.printError(Text.PS_NOT_IN_SCENE);
+            return true;
+          }
           if (ps.isCollidable){
             terminal.printError(Text.CANNOT_CREATE_MUZZLEFLASH_COLLIDABLE_PS);
             return true;
@@ -4133,6 +4251,10 @@ function parse(input){
           var muzzleFlash = muzzleFlashes[muzzleFlashName];
           if (!muzzleFlash){
             terminal.printError(Text.NO_SUCH_MUZZLE_FLASH);
+            return true;
+          }
+          if (muzzleFlash.registeredSceneName != sceneHandler.getActiveSceneName()){
+            terminal.printError(Text.MUZZLE_FLASH_NOT_IN_SCENE);
             return true;
           }
           muzzleFlashCreatorGUIHandler.edit(muzzleFlash);
@@ -4160,6 +4282,7 @@ function parse(input){
             terminal.printError(Text.MUZZLE_FLASH_USED_IN.replace(Text.PARAM1, muzzleFlash.getUsingWeaponName()));
             return true;
           }
+          sceneHandler.onMuzzleFlashDeletion(muzzleFlash);
           muzzleFlash.destroy();
           if (!jobHandlerWorking){
             terminal.printInfo(Text.MUZZLE_FLASH_DESTROYED);
@@ -4176,7 +4299,7 @@ function parse(input){
               opts = false;
             }
             ctr ++;
-            terminal.printInfo(Text.TREE2.replace(Text.PARAM1, muzzleFlashName).replace(Text.PARAM2, muzzleFlashes[muzzleFlashName].refPreconfiguredPS.name), opts);
+            terminal.printInfo(Text.TREE2.replace(Text.PARAM1, muzzleFlashName + " ["+muzzleFlashes[muzzleFlashName].registeredSceneName+"]").replace(Text.PARAM2, muzzleFlashes[muzzleFlashName].refPreconfiguredPS.name), opts);
           }
           if (len == 0){
             terminal.printError(Text.NO_MUZZLE_FLASHES_CREATED);
@@ -4192,6 +4315,7 @@ function parse(input){
             terminal.printError(Text.NO_SKYBOX_MAPPED);
             return true;
           }
+          sceneHandler.onUnmapSkybox();
           skyboxHandler.unmap();
           fogHandler.setBlendWithSkyboxStatus(false);
           terminal.printInfo(Text.SKYBOX_HIDDEN);
@@ -4341,10 +4465,11 @@ function parse(input){
             terminal.printError(Text.NO_SUCH_CROSSHAIR);
             return true;
           }
+          sceneHandler.onCrosshairDeletion(crosshair);
           crosshair.destroy(true);
           delete crosshairs[crosshair.name];
           if (!jobHandlerWorking){
-            terminal.printInfo(Text.CROSSHAIR_EDITED);
+            terminal.printInfo(Text.CROSSHAIR_DESTROYED);
           }
           return true;
         break;
@@ -4358,7 +4483,7 @@ function parse(input){
             if (count == length){
               options = false;
             }
-            terminal.printInfo(Text.TREE2.replace(Text.PARAM1, crosshairName).replace(Text.PARAM2, crosshairs[crosshairName].configurations.texture), options);
+            terminal.printInfo(Text.TREE2.replace(Text.PARAM1, crosshairName + " ["+crosshairs[crosshairName].registeredSceneName+"]").replace(Text.PARAM2, crosshairs[crosshairName].configurations.texture), options);
           }
           if (count == 0){
             terminal.printError(Text.NO_CROSSHAIRS_CREATED);
@@ -4396,7 +4521,108 @@ function parse(input){
               }
             }
           }
+          if (obj.registeredSceneName != sceneHandler.getActiveSceneName()){
+            if (obj.isAddedObject || obj.isObjectGroup){
+              terminal.printError(Text.OBJECT_NOT_IN_SCENE);
+            }else{
+              terminal.printError(Text.TEXT_NOT_IN_SCENE);
+            }
+            return true;
+          }
           animationCreatorGUIHandler.show(obj);
+          return true;
+        break;
+        case 187: //createScene
+          if (mode != 0){
+            terminal.printError(Text.WORKS_ONLY_IN_DESIGN_MODE);
+            return true;
+          }
+          var sceneName = splitted[1];
+          if (sceneHandler.scenes[sceneName]){
+            terminal.printError(Text.NAME_MUST_BE_UNIQUE);
+            return true;
+          }
+          sceneHandler.createScene(sceneName);
+          terminal.printInfo(Text.SCENE_CREATED);
+          return true;
+        break;
+        case 188: //switchScene
+          if (mode != 0){
+            terminal.printError(Text.WORKS_ONLY_IN_DESIGN_MODE);
+            return true;
+          }
+          var sceneName = splitted[1];
+          if (!sceneHandler.scenes[sceneName]){
+            terminal.printError(Text.NO_SUCH_SCENE);
+            return true;
+          }
+          if (sceneName == sceneHandler.activeSceneName){
+            terminal.printError(Text.SCENE_IS_ALREADY_ACTIVE);
+            return true;
+          }
+          selectionHandler.resetCurrentSelection();
+          guiHandler.hideAll();
+          sceneHandler.changeScene(sceneName);
+          if (physicsDebugMode){
+            debugRenderer.refresh();
+          }
+          refreshRaycaster(Text.SCENE_SWITCHED);
+          return true;
+        break;
+        case 189: //printScenes
+          var count = 0;
+          var length = Object.keys(sceneHandler.scenes).length;
+          terminal.printHeader(Text.SCENES);
+          for (var sceneName in sceneHandler.scenes){
+            count ++;
+            var options = true;
+            if (count == length){
+              options = false;
+            }
+            terminal.printInfo(Text.TREE.replace(Text.PARAM1, sceneName), options);
+          }
+          return true;
+        break;
+        case 190: //setEntryScene
+          if (mode != 0){
+            terminal.printError(Text.WORKS_ONLY_IN_DESIGN_MODE);
+            return true;
+          }
+          var sceneName = splitted[1];
+          if (!sceneHandler.scenes[sceneName]){
+            terminal.printError(Text.NO_SUCH_SCENE);
+            return true;
+          }
+          sceneHandler.entrySceneName = sceneName;
+          terminal.printInfo(Text.ENTRY_SCENE_SET.replace(Text.PARAM1, sceneName));
+          return true;
+        break;
+        case 191: //destroyScene
+          if (mode != 0){
+            terminal.printError(Tetx.WORKS_ONLY_IN_DESIGN_MODE);
+            return true;
+          }
+          var sceneName = splitted[1];
+          if (!(sceneName.indexOf("*") == -1)){
+            new JobHandler(splitted).handle();
+            return true;
+          }
+          if (!sceneHandler.scenes[sceneName]){
+            terminal.printError(Text.NO_SUCH_SCENE);
+            return true;
+          }
+          if (sceneHandler.getActiveSceneName() == sceneName){
+            terminal.printError(Text.SCENE_IS_ACTIVE_CANNOT_DELETE);
+            return true;
+          }
+          if (sceneHandler.entrySceneName == sceneName){
+            terminal.printError(Text.CANNOT_DELETE_ENTRY_SCENE);
+            return true;
+          }
+          sceneHandler.destroyScene(sceneName);
+          if (!jobHandlerWorking){
+            terminal.printInfo(Text.SCENE_DESTROYED);
+          }
           return true;
         break;
       }
@@ -4512,9 +4738,8 @@ function processNewGridSystemCommand(name, sizeX, sizeZ, centerX, centerY, cente
     slicedGrid.toggleSelect(true, false, false, true);
     slicedGrid.slicedGridSystemName = name;
   }
-
+  sceneHandler.onGridSystemCreation(gsObject);
   refreshRaycaster(Text.GS_CREATED);
-
   return true;
 }
 
@@ -4536,7 +4761,7 @@ function refreshRaycaster(messageOnFinished, noClear){
       }
     }
   }
-  rayCaster.refresh();
+  raycasterFactory.refresh();
 }
 
 function isNameUsedAsSoftCopyParentName(name){

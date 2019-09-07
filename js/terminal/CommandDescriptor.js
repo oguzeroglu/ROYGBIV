@@ -187,7 +187,12 @@ var CommandDescriptor = function(){
       1, //destroyCrosshair
       0, //printCrosshairs
       0, //scripts
-      1 //animations
+      1, //animations
+      1, //newScene
+      1, //switchScene
+      0, //printScenes
+      1, //setEntryScene
+      1 //destroyScene
   ];
 
   this.commandArgumentsExpectedExplanation = [
@@ -377,7 +382,12 @@ var CommandDescriptor = function(){
     "destroyCrosshair crosshairName",
     "printCrosshairs",
     "scripts",
-    "animations objectName"
+    "animations objectName",
+    "newScene sceneName",
+    "switchScene sceneName",
+    "printScenes",
+    "setEntryScene sceneName",
+    "destroyScene sceneName"
   ];
 
   this.commands = [
@@ -567,7 +577,12 @@ var CommandDescriptor = function(){
     "destroyCrosshair",
     "printCrosshairs",
     "scripts",
-    "animations"
+    "animations",
+    "newScene",
+    "switchScene",
+    "printScenes",
+    "setEntryScene",
+    "destroyScene"
   ];
 
   this.commandInfo = [
@@ -757,7 +772,12 @@ var CommandDescriptor = function(){
     "destroyCrosshair: Destroys a Crosshair object.",
     "printCrosshairs: Prints created crosshairs.",
     "scripts: Opens the script handler GUI.",
-    "animations: Opens the Animation editor GUI for an object or a text."
+    "animations: Opens the Animation editor GUI for an object or a text.",
+    "newScene: Creates a new scene.",
+    "switchScene: Switches the active scene.",
+    "printScenes: Prints created scenes.",
+    "setEntryScene: Sets the entry scene.",
+    "destroyScene: Destroys a scene."
   ];
 
   this.keyboardInfo = [
@@ -863,34 +883,35 @@ var CommandDescriptor = function(){
   this.MATERIAL_NAME              =   5;
   this.MATERIAL_NAME_WITH_NULL    =   6;
   this.OBJECT_NAME                =   7;
-  this.OBJECT_AXIS                =   10;
-  this.PHYSICS_TEST_INDEX         =   11;
-  this.STATE_ON_OFF               =   12;
-  this.S_T_ST                     =   13;
-  this.WALL_COLLECTION_NAME       =   14;
-  this.DEFAULT_MATERIAL_TYPE      =   15;
-  this.TEXTURE_PACK_NAME          =   17;
-  this.HIDE_SHOW                  =   18;
-  this.SKYBOX_NAME                =   19;
-  this.ANY_OBJECT                 =   21;
-  this.GLUED_OBJECT_NAME          =   22;
-  this.MARKED_POINT_NAME          =   23;
-  this.API_FUNCTION_NAME          =   24;
-  this.BLENDING_MODE              =   25;
-  this.OBJECT_CREATION_NAME       =   26;
-  this.AREA_NAME                  =   27;
-  this.AREA_NAME_WITH_DEFAULT     =   28;
-  this.RENDER_SIDE                =   29;
-  this.CHILD_OBJECT_NAME          =   30;
-  this.FONT_NAME                  =   31;
-  this.TEXT_NAME                  =   32;
-  this.EFFECT_NAME                =   33;
-  this.FPS_WEAPON                 =   34;
-  this.PRECONFIGURED_PS_NAME      =   35;
-  this.PRECONFOGURED_PS_POOL_NAME =   36;
-  this.MUZZLE_FLASH_NAME          =   37;
-  this.CROSSHAIR_NAME             =   38;
-  this.OBJECT_AND_TEXT_NAME       =   39;
+  this.OBJECT_AXIS                =   8;
+  this.STATE_ON_OFF               =   9;
+  this.S_T_ST                     =   10;
+  this.WALL_COLLECTION_NAME       =   11;
+  this.DEFAULT_MATERIAL_TYPE      =   12;
+  this.TEXTURE_PACK_NAME          =   13;
+  this.HIDE_SHOW                  =   14;
+  this.SKYBOX_NAME                =   15;
+  this.ANY_OBJECT                 =   16;
+  this.GLUED_OBJECT_NAME          =   17;
+  this.MARKED_POINT_NAME          =   18;
+  this.API_FUNCTION_NAME          =   19;
+  this.BLENDING_MODE              =   20;
+  this.OBJECT_CREATION_NAME       =   21;
+  this.AREA_NAME                  =   22;
+  this.AREA_NAME_WITH_DEFAULT     =   23;
+  this.RENDER_SIDE                =   24;
+  this.CHILD_OBJECT_NAME          =   25;
+  this.FONT_NAME                  =   26;
+  this.TEXT_NAME                  =   27;
+  this.EFFECT_NAME                =   28;
+  this.FPS_WEAPON                 =   29;
+  this.PRECONFIGURED_PS_NAME      =   30;
+  this.PRECONFOGURED_PS_POOL_NAME =   31;
+  this.MUZZLE_FLASH_NAME          =   32;
+  this.CROSSHAIR_NAME             =   33;
+  this.OBJECT_AND_TEXT_NAME       =   34;
+  this.SCENE_NAME                 =   35;
+  this.GS_NAME_NO_WC              =   36;
 
   // newGridSystem
   this.newGridSystem = new Object();
@@ -913,9 +934,9 @@ var CommandDescriptor = function(){
   // destroyGridSystem
   this.destroyGridSystem = new Object();
   this.destroyGridSystem.types = [];
-  this.destroyGridSystem.types.push(this.GRID_SYSTEM_NAME); //name
+  this.destroyGridSystem.types.push(this.GS_NAME_NO_WC); //name
 
-  // selectAllGrids --> DEPRECATED
+  // selectAllGrids
   this.selectAllGrids = new Object();
   this.selectAllGrids.types = [];
   this.selectAllGrids.types.push(this.GRID_SYSTEM_NAME); //name
@@ -1380,6 +1401,27 @@ var CommandDescriptor = function(){
   this.animations = new Object();
   this.animations.types = [];
   this.animations.types.push(this.OBJECT_AND_TEXT_NAME); //animations
+
+  // newScene
+  this.newScene = new Object();
+  this.newScene.types = [];
+  this.newScene.types.push(this.UNKNOWN_INDICATOR); //sceneName
+
+  // switchScene
+  this.switchScene = new Object();
+  this.switchScene.types = [];
+  this.switchScene.types.push(this.SCENE_NAME); //sceneName
+
+  // setEntryScene
+  this.setEntryScene = new Object();
+  this.setEntryScene.types = [];
+  this.setEntryScene.types.push(this.SCENE_NAME); //sceneName
+
+  // destroyScene
+  this.destroyScene = new Object();
+  this.destroyScene.types = [];
+  this.destroyScene.types.push(this.SCENE_NAME); //sceneName
+
 };
 
 CommandDescriptor.prototype.test = function(){

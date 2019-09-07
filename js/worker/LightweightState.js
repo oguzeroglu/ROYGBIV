@@ -33,18 +33,18 @@ var LightweightState = function(){
   }
   // GRID SYSTEMS
   this.gridSystems = new Object();
-  for (var gsName in gridSystems){
+  for (var gsName in sceneHandler.getGridSystems()){
     this.gridSystems[gsName] = gridSystems[gsName].exportLightweight();
   }
   // ADDED OBJECTS
   this.addedObjects = new Object();
-  for (var objName in addedObjects){
+  for (var objName in sceneHandler.getAddedObjects()){
     this.addedObjects[objName] = addedObjects[objName].exportLightweight();
   }
   // OBJECT GROUPS
   this.childAddedObjects = new Object();
   this.objectGroups = new Object();
-  for (var objName in objectGroups){
+  for (var objName in sceneHandler.getObjectGroups()){
     this.objectGroups[objName] = objectGroups[objName].exportLightweight();
     for (var childName in objectGroups[objName].group){
       this.childAddedObjects[childName] = objectGroups[objName].group[childName].exportLightweight();
@@ -52,7 +52,7 @@ var LightweightState = function(){
   }
   // 3D ADDED TEXTS
   this.addedTexts3D = new Object();
-  for (var textName in addedTexts){
+  for (var textName in sceneHandler.getAddedTexts()){
     if (!addedTexts[textName].is2D){
       this.addedTexts3D[textName] = addedTexts[textName].exportLightweight();
     }
@@ -61,6 +61,9 @@ var LightweightState = function(){
   this.particleSystems = new Object();
   for (var psName in particleSystemPool){
     var ps = particleSystemPool[psName];
+    if (ps.registeredSceneName != sceneHandler.getActiveSceneName()){
+      continue;
+    }
     if (ps.shouldSendToWorker()){
       this.particleSystems[psName] = ps.creationConfigurations;
       var particles = new Object();

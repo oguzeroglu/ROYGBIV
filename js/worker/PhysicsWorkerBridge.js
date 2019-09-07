@@ -37,7 +37,9 @@ var PhysicsWorkerBridge = function(){
       physicsWorld.initTransferableBody();
       physicsWorld.ready = true;
     }else{
-      physicsWorld.updateObjects(msg.data);
+      if (physicsWorld.ready){
+        physicsWorld.updateObjects(msg.data);
+      }
     }
   });
 }
@@ -142,7 +144,7 @@ PhysicsWorkerBridge.prototype.initTransferableBody = function(){
   //objectID, px, py, pz, qx, qy, qz, qw, mass, vx, vy, vz, impulseVec1x, impulseVec1y, impulseVec1xz, impulseVec2x, impulseVec2y, impulseVec2z, isVisible
   var objDescriptionAry = [];
   var index = 0;
-  for (var objName in addedObjects){
+  for (var objName in sceneHandler.getAddedObjects()){
     var obj = addedObjects[objName];
     if (obj.isChangeable || (!obj.noMass && obj.physicsBody.mass > 0)){
       obj.impulseVec1 = new THREE.Vector3(); obj.impulseVec2 = new THREE.Vector3();
@@ -157,7 +159,7 @@ PhysicsWorkerBridge.prototype.initTransferableBody = function(){
       index += 19;
     }
   }
-  for (var objName in objectGroups){
+  for (var objName in sceneHandler.getObjectGroups()){
     var obj = objectGroups[objName];
     if (obj.isChangeable || (!obj.noMass && obj.physicsBody.mass > 0)){
       obj.impulseVec1 = new THREE.Vector3(); obj.impulseVec2 = new THREE.Vector3();

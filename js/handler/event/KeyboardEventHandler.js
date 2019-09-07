@@ -122,33 +122,33 @@ KeyboardEventHandler.prototype.onKeyDown = function(event){
 
 KeyboardEventHandler.prototype.activateGridSelectionMode = function(){
   selectionHandler.resetCurrentSelection();
-  for (var objName in addedObjects){
+  for (var objName in sceneHandler.getAddedObjects()){
     addedObjects[objName].mesh.visible = false;
   }
-  for (var objName in objectGroups){
+  for (var objName in sceneHandler.getObjectGroups()){
     objectGroups[objName].mesh.visible = false;
   }
-  for (var textName in addedTexts){
+  for (var textName in sceneHandler.getAddedTexts()){
     addedTexts[textName].hide();
   }
   raycasterFactory.onShiftPress(true);
 }
 
 KeyboardEventHandler.prototype.deactivateGridSelectionMode = function(){
-  for (var objName in addedObjects){
+  for (var objName in sceneHandler.getAddedObjects()){
     addedObjects[objName].mesh.visible = true;
   }
-  for (var objName in objectGroups){
+  for (var objName in sceneHandler.getObjectGroups()){
     objectGroups[objName].mesh.visible = true;
   }
-  for (var textName in addedTexts){
+  for (var textName in sceneHandler.getAddedTexts()){
     addedTexts[textName].show();
   }
   raycasterFactory.onShiftPress(false);
 }
 
 KeyboardEventHandler.prototype.activateObjectSelectionMode = function(){
-  for (var gsName in gridSystems){
+  for (var gsName in sceneHandler.getGridSystems()){
     gridSystems[gsName].hide();
   }
   for (var gridName in gridSelections){
@@ -158,7 +158,7 @@ KeyboardEventHandler.prototype.activateObjectSelectionMode = function(){
 }
 
 KeyboardEventHandler.prototype.deactivateObjectSelectionMode = function(){
-  for (var gsName in gridSystems){
+  for (var gsName in sceneHandler.getGridSystems()){
     gridSystems[gsName].show();
   }
   for (var gridName in gridSelections){

@@ -4,8 +4,27 @@ var AreaConfigurationsHandler = function(){
   this.updateNeeded = false;
 }
 
+AreaConfigurationsHandler.prototype.onAfterSceneChange = function(){
+  var result = sceneHandler.getAreaBinHandler().queryArea(camera.position);
+  if (result){
+    for (var objName in sceneHandler.getAddedObjects()){
+      addedObjects[objName].applyAreaConfiguration(result);
+    }
+    for (var objName in sceneHandler.getObjectGroups()){
+      objectGroups[objName].applyAreaConfiguration(result);
+    }
+  }else{
+    for (var objName in sceneHandler.getAddedObjects()){
+      addedObjects[objName].applyAreaConfiguration("default");
+    }
+    for (var objName in sceneHandler.getObjectGroups()){
+      objectGroups[objName].applyAreaConfiguration("default");
+    }
+  }
+}
+
 AreaConfigurationsHandler.prototype.handle = function(){
-  var result = areaBinHandler.queryArea(camera.position);
+  var result = sceneHandler.getAreaBinHandler().queryArea(camera.position);
   if (result){
     if (result != this.currentArea){
       this.currentArea = result;
@@ -34,7 +53,7 @@ AreaConfigurationsHandler.prototype.generateConfigurations = function(singleArea
   for (var areaName in pseudoAreas){
     this.visibilityConfigurations[areaName] = new Object();
     this.sideConfigurations[areaName] = new Object();
-    for (var objName in addedObjects){
+    for (var objName in sceneHandler.getAddedObjects()){
       var obj = addedObjects[objName];
       this.visibilityConfigurations[areaName][objName] = {
         "Visible": obj.getVisibilityInArea(areaName)
@@ -43,7 +62,7 @@ AreaConfigurationsHandler.prototype.generateConfigurations = function(singleArea
         "Side": obj.getSideInArea(areaName)
       };
     }
-    for (var objName in objectGroups){
+    for (var objName in sceneHandler.getObjectGroups()){
       var obj = objectGroups[objName];
       this.visibilityConfigurations[areaName][objName] = {
         "Visible": obj.getVisibilityInArea(areaName)
@@ -57,7 +76,7 @@ AreaConfigurationsHandler.prototype.generateConfigurations = function(singleArea
   if (!singleAreaName || (singleAreaName && singleAreaName.toLowerCase() == "default")){
     this.visibilityConfigurations["default"] = new Object();
     this.sideConfigurations["default"] = new Object();
-    for (var objName in addedObjects){
+    for (var objName in sceneHandler.getAddedObjects()){
       var obj = addedObjects[objName];
       this.visibilityConfigurations["default"][objName] = {
         "Visible": obj.getVisibilityInArea("default")
@@ -66,7 +85,7 @@ AreaConfigurationsHandler.prototype.generateConfigurations = function(singleArea
         "Side": obj.getSideInArea("default")
       };
     }
-    for (var objName in objectGroups){
+    for (var objName in sceneHandler.getObjectGroups()){
       var obj = objectGroups[objName];
       this.visibilityConfigurations["default"][objName] = {
         "Visible": obj.getVisibilityInArea("default")
@@ -81,7 +100,8 @@ AreaConfigurationsHandler.prototype.generateConfigurations = function(singleArea
 AreaConfigurationsHandler.prototype.show = function(singleAreaName){
   this.generateConfigurations(singleAreaName);
   guiHandler.datGuiAreaConfigurations = new dat.GUI({hideable: false});
-  var pseudoAreas = areas;
+  areaConfigurationsVisible = true;
+  var pseudoAreas = sceneHandler.getAreas();
   if (singleAreaName){
     pseudoAreas = new Object();
     if (singleAreaName.toLowerCase() != "default"){
@@ -100,7 +120,7 @@ AreaConfigurationsHandler.prototype.show = function(singleAreaName){
 
 AreaConfigurationsHandler.prototype.addSubFolder = function(areaName, folder){
   var areaConfigurationsHandlerContext = this;
-  for (var objName in addedObjects){
+  for (var objName in sceneHandler.getAddedObjects()){
     var objFolder = folder.addFolder(objName);
     var visibilityController = objFolder.add(this.visibilityConfigurations[areaName][objName], "Visible");
     var sideController = objFolder.add(this.sideConfigurations[areaName][objName], "Side", this.sideAry);
@@ -117,7 +137,7 @@ AreaConfigurationsHandler.prototype.addSubFolder = function(areaName, folder){
       }
     }.bind({object: addedObjects[objName], areaName: areaName}));
   }
-  for (var objName in objectGroups){
+  for (var objName in sceneHandler.getObjectGroups()){
     var objFolder = folder.addFolder(objName);
     var visibilityController = objFolder.add(this.visibilityConfigurations[areaName][objName], "Visible");
     var sideController = objFolder.add(this.sideConfigurations[areaName][objName], "Side", this.sideAry);
@@ -137,11 +157,7 @@ AreaConfigurationsHandler.prototype.addSubFolder = function(areaName, folder){
 }
 
 AreaConfigurationsHandler.prototype.sphericalDistribution = function(radius){
-  REUSABLE_VECTOR.set(
-    Math.random() - 0.5,
-    Math.random() - 0.5,
-    Math.random() - 0.5
-  );
+  REUSABLE_VECTOR.set(Math.random() - 0.5, Math.random() - 0.5, Math.random() - 0.5);
   REUSABLE_VECTOR.normalize();
   REUSABLE_VECTOR.multiplyScalar(radius);
   return REUSABLE_VECTOR;
@@ -156,8 +172,9 @@ AreaConfigurationsHandler.prototype.getRandomPointInsideArea = function(area){
 }
 
 AreaConfigurationsHandler.prototype.autoConfigureArea = function(areaName){
+  var pseudoRaycaster = raycasterFactory.getNonWorker();
   var area = areas[areaName];
-  for (var objName in addedObjects){
+  for (var objName in sceneHandler.getAddedObjects()){
     addedObjects[objName].setVisibilityInArea(areaName, false);
     if (!addedObjects[objName].defaultSide){
       addedObjects[objName].setSideInArea(areaName, SIDE_BOTH);
@@ -165,7 +182,7 @@ AreaConfigurationsHandler.prototype.autoConfigureArea = function(areaName){
       addedObjects[objName].setSideInArea(areaName, addedObjects[objName].defaultSide);
     }
   }
-  for (var objName in objectGroups){
+  for (var objName in sceneHandler.getObjectGroups()){
     objectGroups[objName].setVisibilityInArea(areaName, false);
     if (!objectGroups[objName].defaultSide){
       objectGroups[objName].setSideInArea(areaName, SIDE_BOTH);
@@ -180,7 +197,7 @@ AreaConfigurationsHandler.prototype.autoConfigureArea = function(areaName){
     for (var i = 0; i<200; i++){
       var vec = this.sphericalDistribution(1);
       REUSABLE_VECTOR_4.set(vec.x , vec.y, vec.z);
-      rayCaster.findIntersections(REUSABLE_VECTOR_5, REUSABLE_VECTOR_4, false);
+      pseudoRaycaster.findIntersections(REUSABLE_VECTOR_5, REUSABLE_VECTOR_4, false, noop);
       if (intersectionPoint){
         visibleObjects[intersectionObject] = true;
       }

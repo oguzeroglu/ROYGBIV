@@ -103,7 +103,7 @@ StateLoader.prototype.finalize = function(){
   this.importHandler.importObjectGroups(this.stateObj);
   this.importHandler.importFog(this.stateObj);
   this.importHandler.importCrosshairs(this.stateObj);
-  this.importHandler.importEffects(this.stateObj);
+  this.importHandler.importScenes(this.stateObj);
   projectLoaded = true;
   this.onAfterFinalized();
 }
@@ -168,7 +168,6 @@ StateLoader.prototype.resetProject = function(){
   preConfiguredParticleSystems = new Object();
   preConfiguredParticleSystemPools = new Object();
   muzzleFlashes = new Object();
-  areaBinHandler = new WorldBinHandler(true);
   webglCallbackHandler = new WebGLCallbackHandler();
   textureAtlasHandler.dispose();
   textureAtlasHandler = new TextureAtlasHandler();
@@ -182,7 +181,6 @@ StateLoader.prototype.resetProject = function(){
   physicsFactory.reset();
   rayCaster = raycasterFactory.get();
   physicsWorld = physicsFactory.get();
-  areaBinHandler.isAreaBinHandler = true;
   anchorGrid = 0;
   areasVisible = true;
   areaConfigurationsVisible = false;
@@ -252,7 +250,7 @@ StateLoader.prototype.resetProject = function(){
   }
   if (!isDeployment){
     guiHandler.hideAll();
-    $("#cliDivheader").text("ROYGBIV Scene Creator - CLI (Design mode)");
+    $("#cliDivheader").text("ROYGBIV Scene Creator - CLI (Design mode - "+sceneHandler.getActiveSceneName()+")");
   }
   LIMIT_BOUNDING_BOX = new THREE.Box3(new THREE.Vector3(-4000, -4000, -4000), new THREE.Vector3(4000, 4000, 4000));
   BIN_SIZE = 50;
@@ -261,4 +259,5 @@ StateLoader.prototype.resetProject = function(){
   physicsShapeCache = new Object();
   shaderPrecisionHandler.reset();
   previewSceneRendered = false;
+  sceneHandler.reset();
 }

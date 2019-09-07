@@ -285,6 +285,7 @@ ObjectGroup.prototype.handleRotation = function(axis, radians){
 ObjectGroup.prototype.untrackObjectPosition = function(){
   delete this.trackedObject;
   delete trackingObjects[this.name];
+  sceneHandler.onTrackingObjectDeletion(this);
 }
 
 ObjectGroup.prototype.trackObjectPosition = function(targetObject){
@@ -294,6 +295,7 @@ ObjectGroup.prototype.trackObjectPosition = function(targetObject){
   targetObject.oldPX = targetObject.physicsBody.position.x;
   targetObject.oldPY = targetObject.physicsBody.position.y;
   targetObject.oldPZ = targetObject.physicsBody.position.z;
+  sceneHandler.onTrackingObjectAddition(this);
 }
 
 ObjectGroup.prototype.setPosition = function(x, y, z){
@@ -355,6 +357,14 @@ ObjectGroup.prototype.show = function(){
     this.isHidden = false;
     rayCaster.show(this);
   }
+}
+
+ObjectGroup.prototype.hideVisually = function(){
+  this.mesh.visible = false;
+}
+
+ObjectGroup.prototype.showVisually = function(){
+  this.mesh.visible = true;
 }
 
 ObjectGroup.prototype.hide = function(keepPhysics){
@@ -425,6 +435,9 @@ ObjectGroup.prototype.resetColor = function(){
 }
 
 ObjectGroup.prototype.applyAreaConfiguration = function(areaName){
+  if (sceneHandler.getActiveSceneName() != this.registeredSceneName){
+    return;
+  }
   if (this.areaVisibilityConfigurations){
     var configurations = this.areaVisibilityConfigurations[areaName];
     if (!(typeof configurations == UNDEFINED)){

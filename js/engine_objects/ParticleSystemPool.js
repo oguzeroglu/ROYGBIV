@@ -14,7 +14,7 @@ ParticleSystemPool.prototype.add = function(particleSystem){
 }
 
 ParticleSystemPool.prototype.get = function(){
-  if (this.availableParticleSystems.size == 0){
+  if (this.availableParticleSystems.size == 0 || this.registeredSceneName != sceneHandler.getActiveSceneName()){
     return false;
   }
   var ps = this.availableParticleSystems.values().next().value;

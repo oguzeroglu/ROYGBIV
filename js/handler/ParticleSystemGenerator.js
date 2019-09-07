@@ -34,7 +34,7 @@ ParticleSystemGenerator.prototype.handleModeSwitch = function(){
   }
   for (var poolName in preConfiguredParticleSystemPools){
     var pool = preConfiguredParticleSystemPools[poolName];
-    this.generateInitializedParticleSystemPool(pool.poolName, particleSystemPool[pool.refParticleSystemName], pool.poolSize);
+    this.generateInitializedParticleSystemPool(pool.poolName, particleSystemPool[pool.refParticleSystemName], pool.poolSize, pool.registeredSceneName);
   }
   var psMergeSkipList = [];
   for (var psName in particleSystemPool){
@@ -212,12 +212,13 @@ ParticleSystemGenerator.prototype.generateParticleSystemName = function(){
   return generatedName;
 }
 
-ParticleSystemGenerator.prototype.generateInitializedParticleSystemPool = function(poolName, refParticleSystem, poolSize){
+ParticleSystemGenerator.prototype.generateInitializedParticleSystemPool = function(poolName, refParticleSystem, poolSize, sceneName){
   var pool = this.generateParticleSystemPool(poolName);
   pool.add(refParticleSystem);
   for (var i = 0; i<poolSize - 1; i++){
     pool.add(refParticleSystem.createCopy(this.generateParticleSystemName()));
   }
+  pool.registeredSceneName = sceneName;
   return pool;
 }
 

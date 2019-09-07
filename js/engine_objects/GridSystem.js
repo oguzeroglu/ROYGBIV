@@ -423,7 +423,7 @@ GridSystem.prototype.getGridByColRow = function(col, row){
 }
 
 GridSystem.prototype.printInfo = function(){
-  terminal.printHeader(this.name);
+  terminal.printHeader(this.name + " ["+this.registeredSceneName+"]");
   terminal.printInfo(
     Text.TREE_NAME.replace(Text.PARAM1, this.name),
     true
@@ -616,23 +616,19 @@ GridSystem.prototype.newArea = function(name, height, selections){
       boxCenterX = grid1.centerX + (height / 2);
     }
   }
-
   var boundingBox = new THREE.Box3().setFromCenterAndSize(
     new THREE.Vector3(boxCenterX, boxCenterY, boxCenterZ),
     new THREE.Vector3(boxSizeX, boxSizeY, boxSizeZ)
   );
-
   areas[name] = new Area(name, boundingBox, this.outlineColor, selections[0].size);
   if (areasVisible){
     areas[name].renderToScreen();
   }
-
   for (var i = 0; i<selections.length; i++){
     selections[i].toggleSelect(false, false, false, true);
   }
-
-  areaBinHandler.insert(boundingBox, name);
-
+  sceneHandler.getAreaBinHandler().insert(boundingBox, name);
+  return areas[name];
 }
 
 GridSystem.prototype.newSurface = function(name, grid1, grid2, material){
@@ -761,6 +757,7 @@ GridSystem.prototype.newSurface = function(name, grid1, grid2, material){
 
   surface.addedObject = addedObjectInstance;
   addedObjectInstance.updateMVMatrix();
+  sceneHandler.onAddedObjectCreation(addedObjectInstance);
 }
 
 GridSystem.prototype.newRamp = function(anchorGrid, otherGrid, axis, height, material, name){
@@ -985,7 +982,7 @@ GridSystem.prototype.newRamp = function(anchorGrid, otherGrid, axis, height, mat
   }
   delete gridSelections[anchorGrid.name];
   delete gridSelections[otherGrid.name];
-
+  sceneHandler.onAddedObjectCreation(addedObjectInstance);
 }
 
 GridSystem.prototype.newBox = function(selections, height, material, name){
@@ -1131,6 +1128,7 @@ GridSystem.prototype.newBox = function(selections, height, material, name){
 
   boxMesh.addedObject = addedObjectInstance;
   addedObjectInstance.updateMVMatrix();
+  sceneHandler.onAddedObjectCreation(addedObjectInstance);
 }
 
 GridSystem.prototype.newSphere = function(sphereName, material, radius, selections){
@@ -1252,6 +1250,7 @@ GridSystem.prototype.newSphere = function(sphereName, material, radius, selectio
   addedObjects[sphereName] = addedObjectInstance;
   sphereMesh.addedObject = addedObjectInstance;
   addedObjectInstance.updateMVMatrix();
+  sceneHandler.onAddedObjectCreation(addedObjectInstance);
 }
 
 GridSystem.prototype.newCylinder = function(cylinderName, material, topRadius, bottomRadius, height, isOpenEnded, selections){
@@ -1377,4 +1376,5 @@ GridSystem.prototype.newCylinder = function(cylinderName, material, topRadius, b
 
   cylinderMesh.addedObject = addedObjectInstance;
   addedObjectInstance.updateMVMatrix();
+  sceneHandler.onAddedObjectCreation(addedObjectInstance);
 }

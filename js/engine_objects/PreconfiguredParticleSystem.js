@@ -88,6 +88,7 @@ PreconfiguredParticleSystem.prototype.getParticleSystem = function(){
     if (this.getUsedTextureName() != null){
       ps.textureName = this.getUsedTextureName();
     }
+    ps.registeredSceneName = this.registeredSceneName;
     return ps;
   }
   throw new Error("Unknown type.");

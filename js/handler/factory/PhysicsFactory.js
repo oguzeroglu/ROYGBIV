@@ -11,12 +11,12 @@ PhysicsFactory.prototype.refresh = function(){
   this.init();
   var elem = this.get();
   if (elem instanceof CANNON.World){
-    for (var objName in addedObjects){
+    for (var objName in sceneHandler.getAddedObjects()){
       if (!addedObjects[objName].noMass){
         elem.add(addedObjects[objName].physicsBody);
       }
     }
-    for (var objName in objectGroups){
+    for (var objName in sceneHandler.getObjectGroups()){
       if (!objectGroups[objName].noMass){
         elem.add(objectGroups[objName].physicsBody);
       }

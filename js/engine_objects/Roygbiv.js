@@ -249,6 +249,7 @@ Roygbiv.prototype.getPosition = function(object, targetVector, axis){
   preConditions.checkIfAxisOnlyIfDefined(ROYGBIV.getPosition, preConditions.axis, axis);
   preConditions.checkIfVectorOnlyIfDefined(ROYGBIV.getPosition, preConditions.targetVector, targetVector);
   preConditions.checkIfAddedObjectObjectGroupParticleSystem(ROYGBIV.getPosition, preConditions.object, object);
+  preConditions.checkIfObjectInsideActiveScene(ROYGBIV.getPosition, object);
   if (object.isAddedObject){
     if (axis){
       if (object.parentObjectName){
@@ -363,6 +364,7 @@ Roygbiv.prototype.getOpacity = function(object){
   }
   preConditions.checkIfDefined(ROYGBIV.getOpacity, preConditions.object, object);
   preConditions.checkIfAddedObjectOrObjectGroup(ROYGBIV.getOpacity, preConditions.object, object);
+  preConditions.checkIfObjectInsideActiveScene(ROYGBIV.getOpacity, object);
   if (object.isAddedObject){
     return object.mesh.material.uniforms.alpha.value;
   }
@@ -379,6 +381,7 @@ Roygbiv.prototype.getMarkedPosition = function(markedPointName, targetVector){
   preConditions.checkIfVectorOnlyIfDefined(ROYGBIV.getMarkedPosition, preConditions.targetVector, targetVector);
   var markedPoint = markedPoints[markedPointName];
   preConditions.checkIfMarkedPointExists(ROYGBIV.getMarkedPosition, null, markedPoint);
+  preConditions.checkIfMarkedPointInsideActiveScene(ROYGBIV.getMarkedPosition, markedPoint);
   targetVector.x = markedPoint.x;
   targetVector.y = markedPoint.y;
   targetVector.z = markedPoint.z;
@@ -398,6 +401,7 @@ Roygbiv.prototype.getParticleSystemVelocityAtTime = function(particleSystem, tim
   preConditions.checkIfNumber(ROYGBIV.getParticleSystemVelocityAtTime, preConditions.time, time);
   preConditions.checkIfDefined(ROYGBIV.getParticleSystemVelocityAtTime, preConditions.targetVector, targetVector);
   preConditions.checkIfVectorOnlyIfDefined(ROYGBIV.getParticleSystemVelocityAtTime, preConditions.targetVector, targetVector);
+  preConditions.checkIfParticleSystemInsideActiveScene(ROYGBIV.getParticleSystemVelocityAtTime, particleSystem);
   return particleSystem.getVelocityAtTime(time, targetVector);
 }
 
@@ -436,6 +440,7 @@ Roygbiv.prototype.getParticleSystemPool = function(name){
   preConditions.checkIfDefined(ROYGBIV.getParticleSystemPool, preConditions.name, name);
   var psPool = particleSystemPools[name];
   preConditions.checkIfParticleSystemPoolExists(ROYGBIV.getParticleSystemPool, null, psPool);
+  preConditions.checkIfParticleSystemPoolInsideActiveScene(ROYGBIV.getParticleSystemPool, psPool);
   return psPool;
 }
 
@@ -449,6 +454,7 @@ Roygbiv.prototype.getParticleSystemFromPool = function(pool){
   preConditions.checkIfDefined(ROYGBIV.getParticleSystemFromPool, preConditions.pool, pool);
   preConditions.checkIfParticleSystemPool(ROYGBIV.getParticleSystemFromPool, preConditions.pool, pool);
   preConditions.checkIfPoolDestroyed(ROYGBIV.getParticleSystemFromPool, null, pool);
+  preConditions.checkIfParticleSystemPoolInsideActiveScene(ROYGBIV.getParticleSystemPool, pool);
   return pool.get();
 }
 
@@ -465,6 +471,7 @@ Roygbiv.prototype.getEndPoint = function(object, axis, targetVector){
   preConditions.checkIfDefined(ROYGBIV.getEndPoint, preConditions.axis, axis);
   preConditions.checkIfDefined(ROYGBIV.getEndPoint, preConditions.targetVector, targetVector);
   preConditions.checkIfVectorOnlyIfDefined(ROYGBIV.getEndPoint, preConditions.targetVector, targetVector);
+  preConditions.checkIfObjectInsideActiveScene(ROYGBIV.getEndPoint, object);
   axis = axis.toLowerCase();
   preConditions.checkIfEndPointAxis(ROYGBIV.getEndPoint, preConditions.axis, axis);
   var endPoint = object.getEndPoint(axis);
@@ -490,6 +497,7 @@ Roygbiv.prototype.getText = function(textName){
   }
   preConditions.checkIfDefined(ROYGBIV.getText, preConditions.textName, textName);
   var text = addedTexts[textName];
+  preConditions.checkIfTextInsideActiveScene(ROYGBIV.getText, text);
   if (text){
     return text;
   }
@@ -518,6 +526,7 @@ Roygbiv.prototype.hide = function(object, keepPhysics){
   var keepPhysicsValue = keepPhysics;
   preConditions.checkIfDefined(ROYGBIV.hide, preConditions.object, object);
   preConditions.checkIfAddedObjectOrObjectGroup(ROYGBIV.hide, preConditions.object, object);
+  preConditions.checkIfObjectInsideActiveScene(ROYGBIV.hide, object);
   if (object.isAddedObject){
     preConditions.checkIfChildObjectOnlyIfExists(ROYGBIV.hide, preConditions.object, object);
     if (keepPhysicsValue){
@@ -542,6 +551,7 @@ Roygbiv.prototype.show = function(object){
   }
   preConditions.checkIfDefined(ROYGBIV.show, preConditions.object, object);
   preConditions.checkIfAddedObjectOrObjectGroup(ROYGBIV.show, preConditions.object, object);
+  preConditions.checkIfObjectInsideActiveScene(ROYGBIV.show, object);
   if (object.isAddedObject){
     preConditions.checkIfChildObjectOnlyIfExists(ROYGBIV.show, preConditions.object, object);
     preConditions.checkIfChangeable(ROYGBIV.show, preConditions.object, object);
@@ -565,6 +575,7 @@ Roygbiv.prototype.applyForce = function(object, force, point){
   preConditions.checkIfDefined(ROYGBIV.applyForce, preConditions.point, point);
   preConditions.checkIfVectorOnlyIfDefined(ROYGBIV.applyForce, preConditions.force, force);
   preConditions.checkIfVectorOnlyIfDefined(ROYGBIV.applyForce, preConditions.point, point);
+  preConditions.checkIfObjectInsideActiveScene(ROYGBIV.applyForce, object);
   REUSABLE_CANNON_VECTOR.set(force.x, force.y, force.z);
   REUSABLE_CANNON_VECTOR_2.set(point.x, point.y, point.z);
   object.physicsBody.applyImpulse(
@@ -588,6 +599,7 @@ Roygbiv.prototype.rotate = function(object, axis, radians){
   preConditions.checkIfAxisOnlyIfDefined(ROYGBIV.rotate, preConditions.axis, axis);
   preConditions.checkIfNumber(ROYGBIV.rotate, preConditions.radians, radians);
   preConditions.checkIfAddedObjectOrObjectGroup(ROYGBIV.rotate, preConditions.object, object);
+  preConditions.checkIfObjectInsideActiveScene(ROYGBIV.rotate, object);
   if (object.isAddedObject && object.parentObjectName){
     var parentObject = objectGroups[object.parentObjectName];
     if (parentObject){
@@ -624,6 +636,7 @@ Roygbiv.prototype.rotateAroundXYZ = function(object, x, y, z, radians, axis){
   preConditions.checkIfNumber(ROYGBIV.rotateAroundXYZ, preConditions.radians, radians);
   preConditions.checkIfDefined(ROYGBIV.rotateAroundXYZ, preConditions.axis, axis);
   preConditions.checkIfAddedObjectOrObjectGroup(ROYGBIV.rotateAroundXYZ, preConditions.object, object);
+  preConditions.checkIfObjectInsideActiveScene(ROYGBIV.rotateAroundXYZ, object);
   axis = axis.toLowerCase();
   preConditions.checkIfAxisOnlyIfDefined(ROYGBIV.rotateAroundXYZ, preConditions.axis, axis);
   var axisVector;
@@ -674,6 +687,7 @@ Roygbiv.prototype.setPosition = function(obj, x, y, z){
   preConditions.checkIfNumber(ROYGBIV.setPosition, preConditions.y, y);
   preConditions.checkIfNumber(ROYGBIV.setPosition, preConditions.z, z);
   preConditions.checkIfAddedObjectOrObjectGroup(ROYGBIV.setPosition, preConditions.obj, obj);
+  preConditions.checkIfObjectInsideActiveScene(ROYGBIV.setPosition, obj);
   if (obj.parentObjectName){
     var objGroup = objectGroups[obj.parentObjectName];
     preConditions.checkIfParentExists(ROYGBIV.setPosition, null, objGroup);
@@ -697,6 +711,7 @@ Roygbiv.prototype.setMass = function(object, mass){
   preConditions.checkIfChangeable(ROYGBIV.setMass, preConditions.object, object);
   preConditions.checkIfNoMass(ROYGBIV.setMass, preConditions.object, object);
   preConditions.checkIfChildObjectOnlyIfExists(ROYGBIV.setMass, preConditions.object, object);
+  preConditions.checkIfObjectInsideActiveScene(ROYGBIV.setMass, object);
   if (typeof object.originalMass == UNDEFINED){
     object.originalMass = object.mass;
   }
@@ -709,14 +724,18 @@ Roygbiv.prototype.setMass = function(object, mass){
   if (object.isAddedObject){
     if (mass > 0){
       dynamicObjects.set(object.name,  object);
+      sceneHandler.onDynamicObjectAddition(object);
     }else{
       dynamicObjects.delete(object.name);
+      sceneHandler.onDynamicObjectDeletion(object);
     }
   }else if (object.isObjectGroup){
     if (mass > 0){
       dynamicObjectGroups.set(object.name, object);
+      sceneHandler.onDynamicObjectAddition(object);
     }else{
       dynamicObjectGroups.delete(object.name);
+      sceneHandler.onDynamicObjectDeletion(object);
     }
   }
 }
@@ -734,6 +753,7 @@ Roygbiv.prototype.translate = function(object, axis, amount){
   preConditions.checkIfAxisOnlyIfDefined(ROYGBIV.translate, preConditions.axis, axis);
   preConditions.checkIfNumber(ROYGBIV.translate, preConditions.amount, amount);
   preConditions.checkIfAddedObjectOrObjectGroup(ROYGBIV.translate, preConditions.object, object);
+  preConditions.checkIfObjectInsideActiveScene(ROYGBIV.translate, object);
   if (object.isAddedObject){
     if (object.parentObjectName){
       var parentObject = objectGroups[object.parentObjectName];
@@ -761,6 +781,7 @@ Roygbiv.prototype.opacity = function(object, delta){
   preConditions.checkIfNumber(ROYGBIV.opacity, preConditions.delta, delta);
   preConditions.checkIfAddedObjectOrObjectGroup(ROYGBIV.opacity, preConditions.object, object);
   preConditions.checkIfChildObjectOnlyIfExists(ROYGBIV.opacity, preConditions.object, object);
+  preConditions.checkIfObjectInsideActiveScene(ROYGBIV.opacity, object);
   if (!object.initOpacitySet && (object.isAddedObject)){
     object.initOpacity = object.mesh.material.uniforms.alpha.value;
     object.initOpacitySet = true;
@@ -799,6 +820,7 @@ Roygbiv.prototype.setObjectVelocity = function(object, velocityVector, axis){
   preConditions.checkIfDynamic(ROYGBIV.setObjectVelocity, preConditions.object, object);
   preConditions.checkIfDefined(ROYGBIV.setObjectVelocity, preConditions.velocityVector, velocityVector);
   preConditions.checkIfVectorOnlyIfDefined(ROYGBIV.setObjectVelocity, preConditions.velocityVector, velocityVector);
+  preConditions.checkIfObjectInsideActiveScene(ROYGBIV.setObjectVelocity, object);
   if (!(typeof axis == UNDEFINED)){
     axis = axis.toLowerCase();
     preConditions.checkIfAxisOnlyIfDefined(ROYGBIV.setObjectVelocity, preConditions.axis, axis);
@@ -823,6 +845,7 @@ Roygbiv.prototype.setObjectColor = function(object, colorName, alpha){
   preConditions.checkIfAddedObjectOrObjectGroup(ROYGBIV.setObjectColor, preConditions.object, object);
   preConditions.checkIfColorizable(ROYGBIV.setObjectColor, preConditions.object, object);
   preConditions.checkIfDefined(ROYGBIV.setObjectColor, preConditions.colorName, colorName);
+  preConditions.checkIfObjectInsideActiveScene(ROYGBIV.setObjectColor, object);
   if (typeof alpha == UNDEFINED){
     alpha = 1;
   }else{
@@ -843,6 +866,7 @@ Roygbiv.prototype.resetObjectColor = function(object){
   preConditions.checkIfDefined(ROYGBIV.resetObjectColor, preConditions.object, object);
   preConditions.checkIfAddedObjectOrObjectGroup(ROYGBIV.resetObjectColor, preConditions.object, object);
   preConditions.checkIfColorizable(ROYGBIV.resetObjectColor, preConditions.object, object);
+  preConditions.checkIfObjectInsideActiveScene(ROYGBIV.resetObjectColor, object);
   if (object.autoInstancedParent){
     object.autoInstancedParent.resetColor(object);
   }
@@ -857,6 +881,7 @@ Roygbiv.prototype.setRotationPivot = function(rotationPivot){
   preConditions.checkIfDefined(ROYGBIV.setRotationPivot, preConditions.rotationPivot, rotationPivot);
   preConditions.checkIfRotationPivot(ROYGBIV.setRotationPivot, preConditions.rotat, rotationPivot);
   var sourceObject = rotationPivot.sourceObject;
+  preConditions.checkIfObjectInsideActiveScene(ROYGBIV.setRotationPivot, sourceObject);
   sourceObject.setRotationPivot(rotationPivot);
 }
 
@@ -868,6 +893,7 @@ Roygbiv.prototype.unsetRotationPivot = function(object){
   preConditions.checkIfDefined(ROYGBIV.unsetRotationPivot, preConditions.object, object);
   preConditions.checkIfAddedObjectOrObjectGroup(ROYGBIV.unsetRotationPivot, preConditions.object, object);
   preConditions.checkIfHavePivotPoint(ROYGBIV.unsetRotationPivot, preConditions.object, object);
+  preConditions.checkIfObjectInsideActiveScene(ROYGBIV.unsetRotationPivot, object);
   object.unsetRotationPivot();
 }
 
@@ -881,6 +907,7 @@ Roygbiv.prototype.resetObjectVelocity = function(object){
   preConditions.checkIfChangeable(ROYGBIV.resetObjectVelocity, preConditions.object, object);
   preConditions.checkIfChildObjectOnlyIfExists(ROYGBIV.resetObjectVelocity, preConditions.object, object);
   preConditions.checkIfDynamic(ROYGBIV.resetObjectVelocity, preConditions.object, object);
+  preConditions.checkIfObjectInsideActiveScene(ROYGBIV.resetObjectVelocity, object);
   object.resetVelocity();
 }
 
@@ -902,6 +929,7 @@ Roygbiv.prototype.setParticleSystemRotation = function(particleSystem, axis, rad
   preConditions.checkIfTrue(ROYGBIV.setParticleSystemRotation, "particleSystem has a collidable particle. Cannot set rotation.", particleSystem.particlesWithCollisionCallbacks.size > 0);
   preConditions.checkIfTrue(ROYGBIV.setParticleSystemRotation, "particleSystem has a trailed particle. Cannot set rotation.", particleSystem.hasTrailedParticle);
   preConditions.checkIfTrue(ROYGBIV.setParticleSystemRotation, "particleSystem has a defined motion. Cannot set rotation.", (particleSystem.velocity.x != 0 || particleSystem.velocity.y != 0 || particleSystem.velocity.z != 0 || particleSystem.acceleration.x != 0 || particleSystem.acceleration.y != 0 || particleSystem.acceleration.z != 0));
+  preConditions.checkIfParticleSystemInsideActiveScene(ROYGBIV.setParticleSystemRotation, particleSystem);
   if (axis == "x"){
     particleSystem.mesh.rotation.x = radians;
   }else if (axis == "y"){
@@ -928,6 +956,7 @@ Roygbiv.prototype.setParticleSystemQuaternion = function(particleSystem, quatX, 
   preConditions.checkIfTrue(ROYGBIV.setParticleSystemQuaternion, "particleSystem has a collidable particle. Cannot set quaternion.", (particleSystem.particlesWithCollisionCallbacks.size > 0));
   preConditions.checkIfTrue(ROYGBIV.setParticleSystemQuaternion, "particleSystem has a trailed particle. Cannot set quaternion.", (particleSystem.hasTrailedParticle));
   preConditions.checkIfTrue(ROYGBIV.setParticleSystemQuaternion, "particleSystem has a defined motion. Cannot set quaternion.", (particleSystem.velocity.x != 0 || particleSystem.velocity.y != 0 || particleSystem.velocity.z != 0 || particleSystem.acceleration.x != 0 || particleSystem.acceleration.y != 0 || particleSystem.acceleration.z != 0));
+  preConditions.checkIfParticleSystemInsideActiveScene(ROYGBIV.setParticleSystemQuaternion, particleSystem);
   particleSystem.mesh.quaternion.set(quatX, quatY, quatZ, quatW);
   particleSystem.hasManualQuaternionSet = true;
 }
@@ -946,6 +975,7 @@ Roygbiv.prototype.stopParticleSystem = function(particleSystem, stopDuration){
   preConditions.checkIfDefined(ROYGBIV.stopParticleSystem, preConditions.stopDuration, stopDuration);
   preConditions.checkIfNumber(ROYGBIV.stopParticleSystem, preConditions.stopDuration, stopDuration);
   preConditions.checkIfLessThanExclusive(ROYGBIV.stopParticleSystem, preConditions.stopDuration, stopDuration, 0);
+  preConditions.checkIfParticleSystemInsideActiveScene(ROYGBIV.stopParticleSystem, particleSystem);
   particleSystem.stop(stopDuration);
 }
 
@@ -966,6 +996,7 @@ Roygbiv.prototype.startParticleSystem = function(configurations){
   preConditions.checkIfVectorOnlyIfDefined(ROYGBIV.startParticleSystem, preConditions.startVelocity, configurations.startVelocity);
   preConditions.checkIfVectorOnlyIfDefined(ROYGBIV.startParticleSystem, preConditions.startAcceleration, configurations.startAcceleration);
   preConditions.checkIfVectorOnlyIfDefined(ROYGBIV.startParticleSystem, preConditions.startQuaternion, configurations.startQuaternion);
+  preConditions.checkIfParticleSystemInsideActiveScene(ROYGBIV.startParticleSystem, configurations.particleSystem);
   configurations.particleSystem.start(configurations);
 }
 
@@ -976,6 +1007,7 @@ Roygbiv.prototype.hideParticleSystem = function(particleSystem){
   }
   preConditions.checkIfDefined(ROYGBIV.hideParticleSystem, preConditions.particleSystem, particleSystem);
   preConditions.checkIfParticleSystem(ROYGBIV.hideParticleSystem, preConditions.particleSystem, particleSystem);
+  preConditions.checkIfParticleSystemInsideActiveScene(ROYGBIV.hideParticleSystem, particleSystem);
   particleSystem.hide();
 }
 
@@ -991,6 +1023,7 @@ Roygbiv.prototype.fadeAway = function(particleSystem, coefficient){
   preConditions.checkIfDefined(ROYGBIV.fadeAway, preConditions.coefficient, coefficient);
   preConditions.checkIfNumber(ROYGBIV.fadeAway, preConditions.coefficient, coefficient);
   preConditions.checkIfLessThan(ROYGBIV.fadeAway, preConditions.coefficient, coefficient, 0);
+  preConditions.checkIfParticleSystemInsideActiveScene(ROYGBIV.fadeAway, particleSystem);
   if (!particleSystem.psMerger){
     particleSystem.material.uniforms.dissapearCoef.value = coefficient;
   }else{
@@ -1019,6 +1052,7 @@ Roygbiv.prototype.setParticleSystemPosition = function(particleSystem, x, y, z){
   preConditions.checkIfTrue(ROYGBIV.setParticleSystemPosition, "particleSystem has collidable particles.", (particleSystem.particlesWithCollisionCallbacks.size > 0));
   preConditions.checkIfTrue(ROYGBIV.setParticleSystemPosition, "particleSystem has a trailed particle.", particleSystem.hasTrailedParticle);
   preConditions.checkIfTrue(ROYGBIV.setParticleSystemPosition, "particleSystem has a defined motion.", (particleSystem.velocity.x != 0 || particleSystem.velocity.y != 0 || particleSystem.velocity.z != 0 || particleSystem.acceleration.x != 0 || particleSystem.acceleration.y != 0 || particleSystem.acceleration.z != 0));
+  preConditions.checkIfParticleSystemInsideActiveScene(ROYGBIV.setParticleSystemPosition, particleSystem);
   particleSystem.mesh.position.set(x, y, z);
   particleSystem.hasManualPositionSet = true;
 }
@@ -1033,6 +1067,7 @@ Roygbiv.prototype.executeForEachParticleSystem = function(psPool, callbackFuncti
   preConditions.checkIfDefined(ROYGBIV.executeForEachParticleSystem, preConditions.callbackFunction, callbackFunction);
   preConditions.checkIfFunctionOnlyIfExists(ROYGBIV.executeForEachParticleSystem, preConditions.callbackFunction, callbackFunction);
   preConditions.checkIfParticleSystemPool(ROYGBIV.executeForEachParticleSystem, preConditions.psPool, psPool);
+  preConditions.checkIfParticleSystemPoolInsideActiveScene(ROYGBIV.executeForEachParticleSystem, psPool);
   for (var psName in psPool.particleSystems){
     callbackFunction(psPool.particleSystems[psName]);
   }
@@ -1047,6 +1082,7 @@ Roygbiv.prototype.startMotionBlur = function(object){
   }
   preConditions.checkIfDefined(ROYGBIV.startMotionBlur, preConditions.object, object);
   preConditions.checkIfAddedObjectOrObjectGroup(ROYGBIV.startMotionBlur, preConditions.object, object);
+  preConditions.checkIfObjectInsideActiveScene(ROYGBIV.startMotionBlur, object);
   var objectTrail = objectTrails[object.name];
   preConditions.checkIfTrue(ROYGBIV.startMotionBlur, "No effect attached to object.", (!objectTrail));
   objectTrail.start();
@@ -1059,6 +1095,7 @@ Roygbiv.prototype.stopMotionBlur = function(object){
   }
   preConditions.checkIfDefined(ROYGBIV.stopMotionBlur, preConditions.object, object);
   preConditions.checkIfAddedObjectOrObjectGroup(ROYGBIV.stopMotionBlur, preConditions.object, object);
+  preConditions.checkIfObjectInsideActiveScene(ROYGBIV.stopMotionBlur, object);
   var objectTrail = objectTrails[object.name];
   preConditions.checkIfTrue(ROYGBIV.stopMotionBlur, "No effect attached to object.", (!objectTrail));
   objectTrail.stop();
@@ -1074,6 +1111,7 @@ Roygbiv.prototype.selectCrosshair = function(crosshairName){
   preConditions.checkIfDefined(ROYGBIV.selectCrosshair, preConditions.crosshairName, crosshairName);
   var crosshair = crosshairs[crosshairName];
   preConditions.checkIfTrue(ROYGBIV.selectCrosshair, "No such crosshair.", (!crosshair));
+  preConditions.checkIfCrosshairInsideActiveScene(ROYGBIV.selectCrosshair, crosshair);
   crosshairHandler.selectCrosshair(crosshair);
 }
 
@@ -1177,6 +1215,7 @@ Roygbiv.prototype.setCollisionListener = function(sourceObject, callbackFunction
   if ((sourceObject.isAddedObject) || (sourceObject.isObjectGroup)){
     preConditions.checkIfTrue(ROYGBIV.setCollisionListener, "Cannot set collision listener for more than "+MAX_OBJECT_COLLISION_LISTENER_COUNT+" objects.", (TOTAL_OBJECT_COLLISION_LISTENER_COUNT >= MAX_OBJECT_COLLISION_LISTENER_COUNT));
     preConditions.checkIfTrue(ROYGBIV.setCollisionListener, "Object used as FPS player body, cannot listen for collisions.", sourceObject.usedAsFPSPlayerBody);
+    preConditions.checkIfObjectInsideActiveScene(ROYGBIV.setCollisionListener, sourceObject);
     preConditions.checkIfNoMass(ROYGBIV.setCollisionListener, preConditions.sourceObject, sourceObject);
     if (!collisionCallbackRequests.has(sourceObject.name)){
       TOTAL_OBJECT_COLLISION_LISTENER_COUNT ++;
@@ -1187,6 +1226,7 @@ Roygbiv.prototype.setCollisionListener = function(sourceObject, callbackFunction
     preConditions.checkIfTrue(ROYGBIV.setCollisionListener, "A position is set manually to the particle system. Cannot listen for collisions.", (sourceObject.hasManualPositionSet));
     preConditions.checkIfTrue(ROYGBIV.setCollisionListener, "A rotation is set manually to the particle system. Cannot listen for collisions.", (sourceObject.hasManualRotationSet));
     preConditions.checkIfTrue(ROYGBIV.setCollisionListener, "A quaternion is set manually to the particle system. Cannot listen for collisions.", (sourceObject.hasManualQuaternionSet));
+    preConditions.checkIfParticleSystemInsideActiveScene(ROYGBIV.setCollisionListener, sourceObject);
     var incrCounter = false;
     if (!particleSystemCollisionCallbackRequests[sourceObject.name]){
       incrCounter = true;
@@ -1207,8 +1247,10 @@ Roygbiv.prototype.removeCollisionListener = function(sourceObject){
   preConditions.checkIfAddedObjectObjectGroupParticleSystemParticle(ROYGBIV.removeCollisionListener, preConditions.sourceObject, sourceObject);
   var curCallbackRequest;
   if ((sourceObject.isAddedObject) || (sourceObject.isObjectGroup)){
+    preConditions.checkIfObjectInsideActiveScene(ROYGBIV.removeCollisionListener, sourceObject);
     curCallbackRequest = collisionCallbackRequests.get(sourceObject.name);
   }else if (sourceObject.isParticleSystem){
+    preConditions.checkIfParticleSystemInsideActiveScene(ROYGBIV.removeCollisionListener, sourceObject);
     curCallbackRequest = particleSystemCollisionCallbackRequests[sourceObject.name];
   }
   if (curCallbackRequest){
@@ -1234,6 +1276,7 @@ Roygbiv.prototype.setExpireListener = function(sourceObject, callbackFunction){
   preConditions.checkIfDefined(ROYGBIV.setExpireListener, preConditions.callbackFunction, callbackFunction);
   preConditions.checkIfFunctionOnlyIfExists(ROYGBIV.setExpireListener, preConditions.callbackFunction, callbackFunction);
   preConditions.checkIfTrue(ROYGBIV.setExpireListener, "sourceObject is already expired.", (sourceObject.destroyed));
+  preConditions.checkIfParticleSystemInsideActiveScene(ROYGBIV.setExpireListener, sourceObject);
   sourceObject.expirationFunction = callbackFunction;
 }
 
@@ -1245,6 +1288,7 @@ Roygbiv.prototype.removeExpireListener = function(sourceObject){
   preConditions.checkIfDefined(ROYGBIV.removeExpireListener, preConditions.sourceObject, sourceObject);
   preConditions.checkIfParticleSystem(ROYGBIV.removeExpireListener, preConditions.sourceObject, sourceObject);
   preConditions.checkIfTrue(ROYGBIV.removeExpireListener, "sourceObject is already expired", (sourceObject.destroyed));
+  preConditions.checkIfParticleSystemInsideActiveScene(ROYGBIV.removeExpireListener, sourceObject);
   delete sourceObject.expirationFunction;
 }
 
@@ -1259,6 +1303,7 @@ Roygbiv.prototype.setObjectClickListener = function(sourceObject, callbackFuncti
   preConditions.checkIfAddedObjectOrObjectGroup(ROYGBIV.setObjectClickListener, preConditions.sourceObject, sourceObject);
   preConditions.checkIfTrue(ROYGBIV.setObjectClickListener, "sourceObject marked as unintersectable, cannot be clicked on.", (!sourceObject.isIntersectable));
   preConditions.checkIfFunctionOnlyIfExists(ROYGBIV.setObjectClickListener, preConditions.callbackFunction, callbackFunction);
+  preConditions.checkIfObjectInsideActiveScene(ROYGBIV.setObjectClickListener, sourceObject);
   sourceObject.clickCallbackFunction = callbackFunction;
   objectsWithOnClickListeners.set(sourceObject.name, sourceObject);
 }
@@ -1271,6 +1316,7 @@ Roygbiv.prototype.removeObjectClickListener = function(sourceObject){
   preConditions.checkIfDefined(ROYGBIV.removeObjectClickListener, preConditions.sourceObject, sourceObject);
   preConditions.checkIfAddedObjectOrObjectGroup(ROYGBIV.removeObjectClickListener, preConditions.sourceObject, sourceObject);
   preConditions.checkIfTrue(ROYGBIV.removeObjectClickListener, "sourceObject is marked as unintersectable.", (!sourceObject.isIntersectable));
+  preConditions.checkIfObjectInsideActiveScene(ROYGBIV.removeObjectClickListener, sourceObject);
   delete sourceObject.clickCallbackFunction;
   objectsWithOnClickListeners.delete(sourceObject.name);
 }
@@ -1380,6 +1426,7 @@ Roygbiv.prototype.setParticleSystemPoolConsumedListener = function(psPool, callb
   preConditions.checkIfParticleSystemPool(ROYGBIV.setParticleSystemPoolConsumedListener, preConditions.psPool, psPool);
   preConditions.checkIfDefined(ROYGBIV.setParticleSystemPoolConsumedListener, preConditions.callbackFunction, callbackFunction);
   preConditions.checkIfFunctionOnlyIfExists(ROYGBIV.setParticleSystemPoolConsumedListener, preConditions.callbackFunction, callbackFunction);
+  preConditions.checkIfParticleSystemPoolInsideActiveScene(ROYGBIV.setParticleSystemPoolConsumedListener, psPool);
   psPool.consumedCallback = callbackFunction;
 }
 
@@ -1390,6 +1437,7 @@ Roygbiv.prototype.removeParticleSystemPoolConsumedListener = function(psPool){
   }
   preConditions.checkIfDefined(ROYGBIV.removeParticleSystemPoolConsumedListener, preConditions.psPool, psPool);
   preConditions.checkIfParticleSystemPool(ROYGBIV.removeParticleSystemPoolConsumedListener, preConditions.psPool, psPool);
+  preConditions.checkIfParticleSystemPoolInsideActiveScene(ROYGBIV.removeParticleSystemPoolConsumedListener, psPool);
   psPool.consumedCallback = noop;
 }
 
@@ -1403,6 +1451,7 @@ Roygbiv.prototype.setParticleSystemPoolAvailableListener = function(psPool, call
   preConditions.checkIfParticleSystemPool(ROYGBIV.setParticleSystemPoolAvailableListener, preConditions.psPool, psPool);
   preConditions.checkIfDefined(ROYGBIV.setParticleSystemPoolAvailableListener, preConditions.callbackFunction, callbackFunction);
   preConditions.checkIfFunctionOnlyIfExists(ROYGBIV.setParticleSystemPoolAvailableListener, preConditions.callbackFunction, callbackFunction);
+  preConditions.checkIfParticleSystemPoolInsideActiveScene(ROYGBIV.setParticleSystemPoolAvailableListener, psPool);
   psPool.availableCallback = callbackFunction;
 }
 
@@ -1413,6 +1462,7 @@ Roygbiv.prototype.removeParticleSystemPoolAvailableListener = function(psPool){
   }
   preConditions.checkIfDefined(ROYGBIV.removeParticleSystemPoolAvailableListener, preConditions.psPool, psPool);
   preConditions.checkIfParticleSystemPool(ROYGBIV.removeParticleSystemPoolAvailableListener, preConditions.psPool, psPool);
+  preConditions.checkIfParticleSystemPoolInsideActiveScene(ROYGBIV.removeParticleSystemPoolAvailableListener, psPool);
   psPool.availableCallback = noop;
 }
 
@@ -1563,6 +1613,7 @@ Roygbiv.prototype.onTextClick = function(text, callbackFunction){
   preConditions.checkIfTextClickable(ROYGBIV.onTextClick, preConditions.text, text);
   preConditions.checkIfDefined(ROYGBIV.onTextClick, preConditions.callbackFunction, callbackFunction);
   preConditions.checkIfFunctionOnlyIfExists(ROYGBIV.onTextClick, preConditions.callbackFunction, callbackFunction);
+  preConditions.checkIfTextInsideActiveScene(ROYGBIV.onTextClick, text);
   text.clickCallbackFunction = callbackFunction;
   objectsWithOnClickListeners.set(text.name, text);
 }
@@ -1574,6 +1625,7 @@ Roygbiv.prototype.removeTextClickListener = function(text){
   }
   preConditions.checkIfDefined(ROYGBIV.removeTextClickListener, preConditions.text, text);
   preConditions.checkIfAddedText(ROYGBIV.removeTextClickListener, preConditions.text, text);
+  preConditions.checkIfTextInsideActiveScene(ROYGBIV.removeTextClickListener, text);
   text.clickCallbackFunction = noop;
   objectsWithOnClickListeners.delete(text.name);
 }
@@ -1627,6 +1679,7 @@ Roygbiv.prototype.setObjectMouseOverListener = function(sourceObject, callbackFu
   preConditions.checkIfAddedObjectOrObjectGroup(ROYGBIV.setObjectMouseOverListener, preConditions.sourceObject, sourceObject);
   preConditions.checkIfTrue(ROYGBIV.setObjectMouseOverListener, "sourceObject marked as unintersectable, cannot be selected.", (!sourceObject.isIntersectable));
   preConditions.checkIfFunctionOnlyIfExists(ROYGBIV.setObjectMouseOverListener, preConditions.callbackFunction, callbackFunction);
+  preConditions.checkIfObjectInsideActiveScene(ROYGBIV.setObjectMouseOverListener, sourceObject);
   sourceObject.mouseOverCallbackFunction = callbackFunction;
   objectsWithMouseOverListeners.set(sourceObject.name, sourceObject);
 }
@@ -1639,6 +1692,7 @@ Roygbiv.prototype.removeObjectMouseOverListener = function(sourceObject){
   preConditions.checkIfDefined(ROYGBIV.removeObjectMouseOverListener, preConditions.sourceObject, sourceObject);
   preConditions.checkIfAddedObjectOrObjectGroup(ROYGBIV.removeObjectMouseOverListener, preConditions.sourceObject, sourceObject);
   preConditions.checkIfTrue(ROYGBIV.removeObjectMouseOverListener, "sourceObject is marked as unintersectable.", (!sourceObject.isIntersectable));
+  preConditions.checkIfObjectInsideActiveScene(ROYGBIV.removeObjectMouseOverListener, sourceObject);
   delete sourceObject.mouseOverCallbackFunction;
   objectsWithMouseOverListeners.delete(sourceObject.name);
 }
@@ -1654,6 +1708,7 @@ Roygbiv.prototype.setObjectMouseOutListener = function(sourceObject, callbackFun
   preConditions.checkIfAddedObjectOrObjectGroup(ROYGBIV.setObjectMouseOutListener, preConditions.sourceObject, sourceObject);
   preConditions.checkIfTrue(ROYGBIV.setObjectMouseOutListener, "sourceObject marked as unintersectable, cannot be selected.", (!sourceObject.isIntersectable));
   preConditions.checkIfFunctionOnlyIfExists(ROYGBIV.setObjectMouseOutListener, preConditions.callbackFunction, callbackFunction);
+  preConditions.checkIfObjectInsideActiveScene(ROYGBIV.setObjectMouseOutListener, sourceObject);
   sourceObject.mouseOutCallbackFunction = callbackFunction;
   objectsWithMouseOutListeners.set(sourceObject.name, sourceObject);
 }
@@ -1666,6 +1721,7 @@ Roygbiv.prototype.removeObjectMouseOutListener = function(sourceObject){
   preConditions.checkIfDefined(ROYGBIV.removeObjectMouseOutListener, preConditions.sourceObject, sourceObject);
   preConditions.checkIfAddedObjectOrObjectGroup(ROYGBIV.removeObjectMouseOutListener, preConditions.sourceObject, sourceObject);
   preConditions.checkIfTrue(ROYGBIV.removeObjectMouseOutListener, "sourceObject is marked as unintersectable.", (!sourceObject.isIntersectable));
+  preConditions.checkIfObjectInsideActiveScene(ROYGBIV.removeObjectMouseOutListener, sourceObject);
   delete sourceObject.mouseOutCallbackFunction;
   objectsWithMouseOutListeners.delete(sourceObject.name);
 }
@@ -1680,6 +1736,7 @@ Roygbiv.prototype.onTextMouseOver = function(text, callbackFunction){
   preConditions.checkIfTextClickable(ROYGBIV.onTextMouseOver, preConditions.text, text);
   preConditions.checkIfDefined(ROYGBIV.onTextMouseOver, preConditions.callbackFunction, callbackFunction);
   preConditions.checkIfFunctionOnlyIfExists(ROYGBIV.onTextMouseOver, preConditions.callbackFunction, callbackFunction);
+  preConditions.checkIfTextInsideActiveScene(ROYGBIV.onTextMouseOver, text);
   text.mouseOverCallbackFunction = callbackFunction;
   objectsWithMouseOverListeners.set(text.name, text);
 }
@@ -1691,6 +1748,7 @@ Roygbiv.prototype.removeTextMouseOverListener = function(text){
   }
   preConditions.checkIfDefined(ROYGBIV.removeTextMouseOverListener, preConditions.text, text);
   preConditions.checkIfAddedText(ROYGBIV.removeTextMouseOverListener, preConditions.text, text);
+  preConditions.checkIfTextInsideActiveScene(ROYGBIV.removeTextMouseOverListener, text);
   delete text.mouseOverCallbackFunction;
   objectsWithMouseOverListeners.delete(text.name);
 }
@@ -1705,6 +1763,7 @@ Roygbiv.prototype.onTextMouseOut = function(text, callbackFunction){
   preConditions.checkIfTextClickable(ROYGBIV.onTextMouseOut, preConditions.text, text);
   preConditions.checkIfDefined(ROYGBIV.onTextMouseOut, preConditions.callbackFunction, callbackFunction);
   preConditions.checkIfFunctionOnlyIfExists(ROYGBIV.onTextMouseOut, preConditions.callbackFunction, callbackFunction);
+  preConditions.checkIfTextInsideActiveScene(ROYGBIV.onTextMouseOut, text);
   text.mouseOutCallbackFunction = callbackFunction;
   objectsWithMouseOutListeners.set(text.name, text);
 }
@@ -1716,6 +1775,7 @@ Roygbiv.prototype.removeTextMouseOutListener = function(text){
   }
   preConditions.checkIfDefined(ROYGBIV.removeTextMouseOutListener, preConditions.text, text);
   preConditions.checkIfAddedText(ROYGBIV.removeTextMouseOutListener, preConditions.text, text);
+  preConditions.checkIfTextInsideActiveScene(ROYGBIV.removeTextMouseOutListener, text);
   delete text.mouseOutCallbackFunction;
   objectsWithMouseOutListeners.delete(text.name);
 }
@@ -1739,6 +1799,7 @@ Roygbiv.prototype.onObjectPositionThresholdExceeded = function(object, axis, thr
   preConditions.checkIfNumber(ROYGBIV.onObjectPositionThresholdExceeded, preConditions.threshold, threshold);
   preConditions.checkIfFunctionOnlyIfExists(ROYGBIV.onObjectPositionThresholdExceeded, preConditions.callbackFunction, callbackFunction);
   preConditions.checkIfTrue(ROYGBIV.onObjectPositionThresholdExceeded, "controlMode must be 1 or 2", (controlMode != 1 && controlMode != 2));
+  preConditions.checkIfObjectInsideActiveScene(ROYGBIV.onObjectPositionThresholdExceeded, object);
   object.setPositionThresholdExceededListener(axis, threshold, controlMode, callbackFunction);
 }
 
@@ -1750,6 +1811,7 @@ Roygbiv.prototype.removeObjectPositionThresholdExceededListener = function(objec
   }
   preConditions.checkIfDefined(ROYGBIV.removeObjectPositionThresholdExceededListener, preConditions.object, object);
   preConditions.checkIfAddedObjectOrObjectGroup(ROYGBIV.removeObjectPositionThresholdExceededListener, preConditions.object, object);
+  preConditions.checkIfObjectInsideActiveScene(ROYGBIV.removeObjectPositionThresholdExceededListener, object);
   if (object.positionThresholdExceededListenerInfo){
     object.positionThresholdExceededListenerInfo.isActive = false;
   }
@@ -1806,6 +1868,7 @@ Roygbiv.prototype.onAnimationFinished = function(object, animationName, callback
   preConditions.checkIfAddedObjectObjectGroupAddedText(ROYGBIV.onAnimationFinished, preConditions.object, object);
   preConditions.checkIfAnimationExists(ROYGBIV.onAnimationFinished, object, animationName);
   preConditions.checkIfFunctionOnlyIfExists(ROYGBIV.onAnimationFinished, preConditions.callbackFunction, callbackFunction);
+  preConditions.checkIfObjectInsideActiveScene(ROYGBIV.onAnimationFinished, object);
   object.animations[animationName].setFinishCallbackFunction(callbackFunction);
 }
 
@@ -1818,6 +1881,7 @@ Roygbiv.prototype.removeAnimationFinishListener = function(object, animationName
   preConditions.checkIfDefined(ROYGBIV.removeAnimationFinishListener, preConditions.animationName, animationName);
   preConditions.checkIfAddedObjectObjectGroupAddedText(ROYGBIV.removeAnimationFinishListener, preConditions.object, object);
   preConditions.checkIfAnimationExists(ROYGBIV.removeAnimationFinishListener, object, animationName);
+  preConditions.checkIfObjectInsideActiveScene(ROYGBIV.removeAnimationFinishListener, object);
   object.animations[animationName].finishCallbackFunction = 0;
 }
 
@@ -1832,6 +1896,7 @@ Roygbiv.prototype.setText = function(textObject, text){
   preConditions.checkIfAddedText(ROYGBIV.setText, preConditions.textObject, textObject);
   preConditions.checkIfDefined(ROYGBIV.setText, preConditions.text, text);
   preConditions.checkIfString(ROYGBIV.setText, preConditions.text, text);
+  preConditions.checkIfTextInsideActiveScene(ROYGBIV.setText, textObject);
   textObject.setText(text, true);
 }
 
@@ -1844,6 +1909,7 @@ Roygbiv.prototype.setTextColor = function(text, colorName){
   preConditions.checkIfDefined(ROYGBIV.setTextColor, preConditions.text, text);
   preConditions.checkIfAddedText(ROYGBIV.setTextColor, preConditions.text, text);
   preConditions.checkIfDefined(ROYGBIV.setTextColor, preConditions.colorName, colorName);
+  preConditions.checkIfTextInsideActiveScene(ROYGBIV.setTextColor, text);
   text.setColor(colorName, true);
 }
 
@@ -1856,6 +1922,7 @@ Roygbiv.prototype.setTextAlpha = function(text, alpha){
   preConditions.checkIfAddedText(ROYGBIV.setTextAlpha, preConditions.text, text);
   preConditions.checkIfDefined(ROYGBIV.setTextAlpha, preConditions.alpha, alpha);
   preConditions.checkIfNumber(ROYGBIV.setTextAlpha, preConditions.alpha, alpha);
+  preConditions.checkIfTextInsideActiveScene(ROYGBIV.setTextAlpha, text);
   text.setAlpha(alpha, true);
 }
 
@@ -1873,6 +1940,7 @@ Roygbiv.prototype.setTextPosition = function(text, x, y, z){
   preConditions.checkIfNumber(ROYGBIV.setTextPosition, preConditions.x, x);
   preConditions.checkIfNumber(ROYGBIV.setTextPosition, preConditions.y, y);
   preConditions.checkIfNumberOnlyIfExists(ROYGBIV.setTextPosition, preConditions.z, z);
+  preConditions.checkIfTextInsideActiveScene(ROYGBIV.setTextPosition, text);
   text.setPosition(x, y, z);
 }
 
@@ -1888,6 +1956,7 @@ Roygbiv.prototype.setTextBackground = function(text, colorName, alpha){
   preConditions.checkIfString(ROYGBIV.setTextBackground, preConditions.colorName, colorName);
   preConditions.checkIfDefined(ROYGBIV.setTextBackground, preConditions.alpha, alpha);
   preConditions.checkIfNumber(ROYGBIV.setTextBackground, preConditions.alpha, alpha);
+  preConditions.checkIfTextInsideActiveScene(ROYGBIV.setTextBackground, text);
   text.setBackground(colorName, alpha, true);
 }
 
@@ -1899,6 +1968,7 @@ Roygbiv.prototype.removeTextBackground = function(text){
   preConditions.checkIfDefined(ROYGBIV.removeTextBackground, preConditions.text, text);
   preConditions.checkIfAddedText(ROYGBIV.removeTextBackground, preConditions.text, text);
   preConditions.checkIfTrue(ROYGBIV.setTextBackground, "text has no background", (!text.hasBackground));
+  preConditions.checkIfTextInsideActiveScene(ROYGBIV.setTextBackground, text);
   text.removeBackground(true);
 }
 
@@ -1916,6 +1986,7 @@ Roygbiv.prototype.setTextCenterPosition = function(text, x, y, z){
   preConditions.checkIfNumber(ROYGBIV.setTextCenterPosition, preConditions.x, x);
   preConditions.checkIfNumber(ROYGBIV.setTextCenterPosition, preConditions.y, y);
   preConditions.checkIfNumber(ROYGBIV.setTextCenterPosition, preConditions.z, z);
+  preConditions.checkIfTextInsideActiveScene(ROYGBIV.setTextCenterPosition, text);
   var centerPos = text.getCenterCoordinates();
   text.mesh.position.set(text.mesh.position.x + (x - centerPos.x), text.mesh.position.y + (y - centerPos.y), text.mesh.position.z + (z - centerPos.z));
 }
@@ -1928,6 +1999,7 @@ Roygbiv.prototype.hideText = function(text){
   }
   preConditions.checkIfDefined(ROYGBIV.hideText, preConditions.text, text);
   preConditions.checkIfAddedText(ROYGBIV.hideText, preConditions.text, text);
+  preConditions.checkIfTextInsideActiveScene(ROYGBIV.hideText, text);
   if (text.mesh.visible){
     text.hide();
   }
@@ -1941,6 +2013,7 @@ Roygbiv.prototype.showText = function(text){
   }
   preConditions.checkIfDefined(ROYGBIV.showText, preConditions.text, text);
   preConditions.checkIfAddedText(ROYGBIV.showText, preConditions.text, text);
+  preConditions.checkIfTextInsideActiveScene(ROYGBIV.showText, text);
   if (!text.mesh.visible){
     text.show();
   }
@@ -2152,6 +2225,10 @@ Roygbiv.prototype.createFPSControl = function(parameters){
   preConditions.checkIfAlreadyUsedAsFPSWeaponOnlyIfExists(ROYGBIV.createFPSControl, preConditions.weaponObject1, parameters.weaponObject1);
   preConditions.checkIfAlreadyUsedAsFPSWeaponOnlyIfExists(ROYGBIV.createFPSControl, preConditions.weaponObject2, parameters.weaponObject2);
   preConditions.checkIfTrue(ROYGBIV.createFPSControl, "Player body object cannot have set colllision listener.", collisionCallbackRequests.has(parameters.playerBodyObject.name));
+  preConditions.checkIfObjectInsideActiveScene(ROYGBIV.createFPSControl, playerBodyObject);
+  preConditions.checkIfObjectInsideActiveSceneOnlyIfExists(ROYGBIV.createFPSControl, parameters.weaponObject1);
+  preConditions.checkIfObjectInsideActiveSceneOnlyIfExists(ROYGBIV.createFPSControl, parameters.weaponObject2);
+  preConditions.checkIfCrosshairInsideActiveSceneOnlyIfNameExists(ROYGBIV.createFPSControl, parameters.crosshairName);
   return new FPSControls(parameters);
 }
 
@@ -2208,6 +2285,7 @@ Roygbiv.prototype.startAnimation = function(object, animationName){
   preConditions.checkIfAddedObjectObjectGroupAddedText(ROYGBIV.startAnimation, preConditions.object, object);
   preConditions.checkIfDefined(ROYGBIV.startAnimation, preConditions.animationName, animationName);
   preConditions.checkIfAnimationExists(ROYGBIV.startAnimation, object, animationName);
+  preConditions.checkIfObjectInsideActiveScene(ROYGBIV.startAnimation, object);
   var animation = object.animations[animationName];
   animationHandler.forceFinish(animation);
   animationHandler.startAnimation(animation);
@@ -2222,6 +2300,7 @@ Roygbiv.prototype.stopAnimation = function(object, animationName){
   preConditions.checkIfAddedObjectObjectGroupAddedText(ROYGBIV.stopAnimation, preConditions.object, object);
   preConditions.checkIfDefined(ROYGBIV.stopAnimation, preConditions.animationName, animationName);
   preConditions.checkIfAnimationExists(ROYGBIV.stopAnimation, object, animationName);
+  preConditions.checkIfObjectInsideActiveScene(ROYGBIV.stopAnimation, object);
   var animation = object.animations[animationName];
   animationHandler.forceFinish(animation);
 }
@@ -2239,6 +2318,7 @@ Roygbiv.prototype.showMuzzleFlash = function(muzzleflashName){
   preConditions.checkIfMuzzleFlashExists(ROYGBIV.showMuzzleFlash, muzzleFlash);
   preConditions.checkIfMuzzleFlashAttached(ROYGBIV.showMuzzleFlash, muzzleFlash);
   preConditions.checkIfMuzzleFlashActivated(ROYGBIV.showMuzzleFlash, muzzleFlash);
+  preConditions.checkIfMuzzleFlashInsideActiveScene(ROYGBIV.showMuzzleFlash, muzzleFlash);
   muzzleFlash.onShow();
 }
 
@@ -2249,17 +2329,25 @@ Roygbiv.prototype.vector = function(x, y, z){
   if (mode == 0){
     return;
   }
-  preConditions.checkIfDefined(ROYGBIV.vector, preConditions.x, x);
-  preConditions.checkIfDefined(ROYGBIV.vector, preConditions.y, y);
-  preConditions.checkIfDefined(ROYGBIV.vector, preConditions.z, z);
-  preConditions.checkIfNumber(ROYGBIV.vector, preConditions.x, x);
-  preConditions.checkIfNumber(ROYGBIV.vector, preConditions.y, y);
-  preConditions.checkIfNumber(ROYGBIV.vector, preConditions.z, z);
   var obj = new Object();
-  obj.x = x;
-  obj.y = y;
-  obj.z = z;
-
+  if (typeof x == UNDEFINED){
+    obj.x = 0;
+  }else{
+    preConditions.checkIfNumber(ROYGBIV.vector, preConditions.x, x);
+    obj.x = x;
+  }
+  if (typeof y == UNDEFINED){
+    obj.y = 0;
+  }else{
+    preConditions.checkIfNumber(ROYGBIV.vector, preConditions.y, y);
+    obj.y = y;
+  }
+  if (typeof z == UNDEFINED){
+    obj.z = 0;
+  }else{
+    preConditions.checkIfNumber(ROYGBIV.vector, preConditions.z, z);
+    obj.z = z;
+  }
   return obj;
 }
 
@@ -2544,6 +2632,8 @@ Roygbiv.prototype.trackObjectPosition = function(sourceObject, targetObject){
   preConditions.checkIfDynamic(ROYGBIV.trackObjectPosition, preConditions.targetObject, targetObject);
   preConditions.checkIfNotDynamic(ROYGBIV.trackObjectPosition, preConditions.sourceObject, sourceObject);
   preConditions.checkIfChangeable(ROYGBIV.trackObjectPosition, preConditions.sourceObject, sourceObject);
+  preConditions.checkIfObjectInsideActiveScene(ROYGBIV.trackObjectPosition, sourceObject);
+  preConditions.checkIfObjectInsideActiveScene(ROYGBIV.trackObjectPosition, targetObject);
   sourceObject.trackObjectPosition(targetObject);
 }
 
@@ -2554,6 +2644,7 @@ Roygbiv.prototype.untrackObjectPosition = function(sourceObject){
   }
   preConditions.checkIfDefined(ROYGBIV.untrackObjectPosition, preConditions.sourceObject, sourceObject);
   preConditions.checkIfAddedObjectOrObjectGroup(ROYGBIV.untrackObjectPosition, preConditions.sourceObject, sourceObject);
+  preConditions.checkIfObjectInsideActiveScene(ROYGBIV.untrackObjectPosition, sourceObject);
   sourceObject.untrackObjectPosition();
 }
 
@@ -2573,6 +2664,7 @@ Roygbiv.prototype.createRotationPivot = function(sourceObject, offsetX, offsetY,
   preConditions.checkIfNumber(ROYGBIV.createRotationPivot, preConditions.offsetX, offsetX);
   preConditions.checkIfNumber(ROYGBIV.createRotationPivot, preConditions.offsetY, offsetY);
   preConditions.checkIfNumber(ROYGBIV.createRotationPivot, preConditions.offsetZ, offsetZ);
+  preConditions.checkIfObjectInsideActiveScene(ROYGBIV.createRotationPivot, sourceObject);
   return sourceObject.makePivot(offsetX, offsetY, offsetZ);
 }
 
@@ -2709,10 +2801,10 @@ Roygbiv.prototype.executeForEachObject = function(func){
   }
   preConditions.checkIfDefined(ROYGBIV.executeForEachObject, preConditions.func, func);
   preConditions.checkIfFunctionOnlyIfExists(ROYGBIV.executeForEachObject, preConditions.func, func);
-  for (var objName in addedObjects){
+  for (var objName in sceneHandler.getAddedObjects()){
     func(addedObjects[objName], objName)
   }
-  for (var objName in objectGroups){
+  for (var objName in sceneHandler.getObjectGroups()){
     func(objectGroups[objName], objName)
   }
 }

@@ -38,12 +38,12 @@ THREE.CannonDebugRenderer.prototype = {
       for (var i = 0; i<this.world.bodies.length; i++){
         this.world.remove(this.world.bodies[i]);
       }
-      for (var objName in addedObjects){
+      for (var objName in sceneHandler.getAddedObjects()){
         if (!addedObjects[objName].noMass){
           this.world.add(addedObjects[objName].physicsBody);
         }
       }
-      for (var objName in objectGroups){
+      for (var objName in sceneHandler.getObjectGroups()){
         if (!objectGroups[objName].noMass){
           this.world.add(objectGroups[objName].physicsBody);
         }

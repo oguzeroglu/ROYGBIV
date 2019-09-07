@@ -702,6 +702,14 @@ AddedText.prototype.debugTriangles = function(triangleIndex){
   sCenter.position.copy(this.getCenterCoordinates());
 }
 
+AddedText.prototype.hideVisually = function(){
+  this.mesh.visible = false;
+}
+
+AddedText.prototype.showVisually = function(){
+  this.mesh.visible = true;
+}
+
 AddedText.prototype.hide = function(){
   this.mesh.visible = false;
   this.isHidden = true;

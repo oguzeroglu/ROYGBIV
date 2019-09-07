@@ -6,6 +6,9 @@ var WorldBinHandler = function(){
 }
 
 WorldBinHandler.prototype.deleteObjectFromBin = function(binInfo, objName){
+  if (!binInfo){
+    return;
+  }
   for (var x of binInfo.keys()){
     for (var y of binInfo.get(x).keys()){
       for (var z of binInfo.get(x).get(y).keys()){
