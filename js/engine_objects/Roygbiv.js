@@ -526,6 +526,7 @@ Roygbiv.prototype.hide = function(object, keepPhysics){
   var keepPhysicsValue = keepPhysics;
   preConditions.checkIfDefined(ROYGBIV.hide, preConditions.object, object);
   preConditions.checkIfAddedObjectOrObjectGroup(ROYGBIV.hide, preConditions.object, object);
+  preConditions.checkIfObjectInsideActiveScene(ROYGBIV.hide, object);
   if (object.isAddedObject){
     preConditions.checkIfChildObjectOnlyIfExists(ROYGBIV.hide, preConditions.object, object);
     if (keepPhysicsValue){
@@ -550,6 +551,7 @@ Roygbiv.prototype.show = function(object){
   }
   preConditions.checkIfDefined(ROYGBIV.show, preConditions.object, object);
   preConditions.checkIfAddedObjectOrObjectGroup(ROYGBIV.show, preConditions.object, object);
+  preConditions.checkIfObjectInsideActiveScene(ROYGBIV.show, object);
   if (object.isAddedObject){
     preConditions.checkIfChildObjectOnlyIfExists(ROYGBIV.show, preConditions.object, object);
     preConditions.checkIfChangeable(ROYGBIV.show, preConditions.object, object);
@@ -573,6 +575,7 @@ Roygbiv.prototype.applyForce = function(object, force, point){
   preConditions.checkIfDefined(ROYGBIV.applyForce, preConditions.point, point);
   preConditions.checkIfVectorOnlyIfDefined(ROYGBIV.applyForce, preConditions.force, force);
   preConditions.checkIfVectorOnlyIfDefined(ROYGBIV.applyForce, preConditions.point, point);
+  preConditions.checkIfObjectInsideActiveScene(ROYGBIV.applyForce, object);
   REUSABLE_CANNON_VECTOR.set(force.x, force.y, force.z);
   REUSABLE_CANNON_VECTOR_2.set(point.x, point.y, point.z);
   object.physicsBody.applyImpulse(
@@ -596,6 +599,7 @@ Roygbiv.prototype.rotate = function(object, axis, radians){
   preConditions.checkIfAxisOnlyIfDefined(ROYGBIV.rotate, preConditions.axis, axis);
   preConditions.checkIfNumber(ROYGBIV.rotate, preConditions.radians, radians);
   preConditions.checkIfAddedObjectOrObjectGroup(ROYGBIV.rotate, preConditions.object, object);
+  preConditions.checkIfObjectInsideActiveScene(ROYGBIV.rotate, object);
   if (object.isAddedObject && object.parentObjectName){
     var parentObject = objectGroups[object.parentObjectName];
     if (parentObject){
@@ -632,6 +636,7 @@ Roygbiv.prototype.rotateAroundXYZ = function(object, x, y, z, radians, axis){
   preConditions.checkIfNumber(ROYGBIV.rotateAroundXYZ, preConditions.radians, radians);
   preConditions.checkIfDefined(ROYGBIV.rotateAroundXYZ, preConditions.axis, axis);
   preConditions.checkIfAddedObjectOrObjectGroup(ROYGBIV.rotateAroundXYZ, preConditions.object, object);
+  preConditions.checkIfObjectInsideActiveScene(ROYGBIV.rotateAroundXYZ, object);
   axis = axis.toLowerCase();
   preConditions.checkIfAxisOnlyIfDefined(ROYGBIV.rotateAroundXYZ, preConditions.axis, axis);
   var axisVector;
@@ -682,6 +687,7 @@ Roygbiv.prototype.setPosition = function(obj, x, y, z){
   preConditions.checkIfNumber(ROYGBIV.setPosition, preConditions.y, y);
   preConditions.checkIfNumber(ROYGBIV.setPosition, preConditions.z, z);
   preConditions.checkIfAddedObjectOrObjectGroup(ROYGBIV.setPosition, preConditions.obj, obj);
+  preConditions.checkIfObjectInsideActiveScene(ROYGBIV.setPosition, obj);
   if (obj.parentObjectName){
     var objGroup = objectGroups[obj.parentObjectName];
     preConditions.checkIfParentExists(ROYGBIV.setPosition, null, objGroup);
@@ -705,6 +711,7 @@ Roygbiv.prototype.setMass = function(object, mass){
   preConditions.checkIfChangeable(ROYGBIV.setMass, preConditions.object, object);
   preConditions.checkIfNoMass(ROYGBIV.setMass, preConditions.object, object);
   preConditions.checkIfChildObjectOnlyIfExists(ROYGBIV.setMass, preConditions.object, object);
+  preConditions.checkIfObjectInsideActiveScene(ROYGBIV.setMass, object);
   if (typeof object.originalMass == UNDEFINED){
     object.originalMass = object.mass;
   }
@@ -746,6 +753,7 @@ Roygbiv.prototype.translate = function(object, axis, amount){
   preConditions.checkIfAxisOnlyIfDefined(ROYGBIV.translate, preConditions.axis, axis);
   preConditions.checkIfNumber(ROYGBIV.translate, preConditions.amount, amount);
   preConditions.checkIfAddedObjectOrObjectGroup(ROYGBIV.translate, preConditions.object, object);
+  preConditions.checkIfObjectInsideActiveScene(ROYGBIV.translate, object);
   if (object.isAddedObject){
     if (object.parentObjectName){
       var parentObject = objectGroups[object.parentObjectName];
@@ -773,6 +781,7 @@ Roygbiv.prototype.opacity = function(object, delta){
   preConditions.checkIfNumber(ROYGBIV.opacity, preConditions.delta, delta);
   preConditions.checkIfAddedObjectOrObjectGroup(ROYGBIV.opacity, preConditions.object, object);
   preConditions.checkIfChildObjectOnlyIfExists(ROYGBIV.opacity, preConditions.object, object);
+  preConditions.checkIfObjectInsideActiveScene(ROYGBIV.opacity, object);
   if (!object.initOpacitySet && (object.isAddedObject)){
     object.initOpacity = object.mesh.material.uniforms.alpha.value;
     object.initOpacitySet = true;
@@ -811,6 +820,7 @@ Roygbiv.prototype.setObjectVelocity = function(object, velocityVector, axis){
   preConditions.checkIfDynamic(ROYGBIV.setObjectVelocity, preConditions.object, object);
   preConditions.checkIfDefined(ROYGBIV.setObjectVelocity, preConditions.velocityVector, velocityVector);
   preConditions.checkIfVectorOnlyIfDefined(ROYGBIV.setObjectVelocity, preConditions.velocityVector, velocityVector);
+  preConditions.checkIfObjectInsideActiveScene(ROYGBIV.setObjectVelocity, object);
   if (!(typeof axis == UNDEFINED)){
     axis = axis.toLowerCase();
     preConditions.checkIfAxisOnlyIfDefined(ROYGBIV.setObjectVelocity, preConditions.axis, axis);
@@ -835,6 +845,7 @@ Roygbiv.prototype.setObjectColor = function(object, colorName, alpha){
   preConditions.checkIfAddedObjectOrObjectGroup(ROYGBIV.setObjectColor, preConditions.object, object);
   preConditions.checkIfColorizable(ROYGBIV.setObjectColor, preConditions.object, object);
   preConditions.checkIfDefined(ROYGBIV.setObjectColor, preConditions.colorName, colorName);
+  preConditions.checkIfObjectInsideActiveScene(ROYGBIV.setObjectColor, object);
   if (typeof alpha == UNDEFINED){
     alpha = 1;
   }else{
@@ -855,6 +866,7 @@ Roygbiv.prototype.resetObjectColor = function(object){
   preConditions.checkIfDefined(ROYGBIV.resetObjectColor, preConditions.object, object);
   preConditions.checkIfAddedObjectOrObjectGroup(ROYGBIV.resetObjectColor, preConditions.object, object);
   preConditions.checkIfColorizable(ROYGBIV.resetObjectColor, preConditions.object, object);
+  preConditions.checkIfObjectInsideActiveScene(ROYGBIV.resetObjectColor, object);
   if (object.autoInstancedParent){
     object.autoInstancedParent.resetColor(object);
   }
@@ -869,6 +881,7 @@ Roygbiv.prototype.setRotationPivot = function(rotationPivot){
   preConditions.checkIfDefined(ROYGBIV.setRotationPivot, preConditions.rotationPivot, rotationPivot);
   preConditions.checkIfRotationPivot(ROYGBIV.setRotationPivot, preConditions.rotat, rotationPivot);
   var sourceObject = rotationPivot.sourceObject;
+  preConditions.checkIfObjectInsideActiveScene(ROYGBIV.setRotationPivot, sourceObject);
   sourceObject.setRotationPivot(rotationPivot);
 }
 
@@ -880,6 +893,7 @@ Roygbiv.prototype.unsetRotationPivot = function(object){
   preConditions.checkIfDefined(ROYGBIV.unsetRotationPivot, preConditions.object, object);
   preConditions.checkIfAddedObjectOrObjectGroup(ROYGBIV.unsetRotationPivot, preConditions.object, object);
   preConditions.checkIfHavePivotPoint(ROYGBIV.unsetRotationPivot, preConditions.object, object);
+  preConditions.checkIfObjectInsideActiveScene(ROYGBIV.unsetRotationPivot, object);
   object.unsetRotationPivot();
 }
 
@@ -893,6 +907,7 @@ Roygbiv.prototype.resetObjectVelocity = function(object){
   preConditions.checkIfChangeable(ROYGBIV.resetObjectVelocity, preConditions.object, object);
   preConditions.checkIfChildObjectOnlyIfExists(ROYGBIV.resetObjectVelocity, preConditions.object, object);
   preConditions.checkIfDynamic(ROYGBIV.resetObjectVelocity, preConditions.object, object);
+  preConditions.checkIfObjectInsideActiveScene(ROYGBIV.resetObjectVelocity, object);
   object.resetVelocity();
 }
 
