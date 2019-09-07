@@ -227,6 +227,12 @@ Preconditions.prototype.throw = function(callerFunc, errorMsg){
   throw new Error(this.errorHeader(callerFunc)+" ["+errorMsg+"]");
 }
 
+Preconditions.prototype.checkIfCrosshairInsideActiveSceneOnlyIfNameExists = function(callerFunc, crosshairName){
+  if (crosshairName){
+    this.checkIfCrosshairInsideActiveScene(callerFunc, crosshairs[crosshairName]);
+  }
+}
+
 Preconditions.prototype.checkIfCrosshairInsideActiveScene = function(callerFunc, crosshair){
   if (crosshair.registeredSceneName != sceneHandler.getActiveSceneName()){
     this.throw(callerFunc, "Crosshair not inside the active scene.");
@@ -260,6 +266,12 @@ Preconditions.prototype.checkIfMarkedPointInsideActiveScene = function(callerFun
 Preconditions.prototype.checkIfObjectInsideActiveScene = function(callerFunc, obj){
   if (obj.registeredSceneName != sceneHandler.getActiveSceneName()){
     this.throw(callerFunc, "Object not inside active scene.");
+  }
+}
+
+Preconditions.prototype.checkIfObjectInsideActiveSceneOnlyIfExists = function(callerFunc, obj){
+  if (obj){
+    this.checkIfObjectInsideActiveScene(callerFunc, obj);
   }
 }
 
