@@ -929,6 +929,7 @@ Roygbiv.prototype.setParticleSystemRotation = function(particleSystem, axis, rad
   preConditions.checkIfTrue(ROYGBIV.setParticleSystemRotation, "particleSystem has a collidable particle. Cannot set rotation.", particleSystem.particlesWithCollisionCallbacks.size > 0);
   preConditions.checkIfTrue(ROYGBIV.setParticleSystemRotation, "particleSystem has a trailed particle. Cannot set rotation.", particleSystem.hasTrailedParticle);
   preConditions.checkIfTrue(ROYGBIV.setParticleSystemRotation, "particleSystem has a defined motion. Cannot set rotation.", (particleSystem.velocity.x != 0 || particleSystem.velocity.y != 0 || particleSystem.velocity.z != 0 || particleSystem.acceleration.x != 0 || particleSystem.acceleration.y != 0 || particleSystem.acceleration.z != 0));
+  preConditions.checkIfParticleSystemInsideActiveScene(ROYGBIV.setParticleSystemRotation, particleSystem);
   if (axis == "x"){
     particleSystem.mesh.rotation.x = radians;
   }else if (axis == "y"){
@@ -955,6 +956,7 @@ Roygbiv.prototype.setParticleSystemQuaternion = function(particleSystem, quatX, 
   preConditions.checkIfTrue(ROYGBIV.setParticleSystemQuaternion, "particleSystem has a collidable particle. Cannot set quaternion.", (particleSystem.particlesWithCollisionCallbacks.size > 0));
   preConditions.checkIfTrue(ROYGBIV.setParticleSystemQuaternion, "particleSystem has a trailed particle. Cannot set quaternion.", (particleSystem.hasTrailedParticle));
   preConditions.checkIfTrue(ROYGBIV.setParticleSystemQuaternion, "particleSystem has a defined motion. Cannot set quaternion.", (particleSystem.velocity.x != 0 || particleSystem.velocity.y != 0 || particleSystem.velocity.z != 0 || particleSystem.acceleration.x != 0 || particleSystem.acceleration.y != 0 || particleSystem.acceleration.z != 0));
+  preConditions.checkIfParticleSystemInsideActiveScene(ROYGBIV.setParticleSystemQuaternion, particleSystem);
   particleSystem.mesh.quaternion.set(quatX, quatY, quatZ, quatW);
   particleSystem.hasManualQuaternionSet = true;
 }
@@ -973,6 +975,7 @@ Roygbiv.prototype.stopParticleSystem = function(particleSystem, stopDuration){
   preConditions.checkIfDefined(ROYGBIV.stopParticleSystem, preConditions.stopDuration, stopDuration);
   preConditions.checkIfNumber(ROYGBIV.stopParticleSystem, preConditions.stopDuration, stopDuration);
   preConditions.checkIfLessThanExclusive(ROYGBIV.stopParticleSystem, preConditions.stopDuration, stopDuration, 0);
+  preConditions.checkIfParticleSystemInsideActiveScene(ROYGBIV.stopParticleSystem, particleSystem);
   particleSystem.stop(stopDuration);
 }
 
@@ -993,6 +996,7 @@ Roygbiv.prototype.startParticleSystem = function(configurations){
   preConditions.checkIfVectorOnlyIfDefined(ROYGBIV.startParticleSystem, preConditions.startVelocity, configurations.startVelocity);
   preConditions.checkIfVectorOnlyIfDefined(ROYGBIV.startParticleSystem, preConditions.startAcceleration, configurations.startAcceleration);
   preConditions.checkIfVectorOnlyIfDefined(ROYGBIV.startParticleSystem, preConditions.startQuaternion, configurations.startQuaternion);
+  preConditions.checkIfParticleSystemInsideActiveScene(ROYGBIV.startParticleSystem, configurations.particleSystem);
   configurations.particleSystem.start(configurations);
 }
 
@@ -1003,6 +1007,7 @@ Roygbiv.prototype.hideParticleSystem = function(particleSystem){
   }
   preConditions.checkIfDefined(ROYGBIV.hideParticleSystem, preConditions.particleSystem, particleSystem);
   preConditions.checkIfParticleSystem(ROYGBIV.hideParticleSystem, preConditions.particleSystem, particleSystem);
+  preConditions.checkIfParticleSystemInsideActiveScene(ROYGBIV.hideParticleSystem, particleSystem);
   particleSystem.hide();
 }
 
@@ -1018,6 +1023,7 @@ Roygbiv.prototype.fadeAway = function(particleSystem, coefficient){
   preConditions.checkIfDefined(ROYGBIV.fadeAway, preConditions.coefficient, coefficient);
   preConditions.checkIfNumber(ROYGBIV.fadeAway, preConditions.coefficient, coefficient);
   preConditions.checkIfLessThan(ROYGBIV.fadeAway, preConditions.coefficient, coefficient, 0);
+  preConditions.checkIfParticleSystemInsideActiveScene(ROYGBIV.fadeAway, particleSystem);
   if (!particleSystem.psMerger){
     particleSystem.material.uniforms.dissapearCoef.value = coefficient;
   }else{
@@ -1046,6 +1052,7 @@ Roygbiv.prototype.setParticleSystemPosition = function(particleSystem, x, y, z){
   preConditions.checkIfTrue(ROYGBIV.setParticleSystemPosition, "particleSystem has collidable particles.", (particleSystem.particlesWithCollisionCallbacks.size > 0));
   preConditions.checkIfTrue(ROYGBIV.setParticleSystemPosition, "particleSystem has a trailed particle.", particleSystem.hasTrailedParticle);
   preConditions.checkIfTrue(ROYGBIV.setParticleSystemPosition, "particleSystem has a defined motion.", (particleSystem.velocity.x != 0 || particleSystem.velocity.y != 0 || particleSystem.velocity.z != 0 || particleSystem.acceleration.x != 0 || particleSystem.acceleration.y != 0 || particleSystem.acceleration.z != 0));
+  preConditions.checkIfParticleSystemInsideActiveScene(ROYGBIV.setParticleSystemPosition, particleSystem);
   particleSystem.mesh.position.set(x, y, z);
   particleSystem.hasManualPositionSet = true;
 }
@@ -1060,6 +1067,7 @@ Roygbiv.prototype.executeForEachParticleSystem = function(psPool, callbackFuncti
   preConditions.checkIfDefined(ROYGBIV.executeForEachParticleSystem, preConditions.callbackFunction, callbackFunction);
   preConditions.checkIfFunctionOnlyIfExists(ROYGBIV.executeForEachParticleSystem, preConditions.callbackFunction, callbackFunction);
   preConditions.checkIfParticleSystemPool(ROYGBIV.executeForEachParticleSystem, preConditions.psPool, psPool);
+  preConditions.checkIfParticleSystemPoolInsideActiveScene(ROYGBIV.executeForEachParticleSystem, psPool);
   for (var psName in psPool.particleSystems){
     callbackFunction(psPool.particleSystems[psName]);
   }
