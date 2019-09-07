@@ -1082,6 +1082,7 @@ Roygbiv.prototype.startMotionBlur = function(object){
   }
   preConditions.checkIfDefined(ROYGBIV.startMotionBlur, preConditions.object, object);
   preConditions.checkIfAddedObjectOrObjectGroup(ROYGBIV.startMotionBlur, preConditions.object, object);
+  preConditions.checkIfObjectInsideActiveScene(ROYGBIV.startMotionBlur, object);
   var objectTrail = objectTrails[object.name];
   preConditions.checkIfTrue(ROYGBIV.startMotionBlur, "No effect attached to object.", (!objectTrail));
   objectTrail.start();
@@ -1094,6 +1095,7 @@ Roygbiv.prototype.stopMotionBlur = function(object){
   }
   preConditions.checkIfDefined(ROYGBIV.stopMotionBlur, preConditions.object, object);
   preConditions.checkIfAddedObjectOrObjectGroup(ROYGBIV.stopMotionBlur, preConditions.object, object);
+  preConditions.checkIfObjectInsideActiveScene(ROYGBIV.stopMotionBlur, object);
   var objectTrail = objectTrails[object.name];
   preConditions.checkIfTrue(ROYGBIV.stopMotionBlur, "No effect attached to object.", (!objectTrail));
   objectTrail.stop();
