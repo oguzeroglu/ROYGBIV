@@ -149,14 +149,14 @@ SceneHandler.prototype.hideAll = function(){
 
 SceneHandler.prototype.changeScene = function(sceneName){
   this.hideAll();
+  if (this.scenes[sceneName].isSkyboxMapped){
+    skyboxHandler.map(skyBoxes[this.scenes[sceneName].mappedSkyboxName]);
+  }
   if (mode == 0){
     this.scenes[this.getActiveSceneName()].savePostProcessing();
     this.scenes[sceneName].loadPostProcessing();
     croppedGridSystemBuffer = 0;
     anchorGrid = 0;
-    if (this.scenes[sceneName].isSkyboxMapped){
-      skyboxHandler.map(skyBoxes[this.scenes[sceneName].mappedSkyboxName]);
-    }
     if (this.scenes[sceneName].fogConfigurations){
       fogHandler.import(this.scenes[sceneName].fogConfigurations);
     }else{
