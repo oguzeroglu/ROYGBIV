@@ -4,6 +4,10 @@ var ModeSwitcher = function(){
   this.scriptReloadSuccessFunction = function(scriptName){
     that.loadedScriptsCounter ++;
     if (that.loadedScriptsCounter == that.totalScriptsToLoad){
+      canvas.style.visibility = "";
+      if (!isDeployment){
+        terminal.enable();
+      }
       that.switchFromDesignToPreview();
     }
   }
