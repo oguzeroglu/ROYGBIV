@@ -2329,17 +2329,25 @@ Roygbiv.prototype.vector = function(x, y, z){
   if (mode == 0){
     return;
   }
-  preConditions.checkIfDefined(ROYGBIV.vector, preConditions.x, x);
-  preConditions.checkIfDefined(ROYGBIV.vector, preConditions.y, y);
-  preConditions.checkIfDefined(ROYGBIV.vector, preConditions.z, z);
-  preConditions.checkIfNumber(ROYGBIV.vector, preConditions.x, x);
-  preConditions.checkIfNumber(ROYGBIV.vector, preConditions.y, y);
-  preConditions.checkIfNumber(ROYGBIV.vector, preConditions.z, z);
   var obj = new Object();
-  obj.x = x;
-  obj.y = y;
-  obj.z = z;
-
+  if (typeof x == UNDEFINED){
+    obj.x = 0;
+  }else{
+    preConditions.checkIfNumber(ROYGBIV.vector, preConditions.x, x);
+    obj.x = x;
+  }
+  if (typeof y == UNDEFINED){
+    obj.y = 0;
+  }else{
+    preConditions.checkIfNumber(ROYGBIV.vector, preConditions.y, y);
+    obj.y = y;
+  }
+  if (typeof z == UNDEFINED){
+    obj.z = 0;
+  }else{
+    preConditions.checkIfNumber(ROYGBIV.vector, preConditions.z, z);
+    obj.z = z;
+  }
   return obj;
 }
 
@@ -2624,6 +2632,8 @@ Roygbiv.prototype.trackObjectPosition = function(sourceObject, targetObject){
   preConditions.checkIfDynamic(ROYGBIV.trackObjectPosition, preConditions.targetObject, targetObject);
   preConditions.checkIfNotDynamic(ROYGBIV.trackObjectPosition, preConditions.sourceObject, sourceObject);
   preConditions.checkIfChangeable(ROYGBIV.trackObjectPosition, preConditions.sourceObject, sourceObject);
+  preConditions.checkIfObjectInsideActiveScene(ROYGBIV.trackObjectPosition, sourceObject);
+  preConditions.checkIfObjectInsideActiveScene(ROYGBIV.trackObjectPosition, targetObject);
   sourceObject.trackObjectPosition(targetObject);
 }
 
@@ -2634,6 +2644,7 @@ Roygbiv.prototype.untrackObjectPosition = function(sourceObject){
   }
   preConditions.checkIfDefined(ROYGBIV.untrackObjectPosition, preConditions.sourceObject, sourceObject);
   preConditions.checkIfAddedObjectOrObjectGroup(ROYGBIV.untrackObjectPosition, preConditions.sourceObject, sourceObject);
+  preConditions.checkIfObjectInsideActiveScene(ROYGBIV.untrackObjectPosition, sourceObject);
   sourceObject.untrackObjectPosition();
 }
 
@@ -2653,6 +2664,7 @@ Roygbiv.prototype.createRotationPivot = function(sourceObject, offsetX, offsetY,
   preConditions.checkIfNumber(ROYGBIV.createRotationPivot, preConditions.offsetX, offsetX);
   preConditions.checkIfNumber(ROYGBIV.createRotationPivot, preConditions.offsetY, offsetY);
   preConditions.checkIfNumber(ROYGBIV.createRotationPivot, preConditions.offsetZ, offsetZ);
+  preConditions.checkIfObjectInsideActiveScene(ROYGBIV.createRotationPivot, sourceObject);
   return sourceObject.makePivot(offsetX, offsetY, offsetZ);
 }
 
@@ -2789,10 +2801,10 @@ Roygbiv.prototype.executeForEachObject = function(func){
   }
   preConditions.checkIfDefined(ROYGBIV.executeForEachObject, preConditions.func, func);
   preConditions.checkIfFunctionOnlyIfExists(ROYGBIV.executeForEachObject, preConditions.func, func);
-  for (var objName in addedObjects){
+  for (var objName in sceneHandler.getAddedObjects()){
     func(addedObjects[objName], objName)
   }
-  for (var objName in objectGroups){
+  for (var objName in sceneHandler.getObjectGroups()){
     func(objectGroups[objName], objName)
   }
 }
