@@ -1896,6 +1896,7 @@ Roygbiv.prototype.setText = function(textObject, text){
   preConditions.checkIfAddedText(ROYGBIV.setText, preConditions.textObject, textObject);
   preConditions.checkIfDefined(ROYGBIV.setText, preConditions.text, text);
   preConditions.checkIfString(ROYGBIV.setText, preConditions.text, text);
+  preConditions.checkIfTextInsideActiveScene(ROYGBIV.setText, textObject);
   textObject.setText(text, true);
 }
 
@@ -1908,6 +1909,7 @@ Roygbiv.prototype.setTextColor = function(text, colorName){
   preConditions.checkIfDefined(ROYGBIV.setTextColor, preConditions.text, text);
   preConditions.checkIfAddedText(ROYGBIV.setTextColor, preConditions.text, text);
   preConditions.checkIfDefined(ROYGBIV.setTextColor, preConditions.colorName, colorName);
+  preConditions.checkIfTextInsideActiveScene(ROYGBIV.setTextColor, text);
   text.setColor(colorName, true);
 }
 
@@ -1920,6 +1922,7 @@ Roygbiv.prototype.setTextAlpha = function(text, alpha){
   preConditions.checkIfAddedText(ROYGBIV.setTextAlpha, preConditions.text, text);
   preConditions.checkIfDefined(ROYGBIV.setTextAlpha, preConditions.alpha, alpha);
   preConditions.checkIfNumber(ROYGBIV.setTextAlpha, preConditions.alpha, alpha);
+  preConditions.checkIfTextInsideActiveScene(ROYGBIV.setTextAlpha, text);
   text.setAlpha(alpha, true);
 }
 
@@ -1937,6 +1940,7 @@ Roygbiv.prototype.setTextPosition = function(text, x, y, z){
   preConditions.checkIfNumber(ROYGBIV.setTextPosition, preConditions.x, x);
   preConditions.checkIfNumber(ROYGBIV.setTextPosition, preConditions.y, y);
   preConditions.checkIfNumberOnlyIfExists(ROYGBIV.setTextPosition, preConditions.z, z);
+  preConditions.checkIfTextInsideActiveScene(ROYGBIV.setTextPosition, text);
   text.setPosition(x, y, z);
 }
 
@@ -1952,6 +1956,7 @@ Roygbiv.prototype.setTextBackground = function(text, colorName, alpha){
   preConditions.checkIfString(ROYGBIV.setTextBackground, preConditions.colorName, colorName);
   preConditions.checkIfDefined(ROYGBIV.setTextBackground, preConditions.alpha, alpha);
   preConditions.checkIfNumber(ROYGBIV.setTextBackground, preConditions.alpha, alpha);
+  preConditions.checkIfTextInsideActiveScene(ROYGBIV.setTextBackground, text);
   text.setBackground(colorName, alpha, true);
 }
 
@@ -1963,6 +1968,7 @@ Roygbiv.prototype.removeTextBackground = function(text){
   preConditions.checkIfDefined(ROYGBIV.removeTextBackground, preConditions.text, text);
   preConditions.checkIfAddedText(ROYGBIV.removeTextBackground, preConditions.text, text);
   preConditions.checkIfTrue(ROYGBIV.setTextBackground, "text has no background", (!text.hasBackground));
+  preConditions.checkIfTextInsideActiveScene(ROYGBIV.setTextBackground, text);
   text.removeBackground(true);
 }
 
@@ -1980,6 +1986,7 @@ Roygbiv.prototype.setTextCenterPosition = function(text, x, y, z){
   preConditions.checkIfNumber(ROYGBIV.setTextCenterPosition, preConditions.x, x);
   preConditions.checkIfNumber(ROYGBIV.setTextCenterPosition, preConditions.y, y);
   preConditions.checkIfNumber(ROYGBIV.setTextCenterPosition, preConditions.z, z);
+  preConditions.checkIfTextInsideActiveScene(ROYGBIV.setTextCenterPosition, text);
   var centerPos = text.getCenterCoordinates();
   text.mesh.position.set(text.mesh.position.x + (x - centerPos.x), text.mesh.position.y + (y - centerPos.y), text.mesh.position.z + (z - centerPos.z));
 }
@@ -1992,6 +1999,7 @@ Roygbiv.prototype.hideText = function(text){
   }
   preConditions.checkIfDefined(ROYGBIV.hideText, preConditions.text, text);
   preConditions.checkIfAddedText(ROYGBIV.hideText, preConditions.text, text);
+  preConditions.checkIfTextInsideActiveScene(ROYGBIV.hideText, text);
   if (text.mesh.visible){
     text.hide();
   }
@@ -2005,6 +2013,7 @@ Roygbiv.prototype.showText = function(text){
   }
   preConditions.checkIfDefined(ROYGBIV.showText, preConditions.text, text);
   preConditions.checkIfAddedText(ROYGBIV.showText, preConditions.text, text);
+  preConditions.checkIfTextInsideActiveScene(ROYGBIV.showText, text);
   if (!text.mesh.visible){
     text.show();
   }
