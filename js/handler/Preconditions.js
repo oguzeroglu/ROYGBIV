@@ -227,6 +227,12 @@ Preconditions.prototype.throw = function(callerFunc, errorMsg){
   throw new Error(this.errorHeader(callerFunc)+" ["+errorMsg+"]");
 }
 
+Preconditions.prototype.checkIfCrosshairInsideActiveScene = function(callerFunc, crosshair){
+  if (crosshair.registeredSceneName != sceneHandler.getActiveSceneName()){
+    this.throw(callerFunc, "Crosshair not inside the active scene.");
+  }
+}
+
 Preconditions.prototype.checkIfTextInsideActiveScene = function(callerFunc, text){
   if (text.registeredSceneName != sceneHandler.getActiveSceneName()){
     this.throw(callerFunc, "Text not inside the active scene.");

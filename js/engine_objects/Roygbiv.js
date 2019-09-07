@@ -1111,6 +1111,7 @@ Roygbiv.prototype.selectCrosshair = function(crosshairName){
   preConditions.checkIfDefined(ROYGBIV.selectCrosshair, preConditions.crosshairName, crosshairName);
   var crosshair = crosshairs[crosshairName];
   preConditions.checkIfTrue(ROYGBIV.selectCrosshair, "No such crosshair.", (!crosshair));
+  preConditions.checkIfCrosshairInsideActiveScene(ROYGBIV.selectCrosshair, crosshair);
   crosshairHandler.selectCrosshair(crosshair);
 }
 
