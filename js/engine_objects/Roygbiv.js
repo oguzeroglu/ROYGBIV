@@ -2318,6 +2318,7 @@ Roygbiv.prototype.showMuzzleFlash = function(muzzleflashName){
   preConditions.checkIfMuzzleFlashExists(ROYGBIV.showMuzzleFlash, muzzleFlash);
   preConditions.checkIfMuzzleFlashAttached(ROYGBIV.showMuzzleFlash, muzzleFlash);
   preConditions.checkIfMuzzleFlashActivated(ROYGBIV.showMuzzleFlash, muzzleFlash);
+  preConditions.checkIfMuzzleFlashInsideActiveScene(ROYGBIV.showMuzzleFlash, muzzleFlash);
   muzzleFlash.onShow();
 }
 

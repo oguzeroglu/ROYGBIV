@@ -227,6 +227,12 @@ Preconditions.prototype.throw = function(callerFunc, errorMsg){
   throw new Error(this.errorHeader(callerFunc)+" ["+errorMsg+"]");
 }
 
+Preconditions.prototype.checkIfMuzzleFlashInsideActiveScene = function(callerFunc, muzzleFlash){
+  if (muzzleFlash.registeredSceneName == sceneHandler.getActiveSceneName()){
+    this.throw(callerFunc, "Muzzleflash not inside the active scene.");
+  }
+}
+
 Preconditions.prototype.checkIfCrosshairInsideActiveSceneOnlyIfNameExists = function(callerFunc, crosshairName){
   if (crosshairName){
     this.checkIfCrosshairInsideActiveScene(callerFunc, crosshairs[crosshairName]);
