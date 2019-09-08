@@ -2225,7 +2225,7 @@ Roygbiv.prototype.createFPSControl = function(parameters){
   preConditions.checkIfAlreadyUsedAsFPSWeaponOnlyIfExists(ROYGBIV.createFPSControl, preConditions.weaponObject1, parameters.weaponObject1);
   preConditions.checkIfAlreadyUsedAsFPSWeaponOnlyIfExists(ROYGBIV.createFPSControl, preConditions.weaponObject2, parameters.weaponObject2);
   preConditions.checkIfTrue(ROYGBIV.createFPSControl, "Player body object cannot have set colllision listener.", collisionCallbackRequests.has(parameters.playerBodyObject.name));
-  preConditions.checkIfObjectInsideActiveScene(ROYGBIV.createFPSControl, playerBodyObject);
+  preConditions.checkIfObjectInsideActiveScene(ROYGBIV.createFPSControl, parameters.playerBodyObject);
   preConditions.checkIfObjectInsideActiveSceneOnlyIfExists(ROYGBIV.createFPSControl, parameters.weaponObject1);
   preConditions.checkIfObjectInsideActiveSceneOnlyIfExists(ROYGBIV.createFPSControl, parameters.weaponObject2);
   preConditions.checkIfCrosshairInsideActiveSceneOnlyIfNameExists(ROYGBIV.createFPSControl, parameters.crosshairName);

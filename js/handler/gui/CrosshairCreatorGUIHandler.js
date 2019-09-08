@@ -4,6 +4,7 @@ var CrosshairCreatorGUIHandler = function(){
 
 CrosshairCreatorGUIHandler.prototype.handleTestCrosshair = function(crosshairName){
   if (this.crosshair){
+    scene.remove(this.crosshair.mesh);
     this.crosshair.destroy();
     this.crosshair = 0;
   }
@@ -31,6 +32,9 @@ CrosshairCreatorGUIHandler.prototype.init = function(crosshairName, isEdit){
     "maxWidthPercent": 100,
     "maxHeightPercent": 100,
     "Cancel": function(){
+      if (crosshairCreatorGUIHandler.isEdit){
+        scene.add(crosshairs[crosshairName].mesh);
+      }
       crosshairCreatorGUIHandler.close(Text.OPERATION_CANCELLED);
     },
     "Done": function(){
@@ -45,6 +49,7 @@ CrosshairCreatorGUIHandler.prototype.init = function(crosshairName, isEdit){
 }
 
 CrosshairCreatorGUIHandler.prototype.close = function(msg){
+  scene.remove(this.crosshair.mesh);
   this.crosshair.destroy();
   this.crosshair = 0;
   guiHandler.hideAll();
@@ -107,6 +112,7 @@ CrosshairCreatorGUIHandler.prototype.show = function(crosshairName, texturePackN
   this.createGUI(crosshairName, texturePackNames);
   this.configurations["Texture"] = texturePackNames[0];
   this.handleTestCrosshair(crosshairName);
+  this.isEdit = false;
 }
 
 CrosshairCreatorGUIHandler.prototype.edit = function(crosshair, texturePackNames){
@@ -119,5 +125,7 @@ CrosshairCreatorGUIHandler.prototype.edit = function(crosshair, texturePackNames
   this.configurations["maxWidthPercent"] = crosshair.configurations.maxWidthPercent;
   this.configurations["maxHeightPercent"] = crosshair.configurations.maxHeightPercent;
   this.createGUI(crosshair.name, texturePackNames);
+  scene.remove(crosshair.mesh);
   this.handleTestCrosshair(crosshair.name);
+  this.isEdit = true;
 }
