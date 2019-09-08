@@ -228,7 +228,7 @@ Preconditions.prototype.throw = function(callerFunc, errorMsg){
 }
 
 Preconditions.prototype.checkIfMuzzleFlashInsideActiveScene = function(callerFunc, muzzleFlash){
-  if (muzzleFlash.registeredSceneName == sceneHandler.getActiveSceneName()){
+  if (muzzleFlash.registeredSceneName != sceneHandler.getActiveSceneName()){
     this.throw(callerFunc, "Muzzleflash not inside the active scene.");
   }
 }
