@@ -216,7 +216,9 @@ SceneHandler.prototype.changeScene = function(sceneName){
       obj.showVisually();
     }
     this.activeSceneName = sceneName;
-    rayCaster.onReadyCallback = noop;
+    if (!isDeployment){
+      rayCaster.onReadyCallback = noop;
+    }
     raycasterFactory.refresh();
     physicsFactory.refresh();
   }
