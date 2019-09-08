@@ -191,7 +191,7 @@ ImportHandler.prototype.importParticleSystems = function(obj){
   }
   for (var poolName in obj.preConfiguredParticleSystemPools){
     var curExport = obj.preConfiguredParticleSystemPools[poolName];
-    preConfiguredParticleSystemPools[poolName] = new PreconfiguredParticleSystemPool(curExport.psName, curExport.poolName, curExport.poolSize);
+    preConfiguredParticleSystemPools[poolName] = new PreconfiguredParticleSystemPool(curExport.refParticleSystemName, curExport.poolName, curExport.poolSize);
   }
   for (var muzzleFlashName in obj.muzzleFlashes){
     var curMuzzleFlashExport = obj.muzzleFlashes[muzzleFlashName];
