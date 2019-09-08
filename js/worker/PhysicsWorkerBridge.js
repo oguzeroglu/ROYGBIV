@@ -80,7 +80,7 @@ PhysicsWorkerBridge.prototype.issueUpdate = function(obj){
   ary[i+12] = obj.impulseVec1.x; ary[i+13] = obj.impulseVec1.y; ary[i+14] = obj.impulseVec1.z;
   ary[i+15] = obj.impulseVec2.x; ary[i+16] = obj.impulseVec2.y; ary[i+17] = obj.impulseVec2.z;
   ary[i+18] = 1;
-  if (!obj.mesh.visible && !obj.physicsKeptWhenHidden){
+  if (!obj.isVisibleOnThePreviewScene() && !obj.physicsKeptWhenHidden){
     ary[i+18] = 0;
   }
 }
