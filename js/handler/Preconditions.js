@@ -217,6 +217,7 @@ var Preconditions = function(){
   this.delayInMS = "delayInMS";
   this.repeat = "repeat";
   this.delayedExecutionID = "delayedExecutionID";
+  this.sceneName = "sceneName";
 }
 
 Preconditions.prototype.errorHeader = function(callerFunc){
@@ -225,6 +226,12 @@ Preconditions.prototype.errorHeader = function(callerFunc){
 
 Preconditions.prototype.throw = function(callerFunc, errorMsg){
   throw new Error(this.errorHeader(callerFunc)+" ["+errorMsg+"]");
+}
+
+Preconditions.prototype.checkIfSceneExists = function(callerFunc, sceneName){
+  if (!sceneHandler.scenes[sceneName]){
+    this.throw(callerFunc, "No such scene.");
+  }
 }
 
 Preconditions.prototype.checkIfMuzzleFlashInsideActiveScene = function(callerFunc, muzzleFlash){

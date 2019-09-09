@@ -174,7 +174,8 @@ var Roygbiv = function(){
     "removeAnimationFinishListener",
     "showMuzzleFlash",
     "executeDelayed",
-    "stopDelayedExecution"
+    "stopDelayedExecution",
+    "changeScene"
   ];
 
   this.globals = new Object();
@@ -2905,4 +2906,15 @@ Roygbiv.prototype.stopScript = function(scriptName){
   var script = scripts[scriptName];
   preConditions.checkIfScriptExists(ROYGBIV.stopScript, null, script);
   script.stop();
+}
+
+// Changes the active scene.
+Roygbiv.prototype.changeScene = function(sceneName){
+  if (mode == 0){
+    return;
+  }
+  preConditions.checkIfDefined(ROYGBIV.changeScene, preConditions.sceneName, sceneName);
+  preConditions.checkIfSceneExists(ROYGBIV.changeScene, sceneName);
+  preConditions.checkIfTrue(ROYGBIV.changeScene, "Scene is already active.", sceneHandler.getActiveSceneName() == sceneName);
+  sceneHandler.changeScene(sceneName);
 }
