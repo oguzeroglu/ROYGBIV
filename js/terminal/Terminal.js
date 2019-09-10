@@ -35,6 +35,7 @@ Terminal.prototype.init = function(){
 	this.printInfo("Loading shaders");
 	canvas.style.visibility = "hidden";
 	this.disable();
+	this.skip = false;
 }
 
 Terminal.prototype.enable = function(){
@@ -60,14 +61,23 @@ Terminal.prototype.clear = function(){
 }
 
 Terminal.prototype.printHeader = function(text){
+	if (this.skip){
+		return;
+	}
 	this.print(text, {color: "fuchsia", noNewLine: true});
 }
 
 Terminal.prototype.printError = function(text){
+	if (this.skip){
+		return;
+	}
 	this.print(text, {color: "fuchsia"});
 }
 
 Terminal.prototype.printInfo = function(text, noNewLine){
+	if (this.skip){
+		return;
+	}
 	var colorText = "yellow";
 	if (!noNewLine){
 		this.print(text, {color: colorText});
@@ -77,11 +87,17 @@ Terminal.prototype.printInfo = function(text, noNewLine){
 }
 
 Terminal.prototype.printFromScript = function(text, color){
+	if (this.skip){
+		return;
+	}
 	var colorText = color;
 	this.print(text, {color: colorText, noNewLine: true});
 }
 
 Terminal.prototype.handleAboutCommand = function(){
+	if (this.skip){
+		return;
+	}
 	if (isDeployment){
 		this.printInfo("Project name: "+projectName);
 		this.printInfo("Author: "+author);
@@ -103,6 +119,9 @@ Terminal.prototype.handleAboutCommand = function(){
 }
 
 Terminal.prototype.print = function(text, options){
+	if (this.skip){
+		return;
+	}
 	if (options){
 		if (!options.noNewLine){
 			text += "\n";
@@ -128,6 +147,9 @@ Terminal.prototype.print = function(text, options){
 }
 
 Terminal.prototype.printFunctionArguments = function(commandIndex){
+	if (this.skip){
+		return;
+	}
 	var expectedCount = commandDescriptor.commandArgumentsExpectedCount[commandIndex];
 	var functionName = commandDescriptor.commands[commandIndex];
 	if (expectedCount == 0){
@@ -180,6 +202,9 @@ Terminal.prototype.printFunctionArguments = function(commandIndex){
 }
 
 Terminal.prototype.help = function(commandInfosSorted, commandsSorted, apiMatchesSorted){
+	if (this.skip){
+		return;
+	}
 	for (var i=0; i<commandInfosSorted.length; i++){
 		var commandInfosSplitted = commandInfosSorted[i].split(" ");
 		commandInfosSorted[i] = "";

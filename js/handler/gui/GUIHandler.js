@@ -840,9 +840,18 @@ GUIHandler.prototype.initializeObjectManipulationGUI = function(){
       }
       var sizeVec = new THREE.Vector3();
       box3.getSize(sizeVec);
-      parseCommand("simplifyPhysics "+obj.name+" "+sizeVec.x+" "+sizeVec.y+" "+sizeVec.z);
+      var xSize = (sizeVec.x <= 0)? surfacePhysicalThickness: sizeVec.x;
+      var ySize = (sizeVec.y <= 0)? surfacePhysicalThickness: sizeVec.y;
+      var zSize = (sizeVec.z <= 0)? surfacePhysicalThickness: sizeVec.z;
+      parseCommand("simplifyPhysics "+obj.name+" "+xSize+" "+ySize+" "+zSize);
     }else{
       parseCommand("unsimplifyPhysics "+obj.name);
+    }
+    if (physicsDebugMode){
+      terminal.skip = true;
+      parseCommand("switchPhysicsDebugMode");
+      parseCommand("switchPhysicsDebugMode");
+      terminal.skip = false;
     }
   }).listen();
   guiHandler.omSlipperyController = guiHandler.datGuiObjectManipulation.add(guiHandler.objectManipulationParameters, "Slippery").onChange(function(val){
