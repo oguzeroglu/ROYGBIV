@@ -83,6 +83,9 @@ FogHandler.prototype.setFogToObjects = function(){
   for (var objName in autoInstancedObjects){
     autoInstancedObjects[objName].setFog();
   }
+  for (var objTrailName in objectTrails){
+    objectTrails[objTrailName].setFog();
+  }
 }
 
 FogHandler.prototype.removeFogFromObjects = function(){
@@ -97,6 +100,9 @@ FogHandler.prototype.removeFogFromObjects = function(){
   }
   for (var objName in autoInstancedObjects){
     autoInstancedObjects[objName].removeFog();
+  }
+  for (var objTrailName in objectTrails){
+    objectTrails[objTrailName].removeFog();
   }
 }
 
