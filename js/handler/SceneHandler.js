@@ -221,6 +221,15 @@ SceneHandler.prototype.changeScene = function(sceneName){
     }
     raycasterFactory.refresh();
     physicsFactory.refresh();
+    if (this.scenes[sceneName].fogConfigurations){
+      fogHandler.import(this.scenes[sceneName].fogConfigurations);
+    }else{
+      fogHandler.reset();
+    }
+    fogHandler.removeFogFromObjects();
+    if(fogHandler.fogActive){
+      fogHandler.setFogToObjects();
+    }
   }
   if (mode == 0){
     $("#cliDivheader").text("ROYGBIV 3D Engine - CLI (Design mode - "+sceneHandler.getActiveSceneName()+")");
