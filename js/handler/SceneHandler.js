@@ -195,6 +195,7 @@ SceneHandler.prototype.changeScene = function(sceneName){
     this.activeSceneName = sceneName;
     areaConfigurationsHandler.onAfterSceneChange();
   }else{
+    this.scenes[sceneName].loadPostProcessing();
     activeControl.onDeactivated(true);
     activeControl = new FreeControls({});
     activeControl.onActivated();
