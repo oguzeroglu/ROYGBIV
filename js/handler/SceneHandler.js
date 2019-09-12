@@ -2,6 +2,30 @@ var SceneHandler = function(){
   this.reset();
 }
 
+SceneHandler.prototype.onReady = function(){
+  this.ready = true;
+  if (this.nextSceneToChange){
+    this.changeScene(this.nextSceneToChange);
+    delete this.nextSceneToChange;
+  }
+}
+
+SceneHandler.prototype.onPhysicsReady = function(){
+  this.physicsReady = true;
+  if (this.raycasterReady){
+    this.onReady();
+  }
+}
+
+SceneHandler.prototype.onRaycasterReady = function(){
+  this.raycasterReady = true;
+  if (this.physicsReady){
+    this.onReady();
+  }else if (mode == 0){
+    this.onReady();
+  }
+}
+
 SceneHandler.prototype.destroyScene = function(sceneName){
   this.scenes[sceneName].destroy();
   delete this.scenes[sceneName];
@@ -12,6 +36,10 @@ SceneHandler.prototype.reset = function(){
   this.scenes = new Object();
   this.scenes[this.activeSceneName] = new Scene("scene1");
   this.entrySceneName = "scene1";
+  this.ready = true;
+  if (!(typeof this.nextSceneToChange == UNDEFINED)){
+    delete this.nextSceneToChange;
+  }
 }
 
 SceneHandler.prototype.onSwitchFromDesignToPreview = function(){
@@ -20,6 +48,10 @@ SceneHandler.prototype.onSwitchFromDesignToPreview = function(){
 }
 
 SceneHandler.prototype.onSwitchFromPreviewToDesign = function(){
+  if (!(typeof this.nextSceneToChange == UNDEFINED)){
+    delete this.nextSceneToChange;
+  }
+  this.ready = true;
   for (var sceneName in this.scenes){
     this.scenes[sceneName].resetAutoInstancedObjects();
     this.scenes[sceneName].resetClickableTexts();
@@ -148,6 +180,13 @@ SceneHandler.prototype.hideAll = function(){
 }
 
 SceneHandler.prototype.changeScene = function(sceneName){
+  if (!this.ready){
+    this.nextSceneToChange = sceneName;
+    return;
+  }
+  this.ready = false;
+  this.physicsReady = false;
+  this.raycasterReady = false;
   this.hideAll();
   if (this.scenes[sceneName].isSkyboxMapped){
     skyboxHandler.map(skyBoxes[this.scenes[sceneName].mappedSkyboxName]);

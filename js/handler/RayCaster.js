@@ -12,6 +12,9 @@ RayCaster.prototype.onReady = function(){
   if (this.onReadyCallback){
     this.onReadyCallback();
   }
+  if (!IS_WORKER_CONTEXT){
+    sceneHandler.onRaycasterReady();
+  }
 }
 
 RayCaster.prototype.flush = function(){

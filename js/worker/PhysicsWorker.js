@@ -87,6 +87,9 @@ PhysicsWorker.prototype.debug = function(){
   postMessage(response);
 }
 PhysicsWorker.prototype.setObjectCollisionCallback = function(obj){
+  if (!obj){
+    return;
+  }
   if (!worker.objectsWithCollisionListeners.has(obj.name)){
     obj.collisionEvent = function(event){
       if (!obj.physicsWorkerCollisionInfo){
@@ -105,6 +108,9 @@ PhysicsWorker.prototype.setObjectCollisionCallback = function(obj){
   }
 }
 PhysicsWorker.prototype.removeObjectCollisionCallback = function(obj){
+  if (!obj){
+    return;
+  }
   if (worker.objectsWithCollisionListeners.has(obj.name)){
     obj.physicsBody.removeEventListener("collide", obj.collisionEvent);
     worker.objectsWithCollisionListeners.delete(obj.name);

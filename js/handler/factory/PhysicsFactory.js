@@ -21,6 +21,7 @@ PhysicsFactory.prototype.refresh = function(){
         elem.add(objectGroups[objName].physicsBody);
       }
     }
+    sceneHandler.onPhysicsReady();
   }else{
     elem.refresh();
   }

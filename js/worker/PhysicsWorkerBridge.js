@@ -36,6 +36,7 @@ var PhysicsWorkerBridge = function(){
       }
       physicsWorld.initTransferableBody();
       physicsWorld.ready = true;
+      sceneHandler.onPhysicsReady();
     }else{
       if (physicsWorld.ready){
         physicsWorld.updateObjects(msg.data);

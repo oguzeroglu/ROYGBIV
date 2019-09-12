@@ -275,6 +275,7 @@ RaycasterWorkerBridge.prototype.onReady = function(){
   if (this.onReadyCallback){
     this.onReadyCallback();
   }
+  sceneHandler.onRaycasterReady();
 }
 
 RaycasterWorkerBridge.prototype.flush = function(){
