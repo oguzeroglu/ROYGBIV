@@ -28,7 +28,7 @@ ResizeEventHandler.prototype.onResize = function(){
   }
   if (mode == 1){
     handleViewport();
-  }else{
+  }else if (!deployment){
     if (fpsWeaponGUIHandler.fpsWeaponAlignmentConfigurationObject){
       fpsWeaponGUIHandler.fpsWeaponAlignmentConfigurationObject.onFPSWeaponAlignmentUpdate();
     }
