@@ -4,6 +4,9 @@ var SceneHandler = function(){
 
 SceneHandler.prototype.onReady = function(){
   this.ready = true;
+  if (mode == 1){
+    canvas.style.visibility = "";
+  }
   if (this.readyCallback){
     this.readyCallback();
   }
@@ -242,6 +245,7 @@ SceneHandler.prototype.changeScene = function(sceneName, readyCallback){
     this.activeSceneName = sceneName;
     areaConfigurationsHandler.onAfterSceneChange();
   }else{
+    canvas.style.visibility = "hidden";
     this.scenes[sceneName].loadPostProcessing();
     activeControl.onDeactivated(true);
     activeControl = new FreeControls({});
