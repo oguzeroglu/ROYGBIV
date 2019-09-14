@@ -386,6 +386,10 @@ function startDeployment(){
   appendtoDeploymentConsole("Loading application.");
 }
 
+function clearDeploymentConsole(){
+  document.getElementById("cliDiv").value = "";
+}
+
 function appendtoDeploymentConsole(val){
   document.getElementById("cliDiv").value += val + "\n";
 }
@@ -395,9 +399,15 @@ function removeCLIDom(){
     return;
   }
   if (!(typeof cliDiv == UNDEFINED)){
-    document.body.removeChild(cliDiv);
+    document.getElementById("cliDiv").style.display = "none";
   }
   resizeEventHandler.onResize();
+}
+
+function addCLIDom(){
+  if (!(typeof cliDiv == UNDEFINED)){
+    document.getElementById("cliDiv").style.display = "";
+  }
 }
 
 function onRaycasterMouseMoveIntersection(){

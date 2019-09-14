@@ -6,6 +6,12 @@ SceneHandler.prototype.onReady = function(){
   this.ready = true;
   if (mode == 1){
     canvas.style.visibility = "";
+    if (!isDeployment){
+      terminal.clear();
+      terminal.printInfo(Text.SCENE_LOADED);
+    }else{
+      removeCLIDom();
+    }
   }
   if (this.readyCallback){
     this.readyCallback();
@@ -246,6 +252,14 @@ SceneHandler.prototype.changeScene = function(sceneName, readyCallback){
     areaConfigurationsHandler.onAfterSceneChange();
   }else{
     canvas.style.visibility = "hidden";
+    if (!isDeployment){
+      terminal.clear();
+      terminal.printInfo(Text.LOADING);
+    }else{
+      addCLIDom();
+      clearDeploymentConsole();
+      appendtoDeploymentConsole("Loading.");
+    }
     this.scenes[sceneName].loadPostProcessing();
     activeControl.onDeactivated(true);
     activeControl = new FreeControls({});

@@ -507,6 +507,7 @@ var Text = function(){
   this.TEXTUREPACK_INFO_HEADER = "Texture pack info";
   this.FAILED_TO_LOAD_SCRIPT = "Failed to load script @@1 from file path @@2.";
   this.SCRIPT_UPLOADED = "Script uploaded.";
+  this.SCENE_LOADED = "Scene loaded.";
   this.AN_UNEXPECTED_ERROR_HAPPENED = "An unexpected error happened.";
   this.AREA_CONFIGURATIONS_ARE_ALREADY_STOPPED = "Area configurations handling is already stopped.";
   this.AREA_CONFIGURATIONS_ARE_ALREADY_STARTED = "Area configurations handling is already started.";
