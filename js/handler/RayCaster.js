@@ -166,6 +166,9 @@ RayCaster.prototype.findIntersections = function(from, direction, intersectGridS
     this.oldPosition.copy(this.origin);
     this.origin.addScaledVector(this.direction, RAYCASTER_STEP_AMOUNT);
     iterate = LIMIT_BOUNDING_BOX.containsPoint(this.origin);
+    if (this.oldPosition.x == this.origin.x && this.oldPosition.y == this.origin.y && this.oldPosition.z == this.origin.z){
+      iterate = false;
+    }
   }
   callbackFunction(0, 0, 0, null);
 }
