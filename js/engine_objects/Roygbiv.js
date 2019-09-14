@@ -2908,13 +2908,16 @@ Roygbiv.prototype.stopScript = function(scriptName){
   script.stop();
 }
 
-// Changes the active scene.
-Roygbiv.prototype.changeScene = function(sceneName){
+// Changes the active scene. The readyCallback function is executed when
+// the new scene is ready.
+Roygbiv.prototype.changeScene = function(sceneName, readyCallback){
   if (mode == 0){
     return;
   }
   preConditions.checkIfDefined(ROYGBIV.changeScene, preConditions.sceneName, sceneName);
   preConditions.checkIfSceneExists(ROYGBIV.changeScene, sceneName);
+  preConditions.checkIfDefined(ROYGBIV.changeScene, preConditions.readyCallback, readyCallback);
+  preConditions.checkIfFunctionOnlyIfExists(ROYGBIV.changeScene, preConditions.readyCallback, readyCallback);
   preConditions.checkIfTrue(ROYGBIV.changeScene, "Scene is already active.", sceneHandler.getActiveSceneName() == sceneName);
-  sceneHandler.changeScene(sceneName);
+  sceneHandler.changeScene(sceneName, readyCallback);
 }

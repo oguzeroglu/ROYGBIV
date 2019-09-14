@@ -4,9 +4,13 @@ var SceneHandler = function(){
 
 SceneHandler.prototype.onReady = function(){
   this.ready = true;
+  if (this.readyCallback){
+    this.readyCallback();
+  }
   if (this.nextSceneToChange){
-    this.changeScene(this.nextSceneToChange);
+    this.changeScene(this.nextSceneToChange, this.nextReadyCallback);
     delete this.nextSceneToChange;
+    delete this.nextReadyCallback;
   }
 }
 
@@ -179,10 +183,14 @@ SceneHandler.prototype.hideAll = function(){
   }
 }
 
-SceneHandler.prototype.changeScene = function(sceneName){
+SceneHandler.prototype.changeScene = function(sceneName, readyCallback){
   if (!this.ready){
     this.nextSceneToChange = sceneName;
+    this.nextReadyCallback = readyCallback;
     return;
+  }
+  if (mode == 1){
+    this.readyCallback = readyCallback;
   }
   this.ready = false;
   this.physicsReady = false;
