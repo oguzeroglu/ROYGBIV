@@ -54,10 +54,12 @@ MarkedPoint.prototype.export = function(){
 
 MarkedPoint.prototype.destroy = function(){
   if (!this.isHidden){
-    this.text.destroy();
-    this.line.geometry.dispose();
-    this.line.material.dispose();
-    scene.remove(this.line);
+    this.text.destroy(true);
+    if (this.line && this.line.geometry){
+      this.line.geometry.dispose();
+      this.line.material.dispose();
+      scene.remove(this.line);
+    }
   }
 }
 
