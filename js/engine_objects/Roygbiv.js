@@ -175,7 +175,8 @@ var Roygbiv = function(){
     "showMuzzleFlash",
     "executeDelayed",
     "stopDelayedExecution",
-    "changeScene"
+    "changeScene",
+    "getActiveSceneName"
   ];
 
   this.globals = new Object();
@@ -511,6 +512,14 @@ Roygbiv.prototype.getFPS = function(){
     return;
   }
   return fpsHandler.fps;
+}
+
+// Returns the active scene name.
+Roygbiv.prototype.getActiveSceneName = function(){
+  if (mode == 0){
+    return;
+  }
+  return sceneHandler.getActiveSceneName();
 }
 
 // OBJECT MANIPULATION FUNCTIONS ***********************************************
