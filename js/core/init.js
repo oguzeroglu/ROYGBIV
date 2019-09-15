@@ -421,7 +421,9 @@ function onRaycasterMouseMoveIntersection(){
     }
     var isDifferent = currentMouseOverObjectName != object.name;
     if (object.mouseOverCallbackFunction && isDifferent){
-      object.mouseOverCallbackFunction(intersectionPoint.x, intersectionPoint.y, intersectionPoint.z);
+      if (object.registeredSceneName == sceneHandler.getActiveSceneName()){
+        object.mouseOverCallbackFunction(intersectionPoint.x, intersectionPoint.y, intersectionPoint.z);
+      }
     }
     if (currentMouseOverObjectName && isDifferent){
       var curObj = addedObjects[currentMouseOverObjectName];
@@ -432,7 +434,9 @@ function onRaycasterMouseMoveIntersection(){
         curObj = addedTexts[currentMouseOverObjectName];
       }
       if (curObj && curObj.mouseOutCallbackFunction){
-        curObj.mouseOutCallbackFunction();
+        if (curObj.registeredSceneName == sceneHandler.getActiveSceneName()){
+          curObj.mouseOutCallbackFunction();
+        }
       }
     }
     currentMouseOverObjectName = intersectionObject;
@@ -446,7 +450,9 @@ function onRaycasterMouseMoveIntersection(){
         curObj = addedTexts[currentMouseOverObjectName];
       }
       if (curObj && curObj.mouseOutCallbackFunction){
-        curObj.mouseOutCallbackFunction();
+        if (curObj.registeredSceneName == sceneHandler.getActiveSceneName()){
+          curObj.mouseOutCallbackFunction();
+        }
       }
     }
     currentMouseOverObjectName = 0;
