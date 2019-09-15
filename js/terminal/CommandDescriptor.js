@@ -192,7 +192,8 @@ var CommandDescriptor = function(){
       1, //switchScene
       0, //printScenes
       1, //setEntryScene
-      1 //destroyScene
+      1, //destroyScene
+      2 //syncTextProperties
   ];
 
   this.commandArgumentsExpectedExplanation = [
@@ -387,7 +388,8 @@ var CommandDescriptor = function(){
     "switchScene sceneName",
     "printScenes",
     "setEntryScene sceneName",
-    "destroyScene sceneName"
+    "destroyScene sceneName",
+    "syncTextProperties sourceText targetText"
   ];
 
   this.commands = [
@@ -582,7 +584,8 @@ var CommandDescriptor = function(){
     "switchScene",
     "printScenes",
     "setEntryScene",
-    "destroyScene"
+    "destroyScene",
+    "syncTextProperties"
   ];
 
   this.commandInfo = [
@@ -777,7 +780,8 @@ var CommandDescriptor = function(){
     "switchScene: Switches the active scene.",
     "printScenes: Prints created scenes.",
     "setEntryScene: Sets the entry scene.",
-    "destroyScene: Destroys a scene."
+    "destroyScene: Destroys a scene.",
+    "syncTextProperties: Sets the properties of targeText based on sourceText properties."
   ];
 
   this.keyboardInfo = [
@@ -1421,6 +1425,12 @@ var CommandDescriptor = function(){
   this.destroyScene = new Object();
   this.destroyScene.types = [];
   this.destroyScene.types.push(this.SCENE_NAME); //sceneName
+
+  // syncTextProperties
+  this.syncTextProperties = new Object();
+  this.syncTextProperties.types = [];
+  this.syncTextProperties.types.push(this.TEXT_NAME); //sourceText
+  this.syncTextProperties.types.push(this.TEXT_NAME); //targetText
 
 };
 

@@ -4625,6 +4625,33 @@ function parse(input){
           }
           return true;
         break;
+        case 192: //syncTextProperties
+          if (mode != 0){
+            terminal.printError(Text.WORKS_ONLY_IN_DESIGN_MODE);
+            return true;
+          }
+          var sourceText = addedTexts[splitted[1]];
+          var targetText = addedTexts[splitted[2]];
+          if (!sourceText){
+            terminal.printError(Text.SOURCE_TEXT_IS_NOT_DEFINED);
+            return true;
+          }
+          if (!targetText){
+            terminal.printError(Text.TARGET_TEXT_IS_NOT_DEFINED);
+            return true;
+          }
+          if (sourceText.name == targetText.name){
+            terminal.printError(Text.TEXTS_ARE_THE_SAME);
+            return true;
+          }
+          if (sourceText.is2D != targetText.is2D){
+            terminal.printError(Text.TEXTS_HAVE_DIFFERENT_DIMENSIONS);
+            return true;
+          }
+          targetText.syncProperties(sourceText);
+          terminal.printInfo(Text.TEXT_PROPERTIES_SYNCED);
+          return true;
+        break;
       }
       return true;
     }catch(err){

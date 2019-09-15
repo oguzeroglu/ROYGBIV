@@ -594,7 +594,8 @@ Terminal.prototype.autocomplete = function(command){
 				helpString = "[Fonts]: ";
 			break;
 			case commandDescriptor.TEXT_NAME:
-				for (var textName in sceneHandler.getAddedTexts()){
+				var allTexts = (commandSplitted[0] == "syncTextProperties")? addedTexts: sceneHandler.getAddedTexts();
+				for (var textName in allTexts){
 					if (textName.startsWith(curEntry)){
 						possibilities.push(textName);
 					}

@@ -99,6 +99,19 @@ var AddedText = function(name, font, text, position, color, alpha, characterSize
   webglCallbackHandler.registerEngineObject(this);
 }
 
+AddedText.prototype.syncProperties = function(sourceText){
+  this.setColor("#" + sourceText.getColor().getHexString());
+  this.setAlpha(sourceText.getAlpha());
+  if (sourceText.hasBackground){
+    this.setBackground("#"+sourceText.getBackgroundColor().getHexString(), sourceText.getBackgroundAlpha());
+  }else{
+    this.removeBackground();
+  }
+  this.setCharSize(sourceText.getCharSize());
+  this.setMarginBetweenChars(sourceText.getMarginBetweenChars());
+  this.setMarginBetweenLines(sourceText.getMarginBetweenLines());
+}
+
 AddedText.prototype.addAnimation = function(animation){
   this.animations[animation.name] = animation;
 }
