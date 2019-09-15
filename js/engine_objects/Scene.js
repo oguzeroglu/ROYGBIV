@@ -90,7 +90,7 @@ Scene.prototype.savePostProcessing = function(){
   }
   this.postProcessing = new Object();
   for (var effectName in renderer.effects){
-    this.postProcessing[effectName] = renderer.effects[effectName].export();
+    this.postProcessing[effectName] = JSON.parse(JSON.stringify(renderer.effects[effectName].export()));
   }
 }
 
