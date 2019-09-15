@@ -70,6 +70,7 @@ SceneHandler.prototype.onSwitchFromPreviewToDesign = function(){
     this.scenes[sceneName].resetClickableTexts();
     this.scenes[sceneName].resetTrackingObjects();
   }
+  this.readyCallback = noop;
   this.changeScene(this.sceneNameBeforeSwitchToPreviewMode);
   delete this.sceneNameBeforeSwitchToPreviewMode;
 }
