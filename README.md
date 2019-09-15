@@ -3,14 +3,8 @@
 ROYGBIV is a WebGL game engine for motivated programmers who do not have the budget for buying fancy 3D models or licensing a popular engine but still want to make 60 FPS web games for both mobile and desktop. It is being developed by one of such programmers on top of low level THREE.js features for the graphics and CANNON.js for physics. It is named after this [Boards of Canada track](https://www.youtube.com/watch?v=W-GWjzw0GwQ).
 
 ## Demos
-[Big bang](https://oguzeroglu.github.io/ROYGBIV/demo/bigbang/application.html)    
-[Collidable particles](https://oguzeroglu.github.io/ROYGBIV/demo/collidableParticles/application.html)    
-[Magic walls](https://oguzeroglu.github.io/ROYGBIV/demo/magic_walls/application.html)    
-[Motion blur](https://oguzeroglu.github.io/ROYGBIV/demo/demo1/application.html)  
-[GPU particles showcase](https://oguzeroglu.github.io/ROYGBIV/demo/psShowcase/application.html)  
-[Fast object picking](https://oguzeroglu.github.io/ROYGBIV/demo/fastPicking/application.html)  
-[Physics worker](https://oguzeroglu.github.io/ROYGBIV/demo/physicsWorker/application.html)  
-[Dynamic instances](https://oguzeroglu.github.io/ROYGBIV/demo/dynamicInstances/application.html)  
+[Shooter](https://oguzeroglu.github.io/ROYGBIV/demo/shooter/application.html)   
+[GPU particles showcase](https://oguzeroglu.github.io/ROYGBIV/demo/psShowcase/application.html)   
 [Online preview of the engine](https://oguzeroglu.github.io/ROYGBIV/roygbiv.html)  
 
 ## The current state of the project
