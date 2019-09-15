@@ -110,6 +110,9 @@ AddedText.prototype.syncProperties = function(sourceText){
   this.setCharSize(sourceText.getCharSize());
   this.setMarginBetweenChars(sourceText.getMarginBetweenChars());
   this.setMarginBetweenLines(sourceText.getMarginBetweenLines());
+  this.refCharSize = sourceText.refCharSize;
+  this.refInnerHeight = sourceText.refInnerHeight;
+  this.handleResize();
 }
 
 AddedText.prototype.addAnimation = function(animation){
