@@ -206,7 +206,9 @@ SceneHandler.prototype.changeScene = function(sceneName, readyCallback){
   this.physicsReady = false;
   this.raycasterReady = false;
   pointerLockRequested = false;
-  document.exitPointerLock();
+  if (document.exitPointerLock){
+    document.exitPointerLock();
+  }
   this.hideAll();
   if (this.scenes[sceneName].isSkyboxMapped){
     skyboxHandler.map(skyBoxes[this.scenes[sceneName].mappedSkyboxName]);

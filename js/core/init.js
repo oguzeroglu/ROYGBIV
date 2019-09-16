@@ -341,7 +341,7 @@ function generateUniqueObjectName(){
 }
 
 function onCanvasInitiated(){
-  document.exitPointerLock = document.exitPointerLock || document.mozExitPointerLock;
+  document.exitPointerLock = document.exitPointerLock || document.mozExitPointerLock || document.webkitExitPointerLock;
   mouseEventHandler = new MouseEventHandler();
   touchEventHandler = new TouchEventHandler();
   pointerLockEventHandler = new PointerLockEventHandler();
