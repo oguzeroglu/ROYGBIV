@@ -236,7 +236,8 @@ MeshGenerator.prototype.generateParticleSystemMesh = function(ps, texture, noTar
         time: new THREE.Uniform(0.0),
         dissapearCoef: new THREE.Uniform(0.0),
         stopInfo: new THREE.Uniform(new THREE.Vector3(-10, -10, -10)),
-        parentMotionMatrix: new THREE.Uniform(new THREE.Matrix3().fromArray([ps.x, ps.y, ps.z, ps.vx, ps.vy, ps.vz, ps.ax, ps.ay, ps.az]))
+        parentMotionMatrix: new THREE.Uniform(new THREE.Matrix3().fromArray([ps.x, ps.y, ps.z, ps.vx, ps.vy, ps.vz, ps.ax, ps.ay, ps.az])),
+        screenResolution: GLOBAL_SCREEN_RESOLUTION_UNIFORM
       }
     });
   }else{

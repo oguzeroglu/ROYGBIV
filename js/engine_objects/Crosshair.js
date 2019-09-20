@@ -36,7 +36,8 @@ var Crosshair = function(configurations){
       color: new THREE.Uniform(new THREE.Vector4(colorR, colorG, colorB, alpha)),
       uvTransform: new THREE.Uniform(new THREE.Matrix3()),
       expandInfo: new THREE.Uniform(new THREE.Vector4(0, 0, 0, 0)),
-      shrinkStartSize: new THREE.Uniform(size)
+      shrinkStartSize: new THREE.Uniform(size),
+      screenResolution: GLOBAL_SCREEN_RESOLUTION_UNIFORM
     }
   });
   this.mesh = new THREE.Points(this.geometry, this.material);

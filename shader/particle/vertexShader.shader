@@ -19,6 +19,8 @@ varying float vDiscardFlag;
 uniform mat4 viewMatrix;
 uniform mat4 projectionMatrix;
 
+uniform float screenResolution;
+
 #define INSERTION
 
 #ifdef HAS_REF_HEIGHT
@@ -307,7 +309,7 @@ void main(){
       mvPosition = viewMatrix * vec4(newPosition, 1.0);
     }
 
-    gl_PointSize = (500.0 - (selectedDissapearCoef * selectedTime)) * size / length(mvPosition.xyz) * decomposeScaleFromWorldMatrix(selectedWorldMatrix);
+    gl_PointSize = (500.0 - (selectedDissapearCoef * selectedTime)) * (size * screenResolution) / length(mvPosition.xyz) * decomposeScaleFromWorldMatrix(selectedWorldMatrix);
     #ifdef HAS_REF_HEIGHT
       gl_PointSize = gl_PointSize * refHeightCoef;
     #endif

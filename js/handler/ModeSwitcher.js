@@ -211,6 +211,7 @@ ModeSwitcher.prototype.switchFromDesignToPreview = function(){
       }
     }
   }
+  renderer.setPixelRatio(screenResolution);
 }
 
 ModeSwitcher.prototype.switchFromPreviewToDesign = function(){
@@ -404,4 +405,5 @@ ModeSwitcher.prototype.switchFromPreviewToDesign = function(){
       terminal.printInfo(Text.SWITCHED_TO_DESIGN_MODE);
     }
   }
+  renderer.setPixelRatio(screenResolution);
 }

@@ -224,6 +224,7 @@ var ParticleSystemMerger = function(psObj, name){
       dissapearCoefArray: new THREE.Uniform(dissapearCoefArray),
       stopInfoArray: new THREE.Uniform(stopInfoArray),
       parentMotionMatrixArray: new THREE.Uniform(motionMatrixArray),
+      screenResolution: GLOBAL_SCREEN_RESOLUTION_UNIFORM
     }
   });
   macroHandler.injectMacro("IS_MERGED", this.material, true, false);

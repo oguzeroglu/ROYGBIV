@@ -63,4 +63,5 @@ ResizeEventHandler.prototype.onResize = function(){
   for (var textName in addedTexts){
     addedTexts[textName].handleResize();
   }
+  renderer.setPixelRatio(screenResolution);
 }
