@@ -383,6 +383,14 @@ var AnimationHandler = function(){
   this.updateFunctionsByType[this.animationTypes.BOUNCE_EASE_INOUT] = this.bounceEaseInOutFunc;
 }
 
+AnimationHandler.prototype.freezeOnFinish = function(animation){
+  animation.freezeOnFinish = true;
+}
+
+AnimationHandler.prototype.unfreeze = function(animation){
+  animation.freezeOnFinish = false;
+}
+
 AnimationHandler.prototype.assignUUIDToAnimation = function(animation){
   animation.uuid = this.uuidCounter ++;
 }

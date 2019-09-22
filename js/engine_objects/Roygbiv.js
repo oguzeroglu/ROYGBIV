@@ -176,7 +176,9 @@ var Roygbiv = function(){
     "executeDelayed",
     "stopDelayedExecution",
     "changeScene",
-    "getActiveSceneName"
+    "getActiveSceneName",
+    "freezeAnimationOnFinish",
+    "unfreezeAnimation"
   ];
 
   this.globals = new Object();
@@ -2313,6 +2315,36 @@ Roygbiv.prototype.stopAnimation = function(object, animationName){
   preConditions.checkIfObjectInsideActiveScene(ROYGBIV.stopAnimation, object);
   var animation = object.animations[animationName];
   animationHandler.forceFinish(animation);
+}
+
+// Makes an animation freeze on finish. This can be used for certain weapon
+// animations where the weapon starts shooting after going to a certain position/rotation.
+// Use unfreezeAnimation API to undo this.
+Roygbiv.prototype.freezeAnimationOnFinish = function(object, animationName){
+  if (mode == 0){
+    return;
+  }
+  preConditions.checkIfDefined(ROYGBIV.unfreezeAnimation, preConditions.object, object);
+  preConditions.checkIfAddedObjectObjectGroupAddedText(ROYGBIV.stopAnimation, preConditions.object, object);
+  preConditions.checkIfDefined(ROYGBIV.stopAnimation, preConditions.animationName, animationName);
+  preConditions.checkIfAnimationExists(ROYGBIV.stopAnimation, object, animationName);
+  preConditions.checkIfObjectInsideActiveScene(ROYGBIV.stopAnimation, object);
+  var animation = object.animations[animationName];
+  animationHandler.freezeOnFinish(animation);
+}
+
+// Unfreezes an animation started with freezeOnFinish parameter set to true.
+Roygbiv.prototype.unfreezeAnimation = function(object, animationName){
+  if (mode == 0){
+    return;
+  }
+  preConditions.checkIfDefined(ROYGBIV.unfreezeAnimation, preConditions.object, object);
+  preConditions.checkIfAddedObjectObjectGroupAddedText(ROYGBIV.stopAnimation, preConditions.object, object);
+  preConditions.checkIfDefined(ROYGBIV.stopAnimation, preConditions.animationName, animationName);
+  preConditions.checkIfAnimationExists(ROYGBIV.stopAnimation, object, animationName);
+  preConditions.checkIfObjectInsideActiveScene(ROYGBIV.stopAnimation, object);
+  var animation = object.animations[animationName];
+  animationHandler.unfreeze(animation);
 }
 
 // MUZZLEFLASH FUNCTIONS *******************************************************

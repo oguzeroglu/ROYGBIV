@@ -852,4 +852,6 @@ var Text = function(){
   this.ROYGBIV_SCRIPTING_API_STOPDELAYEDEXECUTION = "Stops a function to get executed with executeDelayed API. The delayedExecutionID parameter should be the return value of\nexecuteDelayed API. This API returns true if a function is found associated with the provided delayedExecutionID parameter,\nreturns false otherwise.";
   this.ROYGBIV_SCRIPTING_API_CHANGESCENE = "Changes the active scene. The readyCallback function is executed when the new scene is ready.";
   this.ROYGBIV_SCRIPTING_API_GETACTIVESCENENAME = "Returns the active scene name.";
+  this.ROYGBIV_SCRIPTING_API_FREEZEANIMATIONONFINISH = "Makes an animation freeze on finish. This can be used for certain weapon animations where the weapon starts shooting\nafter going to a certain position/rotation. Use unfreezeAnimation API to undo this.";
+  this.ROYGBIV_SCRIPTING_API_UNFREEZEANIMATION = "Unfreezes an animation started with freezeOnFinish parameter set to true.";
 }

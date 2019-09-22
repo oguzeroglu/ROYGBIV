@@ -121,6 +121,10 @@ Animation.prototype.onRepeat = function(){
 }
 
 Animation.prototype.update = function(){
+  if (this.isFreezed && this.freezeOnFinish){
+    return;
+  }
+  this.isFreezed = false;
   this.params.value = this.updateFunction(this.tick, this.initialValue, this.changeInValue, this.totalTimeInSeconds);
   this.actionFunction(this.params, this.increaseTick);
   if (this.increaseTick){
@@ -129,6 +133,10 @@ Animation.prototype.update = function(){
     this.tick -= STEP;
   }
   if (this.increaseTick && this.tick > this.totalTimeInSeconds){
+    if (this.freezeOnFinish){
+      this.isFreezed = true;
+      return;
+    }
     if (this.rewind){
       this.increaseTick = false;
     }else if (!this.repeat){
