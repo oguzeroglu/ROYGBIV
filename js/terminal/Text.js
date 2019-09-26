@@ -855,4 +855,5 @@ var Text = function(){
   this.ROYGBIV_SCRIPTING_API_GETACTIVESCENENAME = "Returns the active scene name.";
   this.ROYGBIV_SCRIPTING_API_FREEZEANIMATIONONFINISH = "Makes an animation freeze on finish. This can be used for certain weapon animations where the weapon starts shooting\nafter going to a certain position/rotation. Use unfreezeAnimation API to undo this.";
   this.ROYGBIV_SCRIPTING_API_UNFREEZEANIMATION = "Unfreezes an animation started with freezeOnFinish parameter set to true.";
+  this.ROYGBIV_SCRIPTING_API_HIDEMUZZLEFLASH = "Hides a muzzle flash. This function may be called inside onStoppedShooting callback of a FPS control.";
 }

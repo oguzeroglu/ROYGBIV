@@ -178,7 +178,8 @@ var Roygbiv = function(){
     "changeScene",
     "getActiveSceneName",
     "freezeAnimationOnFinish",
-    "unfreezeAnimation"
+    "unfreezeAnimation",
+    "hideMuzzleFlash"
   ];
 
   this.globals = new Object();
@@ -2365,6 +2366,21 @@ Roygbiv.prototype.showMuzzleFlash = function(muzzleflashName){
   preConditions.checkIfMuzzleFlashActivated(ROYGBIV.showMuzzleFlash, muzzleFlash);
   preConditions.checkIfMuzzleFlashInsideActiveScene(ROYGBIV.showMuzzleFlash, muzzleFlash);
   muzzleFlash.onShow();
+}
+
+// Hides a muzzle flash. This function may be called inside onStoppedShooting callback
+// of a FPS control.
+Roygbiv.prototype.hideMuzzleFlash = function(muzzleflashName){
+  if (mode == 0){
+    return;
+  }
+  preConditions.checkIfDefined(ROYGBIV.hideMuzzleFlash, preConditions.muzzleflashName, muzzleflashName);
+  var muzzleFlash = muzzleFlashes[muzzleflashName];
+  preConditions.checkIfMuzzleFlashExists(ROYGBIV.hideMuzzleFlash, muzzleFlash);
+  preConditions.checkIfMuzzleFlashAttached(ROYGBIV.hideMuzzleFlash, muzzleFlash);
+  preConditions.checkIfMuzzleFlashActivated(ROYGBIV.hideMuzzleFlash, muzzleFlash);
+  preConditions.checkIfMuzzleFlashInsideActiveScene(ROYGBIV.hideMuzzleFlash, muzzleFlash);
+  muzzleFlash.onHide();
 }
 
 // UTILITY FUNCTIONS ***********************************************************

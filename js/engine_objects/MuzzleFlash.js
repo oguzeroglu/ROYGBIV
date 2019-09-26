@@ -125,10 +125,21 @@ MuzzleFlash.prototype.hide = function(){
   }
 }
 
+MuzzleFlash.prototype.onHide = function(){
+  if (!this.isShown){
+    return;
+  }
+  this.isShown = false;
+  activeMuzzleFlashes.delete(this.name);
+  this.hide();
+}
+
 MuzzleFlash.prototype.onShow = function(){
   if (this.isShown){
     return;
   }
+  this.tick = 0;
+  this.particleIndex = 0;
   this.isShown = true;
   activeMuzzleFlashes.set(this.name, this);
 }
