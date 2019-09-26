@@ -2188,6 +2188,8 @@ Roygbiv.prototype.setActiveControl = function(control){
 // object from the FPS camera while the mouse is down for Desktop devices. For mobile devices due to lack of mouse device
 // this function is executed when the camera is looking at one of the shootable objects defined with the shootableObjects
 // parameter in order to help implementing the auto-shoot functionality. Default value is noop.
+// onStoppedShooting (optional): A callback function executed without any parameter when the mouse is not down
+// for the first time after it was down.
 // shootableObjects (optional): An array of objects representing the objects that can be shot. This parameter is
 // used inside the onShoot event for mobile devices in order to decide if the object being looked at should
 // trigger the onShoot function or not. Default value is an empty array.
@@ -2228,6 +2230,7 @@ Roygbiv.prototype.createFPSControl = function(parameters){
   preConditions.checkIfBooleanOnlyIfExists(ROYGBIV.createFPSControl, preConditions.weaponRotationRandomnessOn, parameters.weaponRotationRandomnessOn);
   preConditions.checkIfFunctionOnlyIfExists(ROYGBIV.createFPSControl, preConditions.onLook, parameters.onLook);
   preConditions.checkIfFunctionOnlyIfExists(ROYGBIV.createFPSControl, preConditions.onShoot, parameters.onShoot);
+  preConditions.checkIfFunctionOnlyIfExists(ROYGBIV.createFPSControl, preConditions.onStoppedShooting, parameters.onStoppedShooting);
   preConditions.checkIfArrayOnlyIfExists(ROYGBIV.createFPSControl, preConditions.shootableObjects, parameters.shootableObjects);
   preConditions.checkIfArrayOfObjectsOnlyIfExists(ROYGBIV.createFPSControl, preConditions.shootableObjects, parameters.shootableObjects);
   preConditions.checkIfFunctionOnlyIfExists(ROYGBIV.createFPSControl, preConditions.onPause, parameters.onPause);

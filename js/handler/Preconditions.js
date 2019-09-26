@@ -196,6 +196,7 @@ var Preconditions = function(){
   this.weaponRotationRandomnessOn = "weaponRotationRandomnessOn";
   this.onLook = "onLook";
   this.onShoot = "onShoot";
+  this.onStoppedShooting = "onStoppedShooting";
   this.shootableObjects = "shootableObjects";
   this.onPause = "onPause";
   this.onResume = "onResume";

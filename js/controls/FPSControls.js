@@ -38,6 +38,7 @@ var FPSControls = function(params){
   this.weaponRotationRandomnessOn = params.weaponRotationRandomnessOn;
   this.onLook = params.onLook;
   this.onShoot = params.onShoot;
+  this.onStoppedShooting = params.onStoppedShooting;
   this.shootableObjects = params.shootableObjects;
   this.onPause = params.onPause;
   this.onResume = params.onResume;
@@ -83,6 +84,9 @@ var FPSControls = function(params){
   }
   if (typeof this.onShoot == UNDEFINED){
     this.onShoot = noop;
+  }
+  if (typeof this.onStoppedShooting == UNDEFINED){
+    this.onStoppedShooting = noop;
   }
   if (typeof this.shootableObjects == UNDEFINED){
     this.shootableObjects = [];
@@ -155,6 +159,7 @@ FPSControls.prototype.init = function(){
       this.shootableMap[this.shootableObjects[i].name] = this.shootableObjects[i];
     }
   }
+  this.isShooting = false;
 }
 
 FPSControls.prototype.onFullScreenChange = function(isFullScreen){
@@ -511,10 +516,17 @@ FPSControls.prototype.onlookRaycasterComplete = function(x, y, z, objName){
   if (!isMobile){
     if (activeControl.isMouseDown){
       activeControl.onShoot(x, y, z, objName);
+      activeControl.isShooting = true;
+    }else if (activeControl.isShooting){
+      activeControl.onStoppedShooting();
+      activeControl.isShooting = false;
     }
   }else{
     if (objName != null && activeControl.shootableMap[objName]){
       activeControl.onShoot(x, y, z, objName);
+    }else if (activeControl.isShooting){
+      activeControl.onStoppedShooting();
+      activeControl.isShooting = false;
     }
   }
 }
@@ -675,6 +687,7 @@ FPSControls.prototype.onDeactivated = function(doNotShowElements){
   if (isMobile){
     touchEventHandler.tapThreshold = 310;
   }
+  this.isShooting = false;
 }
 
 FPSControls.prototype.onPlayerBodyCollision = function(event){
