@@ -220,6 +220,7 @@ var Preconditions = function(){
   this.delayedExecutionID = "delayedExecutionID";
   this.sceneName = "sceneName";
   this.readyCallback = "readyCallback";
+  this.animationTimeInMS = "animationTimeInMS";
 }
 
 Preconditions.prototype.errorHeader = function(callerFunc){

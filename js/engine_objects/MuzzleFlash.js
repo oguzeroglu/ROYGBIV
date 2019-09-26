@@ -125,23 +125,38 @@ MuzzleFlash.prototype.hide = function(){
   }
 }
 
-MuzzleFlash.prototype.onHide = function(){
+MuzzleFlash.prototype.onHide = function(animationTimeInMS){
   if (!this.isShown){
     return;
   }
-  this.isShown = false;
-  activeMuzzleFlashes.delete(this.name);
-  this.hide();
+  if (!(typeof animationTimeInMS == UNDEFINED)){
+    this.scaleDelta = (this.getScale() / animationTimeInMS) * 60;
+    this.increaseScale = false;
+    this.decreaseScale = true;
+  }else{
+    this.isShown = false;
+    activeMuzzleFlashes.delete(this.name);
+    this.hide();
+  }
 }
 
-MuzzleFlash.prototype.onShow = function(){
-  if (this.isShown){
+MuzzleFlash.prototype.onShow = function(animationTimeInMS){
+  if (this.isShown && !this.decreaseScale){
     return;
   }
   this.tick = 0;
   this.particleIndex = 0;
   this.isShown = true;
   activeMuzzleFlashes.set(this.name, this);
+  if (!(typeof animationTimeInMS == UNDEFINED)){
+    this.setScale(0);
+    this.scaleDelta = (this.realScale / animationTimeInMS) * 60;
+    this.increaseScale = true;
+    this.decreaseScale = false;
+  }else{
+    this.setScale(this.realScale);
+    this.increaseScale = false;
+  }
 }
 
 MuzzleFlash.prototype.onWeaponDeactivated = function(){
@@ -156,6 +171,7 @@ MuzzleFlash.prototype.onWeaponActivated = function(weaponObj){
   this.setScale(weaponObj.muzzleFlashParameters.scale);
   this.setRotation(weaponObj.muzzleFlashParameters.rotationX, weaponObj.muzzleFlashParameters.rotationY, weaponObj.muzzleFlashParameters.rotationZ);
   this.isActivated = true;
+  this.realScale = weaponObj.muzzleFlashParameters.scale;
 }
 
 MuzzleFlash.prototype.update = function(){
@@ -188,6 +204,23 @@ MuzzleFlash.prototype.update = function(){
     if (mode == 1){
       this.isShown = false;
       activeMuzzleFlashes.delete(this.name);
+    }
+  }
+  if (this.increaseScale){
+    var newScale = this.getScale() + this.scaleDelta;
+    if (newScale > this.realScale){
+      this.setScale(this.realScale);
+      this.increaseScale = false;
+    }else{
+      this.setScale(newScale);
+    }
+  }else if (this.decreaseScale){
+    var newScale = this.getScale() - this.scaleDelta;
+    if (newScale > 0){
+      this.setScale(newScale);
+    }else{
+      this.decreaseScale = false;
+      this.onHide();
     }
   }
 }

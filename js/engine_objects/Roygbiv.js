@@ -2354,8 +2354,10 @@ Roygbiv.prototype.unfreezeAnimation = function(object, animationName){
 // MUZZLEFLASH FUNCTIONS *******************************************************
 
 // Shows a muzzle flash. This function may be called each time a FPS weapon
-// is shooting.
-Roygbiv.prototype.showMuzzleFlash = function(muzzleflashName){
+// is shooting. The optional animationTimeInMS parameter can be used to
+// start the muzzle flash with a scale animation. This can be useful for
+// flame-like muzzle flashes.
+Roygbiv.prototype.showMuzzleFlash = function(muzzleflashName, animationTimeInMS){
   if (mode == 0){
     return;
   }
@@ -2365,12 +2367,15 @@ Roygbiv.prototype.showMuzzleFlash = function(muzzleflashName){
   preConditions.checkIfMuzzleFlashAttached(ROYGBIV.showMuzzleFlash, muzzleFlash);
   preConditions.checkIfMuzzleFlashActivated(ROYGBIV.showMuzzleFlash, muzzleFlash);
   preConditions.checkIfMuzzleFlashInsideActiveScene(ROYGBIV.showMuzzleFlash, muzzleFlash);
-  muzzleFlash.onShow();
+  preConditions.checkIfNumberOnlyIfExists(ROYGBIV.showMuzzleFlash, preConditions.animationTimeInMS, animationTimeInMS);
+  muzzleFlash.onShow(animationTimeInMS);
 }
 
 // Hides a muzzle flash. This function may be called inside onStoppedShooting callback
-// of a FPS control.
-Roygbiv.prototype.hideMuzzleFlash = function(muzzleflashName){
+// of a FPS control. The optional animationTimeInMS parameter can be used to
+// hide the muzzle flash with a scale animation. This can be useful for
+// flame-like muzzle flashes.
+Roygbiv.prototype.hideMuzzleFlash = function(muzzleflashName, animationTimeInMS){
   if (mode == 0){
     return;
   }
@@ -2380,7 +2385,8 @@ Roygbiv.prototype.hideMuzzleFlash = function(muzzleflashName){
   preConditions.checkIfMuzzleFlashAttached(ROYGBIV.hideMuzzleFlash, muzzleFlash);
   preConditions.checkIfMuzzleFlashActivated(ROYGBIV.hideMuzzleFlash, muzzleFlash);
   preConditions.checkIfMuzzleFlashInsideActiveScene(ROYGBIV.hideMuzzleFlash, muzzleFlash);
-  muzzleFlash.onHide();
+  preConditions.checkIfNumberOnlyIfExists(ROYGBIV.hideMuzzleFlash, preConditions.animationTimeInMS, animationTimeInMS);
+  muzzleFlash.onHide(animationTimeInMS);
 }
 
 // UTILITY FUNCTIONS ***********************************************************

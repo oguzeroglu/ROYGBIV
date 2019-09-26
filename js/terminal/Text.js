@@ -848,12 +848,12 @@ var Text = function(){
   this.ROYGBIV_SCRIPTING_API_STOPANIMATION = "Stops an animation of given object, object group or text.";
   this.ROYGBIV_SCRIPTING_API_ONANIMATIONFINISHED = "Sets a finish listener for an animation of given object, object group or text. For repeating animations the callbackFunction is\nexecuted before each repeat. For rewinding animations the callbackFunction is executed when the rewind is finished.";
   this.ROYGBIV_SCRIPTING_API_REMOVEANIMATIONFINISHLISTENER = "Removes the finish listener for an animation of given object, object group or text.";
-  this.ROYGBIV_SCRIPTING_API_SHOWMUZZLEFLASH = "Shows a muzzle flash. This function may be called each time a FPS weapon is shooting.";
+  this.ROYGBIV_SCRIPTING_API_SHOWMUZZLEFLASH = "Shows a muzzle flash. This function may be called each time a FPS weapon is shooting. The optional animationTimeInMS\nparameter can be used to start the muzzle flash with a scale animation. This can be useful for flame-like muzzle flashes.";
   this.ROYGBIV_SCRIPTING_API_EXECUTEDELAYED = "Runs a function after delayInMS milliseconds. If the repeat parameter is set to true runs the function in every delayInMS milliseconds.\nThis function returns a delayedExecutionID. This ID may provided to stopDelayedExecution API\nin order to stop a function to get executed.";
   this.ROYGBIV_SCRIPTING_API_STOPDELAYEDEXECUTION = "Stops a function to get executed with executeDelayed API. The delayedExecutionID parameter should be the return value of\nexecuteDelayed API. This API returns true if a function is found associated with the provided delayedExecutionID parameter,\nreturns false otherwise.";
   this.ROYGBIV_SCRIPTING_API_CHANGESCENE = "Changes the active scene. The readyCallback function is executed when the new scene is ready.";
   this.ROYGBIV_SCRIPTING_API_GETACTIVESCENENAME = "Returns the active scene name.";
   this.ROYGBIV_SCRIPTING_API_FREEZEANIMATIONONFINISH = "Makes an animation freeze on finish. This can be used for certain weapon animations where the weapon starts shooting\nafter going to a certain position/rotation. Use unfreezeAnimation API to undo this.";
   this.ROYGBIV_SCRIPTING_API_UNFREEZEANIMATION = "Unfreezes an animation started with freezeOnFinish parameter set to true.";
-  this.ROYGBIV_SCRIPTING_API_HIDEMUZZLEFLASH = "Hides a muzzle flash. This function may be called inside onStoppedShooting callback of a FPS control.";
+  this.ROYGBIV_SCRIPTING_API_HIDEMUZZLEFLASH = "Hides a muzzle flash. This function may be called inside onStoppedShooting callback of a FPS control. The optional\nanimationTimeInMS parameter can be used to hide the muzzle flash with a scale animation. This can be useful for\nflame-like muzzle flashes.";
 }
