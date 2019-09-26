@@ -126,6 +126,9 @@ MuzzleFlash.prototype.hide = function(){
 }
 
 MuzzleFlash.prototype.onShow = function(){
+  if (this.isShown){
+    return;
+  }
   this.isShown = true;
   activeMuzzleFlashes.set(this.name, this);
 }
