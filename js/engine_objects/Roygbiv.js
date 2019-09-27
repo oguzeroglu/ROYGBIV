@@ -2323,7 +2323,8 @@ Roygbiv.prototype.stopAnimation = function(object, animationName){
 
 // Makes an animation freeze on finish. This can be used for certain weapon
 // animations where the weapon starts shooting after going to a certain position/rotation.
-// Use unfreezeAnimation API to undo this.
+// Use unfreezeAnimation API to undo this. Note that this function should be used
+// after starting an animation.
 Roygbiv.prototype.freezeAnimationOnFinish = function(object, animationName){
   if (mode == 0){
     return;

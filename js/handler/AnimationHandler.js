@@ -460,6 +460,7 @@ AnimationHandler.prototype.assignInitialValue = function(animation){
 }
 
 AnimationHandler.prototype.startAnimation = function(animation){
+  this.unfreeze(animation);
   this.assignInitialValue(animation);
   this.activeAnimations.set(animation.uuid, animation);
   animation.onStart(this.initialValueGetterFunctionsByType[animation.description.action](animation.attachedObject));
