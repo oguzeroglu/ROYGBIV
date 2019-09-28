@@ -122,6 +122,7 @@ MuzzleFlash.prototype.init = function(){
 MuzzleFlash.prototype.hide = function(){
   for (var i = 0; i<this.particleSystems.length; i++){
     this.particleSystems[i].mesh.visible = false;
+    this.particleSystems[i].tick = 0;
   }
 }
 
