@@ -126,6 +126,10 @@ Animation.prototype.cancelRewind = function(){
   this.increaseTick = true;
 }
 
+Animation.prototype.forceRewind = function(){
+  this.increaseTick = false;
+}
+
 Animation.prototype.update = function(){
   if (this.isFreezed && this.freezeOnFinish){
     this.animationState = ANIMATION_STATE_FROZEN;
