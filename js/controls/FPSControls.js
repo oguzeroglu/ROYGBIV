@@ -413,11 +413,21 @@ FPSControls.prototype.onTouchEnd = function(event){
 FPSControls.prototype.pauseDueToScreenOrientation = function(){
   this.onPause();
   this.pausedDueToScreenOrientation = true;
+  if (this.isShooting){
+    this.onStoppedShooting();
+  }
+  this.isShooting = false;
   if (this.hasWeapon1){
     this.weaponObject1.hide(false);
+    if (this.weaponObject1.muzzleFlashParameters){
+      muzzleFlashes[this.weaponObject1.muzzleFlashParameters.muzzleFlashName].onWeaponDeactivated();
+    }
   }
   if (this.hasWeapon2){
     this.weaponObject2.hide(false);
+    if (this.weaponObject2.muzzleFlashParameters){
+      muzzleFlashes[this.weaponObject2.muzzleFlashParameters.muzzleFlashName].onWeaponDeactivated();
+    }
   }
 }
 
