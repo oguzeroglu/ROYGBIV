@@ -24,6 +24,7 @@ var Animation = function(name, type, attachedObject, description, rewind, repeat
     initialValue: 0, tick: 0, increaseTick: false, totalTranslationX: 0, totalTranslationY: 0, totalTranslationZ: 0
   }
   this.isActive = false;
+  this.animationState = ANIMATION_STATE_NOT_RUNNING;
 }
 
 Animation.prototype.restore = function(){
@@ -86,6 +87,7 @@ Animation.prototype.onFinished = function(){
 }
 
 Animation.prototype.onStart = function(initialValue){
+  this.animationState = ANIMATION_STATE_RUNNING;
   this.initialValue = initialValue;
   this.tick = 0;
   if (this.description.action == animationHandler.actionTypes.OBJECT.EMISSIVE_COLOR){
@@ -122,14 +124,17 @@ Animation.prototype.onRepeat = function(){
 
 Animation.prototype.update = function(){
   if (this.isFreezed && this.freezeOnFinish){
+    this.animationState = ANIMATION_STATE_FROZEN;
     return;
   }
   this.isFreezed = false;
   this.params.value = this.updateFunction(this.tick, this.initialValue, this.changeInValue, this.totalTimeInSeconds);
   this.actionFunction(this.params, this.increaseTick);
   if (this.increaseTick){
+    this.animationState = ANIMATION_STATE_RUNNING;
     this.tick += STEP;
   }else{
+    this.animationState = ANIMATION_STATE_REWINDING;
     this.tick -= STEP;
   }
   if (this.increaseTick && this.tick > this.totalTimeInSeconds){

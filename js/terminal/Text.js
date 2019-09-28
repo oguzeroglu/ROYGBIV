@@ -856,4 +856,9 @@ var Text = function(){
   this.ROYGBIV_SCRIPTING_API_FREEZEANIMATIONONFINISH = "Makes an animation freeze on finish. This can be used for certain weapon animations where the weapon starts shooting\nafter going to a certain position/rotation. Use unfreezeAnimation API to undo this. Note that this function should be\nused after starting an animation.";
   this.ROYGBIV_SCRIPTING_API_UNFREEZEANIMATION = "Unfreezes an animation started with freezeOnFinish parameter set to true.";
   this.ROYGBIV_SCRIPTING_API_HIDEMUZZLEFLASH = "Hides a muzzle flash. This function may be called inside onStoppedShooting callback of a FPS control. The optional\nanimationTimeInMS parameter can be used to hide the muzzle flash with a scale animation. This can be useful for\nflame-like muzzle flashes.";
+  this.ROYGBIV_SCRIPTING_API_GETANIMATIONSTATE = "Returns the animation state. The animation state can be these global enums:\n"+
+                                                 "ANIMATION_STATE_NOT_RUNNING (0)\n"+
+                                                 "ANIMATION_STATE_RUNNING (1)\n"+
+                                                 "ANIMATION_STATE_FROZEN (2)\n"+
+                                                 "ANIMATION_STATE_REWINDING (3)";
 }

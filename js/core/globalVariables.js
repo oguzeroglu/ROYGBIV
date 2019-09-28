@@ -348,6 +348,10 @@ var minusZ = "-z";
 var activeMuzzleFlashes = new Map();
 var delayedExecutionHandler;
 var sceneHandler;
+var ANIMATION_STATE_NOT_RUNNING = 0;
+var ANIMATION_STATE_RUNNING = 1;
+var ANIMATION_STATE_FROZEN = 2;
+var ANIMATION_STATE_REWINDING = 3;
 
 // RENDER ORDERS
 var renderOrders = {

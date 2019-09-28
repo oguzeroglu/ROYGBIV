@@ -179,7 +179,8 @@ var Roygbiv = function(){
     "getActiveSceneName",
     "freezeAnimationOnFinish",
     "unfreezeAnimation",
-    "hideMuzzleFlash"
+    "hideMuzzleFlash",
+    "getAnimationState"
   ];
 
   this.globals = new Object();
@@ -523,6 +524,23 @@ Roygbiv.prototype.getActiveSceneName = function(){
     return;
   }
   return sceneHandler.getActiveSceneName();
+}
+
+// Returns the animation state. The animation state can be these global enums:
+// ANIMATION_STATE_NOT_RUNNING (0)
+// ANIMATION_STATE_RUNNING (1)
+// ANIMATION_STATE_FROZEN (2)
+// ANIMATION_STATE_REWINDING (3)
+Roygbiv.prototype.getAnimationState = function(object, animationName){
+  if (mode == 0){
+    return;
+  }
+  preConditions.checkIfDefined(ROYGBIV.getAnimationState, preConditions.object, object);
+  preConditions.checkIfAddedObjectObjectGroupAddedText(ROYGBIV.getAnimationState, preConditions.object, object);
+  preConditions.checkIfDefined(ROYGBIV.getAnimationState, preConditions.animationName, animationName);
+  preConditions.checkIfAnimationExists(ROYGBIV.getAnimationState, object, animationName);
+  preConditions.checkIfObjectInsideActiveScene(ROYGBIV.getAnimationState, object);
+  return object.animations[animationName].animationState;
 }
 
 // OBJECT MANIPULATION FUNCTIONS ***********************************************

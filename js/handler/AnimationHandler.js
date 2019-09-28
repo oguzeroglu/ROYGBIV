@@ -408,6 +408,7 @@ AnimationHandler.prototype.forceFinish = function(animation){
   if (!animation.isInitialValueAssigned()){
     return;
   }
+  animation.animationState = ANIMATION_STATE_NOT_RUNNING;
   this.activeAnimations.delete(animation.uuid);
   this.afterAnimationSettersByType[animation.description.action](animation);
   animation.invalidateInitialValue();
@@ -415,6 +416,7 @@ AnimationHandler.prototype.forceFinish = function(animation){
 
 AnimationHandler.prototype.onAnimationFinished = function(animation){
   if (!animation.repeat){
+    animation.animationState = ANIMATION_STATE_NOT_RUNNING;
     this.activeAnimations.delete(animation.uuid);
     this.afterAnimationSettersByType[animation.description.action](animation);
     animation.invalidateInitialValue();
