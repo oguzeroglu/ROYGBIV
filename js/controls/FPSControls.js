@@ -524,6 +524,7 @@ FPSControls.prototype.onlookRaycasterComplete = function(x, y, z, objName){
   }else{
     if (objName != null && activeControl.shootableMap[objName]){
       activeControl.onShoot(x, y, z, objName);
+      activeControl.isShooting = true;
     }else if (activeControl.isShooting){
       activeControl.onStoppedShooting();
       activeControl.isShooting = false;
