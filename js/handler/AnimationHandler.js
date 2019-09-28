@@ -461,6 +461,12 @@ AnimationHandler.prototype.assignInitialValue = function(animation){
   animation.hasInitialValue = true;
 }
 
+AnimationHandler.prototype.cancelRewind = function(animation){
+  if (animation.animationState == ANIMATION_STATE_REWINDING){
+    animation.cancelRewind();
+  }
+}
+
 AnimationHandler.prototype.startAnimation = function(animation){
   this.unfreeze(animation);
   this.assignInitialValue(animation);

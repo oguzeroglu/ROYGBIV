@@ -180,7 +180,8 @@ var Roygbiv = function(){
     "freezeAnimationOnFinish",
     "unfreezeAnimation",
     "hideMuzzleFlash",
-    "getAnimationState"
+    "getAnimationState",
+    "cancelAnimationRewind"
   ];
 
   this.globals = new Object();
@@ -2368,6 +2369,20 @@ Roygbiv.prototype.unfreezeAnimation = function(object, animationName){
   preConditions.checkIfObjectInsideActiveScene(ROYGBIV.stopAnimation, object);
   var animation = object.animations[animationName];
   animationHandler.unfreeze(animation);
+}
+
+// Sets the state of an animation to ANIMATION_STATE_RUNNING for animations
+// that are in ANIMATION_STATE_REWINDING state.
+Roygbiv.prototype.cancelAnimationRewind = function(object, animationName){
+  if (mode == 0){
+    return;
+  }
+  preConditions.checkIfDefined(ROYGBIV.cancelAnimationRewind, preConditions.object, object);
+  preConditions.checkIfAddedObjectObjectGroupAddedText(ROYGBIV.cancelAnimationRewind, preConditions.object, object);
+  preConditions.checkIfDefined(ROYGBIV.cancelAnimationRewind, preConditions.animationName, animationName);
+  preConditions.checkIfAnimationExists(ROYGBIV.cancelAnimationRewind, object, animationName);
+  preConditions.checkIfObjectInsideActiveScene(ROYGBIV.cancelAnimationRewind, object);
+  animationHandler.cancelRewind(object.animations[animationName]);
 }
 
 // MUZZLEFLASH FUNCTIONS *******************************************************

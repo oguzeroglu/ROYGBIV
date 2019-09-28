@@ -861,4 +861,5 @@ var Text = function(){
                                                  "ANIMATION_STATE_RUNNING (1)\n"+
                                                  "ANIMATION_STATE_FROZEN (2)\n"+
                                                  "ANIMATION_STATE_REWINDING (3)";
+  this.ROYGBIV_SCRIPTING_API_CANCELANIMATIONREWIND = "Sets the state of an animation to ANIMATION_STATE_RUNNING for animations that are in ANIMATION_STATE_REWINDING state.";
 }
