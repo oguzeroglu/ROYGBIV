@@ -53,6 +53,7 @@ Lightning.prototype.init = function(startPoint, endPoint){
   this.geometry.setDrawRange(0, this.vertexCount);
   this.mesh = new MeshGenerator().generateLightning(this);
   scene.add(this.mesh);
+  webglCallbackHandler.registerEngineObject(this);
 }
 
 Lightning.prototype.update = function(){
