@@ -1,13 +1,28 @@
-var Lightning = function(name, detailThreshold, maxDisplacement, count){
+var Lightning = function(name, detailThreshold, maxDisplacement, count, colorName){
   this.name = name;
+  this.isLightning = true;
   this.detailThreshold = detailThreshold;
   this.maxDisplacement = maxDisplacement;
   this.count = count;
+  this.colorName = colorName;
   this.tree = new Object();
   this.renderMap = new Object();
   this.idCounter = 0;
+  this.vertexCount = 0;
   this.STATE_INIT = 0;
   this.STATE_UPDATE = 1;
+}
+
+Lightning.prototype.start = function(startPoint, endPoint){
+  this.startPoint.copy(startPoint);
+  this.endPoint.copy(endPoint);
+  activeLightnings.set(this.name, this);
+  this.mesh.visible = true;
+}
+
+Lightning.prototype.stop = function(){
+  activeLightnings.delete(this.name);
+  this.mesh.visible = false;
 }
 
 Lightning.prototype.init = function(startPoint, endPoint){
@@ -17,6 +32,27 @@ Lightning.prototype.init = function(startPoint, endPoint){
   }
   this.startPoint = startPoint;
   this.endPoint = endPoint;
+  this.geometry = new THREE.BufferGeometry();
+  this.positionAttributeIndexByIds = new Object();
+  var positions = new Float32Array(this.vertexCount * 3);
+  var ctr = 0;
+  for (var id in this.renderMap){
+    var sp = this.renderMap[id].startPoint;
+    var ep = this.renderMap[id].endPoint;
+    positions[ctr++] = sp.x;
+    positions[ctr++] = sp.y;
+    positions[ctr++] = sp.z;
+    positions[ctr++] = ep.x;
+    positions[ctr++] = ep.y;
+    positions[ctr++] = ep.z;
+    this.positionAttributeIndexByIds[id] = ctr - 6;
+  }
+  this.positionBufferAttribute = new THREE.BufferAttribute(positions, 3);
+  this.positionBufferAttribute.setDynamic(true);
+  this.geometry.addAttribute("position", this.positionBufferAttribute);
+  this.geometry.setDrawRange(0, this.vertexCount);
+  this.mesh = new MeshGenerator().generateLightning(this);
+  scene.add(this.mesh);
 }
 
 Lightning.prototype.update = function(){
@@ -25,6 +61,7 @@ Lightning.prototype.update = function(){
   for (var i = 0; i<this.count; i++){
     this.generateTree(this.tree, this.startPoint, this.endPoint, this.maxDisplacement);
   }
+  this.positionBufferAttribute.updateRange.set(0, this.vertexCount * 3);
 }
 
 Lightning.prototype.addSegment = function(node, startPoint, endPoint){
@@ -42,6 +79,17 @@ Lightning.prototype.addSegment = function(node, startPoint, endPoint){
   }
   this.idCounter ++;
   return obj;
+}
+
+Lightning.prototype.updateNodePositionInShader = function(node){
+  var bufferAttributeIndex = this.positionAttributeIndexByIds[node.id];
+  this.positionBufferAttribute.array[bufferAttributeIndex] = node.startPoint.x;
+  this.positionBufferAttribute.array[bufferAttributeIndex + 1] = node.startPoint.y;
+  this.positionBufferAttribute.array[bufferAttributeIndex + 2] = node.startPoint.z;
+  this.positionBufferAttribute.array[bufferAttributeIndex + 3] = node.endPoint.x;
+  this.positionBufferAttribute.array[bufferAttributeIndex + 4] = node.endPoint.y;
+  this.positionBufferAttribute.array[bufferAttributeIndex + 5] = node.endPoint.z;
+  this.positionBufferAttribute.needsUpdate = true;
 }
 
 Lightning.prototype.generateTree = function(node, startPoint, endPoint, displacement){
@@ -67,20 +115,10 @@ Lightning.prototype.generateTree = function(node, startPoint, endPoint, displace
     this.generateTree(children, middlePoint, endPoint, displacement);
   }else{
     this.renderMap[addedNode.id] = addedNode;
+    if (this.state == this.STATE_UPDATE){
+      this.updateNodePositionInShader(addedNode);
+    }else{
+      this.vertexCount += 2;
+    }
   }
-}
-
-Lightning.prototype.debug = function(){
-  if (this.debugMesh){
-    scene.remove(this.debugMesh);
-  }
-  var material = new THREE.LineBasicMaterial( { color: "lime" } );
-  var geom = new THREE.Geometry();
-  for (var id in this.renderMap){
-    var node = this.renderMap[id];
-    geom.vertices.push(node.startPoint);
-    geom.vertices.push(node.endPoint);
-  }
-  this.debugMesh = new THREE.LineSegments(geom, material);
-  scene.add(this.debugMesh);
 }

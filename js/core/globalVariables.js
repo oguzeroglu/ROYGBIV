@@ -347,6 +347,7 @@ var minusX = "-x";
 var minusY = "-y";
 var minusZ = "-z";
 var activeMuzzleFlashes = new Map();
+var activeLightnings = new Map();
 var delayedExecutionHandler;
 var sceneHandler;
 var ANIMATION_STATE_NOT_RUNNING = 0;
@@ -367,6 +368,7 @@ var renderOrders = {
   GRID_SYSTEM_REPRESENTATION: 10,
   OBJECT: 10,
   TEXT_3D: 10,
+  LIGHTNING: 10,
   TEXT_2D: 50,
   CROSSHAIR: 60,
   OBJECT_TRAIL: 100
