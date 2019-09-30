@@ -326,6 +326,7 @@ var fontCreatorGUIHandler;
 var crosshairCreatorGUIHandler;
 var scriptsGUIHandler;
 var animationCreatorGUIHandler;
+var lightningCreatorGUIHandler;
 var skyboxHandler;
 var fogHandler;
 var scriptsHandler;
@@ -354,6 +355,7 @@ var ANIMATION_STATE_NOT_RUNNING = 0;
 var ANIMATION_STATE_RUNNING = 1;
 var ANIMATION_STATE_FROZEN = 2;
 var ANIMATION_STATE_REWINDING = 3;
+var lightnings = new Object();
 
 // RENDER ORDERS
 var renderOrders = {

@@ -168,6 +168,7 @@ StateLoader.prototype.resetProject = function(){
   preConfiguredParticleSystems = new Object();
   preConfiguredParticleSystemPools = new Object();
   muzzleFlashes = new Object();
+  lightnings = new Object();
   webglCallbackHandler = new WebGLCallbackHandler();
   textureAtlasHandler.dispose();
   textureAtlasHandler = new TextureAtlasHandler();

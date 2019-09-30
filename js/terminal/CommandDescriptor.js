@@ -193,7 +193,8 @@ var CommandDescriptor = function(){
       0, //printScenes
       1, //setEntryScene
       1, //destroyScene
-      2 //syncTextProperties
+      2, //syncTextProperties
+      1 //newLightning
   ];
 
   this.commandArgumentsExpectedExplanation = [
@@ -389,7 +390,8 @@ var CommandDescriptor = function(){
     "printScenes",
     "setEntryScene sceneName",
     "destroyScene sceneName",
-    "syncTextProperties sourceText targetText"
+    "syncTextProperties sourceText targetText",
+    "newLightning lightningName"
   ];
 
   this.commands = [
@@ -585,7 +587,8 @@ var CommandDescriptor = function(){
     "printScenes",
     "setEntryScene",
     "destroyScene",
-    "syncTextProperties"
+    "syncTextProperties",
+    "newLightning"
   ];
 
   this.commandInfo = [
@@ -781,7 +784,8 @@ var CommandDescriptor = function(){
     "printScenes: Prints created scenes.",
     "setEntryScene: Sets the entry scene.",
     "destroyScene: Destroys a scene.",
-    "syncTextProperties: Sets the properties of targeText based on sourceText properties."
+    "syncTextProperties: Sets the properties of targeText based on sourceText properties.",
+    "newLightning: Opents the Lightning editor GUI for lightning creation."
   ];
 
   this.keyboardInfo = [
@@ -1431,6 +1435,11 @@ var CommandDescriptor = function(){
   this.syncTextProperties.types = [];
   this.syncTextProperties.types.push(this.TEXT_NAME); //sourceText
   this.syncTextProperties.types.push(this.TEXT_NAME); //targetText
+
+  // newLightning
+  this.newLightning = new Object();
+  this.newLightning.types = [];
+  this.newLightning.types.push(this.UNKNOWN_INDICATOR); //lightningName
 
 };
 

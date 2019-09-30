@@ -72,6 +72,7 @@ window.onload = function() {
     crosshairCreatorGUIHandler = new CrosshairCreatorGUIHandler();
     scriptsGUIHandler = new ScriptsGUIHandler();
     animationCreatorGUIHandler = new AnimationCreatorGUIHandler();
+    lightningCreatorGUIHandler = new LightningCreatorGUIHandler();
   }
 
   // PHYSICS BODY GENERATOR

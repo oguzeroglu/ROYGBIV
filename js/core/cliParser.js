@@ -4652,6 +4652,19 @@ function parse(input){
           terminal.printInfo(Text.TEXT_PROPERTIES_SYNCED);
           return true;
         break;
+        case 193: //newLightning
+          if (mode != 0){
+            terminal.printError(Text.WORKS_ONLY_IN_DESIGN_MODE);
+            return true;
+          }
+          var lightningName = splitted[1];
+          if (lightnings[lightningName]){
+            terminal.printError(Text.NAME_MUST_BE_UNIQUE);
+            return true;
+          }
+          lightningCreatorGUIHandler.show(lightningName);
+          return true;
+        break;
       }
       return true;
     }catch(err){
