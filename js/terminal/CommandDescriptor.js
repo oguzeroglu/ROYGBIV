@@ -789,7 +789,7 @@ var CommandDescriptor = function(){
     "destroyScene: Destroys a scene.",
     "syncTextProperties: Sets the properties of targeText based on sourceText properties.",
     "newLightning: Opents the Lightning editor GUI for lightning creation.",
-    "editLightning: Opents the Lightning editor GUI to edit a lightning."
+    "editLightning: Opens the Lightning editor GUI to edit a lightning."
   ];
 
   this.keyboardInfo = [
