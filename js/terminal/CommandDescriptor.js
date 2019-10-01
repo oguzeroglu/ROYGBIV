@@ -194,7 +194,8 @@ var CommandDescriptor = function(){
       1, //setEntryScene
       1, //destroyScene
       2, //syncTextProperties
-      1 //newLightning
+      1, //newLightning
+      1 //editLightning
   ];
 
   this.commandArgumentsExpectedExplanation = [
@@ -391,7 +392,8 @@ var CommandDescriptor = function(){
     "setEntryScene sceneName",
     "destroyScene sceneName",
     "syncTextProperties sourceText targetText",
-    "newLightning lightningName"
+    "newLightning lightningName",
+    "editLightning lightningName"
   ];
 
   this.commands = [
@@ -588,7 +590,8 @@ var CommandDescriptor = function(){
     "setEntryScene",
     "destroyScene",
     "syncTextProperties",
-    "newLightning"
+    "newLightning",
+    "editLightning"
   ];
 
   this.commandInfo = [
@@ -785,7 +788,8 @@ var CommandDescriptor = function(){
     "setEntryScene: Sets the entry scene.",
     "destroyScene: Destroys a scene.",
     "syncTextProperties: Sets the properties of targeText based on sourceText properties.",
-    "newLightning: Opents the Lightning editor GUI for lightning creation."
+    "newLightning: Opents the Lightning editor GUI for lightning creation.",
+    "editLightning: Opents the Lightning editor GUI to edit a lightning."
   ];
 
   this.keyboardInfo = [
@@ -920,6 +924,7 @@ var CommandDescriptor = function(){
   this.OBJECT_AND_TEXT_NAME       =   34;
   this.SCENE_NAME                 =   35;
   this.GS_NAME_NO_WC              =   36;
+  this.LIGHTNING_NAME             =   37;
 
   // newGridSystem
   this.newGridSystem = new Object();
@@ -1440,6 +1445,11 @@ var CommandDescriptor = function(){
   this.newLightning = new Object();
   this.newLightning.types = [];
   this.newLightning.types.push(this.UNKNOWN_INDICATOR); //lightningName
+
+  // editLightning
+  this.editLightning = new Object();
+  this.editLightning.types = [];
+  this.editLightning.types.push(this.LIGHTNING_NAME); //lightningName
 
 };
 

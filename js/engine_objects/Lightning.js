@@ -13,15 +13,27 @@ var Lightning = function(name, detailThreshold, maxDisplacement, count, colorNam
   this.STATE_UPDATE = 1;
 }
 
+Lightning.prototype.destroy = function(){
+  scene.remove(this.mesh);
+  this.mesh.geometry.dispose();
+  this.mesh.material.dispose();
+}
+
 Lightning.prototype.start = function(startPoint, endPoint){
-  this.startPoint.copy(startPoint);
-  this.endPoint.copy(endPoint);
-  activeLightnings.set(this.name, this);
+  if (startPoint && endPoint){
+    this.startPoint.copy(startPoint);
+    this.endPoint.copy(endPoint);
+  }
+  if (mode == 1){
+    activeLightnings.set(this.name, this);
+  }
   this.mesh.visible = true;
 }
 
 Lightning.prototype.stop = function(){
-  activeLightnings.delete(this.name);
+  if (mode == 1){
+    activeLightnings.delete(this.name);
+  }
   this.mesh.visible = false;
 }
 

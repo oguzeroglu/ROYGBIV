@@ -93,7 +93,7 @@ var GUIHandler = function(){
   this.guiTypes = {
     TEXT: 0, OBJECT: 1, BLOOM: 2, FPS_WEAPON_ALIGNMENT: 3, SHADER_PRECISION: 4, PARTICLE_SYSTEM: 5,
     WORKER_STATUS: 6, MUZZLE_FLASH: 7, TEXTURE_PACK: 8, SKYBOX_CREATION: 9, FOG: 10, FONT: 11,
-    CROSSHAIR_CREATION: 12, SCRIPTS: 13, ANIMATION_CREATION: 14, AREA: 15
+    CROSSHAIR_CREATION: 12, SCRIPTS: 13, ANIMATION_CREATION: 14, AREA: 15, LIGHTNING: 16
   };
   this.blockingGUITypes = [
     this.guiTypes.FPS_WEAPON_ALIGNMENT, this.guiTypes.PARTICLE_SYSTEM, this.guiTypes.MUZZLE_FLASH,
@@ -152,6 +152,11 @@ GUIHandler.prototype.isOneOfBlockingGUIActive = function(){
       break;
       case this.guiTypes.ANIMATION_CREATION:
         if (this.datGuiAnimationCreation){
+          return true;
+        }
+      break;
+      case this.guiTypes.LIGHTNING:
+        if (this.datGuiLightningCreation){
           return true;
         }
       break;
@@ -706,6 +711,12 @@ GUIHandler.prototype.hide = function(guiType){
       if (this.datGuiAnimationCreation){
         this.destroyGUI(this.datGuiAnimationCreation);
         this.datGuiAnimationCreation = 0;
+      }
+    return;
+    case this.guiTypes.LIGHTNING:
+      if (this.datGuiLightningCreation){
+        this.destroyGUI(this.datGuiLightningCreation);
+        this.datGuiLightningCreation = 0;
       }
     return;
   }

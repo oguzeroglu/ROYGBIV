@@ -42,6 +42,7 @@ function render(){
       muzzleFlashCreatorGUIHandler.update();
       fpsWeaponGUIHandler.update();
       animationCreatorGUIHandler.update();
+      lightningCreatorGUIHandler.update();
     }
     cameraOperationsDone = false;
   }
