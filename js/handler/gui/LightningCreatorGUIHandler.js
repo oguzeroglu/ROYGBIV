@@ -81,7 +81,10 @@ LightningCreatorGUIHandler.prototype.init = function(lightningName, isEdit){
       lightningCreatorGUIHandler.close(true, isEdit, Text.OPERATION_CANCELLED);
     },
     "Done": function(){
-      lightnings[lightningName] = lightningCreatorGUIHandler.lightning;
+      if (lightnings[lightningName]){
+        lightnings[lightningName].destroy();
+      }
+      lightnings[lightningName] = lightningCreatorGUIHandler.lightning.clone();
       sceneHandler.onLightningCreation(lightnings[lightningName]);
       lightningCreatorGUIHandler.close(false, isEdit, isEdit ? Text.LIGHTNING_EDITED : Text.LIGHTNING_CREATED);
     }

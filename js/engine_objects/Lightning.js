@@ -13,6 +13,12 @@ var Lightning = function(name, detailThreshold, maxDisplacement, count, colorNam
   this.STATE_UPDATE = 1;
 }
 
+Lightning.prototype.clone = function(){
+  var clone = new Lightning(this.name, this.detailThreshold, this.maxDisplacement, this.count, this.colorName);
+  clone.init(this.startPoint, this.endPoint);
+  return clone;
+}
+
 Lightning.prototype.export = function(){
   return {
     name: this.name,
