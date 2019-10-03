@@ -87,6 +87,10 @@ Lightning.prototype.init = function(startPoint, endPoint){
 Lightning.prototype.update = function(){
   this.state = this.STATE_UPDATE;
   this.idCounter = 0;
+  this.currentDistanceCoef = this.startPoint.distanceTo(this.endPoint) / 100;
+  if (this.currentDistanceCoef > 1){
+    this.currentDistanceCoef = 1;
+  }
   for (var i = 0; i<this.count; i++){
     this.generateTree(this.tree, this.startPoint, this.endPoint, this.maxDisplacement);
   }
@@ -135,9 +139,9 @@ Lightning.prototype.generateTree = function(node, startPoint, endPoint, displace
       );
     }else{
       middlePoint = addedNode.reusableVector.set(
-        ((startPoint.x + endPoint.x) / 2) + displacement * (Math.random() - 0.5),
-        ((startPoint.y + endPoint.y) / 2) + displacement * (Math.random() - 0.5),
-        ((startPoint.z + endPoint.z) / 2) + displacement * (Math.random() - 0.5)
+        (((startPoint.x + endPoint.x) / 2) + displacement * (Math.random() - 0.5) * this.currentDistanceCoef) ,
+        (((startPoint.y + endPoint.y) / 2) + displacement * (Math.random() - 0.5) * this.currentDistanceCoef),
+        (((startPoint.z + endPoint.z) / 2) + displacement * (Math.random() - 0.5) * this.currentDistanceCoef)
       );
     }
     this.generateTree(children, startPoint, middlePoint, displacement);
