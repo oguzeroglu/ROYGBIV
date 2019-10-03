@@ -405,6 +405,8 @@ ModeSwitcher.prototype.switchFromPreviewToDesign = function(){
       canvas.style.visibility = "";
       terminal.printInfo(Text.SWITCHED_TO_DESIGN_MODE);
     }
+  }else if (!isDeployment){
+    terminal.printInfo(Text.SWITCHED_TO_DESIGN_MODE);
   }
   renderer.setPixelRatio(screenResolution);
 }
