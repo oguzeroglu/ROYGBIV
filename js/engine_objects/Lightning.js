@@ -13,6 +13,16 @@ var Lightning = function(name, detailThreshold, maxDisplacement, count, colorNam
   this.STATE_UPDATE = 1;
 }
 
+Lightning.prototype.export = function(){
+  return {
+    name: this.name,
+    detailThreshold: this.detailThreshold,
+    maxDisplacement: this.maxDisplacement,
+    count: this.count,
+    colorName: this.colorName
+  };
+}
+
 Lightning.prototype.destroy = function(){
   scene.remove(this.mesh);
   this.mesh.geometry.dispose();

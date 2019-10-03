@@ -73,7 +73,7 @@ LightningCreatorGUIHandler.prototype.createGUI = function(lightningName){
 
 LightningCreatorGUIHandler.prototype.init = function(lightningName, isEdit){
   this.parameters = {
-    "Detail": 0.5,
+    "Detail": isEdit? (1/lightnings[lightningName].detailThreshold): 0.5,
     "Displacement": isEdit? lightnings[lightningName].maxDisplacement: 80,
     "Count": isEdit? lightnings[lightningName].count: 1,
     "Color": isEdit? "#" + REUSABLE_COLOR.set(lightnings[lightningName].colorName).getHexString(): "#ffffff",

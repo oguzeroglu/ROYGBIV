@@ -1234,3 +1234,11 @@ ImportHandler.prototype.importCrosshairs = function(obj){
     crosshairs[crosshairName] = new Crosshair(obj.crosshairs[crosshairName]);
   }
 }
+
+ImportHandler.prototype.importLightnings = function(obj){
+  for (var lightningName in obj.lightnings){
+    var curExport = obj.lightnings[lightningName];
+    lightnings[lightningName] = new Lightning(lightningName, curExport.detailThreshold, curExport.maxDisplacement, curExport.count, curExport.colorName);
+    lightnings[lightningName].init(new THREE.Vector3(0, 0, 0), new THREE.Vector3(0, 100, 0));
+  }
+}
