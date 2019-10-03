@@ -4684,6 +4684,44 @@ function parse(input){
           terminal.printInfo(Text.AFTER_LIGHTNING_CREATION);
           return true;
         break;
+        case 195: //destroyLightning
+          if (mode != 0){
+            terminal.printError(Text.WORKS_ONLY_IN_DESIGN_MODE);
+            return true;
+          }
+          if (!(splitted[1].indexOf("*") == -1)){
+            new JobHandler(splitted).handle();
+            return true;
+          }
+          var lightning = lightnings[splitted[1]];
+          if (!lightning){
+            terminal.printError(Text.NO_SUCH_LIGHTNING);
+            return true;
+          }
+          lightning.destroy();
+          delete lightnings[lightning.name];
+          if (!jobHandlerWorking){
+            terminal.printInfo(Text.LIGHTNING_DESTROYED);
+          }
+          return true;
+        break;
+        case 196: //printLightnings
+          var count = 0;
+          var length = Object.keys(lightnings).length;
+          terminal.printHeader(Text.LIGHTNINGS);
+          for (var lightningName in lightnings){
+            count ++;
+            var options = true;
+            if (count == length){
+              options = false;
+            }
+            terminal.printInfo(Text.TREE2.replace(Text.PARAM1, lightningName + " ["+lightnings[lightningName].registeredSceneName+"]").replace(Text.PARAM2, lightnings[lightningName].colorName), options);
+          }
+          if (count == 0){
+            terminal.printError(Text.NO_LIGHTNINGS_CREATED);
+          }
+          return true;
+        break;
       }
       return true;
     }catch(err){
