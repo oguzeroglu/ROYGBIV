@@ -75,6 +75,7 @@ var GUIHandler = function(){
     "Particle": "low",
     "Skybox": "low",
     "Text": "low",
+    "Lightning": "low",
     "Done": function(){
       guiHandler.hide(guiHandler.guiTypes.SHADER_PRECISION);
       terminal.clear();
@@ -801,6 +802,11 @@ GUIHandler.prototype.initializeShaderPrecisionGUI = function(){
   }).listen();
   guiHandler.datGuiShaderPrecision.add(guiHandler.shaderPrecisionParameters, "Text", ["low", "medium", "high"]).onChange(function(val){
     shaderPrecisionHandler.setShaderPrecisionForType(shaderPrecisionHandler.types.TEXT, guiHandler.getPrecisionType(val));
+    terminal.clear();
+    terminal.printInfo(Text.SHADER_PRECISION_ADJUSTED);
+  }).listen();
+  guiHandler.datGuiShaderPrecision.add(guiHandler.shaderPrecisionParameters, "Lightning", ["low", "medium", "high"]).onChange(function(val){
+    shaderPrecisionHandler.setShaderPrecisionForType(shaderPrecisionHandler.types.LIGHTNING, guiHandler.getPrecisionType(val));
     terminal.clear();
     terminal.printInfo(Text.SHADER_PRECISION_ADJUSTED);
   }).listen();

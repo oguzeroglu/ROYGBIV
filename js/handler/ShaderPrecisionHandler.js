@@ -10,7 +10,8 @@ var ShaderPrecisionHandler = function(){
     OBJECT_TRAIL: 4,
     PARTICLE: 5,
     SKYBOX: 6,
-    TEXT: 7
+    TEXT: 7,
+    LIGHTNING: 8
   }
   this.reset();
 }
@@ -201,11 +202,29 @@ ShaderPrecisionHandler.prototype.setShaderPrecisionForType = function(type, prec
   }
   var vertexShader, fragmentShader, vertexShaderName, fragmentShaderName;
   switch (type){
+    case this.types.LIGHTNING:
+      vertexShader = ShaderContent.lightningVertexShader;
+      fragmentShader = ShaderContent.lightningFragmentShader;
+      vertexShaderName = "lightningVertexShader";
+      fragmentShaderName = "lightningFragmentShader";
+      for (var lightningName in lightnings){
+        var lightning = lightnings[lightningName];
+        lightning.mesh.material.vertexShader = this.replace(lightning.mesh.material.vertexShader, currentPrecisionForType, newPrecisionForType);
+        lightning.mesh.material.fragmentShader = this.replace(lightning.mesh.material.fragmentShader, currentPrecisionForType, newPrecisionForType);
+        lightning.mesh.material.needsUpdate = true;
+      }
+    break;
     case this.types.CROSSHAIR:
       vertexShader = ShaderContent.crossHairVertexShader;
       fragmentShader = ShaderContent.crossHairFragmentShader;
       vertexShaderName = "crossHairVertexShader";
       fragmentShaderName = "crossHairFragmentShader";
+      for (var chName in crosshairs){
+        var crosshair = crosshairs[chName];
+        crosshair.mesh.material.vertexShader = this.replace(crosshair.mesh.material.vertexShader, currentPrecisionForType, newPrecisionForType);
+        crosshair.mesh.material.fragmentShader = this.replace(crosshair.mesh.material.fragmentShader, currentPrecisionForType, newPrecisionForType);
+        crosshair.mesh.material.needsUpdate = true;
+      }
     break;
     case this.types.BASIC_MATERIAL:
       vertexShader = ShaderContent.basicMaterialVertexShader;

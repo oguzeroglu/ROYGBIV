@@ -3985,6 +3985,7 @@ function parse(input){
             guiHandler.shaderPrecisionParameters["Particle"] = shaderPrecisionHandler.getShaderPrecisionTextForType(shaderPrecisionHandler.types.PARTICLE);
             guiHandler.shaderPrecisionParameters["Skybox"] = shaderPrecisionHandler.getShaderPrecisionTextForType(shaderPrecisionHandler.types.SKYBOX);
             guiHandler.shaderPrecisionParameters["Text"] = shaderPrecisionHandler.getShaderPrecisionTextForType(shaderPrecisionHandler.types.TEXT);
+            guiHandler.shaderPrecisionParameters["Lightning"] = shaderPrecisionHandler.getShaderPrecisionTextForType(shaderPrecisionHandler.types.LIGHTNING);
             guiHandler.show(guiHandler.guiTypes.SHADER_PRECISION);
             terminal.printInfo(Text.GUI_OPENED);
           }else{
