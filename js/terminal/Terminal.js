@@ -709,7 +709,7 @@ Terminal.prototype.autocomplete = function(command){
 				helpString = "[Grid system names]: ";
 			break;
 			case commandDescriptor.LIGHTNING_NAME:
-				for (var lightningName in lightnings){
+				for (var lightningName in sceneHandler.getLightnings()){
 					if (lightningName.toLowerCase().startsWith(curEntry.toLowerCase())){
 						possibilities.push(lightningName);
 					}

@@ -4703,6 +4703,7 @@ function parse(input){
           if (!jobHandlerWorking){
             terminal.printInfo(Text.LIGHTNING_DESTROYED);
           }
+          sceneHandler.onLightningDeletion(lightning);
           return true;
         break;
         case 196: //printLightnings

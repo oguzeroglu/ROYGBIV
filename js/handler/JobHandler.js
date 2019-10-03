@@ -111,7 +111,7 @@ JobHandler.prototype.handle = function(previewModeCommand){
 JobHandler.prototype.handleDestroyLightningCommand = function(){
   var lightningNamePrefix = this.splitted[1].split("*")[0];
   var ctr = 0;
-  for (var lightningName in lightnings){
+  for (var lightningName in sceneHandler.getLightnings()){
     if (lightningName.startsWith(lightningNamePrefix)){
       parseCommand("destroylightning "+lightningName);
       ctr ++;

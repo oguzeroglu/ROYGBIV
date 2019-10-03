@@ -82,6 +82,7 @@ LightningCreatorGUIHandler.prototype.init = function(lightningName, isEdit){
     },
     "Done": function(){
       lightnings[lightningName] = lightningCreatorGUIHandler.lightning;
+      sceneHandler.onLightningCreation(lightnings[lightningName]);
       lightningCreatorGUIHandler.close(false, isEdit, isEdit ? Text.LIGHTNING_EDITED : Text.LIGHTNING_CREATED);
     }
   };

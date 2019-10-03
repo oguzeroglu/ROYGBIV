@@ -15,6 +15,7 @@ Scene.prototype.reset = function(){
   this.particleSystemPools = new Object();
   this.muzzleFlashes = new Object();
   this.crosshairs = new Object();
+  this.lightnings = new Object();
   this.autoInstancedObjects = new Object();
   this.areaBinHandler = new WorldBinHandler(true);
   this.dynamicObjects = new Map();
@@ -53,6 +54,9 @@ Scene.prototype.destroy = function(){
   }
   for (var muzzleFlashName in this.muzzleFlashes){
     parseCommand("destroyMuzzleFlash "+muzzleFlashName);
+  }
+  for (var lightningName in this.lightnings){
+    parseCommand("destroyLightning "+lightningName);
   }
   for (var psName in this.particleSystems){
     parseCommand("destroyParticleSystem "+psName);
@@ -129,6 +133,9 @@ Scene.prototype.import = function(exportObj){
   for (var i = 0; i<exportObj.crosshairNames.length; i++){
     this.registerCrosshair(crosshairs[exportObj.crosshairNames[i]]);
   }
+  for (var i = 0; i<exportObj.lightningNames.length; i++){
+    this.registerLightning(lightnings[exportObj.lightningNames[i]]);
+  }
   this.isSkyboxMapped = exportObj.isSkyboxMapped;
   if (this.isSkyboxMapped){
     this.mappedSkyboxName = exportObj.mappedSkyboxName;
@@ -151,6 +158,7 @@ Scene.prototype.export = function(){
   exportObj.particleSystemNames = Object.keys(this.particleSystems);
   exportObj.particleSystemPoolNames = Object.keys(this.particleSystemPools);
   exportObj.muzzleFlashNames = Object.keys(this.muzzleFlashes);
+  exportObj.lightningNames = Object.keys(this.lightnings);
   exportObj.crosshairNames = Object.keys(this.crosshairs);
   exportObj.isSkyboxMapped = this.isSkyboxMapped;
   exportObj.postProcessing = this.postProcessing;
@@ -209,6 +217,16 @@ Scene.prototype.unregisterDynamicObject = function(obj){
 
 Scene.prototype.registerAutoInstancedObject = function(autoInstancedObject){
   this.autoInstancedObjects[autoInstancedObject.name] = autoInstancedObject;
+}
+
+Scene.prototype.registerLightning = function(lightning){
+  this.lightnings[lightning.name] = lightning;
+  lightning.registeredSceneName = this.name;
+}
+
+Scene.prototype.unregisterLightning = function(lightning){
+  delete this.lightnings[lightning.name];
+  delete lightning.registeredSceneName;
 }
 
 Scene.prototype.registerCrosshair = function(crosshair){
