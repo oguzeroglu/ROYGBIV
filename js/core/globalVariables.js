@@ -1,6 +1,9 @@
 var isDeployment = false;
 var IS_WORKER_CONTEXT = false;
 
+var COS30DEG = Math.cos(30 * Math.PI / 180);
+var SIN30DEG = Math.sin(30 * Math.PI / 180);
+
 // CLI
 var terminal;
 var cliInnerDiv;

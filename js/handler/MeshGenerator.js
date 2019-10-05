@@ -285,7 +285,7 @@ MeshGenerator.prototype.generateLightning = function(lightning){
       color: new THREE.Uniform(new THREE.Color(lightning.colorName))
     }
   });
-  var mesh = new THREE.LineSegments(lightning.geometry, material);
+  var mesh = new THREE.Mesh(lightning.geometry, material);
   mesh.frustumCulled = false;
   mesh.renderOrder = renderOrders.LIGHTNING;
   material.uniforms.modelViewMatrix.value = mesh.modelViewMatrix;
