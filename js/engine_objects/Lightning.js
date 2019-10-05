@@ -212,7 +212,7 @@ Lightning.prototype.generateTree = function(node, startPoint, endPoint, displace
       var noiseX = addedNode.noises.x[addedNode.noiseIndex];
       var noiseY = addedNode.noises.y[addedNode.noiseIndex];
       var noiseZ = addedNode.noises.z[addedNode.noiseIndex];
-      middlePoint = new THREE.Vector3(
+      middlePoint = addedNode.reusableVector.set(
         ((startPoint.x + endPoint.x) / 2) + displacement * noiseX,
         ((startPoint.y + endPoint.y) / 2) + displacement * noiseY,
         ((startPoint.z + endPoint.z) / 2) + displacement * noiseZ
