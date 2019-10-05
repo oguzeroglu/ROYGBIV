@@ -713,3 +713,12 @@ function drawGridToScreen(widthParts, heightParts){
   gridMesh.frustumCulled = false;
   scene.add(gridMesh);
 }
+
+// WARNING: FOR TEST PURPOSES
+function debugPoint(point){
+  var dotGeometry = new THREE.Geometry();
+  dotGeometry.vertices.push(point);
+  var dotMaterial = new THREE.PointsMaterial({size: 5, sizeAttenuation: false});
+  var dot = new THREE.Points(dotGeometry, dotMaterial);
+  scene.add(dot);
+}
