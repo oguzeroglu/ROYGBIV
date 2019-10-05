@@ -1,4 +1,4 @@
-var Lightning = function(name, detailThreshold, maxDisplacement, count, colorName, radius){
+var Lightning = function(name, detailThreshold, maxDisplacement, count, colorName, radius, roughness){
   this.name = name;
   this.isLightning = true;
   this.detailThreshold = detailThreshold;
@@ -6,6 +6,7 @@ var Lightning = function(name, detailThreshold, maxDisplacement, count, colorNam
   this.radius = radius;
   this.count = count;
   this.colorName = colorName;
+  this.roughness = roughness;
   this.tree = new Object();
   this.renderMap = new Object();
   this.idCounter = 0;
@@ -31,7 +32,7 @@ Lightning.prototype.generateNoisesForNode = function(node){
     var radius = 2 * (Math.random() - 0.5);
     for (var i = 0; i<selectedAmount; i++){
       noises[noiseKeys[i2]].push(radius * func(alpha));
-      alpha += Math.random() / 5;
+      alpha += Math.random() * this.roughness;
     }
   }
   node.noises = noises;
@@ -40,7 +41,7 @@ Lightning.prototype.generateNoisesForNode = function(node){
 }
 
 Lightning.prototype.clone = function(){
-  var clone = new Lightning(this.name, this.detailThreshold, this.maxDisplacement, this.count, this.colorName, this.radius);
+  var clone = new Lightning(this.name, this.detailThreshold, this.maxDisplacement, this.count, this.colorName, this.radius, this.roughness);
   clone.init(this.startPoint, this.endPoint);
   return clone;
 }
@@ -52,7 +53,8 @@ Lightning.prototype.export = function(){
     maxDisplacement: this.maxDisplacement,
     count: this.count,
     colorName: this.colorName,
-    radius: this.radius
+    radius: this.radius,
+    roughness: this.roughness
   };
 }
 

@@ -33,7 +33,7 @@ LightningCreatorGUIHandler.prototype.handleMesh = function(lightningName){
   if (this.lightning){
     this.lightning.destroy();
   }
-  this.lightning = new Lightning(lightningName, 1/this.parameters["Detail"], this.parameters["Displacement"], this.parameters["Count"], this.parameters["Color"], this.parameters["Radius"]);
+  this.lightning = new Lightning(lightningName, 1/this.parameters["Detail"], this.parameters["Displacement"], this.parameters["Count"], this.parameters["Color"], this.parameters["Radius"], this.parameters["Roughness"]);
   this.lightning.init(new THREE.Vector3(0, 0, 0), new THREE.Vector3(0, 100, 0));
   this.lightning.start();
 }
@@ -67,6 +67,9 @@ LightningCreatorGUIHandler.prototype.createGUI = function(lightningName){
   guiHandler.datGuiLightningCreation.add(this.parameters, "Radius").min(0.1).max(20).step(0.1).onChange(function(val){
     lightningCreatorGUIHandler.handleMesh(lightningName);
   }).listen();
+  guiHandler.datGuiLightningCreation.add(this.parameters, "Roughness").min(0.01).max(10).step(0.01).onChange(function(val){
+    lightningCreatorGUIHandler.handleMesh(lightningName);
+  }).listen();
   guiHandler.datGuiLightningCreation.addColor(this.parameters, "Color").onChange(function(val){
     lightningCreatorGUIHandler.handleMesh(lightningName);
   }).listen();
@@ -80,6 +83,7 @@ LightningCreatorGUIHandler.prototype.init = function(lightningName, isEdit){
     "Displacement": isEdit? lightnings[lightningName].maxDisplacement: 80,
     "Count": isEdit? lightnings[lightningName].count: 1,
     "Radius": isEdit? lightnings[lightningName].radius: 5,
+    "Roughness": isEdit? lightnings[lightningName].roughness: 0.2,
     "Color": isEdit? "#" + REUSABLE_COLOR.set(lightnings[lightningName].colorName).getHexString(): "#ffffff",
     "Cancel": function(){
       lightningCreatorGUIHandler.close(true, isEdit, Text.OPERATION_CANCELLED);
