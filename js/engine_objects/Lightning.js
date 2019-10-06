@@ -103,6 +103,9 @@ Lightning.prototype.updateNodePositionInShader = function(node, isStart){
     }
   }
   this.forwardsFill.subVectors(node.endPoint, node.startPoint).normalize();
+  this.up.set(Math.random(), Math.random(), 0);
+  this.up.z = -(this.up.x * this.forwardsFill.x + this.up.y * this.forwardsFill.y) / this.forwardsFill.z;
+  this.up.normalize();
   this.side.crossVectors(this.up, this.forwardsFill).multiplyScalar(radius * COS30DEG);
   this.down.copy(this.up).multiplyScalar(-radius * SIN30DEG);
   var p = this.vPos;
