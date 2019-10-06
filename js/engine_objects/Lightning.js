@@ -20,6 +20,11 @@ var Lightning = function(name, detailThreshold, maxDisplacement, count, colorNam
   this.up = new THREE.Vector3(0, 0, 1);
 }
 
+Lightning.prototype.setCorrectionProperties = function(refDistance){
+  this.isCorrected = true;
+  this.correctionRefDistance = refDistance;
+}
+
 Lightning.prototype.generateNoisesForNode = function(node){
   var noises = {
     x: [], y: [], z: []
@@ -87,12 +92,20 @@ Lightning.prototype.updateNodePositionInShader = function(node, isStart){
   if (!isStart){
     i += 9;
   }
+  var pos = isStart ? node.startPoint : node.endPoint;
+  var radius = this.radius;
+  if (this.isCorrected){
+    var distanceFromCamera = pos.distanceTo(camera.position);
+    if (distanceFromCamera < this.correctionRefDistance){
+      var coef = distanceFromCamera / this.correctionRefDistance;
+      radius *= coef;
+    }
+  }
   this.forwardsFill.subVectors(node.endPoint, node.startPoint).normalize();
-  this.side.crossVectors(this.up, this.forwardsFill).multiplyScalar(this.radius * COS30DEG);
-  this.down.copy(this.up).multiplyScalar(-this.radius * SIN30DEG);
+  this.side.crossVectors(this.up, this.forwardsFill).multiplyScalar(radius * COS30DEG);
+  this.down.copy(this.up).multiplyScalar(-radius * SIN30DEG);
   var p = this.vPos;
   var v = this.positionBufferAttribute.array;
-  var pos = isStart ? node.startPoint : node.endPoint;
   p.copy(pos).sub(this.side).add(this.down);
   v[i++] = p.x;
   v[i++] = p.y;
@@ -101,7 +114,7 @@ Lightning.prototype.updateNodePositionInShader = function(node, isStart){
   v[i++] = p.x;
   v[i++] = p.y;
   v[i++] = p.z;
-  p.copy(this.up).multiplyScalar(this.radius).add(pos);
+  p.copy(this.up).multiplyScalar(radius).add(pos);
   v[i++] = p.x;
   v[i++] = p.y;
   v[i++] = p.z;
