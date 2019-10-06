@@ -20,9 +20,10 @@ var Lightning = function(name, detailThreshold, maxDisplacement, count, colorNam
   this.up = new THREE.Vector3(0, 0, 1);
 }
 
-Lightning.prototype.setCorrectionProperties = function(refDistance){
+Lightning.prototype.setCorrectionProperties = function(radiusCorrectionRefDistance, displacementCorrectionRefLength){
   this.isCorrected = true;
-  this.correctionRefDistance = refDistance;
+  this.correctionRefDistance = radiusCorrectionRefDistance;
+  this.correctionRefLength = displacementCorrectionRefLength;
 }
 
 Lightning.prototype.generateNoisesForNode = function(node){
@@ -145,7 +146,7 @@ Lightning.prototype.createIndices = function(vertex, indicesAry){
 Lightning.prototype.init = function(startPoint, endPoint){
   this.state = this.STATE_INIT;
   for (var i = 0; i<this.count; i++){
-    this.generateTree(this.tree, startPoint, endPoint, this.maxDisplacement);
+    this.generateTree(this.tree, startPoint, endPoint, this.maxDisplacement, this.maxDisplacement);
   }
   this.startPoint = startPoint;
   this.endPoint = endPoint;
@@ -185,8 +186,16 @@ Lightning.prototype.init = function(startPoint, endPoint){
 Lightning.prototype.update = function(){
   this.state = this.STATE_UPDATE;
   this.idCounter = 0;
+  var displacement = this.maxDisplacement;
+  if (this.isCorrected){
+    var len = this.endPoint.distanceTo(this.startPoint);
+    if (len < this.correctionRefLength){
+      var coef = len / this.correctionRefLength;
+      displacement *= coef;
+    }
+  }
   for (var i = 0; i<this.count; i++){
-    this.generateTree(this.tree, this.startPoint, this.endPoint, this.maxDisplacement);
+    this.generateTree(this.tree, this.startPoint, this.endPoint, displacement, this.maxDisplacement);
   }
   this.positionBufferAttribute.updateRange.set(0, this.positionsLen);
 }
@@ -209,11 +218,12 @@ Lightning.prototype.addSegment = function(node, startPoint, endPoint){
   return obj;
 }
 
-Lightning.prototype.generateTree = function(node, startPoint, endPoint, displacement){
+Lightning.prototype.generateTree = function(node, startPoint, endPoint, displacement, realDisplacement){
   var addedNode = this.addSegment(node, startPoint, endPoint, displacement);
   var children = addedNode.children;
-  if (displacement > this.detailThreshold){
+  if (realDisplacement > this.detailThreshold){
     displacement = displacement / 2;
+    realDisplacement = realDisplacement / 2;
     var middlePoint;
     if (this.state == this.STATE_INIT){
       middlePoint = new THREE.Vector3(
@@ -244,8 +254,8 @@ Lightning.prototype.generateTree = function(node, startPoint, endPoint, displace
         }
       }
     }
-    this.generateTree(children, startPoint, middlePoint, displacement);
-    this.generateTree(children, middlePoint, endPoint, displacement);
+    this.generateTree(children, startPoint, middlePoint, displacement, realDisplacement);
+    this.generateTree(children, middlePoint, endPoint, displacement, realDisplacement);
   }else{
     this.renderMap[addedNode.id] = addedNode;
     if (this.state == this.STATE_UPDATE){
