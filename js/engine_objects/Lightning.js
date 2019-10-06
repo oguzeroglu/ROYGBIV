@@ -26,24 +26,28 @@ Lightning.prototype.setCorrectionProperties = function(radiusCorrectionRefDistan
   this.correctionRefLength = displacementCorrectionRefLength;
 }
 
-Lightning.prototype.generateNoisesForNode = function(node){
-  var noises = {
-    x: [], y: [], z: []
-  }
-  var func = (Math.random() * 50) > 25 ? Math.sin : Math.cos;
-  var noiseKeys = ["x", "y", "z"];
-  var selectedAmount = 500 + (1000 * Math.random());
-  for (var i2 = 0; i2<3; i2++){
-    var alpha = 0;
-    var radius = 2 * (Math.random() - 0.5);
-    for (var i = 0; i<selectedAmount; i++){
-      noises[noiseKeys[i2]].push(radius * func(alpha));
-      alpha += Math.random() * this.roughness;
-    }
-  }
-  node.noises = noises;
-  node.noiseIndex = 0;
-  node.increaseNoiseIndex = true;
+Lightning.prototype.generateNoisePropertiesForNode = function(node){
+  node.noiseAlphaX = 0;
+  node.noiseAlphaY = 0;
+  node.noiseAlphaZ = 0;
+  node.noiseRadiusX = 2 * (Math.random() - 0.5);
+  node.noiseRadiusY = 2 * (Math.random() - 0.5);
+  node.noiseRadiusZ = 2 * (Math.random() - 0.5);
+  node.noiseFuncX = (Math.random() * 50) > 25 ? Math.sin : Math.cos;
+  node.noiseFuncY = (Math.random() * 50) > 25 ? Math.sin : Math.cos;
+  node.noiseFuncZ = (Math.random() * 50) > 25 ? Math.sin : Math.cos;
+}
+
+Lightning.prototype.getNoiseForNode = function(node){
+  REUSABLE_VECTOR.set(
+    node.noiseRadiusX * node.noiseFuncX(node.noiseAlphaX),
+    node.noiseRadiusY * node.noiseFuncY(node.noiseAlphaY),
+    node.noiseRadiusZ * node.noiseFuncZ(node.noiseAlphaZ)
+  );
+  node.noiseAlphaX += Math.random() * this.roughness;
+  node.noiseAlphaY += Math.random() * this.roughness;
+  node.noiseAlphaZ += Math.random() * this.roughness;
+  return REUSABLE_VECTOR;
 }
 
 Lightning.prototype.clone = function(){
@@ -211,7 +215,7 @@ Lightning.prototype.addSegment = function(node, startPoint, endPoint){
     obj.endPoint = new THREE.Vector3().copy(endPoint);
     obj.children = new Object();
     obj.reusableVector = new THREE.Vector3();
-    this.generateNoisesForNode(obj);
+    this.generateNoisePropertiesForNode(obj);
     node[this.idCounter] = obj;
   }else{
     obj.startPoint.copy(startPoint);
@@ -235,27 +239,12 @@ Lightning.prototype.generateTree = function(node, startPoint, endPoint, displace
         ((startPoint.z + endPoint.z) / 2) + displacement * (Math.random() - 0.5)
       );
     }else{
-      var noiseX = addedNode.noises.x[addedNode.noiseIndex];
-      var noiseY = addedNode.noises.y[addedNode.noiseIndex];
-      var noiseZ = addedNode.noises.z[addedNode.noiseIndex];
+      var nodeNoise = this.getNoiseForNode(addedNode);
       middlePoint = addedNode.reusableVector.set(
-        ((startPoint.x + endPoint.x) / 2) + displacement * noiseX,
-        ((startPoint.y + endPoint.y) / 2) + displacement * noiseY,
-        ((startPoint.z + endPoint.z) / 2) + displacement * noiseZ
+        ((startPoint.x + endPoint.x) / 2) + displacement * nodeNoise.x,
+        ((startPoint.y + endPoint.y) / 2) + displacement * nodeNoise.y,
+        ((startPoint.z + endPoint.z) / 2) + displacement * nodeNoise.z
       );
-      if (addedNode.increaseNoiseIndex){
-        addedNode.noiseIndex ++;
-        if (addedNode.noiseIndex == addedNode.noises.x.length){
-          addedNode.increaseNoiseIndex = false;
-          addedNode.noiseIndex = addedNode.noises.x.length - 2;
-        }
-      }else{
-        addedNode.noiseIndex --;
-        if (addedNode.noiseIndex < 0){
-          addedNode.increaseNoiseIndex = true;
-          addedNode.noiseIndex = 1;
-        }
-      }
     }
     this.generateTree(children, startPoint, middlePoint, displacement, realDisplacement);
     this.generateTree(children, middlePoint, endPoint, displacement, realDisplacement);
