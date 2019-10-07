@@ -20,6 +20,15 @@ var Lightning = function(name, detailThreshold, maxDisplacement, count, colorNam
   this.up = new THREE.Vector3(0, 0, 1);
 }
 
+Lightning.prototype.detachFromFPSWeapon = function(){
+  this.attachToFPSWeapon = false;
+}
+
+Lightning.prototype.attachToFPSWeapon = function(weaponObj, childObjName, endpoint){
+  this.fpsWeaponConfigurations = {weaponObj: weaponObj, childObjName: childObjName, endpoint: endpoint};
+  this.attachedToFPSWeapon = true;
+}
+
 Lightning.prototype.disableCorrection = function(){
   this.isCorrected = false;
 }
@@ -68,7 +77,18 @@ Lightning.prototype.export = function(){
     count: this.count,
     colorName: this.colorName,
     radius: this.radius,
-    roughness: this.roughness
+    roughness: this.roughness,
+    correctionProperties: {
+      isCorrected: this.isCorrected,
+      correctionRefDistance: this.correctionRefDistance,
+      correctionRefLength: this.correctionRefLength
+    },
+    fpsWeaponConfigurations: {
+      attachedToFPSWeapon: this.attachedToFPSWeapon,
+      weaponObjName: this.fpsWeaponConfigurations.weaponObj.name,
+      childObjName: this.fpsWeaponConfigurations.childObjName,
+      endPoint: this.fpsWeaponConfigurations.endpoint
+    }
   };
 }
 
@@ -79,8 +99,10 @@ Lightning.prototype.destroy = function(){
 }
 
 Lightning.prototype.start = function(startPoint, endPoint){
-  if (startPoint && endPoint){
+  if (!(mode == 1 && this.attachToFPSWeapon) && startPoint && endPoint){
     this.startPoint.copy(startPoint);
+    this.endPoint.copy(endPoint);
+  }else if (mode == 1 && this.attachToFPSWeapon){
     this.endPoint.copy(endPoint);
   }
   if (mode == 1){
@@ -194,7 +216,20 @@ Lightning.prototype.init = function(startPoint, endPoint){
   }
 }
 
+Lightning.prototype.handleFPSWeaponStartPosition = function(){
+  var position
+  if (this.fpsWeaponConfigurations.weaponObj.isAddedObject){
+    position = this.fpsWeaponConfigurations.weaponObj.getEndPoint(this.fpsWeaponConfigurations.endpoint);
+  }else{
+    position = this.fpsWeaponConfigurations.weaponObj.group[this.fpsWeaponConfigurations.childObjName].getEndPoint(this.fpsWeaponConfigurations.endpoint);
+  }
+  this.startPoint.copy(position);
+}
+
 Lightning.prototype.update = function(){
+  if (mode == 1 && this.attachToFPSWeapon){
+    this.handleFPSWeaponStartPosition();
+  }
   this.state = this.STATE_UPDATE;
   this.idCounter = 0;
   var displacement = this.maxDisplacement;

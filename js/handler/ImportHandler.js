@@ -1238,7 +1238,22 @@ ImportHandler.prototype.importCrosshairs = function(obj){
 ImportHandler.prototype.importLightnings = function(obj){
   for (var lightningName in obj.lightnings){
     var curExport = obj.lightnings[lightningName];
-    lightnings[lightningName] = new Lightning(lightningName, curExport.detailThreshold, curExport.maxDisplacement, curExport.count, curExport.colorName, curExport.radius, curExport.roughness);
-    lightnings[lightningName].init(new THREE.Vector3(0, 0, 0), new THREE.Vector3(0, 100, 0));
+    var lightning = new Lightning(lightningName, curExport.detailThreshold, curExport.maxDisplacement, curExport.count, curExport.colorName, curExport.radius, curExport.roughness);
+    lightning.init(new THREE.Vector3(0, 0, 0), new THREE.Vector3(0, 100, 0));
+    if (curExport.correctionProperties && curExport.correctionProperties.isCorrected){
+      lightning.setCorrectionProperties(curExport.correctionProperties.correctionRefDistance, curExport.correctionProperties.correctionRefLength);
+    }else{
+      lightning.disableCorrection();
+    }
+    if (curExport.fpsWeaponConfigurations && curExport.fpsWeaponConfigurations.attachedToFPSWeapon){
+      if (curExport.fpsWeaponConfigurations.childObjName){
+        lightning.attachToFPSWeapon(objectGroups[curExport.fpsWeaponConfigurations.weaponObjName], curExport.fpsWeaponConfigurations.childObjName, curExport.fpsWeaponConfigurations.endPoint);
+      }else{
+        lightning.attachToFPSWeapon(addedObjects[curExport.fpsWeaponConfigurations.weaponObjName], null, curExport.fpsWeaponConfigurations.endPoint);
+      }
+    }else{
+      lightning.detachFromFPSWeapon();
+    }
+    lightnings[lightningName] = lightning;
   }
 }
