@@ -596,6 +596,11 @@ function parse(input){
             objectGroup.destroy(true);
             delete objectGroups[objectName];
           }
+          for (var lightningName in lightnings){
+            if (lightnings[lightningName].attachToFPSWeapon && lightnings[lightningName].fpsWeaponConfigurations.weaponObj.name == objectName){
+              lightnings[lightningName].detachFromFPSWeapon();
+            }
+          }
           if (areaConfigurationsVisible){
             guiHandler.hide(guiHandler.guiTypes.AREA);
           }

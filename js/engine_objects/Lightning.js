@@ -21,7 +21,7 @@ var Lightning = function(name, detailThreshold, maxDisplacement, count, colorNam
 }
 
 Lightning.prototype.detachFromFPSWeapon = function(){
-  this.attachToFPSWeapon = false;
+  this.attachedToFPSWeapon = false;
 }
 
 Lightning.prototype.attachToFPSWeapon = function(weaponObj, childObjName, endpoint){
@@ -99,10 +99,10 @@ Lightning.prototype.destroy = function(){
 }
 
 Lightning.prototype.start = function(startPoint, endPoint){
-  if (!(mode == 1 && this.attachToFPSWeapon) && startPoint && endPoint){
+  if (!(mode == 1 && this.attachedToFPSWeapon) && startPoint && endPoint){
     this.startPoint.copy(startPoint);
     this.endPoint.copy(endPoint);
-  }else if (mode == 1 && this.attachToFPSWeapon){
+  }else if (mode == 1 && this.attachedToFPSWeapon){
     this.endPoint.copy(endPoint);
   }
   if (mode == 1){
@@ -227,7 +227,7 @@ Lightning.prototype.handleFPSWeaponStartPosition = function(){
 }
 
 Lightning.prototype.update = function(){
-  if (mode == 1 && this.attachToFPSWeapon){
+  if (mode == 1 && this.attachedToFPSWeapon){
     this.handleFPSWeaponStartPosition();
   }
   this.state = this.STATE_UPDATE;

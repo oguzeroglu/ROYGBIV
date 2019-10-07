@@ -989,6 +989,11 @@ GUIHandler.prototype.initializeObjectManipulationGUI = function(){
       guiHandler.objectManipulationParameters["Has mass"] = true;
       guiHandler.objectManipulationParameters["Changeable"] = false;
       guiHandler.objectManipulationParameters["Intersectable"] = true;
+      for (var lightningName in lightnings){
+        if (lightnings[lightningName].attachToFPSWeapon && lightnings[lightningName].fpsWeaponConfigurations.weaponObj.name == selectionHandler.getSelectedObject().name){
+          lightnings[lightningName].detachFromFPSWeapon();
+        }
+      }
     }
     if (physicsDebugMode){
       debugRenderer.refresh();
