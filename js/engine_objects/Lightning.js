@@ -20,6 +20,10 @@ var Lightning = function(name, detailThreshold, maxDisplacement, count, colorNam
   this.up = new THREE.Vector3(0, 0, 1);
 }
 
+Lightning.prototype.disableCorrection = function(){
+  this.isCorrected = false;
+}
+
 Lightning.prototype.setCorrectionProperties = function(radiusCorrectionRefDistance, displacementCorrectionRefLength){
   this.isCorrected = true;
   this.correctionRefDistance = radiusCorrectionRefDistance;
