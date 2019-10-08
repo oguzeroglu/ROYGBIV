@@ -87,6 +87,15 @@ FPSWeaponGUIHandler.prototype.init = function(){
     "RotateY": "",
     "RotateZ": ""
   }
+  this.lightningParameters = {
+    "Lightning": "",
+    "Has lightning": false,
+    "Child obj": "",
+    "Endpoint": "+x",
+    "Ref distance": 40,
+    "Ref length": 200,
+    "Test length": 100
+  }
 }
 
 FPSWeaponGUIHandler.prototype.show = function(obj){
@@ -324,6 +333,13 @@ FPSWeaponGUIHandler.prototype.prepareGUI = function(){
       muzzleFlashAry.push(muzzleFlashName);
     }
   }
+  var lightningAry = [];
+  for (var lightningName in sceneHandler.getLightnings()){
+    var isUsed = (lightnings[lightningName].attachedToFPSWeapon && lightnings[lightningName].fpsWeaponConfigurations.weaponObj.name != fpsWeaponGUIHandler.fpsWeaponAlignmentConfigurationObject.name);
+    if (!isUsed){
+      lightningAry.push(lightningName);
+    }
+  }
   var muzzleFlashFolder = guiHandler.datGuiFPSWeaponAlignment.addFolder("Muzzle flash");
   var hasMuzzleFlashController = muzzleFlashFolder.add(this.muzzleFlashParameters, "Has muz. flash").onChange(function(val){
     if (muzzleFlashAry.length == 0){
@@ -455,6 +471,88 @@ FPSWeaponGUIHandler.prototype.prepareGUI = function(){
       guiHandler.disableController(muzzleFlashChildObjectController);
     }
   }
+  var lightningFolder = guiHandler.datGuiFPSWeaponAlignment.addFolder("Lightning");
+  var handleLightning = function(){
+    var obj = fpsWeaponGUIHandler.fpsWeaponAlignmentConfigurationObject;
+    var childObjName = null;
+    if (obj.isObjectGroup){
+      childObjName = fpsWeaponGUIHandler.lightningParameters["Child obj"];
+    }
+    var lightning = lightnings[fpsWeaponGUIHandler.lightningParameters["Lightning"]];
+    lightning.setCorrectionProperties(fpsWeaponGUIHandler.lightningParameters["Ref distance"], fpsWeaponGUIHandler.lightningParameters["Ref length"]);
+    lightning.attachToFPSWeapon(obj, childObjName, fpsWeaponGUIHandler.lightningParameters["Endpoint"]);
+    lightning.handleFPSWeaponStartPosition();
+    lightning.handleFPSWeaponEndPoint(fpsWeaponGUIHandler.lightningParameters["Test length"]);
+    lightning.mesh.visible = true;
+    fpsWeaponGUIHandler.lightning = lightning;
+  }
+  var hasLightningController = lightningFolder.add(this.lightningParameters, "Has lightning").onChange(function(val){
+    if (lightningAry.length == 0){
+      fpsWeaponGUIHandler.lightningParameters["Has lightning"] = false;
+      return;
+    }
+    if (val){
+      handleLightning();
+    }else{
+      fpsWeaponGUIHandler.lightning.mesh.visible = false;
+      fpsWeaponGUIHandler.lightning.detachFromFPSWeapon();
+      delete fpsWeaponGUIHandler.lightning;
+    }
+  }).listen();
+  var lightningNameController = lightningFolder.add(this.lightningParameters, "Lightning", lightningAry).onChange(function(val){
+    if (fpsWeaponGUIHandler.lightning){
+      fpsWeaponGUIHandler.lightning.mesh.visible = false;
+      fpsWeaponGUIHandler.lightning.detachFromFPSWeapon();
+      handleLightning();
+    }
+  }).listen();
+  var lightningChildObjController;
+  if (this.fpsWeaponAlignmentConfigurationObject.isObjectGroup){
+    var childObjNames = [];
+    for (var objName in this.fpsWeaponAlignmentConfigurationObject.group){
+      childObjNames.push(objName);
+      if (this.lightningParameters["Child obj"] == ""){
+        this.lightningParameters["Child obj"] = objName;
+      }
+    }
+    lightningChildObjController = lightningFolder.add(this.lightningParameters, "Child obj", childObjNames).onChange(function(val){
+
+    }).listen();
+  }
+  var lightningEndPointController = lightningFolder.add(this.lightningParameters, "Endpoint", this.endPoints).onChange(function(val){
+    if (fpsWeaponGUIHandler.lightning){
+      fpsWeaponGUIHandler.lightning.fpsWeaponConfigurations.endpoint = val;
+      fpsWeaponGUIHandler.lightning.handleFPSWeaponStartPosition();
+      fpsWeaponGUIHandler.lightning.handleFPSWeaponEndPoint(fpsWeaponGUIHandler.lightningParameters["Test length"]);
+    }
+  }).listen();
+  var lightningRefDistanceController = lightningFolder.add(this.lightningParameters, "Ref distance").min(0).max(500).step(0.1).onChange(function(val){
+    if (fpsWeaponGUIHandler.lightning){
+      fpsWeaponGUIHandler.lightning.setCorrectionProperties(val, fpsWeaponGUIHandler.lightningParameters["Ref length"]);
+    }
+  }).listen();
+  var lightningRefLengthController = lightningFolder.add(this.lightningParameters, "Ref length").min(0).max(500).step(0.1).onChange(function(val){
+    if (fpsWeaponGUIHandler.lightning){
+      fpsWeaponGUIHandler.lightning.setCorrectionProperties(fpsWeaponGUIHandler.lightningParameters["Ref distance"], val);
+    }
+  }).listen();
+  var lightningTestLengthController = lightningFolder.add(this.lightningParameters, "Test length").min(1).max(1000).step(1).onChange(function(val){
+    if (fpsWeaponGUIHandler.lightning){
+      fpsWeaponGUIHandler.lightning.handleFPSWeaponEndPoint(val);
+    }
+  }).listen();
+  if (lightningAry.length == 0){
+    guiHandler.disableController(hasLightningController);
+    guiHandler.disableController(lightningEndPointController);
+    guiHandler.disableController(lightningRefDistanceController);
+    guiHandler.disableController(lightningRefLengthController);
+    guiHandler.disableController(lightningTestLengthController);
+    if (lightningChildObjController){
+      guiHandler.disableController(lightningChildObjController);
+    }
+  }else{
+    this.lightningParameters["Lightning"] = lightningAry[0];
+  }
   guiHandler.datGuiFPSWeaponAlignment.add(this.fpsWeaponAlignmentParameters, "Load from", otherWeaponsArray).onChange(function(val){
     var obj = addedObjects[val] || objectGroups[val];
     for (var key in obj.fpsWeaponAlignment){
@@ -476,5 +574,8 @@ FPSWeaponGUIHandler.prototype.prepareGUI = function(){
 FPSWeaponGUIHandler.prototype.update = function(){
   if (this.muzzleFlash){
     this.muzzleFlash.update();
+  }
+  if (this.lightning){
+    this.lightning.update();
   }
 }

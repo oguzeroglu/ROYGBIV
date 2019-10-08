@@ -350,6 +350,14 @@ var plusZ = "+z";
 var minusX = "-x";
 var minusY = "-y";
 var minusZ = "-z";
+var endpointInverses = {
+  "+x": "-x",
+  "+y": "-y",
+  "+z": "-z",
+  "-x": "+x",
+  "-y": "+y",
+  "-z": "+z"
+};
 var activeMuzzleFlashes = new Map();
 var activeLightnings = new Map();
 var delayedExecutionHandler;

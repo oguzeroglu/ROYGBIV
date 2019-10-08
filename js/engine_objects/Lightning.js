@@ -29,6 +29,31 @@ Lightning.prototype.attachToFPSWeapon = function(weaponObj, childObjName, endpoi
   this.attachedToFPSWeapon = true;
 }
 
+Lightning.prototype.handleFPSWeaponEndPoint = function(distance){
+  var otherEndPoint = this.getObjEndPoint(endpointInverses[this.fpsWeaponConfigurations.endpoint]);
+  var oepX = otherEndPoint.x, oepY = otherEndPoint.y, oepZ = otherEndPoint.z;
+  var endPoint = this.getObjEndPoint(this.fpsWeaponConfigurations.endPoint);
+  var epX = endPoint.x, epY = endPoint.y, epZ = endPoint.z;
+  REUSABLE_VECTOR.set(epX - oepX, epY - oepY, epZ - oepZ);
+  REUSABLE_VECTOR.normalize();
+  REUSABLE_VECTOR.multiplyScalar(distance);
+  this.endPoint.set(REUSABLE_VECTOR.x + epX, REUSABLE_VECTOR.y + epY, REUSABLE_VECTOR.z + epZ);
+}
+
+Lightning.prototype.getObjEndPoint = function(endPoint){
+  var position
+  if (this.fpsWeaponConfigurations.weaponObj.isAddedObject){
+    position = this.fpsWeaponConfigurations.weaponObj.getEndPoint(endPoint);
+  }else{
+    position = this.fpsWeaponConfigurations.weaponObj.group[this.fpsWeaponConfigurations.childObjName].getEndPoint(endPoint);
+  }
+  return position;
+}
+
+Lightning.prototype.handleFPSWeaponStartPosition = function(){
+  this.startPoint.copy(this.getObjEndPoint(this.fpsWeaponConfigurations.endpoint));
+}
+
 Lightning.prototype.disableCorrection = function(){
   this.isCorrected = false;
 }
@@ -85,9 +110,9 @@ Lightning.prototype.export = function(){
     },
     fpsWeaponConfigurations: {
       attachedToFPSWeapon: this.attachedToFPSWeapon,
-      weaponObjName: this.fpsWeaponConfigurations.weaponObj.name,
-      childObjName: this.fpsWeaponConfigurations.childObjName,
-      endPoint: this.fpsWeaponConfigurations.endpoint
+      weaponObjName: this.attachedToFPSWeapon? this.fpsWeaponConfigurations.weaponObj.name: null,
+      childObjName: this.attachedToFPSWeapon? this.fpsWeaponConfigurations.childObjName: null,
+      endPoint: this.attachedToFPSWeapon? this.fpsWeaponConfigurations.endpoint: null
     }
   };
 }
@@ -214,16 +239,6 @@ Lightning.prototype.init = function(startPoint, endPoint){
     this.updateNodePositionInShader(this.renderMap[id], true);
     this.updateNodePositionInShader(this.renderMap[id], false);
   }
-}
-
-Lightning.prototype.handleFPSWeaponStartPosition = function(){
-  var position
-  if (this.fpsWeaponConfigurations.weaponObj.isAddedObject){
-    position = this.fpsWeaponConfigurations.weaponObj.getEndPoint(this.fpsWeaponConfigurations.endpoint);
-  }else{
-    position = this.fpsWeaponConfigurations.weaponObj.group[this.fpsWeaponConfigurations.childObjName].getEndPoint(this.fpsWeaponConfigurations.endpoint);
-  }
-  this.startPoint.copy(position);
 }
 
 Lightning.prototype.update = function(){
