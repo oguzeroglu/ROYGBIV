@@ -38,15 +38,21 @@ LightningCreatorGUIHandler.prototype.handleMesh = function(lightningName){
     prevCorrectionRefDistance = this.lightning.correctionRefDistance;
     prevCorrectionRefLength = this.lightning.correctionRefLength;
     this.lightning.destroy();
+  }else if (lightnings[lightningName]){
+    prevAttachedToFPSWeapon = lightnings[lightningName].attachedToFPSWeapon;
+    prevFPSWeaponConfigurations = lightnings[lightningName].fpsWeaponConfigurations;
+    prevIsCorrected = lightnings[lightningName].isCorrected;
+    prevCorrectionRefDistance = lightnings[lightningName].correctionRefDistance;
+    prevCorrectionRefLength = lightnings[lightningName].correctionRefLength;
   }
   this.lightning = new Lightning(lightningName, 1/this.parameters["Detail"], this.parameters["Displacement"], this.parameters["Count"], this.parameters["Color"], this.parameters["Radius"], this.parameters["Roughness"]);
   this.lightning.init(new THREE.Vector3(0, 0, 0), new THREE.Vector3(0, 100, 0));
   if (prevAttachedToFPSWeapon){
-    lightning.attachedToFPSWeapon = true;
-    lightning.fpsWeaponConfigurations = prevFPSWeaponConfigurations;
+    this.lightning.attachedToFPSWeapon = true;
+    this.lightning.fpsWeaponConfigurations = prevFPSWeaponConfigurations;
   }
   if (prevIsCorrected){
-    lightning.setCorrectionProperties(prevCorrectionRefDistance, prevCorrectionRefLength);
+    this.lightning.setCorrectionProperties(prevCorrectionRefDistance, prevCorrectionRefLength);
   }
   this.lightning.start();
 }
