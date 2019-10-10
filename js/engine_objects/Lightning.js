@@ -90,6 +90,13 @@ Lightning.prototype.getNoiseForNode = function(node){
 
 Lightning.prototype.clone = function(){
   var clone = new Lightning(this.name, this.detailThreshold, this.maxDisplacement, this.count, this.colorName, this.radius, this.roughness);
+  if (this.attachedToFPSWeapon){
+    clone.attachedToFPSWeapon = true;
+    clone.fpsWeaponConfigurations = this.fpsWeaponConfigurations;
+  }
+  if (this.isCorrected){
+    clone.setCorrectionProperties(this.correctionRefDistance, this.correctionRefLength);
+  }
   clone.init(this.startPoint, this.endPoint);
   return clone;
 }

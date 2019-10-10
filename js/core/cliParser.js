@@ -597,7 +597,7 @@ function parse(input){
             delete objectGroups[objectName];
           }
           for (var lightningName in lightnings){
-            if (lightnings[lightningName].attachToFPSWeapon && lightnings[lightningName].fpsWeaponConfigurations.weaponObj.name == objectName){
+            if (lightnings[lightningName].attachedToFPSWeapon && lightnings[lightningName].fpsWeaponConfigurations.weaponObj.name == objectName){
               lightnings[lightningName].detachFromFPSWeapon();
             }
           }
@@ -1998,6 +1998,11 @@ function parse(input){
               sceneHandler.onObjectGroupDeletion(gluedObject);
               gluedObject.detach();
               delete objectGroups[gluedObject.name];
+              for (var lightningName in lightnings){
+                if (lightnings[lightningName].attachedToFPSWeapon && lightnings[lightningName].fpsWeaponConfigurations.weaponObj.name == gluedObject.name){
+                  lightnings[lightningName].detachFromFPSWeapon();
+                }
+              }
             }
             if (materialUsed == 1){
               objectGroup.isBasicMaterial = true;
@@ -2007,6 +2012,11 @@ function parse(input){
             objectGroups[groupName] = objectGroup;
             for (var childObjName in objectGroup.group){
               sceneHandler.onAddedObjectDeletion(objectGroup.group[childObjName]);
+              for (var lightningName in lightnings){
+                if (lightnings[lightningName].attachedToFPSWeapon && lightnings[lightningName].fpsWeaponConfigurations.weaponObj.name == childObjName){
+                  lightnings[lightningName].detachFromFPSWeapon();
+                }
+              }
             }
             guiHandler.hide(guiHandler.guiTypes.OBJECT);
             if (areaConfigurationsVisible){
@@ -2048,6 +2058,11 @@ function parse(input){
           selectionHandler.resetCurrentSelection();
           if (areaConfigurationsVisible){
             guiHandler.hide(guiHandler.guiTypes.AREA);
+          }
+          for (var lightningName in lightnings){
+            if (lightnings[lightningName].attachedToFPSWeapon && lightnings[lightningName].fpsWeaponConfigurations.weaponObj.name == name){
+              lightnings[lightningName].detachFromFPSWeapon();
+            }
           }
           if (!jobHandlerWorking){
             refreshRaycaster(Text.OBJECT_DETACHED);

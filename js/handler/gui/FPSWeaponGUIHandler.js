@@ -66,6 +66,10 @@ FPSWeaponGUIHandler.prototype.init = function(){
         fpsWeaponGUIHandler.muzzleFlash = 0;
         particleSystems = new Map();
       }
+      if (fpsWeaponGUIHandler.lightning){
+        fpsWeaponGUIHandler.lightning.mesh.visible = false;
+        delete fpsWeaponGUIHandler.lightning;
+      }
       guiHandler.hide(guiHandler.guiTypes.FPS_WEAPON_ALIGNMENT);
       terminal.clear();
       terminal.printInfo(Text.DONE);
