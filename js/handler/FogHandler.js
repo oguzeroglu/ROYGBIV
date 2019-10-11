@@ -86,6 +86,9 @@ FogHandler.prototype.setFogToObjects = function(){
   for (var objTrailName in objectTrails){
     objectTrails[objTrailName].setFog();
   }
+  for (var lightningName in lightnings){
+    lightnings[lightningName].setFog();
+  }
 }
 
 FogHandler.prototype.removeFogFromObjects = function(){
@@ -103,6 +106,9 @@ FogHandler.prototype.removeFogFromObjects = function(){
   }
   for (var objTrailName in objectTrails){
     objectTrails[objTrailName].removeFog();
+  }
+  for (var lightningName in lightnings){
+    lightnings[lightningName].removeFog();
   }
 }
 
