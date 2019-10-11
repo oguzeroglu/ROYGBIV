@@ -179,7 +179,7 @@ MeshGenerator.prototype.generateBasicMesh = function(){
     fragmentShader: ShaderContent.basicMaterialFragmentShader,
     transparent: true,
     side: THREE.DoubleSide,
-    uniforms:{
+    uniforms: {
       projectionMatrix: GLOBAL_PROJECTION_UNIFORM,
       modelViewMatrix: new THREE.Uniform(new THREE.Matrix4()),
       color: new THREE.Uniform(this.material.color),
@@ -269,6 +269,26 @@ MeshGenerator.prototype.generateParticleSystemMesh = function(ps, texture, noTar
   mesh.renderOrder = renderOrders.PARTICLE_SYSTEM;
   mesh.position.set(ps.x, ps.y, ps.z);
   mesh.frustumCulled = false;
+  mesh.visible = false;
+  return mesh;
+}
+
+MeshGenerator.prototype.generateLightning = function(lightning){
+  var material = new THREE.RawShaderMaterial({
+    vertexShader: ShaderContent.lightningVertexShader,
+    fragmentShader: ShaderContent.lightningFragmentShader,
+    transparent: false,
+    side: THREE.DoubleSide,
+    uniforms: {
+      projectionMatrix: GLOBAL_PROJECTION_UNIFORM,
+      modelViewMatrix: new THREE.Uniform(new THREE.Matrix4()),
+      color: new THREE.Uniform(new THREE.Color(lightning.colorName))
+    }
+  });
+  var mesh = new THREE.Mesh(lightning.geometry, material);
+  mesh.frustumCulled = false;
+  mesh.renderOrder = renderOrders.LIGHTNING;
+  material.uniforms.modelViewMatrix.value = mesh.modelViewMatrix;
   mesh.visible = false;
   return mesh;
 }

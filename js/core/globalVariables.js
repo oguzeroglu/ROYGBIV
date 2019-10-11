@@ -1,6 +1,9 @@
 var isDeployment = false;
 var IS_WORKER_CONTEXT = false;
 
+var COS30DEG = Math.cos(30 * Math.PI / 180);
+var SIN30DEG = Math.sin(30 * Math.PI / 180);
+
 // CLI
 var terminal;
 var cliInnerDiv;
@@ -146,6 +149,7 @@ var MIN_CELLSIZE_ALLOWED = 5;
 var THREE_AXIS_VECTOR_X = new THREE.Vector3(1, 0, 0);
 var THREE_AXIS_VECTOR_Y = new THREE.Vector3(0, 1, 0);
 var THREE_AXIS_VECTOR_Z = new THREE.Vector3(0, 0, 1);
+var ALL_AXES = [THREE_AXIS_VECTOR_X, THREE_AXIS_VECTOR_Y, THREE_AXIS_VECTOR_Z];
 var CANNON_AXIS_VECTOR_X = new CANNON.Vec3(1, 0, 0);
 var CANNON_AXIS_VECTOR_Y = new CANNON.Vec3(0, 1, 0);
 var CANNON_AXIS_VECTOR_Z = new CANNON.Vec3(0, 0, 1);
@@ -325,6 +329,7 @@ var fontCreatorGUIHandler;
 var crosshairCreatorGUIHandler;
 var scriptsGUIHandler;
 var animationCreatorGUIHandler;
+var lightningCreatorGUIHandler;
 var skyboxHandler;
 var fogHandler;
 var scriptsHandler;
@@ -345,13 +350,23 @@ var plusZ = "+z";
 var minusX = "-x";
 var minusY = "-y";
 var minusZ = "-z";
+var endpointInverses = {
+  "+x": "-x",
+  "+y": "-y",
+  "+z": "-z",
+  "-x": "+x",
+  "-y": "+y",
+  "-z": "+z"
+};
 var activeMuzzleFlashes = new Map();
+var activeLightnings = new Map();
 var delayedExecutionHandler;
 var sceneHandler;
 var ANIMATION_STATE_NOT_RUNNING = 0;
 var ANIMATION_STATE_RUNNING = 1;
 var ANIMATION_STATE_FROZEN = 2;
 var ANIMATION_STATE_REWINDING = 3;
+var lightnings = new Object();
 
 // RENDER ORDERS
 var renderOrders = {
@@ -366,6 +381,7 @@ var renderOrders = {
   GRID_SYSTEM_REPRESENTATION: 10,
   OBJECT: 10,
   TEXT_3D: 10,
+  LIGHTNING: 10,
   TEXT_2D: 50,
   CROSSHAIR: 60,
   OBJECT_TRAIL: 100

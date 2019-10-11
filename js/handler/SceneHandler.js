@@ -190,6 +190,10 @@ SceneHandler.prototype.hideAll = function(){
       var ps = particleSystemPool[psName];
       ps.hide();
     }
+    for (var lightningName in lightnings){
+      var lightning = lightnings[lightningName];
+      lightning.stop();
+    }
   }
 }
 
@@ -313,6 +317,14 @@ SceneHandler.prototype.createScene = function(sceneName){
 
 SceneHandler.prototype.onAutoInstancedObjectCreation = function(autoInstancedObject){
   this.scenes[autoInstancedObject.getRegisteredSceneName()].registerAutoInstancedObject(autoInstancedObject);
+}
+
+SceneHandler.prototype.onLightningCreation = function(lightning){
+  this.scenes[this.activeSceneName].registerLightning(lightning);
+}
+
+SceneHandler.prototype.onLightningDeletion = function(lightning){
+  this.scenes[lightning.registeredSceneName].unregisterLightning(lightning);
 }
 
 SceneHandler.prototype.onCrosshairCreation = function(crosshair){
@@ -510,4 +522,8 @@ SceneHandler.prototype.getClickableAddedTexts2D = function(){
 
 SceneHandler.prototype.getTrackingObjects = function(){
   return this.scenes[this.activeSceneName].trackingObjects;
+}
+
+SceneHandler.prototype.getLightnings = function(){
+  return this.scenes[this.activeSceneName].lightnings;
 }

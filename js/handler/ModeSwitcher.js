@@ -130,6 +130,7 @@ ModeSwitcher.prototype.switchFromDesignToPreview = function(){
   dynamicObjects = new Map();
   dynamicObjectGroups = new Map();
   activeMuzzleFlashes = new Map();
+  activeLightnings = new Map();
   for (var objectName in objectGroups){
     var object = objectGroups[objectName];
     object.mesh.remove(axesHelper);
@@ -251,6 +252,9 @@ ModeSwitcher.prototype.switchFromPreviewToDesign = function(){
   fpsHandler.reset();
   pointerLockRequested = false;
   fullScreenRequested = false;
+  for (var lightningName in lightnings){
+    lightnings[lightningName].stop();
+  }
   for (var gsName in gridSystems){
     scene.add(gridSystems[gsName].gridSystemRepresentation);
     scene.add(gridSystems[gsName].boundingPlane);
@@ -404,6 +408,8 @@ ModeSwitcher.prototype.switchFromPreviewToDesign = function(){
       canvas.style.visibility = "";
       terminal.printInfo(Text.SWITCHED_TO_DESIGN_MODE);
     }
+  }else if (!isDeployment){
+    terminal.printInfo(Text.SWITCHED_TO_DESIGN_MODE);
   }
   renderer.setPixelRatio(screenResolution);
 }

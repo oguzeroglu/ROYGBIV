@@ -34,6 +34,7 @@ function render(){
     cpuOperationsHandler.updateCrosshair();
     cpuOperationsHandler.handleObjectMouseEvents();
     cpuOperationsHandler.handleActiveMuzzleFlashes();
+    cpuOperationsHandler.handleActiveLightnings();
     delayedExecutionHandler.tick();
   }else{
     if (!isDeployment){
@@ -41,6 +42,7 @@ function render(){
       muzzleFlashCreatorGUIHandler.update();
       fpsWeaponGUIHandler.update();
       animationCreatorGUIHandler.update();
+      lightningCreatorGUIHandler.update();
     }
     cameraOperationsDone = false;
   }
@@ -120,6 +122,14 @@ function muzzleFlashesUpdateFunction(muzzleFlash, muzzleFlashName){
 
 function handleActiveMuzzleFlashes(){
   activeMuzzleFlashes.forEach(muzzleFlashesUpdateFunction);
+}
+
+function lightningUpdateFunction(lightning, lightningName){
+  lightning.update();
+}
+
+function handleActiveLightnings(){
+  activeLightnings.forEach(lightningUpdateFunction);
 }
 
 function objectTrailsUpdateFunction(objectTrail, objName){

@@ -157,6 +157,11 @@ var State = function(projectName, author){
   for (var crosshairName in crosshairs){
     this.crosshairs[crosshairName] = crosshairs[crosshairName].export();
   }
+  // LIGHTNINGS ****************************************************
+  this.lightnings = new Object();
+  for (var lightningName in lightnings){
+    this.lightnings[lightningName] = lightnings[lightningName].export();
+  }
   // SCENES ********************************************************
   this.scenes = sceneHandler.export();
 }

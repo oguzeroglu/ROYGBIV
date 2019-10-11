@@ -75,6 +75,7 @@ var GUIHandler = function(){
     "Particle": "low",
     "Skybox": "low",
     "Text": "low",
+    "Lightning": "low",
     "Done": function(){
       guiHandler.hide(guiHandler.guiTypes.SHADER_PRECISION);
       terminal.clear();
@@ -93,12 +94,13 @@ var GUIHandler = function(){
   this.guiTypes = {
     TEXT: 0, OBJECT: 1, BLOOM: 2, FPS_WEAPON_ALIGNMENT: 3, SHADER_PRECISION: 4, PARTICLE_SYSTEM: 5,
     WORKER_STATUS: 6, MUZZLE_FLASH: 7, TEXTURE_PACK: 8, SKYBOX_CREATION: 9, FOG: 10, FONT: 11,
-    CROSSHAIR_CREATION: 12, SCRIPTS: 13, ANIMATION_CREATION: 14, AREA: 15
+    CROSSHAIR_CREATION: 12, SCRIPTS: 13, ANIMATION_CREATION: 14, AREA: 15, LIGHTNING: 16
   };
   this.blockingGUITypes = [
     this.guiTypes.FPS_WEAPON_ALIGNMENT, this.guiTypes.PARTICLE_SYSTEM, this.guiTypes.MUZZLE_FLASH,
     this.guiTypes.TEXTURE_PACK, this.guiTypes.SKYBOX_CREATION, this.guiTypes.FOG, this.guiTypes.FONT,
-    this.guiTypes.CROSSHAIR_CREATION, this.guiTypes.SCRIPTS, this.guiTypes.ANIMATION_CREATION
+    this.guiTypes.CROSSHAIR_CREATION, this.guiTypes.SCRIPTS, this.guiTypes.ANIMATION_CREATION,
+    this.guiTypes.LIGHTNING
   ];
 }
 
@@ -152,6 +154,11 @@ GUIHandler.prototype.isOneOfBlockingGUIActive = function(){
       break;
       case this.guiTypes.ANIMATION_CREATION:
         if (this.datGuiAnimationCreation){
+          return true;
+        }
+      break;
+      case this.guiTypes.LIGHTNING:
+        if (this.datGuiLightningCreation){
           return true;
         }
       break;
@@ -708,6 +715,12 @@ GUIHandler.prototype.hide = function(guiType){
         this.datGuiAnimationCreation = 0;
       }
     return;
+    case this.guiTypes.LIGHTNING:
+      if (this.datGuiLightningCreation){
+        this.destroyGUI(this.datGuiLightningCreation);
+        this.datGuiLightningCreation = 0;
+      }
+    return;
   }
   throw new Error("Unknown guiType.");
 }
@@ -790,6 +803,11 @@ GUIHandler.prototype.initializeShaderPrecisionGUI = function(){
   }).listen();
   guiHandler.datGuiShaderPrecision.add(guiHandler.shaderPrecisionParameters, "Text", ["low", "medium", "high"]).onChange(function(val){
     shaderPrecisionHandler.setShaderPrecisionForType(shaderPrecisionHandler.types.TEXT, guiHandler.getPrecisionType(val));
+    terminal.clear();
+    terminal.printInfo(Text.SHADER_PRECISION_ADJUSTED);
+  }).listen();
+  guiHandler.datGuiShaderPrecision.add(guiHandler.shaderPrecisionParameters, "Lightning", ["low", "medium", "high"]).onChange(function(val){
+    shaderPrecisionHandler.setShaderPrecisionForType(shaderPrecisionHandler.types.LIGHTNING, guiHandler.getPrecisionType(val));
     terminal.clear();
     terminal.printInfo(Text.SHADER_PRECISION_ADJUSTED);
   }).listen();
@@ -971,6 +989,11 @@ GUIHandler.prototype.initializeObjectManipulationGUI = function(){
       guiHandler.objectManipulationParameters["Has mass"] = true;
       guiHandler.objectManipulationParameters["Changeable"] = false;
       guiHandler.objectManipulationParameters["Intersectable"] = true;
+      for (var lightningName in lightnings){
+        if (lightnings[lightningName].attachToFPSWeapon && lightnings[lightningName].fpsWeaponConfigurations.weaponObj.name == selectionHandler.getSelectedObject().name){
+          lightnings[lightningName].detachFromFPSWeapon();
+        }
+      }
     }
     if (physicsDebugMode){
       debugRenderer.refresh();

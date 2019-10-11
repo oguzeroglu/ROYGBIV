@@ -15,6 +15,7 @@
 //  * Control functions
 //  * Animation functions
 //  * Muzzleflash functions
+//  * Lightning functions
 //  * Script related functions
 var Roygbiv = function(){
   this.functionNames = [
@@ -182,7 +183,12 @@ var Roygbiv = function(){
     "hideMuzzleFlash",
     "getAnimationState",
     "cancelAnimationRewind",
-    "rewindAnimation"
+    "rewindAnimation",
+    "getLightning",
+    "startLightning",
+    "setLightningStartPoint",
+    "setLightningEndPoint",
+    "stopLightning"
   ];
 
   this.globals = new Object();
@@ -543,6 +549,20 @@ Roygbiv.prototype.getAnimationState = function(object, animationName){
   preConditions.checkIfAnimationExists(ROYGBIV.getAnimationState, object, animationName);
   preConditions.checkIfObjectInsideActiveScene(ROYGBIV.getAnimationState, object);
   return object.animations[animationName].animationState;
+}
+
+// Returns a lightning object or 0 if lightning does not exist.
+Roygbiv.prototype.getLightning = function(lightningName){
+  if (mode == 0){
+    return;
+  }
+  preConditions.checkIfDefined(ROYGBIV.getLightning, preConditions.lightningName, lightningName);
+  var lightning = lightnings[lightningName];
+  if (lightning){
+    preConditions.checkIfLightningInsideActiveScene(ROYGBIV.getLightning, lightning);
+    return lightning;
+  }
+  return 0;
 }
 
 // OBJECT MANIPULATION FUNCTIONS ***********************************************
@@ -2437,6 +2457,58 @@ Roygbiv.prototype.hideMuzzleFlash = function(muzzleflashName, animationTimeInMS)
   preConditions.checkIfMuzzleFlashInsideActiveScene(ROYGBIV.hideMuzzleFlash, muzzleFlash);
   preConditions.checkIfNumberOnlyIfExists(ROYGBIV.hideMuzzleFlash, preConditions.animationTimeInMS, animationTimeInMS);
   muzzleFlash.onHide(animationTimeInMS);
+}
+
+// LIGHTNING FUNCTIONS *********************************************************
+
+// Starts a lightning. Does nothing if the lightning is already started.
+Roygbiv.prototype.startLightning = function(lightning){
+  if (mode == 0){
+    return;
+  }
+  preConditions.checkIfDefined(ROYGBIV.startLightning, preConditions.lightning, lightning);
+  preConditions.checkIfLightning(ROYGBIV.startLightning, lightning);
+  preConditions.checkIfLightningInsideActiveScene(ROYGBIV.startLightning, lightning);
+  preConditions.checkIfLightningStartable(ROYGBIV.startLightning, lightning);
+  lightning.start();
+}
+
+// Sets the start point of a lightning.
+Roygbiv.prototype.setLightningStartPoint = function(lightning, position){
+  if (mode == 0){
+    return;
+  }
+  preConditions.checkIfDefined(ROYGBIV.setLightningStartPoint, preConditions.lightning, lightning);
+  preConditions.checkIfDefined(ROYGBIV.setLightningStartPoint, preConditions.position, position);
+  preConditions.checkIfLightning(ROYGBIV.setLightningStartPoint, lightning);
+  preConditions.checkIfLightningInsideActiveScene(ROYGBIV.setLightningStartPoint, lightning);
+  preConditions.checkIfVectorOnlyIfDefined(ROYGBIV.setLightningStartPoint, preConditions.position, position);
+  preConditions.checkIfTrue(ROYGBIV.setLightningStartPoint, "Lightning is attached to a FPS weapon, cannot set start point.", lightning.attachedToFPSWeapon);
+  lightning.startPoint.set(position.x, position.y, position.z);
+}
+
+// Sets the end point of a lightning.
+Roygbiv.prototype.setLightningEndPoint = function(lightning, position){
+  if (mode == 0){
+    return;
+  }
+  preConditions.checkIfDefined(ROYGBIV.setLightningEndPoint, preConditions.lightning, lightning);
+  preConditions.checkIfDefined(ROYGBIV.setLightningEndPoint, preConditions.position, position);
+  preConditions.checkIfLightning(ROYGBIV.setLightningEndPoint, lightning);
+  preConditions.checkIfLightningInsideActiveScene(ROYGBIV.setLightningEndPoint, lightning);
+  preConditions.checkIfVectorOnlyIfDefined(ROYGBIV.setLightningEndPoint, preConditions.position, position);
+  lightning.endPoint.set(position.x, position.y, position.z);
+}
+
+// Stops a lightning. Does nothing if the lightning is already stopped.
+Roygbiv.prototype.stopLightning = function(lightning){
+  if (mode == 0){
+    return;
+  }
+  preConditions.checkIfDefined(ROYGBIV.stopLightning, preConditions.lightning, lightning);
+  preConditions.checkIfLightning(ROYGBIV.stopLightning, lightning);
+  preConditions.checkIfLightningInsideActiveScene(ROYGBIV.stopLightning, lightning);
+  lightning.stop();
 }
 
 // UTILITY FUNCTIONS ***********************************************************

@@ -72,6 +72,7 @@ window.onload = function() {
     crosshairCreatorGUIHandler = new CrosshairCreatorGUIHandler();
     scriptsGUIHandler = new ScriptsGUIHandler();
     animationCreatorGUIHandler = new AnimationCreatorGUIHandler();
+    lightningCreatorGUIHandler = new LightningCreatorGUIHandler();
   }
 
   // PHYSICS BODY GENERATOR
@@ -711,4 +712,13 @@ function drawGridToScreen(widthParts, heightParts){
   var gridMesh = new THREE.Points(gridGeom, gridMaterial);
   gridMesh.frustumCulled = false;
   scene.add(gridMesh);
+}
+
+// WARNING: FOR TEST PURPOSES
+function debugPoint(point){
+  var dotGeometry = new THREE.Geometry();
+  dotGeometry.vertices.push(point);
+  var dotMaterial = new THREE.PointsMaterial({size: 5, sizeAttenuation: false});
+  var dot = new THREE.Points(dotGeometry, dotMaterial);
+  scene.add(dot);
 }

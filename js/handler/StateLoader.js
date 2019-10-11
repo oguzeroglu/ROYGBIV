@@ -52,6 +52,7 @@ StateLoader.prototype.load = function(){
     this.importHandler.importAreas(obj);
     this.importHandler.importScripts(obj);
     this.importHandler.importAddedObjects(obj);
+    this.importHandler.importLightnings(obj);
     this.importHandler.importTexturePacks(obj, this.onTexturePackLoaded.bind(this));
     this.importHandler.importSkyboxes(obj, this.onSkyboxLoaded.bind(this));
     this.importHandler.importFonts(obj, this.onFontLoaded.bind(this));
@@ -168,6 +169,7 @@ StateLoader.prototype.resetProject = function(){
   preConfiguredParticleSystems = new Object();
   preConfiguredParticleSystemPools = new Object();
   muzzleFlashes = new Object();
+  lightnings = new Object();
   webglCallbackHandler = new WebGLCallbackHandler();
   textureAtlasHandler.dispose();
   textureAtlasHandler = new TextureAtlasHandler();

@@ -193,7 +193,11 @@ var CommandDescriptor = function(){
       0, //printScenes
       1, //setEntryScene
       1, //destroyScene
-      2 //syncTextProperties
+      2, //syncTextProperties
+      1, //newLightning
+      1, //editLightning
+      1, //destroyLightning
+      0 //printLightnings
   ];
 
   this.commandArgumentsExpectedExplanation = [
@@ -389,7 +393,11 @@ var CommandDescriptor = function(){
     "printScenes",
     "setEntryScene sceneName",
     "destroyScene sceneName",
-    "syncTextProperties sourceText targetText"
+    "syncTextProperties sourceText targetText",
+    "newLightning lightningName",
+    "editLightning lightningName",
+    "destroyLightning lightningName",
+    "printLightnings"
   ];
 
   this.commands = [
@@ -585,7 +593,11 @@ var CommandDescriptor = function(){
     "printScenes",
     "setEntryScene",
     "destroyScene",
-    "syncTextProperties"
+    "syncTextProperties",
+    "newLightning",
+    "editLightning",
+    "destroyLightning",
+    "printLightnings"
   ];
 
   this.commandInfo = [
@@ -781,7 +793,11 @@ var CommandDescriptor = function(){
     "printScenes: Prints created scenes.",
     "setEntryScene: Sets the entry scene.",
     "destroyScene: Destroys a scene.",
-    "syncTextProperties: Sets the properties of targeText based on sourceText properties."
+    "syncTextProperties: Sets the properties of targeText based on sourceText properties.",
+    "newLightning: Opents the Lightning editor GUI for lightning creation.",
+    "editLightning: Opens the Lightning editor GUI to edit a lightning.",
+    "destroyLightning: Destroys a Lightning.",
+    "printLightnings: Prints a list of created lightnings."
   ];
 
   this.keyboardInfo = [
@@ -916,6 +932,7 @@ var CommandDescriptor = function(){
   this.OBJECT_AND_TEXT_NAME       =   34;
   this.SCENE_NAME                 =   35;
   this.GS_NAME_NO_WC              =   36;
+  this.LIGHTNING_NAME             =   37;
 
   // newGridSystem
   this.newGridSystem = new Object();
@@ -1431,6 +1448,21 @@ var CommandDescriptor = function(){
   this.syncTextProperties.types = [];
   this.syncTextProperties.types.push(this.TEXT_NAME); //sourceText
   this.syncTextProperties.types.push(this.TEXT_NAME); //targetText
+
+  // newLightning
+  this.newLightning = new Object();
+  this.newLightning.types = [];
+  this.newLightning.types.push(this.UNKNOWN_INDICATOR); //lightningName
+
+  // editLightning
+  this.editLightning = new Object();
+  this.editLightning.types = [];
+  this.editLightning.types.push(this.LIGHTNING_NAME); //lightningName
+
+  // destroyLightning
+  this.destroyLightning = new Object();
+  this.destroyLightning.types = [];
+  this.destroyLightning.types.push(this.LIGHTNING_NAME); //lightningName
 
 };
 

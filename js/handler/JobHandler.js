@@ -93,6 +93,8 @@ JobHandler.prototype.handle = function(previewModeCommand){
       this.handleDestroyCrosshairCommand();
     }else if (this.splitted[0] == "destroyscene"){
       this.handleDestroySceneCommand();
+    }else if (this.splitted[0] == "destroylightning"){
+      this.handleDestroyLightningCommand();
     }
     if (jobHandlerRaycasterRefresh){
       refreshRaycaster(Text.JOB_COMPLETED, true);
@@ -103,6 +105,22 @@ JobHandler.prototype.handle = function(previewModeCommand){
   // because async
   if (this.splitted[0] != "autoConfigureArea".toLowerCase()){
     jobHandlerWorking = false;
+  }
+}
+
+JobHandler.prototype.handleDestroyLightningCommand = function(){
+  var lightningNamePrefix = this.splitted[1].split("*")[0];
+  var ctr = 0;
+  for (var lightningName in sceneHandler.getLightnings()){
+    if (lightningName.startsWith(lightningNamePrefix)){
+      parseCommand("destroylightning "+lightningName);
+      ctr ++;
+    }
+  }
+  if (ctr == 0){
+    terminal.printError(Text.NO_LIGHTNINGS_FOUND);
+  }else{
+    terminal.printInfo(Text.COMMAND_EXECUTED_FOR_X_LIGHTNINGS.replace(Text.PARAM1, ctr));
   }
 }
 

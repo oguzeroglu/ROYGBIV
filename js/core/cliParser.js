@@ -596,6 +596,11 @@ function parse(input){
             objectGroup.destroy(true);
             delete objectGroups[objectName];
           }
+          for (var lightningName in lightnings){
+            if (lightnings[lightningName].attachedToFPSWeapon && lightnings[lightningName].fpsWeaponConfigurations.weaponObj.name == objectName){
+              lightnings[lightningName].detachFromFPSWeapon();
+            }
+          }
           if (areaConfigurationsVisible){
             guiHandler.hide(guiHandler.guiTypes.AREA);
           }
@@ -1993,6 +1998,11 @@ function parse(input){
               sceneHandler.onObjectGroupDeletion(gluedObject);
               gluedObject.detach();
               delete objectGroups[gluedObject.name];
+              for (var lightningName in lightnings){
+                if (lightnings[lightningName].attachedToFPSWeapon && lightnings[lightningName].fpsWeaponConfigurations.weaponObj.name == gluedObject.name){
+                  lightnings[lightningName].detachFromFPSWeapon();
+                }
+              }
             }
             if (materialUsed == 1){
               objectGroup.isBasicMaterial = true;
@@ -2002,6 +2012,11 @@ function parse(input){
             objectGroups[groupName] = objectGroup;
             for (var childObjName in objectGroup.group){
               sceneHandler.onAddedObjectDeletion(objectGroup.group[childObjName]);
+              for (var lightningName in lightnings){
+                if (lightnings[lightningName].attachedToFPSWeapon && lightnings[lightningName].fpsWeaponConfigurations.weaponObj.name == childObjName){
+                  lightnings[lightningName].detachFromFPSWeapon();
+                }
+              }
             }
             guiHandler.hide(guiHandler.guiTypes.OBJECT);
             if (areaConfigurationsVisible){
@@ -2043,6 +2058,11 @@ function parse(input){
           selectionHandler.resetCurrentSelection();
           if (areaConfigurationsVisible){
             guiHandler.hide(guiHandler.guiTypes.AREA);
+          }
+          for (var lightningName in lightnings){
+            if (lightnings[lightningName].attachedToFPSWeapon && lightnings[lightningName].fpsWeaponConfigurations.weaponObj.name == name){
+              lightnings[lightningName].detachFromFPSWeapon();
+            }
           }
           if (!jobHandlerWorking){
             refreshRaycaster(Text.OBJECT_DETACHED);
@@ -3985,6 +4005,7 @@ function parse(input){
             guiHandler.shaderPrecisionParameters["Particle"] = shaderPrecisionHandler.getShaderPrecisionTextForType(shaderPrecisionHandler.types.PARTICLE);
             guiHandler.shaderPrecisionParameters["Skybox"] = shaderPrecisionHandler.getShaderPrecisionTextForType(shaderPrecisionHandler.types.SKYBOX);
             guiHandler.shaderPrecisionParameters["Text"] = shaderPrecisionHandler.getShaderPrecisionTextForType(shaderPrecisionHandler.types.TEXT);
+            guiHandler.shaderPrecisionParameters["Lightning"] = shaderPrecisionHandler.getShaderPrecisionTextForType(shaderPrecisionHandler.types.LIGHTNING);
             guiHandler.show(guiHandler.guiTypes.SHADER_PRECISION);
             terminal.printInfo(Text.GUI_OPENED);
           }else{
@@ -4650,6 +4671,77 @@ function parse(input){
           }
           targetText.syncProperties(sourceText);
           terminal.printInfo(Text.TEXT_PROPERTIES_SYNCED);
+          return true;
+        break;
+        case 193: //newLightning
+          if (mode != 0){
+            terminal.printError(Text.WORKS_ONLY_IN_DESIGN_MODE);
+            return true;
+          }
+          var lightningName = splitted[1];
+          if (lightnings[lightningName]){
+            terminal.printError(Text.NAME_MUST_BE_UNIQUE);
+            return true;
+          }
+          lightningCreatorGUIHandler.show(lightningName, false);
+          terminal.disable();
+          terminal.clear();
+          terminal.printInfo(Text.AFTER_LIGHTNING_CREATION);
+          return true;
+        break;
+        case 194: //editLightning
+          if (mode != 0){
+            terminal.printError(Text.WORKS_ONLY_IN_DESIGN_MODE);
+            return true;
+          }
+          var lightningName = splitted[1];
+          if (!lightnings[lightningName]){
+            terminal.printError(Text.NO_SUCH_LIGHTNING);
+            return true;
+          }
+          lightningCreatorGUIHandler.show(lightningName, true);
+          terminal.disable();
+          terminal.clear();
+          terminal.printInfo(Text.AFTER_LIGHTNING_CREATION);
+          return true;
+        break;
+        case 195: //destroyLightning
+          if (mode != 0){
+            terminal.printError(Text.WORKS_ONLY_IN_DESIGN_MODE);
+            return true;
+          }
+          if (!(splitted[1].indexOf("*") == -1)){
+            new JobHandler(splitted).handle();
+            return true;
+          }
+          var lightning = lightnings[splitted[1]];
+          if (!lightning){
+            terminal.printError(Text.NO_SUCH_LIGHTNING);
+            return true;
+          }
+          lightning.destroy();
+          delete lightnings[lightning.name];
+          if (!jobHandlerWorking){
+            terminal.printInfo(Text.LIGHTNING_DESTROYED);
+          }
+          sceneHandler.onLightningDeletion(lightning);
+          return true;
+        break;
+        case 196: //printLightnings
+          var count = 0;
+          var length = Object.keys(lightnings).length;
+          terminal.printHeader(Text.LIGHTNINGS);
+          for (var lightningName in lightnings){
+            count ++;
+            var options = true;
+            if (count == length){
+              options = false;
+            }
+            terminal.printInfo(Text.TREE2.replace(Text.PARAM1, lightningName + " ["+lightnings[lightningName].registeredSceneName+"]").replace(Text.PARAM2, lightnings[lightningName].colorName), options);
+          }
+          if (count == 0){
+            terminal.printError(Text.NO_LIGHTNINGS_CREATED);
+          }
           return true;
         break;
       }

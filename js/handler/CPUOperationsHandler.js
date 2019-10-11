@@ -17,7 +17,8 @@ var CPUOperationsHandler = function(){
     updateAnimations: 0,
     objectMouseEvents: 0,
     mouseEventHandlerFlush: 0,
-    muzzleFlashUpdate: 0
+    muzzleFlashUpdate: 0,
+    lightningUpdate: 0
   }
   this.scriptPerformances = {};
 }
@@ -57,6 +58,16 @@ CPUOperationsHandler.prototype.dumpPerformanceLogs = function(){
         console.log("%c   ["+pseudoAry2[i2].name+"] -> "+pseudoAry2[i2].value+" ms.", "background: black; color: lightcyan");
       }
     }
+  }
+}
+
+CPUOperationsHandler.prototype.handleActiveLightnings = function(){
+  if (this.record){
+    var s = performance.now();
+    handleActiveLightnings();
+    this.performanceLogs.lightningUpdate = performance.now() - s;
+  }else{
+    handleActiveLightnings();
   }
 }
 

@@ -221,6 +221,8 @@ var Preconditions = function(){
   this.sceneName = "sceneName";
   this.readyCallback = "readyCallback";
   this.animationTimeInMS = "animationTimeInMS";
+  this.lightningName = "lightningName";
+  this.lightning = "lightning";
 }
 
 Preconditions.prototype.errorHeader = function(callerFunc){
@@ -234,6 +236,37 @@ Preconditions.prototype.throw = function(callerFunc, errorMsg){
 Preconditions.prototype.checkIfSceneExists = function(callerFunc, sceneName){
   if (!sceneHandler.scenes[sceneName]){
     this.throw(callerFunc, "No such scene.");
+  }
+}
+
+Preconditions.prototype.checkIfLightningStartable = function(callerFunc, lightning){
+  if (lightning.attachedToFPSWeapon){
+    var fpsWeaponObj = lightning.fpsWeaponConfigurations.weaponObj;
+    if (!activeControl.isFPSControls){
+      this.throw(callerFunc, "Lightning attached to FPS weapon but FPS control is not active.");
+    }else{
+      var found = false;
+      if (activeControl.hasWeapon1 && activeControl.weaponObject1 == fpsWeaponObj){
+        found = true;
+      }else if (activeControl.hasWeapon2 && activeControl.weaponObject2 == fpsWeaponObj){
+        found = true;
+      }
+      if (!found){
+        this.throw(callerFunc, "Lightning attached to FPS weapon but FPS weapon is not active.");
+      }
+    }
+  }
+}
+
+Preconditions.prototype.checkIfLightning = function(callerFunc, lightning){
+  if (!lightning.isLightning){
+    this.throw(callerFunc, "Object is not a lightning.");
+  }
+}
+
+Preconditions.prototype.checkIfLightningInsideActiveScene = function(callerFunc, lightning){
+  if (lightning.registeredSceneName != sceneHandler.getActiveSceneName()){
+    this.throw(callerFunc, "Lightning not inside active scene.");
   }
 }
 
