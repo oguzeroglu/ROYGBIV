@@ -252,6 +252,9 @@ ModeSwitcher.prototype.switchFromPreviewToDesign = function(){
   fpsHandler.reset();
   pointerLockRequested = false;
   fullScreenRequested = false;
+  for (var lightningName in lightnings){
+    lightnings[lightningName].stop();
+  }
   for (var gsName in gridSystems){
     scene.add(gridSystems[gsName].gridSystemRepresentation);
     scene.add(gridSystems[gsName].boundingPlane);
