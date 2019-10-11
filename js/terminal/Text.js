@@ -872,4 +872,9 @@ var Text = function(){
                                                  "ANIMATION_STATE_REWINDING (3)";
   this.ROYGBIV_SCRIPTING_API_CANCELANIMATIONREWIND = "Sets the state of an animation to ANIMATION_STATE_RUNNING for animations that are in ANIMATION_STATE_REWINDING state.";
   this.ROYGBIV_SCRIPTING_API_REWINDANIMATION = "Sets the state of an animation to ANIMATION_STATE_REWINDING for animations that are in ANIMATION_STATE_RUNNING state.\nFor animations in ANIMATION_STATE_FROZEN state, use unfreezeAnimation API instead of this.";
+  this.ROYGBIV_SCRIPTING_API_GETLIGHTNING = "Returns a lightning object or 0 if lightning does not exist.";
+  this.ROYGBIV_SCRIPTING_API_STARTLIGHTNING = "Starts a lightning. Does nothing if the lightning is already started.";
+  this.ROYGBIV_SCRIPTING_API_SETLIGHTNINGSTARTPOINT = "Sets the start point of a lightning.";
+  this.ROYGBIV_SCRIPTING_API_SETLIGHTNINGENDPOINT = "Sets the end point of a lightning.";
+  this.ROYGBIV_SCRIPTING_API_STOPLIGHTNING = "Stops a lightning. Does nothing if the lightning is already stopped.";
 }

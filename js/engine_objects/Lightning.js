@@ -131,6 +131,9 @@ Lightning.prototype.destroy = function(){
 }
 
 Lightning.prototype.start = function(startPoint, endPoint){
+  if (this.mesh.visible){
+    return;
+  }
   if (!(mode == 1 && this.attachedToFPSWeapon) && startPoint && endPoint){
     this.startPoint.copy(startPoint);
     this.endPoint.copy(endPoint);
@@ -144,6 +147,9 @@ Lightning.prototype.start = function(startPoint, endPoint){
 }
 
 Lightning.prototype.stop = function(){
+  if (!this.mesh.visible){
+    return;
+  }
   if (mode == 1){
     activeLightnings.delete(this.name);
   }
