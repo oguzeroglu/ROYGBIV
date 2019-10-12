@@ -212,6 +212,7 @@ StateLoader.prototype.resetProject = function(){
   screenDragCallbackFunction = 0;
   fpsHandler.reset();
   animationHandler.reset();
+  lightningHandler.reset();
   fonts = new Object();
   NO_MOBILE = false;
   fixedAspect = 0;

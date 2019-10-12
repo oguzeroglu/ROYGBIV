@@ -64,10 +64,10 @@ CPUOperationsHandler.prototype.dumpPerformanceLogs = function(){
 CPUOperationsHandler.prototype.handleActiveLightnings = function(){
   if (this.record){
     var s = performance.now();
-    handleActiveLightnings();
+    lightningHandler.handleActiveLightnings();
     this.performanceLogs.lightningUpdate = performance.now() - s;
   }else{
-    handleActiveLightnings();
+    lightningHandler.handleActiveLightnings();
   }
 }
 

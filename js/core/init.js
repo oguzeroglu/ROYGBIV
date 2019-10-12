@@ -29,6 +29,8 @@ window.onload = function() {
   delayedExecutionHandler = new DelayedExecutionHandler();
   // SCENE HANDLER
   sceneHandler = new SceneHandler();
+  // LIGHTNING HANDLER
+  lightningHandler = new LightningHandler();
   // TEXT POOL
   Text = (!isDeployment)? new Text(): 0;
   // DRAGABLE CLI
