@@ -336,8 +336,10 @@ function copyWorkers(application){
   fs.mkdirSync("deploy/"+application.projectName+"/js/worker/");
   var raycasterWorkerContent = fs.readFileSync("./js/worker/RaycasterWorker.js", "utf8");
   var physicsWorkerContent = fs.readFileSync("./js/worker/PhysicsWorker.js", "utf8");
+  var lightningWorkerContent = fs.readFileSync("./js/worker/LightningWorker.js", "utf8");
   var raycasterWorkerContentSplitted = raycasterWorkerContent.split("\n");
   var physicsWorkerContentSplitted = physicsWorkerContent.split("\n");
+  var lightningWorkerContentSplitted = lightningWorkerContent.split("\n");
   var workerImportContent = "";
   var imports = new Object();
   for (var i = 0; i<raycasterWorkerContentSplitted.length; i++){
@@ -360,10 +362,22 @@ function copyWorkers(application){
       }
     }
   }
+  for (var i = 0; i<lightningWorkerContentSplitted.length; i++){
+    if (lightningWorkerContentSplitted[i].startsWith("importScripts")){
+      lightningWorkerContent = lightningWorkerContent.replace(lightningWorkerContentSplitted[i], "");
+      var path = extractFirstText(lightningWorkerContentSplitted[i]).replace("..", "js");
+      if (!imports[path]){
+        workerImportContent += fs.readFileSync(path, "utf8");
+        imports[path] = true;
+      }
+    }
+  }
   raycasterWorkerContent = "importScripts(\"./WorkerImport.js\");\n" + raycasterWorkerContent.trim();
   physicsWorkerContent = "importScripts(\"./WorkerImport.js\");\n" + physicsWorkerContent.trim();
+  lightningWorkerContent = "importScripts(\"./WorkerImport.js\");\n" + lightningWorkerContent.trim();
   fs.writeFileSync("deploy/"+application.projectName+"/js/worker/RaycasterWorker.js", raycasterWorkerContent);
   fs.writeFileSync("deploy/"+application.projectName+"/js/worker/PhysicsWorker.js", physicsWorkerContent);
+  fs.writeFileSync("deploy/"+application.projectName+"/js/worker/LightningWorker.js", lightningWorkerContent);
   fs.writeFileSync("deploy/"+application.projectName+"/js/worker/WorkerImport.js", workerImportContent);
 }
 

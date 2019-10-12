@@ -10,7 +10,6 @@ var Lightning = function(name, detailThreshold, maxDisplacement, count, colorNam
   this.tree = new Object();
   this.renderMap = new Object();
   this.idCounter = 0;
-  this.vertexCount = 0;
   this.STATE_INIT = 0;
   this.STATE_UPDATE = 1;
   this.forwardsFill = new THREE.Vector3();
@@ -259,8 +258,10 @@ Lightning.prototype.init = function(startPoint, endPoint){
 }
 
 Lightning.prototype.update = function(){
-  if (mode == 1 && this.attachedToFPSWeapon){
-    this.handleFPSWeaponStartPosition();
+  if (!IS_WORKER_CONTEXT){
+    if (mode == 1 && this.attachedToFPSWeapon){
+      this.handleFPSWeaponStartPosition();
+    }
   }
   this.state = this.STATE_UPDATE;
   this.idCounter = 0;
@@ -275,7 +276,9 @@ Lightning.prototype.update = function(){
   for (var i = 0; i<this.count; i++){
     this.generateTree(this.tree, this.startPoint, this.endPoint, displacement, this.maxDisplacement);
   }
-  this.positionBufferAttribute.updateRange.set(0, this.positionsLen);
+  if (!IS_WORKER_CONTEXT){
+    this.positionBufferAttribute.updateRange.set(0, this.positionsLen);
+  }
 }
 
 Lightning.prototype.addSegment = function(node, startPoint, endPoint){
@@ -321,11 +324,9 @@ Lightning.prototype.generateTree = function(node, startPoint, endPoint, displace
     this.generateTree(children, middlePoint, endPoint, displacement, realDisplacement);
   }else{
     this.renderMap[addedNode.id] = addedNode;
-    if (this.state == this.STATE_UPDATE){
+    if (this.state == this.STATE_UPDATE && !IS_WORKER_CONTEXT){
       this.updateNodePositionInShader(addedNode, true);
       this.updateNodePositionInShader(addedNode, false);
-    }else{
-      this.vertexCount += 6;
     }
   }
 }
