@@ -109,9 +109,16 @@ LightningCreatorGUIHandler.prototype.init = function(lightningName, isEdit){
     },
     "Done": function(){
       if (lightnings[lightningName]){
-        lightnings[lightningName].destroy();
+        var lightning = lightnings[lightningName];
+        lightning.destroy();
+        delete lightnings[lightningName];
+        lightningHandler.onLightningDeletion(lightning);
       }
       lightnings[lightningName] = lightningCreatorGUIHandler.lightning.clone();
+      lightningHandler.onLightningCreation(lightnings[lightningName]);
+      if (lightnings[lightningName].isCorrected){
+        lightningHandler.onSetCorrectionProperties(lightnings[lightningName]);
+      }
       sceneHandler.onLightningCreation(lightnings[lightningName]);
       lightningCreatorGUIHandler.close(false, isEdit, isEdit ? Text.LIGHTNING_EDITED : Text.LIGHTNING_CREATED);
     }

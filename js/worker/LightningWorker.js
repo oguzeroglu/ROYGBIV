@@ -11,6 +11,7 @@ LightningWorker.prototype.reset = function(){
   this.lightnings = new Object();
   this.lightningIDsByLightningName = new Object();
   this.idCtr = 0;
+  this.nodeDefinitionBufferIndicesByLightningName = new Object();
 }
 
 LightningWorker.prototype.onLightningCreation = function(lightningDescription){
@@ -38,6 +39,12 @@ LightningWorker.prototype.onDisableCorrection = function(lightningName){
   lightning.disableCorrection();
 }
 
+LightningWorker.prototype.saveNodeDefinitionBufferIndices = function(payload){
+  for (var lightningName in payload){
+    this.nodeDefinitionBufferIndicesByLightningName[lightningName] = payload[lightningName];
+  }
+}
+
 var worker = new LightningWorker();
 
 self.onmessage = function(msg){
@@ -52,5 +59,7 @@ self.onmessage = function(msg){
     worker.onSetCorrectionProperties(data.lightningName, data.correctionRefDistance, data.correctionRefLength);
   }else if (data.onDisableCorrection){
     worker.onDisableCorrection(data.lightningName);
+  }else if (data.isNodeDefinitionBufferIndices){
+    worker.saveNodeDefinitionBufferIndices(data.payload);
   }
 }

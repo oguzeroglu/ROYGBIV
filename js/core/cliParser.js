@@ -4721,6 +4721,7 @@ function parse(input){
           }
           lightning.destroy();
           delete lightnings[lightning.name];
+          lightningHandler.onLightningDeletion(lightning);
           if (!jobHandlerWorking){
             terminal.printInfo(Text.LIGHTNING_DESTROYED);
           }

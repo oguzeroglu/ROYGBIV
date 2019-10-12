@@ -18,9 +18,6 @@ var Lightning = function(name, detailThreshold, maxDisplacement, count, colorNam
   this.down = new THREE.Vector3();
   this.vPos = new THREE.Vector3();
   this.up = new THREE.Vector3(0, 0, 1);
-  if (!IS_WORKER_CONTEXT){
-    lightningHandler.onLightningCreation(this);
-  }
 }
 
 Lightning.prototype.detachFromFPSWeapon = function(){
@@ -60,18 +57,12 @@ Lightning.prototype.handleFPSWeaponStartPosition = function(){
 
 Lightning.prototype.disableCorrection = function(){
   this.isCorrected = false;
-  if (!IS_WORKER_CONTEXT){
-    lightningHandler.onDisableCorrection(this);
-  }
 }
 
 Lightning.prototype.setCorrectionProperties = function(radiusCorrectionRefDistance, displacementCorrectionRefLength){
   this.isCorrected = true;
   this.correctionRefDistance = radiusCorrectionRefDistance;
   this.correctionRefLength = displacementCorrectionRefLength;
-  if (!IS_WORKER_CONTEXT){
-    lightningHandler.onSetCorrectionProperties(this);
-  }
 }
 
 Lightning.prototype.generateNoisePropertiesForNode = function(node){
@@ -138,7 +129,6 @@ Lightning.prototype.destroy = function(){
   scene.remove(this.mesh);
   this.mesh.geometry.dispose();
   this.mesh.material.dispose();
-  lightningHandler.onLightningDeletion(this);
 }
 
 Lightning.prototype.start = function(startPoint, endPoint){

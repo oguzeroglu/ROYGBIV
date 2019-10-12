@@ -1255,5 +1255,9 @@ ImportHandler.prototype.importLightnings = function(obj){
       lightning.detachFromFPSWeapon();
     }
     lightnings[lightningName] = lightning;
+    lightningHandler.onLightningCreation(lightning);
+    if (lightning.isCorrected){
+      lightningHandler.onSetCorrectionProperties(lightning);
+    }
   }
 }
