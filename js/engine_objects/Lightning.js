@@ -266,6 +266,7 @@ Lightning.prototype.init = function(startPoint, endPoint){
   if (!IS_WORKER_CONTEXT){
     if (lightningHandler.isLightningWorkerActive()){
       delete this.tree;
+      delete this.renderMap;
     }
   }
 }
