@@ -98,8 +98,8 @@ LightningHandler.prototype.initializeTransferableMessageBody = function(lightnin
     this.startEndPointBufferIndicesByLightningName[lightning.name] = startEndPointCount;
     startEndPointCount += 6;
     updateBufferCount ++;
-    this.transferableMessageBody.buffer[lightning.name] = lightning.positionsTypedAray;
-    this.transferableList.push(lightning.positionsTypedAray.buffer);
+    this.transferableMessageBody.buffer[lightning.name] = lightning.positionsTypedAray.slice();
+    this.transferableList.push(this.transferableMessageBody.buffer[lightning.name].buffer);
   }
   this.transferableMessageBody.startEndPoints = new Float32Array(startEndPointCount);
   this.transferableList.push(this.transferableMessageBody.startEndPoints.buffer);
