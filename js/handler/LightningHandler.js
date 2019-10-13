@@ -14,8 +14,12 @@ var LightningHandler = function(){
       }else{
         lightningHandler.transferableMessageBody = data;
         lightningHandler.transferableList[0] = data.cameraPosition.buffer;
-        lightningHandler.transferableList[1] = data.nodeDefinitions.buffer;
-        lightningHandler.transferableList[2] = data.updateBuffer.buffer;
+        var i = 1;
+        for (var key in data.buffer){
+          lightningHandler.transferableList[i++] = data.buffer[key].buffer;
+        }
+        lightningHandler.transferableList[i] = data.startEndPoints.buffer;
+        lightningHandler.transferableList[i+1] = data.updateBuffer.buffer;
         lightningHandler.handleWorkerUpdate(data);
       }
     });
@@ -45,7 +49,6 @@ LightningHandler.prototype.onSwitchToPreviewMode = function(){
 }
 
 LightningHandler.prototype.handleWorkerUpdate = function(transferableMessageBody){
-  var nodeDefinitions = transferableMessageBody.nodeDefinitions;
   for (var i = 0; i<transferableMessageBody.updateBuffer.length; i++){
     var curID = transferableMessageBody.updateBuffer[i];
     if (curID == -1){
@@ -54,20 +57,13 @@ LightningHandler.prototype.handleWorkerUpdate = function(transferableMessageBody
       var condition = this.editorLightning && !this.isFPSWeaponGUIOpen;
       var lightningName = condition? this.editorLightning.name: this.lightningNamesByLightningID[curID];
       var lightning = condition? this.editorLightning: lightnings[lightningName];
-      var nodeDefinitionIndex = condition? 6: this.nodeDefinitionBufferIndicesByLightningName[lightningName] + 6;
       transferableMessageBody.updateBuffer[i] = -1;
       if (!lightning){
         break;
       }
-      for (var nodeID in lightning.renderMap){
-        var node = lightning.renderMap[nodeID];
-        node.startPoint.set(nodeDefinitions[nodeDefinitionIndex], nodeDefinitions[nodeDefinitionIndex + 1], nodeDefinitions[nodeDefinitionIndex + 2]);
-        node.endPoint.set(nodeDefinitions[nodeDefinitionIndex + 3], nodeDefinitions[nodeDefinitionIndex + 4], nodeDefinitions[nodeDefinitionIndex + 5]);
-        lightning.updateNodePositionInShader(node, true);
-        lightning.updateNodePositionInShader(node, false);
-        nodeDefinitionIndex += 6;
-      }
+      lightning.positionBufferAttribute.array.set(transferableMessageBody.buffer[lightning.name]);
       lightning.positionBufferAttribute.updateRange.set(0, lightning.positionsLen);
+      lightning.positionBufferAttribute.needsUpdate = true;
     }
   }
   this.hasOwnership = true;
@@ -83,32 +79,36 @@ LightningHandler.prototype.postTransferable = function(){
 
 LightningHandler.prototype.initializeTransferableMessageBody = function(lightning){
   this.worker.postMessage({invalidateTransferableBody: true});
-  this.nodeDefinitionBufferIndicesByLightningName = new Object();
+  this.startEndPointBufferIndicesByLightningName = new Object();
   this.hasOwnership = true;
-  this.transferableMessageBody = {};
+  this.transferableMessageBody = {buffer: {}};
   this.transferableList = [];
   this.transferableMessageBody.cameraPosition = new Float32Array(3);
   this.transferableList.push(this.transferableMessageBody.cameraPosition.buffer);
-  var nodeDefinitionCount = 0, updateBufferCount = 0;
+  var startEndPointCount = 0, updateBufferCount = 0;
   if (!lightning){
     for (var lightningName in lightnings){
-      this.nodeDefinitionBufferIndicesByLightningName[lightningName] = nodeDefinitionCount;
-      nodeDefinitionCount += 6 + (6 * Object.keys(lightnings[lightningName].renderMap).length);
+      this.startEndPointBufferIndicesByLightningName[lightningName] = startEndPointCount;
+      startEndPointCount += 6;
       updateBufferCount ++;
+      this.transferableMessageBody.buffer[lightningName] = lightnings[lightningName].positionsTypedAray.slice();
+      this.transferableList.push(this.transferableMessageBody.buffer[lightningName].buffer);
     }
   }else{
-    this.nodeDefinitionBufferIndicesByLightningName[lightning.name] = nodeDefinitionCount;
-    nodeDefinitionCount += 6 + (6 * Object.keys(lightning.renderMap).length);
+    this.startEndPointBufferIndicesByLightningName[lightning.name] = startEndPointCount;
+    startEndPointCount += 6;
     updateBufferCount ++;
+    this.transferableMessageBody.buffer[lightning.name] = lightning.positionsTypedAray;
+    this.transferableList.push(lightning.positionsTypedAray.buffer);
   }
-  this.transferableMessageBody.nodeDefinitions = new Float32Array(nodeDefinitionCount);
-  this.transferableList.push(this.transferableMessageBody.nodeDefinitions.buffer);
+  this.transferableMessageBody.startEndPoints = new Float32Array(startEndPointCount);
+  this.transferableList.push(this.transferableMessageBody.startEndPoints.buffer);
   this.transferableMessageBody.updateBuffer = new Int16Array(updateBufferCount);
   for (var i = 0; i<this.transferableMessageBody.updateBuffer.length; i++){
     this.transferableMessageBody.updateBuffer[i] = -1;
   }
   this.transferableList.push(this.transferableMessageBody.updateBuffer.buffer);
-  this.worker.postMessage({isNodeDefinitionBufferIndices: true, payload: this.nodeDefinitionBufferIndicesByLightningName});
+  this.worker.postMessage({isStartEndPointBufferIndices: true, payload: this.startEndPointBufferIndicesByLightningName});
 }
 
 LightningHandler.prototype.reset = function(){
@@ -171,7 +171,7 @@ LightningHandler.prototype.onLightningDeletion = function(lightning){
   }
   delete this.lightningNamesByLightningID[this.lightningIDsByLightningName[lightning.name]];
   delete this.lightningIDsByLightningName[lightning.name];
-  delete this.nodeDefinitionBufferIndicesByLightningName[lightning.name];
+  delete this.startEndPointBufferIndicesByLightningName[lightning.name];
   this.worker.postMessage({onLightningDeletion: true, lightningName: lightning.name});
 }
 
@@ -185,13 +185,13 @@ LightningHandler.prototype.fillUpdateBuffer = function(lightning, lightningName)
   }
   var transferableMessageBody = lightningHandler.transferableMessageBody;
   transferableMessageBody.updateBuffer[lightningHandler.currentUpdateBufferIndex ++] = lightningHandler.lightningIDsByLightningName[lightningName];
-  var indexInNodeBuffer = lightningHandler.nodeDefinitionBufferIndicesByLightningName[lightningName];
-  transferableMessageBody.nodeDefinitions[indexInNodeBuffer] = lightning.startPoint.x;
-  transferableMessageBody.nodeDefinitions[indexInNodeBuffer + 1] = lightning.startPoint.y;
-  transferableMessageBody.nodeDefinitions[indexInNodeBuffer + 2] = lightning.startPoint.z;
-  transferableMessageBody.nodeDefinitions[indexInNodeBuffer + 3] = lightning.endPoint.x;
-  transferableMessageBody.nodeDefinitions[indexInNodeBuffer + 4] = lightning.endPoint.y;
-  transferableMessageBody.nodeDefinitions[indexInNodeBuffer + 5] = lightning.endPoint.z;
+  var indexInNodeBuffer = lightningHandler.startEndPointBufferIndicesByLightningName[lightningName];
+  transferableMessageBody.startEndPoints[indexInNodeBuffer] = lightning.startPoint.x;
+  transferableMessageBody.startEndPoints[indexInNodeBuffer + 1] = lightning.startPoint.y;
+  transferableMessageBody.startEndPoints[indexInNodeBuffer + 2] = lightning.startPoint.z;
+  transferableMessageBody.startEndPoints[indexInNodeBuffer + 3] = lightning.endPoint.x;
+  transferableMessageBody.startEndPoints[indexInNodeBuffer + 4] = lightning.endPoint.y;
+  transferableMessageBody.startEndPoints[indexInNodeBuffer + 5] = lightning.endPoint.z;
   lightningHandler.shouldSend = true;
 }
 

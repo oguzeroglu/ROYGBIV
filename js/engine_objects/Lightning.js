@@ -174,7 +174,12 @@ Lightning.prototype.updateNodePositionInShader = function(node, isStart){
   this.side.crossVectors(this.up, this.forwardsFill).multiplyScalar(radius * COS30DEG);
   this.down.copy(this.up).multiplyScalar(-radius * SIN30DEG);
   var p = this.vPos;
-  var v = this.positionBufferAttribute.array;
+  var v;
+  if (!IS_WORKER_CONTEXT){
+    v = this.positionBufferAttribute.array;
+  }else{
+    v = this.positionsTypedAray;
+  }
   p.copy(pos).sub(this.side).add(this.down);
   v[i++] = p.x;
   v[i++] = p.y;
@@ -187,7 +192,9 @@ Lightning.prototype.updateNodePositionInShader = function(node, isStart){
   v[i++] = p.x;
   v[i++] = p.y;
   v[i++] = p.z;
-  this.positionBufferAttribute.needsUpdate = true;
+  if (!IS_WORKER_CONTEXT){
+    this.positionBufferAttribute.needsUpdate = true;
+  }
 }
 
 Lightning.prototype.createIndices = function(vertex, indicesAry){
@@ -221,13 +228,11 @@ Lightning.prototype.init = function(startPoint, endPoint){
   }
   this.startPoint = startPoint;
   this.endPoint = endPoint;
-  if (IS_WORKER_CONTEXT){
-    return;
-  }
   this.geometry = new THREE.BufferGeometry();
   this.positionAttributeIndexByIds = new Object();
   this.positionsLen = Object.keys(this.renderMap).length * 18;
   var positions = new Float32Array(this.positionsLen);
+  this.positionsTypedAray = positions;
   var ctr = 0;
   this.currentIndex = 0;
   var currentVertex = 0;
@@ -237,6 +242,9 @@ Lightning.prototype.init = function(startPoint, endPoint){
     ctr += 18;
     this.createIndices(currentVertex, indicesAry);
     currentVertex += 6;
+  }
+  if (IS_WORKER_CONTEXT){
+    return;
   }
   var indices = new Uint32Array(indicesAry.length);
   for (var i = 0; i<indicesAry.length; i++){

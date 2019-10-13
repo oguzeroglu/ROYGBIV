@@ -8,6 +8,8 @@ var camera = {
   }
 };
 var REUSABLE_VECTOR = new THREE.Vector3();
+var COS30DEG = Math.cos(30 * Math.PI / 180);
+var SIN30DEG = Math.sin(30 * Math.PI / 180);
 
 var LightningWorker = function(){
   this.reset();
@@ -33,7 +35,7 @@ LightningWorker.prototype.reset = function(){
   this.lightnings = new Object();
   this.lightningIDsByLightningName = new Object();
   this.idCtr = 0;
-  this.nodeDefinitionBufferIndicesByLightningName = new Object();
+  this.startEndPointBufferIndicesByLightningName = new Object();
 }
 
 LightningWorker.prototype.onLightningCreation = function(lightningDescription, isEditorLightning){
@@ -52,7 +54,7 @@ LightningWorker.prototype.onLightningDeletion = function(lightningName){
   var id = this.lightningIDsByLightningName[lightningName];
   delete this.lightnings[id];
   delete this.lightningIDsByLightningName[lightningName];
-  delete this.nodeDefinitionBufferIndicesByLightningName[lightningName];
+  delete this.startEndPointBufferIndicesByLightningName[lightningName];
 }
 
 LightningWorker.prototype.onSetCorrectionProperties = function(lightningName, correctionRefDistance, correctionRefLength){
@@ -67,9 +69,9 @@ LightningWorker.prototype.onDisableCorrection = function(lightningName){
   lightning.disableCorrection();
 }
 
-LightningWorker.prototype.saveNodeDefinitionBufferIndices = function(payload){
+LightningWorker.prototype.saveStartEndPointBufferIndices = function(payload){
   for (var lightningName in payload){
-    this.nodeDefinitionBufferIndicesByLightningName[lightningName] = payload[lightningName];
+    this.startEndPointBufferIndicesByLightningName[lightningName] = payload[lightningName];
   }
 }
 
@@ -91,26 +93,21 @@ LightningWorker.prototype.update = function(transferableMessageBody){
       break;
     }else{
       var lightning = this.editorLightning? this.editorLightning: this.lightnings[id];
-      var curNodeDefinitionIndex = this.editorLightning? 0: this.nodeDefinitionBufferIndicesByLightningName[lightning.name];
-      lightning.startPoint.set(worker.transferableMessageBody.nodeDefinitions[curNodeDefinitionIndex], worker.transferableMessageBody.nodeDefinitions[curNodeDefinitionIndex + 1], worker.transferableMessageBody.nodeDefinitions[curNodeDefinitionIndex + 2]);
-      lightning.endPoint.set(worker.transferableMessageBody.nodeDefinitions[curNodeDefinitionIndex + 3], worker.transferableMessageBody.nodeDefinitions[curNodeDefinitionIndex + 4], worker.transferableMessageBody.nodeDefinitions[curNodeDefinitionIndex + 5]);
-      curNodeDefinitionIndex += 6;
+      var curStartEndPointBufferIndex = this.editorLightning? 0: this.startEndPointBufferIndicesByLightningName[lightning.name];
+      lightning.startPoint.set(transferableMessageBody.startEndPoints[curStartEndPointBufferIndex], transferableMessageBody.startEndPoints[curStartEndPointBufferIndex + 1], transferableMessageBody.startEndPoints[curStartEndPointBufferIndex + 2]);
+      lightning.endPoint.set(transferableMessageBody.startEndPoints[curStartEndPointBufferIndex + 3], transferableMessageBody.startEndPoints[curStartEndPointBufferIndex + 4], transferableMessageBody.startEndPoints[curStartEndPointBufferIndex + 5]);
+      curStartEndPointBufferIndex += 6;
       lightning.update();
+      lightning.positionsTypedAray = transferableMessageBody.buffer[lightning.name];
       for (var nodeID in lightning.renderMap){
-        var node = lightning.renderMap[nodeID];
-        worker.transferableMessageBody.nodeDefinitions[curNodeDefinitionIndex ++] = node.startPoint.x;
-        worker.transferableMessageBody.nodeDefinitions[curNodeDefinitionIndex ++] = node.startPoint.y;
-        worker.transferableMessageBody.nodeDefinitions[curNodeDefinitionIndex ++] = node.startPoint.z;
-        worker.transferableMessageBody.nodeDefinitions[curNodeDefinitionIndex ++] = node.startPoint.x;
-        worker.transferableMessageBody.nodeDefinitions[curNodeDefinitionIndex ++] = node.endPoint.y;
-        worker.transferableMessageBody.nodeDefinitions[curNodeDefinitionIndex ++] = node.endPoint.z;
+        lightning.updateNodePositionInShader(lightning.renderMap[nodeID], true);
+        lightning.updateNodePositionInShader(lightning.renderMap[nodeID], false);
       }
     }
   }
   if (this.isRecording){
     this.performance = performance.now() - startTime;
   }
-  postMessage(this.transferableMessageBody, this.transferableList);
 }
 
 var worker = new LightningWorker();
@@ -127,8 +124,8 @@ self.onmessage = function(msg){
     worker.onSetCorrectionProperties(data.lightningName, data.correctionRefDistance, data.correctionRefLength);
   }else if (data.onDisableCorrection){
     worker.onDisableCorrection(data.lightningName);
-  }else if (data.isNodeDefinitionBufferIndices){
-    worker.saveNodeDefinitionBufferIndices(data.payload);
+  }else if (data.isStartEndPointBufferIndices){
+    worker.saveStartEndPointBufferIndices(data.payload);
   }else if (data.invalidateTransferableBody){
     worker.invalidateTransferableBody();
   }else if (data.onEditorClose){
@@ -138,21 +135,25 @@ self.onmessage = function(msg){
   }else if (data.dumpPerformance){
     worker.dumpPerformance();
   }else{
-    if (!worker.transferableMessageBody){
-      worker.transferableMessageBody = {
-        cameraPosition: data.cameraPosition,
-        nodeDefinitions: data.nodeDefinitions,
-        updateBuffer: data.updateBuffer
-      };
-      worker.transferableList = [data.cameraPosition.buffer, data.nodeDefinitions.buffer, data.updateBuffer.buffer];
-    }else{
-      worker.transferableMessageBody.cameraPosition = data.cameraPosition;
-      worker.transferableMessageBody.nodeDefinitions = data.nodeDefinitions;
-      worker.transferableMessageBody.updateBuffer = data.updateBuffer;
-      worker.transferableList[0] = data.cameraPosition.buffer;
-      worker.transferableList[1] = data.nodeDefinitions.buffer;
-      worker.transferableList[2] = data.updateBuffer.buffer;
-    }
     worker.update(data);
+    if (!worker.transferableMessageBody){
+      worker.transferableMessageBody = data;
+      worker.transferableList = [data.cameraPosition.buffer];
+      for (var key in data.buffer){
+        worker.transferableList.push(data.buffer[key].buffer);
+      }
+      worker.transferableList.push(data.startEndPoints.buffer);
+      worker.transferableList.push(data.updateBuffer.buffer);
+    }else{
+      worker.transferableMessageBody = data;
+      worker.transferableList[0] = data.cameraPosition.buffer;
+      var i = 1;
+      for (var key in data.buffer){
+        worker.transferableList[i++] = data.buffer[key].buffer;
+      }
+      worker.transferableList[i] = data.startEndPoints.buffer;
+      worker.transferableList[i+1] = data.updateBuffer.buffer;
+    }
+    postMessage(worker.transferableMessageBody, worker.transferableList);
   }
 }
