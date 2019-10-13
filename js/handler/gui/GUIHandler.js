@@ -86,6 +86,7 @@ var GUIHandler = function(){
   this.workerStatusParameters = {
     "Raycaster": "ON",
     "Physics": "ON",
+    "Lightning": "ON",
     "Done": function(){
       terminal.clear();
       parseCommand("workerConfigurations hide");
@@ -750,6 +751,7 @@ GUIHandler.prototype.initializeWorkerStatusGUI = function(){
   }
   guiHandler.workerStatusParameters["Raycaster"] = (RAYCASTER_WORKER_ON)? "ON": "OFF";
   guiHandler.workerStatusParameters["Physics"] = (PHYSICS_WORKER_ON)? "ON": "OFF";
+  guiHandler.workerStatusParameters["Lightning"] = (LIGHTNING_WORKER_ON)? "ON": "OFF";
   guiHandler.datGuiWorkerStatus = new dat.GUI({hideable: false});
   guiHandler.datGuiWorkerStatus.add(guiHandler.workerStatusParameters, "Raycaster", guiHandler.onOff).onChange(function(val){
     RAYCASTER_WORKER_ON = (val == "ON");
@@ -760,6 +762,12 @@ GUIHandler.prototype.initializeWorkerStatusGUI = function(){
     PHYSICS_WORKER_ON = (val == "ON");
     physicsFactory.refresh();
     physicsWorld = physicsFactory.get();
+  }).listen();
+  guiHandler.datGuiWorkerStatus.add(guiHandler.workerStatusParameters, "Lightning", guiHandler.onOff).onChange(function(val){
+    LIGHTNING_WORKER_ON = (val == "ON");
+    for (var lightningName in lightnings){
+      lightnings[lightningName].init(new THREE.Vector3(0, 0, 0), new THREE.Vector3(0, 100, 0));
+    }
   }).listen();
   guiHandler.datGuiWorkerStatus.add(guiHandler.workerStatusParameters, "Done");
 }

@@ -7,9 +7,6 @@ var Lightning = function(name, detailThreshold, maxDisplacement, count, colorNam
   this.count = count;
   this.colorName = colorName;
   this.roughness = roughness;
-  this.tree = new Object();
-  this.renderMap = new Object();
-  this.idCounter = 0;
   this.STATE_INIT = 0;
   this.STATE_UPDATE = 1;
   this.forwardsFill = new THREE.Vector3();
@@ -215,6 +212,9 @@ Lightning.prototype.createIndices = function(vertex, indicesAry){
 }
 
 Lightning.prototype.init = function(startPoint, endPoint){
+  this.tree = new Object();
+  this.renderMap = new Object();
+  this.idCounter = 0;
   this.state = this.STATE_INIT;
   for (var i = 0; i<this.count; i++){
     this.generateTree(this.tree, startPoint, endPoint, this.maxDisplacement, this.maxDisplacement);

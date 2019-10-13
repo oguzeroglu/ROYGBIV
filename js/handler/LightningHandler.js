@@ -20,7 +20,7 @@ var LightningHandler = function(){
 }
 
 LightningHandler.prototype.isLightningWorkerActive = function(){
-  return true;
+  return LIGHTNING_WORKER_ON && WORKERS_SUPPORTED;
 }
 
 LightningHandler.prototype.onSwitchToPreviewMode = function(){
