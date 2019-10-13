@@ -13,6 +13,14 @@ var LightningWorker = function(){
   this.reset();
 }
 
+LightningWorker.prototype.startRecording = function(){
+  this.isRecording = true;
+}
+
+LightningWorker.prototype.dumpPerformance = function(){
+  postMessage({performance: this.performance});
+}
+
 LightningWorker.prototype.invalidateTransferableBody = function(){
   if (this.transferableMessageBody){
     delete this.transferableMessageBody;
@@ -21,6 +29,7 @@ LightningWorker.prototype.invalidateTransferableBody = function(){
 }
 
 LightningWorker.prototype.reset = function(){
+  this.isRecording = false;
   this.lightnings = new Object();
   this.lightningIDsByLightningName = new Object();
   this.idCtr = 0;
@@ -69,6 +78,10 @@ LightningWorker.prototype.onEditorClose = function(){
 }
 
 LightningWorker.prototype.update = function(transferableMessageBody){
+  var startTime
+  if (this.isRecording){
+    startTime = performance.now();
+  }
   camera.position.x = transferableMessageBody.cameraPosition[0];
   camera.position.y = transferableMessageBody.cameraPosition[1];
   camera.position.z = transferableMessageBody.cameraPosition[2];
@@ -94,6 +107,9 @@ LightningWorker.prototype.update = function(transferableMessageBody){
       }
     }
   }
+  if (this.isRecording){
+    this.performance = performance.now() - startTime;
+  }
   postMessage(this.transferableMessageBody, this.transferableList);
 }
 
@@ -117,6 +133,10 @@ self.onmessage = function(msg){
     worker.invalidateTransferableBody();
   }else if (data.onEditorClose){
     worker.onEditorClose();
+  }else if (data.startRecording){
+    worker.startRecording();
+  }else if (data.dumpPerformance){
+    worker.dumpPerformance();
   }else{
     if (!worker.transferableMessageBody){
       worker.transferableMessageBody = {

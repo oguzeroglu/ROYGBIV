@@ -8,6 +8,9 @@ var LightningHandler = function(){
       if (data.idResponse){
         lightningHandler.lightningIDsByLightningName[data.lightningName] = data.id;
         lightningHandler.lightningNamesByLightningID[data.id] = data.lightningName;
+      }else if (data.performance){
+        console.log("%c                    LIGHTNING WORKER                  ", "background: black; color: lime");
+        console.log("%cUpdate time: "+data.performance+" ms", "background: black; color: magenta");
       }else{
         lightningHandler.transferableMessageBody = data;
         lightningHandler.transferableList[0] = data.cameraPosition.buffer;
@@ -16,6 +19,18 @@ var LightningHandler = function(){
         lightningHandler.handleWorkerUpdate(data);
       }
     });
+  }
+}
+
+LightningHandler.prototype.startRecording = function(){
+  if (this.isLightningWorkerActive()){
+    this.worker.postMessage({startRecording: true});
+  }
+}
+
+LightningHandler.prototype.dumpPerformance = function(){
+  if (this.isLightningWorkerActive()){
+    this.worker.postMessage({dumpPerformance: true});
   }
 }
 

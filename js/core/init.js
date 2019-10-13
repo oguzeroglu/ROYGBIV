@@ -637,6 +637,7 @@ function startPerformanceAnalysis(){
   threejsRenderMonitoringHandler.startRecording();
   raycasterFactory.startRecording();
   physicsFactory.startRecording();
+  lightningHandler.startRecording();
 }
 
 function dumpPerformance(){
@@ -652,6 +653,7 @@ function dumpPerformance(){
   threejsRenderMonitoringHandler.dumpPerformanceLogs();
   raycasterFactory.dumpPerformance();
   physicsFactory.dumpPerformance();
+  lightningHandler.dumpPerformance();
 }
 
 //******************************************************************
