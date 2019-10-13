@@ -768,6 +768,12 @@ GUIHandler.prototype.initializeWorkerStatusGUI = function(){
     for (var lightningName in lightnings){
       lightnings[lightningName].init(new THREE.Vector3(0, 0, 0), new THREE.Vector3(0, 100, 0));
     }
+    if (LIGHTNING_WORKER_ON){
+      lightningHandler.reset();
+      for (var lightningName in lightnings){
+        lightningHandler.onLightningCreation(lightnings[lightningName]);
+      }
+    }
   }).listen();
   guiHandler.datGuiWorkerStatus.add(guiHandler.workerStatusParameters, "Done");
 }
