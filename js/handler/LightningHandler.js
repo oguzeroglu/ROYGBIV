@@ -23,6 +23,12 @@ LightningHandler.prototype.isLightningWorkerActive = function(){
   return true;
 }
 
+LightningHandler.prototype.onSwitchToPreviewMode = function(){
+  if (this.isLightningWorkerActive()){
+    this.initializeTransferableMessageBody();
+  }
+}
+
 LightningHandler.prototype.handleWorkerUpdate = function(transferableMessageBody){
   var nodeDefinitions = transferableMessageBody.nodeDefinitions;
   for (var i = 0; i<transferableMessageBody.updateBuffer.length; i++){
@@ -30,10 +36,14 @@ LightningHandler.prototype.handleWorkerUpdate = function(transferableMessageBody
     if (curID == -1){
       break;
     }else{
-      var lightningName = this.lightningNamesByLightningID[curID];
-      var lightning = lightnings[lightningName];
-      var nodeDefinitionIndex = this.nodeDefinitionBufferIndicesByLightningName[lightningName] + 6;
+      var condition = this.editorLightning && !this.isFPSWeaponGUIOpen;
+      var lightningName = condition? this.editorLightning.name: this.lightningNamesByLightningID[curID];
+      var lightning = condition? this.editorLightning: lightnings[lightningName];
+      var nodeDefinitionIndex = condition? 6: this.nodeDefinitionBufferIndicesByLightningName[lightningName] + 6;
       transferableMessageBody.updateBuffer[i] = -1;
+      if (!lightning){
+        break;
+      }
       for (var nodeID in lightning.renderMap){
         var node = lightning.renderMap[nodeID];
         node.startPoint.set(nodeDefinitions[nodeDefinitionIndex], nodeDefinitions[nodeDefinitionIndex + 1], nodeDefinitions[nodeDefinitionIndex + 2]);
@@ -56,7 +66,8 @@ LightningHandler.prototype.postTransferable = function(){
   this.hasOwnership = false;
 }
 
-LightningHandler.prototype.initializeTransferableMessageBody = function(){
+LightningHandler.prototype.initializeTransferableMessageBody = function(lightning){
+  this.worker.postMessage({invalidateTransferableBody: true});
   this.nodeDefinitionBufferIndicesByLightningName = new Object();
   this.hasOwnership = true;
   this.transferableMessageBody = {};
@@ -64,9 +75,15 @@ LightningHandler.prototype.initializeTransferableMessageBody = function(){
   this.transferableMessageBody.cameraPosition = new Float32Array(3);
   this.transferableList.push(this.transferableMessageBody.cameraPosition.buffer);
   var nodeDefinitionCount = 0, updateBufferCount = 0;
-  for (var lightningName in lightnings){
-    this.nodeDefinitionBufferIndicesByLightningName[lightningName] = nodeDefinitionCount;
-    nodeDefinitionCount += 6 + (6 * Object.keys(lightnings[lightningName].renderMap).length);
+  if (!lightning){
+    for (var lightningName in lightnings){
+      this.nodeDefinitionBufferIndicesByLightningName[lightningName] = nodeDefinitionCount;
+      nodeDefinitionCount += 6 + (6 * Object.keys(lightnings[lightningName].renderMap).length);
+      updateBufferCount ++;
+    }
+  }else{
+    this.nodeDefinitionBufferIndicesByLightningName[lightning.name] = nodeDefinitionCount;
+    nodeDefinitionCount += 6 + (6 * Object.keys(lightning.renderMap).length);
     updateBufferCount ++;
   }
   this.transferableMessageBody.nodeDefinitions = new Float32Array(nodeDefinitionCount);
@@ -86,7 +103,6 @@ LightningHandler.prototype.reset = function(){
   this.lightningIDsByLightningName = new Object();
   this.lightningNamesByLightningID = new Object();
   this.worker.postMessage({reset: true});
-  this.initializeTransferableMessageBody();
 }
 
 LightningHandler.prototype.onDisableCorrection = function(lightning){
@@ -103,12 +119,35 @@ LightningHandler.prototype.onSetCorrectionProperties = function(lightning){
   this.worker.postMessage({onSetCorrectionProperties: true, lightningName: lightning.name, correctionRefDistance: lightning.correctionRefDistance, correctionRefLength: lightning.correctionRefLength});
 }
 
-LightningHandler.prototype.onLightningCreation = function(lightning){
+LightningHandler.prototype.onEditorClose = function(){
   if (!this.isLightningWorkerActive()){
     return;
   }
-  this.worker.postMessage({onLightningCreation: true, lightning: lightning.export()});
-  this.initializeTransferableMessageBody();
+  delete this.isFPSWeaponGUIOpen;
+  delete this.editorLightning;
+  this.worker.postMessage({onEditorClose: true});
+}
+
+LightningHandler.prototype.onFPSWeaponGUIOpened = function(){
+  if (this.isLightningWorkerActive()){
+    this.isFPSWeaponGUIOpen = true;
+    this.initializeTransferableMessageBody();
+  }
+}
+
+LightningHandler.prototype.onEditorLightningCreation = function(lightning){
+  if (!this.isLightningWorkerActive()){
+    return;
+  }
+  this.onLightningCreation(lightning, true);
+  this.initializeTransferableMessageBody(lightning);
+}
+
+LightningHandler.prototype.onLightningCreation = function(lightning, isEditorLightning){
+  if (!this.isLightningWorkerActive()){
+    return;
+  }
+  this.worker.postMessage({onLightningCreation: true, lightning: lightning.export(), isEditorLightning: isEditorLightning});
 }
 
 LightningHandler.prototype.onLightningDeletion = function(lightning){
@@ -119,7 +158,6 @@ LightningHandler.prototype.onLightningDeletion = function(lightning){
   delete this.lightningIDsByLightningName[lightning.name];
   delete this.nodeDefinitionBufferIndicesByLightningName[lightning.name];
   this.worker.postMessage({onLightningDeletion: true, lightningName: lightning.name});
-  this.initializeTransferableMessageBody();
 }
 
 LightningHandler.prototype.lightningUpdateFunction = function(lightning, lightningName){
@@ -127,7 +165,7 @@ LightningHandler.prototype.lightningUpdateFunction = function(lightning, lightni
 }
 
 LightningHandler.prototype.fillUpdateBuffer = function(lightning, lightningName){
-  if (lightning.attachedToFPSWeapon){
+  if ((mode == 1 || this.isFPSWeaponGUIOpen) && lightning.attachedToFPSWeapon){
     lightning.handleFPSWeaponStartPosition();
   }
   var transferableMessageBody = lightningHandler.transferableMessageBody;
@@ -142,13 +180,23 @@ LightningHandler.prototype.fillUpdateBuffer = function(lightning, lightningName)
   lightningHandler.shouldSend = true;
 }
 
-LightningHandler.prototype.handleActiveLightnings = function(){
+LightningHandler.prototype.handleActiveLightnings = function(lightning){
+  this.editorLightning = lightning;
   if (!this.isLightningWorkerActive()){
-    activeLightnings.forEach(this.lightningUpdateFunction);
+    if (!lightning){
+      activeLightnings.forEach(this.lightningUpdateFunction);
+    }else{
+      lightning.update();
+    }
   }else if (this.hasOwnership){
     this.currentUpdateBufferIndex = 0;
     this.shouldSend = false;
-    activeLightnings.forEach(this.fillUpdateBuffer);
+    if (!lightning){
+      activeLightnings.forEach(this.fillUpdateBuffer);
+    }else{
+      this.shouldSend = true;
+      this.fillUpdateBuffer(lightning, lightning.name);
+    }
     if (this.shouldSend){
       this.transferableMessageBody.cameraPosition[0] = camera.position.x;
       this.transferableMessageBody.cameraPosition[1] = camera.position.y;

@@ -27,12 +27,16 @@ LightningWorker.prototype.reset = function(){
   this.nodeDefinitionBufferIndicesByLightningName = new Object();
 }
 
-LightningWorker.prototype.onLightningCreation = function(lightningDescription){
+LightningWorker.prototype.onLightningCreation = function(lightningDescription, isEditorLightning){
   var lightning = new Lightning(lightningDescription.name, lightningDescription.detailThreshold, lightningDescription.maxDisplacement, lightningDescription.count, lightningDescription.colorName, lightningDescription.radius, lightningDescription.roughness);
   lightning.init(new THREE.Vector3(0, 0, 0), new THREE.Vector3(0, 100, 0));
-  this.lightnings[this.idCtr ++] = lightning;
-  this.lightningIDsByLightningName[lightning.name] = this.idCtr - 1;
-  postMessage({idResponse: true, lightningName: lightning.name, id: this.idCtr - 1});
+  if (!isEditorLightning){
+    this.lightnings[this.idCtr ++] = lightning;
+    this.lightningIDsByLightningName[lightning.name] = this.idCtr - 1;
+    postMessage({idResponse: true, lightningName: lightning.name, id: this.idCtr - 1});
+  }else{
+    this.editorLightning = lightning;
+  }
 }
 
 LightningWorker.prototype.onLightningDeletion = function(lightningName){
@@ -60,6 +64,10 @@ LightningWorker.prototype.saveNodeDefinitionBufferIndices = function(payload){
   }
 }
 
+LightningWorker.prototype.onEditorClose = function(){
+  delete this.editorLightning;
+}
+
 LightningWorker.prototype.update = function(transferableMessageBody){
   camera.position.x = transferableMessageBody.cameraPosition[0];
   camera.position.y = transferableMessageBody.cameraPosition[1];
@@ -69,8 +77,8 @@ LightningWorker.prototype.update = function(transferableMessageBody){
     if (id == -1){
       break;
     }else{
-      var lightning = this.lightnings[id];
-      var curNodeDefinitionIndex = this.nodeDefinitionBufferIndicesByLightningName[lightning.name];
+      var lightning = this.editorLightning? this.editorLightning: this.lightnings[id];
+      var curNodeDefinitionIndex = this.editorLightning? 0: this.nodeDefinitionBufferIndicesByLightningName[lightning.name];
       lightning.startPoint.set(worker.transferableMessageBody.nodeDefinitions[curNodeDefinitionIndex], worker.transferableMessageBody.nodeDefinitions[curNodeDefinitionIndex + 1], worker.transferableMessageBody.nodeDefinitions[curNodeDefinitionIndex + 2]);
       lightning.endPoint.set(worker.transferableMessageBody.nodeDefinitions[curNodeDefinitionIndex + 3], worker.transferableMessageBody.nodeDefinitions[curNodeDefinitionIndex + 4], worker.transferableMessageBody.nodeDefinitions[curNodeDefinitionIndex + 5]);
       curNodeDefinitionIndex += 6;
@@ -94,7 +102,7 @@ var worker = new LightningWorker();
 self.onmessage = function(msg){
   var data = msg.data;
   if (data.onLightningCreation){
-    worker.onLightningCreation(data.lightning);
+    worker.onLightningCreation(data.lightning, data.isEditorLightning);
   }else if (data.onLightningDeletion){
     worker.onLightningDeletion(data.lightningName);
   }else if (data.reset){
@@ -105,6 +113,10 @@ self.onmessage = function(msg){
     worker.onDisableCorrection(data.lightningName);
   }else if (data.isNodeDefinitionBufferIndices){
     worker.saveNodeDefinitionBufferIndices(data.payload);
+  }else if (data.invalidateTransferableBody){
+    worker.invalidateTransferableBody();
+  }else if (data.onEditorClose){
+    worker.onEditorClose();
   }else{
     if (!worker.transferableMessageBody){
       worker.transferableMessageBody = {

@@ -255,6 +255,11 @@ Lightning.prototype.init = function(startPoint, endPoint){
     this.updateNodePositionInShader(this.renderMap[id], true);
     this.updateNodePositionInShader(this.renderMap[id], false);
   }
+  if (!IS_WORKER_CONTEXT){
+    if (lightningHandler.isLightningWorkerActive()){
+      delete this.tree;
+    }
+  }
 }
 
 Lightning.prototype.update = function(){

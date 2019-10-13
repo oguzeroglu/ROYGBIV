@@ -3,6 +3,7 @@ var LightningCreatorGUIHandler = function(){
 }
 
 LightningCreatorGUIHandler.prototype.close = function(isCancel, isEdit, msg){
+  lightningHandler.onEditorClose();
   this.lightning.stop();
   if (isCancel || (!isCancel && isEdit)){
     this.lightning.destroy();
@@ -25,7 +26,7 @@ LightningCreatorGUIHandler.prototype.close = function(isCancel, isEdit, msg){
 
 LightningCreatorGUIHandler.prototype.update = function(){
   if (this.lightning){
-    this.lightning.update();
+    lightningHandler.handleActiveLightnings(this.lightning);
   }
 }
 
@@ -47,6 +48,7 @@ LightningCreatorGUIHandler.prototype.handleMesh = function(lightningName){
   }
   this.lightning = new Lightning(lightningName, 1/this.parameters["Detail"], this.parameters["Displacement"], this.parameters["Count"], this.parameters["Color"], this.parameters["Radius"], this.parameters["Roughness"]);
   this.lightning.init(new THREE.Vector3(0, 0, 0), new THREE.Vector3(0, 100, 0));
+  lightningHandler.onEditorLightningCreation(this.lightning);
   if (prevAttachedToFPSWeapon){
     this.lightning.attachedToFPSWeapon = true;
     this.lightning.fpsWeaponConfigurations = prevFPSWeaponConfigurations;
