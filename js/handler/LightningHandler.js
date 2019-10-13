@@ -115,6 +115,9 @@ LightningHandler.prototype.onLightningDeletion = function(lightning){
   if (!this.isLightningWorkerActive()){
     return;
   }
+  delete this.lightningNamesByLightningID[this.lightningIDsByLightningName[lightning.name]];
+  delete this.lightningIDsByLightningName[lightning.name];
+  delete this.nodeDefinitionBufferIndicesByLightningName[lightning.name];
   this.worker.postMessage({onLightningDeletion: true, lightningName: lightning.name});
   this.initializeTransferableMessageBody();
 }

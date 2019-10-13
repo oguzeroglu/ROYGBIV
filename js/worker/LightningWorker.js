@@ -38,6 +38,8 @@ LightningWorker.prototype.onLightningCreation = function(lightningDescription){
 LightningWorker.prototype.onLightningDeletion = function(lightningName){
   var id = this.lightningIDsByLightningName[lightningName];
   delete this.lightnings[id];
+  delete this.lightningIDsByLightningName[lightningName];
+  delete this.nodeDefinitionBufferIndicesByLightningName[lightningName];
 }
 
 LightningWorker.prototype.onSetCorrectionProperties = function(lightningName, correctionRefDistance, correctionRefLength){
