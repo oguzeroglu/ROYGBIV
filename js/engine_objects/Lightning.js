@@ -1,7 +1,13 @@
-var Lightning = function(name, detailThreshold, maxDisplacement, count, colorName, radius, roughness){
+var Lightning = function(name, detailThreshold, mobileDetailThreshold, maxDisplacement, count, colorName, radius, roughness){
   this.name = name;
   this.isLightning = true;
-  this.detailThreshold = detailThreshold;
+  if (isMobile){
+    this.detailThreshold = mobileDetailThreshold;
+  }else{
+    this.detailThreshold = detailThreshold;
+  }
+  this.desktopDetailThreshold = detailThreshold;
+  this.mobileDetailThreshold = mobileDetailThreshold;
   this.maxDisplacement = maxDisplacement;
   this.radius = radius;
   this.count = count;
@@ -86,7 +92,7 @@ Lightning.prototype.getNoiseForNode = function(node){
 }
 
 Lightning.prototype.clone = function(){
-  var clone = new Lightning(this.name, this.detailThreshold, this.maxDisplacement, this.count, this.colorName, this.radius, this.roughness);
+  var clone = new Lightning(this.name, this.desktopDetailThreshold, this.mobileDetailThreshold, this.maxDisplacement, this.count, this.colorName, this.radius, this.roughness);
   if (this.attachedToFPSWeapon){
     clone.attachedToFPSWeapon = true;
     clone.fpsWeaponConfigurations = this.fpsWeaponConfigurations;
@@ -101,7 +107,8 @@ Lightning.prototype.clone = function(){
 Lightning.prototype.export = function(){
   return {
     name: this.name,
-    detailThreshold: this.detailThreshold,
+    detailThreshold: this.desktopDetailThreshold,
+    mobileDetailThreshold: this.mobileDetailThreshold,
     maxDisplacement: this.maxDisplacement,
     count: this.count,
     colorName: this.colorName,

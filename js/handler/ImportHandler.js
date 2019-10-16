@@ -1239,7 +1239,7 @@ ImportHandler.prototype.importCrosshairs = function(obj){
 ImportHandler.prototype.importLightnings = function(obj){
   for (var lightningName in obj.lightnings){
     var curExport = obj.lightnings[lightningName];
-    var lightning = new Lightning(lightningName, curExport.detailThreshold, curExport.maxDisplacement, curExport.count, curExport.colorName, curExport.radius, curExport.roughness);
+    var lightning = new Lightning(lightningName, curExport.detailThreshold, curExport.mobileDetailThreshold, curExport.maxDisplacement, curExport.count, curExport.colorName, curExport.radius, curExport.roughness);
     lightning.init(new THREE.Vector3(0, 0, 0), new THREE.Vector3(0, 100, 0));
     if (curExport.correctionProperties && curExport.correctionProperties.isCorrected){
       lightning.setCorrectionProperties(curExport.correctionProperties.correctionRefDistance, curExport.correctionProperties.correctionRefLength);

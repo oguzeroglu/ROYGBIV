@@ -165,7 +165,11 @@ LightningHandler.prototype.onLightningCreation = function(lightning, isEditorLig
   if (!this.isLightningWorkerActive()){
     return;
   }
-  this.worker.postMessage({onLightningCreation: true, lightning: lightning.export(), isEditorLightning: isEditorLightning});
+  var descriptionBody = {onLightningCreation: true, lightning: lightning.export(), isEditorLightning: isEditorLightning};
+  if (isMobile){
+    descriptionBody.lightning.detailThreshold = lightning.mobileDetailThreshold;
+  }
+  this.worker.postMessage(descriptionBody);
 }
 
 LightningHandler.prototype.onLightningDeletion = function(lightning){

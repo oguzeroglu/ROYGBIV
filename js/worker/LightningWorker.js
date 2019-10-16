@@ -2,6 +2,8 @@ importScripts("../third_party/three.min.js");
 importScripts("../engine_objects/Lightning.js");
 
 var IS_WORKER_CONTEXT = true;
+var isMobile = false;
+
 var camera = {
   position: {
     x: 0, y: 0, z: 0
@@ -39,7 +41,7 @@ LightningWorker.prototype.reset = function(){
 }
 
 LightningWorker.prototype.onLightningCreation = function(lightningDescription, isEditorLightning){
-  var lightning = new Lightning(lightningDescription.name, lightningDescription.detailThreshold, lightningDescription.maxDisplacement, lightningDescription.count, lightningDescription.colorName, lightningDescription.radius, lightningDescription.roughness);
+  var lightning = new Lightning(lightningDescription.name, lightningDescription.detailThreshold, 0, lightningDescription.maxDisplacement, lightningDescription.count, lightningDescription.colorName, lightningDescription.radius, lightningDescription.roughness);
   lightning.init(new THREE.Vector3(0, 0, 0), new THREE.Vector3(0, 100, 0));
   if (!isEditorLightning){
     this.lightnings[this.idCtr ++] = lightning;
