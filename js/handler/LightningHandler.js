@@ -27,7 +27,7 @@ var LightningHandler = function(){
 }
 
 LightningHandler.prototype.turnOff = function(){
-  if (WORKERS_SUPPORTED){
+  if (this.isLightningWorkerActive()){
     this.worker.terminate();
   }
 }

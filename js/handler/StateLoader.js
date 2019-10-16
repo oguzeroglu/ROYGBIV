@@ -105,8 +105,46 @@ StateLoader.prototype.finalize = function(){
   this.importHandler.importFog(this.stateObj);
   this.importHandler.importCrosshairs(this.stateObj);
   this.importHandler.importScenes(this.stateObj);
+
+  this.closePhysicsWorkerIfNotUsed();
+  this.closeRaycasterWorkerIfNotUsed();
+
   projectLoaded = true;
   this.onAfterFinalized();
+}
+
+StateLoader.prototype.closePhysicsWorkerIfNotUsed = function(){
+  if (!isDeployment || !WORKERS_SUPPORTED || !PHYSICS_WORKER_ON){
+    return;
+  }
+  var hasPhyiscs = false;
+  for (var objName in addedObjects){
+    var obj = addedObjects[objName];
+    if (!obj.noMass){
+      if (obj.isDynamicObject || obj.isChangeable){
+        hasPhyiscs = true;
+        break;
+      }
+    }
+  }
+  if (!hasPhyiscs){
+    for (var objName in objectGroups){
+      var obj = objectGroups[objName];
+      if (!obj.noMass){
+        if (obj.isDynamicObject || obj.isChangeable){
+          hasPhyiscs = true;
+          break;
+        }
+      }
+    }
+  }
+  if (!hasPhyiscs){
+    physicsFactory.turnOffWorker();
+  }
+}
+
+StateLoader.prototype.closeRaycasterWorkerIfNotUsed = function(){
+
 }
 
 StateLoader.prototype.resetProject = function(){

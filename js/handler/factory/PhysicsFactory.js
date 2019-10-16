@@ -6,6 +6,11 @@ var PhysicsFactory = function(){
   this.init();
 }
 
+PhysicsFactory.prototype.turnOffWorker = function(){
+  this.workerTurnedOff = true;
+  this.bridge.worker.terminate();
+}
+
 PhysicsFactory.prototype.refresh = function(){
   this.cannonWorld = new CANNON.World();
   this.init();
@@ -22,7 +27,7 @@ PhysicsFactory.prototype.refresh = function(){
       }
     }
     sceneHandler.onPhysicsReady();
-  }else{
+  }else if (!this.workerTurnedOff){
     elem.refresh();
   }
 }
