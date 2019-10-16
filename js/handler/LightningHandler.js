@@ -26,6 +26,12 @@ var LightningHandler = function(){
   }
 }
 
+LightningHandler.prototype.turnOff = function(){
+  if (WORKERS_SUPPORTED){
+    this.worker.terminate();
+  }
+}
+
 LightningHandler.prototype.startRecording = function(){
   if (this.isLightningWorkerActive()){
     this.worker.postMessage({startRecording: true});
