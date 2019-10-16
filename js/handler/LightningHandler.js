@@ -81,6 +81,7 @@ LightningHandler.prototype.postTransferable = function(){
 }
 
 LightningHandler.prototype.initializeTransferableMessageBody = function(lightning){
+  this.isInitialized = true;
   this.worker.postMessage({invalidateTransferableBody: true});
   this.startEndPointBufferIndicesByLightningName = new Object();
   this.hasOwnership = true;
@@ -178,7 +179,9 @@ LightningHandler.prototype.onLightningDeletion = function(lightning){
   }
   delete this.lightningNamesByLightningID[this.lightningIDsByLightningName[lightning.name]];
   delete this.lightningIDsByLightningName[lightning.name];
-  delete this.startEndPointBufferIndicesByLightningName[lightning.name];
+  if (this.isInitialized){
+    delete this.startEndPointBufferIndicesByLightningName[lightning.name];
+  }
   this.worker.postMessage({onLightningDeletion: true, lightningName: lightning.name});
 }
 
