@@ -1,16 +1,18 @@
-var Lightning = function(name, detailThreshold, maxDisplacement, count, colorName, radius, roughness){
+var Lightning = function(name, detailThreshold, mobileDetailThreshold, maxDisplacement, count, colorName, radius, roughness){
   this.name = name;
   this.isLightning = true;
-  this.detailThreshold = detailThreshold;
+  if (isMobile){
+    this.detailThreshold = mobileDetailThreshold;
+  }else{
+    this.detailThreshold = detailThreshold;
+  }
+  this.desktopDetailThreshold = detailThreshold;
+  this.mobileDetailThreshold = mobileDetailThreshold;
   this.maxDisplacement = maxDisplacement;
   this.radius = radius;
   this.count = count;
   this.colorName = colorName;
   this.roughness = roughness;
-  this.tree = new Object();
-  this.renderMap = new Object();
-  this.idCounter = 0;
-  this.vertexCount = 0;
   this.STATE_INIT = 0;
   this.STATE_UPDATE = 1;
   this.forwardsFill = new THREE.Vector3();
@@ -22,6 +24,7 @@ var Lightning = function(name, detailThreshold, maxDisplacement, count, colorNam
 
 Lightning.prototype.detachFromFPSWeapon = function(){
   this.attachedToFPSWeapon = false;
+  this.disableCorrection();
 }
 
 Lightning.prototype.attachToFPSWeapon = function(weaponObj, childObjName, endpoint){
@@ -89,7 +92,7 @@ Lightning.prototype.getNoiseForNode = function(node){
 }
 
 Lightning.prototype.clone = function(){
-  var clone = new Lightning(this.name, this.detailThreshold, this.maxDisplacement, this.count, this.colorName, this.radius, this.roughness);
+  var clone = new Lightning(this.name, this.desktopDetailThreshold, this.mobileDetailThreshold, this.maxDisplacement, this.count, this.colorName, this.radius, this.roughness);
   if (this.attachedToFPSWeapon){
     clone.attachedToFPSWeapon = true;
     clone.fpsWeaponConfigurations = this.fpsWeaponConfigurations;
@@ -104,7 +107,8 @@ Lightning.prototype.clone = function(){
 Lightning.prototype.export = function(){
   return {
     name: this.name,
-    detailThreshold: this.detailThreshold,
+    detailThreshold: this.desktopDetailThreshold,
+    mobileDetailThreshold: this.mobileDetailThreshold,
     maxDisplacement: this.maxDisplacement,
     count: this.count,
     colorName: this.colorName,
@@ -177,7 +181,12 @@ Lightning.prototype.updateNodePositionInShader = function(node, isStart){
   this.side.crossVectors(this.up, this.forwardsFill).multiplyScalar(radius * COS30DEG);
   this.down.copy(this.up).multiplyScalar(-radius * SIN30DEG);
   var p = this.vPos;
-  var v = this.positionBufferAttribute.array;
+  var v;
+  if (!IS_WORKER_CONTEXT){
+    v = this.positionBufferAttribute.array;
+  }else{
+    v = this.positionsTypedAray;
+  }
   p.copy(pos).sub(this.side).add(this.down);
   v[i++] = p.x;
   v[i++] = p.y;
@@ -190,7 +199,9 @@ Lightning.prototype.updateNodePositionInShader = function(node, isStart){
   v[i++] = p.x;
   v[i++] = p.y;
   v[i++] = p.z;
-  this.positionBufferAttribute.needsUpdate = true;
+  if (!IS_WORKER_CONTEXT){
+    this.positionBufferAttribute.needsUpdate = true;
+  }
 }
 
 Lightning.prototype.createIndices = function(vertex, indicesAry){
@@ -215,6 +226,9 @@ Lightning.prototype.createIndices = function(vertex, indicesAry){
 }
 
 Lightning.prototype.init = function(startPoint, endPoint){
+  this.tree = new Object();
+  this.renderMap = new Object();
+  this.idCounter = 0;
   this.state = this.STATE_INIT;
   for (var i = 0; i<this.count; i++){
     this.generateTree(this.tree, startPoint, endPoint, this.maxDisplacement, this.maxDisplacement);
@@ -225,6 +239,7 @@ Lightning.prototype.init = function(startPoint, endPoint){
   this.positionAttributeIndexByIds = new Object();
   this.positionsLen = Object.keys(this.renderMap).length * 18;
   var positions = new Float32Array(this.positionsLen);
+  this.positionsTypedAray = positions;
   var ctr = 0;
   this.currentIndex = 0;
   var currentVertex = 0;
@@ -234,6 +249,9 @@ Lightning.prototype.init = function(startPoint, endPoint){
     ctr += 18;
     this.createIndices(currentVertex, indicesAry);
     currentVertex += 6;
+  }
+  if (IS_WORKER_CONTEXT){
+    return;
   }
   var indices = new Uint32Array(indicesAry.length);
   for (var i = 0; i<indicesAry.length; i++){
@@ -252,11 +270,19 @@ Lightning.prototype.init = function(startPoint, endPoint){
     this.updateNodePositionInShader(this.renderMap[id], true);
     this.updateNodePositionInShader(this.renderMap[id], false);
   }
+  if (!IS_WORKER_CONTEXT){
+    if (lightningHandler.isLightningWorkerActive()){
+      delete this.tree;
+      delete this.renderMap;
+    }
+  }
 }
 
 Lightning.prototype.update = function(){
-  if (mode == 1 && this.attachedToFPSWeapon){
-    this.handleFPSWeaponStartPosition();
+  if (!IS_WORKER_CONTEXT){
+    if (mode == 1 && this.attachedToFPSWeapon){
+      this.handleFPSWeaponStartPosition();
+    }
   }
   this.state = this.STATE_UPDATE;
   this.idCounter = 0;
@@ -271,7 +297,9 @@ Lightning.prototype.update = function(){
   for (var i = 0; i<this.count; i++){
     this.generateTree(this.tree, this.startPoint, this.endPoint, displacement, this.maxDisplacement);
   }
-  this.positionBufferAttribute.updateRange.set(0, this.positionsLen);
+  if (!IS_WORKER_CONTEXT){
+    this.positionBufferAttribute.updateRange.set(0, this.positionsLen);
+  }
 }
 
 Lightning.prototype.addSegment = function(node, startPoint, endPoint){
@@ -317,11 +345,9 @@ Lightning.prototype.generateTree = function(node, startPoint, endPoint, displace
     this.generateTree(children, middlePoint, endPoint, displacement, realDisplacement);
   }else{
     this.renderMap[addedNode.id] = addedNode;
-    if (this.state == this.STATE_UPDATE){
+    if (this.state == this.STATE_UPDATE && !IS_WORKER_CONTEXT){
       this.updateNodePositionInShader(addedNode, true);
       this.updateNodePositionInShader(addedNode, false);
-    }else{
-      this.vertexCount += 6;
     }
   }
 }

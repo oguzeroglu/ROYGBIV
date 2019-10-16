@@ -29,6 +29,8 @@ window.onload = function() {
   delayedExecutionHandler = new DelayedExecutionHandler();
   // SCENE HANDLER
   sceneHandler = new SceneHandler();
+  // LIGHTNING HANDLER
+  lightningHandler = new LightningHandler();
   // TEXT POOL
   Text = (!isDeployment)? new Text(): 0;
   // DRAGABLE CLI
@@ -635,6 +637,7 @@ function startPerformanceAnalysis(){
   threejsRenderMonitoringHandler.startRecording();
   raycasterFactory.startRecording();
   physicsFactory.startRecording();
+  lightningHandler.startRecording();
 }
 
 function dumpPerformance(){
@@ -650,6 +653,7 @@ function dumpPerformance(){
   threejsRenderMonitoringHandler.dumpPerformanceLogs();
   raycasterFactory.dumpPerformance();
   physicsFactory.dumpPerformance();
+  lightningHandler.dumpPerformance();
 }
 
 //******************************************************************

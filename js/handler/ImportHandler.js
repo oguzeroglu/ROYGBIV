@@ -19,6 +19,7 @@ ImportHandler.prototype.importEngineVariables = function(obj){
   }
   RAYCASTER_WORKER_ON = (!(typeof obj.RAYCASTER_WORKER_ON == UNDEFINED))? obj.RAYCASTER_WORKER_ON: true;
   PHYSICS_WORKER_ON = (!(typeof obj.PHYSICS_WORKER_ON == UNDEFINED))? obj.PHYSICS_WORKER_ON: true;
+  LIGHTNING_WORKER_ON = (!(typeof obj.LIGHTNING_WORKER_ON == UNDEFINED))? obj.LIGHTNING_WORKER_ON: true;
   rayCaster = raycasterFactory.get();
   physicsWorld = physicsFactory.get();
   particleSystemRefHeight = obj.particleSystemRefHeight;
@@ -1238,7 +1239,7 @@ ImportHandler.prototype.importCrosshairs = function(obj){
 ImportHandler.prototype.importLightnings = function(obj){
   for (var lightningName in obj.lightnings){
     var curExport = obj.lightnings[lightningName];
-    var lightning = new Lightning(lightningName, curExport.detailThreshold, curExport.maxDisplacement, curExport.count, curExport.colorName, curExport.radius, curExport.roughness);
+    var lightning = new Lightning(lightningName, curExport.detailThreshold, curExport.mobileDetailThreshold, curExport.maxDisplacement, curExport.count, curExport.colorName, curExport.radius, curExport.roughness);
     lightning.init(new THREE.Vector3(0, 0, 0), new THREE.Vector3(0, 100, 0));
     if (curExport.correctionProperties && curExport.correctionProperties.isCorrected){
       lightning.setCorrectionProperties(curExport.correctionProperties.correctionRefDistance, curExport.correctionProperties.correctionRefLength);
@@ -1255,5 +1256,9 @@ ImportHandler.prototype.importLightnings = function(obj){
       lightning.detachFromFPSWeapon();
     }
     lightnings[lightningName] = lightning;
+    lightningHandler.onLightningCreation(lightning);
+    if (lightning.isCorrected){
+      lightningHandler.onSetCorrectionProperties(lightning);
+    }
   }
 }

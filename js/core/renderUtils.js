@@ -124,14 +124,6 @@ function handleActiveMuzzleFlashes(){
   activeMuzzleFlashes.forEach(muzzleFlashesUpdateFunction);
 }
 
-function lightningUpdateFunction(lightning, lightningName){
-  lightning.update();
-}
-
-function handleActiveLightnings(){
-  activeLightnings.forEach(lightningUpdateFunction);
-}
-
 function objectTrailsUpdateFunction(objectTrail, objName){
   if (objectTrail && !objectTrail.destroyed){
     objectTrail.update();

@@ -16,6 +16,7 @@ var State = function(projectName, author){
   // WORKER STATUS ***********************************************
   this.RAYCASTER_WORKER_ON = RAYCASTER_WORKER_ON;
   this.PHYSICS_WORKER_ON = PHYSICS_WORKER_ON;
+  this.LIGHTNING_WORKER_ON = LIGHTNING_WORKER_ON;
   // PS REF HEIGHT *************************************************
   this.particleSystemRefHeight = particleSystemRefHeight;
   // TEXTURE ATLAS *************************************************

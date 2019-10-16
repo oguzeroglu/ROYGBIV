@@ -127,6 +127,7 @@ ModeSwitcher.prototype.switchFromDesignToPreview = function(){
   if (selectedObjectGroup){
     selectedObjectGroup.removeBoundingBoxesFromScene();
   }
+  lightningHandler.onSwitchToPreviewMode();
   dynamicObjects = new Map();
   dynamicObjectGroups = new Map();
   activeMuzzleFlashes = new Map();

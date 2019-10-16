@@ -79,6 +79,7 @@ FPSWeaponGUIHandler.prototype.init = function(){
         fpsWeaponGUIHandler.hiddenObjectsDueToFPSWeaponAlignmentConfiguration[i].visible = true;
       }
       delete fpsWeaponGUIHandler.hiddenObjectsDueToFPSWeaponAlignmentConfiguration;
+      lightningHandler.onEditorClose();
     }
   };
   this.muzzleFlashParameters = {
@@ -173,6 +174,7 @@ FPSWeaponGUIHandler.prototype.show = function(obj){
       this.hiddenObjectsDueToFPSWeaponAlignmentConfiguration.push(child);
     }
   }
+  lightningHandler.onFPSWeaponGUIOpened();
 }
 
 FPSWeaponGUIHandler.prototype.prepareGUI = function(){
@@ -488,6 +490,7 @@ FPSWeaponGUIHandler.prototype.prepareGUI = function(){
     lightning.attachToFPSWeapon(obj, childObjName, fpsWeaponGUIHandler.lightningParameters["Endpoint"]);
     lightning.handleFPSWeaponStartPosition();
     lightning.handleFPSWeaponEndPoint(fpsWeaponGUIHandler.lightningParameters["Test length"]);
+    lightningHandler.onSetCorrectionProperties(lightning);
     lightning.mesh.visible = true;
     fpsWeaponGUIHandler.lightning = lightning;
   }
@@ -501,6 +504,7 @@ FPSWeaponGUIHandler.prototype.prepareGUI = function(){
     }else{
       fpsWeaponGUIHandler.lightning.mesh.visible = false;
       fpsWeaponGUIHandler.lightning.detachFromFPSWeapon();
+      lightningHandler.onDisableCorrection(fpsWeaponGUIHandler.lightning);
       delete fpsWeaponGUIHandler.lightning;
     }
   }).listen();
@@ -508,6 +512,7 @@ FPSWeaponGUIHandler.prototype.prepareGUI = function(){
     if (fpsWeaponGUIHandler.lightning){
       fpsWeaponGUIHandler.lightning.mesh.visible = false;
       fpsWeaponGUIHandler.lightning.detachFromFPSWeapon();
+      lightningHandler.onDisableCorrection(fpsWeaponGUIHandler.lightning);
     }
     handleLightning();
   }).listen();
@@ -536,11 +541,13 @@ FPSWeaponGUIHandler.prototype.prepareGUI = function(){
   var lightningRefDistanceController = lightningFolder.add(this.lightningParameters, "Ref distance").min(0).max(500).step(0.1).onChange(function(val){
     if (fpsWeaponGUIHandler.lightning){
       fpsWeaponGUIHandler.lightning.setCorrectionProperties(val, fpsWeaponGUIHandler.lightningParameters["Ref length"]);
+      lightningHandler.onSetCorrectionProperties(fpsWeaponGUIHandler.lightning);
     }
   }).listen();
   var lightningRefLengthController = lightningFolder.add(this.lightningParameters, "Ref length").min(0).max(1000).step(0.1).onChange(function(val){
     if (fpsWeaponGUIHandler.lightning){
       fpsWeaponGUIHandler.lightning.setCorrectionProperties(fpsWeaponGUIHandler.lightningParameters["Ref distance"], val);
+      lightningHandler.onSetCorrectionProperties(fpsWeaponGUIHandler.lightning);
     }
   }).listen();
   var lightningTestLengthController = lightningFolder.add(this.lightningParameters, "Test length").min(1).max(1000).step(1).onChange(function(val){
@@ -595,6 +602,6 @@ FPSWeaponGUIHandler.prototype.update = function(){
     this.muzzleFlash.update();
   }
   if (this.lightning){
-    this.lightning.update();
+    lightningHandler.handleActiveLightnings(this.lightning);
   }
 }

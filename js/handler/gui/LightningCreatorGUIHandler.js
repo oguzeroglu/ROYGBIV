@@ -3,6 +3,7 @@ var LightningCreatorGUIHandler = function(){
 }
 
 LightningCreatorGUIHandler.prototype.close = function(isCancel, isEdit, msg){
+  lightningHandler.onEditorClose();
   this.lightning.stop();
   if (isCancel || (!isCancel && isEdit)){
     this.lightning.destroy();
@@ -25,7 +26,7 @@ LightningCreatorGUIHandler.prototype.close = function(isCancel, isEdit, msg){
 
 LightningCreatorGUIHandler.prototype.update = function(){
   if (this.lightning){
-    this.lightning.update();
+    lightningHandler.handleActiveLightnings(this.lightning);
   }
 }
 
@@ -45,8 +46,9 @@ LightningCreatorGUIHandler.prototype.handleMesh = function(lightningName){
     prevCorrectionRefDistance = lightnings[lightningName].correctionRefDistance;
     prevCorrectionRefLength = lightnings[lightningName].correctionRefLength;
   }
-  this.lightning = new Lightning(lightningName, 1/this.parameters["Detail"], this.parameters["Displacement"], this.parameters["Count"], this.parameters["Color"], this.parameters["Radius"], this.parameters["Roughness"]);
+  this.lightning = new Lightning(lightningName, 1/this.parameters["Detail"], 1/this.parameters["Mobile detail"], this.parameters["Displacement"], this.parameters["Count"], this.parameters["Color"], this.parameters["Radius"], this.parameters["Roughness"]);
   this.lightning.init(new THREE.Vector3(0, 0, 0), new THREE.Vector3(0, 100, 0));
+  lightningHandler.onEditorLightningCreation(this.lightning);
   if (prevAttachedToFPSWeapon){
     this.lightning.attachedToFPSWeapon = true;
     this.lightning.fpsWeaponConfigurations = prevFPSWeaponConfigurations;
@@ -77,6 +79,9 @@ LightningCreatorGUIHandler.prototype.createGUI = function(lightningName){
   guiHandler.datGuiLightningCreation.add(this.parameters, "Detail").min(0.001).max(10).step(0.001).onChange(function(val){
     lightningCreatorGUIHandler.handleMesh(lightningName);
   }).listen();
+  guiHandler.datGuiLightningCreation.add(this.parameters, "Mobile detail").min(0.001).max(10).step(0.001).onChange(function(val){
+    lightningCreatorGUIHandler.handleMesh(lightningName);
+  }).listen();
   guiHandler.datGuiLightningCreation.add(this.parameters, "Displacement").min(0).max(500).step(0.5).onChange(function(val){
     lightningCreatorGUIHandler.handleMesh(lightningName);
   }).listen();
@@ -98,7 +103,8 @@ LightningCreatorGUIHandler.prototype.createGUI = function(lightningName){
 
 LightningCreatorGUIHandler.prototype.init = function(lightningName, isEdit){
   this.parameters = {
-    "Detail": isEdit? (1/lightnings[lightningName].detailThreshold): 0.5,
+    "Detail": isEdit? (1/lightnings[lightningName].desktopDetailThreshold): 0.5,
+    "Mobile detail": isEdit? (1/lightnings[lightningName].mobileDetailThreshold): 0.5,
     "Displacement": isEdit? lightnings[lightningName].maxDisplacement: 80,
     "Count": isEdit? lightnings[lightningName].count: 1,
     "Radius": isEdit? lightnings[lightningName].radius: 5,
@@ -109,9 +115,16 @@ LightningCreatorGUIHandler.prototype.init = function(lightningName, isEdit){
     },
     "Done": function(){
       if (lightnings[lightningName]){
-        lightnings[lightningName].destroy();
+        var lightning = lightnings[lightningName];
+        lightning.destroy();
+        delete lightnings[lightningName];
+        lightningHandler.onLightningDeletion(lightning);
       }
       lightnings[lightningName] = lightningCreatorGUIHandler.lightning.clone();
+      lightningHandler.onLightningCreation(lightnings[lightningName]);
+      if (lightnings[lightningName].isCorrected){
+        lightningHandler.onSetCorrectionProperties(lightnings[lightningName]);
+      }
       sceneHandler.onLightningCreation(lightnings[lightningName]);
       lightningCreatorGUIHandler.close(false, isEdit, isEdit ? Text.LIGHTNING_EDITED : Text.LIGHTNING_CREATED);
     }
