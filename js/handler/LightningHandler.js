@@ -61,9 +61,12 @@ LightningHandler.prototype.handleWorkerUpdate = function(transferableMessageBody
       if (!lightning){
         break;
       }
-      lightning.positionBufferAttribute.array.set(transferableMessageBody.buffer[lightning.name]);
-      lightning.positionBufferAttribute.updateRange.set(0, lightning.positionsLen);
-      lightning.positionBufferAttribute.needsUpdate = true;
+      var buf = transferableMessageBody.buffer[lightning.name];
+      if (buf.length == lightning.positionBufferAttribute.array.length){
+        lightning.positionBufferAttribute.array.set(buf);
+        lightning.positionBufferAttribute.updateRange.set(0, lightning.positionsLen);
+        lightning.positionBufferAttribute.needsUpdate = true;
+      }
     }
   }
   this.hasOwnership = true;
