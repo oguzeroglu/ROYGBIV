@@ -6,13 +6,25 @@ var RaycasterFactory = function(){
   this.init();
 }
 
+RaycasterFactory.prototype.turnOffWorker = function(){
+  this.workerTurnedOff = true;
+  if (this.raycasterWorkerBridge){
+    this.raycasterWorkerBridge.worker.terminate();
+  }
+}
+
 RaycasterFactory.prototype.getNonWorker = function(){
   this.raycaster.refresh();
   return this.raycaster;
 }
 
 RaycasterFactory.prototype.refresh = function(){
-  this.get().refresh();
+  var instance = this.get();
+  if (instance.isRaycasterWorkerBridge && this.workerTurnedOff){
+    instance.onReady();
+    return;
+  }
+  instance.refresh();
 }
 
 RaycasterFactory.prototype.test = function(){

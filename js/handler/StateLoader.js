@@ -113,6 +113,41 @@ StateLoader.prototype.finalize = function(){
   this.onAfterFinalized();
 }
 
+StateLoader.prototype.closeRaycasterWorkerIfNotUsed = function(){
+  if (!isDeployment || !WORKERS_SUPPORTED || !RAYCASTER_WORKER_ON){
+    return;
+  }
+  var hasRaycasting = false;
+  for (var objName in addedObjects){
+    var obj = addedObjects[objName];
+    if (obj.isIntersectable){
+      hasRaycasting = true;
+      break;
+    }
+  }
+  if (!hasRaycasting){
+    for (var objName in objectGroups){
+      var obj = objectGroups[objName];
+      if (obj.isIntersectable){
+        hasRaycasting = true;
+        break;
+      }
+    }
+    if (!hasRaycasting){
+      for (var objName in addedTexts){
+        var text = addedTexts[objName];
+        if (!text.is2D && text.isClickable){
+          hasRaycasting = true;
+          break;
+        }
+      }
+    }
+  }
+  if (!hasRaycasting){
+    raycasterFactory.turnOffWorker();
+  }
+}
+
 StateLoader.prototype.closePhysicsWorkerIfNotUsed = function(){
   if (!isDeployment || !WORKERS_SUPPORTED || !PHYSICS_WORKER_ON){
     return;
@@ -141,10 +176,6 @@ StateLoader.prototype.closePhysicsWorkerIfNotUsed = function(){
   if (!hasPhyiscs){
     physicsFactory.turnOffWorker();
   }
-}
-
-StateLoader.prototype.closeRaycasterWorkerIfNotUsed = function(){
-
 }
 
 StateLoader.prototype.resetProject = function(){
