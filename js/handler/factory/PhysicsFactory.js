@@ -8,7 +8,9 @@ var PhysicsFactory = function(){
 
 PhysicsFactory.prototype.turnOffWorker = function(){
   this.workerTurnedOff = true;
-  this.bridge.worker.terminate();
+  if (this.bridge){
+    this.bridge.worker.terminate();
+  }
 }
 
 PhysicsFactory.prototype.refresh = function(){
