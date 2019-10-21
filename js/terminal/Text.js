@@ -595,6 +595,7 @@ var Text = function(){
   this.THIS_TEXT_IS_ALLOCATED_FOR = "This text is allocated for @@1 characters maximum.";
   this.AREA_CREATED = "Area created.";
   this.AREA_HEIGHT_MUST_BE_DIVISABLE = "Area height must be divisable by grid size.";
+  this.HEIGHT_MUST_BE_DIVISIBLE = "Height must be divisable by grid size.";
   this.NO_AREAS_CREATED = "No areas created.";
   this.AREA_CONFIGURATION_WINDOW_IS_ALREADY_VISIBLE = "Area configuration window is already visible.";
   this.AREA_CONFIGURATION_WINDOW_IS_ALREADY_HIDDEN = "Area configuration window is already hidden.";

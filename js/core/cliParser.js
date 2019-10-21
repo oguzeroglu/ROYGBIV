@@ -1076,6 +1076,10 @@ function parse(input){
               return true;
             }
           }
+          if (height % grid1.size != 0){
+            terminal.printError(Text.HEIGHT_MUST_BE_DIVISIBLE);
+            return true;
+          }
           var baseGridSystem = gridSystems[grid1.parentName];
           var wcObject = new WallCollection(name, height, outlineColor, grid1, grid2);
           for (var gridName in gridSelections){
