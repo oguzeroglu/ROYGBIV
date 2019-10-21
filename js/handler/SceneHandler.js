@@ -217,8 +217,8 @@ SceneHandler.prototype.changeScene = function(sceneName, readyCallback){
   if (this.scenes[sceneName].isSkyboxMapped){
     skyboxHandler.map(skyBoxes[this.scenes[sceneName].mappedSkyboxName]);
   }
+  this.scenes[this.getActiveSceneName()].savePostProcessing();
   if (mode == 0){
-    this.scenes[this.getActiveSceneName()].savePostProcessing();
     this.scenes[sceneName].loadPostProcessing();
     croppedGridSystemBuffer = 0;
     anchorGrid = 0;
