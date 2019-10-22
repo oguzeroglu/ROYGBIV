@@ -241,7 +241,7 @@ Preconditions.prototype.checkIfSceneExists = function(callerFunc, sceneName){
 }
 
 Preconditions.prototype.checkIfAreaExists = function(callerFunc, areaName){
-  if (!areas[areaName]){
+  if (!areas[areaName] && areaName !== "default"){
     this.throw(callerFunc, "Area does not exist.");
   }
 }
