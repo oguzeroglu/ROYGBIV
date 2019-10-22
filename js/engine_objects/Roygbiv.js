@@ -190,7 +190,9 @@ var Roygbiv = function(){
     "setLightningEndPoint",
     "stopLightning",
     "onAreaEnter",
-    "onAreaExit"
+    "onAreaExit",
+    "removeAreaEnterListener",
+    "removeAreaExitListener"
   ];
 
   this.globals = new Object();
@@ -1964,6 +1966,26 @@ Roygbiv.prototype.onAreaExit = function(areaName, callbackFunction){
   preConditions.checkIfAreaExists(ROYGBIV.onAreaExit, areaName);
   preConditions.checkIfFunctionOnlyIfExists(ROYGBIV.onAreaExit, preConditions.callbackFunction, callbackFunction);
   areaExitCallbacks[areaName] = callbackFunction;
+}
+
+// Removes the area enter listener for given area name.
+Roygbiv.prototype.removeAreaEnterListener = function(areaName){
+  if (mode == 0){
+    return;
+  }
+  preConditions.checkIfDefined(ROYGBIV.removeAreaEnterListener, preConditions.areaName, areaName);
+  preConditions.checkIfAreaExists(ROYGBIV.removeAreaEnterListener, areaName);
+  delete areaEnterCallbacks[areaName];
+}
+
+// Removes the area exit listener for given area name.
+Roygbiv.prototype.removeAreaExitListener = function(areaName){
+  if (mode == 0){
+    return;
+  }
+  preConditions.checkIfDefined(ROYGBIV.removeAreaExitListener, preConditions.areaName, areaName);
+  preConditions.checkIfAreaExists(ROYGBIV.removeAreaExitListener, areaName);
+  delete areaExitCallbacks[areaName];
 }
 
 // TEXT FUNCTIONS **************************************************************
