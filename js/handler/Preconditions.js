@@ -223,6 +223,7 @@ var Preconditions = function(){
   this.animationTimeInMS = "animationTimeInMS";
   this.lightningName = "lightningName";
   this.lightning = "lightning";
+  this.areaName = "areaName";
 }
 
 Preconditions.prototype.errorHeader = function(callerFunc){
@@ -236,6 +237,12 @@ Preconditions.prototype.throw = function(callerFunc, errorMsg){
 Preconditions.prototype.checkIfSceneExists = function(callerFunc, sceneName){
   if (!sceneHandler.scenes[sceneName]){
     this.throw(callerFunc, "No such scene.");
+  }
+}
+
+Preconditions.prototype.checkIfAreaExists = function(callerFunc, areaName){
+  if (!areas[areaName]){
+    this.throw(callerFunc, "Area does not exist.");
   }
 }
 

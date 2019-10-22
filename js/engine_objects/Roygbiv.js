@@ -188,7 +188,9 @@ var Roygbiv = function(){
     "startLightning",
     "setLightningStartPoint",
     "setLightningEndPoint",
-    "stopLightning"
+    "stopLightning",
+    "onAreaEnter",
+    "onAreaExit"
   ];
 
   this.globals = new Object();
@@ -1936,6 +1938,32 @@ Roygbiv.prototype.removeAnimationFinishListener = function(object, animationName
   preConditions.checkIfAnimationExists(ROYGBIV.removeAnimationFinishListener, object, animationName);
   preConditions.checkIfObjectInsideActiveScene(ROYGBIV.removeAnimationFinishListener, object);
   object.animations[animationName].finishCallbackFunction = 0;
+}
+
+// Executes the callbackFunction with areaName parameter when the camera enters
+// into given area.
+Roygbiv.prototype.onAreaEnter = function(areaName, callbackFunction){
+  if (mode == 0){
+    return;
+  }
+  preConditions.checkIfDefined(ROYGBIV.onAreaEnter, preConditions.areaName, areaName);
+  preConditions.checkIfDefined(ROYGBIV.onAreaEnter, preConditions.callbackFunction, callbackFunction);
+  preConditions.checkIfAreaExists(ROYGBIV.onAreaEnter, areaName);
+  preConditions.checkIfFunctionOnlyIfExists(ROYGBIV.onAreaEnter, preConditions.callbackFunction, callbackFunction);
+  areaEnterCallbacks[areaName] = callbackFunction;
+}
+
+// Executes the callbackFunction with areaName parameter when the camera exits
+// from given area.
+Roygbiv.prototype.onAreaExit = function(areaName, callbackFunction){
+  if (mode == 0){
+    return;
+  }
+  preConditions.checkIfDefined(ROYGBIV.onAreaExit, preConditions.areaName, areaName);
+  preConditions.checkIfDefined(ROYGBIV.onAreaExit, preConditions.callbackFunction, callbackFunction);
+  preConditions.checkIfAreaExists(ROYGBIV.onAreaExit, areaName);
+  preConditions.checkIfFunctionOnlyIfExists(ROYGBIV.onAreaExit, preConditions.callbackFunction, callbackFunction);
+  areaExitCallbacks[areaName] = callbackFunction;
 }
 
 // TEXT FUNCTIONS **************************************************************

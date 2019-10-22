@@ -278,6 +278,8 @@ ModeSwitcher.prototype.switchFromPreviewToDesign = function(){
   collisionCallbackRequests = new Map();
   particleCollisionCallbackRequests = new Object();
   particleSystemCollisionCallbackRequests = new Object();
+  areaEnterCallbacks = new Object();
+  areaExitCallbacks = new Object();
 
   for (var particleSystemName in particleSystemPool){
     particleSystemPool[particleSystemName].destroy();

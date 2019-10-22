@@ -4,6 +4,20 @@ var AreaConfigurationsHandler = function(){
   this.updateNeeded = false;
 }
 
+AreaConfigurationsHandler.prototype.onCurrentAreaChange = function(enteredAreaName, exitedAreaName){
+  if (mode == 0){
+    return;
+  }
+  var enterCallbackFunc = areaEnterCallbacks[enteredAreaName];
+  var exitCallbackFunc = areaExitCallbacks[exitedAreaName];
+  if (enterCallbackFunc){
+    enterCallbackFunc(enteredAreaName);
+  }
+  if (exitCallbackFunc){
+    exitCallbackFunc(exitedAreaName);
+  }
+}
+
 AreaConfigurationsHandler.prototype.onAfterSceneChange = function(){
   var result = sceneHandler.getAreaBinHandler().queryArea(camera.position);
   if (result){
@@ -27,12 +41,14 @@ AreaConfigurationsHandler.prototype.handle = function(){
   var result = sceneHandler.getAreaBinHandler().queryArea(camera.position);
   if (result){
     if (result != this.currentArea){
+      this.onCurrentAreaChange(result, this.currentArea);
       this.currentArea = result;
       this.updateNeeded = true;
     }else{
       this.updateNeeded = false;
     }
   }else if (this.currentArea != this.areaDefault){
+    this.onCurrentAreaChange(this.areaDefault, this.currentArea);
     this.currentArea = this.areaDefault;
     this.updateNeeded = true;
   }else{

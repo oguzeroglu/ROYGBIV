@@ -368,6 +368,8 @@ var ANIMATION_STATE_RUNNING = 1;
 var ANIMATION_STATE_FROZEN = 2;
 var ANIMATION_STATE_REWINDING = 3;
 var lightnings = new Object();
+var areaEnterCallbacks = new Object();
+var areaExitCallbacks = new Object();
 
 // RENDER ORDERS
 var renderOrders = {
