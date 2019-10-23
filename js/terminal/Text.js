@@ -878,8 +878,8 @@ var Text = function(){
   this.ROYGBIV_SCRIPTING_API_SETLIGHTNINGSTARTPOINT = "Sets the start point of a lightning.";
   this.ROYGBIV_SCRIPTING_API_SETLIGHTNINGENDPOINT = "Sets the end point of a lightning.";
   this.ROYGBIV_SCRIPTING_API_STOPLIGHTNING = "Stops a lightning. Does nothing if the lightning is already stopped.";
-  this.ROYGBIV_SCRIPTING_API_ONAREAENTER = "Executes the callbackFunction with areaName parameter when the camera enters into given area.";
-  this.ROYGBIV_SCRIPTING_API_ONAREAEXIT = "Executes the callbackFunction with areaName parameter when the camera exits from given area.";
+  this.ROYGBIV_SCRIPTING_API_ONAREAENTER = "Executes the callbackFunction with exitedAreaName parameter when the camera enters into given area.\nThe exitedAreaName is the name of the previous area that the camera was in.";
+  this.ROYGBIV_SCRIPTING_API_ONAREAEXIT = "Executes the callbackFunction with enteredAreaName parameter when the camera exits from given area.\nThe enteredAreaName is the name of the area that the camera entered into.";
   this.ROYGBIV_SCRIPTING_API_REMOVEAREAENTERLISTENER = "Removes the area enter listener for given area name.";
   this.ROYGBIV_SCRIPTING_API_REMOVEAREAEXITLISTENER = "Removes the area exit listener for given area name.";
 }

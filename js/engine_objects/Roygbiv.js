@@ -1942,8 +1942,9 @@ Roygbiv.prototype.removeAnimationFinishListener = function(object, animationName
   object.animations[animationName].finishCallbackFunction = 0;
 }
 
-// Executes the callbackFunction with areaName parameter when the camera enters
-// into given area.
+// Executes the callbackFunction with exitedAreaName parameter when the camera enters
+// into given area. The exitedAreaName is the name of the previous area
+// that the camera was in.
 Roygbiv.prototype.onAreaEnter = function(areaName, callbackFunction){
   if (mode == 0){
     return;
@@ -1955,8 +1956,9 @@ Roygbiv.prototype.onAreaEnter = function(areaName, callbackFunction){
   areaEnterCallbacks[areaName] = callbackFunction;
 }
 
-// Executes the callbackFunction with areaName parameter when the camera exits
-// from given area.
+// Executes the callbackFunction with enteredAreaName parameter when the camera exits
+// from given area. The enteredAreaName is the name of the area that the
+// camera entered into.
 Roygbiv.prototype.onAreaExit = function(areaName, callbackFunction){
   if (mode == 0){
     return;

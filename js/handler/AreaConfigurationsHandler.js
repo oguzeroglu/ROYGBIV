@@ -11,10 +11,10 @@ AreaConfigurationsHandler.prototype.onCurrentAreaChange = function(enteredAreaNa
   var enterCallbackFunc = areaEnterCallbacks[enteredAreaName];
   var exitCallbackFunc = areaExitCallbacks[exitedAreaName];
   if (enterCallbackFunc){
-    enterCallbackFunc(enteredAreaName);
+    enterCallbackFunc(exitedAreaName);
   }
   if (exitCallbackFunc){
-    exitCallbackFunc(exitedAreaName);
+    exitCallbackFunc(enteredAreaName);
   }
 }
 
