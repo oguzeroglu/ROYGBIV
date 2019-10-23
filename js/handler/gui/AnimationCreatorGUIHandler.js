@@ -177,6 +177,11 @@ AnimationCreatorGUIHandler.prototype.init = function(object){
           continue;
         }
       }
+      if (key == "SCALE_X" || key == "SCALE_Y" || key == "SCALE_Z"){
+        if (!object.noMass){
+          continue;
+        }
+      }
       this.objectAnimationActionsAry.push(animationHandler.actionTypes.OBJECT[key]);
     }
   }else if (object.isAddedText){
