@@ -1696,7 +1696,11 @@ ObjectGroup.prototype.detach = function(childrenNoPhysicsContribution){
     delete addedObject.textureOffsetXWhenAttached;
     delete addedObject.textureOffsetYWhenAttached;
 
-    addedObject.noPhysicsContributionWhenGlued = childrenNoPhysicsContribution;
+    if (typeof childrenNoPhysicsContribution == UNDEFINED){
+      addedObject.noPhysicsContributionWhenGlued = false;
+    }else{
+      addedObject.noPhysicsContributionWhenGlued = addedObject.noPhysicsContributionWhenGlued || childrenNoPhysicsContribution;
+    }
   }
 }
 

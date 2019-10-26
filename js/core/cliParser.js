@@ -2005,8 +2005,13 @@ function parse(input){
               if (gluedObject.isPhysicsSimplified){
                 simplifiedChildrenPhysicsBodies.push(gluedObject.physicsBody);
                 simplifiedChildrenPhysicsBodyDescriptions.push(gluedObject.physicsSimplificationParameters);
+              }else if (gluedObject.simplifiedChildrenPhysicsBodies){
+                for (var i = 0; i<gluedObject.simplifiedChildrenPhysicsBodies.length; i++){
+                  simplifiedChildrenPhysicsBodies.push(gluedObject.simplifiedChildrenPhysicsBodies[i]);
+                  simplifiedChildrenPhysicsBodyDescriptions.push(gluedObject.simplifiedChildrenPhysicsBodyDescriptions[i]);
+                }
               }
-              gluedObject.detach(gluedObject.isPhysicsSimplified);
+              gluedObject.detach(!!gluedObject.isPhysicsSimplified);
               delete objectGroups[gluedObject.name];
               for (var lightningName in lightnings){
                 if (lightnings[lightningName].attachedToFPSWeapon && lightnings[lightningName].fpsWeaponConfigurations.weaponObj.name == gluedObject.name){
