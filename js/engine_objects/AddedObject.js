@@ -516,6 +516,9 @@ AddedObject.prototype.exportLightweight = function(){
     exportObject.physicsPosition = this.physicsPositionWhenAttached;
     exportObject.physicsQuaternion = this.physicsQuaternionWhenAttached;
   }
+  if (this.noPhysicsContributionWhenGlued){
+    exportObject.noPhysicsContributionWhenGlued = true;
+  }
   return exportObject;
 }
 
@@ -736,6 +739,9 @@ AddedObject.prototype.export = function(){
   }
   if (this.muzzleFlashParameters){
     exportObject.muzzleFlashParameters = this.muzzleFlashParameters;
+  }
+  if (this.noPhysicsContributionWhenGlued){
+    exportObject.noPhysicsContributionWhenGlued = true;
   }
   exportObject.animations = new Object();
   for (var animationName in this.animations){

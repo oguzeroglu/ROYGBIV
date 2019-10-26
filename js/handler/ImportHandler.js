@@ -710,6 +710,9 @@ ImportHandler.prototype.importAddedObjects = function(obj){
      if (curAddedObjectExport.muzzleFlashParameters){
        addedObjectInstance.muzzleFlashParameters = curAddedObjectExport.muzzleFlashParameters;
      }
+     if (curAddedObjectExport.noPhysicsContributionWhenGlued){
+       addedObjectInstance.noPhysicsContributionWhenGlued = true;
+     }
      for (var animationName in curAddedObjectExport.animations){
        var curAnimationExport = curAddedObjectExport.animations[animationName];
        addedObjectInstance.addAnimation(new Animation(animationName, curAnimationExport.type, addedObjectInstance, curAnimationExport.description, curAnimationExport.rewind, curAnimationExport.repeat));
@@ -1058,7 +1061,18 @@ ImportHandler.prototype.importObjectGroups = function(obj){
     if (curObjectGroupExport.isRotationDirty){
       objectGroupInstance.isRotationDirty = true;
     }
-    objectGroupInstance.glue();
+    var simplifiedChildrenPhysicsBodies = [];
+    if (curObjectGroupExport.simplifiedChildrenPhysicsBodyDescriptions){
+      for (var i = 0; i<curObjectGroupExport.simplifiedChildrenPhysicsBodyDescriptions.length; i++){
+        var curDescription = curObjectGroupExport.simplifiedChildrenPhysicsBodyDescriptions[i];
+        var simplifiedBody = physicsBodyGenerator.generateBoxBody({x: curDescription.sizeX, y: curDescription.sizeY, z: curDescription.sizeZ});
+        simplifiedBody.position.set(curDescription.pbodyPosition.x, curDescription.pbodyPosition.y, curDescription.pbodyPosition.z);
+        simplifiedBody.quaternion.set(curDescription.pbodyQuaternion.x, curDescription.pbodyQuaternion.y, curDescription.pbodyQuaternion.z, curDescription.pbodyQuaternion.w);
+        simplifiedChildrenPhysicsBodies.push(simplifiedBody);
+      }
+      objectGroupInstance.simplifiedChildrenPhysicsBodyDescriptions = curObjectGroupExport.simplifiedChildrenPhysicsBodyDescriptions;
+    }
+    objectGroupInstance.glue(simplifiedChildrenPhysicsBodies);
     if (curObjectGroupExport.mass){
       objectGroupInstance.setMass(curObjectGroupExport.mass);
     }

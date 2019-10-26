@@ -1414,7 +1414,7 @@ ObjectGroup.prototype.merge = function(){
   pseudoGeometry = null;
 }
 
-ObjectGroup.prototype.glue = function(){
+ObjectGroup.prototype.glue = function(simplifiedChildrenPhysicsBodies){
   var group = this.group;
   var physicsBody = physicsBodyGenerator.generateEmptyBody();
   this.originalPhysicsBody = physicsBody;
@@ -1445,7 +1445,7 @@ ObjectGroup.prototype.glue = function(){
 
     this.totalVertexCount += addedObject.mesh.geometry.attributes.position.count;
     // GLUE PHYSICS ************************************************
-    if (!addedObject.noMass){
+    if (!addedObject.noMass && !addedObject.noPhysicsContributionWhenGlued){
       var shape = addedObject.physicsBody.shapes[0];
       physicsBody.addShape(shape, addedObject.physicsBody.position.vsub(referenceVector), addedObject.physicsBody.quaternion);
       hasAnyPhysicsShape = true;
@@ -1471,6 +1471,17 @@ ObjectGroup.prototype.glue = function(){
     addedObject.indexInParent = graphicsGroup.children.length - 1;
 
   }
+
+  // GLUE PHYSICS OF CHILDREN WITH SIMPLIFIED BODIES ***************
+  if (simplifiedChildrenPhysicsBodies){
+    for (var i = 0; i<simplifiedChildrenPhysicsBodies.length; i++){
+      var shape = simplifiedChildrenPhysicsBodies[i].shapes[0];
+      physicsBody.addShape(shape, simplifiedChildrenPhysicsBodies[i].position.vsub(referenceVector), simplifiedChildrenPhysicsBodies[i].quaternion);
+      hasAnyPhysicsShape = true;
+    }
+  }
+
+  this.simplifiedChildrenPhysicsBodies = simplifiedChildrenPhysicsBodies;
 
   this.gridSystemNames = Object.keys(gridSystemNamesMap);
 
@@ -1556,7 +1567,7 @@ ObjectGroup.prototype.destroyParts = function(){
   }
 }
 
-ObjectGroup.prototype.detach = function(){
+ObjectGroup.prototype.detach = function(childrenNoPhysicsContribution){
   this.graphicsGroup.position.copy(this.mesh.position);
   this.graphicsGroup.quaternion.copy(this.mesh.quaternion);
   this.graphicsGroup.updateMatrixWorld();
@@ -1684,6 +1695,8 @@ ObjectGroup.prototype.detach = function(){
     delete addedObject.aoIntensityWhenAttached;
     delete addedObject.textureOffsetXWhenAttached;
     delete addedObject.textureOffsetYWhenAttached;
+
+    addedObject.noPhysicsContributionWhenGlued = childrenNoPhysicsContribution;
   }
 }
 
@@ -1903,6 +1916,7 @@ ObjectGroup.prototype.exportLightweight = function(){
   exportObj.physicsPosition = {x: this.physicsBody.position.x, y: this.physicsBody.position.y, z: this.physicsBody.position.z};
   exportObj.physicsQuaternion = {x: this.physicsBody.quaternion.x, y: this.physicsBody.quaternion.y, z: this.physicsBody.quaternion.z, w: this.physicsBody.quaternion.w};
   exportObj.initialPhysicsPositionWhenGlued = this.initialPhysicsPositionWhenGlued;
+  exportObj.simplifiedChildrenPhysicsBodyDescriptions = this.simplifiedChildrenPhysicsBodyDescriptions;
   if (this.isPhysicsSimplified){
     exportObj.physicsSimplificationParameters = this.physicsSimplificationParameters;
     exportObj.isPhysicsSimplified = true;
@@ -2070,6 +2084,7 @@ ObjectGroup.prototype.export = function(){
   if (this.muzzleFlashParameters){
     exportObj.muzzleFlashParameters = this.muzzleFlashParameters;
   }
+  exportObj.simplifiedChildrenPhysicsBodyDescriptions = this.simplifiedChildrenPhysicsBodyDescriptions;
   exportObj.animations = new Object();
   for (var animationName in this.animations){
     exportObj.animations[animationName] = this.animations[animationName].export();

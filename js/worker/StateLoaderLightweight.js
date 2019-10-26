@@ -265,6 +265,9 @@ StateLoaderLightweight.prototype.loadPhysics = function(){
     physicsBody.quaternion.copy(curAddedObjectExport.physicsQuaternion);
     physicsBody.roygbivName = objName;
     var addedObject = new AddedObject();
+    if (curAddedObjectExport.noPhysicsContributionWhenGlued){
+      addedObject.noPhysicsContributionWhenGlued = true;
+    }
     addedObject.name = objName;
     addedObject.physicsBody = physicsBody;
     addedObject.isSlippery = curAddedObjectExport.isSlippery;
@@ -296,14 +299,27 @@ StateLoaderLightweight.prototype.loadPhysics = function(){
     physicsBody.position.copy(curExport.initialPhysicsPositionWhenGlued);
     for (var i = 0; i<curExport.childNames.length; i++){
       var childBody = childBodies[curExport.childNames[i]];
+      var childNoPhysicsContributionWhenGlued = addedObjects[curExport.childNames[i]].noPhysicsContributionWhenGlued;
       physicsWorld.removeBody(childBody);
       delete childBodies[curExport.childNames[i]];
       delete addedObjects[curExport.childNames[i]];
-      if (!curExport.isPhysicsSimplified){
+      if (!curExport.isPhysicsSimplified && !childNoPhysicsContributionWhenGlued){
         var shape = childBody.shapes[0];
         physicsBody.addShape(shape, childBody.position.vsub(physicsBody.position), childBody.quaternion);
       }
-      hasAnyPhysicsShape = true;
+      if (curExport.isPhysicsSimplified || !childNoPhysicsContributionWhenGlued){
+        hasAnyPhysicsShape = true;
+      }
+    }
+    if (curExport.simplifiedChildrenPhysicsBodyDescriptions){
+      for (var i = 0; i<curExport.simplifiedChildrenPhysicsBodyDescriptions.length; i++){
+        var curDescription = curExport.simplifiedChildrenPhysicsBodyDescriptions[i];
+        var simplifiedBody = physicsBodyGenerator.generateBoxBody({x: curDescription.sizeX, y: curDescription.sizeY, z: curDescription.sizeZ});
+        simplifiedBody.position.set(curDescription.pbodyPosition.x, curDescription.pbodyPosition.y, curDescription.pbodyPosition.z);
+        simplifiedBody.quaternion.set(curDescription.pbodyQuaternion.x, curDescription.pbodyQuaternion.y, curDescription.pbodyQuaternion.z, curDescription.pbodyQuaternion.w);
+        physicsBody.addShape(simplifiedBody.shapes[0], simplifiedBody.position.vsub(physicsBody.position), simplifiedBody.quaternion);
+        hasAnyPhysicsShape = true;
+      }
     }
     var objGroup = new ObjectGroup();
     objGroup.name = objName;

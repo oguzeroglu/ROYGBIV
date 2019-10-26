@@ -1997,10 +1997,16 @@ function parse(input){
               terminal.printError(textureMergerErr.message);
               return true;
             }
+            var simplifiedChildrenPhysicsBodies = [];
+            var simplifiedChildrenPhysicsBodyDescriptions = [];
             for (var objGroupName in detachedObjectGroups){
               var gluedObject = detachedObjectGroups[objGroupName];
               sceneHandler.onObjectGroupDeletion(gluedObject);
-              gluedObject.detach();
+              if (gluedObject.isPhysicsSimplified){
+                simplifiedChildrenPhysicsBodies.push(gluedObject.physicsBody);
+                simplifiedChildrenPhysicsBodyDescriptions.push(gluedObject.physicsSimplificationParameters);
+              }
+              gluedObject.detach(gluedObject.isPhysicsSimplified);
               delete objectGroups[gluedObject.name];
               for (var lightningName in lightnings){
                 if (lightnings[lightningName].attachedToFPSWeapon && lightnings[lightningName].fpsWeaponConfigurations.weaponObj.name == gluedObject.name){
@@ -2011,7 +2017,8 @@ function parse(input){
             if (materialUsed == 1){
               objectGroup.isBasicMaterial = true;
             }
-            objectGroup.glue();
+            objectGroup.glue(simplifiedChildrenPhysicsBodies);
+            objectGroup.simplifiedChildrenPhysicsBodyDescriptions = simplifiedChildrenPhysicsBodyDescriptions;
             sceneHandler.onObjectGroupCreation(objectGroup);
             objectGroups[groupName] = objectGroup;
             for (var childObjName in objectGroup.group){
@@ -2025,6 +2032,10 @@ function parse(input){
             guiHandler.hide(guiHandler.guiTypes.OBJECT);
             if (areaConfigurationsVisible){
               guiHandler.hide(guiHandler.guiTypes.AREA);
+            }
+            if (physicsDebugMode){
+              parseCommand("switchPhysicsDebugMode");
+              parseCommand("switchPhysicsDebugMode");
             }
             refreshRaycaster(Text.OBJECTS_GLUED_TOGETHER);
             return true;
