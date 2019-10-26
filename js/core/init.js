@@ -726,3 +726,13 @@ function debugPoint(point){
   var dot = new THREE.Points(dotGeometry, dotMaterial);
   scene.add(dot);
 }
+
+// WARNING: FOR TEST PURPOSES
+// THIS FUNCTION HAS TO BE USED ON PREVIEW MODE
+function dumpPhysicsWorkerShapeCount(){
+  if (PHYSICS_WORKER_ON && WORKERS_SUPPORTED){
+    physicsFactory.get().worker.postMessage({dumpShapeCount: true});
+  }else{
+    console.error("Physics worker not active.");
+  }
+}

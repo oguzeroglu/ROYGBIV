@@ -233,6 +233,14 @@ PhysicsWorker.prototype.removeCollisionListener = function(objName){
   var obj = addedObjects[objName] || objectGroups[objName];
   this.removeCollisionListenerBuffer.set(objName, obj);
 }
+
+PhysicsWorker.prototype.dumpShapeCount = function(){
+  var count = 0;
+  for (var i = 0; i<physicsWorld.bodies.length; i++){
+    count += physicsWorld.bodies[i].shapes.length;
+  }
+  console.log(count);
+}
 // START
 var STEP = 1/60;
 var PIPE = "|";
@@ -260,6 +268,8 @@ self.onmessage = function(msg){
     worker.startRecording();
   }else if (msg.data.dumpPerformanceLogs){
     worker.dumpPerformanceLogs();
+  }else if(msg.data.dumpShapeCount){
+    worker.dumpShapeCount();
   }else{
     worker.hasOwnership = true;
     worker.step(msg.data);
