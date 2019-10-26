@@ -197,7 +197,8 @@ var CommandDescriptor = function(){
       1, //newLightning
       1, //editLightning
       1, //destroyLightning
-      0 //printLightnings
+      0, //printLightnings
+      0 //printTotalPhysicsShapeCount
   ];
 
   this.commandArgumentsExpectedExplanation = [
@@ -397,7 +398,8 @@ var CommandDescriptor = function(){
     "newLightning lightningName",
     "editLightning lightningName",
     "destroyLightning lightningName",
-    "printLightnings"
+    "printLightnings",
+    "printTotalPhysicsShapeCount"
   ];
 
   this.commands = [
@@ -597,7 +599,8 @@ var CommandDescriptor = function(){
     "newLightning",
     "editLightning",
     "destroyLightning",
-    "printLightnings"
+    "printLightnings",
+    "printTotalPhysicsShapeCount"
   ];
 
   this.commandInfo = [
@@ -797,7 +800,8 @@ var CommandDescriptor = function(){
     "newLightning: Opents the Lightning editor GUI for lightning creation.",
     "editLightning: Opens the Lightning editor GUI to edit a lightning.",
     "destroyLightning: Destroys a Lightning.",
-    "printLightnings: Prints a list of created lightnings."
+    "printLightnings: Prints a list of created lightnings.",
+    "printTotalPhysicsShapeCount: Prints the total count of physics shapes for current scene."
   ];
 
   this.keyboardInfo = [

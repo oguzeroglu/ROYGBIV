@@ -4600,7 +4600,8 @@ function parse(input){
           guiHandler.hideAll();
           sceneHandler.changeScene(sceneName);
           if (physicsDebugMode){
-            debugRenderer.refresh();
+            parseCommand("switchPhysicsDebugMode");
+            parseCommand("switchPhysicsDebugMode");
           }
           refreshRaycaster(Text.SCENE_SWITCHED);
           return true;
@@ -4758,6 +4759,26 @@ function parse(input){
           if (count == 0){
             terminal.printError(Text.NO_LIGHTNINGS_CREATED);
           }
+          return true;
+        break;
+        case 197: //printTotalPhysicsShapeCount
+          var count = 0;
+          var addedObjectsInScene = sceneHandler.getAddedObjects();
+          var objectGroupsInScene = sceneHandler.getObjectGroups();
+          for (var objName in addedObjectsInScene){
+            var addedObject = addedObjectsInScene[objName];
+            if (!addedObject.noMass){
+              count += addedObject.physicsBody.shapes.length;
+            }
+          }
+          for (var objName in objectGroupsInScene){
+            var objectGroup = objectGroupsInScene[objName];
+            if (!objectGroup.noMass){
+              count += objectGroup.physicsBody.shapes.length;
+            }
+          }
+          terminal.printHeader(Text.SHAPES);
+          terminal.printInfo(Text.TREE.replace(Text.PARAM1, count));
           return true;
         break;
       }

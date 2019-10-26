@@ -89,6 +89,7 @@ var Text = function(){
   this.ISHARDCOPY_MUST_BE_TRUE_OR_FALSE = "isHardCopy must be true or false.";
   this.SIDES_MUST_BE_BOTH_FRONT_OR_BACK = "sides must be front, back or both.";
   this.DIFFERENT_GRID_SYSTEM_AXIS = "Source object and target object have different grid system axis.";
+  this.SHAPES = "Shapes";
   this.CONFIGURATION_CREATED = "Configuration created.";
   this.MATERIAL_CREATED = "Material created.";
   this.BASIC_MATERIAL_INFO_TREE = "|____BASIC MATERIAL: @@1 -> color: @@2";
