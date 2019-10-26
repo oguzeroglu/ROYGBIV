@@ -141,7 +141,7 @@ Lightning.prototype.start = function(startPoint, endPoint){
   if (!(mode == 1 && this.attachedToFPSWeapon) && startPoint && endPoint){
     this.startPoint.copy(startPoint);
     this.endPoint.copy(endPoint);
-  }else if (mode == 1 && this.attachedToFPSWeapon){
+  }else if (mode == 1 && this.attachedToFPSWeapon && endPoint){
     this.endPoint.copy(endPoint);
   }
   if (mode == 1){
