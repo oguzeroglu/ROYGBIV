@@ -409,6 +409,7 @@ AnimationHandler.prototype.forceFinish = function(animation){
     return;
   }
   animation.animationState = ANIMATION_STATE_NOT_RUNNING;
+  animation.isFreezed = false;
   this.activeAnimations.delete(animation.uuid);
   this.afterAnimationSettersByType[animation.description.action](animation);
   animation.invalidateInitialValue();
