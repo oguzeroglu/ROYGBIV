@@ -38,6 +38,11 @@ AreaConfigurationsHandler.prototype.onAfterSceneChange = function(){
 }
 
 AreaConfigurationsHandler.prototype.handle = function(){
+  if (mode == 0 && !isDeployment){
+    if (guiHandler.isOneOfBlockingGUIActive()){
+      return;
+    }
+  }
   var result = sceneHandler.getAreaBinHandler().queryArea(camera.position);
   if (result){
     if (result != this.currentArea){
