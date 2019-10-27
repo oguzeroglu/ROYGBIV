@@ -21,6 +21,7 @@ var FPSControls = function(params){
     {key: "Space", action: this.jump}
   ];
   this.playerBodyObject = params.playerBodyObject;
+  this.initialPosition = params.initialPosition;
   this.mouseSpeed = params.mouseSpeed;
   this.touchLookSpeed = params.touchLookSpeed;
   this.speed = params.speed;
@@ -710,6 +711,7 @@ FPSControls.prototype.onPlayerBodyCollision = function(event){
 
 FPSControls.prototype.onActivated = function(){
   this.resetRotation();
+  this.playerBodyObject.setPosition(this.initialPosition.x, this.initialPosition.y, this.initialPosition.z);
   this.deactivated = false;
   this.canJump = true;
   this.canDoubleJump = true;

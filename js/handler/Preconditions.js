@@ -224,6 +224,7 @@ var Preconditions = function(){
   this.lightningName = "lightningName";
   this.lightning = "lightning";
   this.areaName = "areaName";
+  this.initialPosition = "initialPosition";
 }
 
 Preconditions.prototype.errorHeader = function(callerFunc){

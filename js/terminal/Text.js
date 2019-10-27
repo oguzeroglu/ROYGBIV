@@ -803,6 +803,7 @@ var Text = function(){
                                               "For mobile devices controls are automatically paused for portrait orientation.\n"+
                                               "Configurations are:\n"+
                                               "playerBodyObject (mandatory): A dummy sphere type object to physically represent the player. The camera is placed on the\ncenter of the playerBodyObject. The playerBodyObject is graphically hidden when the FPSControls object is activated,\nshown again when deactivated. The playerBodyObject must be a dynamic object (mass > 0) and must be marked as changeable in order\nto be used by FPSControls class.\n"+
+                                              "initialPosition (mandatory): The initial position of playerBodyObject.\n"+
                                               "mouseSpeed (optional): The speed of mouse based camera look-around event. Default value is 0.002.\n"+
                                               "touchLookSpeed (optional): The speed of touch based camera look*around event. Default value is 0.01.\n"+
                                               "speed (optional): The speed of motion. Default value is 200.\n"+

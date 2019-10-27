@@ -2252,6 +2252,7 @@ Roygbiv.prototype.setActiveControl = function(control){
 // The camera is placed on the center of the playerBodyObject. The playerBodyObject is graphically hidden
 // when the FPSControls object is activated, shown again when deactivated. The playerBodyObject must be a
 // dynamic object (mass > 0) and must be marked as changeable in order to be used by FPSControls class.
+// initialPosition (mandatory): The initial position of playerBodyObject.
 // mouseSpeed (optional): The speed of mouse based camera look-around event. Default value is 0.002.
 // touchLookSpeed (optional): The speed of touch based camera look*around event. Default value is 0.01.
 // speed (optional): The speed of motion. Default value is 200.
@@ -2304,6 +2305,8 @@ Roygbiv.prototype.createFPSControl = function(parameters){
   preConditions.checkIfDynamic(ROYGBIV.createFPSControl, preConditions.playerBodyObject, parameters.playerBodyObject);
   preConditions.checkIfChangeable(ROYGBIV.createFPSControl, preConditions.playerBodyObject, parameters.playerBodyObject);
   preConditions.checkIfTrue(ROYGBIV.createFPSControl, "Player body object must be unintersectable", parameters.playerBodyObject.isIntersectable);
+  preConditions.checkIfDefined(ROYGBIV.createFPSControl, preConditions.initialPosition, parameters.initialPosition);
+  preConditions.checkIfVectorOnlyIfDefined(ROYGBIV.createFPSControl, preConditions.initialPosition, parameters.initialPosition);
   preConditions.checkIfNumberOnlyIfExists(ROYGBIV.createFPSControl, preConditions.mouseSpeed, parameters.mouseSpeed);
   preConditions.checkIfNumberOnlyIfExists(ROYGBIV.createFPSControl, preConditions.touchLookSpeed, parameters.touchLookSpeed);
   preConditions.checkIfNumberOnlyIfExists(ROYGBIV.createFPSControl, preConditions.speed, parameters.speed);
