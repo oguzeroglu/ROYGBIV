@@ -179,6 +179,9 @@ function updateTrackingObjects(){
     }
     obj.onPositionChange(obj.prevPositionVector, obj.mesh.position);
   }
+  if (activeControl.trackingUpdateNeeded){
+    activeControl.onTrackingUpdate();
+  }
 }
 
 function dynamicObjectUpdateFunction(object, objectName){

@@ -702,6 +702,11 @@ FPSControls.prototype.onDeactivated = function(doNotShowElements){
   this.isShooting = false;
 }
 
+FPSControls.prototype.onTrackingUpdate = function(){
+  this.onResize();
+  this.trackingUpdateNeeded = false;
+}
+
 FPSControls.prototype.onPlayerBodyCollision = function(event){
   if (event.y < this.physicsBody.position.y){
     activeControl.canJump = true;
@@ -756,7 +761,7 @@ FPSControls.prototype.onActivated = function(){
     this.weapon1InitQuaternion.copy(this.weaponObject1.mesh.quaternion);
     this.weaponObject1.mesh.scale.set(this.weaponObject1.fpsWeaponAlignment.scale, this.weaponObject1.fpsWeaponAlignment.scale, this.weaponObject1.fpsWeaponAlignment.scale);
     this.weapon1Position.set(this.weaponObject1.fpsWeaponAlignment.x, this.weaponObject1.fpsWeaponAlignment.y, this.weaponObject1.fpsWeaponAlignment.z);
-    this.updateGunAlignment(0, this.weapon1Position.x, this.weapon1Position.y, this.weapon1Position.z);
+    this.trackingUpdateNeeded = true;
     if (this.hasIdleGunAnimation){
       this.weapon1IdleAnimationInfo.x = 0;
       this.weapon1IdleAnimationInfo.z = 0;
@@ -778,7 +783,7 @@ FPSControls.prototype.onActivated = function(){
     this.weapon2InitQuaternion.copy(this.weaponObject2.mesh.quaternion);
     this.weaponObject2.mesh.scale.set(this.weaponObject2.fpsWeaponAlignment.scale, this.weaponObject2.fpsWeaponAlignment.scale, this.weaponObject2.fpsWeaponAlignment.scale);
     this.weapon2Position.set(this.weaponObject2.fpsWeaponAlignment.x, this.weaponObject2.fpsWeaponAlignment.y, this.weaponObject2.fpsWeaponAlignment.z);
-    this.updateGunAlignment(1, this.weapon2Position.x, this.weapon2Position.y, this.weapon2Position.z);
+    this.trackingUpdateNeeded = true;
     if (this.hasIdleGunAnimation){
       this.weapon2IdleAnimationInfo.x = 0;
       this.weapon2IdleAnimationInfo.z = 0;
