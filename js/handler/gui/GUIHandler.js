@@ -772,6 +772,9 @@ GUIHandler.prototype.initializeWorkerStatusGUI = function(){
       lightningHandler.reset();
       for (var lightningName in lightnings){
         lightningHandler.onLightningCreation(lightnings[lightningName]);
+        if (lightnings[lightningName].isCorrected){
+          lightningHandler.onSetCorrectionProperties(lightnings[lightningName]);
+        }
       }
     }
   }).listen();
