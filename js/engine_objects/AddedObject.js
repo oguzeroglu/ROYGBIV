@@ -1418,7 +1418,7 @@ AddedObject.prototype.setPosition = function(x, y, z){
   this.prevPositionVector.copy(this.mesh.position);
   this.mesh.position.set(x, y, z);
   this.physicsBody.position.set(x, y, z);
-  if (this.mesh.visible){
+  if (this.mesh.visible || (this.autoInstancedParent && this.autoInstancedParent.mesh.visible)){
     rayCaster.updateObject(this);
   }
   physicsWorld.updateObject(this, true, false);
@@ -1454,7 +1454,7 @@ AddedObject.prototype.translate = function(axis, amount, fromScript){
     this.mesh.translateZ(amount);
   }
   physicsBody.position.copy(this.mesh.position);
-  if (this.mesh.visible){
+  if (this.mesh.visible || (this.autoInstancedParent && this.autoInstancedParent.mesh.visible)){
     rayCaster.updateObject(this);
   }
 }
@@ -1476,7 +1476,7 @@ AddedObject.prototype.rotatePivotAroundXYZ = function(x, y, z, axis, axisVector,
   this.mesh.position.copy(REUSABLE_VECTOR);
   this.mesh.quaternion.copy(REUSABLE_QUATERNION);
   this.setPhysicsAfterRotationAroundPoint();
-  if (this.mesh.visible){
+  if (this.mesh.visible || (this.autoInstancedParent && this.autoInstancedParent.mesh.visible)){
     rayCaster.updateObject(this);
   }
 }
@@ -1498,7 +1498,7 @@ AddedObject.prototype.rotateAroundXYZ = function(x, y, z, axis, axisVector, radi
   }
   this.mesh.rotateOnAxis(axisVector, radians);
   this.setPhysicsAfterRotationAroundPoint();
-  if (this.mesh.visible){
+  if (this.mesh.visible || (this.autoInstancedParent && this.autoInstancedParent.mesh.visible)){
     rayCaster.updateObject(this);
   }
 }
@@ -1525,7 +1525,7 @@ AddedObject.prototype.rotate = function(axis, radians, fromScript){
     }
     this.initQuaternion.copy(this.mesh.quaternion);
   }
-  if (this.mesh.visible){
+  if (this.mesh.visible || (this.autoInstancedParent && this.autoInstancedParent.mesh.visible)){
     rayCaster.updateObject(this);
   }
 }
@@ -2573,7 +2573,7 @@ AddedObject.prototype.rotateAroundPivotObject = function(axis, radians){
   }
   this.updateTransformBasedOnPivot();
   this.setPhysicsAfterRotationAroundPoint();
-  if (this.mesh.visible){
+  if (this.mesh.visible || (this.autoInstancedParent && this.autoInstancedParent.mesh.visible)){
     rayCaster.updateObject(this);
   }
   for (var animName in this.animations){
