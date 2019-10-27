@@ -188,17 +188,17 @@ Lightning.prototype.updateNodePositionInShader = function(node, isStart){
     v = this.positionsTypedAray;
   }
   p.copy(pos).sub(this.side).add(this.down);
-  v[i++] = p.x;
-  v[i++] = p.y;
-  v[i++] = p.z;
+  v[i++] = p.x - this.startPoint.x;
+  v[i++] = p.y - this.startPoint.y;
+  v[i++] = p.z - this.startPoint.z;
   p.copy(pos).add(this.side).add(this.down);
-  v[i++] = p.x;
-  v[i++] = p.y;
-  v[i++] = p.z;
+  v[i++] = p.x - this.startPoint.x;
+  v[i++] = p.y - this.startPoint.y;
+  v[i++] = p.z - this.startPoint.z;
   p.copy(this.up).multiplyScalar(radius).add(pos);
-  v[i++] = p.x;
-  v[i++] = p.y;
-  v[i++] = p.z;
+  v[i++] = p.x - this.startPoint.x;
+  v[i++] = p.y - this.startPoint.y;
+  v[i++] = p.z - this.startPoint.z;
   if (!IS_WORKER_CONTEXT){
     this.positionBufferAttribute.needsUpdate = true;
   }
@@ -283,6 +283,7 @@ Lightning.prototype.update = function(){
     if (mode == 1 && this.attachedToFPSWeapon){
       this.handleFPSWeaponStartPosition();
     }
+    this.mesh.material.uniforms.startPoint.value.copy(this.startPoint);
   }
   this.state = this.STATE_UPDATE;
   this.idCounter = 0;

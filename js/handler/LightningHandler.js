@@ -199,6 +199,7 @@ LightningHandler.prototype.fillUpdateBuffer = function(lightning, lightningName)
   if ((mode == 1 || this.isFPSWeaponGUIOpen) && lightning.attachedToFPSWeapon){
     lightning.handleFPSWeaponStartPosition();
   }
+  lightning.mesh.material.uniforms.startPoint.value.copy(lightning.startPoint);
   var transferableMessageBody = lightningHandler.transferableMessageBody;
   transferableMessageBody.updateBuffer[lightningHandler.currentUpdateBufferIndex ++] = lightningHandler.lightningIDsByLightningName[lightningName];
   var indexInNodeBuffer = lightningHandler.startEndPointBufferIndicesByLightningName[lightningName];

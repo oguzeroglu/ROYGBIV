@@ -282,7 +282,8 @@ MeshGenerator.prototype.generateLightning = function(lightning){
     uniforms: {
       projectionMatrix: GLOBAL_PROJECTION_UNIFORM,
       modelViewMatrix: new THREE.Uniform(new THREE.Matrix4()),
-      color: new THREE.Uniform(new THREE.Color(lightning.colorName))
+      color: new THREE.Uniform(new THREE.Color(lightning.colorName)),
+      startPoint: new THREE.Uniform(new THREE.Vector3())
     }
   });
   var mesh = new THREE.Mesh(lightning.geometry, material);
