@@ -459,7 +459,7 @@ FPSControls.prototype.update = function(){
   this.playerBodyObject.setVelocityZ(0);
   this.xVelocity = 0;
   this.zVelocity = 0;
-  var hasMotion = this.isMouseDown;
+  var hasMotion = this.isMouseDown || this.isShooting;
   if (!isMobile){
     var len = this.keyboardActions.length;
     for (var i = 0; i<len; i++){
