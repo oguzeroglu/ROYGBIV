@@ -4,8 +4,20 @@ var WorldBinHandler2D = function(floatingPointCount){
   this.segmentCount = Math.pow(10, this.floatingPointCount);
 }
 
+WorldBinHandler2D.prototype.query = function(screenX, screenY){
+  var screenXConverted = this.convertFromWebGLRange(screenX);
+  var binIndexX = this.getBinIndex(screenXConverted);
+  if (this.bin.has(binIndexX)){
+    var screenYConverted = this.convertFromWebGLRange(screenY);
+    var binIndexY = this.getBinIndex(screenYConverted);
+    if (this.bin.get(binIndexX).has(binIndexY)){
+      // return results here
+    }
+  }
+}
+
 WorldBinHandler2D.prototype.convertFromWebGLRange = function(value){
-  return (value +1) / 2;
+  return (value + 1) / 2;
 }
 
 WorldBinHandler2D.prototype.getBinIndex = function(float){
