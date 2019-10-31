@@ -11,7 +11,7 @@ ObjectPicker2D.prototype.find = function(screenSpaceX, screenSpaceY){
   var webglSpaceX = ((screenSpaceX - rectX) / rectZ) * 2 - 1;
   var webglSpaceY = - ((screenSpaceY - rectY) / rectW) * 2 + 1;
   intersectionPoint = 0, intersectionObject = 0;
-  var totalObj = addedTexts2D;
+  var totalObj = sceneHandler.getAddedTexts2D();
   if (mode == 1){
     totalObj = sceneHandler.getClickableAddedTexts2D();
   }

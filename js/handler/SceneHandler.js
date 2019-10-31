@@ -488,6 +488,10 @@ SceneHandler.prototype.getAddedTexts = function(){
   return this.scenes[this.activeSceneName].addedTexts;
 }
 
+SceneHandler.prototype.getAddedTexts2D = function(){
+  return this.scenes[this.activeSceneName].addedTexts2D;
+}
+
 SceneHandler.prototype.getMuzzleFlashes = function(){
   return this.scenes[this.activeSceneName].muzzleFlashes;
 }

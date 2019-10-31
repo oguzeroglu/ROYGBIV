@@ -1210,7 +1210,9 @@ GUIHandler.prototype.initializeTextManipulationGUI = function(){
     selectionHandler.getSelectedObject().setAffectedByFog(val);
   }).listen();
   guiHandler.textManipulationIs2DController = guiHandler.datGuiTextManipulation.add(guiHandler.textManipulationParameters, "is 2D").onChange(function(val){
+    sceneHandler.onAddedTextDeletion(selectionHandler.getSelectedObject());
     selectionHandler.getSelectedObject().set2DStatus(val);
+    sceneHandler.onAddedTextCreation(selectionHandler.getSelectedObject());
     refreshRaycaster("Ok")
     if (val){
       guiHandler.enableController(guiHandler.textManipulationMarginModeController);

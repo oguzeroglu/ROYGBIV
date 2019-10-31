@@ -7,6 +7,7 @@ Scene.prototype.reset = function(){
   this.addedObjects = new Object();
   this.objectGroups = new Object();
   this.addedTexts = new Object();
+  this.addedTexts2D = new Object();
   this.gridSystems = new Object();
   this.wallCollections = new Object();
   this.markedPoints = new Object();
@@ -286,11 +287,17 @@ Scene.prototype.unmapSkybox = function(){
 Scene.prototype.registerAddedText = function(addedText){
   this.addedTexts[addedText.name] = addedText;
   addedText.registeredSceneName = this.name;
+  if (addedText.is2D){
+    this.addedTexts2D[addedText.name] = addedText;
+  }
 }
 
 Scene.prototype.unregisterAddedText = function(addedText){
   delete this.addedTexts[addedText.name];
   delete addedText.registeredSceneName;
+  if (addedText.is2D){
+    delete this.addedTexts2D[addedText.name];
+  }
 }
 
 Scene.prototype.registerObjectGroup = function(objectGroup){
