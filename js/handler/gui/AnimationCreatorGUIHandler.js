@@ -189,6 +189,9 @@ AnimationCreatorGUIHandler.prototype.init = function(object){
       if (!object.hasBackground && key == "BACKGROUND_COLOR"){
         continue;
       }
+      if (object.is2D && key == "POSITION_Z"){
+        continue;
+      }
       this.objectAnimationActionsAry.push(animationHandler.actionTypes.TEXT[key]);
     }
   }else{
