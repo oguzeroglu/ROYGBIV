@@ -1,13 +1,25 @@
 var ObjectPicker2D = function(){
   this.binHandlerPrecision = 1;
   this.binHandler = new WorldBinHandler2D(this.binHandlerPrecision);
+  this.updateBuffer = new Map();
+}
+
+ObjectPicker2D.prototype.issueUpdate = function(obj, objName){
+  objectPicker2D.binHandler.update(obj);
+}
+
+ObjectPicker2D.prototype.flush = function(){
+  this.updateBuffer.forEach(this.issueUpdate);
+  if (this.updateBuffer.size > 0){
+    this.updateBuffer.clear();
+  }
 }
 
 ObjectPicker2D.prototype.update = function(obj){
   if (obj.isAddedText && !obj.is2D){
     return;
   }
-  this.binHandler.update(obj);
+  this.updateBuffer.set(obj.name, obj);
 }
 
 ObjectPicker2D.prototype.hide = function(obj){

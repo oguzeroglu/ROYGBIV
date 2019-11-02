@@ -13,6 +13,7 @@ var CPUOperationsHandler = function(){
     updateCrosshair: 0,
     renderScene: 0,
     updateAddedTexts: 0,
+    updateObjectPicker2D: 0,
     updateRaycaster: 0,
     updateAnimations: 0,
     objectMouseEvents: 0,
@@ -108,6 +109,16 @@ CPUOperationsHandler.prototype.updateAnimations = function(){
     this.performanceLogs.updateAnimations = performance.now() - s;
   }else{
     animationHandler.update();
+  }
+}
+
+CPUOperationsHandler.prototype.updateObjectPicker2D = function(){
+  if (this.record){
+    var s = performance.now();
+    updateObjectPicker2D();
+    this.performanceLogs.updateObjectPicker2D = performance.now() - s;
+  }else{
+    updateObjectPicker2D();
   }
 }
 
