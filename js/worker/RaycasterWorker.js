@@ -284,6 +284,22 @@ RaycasterWorker.prototype.onParticleSystemRemoveCollisionListener = function(dat
   particleSystem.removeCollisionListener();
 }
 
+RaycasterWorker.prototype.set2DTextSizes = function(data){
+  if (!renderer.viewport){
+    return;
+  }
+  screenResolution = data.screenResolution;
+  renderer.viewport.x = data.vp.x;
+  renderer.viewport.y = data.vp.y;
+  renderer.viewport.z = data.vp.z;
+  renderer.viewport.w = data.vp.w;
+  var msgBody = data.body;
+  for (var textName in msgBody){
+    addedTexts[textName].twoDimensionalSize.set(msgBody[textName].x, msgBody[textName].y, msgBody[textName].z, msgBody[textName].w);
+  }
+  this.rayCaster.refresh2D();
+}
+
 // START
 raycasterFactory = new RaycasterFactory();
 var particleSystemGenerator = new ParticleSystemGenerator();
@@ -317,6 +333,8 @@ self.onmessage = function(msg){
     worker.onParticleSystemSetCollisionListener(msg.data.particleSystemSetCollisionListener);
   }else if (msg.data.particleSystemRemoveCollisionListener){
     worker.onParticleSystemRemoveCollisionListener(msg.data.particleSystemRemoveCollisionListener);
+  }else if (msg.data.refresh2D){
+    worker.set2DTextSizes(msg.data);
   }else{
     worker.update(msg.data);
     worker.transferableMessageBody = msg.data;

@@ -108,7 +108,6 @@ WorldBinHandler2D.prototype.insert = function(obj){
   }
   if (obj.isAddedText){
     this.insertAddedText(obj);
-    return;
   }
   if (this.applyCaching && this.cache.size > 0){
     this.cache.clear();
