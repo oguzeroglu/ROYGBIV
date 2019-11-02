@@ -1,5 +1,16 @@
 var ObjectPicker2D = function(){
+  this.binHandlerPrecision = 1;
+  this.binHandler = new WorldBinHandler2D(this.binHandlerPrecision);
+}
 
+ObjectPicker2D.prototype.refresh = function(){
+  this.binHandler = new WorldBinHandler2D(this.binHandlerPrecision);
+  if (mode == 0){
+    var texts = sceneHandler.getAddedTexts2D();
+    for (var textName in texts){
+      this.binHandler.insert(texts[textName]);
+    }
+  }
 }
 
 ObjectPicker2D.prototype.find = function(screenSpaceX, screenSpaceY){
@@ -11,12 +22,12 @@ ObjectPicker2D.prototype.find = function(screenSpaceX, screenSpaceY){
   var webglSpaceX = ((screenSpaceX - rectX) / rectZ) * 2 - 1;
   var webglSpaceY = - ((screenSpaceY - rectY) / rectW) * 2 + 1;
   intersectionPoint = 0, intersectionObject = 0;
-  var totalObj = sceneHandler.getAddedTexts2D();
-  if (mode == 1){
-    totalObj = sceneHandler.getClickableAddedTexts2D();
+  var results = this.binHandler.query(webglSpaceX, webglSpaceY);
+  if (!results){
+    return;
   }
-  for (var textName in totalObj){
-    var textObject = addedTexts2D[textName];
+  for (var name in results){
+    var textObject = addedTexts2D[name];
     if (!textObject.mesh.visible){
       continue;
     }
@@ -26,7 +37,7 @@ ObjectPicker2D.prototype.find = function(screenSpaceX, screenSpaceY){
     if (webglSpaceX >= textObject.twoDimensionalSize.x && webglSpaceX <= textObject.twoDimensionalSize.z){
       if (webglSpaceY >= textObject.twoDimensionalSize.w && webglSpaceY <= textObject.twoDimensionalSize.y){
         intersectionPoint = 1;
-        intersectionObject = textName;
+        intersectionObject = name;
       }
     }
   }

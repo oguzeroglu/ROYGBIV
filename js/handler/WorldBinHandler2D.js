@@ -11,7 +11,12 @@ WorldBinHandler2D.prototype.query = function(webglX, webglY){
     var screenYConverted = this.convertFromWebGLRange(webglY);
     var binIndexY = this.getBinIndex(screenYConverted);
     if (this.bin.get(binIndexX).has(binIndexY)){
-      // return results here
+      var results = new Object();
+      var keys = this.bin.get(binIndexX).get(binIndexY).keys();
+      for (var name of keys){
+        results[name] = true;
+      }
+      return results;
     }
   }
 }
@@ -25,7 +30,7 @@ WorldBinHandler2D.prototype.getBinIndex = function(float){
   if (result < 0){
     result = 0;
   }
-  return result;
+  return parseInt(result);
 }
 
 WorldBinHandler2D.prototype.insertAddedText = function(obj){
