@@ -5,11 +5,14 @@ var ObjectPicker2D = function(){
 
 ObjectPicker2D.prototype.refresh = function(){
   this.binHandler = new WorldBinHandler2D(this.binHandlerPrecision);
+  var texts;
   if (mode == 0){
-    var texts = sceneHandler.getAddedTexts2D();
-    for (var textName in texts){
-      this.binHandler.insert(texts[textName]);
-    }
+    texts = sceneHandler.getAddedTexts2D();
+  }else{
+    texts = sceneHandler.getClickableAddedTexts2D();
+  }
+  for (var textName in texts){
+    this.binHandler.insert(texts[textName]);
   }
 }
 

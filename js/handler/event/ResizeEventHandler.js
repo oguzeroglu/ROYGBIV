@@ -64,4 +64,5 @@ ResizeEventHandler.prototype.onResize = function(){
     addedTexts[textName].handleResize();
   }
   renderer.setPixelRatio(screenResolution);
+  objectPicker2D.refresh();
 }

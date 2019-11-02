@@ -74,6 +74,7 @@ ModeSwitcher.prototype.commonSwitchFunctions = function(){
     activeControl.onDeactivated();
   }
   activeControl = new FreeControls({});
+  objectPicker2D.refresh();
   raycasterFactory.refresh();
   physicsFactory.refresh();
   if (oldIsPaused){

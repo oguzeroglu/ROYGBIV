@@ -4608,6 +4608,7 @@ function parse(input){
             parseCommand("switchPhysicsDebugMode");
             parseCommand("switchPhysicsDebugMode");
           }
+          objectPicker2D.refresh();
           refreshRaycaster(Text.SCENE_SWITCHED);
           return true;
         break;
