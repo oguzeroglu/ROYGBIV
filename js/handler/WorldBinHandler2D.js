@@ -2,19 +2,37 @@ var WorldBinHandler2D = function(floatingPointCount){
   this.bin = new Map();
   this.floatingPointCount = floatingPointCount; // number of digits after floating point
   this.segmentCount = Math.pow(10, this.floatingPointCount);
+  this.cache = new Map();
+  this.applyCaching = true;
+  this.cacheHitCount = 0;
 }
 
 WorldBinHandler2D.prototype.query = function(webglX, webglY){
   var screenXConverted = this.convertFromWebGLRange(webglX);
+  var screenYConverted = this.convertFromWebGLRange(webglY);
   var binIndexX = this.getBinIndex(screenXConverted);
+  var binIndexY = this.getBinIndex(screenYConverted);
+  var cacheKey;
+  if (this.applyCaching){
+    cacheKey = binIndexX + PIPE + binIndexY;
+    var cached = this.cache.get(cacheKey);
+    if (cached){
+      this.cacheHitCount ++;
+      if (this.cacheHitCount > 10000){
+        this.cacheHitCount = 0;
+      }
+      return cached;
+    }
+  }
   if (this.bin.has(binIndexX)){
-    var screenYConverted = this.convertFromWebGLRange(webglY);
-    var binIndexY = this.getBinIndex(screenYConverted);
     if (this.bin.get(binIndexX).has(binIndexY)){
       var results = new Object();
       var keys = this.bin.get(binIndexX).get(binIndexY).keys();
       for (var name of keys){
         results[name] = true;
+      }
+      if (this.applyCaching){
+        this.cache.set(cacheKey, results);
       }
       return results;
     }
