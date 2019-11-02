@@ -74,7 +74,6 @@ ModeSwitcher.prototype.commonSwitchFunctions = function(){
     activeControl.onDeactivated();
   }
   activeControl = new FreeControls({});
-  objectPicker2D.refresh();
   raycasterFactory.refresh();
   physicsFactory.refresh();
   if (oldIsPaused){
@@ -215,6 +214,7 @@ ModeSwitcher.prototype.switchFromDesignToPreview = function(){
     }
   }
   renderer.setPixelRatio(screenResolution);
+  objectPicker2D.refresh();
 }
 
 ModeSwitcher.prototype.switchFromPreviewToDesign = function(){
@@ -416,4 +416,5 @@ ModeSwitcher.prototype.switchFromPreviewToDesign = function(){
     terminal.printInfo(Text.SWITCHED_TO_DESIGN_MODE);
   }
   renderer.setPixelRatio(screenResolution);
+  objectPicker2D.refresh();
 }

@@ -68,13 +68,59 @@ WorldBinHandler2D.prototype.insertAddedText = function(obj){
         this.bin.get(x).set(y, new Map());
       }
       this.bin.get(x).get(y).set(obj.name, true);
+      if (!obj.binInfo2D.has(x)){
+        obj.binInfo2D.set(x, new Map());
+      }
+      obj.binInfo2D.get(x).set(y, true);
     }
   }
 }
 
+WorldBinHandler2D.prototype.delete = function(obj){
+  if (!obj.binInfo2D){
+    return;
+  }
+  for (var x of obj.binInfo2D.keys()){
+    for (var y of obj.binInfo2D.get(x).keys()){
+      if (this.bin.has(x) && this.bin.get(x).has(y)){
+        this.bin.get(x).get(y).delete(obj.name);
+        if (this.bin.get(x).get(y).size == 0){
+          this.bin.get(x).delete(y);
+          if (this.bin.get(x).size == 0){
+            this.bin.delete(x);
+          }
+        }
+      }
+    }
+  }
+  obj.binInfo2D.clear();
+  if (this.applyCaching && this.cache.size > 0){
+    this.cache.clear();
+    this.cacheHitCount = 0;
+  }
+}
+
 WorldBinHandler2D.prototype.insert = function(obj){
+  if (!obj.binInfo2D){
+    obj.binInfo2D = new Map();
+  }else if (obj.binInfo2D.size > 0){
+    obj.binInfo2D.clear();
+  }
   if (obj.isAddedText){
     this.insertAddedText(obj);
     return;
+  }
+  if (this.applyCaching && this.cache.size > 0){
+    this.cache.clear();
+    this.cacheHitCount = 0;
+  }
+}
+
+WorldBinHandler2D.prototype.update = function(obj){
+  this.delete(obj);
+  this.insert(obj);
+  if (this.applyCaching && this.cache.size > 0){
+    this.cache.clear();
+    this.cacheHitCount = 0;
   }
 }

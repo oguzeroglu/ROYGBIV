@@ -2047,6 +2047,9 @@ Roygbiv.prototype.setTextPosition = function(text, x, y, z){
   preConditions.checkIfNumberOnlyIfExists(ROYGBIV.setTextPosition, preConditions.z, z);
   preConditions.checkIfTextInsideActiveScene(ROYGBIV.setTextPosition, text);
   text.setPosition(x, y, z);
+  if (text.is2D && text.isClickable){
+    objectPicker2D.update(text);
+  }
 }
 
 // Sets the background color/alpha of a text object.
@@ -2107,6 +2110,9 @@ Roygbiv.prototype.hideText = function(text){
   preConditions.checkIfTextInsideActiveScene(ROYGBIV.hideText, text);
   if (text.mesh.visible){
     text.hide();
+    if (text.is2D && text.isClickable){
+      objectPicker2D.hide(text);
+    }
   }
 }
 
@@ -2121,6 +2127,9 @@ Roygbiv.prototype.showText = function(text){
   preConditions.checkIfTextInsideActiveScene(ROYGBIV.showText, text);
   if (!text.mesh.visible){
     text.show();
+    if (text.is2D && text.isClickable){
+      objectPicker2D.show(text);
+    }
   }
 }
 

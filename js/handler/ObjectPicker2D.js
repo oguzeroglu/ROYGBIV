@@ -3,6 +3,21 @@ var ObjectPicker2D = function(){
   this.binHandler = new WorldBinHandler2D(this.binHandlerPrecision);
 }
 
+ObjectPicker2D.prototype.update = function(obj){
+  if (obj.isAddedText && !obj.is2D){
+    return;
+  }
+  this.binHandler.update(obj);
+}
+
+ObjectPicker2D.prototype.hide = function(obj){
+  this.binHandler.delete(obj);
+}
+
+ObjectPicker2D.prototype.show = function(obj){
+  this.binHandler.insert(obj);
+}
+
 ObjectPicker2D.prototype.refresh = function(){
   this.binHandler = new WorldBinHandler2D(this.binHandlerPrecision);
   var texts;

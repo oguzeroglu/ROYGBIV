@@ -1139,9 +1139,11 @@ GUIHandler.prototype.initializeTextManipulationGUI = function(){
       terminal.clear();
       terminal.printError(Text.THIS_TEXT_IS_ALLOCATED_FOR.replace(Text.PARAM1, addedText.strlen));
       guiHandler.textManipulationParameters["Content"] = addedText.text;
+      objectPicker2D.update(addedText);
       return;
     }
     addedText.setText(val);
+    objectPicker2D.update(addedText);
   }).listen();
   guiHandler.textManipulationTextColorController = guiHandler.datGuiTextManipulation.addColor(guiHandler.textManipulationParameters, "Text color").onChange(function(val){
     selectionHandler.getSelectedObject().setColor(val);
@@ -1176,14 +1178,17 @@ GUIHandler.prototype.initializeTextManipulationGUI = function(){
     selectionHandler.getSelectedObject().refCharSize= val;
     selectionHandler.getSelectedObject().refInnerHeight = window.innerHeight;
     selectionHandler.getSelectedObject().handleResize();
+    objectPicker2D.update(selectionHandler.getSelectedObject());
   }).listen();
   guiHandler.textManipulationCharacterMarginController = guiHandler.datGuiTextManipulation.add(guiHandler.textManipulationParameters, "Char margin").min(0.5).max(100).step(0.5).onChange(function(val){
     selectionHandler.getSelectedObject().setMarginBetweenChars(val);
     selectionHandler.getSelectedObject().handleResize();
+    objectPicker2D.update(selectionHandler.getSelectedObject());
   }).listen();
   guiHandler.textManipulationLineMarginController = guiHandler.datGuiTextManipulation.add(guiHandler.textManipulationParameters, "Line margin").min(0.5).max(100).step(0.5).onChange(function(val){
     selectionHandler.getSelectedObject().setMarginBetweenLines(val);
     selectionHandler.getSelectedObject().handleResize();
+    objectPicker2D.update(selectionHandler.getSelectedObject());
   }).listen();
   guiHandler.textManipulationClickableController = guiHandler.datGuiTextManipulation.add(guiHandler.textManipulationParameters, "Clickable").onChange(function(val){
     selectionHandler.getSelectedObject().isClickable = val;
@@ -1249,26 +1254,31 @@ GUIHandler.prototype.initializeTextManipulationGUI = function(){
       selectionHandler.getSelectedObject().marginMode = MARGIN_MODE_2D_TEXT_CENTER;
     }
     selectionHandler.getSelectedObject().set2DCoordinates(selectionHandler.getSelectedObject().marginPercentWidth, selectionHandler.getSelectedObject().marginPercentHeight);
+    objectPicker2D.update(selectionHandler.getSelectedObject());
   }).listen();
   guiHandler.textManipulationMarginXController = guiHandler.datGuiTextManipulation.add(guiHandler.textManipulationParameters, "Margin X").min(0).max(100).step(0.1).onChange(function(val){
     selectionHandler.getSelectedObject().set2DCoordinates(
       val, selectionHandler.getSelectedObject().marginPercentHeight
     );
     selectionHandler.getSelectedObject().handleResize();
+    objectPicker2D.update(selectionHandler.getSelectedObject());
   }).listen();
   guiHandler.textManipulationMarginYController = guiHandler.datGuiTextManipulation.add(guiHandler.textManipulationParameters, "Margin Y").min(0).max(100).step(0.1).onChange(function(val){
     selectionHandler.getSelectedObject().set2DCoordinates(
       selectionHandler.getSelectedObject().marginPercentWidth, val
     );
     selectionHandler.getSelectedObject().handleResize();
+    objectPicker2D.update(selectionHandler.getSelectedObject());
   }).listen();
   guiHandler.textManipulationMaxWidthPercentController = guiHandler.datGuiTextManipulation.add(guiHandler.textManipulationParameters, "Max width%").min(0).max(100).step(0.1).onChange(function(val){
     selectionHandler.getSelectedObject().maxWidthPercent = val;
     selectionHandler.getSelectedObject().handleResize();
+    objectPicker2D.update(selectionHandler.getSelectedObject());
   }).listen();
   guiHandler.textManipulationMaxHeightPercentController = guiHandler.datGuiTextManipulation.add(guiHandler.textManipulationParameters, "Max height%").min(0).max(100).step(0.1).onChange(function(val){
     selectionHandler.getSelectedObject().maxHeightPercent = val;
     selectionHandler.getSelectedObject().handleResize();
+    objectPicker2D.update(selectionHandler.getSelectedObject());
   }).listen();
 }
 
