@@ -2995,7 +2995,7 @@ Roygbiv.prototype.intersectionTest = function(fromVector, directionVector, onCom
   preConditions.checkIfFunctionOnlyIfExists(ROYGBIV.intersectionTest, preConditions.onComplete, onComplete);
   REUSABLE_VECTOR.set(fromVector.x, fromVector.y, fromVector.z);
   REUSABLE_VECTOR_2.set(directionVector.x, directionVector.y, directionVector.z).normalize();
-  rayCaster.findIntersections(REUSABLE_VECTOR, REUSABLE_VECTOR_2, false, onComplete);
+  rayCaster.findIntersections(REUSABLE_VECTOR, REUSABLE_VECTOR_2, false, onComplete, null, null);
 }
 
 // Returns if the current client is a mobile client.

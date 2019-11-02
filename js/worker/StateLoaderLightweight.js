@@ -55,7 +55,13 @@ StateLoaderLightweight.prototype.loadBoundingBoxes = function(){
   var addedObjectExports = this.state.addedObjects;
   var childAddedObjectExports = this.state.childAddedObjects;
   var objectGroupExports = this.state.objectGroups;
-  var addedTextExports = this.state.addedTexts3D;
+  var addedTextExports = new Object();
+  for (var key in this.state.addedTexts3D){
+    addedTextExports[key] = this.state.addedTexts3D[key];
+  }
+  for (var key in this.state.addedTexts2D){
+    addedTextExports[key] = this.state.addedTexts2D[key];
+  }
   for (var gsName in gridSystemExports){
     var gridSystem = new GridSystem();
     gridSystem.name = gsName;
@@ -204,7 +210,16 @@ StateLoaderLightweight.prototype.loadBoundingBoxes = function(){
     addedText.lastUpdatePosition = new THREE.Vector3();
     addedText.lastUpdateCameraPosition = new THREE.Vector3();
     addedText.isClickable = curExport.isClickable;
-    addedText.handleBoundingBox();
+    addedText.is2D = !!curExport.twoDimensionalSize;
+    if (!addedText.is2D){
+      addedText.handleBoundingBox();
+    }else{
+      addedText.twoDimensionalSize = new THREE.Vector4(curExport.twoDimensionalSize.x, curExport.twoDimensionalSize.y, curExport.twoDimensionalSize.z, curExport.twoDimensionalSize.w);
+      addedTexts2D[addedText.name] = addedText;
+      if (addedText.isClickable){
+        clickableAddedTexts2D[addedText.name] = addedText;
+      }
+    }
     addedTexts[textName] = addedText;
   }
 }

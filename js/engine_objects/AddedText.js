@@ -270,6 +270,12 @@ AddedText.prototype.exportLightweight = function(){
   exportObj.position = this.mesh.position;
   exportObj.initPosition = this.position;
   exportObj.isClickable = this.isClickable;
+  if (this.is2D){
+    if (!this.twoDimensionalSize){
+      this.handleResize();
+    }
+    exportObj.twoDimensionalSize = {x: this.twoDimensionalSize.x, y: this.twoDimensionalSize.y, z: this.twoDimensionalSize.z, w: this.twoDimensionalSize.w};
+  }
   return exportObj;
 }
 

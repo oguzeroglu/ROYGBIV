@@ -198,9 +198,6 @@ ModeSwitcher.prototype.switchFromDesignToPreview = function(){
       }
     }
   }
-  sceneHandler.onSwitchFromDesignToPreview();
-  this.commonSwitchFunctions();
-  handleViewport();
   for (var txtName in addedTexts){
     addedTexts[txtName].handleResize();
     if (addedTexts[txtName].isClickable){
@@ -213,8 +210,10 @@ ModeSwitcher.prototype.switchFromDesignToPreview = function(){
       }
     }
   }
+  sceneHandler.onSwitchFromDesignToPreview();
+  this.commonSwitchFunctions();
+  handleViewport();
   renderer.setPixelRatio(screenResolution);
-  objectPicker2D.refresh();
 }
 
 ModeSwitcher.prototype.switchFromPreviewToDesign = function(){
@@ -416,5 +415,4 @@ ModeSwitcher.prototype.switchFromPreviewToDesign = function(){
     terminal.printInfo(Text.SWITCHED_TO_DESIGN_MODE);
   }
   renderer.setPixelRatio(screenResolution);
-  objectPicker2D.refresh();
 }

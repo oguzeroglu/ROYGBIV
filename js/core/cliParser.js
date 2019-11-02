@@ -2914,8 +2914,7 @@ function parse(input){
           for (var textName in addedTexts){
             addedTexts[textName].handleResize();
           }
-          objectPicker2D.refresh();
-          terminal.printInfo(Text.RESOLUTION_SET);
+          refreshRaycaster(Text.RESOLUTION_SET);
           return true;
         break;
         case 135: //configureArea
@@ -4609,7 +4608,6 @@ function parse(input){
             parseCommand("switchPhysicsDebugMode");
             parseCommand("switchPhysicsDebugMode");
           }
-          objectPicker2D.refresh();
           refreshRaycaster(Text.SCENE_SWITCHED);
           return true;
         break;
@@ -4693,8 +4691,7 @@ function parse(input){
             return true;
           }
           targetText.syncProperties(sourceText);
-          objectPicker2D.refresh();
-          terminal.printInfo(Text.TEXT_PROPERTIES_SYNCED);
+          refreshRaycaster(Text.TEXT_PROPERTIES_SYNCED);
           return true;
         break;
         case 193: //newLightning

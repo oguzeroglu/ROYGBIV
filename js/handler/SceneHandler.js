@@ -294,7 +294,6 @@ SceneHandler.prototype.changeScene = function(sceneName, readyCallback){
     if (!isDeployment){
       rayCaster.onReadyCallback = noop;
     }
-    objectPicker2D.refresh();
     raycasterFactory.refresh();
     physicsFactory.refresh();
     if (this.scenes[sceneName].fogConfigurations){

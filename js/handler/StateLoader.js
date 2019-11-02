@@ -88,7 +88,6 @@ StateLoader.prototype.onAfterFinalized = function(){
       terminal.clear();
       terminal.printInfo("Project loaded.");
     }
-    objectPicker2D.refresh();
     rayCaster.refresh();
   }else{
     appendtoDeploymentConsole("Initializing workers.");

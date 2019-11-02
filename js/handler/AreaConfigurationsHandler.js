@@ -218,7 +218,7 @@ AreaConfigurationsHandler.prototype.autoConfigureArea = function(areaName){
     for (var i = 0; i<200; i++){
       var vec = this.sphericalDistribution(1);
       REUSABLE_VECTOR_4.set(vec.x , vec.y, vec.z);
-      pseudoRaycaster.findIntersections(REUSABLE_VECTOR_5, REUSABLE_VECTOR_4, false, noop);
+      pseudoRaycaster.findIntersections(REUSABLE_VECTOR_5, REUSABLE_VECTOR_4, false, noop, null, null);
       if (intersectionPoint){
         visibleObjects[intersectionObject] = true;
       }

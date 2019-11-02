@@ -32,12 +32,7 @@ ObjectPicker2D.prototype.show = function(obj){
 
 ObjectPicker2D.prototype.refresh = function(){
   this.binHandler = new WorldBinHandler2D(this.binHandlerPrecision);
-  var texts;
-  if (mode == 0){
-    texts = sceneHandler.getAddedTexts2D();
-  }else{
-    texts = sceneHandler.getClickableAddedTexts2D();
-  }
+  var texts = this.getTexts();
   for (var textName in texts){
     this.binHandler.insert(texts[textName]);
   }
@@ -69,6 +64,22 @@ ObjectPicker2D.prototype.find = function(screenSpaceX, screenSpaceY){
         intersectionPoint = 1;
         intersectionObject = name;
       }
+    }
+  }
+}
+
+ObjectPicker2D.prototype.getTexts = function(){
+  if (!IS_WORKER_CONTEXT){
+    if (mode == 0){
+      return sceneHandler.getAddedTexts2D();
+    }else{
+      return sceneHandler.getClickableAddedTexts2D();
+    }
+  }else{
+    if (mode == 0){
+      return addedTexts2D;
+    }else{
+      return clickableAddedTexts2D;
     }
   }
 }

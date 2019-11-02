@@ -14,8 +14,11 @@ importScripts("../engine_objects/Particle.js");
 importScripts("../engine_objects/ParticleSystem.js");
 importScripts("../handler/factory/RaycasterFactory.js");
 importScripts("../engine_objects/CollisionInfo.js");
+importScripts("../handler/WorldBinHandler2D.js");
+importScripts("../handler/ObjectPicker2D.js");
 
 var IS_WORKER_CONTEXT = true;
+var objectPicker2D = new ObjectPicker2D();
 
 // CLASS DEFINITION
 var RaycasterWorker = function(){
@@ -206,18 +209,28 @@ RaycasterWorker.prototype.update = function(transferableMessageBody){
     }
   }
   if (transferableMessageBody.flagsDescription[1] > 0){
+    intersectionObject = 0, intersectionPoint = 0;
     var intersectionTestDescription = transferableMessageBody.intersectionTestDescription;
-    for (var i = 0; i<intersectionTestDescription.length; i+= 8){
+    for (var i = 0; i<intersectionTestDescription.length; i+= 11){
       if (intersectionTestDescription[i] >= 0){
-        this.reusableVector1.set(intersectionTestDescription[i+1], intersectionTestDescription[i+2], intersectionTestDescription[i+3]);
-        this.reusableVector2.set(intersectionTestDescription[i+4], intersectionTestDescription[i+5], intersectionTestDescription[i+6]);
-        var intersectGridSystems = (intersectionTestDescription[i+7] > 0);
-        this.rayCaster.findIntersections(this.reusableVector1, this.reusableVector2, intersectGridSystems, noop);
-        if (intersectionObject){
+        var test2D = intersectionTestDescription[i + 8] > 0;
+        if (test2D){
+          objectPicker2D.find(intersectionTestDescription[i + 9], intersectionTestDescription[i + 10]);
+        }
+        if (!intersectionPoint){
+          this.reusableVector1.set(intersectionTestDescription[i+1], intersectionTestDescription[i+2], intersectionTestDescription[i+3]);
+          this.reusableVector2.set(intersectionTestDescription[i+4], intersectionTestDescription[i+5], intersectionTestDescription[i+6]);
+          var intersectGridSystems = (intersectionTestDescription[i+7] > 0);
+          this.rayCaster.findIntersections(this.reusableVector1, this.reusableVector2, intersectGridSystems, noop);
+          if (intersectionObject){
+            intersectionTestDescription[i+1] = this.workerIDsByObjectName[intersectionObject];
+            intersectionTestDescription[i+2] = intersectionPoint.x; intersectionTestDescription[i+3] = intersectionPoint.y; intersectionTestDescription[i+4] = intersectionPoint.z;
+          }else{
+            intersectionTestDescription[i+1] = -1;
+          }
+        }else{
           intersectionTestDescription[i+1] = this.workerIDsByObjectName[intersectionObject];
           intersectionTestDescription[i+2] = intersectionPoint.x; intersectionTestDescription[i+3] = intersectionPoint.y; intersectionTestDescription[i+4] = intersectionPoint.z;
-        }else{
-          intersectionTestDescription[i+1] = -1;
         }
       }
     }

@@ -7,6 +7,10 @@ var RayCaster = function(){
   this.ready = false;
 }
 
+RayCaster.prototype.refresh2D = function(){
+  objectPicker2D.refresh();
+}
+
 RayCaster.prototype.onReady = function(){
   this.ready = true;
   if (this.onReadyCallback){
@@ -27,6 +31,7 @@ RayCaster.prototype.refresh = function(){
     return;
   }
   this.ready = false;
+  this.refresh2D();
   this.binHandler = new WorldBinHandler();
   for (var objName in this.getAddedObjects()){
     var addedObject = addedObjects[objName];
@@ -94,8 +99,13 @@ RayCaster.prototype.issueUpdate = function(obj){
   }
 }
 
-RayCaster.prototype.findIntersections = function(from, direction, intersectGridSystems, callbackFunction){
+RayCaster.prototype.findIntersections = function(from, direction, intersectGridSystems, callbackFunction, clientX, clientY){
   intersectionPoint = 0, intersectionObject = 0;
+  objectPicker2D.find(clientX, clientY);
+  if (intersectionPoint){
+    callbackFunction();
+    return;
+  }
   this.origin.copy(from);
   this.direction.copy(direction);
   this.oldPosition.copy(this.origin);

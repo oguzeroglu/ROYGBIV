@@ -57,6 +57,13 @@ var LightweightState = function(){
       this.addedTexts3D[textName] = addedTexts[textName].exportLightweight();
     }
   }
+  // 2D ADDED TEXTS
+  this.addedTexts2D = new Object();
+  for (var textName in sceneHandler.getAddedTexts2D()){
+    if (addedTexts[textName].is2D){
+      this.addedTexts2D[textName] = addedTexts[textName].exportLightweight();
+    }
+  }
   // PARTICLE SYSTEMS
   this.particleSystems = new Object();
   for (var psName in particleSystemPool){

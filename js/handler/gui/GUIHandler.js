@@ -1218,7 +1218,6 @@ GUIHandler.prototype.initializeTextManipulationGUI = function(){
     sceneHandler.onAddedTextDeletion(selectionHandler.getSelectedObject());
     selectionHandler.getSelectedObject().set2DStatus(val);
     sceneHandler.onAddedTextCreation(selectionHandler.getSelectedObject());
-    objectPicker2D.refresh();
     refreshRaycaster("Ok")
     if (val){
       guiHandler.enableController(guiHandler.textManipulationMarginModeController);
