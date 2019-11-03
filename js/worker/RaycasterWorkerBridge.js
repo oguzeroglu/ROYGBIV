@@ -100,16 +100,27 @@ var RaycasterWorkerBridge = function(){
       var addedTextScaleDescriptionIndex = 0;
       for (var textName in sceneHandler.getAddedTexts()){
         var text = addedTexts[textName];
-        var insertTextToBuffer = (!text.is2D) && ((mode == 0) || (mode == 1 && text.isClickable));
+        var insertTextToBuffer = ((mode == 0) || (mode == 1 && text.isClickable));
         if (insertTextToBuffer){
           text.indexInIntersectableObjDescriptionArray = intersectableArrayIndex;
           text.indexInTextScaleDescriptionArray = addedTextScaleDescriptionIndex;
           intersectablesAry.push(rayCaster.idsByObjectNames[text.name]);
           intersectablesAry.push(1);
           addedTextScaleDescriptionArray.push(rayCaster.idsByObjectNames[text.name]);
-          text.mesh.updateMatrixWorld();
-          for (var i = 0; i<text.mesh.matrixWorld.elements.length; i++){
-            intersectablesAry.push(text.mesh.matrixWorld.elements[i]);
+          if (!text.is2D){
+            text.mesh.updateMatrixWorld();
+            for (var i = 0; i<text.mesh.matrixWorld.elements.length; i++){
+              intersectablesAry.push(text.mesh.matrixWorld.elements[i]);
+            }
+          }else{
+            text.handleResize();
+            intersectablesAry.push(text.twoDimensionalSize.x);
+            intersectablesAry.push(text.twoDimensionalSize.y);
+            intersectablesAry.push(text.twoDimensionalSize.z);
+            intersectablesAry.push(text.twoDimensionalSize.w);
+            for (var i = 0; i<12; i++){
+              intersectablesAry.push(-1);
+            }
           }
           intersectableArrayIndex += text.mesh.matrixWorld.elements.length + 2;
           addedTextScaleDescriptionArray.push(text.characterSize);
@@ -271,6 +282,7 @@ RaycasterWorkerBridge.prototype.getGridSystems = noop;
 RaycasterWorkerBridge.prototype.getAddedObjects = noop;
 RaycasterWorkerBridge.prototype.getObjectGroups = noop;
 RaycasterWorkerBridge.prototype.getAddedTexts = noop;
+RaycasterWorkerBridge.prototype.update2D = noop;
 
 RaycasterWorkerBridge.prototype.refresh2D = function(){
   var totalObj = (mode == 0)? sceneHandler.getAddedTexts2D(): sceneHandler.getClickableAddedTexts2D();
@@ -450,8 +462,15 @@ RaycasterWorkerBridge.prototype.issueParticleSystemStatusUpdate = function(ps){
 RaycasterWorkerBridge.prototype.issueUpdate = function(obj){
   obj.mesh.updateMatrixWorld();
   var description = rayCaster.transferableMessageBody.intersectableObjDescription;
-  for (var i = obj.indexInIntersectableObjDescriptionArray + 2; i < obj.indexInIntersectableObjDescriptionArray + 18; i++){
-    description[i] = obj.mesh.matrixWorld.elements[i - obj.indexInIntersectableObjDescriptionArray - 2]
+  if (obj.isAddedText && obj.is2D){
+    description[obj.indexInIntersectableObjDescriptionArray + 2] = obj.twoDimensionalSize.x;
+    description[obj.indexInIntersectableObjDescriptionArray + 3] = obj.twoDimensionalSize.y;
+    description[obj.indexInIntersectableObjDescriptionArray + 4] = obj.twoDimensionalSize.z;
+    description[obj.indexInIntersectableObjDescriptionArray + 5] = obj.twoDimensionalSize.w;
+  }else{
+    for (var i = obj.indexInIntersectableObjDescriptionArray + 2; i < obj.indexInIntersectableObjDescriptionArray + 18; i++){
+      description[i] = obj.mesh.matrixWorld.elements[i - obj.indexInIntersectableObjDescriptionArray - 2]
+    }
   }
   if (obj.isHidden){
     description[obj.indexInIntersectableObjDescriptionArray+1] = -1;
@@ -465,6 +484,9 @@ RaycasterWorkerBridge.prototype.updateObject = function(obj){
     return;
   }
   if (mode == 1 && (obj.isAddedObject || obj.isObjectGroup) && !obj.isIntersectable){
+    return;
+  }
+  if (mode == 1 && (obj.isAddedText && obj.is2D && !obj.isClickable)){
     return;
   }
   if (obj.isAddedText && obj.isEditorHelper){

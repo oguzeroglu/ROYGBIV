@@ -123,17 +123,24 @@ RaycasterWorker.prototype.update = function(transferableMessageBody){
           obj.isHidden = false;
         }
       }else if (obj.isAddedText){
-        for (var i2 = i+2; i2 < (i+18); i2++){
-          this.reusableArray16[i2-i-2] = intersectableObjDescription[i2];
+        if (obj.is2D){
+          obj.twoDimensionalSize.x = intersectableObjDescription[i + 2];
+          obj.twoDimensionalSize.y = intersectableObjDescription[i + 3];
+          obj.twoDimensionalSize.z = intersectableObjDescription[i + 4];
+          obj.twoDimensionalSize.w = intersectableObjDescription[i + 5];
+        }else{
+          for (var i2 = i+2; i2 < (i+18); i2++){
+            this.reusableArray16[i2-i-2] = intersectableObjDescription[i2];
+          }
+          obj.mesh.matrixWorld.fromArray(this.reusableArray16);
+          obj.mesh.matrixWorld.decompose(this.reusableVector1, this.reusableQuaternion, this.reusableVector2);
+          obj.mesh.position.copy(this.reusableVector1);
+          obj.mesh.quaternion.copy(this.reusableQuaternion);
+          REUSABLE_MATRIX_4.copy(obj.mesh.matrixWorld);
+          REUSABLE_MATRIX_4.premultiply(camera.matrixWorldInverse);
+          obj.mesh.modelViewMatrix.copy(REUSABLE_MATRIX_4);
+          obj.handleBoundingBox();
         }
-        obj.mesh.matrixWorld.fromArray(this.reusableArray16);
-        obj.mesh.matrixWorld.decompose(this.reusableVector1, this.reusableQuaternion, this.reusableVector2);
-        obj.mesh.position.copy(this.reusableVector1);
-        obj.mesh.quaternion.copy(this.reusableQuaternion);
-        REUSABLE_MATRIX_4.copy(obj.mesh.matrixWorld);
-        REUSABLE_MATRIX_4.premultiply(camera.matrixWorldInverse);
-        obj.mesh.modelViewMatrix.copy(REUSABLE_MATRIX_4);
-        obj.handleBoundingBox();
         this.rayCaster.updateObject(obj, true);
       }else{
         throw new Error("Not implemented.");

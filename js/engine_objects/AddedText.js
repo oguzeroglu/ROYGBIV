@@ -962,6 +962,7 @@ AddedText.prototype.set2DCoordinates = function(marginPercentWidth, marginPercen
     this.webglSpaceSize.x, this.webglSpaceSize.y
   );
   this.rectangle.updateMesh(0.005);
+  rayCaster.updateObject(this);
 }
 
 AddedText.prototype.debugCornerPoints = function(representativeCharacter, cornerIndex){

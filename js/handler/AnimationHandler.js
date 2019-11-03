@@ -292,33 +292,18 @@ var AnimationHandler = function(){
   };
   this.afterAnimationSettersByType[this.actionTypes.TEXT.CHAR_SIZE] = function(animation){
     animation.attachedObject.setCharSize(animation.initialValue);
-    if (animation.attachedObject.is2D && animation.attachedObject.isClickable){
-      objectPicker2D.update(animation.attachedObject);
-    }
   };
   this.afterAnimationSettersByType[this.actionTypes.TEXT.MARGIN_BETWEEN_CHARS] = function(animation){
     animation.attachedObject.setMarginBetweenChars(animation.initialValue);
-    if (animation.attachedObject.is2D && animation.attachedObject.isClickable){
-      objectPicker2D.update(animation.attachedObject);
-    }
   }
   this.afterAnimationSettersByType[this.actionTypes.TEXT.MARGIN_BETWEEN_LINES] = function(animation){
     animation.attachedObject.setMarginBetweenLines(animation.initialValue);
-    if (animation.attachedObject.is2D && animation.attachedObject.isClickable){
-      objectPicker2D.update(animation.attachedObject);
-    }
   }
   this.afterAnimationSettersByType[this.actionTypes.TEXT.POSITION_X] = function(animation){
     animation.attachedObject.setPositionX(animation.initialValue);
-    if (animation.attachedObject.is2D && animation.attachedObject.isClickable){
-      objectPicker2D.update(animation.attachedObject);
-    }
   }
   this.afterAnimationSettersByType[this.actionTypes.TEXT.POSITION_Y] = function(animation){
     animation.attachedObject.setPositionY(animation.initialValue);
-    if (animation.attachedObject.is2D && animation.attachedObject.isClickable){
-      objectPicker2D.update(animation.attachedObject);
-    }
   }
   this.afterAnimationSettersByType[this.actionTypes.TEXT.POSITION_Z] = function(animation){
     animation.attachedObject.setPositionZ(animation.initialValue);
@@ -331,9 +316,6 @@ var AnimationHandler = function(){
   }
   this.afterAnimationSettersByType[this.actionTypes.TEXT.TYPING] = function(animation){
     animation.attachedObject.setText(animation.params.sourceText, false);
-    if (animation.attachedObject.is2D && animation.attachedObject.isClickable){
-      objectPicker2D.update(animation.attachedObject);
-    }
   }
   // ACTION FUNCTIONS **********************************************
   this.actionFunctionsByType = new Object();
@@ -666,33 +648,18 @@ AnimationHandler.prototype.updateTextTransparencyFunc = function(params){
 }
 AnimationHandler.prototype.updateTextCharSizeFunc = function(params){
   params.object.setCharSize(params.value);
-  if (params.object.is2D && params.object.isClickable){
-    objectPicker2D.update(params.object);
-  }
 }
 AnimationHandler.prototype.updateTextMarginBetweenCharsFunc = function(params){
   params.object.setMarginBetweenChars(params.value);
-  if (params.object.is2D && params.object.isClickable){
-    objectPicker2D.update(params.object);
-  }
 }
 AnimationHandler.prototype.updateTextMarginBetweenLinesFunc = function(params){
   params.object.setMarginBetweenLines(params.value);
-  if (params.object.is2D && params.object.isClickable){
-    objectPicker2D.update(params.object);
-  }
 }
 AnimationHandler.prototype.updateTextPositionXFunc = function(params){
   params.object.setPositionX(params.value);
-  if (params.object.is2D && params.object.isClickable){
-    objectPicker2D.update(params.object);
-  }
 }
 AnimationHandler.prototype.updateTextPositionYFunc = function(params){
   params.object.setPositionY(params.value);
-  if (params.object.is2D && params.object.isClickable){
-    objectPicker2D.update(params.object);
-  }
 }
 AnimationHandler.prototype.updateTextPositionZFunc = function(params){
   params.object.setPositionZ(params.value);
@@ -707,9 +674,6 @@ AnimationHandler.prototype.updateTextBackgroundColorFunc = function(params){
 }
 AnimationHandler.prototype.updateTextTypingFunc = function(params){
   params.object.firstNChars(params.sourceText, params.value);
-  if (params.object.is2D && params.object.isClickable){
-    objectPicker2D.update(params.object);
-  }
 }
 // UPDATE FUNCTIONS ************************************************
 AnimationHandler.prototype.linearFunc = function(curTime, startVal, changeInVal, totalTime){

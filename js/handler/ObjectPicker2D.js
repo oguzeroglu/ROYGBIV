@@ -15,8 +15,15 @@ ObjectPicker2D.prototype.flush = function(){
   }
 }
 
-ObjectPicker2D.prototype.update = function(obj){
+ObjectPicker2D.prototype.update = function(obj, forceUpdate){
   if (obj.isAddedText && !obj.is2D){
+    return;
+  }
+  if (mode == 1 && obj.isAddedText && !obj.isClickable){
+    return;
+  }
+  if (forceUpdate){
+    this.issueUpdate(obj, obj.name);
     return;
   }
   this.updateBuffer.set(obj.name, obj);

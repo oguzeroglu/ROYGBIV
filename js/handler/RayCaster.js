@@ -7,6 +7,10 @@ var RayCaster = function(){
   this.ready = false;
 }
 
+RayCaster.prototype.update2D = function(object, forceUpdate){
+  objectPicker2D.update(object, forceUpdate);
+}
+
 RayCaster.prototype.refresh2D = function(){
   objectPicker2D.refresh();
 }
@@ -86,6 +90,10 @@ RayCaster.prototype.refresh = function(){
 }
 
 RayCaster.prototype.updateObject = function(obj, forceUpdate){
+  if (obj.isAddedText && obj.is2D){
+    this.update2D(obj, forceUpdate);
+    return;
+  }
   if (forceUpdate){
     this.binHandler.updateObject(obj);
     return;
