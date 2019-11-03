@@ -16,13 +16,14 @@ var RaycasterWorkerBridge = function(){
   };
   this.intersectionTestBuffer = {
     isActive: false, fromVectors: [] , directionVectors: [],
-    intersectGridSystems: [], callbackFunctions: []
+    intersectGridSystems: [], callbackFunctions: [], test2D: []
   };
   for (var i = 0 ; i < this.maxIntersectionCountInAFrame; i ++){
     this.intersectionTestBuffer.fromVectors.push(new THREE.Vector3());
     this.intersectionTestBuffer.directionVectors.push(new THREE.Vector3());
     this.intersectionTestBuffer.intersectGridSystems.push(false);
     this.intersectionTestBuffer.callbackFunctions.push(noop);
+    this.intersectionTestBuffer.test2D.push({test: false, x: null, y: null});
   }
   this.worker.addEventListener("message", function(msg){
     if (msg.data.isPerformanceLog){
@@ -99,16 +100,27 @@ var RaycasterWorkerBridge = function(){
       var addedTextScaleDescriptionIndex = 0;
       for (var textName in sceneHandler.getAddedTexts()){
         var text = addedTexts[textName];
-        var insertTextToBuffer = (!text.is2D) && ((mode == 0) || (mode == 1 && text.isClickable));
+        var insertTextToBuffer = ((mode == 0) || (mode == 1 && text.isClickable));
         if (insertTextToBuffer){
           text.indexInIntersectableObjDescriptionArray = intersectableArrayIndex;
           text.indexInTextScaleDescriptionArray = addedTextScaleDescriptionIndex;
           intersectablesAry.push(rayCaster.idsByObjectNames[text.name]);
           intersectablesAry.push(1);
           addedTextScaleDescriptionArray.push(rayCaster.idsByObjectNames[text.name]);
-          text.mesh.updateMatrixWorld();
-          for (var i = 0; i<text.mesh.matrixWorld.elements.length; i++){
-            intersectablesAry.push(text.mesh.matrixWorld.elements[i]);
+          if (!text.is2D){
+            text.mesh.updateMatrixWorld();
+            for (var i = 0; i<text.mesh.matrixWorld.elements.length; i++){
+              intersectablesAry.push(text.mesh.matrixWorld.elements[i]);
+            }
+          }else{
+            text.handleResize();
+            intersectablesAry.push(text.twoDimensionalSize.x);
+            intersectablesAry.push(text.twoDimensionalSize.y);
+            intersectablesAry.push(text.twoDimensionalSize.z);
+            intersectablesAry.push(text.twoDimensionalSize.w);
+            for (var i = 0; i<12; i++){
+              intersectablesAry.push(-1);
+            }
           }
           intersectableArrayIndex += text.mesh.matrixWorld.elements.length + 2;
           addedTextScaleDescriptionArray.push(text.characterSize);
@@ -148,7 +160,7 @@ var RaycasterWorkerBridge = function(){
         }
       }
       var intersectableObjectDescriptionArray = new Float32Array(intersectablesAry);
-      var intersectionTestDescription = new Float32Array(8 * rayCaster.maxIntersectionCountInAFrame);
+      var intersectionTestDescription = new Float32Array(11 * rayCaster.maxIntersectionCountInAFrame);
       var particleSystemStatusDescription = new Float32Array(particleSystemStatusDescriptionArray);
       var cameraOrientationDescription = new Float32Array(8);
       var flagsDescription = new Float32Array(4);
@@ -185,7 +197,7 @@ var RaycasterWorkerBridge = function(){
       rayCaster.transferableList[7] = rayCaster.transferableMessageBody.particleSystemCollisionCallbackDescription.buffer;
       var intersectionTestDescription = rayCaster.transferableMessageBody.intersectionTestDescription;
       if (rayCaster.transferableMessageBody.flagsDescription[1] > 0){
-        for (var i = 0; i<intersectionTestDescription.length; i+=8){
+        for (var i = 0; i<intersectionTestDescription.length; i+=11){
           if (intersectionTestDescription[i] < 0){
             break;
           }
@@ -198,6 +210,7 @@ var RaycasterWorkerBridge = function(){
             intersectionPoint = REUSABLE_VECTOR;
             callbackFunc(intersectionPoint.x, intersectionPoint.y, intersectionPoint.z, intersectionObject)
           }else{
+            intersectionPoint = 0;
             callbackFunc(0, 0, 0, null);
           }
         }
@@ -269,6 +282,20 @@ RaycasterWorkerBridge.prototype.getGridSystems = noop;
 RaycasterWorkerBridge.prototype.getAddedObjects = noop;
 RaycasterWorkerBridge.prototype.getObjectGroups = noop;
 RaycasterWorkerBridge.prototype.getAddedTexts = noop;
+RaycasterWorkerBridge.prototype.update2D = noop;
+RaycasterWorkerBridge.prototype.hide2D = noop;
+RaycasterWorkerBridge.prototype.show2D = noop;
+
+RaycasterWorkerBridge.prototype.refresh2D = function(){
+  var totalObj = (mode == 0)? sceneHandler.getAddedTexts2D(): sceneHandler.getClickableAddedTexts2D();
+  var msgBody = new Object();
+  for (var textName in totalObj){
+    var size = totalObj[textName].twoDimensionalSize;
+    msgBody[textName] = {x: size.x, y: size.y, z: size.z, w: size.w};
+  }
+  var vp = {x: renderer.getCurrentViewport().x, y: renderer.getCurrentViewport().y, z: renderer.getCurrentViewport().z, w: renderer.getCurrentViewport().w}
+  this.worker.postMessage({refresh2D: true, body: msgBody, vp: vp, screenResolution: screenResolution});
+}
 
 RaycasterWorkerBridge.prototype.onReady = function(){
   this.ready = true;
@@ -328,10 +355,13 @@ RaycasterWorkerBridge.prototype.flush = function(){
         intersectionTestDescription[i2++] = this.intersectionTestBuffer.directionVectors[i].x;
         intersectionTestDescription[i2++] = this.intersectionTestBuffer.directionVectors[i].y;
         intersectionTestDescription[i2++] = this.intersectionTestBuffer.directionVectors[i].z;
-        intersectionTestDescription[i2++] = (this.intersectionTestBuffer.intersectGridSystems[i]? 1: -1)
+        intersectionTestDescription[i2++] = (this.intersectionTestBuffer.intersectGridSystems[i]? 1: -1);
+        intersectionTestDescription[i2++] = (this.intersectionTestBuffer.test2D.test)? 1: -1;
+        intersectionTestDescription[i2++] = (this.intersectionTestBuffer.test2D.test)? this.intersectionTestBuffer.test2D.x: -1;
+        intersectionTestDescription[i2++] = (this.intersectionTestBuffer.test2D.test)? this.intersectionTestBuffer.test2D.y: -1;
       }else{
         intersectionTestDescription[i2] = -1;
-        i2+=8;
+        i2+=11;
       }
     }
     this.intersectionTestBuffer.isActive = false;
@@ -361,13 +391,14 @@ RaycasterWorkerBridge.prototype.refresh = function(){
   this.particleSystemStatusUpdateBuffer = new Map();
   this.intersectionTestBuffer = {
     isActive: false, fromVectors: [] , directionVectors: [],
-    intersectGridSystems: [], callbackFunctions: []
+    intersectGridSystems: [], callbackFunctions: [], test2D: []
   };
   for (var i = 0 ; i < this.maxIntersectionCountInAFrame; i ++){
     this.intersectionTestBuffer.fromVectors.push(new THREE.Vector3());
     this.intersectionTestBuffer.directionVectors.push(new THREE.Vector3());
     this.intersectionTestBuffer.intersectGridSystems.push(false);
     this.intersectionTestBuffer.callbackFunctions.push(noop);
+    this.intersectionTestBuffer.test2D.push({test: false, x: null, y: null});
   }
   this.worker.postMessage(new LightweightState());
 }
@@ -433,8 +464,15 @@ RaycasterWorkerBridge.prototype.issueParticleSystemStatusUpdate = function(ps){
 RaycasterWorkerBridge.prototype.issueUpdate = function(obj){
   obj.mesh.updateMatrixWorld();
   var description = rayCaster.transferableMessageBody.intersectableObjDescription;
-  for (var i = obj.indexInIntersectableObjDescriptionArray + 2; i < obj.indexInIntersectableObjDescriptionArray + 18; i++){
-    description[i] = obj.mesh.matrixWorld.elements[i - obj.indexInIntersectableObjDescriptionArray - 2]
+  if (obj.isAddedText && obj.is2D){
+    description[obj.indexInIntersectableObjDescriptionArray + 2] = obj.twoDimensionalSize.x;
+    description[obj.indexInIntersectableObjDescriptionArray + 3] = obj.twoDimensionalSize.y;
+    description[obj.indexInIntersectableObjDescriptionArray + 4] = obj.twoDimensionalSize.z;
+    description[obj.indexInIntersectableObjDescriptionArray + 5] = obj.twoDimensionalSize.w;
+  }else{
+    for (var i = obj.indexInIntersectableObjDescriptionArray + 2; i < obj.indexInIntersectableObjDescriptionArray + 18; i++){
+      description[i] = obj.mesh.matrixWorld.elements[i - obj.indexInIntersectableObjDescriptionArray - 2]
+    }
   }
   if (obj.isHidden){
     description[obj.indexInIntersectableObjDescriptionArray+1] = -1;
@@ -450,13 +488,16 @@ RaycasterWorkerBridge.prototype.updateObject = function(obj){
   if (mode == 1 && (obj.isAddedObject || obj.isObjectGroup) && !obj.isIntersectable){
     return;
   }
+  if (mode == 1 && (obj.isAddedText && obj.is2D && !obj.isClickable)){
+    return;
+  }
   if (obj.isAddedText && obj.isEditorHelper){
     return;
   }
   this.updateBuffer.set(obj.name, obj);
 }
 
-RaycasterWorkerBridge.prototype.findIntersections = function(from, direction, intersectGridSystems, callbackFunction){
+RaycasterWorkerBridge.prototype.findIntersections = function(from, direction, intersectGridSystems, callbackFunction, coord2DX, coord2DY){
   if (this.curIntersectionTestRequestCount < this.maxIntersectionCountInAFrame){
     var i = this.curIntersectionTestRequestCount;
     this.intersectionTestBuffer.isActive = true;
@@ -464,6 +505,13 @@ RaycasterWorkerBridge.prototype.findIntersections = function(from, direction, in
     this.intersectionTestBuffer.directionVectors[i].copy(direction);
     this.intersectionTestBuffer.intersectGridSystems[i] = intersectGridSystems;
     this.intersectionTestBuffer.callbackFunctions[i] = callbackFunction;
+    if (coord2DX != null && coord2DY != null){
+      this.intersectionTestBuffer.test2D.test = true;
+      this.intersectionTestBuffer.test2D.x = coord2DX;
+      this.intersectionTestBuffer.test2D.y = coord2DY;
+    }else{
+      this.intersectionTestBuffer.test2D.test = false;
+    }
     this.curIntersectionTestRequestCount ++;
   }
 }

@@ -2914,7 +2914,7 @@ function parse(input){
           for (var textName in addedTexts){
             addedTexts[textName].handleResize();
           }
-          terminal.printInfo(Text.RESOLUTION_SET);
+          refreshRaycaster(Text.RESOLUTION_SET);
           return true;
         break;
         case 135: //configureArea
@@ -4691,7 +4691,7 @@ function parse(input){
             return true;
           }
           targetText.syncProperties(sourceText);
-          terminal.printInfo(Text.TEXT_PROPERTIES_SYNCED);
+          refreshRaycaster(Text.TEXT_PROPERTIES_SYNCED);
           return true;
         break;
         case 193: //newLightning

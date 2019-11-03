@@ -14,8 +14,11 @@ importScripts("../engine_objects/Particle.js");
 importScripts("../engine_objects/ParticleSystem.js");
 importScripts("../handler/factory/RaycasterFactory.js");
 importScripts("../engine_objects/CollisionInfo.js");
+importScripts("../handler/WorldBinHandler2D.js");
+importScripts("../handler/ObjectPicker2D.js");
 
 var IS_WORKER_CONTEXT = true;
+var objectPicker2D = new ObjectPicker2D();
 
 // CLASS DEFINITION
 var RaycasterWorker = function(){
@@ -111,27 +114,45 @@ RaycasterWorker.prototype.update = function(transferableMessageBody){
         obj.mesh.position.copy(this.reusableVector1);
         obj.mesh.quaternion.copy(this.reusableQuaternion);
         obj.updateBoundingBoxes();
-        this.rayCaster.updateObject(obj, true);
+        if (!obj.isHidden){
+          this.rayCaster.updateObject(obj, true);
+        }
         if (!obj.isHidden && intersectableObjDescription[i+1] < 0){
-          this.rayCaster.binHandler.hide(obj);
+          this.rayCaster.hide(obj);
           obj.isHidden = true;
         }else if (obj.isHidden && intersectableObjDescription[i+1] > 0){
-          this.rayCaster.binHandler.show(obj);
+          this.rayCaster.show(obj);
           obj.isHidden = false;
         }
       }else if (obj.isAddedText){
-        for (var i2 = i+2; i2 < (i+18); i2++){
-          this.reusableArray16[i2-i-2] = intersectableObjDescription[i2];
+        if (obj.is2D){
+          obj.twoDimensionalSize.x = intersectableObjDescription[i + 2];
+          obj.twoDimensionalSize.y = intersectableObjDescription[i + 3];
+          obj.twoDimensionalSize.z = intersectableObjDescription[i + 4];
+          obj.twoDimensionalSize.w = intersectableObjDescription[i + 5];
+        }else{
+          for (var i2 = i+2; i2 < (i+18); i2++){
+            this.reusableArray16[i2-i-2] = intersectableObjDescription[i2];
+          }
+          obj.mesh.matrixWorld.fromArray(this.reusableArray16);
+          obj.mesh.matrixWorld.decompose(this.reusableVector1, this.reusableQuaternion, this.reusableVector2);
+          obj.mesh.position.copy(this.reusableVector1);
+          obj.mesh.quaternion.copy(this.reusableQuaternion);
+          REUSABLE_MATRIX_4.copy(obj.mesh.matrixWorld);
+          REUSABLE_MATRIX_4.premultiply(camera.matrixWorldInverse);
+          obj.mesh.modelViewMatrix.copy(REUSABLE_MATRIX_4);
+          obj.handleBoundingBox();
         }
-        obj.mesh.matrixWorld.fromArray(this.reusableArray16);
-        obj.mesh.matrixWorld.decompose(this.reusableVector1, this.reusableQuaternion, this.reusableVector2);
-        obj.mesh.position.copy(this.reusableVector1);
-        obj.mesh.quaternion.copy(this.reusableQuaternion);
-        REUSABLE_MATRIX_4.copy(obj.mesh.matrixWorld);
-        REUSABLE_MATRIX_4.premultiply(camera.matrixWorldInverse);
-        obj.mesh.modelViewMatrix.copy(REUSABLE_MATRIX_4);
-        obj.handleBoundingBox();
-        this.rayCaster.updateObject(obj, true);
+        if (!obj.isHidden){
+          this.rayCaster.updateObject(obj, true);
+        }
+        if (!obj.isHidden && intersectableObjDescription[i+1] < 0){
+          this.rayCaster.hide(obj);
+          obj.isHidden = true;
+        }else if (obj.isHidden && intersectableObjDescription[i+1] > 0){
+          this.rayCaster.show(obj);
+          obj.isHidden = false;
+        }
       }else{
         throw new Error("Not implemented.");
       }
@@ -206,18 +227,28 @@ RaycasterWorker.prototype.update = function(transferableMessageBody){
     }
   }
   if (transferableMessageBody.flagsDescription[1] > 0){
+    intersectionObject = 0, intersectionPoint = 0;
     var intersectionTestDescription = transferableMessageBody.intersectionTestDescription;
-    for (var i = 0; i<intersectionTestDescription.length; i+= 8){
+    for (var i = 0; i<intersectionTestDescription.length; i+= 11){
       if (intersectionTestDescription[i] >= 0){
-        this.reusableVector1.set(intersectionTestDescription[i+1], intersectionTestDescription[i+2], intersectionTestDescription[i+3]);
-        this.reusableVector2.set(intersectionTestDescription[i+4], intersectionTestDescription[i+5], intersectionTestDescription[i+6]);
-        var intersectGridSystems = (intersectionTestDescription[i+7] > 0);
-        this.rayCaster.findIntersections(this.reusableVector1, this.reusableVector2, intersectGridSystems, noop);
-        if (intersectionObject){
+        var test2D = intersectionTestDescription[i + 8] > 0;
+        if (test2D){
+          objectPicker2D.find(intersectionTestDescription[i + 9], intersectionTestDescription[i + 10]);
+        }
+        if (!intersectionPoint){
+          this.reusableVector1.set(intersectionTestDescription[i+1], intersectionTestDescription[i+2], intersectionTestDescription[i+3]);
+          this.reusableVector2.set(intersectionTestDescription[i+4], intersectionTestDescription[i+5], intersectionTestDescription[i+6]);
+          var intersectGridSystems = (intersectionTestDescription[i+7] > 0);
+          this.rayCaster.findIntersections(this.reusableVector1, this.reusableVector2, intersectGridSystems, noop);
+          if (intersectionObject){
+            intersectionTestDescription[i+1] = this.workerIDsByObjectName[intersectionObject];
+            intersectionTestDescription[i+2] = intersectionPoint.x; intersectionTestDescription[i+3] = intersectionPoint.y; intersectionTestDescription[i+4] = intersectionPoint.z;
+          }else{
+            intersectionTestDescription[i+1] = -1;
+          }
+        }else{
           intersectionTestDescription[i+1] = this.workerIDsByObjectName[intersectionObject];
           intersectionTestDescription[i+2] = intersectionPoint.x; intersectionTestDescription[i+3] = intersectionPoint.y; intersectionTestDescription[i+4] = intersectionPoint.z;
-        }else{
-          intersectionTestDescription[i+1] = -1;
         }
       }
     }
@@ -271,6 +302,22 @@ RaycasterWorker.prototype.onParticleSystemRemoveCollisionListener = function(dat
   particleSystem.removeCollisionListener();
 }
 
+RaycasterWorker.prototype.set2DTextSizes = function(data){
+  if (!renderer.viewport){
+    return;
+  }
+  screenResolution = data.screenResolution;
+  renderer.viewport.x = data.vp.x;
+  renderer.viewport.y = data.vp.y;
+  renderer.viewport.z = data.vp.z;
+  renderer.viewport.w = data.vp.w;
+  var msgBody = data.body;
+  for (var textName in msgBody){
+    addedTexts[textName].twoDimensionalSize.set(msgBody[textName].x, msgBody[textName].y, msgBody[textName].z, msgBody[textName].w);
+  }
+  this.rayCaster.refresh2D();
+}
+
 // START
 raycasterFactory = new RaycasterFactory();
 var particleSystemGenerator = new ParticleSystemGenerator();
@@ -304,6 +351,8 @@ self.onmessage = function(msg){
     worker.onParticleSystemSetCollisionListener(msg.data.particleSystemSetCollisionListener);
   }else if (msg.data.particleSystemRemoveCollisionListener){
     worker.onParticleSystemRemoveCollisionListener(msg.data.particleSystemRemoveCollisionListener);
+  }else if (msg.data.refresh2D){
+    worker.set2DTextSizes(msg.data);
   }else{
     worker.update(msg.data);
     worker.transferableMessageBody = msg.data;

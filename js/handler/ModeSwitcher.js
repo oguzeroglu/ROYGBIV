@@ -198,9 +198,6 @@ ModeSwitcher.prototype.switchFromDesignToPreview = function(){
       }
     }
   }
-  sceneHandler.onSwitchFromDesignToPreview();
-  this.commonSwitchFunctions();
-  handleViewport();
   for (var txtName in addedTexts){
     addedTexts[txtName].handleResize();
     if (addedTexts[txtName].isClickable){
@@ -213,6 +210,9 @@ ModeSwitcher.prototype.switchFromDesignToPreview = function(){
       }
     }
   }
+  sceneHandler.onSwitchFromDesignToPreview();
+  this.commonSwitchFunctions();
+  handleViewport();
   renderer.setPixelRatio(screenResolution);
 }
 

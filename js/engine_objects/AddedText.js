@@ -270,6 +270,12 @@ AddedText.prototype.exportLightweight = function(){
   exportObj.position = this.mesh.position;
   exportObj.initPosition = this.position;
   exportObj.isClickable = this.isClickable;
+  if (this.is2D){
+    if (!this.twoDimensionalSize){
+      this.handleResize();
+    }
+    exportObj.twoDimensionalSize = {x: this.twoDimensionalSize.x, y: this.twoDimensionalSize.y, z: this.twoDimensionalSize.z, w: this.twoDimensionalSize.w};
+  }
   return exportObj;
 }
 
@@ -735,7 +741,7 @@ AddedText.prototype.hide = function(){
   if (mode == 0 && this.rectangle){
     scene.remove(this.rectangle.mesh);
   }
-  if (mode == 1 && this.isClickable && !this.is2D){
+  if (mode == 1 && this.isClickable){
     rayCaster.hide(this);
   }
 }
@@ -747,9 +753,7 @@ AddedText.prototype.show = function(){
     if (!this.boundingBox){
       this.handleBoundingBox();
     }
-    if (!this.is2D){
-      rayCaster.show(this);
-    }
+    rayCaster.show(this);
   }
 }
 
@@ -956,6 +960,7 @@ AddedText.prototype.set2DCoordinates = function(marginPercentWidth, marginPercen
     this.webglSpaceSize.x, this.webglSpaceSize.y
   );
   this.rectangle.updateMesh(0.005);
+  rayCaster.updateObject(this);
 }
 
 AddedText.prototype.debugCornerPoints = function(representativeCharacter, cornerIndex){

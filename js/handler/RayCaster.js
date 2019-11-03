@@ -7,6 +7,22 @@ var RayCaster = function(){
   this.ready = false;
 }
 
+RayCaster.prototype.hide2D = function(object){
+  objectPicker2D.hide(object);
+}
+
+RayCaster.prototype.show2D = function(object){
+  objectPicker2D.show(object);
+}
+
+RayCaster.prototype.update2D = function(object, forceUpdate){
+  objectPicker2D.update(object, forceUpdate);
+}
+
+RayCaster.prototype.refresh2D = function(){
+  objectPicker2D.refresh();
+}
+
 RayCaster.prototype.onReady = function(){
   this.ready = true;
   if (this.onReadyCallback){
@@ -27,6 +43,7 @@ RayCaster.prototype.refresh = function(){
     return;
   }
   this.ready = false;
+  this.refresh2D();
   this.binHandler = new WorldBinHandler();
   for (var objName in this.getAddedObjects()){
     var addedObject = addedObjects[objName];
@@ -81,6 +98,10 @@ RayCaster.prototype.refresh = function(){
 }
 
 RayCaster.prototype.updateObject = function(obj, forceUpdate){
+  if (obj.isAddedText && obj.is2D){
+    this.update2D(obj, forceUpdate);
+    return;
+  }
   if (forceUpdate){
     this.binHandler.updateObject(obj);
     return;
@@ -94,8 +115,13 @@ RayCaster.prototype.issueUpdate = function(obj){
   }
 }
 
-RayCaster.prototype.findIntersections = function(from, direction, intersectGridSystems, callbackFunction){
+RayCaster.prototype.findIntersections = function(from, direction, intersectGridSystems, callbackFunction, clientX, clientY){
   intersectionPoint = 0, intersectionObject = 0;
+  objectPicker2D.find(clientX, clientY);
+  if (intersectionPoint){
+    callbackFunction();
+    return;
+  }
   this.origin.copy(from);
   this.direction.copy(direction);
   this.oldPosition.copy(this.origin);
@@ -174,10 +200,18 @@ RayCaster.prototype.findIntersections = function(from, direction, intersectGridS
 }
 
 RayCaster.prototype.hide = function(object){
+  if (object.isAddedText && object.is2D){
+    this.hide2D(object);
+    return;
+  }
   this.binHandler.hide(object);
 }
 
 RayCaster.prototype.show = function(object){
+  if (object.isAddedText && object.is2D){
+    this.show2D(object);
+    return;
+  }
   this.binHandler.show(object);
 }
 

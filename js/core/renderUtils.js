@@ -52,6 +52,7 @@ function render(){
   if (mode == 1){
     previewSceneRendered = true;
   }
+  cpuOperationsHandler.updateObjectPicker2D();
   cpuOperationsHandler.updateRaycaster();
   if (!isMobile){
     cpuOperationsHandler.flushMouseEventHandler();
@@ -66,6 +67,10 @@ function renderScene(){
   if (threejsRenderMonitoringHandler.currentRenderCallCountPerFrame > threejsRenderMonitoringHandler.maxRenderCallCountPerFrame){
     threejsRenderMonitoringHandler.maxRenderCallCountPerFrame = threejsRenderMonitoringHandler.currentRenderCallCountPerFrame;
   }
+}
+
+function updateObjectPicker2D(){
+  objectPicker2D.flush();
 }
 
 function updateRaycaster(){

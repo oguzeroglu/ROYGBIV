@@ -108,15 +108,9 @@ MouseEventHandler.prototype.handleObjectMouseEvents = function(){
   var objectsWithMouseOverListenersSize = objectsWithMouseOverListeners.size;
   var objectsWithMouseOutListenerSize = objectsWithMouseOutListeners.size;
   if (mode == 1 && (objectsWithMouseOverListenersSize > 0 || objectsWithMouseOutListenerSize > 0)){
-    // TRY TO PICK 2D OBJECTS FIRST
-    objectPicker2D.find(this.clientX, this.clientY);
-    if (!intersectionPoint){
-      REUSABLE_VECTOR.setFromMatrixPosition(camera.matrixWorld);
-      REUSABLE_VECTOR_2.set(this.coordX, this.coordY, 0.5).unproject(camera).sub(REUSABLE_VECTOR).normalize();
-      rayCaster.findIntersections(REUSABLE_VECTOR, REUSABLE_VECTOR_2, false, onRaycasterMouseMoveIntersection);
-    }else{
-      onRaycasterMouseMoveIntersection();
-    }
+    REUSABLE_VECTOR.setFromMatrixPosition(camera.matrixWorld);
+    REUSABLE_VECTOR_2.set(this.coordX, this.coordY, 0.5).unproject(camera).sub(REUSABLE_VECTOR).normalize();
+    rayCaster.findIntersections(REUSABLE_VECTOR, REUSABLE_VECTOR_2, false, onRaycasterMouseMoveIntersection, this.clientX, this.clientY);
   }
 }
 
@@ -238,14 +232,8 @@ MouseEventHandler.prototype.onClick = function(event, fromTap){
         return;
       }
     }
-    // TRY TO PICK 2D OBJECTS FIRST
-    objectPicker2D.find(event.clientX, event.clientY);
-    if (!intersectionPoint){
-      REUSABLE_VECTOR.setFromMatrixPosition(camera.matrixWorld);
-      REUSABLE_VECTOR_2.set(coordX, coordY, 0.5).unproject(camera).sub(REUSABLE_VECTOR).normalize();
-      rayCaster.findIntersections(REUSABLE_VECTOR, REUSABLE_VECTOR_2, (mode == 0), onRaycasterIntersection);
-    }else{
-      onRaycasterIntersection();
-    }
+    REUSABLE_VECTOR.setFromMatrixPosition(camera.matrixWorld);
+    REUSABLE_VECTOR_2.set(coordX, coordY, 0.5).unproject(camera).sub(REUSABLE_VECTOR).normalize();
+    rayCaster.findIntersections(REUSABLE_VECTOR, REUSABLE_VECTOR_2, (mode == 0), onRaycasterIntersection, event.clientX, event.clientY);
   }
 }
