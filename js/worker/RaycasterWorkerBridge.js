@@ -283,6 +283,8 @@ RaycasterWorkerBridge.prototype.getAddedObjects = noop;
 RaycasterWorkerBridge.prototype.getObjectGroups = noop;
 RaycasterWorkerBridge.prototype.getAddedTexts = noop;
 RaycasterWorkerBridge.prototype.update2D = noop;
+RaycasterWorkerBridge.prototype.hide2D = noop;
+RaycasterWorkerBridge.prototype.show2D = noop;
 
 RaycasterWorkerBridge.prototype.refresh2D = function(){
   var totalObj = (mode == 0)? sceneHandler.getAddedTexts2D(): sceneHandler.getClickableAddedTexts2D();

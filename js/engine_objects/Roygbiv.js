@@ -2107,9 +2107,6 @@ Roygbiv.prototype.hideText = function(text){
   preConditions.checkIfTextInsideActiveScene(ROYGBIV.hideText, text);
   if (text.mesh.visible){
     text.hide();
-    if (text.is2D && text.isClickable){
-      objectPicker2D.hide(text);
-    }
   }
 }
 
@@ -2124,9 +2121,6 @@ Roygbiv.prototype.showText = function(text){
   preConditions.checkIfTextInsideActiveScene(ROYGBIV.showText, text);
   if (!text.mesh.visible){
     text.show();
-    if (text.is2D && text.isClickable){
-      objectPicker2D.show(text);
-    }
   }
 }
 

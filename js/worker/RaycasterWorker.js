@@ -114,12 +114,14 @@ RaycasterWorker.prototype.update = function(transferableMessageBody){
         obj.mesh.position.copy(this.reusableVector1);
         obj.mesh.quaternion.copy(this.reusableQuaternion);
         obj.updateBoundingBoxes();
-        this.rayCaster.updateObject(obj, true);
+        if (!obj.isHidden){
+          this.rayCaster.updateObject(obj, true);
+        }
         if (!obj.isHidden && intersectableObjDescription[i+1] < 0){
-          this.rayCaster.binHandler.hide(obj);
+          this.rayCaster.hide(obj);
           obj.isHidden = true;
         }else if (obj.isHidden && intersectableObjDescription[i+1] > 0){
-          this.rayCaster.binHandler.show(obj);
+          this.rayCaster.show(obj);
           obj.isHidden = false;
         }
       }else if (obj.isAddedText){
@@ -141,7 +143,16 @@ RaycasterWorker.prototype.update = function(transferableMessageBody){
           obj.mesh.modelViewMatrix.copy(REUSABLE_MATRIX_4);
           obj.handleBoundingBox();
         }
-        this.rayCaster.updateObject(obj, true);
+        if (!obj.isHidden){
+          this.rayCaster.updateObject(obj, true);
+        }
+        if (!obj.isHidden && intersectableObjDescription[i+1] < 0){
+          this.rayCaster.hide(obj);
+          obj.isHidden = true;
+        }else if (obj.isHidden && intersectableObjDescription[i+1] > 0){
+          this.rayCaster.show(obj);
+          obj.isHidden = false;
+        }
       }else{
         throw new Error("Not implemented.");
       }

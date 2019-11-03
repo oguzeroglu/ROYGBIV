@@ -741,7 +741,7 @@ AddedText.prototype.hide = function(){
   if (mode == 0 && this.rectangle){
     scene.remove(this.rectangle.mesh);
   }
-  if (mode == 1 && this.isClickable && !this.is2D){
+  if (mode == 1 && this.isClickable){
     rayCaster.hide(this);
   }
 }
@@ -753,9 +753,7 @@ AddedText.prototype.show = function(){
     if (!this.boundingBox){
       this.handleBoundingBox();
     }
-    if (!this.is2D){
-      rayCaster.show(this);
-    }
+    rayCaster.show(this);
   }
 }
 

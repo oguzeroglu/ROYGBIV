@@ -7,6 +7,14 @@ var RayCaster = function(){
   this.ready = false;
 }
 
+RayCaster.prototype.hide2D = function(object){
+  objectPicker2D.hide(object);
+}
+
+RayCaster.prototype.show2D = function(object){
+  objectPicker2D.show(object);
+}
+
 RayCaster.prototype.update2D = function(object, forceUpdate){
   objectPicker2D.update(object, forceUpdate);
 }
@@ -192,10 +200,18 @@ RayCaster.prototype.findIntersections = function(from, direction, intersectGridS
 }
 
 RayCaster.prototype.hide = function(object){
+  if (object.isAddedText && object.is2D){
+    this.hide2D(object);
+    return;
+  }
   this.binHandler.hide(object);
 }
 
 RayCaster.prototype.show = function(object){
+  if (object.isAddedText && object.is2D){
+    this.show2D(object);
+    return;
+  }
   this.binHandler.show(object);
 }
 
