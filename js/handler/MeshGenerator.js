@@ -293,3 +293,23 @@ MeshGenerator.prototype.generateLightning = function(lightning){
   mesh.visible = false;
   return mesh;
 }
+
+MeshGenerator.prototype.generateSprite = function(sprite){
+  var material = new THREE.RawShaderMaterial({
+    vertexShader: ShaderContent.spriteVertexShader,
+    fragmentShader: ShaderContent.spriteFragmentShader,
+    transparent: false,
+    side: THREE.DoubleSide,
+    uniforms: {
+      spriteSize: new THREE.Uniform(sprite.size),
+      margin2D: new THREE.Uniform(new THREE.Vector2()),
+      currentViewport: GLOBAL_ADDEDTEXT_VIEWPORT_UNIFORM,
+      screenResolution: GLOBAL_SCREEN_RESOLUTION_UNIFORM
+    }
+  });
+  var mesh = new THREE.Points(sprite.geometry, material);
+  mesh.frustumCulled = false;
+  mesh.renderOrder = renderOrders.SPRITE;
+  mesh.visible = false;
+  return mesh;
+}

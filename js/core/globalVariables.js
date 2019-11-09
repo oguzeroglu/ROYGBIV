@@ -386,6 +386,7 @@ var renderOrders = {
   TEXT_3D: 10,
   LIGHTNING: 10,
   TEXT_2D: 50,
+  SPRITE: 50,
   CROSSHAIR: 60,
   OBJECT_TRAIL: 100
 }
