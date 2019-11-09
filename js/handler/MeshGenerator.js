@@ -301,13 +301,11 @@ MeshGenerator.prototype.generateSprite = function(sprite){
     transparent: false,
     side: THREE.DoubleSide,
     uniforms: {
-      spriteSize: new THREE.Uniform(sprite.size),
-      margin2D: new THREE.Uniform(new THREE.Vector2()),
       currentViewport: GLOBAL_ADDEDTEXT_VIEWPORT_UNIFORM,
-      screenResolution: GLOBAL_SCREEN_RESOLUTION_UNIFORM
+      scale: new THREE.Uniform(new THREE.Vector2(1, 1))
     }
   });
-  var mesh = new THREE.Points(sprite.geometry, material);
+  var mesh = new THREE.Mesh(sprite.geometry, material);
   mesh.frustumCulled = false;
   mesh.renderOrder = renderOrders.SPRITE;
   mesh.visible = false;
