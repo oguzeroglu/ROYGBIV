@@ -6,6 +6,8 @@ uniform float screenResolution;
 uniform vec4 currentViewport;
 uniform vec2 margin2D;
 
+#define INSERTION
+
 void main(){
   float oldPosX = ((currentViewport.z - currentViewport.x) / 2.0) + currentViewport.x;
   float oldPosY = ((currentViewport.w - currentViewport.y) / 2.0) + currentViewport.y;

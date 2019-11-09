@@ -10,6 +10,23 @@ var Sprite = function(name){
   this.set2DCoordinates(50, 50);
 }
 
+Sprite.prototype.setTexture = function(texture){
+  if (!this.isTextured){
+    macroHandler.injectMacro("HAS_TEXTURE", this.mesh.material, false, true);
+    this.mesh.material.uniforms.texture = new THREE.Uniform(texture);
+    this.mesh.material.needsUpdate = true;
+  }else{
+    this.mesh.material.uniforms.texture.value = texture;
+  }
+  this.isTextured = true;
+}
+
+Sprite.prototype.setSize = function(size){
+  this.size = size;
+  this.mesh.material.uniforms.spriteSize.value = size;
+  this.set2DCoordinates(this.marginPercentWidth, this.marginPercentHeight);
+}
+
 Sprite.prototype.makeMesh = function(){
   this.geometry = new THREE.BufferGeometry();
   this.geometry.addAttribute("pseudo", new THREE.BufferAttribute(new Float32Array(1), 1));
