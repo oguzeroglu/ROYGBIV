@@ -4,11 +4,17 @@ precision lowp int;
 #define PI 3.141592653589793
 
 attribute vec3 position;
+attribute vec2 uv;
 uniform vec4 currentViewport;
 uniform vec2 scale;
 uniform float rotationAngle;
 
 #define INSERTION
+
+#ifdef HAS_TEXTURE
+  varying vec2 vUV;
+#endif
+
 
 vec2 rotate2D(vec2 pos, vec2 rot) {
   return vec2(pos.x * rot.y + pos.y * rot.x, pos.y * rot.y - pos.x * rot.x);
@@ -21,6 +27,9 @@ vec2 applyRotationAngle(float angleInDegrees, vec2 pos){
 }
 
 void main(){
+  #ifdef HAS_TEXTURE
+    vUV = uv;
+  #endif
   float scaledX = scale.x * position.x;
   float scaledY = scale.y * position.y;
   vec2 rotated = applyRotationAngle(rotationAngle, vec2(scaledX, scaledY));

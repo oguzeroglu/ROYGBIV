@@ -5,3 +5,21 @@ var Sprite = function(name){
   this.mesh = new MeshGenerator().generateSprite(this);
   scene.add(this.mesh);
 }
+
+Sprite.prototype.getTextureUniform = function(texture){
+  if (textureUniformCache[texture.uuid]){
+    return textureUniformCache[texture.uuid];
+  }
+  var uniform = new THREE.Uniform(texture);
+  textureUniformCache[texture.uuid] = uniform;
+  return uniform;
+}
+
+Sprite.prototype.mapTexture = function(texture){
+  if (!this.isTextured){
+    macroHandler.injectMacro("HAS_TEXTURE", this.mesh.material, true, true);
+  }
+  this.mesh.material.uniforms.texture = this.getTextureUniform(texture);
+  this.mesh.material.needsUpdate = true;
+  this.isTextured = true;
+}
