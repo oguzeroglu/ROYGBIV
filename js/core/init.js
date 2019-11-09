@@ -11,7 +11,7 @@ window.onload = function() {
   fpsHandler = new FPSHandler();
   // REUSABLE COLLISION INFO
   reusableCollisionInfo = new CollisionInfo();
-  GLOBAL_ADDEDTEXT_VIEWPORT_UNIFORM = new THREE.Uniform(new THREE.Vector4(0, 0, window.innerWidth, window.innerHeight));
+  GLOBAL_VIEWPORT_UNIFORM = new THREE.Uniform(new THREE.Vector4(0, 0, window.innerWidth, window.innerHeight));
   isOrientationLandscape = (window.innerWidth > window.innerHeight);
   // MACRO HANDLER
   macroHandler = new MacroHandler();

@@ -301,7 +301,7 @@ MeshGenerator.prototype.generateSprite = function(sprite){
     transparent: false,
     side: THREE.DoubleSide,
     uniforms: {
-      currentViewport: GLOBAL_ADDEDTEXT_VIEWPORT_UNIFORM,
+      currentViewport: GLOBAL_VIEWPORT_UNIFORM,
       scale: new THREE.Uniform(new THREE.Vector2(1, 1))
     }
   });
