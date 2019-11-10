@@ -6,6 +6,10 @@ var Sprite = function(name){
   scene.add(this.mesh);
 }
 
+Sprite.prototype.setRotation = function(angleInDegrees){
+  this.mesh.material.uniforms.rotationAngle.value = angleInDegrees;
+}
+
 Sprite.prototype.getTextureUniform = function(texture){
   if (textureUniformCache[texture.uuid]){
     return textureUniformCache[texture.uuid];
