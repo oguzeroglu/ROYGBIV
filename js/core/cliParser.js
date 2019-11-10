@@ -1320,6 +1320,12 @@ function parse(input){
               }
             }
           }
+          for (var spriteName in sprites){
+            if (sprites[spriteName].mappedTexturePackName == name){
+              terminal.printError(Text.TEXTURE_PACK_USED_IN_A_SPRITE.replace(Text.PARAM1, spriteName));
+              return true;
+            }
+          }
           if (texturePack.isParticleTexture){
             for (var psName in preConfiguredParticleSystems){
               var usedTextureName = preConfiguredParticleSystems[psName].getUsedTextureName();

@@ -73,14 +73,14 @@ Sprite.prototype.set2DCoordinates = function(marginPercentX, marginPercentY){
     var tmpX = ((curViewport.z - curViewport.x) / 2.0) + curViewport.x + (this.rectangle.width / screenResolution);
     var widthX = (((tmpX - curViewport.x) * 2.0) / curViewport.z) - 1.0;
     var marginX = (((marginPercentX) * (2)) / (100)) -1;
-    marginX -= this.rectangle.x;
+    marginX += this.rectangle.width / 2;
     this.mesh.material.uniforms.margin.value.x = marginX;
   }else if (!isFromCenter){
     marginPercentX = marginPercentX + 100;
     var tmpX = ((curViewport.z - curViewport.x) / 2.0) + curViewport.x + (this.rectangle.width / screenResolution);
     var widthX = (((tmpX - curViewport.x) * 2.0) / curViewport.z) - 1.0;
     var marginX = (((marginPercentX) * (2)) / (100)) -1;
-    marginX = 2 - marginX + this.rectangle.x;
+    marginX = 2 - marginX - (this.rectangle.width / 2);
     this.mesh.material.uniforms.margin.value.x = marginX;
   }else{
     marginPercentX = marginPercentX + 100;
@@ -96,13 +96,13 @@ Sprite.prototype.set2DCoordinates = function(marginPercentX, marginPercentY){
     var tmpY = ((curViewport.w - curViewport.y) / 2.0) + curViewport.y + (this.rectangle.height / screenResolution);
     var heightY = (((tmpY - curViewport.y) * 2.0) / curViewport.w) - 1.0;
     var marginY = (((marginPercentY) * (2)) / (100)) -1;
-    marginY += this.rectangle.y;
+    marginY -= this.rectangle.height / 2;
     this.mesh.material.uniforms.margin.value.y = marginY;
   }else if (!isFromCenter){
     var tmpY = ((curViewport.w - curViewport.y) / 2.0) + curViewport.y + (this.rectangle.height / screenResolution);
     var heightY = (((tmpY - curViewport.y) * 2.0) / curViewport.w) - 1.0;
     var marginY = (((marginPercentY) * (2)) / (100)) -1;
-    marginY -= this.rectangle.y;
+    marginY += this.rectangle.height / 2;
     this.mesh.material.uniforms.margin.value.y = marginY;
   }else{
     marginPercentY = 100 - marginPercentY;
@@ -173,16 +173,17 @@ Sprite.prototype.getTextureUniform = function(texture){
   return uniform;
 }
 
-Sprite.prototype.mapTexture = function(texture){
+Sprite.prototype.mapTexture = function(texturePack){
   if (!this.isTextured){
     macroHandler.injectMacro("HAS_TEXTURE", this.mesh.material, true, true);
   }
-  this.mesh.material.uniforms.texture = this.getTextureUniform(texture);
+  this.mesh.material.uniforms.texture = this.getTextureUniform(texturePack.diffuseTexture);
   this.mesh.material.needsUpdate = true;
   this.isTextured = true;
+  this.mappedTexturePackName = texturePack.name;
 }
 
-Sprite.prototype.removeTexture = function(texture){
+Sprite.prototype.removeTexture = function(){
   if (!this.isTextured){
     return;
   }
@@ -190,4 +191,5 @@ Sprite.prototype.removeTexture = function(texture){
   delete this.mesh.material.uniforms.texture;
   this.mesh.material.needsUpdate = true;
   this.isTextured = false;
+  delete this.mappedTexturePackName;
 }

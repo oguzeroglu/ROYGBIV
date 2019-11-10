@@ -57,6 +57,7 @@ MouseEventHandler.prototype.onCliDivClick = function(event){
   cliFocused = true;
   omGUIFocused = false;
   tmGUIFocused = false;
+  smGUIFocused = false;
   acGUIFocused = false;
   inactiveCounter = 0;
   if (keyboardBuffer["Shift"] && mode == 0){
@@ -174,6 +175,7 @@ MouseEventHandler.prototype.onClick = function(event, fromTap){
   cliFocused = false;
   omGUIFocused = false;
   tmGUIFocused = false;
+  smGUIFocused = false;
   acGUIFocused = false;
   if (windowLoaded){
     if (mode == 0){

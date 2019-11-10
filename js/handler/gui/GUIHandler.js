@@ -49,6 +49,20 @@ var GUIHandler = function(){
     "Max width%": 100,
     "Max height%": 100
   };
+  this.spriteManipulationParameters = {
+    "Sprite": "spriteName",
+    "Color": "#ffffff",
+    "Alpha": 1.0,
+    "Margin mode": "Center",
+    "Margin X": 50.0,
+    "Margin Y": 50.0,
+    "Has texture": false,
+    "Texture": "",
+    "Scale X": 1.0,
+    "Scale Y": 1.0,
+    "Rotation": 0.0,
+    "Clickable": false
+  }
   this.bloomParameters = {
     "Threshold": 0.0,
     "Active": false,
@@ -95,7 +109,7 @@ var GUIHandler = function(){
   this.guiTypes = {
     TEXT: 0, OBJECT: 1, BLOOM: 2, FPS_WEAPON_ALIGNMENT: 3, SHADER_PRECISION: 4, PARTICLE_SYSTEM: 5,
     WORKER_STATUS: 6, MUZZLE_FLASH: 7, TEXTURE_PACK: 8, SKYBOX_CREATION: 9, FOG: 10, FONT: 11,
-    CROSSHAIR_CREATION: 12, SCRIPTS: 13, ANIMATION_CREATION: 14, AREA: 15, LIGHTNING: 16
+    CROSSHAIR_CREATION: 12, SCRIPTS: 13, ANIMATION_CREATION: 14, AREA: 15, LIGHTNING: 16, SPRITE: 17
   };
   this.blockingGUITypes = [
     this.guiTypes.FPS_WEAPON_ALIGNMENT, this.guiTypes.PARTICLE_SYSTEM, this.guiTypes.MUZZLE_FLASH,
@@ -169,6 +183,37 @@ GUIHandler.prototype.isOneOfBlockingGUIActive = function(){
     }
   }
   return false;
+}
+
+GUIHandler.prototype.afterSpriteSelection = function(){
+  if (mode != 0){
+    return;
+  }
+  var curSelection = selectionHandler.getSelectedObject();
+  if (curSelection && curSelection.isSprite){
+    guiHandler.show(guiHandler.guiTypes.SPRITE);
+    guiHandler.enableAllSMControllers();
+    guiHandler.spriteManipulationParameters["Sprite"] = curSelection.name;
+    guiHandler.spriteManipulationParameters["Color"] = "#" + curSelection.mesh.material.uniforms.color.value.getHexString();
+    guiHandler.spriteManipulationParameters["Alpha"] = curSelection.mesh.material.uniforms.alpha.value;
+    guiHandler.spriteManipulationParameters["Margin mode"] = (curSelection.marginMode == MARGIN_MODE_2D_CENTER) ? "Center" : (curSelection.marginMode == MARGIN_MODE_2D_TOP_LEFT ? "Top/Left" : "Bottom/Right");
+    guiHandler.spriteManipulationParameters["Margin X"] = curSelection.marginPercentX;
+    guiHandler.spriteManipulationParameters["Margin Y"] = curSelection.marginPercentY;
+    guiHandler.spriteManipulationParameters["Has texture"] = !!curSelection.isTextured;
+    guiHandler.spriteManipulationParameters["Texture"] = (curSelection.mappedTexturePackName ? curSelection.mappedTexturePackName : "");
+    guiHandler.spriteManipulationParameters["Scale X"] = curSelection.mesh.material.uniforms.scale.value.x;
+    guiHandler.spriteManipulationParameters["Scale Y"] = curSelection.mesh.material.uniforms.scale.value.y;
+    guiHandler.spriteManipulationParameters["Rotation"] = curSelection.mesh.material.uniforms.rotationAngle.value;
+    guiHandler.spriteManipulationParameters["Clickable"] = !!curSelection.isClickable;
+    if (!curSelection.isTextured){
+      guiHandler.disableController(guiHandler.spriteManipulationTextureController);
+    }
+    if (Object.keys(texturePacks).length == 0){
+      guiHandler.disableController(guiHandler.spriteManipulationHasTextureController);
+    }
+  }else{
+    guiHandler.hide(guiHandler.guiTypes.SPRITE);
+  }
 }
 
 GUIHandler.prototype.afterTextSelection = function(){
@@ -251,6 +296,7 @@ GUIHandler.prototype.afterTextSelection = function(){
   }else{
     guiHandler.hide(guiHandler.guiTypes.TEXT);
   }
+  guiHandler.afterSpriteSelection();
 }
 
 GUIHandler.prototype.afterObjectSelection = function(){
@@ -529,6 +575,21 @@ GUIHandler.prototype.enableAllTMControllers = function(){
   guiHandler.enableController(guiHandler.textManipulationShaderPrecisionController);
 }
 
+GUIHandler.prototype.enableAllSMControllers = function(){
+  guiHandler.enableController(guiHandler.spriteManipulationSpriteNameController);
+  guiHandler.enableController(guiHandler.spriteManipulationColorController);
+  guiHandler.enableController(guiHandler.spriteManipulationAlphaController);
+  guiHandler.enableController(guiHandler.spriteManipulationMarginModeController);
+  guiHandler.enableController(guiHandler.spriteManipulationMarginXController);
+  guiHandler.enableController(guiHandler.spriteManipulationMarginYController);
+  guiHandler.enableController(guiHandler.spriteManipulationHasTextureController);
+  guiHandler.enableController(guiHandler.spriteManipulationTextureController);
+  guiHandler.enableController(guiHandler.spriteManipulationScaleXController);
+  guiHandler.enableController(guiHandler.spriteManipulationScaleYController);
+  guiHandler.enableController(guiHandler.spriteManipulationRotationController);
+  guiHandler.enableController(guiHandler.spriteManipulationClickableController);
+}
+
 GUIHandler.prototype.enableAllOMControllers = function(){
   guiHandler.enableController(guiHandler.omRotationXController);
   guiHandler.enableController(guiHandler.omRotationYController);
@@ -568,6 +629,11 @@ GUIHandler.prototype.show = function(guiType){
     case this.guiTypes.TEXT:
       if (!this.datGuiTextManipulation){
         this.initializeTextManipulationGUI();
+      }
+    return;
+    case this.guiTypes.SPRITE:
+      if (!this.datGuiSpriteManipulation){
+        this.initializeSpriteManipulationGUI();
       }
     return;
     case this.guiTypes.BLOOM:
@@ -627,6 +693,12 @@ GUIHandler.prototype.hide = function(guiType){
       if (this.datGuiTextManipulation){
         this.destroyGUI(this.datGuiTextManipulation);
         this.datGuiTextManipulation = 0;
+      }
+    return;
+    case this.guiTypes.SPRITE:
+      if (this.datGuiSpriteManipulation){
+        this.destroyGUI(this.datGuiSpriteManipulation);
+        this.datGuiSpriteManipulation = 0;
       }
     return;
     case this.guiTypes.BLOOM:
@@ -1122,6 +1194,67 @@ GUIHandler.prototype.initializeObjectManipulationGUI = function(){
   }).listen();
   guiHandler.omObjectTrailTimeController = guiHandler.datGuiObjectManipulation.add(guiHandler.objectManipulationParameters, "mb time").min(1/15).max(OBJECT_TRAIL_MAX_TIME_IN_SECS_DEFAULT).step(1/60).onChange(function(val){
     selectionHandler.getSelectedObject().objectTrailConfigurations.time = val;
+  }).listen();
+}
+
+GUIHandler.prototype.initializeSpriteManipulationGUI = function(){
+  guiHandler.datGuiSpriteManipulation = new dat.GUI({hideable: false});
+  guiHandler.datGuiSpriteManipulation.domElement.addEventListener("mousedown", function(e){
+    smGUIFocused = true;
+  });
+  guiHandler.spriteManipulationSpriteNameController = guiHandler.datGuiSpriteManipulation.add(guiHandler.spriteManipulationParameters, "Sprite").listen();
+  guiHandler.spriteManipulationColorController = guiHandler.datGuiSpriteManipulation.addColor(guiHandler.spriteManipulationParameters, "Color").onChange(function(val){
+    selectionHandler.getSelectedObject().setColor(val);
+  }).listen();
+  guiHandler.spriteManipulationAlphaController = guiHandler.datGuiSpriteManipulation.add(guiHandler.spriteManipulationParameters, "Alpha").min(0).max(1).step(0.01).onChange(function(val){
+    selectionHandler.getSelectedObject().setAlpha(val);
+  }).listen();
+  guiHandler.spriteManipulationMarginModeController = guiHandler.datGuiSpriteManipulation.add(guiHandler.spriteManipulationParameters, "Margin mode", ["Top/Left", "Bottom/Right", "Center"]).onChange(function(val){
+    var marginMode = MARGIN_MODE_2D_CENTER;
+    if (val == "Top/Left"){
+      marginMode = MARGIN_MODE_2D_TOP_LEFT;
+    }else if (val == "Bottom/Right"){
+      marginMode = MARGIN_MODE_2D_BOTTOM_RIGHT;
+    }
+    selectionHandler.getSelectedObject().marginMode = marginMode;
+    selectionHandler.getSelectedObject().set2DCoordinates(selectionHandler.getSelectedObject().marginPercentX, selectionHandler.getSelectedObject().marginPercentY);
+  }).listen();
+  guiHandler.spriteManipulationMarginXController = guiHandler.datGuiSpriteManipulation.add(guiHandler.spriteManipulationParameters, "Margin X").min(0).max(100).step(0.1).onChange(function(val){
+    selectionHandler.getSelectedObject().set2DCoordinates(val, selectionHandler.getSelectedObject().marginPercentY);
+  }).listen();
+  guiHandler.spriteManipulationMarginYController = guiHandler.datGuiSpriteManipulation.add(guiHandler.spriteManipulationParameters, "Margin Y").min(0).max(100).step(0.1).onChange(function(val){
+    selectionHandler.getSelectedObject().set2DCoordinates(selectionHandler.getSelectedObject().marginPercentX, val);
+  }).listen();
+  guiHandler.spriteManipulationHasTextureController = guiHandler.datGuiSpriteManipulation.add(guiHandler.spriteManipulationParameters, "Has texture").onChange(function(val){
+    if (Object.keys(texturePacks).length == 0){
+      guiHandler.spriteManipulationParameters["Has texture"] = false;
+      return;
+    }
+    if (val){
+      guiHandler.enableController(guiHandler.spriteManipulationTextureController);
+      var textureName = guiHandler.spriteManipulationParameters["Texture"];
+      if (texturePacks[textureName]){
+        selectionHandler.getSelectedObject().mapTexture(texturePacks[textureName]);
+      }
+    }else{
+      guiHandler.disableController(guiHandler.spriteManipulationTextureController);
+      selectionHandler.getSelectedObject().removeTexture();
+    }
+  }).listen();
+  guiHandler.spriteManipulationTextureController = guiHandler.datGuiSpriteManipulation.add(guiHandler.spriteManipulationParameters, "Texture", Object.keys(texturePacks)).onChange(function(val){
+    selectionHandler.getSelectedObject().mapTexture(texturePacks[val]);
+  }).listen();
+  guiHandler.spriteManipulationScaleXController = guiHandler.datGuiSpriteManipulation.add(guiHandler.spriteManipulationParameters, "Scale X").min(1).max(20).step(0.1).onChange(function(val){
+    selectionHandler.getSelectedObject().setScale(val, selectionHandler.getSelectedObject().mesh.material.uniforms.scale.value.y);
+  }).listen();
+  guiHandler.spriteManipulationScaleYController = guiHandler.datGuiSpriteManipulation.add(guiHandler.spriteManipulationParameters, "Scale Y").min(1).max(20).step(0.1).onChange(function(val){
+    selectionHandler.getSelectedObject().setScale(selectionHandler.getSelectedObject().mesh.material.uniforms.scale.value.x, val);
+  }).listen();
+  guiHandler.spriteManipulationRotationController = guiHandler.datGuiSpriteManipulation.add(guiHandler.spriteManipulationParameters, "Rotation").min(0).max(360).step(0.01).onChange(function(val){
+    selectionHandler.getSelectedObject().setRotation(val);
+  }).listen();
+  guiHandler.spriteManipulationClickableController = guiHandler.datGuiSpriteManipulation.add(guiHandler.spriteManipulationParameters, "Clickable").onChange(function(val){
+    selectionHandler.getSelectedObject().isClickable = val;
   }).listen();
 }
 
