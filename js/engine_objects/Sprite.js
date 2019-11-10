@@ -23,3 +23,13 @@ Sprite.prototype.mapTexture = function(texture){
   this.mesh.material.needsUpdate = true;
   this.isTextured = true;
 }
+
+Sprite.prototype.removeTexture = function(texture){
+  if (!this.isTextured){
+    return;
+  }
+  macroHandler.removeMacro("HAS_TEXTURE", this.mesh.material, true, true);
+  delete this.mesh.material.uniforms.texture;
+  this.mesh.material.needsUpdate = true;
+  this.isTextured = false;
+}
