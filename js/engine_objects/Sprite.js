@@ -22,6 +22,15 @@ var Sprite = function(name){
   this.mesh.visible = true;
 }
 
+Sprite.prototype.showVisually = function(){
+  this.mesh.visible = true;
+}
+
+
+Sprite.prototype.hideVisually = function(){
+  this.mesh.visible = false;
+}
+
 Sprite.prototype.exportLightweight = function(){
   this.handleRectangle();
   return {

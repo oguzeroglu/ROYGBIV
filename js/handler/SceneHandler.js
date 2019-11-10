@@ -160,6 +160,15 @@ SceneHandler.prototype.hideAll = function(){
     }
     text.hideVisually();
   }
+  for (var spriteName in sprites){
+    var sprite = sprites[spriteName];
+    if (mode == 1){
+      for (var animName in sprite.animations){
+        animationHandler.forceFinish(sprite.animations[animName]);
+      }
+    }
+    sprite.hideVisually();
+  }
   if (mode == 0){
     for (var gsName in gridSystems){
       gridSystems[gsName].hide();
@@ -243,6 +252,10 @@ SceneHandler.prototype.changeScene = function(sceneName, readyCallback){
     for (var textName in this.scenes[sceneName].addedTexts){
       var text = this.scenes[sceneName].addedTexts[textName];
       text.showVisually();
+    }
+    for (var spriteName in this.scenes[sceneName].sprites){
+      var sprite = this.scenes[sceneName].sprites[spriteName];
+      sprite.showVisually();
     }
     if (markedPointsVisible){
       for (var markedPointName in this.scenes[sceneName].markedPoints){
