@@ -1,9 +1,12 @@
 var Sprite = function(name){
   this.isSprite = true;
   this.name = name;
+  if (IS_WORKER_CONTEXT){
+    return;
+  }
   this.color = new THREE.Color("white");
   this.alpha = 1;
-  this.geometry = new THREE.PlaneBufferGeometry(5, 5);
+  this.geometry = new THREE.PlaneBufferGeometry(100, 100);
   this.mesh = new MeshGenerator().generateSprite(this);
   this.reusableVector1 = new THREE.Vector2();
   this.reusableVector2 = new THREE.Vector2();
@@ -14,6 +17,31 @@ var Sprite = function(name){
   this.handleRectangle();
   this.set2DCoordinates(50, 50);
   scene.add(this.mesh);
+  this.mesh.visible = true;
+}
+
+Sprite.prototype.exportLightweight = function(){
+  this.handleRectangle();
+  return {
+    x: this.rectangle.x,
+    y: this.rectangle.y,
+    finalX: this.rectangle.finalX,
+    finalY: this.rectangle.finalY,
+    width: this.rectangle.width,
+    height: this.rectangle.height
+  };
+}
+
+Sprite.prototype.destroy = function(){
+  scene.remove(this.mesh);
+  this.mesh.material.dispose();
+  this.mesh.geometry.dispose();
+  if (this.rectangle){
+    scene.remove(this.rectangle.mesh);
+    this.rectangle.material.dispose();
+    this.rectangle.geometry.dispose();
+  }
+  delete sprites[this.name];
 }
 
 Sprite.prototype.setColor = function(color){
@@ -29,7 +57,7 @@ Sprite.prototype.setAlpha = function(alpha){
   this.mesh.material.uniforms.alpha.value = alpha;
 }
 
-Sprite.prototype.set2DCoordinates = function(marginPercentX, marginPercentY) {
+Sprite.prototype.set2DCoordinates = function(marginPercentX, marginPercentY){
   GLOBAL_VIEWPORT_UNIFORM.value.set(0, 0, window.innerWidth * screenResolution, window.innerHeight * screenResolution);
   this.marginPercentX = marginPercentX;
   this.marginPercentY = marginPercentY;

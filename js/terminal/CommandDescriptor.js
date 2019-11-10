@@ -198,7 +198,8 @@ var CommandDescriptor = function(){
       1, //editLightning
       1, //destroyLightning
       0, //printLightnings
-      0 //printTotalPhysicsShapeCount
+      0, //printTotalPhysicsShapeCount
+      1 //newSprite
   ];
 
   this.commandArgumentsExpectedExplanation = [
@@ -399,7 +400,8 @@ var CommandDescriptor = function(){
     "editLightning lightningName",
     "destroyLightning lightningName",
     "printLightnings",
-    "printTotalPhysicsShapeCount"
+    "printTotalPhysicsShapeCount",
+    "newSprite spriteName"
   ];
 
   this.commands = [
@@ -600,7 +602,8 @@ var CommandDescriptor = function(){
     "editLightning",
     "destroyLightning",
     "printLightnings",
-    "printTotalPhysicsShapeCount"
+    "printTotalPhysicsShapeCount",
+    "newSprite"
   ];
 
   this.commandInfo = [
@@ -801,7 +804,8 @@ var CommandDescriptor = function(){
     "editLightning: Opens the Lightning editor GUI to edit a lightning.",
     "destroyLightning: Destroys a Lightning.",
     "printLightnings: Prints a list of created lightnings.",
-    "printTotalPhysicsShapeCount: Prints the total count of physics shapes for current scene."
+    "printTotalPhysicsShapeCount: Prints the total count of physics shapes for current scene.",
+    "newSprite: Creates a new sprite."
   ];
 
   this.keyboardInfo = [
@@ -1467,6 +1471,11 @@ var CommandDescriptor = function(){
   this.destroyLightning = new Object();
   this.destroyLightning.types = [];
   this.destroyLightning.types.push(this.LIGHTNING_NAME); //lightningName
+
+  // newSprite
+  this.newSprite = new Object();
+  this.newSprite.types = [];
+  this.newSprite.types.push(this.UNKNOWN_INDICATOR); //spriteName
 
 };
 

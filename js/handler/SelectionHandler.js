@@ -25,6 +25,10 @@ SelectionHandler.prototype.select = function(object){
       scene.add(selectedAddedText.bbHelper);
     }
   }
+  if (object.isSprite){
+    selectedSprite = object;
+    scene.add(object.rectangle.mesh);
+  }
   this.currentSelection = object;
 }
 
@@ -37,6 +41,9 @@ SelectionHandler.prototype.getSelectedObject = function(){
   }
   if (selectedAddedText){
     return selectedAddedText;
+  }
+  if (selectedSprite){
+    return selectedSprite;
   }
   return 0;
 }
@@ -61,6 +68,9 @@ SelectionHandler.prototype.resetCurrentSelection = function(){
       scene.remove(this.currentSelection.rectangle.mesh);
     }
     selectedAddedText = 0;
+  }else if (this.currentSelection.isSprite){
+    scene.remove(this.currentSelection.rectangle.mesh);
+    selectedSprite = 0;
   }
   this.currentSelection = 0;
   if (!isDeployment){

@@ -475,6 +475,9 @@ function onRaycasterIntersection(){
      if (!object){
        object = addedTexts[intersectionObject];
      }
+     if (!object){
+       object = sprites[intersectionObject];
+     }
      if (object.isAddedObject || object.isObjectGroup){
        if (!isDeployment && mode == 0){
          terminal.clear();
@@ -614,6 +617,20 @@ function onRaycasterIntersection(){
        }
        if (mode != 0 && object.clickCallbackFunction){
          object.clickCallbackFunction(object.name);
+       }
+       if (!isDeployment){
+         guiHandler.afterObjectSelection();
+       }
+     }else if (object.isSprite){
+       if (mode == 0){
+         selectionHandler.resetCurrentSelection();
+       }
+       if (!isDeployment && mode == 0){
+         terminal.clear();
+         terminal.printInfo(Text.SELECTED.replace(Text.PARAM1, object.name));
+       }
+       if (!isDeployment){
+         selectionHandler.select(object);
        }
        if (!isDeployment){
          guiHandler.afterObjectSelection();

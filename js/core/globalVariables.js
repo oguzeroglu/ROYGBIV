@@ -126,6 +126,7 @@ var physicsDebugMode = false;
 var selectedAddedObject = 0;
 var selectedObjectGroup = 0;
 var selectedAddedText = 0;
+var selectedSprite = 0;
 var planeWidthSegments = 10;
 var planeHeightSegments = 10;
 var boxWidthSegments = 10;
@@ -370,6 +371,8 @@ var ANIMATION_STATE_REWINDING = 3;
 var lightnings = new Object();
 var areaEnterCallbacks = new Object();
 var areaExitCallbacks = new Object();
+var sprites = new Object();
+var clickableSprites = new Object();
 
 // RENDER ORDERS
 var renderOrders = {

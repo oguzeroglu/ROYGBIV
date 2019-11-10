@@ -24,6 +24,8 @@ Scene.prototype.reset = function(){
   this.clickableAddedTexts = new Object();
   this.clickableAddedTexts2D = new Object();
   this.trackingObjects = new Object();
+  this.sprites = new Object();
+  this.clickableSprites = new Object();
   this.areaBinHandler.isAreaBinHandler = true;
   this.isSkyboxMapped = false;
 }
@@ -64,6 +66,9 @@ Scene.prototype.destroy = function(){
   }
   for (var chName in this.crosshairs){
     parseCommand("destroyCrosshair "+chName);
+  }
+  for (var spriteName in this.sprites){
+    parseCommand("destroysprite "+spriteName);
   }
   this.reset();
 }
@@ -137,6 +142,9 @@ Scene.prototype.import = function(exportObj){
   for (var i = 0; i<exportObj.lightningNames.length; i++){
     this.registerLightning(lightnings[exportObj.lightningNames[i]]);
   }
+  for (var i = 0; i<exportObj.spriteNames.length; i++){
+    this.registerSprite(sprites[exportObj.spriteNames[i]]);
+  }
   this.isSkyboxMapped = exportObj.isSkyboxMapped;
   if (this.isSkyboxMapped){
     this.mappedSkyboxName = exportObj.mappedSkyboxName;
@@ -161,6 +169,7 @@ Scene.prototype.export = function(){
   exportObj.muzzleFlashNames = Object.keys(this.muzzleFlashes);
   exportObj.lightningNames = Object.keys(this.lightnings);
   exportObj.crosshairNames = Object.keys(this.crosshairs);
+  exportObj.spriteNames = Object.keys(this.sprites);
   exportObj.isSkyboxMapped = this.isSkyboxMapped;
   exportObj.postProcessing = this.postProcessing;
   if (this.isSkyboxMapped){
@@ -182,6 +191,16 @@ Scene.prototype.refreshAreaBinHandler = function(){
 
 Scene.prototype.resetAutoInstancedObjects = function(){
   this.autoInstancedObjects = new Object();
+}
+
+Scene.prototype.unregisterSprite = function(sprite){
+  delete this.sprites[sprite.name];
+  delete sprite.registeredSceneName;
+}
+
+Scene.prototype.registerSprite = function(sprite){
+  this.sprites[sprite.name] = sprite;
+  sprite.registeredSceneName = this.name;
 }
 
 Scene.prototype.registerTrackingObject = function(obj){

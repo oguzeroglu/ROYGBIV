@@ -220,6 +220,7 @@ var Text = function(){
   this.MUZZLEFLASH_CREATED = "Muzzle flash created.";
   this.MUZZLEFLASH_EDITED = "Muzzle flash edited.";
   this.OBJECT_MARKED_AS = "Object marked as @@1.";
+  this.SPRITE_CREATED = "Sprite created.";
   this.OBJECT_INTERSECTABLE = "Object set as intersectable. It means that the object can be collided with particles/particle systems and be picked with mouse.";
   this.OBJECT_UNINTERSECTABLE = "Object set as unintersectable. It means that the object cannot be collided with particles/particle systems and be picked with mouse.";
   this.A_NEW_BOX_TEST_STARTED = "A new box test started.";

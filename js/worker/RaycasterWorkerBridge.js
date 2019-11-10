@@ -54,6 +54,11 @@ var RaycasterWorkerBridge = function(){
           var textWorkerID = msg.data.ids[i].id;
           rayCaster.objectsByWorkerID[textWorkerID] = text;
           rayCaster.idsByObjectNames[text.name] = textWorkerID;
+        }else if (msg.data.ids[i].type == "sprite"){
+          var sprite = sprites[msg.data.ids[i].name];
+          var spriteWorkerID = msg.data.ids[i].id;
+          rayCaster.objectsByWorkerID[spriteWorkerID] = sprite;
+          rayCaster.idsByObjectNames[sprite.name] = spriteWorkerID;
         }else if (msg.data.ids[i].type == "particleSystem"){
           var particleSystem = particleSystemPool[msg.data.ids[i].name];
           var particleSystemWorkerID = msg.data.ids[i].id;

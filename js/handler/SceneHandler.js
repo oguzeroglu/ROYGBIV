@@ -315,6 +315,14 @@ SceneHandler.prototype.createScene = function(sceneName){
   this.scenes[sceneName] = new Scene(sceneName);
 }
 
+SceneHandler.prototype.onSpriteDeletion = function(sprite){
+  this.scenes[sprite.registeredSceneName].unregisterSprite(sprite);
+}
+
+SceneHandler.prototype.onSpriteCreation = function(sprite){
+  this.scenes[this.activeSceneName].registerSprite(sprite);
+}
+
 SceneHandler.prototype.onAutoInstancedObjectCreation = function(autoInstancedObject){
   this.scenes[autoInstancedObject.getRegisteredSceneName()].registerAutoInstancedObject(autoInstancedObject);
 }
@@ -492,6 +500,10 @@ SceneHandler.prototype.getAddedTexts2D = function(){
   return this.scenes[this.activeSceneName].addedTexts2D;
 }
 
+SceneHandler.prototype.getSprites = function(){
+  return this.scenes[this.activeSceneName].sprites;
+}
+
 SceneHandler.prototype.getMuzzleFlashes = function(){
   return this.scenes[this.activeSceneName].muzzleFlashes;
 }
@@ -518,6 +530,10 @@ SceneHandler.prototype.getDynamicObjectGroups = function(){
 
 SceneHandler.prototype.getClickableAddedTexts = function(){
   return this.scenes[this.activeSceneName].clickableAddedTexts;
+}
+
+SceneHandler.prototype.getClickableSprites = function(){
+  return this.scenes[this.activeSceneName].clickableSprites;
 }
 
 SceneHandler.prototype.getClickableAddedTexts2D = function(){

@@ -205,6 +205,7 @@ AddedText.prototype.destroy = function(skipRaycasterRefresh){
     this.bbHelper.geometry.dispose();
   }
   if (this.rectangle){
+    scene.remove(this.rectangle.mesh);
     this.rectangle.material.dispose();
     this.rectangle.geometry.dispose();
   }

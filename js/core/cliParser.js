@@ -3667,7 +3667,7 @@ function parse(input){
           var offsetX = parseFloat(splitted[4]);
           var offsetY = parseFloat(splitted[5]);
           var offsetZ = parseFloat(splitted[6]);
-          if (addedTexts[textName]){
+          if (addedTexts[textName] || sprites[textName]){
             terminal.printError(Text.NAME_MUST_BE_UNIQUE);
             return true;
           }
@@ -3679,6 +3679,7 @@ function parse(input){
             for (var childName in objectGroups[objName].group){
               if (childName == textName){
                 terminal.printError(Text.NAME_MUST_BE_UNIQUE);
+                return true;
               }
             }
           }
@@ -4784,6 +4785,22 @@ function parse(input){
           }
           terminal.printHeader(Text.SHAPES);
           terminal.printInfo(Text.TREE.replace(Text.PARAM1, count));
+          return true;
+        break;
+        case 198: //newSprite
+          if (mode != 0){
+            terminal.printError(Text.WORKS_ONLY_IN_DESIGN_MODE);
+            return true;
+          }
+          var spriteName = splitted[1];
+          if (sprites[spriteName] || addedTexts[spriteName]){
+            terminal.printError(Text.NAME_MUST_BE_UNIQUE);
+            return true;
+          }
+          sprites[spriteName] = new Sprite(spriteName);
+          sceneHandler.onSpriteCreation(sprites[spriteName]);
+          selectionHandler.select(sprites[spriteName]);
+          refreshRaycaster(Text.SPRITE_CREATED);
           return true;
         break;
       }

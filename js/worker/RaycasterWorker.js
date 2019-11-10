@@ -16,6 +16,8 @@ importScripts("../handler/factory/RaycasterFactory.js");
 importScripts("../engine_objects/CollisionInfo.js");
 importScripts("../handler/WorldBinHandler2D.js");
 importScripts("../handler/ObjectPicker2D.js");
+importScripts("../engine_objects/Rectangle.js");
+importScripts("../engine_objects/Sprite.js");
 
 var IS_WORKER_CONTEXT = true;
 var objectPicker2D = new ObjectPicker2D();
@@ -72,6 +74,12 @@ RaycasterWorker.prototype.refresh = function(state){
     idResponse.push({type: "addedText", name: textName, id: addedTexts[textName].workerID});
     this.workerIDsByObjectName[textName] = addedTexts[textName].workerID;
     this.objectsByWorkerID[addedTexts[textName].workerID] = addedTexts[textName];
+  }
+  for (var spriteName in sprites){
+    sprites[spriteName].workerID = idCounter ++;
+    idResponse.push({type: "sprite", name: spriteName, id: sprites[spriteName].workerID});
+    this.workerIDsByObjectName[spriteName] = sprites[spriteName].workerID;
+    this.objectsByWorkerID[sprites[spriteName].workerID] = sprites[spriteName];
   }
   for (var psName in particleSystemPool){
     particleSystemPool[psName].workerID = psIDCounter ++;
