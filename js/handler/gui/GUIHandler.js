@@ -217,9 +217,9 @@ GUIHandler.prototype.afterTextSelection = function(){
     if (typeof guiHandler.textManipulationParameters["Max height%"] == UNDEFINED){
       guiHandler.textManipulationParameters["Max height%"] = 0;
     }
-    if (curSelection.marginMode == MARGIN_MODE_2D_TEXT_TOP_LEFT){
+    if (curSelection.marginMode == MARGIN_MODE_2D_TOP_LEFT){
       guiHandler.textManipulationParameters["Margin mode"] = "Top/Left";
-    }else if (curSelection.marginMode == MARGIN_MODE_2D_TEXT_BOTTOM_RIGHT){
+    }else if (curSelection.marginMode == MARGIN_MODE_2D_BOTTOM_RIGHT){
       guiHandler.textManipulationParameters["Margin mode"] = "Bottom/Right";
     }else{
       guiHandler.textManipulationParameters["Margin mode"] = "Center";
@@ -1241,11 +1241,11 @@ GUIHandler.prototype.initializeTextManipulationGUI = function(){
   }).listen();
   guiHandler.textManipulationMarginModeController = guiHandler.datGuiTextManipulation.add(guiHandler.textManipulationParameters, "Margin mode", ["Top/Left", "Bottom/Right", "Center"]).onChange(function(val){
     if (val == "Top/Left"){
-      selectionHandler.getSelectedObject().marginMode = MARGIN_MODE_2D_TEXT_TOP_LEFT;
+      selectionHandler.getSelectedObject().marginMode = MARGIN_MODE_2D_TOP_LEFT;
     }else if (val == "Bottom/Right"){
-      selectionHandler.getSelectedObject().marginMode = MARGIN_MODE_2D_TEXT_BOTTOM_RIGHT;
+      selectionHandler.getSelectedObject().marginMode = MARGIN_MODE_2D_BOTTOM_RIGHT;
     }else{
-      selectionHandler.getSelectedObject().marginMode = MARGIN_MODE_2D_TEXT_CENTER;
+      selectionHandler.getSelectedObject().marginMode = MARGIN_MODE_2D_CENTER;
     }
     selectionHandler.getSelectedObject().set2DCoordinates(selectionHandler.getSelectedObject().marginPercentWidth, selectionHandler.getSelectedObject().marginPercentHeight);
   }).listen();

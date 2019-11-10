@@ -7,6 +7,7 @@ attribute vec3 position;
 attribute vec2 uv;
 uniform vec4 currentViewport;
 uniform vec2 scale;
+uniform vec2 margin;
 uniform float rotationAngle;
 
 #define INSERTION
@@ -37,5 +38,5 @@ void main(){
   float oldPosY = ((currentViewport.w - currentViewport.y) / 2.0) + currentViewport.y + rotated.y;
   float x = (((oldPosX - currentViewport.x) * 2.0) / currentViewport.z) - 1.0;
   float y = (((oldPosY - currentViewport.y) * 2.0) / currentViewport.w) - 1.0;
-  gl_Position = vec4(x, y, 0.0, 1.0);
+  gl_Position = vec4(x + margin.x, y + margin.y, 0.0, 1.0);
 }

@@ -8,8 +8,68 @@ var Sprite = function(name){
   this.reusableVector3 = new THREE.Vector2();
   this.reusableVector4 = new THREE.Vector2();
   this.reusableVector5 = new THREE.Vector2();
+  this.marginMode = MARGIN_MODE_2D_CENTER;
   this.handleRectangle();
+  this.set2DCoordinates(50, 50);
   scene.add(this.mesh);
+}
+
+Sprite.prototype.set2DCoordinates = function(marginPercentX, marginPercentY) {
+  GLOBAL_VIEWPORT_UNIFORM.value.set(0, 0, window.innerWidth * screenResolution, window.innerHeight * screenResolution);
+  this.marginPercentX = marginPercentX;
+  this.marginPercentY = marginPercentY;
+  var isFromLeft = false, isFromTop = false, isFromCenter = false;
+  if (this.marginMode == MARGIN_MODE_2D_TOP_LEFT){
+    isFromLeft = true;
+    isFromTop = true;
+  }else if (this.marginMode == MARGIN_MODE_2D_CENTER){
+    isFromCenter = true;
+  }
+  var curViewport = REUSABLE_QUATERNION.set(0, 0, window.innerWidth, window.innerHeight);
+  if (isFromLeft){
+    var tmpX = ((curViewport.z - curViewport.x) / 2.0) + curViewport.x + (this.rectangle.width / screenResolution);
+    var widthX = (((tmpX - curViewport.x) * 2.0) / curViewport.z) - 1.0;
+    var marginX = (((marginPercentX) * (2)) / (100)) -1;
+    marginX -= this.rectangle.x;
+    this.mesh.material.uniforms.margin.value.x = marginX;
+  }else if (!isFromCenter){
+    marginPercentX = marginPercentX + 100;
+    var tmpX = ((curViewport.z - curViewport.x) / 2.0) + curViewport.x + (this.rectangle.width / screenResolution);
+    var widthX = (((tmpX - curViewport.x) * 2.0) / curViewport.z) - 1.0;
+    var marginX = (((marginPercentX) * (2)) / (100)) -1;
+    marginX = 2 - marginX + this.rectangle.x;
+    this.mesh.material.uniforms.margin.value.x = marginX;
+  }else{
+    marginPercentX = marginPercentX + 100;
+    var tmpX = ((curViewport.z - curViewport.x) / 2.0) + curViewport.x + (this.rectangle.width / screenResolution);
+    var widthX = (((tmpX - curViewport.x) * 2.0) / curViewport.z) - 1.0;
+    var marginX = (((marginPercentX) * (2)) / (100)) -1;
+    marginX += (widthX / 2);
+    marginX = 2 - marginX;
+    this.mesh.material.uniforms.margin.value.x = marginX;
+  }
+  if (isFromTop){
+    marginPercentY = 100 - marginPercentY;
+    var tmpY = ((curViewport.w - curViewport.y) / 2.0) + curViewport.y + (this.rectangle.height / screenResolution);
+    var heightY = (((tmpY - curViewport.y) * 2.0) / curViewport.w) - 1.0;
+    var marginY = (((marginPercentY) * (2)) / (100)) -1;
+    marginY += this.rectangle.y;
+    this.mesh.material.uniforms.margin.value.y = marginY;
+  }else if (!isFromCenter){
+    var tmpY = ((curViewport.w - curViewport.y) / 2.0) + curViewport.y + (this.rectangle.height / screenResolution);
+    var heightY = (((tmpY - curViewport.y) * 2.0) / curViewport.w) - 1.0;
+    var marginY = (((marginPercentY) * (2)) / (100)) -1;
+    marginY -= this.rectangle.y;
+    this.mesh.material.uniforms.margin.value.y = marginY;
+  }else{
+    marginPercentY = 100 - marginPercentY;
+    var tmpY = ((curViewport.w - curViewport.y) / 2.0) + curViewport.y + (this.rectangle.height / screenResolution);
+    var heightY = (((tmpY - curViewport.y) * 2.0) / curViewport.w) - 1.0;
+    var marginY = (((marginPercentY) * (2)) / (100)) -1;
+    marginY -= heightY / 2;
+    this.mesh.material.uniforms.margin.value.y = marginY;
+  }
+  this.handleRectangle();
 }
 
 Sprite.prototype.getCornerPoint = function(point){
@@ -26,8 +86,8 @@ Sprite.prototype.getCornerPoint = function(point){
   var oldPosY = ((currentViewport.w - currentViewport.y) / 2.0) + currentViewport.y + rotated.y;
   var x = (((oldPosX - currentViewport.x) * 2.0) / currentViewport.z) - 1.0;
   var y = (((oldPosY - currentViewport.y) * 2.0) / currentViewport.w) - 1.0;
-  point.x = x;
-  point.y = y;
+  point.x = x + this.mesh.material.uniforms.margin.value.x;
+  point.y = y + this.mesh.material.uniforms.margin.value.y;
 }
 
 Sprite.prototype.handleRectangle = function(){

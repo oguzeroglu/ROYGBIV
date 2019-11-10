@@ -88,7 +88,7 @@ var AddedText = function(name, font, text, position, color, alpha, characterSize
   this.reusableVector = new THREE.Vector3();
   this.makeFirstUpdate = true;
   this.isAffectedByFog = false;
-  this.marginMode = MARGIN_MODE_2D_TEXT_TOP_LEFT;
+  this.marginMode = MARGIN_MODE_2D_TOP_LEFT;
   this.marginPercentWidth = 50;
   this.marginPercentHeight = 50;
   this.maxWidthPercent = 100;
@@ -852,10 +852,10 @@ AddedText.prototype.set2DCoordinates = function(marginPercentWidth, marginPercen
   this.marginPercentWidth = marginPercentWidth;
   this.marginPercentHeight = marginPercentHeight;
   var isFromLeft = false, isFromTop = false, isFromCenter = false;
-  if (this.marginMode == MARGIN_MODE_2D_TEXT_TOP_LEFT){
+  if (this.marginMode == MARGIN_MODE_2D_TOP_LEFT){
     isFromLeft = true;
     isFromTop = true;
-  }else if (this.marginMode == MARGIN_MODE_2D_TEXT_CENTER){
+  }else if (this.marginMode == MARGIN_MODE_2D_CENTER){
     isFromCenter = true;
   }
   var curViewport = REUSABLE_QUATERNION.set(0, 0, window.innerWidth, window.innerHeight);
