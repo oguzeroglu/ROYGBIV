@@ -230,6 +230,8 @@ StateLoaderLightweight.prototype.loadBoundingBoxes = function(){
       spriteExports[spriteName].finalX, spriteExports[spriteName].finalY,
       spriteExports[spriteName].width, spriteExports[spriteName].heigth
     );
+    sprites[spriteName].triangle1.set(spriteExports[spriteName].triangle1.a, spriteExports[spriteName].triangle1.b, spriteExports[spriteName].triangle1.c);
+    sprites[spriteName].triangle2.set(spriteExports[spriteName].triangle2.a, spriteExports[spriteName].triangle2.b, spriteExports[spriteName].triangle2.c);
   }
 }
 

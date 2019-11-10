@@ -161,6 +161,19 @@ RaycasterWorker.prototype.update = function(transferableMessageBody){
           this.rayCaster.show(obj);
           obj.isHidden = false;
         }
+      }else if (obj.isSprite){
+        obj.rectangle.set(
+          intersectableObjDescription[i + 2], intersectableObjDescription[i + 3],
+          intersectableObjDescription[i + 4], intersectableObjDescription[i + 5],
+          intersectableObjDescription[i + 6], intersectableObjDescription[i + 7]
+        );
+        obj.reusableVector1.set(intersectableObjDescription[i + 8], intersectableObjDescription[i + 9], 0);
+        obj.reusableVector2.set(intersectableObjDescription[i + 10], intersectableObjDescription[i + 11], 0);
+        obj.reusableVector3.set(intersectableObjDescription[i + 12], intersectableObjDescription[i + 13], 0);
+        obj.reusableVector4.set(intersectableObjDescription[i + 14], intersectableObjDescription[i + 15], 0);
+        obj.triangle1.set(obj.reusableVector1, obj.reusableVector3, obj.reusableVector2);
+        obj.triangle2.set(obj.reusableVector3, obj.reusableVector4, obj.reusableVector2);
+        this.rayCaster.updateObject(obj, true);
       }else{
         throw new Error("Not implemented.");
       }

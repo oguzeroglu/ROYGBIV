@@ -1,6 +1,13 @@
 var Sprite = function(name){
   this.isSprite = true;
   this.name = name;
+  this.triangle1 = new THREE.Triangle();
+  this.triangle2 = new THREE.Triangle();
+  this.reusableVector1 = new THREE.Vector3();
+  this.reusableVector2 = new THREE.Vector3();
+  this.reusableVector3 = new THREE.Vector3();
+  this.reusableVector4 = new THREE.Vector3();
+  this.reusableVector5 = new THREE.Vector3();
   if (IS_WORKER_CONTEXT){
     return;
   }
@@ -8,11 +15,6 @@ var Sprite = function(name){
   this.alpha = 1;
   this.geometry = new THREE.PlaneBufferGeometry(100, 100);
   this.mesh = new MeshGenerator().generateSprite(this);
-  this.reusableVector1 = new THREE.Vector2();
-  this.reusableVector2 = new THREE.Vector2();
-  this.reusableVector3 = new THREE.Vector2();
-  this.reusableVector4 = new THREE.Vector2();
-  this.reusableVector5 = new THREE.Vector2();
   this.marginMode = MARGIN_MODE_2D_CENTER;
   this.handleRectangle();
   this.set2DCoordinates(50, 50);
@@ -28,7 +30,17 @@ Sprite.prototype.exportLightweight = function(){
     finalX: this.rectangle.finalX,
     finalY: this.rectangle.finalY,
     width: this.rectangle.width,
-    height: this.rectangle.height
+    height: this.rectangle.height,
+    triangle1: {
+      a: this.triangle1.a,
+      b: this.triangle1.b,
+      c: this.triangle1.c
+    },
+    triangle2: {
+      a: this.triangle2.a,
+      b: this.triangle2.b,
+      c: this.triangle2.c
+    }
   };
 }
 
@@ -113,6 +125,7 @@ Sprite.prototype.set2DCoordinates = function(marginPercentX, marginPercentY){
     this.mesh.material.uniforms.margin.value.y = marginY;
   }
   this.handleRectangle();
+  rayCaster.updateObject(this);
 }
 
 Sprite.prototype.getCornerPoint = function(point){
@@ -138,14 +151,16 @@ Sprite.prototype.handleRectangle = function(){
     this.rectangle = new Rectangle(0, 0, 0, 0);
   }
   var points = this.mesh.geometry.attributes.position.array;
-  this.reusableVector1.set(points[0], points[1]);
-  this.reusableVector2.set(points[3], points[4]);
-  this.reusableVector3.set(points[6], points[7]);
-  this.reusableVector4.set(points[9], points[10]);
+  this.reusableVector1.set(points[0], points[1], 0);
+  this.reusableVector2.set(points[3], points[4], 0);
+  this.reusableVector3.set(points[6], points[7], 0);
+  this.reusableVector4.set(points[9], points[10], 0);
   this.getCornerPoint(this.reusableVector1);
   this.getCornerPoint(this.reusableVector2);
   this.getCornerPoint(this.reusableVector3);
   this.getCornerPoint(this.reusableVector4);
+  this.triangle1.set(this.reusableVector1, this.reusableVector3, this.reusableVector2);
+  this.triangle2.set(this.reusableVector3, this.reusableVector4, this.reusableVector2);
   var minX = Math.min(this.reusableVector1.x, this.reusableVector2.x, this.reusableVector3.x, this.reusableVector4.x);
   var minY = Math.min(this.reusableVector1.y, this.reusableVector2.y, this.reusableVector3.y, this.reusableVector4.y);
   var maxX = Math.max(this.reusableVector1.x, this.reusableVector2.x, this.reusableVector3.x, this.reusableVector4.x);
@@ -157,11 +172,13 @@ Sprite.prototype.handleRectangle = function(){
 Sprite.prototype.setScale = function(scaleX, scaleY){
   this.mesh.material.uniforms.scale.value.set(scaleX, scaleY);
   this.handleRectangle();
+  rayCaster.updateObject(this);
 }
 
 Sprite.prototype.setRotation = function(angleInDegrees){
   this.mesh.material.uniforms.rotationAngle.value = angleInDegrees;
   this.handleRectangle();
+  rayCaster.updateObject(this);
 }
 
 Sprite.prototype.getTextureUniform = function(texture){

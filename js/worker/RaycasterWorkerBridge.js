@@ -135,6 +135,33 @@ var RaycasterWorkerBridge = function(){
           addedTextScaleDescriptionIndex += 11;
         }
       }
+      for (var spriteName in sceneHandler.getSprites()){
+        var sprite = sprites[spriteName];
+        var insertSpriteToBuffer = ((mode == 0) || (mode == 1 && sprite.isClickable));
+        if (insertSpriteToBuffer){
+          sprite.indexInIntersectableObjDescriptionArray = intersectableArrayIndex;
+          intersectablesAry.push(rayCaster.idsByObjectNames[sprite.name]);
+          intersectablesAry.push(1);
+          sprite.handleRectangle();
+          intersectablesAry.push(sprite.rectangle.x);
+          intersectablesAry.push(sprite.rectangle.y);
+          intersectablesAry.push(sprite.rectangle.finalX);
+          intersectablesAry.push(sprite.rectangle.finalY);
+          intersectablesAry.push(sprite.rectangle.width);
+          intersectablesAry.push(sprite.rectangle.height);
+          intersectablesAry.push(sprite.reusableVector1.x);
+          intersectablesAry.push(sprite.reusableVector1.y);
+          intersectablesAry.push(sprite.reusableVector2.x);
+          intersectablesAry.push(sprite.reusableVector2.y);
+          intersectablesAry.push(sprite.reusableVector3.x);
+          intersectablesAry.push(sprite.reusableVector3.y);
+          intersectablesAry.push(sprite.reusableVector4.x);
+          intersectablesAry.push(sprite.reusableVector4.y);
+          intersectablesAry.push(-1);
+          intersectablesAry.push(-1);
+          intersectableArrayIndex += sprite.mesh.matrixWorld.elements.length + 2;
+        }
+      }
       var particleSystemStatusDescriptionArray = [];
       var particleSystemStatusDescriptionIndex = 0;
       for (var psName in particleSystemPool){
@@ -474,6 +501,21 @@ RaycasterWorkerBridge.prototype.issueUpdate = function(obj){
     description[obj.indexInIntersectableObjDescriptionArray + 3] = obj.twoDimensionalSize.y;
     description[obj.indexInIntersectableObjDescriptionArray + 4] = obj.twoDimensionalSize.z;
     description[obj.indexInIntersectableObjDescriptionArray + 5] = obj.twoDimensionalSize.w;
+  }else if (obj.isSprite){
+    description[obj.indexInIntersectableObjDescriptionArray + 2] = obj.rectangle.x;
+    description[obj.indexInIntersectableObjDescriptionArray + 3] = obj.rectangle.y;
+    description[obj.indexInIntersectableObjDescriptionArray + 4] = obj.rectangle.finalX;
+    description[obj.indexInIntersectableObjDescriptionArray + 5] = obj.rectangle.finalY;
+    description[obj.indexInIntersectableObjDescriptionArray + 6] = obj.rectangle.width;
+    description[obj.indexInIntersectableObjDescriptionArray + 7] = obj.rectangle.heigth;
+    description[obj.indexInIntersectableObjDescriptionArray + 8] = obj.reusableVector1.x;
+    description[obj.indexInIntersectableObjDescriptionArray + 9] = obj.reusableVector1.y;
+    description[obj.indexInIntersectableObjDescriptionArray + 10] = obj.reusableVector2.x;
+    description[obj.indexInIntersectableObjDescriptionArray + 11] = obj.reusableVector2.y;
+    description[obj.indexInIntersectableObjDescriptionArray + 12] = obj.reusableVector3.x;
+    description[obj.indexInIntersectableObjDescriptionArray + 13] = obj.reusableVector3.y;
+    description[obj.indexInIntersectableObjDescriptionArray + 14] = obj.reusableVector4.x;
+    description[obj.indexInIntersectableObjDescriptionArray + 15] = obj.reusableVector4.y;
   }else{
     for (var i = obj.indexInIntersectableObjDescriptionArray + 2; i < obj.indexInIntersectableObjDescriptionArray + 18; i++){
       description[i] = obj.mesh.matrixWorld.elements[i - obj.indexInIntersectableObjDescriptionArray - 2]
@@ -494,6 +536,9 @@ RaycasterWorkerBridge.prototype.updateObject = function(obj){
     return;
   }
   if (mode == 1 && (obj.isAddedText && obj.is2D && !obj.isClickable)){
+    return;
+  }
+  if (mode == 1 && (obj.isSprite && !obj.isClickable)){
     return;
   }
   if (obj.isAddedText && obj.isEditorHelper){

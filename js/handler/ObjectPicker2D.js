@@ -84,11 +84,10 @@ ObjectPicker2D.prototype.find = function(screenSpaceX, screenSpaceY){
         }
       }
     }else if (obj.isSprite){
-      if (webglSpaceX >= obj.rectangle.x && webglSpaceX <= obj.rectangle.finalX){
-        if (webglSpaceY >= obj.rectangle.y && webglSpaceY <= obj.rectangle.finalY){
-          intersectionPoint = 1;
-          intersectionObject = name;
-        }
+      REUSABLE_VECTOR.set(webglSpaceX, webglSpaceY, 0);
+      if (obj.triangle1.containsPoint(REUSABLE_VECTOR) || obj.triangle2.containsPoint(REUSABLE_VECTOR)){
+        intersectionPoint = 1;
+        intersectionObject = name;
       }
     }
   }
