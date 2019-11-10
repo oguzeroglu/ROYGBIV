@@ -1,6 +1,8 @@
 var Sprite = function(name){
   this.isSprite = true;
   this.name = name;
+  this.color = new THREE.Color("white");
+  this.alpha = 1;
   this.geometry = new THREE.PlaneBufferGeometry(5, 5);
   this.mesh = new MeshGenerator().generateSprite(this);
   this.reusableVector1 = new THREE.Vector2();
@@ -12,6 +14,19 @@ var Sprite = function(name){
   this.handleRectangle();
   this.set2DCoordinates(50, 50);
   scene.add(this.mesh);
+}
+
+Sprite.prototype.setColor = function(color){
+  this.mesh.material.uniforms.color.value.set(color);
+}
+
+Sprite.prototype.setAlpha = function(alpha){
+  if (alpha != 1){
+    this.mesh.material.transparent = true;
+  }else{
+    this.mesh.material.transparent = false;
+  }
+  this.mesh.material.uniforms.alpha.value = alpha;
 }
 
 Sprite.prototype.set2DCoordinates = function(marginPercentX, marginPercentY) {
