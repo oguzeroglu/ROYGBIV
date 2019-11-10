@@ -6,6 +6,10 @@ var Sprite = function(name){
   scene.add(this.mesh);
 }
 
+Sprite.prototype.setScale = function(scaleX, scaleY){
+  this.mesh.material.uniforms.scale.value.set(scaleX, scaleY);
+}
+
 Sprite.prototype.setRotation = function(angleInDegrees){
   this.mesh.material.uniforms.rotationAngle.value = angleInDegrees;
 }
