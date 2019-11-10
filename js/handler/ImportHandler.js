@@ -1281,3 +1281,21 @@ ImportHandler.prototype.importLightnings = function(obj){
     lightningHandler.turnOff();
   }
 }
+
+ImportHandler.prototype.importSprites = function(obj){
+  for (var spriteName in obj.sprites){
+    var curExport = obj.sprites[spriteName];
+    var sprite = new Sprite(spriteName);
+    sprite.setColor(curExport.color);
+    sprite.setAlpha(curExport.alpha);
+    sprite.setScale(curExport.scaleX, curExport.scaleY);
+    sprite.setRotation(curExport.rotation);
+    sprite.marginMode = curExport.marginMode;
+    sprite.set2DCoordinates(curExport.marginPercentX, curExport.marginPercentY);
+    if (curExport.isTextured){
+      sprite.mapTexture(texturePacks[curExport.mappedTexturePackName]);
+    }
+    sprite.isClickable = curExport.isClickable;
+    sprites[sprite.name] = sprite;
+  }
+}

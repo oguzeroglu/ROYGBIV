@@ -104,6 +104,7 @@ StateLoader.prototype.finalize = function(){
   this.importHandler.importObjectGroups(this.stateObj);
   this.importHandler.importFog(this.stateObj);
   this.importHandler.importCrosshairs(this.stateObj);
+  this.importHandler.importSprites(this.stateObj);
   this.importHandler.importScenes(this.stateObj);
 
   this.closePhysicsWorkerIfNotUsed();

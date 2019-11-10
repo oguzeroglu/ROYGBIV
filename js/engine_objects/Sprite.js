@@ -11,8 +11,6 @@ var Sprite = function(name){
   if (IS_WORKER_CONTEXT){
     return;
   }
-  this.color = new THREE.Color("white");
-  this.alpha = 1;
   this.geometry = new THREE.PlaneBufferGeometry(100, 100);
   this.mesh = new MeshGenerator().generateSprite(this);
   this.marginMode = MARGIN_MODE_2D_CENTER;
@@ -20,6 +18,23 @@ var Sprite = function(name){
   this.set2DCoordinates(50, 50);
   scene.add(this.mesh);
   this.mesh.visible = true;
+}
+
+Sprite.prototype.export = function(){
+  return {
+    name: this.name,
+    color: "#" + this.mesh.material.uniforms.color.value.getHexString(),
+    alpha: this.mesh.material.uniforms.alpha.value,
+    marginMode: this.marginMode,
+    marginPercentX: this.marginPercentX,
+    marginPercentY: this.marginPercentY,
+    isTextured: this.isTextured,
+    mappedTexturePackName: this.mappedTexturePackName,
+    scaleX: this.mesh.material.uniforms.scale.value.x,
+    scaleY: this.mesh.material.uniforms.scale.value.y,
+    rotation: this.mesh.material.uniforms.rotationAngle.value,
+    isClickable: this.isClickable
+  };
 }
 
 Sprite.prototype.showVisually = function(){
