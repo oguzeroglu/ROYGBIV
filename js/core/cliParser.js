@@ -4809,6 +4809,21 @@ function parse(input){
           refreshRaycaster(Text.SPRITE_CREATED);
           return true;
         break;
+        case 199:
+          if (mode != 0){
+            terminal.printError(Text.WORKS_ONLY_IN_DESIGN_MODE);
+            return true;
+          }
+          var spriteName = splitted[1];
+          var sprite = sprites[spriteName];
+          if (!sprite){
+            terminal.printError(Text.NO_SUCH_SPRITE);
+            return true;
+          }
+          sprite.destroy();
+          sceneHandler.onSpriteDeletion(sprite);
+          terminal.printInfo(Text.SPRITE_DESTROYED);
+        break;
       }
       return true;
     }catch(err){

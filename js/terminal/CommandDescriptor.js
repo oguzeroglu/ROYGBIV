@@ -199,7 +199,8 @@ var CommandDescriptor = function(){
       1, //destroyLightning
       0, //printLightnings
       0, //printTotalPhysicsShapeCount
-      1 //newSprite
+      1, //newSprite
+      1 //destroySprite
   ];
 
   this.commandArgumentsExpectedExplanation = [
@@ -401,7 +402,8 @@ var CommandDescriptor = function(){
     "destroyLightning lightningName",
     "printLightnings",
     "printTotalPhysicsShapeCount",
-    "newSprite spriteName"
+    "newSprite spriteName",
+    "destroySprite spriteName"
   ];
 
   this.commands = [
@@ -603,7 +605,8 @@ var CommandDescriptor = function(){
     "destroyLightning",
     "printLightnings",
     "printTotalPhysicsShapeCount",
-    "newSprite"
+    "newSprite",
+    "destroySprite"
   ];
 
   this.commandInfo = [
@@ -805,7 +808,8 @@ var CommandDescriptor = function(){
     "destroyLightning: Destroys a Lightning.",
     "printLightnings: Prints a list of created lightnings.",
     "printTotalPhysicsShapeCount: Prints the total count of physics shapes for current scene.",
-    "newSprite: Creates a new sprite."
+    "newSprite: Creates a new sprite.",
+    "destroySprite: Destroys a sprite."
   ];
 
   this.keyboardInfo = [
@@ -941,6 +945,7 @@ var CommandDescriptor = function(){
   this.SCENE_NAME                 =   35;
   this.GS_NAME_NO_WC              =   36;
   this.LIGHTNING_NAME             =   37;
+  this.SPRITE_NAME                =   38;
 
   // newGridSystem
   this.newGridSystem = new Object();
@@ -1476,6 +1481,11 @@ var CommandDescriptor = function(){
   this.newSprite = new Object();
   this.newSprite.types = [];
   this.newSprite.types.push(this.UNKNOWN_INDICATOR); //spriteName
+
+  // destroySprite
+  this.destroySprite = new Object();
+  this.destroySprite.types = [];
+  this.destroySprite.types.push(this.SPRITE_NAME); //spriteName
 
 };
 

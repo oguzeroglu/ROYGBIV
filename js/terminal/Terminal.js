@@ -716,6 +716,14 @@ Terminal.prototype.autocomplete = function(command){
 				}
 				helpString = "[Lightnings]: ";
 			break;
+			case commandDescriptor.SPRITE_NAME:
+				for (var spriteName in sceneHandler.getSprites()){
+					if (spriteName.toLowerCase().startsWith(curEntry.toLowerCase())){
+						possibilities.push(spriteName);
+					}
+				}
+				helpString = "[Sprites]: ";
+			break;
 		}
 
 		//  **********************************************************
