@@ -4809,7 +4809,7 @@ function parse(input){
           refreshRaycaster(Text.SPRITE_CREATED);
           return true;
         break;
-        case 199:
+        case 199: //destroySprite
           if (mode != 0){
             terminal.printError(Text.WORKS_ONLY_IN_DESIGN_MODE);
             return true;
@@ -4823,6 +4823,26 @@ function parse(input){
           sprite.destroy();
           sceneHandler.onSpriteDeletion(sprite);
           terminal.printInfo(Text.SPRITE_DESTROYED);
+          return true;
+        break;
+        case 200: //selectSprite
+          if (mode != 0){
+            terminal.printError(Text.WORKS_ONLY_IN_DESIGN_MODE);
+            return true;
+          }
+          var spriteName = splitted[1];
+          var sprite = sprites[spriteName];
+          if (!sprite){
+            terminal.printError(Text.NO_SUCH_SPRITE);
+            return true;
+          }
+          if (sprite.registeredSceneName != sceneHandler.getActiveSceneName()){
+            terminal.printError(Text.SPRITE_NOT_IN_ACTIVE_SCENE);
+            return true;
+          }
+          selectionHandler.select(sprite);
+          terminal.printInfo(Text.SPRITE_SELECTED);
+          return true;
         break;
       }
       return true;

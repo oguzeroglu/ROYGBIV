@@ -200,7 +200,8 @@ var CommandDescriptor = function(){
       0, //printLightnings
       0, //printTotalPhysicsShapeCount
       1, //newSprite
-      1 //destroySprite
+      1, //destroySprite
+      1 //selectSprite
   ];
 
   this.commandArgumentsExpectedExplanation = [
@@ -403,7 +404,8 @@ var CommandDescriptor = function(){
     "printLightnings",
     "printTotalPhysicsShapeCount",
     "newSprite spriteName",
-    "destroySprite spriteName"
+    "destroySprite spriteName",
+    "selectSprite spriteName"
   ];
 
   this.commands = [
@@ -606,7 +608,8 @@ var CommandDescriptor = function(){
     "printLightnings",
     "printTotalPhysicsShapeCount",
     "newSprite",
-    "destroySprite"
+    "destroySprite",
+    "selectSprite"
   ];
 
   this.commandInfo = [
@@ -809,7 +812,8 @@ var CommandDescriptor = function(){
     "printLightnings: Prints a list of created lightnings.",
     "printTotalPhysicsShapeCount: Prints the total count of physics shapes for current scene.",
     "newSprite: Creates a new sprite.",
-    "destroySprite: Destroys a sprite."
+    "destroySprite: Destroys a sprite.",
+    "selectSprite: Selects a sprite."
   ];
 
   this.keyboardInfo = [
@@ -1487,6 +1491,10 @@ var CommandDescriptor = function(){
   this.destroySprite.types = [];
   this.destroySprite.types.push(this.SPRITE_NAME); //spriteName
 
+  // selectSprite
+  this.selectSprite = new Object();
+  this.selectSprite.types = [];
+  this.selectSprite.types.push(this.SPRITE_NAME); //selectSprite
 };
 
 CommandDescriptor.prototype.test = function(){
