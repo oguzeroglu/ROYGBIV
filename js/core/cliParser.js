@@ -4844,6 +4844,23 @@ function parse(input){
           terminal.printInfo(Text.SPRITE_SELECTED);
           return true;
         break;
+        case 201: //printSprites
+          var count = 0;
+          var length = Object.keys(sprites).length;
+          terminal.printHeader(Text.SPRITES);
+          for (var spriteName in sprites){
+            count ++;
+            var options = true;
+            if (count == length){
+              options = false;
+            }
+            terminal.printInfo(Text.TREE.replace(Text.PARAM1, spriteName + " ["+sprites[spriteName].registeredSceneName+"]"), options);
+          }
+          if (count == 0){
+            terminal.printError(Text.NO_SPRITES_CREATED);
+          }
+          return true;
+        break;
       }
       return true;
     }catch(err){

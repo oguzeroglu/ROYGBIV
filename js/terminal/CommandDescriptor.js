@@ -201,7 +201,8 @@ var CommandDescriptor = function(){
       0, //printTotalPhysicsShapeCount
       1, //newSprite
       1, //destroySprite
-      1 //selectSprite
+      1, //selectSprite
+      0 //printSprites
   ];
 
   this.commandArgumentsExpectedExplanation = [
@@ -405,7 +406,8 @@ var CommandDescriptor = function(){
     "printTotalPhysicsShapeCount",
     "newSprite spriteName",
     "destroySprite spriteName",
-    "selectSprite spriteName"
+    "selectSprite spriteName",
+    "printSprites"
   ];
 
   this.commands = [
@@ -609,7 +611,8 @@ var CommandDescriptor = function(){
     "printTotalPhysicsShapeCount",
     "newSprite",
     "destroySprite",
-    "selectSprite"
+    "selectSprite",
+    "printSprites"
   ];
 
   this.commandInfo = [
@@ -813,7 +816,8 @@ var CommandDescriptor = function(){
     "printTotalPhysicsShapeCount: Prints the total count of physics shapes for current scene.",
     "newSprite: Creates a new sprite.",
     "destroySprite: Destroys a sprite.",
-    "selectSprite: Selects a sprite."
+    "selectSprite: Selects a sprite.",
+    "printSprites: Prints created sprites."
   ];
 
   this.keyboardInfo = [
