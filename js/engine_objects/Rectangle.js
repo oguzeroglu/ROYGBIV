@@ -74,6 +74,9 @@ Rectangle.prototype.handlePositionUniform = function(thicknessOffset){
 
 }
 Rectangle.prototype.updateMesh = function(thicknessOffset){
+  if (isDeployment){
+    return;
+  }
   if (!this.mesh){
     this.geometry = new THREE.BufferGeometry();
     var rectangleIndices = new Float32Array(24);
