@@ -4804,6 +4804,7 @@ function parse(input){
             return true;
           }
           sprites[spriteName] = new Sprite(spriteName);
+          sprites[spriteName].setRefHeight();
           sceneHandler.onSpriteCreation(sprites[spriteName]);
           selectionHandler.select(sprites[spriteName]);
           refreshRaycaster(Text.SPRITE_CREATED);

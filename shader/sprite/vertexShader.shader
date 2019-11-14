@@ -9,6 +9,7 @@ uniform vec4 currentViewport;
 uniform vec2 scale;
 uniform vec2 margin;
 uniform float rotationAngle;
+uniform float scaleCoef;
 
 #define INSERTION
 
@@ -31,8 +32,8 @@ void main(){
   #ifdef HAS_TEXTURE
     vUV = uv;
   #endif
-  float scaledX = scale.x * position.x;
-  float scaledY = scale.y * position.y;
+  float scaledX = scale.x * scaleCoef * position.x;
+  float scaledY = scale.y * scaleCoef * position.y;
   vec2 rotated = applyRotationAngle(rotationAngle, vec2(scaledX, scaledY));
   float oldPosX = ((currentViewport.z - currentViewport.x) / 2.0) + currentViewport.x + rotated.x;
   float oldPosY = ((currentViewport.w - currentViewport.y) / 2.0) + currentViewport.y + rotated.y;

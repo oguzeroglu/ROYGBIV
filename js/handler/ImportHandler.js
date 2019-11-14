@@ -1286,6 +1286,8 @@ ImportHandler.prototype.importSprites = function(obj){
   for (var spriteName in obj.sprites){
     var curExport = obj.sprites[spriteName];
     var sprite = new Sprite(spriteName);
+    sprite.refHeight = curExport.refHeight;
+    sprite.mesh.material.uniforms.scaleCoef.value = (renderer.getCurrentViewport().w / screenResolution) / sprite.refHeight;
     sprite.setColor(curExport.color);
     sprite.setAlpha(curExport.alpha);
     sprite.setScale(curExport.scaleX, curExport.scaleY);

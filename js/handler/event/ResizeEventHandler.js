@@ -63,6 +63,9 @@ ResizeEventHandler.prototype.onResize = function(){
   for (var textName in addedTexts){
     addedTexts[textName].handleResize();
   }
+  for (var spriteName in sprites){
+    sprites[spriteName].handleResize();
+  }
   renderer.setPixelRatio(screenResolution);
   rayCaster.refresh2D();
 }

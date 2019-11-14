@@ -306,6 +306,7 @@ MeshGenerator.prototype.generateSprite = function(sprite){
       alpha: new THREE.Uniform(1),
       margin: new THREE.Uniform(new THREE.Vector2(0, 0)),
       scale: new THREE.Uniform(new THREE.Vector2(1, 1)),
+      scaleCoef: new THREE.Uniform(1),
       rotationAngle: new THREE.Uniform(0) // [0, 360]
     }
   });
