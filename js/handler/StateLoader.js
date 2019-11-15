@@ -226,6 +226,7 @@ StateLoader.prototype.resetProject = function(){
   addedTexts2D = new Object();
   clickableAddedTexts = new Object();
   clickableAddedTexts2D = new Object();
+  clickableSprites = new Object();
   physicsTests = new Object();
   wallCollections = new Object();
   texturePacks = new Object();

@@ -68,6 +68,7 @@ SceneHandler.prototype.onSwitchFromPreviewToDesign = function(){
   for (var sceneName in this.scenes){
     this.scenes[sceneName].resetAutoInstancedObjects();
     this.scenes[sceneName].resetClickableTexts();
+    this.scenes[sceneName].resetClickableSprites();
     this.scenes[sceneName].resetTrackingObjects();
   }
   this.readyCallback = noop;
@@ -93,6 +94,10 @@ SceneHandler.prototype.onClickableAddedTextAddition = function(addedText){
 
 SceneHandler.prototype.onClickableAddedText2DAddition = function(addedText){
   this.scenes[addedText.registeredSceneName].registerClickableText2D(addedText);
+}
+
+SceneHandler.prototype.onClickableSpriteAddition = function(sprite){
+  this.scenes[sprite.registeredSceneName].registerClickableSprite(sprite);
 }
 
 SceneHandler.prototype.onDynamicObjectAddition = function(obj){
@@ -298,6 +303,10 @@ SceneHandler.prototype.changeScene = function(sceneName, readyCallback){
     for (var textName in this.scenes[sceneName].addedTexts){
       var text = this.scenes[sceneName].addedTexts[textName];
       text.showVisually();
+    }
+    for (var spriteName in this.scenes[sceneName].sprites){
+      var sprite = this.scenes[sceneName].sprites[spriteName];
+      sprite.showVisually();
     }
     for (var objName in this.scenes[sceneName].autoInstancedObjects){
       var obj = this.scenes[sceneName].autoInstancedObjects[objName];

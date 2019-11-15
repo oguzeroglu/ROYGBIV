@@ -23,9 +23,9 @@ Scene.prototype.reset = function(){
   this.dynamicObjectGroups = new Map();
   this.clickableAddedTexts = new Object();
   this.clickableAddedTexts2D = new Object();
+  this.clickableSprites = new Object();
   this.trackingObjects = new Object();
   this.sprites = new Object();
-  this.clickableSprites = new Object();
   this.areaBinHandler.isAreaBinHandler = true;
   this.isSkyboxMapped = false;
 }
@@ -80,6 +80,10 @@ Scene.prototype.resetTrackingObjects = function(){
 Scene.prototype.resetClickableTexts = function(){
   this.clickableAddedTexts = new Object();
   this.clickableAddedTexts2D = new Object();
+}
+
+Scene.prototype.resetClickableSprites = function(){
+  this.clickableSprites = new Object();
 }
 
 Scene.prototype.loadPostProcessing = function(){
@@ -217,6 +221,10 @@ Scene.prototype.registerClickableText = function(addedText){
 
 Scene.prototype.registerClickableText2D = function(addedText){
   this.clickableAddedTexts2D[addedText.name] = addedText;
+}
+
+Scene.prototype.registerClickableSprite = function(sprite){
+  this.clickableSprites[sprite.name] = sprite;
 }
 
 Scene.prototype.registerDynamicObject = function(obj){

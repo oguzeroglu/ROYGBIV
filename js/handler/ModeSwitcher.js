@@ -210,6 +210,12 @@ ModeSwitcher.prototype.switchFromDesignToPreview = function(){
       }
     }
   }
+  for (var spriteName in sprites){
+    if (sprites[spriteName].isClickable){
+      clickableSprites[spriteName] = sprites[spriteName];
+      sceneHandler.onClickableSpriteAddition(sprites[spriteName]);
+    }
+  }
   sceneHandler.onSwitchFromDesignToPreview();
   this.commonSwitchFunctions();
   handleViewport();
@@ -393,6 +399,7 @@ ModeSwitcher.prototype.switchFromPreviewToDesign = function(){
 
   clickableAddedTexts = new Object();
   clickableAddedTexts2D = new Object();
+  clickableSprites = new Object();
   sceneHandler.onSwitchFromPreviewToDesign();
   this.commonSwitchFunctions();
   for (var txtName in addedTexts){

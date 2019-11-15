@@ -333,8 +333,19 @@ RaycasterWorker.prototype.set2DTextSizes = function(data){
   renderer.viewport.z = data.vp.z;
   renderer.viewport.w = data.vp.w;
   var msgBody = data.body;
-  for (var textName in msgBody){
-    addedTexts[textName].twoDimensionalSize.set(msgBody[textName].x, msgBody[textName].y, msgBody[textName].z, msgBody[textName].w);
+  for (var textName in msgBody.texts){
+    addedTexts[textName].twoDimensionalSize.set(msgBody.texts[textName].x, msgBody.texts[textName].y, msgBody.texts[textName].z, msgBody.texts[textName].w);
+  }
+  for (var spriteName in msgBody.sprites){
+    var sprite = sprites[spriteName];
+    var spriteExport = msgBody.sprites[spriteName];
+    sprite.rectangle = new Rectangle(0, 0, 0, 0).set(
+      spriteExport.x, spriteExport.y,
+      spriteExport.finalX, spriteExport.finalY,
+      spriteExport.width, spriteExport.heigth
+    );
+    sprite.triangle1.set(spriteExport.triangle1.a, spriteExport.triangle1.b, spriteExport.triangle1.c);
+    sprite.triangle2.set(spriteExport.triangle2.a, spriteExport.triangle2.b, spriteExport.triangle2.c);
   }
   this.rayCaster.refresh2D();
 }

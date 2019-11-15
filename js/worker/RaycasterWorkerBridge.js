@@ -319,11 +319,15 @@ RaycasterWorkerBridge.prototype.hide2D = noop;
 RaycasterWorkerBridge.prototype.show2D = noop;
 
 RaycasterWorkerBridge.prototype.refresh2D = function(){
-  var totalObj = (mode == 0)? sceneHandler.getAddedTexts2D(): sceneHandler.getClickableAddedTexts2D();
-  var msgBody = new Object();
-  for (var textName in totalObj){
-    var size = totalObj[textName].twoDimensionalSize;
-    msgBody[textName] = {x: size.x, y: size.y, z: size.z, w: size.w};
+  var totalTextObj = (mode == 0)? sceneHandler.getAddedTexts2D(): sceneHandler.getClickableAddedTexts2D();
+  var totalSpriteObj = (mode == 0)? sceneHandler.getSprites(): sceneHandler.getClickableSprites();
+  var msgBody = {texts: {}, sprites: {}};
+  for (var textName in totalTextObj){
+    var size = totalTextObj[textName].twoDimensionalSize;
+    msgBody.texts[textName] = {x: size.x, y: size.y, z: size.z, w: size.w};
+  }
+  for (var spriteName in totalSpriteObj){
+    msgBody.sprites[spriteName] = totalSpriteObj[spriteName].exportLightweight();
   }
   var vp = {x: renderer.getCurrentViewport().x, y: renderer.getCurrentViewport().y, z: renderer.getCurrentViewport().z, w: renderer.getCurrentViewport().w}
   this.worker.postMessage({refresh2D: true, body: msgBody, vp: vp, screenResolution: screenResolution});
