@@ -20,6 +20,13 @@ var Sprite = function(name){
   this.mesh.visible = true;
 }
 
+Sprite.prototype.setCropCoefficient = function(coefX, coefY){
+  this.cropCoefficientX = coefX;
+  this.cropCoefficientY = coefY;
+  this.handleRectangle();
+  rayCaster.updateObject(this);
+}
+
 Sprite.prototype.handleResize = function(){
   var newHeight = (renderer.getCurrentViewport().w / screenResolution);
   this.mesh.material.uniforms.scaleCoef.value = newHeight / this.refHeight;
@@ -44,7 +51,9 @@ Sprite.prototype.export = function(){
     scaleY: this.mesh.material.uniforms.scale.value.y,
     rotation: this.mesh.material.uniforms.rotationAngle.value,
     isClickable: this.isClickable,
-    refHeight: this.refHeight
+    refHeight: this.refHeight,
+    cropCoefficientX: this.cropCoefficientX,
+    cropCoefficientY: this.cropCoefficientY
   };
 }
 
@@ -167,6 +176,12 @@ Sprite.prototype.getCornerPoint = function(point){
   // CONVERTED FROM GLSL SHADER CODE
   var scaledX = this.mesh.material.uniforms.scale.value.x * this.mesh.material.uniforms.scaleCoef.value * point.x;
   var scaledY = this.mesh.material.uniforms.scale.value.y * this.mesh.material.uniforms.scaleCoef.value * point.y;
+  if (!(typeof this.cropCoefficientX == UNDEFINED)){
+    scaledX *= this.cropCoefficientX;
+  }
+  if (!(typeof this.cropCoefficientY == UNDEFINED)){
+    scaledY *= this.cropCoefficientY;
+  }
   var rotationAngle = this.mesh.material.uniforms.rotationAngle.value;
   rotationAngle = 360 - rotationAngle;
   var rotationInRadians = rotationAngle * Math.PI / 180;

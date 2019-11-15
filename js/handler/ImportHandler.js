@@ -1299,5 +1299,11 @@ ImportHandler.prototype.importSprites = function(obj){
     }
     sprite.isClickable = curExport.isClickable;
     sprites[sprite.name] = sprite;
+    if (!(typeof curExport.cropCoefficientX == UNDEFINED)){
+      sprite.cropCoefficientX = curExport.cropCoefficientX;
+    }
+    if (!(typeof curExport.cropCoefficientY == UNDEFINED)){
+      sprite.cropCoefficientY = curExport.cropCoefficientY;
+    }
   }
 }

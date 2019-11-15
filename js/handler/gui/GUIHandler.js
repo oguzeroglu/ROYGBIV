@@ -61,7 +61,9 @@ var GUIHandler = function(){
     "Scale X": 1.0,
     "Scale Y": 1.0,
     "Rotation": 0.0,
-    "Clickable": false
+    "Clickable": false,
+    "Crop X": 0.01,
+    "Crop Y": 0.01
   }
   this.bloomParameters = {
     "Threshold": 0.0,
@@ -205,6 +207,8 @@ GUIHandler.prototype.afterSpriteSelection = function(){
     guiHandler.spriteManipulationParameters["Scale Y"] = curSelection.mesh.material.uniforms.scale.value.y;
     guiHandler.spriteManipulationParameters["Rotation"] = curSelection.mesh.material.uniforms.rotationAngle.value;
     guiHandler.spriteManipulationParameters["Clickable"] = !!curSelection.isClickable;
+    guiHandler.spriteManipulationParameters["Crop X"] = (curSelection.cropCoefficientX ? curSelection.cropCoefficientX : 1.0);
+    guiHandler.spriteManipulationParameters["Crop Y"] = (curSelection.cropCoefficientY ? curSelection.cropCoefficientY : 1.0);
     if (!curSelection.isTextured){
       guiHandler.disableController(guiHandler.spriteManipulationTextureController);
     }
@@ -588,6 +592,8 @@ GUIHandler.prototype.enableAllSMControllers = function(){
   guiHandler.enableController(guiHandler.spriteManipulationScaleYController);
   guiHandler.enableController(guiHandler.spriteManipulationRotationController);
   guiHandler.enableController(guiHandler.spriteManipulationClickableController);
+  guiHandler.enableController(guiHandler.spriteManipulationCropCoefficientXController);
+  guiHandler.enableController(guiHandler.spriteManipulationCropCoefficientYController);
 }
 
 GUIHandler.prototype.enableAllOMControllers = function(){
@@ -1255,6 +1261,16 @@ GUIHandler.prototype.initializeSpriteManipulationGUI = function(){
   }).listen();
   guiHandler.spriteManipulationClickableController = guiHandler.datGuiSpriteManipulation.add(guiHandler.spriteManipulationParameters, "Clickable").onChange(function(val){
     selectionHandler.getSelectedObject().isClickable = val;
+  }).listen();
+  guiHandler.spriteManipulationCropCoefficientXController = guiHandler.datGuiSpriteManipulation.add(guiHandler.spriteManipulationParameters, "Crop X").min(0.01).max(1).step(0.01).onChange(function(val) {
+    var sprite = selectionHandler.getSelectedObject();
+    var coefY = sprite.cropCoefficientY ? sprite.cropCoefficientY : 1.0;
+    sprite.setCropCoefficient(val, coefY);
+  }).listen();
+  guiHandler.spriteManipulationCropCoefficientYController = guiHandler.datGuiSpriteManipulation.add(guiHandler.spriteManipulationParameters, "Crop Y").min(0.01).max(1).step(0.01).onChange(function(val) {
+    var sprite = selectionHandler.getSelectedObject();
+    var coefX = sprite.cropCoefficientX ? sprite.cropCoefficientX : 1.0;
+    sprite.setCropCoefficient(coefX, val);
   }).listen();
 }
 
