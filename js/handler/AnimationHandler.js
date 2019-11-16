@@ -29,7 +29,7 @@ var AnimationHandler = function(){
     },
     SPRITE: {
       TRANSPARENCY: "SPRITE_TRANSPARENCY", SCALE_X: "SPRITE_SCALE_X", SCALE_Y: "SPRITE_SCALE_Y", ROTATION: "SPRITE_ROTATION",
-      COLOR: "SPRITE_COLOR"
+      COLOR: "SPRITE_COLOR", POSITION_X: "SPRITE_POSITION_X", POSITION_Y: "SPRITE_POSITION_Y"
     }
   };
   // INITIAL VALUE GETTERS
@@ -153,6 +153,12 @@ var AnimationHandler = function(){
   }
   this.initialValueGetterFunctionsByType[this.actionTypes.SPRITE.COLOR] = function(object){
     return 0;
+  }
+  this.initialValueGetterFunctionsByType[this.actionTypes.SPRITE.POSITION_X] = function(object){
+    return object.marginPercentX;
+  }
+  this.initialValueGetterFunctionsByType[this.actionTypes.SPRITE.POSITION_Y] = function(object){
+    return object.marginPercentY;
   }
   // AFTER ANIMATION SETTER FUNCTIONS
   this.afterAnimationSettersByType = new Object();
@@ -356,6 +362,12 @@ var AnimationHandler = function(){
   this.afterAnimationSettersByType[this.actionTypes.SPRITE.COLOR] = function(animation){
     animation.attachedObject.setColor(animation.params.sourceColor.getHex());
   }
+  this.afterAnimationSettersByType[this.actionTypes.SPRITE.POSITION_X] = function(animation){
+    animation.attachedObject.set2DCoordinates(animation.initialValue, animation.attachedObject.marginPercentY);
+  }
+  this.afterAnimationSettersByType[this.actionTypes.SPRITE.POSITION_Y] = function(animation){
+    animation.attachedObject.set2DCoordinates(animation.attachedObject.marginPercentX, animation.initialValue);
+  }
   // ACTION FUNCTIONS **********************************************
   this.actionFunctionsByType = new Object();
   this.actionFunctionsByType[this.actionTypes.OBJECT.TRANSPARENCY] = this.updateObjectTransparencyFunc;
@@ -392,6 +404,8 @@ var AnimationHandler = function(){
   this.actionFunctionsByType[this.actionTypes.SPRITE.SCALE_Y] = this.updateSpriteScaleYFunc;
   this.actionFunctionsByType[this.actionTypes.SPRITE.ROTATION] = this.updateSpriteRotationFunc;
   this.actionFunctionsByType[this.actionTypes.SPRITE.COLOR] = this.updateSpriteColorFunc;
+  this.actionFunctionsByType[this.actionTypes.SPRITE.POSITION_X] = this.updateSpritePositionXFunc;
+  this.actionFunctionsByType[this.actionTypes.SPRITE.POSITION_Y] = this.updateSpritePositionYFunc;
   // UPDATE FUNCTIONS **********************************************
   this.updateFunctionsByType = new Object();
   this.updateFunctionsByType[this.animationTypes.LINEAR] = this.linearFunc;
@@ -739,6 +753,12 @@ AnimationHandler.prototype.updateSpriteRotationFunc = function(params){
 AnimationHandler.prototype.updateSpriteColorFunc = function(params){
   REUSABLE_COLOR.copy(params.sourceColor);
   params.object.setColor(REUSABLE_COLOR.lerp(params.targetColor, params.value).getHex());
+}
+AnimationHandler.prototype.updateSpritePositionXFunc = function(params){
+  params.object.set2DCoordinates(params.value, params.object.marginPercentY);
+}
+AnimationHandler.prototype.updateSpritePositionYFunc = function(params){
+  params.object.set2DCoordinates(params.object.marginPercentX, params.value);
 }
 // UPDATE FUNCTIONS ************************************************
 AnimationHandler.prototype.linearFunc = function(curTime, startVal, changeInVal, totalTime){
