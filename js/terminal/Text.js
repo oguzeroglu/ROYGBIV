@@ -895,4 +895,6 @@ var Text = function(){
   this.ROYGBIV_SCRIPTING_API_GETSPRITE = "Returns a sprite object or 0 if sprite does not exist.";
   this.ROYGBIV_SCRIPTING_API_ONSPRITECLICK = "Sets a sprite click listener. The callbackFunction is executed when the sprite is clicked.";
   this.ROYGBIV_SCRIPTING_API_REMOVESPRITECLICKLISTENER = "Removes the click listener of a sprite object.";
+  this.ROYGBIV_SCRIPTING_API_ONSPRITEMOUSEOVER = "Sets a mouse over listener for a sprite.";
+  this.ROYGBIV_SCRIPTING_API_REMOVESPRITEMOUSEOVERLISTENER = "Removes the mouseover listener of a sprite.";
 }

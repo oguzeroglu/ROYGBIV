@@ -423,6 +423,9 @@ function onRaycasterMouseMoveIntersection(){
     if (!object){
       object = addedTexts[intersectionObject];
     }
+    if (!object){
+      object = sprites[intersectionObject];
+    }
     var isDifferent = currentMouseOverObjectName != object.name;
     if (object.mouseOverCallbackFunction && isDifferent){
       if (object.registeredSceneName == sceneHandler.getActiveSceneName()){
@@ -436,6 +439,9 @@ function onRaycasterMouseMoveIntersection(){
       }
       if (!curObj){
         curObj = addedTexts[currentMouseOverObjectName];
+      }
+      if (!curObj){
+        curObj = sprites[currentMouseOverObjectName];
       }
       if (curObj && curObj.mouseOutCallbackFunction){
         if (curObj.registeredSceneName == sceneHandler.getActiveSceneName()){
@@ -452,6 +458,9 @@ function onRaycasterMouseMoveIntersection(){
       }
       if (!curObj){
         curObj = addedTexts[currentMouseOverObjectName];
+      }
+      if (!curObj){
+        curObj = sprites[currentMouseOverObjectName];
       }
       if (curObj && curObj.mouseOutCallbackFunction){
         if (curObj.registeredSceneName == sceneHandler.getActiveSceneName()){
