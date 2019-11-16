@@ -192,7 +192,8 @@ var Roygbiv = function(){
     "onAreaEnter",
     "onAreaExit",
     "removeAreaEnterListener",
-    "removeAreaExitListener"
+    "removeAreaExitListener",
+    "getSprite"
   ];
 
   this.globals = new Object();
@@ -565,6 +566,20 @@ Roygbiv.prototype.getLightning = function(lightningName){
   if (lightning){
     preConditions.checkIfLightningInsideActiveScene(ROYGBIV.getLightning, lightning);
     return lightning;
+  }
+  return 0;
+}
+
+// Returns a sprite object or 0 if sprite does not exist.
+Roygbiv.prototype.getSprite = function(spriteName){
+  if (mode == 0){
+    return;
+  }
+  preConditions.checkIfDefined(ROYGBIV.getSprite, preConditions.spriteName, spriteName);
+  var sprite = sprites[spriteName];
+  if (sprite){
+    preConditions.checkIfSpriteInsideActiveScene(ROYGBIV.getSprite, sprite);
+    return sprite;
   }
   return 0;
 }

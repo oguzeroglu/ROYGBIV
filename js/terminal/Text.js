@@ -892,4 +892,5 @@ var Text = function(){
   this.ROYGBIV_SCRIPTING_API_ONAREAEXIT = "Executes the callbackFunction with enteredAreaName parameter when the camera exits from given area.\nThe enteredAreaName is the name of the area that the camera entered into.";
   this.ROYGBIV_SCRIPTING_API_REMOVEAREAENTERLISTENER = "Removes the area enter listener for given area name.";
   this.ROYGBIV_SCRIPTING_API_REMOVEAREAEXITLISTENER = "Removes the area exit listener for given area name.";
+  this.ROYGBIV_SCRIPTING_API_GETSPRITE = "Returns a sprite object or 0 if sprite does not exist.";
 }

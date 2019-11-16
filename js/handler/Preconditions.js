@@ -225,6 +225,7 @@ var Preconditions = function(){
   this.lightning = "lightning";
   this.areaName = "areaName";
   this.initialPosition = "initialPosition";
+  this.spriteName = "spriteName";
 }
 
 Preconditions.prototype.errorHeader = function(callerFunc){
@@ -275,6 +276,12 @@ Preconditions.prototype.checkIfLightning = function(callerFunc, lightning){
 Preconditions.prototype.checkIfLightningInsideActiveScene = function(callerFunc, lightning){
   if (lightning.registeredSceneName != sceneHandler.getActiveSceneName()){
     this.throw(callerFunc, "Lightning not inside active scene.");
+  }
+}
+
+Preconditions.prototype.checkIfSpriteInsideActiveScene = function(callerFunc, sprite){
+  if (sprite.registeredSceneName != sceneHandler.getActiveSceneName()){
+    this.throw(callerFunc, "Sprite not inside active scene.");
   }
 }
 
