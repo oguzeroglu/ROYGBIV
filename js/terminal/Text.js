@@ -864,7 +864,7 @@ var Text = function(){
                                            "parentdir1_parentdir2_....._parentdirX_scriptFileName\n"+
                                            "For example in order to get a script under the scripts/ root folder example.js, the scriptName parameter should be example. However,\nto get a script under scripts/testFolder/test.js, the scriptName parameter should be testFolder_test.";
   this.ROYGBIV_SCRIPTING_API_STOPSCRIPT = "Stops a script. The scriptName parameter is explained with startScript API.";
-  this.ROYGBIV_SCRIPTING_API_STARTANIMATION = "Starts an animation of given object, object group or text.";
+  this.ROYGBIV_SCRIPTING_API_STARTANIMATION = "Starts an animation of given object, object group, text or sprite.";
   this.ROYGBIV_SCRIPTING_API_STOPANIMATION = "Stops an animation of given object, object group or text.";
   this.ROYGBIV_SCRIPTING_API_ONANIMATIONFINISHED = "Sets a finish listener for an animation of given object, object group or text. For repeating animations the callbackFunction is\nexecuted before each repeat. For rewinding animations the callbackFunction is executed when the rewind is finished.";
   this.ROYGBIV_SCRIPTING_API_REMOVEANIMATIONFINISHLISTENER = "Removes the finish listener for an animation of given object, object group or text.";

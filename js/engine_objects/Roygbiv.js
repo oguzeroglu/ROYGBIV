@@ -2432,13 +2432,13 @@ Roygbiv.prototype.createOrbitControl = function(parameters){
 
 // ANIMATION FUNCTIONS *********************************************************
 
-// Starts an animation of given object, object group or text.
+// Starts an animation of given object, object group, text or sprite.
 Roygbiv.prototype.startAnimation = function(object, animationName){
   if (mode == 0){
     return;
   }
   preConditions.checkIfDefined(ROYGBIV.startAnimation, preConditions.object, object);
-  preConditions.checkIfAddedObjectObjectGroupAddedText(ROYGBIV.startAnimation, preConditions.object, object);
+  preConditions.checkIfAddedObjectObjectGroupAddedTextSprite(ROYGBIV.startAnimation, preConditions.object, object);
   preConditions.checkIfDefined(ROYGBIV.startAnimation, preConditions.animationName, animationName);
   preConditions.checkIfAnimationExists(ROYGBIV.startAnimation, object, animationName);
   preConditions.checkIfObjectInsideActiveScene(ROYGBIV.startAnimation, object);

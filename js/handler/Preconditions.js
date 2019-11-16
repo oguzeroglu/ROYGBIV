@@ -513,6 +513,12 @@ Preconditions.prototype.checkIfAddedObjectObjectGroupAddedText = function(caller
   }
 }
 
+Preconditions.prototype.checkIfAddedObjectObjectGroupAddedTextSprite = function(callerFunc, parameterName, obj){
+  if (!(obj.isAddedObject) && !(obj.isObjectGroup) && !(obj.isAddedText) && !(obj.isSprite)){
+    this.throw(callerFunc, parameterName+" must be an object, object group, text or sprite.");
+  }
+}
+
 Preconditions.prototype.checkIfFPSWeaponOnlyIfExists = function(callerFunc, parameterName, obj){
   if (!(typeof obj == UNDEFINED)){
     if (!obj.isFPSWeapon){

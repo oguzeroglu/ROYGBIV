@@ -284,6 +284,9 @@ ModeSwitcher.prototype.switchFromPreviewToDesign = function(){
   }
   for (var spriteName in sprites){
     delete sprites[spriteName].onClickCallback;
+    for (var animationName in sprites[spriteName].animations){
+      animationHandler.forceFinish(sprites[spriteName].animations[animationName]);
+    }
   }
   collisionCallbackRequests = new Map();
   particleCollisionCallbackRequests = new Object();
