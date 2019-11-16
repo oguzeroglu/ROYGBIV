@@ -28,7 +28,8 @@ var AnimationHandler = function(){
       POSITION_Z: "TEXT_POSITION_Z", TEXT_COLOR: "TEXT_TEXT_COLOR", BACKGROUND_COLOR: "TEXT_BACKGROUND_COLOR", TYPING: "TEXT_TYPING"
     },
     SPRITE: {
-      TRANSPARENCY: "SPRITE_TRANSPARENCY", SCALE_X: "SPRITE_SCALE_X", SCALE_Y: "SPRITE_SCALE_Y", ROTATION: "SPRITE_ROTATION"
+      TRANSPARENCY: "SPRITE_TRANSPARENCY", SCALE_X: "SPRITE_SCALE_X", SCALE_Y: "SPRITE_SCALE_Y", ROTATION: "SPRITE_ROTATION",
+      COLOR: "SPRITE_COLOR"
     }
   };
   // INITIAL VALUE GETTERS
@@ -149,6 +150,9 @@ var AnimationHandler = function(){
   }
   this.initialValueGetterFunctionsByType[this.actionTypes.SPRITE.ROTATION] = function(object){
     return object.mesh.material.uniforms.rotationAngle.value;
+  }
+  this.initialValueGetterFunctionsByType[this.actionTypes.SPRITE.COLOR] = function(object){
+    return 0;
   }
   // AFTER ANIMATION SETTER FUNCTIONS
   this.afterAnimationSettersByType = new Object();
@@ -349,6 +353,9 @@ var AnimationHandler = function(){
   this.afterAnimationSettersByType[this.actionTypes.SPRITE.ROTATION] = function(animation){
     animation.attachedObject.setRotation(animation.initialValue);
   }
+  this.afterAnimationSettersByType[this.actionTypes.SPRITE.COLOR] = function(animation){
+    animation.attachedObject.setColor(animation.params.sourceColor.getHex());
+  }
   // ACTION FUNCTIONS **********************************************
   this.actionFunctionsByType = new Object();
   this.actionFunctionsByType[this.actionTypes.OBJECT.TRANSPARENCY] = this.updateObjectTransparencyFunc;
@@ -384,6 +391,7 @@ var AnimationHandler = function(){
   this.actionFunctionsByType[this.actionTypes.SPRITE.SCALE_X] = this.updateSpriteScaleXFunc;
   this.actionFunctionsByType[this.actionTypes.SPRITE.SCALE_Y] = this.updateSpriteScaleYFunc;
   this.actionFunctionsByType[this.actionTypes.SPRITE.ROTATION] = this.updateSpriteRotationFunc;
+  this.actionFunctionsByType[this.actionTypes.SPRITE.COLOR] = this.updateSpriteColorFunc;
   // UPDATE FUNCTIONS **********************************************
   this.updateFunctionsByType = new Object();
   this.updateFunctionsByType[this.animationTypes.LINEAR] = this.linearFunc;
@@ -727,6 +735,10 @@ AnimationHandler.prototype.updateSpriteScaleYFunc = function(params){
 }
 AnimationHandler.prototype.updateSpriteRotationFunc = function(params){
   params.object.setRotation(params.value);
+}
+AnimationHandler.prototype.updateSpriteColorFunc = function(params){
+  REUSABLE_COLOR.copy(params.sourceColor);
+  params.object.setColor(REUSABLE_COLOR.lerp(params.targetColor, params.value).getHex());
 }
 // UPDATE FUNCTIONS ************************************************
 AnimationHandler.prototype.linearFunc = function(curTime, startVal, changeInVal, totalTime){
