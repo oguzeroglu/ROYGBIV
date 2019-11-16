@@ -197,7 +197,9 @@ var Roygbiv = function(){
     "onSpriteClick",
     "removeSpriteClickListener",
     "onSpriteMouseOver",
-    "removeSpriteMouseOverListener"
+    "removeSpriteMouseOverListener",
+    "onSpriteMouseOut",
+    "removeSpriteMouseOutListener"
   ];
 
   this.globals = new Object();
@@ -2196,6 +2198,33 @@ Roygbiv.prototype.showText = function(text){
   if (!text.mesh.visible){
     text.show();
   }
+}
+
+// Sets a mouseout listener for a sprite.
+Roygbiv.prototype.onSpriteMouseOut = function(sprite, callbackFunction){
+  if (mode == 0){
+    return;
+  }
+  preConditions.checkIfDefined(ROYGBIV.onSpriteMouseOut, preConditions.sprite, sprite);
+  preConditions.checkIfSprite(ROYGBIV.onSpriteMouseOut, preConditions.sprite, sprite);
+  preConditions.checkIfSpriteClickable(ROYGBIV.onSpriteMouseOut, sprite);
+  preConditions.checkIfDefined(ROYGBIV.onSpriteMouseOut, preConditions.callbackFunction, callbackFunction);
+  preConditions.checkIfFunctionOnlyIfExists(ROYGBIV.onSpriteMouseOut, preConditions.callbackFunction, callbackFunction);
+  preConditions.checkIfSpriteInsideActiveScene(ROYGBIV.onSpriteMouseOut, sprite);
+  sprite.mouseOutCallbackFunction = callbackFunction;
+  objectsWithMouseOutListeners.set(sprite.name, sprite);
+}
+
+// Removes the mouseout listener of a sprite.
+Roygbiv.prototype.removeSpriteMouseOutListener = function(sprite){
+  if (mode == 0){
+    return;
+  }
+  preConditions.checkIfDefined(ROYGBIV.removeSpriteMouseOutListener, preConditions.sprite, sprite);
+  preConditions.checkIfSprite(ROYGBIV.removeSpriteMouseOutListener, preConditions.sprite, sprite);
+  preConditions.checkIfSpriteInsideActiveScene(ROYGBIV.removeSpriteMouseOutListener, sprite);
+  delete sprite.mouseOutCallbackFunction;
+  objectsWithMouseOutListeners.delete(sprite.name);
 }
 
 // CONTROL FUNCTIONS ***********************************************************

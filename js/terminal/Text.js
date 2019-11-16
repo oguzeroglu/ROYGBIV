@@ -897,4 +897,6 @@ var Text = function(){
   this.ROYGBIV_SCRIPTING_API_REMOVESPRITECLICKLISTENER = "Removes the click listener of a sprite object.";
   this.ROYGBIV_SCRIPTING_API_ONSPRITEMOUSEOVER = "Sets a mouse over listener for a sprite.";
   this.ROYGBIV_SCRIPTING_API_REMOVESPRITEMOUSEOVERLISTENER = "Removes the mouseover listener of a sprite.";
+  this.ROYGBIV_SCRIPTING_API_ONSPRITEMOUSEOUT = "Sets a mouseout listener for a sprite.";
+  this.ROYGBIV_SCRIPTING_API_REMOVESPRITEMOUSEOUTLISTENER = "Removes the mouseout listener of a sprite.";
 }
