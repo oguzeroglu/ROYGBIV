@@ -724,6 +724,19 @@ Terminal.prototype.autocomplete = function(command){
 				}
 				helpString = "[Sprites]: ";
 			break;
+			case commandDescriptor.OBJECT_OR_SPRITE_NAME:
+				for (objectName in sceneHandler.getAddedObjects()){
+					if (objectName.startsWith(curEntry)){
+						possibilities.push(objectName);
+					}
+				}
+				for (var spriteName in sceneHandler.getSprites()){
+					if (spriteName.toLowerCase().startsWith(curEntry.toLowerCase())){
+						possibilities.push(spriteName);
+					}
+				}
+				helpString = "[Objects/Sprites]: ";
+			break;
 		}
 
 		//  **********************************************************

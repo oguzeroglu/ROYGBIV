@@ -1215,6 +1215,7 @@ function parse(input){
           var objectName = splitted[2];
           var texturePack = texturePacks[texturePackName];
           var addedObject = addedObjects[objectName];
+          var sprite = sprites[objectName];
           if (mode != 0){
             terminal.printError(Text.WORKS_ONLY_IN_DESIGN_MODE);
             return true;
@@ -1231,15 +1232,23 @@ function parse(input){
             terminal.printError(Text.NO_SUCH_TEXTURE_PACK);
             return true;
           }
-          if (!addedObject){
+          if (!addedObject && !sprite){
             terminal.printError(Text.NO_SUCH_OBJECT);
             return true;
           }
-          if (addedObject.registeredSceneName != sceneHandler.getActiveSceneName()){
-            terminal.printError(Text.OBJECT_NOT_IN_SCENE);
-            return true;
+          if (addedObject){
+            if (addedObject.registeredSceneName != sceneHandler.getActiveSceneName()){
+              terminal.printError(Text.OBJECT_NOT_IN_SCENE);
+              return true;
+            }
+            addedObject.mapTexturePack(texturePack);
+          }else{
+            if (sprite.registeredSceneName != sceneHandler.getActiveSceneName()){
+              terminal.printError(Text.SPRITE_NOT_IN_ACTIVE_SCENE);
+              return true;
+            }
+            sprite.mapTexture(texturePack);
           }
-          addedObject.mapTexturePack(texturePack);
           if (!jobHandlerWorking){
             terminal.printInfo(Text.TEXTURE_PACK_MAPPED);
           }

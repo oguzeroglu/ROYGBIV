@@ -837,25 +837,6 @@ JobHandler.prototype.handleAdjustTextureRepeatCommand = function(){
   }
 }
 
-JobHandler.prototype.handleMapTextureCommand = function(){
-  var objNamePrefix = this.splitted[2].split("*")[0];
-  var ctr = 0;
-  for (var objName in addedObjects){
-    if (objName.startsWith(objNamePrefix)){
-      parseCommand(
-        "mapTexture "+this.splitted[1]+" "+objName
-      );
-      ctr ++;
-    }
-  }
-  if (ctr == 0){
-
-    terminal.printError(Text.NO_OBJECT_FOUND);
-  }else{
-    terminal.printInfo(Text.COMMAND_EXECUTED_FOR_X_OBJECTS.replace(Text.PARAM1, ctr));
-  }
-}
-
 JobHandler.prototype.handleDestroyObjectCommand = function(){
   var objNamePrefix = this.splitted[1].split("*")[0];
   var ctr = 0;
@@ -939,6 +920,14 @@ JobHandler.prototype.handleMapTexturePackCommand = function(){
     if (objName.startsWith(objNamePrefix)){
       parseCommand(
         "mapTexturePack "+this.splitted[1]+" "+objName
+      );
+      ctr ++;
+    }
+  }
+  for (var spriteName in sceneHandler.getSprites()){
+    if (spriteName.startsWith(objNamePrefix)){
+      parseCommand(
+        "mapTexturePack "+this.splitted[1]+" "+spriteName
       );
       ctr ++;
     }

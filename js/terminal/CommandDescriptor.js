@@ -675,7 +675,7 @@ var CommandDescriptor = function(){
     "newTexturePack: Cretes a new Texture Pack.",
     "printTexturePacks: Prints created texture packs.",
     "printTexturePackInfo: Prints information about a texture pack.",
-    "mapTexturePack: Maps a texture pack to an object.",
+    "mapTexturePack: Maps a texture pack to an object or to a sprite.",
     "destroyTexturePack: Destroys a texture pack.",
     "refreshTexturePack: Reloads a texture pack.",
     "mapHeight: Set a displacement/height map of an object.",
@@ -954,6 +954,7 @@ var CommandDescriptor = function(){
   this.GS_NAME_NO_WC              =   36;
   this.LIGHTNING_NAME             =   37;
   this.SPRITE_NAME                =   38;
+  this.OBJECT_OR_SPRITE_NAME      =   39;
 
   // newGridSystem
   this.newGridSystem = new Object();
@@ -1070,7 +1071,7 @@ var CommandDescriptor = function(){
   this.mapTexturePack = new Object();
   this.mapTexturePack.types = [];
   this.mapTexturePack.types.push(this.TEXTURE_PACK_NAME); //texturePackName
-  this.mapTexturePack.types.push(this.OBJECT_NAME); //objectName
+  this.mapTexturePack.types.push(this.OBJECT_OR_SPRITE_NAME); //objectName
 
   // destroyTexturePack
   this.destroyTexturePack = new Object();
