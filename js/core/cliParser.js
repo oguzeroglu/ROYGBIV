@@ -4486,16 +4486,21 @@ function parse(input){
             if (!obj){
               obj = addedTexts[objName];
               if (!obj){
-                terminal.printError(Text.NO_SUCH_OBJECT);
-                return true;
+                obj = sprites[objName];
+                if (!obj){
+                  terminal.printError(Text.NO_SUCH_OBJECT);
+                  return true;
+                }
               }
             }
           }
           if (obj.registeredSceneName != sceneHandler.getActiveSceneName()){
             if (obj.isAddedObject || obj.isObjectGroup){
               terminal.printError(Text.OBJECT_NOT_IN_SCENE);
-            }else{
+            }else if (obj.isAddedText){
               terminal.printError(Text.TEXT_NOT_IN_SCENE);
+            }else{
+              terminal.printError(Text.SPRITE_NOT_IN_ACTIVE_SCENE);
             }
             return true;
           }

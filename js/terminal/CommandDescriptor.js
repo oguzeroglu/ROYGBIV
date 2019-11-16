@@ -955,6 +955,7 @@ var CommandDescriptor = function(){
   this.LIGHTNING_NAME             =   37;
   this.SPRITE_NAME                =   38;
   this.OBJECT_OR_SPRITE_NAME      =   39;
+  this.OBJECT_TEXT_SPRITE_NAME    =   40;
 
   // newGridSystem
   this.newGridSystem = new Object();
@@ -1443,7 +1444,7 @@ var CommandDescriptor = function(){
   // animations
   this.animations = new Object();
   this.animations.types = [];
-  this.animations.types.push(this.OBJECT_AND_TEXT_NAME); //animations
+  this.animations.types.push(this.OBJECT_TEXT_SPRITE_NAME); //animations
 
   // newScene
   this.newScene = new Object();

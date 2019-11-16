@@ -194,6 +194,10 @@ AnimationCreatorGUIHandler.prototype.init = function(object){
       }
       this.objectAnimationActionsAry.push(animationHandler.actionTypes.TEXT[key]);
     }
+  }else if (object.isSprite){
+    for (var key in animationHandler.actionTypes.SPRITE){
+      this.objectAnimationActionsAry.push(animationHandler.actionTypes.SPRITE[key]);
+    }
   }else{
     throw new Error("Not implemented.");
   }
@@ -226,8 +230,12 @@ AnimationCreatorGUIHandler.prototype.init = function(object){
       var animation;
       if (object.isAddedObject || object.isObjectGroup){
         animation = animationCreatorGUIHandler.createAnimation(object, name, animationHandler.animationTypes.LINEAR, animationHandler.actionTypes.OBJECT.TRANSPARENCY, 3, -1, false, "#ffffff", false);
-      }else{
+      }else if (object.isAddedText){
         animation = animationCreatorGUIHandler.createAnimation(object, name, animationHandler.animationTypes.LINEAR, animationHandler.actionTypes.TEXT.TRANSPARENCY, 3, -1, false, "#ffffff", false);
+      } else if (object.isSprite){
+        animation = animationCreatorGUIHandler.createAnimation(object, name, animationHandler.animationTypes.LINEAR, animationHandler.actionTypes.SPRITE.TRANSPARENCY, 3, -1, false, "#ffffff", false);
+      } else {
+        throw new Error("Not implemented.");
       }
       animationCreatorGUIHandler.addAnimationFolder(animation, object);
       animationCreatorGUIHandler.refreshAnimations(object);

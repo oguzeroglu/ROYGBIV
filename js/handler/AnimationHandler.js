@@ -28,7 +28,7 @@ var AnimationHandler = function(){
       POSITION_Z: "TEXT_POSITION_Z", TEXT_COLOR: "TEXT_TEXT_COLOR", BACKGROUND_COLOR: "TEXT_BACKGROUND_COLOR", TYPING: "TEXT_TYPING"
     },
     SPRITE: {
-      
+      TRANSPARENCY: "SPRITE_TRANSPARENCY"
     }
   };
   // INITIAL VALUE GETTERS
@@ -138,6 +138,9 @@ var AnimationHandler = function(){
   this.initialValueGetterFunctionsByType[this.actionTypes.TEXT.TYPING] = function(object){
     return 0;
   };
+  this.initialValueGetterFunctionsByType[this.actionTypes.SPRITE.TRANSPARENCY] = function(object){
+    return object.mesh.material.uniforms.alpha.value;
+  }
   // AFTER ANIMATION SETTER FUNCTIONS
   this.afterAnimationSettersByType = new Object();
   this.afterAnimationSettersByType[this.actionTypes.OBJECT.TRANSPARENCY] = function(animation){
@@ -320,6 +323,14 @@ var AnimationHandler = function(){
   this.afterAnimationSettersByType[this.actionTypes.TEXT.TYPING] = function(animation){
     animation.attachedObject.setText(animation.params.sourceText, false);
   }
+  this.afterAnimationSettersByType[this.actionTypes.SPRITE.TRANSPARENCY] = function(animation){
+    animation.attachedObject.mesh.material.uniforms.alpha.value = animation.initialValue;
+    if (animation.initialValue >= 1){
+      animation.attachedObject.mesh.material.transparent = false;
+    }else{
+      animation.attachedObject.mesh.material.transparent = true;
+    }
+  }
   // ACTION FUNCTIONS **********************************************
   this.actionFunctionsByType = new Object();
   this.actionFunctionsByType[this.actionTypes.OBJECT.TRANSPARENCY] = this.updateObjectTransparencyFunc;
@@ -351,6 +362,7 @@ var AnimationHandler = function(){
   this.actionFunctionsByType[this.actionTypes.TEXT.TEXT_COLOR] = this.updateTextColorFunc;
   this.actionFunctionsByType[this.actionTypes.TEXT.BACKGROUND_COLOR] = this.updateTextBackgroundColorFunc;
   this.actionFunctionsByType[this.actionTypes.TEXT.TYPING] = this.updateTextTypingFunc;
+  this.actionFunctionsByType[this.actionTypes.SPRITE.TRANSPARENCY] = this.updateSpriteTransparencyFunc;
   // UPDATE FUNCTIONS **********************************************
   this.updateFunctionsByType = new Object();
   this.updateFunctionsByType[this.animationTypes.LINEAR] = this.linearFunc;
@@ -677,6 +689,14 @@ AnimationHandler.prototype.updateTextBackgroundColorFunc = function(params){
 }
 AnimationHandler.prototype.updateTextTypingFunc = function(params){
   params.object.firstNChars(params.sourceText, params.value);
+}
+AnimationHandler.prototype.updateSpriteTransparencyFunc = function(params){
+  params.object.mesh.material.uniforms.alpha.value = params.value;
+  if (params.value >= 1){
+    params.object.mesh.material.transparent = false;
+  }else{
+    params.object.mesh.material.transparent = true;
+  }
 }
 // UPDATE FUNCTIONS ************************************************
 AnimationHandler.prototype.linearFunc = function(curTime, startVal, changeInVal, totalTime){

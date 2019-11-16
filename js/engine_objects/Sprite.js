@@ -18,6 +18,16 @@ var Sprite = function(name){
   this.set2DCoordinates(50, 50);
   scene.add(this.mesh);
   this.mesh.visible = true;
+  this.animations = new Object();
+  webglCallbackHandler.registerEngineObject(this);
+}
+
+Sprite.prototype.addAnimation = function(animation){
+  this.animations[animation.name] = animation;
+}
+
+Sprite.prototype.removeAnimation = function(animation){
+  delete this.animations[animation.name];
 }
 
 Sprite.prototype.setCropCoefficient = function(coefX, coefY){

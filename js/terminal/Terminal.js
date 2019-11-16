@@ -737,6 +737,29 @@ Terminal.prototype.autocomplete = function(command){
 				}
 				helpString = "[Objects/Sprites]: ";
 			break;
+			case commandDescriptor.OBJECT_TEXT_SPRITE_NAME:
+				for (var objName in sceneHandler.getAddedObjects()){
+					if (objName.toLowerCase().startsWith(curEntry.toLowerCase())){
+						possibilities.push(objName);
+					}
+				}
+				for (var objName in sceneHandler.getObjectGroups()){
+					if (objName.toLowerCase().startsWith(curEntry.toLowerCase())){
+						possibilities.push(objName);
+					}
+				}
+				for (var textName in sceneHandler.getAddedTexts()){
+					if (textName.toLowerCase().startsWith(curEntry.toLowerCase())){
+						possibilities.push(textName);
+					}
+				}
+				for (var spriteName in sceneHandler.getSprites()){
+					if (spriteName.toLowerCase().startsWith(curEntry.toLowerCase())){
+						possibilities.push(spriteName);
+					}
+				}
+				helpString = "[Objects]: ";
+			break;
 		}
 
 		//  **********************************************************
