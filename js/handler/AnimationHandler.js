@@ -28,7 +28,7 @@ var AnimationHandler = function(){
       POSITION_Z: "TEXT_POSITION_Z", TEXT_COLOR: "TEXT_TEXT_COLOR", BACKGROUND_COLOR: "TEXT_BACKGROUND_COLOR", TYPING: "TEXT_TYPING"
     },
     SPRITE: {
-      TRANSPARENCY: "SPRITE_TRANSPARENCY", SCALE_X: "SPRITE_SCALE_X", SCALE_Y: "SPRITE_SCALE_Y"
+      TRANSPARENCY: "SPRITE_TRANSPARENCY", SCALE_X: "SPRITE_SCALE_X", SCALE_Y: "SPRITE_SCALE_Y", ROTATION: "SPRITE_ROTATION"
     }
   };
   // INITIAL VALUE GETTERS
@@ -146,6 +146,9 @@ var AnimationHandler = function(){
   };
   this.initialValueGetterFunctionsByType[this.actionTypes.SPRITE.SCALE_Y] = function(object){
     return object.mesh.material.uniforms.scale.value.y;
+  }
+  this.initialValueGetterFunctionsByType[this.actionTypes.SPRITE.ROTATION] = function(object){
+    return object.mesh.material.uniforms.rotationAngle.value;
   }
   // AFTER ANIMATION SETTER FUNCTIONS
   this.afterAnimationSettersByType = new Object();
@@ -343,6 +346,9 @@ var AnimationHandler = function(){
   this.afterAnimationSettersByType[this.actionTypes.SPRITE.SCALE_Y] = function(animation){
     animation.attachedObject.setScale(animation.attachedObject.mesh.material.uniforms.scale.value.x, animation.initialValue);
   }
+  this.afterAnimationSettersByType[this.actionTypes.SPRITE.ROTATION] = function(animation){
+    animation.attachedObject.setRotation(animation.initialValue);
+  }
   // ACTION FUNCTIONS **********************************************
   this.actionFunctionsByType = new Object();
   this.actionFunctionsByType[this.actionTypes.OBJECT.TRANSPARENCY] = this.updateObjectTransparencyFunc;
@@ -377,6 +383,7 @@ var AnimationHandler = function(){
   this.actionFunctionsByType[this.actionTypes.SPRITE.TRANSPARENCY] = this.updateSpriteTransparencyFunc;
   this.actionFunctionsByType[this.actionTypes.SPRITE.SCALE_X] = this.updateSpriteScaleXFunc;
   this.actionFunctionsByType[this.actionTypes.SPRITE.SCALE_Y] = this.updateSpriteScaleYFunc;
+  this.actionFunctionsByType[this.actionTypes.SPRITE.ROTATION] = this.updateSpriteRotationFunc;
   // UPDATE FUNCTIONS **********************************************
   this.updateFunctionsByType = new Object();
   this.updateFunctionsByType[this.animationTypes.LINEAR] = this.linearFunc;
@@ -717,6 +724,9 @@ AnimationHandler.prototype.updateSpriteScaleXFunc = function(params){
 }
 AnimationHandler.prototype.updateSpriteScaleYFunc = function(params){
   params.object.setScale(params.object.mesh.material.uniforms.scale.value.x, params.value);
+}
+AnimationHandler.prototype.updateSpriteRotationFunc = function(params){
+  params.object.setRotation(params.value);
 }
 // UPDATE FUNCTIONS ************************************************
 AnimationHandler.prototype.linearFunc = function(curTime, startVal, changeInVal, totalTime){
