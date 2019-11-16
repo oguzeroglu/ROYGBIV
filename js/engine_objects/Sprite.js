@@ -48,6 +48,10 @@ Sprite.prototype.setRefHeight = function(){
 }
 
 Sprite.prototype.export = function(){
+  var animations = new Object();
+  for (var animationName in this.animations){
+    animations[animationName] = this.animations[animationName].export();
+  }
   return {
     name: this.name,
     color: "#" + this.mesh.material.uniforms.color.value.getHexString(),
@@ -63,7 +67,8 @@ Sprite.prototype.export = function(){
     isClickable: this.isClickable,
     refHeight: this.refHeight,
     cropCoefficientX: this.cropCoefficientX,
-    cropCoefficientY: this.cropCoefficientY
+    cropCoefficientY: this.cropCoefficientY,
+    animations: animations
   };
 }
 
