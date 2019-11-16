@@ -99,7 +99,8 @@ Sprite.prototype.exportLightweight = function(){
       a: this.triangle2.a,
       b: this.triangle2.b,
       c: this.triangle2.c
-    }
+    },
+    clickable: this.isClickable
   };
 }
 

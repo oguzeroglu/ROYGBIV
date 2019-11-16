@@ -211,6 +211,7 @@ ModeSwitcher.prototype.switchFromDesignToPreview = function(){
     }
   }
   for (var spriteName in sprites){
+    delete sprites[spriteName].onClickCallback;
     if (sprites[spriteName].isClickable){
       clickableSprites[spriteName] = sprites[spriteName];
       sceneHandler.onClickableSpriteAddition(sprites[spriteName]);
@@ -280,6 +281,9 @@ ModeSwitcher.prototype.switchFromPreviewToDesign = function(){
     delete addedText.clickCallbackFunction;
     delete addedText.mouseOverCallbackFunction;
     delete addedText.mouseOutCallbackFunction;
+  }
+  for (var spriteName in sprites){
+    delete sprites[spriteName].onClickCallback;
   }
   collisionCallbackRequests = new Map();
   particleCollisionCallbackRequests = new Object();

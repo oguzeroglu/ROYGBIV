@@ -635,6 +635,9 @@ function onRaycasterIntersection(){
        if (!isDeployment){
          guiHandler.afterObjectSelection();
        }
+       if (mode == 1 && object.onClickCallback){
+         object.onClickCallback();
+       }
      }
   }else{
     if (!isDeployment){

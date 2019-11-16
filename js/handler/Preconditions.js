@@ -226,6 +226,7 @@ var Preconditions = function(){
   this.areaName = "areaName";
   this.initialPosition = "initialPosition";
   this.spriteName = "spriteName";
+  this.sprite = "sprite";
 }
 
 Preconditions.prototype.errorHeader = function(callerFunc){
@@ -459,6 +460,18 @@ Preconditions.prototype.checkIfTextClickable = function(callerFunc, parameterNam
 Preconditions.prototype.checkIfAddedText = function(callerFunc, parameterName, obj){
   if(!obj.isAddedText){
     this.throw(callerFunc, parameterName+" is not a text object.");
+  }
+}
+
+Preconditions.prototype.checkIfSprite = function(callerFunc, parameterName, obj){
+  if (!obj.isSprite){
+    this.throw(callerFunc, parameterName+" is not a sprite.");
+  }
+}
+
+Preconditions.prototype.checkIfSpriteClickable = function(callerFunc, sprite){
+  if (!sprite.isClickable){
+    this.throw(callerFunc, "Sprite is not clickable.");
   }
 }
 

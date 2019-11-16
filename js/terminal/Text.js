@@ -893,4 +893,6 @@ var Text = function(){
   this.ROYGBIV_SCRIPTING_API_REMOVEAREAENTERLISTENER = "Removes the area enter listener for given area name.";
   this.ROYGBIV_SCRIPTING_API_REMOVEAREAEXITLISTENER = "Removes the area exit listener for given area name.";
   this.ROYGBIV_SCRIPTING_API_GETSPRITE = "Returns a sprite object or 0 if sprite does not exist.";
+  this.ROYGBIV_SCRIPTING_API_ONSPRITECLICK = "Sets a sprite click listener. The callbackFunction is executed when the sprite is clicked.";
+  this.ROYGBIV_SCRIPTING_API_REMOVESPRITECLICKLISTENER = "Removes the click listener of a sprite object.";
 }

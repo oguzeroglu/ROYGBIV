@@ -193,7 +193,9 @@ var Roygbiv = function(){
     "onAreaExit",
     "removeAreaEnterListener",
     "removeAreaExitListener",
-    "getSprite"
+    "getSprite",
+    "onSpriteClick",
+    "removeSpriteClickListener"
   ];
 
   this.globals = new Object();
@@ -2003,6 +2005,34 @@ Roygbiv.prototype.removeAreaExitListener = function(areaName){
   preConditions.checkIfDefined(ROYGBIV.removeAreaExitListener, preConditions.areaName, areaName);
   preConditions.checkIfAreaExists(ROYGBIV.removeAreaExitListener, areaName);
   delete areaExitCallbacks[areaName];
+}
+
+// Sets a sprite click listener. The callbackFunction is executed when the
+// sprite is clicked.
+Roygbiv.prototype.onSpriteClick = function(sprite, callbackFunction){
+  if (mode == 0){
+    return;
+  }
+  preConditions.checkIfDefined(ROYGBIV.onSpriteClick, preConditions.sprite, sprite);
+  preConditions.checkIfSprite(ROYGBIV.onSpriteClick, preConditions.sprite, sprite);
+  preConditions.checkIfSpriteClickable(ROYGBIV.onSpriteClick, sprite);
+  preConditions.checkIfSpriteInsideActiveScene(ROYGBIV.onSpriteClick, sprite);
+  preConditions.checkIfDefined(ROYGBIV.onSpriteClick, preConditions.callbackFunction, callbackFunction);
+  preConditions.checkIfFunctionOnlyIfExists(ROYGBIV.onSpriteClick, preConditions.callbackFunction, callbackFunction);
+  sprite.onClickCallback = callbackFunction;
+  objectsWithOnClickListeners.set(sprite.name, sprite);
+}
+
+// Removes the click listener of a sprite object.
+Roygbiv.prototype.removeSpriteClickListener = function(sprite){
+  if (mode == 0){
+    return;
+  }
+  preConditions.checkIfDefined(ROYGBIV.removeSpriteClickListener, preConditions.sprite, sprite);
+  preConditions.checkIfSprite(ROYGBIV.removeSpriteClickListener, preConditions.sprite, sprite);
+  preConditions.checkIfSpriteInsideActiveScene(ROYGBIV.removeSpriteClickListener, sprite);
+  sprite.onClickCallback = noop;
+  objectsWithOnClickListeners.delete(sprite.name);
 }
 
 // TEXT FUNCTIONS **************************************************************
