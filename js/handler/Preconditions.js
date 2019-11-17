@@ -227,6 +227,8 @@ var Preconditions = function(){
   this.initialPosition = "initialPosition";
   this.spriteName = "spriteName";
   this.sprite = "sprite";
+  this.sprite1 = "sprite1";
+  this.sprite2 = "sprite2";
 }
 
 Preconditions.prototype.errorHeader = function(callerFunc){

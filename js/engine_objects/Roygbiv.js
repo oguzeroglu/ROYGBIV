@@ -16,6 +16,7 @@
 //  * Animation functions
 //  * Muzzleflash functions
 //  * Lightning functions
+//  * Sprıte functions
 //  * Script related functions
 var Roygbiv = function(){
   this.functionNames = [
@@ -205,7 +206,8 @@ var Roygbiv = function(){
     "onSpriteDragging",
     "removeSpriteDragStartListener",
     "removeSpriteDragStopListener",
-    "removeSpriteDraggingListener"
+    "removeSpriteDraggingListener",
+    "areSpritesIntersected"
   ];
 
   this.globals = new Object();
@@ -2754,6 +2756,20 @@ Roygbiv.prototype.stopLightning = function(lightning){
   preConditions.checkIfLightning(ROYGBIV.stopLightning, lightning);
   preConditions.checkIfLightningInsideActiveScene(ROYGBIV.stopLightning, lightning);
   lightning.stop();
+}
+
+// SPRITE FUNCTIONS ************************************************************
+
+// Returns if two sprites are intersected.
+Roygbiv.prototype.areSpritesIntersected = function(sprite1, sprite2){
+  if (mode == 0){
+    return;
+  }
+  preConditions.checkIfDefined(ROYGBIV.areSpritesIntersected, preConditions.sprite1, sprite1);
+  preConditions.checkIfDefined(ROYGBIV.areSpritesIntersected, preConditions.sprite2, sprite2);
+  preConditions.checkIfSprite(ROYGBIV.areSpritesIntersected, preConditions.sprite1, sprite1);
+  preConditions.checkIfSprite(ROYGBIV.areSpritesIntersected, preConditions.sprite2, sprite2);
+  return sprite1.intersectionTest(sprite2);
 }
 
 // UTILITY FUNCTIONS ***********************************************************

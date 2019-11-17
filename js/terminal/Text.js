@@ -905,4 +905,5 @@ var Text = function(){
   this.ROYGBIV_SCRIPTING_API_REMOVESPRITEDRAGSTARTLISTENER = "Removes the drag start listener of a sprite.";
   this.ROYGBIV_SCRIPTING_API_REMOVESPRITEDRAGSTOPLISTENER = "Removes the drag stop listener of a sprite.";
   this.ROYGBIV_SCRIPTING_API_REMOVESPRITEDRAGGINGLISTENER = "Removes the dragging listener of a sprite.";
+  this.ROYGBIV_SCRIPTING_API_ARESPRITESINTERSECTED = "Returns if two sprites are intersected.";
 }
