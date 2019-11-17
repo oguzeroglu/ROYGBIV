@@ -24,10 +24,16 @@ var Sprite = function(name){
 
 Sprite.prototype.onDragStarted = function(){
   draggingSprite = this;
+  if (this.dragStartCallback){
+    this.dragStartCallback();
+  }
 }
 
 Sprite.prototype.onDragStopped = function(){
   draggingSprite = false;
+  if (this.dragStopCallback){
+    this.dragStopCallback();
+  }
 }
 
 Sprite.prototype.onDrag = function(diffX, diffY){
@@ -41,6 +47,9 @@ Sprite.prototype.onDrag = function(diffX, diffY){
     diffYPercent = -1 * diffYPercent;
   }
   this.set2DCoordinates(this.marginPercentX - diffXPercent, this.marginPercentY + diffYPercent);
+  if (this.draggingCallback){
+    this.draggingCallback();
+  }
 }
 
 Sprite.prototype.addAnimation = function(animation){

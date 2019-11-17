@@ -199,7 +199,13 @@ var Roygbiv = function(){
     "onSpriteMouseOver",
     "removeSpriteMouseOverListener",
     "onSpriteMouseOut",
-    "removeSpriteMouseOutListener"
+    "removeSpriteMouseOutListener",
+    "onSpriteDragStart",
+    "onSpriteDragStop",
+    "onSpriteDragging",
+    "removeSpriteDragStartListener",
+    "removeSpriteDragStopListener",
+    "removeSpriteDraggingListener"
   ];
 
   this.globals = new Object();
@@ -2225,6 +2231,87 @@ Roygbiv.prototype.removeSpriteMouseOutListener = function(sprite){
   preConditions.checkIfSpriteInsideActiveScene(ROYGBIV.removeSpriteMouseOutListener, sprite);
   delete sprite.mouseOutCallbackFunction;
   objectsWithMouseOutListeners.delete(sprite.name);
+}
+
+// Sets a drag start listener for a sprite. The callbackFunction is executed
+// when a drag is initiated on a draggable sprite (mousedown/touchstart).
+Roygbiv.prototype.onSpriteDragStart = function(sprite, callbackFunction){
+  if (mode == 0){
+    return;
+  }
+  preConditions.checkIfDefined(ROYGBIV.onSpriteDragStart, preConditions.sprite, sprite);
+  preConditions.checkIfSprite(ROYGBIV.onSpriteDragStart, preConditions.sprite, sprite);
+  preConditions.checkIfSpriteInsideActiveScene(ROYGBIV.onSpriteDragStart, sprite);
+  preConditions.checkIfDefined(ROYGBIV.onSpriteDragStart, preConditions.callbackFunction, callbackFunction);
+  preConditions.checkIfFunctionOnlyIfExists(ROYGBIV.onSpriteDragStart, preConditions.callbackFunction, callbackFunction);
+  preConditions.checkIfSpriteDraggable(ROYGBIV.onSpriteDragStart, sprite);
+  sprite.dragStartCallback = callbackFunction;
+}
+
+// Sets a drag stop listener for a sprite. The callbackFunction is executed
+// when a user stops dragging a sprite (mouseup/touchend).
+Roygbiv.prototype.onSpriteDragStop = function(sprite, callbackFunction){
+  if (mode == 0){
+    return;
+  }
+  preConditions.checkIfDefined(ROYGBIV.onSpriteDragStop, preConditions.sprite, sprite);
+  preConditions.checkIfSprite(ROYGBIV.onSpriteDragStop, preConditions.sprite, sprite);
+  preConditions.checkIfSpriteInsideActiveScene(ROYGBIV.onSpriteDragStop, sprite);
+  preConditions.checkIfDefined(ROYGBIV.onSpriteDragStop, preConditions.callbackFunction, callbackFunction);
+  preConditions.checkIfFunctionOnlyIfExists(ROYGBIV.onSpriteDragStop, preConditions.callbackFunction, callbackFunction);
+  preConditions.checkIfSpriteDraggable(ROYGBIV.onSpriteDragStop, sprite);
+  sprite.dragStopCallback = callbackFunction;
+}
+
+// Sets a dragging listener for a sprite. The callbackFunction is executed
+// each time a sprite is relocated while being dragged.
+Roygbiv.prototype.onSpriteDragging = function(sprite, callbackFunction){
+  if (mode == 0){
+    return;
+  }
+  preConditions.checkIfDefined(ROYGBIV.onSpriteDragging, preConditions.sprite, sprite);
+  preConditions.checkIfSprite(ROYGBIV.onSpriteDragging, preConditions.sprite, sprite);
+  preConditions.checkIfSpriteInsideActiveScene(ROYGBIV.onSpriteDragging, sprite);
+  preConditions.checkIfDefined(ROYGBIV.onSpriteDragging, preConditions.callbackFunction, callbackFunction);
+  preConditions.checkIfFunctionOnlyIfExists(ROYGBIV.onSpriteDragging, preConditions.callbackFunction, callbackFunction);
+  preConditions.checkIfSpriteDraggable(ROYGBIV.onSpriteDragging, sprite);
+  sprite.draggingCallback = callbackFunction;
+}
+
+// Removes the drag start listener of a sprite.
+Roygbiv.prototype.removeSpriteDragStartListener = function(sprite){
+  if (mode == 0){
+    return;
+  }
+  preConditions.checkIfDefined(ROYGBIV.removeSpriteDragStartListener, preConditions.sprite, sprite);
+  preConditions.checkIfSprite(ROYGBIV.removeSpriteDragStartListener, preConditions.sprite, sprite);
+  preConditions.checkIfSpriteInsideActiveScene(ROYGBIV.removeSpriteDragStartListener, sprite);
+  preConditions.checkIfSpriteDraggable(ROYGBIV.removeSpriteDragStartListener, sprite);
+  sprite.dragStartCallback = noop;
+}
+
+// Removes the drag stop listener of a sprite.
+Roygbiv.prototype.removeSpriteDragStopListener = function(sprite){
+  if (mode == 0){
+    return;
+  }
+  preConditions.checkIfDefined(ROYGBIV.removeSpriteDragStopListener, preConditions.sprite, sprite);
+  preConditions.checkIfSprite(ROYGBIV.removeSpriteDragStopListener, preConditions.sprite, sprite);
+  preConditions.checkIfSpriteInsideActiveScene(ROYGBIV.removeSpriteDragStopListener, sprite);
+  preConditions.checkIfSpriteDraggable(ROYGBIV.removeSpriteDragStopListener, sprite);
+  sprite.dragStopCallback = noop;
+}
+
+// Removes the dragging listener of a sprite.
+Roygbiv.prototype.removeSpriteDraggingListener = function(sprite){
+  if (mode == 0){
+    return;
+  }
+  preConditions.checkIfDefined(ROYGBIV.removeSpriteDraggingListener, preConditions.sprite, sprite);
+  preConditions.checkIfSprite(ROYGBIV.removeSpriteDraggingListener, preConditions.sprite, sprite);
+  preConditions.checkIfSpriteInsideActiveScene(ROYGBIV.removeSpriteDraggingListener, sprite);
+  preConditions.checkIfSpriteDraggable(ROYGBIV.removeSpriteDraggingListener, sprite);
+  sprite.draggingCallback = noop;
 }
 
 // CONTROL FUNCTIONS ***********************************************************

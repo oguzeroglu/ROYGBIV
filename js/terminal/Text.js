@@ -899,4 +899,10 @@ var Text = function(){
   this.ROYGBIV_SCRIPTING_API_REMOVESPRITEMOUSEOVERLISTENER = "Removes the mouseover listener of a sprite.";
   this.ROYGBIV_SCRIPTING_API_ONSPRITEMOUSEOUT = "Sets a mouseout listener for a sprite.";
   this.ROYGBIV_SCRIPTING_API_REMOVESPRITEMOUSEOUTLISTENER = "Removes the mouseout listener of a sprite.";
+  this.ROYGBIV_SCRIPTING_API_ONSPRITEDRAGSTART = "Sets a drag start listener for a sprite. The callbackFunction is executed when a drag is initiated on a\ndraggable sprite (mousedown/touchstart).";
+  this.ROYGBIV_SCRIPTING_API_ONSPRITEDRAGSTOP = "Sets a drag stop listener for a sprite. The callbackFunction is executed when a user stops dragging a sprite (mouseup/touchend).";
+  this.ROYGBIV_SCRIPTING_API_ONSPRITEDRAGGING = "Sets a dragging listener for a sprite. The callbackFunction is executed each time a sprite is relocated while being dragged.";
+  this.ROYGBIV_SCRIPTING_API_REMOVESPRITEDRAGSTARTLISTENER = "Removes the drag start listener of a sprite.";
+  this.ROYGBIV_SCRIPTING_API_REMOVESPRITEDRAGSTOPLISTENER = "Removes the drag stop listener of a sprite.";
+  this.ROYGBIV_SCRIPTING_API_REMOVESPRITEDRAGGINGLISTENER = "Removes the dragging listener of a sprite.";
 }

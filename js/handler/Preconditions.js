@@ -475,6 +475,12 @@ Preconditions.prototype.checkIfSpriteClickable = function(callerFunc, sprite){
   }
 }
 
+Preconditions.prototype.checkIfSpriteDraggable = function(callerFunc, sprite){
+  if (!sprite.isDraggable){
+    this.throw(callerFunc, "Sprite is not draggable.");
+  }
+}
+
 Preconditions.prototype.checkIfAddedObject = function(callerFunc, parameterName, obj){
   if (!obj.isAddedObject){
     this.throw(callerFunc, parameterName+" is not an AddedObject.");
