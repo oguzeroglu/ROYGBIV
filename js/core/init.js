@@ -414,6 +414,15 @@ function addCLIDom(){
   }
 }
 
+function onRaycasterMouseDownIntersection(){
+  if (intersectionPoint){
+    var sprite = sprites[intersectionObject];
+    if (sprite && sprite.isDraggable && mode == 1){
+      sprite.onDragStarted();
+    }
+  }
+}
+
 function onRaycasterMouseMoveIntersection(){
   if (intersectionPoint){
     var object = addedObjects[intersectionObject];
@@ -640,12 +649,13 @@ function onRaycasterIntersection(){
        }
        if (!isDeployment){
          selectionHandler.select(object);
-       }
-       if (!isDeployment){
          guiHandler.afterObjectSelection();
        }
        if (mode == 1 && object.onClickCallback){
          object.onClickCallback();
+       }
+       if (mode == 1 && object.isDraggable){
+         object.onDragStarted();
        }
      }
   }else{

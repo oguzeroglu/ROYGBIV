@@ -70,6 +70,7 @@ ModeSwitcher.prototype.commonSwitchFunctions = function(){
   objectsWithMouseOverListeners = new Map();
   objectsWithMouseOutListeners = new Map();
   currentMouseOverObjectName = 0;
+  draggingSprite = false;
   if (activeControl){
     activeControl.onDeactivated();
   }
@@ -215,6 +216,13 @@ ModeSwitcher.prototype.switchFromDesignToPreview = function(){
     if (sprites[spriteName].isClickable){
       clickableSprites[spriteName] = sprites[spriteName];
       sceneHandler.onClickableSpriteAddition(sprites[spriteName]);
+      if (sprites[spriteName].isDraggable){
+        sceneHandler.setDraggableSprite(sprites[spriteName]);
+        sprites[spriteName].marginBeforeDrag = {
+          x: sprites[spriteName].marginPercentX,
+          y: sprites[spriteName].marginPercentY
+        };
+      }
     }
   }
   sceneHandler.onSwitchFromDesignToPreview();
@@ -286,6 +294,10 @@ ModeSwitcher.prototype.switchFromPreviewToDesign = function(){
     delete sprites[spriteName].onClickCallback;
     for (var animationName in sprites[spriteName].animations){
       animationHandler.forceFinish(sprites[spriteName].animations[animationName]);
+    }
+    if (sprites[spriteName].isDraggable){
+      sprites[spriteName].set2DCoordinates(sprites[spriteName].marginBeforeDrag.x, sprites[spriteName].marginBeforeDrag.y);
+      delete sprites[spriteName].marginBeforeDrag;
     }
   }
   collisionCallbackRequests = new Map();

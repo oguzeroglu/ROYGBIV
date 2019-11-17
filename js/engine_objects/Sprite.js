@@ -22,6 +22,27 @@ var Sprite = function(name){
   webglCallbackHandler.registerEngineObject(this);
 }
 
+Sprite.prototype.onDragStarted = function(){
+  draggingSprite = this;
+}
+
+Sprite.prototype.onDragStopped = function(){
+  draggingSprite = false;
+}
+
+Sprite.prototype.onDrag = function(diffX, diffY){
+  var width = renderer.getCurrentViewport().z;
+  var height = renderer.getCurrentViewport().w;
+  var diffXPercent = (((diffX) * (100)) / (width));
+  var diffYPercent = (((diffY) * (100)) / (height));
+  if (this.marginMode == MARGIN_MODE_2D_TOP_LEFT){
+    diffXPercent = -1 * diffXPercent;
+  }else if (this.marginMode == MARGIN_MODE_2D_BOTTOM_RIGHT){
+    diffYPercent = -1 * diffYPercent;
+  }
+  this.set2DCoordinates(this.marginPercentX - diffXPercent, this.marginPercentY + diffYPercent);
+}
+
 Sprite.prototype.addAnimation = function(animation){
   this.animations[animation.name] = animation;
 }
@@ -65,6 +86,7 @@ Sprite.prototype.export = function(){
     scaleY: this.mesh.material.uniforms.scale.value.y,
     rotation: this.mesh.material.uniforms.rotationAngle.value,
     isClickable: this.isClickable,
+    isDraggable: this.isDraggable,
     refHeight: this.refHeight,
     cropCoefficientX: this.cropCoefficientX,
     cropCoefficientY: this.cropCoefficientY,

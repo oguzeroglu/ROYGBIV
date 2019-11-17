@@ -48,11 +48,20 @@ SceneHandler.prototype.reset = function(){
   this.activeSceneName = "scene1";
   this.scenes = new Object();
   this.scenes[this.activeSceneName] = new Scene("scene1");
+  this.draggableSpriteStatusBySceneName = new Object();
   this.entrySceneName = "scene1";
   this.ready = true;
   if (!(typeof this.nextSceneToChange == UNDEFINED)){
     delete this.nextSceneToChange;
   }
+}
+
+SceneHandler.prototype.hasDraggableSprite = function(){
+  return this.draggableSpriteStatusBySceneName[this.getActiveSceneName()];
+}
+
+SceneHandler.prototype.setDraggableSprite = function(sprite){
+  this.draggableSpriteStatusBySceneName[sprite.registeredSceneName] = true;
 }
 
 SceneHandler.prototype.onSwitchFromDesignToPreview = function(){
@@ -71,6 +80,7 @@ SceneHandler.prototype.onSwitchFromPreviewToDesign = function(){
     this.scenes[sceneName].resetClickableSprites();
     this.scenes[sceneName].resetTrackingObjects();
   }
+  this.draggableSpriteStatusBySceneName = new Object();
   this.readyCallback = noop;
   this.changeScene(this.sceneNameBeforeSwitchToPreviewMode);
   delete this.sceneNameBeforeSwitchToPreviewMode;

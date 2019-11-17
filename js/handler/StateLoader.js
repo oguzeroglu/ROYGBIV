@@ -142,6 +142,15 @@ StateLoader.prototype.closeRaycasterWorkerIfNotUsed = function(){
           break;
         }
       }
+      if (!hasRaycasting){
+        for (var spriteName in sprites){
+          var sprite = sprites[spriteName];
+          if (sprite.isClickable){
+            hasRaycasting = true;
+            break;
+          }
+        }
+      }
     }
   }
   if (!hasRaycasting){
@@ -268,6 +277,7 @@ StateLoader.prototype.resetProject = function(){
   dynamicObjectGroups = new Map();
   trackingObjects = new Object();
   screenResolution = 1;
+  draggingSprite = false;
   renderer.setPixelRatio(screenResolution);
   fogConfigurationsVisible = false;
   stopAreaConfigurationsHandler = false;

@@ -62,6 +62,7 @@ var GUIHandler = function(){
     "Scale Y": 1.0,
     "Rotation": 0.0,
     "Clickable": false,
+    "Draggable": false,
     "Crop X": 0.01,
     "Crop Y": 0.01
   }
@@ -207,6 +208,7 @@ GUIHandler.prototype.afterSpriteSelection = function(){
     guiHandler.spriteManipulationParameters["Scale Y"] = curSelection.mesh.material.uniforms.scale.value.y;
     guiHandler.spriteManipulationParameters["Rotation"] = curSelection.mesh.material.uniforms.rotationAngle.value;
     guiHandler.spriteManipulationParameters["Clickable"] = !!curSelection.isClickable;
+    guiHandler.spriteManipulationParameters["Draggable"] = !!curSelection.isDraggable;
     guiHandler.spriteManipulationParameters["Crop X"] = (curSelection.cropCoefficientX ? curSelection.cropCoefficientX : 1.0);
     guiHandler.spriteManipulationParameters["Crop Y"] = (curSelection.cropCoefficientY ? curSelection.cropCoefficientY : 1.0);
     if (!curSelection.isTextured){
@@ -214,6 +216,9 @@ GUIHandler.prototype.afterSpriteSelection = function(){
     }
     if (Object.keys(texturePacks).length == 0){
       guiHandler.disableController(guiHandler.spriteManipulationHasTextureController);
+    }
+    if (!curSelection.isClickable){
+      guiHandler.disableController(guiHandler.spriteManipulationDraggableController);
     }
   }else{
     guiHandler.hide(guiHandler.guiTypes.SPRITE);
@@ -592,6 +597,7 @@ GUIHandler.prototype.enableAllSMControllers = function(){
   guiHandler.enableController(guiHandler.spriteManipulationScaleYController);
   guiHandler.enableController(guiHandler.spriteManipulationRotationController);
   guiHandler.enableController(guiHandler.spriteManipulationClickableController);
+  guiHandler.enableController(guiHandler.spriteManipulationDraggableController);
   guiHandler.enableController(guiHandler.spriteManipulationCropCoefficientXController);
   guiHandler.enableController(guiHandler.spriteManipulationCropCoefficientYController);
 }
@@ -1261,6 +1267,20 @@ GUIHandler.prototype.initializeSpriteManipulationGUI = function(){
   }).listen();
   guiHandler.spriteManipulationClickableController = guiHandler.datGuiSpriteManipulation.add(guiHandler.spriteManipulationParameters, "Clickable").onChange(function(val){
     selectionHandler.getSelectedObject().isClickable = val;
+    if (!val){
+       selectionHandler.getSelectedObject().isDraggable = false;
+       guiHandler.spriteManipulationParameters["Draggable"] = false;
+       guiHandler.disableController(guiHandler.spriteManipulationDraggableController);
+    } else{
+      guiHandler.enableController(guiHandler.spriteManipulationDraggableController);
+    }
+  }).listen();
+  guiHandler.spriteManipulationDraggableController = guiHandler.datGuiSpriteManipulation.add(guiHandler.spriteManipulationParameters, "Draggable").onChange(function(val){
+    if (!selectionHandler.getSelectedObject().isClickable){
+      guiHandler.spriteManipulationParameters["Draggable"] = false;
+      return;
+    }
+    selectionHandler.getSelectedObject().isDraggable = val;
   }).listen();
   guiHandler.spriteManipulationCropCoefficientXController = guiHandler.datGuiSpriteManipulation.add(guiHandler.spriteManipulationParameters, "Crop X").min(0.01).max(1).step(0.01).onChange(function(val) {
     var sprite = selectionHandler.getSelectedObject();

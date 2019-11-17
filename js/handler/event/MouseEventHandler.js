@@ -134,6 +134,13 @@ MouseEventHandler.prototype.onMouseMove = function(event){
   if (mode == 1 && screenMouseMoveCallbackFunction){
     screenMouseMoveCallbackFunction(mouseEventHandler.coordX, mouseEventHandler.coordY, mouseEventHandler.movementX, mouseEventHandler.movementY);
   }
+  if (mode == 1 && draggingSprite){
+    var diffX = mouseEventHandler.clientX - mouseEventHandler.oldClientX;
+    var diffY = mouseEventHandler.clientY - mouseEventHandler.oldClientY;
+    draggingSprite.onDrag(diffX, diffY);
+    mouseEventHandler.oldClientX = mouseEventHandler.clientX;
+    mouseEventHandler.oldClientY = mouseEventHandler.clientY;
+  }
   mouseEventHandler.eventBuffer.mouseMove.needsFlush = true;
   mouseEventHandler.eventBuffer.mouseMove.event = event;
   if (isMouseDown && !isMobile){
@@ -149,6 +156,9 @@ MouseEventHandler.prototype.onMouseUp = function(event){
     var coordY = - ((event.clientY - rect.top) / rect.height) * 2 + 1;
     screenMouseUpCallbackFunction(coordX, coordY);
   }
+  if (mode == 1 && draggingSprite){
+    draggingSprite.onDragStopped();
+  }
   isMouseDown = false;
   mouseEventHandler.eventBuffer.mouseUp.event = event;
   mouseEventHandler.eventBuffer.mouseUp.needsFlush = true;
@@ -159,11 +169,18 @@ MouseEventHandler.prototype.onMouseDown = function(event){
     mouseEventHandler.lastMouseDownTime = performance.now();
   }
   inactiveCounter = 0;
+  var rect = boundingClientRect;
+  var coordX = ((event.clientX - rect.left) / rect.width) * 2 - 1;
+  var coordY = - ((event.clientY - rect.top) / rect.height) * 2 + 1;
+  mouseEventHandler.oldClientX = event.clientX;
+  mouseEventHandler.oldClientY = event.clientY;
   if (mode == 1 && screenMouseDownCallbackFunction){
-    var rect = boundingClientRect;
-    var coordX = ((event.clientX - rect.left) / rect.width) * 2 - 1;
-    var coordY = - ((event.clientY - rect.top) / rect.height) * 2 + 1;
     screenMouseDownCallbackFunction(coordX, coordY);
+  }
+  if (mode == 1 && sceneHandler.hasDraggableSprite()){
+    REUSABLE_VECTOR.setFromMatrixPosition(camera.matrixWorld);
+    REUSABLE_VECTOR_2.set(coordX, coordY, 0.5).unproject(camera).sub(REUSABLE_VECTOR).normalize();
+    rayCaster.findIntersections(REUSABLE_VECTOR, REUSABLE_VECTOR_2, (mode == 0), onRaycasterMouseDownIntersection, event.clientX, event.clientY);
   }
   isMouseDown = true;
   mouseEventHandler.eventBuffer.mouseDown.event = event;
