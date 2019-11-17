@@ -49,6 +49,16 @@ TouchEventHandler.prototype.onTouchStart = function(event){
   }else{
     touchEventHandler.tapStartTime = 0;
   }
+
+  if (event.changedTouches.length == 1 && mode == 1 && sceneHandler.hasDraggableSprite()){
+    var touch = event.changedTouches[0];
+    var rect = boundingClientRect;
+    var coordX = ((touch.clientX - rect.left) / rect.width) * 2 - 1;
+    var coordY = - ((touch.clientY - rect.top) / rect.height) * 2 + 1;
+    REUSABLE_VECTOR.setFromMatrixPosition(camera.matrixWorld);
+    REUSABLE_VECTOR_2.set(coordX, coordY, 0.5).unproject(camera).sub(REUSABLE_VECTOR).normalize();
+    rayCaster.findIntersections(REUSABLE_VECTOR, REUSABLE_VECTOR_2, (mode == 0), onRaycasterMouseDownIntersection, touch.clientX, touch.clientY);
+  }
 }
 
 TouchEventHandler.prototype.onTouchMove = function(event){
@@ -79,6 +89,9 @@ TouchEventHandler.prototype.onTouchMove = function(event){
         var diffX = t1.pageX - touchEventHandler.lastSwipeCoordinates.x;
         var diffY = t1.pageY - touchEventHandler.lastSwipeCoordinates.y;
         activeControl.onSwipe(diffX, diffY);
+        if (draggingSprite){
+          draggingSprite.onDrag(diffX, diffY);
+        }
       }
       touchEventHandler.lastSwipeCoordinates.x = t1.pageX;
       touchEventHandler.lastSwipeCoordinates.y = t1.pageY;
@@ -119,5 +132,8 @@ TouchEventHandler.prototype.onTouchEnd = function(event){
   touchEventHandler.currentTouchCount = event.targetTouches.length;
   if (touchEventHandler.currentTouchCount == 0){
     touchEventHandler.isThereFingerTouched = false;
+  }
+  if (mode == 1 && event.changedTouches.length == 1 && draggingSprite){
+    draggingSprite.onDragStopped();
   }
 }
