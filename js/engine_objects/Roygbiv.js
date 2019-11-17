@@ -207,7 +207,9 @@ var Roygbiv = function(){
     "removeSpriteDragStartListener",
     "removeSpriteDragStopListener",
     "removeSpriteDraggingListener",
-    "areSpritesIntersected"
+    "areSpritesIntersected",
+    "setSpriteColor",
+    "setSpriteAlpha"
   ];
 
   this.globals = new Object();
@@ -2770,6 +2772,30 @@ Roygbiv.prototype.areSpritesIntersected = function(sprite1, sprite2){
   preConditions.checkIfSprite(ROYGBIV.areSpritesIntersected, preConditions.sprite1, sprite1);
   preConditions.checkIfSprite(ROYGBIV.areSpritesIntersected, preConditions.sprite2, sprite2);
   return sprite1.intersectionTest(sprite2);
+}
+
+// Sets the color of a sprite.
+Roygbiv.prototype.setSpriteColor = function(sprite, colorName){
+  if (mode == 0){
+    return;
+  }
+  preConditions.checkIfDefined(ROYGBIV.setSpriteColor, preConditions.sprite, sprite);
+  preConditions.checkIfSprite(ROYGBIV.setSpriteColor, preConditions.sprite, sprite);
+  preConditions.checkIfDefined(ROYGBIV.setSpriteColor, preConditions.colorName, colorName);
+  preConditions.checkIfString(ROYGBIV.setSpriteColor, preConditions.colorName, colorName);
+  sprite.setColor(colorName);
+}
+
+// Sets the alpha of a sprite.
+Roygbiv.prototype.setSpriteAlpha = function(sprite, alpha){
+  if (mode == 0){
+    return;
+  }
+  preConditions.checkIfDefined(ROYGBIV.setSpriteAlpha, preConditions.sprite, sprite);
+  preConditions.checkIfSprite(ROYGBIV.setSpriteAlpha, preConditions.sprite, sprite);
+  preConditions.checkIfDefined(ROYGBIV.setSpriteAlpha, preConditions.alpha, alpha);
+  preConditions.checkIfNumber(ROYGBIV.setSpriteAlpha, preConditions.alpha, alpha);
+  sprite.setAlpha(alpha);
 }
 
 // UTILITY FUNCTIONS ***********************************************************

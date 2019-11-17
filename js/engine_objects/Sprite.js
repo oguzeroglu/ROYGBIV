@@ -44,9 +44,11 @@ Sprite.prototype.cross2 = function(points, triangle) {
   var ta = (p2.y - p0.y) * dXa + (p0.x - p2.x) * dYa;
   var tb = (p2.y - p0.y) * dXb + (p0.x - p2.x) * dYb;
   var tc = (p2.y - p0.y) * dXc + (p0.x - p2.x) * dYc;
-  if (D < 0) return ((sa >= 0 && sb >= 0 && sc >= 0) ||
-                     (ta >= 0 && tb >= 0 && tc >= 0) ||
-                     (sa+ta <= D && sb+tb <= D && sc+tc <= D));
+  if (D < 0){
+    return ((sa >= 0 && sb >= 0 && sc >= 0) ||
+            (ta >= 0 && tb >= 0 && tc >= 0) ||
+            (sa+ta <= D && sb+tb <= D && sc+tc <= D));
+  }
   return ((sa <= 0 && sb <= 0 && sc <= 0) ||
           (ta <= 0 && tb <= 0 && tc <= 0) ||
           (sa+ta >= D && sb+tb >= D && sc+tc >= D));
@@ -56,7 +58,7 @@ Sprite.prototype.intersectionTest = function(sprite){
   return (!(this.cross2(this.triangle1, sprite.triangle1) || this.cross2(sprite.triangle1, this.triangle1))) ||
          (!(this.cross2(this.triangle1, sprite.triangle2) || this.cross2(sprite.triangle2, this.triangle1))) ||
          (!(this.cross2(this.triangle2, sprite.triangle1) || this.cross2(sprite.triangle1, this.triangle2))) ||
-         (!(this.cross2(this.triangle2, sprite.triangle2) || this.cross2(sprite.triangle2, this.triangle2)))
+         (!(this.cross2(this.triangle2, sprite.triangle2) || this.cross2(sprite.triangle2, this.triangle2)));
 }
 
 Sprite.prototype.onDragStarted = function(){
