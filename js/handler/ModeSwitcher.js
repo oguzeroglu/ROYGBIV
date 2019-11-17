@@ -224,6 +224,7 @@ ModeSwitcher.prototype.switchFromDesignToPreview = function(){
         };
       }
     }
+    sprites[spriteName].originalColor = sprites[spriteName].mesh.material.uniforms.color.value.getHex();
   }
   sceneHandler.onSwitchFromDesignToPreview();
   this.commonSwitchFunctions();
@@ -299,6 +300,7 @@ ModeSwitcher.prototype.switchFromPreviewToDesign = function(){
       sprites[spriteName].set2DCoordinates(sprites[spriteName].marginBeforeDrag.x, sprites[spriteName].marginBeforeDrag.y);
       delete sprites[spriteName].marginBeforeDrag;
     }
+    sprites[spriteName].setColor(sprites[spriteName].originalColor);
   }
   collisionCallbackRequests = new Map();
   particleCollisionCallbackRequests = new Object();
