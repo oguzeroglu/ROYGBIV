@@ -29,7 +29,8 @@ var AnimationHandler = function(){
     },
     SPRITE: {
       TRANSPARENCY: "SPRITE_TRANSPARENCY", SCALE_X: "SPRITE_SCALE_X", SCALE_Y: "SPRITE_SCALE_Y", ROTATION: "SPRITE_ROTATION",
-      COLOR: "SPRITE_COLOR", POSITION_X: "SPRITE_POSITION_X", POSITION_Y: "SPRITE_POSITION_Y"
+      COLOR: "SPRITE_COLOR", POSITION_X: "SPRITE_POSITION_X", POSITION_Y: "SPRITE_POSITION_Y", TARGET_POSITION_X: "SPRITE_TARGET_POSITION_X",
+      TARGET_POSITION_Y: "SPRITE_TARGET_POSITION_Y", TARGET_ROTATION: "SPRITE_TARGET_ROTATION"
     }
   };
   // INITIAL VALUE GETTERS
@@ -159,6 +160,15 @@ var AnimationHandler = function(){
   }
   this.initialValueGetterFunctionsByType[this.actionTypes.SPRITE.POSITION_Y] = function(object){
     return object.marginPercentY;
+  }
+  this.initialValueGetterFunctionsByType[this.actionTypes.SPRITE.TARGET_POSITION_X] = function(object){
+    return 0;
+  }
+  this.initialValueGetterFunctionsByType[this.actionTypes.SPRITE.TARGET_POSITION_Y] = function(object){
+    return 0;
+  }
+  this.initialValueGetterFunctionsByType[this.actionTypes.SPRITE.TARGET_ROTATION] = function(object){
+    return 0;
   }
   // AFTER ANIMATION SETTER FUNCTIONS
   this.afterAnimationSettersByType = new Object();
@@ -368,6 +378,15 @@ var AnimationHandler = function(){
   this.afterAnimationSettersByType[this.actionTypes.SPRITE.POSITION_Y] = function(animation){
     animation.attachedObject.set2DCoordinates(animation.attachedObject.marginPercentX, animation.initialValue);
   }
+  this.afterAnimationSettersByType[this.actionTypes.SPRITE.TARGET_POSITION_X] = function(animation){
+    animation.attachedObject.set2DCoordinates(animation.params.sourcePosition, animation.attachedObject.marginPercentY);
+  }
+  this.afterAnimationSettersByType[this.actionTypes.SPRITE.TARGET_POSITION_Y] = function(animation){
+    animation.attachedObject.set2DCoordinates(animation.attachedObject.marginPercentX, animation.params.sourcePosition);
+  }
+  this.afterAnimationSettersByType[this.actionTypes.SPRITE.TARGET_ROTATION] = function(animation){
+    animation.attachedObject.setRotation(animation.params.sourceRotation);
+  }
   // ACTION FUNCTIONS **********************************************
   this.actionFunctionsByType = new Object();
   this.actionFunctionsByType[this.actionTypes.OBJECT.TRANSPARENCY] = this.updateObjectTransparencyFunc;
@@ -406,6 +425,9 @@ var AnimationHandler = function(){
   this.actionFunctionsByType[this.actionTypes.SPRITE.COLOR] = this.updateSpriteColorFunc;
   this.actionFunctionsByType[this.actionTypes.SPRITE.POSITION_X] = this.updateSpritePositionXFunc;
   this.actionFunctionsByType[this.actionTypes.SPRITE.POSITION_Y] = this.updateSpritePositionYFunc;
+  this.actionFunctionsByType[this.actionTypes.SPRITE.TARGET_POSITION_X] = this.updateSpriteTargetPositionXFunc;
+  this.actionFunctionsByType[this.actionTypes.SPRITE.TARGET_POSITION_Y] = this.updatespriteTargetPositionYFunc;
+  this.actionFunctionsByType[this.actionTypes.SPRITE.TARGET_ROTATION] = this.updateSpriteTargetRotationFunc;
   // UPDATE FUNCTIONS **********************************************
   this.updateFunctionsByType = new Object();
   this.updateFunctionsByType[this.animationTypes.LINEAR] = this.linearFunc;
@@ -759,6 +781,18 @@ AnimationHandler.prototype.updateSpritePositionXFunc = function(params){
 }
 AnimationHandler.prototype.updateSpritePositionYFunc = function(params){
   params.object.set2DCoordinates(params.object.marginPercentX, params.value);
+}
+AnimationHandler.prototype.updateSpriteTargetPositionXFunc = function(params){
+  var newVal = params.sourcePosition + (params.targetPosition - params.sourcePosition) * params.value;
+  params.object.set2DCoordinates(newVal, params.object.marginPercentY);
+}
+AnimationHandler.prototype.updatespriteTargetPositionYFunc = function(params){
+  var newVal = params.sourcePosition + (params.targetPosition - params.sourcePosition) * params.value;
+  params.object.set2DCoordinates(params.object.marginPercentX, newVal);
+}
+AnimationHandler.prototype.updateSpriteTargetRotationFunc = function(params){
+  var newVal = params.sourceRotation + (params.targetRotation - params.sourceRotation) * params.value;
+  params.object.setRotation(newVal);
 }
 // UPDATE FUNCTIONS ************************************************
 AnimationHandler.prototype.linearFunc = function(curTime, startVal, changeInVal, totalTime){

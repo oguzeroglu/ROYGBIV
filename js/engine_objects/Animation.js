@@ -16,6 +16,18 @@ var Animation = function(name, type, attachedObject, description, rewind, repeat
   }else if (description.action == animationHandler.actionTypes.TEXT.TYPING){
     this.changeInValue = attachedObject.text.length + 1;
     this.params.sourceText = attachedObject.text;
+  }else if (description.action == animationHandler.actionTypes.SPRITE.TARGET_POSITION_X){
+    this.changeInValue = 1;
+    this.params.sourcePosition = attachedObject.marginPercentX;
+    this.params.targetPosition = description.targetPosition;
+  }else if (description.action == animationHandler.actionTypes.SPRITE.TARGET_POSITION_Y){
+    this.changeInValue = 1;
+    this.params.sourcePosition = attachedObject.marginPercentY;
+    this.params.targetPosition = description.targetPosition;
+  }else if (description.action == animationHandler.actionTypes.SPRITE.TARGET_ROTATION){
+    this.changeInValue = 1;
+    this.params.sourceRotation = attachedObject.mesh.material.uniforms.rotationAngle.value;
+    this.params.targetRotation = description.targetRotation;
   }else{
     this.changeInValue = this.description.changeInValue;
   }
@@ -106,6 +118,12 @@ Animation.prototype.onStart = function(initialValue){
     this.params.totalTranslationY = 0;
   }else if (this.description.action == animationHandler.actionTypes.OBJECT.TRANSLATE_Z){
     this.params.totalTranslationZ = 0;
+  }else if (this.description.action == animationHandler.actionTypes.SPRITE.TARGET_POSITION_X){
+    this.params.sourcePosition = this.attachedObject.marginPercentX;
+  }else if (this.description.action == animationHandler.actionTypes.SPRITE.TARGET_POSITION_Y){
+    this.params.sourcePosition = this.attachedObject.marginPercentY;
+  }else if (this.description.action == animationHandler.actionTypes.SPRITE.TARGET_ROTATION){
+    this.params.sourceRotation = this.attachedObject.mesh.material.uniforms.rotationAngle.value;
   }
   this.increaseTick = true;
   this.isActive = true;
