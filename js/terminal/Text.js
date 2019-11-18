@@ -908,4 +908,6 @@ var Text = function(){
   this.ROYGBIV_SCRIPTING_API_ARESPRITESINTERSECTED = "Returns if two sprites are intersected.";
   this.ROYGBIV_SCRIPTING_API_SETSPRITECOLOR = "Sets the color of a sprite.";
   this.ROYGBIV_SCRIPTING_API_SETSPRITEALPHA = "Sets the alpha of a sprite.";
+  this.ROYGBIV_SCRIPTING_API_HIDESPRITE = "Hides a sprite. Does nothing if the sprite is already hidden.";
+  this.ROYGBIV_SCRIPTING_API_SHOWSPRITE = "Shows a sprite. Does nothing if the sprite is already visible.";
 }

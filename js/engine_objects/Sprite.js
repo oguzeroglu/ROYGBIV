@@ -22,6 +22,28 @@ var Sprite = function(name){
   webglCallbackHandler.registerEngineObject(this);
 }
 
+Sprite.prototype.show = function(){
+  if (this.mesh.visible){
+    return;
+  }
+  this.mesh.visible = true;
+  this.isHidden = false;
+  if (this.isClickable){
+    rayCaster.show(this);
+  }
+}
+
+Sprite.prototype.hide = function(){
+  if (!this.mesh.visible){
+    return;
+  }
+  this.mesh.visible = false;
+  this.isHidden = true;
+  if (this.isClickable){
+    rayCaster.hide(this);
+  }
+}
+
 Sprite.prototype.cross2 = function(points, triangle) {
   var pa = points.a;
   var pb = points.b;

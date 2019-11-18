@@ -200,7 +200,7 @@ RayCaster.prototype.findIntersections = function(from, direction, intersectGridS
 }
 
 RayCaster.prototype.hide = function(object){
-  if (object.isAddedText && object.is2D){
+  if ((object.isAddedText && object.is2D) || (object.isSprite)){
     this.hide2D(object);
     return;
   }
@@ -208,7 +208,7 @@ RayCaster.prototype.hide = function(object){
 }
 
 RayCaster.prototype.show = function(object){
-  if (object.isAddedText && object.is2D){
+  if ((object.isAddedText && object.is2D) || (object.isSprite)){
     this.show2D(object);
     return;
   }

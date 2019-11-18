@@ -209,7 +209,9 @@ var Roygbiv = function(){
     "removeSpriteDraggingListener",
     "areSpritesIntersected",
     "setSpriteColor",
-    "setSpriteAlpha"
+    "setSpriteAlpha",
+    "hideSprite",
+    "showSprite"
   ];
 
   this.globals = new Object();
@@ -2796,6 +2798,26 @@ Roygbiv.prototype.setSpriteAlpha = function(sprite, alpha){
   preConditions.checkIfDefined(ROYGBIV.setSpriteAlpha, preConditions.alpha, alpha);
   preConditions.checkIfNumber(ROYGBIV.setSpriteAlpha, preConditions.alpha, alpha);
   sprite.setAlpha(alpha);
+}
+
+// Hides a sprite. Does nothing if the sprite is already hidden.
+Roygbiv.prototype.hideSprite = function(sprite){
+  if (mode == 0){
+    return;
+  }
+  preConditions.checkIfDefined(ROYGBIV.hideSprite, preConditions.sprite, sprite);
+  preConditions.checkIfSprite(ROYGBIV.hideSprite, preConditions.sprite, sprite);
+  sprite.hide();
+}
+
+// Shows a sprite. Does nothing if the sprite is already visible.
+Roygbiv.prototype.showSprite = function(sprite){
+  if (mode == 0){
+    return;
+  }
+  preConditions.checkIfDefined(ROYGBIV.showSprite, preConditions.sprite, sprite);
+  preConditions.checkIfSprite(ROYGBIV.showSprite, preConditions.sprite, sprite);
+  sprite.show();
 }
 
 // UTILITY FUNCTIONS ***********************************************************

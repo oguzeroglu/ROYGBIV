@@ -173,7 +173,16 @@ RaycasterWorker.prototype.update = function(transferableMessageBody){
         obj.reusableVector4.set(intersectableObjDescription[i + 14], intersectableObjDescription[i + 15], 0);
         obj.triangle1.set(obj.reusableVector1, obj.reusableVector3, obj.reusableVector2);
         obj.triangle2.set(obj.reusableVector3, obj.reusableVector4, obj.reusableVector2);
-        this.rayCaster.updateObject(obj, true);
+        if (!obj.isHidden){
+          this.rayCaster.updateObject(obj, true);
+        }
+        if (!obj.isHidden && intersectableObjDescription[i+1] < 0){
+          this.rayCaster.hide(obj);
+          obj.isHidden = true;
+        }else if (obj.isHidden && intersectableObjDescription[i+1] > 0){
+          this.rayCaster.show(obj);
+          obj.isHidden = false;
+        }
       }else{
         throw new Error("Not implemented.");
       }
