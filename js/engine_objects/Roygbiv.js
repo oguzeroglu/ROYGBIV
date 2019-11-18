@@ -2602,7 +2602,7 @@ Roygbiv.prototype.stopAnimation = function(object, animationName){
     return;
   }
   preConditions.checkIfDefined(ROYGBIV.stopAnimation, preConditions.object, object);
-  preConditions.checkIfAddedObjectObjectGroupAddedText(ROYGBIV.stopAnimation, preConditions.object, object);
+  preConditions.checkIfAddedObjectObjectGroupAddedTextSprite(ROYGBIV.stopAnimation, preConditions.object, object);
   preConditions.checkIfDefined(ROYGBIV.stopAnimation, preConditions.animationName, animationName);
   preConditions.checkIfAnimationExists(ROYGBIV.stopAnimation, object, animationName);
   preConditions.checkIfObjectInsideActiveScene(ROYGBIV.stopAnimation, object);
@@ -2618,11 +2618,11 @@ Roygbiv.prototype.freezeAnimationOnFinish = function(object, animationName){
   if (mode == 0){
     return;
   }
-  preConditions.checkIfDefined(ROYGBIV.unfreezeAnimation, preConditions.object, object);
-  preConditions.checkIfAddedObjectObjectGroupAddedText(ROYGBIV.stopAnimation, preConditions.object, object);
-  preConditions.checkIfDefined(ROYGBIV.stopAnimation, preConditions.animationName, animationName);
-  preConditions.checkIfAnimationExists(ROYGBIV.stopAnimation, object, animationName);
-  preConditions.checkIfObjectInsideActiveScene(ROYGBIV.stopAnimation, object);
+  preConditions.checkIfDefined(ROYGBIV.freezeAnimationOnFinish, preConditions.object, object);
+  preConditions.checkIfAddedObjectObjectGroupAddedTextSprite(ROYGBIV.freezeAnimationOnFinish, preConditions.object, object);
+  preConditions.checkIfDefined(ROYGBIV.freezeAnimationOnFinish, preConditions.animationName, animationName);
+  preConditions.checkIfAnimationExists(ROYGBIV.freezeAnimationOnFinish, object, animationName);
+  preConditions.checkIfObjectInsideActiveScene(ROYGBIV.freezeAnimationOnFinish, object);
   var animation = object.animations[animationName];
   animationHandler.freezeOnFinish(animation);
 }
@@ -2633,10 +2633,10 @@ Roygbiv.prototype.unfreezeAnimation = function(object, animationName){
     return;
   }
   preConditions.checkIfDefined(ROYGBIV.unfreezeAnimation, preConditions.object, object);
-  preConditions.checkIfAddedObjectObjectGroupAddedText(ROYGBIV.stopAnimation, preConditions.object, object);
-  preConditions.checkIfDefined(ROYGBIV.stopAnimation, preConditions.animationName, animationName);
-  preConditions.checkIfAnimationExists(ROYGBIV.stopAnimation, object, animationName);
-  preConditions.checkIfObjectInsideActiveScene(ROYGBIV.stopAnimation, object);
+  preConditions.checkIfAddedObjectObjectGroupAddedTextSprite(ROYGBIV.unfreezeAnimation, preConditions.object, object);
+  preConditions.checkIfDefined(ROYGBIV.unfreezeAnimation, preConditions.animationName, animationName);
+  preConditions.checkIfAnimationExists(ROYGBIV.unfreezeAnimation, object, animationName);
+  preConditions.checkIfObjectInsideActiveScene(ROYGBIV.unfreezeAnimation, object);
   var animation = object.animations[animationName];
   animationHandler.unfreeze(animation);
 }
@@ -2648,7 +2648,7 @@ Roygbiv.prototype.cancelAnimationRewind = function(object, animationName){
     return;
   }
   preConditions.checkIfDefined(ROYGBIV.cancelAnimationRewind, preConditions.object, object);
-  preConditions.checkIfAddedObjectObjectGroupAddedText(ROYGBIV.cancelAnimationRewind, preConditions.object, object);
+  preConditions.checkIfAddedObjectObjectGroupAddedTextSprite(ROYGBIV.cancelAnimationRewind, preConditions.object, object);
   preConditions.checkIfDefined(ROYGBIV.cancelAnimationRewind, preConditions.animationName, animationName);
   preConditions.checkIfAnimationExists(ROYGBIV.cancelAnimationRewind, object, animationName);
   preConditions.checkIfObjectInsideActiveScene(ROYGBIV.cancelAnimationRewind, object);
@@ -2663,7 +2663,7 @@ Roygbiv.prototype.rewindAnimation = function(object, animationName){
     return;
   }
   preConditions.checkIfDefined(ROYGBIV.rewindAnimation, preConditions.object, object);
-  preConditions.checkIfAddedObjectObjectGroupAddedText(ROYGBIV.rewindAnimation, preConditions.object, object);
+  preConditions.checkIfAddedObjectObjectGroupAddedTextSprite(ROYGBIV.rewindAnimation, preConditions.object, object);
   preConditions.checkIfDefined(ROYGBIV.rewindAnimation, preConditions.animationName, animationName);
   preConditions.checkIfAnimationExists(ROYGBIV.rewindAnimation, object, animationName);
   preConditions.checkIfObjectInsideActiveScene(ROYGBIV.rewindAnimation, object);
