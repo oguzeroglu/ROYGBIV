@@ -117,10 +117,12 @@ RayCaster.prototype.issueUpdate = function(obj){
 
 RayCaster.prototype.findIntersections = function(from, direction, intersectGridSystems, callbackFunction, clientX, clientY){
   intersectionPoint = 0, intersectionObject = 0;
-  objectPicker2D.find(clientX, clientY);
-  if (intersectionPoint){
-    callbackFunction();
-    return;
+  if (!IS_WORKER_CONTEXT){
+    objectPicker2D.find(clientX, clientY);
+    if (intersectionPoint){
+      callbackFunction();
+      return;
+    }
   }
   this.origin.copy(from);
   this.direction.copy(direction);

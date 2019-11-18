@@ -262,7 +262,7 @@ RaycasterWorker.prototype.update = function(transferableMessageBody){
     for (var i = 0; i<intersectionTestDescription.length; i+= 11){
       if (intersectionTestDescription[i] >= 0){
         var test2D = intersectionTestDescription[i + 8] > 0;
-        if (test2D){
+        if (test2D && !(mode == 0 && keyboardBuffer["Shift"])){
           objectPicker2D.find(intersectionTestDescription[i + 9], intersectionTestDescription[i + 10]);
         }
         if (!intersectionPoint){
