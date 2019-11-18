@@ -55,6 +55,7 @@ StateLoaderLightweight.prototype.loadBoundingBoxes = function(){
   var addedObjectExports = this.state.addedObjects;
   var childAddedObjectExports = this.state.childAddedObjects;
   var objectGroupExports = this.state.objectGroups;
+  var spriteExports = this.state.sprites;
   var addedTextExports = new Object();
   for (var key in this.state.addedTexts3D){
     addedTextExports[key] = this.state.addedTexts3D[key];
@@ -221,6 +222,20 @@ StateLoaderLightweight.prototype.loadBoundingBoxes = function(){
       }
     }
     addedTexts[textName] = addedText;
+  }
+  for (var spriteName in spriteExports){
+    sprites[spriteName] = new Sprite(spriteName);
+    sprites[spriteName].rectangle = new Rectangle(0, 0, 0, 0).set(
+      spriteExports[spriteName].x, spriteExports[spriteName].y,
+      spriteExports[spriteName].finalX, spriteExports[spriteName].finalY,
+      spriteExports[spriteName].width, spriteExports[spriteName].heigth
+    );
+    sprites[spriteName].triangle1.set(spriteExports[spriteName].triangle1.a, spriteExports[spriteName].triangle1.b, spriteExports[spriteName].triangle1.c);
+    sprites[spriteName].triangle2.set(spriteExports[spriteName].triangle2.a, spriteExports[spriteName].triangle2.b, spriteExports[spriteName].triangle2.c);
+    sprites[spriteName].isClickable = spriteExports[spriteName].clickable;
+    if (sprites[spriteName].isClickable){
+      clickableSprites[spriteName] = sprites[spriteName];
+    }
   }
 }
 
@@ -391,6 +406,10 @@ StateLoaderLightweight.prototype.reset = function(){
   objectGroups = new Object();
   gridSystems = new Object();
   addedTexts = new Object();
+  addedTexts2D = new Object();
+  clickableAddedTexts2D = new Object();
+  clickableSprites = new Object();
+  sprites = new Object();
   particleSystemPool = new Object();
   particleSystems = new Map();
   particlesWithCollisionCallbacks = new Object();

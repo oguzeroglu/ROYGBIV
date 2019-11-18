@@ -104,6 +104,7 @@ StateLoader.prototype.finalize = function(){
   this.importHandler.importObjectGroups(this.stateObj);
   this.importHandler.importFog(this.stateObj);
   this.importHandler.importCrosshairs(this.stateObj);
+  this.importHandler.importSprites(this.stateObj);
   this.importHandler.importScenes(this.stateObj);
 
   this.closePhysicsWorkerIfNotUsed();
@@ -139,6 +140,15 @@ StateLoader.prototype.closeRaycasterWorkerIfNotUsed = function(){
         if (!text.is2D && text.isClickable){
           hasRaycasting = true;
           break;
+        }
+      }
+      if (!hasRaycasting){
+        for (var spriteName in sprites){
+          var sprite = sprites[spriteName];
+          if (sprite.isClickable){
+            hasRaycasting = true;
+            break;
+          }
         }
       }
     }
@@ -191,6 +201,9 @@ StateLoader.prototype.resetProject = function(){
   for (var textName in addedTexts){
     addedTexts[textName].destroy();
   }
+  for (var spriteName in sprites){
+    sprites[spriteName].destroy();
+  }
   skyboxHandler.reset();
   collisionCallbackRequests = new Map();
   particleCollisionCallbackRequests = new Object();
@@ -222,6 +235,7 @@ StateLoader.prototype.resetProject = function(){
   addedTexts2D = new Object();
   clickableAddedTexts = new Object();
   clickableAddedTexts2D = new Object();
+  clickableSprites = new Object();
   physicsTests = new Object();
   wallCollections = new Object();
   texturePacks = new Object();
@@ -239,6 +253,8 @@ StateLoader.prototype.resetProject = function(){
   preConfiguredParticleSystemPools = new Object();
   muzzleFlashes = new Object();
   lightnings = new Object();
+  sprites = new Object();
+  clickableSprites = new Object();
   webglCallbackHandler = new WebGLCallbackHandler();
   textureAtlasHandler.dispose();
   textureAtlasHandler = new TextureAtlasHandler();
@@ -261,6 +277,7 @@ StateLoader.prototype.resetProject = function(){
   dynamicObjectGroups = new Map();
   trackingObjects = new Object();
   screenResolution = 1;
+  draggingSprite = false;
   renderer.setPixelRatio(screenResolution);
   fogConfigurationsVisible = false;
   stopAreaConfigurationsHandler = false;

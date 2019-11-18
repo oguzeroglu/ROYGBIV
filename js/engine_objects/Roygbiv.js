@@ -16,6 +16,7 @@
 //  * Animation functions
 //  * Muzzleflash functions
 //  * Lightning functions
+//  * Sprıte functions
 //  * Script related functions
 var Roygbiv = function(){
   this.functionNames = [
@@ -192,7 +193,25 @@ var Roygbiv = function(){
     "onAreaEnter",
     "onAreaExit",
     "removeAreaEnterListener",
-    "removeAreaExitListener"
+    "removeAreaExitListener",
+    "getSprite",
+    "onSpriteClick",
+    "removeSpriteClickListener",
+    "onSpriteMouseOver",
+    "removeSpriteMouseOverListener",
+    "onSpriteMouseOut",
+    "removeSpriteMouseOutListener",
+    "onSpriteDragStart",
+    "onSpriteDragStop",
+    "onSpriteDragging",
+    "removeSpriteDragStartListener",
+    "removeSpriteDragStopListener",
+    "removeSpriteDraggingListener",
+    "areSpritesIntersected",
+    "setSpriteColor",
+    "setSpriteAlpha",
+    "hideSprite",
+    "showSprite"
   ];
 
   this.globals = new Object();
@@ -565,6 +584,20 @@ Roygbiv.prototype.getLightning = function(lightningName){
   if (lightning){
     preConditions.checkIfLightningInsideActiveScene(ROYGBIV.getLightning, lightning);
     return lightning;
+  }
+  return 0;
+}
+
+// Returns a sprite object or 0 if sprite does not exist.
+Roygbiv.prototype.getSprite = function(spriteName){
+  if (mode == 0){
+    return;
+  }
+  preConditions.checkIfDefined(ROYGBIV.getSprite, preConditions.spriteName, spriteName);
+  var sprite = sprites[spriteName];
+  if (sprite){
+    preConditions.checkIfSpriteInsideActiveScene(ROYGBIV.getSprite, sprite);
+    return sprite;
   }
   return 0;
 }
@@ -1990,6 +2023,61 @@ Roygbiv.prototype.removeAreaExitListener = function(areaName){
   delete areaExitCallbacks[areaName];
 }
 
+// Sets a sprite click listener. The callbackFunction is executed when the
+// sprite is clicked.
+Roygbiv.prototype.onSpriteClick = function(sprite, callbackFunction){
+  if (mode == 0){
+    return;
+  }
+  preConditions.checkIfDefined(ROYGBIV.onSpriteClick, preConditions.sprite, sprite);
+  preConditions.checkIfSprite(ROYGBIV.onSpriteClick, preConditions.sprite, sprite);
+  preConditions.checkIfSpriteClickable(ROYGBIV.onSpriteClick, sprite);
+  preConditions.checkIfSpriteInsideActiveScene(ROYGBIV.onSpriteClick, sprite);
+  preConditions.checkIfDefined(ROYGBIV.onSpriteClick, preConditions.callbackFunction, callbackFunction);
+  preConditions.checkIfFunctionOnlyIfExists(ROYGBIV.onSpriteClick, preConditions.callbackFunction, callbackFunction);
+  sprite.onClickCallback = callbackFunction;
+  objectsWithOnClickListeners.set(sprite.name, sprite);
+}
+
+// Removes the click listener of a sprite object.
+Roygbiv.prototype.removeSpriteClickListener = function(sprite){
+  if (mode == 0){
+    return;
+  }
+  preConditions.checkIfDefined(ROYGBIV.removeSpriteClickListener, preConditions.sprite, sprite);
+  preConditions.checkIfSprite(ROYGBIV.removeSpriteClickListener, preConditions.sprite, sprite);
+  preConditions.checkIfSpriteInsideActiveScene(ROYGBIV.removeSpriteClickListener, sprite);
+  sprite.onClickCallback = noop;
+  objectsWithOnClickListeners.delete(sprite.name);
+}
+
+// Sets a mouse over listener for a sprite.
+Roygbiv.prototype.onSpriteMouseOver = function(sprite, callbackFunction){
+  if (mode == 0){
+    return;
+  }
+  preConditions.checkIfDefined(ROYGBIV.onSpriteMouseOver, preConditions.sprite, sprite);
+  preConditions.checkIfSprite(ROYGBIV.onSpriteMouseOver, preConditions.sprite, sprite);
+  preConditions.checkIfSpriteClickable(ROYGBIV.onSpriteMouseOver, sprite);
+  preConditions.checkIfDefined(ROYGBIV.onSpriteMouseOver, preConditions.callbackFunction, callbackFunction);
+  preConditions.checkIfFunctionOnlyIfExists(ROYGBIV.onSpriteMouseOver, preConditions.callbackFunction, callbackFunction);
+  preConditions.checkIfSpriteInsideActiveScene(ROYGBIV.onSpriteMouseOver, sprite);
+  sprite.mouseOverCallbackFunction = callbackFunction;
+  objectsWithMouseOverListeners.set(sprite.name, sprite);
+}
+
+// Removes the mouseover listener of a sprite.
+Roygbiv.prototype.removeSpriteMouseOverListener = function(sprite){
+  if (mode == 0){
+    return;
+  }
+  preConditions.checkIfDefined(ROYGBIV.removeSpriteMouseOverListener, preConditions.sprite, sprite);
+  preConditions.checkIfSprite(ROYGBIV.removeSpriteMouseOverListener, preConditions.sprite, sprite);
+  preConditions.checkIfSpriteInsideActiveScene(ROYGBIV.removeSpriteMouseOverListener, sprite);
+  delete sprite.mouseOverCallbackFunction;
+  objectsWithMouseOverListeners.delete(sprite.name);
+}
+
 // TEXT FUNCTIONS **************************************************************
 
 // Sets a text to a text object.
@@ -2122,6 +2210,114 @@ Roygbiv.prototype.showText = function(text){
   if (!text.mesh.visible){
     text.show();
   }
+}
+
+// Sets a mouseout listener for a sprite.
+Roygbiv.prototype.onSpriteMouseOut = function(sprite, callbackFunction){
+  if (mode == 0){
+    return;
+  }
+  preConditions.checkIfDefined(ROYGBIV.onSpriteMouseOut, preConditions.sprite, sprite);
+  preConditions.checkIfSprite(ROYGBIV.onSpriteMouseOut, preConditions.sprite, sprite);
+  preConditions.checkIfSpriteClickable(ROYGBIV.onSpriteMouseOut, sprite);
+  preConditions.checkIfDefined(ROYGBIV.onSpriteMouseOut, preConditions.callbackFunction, callbackFunction);
+  preConditions.checkIfFunctionOnlyIfExists(ROYGBIV.onSpriteMouseOut, preConditions.callbackFunction, callbackFunction);
+  preConditions.checkIfSpriteInsideActiveScene(ROYGBIV.onSpriteMouseOut, sprite);
+  sprite.mouseOutCallbackFunction = callbackFunction;
+  objectsWithMouseOutListeners.set(sprite.name, sprite);
+}
+
+// Removes the mouseout listener of a sprite.
+Roygbiv.prototype.removeSpriteMouseOutListener = function(sprite){
+  if (mode == 0){
+    return;
+  }
+  preConditions.checkIfDefined(ROYGBIV.removeSpriteMouseOutListener, preConditions.sprite, sprite);
+  preConditions.checkIfSprite(ROYGBIV.removeSpriteMouseOutListener, preConditions.sprite, sprite);
+  preConditions.checkIfSpriteInsideActiveScene(ROYGBIV.removeSpriteMouseOutListener, sprite);
+  delete sprite.mouseOutCallbackFunction;
+  objectsWithMouseOutListeners.delete(sprite.name);
+}
+
+// Sets a drag start listener for a sprite. The callbackFunction is executed
+// when a drag is initiated on a draggable sprite (mousedown/touchstart).
+Roygbiv.prototype.onSpriteDragStart = function(sprite, callbackFunction){
+  if (mode == 0){
+    return;
+  }
+  preConditions.checkIfDefined(ROYGBIV.onSpriteDragStart, preConditions.sprite, sprite);
+  preConditions.checkIfSprite(ROYGBIV.onSpriteDragStart, preConditions.sprite, sprite);
+  preConditions.checkIfSpriteInsideActiveScene(ROYGBIV.onSpriteDragStart, sprite);
+  preConditions.checkIfDefined(ROYGBIV.onSpriteDragStart, preConditions.callbackFunction, callbackFunction);
+  preConditions.checkIfFunctionOnlyIfExists(ROYGBIV.onSpriteDragStart, preConditions.callbackFunction, callbackFunction);
+  preConditions.checkIfSpriteDraggable(ROYGBIV.onSpriteDragStart, sprite);
+  sprite.dragStartCallback = callbackFunction;
+}
+
+// Sets a drag stop listener for a sprite. The callbackFunction is executed
+// when a user stops dragging a sprite (mouseup/touchend).
+Roygbiv.prototype.onSpriteDragStop = function(sprite, callbackFunction){
+  if (mode == 0){
+    return;
+  }
+  preConditions.checkIfDefined(ROYGBIV.onSpriteDragStop, preConditions.sprite, sprite);
+  preConditions.checkIfSprite(ROYGBIV.onSpriteDragStop, preConditions.sprite, sprite);
+  preConditions.checkIfSpriteInsideActiveScene(ROYGBIV.onSpriteDragStop, sprite);
+  preConditions.checkIfDefined(ROYGBIV.onSpriteDragStop, preConditions.callbackFunction, callbackFunction);
+  preConditions.checkIfFunctionOnlyIfExists(ROYGBIV.onSpriteDragStop, preConditions.callbackFunction, callbackFunction);
+  preConditions.checkIfSpriteDraggable(ROYGBIV.onSpriteDragStop, sprite);
+  sprite.dragStopCallback = callbackFunction;
+}
+
+// Sets a dragging listener for a sprite. The callbackFunction is executed
+// each time a sprite is relocated while being dragged.
+Roygbiv.prototype.onSpriteDragging = function(sprite, callbackFunction){
+  if (mode == 0){
+    return;
+  }
+  preConditions.checkIfDefined(ROYGBIV.onSpriteDragging, preConditions.sprite, sprite);
+  preConditions.checkIfSprite(ROYGBIV.onSpriteDragging, preConditions.sprite, sprite);
+  preConditions.checkIfSpriteInsideActiveScene(ROYGBIV.onSpriteDragging, sprite);
+  preConditions.checkIfDefined(ROYGBIV.onSpriteDragging, preConditions.callbackFunction, callbackFunction);
+  preConditions.checkIfFunctionOnlyIfExists(ROYGBIV.onSpriteDragging, preConditions.callbackFunction, callbackFunction);
+  preConditions.checkIfSpriteDraggable(ROYGBIV.onSpriteDragging, sprite);
+  sprite.draggingCallback = callbackFunction;
+}
+
+// Removes the drag start listener of a sprite.
+Roygbiv.prototype.removeSpriteDragStartListener = function(sprite){
+  if (mode == 0){
+    return;
+  }
+  preConditions.checkIfDefined(ROYGBIV.removeSpriteDragStartListener, preConditions.sprite, sprite);
+  preConditions.checkIfSprite(ROYGBIV.removeSpriteDragStartListener, preConditions.sprite, sprite);
+  preConditions.checkIfSpriteInsideActiveScene(ROYGBIV.removeSpriteDragStartListener, sprite);
+  preConditions.checkIfSpriteDraggable(ROYGBIV.removeSpriteDragStartListener, sprite);
+  sprite.dragStartCallback = noop;
+}
+
+// Removes the drag stop listener of a sprite.
+Roygbiv.prototype.removeSpriteDragStopListener = function(sprite){
+  if (mode == 0){
+    return;
+  }
+  preConditions.checkIfDefined(ROYGBIV.removeSpriteDragStopListener, preConditions.sprite, sprite);
+  preConditions.checkIfSprite(ROYGBIV.removeSpriteDragStopListener, preConditions.sprite, sprite);
+  preConditions.checkIfSpriteInsideActiveScene(ROYGBIV.removeSpriteDragStopListener, sprite);
+  preConditions.checkIfSpriteDraggable(ROYGBIV.removeSpriteDragStopListener, sprite);
+  sprite.dragStopCallback = noop;
+}
+
+// Removes the dragging listener of a sprite.
+Roygbiv.prototype.removeSpriteDraggingListener = function(sprite){
+  if (mode == 0){
+    return;
+  }
+  preConditions.checkIfDefined(ROYGBIV.removeSpriteDraggingListener, preConditions.sprite, sprite);
+  preConditions.checkIfSprite(ROYGBIV.removeSpriteDraggingListener, preConditions.sprite, sprite);
+  preConditions.checkIfSpriteInsideActiveScene(ROYGBIV.removeSpriteDraggingListener, sprite);
+  preConditions.checkIfSpriteDraggable(ROYGBIV.removeSpriteDraggingListener, sprite);
+  sprite.draggingCallback = noop;
 }
 
 // CONTROL FUNCTIONS ***********************************************************
@@ -2387,13 +2583,13 @@ Roygbiv.prototype.createOrbitControl = function(parameters){
 
 // ANIMATION FUNCTIONS *********************************************************
 
-// Starts an animation of given object, object group or text.
+// Starts an animation of given object, object group, text or sprite.
 Roygbiv.prototype.startAnimation = function(object, animationName){
   if (mode == 0){
     return;
   }
   preConditions.checkIfDefined(ROYGBIV.startAnimation, preConditions.object, object);
-  preConditions.checkIfAddedObjectObjectGroupAddedText(ROYGBIV.startAnimation, preConditions.object, object);
+  preConditions.checkIfAddedObjectObjectGroupAddedTextSprite(ROYGBIV.startAnimation, preConditions.object, object);
   preConditions.checkIfDefined(ROYGBIV.startAnimation, preConditions.animationName, animationName);
   preConditions.checkIfAnimationExists(ROYGBIV.startAnimation, object, animationName);
   preConditions.checkIfObjectInsideActiveScene(ROYGBIV.startAnimation, object);
@@ -2408,7 +2604,7 @@ Roygbiv.prototype.stopAnimation = function(object, animationName){
     return;
   }
   preConditions.checkIfDefined(ROYGBIV.stopAnimation, preConditions.object, object);
-  preConditions.checkIfAddedObjectObjectGroupAddedText(ROYGBIV.stopAnimation, preConditions.object, object);
+  preConditions.checkIfAddedObjectObjectGroupAddedTextSprite(ROYGBIV.stopAnimation, preConditions.object, object);
   preConditions.checkIfDefined(ROYGBIV.stopAnimation, preConditions.animationName, animationName);
   preConditions.checkIfAnimationExists(ROYGBIV.stopAnimation, object, animationName);
   preConditions.checkIfObjectInsideActiveScene(ROYGBIV.stopAnimation, object);
@@ -2424,11 +2620,11 @@ Roygbiv.prototype.freezeAnimationOnFinish = function(object, animationName){
   if (mode == 0){
     return;
   }
-  preConditions.checkIfDefined(ROYGBIV.unfreezeAnimation, preConditions.object, object);
-  preConditions.checkIfAddedObjectObjectGroupAddedText(ROYGBIV.stopAnimation, preConditions.object, object);
-  preConditions.checkIfDefined(ROYGBIV.stopAnimation, preConditions.animationName, animationName);
-  preConditions.checkIfAnimationExists(ROYGBIV.stopAnimation, object, animationName);
-  preConditions.checkIfObjectInsideActiveScene(ROYGBIV.stopAnimation, object);
+  preConditions.checkIfDefined(ROYGBIV.freezeAnimationOnFinish, preConditions.object, object);
+  preConditions.checkIfAddedObjectObjectGroupAddedTextSprite(ROYGBIV.freezeAnimationOnFinish, preConditions.object, object);
+  preConditions.checkIfDefined(ROYGBIV.freezeAnimationOnFinish, preConditions.animationName, animationName);
+  preConditions.checkIfAnimationExists(ROYGBIV.freezeAnimationOnFinish, object, animationName);
+  preConditions.checkIfObjectInsideActiveScene(ROYGBIV.freezeAnimationOnFinish, object);
   var animation = object.animations[animationName];
   animationHandler.freezeOnFinish(animation);
 }
@@ -2439,10 +2635,10 @@ Roygbiv.prototype.unfreezeAnimation = function(object, animationName){
     return;
   }
   preConditions.checkIfDefined(ROYGBIV.unfreezeAnimation, preConditions.object, object);
-  preConditions.checkIfAddedObjectObjectGroupAddedText(ROYGBIV.stopAnimation, preConditions.object, object);
-  preConditions.checkIfDefined(ROYGBIV.stopAnimation, preConditions.animationName, animationName);
-  preConditions.checkIfAnimationExists(ROYGBIV.stopAnimation, object, animationName);
-  preConditions.checkIfObjectInsideActiveScene(ROYGBIV.stopAnimation, object);
+  preConditions.checkIfAddedObjectObjectGroupAddedTextSprite(ROYGBIV.unfreezeAnimation, preConditions.object, object);
+  preConditions.checkIfDefined(ROYGBIV.unfreezeAnimation, preConditions.animationName, animationName);
+  preConditions.checkIfAnimationExists(ROYGBIV.unfreezeAnimation, object, animationName);
+  preConditions.checkIfObjectInsideActiveScene(ROYGBIV.unfreezeAnimation, object);
   var animation = object.animations[animationName];
   animationHandler.unfreeze(animation);
 }
@@ -2454,7 +2650,7 @@ Roygbiv.prototype.cancelAnimationRewind = function(object, animationName){
     return;
   }
   preConditions.checkIfDefined(ROYGBIV.cancelAnimationRewind, preConditions.object, object);
-  preConditions.checkIfAddedObjectObjectGroupAddedText(ROYGBIV.cancelAnimationRewind, preConditions.object, object);
+  preConditions.checkIfAddedObjectObjectGroupAddedTextSprite(ROYGBIV.cancelAnimationRewind, preConditions.object, object);
   preConditions.checkIfDefined(ROYGBIV.cancelAnimationRewind, preConditions.animationName, animationName);
   preConditions.checkIfAnimationExists(ROYGBIV.cancelAnimationRewind, object, animationName);
   preConditions.checkIfObjectInsideActiveScene(ROYGBIV.cancelAnimationRewind, object);
@@ -2469,7 +2665,7 @@ Roygbiv.prototype.rewindAnimation = function(object, animationName){
     return;
   }
   preConditions.checkIfDefined(ROYGBIV.rewindAnimation, preConditions.object, object);
-  preConditions.checkIfAddedObjectObjectGroupAddedText(ROYGBIV.rewindAnimation, preConditions.object, object);
+  preConditions.checkIfAddedObjectObjectGroupAddedTextSprite(ROYGBIV.rewindAnimation, preConditions.object, object);
   preConditions.checkIfDefined(ROYGBIV.rewindAnimation, preConditions.animationName, animationName);
   preConditions.checkIfAnimationExists(ROYGBIV.rewindAnimation, object, animationName);
   preConditions.checkIfObjectInsideActiveScene(ROYGBIV.rewindAnimation, object);
@@ -2564,6 +2760,64 @@ Roygbiv.prototype.stopLightning = function(lightning){
   preConditions.checkIfLightning(ROYGBIV.stopLightning, lightning);
   preConditions.checkIfLightningInsideActiveScene(ROYGBIV.stopLightning, lightning);
   lightning.stop();
+}
+
+// SPRITE FUNCTIONS ************************************************************
+
+// Returns if two sprites are intersected.
+Roygbiv.prototype.areSpritesIntersected = function(sprite1, sprite2){
+  if (mode == 0){
+    return;
+  }
+  preConditions.checkIfDefined(ROYGBIV.areSpritesIntersected, preConditions.sprite1, sprite1);
+  preConditions.checkIfDefined(ROYGBIV.areSpritesIntersected, preConditions.sprite2, sprite2);
+  preConditions.checkIfSprite(ROYGBIV.areSpritesIntersected, preConditions.sprite1, sprite1);
+  preConditions.checkIfSprite(ROYGBIV.areSpritesIntersected, preConditions.sprite2, sprite2);
+  return sprite1.intersectionTest(sprite2);
+}
+
+// Sets the color of a sprite.
+Roygbiv.prototype.setSpriteColor = function(sprite, colorName){
+  if (mode == 0){
+    return;
+  }
+  preConditions.checkIfDefined(ROYGBIV.setSpriteColor, preConditions.sprite, sprite);
+  preConditions.checkIfSprite(ROYGBIV.setSpriteColor, preConditions.sprite, sprite);
+  preConditions.checkIfDefined(ROYGBIV.setSpriteColor, preConditions.colorName, colorName);
+  preConditions.checkIfString(ROYGBIV.setSpriteColor, preConditions.colorName, colorName);
+  sprite.setColor(colorName);
+}
+
+// Sets the alpha of a sprite.
+Roygbiv.prototype.setSpriteAlpha = function(sprite, alpha){
+  if (mode == 0){
+    return;
+  }
+  preConditions.checkIfDefined(ROYGBIV.setSpriteAlpha, preConditions.sprite, sprite);
+  preConditions.checkIfSprite(ROYGBIV.setSpriteAlpha, preConditions.sprite, sprite);
+  preConditions.checkIfDefined(ROYGBIV.setSpriteAlpha, preConditions.alpha, alpha);
+  preConditions.checkIfNumber(ROYGBIV.setSpriteAlpha, preConditions.alpha, alpha);
+  sprite.setAlpha(alpha);
+}
+
+// Hides a sprite. Does nothing if the sprite is already hidden.
+Roygbiv.prototype.hideSprite = function(sprite){
+  if (mode == 0){
+    return;
+  }
+  preConditions.checkIfDefined(ROYGBIV.hideSprite, preConditions.sprite, sprite);
+  preConditions.checkIfSprite(ROYGBIV.hideSprite, preConditions.sprite, sprite);
+  sprite.hide();
+}
+
+// Shows a sprite. Does nothing if the sprite is already visible.
+Roygbiv.prototype.showSprite = function(sprite){
+  if (mode == 0){
+    return;
+  }
+  preConditions.checkIfDefined(ROYGBIV.showSprite, preConditions.sprite, sprite);
+  preConditions.checkIfSprite(ROYGBIV.showSprite, preConditions.sprite, sprite);
+  sprite.show();
 }
 
 // UTILITY FUNCTIONS ***********************************************************

@@ -26,6 +26,11 @@ var AnimationHandler = function(){
       TRANSPARENCY: "TEXT_TRANSPARENCY", CHAR_SIZE: "TEXT_CHAR_SIZE", MARGIN_BETWEEN_CHARS: "TEXT_MARGIN_BETWEEN_CHARS",
       MARGIN_BETWEEN_LINES: "TEXT_MARGIN_BETWEEN_LINES", POSITION_X: "TEXT_POSITION_X", POSITION_Y: "TEXT_POSITION_Y",
       POSITION_Z: "TEXT_POSITION_Z", TEXT_COLOR: "TEXT_TEXT_COLOR", BACKGROUND_COLOR: "TEXT_BACKGROUND_COLOR", TYPING: "TEXT_TYPING"
+    },
+    SPRITE: {
+      TRANSPARENCY: "SPRITE_TRANSPARENCY", SCALE_X: "SPRITE_SCALE_X", SCALE_Y: "SPRITE_SCALE_Y", ROTATION: "SPRITE_ROTATION",
+      COLOR: "SPRITE_COLOR", POSITION_X: "SPRITE_POSITION_X", POSITION_Y: "SPRITE_POSITION_Y", TARGET_POSITION_X: "SPRITE_TARGET_POSITION_X",
+      TARGET_POSITION_Y: "SPRITE_TARGET_POSITION_Y", TARGET_ROTATION: "SPRITE_TARGET_ROTATION"
     }
   };
   // INITIAL VALUE GETTERS
@@ -135,6 +140,36 @@ var AnimationHandler = function(){
   this.initialValueGetterFunctionsByType[this.actionTypes.TEXT.TYPING] = function(object){
     return 0;
   };
+  this.initialValueGetterFunctionsByType[this.actionTypes.SPRITE.TRANSPARENCY] = function(object){
+    return object.mesh.material.uniforms.alpha.value;
+  };
+  this.initialValueGetterFunctionsByType[this.actionTypes.SPRITE.SCALE_X] = function(object){
+    return object.mesh.material.uniforms.scale.value.x;
+  };
+  this.initialValueGetterFunctionsByType[this.actionTypes.SPRITE.SCALE_Y] = function(object){
+    return object.mesh.material.uniforms.scale.value.y;
+  }
+  this.initialValueGetterFunctionsByType[this.actionTypes.SPRITE.ROTATION] = function(object){
+    return object.mesh.material.uniforms.rotationAngle.value;
+  }
+  this.initialValueGetterFunctionsByType[this.actionTypes.SPRITE.COLOR] = function(object){
+    return 0;
+  }
+  this.initialValueGetterFunctionsByType[this.actionTypes.SPRITE.POSITION_X] = function(object){
+    return object.marginPercentX;
+  }
+  this.initialValueGetterFunctionsByType[this.actionTypes.SPRITE.POSITION_Y] = function(object){
+    return object.marginPercentY;
+  }
+  this.initialValueGetterFunctionsByType[this.actionTypes.SPRITE.TARGET_POSITION_X] = function(object){
+    return 0;
+  }
+  this.initialValueGetterFunctionsByType[this.actionTypes.SPRITE.TARGET_POSITION_Y] = function(object){
+    return 0;
+  }
+  this.initialValueGetterFunctionsByType[this.actionTypes.SPRITE.TARGET_ROTATION] = function(object){
+    return 0;
+  }
   // AFTER ANIMATION SETTER FUNCTIONS
   this.afterAnimationSettersByType = new Object();
   this.afterAnimationSettersByType[this.actionTypes.OBJECT.TRANSPARENCY] = function(animation){
@@ -317,6 +352,41 @@ var AnimationHandler = function(){
   this.afterAnimationSettersByType[this.actionTypes.TEXT.TYPING] = function(animation){
     animation.attachedObject.setText(animation.params.sourceText, false);
   }
+  this.afterAnimationSettersByType[this.actionTypes.SPRITE.TRANSPARENCY] = function(animation){
+    animation.attachedObject.mesh.material.uniforms.alpha.value = animation.initialValue;
+    if (animation.initialValue >= 1){
+      animation.attachedObject.mesh.material.transparent = false;
+    }else{
+      animation.attachedObject.mesh.material.transparent = true;
+    }
+  }
+  this.afterAnimationSettersByType[this.actionTypes.SPRITE.SCALE_X] = function(animation){
+    animation.attachedObject.setScale(animation.initialValue, animation.attachedObject.mesh.material.uniforms.scale.value.y);
+  }
+  this.afterAnimationSettersByType[this.actionTypes.SPRITE.SCALE_Y] = function(animation){
+    animation.attachedObject.setScale(animation.attachedObject.mesh.material.uniforms.scale.value.x, animation.initialValue);
+  }
+  this.afterAnimationSettersByType[this.actionTypes.SPRITE.ROTATION] = function(animation){
+    animation.attachedObject.setRotation(animation.initialValue);
+  }
+  this.afterAnimationSettersByType[this.actionTypes.SPRITE.COLOR] = function(animation){
+    animation.attachedObject.setColor(animation.params.sourceColor.getHex());
+  }
+  this.afterAnimationSettersByType[this.actionTypes.SPRITE.POSITION_X] = function(animation){
+    animation.attachedObject.set2DCoordinates(animation.initialValue, animation.attachedObject.marginPercentY);
+  }
+  this.afterAnimationSettersByType[this.actionTypes.SPRITE.POSITION_Y] = function(animation){
+    animation.attachedObject.set2DCoordinates(animation.attachedObject.marginPercentX, animation.initialValue);
+  }
+  this.afterAnimationSettersByType[this.actionTypes.SPRITE.TARGET_POSITION_X] = function(animation){
+    animation.attachedObject.set2DCoordinates(animation.params.sourcePosition, animation.attachedObject.marginPercentY);
+  }
+  this.afterAnimationSettersByType[this.actionTypes.SPRITE.TARGET_POSITION_Y] = function(animation){
+    animation.attachedObject.set2DCoordinates(animation.attachedObject.marginPercentX, animation.params.sourcePosition);
+  }
+  this.afterAnimationSettersByType[this.actionTypes.SPRITE.TARGET_ROTATION] = function(animation){
+    animation.attachedObject.setRotation(animation.params.sourceRotation);
+  }
   // ACTION FUNCTIONS **********************************************
   this.actionFunctionsByType = new Object();
   this.actionFunctionsByType[this.actionTypes.OBJECT.TRANSPARENCY] = this.updateObjectTransparencyFunc;
@@ -348,6 +418,16 @@ var AnimationHandler = function(){
   this.actionFunctionsByType[this.actionTypes.TEXT.TEXT_COLOR] = this.updateTextColorFunc;
   this.actionFunctionsByType[this.actionTypes.TEXT.BACKGROUND_COLOR] = this.updateTextBackgroundColorFunc;
   this.actionFunctionsByType[this.actionTypes.TEXT.TYPING] = this.updateTextTypingFunc;
+  this.actionFunctionsByType[this.actionTypes.SPRITE.TRANSPARENCY] = this.updateSpriteTransparencyFunc;
+  this.actionFunctionsByType[this.actionTypes.SPRITE.SCALE_X] = this.updateSpriteScaleXFunc;
+  this.actionFunctionsByType[this.actionTypes.SPRITE.SCALE_Y] = this.updateSpriteScaleYFunc;
+  this.actionFunctionsByType[this.actionTypes.SPRITE.ROTATION] = this.updateSpriteRotationFunc;
+  this.actionFunctionsByType[this.actionTypes.SPRITE.COLOR] = this.updateSpriteColorFunc;
+  this.actionFunctionsByType[this.actionTypes.SPRITE.POSITION_X] = this.updateSpritePositionXFunc;
+  this.actionFunctionsByType[this.actionTypes.SPRITE.POSITION_Y] = this.updateSpritePositionYFunc;
+  this.actionFunctionsByType[this.actionTypes.SPRITE.TARGET_POSITION_X] = this.updateSpriteTargetPositionXFunc;
+  this.actionFunctionsByType[this.actionTypes.SPRITE.TARGET_POSITION_Y] = this.updatespriteTargetPositionYFunc;
+  this.actionFunctionsByType[this.actionTypes.SPRITE.TARGET_ROTATION] = this.updateSpriteTargetRotationFunc;
   // UPDATE FUNCTIONS **********************************************
   this.updateFunctionsByType = new Object();
   this.updateFunctionsByType[this.animationTypes.LINEAR] = this.linearFunc;
@@ -674,6 +754,45 @@ AnimationHandler.prototype.updateTextBackgroundColorFunc = function(params){
 }
 AnimationHandler.prototype.updateTextTypingFunc = function(params){
   params.object.firstNChars(params.sourceText, params.value);
+}
+AnimationHandler.prototype.updateSpriteTransparencyFunc = function(params){
+  params.object.mesh.material.uniforms.alpha.value = params.value;
+  if (params.value >= 1){
+    params.object.mesh.material.transparent = false;
+  }else{
+    params.object.mesh.material.transparent = true;
+  }
+}
+AnimationHandler.prototype.updateSpriteScaleXFunc = function(params){
+  params.object.setScale(params.value, params.object.mesh.material.uniforms.scale.value.y);
+}
+AnimationHandler.prototype.updateSpriteScaleYFunc = function(params){
+  params.object.setScale(params.object.mesh.material.uniforms.scale.value.x, params.value);
+}
+AnimationHandler.prototype.updateSpriteRotationFunc = function(params){
+  params.object.setRotation(params.value);
+}
+AnimationHandler.prototype.updateSpriteColorFunc = function(params){
+  REUSABLE_COLOR.copy(params.sourceColor);
+  params.object.setColor(REUSABLE_COLOR.lerp(params.targetColor, params.value).getHex());
+}
+AnimationHandler.prototype.updateSpritePositionXFunc = function(params){
+  params.object.set2DCoordinates(params.value, params.object.marginPercentY);
+}
+AnimationHandler.prototype.updateSpritePositionYFunc = function(params){
+  params.object.set2DCoordinates(params.object.marginPercentX, params.value);
+}
+AnimationHandler.prototype.updateSpriteTargetPositionXFunc = function(params){
+  var newVal = params.sourcePosition + (params.targetPosition - params.sourcePosition) * params.value;
+  params.object.set2DCoordinates(newVal, params.object.marginPercentY);
+}
+AnimationHandler.prototype.updatespriteTargetPositionYFunc = function(params){
+  var newVal = params.sourcePosition + (params.targetPosition - params.sourcePosition) * params.value;
+  params.object.set2DCoordinates(params.object.marginPercentX, newVal);
+}
+AnimationHandler.prototype.updateSpriteTargetRotationFunc = function(params){
+  var newVal = params.sourceRotation + (params.targetRotation - params.sourceRotation) * params.value;
+  params.object.setRotation(newVal);
 }
 // UPDATE FUNCTIONS ************************************************
 AnimationHandler.prototype.linearFunc = function(curTime, startVal, changeInVal, totalTime){

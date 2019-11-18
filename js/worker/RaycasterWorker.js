@@ -16,6 +16,8 @@ importScripts("../handler/factory/RaycasterFactory.js");
 importScripts("../engine_objects/CollisionInfo.js");
 importScripts("../handler/WorldBinHandler2D.js");
 importScripts("../handler/ObjectPicker2D.js");
+importScripts("../engine_objects/Rectangle.js");
+importScripts("../engine_objects/Sprite.js");
 
 var IS_WORKER_CONTEXT = true;
 var objectPicker2D = new ObjectPicker2D();
@@ -72,6 +74,12 @@ RaycasterWorker.prototype.refresh = function(state){
     idResponse.push({type: "addedText", name: textName, id: addedTexts[textName].workerID});
     this.workerIDsByObjectName[textName] = addedTexts[textName].workerID;
     this.objectsByWorkerID[addedTexts[textName].workerID] = addedTexts[textName];
+  }
+  for (var spriteName in sprites){
+    sprites[spriteName].workerID = idCounter ++;
+    idResponse.push({type: "sprite", name: spriteName, id: sprites[spriteName].workerID});
+    this.workerIDsByObjectName[spriteName] = sprites[spriteName].workerID;
+    this.objectsByWorkerID[sprites[spriteName].workerID] = sprites[spriteName];
   }
   for (var psName in particleSystemPool){
     particleSystemPool[psName].workerID = psIDCounter ++;
@@ -143,6 +151,28 @@ RaycasterWorker.prototype.update = function(transferableMessageBody){
           obj.mesh.modelViewMatrix.copy(REUSABLE_MATRIX_4);
           obj.handleBoundingBox();
         }
+        if (!obj.isHidden){
+          this.rayCaster.updateObject(obj, true);
+        }
+        if (!obj.isHidden && intersectableObjDescription[i+1] < 0){
+          this.rayCaster.hide(obj);
+          obj.isHidden = true;
+        }else if (obj.isHidden && intersectableObjDescription[i+1] > 0){
+          this.rayCaster.show(obj);
+          obj.isHidden = false;
+        }
+      }else if (obj.isSprite){
+        obj.rectangle.set(
+          intersectableObjDescription[i + 2], intersectableObjDescription[i + 3],
+          intersectableObjDescription[i + 4], intersectableObjDescription[i + 5],
+          intersectableObjDescription[i + 6], intersectableObjDescription[i + 7]
+        );
+        obj.reusableVector1.set(intersectableObjDescription[i + 8], intersectableObjDescription[i + 9], 0);
+        obj.reusableVector2.set(intersectableObjDescription[i + 10], intersectableObjDescription[i + 11], 0);
+        obj.reusableVector3.set(intersectableObjDescription[i + 12], intersectableObjDescription[i + 13], 0);
+        obj.reusableVector4.set(intersectableObjDescription[i + 14], intersectableObjDescription[i + 15], 0);
+        obj.triangle1.set(obj.reusableVector1, obj.reusableVector3, obj.reusableVector2);
+        obj.triangle2.set(obj.reusableVector3, obj.reusableVector4, obj.reusableVector2);
         if (!obj.isHidden){
           this.rayCaster.updateObject(obj, true);
         }
@@ -232,7 +262,7 @@ RaycasterWorker.prototype.update = function(transferableMessageBody){
     for (var i = 0; i<intersectionTestDescription.length; i+= 11){
       if (intersectionTestDescription[i] >= 0){
         var test2D = intersectionTestDescription[i + 8] > 0;
-        if (test2D){
+        if (test2D && !(mode == 0 && keyboardBuffer["Shift"])){
           objectPicker2D.find(intersectionTestDescription[i + 9], intersectionTestDescription[i + 10]);
         }
         if (!intersectionPoint){
@@ -312,8 +342,19 @@ RaycasterWorker.prototype.set2DTextSizes = function(data){
   renderer.viewport.z = data.vp.z;
   renderer.viewport.w = data.vp.w;
   var msgBody = data.body;
-  for (var textName in msgBody){
-    addedTexts[textName].twoDimensionalSize.set(msgBody[textName].x, msgBody[textName].y, msgBody[textName].z, msgBody[textName].w);
+  for (var textName in msgBody.texts){
+    addedTexts[textName].twoDimensionalSize.set(msgBody.texts[textName].x, msgBody.texts[textName].y, msgBody.texts[textName].z, msgBody.texts[textName].w);
+  }
+  for (var spriteName in msgBody.sprites){
+    var sprite = sprites[spriteName];
+    var spriteExport = msgBody.sprites[spriteName];
+    sprite.rectangle = new Rectangle(0, 0, 0, 0).set(
+      spriteExport.x, spriteExport.y,
+      spriteExport.finalX, spriteExport.finalY,
+      spriteExport.width, spriteExport.heigth
+    );
+    sprite.triangle1.set(spriteExport.triangle1.a, spriteExport.triangle1.b, spriteExport.triangle1.c);
+    sprite.triangle2.set(spriteExport.triangle2.a, spriteExport.triangle2.b, spriteExport.triangle2.c);
   }
   this.rayCaster.refresh2D();
 }

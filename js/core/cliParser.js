@@ -445,16 +445,7 @@ function parse(input){
           if (objectName.toUpperCase() == "NULL"){
             objectName = generateUniqueObjectName();
           }
-          if (addedObjects[objectName] || objectGroups[objectName] || gridSystems[objectName]){
-            terminal.printError(Text.NAME_MUST_BE_UNIQUE);
-            return true;
-          }
-          if (isNameUsedAsSoftCopyParentName(objectName)){
-            terminal.printError(Text.NAME_USED_AS_A_REFERENCE);
-            return true;
-          }
-          if (disabledObjectNames[objectName]){
-            terminal.printError(Text.NAME_USED_IN_AN_OBJECT_GROUP);
+          if (!checkIfNameUnique(objectName, Text.NAME_MUST_BE_UNIQUE)){
             return true;
           }
           if (objectName.indexOf(Text.COMMA) != -1){
@@ -724,22 +715,11 @@ function parse(input){
           var axis = splitted[3].toLowerCase();
           var height = splitted[4];
           var material = materials[materialName];
-
           if (name.indexOf(Text.COMMA) != -1){
             terminal.printError(Text.INVALID_CHARACTER_IN_OBJECT_NAME);
             return true;
           }
-
-          if (addedObjects[name] || objectGroups[name] || gridSystems[name]){
-            terminal.printError(Text.NAME_MUST_BE_UNIQUE);
-            return true;
-          }
-          if (isNameUsedAsSoftCopyParentName(name)){
-            terminal.printError(Text.NAME_USED_AS_A_REFERENCE);
-            return true;
-          }
-          if (disabledObjectNames[name]){
-            terminal.printError(Text.NAME_USED_IN_AN_OBJECT_GROUP);
+          if (!checkIfNameUnique(name, Text.NAME_MUST_BE_UNIQUE)){
             return true;
           }
           if (materialName == "*"){
@@ -893,12 +873,10 @@ function parse(input){
         break;
         case 34: //newBox
           var name = splitted[1];
-
           if (!(name.indexOf("*") == -1)){
             new JobHandler(splitted).handle();
             return true;
           }
-
           if (name.toUpperCase() == "NULL"){
             name = generateUniqueObjectName();
           }
@@ -908,25 +886,13 @@ function parse(input){
             terminal.printError(Text.INVALID_CHARACTER_IN_OBJECT_NAME);
             return true;
           }
-
           if (mode != 0){
             terminal.printError(Text.WORKS_ONLY_IN_DESIGN_MODE);
             return true;
           }
-
-          if (addedObjects[name] || objectGroups[name] || gridSystems[name]){
-            terminal.printError(Text.NAME_MUST_BE_UNIQUE);
+          if (!checkIfNameUnique(name, Text.NAME_MUST_BE_UNIQUE)){
             return true;
           }
-          if (isNameUsedAsSoftCopyParentName(name)){
-            terminal.printError(Text.NAME_USED_AS_A_REFERENCE);
-            return true;
-          }
-          if (disabledObjectNames[name]){
-            terminal.printError(Text.NAME_USED_IN_AN_OBJECT_GROUP);
-            return true;
-          }
-
           var material = materials[materialName];
           if (materialName == "*"){
             material = pickRandomMaterial();
@@ -1009,16 +975,8 @@ function parse(input){
             terminal.printError(Text.INVALID_CHARACTER_IN_NAME);
             return true;
           }
-          if (wallCollections[name]){
-            terminal.printError(Text.NAME_MUST_BE_UNIQUE);
+          if (!checkIfNameUnique(name, Text.NAME_MUST_BE_UNIQUE)){
             return true;
-          }
-          for (var objName in objectGroups){
-            for (var childName in objectGroups[objName].group){
-              if (childName == name){
-                terminal.printError(Text.NAME_MUST_BE_UNIQUE);
-              }
-            }
           }
           var gridSelectionSize = Object.keys(gridSelections).length;
           if (gridSelectionSize != 2 && gridSelectionSize != 1){
@@ -1257,6 +1215,7 @@ function parse(input){
           var objectName = splitted[2];
           var texturePack = texturePacks[texturePackName];
           var addedObject = addedObjects[objectName];
+          var sprite = sprites[objectName];
           if (mode != 0){
             terminal.printError(Text.WORKS_ONLY_IN_DESIGN_MODE);
             return true;
@@ -1273,15 +1232,23 @@ function parse(input){
             terminal.printError(Text.NO_SUCH_TEXTURE_PACK);
             return true;
           }
-          if (!addedObject){
+          if (!addedObject && !sprite){
             terminal.printError(Text.NO_SUCH_OBJECT);
             return true;
           }
-          if (addedObject.registeredSceneName != sceneHandler.getActiveSceneName()){
-            terminal.printError(Text.OBJECT_NOT_IN_SCENE);
-            return true;
+          if (addedObject){
+            if (addedObject.registeredSceneName != sceneHandler.getActiveSceneName()){
+              terminal.printError(Text.OBJECT_NOT_IN_SCENE);
+              return true;
+            }
+            addedObject.mapTexturePack(texturePack);
+          }else{
+            if (sprite.registeredSceneName != sceneHandler.getActiveSceneName()){
+              terminal.printError(Text.SPRITE_NOT_IN_ACTIVE_SCENE);
+              return true;
+            }
+            sprite.mapTexture(texturePack);
           }
-          addedObject.mapTexturePack(texturePack);
           if (!jobHandlerWorking){
             terminal.printInfo(Text.TEXTURE_PACK_MAPPED);
           }
@@ -1318,6 +1285,12 @@ function parse(input){
                 terminal.printError(Text.TEXTURE_PACK_USED_IN_AN_OBJECT.replace(Text.PARAM1, objectGroupName + "->" + objectName));
                 return true;
               }
+            }
+          }
+          for (var spriteName in sprites){
+            if (sprites[spriteName].mappedTexturePackName == name){
+              terminal.printError(Text.TEXTURE_PACK_USED_IN_A_SPRITE.replace(Text.PARAM1, spriteName));
+              return true;
             }
           }
           if (texturePack.isParticleTexture){
@@ -1907,12 +1880,7 @@ function parse(input){
             terminal.printError(Text.WORKS_ONLY_IN_DESIGN_MODE);
             return true;
           }
-          if (addedObjects[groupName] || objectGroups[groupName] || gridSystems[name]){
-            terminal.printError(Text.NAME_MUST_BE_UNIQUE);
-            return true;
-          }
-          if (isNameUsedAsSoftCopyParentName(groupName)){
-            terminal.printError(Text.NAME_USED_AS_A_REFERENCE);
+          if (!checkIfNameUnique(groupName, Text.NAME_MUST_BE_UNIQUE)){
             return true;
           }
           try{
@@ -2567,16 +2535,7 @@ function parse(input){
           if (sphereName.toUpperCase() == "NULL"){
             sphereName = generateUniqueObjectName();
           }
-          if (addedObjects[sphereName] || objectGroups[sphereName] || gridSystems[sphereName]){
-              terminal.printError(Text.NAME_MUST_BE_UNIQUE);
-              return true;
-          }
-          if (isNameUsedAsSoftCopyParentName(sphereName)){
-            terminal.printError(Text.NAME_USED_AS_A_REFERENCE);
-            return true;
-          }
-          if (disabledObjectNames[sphereName]){
-            terminal.printError(Text.NAME_USED_IN_AN_OBJECT_GROUP);
+          if (!checkIfNameUnique(sphereName, Text.NAME_MUST_BE_UNIQUE)){
             return true;
           }
           var material = materials[materialName];
@@ -3098,16 +3057,7 @@ function parse(input){
           if (cylinderName.toUpperCase() == "NULL"){
             cylinderName = generateUniqueObjectName();
           }
-          if (addedObjects[cylinderName] || objectGroups[cylinderName] || gridSystems[cylinderName]){
-              terminal.printError(Text.NAME_MUST_BE_UNIQUE);
-              return true;
-          }
-          if (isNameUsedAsSoftCopyParentName(cylinderName)){
-            terminal.printError(Text.NAME_USED_AS_A_REFERENCE);
-            return true;
-          }
-          if (disabledObjectNames[cylinderName]){
-            terminal.printError(Text.NAME_USED_IN_AN_OBJECT_GROUP);
+          if (!checkIfNameUnique(cylinderName, Text.NAME_MUST_BE_UNIQUE)){
             return true;
           }
           var material = materials[materialName];
@@ -3339,16 +3289,7 @@ function parse(input){
             terminal.printError(Text.INVALID_CHARACTER_IN_OBJECT_NAME);
             return true;
           }
-          if (addedObjects[targetName] || objectGroups[targetName] || gridSystems[targetName]){
-            terminal.printError(Text.NAME_MUST_BE_UNIQUE);
-            return true;
-          }
-          if (isNameUsedAsSoftCopyParentName(targetName)){
-            terminal.printError(Text.NAME_USED_AS_A_REFERENCE);
-            return true;
-          }
-          if (disabledObjectNames[targetName]){
-            terminal.printError(Text.NAME_USED_IN_AN_OBJECT_GROUP);
+          if (!checkIfNameUnique(targetName, Text.NAME_MUST_BE_UNIQUE)){
             return true;
           }
           if (!(addedObjects[sourceName] || objectGroups[sourceName])){
@@ -3667,20 +3608,8 @@ function parse(input){
           var offsetX = parseFloat(splitted[4]);
           var offsetY = parseFloat(splitted[5]);
           var offsetZ = parseFloat(splitted[6]);
-          if (addedTexts[textName]){
-            terminal.printError(Text.NAME_MUST_BE_UNIQUE);
+          if (!checkIfNameUnique(textName, Text.NAME_MUST_BE_UNIQUE)){
             return true;
-          }
-          if (addedObjects[textName] || objectGroups[textName] || gridSystems[textName]){
-            terminal.printError(Text.NAME_MUST_BE_UNIQUE);
-            return true;
-          }
-          for (var objName in objectGroups){
-            for (var childName in objectGroups[objName].group){
-              if (childName == textName){
-                terminal.printError(Text.NAME_MUST_BE_UNIQUE);
-              }
-            }
           }
           var selectedFont = fonts[fontName];
           if (!selectedFont){
@@ -4557,16 +4486,21 @@ function parse(input){
             if (!obj){
               obj = addedTexts[objName];
               if (!obj){
-                terminal.printError(Text.NO_SUCH_OBJECT);
-                return true;
+                obj = sprites[objName];
+                if (!obj){
+                  terminal.printError(Text.NO_SUCH_OBJECT);
+                  return true;
+                }
               }
             }
           }
           if (obj.registeredSceneName != sceneHandler.getActiveSceneName()){
             if (obj.isAddedObject || obj.isObjectGroup){
               terminal.printError(Text.OBJECT_NOT_IN_SCENE);
-            }else{
+            }else if (obj.isAddedText){
               terminal.printError(Text.TEXT_NOT_IN_SCENE);
+            }else{
+              terminal.printError(Text.SPRITE_NOT_IN_ACTIVE_SCENE);
             }
             return true;
           }
@@ -4786,6 +4720,74 @@ function parse(input){
           terminal.printInfo(Text.TREE.replace(Text.PARAM1, count));
           return true;
         break;
+        case 198: //newSprite
+          if (mode != 0){
+            terminal.printError(Text.WORKS_ONLY_IN_DESIGN_MODE);
+            return true;
+          }
+          var spriteName = splitted[1];
+          if (!checkIfNameUnique(spriteName, Text.NAME_MUST_BE_UNIQUE)){
+            return true;
+          }
+          sprites[spriteName] = new Sprite(spriteName);
+          sprites[spriteName].setRefHeight();
+          sceneHandler.onSpriteCreation(sprites[spriteName]);
+          selectionHandler.select(sprites[spriteName]);
+          refreshRaycaster(Text.SPRITE_CREATED);
+          return true;
+        break;
+        case 199: //destroySprite
+          if (mode != 0){
+            terminal.printError(Text.WORKS_ONLY_IN_DESIGN_MODE);
+            return true;
+          }
+          var spriteName = splitted[1];
+          var sprite = sprites[spriteName];
+          if (!sprite){
+            terminal.printError(Text.NO_SUCH_SPRITE);
+            return true;
+          }
+          sprite.destroy();
+          sceneHandler.onSpriteDeletion(sprite);
+          terminal.printInfo(Text.SPRITE_DESTROYED);
+          return true;
+        break;
+        case 200: //selectSprite
+          if (mode != 0){
+            terminal.printError(Text.WORKS_ONLY_IN_DESIGN_MODE);
+            return true;
+          }
+          var spriteName = splitted[1];
+          var sprite = sprites[spriteName];
+          if (!sprite){
+            terminal.printError(Text.NO_SUCH_SPRITE);
+            return true;
+          }
+          if (sprite.registeredSceneName != sceneHandler.getActiveSceneName()){
+            terminal.printError(Text.SPRITE_NOT_IN_ACTIVE_SCENE);
+            return true;
+          }
+          selectionHandler.select(sprite);
+          terminal.printInfo(Text.SPRITE_SELECTED);
+          return true;
+        break;
+        case 201: //printSprites
+          var count = 0;
+          var length = Object.keys(sprites).length;
+          terminal.printHeader(Text.SPRITES);
+          for (var spriteName in sprites){
+            count ++;
+            var options = true;
+            if (count == length){
+              options = false;
+            }
+            terminal.printInfo(Text.TREE.replace(Text.PARAM1, spriteName + " ["+sprites[spriteName].registeredSceneName+"]"), options);
+          }
+          if (count == 0){
+            terminal.printError(Text.NO_SPRITES_CREATED);
+          }
+          return true;
+        break;
       }
       return true;
     }catch(err){
@@ -4812,8 +4814,7 @@ function processNewGridSystemCommand(name, sizeX, sizeZ, centerX, centerY, cente
     terminal.printError(Text.INVALID_CHARACTER_IN_NAME);
     return true;
   }
-  if (addedObjects[name] || objectGroups[name]){
-    terminal.printError(Text.NAME_MUST_BE_UNIQUE);
+  if (!checkIfNameUnique(name, Text.NAME_MUST_BE_UNIQUE)){
     return true;
   }
   for (var objName in objectGroups){
@@ -4937,6 +4938,30 @@ function isNameUsedAsSoftCopyParentName(name){
     }
   }
   return false;
+}
+
+function checkIfNameUnique(name, errorMsg){
+  if (addedObjects[name] || objectGroups[name] || gridSystems[name] || addedTexts[name] || sprites[name] || wallCollections[name]){
+    terminal.printError(errorMsg);
+    return false;
+  }
+  if (isNameUsedAsSoftCopyParentName(name)){
+    terminal.printError(errorMsg);
+    return false;
+  }
+  if (disabledObjectNames[name]){
+    terminal.printError(errorMsg);
+    return false;
+  }
+  for (var objName in objectGroups){
+    for (var childName in objectGroups[objName].group){
+      if (childName == name){
+        terminal.printError(errorMsg);
+        return false;
+      }
+    }
+  }
+  return true;
 }
 
 function save(){

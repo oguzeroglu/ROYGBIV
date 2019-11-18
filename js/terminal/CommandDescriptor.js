@@ -198,7 +198,11 @@ var CommandDescriptor = function(){
       1, //editLightning
       1, //destroyLightning
       0, //printLightnings
-      0 //printTotalPhysicsShapeCount
+      0, //printTotalPhysicsShapeCount
+      1, //newSprite
+      1, //destroySprite
+      1, //selectSprite
+      0 //printSprites
   ];
 
   this.commandArgumentsExpectedExplanation = [
@@ -399,7 +403,11 @@ var CommandDescriptor = function(){
     "editLightning lightningName",
     "destroyLightning lightningName",
     "printLightnings",
-    "printTotalPhysicsShapeCount"
+    "printTotalPhysicsShapeCount",
+    "newSprite spriteName",
+    "destroySprite spriteName",
+    "selectSprite spriteName",
+    "printSprites"
   ];
 
   this.commands = [
@@ -600,7 +608,11 @@ var CommandDescriptor = function(){
     "editLightning",
     "destroyLightning",
     "printLightnings",
-    "printTotalPhysicsShapeCount"
+    "printTotalPhysicsShapeCount",
+    "newSprite",
+    "destroySprite",
+    "selectSprite",
+    "printSprites"
   ];
 
   this.commandInfo = [
@@ -663,7 +675,7 @@ var CommandDescriptor = function(){
     "newTexturePack: Cretes a new Texture Pack.",
     "printTexturePacks: Prints created texture packs.",
     "printTexturePackInfo: Prints information about a texture pack.",
-    "mapTexturePack: Maps a texture pack to an object.",
+    "mapTexturePack: Maps a texture pack to an object or to a sprite.",
     "destroyTexturePack: Destroys a texture pack.",
     "refreshTexturePack: Reloads a texture pack.",
     "mapHeight: Set a displacement/height map of an object.",
@@ -801,7 +813,11 @@ var CommandDescriptor = function(){
     "editLightning: Opens the Lightning editor GUI to edit a lightning.",
     "destroyLightning: Destroys a Lightning.",
     "printLightnings: Prints a list of created lightnings.",
-    "printTotalPhysicsShapeCount: Prints the total count of physics shapes for current scene."
+    "printTotalPhysicsShapeCount: Prints the total count of physics shapes for current scene.",
+    "newSprite: Creates a new sprite.",
+    "destroySprite: Destroys a sprite.",
+    "selectSprite: Selects a sprite.",
+    "printSprites: Prints created sprites."
   ];
 
   this.keyboardInfo = [
@@ -937,6 +953,9 @@ var CommandDescriptor = function(){
   this.SCENE_NAME                 =   35;
   this.GS_NAME_NO_WC              =   36;
   this.LIGHTNING_NAME             =   37;
+  this.SPRITE_NAME                =   38;
+  this.OBJECT_OR_SPRITE_NAME      =   39;
+  this.OBJECT_TEXT_SPRITE_NAME    =   40;
 
   // newGridSystem
   this.newGridSystem = new Object();
@@ -1053,7 +1072,7 @@ var CommandDescriptor = function(){
   this.mapTexturePack = new Object();
   this.mapTexturePack.types = [];
   this.mapTexturePack.types.push(this.TEXTURE_PACK_NAME); //texturePackName
-  this.mapTexturePack.types.push(this.OBJECT_NAME); //objectName
+  this.mapTexturePack.types.push(this.OBJECT_OR_SPRITE_NAME); //objectName
 
   // destroyTexturePack
   this.destroyTexturePack = new Object();
@@ -1425,7 +1444,7 @@ var CommandDescriptor = function(){
   // animations
   this.animations = new Object();
   this.animations.types = [];
-  this.animations.types.push(this.OBJECT_AND_TEXT_NAME); //animations
+  this.animations.types.push(this.OBJECT_TEXT_SPRITE_NAME); //animations
 
   // newScene
   this.newScene = new Object();
@@ -1468,6 +1487,20 @@ var CommandDescriptor = function(){
   this.destroyLightning.types = [];
   this.destroyLightning.types.push(this.LIGHTNING_NAME); //lightningName
 
+  // newSprite
+  this.newSprite = new Object();
+  this.newSprite.types = [];
+  this.newSprite.types.push(this.UNKNOWN_INDICATOR); //spriteName
+
+  // destroySprite
+  this.destroySprite = new Object();
+  this.destroySprite.types = [];
+  this.destroySprite.types.push(this.SPRITE_NAME); //spriteName
+
+  // selectSprite
+  this.selectSprite = new Object();
+  this.selectSprite.types = [];
+  this.selectSprite.types.push(this.SPRITE_NAME); //selectSprite
 };
 
 CommandDescriptor.prototype.test = function(){

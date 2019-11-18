@@ -138,6 +138,11 @@ var State = function(projectName, author){
   for (var textName in addedTexts){
     this.texts[textName] = addedTexts[textName].export();
   }
+  // SPRITES *******************************************************
+  this.sprites = new Object();
+  for (var spriteName in sprites){
+    this.sprites[spriteName] = sprites[spriteName].export();
+  }
   // PRECONFIGURED PARTICLE SYSTEMS ********************************
   this.preConfiguredParticleSystems = new Object();
   for (var psName in preConfiguredParticleSystems){

@@ -23,6 +23,7 @@ var windowLoaded;
 var cliFocused = true;
 var omGUIFocused = false;
 var tmGUIFocused = false;
+var smGUIFocused = false;
 var acGUIFocused = false;
 var cliIsBeingDragged = false;
 var requestID;
@@ -126,6 +127,7 @@ var physicsDebugMode = false;
 var selectedAddedObject = 0;
 var selectedObjectGroup = 0;
 var selectedAddedText = 0;
+var selectedSprite = 0;
 var planeWidthSegments = 10;
 var planeHeightSegments = 10;
 var boxWidthSegments = 10;
@@ -222,7 +224,7 @@ var GLOBAL_VIEW_UNIFORM = new THREE.Uniform(new THREE.Matrix4());
 var GLOBAL_CAMERA_POSITION_UNIFORM = new THREE.Uniform(new THREE.Vector3());
 var GLOBAL_CAMERA_QUATERNION_UNIFORM = new THREE.Uniform(new THREE.Quaternion());
 var GLOBAL_CUBE_TEXTURE_UNIFORM;
-var GLOBAL_ADDEDTEXT_VIEWPORT_UNIFORM;
+var GLOBAL_VIEWPORT_UNIFORM;
 var GLOBAL_SCREEN_RESOLUTION_UNIFORM = new THREE.Uniform(1);
 var GLOBAL_PS_REF_HEIGHT_UNIFORM = new THREE.Uniform(0);
 var VERTEX_SHADER_TEXTURE_FETCH_SUPPORTED;
@@ -290,9 +292,9 @@ var fonts = new Object();
 var MAX_TEXT_CHAR_COUNT = 64;
 var DEFAULT_OFFSET_BETWEEN_CHARS = 20;
 var DEFAULT_OFFSET_BETWEEN_LINES = 20;
-var MARGIN_MODE_2D_TEXT_TOP_LEFT = 0;
-var MARGIN_MODE_2D_TEXT_BOTTOM_RIGHT = 1;
-var MARGIN_MODE_2D_TEXT_CENTER = 2;
+var MARGIN_MODE_2D_TOP_LEFT = 0;
+var MARGIN_MODE_2D_BOTTOM_RIGHT = 1;
+var MARGIN_MODE_2D_CENTER = 2;
 var roygbivAttributeCounter = 1;
 var roygbivBufferAttributeCounter = 1;
 var roygbivSkippedArrayBufferUpdates = 0;
@@ -370,6 +372,9 @@ var ANIMATION_STATE_REWINDING = 3;
 var lightnings = new Object();
 var areaEnterCallbacks = new Object();
 var areaExitCallbacks = new Object();
+var sprites = new Object();
+var clickableSprites = new Object();
+var draggingSprite = false;
 
 // RENDER ORDERS
 var renderOrders = {
@@ -386,6 +391,7 @@ var renderOrders = {
   TEXT_3D: 10,
   LIGHTNING: 10,
   TEXT_2D: 50,
+  SPRITE: 50,
   CROSSHAIR: 60,
   OBJECT_TRAIL: 100
 }

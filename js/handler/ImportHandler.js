@@ -1281,3 +1281,34 @@ ImportHandler.prototype.importLightnings = function(obj){
     lightningHandler.turnOff();
   }
 }
+
+ImportHandler.prototype.importSprites = function(obj){
+  for (var spriteName in obj.sprites){
+    var curExport = obj.sprites[spriteName];
+    var sprite = new Sprite(spriteName);
+    sprite.refHeight = curExport.refHeight;
+    sprite.mesh.material.uniforms.scaleCoef.value = (renderer.getCurrentViewport().w / screenResolution) / sprite.refHeight;
+    sprite.setColor(curExport.color);
+    sprite.setAlpha(curExport.alpha);
+    sprite.setScale(curExport.scaleX, curExport.scaleY);
+    sprite.setRotation(curExport.rotation);
+    sprite.marginMode = curExport.marginMode;
+    sprite.set2DCoordinates(curExport.marginPercentX, curExport.marginPercentY);
+    if (curExport.isTextured){
+      sprite.mapTexture(texturePacks[curExport.mappedTexturePackName]);
+    }
+    sprite.isClickable = curExport.isClickable;
+    sprite.isDraggable = curExport.isDraggable;
+    sprites[sprite.name] = sprite;
+    if (!(typeof curExport.cropCoefficientX == UNDEFINED)){
+      sprite.cropCoefficientX = curExport.cropCoefficientX;
+    }
+    if (!(typeof curExport.cropCoefficientY == UNDEFINED)){
+      sprite.cropCoefficientY = curExport.cropCoefficientY;
+    }
+    for (var animationName in curExport.animations){
+      var curAnimationExport = curExport.animations[animationName];
+      sprite.addAnimation(new Animation(animationName, curAnimationExport.type, sprite, curAnimationExport.description, curAnimationExport.rewind, curAnimationExport.repeat));
+    }
+  }
+}

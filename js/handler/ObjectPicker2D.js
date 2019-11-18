@@ -22,6 +22,9 @@ ObjectPicker2D.prototype.update = function(obj, forceUpdate){
   if (mode == 1 && obj.isAddedText && !obj.isClickable){
     return;
   }
+  if (mode == 1 && obj.isSprite && !obj.isClickable){
+    return;
+  }
   if (forceUpdate){
     this.issueUpdate(obj, obj.name);
     return;
@@ -39,9 +42,13 @@ ObjectPicker2D.prototype.show = function(obj){
 
 ObjectPicker2D.prototype.refresh = function(){
   this.binHandler = new WorldBinHandler2D(this.binHandlerPrecision);
-  var texts = this.getTexts();
-  for (var textName in texts){
-    this.binHandler.insert(texts[textName]);
+  var allTexts = this.getTexts();
+  var allSprites = this.getSprites();
+  for (var textName in allTexts){
+    this.binHandler.insert(allTexts[textName]);
+  }
+  for (var spriteName in allSprites){
+    this.binHandler.insert(allSprites[spriteName]);
   }
 }
 
@@ -59,18 +66,45 @@ ObjectPicker2D.prototype.find = function(screenSpaceX, screenSpaceY){
     return;
   }
   for (var name in results){
-    var textObject = addedTexts2D[name];
-    if (!textObject.mesh.visible){
+    var obj = addedTexts2D[name];
+    if (!obj){
+      obj = sprites[name];
+    }
+    if (obj.mesh && !obj.mesh.visible){
       continue;
     }
-    if (!textObject.twoDimensionalSize){
-      textObject.handleResize();
+    if (obj.isAddedText && !obj.twoDimensionalSize){
+      obj.handleResize();
     }
-    if (webglSpaceX >= textObject.twoDimensionalSize.x && webglSpaceX <= textObject.twoDimensionalSize.z){
-      if (webglSpaceY >= textObject.twoDimensionalSize.w && webglSpaceY <= textObject.twoDimensionalSize.y){
+    if (obj.isAddedText){
+      if (webglSpaceX >= obj.twoDimensionalSize.x && webglSpaceX <= obj.twoDimensionalSize.z){
+        if (webglSpaceY >= obj.twoDimensionalSize.w && webglSpaceY <= obj.twoDimensionalSize.y){
+          intersectionPoint = 1;
+          intersectionObject = name;
+        }
+      }
+    }else if (obj.isSprite){
+      REUSABLE_VECTOR.set(webglSpaceX, webglSpaceY, 0);
+      if (obj.triangle1.containsPoint(REUSABLE_VECTOR) || obj.triangle2.containsPoint(REUSABLE_VECTOR)){
         intersectionPoint = 1;
         intersectionObject = name;
       }
+    }
+  }
+}
+
+ObjectPicker2D.prototype.getSprites = function(){
+  if (!IS_WORKER_CONTEXT){
+    if (mode == 0){
+      return sceneHandler.getSprites();
+    }else{
+      return sceneHandler.getClickableSprites();
+    }
+  }else{
+    if (mode == 0){
+      return sprites;
+    }else{
+      return clickableSprites;
     }
   }
 }

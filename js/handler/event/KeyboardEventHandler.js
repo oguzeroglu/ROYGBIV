@@ -11,7 +11,7 @@ KeyboardEventHandler.prototype.onKeyUp = function(event){
   if (!windowLoaded){
     return;
   }
-  if (cliFocused || omGUIFocused || tmGUIFocused || acGUIFocused){
+  if (cliFocused || omGUIFocused || tmGUIFocused || smGUIFocused || acGUIFocused){
     return;
   }
   if (keyCodeToChar[event.keyCode]){
@@ -63,7 +63,7 @@ KeyboardEventHandler.prototype.onKeyDown = function(event){
   if (!windowLoaded){
     return;
   }
-  if (cliFocused || omGUIFocused || tmGUIFocused || acGUIFocused){
+  if (cliFocused || omGUIFocused || tmGUIFocused || smGUIFocused || acGUIFocused){
     return;
   }
   if (keyCodeToChar[event.keyCode]){
@@ -131,6 +131,9 @@ KeyboardEventHandler.prototype.activateGridSelectionMode = function(){
   for (var textName in sceneHandler.getAddedTexts()){
     addedTexts[textName].hide();
   }
+  for (var spriteName in sceneHandler.getSprites()){
+    sprites[spriteName].mesh.visible = false;
+  }
   raycasterFactory.onShiftPress(true);
 }
 
@@ -143,6 +146,9 @@ KeyboardEventHandler.prototype.deactivateGridSelectionMode = function(){
   }
   for (var textName in sceneHandler.getAddedTexts()){
     addedTexts[textName].show();
+  }
+  for (var spriteName in sceneHandler.getSprites()){
+    sprites[spriteName].mesh.visible = true;
   }
   raycasterFactory.onShiftPress(false);
 }

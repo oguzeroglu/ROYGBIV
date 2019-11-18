@@ -225,6 +225,10 @@ var Preconditions = function(){
   this.lightning = "lightning";
   this.areaName = "areaName";
   this.initialPosition = "initialPosition";
+  this.spriteName = "spriteName";
+  this.sprite = "sprite";
+  this.sprite1 = "sprite1";
+  this.sprite2 = "sprite2";
 }
 
 Preconditions.prototype.errorHeader = function(callerFunc){
@@ -275,6 +279,12 @@ Preconditions.prototype.checkIfLightning = function(callerFunc, lightning){
 Preconditions.prototype.checkIfLightningInsideActiveScene = function(callerFunc, lightning){
   if (lightning.registeredSceneName != sceneHandler.getActiveSceneName()){
     this.throw(callerFunc, "Lightning not inside active scene.");
+  }
+}
+
+Preconditions.prototype.checkIfSpriteInsideActiveScene = function(callerFunc, sprite){
+  if (sprite.registeredSceneName != sceneHandler.getActiveSceneName()){
+    this.throw(callerFunc, "Sprite not inside active scene.");
   }
 }
 
@@ -455,6 +465,24 @@ Preconditions.prototype.checkIfAddedText = function(callerFunc, parameterName, o
   }
 }
 
+Preconditions.prototype.checkIfSprite = function(callerFunc, parameterName, obj){
+  if (!obj.isSprite){
+    this.throw(callerFunc, parameterName+" is not a sprite.");
+  }
+}
+
+Preconditions.prototype.checkIfSpriteClickable = function(callerFunc, sprite){
+  if (!sprite.isClickable){
+    this.throw(callerFunc, "Sprite is not clickable.");
+  }
+}
+
+Preconditions.prototype.checkIfSpriteDraggable = function(callerFunc, sprite){
+  if (!sprite.isDraggable){
+    this.throw(callerFunc, "Sprite is not draggable.");
+  }
+}
+
 Preconditions.prototype.checkIfAddedObject = function(callerFunc, parameterName, obj){
   if (!obj.isAddedObject){
     this.throw(callerFunc, parameterName+" is not an AddedObject.");
@@ -490,6 +518,12 @@ Preconditions.prototype.checkIfAddedObjectObjectGroupParticleSystemParticle = fu
 Preconditions.prototype.checkIfAddedObjectObjectGroupAddedText = function(callerFunc, parameterName, obj){
   if (!(obj.isAddedObject) && !(obj.isObjectGroup) && !(obj.isAddedText)){
     this.throw(callerFunc, parameterName+" must be an object, object group or text.");
+  }
+}
+
+Preconditions.prototype.checkIfAddedObjectObjectGroupAddedTextSprite = function(callerFunc, parameterName, obj){
+  if (!(obj.isAddedObject) && !(obj.isObjectGroup) && !(obj.isAddedText) && !(obj.isSprite)){
+    this.throw(callerFunc, parameterName+" must be an object, object group, text or sprite.");
   }
 }
 

@@ -48,11 +48,20 @@ SceneHandler.prototype.reset = function(){
   this.activeSceneName = "scene1";
   this.scenes = new Object();
   this.scenes[this.activeSceneName] = new Scene("scene1");
+  this.draggableSpriteStatusBySceneName = new Object();
   this.entrySceneName = "scene1";
   this.ready = true;
   if (!(typeof this.nextSceneToChange == UNDEFINED)){
     delete this.nextSceneToChange;
   }
+}
+
+SceneHandler.prototype.hasDraggableSprite = function(){
+  return this.draggableSpriteStatusBySceneName[this.getActiveSceneName()];
+}
+
+SceneHandler.prototype.setDraggableSprite = function(sprite){
+  this.draggableSpriteStatusBySceneName[sprite.registeredSceneName] = true;
 }
 
 SceneHandler.prototype.onSwitchFromDesignToPreview = function(){
@@ -68,8 +77,10 @@ SceneHandler.prototype.onSwitchFromPreviewToDesign = function(){
   for (var sceneName in this.scenes){
     this.scenes[sceneName].resetAutoInstancedObjects();
     this.scenes[sceneName].resetClickableTexts();
+    this.scenes[sceneName].resetClickableSprites();
     this.scenes[sceneName].resetTrackingObjects();
   }
+  this.draggableSpriteStatusBySceneName = new Object();
   this.readyCallback = noop;
   this.changeScene(this.sceneNameBeforeSwitchToPreviewMode);
   delete this.sceneNameBeforeSwitchToPreviewMode;
@@ -93,6 +104,10 @@ SceneHandler.prototype.onClickableAddedTextAddition = function(addedText){
 
 SceneHandler.prototype.onClickableAddedText2DAddition = function(addedText){
   this.scenes[addedText.registeredSceneName].registerClickableText2D(addedText);
+}
+
+SceneHandler.prototype.onClickableSpriteAddition = function(sprite){
+  this.scenes[sprite.registeredSceneName].registerClickableSprite(sprite);
 }
 
 SceneHandler.prototype.onDynamicObjectAddition = function(obj){
@@ -159,6 +174,15 @@ SceneHandler.prototype.hideAll = function(){
       }
     }
     text.hideVisually();
+  }
+  for (var spriteName in sprites){
+    var sprite = sprites[spriteName];
+    if (mode == 1){
+      for (var animName in sprite.animations){
+        animationHandler.forceFinish(sprite.animations[animName]);
+      }
+    }
+    sprite.hideVisually();
   }
   if (mode == 0){
     for (var gsName in gridSystems){
@@ -244,6 +268,10 @@ SceneHandler.prototype.changeScene = function(sceneName, readyCallback){
       var text = this.scenes[sceneName].addedTexts[textName];
       text.showVisually();
     }
+    for (var spriteName in this.scenes[sceneName].sprites){
+      var sprite = this.scenes[sceneName].sprites[spriteName];
+      sprite.showVisually();
+    }
     if (markedPointsVisible){
       for (var markedPointName in this.scenes[sceneName].markedPoints){
         var markedPoint = this.scenes[sceneName].markedPoints[markedPointName];
@@ -286,6 +314,10 @@ SceneHandler.prototype.changeScene = function(sceneName, readyCallback){
       var text = this.scenes[sceneName].addedTexts[textName];
       text.showVisually();
     }
+    for (var spriteName in this.scenes[sceneName].sprites){
+      var sprite = this.scenes[sceneName].sprites[spriteName];
+      sprite.showVisually();
+    }
     for (var objName in this.scenes[sceneName].autoInstancedObjects){
       var obj = this.scenes[sceneName].autoInstancedObjects[objName];
       obj.showVisually();
@@ -313,6 +345,14 @@ SceneHandler.prototype.changeScene = function(sceneName, readyCallback){
 
 SceneHandler.prototype.createScene = function(sceneName){
   this.scenes[sceneName] = new Scene(sceneName);
+}
+
+SceneHandler.prototype.onSpriteDeletion = function(sprite){
+  this.scenes[sprite.registeredSceneName].unregisterSprite(sprite);
+}
+
+SceneHandler.prototype.onSpriteCreation = function(sprite){
+  this.scenes[this.activeSceneName].registerSprite(sprite);
 }
 
 SceneHandler.prototype.onAutoInstancedObjectCreation = function(autoInstancedObject){
@@ -492,6 +532,10 @@ SceneHandler.prototype.getAddedTexts2D = function(){
   return this.scenes[this.activeSceneName].addedTexts2D;
 }
 
+SceneHandler.prototype.getSprites = function(){
+  return this.scenes[this.activeSceneName].sprites;
+}
+
 SceneHandler.prototype.getMuzzleFlashes = function(){
   return this.scenes[this.activeSceneName].muzzleFlashes;
 }
@@ -518,6 +562,10 @@ SceneHandler.prototype.getDynamicObjectGroups = function(){
 
 SceneHandler.prototype.getClickableAddedTexts = function(){
   return this.scenes[this.activeSceneName].clickableAddedTexts;
+}
+
+SceneHandler.prototype.getClickableSprites = function(){
+  return this.scenes[this.activeSceneName].clickableSprites;
 }
 
 SceneHandler.prototype.getClickableAddedTexts2D = function(){

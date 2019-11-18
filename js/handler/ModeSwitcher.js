@@ -70,6 +70,7 @@ ModeSwitcher.prototype.commonSwitchFunctions = function(){
   objectsWithMouseOverListeners = new Map();
   objectsWithMouseOutListeners = new Map();
   currentMouseOverObjectName = 0;
+  draggingSprite = false;
   if (activeControl){
     activeControl.onDeactivated();
   }
@@ -210,6 +211,21 @@ ModeSwitcher.prototype.switchFromDesignToPreview = function(){
       }
     }
   }
+  for (var spriteName in sprites){
+    delete sprites[spriteName].onClickCallback;
+    if (sprites[spriteName].isClickable){
+      clickableSprites[spriteName] = sprites[spriteName];
+      sceneHandler.onClickableSpriteAddition(sprites[spriteName]);
+      if (sprites[spriteName].isDraggable){
+        sceneHandler.setDraggableSprite(sprites[spriteName]);
+        sprites[spriteName].marginBeforeDrag = {
+          x: sprites[spriteName].marginPercentX,
+          y: sprites[spriteName].marginPercentY
+        };
+      }
+    }
+    sprites[spriteName].originalColor = sprites[spriteName].mesh.material.uniforms.color.value.getHex();
+  }
   sceneHandler.onSwitchFromDesignToPreview();
   this.commonSwitchFunctions();
   handleViewport();
@@ -274,6 +290,17 @@ ModeSwitcher.prototype.switchFromPreviewToDesign = function(){
     delete addedText.clickCallbackFunction;
     delete addedText.mouseOverCallbackFunction;
     delete addedText.mouseOutCallbackFunction;
+  }
+  for (var spriteName in sprites){
+    delete sprites[spriteName].onClickCallback;
+    for (var animationName in sprites[spriteName].animations){
+      animationHandler.forceFinish(sprites[spriteName].animations[animationName]);
+    }
+    if (sprites[spriteName].isDraggable){
+      sprites[spriteName].set2DCoordinates(sprites[spriteName].marginBeforeDrag.x, sprites[spriteName].marginBeforeDrag.y);
+      delete sprites[spriteName].marginBeforeDrag;
+    }
+    sprites[spriteName].setColor(sprites[spriteName].originalColor);
   }
   collisionCallbackRequests = new Map();
   particleCollisionCallbackRequests = new Object();
@@ -393,6 +420,7 @@ ModeSwitcher.prototype.switchFromPreviewToDesign = function(){
 
   clickableAddedTexts = new Object();
   clickableAddedTexts2D = new Object();
+  clickableSprites = new Object();
   sceneHandler.onSwitchFromPreviewToDesign();
   this.commonSwitchFunctions();
   for (var txtName in addedTexts){

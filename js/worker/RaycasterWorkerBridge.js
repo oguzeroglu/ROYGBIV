@@ -54,6 +54,11 @@ var RaycasterWorkerBridge = function(){
           var textWorkerID = msg.data.ids[i].id;
           rayCaster.objectsByWorkerID[textWorkerID] = text;
           rayCaster.idsByObjectNames[text.name] = textWorkerID;
+        }else if (msg.data.ids[i].type == "sprite"){
+          var sprite = sprites[msg.data.ids[i].name];
+          var spriteWorkerID = msg.data.ids[i].id;
+          rayCaster.objectsByWorkerID[spriteWorkerID] = sprite;
+          rayCaster.idsByObjectNames[sprite.name] = spriteWorkerID;
         }else if (msg.data.ids[i].type == "particleSystem"){
           var particleSystem = particleSystemPool[msg.data.ids[i].name];
           var particleSystemWorkerID = msg.data.ids[i].id;
@@ -128,6 +133,33 @@ var RaycasterWorkerBridge = function(){
           addedTextScaleDescriptionArray.push(text.topRight.x); addedTextScaleDescriptionArray.push(text.topRight.y); addedTextScaleDescriptionArray.push(text.topRight.z);
           addedTextScaleDescriptionArray.push(text.bottomLeft.x); addedTextScaleDescriptionArray.push(text.bottomLeft.y); addedTextScaleDescriptionArray.push(text.bottomLeft.z);
           addedTextScaleDescriptionIndex += 11;
+        }
+      }
+      for (var spriteName in sceneHandler.getSprites()){
+        var sprite = sprites[spriteName];
+        var insertSpriteToBuffer = ((mode == 0) || (mode == 1 && sprite.isClickable));
+        if (insertSpriteToBuffer){
+          sprite.indexInIntersectableObjDescriptionArray = intersectableArrayIndex;
+          intersectablesAry.push(rayCaster.idsByObjectNames[sprite.name]);
+          intersectablesAry.push(1);
+          sprite.handleRectangle();
+          intersectablesAry.push(sprite.rectangle.x);
+          intersectablesAry.push(sprite.rectangle.y);
+          intersectablesAry.push(sprite.rectangle.finalX);
+          intersectablesAry.push(sprite.rectangle.finalY);
+          intersectablesAry.push(sprite.rectangle.width);
+          intersectablesAry.push(sprite.rectangle.height);
+          intersectablesAry.push(sprite.reusableVector1.x);
+          intersectablesAry.push(sprite.reusableVector1.y);
+          intersectablesAry.push(sprite.reusableVector2.x);
+          intersectablesAry.push(sprite.reusableVector2.y);
+          intersectablesAry.push(sprite.reusableVector3.x);
+          intersectablesAry.push(sprite.reusableVector3.y);
+          intersectablesAry.push(sprite.reusableVector4.x);
+          intersectablesAry.push(sprite.reusableVector4.y);
+          intersectablesAry.push(-1);
+          intersectablesAry.push(-1);
+          intersectableArrayIndex += sprite.mesh.matrixWorld.elements.length + 2;
         }
       }
       var particleSystemStatusDescriptionArray = [];
@@ -287,11 +319,15 @@ RaycasterWorkerBridge.prototype.hide2D = noop;
 RaycasterWorkerBridge.prototype.show2D = noop;
 
 RaycasterWorkerBridge.prototype.refresh2D = function(){
-  var totalObj = (mode == 0)? sceneHandler.getAddedTexts2D(): sceneHandler.getClickableAddedTexts2D();
-  var msgBody = new Object();
-  for (var textName in totalObj){
-    var size = totalObj[textName].twoDimensionalSize;
-    msgBody[textName] = {x: size.x, y: size.y, z: size.z, w: size.w};
+  var totalTextObj = (mode == 0)? sceneHandler.getAddedTexts2D(): sceneHandler.getClickableAddedTexts2D();
+  var totalSpriteObj = (mode == 0)? sceneHandler.getSprites(): sceneHandler.getClickableSprites();
+  var msgBody = {texts: {}, sprites: {}};
+  for (var textName in totalTextObj){
+    var size = totalTextObj[textName].twoDimensionalSize;
+    msgBody.texts[textName] = {x: size.x, y: size.y, z: size.z, w: size.w};
+  }
+  for (var spriteName in totalSpriteObj){
+    msgBody.sprites[spriteName] = totalSpriteObj[spriteName].exportLightweight();
   }
   var vp = {x: renderer.getCurrentViewport().x, y: renderer.getCurrentViewport().y, z: renderer.getCurrentViewport().z, w: renderer.getCurrentViewport().w}
   this.worker.postMessage({refresh2D: true, body: msgBody, vp: vp, screenResolution: screenResolution});
@@ -469,6 +505,21 @@ RaycasterWorkerBridge.prototype.issueUpdate = function(obj){
     description[obj.indexInIntersectableObjDescriptionArray + 3] = obj.twoDimensionalSize.y;
     description[obj.indexInIntersectableObjDescriptionArray + 4] = obj.twoDimensionalSize.z;
     description[obj.indexInIntersectableObjDescriptionArray + 5] = obj.twoDimensionalSize.w;
+  }else if (obj.isSprite){
+    description[obj.indexInIntersectableObjDescriptionArray + 2] = obj.rectangle.x;
+    description[obj.indexInIntersectableObjDescriptionArray + 3] = obj.rectangle.y;
+    description[obj.indexInIntersectableObjDescriptionArray + 4] = obj.rectangle.finalX;
+    description[obj.indexInIntersectableObjDescriptionArray + 5] = obj.rectangle.finalY;
+    description[obj.indexInIntersectableObjDescriptionArray + 6] = obj.rectangle.width;
+    description[obj.indexInIntersectableObjDescriptionArray + 7] = obj.rectangle.heigth;
+    description[obj.indexInIntersectableObjDescriptionArray + 8] = obj.reusableVector1.x;
+    description[obj.indexInIntersectableObjDescriptionArray + 9] = obj.reusableVector1.y;
+    description[obj.indexInIntersectableObjDescriptionArray + 10] = obj.reusableVector2.x;
+    description[obj.indexInIntersectableObjDescriptionArray + 11] = obj.reusableVector2.y;
+    description[obj.indexInIntersectableObjDescriptionArray + 12] = obj.reusableVector3.x;
+    description[obj.indexInIntersectableObjDescriptionArray + 13] = obj.reusableVector3.y;
+    description[obj.indexInIntersectableObjDescriptionArray + 14] = obj.reusableVector4.x;
+    description[obj.indexInIntersectableObjDescriptionArray + 15] = obj.reusableVector4.y;
   }else{
     for (var i = obj.indexInIntersectableObjDescriptionArray + 2; i < obj.indexInIntersectableObjDescriptionArray + 18; i++){
       description[i] = obj.mesh.matrixWorld.elements[i - obj.indexInIntersectableObjDescriptionArray - 2]
@@ -489,6 +540,9 @@ RaycasterWorkerBridge.prototype.updateObject = function(obj){
     return;
   }
   if (mode == 1 && (obj.isAddedText && obj.is2D && !obj.isClickable)){
+    return;
+  }
+  if (mode == 1 && (obj.isSprite && !obj.isClickable)){
     return;
   }
   if (obj.isAddedText && obj.isEditorHelper){

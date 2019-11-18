@@ -25,7 +25,9 @@ var ShaderContent = function(){
     {name: "bloomCombinerVertexShader", isVertexShader: true, dir: "post_processing/bloom/combiner"},
     {name: "bloomCombinerFragmentShader", isVertexShader: false, dir: "post_processing/bloom/combiner"},
     {name: "lightningVertexShader", isVertexShader: true, dir: "lightning"},
-    {name: "lightningFragmentShader", isVertexShader: false, dir: "lightning"}
+    {name: "lightningFragmentShader", isVertexShader: false, dir: "lightning"},
+    {name: "spriteVertexShader", isVertexShader: true, dir: "sprite"},
+    {name: "spriteFragmentShader", isVertexShader: false, dir: "sprite"}
   ];
   this.currentLoadCount = 0;
   this.allShadersReadyCallback = function(){

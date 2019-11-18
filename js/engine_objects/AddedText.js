@@ -59,7 +59,7 @@ var AddedText = function(name, font, text, position, color, alpha, characterSize
       glyphTexture: this.getGlyphUniform(),
       xOffsets: new THREE.Uniform(xOffsetsArray),
       yOffsets: new THREE.Uniform(yOffsetsArray),
-      currentViewport: GLOBAL_ADDEDTEXT_VIEWPORT_UNIFORM,
+      currentViewport: GLOBAL_VIEWPORT_UNIFORM,
       charSize: new THREE.Uniform(this.characterSize),
       screenResolution: GLOBAL_SCREEN_RESOLUTION_UNIFORM
     }
@@ -88,7 +88,7 @@ var AddedText = function(name, font, text, position, color, alpha, characterSize
   this.reusableVector = new THREE.Vector3();
   this.makeFirstUpdate = true;
   this.isAffectedByFog = false;
-  this.marginMode = MARGIN_MODE_2D_TEXT_TOP_LEFT;
+  this.marginMode = MARGIN_MODE_2D_TOP_LEFT;
   this.marginPercentWidth = 50;
   this.marginPercentHeight = 50;
   this.maxWidthPercent = 100;
@@ -205,6 +205,7 @@ AddedText.prototype.destroy = function(skipRaycasterRefresh){
     this.bbHelper.geometry.dispose();
   }
   if (this.rectangle){
+    scene.remove(this.rectangle.mesh);
     this.rectangle.material.dispose();
     this.rectangle.geometry.dispose();
   }
@@ -848,14 +849,14 @@ AddedText.prototype.set2DStatus = function(is2D){
 }
 
 AddedText.prototype.set2DCoordinates = function(marginPercentWidth, marginPercentHeight){
-  GLOBAL_ADDEDTEXT_VIEWPORT_UNIFORM.value.set(0, 0, window.innerWidth * screenResolution, window.innerHeight * screenResolution);
+  GLOBAL_VIEWPORT_UNIFORM.value.set(0, 0, window.innerWidth * screenResolution, window.innerHeight * screenResolution);
   this.marginPercentWidth = marginPercentWidth;
   this.marginPercentHeight = marginPercentHeight;
   var isFromLeft = false, isFromTop = false, isFromCenter = false;
-  if (this.marginMode == MARGIN_MODE_2D_TEXT_TOP_LEFT){
+  if (this.marginMode == MARGIN_MODE_2D_TOP_LEFT){
     isFromLeft = true;
     isFromTop = true;
-  }else if (this.marginMode == MARGIN_MODE_2D_TEXT_CENTER){
+  }else if (this.marginMode == MARGIN_MODE_2D_CENTER){
     isFromCenter = true;
   }
   var curViewport = REUSABLE_QUATERNION.set(0, 0, window.innerWidth, window.innerHeight);
@@ -935,16 +936,16 @@ AddedText.prototype.set2DCoordinates = function(marginPercentWidth, marginPercen
   }
 
   // CONVERTED FROM TEXT VERTEX SHADER CODE
-  var oldPosX = ((GLOBAL_ADDEDTEXT_VIEWPORT_UNIFORM.value.z - GLOBAL_ADDEDTEXT_VIEWPORT_UNIFORM.value.x) / 2.0) + GLOBAL_ADDEDTEXT_VIEWPORT_UNIFORM.value.x + this.xMax;
-  var oldPosY = ((GLOBAL_ADDEDTEXT_VIEWPORT_UNIFORM.value.w - GLOBAL_ADDEDTEXT_VIEWPORT_UNIFORM.value.y) / 2.0) + GLOBAL_ADDEDTEXT_VIEWPORT_UNIFORM.value.y + this.yMin;
-  var x = (((oldPosX - GLOBAL_ADDEDTEXT_VIEWPORT_UNIFORM.value.x) * 2.0) / GLOBAL_ADDEDTEXT_VIEWPORT_UNIFORM.value.z) - 1.0;
-  var y = (((oldPosY - GLOBAL_ADDEDTEXT_VIEWPORT_UNIFORM.value.y) * 2.0) / GLOBAL_ADDEDTEXT_VIEWPORT_UNIFORM.value.w) - 1.0;
+  var oldPosX = ((GLOBAL_VIEWPORT_UNIFORM.value.z - GLOBAL_VIEWPORT_UNIFORM.value.x) / 2.0) + GLOBAL_VIEWPORT_UNIFORM.value.x + this.xMax;
+  var oldPosY = ((GLOBAL_VIEWPORT_UNIFORM.value.w - GLOBAL_VIEWPORT_UNIFORM.value.y) / 2.0) + GLOBAL_VIEWPORT_UNIFORM.value.y + this.yMin;
+  var x = (((oldPosX - GLOBAL_VIEWPORT_UNIFORM.value.x) * 2.0) / GLOBAL_VIEWPORT_UNIFORM.value.z) - 1.0;
+  var y = (((oldPosY - GLOBAL_VIEWPORT_UNIFORM.value.y) * 2.0) / GLOBAL_VIEWPORT_UNIFORM.value.w) - 1.0;
   this.twoDimensionalSize.z = x + this.shaderMargin.x + this.cSizeX;
   this.twoDimensionalSize.w = y + this.shaderMargin.y - this.cSizeY;
-  oldPosX = ((GLOBAL_ADDEDTEXT_VIEWPORT_UNIFORM.value.z - GLOBAL_ADDEDTEXT_VIEWPORT_UNIFORM.value.x) / 2.0) + GLOBAL_ADDEDTEXT_VIEWPORT_UNIFORM.value.x;
-  oldPosY = ((GLOBAL_ADDEDTEXT_VIEWPORT_UNIFORM.value.w - GLOBAL_ADDEDTEXT_VIEWPORT_UNIFORM.value.y) / 2.0) + GLOBAL_ADDEDTEXT_VIEWPORT_UNIFORM.value.y;
-  x = (((oldPosX - GLOBAL_ADDEDTEXT_VIEWPORT_UNIFORM.value.x) * 2.0) / GLOBAL_ADDEDTEXT_VIEWPORT_UNIFORM.value.z) - 1.0;
-  y = (((oldPosY - GLOBAL_ADDEDTEXT_VIEWPORT_UNIFORM.value.y) * 2.0) / GLOBAL_ADDEDTEXT_VIEWPORT_UNIFORM.value.w) - 1.0;
+  oldPosX = ((GLOBAL_VIEWPORT_UNIFORM.value.z - GLOBAL_VIEWPORT_UNIFORM.value.x) / 2.0) + GLOBAL_VIEWPORT_UNIFORM.value.x;
+  oldPosY = ((GLOBAL_VIEWPORT_UNIFORM.value.w - GLOBAL_VIEWPORT_UNIFORM.value.y) / 2.0) + GLOBAL_VIEWPORT_UNIFORM.value.y;
+  x = (((oldPosX - GLOBAL_VIEWPORT_UNIFORM.value.x) * 2.0) / GLOBAL_VIEWPORT_UNIFORM.value.z) - 1.0;
+  y = (((oldPosY - GLOBAL_VIEWPORT_UNIFORM.value.y) * 2.0) / GLOBAL_VIEWPORT_UNIFORM.value.w) - 1.0;
   this.twoDimensionalSize.x = x + this.shaderMargin.x - this.cSizeX;
   this.twoDimensionalSize.y = y + this.shaderMargin.y + this.cSizeY;
   this.webglSpaceSize.set(

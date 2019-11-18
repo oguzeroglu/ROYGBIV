@@ -98,7 +98,7 @@ RayCaster.prototype.refresh = function(){
 }
 
 RayCaster.prototype.updateObject = function(obj, forceUpdate){
-  if (obj.isAddedText && obj.is2D){
+  if ((obj.isAddedText && obj.is2D) || (obj.isSprite)){
     this.update2D(obj, forceUpdate);
     return;
   }
@@ -117,10 +117,12 @@ RayCaster.prototype.issueUpdate = function(obj){
 
 RayCaster.prototype.findIntersections = function(from, direction, intersectGridSystems, callbackFunction, clientX, clientY){
   intersectionPoint = 0, intersectionObject = 0;
-  objectPicker2D.find(clientX, clientY);
-  if (intersectionPoint){
-    callbackFunction();
-    return;
+  if (!IS_WORKER_CONTEXT){
+    objectPicker2D.find(clientX, clientY);
+    if (intersectionPoint){
+      callbackFunction();
+      return;
+    }
   }
   this.origin.copy(from);
   this.direction.copy(direction);
@@ -200,7 +202,7 @@ RayCaster.prototype.findIntersections = function(from, direction, intersectGridS
 }
 
 RayCaster.prototype.hide = function(object){
-  if (object.isAddedText && object.is2D){
+  if ((object.isAddedText && object.is2D) || (object.isSprite)){
     this.hide2D(object);
     return;
   }
@@ -208,7 +210,7 @@ RayCaster.prototype.hide = function(object){
 }
 
 RayCaster.prototype.show = function(object){
-  if (object.isAddedText && object.is2D){
+  if ((object.isAddedText && object.is2D) || (object.isSprite)){
     this.show2D(object);
     return;
   }
