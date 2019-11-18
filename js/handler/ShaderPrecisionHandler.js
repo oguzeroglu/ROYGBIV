@@ -11,7 +11,8 @@ var ShaderPrecisionHandler = function(){
     PARTICLE: 5,
     SKYBOX: 6,
     TEXT: 7,
-    LIGHTNING: 8
+    LIGHTNING: 8,
+    SPRITE: 9
   }
   this.reset();
 }
@@ -307,6 +308,18 @@ ShaderPrecisionHandler.prototype.setShaderPrecisionForType = function(type, prec
         text.mesh.material.vertexShader = this.replace(text.mesh.material.vertexShader, currentPrecisionForType, newPrecisionForType);
         text.mesh.material.fragmentShader = this.replace(text.mesh.material.fragmentShader, currentPrecisionForType, newPrecisionForType);
         text.mesh.material.needsUpdate = true;
+      }
+    break;
+    case this.types.SPRITE:
+      vertexShader = ShaderContent.spriteVertexShader;
+      fragmentShader = ShaderContent.spriteFragmentShader;
+      vertexShaderName = "spriteVertexShader";
+      fragmentShaderName = "spriteFragmentShader";
+      for (var spriteName in sprites){
+        var sprite = sprites[spriteName];
+        sprite.mesh.material.vertexShader = this.replace(sprite.mesh.material.vertexShader, currentPrecisionForType, newPrecisionForType);
+        sprite.mesh.material.fragmentShader = this.replace(sprite.mesh.material.fragmentShader, currentPrecisionForType, newPrecisionForType);
+        sprite.mesh.material.needsUpdate = true;
       }
     break;
   }
