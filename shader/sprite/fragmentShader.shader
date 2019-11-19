@@ -14,6 +14,11 @@ uniform float alpha;
 void main(){
   gl_FragColor = vec4(color.r, color.g, color.b, alpha);
   #ifdef HAS_TEXTURE
-    gl_FragColor *= texture2D(texture, vUV);
+    vec4 textureColor = texture2D(texture, vUV);
+    if (textureColor.a <= 0.5){
+      discard;
+    }else{
+      gl_FragColor *= texture2D(texture, vUV);
+    }
   #endif
 }

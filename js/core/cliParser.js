@@ -4749,6 +4749,7 @@ function parse(input){
           }
           sprite.destroy();
           sceneHandler.onSpriteDeletion(sprite);
+          selectionHandler.resetCurrentSelection();
           terminal.printInfo(Text.SPRITE_DESTROYED);
           return true;
         break;
