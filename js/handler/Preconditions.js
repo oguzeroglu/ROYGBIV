@@ -229,6 +229,8 @@ var Preconditions = function(){
   this.sprite = "sprite";
   this.sprite1 = "sprite1";
   this.sprite2 = "sprite2";
+  this.marginPercentX = "marginPercentX";
+  this.marginPercentY = "marginPercentY";
 }
 
 Preconditions.prototype.errorHeader = function(callerFunc){

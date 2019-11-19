@@ -277,7 +277,9 @@ Sprite.prototype.set2DCoordinates = function(marginPercentX, marginPercentY){
     this.mesh.material.uniforms.margin.value.y = marginY;
   }
   this.handleRectangle();
-  rayCaster.updateObject(this);
+  if (mode == 0 || (mode == 1 && this.isClickable)){
+    rayCaster.updateObject(this);
+  }
 }
 
 Sprite.prototype.getCornerPoint = function(point){

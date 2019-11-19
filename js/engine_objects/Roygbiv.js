@@ -211,7 +211,8 @@ var Roygbiv = function(){
     "setSpriteColor",
     "setSpriteAlpha",
     "hideSprite",
-    "showSprite"
+    "showSprite",
+    "setSpriteMargin"
   ];
 
   this.globals = new Object();
@@ -2818,6 +2819,21 @@ Roygbiv.prototype.showSprite = function(sprite){
   preConditions.checkIfDefined(ROYGBIV.showSprite, preConditions.sprite, sprite);
   preConditions.checkIfSprite(ROYGBIV.showSprite, preConditions.sprite, sprite);
   sprite.show();
+}
+
+// Sets the margin of a sprite.
+Roygbiv.prototype.setSpriteMargin = function(sprite, marginPercentX, marginPercentY){
+  if (mode == 0){
+    return;
+  }
+  preConditions.checkIfDefined(ROYGBIV.setSpriteMargin, preConditions.sprite, sprite);
+  preConditions.checkIfDefined(ROYGBIV.setSpriteMargin, preConditions.marginPercentX, marginPercentX);
+  preConditions.checkIfDefined(ROYGBIV.setSpriteMargin, preConditions.marginPercentY, marginPercentY);
+  preConditions.checkIfSprite(ROYGBIV.setSpriteMargin, preConditions.sprite, sprite);
+  preConditions.checkIfNumber(ROYGBIV.setSpriteMargin, preConditions.marginPercentX, marginPercentX);
+  preConditions.checkIfNumber(ROYGBIV.setSpriteMargin, preConditions.marginPercentY, marginPercentY);
+  preConditions.checkIfSpriteInsideActiveScene(ROYGBIV.setSpriteMargin, sprite);
+  sprite.set2DCoordinates(marginPercentX, marginPercentY);
 }
 
 // UTILITY FUNCTIONS ***********************************************************

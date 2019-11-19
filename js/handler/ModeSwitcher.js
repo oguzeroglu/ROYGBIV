@@ -218,12 +218,12 @@ ModeSwitcher.prototype.switchFromDesignToPreview = function(){
       sceneHandler.onClickableSpriteAddition(sprites[spriteName]);
       if (sprites[spriteName].isDraggable){
         sceneHandler.setDraggableSprite(sprites[spriteName]);
-        sprites[spriteName].marginBeforeDrag = {
-          x: sprites[spriteName].marginPercentX,
-          y: sprites[spriteName].marginPercentY
-        };
       }
     }
+    sprites[spriteName].originalMargin = {
+      x: sprites[spriteName].marginPercentX,
+      y: sprites[spriteName].marginPercentY
+    };
     sprites[spriteName].originalColor = sprites[spriteName].mesh.material.uniforms.color.value.getHex();
   }
   sceneHandler.onSwitchFromDesignToPreview();
@@ -296,10 +296,8 @@ ModeSwitcher.prototype.switchFromPreviewToDesign = function(){
     for (var animationName in sprites[spriteName].animations){
       animationHandler.forceFinish(sprites[spriteName].animations[animationName]);
     }
-    if (sprites[spriteName].isDraggable){
-      sprites[spriteName].set2DCoordinates(sprites[spriteName].marginBeforeDrag.x, sprites[spriteName].marginBeforeDrag.y);
-      delete sprites[spriteName].marginBeforeDrag;
-    }
+    sprites[spriteName].set2DCoordinates(sprites[spriteName].originalMargin.x, sprites[spriteName].originalMargin.y);
+    delete sprites[spriteName].originalMargin;
     sprites[spriteName].setColor(sprites[spriteName].originalColor);
   }
   collisionCallbackRequests = new Map();
