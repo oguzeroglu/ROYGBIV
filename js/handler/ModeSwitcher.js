@@ -224,6 +224,7 @@ ModeSwitcher.prototype.switchFromDesignToPreview = function(){
       x: sprites[spriteName].marginPercentX,
       y: sprites[spriteName].marginPercentY
     };
+    sprites[spriteName].originalRotation = sprites[spriteName].mesh.material.uniforms.rotationAngle.value;
     sprites[spriteName].originalColor = sprites[spriteName].mesh.material.uniforms.color.value.getHex();
   }
   sceneHandler.onSwitchFromDesignToPreview();
@@ -298,6 +299,8 @@ ModeSwitcher.prototype.switchFromPreviewToDesign = function(){
     }
     sprites[spriteName].set2DCoordinates(sprites[spriteName].originalMargin.x, sprites[spriteName].originalMargin.y);
     delete sprites[spriteName].originalMargin;
+    sprites[spriteName].setRotation(sprites[spriteName].originalRotation);
+    delete sprites[spriteName].originalRotation;
     sprites[spriteName].setColor(sprites[spriteName].originalColor);
   }
   collisionCallbackRequests = new Map();

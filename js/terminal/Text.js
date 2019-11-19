@@ -911,4 +911,5 @@ var Text = function(){
   this.ROYGBIV_SCRIPTING_API_HIDESPRITE = "Hides a sprite. Does nothing if the sprite is already hidden.";
   this.ROYGBIV_SCRIPTING_API_SHOWSPRITE = "Shows a sprite. Does nothing if the sprite is already visible.";
   this.ROYGBIV_SCRIPTING_API_SETSPRITEMARGIN = "Sets the margin of a sprite.";
+  this.ROYGBIV_SCRIPTING_API_SETSPRITEROTATIONANGLE = "Sets the rotation of a sprite. Angle is expected to be between [0, 360].";
 }

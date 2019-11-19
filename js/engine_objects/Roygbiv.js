@@ -212,7 +212,8 @@ var Roygbiv = function(){
     "setSpriteAlpha",
     "hideSprite",
     "showSprite",
-    "setSpriteMargin"
+    "setSpriteMargin",
+    "setSpriteRotationAngle"
   ];
 
   this.globals = new Object();
@@ -2834,6 +2835,20 @@ Roygbiv.prototype.setSpriteMargin = function(sprite, marginPercentX, marginPerce
   preConditions.checkIfNumber(ROYGBIV.setSpriteMargin, preConditions.marginPercentY, marginPercentY);
   preConditions.checkIfSpriteInsideActiveScene(ROYGBIV.setSpriteMargin, sprite);
   sprite.set2DCoordinates(marginPercentX, marginPercentY);
+}
+
+// Sets the rotation of a sprite. Angle is expected to be between [0, 360].
+Roygbiv.prototype.setSpriteRotationAngle = function(sprite, angle){
+  if (mode == 0){
+    return;
+  }
+  preConditions.checkIfDefined(ROYGBIV.setSpriteRotationAngle, preConditions.sprite, sprite);
+  preConditions.checkIfDefined(ROYGBIV.setSpriteRotationAngle, preConditions.angle, angle);
+  preConditions.checkIfSprite(ROYGBIV.setSpriteRotationAngle, preConditions.sprite, sprite);
+  preConditions.checkIfSpriteInsideActiveScene(ROYGBIV.setSpriteRotationAngle, sprite);
+  preConditions.checkIfNumber(ROYGBIV.setSpriteRotationAngle, preConditions.angle, angle);
+  preConditions.checkIfInRange(ROYGBIV.setSpriteRotationAngle, preConditions.angle, angle, 0, 360);
+  sprite.setRotation(angle);
 }
 
 // UTILITY FUNCTIONS ***********************************************************

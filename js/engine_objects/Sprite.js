@@ -339,7 +339,9 @@ Sprite.prototype.setScale = function(scaleX, scaleY){
 Sprite.prototype.setRotation = function(angleInDegrees){
   this.mesh.material.uniforms.rotationAngle.value = angleInDegrees;
   this.handleRectangle();
-  rayCaster.updateObject(this);
+  if (mode == 0 || (mode == 1 && this.isClickable)){
+    rayCaster.updateObject(this);
+  }
 }
 
 Sprite.prototype.getTextureUniform = function(texture){
