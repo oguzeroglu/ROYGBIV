@@ -114,6 +114,8 @@ KeyboardEventHandler.prototype.onKeyDown = function(event){
       }else if (currentSelection.isAddedText){
         terminal.clear();
         parseCommand("destroyText "+currentSelection.name);
+      }else if (currentSelection.isSprite){
+        parseCommand("destroySprite "+currentSelection.name);
       }
       guiHandler.afterObjectSelection();
     break;
