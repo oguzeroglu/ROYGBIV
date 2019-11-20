@@ -4,6 +4,7 @@ var Scene = function(name){
 }
 
 Scene.prototype.reset = function(){
+  this.backgroundColor = "#000000";
   this.addedObjects = new Object();
   this.objectGroups = new Object();
   this.addedTexts = new Object();
@@ -109,6 +110,7 @@ Scene.prototype.savePostProcessing = function(){
 }
 
 Scene.prototype.import = function(exportObj){
+  this.backgroundColor = exportObj.backgroundColor;
   for (var i = 0; i<exportObj.addedObjectNames.length; i++){
     this.registerAddedObject(addedObjects[exportObj.addedObjectNames[i]]);
   }
@@ -161,6 +163,7 @@ Scene.prototype.import = function(exportObj){
 
 Scene.prototype.export = function(){
   var exportObj = new Object();
+  exportObj.backgroundColor = this.backgroundColor;
   exportObj.addedObjectNames = Object.keys(this.addedObjects);
   exportObj.objectGroupNames = Object.keys(this.objectGroups);
   exportObj.addedTextNames = Object.keys(this.addedTexts);

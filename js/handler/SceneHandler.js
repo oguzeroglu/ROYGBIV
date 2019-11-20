@@ -238,6 +238,7 @@ SceneHandler.prototype.changeScene = function(sceneName, readyCallback){
     document.exitPointerLock();
   }
   this.hideAll();
+  scene.background.set("black");
   if (this.scenes[sceneName].isSkyboxMapped){
     skyboxHandler.map(skyBoxes[this.scenes[sceneName].mappedSkyboxName]);
   }
@@ -338,6 +339,7 @@ SceneHandler.prototype.changeScene = function(sceneName, readyCallback){
       fogHandler.setFogToObjects();
     }
   }
+  scene.background.set(this.scenes[this.activeSceneName].backgroundColor);
   if (mode == 0){
     $("#cliDivheader").text("ROYGBIV 3D Engine - CLI (Design mode - "+sceneHandler.getActiveSceneName()+")");
   }
@@ -345,6 +347,11 @@ SceneHandler.prototype.changeScene = function(sceneName, readyCallback){
 
 SceneHandler.prototype.createScene = function(sceneName){
   this.scenes[sceneName] = new Scene(sceneName);
+}
+
+SceneHandler.prototype.setBackgroundColor = function(colorName){
+  this.scenes[this.activeSceneName].backgroundColor = colorName;
+  scene.background.set(colorName);
 }
 
 SceneHandler.prototype.onSpriteDeletion = function(sprite){

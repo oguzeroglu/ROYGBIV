@@ -82,6 +82,7 @@ var Text = function(){
   this.SWITCHED_TO_PREVIEW_MODE = "Switched to preview mode.";
   this.SWITCHED_TO_DESIGN_MODE = "Switched to design mode.";
   this.NAME_RESERVED = "Name reserved.";
+  this.BACKGROUND_COLOR_SET = "Background color set.";
   this.MATERIAL_NAME_MUST_BE_UNIQUE = "Material name must be unique.";
   this.ISWIREFRAMED_MUST_BE_TRUE_OR_FALSE = "isWireFramed must be true or false.";
   this.ISVISIBLE_MUST_BE_TRUE_OR_FALSE = "isVisible must be true or false.";

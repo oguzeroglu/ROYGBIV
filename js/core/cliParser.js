@@ -4789,6 +4789,15 @@ function parse(input){
           }
           return true;
         break;
+        case 202: //setBackgroundColor
+          if (mode != 0){
+            terminal.printError(Text.WORKS_ONLY_IN_DESIGN_MODE);
+            return true;
+          }
+          sceneHandler.setBackgroundColor(splitted[1]);
+          terminal.printInfo(Text.BACKGROUND_COLOR_SET);
+          return true;
+        break;
       }
       return true;
     }catch(err){
