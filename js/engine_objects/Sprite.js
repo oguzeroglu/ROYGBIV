@@ -84,6 +84,9 @@ Sprite.prototype.intersectionTest = function(sprite){
 }
 
 Sprite.prototype.onDragStarted = function(){
+  if (this.draggingDisabled){
+    return;
+  }
   draggingSprite = this;
   if (this.dragStartCallback){
     this.dragStartCallback();
@@ -91,6 +94,9 @@ Sprite.prototype.onDragStarted = function(){
 }
 
 Sprite.prototype.onDragStopped = function(){
+  if (this.draggingDisabled){
+    return;
+  }
   draggingSprite = false;
   if (this.dragStopCallback){
     this.dragStopCallback();
@@ -98,6 +104,9 @@ Sprite.prototype.onDragStopped = function(){
 }
 
 Sprite.prototype.onDrag = function(diffX, diffY){
+  if (this.draggingDisabled){
+    return;
+  }
   var width = renderer.getCurrentViewport().z;
   var height = renderer.getCurrentViewport().w;
   var diffXPercent = (((diffX) * (100)) / (width));

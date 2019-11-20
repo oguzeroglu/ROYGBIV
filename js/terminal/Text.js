@@ -913,4 +913,6 @@ var Text = function(){
   this.ROYGBIV_SCRIPTING_API_SHOWSPRITE = "Shows a sprite. Does nothing if the sprite is already visible.";
   this.ROYGBIV_SCRIPTING_API_SETSPRITEMARGIN = "Sets the margin of a sprite.";
   this.ROYGBIV_SCRIPTING_API_SETSPRITEROTATIONANGLE = "Sets the rotation of a sprite. Angle is expected to be between [0, 360].";
+  this.ROYGBIV_SCRIPTING_API_ENABLESPRITEDRAGGING = "Enables dragging for draggable sprites. Dragging is initially enabled for draggable sprites.";
+  this.ROYGBIV_SCRIPTING_API_DISABLESPRITEDRAGGING = "Disables dragging for draggable sprites. Dragging is initially enabled for draggable sprites.";
 }

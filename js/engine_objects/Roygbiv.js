@@ -213,7 +213,9 @@ var Roygbiv = function(){
     "hideSprite",
     "showSprite",
     "setSpriteMargin",
-    "setSpriteRotationAngle"
+    "setSpriteRotationAngle",
+    "enableSpriteDragging",
+    "disableSpriteDragging"
   ];
 
   this.globals = new Object();
@@ -2849,6 +2851,30 @@ Roygbiv.prototype.setSpriteRotationAngle = function(sprite, angle){
   preConditions.checkIfNumber(ROYGBIV.setSpriteRotationAngle, preConditions.angle, angle);
   preConditions.checkIfInRange(ROYGBIV.setSpriteRotationAngle, preConditions.angle, angle, 0, 360);
   sprite.setRotation(angle);
+}
+
+// Enables dragging for draggable sprites. Dragging is initially enabled
+// for draggable sprites.
+Roygbiv.prototype.enableSpriteDragging = function(sprite){
+  if (mode == 0){
+    return;
+  }
+  preConditions.checkIfDefined(ROYGBIV.enableSpriteDragging, preConditions.sprite, sprite);
+  preConditions.checkIfSprite(ROYGBIV.enableSpriteDragging, preConditions.sprite, sprite);
+  preConditions.checkIfSpriteDraggable(ROYGBIV.enableSpriteDragging, sprite);
+  sprite.draggingDisabled = false;
+}
+
+// Disables dragging for draggable sprites. Dragging is initially enabled
+// for draggable sprites.
+Roygbiv.prototype.disableSpriteDragging = function(sprite){
+  if (mode == 0){
+    return;
+  }
+  preConditions.checkIfDefined(ROYGBIV.disableSpriteDragging, preConditions.sprite, sprite);
+  preConditions.checkIfSprite(ROYGBIV.disableSpriteDragging, preConditions.sprite, sprite);
+  preConditions.checkIfSpriteDraggable(ROYGBIV.disableSpriteDragging, sprite);
+  sprite.draggingDisabled = true;
 }
 
 // UTILITY FUNCTIONS ***********************************************************

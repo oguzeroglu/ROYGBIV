@@ -299,6 +299,7 @@ ModeSwitcher.prototype.switchFromPreviewToDesign = function(){
     delete sprites[spriteName].dragStartCallback;
     delete sprites[spriteName].dragStopCallback;
     delete sprites[spriteName].draggingCallback;
+    delete sprites[spriteName].draggingDisabled;
     for (var animationName in sprites[spriteName].animations){
       animationHandler.forceFinish(sprites[spriteName].animations[animationName]);
     }
