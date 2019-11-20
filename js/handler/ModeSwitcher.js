@@ -212,7 +212,6 @@ ModeSwitcher.prototype.switchFromDesignToPreview = function(){
     }
   }
   for (var spriteName in sprites){
-    delete sprites[spriteName].onClickCallback;
     if (sprites[spriteName].isClickable){
       clickableSprites[spriteName] = sprites[spriteName];
       sceneHandler.onClickableSpriteAddition(sprites[spriteName]);
@@ -226,6 +225,7 @@ ModeSwitcher.prototype.switchFromDesignToPreview = function(){
     };
     sprites[spriteName].originalRotation = sprites[spriteName].mesh.material.uniforms.rotationAngle.value;
     sprites[spriteName].originalColor = sprites[spriteName].mesh.material.uniforms.color.value.getHex();
+    sprites[spriteName].originalAlpha = sprites[spriteName].mesh.material.uniforms.alpha.value;
   }
   sceneHandler.onSwitchFromDesignToPreview();
   this.commonSwitchFunctions();
@@ -294,6 +294,11 @@ ModeSwitcher.prototype.switchFromPreviewToDesign = function(){
   }
   for (var spriteName in sprites){
     delete sprites[spriteName].onClickCallback;
+    delete sprites[spriteName].mouseOverCallbackFunction;
+    delete sprites[spriteName].mouseOutCallbackFunction;
+    delete sprites[spriteName].dragStartCallback;
+    delete sprites[spriteName].dragStopCallback;
+    delete sprites[spriteName].draggingCallback;
     for (var animationName in sprites[spriteName].animations){
       animationHandler.forceFinish(sprites[spriteName].animations[animationName]);
     }
@@ -302,6 +307,9 @@ ModeSwitcher.prototype.switchFromPreviewToDesign = function(){
     sprites[spriteName].setRotation(sprites[spriteName].originalRotation);
     delete sprites[spriteName].originalRotation;
     sprites[spriteName].setColor(sprites[spriteName].originalColor);
+    delete sprites[spriteName].originalColor;
+    sprites[spriteName].setAlpha(sprites[spriteName].originalAlpha);
+    delete sprites[spriteName].originalAlpha;
   }
   collisionCallbackRequests = new Map();
   particleCollisionCallbackRequests = new Object();
