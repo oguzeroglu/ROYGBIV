@@ -2850,7 +2850,6 @@ Roygbiv.prototype.setSpriteRotationAngle = function(sprite, angle){
   preConditions.checkIfSprite(ROYGBIV.setSpriteRotationAngle, preConditions.sprite, sprite);
   preConditions.checkIfSpriteInsideActiveScene(ROYGBIV.setSpriteRotationAngle, sprite);
   preConditions.checkIfNumber(ROYGBIV.setSpriteRotationAngle, preConditions.angle, angle);
-  preConditions.checkIfInRange(ROYGBIV.setSpriteRotationAngle, preConditions.angle, angle, 0, 360);
   sprite.setRotation(angle);
 }
 
