@@ -22,6 +22,30 @@ var Sprite = function(name){
   webglCallbackHandler.registerEngineObject(this);
 }
 
+Sprite.prototype.setHeightPercent = function(heightPercent){
+  this.setScale(this.mesh.material.uniforms.scale.value.x ,this.mesh.material.uniforms.scale.value.y * heightPercent / this.calculateHeightPercent());
+  this.handleRectangle();
+  if (mode == 0 || this.isClickable){
+    rayCaster.updateObject(this);
+  }
+}
+
+Sprite.prototype.setWidthPercent = function(widthPercent){
+  this.setScale(this.mesh.material.uniforms.scale.value.x * widthPercent / this.calculateWidthPercent(), this.mesh.material.uniforms.scale.value.y);
+  this.handleRectangle();
+  if (mode == 0 || this.isClickable){
+    rayCaster.updateObject(this);
+  }
+}
+
+Sprite.prototype.calculateHeightPercent = function(){
+  return this.rectangle.height * 100 / 2;
+}
+
+Sprite.prototype.calculateWidthPercent = function(){
+  return this.rectangle.width * 100 / 2;
+}
+
 Sprite.prototype.show = function(){
   if (this.mesh.visible){
     return;
@@ -141,6 +165,12 @@ Sprite.prototype.handleResize = function(){
   var newHeight = (renderer.getCurrentViewport().w / screenResolution);
   this.mesh.material.uniforms.scaleCoef.value = newHeight / this.refHeight;
   this.handleRectangle();
+  if (!(typeof this.fixedWidth == UNDEFINED)){
+    this.setWidthPercent(this.fixedWidth);
+  }
+  if (!(typeof this.fixedHeight == UNDEFINED)){
+    this.setHeightPercent(this.fixedHeight);
+  }
 }
 
 Sprite.prototype.setRefHeight = function(){
@@ -169,7 +199,9 @@ Sprite.prototype.export = function(){
     refHeight: this.refHeight,
     cropCoefficientX: this.cropCoefficientX,
     cropCoefficientY: this.cropCoefficientY,
-    animations: animations
+    animations: animations,
+    fixedWidth: this.fixedWidth,
+    fixedHeight: this.fixedHeight
   };
 }
 

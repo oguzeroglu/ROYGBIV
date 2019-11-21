@@ -60,6 +60,10 @@ var GUIHandler = function(){
     "Texture": "",
     "Scale X": 1.0,
     "Scale Y": 1.0,
+    "Width fixed": false,
+    "Height fixed": false,
+    "Width %": 50,
+    "Height %": 50,
     "Rotation": 0.0,
     "Clickable": false,
     "Draggable": false,
@@ -212,6 +216,10 @@ GUIHandler.prototype.afterSpriteSelection = function(){
     guiHandler.spriteManipulationParameters["Draggable"] = !!curSelection.isDraggable;
     guiHandler.spriteManipulationParameters["Crop X"] = (curSelection.cropCoefficientX ? curSelection.cropCoefficientX : 1.0);
     guiHandler.spriteManipulationParameters["Crop Y"] = (curSelection.cropCoefficientY ? curSelection.cropCoefficientY : 1.0);
+    guiHandler.spriteManipulationParameters["Width fixed"] = !(typeof curSelection.fixedWidth == UNDEFINED);
+    guiHandler.spriteManipulationParameters["Width %"] = (!(typeof curSelection.fixedWidth == UNDEFINED)) ? (curSelection.fixedWidth) : 50;
+    guiHandler.spriteManipulationParameters["Height %"] = (!(typeof curSelection.fixedHeight == UNDEFINED)) ? (curSelection.fixedHeight) : 50;
+    guiHandler.spriteManipulationParameters["Height fixed"] = !(typeof curSelection.fixedHeight == UNDEFINED);
     if (!curSelection.isTextured){
       guiHandler.disableController(guiHandler.spriteManipulationTextureController);
     }
@@ -220,6 +228,16 @@ GUIHandler.prototype.afterSpriteSelection = function(){
     }
     if (!curSelection.isClickable){
       guiHandler.disableController(guiHandler.spriteManipulationDraggableController);
+    }
+    if (!(typeof curSelection.fixedWidth == UNDEFINED)){
+      guiHandler.disableController(guiHandler.spriteManipulationScaleXController);
+    }else{
+      guiHandler.disableController(guiHandler.spriteManipulationFixedWidthController);
+    }
+    if (!(typeof curSelection.fixedHeight == UNDEFINED)){
+      guiHandler.disableController(guiHandler.spriteManipulationScaleYController);
+    }else{
+      guiHandler.disableController(guiHandler.spriteManipulationFixedHeightController);
     }
   }else{
     guiHandler.hide(guiHandler.guiTypes.SPRITE);
@@ -601,6 +619,10 @@ GUIHandler.prototype.enableAllSMControllers = function(){
   guiHandler.enableController(guiHandler.spriteManipulationDraggableController);
   guiHandler.enableController(guiHandler.spriteManipulationCropCoefficientXController);
   guiHandler.enableController(guiHandler.spriteManipulationCropCoefficientYController);
+  guiHandler.enableController(guiHandler.spriteManipulationFixedWidthController);
+  guiHandler.enableController(guiHandler.spriteManipulationFixedHeightController);
+  guiHandler.enableController(guiHandler.spriteManipulationHasFixedWidthController);
+  guiHandler.enableController(guiHandler.spriteManipulationHasFixedHeightController);
 }
 
 GUIHandler.prototype.enableAllOMControllers = function(){
@@ -1267,6 +1289,42 @@ GUIHandler.prototype.initializeSpriteManipulationGUI = function(){
   }).listen();
   guiHandler.spriteManipulationScaleYController = guiHandler.datGuiSpriteManipulation.add(guiHandler.spriteManipulationParameters, "Scale Y").min(0.1).max(20).step(0.1).onChange(function(val){
     selectionHandler.getSelectedObject().setScale(selectionHandler.getSelectedObject().mesh.material.uniforms.scale.value.x, val);
+  }).listen();
+  guiHandler.spriteManipulationHasFixedWidthController = guiHandler.datGuiSpriteManipulation.add(guiHandler.spriteManipulationParameters, "Width fixed").onChange(function(val){
+    if (val){
+      selectionHandler.getSelectedObject().fixedWidth = guiHandler.spriteManipulationParameters["Width %"];
+      selectionHandler.getSelectedObject().setWidthPercent(selectionHandler.getSelectedObject().fixedWidth);
+      guiHandler.disableController(guiHandler.spriteManipulationScaleXController);
+      guiHandler.enableController(guiHandler.spriteManipulationFixedWidthController);
+    }else {
+      delete selectionHandler.getSelectedObject().fixedWidth;
+      guiHandler.spriteManipulationParameters["Scale X"] = 1;
+      selectionHandler.getSelectedObject().setScale(1, selectionHandler.getSelectedObject().mesh.material.uniforms.scale.value.y);
+      guiHandler.disableController(guiHandler.spriteManipulationFixedWidthController);
+      guiHandler.enableController(guiHandler.spriteManipulationScaleXController);
+    }
+  }).listen();
+  guiHandler.spriteManipulationFixedWidthController = guiHandler.datGuiSpriteManipulation.add(guiHandler.spriteManipulationParameters, "Width %").min(0.1).max(100).step(0.1).onChange(function(val){
+    selectionHandler.getSelectedObject().setWidthPercent(val);
+    selectionHandler.getSelectedObject().fixedWidth = val;
+  }).listen();
+  guiHandler.spriteManipulationHasFixedHeightController = guiHandler.datGuiSpriteManipulation.add(guiHandler.spriteManipulationParameters, "Height fixed").onChange(function(val){
+    if (val){
+      selectionHandler.getSelectedObject().fixedHeight = guiHandler.spriteManipulationParameters["Height %"];
+      selectionHandler.getSelectedObject().setHeightPercent(selectionHandler.getSelectedObject().fixedHeight);
+      guiHandler.disableController(guiHandler.spriteManipulationScaleYController);
+      guiHandler.enableController(guiHandler.spriteManipulationFixedHeightController);
+    }else {
+      delete selectionHandler.getSelectedObject().fixedHeight;
+      guiHandler.spriteManipulationParameters["Scale Y"] = 1;
+      selectionHandler.getSelectedObject().setScale(selectionHandler.getSelectedObject().mesh.material.uniforms.scale.value.x, 1);
+      guiHandler.disableController(guiHandler.spriteManipulationFixedHeightController);
+      guiHandler.enableController(guiHandler.spriteManipulationScaleYController);
+    }
+  }).listen();
+  guiHandler.spriteManipulationFixedHeightController = guiHandler.datGuiSpriteManipulation.add(guiHandler.spriteManipulationParameters, "Height %").min(0.1).max(100).step(0.1).onChange(function(val){
+    selectionHandler.getSelectedObject().setHeightPercent(val);
+    selectionHandler.getSelectedObject().fixedHeight = val;
   }).listen();
   guiHandler.spriteManipulationRotationController = guiHandler.datGuiSpriteManipulation.add(guiHandler.spriteManipulationParameters, "Rotation").min(0).max(360).step(0.01).onChange(function(val){
     selectionHandler.getSelectedObject().setRotation(val);

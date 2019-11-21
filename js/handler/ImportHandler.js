@@ -1297,6 +1297,8 @@ ImportHandler.prototype.importSprites = function(obj){
     if (curExport.isTextured){
       sprite.mapTexture(texturePacks[curExport.mappedTexturePackName]);
     }
+    sprite.fixedWidth = curExport.fixedWidth;
+    sprite.fixedHeight = curExport.fixedHeight;
     sprite.isClickable = curExport.isClickable;
     sprite.isDraggable = curExport.isDraggable;
     sprites[sprite.name] = sprite;
