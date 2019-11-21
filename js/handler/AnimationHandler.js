@@ -30,7 +30,8 @@ var AnimationHandler = function(){
     SPRITE: {
       TRANSPARENCY: "SPRITE_TRANSPARENCY", SCALE_X: "SPRITE_SCALE_X", SCALE_Y: "SPRITE_SCALE_Y", ROTATION: "SPRITE_ROTATION",
       COLOR: "SPRITE_COLOR", POSITION_X: "SPRITE_POSITION_X", POSITION_Y: "SPRITE_POSITION_Y", TARGET_POSITION_X: "SPRITE_TARGET_POSITION_X",
-      TARGET_POSITION_Y: "SPRITE_TARGET_POSITION_Y", TARGET_ROTATION: "SPRITE_TARGET_ROTATION"
+      TARGET_POSITION_Y: "SPRITE_TARGET_POSITION_Y", TARGET_ROTATION: "SPRITE_TARGET_ROTATION", TARGET_SCALE_X: "SPRITE_TARGET_SCALE_X",
+      TARGET_SCALE_Y: "SPRITE_TARGET_SCALE_Y"
     }
   };
   // INITIAL VALUE GETTERS
@@ -168,6 +169,12 @@ var AnimationHandler = function(){
     return 0;
   }
   this.initialValueGetterFunctionsByType[this.actionTypes.SPRITE.TARGET_ROTATION] = function(object){
+    return 0;
+  }
+  this.initialValueGetterFunctionsByType[this.actionTypes.SPRITE.TARGET_SCALE_X] = function(object){
+    return 0;
+  }
+  this.initialValueGetterFunctionsByType[this.actionTypes.SPRITE.TARGET_SCALE_Y] = function(object){
     return 0;
   }
   // AFTER ANIMATION SETTER FUNCTIONS
@@ -387,6 +394,12 @@ var AnimationHandler = function(){
   this.afterAnimationSettersByType[this.actionTypes.SPRITE.TARGET_ROTATION] = function(animation){
     animation.attachedObject.setRotation(animation.params.sourceRotation);
   }
+  this.afterAnimationSettersByType[this.actionTypes.SPRITE.TARGET_SCALE_X] = function(animation){
+    animation.attachedObject.setScale(animation.params.sourceScale, animation.attachedObject.mesh.material.uniforms.scale.value.y);
+  }
+  this.afterAnimationSettersByType[this.actionTypes.SPRITE.TARGET_SCALE_Y] = function(animation){
+    animation.attachedObject.setScale(animation.attachedObject.mesh.material.uniforms.scale.value.x, animation.params.sourceScale);
+  }
   // ACTION FUNCTIONS **********************************************
   this.actionFunctionsByType = new Object();
   this.actionFunctionsByType[this.actionTypes.OBJECT.TRANSPARENCY] = this.updateObjectTransparencyFunc;
@@ -428,6 +441,8 @@ var AnimationHandler = function(){
   this.actionFunctionsByType[this.actionTypes.SPRITE.TARGET_POSITION_X] = this.updateSpriteTargetPositionXFunc;
   this.actionFunctionsByType[this.actionTypes.SPRITE.TARGET_POSITION_Y] = this.updatespriteTargetPositionYFunc;
   this.actionFunctionsByType[this.actionTypes.SPRITE.TARGET_ROTATION] = this.updateSpriteTargetRotationFunc;
+  this.actionFunctionsByType[this.actionTypes.SPRITE.TARGET_SCALE_X] = this.updateSpriteTargetScaleXFunc;
+  this.actionFunctionsByType[this.actionTypes.SPRITE.TARGET_SCALE_Y] = this.updateSpriteTargetScaleYFunc;
   // UPDATE FUNCTIONS **********************************************
   this.updateFunctionsByType = new Object();
   this.updateFunctionsByType[this.animationTypes.LINEAR] = this.linearFunc;
@@ -793,6 +808,14 @@ AnimationHandler.prototype.updatespriteTargetPositionYFunc = function(params){
 AnimationHandler.prototype.updateSpriteTargetRotationFunc = function(params){
   var newVal = params.sourceRotation + (params.targetRotation - params.sourceRotation) * params.value;
   params.object.setRotation(newVal);
+}
+AnimationHandler.prototype.updateSpriteTargetScaleXFunc = function(params){
+  var newVal = params.sourceScale + (params.targetScale - params.sourceScale) * params.value;
+  params.object.setScale(newVal, params.object.mesh.material.uniforms.scale.value.y);
+}
+AnimationHandler.prototype.updateSpriteTargetScaleYFunc = function(params){
+  var newVal = params.sourceScale + (params.targetScale - params.sourceScale) * params.value;
+  params.object.setScale(params.object.mesh.material.uniforms.scale.value.x, newVal);
 }
 // UPDATE FUNCTIONS ************************************************
 AnimationHandler.prototype.linearFunc = function(curTime, startVal, changeInVal, totalTime){

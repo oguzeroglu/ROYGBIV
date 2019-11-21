@@ -28,6 +28,14 @@ var Animation = function(name, type, attachedObject, description, rewind, repeat
     this.changeInValue = 1;
     this.params.sourceRotation = attachedObject.mesh.material.uniforms.rotationAngle.value;
     this.params.targetRotation = description.targetRotation;
+  }else if (description.action == animationHandler.actionTypes.SPRITE.TARGET_SCALE_X){
+    this.changeInValue = 1;
+    this.params.sourceScale = attachedObject.mesh.material.uniforms.scale.value.x;
+    this.params.targetScale = description.targetScale;
+  }else if (description.action == animationHandler.actionTypes.SPRITE.TARGET_SCALE_Y){
+    this.changeInValue = 1;
+    this.params.sourceScale = attachedObject.mesh.material.uniforms.scale.value.y;
+    this.params.targetScale = description.targetScale;
   }else{
     this.changeInValue = this.description.changeInValue;
   }
@@ -124,6 +132,10 @@ Animation.prototype.onStart = function(initialValue){
     this.params.sourcePosition = this.attachedObject.marginPercentY;
   }else if (this.description.action == animationHandler.actionTypes.SPRITE.TARGET_ROTATION){
     this.params.sourceRotation = this.attachedObject.mesh.material.uniforms.rotationAngle.value;
+  }else if (this.description.action == animationHandler.actionTypes.SPRITE.TARGET_SCALE_X){
+    this.params.sourceScale = this.attachedObject.mesh.material.uniforms.scale.value.x;
+  }else if (this.description.action == animationHandler.actionTypes.SPRITE.TARGET_SCALE_Y){
+    this.params.sourceScale = this.attachedObject.mesh.material.uniforms.scale.value.y;
   }
   this.increaseTick = true;
   this.isActive = true;

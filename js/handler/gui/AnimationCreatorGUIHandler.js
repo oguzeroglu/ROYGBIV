@@ -39,8 +39,10 @@ AnimationCreatorGUIHandler.prototype.addAnimationFolder = function(animation, ob
   var targetValue = "0";
   if (animation.description.action == animationHandler.actionTypes.SPRITE.TARGET_POSITION_X || animation.description.action == animationHandler.actionTypes.SPRITE.TARGET_POSITION_Y){
     targetValue = ""+animation.params.targetPosition;
-  }else if (animation.description.action == animationHandler.actionTypes.SPRITE_TARGET_ROTATION){
+  }else if (animation.description.action == animationHandler.actionTypes.SPRITE.TARGET_ROTATION){
     targetValue = ""+animation.params.targetRotation;
+  }else if (animation.description.action == animationHandler.actionTypes.SPRITE.TARGET_SCALE_X || animation.description.action == animationHandler.actionTypes.SPRITE.TARGET_SCALE_Y){
+    targetValue = ""+animation.params.targetScale
   }
   var folderID = this.folderIDCounter ++;
   this.animationsByFolderID[folderID] = animation;
@@ -85,7 +87,7 @@ AnimationCreatorGUIHandler.prototype.addAnimationFolder = function(animation, ob
     if (val == animationHandler.actionTypes.OBJECT.EMISSIVE_COLOR || val == animationHandler.actionTypes.TEXT.TEXT_COLOR || val == animationHandler.actionTypes.TEXT.BACKGROUND_COLOR || val == animationHandler.actionTypes.SPRITE.COLOR){
       guiHandler.disableController(deltaController);
       guiHandler.enableController(colorController);
-    }else if (val == animationHandler.actionTypes.SPRITE.TARGET_POSITION_X || val == animationHandler.actionTypes.SPRITE.TARGET_POSITION_Y || val == animationHandler.actionTypes.SPRITE.TARGET_ROTATION){
+    }else if (val == animationHandler.actionTypes.SPRITE.TARGET_POSITION_X || val == animationHandler.actionTypes.SPRITE.TARGET_POSITION_Y || val == animationHandler.actionTypes.SPRITE.TARGET_ROTATION || val == animationHandler.actionTypes.SPRITE.TARGET_SCALE_X || val == animationHandler.actionTypes.SPRITE.TARGET_SCALE_Y){
       guiHandler.disableController(deltaController);
       guiHandler.enableController(targetValueController);
     }else{
@@ -172,7 +174,7 @@ AnimationCreatorGUIHandler.prototype.addAnimationFolder = function(animation, ob
   if (animation.description.action == animationHandler.actionTypes.OBJECT.EMISSIVE_COLOR || animation.description.action == animationHandler.actionTypes.TEXT.TEXT_COLOR || animation.description.action == animationHandler.actionTypes.TEXT.BACKGROUND_COLOR || animation.description.action == animationHandler.actionTypes.SPRITE.COLOR){
     guiHandler.disableController(deltaController);
     guiHandler.enableController(colorController);
-  }else if (animation.description.action == animationHandler.actionTypes.SPRITE.TARGET_POSITION_X || animation.description.action == animationHandler.actionTypes.SPRITE.TARGET_POSITION_Y || animation.description.action == animationHandler.actionTypes.SPRITE.TARGET_ROTATION){
+  }else if (animation.description.action == animationHandler.actionTypes.SPRITE.TARGET_POSITION_X || animation.description.action == animationHandler.actionTypes.SPRITE.TARGET_POSITION_Y || animation.description.action == animationHandler.actionTypes.SPRITE.TARGET_ROTATION || animation.description.action == animationHandler.actionTypes.SPRITE.TARGET_SCALE_X || animation.description.action == animationHandler.actionTypes.SPRITE.TARGET_SCALE_Y){
     guiHandler.disableController(deltaController);
     guiHandler.enableController(targetValueController);
   }else{
@@ -285,7 +287,8 @@ AnimationCreatorGUIHandler.prototype.createAnimation = function(object, name, up
     changeInValue: changeInValue,
     targetColor: targetColor,
     targetPosition: targetValue,
-    targetRotation: targetValue
+    targetRotation: targetValue,
+    targetScale: targetValue
   }, rewind, repeat);
   object.addAnimation(animation);
   return animation;
