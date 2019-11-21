@@ -374,6 +374,7 @@ Sprite.prototype.handleRectangle = function(){
 Sprite.prototype.setScale = function(scaleX, scaleY){
   this.mesh.material.uniforms.scale.value.set(scaleX, scaleY);
   this.handleRectangle();
+  this.set2DCoordinates(this.marginPercentX, this.marginPercentY);
   rayCaster.updateObject(this);
 }
 
