@@ -215,7 +215,8 @@ var Roygbiv = function(){
     "setSpriteMargin",
     "setSpriteRotationAngle",
     "enableSpriteDragging",
-    "disableSpriteDragging"
+    "disableSpriteDragging",
+    "degreeToRadian"
   ];
 
   this.globals = new Object();
@@ -3474,4 +3475,14 @@ Roygbiv.prototype.changeScene = function(sceneName, readyCallback){
   preConditions.checkIfFunctionOnlyIfExists(ROYGBIV.changeScene, preConditions.readyCallback, readyCallback);
   preConditions.checkIfTrue(ROYGBIV.changeScene, "Scene is already active.", sceneHandler.getActiveSceneName() == sceneName);
   sceneHandler.changeScene(sceneName, readyCallback);
+}
+
+// Converts degrees to radians.
+Roygbiv.prototype.degreeToRadian = function(degree){
+  if (mode == 0){
+    return;
+  }
+  preConditions.checkIfDefined(ROYGBIV.degreeToRadian, preConditions.degree, degree);
+  preConditions.checkIfNumber(ROYGBIV.degreeToRadian, preConditions.degree, degree);
+  return (degree * (Math.PI / 180));
 }
