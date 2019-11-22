@@ -144,7 +144,9 @@ function scriptRunFunction(script, scriptName){
 }
 
 function runScripts(){
-  if(!rayCaster.ready || !physicsWorld.ready){
+  var raycasterReady = (rayCaster.ready || raycasterFactory.workerTurnedOff);
+  var physicsWorldReady = (physicsWorld.ready || physicsFactory.workerTurnedOff);
+  if(!raycasterReady|| !physicsWorldReady){
     return;
   }
   if (isDeployment){
