@@ -45,3 +45,20 @@ Container2D.prototype.insertAddedText = function(addedText){
   }
   addedText.set2DCoordinates(selectedCoordXPercent, selectedCoordYPercent);
 }
+
+Container2D.prototype.insertSprite = function(sprite){
+  sprite.setWidthPercent(this.widthPercent);
+  sprite.setHeightPercent(this.heightPercent);
+  var selectedCoordXPercent, selectedCoordYPercent;
+  if (sprite.marginMode == MARGIN_MODE_2D_CENTER){
+    selectedCoordXPercent = 100 - this.centerXPercent;
+    selectedCoordYPercent = 100 - this.centerYPercent;
+  }else if (sprite.marginMode == MARGIN_MODE_2D_TOP_LEFT){
+    selectedCoordXPercent = this.centerXPercent - (this.widthPercent / 2);
+    selectedCoordYPercent = 100 - this.centerYPercent - (this.heightPercent / 2);
+  }else{
+    selectedCoordXPercent = 100 - this.centerXPercent - (this.widthPercent / 2);
+    selectedCoordYPercent = this.centerYPercent - (this.heightPercent / 2);
+  }
+  sprite.set2DCoordinates(selectedCoordXPercent, selectedCoordYPercent);
+}
