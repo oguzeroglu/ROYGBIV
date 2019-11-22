@@ -24,3 +24,24 @@ Container2D.prototype.handleRectangle = function(){
   this.rectangle.set(x, y, x2, y2, widthWebGL, heightWebGL);
   this.rectangle.updateMesh(0.005);
 }
+
+Container2D.prototype.insertAddedText = function(addedText){
+  if (!addedText.is2D){
+    return;
+  }
+  addedText.maxWidthPercent = this.widthPercent;
+  addedText.maxHeightPercent = this.heightPercent;
+  addedText.handleResize();
+  var selectedCoordXPercent, selectedCoordYPercent;
+  if (addedText.marginMode == MARGIN_MODE_2D_CENTER){
+    selectedCoordXPercent = 100 - this.centerXPercent;
+    selectedCoordYPercent = 100 - this.centerYPercent;
+  }else if (addedText.marginMode == MARGIN_MODE_2D_TOP_LEFT){
+    selectedCoordXPercent = this.centerXPercent - (this.widthPercent / 2);
+    selectedCoordYPercent = 100 - this.centerYPercent - (this.heightPercent / 2);
+  }else{
+    selectedCoordXPercent = 100 - this.centerXPercent - (this.widthPercent / 2);
+    selectedCoordYPercent = this.centerYPercent + (this.heightPercent / 2);
+  }
+  addedText.set2DCoordinates(selectedCoordXPercent, selectedCoordYPercent);
+}
