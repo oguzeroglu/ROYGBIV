@@ -5,6 +5,8 @@ var Container2D = function(name, centerXPercent, centerYPercent, widthPercent, h
   this.widthPercent = widthPercent;
   this.heightPercent = heightPercent;
   this.handleRectangle();
+  this.addedTexts = new Object();
+  this.sprites = new Object();
 }
 
 Container2D.prototype.handleRectangle = function(){
@@ -44,6 +46,8 @@ Container2D.prototype.insertAddedText = function(addedText){
     selectedCoordYPercent = this.centerYPercent + (this.heightPercent / 2);
   }
   addedText.set2DCoordinates(selectedCoordXPercent, selectedCoordYPercent);
+  addedText.containerParent = this.name;
+  this.addedTexts[addedText.name] = addedText;
 }
 
 Container2D.prototype.insertSprite = function(sprite){
@@ -61,4 +65,6 @@ Container2D.prototype.insertSprite = function(sprite){
     selectedCoordYPercent = this.centerYPercent - (this.heightPercent / 2);
   }
   sprite.set2DCoordinates(selectedCoordXPercent, selectedCoordYPercent);
+  sprite.containerParent = this.name;
+  this.sprites[sprite.name] = sprite;
 }
