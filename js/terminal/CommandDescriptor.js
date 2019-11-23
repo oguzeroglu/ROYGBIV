@@ -204,7 +204,8 @@ var CommandDescriptor = function(){
       1, //selectSprite
       0, //printSprites
       1, //setBackgroundColor
-      1 //newContainer
+      1, //newContainer
+      1 //selectContainer
   ];
 
   this.commandArgumentsExpectedExplanation = [
@@ -411,7 +412,8 @@ var CommandDescriptor = function(){
     "selectSprite spriteName",
     "printSprites",
     "setBackgroundColor colorName",
-    "newContainer containerName"
+    "newContainer containerName",
+    "selectContainer containerName"
   ];
 
   this.commands = [
@@ -618,7 +620,8 @@ var CommandDescriptor = function(){
     "selectSprite",
     "printSprites",
     "setBackgroundColor",
-    "newContainer"
+    "newContainer",
+    "selectContainer"
   ];
 
   this.commandInfo = [
@@ -825,7 +828,8 @@ var CommandDescriptor = function(){
     "selectSprite: Selects a sprite.",
     "printSprites: Prints created sprites.",
     "setBackgroundColor: Sets the background color of the current scene.",
-    "newContainer: Creates a new 2D container."
+    "newContainer: Creates a new 2D container.",
+    "selectContainer: Selects a 2D container."
   ];
 
   this.keyboardInfo = [
@@ -964,6 +968,7 @@ var CommandDescriptor = function(){
   this.SPRITE_NAME                =   38;
   this.OBJECT_OR_SPRITE_NAME      =   39;
   this.OBJECT_TEXT_SPRITE_NAME    =   40;
+  this.CONTAINER_NAME             =   41;
 
   // newGridSystem
   this.newGridSystem = new Object();
@@ -1519,6 +1524,11 @@ var CommandDescriptor = function(){
   this.newContainer = new Object();
   this.newContainer.types = [];
   this.newContainer.types.push(this.UNKNOWN_INDICATOR); //containerName
+
+  // selectContainer
+  this.selectContainer = new Object();
+  this.selectContainer.types = [];
+  this.selectContainer.types.push(this.CONTAINER_NAME); //containerName
 };
 
 CommandDescriptor.prototype.test = function(){

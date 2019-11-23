@@ -760,6 +760,14 @@ Terminal.prototype.autocomplete = function(command){
 				}
 				helpString = "[Objects]: ";
 			break;
+			case commandDescriptor.CONTAINER_NAME:
+				for (var containerName in sceneHandler.getContainers()){
+					if (containerName.toLowerCase().startsWith(curEntry.toLowerCase())){
+						possibilities.push(containerName);
+					}
+				}
+				helpString = "[Containers]: ";
+			break;
 		}
 
 		//  **********************************************************
