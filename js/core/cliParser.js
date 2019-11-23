@@ -4819,6 +4819,7 @@ function parse(input){
           containers[containerName] = container;
           selectionHandler.select(container);
           guiHandler.afterObjectSelection();
+          sceneHandler.onContainerCreation(container);
           terminal.printInfo(Text.CONTAINER_CREATED);
           return true;
         break;

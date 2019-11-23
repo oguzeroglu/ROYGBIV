@@ -9,6 +9,26 @@ var Container2D = function(name, centerXPercent, centerYPercent, widthPercent, h
   this.rectangle.mesh.material.uniforms.color.value.set("lime");
 }
 
+Container2D.prototype.export = function(){
+  var exportObj = {
+    centerXPercent: this.centerXPercent,
+    centerYPercent: this.centerYPercent,
+    widthPercent: this.widthPercent,
+    heightPercent: this.heightPercent
+  };
+  if (this.sprite){
+    exportObj.spriteName = this.sprite.name
+  }
+  if (this.addedText){
+    exportObj.addedTextName = this.addedText.name;
+  }
+  return exportObj;
+}
+
+Container2D.prototype.makeInvisible = function(){
+  scene.remove(this.rectangle.mesh);
+}
+
 Container2D.prototype.makeVisible = function(){
   scene.add(this.rectangle.mesh);
 }

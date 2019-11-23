@@ -191,6 +191,9 @@ SceneHandler.prototype.hideAll = function(){
     for (var gridName in gridSelections){
       gridSelections[gridName].toggleSelect();
     }
+    for (var containerName in containers){
+      containers[containerName].makeInvisible();
+    }
     if (markedPointsVisible){
       for (var markedPointName in markedPoints){
         var markedPoint = markedPoints[markedPointName];
@@ -273,6 +276,10 @@ SceneHandler.prototype.changeScene = function(sceneName, readyCallback){
       var sprite = this.scenes[sceneName].sprites[spriteName];
       sprite.showVisually();
     }
+    for (var containerName in this.scenes[sceneName].containers){
+      var container = this.scenes[sceneName].containers[containerName];
+      container.makeVisible();
+    }
     if (markedPointsVisible){
       for (var markedPointName in this.scenes[sceneName].markedPoints){
         var markedPoint = this.scenes[sceneName].markedPoints[markedPointName];
@@ -352,6 +359,14 @@ SceneHandler.prototype.createScene = function(sceneName){
 SceneHandler.prototype.setBackgroundColor = function(colorName){
   this.scenes[this.activeSceneName].backgroundColor = colorName;
   scene.background.set(colorName);
+}
+
+SceneHandler.prototype.onContainerDeletion = function(container){
+  this.scenes[container.registeredSceneName].unregisterContainer(container);
+}
+
+SceneHandler.prototype.onContainerCreation = function(container){
+  this.scenes[this.activeSceneName].registerContainer(container);
 }
 
 SceneHandler.prototype.onSpriteDeletion = function(sprite){
@@ -537,6 +552,10 @@ SceneHandler.prototype.getAddedTexts = function(){
 
 SceneHandler.prototype.getAddedTexts2D = function(){
   return this.scenes[this.activeSceneName].addedTexts2D;
+}
+
+SceneHandler.prototype.getContainers = function(){
+  return this.scenes[this.activeSceneName].containers;
 }
 
 SceneHandler.prototype.getSprites = function(){

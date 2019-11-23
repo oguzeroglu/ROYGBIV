@@ -27,6 +27,7 @@ Scene.prototype.reset = function(){
   this.clickableSprites = new Object();
   this.trackingObjects = new Object();
   this.sprites = new Object();
+  this.containers = new Object();
   this.areaBinHandler.isAreaBinHandler = true;
   this.isSkyboxMapped = false;
 }
@@ -70,6 +71,9 @@ Scene.prototype.destroy = function(){
   }
   for (var spriteName in this.sprites){
     parseCommand("destroysprite "+spriteName);
+  }
+  for (var containerName in this.containers){
+    parseCommand("destroyContainer "+containerName);
   }
   this.reset();
 }
@@ -151,6 +155,9 @@ Scene.prototype.import = function(exportObj){
   for (var i = 0; i<exportObj.spriteNames.length; i++){
     this.registerSprite(sprites[exportObj.spriteNames[i]]);
   }
+  for (var i = 0; i<exportObj.containerNames.length; i++){
+    this.registerContainer(containers[exportObj.containerNames[i]]);
+  }
   this.isSkyboxMapped = exportObj.isSkyboxMapped;
   if (this.isSkyboxMapped){
     this.mappedSkyboxName = exportObj.mappedSkyboxName;
@@ -177,6 +184,7 @@ Scene.prototype.export = function(){
   exportObj.lightningNames = Object.keys(this.lightnings);
   exportObj.crosshairNames = Object.keys(this.crosshairs);
   exportObj.spriteNames = Object.keys(this.sprites);
+  exportObj.containerNames = Object.keys(this.containers);
   exportObj.isSkyboxMapped = this.isSkyboxMapped;
   exportObj.postProcessing = this.postProcessing;
   if (this.isSkyboxMapped){
@@ -198,6 +206,16 @@ Scene.prototype.refreshAreaBinHandler = function(){
 
 Scene.prototype.resetAutoInstancedObjects = function(){
   this.autoInstancedObjects = new Object();
+}
+
+Scene.prototype.unregisterContainer = function(container){
+  delete this.containers[container.name];
+  delete container.registeredSceneName;
+}
+
+Scene.prototype.registerContainer = function(container){
+  this.containers[container.name] = container;
+  container.registeredSceneName = this.name;
 }
 
 Scene.prototype.unregisterSprite = function(sprite){

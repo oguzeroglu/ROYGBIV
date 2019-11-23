@@ -1282,6 +1282,20 @@ ImportHandler.prototype.importLightnings = function(obj){
   }
 }
 
+ImportHandler.prototype.importContainers = function(obj){
+  for (var containerName in obj.containers){
+    var curExport = obj.containers[containerName];
+    var container = new Container2D(containerName, curExport.centerXPercent, curExport.centerYPercent, curExport.widthPercent, curExport.heightPercent);
+    containers[containerName] = container;
+    if (!(typeof curExport.spriteName == UNDEFINED)){
+      container.insertSprite(sprites[curExport.spriteName]);
+    }
+    if (!(typeof curExport.addedTextName == UNDEFINED)){
+      container.insertAddedText(addedTexts[curExport.addedTextName]);
+    }
+  }
+}
+
 ImportHandler.prototype.importSprites = function(obj){
   for (var spriteName in obj.sprites){
     var curExport = obj.sprites[spriteName];
