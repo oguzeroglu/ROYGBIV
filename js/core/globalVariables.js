@@ -375,6 +375,7 @@ var areaExitCallbacks = new Object();
 var sprites = new Object();
 var clickableSprites = new Object();
 var draggingSprite = false;
+var containers = new Object();
 
 // RENDER ORDERS
 var renderOrders = {

@@ -204,6 +204,9 @@ StateLoader.prototype.resetProject = function(){
   for (var spriteName in sprites){
     sprites[spriteName].destroy();
   }
+  for (var containerName in containers){
+    containers[containerName].destroy();
+  }
   skyboxHandler.reset();
   collisionCallbackRequests = new Map();
   particleCollisionCallbackRequests = new Object();
@@ -255,6 +258,7 @@ StateLoader.prototype.resetProject = function(){
   lightnings = new Object();
   sprites = new Object();
   clickableSprites = new Object();
+  containers = new Object();
   webglCallbackHandler = new WebGLCallbackHandler();
   textureAtlasHandler.dispose();
   textureAtlasHandler = new TextureAtlasHandler();

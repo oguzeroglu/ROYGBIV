@@ -5,6 +5,20 @@ var Container2D = function(name, centerXPercent, centerYPercent, widthPercent, h
   this.widthPercent = widthPercent;
   this.heightPercent = heightPercent;
   this.handleRectangle();
+  this.rectangle.mesh.material.uniforms.color.value.set("lime");
+}
+
+Container2D.prototype.destroy = function(){
+  scene.remove(this.rectangle.mesh);
+  this.rectangle.material.dispose();
+  this.rectangle.geometry.dispose();
+  if (this.sprite){
+    this.removeSprite();
+  }
+  if (this.addedText){
+    this.removeAddedText();
+  }
+  delete containers[this.name];
 }
 
 Container2D.prototype.setCenter = function(centerXPercent, centerYPercent){
