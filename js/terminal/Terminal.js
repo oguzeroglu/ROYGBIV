@@ -768,6 +768,19 @@ Terminal.prototype.autocomplete = function(command){
 				}
 				helpString = "[Containers]: ";
 			break;
+			case commandDescriptor.SPRITE_OR_2D_TEXT_NAME:
+				for (var textName in sceneHandler.getAddedTexts2D()){
+					if (textName.toLowerCase().startsWith(curEntry.toLowerCase())){
+						possibilities.push(textName);
+					}
+				}
+				for (var spriteName in sceneHandler.getSprites()){
+					if (spriteName.toLowerCase().startsWith(curEntry.toLowerCase())){
+						possibilities.push(spriteName);
+					}
+				}
+				helpString = "[2D objects]: ";
+			break;
 		}
 
 		//  **********************************************************

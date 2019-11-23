@@ -4842,6 +4842,55 @@ function parse(input){
           terminal.printInfo(Text.CONTAINER_SELECTED);
           return true;
         break;
+        case 205: //addToContainer
+          if (mode != 0){
+            terminal.printError(Text.WORKS_ONLY_IN_DESIGN_MODE);
+            return true;
+          }
+          var container = containers[splitted[1]];
+          var objName = splitted[2];
+          if (!container){
+            terminal.printError(Text.NO_SUCH_CONTAINER);
+            return true;
+          }
+          if (container.registeredSceneName != sceneHandler.getActiveSceneName()){
+            terminal.printError(Text.CONTAINER_NOT_IN_ACTIVE_SCENE);
+            return true;
+          }
+          var obj = addedTexts[objName];
+          if (!obj){
+            obj = sprites[objName];
+            if (!obj){
+              terminal.printError(Text.NO_SUCH_OBJECT);
+              return true;
+            }else{
+              if (obj.registeredSceneName != sceneHandler.getActiveSceneName()){
+                terminal.printError(Text.SPRITE_NOT_IN_ACTIVE_SCENE);
+                return true;
+              }
+            }
+          }else{
+            if (!obj.is2D){
+              terminal.printError(Text.WORKS_ONLY_FOR_2D_TEXTS);
+              return true;
+            }
+            if (obj.registeredSceneName != sceneHandler.getActiveSceneName()){
+              terminal.printError(Text.TEXT_NOT_IN_SCENE);
+              return true;
+            }
+          }
+          if (container.addedText || container.sprite){
+            terminal.printError(Text.CONTAINER_ALREADY_FULL);
+            return true;
+          }
+          if (obj.isAddedText){
+            container.insertAddedText(obj);
+          }else{
+            container.insertSprite(obj);
+          }
+          terminal.printInfo(Text.OBJECT_ADDED_TO_CONTAINER);
+          return true;
+        break;
       }
       return true;
     }catch(err){
