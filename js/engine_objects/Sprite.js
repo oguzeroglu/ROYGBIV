@@ -203,7 +203,9 @@ Sprite.prototype.export = function(){
     fixedWidth: this.fixedWidth,
     fixedHeight: this.fixedHeight,
     originalWidth: this.originalWidth,
-    originalHeight: this.originalHeight
+    originalHeight: this.originalHeight,
+    originalWidthReference: this.originalWidthReference,
+    originalHeightReference: this.originalHeightReference
   };
 }
 

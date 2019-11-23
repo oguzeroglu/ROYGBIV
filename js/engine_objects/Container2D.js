@@ -9,6 +9,15 @@ var Container2D = function(name, centerXPercent, centerYPercent, widthPercent, h
   this.rectangle.mesh.material.uniforms.color.value.set("lime");
 }
 
+Container2D.prototype.handleResize = function(){
+  if (this.addedText){
+    this.insertAddedText(this.addedText);
+  }
+  if (this.sprite){
+    this.insertSprite(this.sprite);
+  }
+}
+
 Container2D.prototype.export = function(){
   var exportObj = {
     centerXPercent: this.centerXPercent,
@@ -135,8 +144,8 @@ Container2D.prototype.insertSprite = function(sprite){
   sprite.setRotation(0);
   var maxWidth = this.widthPercent;
   var maxHeight = this.heightPercent;
-  var sourceWidth = sprite.originalWidth;
-  var sourceHeight = sprite.originalHeight;
+  var sourceWidth = sprite.originalWidth * sprite.originalWidthReference / renderer.getCurrentViewport().z;
+  var sourceHeight = sprite.originalHeight * sprite.originalHeightReference / renderer.getCurrentViewport().w;
   var scale = Math.min(maxWidth / sourceWidth, maxHeight / sourceHeight);
   if (scale > 1){
     scale = 1;

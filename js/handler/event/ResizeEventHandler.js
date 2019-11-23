@@ -66,6 +66,9 @@ ResizeEventHandler.prototype.onResize = function(){
   for (var spriteName in sprites){
     sprites[spriteName].handleResize();
   }
+  for (var containerName in containers){
+    containers[containerName].handleResize();
+  }
   renderer.setPixelRatio(screenResolution);
   rayCaster.refresh2D();
 }

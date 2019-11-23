@@ -1371,10 +1371,12 @@ GUIHandler.prototype.initializeSpriteManipulationGUI = function(){
   guiHandler.spriteManipulationScaleXController = guiHandler.datGuiSpriteManipulation.add(guiHandler.spriteManipulationParameters, "Scale X").min(0.1).max(20).step(0.1).onChange(function(val){
     selectionHandler.getSelectedObject().setScale(val, selectionHandler.getSelectedObject().mesh.material.uniforms.scale.value.y);
     selectionHandler.getSelectedObject().originalWidth = selectionHandler.getSelectedObject().calculateWidthPercent();
+    selectionHandler.getSelectedObject().originalWidthReference = renderer.getCurrentViewport().z;
   }).listen();
   guiHandler.spriteManipulationScaleYController = guiHandler.datGuiSpriteManipulation.add(guiHandler.spriteManipulationParameters, "Scale Y").min(0.1).max(20).step(0.1).onChange(function(val){
     selectionHandler.getSelectedObject().setScale(selectionHandler.getSelectedObject().mesh.material.uniforms.scale.value.x, val);
     selectionHandler.getSelectedObject().originalHeight = selectionHandler.getSelectedObject().calculateHeightPercent();
+    selectionHandler.getSelectedObject().originalHeightReference = renderer.getCurrentViewport().w;
   }).listen();
   guiHandler.spriteManipulationHasFixedWidthController = guiHandler.datGuiSpriteManipulation.add(guiHandler.spriteManipulationParameters, "Width fixed").onChange(function(val){
     if (selectionHandler.getSelectedObject().containerParent){
@@ -1394,11 +1396,13 @@ GUIHandler.prototype.initializeSpriteManipulationGUI = function(){
       guiHandler.enableController(guiHandler.spriteManipulationScaleXController);
     }
     selectionHandler.getSelectedObject().originalWidth = selectionHandler.getSelectedObject().calculateWidthPercent();
+    selectionHandler.getSelectedObject().originalWidthReference = renderer.getCurrentViewport().z;
   }).listen();
   guiHandler.spriteManipulationFixedWidthController = guiHandler.datGuiSpriteManipulation.add(guiHandler.spriteManipulationParameters, "Width %").min(0.1).max(100).step(0.1).onChange(function(val){
     selectionHandler.getSelectedObject().setWidthPercent(val);
     selectionHandler.getSelectedObject().fixedWidth = val;
     selectionHandler.getSelectedObject().originalWidth = selectionHandler.getSelectedObject().calculateWidthPercent();
+    selectionHandler.getSelectedObject().originalWidthReference = renderer.getCurrentViewport().z;
   }).listen();
   guiHandler.spriteManipulationHasFixedHeightController = guiHandler.datGuiSpriteManipulation.add(guiHandler.spriteManipulationParameters, "Height fixed").onChange(function(val){
     if (selectionHandler.getSelectedObject().containerParent){
@@ -1418,11 +1422,13 @@ GUIHandler.prototype.initializeSpriteManipulationGUI = function(){
       guiHandler.enableController(guiHandler.spriteManipulationScaleYController);
     }
     selectionHandler.getSelectedObject().originalHeight = selectionHandler.getSelectedObject().calculateHeightPercent();
+    selectionHandler.getSelectedObject().originalHeightReference = renderer.getCurrentViewport().w;
   }).listen();
   guiHandler.spriteManipulationFixedHeightController = guiHandler.datGuiSpriteManipulation.add(guiHandler.spriteManipulationParameters, "Height %").min(0.1).max(100).step(0.1).onChange(function(val){
     selectionHandler.getSelectedObject().setHeightPercent(val);
     selectionHandler.getSelectedObject().fixedHeight = val;
     selectionHandler.getSelectedObject().originalHeight = selectionHandler.getSelectedObject().calculateHeightPercent();
+    selectionHandler.getSelectedObject().originalHeightReference = renderer.getCurrentViewport().w;
   }).listen();
   guiHandler.spriteManipulationRotationController = guiHandler.datGuiSpriteManipulation.add(guiHandler.spriteManipulationParameters, "Rotation").min(0).max(360).step(0.01).onChange(function(val){
     selectionHandler.getSelectedObject().setRotation(val);
