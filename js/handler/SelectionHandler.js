@@ -29,6 +29,9 @@ SelectionHandler.prototype.select = function(object){
     selectedSprite = object;
     scene.add(object.rectangle.mesh);
   }
+  if (object.isContainer){
+    selectedContainer = object;
+  }
   this.currentSelection = object;
 }
 
@@ -44,6 +47,9 @@ SelectionHandler.prototype.getSelectedObject = function(){
   }
   if (selectedSprite){
     return selectedSprite;
+  }
+  if (selectedContainer){
+    return selectedContainer;
   }
   return 0;
 }
@@ -71,6 +77,8 @@ SelectionHandler.prototype.resetCurrentSelection = function(){
   }else if (this.currentSelection.isSprite){
     scene.remove(this.currentSelection.rectangle.mesh);
     selectedSprite = 0;
+  }else if (this.currentSelection.isContainer){
+    selectedContainer = 0;
   }
   this.currentSelection = 0;
   if (!isDeployment){

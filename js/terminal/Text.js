@@ -130,6 +130,7 @@ var Text = function(){
   this.SPRITE_SELECTED = "Sprite selected.";
   this.SOURCE_TEXT_IS_NOT_DEFINED = "Source text is not defined.";
   this.TARGET_TEXT_IS_NOT_DEFINED = "Target text is not defined.";
+  this.CONTAINER_CREATED = "Container created.";
   this.TEXTS_HAVE_DIFFERENT_DIMENSIONS = "Texts have different dimensions.";
   this.TEXTS_ARE_THE_SAME = "Texts are the same.";
   this.TEXT_PROPERTIES_SYNCED = "Text properties synced.";

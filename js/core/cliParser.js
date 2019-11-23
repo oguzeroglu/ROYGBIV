@@ -4804,6 +4804,24 @@ function parse(input){
           terminal.printInfo(Text.BACKGROUND_COLOR_SET);
           return true;
         break;
+        case 203: //newContainer
+          if (mode != 0){
+            terminal.printError(Text.WORKS_ONLY_IN_DESIGN_MODE);
+            return true;
+          }
+          var containerName = splitted[1];
+          if (containers[containerName]){
+            terminal.printError(Text.NAME_MUST_BE_UNIQUE);
+            return true;
+          }
+          var container = new Container2D(containerName, 50, 50, 10, 10);
+          container.makeVisible();
+          containers[containerName] = container;
+          selectionHandler.select(container);
+          guiHandler.afterObjectSelection();
+          terminal.printInfo(Text.CONTAINER_CREATED);
+          return true;
+        break;
       }
       return true;
     }catch(err){

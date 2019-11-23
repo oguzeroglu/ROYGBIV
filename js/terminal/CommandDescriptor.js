@@ -203,7 +203,8 @@ var CommandDescriptor = function(){
       1, //destroySprite
       1, //selectSprite
       0, //printSprites
-      1 //setBackgroundColor
+      1, //setBackgroundColor
+      1 //newContainer
   ];
 
   this.commandArgumentsExpectedExplanation = [
@@ -409,7 +410,8 @@ var CommandDescriptor = function(){
     "destroySprite spriteName",
     "selectSprite spriteName",
     "printSprites",
-    "setBackgroundColor colorName"
+    "setBackgroundColor colorName",
+    "newContainer containerName"
   ];
 
   this.commands = [
@@ -615,7 +617,8 @@ var CommandDescriptor = function(){
     "destroySprite",
     "selectSprite",
     "printSprites",
-    "setBackgroundColor"
+    "setBackgroundColor",
+    "newContainer"
   ];
 
   this.commandInfo = [
@@ -821,7 +824,8 @@ var CommandDescriptor = function(){
     "destroySprite: Destroys a sprite.",
     "selectSprite: Selects a sprite.",
     "printSprites: Prints created sprites.",
-    "setBackgroundColor: Sets the background color of the current scene."
+    "setBackgroundColor: Sets the background color of the current scene.",
+    "newContainer: Creates a new 2D container."
   ];
 
   this.keyboardInfo = [
@@ -1510,6 +1514,11 @@ var CommandDescriptor = function(){
   this.setBackgroundColor = new Object();
   this.setBackgroundColor.types = [];
   this.setBackgroundColor.types.push(this.COLOR); //colorName
+
+  // newContainer
+  this.newContainer = new Object();
+  this.newContainer.types = [];
+  this.newContainer.types.push(this.UNKNOWN_INDICATOR); //containerName
 };
 
 CommandDescriptor.prototype.test = function(){

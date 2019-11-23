@@ -69,7 +69,14 @@ var GUIHandler = function(){
     "Draggable": false,
     "Crop X": 0.01,
     "Crop Y": 0.01
-  }
+  };
+  this.containerManipulationParameters = {
+    "Container": "containerName",
+    "Center X": 50,
+    "Center Y": 50,
+    "Width": 10,
+    "Height": 10
+  };
   this.bloomParameters = {
     "Threshold": 0.0,
     "Active": false,
@@ -117,7 +124,8 @@ var GUIHandler = function(){
   this.guiTypes = {
     TEXT: 0, OBJECT: 1, BLOOM: 2, FPS_WEAPON_ALIGNMENT: 3, SHADER_PRECISION: 4, PARTICLE_SYSTEM: 5,
     WORKER_STATUS: 6, MUZZLE_FLASH: 7, TEXTURE_PACK: 8, SKYBOX_CREATION: 9, FOG: 10, FONT: 11,
-    CROSSHAIR_CREATION: 12, SCRIPTS: 13, ANIMATION_CREATION: 14, AREA: 15, LIGHTNING: 16, SPRITE: 17
+    CROSSHAIR_CREATION: 12, SCRIPTS: 13, ANIMATION_CREATION: 14, AREA: 15, LIGHTNING: 16, SPRITE: 17,
+    CONTAINER: 18
   };
   this.blockingGUITypes = [
     this.guiTypes.FPS_WEAPON_ALIGNMENT, this.guiTypes.PARTICLE_SYSTEM, this.guiTypes.MUZZLE_FLASH,
@@ -193,6 +201,24 @@ GUIHandler.prototype.isOneOfBlockingGUIActive = function(){
   return false;
 }
 
+GUIHandler.prototype.afterContainerSelection = function(){
+  if (mode != 0){
+    return;
+  }
+  var curSelection = selectionHandler.getSelectedObject();
+  if (curSelection && curSelection.isContainer){
+    guiHandler.show(guiHandler.guiTypes.CONTAINER);
+    guiHandler.enableAllCMControllers();
+    guiHandler.containerManipulationParameters["Container"] = curSelection.name;
+    guiHandler.containerManipulationParameters["Center X"] = curSelection.centerXPercent;
+    guiHandler.containerManipulationParameters["Center Y"] = curSelection.centerYPercent;
+    guiHandler.containerManipulationParameters["Width"] = curSelection.widthPercent;
+    guiHandler.containerManipulationParameters["Height"] = curSelection.heightPercent;
+  }else{
+    guiHandler.hide(guiHandler.guiTypes.CONTAINER);
+  }
+}
+
 GUIHandler.prototype.afterSpriteSelection = function(){
   if (mode != 0){
     return;
@@ -254,6 +280,7 @@ GUIHandler.prototype.afterSpriteSelection = function(){
   }else{
     guiHandler.hide(guiHandler.guiTypes.SPRITE);
   }
+  guiHandler.afterContainerSelection();
 }
 
 GUIHandler.prototype.afterTextSelection = function(){
@@ -599,6 +626,14 @@ GUIHandler.prototype.enableController = function(controller){
   controller.domElement.style.opacity = 1;
 }
 
+GUIHandler.prototype.enableAllCMControllers = function(){
+  guiHandler.enableController(guiHandler.containerManipulationNameController);
+  guiHandler.enableController(guiHandler.containerManipulationCenterXController);
+  guiHandler.enableController(guiHandler.containerManipulationCenterYController);
+  guiHandler.enableController(guiHandler.containerManipulationWidthController);
+  guiHandler.enableController(guiHandler.containerManipulationHeightController);
+}
+
 GUIHandler.prototype.enableAllTMControllers = function(){
   guiHandler.enableController(guiHandler.textManipulationTextNameController);
   guiHandler.enableController(guiHandler.textManipulationContentController);
@@ -689,6 +724,11 @@ GUIHandler.prototype.show = function(guiType){
         this.initializeSpriteManipulationGUI();
       }
     return;
+    case this.guiTypes.CONTAINER:
+      if (!this.datGuiContainerManipulation){
+        this.initializeContainerManipulationGUI();
+      }
+    return;
     case this.guiTypes.BLOOM:
       if (!this.datGuiBloom){
         this.initializeBloomGUI();
@@ -752,6 +792,12 @@ GUIHandler.prototype.hide = function(guiType){
       if (this.datGuiSpriteManipulation){
         this.destroyGUI(this.datGuiSpriteManipulation);
         this.datGuiSpriteManipulation = 0;
+      }
+    return;
+    case this.guiTypes.CONTAINER:
+      if (this.datGuiContainerManipulation){
+        this.destroyGUI(this.datGuiContainerManipulation);
+        this.datGuiContainerManipulation = 0;
       }
     return;
     case this.guiTypes.BLOOM:
@@ -1252,6 +1298,26 @@ GUIHandler.prototype.initializeObjectManipulationGUI = function(){
   }).listen();
   guiHandler.omObjectTrailTimeController = guiHandler.datGuiObjectManipulation.add(guiHandler.objectManipulationParameters, "mb time").min(1/15).max(OBJECT_TRAIL_MAX_TIME_IN_SECS_DEFAULT).step(1/60).onChange(function(val){
     selectionHandler.getSelectedObject().objectTrailConfigurations.time = val;
+  }).listen();
+}
+
+GUIHandler.prototype.initializeContainerManipulationGUI = function(){
+  guiHandler.datGuiContainerManipulation = new dat.GUI({hideable: false});
+  guiHandler.datGuiContainerManipulation.domElement.addEventListener("mousedown", function(e){
+    cmGUIFocused = true;
+  });
+  guiHandler.containerManipulationNameController = guiHandler.datGuiContainerManipulation.add(guiHandler.containerManipulationParameters, "Container").listen();
+  guiHandler.containerManipulationCenterXController = guiHandler.datGuiContainerManipulation.add(guiHandler.containerManipulationParameters, "Center X").min(0).max(100).step(0.1).onChange(function(val){
+    selectionHandler.getSelectedObject().setCenter(val, selectionHandler.getSelectedObject().centerYPercent);
+  }).listen();
+  guiHandler.containerManipulationCenterYController = guiHandler.datGuiContainerManipulation.add(guiHandler.containerManipulationParameters, "Center Y").min(0).max(100).step(0.1).onChange(function(val){
+    selectionHandler.getSelectedObject().setCenter(selectionHandler.getSelectedObject().centerXPercent, val);
+  }).listen();
+  guiHandler.containerManipulationWidthController = guiHandler.datGuiContainerManipulation.add(guiHandler.containerManipulationParameters, "Width").min(0.1).max(100).step(0.1).onChange(function(val){
+    selectionHandler.getSelectedObject().setWidth(val);
+  }).listen();
+  guiHandler.containerManipulationHeightController = guiHandler.datGuiContainerManipulation.add(guiHandler.containerManipulationParameters, "Height").min(0.1).max(100).step(0.1).onChange(function(val){
+    selectionHandler.getSelectedObject().setHeight(val);
   }).listen();
 }
 

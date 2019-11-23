@@ -1,4 +1,5 @@
 var Container2D = function(name, centerXPercent, centerYPercent, widthPercent, heightPercent){
+  this.isContainer = true;
   this.name = name;
   this.centerXPercent = centerXPercent;
   this.centerYPercent = centerYPercent;
@@ -6,6 +7,10 @@ var Container2D = function(name, centerXPercent, centerYPercent, widthPercent, h
   this.heightPercent = heightPercent;
   this.handleRectangle();
   this.rectangle.mesh.material.uniforms.color.value.set("lime");
+}
+
+Container2D.prototype.makeVisible = function(){
+  scene.add(this.rectangle.mesh);
 }
 
 Container2D.prototype.destroy = function(){
@@ -112,9 +117,11 @@ Container2D.prototype.insertSprite = function(sprite){
   var maxHeight = this.heightPercent;
   var sourceWidth = sprite.calculateWidthPercent();
   var sourceHeight = sprite.calculateHeightPercent();
-  var scale = Math.min(maxWidth / sourceWidth, maxHeight / sourceHeight);
-  sprite.setWidthPercent(sourceWidth * scale);
-  sprite.setHeightPercent(sourceHeight * scale);
+  if (sourceWidth > maxWidth || sourceHeight > maxHeight){
+    var scale = Math.min(maxWidth / sourceWidth, maxHeight / sourceHeight);
+    sprite.setWidthPercent(sourceWidth * scale);
+    sprite.setHeightPercent(sourceHeight * scale);
+  }
   var selectedCoordXPercent, selectedCoordYPercent;
   if (sprite.marginMode == MARGIN_MODE_2D_CENTER){
     selectedCoordXPercent = 100 - this.centerXPercent;
