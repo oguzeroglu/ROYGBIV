@@ -303,6 +303,18 @@ Preconditions.prototype.checkIfCrosshairInsideActiveSceneOnlyIfNameExists = func
   }
 }
 
+Preconditions.prototype.checkIfSpriteContained = function(callerFunc, sprite){
+  if (sprite.containerParent){
+    this.throw(callerFunc, "Sprite is inside a container.");
+  }
+}
+
+Preconditions.prototype.checkIfTextContained = function(callerFunc, text){
+  if (text.containerParent){
+    this.throw(callerFunc, "Text is inside a container.");
+  }
+}
+
 Preconditions.prototype.checkIfCrosshairInsideActiveScene = function(callerFunc, crosshair){
   if (crosshair.registeredSceneName != sceneHandler.getActiveSceneName()){
     this.throw(callerFunc, "Crosshair not inside the active scene.");

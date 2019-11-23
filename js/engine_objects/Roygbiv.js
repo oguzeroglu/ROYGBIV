@@ -2204,6 +2204,9 @@ Roygbiv.prototype.setText = function(textObject, text){
   preConditions.checkIfString(ROYGBIV.setText, preConditions.text, text);
   preConditions.checkIfTextInsideActiveScene(ROYGBIV.setText, textObject);
   textObject.setText(text, true);
+  if (textObject.containerParent){
+    textObject.containerParent.insertAddedText(textObject);
+  }
 }
 
 // Sets the color of a text. colorName can be a color name like red or an hex string
@@ -2247,6 +2250,7 @@ Roygbiv.prototype.setTextPosition = function(text, x, y, z){
   preConditions.checkIfNumber(ROYGBIV.setTextPosition, preConditions.y, y);
   preConditions.checkIfNumberOnlyIfExists(ROYGBIV.setTextPosition, preConditions.z, z);
   preConditions.checkIfTextInsideActiveScene(ROYGBIV.setTextPosition, text);
+  preConditions.checkIfTextContained(ROYGBIV.setTextPosition, text);
   text.setPosition(x, y, z);
 }
 
@@ -2837,6 +2841,7 @@ Roygbiv.prototype.setSpriteMargin = function(sprite, marginPercentX, marginPerce
   preConditions.checkIfNumber(ROYGBIV.setSpriteMargin, preConditions.marginPercentX, marginPercentX);
   preConditions.checkIfNumber(ROYGBIV.setSpriteMargin, preConditions.marginPercentY, marginPercentY);
   preConditions.checkIfSpriteInsideActiveScene(ROYGBIV.setSpriteMargin, sprite);
+  preConditions.checkIfSpriteContained(ROYGBIV.setSpriteMargin, sprite);
   sprite.set2DCoordinates(marginPercentX, marginPercentY);
 }
 
@@ -2850,6 +2855,7 @@ Roygbiv.prototype.setSpriteRotationAngle = function(sprite, angle){
   preConditions.checkIfSprite(ROYGBIV.setSpriteRotationAngle, preConditions.sprite, sprite);
   preConditions.checkIfSpriteInsideActiveScene(ROYGBIV.setSpriteRotationAngle, sprite);
   preConditions.checkIfNumber(ROYGBIV.setSpriteRotationAngle, preConditions.angle, angle);
+  preConditions.checkIfSpriteContained(ROYGBIV.setSpriteRotationAngle, sprite);
   sprite.setRotation(angle);
 }
 

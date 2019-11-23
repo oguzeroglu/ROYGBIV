@@ -4751,6 +4751,9 @@ function parse(input){
             return true;
           }
           sprite.destroy();
+          if (sprite.containerParent){
+            sprite.containerParent.removeSprite();
+          }
           sceneHandler.onSpriteDeletion(sprite);
           selectionHandler.resetCurrentSelection();
           terminal.printInfo(Text.SPRITE_DESTROYED);

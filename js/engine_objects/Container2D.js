@@ -59,6 +59,7 @@ Container2D.prototype.insertAddedText = function(addedText){
 }
 
 Container2D.prototype.insertSprite = function(sprite){
+  sprite.setRotation(0);
   sprite.setWidthPercent(this.widthPercent);
   sprite.setHeightPercent(this.heightPercent);
   var selectedCoordXPercent, selectedCoordYPercent;
