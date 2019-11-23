@@ -135,13 +135,14 @@ Container2D.prototype.insertSprite = function(sprite){
   sprite.setRotation(0);
   var maxWidth = this.widthPercent;
   var maxHeight = this.heightPercent;
-  var sourceWidth = sprite.calculateWidthPercent();
-  var sourceHeight = sprite.calculateHeightPercent();
-  if (sourceWidth > maxWidth || sourceHeight > maxHeight){
-    var scale = Math.min(maxWidth / sourceWidth, maxHeight / sourceHeight);
-    sprite.setWidthPercent(sourceWidth * scale);
-    sprite.setHeightPercent(sourceHeight * scale);
+  var sourceWidth = sprite.originalWidth;
+  var sourceHeight = sprite.originalHeight;
+  var scale = Math.min(maxWidth / sourceWidth, maxHeight / sourceHeight);
+  if (scale > 1){
+    scale = 1;
   }
+  sprite.setWidthPercent(sourceWidth * scale);
+  sprite.setHeightPercent(sourceHeight * scale);
   var selectedCoordXPercent, selectedCoordYPercent;
   if (sprite.marginMode == MARGIN_MODE_2D_CENTER){
     selectedCoordXPercent = 100 - this.centerXPercent;

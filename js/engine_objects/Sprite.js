@@ -201,7 +201,9 @@ Sprite.prototype.export = function(){
     cropCoefficientY: this.cropCoefficientY,
     animations: animations,
     fixedWidth: this.fixedWidth,
-    fixedHeight: this.fixedHeight
+    fixedHeight: this.fixedHeight,
+    originalWidth: this.originalWidth,
+    originalHeight: this.originalHeight
   };
 }
 

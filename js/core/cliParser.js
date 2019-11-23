@@ -4734,6 +4734,8 @@ function parse(input){
           }
           sprites[spriteName] = new Sprite(spriteName);
           sprites[spriteName].setRefHeight();
+          sprites[spriteName].originalWidth = sprites[spriteName].calculateWidthPercent();
+          sprites[spriteName].originalHeight = sprites[spriteName].calculateHeightPercent();
           sceneHandler.onSpriteCreation(sprites[spriteName]);
           selectionHandler.select(sprites[spriteName]);
           refreshRaycaster(Text.SPRITE_CREATED);
