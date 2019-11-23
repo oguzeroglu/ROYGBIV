@@ -60,8 +60,13 @@ Container2D.prototype.insertAddedText = function(addedText){
 
 Container2D.prototype.insertSprite = function(sprite){
   sprite.setRotation(0);
-  sprite.setWidthPercent(this.widthPercent);
-  sprite.setHeightPercent(this.heightPercent);
+  var maxWidth = this.widthPercent;
+  var maxHeight = this.heightPercent;
+  var sourceWidth = sprite.calculateWidthPercent();
+  var sourceHeight = sprite.calculateHeightPercent();
+  var scale = Math.min(maxWidth / sourceWidth, maxHeight / sourceHeight);
+  sprite.setWidthPercent(sourceWidth * scale);
+  sprite.setHeightPercent(sourceHeight * scale);
   var selectedCoordXPercent, selectedCoordYPercent;
   if (sprite.marginMode == MARGIN_MODE_2D_CENTER){
     selectedCoordXPercent = 100 - this.centerXPercent;
