@@ -7,6 +7,40 @@ var Container2D = function(name, centerXPercent, centerYPercent, widthPercent, h
   this.handleRectangle();
 }
 
+Container2D.prototype.setCenter = function(centerXPercent, centerYPercent){
+  this.centerXPercent = centerXPercent;
+  this.centerYPercent = centerYPercent;
+  this.handleRectangle();
+  if (this.sprite){
+    this.insertSprite(this.sprite);
+  }
+  if (this.addedText){
+    this.insertAddedText(this.addedText);
+  }
+}
+
+Container2D.prototype.setWidth = function(widthPercent){
+  this.widthPercent = widthPercent;
+  this.handleRectangle();
+  if (this.sprite){
+    this.insertSprite(this.sprite);
+  }
+  if (this.addedText){
+    this.insertAddedText(this.addedText);
+  }
+}
+
+Container2D.prototype.setHeight = function(heightPercent){
+  this.heightPercent = heightPercent;
+  this.handleRectangle();
+  if (this.sprite){
+    this.insertSprite(this.sprite);
+  }
+  if (this.addedText){
+    this.insertAddedText(this.addedText);
+  }
+}
+
 Container2D.prototype.handleRectangle = function(){
   if (!this.rectangle){
     this.rectangle = new Rectangle();
