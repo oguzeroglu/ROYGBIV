@@ -3745,6 +3745,9 @@ function parse(input){
           selectionHandler.resetCurrentSelection();
           sceneHandler.onAddedTextDeletion(textToDestroy);
           textToDestroy.destroy(true);
+          if (textToDestroy.containerParent){
+            textToDestroy.containerParent.removeAddedText();
+          }
           if (!jobHandlerWorking){
             refreshRaycaster(Text.TEXT_DESTROYED);
           }else{

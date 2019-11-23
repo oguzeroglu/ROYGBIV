@@ -25,6 +25,16 @@ Container2D.prototype.handleRectangle = function(){
   this.rectangle.updateMesh(0.005);
 }
 
+Container2D.prototype.removeSprite = function(){
+  delete this.sprite.containerParent;
+  delete this.sprite;
+}
+
+Container2D.prototype.removeAddedText = function(){
+  delete this.addedText.containerParent;
+  delete this.addedText;
+}
+
 Container2D.prototype.insertAddedText = function(addedText){
   if (!addedText.is2D){
     return;
@@ -44,7 +54,7 @@ Container2D.prototype.insertAddedText = function(addedText){
     selectedCoordYPercent = this.centerYPercent + (this.heightPercent / 2);
   }
   addedText.set2DCoordinates(selectedCoordXPercent, selectedCoordYPercent);
-  addedText.containerParent = this.name;
+  addedText.containerParent = this;
   this.addedText = addedText;
 }
 
@@ -63,6 +73,6 @@ Container2D.prototype.insertSprite = function(sprite){
     selectedCoordYPercent = this.centerYPercent - (this.heightPercent / 2);
   }
   sprite.set2DCoordinates(selectedCoordXPercent, selectedCoordYPercent);
-  sprite.containerParent = this.name;
+  sprite.containerParent = this;
   this.sprite = sprite;
 }

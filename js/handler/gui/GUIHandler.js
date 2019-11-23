@@ -305,6 +305,12 @@ GUIHandler.prototype.afterTextSelection = function(){
       guiHandler.disableController(guiHandler.textManipulationMaxHeightPercentController);
     }else{
       guiHandler.disableController(guiHandler.textManipulationAffectedByFogController);
+      if (curSelection.containerParent){
+        guiHandler.disableController(guiHandler.textManipulationMaxWidthPercentController);
+        guiHandler.disableController(guiHandler.textManipulationMaxHeightPercentController);
+        guiHandler.disableController(guiHandler.textManipulationMarginXController);
+        guiHandler.disableController(guiHandler.textManipulationMarginYController);
+      }
     }
     if (curSelection.hasCustomPrecision){
       switch(curSelection.customPrecision){
@@ -1375,6 +1381,9 @@ GUIHandler.prototype.initializeTextManipulationGUI = function(){
       return;
     }
     addedText.setText(val);
+    if (addedText.containerParent){
+      addedText.containerParent.insertAddedText(addedText);
+    }
   }).listen();
   guiHandler.textManipulationTextColorController = guiHandler.datGuiTextManipulation.addColor(guiHandler.textManipulationParameters, "Text color").onChange(function(val){
     selectionHandler.getSelectedObject().setColor(val);
@@ -1409,14 +1418,23 @@ GUIHandler.prototype.initializeTextManipulationGUI = function(){
     selectionHandler.getSelectedObject().refCharSize= val;
     selectionHandler.getSelectedObject().refInnerHeight = window.innerHeight;
     selectionHandler.getSelectedObject().handleResize();
+    if (selectionHandler.getSelectedObject().containerParent){
+      selectionHandler.getSelectedObject().containerParent.insertAddedText(selectionHandler.getSelectedObject());
+    }
   }).listen();
   guiHandler.textManipulationCharacterMarginController = guiHandler.datGuiTextManipulation.add(guiHandler.textManipulationParameters, "Char margin").min(0.5).max(100).step(0.5).onChange(function(val){
     selectionHandler.getSelectedObject().setMarginBetweenChars(val);
     selectionHandler.getSelectedObject().handleResize();
+    if (selectionHandler.getSelectedObject().containerParent){
+      selectionHandler.getSelectedObject().containerParent.insertAddedText(selectionHandler.getSelectedObject());
+    }
   }).listen();
   guiHandler.textManipulationLineMarginController = guiHandler.datGuiTextManipulation.add(guiHandler.textManipulationParameters, "Line margin").min(0.5).max(100).step(0.5).onChange(function(val){
     selectionHandler.getSelectedObject().setMarginBetweenLines(val);
     selectionHandler.getSelectedObject().handleResize();
+    if (selectionHandler.getSelectedObject().containerParent){
+      selectionHandler.getSelectedObject().containerParent.insertAddedText(selectionHandler.getSelectedObject());
+    }
   }).listen();
   guiHandler.textManipulationClickableController = guiHandler.datGuiTextManipulation.add(guiHandler.textManipulationParameters, "Clickable").onChange(function(val){
     selectionHandler.getSelectedObject().isClickable = val;
@@ -1466,6 +1484,9 @@ GUIHandler.prototype.initializeTextManipulationGUI = function(){
       guiHandler.disableController(guiHandler.textManipulationMaxWidthPercentController);
       guiHandler.disableController(guiHandler.textManipulationMaxHeightPercentController);
       guiHandler.enableController(guiHandler.textManipulationAffectedByFogController);
+      if (selectionHandler.getSelectedObject().containerParent){
+        selectionHandler.getSelectedObject().containerParent.removeAddedText();
+      }
     }
     selectionHandler.getSelectedObject().handleResize();
     var obj = selectionHandler.getSelectedObject();
@@ -1481,6 +1502,9 @@ GUIHandler.prototype.initializeTextManipulationGUI = function(){
       selectionHandler.getSelectedObject().marginMode = MARGIN_MODE_2D_CENTER;
     }
     selectionHandler.getSelectedObject().set2DCoordinates(selectionHandler.getSelectedObject().marginPercentWidth, selectionHandler.getSelectedObject().marginPercentHeight);
+    if (selectionHandler.getSelectedObject().containerParent){
+      selectionHandler.getSelectedObject().containerParent.insertAddedText(selectionHandler.getSelectedObject());
+    }
   }).listen();
   guiHandler.textManipulationMarginXController = guiHandler.datGuiTextManipulation.add(guiHandler.textManipulationParameters, "Margin X").min(0).max(100).step(0.1).onChange(function(val){
     selectionHandler.getSelectedObject().set2DCoordinates(
