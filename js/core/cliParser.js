@@ -4887,6 +4887,10 @@ function parse(input){
             terminal.printError(Text.CONTAINER_ALREADY_FULL);
             return true;
           }
+          if (obj.containerParent){
+            terminal.printError(Text.OBJECT_ALREADY_INSIDE_CONTAINER.replace(Text.PARAM1, obj.containerParent.name));
+            return true;
+          }
           if (obj.isAddedText){
             container.insertAddedText(obj);
           }else{
