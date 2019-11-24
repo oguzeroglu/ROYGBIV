@@ -76,6 +76,8 @@ var GUIHandler = function(){
     "Center Y": 50,
     "Width": 10,
     "Height": 10,
+    "Padding X": 0,
+    "Padding Y": 0,
     "Square": false
   };
   this.bloomParameters = {
@@ -216,6 +218,8 @@ GUIHandler.prototype.afterContainerSelection = function(){
     guiHandler.containerManipulationParameters["Width"] = curSelection.widthPercent;
     guiHandler.containerManipulationParameters["Height"] = curSelection.heightPercent;
     guiHandler.containerManipulationParameters["Square"] = !!curSelection.isSquare;
+    guiHandler.containerManipulationParameters["Padding X"] = curSelection.paddingXContainerSpace;
+    guiHandler.containerManipulationParameters["Padding Y"] = curSelection.paddingYContainerSpace;
   }else{
     guiHandler.hide(guiHandler.guiTypes.CONTAINER);
   }
@@ -635,6 +639,8 @@ GUIHandler.prototype.enableAllCMControllers = function(){
   guiHandler.enableController(guiHandler.containerManipulationWidthController);
   guiHandler.enableController(guiHandler.containerManipulationHeightController);
   guiHandler.enableController(guiHandler.containerManipulationSquareController);
+  guiHandler.enableController(guiHandler.containerManipulationPaddingXController);
+  guiHandler.enableController(guiHandler.containerManipulationPaddingYController);
 }
 
 GUIHandler.prototype.enableAllTMControllers = function(){
@@ -1321,6 +1327,12 @@ GUIHandler.prototype.initializeContainerManipulationGUI = function(){
   }).listen();
   guiHandler.containerManipulationHeightController = guiHandler.datGuiContainerManipulation.add(guiHandler.containerManipulationParameters, "Height").min(0.1).max(100).step(0.1).onChange(function(val){
     selectionHandler.getSelectedObject().setHeight(val);
+  }).listen();
+  guiHandler.containerManipulationPaddingXController = guiHandler.datGuiContainerManipulation.add(guiHandler.containerManipulationParameters, "Padding X").min(0).max(99.9).step(0.1).onChange(function(val){
+    selectionHandler.getSelectedObject().setPaddingX(val);
+  }).listen();
+  guiHandler.containerManipulationPaddingYController = guiHandler.datGuiContainerManipulation.add(guiHandler.containerManipulationParameters, "Padding Y").min(0).max(99.9).step(0.1).onChange(function(val){
+    selectionHandler.getSelectedObject().setPaddingY(val);
   }).listen();
   guiHandler.containerManipulationSquareController = guiHandler.datGuiContainerManipulation.add(guiHandler.containerManipulationParameters, "Square").onChange(function(val){
     selectionHandler.getSelectedObject().isSquare = val;
