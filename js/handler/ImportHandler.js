@@ -1312,6 +1312,7 @@ ImportHandler.prototype.importSprites = function(obj){
     sprite.originalHeight = curExport.originalHeight;
     sprite.originalWidthReference = curExport.originalWidthReference;
     sprite.originalHeightReference = curExport.originalHeightReference;
+    sprite.originalScreenResolution = curExport.originalScreenResolution;
     if (curExport.isTextured){
       sprite.mapTexture(texturePacks[curExport.mappedTexturePackName]);
     }

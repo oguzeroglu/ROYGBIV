@@ -148,6 +148,8 @@ Container2D.prototype.insertSprite = function(sprite){
   var maxHeight = this.heightPercent;
   var sourceWidth = sprite.originalWidth * sprite.originalWidthReference / renderer.getCurrentViewport().z;
   var sourceHeight = sprite.originalHeight * sprite.originalHeightReference / renderer.getCurrentViewport().w;
+  sourceWidth *= screenResolution / sprite.originalScreenResolution;
+  sourceHeight *= screenResolution / sprite.originalScreenResolution;
   var scale = Math.min(maxWidth / sourceWidth, maxHeight / sourceHeight);
   if (scale > 1){
     scale = 1;

@@ -205,7 +205,8 @@ Sprite.prototype.export = function(){
     originalWidth: this.originalWidth,
     originalHeight: this.originalHeight,
     originalWidthReference: this.originalWidthReference,
-    originalHeightReference: this.originalHeightReference
+    originalHeightReference: this.originalHeightReference,
+    originalScreenResolution: this.originalScreenResolution
   };
 }
 

@@ -4738,6 +4738,7 @@ function parse(input){
           sprites[spriteName].originalHeight = sprites[spriteName].calculateHeightPercent();
           sprites[spriteName].originalWidthReference = renderer.getCurrentViewport().z;
           sprites[spriteName].originalHeightReference = renderer.getCurrentViewport().w;
+          sprites[spriteName].originalScreenResolution = screenResolution;
           sceneHandler.onSpriteCreation(sprites[spriteName]);
           selectionHandler.select(sprites[spriteName]);
           refreshRaycaster(Text.SPRITE_CREATED);
