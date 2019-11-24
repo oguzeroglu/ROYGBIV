@@ -329,8 +329,8 @@ Sprite.prototype.set2DCoordinates = function(marginPercentX, marginPercentY){
 
 Sprite.prototype.getCornerPoint = function(point){
   // CONVERTED FROM GLSL SHADER CODE
-  var scaledX = this.mesh.material.uniforms.scale.value.x * this.mesh.material.uniforms.scaleCoef.value * point.x;
-  var scaledY = this.mesh.material.uniforms.scale.value.y * this.mesh.material.uniforms.scaleCoef.value * point.y;
+  var scaledX = screenResolution * this.mesh.material.uniforms.scale.value.x * this.mesh.material.uniforms.scaleCoef.value * point.x;
+  var scaledY = screenResolution * this.mesh.material.uniforms.scale.value.y * this.mesh.material.uniforms.scaleCoef.value * point.y;
   if (!(typeof this.cropCoefficientX == UNDEFINED)){
     scaledX *= this.cropCoefficientX;
   }
