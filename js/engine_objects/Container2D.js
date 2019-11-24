@@ -7,9 +7,33 @@ var Container2D = function(name, centerXPercent, centerYPercent, widthPercent, h
   this.heightPercent = heightPercent;
   this.scaleWidth = 1;
   this.scaleHeight = 1;
+  this.paddingXContainerSpace = 0;
+  this.paddingYContainerSpace = 0;
   this.handleRectangle();
   if (!isDeployment){
     this.rectangle.mesh.material.uniforms.color.value.set("lime");
+  }
+}
+
+// paddingY -> [0, 100[
+Container2D.prototype.setPaddingY = function(paddingY){
+  this.paddingYContainerSpace = paddingY;
+  if (this.sprite){
+    this.insertSprite(this.sprite);
+  }
+  if (this.addedText){
+    this.insertAddedText(this.addedText);
+  }
+}
+
+// paddingX -> [0, 100[
+Container2D.prototype.setPaddingX = function(paddingX){
+  this.paddingXContainerSpace = paddingX;
+  if (this.sprite){
+    this.insertSprite(this.sprite);
+  }
+  if (this.addedText){
+    this.insertAddedText(this.addedText);
   }
 }
 
@@ -52,7 +76,9 @@ Container2D.prototype.export = function(){
     centerYPercent: this.centerYPercent,
     widthPercent: this.widthPercent,
     heightPercent: this.heightPercent,
-    isSquare: !!this.isSquare
+    isSquare: !!this.isSquare,
+    paddingXContainerSpace: this.paddingXContainerSpace,
+    paddingYContainerSpace: this.paddingYContainerSpace
   };
   if (this.sprite){
     exportObj.spriteName = this.sprite.name
@@ -156,19 +182,21 @@ Container2D.prototype.insertAddedText = function(addedText){
   if (!addedText.is2D){
     return;
   }
-  addedText.maxWidthPercent = this.widthPercent;
-  addedText.maxHeightPercent = this.heightPercent;
+  var paddingX = (((this.paddingXContainerSpace) * ((this.widthPercent / 2))) / (100));
+  var paddingY = (((this.paddingYContainerSpace) * ((this.heightPercent / 2))) / (100));
+  addedText.maxWidthPercent = this.widthPercent - (2 * paddingX);
+  addedText.maxHeightPercent = this.heightPercent - (2 * paddingY);
   addedText.handleResize();
   var selectedCoordXPercent, selectedCoordYPercent;
   if (addedText.marginMode == MARGIN_MODE_2D_CENTER){
     selectedCoordXPercent = 100 - this.centerXPercent;
     selectedCoordYPercent = 100 - this.centerYPercent;
   }else if (addedText.marginMode == MARGIN_MODE_2D_TOP_LEFT){
-    selectedCoordXPercent = this.centerXPercent - (this.widthPercent / 2);
-    selectedCoordYPercent = 100 - this.centerYPercent - (this.heightPercent / 2);
+    selectedCoordXPercent = this.centerXPercent - (this.widthPercent / 2) + paddingX;
+    selectedCoordYPercent = 100 - this.centerYPercent - (this.heightPercent / 2) + paddingY;
   }else{
-    selectedCoordXPercent = 100 - this.centerXPercent - (this.widthPercent / 2);
-    selectedCoordYPercent = this.centerYPercent + (this.heightPercent / 2);
+    selectedCoordXPercent = 100 - this.centerXPercent - (this.widthPercent / 2) + paddingX;
+    selectedCoordYPercent = this.centerYPercent - (this.heightPercent / 2) + addedText.getHeightPercent() + paddingY;
   }
   addedText.set2DCoordinates(selectedCoordXPercent, selectedCoordYPercent);
   addedText.containerParent = this;
@@ -176,9 +204,11 @@ Container2D.prototype.insertAddedText = function(addedText){
 }
 
 Container2D.prototype.insertSprite = function(sprite){
+  var paddingX = (((this.paddingXContainerSpace) * ((this.widthPercent / 2))) / (100));
+  var paddingY = (((this.paddingYContainerSpace) * ((this.heightPercent / 2))) / (100));
   sprite.setRotation(0);
-  var maxWidth = this.widthPercent;
-  var maxHeight = this.heightPercent;
+  var maxWidth = this.widthPercent - (2 * paddingX);
+  var maxHeight = this.heightPercent - (2 * paddingY);
   var sourceWidth = sprite.originalWidth * sprite.originalWidthReference / renderer.getCurrentViewport().z;
   var sourceHeight = sprite.originalHeight * sprite.originalHeightReference / renderer.getCurrentViewport().w;
   sourceWidth *= screenResolution / sprite.originalScreenResolution;
@@ -194,11 +224,11 @@ Container2D.prototype.insertSprite = function(sprite){
     selectedCoordXPercent = 100 - this.centerXPercent;
     selectedCoordYPercent = 100 - this.centerYPercent;
   }else if (sprite.marginMode == MARGIN_MODE_2D_TOP_LEFT){
-    selectedCoordXPercent = this.centerXPercent - (this.widthPercent / 2);
-    selectedCoordYPercent = 100 - this.centerYPercent - (this.heightPercent / 2);
+    selectedCoordXPercent = this.centerXPercent - (this.widthPercent / 2) + paddingX;
+    selectedCoordYPercent = 100 - this.centerYPercent - (this.heightPercent / 2) + paddingY;
   }else{
-    selectedCoordXPercent = 100 - this.centerXPercent - (this.widthPercent / 2);
-    selectedCoordYPercent = this.centerYPercent - (this.heightPercent / 2);
+    selectedCoordXPercent = 100 - this.centerXPercent - (this.widthPercent / 2) + paddingX;
+    selectedCoordYPercent = this.centerYPercent - (this.heightPercent / 2) + paddingY;
   }
   sprite.set2DCoordinates(selectedCoordXPercent, selectedCoordYPercent);
   sprite.containerParent = this;
