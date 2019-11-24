@@ -5,13 +5,39 @@ var Container2D = function(name, centerXPercent, centerYPercent, widthPercent, h
   this.centerYPercent = centerYPercent;
   this.widthPercent = widthPercent;
   this.heightPercent = heightPercent;
+  this.scaleWidth = 1;
+  this.scaleHeight = 1;
   this.handleRectangle();
   if (!isDeployment){
     this.rectangle.mesh.material.uniforms.color.value.set("lime");
   }
 }
 
+Container2D.prototype.makeSquare = function(){
+  var actualWidth = renderer.getCurrentViewport().z * this.widthPercent / 100;
+  var actualHeight = renderer.getCurrentViewport().w * this.heightPercent / 100;
+  if (actualWidth > actualHeight){
+    var newWidthPercent = this.heightPercent * renderer.getCurrentViewport().w / renderer.getCurrentViewport().z;
+    this.scaleWidth = newWidthPercent / this.widthPercent;
+    this.scaleHeight = 1;
+  }else if (actualHeight > actualWidth){
+    var newHeightPercent = this.widthPercent * renderer.getCurrentViewport().z / renderer.getCurrentViewport().w;
+    this.scaleHeight = newHeightPercent / this.heightPercent;
+    this.scaleWidth = 1;
+  }
+  if (!isDeployment){
+    if (guiHandler.datGuiContainerManipulation){
+      guiHandler.containerManipulationParameters["Width"] = this.widthPercent * this.scaleWidth;
+      guiHandler.containerManipulationParameters["Height"] = this.heightPercent * this.scaleHeight;
+    }
+  }
+  this.handleRectangle();
+}
+
 Container2D.prototype.handleResize = function(){
+  if (this.isSquare){
+    this.makeSquare();
+  }
   if (this.addedText){
     this.insertAddedText(this.addedText);
   }
@@ -25,7 +51,8 @@ Container2D.prototype.export = function(){
     centerXPercent: this.centerXPercent,
     centerYPercent: this.centerYPercent,
     widthPercent: this.widthPercent,
-    heightPercent: this.heightPercent
+    heightPercent: this.heightPercent,
+    isSquare: !!this.isSquare
   };
   if (this.sprite){
     exportObj.spriteName = this.sprite.name
@@ -72,6 +99,9 @@ Container2D.prototype.setCenter = function(centerXPercent, centerYPercent){
 Container2D.prototype.setWidth = function(widthPercent){
   this.widthPercent = widthPercent;
   this.handleRectangle();
+  if (this.isSquare){
+    this.makeSquare();
+  }
   if (this.sprite){
     this.insertSprite(this.sprite);
   }
@@ -83,6 +113,9 @@ Container2D.prototype.setWidth = function(widthPercent){
 Container2D.prototype.setHeight = function(heightPercent){
   this.heightPercent = heightPercent;
   this.handleRectangle();
+  if (this.isSquare){
+    this.makeSquare();
+  }
   if (this.sprite){
     this.insertSprite(this.sprite);
   }
@@ -98,8 +131,8 @@ Container2D.prototype.handleRectangle = function(){
 
   var centerXWebGL = ((this.centerXPercent * 2) / 100) -1;
   var centerYWebGL = ((this.centerYPercent * 2) / 100) -1;
-  var widthWebGL = ((this.widthPercent * 2) / 100);
-  var heightWebGL = ((this.heightPercent * 2) / 100);
+  var widthWebGL = ((this.widthPercent * this.scaleWidth * 2) / 100);
+  var heightWebGL = ((this.heightPercent * this.scaleHeight * 2) / 100);
 
   var x = centerXWebGL - (widthWebGL / 2);
   var x2 = centerXWebGL + (widthWebGL / 2);

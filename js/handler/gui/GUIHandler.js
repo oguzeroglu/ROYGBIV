@@ -75,7 +75,8 @@ var GUIHandler = function(){
     "Center X": 50,
     "Center Y": 50,
     "Width": 10,
-    "Height": 10
+    "Height": 10,
+    "Square": false
   };
   this.bloomParameters = {
     "Threshold": 0.0,
@@ -214,6 +215,7 @@ GUIHandler.prototype.afterContainerSelection = function(){
     guiHandler.containerManipulationParameters["Center Y"] = curSelection.centerYPercent;
     guiHandler.containerManipulationParameters["Width"] = curSelection.widthPercent;
     guiHandler.containerManipulationParameters["Height"] = curSelection.heightPercent;
+    guiHandler.containerManipulationParameters["Square"] = !!curSelection.isSquare;
   }else{
     guiHandler.hide(guiHandler.guiTypes.CONTAINER);
   }
@@ -632,6 +634,7 @@ GUIHandler.prototype.enableAllCMControllers = function(){
   guiHandler.enableController(guiHandler.containerManipulationCenterYController);
   guiHandler.enableController(guiHandler.containerManipulationWidthController);
   guiHandler.enableController(guiHandler.containerManipulationHeightController);
+  guiHandler.enableController(guiHandler.containerManipulationSquareController);
 }
 
 GUIHandler.prototype.enableAllTMControllers = function(){
@@ -1318,6 +1321,12 @@ GUIHandler.prototype.initializeContainerManipulationGUI = function(){
   }).listen();
   guiHandler.containerManipulationHeightController = guiHandler.datGuiContainerManipulation.add(guiHandler.containerManipulationParameters, "Height").min(0.1).max(100).step(0.1).onChange(function(val){
     selectionHandler.getSelectedObject().setHeight(val);
+  }).listen();
+  guiHandler.containerManipulationSquareController = guiHandler.datGuiContainerManipulation.add(guiHandler.containerManipulationParameters, "Square").onChange(function(val){
+    selectionHandler.getSelectedObject().isSquare = val;
+    if (val){
+      selectionHandler.getSelectedObject().makeSquare();
+    }
   }).listen();
 }
 

@@ -1287,6 +1287,10 @@ ImportHandler.prototype.importContainers = function(obj){
     var curExport = obj.containers[containerName];
     var container = new Container2D(containerName, curExport.centerXPercent, curExport.centerYPercent, curExport.widthPercent, curExport.heightPercent);
     containers[containerName] = container;
+    if (curExport.isSquare){
+      container.isSquare = true;
+      container.makeSquare();
+    }
     if (!(typeof curExport.spriteName == UNDEFINED)){
       container.insertSprite(sprites[curExport.spriteName]);
     }
