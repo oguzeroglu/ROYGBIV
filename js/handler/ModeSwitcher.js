@@ -99,6 +99,9 @@ ModeSwitcher.prototype.switchFromDesignToPreview = function(){
     scene.remove(gridSelections[gridName].mesh);
     scene.remove(gridSelections[gridName].dot);
   }
+  for (var containerName in containers){
+    containers[containerName].makeInvisible();
+  }
   scriptsToRun = new Map();
   scriptsHandler.onModeSwitch();
   for (var markedPointName in sceneHandler.getMarkedPoints()){
@@ -280,6 +283,9 @@ ModeSwitcher.prototype.switchFromPreviewToDesign = function(){
   for (var gridName in gridSelections){
     scene.add(gridSelections[gridName].mesh);
     scene.add(gridSelections[gridName].dot);
+  }
+  for (var containerName in containers){
+    containers[containerName].makeVisible();
   }
   for (var textName in sceneHandler.getAddedTexts()){
     var addedText = addedTexts[textName];
