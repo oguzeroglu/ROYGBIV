@@ -1326,6 +1326,9 @@ GUIHandler.prototype.initializeContainerManipulationGUI = function(){
     selectionHandler.getSelectedObject().isSquare = val;
     if (val){
       selectionHandler.getSelectedObject().makeSquare();
+    }else{
+      selectionHandler.getSelectedObject().scaleWidth = 1;
+      selectionHandler.getSelectedObject().scaleHeight = 1;
     }
   }).listen();
 }
