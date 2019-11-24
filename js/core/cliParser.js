@@ -4900,6 +4900,28 @@ function parse(input){
           terminal.printInfo(Text.OBJECT_ADDED_TO_CONTAINER);
           return true;
         break;
+        case 206: //emptyContainer
+          if (mode != 0){
+            terminal.printError(Text.WORKS_ONLY_IN_DESIGN_MODE);
+            return true;
+          }
+          var container = containers[splitted[1]];
+          if (!container){
+            terminal.printError(Text.NO_SUCH_CONTAINER);
+            return true;
+          }
+          if (container.registeredSceneName != sceneHandler.getActiveSceneName()){
+            terminal.printError(Text.CONTAINER_NOT_IN_ACTIVE_SCENE);
+            return true;
+          }
+          if (!container.addedText && !container.sprite){
+            terminal.printError(Text.CONTAINER_IS_EMPTY);
+            return true;
+          }
+          container.makeEmpty();
+          terminal.printInfo(Text.CONTAINER_EMPTIED);
+          return true;
+        break;
       }
       return true;
     }catch(err){

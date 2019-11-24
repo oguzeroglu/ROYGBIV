@@ -15,6 +15,15 @@ var Container2D = function(name, centerXPercent, centerYPercent, widthPercent, h
   }
 }
 
+Container2D.prototype.makeEmpty = function(){
+  if (this.sprite){
+    this.removeSprite();
+  }
+  if (this.addedText){
+    this.removeAddedText();
+  }
+}
+
 // paddingY -> [0, 100[
 Container2D.prototype.setPaddingY = function(paddingY){
   this.paddingYContainerSpace = paddingY;
