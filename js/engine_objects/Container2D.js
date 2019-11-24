@@ -6,7 +6,9 @@ var Container2D = function(name, centerXPercent, centerYPercent, widthPercent, h
   this.widthPercent = widthPercent;
   this.heightPercent = heightPercent;
   this.handleRectangle();
-  this.rectangle.mesh.material.uniforms.color.value.set("lime");
+  if (!isDeployment){
+    this.rectangle.mesh.material.uniforms.color.value.set("lime");
+  }
 }
 
 Container2D.prototype.handleResize = function(){
