@@ -9,10 +9,38 @@ var Container2D = function(name, centerXPercent, centerYPercent, widthPercent, h
   this.scaleHeight = 1;
   this.paddingXContainerSpace = 0;
   this.paddingYContainerSpace = 0;
+  this.alignedContainerInfos = {};
   this.handleRectangle();
   if (!isDeployment){
     this.rectangle.mesh.material.uniforms.color.value.set("lime");
   }
+}
+
+Container2D.prototype.handleAlignments = function(){
+  for (var key in this.alignedContainerInfos){
+    var curAlignedContainerInfos = this.alignedContainerInfos[key];
+    for (var i = 0; i<curAlignedContainerInfos.length; i++){
+      var curInfo = curAlignedContainerInfos[i];
+      var curContainer = curInfo.container;
+      if (curInfo.alignmentType == CONTAINER_ALIGNMENT_TYPE_RIGHT){
+        curContainer.setCenter(this.centerXPercent + (this.widthPercent / 2) + curInfo.value + (curContainer.widthPercent / 2), curContainer.centerYPercent);
+      }else if (curInfo.alignmentType == CONTAINER_ALIGNMENT_TYPE_LEFT){
+        curContainer.setCenter(this.centerXPercent - (this.widthPercent / 2) - curInfo.value - (curContainer.widthPercent / 2), curContainer.centerYPercent);
+      }else if (curInfo.alignmentType == CONTAINER_ALIGNMENT_TYPE_TOP){
+        curContainer.setCenter(curContainer.centerXPercent, this.centerYPercent + (this.heightPercent / 2) + curInfo.value + (curContainer.heightPercent / 2));
+      }else if (curInfo.alignmentType == CONTAINER_ALIGNMENT_TYPE_BOTTOM){
+        curContainer.setCenter(curContainer.centerXPercent, this.centerYPercent - (this.heightPercent / 2) - curInfo.value - (curContainer.heightPercent / 2));
+      }
+    }
+  }
+}
+
+Container2D.prototype.addAlignedContainer = function(alignmentInfo){
+  if (!this.alignedContainerInfos[alignmentInfo.container.name]){
+    this.alignedContainerInfos[alignmentInfo.container.name] = [];
+  }
+  this.alignedContainerInfos[alignmentInfo.container.name].push(alignmentInfo);
+  this.handleAlignments();
 }
 
 Container2D.prototype.makeEmpty = function(){
@@ -175,6 +203,7 @@ Container2D.prototype.handleRectangle = function(){
   var y2 = centerYWebGL - (heightWebGL / 2);
   this.rectangle.set(x, y, x2, y2, widthWebGL, heightWebGL);
   this.rectangle.updateMesh(0.005);
+  this.handleAlignments();
 }
 
 Container2D.prototype.removeSprite = function(){
