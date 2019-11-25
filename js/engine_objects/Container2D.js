@@ -17,19 +17,23 @@ var Container2D = function(name, centerXPercent, centerYPercent, widthPercent, h
 }
 
 Container2D.prototype.handleAlignments = function(){
+  var wp = this.widthPercent * this.scaleWidth;
+  var hp = this.heightPercent * this.scaleHeight;
   for (var key in this.alignedContainerInfos){
     var curAlignedContainerInfos = this.alignedContainerInfos[key];
     for (var i = 0; i<curAlignedContainerInfos.length; i++){
       var curInfo = curAlignedContainerInfos[i];
       var curContainer = curInfo.container;
+      var curWidthPercent = curContainer.widthPercent * curContainer.scaleWidth;
+      var curHeightPercent = curContainer.heightPercent * curContainer.scaleHeight;
       if (curInfo.alignmentType == CONTAINER_ALIGNMENT_TYPE_RIGHT){
-        curContainer.setCenter(this.centerXPercent + (this.widthPercent / 2) + curInfo.value + (curContainer.widthPercent / 2), curContainer.centerYPercent);
+        curContainer.setCenter(this.centerXPercent + (wp / 2) + curInfo.value + (curWidthPercent / 2), curContainer.centerYPercent);
       }else if (curInfo.alignmentType == CONTAINER_ALIGNMENT_TYPE_LEFT){
-        curContainer.setCenter(this.centerXPercent - (this.widthPercent / 2) - curInfo.value - (curContainer.widthPercent / 2), curContainer.centerYPercent);
+        curContainer.setCenter(this.centerXPercent - (wp / 2) - curInfo.value - (curWidthPercent / 2), curContainer.centerYPercent);
       }else if (curInfo.alignmentType == CONTAINER_ALIGNMENT_TYPE_TOP){
-        curContainer.setCenter(curContainer.centerXPercent, this.centerYPercent + (this.heightPercent / 2) + curInfo.value + (curContainer.heightPercent / 2));
+        curContainer.setCenter(curContainer.centerXPercent, this.centerYPercent + (hp / 2) + curInfo.value + (curHeightPercent / 2));
       }else if (curInfo.alignmentType == CONTAINER_ALIGNMENT_TYPE_BOTTOM){
-        curContainer.setCenter(curContainer.centerXPercent, this.centerYPercent - (this.heightPercent / 2) - curInfo.value - (curContainer.heightPercent / 2));
+        curContainer.setCenter(curContainer.centerXPercent, this.centerYPercent - (hp / 2) - curInfo.value - (curHeightPercent / 2));
       }
     }
   }
