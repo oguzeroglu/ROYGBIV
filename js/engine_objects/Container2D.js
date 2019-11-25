@@ -16,25 +16,42 @@ var Container2D = function(name, centerXPercent, centerYPercent, widthPercent, h
   }
 }
 
-Container2D.prototype.handleAlignments = function(){
+Container2D.prototype.isChildAlignedWithType = function(childContainer, alignmentType){
+  var alignmentInfos = this.alignedContainerInfos[childContainer.name];
+  if (!alignmentInfos){
+    return false;
+  }
+  for (var i = 0; i<alignmentInfos.length; i++){
+    if (alignmentInfos[i].alignmentType == alignmentType){
+      return true;
+    }
+  }
+  return false;
+}
+
+Container2D.prototype.handleAlignment = function(curInfo){
   var wp = this.widthPercent * this.scaleWidth;
   var hp = this.heightPercent * this.scaleHeight;
+  var curContainer = curInfo.container;
+  var curWidthPercent = curContainer.widthPercent * curContainer.scaleWidth;
+  var curHeightPercent = curContainer.heightPercent * curContainer.scaleHeight;
+  if (curInfo.alignmentType == CONTAINER_ALIGNMENT_TYPE_RIGHT){
+    curContainer.setCenter(this.centerXPercent + (wp / 2) + curInfo.value + (curWidthPercent / 2), curContainer.centerYPercent);
+  }else if (curInfo.alignmentType == CONTAINER_ALIGNMENT_TYPE_LEFT){
+    curContainer.setCenter(this.centerXPercent - (wp / 2) - curInfo.value - (curWidthPercent / 2), curContainer.centerYPercent);
+  }else if (curInfo.alignmentType == CONTAINER_ALIGNMENT_TYPE_TOP){
+    curContainer.setCenter(curContainer.centerXPercent, this.centerYPercent + (hp / 2) + curInfo.value + (curHeightPercent / 2));
+  }else if (curInfo.alignmentType == CONTAINER_ALIGNMENT_TYPE_BOTTOM){
+    curContainer.setCenter(curContainer.centerXPercent, this.centerYPercent - (hp / 2) - curInfo.value - (curHeightPercent / 2));
+  }
+}
+
+Container2D.prototype.handleAlignments = function(){
   for (var key in this.alignedContainerInfos){
     var curAlignedContainerInfos = this.alignedContainerInfos[key];
     for (var i = 0; i<curAlignedContainerInfos.length; i++){
       var curInfo = curAlignedContainerInfos[i];
-      var curContainer = curInfo.container;
-      var curWidthPercent = curContainer.widthPercent * curContainer.scaleWidth;
-      var curHeightPercent = curContainer.heightPercent * curContainer.scaleHeight;
-      if (curInfo.alignmentType == CONTAINER_ALIGNMENT_TYPE_RIGHT){
-        curContainer.setCenter(this.centerXPercent + (wp / 2) + curInfo.value + (curWidthPercent / 2), curContainer.centerYPercent);
-      }else if (curInfo.alignmentType == CONTAINER_ALIGNMENT_TYPE_LEFT){
-        curContainer.setCenter(this.centerXPercent - (wp / 2) - curInfo.value - (curWidthPercent / 2), curContainer.centerYPercent);
-      }else if (curInfo.alignmentType == CONTAINER_ALIGNMENT_TYPE_TOP){
-        curContainer.setCenter(curContainer.centerXPercent, this.centerYPercent + (hp / 2) + curInfo.value + (curHeightPercent / 2));
-      }else if (curInfo.alignmentType == CONTAINER_ALIGNMENT_TYPE_BOTTOM){
-        curContainer.setCenter(curContainer.centerXPercent, this.centerYPercent - (hp / 2) - curInfo.value - (curHeightPercent / 2));
-      }
+      this.handleAlignment(curInfo);
     }
   }
 }
@@ -43,7 +60,30 @@ Container2D.prototype.addAlignedContainer = function(alignmentInfo){
   if (!this.alignedContainerInfos[alignmentInfo.container.name]){
     this.alignedContainerInfos[alignmentInfo.container.name] = [];
   }
-  this.alignedContainerInfos[alignmentInfo.container.name].push(alignmentInfo);
+  var found = false;
+  if (this.alignedContainerInfos[alignmentInfo.container.name]){
+    var alternativeType;
+    if (alignmentInfo.alignmentType == CONTAINER_ALIGNMENT_TYPE_TOP){
+      alternativeType = CONTAINER_ALIGNMENT_TYPE_BOTTOM;
+    }else if (alignmentInfo.alignmentType == CONTAINER_ALIGNMENT_TYPE_BOTTOM){
+      alternativeType = CONTAINER_ALIGNMENT_TYPE_TOP;
+    }else if (alignmentInfo.alignmentType == CONTAINER_ALIGNMENT_TYPE_LEFT){
+      alternativeType = CONTAINER_ALIGNMENT_TYPE_RIGHT;
+    }else if (alignmentInfo.alignmentType == CONTAINER_ALIGNMENT_TYPE_RIGHT){
+      alternativeType = CONTAINER_ALIGNMENT_TYPE_LEFT;
+    }
+    for (var i = 0; i<this.alignedContainerInfos[alignmentInfo.container.name].length; i++){
+      var alignmentType = this.alignedContainerInfos[alignmentInfo.container.name][i].alignmentType;
+      if (alignmentType == alignmentInfo.alignmentType || alignmentType == alternativeType){
+        this.alignedContainerInfos[alignmentInfo.container.name][i] = alignmentInfo;
+        found = true;
+        break;
+      }
+    }
+  }
+  if (!found){
+    this.alignedContainerInfos[alignmentInfo.container.name].push(alignmentInfo);
+  }
   this.handleAlignments();
 }
 

@@ -781,6 +781,21 @@ Terminal.prototype.autocomplete = function(command){
 				}
 				helpString = "[2D objects]: ";
 			break;
+			case commandDescriptor.CONTAINER_ALIGNMENT_TYPE:
+				if ("container_alignment_type_top".startsWith(curEntry.toLowerCase())){
+					possibilities.push("CONTAINER_ALIGNMENT_TYPE_TOP");
+				}
+				if ("container_alignment_type_bottom".startsWith(curEntry.toLowerCase())){
+					possibilities.push("CONTAINER_ALIGNMENT_TYPE_BOTTOM");
+				}
+				if ("container_alignment_type_right".startsWith(curEntry.toLowerCase())){
+					possibilities.push("CONTAINER_ALIGNMENT_TYPE_RIGHT");
+				}
+				if ("container_alignment_type_left".startsWith(curEntry.toLowerCase())){
+					possibilities.push("CONTAINER_ALIGNMENT_TYPE_LEFT");
+				}
+				helpString = "[Alignment type]: ";
+			break;
 		}
 
 		//  **********************************************************

@@ -220,6 +220,18 @@ GUIHandler.prototype.afterContainerSelection = function(){
     guiHandler.containerManipulationParameters["Square"] = !!curSelection.isSquare;
     guiHandler.containerManipulationParameters["Padding X"] = curSelection.paddingXContainerSpace;
     guiHandler.containerManipulationParameters["Padding Y"] = curSelection.paddingYContainerSpace;
+    if (curSelection.alignedParent){
+      var alignedLeft = curSelection.alignedParent.isChildAlignedWithType(curSelection, CONTAINER_ALIGNMENT_TYPE_LEFT);
+      var alignedRight = curSelection.alignedParent.isChildAlignedWithType(curSelection, CONTAINER_ALIGNMENT_TYPE_RIGHT);
+      var alignedBottom = curSelection.alignedParent.isChildAlignedWithType(curSelection, CONTAINER_ALIGNMENT_TYPE_BOTTOM);
+      var alignedTop = curSelection.alignedParent.isChildAlignedWithType(curSelection, CONTAINER_ALIGNMENT_TYPE_TOP);
+      if (alignedLeft || alignedRight){
+        guiHandler.disableController(guiHandler.containerManipulationCenterXController);
+      }
+      if (alignedTop || alignedBottom){
+        guiHandler.disableController(guiHandler.containerManipulationCenterYController);
+      }
+    }
   }else{
     guiHandler.hide(guiHandler.guiTypes.CONTAINER);
   }
@@ -1324,9 +1336,21 @@ GUIHandler.prototype.initializeContainerManipulationGUI = function(){
   }).listen();
   guiHandler.containerManipulationWidthController = guiHandler.datGuiContainerManipulation.add(guiHandler.containerManipulationParameters, "Width").min(0.1).max(100).step(0.1).onChange(function(val){
     selectionHandler.getSelectedObject().setWidth(val);
+    if (selectionHandler.getSelectedObject().alignedParent){
+      var ary = selectionHandler.getSelectedObject().alignedParent.alignedContainerInfos[selectionHandler.getSelectedObject().name];
+      for (var i = 0; i<ary.length; i++){
+        selectionHandler.getSelectedObject().alignedParent.handleAlignment(ary[i]);
+      }
+    }
   }).listen();
   guiHandler.containerManipulationHeightController = guiHandler.datGuiContainerManipulation.add(guiHandler.containerManipulationParameters, "Height").min(0.1).max(100).step(0.1).onChange(function(val){
     selectionHandler.getSelectedObject().setHeight(val);
+    if (selectionHandler.getSelectedObject().alignedParent){
+      var ary = selectionHandler.getSelectedObject().alignedParent.alignedContainerInfos[selectionHandler.getSelectedObject().name];
+      for (var i = 0; i<ary.length; i++){
+        selectionHandler.getSelectedObject().alignedParent.handleAlignment(ary[i]);
+      }
+    }
   }).listen();
   guiHandler.containerManipulationPaddingXController = guiHandler.datGuiContainerManipulation.add(guiHandler.containerManipulationParameters, "Padding X").min(0).max(99.9).step(0.1).onChange(function(val){
     selectionHandler.getSelectedObject().setPaddingX(val);

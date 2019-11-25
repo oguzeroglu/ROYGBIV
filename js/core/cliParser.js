@@ -4922,6 +4922,48 @@ function parse(input){
           terminal.printInfo(Text.CONTAINER_EMPTIED);
           return true;
         break;
+        case 207: //alignContainers
+          if (mode != 0){
+            terminal.printError(Text.WORKS_ONLY_IN_DESIGN_MODE);
+            return true;
+          }
+          var parentContainer = containers[splitted[1]];
+          var childContainer = containers[splitted[2]];
+          var alignmentType = splitted[3].toUpperCase();
+          var margin = parseFloat(splitted[4]);
+          if (!parentContainer){
+            terminal.printError(Text.PARENT_CONTAINER_DOES_NOT_EXIST);
+            return true;
+          }
+          if (!childContainer){
+            terminal.printError(Text.CHILD_CONTAINER_DOES_NOT_EXIST);
+            return true;
+          }
+          if (parentContainer.registeredSceneName != sceneHandler.getActiveSceneName()){
+            terminal.printError(Text.PARENT_CONTAINER_NOT_IN_ACTIVE_SCENE);
+            return true;
+          }
+          if (childContainer.registeredSceneName != sceneHandler.getActiveSceneName()){
+            terminal.printError(Text.CHILD_CONTAINER_NOT_IN_ACTIVE_SCENE);
+            return true;
+          }
+          if (alignmentType != "CONTAINER_ALIGNMENT_TYPE_TOP" && alignmentType != "CONTAINER_ALIGNMENT_TYPE_BOTTOM" && alignmentType != "CONTAINER_ALIGNMENT_TYPE_LEFT" && alignmentType != "CONTAINER_ALIGNMENT_TYPE_RIGHT"){
+            terminal.printError(Text.INVALID_ALIGNMENT_TYPE);
+            return true;
+          }
+          if (isNaN(margin)){
+            terminal.printError(Text.IS_NOT_A_NUMBER.replace(Text.PARAM1, "margin"));
+            return true;
+          }
+          if (childContainer.alignedParent && childContainer.alignedParent.name != parentContainer.name){
+            terminal.printError(Text.CHILD_CONTAINER_IS_ALREADY_ALIGNED);
+            return true;
+          }
+          parentContainer.addAlignedContainer({container: childContainer, alignmentType: alignmentType, value: margin});
+          childContainer.alignedParent = parentContainer;
+          terminal.printInfo(Text.CONTAINER_ALIGNED);
+          return true;
+        break;
       }
       return true;
     }catch(err){

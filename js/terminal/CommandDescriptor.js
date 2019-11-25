@@ -207,7 +207,8 @@ var CommandDescriptor = function(){
       1, //newContainer
       1, //selectContainer
       2, //addToContainer
-      1 //emptyContainer
+      1, //emptyContainer
+      4 //alignContainers
   ];
 
   this.commandArgumentsExpectedExplanation = [
@@ -417,7 +418,8 @@ var CommandDescriptor = function(){
     "newContainer containerName",
     "selectContainer containerName",
     "addToContainer containerName textOrSpriteName",
-    "emptyContainer containerName"
+    "emptyContainer containerName",
+    "alignContainers parentContainer childContainer alignmentType margin"
   ];
 
   this.commands = [
@@ -627,7 +629,8 @@ var CommandDescriptor = function(){
     "newContainer",
     "selectContainer",
     "addToContainer",
-    "emptyContainer"
+    "emptyContainer",
+    "alignContainers"
   ];
 
   this.commandInfo = [
@@ -837,7 +840,8 @@ var CommandDescriptor = function(){
     "newContainer: Creates a new 2D container.",
     "selectContainer: Selects a 2D container.",
     "addToContainer: Inserts a 2D added text or sprite into a 2D container.",
-    "emptyContainer: Removes inserted object from a container."
+    "emptyContainer: Removes inserted object from a container.",
+    "alignContainers: Aligns child container to parent container given margin."
   ];
 
   this.keyboardInfo = [
@@ -978,6 +982,7 @@ var CommandDescriptor = function(){
   this.OBJECT_TEXT_SPRITE_NAME    =   40;
   this.CONTAINER_NAME             =   41;
   this.SPRITE_OR_2D_TEXT_NAME     =   42;
+  this.CONTAINER_ALIGNMENT_TYPE   =   43;
 
   // newGridSystem
   this.newGridSystem = new Object();
@@ -1549,6 +1554,14 @@ var CommandDescriptor = function(){
   this.emptyContainer = new Object();
   this.emptyContainer.types = [];
   this.emptyContainer.types.push(this.CONTAINER_NAME); //containerName
+
+  // alignContainers
+  this.alignContainers = new Object();
+  this.alignContainers.types = [];
+  this.alignContainers.types.push(this.CONTAINER_NAME); //parentContainer
+  this.alignContainers.types.push(this.CONTAINER_NAME); //childContainer
+  this.alignContainers.types.push(this.CONTAINER_ALIGNMENT_TYPE); //alignmentType
+  this.alignContainers.types.push(this.UNKNOWN_INDICATOR); //margin
 };
 
 CommandDescriptor.prototype.test = function(){
