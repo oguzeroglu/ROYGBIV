@@ -167,6 +167,17 @@ Container2D.prototype.export = function(){
   if (this.addedText){
     exportObj.addedTextName = this.addedText.name;
   }
+  exportObj.alignedContainerInfos = new Object();
+  for (var key in this.alignedContainerInfos){
+    exportObj.alignedContainerInfos[key] = [];
+    for (var i = 0; i<this.alignedContainerInfos[key].length; i++){
+      exportObj.alignedContainerInfos[key].push({
+        containerName: this.alignedContainerInfos[key][i].container.name,
+        alignmentType: this.alignedContainerInfos[key][i].alignmentType,
+        value: this.alignedContainerInfos[key][i].value
+      });
+    }
+  }
   return exportObj;
 }
 

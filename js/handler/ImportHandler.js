@@ -1300,6 +1300,18 @@ ImportHandler.prototype.importContainers = function(obj){
       container.insertAddedText(addedTexts[curExport.addedTextName]);
     }
   }
+  for (var containerName in obj.containers){
+    var curExport = obj.containers[containerName];
+    for (var key in curExport.alignedContainerInfos){
+      var ary = curExport.alignedContainerInfos[key];
+      for (var i = 0; i<ary.length; i++){
+        var curInfo = ary[i];
+        var child = containers[curInfo.containerName];
+        containers[containerName].addAlignedContainer({container: child, alignmentType: curInfo.alignmentType, value: curInfo.value});
+        child.alignedParent = containers[containerName];
+      }
+    }
+  }
 }
 
 ImportHandler.prototype.importSprites = function(obj){
