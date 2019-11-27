@@ -4905,6 +4905,10 @@ function parse(input){
             terminal.printError(Text.WORKS_ONLY_IN_DESIGN_MODE);
             return true;
           }
+          if (!(splitted[1].indexOf("*") == -1)){
+            new JobHandler(splitted).handle();
+            return true;
+          }
           var container = containers[splitted[1]];
           if (!container){
             terminal.printError(Text.NO_SUCH_CONTAINER);
@@ -4919,7 +4923,9 @@ function parse(input){
             return true;
           }
           container.makeEmpty();
-          terminal.printInfo(Text.CONTAINER_EMPTIED);
+          if (!jobHandlerWorking){
+            terminal.printInfo(Text.CONTAINER_EMPTIED);
+          }
           return true;
         break;
         case 207: //alignContainers
@@ -4972,6 +4978,10 @@ function parse(input){
             terminal.printError(Text.WORKS_ONLY_IN_DESIGN_MODE);
             return true;
           }
+          if (!(splitted[1].indexOf("*") == -1)){
+            new JobHandler(splitted).handle();
+            return true;
+          }
           var container = containers[splitted[1]];
           if (!container){
             terminal.printError(Text.NO_SUCH_CONTAINER);
@@ -4986,12 +4996,18 @@ function parse(input){
             return true;
           }
           container.alignedParent.unalign(container);
-          terminal.printInfo(Text.CONTAINER_UNALIGNED);
+          if (!jobHandlerWorking){
+            terminal.printInfo(Text.CONTAINER_UNALIGNED);
+          }
           return true;
         break;
-        case 209:
+        case 209: // destroyContainer
           if (mode != 0){
             terminal.printError(Text.WORKS_ONLY_IN_DESIGN_MODE);
+            return true;
+          }
+          if (!(splitted[1].indexOf("*") == -1)){
+            new JobHandler(splitted).handle();
             return true;
           }
           var container = containers[splitted[1]];
@@ -5004,7 +5020,9 @@ function parse(input){
             return true;
           }
           container.destroy();
-          terminal.printInfo(Text.CONTAINER_DESTROYED);
+          if (!jobHandlerWorking){
+            terminal.printInfo(Text.CONTAINER_DESTROYED);
+          }
           selectionHandler.resetCurrentSelection();
           return true;
         break;
