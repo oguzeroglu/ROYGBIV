@@ -205,6 +205,15 @@ Container2D.prototype.destroy = function(){
     this.removeAddedText();
   }
   delete containers[this.name];
+  if (this.alignedParent){
+    this.alignedParent.unalign(this);
+    delete this.alignedParent;
+  }
+  for (var containerName in containers){
+    if (containers[containerName].alignedParent && containers[containerName].alignedParent.name == this.name){
+      this.unalign(containers[containerName]);
+    }
+  }
 }
 
 Container2D.prototype.setCenter = function(centerXPercent, centerYPercent){
