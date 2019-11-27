@@ -4989,6 +4989,25 @@ function parse(input){
           terminal.printInfo(Text.CONTAINER_UNALIGNED);
           return true;
         break;
+        case 209:
+          if (mode != 0){
+            terminal.printError(Text.WORKS_ONLY_IN_DESIGN_MODE);
+            return true;
+          }
+          var container = containers[splitted[1]];
+          if (!container){
+            terminal.printError(Text.NO_SUCH_CONTAINER);
+            return true;
+          }
+          if (container.registeredSceneName != sceneHandler.getActiveSceneName()){
+            terminal.printError(Text.CONTAINER_NOT_IN_ACTIVE_SCENE);
+            return true;
+          }
+          container.destroy();
+          terminal.printInfo(Text.CONTAINER_DESTROYED);
+          selectionHandler.resetCurrentSelection();
+          return true;
+        break;
       }
       return true;
     }catch(err){

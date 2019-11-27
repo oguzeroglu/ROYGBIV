@@ -209,6 +209,7 @@ var Text = function(){
   this.CANNOT_ALIGN_SAME_CONTAINER = "Parent and child containers cannot be the same.";
   this.CONTAINER_IS_NOT_ALIGNED = "Container is not aligned.";
   this.CONTAINER_UNALIGNED = "Container unaligned.";
+  this.CONTAINER_DESTROYED = "Container destroyed.";
   this.OBJECT_ALREADY_INSIDE_CONTAINER = "Object already inside container [@@1]. Use emptyContainer command first.";
   this.SCENE_IS_ALREADY_ACTIVE = "Scene is already active.";
   this.SCENE_SWITCHED = "Scene switched";

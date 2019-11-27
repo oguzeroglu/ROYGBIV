@@ -209,7 +209,8 @@ var CommandDescriptor = function(){
       2, //addToContainer
       1, //emptyContainer
       4, //alignContainers
-      1 //unalignContainer
+      1, //unalignContainer
+      1 //destroyContainer
   ];
 
   this.commandArgumentsExpectedExplanation = [
@@ -421,7 +422,8 @@ var CommandDescriptor = function(){
     "addToContainer containerName textOrSpriteName",
     "emptyContainer containerName",
     "alignContainers parentContainer childContainer alignmentType margin",
-    "unalignContainer containerName"
+    "unalignContainer containerName",
+    "destroyContainer containerName"
   ];
 
   this.commands = [
@@ -633,7 +635,8 @@ var CommandDescriptor = function(){
     "addToContainer",
     "emptyContainer",
     "alignContainers",
-    "unalignContainer"
+    "unalignContainer",
+    "destroyContainer"
   ];
 
   this.commandInfo = [
@@ -845,7 +848,8 @@ var CommandDescriptor = function(){
     "addToContainer: Inserts a 2D added text or sprite into a 2D container.",
     "emptyContainer: Removes inserted object from a container.",
     "alignContainers: Aligns child container to parent container given margin.",
-    "unalignContainer: Unaligns an aligned container."
+    "unalignContainer: Unaligns an aligned container.",
+    "destroyContainer: Destroys a container."
   ];
 
   this.keyboardInfo = [
@@ -1571,6 +1575,11 @@ var CommandDescriptor = function(){
   this.unalignContainer = new Object();
   this.unalignContainer.types = [];
   this.unalignContainer.types.push(this.CONTAINER_NAME); //containerName
+
+  // destroyContainer
+  this.destroyContainer = new Object();
+  this.destroyContainer.types = [];
+  this.destroyContainer.types.push(this.CONTAINER_NAME); //containerName
 
 };
 
