@@ -4939,6 +4939,9 @@ function parse(input){
             terminal.printError(Text.CHILD_CONTAINER_DOES_NOT_EXIST);
             return true;
           }
+          if (splitted[1] == splitted[2]){
+            terminal.printError(Text.CANNOT_ALIGN_SAME_CONTAINER);
+          }
           if (parentContainer.registeredSceneName != sceneHandler.getActiveSceneName()){
             terminal.printError(Text.PARENT_CONTAINER_NOT_IN_ACTIVE_SCENE);
             return true;
@@ -4962,6 +4965,28 @@ function parse(input){
           parentContainer.addAlignedContainer({container: childContainer, alignmentType: alignmentType, value: margin});
           childContainer.alignedParent = parentContainer;
           terminal.printInfo(Text.CONTAINER_ALIGNED);
+          return true;
+        break;
+        case 208: //unalignContainer
+          if (mode != 0){
+            terminal.printError(Text.WORKS_ONLY_IN_DESIGN_MODE);
+            return true;
+          }
+          var container = containers[splitted[1]];
+          if (!container){
+            terminal.printError(Text.NO_SUCH_CONTAINER);
+            return true;
+          }
+          if (container.registeredSceneName != sceneHandler.getActiveSceneName()){
+            terminal.printError(Text.CONTAINER_NOT_IN_ACTIVE_SCENE);
+            return true;
+          }
+          if (!container.alignedParent){
+            terminal.printError(Text.CONTAINER_IS_NOT_ALIGNED);
+            return true;
+          }
+          container.alignedParent.unalign(container);
+          terminal.printInfo(Text.CONTAINER_UNALIGNED);
           return true;
         break;
       }

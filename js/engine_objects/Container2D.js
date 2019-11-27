@@ -56,6 +56,11 @@ Container2D.prototype.handleAlignments = function(){
   }
 }
 
+Container2D.prototype.unalign = function(container){
+  delete container.alignedParent;
+  delete this.alignedContainerInfos[container.name];
+}
+
 Container2D.prototype.addAlignedContainer = function(alignmentInfo){
   if (!this.alignedContainerInfos[alignmentInfo.container.name]){
     this.alignedContainerInfos[alignmentInfo.container.name] = [];

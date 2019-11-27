@@ -208,7 +208,8 @@ var CommandDescriptor = function(){
       1, //selectContainer
       2, //addToContainer
       1, //emptyContainer
-      4 //alignContainers
+      4, //alignContainers
+      1 //unalignContainer
   ];
 
   this.commandArgumentsExpectedExplanation = [
@@ -419,7 +420,8 @@ var CommandDescriptor = function(){
     "selectContainer containerName",
     "addToContainer containerName textOrSpriteName",
     "emptyContainer containerName",
-    "alignContainers parentContainer childContainer alignmentType margin"
+    "alignContainers parentContainer childContainer alignmentType margin",
+    "unalignContainer containerName"
   ];
 
   this.commands = [
@@ -630,7 +632,8 @@ var CommandDescriptor = function(){
     "selectContainer",
     "addToContainer",
     "emptyContainer",
-    "alignContainers"
+    "alignContainers",
+    "unalignContainer"
   ];
 
   this.commandInfo = [
@@ -841,7 +844,8 @@ var CommandDescriptor = function(){
     "selectContainer: Selects a 2D container.",
     "addToContainer: Inserts a 2D added text or sprite into a 2D container.",
     "emptyContainer: Removes inserted object from a container.",
-    "alignContainers: Aligns child container to parent container given margin."
+    "alignContainers: Aligns child container to parent container given margin.",
+    "unalignContainer: Unaligns an aligned container."
   ];
 
   this.keyboardInfo = [
@@ -1562,6 +1566,12 @@ var CommandDescriptor = function(){
   this.alignContainers.types.push(this.CONTAINER_NAME); //childContainer
   this.alignContainers.types.push(this.CONTAINER_ALIGNMENT_TYPE); //alignmentType
   this.alignContainers.types.push(this.UNKNOWN_INDICATOR); //margin
+
+  // unalignContainer
+  this.unalignContainer = new Object();
+  this.unalignContainer.types = [];
+  this.unalignContainer.types.push(this.CONTAINER_NAME); //containerName
+
 };
 
 CommandDescriptor.prototype.test = function(){
