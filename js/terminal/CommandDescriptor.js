@@ -210,7 +210,8 @@ var CommandDescriptor = function(){
       1, //emptyContainer
       4, //alignContainers
       1, //unalignContainer
-      1 //destroyContainer
+      1, //destroyContainer
+      0 //printContainers
   ];
 
   this.commandArgumentsExpectedExplanation = [
@@ -423,7 +424,8 @@ var CommandDescriptor = function(){
     "emptyContainer containerName",
     "alignContainers parentContainer childContainer alignmentType margin",
     "unalignContainer containerName",
-    "destroyContainer containerName"
+    "destroyContainer containerName",
+    "printContainers"
   ];
 
   this.commands = [
@@ -636,7 +638,8 @@ var CommandDescriptor = function(){
     "emptyContainer",
     "alignContainers",
     "unalignContainer",
-    "destroyContainer"
+    "destroyContainer",
+    "printContainers"
   ];
 
   this.commandInfo = [
@@ -849,7 +852,8 @@ var CommandDescriptor = function(){
     "emptyContainer: Removes inserted object from a container.",
     "alignContainers: Aligns child container to parent container given margin.",
     "unalignContainer: Unaligns an aligned container.",
-    "destroyContainer: Destroys a container."
+    "destroyContainer: Destroys a container.",
+    "printContainers: Prints created containers."
   ];
 
   this.keyboardInfo = [

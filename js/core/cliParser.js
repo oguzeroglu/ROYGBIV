@@ -5001,7 +5001,7 @@ function parse(input){
           }
           return true;
         break;
-        case 209: // destroyContainer
+        case 209: //destroyContainer
           if (mode != 0){
             terminal.printError(Text.WORKS_ONLY_IN_DESIGN_MODE);
             return true;
@@ -5024,6 +5024,23 @@ function parse(input){
             terminal.printInfo(Text.CONTAINER_DESTROYED);
           }
           selectionHandler.resetCurrentSelection();
+          return true;
+        break;
+        case 210: //printContainers
+          var count = 0;
+          var length = Object.keys(containers).length;
+          terminal.printHeader(Text.CONTAINERS);
+          for (var containerName in containers){
+            count ++;
+            var options = true;
+            if (count == length){
+              options = false;
+            }
+            terminal.printInfo(Text.TREE.replace(Text.PARAM1, containerName + " ["+containers[containerName].registeredSceneName+"]"), options);
+          }
+          if (count == 0){
+            terminal.printError(Text.NO_CONTAINERS_CREATED);
+          }
           return true;
         break;
       }
