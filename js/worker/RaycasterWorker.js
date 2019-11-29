@@ -18,6 +18,7 @@ importScripts("../handler/WorldBinHandler2D.js");
 importScripts("../handler/ObjectPicker2D.js");
 importScripts("../engine_objects/Rectangle.js");
 importScripts("../engine_objects/Sprite.js");
+importScripts("../engine_objects/Container2D.js");
 
 var IS_WORKER_CONTEXT = true;
 var objectPicker2D = new ObjectPicker2D();
@@ -80,6 +81,12 @@ RaycasterWorker.prototype.refresh = function(state){
     idResponse.push({type: "sprite", name: spriteName, id: sprites[spriteName].workerID});
     this.workerIDsByObjectName[spriteName] = sprites[spriteName].workerID;
     this.objectsByWorkerID[sprites[spriteName].workerID] = sprites[spriteName];
+  }
+  for (var containerName in containers){
+    containers[containerName].workerID = idCounter ++;
+    idResponse.push({type: "container", name: containerName, id: containers[containerName].workerID});
+    this.workerIDsByObjectName[containerName] = containers[containerName].workerID;
+    this.objectsByWorkerID[containers[containerName].workerID] = containers[containerName];
   }
   for (var psName in particleSystemPool){
     particleSystemPool[psName].workerID = psIDCounter ++;
@@ -173,6 +180,22 @@ RaycasterWorker.prototype.update = function(transferableMessageBody){
         obj.reusableVector4.set(intersectableObjDescription[i + 14], intersectableObjDescription[i + 15], 0);
         obj.triangle1.set(obj.reusableVector1, obj.reusableVector3, obj.reusableVector2);
         obj.triangle2.set(obj.reusableVector3, obj.reusableVector4, obj.reusableVector2);
+        if (!obj.isHidden){
+          this.rayCaster.updateObject(obj, true);
+        }
+        if (!obj.isHidden && intersectableObjDescription[i+1] < 0){
+          this.rayCaster.hide(obj);
+          obj.isHidden = true;
+        }else if (obj.isHidden && intersectableObjDescription[i+1] > 0){
+          this.rayCaster.show(obj);
+          obj.isHidden = false;
+        }
+      }else if (obj.isContainer){
+        obj.rectangle.set(
+          intersectableObjDescription[i + 2], intersectableObjDescription[i + 3],
+          intersectableObjDescription[i + 4], intersectableObjDescription[i + 5],
+          intersectableObjDescription[i + 6], intersectableObjDescription[i + 7]
+        );
         if (!obj.isHidden){
           this.rayCaster.updateObject(obj, true);
         }

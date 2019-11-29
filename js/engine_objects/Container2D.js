@@ -10,10 +10,24 @@ var Container2D = function(name, centerXPercent, centerYPercent, widthPercent, h
   this.paddingXContainerSpace = 0;
   this.paddingYContainerSpace = 0;
   this.alignedContainerInfos = {};
-  this.handleRectangle();
-  if (!isDeployment){
-    this.rectangle.mesh.material.uniforms.color.value.set("lime");
+  if (!IS_WORKER_CONTEXT){
+    this.handleRectangle();
+    if (!isDeployment){
+      this.rectangle.mesh.material.uniforms.color.value.set("lime");
+    }
   }
+}
+
+Container2D.prototype.exportLightweight = function(){
+  return {
+    x: this.rectangle.x,
+    y: this.rectangle.y,
+    x2: this.rectangle.finalX,
+    y2: this.rectangle.finalY,
+    width: this.rectangle.width,
+    height: this.rectangle.height,
+    isClickable: !!this.isClickable
+  };
 }
 
 Container2D.prototype.isChildAlignedWithType = function(childContainer, alignmentType){

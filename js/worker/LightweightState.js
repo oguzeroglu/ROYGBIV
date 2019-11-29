@@ -64,9 +64,15 @@ var LightweightState = function(){
       this.addedTexts2D[textName] = addedTexts[textName].exportLightweight();
     }
   }
+  // SPRITES
   this.sprites = new Object();
   for (var spriteName in sceneHandler.getSprites()){
     this.sprites[spriteName] = sprites[spriteName].exportLightweight();
+  }
+  // CONTAINERS
+  this.containers = new Object();
+  for (var containerName in sceneHandler.getContainers()){
+    this.containers[containerName] = containers[containerName].exportLightweight();
   }
   // PARTICLE SYSTEMS
   this.particleSystems = new Object();
