@@ -4825,7 +4825,7 @@ function parse(input){
           selectionHandler.select(container);
           guiHandler.afterObjectSelection();
           sceneHandler.onContainerCreation(container);
-          terminal.printInfo(Text.CONTAINER_CREATED);
+          refreshRaycaster(Text.CONTAINER_CREATED);
           return true;
         break;
         case 204: //selectContainer

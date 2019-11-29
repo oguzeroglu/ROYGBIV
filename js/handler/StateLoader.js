@@ -240,6 +240,7 @@ StateLoader.prototype.resetProject = function(){
   clickableAddedTexts = new Object();
   clickableAddedTexts2D = new Object();
   clickableSprites = new Object();
+  clickableContainers = new Object();
   physicsTests = new Object();
   wallCollections = new Object();
   texturePacks = new Object();
@@ -258,7 +259,6 @@ StateLoader.prototype.resetProject = function(){
   muzzleFlashes = new Object();
   lightnings = new Object();
   sprites = new Object();
-  clickableSprites = new Object();
   containers = new Object();
   webglCallbackHandler = new WebGLCallbackHandler();
   textureAtlasHandler.dispose();

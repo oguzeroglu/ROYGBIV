@@ -380,6 +380,7 @@ var areaEnterCallbacks = new Object();
 var areaExitCallbacks = new Object();
 var sprites = new Object();
 var clickableSprites = new Object();
+var clickableContainers = new Object();
 var draggingSprite = false;
 var containers = new Object();
 

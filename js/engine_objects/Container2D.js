@@ -142,6 +142,7 @@ Container2D.prototype.makeSquare = function(){
     }
   }
   this.handleRectangle();
+  rayCaster.updateObject(this);
 }
 
 Container2D.prototype.handleResize = function(){
@@ -154,6 +155,7 @@ Container2D.prototype.handleResize = function(){
   if (this.sprite){
     this.insertSprite(this.sprite);
   }
+  rayCaster.updateObject(this);
 }
 
 Container2D.prototype.export = function(){
@@ -227,6 +229,7 @@ Container2D.prototype.setCenter = function(centerXPercent, centerYPercent){
   if (this.addedText){
     this.insertAddedText(this.addedText);
   }
+  rayCaster.updateObject(this);
 }
 
 Container2D.prototype.setWidth = function(widthPercent){
@@ -241,6 +244,7 @@ Container2D.prototype.setWidth = function(widthPercent){
   if (this.addedText){
     this.insertAddedText(this.addedText);
   }
+  rayCaster.updateObject(this);
 }
 
 Container2D.prototype.setHeight = function(heightPercent){
@@ -255,6 +259,7 @@ Container2D.prototype.setHeight = function(heightPercent){
   if (this.addedText){
     this.insertAddedText(this.addedText);
   }
+  rayCaster.updateObject(this);
 }
 
 Container2D.prototype.handleRectangle = function(){

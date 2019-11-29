@@ -25,6 +25,9 @@ ObjectPicker2D.prototype.update = function(obj, forceUpdate){
   if (mode == 1 && obj.isSprite && !obj.isClickable){
     return;
   }
+  if (mode == 1 && obj.isContainer && !obj.isClickable){
+    return;
+  }
   if (forceUpdate){
     this.issueUpdate(obj, obj.name);
     return;
@@ -44,11 +47,15 @@ ObjectPicker2D.prototype.refresh = function(){
   this.binHandler = new WorldBinHandler2D(this.binHandlerPrecision);
   var allTexts = this.getTexts();
   var allSprites = this.getSprites();
+  var allContainers = this.getContainers();
   for (var textName in allTexts){
     this.binHandler.insert(allTexts[textName]);
   }
   for (var spriteName in allSprites){
     this.binHandler.insert(allSprites[spriteName]);
+  }
+  for (var containerName in allContainers){
+    this.binHandler.insert(allContainers[containerName]);
   }
 }
 
@@ -70,6 +77,9 @@ ObjectPicker2D.prototype.find = function(screenSpaceX, screenSpaceY){
     if (!obj){
       obj = sprites[name];
     }
+    if (!obj){
+      obj = containers[name];
+    }
     if (obj.mesh && !obj.mesh.visible){
       continue;
     }
@@ -81,6 +91,7 @@ ObjectPicker2D.prototype.find = function(screenSpaceX, screenSpaceY){
         if (webglSpaceY >= obj.twoDimensionalSize.w && webglSpaceY <= obj.twoDimensionalSize.y){
           intersectionPoint = 1;
           intersectionObject = name;
+          return;
         }
       }
     }else if (obj.isSprite){
@@ -88,6 +99,15 @@ ObjectPicker2D.prototype.find = function(screenSpaceX, screenSpaceY){
       if (obj.triangle1.containsPoint(REUSABLE_VECTOR) || obj.triangle2.containsPoint(REUSABLE_VECTOR)){
         intersectionPoint = 1;
         intersectionObject = name;
+        return;
+      }
+    }else if (obj.isContainer){
+      if (webglSpaceX >= obj.rectangle.x && webglSpaceX <= obj.rectangle.finalX){
+        if (webglSpaceY <= obj.rectangle.y && webglSpaceY >= obj.rectangle.finalY){
+          intersectionPoint = 1;
+          intersectionObject = name;
+          return;
+        }
       }
     }
   }
@@ -105,6 +125,22 @@ ObjectPicker2D.prototype.getSprites = function(){
       return sprites;
     }else{
       return clickableSprites;
+    }
+  }
+}
+
+ObjectPicker2D.prototype.getContainers = function(){
+  if (!IS_WORKER_CONTEXT){
+    if (mode == 0){
+      return sceneHandler.getContainers();
+    }else{
+      return sceneHandler.getClickableContainers();
+    }
+  }else{
+    if (mode == 0){
+      return containers;
+    }else{
+      return clickableContainers;
     }
   }
 }

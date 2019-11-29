@@ -78,6 +78,7 @@ SceneHandler.prototype.onSwitchFromPreviewToDesign = function(){
     this.scenes[sceneName].resetAutoInstancedObjects();
     this.scenes[sceneName].resetClickableTexts();
     this.scenes[sceneName].resetClickableSprites();
+    this.scenes[sceneName].resetClickableContainers();
     this.scenes[sceneName].resetTrackingObjects();
   }
   this.draggableSpriteStatusBySceneName = new Object();
@@ -108,6 +109,10 @@ SceneHandler.prototype.onClickableAddedText2DAddition = function(addedText){
 
 SceneHandler.prototype.onClickableSpriteAddition = function(sprite){
   this.scenes[sprite.registeredSceneName].registerClickableSprite(sprite);
+}
+
+SceneHandler.prototype.onClickableContainerAddition = function(container){
+  this.scenes[container.registeredSceneName].registerClickableContainer(container);
 }
 
 SceneHandler.prototype.onDynamicObjectAddition = function(obj){
@@ -592,6 +597,10 @@ SceneHandler.prototype.getClickableAddedTexts = function(){
 
 SceneHandler.prototype.getClickableSprites = function(){
   return this.scenes[this.activeSceneName].clickableSprites;
+}
+
+SceneHandler.prototype.getClickableContainers = function(){
+  return this.scene[this.activeSceneName].clickableContainers;
 }
 
 SceneHandler.prototype.getClickableAddedTexts2D = function(){

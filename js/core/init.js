@@ -435,6 +435,9 @@ function onRaycasterMouseMoveIntersection(){
     if (!object){
       object = sprites[intersectionObject];
     }
+    if (!object){
+      object = containers[intersectionObject];
+    }
     var isDifferent = currentMouseOverObjectName != object.name;
     if (object.mouseOverCallbackFunction && isDifferent){
       if (object.registeredSceneName == sceneHandler.getActiveSceneName()){
@@ -451,6 +454,9 @@ function onRaycasterMouseMoveIntersection(){
       }
       if (!curObj){
         curObj = sprites[currentMouseOverObjectName];
+      }
+      if (!curObj){
+        curObj = containers[currentMouseOverObjectName];
       }
       if (curObj && curObj.mouseOutCallbackFunction){
         if (curObj.registeredSceneName == sceneHandler.getActiveSceneName()){
@@ -470,6 +476,9 @@ function onRaycasterMouseMoveIntersection(){
       }
       if (!curObj){
         curObj = sprites[currentMouseOverObjectName];
+      }
+      if (!curObj){
+        curObj = containers[currentMouseOverObjectName];
       }
       if (curObj && curObj.mouseOutCallbackFunction){
         if (curObj.registeredSceneName == sceneHandler.getActiveSceneName()){
@@ -495,6 +504,9 @@ function onRaycasterIntersection(){
      }
      if (!object){
        object = sprites[intersectionObject];
+     }
+     if (!object){
+       object = containers[intersectionObject];
      }
      if (object.isAddedObject || object.isObjectGroup){
        if (!isDeployment && mode == 0){
@@ -639,7 +651,7 @@ function onRaycasterIntersection(){
        if (!isDeployment){
          guiHandler.afterObjectSelection();
        }
-     }else if (object.isSprite){
+     }else if (object.isSprite || object.isContainer){
        if (mode == 0){
          selectionHandler.resetCurrentSelection();
        }

@@ -230,6 +230,12 @@ ModeSwitcher.prototype.switchFromDesignToPreview = function(){
     sprites[spriteName].originalColor = sprites[spriteName].mesh.material.uniforms.color.value.getHex();
     sprites[spriteName].originalAlpha = sprites[spriteName].mesh.material.uniforms.alpha.value;
   }
+  for (var containerName in containers){
+    if (containers[containerName].isClickable){
+      clickableContainers[containerName] = containers[containerName];
+      sceneHandler.onClickableContainerAddition(containers[containerName]);
+    }
+  }
   sceneHandler.onSwitchFromDesignToPreview();
   this.commonSwitchFunctions();
   handleViewport();
@@ -437,6 +443,7 @@ ModeSwitcher.prototype.switchFromPreviewToDesign = function(){
   clickableAddedTexts = new Object();
   clickableAddedTexts2D = new Object();
   clickableSprites = new Object();
+  clickableContainers = new Object();
   sceneHandler.onSwitchFromPreviewToDesign();
   this.commonSwitchFunctions();
   for (var txtName in addedTexts){

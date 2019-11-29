@@ -409,6 +409,7 @@ StateLoaderLightweight.prototype.reset = function(){
   addedTexts2D = new Object();
   clickableAddedTexts2D = new Object();
   clickableSprites = new Object();
+  clickableContainers = new Object();
   sprites = new Object();
   particleSystemPool = new Object();
   particleSystems = new Map();

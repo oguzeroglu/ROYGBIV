@@ -25,6 +25,7 @@ Scene.prototype.reset = function(){
   this.clickableAddedTexts = new Object();
   this.clickableAddedTexts2D = new Object();
   this.clickableSprites = new Object();
+  this.clickableContainers = new Object();
   this.trackingObjects = new Object();
   this.sprites = new Object();
   this.containers = new Object();
@@ -89,6 +90,10 @@ Scene.prototype.resetClickableTexts = function(){
 
 Scene.prototype.resetClickableSprites = function(){
   this.clickableSprites = new Object();
+}
+
+Scene.prototype.resetClickableContainers = function(){
+  this.clickableContainers = new Object();
 }
 
 Scene.prototype.loadPostProcessing = function(){
@@ -246,6 +251,10 @@ Scene.prototype.registerClickableText2D = function(addedText){
 
 Scene.prototype.registerClickableSprite = function(sprite){
   this.clickableSprites[sprite.name] = sprite;
+}
+
+Scene.prototype.registerClickableContainer = function(container){
+  this.clickableContainers[container.name] = container;
 }
 
 Scene.prototype.registerDynamicObject = function(obj){
