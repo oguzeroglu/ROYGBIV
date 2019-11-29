@@ -78,7 +78,8 @@ var GUIHandler = function(){
     "Height": 10,
     "Padding X": 0,
     "Padding Y": 0,
-    "Square": false
+    "Square": false,
+    "Clickable": false
   };
   this.bloomParameters = {
     "Threshold": 0.0,
@@ -220,6 +221,7 @@ GUIHandler.prototype.afterContainerSelection = function(){
     guiHandler.containerManipulationParameters["Square"] = !!curSelection.isSquare;
     guiHandler.containerManipulationParameters["Padding X"] = curSelection.paddingXContainerSpace;
     guiHandler.containerManipulationParameters["Padding Y"] = curSelection.paddingYContainerSpace;
+    guiHandler.containerManipulationParameters["Clickable"] = !!curSelection.isClickable;
     if (curSelection.alignedParent){
       var alignedLeft = curSelection.alignedParent.isChildAlignedWithType(curSelection, CONTAINER_ALIGNMENT_TYPE_LEFT);
       var alignedRight = curSelection.alignedParent.isChildAlignedWithType(curSelection, CONTAINER_ALIGNMENT_TYPE_RIGHT);
@@ -653,6 +655,7 @@ GUIHandler.prototype.enableAllCMControllers = function(){
   guiHandler.enableController(guiHandler.containerManipulationSquareController);
   guiHandler.enableController(guiHandler.containerManipulationPaddingXController);
   guiHandler.enableController(guiHandler.containerManipulationPaddingYController);
+  guiHandler.enableController(guiHandler.containerManipulationClickableController);
 }
 
 GUIHandler.prototype.enableAllTMControllers = function(){
@@ -1368,6 +1371,9 @@ GUIHandler.prototype.initializeContainerManipulationGUI = function(){
       selectionHandler.getSelectedObject().scaleWidth = 1;
       selectionHandler.getSelectedObject().scaleHeight = 1;
     }
+  }).listen();
+  guiHandler.containerManipulationClickableController = guiHandler.datGuiContainerManipulation.add(guiHandler.containerManipulationParameters, "Clickable").onChange(function(val){
+    selectionHandler.getSelectedObject().isClickable = val;
   }).listen();
 }
 

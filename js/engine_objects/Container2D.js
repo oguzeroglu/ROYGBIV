@@ -164,7 +164,8 @@ Container2D.prototype.export = function(){
     heightPercent: this.heightPercent,
     isSquare: !!this.isSquare,
     paddingXContainerSpace: this.paddingXContainerSpace,
-    paddingYContainerSpace: this.paddingYContainerSpace
+    paddingYContainerSpace: this.paddingYContainerSpace,
+    isClickable: !!this.isClickable
   };
   if (this.sprite){
     exportObj.spriteName = this.sprite.name

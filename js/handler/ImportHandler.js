@@ -1293,6 +1293,7 @@ ImportHandler.prototype.importContainers = function(obj){
       container.isSquare = true;
       container.makeSquare();
     }
+    container.isClickable = curExport.isClickable;
     if (!(typeof curExport.spriteName == UNDEFINED)){
       container.insertSprite(sprites[curExport.spriteName]);
     }
