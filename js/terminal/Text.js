@@ -948,4 +948,7 @@ var Text = function(){
   this.ROYGBIV_SCRIPTING_API_REMOVECONTAINERMOUSEOVERLISTENER = "Removes the mouse over listener for a container.";
   this.ROYGBIV_SCRIPTING_API_ONCONTAINERMOUSEOUT = "Sets a mouse out listener for a container. The callbackFunction is executed when the mouse is moved out from a container.";
   this.ROYGBIV_SCRIPTING_API_REMOVECONTAINERMOUSEOUTLISTENER = "Removes the mouse out listener for a container.";
+  this.ROYGBIV_SCRIPTING_API_HIDECONTAINERBORDER = "Hides the border of a container.";
+  this.ROYGBIV_SCRIPTING_API_SHOWCONTAINERBORDER = "Shows the border of a container.";
+  this.ROYGBIV_SCRIPTING_API_SETCONTAINERBORDERCOLOR = "Sets the border color of a container.";
 }

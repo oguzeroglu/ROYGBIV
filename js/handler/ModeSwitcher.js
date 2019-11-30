@@ -101,6 +101,9 @@ ModeSwitcher.prototype.switchFromDesignToPreview = function(){
   }
   for (var containerName in containers){
     containers[containerName].makeInvisible();
+    if (containers[containerName].hasBorder){
+      containers[containerName].originalBorderColor = containers[containerName].borderColor;
+    }
   }
   scriptsToRun = new Map();
   scriptsHandler.onModeSwitch();
@@ -291,6 +294,11 @@ ModeSwitcher.prototype.switchFromPreviewToDesign = function(){
     scene.add(gridSelections[gridName].dot);
   }
   for (var containerName in containers){
+    containers[containerName].rectangle.mesh.visible = true;
+    if (containers[containerName].hasBorder){
+      containers[containerName].setBorder(containers[containerName].originalBorderColor, containers[containerName].borderThickness);
+      delete containers[containerName].originalBorderColor;
+    }
     containers[containerName].makeVisible();
     delete containers[containerName].onClickCallback;
     delete containers[containerName].mouseOverCallbackFunction;

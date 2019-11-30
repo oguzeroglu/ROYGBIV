@@ -17,6 +17,7 @@
 //  * Muzzleflash functions
 //  * Lightning functions
 //  * Sprite functions
+//  * Container functions
 //  * Script related functions
 var Roygbiv = function(){
   this.functionNames = [
@@ -223,7 +224,10 @@ var Roygbiv = function(){
     "onContainerMouseOver",
     "removeContainerMouseOverListener",
     "onContainerMouseOut",
-    "removeContainerMouseOutListener"
+    "removeContainerMouseOutListener",
+    "hideContainerBorder",
+    "showContainerBorder",
+    "setContainerBorderColor"
   ];
 
   this.globals = new Object();
@@ -2989,6 +2993,45 @@ Roygbiv.prototype.disableSpriteDragging = function(sprite){
   preConditions.checkIfSprite(ROYGBIV.disableSpriteDragging, preConditions.sprite, sprite);
   preConditions.checkIfSpriteDraggable(ROYGBIV.disableSpriteDragging, sprite);
   sprite.draggingDisabled = true;
+}
+
+// CONTAINER FUNCTIONS *********************************************************
+
+// Hides the border of a container.
+Roygbiv.prototype.hideContainerBorder = function(container){
+  if (mode == 0){
+    return;
+  }
+  preConditions.checkIfDefined(ROYGBIV.hideContainerBorder, preConditions.container, container);
+  preConditions.checkIfContainer(ROYGBIV.hideContainerBorder, container);
+  preConditions.checkIfContainerInsideActiveScene(ROYGBIV.hideContainerBorder, container);
+  preConditions.checkIfContainerHasBorder(ROYGBIV.hideContainerBorder, container);
+  container.rectangle.mesh.visible = false;
+}
+
+// Shows the border of a container.
+Roygbiv.prototype.showContainerBorder = function(container){
+  if (mode == 0){
+    return;
+  }
+  preConditions.checkIfDefined(ROYGBIV.showContainerBorder, preConditions.container, container);
+  preConditions.checkIfContainer(ROYGBIV.showContainerBorder, container);
+  preConditions.checkIfContainerInsideActiveScene(ROYGBIV.showContainerBorder, container);
+  preConditions.checkIfContainerHasBorder(ROYGBIV.showContainerBorder, container);
+  container.rectangle.mesh.visible = true;
+}
+
+// Sets the border color of a container.
+Roygbiv.prototype.setContainerBorderColor = function(container, colorName){
+  if (mode == 0){
+    return;
+  }
+  preConditions.checkIfDefined(ROYGBIV.setContainerBorderColor, preConditions.container, container);
+  preConditions.checkIfDefined(ROYGBIV.setContainerBorderColor, preConditions.colorName, colorName);
+  preConditions.checkIfContainer(ROYGBIV.setContainerBorderColor, container);
+  preConditions.checkIfContainerInsideActiveScene(ROYGBIV.setContainerBorderColor, container);
+  preConditions.checkIfContainerHasBorder(ROYGBIV.setContainerBorderColor, container);
+  container.rectangle.mesh.material.uniforms.color.value.set(colorName);
 }
 
 // UTILITY FUNCTIONS ***********************************************************
