@@ -152,6 +152,15 @@ StateLoader.prototype.closeRaycasterWorkerIfNotUsed = function(){
           }
         }
       }
+      if (!hasRaycasting){
+        for (var containerName in containers){
+          var container = containers[containerName];
+          if (container.isClickable){
+            hasRaycasting = true;
+            break;
+          }
+        }
+      }
     }
   }
   if (!hasRaycasting){

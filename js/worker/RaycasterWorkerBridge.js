@@ -354,7 +354,7 @@ RaycasterWorkerBridge.prototype.refresh2D = function(){
   var totalTextObj = (mode == 0)? sceneHandler.getAddedTexts2D(): sceneHandler.getClickableAddedTexts2D();
   var totalSpriteObj = (mode == 0)? sceneHandler.getSprites(): sceneHandler.getClickableSprites();
   var totalContainerObj = (mode == 0)? sceneHandler.getContainers(): sceneHandler.getClickableContainers();
-  var msgBody = {texts: {}, sprites: {}};
+  var msgBody = {texts: {}, sprites: {}, containers:{}};
   for (var textName in totalTextObj){
     var size = totalTextObj[textName].twoDimensionalSize;
     msgBody.texts[textName] = {x: size.x, y: size.y, z: size.z, w: size.w};

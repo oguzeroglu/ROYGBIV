@@ -600,7 +600,7 @@ SceneHandler.prototype.getClickableSprites = function(){
 }
 
 SceneHandler.prototype.getClickableContainers = function(){
-  return this.scene[this.activeSceneName].clickableContainers;
+  return this.scenes[this.activeSceneName].clickableContainers;
 }
 
 SceneHandler.prototype.getClickableAddedTexts2D = function(){

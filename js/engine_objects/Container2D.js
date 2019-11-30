@@ -204,10 +204,16 @@ Container2D.prototype.export = function(){
 }
 
 Container2D.prototype.makeInvisible = function(){
+  if (isDeployment){
+    return;
+  }
   scene.remove(this.rectangle.mesh);
 }
 
 Container2D.prototype.makeVisible = function(){
+  if (isDeployment){
+    return;
+  }
   scene.add(this.rectangle.mesh);
 }
 

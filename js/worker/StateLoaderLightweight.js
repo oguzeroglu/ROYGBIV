@@ -245,7 +245,7 @@ StateLoaderLightweight.prototype.loadBoundingBoxes = function(){
     containers[containerName].rectangle.set(curExport.x, curExport.y, curExport.x2, curExport.y2, curExport.width, curExport.height);
     containers[containerName].isClickable = curExport.isClickable;
     if (containers[containerName].isClickable){
-      clickableContainers = containers[containerName];
+      clickableContainers[containerName] = containers[containerName];
     }
   }
 }
