@@ -11,7 +11,11 @@ var Sprite = function(name){
   if (IS_WORKER_CONTEXT){
     return;
   }
-  this.geometry = new THREE.PlaneBufferGeometry(100, 100);
+  this.geometry = geometryCache["SPRITE_GEOMETRY"];
+  if (!this.geometry){
+    this.geometry = new THREE.PlaneBufferGeometry(100, 100);
+    geometryCache["SPRITE_GEOMETRY"] = this.geometry;
+  }
   this.mesh = new MeshGenerator().generateSprite(this);
   this.marginMode = MARGIN_MODE_2D_CENTER;
   this.handleRectangle();
