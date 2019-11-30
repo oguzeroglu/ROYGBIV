@@ -4815,8 +4815,7 @@ function parse(input){
             return true;
           }
           var containerName = splitted[1];
-          if (containers[containerName]){
-            terminal.printError(Text.NAME_MUST_BE_UNIQUE);
+          if (!checkIfNameUnique(containerName, Text.NAME_MUST_BE_UNIQUE)){
             return true;
           }
           var container = new Container2D(containerName, 50, 50, 10, 10);
@@ -5196,7 +5195,7 @@ function isNameUsedAsSoftCopyParentName(name){
 }
 
 function checkIfNameUnique(name, errorMsg){
-  if (addedObjects[name] || objectGroups[name] || gridSystems[name] || addedTexts[name] || sprites[name] || wallCollections[name]){
+  if (addedObjects[name] || objectGroups[name] || gridSystems[name] || addedTexts[name] || sprites[name] || wallCollections[name] || containers[name]){
     terminal.printError(errorMsg);
     return false;
   }

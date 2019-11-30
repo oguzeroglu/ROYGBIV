@@ -16,7 +16,7 @@
 //  * Animation functions
 //  * Muzzleflash functions
 //  * Lightning functions
-//  * Sprıte functions
+//  * Sprite functions
 //  * Script related functions
 var Roygbiv = function(){
   this.functionNames = [
@@ -216,7 +216,10 @@ var Roygbiv = function(){
     "setSpriteRotationAngle",
     "enableSpriteDragging",
     "disableSpriteDragging",
-    "degreeToRadian"
+    "degreeToRadian",
+    "getContainer",
+    "onContainerClick",
+    "removeContainerClickListener"
   ];
 
   this.globals = new Object();
@@ -603,6 +606,20 @@ Roygbiv.prototype.getSprite = function(spriteName){
   if (sprite){
     preConditions.checkIfSpriteInsideActiveScene(ROYGBIV.getSprite, sprite);
     return sprite;
+  }
+  return 0;
+}
+
+// Returns a container or 0 if container does not exist.
+Roygbiv.prototype.getContainer = function(containerName){
+  if (mode == 0){
+    return;
+  }
+  preConditions.checkIfDefined(ROYGBIV.getContainer, preConditions.containerName, containerName);
+  var container = containers[containerName];
+  if (container){
+    preConditions.checkIfContainerInsideActiveScene(ROYGBIV.getContainer, container);
+    return container;
   }
   return 0;
 }
@@ -2189,6 +2206,35 @@ Roygbiv.prototype.removeSpriteDraggingListener = function(sprite){
   preConditions.checkIfSpriteInsideActiveScene(ROYGBIV.removeSpriteDraggingListener, sprite);
   preConditions.checkIfSpriteDraggable(ROYGBIV.removeSpriteDraggingListener, sprite);
   sprite.draggingCallback = noop;
+}
+
+// Sets a click listener for a container. The callbackFunction is executed
+// when the container is clicked.
+Roygbiv.prototype.onContainerClick = function(container, callbackFunction){
+  if (mode == 0){
+    return;
+  }
+  preConditions.checkIfDefined(ROYGBIV.onContainerClick, preConditions.container, container);
+  preConditions.checkIfDefined(ROYGBIV.onContainerClick, preConditions.callbackFunction, callbackFunction);
+  preConditions.checkIfContainer(ROYGBIV.onContainerClick, container);
+  preConditions.checkIfFunctionOnlyIfExists(ROYGBIV.onContainerClick, preConditions.callbackFunction, callbackFunction);
+  preConditions.checkIfContainerClickable(ROYGBIV.onContainerClick, container);
+  preConditions.checkIfContainerInsideActiveScene(ROYGBIV.onContainerClick, container);
+  container.onClickCallback = callbackFunction;
+  objectsWithOnClickListeners.set(container.name, container);
+}
+
+// Removes the click listener of a container.
+Roygbiv.prototype.removeContainerClickListener = function(container){
+  if (mode == 0){
+    return;
+  }
+  preConditions.checkIfDefined(ROYGBIV.removeContainerClickListener, preConditions.container, container);
+  preConditions.checkIfContainer(ROYGBIV.removeContainerClickListener, container);
+  preConditions.checkIfContainerClickable(ROYGBIV.removeContainerClickListener, container);
+  preConditions.checkIfContainerInsideActiveScene(ROYGBIV.removeContainerClickListener, container);
+  container.onClickCallback = noop;
+  objectsWithOnClickListeners.delete(container.name);
 }
 
 // TEXT FUNCTIONS **************************************************************

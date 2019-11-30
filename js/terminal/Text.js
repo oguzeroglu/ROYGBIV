@@ -941,4 +941,7 @@ var Text = function(){
   this.ROYGBIV_SCRIPTING_API_ENABLESPRITEDRAGGING = "Enables dragging for draggable sprites. Dragging is initially enabled for draggable sprites.";
   this.ROYGBIV_SCRIPTING_API_DISABLESPRITEDRAGGING = "Disables dragging for draggable sprites. Dragging is initially enabled for draggable sprites.";
   this.ROYGBIV_SCRIPTING_API_DEGREETORADIAN = "Converts degrees to radians.";
+  this.ROYGBIV_SCRIPTING_API_GETCONTAINER = "Returns a container or 0 if container does not exist.";
+  this.ROYGBIV_SCRIPTING_API_ONCONTAINERCLICK = "Sets a click listener for a container. The callbackFunction is executed when the container is clicked.";
+  this.ROYGBIV_SCRIPTING_API_REMOVECONTAINERCLICKLISTENER = "Removes the click listener of a container.";
 }

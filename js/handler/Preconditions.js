@@ -232,6 +232,8 @@ var Preconditions = function(){
   this.marginPercentX = "marginPercentX";
   this.marginPercentY = "marginPercentY";
   this.degree = "degree";
+  this.containerName = "containerName";
+  this.container = "container";
 }
 
 Preconditions.prototype.errorHeader = function(callerFunc){
@@ -273,6 +275,18 @@ Preconditions.prototype.checkIfLightningStartable = function(callerFunc, lightni
   }
 }
 
+Preconditions.prototype.checkIfContainerClickable = function(callerFunc, container){
+  if (!container.isClickable){
+    this.throw(callerFunc, "Container is not clickable.");
+  }
+}
+
+Preconditions.prototype.checkIfContainer = function(callerFunc, container){
+  if (!container.isContainer){
+    this.throw(callerFunc, "Object is not a container.");
+  }
+}
+
 Preconditions.prototype.checkIfLightning = function(callerFunc, lightning){
   if (!lightning.isLightning){
     this.throw(callerFunc, "Object is not a lightning.");
@@ -288,6 +302,12 @@ Preconditions.prototype.checkIfLightningInsideActiveScene = function(callerFunc,
 Preconditions.prototype.checkIfSpriteInsideActiveScene = function(callerFunc, sprite){
   if (sprite.registeredSceneName != sceneHandler.getActiveSceneName()){
     this.throw(callerFunc, "Sprite not inside active scene.");
+  }
+}
+
+Preconditions.prototype.checkIfContainerInsideActiveScene = function(callerFunc, container){
+  if (container.registeredSceneName != sceneHandler.getActiveSceneName()){
+    this.throw(callerFunc, "Container not inside active scene.");
   }
 }
 
