@@ -292,6 +292,9 @@ ModeSwitcher.prototype.switchFromPreviewToDesign = function(){
   }
   for (var containerName in containers){
     containers[containerName].makeVisible();
+    delete containers[containerName].onClickCallback;
+    delete containers[containerName].mouseOverCallbackFunction;
+    delete containers[containerName].mouseOutCallbackFunction;
   }
   for (var textName in sceneHandler.getAddedTexts()){
     var addedText = addedTexts[textName];

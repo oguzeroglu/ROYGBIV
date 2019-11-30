@@ -219,7 +219,11 @@ var Roygbiv = function(){
     "degreeToRadian",
     "getContainer",
     "onContainerClick",
-    "removeContainerClickListener"
+    "removeContainerClickListener",
+    "onContainerMouseOver",
+    "removeContainerMouseOverListener",
+    "onContainerMouseOut",
+    "removeContainerMouseOutListener"
   ];
 
   this.globals = new Object();
@@ -2235,6 +2239,64 @@ Roygbiv.prototype.removeContainerClickListener = function(container){
   preConditions.checkIfContainerInsideActiveScene(ROYGBIV.removeContainerClickListener, container);
   container.onClickCallback = noop;
   objectsWithOnClickListeners.delete(container.name);
+}
+
+// Sets a mouse over listener for a container. The callbackFunction is executed
+// when the mouse is moved over a container.
+Roygbiv.prototype.onContainerMouseOver = function(container, callbackFunction){
+  if (mode == 0){
+    return;
+  }
+  preConditions.checkIfDefined(ROYGBIV.onContainerMouseOver, preConditions.container, container);
+  preConditions.checkIfDefined(ROYGBIV.onContainerMouseOver, preConditions.callbackFunction, callbackFunction);
+  preConditions.checkIfContainer(ROYGBIV.onContainerMouseOver, container);
+  preConditions.checkIfFunctionOnlyIfExists(ROYGBIV.onContainerMouseOver, preConditions.callbackFunction, callbackFunction);
+  preConditions.checkIfContainerClickable(ROYGBIV.onContainerMouseOver, container);
+  preConditions.checkIfContainerInsideActiveScene(ROYGBIV.onContainerMouseOver, container);
+  container.mouseOverCallbackFunction = callbackFunction;
+  objectsWithMouseOverListeners.set(container.name, container);
+}
+
+// Removes the mouse over listener for a container.
+Roygbiv.prototype.removeContainerMouseOverListener = function(container){
+  if (mode == 0){
+    return;
+  }
+  preConditions.checkIfDefined(ROYGBIV.removeContainerMouseOverListener, preConditions.container, container);
+  preConditions.checkIfContainer(ROYGBIV.removeContainerMouseOverListener, container);
+  preConditions.checkIfContainerClickable(ROYGBIV.removeContainerMouseOverListener, container);
+  preConditions.checkIfContainerInsideActiveScene(ROYGBIV.removeContainerMouseOverListener, container);
+  container.mouseOverCallbackFunction = noop;
+  objectsWithMouseOverListeners.delete(container.name);
+}
+
+// Sets a mouse out listener for a container. The callbackFunction is executed
+// when the mouse is moved out from a container.
+Roygbiv.prototype.onContainerMouseOut = function(container, callbackFunction){
+  if (mode == 0){
+    return;
+  }
+  preConditions.checkIfDefined(ROYGBIV.onContainerMouseOut, preConditions.container, container);
+  preConditions.checkIfDefined(ROYGBIV.onContainerMouseOut, preConditions.callbackFunction, callbackFunction);
+  preConditions.checkIfContainer(ROYGBIV.onContainerMouseOut, container);
+  preConditions.checkIfFunctionOnlyIfExists(ROYGBIV.onContainerMouseOut, preConditions.callbackFunction, callbackFunction);
+  preConditions.checkIfContainerClickable(ROYGBIV.onContainerMouseOut, container);
+  preConditions.checkIfContainerInsideActiveScene(ROYGBIV.onContainerMouseOut, container);
+  container.mouseOutCallbackFunction = callbackFunction;
+  objectsWithMouseOutListeners.set(container.name, container);
+}
+
+// Removes the mouse out listener for a container.
+Roygbiv.prototype.removeContainerMouseOutListener = function(container){
+  if (mode == 0){
+    return;
+  }
+  preConditions.checkIfDefined(ROYGBIV.removeContainerMouseOutListener, preConditions.container, container);
+  preConditions.checkIfContainer(ROYGBIV.removeContainerMouseOutListener, container);
+  preConditions.checkIfContainerClickable(ROYGBIV.removeContainerMouseOutListener, container);
+  preConditions.checkIfContainerInsideActiveScene(ROYGBIV.removeContainerMouseOutListener, container);
+  container.mouseOutCallbackFunction = noop;
+  objectsWithMouseOutListeners.delete(container.name);
 }
 
 // TEXT FUNCTIONS **************************************************************

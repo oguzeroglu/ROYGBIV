@@ -944,4 +944,8 @@ var Text = function(){
   this.ROYGBIV_SCRIPTING_API_GETCONTAINER = "Returns a container or 0 if container does not exist.";
   this.ROYGBIV_SCRIPTING_API_ONCONTAINERCLICK = "Sets a click listener for a container. The callbackFunction is executed when the container is clicked.";
   this.ROYGBIV_SCRIPTING_API_REMOVECONTAINERCLICKLISTENER = "Removes the click listener of a container.";
+  this.ROYGBIV_SCRIPTING_API_ONCONTAINERMOUSEOVER = "Sets a mouse over listener for a container. The callbackFunction is executed when the mouse is moved over a container.";
+  this.ROYGBIV_SCRIPTING_API_REMOVECONTAINERMOUSEOVERLISTENER = "Removes the mouse over listener for a container.";
+  this.ROYGBIV_SCRIPTING_API_ONCONTAINERMOUSEOUT = "Sets a mouse out listener for a container. The callbackFunction is executed when the mouse is moved out from a container.";
+  this.ROYGBIV_SCRIPTING_API_REMOVECONTAINERMOUSEOUTLISTENER = "Removes the mouse out listener for a container.";
 }
