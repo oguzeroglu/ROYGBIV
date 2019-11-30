@@ -1300,6 +1300,9 @@ ImportHandler.prototype.importContainers = function(obj){
     if (!(typeof curExport.addedTextName == UNDEFINED)){
       container.insertAddedText(addedTexts[curExport.addedTextName]);
     }
+    if (curExport.hasBorder){
+      container.setBorder(curExport.borderColor, curExport.borderThickness);
+    }
   }
   for (var containerName in obj.containers){
     var curExport = obj.containers[containerName];

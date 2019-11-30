@@ -18,6 +18,23 @@ var Container2D = function(name, centerXPercent, centerYPercent, widthPercent, h
   }
 }
 
+Container2D.prototype.removeBorder = function(){
+  this.hasBorder = false;
+  delete this.borderColor;
+  delete this.borderThickness;
+  this.rectangle.updateMesh(0.005);
+  var color = selectionHandler.getSelectedObject() == this? "yellow": "lime";
+  this.rectangle.mesh.material.uniforms.color.value.set(color);
+}
+
+Container2D.prototype.setBorder = function(borderColor, thickness){
+  this.hasBorder = true;
+  this.borderColor = borderColor;
+  this.borderThickness = thickness;
+  this.rectangle.updateMesh(thickness, true);
+  this.rectangle.mesh.material.uniforms.color.value.set(borderColor);
+}
+
 Container2D.prototype.exportLightweight = function(){
   return {
     x: this.rectangle.x,
@@ -184,7 +201,10 @@ Container2D.prototype.export = function(){
     isSquare: !!this.isSquare,
     paddingXContainerSpace: this.paddingXContainerSpace,
     paddingYContainerSpace: this.paddingYContainerSpace,
-    isClickable: !!this.isClickable
+    isClickable: !!this.isClickable,
+    hasBorder: !!this.hasBorder,
+    borderColor: this.borderColor,
+    borderThickness: this.borderThickness
   };
   if (this.sprite){
     exportObj.spriteName = this.sprite.name
@@ -300,7 +320,8 @@ Container2D.prototype.handleRectangle = function(){
   var y = centerYWebGL + (heightWebGL / 2);
   var y2 = centerYWebGL - (heightWebGL / 2);
   this.rectangle.set(x, y, x2, y2, widthWebGL, heightWebGL);
-  this.rectangle.updateMesh(0.005);
+  var rectangleThickness = this.hasBorder? this.borderThickness: 0.005;
+  this.rectangle.updateMesh(rectangleThickness);
   this.handleAlignments();
 }
 

@@ -189,15 +189,15 @@ SceneHandler.prototype.hideAll = function(){
     }
     sprite.hideVisually();
   }
+  for (var containerName in containers){
+    containers[containerName].makeInvisible();
+  }
   if (mode == 0){
     for (var gsName in gridSystems){
       gridSystems[gsName].hide();
     }
     for (var gridName in gridSelections){
       gridSelections[gridName].toggleSelect();
-    }
-    for (var containerName in containers){
-      containers[containerName].makeInvisible();
     }
     if (markedPointsVisible){
       for (var markedPointName in markedPoints){
@@ -334,6 +334,12 @@ SceneHandler.prototype.changeScene = function(sceneName, readyCallback){
     for (var objName in this.scenes[sceneName].autoInstancedObjects){
       var obj = this.scenes[sceneName].autoInstancedObjects[objName];
       obj.showVisually();
+    }
+    for (var containerName in this.scenes[sceneName].containers){
+      var container = this.scenes[sceneName].containers[containerName];
+      if (container.hasBorder){
+        container.makeVisible();
+      }
     }
     this.activeSceneName = sceneName;
     if (!isDeployment){

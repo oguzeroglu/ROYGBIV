@@ -91,8 +91,8 @@ Rectangle.prototype.getGeometry = function(){
   return geom;
 }
 
-Rectangle.prototype.updateMesh = function(thicknessOffset){
-  if (isDeployment){
+Rectangle.prototype.updateMesh = function(thicknessOffset, force){
+  if (isDeployment && !force){
     return;
   }
   if (!this.mesh){

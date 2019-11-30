@@ -31,7 +31,9 @@ SelectionHandler.prototype.select = function(object){
   }
   if (object.isContainer){
     selectedContainer = object;
-    object.rectangle.mesh.material.uniforms.color.value.set("yellow");
+    if (!object.hasBorder){
+      object.rectangle.mesh.material.uniforms.color.value.set("yellow");
+    }
   }
   this.currentSelection = object;
 }
@@ -80,7 +82,9 @@ SelectionHandler.prototype.resetCurrentSelection = function(){
     selectedSprite = 0;
   }else if (this.currentSelection.isContainer){
     selectedContainer = 0;
-    this.currentSelection.rectangle.mesh.material.uniforms.color.value.set("lime");
+    if (!this.currentSelection.hasBorder){
+      this.currentSelection.rectangle.mesh.material.uniforms.color.value.set("lime");
+    }
   }
   this.currentSelection = 0;
   if (!isDeployment){
