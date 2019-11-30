@@ -71,7 +71,6 @@ Rectangle.prototype.handlePositionUniform = function(thicknessOffset){
   positions[22].y = this.y;
   positions[23].x = this.x - tox;
   positions[23].y = this.y;
-
 }
 
 Rectangle.prototype.getGeometry = function(){
@@ -117,6 +116,7 @@ Rectangle.prototype.updateMesh = function(thicknessOffset){
     this.mesh.frustumCulled = false;
   }
   this.handlePositionUniform(thicknessOffset);
+  this.thicknessOffset = thicknessOffset;
 }
 Rectangle.prototype.fits = function(texture){
   var tw = texture.image.width;

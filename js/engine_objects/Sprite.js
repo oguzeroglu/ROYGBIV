@@ -175,6 +175,9 @@ Sprite.prototype.handleResize = function(){
   if (!(typeof this.fixedHeight == UNDEFINED)){
     this.setHeightPercent(this.fixedHeight);
   }
+  if (this.rectangle && !(typeof this.rectangle.thicknessOffset == UNDEFINED)){
+    this.rectangle.updateMesh(this.rectangle.thicknessOffset);
+  }
 }
 
 Sprite.prototype.setRefHeight = function(){

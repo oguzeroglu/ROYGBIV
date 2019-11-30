@@ -169,6 +169,9 @@ Container2D.prototype.handleResize = function(){
   if (this.sprite){
     this.insertSprite(this.sprite);
   }
+  if (this.rectangle && !(typeof this.rectangle.thicknessOffset == UNDEFINED)){
+    this.rectangle.updateMesh(this.rectangle.thicknessOffset);
+  }
   rayCaster.updateObject(this);
 }
 
