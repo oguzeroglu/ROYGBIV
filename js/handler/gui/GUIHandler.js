@@ -79,7 +79,10 @@ var GUIHandler = function(){
     "Padding X": 0,
     "Padding Y": 0,
     "Square": false,
-    "Clickable": false
+    "Clickable": false,
+    "Has border": false,
+    "Border color": "#ffffff",
+    "Border thickness": 0.005
   };
   this.bloomParameters = {
     "Threshold": 0.0,
@@ -222,6 +225,9 @@ GUIHandler.prototype.afterContainerSelection = function(){
     guiHandler.containerManipulationParameters["Padding X"] = curSelection.paddingXContainerSpace;
     guiHandler.containerManipulationParameters["Padding Y"] = curSelection.paddingYContainerSpace;
     guiHandler.containerManipulationParameters["Clickable"] = !!curSelection.isClickable;
+    guiHandler.containerManipulationParameters["Has border"] = !!curSelection.hasBorder;
+    guiHandler.containerManipulationParameters["Border color"] = curSelection.borderColor? curSelection.borderColor: "#ffffff";
+    guiHandler.containerManipulationParameters["Border thickness"] = curSelection.borderThickness? curSelection.borderThickness: 0.005;
     if (curSelection.alignedParent){
       var alignedLeft = curSelection.alignedParent.isChildAlignedWithType(curSelection, CONTAINER_ALIGNMENT_TYPE_LEFT);
       var alignedRight = curSelection.alignedParent.isChildAlignedWithType(curSelection, CONTAINER_ALIGNMENT_TYPE_RIGHT);
@@ -233,6 +239,10 @@ GUIHandler.prototype.afterContainerSelection = function(){
       if (alignedTop || alignedBottom){
         guiHandler.disableController(guiHandler.containerManipulationCenterYController);
       }
+    }
+    if (!curSelection.hasBorder){
+      guiHandler.disableController(guiHandler.containerManipulationBorderColorController);
+      guiHandler.disableController(guiHandler.containerManipulationBorderThicknessController);
     }
   }else{
     guiHandler.hide(guiHandler.guiTypes.CONTAINER);
@@ -656,6 +666,9 @@ GUIHandler.prototype.enableAllCMControllers = function(){
   guiHandler.enableController(guiHandler.containerManipulationPaddingXController);
   guiHandler.enableController(guiHandler.containerManipulationPaddingYController);
   guiHandler.enableController(guiHandler.containerManipulationClickableController);
+  guiHandler.enableController(guiHandler.containerManipulationHasBorderController);
+  guiHandler.enableController(guiHandler.containerManipulationBorderColorController);
+  guiHandler.enableController(guiHandler.containerManipulationBorderThicknessController);
 }
 
 GUIHandler.prototype.enableAllTMControllers = function(){
@@ -1374,6 +1387,23 @@ GUIHandler.prototype.initializeContainerManipulationGUI = function(){
   }).listen();
   guiHandler.containerManipulationClickableController = guiHandler.datGuiContainerManipulation.add(guiHandler.containerManipulationParameters, "Clickable").onChange(function(val){
     selectionHandler.getSelectedObject().isClickable = val;
+  }).listen();
+  guiHandler.containerManipulationHasBorderController = guiHandler.datGuiContainerManipulation.add(guiHandler.containerManipulationParameters, "Has border").onChange(function(val){
+    if (val){
+      selectionHandler.getSelectedObject().setBorder(guiHandler.containerManipulationParameters["Border color"], guiHandler.containerManipulationParameters["Border thickness"]);
+      guiHandler.enableController(guiHandler.containerManipulationBorderColorController);
+      guiHandler.enableController(guiHandler.containerManipulationBorderThicknessController);
+    }else{
+      selectionHandler.getSelectedObject().removeBorder();
+      guiHandler.disableController(guiHandler.containerManipulationBorderColorController);
+      guiHandler.disableController(guiHandler.containerManipulationBorderThicknessController);
+    }
+  }).listen();
+  guiHandler.containerManipulationBorderColorController = guiHandler.datGuiContainerManipulation.addColor(guiHandler.containerManipulationParameters, "Border color").onChange(function(val){
+    selectionHandler.getSelectedObject().setBorder(guiHandler.containerManipulationParameters["Border color"], guiHandler.containerManipulationParameters["Border thickness"]);
+  }).listen();
+  guiHandler.containerManipulationBorderThicknessController = guiHandler.datGuiContainerManipulation.add(guiHandler.containerManipulationParameters, "Border thickness").min(0.001).max(0.1).step(0.0001).onChange(function(val){
+    selectionHandler.getSelectedObject().setBorder(guiHandler.containerManipulationParameters["Border color"], guiHandler.containerManipulationParameters["Border thickness"]);
   }).listen();
 }
 
