@@ -42,8 +42,10 @@ Container2D.prototype.setBackground = function(backgroundColor, backgroundAlpha,
   this.backgroundSprite.set2DCoordinates(100 - this.centerXPercent, 100 - this.centerYPercent);
   this.backgroundSprite.setColor(backgroundColor);
   this.backgroundSprite.setAlpha(backgroundAlpha);
-  if (!(typeof backgroundTextureName == UNDEFINED)){
+  if (!!backgroundTextureName){
     this.backgroundSprite.mapTexture(texturePacks[backgroundTextureName]);
+  } else if (this.backgroundSprite.isTextured){
+    this.backgroundSprite.removeTexture();
   }
   this.backgroundColor = backgroundColor;
   this.backgroundAlpha = backgroundAlpha;

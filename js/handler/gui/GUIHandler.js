@@ -82,7 +82,12 @@ var GUIHandler = function(){
     "Clickable": false,
     "Has border": false,
     "Border color": "#ffffff",
-    "Border thickness": 0.005
+    "Border thickness": 0.005,
+    "Has background": false,
+    "BG color": "#ffffff",
+    "BG alpha": 1,
+    "Has BG texture": false,
+    "BG texture": ""
   };
   this.bloomParameters = {
     "Threshold": 0.0,
@@ -228,6 +233,11 @@ GUIHandler.prototype.afterContainerSelection = function(){
     guiHandler.containerManipulationParameters["Has border"] = !!curSelection.hasBorder;
     guiHandler.containerManipulationParameters["Border color"] = curSelection.borderColor? curSelection.borderColor: "#ffffff";
     guiHandler.containerManipulationParameters["Border thickness"] = curSelection.borderThickness? curSelection.borderThickness: 0.005;
+    guiHandler.containerManipulationParameters["Has background"] = !!curSelection.hasBackground;
+    guiHandler.containerManipulationParameters["BG color"] = curSelection.hasBackground? curSelection.backgroundColor: "#ffffff";
+    guiHandler.containerManipulationParameters["BG alpha"] = curSelection.hasBackground? curSelection.backgroundAlpha: 1,
+    guiHandler.containerManipulationParameters["Has BG texture"] = !!curSelection.backgroundTextureName;
+    guiHandler.containerManipulationParameters["BG texture"] = curSelection.hasBackground? curSelection.backgroundTextureName: "";
     if (curSelection.alignedParent){
       var alignedLeft = curSelection.alignedParent.isChildAlignedWithType(curSelection, CONTAINER_ALIGNMENT_TYPE_LEFT);
       var alignedRight = curSelection.alignedParent.isChildAlignedWithType(curSelection, CONTAINER_ALIGNMENT_TYPE_RIGHT);
@@ -243,6 +253,19 @@ GUIHandler.prototype.afterContainerSelection = function(){
     if (!curSelection.hasBorder){
       guiHandler.disableController(guiHandler.containerManipulationBorderColorController);
       guiHandler.disableController(guiHandler.containerManipulationBorderThicknessController);
+    }
+    if (!curSelection.hasBackground){
+      guiHandler.disableController(guiHandler.containerManipulationBackgroundColorController);
+      guiHandler.disableController(guiHandler.containerManipulationBackgroundAlphaController);
+      guiHandler.disableController(guiHandler.containerManipulationBackgroundTextureController);
+      guiHandler.disableController(guiHandler.containerManipulationHasBackgroundTextureController);
+    }
+    if (!curSelection.backgroundTextureName){
+      guiHandler.disableController(guiHandler.containerManipulationBackgroundTextureController);
+    }
+    if (Object.keys(texturePacks).length == 0){
+      guiHandler.disableController(guiHandler.containerManipulationHasBackgroundTextureController);
+      guiHandler.disableController(guiHandler.containerManipulationBackgroundTextureController);
     }
   }else{
     guiHandler.hide(guiHandler.guiTypes.CONTAINER);
@@ -669,6 +692,11 @@ GUIHandler.prototype.enableAllCMControllers = function(){
   guiHandler.enableController(guiHandler.containerManipulationHasBorderController);
   guiHandler.enableController(guiHandler.containerManipulationBorderColorController);
   guiHandler.enableController(guiHandler.containerManipulationBorderThicknessController);
+  guiHandler.enableController(guiHandler.containerManipulationHasBackgroundController);
+  guiHandler.enableController(guiHandler.containerManipulationBackgroundColorController);
+  guiHandler.enableController(guiHandler.containerManipulationBackgroundAlphaController);
+  guiHandler.enableController(guiHandler.containerManipulationHasBackgroundTextureController);
+  guiHandler.enableController(guiHandler.containerManipulationBackgroundTextureController);
 }
 
 GUIHandler.prototype.enableAllTMControllers = function(){
@@ -1404,6 +1432,64 @@ GUIHandler.prototype.initializeContainerManipulationGUI = function(){
   }).listen();
   guiHandler.containerManipulationBorderThicknessController = guiHandler.datGuiContainerManipulation.add(guiHandler.containerManipulationParameters, "Border thickness").min(0.001).max(0.1).step(0.0001).onChange(function(val){
     selectionHandler.getSelectedObject().setBorder(guiHandler.containerManipulationParameters["Border color"], guiHandler.containerManipulationParameters["Border thickness"]);
+  }).listen();
+  guiHandler.containerManipulationHasBackgroundController = guiHandler.datGuiContainerManipulation.add(guiHandler.containerManipulationParameters, "Has background").onChange(function(val){
+    var allTexturePackNames = Object.keys(texturePacks);
+    if (val){
+      guiHandler.enableController(guiHandler.containerManipulationBackgroundColorController);
+      guiHandler.enableController(guiHandler.containerManipulationBackgroundAlphaController);
+      if (allTexturePackNames.length > 0){
+        guiHandler.enableController(guiHandler.containerManipulationHasBackgroundTextureController);
+        guiHandler.enableController(guiHandler.containerManipulationBackgroundTextureController);
+      }
+      var bgColor = guiHandler.containerManipulationParameters["BG color"];
+      var bgAlpha = guiHandler.containerManipulationParameters["BG alpha"];
+      var bgTextureName = (guiHandler.containerManipulationParameters["Has BG texture"] && guiHandler.containerManipulationParameters["BG texture"])? guiHandler.containerManipulationParameters["BG texture"]: null;
+      selectionHandler.getSelectedObject().setBackground(bgColor, bgAlpha, bgTextureName);
+    }else{
+      guiHandler.disableController(guiHandler.containerManipulationBackgroundColorController);
+      guiHandler.disableController(guiHandler.containerManipulationBackgroundAlphaController);
+      guiHandler.disableController(guiHandler.containerManipulationHasBackgroundTextureController);
+      guiHandler.disableController(guiHandler.containerManipulationBackgroundTextureController);
+      selectionHandler.getSelectedObject().removeBackground();
+    }
+  }).listen();
+  guiHandler.containerManipulationBackgroundColorController = guiHandler.datGuiContainerManipulation.addColor(guiHandler.containerManipulationParameters, "BG color").onChange(function(val){
+    var bgColor = val;
+    var bgAlpha = guiHandler.containerManipulationParameters["BG alpha"];
+    var bgTextureName = (guiHandler.containerManipulationParameters["Has BG texture"] && guiHandler.containerManipulationParameters["BG texture"])? guiHandler.containerManipulationParameters["BG texture"]: null;
+    selectionHandler.getSelectedObject().setBackground(bgColor, bgAlpha, bgTextureName);
+  }).listen();
+  guiHandler.containerManipulationBackgroundAlphaController = guiHandler.datGuiContainerManipulation.add(guiHandler.containerManipulationParameters, "BG alpha").min(0).max(1).step(0.01).onChange(function(val){
+    var bgColor = guiHandler.containerManipulationParameters["BG color"];
+    var bgAlpha = val;
+    var bgTextureName = (guiHandler.containerManipulationParameters["Has BG texture"] && guiHandler.containerManipulationParameters["BG texture"])? guiHandler.containerManipulationParameters["BG texture"]: null;
+    selectionHandler.getSelectedObject().setBackground(bgColor, bgAlpha, bgTextureName);
+  }).listen();
+  guiHandler.containerManipulationHasBackgroundTextureController = guiHandler.datGuiContainerManipulation.add(guiHandler.containerManipulationParameters, "Has BG texture").onChange(function(val){
+     var hasBG = guiHandler.containerManipulationParameters["Has background"];
+     var allTexturePackNames = Object.keys(texturePacks);
+     if (!hasBG || allTexturePackNames.length == 0){
+       guiHandler.containerManipulationParameters["Has BG texture"] = false;
+       return;
+     }
+     var bgColor = guiHandler.containerManipulationParameters["BG color"];
+     var bgAlpha = guiHandler.containerManipulationParameters["BG alpha"];
+     if (val){
+       if (!texturePacks[guiHandler.containerManipulationParameters["BG texture"]]){
+         guiHandler.containerManipulationParameters["BG texture"] = allTexturePackNames[0];
+       }
+       guiHandler.enableController(guiHandler.containerManipulationBackgroundTextureController);
+       selectionHandler.getSelectedObject().setBackground(bgColor, bgAlpha, guiHandler.containerManipulationParameters["BG texture"]);
+     }else{
+       guiHandler.disableController(guiHandler.containerManipulationBackgroundTextureController);
+       selectionHandler.getSelectedObject().setBackground(bgColor, bgAlpha, null);
+     }
+  }).listen();
+  guiHandler.containerManipulationBackgroundTextureController = guiHandler.datGuiContainerManipulation.add(guiHandler.containerManipulationParameters, "BG texture", Object.keys(texturePacks)).onChange(function(val){
+    var bgColor = guiHandler.containerManipulationParameters["BG color"];
+    var bgAlpha = guiHandler.containerManipulationParameters["BG alpha"];
+    selectionHandler.getSelectedObject().setBackground(bgColor, bgAlpha, val);
   }).listen();
 }
 
