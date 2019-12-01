@@ -212,6 +212,7 @@ Container2D.prototype.makeSquare = function(){
 }
 
 Container2D.prototype.handleResize = function(){
+  GLOBAL_VIEWPORT_UNIFORM.value.set(0, 0, window.innerWidth * screenResolution, window.innerHeight * screenResolution);
   if (this.isSquare){
     this.makeSquare();
   }
@@ -225,6 +226,10 @@ Container2D.prototype.handleResize = function(){
     this.rectangle.updateMesh(this.borderThickness, true);
   }else if (this.rectangle && (!(typeof this.rectangle.thicknessOffset == UNDEFINED))){
     this.rectangle.updateMesh(this.rectangle.thicknessOffset);
+  }
+  if (this.hasBackground){
+    this.backgroundSprite.handleRectangle();
+    this.setBackground(this.backgroundColor, this.backgroundAlpha, this.backgroundTextureName);
   }
   rayCaster.updateObject(this);
 }
