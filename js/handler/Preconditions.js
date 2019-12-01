@@ -275,6 +275,12 @@ Preconditions.prototype.checkIfLightningStartable = function(callerFunc, lightni
   }
 }
 
+Preconditions.prototype.checkIfContainerHasBackground = function(callerFunc, container){
+  if (!container.hasBackground){
+    this.throw(callerFunc, "Container has no background.");
+  }
+}
+
 Preconditions.prototype.checkIfContainerHasBorder = function(callerFunc, container){
   if (!container.hasBorder){
     this.throw(callerFunc, "Container has no border.");

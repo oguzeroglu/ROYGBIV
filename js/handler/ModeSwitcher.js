@@ -303,6 +303,10 @@ ModeSwitcher.prototype.switchFromPreviewToDesign = function(){
     delete containers[containerName].onClickCallback;
     delete containers[containerName].mouseOverCallbackFunction;
     delete containers[containerName].mouseOutCallbackFunction;
+    if (containers[containerName].hasBackground){
+      containers[containerName].setBackground(containers[containerName].backgroundColor, containers[containerName].backgroundAlpha, containers[containerName].backgroundTextureName);
+      containers[containerName].backgroundSprite.mesh.visible = true;
+    }
   }
   for (var textName in sceneHandler.getAddedTexts()){
     var addedText = addedTexts[textName];

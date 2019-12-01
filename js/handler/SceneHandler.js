@@ -346,6 +346,9 @@ SceneHandler.prototype.changeScene = function(sceneName, readyCallback){
       if (container.hasBorder){
         container.makeVisible();
       }
+      if (container.hasBackground){
+        container.backgroundSprite.showVisually();
+      }
     }
     this.activeSceneName = sceneName;
     if (!isDeployment){

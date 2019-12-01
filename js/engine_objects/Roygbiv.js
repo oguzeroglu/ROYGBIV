@@ -227,7 +227,11 @@ var Roygbiv = function(){
     "removeContainerMouseOutListener",
     "hideContainerBorder",
     "showContainerBorder",
-    "setContainerBorderColor"
+    "setContainerBorderColor",
+    "setContainerBackgroundColor",
+    "setContainerBackgroundAlpha",
+    "hideContainerBackground",
+    "showContainerBackground"
   ];
 
   this.globals = new Object();
@@ -3032,6 +3036,57 @@ Roygbiv.prototype.setContainerBorderColor = function(container, colorName){
   preConditions.checkIfContainerInsideActiveScene(ROYGBIV.setContainerBorderColor, container);
   preConditions.checkIfContainerHasBorder(ROYGBIV.setContainerBorderColor, container);
   container.rectangle.mesh.material.uniforms.color.value.set(colorName);
+}
+
+// Sets the background color of a container.
+Roygbiv.prototype.setContainerBackgroundColor = function(container, colorName){
+  if (mode == 0){
+    return;
+  }
+  preConditions.checkIfDefined(ROYGBIV.setContainerBackgroundColor, preConditions.container, container);
+  preConditions.checkIfDefined(ROYGBIV.setContainerBackgroundColor, preConditions.colorName, colorName);
+  preConditions.checkIfContainer(ROYGBIV.setContainerBackgroundColor, container);
+  preConditions.checkIfContainerInsideActiveScene(ROYGBIV.setContainerBackgroundColor, container);
+  preConditions.checkIfContainerHasBackground(ROYGBIV.setContainerBackgroundColor, container);
+  container.backgroundSprite.setColor(colorName);
+}
+
+// Sets the alpha value of the background of a container.
+Roygbiv.prototype.setContainerBackgroundAlpha = function(container, alpha){
+  if (mode == 0){
+    return;
+  }
+  preConditions.checkIfDefined(ROYGBIV.setContainerBackgroundAlpha, preConditions.container, container);
+  preConditions.checkIfDefined(ROYGBIV.setContainerBackgroundAlpha, preConditions.colorName, alpha);
+  preConditions.checkIfContainer(ROYGBIV.setContainerBackgroundAlpha, container);
+  preConditions.checkIfNumber(ROYGBIV.setContainerBackgroundAlpha, preConditions.alpha, alpha);
+  preConditions.checkIfContainerInsideActiveScene(ROYGBIV.setContainerBackgroundAlpha, container);
+  preConditions.checkIfContainerHasBackground(ROYGBIV.setContainerBackgroundAlpha, container);
+  container.backgroundSprite.setAlpha(alpha);
+}
+
+// Hides the background of a container.
+Roygbiv.prototype.hideContainerBackground = function(container){
+  if (mode == 0){
+    return;
+  }
+  preConditions.checkIfDefined(ROYGBIV.hideContainerBackground, preConditions.container, container);
+  preConditions.checkIfContainer(ROYGBIV.hideContainerBackground, container);
+  preConditions.checkIfContainerInsideActiveScene(ROYGBIV.hideContainerBackground, container);
+  preConditions.checkIfContainerHasBackground(ROYGBIV.hideContainerBackground, container);
+  container.backgroundSprite.mesh.visible = false;
+}
+
+// Shows the background of a container.
+Roygbiv.prototype.showContainerBackground = function(container){
+  if (mode == 0){
+    return;
+  }
+  preConditions.checkIfDefined(ROYGBIV.showContainerBackground, preConditions.container, container);
+  preConditions.checkIfContainer(ROYGBIV.showContainerBackground, container);
+  preConditions.checkIfContainerInsideActiveScene(ROYGBIV.showContainerBackground, container);
+  preConditions.checkIfContainerHasBackground(ROYGBIV.showContainerBackground, container);
+  container.backgroundSprite.mesh.visible = true;
 }
 
 // UTILITY FUNCTIONS ***********************************************************

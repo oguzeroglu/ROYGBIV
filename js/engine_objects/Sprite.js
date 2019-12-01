@@ -268,6 +268,12 @@ Sprite.prototype.setColor = function(color){
 }
 
 Sprite.prototype.setAlpha = function(alpha){
+  if (alpha > 1){
+    alpha = 1;
+  }
+  if (alpha < 0){
+    alpha = 0;
+  }
   if (alpha != 1){
     this.mesh.material.transparent = true;
   }else{

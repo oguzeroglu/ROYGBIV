@@ -952,4 +952,8 @@ var Text = function(){
   this.ROYGBIV_SCRIPTING_API_HIDECONTAINERBORDER = "Hides the border of a container.";
   this.ROYGBIV_SCRIPTING_API_SHOWCONTAINERBORDER = "Shows the border of a container.";
   this.ROYGBIV_SCRIPTING_API_SETCONTAINERBORDERCOLOR = "Sets the border color of a container.";
+  this.ROYGBIV_SCRIPTING_API_SETCONTAINERBACKGROUNDCOLOR = "Sets the background color of a container.";
+  this.ROYGBIV_SCRIPTING_API_SETCONTAINERBACKGROUNDALPHA = "Sets the alpha value of the background of a container.";
+  this.ROYGBIV_SCRIPTING_API_HIDECONTAINERBACKGROUND = "Hides the background of a container.";
+  this.ROYGBIV_SCRIPTING_API_SHOWCONTAINERBACKGROUND = "Shows the background of a container.";
 }
