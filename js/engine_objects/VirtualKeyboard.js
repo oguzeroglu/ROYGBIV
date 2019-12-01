@@ -67,7 +67,6 @@ VirtualKeyboard.prototype.initialize = function(){
   var realKeyHeight = this.totalHeightPercent * (this.keyHeightPercent) / 100;
 
   var topY = this.totalHeightPercent;
-  var minX = 25;
   var padY = (this.totalHeightPercent - (4 * realKeyHeight)) / 5;
 
   var curY = topY - padY;
@@ -78,13 +77,13 @@ VirtualKeyboard.prototype.initialize = function(){
       totalRowWidth += realKeyWidth * (curRow[i2].weight);
     }
     var offs = 0;
-    if (i == 1){
-      offs = 2;
-    }else if (i == 3){
-      offs = 8;
-    }
-    var padX = (this.totalWidthPercent - 2 * offs - totalRowWidth) / (curRow.length + 1);
-    var curX = 25 + padX + offs;
+    //if (i == 1){
+    //  offs = 2;
+    //}else if (i == 3){
+    //  offs = 8;
+    //}
+    var padX = (this.totalWidthPercent - (2 * offs) - totalRowWidth) / (curRow.length + 1);
+    var curX = 50 - (this.totalWidthPercent / 2) + padX + offs;
     curY = curY - (realKeyHeight / 2);
     for (var i2 = 0; i2<curRow.length; i2++){
       curX += (realKeyWidth * curRow[i2].weight / 2);
