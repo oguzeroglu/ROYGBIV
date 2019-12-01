@@ -12,6 +12,13 @@
 //  borderColor
 //  keyWidthPercent
 //  keyHeightPercent
+//  keyHasBorder
+//  keyBorderColor
+//  keyBorderThickness
+//  keyHasBackground
+//  keyBackgroundColor
+//  keyBackgroundAlpha
+//  keyBackgroundTextureName
 var VirtualKeyboard = function(parameters){
   this.name = parameters.name;
   this.fontName = parameters.fontName;
@@ -26,6 +33,13 @@ var VirtualKeyboard = function(parameters){
   this.borderColor = parameters.borderColor;
   this.keyWidthPercent = parameters.keyWidthPercent;
   this.keyHeightPercent = parameters.keyHeightPercent;
+  this.keyHasBorder = parameters.keyHasBorder;
+  this.keyBorderColor = parameters.keyBorderColor;
+  this.keyBorderThickness = parameters.keyBorderThickness;
+  this.keyHasBackground = parameters.keyHasBackground;
+  this.keyBackgroundColor = parameters.keyBackgroundColor;
+  this.keyBackgroundAlpha = parameters.keyBackgroundAlpha;
+  this.keyBackgroundTextureName = parameters.keyBackgroundTextureName;
 
   this.keys = [
     [
@@ -51,7 +65,13 @@ var VirtualKeyboard = function(parameters){
 
 VirtualKeyboard.prototype.initializeKey = function(x, y, width, height){
   var container = new Container2D(null, x, y, width, height);
-  container.makeVisible();
+  if (this.keyHasBorder){
+    container.setBorder(this.keyBorderColor, this.keyBorderThickness);
+    container.makeVisible();
+  }
+  if (this.keyHasBackground){
+    container.setBackground(this.keyBackgroundColor, this.keyBackgroundAlpha, this.keyBackgroundTextureName);
+  }
 }
 
 VirtualKeyboard.prototype.initialize = function(){
@@ -61,6 +81,7 @@ VirtualKeyboard.prototype.initialize = function(){
   }
   if (this.hasBorder){
     this.backgroundContainer.setBorder(this.borderColor, this.borderThickness);
+    this.backgroundContainer.makeVisible();
   }
 
   var realKeyWidth = this.totalWidthPercent * (this.keyWidthPercent) / 100;
@@ -92,6 +113,4 @@ VirtualKeyboard.prototype.initialize = function(){
     }
     curY = curY - padY - (realKeyHeight / 2);
   }
-
-  this.backgroundContainer.makeVisible();
 }
