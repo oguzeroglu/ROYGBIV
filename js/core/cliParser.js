@@ -1293,6 +1293,12 @@ function parse(input){
               return true;
             }
           }
+          for (var containerName in containers){
+            if (containers[containerName].backgroundTextureName == name){
+              terminal.printError(Text.TEXTURE_PACK_USED_AS_A_BACKGROUND_TEXTURE.replace(Text.PARAM1, containerName));
+              return true;
+            }
+          }
           if (texturePack.isParticleTexture){
             for (var psName in preConfiguredParticleSystems){
               var usedTextureName = preConfiguredParticleSystems[psName].getUsedTextureName();

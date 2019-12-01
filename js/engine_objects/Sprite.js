@@ -258,7 +258,9 @@ Sprite.prototype.destroy = function(){
     this.rectangle.material.dispose();
     this.rectangle.geometry.dispose();
   }
-  delete sprites[this.name];
+  if (!this.isBackgroundObject){
+    delete sprites[this.name];
+  }
 }
 
 Sprite.prototype.setColor = function(color){

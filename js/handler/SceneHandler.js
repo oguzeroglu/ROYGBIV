@@ -191,6 +191,9 @@ SceneHandler.prototype.hideAll = function(){
   }
   for (var containerName in containers){
     containers[containerName].makeInvisible();
+    if (containers[containerName].hasBackground){
+      containers[containerName].backgroundSprite.hideVisually();
+    }
   }
   if (mode == 0){
     for (var gsName in gridSystems){
@@ -284,6 +287,9 @@ SceneHandler.prototype.changeScene = function(sceneName, readyCallback){
     for (var containerName in this.scenes[sceneName].containers){
       var container = this.scenes[sceneName].containers[containerName];
       container.makeVisible();
+      if (container.hasBackground){
+        container.backgroundSprite.showVisually();
+      }
     }
     if (markedPointsVisible){
       for (var markedPointName in this.scenes[sceneName].markedPoints){

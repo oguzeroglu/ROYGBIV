@@ -18,6 +18,27 @@ var Container2D = function(name, centerXPercent, centerYPercent, widthPercent, h
   }
 }
 
+Container2D.prototype.setBackground = function(backgroundColor, backgroundAlpha, backgroundTextureName){
+  if (!this.backgroundSprite){
+    var bgSprite = new Sprite();
+    bgSprite.mesh.renderOrder = renderOrders.CONTAINER_BACKGROUND;
+    bgSprite.isBackgroundObject = true;
+    this.backgroundSprite = bgSprite;
+  }
+  this.backgroundSprite.setWidthPercent(this.scaleWidth * this.widthPercent);
+  this.backgroundSprite.setHeightPercent(this.scaleHeight * this.heightPercent);
+  this.backgroundSprite.set2DCoordinates(100 - this.centerXPercent, 100 - this.centerYPercent);
+  this.backgroundSprite.setColor(backgroundColor);
+  this.backgroundSprite.setAlpha(backgroundAlpha);
+  if (!(typeof backgroundTextureName == UNDEFINED)){
+    this.backgroundSprite.mapTexture(texturePacks[backgroundTextureName]);
+  }
+  this.backgroundColor = backgroundColor;
+  this.backgroundAlpha = backgroundAlpha;
+  this.backgroundTextureName = backgroundTextureName;
+  this.hasBackground = true;
+}
+
 Container2D.prototype.removeBorder = function(){
   this.hasBorder = false;
   delete this.borderColor;
@@ -260,6 +281,9 @@ Container2D.prototype.destroy = function(){
       this.unalign(containers[containerName]);
     }
   }
+  if (this.hasBackground){
+    this.backgroundSprite.destroy();
+  }
 }
 
 Container2D.prototype.setCenter = function(centerXPercent, centerYPercent){
@@ -323,6 +347,9 @@ Container2D.prototype.handleRectangle = function(){
   var rectangleThickness = this.hasBorder? this.borderThickness: 0.005;
   this.rectangle.updateMesh(rectangleThickness);
   this.handleAlignments();
+  if (this.hasBackground){
+    this.setBackground(this.backgroundColor, this.backgroundAlpha, this.backgroundTextureName);
+  }
 }
 
 Container2D.prototype.removeSprite = function(){

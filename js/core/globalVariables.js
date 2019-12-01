@@ -386,6 +386,7 @@ var containers = new Object();
 
 // RENDER ORDERS
 var renderOrders = {
+  CONTAINER_BACKGROUND: -1000,
   MARKED_POINT: -30,
   GRID_HELPER: -20,
   FPS_WEAPON: -10,

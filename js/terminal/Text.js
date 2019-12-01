@@ -602,6 +602,7 @@ var Text = function(){
   this.TEXTURE_PACK_USED_IN_AN_OBJECT = "Texture pack used in object [@@1]. Cannot delete.";
   this.TEXTURE_PACK_USED_IN_A_PARTICLE_SYSTEM = "Texture pack used in a particle system [@@1]. Cannot delete.";
   this.TEXTURE_PACK_USED_IN_A_SPRITE = "Texture pack used in a sprite [@@1]. Cannot delete.";
+  this.TEXTURE_PACK_USED_AS_A_BACKGROUND_TEXTURE = "Texture pack used as a background texture in container [@@1]. Cannot delete.";
   this.TEXTURE_PACK_USED_IN_A_CROSSHAIR = "Texture pack used in a crosshair [@@1]. Cannot delete.";
   this.MATERIAL_USED_IN_AN_OBJECT = "Material used in an object [@@1]. Cannot delete.";
   this.NO_SUCH_IMAGE = "No such image.";
