@@ -11,7 +11,11 @@ var Sprite = function(name){
   if (IS_WORKER_CONTEXT){
     return;
   }
-  this.geometry = new THREE.PlaneBufferGeometry(100, 100);
+  this.geometry = geometryCache["SPRITE_GEOMETRY"];
+  if (!this.geometry){
+    this.geometry = new THREE.PlaneBufferGeometry(100, 100);
+    geometryCache["SPRITE_GEOMETRY"] = this.geometry;
+  }
   this.mesh = new MeshGenerator().generateSprite(this);
   this.marginMode = MARGIN_MODE_2D_CENTER;
   this.handleRectangle();
@@ -171,6 +175,9 @@ Sprite.prototype.handleResize = function(){
   if (!(typeof this.fixedHeight == UNDEFINED)){
     this.setHeightPercent(this.fixedHeight);
   }
+  if (this.rectangle && !(typeof this.rectangle.thicknessOffset == UNDEFINED)){
+    this.rectangle.updateMesh(this.rectangle.thicknessOffset);
+  }
 }
 
 Sprite.prototype.setRefHeight = function(){
@@ -201,7 +208,12 @@ Sprite.prototype.export = function(){
     cropCoefficientY: this.cropCoefficientY,
     animations: animations,
     fixedWidth: this.fixedWidth,
-    fixedHeight: this.fixedHeight
+    fixedHeight: this.fixedHeight,
+    originalWidth: this.originalWidth,
+    originalHeight: this.originalHeight,
+    originalWidthReference: this.originalWidthReference,
+    originalHeightReference: this.originalHeightReference,
+    originalScreenResolution: this.originalScreenResolution
   };
 }
 
@@ -246,7 +258,9 @@ Sprite.prototype.destroy = function(){
     this.rectangle.material.dispose();
     this.rectangle.geometry.dispose();
   }
-  delete sprites[this.name];
+  if (!this.isBackgroundObject){
+    delete sprites[this.name];
+  }
 }
 
 Sprite.prototype.setColor = function(color){
@@ -254,6 +268,12 @@ Sprite.prototype.setColor = function(color){
 }
 
 Sprite.prototype.setAlpha = function(alpha){
+  if (alpha > 1){
+    alpha = 1;
+  }
+  if (alpha < 0){
+    alpha = 0;
+  }
   if (alpha != 1){
     this.mesh.material.transparent = true;
   }else{
@@ -325,8 +345,8 @@ Sprite.prototype.set2DCoordinates = function(marginPercentX, marginPercentY){
 
 Sprite.prototype.getCornerPoint = function(point){
   // CONVERTED FROM GLSL SHADER CODE
-  var scaledX = this.mesh.material.uniforms.scale.value.x * this.mesh.material.uniforms.scaleCoef.value * point.x;
-  var scaledY = this.mesh.material.uniforms.scale.value.y * this.mesh.material.uniforms.scaleCoef.value * point.y;
+  var scaledX = screenResolution * this.mesh.material.uniforms.scale.value.x * this.mesh.material.uniforms.scaleCoef.value * point.x;
+  var scaledY = screenResolution * this.mesh.material.uniforms.scale.value.y * this.mesh.material.uniforms.scaleCoef.value * point.y;
   if (!(typeof this.cropCoefficientX == UNDEFINED)){
     scaledX *= this.cropCoefficientX;
   }

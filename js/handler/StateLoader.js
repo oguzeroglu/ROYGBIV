@@ -105,6 +105,7 @@ StateLoader.prototype.finalize = function(){
   this.importHandler.importFog(this.stateObj);
   this.importHandler.importCrosshairs(this.stateObj);
   this.importHandler.importSprites(this.stateObj);
+  this.importHandler.importContainers(this.stateObj);
   this.importHandler.importScenes(this.stateObj);
 
   this.closePhysicsWorkerIfNotUsed();
@@ -146,6 +147,15 @@ StateLoader.prototype.closeRaycasterWorkerIfNotUsed = function(){
         for (var spriteName in sprites){
           var sprite = sprites[spriteName];
           if (sprite.isClickable){
+            hasRaycasting = true;
+            break;
+          }
+        }
+      }
+      if (!hasRaycasting){
+        for (var containerName in containers){
+          var container = containers[containerName];
+          if (container.isClickable){
             hasRaycasting = true;
             break;
           }
@@ -204,6 +214,9 @@ StateLoader.prototype.resetProject = function(){
   for (var spriteName in sprites){
     sprites[spriteName].destroy();
   }
+  for (var containerName in containers){
+    containers[containerName].destroy();
+  }
   skyboxHandler.reset();
   collisionCallbackRequests = new Map();
   particleCollisionCallbackRequests = new Object();
@@ -236,6 +249,7 @@ StateLoader.prototype.resetProject = function(){
   clickableAddedTexts = new Object();
   clickableAddedTexts2D = new Object();
   clickableSprites = new Object();
+  clickableContainers = new Object();
   physicsTests = new Object();
   wallCollections = new Object();
   texturePacks = new Object();
@@ -254,7 +268,7 @@ StateLoader.prototype.resetProject = function(){
   muzzleFlashes = new Object();
   lightnings = new Object();
   sprites = new Object();
-  clickableSprites = new Object();
+  containers = new Object();
   webglCallbackHandler = new WebGLCallbackHandler();
   textureAtlasHandler.dispose();
   textureAtlasHandler = new TextureAtlasHandler();

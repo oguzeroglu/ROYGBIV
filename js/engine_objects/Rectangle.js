@@ -71,24 +71,36 @@ Rectangle.prototype.handlePositionUniform = function(thicknessOffset){
   positions[22].y = this.y;
   positions[23].x = this.x - tox;
   positions[23].y = this.y;
-
 }
-Rectangle.prototype.updateMesh = function(thicknessOffset){
-  if (isDeployment){
+
+Rectangle.prototype.getGeometry = function(){
+  var geom = geometryCache["RECTANGLE_GEOMETRY"];
+  if (geom){
+    return geom;
+  }
+  geom = new THREE.BufferGeometry();
+  var rectangleIndices = new Float32Array(24);
+  for (var i = 0; i<24; i++){
+    rectangleIndices[i] = i;
+  }
+  var indicesBufferAttribute = new THREE.BufferAttribute(rectangleIndices, 1);
+  indicesBufferAttribute.setDynamic(false);
+  geom.addAttribute('rectangleIndex', indicesBufferAttribute);
+  geom.setDrawRange(0, 24);
+  geometryCache["RECTANGLE_GEOMETRY"] = geom;
+  return geom;
+}
+
+Rectangle.prototype.updateMesh = function(thicknessOffset, force){
+  if (isDeployment && !force){
     return;
   }
   if (!this.mesh){
-    this.geometry = new THREE.BufferGeometry();
-    var rectangleIndices = new Float32Array(24);
+    this.geometry = this.getGeometry();
     var positions = [];
     for (var i = 0; i<24; i++){
-      rectangleIndices[i] = i;
       positions.push(new THREE.Vector2());
     }
-    var indicesBufferAttribute = new THREE.BufferAttribute(rectangleIndices, 1);
-    indicesBufferAttribute.setDynamic(false);
-    this.geometry.addAttribute('rectangleIndex', indicesBufferAttribute);
-    this.geometry.setDrawRange(0, 24);
     this.material = new THREE.RawShaderMaterial({
       vertexShader: ShaderContent.rectangleVertexShader,
       fragmentShader: ShaderContent.rectangleFragmentShader,
@@ -104,6 +116,7 @@ Rectangle.prototype.updateMesh = function(thicknessOffset){
     this.mesh.frustumCulled = false;
   }
   this.handlePositionUniform(thicknessOffset);
+  this.thicknessOffset = thicknessOffset;
 }
 Rectangle.prototype.fits = function(texture){
   var tw = texture.image.width;

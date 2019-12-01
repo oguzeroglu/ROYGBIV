@@ -11,7 +11,7 @@ KeyboardEventHandler.prototype.onKeyUp = function(event){
   if (!windowLoaded){
     return;
   }
-  if (cliFocused || omGUIFocused || tmGUIFocused || smGUIFocused || acGUIFocused){
+  if (cliFocused || omGUIFocused || tmGUIFocused || smGUIFocused || cmGUIFocused || acGUIFocused){
     return;
   }
   if (keyCodeToChar[event.keyCode]){
@@ -63,7 +63,7 @@ KeyboardEventHandler.prototype.onKeyDown = function(event){
   if (!windowLoaded){
     return;
   }
-  if (cliFocused || omGUIFocused || tmGUIFocused || smGUIFocused || acGUIFocused){
+  if (cliFocused || omGUIFocused || tmGUIFocused || smGUIFocused || cmGUIFocused || acGUIFocused){
     return;
   }
   if (keyCodeToChar[event.keyCode]){
@@ -136,6 +136,9 @@ KeyboardEventHandler.prototype.activateGridSelectionMode = function(){
   for (var spriteName in sceneHandler.getSprites()){
     sprites[spriteName].mesh.visible = false;
   }
+  for (var containerName in sceneHandler.getContainers()){
+    containers[containerName].rectangle.mesh.visible = false;
+  }
   raycasterFactory.onShiftPress(true);
 }
 
@@ -151,6 +154,9 @@ KeyboardEventHandler.prototype.deactivateGridSelectionMode = function(){
   }
   for (var spriteName in sceneHandler.getSprites()){
     sprites[spriteName].mesh.visible = true;
+  }
+  for (var containerName in sceneHandler.getContainers()){
+    containers[containerName].rectangle.mesh.visible = true;
   }
   raycasterFactory.onShiftPress(false);
 }

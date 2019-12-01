@@ -99,6 +99,12 @@ ModeSwitcher.prototype.switchFromDesignToPreview = function(){
     scene.remove(gridSelections[gridName].mesh);
     scene.remove(gridSelections[gridName].dot);
   }
+  for (var containerName in containers){
+    containers[containerName].makeInvisible();
+    if (containers[containerName].hasBorder){
+      containers[containerName].originalBorderColor = containers[containerName].borderColor;
+    }
+  }
   scriptsToRun = new Map();
   scriptsHandler.onModeSwitch();
   for (var markedPointName in sceneHandler.getMarkedPoints()){
@@ -227,6 +233,12 @@ ModeSwitcher.prototype.switchFromDesignToPreview = function(){
     sprites[spriteName].originalColor = sprites[spriteName].mesh.material.uniforms.color.value.getHex();
     sprites[spriteName].originalAlpha = sprites[spriteName].mesh.material.uniforms.alpha.value;
   }
+  for (var containerName in containers){
+    if (containers[containerName].isClickable){
+      clickableContainers[containerName] = containers[containerName];
+      sceneHandler.onClickableContainerAddition(containers[containerName]);
+    }
+  }
   sceneHandler.onSwitchFromDesignToPreview();
   this.commonSwitchFunctions();
   handleViewport();
@@ -280,6 +292,21 @@ ModeSwitcher.prototype.switchFromPreviewToDesign = function(){
   for (var gridName in gridSelections){
     scene.add(gridSelections[gridName].mesh);
     scene.add(gridSelections[gridName].dot);
+  }
+  for (var containerName in containers){
+    containers[containerName].rectangle.mesh.visible = true;
+    if (containers[containerName].hasBorder){
+      containers[containerName].setBorder(containers[containerName].originalBorderColor, containers[containerName].borderThickness);
+      delete containers[containerName].originalBorderColor;
+    }
+    containers[containerName].makeVisible();
+    delete containers[containerName].onClickCallback;
+    delete containers[containerName].mouseOverCallbackFunction;
+    delete containers[containerName].mouseOutCallbackFunction;
+    if (containers[containerName].hasBackground){
+      containers[containerName].setBackground(containers[containerName].backgroundColor, containers[containerName].backgroundAlpha, containers[containerName].backgroundTextureName);
+      containers[containerName].backgroundSprite.mesh.visible = true;
+    }
   }
   for (var textName in sceneHandler.getAddedTexts()){
     var addedText = addedTexts[textName];
@@ -431,6 +458,7 @@ ModeSwitcher.prototype.switchFromPreviewToDesign = function(){
   clickableAddedTexts = new Object();
   clickableAddedTexts2D = new Object();
   clickableSprites = new Object();
+  clickableContainers = new Object();
   sceneHandler.onSwitchFromPreviewToDesign();
   this.commonSwitchFunctions();
   for (var txtName in addedTexts){

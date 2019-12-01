@@ -16,7 +16,8 @@
 //  * Animation functions
 //  * Muzzleflash functions
 //  * Lightning functions
-//  * Sprıte functions
+//  * Sprite functions
+//  * Container functions
 //  * Script related functions
 var Roygbiv = function(){
   this.functionNames = [
@@ -216,7 +217,21 @@ var Roygbiv = function(){
     "setSpriteRotationAngle",
     "enableSpriteDragging",
     "disableSpriteDragging",
-    "degreeToRadian"
+    "degreeToRadian",
+    "getContainer",
+    "onContainerClick",
+    "removeContainerClickListener",
+    "onContainerMouseOver",
+    "removeContainerMouseOverListener",
+    "onContainerMouseOut",
+    "removeContainerMouseOutListener",
+    "hideContainerBorder",
+    "showContainerBorder",
+    "setContainerBorderColor",
+    "setContainerBackgroundColor",
+    "setContainerBackgroundAlpha",
+    "hideContainerBackground",
+    "showContainerBackground"
   ];
 
   this.globals = new Object();
@@ -603,6 +618,20 @@ Roygbiv.prototype.getSprite = function(spriteName){
   if (sprite){
     preConditions.checkIfSpriteInsideActiveScene(ROYGBIV.getSprite, sprite);
     return sprite;
+  }
+  return 0;
+}
+
+// Returns a container or 0 if container does not exist.
+Roygbiv.prototype.getContainer = function(containerName){
+  if (mode == 0){
+    return;
+  }
+  preConditions.checkIfDefined(ROYGBIV.getContainer, preConditions.containerName, containerName);
+  var container = containers[containerName];
+  if (container){
+    preConditions.checkIfContainerInsideActiveScene(ROYGBIV.getContainer, container);
+    return container;
   }
   return 0;
 }
@@ -2191,6 +2220,93 @@ Roygbiv.prototype.removeSpriteDraggingListener = function(sprite){
   sprite.draggingCallback = noop;
 }
 
+// Sets a click listener for a container. The callbackFunction is executed
+// when the container is clicked.
+Roygbiv.prototype.onContainerClick = function(container, callbackFunction){
+  if (mode == 0){
+    return;
+  }
+  preConditions.checkIfDefined(ROYGBIV.onContainerClick, preConditions.container, container);
+  preConditions.checkIfDefined(ROYGBIV.onContainerClick, preConditions.callbackFunction, callbackFunction);
+  preConditions.checkIfContainer(ROYGBIV.onContainerClick, container);
+  preConditions.checkIfFunctionOnlyIfExists(ROYGBIV.onContainerClick, preConditions.callbackFunction, callbackFunction);
+  preConditions.checkIfContainerClickable(ROYGBIV.onContainerClick, container);
+  preConditions.checkIfContainerInsideActiveScene(ROYGBIV.onContainerClick, container);
+  container.onClickCallback = callbackFunction;
+  objectsWithOnClickListeners.set(container.name, container);
+}
+
+// Removes the click listener of a container.
+Roygbiv.prototype.removeContainerClickListener = function(container){
+  if (mode == 0){
+    return;
+  }
+  preConditions.checkIfDefined(ROYGBIV.removeContainerClickListener, preConditions.container, container);
+  preConditions.checkIfContainer(ROYGBIV.removeContainerClickListener, container);
+  preConditions.checkIfContainerClickable(ROYGBIV.removeContainerClickListener, container);
+  preConditions.checkIfContainerInsideActiveScene(ROYGBIV.removeContainerClickListener, container);
+  container.onClickCallback = noop;
+  objectsWithOnClickListeners.delete(container.name);
+}
+
+// Sets a mouse over listener for a container. The callbackFunction is executed
+// when the mouse is moved over a container.
+Roygbiv.prototype.onContainerMouseOver = function(container, callbackFunction){
+  if (mode == 0){
+    return;
+  }
+  preConditions.checkIfDefined(ROYGBIV.onContainerMouseOver, preConditions.container, container);
+  preConditions.checkIfDefined(ROYGBIV.onContainerMouseOver, preConditions.callbackFunction, callbackFunction);
+  preConditions.checkIfContainer(ROYGBIV.onContainerMouseOver, container);
+  preConditions.checkIfFunctionOnlyIfExists(ROYGBIV.onContainerMouseOver, preConditions.callbackFunction, callbackFunction);
+  preConditions.checkIfContainerClickable(ROYGBIV.onContainerMouseOver, container);
+  preConditions.checkIfContainerInsideActiveScene(ROYGBIV.onContainerMouseOver, container);
+  container.mouseOverCallbackFunction = callbackFunction;
+  objectsWithMouseOverListeners.set(container.name, container);
+}
+
+// Removes the mouse over listener for a container.
+Roygbiv.prototype.removeContainerMouseOverListener = function(container){
+  if (mode == 0){
+    return;
+  }
+  preConditions.checkIfDefined(ROYGBIV.removeContainerMouseOverListener, preConditions.container, container);
+  preConditions.checkIfContainer(ROYGBIV.removeContainerMouseOverListener, container);
+  preConditions.checkIfContainerClickable(ROYGBIV.removeContainerMouseOverListener, container);
+  preConditions.checkIfContainerInsideActiveScene(ROYGBIV.removeContainerMouseOverListener, container);
+  container.mouseOverCallbackFunction = noop;
+  objectsWithMouseOverListeners.delete(container.name);
+}
+
+// Sets a mouse out listener for a container. The callbackFunction is executed
+// when the mouse is moved out from a container.
+Roygbiv.prototype.onContainerMouseOut = function(container, callbackFunction){
+  if (mode == 0){
+    return;
+  }
+  preConditions.checkIfDefined(ROYGBIV.onContainerMouseOut, preConditions.container, container);
+  preConditions.checkIfDefined(ROYGBIV.onContainerMouseOut, preConditions.callbackFunction, callbackFunction);
+  preConditions.checkIfContainer(ROYGBIV.onContainerMouseOut, container);
+  preConditions.checkIfFunctionOnlyIfExists(ROYGBIV.onContainerMouseOut, preConditions.callbackFunction, callbackFunction);
+  preConditions.checkIfContainerClickable(ROYGBIV.onContainerMouseOut, container);
+  preConditions.checkIfContainerInsideActiveScene(ROYGBIV.onContainerMouseOut, container);
+  container.mouseOutCallbackFunction = callbackFunction;
+  objectsWithMouseOutListeners.set(container.name, container);
+}
+
+// Removes the mouse out listener for a container.
+Roygbiv.prototype.removeContainerMouseOutListener = function(container){
+  if (mode == 0){
+    return;
+  }
+  preConditions.checkIfDefined(ROYGBIV.removeContainerMouseOutListener, preConditions.container, container);
+  preConditions.checkIfContainer(ROYGBIV.removeContainerMouseOutListener, container);
+  preConditions.checkIfContainerClickable(ROYGBIV.removeContainerMouseOutListener, container);
+  preConditions.checkIfContainerInsideActiveScene(ROYGBIV.removeContainerMouseOutListener, container);
+  container.mouseOutCallbackFunction = noop;
+  objectsWithMouseOutListeners.delete(container.name);
+}
+
 // TEXT FUNCTIONS **************************************************************
 
 // Sets a text to a text object.
@@ -2204,6 +2320,9 @@ Roygbiv.prototype.setText = function(textObject, text){
   preConditions.checkIfString(ROYGBIV.setText, preConditions.text, text);
   preConditions.checkIfTextInsideActiveScene(ROYGBIV.setText, textObject);
   textObject.setText(text, true);
+  if (textObject.containerParent){
+    textObject.containerParent.insertAddedText(textObject);
+  }
 }
 
 // Sets the color of a text. colorName can be a color name like red or an hex string
@@ -2247,6 +2366,7 @@ Roygbiv.prototype.setTextPosition = function(text, x, y, z){
   preConditions.checkIfNumber(ROYGBIV.setTextPosition, preConditions.y, y);
   preConditions.checkIfNumberOnlyIfExists(ROYGBIV.setTextPosition, preConditions.z, z);
   preConditions.checkIfTextInsideActiveScene(ROYGBIV.setTextPosition, text);
+  preConditions.checkIfTextContained(ROYGBIV.setTextPosition, text);
   text.setPosition(x, y, z);
 }
 
@@ -2837,6 +2957,7 @@ Roygbiv.prototype.setSpriteMargin = function(sprite, marginPercentX, marginPerce
   preConditions.checkIfNumber(ROYGBIV.setSpriteMargin, preConditions.marginPercentX, marginPercentX);
   preConditions.checkIfNumber(ROYGBIV.setSpriteMargin, preConditions.marginPercentY, marginPercentY);
   preConditions.checkIfSpriteInsideActiveScene(ROYGBIV.setSpriteMargin, sprite);
+  preConditions.checkIfSpriteContained(ROYGBIV.setSpriteMargin, sprite);
   sprite.set2DCoordinates(marginPercentX, marginPercentY);
 }
 
@@ -2850,6 +2971,7 @@ Roygbiv.prototype.setSpriteRotationAngle = function(sprite, angle){
   preConditions.checkIfSprite(ROYGBIV.setSpriteRotationAngle, preConditions.sprite, sprite);
   preConditions.checkIfSpriteInsideActiveScene(ROYGBIV.setSpriteRotationAngle, sprite);
   preConditions.checkIfNumber(ROYGBIV.setSpriteRotationAngle, preConditions.angle, angle);
+  preConditions.checkIfSpriteContained(ROYGBIV.setSpriteRotationAngle, sprite);
   sprite.setRotation(angle);
 }
 
@@ -2875,6 +2997,96 @@ Roygbiv.prototype.disableSpriteDragging = function(sprite){
   preConditions.checkIfSprite(ROYGBIV.disableSpriteDragging, preConditions.sprite, sprite);
   preConditions.checkIfSpriteDraggable(ROYGBIV.disableSpriteDragging, sprite);
   sprite.draggingDisabled = true;
+}
+
+// CONTAINER FUNCTIONS *********************************************************
+
+// Hides the border of a container.
+Roygbiv.prototype.hideContainerBorder = function(container){
+  if (mode == 0){
+    return;
+  }
+  preConditions.checkIfDefined(ROYGBIV.hideContainerBorder, preConditions.container, container);
+  preConditions.checkIfContainer(ROYGBIV.hideContainerBorder, container);
+  preConditions.checkIfContainerInsideActiveScene(ROYGBIV.hideContainerBorder, container);
+  preConditions.checkIfContainerHasBorder(ROYGBIV.hideContainerBorder, container);
+  container.rectangle.mesh.visible = false;
+}
+
+// Shows the border of a container.
+Roygbiv.prototype.showContainerBorder = function(container){
+  if (mode == 0){
+    return;
+  }
+  preConditions.checkIfDefined(ROYGBIV.showContainerBorder, preConditions.container, container);
+  preConditions.checkIfContainer(ROYGBIV.showContainerBorder, container);
+  preConditions.checkIfContainerInsideActiveScene(ROYGBIV.showContainerBorder, container);
+  preConditions.checkIfContainerHasBorder(ROYGBIV.showContainerBorder, container);
+  container.rectangle.mesh.visible = true;
+}
+
+// Sets the border color of a container.
+Roygbiv.prototype.setContainerBorderColor = function(container, colorName){
+  if (mode == 0){
+    return;
+  }
+  preConditions.checkIfDefined(ROYGBIV.setContainerBorderColor, preConditions.container, container);
+  preConditions.checkIfDefined(ROYGBIV.setContainerBorderColor, preConditions.colorName, colorName);
+  preConditions.checkIfContainer(ROYGBIV.setContainerBorderColor, container);
+  preConditions.checkIfContainerInsideActiveScene(ROYGBIV.setContainerBorderColor, container);
+  preConditions.checkIfContainerHasBorder(ROYGBIV.setContainerBorderColor, container);
+  container.rectangle.mesh.material.uniforms.color.value.set(colorName);
+}
+
+// Sets the background color of a container.
+Roygbiv.prototype.setContainerBackgroundColor = function(container, colorName){
+  if (mode == 0){
+    return;
+  }
+  preConditions.checkIfDefined(ROYGBIV.setContainerBackgroundColor, preConditions.container, container);
+  preConditions.checkIfDefined(ROYGBIV.setContainerBackgroundColor, preConditions.colorName, colorName);
+  preConditions.checkIfContainer(ROYGBIV.setContainerBackgroundColor, container);
+  preConditions.checkIfContainerInsideActiveScene(ROYGBIV.setContainerBackgroundColor, container);
+  preConditions.checkIfContainerHasBackground(ROYGBIV.setContainerBackgroundColor, container);
+  container.backgroundSprite.setColor(colorName);
+}
+
+// Sets the alpha value of the background of a container.
+Roygbiv.prototype.setContainerBackgroundAlpha = function(container, alpha){
+  if (mode == 0){
+    return;
+  }
+  preConditions.checkIfDefined(ROYGBIV.setContainerBackgroundAlpha, preConditions.container, container);
+  preConditions.checkIfDefined(ROYGBIV.setContainerBackgroundAlpha, preConditions.colorName, alpha);
+  preConditions.checkIfContainer(ROYGBIV.setContainerBackgroundAlpha, container);
+  preConditions.checkIfNumber(ROYGBIV.setContainerBackgroundAlpha, preConditions.alpha, alpha);
+  preConditions.checkIfContainerInsideActiveScene(ROYGBIV.setContainerBackgroundAlpha, container);
+  preConditions.checkIfContainerHasBackground(ROYGBIV.setContainerBackgroundAlpha, container);
+  container.backgroundSprite.setAlpha(alpha);
+}
+
+// Hides the background of a container.
+Roygbiv.prototype.hideContainerBackground = function(container){
+  if (mode == 0){
+    return;
+  }
+  preConditions.checkIfDefined(ROYGBIV.hideContainerBackground, preConditions.container, container);
+  preConditions.checkIfContainer(ROYGBIV.hideContainerBackground, container);
+  preConditions.checkIfContainerInsideActiveScene(ROYGBIV.hideContainerBackground, container);
+  preConditions.checkIfContainerHasBackground(ROYGBIV.hideContainerBackground, container);
+  container.backgroundSprite.mesh.visible = false;
+}
+
+// Shows the background of a container.
+Roygbiv.prototype.showContainerBackground = function(container){
+  if (mode == 0){
+    return;
+  }
+  preConditions.checkIfDefined(ROYGBIV.showContainerBackground, preConditions.container, container);
+  preConditions.checkIfContainer(ROYGBIV.showContainerBackground, container);
+  preConditions.checkIfContainerInsideActiveScene(ROYGBIV.showContainerBackground, container);
+  preConditions.checkIfContainerHasBackground(ROYGBIV.showContainerBackground, container);
+  container.backgroundSprite.mesh.visible = true;
 }
 
 // UTILITY FUNCTIONS ***********************************************************

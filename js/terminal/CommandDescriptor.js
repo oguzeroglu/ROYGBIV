@@ -203,7 +203,15 @@ var CommandDescriptor = function(){
       1, //destroySprite
       1, //selectSprite
       0, //printSprites
-      1 //setBackgroundColor
+      1, //setBackgroundColor
+      1, //newContainer
+      1, //selectContainer
+      2, //addToContainer
+      1, //emptyContainer
+      4, //alignContainers
+      1, //unalignContainer
+      1, //destroyContainer
+      0 //printContainers
   ];
 
   this.commandArgumentsExpectedExplanation = [
@@ -409,7 +417,15 @@ var CommandDescriptor = function(){
     "destroySprite spriteName",
     "selectSprite spriteName",
     "printSprites",
-    "setBackgroundColor colorName"
+    "setBackgroundColor colorName",
+    "newContainer containerName",
+    "selectContainer containerName",
+    "addToContainer containerName textOrSpriteName",
+    "emptyContainer containerName",
+    "alignContainers parentContainer childContainer alignmentType margin",
+    "unalignContainer containerName",
+    "destroyContainer containerName",
+    "printContainers"
   ];
 
   this.commands = [
@@ -615,7 +631,15 @@ var CommandDescriptor = function(){
     "destroySprite",
     "selectSprite",
     "printSprites",
-    "setBackgroundColor"
+    "setBackgroundColor",
+    "newContainer",
+    "selectContainer",
+    "addToContainer",
+    "emptyContainer",
+    "alignContainers",
+    "unalignContainer",
+    "destroyContainer",
+    "printContainers"
   ];
 
   this.commandInfo = [
@@ -821,7 +845,15 @@ var CommandDescriptor = function(){
     "destroySprite: Destroys a sprite.",
     "selectSprite: Selects a sprite.",
     "printSprites: Prints created sprites.",
-    "setBackgroundColor: Sets the background color of the current scene."
+    "setBackgroundColor: Sets the background color of the current scene.",
+    "newContainer: Creates a new 2D container.",
+    "selectContainer: Selects a 2D container.",
+    "addToContainer: Inserts a 2D added text or sprite into a 2D container.",
+    "emptyContainer: Removes inserted object from a container.",
+    "alignContainers: Aligns child container to parent container given margin.",
+    "unalignContainer: Unaligns an aligned container.",
+    "destroyContainer: Destroys a container.",
+    "printContainers: Prints created containers."
   ];
 
   this.keyboardInfo = [
@@ -960,6 +992,9 @@ var CommandDescriptor = function(){
   this.SPRITE_NAME                =   38;
   this.OBJECT_OR_SPRITE_NAME      =   39;
   this.OBJECT_TEXT_SPRITE_NAME    =   40;
+  this.CONTAINER_NAME             =   41;
+  this.SPRITE_OR_2D_TEXT_NAME     =   42;
+  this.CONTAINER_ALIGNMENT_TYPE   =   43;
 
   // newGridSystem
   this.newGridSystem = new Object();
@@ -1510,6 +1545,46 @@ var CommandDescriptor = function(){
   this.setBackgroundColor = new Object();
   this.setBackgroundColor.types = [];
   this.setBackgroundColor.types.push(this.COLOR); //colorName
+
+  // newContainer
+  this.newContainer = new Object();
+  this.newContainer.types = [];
+  this.newContainer.types.push(this.UNKNOWN_INDICATOR); //containerName
+
+  // selectContainer
+  this.selectContainer = new Object();
+  this.selectContainer.types = [];
+  this.selectContainer.types.push(this.CONTAINER_NAME); //containerName
+
+  // addToContainer
+  this.addToContainer = new Object();
+  this.addToContainer.types = [];
+  this.addToContainer.types.push(this.CONTAINER_NAME); //containerName
+  this.addToContainer.types.push(this.SPRITE_OR_2D_TEXT_NAME); //textOrSpriteName
+
+  // emptyContainer
+  this.emptyContainer = new Object();
+  this.emptyContainer.types = [];
+  this.emptyContainer.types.push(this.CONTAINER_NAME); //containerName
+
+  // alignContainers
+  this.alignContainers = new Object();
+  this.alignContainers.types = [];
+  this.alignContainers.types.push(this.CONTAINER_NAME); //parentContainer
+  this.alignContainers.types.push(this.CONTAINER_NAME); //childContainer
+  this.alignContainers.types.push(this.CONTAINER_ALIGNMENT_TYPE); //alignmentType
+  this.alignContainers.types.push(this.UNKNOWN_INDICATOR); //margin
+
+  // unalignContainer
+  this.unalignContainer = new Object();
+  this.unalignContainer.types = [];
+  this.unalignContainer.types.push(this.CONTAINER_NAME); //containerName
+
+  // destroyContainer
+  this.destroyContainer = new Object();
+  this.destroyContainer.types = [];
+  this.destroyContainer.types.push(this.CONTAINER_NAME); //containerName
+
 };
 
 CommandDescriptor.prototype.test = function(){

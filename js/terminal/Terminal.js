@@ -760,6 +760,42 @@ Terminal.prototype.autocomplete = function(command){
 				}
 				helpString = "[Objects]: ";
 			break;
+			case commandDescriptor.CONTAINER_NAME:
+				for (var containerName in sceneHandler.getContainers()){
+					if (containerName.toLowerCase().startsWith(curEntry.toLowerCase())){
+						possibilities.push(containerName);
+					}
+				}
+				helpString = "[Containers]: ";
+			break;
+			case commandDescriptor.SPRITE_OR_2D_TEXT_NAME:
+				for (var textName in sceneHandler.getAddedTexts2D()){
+					if (textName.toLowerCase().startsWith(curEntry.toLowerCase())){
+						possibilities.push(textName);
+					}
+				}
+				for (var spriteName in sceneHandler.getSprites()){
+					if (spriteName.toLowerCase().startsWith(curEntry.toLowerCase())){
+						possibilities.push(spriteName);
+					}
+				}
+				helpString = "[2D objects]: ";
+			break;
+			case commandDescriptor.CONTAINER_ALIGNMENT_TYPE:
+				if ("container_alignment_type_top".startsWith(curEntry.toLowerCase())){
+					possibilities.push("CONTAINER_ALIGNMENT_TYPE_TOP");
+				}
+				if ("container_alignment_type_bottom".startsWith(curEntry.toLowerCase())){
+					possibilities.push("CONTAINER_ALIGNMENT_TYPE_BOTTOM");
+				}
+				if ("container_alignment_type_right".startsWith(curEntry.toLowerCase())){
+					possibilities.push("CONTAINER_ALIGNMENT_TYPE_RIGHT");
+				}
+				if ("container_alignment_type_left".startsWith(curEntry.toLowerCase())){
+					possibilities.push("CONTAINER_ALIGNMENT_TYPE_LEFT");
+				}
+				helpString = "[Alignment type]: ";
+			break;
 		}
 
 		//  **********************************************************

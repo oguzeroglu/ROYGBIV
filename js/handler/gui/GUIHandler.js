@@ -69,7 +69,21 @@ var GUIHandler = function(){
     "Draggable": false,
     "Crop X": 0.01,
     "Crop Y": 0.01
-  }
+  };
+  this.containerManipulationParameters = {
+    "Container": "containerName",
+    "Center X": 50,
+    "Center Y": 50,
+    "Width": 10,
+    "Height": 10,
+    "Padding X": 0,
+    "Padding Y": 0,
+    "Square": false,
+    "Clickable": false,
+    "Has border": false,
+    "Border color": "#ffffff",
+    "Border thickness": 0.005
+  };
   this.bloomParameters = {
     "Threshold": 0.0,
     "Active": false,
@@ -117,7 +131,8 @@ var GUIHandler = function(){
   this.guiTypes = {
     TEXT: 0, OBJECT: 1, BLOOM: 2, FPS_WEAPON_ALIGNMENT: 3, SHADER_PRECISION: 4, PARTICLE_SYSTEM: 5,
     WORKER_STATUS: 6, MUZZLE_FLASH: 7, TEXTURE_PACK: 8, SKYBOX_CREATION: 9, FOG: 10, FONT: 11,
-    CROSSHAIR_CREATION: 12, SCRIPTS: 13, ANIMATION_CREATION: 14, AREA: 15, LIGHTNING: 16, SPRITE: 17
+    CROSSHAIR_CREATION: 12, SCRIPTS: 13, ANIMATION_CREATION: 14, AREA: 15, LIGHTNING: 16, SPRITE: 17,
+    CONTAINER: 18
   };
   this.blockingGUITypes = [
     this.guiTypes.FPS_WEAPON_ALIGNMENT, this.guiTypes.PARTICLE_SYSTEM, this.guiTypes.MUZZLE_FLASH,
@@ -193,6 +208,47 @@ GUIHandler.prototype.isOneOfBlockingGUIActive = function(){
   return false;
 }
 
+GUIHandler.prototype.afterContainerSelection = function(){
+  if (mode != 0){
+    return;
+  }
+  var curSelection = selectionHandler.getSelectedObject();
+  if (curSelection && curSelection.isContainer){
+    guiHandler.show(guiHandler.guiTypes.CONTAINER);
+    guiHandler.enableAllCMControllers();
+    guiHandler.containerManipulationParameters["Container"] = curSelection.name;
+    guiHandler.containerManipulationParameters["Center X"] = curSelection.centerXPercent;
+    guiHandler.containerManipulationParameters["Center Y"] = curSelection.centerYPercent;
+    guiHandler.containerManipulationParameters["Width"] = curSelection.widthPercent * curSelection.scaleWidth;
+    guiHandler.containerManipulationParameters["Height"] = curSelection.heightPercent * curSelection.scaleHeight;
+    guiHandler.containerManipulationParameters["Square"] = !!curSelection.isSquare;
+    guiHandler.containerManipulationParameters["Padding X"] = curSelection.paddingXContainerSpace;
+    guiHandler.containerManipulationParameters["Padding Y"] = curSelection.paddingYContainerSpace;
+    guiHandler.containerManipulationParameters["Clickable"] = !!curSelection.isClickable;
+    guiHandler.containerManipulationParameters["Has border"] = !!curSelection.hasBorder;
+    guiHandler.containerManipulationParameters["Border color"] = curSelection.borderColor? curSelection.borderColor: "#ffffff";
+    guiHandler.containerManipulationParameters["Border thickness"] = curSelection.borderThickness? curSelection.borderThickness: 0.005;
+    if (curSelection.alignedParent){
+      var alignedLeft = curSelection.alignedParent.isChildAlignedWithType(curSelection, CONTAINER_ALIGNMENT_TYPE_LEFT);
+      var alignedRight = curSelection.alignedParent.isChildAlignedWithType(curSelection, CONTAINER_ALIGNMENT_TYPE_RIGHT);
+      var alignedBottom = curSelection.alignedParent.isChildAlignedWithType(curSelection, CONTAINER_ALIGNMENT_TYPE_BOTTOM);
+      var alignedTop = curSelection.alignedParent.isChildAlignedWithType(curSelection, CONTAINER_ALIGNMENT_TYPE_TOP);
+      if (alignedLeft || alignedRight){
+        guiHandler.disableController(guiHandler.containerManipulationCenterXController);
+      }
+      if (alignedTop || alignedBottom){
+        guiHandler.disableController(guiHandler.containerManipulationCenterYController);
+      }
+    }
+    if (!curSelection.hasBorder){
+      guiHandler.disableController(guiHandler.containerManipulationBorderColorController);
+      guiHandler.disableController(guiHandler.containerManipulationBorderThicknessController);
+    }
+  }else{
+    guiHandler.hide(guiHandler.guiTypes.CONTAINER);
+  }
+}
+
 GUIHandler.prototype.afterSpriteSelection = function(){
   if (mode != 0){
     return;
@@ -239,9 +295,22 @@ GUIHandler.prototype.afterSpriteSelection = function(){
     }else{
       guiHandler.disableController(guiHandler.spriteManipulationFixedHeightController);
     }
+    if (curSelection.containerParent){
+      guiHandler.disableController(guiHandler.spriteManipulationMarginModeController);
+      guiHandler.disableController(guiHandler.spriteManipulationMarginXController);
+      guiHandler.disableController(guiHandler.spriteManipulationMarginYController);
+      guiHandler.disableController(guiHandler.spriteManipulationScaleXController);
+      guiHandler.disableController(guiHandler.spriteManipulationScaleYController);
+      guiHandler.disableController(guiHandler.spriteManipulationHasFixedWidthController);
+      guiHandler.disableController(guiHandler.spriteManipulationHasFixedHeightController);
+      guiHandler.disableController(guiHandler.spriteManipulationFixedWidthController);
+      guiHandler.disableController(guiHandler.spriteManipulationFixedHeightController);
+      guiHandler.disableController(guiHandler.spriteManipulationRotationController);
+    }
   }else{
     guiHandler.hide(guiHandler.guiTypes.SPRITE);
   }
+  guiHandler.afterContainerSelection();
 }
 
 GUIHandler.prototype.afterTextSelection = function(){
@@ -305,6 +374,12 @@ GUIHandler.prototype.afterTextSelection = function(){
       guiHandler.disableController(guiHandler.textManipulationMaxHeightPercentController);
     }else{
       guiHandler.disableController(guiHandler.textManipulationAffectedByFogController);
+      if (curSelection.containerParent){
+        guiHandler.disableController(guiHandler.textManipulationMaxWidthPercentController);
+        guiHandler.disableController(guiHandler.textManipulationMaxHeightPercentController);
+        guiHandler.disableController(guiHandler.textManipulationMarginXController);
+        guiHandler.disableController(guiHandler.textManipulationMarginYController);
+      }
     }
     if (curSelection.hasCustomPrecision){
       switch(curSelection.customPrecision){
@@ -581,6 +656,21 @@ GUIHandler.prototype.enableController = function(controller){
   controller.domElement.style.opacity = 1;
 }
 
+GUIHandler.prototype.enableAllCMControllers = function(){
+  guiHandler.enableController(guiHandler.containerManipulationNameController);
+  guiHandler.enableController(guiHandler.containerManipulationCenterXController);
+  guiHandler.enableController(guiHandler.containerManipulationCenterYController);
+  guiHandler.enableController(guiHandler.containerManipulationWidthController);
+  guiHandler.enableController(guiHandler.containerManipulationHeightController);
+  guiHandler.enableController(guiHandler.containerManipulationSquareController);
+  guiHandler.enableController(guiHandler.containerManipulationPaddingXController);
+  guiHandler.enableController(guiHandler.containerManipulationPaddingYController);
+  guiHandler.enableController(guiHandler.containerManipulationClickableController);
+  guiHandler.enableController(guiHandler.containerManipulationHasBorderController);
+  guiHandler.enableController(guiHandler.containerManipulationBorderColorController);
+  guiHandler.enableController(guiHandler.containerManipulationBorderThicknessController);
+}
+
 GUIHandler.prototype.enableAllTMControllers = function(){
   guiHandler.enableController(guiHandler.textManipulationTextNameController);
   guiHandler.enableController(guiHandler.textManipulationContentController);
@@ -671,6 +761,11 @@ GUIHandler.prototype.show = function(guiType){
         this.initializeSpriteManipulationGUI();
       }
     return;
+    case this.guiTypes.CONTAINER:
+      if (!this.datGuiContainerManipulation){
+        this.initializeContainerManipulationGUI();
+      }
+    return;
     case this.guiTypes.BLOOM:
       if (!this.datGuiBloom){
         this.initializeBloomGUI();
@@ -734,6 +829,12 @@ GUIHandler.prototype.hide = function(guiType){
       if (this.datGuiSpriteManipulation){
         this.destroyGUI(this.datGuiSpriteManipulation);
         this.datGuiSpriteManipulation = 0;
+      }
+    return;
+    case this.guiTypes.CONTAINER:
+      if (this.datGuiContainerManipulation){
+        this.destroyGUI(this.datGuiContainerManipulation);
+        this.datGuiContainerManipulation = 0;
       }
     return;
     case this.guiTypes.BLOOM:
@@ -1237,6 +1338,75 @@ GUIHandler.prototype.initializeObjectManipulationGUI = function(){
   }).listen();
 }
 
+GUIHandler.prototype.initializeContainerManipulationGUI = function(){
+  guiHandler.datGuiContainerManipulation = new dat.GUI({hideable: false});
+  guiHandler.datGuiContainerManipulation.domElement.addEventListener("mousedown", function(e){
+    cmGUIFocused = true;
+  });
+  guiHandler.containerManipulationNameController = guiHandler.datGuiContainerManipulation.add(guiHandler.containerManipulationParameters, "Container").listen();
+  guiHandler.containerManipulationCenterXController = guiHandler.datGuiContainerManipulation.add(guiHandler.containerManipulationParameters, "Center X").min(0).max(100).step(0.1).onChange(function(val){
+    selectionHandler.getSelectedObject().setCenter(val, selectionHandler.getSelectedObject().centerYPercent);
+  }).listen();
+  guiHandler.containerManipulationCenterYController = guiHandler.datGuiContainerManipulation.add(guiHandler.containerManipulationParameters, "Center Y").min(0).max(100).step(0.1).onChange(function(val){
+    selectionHandler.getSelectedObject().setCenter(selectionHandler.getSelectedObject().centerXPercent, val);
+  }).listen();
+  guiHandler.containerManipulationWidthController = guiHandler.datGuiContainerManipulation.add(guiHandler.containerManipulationParameters, "Width").min(0.1).max(100).step(0.1).onChange(function(val){
+    selectionHandler.getSelectedObject().setWidth(val);
+    if (selectionHandler.getSelectedObject().alignedParent){
+      var ary = selectionHandler.getSelectedObject().alignedParent.alignedContainerInfos[selectionHandler.getSelectedObject().name];
+      for (var i = 0; i<ary.length; i++){
+        selectionHandler.getSelectedObject().alignedParent.handleAlignment(ary[i]);
+      }
+    }
+  }).listen();
+  guiHandler.containerManipulationHeightController = guiHandler.datGuiContainerManipulation.add(guiHandler.containerManipulationParameters, "Height").min(0.1).max(100).step(0.1).onChange(function(val){
+    selectionHandler.getSelectedObject().setHeight(val);
+    if (selectionHandler.getSelectedObject().alignedParent){
+      var ary = selectionHandler.getSelectedObject().alignedParent.alignedContainerInfos[selectionHandler.getSelectedObject().name];
+      for (var i = 0; i<ary.length; i++){
+        selectionHandler.getSelectedObject().alignedParent.handleAlignment(ary[i]);
+      }
+    }
+  }).listen();
+  guiHandler.containerManipulationPaddingXController = guiHandler.datGuiContainerManipulation.add(guiHandler.containerManipulationParameters, "Padding X").min(0).max(99.9).step(0.1).onChange(function(val){
+    selectionHandler.getSelectedObject().setPaddingX(val);
+  }).listen();
+  guiHandler.containerManipulationPaddingYController = guiHandler.datGuiContainerManipulation.add(guiHandler.containerManipulationParameters, "Padding Y").min(0).max(99.9).step(0.1).onChange(function(val){
+    selectionHandler.getSelectedObject().setPaddingY(val);
+  }).listen();
+  guiHandler.containerManipulationSquareController = guiHandler.datGuiContainerManipulation.add(guiHandler.containerManipulationParameters, "Square").onChange(function(val){
+    selectionHandler.getSelectedObject().isSquare = val;
+    if (val){
+      selectionHandler.getSelectedObject().makeSquare();
+    }else{
+      selectionHandler.getSelectedObject().setWidth(selectionHandler.getSelectedObject().widthPercent * selectionHandler.getSelectedObject().scaleWidth);
+      selectionHandler.getSelectedObject().setHeight(selectionHandler.getSelectedObject().heightPercent * selectionHandler.getSelectedObject().scaleHeight);
+      selectionHandler.getSelectedObject().scaleWidth = 1;
+      selectionHandler.getSelectedObject().scaleHeight = 1;
+    }
+  }).listen();
+  guiHandler.containerManipulationClickableController = guiHandler.datGuiContainerManipulation.add(guiHandler.containerManipulationParameters, "Clickable").onChange(function(val){
+    selectionHandler.getSelectedObject().isClickable = val;
+  }).listen();
+  guiHandler.containerManipulationHasBorderController = guiHandler.datGuiContainerManipulation.add(guiHandler.containerManipulationParameters, "Has border").onChange(function(val){
+    if (val){
+      selectionHandler.getSelectedObject().setBorder(guiHandler.containerManipulationParameters["Border color"], guiHandler.containerManipulationParameters["Border thickness"]);
+      guiHandler.enableController(guiHandler.containerManipulationBorderColorController);
+      guiHandler.enableController(guiHandler.containerManipulationBorderThicknessController);
+    }else{
+      selectionHandler.getSelectedObject().removeBorder();
+      guiHandler.disableController(guiHandler.containerManipulationBorderColorController);
+      guiHandler.disableController(guiHandler.containerManipulationBorderThicknessController);
+    }
+  }).listen();
+  guiHandler.containerManipulationBorderColorController = guiHandler.datGuiContainerManipulation.addColor(guiHandler.containerManipulationParameters, "Border color").onChange(function(val){
+    selectionHandler.getSelectedObject().setBorder(guiHandler.containerManipulationParameters["Border color"], guiHandler.containerManipulationParameters["Border thickness"]);
+  }).listen();
+  guiHandler.containerManipulationBorderThicknessController = guiHandler.datGuiContainerManipulation.add(guiHandler.containerManipulationParameters, "Border thickness").min(0.001).max(0.1).step(0.0001).onChange(function(val){
+    selectionHandler.getSelectedObject().setBorder(guiHandler.containerManipulationParameters["Border color"], guiHandler.containerManipulationParameters["Border thickness"]);
+  }).listen();
+}
+
 GUIHandler.prototype.initializeSpriteManipulationGUI = function(){
   guiHandler.datGuiSpriteManipulation = new dat.GUI({hideable: false});
   guiHandler.datGuiSpriteManipulation.domElement.addEventListener("mousedown", function(e){
@@ -1286,11 +1456,21 @@ GUIHandler.prototype.initializeSpriteManipulationGUI = function(){
   }).listen();
   guiHandler.spriteManipulationScaleXController = guiHandler.datGuiSpriteManipulation.add(guiHandler.spriteManipulationParameters, "Scale X").min(0.1).max(20).step(0.1).onChange(function(val){
     selectionHandler.getSelectedObject().setScale(val, selectionHandler.getSelectedObject().mesh.material.uniforms.scale.value.y);
+    selectionHandler.getSelectedObject().originalWidth = selectionHandler.getSelectedObject().calculateWidthPercent();
+    selectionHandler.getSelectedObject().originalWidthReference = renderer.getCurrentViewport().z;
+    selectionHandler.getSelectedObject().originalScreenResolution = screenResolution;
   }).listen();
   guiHandler.spriteManipulationScaleYController = guiHandler.datGuiSpriteManipulation.add(guiHandler.spriteManipulationParameters, "Scale Y").min(0.1).max(20).step(0.1).onChange(function(val){
     selectionHandler.getSelectedObject().setScale(selectionHandler.getSelectedObject().mesh.material.uniforms.scale.value.x, val);
+    selectionHandler.getSelectedObject().originalHeight = selectionHandler.getSelectedObject().calculateHeightPercent();
+    selectionHandler.getSelectedObject().originalHeightReference = renderer.getCurrentViewport().w;
+    selectionHandler.getSelectedObject().originalScreenResolution = screenResolution;
   }).listen();
   guiHandler.spriteManipulationHasFixedWidthController = guiHandler.datGuiSpriteManipulation.add(guiHandler.spriteManipulationParameters, "Width fixed").onChange(function(val){
+    if (selectionHandler.getSelectedObject().containerParent){
+      guiHandler.spriteManipulationParameters["Width fixed"] = true;
+      return;
+    }
     if (val){
       selectionHandler.getSelectedObject().fixedWidth = guiHandler.spriteManipulationParameters["Width %"];
       selectionHandler.getSelectedObject().setWidthPercent(selectionHandler.getSelectedObject().fixedWidth);
@@ -1303,12 +1483,22 @@ GUIHandler.prototype.initializeSpriteManipulationGUI = function(){
       guiHandler.disableController(guiHandler.spriteManipulationFixedWidthController);
       guiHandler.enableController(guiHandler.spriteManipulationScaleXController);
     }
+    selectionHandler.getSelectedObject().originalWidth = selectionHandler.getSelectedObject().calculateWidthPercent();
+    selectionHandler.getSelectedObject().originalWidthReference = renderer.getCurrentViewport().z;
+    selectionHandler.getSelectedObject().originalScreenResolution = screenResolution;
   }).listen();
   guiHandler.spriteManipulationFixedWidthController = guiHandler.datGuiSpriteManipulation.add(guiHandler.spriteManipulationParameters, "Width %").min(0.1).max(100).step(0.1).onChange(function(val){
     selectionHandler.getSelectedObject().setWidthPercent(val);
     selectionHandler.getSelectedObject().fixedWidth = val;
+    selectionHandler.getSelectedObject().originalWidth = selectionHandler.getSelectedObject().calculateWidthPercent();
+    selectionHandler.getSelectedObject().originalWidthReference = renderer.getCurrentViewport().z;
+    selectionHandler.getSelectedObject().originalScreenResolution = screenResolution;
   }).listen();
   guiHandler.spriteManipulationHasFixedHeightController = guiHandler.datGuiSpriteManipulation.add(guiHandler.spriteManipulationParameters, "Height fixed").onChange(function(val){
+    if (selectionHandler.getSelectedObject().containerParent){
+      guiHandler.spriteManipulationParameters["Height fixed"] = true;
+      return;
+    }
     if (val){
       selectionHandler.getSelectedObject().fixedHeight = guiHandler.spriteManipulationParameters["Height %"];
       selectionHandler.getSelectedObject().setHeightPercent(selectionHandler.getSelectedObject().fixedHeight);
@@ -1321,10 +1511,16 @@ GUIHandler.prototype.initializeSpriteManipulationGUI = function(){
       guiHandler.disableController(guiHandler.spriteManipulationFixedHeightController);
       guiHandler.enableController(guiHandler.spriteManipulationScaleYController);
     }
+    selectionHandler.getSelectedObject().originalHeight = selectionHandler.getSelectedObject().calculateHeightPercent();
+    selectionHandler.getSelectedObject().originalHeightReference = renderer.getCurrentViewport().w;
+    selectionHandler.getSelectedObject().originalScreenResolution = screenResolution;
   }).listen();
   guiHandler.spriteManipulationFixedHeightController = guiHandler.datGuiSpriteManipulation.add(guiHandler.spriteManipulationParameters, "Height %").min(0.1).max(100).step(0.1).onChange(function(val){
     selectionHandler.getSelectedObject().setHeightPercent(val);
     selectionHandler.getSelectedObject().fixedHeight = val;
+    selectionHandler.getSelectedObject().originalHeight = selectionHandler.getSelectedObject().calculateHeightPercent();
+    selectionHandler.getSelectedObject().originalHeightReference = renderer.getCurrentViewport().w;
+    selectionHandler.getSelectedObject().originalScreenResolution = screenResolution;
   }).listen();
   guiHandler.spriteManipulationRotationController = guiHandler.datGuiSpriteManipulation.add(guiHandler.spriteManipulationParameters, "Rotation").min(0).max(360).step(0.01).onChange(function(val){
     selectionHandler.getSelectedObject().setRotation(val);
@@ -1375,6 +1571,9 @@ GUIHandler.prototype.initializeTextManipulationGUI = function(){
       return;
     }
     addedText.setText(val);
+    if (addedText.containerParent){
+      addedText.containerParent.insertAddedText(addedText);
+    }
   }).listen();
   guiHandler.textManipulationTextColorController = guiHandler.datGuiTextManipulation.addColor(guiHandler.textManipulationParameters, "Text color").onChange(function(val){
     selectionHandler.getSelectedObject().setColor(val);
@@ -1409,14 +1608,23 @@ GUIHandler.prototype.initializeTextManipulationGUI = function(){
     selectionHandler.getSelectedObject().refCharSize= val;
     selectionHandler.getSelectedObject().refInnerHeight = window.innerHeight;
     selectionHandler.getSelectedObject().handleResize();
+    if (selectionHandler.getSelectedObject().containerParent){
+      selectionHandler.getSelectedObject().containerParent.insertAddedText(selectionHandler.getSelectedObject());
+    }
   }).listen();
   guiHandler.textManipulationCharacterMarginController = guiHandler.datGuiTextManipulation.add(guiHandler.textManipulationParameters, "Char margin").min(0.5).max(100).step(0.5).onChange(function(val){
     selectionHandler.getSelectedObject().setMarginBetweenChars(val);
     selectionHandler.getSelectedObject().handleResize();
+    if (selectionHandler.getSelectedObject().containerParent){
+      selectionHandler.getSelectedObject().containerParent.insertAddedText(selectionHandler.getSelectedObject());
+    }
   }).listen();
   guiHandler.textManipulationLineMarginController = guiHandler.datGuiTextManipulation.add(guiHandler.textManipulationParameters, "Line margin").min(0.5).max(100).step(0.5).onChange(function(val){
     selectionHandler.getSelectedObject().setMarginBetweenLines(val);
     selectionHandler.getSelectedObject().handleResize();
+    if (selectionHandler.getSelectedObject().containerParent){
+      selectionHandler.getSelectedObject().containerParent.insertAddedText(selectionHandler.getSelectedObject());
+    }
   }).listen();
   guiHandler.textManipulationClickableController = guiHandler.datGuiTextManipulation.add(guiHandler.textManipulationParameters, "Clickable").onChange(function(val){
     selectionHandler.getSelectedObject().isClickable = val;
@@ -1466,6 +1674,9 @@ GUIHandler.prototype.initializeTextManipulationGUI = function(){
       guiHandler.disableController(guiHandler.textManipulationMaxWidthPercentController);
       guiHandler.disableController(guiHandler.textManipulationMaxHeightPercentController);
       guiHandler.enableController(guiHandler.textManipulationAffectedByFogController);
+      if (selectionHandler.getSelectedObject().containerParent){
+        selectionHandler.getSelectedObject().containerParent.removeAddedText();
+      }
     }
     selectionHandler.getSelectedObject().handleResize();
     var obj = selectionHandler.getSelectedObject();
@@ -1481,6 +1692,9 @@ GUIHandler.prototype.initializeTextManipulationGUI = function(){
       selectionHandler.getSelectedObject().marginMode = MARGIN_MODE_2D_CENTER;
     }
     selectionHandler.getSelectedObject().set2DCoordinates(selectionHandler.getSelectedObject().marginPercentWidth, selectionHandler.getSelectedObject().marginPercentHeight);
+    if (selectionHandler.getSelectedObject().containerParent){
+      selectionHandler.getSelectedObject().containerParent.insertAddedText(selectionHandler.getSelectedObject());
+    }
   }).listen();
   guiHandler.textManipulationMarginXController = guiHandler.datGuiTextManipulation.add(guiHandler.textManipulationParameters, "Margin X").min(0).max(100).step(0.1).onChange(function(val){
     selectionHandler.getSelectedObject().set2DCoordinates(

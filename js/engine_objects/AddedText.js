@@ -570,6 +570,9 @@ AddedText.prototype.handleResize = function(){
         }
       }
     }
+    if (this.rectangle && !(typeof this.rectangle.thicknessOffset == UNDEFINED)){
+      this.rectangle.updateMesh(this.rectangle.thicknessOffset);
+    }
   }
   rayCaster.onAddedTextResize(this);
 }

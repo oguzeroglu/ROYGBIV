@@ -95,6 +95,12 @@ JobHandler.prototype.handle = function(previewModeCommand){
       this.handleDestroySceneCommand();
     }else if (this.splitted[0] == "destroylightning"){
       this.handleDestroyLightningCommand();
+    }else if (this.splitted[0] == "unaligncontainer"){
+      this.handleUnalignContainerCommand();
+    }else if (this.splitted[0] == "emptycontainer"){
+      this.handleEmptyContainerCommand();
+    }else if (this.splitted[0] == "destroycontainer"){
+      this.handleDestroyContainerCommand();
     }
     if (jobHandlerRaycasterRefresh){
       refreshRaycaster(Text.JOB_COMPLETED, true);
@@ -105,6 +111,54 @@ JobHandler.prototype.handle = function(previewModeCommand){
   // because async
   if (this.splitted[0] != "autoConfigureArea".toLowerCase()){
     jobHandlerWorking = false;
+  }
+}
+
+JobHandler.prototype.handleDestroyContainerCommand = function(){
+  var containerNamePrefix = this.splitted[1].split("*")[0];
+  var ctr = 0;
+  for (var containerName in sceneHandler.getContainers()){
+    if (containerName.startsWith(containerNamePrefix)){
+      parseCommand("destroyContainer "+containerName);
+      ctr ++
+    }
+  }
+  if (ctr == 0){
+    terminal.printInfo(Text.NO_CONTAINERS_FOUND);
+  }else{
+    terminal.printInfo(Text.COMMAND_EXECUTED_FOR_X_CONTAINERS.replace(Text.PARAM1, ctr));
+  }
+}
+
+JobHandler.prototype.handleEmptyContainerCommand = function(){
+  var containerNamePrefix = this.splitted[1].split("*")[0];
+  var ctr = 0;
+  for (var containerName in sceneHandler.getContainers()){
+    if (containerName.startsWith(containerNamePrefix)){
+      parseCommand("emptyContainer "+containerName);
+      ctr ++
+    }
+  }
+  if (ctr == 0){
+    terminal.printInfo(Text.NO_CONTAINERS_FOUND);
+  }else{
+    terminal.printInfo(Text.COMMAND_EXECUTED_FOR_X_CONTAINERS.replace(Text.PARAM1, ctr));
+  }
+}
+
+JobHandler.prototype.handleUnalignContainerCommand = function(){
+  var containerNamePrefix = this.splitted[1].split("*")[0];
+  var ctr = 0;
+  for (var containerName in sceneHandler.getContainers()){
+    if (containerName.startsWith(containerNamePrefix)){
+      parseCommand("unalignContainer "+containerName);
+      ctr ++
+    }
+  }
+  if (ctr == 0){
+    terminal.printInfo(Text.NO_CONTAINERS_FOUND);
+  }else{
+    terminal.printInfo(Text.COMMAND_EXECUTED_FOR_X_CONTAINERS.replace(Text.PARAM1, ctr));
   }
 }
 

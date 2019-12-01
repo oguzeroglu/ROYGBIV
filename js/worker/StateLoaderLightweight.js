@@ -56,6 +56,7 @@ StateLoaderLightweight.prototype.loadBoundingBoxes = function(){
   var childAddedObjectExports = this.state.childAddedObjects;
   var objectGroupExports = this.state.objectGroups;
   var spriteExports = this.state.sprites;
+  var containerExports = this.state.containers;
   var addedTextExports = new Object();
   for (var key in this.state.addedTexts3D){
     addedTextExports[key] = this.state.addedTexts3D[key];
@@ -237,6 +238,16 @@ StateLoaderLightweight.prototype.loadBoundingBoxes = function(){
       clickableSprites[spriteName] = sprites[spriteName];
     }
   }
+  for (var containerName in containerExports){
+    containers[containerName] = new Container2D(containerName);
+    var curExport = containerExports[containerName];
+    containers[containerName].rectangle = new Rectangle();
+    containers[containerName].rectangle.set(curExport.x, curExport.y, curExport.x2, curExport.y2, curExport.width, curExport.height);
+    containers[containerName].isClickable = curExport.isClickable;
+    if (containers[containerName].isClickable){
+      clickableContainers[containerName] = containers[containerName];
+    }
+  }
 }
 
 StateLoaderLightweight.prototype.loadPhysics = function(){
@@ -409,6 +420,7 @@ StateLoaderLightweight.prototype.reset = function(){
   addedTexts2D = new Object();
   clickableAddedTexts2D = new Object();
   clickableSprites = new Object();
+  clickableContainers = new Object();
   sprites = new Object();
   particleSystemPool = new Object();
   particleSystems = new Map();

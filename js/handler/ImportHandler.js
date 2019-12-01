@@ -1282,6 +1282,45 @@ ImportHandler.prototype.importLightnings = function(obj){
   }
 }
 
+ImportHandler.prototype.importContainers = function(obj){
+  for (var containerName in obj.containers){
+    var curExport = obj.containers[containerName];
+    var container = new Container2D(containerName, curExport.centerXPercent, curExport.centerYPercent, curExport.widthPercent, curExport.heightPercent);
+    containers[containerName] = container;
+    container.paddingXContainerSpace = curExport.paddingXContainerSpace;
+    container.paddingYContainerSpace = curExport.paddingYContainerSpace;
+    if (curExport.isSquare){
+      container.isSquare = true;
+      container.makeSquare();
+    }
+    container.isClickable = curExport.isClickable;
+    if (!(typeof curExport.spriteName == UNDEFINED)){
+      container.insertSprite(sprites[curExport.spriteName]);
+    }
+    if (!(typeof curExport.addedTextName == UNDEFINED)){
+      container.insertAddedText(addedTexts[curExport.addedTextName]);
+    }
+    if (curExport.hasBorder){
+      container.setBorder(curExport.borderColor, curExport.borderThickness);
+    }
+    if (curExport.hasBackground){
+      container.setBackground(curExport.backgroundColor, curExport.backgroundAlpha, curExport.backgroundTextureName);
+    }
+  }
+  for (var containerName in obj.containers){
+    var curExport = obj.containers[containerName];
+    for (var key in curExport.alignedContainerInfos){
+      var ary = curExport.alignedContainerInfos[key];
+      for (var i = 0; i<ary.length; i++){
+        var curInfo = ary[i];
+        var child = containers[curInfo.containerName];
+        containers[containerName].addAlignedContainer({container: child, alignmentType: curInfo.alignmentType, value: curInfo.value});
+        child.alignedParent = containers[containerName];
+      }
+    }
+  }
+}
+
 ImportHandler.prototype.importSprites = function(obj){
   for (var spriteName in obj.sprites){
     var curExport = obj.sprites[spriteName];
@@ -1294,6 +1333,11 @@ ImportHandler.prototype.importSprites = function(obj){
     sprite.setRotation(curExport.rotation);
     sprite.marginMode = curExport.marginMode;
     sprite.set2DCoordinates(curExport.marginPercentX, curExport.marginPercentY);
+    sprite.originalWidth = curExport.originalWidth;
+    sprite.originalHeight = curExport.originalHeight;
+    sprite.originalWidthReference = curExport.originalWidthReference;
+    sprite.originalHeightReference = curExport.originalHeightReference;
+    sprite.originalScreenResolution = curExport.originalScreenResolution;
     if (curExport.isTextured){
       sprite.mapTexture(texturePacks[curExport.mappedTexturePackName]);
     }

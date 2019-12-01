@@ -24,6 +24,7 @@ var cliFocused = true;
 var omGUIFocused = false;
 var tmGUIFocused = false;
 var smGUIFocused = false;
+var cmGUIFocused = false;
 var acGUIFocused = false;
 var cliIsBeingDragged = false;
 var requestID;
@@ -128,6 +129,7 @@ var selectedAddedObject = 0;
 var selectedObjectGroup = 0;
 var selectedAddedText = 0;
 var selectedSprite = 0;
+var selectedContainer = 0;
 var planeWidthSegments = 10;
 var planeHeightSegments = 10;
 var boxWidthSegments = 10;
@@ -295,6 +297,10 @@ var DEFAULT_OFFSET_BETWEEN_LINES = 20;
 var MARGIN_MODE_2D_TOP_LEFT = 0;
 var MARGIN_MODE_2D_BOTTOM_RIGHT = 1;
 var MARGIN_MODE_2D_CENTER = 2;
+var CONTAINER_ALIGNMENT_TYPE_RIGHT = "CONTAINER_ALIGNMENT_TYPE_RIGHT";
+var CONTAINER_ALIGNMENT_TYPE_LEFT = "CONTAINER_ALIGNMENT_TYPE_LEFT";
+var CONTAINER_ALIGNMENT_TYPE_TOP = "CONTAINER_ALIGNMENT_TYPE_TOP";
+var CONTAINER_ALIGNMENT_TYPE_BOTTOM = "CONTAINER_ALIGNMENT_TYPE_BOTTOM";
 var roygbivAttributeCounter = 1;
 var roygbivBufferAttributeCounter = 1;
 var roygbivSkippedArrayBufferUpdates = 0;
@@ -374,10 +380,13 @@ var areaEnterCallbacks = new Object();
 var areaExitCallbacks = new Object();
 var sprites = new Object();
 var clickableSprites = new Object();
+var clickableContainers = new Object();
 var draggingSprite = false;
+var containers = new Object();
 
 // RENDER ORDERS
 var renderOrders = {
+  CONTAINER_BACKGROUND: -1000,
   MARKED_POINT: -30,
   GRID_HELPER: -20,
   FPS_WEAPON: -10,

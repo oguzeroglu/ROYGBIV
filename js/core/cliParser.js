@@ -1293,6 +1293,12 @@ function parse(input){
               return true;
             }
           }
+          for (var containerName in containers){
+            if (containers[containerName].backgroundTextureName == name){
+              terminal.printError(Text.TEXTURE_PACK_USED_AS_A_BACKGROUND_TEXTURE.replace(Text.PARAM1, containerName));
+              return true;
+            }
+          }
           if (texturePack.isParticleTexture){
             for (var psName in preConfiguredParticleSystems){
               var usedTextureName = preConfiguredParticleSystems[psName].getUsedTextureName();
@@ -3745,6 +3751,9 @@ function parse(input){
           selectionHandler.resetCurrentSelection();
           sceneHandler.onAddedTextDeletion(textToDestroy);
           textToDestroy.destroy(true);
+          if (textToDestroy.containerParent){
+            textToDestroy.containerParent.removeAddedText();
+          }
           if (!jobHandlerWorking){
             refreshRaycaster(Text.TEXT_DESTROYED);
           }else{
@@ -4731,6 +4740,11 @@ function parse(input){
           }
           sprites[spriteName] = new Sprite(spriteName);
           sprites[spriteName].setRefHeight();
+          sprites[spriteName].originalWidth = sprites[spriteName].calculateWidthPercent();
+          sprites[spriteName].originalHeight = sprites[spriteName].calculateHeightPercent();
+          sprites[spriteName].originalWidthReference = renderer.getCurrentViewport().z;
+          sprites[spriteName].originalHeightReference = renderer.getCurrentViewport().w;
+          sprites[spriteName].originalScreenResolution = screenResolution;
           sceneHandler.onSpriteCreation(sprites[spriteName]);
           selectionHandler.select(sprites[spriteName]);
           refreshRaycaster(Text.SPRITE_CREATED);
@@ -4748,6 +4762,9 @@ function parse(input){
             return true;
           }
           sprite.destroy();
+          if (sprite.containerParent){
+            sprite.containerParent.removeSprite();
+          }
           sceneHandler.onSpriteDeletion(sprite);
           selectionHandler.resetCurrentSelection();
           terminal.printInfo(Text.SPRITE_DESTROYED);
@@ -4796,6 +4813,239 @@ function parse(input){
           }
           sceneHandler.setBackgroundColor(splitted[1]);
           terminal.printInfo(Text.BACKGROUND_COLOR_SET);
+          return true;
+        break;
+        case 203: //newContainer
+          if (mode != 0){
+            terminal.printError(Text.WORKS_ONLY_IN_DESIGN_MODE);
+            return true;
+          }
+          var containerName = splitted[1];
+          if (!checkIfNameUnique(containerName, Text.NAME_MUST_BE_UNIQUE)){
+            return true;
+          }
+          var container = new Container2D(containerName, 50, 50, 10, 10);
+          container.makeVisible();
+          containers[containerName] = container;
+          selectionHandler.select(container);
+          guiHandler.afterObjectSelection();
+          sceneHandler.onContainerCreation(container);
+          refreshRaycaster(Text.CONTAINER_CREATED);
+          return true;
+        break;
+        case 204: //selectContainer
+          if (mode != 0){
+            terminal.printError(Text.WORKS_ONLY_IN_DESIGN_MODE);
+            return true;
+          }
+          var containerName = splitted[1];
+          if (!containers[containerName]){
+            terminal.printError(Text.NO_SUCH_CONTAINER);
+            return true;
+          }
+          if (containers[containerName].registeredSceneName != sceneHandler.getActiveSceneName()){
+            terminal.printError(Text.CONTAINER_NOT_IN_ACTIVE_SCENE);
+            return true;
+          }
+          selectionHandler.select(containers[containerName]);
+          guiHandler.afterObjectSelection();
+          terminal.printInfo(Text.CONTAINER_SELECTED);
+          return true;
+        break;
+        case 205: //addToContainer
+          if (mode != 0){
+            terminal.printError(Text.WORKS_ONLY_IN_DESIGN_MODE);
+            return true;
+          }
+          var container = containers[splitted[1]];
+          var objName = splitted[2];
+          if (!container){
+            terminal.printError(Text.NO_SUCH_CONTAINER);
+            return true;
+          }
+          if (container.registeredSceneName != sceneHandler.getActiveSceneName()){
+            terminal.printError(Text.CONTAINER_NOT_IN_ACTIVE_SCENE);
+            return true;
+          }
+          var obj = addedTexts[objName];
+          if (!obj){
+            obj = sprites[objName];
+            if (!obj){
+              terminal.printError(Text.NO_SUCH_OBJECT);
+              return true;
+            }else{
+              if (obj.registeredSceneName != sceneHandler.getActiveSceneName()){
+                terminal.printError(Text.SPRITE_NOT_IN_ACTIVE_SCENE);
+                return true;
+              }
+            }
+          }else{
+            if (!obj.is2D){
+              terminal.printError(Text.WORKS_ONLY_FOR_2D_TEXTS);
+              return true;
+            }
+            if (obj.registeredSceneName != sceneHandler.getActiveSceneName()){
+              terminal.printError(Text.TEXT_NOT_IN_SCENE);
+              return true;
+            }
+          }
+          if (container.addedText || container.sprite){
+            terminal.printError(Text.CONTAINER_ALREADY_FULL);
+            return true;
+          }
+          if (obj.containerParent){
+            terminal.printError(Text.OBJECT_ALREADY_INSIDE_CONTAINER.replace(Text.PARAM1, obj.containerParent.name));
+            return true;
+          }
+          if (obj.isAddedText){
+            container.insertAddedText(obj);
+          }else{
+            container.insertSprite(obj);
+          }
+          terminal.printInfo(Text.OBJECT_ADDED_TO_CONTAINER);
+          return true;
+        break;
+        case 206: //emptyContainer
+          if (mode != 0){
+            terminal.printError(Text.WORKS_ONLY_IN_DESIGN_MODE);
+            return true;
+          }
+          if (!(splitted[1].indexOf("*") == -1)){
+            new JobHandler(splitted).handle();
+            return true;
+          }
+          var container = containers[splitted[1]];
+          if (!container){
+            terminal.printError(Text.NO_SUCH_CONTAINER);
+            return true;
+          }
+          if (container.registeredSceneName != sceneHandler.getActiveSceneName()){
+            terminal.printError(Text.CONTAINER_NOT_IN_ACTIVE_SCENE);
+            return true;
+          }
+          if (!container.addedText && !container.sprite){
+            terminal.printError(Text.CONTAINER_IS_EMPTY);
+            return true;
+          }
+          container.makeEmpty();
+          if (!jobHandlerWorking){
+            terminal.printInfo(Text.CONTAINER_EMPTIED);
+          }
+          return true;
+        break;
+        case 207: //alignContainers
+          if (mode != 0){
+            terminal.printError(Text.WORKS_ONLY_IN_DESIGN_MODE);
+            return true;
+          }
+          var parentContainer = containers[splitted[1]];
+          var childContainer = containers[splitted[2]];
+          var alignmentType = splitted[3].toUpperCase();
+          var margin = parseFloat(splitted[4]);
+          if (!parentContainer){
+            terminal.printError(Text.PARENT_CONTAINER_DOES_NOT_EXIST);
+            return true;
+          }
+          if (!childContainer){
+            terminal.printError(Text.CHILD_CONTAINER_DOES_NOT_EXIST);
+            return true;
+          }
+          if (splitted[1] == splitted[2]){
+            terminal.printError(Text.CANNOT_ALIGN_SAME_CONTAINER);
+          }
+          if (parentContainer.registeredSceneName != sceneHandler.getActiveSceneName()){
+            terminal.printError(Text.PARENT_CONTAINER_NOT_IN_ACTIVE_SCENE);
+            return true;
+          }
+          if (childContainer.registeredSceneName != sceneHandler.getActiveSceneName()){
+            terminal.printError(Text.CHILD_CONTAINER_NOT_IN_ACTIVE_SCENE);
+            return true;
+          }
+          if (alignmentType != "CONTAINER_ALIGNMENT_TYPE_TOP" && alignmentType != "CONTAINER_ALIGNMENT_TYPE_BOTTOM" && alignmentType != "CONTAINER_ALIGNMENT_TYPE_LEFT" && alignmentType != "CONTAINER_ALIGNMENT_TYPE_RIGHT"){
+            terminal.printError(Text.INVALID_ALIGNMENT_TYPE);
+            return true;
+          }
+          if (isNaN(margin)){
+            terminal.printError(Text.IS_NOT_A_NUMBER.replace(Text.PARAM1, "margin"));
+            return true;
+          }
+          if (childContainer.alignedParent && childContainer.alignedParent.name != parentContainer.name){
+            terminal.printError(Text.CHILD_CONTAINER_IS_ALREADY_ALIGNED);
+            return true;
+          }
+          parentContainer.addAlignedContainer({container: childContainer, alignmentType: alignmentType, value: margin});
+          childContainer.alignedParent = parentContainer;
+          terminal.printInfo(Text.CONTAINER_ALIGNED);
+          return true;
+        break;
+        case 208: //unalignContainer
+          if (mode != 0){
+            terminal.printError(Text.WORKS_ONLY_IN_DESIGN_MODE);
+            return true;
+          }
+          if (!(splitted[1].indexOf("*") == -1)){
+            new JobHandler(splitted).handle();
+            return true;
+          }
+          var container = containers[splitted[1]];
+          if (!container){
+            terminal.printError(Text.NO_SUCH_CONTAINER);
+            return true;
+          }
+          if (container.registeredSceneName != sceneHandler.getActiveSceneName()){
+            terminal.printError(Text.CONTAINER_NOT_IN_ACTIVE_SCENE);
+            return true;
+          }
+          if (!container.alignedParent){
+            terminal.printError(Text.CONTAINER_IS_NOT_ALIGNED);
+            return true;
+          }
+          container.alignedParent.unalign(container);
+          if (!jobHandlerWorking){
+            terminal.printInfo(Text.CONTAINER_UNALIGNED);
+          }
+          return true;
+        break;
+        case 209: //destroyContainer
+          if (mode != 0){
+            terminal.printError(Text.WORKS_ONLY_IN_DESIGN_MODE);
+            return true;
+          }
+          if (!(splitted[1].indexOf("*") == -1)){
+            new JobHandler(splitted).handle();
+            return true;
+          }
+          var container = containers[splitted[1]];
+          if (!container){
+            terminal.printError(Text.NO_SUCH_CONTAINER);
+            return true;
+          }
+          if (container.registeredSceneName != sceneHandler.getActiveSceneName()){
+            terminal.printError(Text.CONTAINER_NOT_IN_ACTIVE_SCENE);
+            return true;
+          }
+          container.destroy();
+          if (!jobHandlerWorking){
+            terminal.printInfo(Text.CONTAINER_DESTROYED);
+          }
+          selectionHandler.resetCurrentSelection();
+          return true;
+        break;
+        case 210: //printContainers
+          var count = 0;
+          var length = Object.keys(containers).length;
+          terminal.printHeader(Text.CONTAINERS);
+          for (var containerName in containers){
+            count ++;
+            var options = true;
+            if (count == length){
+              options = false;
+            }
+            terminal.printInfo(Text.TREE.replace(Text.PARAM1, containerName + " ["+containers[containerName].registeredSceneName+"]"), options);
+          }
+          if (count == 0){
+            terminal.printError(Text.NO_CONTAINERS_CREATED);
+          }
           return true;
         break;
       }
@@ -4951,7 +5201,7 @@ function isNameUsedAsSoftCopyParentName(name){
 }
 
 function checkIfNameUnique(name, errorMsg){
-  if (addedObjects[name] || objectGroups[name] || gridSystems[name] || addedTexts[name] || sprites[name] || wallCollections[name]){
+  if (addedObjects[name] || objectGroups[name] || gridSystems[name] || addedTexts[name] || sprites[name] || wallCollections[name] || containers[name]){
     terminal.printError(errorMsg);
     return false;
   }

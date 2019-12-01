@@ -232,6 +232,8 @@ var Preconditions = function(){
   this.marginPercentX = "marginPercentX";
   this.marginPercentY = "marginPercentY";
   this.degree = "degree";
+  this.containerName = "containerName";
+  this.container = "container";
 }
 
 Preconditions.prototype.errorHeader = function(callerFunc){
@@ -273,6 +275,30 @@ Preconditions.prototype.checkIfLightningStartable = function(callerFunc, lightni
   }
 }
 
+Preconditions.prototype.checkIfContainerHasBackground = function(callerFunc, container){
+  if (!container.hasBackground){
+    this.throw(callerFunc, "Container has no background.");
+  }
+}
+
+Preconditions.prototype.checkIfContainerHasBorder = function(callerFunc, container){
+  if (!container.hasBorder){
+    this.throw(callerFunc, "Container has no border.");
+  }
+}
+
+Preconditions.prototype.checkIfContainerClickable = function(callerFunc, container){
+  if (!container.isClickable){
+    this.throw(callerFunc, "Container is not clickable.");
+  }
+}
+
+Preconditions.prototype.checkIfContainer = function(callerFunc, container){
+  if (!container.isContainer){
+    this.throw(callerFunc, "Object is not a container.");
+  }
+}
+
 Preconditions.prototype.checkIfLightning = function(callerFunc, lightning){
   if (!lightning.isLightning){
     this.throw(callerFunc, "Object is not a lightning.");
@@ -291,6 +317,12 @@ Preconditions.prototype.checkIfSpriteInsideActiveScene = function(callerFunc, sp
   }
 }
 
+Preconditions.prototype.checkIfContainerInsideActiveScene = function(callerFunc, container){
+  if (container.registeredSceneName != sceneHandler.getActiveSceneName()){
+    this.throw(callerFunc, "Container not inside active scene.");
+  }
+}
+
 Preconditions.prototype.checkIfMuzzleFlashInsideActiveScene = function(callerFunc, muzzleFlash){
   if (muzzleFlash.registeredSceneName != sceneHandler.getActiveSceneName()){
     this.throw(callerFunc, "Muzzleflash not inside the active scene.");
@@ -300,6 +332,18 @@ Preconditions.prototype.checkIfMuzzleFlashInsideActiveScene = function(callerFun
 Preconditions.prototype.checkIfCrosshairInsideActiveSceneOnlyIfNameExists = function(callerFunc, crosshairName){
   if (crosshairName){
     this.checkIfCrosshairInsideActiveScene(callerFunc, crosshairs[crosshairName]);
+  }
+}
+
+Preconditions.prototype.checkIfSpriteContained = function(callerFunc, sprite){
+  if (sprite.containerParent){
+    this.throw(callerFunc, "Sprite is inside a container.");
+  }
+}
+
+Preconditions.prototype.checkIfTextContained = function(callerFunc, text){
+  if (text.containerParent){
+    this.throw(callerFunc, "Text is inside a container.");
   }
 }
 

@@ -78,6 +78,7 @@ SceneHandler.prototype.onSwitchFromPreviewToDesign = function(){
     this.scenes[sceneName].resetAutoInstancedObjects();
     this.scenes[sceneName].resetClickableTexts();
     this.scenes[sceneName].resetClickableSprites();
+    this.scenes[sceneName].resetClickableContainers();
     this.scenes[sceneName].resetTrackingObjects();
   }
   this.draggableSpriteStatusBySceneName = new Object();
@@ -108,6 +109,10 @@ SceneHandler.prototype.onClickableAddedText2DAddition = function(addedText){
 
 SceneHandler.prototype.onClickableSpriteAddition = function(sprite){
   this.scenes[sprite.registeredSceneName].registerClickableSprite(sprite);
+}
+
+SceneHandler.prototype.onClickableContainerAddition = function(container){
+  this.scenes[container.registeredSceneName].registerClickableContainer(container);
 }
 
 SceneHandler.prototype.onDynamicObjectAddition = function(obj){
@@ -183,6 +188,12 @@ SceneHandler.prototype.hideAll = function(){
       }
     }
     sprite.hideVisually();
+  }
+  for (var containerName in containers){
+    containers[containerName].makeInvisible();
+    if (containers[containerName].hasBackground){
+      containers[containerName].backgroundSprite.hideVisually();
+    }
   }
   if (mode == 0){
     for (var gsName in gridSystems){
@@ -273,6 +284,13 @@ SceneHandler.prototype.changeScene = function(sceneName, readyCallback){
       var sprite = this.scenes[sceneName].sprites[spriteName];
       sprite.showVisually();
     }
+    for (var containerName in this.scenes[sceneName].containers){
+      var container = this.scenes[sceneName].containers[containerName];
+      container.makeVisible();
+      if (container.hasBackground){
+        container.backgroundSprite.showVisually();
+      }
+    }
     if (markedPointsVisible){
       for (var markedPointName in this.scenes[sceneName].markedPoints){
         var markedPoint = this.scenes[sceneName].markedPoints[markedPointName];
@@ -323,6 +341,15 @@ SceneHandler.prototype.changeScene = function(sceneName, readyCallback){
       var obj = this.scenes[sceneName].autoInstancedObjects[objName];
       obj.showVisually();
     }
+    for (var containerName in this.scenes[sceneName].containers){
+      var container = this.scenes[sceneName].containers[containerName];
+      if (container.hasBorder){
+        container.makeVisible();
+      }
+      if (container.hasBackground){
+        container.backgroundSprite.showVisually();
+      }
+    }
     this.activeSceneName = sceneName;
     if (!isDeployment){
       rayCaster.onReadyCallback = noop;
@@ -352,6 +379,14 @@ SceneHandler.prototype.createScene = function(sceneName){
 SceneHandler.prototype.setBackgroundColor = function(colorName){
   this.scenes[this.activeSceneName].backgroundColor = colorName;
   scene.background.set(colorName);
+}
+
+SceneHandler.prototype.onContainerDeletion = function(container){
+  this.scenes[container.registeredSceneName].unregisterContainer(container);
+}
+
+SceneHandler.prototype.onContainerCreation = function(container){
+  this.scenes[this.activeSceneName].registerContainer(container);
 }
 
 SceneHandler.prototype.onSpriteDeletion = function(sprite){
@@ -539,6 +574,10 @@ SceneHandler.prototype.getAddedTexts2D = function(){
   return this.scenes[this.activeSceneName].addedTexts2D;
 }
 
+SceneHandler.prototype.getContainers = function(){
+  return this.scenes[this.activeSceneName].containers;
+}
+
 SceneHandler.prototype.getSprites = function(){
   return this.scenes[this.activeSceneName].sprites;
 }
@@ -573,6 +612,10 @@ SceneHandler.prototype.getClickableAddedTexts = function(){
 
 SceneHandler.prototype.getClickableSprites = function(){
   return this.scenes[this.activeSceneName].clickableSprites;
+}
+
+SceneHandler.prototype.getClickableContainers = function(){
+  return this.scenes[this.activeSceneName].clickableContainers;
 }
 
 SceneHandler.prototype.getClickableAddedTexts2D = function(){

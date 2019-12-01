@@ -98,7 +98,7 @@ RayCaster.prototype.refresh = function(){
 }
 
 RayCaster.prototype.updateObject = function(obj, forceUpdate){
-  if ((obj.isAddedText && obj.is2D) || (obj.isSprite)){
+  if ((obj.isAddedText && obj.is2D) || (obj.isSprite && !obj.isBackgroundObject) || (obj.isContainer)){
     this.update2D(obj, forceUpdate);
     return;
   }

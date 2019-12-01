@@ -51,6 +51,28 @@ WorldBinHandler2D.prototype.getBinIndex = function(float){
   return parseInt(result);
 }
 
+WorldBinHandler2D.prototype.insertContainer = function(obj){
+  var minXIndex = this.getBinIndex(this.convertFromWebGLRange(obj.rectangle.x));
+  var maxYIndex = this.getBinIndex(this.convertFromWebGLRange(obj.rectangle.y));
+  var maxXIndex = this.getBinIndex(this.convertFromWebGLRange(obj.rectangle.finalX));
+  var minYIndex = this.getBinIndex(this.convertFromWebGLRange(obj.rectangle.finalY));
+  for (var x = minXIndex; x<= maxXIndex; x++){
+    for (var y = minYIndex; y<= maxYIndex; y++){
+      if (!this.bin.has(x)){
+        this.bin.set(x, new Map());
+      }
+      if (!this.bin.get(x).has(y)){
+        this.bin.get(x).set(y, new Map());
+      }
+      this.bin.get(x).get(y).set(obj.name, true);
+      if (!obj.binInfo2D.has(x)){
+        obj.binInfo2D.set(x, new Map());
+      }
+      obj.binInfo2D.get(x).set(y, true);
+    }
+  }
+}
+
 WorldBinHandler2D.prototype.insertSprite = function(obj){
   var minXIndex = this.getBinIndex(this.convertFromWebGLRange(obj.rectangle.x));
   var maxYIndex = this.getBinIndex(this.convertFromWebGLRange(obj.rectangle.finalY));
@@ -132,6 +154,8 @@ WorldBinHandler2D.prototype.insert = function(obj){
     this.insertAddedText(obj);
   }else if (obj.isSprite){
     this.insertSprite(obj);
+  }else if (obj.isContainer){
+    this.insertContainer(obj);
   }
   if (this.applyCaching && this.cache.size > 0){
     this.cache.clear();

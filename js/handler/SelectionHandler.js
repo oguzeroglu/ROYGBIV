@@ -29,6 +29,12 @@ SelectionHandler.prototype.select = function(object){
     selectedSprite = object;
     scene.add(object.rectangle.mesh);
   }
+  if (object.isContainer){
+    selectedContainer = object;
+    if (!object.hasBorder){
+      object.rectangle.mesh.material.uniforms.color.value.set("yellow");
+    }
+  }
   this.currentSelection = object;
 }
 
@@ -44,6 +50,9 @@ SelectionHandler.prototype.getSelectedObject = function(){
   }
   if (selectedSprite){
     return selectedSprite;
+  }
+  if (selectedContainer){
+    return selectedContainer;
   }
   return 0;
 }
@@ -71,6 +80,11 @@ SelectionHandler.prototype.resetCurrentSelection = function(){
   }else if (this.currentSelection.isSprite){
     scene.remove(this.currentSelection.rectangle.mesh);
     selectedSprite = 0;
+  }else if (this.currentSelection.isContainer){
+    selectedContainer = 0;
+    if (!this.currentSelection.hasBorder){
+      this.currentSelection.rectangle.mesh.material.uniforms.color.value.set("lime");
+    }
   }
   this.currentSelection = 0;
   if (!isDeployment){
