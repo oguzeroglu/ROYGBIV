@@ -221,7 +221,9 @@ Container2D.prototype.handleResize = function(){
   if (this.sprite){
     this.insertSprite(this.sprite);
   }
-  if (this.rectangle && !(typeof this.rectangle.thicknessOffset == UNDEFINED)){
+  if (this.hasBorder){
+    this.rectangle.updateMesh(this.borderThickness, true);
+  }else if (this.rectangle && (!(typeof this.rectangle.thicknessOffset == UNDEFINED))){
     this.rectangle.updateMesh(this.rectangle.thicknessOffset);
   }
   rayCaster.updateObject(this);
