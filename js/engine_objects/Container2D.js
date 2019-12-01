@@ -256,6 +256,12 @@ Container2D.prototype.export = function(){
       });
     }
   }
+  if (this.hasBackground){
+    exportObj.hasBackground = true;
+    exportObj.backgroundColor = this.backgroundColor;
+    exportObj.backgroundAlpha = this.backgroundAlpha;
+    exportObj.backgroundTextureName = this.backgroundTextureName;
+  }
   return exportObj;
 }
 

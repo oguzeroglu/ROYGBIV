@@ -1303,6 +1303,9 @@ ImportHandler.prototype.importContainers = function(obj){
     if (curExport.hasBorder){
       container.setBorder(curExport.borderColor, curExport.borderThickness);
     }
+    if (curExport.hasBackground){
+      container.setBackground(curExport.backgroundColor, curExport.backgroundAlpha, curExport.backgroundTextureName);
+    }
   }
   for (var containerName in obj.containers){
     var curExport = obj.containers[containerName];
