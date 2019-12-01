@@ -18,6 +18,18 @@ var Container2D = function(name, centerXPercent, centerYPercent, widthPercent, h
   }
 }
 
+Container2D.prototype.removeBackground = function(){
+  if (!this.hasBackground){
+    return;
+  }
+  this.backgroundSprite.destroy();
+  this.hasBackground = false;
+  delete this.backgroundColor;
+  delete this.backgroundAlpha;
+  delete this.backgroundTextureName;
+  delete this.backgroundSprite;
+}
+
 Container2D.prototype.setBackground = function(backgroundColor, backgroundAlpha, backgroundTextureName){
   if (!this.backgroundSprite){
     var bgSprite = new Sprite();
