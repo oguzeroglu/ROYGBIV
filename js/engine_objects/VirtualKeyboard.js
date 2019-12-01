@@ -19,6 +19,9 @@
 //  keyBackgroundColor
 //  keyBackgroundAlpha
 //  keyBackgroundTextureName
+//  keyColor
+//  keyCharMargin
+//  keyCharSize
 var VirtualKeyboard = function(parameters){
   this.name = parameters.name;
   this.fontName = parameters.fontName;
@@ -40,6 +43,13 @@ var VirtualKeyboard = function(parameters){
   this.keyBackgroundColor = parameters.keyBackgroundColor;
   this.keyBackgroundAlpha = parameters.keyBackgroundAlpha;
   this.keyBackgroundTextureName = parameters.keyBackgroundTextureName;
+  this.keyColor = parameters.keyColor;
+  this.keyCharMargin = parameters.keyCharMargin;
+  this.keyCharSize = parameters.keyCharSize;
+
+  this.font = fonts[this.fontName];
+
+  this.reusableColor = new THREE.Color(parameters.keyColor);
 
   this.keys = [
     [
@@ -51,19 +61,19 @@ var VirtualKeyboard = function(parameters){
       {key: "h", weight: 1}, {key: "j", weight: 1}, {key: "k", weight: 1}, {key: "l", weight: 1}
     ],
     [
-      {key: "CAPS", weight: 1.5}, {key: "z", weight: 1}, {key: "x", weight: 1}, {key: "c", weight: 1}, {key: "v", weight: 1},
-      {key: "b", weight: 1}, {key: "n", weight: 1}, {key: "m", weight: 1}, {key: "DEL", weight: 1.5}
+      {key: "caps", weight: 1.5}, {key: "z", weight: 1}, {key: "x", weight: 1}, {key: "c", weight: 1}, {key: "v", weight: 1},
+      {key: "b", weight: 1}, {key: "n", weight: 1}, {key: "m", weight: 1}, {key: "del", weight: 1.5}
     ],
     [
-      {key: "MODE", weight: 1.5}, {key: ",", weight: 1}, {key: "SPACE", weight: 4.5},
-      {key: ".", weight: 1}, {key: "OK", weight: 1.5}
+      {key: "123", weight: 1.5}, {key: ",", weight: 1}, {key: "space", weight: 4.5},
+      {key: ".", weight: 1}, {key: "ok", weight: 1.5}
     ]
   ];
 
   this.initialize();
 }
 
-VirtualKeyboard.prototype.initializeKey = function(x, y, width, height){
+VirtualKeyboard.prototype.initializeKey = function(x, y, width, height, key){
   var container = new Container2D(null, x, y, width, height);
   if (this.keyHasBorder){
     container.setBorder(this.keyBorderColor, this.keyBorderThickness);
@@ -72,6 +82,15 @@ VirtualKeyboard.prototype.initializeKey = function(x, y, width, height){
   if (this.keyHasBackground){
     container.setBackground(this.keyBackgroundColor, this.keyBackgroundAlpha, this.keyBackgroundTextureName);
   }
+  var text = new AddedText(null, this.font, key, REUSABLE_VECTOR, this.reusableColor, 1, this.keyCharSize, key.length);
+  text.marginMode = MARGIN_MODE_2D_CENTER;
+  text.setMarginBetweenChars(this.keyCharMargin);
+  text.refCharSize = this.keyCharSize;
+  text.refInnerHeight = window.innerHeight;
+  text.handleBoundingBox();
+  text.set2DStatus(true);
+  text.mesh.visible = true;
+  container.insertAddedText(text);
 }
 
 VirtualKeyboard.prototype.initialize = function(){
@@ -108,7 +127,7 @@ VirtualKeyboard.prototype.initialize = function(){
     curY = curY - (realKeyHeight / 2);
     for (var i2 = 0; i2<curRow.length; i2++){
       curX += (realKeyWidth * curRow[i2].weight / 2);
-      this.initializeKey(curX, curY, realKeyWidth * curRow[i2].weight, realKeyHeight);
+      this.initializeKey(curX, curY, realKeyWidth * curRow[i2].weight, realKeyHeight, curRow[i2].key);
       curX += padX + (realKeyWidth * curRow[i2].weight / 2);
     }
     curY = curY - padY - (realKeyHeight / 2);

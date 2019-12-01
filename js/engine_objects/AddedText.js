@@ -826,7 +826,9 @@ AddedText.prototype.set2DStatus = function(is2D){
       this.oldIsClickable = this.isClickable;
     }
     this.isClickable = false;
-    addedTexts2D[this.name] = this;
+    if (!!this.name){
+      addedTexts2D[this.name] = this;
+    }
     this.mesh.renderOrder = renderOrders.TEXT_2D;
   }else{
     macroHandler.removeMacro("IS_TWO_DIMENSIONAL", this.material, true, false);
@@ -841,7 +843,9 @@ AddedText.prototype.set2DStatus = function(is2D){
       this.setMarginBetweenLines(this.refLineOffset);
       delete this.refLineOffset;
     }
-    delete addedTexts2D[this.name];
+    if (!!this.name){
+      delete addedTexts2D[this.name];
+    }
     this.mesh.renderOrder = renderOrders.TEXT_3D;
   }
   if (is2D){
