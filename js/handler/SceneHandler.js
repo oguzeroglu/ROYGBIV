@@ -17,22 +17,24 @@ SceneHandler.prototype.onReady = function(){
     this.readyCallback();
   }
   if (this.nextSceneToChange){
-    this.changeScene(this.nextSceneToChange, this.nextReadyCallback);
+    var nextSceneToChange = this.nextSceneToChange;
+    var nextReadyCallback = this.nextReadyCallback;
     delete this.nextSceneToChange;
     delete this.nextReadyCallback;
+    this.changeScene(nextSceneToChange, nextReadyCallback);
   }
 }
 
 SceneHandler.prototype.onPhysicsReady = function(){
   this.physicsReady = true;
-  if (this.raycasterReady){
+  if (this.raycasterReady || raycasterFactory.workerTurnedOff){
     this.onReady();
   }
 }
 
 SceneHandler.prototype.onRaycasterReady = function(){
   this.raycasterReady = true;
-  if (this.physicsReady){
+  if (this.physicsReady || physicsFactory.workerTurnedOff){
     this.onReady();
   }else if (mode == 0){
     this.onReady();
