@@ -1,5 +1,7 @@
 // parameters:
 //  name
+//  positionXPercent
+//  positionYPercent
 //  fontName
 //  totalWidthPercent
 //  totalHeightPercent
@@ -26,6 +28,8 @@
 //  refCharInnerHeight
 var VirtualKeyboard = function(parameters){
   this.name = parameters.name;
+  this.positionXPercent = parameters.positionXPercent;
+  this.positionYPercent = parameters.positionYPercent;
   this.fontName = parameters.fontName;
   this.totalWidthPercent = parameters.totalWidthPercent;
   this.totalHeightPercent = parameters.totalHeightPercent;
@@ -108,7 +112,7 @@ VirtualKeyboard.prototype.initializeKey = function(x, y, width, height, key){
 }
 
 VirtualKeyboard.prototype.initialize = function(){
-  this.backgroundContainer = new Container2D(null, 50, (this.totalHeightPercent / 2), this.totalWidthPercent, this.totalHeightPercent);
+  this.backgroundContainer = new Container2D(null, this.positionXPercent, this.positionYPercent, this.totalWidthPercent, this.totalHeightPercent);
   if (this.hasBackground){
     this.backgroundContainer.setBackground(this.backgroundColor, this.backgroundAlpha, this.backgroundTextureName);
   }
@@ -120,7 +124,7 @@ VirtualKeyboard.prototype.initialize = function(){
   var realKeyWidth = this.totalWidthPercent * (this.keyWidthPercent) / 100;
   var realKeyHeight = this.totalHeightPercent * (this.keyHeightPercent) / 100;
 
-  var topY = this.totalHeightPercent;
+  var topY = this.positionYPercent + (this.totalHeightPercent / 2);
   var padY = (this.totalHeightPercent - (4 * realKeyHeight)) / 5;
 
   var curY = topY - padY;
@@ -137,7 +141,7 @@ VirtualKeyboard.prototype.initialize = function(){
     //  offs = 8;
     //}
     var padX = (this.totalWidthPercent - (2 * offs) - totalRowWidth) / (curRow.length + 1);
-    var curX = 50 - (this.totalWidthPercent / 2) + padX + offs;
+    var curX = this.positionXPercent - (this.totalWidthPercent / 2) + padX + offs;
     curY = curY - (realKeyHeight / 2);
     for (var i2 = 0; i2<curRow.length; i2++){
       curX += (realKeyWidth * curRow[i2].weight / 2);
