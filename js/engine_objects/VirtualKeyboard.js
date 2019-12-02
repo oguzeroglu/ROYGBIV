@@ -22,6 +22,8 @@
 //  keyColor
 //  keyCharMargin
 //  keyCharSize
+//  refCharSize
+//  refCharInnerHeight
 var VirtualKeyboard = function(parameters){
   this.name = parameters.name;
   this.fontName = parameters.fontName;
@@ -46,6 +48,8 @@ var VirtualKeyboard = function(parameters){
   this.keyColor = parameters.keyColor;
   this.keyCharMargin = parameters.keyCharMargin;
   this.keyCharSize = parameters.keyCharSize;
+  this.refCharSize = parameters.refCharSize;
+  this.refCharInnerHeight = parameters.refCharInnerHeight;
 
   this.font = fonts[this.fontName];
 
@@ -70,7 +74,16 @@ var VirtualKeyboard = function(parameters){
     ]
   ];
 
+  this.keyContainers = [];
+
   this.initialize();
+}
+
+VirtualKeyboard.prototype.handleResize = function(){
+  this.backgroundContainer.handleResize();
+  for (var i = 0; i<this.keyContainers.length; i++){
+    this.keyContainers[i].handleResize();
+  }
 }
 
 VirtualKeyboard.prototype.initializeKey = function(x, y, width, height, key){
@@ -85,12 +98,13 @@ VirtualKeyboard.prototype.initializeKey = function(x, y, width, height, key){
   var text = new AddedText(null, this.font, key, REUSABLE_VECTOR, this.reusableColor, 1, this.keyCharSize, key.length);
   text.marginMode = MARGIN_MODE_2D_CENTER;
   text.setMarginBetweenChars(this.keyCharMargin);
-  text.refCharSize = this.keyCharSize;
-  text.refInnerHeight = window.innerHeight;
+  text.refCharSize = this.refCharSize;
+  text.refInnerHeight = this.refCharInnerHeight;
   text.handleBoundingBox();
   text.set2DStatus(true);
   text.mesh.visible = true;
   container.insertAddedText(text);
+  this.keyContainers.push(container);
 }
 
 VirtualKeyboard.prototype.initialize = function(){
