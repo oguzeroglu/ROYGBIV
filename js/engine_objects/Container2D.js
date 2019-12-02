@@ -231,7 +231,9 @@ Container2D.prototype.handleResize = function(){
     this.backgroundSprite.handleRectangle();
     this.setBackground(this.backgroundColor, this.backgroundAlpha, this.backgroundTextureName);
   }
-  rayCaster.updateObject(this);
+  if (this.name){
+    rayCaster.updateObject(this);
+  }
 }
 
 Container2D.prototype.export = function(){

@@ -574,7 +574,9 @@ AddedText.prototype.handleResize = function(){
       this.rectangle.updateMesh(this.rectangle.thicknessOffset);
     }
   }
-  rayCaster.onAddedTextResize(this);
+  if (this.name){
+    rayCaster.onAddedTextResize(this);
+  }
 }
 
 AddedText.prototype.getWidthPercent = function(){
