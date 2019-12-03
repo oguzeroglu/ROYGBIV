@@ -79,8 +79,27 @@ var VirtualKeyboard = function(parameters){
   ];
 
   this.keyContainers = [];
+  this.textsByKey = new Object();
+  this.isCapslockOn = false;
 
   this.initialize();
+}
+
+VirtualKeyboard.prototype.onCapsLock = function(){
+  this.isCapslockOn = !this.isCapslockOn;
+  if (this.isCapslockOn){
+    for (var key in this.textsByKey){
+      if (key.length == 1){
+        this.textsByKey[key].setText(key.toUpperCase());
+      }
+    }
+  } else{
+    for (var key in this.textsByKey){
+      if (key.length == 1){
+        this.textsByKey[key].setText(key.toLowerCase());
+      }
+    }
+  }
 }
 
 VirtualKeyboard.prototype.handleResize = function(){
@@ -109,6 +128,7 @@ VirtualKeyboard.prototype.initializeKey = function(x, y, width, height, key){
   text.mesh.visible = true;
   container.insertAddedText(text);
   this.keyContainers.push(container);
+  this.textsByKey[key] = text;
 }
 
 VirtualKeyboard.prototype.initialize = function(){
