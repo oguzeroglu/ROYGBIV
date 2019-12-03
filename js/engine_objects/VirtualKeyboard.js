@@ -81,8 +81,44 @@ var VirtualKeyboard = function(parameters){
   this.keyContainers = [];
   this.textsByKey = new Object();
   this.isCapslockOn = false;
+  this.isNumeric = false;
 
   this.initialize();
+}
+
+VirtualKeyboard.prototype.onModeChange = function(){
+  this.isNumeric = !this.isNumeric;
+  if (this.isNumeric){
+    this.textsByKey["123"].setText("ABC");
+    this.textsByKey["caps"].setText("");
+    for (var key in this.textsByKey){
+      if (key.length == 1 && key != "." && key != ","){
+        this.textsByKey[key].setText("");
+      }
+    }
+    this.textsByKey["q"].setText("0");
+    this.textsByKey["w"].setText("1");
+    this.textsByKey["e"].setText("2");
+    this.textsByKey["r"].setText("3");
+    this.textsByKey["t"].setText("4");
+    this.textsByKey["y"].setText("5");
+    this.textsByKey["u"].setText("6");
+    this.textsByKey["i"].setText("7");
+    this.textsByKey["o"].setText("8");
+    this.textsByKey["p"].setText("9");
+  }else{
+    this.textsByKey["123"].setText("123");
+    this.textsByKey["caps"].setText("CAPS");
+    for (var key in this.textsByKey){
+      if (key.length == 1){
+        if (this.isCapslockOn){
+          this.textsByKey[key].setText(key.toUpperCase());
+        }else{
+          this.textsByKey[key].setText(key);
+        }
+      }
+    }
+  }
 }
 
 VirtualKeyboard.prototype.onCapsLock = function(){
@@ -93,7 +129,7 @@ VirtualKeyboard.prototype.onCapsLock = function(){
         this.textsByKey[key].setText(key.toUpperCase());
       }
     }
-  } else{
+  }else{
     for (var key in this.textsByKey){
       if (key.length == 1){
         this.textsByKey[key].setText(key.toLowerCase());
