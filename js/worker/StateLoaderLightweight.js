@@ -57,6 +57,7 @@ StateLoaderLightweight.prototype.loadBoundingBoxes = function(){
   var objectGroupExports = this.state.objectGroups;
   var spriteExports = this.state.sprites;
   var containerExports = this.state.containers;
+  var virtualKeyboardExports = this.state.virtualKeyboards;
   var addedTextExports = new Object();
   for (var key in this.state.addedTexts3D){
     addedTextExports[key] = this.state.addedTexts3D[key];
@@ -239,15 +240,29 @@ StateLoaderLightweight.prototype.loadBoundingBoxes = function(){
     }
   }
   for (var containerName in containerExports){
-    containers[containerName] = new Container2D(containerName);
-    var curExport = containerExports[containerName];
-    containers[containerName].rectangle = new Rectangle();
-    containers[containerName].rectangle.set(curExport.x, curExport.y, curExport.x2, curExport.y2, curExport.width, curExport.height);
-    containers[containerName].isClickable = curExport.isClickable;
+    containers[containerName] = this.containerImportFunc(containerName, containerExports[containerName]);
     if (containers[containerName].isClickable){
       clickableContainers[containerName] = containers[containerName];
     }
   }
+  for (var virtualKeyboardName in virtualKeyboardExports){
+    var params = virtualKeyboardExports[virtualKeyboardName].parameters;
+    virtualKeyboards[virtualKeyboardName] = new VirtualKeyboard(params);
+    for (var containerName in virtualKeyboardExports[virtualKeyboardName].keyContainers){
+      var container = this.containerImportFunc(containerName, virtualKeyboardExports[virtualKeyboardName].keyContainers[containerName]);
+      childContainers[container.name] = virtualKeyboards[virtualKeyboardName];
+      virtualKeyboards[virtualKeyboardName].childContainersByContainerName[containerName] = container;
+      virtualKeyboards[virtualKeyboardName].keyContainers.push(container);
+    }
+  }
+}
+
+StateLoaderLightweight.prototype.containerImportFunc = function(containerName, curExport){
+  var container =  new Container2D(containerName);
+  container.rectangle = new Rectangle();
+  container.rectangle.set(curExport.x, curExport.y, curExport.x2, curExport.y2, curExport.width, curExport.height);
+  container.isClickable = curExport.isClickable;
+  return container;
 }
 
 StateLoaderLightweight.prototype.loadPhysics = function(){
@@ -425,6 +440,9 @@ StateLoaderLightweight.prototype.reset = function(){
   particleSystemPool = new Object();
   particleSystems = new Map();
   particlesWithCollisionCallbacks = new Object();
+  containers = new Object();
+  childContainers = new Object();
+  virtualKeyboards = new Object();
   TOTAL_PARTICLE_SYSTEM_COLLISION_LISTEN_COUNT = 0;
   TOTAL_PARTICLE_COLLISION_LISTEN_COUNT = 0;
   TOTAL_PARTICLE_SYSTEM_COUNT = 0;

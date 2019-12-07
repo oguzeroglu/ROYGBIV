@@ -48,6 +48,7 @@ ObjectPicker2D.prototype.refresh = function(){
   var allTexts = this.getTexts();
   var allSprites = this.getSprites();
   var allContainers = this.getContainers();
+  var allVirtualKeyboards = this.getVirtualKeyboards();
   for (var textName in allTexts){
     this.binHandler.insert(allTexts[textName]);
   }
@@ -56,6 +57,9 @@ ObjectPicker2D.prototype.refresh = function(){
   }
   for (var containerName in allContainers){
     this.binHandler.insert(allContainers[containerName]);
+  }
+  for (var virtualKeyboardName in allVirtualKeyboards){
+    this.binHandler.insert(allVirtualKeyboards[virtualKeyboardName]);
   }
 }
 
@@ -132,6 +136,14 @@ ObjectPicker2D.prototype.getSprites = function(){
     }else{
       return clickableSprites;
     }
+  }
+}
+
+ObjectPicker2D.prototype.getVirtualKeyboards = function(){
+  if (!IS_WORKER_CONTEXT){
+    return sceneHandler.getVirtualKeyboards();
+  }else{
+    return virtualKeyboards;
   }
 }
 

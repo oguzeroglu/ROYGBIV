@@ -1282,6 +1282,14 @@ ImportHandler.prototype.importLightnings = function(obj){
   }
 }
 
+ImportHandler.prototype.importVirtualKeyboards = function(obj){
+  for (var vkName in obj.virtualKeyboards){
+    var curExport = obj.virtualKeyboards[vkName];
+    var virtualKeyboard = new VirtualKeyboard(curExport);
+    virtualKeyboards[vkName] = virtualKeyboard;
+  }
+}
+
 ImportHandler.prototype.importContainers = function(obj){
   for (var containerName in obj.containers){
     var curExport = obj.containers[containerName];

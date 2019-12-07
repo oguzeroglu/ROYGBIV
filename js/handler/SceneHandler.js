@@ -383,6 +383,14 @@ SceneHandler.prototype.setBackgroundColor = function(colorName){
   scene.background.set(colorName);
 }
 
+SceneHandler.prototype.onVirtualKeyboardDeletion = function(virtualKeyboard){
+  this.scenes[virtualKeyboard.registeredSceneName].unregisterVirtualKeyboard(virtualKeyboard);
+}
+
+SceneHandler.prototype.onVirtualKeyboardCreation = function(virtualKeyboard){
+  this.scenes[this.activeSceneName].registerVirtualKeyboard(virtualKeyboard);
+}
+
 SceneHandler.prototype.onContainerDeletion = function(container){
   this.scenes[container.registeredSceneName].unregisterContainer(container);
 }
@@ -578,6 +586,10 @@ SceneHandler.prototype.getAddedTexts2D = function(){
 
 SceneHandler.prototype.getContainers = function(){
   return this.scenes[this.activeSceneName].containers;
+}
+
+SceneHandler.prototype.getVirtualKeyboards = function(){
+  return this.scenes[this.activeSceneName].virtualKeyboards;
 }
 
 SceneHandler.prototype.getSprites = function(){

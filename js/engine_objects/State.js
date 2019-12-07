@@ -148,6 +148,11 @@ var State = function(projectName, author){
   for (var containerName in containers){
     this.containers[containerName] = containers[containerName].export();
   }
+  // VIRTUAL KEYBOARDS *********************************************
+  this.virtualKeyboards = new Object();
+  for (var vkName in virtualKeyboards){
+    this.virtualKeyboards[vkName] = virtualKeyboards[vkName].export();
+  }
   // PRECONFIGURED PARTICLE SYSTEMS ********************************
   this.preConfiguredParticleSystems = new Object();
   for (var psName in preConfiguredParticleSystems){

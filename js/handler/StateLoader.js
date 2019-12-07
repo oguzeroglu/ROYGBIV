@@ -106,6 +106,7 @@ StateLoader.prototype.finalize = function(){
   this.importHandler.importCrosshairs(this.stateObj);
   this.importHandler.importSprites(this.stateObj);
   this.importHandler.importContainers(this.stateObj);
+  this.importHandler.importVirtualKeyboards(this.stateObj);
   this.importHandler.importScenes(this.stateObj);
 
   this.closePhysicsWorkerIfNotUsed();
@@ -270,6 +271,7 @@ StateLoader.prototype.resetProject = function(){
   sprites = new Object();
   containers = new Object();
   childContainers = new Object();
+  virtualKeyboards = new Object();
   webglCallbackHandler = new WebGLCallbackHandler();
   textureAtlasHandler.dispose();
   textureAtlasHandler = new TextureAtlasHandler();

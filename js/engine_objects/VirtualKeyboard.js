@@ -29,6 +29,8 @@
 var VirtualKeyboard = function(parameters){
   this.isVirtualKeyboard = true;
   this.name = parameters.name;
+  this.parameters = parameters;
+
   this.positionXPercent = parameters.positionXPercent;
   this.positionYPercent = parameters.positionYPercent;
   this.fontName = parameters.fontName;
@@ -92,7 +94,23 @@ var VirtualKeyboard = function(parameters){
     "i": "7", "o": "8", "p": "9"
   }
 
-  this.initialize();
+  if (!IS_WORKER_CONTEXT){
+    this.initialize();
+  }
+}
+
+VirtualKeyboard.prototype.export = function(){
+  return this.parameters;
+}
+
+VirtualKeyboard.prototype.exportLightweight = function(){
+  var exportObj = new Object();
+  exportObj.parameters = this.parameters;
+  exportObj.keyContainers = new Object();
+  for (var childContainerName in this.childContainersByContainerName){
+    exportObj.keyContainers[childContainerName] = this.childContainersByContainerName[childContainerName].exportLightweight();
+  }
+  return exportObj;
 }
 
 VirtualKeyboard.prototype.onDelPress = function(){

@@ -61,6 +61,9 @@ var RaycasterWorkerBridge = function(){
           rayCaster.idsByObjectNames[sprite.name] = spriteWorkerID;
         }else if (msg.data.ids[i].type == "container"){
           var container = containers[msg.data.ids[i].name];
+          if (!container){
+            container = childContainers[msg.data.ids[i].name].childContainersByContainerName[msg.data.ids[i].name];
+          }
           var containerWorkerID = msg.data.ids[i].id;
           rayCaster.objectsByWorkerID[containerWorkerID] = container;
           rayCaster.idsByObjectNames[container.name] = containerWorkerID;
@@ -167,8 +170,20 @@ var RaycasterWorkerBridge = function(){
           intersectableArrayIndex += sprite.mesh.matrixWorld.elements.length + 2;
         }
       }
+      var allContainers = new Object();
       for (var containerName in sceneHandler.getContainers()){
+        allContainers[containerName] = sceneHandler.getContainers()[containerName];
+      }
+      for (var vkName in sceneHandler.getVirtualKeyboards()){
+        for (var containerName in sceneHandler.getVirtualKeyboards()[vkName].childContainersByContainerName){
+          allContainers[containerName] = sceneHandler.getVirtualKeyboards()[vkName].childContainersByContainerName[containerName];
+        }
+      }
+      for (var containerName in allContainers){
         var container = containers[containerName];
+        if (!container){
+          container = childContainers[containerName].childContainersByContainerName[containerName];
+        }
         container.indexInIntersectableObjDescriptionArray = intersectableArrayIndex;
         var insertContainerToBuffer = ((mode == 0) || (mode == 1 && container.isClickable));
         if (insertContainerToBuffer){
@@ -354,6 +369,7 @@ RaycasterWorkerBridge.prototype.refresh2D = function(){
   var totalTextObj = (mode == 0)? sceneHandler.getAddedTexts2D(): sceneHandler.getClickableAddedTexts2D();
   var totalSpriteObj = (mode == 0)? sceneHandler.getSprites(): sceneHandler.getClickableSprites();
   var totalContainerObj = (mode == 0)? sceneHandler.getContainers(): sceneHandler.getClickableContainers();
+  var totalVirtualKeyboardObj = sceneHandler.getVirtualKeyboards();
   var msgBody = {texts: {}, sprites: {}, containers:{}};
   for (var textName in totalTextObj){
     var size = totalTextObj[textName].twoDimensionalSize;
@@ -364,6 +380,9 @@ RaycasterWorkerBridge.prototype.refresh2D = function(){
   }
   for (var containerName in totalContainerObj){
     msgBody.containers[containerName] = totalContainerObj[containerName].exportLightweight();
+  }
+  for (var vkName in totalVirtualKeyboardObj){
+    msgBody.virtualKeyboards[vkName] = totalVirtualKeyboardObj[vkName].exportLightweight();
   }
   var vp = {x: renderer.getCurrentViewport().x, y: renderer.getCurrentViewport().y, z: renderer.getCurrentViewport().z, w: renderer.getCurrentViewport().w}
   this.worker.postMessage({refresh2D: true, body: msgBody, vp: vp, screenResolution: screenResolution});
