@@ -27,6 +27,7 @@
 //  refCharSize
 //  refCharInnerHeight
 var VirtualKeyboard = function(parameters){
+  this.isVirtualKeyboard = true;
   this.name = parameters.name;
   this.positionXPercent = parameters.positionXPercent;
   this.positionYPercent = parameters.positionYPercent;
@@ -83,7 +84,60 @@ var VirtualKeyboard = function(parameters){
   this.isCapslockOn = false;
   this.isNumeric = false;
 
+  this.keysByContainerName = new Object();
+  this.childContainersByContainerName = new Object();
+
+  this.numbersByKey = {
+    "q": "0", "w": "1", "e": "2", "r": "3", "t": "4", "y": "5", "u": "6",
+    "i": "7", "o": "8", "p": "9"
+  }
+
   this.initialize();
+}
+
+VirtualKeyboard.prototype.onDelPress = function(){
+
+}
+
+VirtualKeyboard.prototype.onSpacePress = function(){
+
+}
+
+VirtualKeyboard.prototype.onOKPress = function(){
+
+}
+
+VirtualKeyboard.prototype.onKeyPress = function(key){
+
+}
+
+VirtualKeyboard.prototype.onMouseClickIntersection = function(childContainerName){
+  var key = this.keysByContainerName[childContainerName];
+  if (key.length == 1){
+    if (this.isNumeric){
+      var number = this.numbersByKey[key];
+      if (number){
+        this.onKeyPress(number);
+        return;
+      }
+    }
+    if (this.isCapslockOn){
+      this.onKeyPress(key.toUpperCase());
+    }else{
+      this.onKeyPress(key);
+    }
+  }
+  if (key == "del"){
+    this.onDelPress();
+  }else if (key == "space"){
+    this.onSpacePress();
+  }else if (key == "ok"){
+    this.onOKPress();
+  }else if (key == "123"){
+    this.onModeChange();
+  }else if (key == "caps" && !this.isNumeric){
+    this.onCapsLock();
+  }
 }
 
 VirtualKeyboard.prototype.onModeChange = function(){
@@ -146,7 +200,9 @@ VirtualKeyboard.prototype.handleResize = function(){
 }
 
 VirtualKeyboard.prototype.initializeKey = function(x, y, width, height, key){
-  var container = new Container2D(null, x, y, width, height);
+  var container = new Container2D(generateUUID(), x, y, width, height, this);
+  container.assignedKey = key;
+  container.isClickable = true;
   if (this.keyHasBorder){
     container.setBorder(this.keyBorderColor, this.keyBorderThickness);
     container.makeVisible();
@@ -165,10 +221,14 @@ VirtualKeyboard.prototype.initializeKey = function(x, y, width, height, key){
   container.insertAddedText(text);
   this.keyContainers.push(container);
   this.textsByKey[key] = text;
+  this.keysByContainerName[container.name] = key;
+  this.childContainersByContainerName[container.name] = container;
+  childContainers[container.name] = this;
+  container.handleRectangle();
 }
 
 VirtualKeyboard.prototype.initialize = function(){
-  this.backgroundContainer = new Container2D(null, this.positionXPercent, this.positionYPercent, this.totalWidthPercent, this.totalHeightPercent);
+  this.backgroundContainer = new Container2D(null, this.positionXPercent, this.positionYPercent, this.totalWidthPercent, this.totalHeightPercent, this);
   if (this.hasBackground){
     this.backgroundContainer.setBackground(this.backgroundColor, this.backgroundAlpha, this.backgroundTextureName);
   }

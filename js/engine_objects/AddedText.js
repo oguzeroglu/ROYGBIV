@@ -209,7 +209,7 @@ AddedText.prototype.destroy = function(skipRaycasterRefresh){
     this.rectangle.material.dispose();
     this.rectangle.geometry.dispose();
   }
-  if (!skipRaycasterRefresh){
+  if (!skipRaycasterRefresh && this.name){
     rayCaster.refresh();
   }
   delete addedTexts[this.name];
@@ -410,7 +410,9 @@ AddedText.prototype.setText = function(newText, fromScript){
     this.handleResize();
   }else{
     this.handleBoundingBox();
-    rayCaster.onAddedTextResize(this);
+    if (this.name){
+      rayCaster.onAddedTextResize(this);
+    }
   }
 }
 
@@ -747,7 +749,7 @@ AddedText.prototype.hide = function(){
   if (mode == 0 && this.rectangle){
     scene.remove(this.rectangle.mesh);
   }
-  if (mode == 1 && this.isClickable){
+  if (mode == 1 && this.isClickable && this.name){
     rayCaster.hide(this);
   }
 }
@@ -759,7 +761,9 @@ AddedText.prototype.show = function(){
     if (!this.boundingBox){
       this.handleBoundingBox();
     }
-    rayCaster.show(this);
+    if (this.name){
+      rayCaster.show(this);
+    }
   }
 }
 
@@ -970,7 +974,9 @@ AddedText.prototype.set2DCoordinates = function(marginPercentWidth, marginPercen
     this.webglSpaceSize.x, this.webglSpaceSize.y
   );
   this.rectangle.updateMesh(0.005);
-  rayCaster.updateObject(this);
+  if (this.name){
+    rayCaster.updateObject(this);
+  }
 }
 
 AddedText.prototype.debugCornerPoints = function(representativeCharacter, cornerIndex){

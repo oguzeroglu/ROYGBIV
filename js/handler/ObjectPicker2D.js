@@ -80,6 +80,12 @@ ObjectPicker2D.prototype.find = function(screenSpaceX, screenSpaceY){
     if (!obj){
       obj = containers[name];
     }
+    if (!obj){
+      var vk = childContainers[name];
+      if (vk){
+        obj = vk.childContainersByContainerName[name];
+      }
+    }
     if (obj.mesh && !obj.mesh.visible){
       continue;
     }

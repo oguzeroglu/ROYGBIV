@@ -1,4 +1,4 @@
-var Container2D = function(name, centerXPercent, centerYPercent, widthPercent, heightPercent){
+var Container2D = function(name, centerXPercent, centerYPercent, widthPercent, heightPercent, virtualKeyboardParent){
   this.isContainer = true;
   this.name = name;
   this.centerXPercent = centerXPercent;
@@ -16,6 +16,7 @@ var Container2D = function(name, centerXPercent, centerYPercent, widthPercent, h
       this.rectangle.mesh.material.uniforms.color.value.set("lime");
     }
   }
+  this.virtualKeyboardParent = virtualKeyboardParent;
 }
 
 Container2D.prototype.removeBackground = function(){
@@ -208,7 +209,9 @@ Container2D.prototype.makeSquare = function(){
     }
   }
   this.handleRectangle();
-  rayCaster.updateObject(this);
+  if (!this.virtualKeyboardParent){
+    rayCaster.updateObject(this);
+  }
 }
 
 Container2D.prototype.handleResize = function(){
@@ -231,7 +234,7 @@ Container2D.prototype.handleResize = function(){
     this.backgroundSprite.handleRectangle();
     this.setBackground(this.backgroundColor, this.backgroundAlpha, this.backgroundTextureName);
   }
-  if (this.name){
+  if (!this.virtualKeyboardParent){
     rayCaster.updateObject(this);
   }
 }
@@ -325,7 +328,9 @@ Container2D.prototype.setCenter = function(centerXPercent, centerYPercent){
   if (this.addedText){
     this.insertAddedText(this.addedText);
   }
-  rayCaster.updateObject(this);
+  if (!this.virtualKeyboardParent){
+    rayCaster.updateObject(this);
+  }
 }
 
 Container2D.prototype.setWidth = function(widthPercent){
@@ -340,7 +345,9 @@ Container2D.prototype.setWidth = function(widthPercent){
   if (this.addedText){
     this.insertAddedText(this.addedText);
   }
-  rayCaster.updateObject(this);
+  if (!this.virtualKeyboardParent){
+    rayCaster.updateObject(this);
+  }
 }
 
 Container2D.prototype.setHeight = function(heightPercent){
@@ -355,8 +362,11 @@ Container2D.prototype.setHeight = function(heightPercent){
   if (this.addedText){
     this.insertAddedText(this.addedText);
   }
-  rayCaster.updateObject(this);
+  if (!this.virtualKeyboardParent){
+    rayCaster.updateObject(this);
+  }
 }
+
 
 Container2D.prototype.handleRectangle = function(){
   if (!this.rectangle){

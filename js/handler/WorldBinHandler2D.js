@@ -51,6 +51,18 @@ WorldBinHandler2D.prototype.getBinIndex = function(float){
   return parseInt(result);
 }
 
+WorldBinHandler2D.prototype.insertVirtualKeyboard = function(obj){
+  for (var i = 0; i<obj.keyContainers.length; i++){
+    var childObj = obj.keyContainers[i];
+    if (!childObj.binInfo2D){
+      childObj.binInfo2D = new Map();
+    }else if (childObj.binInfo2D.size > 0){
+      childObj.binInfo2D.clear();
+    }
+    this.insertContainer(childObj);
+  }
+}
+
 WorldBinHandler2D.prototype.insertContainer = function(obj){
   var minXIndex = this.getBinIndex(this.convertFromWebGLRange(obj.rectangle.x));
   var maxYIndex = this.getBinIndex(this.convertFromWebGLRange(obj.rectangle.y));
@@ -156,6 +168,8 @@ WorldBinHandler2D.prototype.insert = function(obj){
     this.insertSprite(obj);
   }else if (obj.isContainer){
     this.insertContainer(obj);
+  }else if (obj.isVirtualKeyboard){
+    this.insertVirtualKeyboard(obj);
   }
   if (this.applyCaching && this.cache.size > 0){
     this.cache.clear();

@@ -269,6 +269,7 @@ StateLoader.prototype.resetProject = function(){
   lightnings = new Object();
   sprites = new Object();
   containers = new Object();
+  childContainers = new Object();
   webglCallbackHandler = new WebGLCallbackHandler();
   textureAtlasHandler.dispose();
   textureAtlasHandler = new TextureAtlasHandler();

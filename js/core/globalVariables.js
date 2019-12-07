@@ -383,6 +383,7 @@ var clickableSprites = new Object();
 var clickableContainers = new Object();
 var draggingSprite = false;
 var containers = new Object();
+var childContainers = new Object();
 
 // RENDER ORDERS
 var renderOrders = {
