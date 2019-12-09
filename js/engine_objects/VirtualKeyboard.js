@@ -99,6 +99,30 @@ var VirtualKeyboard = function(parameters){
   }
 }
 
+VirtualKeyboard.prototype.onShiftPress = function(isPressed){
+  var stat = true;
+  if (isPressed){
+    stat = false;
+  }
+  if (this.hasBorder){
+    this.backgroundContainer.rectangle.mesh.visible = stat;
+  }
+  if (this.backgroundContainer.hasBackground){
+    this.backgroundContainer.backgroundSprite.mesh.visible = stat;
+  }
+  for (var i = 0; i<this.keyContainers.length; i++){
+    if (this.keyContainers[i].hasBorder){
+      this.keyContainers[i].rectangle.mesh.visible = stat;
+    }
+    if (this.keyContainers[i].hasBackground){
+      this.keyContainers[i].backgroundSprite.mesh.visible = stat;
+    }
+  }
+  for (var key in this.textsByKey){
+    this.textsByKey[key].mesh.visible = stat;
+  }
+}
+
 VirtualKeyboard.prototype.hideVisually = function(){
   if (this.hasBorder){
     this.backgroundContainer.makeInvisible();
@@ -111,7 +135,7 @@ VirtualKeyboard.prototype.hideVisually = function(){
       this.keyContainers[i].makeInvisible();
     }
     if (this.keyContainers[i].hasBackground){
-      this.keyContainers[i].hideVisually();
+      this.keyContainers[i].backgroundSprite.hideVisually();
     }
   }
   for (var key in this.textsByKey){
@@ -131,7 +155,7 @@ VirtualKeyboard.prototype.showVisually = function(){
       this.keyContainers[i].makeVisible();
     }
     if (this.keyContainers[i].hasBackground){
-      this.keyContainers[i].showVisually();
+      this.keyContainers[i].backgroundSprite.showVisually();
     }
   }
   for (var key in this.textsByKey){

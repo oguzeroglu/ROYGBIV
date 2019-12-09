@@ -138,6 +138,12 @@ KeyboardEventHandler.prototype.activateGridSelectionMode = function(){
   }
   for (var containerName in sceneHandler.getContainers()){
     containers[containerName].rectangle.mesh.visible = false;
+    if (containers[containerName].hasBackground){
+      containers[containerName].backgroundSprite.mesh.visible = false;
+    }
+  }
+  for (var virtualKeyboardName in sceneHandler.getVirtualKeyboards()){
+    virtualKeyboards[virtualKeyboardName].onShiftPress(true);
   }
   raycasterFactory.onShiftPress(true);
 }
@@ -157,6 +163,12 @@ KeyboardEventHandler.prototype.deactivateGridSelectionMode = function(){
   }
   for (var containerName in sceneHandler.getContainers()){
     containers[containerName].rectangle.mesh.visible = true;
+    if (containers[containerName].hasBackground){
+      containers[containerName].backgroundSprite.mesh.visible = true;
+    }
+  }
+  for (var virtualKeyboardName in sceneHandler.getVirtualKeyboards()){
+    virtualKeyboards[virtualKeyboardName].onShiftPress(false);
   }
   raycasterFactory.onShiftPress(false);
 }
