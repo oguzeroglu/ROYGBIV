@@ -99,6 +99,46 @@ var VirtualKeyboard = function(parameters){
   }
 }
 
+VirtualKeyboard.prototype.hideVisually = function(){
+  if (this.hasBorder){
+    this.backgroundContainer.makeInvisible();
+  }
+  if (this.backgroundContainer.hasBackground){
+    this.backgroundContainer.backgroundSprite.hideVisually();
+  }
+  for (var i = 0; i<this.keyContainers.length; i++){
+    if (this.keyContainers[i].hasBorder){
+      this.keyContainers[i].makeInvisible();
+    }
+    if (this.keyContainers[i].hasBackground){
+      this.keyContainers[i].hideVisually();
+    }
+  }
+  for (var key in this.textsByKey){
+    this.textsByKey[key].hideVisually();
+  }
+}
+
+VirtualKeyboard.prototype.showVisually = function(){
+  if (this.hasBorder){
+    this.backgroundContainer.makeVisible();
+  }
+  if (this.backgroundContainer.hasBackground){
+    this.backgroundContainer.backgroundSprite.showVisually();
+  }
+  for (var i = 0; i<this.keyContainers.length; i++){
+    if (this.keyContainers[i].hasBorder){
+      this.keyContainers[i].makeVisible();
+    }
+    if (this.keyContainers[i].hasBackground){
+      this.keyContainers[i].showVisually();
+    }
+  }
+  for (var key in this.textsByKey){
+    this.textsByKey[key].showVisually();
+  }
+}
+
 VirtualKeyboard.prototype.export = function(){
   return this.parameters;
 }

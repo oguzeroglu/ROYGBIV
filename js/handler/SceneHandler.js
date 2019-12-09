@@ -197,6 +197,9 @@ SceneHandler.prototype.hideAll = function(){
       containers[containerName].backgroundSprite.hideVisually();
     }
   }
+  for (var vkName in virtualKeyboards){
+    virtualKeyboards[vkName].hideVisually();
+  }
   if (mode == 0){
     for (var gsName in gridSystems){
       gridSystems[gsName].hide();
@@ -293,6 +296,9 @@ SceneHandler.prototype.changeScene = function(sceneName, readyCallback){
         container.backgroundSprite.showVisually();
       }
     }
+    for (var vkName in this.scenes[sceneName].virtualKeyboards){
+      virtualKeyboards[vkName].showVisually();
+    }
     if (markedPointsVisible){
       for (var markedPointName in this.scenes[sceneName].markedPoints){
         var markedPoint = this.scenes[sceneName].markedPoints[markedPointName];
@@ -351,6 +357,9 @@ SceneHandler.prototype.changeScene = function(sceneName, readyCallback){
       if (container.hasBackground){
         container.backgroundSprite.showVisually();
       }
+    }
+    for (var vkName in this.scenes[sceneName].virtualKeyboards){
+      virtualKeyboards[vkName].showVisually();
     }
     this.activeSceneName = sceneName;
     if (!isDeployment){
