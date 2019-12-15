@@ -5108,6 +5108,23 @@ function parse(input){
           }
           return true;
         break;
+        case 214: //printVirtualKeyboards
+          var count = 0;
+          var length = Object.keys(virtualKeyboards).length;
+          terminal.printHeader(Text.VIRTUAL_KEYBOARDS);
+          for (var vkName in virtualKeyboards){
+            count ++;
+            var options = true;
+            if (count == length){
+              options = false;
+            }
+            terminal.printInfo(Text.TREE.replace(Text.PARAM1, vkName + " ["+virtualKeyboards[vkName].registeredSceneName+"]"), options);
+          }
+          if (count == 0){
+            terminal.printError(Text.NO_VIRTUAL_KEYBOARDS_CREATED);
+          }
+          return true;
+        break;
       }
       return true;
     }catch(err){

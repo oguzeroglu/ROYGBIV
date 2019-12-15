@@ -214,7 +214,8 @@ var CommandDescriptor = function(){
       0, //printContainers
       1, //newVirtualKeyboard
       1, //editVirtualKeyboard
-      1 //destroyVirtualKeyboard
+      1, //destroyVirtualKeyboard
+      0 //printVirtualKeyboards
   ];
 
   this.commandArgumentsExpectedExplanation = [
@@ -431,7 +432,8 @@ var CommandDescriptor = function(){
     "printContainers",
     "newVirtualKeyboard virtualKeyboardName",
     "editVirtualKeyboard virtualKeyboardName",
-    "destroyVirtualKeyboard virtualKeyboardName"
+    "destroyVirtualKeyboard virtualKeyboardName",
+    "printVirtualKeyboards"
   ];
 
   this.commands = [
@@ -648,7 +650,8 @@ var CommandDescriptor = function(){
     "printContainers",
     "newVirtualKeyboard",
     "editVirtualKeyboard",
-    "destroyVirtualKeyboard"
+    "destroyVirtualKeyboard",
+    "printVirtualKeyboards"
   ];
 
   this.commandInfo = [
@@ -865,7 +868,8 @@ var CommandDescriptor = function(){
     "printContainers: Prints created containers.",
     "newVirtualKeyboard: Opens the virtual keyboard creation GUI.",
     "editVirtualKeyboard: Opents GUI for virtual keyboard edition.",
-    "destroyVirtualKeyboard: Destroys a virtual keyboard."
+    "destroyVirtualKeyboard: Destroys a virtual keyboard.",
+    "printVirtualKeyboards: Prints created virtual keyboards."
   ];
 
   this.keyboardInfo = [
