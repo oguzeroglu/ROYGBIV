@@ -80,6 +80,25 @@ VirtualKeyboardCreatorGUIHandler.prototype.showGUI = function(){
   keyFolder.add(this.configurations, "keyCharSize").min(0.1).max(100).step(0.1).onChange(function(val){
     virtualKeyboardCreatorGUIHandler.handleVirtualKeyboardInstance();
   }).listen();
+  guiHandler.datGuiVirtualKeyboardCreation.add({
+    "Done": function(){
+      var name = virtualKeyboardCreatorGUIHandler.virtualKeyboard.name;
+      var params = virtualKeyboardCreatorGUIHandler.virtualKeyboard.parameters;
+      var isCreation = !virtualKeyboards[name];
+      var text = isCreation? Text.VIRTUAL_KEYBOARD_CREATED: Text.VIRTUAL_KEYBOARD_EDITED;
+      virtualKeyboardCreatorGUIHandler.onClose(text);
+      if (virtualKeyboards[name]){
+        virtualKeyboards[name].destroy();
+      }
+      virtualKeyboards[name] = new VirtualKeyboard(params);
+      sceneHandler.onVirtualKeyboardCreation(virtualKeyboards[name]);
+    }
+  }, "Done").listen();
+  guiHandler.datGuiVirtualKeyboardCreation.add({
+    "Cancel": function(){
+      virtualKeyboardCreatorGUIHandler.onClose(Text.OPERATION_CANCELLED);
+    }
+  }, "Cancel").listen();
 }
 
 VirtualKeyboardCreatorGUIHandler.prototype.init = function(name){
@@ -87,36 +106,40 @@ VirtualKeyboardCreatorGUIHandler.prototype.init = function(name){
   this.textureNames = Object.keys(texturePacks);
   this.textureNames.push("");
 
-  this.configurations = {
-    name: name,
-    positionXPercent: 50,
-    positionYPercent: 50,
-    fontName: this.fontNames[0],
-    totalWidthPercent: 30,
-    totalHeightPercent: 40,
-    hasBackground: false,
-    backgroundColor: "#000000",
-    backgroundAlpha: 1,
-    backgroundTextureName: "",
-    hasBorder: true,
-    borderThickness: 0.01,
-    borderColor: "#bfff00",
-    keyWidthPercent: 7,
-    keyHeightPercent: 17,
-    keyHasBorder: true,
-    keyBorderColor: "#bfff00",
-    keyBorderThickness: 0.003,
-    keyHasBackground: false,
-    keyBackgroundColor: "#000000",
-    keyBackgroundAlpha: 1,
-    keyBackgroundTextureName: "",
-    keyColor: "#bfff00",
-    keyCharMargin: 30,
-    keyCharSize: 30,
-    refCharSize: 30,
-    refCharInnerHeight: window.innerHeight
-  };
-
+  if (virtualKeyboards[name]){
+    this.configurations = JSON.parse(JSON.stringify(virtualKeyboards[name].parameters));
+    this.configurations.refCharInnerHeight = window.innerHeight;
+  }else{
+    this.configurations = {
+      name: name,
+      positionXPercent: 50,
+      positionYPercent: 50,
+      fontName: this.fontNames[0],
+      totalWidthPercent: 30,
+      totalHeightPercent: 40,
+      hasBackground: false,
+      backgroundColor: "#000000",
+      backgroundAlpha: 1,
+      backgroundTextureName: "",
+      hasBorder: true,
+      borderThickness: 0.01,
+      borderColor: "#bfff00",
+      keyWidthPercent: 7,
+      keyHeightPercent: 17,
+      keyHasBorder: true,
+      keyBorderColor: "#bfff00",
+      keyBorderThickness: 0.003,
+      keyHasBackground: false,
+      keyBackgroundColor: "#000000",
+      keyBackgroundAlpha: 1,
+      keyBackgroundTextureName: "",
+      keyColor: "#bfff00",
+      keyCharMargin: 30,
+      keyCharSize: 30,
+      refCharSize: 30,
+      refCharInnerHeight: window.innerHeight
+    };
+  }
   this.handleVirtualKeyboardInstance();
 }
 
@@ -144,8 +167,30 @@ VirtualKeyboardCreatorGUIHandler.prototype.handleVirtualKeyboardInstance = funct
   this.virtualKeyboard = new VirtualKeyboard(this.configurations);
 }
 
+VirtualKeyboardCreatorGUIHandler.prototype.onClose = function(text){
+  terminal.enable();
+  terminal.clear();
+  terminal.printInfo(text);
+  guiHandler.hideAll();
+  if (this.hiddenEngineObjects){
+    for (var i = 0; i<this.hiddenEngineObjects.length; i++){
+      this.hiddenEngineObjects[i].visible = true;
+    }
+  }
+  activeControl = new FreeControls({});
+  activeControl.onActivated();
+  camera.quaternion.set(0, 0, 0, 1);
+  camera.position.set(initialCameraX, initialCameraY, initialCameraZ);
+  if (this.virtualKeyboard){
+    this.virtualKeyboard.destroy();
+    delete this.virtualKeyboard;
+  }
+}
+
 VirtualKeyboardCreatorGUIHandler.prototype.show = function(vkName){
   this.commonStartFunctions();
   this.init(vkName);
   this.showGUI(vkName);
+  terminal.disable();
+  terminal.printInfo(Text.AFTER_VIRTUAL_KEYBOARD_CREATION);
 }
