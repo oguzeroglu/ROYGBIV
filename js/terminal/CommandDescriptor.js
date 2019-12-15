@@ -213,7 +213,8 @@ var CommandDescriptor = function(){
       1, //destroyContainer
       0, //printContainers
       1, //newVirtualKeyboard
-      1 //editVirtualKeyboard
+      1, //editVirtualKeyboard
+      1 //destroyVirtualKeyboard
   ];
 
   this.commandArgumentsExpectedExplanation = [
@@ -429,7 +430,8 @@ var CommandDescriptor = function(){
     "destroyContainer containerName",
     "printContainers",
     "newVirtualKeyboard virtualKeyboardName",
-    "editVirtualKeyboard virtualKeyboardName"
+    "editVirtualKeyboard virtualKeyboardName",
+    "destroyVirtualKeyboard virtualKeyboardName"
   ];
 
   this.commands = [
@@ -645,7 +647,8 @@ var CommandDescriptor = function(){
     "destroyContainer",
     "printContainers",
     "newVirtualKeyboard",
-    "editVirtualKeyboard"
+    "editVirtualKeyboard",
+    "destroyVirtualKeyboard"
   ];
 
   this.commandInfo = [
@@ -861,7 +864,8 @@ var CommandDescriptor = function(){
     "destroyContainer: Destroys a container.",
     "printContainers: Prints created containers.",
     "newVirtualKeyboard: Opens the virtual keyboard creation GUI.",
-    "editVirtualKeyboard: Opents GUI for virtual keyboard edition."
+    "editVirtualKeyboard: Opents GUI for virtual keyboard edition.",
+    "destroyVirtualKeyboard: Destroys a virtual keyboard."
   ];
 
   this.keyboardInfo = [
@@ -1603,6 +1607,11 @@ var CommandDescriptor = function(){
   this.editVirtualKeyboard = new Object();
   this.editVirtualKeyboard.types = [];
   this.editVirtualKeyboard.types.push(this.VIRTUAL_KEYBOARD_NAME); //virtualKeyboardName
+
+  // destroyVirtualKeyboard
+  this.destroyVirtualKeyboard = new Object();
+  this.destroyVirtualKeyboard.types = [];
+  this.destroyVirtualKeyboard.types.push(this.VIRTUAL_KEYBOARD_NAME); //virtualKeyboardName
 };
 
 CommandDescriptor.prototype.test = function(){

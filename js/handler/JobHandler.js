@@ -101,6 +101,8 @@ JobHandler.prototype.handle = function(previewModeCommand){
       this.handleEmptyContainerCommand();
     }else if (this.splitted[0] == "destroycontainer"){
       this.handleDestroyContainerCommand();
+    }else if (this.splitted[0] == "destroyvirtualkeyboard"){
+      this.handleDestroyVirtualKeyboardCommand();
     }
     if (jobHandlerRaycasterRefresh){
       refreshRaycaster(Text.JOB_COMPLETED, true);
@@ -111,6 +113,22 @@ JobHandler.prototype.handle = function(previewModeCommand){
   // because async
   if (this.splitted[0] != "autoConfigureArea".toLowerCase()){
     jobHandlerWorking = false;
+  }
+}
+
+JobHandler.prototype.handleDestroyVirtualKeyboardCommand = function(){
+  var virtualContainerNamePrefix = this.splitted[1].split("*")[0];
+  var ctr = 0;
+  for (var vkName in sceneHandler.getVirtualKeyboards()){
+    if (vkName.startsWith(virtualContainerNamePrefix)){
+      parseCommand("destroyVirtualKeyboard "+vkName);
+      ctr ++
+    }
+  }
+  if (ctr == 0){
+    terminal.printInfo(Text.NO_VIRTUAL_KEYBOARDS_FOUND);
+  }else{
+    terminal.printInfo(Text.COMMAND_EXECUTED_FOR_X_VIRTUAL_KEYBOARDS.replace(Text.PARAM1, ctr));
   }
 }
 

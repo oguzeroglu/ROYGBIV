@@ -5082,6 +5082,32 @@ function parse(input){
           virtualKeyboardCreatorGUIHandler.show(vkName);
           return true;
         break;
+        case 213: //destroyVirtualKeyboard
+          if (mode != 0){
+            terminal.printError(Text.WORKS_ONLY_IN_DESIGN_MODE);
+            return true;
+          }
+          if (!(splitted[1].indexOf("*") == -1)){
+            new JobHandler(splitted).handle();
+            return true;
+          }
+          var vkName = splitted[1];
+          if (!virtualKeyboards[vkName]){
+            terminal.printError(Text.NO_SUCH_VIRTUAL_KEYBOARD);
+            return true;
+          }
+          if (sceneHandler.getActiveSceneName() != virtualKeyboards[vkName].registeredSceneName){
+            terminal.printError(Text.VIRTUAL_KEYBOARD_NOT_IN_ACTIVE_SCENE);
+            return true;
+          }
+          virtualKeyboards[vkName].destroy();
+          sceneHandler.onVirtualKeyboardDeletion(virtualKeyboards[vkName]);
+          delete virtualKeyboards[vkName];
+          if (!jobHandlerWorking){
+            terminal.printError(Text.VIRTUAL_KEYBOARD_DESTROYED);
+          }
+          return true;
+        break;
       }
       return true;
     }catch(err){
