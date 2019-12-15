@@ -69,6 +69,9 @@ ResizeEventHandler.prototype.onResize = function(){
   for (var containerName in containers){
     containers[containerName].handleResize();
   }
+  for (var virtualKeyboardName in virtualKeyboards){
+    virtualKeyboards[virtualKeyboardName].handleResize();
+  }
   renderer.setPixelRatio(screenResolution);
   rayCaster.refresh2D();
 }

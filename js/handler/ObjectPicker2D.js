@@ -141,6 +141,9 @@ ObjectPicker2D.prototype.getSprites = function(){
 
 ObjectPicker2D.prototype.getVirtualKeyboards = function(){
   if (!IS_WORKER_CONTEXT){
+    if (mode == 0){
+      return {};
+    }
     return sceneHandler.getVirtualKeyboards();
   }else{
     return virtualKeyboards;

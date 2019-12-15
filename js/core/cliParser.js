@@ -5048,6 +5048,40 @@ function parse(input){
           }
           return true;
         break;
+        case 211: //newVirtualKeyboard
+          if (mode != 0){
+            terminal.printError(Text.WORKS_ONLY_IN_DESIGN_MODE);
+            return true;
+          }
+          var vkName = splitted[1];
+          if (virtualKeyboards[vkName]){
+            terminal.printError(Text.NAME_MUST_BE_UNIQUE);
+            return true;
+          }
+          if (Object.keys(fonts).length == 0){
+            terminal.printError(Text.NO_FONTS_CREATED);
+            return true;
+          }
+          virtualKeyboardCreatorGUIHandler.show(vkName);
+          return true;
+        break;
+        case 212: //editVirtualKeyboard
+          if (mode != 0){
+            terminal.printError(Text.WORKS_ONLY_IN_DESIGN_MODE);
+            return true;
+          }
+          var vkName = splitted[1];
+          if (!virtualKeyboards[vkName]){
+            terminal.printError(Text.NO_SUCH_VIRTUAL_KEYBOARD);
+            return true;
+          }
+          if (sceneHandler.getActiveSceneName() != virtualKeyboards[vkName].registeredSceneName){
+            terminal.printError(Text.VIRTUAL_KEYBOARD_NOT_IN_ACTIVE_SCENE);
+            return true;
+          }
+          virtualKeyboardCreatorGUIHandler.show(vkName);
+          return true;
+        break;
       }
       return true;
     }catch(err){

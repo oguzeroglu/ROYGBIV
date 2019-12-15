@@ -796,6 +796,14 @@ Terminal.prototype.autocomplete = function(command){
 				}
 				helpString = "[Alignment type]: ";
 			break;
+			case commandDescriptor.VIRTUAL_KEYBOARD_NAME:
+				for (var vkName in sceneHandler.getVirtualKeyboards()){
+					if (vkName.toLowerCase().startsWith(curEntry.toLowerCase())){
+						possibilities.push(vkName);
+					}
+				}
+				helpString = "[Virtual keyboards]: ";
+			break;
 		}
 
 		//  **********************************************************
