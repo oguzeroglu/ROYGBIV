@@ -5054,8 +5054,7 @@ function parse(input){
             return true;
           }
           var vkName = splitted[1];
-          if (virtualKeyboards[vkName]){
-            terminal.printError(Text.NAME_MUST_BE_UNIQUE);
+          if (!checkIfNameUnique(vkName, Text.NAME_MUST_BE_UNIQUE)){
             return true;
           }
           if (Object.keys(fonts).length == 0){
@@ -5278,7 +5277,7 @@ function isNameUsedAsSoftCopyParentName(name){
 }
 
 function checkIfNameUnique(name, errorMsg){
-  if (addedObjects[name] || objectGroups[name] || gridSystems[name] || addedTexts[name] || sprites[name] || wallCollections[name] || containers[name]){
+  if (addedObjects[name] || objectGroups[name] || gridSystems[name] || addedTexts[name] || sprites[name] || wallCollections[name] || containers[name] || virtualKeyboards[name]){
     terminal.printError(errorMsg);
     return false;
   }
