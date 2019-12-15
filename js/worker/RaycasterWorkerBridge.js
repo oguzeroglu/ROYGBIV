@@ -370,7 +370,7 @@ RaycasterWorkerBridge.prototype.refresh2D = function(){
   var totalSpriteObj = (mode == 0)? sceneHandler.getSprites(): sceneHandler.getClickableSprites();
   var totalContainerObj = (mode == 0)? sceneHandler.getContainers(): sceneHandler.getClickableContainers();
   var totalVirtualKeyboardObj = (mode == 0)? {}: sceneHandler.getVirtualKeyboards();
-  var msgBody = {texts: {}, sprites: {}, containers:{}};
+  var msgBody = {texts: {}, sprites: {}, containers:{}, virtualKeyboards: {}};
   for (var textName in totalTextObj){
     var size = totalTextObj[textName].twoDimensionalSize;
     msgBody.texts[textName] = {x: size.x, y: size.y, z: size.z, w: size.w};
