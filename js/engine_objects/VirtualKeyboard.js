@@ -99,6 +99,10 @@ var VirtualKeyboard = function(parameters){
   }
 }
 
+VirtualKeyboard.prototype.hasTexturePackUsed = function(tpName){
+  return ((tpName == this.parameters.backgroundTextureName) || (tpName == this.parameters.keyBackgroundTextureName));
+}
+
 VirtualKeyboard.prototype.onShiftPress = function(isPressed){
   var stat = true;
   if (isPressed){

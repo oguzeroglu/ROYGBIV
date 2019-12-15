@@ -1299,6 +1299,12 @@ function parse(input){
               return true;
             }
           }
+          for (var vkName in virtualKeyboards){
+            if (virtualKeyboards[vkName].hasTexturePackUsed(name)){
+              terminal.printError(Text.TEXTURE_PACK_USED_IN_VIRTUAL_KEYBOARD.replace(Text.PARAM1, vkName));
+              return true;
+            }
+          }
           if (texturePack.isParticleTexture){
             for (var psName in preConfiguredParticleSystems){
               var usedTextureName = preConfiguredParticleSystems[psName].getUsedTextureName();
