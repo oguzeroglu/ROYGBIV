@@ -338,6 +338,7 @@ var crosshairCreatorGUIHandler;
 var scriptsGUIHandler;
 var animationCreatorGUIHandler;
 var lightningCreatorGUIHandler;
+var virtualKeyboardCreatorGUIHandler;
 var skyboxHandler;
 var fogHandler;
 var scriptsHandler;

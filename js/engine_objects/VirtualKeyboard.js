@@ -123,6 +123,20 @@ VirtualKeyboard.prototype.onShiftPress = function(isPressed){
   }
 }
 
+VirtualKeyboard.prototype.destroy = function(){
+  if (this.hasBorder){
+    this.backgroundContainer.destroy();
+  }
+  for (var i = 0; i<this.keyContainers.length; i++){
+    if (this.keyContainers[i].hasBorder){
+      this.keyContainers[i].destroy();
+    }
+  }
+  for (var key in this.textsByKey){
+    this.textsByKey[key].destroy();
+  }
+}
+
 VirtualKeyboard.prototype.hideVisually = function(){
   if (this.hasBorder){
     this.backgroundContainer.makeInvisible();

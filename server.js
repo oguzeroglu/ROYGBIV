@@ -577,6 +577,7 @@ function readEngineScripts(projectName, author, noMobile){
         console.log("[*] Skipping ScriptsGUIHandler.");
         console.log("[*] Skipping AnimationCreatorGUIHandler.");
         console.log("[*] Skipping LightningCreatorGUIHandler.");
+        console.log("[*] Skipping VirtualKeyboardCreatorGUIHandler.");
         continue;
       }else if (scriptPath.includes("dat.gui.min.js")){
         console.log("[*] Skipping DAT gui.");

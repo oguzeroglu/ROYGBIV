@@ -75,6 +75,7 @@ window.onload = function() {
     scriptsGUIHandler = new ScriptsGUIHandler();
     animationCreatorGUIHandler = new AnimationCreatorGUIHandler();
     lightningCreatorGUIHandler = new LightningCreatorGUIHandler();
+    virtualKeyboardCreatorGUIHandler = new VirtualKeyboardCreatorGUIHandler();
   }
 
   // PHYSICS BODY GENERATOR
