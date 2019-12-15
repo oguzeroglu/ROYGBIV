@@ -32,6 +32,9 @@ ResizeEventHandler.prototype.onResize = function(){
     if (fpsWeaponGUIHandler.fpsWeaponAlignmentConfigurationObject){
       fpsWeaponGUIHandler.fpsWeaponAlignmentConfigurationObject.onFPSWeaponAlignmentUpdate();
     }
+    if (virtualKeyboardCreatorGUIHandler.virtualKeyboard){
+      virtualKeyboardCreatorGUIHandler.virtualKeyboard.handleResize();
+    }
   }
   if (particleSystemRefHeight){
     GLOBAL_PS_REF_HEIGHT_UNIFORM.value = ((renderer.getCurrentViewport().w / screenResolution) / particleSystemRefHeight);
