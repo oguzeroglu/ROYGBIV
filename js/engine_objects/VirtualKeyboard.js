@@ -23,6 +23,7 @@
 //  keyBackgroundTextureName
 //  keyColor
 //  keyCharMargin
+//  keyInteractionColor
 //  keyCharSize
 //  refCharSize
 //  refCharInnerHeight
@@ -30,6 +31,8 @@ var VirtualKeyboard = function(parameters){
   this.isVirtualKeyboard = true;
   this.name = parameters.name;
   this.parameters = parameters;
+
+  this.mouseDownThresholdInMS = 200;
 
   this.positionXPercent = parameters.positionXPercent;
   this.positionYPercent = parameters.positionYPercent;
@@ -54,13 +57,12 @@ var VirtualKeyboard = function(parameters){
   this.keyBackgroundTextureName = parameters.keyBackgroundTextureName;
   this.keyColor = parameters.keyColor;
   this.keyCharMargin = parameters.keyCharMargin;
+  this.keyInteractionColor = parameters.keyInteractionColor;
   this.keyCharSize = parameters.keyCharSize;
   this.refCharSize = parameters.refCharSize;
   this.refCharInnerHeight = parameters.refCharInnerHeight;
 
   this.font = fonts[this.fontName];
-
-  this.reusableColor = new THREE.Color(parameters.keyColor);
 
   this.keys = [
     [
@@ -195,6 +197,15 @@ VirtualKeyboard.prototype.exportLightweight = function(){
   return exportObj;
 }
 
+VirtualKeyboard.prototype.onMouseDownIntersection = function(childContainerName){
+  var lastMouseDownTime = (this.lastMouseDownTime)? this.lastMouseDownTime: 0;
+  var now = performance.now();
+  if (now - lastMouseDownTime >= this.mouseDownThresholdInMS){
+    this.onMouseClickIntersection(childContainerName);
+    this.lastMouseDownTime = now;
+  }
+}
+
 VirtualKeyboard.prototype.onDelPress = function(){
 
 }
@@ -211,7 +222,43 @@ VirtualKeyboard.prototype.onKeyPress = function(key){
 
 }
 
+VirtualKeyboard.prototype.onMouseMoveIntersection = function(childContainerName){
+  if (!childContainerName){
+    if (this.lastColoredTextInstance){
+      this.lastColoredTextInstance.setColor(this.keyColor);
+      this.lastColoredTextInstance = 0;
+      if (this.keyHasBorder){
+        this.lastColoredContainerInstance.setBorder(this.keyBorderColor, this.keyBorderThickness);
+        this.lastColoredContainerInstance = 0;
+      }
+    }
+    return;
+  }
+  var container = this.childContainersByContainerName[childContainerName];
+  if (this.lastColoredTextInstance){
+    this.lastColoredTextInstance.setColor(this.keyColor);
+    this.lastColoredTextInstance = 0;
+    if (this.keyHasBorder){
+      this.lastColoredContainerInstance.setBorder(this.keyBorderColor, this.keyBorderThickness);
+      this.lastColoredContainerInstance = 0;
+    }
+  }
+  var textInstance = container.addedText;
+  textInstance.setColor(this.keyInteractionColor);
+  this.lastColoredTextInstance = textInstance;
+  if (this.keyHasBorder){
+    container.setBorder(this.keyInteractionColor, this.keyBorderThickness);
+    this.lastColoredContainerInstance = container;
+  }
+}
+
 VirtualKeyboard.prototype.onMouseClickIntersection = function(childContainerName){
+  var lastMouseDownTime = (this.lastMouseDownTime)? this.lastMouseDownTime: 0;
+  var now = performance.now();
+  if (now - lastMouseDownTime < this.mouseDownThresholdInMS){
+    return;
+  }
+  this.lastMouseDownTime = now;
   var key = this.keysByContainerName[childContainerName];
   if (key.length == 1){
     if (this.isNumeric){
@@ -310,7 +357,7 @@ VirtualKeyboard.prototype.initializeKey = function(x, y, width, height, key){
   if (this.keyHasBackground){
     container.setBackground(this.keyBackgroundColor, this.keyBackgroundAlpha, this.keyBackgroundTextureName);
   }
-  var text = new AddedText(null, this.font, key, REUSABLE_VECTOR, this.reusableColor, 1, this.keyCharSize, key.length);
+  var text = new AddedText(null, this.font, key, REUSABLE_VECTOR, new THREE.Color(this.parameters.keyColor), 1, this.keyCharSize, key.length);
   text.marginMode = MARGIN_MODE_2D_CENTER;
   text.setMarginBetweenChars(this.keyCharMargin);
   text.refCharSize = this.refCharSize;

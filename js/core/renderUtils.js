@@ -38,6 +38,7 @@ function render(){
     delayedExecutionHandler.tick();
   }else{
     if (!isDeployment){
+      cpuOperationsHandler.handleObjectMouseEvents();
       particleSystemCreatorGUIHandler.update();
       muzzleFlashCreatorGUIHandler.update();
       fpsWeaponGUIHandler.update();

@@ -107,6 +107,12 @@ MouseEventHandler.prototype.handleObjectMouseEvents = function(){
   if (isMobile || typeof this.coordX == UNDEFINED || pointerLockEventHandler.isPointerLocked){
     return;
   }
+  if (mode == 0 && !isDeployment){
+    virtualKeyboardCreatorGUIHandler.onMouseMove(this.clientX, this.clientY);
+    if (isMouseDown){
+      virtualKeyboardCreatorGUIHandler.onClick(this.clientX, this.clientY);
+    }
+  }
   var objectsWithMouseOverListenersSize = objectsWithMouseOverListeners.size;
   var objectsWithMouseOutListenerSize = objectsWithMouseOutListeners.size;
   if (mode == 1 && (objectsWithMouseOverListenersSize > 0 || objectsWithMouseOutListenerSize > 0)){

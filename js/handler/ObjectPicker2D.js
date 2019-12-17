@@ -146,6 +146,9 @@ ObjectPicker2D.prototype.getVirtualKeyboards = function(){
     }
     return sceneHandler.getVirtualKeyboards();
   }else{
+    if (mode == 0){
+      return {};
+    }
     return virtualKeyboards;
   }
 }

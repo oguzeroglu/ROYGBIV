@@ -2,6 +2,28 @@ var VirtualKeyboardCreatorGUIHandler = function(){
 
 }
 
+VirtualKeyboardCreatorGUIHandler.prototype.onMouseMove = function(clientX, clientY){
+  if (!this.virtualKeyboard){
+    return;
+  }
+  this.objectPicker2D.find(clientX, clientY);
+  if (intersectionPoint){
+    this.virtualKeyboard.onMouseMoveIntersection(intersectionObject);
+  }else{
+    this.virtualKeyboard.onMouseMoveIntersection(null);
+  }
+}
+
+VirtualKeyboardCreatorGUIHandler.prototype.onClick = function(clientX, clientY){
+  if (!this.virtualKeyboard){
+    return;
+  }
+  this.objectPicker2D.find(clientX, clientY);
+  if (intersectionPoint){
+    this.virtualKeyboard.onMouseDownIntersection(intersectionObject);
+  }
+}
+
 VirtualKeyboardCreatorGUIHandler.prototype.showGUI = function(){
   guiHandler.datGuiVirtualKeyboardCreation = new dat.GUI({hideable: false});
   guiHandler.datGuiVirtualKeyboardCreation.add(this.configurations, "name").listen();
@@ -74,6 +96,9 @@ VirtualKeyboardCreatorGUIHandler.prototype.showGUI = function(){
   keyFolder.addColor(this.configurations, "keyColor").onChange(function(val){
     virtualKeyboardCreatorGUIHandler.handleVirtualKeyboardInstance();
   }).listen();
+  keyFolder.addColor(this.configurations, "keyInteractionColor").onChange(function(val){
+    virtualKeyboardCreatorGUIHandler.handleVirtualKeyboardInstance();
+  }).listen();
   keyFolder.add(this.configurations, "keyCharMargin").min(0.1).max(100).step(0.1).onChange(function(val){
     virtualKeyboardCreatorGUIHandler.handleVirtualKeyboardInstance();
   }).listen();
@@ -134,6 +159,7 @@ VirtualKeyboardCreatorGUIHandler.prototype.init = function(name){
       keyBackgroundAlpha: 1,
       keyBackgroundTextureName: "",
       keyColor: "#bfff00",
+      keyInteractionColor: "#ff0000",
       keyCharMargin: 30,
       keyCharSize: 30,
       refCharSize: 30,
@@ -165,6 +191,8 @@ VirtualKeyboardCreatorGUIHandler.prototype.handleVirtualKeyboardInstance = funct
   this.configurations.refCharSize = this.configurations.keyCharSize;
   this.configurations.refCharInnerHeight = window.innerHeight;
   this.virtualKeyboard = new VirtualKeyboard(this.configurations);
+  this.objectPicker2D = new ObjectPicker2D();
+  this.objectPicker2D.binHandler.insertVirtualKeyboard(this.virtualKeyboard);
 }
 
 VirtualKeyboardCreatorGUIHandler.prototype.onClose = function(text){
