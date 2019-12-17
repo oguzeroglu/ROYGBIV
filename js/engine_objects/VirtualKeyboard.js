@@ -32,7 +32,8 @@ var VirtualKeyboard = function(parameters){
   this.name = parameters.name;
   this.parameters = parameters;
 
-  this.mouseDownThresholdInMS = 200;
+  this.keyPressThreshold = 5;
+  this.keyAddThrehsold = 200;
 
   this.positionXPercent = parameters.positionXPercent;
   this.positionYPercent = parameters.positionYPercent;
@@ -83,12 +84,23 @@ var VirtualKeyboard = function(parameters){
     ]
   ];
 
+  this.keypressTestKeysNonNumeric = [
+    "Q", "W", "E", "R", "T", "Y", "U", "I", "O", "P",
+    "A", "S", "D", "F", "G", "H", "J", "K", "L",
+    "Z", "X", "C", "V", "B", "N", "M",
+    ",", "."
+  ];
+  this.keypressTestKeysNumeric = [
+    "0", "1", "2", "3", "4", "5", "6", "7", "8", "9"
+  ];
+
   this.keyContainers = [];
   this.textsByKey = new Object();
   this.isCapslockOn = false;
   this.isNumeric = false;
 
   this.keysByContainerName = new Object();
+  this.containersByKey = new Object();
   this.childContainersByContainerName = new Object();
 
   this.numbersByKey = {
@@ -198,12 +210,7 @@ VirtualKeyboard.prototype.exportLightweight = function(){
 }
 
 VirtualKeyboard.prototype.onMouseDownIntersection = function(childContainerName){
-  var lastMouseDownTime = (this.lastMouseDownTime)? this.lastMouseDownTime: 0;
-  var now = performance.now();
-  if (now - lastMouseDownTime >= this.mouseDownThresholdInMS){
-    this.onMouseClickIntersection(childContainerName);
-    this.lastMouseDownTime = now;
-  }
+  this.onMouseClickIntersection(childContainerName);
 }
 
 VirtualKeyboard.prototype.onDelPress = function(){
@@ -253,13 +260,13 @@ VirtualKeyboard.prototype.onMouseMoveIntersection = function(childContainerName)
 }
 
 VirtualKeyboard.prototype.onMouseClickIntersection = function(childContainerName){
-  var lastMouseDownTime = (this.lastMouseDownTime)? this.lastMouseDownTime: 0;
+  var key = this.keysByContainerName[childContainerName];
   var now = performance.now();
-  if (now - lastMouseDownTime < this.mouseDownThresholdInMS){
+  if (this.lastKey && this.lastKey == key && this.lastKeySelectionTime && (now - this.lastKeySelectionTime <= this.keyAddThrehsold)){
     return;
   }
-  this.lastMouseDownTime = now;
-  var key = this.keysByContainerName[childContainerName];
+  this.lastKeySelectionTime = now;
+  this.lastKey = key;
   if (key.length == 1){
     if (this.isNumeric){
       var number = this.numbersByKey[key];
@@ -369,6 +376,10 @@ VirtualKeyboard.prototype.initializeKey = function(x, y, width, height, key){
   this.keyContainers.push(container);
   this.textsByKey[key] = text;
   this.keysByContainerName[container.name] = key;
+  this.containersByKey[key.toUpperCase()] = container;
+  if (this.numbersByKey[key]){
+    this.containersByKey[this.numbersByKey[key]] = container;
+  }
   this.childContainersByContainerName[container.name] = container;
   childContainers[container.name] = this;
   container.handleRectangle();
@@ -412,5 +423,78 @@ VirtualKeyboard.prototype.initialize = function(){
       curX += padX + (realKeyWidth * curRow[i2].weight / 2);
     }
     curY = curY - padY - (realKeyHeight / 2);
+  }
+}
+
+VirtualKeyboard.prototype.onKeyInteractionWithKeyboard = function(container){
+  var lastKeyInteractionWithKeyboardTime = this.lastKeyInteractionWithKeyboardTime? this.lastKeyInteractionWithKeyboardTime: 0;
+  var now = performance.now();
+  if (now - lastKeyInteractionWithKeyboardTime <= this.keyPressThreshold){
+    return;
+  }
+  var textInstance = container.addedText;
+  textInstance.setColor(this.keyInteractionColor);
+  this.lastColoredTextInstanceWithKeyboard = textInstance;
+  if (this.keyHasBorder){
+    container.setBorder(this.keyInteractionColor, this.keyBorderThickness);
+    this.lastColoredContainerInstanceWithKeyboard = container;
+  }
+  this.lastKeyInteractionWithKeyboardTime = now;
+  this.lastColoredContainerInstanceWithKeyboard = container;
+  this.lastColoredTextInstanceWithKeyboard = textInstance;
+}
+
+VirtualKeyboard.prototype.update = function(){
+  if (this.lastKeyInteractionWithKeyboardTime){
+    var now = performance.now();
+    if (now - this.lastKeyInteractionWithKeyboardTime >= this.keyPressThreshold/2){
+      this.lastColoredTextInstanceWithKeyboard.setColor(this.keyColor);
+      if (this.keyHasBorder){
+        this.lastColoredContainerInstanceWithKeyboard.setBorder(this.keyBorderColor, this.keyBorderThickness);
+      }
+    }
+  }
+  var pressed = false;
+  if (this.isCapslockOn && !keyboardBuffer["Caps Lock"]){
+    this.onMouseClickIntersection(this.containersByKey["CAPS"].name);
+    this.onKeyInteractionWithKeyboard(this.containersByKey["CAPS"]);
+    pressed = true;
+  }else if (!this.isCapslockOn && keyboardBuffer["Caps Lock"]){
+    this.onMouseClickIntersection(this.containersByKey["CAPS"].name);
+    this.onKeyInteractionWithKeyboard(this.containersByKey["CAPS"]);
+    pressed = true;
+  }
+  if (!pressed){
+    if (!this.isNumeric){
+      for (var i = 0; i < this.keypressTestKeysNonNumeric.length; i++){
+        if (keyboardBuffer[this.keypressTestKeysNonNumeric[i]]){
+          this.onMouseClickIntersection(this.containersByKey[this.keypressTestKeysNonNumeric[i]].name);
+          this.onKeyInteractionWithKeyboard(this.containersByKey[this.keypressTestKeysNonNumeric[i]]);
+          pressed = true;
+          break;
+        }
+      }
+    }else{
+      for (var i = 0; i < this.keypressTestKeysNumeric.length; i++){
+        if (keyboardBuffer[this.keypressTestKeysNumeric[i]]){
+          this.onMouseClickIntersection(this.containersByKey[this.keypressTestKeysNumeric[i]].name);
+          this.onKeyInteractionWithKeyboard(this.containersByKey[this.keypressTestKeysNumeric[i]]);
+          pressed = true;
+          break;
+        }
+      }
+    }
+    if (!pressed){
+      if (keyboardBuffer["Backspace"]){
+        this.onMouseClickIntersection(this.containersByKey["DEL"].name);
+        this.onKeyInteractionWithKeyboard(this.containersByKey["DEL"]);
+      }else if (keyboardBuffer["Space"]){
+        this.onMouseClickIntersection(this.containersByKey["SPACE"].name);
+        this.onKeyInteractionWithKeyboard(this.containersByKey["SPACE"]);
+      }else if (keyboardBuffer["Enter"]){
+        this.onMouseClickIntersection(this.containersByKey["OK"].name);
+        this.onKeyInteractionWithKeyboard(this.containersByKey["OK"]);
+      }
+    }
   }
 }

@@ -44,6 +44,7 @@ function render(){
       fpsWeaponGUIHandler.update();
       animationCreatorGUIHandler.update();
       lightningCreatorGUIHandler.update();
+      virtualKeyboardCreatorGUIHandler.update();
     }
     cameraOperationsDone = false;
   }

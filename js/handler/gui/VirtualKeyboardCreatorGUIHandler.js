@@ -2,6 +2,12 @@ var VirtualKeyboardCreatorGUIHandler = function(){
 
 }
 
+VirtualKeyboardCreatorGUIHandler.prototype.update = function(){
+  if (this.virtualKeyboard){
+    this.virtualKeyboard.update();
+  }
+}
+
 VirtualKeyboardCreatorGUIHandler.prototype.onMouseMove = function(clientX, clientY){
   if (!this.virtualKeyboard){
     return;
