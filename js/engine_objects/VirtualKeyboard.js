@@ -114,6 +114,8 @@ var VirtualKeyboard = function(parameters){
   if (!IS_WORKER_CONTEXT){
     this.initialize();
   }
+
+  this.text = "";
 }
 
 VirtualKeyboard.prototype.hasTexturePackUsed = function(tpName){
@@ -217,19 +219,25 @@ VirtualKeyboard.prototype.onMouseDownIntersection = function(childContainerName)
 }
 
 VirtualKeyboard.prototype.onDelPress = function(){
-
+  this.text = this.text.substring(0, this.text.length - 1);
 }
 
 VirtualKeyboard.prototype.onSpacePress = function(){
-
+  this.text += " ";
 }
 
 VirtualKeyboard.prototype.onOKPress = function(){
-
+  if (this.text == ""){
+    return;
+  }
+  if (this.onFlush){
+    this.onFlush(this.text);
+  }
+  this.text = "";
 }
 
 VirtualKeyboard.prototype.onKeyPress = function(key){
-
+  this.text += key;
 }
 
 VirtualKeyboard.prototype.onMouseMoveIntersection = function(childContainerName){
