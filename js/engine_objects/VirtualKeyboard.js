@@ -33,6 +33,9 @@ var VirtualKeyboard = function(parameters){
   this.parameters = parameters;
 
   this.keyPressThreshold = 5;
+  if (isMobile){
+    this.keyPressThreshold = 250;
+  }
   this.keyAddThrehsold = 200;
 
   this.positionXPercent = parameters.positionXPercent;
@@ -260,6 +263,9 @@ VirtualKeyboard.prototype.onMouseMoveIntersection = function(childContainerName)
 }
 
 VirtualKeyboard.prototype.onMouseClickIntersection = function(childContainerName){
+  if (isMobile){
+    this.onKeyInteractionWithKeyboard(this.childContainersByContainerName[childContainerName]);
+  }
   var key = this.keysByContainerName[childContainerName];
   var now = performance.now();
   if (this.lastKey && this.lastKey == key && this.lastKeySelectionTime && (now - this.lastKeySelectionTime <= this.keyAddThrehsold)){
@@ -429,7 +435,7 @@ VirtualKeyboard.prototype.initialize = function(){
 VirtualKeyboard.prototype.onKeyInteractionWithKeyboard = function(container){
   var lastKeyInteractionWithKeyboardTime = this.lastKeyInteractionWithKeyboardTime? this.lastKeyInteractionWithKeyboardTime: 0;
   var now = performance.now();
-  if (now - lastKeyInteractionWithKeyboardTime <= this.keyPressThreshold){
+  if (now - lastKeyInteractionWithKeyboardTime <= this.keyPressThreshold && !isMobile){
     return;
   }
   var textInstance = container.addedText;

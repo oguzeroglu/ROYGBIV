@@ -110,6 +110,9 @@ TouchEventHandler.prototype.onPinch = function(diff){
 TouchEventHandler.prototype.onTap = function(touch){
   mouseEventHandler.onClick(touch, true);
   activeControl.onTap(touch);
+  if (mode == 0 && !isDeployment){
+    virtualKeyboardCreatorGUIHandler.onClick(touch.clientX, touch.clientY);
+  }
 }
 
 TouchEventHandler.prototype.onTouchEnd = function(event){
