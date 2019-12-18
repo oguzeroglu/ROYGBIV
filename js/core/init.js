@@ -441,6 +441,9 @@ function onRaycasterMouseMoveIntersection(){
     }
     if (!object){
       object = childContainers[intersectionObject];
+      if (object == activeVirtualKeyboard){
+        object.onMouseMoveIntersection(intersectionObject);
+      }
     }
     var isDifferent = currentMouseOverObjectName != object.name;
     if (object.mouseOverCallbackFunction && isDifferent){
@@ -465,6 +468,12 @@ function onRaycasterMouseMoveIntersection(){
       if (!curObj){
         curObj = childContainers[currentMouseOverObjectName];
       }
+      if (!curObj){
+        curObj = virtualKeyboards[currentMouseOverObjectName];
+        if (curObj == activeVirtualKeyboard){
+          curObj.onMouseMoveIntersection(null);
+        }
+      }
       if (curObj && curObj.mouseOutCallbackFunction){
         if (curObj.registeredSceneName == sceneHandler.getActiveSceneName()){
           curObj.mouseOutCallbackFunction();
@@ -472,6 +481,9 @@ function onRaycasterMouseMoveIntersection(){
       }
     }
     currentMouseOverObjectName = intersectionObject;
+    if (object.isVirtualKeyboard){
+      currentMouseOverObjectName = object.name;
+    }
   }else{
     if (currentMouseOverObjectName){
       var curObj = addedObjects[currentMouseOverObjectName];
@@ -489,6 +501,12 @@ function onRaycasterMouseMoveIntersection(){
       }
       if (!curObj){
         curObj = childContainers[currentMouseOverObjectName];
+      }
+      if (!curObj){
+        curObj = virtualKeyboards[currentMouseOverObjectName];
+        if (curObj == activeVirtualKeyboard){
+          curObj.onMouseMoveIntersection(null);
+        }
       }
       if (curObj && curObj.mouseOutCallbackFunction){
         if (curObj.registeredSceneName == sceneHandler.getActiveSceneName()){

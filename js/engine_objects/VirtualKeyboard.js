@@ -123,6 +123,9 @@ VirtualKeyboard.prototype.hasTexturePackUsed = function(tpName){
 }
 
 VirtualKeyboard.prototype.onShiftPress = function(isPressed){
+  if (mode == 1){
+    return;
+  }
   var stat = true;
   if (isPressed){
     stat = false;
@@ -178,6 +181,7 @@ VirtualKeyboard.prototype.hideVisually = function(){
   for (var key in this.textsByKey){
     this.textsByKey[key].hideVisually();
   }
+  this.isHidden = true;
 }
 
 VirtualKeyboard.prototype.showVisually = function(){
@@ -198,6 +202,7 @@ VirtualKeyboard.prototype.showVisually = function(){
   for (var key in this.textsByKey){
     this.textsByKey[key].showVisually();
   }
+  this.isHidden = false;
 }
 
 VirtualKeyboard.prototype.export = function(){
@@ -215,6 +220,9 @@ VirtualKeyboard.prototype.exportLightweight = function(){
 }
 
 VirtualKeyboard.prototype.onMouseDownIntersection = function(childContainerName){
+  if (mode == 1 && activeVirtualKeyboard != this){
+    return;
+  }
   this.onMouseClickIntersection(childContainerName);
 }
 
@@ -241,6 +249,9 @@ VirtualKeyboard.prototype.onKeyPress = function(key){
 }
 
 VirtualKeyboard.prototype.onMouseMoveIntersection = function(childContainerName){
+  if (mode == 1 && activeVirtualKeyboard != this){
+    return;
+  }
   if (!childContainerName){
     if (this.lastColoredTextInstance){
       this.lastColoredTextInstance.setColor(this.keyColor);
@@ -271,6 +282,9 @@ VirtualKeyboard.prototype.onMouseMoveIntersection = function(childContainerName)
 }
 
 VirtualKeyboard.prototype.onMouseClickIntersection = function(childContainerName){
+  if (mode == 1 && activeVirtualKeyboard != this){
+    return;
+  }
   if (isMobile){
     this.onKeyInteractionWithKeyboard(this.childContainersByContainerName[childContainerName]);
   }
@@ -441,6 +455,9 @@ VirtualKeyboard.prototype.initialize = function(){
 }
 
 VirtualKeyboard.prototype.onKeyInteractionWithKeyboard = function(container){
+  if (mode == 1 && activeVirtualKeyboard != this){
+    return;
+  }
   var lastKeyInteractionWithKeyboardTime = this.lastKeyInteractionWithKeyboardTime? this.lastKeyInteractionWithKeyboardTime: 0;
   var now = performance.now();
   if (now - lastKeyInteractionWithKeyboardTime <= this.keyPressThreshold && !isMobile){
@@ -459,6 +476,9 @@ VirtualKeyboard.prototype.onKeyInteractionWithKeyboard = function(container){
 }
 
 VirtualKeyboard.prototype.update = function(){
+  if (mode == 1 && this.lastColoredContainerInstance && isMouseDown){
+    this.onMouseDownIntersection(this.lastColoredContainerInstance.name);
+  }
   if (this.lastKeyInteractionWithKeyboardTime){
     var now = performance.now();
     if (now - this.lastKeyInteractionWithKeyboardTime >= this.keyPressThreshold/2){

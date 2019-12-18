@@ -386,6 +386,7 @@ var draggingSprite = false;
 var containers = new Object();
 var childContainers = new Object();
 var virtualKeyboards = new Object();
+var activeVirtualKeyboard;
 
 // RENDER ORDERS
 var renderOrders = {
