@@ -282,6 +282,7 @@ ModeSwitcher.prototype.switchFromPreviewToDesign = function(){
   fpsHandler.reset();
   pointerLockRequested = false;
   fullScreenRequested = false;
+  activeVirtualKeyboard = 0;
   for (var lightningName in lightnings){
     lightnings[lightningName].stop();
   }

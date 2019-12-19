@@ -4,6 +4,8 @@ var KeyboardEventHandler = function(){
   }
   window.addEventListener('keydown', this.onKeyDown);
   window.addEventListener('keyup', this.onKeyUp);
+
+  this.CAPSLOCK = "CapsLock";
 }
 
 KeyboardEventHandler.prototype.onKeyUp = function(event){
@@ -11,6 +13,7 @@ KeyboardEventHandler.prototype.onKeyUp = function(event){
   if (!windowLoaded){
     return;
   }
+  keyboardEventHandler.isCapsOn = event.getModifierState && event.getModifierState(keyboardEventHandler.CAPSLOCK);
   if (cliFocused || omGUIFocused || tmGUIFocused || smGUIFocused || cmGUIFocused || acGUIFocused){
     return;
   }
@@ -63,6 +66,7 @@ KeyboardEventHandler.prototype.onKeyDown = function(event){
   if (!windowLoaded){
     return;
   }
+  keyboardEventHandler.isCapsOn = event.getModifierState && event.getModifierState(keyboardEventHandler.CAPSLOCK);
   if (cliFocused || omGUIFocused || tmGUIFocused || smGUIFocused || cmGUIFocused || acGUIFocused){
     return;
   }

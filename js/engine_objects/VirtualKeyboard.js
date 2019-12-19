@@ -118,6 +118,38 @@ var VirtualKeyboard = function(parameters){
   this.text = "";
 }
 
+VirtualKeyboard.prototype.resetColors = function(){
+  for (var i = 0; i<this.keyContainers.length; i++){
+    var container = this.keyContainers[i];
+    container.addedText.setColor(this.keyColor);
+    if (this.keyHasBorder){
+      container.setBorder(this.keyBorderColor, this.keyBorderThickness);
+    }
+  }
+}
+
+VirtualKeyboard.prototype.activate = function(){
+  for (var virtualKeyboardName in sceneHandler.getVirtualKeyboards()){
+    var vk = virtualKeyboards[virtualKeyboardName];
+    vk.resetColors();
+    vk.hideVisually();
+  }
+  this.showVisually();
+  activeVirtualKeyboard = this;
+}
+
+VirtualKeyboard.prototype.onFlush = function(flushedText){
+  if (mode == 1 && activeVirtualKeyboard == this && this.onFlushCallback){
+    this.onFlushCallback(flushedText);
+  }
+}
+
+VirtualKeyboard.prototype.onTextChange = function(text){
+  if (mode == 1 && activeVirtualKeyboard == this && this.onTextChangeCallback){
+    this.onTextChangeCallback(text);
+  }
+}
+
 VirtualKeyboard.prototype.hasTexturePackUsed = function(tpName){
   return ((tpName == this.parameters.backgroundTextureName) || (tpName == this.parameters.keyBackgroundTextureName));
 }
@@ -227,25 +259,29 @@ VirtualKeyboard.prototype.onMouseDownIntersection = function(childContainerName)
 }
 
 VirtualKeyboard.prototype.onDelPress = function(){
+  if (this.text == ""){
+    return;
+  }
   this.text = this.text.substring(0, this.text.length - 1);
+  this.onTextChange(this.text);
 }
 
 VirtualKeyboard.prototype.onSpacePress = function(){
   this.text += " ";
+  this.onTextChange(this.text);
 }
 
 VirtualKeyboard.prototype.onOKPress = function(){
   if (this.text == ""){
     return;
   }
-  if (this.onFlush){
-    this.onFlush(this.text);
-  }
+  this.onFlush(this.text);
   this.text = "";
 }
 
 VirtualKeyboard.prototype.onKeyPress = function(key){
   this.text += key;
+  this.onTextChange(this.text);
 }
 
 VirtualKeyboard.prototype.onMouseMoveIntersection = function(childContainerName){
@@ -488,15 +524,32 @@ VirtualKeyboard.prototype.update = function(){
       }
     }
   }
+  if (this.isCapslockOn){
+    var capsContainer = this.containersByKey["CAPS"];
+    var capsText = capsContainer.addedText;
+    capsText.setColor(this.keyInteractionColor);
+    if (this.keyHasBorder){
+      capsContainer.setBorder(this.keyInteractionColor, this.keyBorderThickness);
+    }
+  }else if (!this.isCapsOn){
+    var capsContainer = this.containersByKey["CAPS"];
+    var capsText = capsContainer.addedText;
+    capsText.setColor(this.keyColor);
+    if (this.keyHasBorder){
+      capsContainer.setBorder(this.keyBorderColor, this.keyBorderThickness);
+    }
+  }
   var pressed = false;
-  if (this.isCapslockOn && !keyboardBuffer["Caps Lock"]){
-    this.onMouseClickIntersection(this.containersByKey["CAPS"].name);
-    this.onKeyInteractionWithKeyboard(this.containersByKey["CAPS"]);
-    pressed = true;
-  }else if (!this.isCapslockOn && keyboardBuffer["Caps Lock"]){
-    this.onMouseClickIntersection(this.containersByKey["CAPS"].name);
-    this.onKeyInteractionWithKeyboard(this.containersByKey["CAPS"]);
-    pressed = true;
+  if (!isMobile){
+    if (this.isCapslockOn && !keyboardEventHandler.isCapsOn){
+      this.onMouseClickIntersection(this.containersByKey["CAPS"].name);
+      this.onKeyInteractionWithKeyboard(this.containersByKey["CAPS"]);
+      pressed = true;
+    }else if (!this.isCapslockOn && keyboardEventHandler.isCapsOn){
+      this.onMouseClickIntersection(this.containersByKey["CAPS"].name);
+      this.onKeyInteractionWithKeyboard(this.containersByKey["CAPS"]);
+      pressed = true;
+    }
   }
   if (!pressed){
     if (!this.isNumeric){

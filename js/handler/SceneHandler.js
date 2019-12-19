@@ -198,6 +198,7 @@ SceneHandler.prototype.hideAll = function(){
     }
   }
   for (var vkName in virtualKeyboards){
+    virtualKeyboards[vkName].resetColors();
     virtualKeyboards[vkName].hideVisually();
   }
   if (mode == 0){
@@ -297,6 +298,7 @@ SceneHandler.prototype.changeScene = function(sceneName, readyCallback){
       }
     }
     for (var vkName in this.scenes[sceneName].virtualKeyboards){
+      virtualKeyboards[vkName].resetColors();
       virtualKeyboards[vkName].showVisually();
     }
     if (markedPointsVisible){
@@ -359,7 +361,8 @@ SceneHandler.prototype.changeScene = function(sceneName, readyCallback){
       }
     }
     for (var vkName in this.scenes[sceneName].virtualKeyboards){
-      virtualKeyboards[vkName].showVisually();
+      virtualKeyboards[vkName].resetColors();
+      virtualKeyboards[vkName].hideVisually();
     }
     this.activeSceneName = sceneName;
     if (!isDeployment){
