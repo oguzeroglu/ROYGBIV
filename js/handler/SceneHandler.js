@@ -17,22 +17,24 @@ SceneHandler.prototype.onReady = function(){
     this.readyCallback();
   }
   if (this.nextSceneToChange){
-    this.changeScene(this.nextSceneToChange, this.nextReadyCallback);
+    var nextSceneToChange = this.nextSceneToChange;
+    var nextReadyCallback = this.nextReadyCallback;
     delete this.nextSceneToChange;
     delete this.nextReadyCallback;
+    this.changeScene(nextSceneToChange, nextReadyCallback);
   }
 }
 
 SceneHandler.prototype.onPhysicsReady = function(){
   this.physicsReady = true;
-  if (this.raycasterReady){
+  if (this.raycasterReady || raycasterFactory.workerTurnedOff){
     this.onReady();
   }
 }
 
 SceneHandler.prototype.onRaycasterReady = function(){
   this.raycasterReady = true;
-  if (this.physicsReady){
+  if (this.physicsReady || physicsFactory.workerTurnedOff){
     this.onReady();
   }else if (mode == 0){
     this.onReady();
@@ -195,6 +197,10 @@ SceneHandler.prototype.hideAll = function(){
       containers[containerName].backgroundSprite.hideVisually();
     }
   }
+  for (var vkName in virtualKeyboards){
+    virtualKeyboards[vkName].resetColors();
+    virtualKeyboards[vkName].hideVisually();
+  }
   if (mode == 0){
     for (var gsName in gridSystems){
       gridSystems[gsName].hide();
@@ -217,6 +223,10 @@ SceneHandler.prototype.hideAll = function(){
     }
     gridSelections = new Object();
   }else{
+    if (inputText){
+      inputText.deactivateInputMode();
+    }
+    inputText = 0;
     for (var objName in autoInstancedObjects){
       var obj = autoInstancedObjects[objName];
       obj.hideVisually();
@@ -291,6 +301,10 @@ SceneHandler.prototype.changeScene = function(sceneName, readyCallback){
         container.backgroundSprite.showVisually();
       }
     }
+    for (var vkName in this.scenes[sceneName].virtualKeyboards){
+      virtualKeyboards[vkName].resetColors();
+      virtualKeyboards[vkName].showVisually();
+    }
     if (markedPointsVisible){
       for (var markedPointName in this.scenes[sceneName].markedPoints){
         var markedPoint = this.scenes[sceneName].markedPoints[markedPointName];
@@ -350,6 +364,10 @@ SceneHandler.prototype.changeScene = function(sceneName, readyCallback){
         container.backgroundSprite.showVisually();
       }
     }
+    for (var vkName in this.scenes[sceneName].virtualKeyboards){
+      virtualKeyboards[vkName].resetColors();
+      virtualKeyboards[vkName].hideVisually();
+    }
     this.activeSceneName = sceneName;
     if (!isDeployment){
       rayCaster.onReadyCallback = noop;
@@ -379,6 +397,14 @@ SceneHandler.prototype.createScene = function(sceneName){
 SceneHandler.prototype.setBackgroundColor = function(colorName){
   this.scenes[this.activeSceneName].backgroundColor = colorName;
   scene.background.set(colorName);
+}
+
+SceneHandler.prototype.onVirtualKeyboardDeletion = function(virtualKeyboard){
+  this.scenes[virtualKeyboard.registeredSceneName].unregisterVirtualKeyboard(virtualKeyboard);
+}
+
+SceneHandler.prototype.onVirtualKeyboardCreation = function(virtualKeyboard){
+  this.scenes[this.activeSceneName].registerVirtualKeyboard(virtualKeyboard);
 }
 
 SceneHandler.prototype.onContainerDeletion = function(container){
@@ -576,6 +602,10 @@ SceneHandler.prototype.getAddedTexts2D = function(){
 
 SceneHandler.prototype.getContainers = function(){
   return this.scenes[this.activeSceneName].containers;
+}
+
+SceneHandler.prototype.getVirtualKeyboards = function(){
+  return this.scenes[this.activeSceneName].virtualKeyboards;
 }
 
 SceneHandler.prototype.getSprites = function(){

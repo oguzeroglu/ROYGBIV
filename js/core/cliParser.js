@@ -1299,6 +1299,12 @@ function parse(input){
               return true;
             }
           }
+          for (var vkName in virtualKeyboards){
+            if (virtualKeyboards[vkName].hasTexturePackUsed(name)){
+              terminal.printError(Text.TEXTURE_PACK_USED_IN_VIRTUAL_KEYBOARD.replace(Text.PARAM1, vkName));
+              return true;
+            }
+          }
           if (texturePack.isParticleTexture){
             for (var psName in preConfiguredParticleSystems){
               var usedTextureName = preConfiguredParticleSystems[psName].getUsedTextureName();
@@ -5048,6 +5054,82 @@ function parse(input){
           }
           return true;
         break;
+        case 211: //newVirtualKeyboard
+          if (mode != 0){
+            terminal.printError(Text.WORKS_ONLY_IN_DESIGN_MODE);
+            return true;
+          }
+          var vkName = splitted[1];
+          if (!checkIfNameUnique(vkName, Text.NAME_MUST_BE_UNIQUE)){
+            return true;
+          }
+          if (Object.keys(fonts).length == 0){
+            terminal.printError(Text.NO_FONTS_CREATED);
+            return true;
+          }
+          virtualKeyboardCreatorGUIHandler.show(vkName);
+          return true;
+        break;
+        case 212: //editVirtualKeyboard
+          if (mode != 0){
+            terminal.printError(Text.WORKS_ONLY_IN_DESIGN_MODE);
+            return true;
+          }
+          var vkName = splitted[1];
+          if (!virtualKeyboards[vkName]){
+            terminal.printError(Text.NO_SUCH_VIRTUAL_KEYBOARD);
+            return true;
+          }
+          if (sceneHandler.getActiveSceneName() != virtualKeyboards[vkName].registeredSceneName){
+            terminal.printError(Text.VIRTUAL_KEYBOARD_NOT_IN_ACTIVE_SCENE);
+            return true;
+          }
+          virtualKeyboardCreatorGUIHandler.show(vkName);
+          return true;
+        break;
+        case 213: //destroyVirtualKeyboard
+          if (mode != 0){
+            terminal.printError(Text.WORKS_ONLY_IN_DESIGN_MODE);
+            return true;
+          }
+          if (!(splitted[1].indexOf("*") == -1)){
+            new JobHandler(splitted).handle();
+            return true;
+          }
+          var vkName = splitted[1];
+          if (!virtualKeyboards[vkName]){
+            terminal.printError(Text.NO_SUCH_VIRTUAL_KEYBOARD);
+            return true;
+          }
+          if (sceneHandler.getActiveSceneName() != virtualKeyboards[vkName].registeredSceneName){
+            terminal.printError(Text.VIRTUAL_KEYBOARD_NOT_IN_ACTIVE_SCENE);
+            return true;
+          }
+          virtualKeyboards[vkName].destroy();
+          sceneHandler.onVirtualKeyboardDeletion(virtualKeyboards[vkName]);
+          delete virtualKeyboards[vkName];
+          if (!jobHandlerWorking){
+            terminal.printError(Text.VIRTUAL_KEYBOARD_DESTROYED);
+          }
+          return true;
+        break;
+        case 214: //printVirtualKeyboards
+          var count = 0;
+          var length = Object.keys(virtualKeyboards).length;
+          terminal.printHeader(Text.VIRTUAL_KEYBOARDS);
+          for (var vkName in virtualKeyboards){
+            count ++;
+            var options = true;
+            if (count == length){
+              options = false;
+            }
+            terminal.printInfo(Text.TREE.replace(Text.PARAM1, vkName + " ["+virtualKeyboards[vkName].registeredSceneName+"]"), options);
+          }
+          if (count == 0){
+            terminal.printError(Text.NO_VIRTUAL_KEYBOARDS_CREATED);
+          }
+          return true;
+        break;
       }
       return true;
     }catch(err){
@@ -5201,7 +5283,7 @@ function isNameUsedAsSoftCopyParentName(name){
 }
 
 function checkIfNameUnique(name, errorMsg){
-  if (addedObjects[name] || objectGroups[name] || gridSystems[name] || addedTexts[name] || sprites[name] || wallCollections[name] || containers[name]){
+  if (addedObjects[name] || objectGroups[name] || gridSystems[name] || addedTexts[name] || sprites[name] || wallCollections[name] || containers[name] || virtualKeyboards[name]){
     terminal.printError(errorMsg);
     return false;
   }

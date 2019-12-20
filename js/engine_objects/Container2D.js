@@ -1,4 +1,4 @@
-var Container2D = function(name, centerXPercent, centerYPercent, widthPercent, heightPercent){
+var Container2D = function(name, centerXPercent, centerYPercent, widthPercent, heightPercent, virtualKeyboardParent){
   this.isContainer = true;
   this.name = name;
   this.centerXPercent = centerXPercent;
@@ -16,6 +16,7 @@ var Container2D = function(name, centerXPercent, centerYPercent, widthPercent, h
       this.rectangle.mesh.material.uniforms.color.value.set("lime");
     }
   }
+  this.virtualKeyboardParent = virtualKeyboardParent;
 }
 
 Container2D.prototype.removeBackground = function(){
@@ -208,10 +209,13 @@ Container2D.prototype.makeSquare = function(){
     }
   }
   this.handleRectangle();
-  rayCaster.updateObject(this);
+  if (!this.virtualKeyboardParent){
+    rayCaster.updateObject(this);
+  }
 }
 
 Container2D.prototype.handleResize = function(){
+  GLOBAL_VIEWPORT_UNIFORM.value.set(0, 0, window.innerWidth * screenResolution, window.innerHeight * screenResolution);
   if (this.isSquare){
     this.makeSquare();
   }
@@ -221,10 +225,18 @@ Container2D.prototype.handleResize = function(){
   if (this.sprite){
     this.insertSprite(this.sprite);
   }
-  if (this.rectangle && !(typeof this.rectangle.thicknessOffset == UNDEFINED)){
+  if (this.hasBorder){
+    this.rectangle.updateMesh(this.borderThickness, true);
+  }else if (this.rectangle && (!(typeof this.rectangle.thicknessOffset == UNDEFINED))){
     this.rectangle.updateMesh(this.rectangle.thicknessOffset);
   }
-  rayCaster.updateObject(this);
+  if (this.hasBackground){
+    this.backgroundSprite.handleRectangle();
+    this.setBackground(this.backgroundColor, this.backgroundAlpha, this.backgroundTextureName);
+  }
+  if (!this.virtualKeyboardParent){
+    rayCaster.updateObject(this);
+  }
 }
 
 Container2D.prototype.export = function(){
@@ -268,14 +280,14 @@ Container2D.prototype.export = function(){
 }
 
 Container2D.prototype.makeInvisible = function(){
-  if (isDeployment){
+  if (isDeployment && !this.hasBorder){
     return;
   }
   scene.remove(this.rectangle.mesh);
 }
 
 Container2D.prototype.makeVisible = function(){
-  if (isDeployment){
+  if (isDeployment && !this.hasBorder){
     return;
   }
   scene.add(this.rectangle.mesh);
@@ -316,7 +328,9 @@ Container2D.prototype.setCenter = function(centerXPercent, centerYPercent){
   if (this.addedText){
     this.insertAddedText(this.addedText);
   }
-  rayCaster.updateObject(this);
+  if (!this.virtualKeyboardParent){
+    rayCaster.updateObject(this);
+  }
 }
 
 Container2D.prototype.setWidth = function(widthPercent){
@@ -331,7 +345,9 @@ Container2D.prototype.setWidth = function(widthPercent){
   if (this.addedText){
     this.insertAddedText(this.addedText);
   }
-  rayCaster.updateObject(this);
+  if (!this.virtualKeyboardParent){
+    rayCaster.updateObject(this);
+  }
 }
 
 Container2D.prototype.setHeight = function(heightPercent){
@@ -346,8 +362,11 @@ Container2D.prototype.setHeight = function(heightPercent){
   if (this.addedText){
     this.insertAddedText(this.addedText);
   }
-  rayCaster.updateObject(this);
+  if (!this.virtualKeyboardParent){
+    rayCaster.updateObject(this);
+  }
 }
+
 
 Container2D.prototype.handleRectangle = function(){
   if (!this.rectangle){

@@ -978,7 +978,8 @@ ImportHandler.prototype.importAddedTexts = function(obj){
     addedTextInstance.gsName = curTextExport.gsName;
     addedTextInstance.is2D = curTextExport.is2D;
     if (addedTextInstance.is2D){
-      macroHandler.injectMacro("IS_TWO_DIMENSIONAL", addedTextInstance.material, true, false);
+      macroHandler.injectMacro("IS_TWO_DIMENSIONAL", addedTextInstance.material, true, true);
+      addedTextInstance.mesh.material.uniforms.inputLineIndex = new THREE.Uniform(-500);
     }
     if (!(typeof curTextExport.marginMode == UNDEFINED)){
       addedTextInstance.marginMode = curTextExport.marginMode;
@@ -1282,6 +1283,14 @@ ImportHandler.prototype.importLightnings = function(obj){
   }
 }
 
+ImportHandler.prototype.importVirtualKeyboards = function(obj){
+  for (var vkName in obj.virtualKeyboards){
+    var curExport = obj.virtualKeyboards[vkName];
+    var virtualKeyboard = new VirtualKeyboard(curExport);
+    virtualKeyboards[vkName] = virtualKeyboard;
+  }
+}
+
 ImportHandler.prototype.importContainers = function(obj){
   for (var containerName in obj.containers){
     var curExport = obj.containers[containerName];
@@ -1306,6 +1315,7 @@ ImportHandler.prototype.importContainers = function(obj){
     if (curExport.hasBackground){
       container.setBackground(curExport.backgroundColor, curExport.backgroundAlpha, curExport.backgroundTextureName);
     }
+    container.makeVisible();
   }
   for (var containerName in obj.containers){
     var curExport = obj.containers[containerName];

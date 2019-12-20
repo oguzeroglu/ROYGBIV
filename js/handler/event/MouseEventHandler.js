@@ -107,9 +107,15 @@ MouseEventHandler.prototype.handleObjectMouseEvents = function(){
   if (isMobile || typeof this.coordX == UNDEFINED || pointerLockEventHandler.isPointerLocked){
     return;
   }
+  if (mode == 0 && !isDeployment){
+    virtualKeyboardCreatorGUIHandler.onMouseMove(this.clientX, this.clientY);
+    if (isMouseDown){
+      virtualKeyboardCreatorGUIHandler.onClick(this.clientX, this.clientY);
+    }
+  }
   var objectsWithMouseOverListenersSize = objectsWithMouseOverListeners.size;
   var objectsWithMouseOutListenerSize = objectsWithMouseOutListeners.size;
-  if (mode == 1 && (objectsWithMouseOverListenersSize > 0 || objectsWithMouseOutListenerSize > 0)){
+  if (mode == 1 && (objectsWithMouseOverListenersSize > 0 || objectsWithMouseOutListenerSize > 0 || activeVirtualKeyboard)){
     REUSABLE_VECTOR.setFromMatrixPosition(camera.matrixWorld);
     REUSABLE_VECTOR_2.set(this.coordX, this.coordY, 0.5).unproject(camera).sub(REUSABLE_VECTOR).normalize();
     rayCaster.findIntersections(REUSABLE_VECTOR, REUSABLE_VECTOR_2, false, onRaycasterMouseMoveIntersection, this.clientX, this.clientY);
@@ -240,7 +246,7 @@ MouseEventHandler.prototype.onClick = function(event, fromTap){
     if (!fromTap){
       activeControl.onClick(event);
     }
-    if (mode == 1 && objectsWithOnClickListeners.size == 0){
+    if (mode == 1 && objectsWithOnClickListeners.size == 0 && !activeVirtualKeyboard){
       return;
     }
     if (!isMobile && mouseEventHandler.lastMouseDownTime){

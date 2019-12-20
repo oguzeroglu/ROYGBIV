@@ -29,6 +29,7 @@ Scene.prototype.reset = function(){
   this.trackingObjects = new Object();
   this.sprites = new Object();
   this.containers = new Object();
+  this.virtualKeyboards = new Object();
   this.areaBinHandler.isAreaBinHandler = true;
   this.isSkyboxMapped = false;
 }
@@ -75,6 +76,9 @@ Scene.prototype.destroy = function(){
   }
   for (var containerName in this.containers){
     parseCommand("destroyContainer "+containerName);
+  }
+  for (var virtualKeyboardName in this.virtualKeyboards){
+    parseCommand("destroyVirtualKeyboard "+virtualKeyboardName);
   }
   this.reset();
 }
@@ -163,6 +167,9 @@ Scene.prototype.import = function(exportObj){
   for (var i = 0; i<exportObj.containerNames.length; i++){
     this.registerContainer(containers[exportObj.containerNames[i]]);
   }
+  for (var i = 0; i<exportObj.virtualKeyboardNames.length; i++){
+    this.registerVirtualKeyboard(virtualKeyboards[exportObj.virtualKeyboardNames[i]]);
+  }
   this.isSkyboxMapped = exportObj.isSkyboxMapped;
   if (this.isSkyboxMapped){
     this.mappedSkyboxName = exportObj.mappedSkyboxName;
@@ -190,6 +197,7 @@ Scene.prototype.export = function(){
   exportObj.crosshairNames = Object.keys(this.crosshairs);
   exportObj.spriteNames = Object.keys(this.sprites);
   exportObj.containerNames = Object.keys(this.containers);
+  exportObj.virtualKeyboardNames = Object.keys(this.virtualKeyboards);
   exportObj.isSkyboxMapped = this.isSkyboxMapped;
   exportObj.postProcessing = this.postProcessing;
   if (this.isSkyboxMapped){
@@ -211,6 +219,16 @@ Scene.prototype.refreshAreaBinHandler = function(){
 
 Scene.prototype.resetAutoInstancedObjects = function(){
   this.autoInstancedObjects = new Object();
+}
+
+Scene.prototype.unregisterVirtualKeyboard = function(virtualKeyboard){
+  delete this.virtualKeyboards[virtualKeyboard.name];
+  delete virtualKeyboard.registeredSceneName;
+}
+
+Scene.prototype.registerVirtualKeyboard = function(virtualKeyboard){
+  this.virtualKeyboards[virtualKeyboard.name] = virtualKeyboard;
+  virtualKeyboard.registeredSceneName = this.name;
 }
 
 Scene.prototype.unregisterContainer = function(container){

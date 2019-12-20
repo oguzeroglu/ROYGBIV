@@ -32,6 +32,9 @@ ResizeEventHandler.prototype.onResize = function(){
     if (fpsWeaponGUIHandler.fpsWeaponAlignmentConfigurationObject){
       fpsWeaponGUIHandler.fpsWeaponAlignmentConfigurationObject.onFPSWeaponAlignmentUpdate();
     }
+    if (virtualKeyboardCreatorGUIHandler.virtualKeyboard){
+      virtualKeyboardCreatorGUIHandler.virtualKeyboard.handleResize();
+    }
   }
   if (particleSystemRefHeight){
     GLOBAL_PS_REF_HEIGHT_UNIFORM.value = ((renderer.getCurrentViewport().w / screenResolution) / particleSystemRefHeight);
@@ -68,6 +71,9 @@ ResizeEventHandler.prototype.onResize = function(){
   }
   for (var containerName in containers){
     containers[containerName].handleResize();
+  }
+  for (var virtualKeyboardName in virtualKeyboards){
+    virtualKeyboards[virtualKeyboardName].handleResize();
   }
   renderer.setPixelRatio(screenResolution);
   rayCaster.refresh2D();

@@ -282,6 +282,15 @@ ModeSwitcher.prototype.switchFromPreviewToDesign = function(){
   fpsHandler.reset();
   pointerLockRequested = false;
   fullScreenRequested = false;
+  activeVirtualKeyboard = 0;
+  if (inputText){
+    inputText.deactivateInputMode();
+  }
+  inputText = 0;
+  for (var vkName in virtualKeyboards){
+    delete virtualKeyboards[vkName].onTextChangeCallback;
+    delete virtualKeyboards[vkName].onFlushCallback;
+  }
   for (var lightningName in lightnings){
     lightnings[lightningName].stop();
   }

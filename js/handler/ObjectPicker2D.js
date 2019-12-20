@@ -48,6 +48,7 @@ ObjectPicker2D.prototype.refresh = function(){
   var allTexts = this.getTexts();
   var allSprites = this.getSprites();
   var allContainers = this.getContainers();
+  var allVirtualKeyboards = this.getVirtualKeyboards();
   for (var textName in allTexts){
     this.binHandler.insert(allTexts[textName]);
   }
@@ -56,6 +57,9 @@ ObjectPicker2D.prototype.refresh = function(){
   }
   for (var containerName in allContainers){
     this.binHandler.insert(allContainers[containerName]);
+  }
+  for (var virtualKeyboardName in allVirtualKeyboards){
+    this.binHandler.insert(allVirtualKeyboards[virtualKeyboardName]);
   }
 }
 
@@ -79,6 +83,12 @@ ObjectPicker2D.prototype.find = function(screenSpaceX, screenSpaceY){
     }
     if (!obj){
       obj = containers[name];
+    }
+    if (!obj){
+      var vk = childContainers[name];
+      if (vk){
+        obj = vk.childContainersByContainerName[name];
+      }
     }
     if (obj.mesh && !obj.mesh.visible){
       continue;
@@ -126,6 +136,20 @@ ObjectPicker2D.prototype.getSprites = function(){
     }else{
       return clickableSprites;
     }
+  }
+}
+
+ObjectPicker2D.prototype.getVirtualKeyboards = function(){
+  if (!IS_WORKER_CONTEXT){
+    if (mode == 0){
+      return {};
+    }
+    return sceneHandler.getVirtualKeyboards();
+  }else{
+    if (mode == 0){
+      return {};
+    }
+    return virtualKeyboards;
   }
 }
 

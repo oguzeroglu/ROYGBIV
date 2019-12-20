@@ -99,6 +99,58 @@ var AddedText = function(name, font, text, position, color, alpha, characterSize
   webglCallbackHandler.registerEngineObject(this);
 }
 
+AddedText.prototype.handleInputAnimation = function(){
+  var now = performance.now();
+  if (now - this.lastInputLineUpdateTime >= 500){
+    if (this.isInputLineVisible){
+      this.skipInputAdjustment = true;
+      this.setText(this.text.substring(0, this.text.length -1), true);
+      this.skipInputAdjustment = false;
+      this.mesh.material.uniforms.inputLineIndex.value = -500;
+    }else{
+      this.skipInputAdjustment = true;
+      this.setText(this.text + "a", true);
+      this.skipInputAdjustment = false;
+      this.mesh.material.uniforms.inputLineIndex.value = this.text.length -1;
+    }
+    this.isInputLineVisible = !this.isInputLineVisible;
+    this.lastInputLineUpdateTime = now;
+  }
+}
+
+AddedText.prototype.deactivateInputMode = function(){
+  if (!this.is2D || mode == 0){
+    return;
+  }
+  if (mode == 1 && inputText != this){
+    return;
+  }
+  this.isInput = false;
+  this.mesh.material.uniforms.inputLineIndex.value = -500;
+  if (this.isInputLineVisible){
+    this.setText(this.text.substring(0, this.text.length - 1), true);
+  }
+  inputText = 0;
+}
+
+AddedText.prototype.activateInputMode = function(){
+  if (!this.is2D || mode == 0){
+    return;
+  }
+  if (mode == 1 && inputText == this){
+    return;
+  }
+  if (inputText){
+    inputText.deactivateInputMode();
+  }
+  this.isInput = true;
+  this.setText(this.text + "a", true);
+  this.mesh.material.uniforms.inputLineIndex.value = this.text.length -1;
+  inputText = this;
+  this.isInputLineVisible = true;
+  this.lastInputLineUpdateTime = performance.now();
+}
+
 AddedText.prototype.syncProperties = function(sourceText){
   this.setColor("#" + sourceText.getColor().getHexString());
   this.setAlpha(sourceText.getAlpha());
@@ -209,7 +261,7 @@ AddedText.prototype.destroy = function(skipRaycasterRefresh){
     this.rectangle.material.dispose();
     this.rectangle.geometry.dispose();
   }
-  if (!skipRaycasterRefresh){
+  if (!skipRaycasterRefresh && this.name){
     rayCaster.refresh();
   }
   delete addedTexts[this.name];
@@ -403,6 +455,12 @@ AddedText.prototype.setText = function(newText, fromScript){
     this.oldText = this.text;
   }
   this.text = newText;
+  if (mode == 1 && this.isInput && this.is2D && inputText == this && !this.skipInputAdjustment){
+    if (this.isInputLineVisible){
+      this.text += "a";
+      this.mesh.material.uniforms.inputLineIndex.value = this.text.length -1;
+    }
+  }
   this.constructText();
   this.handleUVUniform();
   if (this.is2D){
@@ -410,7 +468,9 @@ AddedText.prototype.setText = function(newText, fromScript){
     this.handleResize();
   }else{
     this.handleBoundingBox();
-    rayCaster.onAddedTextResize(this);
+    if (this.name){
+      rayCaster.onAddedTextResize(this);
+    }
   }
 }
 
@@ -574,7 +634,9 @@ AddedText.prototype.handleResize = function(){
       this.rectangle.updateMesh(this.rectangle.thicknessOffset);
     }
   }
-  rayCaster.onAddedTextResize(this);
+  if (this.name){
+    rayCaster.onAddedTextResize(this);
+  }
 }
 
 AddedText.prototype.getWidthPercent = function(){
@@ -745,7 +807,7 @@ AddedText.prototype.hide = function(){
   if (mode == 0 && this.rectangle){
     scene.remove(this.rectangle.mesh);
   }
-  if (mode == 1 && this.isClickable){
+  if (mode == 1 && this.isClickable && this.name){
     rayCaster.hide(this);
   }
 }
@@ -757,7 +819,9 @@ AddedText.prototype.show = function(){
     if (!this.boundingBox){
       this.handleBoundingBox();
     }
-    rayCaster.show(this);
+    if (this.name){
+      rayCaster.show(this);
+    }
   }
 }
 
@@ -820,17 +884,21 @@ AddedText.prototype.set2DStatus = function(is2D){
   }
   this.is2D = is2D;
   if (is2D){
-    macroHandler.injectMacro("IS_TWO_DIMENSIONAL", this.material, true, false);
+    macroHandler.injectMacro("IS_TWO_DIMENSIONAL", this.material, true, true);
     this.set2DCoordinates(this.marginPercentWidth, this.marginPercentHeight);
     if (typeof this.oldIsClickable == UNDEFINED){
       this.oldIsClickable = this.isClickable;
     }
     this.isClickable = false;
-    addedTexts2D[this.name] = this;
+    if (!!this.name){
+      addedTexts2D[this.name] = this;
+    }
+    this.mesh.material.uniforms.inputLineIndex = new THREE.Uniform(-500);
     this.mesh.renderOrder = renderOrders.TEXT_2D;
   }else{
-    macroHandler.removeMacro("IS_TWO_DIMENSIONAL", this.material, true, false);
+    macroHandler.removeMacro("IS_TWO_DIMENSIONAL", this.material, true, true);
     delete this.mesh.material.uniforms.margin2D;
+    delete this.mesh.material.uniforms.inputLineIndex;
     this.isClickable = this.oldIsClickable;
     delete this.oldIsClickable;
     if (!(typeof this.refCharOffset == UNDEFINED)){
@@ -841,7 +909,9 @@ AddedText.prototype.set2DStatus = function(is2D){
       this.setMarginBetweenLines(this.refLineOffset);
       delete this.refLineOffset;
     }
-    delete addedTexts2D[this.name];
+    if (!!this.name){
+      delete addedTexts2D[this.name];
+    }
     this.mesh.renderOrder = renderOrders.TEXT_3D;
   }
   if (is2D){
@@ -964,7 +1034,9 @@ AddedText.prototype.set2DCoordinates = function(marginPercentWidth, marginPercen
     this.webglSpaceSize.x, this.webglSpaceSize.y
   );
   this.rectangle.updateMesh(0.005);
-  rayCaster.updateObject(this);
+  if (this.name){
+    rayCaster.updateObject(this);
+  }
 }
 
 AddedText.prototype.debugCornerPoints = function(representativeCharacter, cornerIndex){

@@ -35,14 +35,18 @@ function render(){
     cpuOperationsHandler.handleObjectMouseEvents();
     cpuOperationsHandler.handleActiveMuzzleFlashes();
     cpuOperationsHandler.handleActiveLightnings();
+    cpuOperationsHandler.handleActiveVirtualKeyboard();
+    cpuOperationsHandler.handleInputText();
     delayedExecutionHandler.tick();
   }else{
     if (!isDeployment){
+      cpuOperationsHandler.handleObjectMouseEvents();
       particleSystemCreatorGUIHandler.update();
       muzzleFlashCreatorGUIHandler.update();
       fpsWeaponGUIHandler.update();
       animationCreatorGUIHandler.update();
       lightningCreatorGUIHandler.update();
+      virtualKeyboardCreatorGUIHandler.update();
     }
     cameraOperationsDone = false;
   }
@@ -66,6 +70,18 @@ function renderScene(){
   renderer.render(scene, camera);
   if (threejsRenderMonitoringHandler.currentRenderCallCountPerFrame > threejsRenderMonitoringHandler.maxRenderCallCountPerFrame){
     threejsRenderMonitoringHandler.maxRenderCallCountPerFrame = threejsRenderMonitoringHandler.currentRenderCallCountPerFrame;
+  }
+}
+
+function handleInputText(){
+  if (inputText){
+    inputText.handleInputAnimation();
+  }
+}
+
+function handleActiveVirtualKeyboard(){
+  if (activeVirtualKeyboard){
+    activeVirtualKeyboard.update();
   }
 }
 

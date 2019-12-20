@@ -234,6 +234,8 @@ var Preconditions = function(){
   this.degree = "degree";
   this.containerName = "containerName";
   this.container = "container";
+  this.virtualKeyboard = "virtualKeyboard";
+  this.virtualKeyboardName = "virtualKeyboardName";
 }
 
 Preconditions.prototype.errorHeader = function(callerFunc){
@@ -299,6 +301,12 @@ Preconditions.prototype.checkIfContainer = function(callerFunc, container){
   }
 }
 
+Preconditions.prototype.checkIfVirtualKeyboard = function(callerFunc, virtualKeyboard){
+  if (!virtualKeyboard.isVirtualKeyboard){
+    this.throw(callerFunc, "Object is not a virtual keyboard.");
+  }
+}
+
 Preconditions.prototype.checkIfLightning = function(callerFunc, lightning){
   if (!lightning.isLightning){
     this.throw(callerFunc, "Object is not a lightning.");
@@ -314,6 +322,12 @@ Preconditions.prototype.checkIfLightningInsideActiveScene = function(callerFunc,
 Preconditions.prototype.checkIfSpriteInsideActiveScene = function(callerFunc, sprite){
   if (sprite.registeredSceneName != sceneHandler.getActiveSceneName()){
     this.throw(callerFunc, "Sprite not inside active scene.");
+  }
+}
+
+Preconditions.prototype.checkIfVirtualKeyboardInsideActiveScene = function(callerFunc, virtualKeyboard){
+  if (virtualKeyboard.registeredSceneName != sceneHandler.getActiveSceneName()){
+    this.throw(callerFunc, "Virtual keyboard not inside active scene.");
   }
 }
 
@@ -842,5 +856,11 @@ Preconditions.prototype.checkIfFunctionOnlyIfExists = function(callerFunc, param
 Preconditions.prototype.checkIfText2D = function(callerFunc, parameterName, obj){
   if (obj.is2D){
     this.throw(callerFunc, "Cannot use this API for 2D texts.");
+  }
+}
+
+Preconditions.prototype.checkIfText3D = function(callerFunc, parameterName, obj){
+  if (!obj.is2D){
+    this.throw(callerFunc, "Cannot use this API for 3D texts.");
   }
 }

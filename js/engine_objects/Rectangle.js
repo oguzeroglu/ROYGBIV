@@ -17,8 +17,15 @@ Rectangle.prototype.set = function(x, y, x2, y2, width, height){
 }
 Rectangle.prototype.handlePositionUniform = function(thicknessOffset){
   var positions = this.material.uniforms.positions.value;
-  var tox = thicknessOffset;
-  var toy = thicknessOffset * camera.aspect;
+  var tox, toy;
+  var curvp = renderer.getCurrentViewport();
+  if (curvp.z > curvp.w){
+    tox = thicknessOffset;
+    toy = thicknessOffset * camera.aspect;
+  }else{
+    tox = thicknessOffset * camera.aspect;
+    toy = thicknessOffset;
+  }
   // UP
   positions[0].x = this.x - tox;
   positions[0].y = this.y;

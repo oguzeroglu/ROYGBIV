@@ -18,6 +18,7 @@
 //  * Lightning functions
 //  * Sprite functions
 //  * Container functions
+//  * Virtual keyboard functions
 //  * Script related functions
 var Roygbiv = function(){
   this.functionNames = [
@@ -231,7 +232,18 @@ var Roygbiv = function(){
     "setContainerBackgroundColor",
     "setContainerBackgroundAlpha",
     "hideContainerBackground",
-    "showContainerBackground"
+    "showContainerBackground",
+    "getVirtualKeyboard",
+    "activateVirtualKeyboard",
+    "onVirtualKeyboardTextChange",
+    "removeVirtualKeyboardTextChangeListener",
+    "onVirtualKeyboardFlush",
+    "removeVirtualKeyboardFlushListener",
+    "hideVirtualKeyboard",
+    "showVirtualKeyboard",
+    "deactivateVirtualKeyboard",
+    "activateTextInputMode",
+    "deactivateTextInputMode"
   ];
 
   this.globals = new Object();
@@ -632,6 +644,20 @@ Roygbiv.prototype.getContainer = function(containerName){
   if (container){
     preConditions.checkIfContainerInsideActiveScene(ROYGBIV.getContainer, container);
     return container;
+  }
+  return 0;
+}
+
+// Returns a virtual keyboard or 0 if virtual keyboard does not exist.
+Roygbiv.prototype.getVirtualKeyboard = function(virtualKeyboardName){
+  if (mode == 0){
+    return;
+  }
+  preConditions.checkIfDefined(ROYGBIV.getVirtualKeyboard, preConditions.virtualKeyboardName, virtualKeyboardName);
+  var virtualKeyboard = virtualKeyboards[virtualKeyboardName];
+  if (virtualKeyboard){
+    preConditions.checkIfVirtualKeyboardInsideActiveScene(ROYGBIV.getVirtualKeyboard, virtualKeyboard);
+    return virtualKeyboard;
   }
   return 0;
 }
@@ -2307,6 +2333,52 @@ Roygbiv.prototype.removeContainerMouseOutListener = function(container){
   objectsWithMouseOutListeners.delete(container.name);
 }
 
+// Sets a text change listener to a virtual keyboard. The callbackFunction is executed with
+// newText parameter everytime a text of a virtual keyboard is changed.
+Roygbiv.prototype.onVirtualKeyboardTextChange = function(virtualKeyboard, callbackFunction){
+  if (mode == 0){
+    return;
+  }
+  preConditions.checkIfDefined(ROYGBIV.onVirtualKeyboardTextChange, preConditions.virtualKeyboard, virtualKeyboard);
+  preConditions.checkIfVirtualKeyboard(ROYGBIV.onVirtualKeyboardTextChange, virtualKeyboard);
+  preConditions.checkIfDefined(ROYGBIV.onVirtualKeyboardTextChange, preConditions.callbackFunction, callbackFunction);
+  preConditions.checkIfFunctionOnlyIfExists(ROYGBIV.onVirtualKeyboardTextChange, preConditions.callbackFunction, callbackFunction);
+  virtualKeyboard.onTextChangeCallback = callbackFunction;
+}
+
+// Removes the text change listener from a virtual keyboard.
+Roygbiv.prototype.removeVirtualKeyboardTextChangeListener = function(virtualKeyboard){
+  if (mode == 0){
+    return;
+  }
+  preConditions.checkIfDefined(ROYGBIV.onVirtualKeyboardTextChange, preConditions.virtualKeyboard, virtualKeyboard);
+  preConditions.checkIfVirtualKeyboard(ROYGBIV.onVirtualKeyboardTextChange, virtualKeyboard);
+  virtualKeyboard.onTextChangeCallback = noop;
+}
+
+// Sets a flush listener to a virtual keyboard. The callbackFunction is executed
+// with flushedText parameter when the user presses on the OK button of a virtual keyboard.
+Roygbiv.prototype.onVirtualKeyboardFlush = function(virtualKeyboard, callbackFunction){
+  if (mode == 0){
+    return;
+  }
+  preConditions.checkIfDefined(ROYGBIV.onVirtualKeyboardTextChange, preConditions.virtualKeyboard, virtualKeyboard);
+  preConditions.checkIfVirtualKeyboard(ROYGBIV.onVirtualKeyboardTextChange, virtualKeyboard);
+  preConditions.checkIfDefined(ROYGBIV.onVirtualKeyboardTextChange, preConditions.callbackFunction, callbackFunction);
+  preConditions.checkIfFunctionOnlyIfExists(ROYGBIV.onVirtualKeyboardTextChange, preConditions.callbackFunction, callbackFunction);
+  virtualKeyboard.onFlushCallback = callbackFunction;
+}
+
+// Removes the flush listener from a virtual keyboard.
+Roygbiv.prototype.removeVirtualKeyboardFlushListener = function(virtualKeyboard){
+  if (mode == 0){
+    return;
+  }
+  preConditions.checkIfDefined(ROYGBIV.onVirtualKeyboardTextChange, preConditions.virtualKeyboard, virtualKeyboard);
+  preConditions.checkIfVirtualKeyboard(ROYGBIV.onVirtualKeyboardTextChange, virtualKeyboard);
+  virtualKeyboard.onFlushCallback = noop;
+}
+
 // TEXT FUNCTIONS **************************************************************
 
 // Sets a text to a text object.
@@ -2443,6 +2515,32 @@ Roygbiv.prototype.showText = function(text){
   if (!text.mesh.visible){
     text.show();
   }
+}
+
+// Activates the input mode for a 2D text. Does nothing if the text is already in
+// input mode.
+Roygbiv.prototype.activateTextInputMode = function(text){
+  if (mode == 0){
+    return;
+  }
+  preConditions.checkIfDefined(ROYGBIV.activateTextInputMode, preConditions.text, text);
+  preConditions.checkIfAddedText(ROYGBIV.activateTextInputMode, preConditions.text, text);
+  preConditions.checkIfTextInsideActiveScene(ROYGBIV.activateTextInputMode, text);
+  preConditions.checkIfText3D(ROYGBIV.activateTextInputMode, preConditions.text, text);
+  text.activateInputMode();
+}
+
+// Deactivates the input mode for a 2D text. Does nothing if the text is already
+// deactivated from input mode.
+Roygbiv.prototype.deactivateTextInputMode = function(text){
+  if (mode == 0){
+    return;
+  }
+  preConditions.checkIfDefined(ROYGBIV.activateTextInputMode, preConditions.text, text);
+  preConditions.checkIfAddedText(ROYGBIV.activateTextInputMode, preConditions.text, text);
+  preConditions.checkIfTextInsideActiveScene(ROYGBIV.activateTextInputMode, text);
+  preConditions.checkIfText3D(ROYGBIV.activateTextInputMode, preConditions.text, text);
+  text.deactivateInputMode();
 }
 
 // CONTROL FUNCTIONS ***********************************************************
@@ -3087,6 +3185,59 @@ Roygbiv.prototype.showContainerBackground = function(container){
   preConditions.checkIfContainerInsideActiveScene(ROYGBIV.showContainerBackground, container);
   preConditions.checkIfContainerHasBackground(ROYGBIV.showContainerBackground, container);
   container.backgroundSprite.mesh.visible = true;
+}
+
+// VIRTUAL KEYBOARD FUNCTIONS **************************************************
+
+// Activates a virtual keyboard.
+Roygbiv.prototype.activateVirtualKeyboard = function(virtualKeyboard){
+  if (mode == 0){
+    return;
+  }
+  preConditions.checkIfDefined(ROYGBIV.activateVirtualKeyboard, preConditions.virtualKeyboard, virtualKeyboard);
+  preConditions.checkIfVirtualKeyboard(ROYGBIV.activateVirtualKeyboard, virtualKeyboard);
+  preConditions.checkIfVirtualKeyboardInsideActiveScene(ROYGBIV.activateVirtualKeyboard, virtualKeyboard);
+  virtualKeyboard.activate();
+}
+
+// Hides a virtual keyboard. Does nothing if the virtual keyboard if already hidden.
+Roygbiv.prototype.hideVirtualKeyboard = function(virtualKeyboard){
+  if (mode == 0){
+    return;
+  }
+  preConditions.checkIfDefined(ROYGBIV.hideVirtualKeyboard, preConditions.virtualKeyboard, virtualKeyboard);
+  preConditions.checkIfVirtualKeyboard(ROYGBIV.hideVirtualKeyboard, virtualKeyboard);
+  preConditions.checkIfVirtualKeyboardInsideActiveScene(ROYGBIV.hideVirtualKeyboard, virtualKeyboard);
+  if (virtualKeyboard.isHidden){
+    return;
+  }
+  virtualKeyboard.hideVisually();
+}
+
+// Shows a virtual keyboard. Does nothing if the virtual keyboard is already visible.
+Roygbiv.prototype.showVirtualKeyboard = function(virtualKeyboard){
+  if (mode == 0){
+    return;
+  }
+  preConditions.checkIfDefined(ROYGBIV.showVirtualKeyboard, preConditions.virtualKeyboard, virtualKeyboard);
+  preConditions.checkIfVirtualKeyboard(ROYGBIV.showVirtualKeyboard, virtualKeyboard);
+  preConditions.checkIfVirtualKeyboardInsideActiveScene(ROYGBIV.showVirtualKeyboard, virtualKeyboard);
+  if (!virtualKeyboard.isHidden){
+    return;
+  }
+  virtualKeyboard.showVisually();
+}
+
+// Deactivates a virtual keyboard. Does nothing if the virtual keyboard is already
+// not active.
+Roygbiv.prototype.deactivateVirtualKeyboard = function(virtualKeyboard){
+  if (mode == 0){
+    return;
+  }
+  preConditions.checkIfDefined(ROYGBIV.deactivateVirtualKeyboard, preConditions.virtualKeyboard, virtualKeyboard);
+  preConditions.checkIfVirtualKeyboard(ROYGBIV.deactivateVirtualKeyboard, virtualKeyboard);
+  preConditions.checkIfVirtualKeyboardInsideActiveScene(ROYGBIV.deactivateVirtualKeyboard, virtualKeyboard);
+  virtualKeyboard.deactivate();
 }
 
 // UTILITY FUNCTIONS ***********************************************************

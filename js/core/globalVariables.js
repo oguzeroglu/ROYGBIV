@@ -338,6 +338,7 @@ var crosshairCreatorGUIHandler;
 var scriptsGUIHandler;
 var animationCreatorGUIHandler;
 var lightningCreatorGUIHandler;
+var virtualKeyboardCreatorGUIHandler;
 var skyboxHandler;
 var fogHandler;
 var scriptsHandler;
@@ -383,6 +384,10 @@ var clickableSprites = new Object();
 var clickableContainers = new Object();
 var draggingSprite = false;
 var containers = new Object();
+var childContainers = new Object();
+var virtualKeyboards = new Object();
+var activeVirtualKeyboard;
+var inputText;
 
 // RENDER ORDERS
 var renderOrders = {

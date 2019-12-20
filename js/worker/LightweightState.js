@@ -74,6 +74,11 @@ var LightweightState = function(){
   for (var containerName in sceneHandler.getContainers()){
     this.containers[containerName] = containers[containerName].exportLightweight();
   }
+  // VIRTUAL KEYBOARDS
+  this.virtualKeyboards = new Object();
+  for (var virtualKeyboardName in sceneHandler.getVirtualKeyboards()){
+    this.virtualKeyboards[virtualKeyboardName] = virtualKeyboards[virtualKeyboardName].exportLightweight();
+  }
   // PARTICLE SYSTEMS
   this.particleSystems = new Object();
   for (var psName in particleSystemPool){

@@ -4,6 +4,8 @@ var KeyboardEventHandler = function(){
   }
   window.addEventListener('keydown', this.onKeyDown);
   window.addEventListener('keyup', this.onKeyUp);
+
+  this.CAPSLOCK = "CapsLock";
 }
 
 KeyboardEventHandler.prototype.onKeyUp = function(event){
@@ -11,6 +13,7 @@ KeyboardEventHandler.prototype.onKeyUp = function(event){
   if (!windowLoaded){
     return;
   }
+  keyboardEventHandler.isCapsOn = event.getModifierState && event.getModifierState(keyboardEventHandler.CAPSLOCK);
   if (cliFocused || omGUIFocused || tmGUIFocused || smGUIFocused || cmGUIFocused || acGUIFocused){
     return;
   }
@@ -63,6 +66,7 @@ KeyboardEventHandler.prototype.onKeyDown = function(event){
   if (!windowLoaded){
     return;
   }
+  keyboardEventHandler.isCapsOn = event.getModifierState && event.getModifierState(keyboardEventHandler.CAPSLOCK);
   if (cliFocused || omGUIFocused || tmGUIFocused || smGUIFocused || cmGUIFocused || acGUIFocused){
     return;
   }
@@ -138,6 +142,12 @@ KeyboardEventHandler.prototype.activateGridSelectionMode = function(){
   }
   for (var containerName in sceneHandler.getContainers()){
     containers[containerName].rectangle.mesh.visible = false;
+    if (containers[containerName].hasBackground){
+      containers[containerName].backgroundSprite.mesh.visible = false;
+    }
+  }
+  for (var virtualKeyboardName in sceneHandler.getVirtualKeyboards()){
+    virtualKeyboards[virtualKeyboardName].onShiftPress(true);
   }
   raycasterFactory.onShiftPress(true);
 }
@@ -157,6 +167,12 @@ KeyboardEventHandler.prototype.deactivateGridSelectionMode = function(){
   }
   for (var containerName in sceneHandler.getContainers()){
     containers[containerName].rectangle.mesh.visible = true;
+    if (containers[containerName].hasBackground){
+      containers[containerName].backgroundSprite.mesh.visible = true;
+    }
+  }
+  for (var virtualKeyboardName in sceneHandler.getVirtualKeyboards()){
+    virtualKeyboards[virtualKeyboardName].onShiftPress(false);
   }
   raycasterFactory.onShiftPress(false);
 }

@@ -75,6 +75,7 @@ window.onload = function() {
     scriptsGUIHandler = new ScriptsGUIHandler();
     animationCreatorGUIHandler = new AnimationCreatorGUIHandler();
     lightningCreatorGUIHandler = new LightningCreatorGUIHandler();
+    virtualKeyboardCreatorGUIHandler = new VirtualKeyboardCreatorGUIHandler();
   }
 
   // PHYSICS BODY GENERATOR
@@ -438,6 +439,12 @@ function onRaycasterMouseMoveIntersection(){
     if (!object){
       object = containers[intersectionObject];
     }
+    if (!object){
+      object = childContainers[intersectionObject];
+      if (object == activeVirtualKeyboard){
+        object.onMouseMoveIntersection(intersectionObject);
+      }
+    }
     var isDifferent = currentMouseOverObjectName != object.name;
     if (object.mouseOverCallbackFunction && isDifferent){
       if (object.registeredSceneName == sceneHandler.getActiveSceneName()){
@@ -458,6 +465,15 @@ function onRaycasterMouseMoveIntersection(){
       if (!curObj){
         curObj = containers[currentMouseOverObjectName];
       }
+      if (!curObj){
+        curObj = childContainers[currentMouseOverObjectName];
+      }
+      if (!curObj){
+        curObj = virtualKeyboards[currentMouseOverObjectName];
+        if (curObj == activeVirtualKeyboard){
+          curObj.onMouseMoveIntersection(null);
+        }
+      }
       if (curObj && curObj.mouseOutCallbackFunction){
         if (curObj.registeredSceneName == sceneHandler.getActiveSceneName()){
           curObj.mouseOutCallbackFunction();
@@ -465,6 +481,9 @@ function onRaycasterMouseMoveIntersection(){
       }
     }
     currentMouseOverObjectName = intersectionObject;
+    if (object.isVirtualKeyboard){
+      currentMouseOverObjectName = object.name;
+    }
   }else{
     if (currentMouseOverObjectName){
       var curObj = addedObjects[currentMouseOverObjectName];
@@ -479,6 +498,15 @@ function onRaycasterMouseMoveIntersection(){
       }
       if (!curObj){
         curObj = containers[currentMouseOverObjectName];
+      }
+      if (!curObj){
+        curObj = childContainers[currentMouseOverObjectName];
+      }
+      if (!curObj){
+        curObj = virtualKeyboards[currentMouseOverObjectName];
+        if (curObj == activeVirtualKeyboard){
+          curObj.onMouseMoveIntersection(null);
+        }
       }
       if (curObj && curObj.mouseOutCallbackFunction){
         if (curObj.registeredSceneName == sceneHandler.getActiveSceneName()){
@@ -507,6 +535,9 @@ function onRaycasterIntersection(){
      }
      if (!object){
        object = containers[intersectionObject];
+     }
+     if (!object){
+       object = childContainers[intersectionObject];
      }
      if (object.isAddedObject || object.isObjectGroup){
        if (!isDeployment && mode == 0){
@@ -669,6 +700,8 @@ function onRaycasterIntersection(){
        if (mode == 1 && object.isDraggable){
          object.onDragStarted();
        }
+     }else if (object.isVirtualKeyboard){
+       object.onMouseClickIntersection(intersectionObject);
      }
   }else{
     if (!isDeployment){
@@ -705,6 +738,13 @@ function dumpPerformance(){
   raycasterFactory.dumpPerformance();
   physicsFactory.dumpPerformance();
   lightningHandler.dumpPerformance();
+}
+
+function generateUUID() {
+  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c){
+    var r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
+    return v.toString(16);
+  });
 }
 
 //******************************************************************

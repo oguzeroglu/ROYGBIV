@@ -211,7 +211,11 @@ var CommandDescriptor = function(){
       4, //alignContainers
       1, //unalignContainer
       1, //destroyContainer
-      0 //printContainers
+      0, //printContainers
+      1, //newVirtualKeyboard
+      1, //editVirtualKeyboard
+      1, //destroyVirtualKeyboard
+      0 //printVirtualKeyboards
   ];
 
   this.commandArgumentsExpectedExplanation = [
@@ -425,7 +429,11 @@ var CommandDescriptor = function(){
     "alignContainers parentContainer childContainer alignmentType margin",
     "unalignContainer containerName",
     "destroyContainer containerName",
-    "printContainers"
+    "printContainers",
+    "newVirtualKeyboard virtualKeyboardName",
+    "editVirtualKeyboard virtualKeyboardName",
+    "destroyVirtualKeyboard virtualKeyboardName",
+    "printVirtualKeyboards"
   ];
 
   this.commands = [
@@ -639,7 +647,11 @@ var CommandDescriptor = function(){
     "alignContainers",
     "unalignContainer",
     "destroyContainer",
-    "printContainers"
+    "printContainers",
+    "newVirtualKeyboard",
+    "editVirtualKeyboard",
+    "destroyVirtualKeyboard",
+    "printVirtualKeyboards"
   ];
 
   this.commandInfo = [
@@ -853,7 +865,11 @@ var CommandDescriptor = function(){
     "alignContainers: Aligns child container to parent container given margin.",
     "unalignContainer: Unaligns an aligned container.",
     "destroyContainer: Destroys a container.",
-    "printContainers: Prints created containers."
+    "printContainers: Prints created containers.",
+    "newVirtualKeyboard: Opens the virtual keyboard creation GUI.",
+    "editVirtualKeyboard: Opents GUI for virtual keyboard edition.",
+    "destroyVirtualKeyboard: Destroys a virtual keyboard.",
+    "printVirtualKeyboards: Prints created virtual keyboards."
   ];
 
   this.keyboardInfo = [
@@ -995,6 +1011,7 @@ var CommandDescriptor = function(){
   this.CONTAINER_NAME             =   41;
   this.SPRITE_OR_2D_TEXT_NAME     =   42;
   this.CONTAINER_ALIGNMENT_TYPE   =   43;
+  this.VIRTUAL_KEYBOARD_NAME      =   44;
 
   // newGridSystem
   this.newGridSystem = new Object();
@@ -1585,6 +1602,20 @@ var CommandDescriptor = function(){
   this.destroyContainer.types = [];
   this.destroyContainer.types.push(this.CONTAINER_NAME); //containerName
 
+  // newVirtualKeyboard
+  this.newVirtualKeyboard = new Object();
+  this.newVirtualKeyboard.types = [];
+  this.newVirtualKeyboard.types.push(this.UNKNOWN_INDICATOR); //virtualKeyboardName
+
+  // editVirtualKeyboard
+  this.editVirtualKeyboard = new Object();
+  this.editVirtualKeyboard.types = [];
+  this.editVirtualKeyboard.types.push(this.VIRTUAL_KEYBOARD_NAME); //virtualKeyboardName
+
+  // destroyVirtualKeyboard
+  this.destroyVirtualKeyboard = new Object();
+  this.destroyVirtualKeyboard.types = [];
+  this.destroyVirtualKeyboard.types.push(this.VIRTUAL_KEYBOARD_NAME); //virtualKeyboardName
 };
 
 CommandDescriptor.prototype.test = function(){
