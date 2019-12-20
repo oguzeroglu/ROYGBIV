@@ -162,6 +162,12 @@ StateLoader.prototype.closeRaycasterWorkerIfNotUsed = function(){
           }
         }
       }
+      if (!hasRaycasting){
+        for (var vkName in virtualKeyboards){
+          hasRaycasting = true;
+          break;
+        }
+      }
     }
   }
   if (!hasRaycasting){
