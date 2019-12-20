@@ -223,6 +223,10 @@ SceneHandler.prototype.hideAll = function(){
     }
     gridSelections = new Object();
   }else{
+    if (inputText){
+      inputText.deactivateInputMode();
+    }
+    inputText = 0;
     for (var objName in autoInstancedObjects){
       var obj = autoInstancedObjects[objName];
       obj.hideVisually();

@@ -968,4 +968,15 @@ var Text = function(){
   this.ROYGBIV_SCRIPTING_API_SETCONTAINERBACKGROUNDALPHA = "Sets the alpha value of the background of a container.";
   this.ROYGBIV_SCRIPTING_API_HIDECONTAINERBACKGROUND = "Hides the background of a container.";
   this.ROYGBIV_SCRIPTING_API_SHOWCONTAINERBACKGROUND = "Shows the background of a container.";
+  this.ROYGBIV_SCRIPTING_API_GETVIRTUALKEYBOARD = "Returns a virtual keyboard or 0 if virtual keyboard does not exist.";
+  this.ROYGBIV_SCRIPTING_API_ACTIVATEVIRTUALKEYBOARD = "Activates a virtual keyboard.";
+  this.ROYGBIV_SCRIPTING_API_ONVIRTUALKEYBOARDTEXTCHANGE = "Sets a text change listener to a virtual keyboard. The callbackFunction is executed with newText parameter\neverytime a text of a virtual keyboard is changed.";
+  this.ROYGBIV_SCRIPTING_API_REMOVEVIRTUALKEYBOARDTEXTCHANGELISTENER = "Removes the text change listener from a virtual keyboard.";
+  this.ROYGBIV_SCRIPTING_API_ONVIRTUALKEYBOARDFLUSH = "Sets a flush listener to a virtual keyboard. The callbackFunction is executed with flushedText parameter\nwhen the user presses on the OK button of a virtual keyboard.";
+  this.ROYGBIV_SCRIPTING_API_REMOVEVIRTUALKEYBOARDFLUSHLISTENER = "Removes the flush listener from a virtual keyboard.";
+  this.ROYGBIV_SCRIPTING_API_HIDEVIRTUALKEYBOARD = "Hides a virtual keyboard. Does nothing if the virtual keyboard if already hidden.";
+  this.ROYGBIV_SCRIPTING_API_SHOWVIRTUALKEYBOARD = "Shows a virtual keyboard. Does nothing if the virtual keyboard is already visible.";
+  this.ROYGBIV_SCRIPTING_API_DEACTIVATEVIRTUALKEYBOARD = "Deactivates a virtual keyboard. Does nothing if the virtual keyboard is already not active.";
+  this.ROYGBIV_SCRIPTING_API_ACTIVATETEXTINPUTMODE = "Activates the input mode for a 2D text. Does nothing if the text is already in input mode.";
+  this.ROYGBIV_SCRIPTING_API_DEACTIVATETEXTINPUTMODE = "Deactivates the input mode for a 2D text. Does nothing if the text is already deactivated from input mode.";
 }

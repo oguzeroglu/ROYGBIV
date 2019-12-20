@@ -24,18 +24,35 @@ uniform sampler2D glyphTexture;
   uniform vec4 fogInfo;
 #endif
 
+#ifdef IS_TWO_DIMENSIONAL
+  varying float isInputLine;
+#endif
+
 void main(){
   float startU = vUVRanges[0];
   float endU = vUVRanges[1];
   float startV = vUVRanges[2];
   float endV = vUVRanges[3];
-  float coordX = ((gl_PointCoord.x) * (endU - startU)) + startU;
-  float coordY = ((1.0 - gl_PointCoord.y) * (endV - startV)) + startV;
-  vec4 textureColor = texture2D(glyphTexture, vec2(coordX, coordY));
 
   if (startU < -300.0 || startV < -300.0 || endU < -300.0 || endV < -300.0){
     discard;
+    return;
   }
+
+  #ifdef IS_TWO_DIMENSIONAL
+    if (isInputLine > 50.0) {
+      #ifdef HAS_BACKGROUND
+        gl_FragColor = vec4(backgroundColor, backgroundAlpha);
+        return;
+      #endif
+      gl_FragColor = vec4(color, alpha);
+      return;
+    }
+  #endif
+
+  float coordX = ((gl_PointCoord.x) * (endU - startU)) + startU;
+  float coordY = ((1.0 - gl_PointCoord.y) * (endV - startV)) + startV;
+  vec4 textureColor = texture2D(glyphTexture, vec2(coordX, coordY));
 
   if (textureColor.a < 0.5){
     #ifdef HAS_BACKGROUND

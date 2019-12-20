@@ -331,6 +331,8 @@ StateLoader.prototype.resetProject = function(){
   isMouseDown = false;
   modeSwitcher = new ModeSwitcher();
   activeControl = new FreeControls({});
+  activeVirtualKeyboard = 0;
+  inputText = 0;
   fogHandler.reset();
   mode = 0; // 0 -> DESIGN, 1-> PREVIEW
   physicsDebugMode = false;

@@ -128,7 +128,19 @@ VirtualKeyboard.prototype.resetColors = function(){
   }
 }
 
+VirtualKeyboard.prototype.deactivate = function(){
+  if (activeVirtualKeyboard != this){
+    return;
+  }
+  this.hideVisually();
+  activeVirtualKeyboard = 0;
+  this.text = "";
+}
+
 VirtualKeyboard.prototype.activate = function(){
+  if (activeVirtualKeyboard == this){
+    return;
+  }
   for (var virtualKeyboardName in sceneHandler.getVirtualKeyboards()){
     var vk = virtualKeyboards[virtualKeyboardName];
     vk.resetColors();
@@ -136,6 +148,7 @@ VirtualKeyboard.prototype.activate = function(){
   }
   this.showVisually();
   activeVirtualKeyboard = this;
+  this.text = "";
 }
 
 VirtualKeyboard.prototype.onFlush = function(flushedText){

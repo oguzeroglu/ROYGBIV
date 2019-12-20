@@ -36,6 +36,7 @@ function render(){
     cpuOperationsHandler.handleActiveMuzzleFlashes();
     cpuOperationsHandler.handleActiveLightnings();
     cpuOperationsHandler.handleActiveVirtualKeyboard();
+    cpuOperationsHandler.handleInputText();
     delayedExecutionHandler.tick();
   }else{
     if (!isDeployment){
@@ -69,6 +70,12 @@ function renderScene(){
   renderer.render(scene, camera);
   if (threejsRenderMonitoringHandler.currentRenderCallCountPerFrame > threejsRenderMonitoringHandler.maxRenderCallCountPerFrame){
     threejsRenderMonitoringHandler.maxRenderCallCountPerFrame = threejsRenderMonitoringHandler.currentRenderCallCountPerFrame;
+  }
+}
+
+function handleInputText(){
+  if (inputText){
+    inputText.handleInputAnimation();
   }
 }
 

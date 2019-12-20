@@ -978,7 +978,8 @@ ImportHandler.prototype.importAddedTexts = function(obj){
     addedTextInstance.gsName = curTextExport.gsName;
     addedTextInstance.is2D = curTextExport.is2D;
     if (addedTextInstance.is2D){
-      macroHandler.injectMacro("IS_TWO_DIMENSIONAL", addedTextInstance.material, true, false);
+      macroHandler.injectMacro("IS_TWO_DIMENSIONAL", addedTextInstance.material, true, true);
+      addedTextInstance.mesh.material.uniforms.inputLineIndex = new THREE.Uniform(-500);
     }
     if (!(typeof curTextExport.marginMode == UNDEFINED)){
       addedTextInstance.marginMode = curTextExport.marginMode;

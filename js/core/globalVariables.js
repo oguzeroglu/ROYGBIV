@@ -387,6 +387,7 @@ var containers = new Object();
 var childContainers = new Object();
 var virtualKeyboards = new Object();
 var activeVirtualKeyboard;
+var inputText;
 
 // RENDER ORDERS
 var renderOrders = {
