@@ -5030,6 +5030,7 @@ function parse(input){
             terminal.printError(Text.CONTAINER_NOT_IN_ACTIVE_SCENE);
             return true;
           }
+          sceneHandler.onContainerDeletion(container);
           container.destroy();
           if (!jobHandlerWorking){
             terminal.printInfo(Text.CONTAINER_DESTROYED);
