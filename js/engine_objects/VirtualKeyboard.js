@@ -84,7 +84,7 @@ var VirtualKeyboard = function(parameters){
       {key: "b", weight: 1}, {key: "n", weight: 1}, {key: "m", weight: 1}, {key: "del", weight: 1.5}
     ],
     [
-      {key: "123", weight: 1.5}, {key: ",", weight: 1}, {key: "space", weight: 4.5},
+      {key: "?123", weight: 1.5}, {key: ",", weight: 1}, {key: "space", weight: 4.5},
       {key: ".", weight: 1}, {key: "ok", weight: 1.5}
     ]
   ];
@@ -96,7 +96,9 @@ var VirtualKeyboard = function(parameters){
     ",", "."
   ];
   this.keypressTestKeysNumeric = [
-    "0", "1", "2", "3", "4", "5", "6", "7", "8", "9"
+    "0", "1", "2", "3", "4", "5", "6", "7", "8", "9",
+    "+", "=", ";", "-", "_", "|", "<", ">", "(", ")", "!", "#",
+    ":", "{", "?", "}"
   ];
 
   this.keyContainers = [];
@@ -110,7 +112,9 @@ var VirtualKeyboard = function(parameters){
 
   this.numbersByKey = {
     "q": "0", "w": "1", "e": "2", "r": "3", "t": "4", "y": "5", "u": "6",
-    "i": "7", "o": "8", "p": "9"
+    "i": "7", "o": "8", "p": "9",
+    "a": "+", "s": "=", "d": ";", "f": "-", "g": "_", "h": "|", "j": "<", "k": ">", "l": "(",
+    "z": ")", "x": "!", "c": "#", "v": ":", "b": "{", "n": "?", "m": "}"
   }
 
   if (!IS_WORKER_CONTEXT){
@@ -373,7 +377,7 @@ VirtualKeyboard.prototype.onMouseClickIntersection = function(childContainerName
     this.onSpacePress();
   }else if (key == "ok"){
     this.onOKPress();
-  }else if (key == "123"){
+  }else if (key == "?123"){
     this.onModeChange();
   }else if (key == "caps" && !this.isNumeric){
     this.onCapsLock();
@@ -383,25 +387,18 @@ VirtualKeyboard.prototype.onMouseClickIntersection = function(childContainerName
 VirtualKeyboard.prototype.onModeChange = function(){
   this.isNumeric = !this.isNumeric;
   if (this.isNumeric){
-    this.textsByKey["123"].setText("ABC");
+    this.textsByKey["?123"].setText("ABC");
     this.textsByKey["caps"].setText("");
     for (var key in this.textsByKey){
       if (key.length == 1 && key != "." && key != ","){
         this.textsByKey[key].setText("");
       }
     }
-    this.textsByKey["q"].setText("0");
-    this.textsByKey["w"].setText("1");
-    this.textsByKey["e"].setText("2");
-    this.textsByKey["r"].setText("3");
-    this.textsByKey["t"].setText("4");
-    this.textsByKey["y"].setText("5");
-    this.textsByKey["u"].setText("6");
-    this.textsByKey["i"].setText("7");
-    this.textsByKey["o"].setText("8");
-    this.textsByKey["p"].setText("9");
+    for (var key in this.numbersByKey){
+      this.textsByKey[key].setText(this.numbersByKey[key]);
+    }
   }else{
-    this.textsByKey["123"].setText("123");
+    this.textsByKey["?123"].setText("?123");
     this.textsByKey["caps"].setText("CAPS");
     for (var key in this.textsByKey){
       if (key.length == 1){
