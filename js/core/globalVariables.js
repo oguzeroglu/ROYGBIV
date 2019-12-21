@@ -431,7 +431,7 @@ var Text;
 var ROYGBIV;
 
 // KEYCODE TO STRING MAP
-keyCodeToChar = {
+var keyCodeToChar = {
   8:"Backspace",9:"Tab",13:"Enter",16:"Shift",17:"Ctrl",18:"Alt",19:"Pause/Break",20:"Caps Lock",
   27:"Esc",32:"Space",33:"Page Up",34:"Page Down",35:"End",36:"Home",37:"Left",38:"Up",39:"Right",
   40:"Down",45:"Insert",46:"Delete",48:"0",49:"1",50:"2",51:"3",52:"4",53:"5",54:"6",55:"7",56:"8",
@@ -444,6 +444,29 @@ keyCodeToChar = {
   183:"My Calculator",186:";",187:"=",188:",",189:"-",190:".",191:"/",192:"`",
   219:"[",220:"\\",221:"]",222:"'"
 };
+
+var shiftCombinationKeys = {};
+shiftCombinationKeys[192] = "~";
+shiftCombinationKeys[49] = "!";
+shiftCombinationKeys[50] = "@";
+shiftCombinationKeys[51] = "#";
+shiftCombinationKeys[52] = "$";
+shiftCombinationKeys[53] = "%";
+shiftCombinationKeys[54] = "^";
+shiftCombinationKeys[55] = "&";
+shiftCombinationKeys[56] = "*";
+shiftCombinationKeys[57] = "(";
+shiftCombinationKeys[48] = ")";
+shiftCombinationKeys[109] = "_";
+shiftCombinationKeys[107] = "+";
+shiftCombinationKeys[219] = "{";
+shiftCombinationKeys[221] = "}";
+shiftCombinationKeys[220] = "|";
+shiftCombinationKeys[59] = ":";
+shiftCombinationKeys[222] = "\"";
+shiftCombinationKeys[188] = "<";
+shiftCombinationKeys[190] = ">";
+shiftCombinationKeys[191] = "?";
 
 // SUPPORTED FONT ATLAS CHARACTERS
 var supportedFontAtlasChars = [

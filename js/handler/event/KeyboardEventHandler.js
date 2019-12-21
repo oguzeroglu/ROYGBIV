@@ -6,6 +6,7 @@ var KeyboardEventHandler = function(){
   window.addEventListener('keyup', this.onKeyUp);
 
   this.CAPSLOCK = "CapsLock";
+  this.SHIFT = "Shift";
 }
 
 KeyboardEventHandler.prototype.onKeyUp = function(event){
@@ -17,12 +18,20 @@ KeyboardEventHandler.prototype.onKeyUp = function(event){
   if (cliFocused || omGUIFocused || tmGUIFocused || smGUIFocused || cmGUIFocused || acGUIFocused){
     return;
   }
+  if (keyCodeToChar[event.keyCode] == keyboardEventHandler.SHIFT){
+    for (var key in shiftCombinationKeys){
+      keyboardBuffer[shiftCombinationKeys[key]] = false;
+    }
+  }
   if (keyCodeToChar[event.keyCode]){
     keyboardBuffer[keyCodeToChar[event.keyCode]] = false;
     if (mode == 0 && keyCodeToChar[event.keyCode] == "."){
       for (var gridName in gridSelections){
         gridSelections[gridName].removeCornerHelpers();
       }
+    }
+    if (shiftCombinationKeys[event.keyCode]){
+      keyboardBuffer[shiftCombinationKeys[event.keyCode]] = false;
     }
     if (mode == 1 && !isPaused && screenKeyupCallbackFunction){
       screenKeyupCallbackFunction(keyCodeToChar[event.keyCode]);
@@ -70,14 +79,23 @@ KeyboardEventHandler.prototype.onKeyDown = function(event){
   if (cliFocused || omGUIFocused || tmGUIFocused || smGUIFocused || cmGUIFocused || acGUIFocused){
     return;
   }
-  if (keyCodeToChar[event.keyCode]){
+  var foundKey;
+  if (keyboardBuffer[keyboardEventHandler.SHIFT]){
+    foundKey = shiftCombinationKeys[event.keyCode];
+    if (foundKey){
+      keyboardBuffer[foundKey] = true;
+      found = true;
+    }
+  }
+  if (keyCodeToChar[event.keyCode] && !foundKey){
     if (keyboardBuffer[keyCodeToChar[event.keyCode]]){
       return;
     }
-    keyboardBuffer[keyCodeToChar[event.keyCode]] = true;
-    if (mode == 1 && screenKeydownCallbackFunction && !isPaused){
-      screenKeydownCallbackFunction(keyCodeToChar[event.keyCode]);
-    }
+    foundKey = keyCodeToChar[event.keyCode];
+    keyboardBuffer[foundKey] = true;
+  }
+  if (mode == 1 && screenKeydownCallbackFunction && !isPaused && foundKey){
+    screenKeydownCallbackFunction(foundKey);
   }
   activeControl.onKeyDown(event);
   if (mode == 0 && isDeployment){
