@@ -4773,7 +4773,7 @@ function parse(input){
           }
           sceneHandler.onSpriteDeletion(sprite);
           selectionHandler.resetCurrentSelection();
-          terminal.printInfo(Text.SPRITE_DESTROYED);
+          refreshRaycaster(Text.SPRITE_DESTROYED);
           return true;
         break;
         case 200: //selectSprite
