@@ -227,6 +227,7 @@ SceneHandler.prototype.hideAll = function(){
       inputText.deactivateInputMode();
     }
     inputText = 0;
+    activeVirtualKeyboard = 0;
     for (var objName in autoInstancedObjects){
       var obj = autoInstancedObjects[objName];
       obj.hideVisually();
