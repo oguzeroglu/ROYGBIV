@@ -1,5 +1,6 @@
 // parameters:
 //  name
+//  maxLength
 //  positionXPercent
 //  positionYPercent
 //  fontName
@@ -38,6 +39,7 @@ var VirtualKeyboard = function(parameters){
   }
   this.keyAddThrehsold = 200;
 
+  this.maxLength = parameters.maxLength;
   this.positionXPercent = parameters.positionXPercent;
   this.positionYPercent = parameters.positionYPercent;
   this.fontName = parameters.fontName;
@@ -281,6 +283,9 @@ VirtualKeyboard.prototype.onDelPress = function(){
 }
 
 VirtualKeyboard.prototype.onSpacePress = function(){
+  if (this.text.length >= this.maxLength){
+    return;
+  }
   this.text += " ";
   this.onTextChange(this.text);
 }
@@ -294,6 +299,9 @@ VirtualKeyboard.prototype.onOKPress = function(){
 }
 
 VirtualKeyboard.prototype.onKeyPress = function(key){
+  if (this.text.length >= this.maxLength){
+    return;
+  }
   this.text += key;
   this.onTextChange(this.text);
 }

@@ -33,6 +33,9 @@ VirtualKeyboardCreatorGUIHandler.prototype.onClick = function(clientX, clientY){
 VirtualKeyboardCreatorGUIHandler.prototype.showGUI = function(){
   guiHandler.datGuiVirtualKeyboardCreation = new dat.GUI({hideable: false});
   guiHandler.datGuiVirtualKeyboardCreation.add(this.configurations, "name").listen();
+  guiHandler.datGuiVirtualKeyboardCreation.add(this.configurations, "maxLength").min(1).max(100).step(1).onChange(function(val){
+    virtualKeyboardCreatorGUIHandler.handleVirtualKeyboardInstance();
+  }).listen();
   guiHandler.datGuiVirtualKeyboardCreation.add(this.configurations, "positionXPercent").min(0).max(100).step(0.1).onChange(function(val){
     virtualKeyboardCreatorGUIHandler.handleVirtualKeyboardInstance();
   }).listen();
@@ -143,6 +146,7 @@ VirtualKeyboardCreatorGUIHandler.prototype.init = function(name){
   }else{
     this.configurations = {
       name: name,
+      maxLength: 10,
       positionXPercent: 50,
       positionYPercent: 50,
       fontName: this.fontNames[0],
