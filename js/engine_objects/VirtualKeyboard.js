@@ -572,37 +572,42 @@ VirtualKeyboard.prototype.update = function(){
       this.onKeyInteractionWithKeyboard(this.containersByKey["CAPS"]);
       pressed = true;
     }
-  }
-  if (!pressed){
-    if (!this.isNumeric){
+    if (!pressed){
       for (var i = 0; i < this.keypressTestKeysNonNumeric.length; i++){
         if (keyboardBuffer[this.keypressTestKeysNonNumeric[i]]){
+          if (this.isNumeric){
+            this.onModeChange();
+          }
           this.onMouseClickIntersection(this.containersByKey[this.keypressTestKeysNonNumeric[i]].name);
           this.onKeyInteractionWithKeyboard(this.containersByKey[this.keypressTestKeysNonNumeric[i]]);
           pressed = true;
           break;
         }
       }
-    }else{
-      for (var i = 0; i < this.keypressTestKeysNumeric.length; i++){
-        if (keyboardBuffer[this.keypressTestKeysNumeric[i]]){
-          this.onMouseClickIntersection(this.containersByKey[this.keypressTestKeysNumeric[i]].name);
-          this.onKeyInteractionWithKeyboard(this.containersByKey[this.keypressTestKeysNumeric[i]]);
-          pressed = true;
-          break;
+      if (!pressed){
+        for (var i = 0; i < this.keypressTestKeysNumeric.length; i++){
+          if (keyboardBuffer[this.keypressTestKeysNumeric[i]]){
+            if (!this.isNumeric){
+              this.onModeChange();
+            }
+            this.onMouseClickIntersection(this.containersByKey[this.keypressTestKeysNumeric[i]].name);
+            this.onKeyInteractionWithKeyboard(this.containersByKey[this.keypressTestKeysNumeric[i]]);
+            pressed = true;
+            break;
+          }
         }
       }
-    }
-    if (!pressed){
-      if (keyboardBuffer["Backspace"]){
-        this.onMouseClickIntersection(this.containersByKey["DEL"].name);
-        this.onKeyInteractionWithKeyboard(this.containersByKey["DEL"]);
-      }else if (keyboardBuffer["Space"]){
-        this.onMouseClickIntersection(this.containersByKey["SPACE"].name);
-        this.onKeyInteractionWithKeyboard(this.containersByKey["SPACE"]);
-      }else if (keyboardBuffer["Enter"]){
-        this.onMouseClickIntersection(this.containersByKey["OK"].name);
-        this.onKeyInteractionWithKeyboard(this.containersByKey["OK"]);
+      if (!pressed){
+        if (keyboardBuffer["Backspace"]){
+          this.onMouseClickIntersection(this.containersByKey["DEL"].name);
+          this.onKeyInteractionWithKeyboard(this.containersByKey["DEL"]);
+        }else if (keyboardBuffer["Space"]){
+          this.onMouseClickIntersection(this.containersByKey["SPACE"].name);
+          this.onKeyInteractionWithKeyboard(this.containersByKey["SPACE"]);
+        }else if (keyboardBuffer["Enter"]){
+          this.onMouseClickIntersection(this.containersByKey["OK"].name);
+          this.onKeyInteractionWithKeyboard(this.containersByKey["OK"]);
+        }
       }
     }
   }
