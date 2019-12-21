@@ -236,6 +236,7 @@ var Preconditions = function(){
   this.container = "container";
   this.virtualKeyboard = "virtualKeyboard";
   this.virtualKeyboardName = "virtualKeyboardName";
+  this.cursorSizePercent = "cursorSizePercent";
 }
 
 Preconditions.prototype.errorHeader = function(callerFunc){

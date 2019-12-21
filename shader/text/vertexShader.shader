@@ -27,6 +27,7 @@ varying vec4 vUVRanges;
   uniform float inputLineIndex;
   varying float isInputLine;
   uniform vec2 margin2D;
+  uniform float inputLineCharSizePercent;
 #endif
 
 vec3 applyQuaternionToVector(vec3 vector, vec4 quaternion){
@@ -64,12 +65,13 @@ void main(){
     float x = (((oldPosX - currentViewport.x) * 2.0) / currentViewport.z) - 1.0;
     float y = (((oldPosY - currentViewport.y) * 2.0) / currentViewport.w) - 1.0;
     gl_Position = vec4(x + float(margin2D.x), y + float(margin2D.y), 0.0, 1.0);
-    gl_PointSize = charSize * screenResolution;
     int inputLineIndexInt = int(inputLineIndex);
     if (charIndexInt == inputLineIndexInt){
       isInputLine = 100.0;
+      gl_PointSize = inputLineCharSizePercent * charSize * screenResolution / 100.0;
     }else{
       isInputLine = -100.0;
+      gl_PointSize = charSize * screenResolution;
     }
   #else
     gl_Position = projectionMatrix * mvPosition;

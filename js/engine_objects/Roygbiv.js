@@ -2518,8 +2518,9 @@ Roygbiv.prototype.showText = function(text){
 }
 
 // Activates the input mode for a 2D text. Does nothing if the text is already in
-// input mode.
-Roygbiv.prototype.activateTextInputMode = function(text){
+// input mode. The optional cursorSizePercent parameter can be used to adjust the
+// cursor size (cursorSize = charSize * cursorSizePercent / 100)
+Roygbiv.prototype.activateTextInputMode = function(text, cursorSizePercent){
   if (mode == 0){
     return;
   }
@@ -2527,7 +2528,8 @@ Roygbiv.prototype.activateTextInputMode = function(text){
   preConditions.checkIfAddedText(ROYGBIV.activateTextInputMode, preConditions.text, text);
   preConditions.checkIfTextInsideActiveScene(ROYGBIV.activateTextInputMode, text);
   preConditions.checkIfText3D(ROYGBIV.activateTextInputMode, preConditions.text, text);
-  text.activateInputMode();
+  preConditions.checkIfNumberOnlyIfExists(ROYGBIV.activateTextInputMode, preConditions.cursorSizePercent, cursorSizePercent);
+  text.activateInputMode(cursorSizePercent);
 }
 
 // Deactivates the input mode for a 2D text. Does nothing if the text is already

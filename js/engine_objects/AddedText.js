@@ -133,12 +133,15 @@ AddedText.prototype.deactivateInputMode = function(){
   inputText = 0;
 }
 
-AddedText.prototype.activateInputMode = function(){
+AddedText.prototype.activateInputMode = function(inputLineCharSizePercent){
   if (!this.is2D || mode == 0){
     return;
   }
   if (mode == 1 && inputText == this){
     return;
+  }
+  if (!inputLineCharSizePercent){
+    inputLineCharSizePercent = 100;
   }
   if (inputText){
     inputText.deactivateInputMode();
@@ -146,6 +149,7 @@ AddedText.prototype.activateInputMode = function(){
   this.isInput = true;
   this.setText(this.text + "a", true);
   this.mesh.material.uniforms.inputLineIndex.value = this.text.length -1;
+  this.mesh.material.uniforms.inputLineCharSizePercent.value = inputLineCharSizePercent;
   inputText = this;
   this.isInputLineVisible = true;
   this.lastInputLineUpdateTime = performance.now();
@@ -894,6 +898,7 @@ AddedText.prototype.set2DStatus = function(is2D){
       addedTexts2D[this.name] = this;
     }
     this.mesh.material.uniforms.inputLineIndex = new THREE.Uniform(-500);
+    this.mesh.material.uniforms.inputLineCharSizePercent = new THREE.Uniform(-500);
     this.mesh.renderOrder = renderOrders.TEXT_2D;
   }else{
     macroHandler.removeMacro("IS_TWO_DIMENSIONAL", this.material, true, true);

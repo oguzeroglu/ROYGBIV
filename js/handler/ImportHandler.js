@@ -980,6 +980,7 @@ ImportHandler.prototype.importAddedTexts = function(obj){
     if (addedTextInstance.is2D){
       macroHandler.injectMacro("IS_TWO_DIMENSIONAL", addedTextInstance.material, true, true);
       addedTextInstance.mesh.material.uniforms.inputLineIndex = new THREE.Uniform(-500);
+      addedTextInstance.mesh.material.uniforms.inputLineCharSizePercent = new THREE.Uniform(-500);
     }
     if (!(typeof curTextExport.marginMode == UNDEFINED)){
       addedTextInstance.marginMode = curTextExport.marginMode;
