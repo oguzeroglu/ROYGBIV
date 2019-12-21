@@ -237,7 +237,7 @@ ParticleSystemCreatorGUIHandler.prototype.showConfetti = function(prevParams){
   guiHandler.datGuiPSCreator.add(confettiParameters, "particleSize").min(0.1).max(20).step(0.01).onFinishChange(function(val){
     particleSystemCreatorGUIHandler.confettiExplosionGeneratorFunc();
   }).listen();
-  guiHandler.datGuiPSCreator.addColor(confettiParameters, "colorName").onFinishChange(function(val){
+  guiHandler.datGuiPSCreator.add(confettiParameters, "colorName").onFinishChange(function(val){
     particleSystemCreatorGUIHandler.confettiExplosionGeneratorFunc();
   }).listen();
   guiHandler.datGuiPSCreator.add(confettiParameters, "alpha").min(0).max(1).step(0.1).onFinishChange(function(val){
@@ -272,7 +272,7 @@ ParticleSystemCreatorGUIHandler.prototype.showConfetti = function(prevParams){
     }
     particleSystemCreatorGUIHandler.confettiExplosionGeneratorFunc();
   }).listen();
-  particleSystemCreatorGUIHandler.confettiTargetColorController = guiHandler.datGuiPSCreator.addColor(confettiParameters, "targetColorName").onFinishChange(function(val){
+  particleSystemCreatorGUIHandler.confettiTargetColorController = guiHandler.datGuiPSCreator.add(confettiParameters, "targetColorName").onFinishChange(function(val){
     particleSystemCreatorGUIHandler.confettiExplosionGeneratorFunc();
   }).listen();
   particleSystemCreatorGUIHandler.confettiColorStepController = guiHandler.datGuiPSCreator.add(confettiParameters, "colorStep").min(0).max(1).step(0.001).onFinishChange(function(val){
@@ -424,7 +424,7 @@ ParticleSystemCreatorGUIHandler.prototype.showSnow = function(prevParams){
   guiHandler.datGuiPSCreator.add(snowParameters, "avgStartDelay").min(0).max(100).step(0.1).onFinishChange(function(val){
     particleSystemCreatorGUIHandler.snowGeneratorFunc();
   }).listen();
-  guiHandler.datGuiPSCreator.addColor(snowParameters, "colorName").onFinishChange(function(val){
+  guiHandler.datGuiPSCreator.add(snowParameters, "colorName").onFinishChange(function(val){
     particleSystemCreatorGUIHandler.snowGeneratorFunc();
   }).listen();
   guiHandler.datGuiPSCreator.add(snowParameters, "alpha").min(0).max(1).step(0.1).onFinishChange(function(val){
@@ -480,7 +480,7 @@ ParticleSystemCreatorGUIHandler.prototype.showSnow = function(prevParams){
     }
     particleSystemCreatorGUIHandler.snowGeneratorFunc();
   }).listen();
-  particleSystemCreatorGUIHandler.snowTargetColorController = guiHandler.datGuiPSCreator.addColor(snowParameters, "targetColorName").onFinishChange(function(val){
+  particleSystemCreatorGUIHandler.snowTargetColorController = guiHandler.datGuiPSCreator.add(snowParameters, "targetColorName").onFinishChange(function(val){
     particleSystemCreatorGUIHandler.snowGeneratorFunc();
   }).listen();
   particleSystemCreatorGUIHandler.snowColorStepController = guiHandler.datGuiPSCreator.add(snowParameters, "colorStep").min(0).max(1).step(0.001).onFinishChange(function(val){
@@ -567,7 +567,7 @@ ParticleSystemCreatorGUIHandler.prototype.showWaterfall = function(prevParams){
   guiHandler.datGuiPSCreator.add(waterfallParameters, "avgStartDelay").min(0).max(100).step(0.1).onFinishChange(function(val){
     particleSystemCreatorGUIHandler.waterfallGeneratorFunc();
   }).listen();
-  guiHandler.datGuiPSCreator.addColor(waterfallParameters, "colorName").onFinishChange(function(val){
+  guiHandler.datGuiPSCreator.add(waterfallParameters, "colorName").onFinishChange(function(val){
     particleSystemCreatorGUIHandler.waterfallGeneratorFunc();
   }).listen();
   guiHandler.datGuiPSCreator.add(waterfallParameters, "alpha").min(0).max(1).step(0.1).onFinishChange(function(val){
@@ -623,7 +623,7 @@ ParticleSystemCreatorGUIHandler.prototype.showWaterfall = function(prevParams){
     }
     particleSystemCreatorGUIHandler.waterfallGeneratorFunc();
   }).listen();
-  particleSystemCreatorGUIHandler.waterfallTargetColorController = guiHandler.datGuiPSCreator.addColor(waterfallParameters, "targetColorName").onFinishChange(function(val){
+  particleSystemCreatorGUIHandler.waterfallTargetColorController = guiHandler.datGuiPSCreator.add(waterfallParameters, "targetColorName").onFinishChange(function(val){
     particleSystemCreatorGUIHandler.waterfallGeneratorFunc();
   }).listen();
   particleSystemCreatorGUIHandler.waterfallColorStepController = guiHandler.datGuiPSCreator.add(waterfallParameters, "colorStep").min(0).max(1).step(0.001).onFinishChange(function(val){
@@ -722,7 +722,7 @@ ParticleSystemCreatorGUIHandler.prototype.showLaser = function(prevParams){
   guiHandler.datGuiPSCreator.add(laserParameters, "alpha").min(0).max(1).step(0.1).onFinishChange(function(val){
     particleSystemCreatorGUIHandler.laserGeneratorFunc();
   }).listen();
-  guiHandler.datGuiPSCreator.addColor(laserParameters, "colorName").onFinishChange(function(val){
+  guiHandler.datGuiPSCreator.add(laserParameters, "colorName").onFinishChange(function(val){
     particleSystemCreatorGUIHandler.laserGeneratorFunc();
   }).listen();
   guiHandler.datGuiPSCreator.add(laserParameters, "hasTargetColor").onChange(function(val){
@@ -735,7 +735,7 @@ ParticleSystemCreatorGUIHandler.prototype.showLaser = function(prevParams){
     }
     particleSystemCreatorGUIHandler.laserGeneratorFunc();
   }).listen();
-  particleSystemCreatorGUIHandler.laserTargetColorNameController = guiHandler.datGuiPSCreator.addColor(laserParameters, "targetColorName").onFinishChange(function(val){
+  particleSystemCreatorGUIHandler.laserTargetColorNameController = guiHandler.datGuiPSCreator.add(laserParameters, "targetColorName").onFinishChange(function(val){
     particleSystemCreatorGUIHandler.laserGeneratorFunc();
   }).listen();
   particleSystemCreatorGUIHandler.laserColorStepController = guiHandler.datGuiPSCreator.add(laserParameters, "colorStep").min(0).max(1).step(0.001).onFinishChange(function(val){
@@ -873,7 +873,7 @@ ParticleSystemCreatorGUIHandler.prototype.showDynamicTrail = function(prevParams
   guiHandler.datGuiPSCreator.add(dynamicTrailParameters, "alphaVariation").min(-1).max(0).step(0.01).onFinishChange(function(val){
     particleSystemCreatorGUIHandler.dynamicTrailGeneratorFunc();
   }).listen();
-  guiHandler.datGuiPSCreator.addColor(dynamicTrailParameters, "colorName").onFinishChange(function(val){
+  guiHandler.datGuiPSCreator.add(dynamicTrailParameters, "colorName").onFinishChange(function(val){
     particleSystemCreatorGUIHandler.dynamicTrailGeneratorFunc();
   }).listen();
   guiHandler.datGuiPSCreator.add(dynamicTrailParameters, "hasTargetColor").onChange(function(val){
@@ -886,7 +886,7 @@ ParticleSystemCreatorGUIHandler.prototype.showDynamicTrail = function(prevParams
     }
     particleSystemCreatorGUIHandler.dynamicTrailGeneratorFunc();
   }).listen();
-  particleSystemCreatorGUIHandler.dynamicTrailTargetColorController = guiHandler.datGuiPSCreator.addColor(dynamicTrailParameters, "targetColorName").onFinishChange(function(val){
+  particleSystemCreatorGUIHandler.dynamicTrailTargetColorController = guiHandler.datGuiPSCreator.add(dynamicTrailParameters, "targetColorName").onFinishChange(function(val){
     particleSystemCreatorGUIHandler.dynamicTrailGeneratorFunc();
   }).listen();
   particleSystemCreatorGUIHandler.dynamicTrailColorStepController = guiHandler.datGuiPSCreator.add(dynamicTrailParameters, "colorStep").min(0).max(1).step(0.001).onFinishChange(function(val){
@@ -984,7 +984,7 @@ ParticleSystemCreatorGUIHandler.prototype.showCircularExplosion = function(prevP
   guiHandler.datGuiPSCreator.add(circularExplosionParameters, "radius").min(0.1).max(1000).step(0.1).onFinishChange(function(val){
     particleSystemCreatorGUIHandler.circularExplosionGeneratorFunc();
   }).listen();
-  guiHandler.datGuiPSCreator.addColor(circularExplosionParameters, "colorName").onFinishChange(function(val){
+  guiHandler.datGuiPSCreator.add(circularExplosionParameters, "colorName").onFinishChange(function(val){
     particleSystemCreatorGUIHandler.circularExplosionGeneratorFunc();
   }).listen();
   guiHandler.datGuiPSCreator.add(circularExplosionParameters, "hasTargetColor").onChange(function(val){
@@ -997,7 +997,7 @@ ParticleSystemCreatorGUIHandler.prototype.showCircularExplosion = function(prevP
     }
     particleSystemCreatorGUIHandler.circularExplosionGeneratorFunc();
   }).listen();
-  particleSystemCreatorGUIHandler.circularExplosionTargetColorNameController = guiHandler.datGuiPSCreator.addColor(circularExplosionParameters, "targetColorName").onFinishChange(function(val){
+  particleSystemCreatorGUIHandler.circularExplosionTargetColorNameController = guiHandler.datGuiPSCreator.add(circularExplosionParameters, "targetColorName").onFinishChange(function(val){
     particleSystemCreatorGUIHandler.circularExplosionGeneratorFunc();
   }).listen();
   particleSystemCreatorGUIHandler.circularExplosionColorStepController = guiHandler.datGuiPSCreator.add(circularExplosionParameters, "colorStep").min(0).max(1).step(0.001).onFinishChange(function(val){
@@ -1146,7 +1146,7 @@ ParticleSystemCreatorGUIHandler.prototype.showMagicCircle = function(prevParams)
   guiHandler.datGuiPSCreator.add(magicCircleParameters, "particleSize").min(0.1).max(20).step(0.01).onFinishChange(function(val){
     particleSystemCreatorGUIHandler.magicCircleGeneratorFunc();
   }).listen();
-  guiHandler.datGuiPSCreator.addColor(magicCircleParameters, "colorName").onFinishChange(function(val){
+  guiHandler.datGuiPSCreator.add(magicCircleParameters, "colorName").onFinishChange(function(val){
     particleSystemCreatorGUIHandler.magicCircleGeneratorFunc();
   }).listen();
   guiHandler.datGuiPSCreator.add(magicCircleParameters, "alpha").min(0).max(1).step(0.1).onFinishChange(function(val){
@@ -1162,7 +1162,7 @@ ParticleSystemCreatorGUIHandler.prototype.showMagicCircle = function(prevParams)
     }
     particleSystemCreatorGUIHandler.magicCircleGeneratorFunc();
   }).listen();
-  particleSystemCreatorGUIHandler.magicCircleTargetColorController = guiHandler.datGuiPSCreator.addColor(magicCircleParameters, "targetColorName").onFinishChange(function(val){
+  particleSystemCreatorGUIHandler.magicCircleTargetColorController = guiHandler.datGuiPSCreator.add(magicCircleParameters, "targetColorName").onFinishChange(function(val){
     particleSystemCreatorGUIHandler.magicCircleGeneratorFunc();
   }).listen();
   particleSystemCreatorGUIHandler.magicCircleColorStepController = guiHandler.datGuiPSCreator.add(magicCircleParameters, "colorStep").min(0).max(1).step(0.001).onFinishChange(function(val){
@@ -1302,10 +1302,10 @@ ParticleSystemCreatorGUIHandler.prototype.showFireExplosion = function(prevParam
   guiHandler.datGuiPSCreator.add(fireExplosionParameters, "particleCount").min(1).max(5000).step(1).onFinishChange(function(val){
     particleSystemCreatorGUIHandler.fireExplosionGeneratorFunc();
   }).listen();
-  guiHandler.datGuiPSCreator.addColor(fireExplosionParameters, "fireColorName").onFinishChange(function(val){
+  guiHandler.datGuiPSCreator.add(fireExplosionParameters, "fireColorName").onFinishChange(function(val){
     particleSystemCreatorGUIHandler.fireExplosionGeneratorFunc();
   }).listen();
-  guiHandler.datGuiPSCreator.addColor(fireExplosionParameters, "smokeColorName").onFinishChange(function(val){
+  guiHandler.datGuiPSCreator.add(fireExplosionParameters, "smokeColorName").onFinishChange(function(val){
     particleSystemCreatorGUIHandler.fireExplosionGeneratorFunc();
   }).listen();
   guiHandler.datGuiPSCreator.add(fireExplosionParameters, "colorStep").min(0).max(1).step(0.01).onFinishChange(function(val){
@@ -1431,7 +1431,7 @@ ParticleSystemCreatorGUIHandler.prototype.showPlasma = function(prevParams){
   guiHandler.datGuiPSCreator.add(plasmaParameters, "alphaVariation").min(-100).max(100).step(0.1).onFinishChange(function(val){
     particleSystemCreatorGUIHandler.plasmaGeneratorFunc();
   }).listen();
-  guiHandler.datGuiPSCreator.addColor(plasmaParameters, "color").onFinishChange(function(val){
+  guiHandler.datGuiPSCreator.add(plasmaParameters, "color").onFinishChange(function(val){
     particleSystemCreatorGUIHandler.plasmaGeneratorFunc();
   }).listen();
   particleSystemCreatorGUIHandler.plasmaHasTextureController = guiHandler.datGuiPSCreator.add(plasmaParameters, "hasTexture").onChange(function(val){
@@ -1552,7 +1552,7 @@ ParticleSystemCreatorGUIHandler.prototype.showTrail = function(prevParams){
   guiHandler.datGuiPSCreator.add(trailParameters, "startDelay").min(0).max(20).step(0.01).onFinishChange(function(val){
     particleSystemCreatorGUIHandler.trailGeneratorFunc();
   }).listen();
-  guiHandler.datGuiPSCreator.addColor(trailParameters, "colorName").onFinishChange(function(val){
+  guiHandler.datGuiPSCreator.add(trailParameters, "colorName").onFinishChange(function(val){
     particleSystemCreatorGUIHandler.trailGeneratorFunc();
   }).listen();
   guiHandler.datGuiPSCreator.add(trailParameters, "particleSize").min(0.1).max(20).step(0.01).onFinishChange(function(val){
@@ -1599,7 +1599,7 @@ ParticleSystemCreatorGUIHandler.prototype.showTrail = function(prevParams){
     }
     particleSystemCreatorGUIHandler.trailGeneratorFunc();
   }).listen();
-  particleSystemCreatorGUIHandler.trailTargetColorController = guiHandler.datGuiPSCreator.addColor(trailParameters, "targetColor").onFinishChange(function(val){
+  particleSystemCreatorGUIHandler.trailTargetColorController = guiHandler.datGuiPSCreator.add(trailParameters, "targetColor").onFinishChange(function(val){
     particleSystemCreatorGUIHandler.trailGeneratorFunc();
   }).listen();
   particleSystemCreatorGUIHandler.trailColorStepController = guiHandler.datGuiPSCreator.add(trailParameters, "colorStep").min(0).max(1).step(0.001).onFinishChange(function(val){
@@ -1683,7 +1683,7 @@ ParticleSystemCreatorGUIHandler.prototype.showSmoke = function(prevParams){
   guiHandler.datGuiPSCreator.add(smokeParameters, "particleCount").min(1).max(5000).step(1).onFinishChange(function(val){
     particleSystemCreatorGUIHandler.smokeGeneratorFunc();
   }).listen();
-  guiHandler.datGuiPSCreator.addColor(smokeParameters, "colorName").onFinishChange(function(val){
+  guiHandler.datGuiPSCreator.add(smokeParameters, "colorName").onFinishChange(function(val){
     particleSystemCreatorGUIHandler.smokeGeneratorFunc();
   }).listen();
   guiHandler.datGuiPSCreator.add(smokeParameters, "velocity").min(0.1).max(500).step(0.1).onFinishChange(function(val){
@@ -1772,7 +1772,7 @@ ParticleSystemCreatorGUIHandler.prototype.showSmoke = function(prevParams){
 
 ParticleSystemCreatorGUIHandler.prototype.handleCustomMaterialFolder = function(folder){
   var customPSMaterialParameters = particleSystemCreatorGUIHandler.customParameters.material;
-  folder.addColor(customPSMaterialParameters, "color").onFinishChange(function(val){ particleSystemCreatorGUIHandler.customPSGeneratorFunc(); }).listen();
+  folder.add(customPSMaterialParameters, "color").onFinishChange(function(val){ particleSystemCreatorGUIHandler.customPSGeneratorFunc(); }).listen();
   folder.add(customPSMaterialParameters, "size").min(0.1).max(20).step(0.01).onFinishChange(function(val){ particleSystemCreatorGUIHandler.customPSGeneratorFunc(); }).listen();
   folder.add(customPSMaterialParameters, "alpha").min(0).max(1).step(0.1).onFinishChange(function(val){ particleSystemCreatorGUIHandler.customPSGeneratorFunc(); }).listen();
   var hasTextureController = folder.add(customPSMaterialParameters, "hasTexture").onChange(function(val){
@@ -1811,7 +1811,7 @@ ParticleSystemCreatorGUIHandler.prototype.handleCustomMaterialFolder = function(
     }
     particleSystemCreatorGUIHandler.customPSGeneratorFunc();
   }).listen();
-  var targetColorController = folder.addColor(customPSMaterialParameters, "targetColor").onFinishChange(function(val){ particleSystemCreatorGUIHandler.customPSGeneratorFunc(); }).listen();
+  var targetColorController = folder.add(customPSMaterialParameters, "targetColor").onFinishChange(function(val){ particleSystemCreatorGUIHandler.customPSGeneratorFunc(); }).listen();
   var colorStepController = folder.add(customPSMaterialParameters, "colorStep").min(0).max(1).step(0.001).onFinishChange(function(val){ particleSystemCreatorGUIHandler.customPSGeneratorFunc(); }).listen();
   if (!customPSMaterialParameters.hasTexture){
     guiHandler.disableController(textureNameController);

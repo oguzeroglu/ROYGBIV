@@ -94,7 +94,7 @@ LightningCreatorGUIHandler.prototype.createGUI = function(lightningName){
   guiHandler.datGuiLightningCreation.add(this.parameters, "Roughness").min(0.01).max(10).step(0.01).onChange(function(val){
     lightningCreatorGUIHandler.handleMesh(lightningName);
   }).listen();
-  guiHandler.datGuiLightningCreation.addColor(this.parameters, "Color").onChange(function(val){
+  guiHandler.datGuiLightningCreation.add(this.parameters, "Color").onFinishChange(function(val){
     lightningCreatorGUIHandler.handleMesh(lightningName);
   }).listen();
   guiHandler.datGuiLightningCreation.add(this.parameters, "Cancel");

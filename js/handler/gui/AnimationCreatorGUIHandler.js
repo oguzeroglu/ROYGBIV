@@ -142,7 +142,7 @@ AnimationCreatorGUIHandler.prototype.addAnimationFolder = function(animation, ob
     animationCreatorGUIHandler.handleTerminal(null, Text.ANIMATION_UPDATED, object);
   }.bind({folderID: folderID, object: object})).listen();
   this.targetValueControllersByFolderID[folderID] = targetValueController;
-  var colorController = folder.addColor(folderConfigurations, "Target color").onFinishChange(function(val){
+  var colorController = folder.add(folderConfigurations, "Target color").onFinishChange(function(val){
     var confs = animationCreatorGUIHandler.folderConfigurationsByID[this.folderID];
     var animation = animationCreatorGUIHandler.createAnimation(object, confs["Name"], confs["Type"], confs["Action"], confs["Seconds"], confs["Total delta"], confs["Rewind"], val, confs["Repeat"], confs["Target value"]);
     animationCreatorGUIHandler.animationsByFolderID[this.folderID] = animation;

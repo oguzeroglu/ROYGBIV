@@ -52,7 +52,7 @@ VirtualKeyboardCreatorGUIHandler.prototype.showGUI = function(){
   backgroundFolder.add(this.configurations, "hasBackground").onChange(function(val){
     virtualKeyboardCreatorGUIHandler.handleVirtualKeyboardInstance();
   }).listen();
-  backgroundFolder.addColor(this.configurations, "backgroundColor").onChange(function(val){
+  backgroundFolder.add(this.configurations, "backgroundColor").onFinishChange(function(val){
     virtualKeyboardCreatorGUIHandler.handleVirtualKeyboardInstance();
   }).listen();
   backgroundFolder.add(this.configurations, "backgroundAlpha").min(0).max(1).step(0.1).onChange(function(val){
@@ -68,7 +68,7 @@ VirtualKeyboardCreatorGUIHandler.prototype.showGUI = function(){
   borderFolder.add(this.configurations, "borderThickness").min(0).max(0.05).step(0.0001).onChange(function(val){
     virtualKeyboardCreatorGUIHandler.handleVirtualKeyboardInstance();
   }).listen();
-  borderFolder.addColor(this.configurations, "borderColor").onChange(function(val){
+  borderFolder.add(this.configurations, "borderColor").onFinishChange(function(val){
     virtualKeyboardCreatorGUIHandler.handleVirtualKeyboardInstance();
   }).listen();
   var keyFolder = guiHandler.datGuiVirtualKeyboardCreation.addFolder("key");
@@ -81,7 +81,7 @@ VirtualKeyboardCreatorGUIHandler.prototype.showGUI = function(){
   keyFolder.add(this.configurations, "keyHasBorder").onChange(function(val){
     virtualKeyboardCreatorGUIHandler.handleVirtualKeyboardInstance();
   }).listen();
-  keyFolder.addColor(this.configurations, "keyBorderColor").onChange(function(val){
+  keyFolder.add(this.configurations, "keyBorderColor").onFinishChange(function(val){
     virtualKeyboardCreatorGUIHandler.handleVirtualKeyboardInstance();
   }).listen();
   keyFolder.add(this.configurations, "keyBorderThickness").min(0).max(0.05).step(0.0001).onChange(function(val){
@@ -90,7 +90,7 @@ VirtualKeyboardCreatorGUIHandler.prototype.showGUI = function(){
   keyFolder.add(this.configurations, "keyHasBackground").onChange(function(val){
     virtualKeyboardCreatorGUIHandler.handleVirtualKeyboardInstance();
   }).listen();
-  keyFolder.addColor(this.configurations, "keyBackgroundColor").onChange(function(val){
+  keyFolder.add(this.configurations, "keyBackgroundColor").onFinishChange(function(val){
     virtualKeyboardCreatorGUIHandler.handleVirtualKeyboardInstance();
   }).listen();
   keyFolder.add(this.configurations, "keyBackgroundAlpha").min(0).max(1).step(0.1).onChange(function(val){
@@ -99,10 +99,10 @@ VirtualKeyboardCreatorGUIHandler.prototype.showGUI = function(){
   keyFolder.add(this.configurations, "keyBackgroundTextureName", this.textureNames).onChange(function(val){
     virtualKeyboardCreatorGUIHandler.handleVirtualKeyboardInstance();
   }).listen();
-  keyFolder.addColor(this.configurations, "keyColor").onChange(function(val){
+  keyFolder.add(this.configurations, "keyColor").onFinishChange(function(val){
     virtualKeyboardCreatorGUIHandler.handleVirtualKeyboardInstance();
   }).listen();
-  keyFolder.addColor(this.configurations, "keyInteractionColor").onChange(function(val){
+  keyFolder.add(this.configurations, "keyInteractionColor").onFinishChange(function(val){
     virtualKeyboardCreatorGUIHandler.handleVirtualKeyboardInstance();
   }).listen();
   keyFolder.add(this.configurations, "keyCharMargin").min(0.1).max(100).step(0.1).onChange(function(val){

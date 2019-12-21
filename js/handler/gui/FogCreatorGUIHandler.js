@@ -47,7 +47,7 @@ FogCreatorGUIHandler.prototype.createGUI = function(){
   this.densityController = guiHandler.datGuiFog.add(this.configurations, "Density").min(0).max(0.01).step(0.0001).onChange(function(val){
     fogHandler.setFogDensity(val);
   }).listen();
-  this.colorController = guiHandler.datGuiFog.addColor(this.configurations, "Color").onChange(function(val){
+  this.colorController = guiHandler.datGuiFog.add(this.configurations, "Color").onFinishChange(function(val){
     fogHandler.setFogColor(val);
   }).listen();
   this.blendWithSkyboxController = guiHandler.datGuiFog.add(this.configurations, "Blend w Skybox").onChange(function(val){

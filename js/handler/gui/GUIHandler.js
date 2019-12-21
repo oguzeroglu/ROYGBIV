@@ -1325,7 +1325,7 @@ GUIHandler.prototype.initializeObjectManipulationGUI = function(){
       obj.setBlending(MULTIPLY_BLENDING);
     }
   }).listen();
-  guiHandler.omEmissiveColorController = guiHandler.datGuiObjectManipulation.addColor(guiHandler.objectManipulationParameters, "Emissive col.").onChange(function(val){
+  guiHandler.omEmissiveColorController = guiHandler.datGuiObjectManipulation.add(guiHandler.objectManipulationParameters, "Emissive col.").onFinishChange(function(val){
     REUSABLE_COLOR.set(val);
     selectionHandler.getSelectedObject().setEmissiveColor(REUSABLE_COLOR);
   }).listen();
@@ -1438,7 +1438,7 @@ GUIHandler.prototype.initializeContainerManipulationGUI = function(){
       guiHandler.disableController(guiHandler.containerManipulationBorderThicknessController);
     }
   }).listen();
-  guiHandler.containerManipulationBorderColorController = guiHandler.datGuiContainerManipulation.addColor(guiHandler.containerManipulationParameters, "Border color").onChange(function(val){
+  guiHandler.containerManipulationBorderColorController = guiHandler.datGuiContainerManipulation.add(guiHandler.containerManipulationParameters, "Border color").onFinishChange(function(val){
     selectionHandler.getSelectedObject().setBorder(guiHandler.containerManipulationParameters["Border color"], guiHandler.containerManipulationParameters["Border thickness"]);
   }).listen();
   guiHandler.containerManipulationBorderThicknessController = guiHandler.datGuiContainerManipulation.add(guiHandler.containerManipulationParameters, "Border thickness").min(0.001).max(0.1).step(0.0001).onChange(function(val){
@@ -1465,7 +1465,7 @@ GUIHandler.prototype.initializeContainerManipulationGUI = function(){
       selectionHandler.getSelectedObject().removeBackground();
     }
   }).listen();
-  guiHandler.containerManipulationBackgroundColorController = guiHandler.datGuiContainerManipulation.addColor(guiHandler.containerManipulationParameters, "BG color").onChange(function(val){
+  guiHandler.containerManipulationBackgroundColorController = guiHandler.datGuiContainerManipulation.add(guiHandler.containerManipulationParameters, "BG color").onFinishChange(function(val){
     var bgColor = val;
     var bgAlpha = guiHandler.containerManipulationParameters["BG alpha"];
     var bgTextureName = (guiHandler.containerManipulationParameters["Has BG texture"] && guiHandler.containerManipulationParameters["BG texture"])? guiHandler.containerManipulationParameters["BG texture"]: null;
@@ -1510,7 +1510,7 @@ GUIHandler.prototype.initializeSpriteManipulationGUI = function(){
     smGUIFocused = true;
   });
   guiHandler.spriteManipulationSpriteNameController = guiHandler.datGuiSpriteManipulation.add(guiHandler.spriteManipulationParameters, "Sprite").listen();
-  guiHandler.spriteManipulationColorController = guiHandler.datGuiSpriteManipulation.addColor(guiHandler.spriteManipulationParameters, "Color").onChange(function(val){
+  guiHandler.spriteManipulationColorController = guiHandler.datGuiSpriteManipulation.add(guiHandler.spriteManipulationParameters, "Color").onFinishChange(function(val){
     selectionHandler.getSelectedObject().setColor(val);
   }).listen();
   guiHandler.spriteManipulationAlphaController = guiHandler.datGuiSpriteManipulation.add(guiHandler.spriteManipulationParameters, "Alpha").min(0).max(1).step(0.01).onChange(function(val){
@@ -1672,7 +1672,7 @@ GUIHandler.prototype.initializeTextManipulationGUI = function(){
       addedText.containerParent.insertAddedText(addedText);
     }
   }).listen();
-  guiHandler.textManipulationTextColorController = guiHandler.datGuiTextManipulation.addColor(guiHandler.textManipulationParameters, "Text color").onChange(function(val){
+  guiHandler.textManipulationTextColorController = guiHandler.datGuiTextManipulation.add(guiHandler.textManipulationParameters, "Text color").onFinishChange(function(val){
     selectionHandler.getSelectedObject().setColor(val);
   }).listen();
   guiHandler.textManipulationAlphaController = guiHandler.datGuiTextManipulation.add(guiHandler.textManipulationParameters, "Alpha").min(0).max(1).step(0.01).onChange(function(val){
@@ -1691,7 +1691,7 @@ GUIHandler.prototype.initializeTextManipulationGUI = function(){
     guiHandler.textManipulationParameters["Bg color"] = "#000000";
     guiHandler.textManipulationParameters["Alpha"] = 1;
   }).listen();
-  guiHandler.textManipulationBackgroundColorController = guiHandler.datGuiTextManipulation.addColor(guiHandler.textManipulationParameters, "Bg color").onChange(function(val){
+  guiHandler.textManipulationBackgroundColorController = guiHandler.datGuiTextManipulation.add(guiHandler.textManipulationParameters, "Bg color").onFinishChange(function(val){
     selectionHandler.getSelectedObject().setBackground(val, selectionHandler.getSelectedObject().getBackgroundAlpha());
   }).listen();
   guiHandler.textManipulationBackgroundAlphaController = guiHandler.datGuiTextManipulation.add(guiHandler.textManipulationParameters, "Bg alpha").min(0).max(1).step(0.01).onChange(function(val){
@@ -1863,7 +1863,7 @@ GUIHandler.prototype.initializeBloomGUI = function(){
       }
       bloom.setTapForLevel(this.index, tapAmount);
     }.bind({index: i})).listen();
-    guiHandler["blurPassTintColorController"+(i+1)] = blurPassFolder.addColor(guiHandler.bloomParameters["BlurPass"+(i+1)], "Color").onChange(function(val){
+    guiHandler["blurPassTintColorController"+(i+1)] = blurPassFolder.add(guiHandler.bloomParameters["BlurPass"+(i+1)], "Color").onFinishChange(function(val){
       REUSABLE_COLOR.set(val);
       bloom.setBloomTintColor(this.index, REUSABLE_COLOR.r, REUSABLE_COLOR.g, REUSABLE_COLOR.b);
     }.bind({index: i})).listen();

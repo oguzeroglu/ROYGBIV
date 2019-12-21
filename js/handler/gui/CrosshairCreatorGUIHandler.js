@@ -87,7 +87,7 @@ CrosshairCreatorGUIHandler.prototype.createGUI = function(crosshairName, texture
   guiHandler.datGuiCrosshairCreation.add(this.configurations, "Texture", texturePackNames).onChange(function(val){
     crosshairCreatorGUIHandler.handleTestCrosshair(crosshairName);
   }).listen();
-  guiHandler.datGuiCrosshairCreation.addColor(this.configurations, "Color").onChange(function(val){
+  guiHandler.datGuiCrosshairCreation.add(this.configurations, "Color").onFinishChange(function(val){
     crosshairCreatorGUIHandler.handleTestCrosshair(crosshairName);
   }).listen();
   guiHandler.datGuiCrosshairCreation.add(this.configurations, "Alpha").min(0.01).max(1).step(0.01).onChange(function(val){

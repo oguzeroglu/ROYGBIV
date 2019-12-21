@@ -153,7 +153,7 @@ SkyboxCreatorGUIHandler.prototype.createGUI = function(skyboxName, folders){
   this.skyboxController = guiHandler.datGuiSkyboxCreation.add(this.configurations, "Skybox", folders).onChange(function(val){
     skyboxCreatorGUIHandler.loadSkybox(skyboxName, val);
   }).listen();
-  this.colorController = guiHandler.datGuiSkyboxCreation.addColor(this.configurations, "Color").onChange(function(val){
+  this.colorController = guiHandler.datGuiSkyboxCreation.add(this.configurations, "Color").onFinishChange(function(val){
     skyboxCreatorGUIHandler.testMesh.material.uniforms.color.value.set(val);
     skyboxCreatorGUIHandler.skybox.color = val;
   }).listen();
