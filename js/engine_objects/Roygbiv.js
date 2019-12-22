@@ -603,7 +603,7 @@ Roygbiv.prototype.getAnimationState = function(object, animationName){
     return;
   }
   preConditions.checkIfDefined(ROYGBIV.getAnimationState, preConditions.object, object);
-  preConditions.checkIfAddedObjectObjectGroupAddedText(ROYGBIV.getAnimationState, preConditions.object, object);
+  preConditions.checkIfAddedObjectObjectGroupAddedTextSprite(ROYGBIV.getAnimationState, preConditions.object, object);
   preConditions.checkIfDefined(ROYGBIV.getAnimationState, preConditions.animationName, animationName);
   preConditions.checkIfAnimationExists(ROYGBIV.getAnimationState, object, animationName);
   preConditions.checkIfObjectInsideActiveScene(ROYGBIV.getAnimationState, object);
@@ -2033,7 +2033,7 @@ Roygbiv.prototype.removeAnimationFinishListener = function(object, animationName
   }
   preConditions.checkIfDefined(ROYGBIV.removeAnimationFinishListener, preConditions.object, object);
   preConditions.checkIfDefined(ROYGBIV.removeAnimationFinishListener, preConditions.animationName, animationName);
-  preConditions.checkIfAddedObjectObjectGroupAddedText(ROYGBIV.removeAnimationFinishListener, preConditions.object, object);
+  preConditions.checkIfAddedObjectObjectGroupAddedTextSprite(ROYGBIV.removeAnimationFinishListener, preConditions.object, object);
   preConditions.checkIfAnimationExists(ROYGBIV.removeAnimationFinishListener, object, animationName);
   preConditions.checkIfObjectInsideActiveScene(ROYGBIV.removeAnimationFinishListener, object);
   object.animations[animationName].finishCallbackFunction = noop;
