@@ -61,6 +61,7 @@ function render(){
   if (!isMobile){
     cpuOperationsHandler.flushMouseEventHandler();
   }
+  handleRefresh2D();
   fpsHandler.end();
 }
 
@@ -70,6 +71,13 @@ function renderScene(){
   renderer.render(scene, camera);
   if (threejsRenderMonitoringHandler.currentRenderCallCountPerFrame > threejsRenderMonitoringHandler.maxRenderCallCountPerFrame){
     threejsRenderMonitoringHandler.maxRenderCallCountPerFrame = threejsRenderMonitoringHandler.currentRenderCallCountPerFrame;
+  }
+}
+
+function handleRefresh2D(){
+  if (resizeEventHandler.refresh2DNeeded){
+    rayCaster.refresh2D();
+    resizeEventHandler.refresh2DNeeded = false;
   }
 }
 
