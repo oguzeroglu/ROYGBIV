@@ -246,14 +246,18 @@ StateLoaderLightweight.prototype.loadBoundingBoxes = function(){
     }
   }
   for (var virtualKeyboardName in virtualKeyboardExports){
-    var params = virtualKeyboardExports[virtualKeyboardName].parameters;
-    virtualKeyboards[virtualKeyboardName] = new VirtualKeyboard(params);
-    for (var containerName in virtualKeyboardExports[virtualKeyboardName].keyContainers){
-      var container = this.containerImportFunc(containerName, virtualKeyboardExports[virtualKeyboardName].keyContainers[containerName]);
-      childContainers[container.name] = virtualKeyboards[virtualKeyboardName];
-      virtualKeyboards[virtualKeyboardName].childContainersByContainerName[containerName] = container;
-      virtualKeyboards[virtualKeyboardName].keyContainers.push(container);
-    }
+    this.virtualKeyboardImportFunc(virtualKeyboardName, virtualKeyboardExports[virtualKeyboardName]);
+  }
+}
+
+StateLoaderLightweight.prototype.virtualKeyboardImportFunc = function(virtualKeyboardName, curExport){
+  var params = curExport.parameters;
+  virtualKeyboards[virtualKeyboardName] = new VirtualKeyboard(params);
+  for (var containerName in curExport.keyContainers){
+    var container = this.containerImportFunc(containerName, curExport.keyContainers[containerName]);
+    childContainers[container.name] = virtualKeyboards[virtualKeyboardName];
+    virtualKeyboards[virtualKeyboardName].childContainersByContainerName[containerName] = container;
+    virtualKeyboards[virtualKeyboardName].keyContainers.push(container);
   }
 }
 

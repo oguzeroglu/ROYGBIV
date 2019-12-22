@@ -76,5 +76,5 @@ ResizeEventHandler.prototype.onResize = function(){
     virtualKeyboards[virtualKeyboardName].handleResize();
   }
   renderer.setPixelRatio(screenResolution);
-  resizeEventHandler.refreshNeeded = true;
+  resizeEventHandler.refresh2DNeeded = true;
 }
