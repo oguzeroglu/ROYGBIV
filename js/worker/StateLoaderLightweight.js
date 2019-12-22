@@ -230,7 +230,7 @@ StateLoaderLightweight.prototype.loadBoundingBoxes = function(){
     sprites[spriteName].rectangle = new Rectangle(0, 0, 0, 0).set(
       spriteExports[spriteName].x, spriteExports[spriteName].y,
       spriteExports[spriteName].finalX, spriteExports[spriteName].finalY,
-      spriteExports[spriteName].width, spriteExports[spriteName].heigth
+      spriteExports[spriteName].width, spriteExports[spriteName].height
     );
     sprites[spriteName].triangle1.set(spriteExports[spriteName].triangle1.a, spriteExports[spriteName].triangle1.b, spriteExports[spriteName].triangle1.c);
     sprites[spriteName].triangle2.set(spriteExports[spriteName].triangle2.a, spriteExports[spriteName].triangle2.b, spriteExports[spriteName].triangle2.c);

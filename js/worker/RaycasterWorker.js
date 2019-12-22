@@ -384,7 +384,7 @@ RaycasterWorker.prototype.set2DTextSizes = function(data){
     sprite.rectangle = new Rectangle(0, 0, 0, 0).set(
       spriteExport.x, spriteExport.y,
       spriteExport.finalX, spriteExport.finalY,
-      spriteExport.width, spriteExport.heigth
+      spriteExport.width, spriteExport.height
     );
     sprite.triangle1.set(spriteExport.triangle1.a, spriteExport.triangle1.b, spriteExport.triangle1.c);
     sprite.triangle2.set(spriteExport.triangle2.a, spriteExport.triangle2.b, spriteExport.triangle2.c);

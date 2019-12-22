@@ -568,7 +568,7 @@ RaycasterWorkerBridge.prototype.issueUpdate = function(obj){
     description[obj.indexInIntersectableObjDescriptionArray + 4] = obj.rectangle.finalX;
     description[obj.indexInIntersectableObjDescriptionArray + 5] = obj.rectangle.finalY;
     description[obj.indexInIntersectableObjDescriptionArray + 6] = obj.rectangle.width;
-    description[obj.indexInIntersectableObjDescriptionArray + 7] = obj.rectangle.heigth;
+    description[obj.indexInIntersectableObjDescriptionArray + 7] = obj.rectangle.height;
     description[obj.indexInIntersectableObjDescriptionArray + 8] = obj.reusableVector1.x;
     description[obj.indexInIntersectableObjDescriptionArray + 9] = obj.reusableVector1.y;
     description[obj.indexInIntersectableObjDescriptionArray + 10] = obj.reusableVector2.x;
@@ -583,7 +583,7 @@ RaycasterWorkerBridge.prototype.issueUpdate = function(obj){
     description[obj.indexInIntersectableObjDescriptionArray + 4] = obj.rectangle.finalX;
     description[obj.indexInIntersectableObjDescriptionArray + 5] = obj.rectangle.finalY;
     description[obj.indexInIntersectableObjDescriptionArray + 6] = obj.rectangle.width;
-    description[obj.indexInIntersectableObjDescriptionArray + 7] = obj.rectangle.heigth;
+    description[obj.indexInIntersectableObjDescriptionArray + 7] = obj.rectangle.height;
   }else{
     for (var i = obj.indexInIntersectableObjDescriptionArray + 2; i < obj.indexInIntersectableObjDescriptionArray + 18; i++){
       description[i] = obj.mesh.matrixWorld.elements[i - obj.indexInIntersectableObjDescriptionArray - 2]
