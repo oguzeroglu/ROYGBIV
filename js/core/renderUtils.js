@@ -61,7 +61,7 @@ function render(){
   if (!isMobile){
     cpuOperationsHandler.flushMouseEventHandler();
   }
-  handleRefresh2D();
+  handleRaycasterRefresh();
   fpsHandler.end();
 }
 
@@ -74,10 +74,10 @@ function renderScene(){
   }
 }
 
-function handleRefresh2D(){
-  if (resizeEventHandler.refresh2DNeeded){
-    rayCaster.refresh2D();
-    resizeEventHandler.refresh2DNeeded = false;
+function handleRaycasterRefresh(){
+  if (resizeEventHandler.refreshNeeded){
+    raycasterFactory.refresh();
+    resizeEventHandler.refreshNeeded = false;
   }
 }
 
