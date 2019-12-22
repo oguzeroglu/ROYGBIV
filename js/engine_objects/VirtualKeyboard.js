@@ -515,7 +515,7 @@ VirtualKeyboard.prototype.onKeyInteractionWithKeyboard = function(container){
   }
   var lastKeyInteractionWithKeyboardTime = this.lastKeyInteractionWithKeyboardTime? this.lastKeyInteractionWithKeyboardTime: 0;
   var now = performance.now();
-  if (now - lastKeyInteractionWithKeyboardTime <= this.keyPressThreshold && !isMobile){
+  if (now - lastKeyInteractionWithKeyboardTime <= this.keyPressThreshold){
     return;
   }
   var textInstance = container.addedText;
