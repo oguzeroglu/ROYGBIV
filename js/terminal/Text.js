@@ -979,4 +979,5 @@ var Text = function(){
   this.ROYGBIV_SCRIPTING_API_DEACTIVATEVIRTUALKEYBOARD = "Deactivates a virtual keyboard. Does nothing if the virtual keyboard is already not active.";
   this.ROYGBIV_SCRIPTING_API_ACTIVATETEXTINPUTMODE = "Activates the input mode for a 2D text. Does nothing if the text is already in input mode.\nThe optional cursorSizePercent parameter can be used to adjust the cursor size\n(cursorSize = charSize * cursorSizePercent / 100)";
   this.ROYGBIV_SCRIPTING_API_DEACTIVATETEXTINPUTMODE = "Deactivates the input mode for a 2D text. Does nothing if the text is already deactivated from input mode.";
+  this.ROYGBIV_SCRIPTING_API_MAPTEXTURETOSPRITE = "Maps a texture pack to given sprite.";
 }

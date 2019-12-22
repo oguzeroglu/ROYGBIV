@@ -418,9 +418,9 @@ Sprite.prototype.getTextureUniform = function(texture){
 Sprite.prototype.mapTexture = function(texturePack){
   if (!this.isTextured){
     macroHandler.injectMacro("HAS_TEXTURE", this.mesh.material, true, true);
+    this.mesh.material.needsUpdate = true;
   }
   this.mesh.material.uniforms.texture = this.getTextureUniform(texturePack.diffuseTexture);
-  this.mesh.material.needsUpdate = true;
   this.isTextured = true;
   this.mappedTexturePackName = texturePack.name;
 }

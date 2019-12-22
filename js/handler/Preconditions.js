@@ -237,6 +237,7 @@ var Preconditions = function(){
   this.virtualKeyboard = "virtualKeyboard";
   this.virtualKeyboardName = "virtualKeyboardName";
   this.cursorSizePercent = "cursorSizePercent";
+  this.texturePackName = "texturePackName";
 }
 
 Preconditions.prototype.errorHeader = function(callerFunc){
@@ -245,6 +246,12 @@ Preconditions.prototype.errorHeader = function(callerFunc){
 
 Preconditions.prototype.throw = function(callerFunc, errorMsg){
   throw new Error(this.errorHeader(callerFunc)+" ["+errorMsg+"]");
+}
+
+Preconditions.prototype.checkIfTexturePackExists = function(callerFunc, texturePackName){
+  if (!texturePacks[texturePackName]){
+    this.throw(callerFunc, "Texture pack does not exist.");
+  }
 }
 
 Preconditions.prototype.checkIfSceneExists = function(callerFunc, sceneName){

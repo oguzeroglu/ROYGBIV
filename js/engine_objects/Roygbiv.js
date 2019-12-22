@@ -243,7 +243,8 @@ var Roygbiv = function(){
     "showVirtualKeyboard",
     "deactivateVirtualKeyboard",
     "activateTextInputMode",
-    "deactivateTextInputMode"
+    "deactivateTextInputMode",
+    "mapTextureToSprite"
   ];
 
   this.globals = new Object();
@@ -3097,6 +3098,19 @@ Roygbiv.prototype.disableSpriteDragging = function(sprite){
   preConditions.checkIfSprite(ROYGBIV.disableSpriteDragging, preConditions.sprite, sprite);
   preConditions.checkIfSpriteDraggable(ROYGBIV.disableSpriteDragging, sprite);
   sprite.draggingDisabled = true;
+}
+
+// Maps a texture pack to given sprite.
+Roygbiv.prototype.mapTextureToSprite = function(sprite, texturePackName){
+  if (mode == 0){
+    return;
+  }
+  preConditions.checkIfDefined(ROYGBIV.mapTextureToSprite, preConditions.sprite, sprite);
+  preConditions.checkIfDefined(ROYGBIV.mapTextureToSprite, preConditions.texturePackName, texturePackName);
+  preConditions.checkIfSprite(ROYGBIV.disableSpriteDragging, preConditions.sprite, sprite);
+  preConditions.checkIfSpriteInsideActiveScene(ROYGBIV.disableSpriteDragging, sprite);
+  preConditions.checkIfTexturePackExists(ROYGBIV.disableSpriteDragging, texturePackName);
+  sprite.mapTexture(texturePacks[texturePackName]);
 }
 
 // CONTAINER FUNCTIONS *********************************************************
