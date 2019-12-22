@@ -2019,7 +2019,7 @@ Roygbiv.prototype.onAnimationFinished = function(object, animationName, callback
   preConditions.checkIfDefined(ROYGBIV.onAnimationFinished, preConditions.object, object);
   preConditions.checkIfDefined(ROYGBIV.onAnimationFinished, preConditions.animationName, animationName);
   preConditions.checkIfDefined(ROYGBIV.onAnimationFinished, preConditions.callbackFunction, callbackFunction);
-  preConditions.checkIfAddedObjectObjectGroupAddedText(ROYGBIV.onAnimationFinished, preConditions.object, object);
+  preConditions.checkIfAddedObjectObjectGroupAddedTextSprite(ROYGBIV.onAnimationFinished, preConditions.object, object);
   preConditions.checkIfAnimationExists(ROYGBIV.onAnimationFinished, object, animationName);
   preConditions.checkIfFunctionOnlyIfExists(ROYGBIV.onAnimationFinished, preConditions.callbackFunction, callbackFunction);
   preConditions.checkIfObjectInsideActiveScene(ROYGBIV.onAnimationFinished, object);
@@ -2036,7 +2036,7 @@ Roygbiv.prototype.removeAnimationFinishListener = function(object, animationName
   preConditions.checkIfAddedObjectObjectGroupAddedText(ROYGBIV.removeAnimationFinishListener, preConditions.object, object);
   preConditions.checkIfAnimationExists(ROYGBIV.removeAnimationFinishListener, object, animationName);
   preConditions.checkIfObjectInsideActiveScene(ROYGBIV.removeAnimationFinishListener, object);
-  object.animations[animationName].finishCallbackFunction = 0;
+  object.animations[animationName].finishCallbackFunction = noop;
 }
 
 // Executes the callbackFunction with exitedAreaName parameter when the camera enters

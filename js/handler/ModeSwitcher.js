@@ -327,6 +327,7 @@ ModeSwitcher.prototype.switchFromPreviewToDesign = function(){
     var addedText = addedTexts[textName];
     for (var animationName in addedText.animations){
       animationHandler.forceFinish(addedText.animations[animationName]);
+      addedText.animations[animationName].finishCallbackFunction = 0;
     }
     addedText.show();
     addedText.handleResize();
@@ -350,6 +351,7 @@ ModeSwitcher.prototype.switchFromPreviewToDesign = function(){
     delete sprites[spriteName].draggingDisabled;
     for (var animationName in sprites[spriteName].animations){
       animationHandler.forceFinish(sprites[spriteName].animations[animationName]);
+      sprites[spriteName].animations[animationName].finishCallbackFunction = 0;
     }
     sprites[spriteName].set2DCoordinates(sprites[spriteName].originalMargin.x, sprites[spriteName].originalMargin.y);
     delete sprites[spriteName].originalMargin;
@@ -407,6 +409,7 @@ ModeSwitcher.prototype.switchFromPreviewToDesign = function(){
     var object = objectGroups[objectName];
     for (var animationName in object.animations){
       animationHandler.forceFinish(object.animations[animationName]);
+      object.animations[animationName].finishCallbackFunction = 0;
     }
     object.loadState();
     object.resetColor();
@@ -442,6 +445,7 @@ ModeSwitcher.prototype.switchFromPreviewToDesign = function(){
     var object = addedObjects[objectName];
     for (var animationName in object.animations){
       animationHandler.forceFinish(object.animations[animationName]);
+      object.animations[animationName].finishCallbackFunction = 0;
     }
     if (object.positionThresholdExceededListenerInfo){
       object.positionThresholdExceededListenerInfo.isActive = false;
