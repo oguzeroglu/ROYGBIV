@@ -244,7 +244,10 @@ var Roygbiv = function(){
     "deactivateVirtualKeyboard",
     "activateTextInputMode",
     "deactivateTextInputMode",
-    "mapTextureToSprite"
+    "mapTextureToSprite",
+    "setLocationHash",
+    "onLocationHashChange",
+    "removeLocationHashChangeListener"
   ];
 
   this.globals = new Object();
@@ -2380,6 +2383,25 @@ Roygbiv.prototype.removeVirtualKeyboardFlushListener = function(virtualKeyboard)
   virtualKeyboard.onFlushCallback = noop;
 }
 
+// Sets a location hash change listener. The callbackFunction is executed with
+// the newHash parameter when the location hash changes.
+Roygbiv.prototype.onLocationHashChange = function(callbackFunction){
+  if (mode == 0){
+    return;
+  }
+  preConditions.checkIfDefined(ROYGBIV.onLocationHashChange, preConditions.callbackFunction, callbackFunction);
+  preConditions.checkIfFunctionOnlyIfExists(ROYGBIV.onLocationHashChange, preConditions.callbackFunction, callbackFunction);
+  hashChangeCallbackFunction = callbackFunction;
+}
+
+// Removes the location hash change listener.
+Roygbiv.prototype.removeLocationHashChangeListener = function(){
+  if (mode == 0){
+    return;
+  }
+  hashChangeCallbackFunction = noop;
+}
+
 // TEXT FUNCTIONS **************************************************************
 
 // Sets a text to a text object.
@@ -3810,6 +3832,16 @@ Roygbiv.prototype.stopDelayedExecution = function(delayedExecutionID){
   }
   preConditions.checkIfDefined(ROYGBIV.stopDelayedExecution, preConditions.delayedExecutionID, delayedExecutionID);
   return delayedExecutionHandler.stopDelayedExecution(delayedExecutionID);
+}
+
+// Sets a hash to window.location. This can be used to track changes when
+// the user presses on back button.
+Roygbiv.prototype.setLocationHash = function(hash){
+  if (mode == 0){
+    return;
+  }
+  preConditions.checkIfDefined(ROYGBIV.setLocationHash, preConditions.hash, hash);
+  window.location.hash = hash;
 }
 
 // SCRIPT RELATED FUNCTIONS ****************************************************

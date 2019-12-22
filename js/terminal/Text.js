@@ -980,4 +980,7 @@ var Text = function(){
   this.ROYGBIV_SCRIPTING_API_ACTIVATETEXTINPUTMODE = "Activates the input mode for a 2D text. Does nothing if the text is already in input mode.\nThe optional cursorSizePercent parameter can be used to adjust the cursor size\n(cursorSize = charSize * cursorSizePercent / 100)";
   this.ROYGBIV_SCRIPTING_API_DEACTIVATETEXTINPUTMODE = "Deactivates the input mode for a 2D text. Does nothing if the text is already deactivated from input mode.";
   this.ROYGBIV_SCRIPTING_API_MAPTEXTURETOSPRITE = "Maps a texture pack to given sprite.";
+  this.ROYGBIV_SCRIPTING_API_SETLOCATIONHASH = "Sets a hash to window.location. This can be used to track changes when the user presses on back button.";
+  this.ROYGBIV_SCRIPTING_API_ONLOCATIONHASHCHANGE = "Sets a location hash change listener. The callbackFunction is executed with the newHash parameter when the location hash changes.";
+  this.ROYGBIV_SCRIPTING_API_REMOVELOCATIONHASHCHANGELISTENER = "Removes the location hash change listener.";
 }

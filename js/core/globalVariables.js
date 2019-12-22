@@ -44,6 +44,7 @@ var visibilityChangeEventHandler;
 var mouseEventHandler;
 var resizeEventHandler;
 var keyboardEventHandler;
+var hashChangeEventHandler;
 
 // THREE.JS VARIABLES
 var scene;
@@ -278,6 +279,7 @@ var screenOrientationChangeCallbackFunction = 0;
 var userInactivityCallbackFunction = 0;
 var fpsDropCallbackFunction = 0;
 var performanceDropCallbackFunction = 0;
+var hashChangeCallbackFunction = 0;
 var modeSwitcher;
 var isMouseDown = false;
 var projectName = "@@1";

@@ -250,6 +250,7 @@ ModeSwitcher.prototype.switchFromDesignToPreview = function(){
 }
 
 ModeSwitcher.prototype.switchFromPreviewToDesign = function(){
+  history.replaceState(null, null, ' ');
   if (inputText){
     inputText.deactivateInputMode();
   }
@@ -286,6 +287,7 @@ ModeSwitcher.prototype.switchFromPreviewToDesign = function(){
   screenMouseWheelCallbackFunction = 0;
   screenPinchCallbackFunction = 0;
   screenOrientationChangeCallbackFunction = 0;
+  hashChangeCallbackFunction = 0;
   fpsHandler.reset();
   pointerLockRequested = false;
   fullScreenRequested = false;

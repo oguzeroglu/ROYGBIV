@@ -319,6 +319,7 @@ StateLoader.prototype.resetProject = function(){
   screenMouseWheelCallbackFunction = 0;
   screenPinchCallbackFunction = 0;
   screenDragCallbackFunction = 0;
+  hashChangeCallbackFunction = 0;
   fpsHandler.reset();
   animationHandler.reset();
   lightningHandler.reset();

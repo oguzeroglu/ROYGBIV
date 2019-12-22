@@ -353,6 +353,7 @@ function onCanvasInitiated(){
   visibilityChangeEventHandler = new VisibilityChangeEventHandler();
   resizeEventHandler = new ResizeEventHandler();
   keyboardEventHandler = new KeyboardEventHandler();
+  hashChangeEventHandler = new HashChangeEventHandler();
 }
 
 // DEPLOYMENT
