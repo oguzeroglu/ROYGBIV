@@ -983,4 +983,8 @@ var Text = function(){
   this.ROYGBIV_SCRIPTING_API_SETLOCATIONHASH = "Sets a hash to window.location. This can be used to track changes when the user presses on back button.";
   this.ROYGBIV_SCRIPTING_API_ONLOCATIONHASHCHANGE = "Sets a location hash change listener. The callbackFunction is executed with the newHash parameter when the location hash changes.";
   this.ROYGBIV_SCRIPTING_API_REMOVELOCATIONHASHCHANGELISTENER = "Removes the location hash change listener.";
+  this.ROYGBIV_SCRIPTING_API_STOREDATA = "Stores data using localStorage API.";
+  this.ROYGBIV_SCRIPTING_API_GETSTOREDDATA = "Gets stored data using localStorage API.";
+  this.ROYGBIV_SCRIPTING_API_REMOVESTOREDDATA = "Removes stored data using localStorage API.";
+  this.ROYGBIV_SCRIPTING_API_ISDEFINED = "Checks if given element is defined.";
 }

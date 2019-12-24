@@ -247,7 +247,11 @@ var Roygbiv = function(){
     "mapTextureToSprite",
     "setLocationHash",
     "onLocationHashChange",
-    "removeLocationHashChangeListener"
+    "removeLocationHashChangeListener",
+    "storeData",
+    "getStoredData",
+    "removeStoredData",
+    "isDefined"
   ];
 
   this.globals = new Object();
@@ -3895,4 +3899,40 @@ Roygbiv.prototype.degreeToRadian = function(degree){
   preConditions.checkIfDefined(ROYGBIV.degreeToRadian, preConditions.degree, degree);
   preConditions.checkIfNumber(ROYGBIV.degreeToRadian, preConditions.degree, degree);
   return (degree * (Math.PI / 180));
+}
+
+// Stores data using localStorage API.
+Roygbiv.prototype.storeData = function(key, value){
+  if (mode == 0){
+    return;
+  }
+  preConditions.checkIfDefined(ROYGBIV.storeData, preConditions.key, key);
+  preConditions.checkIfDefined(ROYGBIV.storeData, preConditions.value, value);
+  localStorage.setItem(key, value);
+}
+
+// Gets stored data using localStorage API.
+Roygbiv.prototype.getStoredData = function(key){
+  if (mode == 0){
+    return;
+  }
+  preConditions.checkIfDefined(ROYGBIV.getStoredData, preConditions.key, key);
+  return localStorage.getItem(key);
+}
+
+// Removes stored data using localStorage API.
+Roygbiv.prototype.removeStoredData = function(key){
+  if (mode == 0){
+    return;
+  }
+  preConditions.checkIfDefined(ROYGBIV.removeStoredData, preConditions.key, key);
+  localStorage.removeItem(key);
+}
+
+// Checks if given element is defined.
+Roygbiv.prototype.isDefined = function(element){
+  if (mode == 0){
+    return;
+  }
+  return !(typeof element == UNDEFINED) && !(element == null);
 }

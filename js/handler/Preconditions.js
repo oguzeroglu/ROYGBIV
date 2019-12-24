@@ -239,6 +239,7 @@ var Preconditions = function(){
   this.cursorSizePercent = "cursorSizePercent";
   this.texturePackName = "texturePackName";
   this.hash = "hash";
+  this.value = "value";
 }
 
 Preconditions.prototype.errorHeader = function(callerFunc){
