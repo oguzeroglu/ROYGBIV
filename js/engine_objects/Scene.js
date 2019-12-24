@@ -72,7 +72,7 @@ Scene.prototype.destroy = function(){
     parseCommand("destroyCrosshair "+chName);
   }
   for (var spriteName in this.sprites){
-    parseCommand("destroysprite "+spriteName);
+    parseCommand("destroySprite "+spriteName);
   }
   for (var containerName in this.containers){
     parseCommand("destroyContainer "+containerName);
