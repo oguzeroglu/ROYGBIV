@@ -120,6 +120,8 @@ Animation.prototype.onStart = function(initialValue){
     this.params.sourceColor.copy(this.attachedObject.mesh.material.uniforms.color.value);
   }else if (this.description.action == animationHandler.actionTypes.TEXT.TYPING){
     this.params.sourceText = this.attachedObject.text;
+    this.changeInValue = this.attachedObject.text.length + 1;
+    this.attachedObject.setText("");
   }else if (this.description.action == animationHandler.actionTypes.OBJECT.TRANSLATE_X){
     this.params.totalTranslationX = 0;
   }else if (this.description.action == animationHandler.actionTypes.OBJECT.TRANSLATE_Y){
