@@ -252,9 +252,9 @@ var Roygbiv = function(){
     "getStoredData",
     "removeStoredData",
     "isDefined",
-    "getSpriteWidth",
-    "getSpriteHeight",
-    "setSpriteSize"
+    "getSpriteScaleX",
+    "getSpriteScaleY",
+    "setSpriteScale"
   ];
 
   this.globals = new Object();
@@ -3142,30 +3142,30 @@ Roygbiv.prototype.mapTextureToSprite = function(sprite, texturePackName){
   sprite.mapTexture(texturePacks[texturePackName]);
 }
 
-// Returns the width of given sprite in percent.
-Roygbiv.prototype.getSpriteWidth = function(sprite){
+// Returns the X scale of given sprite.
+Roygbiv.prototype.getSpriteScaleX = function(sprite){
   if (mode == 0){
     return;
   }
   preConditions.checkIfDefined(ROYGBIV.getSpriteWidth, preConditions.sprite, sprite);
   preConditions.checkIfSprite(ROYGBIV.getSpriteWidth, preConditions.sprite, sprite);
   preConditions.checkIfSpriteInsideActiveScene(ROYGBIV.getSpriteWidth, sprite);
-  return sprite.calculateWidthPercent();
+  return sprite.mesh.material.uniforms.scale.value.x;
 }
 
-// Returns the height of given sprite in percent.
-Roygbiv.prototype.getSpriteHeight = function(sprite){
+// Returns the Y scale of given sprite.
+Roygbiv.prototype.getSpriteScaleY = function(sprite){
   if (mode == 0){
     return;
   }
   preConditions.checkIfDefined(ROYGBIV.getSpriteHeight, preConditions.sprite, sprite);
   preConditions.checkIfSprite(ROYGBIV.getSpriteHeight, preConditions.sprite, sprite);
   preConditions.checkIfSpriteInsideActiveScene(ROYGBIV.getSpriteHeight, sprite);
-  return sprite.calculateHeightPercent();
+  return sprite.mesh.material.uniforms.scale.value.y;
 }
 
-// Sets the width and height of given sprite in percent.
-Roygbiv.prototype.setSpriteSize = function(sprite, widthPercent, heightPercent){
+// Sets the scale of given sprite.
+Roygbiv.prototype.setSpriteScale = function(sprite, widthPercent, heightPercent){
   if (mode == 0){
     return;
   }
@@ -3177,8 +3177,7 @@ Roygbiv.prototype.setSpriteSize = function(sprite, widthPercent, heightPercent){
   preConditions.checkIfNumber(ROYGBIV.setSpriteSize, preConditions.heightPercent, heightPercent);
   preConditions.checkIfSpriteInsideActiveScene(ROYGBIV.setSpriteSize, sprite);
   preConditions.checkIfSpriteContained(ROYGBIV.setSpriteSize, sprite);
-  sprite.setWidthPercent(widthPercent);
-  sprite.setHeightPercent(heightPercent);
+  sprite.mesh.material.uniforms.scale.value.set(widthPercent, heightPercent);
 }
 
 // CONTAINER FUNCTIONS *********************************************************
