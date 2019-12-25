@@ -1399,7 +1399,7 @@ GUIHandler.prototype.initializeContainerManipulationGUI = function(){
   guiHandler.containerManipulationCenterYController = guiHandler.datGuiContainerManipulation.add(guiHandler.containerManipulationParameters, "Center Y").min(0).max(100).step(0.1).onChange(function(val){
     selectionHandler.getSelectedObject().setCenter(selectionHandler.getSelectedObject().centerXPercent, val);
   }).listen();
-  guiHandler.containerManipulationWidthController = guiHandler.datGuiContainerManipulation.add(guiHandler.containerManipulationParameters, "Width").min(0.1).max(100).step(0.1).onChange(function(val){
+  guiHandler.containerManipulationWidthController = guiHandler.datGuiContainerManipulation.add(guiHandler.containerManipulationParameters, "Width").min(0.1).max(150).step(0.1).onChange(function(val){
     selectionHandler.getSelectedObject().setWidth(val);
     if (selectionHandler.getSelectedObject().alignedParent){
       var ary = selectionHandler.getSelectedObject().alignedParent.alignedContainerInfos[selectionHandler.getSelectedObject().name];
@@ -1408,7 +1408,7 @@ GUIHandler.prototype.initializeContainerManipulationGUI = function(){
       }
     }
   }).listen();
-  guiHandler.containerManipulationHeightController = guiHandler.datGuiContainerManipulation.add(guiHandler.containerManipulationParameters, "Height").min(0.1).max(100).step(0.1).onChange(function(val){
+  guiHandler.containerManipulationHeightController = guiHandler.datGuiContainerManipulation.add(guiHandler.containerManipulationParameters, "Height").min(0.1).max(150).step(0.1).onChange(function(val){
     selectionHandler.getSelectedObject().setHeight(val);
     if (selectionHandler.getSelectedObject().alignedParent){
       var ary = selectionHandler.getSelectedObject().alignedParent.alignedContainerInfos[selectionHandler.getSelectedObject().name];
