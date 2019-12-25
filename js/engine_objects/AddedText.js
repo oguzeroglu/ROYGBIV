@@ -507,6 +507,10 @@ AddedText.prototype.setAlpha = function(alpha, fromScript){
   }
   this.material.uniforms.alpha.value = alpha;
   this.alpha = alpha;
+  if (this.containerParent){
+    this.mesh.renderOrder = renderOrders.ELEMENT_IN_CONTAINER;
+    this.mesh.material.transparent = true;
+  }
 }
 
 AddedText.prototype.getBackgroundColor = function(){

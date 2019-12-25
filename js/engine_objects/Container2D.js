@@ -43,6 +43,8 @@ Container2D.prototype.setBackground = function(backgroundColor, backgroundAlpha,
   this.backgroundSprite.set2DCoordinates(100 - this.centerXPercent, 100 - this.centerYPercent);
   this.backgroundSprite.setColor(backgroundColor);
   this.backgroundSprite.setAlpha(backgroundAlpha);
+  this.backgroundSprite.mesh.material.transparent = true;
+  this.backgroundSprite.mesh.renderOrder = renderOrders.CONTAINER_BACKGROUND;
   if (!!backgroundTextureName){
     this.backgroundSprite.mapTexture(texturePacks[backgroundTextureName]);
   } else if (this.backgroundSprite.isTextured){
@@ -423,6 +425,8 @@ Container2D.prototype.insertAddedText = function(addedText){
   }
   addedText.set2DCoordinates(selectedCoordXPercent, selectedCoordYPercent);
   addedText.containerParent = this;
+  addedText.mesh.material.transparent = true;
+  addedText.mesh.renderOrder = renderOrders.ELEMENT_IN_CONTAINER;
   this.addedText = addedText;
 }
 
@@ -454,6 +458,8 @@ Container2D.prototype.insertSprite = function(sprite){
     selectedCoordYPercent = this.centerYPercent - (this.heightPercent / 2) + paddingY;
   }
   sprite.set2DCoordinates(selectedCoordXPercent, selectedCoordYPercent);
+  sprite.mesh.material.transparent = true;
+  sprite.mesh.renderOrder = renderOrders.ELEMENT_IN_CONTAINER;
   sprite.containerParent = this;
   this.sprite = sprite;
 }

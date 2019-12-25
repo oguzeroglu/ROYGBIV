@@ -284,6 +284,10 @@ Sprite.prototype.setAlpha = function(alpha){
     this.mesh.material.transparent = false;
   }
   this.mesh.material.uniforms.alpha.value = alpha;
+  if (this.containerParent){
+    this.mesh.renderOrder = renderOrders.ELEMENT_IN_CONTAINER;
+    this.mesh.material.transparent = true;
+  }
 }
 
 Sprite.prototype.set2DCoordinates = function(marginPercentX, marginPercentY){
