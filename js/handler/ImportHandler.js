@@ -44,6 +44,9 @@ ImportHandler.prototype.importEngineVariables = function(obj){
   screenResolution = obj.screenResolution;
   if (obj.useOriginalResolution){
     screenResolution = window.devicePixelRatio;
+    useOriginalResolution = true;
+  }else{
+    useOriginalResolution = false;
   }
   renderer.setPixelRatio(screenResolution);
   GLOBAL_PS_REF_HEIGHT_UNIFORM.value = ((renderer.getCurrentViewport().w / screenResolution) / particleSystemRefHeight);
