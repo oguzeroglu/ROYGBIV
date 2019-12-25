@@ -39,7 +39,6 @@ ResizeEventHandler.prototype.onResize = function(){
   if (particleSystemRefHeight){
     GLOBAL_PS_REF_HEIGHT_UNIFORM.value = ((renderer.getCurrentViewport().w / screenResolution) / particleSystemRefHeight);
   }
-  activeControl.onResize();
   if (mode == 0){
     for (var areaName in areas){
       if (areas[areaName].text){
@@ -77,4 +76,5 @@ ResizeEventHandler.prototype.onResize = function(){
   }
   renderer.setPixelRatio(screenResolution);
   resizeEventHandler.refresh2DNeeded = true;
+  activeControl.onResize();
 }
