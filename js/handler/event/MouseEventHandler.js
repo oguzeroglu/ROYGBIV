@@ -151,7 +151,7 @@ MouseEventHandler.prototype.onMouseMove = function(event){
   mouseEventHandler.eventBuffer.mouseMove.needsFlush = true;
   mouseEventHandler.eventBuffer.mouseMove.event = event;
   if (isMouseDown && !isMobile){
-    mouseEventHandler.onDrag(mouseEventHandler.x, mouseEventHandler.y, mouseEventHandler.movementX, mouseEventHandler.movementY);
+    mouseEventHandler.onDrag(mouseEventHandler.clientX, mouseEventHandler.clientY, mouseEventHandler.movementX, mouseEventHandler.movementY);
   }
 }
 
