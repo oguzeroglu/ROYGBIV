@@ -2614,7 +2614,7 @@ Roygbiv.prototype.createFreeControl = function(parameters){
 // controls by filling the related event handlers. Parameters are:
 // onClick (optional): Function to be executed with the click event when the user clicks. Default value is noop.
 // onTap (optional): Function to be executed with the touch event when the user taps (mobile). Default value is noop.
-// onSwipe (optional): Function to be executed with diffX and diffY parameters when the user moves their finger
+// onSwipe (optional): Function to be executed with x, y, diffX and diffY parameters when the user moves their finger
 // on the screen (mobile). Default value is noop.
 // onPinch (optional): Function to be executed with diff parameter when the user performs a pinch zoom (mobile).
 // Default value is noop.

@@ -42,8 +42,8 @@ CustomControls.prototype.onTap = function(event){
   this.onTapFunc(event);
 }
 
-CustomControls.prototype.onSwipe = function(diffX, diffY){
-  this.onSwipeFunc(diffX, diffY);
+CustomControls.prototype.onSwipe = function(x, y, diffX, diffY){
+  this.onSwipeFunc(x, y, diffX, diffY);
 }
 
 CustomControls.prototype.onPinch = function(diff){

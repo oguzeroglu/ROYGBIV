@@ -88,7 +88,7 @@ TouchEventHandler.prototype.onTouchMove = function(event){
       if (touchEventHandler.lastSwipeCoordinates.isInitiated){
         var diffX = t1.pageX - touchEventHandler.lastSwipeCoordinates.x;
         var diffY = t1.pageY - touchEventHandler.lastSwipeCoordinates.y;
-        activeControl.onSwipe(diffX, diffY);
+        activeControl.onSwipe(t1.clientX, t1.clientY, diffX, diffY);
         if (draggingSprite){
           draggingSprite.onDrag(diffX, diffY);
         }
