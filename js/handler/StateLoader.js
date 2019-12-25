@@ -340,6 +340,7 @@ StateLoader.prototype.resetProject = function(){
   activeControl = new FreeControls({});
   activeVirtualKeyboard = 0;
   inputText = 0;
+  useOriginalResolution = false;
   fogHandler.reset();
   mode = 0; // 0 -> DESIGN, 1-> PREVIEW
   physicsDebugMode = false;

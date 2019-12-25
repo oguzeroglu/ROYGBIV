@@ -804,6 +804,12 @@ Terminal.prototype.autocomplete = function(command){
 				}
 				helpString = "[Virtual keyboards]: ";
 			break;
+			case commandDescriptor.RESOLUTION_PARAM:
+				if ("original_resolution".startsWith(curEntry.toLowerCase())){
+					possibilities.push("ORIGINAL_RESOLUTION");
+				}
+				helpString = "[Resolution]: ";
+			break;
 		}
 
 		//  **********************************************************

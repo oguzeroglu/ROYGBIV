@@ -789,7 +789,7 @@ var CommandDescriptor = function(){
     "toggleAreas: Show/hides the areas.",
     "destroyArea: Destroys an area.",
     "areaConfigurations: Show/hides the area configuration window.",
-    "setResolution: Sets the screen resolution.",
+    "setResolution: Sets the screen resolution. Use ORIGINAL_RESOLUTION parameter to use device pixel ratio.",
     "configureArea: Shows the area configuration window for a certain area.",
     "newAreaConfiguration: Creates a new area configuration for an area and object.",
     "autoConfigureArea: Automatically configures an area using ray tests. Manual corrections may be necesary after using this command.",
@@ -1012,6 +1012,7 @@ var CommandDescriptor = function(){
   this.SPRITE_OR_2D_TEXT_NAME     =   42;
   this.CONTAINER_ALIGNMENT_TYPE   =   43;
   this.VIRTUAL_KEYBOARD_NAME      =   44;
+  this.RESOLUTION_PARAM           =   45;
 
   // newGridSystem
   this.newGridSystem = new Object();
@@ -1285,7 +1286,7 @@ var CommandDescriptor = function(){
   // setResolution
   this.setResolution = new Object();
   this.setResolution.types = [];
-  this.setResolution.types.push(this.UNKNOWN_INDICATOR); // resolution
+  this.setResolution.types.push(this.RESOLUTION_PARAM); // resolution
 
   // configureArea
   this.configureArea = new Object();

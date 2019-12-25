@@ -126,6 +126,7 @@ var State = function(projectName, author){
   }
   // RESOLUTION ****************************************************
   this.screenResolution = screenResolution;
+  this.useOriginalResolution = useOriginalResolution;
   // FONTS *********************************************************
   this.fonts = new Object();
   this.totalFontCount = 0;

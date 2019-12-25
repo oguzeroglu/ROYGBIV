@@ -23,7 +23,6 @@ ImportHandler.prototype.importEngineVariables = function(obj){
   rayCaster = raycasterFactory.get();
   physicsWorld = physicsFactory.get();
   particleSystemRefHeight = obj.particleSystemRefHeight;
-  GLOBAL_PS_REF_HEIGHT_UNIFORM.value = ((renderer.getCurrentViewport().w / screenResolution) / particleSystemRefHeight);
   shaderPrecisionHandler.load(obj.shaderPrecisions);
   var octreeLimitInfo = obj.octreeLimit
   var octreeLimitInfoSplitted = octreeLimitInfo.split(",");
@@ -43,7 +42,11 @@ ImportHandler.prototype.importEngineVariables = function(obj){
     RAYCASTER_STEP_AMOUNT = 32;
   }
   screenResolution = obj.screenResolution;
+  if (obj.useOriginalResolution){
+    screenResolution = window.devicePixelRatio;
+  }
   renderer.setPixelRatio(screenResolution);
+  GLOBAL_PS_REF_HEIGHT_UNIFORM.value = ((renderer.getCurrentViewport().w / screenResolution) / particleSystemRefHeight);
   defaultMaterialType = obj.defaultMaterialType;
   markedPointsVisible = obj.markedPointsVisible;
   for (var markedPointName in obj.markedPointsExport){

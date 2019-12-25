@@ -256,6 +256,7 @@ var SIDE_FRONT = "Front";
 var SIDE_BACK = "Back";
 var textureUniformCache = new Object();
 var screenResolution = 1;
+var useOriginalResolution = false;
 var rayCaster;
 var objectPicker2D;
 var intersectionPoint = 0;
