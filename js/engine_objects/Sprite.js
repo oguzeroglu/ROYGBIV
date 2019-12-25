@@ -178,6 +178,10 @@ Sprite.prototype.handleResize = function(){
   if (this.rectangle && !(typeof this.rectangle.thicknessOffset == UNDEFINED)){
     this.rectangle.updateMesh(this.rectangle.thicknessOffset);
   }
+  if (mode == 1){
+    this.originalSizeInfo.width = this.calculateWidthPercent();
+    this.originalSizeInfo.height = this.calculateHeightPercent();
+  }
 }
 
 Sprite.prototype.setRefHeight = function(){
