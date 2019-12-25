@@ -432,8 +432,8 @@ Container2D.prototype.insertSprite = function(sprite){
   sprite.setRotation(0);
   var maxWidth = this.widthPercent - (2 * paddingX);
   var maxHeight = this.heightPercent - (2 * paddingY);
-  var sourceWidth = sprite.originalWidth * sprite.originalWidthReference / renderer.getCurrentViewport().z;
-  var sourceHeight = sprite.originalHeight * sprite.originalHeightReference / renderer.getCurrentViewport().w;
+  var sourceWidth = sprite.calculateWidthPercent();
+  var sourceHeight = sprite.calculateHeightPercent();
   sourceWidth *= screenResolution / sprite.originalScreenResolution;
   sourceHeight *= screenResolution / sprite.originalScreenResolution;
   var scale = Math.min(maxWidth / sourceWidth, maxHeight / sourceHeight);
