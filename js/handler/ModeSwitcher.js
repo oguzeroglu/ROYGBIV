@@ -222,6 +222,10 @@ ModeSwitcher.prototype.switchFromDesignToPreview = function(){
       isTextured: sprites[spriteName].isTextured,
       mappedTexturePackName: sprites[spriteName].mappedTexturePackName
     };
+    sprites[spriteName].originalSizeInfo = {
+      width: sprites[spriteName].calculateWidthPercent(),
+      height: sprites[spriteName].calculateHeightPercent()
+    };
     if (sprites[spriteName].isClickable){
       clickableSprites[spriteName] = sprites[spriteName];
       sceneHandler.onClickableSpriteAddition(sprites[spriteName]);
@@ -341,6 +345,9 @@ ModeSwitcher.prototype.switchFromPreviewToDesign = function(){
     }else{
       sprites[spriteName].removeTexture();
     }
+    sprites[spriteName].setWidthPercent(sprites[spriteName].originalSizeInfo.width);
+    sprites[spriteName].setHeightPercent(sprites[spriteName].originalSizeInfo.height);
+    delete sprites[spriteName].originalSizeInfo;
     delete sprites[spriteName].originalTextureInfo;
     delete sprites[spriteName].onClickCallback;
     delete sprites[spriteName].mouseOverCallbackFunction;

@@ -987,4 +987,7 @@ var Text = function(){
   this.ROYGBIV_SCRIPTING_API_GETSTOREDDATA = "Gets stored data using localStorage API.";
   this.ROYGBIV_SCRIPTING_API_REMOVESTOREDDATA = "Removes stored data using localStorage API.";
   this.ROYGBIV_SCRIPTING_API_ISDEFINED = "Checks if given element is defined.";
+  this.ROYGBIV_SCRIPTING_API_GETSPRITEWIDTH = "Returns the width of given sprite in percent.";
+  this.ROYGBIV_SCRIPTING_API_GETSPRITEHEIGHT = "Returns the height of given sprite in percent.";
+  this.ROYGBIV_SCRIPTING_API_SETSPRITESIZE = "Sets the width and height of given sprite in percent.";
 }

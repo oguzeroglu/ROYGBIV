@@ -240,6 +240,8 @@ var Preconditions = function(){
   this.texturePackName = "texturePackName";
   this.hash = "hash";
   this.value = "value";
+  this.widthPercent = "widthPercent";
+  this.heightPercent = "heightPercent";
 }
 
 Preconditions.prototype.errorHeader = function(callerFunc){
