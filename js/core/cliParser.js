@@ -5024,7 +5024,9 @@ function parse(input){
           sceneHandler.onContainerDeletion(container);
           container.destroy();
           if (!jobHandlerWorking){
-            terminal.printInfo(Text.CONTAINER_DESTROYED);
+            refreshRaycaster(Text.CONTAINER_DESTROYED);
+          }else{
+            jobHandlerRaycasterRefresh = true;
           }
           selectionHandler.resetCurrentSelection();
           return true;
