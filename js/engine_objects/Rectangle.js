@@ -121,6 +121,7 @@ Rectangle.prototype.updateMesh = function(thicknessOffset, force){
     });
     this.mesh = new THREE.Mesh(this.geometry, this.material);
     this.mesh.frustumCulled = false;
+    this.mesh.renderOrder = renderOrders.RECTANGLE;
   }
   this.handlePositionUniform(thicknessOffset);
   this.thicknessOffset = thicknessOffset;
