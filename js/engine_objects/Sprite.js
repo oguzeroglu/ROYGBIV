@@ -179,8 +179,8 @@ Sprite.prototype.handleResize = function(){
     this.rectangle.updateMesh(this.rectangle.thicknessOffset);
   }
   if (mode == 1){
-    this.originalSizeInfo.width = this.calculateWidthPercent();
-    this.originalSizeInfo.height = this.calculateHeightPercent();
+    this.originalSizeInfo.x = this.mesh.material.uniforms.scale.value.x;
+    this.originalSizeInfo.y = this.mesh.material.uniforms.scale.value.y;
   }
 }
 
