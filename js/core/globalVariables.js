@@ -394,6 +394,7 @@ var inputText;
 
 // RENDER ORDERS
 var renderOrders = {
+  CONTAINER_BACKGROUND: -5000,
   MARKED_POINT: -30,
   GRID_HELPER: -20,
   FPS_WEAPON: -10,
@@ -409,8 +410,7 @@ var renderOrders = {
   TEXT_2D: 50,
   SPRITE: 50,
   CROSSHAIR: 60,
-  OBJECT_TRAIL: 100,
-  CONTAINER_BACKGROUND: 5000
+  OBJECT_TRAIL: 100
 }
 
 // FACTORIES
