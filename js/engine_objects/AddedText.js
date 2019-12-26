@@ -105,12 +105,12 @@ AddedText.prototype.handleInputAnimation = function(){
       this.skipInputAdjustment = true;
       this.setText(this.text.substring(0, this.text.length -1), true);
       this.skipInputAdjustment = false;
-      this.mesh.material.uniforms.inputLineIndex.value = -500;
+      this.mesh.material.uniforms.inputLineInfo.value.x = -500;
     }else{
       this.skipInputAdjustment = true;
       this.setText(this.text + "a", true);
       this.skipInputAdjustment = false;
-      this.mesh.material.uniforms.inputLineIndex.value = this.text.length -1;
+      this.mesh.material.uniforms.inputLineInfo.value.x = this.text.length -1;
     }
     this.isInputLineVisible = !this.isInputLineVisible;
     this.lastInputLineUpdateTime = now;
@@ -125,7 +125,7 @@ AddedText.prototype.deactivateInputMode = function(){
     return;
   }
   this.isInput = false;
-  this.mesh.material.uniforms.inputLineIndex.value = -500;
+  this.mesh.material.uniforms.inputLineInfo.value.x = -500;
   if (this.isInputLineVisible){
     this.setText(this.text.substring(0, this.text.length - 1), true);
   }
@@ -147,8 +147,8 @@ AddedText.prototype.activateInputMode = function(inputLineCharSizePercent){
   }
   this.isInput = true;
   this.setText(this.text + "a", true);
-  this.mesh.material.uniforms.inputLineIndex.value = this.text.length -1;
-  this.mesh.material.uniforms.inputLineCharSizePercent.value = inputLineCharSizePercent;
+  this.mesh.material.uniforms.inputLineInfo.value.x = this.text.length -1;
+  this.mesh.material.uniforms.inputLineInfo.value.y = inputLineCharSizePercent;
   inputText = this;
   this.isInputLineVisible = true;
   this.lastInputLineUpdateTime = performance.now();
@@ -461,7 +461,7 @@ AddedText.prototype.setText = function(newText, fromScript){
   if (mode == 1 && this.isInput && this.is2D && inputText == this && !this.skipInputAdjustment){
     if (this.isInputLineVisible){
       this.text += "a";
-      this.mesh.material.uniforms.inputLineIndex.value = this.text.length -1;
+      this.mesh.material.uniforms.inputLineInfo.value.x = this.text.length -1;
     }
   }
   this.constructText();
@@ -903,8 +903,7 @@ AddedText.prototype.set2DStatus = function(is2D){
     delete this.mesh.material.uniforms.cameraQuaternion;
     delete this.mesh.material.uniforms.modelViewMatrix;
     delete this.mesh.material.uniforms.projectionMatrix;
-    this.mesh.material.uniforms.inputLineIndex = new THREE.Uniform(-500);
-    this.mesh.material.uniforms.inputLineCharSizePercent = new THREE.Uniform(-500);
+    this.mesh.material.uniforms.inputLineInfo = new THREE.Uniform(new THREE.Vector2(-500, -500));
     this.mesh.material.uniforms.currentViewport = GLOBAL_VIEWPORT_UNIFORM;
     this.mesh.renderOrder = renderOrders.TEXT_2D;
   }else{
@@ -914,7 +913,7 @@ AddedText.prototype.set2DStatus = function(is2D){
     this.mesh.material.uniforms.modelViewMatrix = new THREE.Uniform(new THREE.Matrix4());
     this.mesh.material.uniforms.modelViewMatrix.value = this.mesh.modelViewMatrix;
     delete this.mesh.material.uniforms.margin2D;
-    delete this.mesh.material.uniforms.inputLineIndex;
+    delete this.mesh.material.uniforms.inputLineInfo;
     delete this.mesh.material.uniforms.currentViewport;
     this.isClickable = this.oldIsClickable;
     delete this.oldIsClickable;

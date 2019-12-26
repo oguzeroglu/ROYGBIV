@@ -20,10 +20,9 @@ varying vec4 vUVRanges;
   uniform mat4 worldMatrix;
 #endif
 #ifdef IS_TWO_DIMENSIONAL
-  uniform float inputLineIndex;
+  uniform vec2 inputLineInfo;
   varying float isInputLine;
   uniform vec2 margin2D;
-  uniform float inputLineCharSizePercent;
   uniform vec4 currentViewport;
 #else
   uniform mat4 projectionMatrix;
@@ -61,6 +60,8 @@ void main(){
     float x = (((oldPosX - currentViewport.x) * 2.0) / currentViewport.z) - 1.0;
     float y = (((oldPosY - currentViewport.y) * 2.0) / currentViewport.w) - 1.0;
     gl_Position = vec4(x + float(margin2D.x), y + float(margin2D.y), 0.0, 1.0);
+    float inputLineIndex = inputLineInfo.x;
+    float inputLineCharSizePercent = inputLineInfo.y;
     int inputLineIndexInt = int(inputLineIndex);
     if (charIndexInt == inputLineIndexInt){
       isInputLine = 100.0;
