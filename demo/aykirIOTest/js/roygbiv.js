@@ -6557,12 +6557,21 @@ function onTutorialEntry(){
     ROYGBIV.onSpriteDragStop(whiteCards[i], function(){
       if (ROYGBIV.globals.draggingSpriteIndex == this.index){
         if (ROYGBIV.areSpritesIntersected(ROYGBIV.getSprite("burayaSurukle"), whiteCards[this.index])){
+          if (ROYGBIV.globals.droppedIndex >= 0){
+            ROYGBIV.showSprite(whiteCards[ROYGBIV.globals.droppedIndex]);
+          }else{
+            ROYGBIV.showText(proceedButton);
+            ROYGBIV.startAnimation(proceedButton, "anim2");
+            buttonClickable = true;
+          }
           var marginX = ROYGBIV.getSpriteMarginX(ROYGBIV.getSprite("burayaSurukle"));
           var marginY = ROYGBIV.getSpriteMarginY(ROYGBIV.getSprite("burayaSurukle"));
           ROYGBIV.setSpriteMargin(whiteCards[this.index], marginX, marginY);
           ROYGBIV.globals.droppedIndex = this.index;
           ROYGBIV.hideSprite(ROYGBIV.getSprite("burayaSurukle"));
           ROYGBIV.setSpriteAlpha(whiteCards[this.index], 1);
+          handleEllipse(whiteCards, ellipseOffset);
+          ROYGBIV.globals.draggingSpriteIndex = -1;
           return;
         }
         var marginX = ROYGBIV.getSpriteMarginX(whiteCards[this.index]);
@@ -6757,17 +6766,30 @@ function onTutorialEntry(){
     },
     onResize: function(){
       handleEllipse(whiteCards, ellipseOffset);
+      if (ROYGBIV.globals.droppedIndex >= 0){
+        var marginX = ROYGBIV.getSpriteMarginX(ROYGBIV.getSprite("burayaSurukle"));
+        var marginY = ROYGBIV.getSpriteMarginY(ROYGBIV.getSprite("burayaSurukle"));
+        ROYGBIV.setSpriteMargin(whiteCards[ROYGBIV.globals.droppedIndex], marginX, marginY);
+      }
     },
     onUpdate: function(){
       if (ROYGBIV.globals.draggingSpriteIndex >= 0){
         var sprite = whiteCards[ROYGBIV.globals.draggingSpriteIndex];
         if (ROYGBIV.areSpritesIntersected(sprite, ROYGBIV.getSprite("burayaSurukle"))){
+          if (ROYGBIV.globals.droppedIndex >= 0){
+            ROYGBIV.hideSprite(whiteCards[ROYGBIV.globals.droppedIndex]);
+            ROYGBIV.showSprite(ROYGBIV.getSprite("burayaSurukle"));
+          }
           if (ROYGBIV.globals.lastMappedTextureName != "on"){
             ROYGBIV.mapTextureToSprite(ROYGBIV.getSprite("burayaSurukle"), "burayaSurukleOn");
             ROYGBIV.globals.lastMappedTextureName = "on";
             ROYGBIV.stopAnimation(ROYGBIV.getSprite("burayaSurukle"), "anim1");
           }
         }else{
+          if (ROYGBIV.globals.droppedIndex >= 0){
+            ROYGBIV.showSprite(whiteCards[ROYGBIV.globals.droppedIndex]);
+            ROYGBIV.hideSprite(ROYGBIV.getSprite("burayaSurukle"));
+          }
           if (ROYGBIV.globals.lastMappedTextureName != "off"){
             ROYGBIV.mapTextureToSprite(ROYGBIV.getSprite("burayaSurukle"), "burayaSurukleOff");
             ROYGBIV.globals.lastMappedTextureName = "off";
@@ -9483,6 +9505,10 @@ ImportHandler.prototype.importAddedTexts = function(obj){
       macroHandler.injectMacro("IS_TWO_DIMENSIONAL", addedTextInstance.material, true, true);
       addedTextInstance.mesh.material.uniforms.inputLineIndex = new THREE.Uniform(-500);
       addedTextInstance.mesh.material.uniforms.inputLineCharSizePercent = new THREE.Uniform(-500);
+      addedTextInstance.mesh.material.uniforms.currentViewport = GLOBAL_VIEWPORT_UNIFORM;
+      delete addedTextInstance.mesh.material.uniforms.cameraQuaternion;
+      delete addedTextInstance.mesh.material.uniforms.modelViewMatrix;
+      delete addedTextInstance.mesh.material.uniforms.projectionMatrix;
     }
     if (!(typeof curTextExport.marginMode == UNDEFINED)){
       addedTextInstance.marginMode = curTextExport.marginMode;
@@ -19070,7 +19096,6 @@ var AddedText = function(name, font, text, position, color, alpha, characterSize
       glyphTexture: this.getGlyphUniform(),
       xOffsets: new THREE.Uniform(xOffsetsArray),
       yOffsets: new THREE.Uniform(yOffsetsArray),
-      currentViewport: GLOBAL_VIEWPORT_UNIFORM,
       charSize: new THREE.Uniform(this.characterSize),
       screenResolution: GLOBAL_SCREEN_RESOLUTION_UNIFORM
     }
@@ -19912,13 +19937,22 @@ AddedText.prototype.set2DStatus = function(is2D){
     if (!!this.name){
       addedTexts2D[this.name] = this;
     }
+    delete this.mesh.material.uniforms.cameraQuaternion;
+    delete this.mesh.material.uniforms.modelViewMatrix;
+    delete this.mesh.material.uniforms.projectionMatrix;
     this.mesh.material.uniforms.inputLineIndex = new THREE.Uniform(-500);
     this.mesh.material.uniforms.inputLineCharSizePercent = new THREE.Uniform(-500);
+    this.mesh.material.uniforms.currentViewport = GLOBAL_VIEWPORT_UNIFORM;
     this.mesh.renderOrder = renderOrders.TEXT_2D;
   }else{
     macroHandler.removeMacro("IS_TWO_DIMENSIONAL", this.material, true, true);
+    this.mesh.material.uniforms.cameraQuaternion = GLOBAL_CAMERA_QUATERNION_UNIFORM;
+    this.mesh.material.uniforms.projectionMatrix = GLOBAL_PROJECTION_UNIFORM;
+    this.mesh.material.uniforms.modelViewMatrix = new THREE.Uniform(new THREE.Matrix4());
+    this.mesh.material.uniforms.modelViewMatrix.value = this.mesh.modelViewMatrix;
     delete this.mesh.material.uniforms.margin2D;
     delete this.mesh.material.uniforms.inputLineIndex;
+    delete this.mesh.material.uniforms.currentViewport;
     this.isClickable = this.oldIsClickable;
     delete this.oldIsClickable;
     if (!(typeof this.refCharOffset == UNDEFINED)){

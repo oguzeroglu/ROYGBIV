@@ -7,11 +7,7 @@ attribute float charIndex;
 
 uniform float xOffsets[STR_LEN];
 uniform float yOffsets[STR_LEN];
-uniform vec4 cameraQuaternion;
 uniform vec4 uvRanges[STR_LEN];
-uniform vec4 currentViewport;
-uniform mat4 modelViewMatrix;
-uniform mat4 projectionMatrix;
 uniform float charSize;
 uniform float screenResolution;
 
@@ -28,6 +24,11 @@ varying vec4 vUVRanges;
   varying float isInputLine;
   uniform vec2 margin2D;
   uniform float inputLineCharSizePercent;
+  uniform vec4 currentViewport;
+#else
+  uniform mat4 projectionMatrix;
+  uniform vec4 cameraQuaternion;
+  uniform mat4 modelViewMatrix;
 #endif
 
 vec3 applyQuaternionToVector(vec3 vector, vec4 quaternion){
@@ -54,11 +55,6 @@ void main(){
   float xOffset = xOffsets[charIndexInt];
   float yOffset = yOffsets[charIndexInt];
   vec3 pos = vec3(xOffset, yOffset, 0.0);
-  vec3 quaternionApplied = applyQuaternionToVector(pos, cameraQuaternion);
-  #ifdef HAS_SKYBOX_FOG
-    vWorldPosition = (worldMatrix * vec4(quaternionApplied, 1.0)).xyz;
-  #endif
-  vec4 mvPosition = modelViewMatrix * vec4(quaternionApplied, 1.0);
   #ifdef IS_TWO_DIMENSIONAL
     float oldPosX = ((currentViewport.z - currentViewport.x) / 2.0) + currentViewport.x + xOffset;
     float oldPosY = ((currentViewport.w - currentViewport.y) / 2.0) + currentViewport.y + yOffset;
@@ -74,6 +70,11 @@ void main(){
       gl_PointSize = charSize * screenResolution;
     }
   #else
+    vec3 quaternionApplied = applyQuaternionToVector(pos, cameraQuaternion);
+    #ifdef HAS_SKYBOX_FOG
+      vWorldPosition = (worldMatrix * vec4(quaternionApplied, 1.0)).xyz;
+    #endif
+    vec4 mvPosition = modelViewMatrix * vec4(quaternionApplied, 1.0);
     gl_Position = projectionMatrix * mvPosition;
     gl_PointSize = (500.0) * (charSize * screenResolution) / length(mvPosition.xyz);
   #endif
