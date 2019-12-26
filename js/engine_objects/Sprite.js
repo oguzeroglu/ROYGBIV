@@ -223,11 +223,13 @@ Sprite.prototype.export = function(){
 
 Sprite.prototype.showVisually = function(){
   this.mesh.visible = true;
+  this.isHidden = false;
 }
 
 
 Sprite.prototype.hideVisually = function(){
   this.mesh.visible = false;
+  this.isHidden = true;
 }
 
 Sprite.prototype.exportLightweight = function(){
