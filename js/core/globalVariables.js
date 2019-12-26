@@ -426,7 +426,7 @@ var WORKERS_SUPPORTED = (typeof(Worker) !== UNDEFINED);
 var RAYCASTER_WORKER_ON = true;
 var PHYSICS_WORKER_ON = true;
 var LIGHTNING_WORKER_ON = true;
-if (!WORKERS_SUPPORTED){
+if (!WORKERS_SUPPORTED && !(typeof WorkerGlobalScope !== UNDEFINED && self instanceof WorkerGlobalScope)){
   console.warn("[!] Workers are not supported for this browser.");
 }
 
