@@ -1105,6 +1105,7 @@ var SIDE_FRONT = "Front";
 var SIDE_BACK = "Back";
 var textureUniformCache = new Object();
 var screenResolution = 1;
+var useOriginalResolution = false;
 var rayCaster;
 var objectPicker2D;
 var intersectionPoint = 0;
@@ -1239,10 +1240,10 @@ var childContainers = new Object();
 var virtualKeyboards = new Object();
 var activeVirtualKeyboard;
 var inputText;
+var dragCandidate;
 
 // RENDER ORDERS
 var renderOrders = {
-  CONTAINER_BACKGROUND: -1000,
   MARKED_POINT: -30,
   GRID_HELPER: -20,
   FPS_WEAPON: -10,
@@ -1258,7 +1259,10 @@ var renderOrders = {
   TEXT_2D: 50,
   SPRITE: 50,
   CROSSHAIR: 60,
-  OBJECT_TRAIL: 100
+  OBJECT_TRAIL: 100,
+  CONTAINER_BACKGROUND: 5000,
+  ELEMENT_IN_CONTAINER: 6000,
+  RECTANGLE: 7000
 }
 
 // FACTORIES
@@ -6402,15 +6406,66 @@ function handleSkybox(){
 }
 
 function deploymentScripts(){
-  if(deploymentScriptsStatus.SCRIPT_EXECUTION_STATUS_vkTest_init){if (cpuOperationsHandler.record){cpuOperationsHandler.scriptPerformances.vkTest_init = performance.now()}var sceneEntryFunctions = {
+  if(deploymentScriptsStatus.SCRIPT_EXECUTION_STATUS_vkTest_init){if (cpuOperationsHandler.record){cpuOperationsHandler.scriptPerformances.vkTest_init = performance.now()}var refHeight = 538;
+var refWidth = 1440;
+var targetVector = ROYGBIV.vector();
+
+var vec1 = ROYGBIV.vector();
+var vec2 = ROYGBIV.vector();
+
+ROYGBIV.globals.Ellipse = function(originX, originY, radiusX, radiusY){
+  this.originX = originX;
+  this.originY = originY;
+  this.radiusX = radiusX;
+  this.radiusY = radiusY;
+}
+
+ROYGBIV.globals.Ellipse.prototype.getXYByAngle = function(angleInDegrees, targetVector){
+  var rad = ROYGBIV.degreeToRadian(angleInDegrees);
+  targetVector.x = this.originX + Math.cos(rad) * this.radiusX;
+  targetVector.y = this.originY + Math.sin(rad) * this.radiusY;
+  return targetVector;
+}
+
+var handleEllipse = function(sprites, offset){
+  var ellipse = new ROYGBIV.globals.Ellipse(50 , 170, 50 * (window.innerHeight / refHeight) / (window.innerWidth / refWidth), 100);
+  var start = 40, end = 180 - start;
+    offset = offset % (end - start);
+  var angle = start;
+  var step = (end - start) / (sprites.length);
+  for (var i = 0; i<sprites.length; i++){
+    if (i == ROYGBIV.globals.droppedIndex){
+      continue;
+    }
+    var sprite = sprites[i];
+    var newAngle = -angle + offset;
+    if (newAngle > -start){
+      var diff = -start - newAngle;
+      var newDiff = -diff;
+      newAngle = -end + newDiff;
+    }
+    if (newAngle < -end){
+      var diff = -newAngle - end;
+      newAngle = -(start + diff);
+    }
+    ellipse.getXYByAngle(newAngle, targetVector);
+    var func = (i % 2 == 0) ? Math.sin : Math.cos;
+    ROYGBIV.setSpriteMargin(sprite, 0.1 * i / 2 * func(offset) + targetVector.x, targetVector.y + 0.1 * i / 2 * func(offset));
+    ROYGBIV.setSpriteRotationAngle(sprite, 90 + newAngle + func(offset));
+    angle += step;
+  }
+}
+
+var sceneEntryFunctions = {
   "scene1": onScene1Entry,
   "scene2": onScene2Entry,
-  "scene2Mobile": onScene2MobileEntry,
-  "aykirio": onSceneAykirioEntry,
-  "rotateDevice": onSceneRotateDeviceEntry
+  "rotateDevice": onSceneRotateDeviceEntry,
+  "main": onSceneMainEntry,
+  "modal": onModalEntry,
+  "tutorial": onTutorialEntry
 }
 ROYGBIV.onLocationHashChange(function(newHash){
-  if (ROYGBIV.getActiveSceneName() == "rotateDevice"){
+if (ROYGBIV.getActiveSceneName() == "rotateDevice" || ROYGBIV.getActiveSceneName() == "main"){
     return;
   }
   if (ROYGBIV.getActiveSceneName() != newHash && sceneEntryFunctions[newHash]){
@@ -6428,44 +6483,602 @@ if (ROYGBIV.isMobile()){
         ROYGBIV.changeScene(ROYGBIV.globals.sceneNameBeforeOrientation, sceneEntryFunctions[ROYGBIV.globals.sceneNameBeforeOrientation]);
         delete ROYGBIV.globals.sceneNameBeforeOrientation;
       }else{
-        ROYGBIV.changeScene("scene1", sceneEntryFunctions["scene1"]);
+        if (!ROYGBIV.isDefined(ROYGBIV.globals.userName)){
+          onScene1Entry();
+        }else{
+          if (!ROYGBIV.isDefined(ROYGBIV.globals.tpName)){
+            ROYGBIV.changeScene("scene2", sceneEntryFunctions["scene2"]);
+          }else{
+            ROYGBIV.changeScene("main", sceneEntryFunctions["main"]);
+          }
+        }
       }
     }
   });
 }
 
-onScene1Entry();
+ROYGBIV.globals.userName = ROYGBIV.getStoredData("userName");
+ROYGBIV.globals.tpName = ROYGBIV.getStoredData("tpName");
+
+if (ROYGBIV.isOrientationLandscape()){
+  ROYGBIV.changeScene("rotateDevice", sceneEntryFunctions["rotateDevice"]);
+}else{
+  if (!ROYGBIV.isDefined(ROYGBIV.globals.userName)){
+    onScene1Entry();
+  }else{
+    if (!ROYGBIV.isDefined(ROYGBIV.globals.tpName)){
+      ROYGBIV.changeScene("scene2", sceneEntryFunctions["scene2"]);
+    }else{
+      ROYGBIV.changeScene("main", sceneEntryFunctions["main"]);
+    }
+  }
+}
 
 ROYGBIV.stopScript("vkTest_init");
 
+function handleTutorialState(index, states){
+  if (index != 0 && states[index-1].onLeave){
+    states[index-1].onLeave();
+  }
+  states[index].onEntry();
+}
+
+function onTutorialEntry(){
+  ROYGBIV.globals.draggingSpriteIndex = -1;
+  var ellipseOffset = 0;
+  var canDrag = false;
+  ROYGBIV.hideSprite(ROYGBIV.getSprite("burayaSurukle"));
+  var whiteCards = [
+    ROYGBIV.getSprite("whiteCard1"),
+    ROYGBIV.getSprite("whiteCard2"),
+    ROYGBIV.getSprite("whiteCard3"),
+    ROYGBIV.getSprite("whiteCard4"),
+    ROYGBIV.getSprite("whiteCard5"),
+    ROYGBIV.getSprite("whiteCard6"),
+    ROYGBIV.getSprite("whiteCard7"),
+    ROYGBIV.getSprite("whiteCard8"),
+    ROYGBIV.getSprite("whiteCard9"),
+    ROYGBIV.getSprite("whiteCard10")
+  ];
+  for (var i = 0; i<whiteCards.length; i++){
+    ROYGBIV.disableSpriteDragging(whiteCards[i]);
+    ROYGBIV.onSpriteDragStart(whiteCards[i], function(diffX, diffY){
+      if (Math.abs(diffX) > Math.abs(diffY)){
+        ROYGBIV.cancelSpriteDrag();
+      }else{
+        ROYGBIV.globals.draggingSpriteIndex = this.index;
+        ROYGBIV.globals.draggingSpriteMarginX = ROYGBIV.getSpriteMarginX(whiteCards[this.index]);
+        ROYGBIV.globals.draggingSpriteMarginY = ROYGBIV.getSpriteMarginY(whiteCards[this.index]);
+        ROYGBIV.startAnimation(whiteCards[this.index], "anim2");
+        ROYGBIV.freezeAnimationOnFinish(whiteCards[this.index], "anim2");
+        ROYGBIV.setSpriteAlpha(whiteCards[this.index], 0.7);
+      }
+    }.bind({index: i}));
+    ROYGBIV.onSpriteDragStop(whiteCards[i], function(){
+      if (ROYGBIV.globals.draggingSpriteIndex == this.index){
+        if (ROYGBIV.areSpritesIntersected(ROYGBIV.getSprite("burayaSurukle"), whiteCards[this.index])){
+          var marginX = ROYGBIV.getSpriteMarginX(ROYGBIV.getSprite("burayaSurukle"));
+          var marginY = ROYGBIV.getSpriteMarginY(ROYGBIV.getSprite("burayaSurukle"));
+          ROYGBIV.setSpriteMargin(whiteCards[this.index], marginX, marginY);
+          ROYGBIV.globals.droppedIndex = this.index;
+          ROYGBIV.hideSprite(ROYGBIV.getSprite("burayaSurukle"));
+          ROYGBIV.setSpriteAlpha(whiteCards[this.index], 1);
+          return;
+        }
+        var marginX = ROYGBIV.getSpriteMarginX(whiteCards[this.index]);
+        var marginY = ROYGBIV.getSpriteMarginY(whiteCards[this.index]);
+        ROYGBIV.setVector(vec1, marginX, marginY, 0);
+        ROYGBIV.setVector(vec2, ROYGBIV.globals.draggingSpriteMarginX, ROYGBIV.globals.draggingSpriteMarginY, 0);
+        if (ROYGBIV.distance(vec1, vec2) > 10){
+          ROYGBIV.setSpriteAlpha(whiteCards[this.index], 0);
+          ROYGBIV.startAnimation(whiteCards[this.index], "anim1");
+          ROYGBIV.freezeAnimationOnFinish(whiteCards[this.index], "anim1");
+        }else{
+          ROYGBIV.setSpriteAlpha(whiteCards[this.index], 1);
+        }
+        ROYGBIV.globals.draggingSpriteIndex = -1;
+        handleEllipse(whiteCards, ellipseOffset);
+        ROYGBIV.unfreezeAnimation(whiteCards[this.index], "anim2");
+        ROYGBIV.stopAnimation(whiteCards[this.index], "anim2");
+      }
+    }.bind({index: i}));
+  }
+  var buttonClickable = false;
+  var repeatCount = 0;
+  ROYGBIV.setLocationHash("tutorial");
+  var tutorialText = ROYGBIV.getText("tutorialText");
+  var proceedButton = ROYGBIV.getText("tutorialDeval");
+  var blackCardSprite = ROYGBIV.getSprite("blackCardSprite");
+  handleEllipse(whiteCards, ellipseOffset);
+  var curStateIndex = 0;
+  var states = [
+    {
+      onEntry: function(){
+        ROYGBIV.hideText(proceedButton);
+        ROYGBIV.setText(tutorialText, "aykir.io'ya\nhosgeldin.");
+        ROYGBIV.startAnimation(tutorialText, "anim1");
+        ROYGBIV.onAnimationFinished(tutorialText, "anim1", function(){
+          ROYGBIV.showText(proceedButton);
+          ROYGBIV.startAnimation(proceedButton, "anim2");
+          buttonClickable = true;
+        });
+      }
+    },
+    {
+      onEntry: function(){
+        buttonClickable = false;
+        ROYGBIV.hideText(proceedButton);
+        ROYGBIV.stopAnimation(proceedButton, "anim1");
+        ROYGBIV.stopAnimation(proceedButton, "anim2");
+        ROYGBIV.setText(tutorialText, "aykir.io, aykiri\ninsanlar icin\nbir kart oyunudur.");
+        ROYGBIV.startAnimation(tutorialText, "anim1");
+        ROYGBIV.onAnimationFinished(tutorialText, "anim1", function(){
+          ROYGBIV.showText(proceedButton);
+          ROYGBIV.startAnimation(proceedButton, "anim2");
+          buttonClickable = true;
+        });
+      }
+    },
+    {
+      onEntry: function(){
+        buttonClickable = false;
+        ROYGBIV.hideText(proceedButton);
+        ROYGBIV.stopAnimation(proceedButton, "anim1");
+        ROYGBIV.stopAnimation(proceedButton, "anim2");
+        ROYGBIV.setText(tutorialText, "her tur siyah bir\nkart goreceksin.");
+        ROYGBIV.startAnimation(tutorialText, "anim1");
+        ROYGBIV.onAnimationFinished(tutorialText, "anim1", function(){
+          ROYGBIV.showText(proceedButton);
+          ROYGBIV.startAnimation(proceedButton, "anim2");
+          buttonClickable = true;
+        });
+      }
+    },
+    {
+      onEntry: function(){
+        buttonClickable = false;
+        ROYGBIV.hideText(proceedButton);
+        ROYGBIV.stopAnimation(proceedButton, "anim1");
+        ROYGBIV.stopAnimation(proceedButton, "anim2");
+        ROYGBIV.startAnimation(blackCardSprite, "anim1");
+        ROYGBIV.executeDelayed(function(){
+          ROYGBIV.showText(proceedButton);
+          ROYGBIV.startAnimation(proceedButton, "anim2");
+          buttonClickable = true;
+        }, 1000, false);
+        ROYGBIV.freezeAnimationOnFinish(blackCardSprite, "anim1");
+      }
+    },
+    {
+      onEntry: function(){
+        buttonClickable = false;
+        ROYGBIV.hideText(proceedButton);
+        ROYGBIV.stopAnimation(proceedButton, "anim1");
+        ROYGBIV.stopAnimation(proceedButton, "anim2");
+        ROYGBIV.setText(tutorialText, "ve her tur elinde 10\nbeyaz kart olacak.");
+        ROYGBIV.startAnimation(tutorialText, "anim1");
+        ROYGBIV.onAnimationFinished(tutorialText, "anim1", function(){
+          ROYGBIV.showText(proceedButton);
+          ROYGBIV.startAnimation(proceedButton, "anim2");
+          buttonClickable = true;
+        });
+      }
+    },
+    {
+      onEntry: function(){
+        buttonClickable = false;
+        ROYGBIV.hideText(proceedButton);
+        ROYGBIV.stopAnimation(proceedButton, "anim1");
+        ROYGBIV.stopAnimation(proceedButton, "anim2");
+        for (var i = 0; i<whiteCards.length; i++){
+          ROYGBIV.startAnimation(whiteCards[i], "anim1");
+          ROYGBIV.freezeAnimationOnFinish(whiteCards[i], "anim1");
+        }
+        ROYGBIV.executeDelayed(function(){
+          ROYGBIV.showText(proceedButton);
+          ROYGBIV.startAnimation(proceedButton, "anim2");
+          buttonClickable = true;
+        }, 1000, false);
+      }
+    },
+    {
+      onEntry: function(){
+        buttonClickable = false;
+        ROYGBIV.hideText(proceedButton);
+        ROYGBIV.stopAnimation(proceedButton, "anim1");
+        ROYGBIV.stopAnimation(proceedButton, "anim2");
+        var text = ROYGBIV.isMobile()? "parmagin ile desteni\nsaga/sola\nsurukleyebilirsin": "mouse ile desteni\nsaga/sola\nsurukleyebilirsin.";
+        canDrag = true;
+        ROYGBIV.setText(tutorialText, text);
+        ROYGBIV.startAnimation(tutorialText, "anim1");
+        ROYGBIV.onAnimationFinished(tutorialText, "anim1", function(){
+          ROYGBIV.showText(proceedButton);
+          ROYGBIV.startAnimation(proceedButton, "anim2");
+          buttonClickable = true;
+        });
+      }
+    },
+    {
+      onEntry: function(){
+        buttonClickable = false;
+        ROYGBIV.hideText(proceedButton);
+        ROYGBIV.stopAnimation(proceedButton, "anim1");
+        ROYGBIV.stopAnimation(proceedButton, "anim2");
+        ROYGBIV.setText(tutorialText, "siyah karttaki boslugu\nelindeki en komik\nbeyaz kartla doldur.");
+        ROYGBIV.startAnimation(tutorialText, "anim1");
+        ROYGBIV.onAnimationFinished(tutorialText, "anim1", function(){
+          ROYGBIV.showText(proceedButton);
+          ROYGBIV.startAnimation(proceedButton, "anim2");
+          buttonClickable = true;
+        });
+      }
+    },
+    {
+      onEntry: function(){
+        buttonClickable = false;
+        ROYGBIV.hideText(proceedButton);
+        ROYGBIV.stopAnimation(proceedButton, "anim1");
+        ROYGBIV.stopAnimation(proceedButton, "anim2");
+        var text = ROYGBIV.isMobile()? "parmagin ile\nbeyaz kartlari\nsurukleyebilirsin.": "mouse ile\nbeyaz kartlari\nsurukleyebilirsin.";
+        ROYGBIV.setText(tutorialText, text);
+        ROYGBIV.startAnimation(tutorialText, "anim1");
+        for (var i = 0; i<whiteCards.length; i++){
+          ROYGBIV.enableSpriteDragging(whiteCards[i]);
+        }
+        ROYGBIV.showSprite(ROYGBIV.getSprite("burayaSurukle"));
+        ROYGBIV.startAnimation(ROYGBIV.getSprite("burayaSurukle"), "anim1");
+        ROYGBIV.onAnimationFinished(tutorialText, "anim1", noop);
+        canDrag = true;
+      }
+    }
+  ];
+  ROYGBIV.setActiveControl(ROYGBIV.createCustomControl({
+    onDrag: function(x, y, movementX, movementY){
+      if (canDrag && ROYGBIV.globals.draggingSpriteIndex < 0){
+        if (Math.abs(movementX) > Math.abs(movementY)){
+          if (y > window.innerHeight / 2 && y < (window.innerHeight - (window.innerHeight / 10))){
+            ellipseOffset += (-movementX / 10);
+            handleEllipse(whiteCards, ellipseOffset);
+            ROYGBIV.cancelSpriteDrag();
+          }
+        }
+      }
+    },
+    onSwipe: function(x, y, movementX, movementY){
+      if (canDrag && ROYGBIV.globals.draggingSpriteIndex < 0){
+        if (Math.abs(movementX) > Math.abs(movementY)){
+          if (y > window.innerHeight / 2 && y < (window.innerHeight - (window.innerHeight / 10))){
+            ellipseOffset += (-movementX / 10);
+            handleEllipse(whiteCards, ellipseOffset);
+            ROYGBIV.cancelSpriteDrag();
+          }
+        }
+      }
+    },
+    onResize: function(){
+      handleEllipse(whiteCards, ellipseOffset);
+    },
+    onUpdate: function(){
+      if (ROYGBIV.globals.draggingSpriteIndex >= 0){
+        var sprite = whiteCards[ROYGBIV.globals.draggingSpriteIndex];
+        if (ROYGBIV.areSpritesIntersected(sprite, ROYGBIV.getSprite("burayaSurukle"))){
+          if (ROYGBIV.globals.lastMappedTextureName != "on"){
+            ROYGBIV.mapTextureToSprite(ROYGBIV.getSprite("burayaSurukle"), "burayaSurukleOn");
+            ROYGBIV.globals.lastMappedTextureName = "on";
+            ROYGBIV.stopAnimation(ROYGBIV.getSprite("burayaSurukle"), "anim1");
+          }
+        }else{
+          if (ROYGBIV.globals.lastMappedTextureName != "off"){
+            ROYGBIV.mapTextureToSprite(ROYGBIV.getSprite("burayaSurukle"), "burayaSurukleOff");
+            ROYGBIV.globals.lastMappedTextureName = "off";
+            ROYGBIV.startAnimation(ROYGBIV.getSprite("burayaSurukle"), "anim1");
+          }
+        }
+      }else{
+        if (ROYGBIV.globals.lastMappedTextureName != "off"){
+          ROYGBIV.mapTextureToSprite(ROYGBIV.getSprite("burayaSurukle"), "burayaSurukleOff");
+          ROYGBIV.globals.lastMappedTextureName = "off";
+          ROYGBIV.startAnimation(ROYGBIV.getSprite("burayaSurukle"), "anim1");
+        }
+      }
+      if (ROYGBIV.isKeyPressed("Enter")){
+        if (buttonClickable){
+          repeatCount = 0;
+          ROYGBIV.setTextColor(proceedButton, "#b8bb26");
+          ROYGBIV.startAnimation(proceedButton, "anim1");
+          ROYGBIV.stopAnimation(proceedButton, "anim2");
+        }
+      }
+    }
+  }));
+  ROYGBIV.onContainerMouseOver(ROYGBIV.getContainer("tutorialBottom"), function(){
+    if (!buttonClickable){
+      return;
+    }
+    ROYGBIV.setTextColor(proceedButton, "#fb4934");
+  });
+  ROYGBIV.onContainerMouseOut(ROYGBIV.getContainer("tutorialBottom"), function(){
+    if (!buttonClickable){
+      return;
+    }
+    ROYGBIV.setTextColor(proceedButton, "#b8bb26");
+  });
+  ROYGBIV.onContainerClick(ROYGBIV.getContainer("tutorialBottom"), function(){
+    repeatCount = 0;
+    ROYGBIV.setTextColor(proceedButton, "#b8bb26");
+    ROYGBIV.startAnimation(proceedButton, "anim1");
+    ROYGBIV.stopAnimation(proceedButton, "anim2");
+  });
+  ROYGBIV.onAnimationFinished(proceedButton, "anim1", function(){
+    repeatCount ++;
+    if (repeatCount == 2){
+      curStateIndex ++;
+      handleTutorialState(curStateIndex, states);
+    }
+  });
+  handleTutorialState(curStateIndex, states);
+}
+
 function onSceneRotateDeviceEntry(){
+  ROYGBIV.setActiveControl(ROYGBIV.createCustomControl({}));
   ROYGBIV.startAnimation(ROYGBIV.getText("rotateDevice"), "anim1");
 }
 
-function onSceneAykirioEntry(){
-  ROYGBIV.setLocationHash("aykirio");
-  var text = ROYGBIV.getText("aykirio");
-  var animMechanism = function(){
-    if (ROYGBIV.getActiveSceneName() != "aykirio"){
-      return;
+function onModalEntry(){
+  var actions = [
+    {
+      text: "evet",
+      textureName: "evet"
+    },
+    {
+      text: "hayir",
+      textureName: "hayir"
     }
-    ROYGBIV.startAnimation(text, "anim1");
-    ROYGBIV.freezeAnimationOnFinish(text, "anim1");
-    ROYGBIV.executeDelayed(function(){
-      if (ROYGBIV.getActiveSceneName() != "aykirio"){
-        return;
+  ];
+  var lastRightPressTime = 0;
+  var lastLeftPressTime = 0;
+  var enterPressed = true;
+  var currentActionIndex = 0;
+  var modalNext = ROYGBIV.getText("modalNext");
+  var modalPrevious = ROYGBIV.getText("modalPrevious");
+  var modalBottom = ROYGBIV.getContainer("modalBottom");
+  ROYGBIV.setText(ROYGBIV.getText("modalActionText"), actions[currentActionIndex].text);
+  ROYGBIV.mapTextureToSprite(ROYGBIV.getSprite("modalIconSprite"), actions[currentActionIndex].textureName);
+  ROYGBIV.executeDelayed(function(){
+    enterPressed = false;
+  }, 1000, false);
+  ROYGBIV.setLocationHash("modal");
+  ROYGBIV.startAnimation(ROYGBIV.getText("modalActionText"), "anim1");
+  ROYGBIV.setActiveControl(ROYGBIV.createCustomControl({
+    onUpdate: function(){
+      if (ROYGBIV.isKeyPressed("Right")){
+        var now = performance.now();
+        if (now - lastRightPressTime >= 300){
+          ROYGBIV.startAnimation(modalNext, "anim1");
+          lastRightPressTime = now;
+          currentActionIndex ++;
+          if (currentActionIndex >= actions.length){
+            currentActionIndex = 0;
+          }
+          ROYGBIV.setText(ROYGBIV.getText("modalActionText"), actions[currentActionIndex].text);
+          ROYGBIV.mapTextureToSprite(ROYGBIV.getSprite("modalIconSprite"), actions[currentActionIndex].textureName);
+          ROYGBIV.startAnimation(ROYGBIV.getSprite("modalIconSprite"), "anim1");
+        }
+      }else if (ROYGBIV.isKeyPressed("Left")){
+        var now = performance.now();
+        if (now - lastLeftPressTime >= 300){
+          ROYGBIV.startAnimation(modalPrevious, "anim1");
+          lastLeftPressTime = now;
+          currentActionIndex --;
+          if (currentActionIndex < 0){
+            currentActionIndex = actions.length -1;
+          }
+          ROYGBIV.setText(ROYGBIV.getText("modalActionText"), actions[currentActionIndex].text);
+          ROYGBIV.mapTextureToSprite(ROYGBIV.getSprite("modalIconSprite"), actions[currentActionIndex].textureName);
+          ROYGBIV.startAnimation(ROYGBIV.getSprite("modalIconSprite"), "anim1");
+        }
+      }else if (ROYGBIV.isKeyPressed("Enter")){
+        if (!enterPressed){
+          enterPressed = true;
+          ROYGBIV.setTextColor(ROYGBIV.getText("modalTamam"), "#b8bb26");
+          ROYGBIV.startAnimation(ROYGBIV.getText("modalTamam"), "anim1");
+        }
       }
-      ROYGBIV.unfreezeAnimation(text, "anim1");
-    }, 2500, false);
-  }
-  animMechanism();
-  ROYGBIV.onAnimationFinished(text, "anim1", function(){
-    animMechanism();
+    }
+  }));
+  ROYGBIV.onTextClick(modalPrevious, function(){
+    if (ROYGBIV.isMobile()){
+      ROYGBIV.startAnimation(modalPrevious, "anim1");
+    }
+    currentActionIndex --;
+    if (currentActionIndex < 0){
+      currentActionIndex = actions.length -1;
+    }
+    ROYGBIV.setText(ROYGBIV.getText("modalActionText"), actions[currentActionIndex].text);
+    ROYGBIV.mapTextureToSprite(ROYGBIV.getSprite("modalIconSprite"), actions[currentActionIndex].textureName);
+    ROYGBIV.startAnimation(ROYGBIV.getSprite("modalIconSprite"), "anim1");
+  });
+  ROYGBIV.onTextClick(modalNext, function(){
+    if (ROYGBIV.isMobile()){
+      ROYGBIV.startAnimation(modalNext, "anim1");
+    }
+    currentActionIndex ++;
+    if (currentActionIndex >= actions.length){
+      currentActionIndex = 0;
+    }
+    ROYGBIV.setText(ROYGBIV.getText("modalActionText"), actions[currentActionIndex].text);
+    ROYGBIV.mapTextureToSprite(ROYGBIV.getSprite("modalIconSprite"), actions[currentActionIndex].textureName);
+    ROYGBIV.startAnimation(ROYGBIV.getSprite("modalIconSprite"), "anim1");
+  });
+  ROYGBIV.onTextMouseOver(modalPrevious, function(){
+    ROYGBIV.setTextColor(modalPrevious, "#fb4934");
+  });
+  ROYGBIV.onTextMouseOut(modalPrevious, function(){
+    ROYGBIV.setTextColor(modalPrevious, "#b8bb26");
+  });
+  ROYGBIV.onTextMouseOver(modalNext, function(){
+    ROYGBIV.setTextColor(modalNext, "#fb4934");
+  });
+  ROYGBIV.onTextMouseOut(modalNext, function(){
+    ROYGBIV.setTextColor(modalNext, "#b8bb26");
+  });
+  ROYGBIV.onContainerMouseOver(modalBottom, function(){
+    ROYGBIV.setTextColor(ROYGBIV.getText("modalTamam"), "#fb4934");
+  });
+  ROYGBIV.onContainerMouseOut(modalBottom, function(){
+    ROYGBIV.setTextColor(ROYGBIV.getText("modalTamam"), "#b8bb26");
+  });
+  ROYGBIV.onContainerClick(modalBottom, function(){
+    ROYGBIV.setTextColor(ROYGBIV.getText("modalTamam"), "#b8bb26");
+    ROYGBIV.startAnimation(ROYGBIV.getText("modalTamam"), "anim1");
+  });
+  var repeatCount = 0;
+  ROYGBIV.onAnimationFinished(ROYGBIV.getText("modalTamam"), "anim1", function(){
+    repeatCount ++;
+    if (repeatCount == 2){
+      if (currentActionIndex == 0){
+        ROYGBIV.removeStoredData("userName");
+        ROYGBIV.removeStoredData("tpName");
+        ROYGBIV.changeScene("scene1", sceneEntryFunctions["scene1"]);
+      }else{
+        ROYGBIV.changeScene("main", sceneEntryFunctions["main"]);
+      }
+    }
+  });
+}
+
+function onSceneMainEntry(){
+  var actions = [
+    {
+      text: "oyna",
+      textureName: "oyna"
+    },
+    {
+      text: "ogren",
+      textureName: "ogren"
+    },
+    {
+      text: "cikis",
+      textureName: "cikis"
+    }
+  ];
+  var currentActionIndex = 0;
+  ROYGBIV.setText(ROYGBIV.getText("action"), actions[currentActionIndex].text);
+  ROYGBIV.mapTextureToSprite(ROYGBIV.getSprite("actionIconSprite"), actions[currentActionIndex].textureName);
+  var tamamText = ROYGBIV.getText("tamamMenu");
+  var tamamContainer = ROYGBIV.getContainer("menuTamamContainer");
+  var menuPrevious = ROYGBIV.getText("menuPrevious");
+  var menuNext = ROYGBIV.getText("menuNext");
+  ROYGBIV.startAnimation(ROYGBIV.getText("action"), "anim1");
+  ROYGBIV.startAnimation(ROYGBIV.getSprite("actionIconSprite"), "anim1");
+  ROYGBIV.mapTextureToSprite(ROYGBIV.getSprite("mainAvatarSprite"), ROYGBIV.globals.tpName);
+  ROYGBIV.setText(ROYGBIV.getText("userName"), ROYGBIV.globals.userName);
+  ROYGBIV.setLocationHash("main");
+  ROYGBIV.setActiveControl(ROYGBIV.createCustomControl({
+    onUpdate: function(){
+      if (ROYGBIV.isKeyPressed("Right")){
+        var now = performance.now();
+        if (now - lastRightPressTime >= 300){
+          ROYGBIV.startAnimation(menuNext, "anim1");
+          lastRightPressTime = now;
+          currentActionIndex ++;
+          if (currentActionIndex >= actions.length){
+            currentActionIndex = 0;
+          }
+          ROYGBIV.setText(ROYGBIV.getText("action"), actions[currentActionIndex].text);
+          ROYGBIV.mapTextureToSprite(ROYGBIV.getSprite("actionIconSprite"), actions[currentActionIndex].textureName);
+          ROYGBIV.startAnimation(ROYGBIV.getSprite("actionIconSprite"), "anim1");
+        }
+      }else if (ROYGBIV.isKeyPressed("Left")){
+        var now = performance.now();
+        if (now - lastLeftPressTime >= 300){
+          ROYGBIV.startAnimation(menuPrevious, "anim1");
+          lastLeftPressTime = now;
+          currentActionIndex --;
+          if (currentActionIndex < 0){
+            currentActionIndex = actions.length -1;
+          }
+          ROYGBIV.setText(ROYGBIV.getText("action"), actions[currentActionIndex].text);
+          ROYGBIV.mapTextureToSprite(ROYGBIV.getSprite("actionIconSprite"), actions[currentActionIndex].textureName);
+          ROYGBIV.startAnimation(ROYGBIV.getSprite("actionIconSprite"), "anim1");
+        }
+      }else if (ROYGBIV.isKeyPressed("Enter")){
+        if (!enterPressed){
+          enterPressed = true;
+          ROYGBIV.setTextColor(ROYGBIV.getText("tamamMenu"), "#b8bb26");
+          ROYGBIV.startAnimation(ROYGBIV.getText("tamamMenu"), "anim1");
+        }
+      }
+    }
+  }));
+  var lastRightPressTime = 0;
+  var lastLeftPressTime = 0;
+  var enterPressed = true;
+  ROYGBIV.executeDelayed(function(){
+    enterPressed = false;
+  }, 1000, false);
+  ROYGBIV.onTextClick(menuPrevious, function(){
+    if (ROYGBIV.isMobile()){
+      ROYGBIV.startAnimation(menuPrevious, "anim1");
+    }
+    currentActionIndex --;
+    if (currentActionIndex < 0){
+      currentActionIndex = actions.length -1;
+    }
+    ROYGBIV.setText(ROYGBIV.getText("action"), actions[currentActionIndex].text);
+    ROYGBIV.mapTextureToSprite(ROYGBIV.getSprite("actionIconSprite"), actions[currentActionIndex].textureName);
+    ROYGBIV.startAnimation(ROYGBIV.getSprite("actionIconSprite"), "anim1");
+  });
+  ROYGBIV.onTextClick(menuNext, function(){
+    if (ROYGBIV.isMobile()){
+      ROYGBIV.startAnimation(menuNext, "anim1");
+    }
+    currentActionIndex ++;
+    if (currentActionIndex >= actions.length){
+      currentActionIndex = 0;
+    }
+    ROYGBIV.setText(ROYGBIV.getText("action"), actions[currentActionIndex].text);
+    ROYGBIV.mapTextureToSprite(ROYGBIV.getSprite("actionIconSprite"), actions[currentActionIndex].textureName);
+    ROYGBIV.startAnimation(ROYGBIV.getSprite("actionIconSprite"), "anim1");
+  });
+  ROYGBIV.onTextMouseOver(menuPrevious, function(){
+    ROYGBIV.setTextColor(menuPrevious, "#fb4934");
+  });
+  ROYGBIV.onTextMouseOut(menuPrevious, function(){
+    ROYGBIV.setTextColor(menuPrevious, "#b8bb26");
+  });
+  ROYGBIV.onTextMouseOver(menuNext, function(){
+    ROYGBIV.setTextColor(menuNext, "#fb4934");
+  });
+  ROYGBIV.onTextMouseOut(menuNext, function(){
+    ROYGBIV.setTextColor(menuNext, "#b8bb26");
+  });
+  ROYGBIV.onContainerMouseOver(tamamContainer, function(){
+    ROYGBIV.setTextColor(tamamText, "#fb4934");
+  });
+  ROYGBIV.onContainerMouseOut(tamamContainer, function(){
+    ROYGBIV.setTextColor(tamamText, "#b8bb26");
+  });
+  ROYGBIV.onContainerClick(tamamContainer, function(){
+    ROYGBIV.setTextColor(tamamText, "#b8bb26");
+    ROYGBIV.startAnimation(tamamText, "anim1");
+  });
+  var repeatCount = 0;
+  ROYGBIV.onAnimationFinished(tamamText, "anim1", function(){
+    repeatCount ++;
+    if (repeatCount == 2){
+      if (currentActionIndex == 2){
+        ROYGBIV.changeScene("modal", sceneEntryFunctions["modal"]);
+      }else if (currentActionIndex == 1){
+        ROYGBIV.changeScene("tutorial", sceneEntryFunctions["tutorial"]);
+      }
+    }
   });
 }
 
 function onScene1Entry(){
   ROYGBIV.setLocationHash("scene1");
+  ROYGBIV.setActiveControl(ROYGBIV.createCustomControl({}));
   delete ROYGBIV.globals.userName;
   var virtualKeyboard = ROYGBIV.getVirtualKeyboard("vk1");
   var inputText = ROYGBIV.getText("nameInput");
@@ -6479,55 +7092,89 @@ function onScene1Entry(){
   });
   ROYGBIV.onVirtualKeyboardFlush(virtualKeyboard, function(flushedText){
     ROYGBIV.globals.userName = flushedText;
-    if (!ROYGBIV.isMobile()){
-      ROYGBIV.changeScene("scene2", sceneEntryFunctions["scene2"]);
-    }else{
-      ROYGBIV.changeScene("scene2Mobile", sceneEntryFunctions["scene2Mobile"]);
-    }
-  });
-}
-
-function onScene2MobileEntry(){
-  ROYGBIV.setLocationHash("scene2Mobile");
-  var avatarIndex = 0;
-  var sprite = ROYGBIV.getSprite("spriteAvatarMobile");
-  var tpNames = ["avatarPusheen", "avatarKenny", "avatarRick", "avatarHarambe", "avatarFry"];
-  ROYGBIV.mapTextureToSprite(sprite, tpNames[avatarIndex]);
-  var nextArrow = ROYGBIV.getText("nextArrowMobile");
-  var previousArrow = ROYGBIV.getText("previousArrowMobile");
-  ROYGBIV.onTextClick(nextArrow, function(){
-    ROYGBIV.startAnimation(sprite, "anim2");
-    avatarIndex ++;
-    if (avatarIndex >= tpNames.length){
-      avatarIndex = 0;
-    }
-    ROYGBIV.mapTextureToSprite(sprite, tpNames[avatarIndex]);
-    ROYGBIV.startAnimation(nextArrow, "anim1");
-  });
-  ROYGBIV.onTextClick(previousArrow, function(){
-    ROYGBIV.startAnimation(sprite, "anim2");
-    avatarIndex --;
-    if (avatarIndex < 0){
-      avatarIndex = tpNames.length -1;
-    }
-    ROYGBIV.mapTextureToSprite(sprite, tpNames[avatarIndex]);
-    ROYGBIV.startAnimation(previousArrow, "anim1");
-  });
-  ROYGBIV.onContainerClick(ROYGBIV.getContainer("mobileOk"), function(){
-    ROYGBIV.startAnimation(ROYGBIV.getText("mobileProcess"), "anim1");
-    ROYGBIV.onAnimationFinished(ROYGBIV.getText("mobileProcess"), "anim1", function(){
-      ROYGBIV.changeScene("aykirio", sceneEntryFunctions["aykirio"]);
-    });
+    ROYGBIV.storeData("userName", ROYGBIV.globals.userName);
+    ROYGBIV.changeScene("scene2", sceneEntryFunctions["scene2"]);
   });
 }
 
 function onScene2Entry(){
-  delete ROYGBIV.globals.selectedAvatarIndex;
   ROYGBIV.setLocationHash("scene2");
-  var previousArrow = ROYGBIV.getText("previousArrow");
-  ROYGBIV.setTextColor(previousArrow, "#b8bb26");
-  ROYGBIV.onTextClick(previousArrow, function(){
-    ROYGBIV.changeScene("scene1", sceneEntryFunctions["scene1"]);
+  var lastRightPressTime = 0;
+  var lastLeftPressTime = 0;
+  var enterPressed = true;
+  ROYGBIV.executeDelayed(function(){
+    enterPressed = false;
+  }, 1000, false);
+  ROYGBIV.setActiveControl(ROYGBIV.createCustomControl({
+    onUpdate: function(){
+      if (ROYGBIV.isKeyPressed("Right")){
+        var now = performance.now();
+        if (now - lastRightPressTime >= 300){
+          avatarIndex ++;
+          if (avatarIndex >= tpNames.length){
+            avatarIndex = 0;
+          }
+          ROYGBIV.setText(ROYGBIV.getText("avatarNameText"), avatarNames[avatarIndex]);
+          ROYGBIV.mapTextureToSprite(sprite, tpNames[avatarIndex]);
+          ROYGBIV.globals.tpName = tpNames[avatarIndex];
+          ROYGBIV.storeData("tpName", ROYGBIV.globals.tpName);
+          ROYGBIV.startAnimation(sprite, "anim2");
+          ROYGBIV.startAnimation(nextArrow, "anim1");
+          lastRightPressTime = now;
+        }
+      }else if (ROYGBIV.isKeyPressed("Left")){
+        var now = performance.now();
+        if (now - lastLeftPressTime >= 300){
+          avatarIndex --;
+          if (avatarIndex < 0){
+            avatarIndex = tpNames.length -1;
+          }
+          ROYGBIV.setText(ROYGBIV.getText("avatarNameText"), avatarNames[avatarIndex]);
+          ROYGBIV.mapTextureToSprite(sprite, tpNames[avatarIndex]);
+          ROYGBIV.globals.tpName = tpNames[avatarIndex];
+          ROYGBIV.storeData("tpName", ROYGBIV.globals.tpName);
+          ROYGBIV.startAnimation(sprite, "anim2");
+          ROYGBIV.startAnimation(previousArrow, "anim1");
+          lastLeftPressTime = now;
+        }
+      }else if (ROYGBIV.isKeyPressed("Enter")){
+        if (!enterPressed){
+          enterPressed = true;
+          ROYGBIV.setTextColor(ROYGBIV.getText("tamamDesktop"), "#b8bb26");
+          ROYGBIV.startAnimation(ROYGBIV.getText("tamamDesktop"), "anim1");
+        }
+      }
+    }
+  }));
+  var avatarIndex = 0;
+  var sprite = ROYGBIV.getSprite("avatarSprite");
+  var tpNames = ["avatarPusheen", "avatarKenny", "avatarRick", "avatarHarambe", "avatarFry"];
+  var avatarNames = ["pusheen", "kenny", "rick", "harambe", "fry"];
+  ROYGBIV.mapTextureToSprite(sprite, tpNames[avatarIndex]);
+  ROYGBIV.globals.tpName = tpNames[avatarIndex];
+  ROYGBIV.storeData("tpName", ROYGBIV.globals.tpName);
+  ROYGBIV.setText(ROYGBIV.getText("avatarNameText"), avatarNames[avatarIndex]);
+  var nextArrow = ROYGBIV.getText("nextAvatar");
+  var previousArrow = ROYGBIV.getText("previousAvatar");
+  ROYGBIV.onTextClick(nextArrow, function(){
+    avatarIndex ++;
+    if (avatarIndex >= tpNames.length){
+      avatarIndex = 0;
+    }
+    ROYGBIV.setText(ROYGBIV.getText("avatarNameText"), avatarNames[avatarIndex]);
+    ROYGBIV.mapTextureToSprite(sprite, tpNames[avatarIndex]);
+    ROYGBIV.globals.tpName = tpNames[avatarIndex];
+    ROYGBIV.storeData("tpName", ROYGBIV.globals.tpName);
+    ROYGBIV.startAnimation(sprite, "anim2");
+    if (ROYGBIV.isMobile()){
+      ROYGBIV.startAnimation(nextArrow, "anim1");
+    }
+  });
+  ROYGBIV.onTextMouseOver(nextArrow, function(){
+    ROYGBIV.setTextColor(nextArrow, "#fb4934");
+  });
+  ROYGBIV.onTextMouseOut(nextArrow, function(){
+    ROYGBIV.setTextColor(nextArrow, "#b8bb26");
   });
   ROYGBIV.onTextMouseOver(previousArrow, function(){
     ROYGBIV.setTextColor(previousArrow, "#fb4934");
@@ -6535,73 +7182,37 @@ function onScene2Entry(){
   ROYGBIV.onTextMouseOut(previousArrow, function(){
     ROYGBIV.setTextColor(previousArrow, "#b8bb26");
   });
-  ROYGBIV.hideText(ROYGBIV.getText("nextArrow"));
-  var sprite1 = ROYGBIV.getSprite("sprite1");
-  var sprite2 = ROYGBIV.getSprite("sprite2");
-  var sprite3 = ROYGBIV.getSprite("sprite3");
-  var sprite4 = ROYGBIV.getSprite("sprite4");
-  var sprite5 = ROYGBIV.getSprite("sprite5");
-  var container1 = ROYGBIV.getContainer("container1");
-  var container2 = ROYGBIV.getContainer("container2");
-  var container3 = ROYGBIV.getContainer("container3");
-  var container4 = ROYGBIV.getContainer("container4");
-  var container5 = ROYGBIV.getContainer("container5");
-  var sprites = [sprite1, sprite2, sprite3, sprite4, sprite5];
-  var containers = [container1, container2, container3, container4, container5];
-  var avatarNames = ["pusheen", "kenny", "rick", "harambe", "fry"];
-  for (var i = 0; i<sprites.length; i++){
-    ROYGBIV.onContainerMouseOver(containers[i], function(){
-      var index = this.index;
-      if (ROYGBIV.globals.selectedAvatarIndex === index){
-        return;
-      }
-      var container = containers[index];
-      var avatarName = avatarNames[index];
-      ROYGBIV.setContainerBorderColor(container, "#fabd2f");
-      ROYGBIV.showContainerBorder(container);
-      if (ROYGBIV.getAnimationState(sprites[index], "anim1") == ANIMATION_STATE_NOT_RUNNING){
-        ROYGBIV.startAnimation(sprites[index], "anim1");
-      }
-    }.bind({index: i}));
-    ROYGBIV.onContainerMouseOut(containers[i], function(){
-      var index = this.index;
-      if (ROYGBIV.globals.selectedAvatarIndex === index){
-        return;
-      }
-      var container = containers[index];
-      var avatarName = avatarNames[index];
-      ROYGBIV.hideContainerBorder(container);
-    }.bind({index: i}));
-    ROYGBIV.onContainerClick(containers[i], function(){
-      if (!(typeof ROYGBIV.globals.selectedAvatarIndex == UNDEFINED)){
-        ROYGBIV.hideContainerBorder(containers[ROYGBIV.globals.selectedAvatarIndex]);
-      }else{
-        var nextArrow = ROYGBIV.getText("nextArrow");
-        ROYGBIV.showText(nextArrow);
-        ROYGBIV.startAnimation(nextArrow, "anim1");
-        ROYGBIV.onTextMouseOver(nextArrow, function(){
-          ROYGBIV.stopAnimation(nextArrow, "anim1");
-          ROYGBIV.setTextColor(nextArrow, "#fb4934");
-        });
-        ROYGBIV.onTextMouseOut(nextArrow, function(){
-          ROYGBIV.startAnimation(nextArrow, "anim1");
-          ROYGBIV.setTextColor(nextArrow, "#b8bb26");
-        });
-        ROYGBIV.onTextClick(nextArrow, function(){
-          ROYGBIV.changeScene("aykirio", sceneEntryFunctions["aykirio"]);
-        });
-      }
-      var index = this.index;
-      var container = containers[index];
-      var avatarName = avatarNames[index];
-      ROYGBIV.setContainerBorderColor(container, "#b8bb26");
-      ROYGBIV.showContainerBorder(container);
-      ROYGBIV.globals.selectedAvatarIndex = index;
-    }.bind({index: i}));
-  }
-  for (var i = 0; i<containers.length; i++){
-    ROYGBIV.hideContainerBorder(containers[i]);
-  }
+  ROYGBIV.onContainerMouseOver(ROYGBIV.getContainer("tamamHolder"), function(){
+    ROYGBIV.setTextColor(ROYGBIV.getText("tamamDesktop"), "#fb4934");
+  });
+  ROYGBIV.onContainerMouseOut(ROYGBIV.getContainer("tamamHolder"), function(){
+    ROYGBIV.setTextColor(ROYGBIV.getText("tamamDesktop"), "#b8bb26");
+  });
+  ROYGBIV.onTextClick(previousArrow, function(){
+    avatarIndex --;
+    if (avatarIndex < 0){
+      avatarIndex = tpNames.length -1;
+    }
+    ROYGBIV.setText(ROYGBIV.getText("avatarNameText"), avatarNames[avatarIndex]);
+    ROYGBIV.mapTextureToSprite(sprite, tpNames[avatarIndex]);
+    ROYGBIV.globals.tpName = tpNames[avatarIndex];
+    ROYGBIV.storeData("tpName", ROYGBIV.globals.tpName);
+    ROYGBIV.startAnimation(sprite, "anim2");
+    if (ROYGBIV.isMobile()){
+      ROYGBIV.startAnimation(previousArrow, "anim1");
+    }
+  });
+  ROYGBIV.onContainerClick(ROYGBIV.getContainer("tamamHolder"), function(){
+    ROYGBIV.setTextColor(ROYGBIV.getText("tamamDesktop"), "#b8bb26");
+    ROYGBIV.startAnimation(ROYGBIV.getText("tamamDesktop"), "anim1");
+  });
+  var repeatCount = 0;
+  ROYGBIV.onAnimationFinished(ROYGBIV.getText("tamamDesktop"), "anim1", function(){
+    repeatCount ++;
+    if (repeatCount == 2){
+      ROYGBIV.changeScene("main", sceneEntryFunctions["main"]);
+    }
+  });
 }
 if (cpuOperationsHandler.record){cpuOperationsHandler.scriptPerformances.vkTest_init = performance.now() - cpuOperationsHandler.scriptPerformances.vkTest_init}}
 
@@ -7292,7 +7903,7 @@ function onRaycasterMouseDownIntersection(){
   if (intersectionPoint){
     var sprite = sprites[intersectionObject];
     if (sprite && sprite.isDraggable && mode == 1){
-      sprite.onDragStarted();
+      dragCandidate = sprite;
     }
   }
 }
@@ -7570,9 +8181,6 @@ function onRaycasterIntersection(){
        if (mode == 1 && object.onClickCallback){
          object.onClickCallback();
        }
-       if (mode == 1 && object.isDraggable){
-         object.onDragStarted();
-       }
      }else if (object.isVirtualKeyboard){
        object.onMouseClickIntersection(intersectionObject);
      }
@@ -7829,6 +8437,7 @@ var State = function(projectName, author){
   }
   // RESOLUTION ****************************************************
   this.screenResolution = screenResolution;
+  this.useOriginalResolution = useOriginalResolution;
   // FONTS *********************************************************
   this.fonts = new Object();
   this.totalFontCount = 0;
@@ -7910,7 +8519,6 @@ ImportHandler.prototype.importEngineVariables = function(obj){
   rayCaster = raycasterFactory.get();
   physicsWorld = physicsFactory.get();
   particleSystemRefHeight = obj.particleSystemRefHeight;
-  GLOBAL_PS_REF_HEIGHT_UNIFORM.value = ((renderer.getCurrentViewport().w / screenResolution) / particleSystemRefHeight);
   shaderPrecisionHandler.load(obj.shaderPrecisions);
   var octreeLimitInfo = obj.octreeLimit
   var octreeLimitInfoSplitted = octreeLimitInfo.split(",");
@@ -7930,7 +8538,14 @@ ImportHandler.prototype.importEngineVariables = function(obj){
     RAYCASTER_STEP_AMOUNT = 32;
   }
   screenResolution = obj.screenResolution;
+  if (obj.useOriginalResolution){
+    screenResolution = window.devicePixelRatio;
+    useOriginalResolution = true;
+  }else{
+    useOriginalResolution = false;
+  }
   renderer.setPixelRatio(screenResolution);
+  GLOBAL_PS_REF_HEIGHT_UNIFORM.value = ((renderer.getCurrentViewport().w / screenResolution) / particleSystemRefHeight);
   defaultMaterialType = obj.defaultMaterialType;
   markedPointsVisible = obj.markedPointsVisible;
   for (var markedPointName in obj.markedPointsExport){
@@ -9560,6 +10175,7 @@ StateLoader.prototype.resetProject = function(){
   trackingObjects = new Object();
   screenResolution = 1;
   draggingSprite = false;
+  dragCandidate = false;
   renderer.setPixelRatio(screenResolution);
   fogConfigurationsVisible = false;
   stopAreaConfigurationsHandler = false;
@@ -9599,6 +10215,7 @@ StateLoader.prototype.resetProject = function(){
   activeControl = new FreeControls({});
   activeVirtualKeyboard = 0;
   inputText = 0;
+  useOriginalResolution = false;
   fogHandler.reset();
   mode = 0; // 0 -> DESIGN, 1-> PREVIEW
   physicsDebugMode = false;
@@ -14677,7 +15294,14 @@ var Roygbiv = function(){
     "mapTextureToSprite",
     "setLocationHash",
     "onLocationHashChange",
-    "removeLocationHashChangeListener"
+    "removeLocationHashChangeListener",
+    "storeData",
+    "getStoredData",
+    "removeStoredData",
+    "isDefined",
+    "cancelSpriteDrag",
+    "getSpriteMarginX",
+    "getSpriteMarginY"
   ];
 
   this.globals = new Object();
@@ -14997,6 +15621,20 @@ Roygbiv.prototype.getVirtualKeyboard = function(virtualKeyboardName){
     return virtualKeyboard;
   }
   return 0;
+}
+
+Roygbiv.prototype.getSpriteMarginX = function(sprite){
+  if (mode == 0){
+    return;
+  }
+  return sprite.getMarginXPercent();
+}
+
+Roygbiv.prototype.getSpriteMarginY = function(sprite){
+  if (mode == 0){
+    return;
+  }
+  return sprite.getMarginYPercent();
 }
 
 
@@ -16422,6 +17060,17 @@ Roygbiv.prototype.deactivateVirtualKeyboard = function(virtualKeyboard){
   virtualKeyboard.deactivate();
 }
 
+Roygbiv.prototype.cancelSpriteDrag = function(){
+  if (mode == 0){
+    return;
+  }
+  if (draggingSprite){
+    draggingSprite.onDragStopped();
+    draggingSprite = false;
+  }
+  dragCandidate = false;
+}
+
 
 Roygbiv.prototype.vector = function(x, y, z){
   if (mode == 0){
@@ -16828,6 +17477,34 @@ Roygbiv.prototype.degreeToRadian = function(degree){
     return;
   }
   return (degree * (Math.PI / 180));
+}
+
+Roygbiv.prototype.storeData = function(key, value){
+  if (mode == 0){
+    return;
+  }
+  localStorage.setItem(key, value);
+}
+
+Roygbiv.prototype.getStoredData = function(key){
+  if (mode == 0){
+    return;
+  }
+  return localStorage.getItem(key);
+}
+
+Roygbiv.prototype.removeStoredData = function(key){
+  if (mode == 0){
+    return;
+  }
+  localStorage.removeItem(key);
+}
+
+Roygbiv.prototype.isDefined = function(element){
+  if (mode == 0){
+    return;
+  }
+  return !(typeof element == UNDEFINED) && !(element == null);
 }
 
 
@@ -18841,6 +19518,10 @@ AddedText.prototype.setAlpha = function(alpha, fromScript){
   }
   this.material.uniforms.alpha.value = alpha;
   this.alpha = alpha;
+  if (this.containerParent){
+    this.mesh.renderOrder = renderOrders.ELEMENT_IN_CONTAINER;
+    this.mesh.material.transparent = true;
+  }
 }
 
 AddedText.prototype.getBackgroundColor = function(){
@@ -20047,6 +20728,7 @@ Rectangle.prototype.updateMesh = function(thicknessOffset, force){
     });
     this.mesh = new THREE.Mesh(this.geometry, this.material);
     this.mesh.frustumCulled = false;
+    this.mesh.renderOrder = renderOrders.RECTANGLE;
   }
   this.handlePositionUniform(thicknessOffset);
   this.thicknessOffset = thicknessOffset;
@@ -20661,6 +21343,7 @@ ModeSwitcher.prototype.commonSwitchFunctions = function(){
   objectsWithMouseOutListeners = new Map();
   currentMouseOverObjectName = 0;
   draggingSprite = false;
+  dragCandidate = false;
   if (activeControl){
     activeControl.onDeactivated();
   }
@@ -20812,6 +21495,10 @@ ModeSwitcher.prototype.switchFromDesignToPreview = function(){
       isTextured: sprites[spriteName].isTextured,
       mappedTexturePackName: sprites[spriteName].mappedTexturePackName
     };
+    sprites[spriteName].originalSizeInfo = {
+      x: sprites[spriteName].mesh.material.uniforms.scale.value.x,
+      y: sprites[spriteName].mesh.material.uniforms.scale.value.y
+    };
     if (sprites[spriteName].isClickable){
       clickableSprites[spriteName] = sprites[spriteName];
       sceneHandler.onClickableSpriteAddition(sprites[spriteName]);
@@ -20931,6 +21618,8 @@ ModeSwitcher.prototype.switchFromPreviewToDesign = function(){
     }else{
       sprites[spriteName].removeTexture();
     }
+    sprites[spriteName].setScale(sprites[spriteName].originalSizeInfo.x, sprites[spriteName].originalSizeInfo.y);
+    delete sprites[spriteName].originalSizeInfo;
     delete sprites[spriteName].originalTextureInfo;
     delete sprites[spriteName].onClickCallback;
     delete sprites[spriteName].mouseOverCallbackFunction;
@@ -23075,15 +23764,20 @@ TouchEventHandler.prototype.onTouchMove = function(event){
     if (event.changedTouches.length == 1){
       var t1 = event.changedTouches[0];
       if (touchEventHandler.lastSwipeCoordinates.isInitiated){
-        var diffX = t1.pageX - touchEventHandler.lastSwipeCoordinates.x;
-        var diffY = t1.pageY - touchEventHandler.lastSwipeCoordinates.y;
-        activeControl.onSwipe(diffX, diffY);
+        var diffX = t1.clientX - touchEventHandler.lastSwipeCoordinates.x;
+        var diffY = t1.clientY - touchEventHandler.lastSwipeCoordinates.y;
+        if (mode ==1 && dragCandidate){
+          draggingSprite = dragCandidate;
+          dragCandidate = false;
+          draggingSprite.onDragStarted(diffX, diffY);
+        }
+        activeControl.onSwipe(t1.clientX, t1.clientY, diffX, diffY);
         if (draggingSprite){
-          draggingSprite.onDrag(diffX, diffY);
+          draggingSprite.onDrag(diffX * 1.7, diffY * 1.7);
         }
       }
-      touchEventHandler.lastSwipeCoordinates.x = t1.pageX;
-      touchEventHandler.lastSwipeCoordinates.y = t1.pageY;
+      touchEventHandler.lastSwipeCoordinates.x = t1.clientX;
+      touchEventHandler.lastSwipeCoordinates.y = t1.clientY;
       touchEventHandler.lastSwipeCoordinates.isInitiated = true;
     }
   }
@@ -23318,17 +24012,22 @@ MouseEventHandler.prototype.onMouseMove = function(event){
   if (mode == 1 && screenMouseMoveCallbackFunction){
     screenMouseMoveCallbackFunction(mouseEventHandler.coordX, mouseEventHandler.coordY, mouseEventHandler.movementX, mouseEventHandler.movementY);
   }
-  if (mode == 1 && draggingSprite){
-    var diffX = mouseEventHandler.clientX - mouseEventHandler.oldClientX;
-    var diffY = mouseEventHandler.clientY - mouseEventHandler.oldClientY;
-    draggingSprite.onDrag(diffX, diffY);
-    mouseEventHandler.oldClientX = mouseEventHandler.clientX;
-    mouseEventHandler.oldClientY = mouseEventHandler.clientY;
+  var diffX = mouseEventHandler.clientX - mouseEventHandler.oldClientX;
+  var diffY = mouseEventHandler.clientY - mouseEventHandler.oldClientY;
+  if (mode == 1 && dragCandidate){
+    draggingSprite = dragCandidate;
+    dragCandidate = false;
+    draggingSprite.onDragStarted(diffX, diffY);
   }
+  if (mode == 1 && draggingSprite){
+    draggingSprite.onDrag(diffX, diffY);
+  }
+  mouseEventHandler.oldClientX = mouseEventHandler.clientX;
+  mouseEventHandler.oldClientY = mouseEventHandler.clientY;
   mouseEventHandler.eventBuffer.mouseMove.needsFlush = true;
   mouseEventHandler.eventBuffer.mouseMove.event = event;
   if (isMouseDown && !isMobile){
-    mouseEventHandler.onDrag(mouseEventHandler.x, mouseEventHandler.y, mouseEventHandler.movementX, mouseEventHandler.movementY);
+    mouseEventHandler.onDrag(mouseEventHandler.clientX, mouseEventHandler.clientY, mouseEventHandler.movementX, mouseEventHandler.movementY);
   }
 }
 
@@ -23343,6 +24042,7 @@ MouseEventHandler.prototype.onMouseUp = function(event){
   if (mode == 1 && draggingSprite){
     draggingSprite.onDragStopped();
   }
+  dragCandidate = false;
   isMouseDown = false;
   mouseEventHandler.eventBuffer.mouseUp.event = event;
   mouseEventHandler.eventBuffer.mouseUp.needsFlush = true;
@@ -23483,7 +24183,6 @@ ResizeEventHandler.prototype.onResize = function(){
   if (particleSystemRefHeight){
     GLOBAL_PS_REF_HEIGHT_UNIFORM.value = ((renderer.getCurrentViewport().w / screenResolution) / particleSystemRefHeight);
   }
-  activeControl.onResize();
   if (mode == 0){
     for (var areaName in areas){
       if (areas[areaName].text){
@@ -23521,6 +24220,7 @@ ResizeEventHandler.prototype.onResize = function(){
   }
   renderer.setPixelRatio(screenResolution);
   resizeEventHandler.refresh2DNeeded = true;
+  activeControl.onResize();
 }
 
 var KeyboardEventHandler = function(){
@@ -26267,8 +26967,8 @@ CustomControls.prototype.onTap = function(event){
   this.onTapFunc(event);
 }
 
-CustomControls.prototype.onSwipe = function(diffX, diffY){
-  this.onSwipeFunc(diffX, diffY);
+CustomControls.prototype.onSwipe = function(x, y, diffX, diffY){
+  this.onSwipeFunc(x, y, diffX, diffY);
 }
 
 CustomControls.prototype.onPinch = function(diff){
@@ -30146,6 +30846,8 @@ Animation.prototype.onStart = function(initialValue){
     this.params.sourceColor.copy(this.attachedObject.mesh.material.uniforms.color.value);
   }else if (this.description.action == animationHandler.actionTypes.TEXT.TYPING){
     this.params.sourceText = this.attachedObject.text;
+    this.changeInValue = this.attachedObject.text.length + 1;
+    this.attachedObject.setText("");
   }else if (this.description.action == animationHandler.actionTypes.OBJECT.TRANSLATE_X){
     this.params.totalTranslationX = 0;
   }else if (this.description.action == animationHandler.actionTypes.OBJECT.TRANSLATE_Y){
@@ -30373,7 +31075,7 @@ Scene.prototype.destroy = function(){
     parseCommand("destroyCrosshair "+chName);
   }
   for (var spriteName in this.sprites){
-    parseCommand("destroysprite "+spriteName);
+    parseCommand("destroySprite "+spriteName);
   }
   for (var containerName in this.containers){
     parseCommand("destroyContainer "+containerName);
@@ -32327,13 +33029,13 @@ Sprite.prototype.intersectionTest = function(sprite){
          (!(this.cross2(this.triangle2, sprite.triangle2) || this.cross2(sprite.triangle2, this.triangle2)));
 }
 
-Sprite.prototype.onDragStarted = function(){
+Sprite.prototype.onDragStarted = function(diffX, diffY){
   if (this.draggingDisabled){
     return;
   }
   draggingSprite = this;
   if (this.dragStartCallback){
-    this.dragStartCallback();
+    this.dragStartCallback(diffX, diffY);
   }
 }
 
@@ -32393,6 +33095,10 @@ Sprite.prototype.handleResize = function(){
   }
   if (this.rectangle && !(typeof this.rectangle.thicknessOffset == UNDEFINED)){
     this.rectangle.updateMesh(this.rectangle.thicknessOffset);
+  }
+  if (mode == 1){
+    this.originalSizeInfo.x = this.mesh.material.uniforms.scale.value.x;
+    this.originalSizeInfo.y = this.mesh.material.uniforms.scale.value.y;
   }
 }
 
@@ -32496,6 +33202,30 @@ Sprite.prototype.setAlpha = function(alpha){
     this.mesh.material.transparent = false;
   }
   this.mesh.material.uniforms.alpha.value = alpha;
+  if (this.containerParent){
+    this.mesh.renderOrder = renderOrders.ELEMENT_IN_CONTAINER;
+    this.mesh.material.transparent = true;
+  }
+}
+
+Sprite.prototype.getMarginXPercent = function(){
+  var marginX = this.marginPercentX;
+  if (this.marginMode == MARGIN_MODE_2D_TOP_LEFT){
+    marginX -= (this.calculateWidthPercent() / 2);
+  }else if (this.marginMode == MARGIN_MODE_2D_BOTTOM_RIGHT){
+    marginX += (this.calculateWidthPercent() / 2);
+  }
+  return marginX;
+}
+
+Sprite.prototype.getMarginYPercent = function(){
+  var marginY = this.marginPercentY;
+  if (this.marginMode == MARGIN_MODE_2D_TOP_LEFT){
+    marginY += (this.calculateHeightPercent() / 2);
+  }else if (this.marginMode == MARGIN_MODE_2D_BOTTOM_RIGHT){
+    marginY -= (this.calculateHeightPercent() / 2);
+  }
+  return marginY;
 }
 
 Sprite.prototype.set2DCoordinates = function(marginPercentX, marginPercentY){
@@ -32697,6 +33427,8 @@ Container2D.prototype.setBackground = function(backgroundColor, backgroundAlpha,
   this.backgroundSprite.set2DCoordinates(100 - this.centerXPercent, 100 - this.centerYPercent);
   this.backgroundSprite.setColor(backgroundColor);
   this.backgroundSprite.setAlpha(backgroundAlpha);
+  this.backgroundSprite.mesh.material.transparent = true;
+  this.backgroundSprite.mesh.renderOrder = renderOrders.CONTAINER_BACKGROUND;
   if (!!backgroundTextureName){
     this.backgroundSprite.mapTexture(texturePacks[backgroundTextureName]);
   } else if (this.backgroundSprite.isTextured){
@@ -33077,6 +33809,8 @@ Container2D.prototype.insertAddedText = function(addedText){
   }
   addedText.set2DCoordinates(selectedCoordXPercent, selectedCoordYPercent);
   addedText.containerParent = this;
+  addedText.mesh.material.transparent = true;
+  addedText.mesh.renderOrder = renderOrders.ELEMENT_IN_CONTAINER;
   this.addedText = addedText;
 }
 
@@ -33086,8 +33820,8 @@ Container2D.prototype.insertSprite = function(sprite){
   sprite.setRotation(0);
   var maxWidth = this.widthPercent - (2 * paddingX);
   var maxHeight = this.heightPercent - (2 * paddingY);
-  var sourceWidth = sprite.originalWidth * sprite.originalWidthReference / renderer.getCurrentViewport().z;
-  var sourceHeight = sprite.originalHeight * sprite.originalHeightReference / renderer.getCurrentViewport().w;
+  var sourceWidth = sprite.calculateWidthPercent();
+  var sourceHeight = sprite.calculateHeightPercent();
   sourceWidth *= screenResolution / sprite.originalScreenResolution;
   sourceHeight *= screenResolution / sprite.originalScreenResolution;
   var scale = Math.min(maxWidth / sourceWidth, maxHeight / sourceHeight);
@@ -33108,6 +33842,8 @@ Container2D.prototype.insertSprite = function(sprite){
     selectedCoordYPercent = this.centerYPercent - (this.heightPercent / 2) + paddingY;
   }
   sprite.set2DCoordinates(selectedCoordXPercent, selectedCoordYPercent);
+  sprite.mesh.material.transparent = true;
+  sprite.mesh.renderOrder = renderOrders.ELEMENT_IN_CONTAINER;
   sprite.containerParent = this;
   this.sprite = sprite;
 }
@@ -33629,7 +34365,7 @@ VirtualKeyboard.prototype.onKeyInteractionWithKeyboard = function(container){
   }
   var lastKeyInteractionWithKeyboardTime = this.lastKeyInteractionWithKeyboardTime? this.lastKeyInteractionWithKeyboardTime: 0;
   var now = performance.now();
-  if (now - lastKeyInteractionWithKeyboardTime <= this.keyPressThreshold && !isMobile){
+  if (now - lastKeyInteractionWithKeyboardTime <= this.keyPressThreshold){
     return;
   }
   var textInstance = container.addedText;

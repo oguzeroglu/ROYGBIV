@@ -284,6 +284,7 @@ var SIDE_FRONT = "Front";
 var SIDE_BACK = "Back";
 var textureUniformCache = new Object();
 var screenResolution = 1;
+var useOriginalResolution = false;
 var rayCaster;
 var objectPicker2D;
 var intersectionPoint = 0;
@@ -418,10 +419,10 @@ var childContainers = new Object();
 var virtualKeyboards = new Object();
 var activeVirtualKeyboard;
 var inputText;
+var dragCandidate;
 
 // RENDER ORDERS
 var renderOrders = {
-  CONTAINER_BACKGROUND: -1000,
   MARKED_POINT: -30,
   GRID_HELPER: -20,
   FPS_WEAPON: -10,
@@ -437,7 +438,10 @@ var renderOrders = {
   TEXT_2D: 50,
   SPRITE: 50,
   CROSSHAIR: 60,
-  OBJECT_TRAIL: 100
+  OBJECT_TRAIL: 100,
+  CONTAINER_BACKGROUND: 5000,
+  ELEMENT_IN_CONTAINER: 6000,
+  RECTANGLE: 7000
 }
 
 // FACTORIES
@@ -9175,6 +9179,10 @@ AddedText.prototype.setAlpha = function(alpha, fromScript){
   }
   this.material.uniforms.alpha.value = alpha;
   this.alpha = alpha;
+  if (this.containerParent){
+    this.mesh.renderOrder = renderOrders.ELEMENT_IN_CONTAINER;
+    this.mesh.material.transparent = true;
+  }
 }
 
 AddedText.prototype.getBackgroundColor = function(){
@@ -12902,6 +12910,7 @@ Rectangle.prototype.updateMesh = function(thicknessOffset, force){
     });
     this.mesh = new THREE.Mesh(this.geometry, this.material);
     this.mesh.frustumCulled = false;
+    this.mesh.renderOrder = renderOrders.RECTANGLE;
   }
   this.handlePositionUniform(thicknessOffset);
   this.thicknessOffset = thicknessOffset;
@@ -13035,13 +13044,13 @@ Sprite.prototype.intersectionTest = function(sprite){
          (!(this.cross2(this.triangle2, sprite.triangle2) || this.cross2(sprite.triangle2, this.triangle2)));
 }
 
-Sprite.prototype.onDragStarted = function(){
+Sprite.prototype.onDragStarted = function(diffX, diffY){
   if (this.draggingDisabled){
     return;
   }
   draggingSprite = this;
   if (this.dragStartCallback){
-    this.dragStartCallback();
+    this.dragStartCallback(diffX, diffY);
   }
 }
 
@@ -13101,6 +13110,10 @@ Sprite.prototype.handleResize = function(){
   }
   if (this.rectangle && !(typeof this.rectangle.thicknessOffset == UNDEFINED)){
     this.rectangle.updateMesh(this.rectangle.thicknessOffset);
+  }
+  if (mode == 1){
+    this.originalSizeInfo.x = this.mesh.material.uniforms.scale.value.x;
+    this.originalSizeInfo.y = this.mesh.material.uniforms.scale.value.y;
   }
 }
 
@@ -13204,6 +13217,30 @@ Sprite.prototype.setAlpha = function(alpha){
     this.mesh.material.transparent = false;
   }
   this.mesh.material.uniforms.alpha.value = alpha;
+  if (this.containerParent){
+    this.mesh.renderOrder = renderOrders.ELEMENT_IN_CONTAINER;
+    this.mesh.material.transparent = true;
+  }
+}
+
+Sprite.prototype.getMarginXPercent = function(){
+  var marginX = this.marginPercentX;
+  if (this.marginMode == MARGIN_MODE_2D_TOP_LEFT){
+    marginX -= (this.calculateWidthPercent() / 2);
+  }else if (this.marginMode == MARGIN_MODE_2D_BOTTOM_RIGHT){
+    marginX += (this.calculateWidthPercent() / 2);
+  }
+  return marginX;
+}
+
+Sprite.prototype.getMarginYPercent = function(){
+  var marginY = this.marginPercentY;
+  if (this.marginMode == MARGIN_MODE_2D_TOP_LEFT){
+    marginY += (this.calculateHeightPercent() / 2);
+  }else if (this.marginMode == MARGIN_MODE_2D_BOTTOM_RIGHT){
+    marginY -= (this.calculateHeightPercent() / 2);
+  }
+  return marginY;
 }
 
 Sprite.prototype.set2DCoordinates = function(marginPercentX, marginPercentY){
@@ -13404,6 +13441,8 @@ Container2D.prototype.setBackground = function(backgroundColor, backgroundAlpha,
   this.backgroundSprite.set2DCoordinates(100 - this.centerXPercent, 100 - this.centerYPercent);
   this.backgroundSprite.setColor(backgroundColor);
   this.backgroundSprite.setAlpha(backgroundAlpha);
+  this.backgroundSprite.mesh.material.transparent = true;
+  this.backgroundSprite.mesh.renderOrder = renderOrders.CONTAINER_BACKGROUND;
   if (!!backgroundTextureName){
     this.backgroundSprite.mapTexture(texturePacks[backgroundTextureName]);
   } else if (this.backgroundSprite.isTextured){
@@ -13784,6 +13823,8 @@ Container2D.prototype.insertAddedText = function(addedText){
   }
   addedText.set2DCoordinates(selectedCoordXPercent, selectedCoordYPercent);
   addedText.containerParent = this;
+  addedText.mesh.material.transparent = true;
+  addedText.mesh.renderOrder = renderOrders.ELEMENT_IN_CONTAINER;
   this.addedText = addedText;
 }
 
@@ -13793,8 +13834,8 @@ Container2D.prototype.insertSprite = function(sprite){
   sprite.setRotation(0);
   var maxWidth = this.widthPercent - (2 * paddingX);
   var maxHeight = this.heightPercent - (2 * paddingY);
-  var sourceWidth = sprite.originalWidth * sprite.originalWidthReference / renderer.getCurrentViewport().z;
-  var sourceHeight = sprite.originalHeight * sprite.originalHeightReference / renderer.getCurrentViewport().w;
+  var sourceWidth = sprite.calculateWidthPercent();
+  var sourceHeight = sprite.calculateHeightPercent();
   sourceWidth *= screenResolution / sprite.originalScreenResolution;
   sourceHeight *= screenResolution / sprite.originalScreenResolution;
   var scale = Math.min(maxWidth / sourceWidth, maxHeight / sourceHeight);
@@ -13815,6 +13856,8 @@ Container2D.prototype.insertSprite = function(sprite){
     selectedCoordYPercent = this.centerYPercent - (this.heightPercent / 2) + paddingY;
   }
   sprite.set2DCoordinates(selectedCoordXPercent, selectedCoordYPercent);
+  sprite.mesh.material.transparent = true;
+  sprite.mesh.renderOrder = renderOrders.ELEMENT_IN_CONTAINER;
   sprite.containerParent = this;
   this.sprite = sprite;
 }
@@ -14335,7 +14378,7 @@ VirtualKeyboard.prototype.onKeyInteractionWithKeyboard = function(container){
   }
   var lastKeyInteractionWithKeyboardTime = this.lastKeyInteractionWithKeyboardTime? this.lastKeyInteractionWithKeyboardTime: 0;
   var now = performance.now();
-  if (now - lastKeyInteractionWithKeyboardTime <= this.keyPressThreshold && !isMobile){
+  if (now - lastKeyInteractionWithKeyboardTime <= this.keyPressThreshold){
     return;
   }
   var textInstance = container.addedText;
