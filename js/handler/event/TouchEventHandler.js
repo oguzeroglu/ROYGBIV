@@ -86,15 +86,20 @@ TouchEventHandler.prototype.onTouchMove = function(event){
     if (event.changedTouches.length == 1){
       var t1 = event.changedTouches[0];
       if (touchEventHandler.lastSwipeCoordinates.isInitiated){
-        var diffX = t1.pageX - touchEventHandler.lastSwipeCoordinates.x;
-        var diffY = t1.pageY - touchEventHandler.lastSwipeCoordinates.y;
+        var diffX = t1.clientX - touchEventHandler.lastSwipeCoordinates.x;
+        var diffY = t1.clientY - touchEventHandler.lastSwipeCoordinates.y;
+        if (mode ==1 && dragCandidate){
+          draggingSprite = dragCandidate;
+          dragCandidate = false;
+          draggingSprite.onDragStarted(diffX, diffY);
+        }
         activeControl.onSwipe(t1.clientX, t1.clientY, diffX, diffY);
         if (draggingSprite){
-          draggingSprite.onDrag(diffX, diffY);
+          draggingSprite.onDrag(diffX * 1.7, diffY * 1.7);
         }
       }
-      touchEventHandler.lastSwipeCoordinates.x = t1.pageX;
-      touchEventHandler.lastSwipeCoordinates.y = t1.pageY;
+      touchEventHandler.lastSwipeCoordinates.x = t1.clientX;
+      touchEventHandler.lastSwipeCoordinates.y = t1.clientY;
       touchEventHandler.lastSwipeCoordinates.isInitiated = true;
     }
   }

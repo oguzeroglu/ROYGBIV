@@ -420,7 +420,7 @@ function onRaycasterMouseDownIntersection(){
   if (intersectionPoint){
     var sprite = sprites[intersectionObject];
     if (sprite && sprite.isDraggable && mode == 1){
-      sprite.onDragStarted();
+      dragCandidate = sprite;
     }
   }
 }
@@ -697,9 +697,6 @@ function onRaycasterIntersection(){
        }
        if (mode == 1 && object.onClickCallback){
          object.onClickCallback();
-       }
-       if (mode == 1 && object.isDraggable){
-         object.onDragStarted();
        }
      }else if (object.isVirtualKeyboard){
        object.onMouseClickIntersection(intersectionObject);

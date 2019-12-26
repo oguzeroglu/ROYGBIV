@@ -111,13 +111,13 @@ Sprite.prototype.intersectionTest = function(sprite){
          (!(this.cross2(this.triangle2, sprite.triangle2) || this.cross2(sprite.triangle2, this.triangle2)));
 }
 
-Sprite.prototype.onDragStarted = function(){
+Sprite.prototype.onDragStarted = function(diffX, diffY){
   if (this.draggingDisabled){
     return;
   }
   draggingSprite = this;
   if (this.dragStartCallback){
-    this.dragStartCallback();
+    this.dragStartCallback(diffX, diffY);
   }
 }
 

@@ -71,6 +71,7 @@ ModeSwitcher.prototype.commonSwitchFunctions = function(){
   objectsWithMouseOutListeners = new Map();
   currentMouseOverObjectName = 0;
   draggingSprite = false;
+  dragCandidate = false;
   if (activeControl){
     activeControl.onDeactivated();
   }

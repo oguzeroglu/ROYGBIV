@@ -391,6 +391,7 @@ var childContainers = new Object();
 var virtualKeyboards = new Object();
 var activeVirtualKeyboard;
 var inputText;
+var dragCandidate;
 
 // RENDER ORDERS
 var renderOrders = {

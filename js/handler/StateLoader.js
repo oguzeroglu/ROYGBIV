@@ -301,6 +301,7 @@ StateLoader.prototype.resetProject = function(){
   trackingObjects = new Object();
   screenResolution = 1;
   draggingSprite = false;
+  dragCandidate = false;
   renderer.setPixelRatio(screenResolution);
   fogConfigurationsVisible = false;
   stopAreaConfigurationsHandler = false;

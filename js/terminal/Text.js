@@ -942,7 +942,7 @@ var Text = function(){
   this.ROYGBIV_SCRIPTING_API_REMOVESPRITEMOUSEOVERLISTENER = "Removes the mouseover listener of a sprite.";
   this.ROYGBIV_SCRIPTING_API_ONSPRITEMOUSEOUT = "Sets a mouseout listener for a sprite.";
   this.ROYGBIV_SCRIPTING_API_REMOVESPRITEMOUSEOUTLISTENER = "Removes the mouseout listener of a sprite.";
-  this.ROYGBIV_SCRIPTING_API_ONSPRITEDRAGSTART = "Sets a drag start listener for a sprite. The callbackFunction is executed when a drag is initiated on a\ndraggable sprite (mousedown/touchstart).";
+  this.ROYGBIV_SCRIPTING_API_ONSPRITEDRAGSTART = "Sets a drag start listener for a sprite. The callbackFunction is executed with diffX and diffY\nparameters when a drag is initiated on a draggable sprite.";
   this.ROYGBIV_SCRIPTING_API_ONSPRITEDRAGSTOP = "Sets a drag stop listener for a sprite. The callbackFunction is executed when a user stops dragging a sprite (mouseup/touchend).";
   this.ROYGBIV_SCRIPTING_API_ONSPRITEDRAGGING = "Sets a dragging listener for a sprite. The callbackFunction is executed each time a sprite is relocated while being dragged.";
   this.ROYGBIV_SCRIPTING_API_REMOVESPRITEDRAGSTARTLISTENER = "Removes the drag start listener of a sprite.";
@@ -991,4 +991,7 @@ var Text = function(){
   this.ROYGBIV_SCRIPTING_API_GETSTOREDDATA = "Gets stored data using localStorage API.";
   this.ROYGBIV_SCRIPTING_API_REMOVESTOREDDATA = "Removes stored data using localStorage API.";
   this.ROYGBIV_SCRIPTING_API_ISDEFINED = "Checks if given element is defined.";
+  this.ROYGBIV_SCRIPTING_API_CANCELSPRITEDRAG = "Cancels sprite dragging if there is an active sprite dragging.";
+  this.ROYGBIV_SCRIPTING_API_GETSPRITEMARGINX = "Returns the marginX value of given sprite.";
+  this.ROYGBIV_SCRIPTING_API_GETSPRITEMARGINY = "Returns the marginY value of given sprite.";
 }

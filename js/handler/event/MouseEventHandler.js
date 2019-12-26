@@ -141,13 +141,18 @@ MouseEventHandler.prototype.onMouseMove = function(event){
   if (mode == 1 && screenMouseMoveCallbackFunction){
     screenMouseMoveCallbackFunction(mouseEventHandler.coordX, mouseEventHandler.coordY, mouseEventHandler.movementX, mouseEventHandler.movementY);
   }
-  if (mode == 1 && draggingSprite){
-    var diffX = mouseEventHandler.clientX - mouseEventHandler.oldClientX;
-    var diffY = mouseEventHandler.clientY - mouseEventHandler.oldClientY;
-    draggingSprite.onDrag(diffX, diffY);
-    mouseEventHandler.oldClientX = mouseEventHandler.clientX;
-    mouseEventHandler.oldClientY = mouseEventHandler.clientY;
+  var diffX = mouseEventHandler.clientX - mouseEventHandler.oldClientX;
+  var diffY = mouseEventHandler.clientY - mouseEventHandler.oldClientY;
+  if (mode == 1 && dragCandidate){
+    draggingSprite = dragCandidate;
+    dragCandidate = false;
+    draggingSprite.onDragStarted(diffX, diffY);
   }
+  if (mode == 1 && draggingSprite){
+    draggingSprite.onDrag(diffX, diffY);
+  }
+  mouseEventHandler.oldClientX = mouseEventHandler.clientX;
+  mouseEventHandler.oldClientY = mouseEventHandler.clientY;
   mouseEventHandler.eventBuffer.mouseMove.needsFlush = true;
   mouseEventHandler.eventBuffer.mouseMove.event = event;
   if (isMouseDown && !isMobile){
@@ -166,6 +171,7 @@ MouseEventHandler.prototype.onMouseUp = function(event){
   if (mode == 1 && draggingSprite){
     draggingSprite.onDragStopped();
   }
+  dragCandidate = false;
   isMouseDown = false;
   mouseEventHandler.eventBuffer.mouseUp.event = event;
   mouseEventHandler.eventBuffer.mouseUp.needsFlush = true;

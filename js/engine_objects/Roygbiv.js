@@ -251,7 +251,10 @@ var Roygbiv = function(){
     "storeData",
     "getStoredData",
     "removeStoredData",
-    "isDefined"
+    "isDefined",
+    "cancelSpriteDrag",
+    "getSpriteMarginX",
+    "getSpriteMarginY"
   ];
 
   this.globals = new Object();
@@ -668,6 +671,28 @@ Roygbiv.prototype.getVirtualKeyboard = function(virtualKeyboardName){
     return virtualKeyboard;
   }
   return 0;
+}
+
+// Returns the marginX value of given sprite.
+Roygbiv.prototype.getSpriteMarginX = function(sprite){
+  if (mode == 0){
+    return;
+  }
+  preConditions.checkIfDefined(ROYGBIV.getSpriteMarginX, preConditions.sprite, sprite);
+  preConditions.checkIfSprite(ROYGBIV.getSpriteMarginX, preConditions.sprite, sprite);
+  preConditions.checkIfSpriteInsideActiveScene(ROYGBIV.getSpriteMarginX, sprite);
+  return sprite.marginPercentX;
+}
+
+// Returns the marginY value of given sprite.
+Roygbiv.prototype.getSpriteMarginY = function(sprite){
+  if (mode == 0){
+    return;
+  }
+  preConditions.checkIfDefined(ROYGBIV.getSpriteMarginY, preConditions.sprite, sprite);
+  preConditions.checkIfSprite(ROYGBIV.getSpriteMarginY, preConditions.sprite, sprite);
+  preConditions.checkIfSpriteInsideActiveScene(ROYGBIV.getSpriteMarginY, sprite);
+  return sprite.marginPercentY;
 }
 
 // OBJECT MANIPULATION FUNCTIONS ***********************************************
@@ -2174,7 +2199,7 @@ Roygbiv.prototype.removeSpriteMouseOutListener = function(sprite){
 }
 
 // Sets a drag start listener for a sprite. The callbackFunction is executed
-// when a drag is initiated on a draggable sprite (mousedown/touchstart).
+// with diffX and diffY parameters when a drag is initiated on a draggable sprite.
 Roygbiv.prototype.onSpriteDragStart = function(sprite, callbackFunction){
   if (mode == 0){
     return;
@@ -3280,6 +3305,18 @@ Roygbiv.prototype.deactivateVirtualKeyboard = function(virtualKeyboard){
   preConditions.checkIfVirtualKeyboard(ROYGBIV.deactivateVirtualKeyboard, virtualKeyboard);
   preConditions.checkIfVirtualKeyboardInsideActiveScene(ROYGBIV.deactivateVirtualKeyboard, virtualKeyboard);
   virtualKeyboard.deactivate();
+}
+
+// Cancels sprite dragging if there is an active sprite dragging.
+Roygbiv.prototype.cancelSpriteDrag = function(){
+  if (mode == 0){
+    return;
+  }
+  if (draggingSprite){
+    draggingSprite.onDragStopped();
+    draggingSprite = false;
+  }
+  dragCandidate = false;
 }
 
 // UTILITY FUNCTIONS ***********************************************************
