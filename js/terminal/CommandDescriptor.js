@@ -215,7 +215,8 @@ var CommandDescriptor = function(){
       1, //newVirtualKeyboard
       1, //editVirtualKeyboard
       1, //destroyVirtualKeyboard
-      0 //printVirtualKeyboards
+      0, //printVirtualKeyboards
+      2 //syncSpriteSize
   ];
 
   this.commandArgumentsExpectedExplanation = [
@@ -433,7 +434,8 @@ var CommandDescriptor = function(){
     "newVirtualKeyboard virtualKeyboardName",
     "editVirtualKeyboard virtualKeyboardName",
     "destroyVirtualKeyboard virtualKeyboardName",
-    "printVirtualKeyboards"
+    "printVirtualKeyboards",
+    "syncSpriteSize sourceSprite targetSprite"
   ];
 
   this.commands = [
@@ -651,7 +653,8 @@ var CommandDescriptor = function(){
     "newVirtualKeyboard",
     "editVirtualKeyboard",
     "destroyVirtualKeyboard",
-    "printVirtualKeyboards"
+    "printVirtualKeyboards",
+    "syncSpriteSize"
   ];
 
   this.commandInfo = [
@@ -869,7 +872,8 @@ var CommandDescriptor = function(){
     "newVirtualKeyboard: Opens the virtual keyboard creation GUI.",
     "editVirtualKeyboard: Opents GUI for virtual keyboard edition.",
     "destroyVirtualKeyboard: Destroys a virtual keyboard.",
-    "printVirtualKeyboards: Prints created virtual keyboards."
+    "printVirtualKeyboards: Prints created virtual keyboards.",
+    "syncSpriteSize: Makes the size of targetSprite same with sourceSprite"
   ];
 
   this.keyboardInfo = [
@@ -1617,6 +1621,12 @@ var CommandDescriptor = function(){
   this.destroyVirtualKeyboard = new Object();
   this.destroyVirtualKeyboard.types = [];
   this.destroyVirtualKeyboard.types.push(this.VIRTUAL_KEYBOARD_NAME); //virtualKeyboardName
+
+  // syncSpriteSize
+  this.syncSpriteSize = new Object();
+  this.syncSpriteSize.types = [];
+  this.syncSpriteSize.types.push(this.SPRITE_NAME); //sourceSprite
+  this.syncSpriteSize.types.push(this.SPRITE_NAME); //targetSprite
 };
 
 CommandDescriptor.prototype.test = function(){

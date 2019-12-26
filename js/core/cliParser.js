@@ -5126,6 +5126,32 @@ function parse(input){
           }
           return true;
         break;
+        case 215: //syncSpriteSize
+          if (mode != 0){
+            terminal.printError(Text.WORKS_ONLY_IN_DESIGN_MODE);
+            return true;
+          }
+          var sourceSprite = sprites[splitted[1]];
+          var targetSprite = sprites[splitted[2]];
+          if (!sourceSprite){
+            terminal.printError(Text.SOURCESPRITE_DOES_NOT_EXIST);
+            return true;
+          }
+          if (!targetSprite){
+            terminal.printError(Text.TARGETSPRITE_DOES_NOT_EXIST);
+            return true;
+          }
+          if (targetSprite.registeredSceneName != sceneHandler.getActiveSceneName()){
+            terminal.printError(Text.TARGETSPRITE_NOT_IN_ACTIVE_SCENE);
+            return true;
+          }
+          targetSprite.refHeight = sourceSprite.refHeight;
+          targetSprite.setScale(sourceSprite.mesh.material.uniforms.scale.value.x, sourceSprite.mesh.material.uniforms.scale.value.y);
+          targetSprite.setWidthPercent(sourceSprite.calculateWidthPercent());
+          targetSprite.setHeightPercent(sourceSprite.calculateHeightPercent());
+          terminal.printInfo(Text.SPRITE_SIZE_ADJUSTED);
+          return true;
+        break;
       }
       return true;
     }catch(err){
