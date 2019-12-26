@@ -290,6 +290,26 @@ Sprite.prototype.setAlpha = function(alpha){
   }
 }
 
+Sprite.prototype.getMarginXPercent = function(){
+  var marginX = this.marginPercentX;
+  if (this.marginMode == MARGIN_MODE_2D_TOP_LEFT){
+    marginX -= (this.calculateWidthPercent() / 2);
+  }else if (this.marginMode == MARGIN_MODE_2D_BOTTOM_RIGHT){
+    marginX += (this.calculateWidthPercent() / 2);
+  }
+  return marginX;
+}
+
+Sprite.prototype.getMarginYPercent = function(){
+  var marginY = this.marginPercentY;
+  if (this.marginMode == MARGIN_MODE_2D_TOP_LEFT){
+    marginY += (this.calculateHeightPercent() / 2);
+  }else if (this.marginMode == MARGIN_MODE_2D_BOTTOM_RIGHT){
+    marginY -= (this.calculateHeightPercent() / 2);
+  }
+  return marginY;
+}
+
 Sprite.prototype.set2DCoordinates = function(marginPercentX, marginPercentY){
   GLOBAL_VIEWPORT_UNIFORM.value.set(0, 0, window.innerWidth * screenResolution, window.innerHeight * screenResolution);
   this.marginPercentX = marginPercentX;

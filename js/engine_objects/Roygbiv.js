@@ -681,7 +681,7 @@ Roygbiv.prototype.getSpriteMarginX = function(sprite){
   preConditions.checkIfDefined(ROYGBIV.getSpriteMarginX, preConditions.sprite, sprite);
   preConditions.checkIfSprite(ROYGBIV.getSpriteMarginX, preConditions.sprite, sprite);
   preConditions.checkIfSpriteInsideActiveScene(ROYGBIV.getSpriteMarginX, sprite);
-  return sprite.marginPercentX;
+  return sprite.getMarginXPercent();
 }
 
 // Returns the marginY value of given sprite.
@@ -692,7 +692,7 @@ Roygbiv.prototype.getSpriteMarginY = function(sprite){
   preConditions.checkIfDefined(ROYGBIV.getSpriteMarginY, preConditions.sprite, sprite);
   preConditions.checkIfSprite(ROYGBIV.getSpriteMarginY, preConditions.sprite, sprite);
   preConditions.checkIfSpriteInsideActiveScene(ROYGBIV.getSpriteMarginY, sprite);
-  return sprite.marginPercentY;
+  return sprite.getMarginYPercent();
 }
 
 // OBJECT MANIPULATION FUNCTIONS ***********************************************
