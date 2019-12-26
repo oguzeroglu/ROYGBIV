@@ -987,6 +987,10 @@ ImportHandler.prototype.importAddedTexts = function(obj){
       macroHandler.injectMacro("IS_TWO_DIMENSIONAL", addedTextInstance.material, true, true);
       addedTextInstance.mesh.material.uniforms.inputLineIndex = new THREE.Uniform(-500);
       addedTextInstance.mesh.material.uniforms.inputLineCharSizePercent = new THREE.Uniform(-500);
+      addedTextInstance.mesh.material.uniforms.currentViewport = GLOBAL_VIEWPORT_UNIFORM;
+      delete addedTextInstance.mesh.material.uniforms.cameraQuaternion;
+      delete addedTextInstance.mesh.material.uniforms.modelViewMatrix;
+      delete addedTextInstance.mesh.material.uniforms.projectionMatrix;
     }
     if (!(typeof curTextExport.marginMode == UNDEFINED)){
       addedTextInstance.marginMode = curTextExport.marginMode;

@@ -59,7 +59,6 @@ var AddedText = function(name, font, text, position, color, alpha, characterSize
       glyphTexture: this.getGlyphUniform(),
       xOffsets: new THREE.Uniform(xOffsetsArray),
       yOffsets: new THREE.Uniform(yOffsetsArray),
-      currentViewport: GLOBAL_VIEWPORT_UNIFORM,
       charSize: new THREE.Uniform(this.characterSize),
       screenResolution: GLOBAL_SCREEN_RESOLUTION_UNIFORM
     }
@@ -901,13 +900,22 @@ AddedText.prototype.set2DStatus = function(is2D){
     if (!!this.name){
       addedTexts2D[this.name] = this;
     }
+    delete this.mesh.material.uniforms.cameraQuaternion;
+    delete this.mesh.material.uniforms.modelViewMatrix;
+    delete this.mesh.material.uniforms.projectionMatrix;
     this.mesh.material.uniforms.inputLineIndex = new THREE.Uniform(-500);
     this.mesh.material.uniforms.inputLineCharSizePercent = new THREE.Uniform(-500);
+    this.mesh.material.uniforms.currentViewport = GLOBAL_VIEWPORT_UNIFORM;
     this.mesh.renderOrder = renderOrders.TEXT_2D;
   }else{
     macroHandler.removeMacro("IS_TWO_DIMENSIONAL", this.material, true, true);
+    this.mesh.material.uniforms.cameraQuaternion = GLOBAL_CAMERA_QUATERNION_UNIFORM;
+    this.mesh.material.uniforms.projectionMatrix = GLOBAL_PROJECTION_UNIFORM;
+    this.mesh.material.uniforms.modelViewMatrix = new THREE.Uniform(new THREE.Matrix4());
+    this.mesh.material.uniforms.modelViewMatrix.value = this.mesh.modelViewMatrix;
     delete this.mesh.material.uniforms.margin2D;
     delete this.mesh.material.uniforms.inputLineIndex;
+    delete this.mesh.material.uniforms.currentViewport;
     this.isClickable = this.oldIsClickable;
     delete this.oldIsClickable;
     if (!(typeof this.refCharOffset == UNDEFINED)){
