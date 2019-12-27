@@ -53,6 +53,7 @@ StateLoader.prototype.load = function(){
     this.importHandler.importScripts(obj);
     this.importHandler.importAddedObjects(obj);
     this.importHandler.importLightnings(obj);
+    this.importHandler.importDynamicTextureFolders(obj);
     this.importHandler.importTexturePacks(obj, this.onTexturePackLoaded.bind(this));
     this.importHandler.importSkyboxes(obj, this.onSkyboxLoaded.bind(this));
     this.importHandler.importFonts(obj, this.onFontLoaded.bind(this));
@@ -342,6 +343,7 @@ StateLoader.prototype.resetProject = function(){
   activeVirtualKeyboard = 0;
   inputText = 0;
   useOriginalResolution = false;
+  dynamicTextureFolders = new Object();
   fogHandler.reset();
   mode = 0; // 0 -> DESIGN, 1-> PREVIEW
   physicsDebugMode = false;

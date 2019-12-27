@@ -5152,6 +5152,41 @@ function parse(input){
           terminal.printInfo(Text.SPRITE_SIZE_ADJUSTED);
           return true;
         break;
+        case 216: //newDynamicTextureFolder
+          if (mode != 0){
+            terminal.printError(Text.WORKS_ONLY_IN_DESIGN_MODE);
+            return true;
+          }
+          var folderName = splitted[1];
+          if (dynamicTextureFolders[folderName]){
+            terminal.printInfo(Text.DYNAMIC_TEXTURE_FOLDER_WITH_SAME_NAME);
+            return true;
+          }
+          terminal.printInfo(Text.LOADING);
+          canvas.style.visibility = "hidden";
+          terminal.disable();
+          var xhr = new XMLHttpRequest();
+          xhr.open("POST", "/prepareDynamicTextures", true);
+          xhr.setRequestHeader("Content-type", "application/json");
+          xhr.onreadystatechange = function(){
+            if (xhr.readyState == 4 && xhr.status == 200){
+              var resp = JSON.parse(xhr.responseText);
+              terminal.clear();
+              terminal.enable();
+              if (resp.folderDoesNotExist){
+                terminal.printError(Text.FOLDER_DOES_NOT_EXIST_UNDER_DYNAMIC_TEXTURES);
+                return;
+              }else if (resp.errorFile){
+                terminal.printError(Text.ERROR_HAPPENED_COMPRESSING_TEXTURE.replace(Text.PARAM1, resp.errorFile));
+                return;
+              }
+              dynamicTextureFolders[folderName] = true;
+              terminal.printInfo(Text.DYNAMIC_TEXTURE_FOLDER_PREPARED);
+            }
+          }
+          xhr.send(JSON.stringify({folderName: folderName}));
+          return true;
+        break;
       }
       return true;
     }catch(err){

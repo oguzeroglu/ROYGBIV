@@ -169,6 +169,34 @@ app.post("/prepareTexturePack", async function(req, res){
   res.send(JSON.stringify(info));
 });
 
+app.post("/prepareDynamicTextures", async function(req, res){
+  console.log("[*] Preparing dynamic textures");
+  var folderName = req.body.folderName;
+  var path = "./dynamic_textures/"+folderName;
+  if (!fs.existsSync(path)){
+    res.send(JSON.stringify({folderDoesNotExist: true}));
+    return;
+  }
+  var files = fs.readdirSync(path);
+  var types = ["astc", "pvrtc", "s3tc"];
+  for (var i = 0; i<files.length; i++){
+    if (files[i].toLowerCase().endsWith(".png")){
+      var fileName = files[i].split(".")[0];
+      for (var i2 = 0; i2<types.length; i2++){
+        var result = await compressTexture(types[i2], fileName, path, false, false);
+        if (result == "UNSUCC"){
+          result = await compressTexture(types[i2], fileName, path, true, false);
+          if (result == "UNSUCC"){
+            res.send(JSON.stringify({errorFile: files[i]}));
+            return;
+          }
+        }
+      }
+    }
+  }
+  res.send(JSON.stringify({ok: true}));
+});
+
 app.post("/prepareSkybox", async function(req, res){
   console.log("Preparing skybox: "+req.body.skyboxFolderName);
   res.setHeader('Content-Type', 'application/json');

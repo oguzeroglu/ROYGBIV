@@ -216,7 +216,8 @@ var CommandDescriptor = function(){
       1, //editVirtualKeyboard
       1, //destroyVirtualKeyboard
       0, //printVirtualKeyboards
-      2 //syncSpriteSize
+      2, //syncSpriteSize
+      1 //newDynamicTextureFolder
   ];
 
   this.commandArgumentsExpectedExplanation = [
@@ -435,7 +436,8 @@ var CommandDescriptor = function(){
     "editVirtualKeyboard virtualKeyboardName",
     "destroyVirtualKeyboard virtualKeyboardName",
     "printVirtualKeyboards",
-    "syncSpriteSize sourceSprite targetSprite"
+    "syncSpriteSize sourceSprite targetSprite",
+    "newDynamicTextureFolder folderName"
   ];
 
   this.commands = [
@@ -654,7 +656,8 @@ var CommandDescriptor = function(){
     "editVirtualKeyboard",
     "destroyVirtualKeyboard",
     "printVirtualKeyboards",
-    "syncSpriteSize"
+    "syncSpriteSize",
+    "newDynamicTextureFolder"
   ];
 
   this.commandInfo = [
@@ -873,7 +876,8 @@ var CommandDescriptor = function(){
     "editVirtualKeyboard: Opents GUI for virtual keyboard edition.",
     "destroyVirtualKeyboard: Destroys a virtual keyboard.",
     "printVirtualKeyboards: Prints created virtual keyboards.",
-    "syncSpriteSize: Makes the size of targetSprite same with sourceSprite"
+    "syncSpriteSize: Makes the size of targetSprite same with sourceSprite",
+    "newDynamicTextureFolder: Compresses each PNG under dynamic_textures/folderName to be used as dynamic texture."
   ];
 
   this.keyboardInfo = [
@@ -1627,6 +1631,11 @@ var CommandDescriptor = function(){
   this.syncSpriteSize.types = [];
   this.syncSpriteSize.types.push(this.SPRITE_NAME); //sourceSprite
   this.syncSpriteSize.types.push(this.SPRITE_NAME); //targetSprite
+
+  // newDynamicTextureFolder
+  this.newDynamicTextureFolder = new Object();
+  this.newDynamicTextureFolder.types = [];
+  this.newDynamicTextureFolder.types.push(this.UNKNOWN_INDICATOR); //folderName
 };
 
 CommandDescriptor.prototype.test = function(){

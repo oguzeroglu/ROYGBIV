@@ -1378,3 +1378,9 @@ ImportHandler.prototype.importSprites = function(obj){
     }
   }
 }
+
+ImportHandler.prototype.importDynamicTextureFolders = function(obj){
+  for (var folderName in obj.dynamicTextureFolders){
+    dynamicTextureFolders[folderName] = true;
+  }
+}

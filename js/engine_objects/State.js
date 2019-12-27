@@ -74,6 +74,12 @@ var State = function(projectName, author){
     texturePacksExport[texturePackName] = texturePacks[texturePackName].export();
   }
   this.texturePacks = texturePacksExport;
+  // DYNAMIC TEXTURE FOLDERS ***************************************
+  var dynamicTextureFoldersExport = new Object();
+  for (var folderName in dynamicTextureFolders){
+    dynamicTextureFoldersExport[folderName] = true;
+  }
+  this.dynamicTextureFolders = dynamicTextureFoldersExport;
   // SKYBOXES ******************************************************
   var skyBoxExport = new Object();
   this.totalSkyboxCount = 0;
