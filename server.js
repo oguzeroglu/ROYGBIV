@@ -497,6 +497,9 @@ function copyAssets(application){
     });
     console.log("[*] Copied a font: "+fontName);
   }
+  for (var folderName in application.dynamicTextureFolders){
+    copyFolderRecursiveSync("dynamic_textures/"+folderName, "deploy/"+application.projectName+"/dynamic_textures/");
+  }
 }
 
 function generateDeployDirectory(projectName, application){
@@ -513,6 +516,7 @@ function generateDeployDirectory(projectName, application){
   var hasTexturePacks = (Object.keys(application.texturePacks).length != 0);
   var hasSkyBoxes = (Object.keys(application.skyBoxes).length != 0);
   var hasFonts = (Object.keys(application.fonts).length != 0);
+  var hasDynamicTextureFolders = (Object.keys(application.dynamicTextureFolders) != 0);
   var hasTextureAtlas = application.textureAtlas.hasTextureAtlas;
   if (hasTexturePacks){
     fs.mkdirSync("deploy/"+projectName+"/texture_packs");
@@ -535,6 +539,12 @@ function generateDeployDirectory(projectName, application){
     console.log("[*] Project has merged textures to load.");
   }else{
     console.log("[*] Project has no fonts or texture atlas.");
+  }
+  if (hasDynamicTextureFolders){
+    fs.mkdirSync("deploy/"+projectName+"/dynamic_textures");
+    console.log("[*] Project has dynamic textures to load.");
+  }else{
+    console.log("[*] Project has no dynamic textures.");
   }
   return true;
 }
