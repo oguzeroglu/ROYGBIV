@@ -103,6 +103,8 @@ JobHandler.prototype.handle = function(previewModeCommand){
       this.handleDestroyContainerCommand();
     }else if (this.splitted[0] == "destroyvirtualkeyboard"){
       this.handleDestroyVirtualKeyboardCommand();
+    }else if (this.splitted[0] == "destroydynamictexturefolder"){
+      this.handleDestroyDynamicTextureFolderCommand();
     }
     if (jobHandlerRaycasterRefresh){
       refreshRaycaster(Text.JOB_COMPLETED, true);
@@ -113,6 +115,22 @@ JobHandler.prototype.handle = function(previewModeCommand){
   // because async
   if (this.splitted[0] != "autoConfigureArea".toLowerCase()){
     jobHandlerWorking = false;
+  }
+}
+
+JobHandler.prototype.handleDestroyDynamicTextureFolderCommand = function(){
+  var dynamicTextureFolderNamePrefix = this.splitted[1].split("*")[0];
+  var ctr = 0;
+  for (var folderName in dynamicTextureFolders){
+    if (folderName.startsWith(dynamicTextureFolderNamePrefix)){
+      parseCommand("destroyDynamicTextureFolder "+folderName);
+      ctr ++
+    }
+  }
+  if (ctr == 0){
+    terminal.printInfo(Text.NO_DYNAMIC_TEXTURE_FOLDERS_FOUND);
+  }else{
+    terminal.printInfo(Text.COMMAND_EXECUTED_FOR_X_DYNAMIC_TEXTURE_FOLDERS.replace(Text.PARAM1, ctr));
   }
 }
 

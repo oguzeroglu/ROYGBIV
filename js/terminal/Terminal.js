@@ -810,6 +810,14 @@ Terminal.prototype.autocomplete = function(command){
 				}
 				helpString = "[Resolution]: ";
 			break;
+			case commandDescriptor.DYNAMIC_TEXTURE_FOLDER_NAME:
+				for (var folderName in dynamicTextureFolders){
+					if (folderName.toLowerCase().startsWith(curEntry.toLowerCase())){
+						possibilities.push(folderName);
+					}
+				}
+				helpString = "[Dynamic texture folder name]: ";
+			break;
 		}
 
 		//  **********************************************************
