@@ -393,6 +393,7 @@ var activeVirtualKeyboard;
 var inputText;
 var dragCandidate;
 var dynamicTextureFolders = new Object();
+var dynamicallyLoadedTextures = [];
 
 // RENDER ORDERS
 var renderOrders = {

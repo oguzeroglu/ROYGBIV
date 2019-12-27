@@ -1,6 +1,11 @@
 var TexturePack = function(name, directoryName, textureDescription){
+  this.isTexturePack = true;
   this.totalLoadedCount = 0
   this.textureDescription = textureDescription;
+  if (!textureDescription){
+    this.isDynamic = true;
+    return;
+  }
   if (this.textureDescription.isAtlas){
     this.maxAttemptCount = 1;
     return this;
@@ -61,7 +66,7 @@ TexturePack.prototype.destroy = function(){
   if (this.hasHeight){
     this.heightTexture.dispose();
   }
-  if (!this.textureDescription.isAtlas){
+  if (!this.textureDescription.isAtlas && !this.isDynamic){
     delete texturePacks[this.name];
   }
 }
@@ -81,9 +86,9 @@ TexturePack.prototype.loadTexture = function(filePath, textureAttrName, textureA
     this[textureAttrName].wrapT = THREE.RepeatWrapping;
     this[textureAttrName].needsUpdate = true;
     this.onTextureLoaded(onLoaded);
-  }.bind(this), function(xhr){
-
-  }, function(xhr){
+  }.bind(this),
+  noop,
+  function(xhr){
     this[textureAvailibilityAttrName] = false;
     this.onTextureLoaded(onLoaded);
     console.error("[!] "+textureAttrName+" could not be loaded --> "+this.name);

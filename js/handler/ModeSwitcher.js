@@ -267,6 +267,10 @@ ModeSwitcher.prototype.switchFromPreviewToDesign = function(){
       objsToRemove.push(scene.children[i]);
     }
   }
+  for (var i = 0; i<dynamicallyLoadedTextures.length; i++){
+    dynamicallyLoadedTextures[i].destroy();
+  }
+  dynamicallyLoadedTextures = [];
   for (var i = 0; i<objsToRemove.length; i++){
     scene.remove(objsToRemove[i]);
   }
