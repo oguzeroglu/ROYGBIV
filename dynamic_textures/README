@@ -1,0 +1,8 @@
+This folder holds the dynamic textures, do not delete this folder.
+
+Dynamic textures are not automatically loaded when the app starts unlike the texture packs. They can be loaded with "loadDynamicTexture" scripting API.
+
+PNG is the supported default file extension. Texture compressions are handled automatically by ROYGBIV engine.
+
+You can load dynamic textures using the command:
+ "newDynamicTexture folderName"
