@@ -200,7 +200,8 @@ window.onload = function() {
     appendtoDeploymentConsole("Loading shaders.");
     console.log(
       "%c "+BANNERL1+"\n"+BANNERL2+"\n"+BANNERL3+"\n"+
-      BANNERL4+"\n"+BANNERL5 +"\n"+"by Oğuz Eroğlu - github.com/oguzeroglu",
+      BANNERL4+"\n"+BANNERL5 +"\n"+"                                         " 
+      + "\nby Oguz Eroglu - github.com/oguzeroglu   ",
       "background: black; color: lime"
     );
   }
