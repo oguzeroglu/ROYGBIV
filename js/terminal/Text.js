@@ -1004,4 +1004,6 @@ var Text = function(){
   this.ROYGBIV_SCRIPTING_API_CANCELSPRITEDRAG = "Cancels sprite dragging if there is an active sprite dragging.";
   this.ROYGBIV_SCRIPTING_API_GETSPRITEMARGINX = "Returns the marginX value of given sprite.";
   this.ROYGBIV_SCRIPTING_API_GETSPRITEMARGINY = "Returns the marginY value of given sprite.";
+  this.ROYGBIV_SCRIPTING_API_LOADDYNAMICTEXTURES = "Loads given textures inside provided dynamic texture folder. onLoadedCallback is executed with results parameter\nwhen the loading process is finished. This results parameter holds either a texture pack object as element\nif the texture could be loaded, or false if not. The order of elements of results parameter and textureNamesArray\nare the same." +
+                                                   " ROYGBIV engine automatically takes care of caching, so a texture is not loaded twice from the same path.";
 }

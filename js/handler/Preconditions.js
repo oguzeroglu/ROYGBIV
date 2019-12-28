@@ -242,6 +242,9 @@ var Preconditions = function(){
   this.value = "value";
   this.widthPercent = "widthPercent";
   this.heightPercent = "heightPercent";
+  this.dynamicTextureFolderName = "dynamicTextureFolderName";
+  this.textureNamesArray = "textureNamesArray";
+  this.onLoadedCallback = "onLoadedCallback";
 }
 
 Preconditions.prototype.errorHeader = function(callerFunc){
@@ -267,6 +270,29 @@ Preconditions.prototype.checkIfSceneExists = function(callerFunc, sceneName){
 Preconditions.prototype.checkIfAreaExists = function(callerFunc, areaName){
   if (!areas[areaName] && areaName !== "default"){
     this.throw(callerFunc, "Area does not exist.");
+  }
+}
+
+Preconditions.prototype.checkIfArrayOfStrings = function(callerFunc, paramName, param){
+  var result = true;
+  if (!Array.isArray(param)){
+    result = false;
+  }else{
+    for (var i = 0; i<param.length; i++){
+      if (!(typeof param[i] == "string")){
+        result = false;
+        break;
+      }
+    }
+  }
+  if (!result){
+    this.throw(callerFunc, paramName+" is not an array of strings.");
+  }
+}
+
+Preconditions.prototype.checkIfDynamicTextureFolderExists = function(callerFunc, dynamicTextureFolderName){
+  if (!dynamicTextureFolders[dynamicTextureFolderName]){
+    this.throw(callerFunc, "Dynamic texture folder is not created.");
   }
 }
 

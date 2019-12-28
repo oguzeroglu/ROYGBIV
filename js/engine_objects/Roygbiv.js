@@ -254,7 +254,8 @@ var Roygbiv = function(){
     "isDefined",
     "cancelSpriteDrag",
     "getSpriteMarginX",
-    "getSpriteMarginY"
+    "getSpriteMarginY",
+    "loadDynamicTextures"
   ];
 
   this.globals = new Object();
@@ -3978,4 +3979,22 @@ Roygbiv.prototype.isDefined = function(element){
     return;
   }
   return !(typeof element == UNDEFINED) && !(element == null);
+}
+
+// Loads given textures inside provided dynamic texture folder. onLoadedCallback is executed
+// with results parameter when the loading process is finished. This results parameter holds either
+// a texture pack object as element if the texture could be loaded, or false if not. The order of
+// elements of results parameter and textureNamesArray are the same. ROYGBIV engine automatically takes care of
+// caching, so a texture is not loaded twice from the same path.
+Roygbiv.prototype.loadDynamicTextures = function(dynamicTextureFolderName, textureNamesArray, onLoadedCallback){
+  if (mode == 0){
+    return;
+  }
+  preConditions.checkIfDefined(ROYGBIV.loadDynamicTextures, preConditions.dynamicTextureFolderName, dynamicTextureFolderName);
+  preConditions.checkIfDefined(ROYGBIV.loadDynamicTextures, preConditions.textureNamesArray, textureNamesArray);
+  preConditions.checkIfDefined(ROYGBIV.loadDynamicTextures, preConditions.onLoadedCallback, onLoadedCallback);
+  preConditions.checkIfDynamicTextureFolderExists(ROYGBIV.loadDynamicTextures, dynamicTextureFolderName);
+  preConditions.checkIfArrayOfStrings(ROYGBIV.loadDynamicTextures, preConditions.textureNamesArray, textureNamesArray);
+  preConditions.checkIfFunctionOnlyIfExists(ROYGBIV.loadDynamicTextures, preConditions.onLoadedCallback, onLoadedCallback);
+  new DynamicTextureLoader().loadDynamicTextures(dynamicTextureFolderName, textureNamesArray, onLoadedCallback);
 }

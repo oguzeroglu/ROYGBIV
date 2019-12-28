@@ -10,16 +10,21 @@ DynamicTextureLoader.prototype.loadDynamicTextures = function(folderName, textur
   for (var i = 0; i<textureNames.length; i++){
     this.results.push(false)
     var path = "./dynamic_textures/"+folderName+"/"+textureNames[i] + textureLoaderFactory.getFilePostfix();
-    loader.load(path, function(textureData){
-      var texturePack = this.context.createTexturePack(textureData);
-      this.context.results[this.index] = texturePack;
-      dynamicallyLoadedTextures.push(texturePack);
-      this.context.onTextureLoaded();
-    }.bind({index: i, context: this}),
-    noop, 
-    function(){
-      this.context.onTextureLoaded();
-    }.bind({context: this}));
+    if (dynamicallyLoadedTextures[path]){
+      this.results[i] = dynamicallyLoadedTextures[path];
+      this.onTextureLoaded();
+    }else{
+      loader.load(path, function(textureData){
+        var texturePack = this.context.createTexturePack(textureData);
+        this.context.results[this.index] = texturePack;
+        dynamicallyLoadedTextures[this.path] = texturePack;
+        this.context.onTextureLoaded();
+      }.bind({index: i, context: this, path: path}),
+      noop,
+      function(){
+        this.context.onTextureLoaded();
+      }.bind({context: this}));
+    }
   }
 }
 
