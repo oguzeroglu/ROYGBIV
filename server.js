@@ -183,9 +183,9 @@ app.post("/prepareDynamicTextures", async function(req, res){
     if (files[i].toLowerCase().endsWith(".png")){
       var fileName = files[i].split(".")[0];
       for (var i2 = 0; i2<types.length; i2++){
-        var result = await compressTexture(types[i2], fileName, path, false, false);
+        var result = await compressTexture(types[i2], fileName, path, true, false, false);
         if (result == "UNSUCC"){
-          result = await compressTexture(types[i2], fileName, path, true, false);
+          result = await compressTexture(types[i2], fileName, path, true, true, false);
           if (result == "UNSUCC"){
             res.send(JSON.stringify({errorFile: files[i]}));
             return;

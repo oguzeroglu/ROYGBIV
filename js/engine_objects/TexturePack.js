@@ -66,7 +66,7 @@ TexturePack.prototype.destroy = function(){
   if (this.hasHeight){
     this.heightTexture.dispose();
   }
-  if (!this.textureDescription.isAtlas && !this.isDynamic){
+  if (this.textureDescription && !this.textureDescription.isAtlas && !this.isDynamic){
     delete texturePacks[this.name];
   }
 }

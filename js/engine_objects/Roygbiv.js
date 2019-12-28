@@ -3151,17 +3151,23 @@ Roygbiv.prototype.disableSpriteDragging = function(sprite){
   sprite.draggingDisabled = true;
 }
 
-// Maps a texture pack to given sprite.
-Roygbiv.prototype.mapTextureToSprite = function(sprite, texturePackName){
+// Maps a texture pack to given sprite. The texturePackOrName parameter
+// can be the name of a tetxure pack or the texture pack itself if loaded
+// with loadDynamicTextures API.
+Roygbiv.prototype.mapTextureToSprite = function(sprite, texturePackOrName){
   if (mode == 0){
     return;
   }
   preConditions.checkIfDefined(ROYGBIV.mapTextureToSprite, preConditions.sprite, sprite);
-  preConditions.checkIfDefined(ROYGBIV.mapTextureToSprite, preConditions.texturePackName, texturePackName);
+  preConditions.checkIfDefined(ROYGBIV.mapTextureToSprite, preConditions.texturePackOrName, texturePackOrName);
   preConditions.checkIfSprite(ROYGBIV.disableSpriteDragging, preConditions.sprite, sprite);
   preConditions.checkIfSpriteInsideActiveScene(ROYGBIV.disableSpriteDragging, sprite);
-  preConditions.checkIfTexturePackExists(ROYGBIV.disableSpriteDragging, texturePackName);
-  sprite.mapTexture(texturePacks[texturePackName]);
+  if (texturePackOrName.isTexturePack){
+    sprite.mapTexture(texturePackOrName);
+  }else{
+    preConditions.checkIfTexturePackExists(ROYGBIV.disableSpriteDragging, texturePackOrName);
+    sprite.mapTexture(texturePacks[texturePackOrName]);
+  }
 }
 
 // CONTAINER FUNCTIONS *********************************************************
