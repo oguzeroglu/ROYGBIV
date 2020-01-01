@@ -5268,6 +5268,32 @@ function parse(input){
           terminal.printInfo(Text.PROTOCOL_DEFINITION_WILL_BE_LOADED_FROM.replace(Text.PARAM1, "/protocol_definitions/"+protocolDefinitionFileName));
           return true;
         break;
+        case 222: //setWSServerURL
+          if (mode != 0){
+            terminal.printError(Text.WORKS_ONLY_IN_DESIGN_MODE);
+            return true;
+          }
+          serverWSURL = splitted[1];
+          terminal.printInfo(Text.SERVER_WS_URL_SET);
+          return true;
+        break;
+        case 223: //resetWSServerURL
+          if (mode != 0){
+            terminal.printError(Text.WORKS_ONLY_IN_DESIGN_MODE);
+            return true;
+          }
+          serverWSURL = 0;
+          terminal.printInfo(Text.SERVER_WS_URL_RESET);
+          return true;
+        break;
+        case 224: //printWSServerURL
+          if (serverWSURL){
+            terminal.printInfo(Text.SERVER_WS_URL_IS.replace(Text.PARAM1, serverWSURL));
+          }else{
+            terminal.printError(Text.SERVER_WS_URL_IS_NOT_SET);
+          }
+          return true;
+        break;
       }
       return true;
     }catch(err){

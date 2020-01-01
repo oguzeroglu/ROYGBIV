@@ -222,7 +222,10 @@ var CommandDescriptor = function(){
       0, //printDynamicTextureFolders
       1, //setProtocolDefinition
       0, //resetProtocolDefinition
-      0 //printProtocolDefinition
+      0, //printProtocolDefinition
+      1, //setWSServerURL
+      0, //resetWSServerURL
+      0 //printWSServerURL
   ];
 
   this.commandArgumentsExpectedExplanation = [
@@ -447,7 +450,10 @@ var CommandDescriptor = function(){
     "printDynamicTextureFolders",
     "setProtocolDefinition protocolDefinitionFileName",
     "resetProtocolDefinition",
-    "printProtocolDefinition"
+    "printProtocolDefinition",
+    "setWSServerURL serverURL",
+    "resetWSServerURL",
+    "printWSServerURL"
   ];
 
   this.commands = [
@@ -672,7 +678,10 @@ var CommandDescriptor = function(){
     "printDynamicTextureFolders",
     "setProtocolDefinition",
     "resetProtocolDefinition",
-    "printProtocolDefinition"
+    "printProtocolDefinition",
+    "setWSServerURL",
+    "resetWSServerURL",
+    "printWSServerURL"
   ];
 
   this.commandInfo = [
@@ -897,7 +906,10 @@ var CommandDescriptor = function(){
     "printDynamicTextureFolders: Prints dynamic texture folders.",
     "setProtocolDefinition: Sets a protocol definition from protocol_definitions folder.",
     "resetProtocolDefinition: Resets the protocol definition file path.",
-    "printProtocolDefinition: Prints the protocol definition file path."
+    "printProtocolDefinition: Prints the protocol definition file path.",
+    "setWSServerURL: Sets the WebSocket URL of the game server.",
+    "resetWSServerURL: Resets the WebSocket URL of the game server.",
+    "printWSServerURL: Prints the set WebSocket URL of the game server."
   ];
 
   this.keyboardInfo = [
@@ -1667,6 +1679,11 @@ var CommandDescriptor = function(){
   this.setProtocolDefinition = new Object();
   this.setProtocolDefinition.types = [];
   this.setProtocolDefinition.types.push(this.UNKNOWN_INDICATOR); //protocolDefinitionFileName
+
+  // setWSServerURL
+  this.setWSServerURL = new Object();
+  this.setWSServerURL.types = [];
+  this.setWSServerURL.types.push(this.UNKNOWN_INDICATOR); //serverURL
 };
 
 CommandDescriptor.prototype.test = function(){

@@ -587,6 +587,10 @@ var Text = function(){
   this.AREA_CONFIGURATIONS_ARE_STARTED = "Area configurations handling is started.";
   this.THIS_SCRIPT_IS_UPLOADED = "This script is uploaded from the local file system. Make your modifications locally."
   this.PREPARING_OBJECT = "Creating KTree of @@1";
+  this.SERVER_WS_URL_SET = "Server WS URL set.";
+  this.SERVER_WS_URL_IS_NOT_SET = "Server WS URL is not set.";
+  this.SERVER_WS_URL_IS = "Server WS URL is: @@1.";
+  this.SERVER_WS_URL_RESET = "Server WS URL reset.";
   this.OBJECT_MUST_BE_IN_THE_SAME_GRIDSYSTEM = "Glued objects must be in the same grid system.";
   this.CREATING_X_GRIDS = "Creating @@1 grids.";
   this.TEXTURE_REPEAT_U_MUST_BE_A_POSITIVE_NUMBER = "repeatU must be a positive number.";
@@ -1011,4 +1015,5 @@ var Text = function(){
   this.ROYGBIV_SCRIPTING_API_GETSPRITEMARGINY = "Returns the marginY value of given sprite.";
   this.ROYGBIV_SCRIPTING_API_LOADDYNAMICTEXTURES = "Loads given textures inside provided dynamic texture folder. onLoadedCallback is executed with results parameter\nwhen the loading process is finished. This results parameter holds either a texture pack object as element\nif the texture could be loaded, or false if not. The order of elements of results parameter and textureNamesArray\nare the same." +
                                                    " ROYGBIV engine automatically takes care of caching, so a texture is not loaded twice from the same path.";
+  this.ROYGBIV_SCRIPTING_API_CONNECTTOSERVER = "Connects to a game server, the URL of which is set by setWSServerURL CLI command. The server and the client interacts through\nRhubarb protocol definition files, the path of which is set by setProtocolDefinition CLI command. onReady callback parameter is\nexecuted when the connection is established. onError is executed with errorReason parameter in case there is an error\nestablishing the connection.";
 }

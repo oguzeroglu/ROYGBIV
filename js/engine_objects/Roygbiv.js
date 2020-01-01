@@ -20,6 +20,7 @@
 //  * Container functions
 //  * Virtual keyboard functions
 //  * Script related functions
+//  * Networking functions
 var Roygbiv = function(){
   this.functionNames = [
     "getObject",
@@ -255,7 +256,8 @@ var Roygbiv = function(){
     "cancelSpriteDrag",
     "getSpriteMarginX",
     "getSpriteMarginY",
-    "loadDynamicTextures"
+    "loadDynamicTextures",
+    "connectToServer"
   ];
 
   this.globals = new Object();
@@ -3324,6 +3326,32 @@ Roygbiv.prototype.cancelSpriteDrag = function(){
     draggingSprite = false;
   }
   dragCandidate = false;
+}
+
+// NETWORKING FUNCTIONS ********************************************************
+
+// Connects to a game server, the URL of which is set by setWSServerURL CLI
+// command. The server and the client interacts through Rhubarb protocol
+// definition files, the path of which is set by setProtocolDefinition CLI
+// command. onReady callback parameter is executed when the connection is
+// established. onError is executed with errorReason parameter in case
+// there is an error establishing the connection.
+Roygbiv.prototype.connectToServer = function(onReady, onError){
+  if (mode == 0){
+    return;
+  }
+  preConditions.checkMultiplayerContext(ROYGBIV.connectToServer);
+  preConditions.checkIfDefined(ROYGBIV.connectToServer, preConditions.onReady, onReady);
+  preConditions.checkIfDefined(ROYGBIV.connectToServer, preConditions.onError, onError);
+  preConditions.checkIfFunctionOnlyIfExists(ROYGBIV.connectToServer, preConditions.onReady, onReady);
+  preConditions.checkIfFunctionOnlyIfExists(ROYGBIV.connectToServer, preConditions.onError, onError);
+  Rhubarb.init({
+    protocolDefinitionPath: "/protocol_definitions/" + protocolDefinitionFileName,
+    workerPath: (isDeployment? "./worker/RhubarbWorker.min.js": "/js/third_party/RhubarbWorker.min.js"),
+    serverAddress: serverWSURL,
+    onReady: onReady,
+    onError: onError
+  });
 }
 
 // UTILITY FUNCTIONS ***********************************************************

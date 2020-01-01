@@ -189,4 +189,6 @@ var State = function(projectName, author){
   this.scenes = sceneHandler.export();
   // PROTOCOL DEFINITION FILE NAME *********************************
   this.protocolDefinitionFileName = protocolDefinitionFileName;
+  // WS SERVER URL *************************************************
+  this.serverWSURL = serverWSURL;
 }

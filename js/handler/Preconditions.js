@@ -245,6 +245,8 @@ var Preconditions = function(){
   this.dynamicTextureFolderName = "dynamicTextureFolderName";
   this.textureNamesArray = "textureNamesArray";
   this.onLoadedCallback = "onLoadedCallback";
+  this.onReady = "onReady";
+  this.onError = "onError";
 }
 
 Preconditions.prototype.errorHeader = function(callerFunc){
@@ -253,6 +255,15 @@ Preconditions.prototype.errorHeader = function(callerFunc){
 
 Preconditions.prototype.throw = function(callerFunc, errorMsg){
   throw new Error(this.errorHeader(callerFunc)+" ["+errorMsg+"]");
+}
+
+Preconditions.prototype.checkMultiplayerContext = function(callerFunc){
+  if (!serverWSURL){
+    this.throw(callerFunc, "Server WS URL not set. Use setWSServerURL CLI command.");
+  }
+  if (!protocolDefinitionFileName){
+    this.throw(callerFunc, "Protocol definition file not set. Use setProtocolDefinition CLI command.");
+  }
 }
 
 Preconditions.prototype.checkIfTexturePackExists = function(callerFunc, texturePackName){
