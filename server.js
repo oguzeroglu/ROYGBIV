@@ -407,6 +407,9 @@ function copyWorkers(application){
   fs.writeFileSync("deploy/"+application.projectName+"/js/worker/PhysicsWorker.js", physicsWorkerContent);
   fs.writeFileSync("deploy/"+application.projectName+"/js/worker/LightningWorker.js", lightningWorkerContent);
   fs.writeFileSync("deploy/"+application.projectName+"/js/worker/WorkerImport.js", workerImportContent);
+
+  var rhubarbWorkerContent = fs.readFileSync("./js/third_party/RhubarbWorker.min.js", "utf8");
+  fs.writeFileSync("deploy/"+application.projectName+"/js/worker/RhubarbWorker.min.js", rhubarbWorkerContent);
 }
 
 function handleScripts(application, engineScriptsConcatted){
