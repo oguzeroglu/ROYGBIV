@@ -261,7 +261,8 @@ var Roygbiv = function(){
     "clearServerConnection",
     "onDisconnectedFromServer",
     "sendToServer",
-    "onReceivedFromServer"
+    "onReceivedFromServer",
+    "onLatencyUpdated"
   ];
 
   this.globals = new Object();
@@ -3408,6 +3409,17 @@ Roygbiv.prototype.onReceivedFromServer = function(protocolName, callbackFunction
   preConditions.checkIfDefined(ROYGBIV.onReceivedFromServer, preConditions.callbackFunction, callbackFunction);
   preConditions.checkIfFunctionOnlyIfExists(ROYGBIV.onReceivedFromServer, preConditions.callbackFunction, callbackFunction);
   Rhubarb.onReceived(protocolName, callbackFunction);
+}
+
+// Listens for latency between the server and the client. The callbackFunction is
+// executed with newLatency (in ms) parameter when the latency is updated.
+Roygbiv.prototype.onLatencyUpdated = function(callbackFunction){
+  if (mode == 0){
+    return;
+  }
+  preConditions.checkIfDefined(ROYGBIV.onLatencyUpdated, preConditions.callbackFunction, callbackFunction);
+  preConditions.checkIfFunctionOnlyIfExists(ROYGBIV.onLatencyUpdated, preConditions.callbackFunction, callbackFunction);
+  Rhubarb.onLatencyUpdated(callbackFunction);
 }
 
 // UTILITY FUNCTIONS ***********************************************************
