@@ -1,0 +1,5 @@
+This file holds RHUBARB protocol definition files. Do not delete this folder.
+
+Read here for the file format: https://github.com/oguzeroglu/Rhubarb/wiki/Protocol-definition-files
+
+Use "setProtocolDefinition" CLI command to load files from this directory.
