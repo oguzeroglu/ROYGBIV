@@ -43,4 +43,4 @@ DynamicTextureLoader.prototype.onTextureLoaded = function(){
   if (this.totalLoadedCount == this.targetCount){
     this.onComplete(this.results);
   }
-}
+};
