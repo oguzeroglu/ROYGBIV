@@ -247,6 +247,8 @@ var Preconditions = function(){
   this.onLoadedCallback = "onLoadedCallback";
   this.onReady = "onReady";
   this.onError = "onError";
+  this.protocolName = "protocolName";
+  this.valuesByParameterName = "valuesByParameterName";
 }
 
 Preconditions.prototype.errorHeader = function(callerFunc){

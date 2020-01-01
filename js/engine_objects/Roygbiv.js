@@ -258,8 +258,10 @@ var Roygbiv = function(){
     "getSpriteMarginY",
     "loadDynamicTextures",
     "connectToServer",
-    "disconnectFromServer",
-    "onDisconnectedFromServer"
+    "clearServerConnection",
+    "onDisconnectedFromServer",
+    "sendToServer",
+    "onReceivedFromServer"
   ];
 
   this.globals = new Object();
@@ -3356,9 +3358,9 @@ Roygbiv.prototype.connectToServer = function(onReady, onError){
   });
 }
 
-// Disconnects from server also clears all networking related callbacks.
+// Disconnects from server and clears Rhubarb context.
 // Does nothing if not connected to server.
-Roygbiv.prototype.disconnectFromServer = function(){
+Roygbiv.prototype.clearServerConnection = function(){
   if (mode == 0){
     return;
   }
@@ -3369,6 +3371,8 @@ Roygbiv.prototype.disconnectFromServer = function(){
 
 // Sets a listener for server connection status. The callbackFunction
 // is executed when the connection between the server and the client is lost.
+// If client needs to try reconnecting, ROYGBIV.clearServerConnection API needs
+// to be used before ROYGBIV.connectFromServer.
 Roygbiv.prototype.onDisconnectedFromServer = function(callbackFunction){
   if (mode == 0){
     return;
@@ -3376,6 +3380,34 @@ Roygbiv.prototype.onDisconnectedFromServer = function(callbackFunction){
   preConditions.checkIfDefined(ROYGBIV.onDisconnectedFromServer, preConditions.callbackFunction, callbackFunction);
   preConditions.checkIfFunctionOnlyIfExists(ROYGBIV.onDisconnectedFromServer, preConditions.callbackFunction, callbackFunction);
   Rhubarb.onDisconnectedFromServer(callbackFunction);
+}
+
+// Sends a message from the server. protocolName is the protocol name defined
+// in protocol definition file. valuesByParameterName is an object containing
+// values to be send by protocol parameter names. Read
+// https://github.com/oguzeroglu/Rhubarb/wiki/API-reference#send for more info.
+Roygbiv.prototype.sendToServer = function(protocolName, valuesByParameterName){
+  if (mode == 0){
+    return;
+  }
+  preConditions.checkIfDefined(ROYGBIV.sendToServer, preConditions.protocolName, protocolName);
+  preConditions.checkIfDefined(ROYGBIV.sendToServer, preConditions.valuesByParameterName, valuesByParameterName);
+  Rhubarb.send(protocolName, valuesByParameterName);
+}
+
+// Listens to server for given protocol and executes callbackFunction when a message
+// received. The callbackFunction is executed with getter parameter. getter is a function
+// which expects a protocol parameter name as input and returns received value
+// for that parameter. Read https://github.com/oguzeroglu/Rhubarb/wiki/API-reference#onReceived
+// for more info.
+Roygbiv.prototype.onReceivedFromServer = function(protocolName, callbackFunction){
+  if (mode == 0){
+    return;
+  }
+  preConditions.checkIfDefined(ROYGBIV.onReceivedFromServer, preConditions.protocolName, protocolName);
+  preConditions.checkIfDefined(ROYGBIV.onReceivedFromServer, preConditions.callbackFunction, callbackFunction);
+  preConditions.checkIfFunctionOnlyIfExists(ROYGBIV.onReceivedFromServer, preConditions.callbackFunction, callbackFunction);
+  Rhubarb.onReceived(protocolName, callbackFunction);
 }
 
 // UTILITY FUNCTIONS ***********************************************************
