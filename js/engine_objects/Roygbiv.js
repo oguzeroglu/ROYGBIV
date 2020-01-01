@@ -257,7 +257,9 @@ var Roygbiv = function(){
     "getSpriteMarginX",
     "getSpriteMarginY",
     "loadDynamicTextures",
-    "connectToServer"
+    "connectToServer",
+    "disconnectFromServer",
+    "onDisconnectedFromServer"
   ];
 
   this.globals = new Object();
@@ -3352,6 +3354,28 @@ Roygbiv.prototype.connectToServer = function(onReady, onError){
     onReady: onReady,
     onError: onError
   });
+}
+
+// Disconnects from server also clears all networking related callbacks.
+// Does nothing if not connected to server.
+Roygbiv.prototype.disconnectFromServer = function(){
+  if (mode == 0){
+    return;
+  }
+  try{
+    Rhubarb.destroy();
+  }catch(err){}
+}
+
+// Sets a listener for server connection status. The callbackFunction
+// is executed when the connection between the server and the client is lost.
+Roygbiv.prototype.onDisconnectedFromServer = function(callbackFunction){
+  if (mode == 0){
+    return;
+  }
+  preConditions.checkIfDefined(ROYGBIV.onDisconnectedFromServer, preConditions.callbackFunction, callbackFunction);
+  preConditions.checkIfFunctionOnlyIfExists(ROYGBIV.onDisconnectedFromServer, preConditions.callbackFunction, callbackFunction);
+  Rhubarb.onDisconnectedFromServer(callbackFunction);
 }
 
 // UTILITY FUNCTIONS ***********************************************************
