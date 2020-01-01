@@ -220,7 +220,9 @@ var CommandDescriptor = function(){
       1, //newDynamicTextureFolder
       1, //destroyDynamicTextureFolder
       0, //printDynamicTextureFolders
-      1 //setProtocolDefinition
+      1, //setProtocolDefinition
+      0, //resetProtocolDefinition
+      0 //printProtocolDefinition
   ];
 
   this.commandArgumentsExpectedExplanation = [
@@ -443,7 +445,9 @@ var CommandDescriptor = function(){
     "newDynamicTextureFolder folderName",
     "destroyDynamicTextureFolder dynamicTextureFolderName",
     "printDynamicTextureFolders",
-    "setProtocolDefinition protocolDefinitionFileName"
+    "setProtocolDefinition protocolDefinitionFileName",
+    "resetProtocolDefinition",
+    "printProtocolDefinition"
   ];
 
   this.commands = [
@@ -666,7 +670,9 @@ var CommandDescriptor = function(){
     "newDynamicTextureFolder",
     "destroyDynamicTextureFolder",
     "printDynamicTextureFolders",
-    "setProtocolDefinition"
+    "setProtocolDefinition",
+    "resetProtocolDefinition",
+    "printProtocolDefinition"
   ];
 
   this.commandInfo = [
@@ -889,7 +895,9 @@ var CommandDescriptor = function(){
     "newDynamicTextureFolder: Compresses each PNG under dynamic_textures/folderName to be used as dynamic texture.",
     "destroyDynamicTextureFolder: Destroys a dynamic texture folder.",
     "printDynamicTextureFolders: Prints dynamic texture folders.",
-    "setProtocolDefinition: Sets a protocol definition from protocol_definitions folder."
+    "setProtocolDefinition: Sets a protocol definition from protocol_definitions folder.",
+    "resetProtocolDefinition: Resets the protocol definition file path.",
+    "printProtocolDefinition: Prints the protocol definition file path."
   ];
 
   this.keyboardInfo = [

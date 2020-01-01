@@ -5251,6 +5251,23 @@ function parse(input){
           }.bind({fileName: fileName})
           xhr.send(JSON.stringify({fileName: fileName}));
         break;
+        case 220: //resetProtocolDefinition
+          if (mode != 0){
+            terminal.printError(Text.WORKS_ONLY_IN_DESIGN_MODE);
+            return true;
+          }
+          protocolDefinitionFileName = 0;
+          terminal.printInfo(Text.PROTOCOL_DEFINITION_FILE_RESET);
+          return true;
+        break;
+        case 221: //printProtocolDefinition
+          if (!protocolDefinitionFileName){
+            terminal.printError(Text.PROTOCOL_DEFINITION_FILE_IS_NOT_SET);
+            return true;
+          }
+          terminal.printInfo(Text.PROTOCOL_DEFINITION_WILL_BE_LOADED_FROM.replace(Text.PARAM1, "/protocol_definitions/"+protocolDefinitionFileName));
+          return true;
+        break;
       }
       return true;
     }catch(err){
