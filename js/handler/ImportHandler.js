@@ -73,6 +73,8 @@ ImportHandler.prototype.importEngineVariables = function(obj){
     }
     markedPoints[markedPointName] = markedPoint;
   }
+  protocolDefinitionFileName = obj.protocolDefinitionFileName;
+  serverWSURL = obj.serverWSURL;
 }
 
 ImportHandler.prototype.importGridSystems = function(obj){

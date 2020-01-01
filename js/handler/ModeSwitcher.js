@@ -255,6 +255,9 @@ ModeSwitcher.prototype.switchFromDesignToPreview = function(){
 }
 
 ModeSwitcher.prototype.switchFromPreviewToDesign = function(){
+  try{
+    Rhubarb.destroy();
+  }catch(err){}
   history.replaceState(null, null, ' ');
   if (inputText){
     inputText.deactivateInputMode();

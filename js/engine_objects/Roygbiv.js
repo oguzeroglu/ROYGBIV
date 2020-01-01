@@ -20,6 +20,7 @@
 //  * Container functions
 //  * Virtual keyboard functions
 //  * Script related functions
+//  * Networking functions
 var Roygbiv = function(){
   this.functionNames = [
     "getObject",
@@ -255,7 +256,13 @@ var Roygbiv = function(){
     "cancelSpriteDrag",
     "getSpriteMarginX",
     "getSpriteMarginY",
-    "loadDynamicTextures"
+    "loadDynamicTextures",
+    "connectToServer",
+    "clearServerConnection",
+    "onDisconnectedFromServer",
+    "sendToServer",
+    "onReceivedFromServer",
+    "onLatencyUpdated"
   ];
 
   this.globals = new Object();
@@ -3324,6 +3331,95 @@ Roygbiv.prototype.cancelSpriteDrag = function(){
     draggingSprite = false;
   }
   dragCandidate = false;
+}
+
+// NETWORKING FUNCTIONS ********************************************************
+
+// Connects to a game server, the URL of which is set by setWSServerURL CLI
+// command. The server and the client interacts through Rhubarb protocol
+// definition files, the path of which is set by setProtocolDefinition CLI
+// command. onReady callback parameter is executed when the connection is
+// established. onError is executed with errorReason parameter in case
+// there is an error establishing the connection.
+Roygbiv.prototype.connectToServer = function(onReady, onError){
+  if (mode == 0){
+    return;
+  }
+  preConditions.checkMultiplayerContext(ROYGBIV.connectToServer);
+  preConditions.checkIfDefined(ROYGBIV.connectToServer, preConditions.onReady, onReady);
+  preConditions.checkIfDefined(ROYGBIV.connectToServer, preConditions.onError, onError);
+  preConditions.checkIfFunctionOnlyIfExists(ROYGBIV.connectToServer, preConditions.onReady, onReady);
+  preConditions.checkIfFunctionOnlyIfExists(ROYGBIV.connectToServer, preConditions.onError, onError);
+  Rhubarb.init({
+    protocolDefinitionPath: "/protocol_definitions/" + protocolDefinitionFileName,
+    workerPath: (isDeployment? "./worker/RhubarbWorker.min.js": "/js/third_party/RhubarbWorker.min.js"),
+    serverAddress: serverWSURL,
+    onReady: onReady,
+    onError: onError
+  });
+}
+
+// Disconnects from server and clears Rhubarb context.
+// Does nothing if not connected to server.
+Roygbiv.prototype.clearServerConnection = function(){
+  if (mode == 0){
+    return;
+  }
+  try{
+    Rhubarb.destroy();
+  }catch(err){}
+}
+
+// Sets a listener for server connection status. The callbackFunction
+// is executed when the connection between the server and the client is lost.
+// If client needs to try reconnecting, ROYGBIV.clearServerConnection API needs
+// to be used before ROYGBIV.connectFromServer.
+Roygbiv.prototype.onDisconnectedFromServer = function(callbackFunction){
+  if (mode == 0){
+    return;
+  }
+  preConditions.checkIfDefined(ROYGBIV.onDisconnectedFromServer, preConditions.callbackFunction, callbackFunction);
+  preConditions.checkIfFunctionOnlyIfExists(ROYGBIV.onDisconnectedFromServer, preConditions.callbackFunction, callbackFunction);
+  Rhubarb.onDisconnectedFromServer(callbackFunction);
+}
+
+// Sends a message from the server. protocolName is the protocol name defined
+// in protocol definition file. valuesByParameterName is an object containing
+// values to be send by protocol parameter names. Read
+// https://github.com/oguzeroglu/Rhubarb/wiki/API-reference#send for more info.
+Roygbiv.prototype.sendToServer = function(protocolName, valuesByParameterName){
+  if (mode == 0){
+    return;
+  }
+  preConditions.checkIfDefined(ROYGBIV.sendToServer, preConditions.protocolName, protocolName);
+  preConditions.checkIfDefined(ROYGBIV.sendToServer, preConditions.valuesByParameterName, valuesByParameterName);
+  Rhubarb.send(protocolName, valuesByParameterName);
+}
+
+// Listens to server for given protocol and executes callbackFunction when a message
+// received. The callbackFunction is executed with getter parameter. getter is a function
+// which expects a protocol parameter name as input and returns received value
+// for that parameter. Read https://github.com/oguzeroglu/Rhubarb/wiki/API-reference#onReceived
+// for more info.
+Roygbiv.prototype.onReceivedFromServer = function(protocolName, callbackFunction){
+  if (mode == 0){
+    return;
+  }
+  preConditions.checkIfDefined(ROYGBIV.onReceivedFromServer, preConditions.protocolName, protocolName);
+  preConditions.checkIfDefined(ROYGBIV.onReceivedFromServer, preConditions.callbackFunction, callbackFunction);
+  preConditions.checkIfFunctionOnlyIfExists(ROYGBIV.onReceivedFromServer, preConditions.callbackFunction, callbackFunction);
+  Rhubarb.onReceived(protocolName, callbackFunction);
+}
+
+// Listens for latency between the server and the client. The callbackFunction is
+// executed with newLatency (in ms) parameter when the latency is updated.
+Roygbiv.prototype.onLatencyUpdated = function(callbackFunction){
+  if (mode == 0){
+    return;
+  }
+  preConditions.checkIfDefined(ROYGBIV.onLatencyUpdated, preConditions.callbackFunction, callbackFunction);
+  preConditions.checkIfFunctionOnlyIfExists(ROYGBIV.onLatencyUpdated, preConditions.callbackFunction, callbackFunction);
+  Rhubarb.onLatencyUpdated(callbackFunction);
 }
 
 // UTILITY FUNCTIONS ***********************************************************

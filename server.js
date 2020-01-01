@@ -44,6 +44,7 @@ app.post("/build", function(req, res){
     fs.writeFileSync("deploy/"+req.body.projectName+"/js/application.json", JSON.stringify(req.body));
     copyAssets(req.body);
     copyWorkers(req.body);
+    copyProtocolDefinitionFile(req.body);
   }catch (err){
     res.send(JSON.stringify({"error": "Build error: "+err.message}));
     throw new Error(err);
@@ -300,6 +301,16 @@ app.post("/compressFont", async function(req, res){
   res.send(JSON.stringify({error: false}));
 });
 
+app.post("/checkProtocolDefinitionFile", function(req, res){
+  console.log("[*] Checking protocol definition file.");
+  var fileName = req.body.fileName;
+  if (!fs.existsSync("./protocol_definitions/"+fileName)){
+    res.send(JSON.stringify({error: true}));
+  }else{
+    res.send(JSON.stringify({error: false}));
+  }
+});
+
 function getScriptsInFolder(curPath, obj){
   var files = fs.readdirSync(curPath);
   for (var i = 0; i<files.length; i++){
@@ -360,6 +371,15 @@ function compressTexture(type, fileName, mainPath, flipY, useJPG, overwrite){
   });
 }
 
+function copyProtocolDefinitionFile(application){
+  if (!application.protocolDefinitionFileName){
+    return;
+  }
+  fs.mkdirSync("deploy/"+application.projectName+"/protocol_definitions/");
+  var protocolDefinition = fs.readFileSync("./protocol_definitions/"+application.protocolDefinitionFileName, "utf8");
+  fs.writeFileSync("deploy/"+application.projectName+"/protocol_definitions/" + application.protocolDefinitionFileName, protocolDefinition);
+}
+
 function copyWorkers(application){
   fs.mkdirSync("deploy/"+application.projectName+"/js/worker/");
   var raycasterWorkerContent = fs.readFileSync("./js/worker/RaycasterWorker.js", "utf8");
@@ -407,6 +427,9 @@ function copyWorkers(application){
   fs.writeFileSync("deploy/"+application.projectName+"/js/worker/PhysicsWorker.js", physicsWorkerContent);
   fs.writeFileSync("deploy/"+application.projectName+"/js/worker/LightningWorker.js", lightningWorkerContent);
   fs.writeFileSync("deploy/"+application.projectName+"/js/worker/WorkerImport.js", workerImportContent);
+
+  var rhubarbWorkerContent = fs.readFileSync("./js/third_party/RhubarbWorker.min.js", "utf8");
+  fs.writeFileSync("deploy/"+application.projectName+"/js/worker/RhubarbWorker.min.js", rhubarbWorkerContent);
 }
 
 function handleScripts(application, engineScriptsConcatted){
