@@ -3352,7 +3352,7 @@ Roygbiv.prototype.connectToServer = function(onReady, onError){
   preConditions.checkIfFunctionOnlyIfExists(ROYGBIV.connectToServer, preConditions.onError, onError);
   Rhubarb.init({
     protocolDefinitionPath: "/protocol_definitions/" + protocolDefinitionFileName,
-    workerPath: (isDeployment? "./worker/RhubarbWorker.min.js": "/js/third_party/RhubarbWorker.min.js"),
+    workerPath: (isDeployment? "./js/worker/RhubarbWorker.min.js": "/js/third_party/RhubarbWorker.min.js"),
     serverAddress: serverWSURL,
     onReady: onReady,
     onError: onError
