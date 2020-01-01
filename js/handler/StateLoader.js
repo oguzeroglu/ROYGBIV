@@ -344,6 +344,7 @@ StateLoader.prototype.resetProject = function(){
   inputText = 0;
   useOriginalResolution = false;
   dynamicTextureFolders = new Object();
+  protocolDefinitionFileName = 0;
   fogHandler.reset();
   mode = 0; // 0 -> DESIGN, 1-> PREVIEW
   physicsDebugMode = false;

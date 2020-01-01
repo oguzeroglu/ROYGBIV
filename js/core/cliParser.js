@@ -5224,6 +5224,33 @@ function parse(input){
           }
           return true;
         break;
+        case 219: //setProtocolDefinition
+          if (mode != 0){
+            terminal.printError(Text.WORKS_ONLY_IN_DESIGN_MODE);
+            return true;
+          }
+          var fileName = splitted[1];
+          terminal.printInfo(Text.LOADING);
+          canvas.style.visibility = "hidden";
+          terminal.disable();
+          var xhr = new XMLHttpRequest();
+          xhr.open("POST", "/checkProtocolDefinitionFile", true);
+          xhr.setRequestHeader("Content-type", "application/json");
+          xhr.onreadystatechange = function(){
+            if (xhr.readyState == 4 && xhr.status == 200){
+              var resp = JSON.parse(xhr.responseText);
+              terminal.clear();
+              terminal.enable();
+              if (resp.error){
+                terminal.printError(Text.PROTOCOL_DEFINITION_FILE_DOES_NOT_EXIST.replace(Text.PARAM1, "/protocol_definitions/"+this.fileName));
+              }else{
+                protocolDefinitionFileName = this.fileName;
+                terminal.printInfo(Text.PROTOCOL_DEFINITION_FILE_SET);
+              }
+            }
+          }.bind({fileName: fileName})
+          xhr.send(JSON.stringify({fileName: fileName}));
+        break;
       }
       return true;
     }catch(err){

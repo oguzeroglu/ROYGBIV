@@ -219,7 +219,8 @@ var CommandDescriptor = function(){
       2, //syncSpriteSize
       1, //newDynamicTextureFolder
       1, //destroyDynamicTextureFolder
-      0 //printDynamicTextureFolders
+      0, //printDynamicTextureFolders
+      1 //setProtocolDefinition
   ];
 
   this.commandArgumentsExpectedExplanation = [
@@ -441,7 +442,8 @@ var CommandDescriptor = function(){
     "syncSpriteSize sourceSprite targetSprite",
     "newDynamicTextureFolder folderName",
     "destroyDynamicTextureFolder dynamicTextureFolderName",
-    "printDynamicTextureFolders"
+    "printDynamicTextureFolders",
+    "setProtocolDefinition protocolDefinitionFileName"
   ];
 
   this.commands = [
@@ -663,7 +665,8 @@ var CommandDescriptor = function(){
     "syncSpriteSize",
     "newDynamicTextureFolder",
     "destroyDynamicTextureFolder",
-    "printDynamicTextureFolders"
+    "printDynamicTextureFolders",
+    "setProtocolDefinition"
   ];
 
   this.commandInfo = [
@@ -885,7 +888,8 @@ var CommandDescriptor = function(){
     "syncSpriteSize: Makes the size of targetSprite same with sourceSprite",
     "newDynamicTextureFolder: Compresses each PNG under dynamic_textures/folderName to be used as dynamic texture.",
     "destroyDynamicTextureFolder: Destroys a dynamic texture folder.",
-    "printDynamicTextureFolders: Prints dynamic texture folders."
+    "printDynamicTextureFolders: Prints dynamic texture folders.",
+    "setProtocolDefinition: Sets a protocol definition from protocol_definitions folder."
   ];
 
   this.keyboardInfo = [
@@ -1650,6 +1654,11 @@ var CommandDescriptor = function(){
   this.destroyDynamicTextureFolder = new Object();
   this.destroyDynamicTextureFolder.types = [];
   this.destroyDynamicTextureFolder.types.push(this.DYNAMIC_TEXTURE_FOLDER_NAME); //dynamicTextureFolderName
+
+  // setProtocolDefinition
+  this.setProtocolDefinition = new Object();
+  this.setProtocolDefinition.types = [];
+  this.setProtocolDefinition.types.push(this.UNKNOWN_INDICATOR); //protocolDefinitionFileName
 };
 
 CommandDescriptor.prototype.test = function(){

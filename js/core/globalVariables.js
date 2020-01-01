@@ -394,6 +394,7 @@ var inputText;
 var dragCandidate;
 var dynamicTextureFolders = new Object();
 var dynamicallyLoadedTextures = new Object();
+var protocolDefinitionFileName = 0;
 
 // RENDER ORDERS
 var renderOrders = {
