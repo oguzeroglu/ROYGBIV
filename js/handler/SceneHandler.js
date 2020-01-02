@@ -131,6 +131,9 @@ SceneHandler.prototype.import = function(exportObj){
     this.scenes[sceneName] = new Scene(sceneName);
     this.scenes[sceneName].import(exportObj.scenes[sceneName]);
   }
+  if (!this.scenes[this.getActiveSceneName()]){
+    this.activeSceneName = exportObj.activeSceneName;
+  }
   this.entrySceneName = exportObj.entrySceneName;
   sceneHandler.hideAll();
   sceneHandler.changeScene(exportObj.activeSceneName);
