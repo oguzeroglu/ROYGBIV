@@ -585,8 +585,8 @@ Roygbiv.prototype.getText = function(textName){
   }
   preConditions.checkIfDefined(ROYGBIV.getText, preConditions.textName, textName);
   var text = addedTexts[textName];
-  preConditions.checkIfTextInsideActiveScene(ROYGBIV.getText, text);
   if (text){
+    preConditions.checkIfTextInsideActiveScene(ROYGBIV.getText, text);
     return text;
   }
   return 0;
