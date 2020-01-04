@@ -5173,6 +5173,7 @@ function parse(input){
               var resp = JSON.parse(xhr.responseText);
               terminal.clear();
               terminal.enable();
+              canvas.style.visibility = "";
               if (resp.folderDoesNotExist){
                 terminal.printError(Text.FOLDER_DOES_NOT_EXIST_UNDER_DYNAMIC_TEXTURES);
                 return;
