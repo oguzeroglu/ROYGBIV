@@ -395,10 +395,18 @@ var AnimationHandler = function(){
     animation.attachedObject.setRotation(animation.params.sourceRotation);
   }
   this.afterAnimationSettersByType[this.actionTypes.SPRITE.TARGET_SCALE_X] = function(animation){
-    animation.attachedObject.setScale(animation.params.sourceScale, animation.attachedObject.mesh.material.uniforms.scale.value.y);
+    if (typeof animation.fixedWidth == UNDEFINED){
+      animation.attachedObject.setScale(animation.params.sourceScale, animation.attachedObject.mesh.material.uniforms.scale.value.y);
+    }else{
+      animation.attachedObject.setWidthPercent(animation.params.fixedWidth);
+    }
   }
   this.afterAnimationSettersByType[this.actionTypes.SPRITE.TARGET_SCALE_Y] = function(animation){
-    animation.attachedObject.setScale(animation.attachedObject.mesh.material.uniforms.scale.value.x, animation.params.sourceScale);
+    if (typeof animation.fixedHeight == UNDEFINED){
+      animation.attachedObject.setScale(animation.attachedObject.mesh.material.uniforms.scale.value.x, animation.params.sourceScale);
+    }else{
+      animation.attachedObject.setHeightPercent(animation.params.fixedHeight);
+    }
   }
   // ACTION FUNCTIONS **********************************************
   this.actionFunctionsByType = new Object();
@@ -811,11 +819,19 @@ AnimationHandler.prototype.updateSpriteTargetRotationFunc = function(params){
 }
 AnimationHandler.prototype.updateSpriteTargetScaleXFunc = function(params){
   var newVal = params.sourceScale + (params.targetScale - params.sourceScale) * params.value;
-  params.object.setScale(newVal, params.object.mesh.material.uniforms.scale.value.y);
+  if (typeof params.object.fixedWidth == UNDEFINED){
+    params.object.setScale(newVal, params.object.mesh.material.uniforms.scale.value.y);
+  }else{
+    params.object.setWidthPercent(newVal);
+  }
 }
 AnimationHandler.prototype.updateSpriteTargetScaleYFunc = function(params){
   var newVal = params.sourceScale + (params.targetScale - params.sourceScale) * params.value;
-  params.object.setScale(params.object.mesh.material.uniforms.scale.value.x, newVal);
+  if (typeof params.object.fixedHeight == UNDEFINED){
+    params.object.setScale(params.object.mesh.material.uniforms.scale.value.x, newVal);
+  }else{
+    params.object.setHeightPercent(newVal);
+  }
 }
 // UPDATE FUNCTIONS ************************************************
 AnimationHandler.prototype.linearFunc = function(curTime, startVal, changeInVal, totalTime){
