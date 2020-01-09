@@ -5238,6 +5238,7 @@ function parse(input){
           xhr.open("POST", "/checkProtocolDefinitionFile", true);
           xhr.setRequestHeader("Content-type", "application/json");
           xhr.onreadystatechange = function(){
+            canvas.style.visibility = "";
             if (xhr.readyState == 4 && xhr.status == 200){
               var resp = JSON.parse(xhr.responseText);
               terminal.clear();
