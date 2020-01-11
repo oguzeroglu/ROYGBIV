@@ -87,6 +87,7 @@ StateLoader.prototype.onAfterFinalized = function(){
       canvas.style.visibility = "";
       terminal.enable();
       terminal.clear();
+      resizeEventHandler.onResize();
       terminal.printInfo("Project loaded.");
     }
     rayCaster.refresh();
