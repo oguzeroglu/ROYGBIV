@@ -135,8 +135,8 @@ Sprite.prototype.onDrag = function(diffX, diffY){
   if (this.draggingDisabled){
     return;
   }
-  var width = renderer.getCurrentViewport().z;
-  var height = renderer.getCurrentViewport().w;
+  var width = renderer.getCurrentViewport().z / screenResolution;
+  var height = renderer.getCurrentViewport().w / screenResolution;
   var diffXPercent = (((diffX) * (100)) / (width));
   var diffYPercent = (((diffY) * (100)) / (height));
   if (this.marginMode == MARGIN_MODE_2D_TOP_LEFT){
