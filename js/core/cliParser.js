@@ -5019,10 +5019,6 @@ function parse(input){
             terminal.printError(Text.NO_SUCH_CONTAINER);
             return true;
           }
-          if (container.registeredSceneName != sceneHandler.getActiveSceneName()){
-            terminal.printError(Text.CONTAINER_NOT_IN_ACTIVE_SCENE);
-            return true;
-          }
           sceneHandler.onContainerDeletion(container);
           container.destroy();
           if (!jobHandlerWorking){
