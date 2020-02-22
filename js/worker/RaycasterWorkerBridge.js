@@ -464,6 +464,7 @@ RaycasterWorkerBridge.prototype.flush = function(){
   cameraOrientationDescription[0] = camera.position.x; cameraOrientationDescription[1] = camera.position.y; cameraOrientationDescription[2] = camera.position.z;
   cameraOrientationDescription[3] = camera.quaternion.x; cameraOrientationDescription[4] = camera.quaternion.y; cameraOrientationDescription[5] = camera.quaternion.z; cameraOrientationDescription[6] = camera.quaternion.w;
   cameraOrientationDescription[7] = camera.aspect;
+  this.intersectionTestBuffer.test2D.test = false;
   this.worker.postMessage(this.transferableMessageBody, this.transferableList);
   this.hasOwnership = false;
   if (this.record){
@@ -630,8 +631,6 @@ RaycasterWorkerBridge.prototype.findIntersections = function(from, direction, in
       this.intersectionTestBuffer.test2D.test = true;
       this.intersectionTestBuffer.test2D.x = coord2DX;
       this.intersectionTestBuffer.test2D.y = coord2DY;
-    }else{
-      this.intersectionTestBuffer.test2D.test = false;
     }
     this.curIntersectionTestRequestCount ++;
   }
