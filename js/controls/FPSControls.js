@@ -443,6 +443,22 @@ FPSControls.prototype.resume = function(){
   }
 }
 
+FPSControls.prototype.applyCustomVelocity = function(axis, velocity, milliseconds){
+  if (axis == "x"){
+    this.hasCustomXVelocity = true;
+    this.customXVelocity = velocity;
+    this.customXVelocityEndTime = performance.now() + milliseconds;
+  }else if (axis == "y"){
+    this.hasCustomYVelocity = true;
+    this.customYVelocity = velocity;
+    this.customYVelocityEndTime = performance.now() + milliseconds;
+  }else if (axis == "z"){
+    this.hasCustomZVelocity = true;
+    this.customZVelocity = velocity;
+    this.customZVelocityEndTime = performance.now() + milliseconds;
+  }
+}
+
 FPSControls.prototype.update = function(){
   if (isMobile && !isOrientationLandscape){
     if (!this.pausedDueToScreenOrientation){
@@ -455,10 +471,37 @@ FPSControls.prototype.update = function(){
     }
   }
   camera.position.copy(this.playerBodyObject.mesh.position);
-  this.playerBodyObject.setVelocityX(0);
-  this.playerBodyObject.setVelocityZ(0);
-  this.xVelocity = 0;
-  this.zVelocity = 0;
+  var now = performance.now();
+  if (!this.hasCustomXVelocity){
+    this.playerBodyObject.setVelocityX(0);
+    this.xVelocity = 0;
+  }else{
+    this.playerBodyObject.setVelocityX(this.customXVelocity);
+    this.xVelocity = this.customXVelocity;
+    if (now >= this.customXVelocityEndTime){
+      this.hasCustomXVelocity = false;
+    }
+  }
+  if (!this.hasCustomZVelocity){
+    this.playerBodyObject.setVelocityZ(0);
+    this.zVelocity = 0;
+  }else{
+    this.playerBodyObject.setVelocityZ(this.customZVelocity);
+    this.zVelocity = this.customZVelocity;
+    if (now >= this.customZVelocityEndTime){
+      this.hasCustomZVelocity = false;
+    }
+  }
+  if (this.hasCustomYVelocity){
+    this.playerBodyObject.setVelocityY(this.customYVelocity);
+    this.yVelocity = this.customYVelocity;
+    if (now >= this.customYVelocityEndTime){
+      this.hasCustomYVelocity = false;
+      this.playerBodyObject.setVelocityY(0);
+      this.yVelocity = 0;
+    }
+  }
+
   var hasMotion = this.isMouseDown || this.isShooting;
   if (!isMobile){
     var len = this.keyboardActions.length;

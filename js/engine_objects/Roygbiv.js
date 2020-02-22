@@ -262,7 +262,8 @@ var Roygbiv = function(){
     "onDisconnectedFromServer",
     "sendToServer",
     "onReceivedFromServer",
-    "onLatencyUpdated"
+    "onLatencyUpdated",
+    "applyCustomVelocity"
   ];
 
   this.globals = new Object();
@@ -3422,6 +3423,35 @@ Roygbiv.prototype.onLatencyUpdated = function(callbackFunction){
   Rhubarb.onLatencyUpdated(callbackFunction);
 }
 
+// SCRIPT RELATED FUNCTIONS ****************************************************
+
+// Starts a script. To get scripts use this format as scriptName:
+// parentdir1_parentdir2_....._parentdirX_scriptFileName
+// For example in order to get a script under the scripts/ root folder
+// example.js, the scriptName parameter should be example. However, to get
+// a script under scripts/testFolder/test.js, the scriptName parameter should be
+// testFolder_test.
+Roygbiv.prototype.startScript = function(scriptName){
+  if (mode == 0){
+    return;
+  }
+  preConditions.checkIfDefined(ROYGBIV.startScript, preConditions.scriptName, scriptName);
+  var script = scripts[scriptName];
+  preConditions.checkIfScriptExists(ROYGBIV.startScript, null, script);
+  script.start();
+}
+
+// Stops a script. The scriptName parameter is explained with startScript API.
+Roygbiv.prototype.stopScript = function(scriptName){
+  if (mode == 0){
+    return;
+  }
+  preConditions.checkIfDefined(ROYGBIV.stopScript, preConditions.scriptName, scriptName);
+  var script = scripts[scriptName];
+  preConditions.checkIfScriptExists(ROYGBIV.stopScript, null, script);
+  script.stop();
+}
+
 // UTILITY FUNCTIONS ***********************************************************
 
 //  Creates a new vector from x, y and z coordinates.
@@ -3988,35 +4018,6 @@ Roygbiv.prototype.setLocationHash = function(hash){
   window.location.hash = hash;
 }
 
-// SCRIPT RELATED FUNCTIONS ****************************************************
-
-// Starts a script. To get scripts use this format as scriptName:
-// parentdir1_parentdir2_....._parentdirX_scriptFileName
-// For example in order to get a script under the scripts/ root folder
-// example.js, the scriptName parameter should be example. However, to get
-// a script under scripts/testFolder/test.js, the scriptName parameter should be
-// testFolder_test.
-Roygbiv.prototype.startScript = function(scriptName){
-  if (mode == 0){
-    return;
-  }
-  preConditions.checkIfDefined(ROYGBIV.startScript, preConditions.scriptName, scriptName);
-  var script = scripts[scriptName];
-  preConditions.checkIfScriptExists(ROYGBIV.startScript, null, script);
-  script.start();
-}
-
-// Stops a script. The scriptName parameter is explained with startScript API.
-Roygbiv.prototype.stopScript = function(scriptName){
-  if (mode == 0){
-    return;
-  }
-  preConditions.checkIfDefined(ROYGBIV.stopScript, preConditions.scriptName, scriptName);
-  var script = scripts[scriptName];
-  preConditions.checkIfScriptExists(ROYGBIV.stopScript, null, script);
-  script.stop();
-}
-
 // Changes the active scene. The readyCallback function is executed when
 // the new scene is ready.
 Roygbiv.prototype.changeScene = function(sceneName, readyCallback){
@@ -4093,4 +4094,21 @@ Roygbiv.prototype.loadDynamicTextures = function(dynamicTextureFolderName, textu
   preConditions.checkIfArrayOfStrings(ROYGBIV.loadDynamicTextures, preConditions.textureNamesArray, textureNamesArray);
   preConditions.checkIfFunctionOnlyIfExists(ROYGBIV.loadDynamicTextures, preConditions.onLoadedCallback, onLoadedCallback);
   new DynamicTextureLoader().loadDynamicTextures(dynamicTextureFolderName, textureNamesArray, onLoadedCallback);
+}
+
+// Applies velocity to FPS controls for given milliseconds. This can be useful for
+// Valve Ricochet kind of games where the player is manually accelerated with jump
+// pads.
+Roygbiv.prototype.applyCustomVelocity = function(axis, velocity, milliseconds){
+  if (mode == 0){
+    return;
+  }
+  preConditions.checkIfDefined(ROYGBIV.applyCustomVelocity, preConditions.axis, axis);
+  preConditions.checkIfDefined(ROYGBIV.applyCustomVelocity, preConditions.velocity, velocity);
+  preConditions.checkIfDefined(ROYGBIV.applyCustomVelocity, preConditions.milliseconds, milliseconds);
+  preConditions.checkIfNumber(ROYGBIV.applyCustomVelocity, preConditions.velocity, velocity);
+  preConditions.checkIfNumber(ROYGBIV.applyCustomVelocity, preConditions.milliseconds, milliseconds);
+  preConditions.checkIfAxisOnlyIfDefined(ROYGBIV.applyCustomVelocity, preConditions.axis, axis);
+  preConditions.checkIfActiveControlFPS(ROYGBIV.applyCustomVelocity);
+  activeControl.applyCustomVelocity(axis, velocity, milliseconds);
 }

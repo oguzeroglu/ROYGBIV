@@ -249,6 +249,8 @@ var Preconditions = function(){
   this.onError = "onError";
   this.protocolName = "protocolName";
   this.valuesByParameterName = "valuesByParameterName";
+  this.axis = "axis";
+  this.milliseconds = "milliseconds";
 }
 
 Preconditions.prototype.errorHeader = function(callerFunc){
@@ -913,5 +915,11 @@ Preconditions.prototype.checkIfText2D = function(callerFunc, parameterName, obj)
 Preconditions.prototype.checkIfText3D = function(callerFunc, parameterName, obj){
   if (!obj.is2D){
     this.throw(callerFunc, "Cannot use this API for 3D texts.");
+  }
+}
+
+Preconditions.prototype.checkIfActiveControlFPS = function(callerFunc){
+  if (!activeControl.isFPSControls){
+    this.throw(callerFunc, "Active control is not a FPS control.");
   }
 }
