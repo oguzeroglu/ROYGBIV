@@ -163,6 +163,8 @@ Container2D.prototype.addAlignedContainer = function(alignmentInfo){
 
 Container2D.prototype.makeEmpty = function(){
   if (this.sprite){
+    delete this.sprite.savedScaleX;
+    delete this.sprite.savedScaleY;
     this.removeSprite();
   }
   if (this.addedText){
@@ -431,6 +433,10 @@ Container2D.prototype.insertAddedText = function(addedText){
 }
 
 Container2D.prototype.insertSprite = function(sprite){
+  if (!(typeof sprite.savedScaleX === UNDEFINED)){
+    sprite.setScale(sprite.savedScaleX, sprite.savedScaleY);
+  }
+  sprite.onBeforeContainerInsertion();
   var paddingX = (((this.paddingXContainerSpace) * ((this.widthPercent / 2))) / (100));
   var paddingY = (((this.paddingYContainerSpace) * ((this.heightPercent / 2))) / (100));
   sprite.setRotation(0);

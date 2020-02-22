@@ -422,6 +422,11 @@ Sprite.prototype.handleRectangle = function(){
   this.rectangle.updateMesh(0.005);
 }
 
+Sprite.prototype.onBeforeContainerInsertion = function(){
+  this.savedScaleX = this.mesh.material.uniforms.scale.value.x;
+  this.savedScaleY = this.mesh.material.uniforms.scale.value.y;
+}
+
 Sprite.prototype.setScale = function(scaleX, scaleY){
   this.mesh.material.uniforms.scale.value.set(scaleX, scaleY);
   this.handleRectangle();
