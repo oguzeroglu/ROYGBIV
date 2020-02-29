@@ -182,8 +182,10 @@ Animation.prototype.update = function(){
     return;
   }
   this.isFreezed = false;
-  this.params.value = this.updateFunction(this.tick, this.initialValue, this.changeInValue, this.totalTimeInSeconds);
-  this.actionFunction(this.params, this.increaseTick);
+  if (this.tick <= this.totalTimeInSeconds && this.tick >= 0){
+    this.params.value = this.updateFunction(this.tick, this.initialValue, this.changeInValue, this.totalTimeInSeconds);
+    this.actionFunction(this.params, this.increaseTick);
+  }
   if (this.increaseTick){
     this.animationState = ANIMATION_STATE_RUNNING;
     this.tick += STEP;
