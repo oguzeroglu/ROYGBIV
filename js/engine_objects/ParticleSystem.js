@@ -145,8 +145,15 @@ ParticleSystem.prototype.start = function(configurations){
   var startVelocity = configurations.startVelocity;
   var startAcceleration = configurations.startAcceleration;
   var startQuaternion = configurations.startQuaternion;
+  var maxCameraDistance = configurations.maxCameraDistance;
   this.tick = 0;
   this.motionTimer = 0;
+  if (!(typeof maxCameraDistance == UNDEFINED)){
+    this.hasMaxCameraDistance = true;
+    this.maxCameraDistance = maxCameraDistance;
+  }else{
+    this.hasMaxCameraDistance = false;
+  }
   if (!(typeof startVelocity == UNDEFINED)){
     this.vx = startVelocity.x;
     this.vy = startVelocity.y;
@@ -214,6 +221,15 @@ ParticleSystem.prototype.start = function(configurations){
       matrix.elements[0] = startPosition.x;
       matrix.elements[1] = startPosition.y;
       matrix.elements[2] = startPosition.z;
+    }
+  }
+  if (this.hasMaxCameraDistance){
+    var dist = camera.position.distanceTo(this.mesh.position);
+    if (dist < this.maxCameraDistance){
+      var divis = dist / this.maxCameraDistance;
+      this.mesh.scale.set(divis, divis, divis);
+    }else{
+      this.mesh.scale.set(1, 1, 1);
     }
   }
   if (!this.psMerger){
@@ -510,6 +526,16 @@ ParticleSystem.prototype.update = function(){
   if (this.checkForCollisions && this.mesh && this.mesh.visible && !raycasterFactory.isWorkerActive()){
     if (mode == 1){
       this.handleCollisions();
+    }
+  }
+
+  if (this.hasMaxCameraDistance){
+    var dist = camera.position.distanceTo(this.mesh.position);
+    if (dist < this.maxCameraDistance){
+      var divis = dist / this.maxCameraDistance;
+      this.mesh.scale.set(divis, divis, divis);
+    }else{
+      this.mesh.scale.set(1, 1, 1);
     }
   }
 }

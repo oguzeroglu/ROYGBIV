@@ -723,7 +723,8 @@ var Text = function(){
                                                      "startPosition: The initial position vector of the particle system. (optional)\n"+
                                                      "startVelocity: The initial velocity vector of the particle system. (optional)\n"+
                                                      "startAcceleration: The initial acceleration vector of the particle system. (optional)\n"+
-                                                     "startQuaternion: The initial quaternion of the particle system. Use ROYGBIV.computeQuaternionFromVectors (optional)";
+                                                     "startQuaternion: The initial quaternion of the particle system. Use ROYGBIV.computeQuaternionFromVectors (optional)\n"+
+                                                     "maxCameraDistance: This parameter can be used for particle systems being shot from FPS weapons to visually adjust their scales.\nIf set, the scale of the particle system is set to [distance_to_camera] / maxCameraDistance while the distance to camera is\nless than maxCameraDistance.";
   this.ROYGBIV_SCRIPTING_API_HIDEPARTICLESYSTEM = "Makes a particle system invisible.";
   this.ROYGBIV_SCRIPTING_API_GETCAMERADIRECTION = "Returns the direction vector of the camera.";
   this.ROYGBIV_SCRIPTING_API_GETCAMERAPOSITION = "Returns the position of the camera.";

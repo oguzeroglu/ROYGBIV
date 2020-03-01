@@ -1177,6 +1177,9 @@ Roygbiv.prototype.stopParticleSystem = function(particleSystem, stopDuration){
 // startVelocity: The initial velocity vector of the particle system. (optional)
 // startAcceleration: The initial acceleration vector of the particle system. (optional)
 // startQuaternion: The initial quaternion of the particle system. Use ROYGBIV.computeQuaternionFromVectors (optional)
+// maxCameraDistance: This parameter can be used for particle systems being shot from FPS weapons to visually
+// adjust their scales. If set, the scale of the particle system is set to [distance_to_camera] / maxCameraDistance
+// while the distance to camera is less than maxCameraDistance. 
 Roygbiv.prototype.startParticleSystem = function(configurations){
   if (mode == 0){
     return;
