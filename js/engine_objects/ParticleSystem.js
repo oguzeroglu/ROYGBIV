@@ -278,6 +278,8 @@ ParticleSystem.prototype.start = function(configurations){
     }
     this.updateExpiredStatusOnNextStart = false;
   }
+  this.positionLine.start.copy(this.mesh.position);
+  this.positionLine.end.copy(this.mesh.position);
   rayCaster.onParticleSystemStart(this, configurations);
 }
 
