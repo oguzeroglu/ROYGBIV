@@ -146,7 +146,6 @@ MuzzleFlash.prototype.onShow = function(animationTimeInMS){
     return;
   }
   this.tick = 0;
-  this.particleIndex = 0;
   this.isShown = true;
   activeMuzzleFlashes.set(this.name, this);
   if (!(typeof animationTimeInMS == UNDEFINED)){
