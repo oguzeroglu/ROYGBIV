@@ -445,7 +445,11 @@ Preconditions.prototype.checkIfMarkedPointInsideActiveScene = function(callerFun
 }
 
 Preconditions.prototype.checkIfObjectInsideActiveScene = function(callerFunc, obj){
-  if (obj.registeredSceneName != sceneHandler.getActiveSceneName()){
+  var sceneName = obj.registeredSceneName;
+  if (obj.parentObjectName){
+    sceneName = objectGroups[obj.parentObjectName].registeredSceneName;
+  }
+  if (sceneName != sceneHandler.getActiveSceneName()){
     this.throw(callerFunc, "Object not inside active scene.");
   }
 }
