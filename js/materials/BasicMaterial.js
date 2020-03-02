@@ -30,3 +30,18 @@ var BasicMaterial = function(parameters){
     this.emissiveColor = parameters.emissiveColor;
   }
 }
+
+BasicMaterial.prototype.export = function(){
+  var exportObj = new Object();
+  var colorHexString = this.color.toArray();
+  var opacity = this.opacity;
+  var aoMapIntensity = this.aoMapIntensity;
+  exportObj["colorHexString"] = colorHexString;
+  exportObj["opacity"] = opacity;
+  exportObj["aoMapIntensity"] = aoMapIntensity;
+  exportObj["textColor"] = this.textColor;
+  exportObj["materialType"] = "BASIC";
+
+  exportObj.roygbivMaterialName = this.roygbivMaterialName;
+  return exportObj;
+}

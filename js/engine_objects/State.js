@@ -36,19 +36,8 @@ var State = function(projectName, author){
   // MATERIALS *****************************************************
   var materialsExport = new Object();
   for (var materialName in materials){
-    var curMaterialExport = new Object();
     var curMaterial = materials[materialName];
-    var colorHexString = curMaterial.color.toArray();
-    var opacity = curMaterial.opacity;
-    var aoMapIntensity = curMaterial.aoMapIntensity;
-    curMaterialExport["colorHexString"] = colorHexString;
-    curMaterialExport["opacity"] = opacity;
-    curMaterialExport["aoMapIntensity"] = aoMapIntensity;
-    curMaterialExport["textColor"] = curMaterial.textColor;
-    if (curMaterial instanceof BasicMaterial){
-      curMaterialExport["materialType"] = "BASIC";
-    }
-    curMaterialExport.roygbivMaterialName = curMaterial.roygbivMaterialName;
+    var curMaterialExport = curMaterial.export();
     materialsExport[materialName] = curMaterialExport;
   }
   this.materials = materialsExport;

@@ -31,6 +31,8 @@ window.onload = function() {
   sceneHandler = new SceneHandler();
   // LIGHTNING HANDLER
   lightningHandler = new LightningHandler();
+  // OBJECT EXPORT IMPORT HANDLER
+  objectExportImportHandler = new ObjectExportImportHandler();
   // TEXT POOL
   Text = (!isDeployment)? new Text(): 0;
   // DRAGABLE CLI
@@ -200,7 +202,7 @@ window.onload = function() {
     appendtoDeploymentConsole("Loading shaders.");
     console.log(
       "%c "+BANNERL1+"\n"+BANNERL2+"\n"+BANNERL3+"\n"+
-      BANNERL4+"\n"+BANNERL5 +"\n"+"                                         " 
+      BANNERL4+"\n"+BANNERL5 +"\n"+"                                         "
       + "\nby Oguz Eroglu - github.com/oguzeroglu   ",
       "background: black; color: lime"
     );

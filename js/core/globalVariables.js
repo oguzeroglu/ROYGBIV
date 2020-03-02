@@ -396,6 +396,7 @@ var dynamicTextureFolders = new Object();
 var dynamicallyLoadedTextures = new Object();
 var protocolDefinitionFileName = 0;
 var serverWSURL = 0;
+var objectExportImportHandler;
 
 // RENDER ORDERS
 var renderOrders = {

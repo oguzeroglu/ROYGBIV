@@ -225,7 +225,8 @@ var CommandDescriptor = function(){
       0, //printProtocolDefinition
       1, //setWSServerURL
       0, //resetWSServerURL
-      0 //printWSServerURL
+      0, //printWSServerURL
+      1 //exportObject
   ];
 
   this.commandArgumentsExpectedExplanation = [
@@ -453,7 +454,8 @@ var CommandDescriptor = function(){
     "printProtocolDefinition",
     "setWSServerURL serverURL",
     "resetWSServerURL",
-    "printWSServerURL"
+    "printWSServerURL",
+    "exportObject objectName"
   ];
 
   this.commands = [
@@ -681,7 +683,8 @@ var CommandDescriptor = function(){
     "printProtocolDefinition",
     "setWSServerURL",
     "resetWSServerURL",
-    "printWSServerURL"
+    "printWSServerURL",
+    "exportObject"
   ];
 
   this.commandInfo = [
@@ -909,7 +912,8 @@ var CommandDescriptor = function(){
     "printProtocolDefinition: Prints the protocol definition file path.",
     "setWSServerURL: Sets the WebSocket URL of the game server.",
     "resetWSServerURL: Resets the WebSocket URL of the game server.",
-    "printWSServerURL: Prints the set WebSocket URL of the game server."
+    "printWSServerURL: Prints the set WebSocket URL of the game server.",
+    "exportObject: Exports an object or an object group."
   ];
 
   this.keyboardInfo = [
@@ -1684,6 +1688,11 @@ var CommandDescriptor = function(){
   this.setWSServerURL = new Object();
   this.setWSServerURL.types = [];
   this.setWSServerURL.types.push(this.UNKNOWN_INDICATOR); //serverURL
+
+  // exportObject
+  this.exportObject = new Object();
+  this.exportObject.types = [];
+  this.exportObject.types.push(this.OBJECT_NAME); //objectName
 };
 
 CommandDescriptor.prototype.test = function(){
