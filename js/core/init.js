@@ -323,6 +323,32 @@ function build(projectName, author){
   xhr.send(data);
 }
 
+function generateUniqueTexturePackName(){
+  var generatedName = (Date.now().toString(36) + Math.random().toString(36).substr(2, 5)).toUpperCase();
+  var nameFound = true;
+  while(nameFound){
+    nameFound = texturePacks[generatedName];
+    if (nameFound){
+      console.error("[!] TexturePack name generation collision happened: "+generatedName);
+      generatedName = (Date.now().toString(36) + Math.random().toString(36).substr(2, 5)).toUpperCase();
+    }
+  }
+  return generatedName;
+}
+
+function generateUniqueMaterialName(){
+  var generatedName = (Date.now().toString(36) + Math.random().toString(36).substr(2, 5)).toUpperCase();
+  var nameFound = true;
+  while(nameFound){
+    nameFound = materials[generatedName];
+    if (nameFound){
+      console.error("[!] Material name generation collision happened: "+generatedName);
+      generatedName = (Date.now().toString(36) + Math.random().toString(36).substr(2, 5)).toUpperCase();
+    }
+  }
+  return generatedName;
+}
+
 function generateUniqueObjectName(){
   var generatedName = (Date.now().toString(36) + Math.random().toString(36).substr(2, 5)).toUpperCase();
   var nameFound = true;

@@ -745,14 +745,16 @@ ImportHandler.prototype.importAddedObjects = function(obj){
   }
 }
 
-ImportHandler.prototype.importTexturePacks = function(obj, callback){
+ImportHandler.prototype.importTexturePacks = function(obj, callback, skipMapping){
   var texturePacksExport = obj.texturePacks;
   for (var texturePackName in texturePacksExport){
     var curTexturePackExport = texturePacksExport[texturePackName];
     var texturePack = new TexturePack(texturePackName, curTexturePackExport.directoryName, curTexturePackExport.textureDescription);
     texturePack.setParticleTextureStatus(curTexturePackExport.isParticleTexture);
     texturePack.loadTextures(function(){
-      this.mapLoadedTexturePack(this.texturePackName, obj);
+      if (!skipMapping){
+        this.mapLoadedTexturePack(this.texturePackName, obj);
+      }
       callback();
     }.bind({texturePackName: texturePackName, mapLoadedTexturePack: this.mapLoadedTexturePack}));
     texturePacks[texturePackName] = texturePack;
