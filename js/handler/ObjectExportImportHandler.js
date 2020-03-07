@@ -15,6 +15,20 @@ ObjectExportImportHandler.prototype.exportObjectGroup = function(obj){
       context.texturePack = texturePacks[obj.group[childName].associatedTexturePack].export();
     }
   }
+  if (obj.muzzleFlashParameters){
+    var muzzleFlash = muzzleFlashes[obj.muzzleFlashParameters.muzzleFlashName];
+    context.muzzleFlash = muzzleFlash.export();
+    context.particleSystem = muzzleFlash.refPreconfiguredPS.export();
+    if (muzzleFlash.refPreconfiguredPS.getUsedTextureName() != null){
+      context.particleSystemTexturePack = texturePacks[muzzleFlash.refPreconfiguredPS.getUsedTextureName()].export();
+    }
+  }
+  for (var lightningName in lightnings){
+    if (lightnings[lightningName].fpsWeaponConfigurations.weaponObj.name == obj.name){
+      context.lightning = lightnings[lightningName].export();
+      break;
+    }
+  }
   return context;
 }
 
@@ -68,6 +82,12 @@ ObjectExportImportHandler.prototype.importObjectLightning = function(objName, co
     var lightningExport = context.lightning;
     var lightningName = generateUniqueLightningName();
     lightningExport.fpsWeaponConfigurations.weaponObjName = objName;
+    if (objectGroups[objName]){
+      for (var childName in objectGroups[objName].group){
+        lightningExport.fpsWeaponConfigurations.childObjName = childName;
+        break;
+      }
+    }
     lightningExport.name = lightningName;
     var importHandler = new ImportHandler();
     var pseudo = new Object();
@@ -99,7 +119,14 @@ ObjectExportImportHandler.prototype.importObjectMuzzleFlash = function(objName, 
     pseudo.muzzleFlashes[mfName] = context.muzzleFlash;
     var importHandler = new ImportHandler();
     importHandler.importParticleSystems(pseudo);
-    addedObjects[objName].muzzleFlashParameters.muzzleFlashName = mfName;
+    var obj = addedObjects[objName] || objectGroups[objName];
+    obj.muzzleFlashParameters.muzzleFlashName = mfName;
+    if (obj.isObjectGroup){
+      for (var childObjName in obj.group){
+        obj.muzzleFlashParameters.childObj = childObjName;
+        break;
+      }
+    }
     preConfiguredParticleSystems[psName].name = psName;
     preConfiguredParticleSystems[psName].params.name = psName;
     sceneHandler.onParticleSystemCreation(preConfiguredParticleSystems[psName]);
@@ -181,7 +208,7 @@ ObjectExportImportHandler.prototype.onChildReady = function(readyContext){
   for (var childName in objectGroups[readyContext.objName].group){
     sceneHandler.onAddedObjectDeletion(objectGroups[readyContext.objName].group[childName]);
   }
-  readyContext.onReady();
+  this.importObjectMuzzleFlash(readyContext.objName, readyContext.context, readyContext.onReady);
 }
 
 ObjectExportImportHandler.prototype.objectGroupImportFunc = function(children, readyContext, objGroupContext){
@@ -258,26 +285,32 @@ ObjectExportImportHandler.prototype.importAddedObject = function(objName, contex
   }
 }
 
-ObjectExportImportHandler.prototype.importObject = function(objName, json, onReady){
+ObjectExportImportHandler.prototype.importFunc = function(objName, json, onReady){
   var context = json.context;
   if (context.isAddedObject) {
-    if (context.particleSystemTexturePack){
-      var importHandler = new ImportHandler();
-      var generatedTexturePackName = generateUniqueTexturePackName();
-      var pseudo = new Object();
-      pseudo.texturePacks = new Object();
-      pseudo.texturePacks[generatedTexturePackName] = context.particleSystemTexturePack;
-      importHandler.importTexturePacks(pseudo, function(){
-        textureAtlasHandler.onTexturePackChange(function(){
-          context.particleSystemTexturePack.name = generatedTexturePackName;
-          this.importAddedObject(objName, context, onReady, json.objGroupContext);
-        }.bind(this), noop, true);
-      }.bind(this), true);
-    }else{
-      this.importAddedObject(objName, context, onReady, json.objGroupContext);
-    }
+    this.importAddedObject(objName, context, onReady, json.objGroupContext);
   }
   if (context.isObjectGroup){
     this.importObjectGroup(objName, context, onReady);
   }
+}
+
+ObjectExportImportHandler.prototype.importObject = function(objName, json, onReady){
+  var context = json.context;
+  if (context.particleSystemTexturePack){
+    var importHandler = new ImportHandler();
+    var generatedTexturePackName = generateUniqueTexturePackName();
+    var pseudo = new Object();
+    pseudo.texturePacks = new Object();
+    pseudo.texturePacks[generatedTexturePackName] = context.particleSystemTexturePack;
+    importHandler.importTexturePacks(pseudo, function(){
+      textureAtlasHandler.onTexturePackChange(function(){
+        context.particleSystemTexturePack.name = generatedTexturePackName;
+        this.importFunc(objName, json, onReady);
+      }.bind(this), noop, true);
+    }.bind(this), true);
+    return;
+  }
+
+  this.importFunc(objName, json, onReady);
 }

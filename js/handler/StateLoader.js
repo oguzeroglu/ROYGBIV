@@ -51,7 +51,6 @@ StateLoader.prototype.load = function(){
     this.importHandler.importAreas(obj);
     this.importHandler.importScripts(obj);
     this.importHandler.importAddedObjects(obj);
-    this.importHandler.importLightnings(obj);
     this.importHandler.importDynamicTextureFolders(obj);
     this.importHandler.importTexturePacks(obj, this.onTexturePackLoaded.bind(this));
     this.importHandler.importSkyboxes(obj, this.onSkyboxLoaded.bind(this));
@@ -104,6 +103,7 @@ StateLoader.prototype.finalize = function(){
   this.importHandler.importAddedTexts(this.stateObj);
   this.importHandler.importAddedObjectGraphicsProperties();
   this.importHandler.importObjectGroups(this.stateObj);
+  this.importHandler.importLightnings(this.stateObj);
   this.importHandler.importFog(this.stateObj);
   this.importHandler.importCrosshairs(this.stateObj);
   this.importHandler.importSprites(this.stateObj);
