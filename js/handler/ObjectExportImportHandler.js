@@ -45,17 +45,56 @@ ObjectExportImportHandler.prototype.exportObject = function(obj){
   };
 }
 
+ObjectExportImportHandler.prototype.importObjectLightning = function(objName, context, onReady){
+  if (context.lightning){
+    var lightningExport = context.lightning;
+    var lightningName = generateUniqueLightningName();
+    lightningExport.fpsWeaponConfigurations.weaponObjName = objName;
+    lightningExport.name = lightningName;
+    var importHandler = new ImportHandler();
+    var pseudo = new Object();
+    pseudo.lightnings = new Object();
+    pseudo.lightnings[lightningName] = lightningExport;
+    importHandler.importLightnings(pseudo);
+    sceneHandler.onLightningCreation(lightnings[lightningName]);
+  }
+  onReady();
+}
+
 ObjectExportImportHandler.prototype.importObjectMuzzleFlash = function(objName, context, onReady){
   if (context.particleSystem){
-
+    var psExport = context.particleSystem;
+    if (context.particleSystemTexturePack){
+      if (psExport.type == "CUSTOM"){
+        psExport.params.material.textureName = context.particleSystemTexturePack.name;
+      }else{
+        psExport.params.textureName = context.particleSystemTexturePack.name;
+      }
+    }
+    var pseudo = new Object();
+    pseudo.preConfiguredParticleSystems = new Object();
+    var psName = generateUniqueParticleSystemName();
+    var mfName = generateUniqueMuzzleFlashName();
+    pseudo.preConfiguredParticleSystems[psName] = context.particleSystem;
+    pseudo.muzzleFlashes = new Object();
+    context.muzzleFlash.refPreconfiguredPSName = psName;
+    pseudo.muzzleFlashes[mfName] = context.muzzleFlash;
+    var importHandler = new ImportHandler();
+    importHandler.importParticleSystems(pseudo);
+    addedObjects[objName].muzzleFlashParameters.muzzleFlashName = mfName;
+    preConfiguredParticleSystems[psName].name = psName;
+    preConfiguredParticleSystems[psName].params.name = psName;
+    sceneHandler.onParticleSystemCreation(preConfiguredParticleSystems[psName]);
+    sceneHandler.onMuzzleFlashCreation(muzzleFlashes[mfName]);
   }
+  this.importObjectLightning(objName, context, onReady);
 }
 
 ObjectExportImportHandler.prototype.importAddedObjectBody = function(objName, context, onReady, meta){
   var importHandler = new ImportHandler();
   var objExport = context.export;
   if (meta.materialName){
-    objExport.roygbivMaterialName = meta.materialName
+    objExport.roygbivMaterialName = meta.materialName;
   }
   var pseudo = new Object();
   pseudo.addedObjects = new Object();
@@ -116,6 +155,7 @@ ObjectExportImportHandler.prototype.importAddedObject = function(objName, contex
     pseudo.materials = new Object();
     pseudo.materials[generatedMaterialName] = materialExport;
     importHandler.importMaterials(pseudo);
+    materials[generatedMaterialName].roygbivMaterialName = generatedMaterialName;
   }
   if (texturePackExport){
     generatedTexturePackName = generateUniqueTexturePackName();
@@ -138,6 +178,20 @@ ObjectExportImportHandler.prototype.importAddedObject = function(objName, contex
 ObjectExportImportHandler.prototype.importObject = function(objName, json, onReady){
   var context = json.context;
   if (context.isAddedObject) {
-    this.importAddedObject(objName, context, onReady);
+    if (context.particleSystemTexturePack){
+      var importHandler = new ImportHandler();
+      var generatedTexturePackName = generateUniqueTexturePackName();
+      var pseudo = new Object();
+      pseudo.texturePacks = new Object();
+      pseudo.texturePacks[generatedTexturePackName] = context.particleSystemTexturePack;
+      importHandler.importTexturePacks(pseudo, function(){
+        textureAtlasHandler.onTexturePackChange(function(){
+          context.particleSystemTexturePack.name = generatedTexturePackName;
+          this.importAddedObject(objName, context, onReady);
+        }.bind(this), noop, true);
+      }.bind(this), true);
+    }else{
+      this.importAddedObject(objName, context, onReady);
+    }
   }
 }

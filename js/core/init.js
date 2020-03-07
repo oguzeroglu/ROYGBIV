@@ -323,6 +323,46 @@ function build(projectName, author){
   xhr.send(data);
 }
 
+function generateUniqueLightningName(){
+  var generatedName = (Date.now().toString(36) + Math.random().toString(36).substr(2, 5)).toUpperCase();
+  var nameFound = true;
+  while(nameFound){
+    nameFound = lightnings[generatedName];
+    if (nameFound){
+      console.error("[!] Lightning name generation collision happened: "+generatedName);
+      generatedName = (Date.now().toString(36) + Math.random().toString(36).substr(2, 5)).toUpperCase();
+    }
+  }
+  return generatedName;
+}
+
+
+function generateUniqueMuzzleFlashName(){
+  var generatedName = (Date.now().toString(36) + Math.random().toString(36).substr(2, 5)).toUpperCase();
+  var nameFound = true;
+  while(nameFound){
+    nameFound = muzzleFlashes[generatedName];
+    if (nameFound){
+      console.error("[!] MuzzleFlash name generation collision happened: "+generatedName);
+      generatedName = (Date.now().toString(36) + Math.random().toString(36).substr(2, 5)).toUpperCase();
+    }
+  }
+  return generatedName;
+}
+
+function generateUniqueParticleSystemName(){
+  var generatedName = (Date.now().toString(36) + Math.random().toString(36).substr(2, 5)).toUpperCase();
+  var nameFound = true;
+  while(nameFound){
+    nameFound = preConfiguredParticleSystems[generatedName];
+    if (nameFound){
+      console.error("[!] ParticleSystem name generation collision happened: "+generatedName);
+      generatedName = (Date.now().toString(36) + Math.random().toString(36).substr(2, 5)).toUpperCase();
+    }
+  }
+  return generatedName;
+}
+
 function generateUniqueTexturePackName(){
   var generatedName = (Date.now().toString(36) + Math.random().toString(36).substr(2, 5)).toUpperCase();
   var nameFound = true;
