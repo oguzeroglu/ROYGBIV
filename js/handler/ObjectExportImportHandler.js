@@ -2,6 +2,22 @@ var ObjectExportImportHandler = function(){
 
 }
 
+ObjectExportImportHandler.prototype.exportObjectGroup = function(obj){
+  var objExport = obj.export();
+  var context = {
+    isObjectGroup: true,
+    export: objExport,
+    children: []
+  };
+  for (var childName in obj.group){
+    context.children.push(this.exportAddedObject(obj.group[childName]));
+    if (texturePacks[obj.group[childName].associatedTexturePack]){
+      context.texturePack = texturePacks[obj.group[childName].associatedTexturePack].export();
+    }
+  }
+  return context;
+}
+
 ObjectExportImportHandler.prototype.exportAddedObject = function(obj){
   var objExport = obj.export();
   objExport.destroyedGrids = new Object();
@@ -38,6 +54,8 @@ ObjectExportImportHandler.prototype.exportObject = function(obj){
   var context;
   if (obj.isAddedObject){
     context = this.exportAddedObject(obj);
+  }else if (obj.isObjectGroup){
+    context = this.exportObjectGroup(obj);
   }
   return {
     isROYGBIVObjectExport: true,
@@ -143,7 +161,64 @@ ObjectExportImportHandler.prototype.importAddedObjectBody = function(objName, co
   this.importObjectMuzzleFlash(objName, context, onReady);
 }
 
-ObjectExportImportHandler.prototype.importAddedObject = function(objName, context, onReady){
+ObjectExportImportHandler.prototype.onChildReady = function(readyContext){
+  if (readyContext.total != readyContext.count){
+    return;
+  }
+  var ctr = 0;
+  var newGroup = new Object();
+  for (var cn in readyContext.context.export.group){
+    newGroup[readyContext.childNames[ctr]] = addedObjects[readyContext.childNames[ctr]].export();
+    ctr ++;
+  }
+  readyContext.context.export.group = newGroup;
+  var importHandler = new ImportHandler();
+  var pseudo = new Object();
+  pseudo.objectGroups = new Object();
+  pseudo.objectGroups[readyContext.objName] = readyContext.context.export;
+  importHandler.importObjectGroups(pseudo);
+  sceneHandler.onObjectGroupCreation(objectGroups[readyContext.objName]);
+  for (var childName in objectGroups[readyContext.objName].group){
+    sceneHandler.onAddedObjectDeletion(objectGroups[readyContext.objName].group[childName]);
+  }
+  readyContext.onReady();
+}
+
+ObjectExportImportHandler.prototype.objectGroupImportFunc = function(children, readyContext, objGroupContext){
+  for (var i = 0; i < children.length; i++){
+    var childName = generateUniqueObjectName();
+    readyContext.childNames.push(childName);
+    this.importObject(childName, {
+      isAddedObject: true,
+      context: children[i],
+      objGroupContext: objGroupContext
+    }, function(){
+      readyContext.count ++;
+      this.onChildReady(readyContext);
+    }.bind(this));
+  }
+}
+
+ObjectExportImportHandler.prototype.importObjectGroup = function(objName, context, onReady){
+  var children = context.children;
+  var readyContext = {childNames: [], total: children.length, count: 0, objName: objName, context: context, onReady: onReady};
+  if (context.texturePack){
+    var generatedTexturePackName = generateUniqueTexturePackName();
+    var pseudo = new Object();
+    pseudo.texturePacks = new Object();
+    pseudo.texturePacks[generatedTexturePackName] = context.texturePack;
+    var importHandler = new ImportHandler();
+    importHandler.importTexturePacks(pseudo, function(){
+      this.objectGroupImportFunc(children, readyContext, {
+        texturePackName: generatedTexturePackName
+      });
+    }.bind(this), true);
+  }else{
+    this.objectGroupImportFunc(children, readyContext);
+  }
+}
+
+ObjectExportImportHandler.prototype.importAddedObject = function(objName, context, onReady, objGroupContext){
   var importHandler = new ImportHandler();
   var materialExport = context.material;
   var texturePackExport = context.texturePack;
@@ -158,16 +233,24 @@ ObjectExportImportHandler.prototype.importAddedObject = function(objName, contex
     materials[generatedMaterialName].roygbivMaterialName = generatedMaterialName;
   }
   if (texturePackExport){
-    generatedTexturePackName = generateUniqueTexturePackName();
-    var pseudo = new Object();
-    pseudo.texturePacks = new Object();
-    pseudo.texturePacks[generatedTexturePackName] = texturePackExport;
-    importHandler.importTexturePacks(pseudo, function(){
+    var skip = objGroupContext && objGroupContext.texturePackName;
+    if (!skip){
+      generatedTexturePackName = generateUniqueTexturePackName();
+      var pseudo = new Object();
+      pseudo.texturePacks = new Object();
+      pseudo.texturePacks[generatedTexturePackName] = texturePackExport;
+      importHandler.importTexturePacks(pseudo, function(){
+        this.importAddedObjectBody(objName, context, onReady, {
+          tpName: generatedTexturePackName,
+          materialName: generatedMaterialName
+        });
+      }.bind(this), true);
+    }else{
       this.importAddedObjectBody(objName, context, onReady, {
-        tpName: generatedTexturePackName,
+        tpName: objGroupContext.texturePackName,
         materialName: generatedMaterialName
       });
-    }.bind(this), true);
+    }
   }else {
     this.importAddedObjectBody(objName, context, onReady, {
       materialName: generatedMaterialName
@@ -187,11 +270,14 @@ ObjectExportImportHandler.prototype.importObject = function(objName, json, onRea
       importHandler.importTexturePacks(pseudo, function(){
         textureAtlasHandler.onTexturePackChange(function(){
           context.particleSystemTexturePack.name = generatedTexturePackName;
-          this.importAddedObject(objName, context, onReady);
+          this.importAddedObject(objName, context, onReady, json.objGroupContext);
         }.bind(this), noop, true);
       }.bind(this), true);
     }else{
-      this.importAddedObject(objName, context, onReady);
+      this.importAddedObject(objName, context, onReady, json.objGroupContext);
     }
+  }
+  if (context.isObjectGroup){
+    this.importObjectGroup(objName, context, onReady);
   }
 }
