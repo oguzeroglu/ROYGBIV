@@ -48,7 +48,6 @@ StateLoader.prototype.load = function(){
     this.importHandler.importEngineVariables(obj);
     this.importHandler.importGridSystems(obj);
     this.importHandler.importMaterials(obj);
-    this.importHandler.importParticleSystems(obj);
     this.importHandler.importAreas(obj);
     this.importHandler.importScripts(obj);
     this.importHandler.importAddedObjects(obj);
@@ -101,6 +100,7 @@ StateLoader.prototype.finalize = function(){
   if (!this.shouldFinalize()){
     return;
   }
+  this.importHandler.importParticleSystems(this.stateObj);
   this.importHandler.importAddedTexts(this.stateObj);
   this.importHandler.importAddedObjectGraphicsProperties();
   this.importHandler.importObjectGroups(this.stateObj);
