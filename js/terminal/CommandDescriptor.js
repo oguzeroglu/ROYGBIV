@@ -226,7 +226,8 @@ var CommandDescriptor = function(){
       1, //setWSServerURL
       0, //resetWSServerURL
       0, //printWSServerURL
-      1 //exportObject
+      1, //exportObject
+      1 //importObject
   ];
 
   this.commandArgumentsExpectedExplanation = [
@@ -455,7 +456,8 @@ var CommandDescriptor = function(){
     "setWSServerURL serverURL",
     "resetWSServerURL",
     "printWSServerURL",
-    "exportObject objectName"
+    "exportObject objectName",
+    "importObject objectName"
   ];
 
   this.commands = [
@@ -684,7 +686,8 @@ var CommandDescriptor = function(){
     "setWSServerURL",
     "resetWSServerURL",
     "printWSServerURL",
-    "exportObject"
+    "exportObject",
+    "importObject"
   ];
 
   this.commandInfo = [
@@ -913,7 +916,8 @@ var CommandDescriptor = function(){
     "setWSServerURL: Sets the WebSocket URL of the game server.",
     "resetWSServerURL: Resets the WebSocket URL of the game server.",
     "printWSServerURL: Prints the set WebSocket URL of the game server.",
-    "exportObject: Exports an object or an object group."
+    "exportObject: Exports an object or an object group.",
+    "importObject: Imports an object or an object group."
   ];
 
   this.keyboardInfo = [
@@ -1693,6 +1697,11 @@ var CommandDescriptor = function(){
   this.exportObject = new Object();
   this.exportObject.types = [];
   this.exportObject.types.push(this.OBJECT_NAME); //objectName
+
+  // importObject
+  this.importObject = new Object();
+  this.importObject.types = [];
+  this.importObject.types.push(this.UNKNOWN_INDICATOR); //objectName
 };
 
 CommandDescriptor.prototype.test = function(){

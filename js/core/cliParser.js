@@ -5314,6 +5314,53 @@ function parse(input){
           save(objectExportImportHandler.exportObject(obj) ,"object_export_" + obj.name);
           return true;
         break;
+        case 226: //importObject
+          if (mode != 0){
+            terminal.printError(Text.WORKS_ONLY_IN_DESIGN_MODE);
+            return true;
+          }
+          var objName = splitted[1];
+          if (addedObjects[objName] || objectGroups[objName]){
+            terminal.printError(Text.NAME_MUST_BE_UNIQUE);
+            return true;
+          }
+          if (!FileReader){
+            terminal.printError(Text.THIS_FUNCTION_IS_NOT_SUPPORTED_IN_YOUR_BROWSER);
+            return true;
+          }
+          document.getElementById("loadInput").onclick = function(){
+            this.value = "";
+            document.getElementById("loadInput").onchange = function(event){
+              terminal.clear();
+              terminal.printInfo(Text.LOADING_FILE);
+              var target = event.target || window.event.srcElement;
+              var files = target.files;
+              if (files && files.length){
+                var fileReader = new FileReader();
+                fileReader.onload = function(e){
+                  var data = e.target.result;
+                  var json = JSON.parse(data);
+                  if (!json.isROYGBIVObjectExport){
+                    terminal.printError(Text.FILE_NOT_VALID);
+                    return;
+                  }
+                  terminal.clear();
+                  terminal.disable();
+                  objectExportImportHandler.importObject(objName, json, function(){
+                    terminal.clear();
+                    refreshRaycaster(Text.OBJECT_IMPORTED);
+                  });
+                };
+                fileReader.readAsText(files[0]);
+              }else{
+                terminal.printError(Text.NO_FILE_SELECTED_OPERATION_CANCELLED);
+              }
+              return true;
+            };
+          }
+          loadInput.click();
+          terminal.printInfo(Text.CHOOSE_A_FILE_TO_UPLOAD);
+        break;
       }
       return true;
     }catch(err){
