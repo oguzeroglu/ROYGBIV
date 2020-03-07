@@ -4,6 +4,7 @@ var ObjectExportImportHandler = function(){
 
 ObjectExportImportHandler.prototype.exportParticleSystem = function(obj){
   var context = {
+    isROYGBIVParticleSystemExport: true,
     isParticleSystem: true,
     export: obj.export()
   };
@@ -340,6 +341,8 @@ ObjectExportImportHandler.prototype.importPSFunction = function(psName, json, on
   pseudo.preConfiguredParticleSystems[psName] = psExport;
   var importHandler = new ImportHandler();
   importHandler.importParticleSystems(pseudo);
+  preConfiguredParticleSystems[psName].name = psName;
+  preConfiguredParticleSystems[psName].params.name = psName;
   sceneHandler.onParticleSystemCreation(preConfiguredParticleSystems[psName]);
   onReady();
 }

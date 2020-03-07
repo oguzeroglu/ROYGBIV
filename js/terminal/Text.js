@@ -66,6 +66,7 @@ var Text = function(){
   this.SELECTED_GRIDS = "Selected grids";
   this.FILE_NOT_VALID = "File not valid.";
   this.OBJECT_IMPORTED = "Object imported.";
+  this.PS_IMPORTED = "ParticleSystem imported.";
   this.NONE_OF_THE_GRIDS_ARE_SELECTED = "None of the grids are selected.";
   this.GRIDS_RESET = "@@1 grids reset.";
   this.OBJECT_HAS_PIVOT = "Object has pivot. Cannot export.";
