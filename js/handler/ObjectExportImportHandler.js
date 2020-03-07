@@ -325,3 +325,41 @@ ObjectExportImportHandler.prototype.importObject = function(objName, json, onRea
 
   this.importFunc(objName, json, onReady);
 }
+
+ObjectExportImportHandler.prototype.importPSFunction = function(psName, json, onReady){
+  var psExport = json.export;
+  if (json.particleSystemTexturePack){
+    if (psExport.type == "CUSTOM"){
+      psExport.params.material.textureName = json.particleSystemTexturePack.name;
+    }else{
+      psExport.params.textureName = json.particleSystemTexturePack.name;
+    }
+  }
+  var pseudo = new Object();
+  pseudo.preConfiguredParticleSystems = new Object();
+  pseudo.preConfiguredParticleSystems[psName] = psExport;
+  var importHandler = new ImportHandler();
+  importHandler.importParticleSystems(pseudo);
+  sceneHandler.onParticleSystemCreation(preConfiguredParticleSystems[psName]);
+  onReady();
+}
+
+ObjectExportImportHandler.prototype.importParticleSystem = function(psName, json, onReady){
+  var context = json.export;
+  if (json.particleSystemTexturePack){
+    var importHandler = new ImportHandler();
+    var generatedTexturePackName = generateUniqueTexturePackName();
+    var pseudo = new Object();
+    pseudo.texturePacks = new Object();
+    pseudo.texturePacks[generatedTexturePackName] = json.particleSystemTexturePack;
+    importHandler.importTexturePacks(pseudo, function(){
+      textureAtlasHandler.onTexturePackChange(function(){
+        json.particleSystemTexturePack.name = generatedTexturePackName;
+        this.importPSFunction(psName, json, onReady);
+      }.bind(this), noop, true);
+    }.bind(this), true);
+    return;
+  }
+
+  this.importPSFunction(psName, json, onReady);
+}
