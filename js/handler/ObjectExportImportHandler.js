@@ -2,6 +2,17 @@ var ObjectExportImportHandler = function(){
 
 }
 
+ObjectExportImportHandler.prototype.exportParticleSystem = function(obj){
+  var context = {
+    isParticleSystem: true,
+    export: obj.export()
+  };
+  if (obj.getUsedTextureName() != null){
+    context.particleSystemTexturePack = texturePacks[obj.getUsedTextureName()].export();
+  }
+  return context;
+}
+
 ObjectExportImportHandler.prototype.exportObjectGroup = function(obj){
   var objExport = obj.export();
   var context = {

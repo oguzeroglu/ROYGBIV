@@ -227,7 +227,8 @@ var CommandDescriptor = function(){
       0, //resetWSServerURL
       0, //printWSServerURL
       1, //exportObject
-      1 //importObject
+      1, //importObject
+      1 //exportParticleSystem
   ];
 
   this.commandArgumentsExpectedExplanation = [
@@ -457,7 +458,8 @@ var CommandDescriptor = function(){
     "resetWSServerURL",
     "printWSServerURL",
     "exportObject objectName",
-    "importObject objectName"
+    "importObject objectName",
+    "exportParticleSystem psName"
   ];
 
   this.commands = [
@@ -687,7 +689,8 @@ var CommandDescriptor = function(){
     "resetWSServerURL",
     "printWSServerURL",
     "exportObject",
-    "importObject"
+    "importObject",
+    "exportParticleSystem"
   ];
 
   this.commandInfo = [
@@ -917,7 +920,8 @@ var CommandDescriptor = function(){
     "resetWSServerURL: Resets the WebSocket URL of the game server.",
     "printWSServerURL: Prints the set WebSocket URL of the game server.",
     "exportObject: Exports an object or an object group.",
-    "importObject: Imports an object or an object group."
+    "importObject: Imports an object or an object group.",
+    "exportParticleSystem: Exports a particle system."
   ];
 
   this.keyboardInfo = [
@@ -1702,6 +1706,11 @@ var CommandDescriptor = function(){
   this.importObject = new Object();
   this.importObject.types = [];
   this.importObject.types.push(this.UNKNOWN_INDICATOR); //objectName
+
+  // exportParticleSystem
+  this.exportParticleSystem = new Object();
+  this.exportParticleSystem.types = [];
+  this.exportParticleSystem.types.push(this.PRECONFIGURED_PS_NAME); //psName
 };
 
 CommandDescriptor.prototype.test = function(){

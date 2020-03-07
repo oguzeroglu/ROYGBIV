@@ -5360,6 +5360,21 @@ function parse(input){
           }
           loadInput.click();
           terminal.printInfo(Text.CHOOSE_A_FILE_TO_UPLOAD);
+          return true;
+        break;
+        case 227: //exportParticleSystem
+          if (mode != 0){
+            terminal.printError(Text.WORKS_ONLY_IN_DESIGN_MODE);
+            return true;
+          }
+          var psName = splitted[1];
+          var ps = preConfiguredParticleSystems[psName];
+          if (!ps){
+            terminal.printError(Text.NO_SUCH_PARTICLE_SYSTEM);
+            return true;
+          }
+          save(objectExportImportHandler.exportParticleSystem(ps) ,"particle_system_export_" + ps.name);
+          return true;
         break;
       }
       return true;
