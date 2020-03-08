@@ -5292,6 +5292,168 @@ function parse(input){
           }
           return true;
         break;
+        case 225: //exportObject
+          if (mode != 0){
+            terminal.printError(Text.WORKS_ONLY_IN_DESIGN_MODE);
+            return true;
+          }
+          var objName = splitted[1];
+          var obj = addedObjects[objName] || objectGroups[objName];
+          if (!obj){
+            terminal.printError(Text.NO_SUCH_OBJECT);
+            return true;
+          }
+          if (obj.softCopyParentName){
+            terminal.printError(Text.OBJECT_IS_A_COPY);
+            return true;
+          }
+          if (obj.pivotObject){
+            terminal.printError(Text.OBJECT_HAS_PIVOT);
+            return true;
+          }
+          save(objectExportImportHandler.exportObject(obj) ,"object_export_" + obj.name);
+          return true;
+        break;
+        case 226: //importObject
+          if (mode != 0){
+            terminal.printError(Text.WORKS_ONLY_IN_DESIGN_MODE);
+            return true;
+          }
+          var objName = splitted[1];
+          if (addedObjects[objName] || objectGroups[objName]){
+            terminal.printError(Text.NAME_MUST_BE_UNIQUE);
+            return true;
+          }
+          if (!FileReader){
+            terminal.printError(Text.THIS_FUNCTION_IS_NOT_SUPPORTED_IN_YOUR_BROWSER);
+            return true;
+          }
+          document.getElementById("loadInput").onclick = function(){
+            this.value = "";
+            document.getElementById("loadInput").onchange = function(event){
+              terminal.clear();
+              terminal.printInfo(Text.LOADING_FILE);
+              var target = event.target || window.event.srcElement;
+              var files = target.files;
+              if (files && files.length){
+                var fileReader = new FileReader();
+                fileReader.onload = function(e){
+                  var data = e.target.result;
+                  var json = JSON.parse(data);
+                  if (!json.isROYGBIVObjectExport){
+                    terminal.printError(Text.FILE_NOT_VALID);
+                    return;
+                  }
+                  terminal.clear();
+                  terminal.disable();
+                  objectExportImportHandler.importObject(objName, json, function(){
+                    terminal.clear();
+                    refreshRaycaster(Text.OBJECT_IMPORTED);
+                  });
+                };
+                fileReader.readAsText(files[0]);
+              }else{
+                terminal.printError(Text.NO_FILE_SELECTED_OPERATION_CANCELLED);
+              }
+              return true;
+            };
+          }
+          loadInput.click();
+          terminal.printInfo(Text.CHOOSE_A_FILE_TO_UPLOAD);
+          return true;
+        break;
+        case 227: //exportParticleSystem
+          if (mode != 0){
+            terminal.printError(Text.WORKS_ONLY_IN_DESIGN_MODE);
+            return true;
+          }
+          var psName = splitted[1];
+          var ps = preConfiguredParticleSystems[psName];
+          if (!ps){
+            terminal.printError(Text.NO_SUCH_PARTICLE_SYSTEM);
+            return true;
+          }
+          save(objectExportImportHandler.exportParticleSystem(ps) ,"particle_system_export_" + ps.name);
+          return true;
+        break;
+        case 228: //importParticleSystem
+          if (mode != 0){
+            terminal.printError(Text.WORKS_ONLY_IN_DESIGN_MODE);
+            return true;
+          }
+          var psName = splitted[1];
+          if (preConfiguredParticleSystems[psName]){
+            terminal.printError(Text.NAME_MUST_BE_UNIQUE);
+            return true;
+          }
+          if (!FileReader){
+            terminal.printError(Text.THIS_FUNCTION_IS_NOT_SUPPORTED_IN_YOUR_BROWSER);
+            return true;
+          }
+          document.getElementById("loadInput").onclick = function(){
+            this.value = "";
+            document.getElementById("loadInput").onchange = function(event){
+              terminal.clear();
+              terminal.printInfo(Text.LOADING_FILE);
+              var target = event.target || window.event.srcElement;
+              var files = target.files;
+              if (files && files.length){
+                var fileReader = new FileReader();
+                fileReader.onload = function(e){
+                  var data = e.target.result;
+                  var json = JSON.parse(data);
+                  if (!json.isROYGBIVParticleSystemExport){
+                    terminal.printError(Text.FILE_NOT_VALID);
+                    return;
+                  }
+                  terminal.clear();
+                  terminal.disable();
+                  objectExportImportHandler.importParticleSystem(psName, json, function(){
+                    terminal.clear();
+                    terminal.enable();
+                    terminal.printInfo(Text.PS_IMPORTED);
+                  });
+                };
+                fileReader.readAsText(files[0]);
+              }else{
+                terminal.printError(Text.NO_FILE_SELECTED_OPERATION_CANCELLED);
+              }
+              return true;
+            };
+          }
+          loadInput.click();
+          terminal.printInfo(Text.CHOOSE_A_FILE_TO_UPLOAD);
+          return true;
+        break;
+        case 229: //setObjectPosition
+          if (mode != 0){
+            terminal.printError(Text.WORKS_ONLY_IN_DESIGN_MODE);
+            return true;
+          }
+          var obj = addedObjects[splitted[1]] || objectGroups[splitted[1]];
+          if (!obj){
+            terminal.printError(Text.NO_SUCH_OBJECT);
+            return true;
+          }
+          var x = parseFloat(splitted[2]);
+          var y = parseFloat(splitted[3]);
+          var z = parseFloat(splitted[4]);
+          if (isNaN(x)){
+            terminal.printError(Text.IS_NOT_A_NUMBER.replace(Text.PARAM1, "x"));
+            return true;
+          }
+          if (isNaN(y)){
+            terminal.printError(Text.IS_NOT_A_NUMBER.replace(Text.PARAM1, "y"));
+            return true;
+          }
+          if (isNaN(z)){
+            terminal.printError(Text.IS_NOT_A_NUMBER.replace(Text.PARAM1, "z"));
+            return true;
+          }
+          obj.setPosition(x, y, z);
+          terminal.printInfo(Text.POSITION_SET);
+          return true;
+        break;
       }
       return true;
     }catch(err){
@@ -5468,13 +5630,18 @@ function checkIfNameUnique(name, errorMsg){
   return true;
 }
 
-function save(){
-  var state = new State();
+function save(customState, customName){
+  var state;
+  if (!customState){
+    state = new State();
+  }else{
+    state = customState;
+  }
   var json = JSON.stringify(state);
   var blob = new Blob([json], {type: "application/json"});
   var url  = URL.createObjectURL(blob);
   var anchor = document.createElement('a');
-  anchor.download = "ROYGBIV_SAVE_"+new Date()+".json";
+  anchor.download = customName? (customName+"_"+new Date()+".json"): "ROYGBIV_SAVE_"+new Date()+".json";
   anchor.href = url;
   if (typeof InstallTrigger !== 'undefined') {
     // F I R E F O X

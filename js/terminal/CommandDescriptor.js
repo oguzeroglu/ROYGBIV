@@ -225,7 +225,12 @@ var CommandDescriptor = function(){
       0, //printProtocolDefinition
       1, //setWSServerURL
       0, //resetWSServerURL
-      0 //printWSServerURL
+      0, //printWSServerURL
+      1, //exportObject
+      1, //importObject
+      1, //exportParticleSystem
+      1, //importParticleSystem
+      4 //setObjectPosition
   ];
 
   this.commandArgumentsExpectedExplanation = [
@@ -453,7 +458,12 @@ var CommandDescriptor = function(){
     "printProtocolDefinition",
     "setWSServerURL serverURL",
     "resetWSServerURL",
-    "printWSServerURL"
+    "printWSServerURL",
+    "exportObject objectName",
+    "importObject objectName",
+    "exportParticleSystem psName",
+    "importParticleSystem psName",
+    "setObjectPosition objectName x y z",
   ];
 
   this.commands = [
@@ -681,7 +691,12 @@ var CommandDescriptor = function(){
     "printProtocolDefinition",
     "setWSServerURL",
     "resetWSServerURL",
-    "printWSServerURL"
+    "printWSServerURL",
+    "exportObject",
+    "importObject",
+    "exportParticleSystem",
+    "importParticleSystem",
+    "setObjectPosition"
   ];
 
   this.commandInfo = [
@@ -909,7 +924,12 @@ var CommandDescriptor = function(){
     "printProtocolDefinition: Prints the protocol definition file path.",
     "setWSServerURL: Sets the WebSocket URL of the game server.",
     "resetWSServerURL: Resets the WebSocket URL of the game server.",
-    "printWSServerURL: Prints the set WebSocket URL of the game server."
+    "printWSServerURL: Prints the set WebSocket URL of the game server.",
+    "exportObject: Exports an object or an object group.",
+    "importObject: Imports an object or an object group.",
+    "exportParticleSystem: Exports a particle system.",
+    "importParticleSystem: Imports a particle system.",
+    "setObjectPosition: Sets the position of an object"
   ];
 
   this.keyboardInfo = [
@@ -1684,6 +1704,34 @@ var CommandDescriptor = function(){
   this.setWSServerURL = new Object();
   this.setWSServerURL.types = [];
   this.setWSServerURL.types.push(this.UNKNOWN_INDICATOR); //serverURL
+
+  // exportObject
+  this.exportObject = new Object();
+  this.exportObject.types = [];
+  this.exportObject.types.push(this.OBJECT_NAME); //objectName
+
+  // importObject
+  this.importObject = new Object();
+  this.importObject.types = [];
+  this.importObject.types.push(this.UNKNOWN_INDICATOR); //objectName
+
+  // exportParticleSystem
+  this.exportParticleSystem = new Object();
+  this.exportParticleSystem.types = [];
+  this.exportParticleSystem.types.push(this.PRECONFIGURED_PS_NAME); //psName
+
+  // importParticleSystem
+  this.importParticleSystem = new Object();
+  this.importParticleSystem.types = [];
+  this.importParticleSystem.types.push(this.UNKNOWN_INDICATOR); //psName
+
+  // setObjectPosition
+  this.setObjectPosition = new Object();
+  this.setObjectPosition.types = [];
+  this.setObjectPosition.types.push(this.OBJECT_NAME); //objectName
+  this.setObjectPosition.types.push(this.UNKNOWN_INDICATOR); //x
+  this.setObjectPosition.types.push(this.UNKNOWN_INDICATOR); //y
+  this.setObjectPosition.types.push(this.UNKNOWN_INDICATOR); //z
 };
 
 CommandDescriptor.prototype.test = function(){

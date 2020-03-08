@@ -646,6 +646,9 @@ function readEngineScripts(projectName, author, noMobile){
       }else if (scriptPath.includes("Preconditions.js")){
         console.log("[*] Skipping Preconditions");
         continue;
+      }else if (scriptPath.includes("ObjectExportImportHandler.js")){
+        console.log("[*] Skipping ObjectExportImportHandler.");
+        continue;
       }
       content += scriptContent +"\n";
     }

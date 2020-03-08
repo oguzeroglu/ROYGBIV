@@ -725,6 +725,9 @@ ImportHandler.prototype.importAddedObjects = function(obj){
        var curAnimationExport = curAddedObjectExport.animations[animationName];
        addedObjectInstance.addAnimation(new Animation(animationName, curAnimationExport.type, addedObjectInstance, curAnimationExport.description, curAnimationExport.rewind, curAnimationExport.repeat));
      }
+     if (curAddedObjectExport.manualPositionInfo){
+       addedObjectInstance.setPosition(curAddedObjectExport.manualPositionInfo.x, curAddedObjectExport.manualPositionInfo.y, curAddedObjectExport.manualPositionInfo.z, true);
+     }
   }
   for (var objName in addedObjects){
     if (addedObjects[objName].softCopyParentName){
@@ -745,14 +748,16 @@ ImportHandler.prototype.importAddedObjects = function(obj){
   }
 }
 
-ImportHandler.prototype.importTexturePacks = function(obj, callback){
+ImportHandler.prototype.importTexturePacks = function(obj, callback, skipMapping){
   var texturePacksExport = obj.texturePacks;
   for (var texturePackName in texturePacksExport){
     var curTexturePackExport = texturePacksExport[texturePackName];
     var texturePack = new TexturePack(texturePackName, curTexturePackExport.directoryName, curTexturePackExport.textureDescription);
     texturePack.setParticleTextureStatus(curTexturePackExport.isParticleTexture);
     texturePack.loadTextures(function(){
-      this.mapLoadedTexturePack(this.texturePackName, obj);
+      if (!skipMapping){
+        this.mapLoadedTexturePack(this.texturePackName, obj);
+      }
       callback();
     }.bind({texturePackName: texturePackName, mapLoadedTexturePack: this.mapLoadedTexturePack}));
     texturePacks[texturePackName] = texturePack;
@@ -1223,6 +1228,9 @@ ImportHandler.prototype.importObjectGroups = function(obj){
     for (var animationName in curObjectGroupExport.animations){
       var curAnimationExport = curObjectGroupExport.animations[animationName];
       objectGroupInstance.addAnimation(new Animation(animationName, curAnimationExport.type, objectGroupInstance, curAnimationExport.description, curAnimationExport.rewind, curAnimationExport.repeat));
+    }
+    if (curObjectGroupExport.manualPositionInfo){
+      objectGroupInstance.setPosition(curObjectGroupExport.manualPositionInfo.x, curObjectGroupExport.manualPositionInfo.y, curObjectGroupExport.manualPositionInfo.z, true);
     }
   }
   for (var objName in objectGroups){
