@@ -725,6 +725,9 @@ ImportHandler.prototype.importAddedObjects = function(obj){
        var curAnimationExport = curAddedObjectExport.animations[animationName];
        addedObjectInstance.addAnimation(new Animation(animationName, curAnimationExport.type, addedObjectInstance, curAnimationExport.description, curAnimationExport.rewind, curAnimationExport.repeat));
      }
+     if (curAddedObjectExport.manualPositionInfo){
+       addedObjectInstance.setPosition(curAddedObjectExport.manualPositionInfo.x, curAddedObjectExport.manualPositionInfo.y, curAddedObjectExport.manualPositionInfo.z, true);
+     }
   }
   for (var objName in addedObjects){
     if (addedObjects[objName].softCopyParentName){
@@ -1225,6 +1228,9 @@ ImportHandler.prototype.importObjectGroups = function(obj){
     for (var animationName in curObjectGroupExport.animations){
       var curAnimationExport = curObjectGroupExport.animations[animationName];
       objectGroupInstance.addAnimation(new Animation(animationName, curAnimationExport.type, objectGroupInstance, curAnimationExport.description, curAnimationExport.rewind, curAnimationExport.repeat));
+    }
+    if (curObjectGroupExport.manualPositionInfo){
+      objectGroupInstance.setPosition(curObjectGroupExport.manualPositionInfo.x, curObjectGroupExport.manualPositionInfo.y, curObjectGroupExport.manualPositionInfo.z, true);
     }
   }
   for (var objName in objectGroups){

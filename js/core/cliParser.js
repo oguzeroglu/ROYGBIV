@@ -5425,6 +5425,35 @@ function parse(input){
           terminal.printInfo(Text.CHOOSE_A_FILE_TO_UPLOAD);
           return true;
         break;
+        case 229: //setObjectPosition
+          if (mode != 0){
+            terminal.printError(Text.WORKS_ONLY_IN_DESIGN_MODE);
+            return true;
+          }
+          var obj = addedObjects[splitted[1]] || objectGroups[splitted[1]];
+          if (!obj){
+            terminal.printError(Text.NO_SUCH_OBJECT);
+            return true;
+          }
+          var x = parseFloat(splitted[2]);
+          var y = parseFloat(splitted[3]);
+          var z = parseFloat(splitted[4]);
+          if (isNaN(x)){
+            terminal.printError(Text.IS_NOT_A_NUMBER.replace(Text.PARAM1, "x"));
+            return true;
+          }
+          if (isNaN(y)){
+            terminal.printError(Text.IS_NOT_A_NUMBER.replace(Text.PARAM1, "y"));
+            return true;
+          }
+          if (isNaN(z)){
+            terminal.printError(Text.IS_NOT_A_NUMBER.replace(Text.PARAM1, "z"));
+            return true;
+          }
+          obj.setPosition(x, y, z);
+          terminal.printInfo(Text.POSITION_SET);
+          return true;
+        break;
       }
       return true;
     }catch(err){

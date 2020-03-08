@@ -630,6 +630,7 @@ var Text = function(){
   this.NO_COMMAND_FOUND = "No command found.";
   this.RESOLUTION_SET = "Resolution set.";
   this.IS_NOT_A_NUMBER = "@@1 is not a number.";
+  this.POSITION_SET = "Position set.";
   this.CHILD_CONTAINER_IS_ALREADY_ALIGNED = "Child container is already aligned to another parent. Use unalignContainer command first.";
   this.IS_NOT_POWER_OF_TWO = "@@1 is not power of two.";
   this.ATLAS_TEXTURE_SIZE_SET = "Atlas texture size set.";

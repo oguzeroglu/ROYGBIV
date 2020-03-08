@@ -747,6 +747,9 @@ AddedObject.prototype.export = function(){
   for (var animationName in this.animations){
     exportObject.animations[animationName] = this.animations[animationName].export();
   }
+  if (this.manualPositionInfo){
+    exportObject.manualPositionInfo = this.manualPositionInfo;
+  }
   return exportObject;
 }
 
@@ -1414,7 +1417,7 @@ AddedObject.prototype.trackObjectPosition = function(targetObject){
   sceneHandler.onTrackingObjectAddition(this);
 }
 
-AddedObject.prototype.setPosition = function(x, y, z){
+AddedObject.prototype.setPosition = function(x, y, z, skipBBUpdate){
   this.prevPositionVector.copy(this.mesh.position);
   this.mesh.position.set(x, y, z);
   this.physicsBody.position.set(x, y, z);
@@ -1426,6 +1429,15 @@ AddedObject.prototype.setPosition = function(x, y, z){
     this.autoInstancedParent.updateObject(this);
   }
   this.onPositionChange(this.prevPositionVector, this.mesh.position);
+  if (mode == 0){
+    if (!skipBBUpdate){
+      this.mesh.updateMatrixWorld(true);
+      this.updateBoundingBoxes();
+    }
+    this.manualPositionInfo = {
+      x: x, y: y, z: z
+    };
+  }
 }
 
 AddedObject.prototype.resetPosition = function(){

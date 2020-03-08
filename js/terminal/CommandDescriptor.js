@@ -229,7 +229,8 @@ var CommandDescriptor = function(){
       1, //exportObject
       1, //importObject
       1, //exportParticleSystem
-      1 //importParticleSystem
+      1, //importParticleSystem
+      4 //setObjectPosition
   ];
 
   this.commandArgumentsExpectedExplanation = [
@@ -461,7 +462,8 @@ var CommandDescriptor = function(){
     "exportObject objectName",
     "importObject objectName",
     "exportParticleSystem psName",
-    "importParticleSystem psName"
+    "importParticleSystem psName",
+    "setObjectPosition objectName x y z",
   ];
 
   this.commands = [
@@ -693,7 +695,8 @@ var CommandDescriptor = function(){
     "exportObject",
     "importObject",
     "exportParticleSystem",
-    "importParticleSystem"
+    "importParticleSystem",
+    "setObjectPosition"
   ];
 
   this.commandInfo = [
@@ -925,7 +928,8 @@ var CommandDescriptor = function(){
     "exportObject: Exports an object or an object group.",
     "importObject: Imports an object or an object group.",
     "exportParticleSystem: Exports a particle system.",
-    "importParticleSystem: Imports a particle system."
+    "importParticleSystem: Imports a particle system.",
+    "setObjectPosition: Sets the position of an object"
   ];
 
   this.keyboardInfo = [
@@ -1720,6 +1724,14 @@ var CommandDescriptor = function(){
   this.importParticleSystem = new Object();
   this.importParticleSystem.types = [];
   this.importParticleSystem.types.push(this.UNKNOWN_INDICATOR); //psName
+
+  // setObjectPosition
+  this.setObjectPosition = new Object();
+  this.setObjectPosition.types = [];
+  this.setObjectPosition.types.push(this.OBJECT_NAME); //objectName
+  this.setObjectPosition.types.push(this.UNKNOWN_INDICATOR); //x
+  this.setObjectPosition.types.push(this.UNKNOWN_INDICATOR); //y
+  this.setObjectPosition.types.push(this.UNKNOWN_INDICATOR); //z
 };
 
 CommandDescriptor.prototype.test = function(){
