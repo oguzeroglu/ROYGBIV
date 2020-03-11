@@ -562,6 +562,9 @@ FPSControls.prototype.onlookRaycasterComplete = function(x, y, z, objName){
   if (activeControl.deactivated){
     return;
   }
+  if (isNaN(x) || isNaN(y) || isNaN(z)){
+    return;
+  }
   activeControl.currentLookInfo.x = x;
   activeControl.currentLookInfo.y = y;
   activeControl.currentLookInfo.z = z;
