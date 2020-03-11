@@ -554,6 +554,9 @@ RaycasterWorkerBridge.prototype.issueParticleSystemStatusUpdate = function(ps){
 }
 
 RaycasterWorkerBridge.prototype.issueUpdate = function(obj){
+  if ((obj.isAddedObject || obj.isObjectGroup) && !obj.isIntersectable){
+    return;
+  }
   if (obj.mesh){
     obj.mesh.updateMatrixWorld();
   }
