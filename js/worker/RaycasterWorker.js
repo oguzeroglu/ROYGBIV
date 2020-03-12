@@ -391,9 +391,17 @@ RaycasterWorker.prototype.set2DTextSizes = function(data){
   }
   var stateLoader = new StateLoaderLightweight();
   for (var containerName in msgBody.containers){
+    var wid;
+    if (containers[containerName]){
+      wid = containers[containerName].workerID;
+    }
     containers[containerName] = stateLoader.containerImportFunc(containerName, msgBody.containers[containerName]);
     if (containers[containerName].isClickable){
       clickableContainers[containerName] = containers[containerName];
+    }
+    if (!(typeof wid == UNDEFINED)){
+      containers[containerName].workerID = wid;
+      this.objectsByWorkerID[wid] = containers[containerName];
     }
   }
   for (var virtualKeyboardName in msgBody.virtualKeyboards){

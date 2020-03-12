@@ -564,6 +564,9 @@ RaycasterWorkerBridge.prototype.issueUpdate = function(obj){
     if (obj.isSprite && !obj.isClickable){
       return;
     }
+    if (obj.isContainer && !obj.isClickable){
+      return;
+    }
   }
   if (obj.mesh){
     obj.mesh.updateMatrixWorld();
@@ -627,6 +630,7 @@ RaycasterWorkerBridge.prototype.updateObject = function(obj){
   if (obj.isAddedText && obj.isEditorHelper){
     return;
   }
+
   this.updateBuffer.set(obj.name, obj);
 }
 
