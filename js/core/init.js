@@ -31,8 +31,6 @@ window.onload = function() {
   sceneHandler = new SceneHandler();
   // LIGHTNING HANDLER
   lightningHandler = new LightningHandler();
-  // OBJECT EXPORT IMPORT HANDLER
-  objectExportImportHandler = new ObjectExportImportHandler();
   // TEXT POOL
   Text = (!isDeployment)? new Text(): 0;
   // DRAGABLE CLI
@@ -65,6 +63,7 @@ window.onload = function() {
   crosshairHandler = new CrosshairHandler();
 
   if (!isDeployment){
+    objectExportImportHandler = new ObjectExportImportHandler();
     selectionHandler = new SelectionHandler();
     particleSystemCreatorGUIHandler = new ParticleSystemCreatorGUIHandler();
     muzzleFlashCreatorGUIHandler = new MuzzleFlashCreatorGUIHandler();
