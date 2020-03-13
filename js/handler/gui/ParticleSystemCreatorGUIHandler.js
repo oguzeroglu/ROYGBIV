@@ -1431,7 +1431,7 @@ ParticleSystemCreatorGUIHandler.prototype.showPlasma = function(prevParams){
   guiHandler.datGuiPSCreator.add(plasmaParameters, "alphaVariation").min(-100).max(100).step(0.1).onFinishChange(function(val){
     particleSystemCreatorGUIHandler.plasmaGeneratorFunc();
   }).listen();
-  guiHandler.datGuiPSCreator.add(plasmaParameters, "colorName").onFinishChange(function(val){
+  guiHandler.datGuiPSCreator.add(plasmaParameters, plasmaParameters.colorName ? "colorName": "color").onFinishChange(function(val){
     particleSystemCreatorGUIHandler.plasmaGeneratorFunc();
   }).listen();
   particleSystemCreatorGUIHandler.plasmaHasTextureController = guiHandler.datGuiPSCreator.add(plasmaParameters, "hasTexture").onChange(function(val){

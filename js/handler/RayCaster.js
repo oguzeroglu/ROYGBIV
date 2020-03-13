@@ -115,9 +115,9 @@ RayCaster.prototype.issueUpdate = function(obj){
   }
 }
 
-RayCaster.prototype.findIntersections = function(from, direction, intersectGridSystems, callbackFunction, clientX, clientY){
+RayCaster.prototype.findIntersections = function(from, direction, intersectGridSystems, callbackFunction, clientX, clientY, skip2D){
   intersectionPoint = 0, intersectionObject = 0;
-  if (!IS_WORKER_CONTEXT){
+  if (!IS_WORKER_CONTEXT && !skip2D){
     objectPicker2D.find(clientX, clientY);
     if (intersectionPoint){
       callbackFunction();

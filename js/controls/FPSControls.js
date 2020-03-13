@@ -592,7 +592,7 @@ FPSControls.prototype.onlookRaycasterComplete = function(x, y, z, objName){
 FPSControls.prototype.lookIntersectionTest = function(){
   REUSABLE_VECTOR.copy(camera.position);
   REUSABLE_VECTOR_2.set(0, 0, -1).applyQuaternion(camera.quaternion);
-  rayCaster.findIntersections(REUSABLE_VECTOR, REUSABLE_VECTOR_2, false, this.onlookRaycasterComplete, null, null);
+  rayCaster.findIntersections(REUSABLE_VECTOR, REUSABLE_VECTOR_2, false, this.onlookRaycasterComplete, null, null, true);
 }
 
 FPSControls.prototype.resetJoystickStatus = function(){
