@@ -187,7 +187,11 @@ AddedObject.prototype.onFPSWeaponAlignmentUpdate = function(){
 }
 
 AddedObject.prototype.revertPositionAfterFPSWeaponConfigurations = function(){
-  this.mesh.position.copy(this.positionWhenUsedAsFPSWeapon);
+  if (this.manualPositionInfo){
+    this.mesh.position.set(this.manualPositionInfo.x, this.manualPositionInfo.y, this.manualPositionInfo.z);
+  }else{
+    this.mesh.position.copy(this.positionWhenUsedAsFPSWeapon);
+  }
   this.mesh.quaternion.copy(this.quaternionBeforeFPSWeaponConfigurationPanelOpened);
   this.mesh.scale.set(1, 1, 1);
   delete this.quaternionBeforeFPSWeaponConfigurationPanelOpened;
