@@ -251,6 +251,8 @@ var Preconditions = function(){
   this.valuesByParameterName = "valuesByParameterName";
   this.axis = "axis";
   this.milliseconds = "milliseconds";
+  this.sourceAreaName = "sourceAreaName";
+  this.targetAreaName = "targetAreaName";
 }
 
 Preconditions.prototype.errorHeader = function(callerFunc){

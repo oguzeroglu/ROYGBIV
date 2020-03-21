@@ -263,7 +263,8 @@ var Roygbiv = function(){
     "sendToServer",
     "onReceivedFromServer",
     "onLatencyUpdated",
-    "applyCustomVelocity"
+    "applyCustomVelocity",
+    "mapAreaPositionToArea"
   ];
 
   this.globals = new Object();
@@ -1179,7 +1180,7 @@ Roygbiv.prototype.stopParticleSystem = function(particleSystem, stopDuration){
 // startQuaternion: The initial quaternion of the particle system. Use ROYGBIV.computeQuaternionFromVectors (optional)
 // maxCameraDistance: This parameter can be used for particle systems being shot from FPS weapons to visually
 // adjust their scales. If set, the scale of the particle system is set to [distance_to_camera] / maxCameraDistance
-// while the distance to camera is less than maxCameraDistance. 
+// while the distance to camera is less than maxCameraDistance.
 Roygbiv.prototype.startParticleSystem = function(configurations){
   if (mode == 0){
     return;
@@ -4114,4 +4115,29 @@ Roygbiv.prototype.applyCustomVelocity = function(axis, velocity, milliseconds){
   preConditions.checkIfAxisOnlyIfDefined(ROYGBIV.applyCustomVelocity, preConditions.axis, axis);
   preConditions.checkIfActiveControlFPS(ROYGBIV.applyCustomVelocity);
   activeControl.applyCustomVelocity(axis, velocity, milliseconds);
+}
+
+// Converts a 3D vector within source area into another vector in target area
+// maintanining the ratio.
+Roygbiv.prototype.mapAreaPositionToArea = function(sourceAreaName, targetAreaName, vector, targetVector){
+  if (mode == 0){
+    return;
+  }
+  preConditions.checkIfDefined(ROYGBIV.mapAreaPositionToArea, preConditions.sourceAreaName, sourceAreaName);
+  preConditions.checkIfDefined(ROYGBIV.mapAreaPositionToArea, preConditions.targetAreaName, targetAreaName);
+  preConditions.checkIfDefined(ROYGBIV.mapAreaPositionToArea, preConditions.vector, vector);
+  preConditions.checkIfDefined(ROYGBIV.mapAreaPositionToArea, preConditions.targetVector, targetVector);
+  preConditions.checkIfAreaExists(ROYGBIV.mapAreaPositionToArea, sourceAreaName);
+  preConditions.checkIfAreaExists(ROYGBIV.mapAreaPositionToArea, targetAreaName);
+  preConditions.checkIfVectorOnlyIfDefined(ROYGBIV.mapAreaPositionToArea, preConditions.vector, vector);
+  preConditions.checkIfVectorOnlyIfDefined(ROYGBIV.mapAreaPositionToArea, preConditions.targetVector, targetVector);
+
+  var bbSource = areas[sourceAreaName].boundingBox;
+  var bbTarget = areas[targetAreaName].boundingBox;
+
+  targetVector.x = affineTransformation(vector.x, bbSource.max.x, bbSource.min.x, bbTarget.max.x, bbTarget.min.x);
+  targetVector.y = affineTransformation(vector.y, bbSource.max.y, bbSource.min.y, bbTarget.max.y, bbTarget.min.y);
+  targetVector.z = affineTransformation(vector.z, bbSource.max.z, bbSource.min.z, bbTarget.max.z, bbTarget.min.z);
+
+  return targetVector;
 }

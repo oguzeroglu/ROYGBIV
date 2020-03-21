@@ -1029,4 +1029,5 @@ var Text = function(){
   this.ROYGBIV_SCRIPTING_API_ONRECEIVEDFROMSERVER = "Listens to server for given protocol and executes callbackFunction when a message received. The callbackFunction is executed\nwith getter parameter. getter is a function which expects a protocol parameter name as input and returns received value\nfor that parameter. Read https://github.com/oguzeroglu/Rhubarb/wiki/API-reference#onReceived for more info.";
   this.ROYGBIV_SCRIPTING_API_ONLATENCYUPDATED = "Listens for latency between the server and the client. The callbackFunction is executed with newLatency (in ms) parameter when the latency is updated.";
   this.ROYGBIV_SCRIPTING_API_APPLYCUSTOMVELOCITY = "Applies velocity to FPS controls for given milliseconds. This can be useful for Valve Ricochet kind of games where\nthe player is manually accelerated with jump pads.";
+  this.ROYGBIV_SCRIPTING_API_MAPAREAPOSITIONTOAREA = "Converts a 3D vector within source area into another vector in target area maintanining the ratio.";
 }

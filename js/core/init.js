@@ -813,6 +813,11 @@ function generateUUID() {
   });
 }
 
+// best formula of the universe.
+function affineTransformation(oldValue, oldMax, oldMin, newMax, newMin){
+  return (((oldValue - oldMin) * (newMax - newMin)) / (oldMax - oldMin)) + newMin;
+}
+
 //******************************************************************
 // WARNING: FOR TEST PURPOSES
 function debugTexture(texture){
