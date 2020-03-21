@@ -99,7 +99,7 @@ void main(){
       vec3 objNormal = normalize(normal);
       float totalDisplacementScale = displacementInfo.x * totalDisplacementInfo.x;
       float totalDisplacementBias = displacementInfo.y * totalDisplacementInfo.y;
-      transformedPosition += objNormal * (texture2D(displacementMap, vUV).r * totalDisplacementScale + totalDisplacementBias);
+      transformedPosition += objNormal * (texture2D(displacementMap, uv).r * totalDisplacementScale + totalDisplacementBias);
     }
   #endif
   gl_Position = projectionMatrix * modelViewMatrix * vec4(transformedPosition, 1.0);

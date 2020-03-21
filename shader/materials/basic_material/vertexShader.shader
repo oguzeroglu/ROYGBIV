@@ -35,7 +35,7 @@ void main(){
   vec3 transformedPosition = position;
   #ifdef HAS_DISPLACEMENT
     vec3 objNormal = normalize(normal);
-    transformedPosition += objNormal * (texture2D(displacementMap, vUV).r * displacementInfo.x + displacementInfo.y);
+    transformedPosition += objNormal * (texture2D(displacementMap, uv).r * displacementInfo.x + displacementInfo.y);
   #endif
 
   vec4 mvPosition = modelViewMatrix * vec4(transformedPosition, 1.0);

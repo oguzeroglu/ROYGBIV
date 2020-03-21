@@ -185,7 +185,7 @@ void main(){
         float totalDisplacementScale = displacementInfo.x * totalDisplacementInfo.x;
         float totalDisplacementBias = displacementInfo.y * totalDisplacementInfo.y;
       #endif
-      transformedPosition += objNormal * (texture2D(displacementMap, vUV).r * totalDisplacementScale + totalDisplacementBias);
+      transformedPosition += objNormal * (texture2D(displacementMap, uv).r * totalDisplacementScale + totalDisplacementBias);
     }
   #endif
   #ifdef IS_AUTO_INSTANCED
