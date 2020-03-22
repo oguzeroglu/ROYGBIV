@@ -23,6 +23,7 @@ varying float vAlpha;
   uniform vec3 autoInstanceEmissiveColorArray[AUTO_INSTANCE_EMISSIVE_COLOR_ARRAY_SIZE];
   uniform vec2 autoInstanceDisplacementInfoArray[AUTO_INSTANCE_DISPLACEMENT_INFO_ARRAY_SIZE];
   uniform vec2 autoInstanceTextureOffsetInfoArray[AUTO_INSTANCE_TEXTURE_OFFSET_INFO_ARRAY_SIZE];
+  uniform float autoInstanceAOIntensityArray[AUTO_INSTANCE_AO_INTENSITY_ARRAY_SIZE];
   varying float vDiscardFlag;
   #ifdef AUTO_INSTANCE_HAS_COLORIZABLE_MEMBER
     attribute float forcedColorIndex;
@@ -170,7 +171,12 @@ void main(){
     #endif
   #endif
   #ifdef HAS_AO
-    vAOIntensity = aoIntensity;
+    #ifdef IS_AUTO_INSTANCED
+      int iai = int(alphaIndex);
+      vAOIntensity = autoInstanceAOIntensityArray[iai];
+    #else
+      vAOIntensity = aoIntensity;
+    #endif
   #endif
 
   vec3 transformedPosition = position;

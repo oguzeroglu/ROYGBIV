@@ -20,7 +20,8 @@ var AnimationHandler = function(){
       ROTATION_X: "OBJECT_ROTATION_X", ROTATION_Y: "OBJECT_ROTATION_Y", ROTATION_Z: "OBJECT_ROTATION_Z", POSITION_X: "OBJECT_POSITION_X",
       POSITION_Y: "OBJECT_POSITION_Y", POSITION_Z: "OBJECT_POSITION_Z", EMISSIVE_INTENSITY: "OBJECT_EMISSIVE_INTENSITY", DISPLACEMENT_SCALE: "OBJECT_DISPLACEMENT_SCALE",
       DISPLACEMENT_BIAS: "OBJECT_DISPLACEMENT_BIAS", EMISSIVE_COLOR: "OBJECT_EMISSIVE_COLOR", TEXTURE_OFFSET_X: "OBJECT_TEXTURE_OFFSET_X",
-      TEXTURE_OFFSET_Y: "OBJECT_TEXTURE_OFFSET_Y", TRANSLATE_X: "OBJECT_TRANSLATE_X", TRANSLATE_Y: "OBJECT_TRANSLATE_Y", TRANSLATE_Z: "OBJECT_TRANSLATE_Z"
+      TEXTURE_OFFSET_Y: "OBJECT_TEXTURE_OFFSET_Y", TRANSLATE_X: "OBJECT_TRANSLATE_X", TRANSLATE_Y: "OBJECT_TRANSLATE_Y", TRANSLATE_Z: "OBJECT_TRANSLATE_Z",
+      AO_INTENSITY: "OBJECT_AO_INTENSITY"
     },
     TEXT: {
       TRANSPARENCY: "TEXT_TRANSPARENCY", CHAR_SIZE: "TEXT_CHAR_SIZE", MARGIN_BETWEEN_CHARS: "TEXT_MARGIN_BETWEEN_CHARS",
@@ -110,6 +111,9 @@ var AnimationHandler = function(){
   };
   this.initialValueGetterFunctionsByType[this.actionTypes.OBJECT.TRANSLATE_Z] = function(object){
     return 0;
+  };
+  this.initialValueGetterFunctionsByType[this.actionTypes.OBJECT.AO_INTENSITY] = function(object){
+    return object.getAOIntensity();
   };
   this.initialValueGetterFunctionsByType[this.actionTypes.TEXT.TRANSPARENCY] = function(object){
     return object.getAlpha();
@@ -329,6 +333,9 @@ var AnimationHandler = function(){
       animation.attachedObject.setPosition(animation.attachedObject.mesh.position.x, animation.attachedObject.mesh.position.y, animation.attachedObject.mesh.position.z);
     }
   };
+  this.afterAnimationSettersByType[this.actionTypes.OBJECT.AO_INTENSITY] = function(animation){
+    animation.attachedObject.setAOIntensity(animation.initialValue);
+  };
   this.afterAnimationSettersByType[this.actionTypes.TEXT.TRANSPARENCY] = function(animation){
     animation.attachedObject.setAlpha(animation.initialValue);
   };
@@ -429,6 +436,7 @@ var AnimationHandler = function(){
   this.actionFunctionsByType[this.actionTypes.OBJECT.TRANSLATE_X] = this.updateObjectTranslationX;
   this.actionFunctionsByType[this.actionTypes.OBJECT.TRANSLATE_Y] = this.updateObjectTranslationY;
   this.actionFunctionsByType[this.actionTypes.OBJECT.TRANSLATE_Z] = this.updateObjectTranslationZ;
+  this.actionFunctionsByType[this.actionTypes.OBJECT.AO_INTENSITY] = this.updateObjectAOIntensity;
   this.actionFunctionsByType[this.actionTypes.TEXT.TRANSPARENCY] = this.updateTextTransparencyFunc;
   this.actionFunctionsByType[this.actionTypes.TEXT.CHAR_SIZE] = this.updateTextCharSizeFunc;
   this.actionFunctionsByType[this.actionTypes.TEXT.MARGIN_BETWEEN_CHARS] = this.updateTextMarginBetweenCharsFunc;
@@ -745,6 +753,9 @@ AnimationHandler.prototype.updateObjectTranslationZ = function(params, increaseT
   if (mode == 1 && params.object.isChangeable){
     params.object.setPosition(params.object.mesh.position.x, params.object.mesh.position.y, params.object.mesh.position.z);
   }
+}
+AnimationHandler.prototype.updateObjectAOIntensity = function(params){
+  params.object.setAOIntensity(params.value);
 }
 AnimationHandler.prototype.updateTextTransparencyFunc = function(params){
   params.object.setAlpha(params.value);

@@ -82,6 +82,9 @@ AddedObject.prototype.getAOIntensity = function(){
 
 AddedObject.prototype.setAOIntensity = function(val){
   this.mesh.material.uniforms.aoIntensity.value = val;
+  if (this.autoInstancedParent){
+    this.autoInstancedParent.updateObject(this);
+  }
 }
 
 AddedObject.prototype.getDisplacementBias = function(){
