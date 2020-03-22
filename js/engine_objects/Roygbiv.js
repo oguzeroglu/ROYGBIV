@@ -264,7 +264,9 @@ var Roygbiv = function(){
     "onReceivedFromServer",
     "onLatencyUpdated",
     "applyCustomVelocity",
-    "mapAreaPositionToArea"
+    "mapAreaPositionToArea",
+    "createVectorPool",
+    "getFromVectorPool"
   ];
 
   this.globals = new Object();
@@ -4140,4 +4142,30 @@ Roygbiv.prototype.mapAreaPositionToArea = function(sourceAreaName, targetAreaNam
   targetVector.z = affineTransformation(vector.z, bbSource.max.z, bbSource.min.z, bbTarget.max.z, bbTarget.min.z);
 
   return targetVector;
+}
+
+// Returns a vector pool to store reusable vectors. Use getFromVectorPool
+// API to get the vector object.
+Roygbiv.prototype.createVectorPool = function(length){
+  if (mode == 0){
+    return;
+  }
+
+  preConditions.checkIfDefined(ROYGBIV.createVectorPool, preConditions.length, length);
+  preConditions.checkIfNumber(ROYGBIV.createVectorPool, preConditions.length, length);
+  preConditions.checkIfLessThan(ROYGBIV.createVectorPool, preConditions.length, length, 0);
+
+  return new VectorPool(this.vector, length);
+}
+
+// Returns a vector from a vector pool create with createVectorPool API.
+Roygbiv.prototype.getFromVectorPool = function(vectorPool){
+  if (mode == 0){
+    return;
+  }
+
+  preConditions.checkIfDefined(ROYGBIV.getFromVectorPool, preConditions.vectorPool, vectorPool);
+  preConditions.checkIfTrue(ROYGBIV.getFromVectorPool, "Object is not a vector pool", !vectorPool.isVectorPool);
+
+  return vectorPool.get();
 }

@@ -253,6 +253,8 @@ var Preconditions = function(){
   this.milliseconds = "milliseconds";
   this.sourceAreaName = "sourceAreaName";
   this.targetAreaName = "targetAreaName";
+  this.length = "length";
+  this.vectorPool = "vectorPool";
 }
 
 Preconditions.prototype.errorHeader = function(callerFunc){
