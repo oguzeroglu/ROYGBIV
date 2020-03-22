@@ -98,6 +98,25 @@ var AddedText = function(name, font, text, position, color, alpha, characterSize
   webglCallbackHandler.registerEngineObject(this);
 }
 
+AddedText.prototype.isAnimationSuitable = function(animation){
+  var action = animation.description.action;
+
+  if (action == animationHandler.actionTypes.TEXT.POSITION_Z){
+    return !this.is2D;
+  }
+  return true;
+}
+
+AddedText.prototype.copyAnimationsFromObject = function(text){
+  this.animations = new Object();
+
+  for (var animName in text.animations){
+    if (this.isAnimationSuitable(text.animations[animName])){
+      this.addAnimation(text.animations[animName].copyWithAnotherObject(this));
+    }
+  }
+}
+
 AddedText.prototype.handleInputAnimation = function(){
   var now = performance.now();
   if (now - this.lastInputLineUpdateTime >= 500){

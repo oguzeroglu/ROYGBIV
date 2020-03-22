@@ -230,7 +230,8 @@ var CommandDescriptor = function(){
       1, //importObject
       1, //exportParticleSystem
       1, //importParticleSystem
-      4 //setObjectPosition
+      4, //setObjectPosition
+      2 //syncAnimations
   ];
 
   this.commandArgumentsExpectedExplanation = [
@@ -464,6 +465,7 @@ var CommandDescriptor = function(){
     "exportParticleSystem psName",
     "importParticleSystem psName",
     "setObjectPosition objectName x y z",
+    "syncAnimations sourceName targetName"
   ];
 
   this.commands = [
@@ -696,7 +698,8 @@ var CommandDescriptor = function(){
     "importObject",
     "exportParticleSystem",
     "importParticleSystem",
-    "setObjectPosition"
+    "setObjectPosition",
+    "syncAnimations"
   ];
 
   this.commandInfo = [
@@ -929,7 +932,8 @@ var CommandDescriptor = function(){
     "importObject: Imports an object or an object group.",
     "exportParticleSystem: Exports a particle system.",
     "importParticleSystem: Imports a particle system.",
-    "setObjectPosition: Sets the position of an object"
+    "setObjectPosition: Sets the position of an object",
+    "syncAnimations: Resets animations of target text/object/sprite and copies each animation of source to target."
   ];
 
   this.keyboardInfo = [
@@ -1732,6 +1736,12 @@ var CommandDescriptor = function(){
   this.setObjectPosition.types.push(this.UNKNOWN_INDICATOR); //x
   this.setObjectPosition.types.push(this.UNKNOWN_INDICATOR); //y
   this.setObjectPosition.types.push(this.UNKNOWN_INDICATOR); //z
+
+  // syncAnimations
+  this.syncAnimations = new Object();
+  this.syncAnimations.types = [];
+  this.syncAnimations.types.push(this.OBJECT_TEXT_SPRITE_NAME); //sourceName
+  this.syncAnimations.types.push(this.OBJECT_TEXT_SPRITE_NAME); //targetName
 };
 
 CommandDescriptor.prototype.test = function(){

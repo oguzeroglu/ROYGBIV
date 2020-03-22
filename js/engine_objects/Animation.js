@@ -53,6 +53,10 @@ var Animation = function(name, type, attachedObject, description, rewind, repeat
   this.animationState = ANIMATION_STATE_NOT_RUNNING;
 }
 
+Animation.prototype.copyWithAnotherObject = function(obj){
+  return new Animation(this.name, this.type, obj, this.description, this.rewind, this.repeat);
+}
+
 Animation.prototype.restore = function(){
   this.initialValue = this.savedState.initialValue;
   this.tick = this.savedState.tick;

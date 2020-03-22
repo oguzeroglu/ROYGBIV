@@ -68,6 +68,43 @@ var AddedObject = function(name, type, metaData, material, mesh, physicsBody, de
   webglCallbackHandler.registerEngineObject(this);
 }
 
+AddedObject.prototype.isAnimationSuitable = function(animation){
+  var action = animation.description.action;
+
+  if (action == animationHandler.actionTypes.OBJECT.EMISSIVE_INTENSITY){
+    return this.hasEmissiveMap();
+  }
+  if (action == animationHandler.actionTypes.OBJECT.DISPLACEMENT_SCALE){
+    return this.hasDisplacementMap();
+  }
+  if (action == animationHandler.actionTypes.OBJECT.DISPLACEMENT_BIAS){
+    return this.hasDisplacementMap();
+  }
+  if (action == animationHandler.actionTypes.OBJECT.EMISSIVE_COLOR){
+    return this.hasEmissiveMap();
+  }
+  if (action == animationHandler.actionTypes.OBJECT.TEXTURE_OFFSET_X){
+    return this.hasTexture();
+  }
+  if (action == animationHandler.actionTypes.OBJECT.TEXTURE_OFFSET_Y){
+    return this.hasTexture();
+  }
+  if (action == animationHandler.actionTypes.OBJECT.AO_INTENSITY){
+    return this.hasAOMap();
+  }
+  return true;
+}
+
+AddedObject.prototype.copyAnimationsFromObject = function(object){
+  this.animations = new Object();
+
+  for (var animName in object.animations){
+    if (this.isAnimationSuitable(object.animations[animName])){
+      this.addAnimation(object.animations[animName].copyWithAnotherObject(this));
+    }
+  }
+}
+
 AddedObject.prototype.addAnimation = function(animation){
   this.animations[animation.name] = animation;
 }

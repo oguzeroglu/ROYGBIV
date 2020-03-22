@@ -26,6 +26,14 @@ var Sprite = function(name){
   webglCallbackHandler.registerEngineObject(this);
 }
 
+Sprite.prototype.copyAnimationsFromObject = function(sprite){
+  this.animations = new Object();
+
+  for (var animName in sprite.animations){
+    this.addAnimation(sprite.animations[animName].copyWithAnotherObject(this));
+  }
+}
+
 Sprite.prototype.setHeightPercent = function(heightPercent){
   this.setScale(this.mesh.material.uniforms.scale.value.x ,this.mesh.material.uniforms.scale.value.y * heightPercent / this.calculateHeightPercent());
   this.handleRectangle();

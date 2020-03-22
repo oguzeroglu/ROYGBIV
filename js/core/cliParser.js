@@ -5454,6 +5454,57 @@ function parse(input){
           terminal.printInfo(Text.POSITION_SET);
           return true;
         break;
+        case 230: //syncAnimations
+          if (mode != 0){
+            terminal.printError(Text.WORKS_ONLY_IN_DESIGN_MODE);
+            return true;
+          }
+          var sourceName = splitted[1];
+          var targetName = splitted[2];
+          if (targetName.indexOf("*") != -1){
+            new JobHandler(splitted).handle();
+            return true;
+          }
+          var sourceObj = addedObjects[sourceName] || objectGroups[sourceName] || addedTexts[sourceName] || sprites[sourceName];
+          var targetObj = addedObjects[targetName] || objectGroups[targetName] || addedTexts[targetName] || sprites[targetName];
+          if (!sourceObj){
+            terminal.printError(Text.SOURCE_OBJECT_NOT_DEFINED);
+            return true;
+          }
+          if (!targetObj){
+            terminal.printError(Text.TARGET_OBJECT_NOT_DEFINED);
+            return true;
+          }
+          if (sourceObj.registeredSceneName != sceneHandler.getActiveSceneName()){
+            terminal.printError(Text.SOURCE_OBJECT_NOT_IN_SCENE);
+            return true;
+          }
+          if (targetObj.registeredSceneName != sceneHandler.getActiveSceneName()){
+            terminal.printError(Text.TARGET_OBJECT_NOT_IN_SCENE);
+            return true;
+          }
+          if ((sourceObj.isAddedObject || sourceObj.isObjectGroup) && !(targetObj.isAddedObject || targetObj.isObjectGroup)){
+            terminal.printError(Text.OBJECTS_HAVE_DIFFERENT_TYPES);
+            return true;
+          }
+          if (sourceObj.isAddedText && !targetObj.isAddedText){
+            terminal.printError(Text.OBJECTS_HAVE_DIFFERENT_TYPES);
+            return true;
+          }
+          if (sourceObj.isSprite && !targetObj.isSprite){
+            terminal.printError(Text.OBJECTS_HAVE_DIFFERENT_TYPES);
+            return true;
+          }
+          if (sourceObj.name == targetObj.name){
+            terminal.printError(Text.SOURCE_AND_TARGET_OBJECTS_ARE_THE_SAME);
+            return true;
+          }
+          targetObj.copyAnimationsFromObject(sourceObj);
+          if (!jobHandlerWorking){
+            terminal.printInfo(Text.ANIMATIONS_SYNCED);
+          }
+          return true;
+        break;
       }
       return true;
     }catch(err){

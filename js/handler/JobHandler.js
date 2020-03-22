@@ -105,6 +105,8 @@ JobHandler.prototype.handle = function(previewModeCommand){
       this.handleDestroyVirtualKeyboardCommand();
     }else if (this.splitted[0] == "destroydynamictexturefolder"){
       this.handleDestroyDynamicTextureFolderCommand();
+    }else if (this.splitted[0] == "syncanimations"){
+      this.handleSyncAnimationsCommand();
     }
     if (jobHandlerRaycasterRefresh){
       refreshRaycaster(Text.JOB_COMPLETED, true);
@@ -115,6 +117,40 @@ JobHandler.prototype.handle = function(previewModeCommand){
   // because async
   if (this.splitted[0] != "autoConfigureArea".toLowerCase()){
     jobHandlerWorking = false;
+  }
+}
+
+JobHandler.prototype.handleSyncAnimationsCommand = function(){
+  var targetNamePrefix = this.splitted[2].split("*")[0];
+  var ctr = 0;
+  for (var objName in sceneHandler.getAddedObjects()){
+    if (objName.startsWith(targetNamePrefix)){
+      parseCommand("syncAnimations " + this.splitted[1] + " " + objName);
+      ctr ++;
+    }
+  }
+  for (var objName in sceneHandler.getObjectGroups()){
+    if (objName.startsWith(targetNamePrefix)){
+      parseCommand("syncAnimations " + this.splitted[1] + " " + objName);
+      ctr ++;
+    }
+  }
+  for (var textName in sceneHandler.getAddedTexts()){
+    if (textName.startsWith(targetNamePrefix)){
+      parseCommand("syncAnimations " + this.splitted[1] + " " + textName);
+       ctr ++;
+    }
+  }
+  for (var spriteName in sceneHandler.getSprites()){
+    if (spriteName.startsWith(targetNamePrefix)){
+      parseCommand("syncAnimations " + this.splitted[1] + " " + spriteName);
+      ctr ++;
+    }
+  }
+  if (ctr == 0){
+    terminal.printInfo(Text.NO_OBJECT_FOUND);
+  }else{
+    terminal.printInfo(Text.COMMAND_EXECUTED_FOR_X_OBJECTS.replace(Text.PARAM1, ctr));
   }
 }
 
