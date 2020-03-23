@@ -10,10 +10,10 @@ AreaConfigurationsHandler.prototype.onCurrentAreaChange = function(enteredAreaNa
   }
   var enterCallbackFunc = areaEnterCallbacks[enteredAreaName];
   var exitCallbackFunc = areaExitCallbacks[exitedAreaName];
-  if (enterCallbackFunc){
+  if (enterCallbackFunc && areas[enteredAreaName].registeredSceneName == sceneHandler.getActiveSceneName()){
     enterCallbackFunc(exitedAreaName);
   }
-  if (exitCallbackFunc){
+  if (exitCallbackFunc && areas[exitedAreaName].registeredSceneName == sceneHandler.getActiveSceneName()){
     exitCallbackFunc(enteredAreaName);
   }
 }
