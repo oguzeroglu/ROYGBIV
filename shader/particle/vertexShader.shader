@@ -235,7 +235,16 @@ void main(){
   float stopTime = selectedStopInfo[1];
   float newLifetime = selectedStopInfo[2];
 
+  float originalRespawnFlag = respawnFlag;
+
   if (parentStoppedFlag >= 5.0){
+    if (respawnFlag > 0.0){
+      float repeatTime = findRepeatTime();
+      if (repeatTime > stopTime){
+        vDiscardFlag = 10.0;
+        return;
+      }
+    }
     respawnFlag = -10.0;
     if (startTime > stopTime){
       startTime = stopTime;
@@ -244,7 +253,7 @@ void main(){
 
   if (selectedTime >= startTime && (skipFlag < 0.0)){
     float timeOfThis = (selectedTime - startTime);
-    if (respawnFlag > 5.0){
+    if (originalRespawnFlag > 5.0){
       if (lifetime > 0.0){
         timeOfThis = timeOfThis - (lifetime * floor(timeOfThis/lifetime));
       }
@@ -272,6 +281,11 @@ void main(){
       timeOfThis = trailTime - diff;
       chosenVelocity = parentVelocity;
       chosenAcceleration = parentAcceleration;
+    }
+
+    if (chosenVelocity.x < 0.1 && chosenVelocity.y < 0.1 && chosenVelocity.z < 0.1 && parentStoppedFlag >= 5.0){
+      vDiscardFlag = 10.0;
+      return;
     }
 
     vec4 mvPosition;
@@ -317,6 +331,7 @@ void main(){
 
   }
 
+
   if (skipFlag < 0.0){
     vDiscardFlag = -10.0;
     vDiscardFlag = expiredFlag;
@@ -326,7 +341,7 @@ void main(){
       if (selectedTime < startTime){
         vDiscardFlag = 10.0;
       }else{
-        if (lifetime > 0.0 && selectedTime >= (lifetime + startTime) && respawnFlag < 5.0){
+        if (lifetime > 0.0 && selectedTime >= (lifetime + startTime) && originalRespawnFlag < 5.0){
           vDiscardFlag = 10.0;
         }
       }
@@ -334,6 +349,7 @@ void main(){
   }else{
     vDiscardFlag = 10.0;
   }
+
   #ifdef HAS_TEXTURE
     vTextureFlag = flags2[2];
     vRgbThreshold = rgbThreshold;
