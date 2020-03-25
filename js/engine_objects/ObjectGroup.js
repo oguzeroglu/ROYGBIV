@@ -407,10 +407,12 @@ ObjectGroup.prototype.show = function(){
 
 ObjectGroup.prototype.hideVisually = function(){
   this.mesh.visible = false;
+  this.isHidden = true;
 }
 
 ObjectGroup.prototype.showVisually = function(){
   this.mesh.visible = true;
+  this.isHidden = false;
 }
 
 ObjectGroup.prototype.hide = function(keepPhysics){

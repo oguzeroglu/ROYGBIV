@@ -443,10 +443,15 @@ AddedObject.prototype.show = function(){
 }
 
 AddedObject.prototype.hideVisually = function(){
+  this.isHidden = true;
+  if (this.autoInstancedParent){
+    return;
+  }
   this.mesh.visible = false;
 }
 
 AddedObject.prototype.showVisually = function(){
+  this.isHidden = false;
   if (this.autoInstancedParent){
     return;
   }
