@@ -25,6 +25,8 @@ window.onload = function() {
   scriptsHandler = new ScriptsHandler();
   // ANIMATION HANDLER
   animationHandler = new AnimationHandler();
+  // LIGHT HANDLER
+  lightHandler = new LightHandler();
   // DELAYED EXECUTION HANDLER
   delayedExecutionHandler = new DelayedExecutionHandler();
   // SCENE HANDLER

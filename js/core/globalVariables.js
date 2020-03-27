@@ -346,6 +346,7 @@ var skyboxHandler;
 var fogHandler;
 var scriptsHandler;
 var animationHandler;
+var lightHandler;
 var lightningHandler;
 var preConfiguredParticleSystems = new Object();
 var preConfiguredParticleSystemPools = new Object();
@@ -397,6 +398,9 @@ var dynamicallyLoadedTextures = new Object();
 var protocolDefinitionFileName = 0;
 var serverWSURL = 0;
 var objectExportImportHandler;
+
+// LIGHTING LIMITS
+var MAX_AMBIENT_LIGHT_COUNT = 5;
 
 // RENDER ORDERS
 var renderOrders = {

@@ -4,8 +4,9 @@ precision lowp int;
 #define LOG2 1.442695
 #define ALPHA_TEST 0.5
 
-uniform vec3 color;
 uniform float alpha;
+
+varying vec3 vColor;
 
 #define INSERTION
 
@@ -53,9 +54,9 @@ void main(){
     vec2 transformedUV = vUV;
     #ifdef HAS_DIFFUSE
       vec4 diffuseColor = texture2D(diffuseMap, transformedUV);
-      gl_FragColor = vec4(color, alpha) * diffuseColor;
+      gl_FragColor = vec4(vColor, alpha) * diffuseColor;
     #else
-      gl_FragColor = vec4(color, alpha);
+      gl_FragColor = vec4(vColor, alpha);
     #endif
     #ifdef HAS_ALPHA
       float val = texture2D(alphaMap, transformedUV).g;
@@ -75,7 +76,7 @@ void main(){
       gl_FragColor.rgb += totalEmissiveRadiance;
     #endif
   #else
-    gl_FragColor = vec4(color, alpha);
+    gl_FragColor = vec4(vColor, alpha);
   #endif
 
   #ifdef HAS_FOG
