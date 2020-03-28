@@ -1214,7 +1214,7 @@ GUIHandler.prototype.initializeObjectManipulationGUI = function(){
     terminal.clear();
     obj.setAffectedByLight(val);
     if (val){
-      terminal.printInfo(Text.OBJECT_WILL_BY_AFFECTED_BY_LIGHTS);
+      terminal.printInfo(Text.OBJECT_WILL_BE_AFFECTED_BY_LIGHTS);
     }else{
       terminal.printInfo(Text.OBJECT_WONT_BE_AFFECTED_BY_LIGHTS);
     }
