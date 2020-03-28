@@ -20,8 +20,10 @@ varying vec3 vColor;
   varying vec2 vUV;
   uniform mat3 textureMatrix;
 #endif
-#ifdef HAS_SKYBOX_FOG
+#if defined(HAS_SKYBOX_FOG) || defined(AFFECTED_BY_LIGHT)
   uniform mat4 worldMatrix;
+#endif
+#ifdef HAS_SKYBOX_FOG
   varying vec3 vWorldPosition;
 #endif
 
@@ -29,18 +31,29 @@ varying vec3 vColor;
   uniform mat4 worldInverseTranspose;
 #endif
 
+vec3 pointLight(float pX, float pY, float pZ, float r, float g, float b, float strength, vec3 worldPosition, vec3 normal){
+  vec3 pointLightPosition = vec3(pX, pY, pZ);
+  vec3 toLight = normalize(pointLightPosition - worldPosition);
+  float diffuseFactor = dot(normal, toLight);
+  if (diffuseFactor > 0.0){
+    vec3 lightColor = vec3(r, g, b);
+    return (strength * diffuseFactor * lightColor);
+  }
+  return vec3(0.0, 0.0, 0.0);
+}
+
 vec3 diffuseLight(float dirX, float dirY, float dirZ, float r, float g, float b, float strength, vec3 normal){
   vec3 lightDir = normalize(vec3(dirX, dirY, dirZ));
   float diffuseFactor = dot(normal, -lightDir);
-  vec3 lightColor = vec3(r, g, b);
   if (diffuseFactor > 0.0){
+     vec3 lightColor = vec3(r, g, b);
      return (strength * diffuseFactor * lightColor);
   }
   return vec3(0.0, 0.0, 0.0);
 }
 
 #ifdef AFFECTED_BY_LIGHT
-  vec3 handleLighting(){
+  vec3 handleLighting(vec3 worldPositionComputed){
 
     vec3 ambient = vec3(0.0, 0.0, 0.0);
     vec3 diffuse = vec3(0.0, 0.0, 0.0);
@@ -88,6 +101,42 @@ vec3 diffuseLight(float dirX, float dirY, float dirZ, float r, float g, float b,
       );
     #endif
 
+    #ifdef HAS_STATIC_POINT_LIGHT_1
+      diffuse += pointLight(
+        float(STATIC_POINT_LIGHT_1_X), float(STATIC_POINT_LIGHT_1_Y), float(STATIC_POINT_LIGHT_1_Z),
+        float(STATIC_POINT_LIGHT_1_R), float(STATIC_POINT_LIGHT_1_G), float(STATIC_POINT_LIGHT_1_B),
+        float(STATIC_POINT_LIGHT_1_STRENGTH), worldPositionComputed, computedNormal
+      );
+    #endif
+    #ifdef HAS_STATIC_POINT_LIGHT_2
+      diffuse += pointLight(
+        float(STATIC_POINT_LIGHT_2_X), float(STATIC_POINT_LIGHT_2_Y), float(STATIC_POINT_LIGHT_2_Z),
+        float(STATIC_POINT_LIGHT_2_R), float(STATIC_POINT_LIGHT_2_G), float(STATIC_POINT_LIGHT_2_B),
+        float(STATIC_POINT_LIGHT_2_STRENGTH), worldPositionComputed, computedNormal
+      );
+    #endif
+    #ifdef HAS_STATIC_POINT_LIGHT_3
+      diffuse += pointLight(
+        float(STATIC_POINT_LIGHT_3_X), float(STATIC_POINT_LIGHT_3_Y), float(STATIC_POINT_LIGHT_3_Z),
+        float(STATIC_POINT_LIGHT_3_R), float(STATIC_POINT_LIGHT_3_G), float(STATIC_POINT_LIGHT_3_B),
+        float(STATIC_POINT_LIGHT_3_STRENGTH), worldPositionComputed, computedNormal
+      );
+    #endif
+    #ifdef HAS_STATIC_POINT_LIGHT_4
+      diffuse += pointLight(
+        float(STATIC_POINT_LIGHT_4_X), float(STATIC_POINT_LIGHT_4_Y), float(STATIC_POINT_LIGHT_4_Z),
+        float(STATIC_POINT_LIGHT_4_R), float(STATIC_POINT_LIGHT_4_G), float(STATIC_POINT_LIGHT_4_B),
+        float(STATIC_POINT_LIGHT_4_STRENGTH), worldPositionComputed, computedNormal
+      );
+    #endif
+    #ifdef HAS_STATIC_POINT_LIGHT_5
+      diffuse += pointLight(
+        float(STATIC_POINT_LIGHT_5_X), float(STATIC_POINT_LIGHT_5_Y), float(STATIC_POINT_LIGHT_5_Z),
+        float(STATIC_POINT_LIGHT_5_R), float(STATIC_POINT_LIGHT_5_G), float(STATIC_POINT_LIGHT_5_B),
+        float(STATIC_POINT_LIGHT_5_STRENGTH), worldPositionComputed, computedNormal
+      );
+    #endif
+
     vec3 ambientColor = (ambient + diffuse) * color;
 
     return ambientColor;
@@ -96,8 +145,12 @@ vec3 diffuseLight(float dirX, float dirY, float dirZ, float r, float g, float b,
 
 void main(){
 
+  #if defined(HAS_SKYBOX_FOG) || defined(AFFECTED_BY_LIGHT)
+    vec3 worldPositionComputed = (worldMatrix * vec4(position, 1.0)).xyz;
+  #endif
+
   #ifdef AFFECTED_BY_LIGHT
-    vColor = handleLighting();
+    vColor = handleLighting(worldPositionComputed);
   #else
     vColor = color;
   #endif
@@ -107,7 +160,7 @@ void main(){
   #endif
 
   #ifdef HAS_SKYBOX_FOG
-    vWorldPosition = (worldMatrix * vec4(position, 1.0)).xyz;
+    vWorldPosition = worldPositionComputed;
   #endif
 
   vec3 transformedPosition = position;
