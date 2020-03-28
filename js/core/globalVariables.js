@@ -400,7 +400,7 @@ var serverWSURL = 0;
 var objectExportImportHandler;
 
 // LIGHTING LIMITS
-var MAX_AMBIENT_LIGHT_COUNT = 5;
+var MAX_STATIC_DIFFUSE_LIGHT_COUNT = 5;
 
 // RENDER ORDERS
 var renderOrders = {

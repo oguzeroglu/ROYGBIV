@@ -68,6 +68,17 @@ var AddedObject = function(name, type, metaData, material, mesh, physicsBody, de
   webglCallbackHandler.registerEngineObject(this);
 }
 
+AddedObject.prototype.setAffectedByLight = function(isAffectedByLight){
+
+  macroHandler.removeMacro("AFFECTED_BY_LIGHT", this.mesh.material, true, false);
+
+  if (isAffectedByLight){
+    macroHandler.injectMacro("AFFECTED_BY_LIGHT", this.mesh.material, true, false);
+  }
+
+  this.affectedByLight = isAffectedByLight;
+}
+
 AddedObject.prototype.isAnimationSuitable = function(animation){
   var action = animation.description.action;
 
