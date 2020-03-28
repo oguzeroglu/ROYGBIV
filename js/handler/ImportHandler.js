@@ -728,6 +728,7 @@ ImportHandler.prototype.importAddedObjects = function(obj){
      if (curAddedObjectExport.manualPositionInfo){
        addedObjectInstance.setPosition(curAddedObjectExport.manualPositionInfo.x, curAddedObjectExport.manualPositionInfo.y, curAddedObjectExport.manualPositionInfo.z, true);
      }
+     addedObjectInstance.setAffectedByLight(curAddedObjectExport.affectedByLight);
   }
   for (var objName in addedObjects){
     if (addedObjects[objName].softCopyParentName){

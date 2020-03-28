@@ -839,6 +839,7 @@ AddedObject.prototype.export = function(){
   if (this.manualPositionInfo){
     exportObject.manualPositionInfo = this.manualPositionInfo;
   }
+  exportObject.affectedByLight = this.affectedByLight;
   return exportObject;
 }
 

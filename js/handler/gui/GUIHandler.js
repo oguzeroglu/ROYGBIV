@@ -10,6 +10,7 @@ var GUIHandler = function(){
     "Changeable": false,
     "Intersectable": false,
     "Colorizable": false,
+    "Affected by light": false,
     "Has mass": true,
     "Shader precision": "default",
     "FPS Weapon": false,
@@ -635,6 +636,10 @@ GUIHandler.prototype.afterObjectSelection = function(){
     }else{
       guiHandler.objectManipulationParameters["FPS Weapon"] = false;
     }
+    guiHandler.objectManipulationParameters["Affected by light"] = false;
+    if (obj.affectedByLight){
+      guiHandler.objectManipulationParameters["Affected by light"] = true;
+    }
     if (obj.hasCustomPrecision){
       switch(obj.customPrecision){
         case shaderPrecisionHandler.precisionTypes.LOW:
@@ -758,6 +763,7 @@ GUIHandler.prototype.enableAllOMControllers = function(){
   guiHandler.enableController(guiHandler.omChangeableController);
   guiHandler.enableController(guiHandler.omIntersectableController);
   guiHandler.enableController(guiHandler.omColorizableController);
+  guiHandler.enableController(guiHandler.omAffectedByLightController);
   guiHandler.enableController(guiHandler.omHasMassController);
   guiHandler.enableController(guiHandler.omTextureOffsetXController);
   guiHandler.enableController(guiHandler.omTextureOffsetYController);
@@ -1202,6 +1208,16 @@ GUIHandler.prototype.initializeObjectManipulationGUI = function(){
       terminal.printInfo(Text.OBJECT_MARKED_AS.replace(Text.PARAM1, "uncolorizable"));
     }
     obj.mesh.material.needsUpdate = true;
+  }).listen();
+  guiHandler.omAffectedByLightController = guiHandler.datGuiObjectManipulation.add(guiHandler.objectManipulationParameters, "Affected by light").onChange(function(val){
+    var obj = selectionHandler.getSelectedObject();
+    terminal.clear();
+    obj.setAffectedByLight(val);
+    if (val){
+      terminal.printInfo(Text.OBJECT_WILL_BY_AFFECTED_BY_LIGHTS);
+    }else{
+      terminal.printInfo(Text.OBJECT_WONT_BE_AFFECTED_BY_LIGHTS);
+    }
   }).listen();
   guiHandler.omHasMassController = guiHandler.datGuiObjectManipulation.add(guiHandler.objectManipulationParameters, "Has mass").onChange(function(val){
     var obj = selectionHandler.getSelectedObject();
