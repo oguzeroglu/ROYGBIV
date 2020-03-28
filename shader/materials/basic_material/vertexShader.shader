@@ -29,25 +29,9 @@ vec3 handleLighting(){
 
   vec3 ambient = vec3(0, 0, 0);
 
-  #ifdef HAS_STATIC_AMBIENT_LIGHT_1
-    vec3 ambientLight1RGB = vec3(STATIC_AMBIENT_LIGHT_1_R, STATIC_AMBIENT_LIGHT_1_G, STATIC_AMBIENT_LIGHT_1_B);
-    ambient += (ambientLight1RGB * STATIC_AMBIENT_LIGHT_1_STRENGTH);
-  #endif
-  #ifdef HAS_STATIC_AMBIENT_LIGHT_2
-    vec3 ambientLight2RGB = vec3(STATIC_AMBIENT_LIGHT_2_R, STATIC_AMBIENT_LIGHT_2_G, STATIC_AMBIENT_LIGHT_2_B);
-    ambient += (ambientLight2RGB * STATIC_AMBIENT_LIGHT_2_STRENGTH);
-  #endif
-  #ifdef HAS_STATIC_AMBIENT_LIGHT_3
-    vec3 ambientLight3RGB = vec3(STATIC_AMBIENT_LIGHT_3_R, STATIC_AMBIENT_LIGHT_3_G, STATIC_AMBIENT_LIGHT_3_B);
-    ambient += (ambientLight3RGB * STATIC_AMBIENT_LIGHT_3_STRENGTH);
-  #endif
-  #ifdef HAS_STATIC_AMBIENT_LIGHT_4
-    vec3 ambientLight4RGB = vec3(STATIC_AMBIENT_LIGHT_4_R, STATIC_AMBIENT_LIGHT_4_G, STATIC_AMBIENT_LIGHT_4_B);
-    ambient += (ambientLight4RGB * STATIC_AMBIENT_LIGHT_4_STRENGTH);
-  #endif
-  #ifdef HAS_STATIC_AMBIENT_LIGHT_5
-    vec3 ambientLight5RGB = vec3(STATIC_AMBIENT_LIGHT_5_R, STATIC_AMBIENT_LIGHT_5_G, STATIC_AMBIENT_LIGHT_5_B);
-    ambient += (ambientLight5RGB * STATIC_AMBIENT_LIGHT_5_STRENGTH);
+  #ifdef HAS_STATIC_AMBIENT_LIGHT
+    vec3 ambientLightRGB = vec3(STATIC_AMBIENT_LIGHT_R, STATIC_AMBIENT_LIGHT_G, STATIC_AMBIENT_LIGHT_B);
+    ambient += (ambientLightRGB * float(STATIC_AMBIENT_LIGHT_STRENGTH));
   #endif
 
   vec3 ambientColor = ambient * color;

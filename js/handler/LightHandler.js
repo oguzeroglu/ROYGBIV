@@ -1,46 +1,40 @@
 var LightHandler = function(){
-  this.ambientLightCount = 0;
+
 }
 
-LightHandler.prototype.addStaticAmbientLight = function(color){
-  if (this.ambientLightCount == MAX_AMBIENT_LIGHT_COUNT){
-    return;
-  }
-
-  this.ambientLightCount ++;
-
+LightHandler.prototype.setAmbientLight = function(color, strength){
   var addedObjectsInScene = sceneHandler.getAddedObjects();
-  var ambientLightMacroNames = this.getStaticAmbientLightMacroNames();
 
   for (var objName in addedObjectsInScene){
     var obj = addedObjectsInScene[objName];
     if (!obj.affectedByLight){
-      return;
+      continue;
     }
 
-    macroHandler.injectMacro("AFFECTED_BY_LIGHT", obj.mesh.material, true, false);
-    macroHandler.injectMacro(ambientLightMacroNames.r + " " + color.r, obj.mesh.material, true, false);
-    macroHandler.injectMacro(ambientLightMacroNames.g + " " + color.g, obj.mesh.material, true, false);
-    macroHandler.injectMacro(ambientLightMacroNames.b + " " + color.b, obj.mesh.material, true, false);
-    macroHandler.injectMacro(ambientLightMacroNames.strength + " 1.0", obj.mesh.material, true, false);
-    macroHandler.injectMacro(ambientLightMacroNames.availibility, obj.mesh.material, true, false);
+    this.handleStaticAmbientLightMacros(obj, color, strength);
   }
+
+  this.ambientColor = color.clone();
+  this.ambientStrength = strength;
 
   return this.ambientLightCount;
 }
 
-LightHandler.prototype.getStaticAmbientLightMacroNames = function(){
-  var rMacroName = "STATIC_AMBIENT_LIGHT_"+ this.ambientLightCount +"_R";
-  var gMacroName = "STATIC_AMBIENT_LIGHT_"+ this.ambientLightCount +"_G";
-  var bMacroName = "STATIC_AMBIENT_LIGHT_"+ this.ambientLightCount +"_B";
-  var strengthMacroName = "STATIC_AMBIENT_LIGHT_"+ this.ambientLightCount +"_STRENGTH";
-  var availibilityName = "HAS_STATIC_AMBIENT_LIGHT_" + this.ambientLightCount;
+LightHandler.prototype.handleStaticAmbientLightMacros = function(obj, color, strength) {
 
-  return {
-    availibility: availibilityName,
-    r: rMacroName,
-    g: gMacroName,
-    b: bMacroName,
-    strength: strengthMacroName
-  };
+  if (this.ambientColor){
+    macroHandler.removeMacro("AFFECTED_BY_LIGHT", obj.mesh.material, true, false);
+    macroHandler.removeMacro("STATIC_AMBIENT_LIGHT_R " + this.ambientColor.r, obj.mesh.material, true, false);
+    macroHandler.removeMacro("STATIC_AMBIENT_LIGHT_G " + this.ambientColor.g, obj.mesh.material, true, false);
+    macroHandler.removeMacro("STATIC_AMBIENT_LIGHT_B " + this.ambientColor.b, obj.mesh.material, true, false);
+    macroHandler.removeMacro("STATIC_AMBIENT_LIGHT_STRENGTH " + this.ambientStrength, obj.mesh.material, true, false);
+    macroHandler.removeMacro("HAS_STATIC_AMBIENT_LIGHT", obj.mesh.material, true, false);
+  }
+
+  macroHandler.injectMacro("AFFECTED_BY_LIGHT", obj.mesh.material, true, false);
+  macroHandler.injectMacro("STATIC_AMBIENT_LIGHT_R " + color.r, obj.mesh.material, true, false);
+  macroHandler.injectMacro("STATIC_AMBIENT_LIGHT_G " + color.g, obj.mesh.material, true, false);
+  macroHandler.injectMacro("STATIC_AMBIENT_LIGHT_B " + color.b, obj.mesh.material, true, false);
+  macroHandler.injectMacro("STATIC_AMBIENT_LIGHT_STRENGTH " + strength, obj.mesh.material, true, false);
+  macroHandler.injectMacro("HAS_STATIC_AMBIENT_LIGHT", obj.mesh.material, true, false);
 }
