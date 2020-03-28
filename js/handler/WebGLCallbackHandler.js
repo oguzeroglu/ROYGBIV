@@ -67,6 +67,9 @@ WebGLCallbackHandler.prototype.dumpPerformanceLogs = function(){
 WebGLCallbackHandler.prototype.registerEngineObject = function(object){
   object.mesh.onBeforeRender = function(){
     webglCallbackHandler.onBeforeRender(object);
+    if (object.onBeforeRender){
+      object.onBeforeRender();
+    }
   }
 }
 

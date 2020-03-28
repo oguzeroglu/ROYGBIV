@@ -65,16 +65,40 @@ var AddedObject = function(name, type, metaData, material, mesh, physicsBody, de
 
   this.animations = new Object();
 
+  this.matrixCache = new THREE.Matrix4();
+
   webglCallbackHandler.registerEngineObject(this);
+}
+
+AddedObject.prototype.updateWorldInverseTranspose = function(){
+  var val = this.mesh.material.uniforms.worldInverseTranspose.value;
+  val.getInverse(this.mesh.matrixWorld).transpose();
+  this.matrixCache.copy(this.mesh.matrixWorld);
+}
+
+AddedObject.prototype.onBeforeRender = function(){
+  if (!this.affectedByLight){
+    return;
+  }
+  if (!this.matrixCache.equals(this.mesh.matrixWorld)){
+    this.updateWorldInverseTranspose();
+  }
 }
 
 AddedObject.prototype.setAffectedByLight = function(isAffectedByLight){
 
   macroHandler.removeMacro("AFFECTED_BY_LIGHT", this.mesh.material, true, false);
 
+  delete this.mesh.material.uniforms.worldInverseTranspose;
+
   if (isAffectedByLight){
     macroHandler.injectMacro("AFFECTED_BY_LIGHT", this.mesh.material, true, false);
+
+    this.mesh.material.uniforms.worldInverseTranspose = new THREE.Uniform(new THREE.Matrix4());
+    this.updateWorldInverseTranspose();
   }
+
+  this.mesh.material.needsUpdate = true;
 
   this.affectedByLight = isAffectedByLight;
 }
