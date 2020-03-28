@@ -6,6 +6,36 @@ var LightHandler = function(){
   this.staticPointLightsBySlotId = new Object();
 }
 
+LightHandler.prototype.removeLightFromObject = function(obj){
+  if (this.staticAmbientColor){
+    this.removeStaticAmbientLightMacros(obj);
+  }
+
+  for (var slotID in this.staticDiffuseLightsBySlotId){
+    this.removeStaticDiffuseLightMacros(obj, slotID);
+  }
+
+  for (var slotID in this.staticPointLightsBySlotId){
+    this.removeStaticPointLightMacros(obj, slotID);
+  }
+}
+
+LightHandler.prototype.addLightToObject = function(obj){
+  if (this.staticAmbientColor){
+    this.handleStaticAmbientLightMacros(obj, this.staticAmbientColor, this.staticAmbientStrength);
+  }
+
+  for (var slotID in this.staticDiffuseLightsBySlotId){
+    var staticDiffuseLight = this.staticDiffuseLightsBySlotId[slotID];
+    this.handleStaticDiffuseLightMacros(slotID, obj, staticDiffuseLight.direction, staticDiffuseLight.color, staticDiffuseLight.strength);
+  }
+
+  for (var slotID in this.staticPointLightsBySlotId){
+    var staticPointLight = this.staticPointLightsBySlotId[slotID];
+    this.handleStaticPointLightMacros(slotID, obj, staticPointLight.position, staticPointLight.color, staticPointLight.strength);
+  }
+}
+
 LightHandler.prototype.removeStaticPointLight = function(slotID){
 
   var addedObjectsInScene = sceneHandler.getAddedObjects();
@@ -16,7 +46,7 @@ LightHandler.prototype.removeStaticPointLight = function(slotID){
       continue;
     }
 
-    this.removeStaticPointLightMacros(obj,slotID);
+    this.removeStaticPointLightMacros(obj, slotID);
   }
 
   this.staticPointLightCount --;
