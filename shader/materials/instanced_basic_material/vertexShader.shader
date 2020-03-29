@@ -17,6 +17,7 @@ varying float vAlpha;
   attribute float orientationIndex;
   attribute float alphaIndex;
   attribute float scaleIndex;
+  attribute float affectedByLight;
   uniform vec4 autoInstanceOrientationArray[AUTO_INSTANCE_ORIENTATION_ARRAY_SIZE];
   uniform vec3 autoInstanceScaleArray[AUTO_INSTANCE_SCALE_ARRAY_SIZE];
   uniform float autoInstanceAlphaArray[AUTO_INSTANCE_ALPHA_ARRAY_SIZE];
@@ -114,7 +115,11 @@ vec3 diffuseLight(float dirX, float dirY, float dirZ, float r, float g, float b,
       ambient += (ambientLightRGB * float(STATIC_AMBIENT_LIGHT_STRENGTH));
     #endif
 
-    vec3 computedNormal = mat3(worldInverseTranspose) * rotatedNormal;
+    #ifdef IS_AUTO_INSTANCED
+      vec3 computedNormal = rotatedNormal;
+    #else
+      vec3 computedNormal = mat3(worldInverseTranspose) * rotatedNormal;
+    #endif
 
     #ifdef HAS_STATIC_DIFFUSE_LIGHT_1
       diffuse += diffuseLight(
@@ -328,7 +333,16 @@ void main(){
   #endif
 
   #ifdef AFFECTED_BY_LIGHT
-    vColor = handleLighting(worldPositionComputed, applyQuaternionToVector(normalize(normal), quaternion));
+    vec3 selectedWorldPosition;
+    #ifdef IS_AUTO_INSTANCED
+      if (affectedByLight > 0.0){
+        vColor = handleLighting(transformedPosition, applyQuaternionToVector(normalize(normal), quaternion));
+      }else{
+        vColor = color;
+      }
+    #else
+      vColor = handleLighting(worldPositionComputed, applyQuaternionToVector(normalize(normal), quaternion));
+    #endif
   #else
     vColor = color;
   #endif
