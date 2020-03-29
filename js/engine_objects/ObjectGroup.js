@@ -970,7 +970,6 @@ ObjectGroup.prototype.mergeInstanced = function(){
     );
     displacementInfoBufferAttribute.setDynamic(false);
     this.geometry.addAttribute("displacementInfo", displacementInfoBufferAttribute);
-    this.geometry.addAttribute("normal", refGeometry.attributes.normal);
   }
 
   positionOffsetBufferAttribute.setDynamic(false);
@@ -983,6 +982,8 @@ ObjectGroup.prototype.mergeInstanced = function(){
   this.geometry.addAttribute("alpha", alphaBufferAttribute);
   this.geometry.addAttribute("color", colorBufferAttribute);
   this.geometry.addAttribute("position", refGeometry.attributes.position);
+
+  this.geometry.addAttribute("normal", refGeometry.attributes.normal);
 
 }
 
