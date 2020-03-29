@@ -70,8 +70,8 @@ var AddedObject = function(name, type, metaData, material, mesh, physicsBody, de
   webglCallbackHandler.registerEngineObject(this);
 }
 
-AddedObject.prototype.updateWorldInverseTranspose = function(){
-  var val = this.mesh.material.uniforms.worldInverseTranspose.value;
+AddedObject.prototype.updateWorldInverseTranspose = function(overrideMatrix){
+  var val = overrideMatrix? overrideMatrix: this.mesh.material.uniforms.worldInverseTranspose.value;
   val.getInverse(this.mesh.matrixWorld).transpose();
   this.matrixCache.copy(this.mesh.matrixWorld);
 }

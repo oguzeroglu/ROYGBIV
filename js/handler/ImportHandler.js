@@ -1233,6 +1233,7 @@ ImportHandler.prototype.importObjectGroups = function(obj){
     if (curObjectGroupExport.manualPositionInfo){
       objectGroupInstance.setPosition(curObjectGroupExport.manualPositionInfo.x, curObjectGroupExport.manualPositionInfo.y, curObjectGroupExport.manualPositionInfo.z, true);
     }
+    objectGroupInstance.setAffectedByLight(curObjectGroupExport.affectedByLight);
   }
   for (var objName in objectGroups){
     if (objectGroups[objName].softCopyParentName){
