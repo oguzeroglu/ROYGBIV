@@ -32,6 +32,15 @@ Scene.prototype.reset = function(){
   this.virtualKeyboards = new Object();
   this.areaBinHandler.isAreaBinHandler = true;
   this.isSkyboxMapped = false;
+  this.lightInfo = {};
+}
+
+Scene.prototype.loadLights = function(){
+  lightHandler.import(this.lightInfo);
+}
+
+Scene.prototype.saveLights = function(){
+  this.lightInfo = lightHandler.export();
 }
 
 Scene.prototype.destroy = function(){
@@ -178,6 +187,7 @@ Scene.prototype.import = function(exportObj){
     this.fogConfigurations = exportObj.fogConfigurations;
   }
   this.postProcessing = exportObj.postProcessing;
+  this.lightInfo = exportObj.lightInfo;
 }
 
 Scene.prototype.export = function(){
@@ -200,6 +210,7 @@ Scene.prototype.export = function(){
   exportObj.virtualKeyboardNames = Object.keys(this.virtualKeyboards);
   exportObj.isSkyboxMapped = this.isSkyboxMapped;
   exportObj.postProcessing = this.postProcessing;
+  exportObj.lightInfo = this.lightInfo;
   if (this.isSkyboxMapped){
     exportObj.mappedSkyboxName = this.mappedSkyboxName;
   }
