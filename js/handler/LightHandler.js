@@ -130,6 +130,11 @@ LightHandler.prototype.addLightToObject = function(obj){
   }
 }
 
+LightHandler.prototype.editStaticPointLight = function(slotID, position, color, strength){
+  this.removeStaticPointLight(slotID);
+  this.addStaticPointLight(position, color, strength, slotID);
+}
+
 LightHandler.prototype.removeStaticPointLight = function(slotID){
 
   var addedObjectsInScene = sceneHandler.getAddedObjects();
@@ -160,16 +165,20 @@ LightHandler.prototype.removeStaticPointLight = function(slotID){
   sceneHandler.onLightsUpdated();
 }
 
-LightHandler.prototype.addStaticPointLight = function(position, color, strength){
+LightHandler.prototype.addStaticPointLight = function(position, color, strength, overrideSlotID){
   if (this.staticPointLightCount == MAX_STATIC_POINT_LIGHT_COUNT){
     return;
   }
 
   var foundSlotID = 1;
-  for (var i = 0; i < MAX_STATIC_POINT_LIGHT_COUNT; i ++){
-    if (!this.staticPointLightsBySlotId[i + 1]){
-      foundSlotID = i + 1;
-      break;
+  if (!(typeof overrideSlotID == UNDEFINED)){
+    foundSlotID = overrideSlotID;
+  }else{
+    for (var i = 0; i < MAX_STATIC_POINT_LIGHT_COUNT; i ++){
+      if (!this.staticPointLightsBySlotId[i + 1]){
+        foundSlotID = i + 1;
+        break;
+      }
     }
   }
 
@@ -207,6 +216,11 @@ LightHandler.prototype.addStaticPointLight = function(position, color, strength)
   return foundSlotID;
 }
 
+LightHandler.prototype.editStaticDiffuseLight = function(slotID, direction, color, strength){
+  this.removeStaticDiffuseLight(slotID);
+  this.addStaticDiffuseLight(direction, color, strength, slotID);
+}
+
 LightHandler.prototype.removeStaticDiffuseLight = function(slotID){
 
   var addedObjectsInScene = sceneHandler.getAddedObjects();
@@ -237,16 +251,20 @@ LightHandler.prototype.removeStaticDiffuseLight = function(slotID){
   sceneHandler.onLightsUpdated();
 }
 
-LightHandler.prototype.addStaticDiffuseLight = function(direction, color, strength){
+LightHandler.prototype.addStaticDiffuseLight = function(direction, color, strength, overrideSlotID){
   if (this.staticDiffuseLightCount == MAX_STATIC_DIFFUSE_LIGHT_COUNT){
     return;
   }
 
   var foundSlotID = 1;
-  for (var i = 0; i < MAX_STATIC_DIFFUSE_LIGHT_COUNT; i ++){
-    if (!this.staticDiffuseLightsBySlotId[i + 1]){
-      foundSlotID = i + 1;
-      break;
+  if (!(typeof overrideSlotID == UNDEFINED)){
+    foundSlotID = overrideSlotID;
+  }else{
+    for (var i = 0; i < MAX_STATIC_DIFFUSE_LIGHT_COUNT; i ++){
+      if (!this.staticDiffuseLightsBySlotId[i + 1]){
+        foundSlotID = i + 1;
+        break;
+      }
     }
   }
 
