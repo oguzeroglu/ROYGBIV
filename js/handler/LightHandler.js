@@ -8,7 +8,10 @@ LightHandler.prototype.bakeObjectLight = function(obj){
   var normalAttrAry = obj.mesh.geometry.attributes.normal.array;
   var positionAttrAry = obj.mesh.geometry.attributes.position.array;
 
-  var color = new THREE.Vector3(obj.mesh.material.uniforms.color.value.r, obj.mesh.material.uniforms.color.value.g, obj.mesh.material.uniforms.color.value.b);
+  var color;
+  if (obj.isAddedObject){
+    color = new THREE.Vector3(obj.mesh.material.uniforms.color.value.r, obj.mesh.material.uniforms.color.value.g, obj.mesh.material.uniforms.color.value.b);
+  }
 
   var mat = new THREE.Matrix4();
   obj.updateWorldInverseTranspose(mat);
@@ -19,6 +22,11 @@ LightHandler.prototype.bakeObjectLight = function(obj){
   for (var i = 0; i < normalAttrAry.length; i = i + 3){
     var normal = new THREE.Vector3(normalAttrAry[i], normalAttrAry[i + 1], normalAttrAry[i + 2]);
     var pos = new THREE.Vector3(positionAttrAry[i], positionAttrAry[i + 1], positionAttrAry[i + 2]);
+
+    if (obj.isObjectGroup){
+      var colorAry = obj.mesh.geometry.attributes.color.array;
+      color = new THREE.Vector3(colorAry[i], colorAry[i + 1], colorAry[i + 2]);
+    }
 
     normal.applyMatrix3(mat3).normalize();
     pos.applyMatrix4(obj.mesh.matrixWorld);
