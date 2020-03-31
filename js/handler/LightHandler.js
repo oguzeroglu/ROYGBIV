@@ -2,6 +2,37 @@ var LightHandler = function(){
   this.reset();
 }
 
+LightHandler.prototype.findBakeableObjects = function(){
+  var bakeableObjects = [];
+  for (var objName in addedObjects){
+    var obj1 = addedObjects[objName];
+    if (obj1.isChangeable || obj1.isDynamicObject){
+      continue;
+    }
+    var isBakeable = true;
+    for (var objName2 in addedObjects){
+      if (objName != objName2){
+        var obj2 = addedObjects[objName2];
+        if (obj1.mesh.geometry == obj2.mesh.geometry){
+          isBakeable = false;
+          break;
+        }
+      }
+    }
+    if (isBakeable){
+      bakeableObjects.push(obj1);
+    }
+  }
+
+  for (var objName in objectGroups){
+    var obj = objectGroups[objName];
+    if (!obj.isChangeable && !obj.isDynamicObject){
+      bakeableObjects.push(obj);
+    }
+  }
+  return bakeableObjects;
+}
+
 LightHandler.prototype.reset = function(){
 
   delete this.staticAmbientColor;
