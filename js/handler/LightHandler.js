@@ -14,6 +14,56 @@ LightHandler.prototype.reset = function(){
   this.staticPointLightsBySlotId = new Object();
 }
 
+LightHandler.prototype.getStaticPointStrength = function(slotID){
+  var info = this.staticPointLightsBySlotId[slotID];
+  return info.strength;
+}
+
+LightHandler.prototype.getStaticPointPosition = function(slotID){
+  var info = this.staticPointLightsBySlotId[slotID];
+  return new THREE.Vector3(info.positionX, info.positionY, info.positionZ);
+}
+
+LightHandler.prototype.getStaticPointColor = function(slotID){
+  var info = this.staticPointLightsBySlotId[slotID];
+  return new THREE.Color(info.colorR, info.colorG, info.colorB);
+}
+
+LightHandler.prototype.hasStaticPointLight = function(slotID){
+  return !!this.staticPointLightsBySlotId[slotID];
+}
+
+LightHandler.prototype.getStaticDiffuseStrength = function(slotID){
+  var info = this.staticDiffuseLightsBySlotId[slotID];
+  return info.strength;
+}
+
+LightHandler.prototype.getStaticDiffuseDirection = function(slotID){
+  var info = this.staticDiffuseLightsBySlotId[slotID];
+  return new THREE.Vector3(info.directionX, info.directionY, info.directionZ);
+}
+
+LightHandler.prototype.getStaticDiffuseColor = function(slotID){
+  var info = this.staticDiffuseLightsBySlotId[slotID];
+  return new THREE.Color(info.colorR, info.colorG, info.colorB);
+}
+
+LightHandler.prototype.hasStaticDiffuseLight = function(slotID){
+  return !!this.staticDiffuseLightsBySlotId[slotID];
+}
+
+LightHandler.prototype.getStaticAmbientStrength = function(){
+  return this.staticAmbientStrength;
+}
+
+LightHandler.prototype.getStaticAmbientColor = function(){
+  return this.staticAmbientColor.clone();
+}
+
+LightHandler.prototype.hasStaticAmbientLight = function(){
+  return !!this.staticAmbientColor;
+}
+
 LightHandler.prototype.onAfterSceneChange = function(){
   var addedObjectsInScene = sceneHandler.getAddedObjects();
   var objectGroupsInScene = sceneHandler.getObjectGroups();
