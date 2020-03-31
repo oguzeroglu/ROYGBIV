@@ -2,11 +2,80 @@ var LightHandler = function(){
   this.reset();
 }
 
+LightHandler.prototype.bakeObjectLight = function(obj){
+  var result = [];
+
+  var normalAttrAry = obj.mesh.geometry.attributes.normal.array;
+  var positionAttrAry = obj.mesh.geometry.attributes.position.array;
+
+  var color = new THREE.Vector3(obj.mesh.material.uniforms.color.value.r, obj.mesh.material.uniforms.color.value.g, obj.mesh.material.uniforms.color.value.b);
+
+  var mat = new THREE.Matrix4();
+  obj.updateWorldInverseTranspose(mat);
+  var mat3 = new THREE.Matrix3().setFromMatrix4(mat);
+
+  obj.mesh.updateMatrixWorld(true);
+
+  for (var i = 0; i < normalAttrAry.length; i = i + 3){
+    var normal = new THREE.Vector3(normalAttrAry[i], normalAttrAry[i + 1], normalAttrAry[i + 2]);
+    var pos = new THREE.Vector3(positionAttrAry[i], positionAttrAry[i + 1], positionAttrAry[i + 2]);
+
+    normal.applyMatrix3(mat3).normalize();
+    pos.applyMatrix4(obj.mesh.matrixWorld);
+
+    var ambient = new THREE.Vector3(0, 0, 0);
+    var diffuse = new THREE.Vector3(0, 0, 0);
+
+    if (this.hasStaticAmbientLight()){
+      ambient.set(this.staticAmbientColor.r * this.staticAmbientStrength, this.staticAmbientColor.g * this.staticAmbientStrength, this.staticAmbientColor.b * this.staticAmbientStrength);
+    }
+
+    for (var slotID in this.staticDiffuseLightsBySlotId){
+      var info = this.staticDiffuseLightsBySlotId[slotID];
+      var lightDirNegative = new THREE.Vector3(-info.directionX, -info.directionY, -info.directionZ).normalize();
+      var diffuseFactor = normal.dot(lightDirNegative);
+      if (diffuseFactor > 0){
+        diffuse.x += info.strength * diffuseFactor * info.colorR;
+        diffuse.y += info.strength * diffuseFactor * info.colorG;
+        diffuse.z += info.strength * diffuseFactor * info.colorB;
+      }
+    }
+
+    for (var slotID in this.staticPointLightsBySlotId){
+      var info = this.staticPointLightsBySlotId[slotID];
+      var toLight = new THREE.Vector3(info.positionX - pos.x, info.positionY - pos.y, info.positionZ - pos.z).normalize();
+      var diffuseFactor = normal.dot(toLight);
+      if (diffuseFactor > 0){
+        diffuse.x += info.strength * diffuseFactor * info.colorR;
+        diffuse.y += info.strength * diffuseFactor * info.colorG;
+        diffuse.z += info.strength * diffuseFactor * info.colorB;
+      }
+    }
+
+    result.push(color.x * (ambient.x + diffuse.x));
+    result.push(color.y * (ambient.y + diffuse.y));
+    result.push(color.z * (ambient.z + diffuse.z));
+  }
+
+  macroHandler.injectMacro("IS_LIGHT_BAKED", obj.mesh.material, true, false);
+  obj.mesh.material.needsUpdate = true;
+  obj.mesh.geometry.addAttribute("bakedColor", new THREE.BufferAttribute(new Float32Array(result), 3));
+  obj.mesh.geometry.attributes.bakedColor.needsUpdate = true;
+}
+
+LightHandler.prototype.bakeLights = function(){
+  var objects = this.findBakeableObjects();
+  for (var i = 0; i < objects.length; i ++){
+    var object = objects[i];
+    this.bakeObjectLight(object);
+  }
+}
+
 LightHandler.prototype.findBakeableObjects = function(){
   var bakeableObjects = [];
   for (var objName in addedObjects){
     var obj1 = addedObjects[objName];
-    if (obj1.isChangeable || obj1.isDynamicObject){
+    if (obj1.isChangeable || obj1.isDynamicObject || !obj1.affectedByLight){
       continue;
     }
     var isBakeable = true;
@@ -26,7 +95,7 @@ LightHandler.prototype.findBakeableObjects = function(){
 
   for (var objName in objectGroups){
     var obj = objectGroups[objName];
-    if (!obj.isChangeable && !obj.isDynamicObject){
+    if (!obj.isChangeable && !obj.isDynamicObject && obj.affectedByLight){
       bakeableObjects.push(obj);
     }
   }

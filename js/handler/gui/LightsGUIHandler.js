@@ -80,9 +80,15 @@ LightsGUIHandler.prototype.addStaticLights = function(staticFolder){
 
   var staticAmbientConfigurations = this.getStaticAmbientConfigurations();
   ambientFolder.add(staticAmbientConfigurations, "Color").onChange(function(val){
+    if (!staticAmbientConfigurations["Active"]){
+      return;
+    }
     lightHandler.setStaticAmbientLight(new THREE.Color(staticAmbientConfigurations["Color"]), staticAmbientConfigurations["Strength"]);
   }).listen();
   ambientFolder.add(staticAmbientConfigurations, "Strength").min(0).max(5).step(0.1).onChange(function(val){
+    if (!staticAmbientConfigurations["Active"]){
+      return;
+    }
     lightHandler.setStaticAmbientLight(new THREE.Color(staticAmbientConfigurations["Color"]), staticAmbientConfigurations["Strength"]);
   }).listen();
   ambientFolder.add(staticAmbientConfigurations, "Active").onChange(function(val){
@@ -101,6 +107,9 @@ LightsGUIHandler.prototype.addStaticLights = function(staticFolder){
     var subFolder = diffuseFolder.addFolder("Diffuse " + i);
     var config = this.getStaticDiffuseConfigurations(i);
     subFolder.add(config, "Color").onChange(function(val){
+      if (!this.config["Active"]){
+        return;
+      }
       var vect = lightsGUIHandler.getVector(this.config["Direction"]);
       if (!vect){
         return;
@@ -110,6 +119,9 @@ LightsGUIHandler.prototype.addStaticLights = function(staticFolder){
       }
     }.bind({slotID: i, config: config})).listen();
     subFolder.add(config, "Direction").onChange(function(val){
+      if (!this.config["Active"]){
+        return;
+      }
       var vect = lightsGUIHandler.getVector(val);
       if (!vect){
         return;
@@ -119,6 +131,9 @@ LightsGUIHandler.prototype.addStaticLights = function(staticFolder){
       }
     }.bind({slotID: i, config: config})).listen();
     subFolder.add(config, "Strength").min(0).max(5).step(0.1).onChange(function(val){
+      if (!this.config["Active"]){
+        return;
+      }
       var vect = lightsGUIHandler.getVector(this.config["Direction"]);
       if (!vect){
         return;
@@ -151,6 +166,9 @@ LightsGUIHandler.prototype.addStaticLights = function(staticFolder){
     var subFolder = pointFolder.addFolder("Point " + i);
     var config = this.getStaticPointConfigurations(i);
     subFolder.add(config, "Color").onChange(function(val){
+      if (!this.config["Active"]){
+        return;
+      }
       var vect = lightsGUIHandler.getVector(this.config["Position"]);
       if (!vect){
         return;
@@ -160,6 +178,9 @@ LightsGUIHandler.prototype.addStaticLights = function(staticFolder){
       }
     }.bind({slotID: i, config: config})).listen();
     subFolder.add(config, "Position").onChange(function(val){
+      if (!this.config["Active"]){
+        return;
+      }
       var vect = lightsGUIHandler.getVector(val);
       if (!vect){
         return;
@@ -169,6 +190,9 @@ LightsGUIHandler.prototype.addStaticLights = function(staticFolder){
       }
     }.bind({slotID: i, config: config})).listen();
     subFolder.add(config, "Strength").min(0).max(5).step(0.1).onChange(function(val){
+      if (!this.config["Active"]){
+        return;
+      }
       var vect = lightsGUIHandler.getVector(this.config["Position"]);
       if (!vect){
         return;
