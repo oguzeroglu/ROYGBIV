@@ -63,6 +63,16 @@ LightHandler.prototype.bakeObjectLight = function(obj){
   obj.mesh.geometry.attributes.bakedColor.needsUpdate = true;
 }
 
+LightHandler.prototype.unbakeLights = function(){
+  var objects = this.findBakeableObjects();
+  for (var i = 0; i < objects.length; i ++){
+    var object = objects[i];
+    macroHandler.removeMacro("IS_LIGHT_BAKED", object.mesh.material, true, false);
+    object.mesh.material.needsUpdate = true;
+    object.mesh.geometry.removeAttribute("bakedColor");
+  }
+}
+
 LightHandler.prototype.bakeLights = function(){
   var objects = this.findBakeableObjects();
   for (var i = 0; i < objects.length; i ++){
