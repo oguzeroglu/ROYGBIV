@@ -5505,6 +5505,15 @@ function parse(input){
           }
           return true;
         break;
+        case 231: //lights
+          if (mode != 0){
+            terminal.printError(Text.WORKS_ONLY_IN_DESIGN_MODE);
+            return true;
+          }
+          lightsGUIHandler.show();
+          terminal.printInfo(Text.GUI_OPENED);
+          return true;
+        break;
       }
       return true;
     }catch(err){

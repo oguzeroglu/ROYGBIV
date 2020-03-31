@@ -231,7 +231,8 @@ var CommandDescriptor = function(){
       1, //exportParticleSystem
       1, //importParticleSystem
       4, //setObjectPosition
-      2 //syncAnimations
+      2, //syncAnimations
+      0 //lights
   ];
 
   this.commandArgumentsExpectedExplanation = [
@@ -465,7 +466,8 @@ var CommandDescriptor = function(){
     "exportParticleSystem psName",
     "importParticleSystem psName",
     "setObjectPosition objectName x y z",
-    "syncAnimations sourceName targetName"
+    "syncAnimations sourceName targetName",
+    "lights"
   ];
 
   this.commands = [
@@ -699,7 +701,8 @@ var CommandDescriptor = function(){
     "exportParticleSystem",
     "importParticleSystem",
     "setObjectPosition",
-    "syncAnimations"
+    "syncAnimations",
+    "lights"
   ];
 
   this.commandInfo = [
@@ -933,7 +936,8 @@ var CommandDescriptor = function(){
     "exportParticleSystem: Exports a particle system.",
     "importParticleSystem: Imports a particle system.",
     "setObjectPosition: Sets the position of an object",
-    "syncAnimations: Resets animations of target text/object/sprite and copies each animation of source to target."
+    "syncAnimations: Resets animations of target text/object/sprite and copies each animation of source to target.",
+    "lights: Opens the light editing GUI."
   ];
 
   this.keyboardInfo = [
