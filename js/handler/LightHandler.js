@@ -1,5 +1,42 @@
 var LightHandler = function(){
+
+  this.dynamicLightTypes = {
+    AMBIENT_COLOR: 0,
+    AMBIENT_STRENGTH: 1,
+    DIFFUSE_DIR: 2,
+    DIFFUSE_COLOR: 3,
+    DIFFUSE_STRENGTH: 4,
+    POINT_POSITION: 5,
+    POINT_COLOR: 6,
+    POINT_STRENGTH: 7,
+    DIFFUSE_DIR_COLOR: 8,
+    DIFFUSE_DIR_STRENGTH: 9,
+    DIFFIUSE_COLOR_STRENGTH: 10,
+    POINT_POSITION_COLOR: 11,
+    POINT_POSITION_STRENGTH: 12,
+    POINT_COLOR_STRENGTH: 13,
+    DIFFUSE_DIR_COLOR_STRENGTH: 14,
+    POINT_POSITION_COLOR_STRENGTH: 15
+  };
+
   this.reset();
+}
+
+LightHandler.prototype.calculateDynamicTypeWeight = function(typeKey){
+  var splitted = typeKey.split("_");
+  var weight = 0;
+  for (var i = 0; i < splitted.length; i ++){
+    if (splitted[i] == "COLOR"){
+      weight += 3;
+    }else if (splitted[i] == "DIR"){
+      weight += 3;
+    }else if (splitted[i] == "POSITION"){
+      weight += 3;
+    }else if (splitted[i] == "STRENGTH"){
+      weight ++;
+    }
+  }
+  return weight;
 }
 
 LightHandler.prototype.onSwitchFromPreviewToDesign = function(){
@@ -138,6 +175,8 @@ LightHandler.prototype.reset = function(){
 
   this.staticDiffuseLightsBySlotId = new Object();
   this.staticPointLightsBySlotId = new Object();
+
+  this.dynamicLightsMatrix = new THREE.Matrix4();
 }
 
 LightHandler.prototype.getStaticPointStrength = function(slotID){
