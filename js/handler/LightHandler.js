@@ -2,6 +2,14 @@ var LightHandler = function(){
   this.reset();
 }
 
+LightHandler.prototype.onSwitchFromPreviewToDesign = function(){
+  this.unbakeLights();
+}
+
+LightHandler.prototype.onSwitchFromDesignToPreview = function(){
+  this.bakeLights();
+}
+
 LightHandler.prototype.bakeObjectLight = function(obj){
   var result = [];
 
