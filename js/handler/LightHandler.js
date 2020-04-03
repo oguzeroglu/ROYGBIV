@@ -31,6 +31,28 @@ LightHandler.prototype.addDynamicLightToObject = function(object, macros){
   }
 }
 
+LightHandler.prototype.updateDynamicLight = function(dynamicLight){
+  var index = this.dynamicLightsMatrixIndicesByLightName[dynamicLight.name];
+  if (!(typeof dynamicLight.dynamicInfo.colorR == UNDEFINED)){
+    this.dynamicLightsMatrix.elements[index ++] = dynamicLight.dynamicInfo.colorR;
+    this.dynamicLightsMatrix.elements[index ++] = dynamicLight.dynamicInfo.colorG;
+    this.dynamicLightsMatrix.elements[index ++] = dynamicLight.dynamicInfo.colorB;
+  }
+  if (!(typeof dynamicLight.dynamicInfo.dirX == UNDEFINED)){
+    this.dynamicLightsMatrix.elements[index ++] = dynamicLight.dynamicInfo.dirX;
+    this.dynamicLightsMatrix.elements[index ++] = dynamicLight.dynamicInfo.dirY;
+    this.dynamicLightsMatrix.elements[index ++] = dynamicLight.dynamicInfo.dirZ;
+  }
+  if (!(typeof dynamicLight.dynamicInfo.positionX == UNDEFINED)){
+    this.dynamicLightsMatrix.elements[index ++] = dynamicLight.dynamicInfo.positionX;
+    this.dynamicLightsMatrix.elements[index ++] = dynamicLight.dynamicInfo.positionY;
+    this.dynamicLightsMatrix.elements[index ++] = dynamicLight.dynamicInfo.positionZ;
+  }
+  if (!(typeof dynamicLight.dynamicInfo.strength == UNDEFINED)){
+    this.dynamicLightsMatrix.elements[index ++] = dynamicLight.dynamicInfo.strength;
+  }
+}
+
 // dynamicLight:
 //    typeKey
 //    name
@@ -70,6 +92,8 @@ LightHandler.prototype.addDynamicLight = function(dynamicLight){
     this.addDynamicLightToObject(obj, macros);
   }
 
+  this.dynamicLightsMatrixIndicesByLightName[dynamicLight.name] = this.dynamicLightsMatrixIndex;
+
   if (!(typeof dynamicLight.dynamicInfo.colorR == UNDEFINED)){
     this.dynamicLightsMatrix.elements[this.dynamicLightsMatrixIndex ++] = dynamicLight.dynamicInfo.colorR;
     this.dynamicLightsMatrix.elements[this.dynamicLightsMatrixIndex ++] = dynamicLight.dynamicInfo.colorG;
@@ -89,7 +113,7 @@ LightHandler.prototype.addDynamicLight = function(dynamicLight){
     this.dynamicLightsMatrix.elements[this.dynamicLightsMatrixIndex ++] = dynamicLight.dynamicInfo.strength;
   }
 
-  this.dynamicLights[dynamicLight.name] = dynamicLight;
+  this.dynamicLights[dynamicLight.name] = JSON.parse(JSON.stringify(dynamicLight));
 }
 
 LightHandler.prototype.calculateDynamicTypeWeight = function(typeKey){
@@ -247,6 +271,7 @@ LightHandler.prototype.reset = function(){
   this.staticPointLightsBySlotId = new Object();
 
   this.dynamicLights = new Object();
+  this.dynamicLightsMatrixIndicesByLightName = new Object();
   this.dynamicLightsMatrixIndex = 0;
 }
 
