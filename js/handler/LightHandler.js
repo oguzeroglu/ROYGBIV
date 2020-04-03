@@ -16,10 +16,78 @@ var LightHandler = function(){
     POINT_POSITION_STRENGTH: 12,
     POINT_COLOR_STRENGTH: 13,
     DIFFUSE_DIR_COLOR_STRENGTH: 14,
-    POINT_POSITION_COLOR_STRENGTH: 15
+    POINT_POSITION_COLOR_STRENGTH: 15,
+    AMBIENT_COLOR_STRENGTH: 16
   };
 
   this.reset();
+}
+
+LightHandler.prototype.addDynamicLightToObject = function(object, macros){
+  for (var i = 0; i < macros.length; i ++){
+    macroHandler.injectMacro(macros[i], object.mesh.material, true, false);
+  }
+}
+
+// dynamicLight:
+//    typeKey
+//    name
+//    staticInfo -> COLOR_R, COLOR_G, COLOR_B, DIR_X, DIR_Y, DIR_Z, POS_X, POS_Y, POS_Z, STRENGTH
+//    dynamicInfo -> colorR, colorG, colorB, dirX, dirY, dirZ, positionX, positionY, positionZ, strength
+LightHandler.prototype.addDynamicLight = function(dynamicLight){
+  var weight = this.calculateDynamicTypeWeight(dynamicLight.typeKey);
+
+  if (weight + this.dynamicLightsMatrixIndex > this.dynamicLightsMatrix.elements.length){
+    return false;
+  }
+
+  var index = Object.keys(this.dynamicLights).length + 1;
+  var macros = [];
+  macros.push("DYNAMIC_LIGHT_" + index + "_TYPE " + this.dynamicLightTypes[dynamicLight.typeKey]);
+
+  for (var key in dynamicLight.staticInfo){
+    macros.push("DYNAMIC_LIGHT_" + index + "_STATIC_" + key + " " + dynamicLight.staticInfo[key]);
+  }
+
+  var addedObjectsInScene = sceneHandler.getAddedObjects();
+  var objectGroupsInScene = sceneHandler.getObjectGroups();
+
+  for (var objName in addedObjectsInScene){
+    var obj = addedObjectsInScene[objName];
+    if (!obj.affectedByLight){
+      continue;
+    }
+    this.addDynamicLightToObject(obj, macros);
+  }
+
+  for (var objName in objectGroupsInScene){
+    var obj = objectGroupsInScene[objName];
+    if (!obj.affectedByLight){
+      continue;
+    }
+    this.addDynamicLightToObject(obj, macros);
+  }
+
+  if (!(typeof dynamicLight.dynamicInfo.colorR == UNDEFINED)){
+    this.dynamicLightsMatrix.elements[this.dynamicLightsMatrixIndex ++] = dynamicLight.dynamicInfo.colorR;
+    this.dynamicLightsMatrix.elements[this.dynamicLightsMatrixIndex ++] = dynamicLight.dynamicInfo.colorG;
+    this.dynamicLightsMatrix.elements[this.dynamicLightsMatrixIndex ++] = dynamicLight.dynamicInfo.colorB;
+  }
+  if (!(typeof dynamicLight.dynamicInfo.dirX == UNDEFINED)){
+    this.dynamicLightsMatrix.elements[this.dynamicLightsMatrixIndex ++] = dynamicLight.dynamicInfo.dirX;
+    this.dynamicLightsMatrix.elements[this.dynamicLightsMatrixIndex ++] = dynamicLight.dynamicInfo.dirY;
+    this.dynamicLightsMatrix.elements[this.dynamicLightsMatrixIndex ++] = dynamicLight.dynamicInfo.dirZ;
+  }
+  if (!(typeof dynamicLight.dynamicInfo.positionX == UNDEFINED)){
+    this.dynamicLightsMatrix.elements[this.dynamicLightsMatrixIndex ++] = dynamicLight.dynamicInfo.positionX;
+    this.dynamicLightsMatrix.elements[this.dynamicLightsMatrixIndex ++] = dynamicLight.dynamicInfo.positionY;
+    this.dynamicLightsMatrix.elements[this.dynamicLightsMatrixIndex ++] = dynamicLight.dynamicInfo.positionZ;
+  }
+  if (!(typeof dynamicLight.dynamicInfo.strength == UNDEFINED)){
+    this.dynamicLightsMatrix.elements[this.dynamicLightsMatrixIndex ++] = dynamicLight.dynamicInfo.strength;
+  }
+
+  this.dynamicLights[dynamicLight.name] = dynamicLight;
 }
 
 LightHandler.prototype.calculateDynamicTypeWeight = function(typeKey){
@@ -176,7 +244,9 @@ LightHandler.prototype.reset = function(){
   this.staticDiffuseLightsBySlotId = new Object();
   this.staticPointLightsBySlotId = new Object();
 
+  this.dynamicLights = new Object();
   this.dynamicLightsMatrix = new THREE.Matrix4();
+  this.dynamicLightsMatrixIndex = 0;
 }
 
 LightHandler.prototype.getStaticPointStrength = function(slotID){
