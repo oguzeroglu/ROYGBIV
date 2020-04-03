@@ -29,6 +29,7 @@ varying vec3 vColor;
 
 #ifdef AFFECTED_BY_LIGHT
   uniform mat4 worldInverseTranspose;
+  uniform mat4 dynamicLightsMatrix;
 #endif
 
 #ifdef IS_LIGHT_BAKED
@@ -57,10 +58,216 @@ vec3 diffuseLight(float dirX, float dirY, float dirZ, float r, float g, float b,
 }
 
 #ifdef AFFECTED_BY_LIGHT
+
+  vec3 getVec3FromLightMatrix(int index){
+    // index expression must be constant.
+    if (index == 0){
+      return vec3(dynamicLightsMatrix[0][0], dynamicLightsMatrix[0][1], dynamicLightsMatrix[0][2]);
+    }else if (index == 1){
+      return vec3(dynamicLightsMatrix[0][1], dynamicLightsMatrix[0][2], dynamicLightsMatrix[0][3]);
+    }else if (index == 2){
+      return vec3(dynamicLightsMatrix[0][2], dynamicLightsMatrix[0][3], dynamicLightsMatrix[1][0]);
+    }else if (index == 3){
+      return vec3(dynamicLightsMatrix[0][3], dynamicLightsMatrix[1][0], dynamicLightsMatrix[1][1]);
+    }else if (index == 4){
+      return vec3(dynamicLightsMatrix[1][0], dynamicLightsMatrix[1][1], dynamicLightsMatrix[1][2]);
+    }else if (index == 5){
+      return vec3(dynamicLightsMatrix[1][1], dynamicLightsMatrix[1][2], dynamicLightsMatrix[1][3]);
+    }else if (index == 6){
+      return vec3(dynamicLightsMatrix[1][2], dynamicLightsMatrix[1][3], dynamicLightsMatrix[2][0]);
+    }else if (index == 7){
+      return vec3(dynamicLightsMatrix[1][3], dynamicLightsMatrix[2][0], dynamicLightsMatrix[2][1]);
+    }else if (index == 8){
+      return vec3(dynamicLightsMatrix[2][0], dynamicLightsMatrix[2][1], dynamicLightsMatrix[2][2]);
+    }else if (index == 9){
+      return vec3(dynamicLightsMatrix[2][1], dynamicLightsMatrix[2][2], dynamicLightsMatrix[2][3]);
+    }else if (index == 10){
+      return vec3(dynamicLightsMatrix[2][2], dynamicLightsMatrix[2][3], dynamicLightsMatrix[3][0]);
+    }else if (index == 11){
+      return vec3(dynamicLightsMatrix[2][3], dynamicLightsMatrix[3][0], dynamicLightsMatrix[3][1]);
+    }else if (index == 12){
+      return vec3(dynamicLightsMatrix[3][0], dynamicLightsMatrix[3][1], dynamicLightsMatrix[3][2]);
+    }else if (index == 13){
+      return vec3(dynamicLightsMatrix[3][1], dynamicLightsMatrix[3][2], dynamicLightsMatrix[3][3]);
+    }
+  }
+
+  float getStaticStrength(int lightIndex){
+    if (lightIndex == 1){
+      #ifdef DYNAMIC_LIGHT_1_STATIC_STRENGTH
+        return float(DYNAMIC_LIGHT_1_STATIC_STRENGTH);
+      #endif
+    }else if (lightIndex == 2){
+      #ifdef DYNAMIC_LIGHT_2_STATIC_STRENGTH
+        return float(DYNAMIC_LIGHT_2_STATIC_STRENGTH);
+      #endif
+    }else if (lightIndex == 3){
+      #ifdef DYNAMIC_LIGHT_3_STATIC_STRENGTH
+        return float(DYNAMIC_LIGHT_3_STATIC_STRENGTH);
+      #endif
+    }else if (lightIndex == 4){
+      #ifdef DYNAMIC_LIGHT_4_STATIC_STRENGTH
+        return float(DYNAMIC_LIGHT_4_STATIC_STRENGTH);
+      #endif
+    }else if (lightIndex == 5){
+      #ifdef DYNAMIC_LIGHT_5_STATIC_STRENGTH
+        return float(DYNAMIC_LIGHT_5_STATIC_STRENGTH);
+      #endif
+    }else if (lightIndex == 6){
+      #ifdef DYNAMIC_LIGHT_6_STATIC_STRENGTH
+        return float(DYNAMIC_LIGHT_6_STATIC_STRENGTH);
+      #endif
+    }else if (lightIndex == 7){
+      #ifdef DYNAMIC_LIGHT_7_STATIC_STRENGTH
+        return float(DYNAMIC_LIGHT_7_STATIC_STRENGTH);
+      #endif
+    }else if (lightIndex == 8){
+      #ifdef DYNAMIC_LIGHT_8_STATIC_STRENGTH
+        return float(DYNAMIC_LIGHT_8_STATIC_STRENGTH);
+      #endif
+    }else if (lightIndex == 9){
+      #ifdef DYNAMIC_LIGHT_9_STATIC_STRENGTH
+        return float(DYNAMIC_LIGHT_9_STATIC_STRENGTH);
+      #endif
+    }else if (lightIndex == 10){
+      #ifdef DYNAMIC_LIGHT_10_STATIC_STRENGTH
+        return float(DYNAMIC_LIGHT_10_STATIC_STRENGTH);
+      #endif
+    }else if (lightIndex == 11){
+      #ifdef DYNAMIC_LIGHT_11_STATIC_STRENGTH
+        return float(DYNAMIC_LIGHT_11_STATIC_STRENGTH);
+      #endif
+    }else if (lightIndex == 12){
+      #ifdef DYNAMIC_LIGHT_12_STATIC_STRENGTH
+        return float(DYNAMIC_LIGHT_12_STATIC_STRENGTH);
+      #endif
+    }else if (lightIndex == 13){
+      #ifdef DYNAMIC_LIGHT_13_STATIC_STRENGTH
+        return float(DYNAMIC_LIGHT_13_STATIC_STRENGTH);
+      #endif
+    }else if (lightIndex == 14){
+      #ifdef DYNAMIC_LIGHT_14_STATIC_STRENGTH
+        return float(DYNAMIC_LIGHT_14_STATIC_STRENGTH);
+      #endif
+    }else if (lightIndex == 15){
+      #ifdef DYNAMIC_LIGHT_15_STATIC_STRENGTH
+        return float(DYNAMIC_LIGHT_15_STATIC_STRENGTH);
+      #endif
+    }else if (lightIndex == 16){
+      #ifdef DYNAMIC_LIGHT_16_STATIC_STRENGTH
+        return float(DYNAMIC_LIGHT_16_STATIC_STRENGTH);
+      #endif
+    }
+
+    return 0.0;
+  }
+
+  void handleDynamicLight(inout vec3 ambient, inout vec3 diffuse, inout int currentIndex, int lightType, int lightIndex){
+
+    if (lightType == 0){ // ambient-color-dynamic
+      vec3 ambientRGB = getVec3FromLightMatrix(currentIndex);
+      ambient += ambientRGB * (getStaticStrength(lightIndex));
+      currentIndex += 3;
+    }else if (lightType == 1){
+
+    }else if (lightType == 2){
+
+    }else if (lightType == 3){
+
+    }else if (lightType == 4){
+
+    }else if (lightType == 5){
+
+    }else if (lightType == 6){
+
+    }else if (lightType == 7){
+
+    }else if (lightType == 8){
+
+    }else if (lightType == 9){
+
+    }else if (lightType == 10){
+
+    }else if (lightType == 11){
+
+    }else if (lightType == 12){
+
+    }else if (lightType == 13){
+
+    }else if (lightType == 14){
+
+    }else if (lightType == 15){
+
+    }else if (lightType == 16){
+
+    }
+  }
+
+  vec3 handleDynamicLights(){
+
+    int currentIndex = 0;
+
+    vec3 ambient = vec3(0.0, 0.0, 0.0);
+    vec3 diffuse = vec3(0.0, 0.0, 0.0);
+
+    // I know this looks horrible, but this is actually a pretty smart way to
+    // handle dynamic lighting.
+    #ifdef DYNAMIC_LIGHT_1_TYPE
+      handleDynamicLight(ambient, diffuse, currentIndex, DYNAMIC_LIGHT_1_TYPE, 1);
+      #ifdef DYNAMIC_LIGHT_2_TYPE
+        handleDynamicLight(ambient, diffuse, currentIndex, DYNAMIC_LIGHT_2_TYPE, 2);
+        #ifdef DYNAMIC_LIGHT_3_TYPE
+          handleDynamicLight(ambient, diffuse, currentIndex, DYNAMIC_LIGHT_3_TYPE, 3);
+          #ifdef DYNAMIC_LIGHT_4_TYPE
+            handleDynamicLight(ambient, diffuse, currentIndex, DYNAMIC_LIGHT_4_TYPE, 4);
+            #ifdef DYNAMIC_LIGHT_5_TYPE
+              handleDynamicLight(ambient, diffuse, currentIndex, DYNAMIC_LIGHT_5_TYPE, 5);
+              #ifdef DYNAMIC_LIGHT_6_TYPE
+                handleDynamicLight(ambient, diffuse, currentIndex, DYNAMIC_LIGHT_6_TYPE, 6);
+                #ifdef DYNAMIC_LIGHT_7_TYPE
+                  handleDynamicLight(ambient, diffuse, currentIndex, DYNAMIC_LIGHT_7_TYPE, 7);
+                  #ifdef DYNAMIC_LIGHT_8_TYPE
+                    handleDynamicLight(ambient, diffuse, currentIndex, DYNAMIC_LIGHT_8_TYPE, 8);
+                    #ifdef DYNAMIC_LIGHT_9_TYPE
+                      handleDynamicLight(ambient, diffuse, currentIndex, DYNAMIC_LIGHT_9_TYPE, 9);
+                      #ifdef DYNAMIC_LIGHT_10_TYPE
+                        handleDynamicLight(ambient, diffuse, currentIndex, DYNAMIC_LIGHT_10_TYPE, 10);
+                        #ifdef DYNAMIC_LIGHT_11_TYPE
+                          handleDynamicLight(ambient, diffuse, currentIndex, DYNAMIC_LIGHT_11_TYPE, 11);
+                          #ifdef DYNAMIC_LIGHT_12_TYPE
+                            handleDynamicLight(ambient, diffuse, currentIndex, DYNAMIC_LIGHT_12_TYPE, 12);
+                            #ifdef DYNAMIC_LIGHT_13_TYPE
+                              handleDynamicLight(ambient, diffuse, currentIndex, DYNAMIC_LIGHT_13_TYPE, 13);
+                              #ifdef DYNAMIC_LIGHT_14_TYPE
+                                handleDynamicLight(ambient, diffuse, currentIndex, DYNAMIC_LIGHT_14_TYPE, 14);
+                                #ifdef DYNAMIC_LIGHT_15_TYPE
+                                  handleDynamicLight(ambient, diffuse, currentIndex, DYNAMIC_LIGHT_15_TYPE, 15);
+                                  #ifdef DYNAMIC_LIGHT_16_TYPE
+                                    handleDynamicLight(ambient, diffuse, currentIndex, DYNAMIC_LIGHT_16_TYPE, 16);
+                                  #endif
+                                #endif
+                              #endif
+                            #endif
+                          #endif
+                        #endif
+                      #endif
+                    #endif
+                  #endif
+                #endif
+              #endif
+            #endif
+          #endif
+        #endif
+      #endif
+    #endif
+
+    return (ambient + diffuse);
+  }
+
   vec3 handleLighting(vec3 worldPositionComputed){
 
     #ifdef IS_LIGHT_BAKED
-      vec3 totalColor = bakedColor;
+      vec3 totalColor = handleDynamicLights() * bakedColor;
     #else
 
       vec3 ambient = vec3(0.0, 0.0, 0.0);
@@ -145,7 +352,7 @@ vec3 diffuseLight(float dirX, float dirY, float dirZ, float r, float g, float b,
         );
       #endif
 
-      vec3 totalColor = (ambient + diffuse) * color;
+      vec3 totalColor = ((ambient + diffuse) + handleDynamicLights()) * color;
 
     #endif
 

@@ -20,6 +20,8 @@ var LightHandler = function(){
     AMBIENT_COLOR_STRENGTH: 16
   };
 
+  this.dynamicLightsMatrix = new THREE.Matrix4();
+
   this.reset();
 }
 
@@ -245,7 +247,6 @@ LightHandler.prototype.reset = function(){
   this.staticPointLightsBySlotId = new Object();
 
   this.dynamicLights = new Object();
-  this.dynamicLightsMatrix = new THREE.Matrix4();
   this.dynamicLightsMatrixIndex = 0;
 }
 
