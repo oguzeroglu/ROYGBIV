@@ -127,6 +127,76 @@ vec3 diffuseLight(float dirX, float dirY, float dirZ, float r, float g, float b,
     }
   }
 
+  vec3 getStaticDirection(int lightIndex){
+    if (lightIndex == 1){
+      #ifdef DYNAMIC_LIGHT_1_STATIC_DIR_X
+        return vec3(DYNAMIC_LIGHT_1_STATIC_DIR_X, DYNAMIC_LIGHT_1_STATIC_DIR_Y, DYNAMIC_LIGHT_1_STATIC_DIR_Z);
+      #endif
+    }else if (lightIndex == 2){
+      #ifdef DYNAMIC_LIGHT_2_STATIC_DIR_X
+        return vec3(DYNAMIC_LIGHT_2_STATIC_DIR_X, DYNAMIC_LIGHT_2_STATIC_DIR_Y, DYNAMIC_LIGHT_2_STATIC_DIR_Z);
+      #endif
+    }else if (lightIndex == 3){
+      #ifdef DYNAMIC_LIGHT_3_STATIC_DIR_X
+        return vec3(DYNAMIC_LIGHT_3_STATIC_DIR_X, DYNAMIC_LIGHT_3_STATIC_DIR_Y, DYNAMIC_LIGHT_3_STATIC_DIR_Z);
+      #endif
+    }else if (lightIndex == 4){
+      #ifdef DYNAMIC_LIGHT_4_STATIC_DIR_X
+        return vec3(DYNAMIC_LIGHT_4_STATIC_DIR_X, DYNAMIC_LIGHT_4_STATIC_DIR_Y, DYNAMIC_LIGHT_4_STATIC_DIR_Z);
+      #endif
+    }else if (lightIndex == 5){
+      #ifdef DYNAMIC_LIGHT_5_STATIC_DIR_X
+        return vec3(DYNAMIC_LIGHT_5_STATIC_DIR_X, DYNAMIC_LIGHT_5_STATIC_DIR_Y, DYNAMIC_LIGHT_5_STATIC_DIR_Z);
+      #endif
+    }else if (lightIndex == 6){
+      #ifdef DYNAMIC_LIGHT_6_STATIC_DIR_X
+        return vec3(DYNAMIC_LIGHT_6_STATIC_DIR_X, DYNAMIC_LIGHT_6_STATIC_DIR_Y, DYNAMIC_LIGHT_6_STATIC_DIR_Z);
+      #endif
+    }else if (lightIndex == 7){
+      #ifdef DYNAMIC_LIGHT_7_STATIC_DIR_X
+        return vec3(DYNAMIC_LIGHT_7_STATIC_DIR_X, DYNAMIC_LIGHT_7_STATIC_DIR_Y, DYNAMIC_LIGHT_7_STATIC_DIR_Z);
+      #endif
+    }else if (lightIndex == 8){
+      #ifdef DYNAMIC_LIGHT_8_STATIC_DIR_X
+        return vec3(DYNAMIC_LIGHT_8_STATIC_DIR_X, DYNAMIC_LIGHT_8_STATIC_DIR_Y, DYNAMIC_LIGHT_8_STATIC_DIR_Z);
+      #endif
+    }else if (lightIndex == 9){
+      #ifdef DYNAMIC_LIGHT_9_STATIC_DIR_X
+        return vec3(DYNAMIC_LIGHT_9_STATIC_DIR_X, DYNAMIC_LIGHT_9_STATIC_DIR_Y, DYNAMIC_LIGHT_9_STATIC_DIR_Z);
+      #endif
+    }else if (lightIndex == 10){
+      #ifdef DYNAMIC_LIGHT_10_STATIC_DIR_X
+        return vec3(DYNAMIC_LIGHT_10_STATIC_DIR_X, DYNAMIC_LIGHT_10_STATIC_DIR_Y, DYNAMIC_LIGHT_10_STATIC_DIR_Z);
+      #endif
+    }else if (lightIndex == 11){
+      #ifdef DYNAMIC_LIGHT_11_STATIC_DIR_X
+        return vec3(DYNAMIC_LIGHT_11_STATIC_DIR_X, DYNAMIC_LIGHT_11_STATIC_DIR_Y, DYNAMIC_LIGHT_11_STATIC_DIR_Z);
+      #endif
+    }else if (lightIndex == 12){
+      #ifdef DYNAMIC_LIGHT_12_STATIC_DIR_X
+        return vec3(DYNAMIC_LIGHT_12_STATIC_DIR_X, DYNAMIC_LIGHT_12_STATIC_DIR_Y, DYNAMIC_LIGHT_12_STATIC_DIR_Z);
+      #endif
+    }else if (lightIndex == 13){
+      #ifdef DYNAMIC_LIGHT_13_STATIC_DIR_X
+        return vec3(DYNAMIC_LIGHT_13_STATIC_DIR_X, DYNAMIC_LIGHT_13_STATIC_DIR_Y, DYNAMIC_LIGHT_13_STATIC_DIR_Z);
+      #endif
+    }else if (lightIndex == 14){
+      #ifdef DYNAMIC_LIGHT_14_STATIC_DIR_X
+        return vec3(DYNAMIC_LIGHT_14_STATIC_DIR_X, DYNAMIC_LIGHT_14_STATIC_DIR_Y, DYNAMIC_LIGHT_14_STATIC_DIR_Z);
+      #endif
+    }else if (lightIndex == 15){
+      #ifdef DYNAMIC_LIGHT_15_STATIC_DIR_X
+        return vec3(DYNAMIC_LIGHT_15_STATIC_DIR_X, DYNAMIC_LIGHT_15_STATIC_DIR_Y, DYNAMIC_LIGHT_15_STATIC_DIR_Z);
+      #endif
+    }else if (lightIndex == 16){
+      #ifdef DYNAMIC_LIGHT_16_STATIC_DIR_X
+        return vec3(DYNAMIC_LIGHT_16_STATIC_DIR_X, DYNAMIC_LIGHT_16_STATIC_DIR_Y, DYNAMIC_LIGHT_16_STATIC_DIR_Z);
+      #endif
+    }
+
+    return vec3(0.0, 0.0, 0.0);
+  }
+
   vec3 getStaticColor(int lightIndex){
     if (lightIndex == 1){
       #ifdef DYNAMIC_LIGHT_1_STATIC_COLOR_R
@@ -287,8 +357,16 @@ vec3 diffuseLight(float dirX, float dirY, float dirZ, float r, float g, float b,
         staticDiffuseStrength, computedNormal
       );
       currentIndex += 3;
-    }else if (lightType == 3){
-
+    }else if (lightType == 3){ // diffuse-color-dynamic
+      vec3 diffuseColor = getVec3FromLightMatrix(currentIndex);
+      float staticDiffuseStrength = getStaticStrength(lightIndex);
+      vec3 staticDiffuseDirection = getStaticDirection(lightIndex);
+      diffuse += diffuseLight(
+        staticDiffuseDirection.x, staticDiffuseDirection.y, staticDiffuseDirection.z,
+        diffuseColor.x, diffuseColor.y, diffuseColor.z,
+        staticDiffuseStrength, computedNormal
+      );
+      currentIndex +=3;
     }else if (lightType == 4){
 
     }else if (lightType == 5){
