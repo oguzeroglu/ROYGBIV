@@ -127,6 +127,76 @@ vec3 diffuseLight(float dirX, float dirY, float dirZ, float r, float g, float b,
     }
   }
 
+  vec3 getStaticPosition(int lightIndex){
+    if (lightIndex == 1){
+      #ifdef DYNAMIC_LIGHT_1_STATIC_POS_X
+        return vec3(DYNAMIC_LIGHT_1_STATIC_POS_X, DYNAMIC_LIGHT_1_STATIC_POS_Y, DYNAMIC_LIGHT_1_STATIC_POS_Z);
+      #endif
+    }else if (lightIndex == 2){
+      #ifdef DYNAMIC_LIGHT_2_STATIC_POS_X
+        return vec3(DYNAMIC_LIGHT_2_STATIC_POS_X, DYNAMIC_LIGHT_2_STATIC_POS_Y, DYNAMIC_LIGHT_2_STATIC_POS_Z);
+      #endif
+    }else if (lightIndex == 3){
+      #ifdef DYNAMIC_LIGHT_3_STATIC_POS_X
+        return vec3(DYNAMIC_LIGHT_3_STATIC_POS_X, DYNAMIC_LIGHT_3_STATIC_POS_Y, DYNAMIC_LIGHT_3_STATIC_POS_Z);
+      #endif
+    }else if (lightIndex == 4){
+      #ifdef DYNAMIC_LIGHT_4_STATIC_POS_X
+        return vec3(DYNAMIC_LIGHT_4_STATIC_POS_X, DYNAMIC_LIGHT_4_STATIC_POS_Y, DYNAMIC_LIGHT_4_STATIC_POS_Z);
+      #endif
+    }else if (lightIndex == 5){
+      #ifdef DYNAMIC_LIGHT_5_STATIC_POS_X
+        return vec3(DYNAMIC_LIGHT_5_STATIC_POS_X, DYNAMIC_LIGHT_5_STATIC_POS_Y, DYNAMIC_LIGHT_5_STATIC_POS_Z);
+      #endif
+    }else if (lightIndex == 6){
+      #ifdef DYNAMIC_LIGHT_6_STATIC_POS_X
+        return vec3(DYNAMIC_LIGHT_6_STATIC_POS_X, DYNAMIC_LIGHT_6_STATIC_POS_Y, DYNAMIC_LIGHT_6_STATIC_POS_Z);
+      #endif
+    }else if (lightIndex == 7){
+      #ifdef DYNAMIC_LIGHT_7_STATIC_POS_X
+        return vec3(DYNAMIC_LIGHT_7_STATIC_POS_X, DYNAMIC_LIGHT_7_STATIC_POS_Y, DYNAMIC_LIGHT_7_STATIC_POS_Z);
+      #endif
+    }else if (lightIndex == 8){
+      #ifdef DYNAMIC_LIGHT_8_STATIC_POS_X
+        return vec3(DYNAMIC_LIGHT_8_STATIC_POS_X, DYNAMIC_LIGHT_8_STATIC_POS_Y, DYNAMIC_LIGHT_8_STATIC_POS_Z);
+      #endif
+    }else if (lightIndex == 9){
+      #ifdef DYNAMIC_LIGHT_9_STATIC_POS_X
+        return vec3(DYNAMIC_LIGHT_9_STATIC_POS_X, DYNAMIC_LIGHT_9_STATIC_POS_Y, DYNAMIC_LIGHT_9_STATIC_POS_Z);
+      #endif
+    }else if (lightIndex == 10){
+      #ifdef DYNAMIC_LIGHT_10_STATIC_POS_X
+        return vec3(DYNAMIC_LIGHT_10_STATIC_POS_X, DYNAMIC_LIGHT_10_STATIC_POS_Y, DYNAMIC_LIGHT_10_STATIC_POS_Z);
+      #endif
+    }else if (lightIndex == 11){
+      #ifdef DYNAMIC_LIGHT_11_STATIC_POS_X
+        return vec3(DYNAMIC_LIGHT_11_STATIC_POS_X, DYNAMIC_LIGHT_11_STATIC_POS_Y, DYNAMIC_LIGHT_11_STATIC_POS_Z);
+      #endif
+    }else if (lightIndex == 12){
+      #ifdef DYNAMIC_LIGHT_12_STATIC_POS_X
+        return vec3(DYNAMIC_LIGHT_12_STATIC_POS_X, DYNAMIC_LIGHT_12_STATIC_POS_Y, DYNAMIC_LIGHT_12_STATIC_POS_Z);
+      #endif
+    }else if (lightIndex == 13){
+      #ifdef DYNAMIC_LIGHT_13_STATIC_POS_X
+        return vec3(DYNAMIC_LIGHT_13_STATIC_POS_X, DYNAMIC_LIGHT_13_STATIC_POS_Y, DYNAMIC_LIGHT_13_STATIC_POS_Z);
+      #endif
+    }else if (lightIndex == 14){
+      #ifdef DYNAMIC_LIGHT_14_STATIC_POS_X
+        return vec3(DYNAMIC_LIGHT_14_STATIC_POS_X, DYNAMIC_LIGHT_14_STATIC_POS_Y, DYNAMIC_LIGHT_14_STATIC_POS_Z);
+      #endif
+    }else if (lightIndex == 15){
+      #ifdef DYNAMIC_LIGHT_15_STATIC_POS_X
+        return vec3(DYNAMIC_LIGHT_15_STATIC_POS_X, DYNAMIC_LIGHT_15_STATIC_POS_Y, DYNAMIC_LIGHT_15_STATIC_POS_Z);
+      #endif
+    }else if (lightIndex == 16){
+      #ifdef DYNAMIC_LIGHT_16_STATIC_POS_X
+        return vec3(DYNAMIC_LIGHT_16_STATIC_POS_X, DYNAMIC_LIGHT_16_STATIC_POS_Y, DYNAMIC_LIGHT_16_STATIC_POS_Z);
+      #endif
+    }
+
+    return vec3(0.0, 0.0, 0.0);
+  }
+
   vec3 getStaticDirection(int lightIndex){
     if (lightIndex == 1){
       #ifdef DYNAMIC_LIGHT_1_STATIC_DIR_X
@@ -387,10 +457,26 @@ vec3 diffuseLight(float dirX, float dirY, float dirZ, float r, float g, float b,
         staticPointStrength, worldPositionComputed, computedNormal
       );
       currentIndex += 3;
-    }else if (lightType == 6){
-
-    }else if (lightType == 7){
-
+    }else if (lightType == 6){ // point-color
+      vec3 staticPointPosition = getStaticPosition(lightIndex);
+      float staticPointStrength = getStaticStrength(lightIndex);
+      vec3 pointColor = getVec3FromLightMatrix(currentIndex);
+      diffuse += pointLight(
+        staticPointPosition.x, staticPointPosition.y, staticPointPosition.z,
+        pointColor.x, pointColor.y, pointColor.z,
+        staticPointStrength, worldPositionComputed, computedNormal
+      );
+      currentIndex += 3;
+    }else if (lightType == 7){ // point-strength
+      vec3 staticPointColor = getStaticColor(lightIndex);
+      vec3 staticPointPosition = getStaticPosition(lightIndex);
+      float pointStrength = getFloatFromLightMatrix(currentIndex);
+      diffuse += pointLight(
+        staticPointPosition.x, staticPointPosition.y, staticPointPosition.z,
+        staticPointColor.x, staticPointColor.y, staticPointColor.z,
+        pointStrength, worldPositionComputed, computedNormal
+      );
+      currentIndex ++;
     }else if (lightType == 8){
 
     }else if (lightType == 9){
