@@ -477,8 +477,17 @@ vec3 diffuseLight(float dirX, float dirY, float dirZ, float r, float g, float b,
         pointStrength, worldPositionComputed, computedNormal
       );
       currentIndex ++;
-    }else if (lightType == 8){
-
+    }else if (lightType == 8){ // diffuse-dir-color
+      vec3 diffuseColor = getVec3FromLightMatrix(currentIndex);
+      currentIndex += 3;
+      vec3 diffuseDir = getVec3FromLightMatrix(currentIndex);
+      currentIndex += 3;
+      float diffuseStrength = getStaticStrength(lightIndex);
+      diffuse += diffuseLight(
+        diffuseDir.x, diffuseDir.y, diffuseDir.z,
+        diffuseColor.x, diffuseColor.y, diffuseColor.z,
+        diffuseStrength, computedNormal
+      );
     }else if (lightType == 9){
 
     }else if (lightType == 10){
@@ -489,8 +498,18 @@ vec3 diffuseLight(float dirX, float dirY, float dirZ, float r, float g, float b,
 
     }else if (lightType == 13){
 
-    }else if (lightType == 14){
-
+    }else if (lightType == 14){ // diffuse-dir-color-strength
+      vec3 diffuseColor = getVec3FromLightMatrix(currentIndex);
+      currentIndex += 3;
+      vec3 diffuseDir = getVec3FromLightMatrix(currentIndex);
+      currentIndex += 3;
+      float diffuseStrength = getFloatFromLightMatrix(currentIndex);
+      currentIndex ++;
+      diffuse += diffuseLight(
+        diffuseDir.x, diffuseDir.y, diffuseDir.z,
+        diffuseColor.x, diffuseColor.y, diffuseColor.z,
+        diffuseStrength, computedNormal
+      );
     }else if (lightType == 15){
 
     }else if (lightType == 16){
