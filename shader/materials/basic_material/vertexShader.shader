@@ -450,9 +450,9 @@ vec3 diffuseLight(float dirX, float dirY, float dirZ, float r, float g, float b,
     }else if (lightType == 5){ // point-position
       vec3 staticPointColor = getStaticColor(lightIndex);
       float staticPointStrength = getStaticStrength(lightIndex);
-      vec3 pointPoition = getVec3FromLightMatrix(currentIndex);
+      vec3 pointPosition = getVec3FromLightMatrix(currentIndex);
       diffuse += pointLight(
-        pointPoition.x, pointPoition.y, pointPoition.z,
+        pointPosition.x, pointPosition.y, pointPosition.z,
         staticPointColor.x, staticPointColor.y, staticPointColor.z,
         staticPointStrength, worldPositionComputed, computedNormal
       );
@@ -488,16 +488,61 @@ vec3 diffuseLight(float dirX, float dirY, float dirZ, float r, float g, float b,
         diffuseColor.x, diffuseColor.y, diffuseColor.z,
         diffuseStrength, computedNormal
       );
-    }else if (lightType == 9){
-
-    }else if (lightType == 10){
-
-    }else if (lightType == 11){
-
-    }else if (lightType == 12){
-
-    }else if (lightType == 13){
-
+    }else if (lightType == 9){ // diffuse-dir-strength
+      vec3 diffuseColor = getStaticColor(lightIndex);
+      vec3 diffuseDir = getVec3FromLightMatrix(currentIndex);
+      currentIndex += 3;
+      float diffuseStrength = getFloatFromLightMatrix(currentIndex);
+      currentIndex ++;
+      diffuse += diffuseLight(
+        diffuseDir.x, diffuseDir.y, diffuseDir.z,
+        diffuseColor.x, diffuseColor.y, diffuseColor.z,
+        diffuseStrength, computedNormal
+      );
+    }else if (lightType == 10){ // diffuse-color-strength
+      vec3 diffuseColor = getVec3FromLightMatrix(currentIndex);
+      currentIndex += 3;
+      vec3 diffuseDir = getStaticDirection(lightIndex);
+      float diffuseStrength = getFloatFromLightMatrix(currentIndex);
+      currentIndex ++;
+      diffuse += diffuseLight(
+        diffuseDir.x, diffuseDir.y, diffuseDir.z,
+        diffuseColor.x, diffuseColor.y, diffuseColor.z,
+        diffuseStrength, computedNormal
+      );
+    }else if (lightType == 11){ // point-position-color
+      vec3 pointColor = getVec3FromLightMatrix(currentIndex);
+      currentIndex += 3;
+      vec3 pointPosition = getVec3FromLightMatrix(currentIndex);
+      currentIndex += 3;
+      float staticPointStrength = getStaticStrength(lightIndex);
+      diffuse += pointLight(
+        pointPosition.x, pointPosition.y, pointPosition.z,
+        pointColor.x, pointColor.y, pointColor.z,
+        staticPointStrength, worldPositionComputed, computedNormal
+      );
+    }else if (lightType == 12){ // point-position-strength
+      vec3 staticPointColor = getStaticColor(lightIndex);
+      vec3 pointPosition = getVec3FromLightMatrix(currentIndex);
+      currentIndex += 3;
+      float pointStrength = getFloatFromLightMatrix(currentIndex);
+      currentIndex ++;
+      diffuse += pointLight(
+        pointPosition.x, pointPosition.y, pointPosition.z,
+        staticPointColor.x, staticPointColor.y, staticPointColor.z,
+        pointStrength, worldPositionComputed, computedNormal
+      );
+    }else if (lightType == 13){ // point-color-strength
+      vec3 pointColor = getVec3FromLightMatrix(currentIndex);
+      currentIndex += 3;
+      float pointStrength = getFloatFromLightMatrix(currentIndex);
+      currentIndex ++;
+      vec3 staticPointPosition = getStaticPosition(lightIndex);
+      diffuse += pointLight(
+        staticPointPosition.x, staticPointPosition.y, staticPointPosition.z,
+        pointColor.x, pointColor.y, pointColor.z,
+        pointStrength, worldPositionComputed, computedNormal
+      );
     }else if (lightType == 14){ // diffuse-dir-color-strength
       vec3 diffuseColor = getVec3FromLightMatrix(currentIndex);
       currentIndex += 3;
@@ -510,10 +555,24 @@ vec3 diffuseLight(float dirX, float dirY, float dirZ, float r, float g, float b,
         diffuseColor.x, diffuseColor.y, diffuseColor.z,
         diffuseStrength, computedNormal
       );
-    }else if (lightType == 15){
-
-    }else if (lightType == 16){
-
+    }else if (lightType == 15){ // point-position-color-strength
+      vec3 pointColor = getVec3FromLightMatrix(currentIndex);
+      currentIndex += 3;
+      vec3 pointPosition = getVec3FromLightMatrix(currentIndex);
+      currentIndex += 3;
+      float pointStrength = getFloatFromLightMatrix(currentIndex);
+      currentIndex ++;
+      diffuse += pointLight(
+        pointPosition.x, pointPosition.y, pointPosition.z,
+        pointColor.x, pointColor.y, pointColor.z,
+        pointStrength, worldPositionComputed, computedNormal
+      );
+    }else if (lightType == 16){ // ambient-color-strength
+      vec3 ambientRGB = getVec3FromLightMatrix(currentIndex);
+      currentIndex += 3;
+      float ambientStrength = getFloatFromLightMatrix(currentIndex);
+      currentIndex ++;
+      ambient += ambientRGB * ambientStrength;
     }
   }
 
