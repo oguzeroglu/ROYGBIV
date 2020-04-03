@@ -337,17 +337,17 @@ vec3 diffuseLight(float dirX, float dirY, float dirZ, float r, float g, float b,
     return 0.0;
   }
 
-  void handleDynamicLight(inout vec3 ambient, inout vec3 diffuse, inout int currentIndex, int lightType, int lightIndex, vec3 computedNormal){
+  void handleDynamicLight(inout vec3 ambient, inout vec3 diffuse, inout int currentIndex, int lightType, int lightIndex, vec3 computedNormal, vec3 worldPositionComputed){
 
-    if (lightType == 0){ // ambient-color-dynamic
+    if (lightType == 0){ // ambient-color
       vec3 ambientRGB = getVec3FromLightMatrix(currentIndex);
       ambient += ambientRGB * (getStaticStrength(lightIndex));
       currentIndex += 3;
-    }else if (lightType == 1){ // ambient-strength-dynamic
+    }else if (lightType == 1){ // ambient-strength
       float strength = getFloatFromLightMatrix(currentIndex);
       ambient += getStaticColor(lightIndex) * strength;
       currentIndex ++;
-    }else if (lightType == 2){ // diffuse-direction-dynamic
+    }else if (lightType == 2){ // diffuse-direction
       vec3 staticDiffuseColor = getStaticColor(lightIndex);
       float staticDiffuseStrength = getStaticStrength(lightIndex);
       vec3 diffuseDir = getVec3FromLightMatrix(currentIndex);
@@ -357,7 +357,7 @@ vec3 diffuseLight(float dirX, float dirY, float dirZ, float r, float g, float b,
         staticDiffuseStrength, computedNormal
       );
       currentIndex += 3;
-    }else if (lightType == 3){ // diffuse-color-dynamic
+    }else if (lightType == 3){ // diffuse-color
       vec3 diffuseColor = getVec3FromLightMatrix(currentIndex);
       float staticDiffuseStrength = getStaticStrength(lightIndex);
       vec3 staticDiffuseDirection = getStaticDirection(lightIndex);
@@ -367,10 +367,26 @@ vec3 diffuseLight(float dirX, float dirY, float dirZ, float r, float g, float b,
         staticDiffuseStrength, computedNormal
       );
       currentIndex +=3;
-    }else if (lightType == 4){
-
-    }else if (lightType == 5){
-
+    }else if (lightType == 4){ // diffuse-strength
+      vec3 staticDiffuseColor = getStaticColor(lightIndex);
+      vec3 staticDiffuseDirection = getStaticDirection(lightIndex);
+      float diffuseStrength = getFloatFromLightMatrix(currentIndex);
+      diffuse += diffuseLight(
+        staticDiffuseDirection.x, staticDiffuseDirection.y, staticDiffuseDirection.z,
+        staticDiffuseColor.x, staticDiffuseColor.y, staticDiffuseColor.z,
+        diffuseStrength, computedNormal
+      );
+      currentIndex ++;
+    }else if (lightType == 5){ // point-position
+      vec3 staticPointColor = getStaticColor(lightIndex);
+      float staticPointStrength = getStaticStrength(lightIndex);
+      vec3 pointPoition = getVec3FromLightMatrix(currentIndex);
+      diffuse += pointLight(
+        pointPoition.x, pointPoition.y, pointPoition.z,
+        staticPointColor.x, staticPointColor.y, staticPointColor.z,
+        staticPointStrength, worldPositionComputed, computedNormal
+      );
+      currentIndex += 3;
     }else if (lightType == 6){
 
     }else if (lightType == 7){
@@ -396,7 +412,7 @@ vec3 diffuseLight(float dirX, float dirY, float dirZ, float r, float g, float b,
     }
   }
 
-  vec3 handleDynamicLights(vec3 computedNormal){
+  vec3 handleDynamicLights(vec3 computedNormal, vec3 worldPositionComputed){
 
     int currentIndex = 0;
 
@@ -406,37 +422,37 @@ vec3 diffuseLight(float dirX, float dirY, float dirZ, float r, float g, float b,
     // I know this looks horrible, but this is actually a pretty smart way to
     // handle dynamic lighting.
     #ifdef DYNAMIC_LIGHT_1_TYPE
-      handleDynamicLight(ambient, diffuse, currentIndex, DYNAMIC_LIGHT_1_TYPE, 1, computedNormal);
+      handleDynamicLight(ambient, diffuse, currentIndex, DYNAMIC_LIGHT_1_TYPE, 1, computedNormal, worldPositionComputed);
       #ifdef DYNAMIC_LIGHT_2_TYPE
-        handleDynamicLight(ambient, diffuse, currentIndex, DYNAMIC_LIGHT_2_TYPE, 2, computedNormal);
+        handleDynamicLight(ambient, diffuse, currentIndex, DYNAMIC_LIGHT_2_TYPE, 2, computedNormal, worldPositionComputed);
         #ifdef DYNAMIC_LIGHT_3_TYPE
-          handleDynamicLight(ambient, diffuse, currentIndex, DYNAMIC_LIGHT_3_TYPE, 3, computedNormal);
+          handleDynamicLight(ambient, diffuse, currentIndex, DYNAMIC_LIGHT_3_TYPE, 3, computedNormal, worldPositionComputed);
           #ifdef DYNAMIC_LIGHT_4_TYPE
-            handleDynamicLight(ambient, diffuse, currentIndex, DYNAMIC_LIGHT_4_TYPE, 4, computedNormal);
+            handleDynamicLight(ambient, diffuse, currentIndex, DYNAMIC_LIGHT_4_TYPE, 4, computedNormal, worldPositionComputed);
             #ifdef DYNAMIC_LIGHT_5_TYPE
-              handleDynamicLight(ambient, diffuse, currentIndex, DYNAMIC_LIGHT_5_TYPE, 5, computedNormal);
+              handleDynamicLight(ambient, diffuse, currentIndex, DYNAMIC_LIGHT_5_TYPE, 5, computedNormal, worldPositionComputed);
               #ifdef DYNAMIC_LIGHT_6_TYPE
-                handleDynamicLight(ambient, diffuse, currentIndex, DYNAMIC_LIGHT_6_TYPE, 6, computedNormal);
+                handleDynamicLight(ambient, diffuse, currentIndex, DYNAMIC_LIGHT_6_TYPE, 6, computedNormal, worldPositionComputed);
                 #ifdef DYNAMIC_LIGHT_7_TYPE
-                  handleDynamicLight(ambient, diffuse, currentIndex, DYNAMIC_LIGHT_7_TYPE, 7, computedNormal);
+                  handleDynamicLight(ambient, diffuse, currentIndex, DYNAMIC_LIGHT_7_TYPE, 7, computedNormal, worldPositionComputed);
                   #ifdef DYNAMIC_LIGHT_8_TYPE
-                    handleDynamicLight(ambient, diffuse, currentIndex, DYNAMIC_LIGHT_8_TYPE, 8, computedNormal);
+                    handleDynamicLight(ambient, diffuse, currentIndex, DYNAMIC_LIGHT_8_TYPE, 8, computedNormal, worldPositionComputed);
                     #ifdef DYNAMIC_LIGHT_9_TYPE
-                      handleDynamicLight(ambient, diffuse, currentIndex, DYNAMIC_LIGHT_9_TYPE, 9, computedNormal);
+                      handleDynamicLight(ambient, diffuse, currentIndex, DYNAMIC_LIGHT_9_TYPE, 9, computedNormal, worldPositionComputed);
                       #ifdef DYNAMIC_LIGHT_10_TYPE
-                        handleDynamicLight(ambient, diffuse, currentIndex, DYNAMIC_LIGHT_10_TYPE, 10, computedNormal);
+                        handleDynamicLight(ambient, diffuse, currentIndex, DYNAMIC_LIGHT_10_TYPE, 10, computedNormal, worldPositionComputed);
                         #ifdef DYNAMIC_LIGHT_11_TYPE
-                          handleDynamicLight(ambient, diffuse, currentIndex, DYNAMIC_LIGHT_11_TYPE, 11, computedNormal);
+                          handleDynamicLight(ambient, diffuse, currentIndex, DYNAMIC_LIGHT_11_TYPE, 11, computedNormal, worldPositionComputed);
                           #ifdef DYNAMIC_LIGHT_12_TYPE
-                            handleDynamicLight(ambient, diffuse, currentIndex, DYNAMIC_LIGHT_12_TYPE, 12, computedNormal);
+                            handleDynamicLight(ambient, diffuse, currentIndex, DYNAMIC_LIGHT_12_TYPE, 12, computedNormal, worldPositionComputed);
                             #ifdef DYNAMIC_LIGHT_13_TYPE
-                              handleDynamicLight(ambient, diffuse, currentIndex, DYNAMIC_LIGHT_13_TYPE, 13, computedNormal);
+                              handleDynamicLight(ambient, diffuse, currentIndex, DYNAMIC_LIGHT_13_TYPE, 13, computedNormal, worldPositionComputed);
                               #ifdef DYNAMIC_LIGHT_14_TYPE
-                                handleDynamicLight(ambient, diffuse, currentIndex, DYNAMIC_LIGHT_14_TYPE, 14, computedNormal);
+                                handleDynamicLight(ambient, diffuse, currentIndex, DYNAMIC_LIGHT_14_TYPE, 14, computedNormal, worldPositionComputed);
                                 #ifdef DYNAMIC_LIGHT_15_TYPE
-                                  handleDynamicLight(ambient, diffuse, currentIndex, DYNAMIC_LIGHT_15_TYPE, 15, computedNormal);
+                                  handleDynamicLight(ambient, diffuse, currentIndex, DYNAMIC_LIGHT_15_TYPE, 15, computedNormal, worldPositionComputed);
                                   #ifdef DYNAMIC_LIGHT_16_TYPE
-                                    handleDynamicLight(ambient, diffuse, currentIndex, DYNAMIC_LIGHT_16_TYPE, 16, computedNormal);
+                                    handleDynamicLight(ambient, diffuse, currentIndex, DYNAMIC_LIGHT_16_TYPE, 16, computedNormal, worldPositionComputed);
                                   #endif
                                 #endif
                               #endif
@@ -462,7 +478,7 @@ vec3 diffuseLight(float dirX, float dirY, float dirZ, float r, float g, float b,
     vec3 computedNormal = mat3(worldInverseTranspose) * normal;
 
     #ifdef IS_LIGHT_BAKED
-      vec3 totalColor = handleDynamicLights(computedNormal) * bakedColor;
+      vec3 totalColor = handleDynamicLights(computedNormal, worldPositionComputed) * bakedColor;
     #else
 
       vec3 ambient = vec3(0.0, 0.0, 0.0);
@@ -545,7 +561,7 @@ vec3 diffuseLight(float dirX, float dirY, float dirZ, float r, float g, float b,
         );
       #endif
 
-      vec3 totalColor = ((ambient + diffuse) + handleDynamicLights(computedNormal)) * color;
+      vec3 totalColor = ((ambient + diffuse) + handleDynamicLights(computedNormal, worldPositionComputed)) * color;
 
     #endif
 
