@@ -25,15 +25,27 @@ var LightHandler = function(){
   this.reset();
 }
 
-LightHandler.prototype.addDynamicLightToObject = function(object, light){
-  var index = this.dynamicLightsIndicesByLightName[light.name];
+LightHandler.prototype.getDynamicLightMacros = function(light, index){
   var macros = [];
   macros.push("DYNAMIC_LIGHT_" + index + "_TYPE " + this.dynamicLightTypes[light.typeKey]);
 
   for (var key in light.staticInfo){
     macros.push("DYNAMIC_LIGHT_" + index + "_STATIC_" + key + " " + light.staticInfo[key]);
   }
+  return macros;
+}
 
+LightHandler.prototype.removeDynamicLightFromObject = function(object, light){
+  var index = this.dynamicLightsIndicesByLightName[light.name];
+  var macros = this.getDynamicLightMacros(light, index);
+  for (var i = 0; i < macros.length; i ++){
+    macroHandler.removeMacro(macros[i], object.mesh.material, true, false);
+  }
+}
+
+LightHandler.prototype.addDynamicLightToObject = function(object, light){
+  var index = this.dynamicLightsIndicesByLightName[light.name];
+  var macros = this.getDynamicLightMacros(light, index);
   for (var i = 0; i < macros.length; i ++){
     macroHandler.injectMacro(macros[i], object.mesh.material, true, false);
   }
@@ -62,7 +74,42 @@ LightHandler.prototype.updateDynamicLight = function(dynamicLight, index){
     this.dynamicLightsMatrix.elements[index ++] = dynamicLight.dynamicInfo.strength;
   }
 
+  this.dynamicLights[dynamicLight.name] = dynamicLight;
+
   return index;
+}
+
+LightHandler.prototype.removeDynamicLight = function(dynamicLight){
+  var omited = new Object();
+  for (var name in this.dynamicLights){
+    if (name != dynamicLight.name){
+      omited[name] = JSON.parse(JSON.stringify(this.dynamicLights[name]));
+    }
+  }
+
+  var addedObjectsInScene = sceneHandler.getAddedObjects();
+  var objectGroupsInScene = sceneHandler.getObjectGroups();
+
+  for (var lightName in this.dynamicLights){
+    for (var objName in addedObjectsInScene){
+      var obj = addedObjectsInScene[objName];
+      if (obj.affectedByLight){
+        this.removeDynamicLightFromObject(obj, this.dynamicLights[lightName]);
+      }
+    }
+    for (var objName in objectGroupsInScene){
+      var obj = objectGroupsInScene[objName];
+      if (obj.affectedByLight){
+        this.removeDynamicLightFromObject(obj, this.dynamicLights[lightName]);
+      }
+    }
+  }
+
+  this.resetDynamicLights();
+
+  for (var lightName in omited){
+    this.addDynamicLight(omited[lightName]);
+  }
 }
 
 // dynamicLight:
@@ -247,6 +294,13 @@ LightHandler.prototype.findBakeableObjects = function(){
   return bakeableObjects;
 }
 
+LightHandler.prototype.resetDynamicLights = function(){
+  this.dynamicLights = new Object();
+  this.dynamicLightsMatrixIndicesByLightName = new Object();
+  this.dynamicLightsIndicesByLightName = new Object();
+  this.dynamicLightsMatrixIndex = 0;
+}
+
 LightHandler.prototype.reset = function(){
 
   delete this.staticAmbientColor;
@@ -258,10 +312,7 @@ LightHandler.prototype.reset = function(){
   this.staticDiffuseLightsBySlotId = new Object();
   this.staticPointLightsBySlotId = new Object();
 
-  this.dynamicLights = new Object();
-  this.dynamicLightsMatrixIndicesByLightName = new Object();
-  this.dynamicLightsIndicesByLightName = new Object();
-  this.dynamicLightsMatrixIndex = 0;
+  this.resetDynamicLights();
 }
 
 LightHandler.prototype.getStaticPointStrength = function(slotID){
