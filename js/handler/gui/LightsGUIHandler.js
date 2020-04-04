@@ -1,5 +1,8 @@
 var LightsGUIHandler = function(){
-
+  this.dynamicLightKeys = [];
+  for (var key in lightHandler.dynamicLightTypes){
+    this.dynamicLightKeys.push(key);
+  }
 }
 
 LightsGUIHandler.prototype.getVector = function(str){
@@ -71,6 +74,21 @@ LightsGUIHandler.prototype.getStaticAmbientConfigurations = function(){
     "Strength": lightHandler.getStaticAmbientStrength(),
     "Active": true
   };
+}
+
+LightsGUIHandler.prototype.addDynamicLights = function(dynamicFolder){
+  var dynamicLightKeys = this.dynamicLightKeys;
+  var newLightConfigurations = {
+    Name: "",
+    Type: dynamicLightKeys[0],
+    Add: function(){
+      
+    }
+  };
+
+  dynamicFolder.add(newLightConfigurations, "Name").listen();
+  dynamicFolder.add(newLightConfigurations, "Type", dynamicLightKeys).listen();
+  dynamicFolder.add(newLightConfigurations, "Add").listen();
 }
 
 LightsGUIHandler.prototype.addStaticLights = function(staticFolder){
@@ -243,4 +261,5 @@ LightsGUIHandler.prototype.show = function(){
     }
   }, "Done").listen();
   this.addStaticLights(staticFolder);
+  this.addDynamicLights(dynamicFolder);
 }
