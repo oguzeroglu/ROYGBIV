@@ -642,7 +642,7 @@ vec3 diffuseLight(float dirX, float dirY, float dirZ, float r, float g, float b,
     vec3 computedNormal = mat3(worldInverseTranspose) * normal;
 
     #ifdef IS_LIGHT_BAKED
-      vec3 totalColor = handleDynamicLights(computedNormal, worldPositionComputed) * bakedColor;
+      vec3 totalColor = handleDynamicLights(computedNormal, worldPositionComputed) + bakedColor;
     #else
 
       vec3 ambient = vec3(0.0, 0.0, 0.0);

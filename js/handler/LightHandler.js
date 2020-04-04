@@ -384,6 +384,11 @@ LightHandler.prototype.import = function(obj){
   this.staticPointLightCount = obj.staticPointLightCount || 0;
   this.staticDiffuseLightsBySlotId = obj.staticDiffuseLightsBySlotId? JSON.parse(JSON.stringify(obj.staticDiffuseLightsBySlotId)): {};
   this.staticPointLightsBySlotId = obj.staticPointLightsBySlotId? JSON.parse(JSON.stringify(obj.staticPointLightsBySlotId)): {};
+
+  this.dynamicLights = JSON.parse(JSON.stringify(obj.dynamicLights));
+  this.dynamicLightsMatrixIndicesByLightName = JSON.parse(JSON.stringify(obj.dynamicLightsMatrixIndicesByLightName));
+  this.dynamicLightsMatrixIndex = obj.dynamicLightsMatrixIndex;
+
   if (obj.staticAmbientInfo){
     this.staticAmbientColor = new THREE.Color(parseFloat(obj.staticAmbientInfo.r), parseFloat(obj.staticAmbientInfo.g), parseFloat(obj.staticAmbientInfo.b));
     this.staticAmbientStrength = parseFloat(obj.staticAmbientInfo.strength);
@@ -398,8 +403,12 @@ LightHandler.prototype.export = function(){
     staticDiffuseLightCount: this.staticDiffuseLightCount,
     staticPointLightCount: this.staticPointLightCount,
     staticDiffuseLightsBySlotId: JSON.parse(JSON.stringify(this.staticDiffuseLightsBySlotId)),
-    staticPointLightsBySlotId: JSON.parse(JSON.stringify(this.staticPointLightsBySlotId))
+    staticPointLightsBySlotId: JSON.parse(JSON.stringify(this.staticPointLightsBySlotId)),
+    dynamicLights: JSON.parse(JSON.stringify(this.dynamicLights)),
+    dynamicLightsMatrixIndicesByLightName: JSON.parse(JSON.stringify(this.dynamicLightsMatrixIndicesByLightName)),
+    dynamicLightsMatrixIndex: this.dynamicLightsMatrixIndex
   };
+
 
   if (this.staticAmbientColor){
     exportObj.staticAmbientInfo = {
