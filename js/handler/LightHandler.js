@@ -25,14 +25,21 @@ var LightHandler = function(){
   this.reset();
 }
 
-LightHandler.prototype.addDynamicLightToObject = function(object, macros){
+LightHandler.prototype.addDynamicLightToObject = function(object, light){
+  var index = this.dynamicLightsIndicesByLightName[light.name];
+  var macros = [];
+  macros.push("DYNAMIC_LIGHT_" + index + "_TYPE " + this.dynamicLightTypes[light.typeKey]);
+
+  for (var key in light.staticInfo){
+    macros.push("DYNAMIC_LIGHT_" + index + "_STATIC_" + key + " " + light.staticInfo[key]);
+  }
+
   for (var i = 0; i < macros.length; i ++){
     macroHandler.injectMacro(macros[i], object.mesh.material, true, false);
   }
 }
 
-LightHandler.prototype.updateDynamicLight = function(dynamicLight){
-  var index = this.dynamicLightsMatrixIndicesByLightName[dynamicLight.name];
+LightHandler.prototype.updateDynamicLight = function(dynamicLight, index){
   if (!(typeof dynamicLight.dynamicInfo.colorR == UNDEFINED)){
     this.dynamicLightsMatrix.elements[index ++] = dynamicLight.dynamicInfo.colorR;
     this.dynamicLightsMatrix.elements[index ++] = dynamicLight.dynamicInfo.colorG;
@@ -51,6 +58,8 @@ LightHandler.prototype.updateDynamicLight = function(dynamicLight){
   if (!(typeof dynamicLight.dynamicInfo.strength == UNDEFINED)){
     this.dynamicLightsMatrix.elements[index ++] = dynamicLight.dynamicInfo.strength;
   }
+
+  return index;
 }
 
 // dynamicLight:
@@ -66,12 +75,7 @@ LightHandler.prototype.addDynamicLight = function(dynamicLight){
   }
 
   var index = Object.keys(this.dynamicLights).length + 1;
-  var macros = [];
-  macros.push("DYNAMIC_LIGHT_" + index + "_TYPE " + this.dynamicLightTypes[dynamicLight.typeKey]);
-
-  for (var key in dynamicLight.staticInfo){
-    macros.push("DYNAMIC_LIGHT_" + index + "_STATIC_" + key + " " + dynamicLight.staticInfo[key]);
-  }
+  this.dynamicLightsIndicesByLightName[dynamicLight.name] = index;
 
   var addedObjectsInScene = sceneHandler.getAddedObjects();
   var objectGroupsInScene = sceneHandler.getObjectGroups();
@@ -81,7 +85,7 @@ LightHandler.prototype.addDynamicLight = function(dynamicLight){
     if (!obj.affectedByLight){
       continue;
     }
-    this.addDynamicLightToObject(obj, macros);
+    this.addDynamicLightToObject(obj, dynamicLight);
   }
 
   for (var objName in objectGroupsInScene){
@@ -89,30 +93,11 @@ LightHandler.prototype.addDynamicLight = function(dynamicLight){
     if (!obj.affectedByLight){
       continue;
     }
-    this.addDynamicLightToObject(obj, macros);
+    this.addDynamicLightToObject(obj, dynamicLight);
   }
 
   this.dynamicLightsMatrixIndicesByLightName[dynamicLight.name] = this.dynamicLightsMatrixIndex;
-
-  if (!(typeof dynamicLight.dynamicInfo.colorR == UNDEFINED)){
-    this.dynamicLightsMatrix.elements[this.dynamicLightsMatrixIndex ++] = dynamicLight.dynamicInfo.colorR;
-    this.dynamicLightsMatrix.elements[this.dynamicLightsMatrixIndex ++] = dynamicLight.dynamicInfo.colorG;
-    this.dynamicLightsMatrix.elements[this.dynamicLightsMatrixIndex ++] = dynamicLight.dynamicInfo.colorB;
-  }
-  if (!(typeof dynamicLight.dynamicInfo.dirX == UNDEFINED)){
-    this.dynamicLightsMatrix.elements[this.dynamicLightsMatrixIndex ++] = dynamicLight.dynamicInfo.dirX;
-    this.dynamicLightsMatrix.elements[this.dynamicLightsMatrixIndex ++] = dynamicLight.dynamicInfo.dirY;
-    this.dynamicLightsMatrix.elements[this.dynamicLightsMatrixIndex ++] = dynamicLight.dynamicInfo.dirZ;
-  }
-  if (!(typeof dynamicLight.dynamicInfo.positionX == UNDEFINED)){
-    this.dynamicLightsMatrix.elements[this.dynamicLightsMatrixIndex ++] = dynamicLight.dynamicInfo.positionX;
-    this.dynamicLightsMatrix.elements[this.dynamicLightsMatrixIndex ++] = dynamicLight.dynamicInfo.positionY;
-    this.dynamicLightsMatrix.elements[this.dynamicLightsMatrixIndex ++] = dynamicLight.dynamicInfo.positionZ;
-  }
-  if (!(typeof dynamicLight.dynamicInfo.strength == UNDEFINED)){
-    this.dynamicLightsMatrix.elements[this.dynamicLightsMatrixIndex ++] = dynamicLight.dynamicInfo.strength;
-  }
-
+  this.dynamicLightsMatrixIndex = this.updateDynamicLight(dynamicLight, this.dynamicLightsMatrixIndex);
   this.dynamicLights[dynamicLight.name] = JSON.parse(JSON.stringify(dynamicLight));
 }
 
@@ -272,6 +257,7 @@ LightHandler.prototype.reset = function(){
 
   this.dynamicLights = new Object();
   this.dynamicLightsMatrixIndicesByLightName = new Object();
+  this.dynamicLightsIndicesByLightName = new Object();
   this.dynamicLightsMatrixIndex = 0;
 }
 
@@ -387,7 +373,12 @@ LightHandler.prototype.import = function(obj){
 
   this.dynamicLights = JSON.parse(JSON.stringify(obj.dynamicLights));
   this.dynamicLightsMatrixIndicesByLightName = JSON.parse(JSON.stringify(obj.dynamicLightsMatrixIndicesByLightName));
+  this.dynamicLightsIndicesByLightName = JSON.parse(JSON.stringify(obj.dynamicLightsIndicesByLightName));
   this.dynamicLightsMatrixIndex = obj.dynamicLightsMatrixIndex;
+
+  for (var name in this.dynamicLights){
+    this.updateDynamicLight(this.dynamicLights[name], this.dynamicLightsMatrixIndicesByLightName[name]);
+  }
 
   if (obj.staticAmbientInfo){
     this.staticAmbientColor = new THREE.Color(parseFloat(obj.staticAmbientInfo.r), parseFloat(obj.staticAmbientInfo.g), parseFloat(obj.staticAmbientInfo.b));
@@ -406,9 +397,9 @@ LightHandler.prototype.export = function(){
     staticPointLightsBySlotId: JSON.parse(JSON.stringify(this.staticPointLightsBySlotId)),
     dynamicLights: JSON.parse(JSON.stringify(this.dynamicLights)),
     dynamicLightsMatrixIndicesByLightName: JSON.parse(JSON.stringify(this.dynamicLightsMatrixIndicesByLightName)),
+    dynamicLightsIndicesByLightName: JSON.parse(JSON.stringify(this.dynamicLightsIndicesByLightName)),
     dynamicLightsMatrixIndex: this.dynamicLightsMatrixIndex
   };
-
 
   if (this.staticAmbientColor){
     exportObj.staticAmbientInfo = {
@@ -447,6 +438,10 @@ LightHandler.prototype.addLightToObject = function(obj){
   for (var slotID in this.staticPointLightsBySlotId){
     var staticPointLight = this.staticPointLightsBySlotId[slotID];
     this.handleStaticPointLightMacros(slotID, obj, new THREE.Vector3(staticPointLight.positionX, staticPointLight.positionY, staticPointLight.positionZ), new THREE.Color(staticPointLight.colorR, staticPointLight.colorG, staticPointLight.colorB), staticPointLight.strength);
+  }
+
+  for (var name in this.dynamicLights){
+    this.addDynamicLightToObject(obj, this.dynamicLights[name]);
   }
 }
 
