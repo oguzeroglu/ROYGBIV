@@ -149,6 +149,7 @@ LightHandler.prototype.addDynamicLight = function(dynamicLight){
   this.dynamicLightsMatrixIndicesByLightName[dynamicLight.name] = this.dynamicLightsMatrixIndex;
   this.dynamicLightsMatrixIndex = this.updateDynamicLight(dynamicLight, this.dynamicLightsMatrixIndex);
   this.dynamicLights[dynamicLight.name] = JSON.parse(JSON.stringify(dynamicLight));
+  return true;
 }
 
 LightHandler.prototype.calculateDynamicTypeWeight = function(typeKey){

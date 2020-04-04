@@ -76,13 +76,125 @@ LightsGUIHandler.prototype.getStaticAmbientConfigurations = function(){
   };
 }
 
+LightsGUIHandler.prototype.createDynamicLightFromConfiguration = function(confs, folder){
+  var name = confs.Name;
+  var type = confs.Type;
+
+  var hasDynamicStrength = false, hasDynamicColor = false, hasDynamicPosition = false, hasDynamicDir = false;
+  var splitted = type.split("_");
+  for (var i = 1; i < splitted.length; i ++){
+    if (splitted[i] == "COLOR"){
+      hasDynamicColor = true;
+    }else if (splitted[i] == "STRENGTH"){
+      hasDynamicStrength = true;
+    }else if (splitted[i] == "DIR"){
+      hasDynamicDir = true;
+    }else if (splitted[i] == "POSITION"){
+      hasDynamicPosition = true;
+    }
+  }
+
+  var dynInfo = {};
+  var staticInfo = {};
+  if (hasDynamicStrength){
+    dynInfo.strength = 1;
+  }else{
+    staticInfo.STRENGTH = 1;
+  }
+  if (hasDynamicDir){
+    dynInfo.dirX = 0;
+    dynInfo.dirY = 1;
+    dynInfo.dirZ = 0;
+  }else if (splitted[0] == "DIFFUSE"){
+    staticInfo.DIR_X = 0;
+    staticInfo.DIR_Y = 1;
+    staticInfo.DIR_Z = 0;
+  }
+  if (hasDynamicColor){
+    dynInfo.colorR = 0;
+    dynInfo.colorG = 1;
+    dynInfo.colorB = 0;
+  }else{
+    staticInfo.COLOR_R = 0;
+    staticInfo.COLOR_G = 1;
+    staticInfo.COLOR_B = 0;
+  }
+  if (hasDynamicPosition){
+    dynInfo.positionX = 0;
+    dynInfo.positionY = 0;
+    dynInfo.positionZ = 0;
+  }else if (splitted[0] == "POINT"){
+    staticInfo.POS_X = 0;
+    staticInfo.POS_Y = 0;
+    staticInfo.POS_Z = 0;
+  }
+
+  var dynLight = { name: name, typeKey: type, staticInfo: staticInfo, dynamicInfo: dynInfo };
+
+  if (!lightHandler.addDynamicLight(dynLight)){
+    terminal.clear();
+    terminal.printError(Text.NO_AVAILABLE_SLOT_FOR_THIS_LIGHT);
+    return;
+  }
+
+  var dynLightFolder = folder.addFolder(name);
+
+  var staticFieldsFolder = dynLightFolder.addFolder("Static fields");
+  var dynamicFieldsFolder = dynLightFolder.addFolder("Dynamic fields");
+
+  var deleteConf = {
+    "Delete": function(){
+      lightHandler.removeDynamicLight(dynLight);
+      folder.removeFolder(dynLightFolder);
+      terminal.clear();
+      terminal.printInfo(Text.LIGHT_REMOVED);
+    }
+  }
+
+  dynLightFolder.add(deleteConf, "Delete");
+
+  for (var key in staticInfo){
+    var step = key.startsWith("POS") ? 1 : 0.01;
+    var min = key.startsWith("POS") ? -5000 : 0;
+    var max = key.startsWith("POS") ? 5000 : 1;
+    if (key.startsWith("DIR")){
+      min = -1;
+    }
+    staticFieldsFolder.add(staticInfo, key).step(step).min(min).max(max).onFinishChange(function(val){
+      lightHandler.removeDynamicLight(JSON.parse(JSON.stringify(dynLight)));
+      lightHandler.addDynamicLight(JSON.parse(JSON.stringify(dynLight)));
+    }).listen();
+  }
+
+  for (var key in dynInfo){
+    var step = key.startsWith("pos") ? 1 : 0.01;
+    var min = key.startsWith("pos") ? -5000 : 0;
+    var max = key.startsWith("pos") ? 5000 : 1;
+    if (key.startsWith("dir")){
+      min = -1;
+    }
+    dynamicFieldsFolder.add(dynInfo, key).step(step).min(min).max(max).onChange(function(val){
+      lightHandler.updateDynamicLight(JSON.parse(JSON.stringify(dynLight)));
+    }).listen();
+  }
+
+  terminal.clear();
+  terminal.printInfo(Text.LIGHT_ADDED);
+  confs.Name = "";
+}
+
 LightsGUIHandler.prototype.addDynamicLights = function(dynamicFolder){
   var dynamicLightKeys = this.dynamicLightKeys;
   var newLightConfigurations = {
     Name: "",
     Type: dynamicLightKeys[0],
     Add: function(){
-      
+      if (lightHandler.dynamicLights[this.Name]){
+        terminal.clear();
+        terminal.printError(Text.NAME_MUST_BE_UNIQUE);
+        return;
+      }
+      lightsGUIHandler.createDynamicLightFromConfiguration(this, dynamicFolder);
     }
   };
 

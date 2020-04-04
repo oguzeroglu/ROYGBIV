@@ -283,6 +283,7 @@ var Text = function(){
   this.AXIS_MUST_BE_Y_OR_Z = "Axis must be y or z for this grid system.";
   this.AXIS_MUST_BE_X_OR_Y = "Axis must be x or y for this grid system.";
   this.NO_AREAS_FOUND = "No areas found.";
+  this.NO_AVAILABLE_SLOT_FOR_THIS_LIGHT = "No available slot for this light.";
   this.VIRTUAL_KEYBOARD_DESTROYED = "Virtual keyboard destroyed.";
   this.NO_VIRTUAL_KEYBOARDS_FOUND = "No virtual keyboards found.";
   this.COMMAND_EXECUTED_FOR_X_VIRTUAL_KEYBOARDS = "Command executed for @@1 virtual keyboards.";
