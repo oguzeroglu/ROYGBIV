@@ -76,6 +76,54 @@ LightsGUIHandler.prototype.getStaticAmbientConfigurations = function(){
   };
 }
 
+LightsGUIHandler.prototype.addDynamicLightFolder = function(dynLight, folder){
+
+  var staticInfo = dynLight.staticInfo;
+  var dynInfo = dynLight.dynamicInfo;
+  var name = dynLight.name;
+
+  var dynLightFolder = folder.addFolder(name);
+
+  var staticFieldsFolder = dynLightFolder.addFolder("Static fields");
+  var dynamicFieldsFolder = dynLightFolder.addFolder("Dynamic fields");
+
+  var deleteConf = {
+    "Delete": function(){
+      lightHandler.removeDynamicLight(dynLight);
+      folder.removeFolder(dynLightFolder);
+      terminal.clear();
+      terminal.printInfo(Text.LIGHT_REMOVED);
+    }
+  }
+
+  dynLightFolder.add(deleteConf, "Delete");
+
+  for (var key in staticInfo){
+    var step = key.startsWith("POS") ? 1 : 0.01;
+    var min = key.startsWith("POS") ? -5000 : 0;
+    var max = key.startsWith("POS") ? 5000 : 1;
+    if (key.startsWith("DIR")){
+      min = -1;
+    }
+    staticFieldsFolder.add(staticInfo, key).step(step).min(min).max(max).onFinishChange(function(val){
+      lightHandler.removeDynamicLight(JSON.parse(JSON.stringify(dynLight)));
+      lightHandler.addDynamicLight(JSON.parse(JSON.stringify(dynLight)));
+    }).listen();
+  }
+
+  for (var key in dynInfo){
+    var step = key.startsWith("pos") ? 1 : 0.01;
+    var min = key.startsWith("pos") ? -5000 : 0;
+    var max = key.startsWith("pos") ? 5000 : 1;
+    if (key.startsWith("dir")){
+      min = -1;
+    }
+    dynamicFieldsFolder.add(dynInfo, key).step(step).min(min).max(max).onChange(function(val){
+      lightHandler.updateDynamicLight(JSON.parse(JSON.stringify(dynLight)));
+    }).listen();
+  }
+}
+
 LightsGUIHandler.prototype.createDynamicLightFromConfiguration = function(confs, folder){
   var name = confs.Name;
   var type = confs.Type;
@@ -137,50 +185,10 @@ LightsGUIHandler.prototype.createDynamicLightFromConfiguration = function(confs,
     return;
   }
 
-  var dynLightFolder = folder.addFolder(name);
-
-  var staticFieldsFolder = dynLightFolder.addFolder("Static fields");
-  var dynamicFieldsFolder = dynLightFolder.addFolder("Dynamic fields");
-
-  var deleteConf = {
-    "Delete": function(){
-      lightHandler.removeDynamicLight(dynLight);
-      folder.removeFolder(dynLightFolder);
-      terminal.clear();
-      terminal.printInfo(Text.LIGHT_REMOVED);
-    }
-  }
-
-  dynLightFolder.add(deleteConf, "Delete");
-
-  for (var key in staticInfo){
-    var step = key.startsWith("POS") ? 1 : 0.01;
-    var min = key.startsWith("POS") ? -5000 : 0;
-    var max = key.startsWith("POS") ? 5000 : 1;
-    if (key.startsWith("DIR")){
-      min = -1;
-    }
-    staticFieldsFolder.add(staticInfo, key).step(step).min(min).max(max).onFinishChange(function(val){
-      lightHandler.removeDynamicLight(JSON.parse(JSON.stringify(dynLight)));
-      lightHandler.addDynamicLight(JSON.parse(JSON.stringify(dynLight)));
-    }).listen();
-  }
-
-  for (var key in dynInfo){
-    var step = key.startsWith("pos") ? 1 : 0.01;
-    var min = key.startsWith("pos") ? -5000 : 0;
-    var max = key.startsWith("pos") ? 5000 : 1;
-    if (key.startsWith("dir")){
-      min = -1;
-    }
-    dynamicFieldsFolder.add(dynInfo, key).step(step).min(min).max(max).onChange(function(val){
-      lightHandler.updateDynamicLight(JSON.parse(JSON.stringify(dynLight)));
-    }).listen();
-  }
-
+  this.addDynamicLightFolder(dynLight, folder);
+  confs.Name = "";
   terminal.clear();
   terminal.printInfo(Text.LIGHT_ADDED);
-  confs.Name = "";
 }
 
 LightsGUIHandler.prototype.addDynamicLights = function(dynamicFolder){
@@ -201,6 +209,10 @@ LightsGUIHandler.prototype.addDynamicLights = function(dynamicFolder){
   dynamicFolder.add(newLightConfigurations, "Name").listen();
   dynamicFolder.add(newLightConfigurations, "Type", dynamicLightKeys).listen();
   dynamicFolder.add(newLightConfigurations, "Add").listen();
+
+  for (var lightName in lightHandler.dynamicLights){
+    this.addDynamicLightFolder(JSON.parse(JSON.stringify(lightHandler.dynamicLights[lightName])), dynamicFolder);
+  }
 }
 
 LightsGUIHandler.prototype.addStaticLights = function(staticFolder){
