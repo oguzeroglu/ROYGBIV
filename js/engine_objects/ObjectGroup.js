@@ -58,12 +58,15 @@ ObjectGroup.prototype.setAffectedByLight = function(isAffectedByLight){
   macroHandler.removeMacro("AFFECTED_BY_LIGHT", this.mesh.material, true, false);
 
   delete this.mesh.material.uniforms.worldInverseTranspose;
+  delete this.mesh.material.uniforms.dynamicLightsMatrix;
+  delete this.mesh.material.uniforms.worldMatrix;
 
   if (isAffectedByLight){
     macroHandler.injectMacro("AFFECTED_BY_LIGHT", this.mesh.material, true, false);
 
     this.mesh.material.uniforms.worldInverseTranspose = new THREE.Uniform(new THREE.Matrix4());
     this.mesh.material.uniforms.worldMatrix = new THREE.Uniform(this.mesh.matrixWorld);
+    this.mesh.material.uniforms.dynamicLightsMatrix = new THREE.Uniform(lightHandler.dynamicLightsMatrix);
     this.updateWorldInverseTranspose();
 
     lightHandler.addLightToObject(this);

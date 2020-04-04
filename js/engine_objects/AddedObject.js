@@ -90,6 +90,8 @@ AddedObject.prototype.setAffectedByLight = function(isAffectedByLight){
   macroHandler.removeMacro("AFFECTED_BY_LIGHT", this.mesh.material, true, false);
 
   delete this.mesh.material.uniforms.worldInverseTranspose;
+  delete this.mesh.material.uniforms.dynamicLightsMatrix;
+  delete this.mesh.material.uniforms.worldMatrix;
 
   if (isAffectedByLight){
     macroHandler.injectMacro("AFFECTED_BY_LIGHT", this.mesh.material, true, false);
