@@ -1041,4 +1041,9 @@ var Text = function(){
   this.ROYGBIV_SCRIPTING_API_MAPAREAPOSITIONTOAREA = "Converts a 3D vector within source area into another vector in target area maintanining the ratio.";
   this.ROYGBIV_SCRIPTING_API_CREATEVECTORPOOL = "Returns a vector pool to store reusable vectors. Use getFromVectorPool API to get the vector object.";
   this.ROYGBIV_SCRIPTING_API_GETFROMVECTORPOOL = "Returns a vector from a vector pool create with createVectorPool API.";
+  this.ROYGBIV_SCRIPTING_API_GETDYNAMICLIGHT = "Returns a dynamic light or 0 if dynamic light does not exist.";
+  this.ROYGBIV_SCRIPTING_API_UPDATELIGHTSTRENGTH = "Updates the strength of a dynamic light.";
+  this.ROYGBIV_SCRIPTING_API_UPDATELIGHTCOLOR = "Updates the color of a dynamic light.";
+  this.ROYGBIV_SCRIPTING_API_UPDATELIGHTDIRECTION = "Updates the direction of a dynamic light.";
+  this.ROYGBIV_SCRIPTING_API_UPDATELIGHTPOSITION = "Updates the position of a dynamic light.";
 }

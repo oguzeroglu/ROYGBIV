@@ -197,6 +197,11 @@ LightsGUIHandler.prototype.addDynamicLights = function(dynamicFolder){
     Name: "",
     Type: dynamicLightKeys[0],
     Add: function(){
+      if (this.Name == ""){
+        terminal.clear();
+        terminal.printError(Text.NAME_CANNOT_BE_EMPTY);
+        return;
+      }
       if (lightHandler.dynamicLights[this.Name]){
         terminal.clear();
         terminal.printError(Text.NAME_MUST_BE_UNIQUE);
