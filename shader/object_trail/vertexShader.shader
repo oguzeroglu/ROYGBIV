@@ -77,9 +77,6 @@ void main(){
     vEmissiveIntensity = emissiveIntensity;
     vEmissiveColor = emissiveColor;
   #endif
-  #ifdef HAS_SKYBOX_FOG
-    vWorldPosition = (worldMatrix * vec4(position, 1.0)).xyz;
-  #endif
 
   int indexX = int(coordIndex);
   int indexY = indexX + 1;
@@ -117,6 +114,10 @@ void main(){
     vec3 rotatedPos = applyQuaternionToVector(transformedPosition, quat);
     vec3 newPosition = coord + rotatedPos;
     gl_Position = projectionMatrix * viewMatrix * vec4(newPosition, 1.0);
+
+    #ifdef HAS_SKYBOX_FOG
+      vWorldPosition = newPosition;
+    #endif
   }
 
 }
