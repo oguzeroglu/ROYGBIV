@@ -40,6 +40,9 @@ LightHandler.prototype.addDynamicLightToObject = function(object, light){
 }
 
 LightHandler.prototype.updateDynamicLight = function(dynamicLight, index){
+  if (typeof index == UNDEFINED){
+    index = this.dynamicLightsMatrixIndicesByLightName[dynamicLight.name];
+  }
   if (!(typeof dynamicLight.dynamicInfo.colorR == UNDEFINED)){
     this.dynamicLightsMatrix.elements[index ++] = dynamicLight.dynamicInfo.colorR;
     this.dynamicLightsMatrix.elements[index ++] = dynamicLight.dynamicInfo.colorG;
