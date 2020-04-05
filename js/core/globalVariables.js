@@ -501,7 +501,7 @@ for (var i = 0; i<supportedFontAtlasChars.length; i++){
 }
 
 // BANNER
-var BANNERL1 = "____   _____   ______ ____ _____     __ ";
+var BANNERL1 = " ____   _____   ______ ____ _____     __ ";
 var BANNERL2 = "|  _ \\ / _ \\ \\ / / ___| __ )_ _\\ \\   / / ";
 var BANNERL3 = "| |_) | | | \\ V / |  _|  _ \\| | \\ \\ / /  ";
 var BANNERL4 = "|  _ <| |_| || || |_| | |_) | |  \\   /   ";
