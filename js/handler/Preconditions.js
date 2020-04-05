@@ -255,6 +255,18 @@ var Preconditions = function(){
   this.targetAreaName = "targetAreaName";
   this.length = "length";
   this.vectorPool = "vectorPool";
+  this.dynamicLightName = "dynamicLightName";
+  this.light = "light";
+  this.newStrength = "newStrength";
+  this.newR = "newR";
+  this.newG = "newG";
+  this.newB = "newB";
+  this.newDirX = "newDirX";
+  this.newDirY = "newDirY";
+  this.newDirZ = "newDirZ";
+  this.newPosX = "newPosX";
+  this.newPosY = "newPosY";
+  this.newPosZ = "newPosZ";
 }
 
 Preconditions.prototype.errorHeader = function(callerFunc){
@@ -263,6 +275,47 @@ Preconditions.prototype.errorHeader = function(callerFunc){
 
 Preconditions.prototype.throw = function(callerFunc, errorMsg){
   throw new Error(this.errorHeader(callerFunc)+" ["+errorMsg+"]");
+}
+
+Preconditions.prototype.checkIfLightInActiveScene = function(callerFunc, light){
+  if (!lightHandler.dynamicLights[light.name]){
+    this.throw(callerFunc, "Light not inside the active scene.");
+  }
+}
+
+Preconditions.prototype.checkIfLightSuitableForStrengthUpdate = function(callerFunc, light){
+  if (typeof light.dynamicInfo.strength == UNDEFINED){
+    this.throw(callerFunc, "Cannot update strength of this light.");
+  }
+}
+
+Preconditions.prototype.checkIfLightSuitableForColorUpdate = function(callerFunc, light){
+  if (typeof light.dynamicInfo.colorR == UNDEFINED){
+    this.throw(callerFunc, "Cannot update color of this light.");
+  }
+}
+
+Preconditions.prototype.checkIfLightSuitableForDirectionUpdate = function(callerFunc, light){
+  if (typeof light.dynamicInfo.dirX == UNDEFINED){
+    this.throw(callerFunc, "Cannot update direction of this light.");
+  }
+}
+
+Preconditions.prototype.checkIfLightSuitableForPositionUpdate = function(callerFunc, light){
+  if (typeof light.dynamicInfo.positionX == UNDEFINED){
+    this.throw(callerFunc, "Cannot update position of this light.");
+  }
+}
+
+Preconditions.prototype.checkIfDynamicLight = function(callerFunc, light){
+  var noTypeKey = (typeof light.typeKey == UNDEFINED);
+  var noName = (typeof light.name == UNDEFINED);
+  var noStaticInfo = (typeof light.staticInfo == UNDEFINED);
+  var noDynamicInfo = (typeof light.dynamicInfo == UNDEFINED);
+
+  if (noTypeKey || noName || noStaticInfo || noDynamicInfo){
+    this.throw(callerFunc, "light is not a dynamic light.");
+  }
 }
 
 Preconditions.prototype.checkMultiplayerContext = function(callerFunc){

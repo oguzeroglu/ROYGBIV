@@ -5,6 +5,26 @@ var AutoInstancedObject = function(name, objects){
   this.pseudoObjectGroup = new ObjectGroup(null, objects);
 }
 
+AutoInstancedObject.prototype.setAffectedByLight = function(isAffectedByLight){
+
+  macroHandler.removeMacro("AFFECTED_BY_LIGHT", this.mesh.material, true, false);
+
+  delete this.mesh.material.uniforms.worldInverseTranspose;
+  delete this.mesh.material.uniforms.dynamicLightsMatrix;
+
+  if (isAffectedByLight){
+    macroHandler.injectMacro("AFFECTED_BY_LIGHT", this.mesh.material, true, false);
+    this.mesh.material.uniforms.dynamicLightsMatrix = new THREE.Uniform(lightHandler.dynamicLightsMatrix);
+    lightHandler.addLightToObject(this);
+  }else{
+    lightHandler.removeLightFromObject(this);
+  }
+
+  this.mesh.material.needsUpdate = true;
+
+  this.affectedByLight = isAffectedByLight;
+}
+
 AutoInstancedObject.prototype.hideVisually = function(){
   this.mesh.visible = false;
 }
@@ -136,15 +156,20 @@ AutoInstancedObject.prototype.init = function(){
   var displacementInfoAry = [];
   var aoIntensityAry = [];
   var textureOffsetInfoAry = [];
+  var affectedByLightAry = [];
   var hasColorizableMember = false;
   for (var objName in this.objects){
     var obj = this.objects[objName];
+    if (obj.affectedByLight){
+      this.affectedByLight = true;
+    }
     this.orientationIndicesByObjectName.set(objName, curIndex);
     this.alphaIndicesByObjectName.set(objName, objCount);
     this.scaleIndicesByObjectName.set(objName, objCount);
     orientationIndices.push(curIndex);
     alphaIndices.push(objCount);
     scaleIndices.push(objCount);
+    affectedByLightAry.push(obj.affectedByLight? 10: -10);
     curIndex += 2;
     objCount ++;
     orientationAry.push(new THREE.Vector4(10, obj.mesh.position.x, obj.mesh.position.y, obj.mesh.position.z));
@@ -185,12 +210,15 @@ AutoInstancedObject.prototype.init = function(){
   var orientationIndicesBufferAttribute = new THREE.InstancedBufferAttribute(new Float32Array(orientationIndices), 1);
   var alphaIndicesBufferAttribute = new THREE.InstancedBufferAttribute(new Float32Array(alphaIndices), 1);
   var scaleIndicesBufferAttribute = new THREE.InstancedBufferAttribute(new Float32Array(scaleIndices), 1);
+  var affectedByLightBufferAttribute = new THREE.InstancedBufferAttribute(new Float32Array(affectedByLightAry), 1);
   orientationIndicesBufferAttribute.setDynamic(false);
   alphaIndicesBufferAttribute.setDynamic(false);
   scaleIndicesBufferAttribute.setDynamic(false);
+  affectedByLightBufferAttribute.setDynamic(false);
   this.mesh.geometry.addAttribute("orientationIndex", orientationIndicesBufferAttribute);
   this.mesh.geometry.addAttribute("alphaIndex", alphaIndicesBufferAttribute);
   this.mesh.geometry.addAttribute("scaleIndex", scaleIndicesBufferAttribute);
+  this.mesh.geometry.addAttribute("affectedByLight", affectedByLightBufferAttribute);
   macroHandler.injectMacro("AUTO_INSTANCE_ORIENTATION_ARRAY_SIZE "+(objCount * 2), this.mesh.material, true, false);
   macroHandler.injectMacro("AUTO_INSTANCE_ALPHA_ARRAY_SIZE "+objCount, this.mesh.material, true, false);
   macroHandler.injectMacro("AUTO_INSTANCE_SCALE_ARRAY_SIZE "+objCount, this.mesh.material, true, false);
@@ -199,6 +227,9 @@ AutoInstancedObject.prototype.init = function(){
   macroHandler.injectMacro("AUTO_INSTANCE_DISPLACEMENT_INFO_ARRAY_SIZE "+objCount, this.mesh.material, true, false);
   macroHandler.injectMacro("AUTO_INSTANCE_TEXTURE_OFFSET_INFO_ARRAY_SIZE "+objCount, this.mesh.material, true, false);
   macroHandler.injectMacro("AUTO_INSTANCE_AO_INTENSITY_ARRAY_SIZE "+objCount, this.mesh.material, true, false);
+  if (this.affectedByLight){
+    this.setAffectedByLight(true);
+  }
   this.mesh.material.uniforms.autoInstanceOrientationArray = new THREE.Uniform(orientationAry);
   this.mesh.material.uniforms.autoInstanceAlphaArray = new THREE.Uniform(alphaAry);
   this.mesh.material.uniforms.autoInstanceScaleArray = new THREE.Uniform(scaleAry);

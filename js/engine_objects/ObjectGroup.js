@@ -34,6 +34,49 @@ var ObjectGroup = function(name, group){
   this.lastUpdateQuaternion = new THREE.Quaternion();
 
   this.animations = new Object();
+
+  this.matrixCache = new THREE.Matrix4();
+}
+
+ObjectGroup.prototype.updateWorldInverseTranspose = function(){
+  var val = this.mesh.material.uniforms.worldInverseTranspose.value;
+  val.getInverse(this.mesh.matrixWorld).transpose();
+  this.matrixCache.copy(this.mesh.matrixWorld);
+}
+
+ObjectGroup.prototype.onBeforeRender = function(){
+  if (!this.affectedByLight){
+    return;
+  }
+  if (!this.matrixCache.equals(this.mesh.matrixWorld)){
+    this.updateWorldInverseTranspose();
+  }
+}
+
+ObjectGroup.prototype.setAffectedByLight = function(isAffectedByLight){
+
+  macroHandler.removeMacro("AFFECTED_BY_LIGHT", this.mesh.material, true, false);
+
+  delete this.mesh.material.uniforms.worldInverseTranspose;
+  delete this.mesh.material.uniforms.dynamicLightsMatrix;
+  delete this.mesh.material.uniforms.worldMatrix;
+
+  if (isAffectedByLight){
+    macroHandler.injectMacro("AFFECTED_BY_LIGHT", this.mesh.material, true, false);
+
+    this.mesh.material.uniforms.worldInverseTranspose = new THREE.Uniform(new THREE.Matrix4());
+    this.mesh.material.uniforms.worldMatrix = new THREE.Uniform(this.mesh.matrixWorld);
+    this.mesh.material.uniforms.dynamicLightsMatrix = new THREE.Uniform(lightHandler.dynamicLightsMatrix);
+    this.updateWorldInverseTranspose();
+
+    lightHandler.addLightToObject(this);
+  }else{
+    lightHandler.removeLightFromObject(this);
+  }
+
+  this.mesh.material.needsUpdate = true;
+
+  this.affectedByLight = isAffectedByLight;
 }
 
 ObjectGroup.prototype.onAfterRotationAnimation = function(){
@@ -930,7 +973,6 @@ ObjectGroup.prototype.mergeInstanced = function(){
     );
     displacementInfoBufferAttribute.setDynamic(false);
     this.geometry.addAttribute("displacementInfo", displacementInfoBufferAttribute);
-    this.geometry.addAttribute("normal", refGeometry.attributes.normal);
   }
 
   positionOffsetBufferAttribute.setDynamic(false);
@@ -943,6 +985,8 @@ ObjectGroup.prototype.mergeInstanced = function(){
   this.geometry.addAttribute("alpha", alphaBufferAttribute);
   this.geometry.addAttribute("color", colorBufferAttribute);
   this.geometry.addAttribute("position", refGeometry.attributes.position);
+
+  this.geometry.addAttribute("normal", refGeometry.attributes.normal);
 
 }
 
@@ -1011,8 +1055,8 @@ ObjectGroup.prototype.merge = function(){
     positions = new Array((max + 1) * 3);
     colors = new Array((max + 1) * 3);
     alphas = new Array(max + 1);
+    normals = new Array((max + 1) * 3);
     if (this.displacementTexture){
-      normals = new Array((max + 1) * 3);
       displacementInfos = new Array((max + 1) * 2);
     }
     if (this.hasTexture){
@@ -1031,8 +1075,8 @@ ObjectGroup.prototype.merge = function(){
     positions = [];
     colors = [];
     alphas = [];
+    normals = [];
     if (this.displacementTexture){
-      normals = [];
       displacementInfos = [];
     }
     if (this.hasTexture){
@@ -1109,22 +1153,20 @@ ObjectGroup.prototype.merge = function(){
       this.push(positions, vertex3.y, ((3*c) + 1), isIndexed);
       this.push(positions, vertex3.z, ((3*c) + 2), isIndexed);
     }
-    if (this.displacementTexture){
-      if (!aSkipped){
-        this.push(normals, vertexNormal1.x, (3*a), isIndexed);
-        this.push(normals, vertexNormal1.y, ((3*a) + 1), isIndexed);
-        this.push(normals, vertexNormal1.z, ((3*a) + 2), isIndexed);
-      }
-      if (!bSkipped){
-        this.push(normals, vertexNormal2.x, (3*b), isIndexed);
-        this.push(normals, vertexNormal2.y, ((3*b) + 1), isIndexed);
-        this.push(normals, vertexNormal2.z, ((3*b) + 2), isIndexed);
-      }
-      if (!cSkipped){
-        this.push(normals, vertexNormal3.x, (3*c), isIndexed);
-        this.push(normals, vertexNormal3.y, ((3*c) + 1), isIndexed);
-        this.push(normals, vertexNormal3.z, ((3*c) + 2), isIndexed);
-      }
+    if (!aSkipped){
+      this.push(normals, vertexNormal1.x, (3*a), isIndexed);
+      this.push(normals, vertexNormal1.y, ((3*a) + 1), isIndexed);
+      this.push(normals, vertexNormal1.z, ((3*a) + 2), isIndexed);
+    }
+    if (!bSkipped){
+      this.push(normals, vertexNormal2.x, (3*b), isIndexed);
+      this.push(normals, vertexNormal2.y, ((3*b) + 1), isIndexed);
+      this.push(normals, vertexNormal2.z, ((3*b) + 2), isIndexed);
+    }
+    if (!cSkipped){
+      this.push(normals, vertexNormal3.x, (3*c), isIndexed);
+      this.push(normals, vertexNormal3.y, ((3*c) + 1), isIndexed);
+      this.push(normals, vertexNormal3.z, ((3*c) + 2), isIndexed);
     }
     // COLORS
     if (!aSkipped){
@@ -1398,15 +1440,12 @@ ObjectGroup.prototype.merge = function(){
   var positionsTypedArray = new Float32Array(positions);
   var colorsTypedArray = new Float32Array(colors);
   var alphasTypedArray = new Float32Array(alphas);
+  var normalsTypedArray = new Float32Array(normals);
 
   if (this.displacementTexture){
-    var normalsTypedArray = new Float32Array(normals);
     var displacementInfosTypedArray = new Float32Array(displacementInfos);
-    var normalsBufferAttribute = new THREE.BufferAttribute(normalsTypedArray, 3);
     var displacementInfosBufferAttribute = new THREE.BufferAttribute(displacementInfosTypedArray, 2);
-    normalsBufferAttribute.setDynamic(false);
     displacementInfosBufferAttribute.setDynamic(false);
-    this.geometry.addAttribute('normal', normalsBufferAttribute);
     this.geometry.addAttribute('displacementInfo', displacementInfosBufferAttribute);
   }
   if (this.hasTexture){
@@ -1443,10 +1482,12 @@ ObjectGroup.prototype.merge = function(){
   var positionsBufferAttribute = new THREE.BufferAttribute(positionsTypedArray, 3);
   var colorsBufferAttribute = new THREE.BufferAttribute(colorsTypedArray, 3);
   var alphasBufferAttribute = new THREE.BufferAttribute(alphasTypedArray, 1);
+  var normalsBufferAttribute = new THREE.BufferAttribute(normalsTypedArray, 3);
 
   positionsBufferAttribute.setDynamic(false);
   colorsBufferAttribute.setDynamic(false);
   alphasBufferAttribute.setDynamic(false);
+  normalsBufferAttribute.setDynamic(false);
 
   if (isIndexed){
     var indicesTypedArray = new Uint16Array(indices);
@@ -1458,6 +1499,7 @@ ObjectGroup.prototype.merge = function(){
   this.geometry.addAttribute('position', positionsBufferAttribute);
   this.geometry.addAttribute('color', colorsBufferAttribute);
   this.geometry.addAttribute('alpha', alphasBufferAttribute);
+  this.geometry.addAttribute('normal', normalsBufferAttribute);
 
   pseudoGeometry = null;
 }
@@ -2147,6 +2189,8 @@ ObjectGroup.prototype.export = function(){
   if (this.manualPositionInfo){
     exportObj.manualPositionInfo = this.manualPositionInfo;
   }
+
+  exportObj.affectedByLight = this.affectedByLight;
   return exportObj;
 }
 
@@ -2709,7 +2753,9 @@ ObjectGroup.prototype.setFog = function(){
   if (fogHandler.isFogBlendingWithSkybox()){
     if (!this.mesh.material.uniforms.cubeTexture){
       macroHandler.injectMacro("HAS_SKYBOX_FOG", this.mesh.material, true, true);
-      this.mesh.material.uniforms.worldMatrix = new THREE.Uniform(this.mesh.matrixWorld);
+      if (!this.affectedByLight){
+        this.mesh.material.uniforms.worldMatrix = new THREE.Uniform(this.mesh.matrixWorld);
+      }
       this.mesh.material.uniforms.cubeTexture = GLOBAL_CUBE_TEXTURE_UNIFORM;
       this.mesh.material.uniforms.cameraPosition = GLOBAL_CAMERA_POSITION_UNIFORM;
     }
@@ -2722,7 +2768,9 @@ ObjectGroup.prototype.removeFog = function(){
   macroHandler.removeMacro("HAS_SKYBOX_FOG", this.mesh.material, true, true);
   delete this.mesh.material.uniforms.fogInfo;
   delete this.mesh.material.uniforms.cubeTexture;
-  delete this.mesh.material.uniforms.worldMatrix;
+  if (!this.affectedByLight){
+    delete this.mesh.material.uniforms.worldMatrix;
+  }
   delete this.mesh.material.uniforms.cameraPosition;
   this.mesh.material.needsUpdate = true;
 }

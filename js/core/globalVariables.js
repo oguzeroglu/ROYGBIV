@@ -26,6 +26,7 @@ var tmGUIFocused = false;
 var smGUIFocused = false;
 var cmGUIFocused = false;
 var acGUIFocused = false;
+var lGUIFocused = false;
 var cliIsBeingDragged = false;
 var requestID;
 var boundingClientRect;
@@ -342,10 +343,12 @@ var scriptsGUIHandler;
 var animationCreatorGUIHandler;
 var lightningCreatorGUIHandler;
 var virtualKeyboardCreatorGUIHandler;
+var lightsGUIHandler;
 var skyboxHandler;
 var fogHandler;
 var scriptsHandler;
 var animationHandler;
+var lightHandler;
 var lightningHandler;
 var preConfiguredParticleSystems = new Object();
 var preConfiguredParticleSystemPools = new Object();
@@ -397,6 +400,10 @@ var dynamicallyLoadedTextures = new Object();
 var protocolDefinitionFileName = 0;
 var serverWSURL = 0;
 var objectExportImportHandler;
+
+// LIGHTING LIMITS
+var MAX_STATIC_DIFFUSE_LIGHT_COUNT = 5;
+var MAX_STATIC_POINT_LIGHT_COUNT = 5;
 
 // RENDER ORDERS
 var renderOrders = {

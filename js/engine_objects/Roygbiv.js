@@ -15,6 +15,7 @@
 //  * Control functions
 //  * Animation functions
 //  * Muzzleflash functions
+//  * Lighting functions
 //  * Lightning functions
 //  * Sprite functions
 //  * Container functions
@@ -266,7 +267,12 @@ var Roygbiv = function(){
     "applyCustomVelocity",
     "mapAreaPositionToArea",
     "createVectorPool",
-    "getFromVectorPool"
+    "getFromVectorPool",
+    "getDynamicLight",
+    "updateLightStrength",
+    "updateLightColor",
+    "updateLightDirection",
+    "updateLightPosition"
   ];
 
   this.globals = new Object();
@@ -705,6 +711,15 @@ Roygbiv.prototype.getSpriteMarginY = function(sprite){
   preConditions.checkIfSprite(ROYGBIV.getSpriteMarginY, preConditions.sprite, sprite);
   preConditions.checkIfSpriteInsideActiveScene(ROYGBIV.getSpriteMarginY, sprite);
   return sprite.getMarginYPercent();
+}
+
+// Returns a dynamic light or 0 if dynamic light does not exist.
+Roygbiv.prototype.getDynamicLight = function(dynamicLightName){
+  if (mode == 0){
+    return;
+  }
+  preConditions.checkIfDefined(ROYGBIV.getDynamicLight, preConditions.dynamicLightName, dynamicLightName);
+  return lightHandler.dynamicLights[dynamicLightName] || 0;
 }
 
 // OBJECT MANIPULATION FUNCTIONS ***********************************************
@@ -3000,6 +3015,86 @@ Roygbiv.prototype.hideMuzzleFlash = function(muzzleflashName, animationTimeInMS)
   preConditions.checkIfMuzzleFlashInsideActiveScene(ROYGBIV.hideMuzzleFlash, muzzleFlash);
   preConditions.checkIfNumberOnlyIfExists(ROYGBIV.hideMuzzleFlash, preConditions.animationTimeInMS, animationTimeInMS);
   muzzleFlash.onHide(animationTimeInMS);
+}
+
+// LIGHTING FUNCTIONS **********************************************************
+
+// Updates the strength of a dynamic light.
+Roygbiv.prototype.updateLightStrength = function(light, newStrength){
+  if (mode == 0){
+    return;
+  }
+  preConditions.checkIfDefined(ROYGBIV.updateLightStrength, preConditions.light, light);
+  preConditions.checkIfDefined(ROYGBIV.updateLightStrength, preConditions.newStrength, newStrength);
+  preConditions.checkIfNumber(ROYGBIV.updateLightStrength, preConditions.newStrength, newStrength);
+  preConditions.checkIfDynamicLight(ROYGBIV.updateLightStrength, light);
+  preConditions.checkIfLightInActiveScene(ROYGBIV.updateLightStrength, light);
+  preConditions.checkIfLightSuitableForStrengthUpdate(ROYGBIV.updateLightStrength, light);
+  light.dynamicInfo.strength = newStrength;
+  lightHandler.updateDynamicLight(light);
+}
+
+// Updates the color of a dynamic light.
+Roygbiv.prototype.updateLightColor = function(light, newR, newG, newB){
+  if (mode == 0){
+    return;
+  }
+  preConditions.checkIfDefined(ROYGBIV.updateLightColor, preConditions.light, light);
+  preConditions.checkIfDefined(ROYGBIV.updateLightColor, preConditions.newR, newR);
+  preConditions.checkIfDefined(ROYGBIV.updateLightColor, preConditions.newG, newG);
+  preConditions.checkIfDefined(ROYGBIV.updateLightColor, preConditions.newB, newB);
+  preConditions.checkIfNumber(ROYGBIV.updateLightColor, preConditions.newR, newR);
+  preConditions.checkIfNumber(ROYGBIV.updateLightColor, preConditions.newG, newG);
+  preConditions.checkIfNumber(ROYGBIV.updateLightColor, preConditions.newB, newB);
+  preConditions.checkIfDynamicLight(ROYGBIV.updateLightColor, light);
+  preConditions.checkIfLightInActiveScene(ROYGBIV.updateLightColor, light);
+  preConditions.checkIfLightSuitableForColorUpdate(ROYGBIV.updateLightColor, light);
+  light.dynamicInfo.colorR = newR;
+  light.dynamicInfo.colorG = newG;
+  light.dynamicInfo.colorB = newB;
+  lightHandler.updateDynamicLight(light);
+}
+
+// Updates the direction of a dynamic light.
+Roygbiv.prototype.updateLightDirection = function(light, newDirX, newDirY, newDirZ){
+  if (mode == 0){
+    return;
+  }
+  preConditions.checkIfDefined(ROYGBIV.updateLightDirection, preConditions.light, light);
+  preConditions.checkIfDefined(ROYGBIV.updateLightDirection, preConditions.newDirX, newDirX);
+  preConditions.checkIfDefined(ROYGBIV.updateLightDirection, preConditions.newDirY, newDirY);
+  preConditions.checkIfDefined(ROYGBIV.updateLightDirection, preConditions.newDirZ, newDirZ);
+  preConditions.checkIfNumber(ROYGBIV.updateLightDirection, preConditions.newDirX, newDirX);
+  preConditions.checkIfNumber(ROYGBIV.updateLightDirection, preConditions.newDirY, newDirY);
+  preConditions.checkIfNumber(ROYGBIV.updateLightDirection, preConditions.newDirZ, newDirZ);
+  preConditions.checkIfDynamicLight(ROYGBIV.updateLightDirection, light);
+  preConditions.checkIfLightInActiveScene(ROYGBIV.updateLightDirection, light);
+  preConditions.checkIfLightSuitableForDirectionUpdate(ROYGBIV.updateLightDirection, light);
+  light.dynamicInfo.dirX = newDirX;
+  light.dynamicInfo.dirY = newDirY;
+  light.dynamicInfo.dirZ = newDirZ;
+  lightHandler.updateDynamicLight(light);
+}
+
+// Updates the position of a dynamic light.
+Roygbiv.prototype.updateLightPosition = function(light, newPosX, newPosY, newPosZ){
+  if (mode == 0){
+    return;
+  }
+  preConditions.checkIfDefined(ROYGBIV.updateLightPosition, preConditions.light, light);
+  preConditions.checkIfDefined(ROYGBIV.updateLightPosition, preConditions.newPosX, newPosX);
+  preConditions.checkIfDefined(ROYGBIV.updateLightPosition, preConditions.newPosY, newPosY);
+  preConditions.checkIfDefined(ROYGBIV.updateLightPosition, preConditions.newPosZ, newPosZ);
+  preConditions.checkIfNumber(ROYGBIV.updateLightPosition, preConditions.newPosX, newPosX);
+  preConditions.checkIfNumber(ROYGBIV.updateLightPosition, preConditions.newPosY, newPosY);
+  preConditions.checkIfNumber(ROYGBIV.updateLightPosition, preConditions.newPosZ, newPosZ);
+  preConditions.checkIfDynamicLight(ROYGBIV.updateLightPosition, light);
+  preConditions.checkIfLightInActiveScene(ROYGBIV.updateLightPosition, light);
+  preConditions.checkIfLightSuitableForPositionUpdate(ROYGBIV.updateLightPosition, light);
+  light.dynamicInfo.positionX = newPosX;
+  light.dynamicInfo.positionY = newPosY;
+  light.dynamicInfo.positionZ = newPosZ;
+  lightHandler.updateDynamicLight(light);
 }
 
 // LIGHTNING FUNCTIONS *********************************************************

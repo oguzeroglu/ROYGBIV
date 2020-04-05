@@ -728,6 +728,7 @@ ImportHandler.prototype.importAddedObjects = function(obj){
      if (curAddedObjectExport.manualPositionInfo){
        addedObjectInstance.setPosition(curAddedObjectExport.manualPositionInfo.x, curAddedObjectExport.manualPositionInfo.y, curAddedObjectExport.manualPositionInfo.z, true);
      }
+     addedObjectInstance.setAffectedByLight(curAddedObjectExport.affectedByLight);
   }
   for (var objName in addedObjects){
     if (addedObjects[objName].softCopyParentName){
@@ -1232,6 +1233,7 @@ ImportHandler.prototype.importObjectGroups = function(obj){
     if (curObjectGroupExport.manualPositionInfo){
       objectGroupInstance.setPosition(curObjectGroupExport.manualPositionInfo.x, curObjectGroupExport.manualPositionInfo.y, curObjectGroupExport.manualPositionInfo.z, true);
     }
+    objectGroupInstance.setAffectedByLight(curObjectGroupExport.affectedByLight);
   }
   for (var objName in objectGroups){
     if (objectGroups[objName].softCopyParentName){

@@ -10,6 +10,7 @@ var GUIHandler = function(){
     "Changeable": false,
     "Intersectable": false,
     "Colorizable": false,
+    "Affected by light": false,
     "Has mass": true,
     "Shader precision": "default",
     "FPS Weapon": false,
@@ -137,7 +138,7 @@ var GUIHandler = function(){
     TEXT: 0, OBJECT: 1, BLOOM: 2, FPS_WEAPON_ALIGNMENT: 3, SHADER_PRECISION: 4, PARTICLE_SYSTEM: 5,
     WORKER_STATUS: 6, MUZZLE_FLASH: 7, TEXTURE_PACK: 8, SKYBOX_CREATION: 9, FOG: 10, FONT: 11,
     CROSSHAIR_CREATION: 12, SCRIPTS: 13, ANIMATION_CREATION: 14, AREA: 15, LIGHTNING: 16, SPRITE: 17,
-    CONTAINER: 18, VIRTUAL_KEYBOARD_CREATION: 19
+    CONTAINER: 18, VIRTUAL_KEYBOARD_CREATION: 19, LIGHTS: 20
   };
   this.blockingGUITypes = [
     this.guiTypes.FPS_WEAPON_ALIGNMENT, this.guiTypes.PARTICLE_SYSTEM, this.guiTypes.MUZZLE_FLASH,
@@ -635,6 +636,10 @@ GUIHandler.prototype.afterObjectSelection = function(){
     }else{
       guiHandler.objectManipulationParameters["FPS Weapon"] = false;
     }
+    guiHandler.objectManipulationParameters["Affected by light"] = false;
+    if (obj.affectedByLight){
+      guiHandler.objectManipulationParameters["Affected by light"] = true;
+    }
     if (obj.hasCustomPrecision){
       switch(obj.customPrecision){
         case shaderPrecisionHandler.precisionTypes.LOW:
@@ -758,6 +763,7 @@ GUIHandler.prototype.enableAllOMControllers = function(){
   guiHandler.enableController(guiHandler.omChangeableController);
   guiHandler.enableController(guiHandler.omIntersectableController);
   guiHandler.enableController(guiHandler.omColorizableController);
+  guiHandler.enableController(guiHandler.omAffectedByLightController);
   guiHandler.enableController(guiHandler.omHasMassController);
   guiHandler.enableController(guiHandler.omTextureOffsetXController);
   guiHandler.enableController(guiHandler.omTextureOffsetYController);
@@ -967,6 +973,12 @@ GUIHandler.prototype.hide = function(guiType){
       if (this.datGuiVirtualKeyboardCreation){
         this.destroyGUI(this.datGuiVirtualKeyboardCreation);
         this.datGuiVirtualKeyboardCreation = 0;
+      }
+    return;
+    case this.guiTypes.LIGHTS:
+      if (this.datGuiLights){
+        this.destroyGUI(this.datGuiLights);
+        this.datGuiLights = 0;
       }
     return;
   }
@@ -1202,6 +1214,16 @@ GUIHandler.prototype.initializeObjectManipulationGUI = function(){
       terminal.printInfo(Text.OBJECT_MARKED_AS.replace(Text.PARAM1, "uncolorizable"));
     }
     obj.mesh.material.needsUpdate = true;
+  }).listen();
+  guiHandler.omAffectedByLightController = guiHandler.datGuiObjectManipulation.add(guiHandler.objectManipulationParameters, "Affected by light").onChange(function(val){
+    var obj = selectionHandler.getSelectedObject();
+    terminal.clear();
+    obj.setAffectedByLight(val);
+    if (val){
+      terminal.printInfo(Text.OBJECT_WILL_BE_AFFECTED_BY_LIGHTS);
+    }else{
+      terminal.printInfo(Text.OBJECT_WONT_BE_AFFECTED_BY_LIGHTS);
+    }
   }).listen();
   guiHandler.omHasMassController = guiHandler.datGuiObjectManipulation.add(guiHandler.objectManipulationParameters, "Has mass").onChange(function(val){
     var obj = selectionHandler.getSelectedObject();

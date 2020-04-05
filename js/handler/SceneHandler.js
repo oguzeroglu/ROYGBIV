@@ -89,8 +89,13 @@ SceneHandler.prototype.onSwitchFromPreviewToDesign = function(){
   delete this.sceneNameBeforeSwitchToPreviewMode;
 }
 
+SceneHandler.prototype.onLightsUpdated = function(){
+  this.scenes[this.getActiveSceneName()].saveLights();
+}
+
 SceneHandler.prototype.onBeforeSave = function(){
   this.scenes[this.getActiveSceneName()].savePostProcessing();
+  this.scenes[this.getActiveSceneName()].saveLights();
 }
 
 SceneHandler.prototype.onTrackingObjectAddition = function(obj){
@@ -262,6 +267,13 @@ SceneHandler.prototype.changeScene = function(sceneName, readyCallback){
   if (document.exitPointerLock){
     document.exitPointerLock();
   }
+
+  lightHandler.onBeforeSceneChange();
+  if (projectLoaded){
+    this.scenes[this.getActiveSceneName()].saveLights();
+  }
+  lightHandler.reset();
+
   this.hideAll();
   scene.background.set("black");
   if (this.scenes[sceneName].isSkyboxMapped){
@@ -389,6 +401,10 @@ SceneHandler.prototype.changeScene = function(sceneName, readyCallback){
     }
   }
   scene.background.set(this.scenes[this.activeSceneName].backgroundColor);
+
+  this.scenes[this.getActiveSceneName()].loadLights();
+  lightHandler.onAfterSceneChange();
+
   if (mode == 0){
     $("#cliDivheader").text("ROYGBIV 3D Engine - CLI (Design mode - "+sceneHandler.getActiveSceneName()+")");
   }
@@ -594,6 +610,10 @@ SceneHandler.prototype.getAddedObjects = function(){
 
 SceneHandler.prototype.getObjectGroups = function(){
   return this.scenes[this.activeSceneName].objectGroups;
+}
+
+SceneHandler.prototype.getAutoInstancedObjects = function(){
+  return this.scenes[this.activeSceneName].autoInstancedObjects;
 }
 
 SceneHandler.prototype.getAddedTexts = function(){

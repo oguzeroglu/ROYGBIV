@@ -65,7 +65,50 @@ var AddedObject = function(name, type, metaData, material, mesh, physicsBody, de
 
   this.animations = new Object();
 
+  this.matrixCache = new THREE.Matrix4();
+
   webglCallbackHandler.registerEngineObject(this);
+}
+
+AddedObject.prototype.updateWorldInverseTranspose = function(overrideMatrix){
+  var val = overrideMatrix? overrideMatrix: this.mesh.material.uniforms.worldInverseTranspose.value;
+  val.getInverse(this.mesh.matrixWorld).transpose();
+  this.matrixCache.copy(this.mesh.matrixWorld);
+}
+
+AddedObject.prototype.onBeforeRender = function(){
+  if (!this.affectedByLight){
+    return;
+  }
+  if (!this.matrixCache.equals(this.mesh.matrixWorld)){
+    this.updateWorldInverseTranspose();
+  }
+}
+
+AddedObject.prototype.setAffectedByLight = function(isAffectedByLight){
+
+  macroHandler.removeMacro("AFFECTED_BY_LIGHT", this.mesh.material, true, false);
+
+  delete this.mesh.material.uniforms.worldInverseTranspose;
+  delete this.mesh.material.uniforms.dynamicLightsMatrix;
+  delete this.mesh.material.uniforms.worldMatrix;
+
+  if (isAffectedByLight){
+    macroHandler.injectMacro("AFFECTED_BY_LIGHT", this.mesh.material, true, false);
+
+    this.mesh.material.uniforms.worldInverseTranspose = new THREE.Uniform(new THREE.Matrix4());
+    this.mesh.material.uniforms.worldMatrix = new THREE.Uniform(this.mesh.matrixWorld);
+    this.mesh.material.uniforms.dynamicLightsMatrix = new THREE.Uniform(lightHandler.dynamicLightsMatrix);
+    this.updateWorldInverseTranspose();
+
+    lightHandler.addLightToObject(this);
+  }else{
+    lightHandler.removeLightFromObject(this);
+  }
+
+  this.mesh.material.needsUpdate = true;
+
+  this.affectedByLight = isAffectedByLight;
 }
 
 AddedObject.prototype.isAnimationSuitable = function(animation){
@@ -799,6 +842,7 @@ AddedObject.prototype.export = function(){
   if (this.manualPositionInfo){
     exportObject.manualPositionInfo = this.manualPositionInfo;
   }
+  exportObject.affectedByLight = this.affectedByLight;
   return exportObject;
 }
 
@@ -2986,7 +3030,9 @@ AddedObject.prototype.setFog = function(){
   if (fogHandler.isFogBlendingWithSkybox()){
     if (!this.mesh.material.uniforms.cubeTexture){
       macroHandler.injectMacro("HAS_SKYBOX_FOG", this.mesh.material, true, true);
-      this.mesh.material.uniforms.worldMatrix = new THREE.Uniform(this.mesh.matrixWorld);
+      if (!this.affectedByLight){
+        this.mesh.material.uniforms.worldMatrix = new THREE.Uniform(this.mesh.matrixWorld);
+      }
       this.mesh.material.uniforms.cubeTexture = GLOBAL_CUBE_TEXTURE_UNIFORM;
       this.mesh.material.uniforms.cameraPosition = GLOBAL_CAMERA_POSITION_UNIFORM;
     }
@@ -2999,7 +3045,9 @@ AddedObject.prototype.removeFog = function(){
   macroHandler.removeMacro("HAS_SKYBOX_FOG", this.mesh.material, true, true);
   delete this.mesh.material.uniforms.fogInfo;
   delete this.mesh.material.uniforms.cubeTexture;
-  delete this.mesh.material.uniforms.worldMatrix;
+  if (!this.affectedByLight){
+    delete this.mesh.material.uniforms.worldMatrix;
+  }
   delete this.mesh.material.uniforms.cameraPosition;
   this.mesh.material.needsUpdate = true;
 }

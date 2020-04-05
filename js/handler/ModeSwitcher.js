@@ -248,6 +248,7 @@ ModeSwitcher.prototype.switchFromDesignToPreview = function(){
       sceneHandler.onClickableContainerAddition(containers[containerName]);
     }
   }
+  lightHandler.onSwitchFromDesignToPreview();
   sceneHandler.onSwitchFromDesignToPreview();
   this.commonSwitchFunctions();
   handleViewport();
@@ -519,5 +520,7 @@ ModeSwitcher.prototype.switchFromPreviewToDesign = function(){
   }else if (!isDeployment){
     terminal.printInfo(Text.SWITCHED_TO_DESIGN_MODE);
   }
+
+  lightHandler.onSwitchFromPreviewToDesign();
   renderer.setPixelRatio(screenResolution);
 }

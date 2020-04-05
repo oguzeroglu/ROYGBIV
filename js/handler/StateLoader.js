@@ -348,6 +348,7 @@ StateLoader.prototype.resetProject = function(){
   protocolDefinitionFileName = 0;
   serverWSURL = 0;
   fogHandler.reset();
+  lightHandler.reset();
   mode = 0; // 0 -> DESIGN, 1-> PREVIEW
   physicsDebugMode = false;
   if (!isDeployment){
