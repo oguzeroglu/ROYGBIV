@@ -76,6 +76,8 @@ LightHandler.prototype.updateDynamicLight = function(dynamicLight, index){
 
   this.dynamicLights[dynamicLight.name] = dynamicLight;
 
+  sceneHandler.onLightsUpdated();
+
   return index;
 }
 
@@ -110,6 +112,8 @@ LightHandler.prototype.removeDynamicLight = function(dynamicLight){
   for (var lightName in omited){
     this.addDynamicLight(omited[lightName]);
   }
+
+  sceneHandler.onLightsUpdated();
 }
 
 // dynamicLight:
@@ -149,6 +153,8 @@ LightHandler.prototype.addDynamicLight = function(dynamicLight){
   this.dynamicLightsMatrixIndicesByLightName[dynamicLight.name] = this.dynamicLightsMatrixIndex;
   this.dynamicLightsMatrixIndex = this.updateDynamicLight(dynamicLight, this.dynamicLightsMatrixIndex);
   this.dynamicLights[dynamicLight.name] = JSON.parse(JSON.stringify(dynamicLight));
+
+  sceneHandler.onLightsUpdated();
   return true;
 }
 
