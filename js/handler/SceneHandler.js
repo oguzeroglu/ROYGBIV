@@ -95,6 +95,7 @@ SceneHandler.prototype.onLightsUpdated = function(){
 
 SceneHandler.prototype.onBeforeSave = function(){
   this.scenes[this.getActiveSceneName()].savePostProcessing();
+  this.scenes[this.getActiveSceneName()].saveLights();
 }
 
 SceneHandler.prototype.onTrackingObjectAddition = function(obj){

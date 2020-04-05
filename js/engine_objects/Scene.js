@@ -211,8 +211,6 @@ Scene.prototype.export = function(){
   exportObj.isSkyboxMapped = this.isSkyboxMapped;
   exportObj.postProcessing = this.postProcessing;
 
-  this.saveLights();
-
   exportObj.lightInfo = this.lightInfo;
   if (this.isSkyboxMapped){
     exportObj.mappedSkyboxName = this.mappedSkyboxName;
