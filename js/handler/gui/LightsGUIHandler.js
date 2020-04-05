@@ -207,6 +207,20 @@ LightsGUIHandler.prototype.addDynamicLights = function(dynamicFolder){
         terminal.printError(Text.NAME_MUST_BE_UNIQUE);
         return;
       }
+      if (this.Type.startsWith("AMBIENT")){
+        if (lightHandler.staticAmbientColor){
+          terminal.clear();
+          terminal.printError(Text.SCENE_ALREADY_HAS_A_STATIC_AMBIENT_LIGHT);
+          return;
+        }
+        for (var name in lightHandler.dynamicLights){
+          if (lightHandler.dynamicLights[name].typeKey.startsWith("AMBIENT")){
+            terminal.clear();
+            terminal.printError(Text.SCENE_ALREADY_HAS_A_DYNAMIC_AMBIENT_LIGHT);
+            return;
+          }
+        }
+      }
       lightsGUIHandler.createDynamicLightFromConfiguration(this, dynamicFolder);
     }
   };
