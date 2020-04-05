@@ -179,7 +179,6 @@ LightHandler.prototype.onSwitchFromPreviewToDesign = function(){
   delete this.originalLightInfos;
 
   this.import(sceneHandler.scenes[sceneHandler.getActiveSceneName()].lightInfo);
-  console.log(sceneHandler.getActiveSceneName());
 }
 
 LightHandler.prototype.onSwitchFromDesignToPreview = function(){
