@@ -426,10 +426,13 @@ LightHandler.prototype.import = function(obj){
   this.staticDiffuseLightsBySlotId = obj.staticDiffuseLightsBySlotId? JSON.parse(JSON.stringify(obj.staticDiffuseLightsBySlotId)): {};
   this.staticPointLightsBySlotId = obj.staticPointLightsBySlotId? JSON.parse(JSON.stringify(obj.staticPointLightsBySlotId)): {};
 
-  this.dynamicLights = JSON.parse(JSON.stringify(obj.dynamicLights));
-  this.dynamicLightsMatrixIndicesByLightName = JSON.parse(JSON.stringify(obj.dynamicLightsMatrixIndicesByLightName));
-  this.dynamicLightsIndicesByLightName = JSON.parse(JSON.stringify(obj.dynamicLightsIndicesByLightName));
+  this.dynamicLights = JSON.parse(JSON.stringify(obj.dynamicLights || {}));
+  this.dynamicLightsMatrixIndicesByLightName = JSON.parse(JSON.stringify(obj.dynamicLightsMatrixIndicesByLightName || {}));
+  this.dynamicLightsIndicesByLightName = JSON.parse(JSON.stringify(obj.dynamicLightsIndicesByLightName|| {}));
   this.dynamicLightsMatrixIndex = obj.dynamicLightsMatrixIndex;
+  if (typeof this.dynamicLightsMatrixIndex == UNDEFINED){
+    this.dynamicLightsMatrixIndex = 0;
+  }
 
   for (var name in this.dynamicLights){
     this.updateDynamicLight(this.dynamicLights[name], this.dynamicLightsMatrixIndicesByLightName[name]);
