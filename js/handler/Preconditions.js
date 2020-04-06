@@ -809,6 +809,12 @@ Preconditions.prototype.checkIfNoMass = function(callerFunc, parameterName, obj)
   }
 }
 
+Preconditions.prototype.checkIfObjectMoveable = function(callerFunc, obj){
+  if (!(obj.isChangeable || obj.isDynamicObject)){
+    this.throw(callerFunc, "Object is not moveable.");
+  }
+}
+
 Preconditions.prototype.checkIfChangeable = function(callerFunc, parameterName, obj){
   if (!obj.isChangeable){
     this.throw(callerFunc, parameterName+" is not marked as changeable.");

@@ -25,6 +25,22 @@ var LightHandler = function(){
   this.reset();
 }
 
+LightHandler.prototype.lightObjectAttachmentUpdateFunc = function(object, lightName){
+  var light = lightHandler.dynamicLights[lightName];
+  light.dynamicInfo.positionX = object.mesh.position.x;
+  light.dynamicInfo.positionY = object.mesh.position.y;
+  light.dynamicInfo.positionZ = object.mesh.position.z;
+  lightHandler.updateDynamicLight(light);
+}
+
+LightHandler.prototype.update = function(){
+  this.lightObjectAttachments.forEach(this.lightObjectAttachmentUpdateFunc);
+}
+
+LightHandler.prototype.attachLightToObject = function(light, object){
+  this.lightObjectAttachments.set(light.name, object);
+}
+
 LightHandler.prototype.getDynamicLightMacros = function(light, index){
   var macros = [];
   macros.push("DYNAMIC_LIGHT_" + index + "_TYPE " + this.dynamicLightTypes[light.typeKey]);
@@ -196,6 +212,7 @@ LightHandler.prototype.onSwitchFromDesignToPreview = function(){
     this.originalLightInfos[sceneName] = JSON.parse(JSON.stringify(sceneHandler.scenes[sceneName].lightInfo));
   }
 
+  this.lightObjectAttachments = new Map();
 }
 
 LightHandler.prototype.bakeObjectLight = function(obj){
@@ -466,6 +483,8 @@ LightHandler.prototype.import = function(obj){
     delete this.staticAmbientColor;
     delete this.staticAmbientStrength;
   }
+
+  this.lightObjectAttachments = new Map();
 }
 
 LightHandler.prototype.export = function(){

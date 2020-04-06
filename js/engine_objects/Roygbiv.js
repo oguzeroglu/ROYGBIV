@@ -272,7 +272,8 @@ var Roygbiv = function(){
     "updateLightStrength",
     "updateLightColor",
     "updateLightDirection",
-    "updateLightPosition"
+    "updateLightPosition",
+    "attachPointLightToObject"
   ];
 
   this.globals = new Object();
@@ -3095,6 +3096,23 @@ Roygbiv.prototype.updateLightPosition = function(light, newPosX, newPosY, newPos
   light.dynamicInfo.positionY = newPosY;
   light.dynamicInfo.positionZ = newPosZ;
   lightHandler.updateDynamicLight(light);
+}
+
+// Places a point light into the position of given object each frame.
+Roygbiv.prototype.attachPointLightToObject = function(object, light){
+  if (mode == 0){
+    return;
+  }
+  preConditions.checkIfDefined(ROYGBIV.attachPointLightToObject, preConditions.object, object);
+  preConditions.checkIfDefined(ROYGBIV.attachPointLightToObject, preConditions.light, light);
+  preConditions.checkIfAddedObjectOrObjectGroup(ROYGBIV.attachPointLightToObject, preConditions.object, object);
+  preConditions.checkIfObjectInsideActiveScene(ROYGBIV.attachPointLightToObject, object);
+  preConditions.checkIfObjectMoveable(ROYGBIV.attachPointLightToObject, object);
+  preConditions.checkIfDynamicLight(ROYGBIV.attachPointLightToObject, light);
+  preConditions.checkIfLightInActiveScene(ROYGBIV.attachPointLightToObject, light);
+  preConditions.checkIfLightSuitableForPositionUpdate(ROYGBIV.attachPointLightToObject, light);
+
+  lightHandler.attachLightToObject(light, object);
 }
 
 // LIGHTNING FUNCTIONS *********************************************************

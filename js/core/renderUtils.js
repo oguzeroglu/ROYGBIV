@@ -37,6 +37,7 @@ function render(){
     cpuOperationsHandler.handleActiveLightnings();
     cpuOperationsHandler.handleActiveVirtualKeyboard();
     cpuOperationsHandler.handleInputText();
+    cpuOperationsHandler.updateLightHandler();
     delayedExecutionHandler.tick();
   }else{
     if (!isDeployment){
