@@ -5510,6 +5510,10 @@ function parse(input){
             terminal.printError(Text.WORKS_ONLY_IN_DESIGN_MODE);
             return true;
           }
+          if (guiHandler.datGuiLights){
+            terminal.printError(Text.GUI_IS_ALREADY_VISIBLE);
+            return true;
+          }
           lightsGUIHandler.show();
           terminal.printInfo(Text.GUI_OPENED);
           return true;
