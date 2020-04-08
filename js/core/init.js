@@ -203,7 +203,7 @@ window.onload = function() {
     cliDiv.value = "";
     appendtoDeploymentConsole("Loading shaders.");
     console.log(
-      "%c "+BANNERL1+"\n"+BANNERL2+"\n"+BANNERL3+"\n"+
+      "%c"+BANNERL1+"\n"+BANNERL2+"\n"+BANNERL3+"\n"+
       BANNERL4+"\n"+BANNERL5 +"\n"+"                                         "
       + "\nby Oguz Eroglu - github.com/oguzeroglu   ",
       "background: black; color: lime"
