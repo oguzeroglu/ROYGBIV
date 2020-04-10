@@ -25,7 +25,7 @@ TexturePackCreatorGUIHandler.prototype.init = function(isEdit){
         force = force || (tp.isParticleTexture && texturePackCreatorGUIHandler.originalDirectoryName != tp.directoryName);
       }
       texturePacks[tp.name] = tp;
-      tp.loadTextures(function(){
+      tp.loadTextures(true, function(){
         terminal.clear();
         if (!tp.isParticleTexture && !force){
           terminal.enable();
@@ -102,7 +102,7 @@ TexturePackCreatorGUIHandler.prototype.mapTexturePack = function(){
 TexturePackCreatorGUIHandler.prototype.loadTexturePack = function(texturePackName, dirName){
   this.isLoading = true;
   terminal.clear();
-  terminal.printInfo(Text.COMPRESSING_TEXTURE);
+  terminal.printInfo(Text.LOADING);
   if (this.testMesh){
     this.testMesh.visible = false;
   }
@@ -112,24 +112,17 @@ TexturePackCreatorGUIHandler.prototype.loadTexturePack = function(texturePackNam
   guiHandler.disableController(this.cancelController);
   guiHandler.disableController(this.doneController);
   var xhr = new XMLHttpRequest();
-  xhr.open("POST", "/prepareTexturePack", true);
+  xhr.open("POST", "/getTexturePackInfo", true);
   xhr.setRequestHeader("Content-type", "application/json");
   xhr.onreadystatechange = function (){
     if (xhr.readyState == 4 && xhr.status == 200){
       var resp = JSON.parse(xhr.responseText);
-      if (resp.error){
-        texturePackCreatorGUIHandler.isLoading = false;
-        texturePackCreatorGUIHandler.close(Text.TEXTURE_COMPRESSION_ENCODE_ERROR.replace(Text.PARAM1, resp.texture).replace(Text.PARAM2, dirName), true);
-        return;
-      }
-      terminal.printInfo(Text.TEXTURES_COMPRESSED);
-      terminal.printInfo(Text.LOADING);
       if (texturePackCreatorGUIHandler.texturePack){
         texturePackCreatorGUIHandler.texturePack.destroy();
       }
       texturePackCreatorGUIHandler.texturePack = new TexturePack(texturePackName, dirName, resp);
       texturePackCreatorGUIHandler.texturePack.isParticleTexture = texturePackCreatorGUIHandler.configurations["Particle texture"];
-      texturePackCreatorGUIHandler.texturePack.loadTextures(function(){
+      texturePackCreatorGUIHandler.texturePack.loadTextures(true, function(){
         terminal.clear();
         terminal.printInfo(Text.AFTER_TEXTURE_PACK_CREATION);
         guiHandler.enableController(texturePackCreatorGUIHandler.texturePackController);
@@ -144,10 +137,6 @@ TexturePackCreatorGUIHandler.prototype.loadTexturePack = function(texturePackNam
         texturePackCreatorGUIHandler.isLoading = false;
       });
     }
-  }
-  xhr.onerror = function(e){
-    texturePackCreatorGUIHandler.isLoading = false;
-    texturePackCreatorGUIHandler.close(Text.TEXTURE_COMPRESSION_ERROR.replace(Text.PARAM1, dirName), true);
   }
   xhr.send(JSON.stringify({texturePackName: texturePackCreatorGUIHandler.configurations["Texture pack"]}));
 }

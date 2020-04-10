@@ -78,8 +78,8 @@ TexturePack.prototype.onTextureLoaded = function(onLoaded){
   }
 }
 
-TexturePack.prototype.loadTexture = function(filePath, textureAttrName, textureAvailibilityAttrName, onLoaded){
-  var loader = (this.isParticleTexture)? textureLoaderFactory.getDefault(): textureLoaderFactory.get();
+TexturePack.prototype.loadTexture = function(forcePNG, filePath, textureAttrName, textureAvailibilityAttrName, onLoaded){
+  var loader = (this.isParticleTexture || forcePNG)? textureLoaderFactory.getDefault(): textureLoaderFactory.get();
   loader.load(filePath, function(textureData){
     this[textureAttrName] = textureData;
     this[textureAttrName].wrapS = THREE.RepeatWrapping;
@@ -98,23 +98,23 @@ TexturePack.prototype.loadTexture = function(filePath, textureAttrName, textureA
 TexturePack.prototype.loadAtlas = function(onLoaded){
   var postfix = textureLoaderFactory.getFilePostfix();
   var atlasPath = atlasRootDirectory + "textureAtlas" + postfix;
-  this.loadTexture(atlasPath, "diffuseTexture", "hasDiffuse", onLoaded);
+  this.loadTexture(false, atlasPath, "diffuseTexture", "hasDiffuse", onLoaded);
 }
 
-TexturePack.prototype.loadTextures = function(onLoaded){
+TexturePack.prototype.loadTextures = function(forcePNG, onLoaded){
   if (this.textureDescription.isAtlas){
     this.loadAtlas(onLoaded);
     return;
   }
   this.totalLoadedCount = 0;
-  var postfix = this.isParticleTexture? ".png": textureLoaderFactory.getFilePostfix();
+  var postfix = (this.isParticleTexture || forcePNG)? ".png": textureLoaderFactory.getFilePostfix();
   var diffuseFilePath = texturePackRootDirectory+this.directoryName+"/diffuse"+postfix;
   var alphaFilePath = texturePackRootDirectory+this.directoryName+"/alpha"+postfix;
   var aoFilePath = texturePackRootDirectory+this.directoryName+"/ao"+postfix;
   var emissiveFilePath = texturePackRootDirectory+this.directoryName+"/emissive"+postfix;
   var heightFilePath = texturePackRootDirectory+this.directoryName+"/height"+postfix;
   if (this.hasDiffuse){
-    this.loadTexture(diffuseFilePath, "diffuseTexture", "hasDiffuse", onLoaded);
+    this.loadTexture(forcePNG, diffuseFilePath, "diffuseTexture", "hasDiffuse", onLoaded);
   }
   if (this.isParticleTexture){
     this.hasAlpha = false;
@@ -125,16 +125,16 @@ TexturePack.prototype.loadTextures = function(onLoaded){
     return;
   }
   if (this.hasAlpha){
-    this.loadTexture(alphaFilePath, "alphaTexture", "hasAlpha", onLoaded);
+    this.loadTexture(forcePNG, alphaFilePath, "alphaTexture", "hasAlpha", onLoaded);
   }
   if (this.hasAO){
-    this.loadTexture(aoFilePath, "aoTexture", "hasAO", onLoaded);
+    this.loadTexture(forcePNG, aoFilePath, "aoTexture", "hasAO", onLoaded);
   }
   if (this.hasEmissive){
-    this.loadTexture(emissiveFilePath, "emissiveTexture", "hasEmissive", onLoaded);
+    this.loadTexture(forcePNG, emissiveFilePath, "emissiveTexture", "hasEmissive", onLoaded);
   }
   if (this.hasHeight){
-    this.loadTexture(heightFilePath, "heightTexture", "hasHeight", onLoaded);
+    this.loadTexture(forcePNG, heightFilePath, "heightTexture", "hasHeight", onLoaded);
   }
 }
 

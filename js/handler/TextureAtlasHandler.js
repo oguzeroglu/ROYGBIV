@@ -21,7 +21,7 @@ TextureAtlasHandler.prototype.compressTexture = function(base64Data, readyCallba
         errorCallback();
       }else{
         textureAtlasHandler.atlas = new TexturePack(null, null, {isAtlas: true});
-        textureAtlasHandler.atlas.loadTextures(function(){
+        textureAtlasHandler.atlas.loadTextures(false, function(){
           textureAtlasHandler.currentParticleTextureCount = particleTextureCount;
           readyCallback();
         });
@@ -80,7 +80,7 @@ TextureAtlasHandler.prototype.import = function(exportObject, readyCallback){
     this.textureMerger = new TextureMerger();
     this.textureMerger.ranges = JSON.parse(JSON.stringify(exportObject.ranges));
     textureAtlasHandler.atlas = new TexturePack(null, null, {isAtlas: true});
-    textureAtlasHandler.atlas.loadTextures(function(){
+    textureAtlasHandler.atlas.loadTextures(false, function(){
       readyCallback();
     });
   }else{
