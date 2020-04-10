@@ -1,3 +1,5 @@
+// This good old class turned into a separate library:
+// https://github.com/oguzeroglu/TextureMerger
 var TextureMerger = function(texturesObj){
   if (!texturesObj){
     return;

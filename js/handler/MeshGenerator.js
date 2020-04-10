@@ -274,6 +274,62 @@ MeshGenerator.prototype.generateParticleSystemMesh = function(ps, texture, noTar
   return mesh;
 }
 
+MeshGenerator.prototype.generateMergedParticleSystemMesh = function(params){
+
+  var vertexShader = ShaderContent.particleVertexShader.replace(
+    "#define OBJECT_SIZE 1", "#define OBJECT_SIZE "+params.size
+  );
+
+  var material = new THREE.RawShaderMaterial({
+    vertexShader: vertexShader,
+    fragmentShader: ShaderContent.particleFragmentShader,
+    transparent: true,
+    side: THREE.DoubleSide,
+    uniforms:{
+      modelViewMatrixArray: new THREE.Uniform(params.mvMatrixArray),
+      worldMatrixArray: new THREE.Uniform(params.worldMatrixArray),
+      projectionMatrix: GLOBAL_PROJECTION_UNIFORM,
+      viewMatrix: GLOBAL_VIEW_UNIFORM,
+      timeArray: new THREE.Uniform(params.timeArray),
+      hiddenArray: new THREE.Uniform(params.hiddenArray),
+      dissapearCoefArray: new THREE.Uniform(params.dissapearCoefArray),
+      stopInfoArray: new THREE.Uniform(params.stopInfoArray),
+      parentMotionMatrixArray: new THREE.Uniform(params.motionMatrixArray),
+      screenResolution: GLOBAL_SCREEN_RESOLUTION_UNIFORM
+    }
+  });
+
+  macroHandler.injectMacro("IS_MERGED", material, true, false);
+  if (fogHandler.isFogBlendingWithSkybox()){
+    material.uniforms.cameraPosition = GLOBAL_CAMERA_POSITION_UNIFORM;
+    material.uniforms.cubeTexture = GLOBAL_CUBE_TEXTURE_UNIFORM;
+    macroHandler.injectMacro("HAS_SKYBOX_FOG", material, true, true);
+  }
+  if (fogHandler.isFogActive()){
+    material.uniforms.fogInfo = GLOBAL_FOG_UNIFORM;
+    macroHandler.injectMacro("HAS_FOG", material, false, true);
+  }
+  if (params.texture){
+    material.uniforms.texture = new THREE.Uniform(params.texture);
+    macroHandler.injectMacro("HAS_TEXTURE", material, true, true);
+    macroHandler.injectMacro("TEXTURE_SIZE " + ACCEPTED_TEXTURE_SIZE, material, true, false);
+  }
+  if (!params.noTargetColor){
+    macroHandler.injectMacro("HAS_TARGET_COLOR", material, true, false);
+  }
+  if (particleSystemRefHeight){
+    macroHandler.injectMacro("HAS_REF_HEIGHT", material, true, false);
+    material.uniforms.refHeightCoef = GLOBAL_PS_REF_HEIGHT_UNIFORM;
+  }
+
+  var mesh = new THREE.Points(params.geometry, material);
+  mesh.renderOrder = renderOrders.PARTICLE_SYSTEM;
+  mesh.frustumCulled = false;
+  scene.add(mesh);
+
+  return mesh;
+}
+
 MeshGenerator.prototype.generateLightning = function(lightning){
   var material = new THREE.RawShaderMaterial({
     vertexShader: ShaderContent.lightningVertexShader,

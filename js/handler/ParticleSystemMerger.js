@@ -205,54 +205,22 @@ var ParticleSystemMerger = function(psObj, name){
   }
   this.geometry.setDrawRange(0, len);
 
-  var vertexShader = ShaderContent.particleVertexShader.replace(
-    "#define OBJECT_SIZE 1", "#define OBJECT_SIZE "+this.size
-  );
-
-  this.material = new THREE.RawShaderMaterial({
-    vertexShader: vertexShader,
-    fragmentShader: ShaderContent.particleFragmentShader,
-    transparent: true,
-    side: THREE.DoubleSide,
-    uniforms:{
-      modelViewMatrixArray: new THREE.Uniform(mvMatrixArray),
-      worldMatrixArray: new THREE.Uniform(worldMatrixArray),
-      projectionMatrix: GLOBAL_PROJECTION_UNIFORM,
-      viewMatrix: GLOBAL_VIEW_UNIFORM,
-      timeArray: new THREE.Uniform(timeArray),
-      hiddenArray: new THREE.Uniform(hiddenArray),
-      dissapearCoefArray: new THREE.Uniform(dissapearCoefArray),
-      stopInfoArray: new THREE.Uniform(stopInfoArray),
-      parentMotionMatrixArray: new THREE.Uniform(motionMatrixArray),
-      screenResolution: GLOBAL_SCREEN_RESOLUTION_UNIFORM
-    }
+  this.mesh = new MeshGenerator().generateMergedParticleSystemMesh({
+    geometry: this.geometry,
+    size: this.size,
+    mvMatrixArray: mvMatrixArray,
+    worldMatrixArray: worldMatrixArray,
+    timeArray: timeArray,
+    hiddenArray: hiddenArray,
+    dissapearCoefArray: dissapearCoefArray,
+    stopInfoArray: stopInfoArray,
+    motionMatrixArray: motionMatrixArray,
+    texture: texture,
+    noTargetColor: this.noTargetColor
   });
-  macroHandler.injectMacro("IS_MERGED", this.material, true, false);
-  if (fogHandler.isFogBlendingWithSkybox()){
-    this.material.uniforms.cameraPosition = GLOBAL_CAMERA_POSITION_UNIFORM;
-    this.material.uniforms.cubeTexture = GLOBAL_CUBE_TEXTURE_UNIFORM;
-    macroHandler.injectMacro("HAS_SKYBOX_FOG", this.material, true, true);
-  }
-  if (fogHandler.isFogActive()){
-    this.material.uniforms.fogInfo = GLOBAL_FOG_UNIFORM;
-    macroHandler.injectMacro("HAS_FOG", this.material, false, true);
-  }
-  if (texture){
-    this.material.uniforms.texture = new THREE.Uniform(texture);
-    macroHandler.injectMacro("HAS_TEXTURE", this.material, true, true);
-    macroHandler.injectMacro("TEXTURE_SIZE " + ACCEPTED_TEXTURE_SIZE, this.material, true, false);
-  }
-  if (!this.noTargetColor){
-    macroHandler.injectMacro("HAS_TARGET_COLOR", this.material, true, false);
-  }
-  if (particleSystemRefHeight){
-    macroHandler.injectMacro("HAS_REF_HEIGHT", this.material, true, false);
-    this.material.uniforms.refHeightCoef = GLOBAL_PS_REF_HEIGHT_UNIFORM;
-  }
-  this.mesh = new THREE.Points(this.geometry, this.material);
-  this.mesh.renderOrder = renderOrders.PARTICLE_SYSTEM;
-  this.mesh.frustumCulled = false;
-  scene.add(this.mesh);
+
+  this.material = this.mesh.material;
+
   this.clean();
   webglCallbackHandler.registerEngineObject(this);
 }
