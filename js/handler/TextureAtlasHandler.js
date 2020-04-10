@@ -39,8 +39,21 @@ TextureAtlasHandler.prototype.onTexturePackChange = function(readyCallback, erro
   var textureCount = 0;
   var texturesObj = new Object();
   for (var texturePackName in texturePacks){
+    var tp = texturePacks[texturePackName];
     textureCount ++;
-    texturesObj[texturePackName] = texturePacks[texturePackName].diffuseTexture;
+    texturesObj[texturePackName + "#diffuse"] = tp.diffuseTexture;
+    if (tp.hasAlpha){
+      texturesObj[texturePackName + "#alpha"] = tp.alphaTexture;
+    }
+    if (tp.hasAO){
+      texturesObj[texturePackName + "#ao"] = tp.aoTexture;
+    }
+    if (tp.hasEmissive){
+      texturesObj[texturePackName + "#emissive"] = tp.emissiveTexture;
+    }
+    if (tp.hasHeight){
+      texturesObj[texturePackName + "#height"] = tp.heightTexture;
+    }
   }
   if (force || this.currentTextureCount != textureCount){
     this.dispose();

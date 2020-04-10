@@ -117,7 +117,7 @@ var ParticleSystemMerger = function(psObj, name){
       ctr ++;
       if (textureCount > 0){
         if (particle.material.texture){
-          var range = textureMerger.ranges[particle.material.texture];
+          var range = textureMerger.ranges[particle.material.texture + "#diffuse"];
           this.uvCoordinates[uvCounter++] = range.startU;
           this.uvCoordinates[uvCounter++] = range.startV;
           this.uvCoordinates[uvCounter++] = range.endU;
