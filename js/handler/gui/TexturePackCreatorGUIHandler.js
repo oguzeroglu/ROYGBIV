@@ -60,7 +60,7 @@ TexturePackCreatorGUIHandler.prototype.close = function(message, isError){
     this.testMesh = 0;
   }
   if (this.texturePack){
-    this.texturePack.destroy();
+    this.texturePack.destroy(true);
     this.texturePack = 0;
   }
   terminal.clear();

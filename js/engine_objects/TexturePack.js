@@ -48,7 +48,7 @@ TexturePack.prototype.export = function(){
   return exportObject;
 }
 
-TexturePack.prototype.destroy = function(){
+TexturePack.prototype.destroy = function(noDelete){
   if (this.hasDiffuse){
     this.diffuseTexture.dispose();
   }
@@ -64,7 +64,7 @@ TexturePack.prototype.destroy = function(){
   if (this.hasHeight){
     this.heightTexture.dispose();
   }
-  if (this.textureDescription && !this.textureDescription.isAtlas && !this.isDynamic){
+  if (this.textureDescription && !this.textureDescription.isAtlas && !this.isDynamic && !noDelete){
     delete texturePacks[this.name];
   }
 }
