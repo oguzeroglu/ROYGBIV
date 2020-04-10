@@ -754,7 +754,6 @@ ImportHandler.prototype.importTexturePacks = function(obj, callback, skipMapping
   for (var texturePackName in texturePacksExport){
     var curTexturePackExport = texturePacksExport[texturePackName];
     var texturePack = new TexturePack(texturePackName, curTexturePackExport.directoryName, curTexturePackExport.textureDescription);
-    texturePack.setParticleTextureStatus(curTexturePackExport.isParticleTexture);
     texturePack.loadTextures(true, function(){
       if (!skipMapping){
         this.mapLoadedTexturePack(this.texturePackName, obj);

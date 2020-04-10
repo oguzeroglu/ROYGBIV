@@ -37,7 +37,6 @@ var TexturePack = function(name, directoryName, textureDescription){
 
 TexturePack.prototype.clone = function(){
   var tp = new TexturePack(this.name, this.directoryName, this.textureDescription);
-  tp.isParticleTexture = this.isParticleTexture;
   return tp;
 }
 
@@ -46,7 +45,6 @@ TexturePack.prototype.export = function(){
   exportObject.directoryName = this.directoryName;
   exportObject.name = this.name;
   exportObject.textureDescription = this.textureDescription;
-  exportObject.isParticleTexture = (!(typeof this.isParticleTexture == UNDEFINED))? this.isParticleTexture: false;
   return exportObject;
 }
 
@@ -79,7 +77,7 @@ TexturePack.prototype.onTextureLoaded = function(onLoaded){
 }
 
 TexturePack.prototype.loadTexture = function(forcePNG, filePath, textureAttrName, textureAvailibilityAttrName, onLoaded){
-  var loader = (this.isParticleTexture || forcePNG)? textureLoaderFactory.getDefault(): textureLoaderFactory.get();
+  var loader = forcePNG? textureLoaderFactory.getDefault(): textureLoaderFactory.get();
   loader.load(filePath, function(textureData){
     this[textureAttrName] = textureData;
     this[textureAttrName].wrapS = THREE.RepeatWrapping;
@@ -107,7 +105,7 @@ TexturePack.prototype.loadTextures = function(forcePNG, onLoaded){
     return;
   }
   this.totalLoadedCount = 0;
-  var postfix = (this.isParticleTexture || forcePNG)? ".png": textureLoaderFactory.getFilePostfix();
+  var postfix = forcePNG? ".png": textureLoaderFactory.getFilePostfix();
   var diffuseFilePath = texturePackRootDirectory+this.directoryName+"/diffuse"+postfix;
   var alphaFilePath = texturePackRootDirectory+this.directoryName+"/alpha"+postfix;
   var aoFilePath = texturePackRootDirectory+this.directoryName+"/ao"+postfix;
@@ -115,14 +113,6 @@ TexturePack.prototype.loadTextures = function(forcePNG, onLoaded){
   var heightFilePath = texturePackRootDirectory+this.directoryName+"/height"+postfix;
   if (this.hasDiffuse){
     this.loadTexture(forcePNG, diffuseFilePath, "diffuseTexture", "hasDiffuse", onLoaded);
-  }
-  if (this.isParticleTexture){
-    this.hasAlpha = false;
-    this.hasAO = false;
-    this.hasEmissive = false;
-    this.hasHeight = false;
-    this.maxAttemptCount = 1;
-    return;
   }
   if (this.hasAlpha){
     this.loadTexture(forcePNG, alphaFilePath, "alphaTexture", "hasAlpha", onLoaded);
@@ -136,13 +126,6 @@ TexturePack.prototype.loadTextures = function(forcePNG, onLoaded){
   if (this.hasHeight){
     this.loadTexture(forcePNG, heightFilePath, "heightTexture", "hasHeight", onLoaded);
   }
-}
-
-TexturePack.prototype.setParticleTextureStatus = function(val){
-  if (typeof val == UNDEFINED){
-    val = false;
-  }
-  this.isParticleTexture = val;
 }
 
 TexturePack.prototype.isUsed = function(){

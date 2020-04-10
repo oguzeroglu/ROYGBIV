@@ -9,7 +9,6 @@ TexturePackCreatorGUIHandler.prototype.init = function(isEdit){
   this.configurations = {
     "Texture pack": "",
     "Test type": "BOX",
-    "Particle texture": false,
     "Done": function(){
       if (texturePackCreatorGUIHandler.isLoading){
         return;
@@ -19,38 +18,24 @@ TexturePackCreatorGUIHandler.prototype.init = function(isEdit){
       terminal.disable();
       terminal.clear();
       terminal.printInfo(Text.LOADING);
-      var force = false;
-      if (isEdit){
-        force = ((!texturePackCreatorGUIHandler.isOriginallyParticleTexture && tp.isParticleTexture) || (texturePackCreatorGUIHandler.isOriginallyParticleTexture && !tp.isParticleTexture))
-        force = force || (tp.isParticleTexture && texturePackCreatorGUIHandler.originalDirectoryName != tp.directoryName);
-      }
       texturePacks[tp.name] = tp;
       tp.loadTextures(true, function(){
         terminal.clear();
-        if (!tp.isParticleTexture && !force){
+        terminal.printInfo(Text.GENERATING_TEXTURE_ATLAS);
+        textureAtlasHandler.onTexturePackChange(function(){
+          terminal.clear();
           terminal.enable();
           if (!isEdit){
             terminal.printInfo(Text.TEXTURE_PACK_CREATED);
           }else{
             terminal.printInfo(Text.TEXTURE_PACK_EDITED);
           }
-        }else{
-          terminal.printInfo(Text.GENERATING_TEXTURE_ATLAS);
-          textureAtlasHandler.onTexturePackChange(function(){
-            terminal.clear();
-            terminal.enable();
-            if (!isEdit){
-              terminal.printInfo(Text.TEXTURE_PACK_CREATED);
-            }else{
-              terminal.printInfo(Text.TEXTURE_PACK_EDITED);
-            }
-          }, function(){
-            terminal.clear();
-            terminal.enable()
-            delete texturePacks[tp.name];
-            terminal.printError(Text.ERROR_HAPPENED_COMPRESSING_TEXTURE_ATLAS);
-          }, force);
-        }
+        }, function(){
+          terminal.clear();
+          terminal.enable()
+          delete texturePacks[tp.name];
+          terminal.printError(Text.ERROR_HAPPENED_COMPRESSING_TEXTURE_ATLAS);
+        }, true);
       });
     },
     "Cancel": function(){
@@ -108,7 +93,6 @@ TexturePackCreatorGUIHandler.prototype.loadTexturePack = function(texturePackNam
   }
   guiHandler.disableController(this.texturePackController);
   guiHandler.disableController(this.testTypeController);
-  guiHandler.disableController(this.particleTextureController);
   guiHandler.disableController(this.cancelController);
   guiHandler.disableController(this.doneController);
   var xhr = new XMLHttpRequest();
@@ -121,13 +105,11 @@ TexturePackCreatorGUIHandler.prototype.loadTexturePack = function(texturePackNam
         texturePackCreatorGUIHandler.texturePack.destroy();
       }
       texturePackCreatorGUIHandler.texturePack = new TexturePack(texturePackName, dirName, resp);
-      texturePackCreatorGUIHandler.texturePack.isParticleTexture = texturePackCreatorGUIHandler.configurations["Particle texture"];
       texturePackCreatorGUIHandler.texturePack.loadTextures(true, function(){
         terminal.clear();
         terminal.printInfo(Text.AFTER_TEXTURE_PACK_CREATION);
         guiHandler.enableController(texturePackCreatorGUIHandler.texturePackController);
         guiHandler.enableController(texturePackCreatorGUIHandler.testTypeController);
-        guiHandler.enableController(texturePackCreatorGUIHandler.particleTextureController);
         guiHandler.enableController(texturePackCreatorGUIHandler.cancelController);
         guiHandler.enableController(texturePackCreatorGUIHandler.doneController);
         if (texturePackCreatorGUIHandler.testMesh){
@@ -205,13 +187,6 @@ TexturePackCreatorGUIHandler.prototype.createGUI = function(texturePackName, fol
   this.testTypeController = guiHandler.datGuiTexturePack.add(this.configurations, "Test type", this.testTypes).onChange(function(val){
     texturePackCreatorGUIHandler.handleTestMesh();
   }).listen();
-  this.particleTextureController = guiHandler.datGuiTexturePack.add(this.configurations, "Particle texture").onChange(function(val){
-    if (texturePackCreatorGUIHandler.isLoading){
-      texturePackCreatorGUIHandler.configurations["Particle texture"] = false;
-      return;
-    }
-    texturePackCreatorGUIHandler.texturePack.setParticleTextureStatus(val);
-  }).listen();
   this.cancelController = guiHandler.datGuiTexturePack.add(this.configurations, "Cancel");
   this.doneController = guiHandler.datGuiTexturePack.add(this.configurations, "Done");
 }
@@ -230,9 +205,7 @@ TexturePackCreatorGUIHandler.prototype.edit = function(texturePack, folders){
   this.commonStartFunctions();
   this.createGUI(texturePack.name, folders);
   this.configurations["Texture pack"] = texturePack.directoryName;
-  this.configurations["Particle texture"] = (typeof texturePack.isParticleTexture == UNDEFINED)? false: texturePack.isParticleTexture;
   this.handleTestMesh();
   this.loadTexturePack(texturePack.name, texturePack.directoryName);
-  this.isOriginallyParticleTexture = this.configurations["Particle texture"];
   this.originalDirectoryName = this.configurations["Texture pack"];
 }

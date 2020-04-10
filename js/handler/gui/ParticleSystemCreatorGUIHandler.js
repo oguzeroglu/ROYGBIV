@@ -2129,9 +2129,7 @@ ParticleSystemCreatorGUIHandler.prototype.commonStartFunctions = function(psName
   this.usableTextureNames = [];
   for (var textureName in texturePacks){
     var txt = texturePacks[textureName];
-    if (txt.isParticleTexture){
-      this.usableTextureNames.push(textureName);
-    }
+    this.usableTextureNames.push(textureName);
   }
   for (var i = 0; i<scene.children.length; i++){
     if (scene.children[i].visible){

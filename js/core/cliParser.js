@@ -1305,13 +1305,11 @@ function parse(input){
               return true;
             }
           }
-          if (texturePack.isParticleTexture){
-            for (var psName in preConfiguredParticleSystems){
-              var usedTextureName = preConfiguredParticleSystems[psName].getUsedTextureName();
-              if (usedTextureName != null && usedTextureName == texturePack.name){
-                terminal.printError(Text.TEXTURE_PACK_USED_IN_A_PARTICLE_SYSTEM.replace(Text.PARAM1, psName));
-                return true;
-              }
+          for (var psName in preConfiguredParticleSystems){
+            var usedTextureName = preConfiguredParticleSystems[psName].getUsedTextureName();
+            if (usedTextureName != null && usedTextureName == texturePack.name){
+              terminal.printError(Text.TEXTURE_PACK_USED_IN_A_PARTICLE_SYSTEM.replace(Text.PARAM1, psName));
+              return true;
             }
           }
           for (var crosshairName in crosshairs){
@@ -1322,22 +1320,18 @@ function parse(input){
           }
           texturePack.destroy();
           if (!jobHandlerWorking){
-            if (!texturePack.isParticleTexture){
-              terminal.printInfo(Text.TEXTURE_PACK_DESTROYED);
-            }else{
+            terminal.clear();
+            terminal.disable();
+            terminal.printInfo(Text.GENERATING_TEXTURE_ATLAS);
+            textureAtlasHandler.onTexturePackChange(function(){
               terminal.clear();
-              terminal.disable();
-              terminal.printInfo(Text.GENERATING_TEXTURE_ATLAS);
-              textureAtlasHandler.onTexturePackChange(function(){
-                terminal.clear();
-                terminal.enable();
-                terminal.print(Text.SKYBOX_DESTROYED);
-              }, function(){
-                terminal.clear();
-                terminal.printError(Text.ERROR_HAPPENED_COMPRESSING_TEXTURE_ATLAS);
-                terminal.enable();
-              }, false);
-            }
+              terminal.enable();
+              terminal.print(Text.TEXTURE_PACK_DESTROYED);
+            }, function(){
+              terminal.clear();
+              terminal.printError(Text.ERROR_HAPPENED_COMPRESSING_TEXTURE_ATLAS);
+              terminal.enable();
+            }, false);
           }
           return true;
         break;

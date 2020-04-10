@@ -871,38 +871,27 @@ JobHandler.prototype.handleRefreshTexturePackCommand = function(){
 JobHandler.prototype.handleDestroyTexturePackCommand = function(){
   var texturePackNamePrefix = this.splitted[1].split("*")[0];
   var ctr = 0;
-  var hasParticleTexture = false;
   for (var texturePackName in texturePacks){
     if (texturePackName.startsWith(texturePackNamePrefix)){
-      if (texturePacks[texturePackName].isParticleTexture){
-        hasParticleTexture = true;
-      }
-      parseCommand(
-        "destroyTexturePack "+texturePackName
-      );
+      parseCommand("destroyTexturePack "+texturePackName);
       ctr ++;
     }
   }
   if (ctr == 0){
     terminal.printError(Text.NO_TEXTURE_PACK_FOUND);
-
   }else{
-    if (!hasParticleTexture){
-      terminal.printInfo(Text.COMMAND_EXECUTED_FOR_X_TEXTURE_PACKS.replace(Text.PARAM1, ctr));
-    }else{
+    terminal.clear();
+    terminal.disable();
+    terminal.printInfo(Text.GENERATING_TEXTURE_ATLAS);
+    textureAtlasHandler.onTexturePackChange(function(){
       terminal.clear();
-      terminal.disable();
-      terminal.printInfo(Text.GENERATING_TEXTURE_ATLAS);
-      textureAtlasHandler.onTexturePackChange(function(){
-        terminal.clear();
-        terminal.enable();
-        terminal.printInfo(Text.COMMAND_EXECUTED_FOR_X_TEXTURE_PACKS.replace(Text.PARAM1, ctr));
-      }, function(){
-        terminal.clear();
-        terminal.printError(Text.ERROR_HAPPENED_COMPRESSING_TEXTURE_ATLAS);
-        terminal.enable();
-      }, false);
-    }
+      terminal.enable();
+      terminal.printInfo(Text.COMMAND_EXECUTED_FOR_X_TEXTURE_PACKS.replace(Text.PARAM1, ctr));
+    }, function(){
+      terminal.clear();
+      terminal.printError(Text.ERROR_HAPPENED_COMPRESSING_TEXTURE_ATLAS);
+      terminal.enable();
+    }, false);
   }
 }
 
