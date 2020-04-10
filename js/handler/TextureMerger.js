@@ -5,18 +5,19 @@ var TextureMerger = function(texturesObj){
   this.dataURLs = new Object();
   for (var textureName in texturesObj){
     var txt = texturesObj[textureName];
+
     if (txt instanceof THREE.CompressedTexture){
-      // NOT SUPPORTED FOR NOW
+      throw new Error("CompressedTextures are not supported.");
+    }
+
+    if (typeof txt.image.toDataURL == UNDEFINED){
+      var tmpCanvas = document.createElement("canvas");
+      tmpCanvas.width = txt.image.naturalWidth;
+      tmpCanvas.height = txt.image.naturalHeight;
+      tmpCanvas.getContext('2d').drawImage(txt.image, 0, 0);
+      this.dataURLs[textureName] = tmpCanvas.toDataURL();
     }else{
-      if (typeof txt.image.toDataURL == UNDEFINED){
-        var tmpCanvas = document.createElement("canvas");
-        tmpCanvas.width = txt.image.naturalWidth;
-        tmpCanvas.height = txt.image.naturalHeight;
-        tmpCanvas.getContext('2d').drawImage(txt.image, 0, 0);
-        this.dataURLs[textureName] = tmpCanvas.toDataURL();
-      }else{
-        this.dataURLs[textureName] = txt.image.toDataURL();
-      }
+      this.dataURLs[textureName] = txt.image.toDataURL();
     }
   }
   this.canvas = document.createElement("canvas");
