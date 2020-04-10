@@ -240,6 +240,7 @@ var ParticleSystemMerger = function(psObj, name){
   if (texture){
     this.material.uniforms.texture = new THREE.Uniform(texture);
     macroHandler.injectMacro("HAS_TEXTURE", this.material, true, true);
+    macroHandler.injectMacro("TEXTURE_SIZE " + ACCEPTED_TEXTURE_SIZE, this.material, true, false);
   }
   if (!this.noTargetColor){
     macroHandler.injectMacro("HAS_TARGET_COLOR", this.material, true, false);
