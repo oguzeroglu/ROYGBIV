@@ -5512,6 +5512,41 @@ function parse(input){
           terminal.printInfo(Text.GUI_OPENED);
           return true;
         break;
+        case 232: //setAcceptedTextureSize
+          if (mode != 0){
+            terminal.printError(Text.WORKS_ONLY_IN_DESIGN_MODE);
+            return true;
+          }
+          if (Object.keys(texturePacks).length){
+            terminal.printError(Text.CANNOT_SET_TEXTURE_SIZE_AFTER);
+            return true;
+          }
+          var textureSize = parseInt(splitted[1]);
+          if (isNaN(textureSize)){
+            terminal.printError(Text.IS_NOT_A_NUMBER.replace(Text.PARAM1, "textureSize"));
+            return true;
+          }
+          if (textureSize <= 0){
+            terminal.printError(Text.MUST_BE_GREATER_THAN.replace(Text.PARAM1, "textureSize").replace(Text.PARAM2, "0"));
+            return true;
+          }
+          if ((Math.log(textureSize)/Math.log(2)) % 1 != 0){
+            terminal.printError(Text.IS_NOT_POWER_OF_TWO.replace(Text.PARAM1, "textureSize"));
+            return true;
+          }
+          if (textureSize > MAX_TEXTURE_SIZE){
+            terminal.printError(Text.MUST_BE_LESS_THAN.replace(Text.PARAM1, "textureSize").replace(Text.PARAM2, MAX_TEXTURE_SIZE));
+            return true;
+          }
+          ACCEPTED_TEXTURE_SIZE = textureSize;
+          terminal.printInfo(Text.ACCEPTED_TEXTURE_SIZE_SET);
+          return true;
+        break;
+        case 233: //printAcceptedTextureSize
+          terminal.printHeader(Text.ACCEPTED_TEXTURE_SIZE);
+          terminal.printInfo(Text.TREE.replace(Text.PARAM1, ACCEPTED_TEXTURE_SIZE));
+          return true;
+        break;
       }
       return true;
     }catch(err){

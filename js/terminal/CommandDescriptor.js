@@ -232,7 +232,9 @@ var CommandDescriptor = function(){
       1, //importParticleSystem
       4, //setObjectPosition
       2, //syncAnimations
-      0 //lights
+      0, //lights
+      1, //setAcceptedTextureSize
+      0 //printAcceptedTextureSize
   ];
 
   this.commandArgumentsExpectedExplanation = [
@@ -467,7 +469,9 @@ var CommandDescriptor = function(){
     "importParticleSystem psName",
     "setObjectPosition objectName x y z",
     "syncAnimations sourceName targetName",
-    "lights"
+    "lights",
+    "setAcceptedTextureSize textureSize",
+    "printAcceptedTextureSize"
   ];
 
   this.commands = [
@@ -702,7 +706,9 @@ var CommandDescriptor = function(){
     "importParticleSystem",
     "setObjectPosition",
     "syncAnimations",
-    "lights"
+    "lights",
+    "setAcceptedTextureSize",
+    "printAcceptedTextureSize"
   ];
 
   this.commandInfo = [
@@ -937,7 +943,9 @@ var CommandDescriptor = function(){
     "importParticleSystem: Imports a particle system.",
     "setObjectPosition: Sets the position of an object",
     "syncAnimations: Resets animations of target text/object/sprite and copies each animation of source to target.",
-    "lights: Opens the light editing GUI."
+    "lights: Opens the light editing GUI.",
+    "setAcceptedTextureSize: Sets the texture size accepted by the engine.",
+    "printAcceptedTextureSize: Prints the texture size accepted by the engine."
   ];
 
   this.keyboardInfo = [
@@ -1746,6 +1754,11 @@ var CommandDescriptor = function(){
   this.syncAnimations.types = [];
   this.syncAnimations.types.push(this.OBJECT_TEXT_SPRITE_NAME); //sourceName
   this.syncAnimations.types.push(this.OBJECT_TEXT_SPRITE_NAME); //targetName
+
+  // setAcceptedTextureSize
+  this.setAcceptedTextureSize = new Object();
+  this.setAcceptedTextureSize.types = [];
+  this.setAcceptedTextureSize.types.push(this.UNKNOWN_INDICATOR); //textureSize
 };
 
 CommandDescriptor.prototype.test = function(){
