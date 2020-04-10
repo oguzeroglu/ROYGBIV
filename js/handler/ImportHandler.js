@@ -35,6 +35,9 @@ ImportHandler.prototype.importEngineVariables = function(obj){
   var upperBound = new THREE.Vector3(
     octreeLimitInfoSplitted[3], octreeLimitInfoSplitted[4], octreeLimitInfoSplitted[5]
   );
+
+  ACCEPTED_TEXTURE_SIZE = obj.ACCEPTED_TEXTURE_SIZE;
+
   LIMIT_BOUNDING_BOX = new THREE.Box3(lowerBound, upperBound);
   BIN_SIZE = parseInt(obj.binSize);
   RAYCASTER_STEP_AMOUNT = parseFloat(obj.raycasterStepAmount);

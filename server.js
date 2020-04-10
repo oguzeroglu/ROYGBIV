@@ -4,6 +4,7 @@ var bodyParser = require("body-parser");
 var fs = require("fs");
 var path = require("path");
 var childProcess = require("child_process");
+var sizeOf = require('image-size');
 
 console.log("*******************************************")
 console.log( " ____   _____   ______ ____ _____     __ ");
@@ -55,6 +56,7 @@ app.post("/build", function(req, res){
 
 app.post("/getTexturePackFolders", function(req, res){
   console.log("[*] Getting texture pack folders.");
+  var acceptedTextureSize = req.body.acceptedTextureSize;
   res.setHeader('Content-Type', 'application/json');
   var folders = [];
   var dirs = fs.readdirSync("texture_packs").filter(f => {
@@ -66,7 +68,10 @@ app.post("/getTexturePackFolders", function(req, res){
   for (var i = 0; i<dirs.length; i++){
     var texturePackFolder = path.join("./texture_packs/", dirs[i]);
     if (fs.readdirSync(texturePackFolder).indexOf("diffuse.png") > -1){
-      folders.push(dirs[i]);
+      var dimensions = sizeOf(path.join(texturePackFolder, "diffuse.png"));
+      if (dimensions.width == acceptedTextureSize && dimensions.height == acceptedTextureSize){
+        folders.push(dirs[i]);
+      }
     }
   }
   console.log("[*] Found "+folders.length+" texture packs.");

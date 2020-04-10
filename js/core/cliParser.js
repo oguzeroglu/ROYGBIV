@@ -1187,7 +1187,7 @@ function parse(input){
               }
             }
           }
-          xhr.send();
+          xhr.send(JSON.stringify({acceptedTextureSize: ACCEPTED_TEXTURE_SIZE}));
           return true;
         break;
         case 57: //printTexturePacks
