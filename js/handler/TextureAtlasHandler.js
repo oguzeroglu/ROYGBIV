@@ -2,10 +2,15 @@ var TextureAtlasHandler = function(){
   this.currentTextureCount = 0;
 }
 
+TextureAtlasHandler.prototype.getRangesForTexturePack = function(tp, type){
+  return this.textureMerger.ranges[tp.name + "#" + type];
+}
+
 TextureAtlasHandler.prototype.getTextureUniform = function(){
   if (this.textureUniformCache){
     return this.textureUniformCache;
   }
+
   this.textureUniformCache = new THREE.Uniform(this.atlas.diffuseTexture);
   return this.textureUniformCache;
 }
@@ -44,7 +49,7 @@ TextureAtlasHandler.prototype.compressTexture = function(base64Data, readyCallba
 }
 
 TextureAtlasHandler.prototype.onTexturePackChange = function(readyCallback, errorCallback, force){
-  var refreshNeeded = false;
+  delete this.textureUniformCache;
   var textureCount = 0;
   var texturesObj = new Object();
   for (var texturePackName in texturePacks){

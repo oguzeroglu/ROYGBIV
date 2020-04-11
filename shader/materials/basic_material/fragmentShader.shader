@@ -11,11 +11,9 @@ varying vec3 vColor;
 #define INSERTION
 
 #ifdef HAS_TEXTURE
+  uniform sampler2D texture;
   uniform mat3 textureMatrix;
   varying vec2 vUV;
-#endif
-#ifdef HAS_DIFFUSE
-  uniform sampler2D diffuseMap;
 #endif
 #ifdef HAS_EMISSIVE
   uniform float emissiveIntensity;
@@ -41,6 +39,14 @@ varying vec3 vColor;
   uniform vec4 forcedColor;
 #endif
 
+#ifdef HAS_TEXTURE
+  vec2 uvAffineTransformation(vec2 original, float endU, float startU, float endV, float startV) {
+    float coordX = (original.x * (endU - startU) + startU);
+    float coordY = (original.y * (startV - endV) + endV);
+    return vec2(coordX, coordY);
+  }
+#endif
+
 void main(){
 
   #ifdef HAS_FORCED_COLOR
@@ -53,7 +59,7 @@ void main(){
   #ifdef HAS_TEXTURE
     vec2 transformedUV = vUV;
     #ifdef HAS_DIFFUSE
-      vec4 diffuseColor = texture2D(diffuseMap, transformedUV);
+      vec4 diffuseColor = texture2D(texture, uvAffineTransformation(transformedUV, float(DIFFUSE_END_U), float(DIFFUSE_START_U), float(DIFFUSE_END_V), float(DIFFUSE_START_V)));
       gl_FragColor = vec4(vColor, alpha) * diffuseColor;
     #else
       gl_FragColor = vec4(vColor, alpha);

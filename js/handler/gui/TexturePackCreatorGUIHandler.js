@@ -5,6 +5,34 @@ var TexturePackCreatorGUIHandler = function(){
   this.mockAddedObject.material = this.mockMaterial;
 }
 
+TexturePackCreatorGUIHandler.prototype.mockTextureAtlasHandler = function(){
+  if (!this.originalTextureMerger){
+    this.originalTextureMerger = textureAtlasHandler.textureMerger;
+    this.originalAtlas = textureAtlasHandler.atlas;
+  }
+
+  var tpObj = new Object();
+  if (this.texturePack.hasDiffuse){
+    tpObj[this.texturePack.name + "#diffuse"] = this.texturePack.diffuseTexture;
+  }
+  if (this.texturePack.hasAlpha){
+    tpObj[this.texturePack.name + "#alpha"] = this.texturePack.alphaTexture;
+  }
+  if (this.texturePack.hasAO){
+    tpObj[this.texturePack.name + "#ao"] = this.texturePack.aoTexture;
+  }
+  if (this.texturePack.hasEmissive){
+    tpObj[this.texturePack.name + "#emissive"] = this.texturePack.emissiveTexture;
+  }
+  if (this.texturePack.hasHeight){
+    tpObj[this.texturePack.name + "#height"] = this.texturePack.heightTexture;
+  }
+
+  textureAtlasHandler.textureMerger = new TextureMerger(tpObj);
+  textureAtlasHandler.atlas = { diffuseTexture: textureAtlasHandler.textureMerger.mergedTexture };
+  delete textureAtlasHandler.textureUniformCache;
+}
+
 TexturePackCreatorGUIHandler.prototype.init = function(isEdit){
   this.configurations = {
     "Texture pack": "",
@@ -48,6 +76,13 @@ TexturePackCreatorGUIHandler.prototype.init = function(isEdit){
 }
 
 TexturePackCreatorGUIHandler.prototype.close = function(message, isError){
+
+  textureAtlasHandler.textureMerger = this.originalTextureMerger;
+  textureAtlasHandler.atlas = this.originalAtlas;
+
+  delete this.originalTextureMerger;
+  delete this.originalAtlas;
+
   guiHandler.hideAll();
   if (this.hiddenEngineObjects){
     for (var i = 0; i<this.hiddenEngineObjects.length; i++){
@@ -106,6 +141,7 @@ TexturePackCreatorGUIHandler.prototype.loadTexturePack = function(texturePackNam
       }
       texturePackCreatorGUIHandler.texturePack = new TexturePack(texturePackName, dirName, resp);
       texturePackCreatorGUIHandler.texturePack.loadTextures(true, function(){
+        texturePackCreatorGUIHandler.mockTextureAtlasHandler();
         terminal.clear();
         terminal.printInfo(Text.AFTER_TEXTURE_PACK_CREATION);
         guiHandler.enableController(texturePackCreatorGUIHandler.texturePackController);

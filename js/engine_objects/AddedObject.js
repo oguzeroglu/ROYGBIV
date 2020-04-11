@@ -1,5 +1,8 @@
 var AddedObject = function(name, type, metaData, material, mesh, physicsBody, destroyedGrids){
   this.isAddedObject = true;
+
+  this.tpInfo = new Object();
+
   if (IS_WORKER_CONTEXT || type == "MOCK"){
     return this;
   }
@@ -676,7 +679,7 @@ AddedObject.prototype.export = function(){
   exportObject["textureRepeatV"] = this.getTextureRepeatY();
 
   if (this.hasDiffuseMap()){
-    var diffuseMap = this.mesh.material.uniforms.diffuseMap.value;
+    var diffuseMap = this.getDiffuseMap();
     exportObject["diffuseRoygbivTexturePackName"] = diffuseMap.roygbivTexturePackName;
   }
   if (this.hasAlphaMap()){
@@ -1354,36 +1357,57 @@ AddedObject.prototype.mapAlpha = function(alphaTexture){
 }
 
 AddedObject.prototype.hasDiffuseMap = function(){
-  return !(typeof this.mesh.material.uniforms.diffuseMap == UNDEFINED);
+  return !!this.tpInfo.diffuse;
 }
 
 AddedObject.prototype.unMapDiffuse = function(){
   if (this.hasDiffuseMap()){
-    delete this.mesh.material.uniforms.diffuseMap;
+    macroHandler.removeMacro("DIFFUSE_START_U " + this.tpInfo.diffuse.startU, this.mesh.material, false, true);
+    macroHandler.removeMacro("DIFFUSE_START_V " + this.tpInfo.diffuse.startV, this.mesh.material, false, true);
+    macroHandler.removeMacro("DIFFUSE_END_U " + this.tpInfo.diffuse.endU, this.mesh.material, false, true);
+    macroHandler.removeMacro("DIFFUSE_END_V " + this.tpInfo.diffuse.endV, this.mesh.material, false, true);
+    delete this.tpInfo.diffuse;
     macroHandler.removeMacro("HAS_DIFFUSE", this.mesh.material, false, true);
     if (!this.hasTexture()){
       delete this.mesh.material.uniforms.textureMatrix;
+      delete this.mesh.material.uniforms.texture;
       macroHandler.removeMacro("HAS_TEXTURE", this.mesh.material, true, true);
     }
   }
 }
 
-AddedObject.prototype.mapDiffuse = function(diffuseTexture){
+AddedObject.prototype.getDiffuseMap = function(){
+  return this.tpInfo.diffuse.texturePack.diffuseTexture;
+}
+
+AddedObject.prototype.mapDiffuse = function(texturePack){
   if (!this.hasTexture()){
     var tMatrix = new THREE.Matrix3();
     tMatrix.setUvTransform(0, 0, 1, 1, 0, 0, 0);
     this.mesh.material.uniforms.textureMatrix = new THREE.Uniform(tMatrix);
     macroHandler.injectMacro("HAS_TEXTURE", this.mesh.material, true, true);
-    this.mesh.material.uniformsNeedUpdate = true;
   }
-  if (this.hasDiffuseMap()){
-    this.mesh.material.uniforms.diffuseMap.value = diffuseTexture
-  }else{
-    this.mesh.material.uniforms.diffuseMap = this.getTextureUniform(diffuseTexture);
+
+  this.mesh.material.uniforms.texture = textureAtlasHandler.getTextureUniform();
+
+  var ranges = textureAtlasHandler.getRangesForTexturePack(texturePack, "diffuse");
+
+  if (!this.hasDiffuseMap()){
     macroHandler.injectMacro("HAS_DIFFUSE", this.mesh.material, false, true);
-    this.mesh.material.uniformsNeedUpdate = true;
+  }else{
+    macroHandler.removeMacro("DIFFUSE_START_U " + this.tpInfo.diffuse.startU, this.mesh.material, false, true);
+    macroHandler.removeMacro("DIFFUSE_START_V " + this.tpInfo.diffuse.startV, this.mesh.material, false, true);
+    macroHandler.removeMacro("DIFFUSE_END_U " + this.tpInfo.diffuse.endU, this.mesh.material, false, true);
+    macroHandler.removeMacro("DIFFUSE_END_V " + this.tpInfo.diffuse.endV, this.mesh.material, false, true);
   }
-  diffuseTexture.updateMatrix();
+
+  this.tpInfo.diffuse = {texturePack: texturePack, startU: ranges.startU, startV: ranges.startV, endU: ranges.endU, endV: ranges.endV};
+
+  macroHandler.injectMacro("DIFFUSE_START_U " + this.tpInfo.diffuse.startU, this.mesh.material, false, true);
+  macroHandler.injectMacro("DIFFUSE_START_V " + this.tpInfo.diffuse.startV, this.mesh.material, false, true);
+  macroHandler.injectMacro("DIFFUSE_END_U " + this.tpInfo.diffuse.endU, this.mesh.material, false, true);
+  macroHandler.injectMacro("DIFFUSE_END_V " + this.tpInfo.diffuse.endV, this.mesh.material, false, true);
+  this.mesh.material.uniformsNeedUpdate = true;
 }
 
 AddedObject.prototype.getOpacity = function(){
@@ -1455,7 +1479,7 @@ AddedObject.prototype.handleMirror = function(axis, property){
 AddedObject.prototype.getTextureStack = function(){
   var texturesStack = [];
   if (this.hasDiffuseMap()){
-    texturesStack.push(this.mesh.material.uniforms.diffuseMap.value);
+    texturesStack.push(this.getDiffuseMap());
   }
   if (this.hasAlphaMap()){
     texturesStack.push(this.mesh.material.uniforms.alphaMap.value);
@@ -1767,7 +1791,7 @@ AddedObject.prototype.destroy = function(skipRaycasterRefresh){
 AddedObject.prototype.dispose = function(){
 
   if (this.hasDiffuseMap()){
-    this.mesh.material.uniforms.diffuseMap.value.dispose();
+    this.getDiffuseMap().dispose();
   }
   if (this.hasAlphaMap()){
     this.mesh.material.uniforms.alphaMap.value.dispose();
@@ -1789,9 +1813,9 @@ AddedObject.prototype.dispose = function(){
 AddedObject.prototype.mapTexturePack = function(texturePack){
   this.resetMaps();
   if (texturePack.hasDiffuse){
-    this.mapDiffuse(texturePack.diffuseTexture);
-    this.mesh.material.uniforms.diffuseMap.value.roygbivTexturePackName = texturePack.name;
-    this.mesh.material.uniforms.diffuseMap.value.needsUpdate = true;
+    this.mapDiffuse(texturePack);
+    this.getDiffuseMap().roygbivTexturePackName = texturePack.name;
+    this.getDiffuseMap().needsUpdate = true;
   }
   if (texturePack.hasAlpha){
     this.mapAlpha(texturePack.alphaTexture);
@@ -2288,7 +2312,7 @@ AddedObject.prototype.resetMaps = function(resetAssociatedTexturePack){
 
 AddedObject.prototype.refreshTextueMatrix = function(){
   if (this.hasDiffuseMap()){
-    this.mesh.material.uniforms.diffuseMap.value.updateMatrix();
+    this.getDiffuseMap().updateMatrix();
   }
   if (this.hasAlphaMap()){
     this.mesh.material.uniforms.alphaMap.value.updateMatrix();
@@ -2925,7 +2949,7 @@ AddedObject.prototype.copy = function(name, isHardCopy, copyPosition, gridSystem
   if (isHardCopy){
     if (this.material instanceof BasicMaterial){
       if (this.hasDiffuseMap()){
-        copyInstance.mapDiffuse(this.mesh.material.uniforms.diffuseMap.value);
+        copyInstance.mapDiffuse(this.tpInfo.diffuse.texturePack);
       }
       if (this.hasAlphaMap()){
         copyInstance.mapAlpha(this.mesh.material.uniforms.alphaMap.value);

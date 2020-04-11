@@ -4,6 +4,7 @@ var TextureMerger = function(texturesObj){
   if (!texturesObj){
     return;
   }
+
   this.dataURLs = new Object();
   for (var textureName in texturesObj){
     var txt = texturesObj[textureName];
