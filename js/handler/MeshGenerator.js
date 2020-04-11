@@ -255,7 +255,7 @@ MeshGenerator.prototype.generateParticleSystemMesh = function(ps, texture, noTar
     macroHandler.injectMacro("HAS_FOG", ps.material, false, true);
   }
   if (texture){
-    ps.material.uniforms.texture = new THREE.Uniform(texture);
+    ps.material.uniforms.texture = textureAtlasHandler.getTextureUniform();
     macroHandler.injectMacro("HAS_TEXTURE", ps.material, true, true);
     macroHandler.injectMacro("TEXTURE_SIZE " + ACCEPTED_TEXTURE_SIZE, ps.material, true, false);
   }
@@ -310,7 +310,7 @@ MeshGenerator.prototype.generateMergedParticleSystemMesh = function(params){
     macroHandler.injectMacro("HAS_FOG", material, false, true);
   }
   if (params.texture){
-    material.uniforms.texture = new THREE.Uniform(params.texture);
+    material.uniforms.texture = textureAtlasHandler.getTextureUniform();
     macroHandler.injectMacro("HAS_TEXTURE", material, true, true);
     macroHandler.injectMacro("TEXTURE_SIZE " + ACCEPTED_TEXTURE_SIZE, material, true, false);
   }

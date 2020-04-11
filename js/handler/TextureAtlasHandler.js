@@ -2,10 +2,19 @@ var TextureAtlasHandler = function(){
   this.currentTextureCount = 0;
 }
 
+TextureAtlasHandler.prototype.getTextureUniform = function(){
+  if (this.textureUniformCache){
+    return this.textureUniformCache;
+  }
+  this.textureUniformCache = new THREE.Uniform(this.atlas.diffuseTexture);
+  return this.textureUniformCache;
+}
+
 TextureAtlasHandler.prototype.dispose = function(){
   if (this.atlas){
     this.atlas.destroy();
     this.atlas = 0;
+    delete this.textureUniformCache;
   }
 }
 
