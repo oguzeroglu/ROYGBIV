@@ -24,3 +24,15 @@ MacroHandler.prototype.removeMacro = function(macro, material, removeVertexShade
   }
   material.needsUpdate = true;
 }
+
+MacroHandler.prototype.getMacroValue = function(macro, material, fromVertexShader){
+  var shaderCode = fromVertexShader? material.vertexShader: material.fragmentShader;
+  var splitted = shaderCode.split("\n");
+  for (var i = 0; i < splitted.length; i ++){
+    if (splitted[i].startsWith("#define " + macro)){
+      var lineSplitted = splitted[i].split(" ");
+      return lineSplitted[lineSplitted.length - 1];
+    }
+  }
+  return null;
+}

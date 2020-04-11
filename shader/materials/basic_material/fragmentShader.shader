@@ -40,10 +40,15 @@ varying vec3 vColor;
 #endif
 
 #ifdef HAS_TEXTURE
-  vec2 uvAffineTransformation(vec2 original, float endU, float startU, float endV, float startV) {
+  vec2 uvAffineTransformation(vec2 original, float startU, float startV, float endU, float endV) {
     float coordX = (original.x * (endU - startU) + startU);
     float coordY = (original.y * (startV - endV) + endV);
     return vec2(coordX, coordY);
+  }
+
+  vec4 fixTextureBleeding(vec4 uvCoordinates){
+    float offset = 0.5 / float(TEXTURE_SIZE);
+    return vec4(uvCoordinates[0] + offset, uvCoordinates[1] - offset, uvCoordinates[2] - offset, uvCoordinates[3] + offset);
   }
 #endif
 
@@ -59,7 +64,8 @@ void main(){
   #ifdef HAS_TEXTURE
     vec2 transformedUV = vUV;
     #ifdef HAS_DIFFUSE
-      vec4 diffuseColor = texture2D(texture, uvAffineTransformation(transformedUV, float(DIFFUSE_END_U), float(DIFFUSE_START_U), float(DIFFUSE_END_V), float(DIFFUSE_START_V)));
+      vec4 diffuseUVFixed = fixTextureBleeding(vec4(float(DIFFUSE_START_U), float(DIFFUSE_START_V), float(DIFFUSE_END_U), float(DIFFUSE_END_V)));
+      vec4 diffuseColor = texture2D(texture, uvAffineTransformation(transformedUV, diffuseUVFixed.x, diffuseUVFixed.y, diffuseUVFixed.z, diffuseUVFixed.w));
       gl_FragColor = vec4(vColor, alpha) * diffuseColor;
     #else
       gl_FragColor = vec4(vColor, alpha);

@@ -1372,6 +1372,7 @@ AddedObject.prototype.unMapDiffuse = function(){
       delete this.mesh.material.uniforms.textureMatrix;
       delete this.mesh.material.uniforms.texture;
       macroHandler.removeMacro("HAS_TEXTURE", this.mesh.material, true, true);
+      macroHandler.removeMacro("TEXTURE_SIZE " + ACCEPTED_TEXTURE_SIZE, this.mesh.material, false, true);
     }
   }
 }
@@ -1408,6 +1409,10 @@ AddedObject.prototype.mapDiffuse = function(texturePack){
   macroHandler.injectMacro("DIFFUSE_END_U " + this.tpInfo.diffuse.endU, this.mesh.material, false, true);
   macroHandler.injectMacro("DIFFUSE_END_V " + this.tpInfo.diffuse.endV, this.mesh.material, false, true);
   this.mesh.material.uniformsNeedUpdate = true;
+
+  if (macroHandler.getMacroValue("TEXTURE_SIZE", this.mesh.material, false) == null){
+    macroHandler.injectMacro("TEXTURE_SIZE " + ACCEPTED_TEXTURE_SIZE, this.mesh.material, false, true);
+  }
 }
 
 AddedObject.prototype.getOpacity = function(){
