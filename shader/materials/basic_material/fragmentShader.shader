@@ -16,7 +16,6 @@ varying vec3 vColor;
 #endif
 #ifdef HAS_EMISSIVE
   uniform float emissiveIntensity;
-  uniform sampler2D emissiveMap;
   uniform vec3 emissiveColor;
 #endif
 #ifdef HAS_ALPHA
@@ -127,7 +126,8 @@ void main(){
       gl_FragColor.rgb *= ao;
     #endif
     #ifdef HAS_EMISSIVE
-      vec4 eColor = texture2D(emissiveMap, transformedUV);
+      vec4 emissiveUVFixed = fixTextureBleeding(vec4(float(EMISSIVE_START_U), float(EMISSIVE_START_V), float(EMISSIVE_END_U), float(EMISSIVE_END_V)));
+      vec4 eColor = texture2D(texture, uvAffineTransformation(transformedUV, emissiveUVFixed.x, emissiveUVFixed.y, emissiveUVFixed.z, emissiveUVFixed.w));
       vec3 totalEmissiveRadiance = vec3(emissiveIntensity, emissiveIntensity, emissiveIntensity) * emissiveColor;
       totalEmissiveRadiance *= eColor.rgb;
       gl_FragColor.rgb += totalEmissiveRadiance;
