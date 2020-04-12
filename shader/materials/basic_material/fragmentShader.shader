@@ -23,7 +23,6 @@ varying vec3 vColor;
 #endif
 #ifdef HAS_AO
   uniform float aoIntensity;
-  uniform sampler2D aoMap;
 #endif
 #ifdef HAS_SKYBOX_FOG
   uniform samplerCube cubeTexture;
@@ -122,7 +121,8 @@ void main(){
       }
     #endif
     #ifdef HAS_AO
-      float ao = (texture2D(aoMap, transformedUV).r - 1.0) * aoIntensity + 1.0;
+      vec4 aoUVFixed = fixTextureBleeding(vec4(float(AO_START_U), float(AO_START_V), float(AO_END_U), float(AO_END_V)));
+      float ao = (texture2D(texture, uvAffineTransformation(transformedUV, aoUVFixed.x, aoUVFixed.y, aoUVFixed.z, aoUVFixed.w)).r - 1.0) * aoIntensity + 1.0;
       gl_FragColor.rgb *= ao;
     #endif
     #ifdef HAS_EMISSIVE

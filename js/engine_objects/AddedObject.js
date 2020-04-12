@@ -687,11 +687,11 @@ AddedObject.prototype.export = function(){
     exportObject["alphaRoygbivTexturePackName"] = alphaMap.roygbivTexturePackName;
   }
   if (this.hasAOMap()){
-    var aoMap = this.mesh.material.uniforms.aoMap.value;
+    var aoMap = this.getAOMap();
     exportObject["aoRoygbivTexturePackName"] = aoMap.roygbivTexturePackName;
   }
   if (this.hasEmissiveMap()){
-    var emissiveMap = this.mesh.material.uniforms.emissiveMap.value;
+    var emissiveMap = this.getEmissiveMap();
     exportObject["emissiveRoygbivTexturePackName"] = emissiveMap.roygbivTexturePackName;
   }
   if (this.hasDisplacementMap()){
@@ -1311,38 +1311,59 @@ AddedObject.prototype.mapDisplacement = function(displacementTexture){
 }
 
 AddedObject.prototype.hasAOMap = function(){
-  return !(typeof this.mesh.material.uniforms.aoMap == UNDEFINED);
+  return !!this.tpInfo.ao;
 }
 
 AddedObject.prototype.unMapAO = function(){
   if (this.hasAOMap()){
-    delete this.mesh.material.uniforms.aoMap;
+    macroHandler.removeMacro("AO_START_U " + this.tpInfo.ao.startU, this.mesh.material, false, true);
+    macroHandler.removeMacro("AO_START_V " + this.tpInfo.ao.startV, this.mesh.material, false, true);
+    macroHandler.removeMacro("AO_END_U " + this.tpInfo.ao.endU, this.mesh.material, false, true);
+    macroHandler.removeMacro("AO_END_V " + this.tpInfo.ao.endV, this.mesh.material, false, true);
+    delete this.tpInfo.ao;
     delete this.mesh.material.uniforms.aoIntensity;
     macroHandler.removeMacro("HAS_AO", this.mesh.material, false, true);
     if (!this.hasTexture()){
       delete this.mesh.material.uniforms.textureMatrix;
+      delete this.mesh.material.uniforms.texture;
       macroHandler.removeMacro("HAS_TEXTURE", this.mesh.material, true, true);
+      macroHandler.removeMacro("TEXTURE_SIZE " + ACCEPTED_TEXTURE_SIZE, this.mesh.material, false, true);
     }
   }
 }
 
-AddedObject.prototype.mapAO = function(aoTexture){
+AddedObject.prototype.mapAO = function(texturePack){
   if (!this.hasTexture()){
     var tMatrix = new THREE.Matrix3();
     tMatrix.setUvTransform(0, 0, 1, 1, 0, 0, 0);
     this.mesh.material.uniforms.textureMatrix = new THREE.Uniform(tMatrix);
     macroHandler.injectMacro("HAS_TEXTURE", this.mesh.material, true, true);
-    this.mesh.material.uniformsNeedUpdate = true;
   }
-  if (this.hasAOMap()){
-    this.mesh.material.uniforms.aoMap.value = aoTexture;
-  }else{
-    this.mesh.material.uniforms.aoMap = this.getTextureUniform(aoTexture);
+
+  this.mesh.material.uniforms.texture = textureAtlasHandler.getTextureUniform();
+  var ranges = textureAtlasHandler.getRangesForTexturePack(texturePack, "ao");
+
+  if (!this.hasAOMap()){
     this.mesh.material.uniforms.aoIntensity = new THREE.Uniform(this.material.aoMapIntensity);
     macroHandler.injectMacro("HAS_AO", this.mesh.material, false, true);
-    this.mesh.material.uniformsNeedUpdate = true;
+  }else{
+    macroHandler.removeMacro("AO_START_U " + this.tpInfo.ao.startU, this.mesh.material, false, true);
+    macroHandler.removeMacro("AO_START_V " + this.tpInfo.ao.startV, this.mesh.material, false, true);
+    macroHandler.removeMacro("AO_END_U " + this.tpInfo.ao.endU, this.mesh.material, false, true);
+    macroHandler.removeMacro("AO_END_V " + this.tpInfo.ao.endV, this.mesh.material, false, true);
   }
-  aoTexture.updateMatrix();
+
+  this.tpInfo.ao = {texturePack: texturePack, startU: ranges.startU, startV: ranges.startV, endU: ranges.endU, endV: ranges.endV};
+
+  macroHandler.injectMacro("AO_START_U " + this.tpInfo.ao.startU, this.mesh.material, false, true);
+  macroHandler.injectMacro("AO_START_V " + this.tpInfo.ao.startV, this.mesh.material, false, true);
+  macroHandler.injectMacro("AO_END_U " + this.tpInfo.ao.endU, this.mesh.material, false, true);
+  macroHandler.injectMacro("AO_END_V " + this.tpInfo.ao.endV, this.mesh.material, false, true);
+  this.mesh.material.uniformsNeedUpdate = true;
+
+  if (macroHandler.getMacroValue("TEXTURE_SIZE", this.mesh.material, false) == null){
+    macroHandler.injectMacro("TEXTURE_SIZE " + ACCEPTED_TEXTURE_SIZE, this.mesh.material, false, true);
+  }
 }
 
 AddedObject.prototype.hasAlphaMap = function(){
@@ -1397,6 +1418,10 @@ AddedObject.prototype.unMapDiffuse = function(){
       macroHandler.removeMacro("TEXTURE_SIZE " + ACCEPTED_TEXTURE_SIZE, this.mesh.material, false, true);
     }
   }
+}
+
+AddedObject.prototype.getAOMap = function(){
+  return this.tpInfo.ao.texturePack.aoTexture;
 }
 
 AddedObject.prototype.getEmissiveMap = function(){
@@ -1516,10 +1541,10 @@ AddedObject.prototype.getTextureStack = function(){
     texturesStack.push(this.mesh.material.uniforms.alphaMap.value);
   }
   if (this.hasAOMap()){
-    texturesStack.push(this.mesh.material.uniforms.aoMap.value);
+    texturesStack.push(this.getAOMap());
   }
   if (this.hasEmissiveMap()){
-    texturesStack.push(this.mesh.material.uniforms.emissiveMap.value);
+    texturesStack.push(this.getEmissiveMap());
   }
   if (this.hasDisplacementMap()){
     texturesStack.push(this.mesh.material.uniforms.displacementMap.value);
@@ -1828,13 +1853,13 @@ AddedObject.prototype.dispose = function(){
     this.mesh.material.uniforms.alphaMap.value.dispose();
   }
   if (this.hasAOMap()){
-    this.mesh.material.uniforms.aoMap.value.dispose();
+    this.getAOMap().dispose();
   }
   if (this.hasDisplacementMap()){
     this.mesh.material.uniforms.displacementMap.value.dispose();
   }
   if (this.hasEmissiveMap()){
-    this.mesh.material.uniforms.emissiveMap.value.dispose();
+    this.getEmissiveMap().dispose();
   }
 
   this.mesh.geometry.dispose();
@@ -1854,9 +1879,9 @@ AddedObject.prototype.mapTexturePack = function(texturePack){
     this.mesh.material.uniforms.alphaMap.value.needsUpdate = true;
   }
   if (texturePack.hasAO){
-    this.mapAO(texturePack.aoTexture);
-    this.mesh.material.uniforms.aoMap.value.roygbivTexturePackName = texturePack.name;
-    this.mesh.material.uniforms.aoMap.value.needsUpdate = true;
+    this.mapAO(texturePack);
+    this.getAOMap().roygbivTexturePackName = texturePack.name;
+    this.getAOMap().needsUpdate = true;
   }
   if (texturePack.hasEmissive){
     this.mapEmissive(texturePack);
@@ -2349,10 +2374,10 @@ AddedObject.prototype.refreshTextueMatrix = function(){
     this.mesh.material.uniforms.alphaMap.value.updateMatrix();
   }
   if (this.hasAOMap()){
-    this.mesh.material.uniforms.aoMap.value.updateMatrix();
+    this.getAOMap().updateMatrix();
   }
   if (this.hasEmissiveMap()){
-    this.mesh.material.uniforms.emissiveMap.value.updateMatrix();
+    this.getEmissiveMap().updateMatrix();
   }
   if (this.hasDisplacementMap()){
     this.mesh.material.uniforms.displacementMap.value.updateMatrix();
@@ -2986,7 +3011,7 @@ AddedObject.prototype.copy = function(name, isHardCopy, copyPosition, gridSystem
         copyInstance.mapAlpha(this.mesh.material.uniforms.alphaMap.value);
       }
       if (this.hasAOMap()){
-        copyInstance.mapAO(this.mesh.material.uniforms.aoMap.value);
+        copyInstance.mapAO(this.toInfo.ao.texturePack);
         copyInstance.setAOIntensity(this.getAOIntensity());
       }
       if (this.hasDisplacementMap()){
