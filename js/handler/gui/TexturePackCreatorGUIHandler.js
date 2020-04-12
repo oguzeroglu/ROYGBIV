@@ -6,9 +6,10 @@ var TexturePackCreatorGUIHandler = function(){
 }
 
 TexturePackCreatorGUIHandler.prototype.mockTextureAtlasHandler = function(){
-  if (!this.originalTextureMerger){
+  if (!this.originalBackedUp){
     this.originalTextureMerger = textureAtlasHandler.textureMerger;
     this.originalAtlas = textureAtlasHandler.atlas;
+    this.originalBackedUp = true;
   }
 
   var tpObj = new Object();
@@ -82,6 +83,7 @@ TexturePackCreatorGUIHandler.prototype.close = function(message, isError){
 
   delete this.originalTextureMerger;
   delete this.originalAtlas;
+  this.originalBackedUp = false;
 
   guiHandler.hideAll();
   if (this.hiddenEngineObjects){
