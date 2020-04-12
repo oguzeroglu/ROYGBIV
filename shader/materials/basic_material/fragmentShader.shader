@@ -18,9 +18,6 @@ varying vec3 vColor;
   uniform float emissiveIntensity;
   uniform vec3 emissiveColor;
 #endif
-#ifdef HAS_ALPHA
-  uniform sampler2D alphaMap;
-#endif
 #ifdef HAS_AO
   uniform float aoIntensity;
 #endif

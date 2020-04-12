@@ -695,7 +695,7 @@ AddedObject.prototype.export = function(){
     exportObject["emissiveRoygbivTexturePackName"] = emissiveMap.roygbivTexturePackName;
   }
   if (this.hasDisplacementMap()){
-    var displacementMap = this.mesh.material.uniforms.displacementMap.value;
+    var displacementMap = this.getDisplacementMap();
     exportObject["displacementRoygbivTexturePackName"] = displacementMap.roygbivTexturePackName;
     if (!this.parentObjectName){
       exportObject["displacementScale"] = this.getDisplacementScale();
@@ -1226,7 +1226,7 @@ AddedObject.prototype.unMapEmissive = function(){
       delete this.mesh.material.uniforms.textureMatrix;
       delete this.mesh.material.uniforms.texture;
       macroHandler.removeMacro("HAS_TEXTURE", this.mesh.material, true, true);
-      macroHandler.removeMacro("TEXTURE_SIZE " + ACCEPTED_TEXTURE_SIZE, this.mesh.material, false, true);
+      macroHandler.removeMacro("TEXTURE_SIZE " + ACCEPTED_TEXTURE_SIZE, this.mesh.material, true, true);
     }
   }
 }
@@ -1263,12 +1263,12 @@ AddedObject.prototype.mapEmissive = function(texturePack){
   this.mesh.material.uniformsNeedUpdate = true;
 
   if (macroHandler.getMacroValue("TEXTURE_SIZE", this.mesh.material, false) == null){
-    macroHandler.injectMacro("TEXTURE_SIZE " + ACCEPTED_TEXTURE_SIZE, this.mesh.material, false, true);
+    macroHandler.injectMacro("TEXTURE_SIZE " + ACCEPTED_TEXTURE_SIZE, this.mesh.material, true, true);
   }
 }
 
 AddedObject.prototype.hasDisplacementMap = function(){
-  return !(typeof this.mesh.material.uniforms.displacementMap == UNDEFINED);
+  return !!this.tpInfo.height;
 }
 
 AddedObject.prototype.unMapDisplacement = function(){
@@ -1277,7 +1277,11 @@ AddedObject.prototype.unMapDisplacement = function(){
     return;
   }
   if (this.hasDisplacementMap()){
-    delete this.mesh.material.uniforms.displacementMap;
+    macroHandler.removeMacro("HEIGHT_START_U " + this.tpInfo.height.startU, this.mesh.material, true, false);
+    macroHandler.removeMacro("HEIGHT_START_V " + this.tpInfo.height.startV, this.mesh.material, true, false);
+    macroHandler.removeMacro("HEIGHT_END_U " + this.tpInfo.height.endU, this.mesh.material, true, false);
+    macroHandler.removeMacro("HEIGHT_END_V " + this.tpInfo.height.endV, this.mesh.material, true, false);
+    delete this.tpInfo.height;
     delete this.mesh.material.uniforms.displacementInfo;
     macroHandler.removeMacro("HAS_DISPLACEMENT", this.mesh.material, true, false);
     if (!this.hasTexture()){
@@ -1287,7 +1291,7 @@ AddedObject.prototype.unMapDisplacement = function(){
   }
 }
 
-AddedObject.prototype.mapDisplacement = function(displacementTexture){
+AddedObject.prototype.mapDisplacement = function(texturePack){
   if (!VERTEX_SHADER_TEXTURE_FETCH_SUPPORTED){
     console.error("Displacement mapping is not supported for this device.");
     return;
@@ -1297,17 +1301,31 @@ AddedObject.prototype.mapDisplacement = function(displacementTexture){
     tMatrix.setUvTransform(0, 0, 1, 1, 0, 0, 0);
     this.mesh.material.uniforms.textureMatrix = new THREE.Uniform(tMatrix);
     macroHandler.injectMacro("HAS_TEXTURE", this.mesh.material, true, true);
-    this.mesh.material.uniformsNeedUpdate = true;
   }
-  if (this.hasDisplacementMap()){
-    this.mesh.material.uniforms.displacementMap.value = displacementTexture;
-  }else{
-    this.mesh.material.uniforms.displacementMap = this.getTextureUniform(displacementTexture);
+
+  this.mesh.material.uniforms.texture = textureAtlasHandler.getTextureUniform();
+  var ranges = textureAtlasHandler.getRangesForTexturePack(texturePack, "height");
+
+  if (!this.hasDisplacementMap()){
     this.mesh.material.uniforms.displacementInfo = new THREE.Uniform(new THREE.Vector2());
     macroHandler.injectMacro("HAS_DISPLACEMENT", this.mesh.material, true, false);
-    this.mesh.material.uniformsNeedUpdate = true;
+  }else{
+    macroHandler.removeMacro("HEIGHT_START_U " + this.tpInfo.height.startU, this.mesh.material, true, false);
+    macroHandler.removeMacro("HEIGHT_START_V " + this.tpInfo.height.startV, this.mesh.material, true, false);
+    macroHandler.removeMacro("HEIGHT_END_U " + this.tpInfo.height.endU, this.mesh.material, true, false);
+    macroHandler.removeMacro("HEIGHT_END_V " + this.tpInfo.height.endV, this.mesh.material, true, false);
   }
-  displacementTexture.updateMatrix();
+  this.tpInfo.height = {texturePack: texturePack, startU: ranges.startU, startV: ranges.startV, endU: ranges.endU, endV: ranges.endV};
+
+  macroHandler.injectMacro("HEIGHT_START_U " + this.tpInfo.height.startU, this.mesh.material, true, false);
+  macroHandler.injectMacro("HEIGHT_START_V " + this.tpInfo.height.startV, this.mesh.material, true, false);
+  macroHandler.injectMacro("HEIGHT_END_U " + this.tpInfo.height.endU, this.mesh.material, true, false);
+  macroHandler.injectMacro("HEIGHT_END_V " + this.tpInfo.height.endV, this.mesh.material, true, false);
+  this.mesh.material.uniformsNeedUpdate = true;
+
+  if (macroHandler.getMacroValue("TEXTURE_SIZE", this.mesh.material, false) == null){
+    macroHandler.injectMacro("TEXTURE_SIZE " + ACCEPTED_TEXTURE_SIZE, this.mesh.material, true, true);
+  }
 }
 
 AddedObject.prototype.hasAOMap = function(){
@@ -1327,7 +1345,7 @@ AddedObject.prototype.unMapAO = function(){
       delete this.mesh.material.uniforms.textureMatrix;
       delete this.mesh.material.uniforms.texture;
       macroHandler.removeMacro("HAS_TEXTURE", this.mesh.material, true, true);
-      macroHandler.removeMacro("TEXTURE_SIZE " + ACCEPTED_TEXTURE_SIZE, this.mesh.material, false, true);
+      macroHandler.removeMacro("TEXTURE_SIZE " + ACCEPTED_TEXTURE_SIZE, this.mesh.material, true, true);
     }
   }
 }
@@ -1362,7 +1380,7 @@ AddedObject.prototype.mapAO = function(texturePack){
   this.mesh.material.uniformsNeedUpdate = true;
 
   if (macroHandler.getMacroValue("TEXTURE_SIZE", this.mesh.material, false) == null){
-    macroHandler.injectMacro("TEXTURE_SIZE " + ACCEPTED_TEXTURE_SIZE, this.mesh.material, false, true);
+    macroHandler.injectMacro("TEXTURE_SIZE " + ACCEPTED_TEXTURE_SIZE, this.mesh.material, true, true);
   }
 }
 
@@ -1382,7 +1400,7 @@ AddedObject.prototype.unMapAlpha = function(){
       delete this.mesh.material.uniforms.textureMatrix;
       delete this.mesh.material.uniforms.texture;
       macroHandler.removeMacro("HAS_TEXTURE", this.mesh.material, true, true);
-      macroHandler.removeMacro("TEXTURE_SIZE " + ACCEPTED_TEXTURE_SIZE, this.mesh.material, false, true);
+      macroHandler.removeMacro("TEXTURE_SIZE " + ACCEPTED_TEXTURE_SIZE, this.mesh.material, true, true);
     }
   }
 }
@@ -1417,7 +1435,7 @@ AddedObject.prototype.mapAlpha = function(texturePack){
   this.mesh.material.uniformsNeedUpdate = true;
 
   if (macroHandler.getMacroValue("TEXTURE_SIZE", this.mesh.material, false) == null){
-    macroHandler.injectMacro("TEXTURE_SIZE " + ACCEPTED_TEXTURE_SIZE, this.mesh.material, false, true);
+    macroHandler.injectMacro("TEXTURE_SIZE " + ACCEPTED_TEXTURE_SIZE, this.mesh.material, true, true);
   }
 }
 
@@ -1437,9 +1455,13 @@ AddedObject.prototype.unMapDiffuse = function(){
       delete this.mesh.material.uniforms.textureMatrix;
       delete this.mesh.material.uniforms.texture;
       macroHandler.removeMacro("HAS_TEXTURE", this.mesh.material, true, true);
-      macroHandler.removeMacro("TEXTURE_SIZE " + ACCEPTED_TEXTURE_SIZE, this.mesh.material, false, true);
+      macroHandler.removeMacro("TEXTURE_SIZE " + ACCEPTED_TEXTURE_SIZE, this.mesh.material, true, true);
     }
   }
+}
+
+AddedObject.prototype.getDisplacementMap = function(){
+  return this.tpInfo.height.texturePack.heightTexture;
 }
 
 AddedObject.prototype.getAlphaMap = function(){
@@ -1488,7 +1510,7 @@ AddedObject.prototype.mapDiffuse = function(texturePack){
   this.mesh.material.uniformsNeedUpdate = true;
 
   if (macroHandler.getMacroValue("TEXTURE_SIZE", this.mesh.material, false) == null){
-    macroHandler.injectMacro("TEXTURE_SIZE " + ACCEPTED_TEXTURE_SIZE, this.mesh.material, false, true);
+    macroHandler.injectMacro("TEXTURE_SIZE " + ACCEPTED_TEXTURE_SIZE, this.mesh.material, true, true);
   }
 }
 
@@ -1573,7 +1595,7 @@ AddedObject.prototype.getTextureStack = function(){
     texturesStack.push(this.getEmissiveMap());
   }
   if (this.hasDisplacementMap()){
-    texturesStack.push(this.mesh.material.uniforms.displacementMap.value);
+    texturesStack.push(this.getDisplacementMap());
   }
   return texturesStack;
 }
@@ -1882,7 +1904,7 @@ AddedObject.prototype.dispose = function(){
     this.getAOMap().dispose();
   }
   if (this.hasDisplacementMap()){
-    this.mesh.material.uniforms.displacementMap.value.dispose();
+    this.getDisplacementMap().dispose();
   }
   if (this.hasEmissiveMap()){
     this.getEmissiveMap().dispose();
@@ -1915,9 +1937,9 @@ AddedObject.prototype.mapTexturePack = function(texturePack){
     this.getEmissiveMap().needsUpdate = true;
   }
   if (texturePack.hasHeight && VERTEX_SHADER_TEXTURE_FETCH_SUPPORTED){
-    this.mapDisplacement(texturePack.heightTexture);
-    this.mesh.material.uniforms.displacementMap.value.roygbivTexturePackName = texturePack.name;
-    this.mesh.material.uniforms.displacementMap.value.needsUpdate = true;
+    this.mapDisplacement(texturePack);
+    this.getDisplacementMap().roygbivTexturePackName = texturePack.name;
+    this.getDisplacementMap().needsUpdate = true;
   }
   this.associatedTexturePack = texturePack.name;
 }
@@ -2406,7 +2428,7 @@ AddedObject.prototype.refreshTextueMatrix = function(){
     this.getEmissiveMap().updateMatrix();
   }
   if (this.hasDisplacementMap()){
-    this.mesh.material.uniforms.displacementMap.value.updateMatrix();
+    this.getDisplacementMap().updateMatrix();
   }
 }
 
@@ -3041,7 +3063,7 @@ AddedObject.prototype.copy = function(name, isHardCopy, copyPosition, gridSystem
         copyInstance.setAOIntensity(this.getAOIntensity());
       }
       if (this.hasDisplacementMap()){
-        copyInstance.mapDisplacement(this.mesh.material.uniforms.displacementMap.value);
+        copyInstance.mapDisplacement(this.tpInfo.height.texturePack);
         copyInstance.setDisplacementScale(this.getDisplacementScale());
         copyInstance.setDisplacementBias(this.getDisplacementBias());
       }
