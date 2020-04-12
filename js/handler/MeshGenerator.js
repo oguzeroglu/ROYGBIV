@@ -125,11 +125,6 @@ MeshGenerator.prototype.generateInstancedMesh = function(graphicsGroup, objectGr
 
 MeshGenerator.prototype.generateMergedMesh = function(graphicsGroup, objectGroup){
   var hasTexture = objectGroup.hasTexture;
-  var diffuseTexture = objectGroup.diffuseTexture;
-  var emissiveTexture = objectGroup.emissiveTexture;
-  var alphaTexture = objectGroup.alphaTexture;
-  var aoTexture = objectGroup.aoTexture;
-  var displacementTexture = objectGroup.displacementTexture;
 
   var uniforms = {
     projectionMatrix: GLOBAL_PROJECTION_UNIFORM,
@@ -138,24 +133,16 @@ MeshGenerator.prototype.generateMergedMesh = function(graphicsGroup, objectGroup
   }
   if (hasTexture){
     uniforms.totalTextureOffset = new THREE.Uniform(new THREE.Vector2(0, 0));
+    uniforms.texture = textureAtlasHandler.getTextureUniform();
   }
-  if (aoTexture){
-    uniforms.aoMap = this.getTextureUniform(aoTexture);
+  if (objectGroup.hasAOMap()){
     uniforms.totalAOIntensity = new THREE.Uniform(1);
   }
-  if (emissiveTexture){
-    uniforms.emissiveMap = this.getTextureUniform(emissiveTexture);
+  if (objectGroup.hasEmissiveMap()){
     uniforms.totalEmissiveIntensity = new THREE.Uniform(1);
     uniforms.totalEmissiveColor = new THREE.Uniform(new THREE.Color("white"));
   }
-  if (diffuseTexture){
-    uniforms.diffuseMap = this.getTextureUniform(diffuseTexture);
-  }
-  if (alphaTexture){
-    uniforms.alphaMap = this.getTextureUniform(alphaTexture);
-  }
-  if (displacementTexture){
-    uniforms.displacementMap = this.getTextureUniform(displacementTexture);
+  if (objectGroup.hasDisplacementMap()){
     uniforms.totalDisplacementInfo = new THREE.Uniform(new THREE.Vector2(1, 1));
   }
 

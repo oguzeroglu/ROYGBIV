@@ -18,22 +18,33 @@ varying float vAlpha;
   attribute vec3 emissiveColor;
   varying vec3 vEmissiveColor;
   varying float vEmissiveIntensity;
+  attribute vec4 emissiveUV;
+  varying vec2 vEmissiveUV;
 #endif
 #ifdef HAS_AO
   attribute float aoIntensity;
   varying float vAOIntensity;
+  attribute vec4 aoUV;
+  varying vec2 vAOUV;
 #endif
 #ifdef HAS_DISPLACEMENT
   attribute vec2 displacementInfo;
-  uniform sampler2D displacementMap;
+  uniform sampler2D texture;
   uniform vec2 totalDisplacementInfo;
+  attribute vec4 displacementUV;
+  vec2 calculatedDisplacementUV;
+#endif
+#ifdef HAS_ALPHA
+  attribute vec4 alphaUV;
+  varying vec2 vAlphaUV;
 #endif
 #ifdef HAS_TEXTURE
   attribute vec2 uv;
   attribute vec4 textureInfo;
   attribute vec4 textureMatrixInfo;
-  varying vec2 vUV;
   uniform vec2 totalTextureOffset;
+  attribute vec4 diffuseUV;
+  varying vec2 vDiffuseUV;
   #ifdef HAS_AO
     varying float hasAOMap;
   #endif
@@ -762,6 +773,48 @@ vec3 diffuseLight(float dirX, float dirY, float dirZ, float r, float g, float b,
   }
 #endif
 
+#ifdef HAS_TEXTURE
+
+  float modulate(float x, float y){
+    return x - (y * floor(x/y));
+  }
+
+  vec2 uvAffineTransformation(vec2 original, float startU, float startV, float endU, float endV) {
+    float coordX = (original.x * (endU - startU) + startU);
+    float coordY = (original.y * (startV - endV) + endV);
+
+    return vec2(coordX, coordY);
+  }
+
+  vec4 fixTextureBleeding(vec4 uvCoordinates){
+    float offset = 0.5 / float(TEXTURE_SIZE);
+    return vec4(uvCoordinates[0] + offset, uvCoordinates[1] - offset, uvCoordinates[2] - offset, uvCoordinates[3] + offset);
+  }
+
+  void handleUVs(vec2 transformedUV){
+    #ifdef HAS_DIFFUSE
+      vec4 diffuseUVFixed = fixTextureBleeding(diffuseUV);
+      vDiffuseUV = uvAffineTransformation(transformedUV, diffuseUVFixed.x, diffuseUVFixed.y, diffuseUVFixed.z, diffuseUVFixed.w);
+    #endif
+    #ifdef HAS_EMISSIVE
+      vec4 emissiveUVFixed = fixTextureBleeding(emissiveUV);
+      vEmissiveUV = uvAffineTransformation(transformedUV, emissiveUVFixed.x, emissiveUVFixed.y, emissiveUVFixed.z, emissiveUVFixed.w);
+    #endif
+    #ifdef HAS_ALPHA
+      vec4 alphaUVFixed = fixTextureBleeding(alphaUV);
+      vAlphaUV = uvAffineTransformation(transformedUV, alphaUVFixed.x, alphaUVFixed.y, alphaUVFixed.z, alphaUVFixed.w);
+    #endif
+    #ifdef HAS_AO
+      vec4 aoUVFixed = fixTextureBleeding(aoUV);
+      vAOUV = uvAffineTransformation(transformedUV, aoUVFixed.x, aoUVFixed.y, aoUVFixed.z, aoUVFixed.w);
+    #endif
+    #ifdef HAS_DISPLACEMENT
+      vec4 displacementUVFixed = fixTextureBleeding(displacementUV);
+      calculatedDisplacementUV = uvAffineTransformation(transformedUV, displacementUVFixed.x, displacementUVFixed.y, displacementUVFixed.z, displacementUVFixed.w);
+    #endif
+  }
+#endif
+
 void main(){
 
   #if defined(HAS_SKYBOX_FOG) || defined(AFFECTED_BY_LIGHT)
@@ -776,14 +829,19 @@ void main(){
 
   vAlpha = alpha;
 
+  vec2 transformedUV;
+
   #ifdef HAS_TEXTURE
-    vUV = (
+    transformedUV = (
       mat3(
         textureMatrixInfo.z, 0.0, 0.0,
         0.0, textureMatrixInfo.w, 0.0,
         textureMatrixInfo.x + totalTextureOffset.x, textureMatrixInfo.y + totalTextureOffset.y, 1.0
       ) * vec3(uv, 1.0)
     ).xy;
+
+    handleUVs(transformedUV);
+
     #ifdef HAS_DIFFUSE
       hasDiffuseMap = -10.0;
       if (textureInfo[0] > 0.0){
@@ -821,7 +879,7 @@ void main(){
       vec3 objNormal = normalize(normal);
       float totalDisplacementScale = displacementInfo.x * totalDisplacementInfo.x;
       float totalDisplacementBias = displacementInfo.y * totalDisplacementInfo.y;
-      transformedPosition += objNormal * (texture2D(displacementMap, uv).r * totalDisplacementScale + totalDisplacementBias);
+      transformedPosition += objNormal * (texture2D(texture, calculatedDisplacementUV).r * totalDisplacementScale + totalDisplacementBias);
     }
   #endif
   gl_Position = projectionMatrix * modelViewMatrix * vec4(transformedPosition, 1.0);
