@@ -40,9 +40,55 @@ varying vec3 vColor;
 #endif
 
 #ifdef HAS_TEXTURE
+
+  float modulate(float x, float y){
+    return x - (y * floor(x/y));
+  }
+
   vec2 uvAffineTransformation(vec2 original, float startU, float startV, float endU, float endV) {
     float coordX = (original.x * (endU - startU) + startU);
     float coordY = (original.y * (startV - endV) + endV);
+
+    if (coordX > endU){
+      for (float i = 0.0; i<5000.0; i += 0.0001){
+        float diff = coordX - endU;
+        coordX = startU + diff;
+        if (coordX <= endU){
+          break;
+        }
+      }
+    }
+
+    if (coordX < startU){
+      for (float i = 0.0; i<5000.0; i += 0.0001){
+        float diff = startU - coordX;
+        coordX = endU - diff;
+        if (coordX >= startU){
+          break;
+        }
+      }
+    }
+
+    if (coordY > startV){
+      for (float i = 0.0; i<5000.0; i += 0.0001){
+        float diff = coordY - startV;
+        coordY = endV + diff;
+        if (coordY <= startV){
+          break;
+        }
+      }
+    }
+
+    if (coordY < endV){
+      for (float i = 0.0; i<5000.0; i += 0.0001){
+        float diff = endV - coordY;
+        coordY = startV - diff;
+        if (coordY >= endV){
+          break;
+        }
+      }
+    }
+
     return vec2(coordX, coordY);
   }
 
