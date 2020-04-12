@@ -12,7 +12,6 @@ varying vec3 vColor;
 
 #ifdef HAS_TEXTURE
   uniform sampler2D texture;
-  uniform mat3 textureMatrix;
   varying vec2 vUV;
 #endif
 #ifdef HAS_EMISSIVE
