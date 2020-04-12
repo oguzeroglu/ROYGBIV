@@ -683,7 +683,7 @@ AddedObject.prototype.export = function(){
     exportObject["diffuseRoygbivTexturePackName"] = diffuseMap.roygbivTexturePackName;
   }
   if (this.hasAlphaMap()){
-    var alphaMap = this.mesh.material.uniforms.alphaMap.value;
+    var alphaMap = this.getAlphaMap();
     exportObject["alphaRoygbivTexturePackName"] = alphaMap.roygbivTexturePackName;
   }
   if (this.hasAOMap()){
@@ -1367,36 +1367,58 @@ AddedObject.prototype.mapAO = function(texturePack){
 }
 
 AddedObject.prototype.hasAlphaMap = function(){
-  return !(typeof this.mesh.material.uniforms.alphaMap == UNDEFINED);
+  return !!this.tpInfo.alpha;
 }
 
 AddedObject.prototype.unMapAlpha = function(){
   if (this.hasAlphaMap()){
-    delete this.mesh.material.uniforms.alphaMap;
+    macroHandler.removeMacro("ALPHA_START_U " + this.tpInfo.alpha.startU, this.mesh.material, false, true);
+    macroHandler.removeMacro("ALPHA_START_V " + this.tpInfo.alpha.startV, this.mesh.material, false, true);
+    macroHandler.removeMacro("ALPHA_END_U " + this.tpInfo.alpha.endU, this.mesh.material, false, true);
+    macroHandler.removeMacro("ALPHA_END_V " + this.tpInfo.alpha.endV, this.mesh.material, false, true);
     macroHandler.removeMacro("HAS_ALPHA", this.mesh.material, false, true);
+    delete this.tpInfo.alpha;
     if (!this.hasTexture()){
       delete this.mesh.material.uniforms.textureMatrix;
+      delete this.mesh.material.uniforms.texture;
       macroHandler.removeMacro("HAS_TEXTURE", this.mesh.material, true, true);
+      macroHandler.removeMacro("TEXTURE_SIZE " + ACCEPTED_TEXTURE_SIZE, this.mesh.material, false, true);
     }
   }
 }
 
-AddedObject.prototype.mapAlpha = function(alphaTexture){
+AddedObject.prototype.mapAlpha = function(texturePack){
   if (!this.hasTexture()){
     var tMatrix = new THREE.Matrix3();
     tMatrix.setUvTransform(0, 0, 1, 1, 0, 0, 0);
     this.mesh.material.uniforms.textureMatrix = new THREE.Uniform(tMatrix);
     macroHandler.injectMacro("HAS_TEXTURE", this.mesh.material, true, true);
-    this.mesh.material.uniformsNeedUpdate = true;
   }
-  if (this.hasAlphaMap()){
-    this.mesh.material.uniforms.alphaMap.value = alphaTexture;
-  }else{
-    this.mesh.material.uniforms.alphaMap = this.getTextureUniform(alphaTexture);
+
+  this.mesh.material.uniforms.texture = textureAtlasHandler.getTextureUniform();
+
+  var ranges = textureAtlasHandler.getRangesForTexturePack(texturePack, "alpha");
+
+  if (!this.hasAlphaMap()){
     macroHandler.injectMacro("HAS_ALPHA", this.mesh.material, false, true);
-    this.mesh.material.uniformsNeedUpdate = true;
+  }else{
+    macroHandler.removeMacro("ALPHA_START_U " + this.tpInfo.alpha.startU, this.mesh.material, false, true);
+    macroHandler.removeMacro("ALPHA_START_V " + this.tpInfo.alpha.startV, this.mesh.material, false, true);
+    macroHandler.removeMacro("ALPHA_END_U " + this.tpInfo.alpha.endU, this.mesh.material, false, true);
+    macroHandler.removeMacro("ALPHA_END_V " + this.tpInfo.alpha.endV, this.mesh.material, false, true);
   }
-  alphaTexture.updateMatrix();
+
+  this.tpInfo.alpha = {texturePack: texturePack, startU: ranges.startU, startV: ranges.startV, endU: ranges.endU, endV: ranges.endV};
+
+  macroHandler.injectMacro("ALPHA_START_U " + this.tpInfo.alpha.startU, this.mesh.material, false, true);
+  macroHandler.injectMacro("ALPHA_START_V " + this.tpInfo.alpha.startV, this.mesh.material, false, true);
+  macroHandler.injectMacro("ALPHA_END_U " + this.tpInfo.alpha.endU, this.mesh.material, false, true);
+  macroHandler.injectMacro("ALPHA_END_V " + this.tpInfo.alpha.endV, this.mesh.material, false, true);
+  this.mesh.material.uniformsNeedUpdate = true;
+
+  if (macroHandler.getMacroValue("TEXTURE_SIZE", this.mesh.material, false) == null){
+    macroHandler.injectMacro("TEXTURE_SIZE " + ACCEPTED_TEXTURE_SIZE, this.mesh.material, false, true);
+  }
 }
 
 AddedObject.prototype.hasDiffuseMap = function(){
@@ -1418,6 +1440,10 @@ AddedObject.prototype.unMapDiffuse = function(){
       macroHandler.removeMacro("TEXTURE_SIZE " + ACCEPTED_TEXTURE_SIZE, this.mesh.material, false, true);
     }
   }
+}
+
+AddedObject.prototype.getAlphaMap = function(){
+  return this.tpInfo.alpha.texturePack.alphaTexture;
 }
 
 AddedObject.prototype.getAOMap = function(){
@@ -1538,7 +1564,7 @@ AddedObject.prototype.getTextureStack = function(){
     texturesStack.push(this.getDiffuseMap());
   }
   if (this.hasAlphaMap()){
-    texturesStack.push(this.mesh.material.uniforms.alphaMap.value);
+    texturesStack.push(this.getAlphaMap());
   }
   if (this.hasAOMap()){
     texturesStack.push(this.getAOMap());
@@ -1850,7 +1876,7 @@ AddedObject.prototype.dispose = function(){
     this.getDiffuseMap().dispose();
   }
   if (this.hasAlphaMap()){
-    this.mesh.material.uniforms.alphaMap.value.dispose();
+    this.getAlphaMap().dispose();
   }
   if (this.hasAOMap()){
     this.getAOMap().dispose();
@@ -1874,9 +1900,9 @@ AddedObject.prototype.mapTexturePack = function(texturePack){
     this.getDiffuseMap().needsUpdate = true;
   }
   if (texturePack.hasAlpha){
-    this.mapAlpha(texturePack.alphaTexture);
-    this.mesh.material.uniforms.alphaMap.value.roygbivTexturePackName = texturePack.name;
-    this.mesh.material.uniforms.alphaMap.value.needsUpdate = true;
+    this.mapAlpha(texturePack);
+    this.getAlphaMap().roygbivTexturePackName = texturePack.name;
+    this.getAlphaMap().needsUpdate = true;
   }
   if (texturePack.hasAO){
     this.mapAO(texturePack);
@@ -2371,7 +2397,7 @@ AddedObject.prototype.refreshTextueMatrix = function(){
     this.getDiffuseMap().updateMatrix();
   }
   if (this.hasAlphaMap()){
-    this.mesh.material.uniforms.alphaMap.value.updateMatrix();
+    this.getAlphaMap().updateMatrix();
   }
   if (this.hasAOMap()){
     this.getAOMap().updateMatrix();
@@ -3008,7 +3034,7 @@ AddedObject.prototype.copy = function(name, isHardCopy, copyPosition, gridSystem
         copyInstance.mapDiffuse(this.tpInfo.diffuse.texturePack);
       }
       if (this.hasAlphaMap()){
-        copyInstance.mapAlpha(this.mesh.material.uniforms.alphaMap.value);
+        copyInstance.mapAlpha(this.tpInfo.alpha.texturePack);
       }
       if (this.hasAOMap()){
         copyInstance.mapAO(this.toInfo.ao.texturePack);

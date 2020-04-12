@@ -114,7 +114,8 @@ void main(){
       gl_FragColor = vec4(vColor, alpha);
     #endif
     #ifdef HAS_ALPHA
-      float val = texture2D(alphaMap, transformedUV).g;
+      vec4 alphaUVFixed = fixTextureBleeding(vec4(float(ALPHA_START_U), float(ALPHA_START_V), float(ALPHA_END_U), float(ALPHA_END_V)));
+      float val = texture2D(texture, uvAffineTransformation(transformedUV, alphaUVFixed.x, alphaUVFixed.y, alphaUVFixed.z, alphaUVFixed.w)).g;
       gl_FragColor.a *= val;
       if (val <= ALPHA_TEST){
         discard;
