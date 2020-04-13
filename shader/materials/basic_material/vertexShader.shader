@@ -740,43 +740,19 @@ vec3 diffuseLight(float dirX, float dirY, float dirZ, float r, float g, float b,
     float coordY = (original.y * (startV - endV) + endV);
 
     if (coordX > endU){
-      for (float i = 0.0; i<5000.0; i += 0.0001){
-        float diff = coordX - endU;
-        coordX = startU + diff;
-        if (coordX <= endU){
-          break;
-        }
-      }
+      coordX = endU - mod((coordX - endU), (endU - startU));
     }
 
     if (coordX < startU){
-      for (float i = 0.0; i<5000.0; i += 0.0001){
-        float diff = startU - coordX;
-        coordX = endU - diff;
-        if (coordX >= startU){
-          break;
-        }
-      }
+      coordX = startU + mod((startU - coordX), (endU - startU));
     }
 
     if (coordY > startV){
-      for (float i = 0.0; i<5000.0; i += 0.0001){
-        float diff = coordY - startV;
-        coordY = endV + diff;
-        if (coordY <= startV){
-          break;
-        }
-      }
+      coordY = startV - mod((coordY - startV), (startV - endV));
     }
 
     if (coordY < endV){
-      for (float i = 0.0; i<5000.0; i += 0.0001){
-        float diff = endV - coordY;
-        coordY = startV - diff;
-        if (coordY >= endV){
-          break;
-        }
-      }
+      coordY = endV + mod((endV - coordY), (startV - endV));
     }
 
     return vec2(coordX, coordY);

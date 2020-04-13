@@ -885,6 +885,22 @@ vec3 applyQuaternionToVector(vec3 vector, vec4 quaternion){
     float coordX = (original.x * (endU - startU) + startU);
     float coordY = (original.y * (startV - endV) + endV);
 
+    if (coordX > endU){
+      coordX = endU - mod((coordX - endU), (endU - startU));
+    }
+
+    if (coordX < startU){
+      coordX = startU + mod((startU - coordX), (endU - startU));
+    }
+
+    if (coordY > startV){
+      coordY = startV - mod((coordY - startV), (startV - endV));
+    }
+
+    if (coordY < endV){
+      coordY = endV + mod((endV - coordY), (startV - endV));
+    }
+
     return vec2(coordX, coordY);
   }
 
