@@ -841,6 +841,48 @@ ObjectGroup.prototype.generateCompressionMacros = function(){
       this.geometry.removeAttribute(attrKey);
     }
   }
+
+  var retryAttributes = [
+    "textureMatrixInfo", "diffuseUV", "emissiveUV", "aoUV", "displacementUV", "alphaUV"
+  ];
+
+  for (var x = 0; x < retryAttributes.length; x ++){
+    var attrKey = retryAttributes[x];
+    if (attributes[attrKey]){
+      var nonZero = 0;
+      var ary = attributes[attrKey].array;
+      for (var i = 0; i < ary.length; i += attributes[attrKey].itemSize){
+        if (ary[i] == 0 && ary[i + 1] == 0 && ary[i + 2] == 0 && ary[i + 3] == 0){
+          continue;
+        }
+        if (!nonZero){
+          nonZero = new THREE.Vector4(ary[i], ary[i + 1], ary[i + 2], ary[i + 3]);
+          break;
+        }
+      }
+      if (!nonZero){
+        continue;
+      }
+      var compressable = true;
+      for (var i = 0; i < ary.length; i += attributes[attrKey].itemSize){
+        if (ary[i] == 0 && ary[i + 1] == 0 && ary[i + 2] == 0 && ary[i + 3] == 0){
+          continue;
+        }
+        if (ary[i] != nonZero.x || ary[i + 1] != nonZero.y || ary[i + 2] != nonZero.z || ary[i + 3] != nonZero.w){
+          compressable = false;
+          break;
+        }
+      }
+      if (compressable){
+        var upper = attrKey.toUpperCase();
+        this.compressionMacros.push("COMPRESSION_MACRO_" + upper + "_X " + nonZero.x);
+        this.compressionMacros.push("COMPRESSION_MACRO_" + upper + "_Y " + nonZero.y);
+        this.compressionMacros.push("COMPRESSION_MACRO_" + upper + "_Z " + nonZero.z);
+        this.compressionMacros.push("COMPRESSION_MACRO_" + upper + "_W " + nonZero.w);
+        this.geometry.removeAttribute(attrKey);
+      }
+    }
+  }
 }
 
 ObjectGroup.prototype.mergeInstanced = function(){
