@@ -19,13 +19,13 @@ varying float vAlpha;
   varying vec3 vEmissiveColor;
   varying float vEmissiveIntensity;
   attribute vec4 emissiveUV;
-  varying vec2 vEmissiveUV;
+  varying vec4 vEmissiveUV;
 #endif
 #ifdef HAS_AO
   attribute float aoIntensity;
   varying float vAOIntensity;
   attribute vec4 aoUV;
-  varying vec2 vAOUV;
+  varying vec4 vAOUV;
 #endif
 #ifdef HAS_DISPLACEMENT
   attribute vec2 displacementInfo;
@@ -36,7 +36,7 @@ varying float vAlpha;
 #endif
 #ifdef HAS_ALPHA
   attribute vec4 alphaUV;
-  varying vec2 vAlphaUV;
+  varying vec4 vAlphaUV;
 #endif
 #ifdef HAS_TEXTURE
   attribute vec2 uv;
@@ -44,7 +44,8 @@ varying float vAlpha;
   attribute vec4 textureMatrixInfo;
   uniform vec2 totalTextureOffset;
   attribute vec4 diffuseUV;
-  varying vec2 vDiffuseUV;
+  varying vec4 vDiffuseUV;
+  varying vec2 vUV;
   #ifdef HAS_AO
     varying float hasAOMap;
   #endif
@@ -783,6 +784,46 @@ vec3 diffuseLight(float dirX, float dirY, float dirZ, float r, float g, float b,
     float coordX = (original.x * (endU - startU) + startU);
     float coordY = (original.y * (startV - endV) + endV);
 
+    if (coordX > endU){
+      for (float i = 0.0; i<5000.0; i += 0.0001){
+        float diff = coordX - endU;
+        coordX = startU + diff;
+        if (coordX <= endU){
+          break;
+        }
+      }
+    }
+
+    if (coordX < startU){
+      for (float i = 0.0; i<5000.0; i += 0.0001){
+        float diff = startU - coordX;
+        coordX = endU - diff;
+        if (coordX >= startU){
+          break;
+        }
+      }
+    }
+
+    if (coordY > startV){
+      for (float i = 0.0; i<5000.0; i += 0.0001){
+        float diff = coordY - startV;
+        coordY = endV + diff;
+        if (coordY <= startV){
+          break;
+        }
+      }
+    }
+
+    if (coordY < endV){
+      for (float i = 0.0; i<5000.0; i += 0.0001){
+        float diff = endV - coordY;
+        coordY = startV - diff;
+        if (coordY >= endV){
+          break;
+        }
+      }
+    }
+
     return vec2(coordX, coordY);
   }
 
@@ -793,20 +834,16 @@ vec3 diffuseLight(float dirX, float dirY, float dirZ, float r, float g, float b,
 
   void handleUVs(vec2 transformedUV){
     #ifdef HAS_DIFFUSE
-      vec4 diffuseUVFixed = fixTextureBleeding(diffuseUV);
-      vDiffuseUV = uvAffineTransformation(transformedUV, diffuseUVFixed.x, diffuseUVFixed.y, diffuseUVFixed.z, diffuseUVFixed.w);
+      vDiffuseUV = diffuseUV;
     #endif
     #ifdef HAS_EMISSIVE
-      vec4 emissiveUVFixed = fixTextureBleeding(emissiveUV);
-      vEmissiveUV = uvAffineTransformation(transformedUV, emissiveUVFixed.x, emissiveUVFixed.y, emissiveUVFixed.z, emissiveUVFixed.w);
+      vEmissiveUV = emissiveUV;
     #endif
     #ifdef HAS_ALPHA
-      vec4 alphaUVFixed = fixTextureBleeding(alphaUV);
-      vAlphaUV = uvAffineTransformation(transformedUV, alphaUVFixed.x, alphaUVFixed.y, alphaUVFixed.z, alphaUVFixed.w);
+      vAlphaUV = alphaUV;
     #endif
     #ifdef HAS_AO
-      vec4 aoUVFixed = fixTextureBleeding(aoUV);
-      vAOUV = uvAffineTransformation(transformedUV, aoUVFixed.x, aoUVFixed.y, aoUVFixed.z, aoUVFixed.w);
+      vAOUV = aoUV;
     #endif
     #ifdef HAS_DISPLACEMENT
       vec4 displacementUVFixed = fixTextureBleeding(displacementUV);
@@ -839,6 +876,8 @@ void main(){
         textureMatrixInfo.x + totalTextureOffset.x, textureMatrixInfo.y + totalTextureOffset.y, 1.0
       ) * vec3(uv, 1.0)
     ).xy;
+
+    vUV = transformedUV;
 
     handleUVs(transformedUV);
 

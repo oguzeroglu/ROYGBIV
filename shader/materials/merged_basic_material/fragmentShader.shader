@@ -12,20 +12,21 @@ varying vec3 vColor;
 
 #ifdef HAS_TEXTURE
   uniform sampler2D texture;
+  varying vec2 vUV;
   #ifdef HAS_DIFFUSE
-    varying vec2 vDiffuseUV;
+    varying vec4 vDiffuseUV;
     varying float hasDiffuseMap;
   #endif
   #ifdef HAS_EMISSIVE
-    varying vec2 vEmissiveUV;
+    varying vec4 vEmissiveUV;
     varying float hasEmissiveMap;
   #endif
   #ifdef HAS_ALPHA
-    varying vec2 vAlphaUV;
+    varying vec4 vAlphaUV;
     varying float hasAlphaMap;
   #endif
   #ifdef HAS_AO
-    varying vec2 vAOUV;
+    varying vec4 vAOUV;
     varying float hasAOMap;
   #endif
 #endif
@@ -51,6 +52,65 @@ varying vec3 vColor;
   uniform vec4 forcedColor;
 #endif
 
+#ifdef HAS_TEXTURE
+
+  float modulate(float x, float y){
+    return x - (y * floor(x/y));
+  }
+
+  vec2 uvAffineTransformation(vec2 original, float startU, float startV, float endU, float endV) {
+    float coordX = (original.x * (endU - startU) + startU);
+    float coordY = (original.y * (startV - endV) + endV);
+
+    if (coordX > endU){
+      for (float i = 0.0; i<5000.0; i += 0.0001){
+        float diff = coordX - endU;
+        coordX = startU + diff;
+        if (coordX <= endU){
+          break;
+        }
+      }
+    }
+
+    if (coordX < startU){
+      for (float i = 0.0; i<5000.0; i += 0.0001){
+        float diff = startU - coordX;
+        coordX = endU - diff;
+        if (coordX >= startU){
+          break;
+        }
+      }
+    }
+
+    if (coordY > startV){
+      for (float i = 0.0; i<5000.0; i += 0.0001){
+        float diff = coordY - startV;
+        coordY = endV + diff;
+        if (coordY <= startV){
+          break;
+        }
+      }
+    }
+
+    if (coordY < endV){
+      for (float i = 0.0; i<5000.0; i += 0.0001){
+        float diff = endV - coordY;
+        coordY = startV - diff;
+        if (coordY >= endV){
+          break;
+        }
+      }
+    }
+
+    return vec2(coordX, coordY);
+  }
+
+  vec4 fixTextureBleeding(vec4 uvCoordinates){
+    float offset = 0.5 / float(TEXTURE_SIZE);
+    return vec4(uvCoordinates[0] + offset, uvCoordinates[1] - offset, uvCoordinates[2] - offset, uvCoordinates[3] + offset);
+  }
+#endif
+
 void main(){
 
   #ifdef HAS_FORCED_COLOR
@@ -63,13 +123,15 @@ void main(){
   vec4 diffuseColor = vec4(1.0, 1.0, 1.0, 1.0);
   #ifdef HAS_DIFFUSE
     if (hasDiffuseMap > 0.0){
-      diffuseColor = texture2D(texture, vDiffuseUV);
+      vec4 diffuseUVFixed = fixTextureBleeding(vDiffuseUV);
+      diffuseColor = texture2D(texture, uvAffineTransformation(vUV, diffuseUVFixed.x, diffuseUVFixed.y, diffuseUVFixed.z, diffuseUVFixed.w));
     }
   #endif
   gl_FragColor = vec4(vColor, vAlpha) * diffuseColor;
   #ifdef HAS_ALPHA
     if (hasAlphaMap > 0.0){
-      float val = texture2D(texture, vAlphaUV).g;
+      vec4 alphaUVFixed = fixTextureBleeding(vAlphaUV);
+      float val = texture2D(texture, uvAffineTransformation(vUV, alphaUVFixed.x, alphaUVFixed.y, alphaUVFixed.z, alphaUVFixed.w)).g;
       gl_FragColor.a *= val;
       if (val <= ALPHA_TEST){
         discard;
@@ -79,13 +141,15 @@ void main(){
   #ifdef HAS_AO
     if (hasAOMap > 0.0){
       float aoIntensityCoef = vAOIntensity * totalAOIntensity;
-      float ao = (texture2D(texture, vAOUV).r - 1.0) * aoIntensityCoef + 1.0;
+      vec4 aoUVFixed = fixTextureBleeding(vAOUV);
+      float ao = (texture2D(texture, uvAffineTransformation(vUV, aoUVFixed.x, aoUVFixed.y, aoUVFixed.z, aoUVFixed.w)).r - 1.0) * aoIntensityCoef + 1.0;
       gl_FragColor.rgb *= ao;
     }
   #endif
   #ifdef HAS_EMISSIVE
     if (hasEmissiveMap > 0.0){
-      vec4 eColor = texture2D(texture, vEmissiveUV);
+      vec4 emissiveUVFixed = fixTextureBleeding(vEmissiveUV);
+      vec4 eColor = texture2D(texture, uvAffineTransformation(vUV, emissiveUVFixed.x, emissiveUVFixed.y, emissiveUVFixed.z, emissiveUVFixed.w));
       float ei = vEmissiveIntensity * totalEmissiveIntensity;
       vec3 totalEmissiveRadiance = vec3(ei, ei, ei) * vEmissiveColor * totalEmissiveColor;
       totalEmissiveRadiance *= eColor.rgb;
