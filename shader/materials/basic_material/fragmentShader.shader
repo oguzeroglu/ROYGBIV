@@ -34,11 +34,6 @@ varying vec3 vColor;
 #endif
 
 #ifdef HAS_TEXTURE
-
-  float modulate(float x, float y){
-    return x - (y * floor(x/y));
-  }
-
   vec2 uvAffineTransformation(vec2 original, float startU, float startV, float endU, float endV) {
     float coordX = (original.x * (endU - startU) + startU);
     float coordY = (original.y * (startV - endV) + endV);

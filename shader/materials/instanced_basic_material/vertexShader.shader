@@ -56,21 +56,31 @@ varying float vAlpha;
   varying vec2 vUV;
   #ifdef HAS_DIFFUSE
     varying float hasDiffuseMap;
+    attribute vec4 diffuseUV;
+    varying vec4 vDiffuseUV;
   #endif
   #ifdef HAS_EMISSIVE
     varying float hasEmissiveMap;
+    attribute vec4 emissiveUV;
+    varying vec4 vEmissiveUV;
   #endif
   #ifdef HAS_ALPHA
     varying float hasAlphaMap;
+    attribute vec4 alphaUV;
+    varying vec4 vAlphaUV;
   #endif
   #ifdef HAS_AO
     varying float hasAOMap;
+    attribute vec4 aoUV;
+    varying vec4 vAOUV;
   #endif
 #endif
 #ifdef HAS_DISPLACEMENT
   attribute vec2 displacementInfo;
-  uniform sampler2D displacementMap;
+  uniform sampler2D texture;
   uniform vec2 totalDisplacementInfo;
+  attribute vec4 displacementUV;
+  vec2 calculatedDisplacementUV;
 #endif
 #if defined(HAS_SKYBOX_FOG) || defined(AFFECTED_BY_LIGHT)
   uniform mat4 worldMatrix;
@@ -797,6 +807,79 @@ vec3 applyQuaternionToVector(vec3 vector, vec4 quaternion){
   return vec3(calculatedX, calculatedY, calculatedZ);
 }
 
+#ifdef HAS_TEXTURE
+  vec2 uvAffineTransformation(vec2 original, float startU, float startV, float endU, float endV) {
+    float coordX = (original.x * (endU - startU) + startU);
+    float coordY = (original.y * (startV - endV) + endV);
+
+    if (coordX > endU){
+      for (float i = 0.0; i<5000.0; i += 0.0001){
+        float diff = coordX - endU;
+        coordX = startU + diff;
+        if (coordX <= endU){
+          break;
+        }
+      }
+    }
+
+    if (coordX < startU){
+      for (float i = 0.0; i<5000.0; i += 0.0001){
+        float diff = startU - coordX;
+        coordX = endU - diff;
+        if (coordX >= startU){
+          break;
+        }
+      }
+    }
+
+    if (coordY > startV){
+      for (float i = 0.0; i<5000.0; i += 0.0001){
+        float diff = coordY - startV;
+        coordY = endV + diff;
+        if (coordY <= startV){
+          break;
+        }
+      }
+    }
+
+    if (coordY < endV){
+      for (float i = 0.0; i<5000.0; i += 0.0001){
+        float diff = endV - coordY;
+        coordY = startV - diff;
+        if (coordY >= endV){
+          break;
+        }
+      }
+    }
+
+    return vec2(coordX, coordY);
+  }
+
+  vec4 fixTextureBleeding(vec4 uvCoordinates){
+    float offset = 0.5 / float(TEXTURE_SIZE);
+    return vec4(uvCoordinates[0] + offset, uvCoordinates[1] - offset, uvCoordinates[2] - offset, uvCoordinates[3] + offset);
+  }
+
+  void handleUVs(vec2 transformedUV){
+    #ifdef HAS_DIFFUSE
+      vDiffuseUV = diffuseUV;
+    #endif
+    #ifdef HAS_EMISSIVE
+      vEmissiveUV = emissiveUV;
+    #endif
+    #ifdef HAS_ALPHA
+      vAlphaUV = alphaUV;
+    #endif
+    #ifdef HAS_AO
+      vAOUV = aoUV;
+    #endif
+    #ifdef HAS_DISPLACEMENT
+      vec4 displacementUVFixed = fixTextureBleeding(displacementUV);
+      calculatedDisplacementUV = uvAffineTransformation(transformedUV, displacementUVFixed.x, displacementUVFixed.y, displacementUVFixed.z, displacementUVFixed.w);
+    #endif
+  }
+#endif
+
 void main(){
 
   #ifdef IS_AUTO_INSTANCED
@@ -837,6 +920,9 @@ void main(){
         ) * vec3(uv, 1.0)
       ).xy;
     #endif
+
+    handleUVs(vUV);
+
     #ifdef HAS_DIFFUSE
       hasDiffuseMap = -10.0;
       if (textureInfo[0] > 0.0){
@@ -893,7 +979,7 @@ void main(){
         float totalDisplacementScale = displacementInfo.x * totalDisplacementInfo.x;
         float totalDisplacementBias = displacementInfo.y * totalDisplacementInfo.y;
       #endif
-      transformedPosition += objNormal * (texture2D(displacementMap, uv).r * totalDisplacementScale + totalDisplacementBias);
+      transformedPosition += objNormal * (texture2D(texture, calculatedDisplacementUV).r * totalDisplacementScale + totalDisplacementBias);
     }
   #endif
   #ifdef IS_AUTO_INSTANCED

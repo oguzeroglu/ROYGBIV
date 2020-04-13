@@ -735,10 +735,6 @@ vec3 diffuseLight(float dirX, float dirY, float dirZ, float r, float g, float b,
 
 
 #ifdef HAS_DISPLACEMENT
-  float modulate(float x, float y){
-    return x - (y * floor(x/y));
-  }
-
   vec2 uvAffineTransformation(vec2 original, float startU, float startV, float endU, float endV) {
     float coordX = (original.x * (endU - startU) + startU);
     float coordY = (original.y * (startV - endV) + endV);
