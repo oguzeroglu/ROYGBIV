@@ -993,8 +993,8 @@ void main(){
   #endif
   #ifdef HAS_AO
     #ifdef IS_AUTO_INSTANCED
-      int iai = int(alphaIndex);
-      vAOIntensity = autoInstanceAOIntensityArray[iai];
+      int iai2 = int(alphaIndex);
+      vAOIntensity = autoInstanceAOIntensityArray[iai2];
     #else
       vAOIntensity = aoIntensity;
     #endif
