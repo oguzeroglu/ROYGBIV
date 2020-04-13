@@ -765,6 +765,84 @@ ObjectGroup.prototype.push = function(array, value, index, isIndexed){
   }
 }
 
+ObjectGroup.prototype.isAttributeRepeating = function(attribute){
+  var itemSize = attribute.itemSize;
+  var firstItem;
+  if (itemSize == 1){
+    firstItem = attribute.array[0];
+  }
+  if (itemSize == 2){
+    firstItem = new THREE.Vector2(attribute.array[0], attribute.array[1]);
+  }
+  if (itemSize == 3){
+    firstItem = new THREE.Vector3(attribute.array[0], attribute.array[1], attribute.array[2]);
+  }
+  if (itemSize == 4){
+    firstItem = new THREE.Vector4(attribute.array[0], attribute.array[1], attribute.array[2], attribute.array[3]);
+  }
+
+  for (var i = itemSize; i < attribute.array.length; i += itemSize){
+    if (itemSize == 1){
+      if (attribute.array[i] != firstItem){
+        return false;
+      }
+    }
+    if (itemSize == 2){
+      if (attribute.array[i] != firstItem.x || attribute.array[i + 1] != firstItem.y){
+        return false;
+      }
+    }
+    if (itemSize == 3){
+      if (attribute.array[i] != firstItem.x || attribute.array[i + 1] != firstItem.y || attribute.array[i + 2] != firstItem.z){
+        return false;
+      }
+    }
+    if (itemSize == 4){
+      if (attribute.array[i] != firstItem.x || attribute.array[i + 1] != firstItem.y || attribute.array[i + 2] != firstItem.z || attribute.array[i + 3] != firstItem.w){
+        return false;
+      }
+    }
+  }
+
+  return true;
+}
+
+ObjectGroup.prototype.generateCompressionMacros = function(){
+  var attributes = this.geometry.attributes;
+
+  var compressableAttributes = [
+    "quaternion", "alpha" , "color", "textureInfo", "textureMatrixInfo",
+    "diffuseUV", "emissiveIntensity", "emissiveColor", "emissiveUV",
+    "aoIntensity", "aoUV", "displacementInfo", "displacementUV", "alphaUV"
+  ];
+
+  this.compressionMacros = [];
+
+  for (var i = 0; i < compressableAttributes.length; i ++){
+    var attrKey = compressableAttributes[i];
+    if (attributes[attrKey] && this.isAttributeRepeating(attributes[attrKey])){
+      var attr = attributes[attrKey];
+      var upper = "COMPRESSION_MACRO_" + attrKey.toUpperCase();
+      if (attr.itemSize == 1){
+        this.compressionMacros.push(upper + " " + attr.array[0]);
+      }else if (attr.itemSize == 2){
+        this.compressionMacros.push(upper + "_X " + attr.array[0]);
+        this.compressionMacros.push(upper + "_Y " + attr.array[1]);
+      }else if (attr.itemSize == 3){
+        this.compressionMacros.push(upper + "_X " + attr.array[0]);
+        this.compressionMacros.push(upper + "_Y " + attr.array[1]);
+        this.compressionMacros.push(upper + "_Z " + attr.array[2]);
+      }else if (attr.itemSize == 4){
+        this.compressionMacros.push(upper + "_X " + attr.array[0]);
+        this.compressionMacros.push(upper + "_Y " + attr.array[1]);
+        this.compressionMacros.push(upper + "_Z " + attr.array[2]);
+        this.compressionMacros.push(upper + "_W " + attr.array[3]);
+      }
+      this.geometry.removeAttribute(attrKey);
+    }
+  }
+}
+
 ObjectGroup.prototype.mergeInstanced = function(){
   this.isInstanced = true;
   var refGeometry;
@@ -783,6 +861,7 @@ ObjectGroup.prototype.mergeInstanced = function(){
   var diffuseUVs = [], emissiveUVs = [], alphaUVs = [], aoUVs = [], displacementUVs = [];
 
   var count = 0;
+
   for (var objName in this.group){
     var obj = this.group[objName];
     positionOffsets.push(obj.mesh.position.x);
@@ -1009,6 +1088,7 @@ ObjectGroup.prototype.mergeInstanced = function(){
 
   this.geometry.addAttribute("normal", refGeometry.attributes.normal);
 
+  this.generateCompressionMacros();
 }
 
 ObjectGroup.prototype.merge = function(){
@@ -1872,6 +1952,12 @@ ObjectGroup.prototype.glue = function(simplifiedChildrenPhysicsBodies){
   if (this.hasTexture){
     macroHandler.injectMacro("HAS_TEXTURE", this.mesh.material, true, true);
     macroHandler.injectMacro("TEXTURE_SIZE " + ACCEPTED_TEXTURE_SIZE, this.mesh.material, true, true);
+  }
+
+  if (this.compressionMacros){
+    for (var i = 0; i < this.compressionMacros.length; i ++){
+      macroHandler.injectMacro(this.compressionMacros[i], this.mesh.material, true, false);
+    }
   }
 
   this.mesh.objectGroupName = this.name;

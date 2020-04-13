@@ -75,38 +75,23 @@ MeshGenerator.prototype.generateObjectTrail = function(
 }
 
 MeshGenerator.prototype.generateInstancedMesh = function(graphicsGroup, objectGroup){
-  var hasTexture = objectGroup.hasTexture;
-  var diffuseTexture = objectGroup.diffuseTexture;
-  var emissiveTexture = objectGroup.emissiveTexture;
-  var alphaTexture = objectGroup.alphaTexture;
-  var aoTexture = objectGroup.aoTexture;
-  var displacementTexture = objectGroup.displacementTexture;
   var vertexShader = ShaderContent.instancedBasicMaterialVertexShader;
   var uniforms = {
     projectionMatrix: GLOBAL_PROJECTION_UNIFORM,
     modelViewMatrix: new THREE.Uniform(new THREE.Matrix4()),
     totalAlpha: new THREE.Uniform(1)
   };
-  if (hasTexture){
+  if (objectGroup.hasTexture){
     uniforms.totalTextureOffset = new THREE.Uniform(new THREE.Vector2(0, 0));
   }
-  if (aoTexture){
-    uniforms.aoMap = this.getTextureUniform(aoTexture);
+  if (objectGroup.hasAOMap()){
     uniforms.totalAOIntensity = new THREE.Uniform(1);
   }
-  if (emissiveTexture){
-    uniforms.emissiveMap = this.getTextureUniform(emissiveTexture);
+  if (objectGroup.hasEmissiveMap()){
     uniforms.totalEmissiveColor = new THREE.Uniform(new THREE.Color("white"));
     uniforms.totalEmissiveIntensity = new THREE.Uniform(1);
   }
-  if (diffuseTexture){
-    uniforms.diffuseMap = this.getTextureUniform(diffuseTexture);
-  }
-  if (alphaTexture){
-    uniforms.alphaMap = this.getTextureUniform(alphaTexture);
-  }
-  if (displacementTexture && VERTEX_SHADER_TEXTURE_FETCH_SUPPORTED){
-    uniforms.displacementMap = this.getTextureUniform(displacementTexture);
+  if (objectGroup.hasDisplacementMap() && VERTEX_SHADER_TEXTURE_FETCH_SUPPORTED){
     uniforms.totalDisplacementInfo = new THREE.Uniform(new THREE.Vector2(1, 1));
   }
   var material = new THREE.RawShaderMaterial({

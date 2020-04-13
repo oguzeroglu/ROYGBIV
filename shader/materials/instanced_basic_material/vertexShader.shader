@@ -1,7 +1,14 @@
 precision lowp float;
 precision lowp int;
 
-attribute vec3 color;
+#define INSERTION
+
+#ifdef COMPRESSION_MACRO_COLOR_X
+  vec3 color = vec3(float(COMPRESSION_MACRO_COLOR_X), float(COMPRESSION_MACRO_COLOR_Y), float(COMPRESSION_MACRO_COLOR_Z));
+#else
+  attribute vec3 color;
+#endif
+
 attribute vec3 position;
 attribute vec3 normal;
 
@@ -10,8 +17,6 @@ uniform mat4 projectionMatrix;
 
 varying vec3 vColor;
 varying float vAlpha;
-
-#define INSERTION
 
 #ifdef IS_AUTO_INSTANCED
   attribute float orientationIndex;
@@ -34,52 +39,120 @@ varying float vAlpha;
   #endif
 #else
   attribute vec3 positionOffset;
-  attribute vec4 quaternion;
-  attribute float alpha;
+  #ifdef COMPRESSION_MACRO_QUATERNION_X
+    vec4 quaternion = vec4(float(COMPRESSION_MACRO_QUATERNION_X), float(COMPRESSION_MACRO_QUATERNION_Y), float(COMPRESSION_MACRO_QUATERNION_Z), float(COMPRESSION_MACRO_QUATERNION_W));
+  #else
+    attribute vec4 quaternion;
+  #endif
+
+  #ifdef COMPRESSION_MACRO_ALPHA
+    float alpha = float(COMPRESSION_MACRO_ALPHA);
+  #else
+    attribute float alpha;
+  #endif
 #endif
 
 #ifdef HAS_EMISSIVE
-  attribute float emissiveIntensity;
-  attribute vec3 emissiveColor;
+  #ifdef COMPRESSION_MACRO_EMISSIVEINTENSITY
+    float emissiveIntensity = float(COMPRESSION_MACRO_EMISSIVEINTENSITY);
+  #else
+    attribute float emissiveIntensity;
+  #endif
+
+  #ifdef COMPRESSION_MACRO_EMISSIVECOLOR_X
+    vec3 emissiveColor = vec3(float(COMPRESSION_MACRO_EMISSIVECOLOR_X), float(COMPRESSION_MACRO_EMISSIVECOLOR_Y), float(COMPRESSION_MACRO_EMISSIVECOLOR_Z));
+  #else
+    attribute vec3 emissiveColor;
+  #endif
+
   varying float vEmissiveIntensity;
   varying vec3 vEmissiveColor;
 #endif
 #ifdef HAS_AO
-  attribute float aoIntensity;
+  #ifdef COMPRESSION_MACRO_AOINTENSITY
+    float aoIntensity = float(COMPRESSION_MACRO_AOINTENSITY);
+  #else
+    attribute float aoIntensity;
+  #endif
   varying float vAOIntensity;
 #endif
 #ifdef HAS_TEXTURE
   attribute vec2 uv;
-  attribute vec4 textureInfo;
-  attribute vec4 textureMatrixInfo;
+  #ifdef COMPRESSION_MACRO_TEXTUREINFO_X
+    vec4 textureInfo = vec4(float(COMPRESSION_MACRO_TEXTUREINFO_X), float(COMPRESSION_MACRO_TEXTUREINFO_Y), float(COMPRESSION_MACRO_TEXTUREINFO_Z), float(COMPRESSION_MACRO_TEXTUREINFO_W));
+  #else
+    attribute vec4 textureInfo;
+  #endif
+
+  #ifdef COMPRESSION_MACRO_TEXTUREMATRIXINFO_X
+    vec4 textureMatrixInfo = vec4(float(COMPRESSION_MACRO_TEXTUREMATRIXINFO_X), float(COMPRESSION_MACRO_TEXTUREMATRIXINFO_Y), float(COMPRESSION_MACRO_TEXTUREMATRIXINFO_Z), float(COMPRESSION_MACRO_TEXTUREMATRIXINFO_W));
+  #else
+    attribute vec4 textureMatrixInfo;
+  #endif
+
   uniform vec2 totalTextureOffset;
   varying vec2 vUV;
   #ifdef HAS_DIFFUSE
     varying float hasDiffuseMap;
-    attribute vec4 diffuseUV;
+
+    #ifdef COMPRESSION_MACRO_DIFFUSEUV_X
+      vec4 diffuseUV = vec4(float(COMPRESSION_MACRO_DIFFUSEUV_X), float(COMPRESSION_MACRO_DIFFUSEUV_Y), float(COMPRESSION_MACRO_DIFFUSEUV_Z), float(COMPRESSION_MACRO_DIFFUSEUV_W));
+    #else
+      attribute vec4 diffuseUV;
+    #endif
+
     varying vec4 vDiffuseUV;
   #endif
   #ifdef HAS_EMISSIVE
     varying float hasEmissiveMap;
-    attribute vec4 emissiveUV;
+
+    #ifdef COMPRESSION_MACRO_EMISSIVEUV_X
+      vec4 emissiveUV = vec4(float(COMPRESSION_MACRO_EMISSIVEUV_X), float(COMPRESSION_MACRO_EMISSIVEUV_Y), float(COMPRESSION_MACRO_EMISSIVEUV_Z), float(COMPRESSION_MACRO_EMISSIVEUV_W));
+    #else
+      attribute vec4 emissiveUV;
+    #endif
+
     varying vec4 vEmissiveUV;
   #endif
   #ifdef HAS_ALPHA
     varying float hasAlphaMap;
-    attribute vec4 alphaUV;
+
+    #ifdef COMPRESSION_MACRO_ALPHAUV_X
+      vec4 alphaUV = vec4(float(COMPRESSION_MACRO_ALPHAUV_X), float(COMPRESSION_MACRO_ALPHAUV_Y), float(COMPRESSION_MACRO_ALPHAUV_Z), float(COMPRESSION_MACRO_ALPHAUV_W));
+    #else
+      attribute vec4 alphaUV;
+    #endif
+
     varying vec4 vAlphaUV;
   #endif
   #ifdef HAS_AO
     varying float hasAOMap;
-    attribute vec4 aoUV;
+    #ifdef COMPRESSION_MACRO_AOUV_X
+      vec4 aoUV = vec4(float(COMPRESSION_MACRO_AOUV_X), float(COMPRESSION_MACRO_AOUV_Y), float(COMPRESSION_MACRO_AOUV_Z), float(COMPRESSION_MACRO_AOUV_W));
+    #else
+      attribute vec4 aoUV;
+    #endif
+
     varying vec4 vAOUV;
   #endif
 #endif
 #ifdef HAS_DISPLACEMENT
-  attribute vec2 displacementInfo;
+
+  #ifdef COMPRESSION_MACRO_DISPLACEMENTINFO_X
+    vec2 displacementInfo = vec2(float(COMPRESSION_MACRO_DISPLACEMENTINFO_X), float(COMPRESSION_MACRO_DISPLACEMENTINFO_Y));
+  #else
+    attribute vec2 displacementInfo;
+  #endif
+
   uniform sampler2D texture;
   uniform vec2 totalDisplacementInfo;
-  attribute vec4 displacementUV;
+
+  #ifdef COMPRESSION_MACRO_DISPLACEMENTUV_X
+    vec4 displacementUV = vec4(float(COMPRESSION_MACRO_DISPLACEMENTUV_X), float(COMPRESSION_MACRO_DISPLACEMENTUV_Y), float(COMPRESSION_MACRO_DISPLACEMENTUV_Z), float(COMPRESSION_MACRO_DISPLACEMENTUV_W));
+  #else
+    attribute vec4 displacementUV;
+  #endif
+
   vec2 calculatedDisplacementUV;
 #endif
 #if defined(HAS_SKYBOX_FOG) || defined(AFFECTED_BY_LIGHT)
@@ -811,46 +884,6 @@ vec3 applyQuaternionToVector(vec3 vector, vec4 quaternion){
   vec2 uvAffineTransformation(vec2 original, float startU, float startV, float endU, float endV) {
     float coordX = (original.x * (endU - startU) + startU);
     float coordY = (original.y * (startV - endV) + endV);
-
-    if (coordX > endU){
-      for (float i = 0.0; i<5000.0; i += 0.0001){
-        float diff = coordX - endU;
-        coordX = startU + diff;
-        if (coordX <= endU){
-          break;
-        }
-      }
-    }
-
-    if (coordX < startU){
-      for (float i = 0.0; i<5000.0; i += 0.0001){
-        float diff = startU - coordX;
-        coordX = endU - diff;
-        if (coordX >= startU){
-          break;
-        }
-      }
-    }
-
-    if (coordY > startV){
-      for (float i = 0.0; i<5000.0; i += 0.0001){
-        float diff = coordY - startV;
-        coordY = endV + diff;
-        if (coordY <= startV){
-          break;
-        }
-      }
-    }
-
-    if (coordY < endV){
-      for (float i = 0.0; i<5000.0; i += 0.0001){
-        float diff = endV - coordY;
-        coordY = startV - diff;
-        if (coordY >= endV){
-          break;
-        }
-      }
-    }
 
     return vec2(coordX, coordY);
   }
