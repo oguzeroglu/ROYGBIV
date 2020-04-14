@@ -112,6 +112,7 @@ AutoInstancedObject.prototype.init = function(){
   var pseudoGraphicsGroup = new THREE.Object3D();
   pseudoGraphicsGroup.position.set(0, 0, 0);
   this.mesh = meshGenerator.generateInstancedMesh(pseudoGraphicsGroup, this.pseudoObjectGroup);
+
   this.mesh.geometry.removeAttribute("positionOffset");
   this.mesh.geometry.removeAttribute("quaternion");
   this.mesh.geometry.removeAttribute("alpha");
@@ -256,6 +257,19 @@ AutoInstancedObject.prototype.init = function(){
     }
     break;
   }
+
+  this.compressGeometry();
+}
+
+AutoInstancedObject.prototype.compressGeometry = function(){
+  var compressableAttributes = [
+    "quaternion", "alpha" , "color", "textureInfo", "textureMatrixInfo",
+    "diffuseUV", "emissiveIntensity", "emissiveColor", "emissiveUV",
+    "aoIntensity", "aoUV", "displacementInfo", "displacementUV", "alphaUV",
+    "affectedByLight"
+  ];
+
+  macroHandler.compressAttributes(this.mesh, compressableAttributes);
 }
 
 AutoInstancedObject.prototype.setFog = function(){

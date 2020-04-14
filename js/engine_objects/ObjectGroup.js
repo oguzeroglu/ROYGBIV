@@ -807,82 +807,15 @@ ObjectGroup.prototype.isAttributeRepeating = function(attribute){
   return true;
 }
 
-ObjectGroup.prototype.generateCompressionMacros = function(){
-  var attributes = this.geometry.attributes;
-
+ObjectGroup.prototype.compressGeometry = function(){
   var compressableAttributes = [
     "quaternion", "alpha" , "color", "textureInfo", "textureMatrixInfo",
     "diffuseUV", "emissiveIntensity", "emissiveColor", "emissiveUV",
-    "aoIntensity", "aoUV", "displacementInfo", "displacementUV", "alphaUV"
+    "aoIntensity", "aoUV", "displacementInfo", "displacementUV", "alphaUV",
+    "affectedByLight"
   ];
 
-  this.compressionMacros = [];
-
-  for (var i = 0; i < compressableAttributes.length; i ++){
-    var attrKey = compressableAttributes[i];
-    if (attributes[attrKey] && this.isAttributeRepeating(attributes[attrKey])){
-      var attr = attributes[attrKey];
-      var upper = "COMPRESSION_MACRO_" + attrKey.toUpperCase();
-      if (attr.itemSize == 1){
-        this.compressionMacros.push(upper + " " + attr.array[0]);
-      }else if (attr.itemSize == 2){
-        this.compressionMacros.push(upper + "_X " + attr.array[0]);
-        this.compressionMacros.push(upper + "_Y " + attr.array[1]);
-      }else if (attr.itemSize == 3){
-        this.compressionMacros.push(upper + "_X " + attr.array[0]);
-        this.compressionMacros.push(upper + "_Y " + attr.array[1]);
-        this.compressionMacros.push(upper + "_Z " + attr.array[2]);
-      }else if (attr.itemSize == 4){
-        this.compressionMacros.push(upper + "_X " + attr.array[0]);
-        this.compressionMacros.push(upper + "_Y " + attr.array[1]);
-        this.compressionMacros.push(upper + "_Z " + attr.array[2]);
-        this.compressionMacros.push(upper + "_W " + attr.array[3]);
-      }
-      this.geometry.removeAttribute(attrKey);
-    }
-  }
-
-  var retryAttributes = [
-    "textureMatrixInfo", "diffuseUV", "emissiveUV", "aoUV", "displacementUV", "alphaUV"
-  ];
-
-  for (var x = 0; x < retryAttributes.length; x ++){
-    var attrKey = retryAttributes[x];
-    if (attributes[attrKey]){
-      var nonZero = 0;
-      var ary = attributes[attrKey].array;
-      for (var i = 0; i < ary.length; i += attributes[attrKey].itemSize){
-        if (ary[i] == 0 && ary[i + 1] == 0 && ary[i + 2] == 0 && ary[i + 3] == 0){
-          continue;
-        }
-        if (!nonZero){
-          nonZero = new THREE.Vector4(ary[i], ary[i + 1], ary[i + 2], ary[i + 3]);
-          break;
-        }
-      }
-      if (!nonZero){
-        continue;
-      }
-      var compressable = true;
-      for (var i = 0; i < ary.length; i += attributes[attrKey].itemSize){
-        if (ary[i] == 0 && ary[i + 1] == 0 && ary[i + 2] == 0 && ary[i + 3] == 0){
-          continue;
-        }
-        if (ary[i] != nonZero.x || ary[i + 1] != nonZero.y || ary[i + 2] != nonZero.z || ary[i + 3] != nonZero.w){
-          compressable = false;
-          break;
-        }
-      }
-      if (compressable){
-        var upper = attrKey.toUpperCase();
-        this.compressionMacros.push("COMPRESSION_MACRO_" + upper + "_X " + nonZero.x);
-        this.compressionMacros.push("COMPRESSION_MACRO_" + upper + "_Y " + nonZero.y);
-        this.compressionMacros.push("COMPRESSION_MACRO_" + upper + "_Z " + nonZero.z);
-        this.compressionMacros.push("COMPRESSION_MACRO_" + upper + "_W " + nonZero.w);
-        this.geometry.removeAttribute(attrKey);
-      }
-    }
-  }
+  macroHandler.compressAttributes(this.mesh, compressableAttributes);
 }
 
 ObjectGroup.prototype.mergeInstanced = function(){
@@ -1129,8 +1062,6 @@ ObjectGroup.prototype.mergeInstanced = function(){
   this.geometry.addAttribute("position", refGeometry.attributes.position);
 
   this.geometry.addAttribute("normal", refGeometry.attributes.normal);
-
-  this.generateCompressionMacros();
 }
 
 ObjectGroup.prototype.merge = function(){
@@ -1975,6 +1906,9 @@ ObjectGroup.prototype.glue = function(simplifiedChildrenPhysicsBodies){
     this.mesh = meshGenerator.generateInstancedMesh(graphicsGroup, this);
     this.mesh.frustumCulled = false;
   }
+
+  this.compressGeometry();
+
   webglCallbackHandler.registerEngineObject(this);
   if (this.hasAO){
     macroHandler.injectMacro("HAS_AO", this.mesh.material, true, true);
@@ -1994,12 +1928,6 @@ ObjectGroup.prototype.glue = function(simplifiedChildrenPhysicsBodies){
   if (this.hasTexture){
     macroHandler.injectMacro("HAS_TEXTURE", this.mesh.material, true, true);
     macroHandler.injectMacro("TEXTURE_SIZE " + ACCEPTED_TEXTURE_SIZE, this.mesh.material, true, true);
-  }
-
-  if (this.compressionMacros){
-    for (var i = 0; i < this.compressionMacros.length; i ++){
-      macroHandler.injectMacro(this.compressionMacros[i], this.mesh.material, true, false);
-    }
   }
 
   this.mesh.objectGroupName = this.name;
