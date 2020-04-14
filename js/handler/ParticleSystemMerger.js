@@ -221,8 +221,17 @@ var ParticleSystemMerger = function(psObj, name){
 
   this.material = this.mesh.material;
 
+  this.compressGeometry();
+
   this.clean();
   webglCallbackHandler.registerEngineObject(this);
+}
+
+ParticleSystemMerger.prototype.compressGeometry = function(){
+  macroHandler.compressAttributes(this.mesh, [
+    "position", "velocity", "acceleration", "flags1", "flags3", "flags4", "angularQuaternion",
+    "rgbThreshold", "uvCoordinates", "targetColor"
+  ]);
 }
 
 ParticleSystemMerger.prototype.removeFog = function(){

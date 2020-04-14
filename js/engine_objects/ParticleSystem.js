@@ -31,8 +31,18 @@ var ParticleSystem = function(copyPS, name, particles, x, y, z, vx, vy, vz, ax, 
     return this;
   }
   this.mesh = particleSystemGenerator.generateParticleSystemMesh(this);
+
+  this.compressGeometry();
+
   scene.add(this.mesh);
   webglCallbackHandler.registerEngineObject(this);
+}
+
+ParticleSystem.prototype.compressGeometry = function(){
+  macroHandler.compressAttributes(this.mesh, [
+    "position", "velocity", "acceleration", "flags1", "flags3", "flags4", "angularQuaternion",
+    "rgbThreshold", "uvCoordinates", "targetColor" 
+  ]);
 }
 
 ParticleSystem.prototype.removeFog = function(){
