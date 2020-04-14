@@ -23,7 +23,36 @@ varying vec3 vColor;
 
 #ifdef HAS_DISPLACEMENT
   attribute vec2 displacementInfo;
-  uniform sampler2D displacementMap;
+  uniform sampler2D texture;
+  #ifdef DISPLACEMENT_START_U
+    vec4 displacementUVs = vec4(float(DISPLACEMENT_START_U), float(DISPLACEMENT_START_V), float(DISPLACEMENT_END_U), float(DISPLACEMENT_END_V));
+  #else
+    attribute vec4 displacementUVs;
+  #endif
+#endif
+#ifdef HAS_DIFFUSE
+  varying vec4 vDiffuseUV;
+  #ifdef DIFFUSE_START_U
+    vec4 diffuseUVs = vec4(float(DIFFUSE_START_U), float(DIFFUSE_START_V), float(DIFFUSE_END_U), float(DIFFUSE_END_V));
+  #else
+    attribute vec4 diffuseUVs;
+  #endif
+#endif
+#ifdef HAS_EMISSIVE
+  varying vec4 vEmissiveUV;
+  #ifdef EMISSIVE_START_U
+    vec4 emissiveUVs = vec4(float(EMISSIVE_START_U), float(EMISSIVE_START_V), float(EMISSIVE_END_U), float(EMISSIVE_END_V));
+  #else
+    attribute vec4 emissiveUVs;
+  #endif
+#endif
+#ifdef HAS_ALPHA
+  varying vec4 vAlphaUV;
+  #ifdef ALPHA_START_U
+    vec4 alphaUVs = vec4(float(ALPHA_START_U), float(ALPHA_START_V), float(ALPHA_END_U), float(ALPHA_END_V));
+  #else
+    attribute vec4 alphaUVs;
+  #endif
 #endif
 #ifdef HAS_TEXTURE
   attribute vec2 faceVertexUV;
@@ -756,7 +785,51 @@ vec3 applyQuaternionToVector(vec3 vector, vec4 quaternion){
   return vec3(calculatedX, calculatedY, calculatedZ);
 }
 
+#ifdef HAS_TEXTURE
+  vec2 uvAffineTransformation(vec2 original, float startU, float startV, float endU, float endV) {
+    float coordX = (original.x * (endU - startU) + startU);
+    float coordY = (original.y * (startV - endV) + endV);
+
+    if (coordX > endU){
+      coordX = endU - mod((coordX - endU), (endU - startU));
+    }
+
+    if (coordX < startU){
+      coordX = startU + mod((startU - coordX), (endU - startU));
+    }
+
+    if (coordY > startV){
+      coordY = startV - mod((coordY - startV), (startV - endV));
+    }
+
+    if (coordY < endV){
+      coordY = endV + mod((endV - coordY), (startV - endV));
+    }
+
+    return vec2(coordX, coordY);
+  }
+
+  vec4 fixTextureBleeding(vec4 uvCoordinates){
+    float offset = 0.5 / float(TEXTURE_SIZE);
+    return vec4(uvCoordinates[0] + offset, uvCoordinates[1] - offset, uvCoordinates[2] - offset, uvCoordinates[3] + offset);
+  }
+#endif
+
+void handleFragmentTextureUVs(){
+  #ifdef HAS_DIFFUSE
+    vDiffuseUV = diffuseUVs;
+  #endif
+  #ifdef HAS_EMISSIVE
+    vEmissiveUV = emissiveUVs;
+  #endif
+  #ifdef HAS_ALPHA
+    vAlphaUV = alphaUVs;
+  #endif
+}
+
 void main(){
+
+  handleFragmentTextureUVs();
 
   vDiscardFlag = -10.0;
   #ifdef HAS_TEXTURE
@@ -802,7 +875,8 @@ void main(){
     #ifdef HAS_DISPLACEMENT
       if (displacementInfo.x > -60.0 && displacementInfo.y > -60.0){
         vec3 objNormal = normalize(normal);
-        transformedPosition += objNormal * (texture2D(displacementMap, vFaceVertexUV).r * displacementInfo.x + displacementInfo.y);
+        vec4 displacementUVsFixed = fixTextureBleeding(displacementUVs);
+        transformedPosition += objNormal * (texture2D(texture, uvAffineTransformation(vFaceVertexUV, displacementUVsFixed.x, displacementUVsFixed.y, displacementUVsFixed.z, displacementUVsFixed.w)).r * displacementInfo.x + displacementInfo.y);
       }
     #endif
     vec3 rotatedPos = applyQuaternionToVector(transformedPosition, quat);

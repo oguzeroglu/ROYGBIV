@@ -13,17 +13,18 @@ uniform float alpha;
 #ifdef HAS_TEXTURE
   varying vec2 vFaceVertexUV;
   varying vec3 vTextureFlags;
+  uniform sampler2D texture;
 #endif
 #ifdef HAS_EMISSIVE
   varying vec3 vEmissiveColor;
   varying float vEmissiveIntensity;
-  uniform sampler2D emissiveMap;
+  varying vec4 vEmissiveUV;
 #endif
 #ifdef HAS_DIFFUSE
-  uniform sampler2D diffuseMap;
+  varying vec4 vDiffuseUV;
 #endif
 #ifdef HAS_ALPHA
-  uniform sampler2D alphaMap;
+  varying vec4 vAlphaUV;
 #endif
 #ifdef HAS_SKYBOX_FOG
   varying vec3 vWorldPosition;
@@ -32,6 +33,36 @@ uniform float alpha;
 #endif
 #ifdef HAS_FOG
   uniform vec4 fogInfo;
+#endif
+
+#ifdef HAS_TEXTURE
+  vec2 uvAffineTransformation(vec2 original, float startU, float startV, float endU, float endV) {
+    float coordX = (original.x * (endU - startU) + startU);
+    float coordY = (original.y * (startV - endV) + endV);
+
+    if (coordX > endU){
+      coordX = endU - mod((coordX - endU), (endU - startU));
+    }
+
+    if (coordX < startU){
+      coordX = startU + mod((startU - coordX), (endU - startU));
+    }
+
+    if (coordY > startV){
+      coordY = startV - mod((coordY - startV), (startV - endV));
+    }
+
+    if (coordY < endV){
+      coordY = endV + mod((endV - coordY), (startV - endV));
+    }
+
+    return vec2(coordX, coordY);
+  }
+
+  vec4 fixTextureBleeding(vec4 uvCoordinates){
+    float offset = 0.5 / float(TEXTURE_SIZE);
+    return vec4(uvCoordinates[0] + offset, uvCoordinates[1] - offset, uvCoordinates[2] - offset, uvCoordinates[3] + offset);
+  }
 #endif
 
 void main(){
@@ -46,13 +77,15 @@ void main(){
     float hasAlpha    = vTextureFlags[2];
     #ifdef HAS_DIFFUSE
       if (hasDiffuse > 0.0){
-        diffuseColor = texture2D(diffuseMap, vFaceVertexUV);
+        vec4 diffuseUVsFixed = fixTextureBleeding(vDiffuseUV);
+        diffuseColor = texture2D(texture, uvAffineTransformation(vFaceVertexUV, diffuseUVsFixed.x, diffuseUVsFixed.y, diffuseUVsFixed.z, diffuseUVsFixed.w));
       }
     #endif
     gl_FragColor = vec4(vColor, alpha) * diffuseColor;
     #ifdef HAS_ALPHA
       if (hasAlpha > 0.0){
-        float val = texture2D(alphaMap, vFaceVertexUV).g;
+        vec4 alphaUVsFixed = fixTextureBleeding(vAlphaUV);
+        float val = texture2D(texture, uvAffineTransformation(vFaceVertexUV, alphaUVsFixed.x, alphaUVsFixed.y, alphaUVsFixed.z, alphaUVsFixed.w)).g;
         gl_FragColor.a *= val;
         if (val <= ALPHA_TEST){
           discard;
@@ -61,7 +94,8 @@ void main(){
     #endif
     #ifdef HAS_EMISSIVE
       if (hasEmissive > 0.0){
-        vec4 eColor = texture2D(emissiveMap, vFaceVertexUV);
+        vec4 emissiveUVsFixed = fixTextureBleeding(vEmissiveUV);
+        vec4 eColor = texture2D(texture, uvAffineTransformation(vFaceVertexUV, emissiveUVsFixed.x, emissiveUVsFixed.y, emissiveUVsFixed.z, emissiveUVsFixed.w));
         vec3 totalEmissiveRadiance = vec3(vEmissiveIntensity, vEmissiveIntensity, vEmissiveIntensity) * vEmissiveColor;
         totalEmissiveRadiance *= eColor.rgb;
         gl_FragColor.rgb += totalEmissiveRadiance;

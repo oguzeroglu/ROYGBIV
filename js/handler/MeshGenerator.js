@@ -3,15 +3,6 @@ var MeshGenerator = function(geometry, material){
   this.material = material;
 }
 
-MeshGenerator.prototype.getTextureUniform = function(texture){
-  if (textureUniformCache[texture.uuid]){
-    return textureUniformCache[texture.uuid];
-  }
-  var uniform = new THREE.Uniform(texture);
-  textureUniformCache[texture.uuid] = uniform;
-  return uniform;
-}
-
 MeshGenerator.prototype.generateMesh = function(){
   if (this.material instanceof BasicMaterial){
     return this.generateBasicMesh();
@@ -52,23 +43,20 @@ MeshGenerator.prototype.generateObjectTrail = function(
     material.uniforms.fogInfo = GLOBAL_FOG_UNIFORM;
     macroHandler.injectMacro("HAS_FOG", material, false, true);
   }
-  if (trail.diffuseTexture){
-    material.uniforms.diffuseMap = this.getTextureUniform(trail.diffuseTexture);
-    macroHandler.injectMacro("HAS_DIFFUSE", material, false, true);
+  if (trail.object.hasDiffuseMap()){
+    macroHandler.injectMacro("HAS_DIFFUSE", material, true, true);
   }
-  if (trail.emissiveTexture){
-    material.uniforms.emissiveMap = this.getTextureUniform(trail.emissiveTexture);
+  if (trail.object.hasEmissiveMap()){
     macroHandler.injectMacro("HAS_EMISSIVE", material, true, true);
   }
-  if (trail.displacementTexture && VERTEX_SHADER_TEXTURE_FETCH_SUPPORTED){
-    material.uniforms.displacementMap = this.getTextureUniform(trail.displacementTexture);
+  if (trail.object.hasDisplacementMap() && VERTEX_SHADER_TEXTURE_FETCH_SUPPORTED){
     macroHandler.injectMacro("HAS_DISPLACEMENT", material, true, false);
   }
-  if (trail.alphaTexture){
-    material.uniforms.alphaMap = this.getTextureUniform(trail.alphaTexture);
-    macroHandler.injectMacro("HAS_ALPHA", material, false, true);
+  if (trail.object.hasAlphaMap()){
+    macroHandler.injectMacro("HAS_ALPHA", material, true, true);
   }
-  if (trail.hasTexture){
+  if (trail.hasTexture()){
+    material.uniforms.texture = textureAtlasHandler.getTextureUniform();
     macroHandler.injectMacro("HAS_TEXTURE", material, true, true);
   }
   return mesh;
