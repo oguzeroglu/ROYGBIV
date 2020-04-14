@@ -447,6 +447,8 @@ var ObjectTrail = function(configurations){
     posit, quat, objectCoordinates, objectQuaternions
   );
 
+  this.compressGeometry();
+
   if (this.hasTexture()){
     macroHandler.injectMacro("TEXTURE_SIZE " + ACCEPTED_TEXTURE_SIZE, this.mesh.material, true, true);
   }
@@ -582,4 +584,15 @@ ObjectTrail.prototype.destroy = function(){
     this.mesh = 0;
     this.destroyed = true;
   }
+}
+
+ObjectTrail.prototype.compressGeometry = function(){
+  var compressableAttributes = [
+    "emissiveIntensity", "emissiveColor", "emissiveUVs",
+    "color", "displacementInfo", "displacementUVs",
+    "diffuseUVs", "emissiveUVs", "alphaUVs", "textureFlags",
+    "textureMatrixInfo"
+  ];
+
+  macroHandler.compressAttributes(this.mesh, compressableAttributes);
 }
