@@ -257,7 +257,7 @@ var frustum = new THREE.Frustum();
 var SIDE_BOTH = "Both";
 var SIDE_FRONT = "Front";
 var SIDE_BACK = "Back";
-var textureUniformCache = new Object();
+var textureUniformCache = new Object(); // after global texture atlas implementation, this only has dynamic texture uniforms
 var screenResolution = 1;
 var useOriginalResolution = false;
 var rayCaster;

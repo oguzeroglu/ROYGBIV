@@ -1199,15 +1199,6 @@ AddedObject.prototype.setAttachedProperties = function(){
   this.textureOffsetYWhenAttached = this.getTextureOffsetY();
 }
 
-AddedObject.prototype.getTextureUniform = function(texture){
-  if (textureUniformCache[texture.uuid]){
-    return textureUniformCache[texture.uuid];
-  }
-  var uniform = new THREE.Uniform(texture);
-  textureUniformCache[texture.uuid] = uniform;
-  return uniform;
-}
-
 AddedObject.prototype.hasEmissiveMap = function(){
   return !!this.tpInfo.emissive;
 }
