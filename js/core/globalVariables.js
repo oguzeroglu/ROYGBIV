@@ -376,6 +376,7 @@ var endpointInverses = {
   "-y": "+y",
   "-z": "+z"
 };
+var DEFAULT_UV_RANGE = {startU: 0, startV: 1, endU: 1, endV: 0};
 var activeMuzzleFlashes = new Map();
 var activeLightnings = new Map();
 var delayedExecutionHandler;

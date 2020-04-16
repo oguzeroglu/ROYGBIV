@@ -450,14 +450,29 @@ Sprite.prototype.setRotation = function(angleInDegrees){
   }
 }
 
+Sprite.prototype.getTextureUniform = function(texture){
+  if (textureUniformCache[texture.uuid]){
+    return textureUniformCache[texture.uuid];
+  }
+  var uniform = new THREE.Uniform(texture);
+  textureUniformCache[texture.uuid] = uniform;
+  return uniform;
+}
+
 Sprite.prototype.mapTexture = function(texturePack){
   if (!this.isTextured){
     macroHandler.injectMacro("HAS_TEXTURE", this.mesh.material, true, true);
     macroHandler.injectMacro("TEXTURE_SIZE " + ACCEPTED_TEXTURE_SIZE, this.mesh.material, false, true);
     this.mesh.material.needsUpdate = true;
   }
-  this.mesh.material.uniforms.texture = textureAtlasHandler.getTextureUniform();
-  var ranges = textureAtlasHandler.getRangesForTexturePack(texturePack, "diffuse");
+  var ranges;
+  if (!texturePack.isDynamic){
+    ranges = textureAtlasHandler.getRangesForTexturePack(texturePack, "diffuse");
+    this.mesh.material.uniforms.texture = textureAtlasHandler.getTextureUniform();
+  }else{
+    ranges = DEFAULT_UV_RANGE;
+    this.mesh.material.uniforms.texture = this.getTextureUniform(texturePack.diffuseTexture);
+  }
   if (this.mesh.material.uniforms.uvRanges){
     this.mesh.material.uniforms.uvRanges.value.set(ranges.startU, ranges.startV, ranges.endU, ranges.endV);
   }else{
