@@ -104,6 +104,26 @@ TexturePack.prototype.loadTextures = function(forcePNG, onLoaded){
     this.loadAtlas(onLoaded);
     return;
   }
+  if (isDeployment){
+    var mock = {};
+    if (this.hasDiffuse){
+      this.diffuseTexture = mock;
+    }
+    if (this.hasAlpha){
+      this.alphaTexture = mock;
+    }
+    if (this.hasAO){
+      this.aoTexture = mock;
+    }
+    if (this.hasEmissive){
+      this.emissiveTexture = mock;
+    }
+    if (this.hasHeight){
+      this.heightTexture = mock;
+    }
+    onLoaded();
+    return;
+  }
   this.totalLoadedCount = 0;
   var postfix = forcePNG? ".png": textureLoaderFactory.getFilePostfix();
   var diffuseFilePath = texturePackRootDirectory+this.directoryName+"/diffuse"+postfix;

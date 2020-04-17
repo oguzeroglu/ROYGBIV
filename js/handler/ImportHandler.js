@@ -758,13 +758,13 @@ ImportHandler.prototype.importTexturePacks = function(obj, callback, skipMapping
   for (var texturePackName in texturePacksExport){
     var curTexturePackExport = texturePacksExport[texturePackName];
     var texturePack = new TexturePack(texturePackName, curTexturePackExport.directoryName, curTexturePackExport.textureDescription);
+    texturePacks[texturePackName] = texturePack;
     texturePack.loadTextures(true, function(){
       if (!skipMapping){
         texturePacksToMap.push(texturePacks[this.texturePackName]);
       }
       callback(texturePacksToMap);
     }.bind({texturePackName: texturePackName, mapLoadedTexturePack: this.mapLoadedTexturePack}));
-    texturePacks[texturePackName] = texturePack;
   }
 }
 
