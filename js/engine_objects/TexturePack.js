@@ -105,21 +105,20 @@ TexturePack.prototype.loadTextures = function(forcePNG, onLoaded){
     return;
   }
   if (isDeployment){
-    var mock = {};
     if (this.hasDiffuse){
-      this.diffuseTexture = mock;
+      this.diffuseTexture = DUMMY_TEXTURE;
     }
     if (this.hasAlpha){
-      this.alphaTexture = mock;
+      this.alphaTexture = DUMMY_TEXTURE;
     }
     if (this.hasAO){
-      this.aoTexture = mock;
+      this.aoTexture = DUMMY_TEXTURE;
     }
     if (this.hasEmissive){
-      this.emissiveTexture = mock;
+      this.emissiveTexture = DUMMY_TEXTURE;
     }
     if (this.hasHeight){
-      this.heightTexture = mock;
+      this.heightTexture = DUMMY_TEXTURE;
     }
     onLoaded();
     return;

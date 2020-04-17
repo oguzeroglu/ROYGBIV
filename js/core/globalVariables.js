@@ -403,6 +403,7 @@ var dynamicallyLoadedTextures = new Object();
 var protocolDefinitionFileName = 0;
 var serverWSURL = 0;
 var objectExportImportHandler;
+var DUMMY_TEXTURE = new THREE.Texture();
 
 // LIGHTING LIMITS
 var MAX_STATIC_DIFFUSE_LIGHT_COUNT = 5;
