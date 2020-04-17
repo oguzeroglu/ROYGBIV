@@ -2,7 +2,7 @@ var Crosshair = function(configurations){
   this.isCrosshair = true;
   this.configurations = JSON.parse(JSON.stringify(configurations));
   var name = configurations.name;
-  var texture = texturePacks[configurations.texture].diffuseTexture;
+  var texturePack = texturePacks[configurations.texture];
   var colorR = configurations.colorR;
   var colorB = configurations.colorB;
   var colorG = configurations.colorG;
@@ -12,7 +12,8 @@ var Crosshair = function(configurations){
   this.maxWidthPercent = configurations.maxWidthPercent;
   this.maxHeightPercent = configurations.maxHeightPercent;
 
-  this.texture = texture;
+  this.texture = new THREE.Texture();
+  this.texturePack = texturePack;
   this.name = name;
   this.sizeAmount = size;
 
@@ -26,16 +27,19 @@ var Crosshair = function(configurations){
   this.geometry.addAttribute("size", this.sizeBufferAttribute);
   this.geometry.setDrawRange(0, 1);
 
+  var ranges = textureAtlasHandler.getRangesForTexturePack(this.texturePack, "diffuse");
+
   this.material = new THREE.RawShaderMaterial({
     vertexShader: ShaderContent.crossHairVertexShader,
     fragmentShader: ShaderContent.crossHairFragmentShader,
     transparent: true,
     side: THREE.DoubleSide,
     uniforms: {
-      texture: new THREE.Uniform(texture),
+      texture: textureAtlasHandler.getTextureUniform(),
       color: new THREE.Uniform(new THREE.Vector4(colorR, colorG, colorB, alpha)),
       uvTransform: new THREE.Uniform(new THREE.Matrix3()),
       expandInfo: new THREE.Uniform(new THREE.Vector4(0, 0, 0, 0)),
+      uvRanges: new THREE.Uniform(new THREE.Vector4(ranges.startU, ranges.startV, ranges.endU, ranges.endV)),
       shrinkStartSize: new THREE.Uniform(size),
       screenResolution: GLOBAL_SCREEN_RESOLUTION_UNIFORM
     }
@@ -49,6 +53,9 @@ var Crosshair = function(configurations){
     this.mesh.material.uniforms.sizeScale = new THREE.Uniform(1);
     macroHandler.injectMacro("HAS_SIZE_SCALE", this.material, true, false);
   }
+
+  macroHandler.injectMacro("TEXTURE_SIZE " + ACCEPTED_TEXTURE_SIZE, this.material, false, true);
+
   scene.add(this.mesh);
   this.texture.center.set(0.5, 0.5);
   this.angularSpeed = 0;
@@ -112,6 +119,7 @@ Crosshair.prototype.resetRotation = function(){
 Crosshair.prototype.destroy = function(destroyMesh){
   this.mesh.geometry.dispose();
   this.mesh.material.dispose();
+  this.texture.dispose();
   if (destroyMesh){
     this.mesh = 0;
     scene.remove(this.mesh);

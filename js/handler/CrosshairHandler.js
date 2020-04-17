@@ -9,6 +9,7 @@ CrosshairHandler.prototype.selectCrosshair = function(crosshair){
   crosshair.mesh.visible = true;
   crosshair.handleResize();
   selectedCrosshair = crosshair;
+  this.stopCrosshairRotation();
 }
 
 CrosshairHandler.prototype.changeCrosshairColor = function(colorName){
@@ -29,7 +30,7 @@ CrosshairHandler.prototype.hideCrosshair = function(){
   selectedCrosshair = 0;
 }
 
-CrosshairHandler.prototype.startCrosshairRotation = function(){
+CrosshairHandler.prototype.startCrosshairRotation = function(angularSpeed){
   if (!selectedCrosshair){
     return;
   }
