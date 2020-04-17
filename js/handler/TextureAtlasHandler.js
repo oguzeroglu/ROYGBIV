@@ -23,7 +23,23 @@ TextureAtlasHandler.prototype.dispose = function(){
   }
 }
 
+TextureAtlasHandler.prototype.refreshUniforms = function(){
+  for (var objName in addedObjects){
+    addedObjects[objName].onTextureAtlasRefreshed();
+  }
+  for (var objName in objectGroups){
+    objectGroups[objName].onTextureAtlasRefreshed();
+  }
+  for (var spriteName in sprites){
+    sprites[spriteName].onTextureAtlasRefreshed();
+  }
+  for (var chName in crosshairs){
+    crosshairs[chName].onTextureAtlasRefreshed();
+  }
+}
+
 TextureAtlasHandler.prototype.compressTexture = function(base64Data, readyCallback, errorCallback, textureCount){
+  var refreshUniforms = this.refreshUniforms;
   var postRequest = new XMLHttpRequest();
   var data = JSON.stringify({image: base64Data});
   postRequest.open("POST", "/compressTextureAtlas", true);
@@ -37,6 +53,7 @@ TextureAtlasHandler.prototype.compressTexture = function(base64Data, readyCallba
         textureAtlasHandler.atlas = new TexturePack(null, null, {isAtlas: true});
         textureAtlasHandler.atlas.loadTextures(false, function(){
           textureAtlasHandler.currentTextureCount = textureCount;
+          refreshUniforms();
           readyCallback();
         });
       }
@@ -49,7 +66,7 @@ TextureAtlasHandler.prototype.compressTexture = function(base64Data, readyCallba
 }
 
 TextureAtlasHandler.prototype.onTexturePackChange = function(readyCallback, errorCallback, force){
-  delete this.textureUniformCache;
+  this.dispose();
   var textureCount = 0;
   var texturesObj = new Object();
   for (var texturePackName in texturePacks){

@@ -73,6 +73,30 @@ var AddedObject = function(name, type, metaData, material, mesh, physicsBody, de
   webglCallbackHandler.registerEngineObject(this);
 }
 
+AddedObject.prototype.onTextureAtlasRefreshed = function(){
+  if (!this.hasTexture()){
+    return;
+  }
+
+  this.mesh.material.uniforms.texture = textureAtlasHandler.getTextureUniform();
+
+  if (this.hasDiffuseMap()){
+    this.mapDiffuse(this.tpInfo.diffuse.texturePack);
+  }
+  if (this.hasEmissiveMap()){
+    this.mapEmissive(this.tpInfo.emissive.texturePack);
+  }
+  if (this.hasAOMap()){
+    this.mapAO(this.tpInfo.ao.texturePack);
+  }
+  if (this.hasDisplacementMap()){
+    this.mapDisplacement(this.tpInfo.height.texturePack);
+  }
+  if (this.hasAlphaMap()){
+    this.mapAlpha(this.tpInfo.alpha.texturePack);
+  }
+}
+
 AddedObject.prototype.updateWorldInverseTranspose = function(overrideMatrix){
   var val = overrideMatrix? overrideMatrix: this.mesh.material.uniforms.worldInverseTranspose.value;
   val.getInverse(this.mesh.matrixWorld).transpose();

@@ -38,6 +38,72 @@ var ObjectGroup = function(name, group){
   this.matrixCache = new THREE.Matrix4();
 }
 
+
+ObjectGroup.prototype.refreshTextureRange = function(context){
+  var childLen = Object.keys(this.group).length;
+
+  if (this[context.checker]()){
+    if (this.mesh.geometry.attributes[context.attrName]){
+      var i = 0;
+      var ary = this.mesh.geometry.attributes[context.attrName].array;
+
+      if (this.isInstanced){
+        for (var childName in this.group){
+          var i2 = 0;
+          var newRange = 0;
+          if (this.group[childName][context.checker]()){
+            newRange = textureAtlasHandler.getRangesForTexturePack(this.group[childName].tpInfo[context.tpInfoName].texturePack, context.tpInfoName);
+          }
+
+          while (i2 < ary.length / childLen){
+            ary[i] = newRange? newRange.startU: 0;
+            ary[i + 1] = newRange? newRange.startV: 0;
+            ary[i + 2] = newRange? newRange.endU: 0;
+            ary[i + 3] = newRange? newRange.endV: 0;
+            i2 += 4;
+            i += 4;
+          }
+        }
+      }else{
+        for (var i = 0; i < ary.length; i += 4){
+          var obj = this.uvRangeMap[i];
+          var newRange = 0;
+          if (obj[context.checker]()){
+            newRange = textureAtlasHandler.getRangesForTexturePack(obj.tpInfo[context.tpInfoName].texturePack, context.tpInfoName);
+          }
+          ary[i] = newRange? newRange.startU: 0;
+          ary[i + 1] = newRange? newRange.startV: 0;
+          ary[i + 2] = newRange? newRange.endU: 0;
+          ary[i + 3] = newRange? newRange.endV: 0;
+        }
+      }
+
+      this.mesh.geometry.attributes[context.attrName].updateRange.set(0, ary.length);
+      this.mesh.geometry.attributes[context.attrName].needsUpdate = true;
+    }else{
+      for (var childName in this.group){
+        var newRange = textureAtlasHandler.getRangesForTexturePack(this.group[childName].tpInfo[context.tpInfoName].texturePack, context.tpInfoName);
+        macroHandler.replaceCompressedVec4(this.mesh.material, context.attrName, newRange.startU, newRange.startV, newRange.endU, newRange.endV);
+        break;
+      }
+    }
+  }
+}
+
+ObjectGroup.prototype.onTextureAtlasRefreshed = function(){
+  if (!this.hasTexture){
+    return;
+  }
+
+  this.mesh.material.uniforms.texture = textureAtlasHandler.getTextureUniform();
+
+  this.refreshTextureRange({checker: "hasDiffuseMap", attrName: "diffuseUV", tpInfoName: "diffuse"});
+  this.refreshTextureRange({checker: "hasEmissiveMap", attrName: "emissiveUV", tpInfoName: "emissive"});
+  this.refreshTextureRange({checker: "hasAOMap", attrName: "aoUV", tpInfoName: "ao"});
+  this.refreshTextureRange({checker: "hasAlphaMap", attrName: "alphaUV", tpInfoName: "alpha"});
+  this.refreshTextureRange({checker: "hasDisplacementMap", attrName: "displacementUV", tpInfoName: "height"});
+}
+
 ObjectGroup.prototype.updateWorldInverseTranspose = function(){
   var val = this.mesh.material.uniforms.worldInverseTranspose.value;
   val.getInverse(this.mesh.matrixWorld).transpose();
@@ -1073,6 +1139,8 @@ ObjectGroup.prototype.merge = function(){
     return;
   }
 
+  this.uvAttrMap = [];
+
   this.geometry = new THREE.BufferGeometry();
   var pseudoGeometry = new THREE.Geometry();
 
@@ -1128,6 +1196,8 @@ ObjectGroup.prototype.merge = function(){
 
   var diffuseUVs, emissiveUVs, alphaUVs, aoUVs, displacementUVs;
 
+  this.uvRangeMap = [];
+
   if (max > 0){
     positions = new Array((max + 1) * 3);
     colors = new Array((max + 1) * 3);
@@ -1142,6 +1212,7 @@ ObjectGroup.prototype.merge = function(){
       textureInfos = new Array((max + 1) * 4);
       textureMatrixInfos = new Array((max + 1) * 4);
       diffuseUVs = new Array((max + 1) * 4);
+      this.uvRangeMap = new Array((max + 1) * 4);
     }
     if (this.hasEmissive){
       emissiveIntensities = new Array(max + 1);
@@ -1169,6 +1240,7 @@ ObjectGroup.prototype.merge = function(){
       textureInfos = [];
       textureMatrixInfos = [];
       diffuseUVs = [];
+      this.uvRangeMap = [];
     }
     if (this.hasEmissive){
       emissiveIntensities = [];
@@ -1299,11 +1371,21 @@ ObjectGroup.prototype.merge = function(){
           this.push(diffuseUVs, ranges.startV, ((2*a) + 1), isIndexed);
           this.push(diffuseUVs, ranges.endU, ((2*a) + 2), isIndexed);
           this.push(diffuseUVs, ranges.endV, ((2*a) + 3), isIndexed);
+
+          this.push(this.uvRangeMap, addedObject, ((2*a)), isIndexed);
+          this.push(this.uvRangeMap, addedObject, ((2*a) + 1), isIndexed);
+          this.push(this.uvRangeMap, addedObject, ((2*a) + 2), isIndexed);
+          this.push(this.uvRangeMap, addedObject, ((2*a) + 3), isIndexed);
         }else{
           this.push(diffuseUVs, 0, ((2*a)), isIndexed);
           this.push(diffuseUVs, 0, ((2*a) + 1), isIndexed);
           this.push(diffuseUVs, 0, ((2*a) + 2), isIndexed);
           this.push(diffuseUVs, 0, ((2*a) + 3), isIndexed);
+
+          this.push(this.uvRangeMap, addedObject, ((2*a)), isIndexed);
+          this.push(this.uvRangeMap, addedObject, ((2*a) + 1), isIndexed);
+          this.push(this.uvRangeMap, addedObject, ((2*a) + 2), isIndexed);
+          this.push(this.uvRangeMap, addedObject, ((2*a) + 3), isIndexed);
         }
       }
       if (!bSkipped){
@@ -1313,11 +1395,21 @@ ObjectGroup.prototype.merge = function(){
           this.push(diffuseUVs, ranges.startV, ((2*b) + 1), isIndexed);
           this.push(diffuseUVs, ranges.endU, ((2*b) + 2), isIndexed);
           this.push(diffuseUVs, ranges.endV, ((2*b) + 3), isIndexed);
+
+          this.push(this.uvRangeMap, addedObject, ((2*b)), isIndexed);
+          this.push(this.uvRangeMap, addedObject, ((2*b) + 1), isIndexed);
+          this.push(this.uvRangeMap, addedObject, ((2*b) + 2), isIndexed);
+          this.push(this.uvRangeMap, addedObject, ((2*b) + 3), isIndexed);
         }else{
           this.push(diffuseUVs, 0, ((2*b)), isIndexed);
           this.push(diffuseUVs, 0, ((2*b) + 1), isIndexed);
           this.push(diffuseUVs, 0, ((2*b) + 2), isIndexed);
           this.push(diffuseUVs, 0, ((2*b) + 3), isIndexed);
+
+          this.push(this.uvRangeMap, addedObject, ((2*b)), isIndexed);
+          this.push(this.uvRangeMap, addedObject, ((2*b) + 1), isIndexed);
+          this.push(this.uvRangeMap, addedObject, ((2*b) + 2), isIndexed);
+          this.push(this.uvRangeMap, addedObject, ((2*b) + 3), isIndexed);
         }
       }
       if (!cSkipped){
@@ -1327,11 +1419,21 @@ ObjectGroup.prototype.merge = function(){
           this.push(diffuseUVs, ranges.startV, ((2*c) + 1), isIndexed);
           this.push(diffuseUVs, ranges.endU, ((2*c) + 2), isIndexed);
           this.push(diffuseUVs, ranges.endV, ((2*c) + 3), isIndexed);
+
+          this.push(this.uvRangeMap, addedObject, ((2*c)), isIndexed);
+          this.push(this.uvRangeMap, addedObject, ((2*c) + 1), isIndexed);
+          this.push(this.uvRangeMap, addedObject, ((2*c) + 2), isIndexed);
+          this.push(this.uvRangeMap, addedObject, ((2*c) + 3), isIndexed);
         }else{
           this.push(diffuseUVs, 0, ((2*c)), isIndexed);
           this.push(diffuseUVs, 0, ((2*c) + 1), isIndexed);
           this.push(diffuseUVs, 0, ((2*c) + 2), isIndexed);
           this.push(diffuseUVs, 0, ((2*c) + 3), isIndexed);
+
+          this.push(this.uvRangeMap, addedObject, ((2*c)), isIndexed);
+          this.push(this.uvRangeMap, addedObject, ((2*c) + 1), isIndexed);
+          this.push(this.uvRangeMap, addedObject, ((2*c) + 2), isIndexed);
+          this.push(this.uvRangeMap, addedObject, ((2*c) + 3), isIndexed);
         }
       }
     }

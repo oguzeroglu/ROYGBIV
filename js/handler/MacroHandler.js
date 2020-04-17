@@ -124,3 +124,25 @@ MacroHandler.prototype.compressAttribute = function(material, compressionInfo){
   material.vertexShader = material.vertexShader.replace("attribute " + attrTypeString + " " + compressionInfo.name, attrTypeString + " " + compressionInfo.name + " = " + newValueString );
   material.needsUpdate = true;
 }
+
+MacroHandler.prototype.replaceCompressedVec4 = function(material, varName, data1, data2, data3, data4){
+  var splitted = material.vertexShader.split("\n");
+  for (var i = 0; i < splitted.length; i ++){
+    if (splitted[i].trim().startsWith("vec4 " + varName + " = vec4(")){
+      splitted[i] = "vec4 " + varName + " = vec4(float(" + data1 + "), float(" + data2 + "), float(" + data3 + "), float(" + data4 + "));";
+      break;
+    }
+  }
+  material.vertexShader = splitted.join("\n");
+
+  splitted = material.fragmentShader.split("\n");
+  for (var i = 0; i < splitted.length; i ++){
+    if (splitted[i].trim().startsWith("vec4 " + varName + " = vec4(")){
+      splitted[i] = "vec4 " + varName + " = vec4(float(" + data1 + "), float(" + data2 + "), float(" + data3 + "), float(" + data4 + "));";
+      break;
+    }
+  }
+  material.fragmentShader = splitted.join("\n");
+
+  material.needsUpdate = true;
+}

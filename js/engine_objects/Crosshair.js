@@ -68,6 +68,12 @@ var Crosshair = function(configurations){
   webglCallbackHandler.registerEngineObject(this);
 }
 
+Crosshair.prototype.onTextureAtlasRefreshed = function(){
+  this.mesh.material.uniforms.texture = textureAtlasHandler.getTextureUniform();
+  var newRanges = textureAtlasHandler.getRangesForTexturePack(texturePacks[this.configurations.texture], "diffuse");
+  this.mesh.material.uniforms.uvRanges.value.set(newRanges.startU, newRanges.startV, newRanges.endU, newRanges.endV);
+}
+
 Crosshair.prototype.export = function(){
   return this.configurations;
 }

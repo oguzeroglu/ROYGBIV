@@ -26,6 +26,16 @@ var Sprite = function(name){
   webglCallbackHandler.registerEngineObject(this);
 }
 
+Sprite.prototype.onTextureAtlasRefreshed = function(){
+  if (!this.isTextured){
+    return;
+  }
+
+  this.mesh.material.uniforms.texture = textureAtlasHandler.getTextureUniform();
+  var newRanges = textureAtlasHandler.getRangesForTexturePack(texturePacks[this.mappedTexturePackName], "diffuse");
+  this.mesh.material.uniforms.uvRanges.value.set(newRanges.startU, newRanges.startV, newRanges.endU, newRanges.endV);
+}
+
 Sprite.prototype.copyAnimationsFromObject = function(sprite){
   this.animations = new Object();
 
