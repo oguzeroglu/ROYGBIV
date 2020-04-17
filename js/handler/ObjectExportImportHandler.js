@@ -23,9 +23,6 @@ ObjectExportImportHandler.prototype.exportObjectGroup = function(obj){
   };
   for (var childName in obj.group){
     context.children.push(this.exportAddedObject(obj.group[childName]));
-    if (texturePacks[obj.group[childName].associatedTexturePack]){
-      context.texturePack = texturePacks[obj.group[childName].associatedTexturePack].export();
-    }
   }
   if (obj.muzzleFlashParameters){
     var muzzleFlash = muzzleFlashes[obj.muzzleFlashParameters.muzzleFlashName];
@@ -200,10 +197,7 @@ ObjectExportImportHandler.prototype.importAddedObjectBody = function(objName, co
   this.importObjectMuzzleFlash(objName, context, onReady);
 }
 
-ObjectExportImportHandler.prototype.onChildReady = function(readyContext){
-  if (readyContext.total != readyContext.count){
-    return;
-  }
+ObjectExportImportHandler.prototype.onChildrenReady = function(readyContext){
   var ctr = 0;
   var newGroup = new Object();
   for (var cn in readyContext.context.export.group){
@@ -223,17 +217,19 @@ ObjectExportImportHandler.prototype.onChildReady = function(readyContext){
   this.importObjectMuzzleFlash(readyContext.objName, readyContext.context, readyContext.onReady);
 }
 
-ObjectExportImportHandler.prototype.objectGroupImportFunc = function(children, readyContext, objGroupContext){
-  for (var i = 0; i < children.length; i++){
+ObjectExportImportHandler.prototype.objectGroupImportFunc = function(children, readyContext){
+  if (readyContext.count == readyContext.total){
+    this.onChildrenReady(readyContext);
+  }else{
     var childName = generateUniqueObjectName();
     readyContext.childNames.push(childName);
     this.importObject(childName, {
       isAddedObject: true,
-      context: children[i],
-      objGroupContext: objGroupContext
+      context: children[readyContext.count],
+      objGroupContext: true
     }, function(){
       readyContext.count ++;
-      this.onChildReady(readyContext);
+      this.objectGroupImportFunc(children, readyContext);
     }.bind(this));
   }
 }
@@ -241,20 +237,7 @@ ObjectExportImportHandler.prototype.objectGroupImportFunc = function(children, r
 ObjectExportImportHandler.prototype.importObjectGroup = function(objName, context, onReady){
   var children = context.children;
   var readyContext = {childNames: [], total: children.length, count: 0, objName: objName, context: context, onReady: onReady};
-  if (context.texturePack){
-    var generatedTexturePackName = generateUniqueTexturePackName();
-    var pseudo = new Object();
-    pseudo.texturePacks = new Object();
-    pseudo.texturePacks[generatedTexturePackName] = context.texturePack;
-    var importHandler = new ImportHandler();
-    importHandler.importTexturePacks(pseudo, function(){
-      this.objectGroupImportFunc(children, readyContext, {
-        texturePackName: generatedTexturePackName
-      });
-    }.bind(this), true);
-  }else{
-    this.objectGroupImportFunc(children, readyContext);
-  }
+  this.objectGroupImportFunc(children, readyContext);
 }
 
 ObjectExportImportHandler.prototype.importAddedObject = function(objName, context, onReady, objGroupContext){
@@ -272,24 +255,9 @@ ObjectExportImportHandler.prototype.importAddedObject = function(objName, contex
     materials[generatedMaterialName].roygbivMaterialName = generatedMaterialName;
   }
   if (texturePackExport){
-    var skip = objGroupContext && objGroupContext.texturePackName;
-    if (!skip){
-      generatedTexturePackName = generateUniqueTexturePackName();
-      var pseudo = new Object();
-      pseudo.texturePacks = new Object();
-      pseudo.texturePacks[generatedTexturePackName] = texturePackExport;
-      importHandler.importTexturePacks(pseudo, function(){
-        this.importAddedObjectBody(objName, context, onReady, {
-          tpName: generatedTexturePackName,
-          materialName: generatedMaterialName
-        });
-      }.bind(this), true);
-    }else{
-      this.importAddedObjectBody(objName, context, onReady, {
-        tpName: objGroupContext.texturePackName,
-        materialName: generatedMaterialName
-      });
-    }
+    this.handleTexturePack(texturePackExport, function(generatedTPName){
+      this.importAddedObjectBody(objName, context, onReady, {tpName: generatedTPName, materialName: generatedMaterialName});
+    }.bind(this));
   }else {
     this.importAddedObjectBody(objName, context, onReady, {
       materialName: generatedMaterialName
@@ -310,17 +278,10 @@ ObjectExportImportHandler.prototype.importFunc = function(objName, json, onReady
 ObjectExportImportHandler.prototype.importObject = function(objName, json, onReady){
   var context = json.context;
   if (context.particleSystemTexturePack){
-    var importHandler = new ImportHandler();
-    var generatedTexturePackName = generateUniqueTexturePackName();
-    var pseudo = new Object();
-    pseudo.texturePacks = new Object();
-    pseudo.texturePacks[generatedTexturePackName] = context.particleSystemTexturePack;
-    importHandler.importTexturePacks(pseudo, function(){
-      textureAtlasHandler.onTexturePackChange(function(){
-        context.particleSystemTexturePack.name = generatedTexturePackName;
-        this.importFunc(objName, json, onReady);
-      }.bind(this), noop, true);
-    }.bind(this), true);
+    this.handleTexturePack(context.particleSystemTexturePack, function(generatedTPName){
+      context.particleSystemTexturePack.name = generatedTPName;
+      this.importFunc(objName, json, onReady);
+    }.bind(this));
     return;
   }
 
@@ -350,19 +311,30 @@ ObjectExportImportHandler.prototype.importPSFunction = function(psName, json, on
 ObjectExportImportHandler.prototype.importParticleSystem = function(psName, json, onReady){
   var context = json.export;
   if (json.particleSystemTexturePack){
-    var importHandler = new ImportHandler();
-    var generatedTexturePackName = generateUniqueTexturePackName();
-    var pseudo = new Object();
-    pseudo.texturePacks = new Object();
-    pseudo.texturePacks[generatedTexturePackName] = json.particleSystemTexturePack;
-    importHandler.importTexturePacks(pseudo, function(){
-      textureAtlasHandler.onTexturePackChange(function(){
-        json.particleSystemTexturePack.name = generatedTexturePackName;
-        this.importPSFunction(psName, json, onReady);
-      }.bind(this), noop, true);
-    }.bind(this), true);
+    this.handleTexturePack(json.particleSystemTexturePack, function(generatedTPName){
+      json.particleSystemTexturePack.name = generatedTPName;
+      this.importPSFunction(psName, json, onReady);
+    }.bind(this));
     return;
   }
 
   this.importPSFunction(psName, json, onReady);
+}
+
+ObjectExportImportHandler.prototype.handleTexturePack = function(texurePack, callbackFunction, skipAtlasRefresh){
+  var importHandler = new ImportHandler();
+  var generatedTexturePackName = generateUniqueTexturePackName();
+  var pseudo = new Object();
+  pseudo.texturePacks = new Object();
+  pseudo.texturePacks[generatedTexturePackName] = texurePack;
+  importHandler.importTexturePacks(pseudo, function(){
+    if (!skipAtlasRefresh){
+      terminal.printInfo(Text.GENERATING_TEXTURE_ATLAS);
+      textureAtlasHandler.onTexturePackChange(function(){
+        callbackFunction(generatedTexturePackName);
+      }, noop, true);
+    }else{
+      callbackFunction(generatedTexturePackName);
+    }
+  }, true);
 }

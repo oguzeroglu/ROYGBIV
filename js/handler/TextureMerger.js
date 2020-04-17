@@ -102,13 +102,8 @@ TextureMerger.prototype.isTextureAlreadyInserted = function(textureName, texture
     }
     var txt = texturesObj[tName];
     var tImg = this.dataURLs[tName];
-    if (img == tImg && (txt.offset.x == texture.offset.x) && (txt.offset.y == texture.offset.y)
-                && (txt.offset.z == texture.offset.z) && (txt.repeat.x == texture.repeat.x)
-                && (txt.repeat.y == texture.repeat.y) && (txt.flipX == texture.flipX) && (txt.flipY == texture.flipY)
-                && (txt.wrapS == texture.wrapS) && (txt.wrapT == texture.wrapT)){
-      if (this.textureOffsets[tName]){
-        return this.textureOffsets[tName];
-      }
+    if (img == tImg && this.textureOffsets[tName]){
+      return this.textureOffsets[tName];
     }
   }
   return false;
