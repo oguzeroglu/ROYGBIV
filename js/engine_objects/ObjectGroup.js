@@ -2910,7 +2910,6 @@ ObjectGroup.prototype.copy = function(name, isHardCopy, copyPosition, gridSystem
     this.group[objName].skipToggleGrid = false;
   }
   var newObjGroup = new ObjectGroup(name, newGroup);
-  newObjGroup.handleTextures();
   newObjGroup.glue();
   if (this.isPhysicsSimplified){
     newObjGroup.simplifyPhysics(this.physicsSimplificationParameters.sizeX, this.physicsSimplificationParameters.sizeY, this.physicsSimplificationParameters.sizeZ);

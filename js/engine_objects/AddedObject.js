@@ -3050,7 +3050,7 @@ AddedObject.prototype.copy = function(name, isHardCopy, copyPosition, gridSystem
         copyInstance.mapAlpha(this.tpInfo.alpha.texturePack);
       }
       if (this.hasAOMap()){
-        copyInstance.mapAO(this.toInfo.ao.texturePack);
+        copyInstance.mapAO(this.tpInfo.ao.texturePack);
         copyInstance.setAOIntensity(this.getAOIntensity());
       }
       if (this.hasDisplacementMap()){
@@ -3070,6 +3070,8 @@ AddedObject.prototype.copy = function(name, isHardCopy, copyPosition, gridSystem
         copyInstance.mesh.material.uniforms.textureMatrix.value.elements[ix] = this.mesh.material.uniforms.textureMatrix.value.elements[ix];
       }
     }
+  }else{
+    copyInstance.tpInfo = this.tpInfo;
   }
   if (this.pivotObject){
     var pivot = copyInstance.makePivot(this.pivotOffsetX, this.pivotOffsetY, this.pivotOffsetZ);
@@ -3086,6 +3088,7 @@ AddedObject.prototype.copy = function(name, isHardCopy, copyPosition, gridSystem
   if (this.hasCustomPrecision){
     copyInstance.useCustomShaderPrecision(this.customPrecision);
   }
+
   return copyInstance;
 }
 
