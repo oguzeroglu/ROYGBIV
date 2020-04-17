@@ -71,6 +71,7 @@ MeshGenerator.prototype.generateInstancedMesh = function(graphicsGroup, objectGr
   };
   if (objectGroup.hasTexture){
     uniforms.totalTextureOffset = new THREE.Uniform(new THREE.Vector2(0, 0));
+    uniforms.texture = textureAtlasHandler.getTextureUniform();
   }
   if (objectGroup.hasAOMap()){
     uniforms.totalAOIntensity = new THREE.Uniform(1);

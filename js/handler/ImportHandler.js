@@ -753,15 +753,16 @@ ImportHandler.prototype.importAddedObjects = function(obj){
 }
 
 ImportHandler.prototype.importTexturePacks = function(obj, callback, skipMapping){
+  var texturePacksToMap = [];
   var texturePacksExport = obj.texturePacks;
   for (var texturePackName in texturePacksExport){
     var curTexturePackExport = texturePacksExport[texturePackName];
     var texturePack = new TexturePack(texturePackName, curTexturePackExport.directoryName, curTexturePackExport.textureDescription);
     texturePack.loadTextures(true, function(){
       if (!skipMapping){
-        this.mapLoadedTexturePack(this.texturePackName, obj);
+        texturePacksToMap.push(texturePacks[this.texturePackName]);
       }
-      callback();
+      callback(texturePacksToMap);
     }.bind({texturePackName: texturePackName, mapLoadedTexturePack: this.mapLoadedTexturePack}));
     texturePacks[texturePackName] = texturePack;
   }
@@ -783,27 +784,18 @@ ImportHandler.prototype.mapLoadedTexturePack = function(texturePackName, exportO
     if (!addedObjectExport){
       return;
     }
-    var diffuseRoygbivTexturePackName;
-    var alphaRoygbivTexturePackName;
-    var aoRoygbivTexturePackName;
-    var emissiveRoygbivTexturePackName;
-    var displacementRoygbivTexturePackName;
 
-    diffuseRoygbivTexturePackName = addedObjectExport["diffuseRoygbivTexturePackName"];
-    alphaRoygbivTexturePackName = addedObjectExport["alphaRoygbivTexturePackName"];
-    aoRoygbivTexturePackName = addedObjectExport["aoRoygbivTexturePackName"];
-    emissiveRoygbivTexturePackName = addedObjectExport["emissiveRoygbivTexturePackName"];
-    displacementRoygbivTexturePackName = addedObjectExport["displacementRoygbivTexturePackName"];
+    var shouldMap = addedObjectExport["diffuseRoygbivTexturePackName"] == texturePackName ||
+                    addedObjectExport["alphaRoygbivTexturePackName"] == texturePackName ||
+                    addedObjectExport["aoRoygbivTexturePackName"] == texturePackName ||
+                    addedObjectExport["emissiveRoygbivTexturePackName"] == texturePackName ||
+                    addedObjectExport["displacementRoygbivTexturePackName"] == texturePackName;
 
-    var textureRepeatU, textureRepeatV;
-    if (!(typeof addedObjectExport["textureRepeatU"] == UNDEFINED)){
-      textureRepeatU = addedObjectExport["textureRepeatU"];
-      addedObject.metaData["textureRepeatU"] = textureRepeatU;
+    if (!shouldMap) {
+      continue;
     }
-    if (!(typeof addedObjectExport["textureRepeatV"] == UNDEFINED)){
-      textureRepeatV = addedObjectExport["textureRepeatV"];
-      addedObject.metaData["textureRepeatV"] = textureRepeatV;
-    }
+
+    addedObject.mapTexturePack(texturePacks[texturePackName]);
 
     var mirrorS = false;
     var mirrorT = false;
@@ -817,19 +809,6 @@ ImportHandler.prototype.mapLoadedTexturePack = function(texturePackName, exportO
         mirrorT = true;
       }
     }
-
-    var textureOffsetX, textureOffsetY;
-    if (!(typeof addedObjectExport.textureOffsetX == UNDEFINED)){
-      textureOffsetX = addedObjectExport.textureOffsetX;
-    }else{
-      textureOffsetX = 0;
-    }
-    if (!(typeof addedObjectExport.textureOffsetY == UNDEFINED)){
-      textureOffsetY = addedObjectExport.textureOffsetY;
-    }else{
-      textureOffsetY = 0;
-    }
-
     var displacementScale, displacementBias;
     if (!(typeof addedObjectExport.displacementScale == UNDEFINED)){
       displacementScale = addedObjectExport.displacementScale;
@@ -837,95 +816,15 @@ ImportHandler.prototype.mapLoadedTexturePack = function(texturePackName, exportO
     if (!(typeof addedObjectExport.displacementBias == UNDEFINED)){
       displacementBias = addedObjectExport.displacementBias;
     }
-    if (diffuseRoygbivTexturePackName){
-      if (diffuseRoygbivTexturePackName == texturePackName){
-        if (texturePack.hasDiffuse){
-          addedObject.mapDiffuse(texturePack.diffuseTexture);
-          material.uniforms.diffuseMap.value.roygbivTexturePackName = texturePackName;
-          if (!(typeof textureOffsetX == UNDEFINED)){
-            material.uniforms.diffuseMap.value.offset.x = textureOffsetX;
-          }
-          if (!(typeof textureOffsetY == UNDEFINED)){
-            material.uniforms.diffuseMap.value.offset.y = textureOffsetY;
-          }
-          if (!(typeof textureRepeatU == UNDEFINED)){
-            material.uniforms.diffuseMap.value.repeat.x = textureRepeatU;
-          }
-          if (!(typeof textureRepeatV == UNDEFINED)){
-            material.uniforms.diffuseMap.value.repeat.y = textureRepeatV;
-          }
-          material.uniforms.diffuseMap.value.needsUpdate = true;
-          material.uniforms.diffuseMap.value.updateMatrix();
-        }
-      }
-    }
-    if (alphaRoygbivTexturePackName){
-      if (alphaRoygbivTexturePackName == texturePackName){
-        if (texturePack.hasAlpha){
-          addedObject.mapAlpha(texturePack.alphaTexture);
-          material.uniforms.alphaMap.value.roygbivTexturePackName = texturePackName;
-          if (!(typeof textureRepeatU == UNDEFINED)){
-            material.uniforms.alphaMap.value.repeat.x = textureRepeatU;
-          }
-          if (!(typeof textureRepeatV == UNDEFINED)){
-            material.uniforms.alphaMap.value.repeat.y = textureRepeatV;
-          }
-          material.uniforms.alphaMap.value.needsUpdate = true;
-          material.uniforms.alphaMap.value.updateMatrix();
-        }
-      }
-    }
-    if (aoRoygbivTexturePackName){
-      if (aoRoygbivTexturePackName == texturePackName){
-        if (texturePack.hasAO){
-          addedObject.mapAO(texturePack.aoTexture);
-          material.uniforms.aoMap.value.roygbivTexturePackName = texturePackName;
-          if (!(typeof textureRepeatU == UNDEFINED)){
-            material.uniforms.aoMap.value.repeat.x = textureRepeatU;
-          }
-          if (!(typeof textureRepeatV == UNDEFINED)){
-            material.uniforms.aoMap.value.repeat.y = textureRepeatV;
-          }
-          material.uniforms.aoMap.value.needsUpdate = true;
-          material.uniforms.aoMap.value.updateMatrix();
-        }
-      }
-    }
-    if (emissiveRoygbivTexturePackName){
-      if (emissiveRoygbivTexturePackName == texturePackName){
-        if (texturePack.hasEmissive){
-          addedObject.mapEmissive(texturePack.emissiveTexture);
-          material.uniforms.emissiveMap.value.roygbivTexturePackName = texturePackName;
-          if (!(typeof textureRepeatU == UNDEFINED)){
-            material.uniforms.emissiveMap.value.repeat.x = textureRepeatU;
-          }
-          if (!(typeof textureRepeatV == UNDEFINED)){
-            material.uniforms.emissiveMap.value.repeat.y = textureRepeatV;
-          }
-          material.uniforms.emissiveMap.value.needsUpdate = true;
-          material.uniforms.emissiveMap.value.updateMatrix();
-        }
-      }
-    }
-    if (displacementRoygbivTexturePackName){
-      if (displacementRoygbivTexturePackName == texturePackName){
+    if (addedObjectExport["displacementRoygbivTexturePackName"]){
+      if (addedObjectExport["displacementRoygbivTexturePackName"] == texturePackName){
         if (texturePack.hasHeight){
-          addedObject.mapDisplacement(texturePack.heightTexture);
-          material.uniforms.displacementMap.value.roygbivTexturePackName = texturePackName;
-          if (!(typeof textureRepeatU == UNDEFINED)){
-            material.uniforms.displacementMap.value.repeat.x = textureRepeatU;
-          }
-          if (!(typeof textureRepeatV == UNDEFINED)){
-            material.uniforms.displacementMap.value.repeat.y = textureRepeatV;
-          }
           if (!(typeof displacementScale == UNDEFINED)){
             addedObject.setDisplacementScale(displacementScale);
           }
           if (!(typeof displacementBias == UNDEFINED)){
             addedObject.setDisplacementBias(displacementBias);
           }
-          material.uniforms.displacementMap.value.needsUpdate = true;
-          material.uniforms.displacementMap.value.updateMatrix();
         }
       }
     }
@@ -947,9 +846,11 @@ ImportHandler.prototype.mapLoadedTexturePack = function(texturePackName, exportO
   }
 }
 
-ImportHandler.prototype.importTextureAtlas = function(obj, callback){
+ImportHandler.prototype.importTextureAtlas = function(obj, callback, texturePacksToMap){
   if (obj.textureAtlas && obj.textureAtlas.hasTextureAtlas){
-    textureAtlasHandler.import(obj.textureAtlas, callback);
+    textureAtlasHandler.import(obj.textureAtlas, function(){
+      callback(texturePacksToMap);
+    });
     if (!isDeployment){
       terminal.printInfo(Text.GENERATING_TEXTURE_ATLAS);
     }
