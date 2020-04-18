@@ -9,6 +9,47 @@ MeshGenerator.prototype.generateMesh = function(){
   }
 }
 
+MeshGenerator.prototype.generateCrosshair = function(chObject, ranges){
+  var colorR = chObject.configurations.colorR;
+  var colorB = chObject.configurations.colorB;
+  var colorG = chObject.configurations.colorG;
+  var alpha = chObject.configurations.alpha;
+  var size = chObject.configurations.size;
+
+  var material = new THREE.RawShaderMaterial({
+    vertexShader: ShaderContent.crossHairVertexShader,
+    fragmentShader: ShaderContent.crossHairFragmentShader,
+    transparent: true,
+    side: THREE.DoubleSide,
+    uniforms: {
+      texture: textureAtlasHandler.getTextureUniform(),
+      color: new THREE.Uniform(new THREE.Vector4(colorR, colorG, colorB, alpha)),
+      uvTransform: new THREE.Uniform(new THREE.Matrix3()),
+      expandInfo: new THREE.Uniform(new THREE.Vector4(0, 0, 0, 0)),
+      uvRanges: new THREE.Uniform(new THREE.Vector4(ranges.startU, ranges.startV, ranges.endU, ranges.endV)),
+      shrinkStartSize: new THREE.Uniform(size),
+      screenResolution: GLOBAL_SCREEN_RESOLUTION_UNIFORM
+    }
+  });
+
+  var mesh = new THREE.Points(chObject.geometry, material);
+
+  if (!(typeof chObject.maxWidthPercent == UNDEFINED) || !(typeof chObject.maxHeightPercent == UNDEFINED)){
+    mesh.material.uniforms.sizeScale = new THREE.Uniform(1);
+    macroHandler.injectMacro("HAS_SIZE_SCALE", material, true, false);
+  }
+
+  macroHandler.injectMacro("TEXTURE_SIZE " + ACCEPTED_TEXTURE_SIZE, material, false, true);
+
+  scene.add(mesh);
+  mesh.renderOrder = renderOrders.CROSSHAIR;
+  mesh.position.set(0, 0, 0);
+  mesh.frustumCulled = false;
+  mesh.visible = false;
+
+  return mesh;
+}
+
 MeshGenerator.prototype.generateObjectTrail = function(
   trail, objectCoordinateSize, objectQuaternionSize, posit, quat, objectCoordinates, objectQuaternions){
   var vertexShaderCode = ShaderContent.objectTrailVertexShader.replace(

@@ -3,11 +3,8 @@ var Crosshair = function(configurations){
   this.configurations = JSON.parse(JSON.stringify(configurations));
   var name = configurations.name;
   var texturePack = texturePacks[configurations.texture];
-  var colorR = configurations.colorR;
-  var colorB = configurations.colorB;
-  var colorG = configurations.colorG;
-  var alpha = configurations.alpha;
-  var size = configurations.size;
+
+  var size = this.configurations.size;
 
   this.maxWidthPercent = configurations.maxWidthPercent;
   this.maxHeightPercent = configurations.maxHeightPercent;
@@ -29,34 +26,10 @@ var Crosshair = function(configurations){
 
   var ranges = textureAtlasHandler.getRangesForTexturePack(this.texturePack, "diffuse");
 
-  this.material = new THREE.RawShaderMaterial({
-    vertexShader: ShaderContent.crossHairVertexShader,
-    fragmentShader: ShaderContent.crossHairFragmentShader,
-    transparent: true,
-    side: THREE.DoubleSide,
-    uniforms: {
-      texture: textureAtlasHandler.getTextureUniform(),
-      color: new THREE.Uniform(new THREE.Vector4(colorR, colorG, colorB, alpha)),
-      uvTransform: new THREE.Uniform(new THREE.Matrix3()),
-      expandInfo: new THREE.Uniform(new THREE.Vector4(0, 0, 0, 0)),
-      uvRanges: new THREE.Uniform(new THREE.Vector4(ranges.startU, ranges.startV, ranges.endU, ranges.endV)),
-      shrinkStartSize: new THREE.Uniform(size),
-      screenResolution: GLOBAL_SCREEN_RESOLUTION_UNIFORM
-    }
-  });
-  this.mesh = new THREE.Points(this.geometry, this.material);
-  this.mesh.renderOrder = renderOrders.CROSSHAIR;
-  this.mesh.position.set(0, 0, 0);
-  this.mesh.frustumCulled = false;
-  this.mesh.visible = false;
-  if (!(typeof this.maxWidthPercent == UNDEFINED) || !(typeof this.maxHeightPercent == UNDEFINED)){
-    this.mesh.material.uniforms.sizeScale = new THREE.Uniform(1);
-    macroHandler.injectMacro("HAS_SIZE_SCALE", this.material, true, false);
-  }
+  this.mesh = new MeshGenerator().generateCrosshair(this, ranges);
 
-  macroHandler.injectMacro("TEXTURE_SIZE " + ACCEPTED_TEXTURE_SIZE, this.material, false, true);
+  this.material = this.mesh.material;
 
-  scene.add(this.mesh);
   this.texture.center.set(0.5, 0.5);
   this.angularSpeed = 0;
   this.rotationTime = 0;
@@ -99,16 +72,16 @@ Crosshair.prototype.update = function(){
   if(this.angularSpeed != 0){
     this.texture.rotation = (this.rotationTime * this.angularSpeed);
     this.texture.updateMatrix();
-    this.material.uniforms.uvTransform.value.copy(this.texture.matrix);
+    this.mesh.material.uniforms.uvTransform.value.copy(this.texture.matrix);
   }
   if (this.expand){
-    this.material.uniforms.expandInfo.value.set(10, this.expandTargetSize, this.expandTick, this.expandDelta);
+    this.mesh.material.uniforms.expandInfo.value.set(10, this.expandTargetSize, this.expandTick, this.expandDelta);
     this.curSize = this.sizeAmount + (this.expandDelta * this.expandTick);
     if (this.curSize > this.expandTargetSize){
       this.curSize = this.expandTargetSize;
     }
   }else if (this.shrink){
-    this.material.uniforms.expandInfo.value.set(-10, 0, this.shrinkTick, this.expandDelta);
+    this.mesh.material.uniforms.expandInfo.value.set(-10, 0, this.shrinkTick, this.expandDelta);
     this.curSize = this.shrinkStartSize - (this.expandDelta * this.shrinkTick);
     if (this.curSize < this.sizeAmount){
       this.curSize = this.sizeAmount;
@@ -119,7 +92,7 @@ Crosshair.prototype.update = function(){
 Crosshair.prototype.resetRotation = function(){
   this.texture.rotation = 0;
   this.texture.updateMatrix();
-  this.material.uniforms.uvTransform.value.copy(this.texture.matrix);
+  this.mesh.material.uniforms.uvTransform.value.copy(this.texture.matrix);
 }
 
 Crosshair.prototype.destroy = function(destroyMesh){
