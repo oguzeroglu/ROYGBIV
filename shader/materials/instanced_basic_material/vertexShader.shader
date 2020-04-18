@@ -56,9 +56,11 @@ varying float vAlpha;
   attribute vec4 textureInfo;
 
   attribute vec4 textureMatrixInfo;
+  attribute vec2 textureMirrorInfo;
 
   uniform vec2 totalTextureOffset;
   varying vec2 vUV;
+  varying vec2 vTextureMirrorInfo;
   #ifdef HAS_DIFFUSE
     varying float hasDiffuseMap;
     attribute vec4 diffuseUV;
@@ -86,7 +88,6 @@ varying float vAlpha;
 #endif
 #ifdef HAS_DISPLACEMENT
   attribute vec2 displacementInfo;
-
 
   uniform sampler2D texture;
   uniform vec2 totalDisplacementInfo;
@@ -830,19 +831,35 @@ vec3 applyQuaternionToVector(vec3 vector, vec4 quaternion){
     float coordY = (original.y * (startV - endV) + endV);
 
     if (coordX > endU){
-      coordX = flipNumber(endU - mod((coordX - endU), (endU - startU)), endU, startU);
+      if(textureMirrorInfo.x < 0.0){
+        coordX = flipNumber(endU - mod((coordX - endU), (endU - startU)), endU, startU);
+      }else{
+        coordX = endU - mod((coordX - endU), (endU - startU));
+      }
     }
 
     if (coordX < startU){
-      coordX = flipNumber(startU + mod((startU - coordX), (endU - startU)), endU, startU);
+      if(textureMirrorInfo.x < 0.0){
+        coordX = flipNumber(startU + mod((startU - coordX), (endU - startU)), endU, startU);
+      }else{
+        coordX = startU + mod((startU - coordX), (endU - startU));
+      }
     }
 
     if (coordY > startV){
-      coordY = flipNumber(startV - mod((coordY - startV), (startV - endV)), startV, endV);
+      if (textureMirrorInfo.y < 0.0){
+        coordY = flipNumber(startV - mod((coordY - startV), (startV - endV)), startV, endV);
+      }else{
+        coordY = startV - mod((coordY - startV), (startV - endV));
+      }
     }
 
     if (coordY < endV){
-      coordY = flipNumber(endV + mod((endV - coordY), (startV - endV)), startV, endV);
+      if (textureMirrorInfo.y < 0.0){
+        coordY = flipNumber(endV + mod((endV - coordY), (startV - endV)), startV, endV);
+      }else{
+        coordY = endV + mod((endV - coordY), (startV - endV));
+      }
     }
 
     return vec2(coordX, coordY);
@@ -894,6 +911,9 @@ void main(){
     vAlpha = alpha;
   #endif
   #ifdef HAS_TEXTURE
+
+    vTextureMirrorInfo = textureMirrorInfo;
+
     #ifdef IS_AUTO_INSTANCED
       int textureOffsetInfoIndex = int(alphaIndex);
       vec2 textureOffsetInfo = autoInstanceTextureOffsetInfoArray[textureOffsetInfoIndex];

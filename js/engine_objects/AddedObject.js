@@ -1558,6 +1558,14 @@ AddedObject.prototype.updateMVMatrix = function(){
   this.mesh.material.uniforms.modelViewMatrix.value = this.mesh.modelViewMatrix;
 }
 
+AddedObject.prototype.hasMirrorS = function(){
+  return this.metaData["mirrorS"] == "ON";
+}
+
+AddedObject.prototype.hasMirrorT = function(){
+  return this.metaData["mirrorT"] == "ON";
+}
+
 AddedObject.prototype.handleMirror = function(axis, property){
   if (axis == "T"){
     this.metaData["mirrorT"] = property.toUpperCase();

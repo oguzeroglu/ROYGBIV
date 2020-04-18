@@ -878,7 +878,7 @@ ObjectGroup.prototype.compressGeometry = function(){
     "quaternion", "alpha" , "color", "textureInfo", "textureMatrixInfo",
     "diffuseUV", "emissiveIntensity", "emissiveColor", "emissiveUV",
     "aoIntensity", "aoUV", "displacementInfo", "displacementUV", "alphaUV",
-    "affectedByLight"
+    "affectedByLight", "textureMirrorInfo"
   ];
 
   macroHandler.compressAttributes(this.mesh, compressableAttributes);
@@ -900,6 +900,8 @@ ObjectGroup.prototype.mergeInstanced = function(){
       textureMatrixInfos = [];
 
   var diffuseUVs = [], emissiveUVs = [], alphaUVs = [], aoUVs = [], displacementUVs = [];
+
+  var textureMirrorInfos = [];
 
   var count = 0;
 
@@ -993,6 +995,16 @@ ObjectGroup.prototype.mergeInstanced = function(){
         diffuseUVs.push(ranges.startV);
         diffuseUVs.push(ranges.endU);
         diffuseUVs.push(ranges.endV);
+        if (obj.hasMirrorS()){
+          textureMirrorInfos.push(100);
+        }else{
+          textureMirrorInfos.push(-100);
+        }
+        if (obj.hasMirrorT()){
+          textureMirrorInfos.push(100);
+        }else{
+          textureMirrorInfos.push(-100);
+        }
       }else{
         textureMatrixInfos.push(0);
         textureMatrixInfos.push(0);
@@ -1002,6 +1014,8 @@ ObjectGroup.prototype.mergeInstanced = function(){
         diffuseUVs.push(0);
         diffuseUVs.push(0);
         diffuseUVs.push(0);
+        textureMirrorInfos.push(0);
+        textureMirrorInfos.push(0);
       }
       if (obj.hasDiffuseMap()){
         textureInfos.push(10);
@@ -1054,18 +1068,18 @@ ObjectGroup.prototype.mergeInstanced = function(){
   var emissiveColorBufferAttribute;
   var aoIntensityBufferAttribute;
   var displacementInfoBufferAttribute;
+  var textureMirrorInfoBufferAttribute
   if (this.hasTexture){
-    textureInfoBufferAttribute = new THREE.InstancedBufferAttribute(
-      new Int16Array(textureInfos), 4
-    );
-    textureMatrixInfosBufferAttribute = new THREE.InstancedBufferAttribute(
-      new Float32Array(textureMatrixInfos), 4
-    );
+    textureInfoBufferAttribute = new THREE.InstancedBufferAttribute(new Int16Array(textureInfos), 4);
+    textureMatrixInfosBufferAttribute = new THREE.InstancedBufferAttribute(new Float32Array(textureMatrixInfos), 4);
+    textureMirrorInfoBufferAttribute = new THREE.InstancedBufferAttribute(new Float32Array(textureMirrorInfos), 2);
     textureInfoBufferAttribute.setDynamic(false);
     textureMatrixInfosBufferAttribute.setDynamic(false);
+    textureMirrorInfoBufferAttribute.setDynamic(false);
     this.geometry.addAttribute("textureInfo", textureInfoBufferAttribute);
     this.geometry.addAttribute("textureMatrixInfo", textureMatrixInfosBufferAttribute);
     this.geometry.addAttribute("uv", refGeometry.attributes.uv);
+    this.geometry.addAttribute("textureMirrorInfo", textureMirrorInfoBufferAttribute);
 
     var diffuseUVsBufferAttribute = new THREE.InstancedBufferAttribute(new Float32Array(diffuseUVs), 4);
     diffuseUVsBufferAttribute.setDynamic(false);
