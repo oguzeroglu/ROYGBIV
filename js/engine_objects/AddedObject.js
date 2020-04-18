@@ -1559,7 +1559,6 @@ AddedObject.prototype.updateMVMatrix = function(){
 }
 
 AddedObject.prototype.handleMirror = function(axis, property){
-  var texturesStack = this.getTextureStack();
   if (axis == "T"){
     this.metaData["mirrorT"] = property.toUpperCase();
   }
@@ -1570,28 +1569,16 @@ AddedObject.prototype.handleMirror = function(axis, property){
     this.metaData["mirrorT"] = property.toUpperCase();
     this.metaData["mirrorS"] = property.toUpperCase();
   }
-  for (var i = 0; i < texturesStack.length; i++){
-    var texture = texturesStack[i];
-    if (property.toUpperCase() == "ON"){
-      if (axis == "T"){
-        texture.wrapT = THREE.MirroredRepeatWrapping;
-      }else if (axis == "S"){
-        texture.wrapS = THREE.MirroredRepeatWrapping;
-      }else if (axis == "ST"){
-        texture.wrapS = THREE.MirroredRepeatWrapping;
-        texture.wrapT = THREE.MirroredRepeatWrapping;
-      }
-    }else if (property.toUpperCase() == "OFF"){
-      if (axis == "T"){
-        texture.wrapT = THREE.RepeatWrapping;
-      }else if (axis == "S"){
-        texture.wrapS = THREE.RepeatWrapping;
-      }else if (axis == "ST"){
-        texture.wrapS = THREE.RepeatWrapping;
-        texture.wrapT = THREE.RepeatWrapping;
-      }
+
+  if (property.toUpperCase() == "ON"){
+    for (var i = 0; i < axis.length; i ++){
+      macroHandler.removeMacro("MIRROR_" + axis[i], this.mesh.material, true, true);
+      macroHandler.injectMacro("MIRROR_" + axis[i], this.mesh.material, true, true);
     }
-    texture.needsUpdate = true;
+  }else{
+    for (var i = 0; i < axis.length; i ++){
+      macroHandler.removeMacro("MIRROR_" + axis[i], this.mesh.material, true, true);
+    }
   }
 }
 

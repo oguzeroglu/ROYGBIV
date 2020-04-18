@@ -776,24 +776,28 @@ vec3 diffuseLight(float dirX, float dirY, float dirZ, float r, float g, float b,
 
 #ifdef HAS_TEXTURE
 
+  float flipNumber(float num, float min, float max){
+    return (max + min) - num;
+  }
+
   vec2 uvAffineTransformation(vec2 original, float startU, float startV, float endU, float endV) {
     float coordX = (original.x * (endU - startU) + startU);
     float coordY = (original.y * (startV - endV) + endV);
 
     if (coordX > endU){
-      coordX = endU - mod((coordX - endU), (endU - startU));
+      coordX = flipNumber(endU - mod((coordX - endU), (endU - startU)), endU, startU);
     }
 
     if (coordX < startU){
-      coordX = startU + mod((startU - coordX), (endU - startU));
+      coordX = flipNumber(startU + mod((startU - coordX), (endU - startU)), endU, startU);
     }
 
     if (coordY > startV){
-      coordY = startV - mod((coordY - startV), (startV - endV));
+      coordY = flipNumber(startV - mod((coordY - startV), (startV - endV)), startV, endV);
     }
 
     if (coordY < endV){
-      coordY = endV + mod((endV - coordY), (startV - endV));
+      coordY = flipNumber(endV + mod((endV - coordY), (startV - endV)), startV, endV);
     }
 
     return vec2(coordX, coordY);
