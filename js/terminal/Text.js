@@ -306,6 +306,7 @@ var Text = function(){
   this.OBJECT_WILL_BE_USED_AS_FPS_WEAPON = "Object will be used as FPS weapon. Use fpsWeaponAlignment CLI command to configure the weapon alignment.";
   this.OBJECT_IS_NOT_MARKED_AS_FPS_WEAPON = "Object is not marked as an FPS weapon.";
   this.TEXTS = "Texts";
+  this.TEXTURE_ATLAS_MAX_ALLOWED_SIZE_EXCEEDED = "Max allowed size for a texture atlas exceeded.";
   this.TEXTURE_PACK_USED_IN_VIRTUAL_KEYBOARD = "Texture pack used in virtual keyboard [@@1]. Cannot delete.";
   this.OBJECT_IS_ALREADY_NOT_SLIPPERY = "Slipperiness is already off for the object.";
   this.SLIPPERINESS_STATE_MUST_BE_ON_OR_OFF = "Slipperiness state must be on or off."

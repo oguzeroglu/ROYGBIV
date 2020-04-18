@@ -66,7 +66,6 @@ TextureAtlasHandler.prototype.compressTexture = function(base64Data, readyCallba
 }
 
 TextureAtlasHandler.prototype.onTexturePackChange = function(readyCallback, errorCallback, force){
-  this.dispose();
   var textureCount = 0;
   var texturesObj = new Object();
   for (var texturePackName in texturePacks){
@@ -87,8 +86,8 @@ TextureAtlasHandler.prototype.onTexturePackChange = function(readyCallback, erro
     }
   }
   if (force || this.currentTextureCount != textureCount){
-    this.dispose();
     if (textureCount == 0){
+      this.dispose();
       this.currentTextureCount = 0;
       readyCallback();
       return;
@@ -96,10 +95,11 @@ TextureAtlasHandler.prototype.onTexturePackChange = function(readyCallback, erro
     var textureMerger;
     try{
       textureMerger = new TextureMerger(texturesObj);
+      this.dispose();
       this.textureMerger = textureMerger;
     }catch (err){
       console.error(err);
-      errorCallback();
+      errorCallback(true);
       return;
     }
     this.compressTexture(textureMerger.mergedTexture.image.toDataURL(), readyCallback, errorCallback, textureCount);

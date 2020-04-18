@@ -59,11 +59,15 @@ TexturePackCreatorGUIHandler.prototype.init = function(isEdit){
           }else{
             terminal.printInfo(Text.TEXTURE_PACK_EDITED);
           }
-        }, function(){
+        }, function(isSizeErr){
           terminal.clear();
           terminal.enable()
           delete texturePacks[tp.name];
-          terminal.printError(Text.ERROR_HAPPENED_COMPRESSING_TEXTURE_ATLAS);
+          if (!isSizeErr){
+            terminal.printError(Text.ERROR_HAPPENED_COMPRESSING_TEXTURE_ATLAS);
+          }else{
+            terminal.printError(Text.TEXTURE_ATLAS_MAX_ALLOWED_SIZE_EXCEEDED);
+          }
         }, true);
       });
     },
