@@ -42,6 +42,8 @@ varying float vAlpha;
   attribute vec2 uv;
   attribute vec4 textureInfo;
   attribute vec4 textureMatrixInfo;
+  attribute vec2 textureMirrorInfo;
+  varying vec2 vTextureMirrorInfo;
   uniform vec2 totalTextureOffset;
   attribute vec4 diffuseUV;
   varying vec4 vDiffuseUV;
@@ -785,19 +787,35 @@ vec3 diffuseLight(float dirX, float dirY, float dirZ, float r, float g, float b,
     float coordY = (original.y * (startV - endV) + endV);
 
     if (coordX > endU){
-      coordX = flipNumber(endU - mod((coordX - endU), (endU - startU)), endU, startU);
+      if (vTextureMirrorInfo.x < 0.0){
+        coordX = flipNumber(endU - mod((coordX - endU), (endU - startU)), endU, startU);
+      }else{
+        coordX = endU - mod((coordX - endU), (endU - startU));
+      }
     }
 
     if (coordX < startU){
-      coordX = flipNumber(startU + mod((startU - coordX), (endU - startU)), endU, startU);
+      if (vTextureMirrorInfo.x < 0.0){
+        coordX = flipNumber(startU + mod((startU - coordX), (endU - startU)), endU, startU);
+      }else{
+        coordX = startU + mod((startU - coordX), (endU - startU));
+      }
     }
 
     if (coordY > startV){
-      coordY = flipNumber(startV - mod((coordY - startV), (startV - endV)), startV, endV);
+      if (vTextureMirrorInfo.y < 0.0){
+        coordY = flipNumber(startV - mod((coordY - startV), (startV - endV)), startV, endV);
+      }else{
+        coordY = startV - mod((coordY - startV), (startV - endV));
+      }
     }
 
     if (coordY < endV){
-      coordY = flipNumber(endV + mod((endV - coordY), (startV - endV)), startV, endV);
+      if (vTextureMirrorInfo.y < 0.0){
+        coordY = flipNumber(endV + mod((endV - coordY), (startV - endV)), startV, endV);
+      }else{
+        coordY = endV + mod((endV - coordY), (startV - endV));
+      }
     }
 
     return vec2(coordX, coordY);
@@ -845,6 +863,9 @@ void main(){
   vec2 transformedUV;
 
   #ifdef HAS_TEXTURE
+
+    vTextureMirrorInfo = textureMirrorInfo;
+
     transformedUV = (
       mat3(
         textureMatrixInfo.z, 0.0, 0.0,

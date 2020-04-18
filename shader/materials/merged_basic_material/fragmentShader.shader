@@ -13,6 +13,7 @@ varying vec3 vColor;
 #ifdef HAS_TEXTURE
   uniform sampler2D texture;
   varying vec2 vUV;
+  varying vec2 vTextureMirrorInfo;
   #ifdef HAS_DIFFUSE
     varying vec4 vDiffuseUV;
     varying float hasDiffuseMap;
@@ -63,19 +64,35 @@ varying vec3 vColor;
     float coordY = (original.y * (startV - endV) + endV);
 
     if (coordX > endU){
-      coordX = flipNumber(endU - mod((coordX - endU), (endU - startU)), endU, startU);
+      if (vTextureMirrorInfo.x < 0.0){
+        coordX = flipNumber(endU - mod((coordX - endU), (endU - startU)), endU, startU);
+      }else{
+        coordX = endU - mod((coordX - endU), (endU - startU));
+      }
     }
 
     if (coordX < startU){
-      coordX = flipNumber(startU + mod((startU - coordX), (endU - startU)), endU, startU);
+      if (vTextureMirrorInfo.x < 0.0){
+        coordX = flipNumber(startU + mod((startU - coordX), (endU - startU)), endU, startU);
+      }else{
+        coordX = startU + mod((startU - coordX), (endU - startU));
+      }
     }
 
     if (coordY > startV){
-      coordY = flipNumber(startV - mod((coordY - startV), (startV - endV)), startV, endV);
+      if (vTextureMirrorInfo.y < 0.0){
+        coordY = flipNumber(startV - mod((coordY - startV), (startV - endV)), startV, endV);
+      }else{
+        coordY = startV - mod((coordY - startV), (startV - endV));
+      }
     }
 
     if (coordY < endV){
-      coordY = flipNumber(endV + mod((endV - coordY), (startV - endV)), startV, endV);
+      if (vTextureMirrorInfo.y < 0.0){
+        coordY = flipNumber(endV + mod((endV - coordY), (startV - endV)), startV, endV);
+      }else{
+        coordY = endV + mod((endV - coordY), (startV - endV));
+      }
     }
 
     return vec2(coordX, coordY);

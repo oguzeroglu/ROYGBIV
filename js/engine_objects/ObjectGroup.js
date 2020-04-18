@@ -1210,6 +1210,8 @@ ObjectGroup.prototype.merge = function(){
 
   var diffuseUVs, emissiveUVs, alphaUVs, aoUVs, displacementUVs;
 
+  var textureMirrorInfos;
+
   this.uvRangeMap = [];
 
   if (max > 0){
@@ -1226,6 +1228,7 @@ ObjectGroup.prototype.merge = function(){
       textureInfos = new Array((max + 1) * 4);
       textureMatrixInfos = new Array((max + 1) * 4);
       diffuseUVs = new Array((max + 1) * 4);
+      textureMirrorInfos = new Array((max + 1) * 2);
       this.uvRangeMap = new Array((max + 1) * 4);
     }
     if (this.hasEmissive){
@@ -1254,6 +1257,7 @@ ObjectGroup.prototype.merge = function(){
       textureInfos = [];
       textureMatrixInfos = [];
       diffuseUVs = [];
+      textureMirrorInfos = [];
       this.uvRangeMap = [];
     }
     if (this.hasEmissive){
@@ -1314,6 +1318,9 @@ ObjectGroup.prototype.merge = function(){
     var uv1 = faceVertexUVs[i][0];
     var uv2 = faceVertexUVs[i][1];
     var uv3 = faceVertexUVs[i][2];
+    var mirrorSInfo = addedObject.hasMirrorS()? 100: -100;
+    var mirrorTInfo = addedObject.hasMirrorT()? 100: -100;
+
     // POSITIONS
     if (!aSkipped){
       this.push(positions, vertex1.x, (3*a), isIndexed);
@@ -1366,14 +1373,20 @@ ObjectGroup.prototype.merge = function(){
       if (!aSkipped){
         this.push(uvs, uv1.x, (2*a), isIndexed);
         this.push(uvs, uv1.y, ((2*a) + 1), isIndexed);
+        this.push(textureMirrorInfos, mirrorSInfo, (2*a), isIndexed);
+        this.push(textureMirrorInfos, mirrorTInfo, ((2*a) + 1), isIndexed);
       }
       if (!bSkipped){
         this.push(uvs, uv2.x, (2*b), isIndexed);
         this.push(uvs, uv2.y, ((2*b) + 1), isIndexed);
+        this.push(textureMirrorInfos, mirrorSInfo, (2*b), isIndexed);
+        this.push(textureMirrorInfos, mirrorTInfo, ((2*b) + 1), isIndexed);
       }
       if (!cSkipped){
         this.push(uvs, uv3.x, (2*c), isIndexed);
         this.push(uvs, uv3.y, ((2*c) + 1), isIndexed);
+        this.push(textureMirrorInfos, mirrorSInfo, (2*c), isIndexed);
+        this.push(textureMirrorInfos, mirrorTInfo, ((2*c) + 1), isIndexed);
       }
     }
     // DIFFUSE UVS
@@ -1871,18 +1884,22 @@ ObjectGroup.prototype.merge = function(){
     var textureInfosTypedArray = new Int8Array(textureInfos);
     var textureMatrixInfosTypedArray = new Float32Array(textureMatrixInfos);
     var diffuseUVsTypedArray = new Float32Array(diffuseUVs);
+    var textureMirrorInfosTypedArray = new Float32Array(textureMirrorInfos);
     var uvsBufferAttribute = new THREE.BufferAttribute(uvsTypedArray, 2);
     var textureInfosBufferAttribute = new THREE.BufferAttribute(textureInfosTypedArray, 4);
     var textureMatrixInfosBufferAttribute = new THREE.BufferAttribute(textureMatrixInfosTypedArray, 4);
     var diffuseUVsBufferAttribute = new THREE.BufferAttribute(diffuseUVsTypedArray, 4);
+    var textureMirrorInfoBufferAttribute = new THREE.BufferAttribute(textureMirrorInfosTypedArray, 2);
     uvsBufferAttribute.setDynamic(false);
     textureInfosBufferAttribute.setDynamic(false);
     textureMatrixInfosBufferAttribute.setDynamic(false);
     diffuseUVsBufferAttribute.setDynamic(false);
+    textureMirrorInfoBufferAttribute.setDynamic(false);
     this.geometry.addAttribute('uv', uvsBufferAttribute);
     this.geometry.addAttribute('textureInfo', textureInfosBufferAttribute);
     this.geometry.addAttribute('textureMatrixInfo', textureMatrixInfosBufferAttribute);
     this.geometry.addAttribute("diffuseUV", diffuseUVsBufferAttribute);
+    this.geometry.addAttribute("textureMirrorInfo", textureMirrorInfoBufferAttribute);
   }
   if (this.hasEmissive){
     var emissiveIntensitiesTypedArray = new Float32Array(emissiveIntensities);
