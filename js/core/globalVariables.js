@@ -215,9 +215,11 @@ var reusableCollisionInfo;
 var TOTAL_OBJECT_COLLISION_LISTENER_COUNT = 0;
 var MAX_OBJECT_COLLISION_LISTENER_COUNT = 50;
 var MAX_VERTEX_UNIFORM_VECTORS;
+var MAX_VERTEX_ATTRIBS;
 var MAX_PS_COMPRESS_AMOUNT_4096 = 200;
 var TOTAL_MERGED_COUNT = 0;
 var MAX_TEXTURE_SIZE = 4096;
+var ACCEPTED_TEXTURE_SIZE = 128;
 var DEFAULT_MAX_PS_TIME = 100000;
 var EMPTY_OBJECT = {};
 var crosshairs = new Object();
@@ -255,7 +257,7 @@ var frustum = new THREE.Frustum();
 var SIDE_BOTH = "Both";
 var SIDE_FRONT = "Front";
 var SIDE_BACK = "Back";
-var textureUniformCache = new Object();
+var textureUniformCache = new Object(); // after global texture atlas implementation, this only has dynamic texture uniforms
 var screenResolution = 1;
 var useOriginalResolution = false;
 var rayCaster;
@@ -374,6 +376,7 @@ var endpointInverses = {
   "-y": "+y",
   "-z": "+z"
 };
+var DEFAULT_UV_RANGE = {startU: 0, startV: 1, endU: 1, endV: 0};
 var activeMuzzleFlashes = new Map();
 var activeLightnings = new Map();
 var delayedExecutionHandler;
@@ -400,6 +403,7 @@ var dynamicallyLoadedTextures = new Object();
 var protocolDefinitionFileName = 0;
 var serverWSURL = 0;
 var objectExportImportHandler;
+var DUMMY_TEXTURE = new THREE.Texture();
 
 // LIGHTING LIMITS
 var MAX_STATIC_DIFFUSE_LIGHT_COUNT = 5;

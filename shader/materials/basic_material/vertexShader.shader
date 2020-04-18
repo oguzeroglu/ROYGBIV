@@ -13,8 +13,8 @@ varying vec3 vColor;
 #define INSERTION
 
 #ifdef HAS_DISPLACEMENT
-  uniform sampler2D displacementMap;
   uniform vec2 displacementInfo;
+  uniform sampler2D texture;
 #endif
 #ifdef HAS_TEXTURE
   varying vec2 vUV;
@@ -733,6 +733,58 @@ vec3 diffuseLight(float dirX, float dirY, float dirZ, float r, float g, float b,
   }
 #endif
 
+
+#ifdef HAS_DISPLACEMENT
+
+  float flipNumber(float num, float min, float max){
+    return (max + min) - num;
+  }
+
+  vec2 uvAffineTransformation(vec2 original, float startU, float startV, float endU, float endV) {
+    float coordX = (original.x * (endU - startU) + startU);
+    float coordY = (original.y * (startV - endV) + endV);
+
+    if (coordX > endU){
+      #ifdef MIRROR_S
+        coordX = endU - mod((coordX - endU), (endU - startU));
+      #else
+        coordX = flipNumber(endU - mod((coordX - endU), (endU - startU)), endU, startU);
+      #endif
+    }
+
+    if (coordX < startU){
+      #ifdef MIRROR_S
+        coordX = startU + mod((startU - coordX), (endU - startU));
+      #else
+        coordX = flipNumber(startU + mod((startU - coordX), (endU - startU)), endU, startU);
+      #endif
+    }
+
+    if (coordY > startV){
+      #ifdef MIRROR_T
+        coordY = startV - mod((coordY - startV), (startV - endV));
+      #else
+        coordY = flipNumber(startV - mod((coordY - startV), (startV - endV)), startV, endV);
+      #endif
+    }
+
+    if (coordY < endV){
+      #ifdef MIRROR_T
+        coordY = endV + mod((endV - coordY), (startV - endV));
+      #else
+        coordY = flipNumber(endV + mod((endV - coordY), (startV - endV)), startV, endV);
+      #endif
+    }
+
+    return vec2(coordX, coordY);
+  }
+
+  vec4 fixTextureBleeding(vec4 uvCoordinates){
+    float offset = 0.5 / float(TEXTURE_SIZE);
+    return vec4(uvCoordinates[0] + offset, uvCoordinates[1] - offset, uvCoordinates[2] - offset, uvCoordinates[3] + offset);
+  }
+#endif
+
 void main(){
 
   #if defined(HAS_SKYBOX_FOG) || defined(AFFECTED_BY_LIGHT)
@@ -755,8 +807,9 @@ void main(){
 
   vec3 transformedPosition = position;
   #ifdef HAS_DISPLACEMENT
+    vec4 heightUVFixed = fixTextureBleeding(vec4(float(HEIGHT_START_U), float(HEIGHT_START_V), float(HEIGHT_END_U), float(HEIGHT_END_V)));
     vec3 objNormal = normalize(normal);
-    transformedPosition += objNormal * (texture2D(displacementMap, uv).r * displacementInfo.x + displacementInfo.y);
+    transformedPosition += objNormal * (texture2D(texture, uvAffineTransformation(vUV, heightUVFixed.x, heightUVFixed.y, heightUVFixed.z, heightUVFixed.w)).r * displacementInfo.x + displacementInfo.y);
   #endif
 
   vec4 mvPosition = modelViewMatrix * vec4(transformedPosition, 1.0);

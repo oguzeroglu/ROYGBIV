@@ -3,19 +3,51 @@ var MeshGenerator = function(geometry, material){
   this.material = material;
 }
 
-MeshGenerator.prototype.getTextureUniform = function(texture){
-  if (textureUniformCache[texture.uuid]){
-    return textureUniformCache[texture.uuid];
-  }
-  var uniform = new THREE.Uniform(texture);
-  textureUniformCache[texture.uuid] = uniform;
-  return uniform;
-}
-
 MeshGenerator.prototype.generateMesh = function(){
   if (this.material instanceof BasicMaterial){
     return this.generateBasicMesh();
   }
+}
+
+MeshGenerator.prototype.generateCrosshair = function(chObject, ranges){
+  var colorR = chObject.configurations.colorR;
+  var colorB = chObject.configurations.colorB;
+  var colorG = chObject.configurations.colorG;
+  var alpha = chObject.configurations.alpha;
+  var size = chObject.configurations.size;
+
+  var material = new THREE.RawShaderMaterial({
+    vertexShader: ShaderContent.crossHairVertexShader,
+    fragmentShader: ShaderContent.crossHairFragmentShader,
+    transparent: true,
+    side: THREE.DoubleSide,
+    uniforms: {
+      texture: textureAtlasHandler.getTextureUniform(),
+      color: new THREE.Uniform(new THREE.Vector4(colorR, colorG, colorB, alpha)),
+      uvTransform: new THREE.Uniform(new THREE.Matrix3()),
+      expandInfo: new THREE.Uniform(new THREE.Vector4(0, 0, 0, 0)),
+      uvRanges: new THREE.Uniform(new THREE.Vector4(ranges.startU, ranges.startV, ranges.endU, ranges.endV)),
+      shrinkStartSize: new THREE.Uniform(size),
+      screenResolution: GLOBAL_SCREEN_RESOLUTION_UNIFORM
+    }
+  });
+
+  var mesh = new THREE.Points(chObject.geometry, material);
+
+  if (!(typeof chObject.maxWidthPercent == UNDEFINED) || !(typeof chObject.maxHeightPercent == UNDEFINED)){
+    mesh.material.uniforms.sizeScale = new THREE.Uniform(1);
+    macroHandler.injectMacro("HAS_SIZE_SCALE", material, true, false);
+  }
+
+  macroHandler.injectMacro("TEXTURE_SIZE " + ACCEPTED_TEXTURE_SIZE, material, false, true);
+
+  scene.add(mesh);
+  mesh.renderOrder = renderOrders.CROSSHAIR;
+  mesh.position.set(0, 0, 0);
+  mesh.frustumCulled = false;
+  mesh.visible = false;
+
+  return mesh;
 }
 
 MeshGenerator.prototype.generateObjectTrail = function(
@@ -52,61 +84,44 @@ MeshGenerator.prototype.generateObjectTrail = function(
     material.uniforms.fogInfo = GLOBAL_FOG_UNIFORM;
     macroHandler.injectMacro("HAS_FOG", material, false, true);
   }
-  if (trail.diffuseTexture){
-    material.uniforms.diffuseMap = this.getTextureUniform(trail.diffuseTexture);
-    macroHandler.injectMacro("HAS_DIFFUSE", material, false, true);
+  if (trail.object.hasDiffuseMap()){
+    macroHandler.injectMacro("HAS_DIFFUSE", material, true, true);
   }
-  if (trail.emissiveTexture){
-    material.uniforms.emissiveMap = this.getTextureUniform(trail.emissiveTexture);
+  if (trail.object.hasEmissiveMap()){
     macroHandler.injectMacro("HAS_EMISSIVE", material, true, true);
   }
-  if (trail.displacementTexture && VERTEX_SHADER_TEXTURE_FETCH_SUPPORTED){
-    material.uniforms.displacementMap = this.getTextureUniform(trail.displacementTexture);
+  if (trail.object.hasDisplacementMap() && VERTEX_SHADER_TEXTURE_FETCH_SUPPORTED){
     macroHandler.injectMacro("HAS_DISPLACEMENT", material, true, false);
   }
-  if (trail.alphaTexture){
-    material.uniforms.alphaMap = this.getTextureUniform(trail.alphaTexture);
-    macroHandler.injectMacro("HAS_ALPHA", material, false, true);
+  if (trail.object.hasAlphaMap()){
+    macroHandler.injectMacro("HAS_ALPHA", material, true, true);
   }
-  if (trail.hasTexture){
+  if (trail.hasTexture()){
+    material.uniforms.texture = textureAtlasHandler.getTextureUniform();
     macroHandler.injectMacro("HAS_TEXTURE", material, true, true);
   }
   return mesh;
 }
 
 MeshGenerator.prototype.generateInstancedMesh = function(graphicsGroup, objectGroup){
-  var hasTexture = objectGroup.hasTexture;
-  var diffuseTexture = objectGroup.diffuseTexture;
-  var emissiveTexture = objectGroup.emissiveTexture;
-  var alphaTexture = objectGroup.alphaTexture;
-  var aoTexture = objectGroup.aoTexture;
-  var displacementTexture = objectGroup.displacementTexture;
   var vertexShader = ShaderContent.instancedBasicMaterialVertexShader;
   var uniforms = {
     projectionMatrix: GLOBAL_PROJECTION_UNIFORM,
     modelViewMatrix: new THREE.Uniform(new THREE.Matrix4()),
     totalAlpha: new THREE.Uniform(1)
   };
-  if (hasTexture){
+  if (objectGroup.hasTexture){
     uniforms.totalTextureOffset = new THREE.Uniform(new THREE.Vector2(0, 0));
+    uniforms.texture = textureAtlasHandler.getTextureUniform();
   }
-  if (aoTexture){
-    uniforms.aoMap = this.getTextureUniform(aoTexture);
+  if (objectGroup.hasAOMap()){
     uniforms.totalAOIntensity = new THREE.Uniform(1);
   }
-  if (emissiveTexture){
-    uniforms.emissiveMap = this.getTextureUniform(emissiveTexture);
+  if (objectGroup.hasEmissiveMap()){
     uniforms.totalEmissiveColor = new THREE.Uniform(new THREE.Color("white"));
     uniforms.totalEmissiveIntensity = new THREE.Uniform(1);
   }
-  if (diffuseTexture){
-    uniforms.diffuseMap = this.getTextureUniform(diffuseTexture);
-  }
-  if (alphaTexture){
-    uniforms.alphaMap = this.getTextureUniform(alphaTexture);
-  }
-  if (displacementTexture && VERTEX_SHADER_TEXTURE_FETCH_SUPPORTED){
-    uniforms.displacementMap = this.getTextureUniform(displacementTexture);
+  if (objectGroup.hasDisplacementMap() && VERTEX_SHADER_TEXTURE_FETCH_SUPPORTED){
     uniforms.totalDisplacementInfo = new THREE.Uniform(new THREE.Vector2(1, 1));
   }
   var material = new THREE.RawShaderMaterial({
@@ -125,11 +140,6 @@ MeshGenerator.prototype.generateInstancedMesh = function(graphicsGroup, objectGr
 
 MeshGenerator.prototype.generateMergedMesh = function(graphicsGroup, objectGroup){
   var hasTexture = objectGroup.hasTexture;
-  var diffuseTexture = objectGroup.diffuseTexture;
-  var emissiveTexture = objectGroup.emissiveTexture;
-  var alphaTexture = objectGroup.alphaTexture;
-  var aoTexture = objectGroup.aoTexture;
-  var displacementTexture = objectGroup.displacementTexture;
 
   var uniforms = {
     projectionMatrix: GLOBAL_PROJECTION_UNIFORM,
@@ -138,24 +148,16 @@ MeshGenerator.prototype.generateMergedMesh = function(graphicsGroup, objectGroup
   }
   if (hasTexture){
     uniforms.totalTextureOffset = new THREE.Uniform(new THREE.Vector2(0, 0));
+    uniforms.texture = textureAtlasHandler.getTextureUniform();
   }
-  if (aoTexture){
-    uniforms.aoMap = this.getTextureUniform(aoTexture);
+  if (objectGroup.hasAOMap()){
     uniforms.totalAOIntensity = new THREE.Uniform(1);
   }
-  if (emissiveTexture){
-    uniforms.emissiveMap = this.getTextureUniform(emissiveTexture);
+  if (objectGroup.hasEmissiveMap()){
     uniforms.totalEmissiveIntensity = new THREE.Uniform(1);
     uniforms.totalEmissiveColor = new THREE.Uniform(new THREE.Color("white"));
   }
-  if (diffuseTexture){
-    uniforms.diffuseMap = this.getTextureUniform(diffuseTexture);
-  }
-  if (alphaTexture){
-    uniforms.alphaMap = this.getTextureUniform(alphaTexture);
-  }
-  if (displacementTexture){
-    uniforms.displacementMap = this.getTextureUniform(displacementTexture);
+  if (objectGroup.hasDisplacementMap()){
     uniforms.totalDisplacementInfo = new THREE.Uniform(new THREE.Vector2(1, 1));
   }
 
@@ -255,8 +257,9 @@ MeshGenerator.prototype.generateParticleSystemMesh = function(ps, texture, noTar
     macroHandler.injectMacro("HAS_FOG", ps.material, false, true);
   }
   if (texture){
-    ps.material.uniforms.texture = new THREE.Uniform(texture);
+    ps.material.uniforms.texture = textureAtlasHandler.getTextureUniform();
     macroHandler.injectMacro("HAS_TEXTURE", ps.material, true, true);
+    macroHandler.injectMacro("TEXTURE_SIZE " + ACCEPTED_TEXTURE_SIZE, ps.material, true, false);
   }
   if (!noTargetColor){
     macroHandler.injectMacro("HAS_TARGET_COLOR", ps.material, true, false);
@@ -270,6 +273,62 @@ MeshGenerator.prototype.generateParticleSystemMesh = function(ps, texture, noTar
   mesh.position.set(ps.x, ps.y, ps.z);
   mesh.frustumCulled = false;
   mesh.visible = false;
+  return mesh;
+}
+
+MeshGenerator.prototype.generateMergedParticleSystemMesh = function(params){
+
+  var vertexShader = ShaderContent.particleVertexShader.replace(
+    "#define OBJECT_SIZE 1", "#define OBJECT_SIZE "+params.size
+  );
+
+  var material = new THREE.RawShaderMaterial({
+    vertexShader: vertexShader,
+    fragmentShader: ShaderContent.particleFragmentShader,
+    transparent: true,
+    side: THREE.DoubleSide,
+    uniforms:{
+      modelViewMatrixArray: new THREE.Uniform(params.mvMatrixArray),
+      worldMatrixArray: new THREE.Uniform(params.worldMatrixArray),
+      projectionMatrix: GLOBAL_PROJECTION_UNIFORM,
+      viewMatrix: GLOBAL_VIEW_UNIFORM,
+      timeArray: new THREE.Uniform(params.timeArray),
+      hiddenArray: new THREE.Uniform(params.hiddenArray),
+      dissapearCoefArray: new THREE.Uniform(params.dissapearCoefArray),
+      stopInfoArray: new THREE.Uniform(params.stopInfoArray),
+      parentMotionMatrixArray: new THREE.Uniform(params.motionMatrixArray),
+      screenResolution: GLOBAL_SCREEN_RESOLUTION_UNIFORM
+    }
+  });
+
+  macroHandler.injectMacro("IS_MERGED", material, true, false);
+  if (fogHandler.isFogBlendingWithSkybox()){
+    material.uniforms.cameraPosition = GLOBAL_CAMERA_POSITION_UNIFORM;
+    material.uniforms.cubeTexture = GLOBAL_CUBE_TEXTURE_UNIFORM;
+    macroHandler.injectMacro("HAS_SKYBOX_FOG", material, true, true);
+  }
+  if (fogHandler.isFogActive()){
+    material.uniforms.fogInfo = GLOBAL_FOG_UNIFORM;
+    macroHandler.injectMacro("HAS_FOG", material, false, true);
+  }
+  if (params.texture){
+    material.uniforms.texture = textureAtlasHandler.getTextureUniform();
+    macroHandler.injectMacro("HAS_TEXTURE", material, true, true);
+    macroHandler.injectMacro("TEXTURE_SIZE " + ACCEPTED_TEXTURE_SIZE, material, true, false);
+  }
+  if (!params.noTargetColor){
+    macroHandler.injectMacro("HAS_TARGET_COLOR", material, true, false);
+  }
+  if (particleSystemRefHeight){
+    macroHandler.injectMacro("HAS_REF_HEIGHT", material, true, false);
+    material.uniforms.refHeightCoef = GLOBAL_PS_REF_HEIGHT_UNIFORM;
+  }
+
+  var mesh = new THREE.Points(params.geometry, material);
+  mesh.renderOrder = renderOrders.PARTICLE_SYSTEM;
+  mesh.frustumCulled = false;
+  scene.add(mesh);
+
   return mesh;
 }
 

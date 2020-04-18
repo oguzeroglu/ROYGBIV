@@ -4,6 +4,7 @@ var bodyParser = require("body-parser");
 var fs = require("fs");
 var path = require("path");
 var childProcess = require("child_process");
+var sizeOf = require('image-size');
 
 console.log("*******************************************")
 console.log( " ____   _____   ______ ____ _____     __ ");
@@ -55,6 +56,7 @@ app.post("/build", function(req, res){
 
 app.post("/getTexturePackFolders", function(req, res){
   console.log("[*] Getting texture pack folders.");
+  var acceptedTextureSize = req.body.acceptedTextureSize;
   res.setHeader('Content-Type', 'application/json');
   var folders = [];
   var dirs = fs.readdirSync("texture_packs").filter(f => {
@@ -66,7 +68,10 @@ app.post("/getTexturePackFolders", function(req, res){
   for (var i = 0; i<dirs.length; i++){
     var texturePackFolder = path.join("./texture_packs/", dirs[i]);
     if (fs.readdirSync(texturePackFolder).indexOf("diffuse.png") > -1){
-      folders.push(dirs[i]);
+      var dimensions = sizeOf(path.join(texturePackFolder, "diffuse.png"));
+      if (dimensions.width == acceptedTextureSize && dimensions.height == acceptedTextureSize){
+        folders.push(dirs[i]);
+      }
     }
   }
   console.log("[*] Found "+folders.length+" texture packs.");
@@ -118,56 +123,16 @@ app.post("/getScripts", function(req, res){
   res.send(JSON.stringify(scriptDescription));
 });
 
-app.post("/prepareTexturePack", async function(req, res){
-  console.log("[*] Preparing texture pack: "+req.body.texturePackName);
-  var info = {hasDiffuse: false, hasAlpha: false, hasAO: false, hasEmissive: false, hasHeight: false};
+app.post("/getTexturePackInfo", async function(req, res){
   res.setHeader('Content-Type', 'application/json');
   var mainPath = "./texture_packs/"+req.body.texturePackName;
-  var compressInfo = [];
-  if (fs.existsSync(mainPath+"/diffuse.png")){
-    info.hasDiffuse = true;
-    compressInfo.push(["astc", "diffuse", mainPath]);
-    compressInfo.push(["pvrtc", "diffuse", mainPath]);
-    compressInfo.push(["s3tc", "diffuse", mainPath]);
-  }
-  if (fs.existsSync(mainPath+"/alpha.png")){
-    info.hasAlpha = true;
-    compressInfo.push(["astc", "alpha", mainPath]);
-    compressInfo.push(["pvrtc", "alpha", mainPath]);
-    compressInfo.push(["s3tc", "alpha", mainPath]);
-  }
-  if (fs.existsSync(mainPath+"/ao.png")){
-    info.hasAO = true;
-    compressInfo.push(["astc", "ao", mainPath]);
-    compressInfo.push(["pvrtc", "ao", mainPath]);
-    compressInfo.push(["s3tc", "ao", mainPath]);
-  }
-  if (fs.existsSync(mainPath+"/emissive.png")){
-    info.hasEmissive = true;
-    compressInfo.push(["astc", "emissive", mainPath]);
-    compressInfo.push(["pvrtc", "emissive", mainPath]);
-    compressInfo.push(["s3tc", "emissive", mainPath]);
-  }
-  if (fs.existsSync(mainPath+"/height.png")){
-    info.hasHeight = true;
-    compressInfo.push(["astc", "height", mainPath]);
-    compressInfo.push(["pvrtc", "height", mainPath]);
-    compressInfo.push(["s3tc", "height", mainPath]);
-  }
-  for (var i = 0; i<compressInfo.length; i++){
-    var result = await compressTexture(compressInfo[i][0], compressInfo[i][1], compressInfo[i][2], true, false, false);
-    if (result == "UNSUCC"){
-      console.log("[!] Error happened trying to compress: "+compressInfo[i][1]+" with "+compressInfo[i][0]);
-      result = await compressTexture(compressInfo[i][0], compressInfo[i][1], compressInfo[i][2], true, true, false);
-      if (result == "UNSUCC"){
-        res.send(JSON.stringify({error: true, texture: compressInfo[i][1]}));
-        return;
-      }else{
-        console.log("[*] Compressed "+compressInfo[i][1]+" texture using fallback format.");
-      }
-    }
-  }
-  res.send(JSON.stringify(info));
+  res.send(JSON.stringify({
+    hasDiffuse: fs.existsSync(mainPath+"/diffuse.png"),
+    hasAlpha: fs.existsSync(mainPath+"/alpha.png"),
+    hasAO: fs.existsSync(mainPath+"/ao.png"),
+    hasEmissive: fs.existsSync(mainPath+"/emissive.png"),
+    hasHeight: fs.existsSync(mainPath+"/height.png")
+  }));
 });
 
 app.post("/prepareDynamicTextures", async function(req, res){

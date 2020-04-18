@@ -4,22 +4,6 @@ var AutoInstancingHandler = function(){
 
 AutoInstancingHandler.prototype.getObjectKey = function(obj){
   var geomKey = obj.mesh.geometry.uuid;
-  var diffuseKey = "null", alphaKey = "null", aoKey = "null", displacementKey = "null", emissiveKey = "null";
-  if (obj.hasDiffuseMap()){
-    diffuseKey = obj.mesh.material.uniforms.diffuseMap.value.uuid;
-  }
-  if (obj.hasAlphaMap()){
-    alphaKey = obj.mesh.material.uniforms.alphaMap.value.uuid;
-  }
-  if (obj.hasAOMap()){
-    aoKey = obj.mesh.material.uniforms.aoMap.value.uuid;
-  }
-  if (obj.hasDisplacementMap()){
-    displacementKey = obj.mesh.material.uniforms.displacementMap.value.uuid;
-  }
-  if (obj.hasEmissiveMap()){
-    emissiveKey = obj.mesh.material.uniforms.emissiveMap.value.uuid;
-  }
   var blendingKey = obj.blendingMode;
   if (!blendingKey){
     blendingKey = "NORMAL_BLENDING";
@@ -28,7 +12,7 @@ AutoInstancingHandler.prototype.getObjectKey = function(obj){
   if (obj.hasCustomPrecision){
     shaderPrecisionKey = obj.customPrecision;
   }
-  return geomKey + PIPE + obj.registeredSceneName + PIPE + diffuseKey + PIPE + alphaKey + PIPE + aoKey + PIPE + displacementKey + PIPE + emissiveKey + PIPE + blendingKey + PIPE + shaderPrecisionKey;
+  return geomKey + PIPE + obj.registeredSceneName + PIPE + blendingKey + PIPE + shaderPrecisionKey;
 }
 
 AutoInstancingHandler.prototype.handle = function(){

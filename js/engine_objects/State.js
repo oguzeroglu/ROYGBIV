@@ -55,6 +55,8 @@ var State = function(projectName, author){
     wallCollectionsExport[wallCollectionName] = wallCollections[wallCollectionName].export();
   }
   this.wallCollections = wallCollectionsExport;
+  // ACCEPTED TEXTURE SIZE *****************************************
+  this.ACCEPTED_TEXTURE_SIZE = ACCEPTED_TEXTURE_SIZE;
   // TEXTURE PACKS *************************************************
   var texturePacksExport = new Object();
   this.totalTexturePackCount = 0;

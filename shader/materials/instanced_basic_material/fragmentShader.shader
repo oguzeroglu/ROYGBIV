@@ -18,29 +18,33 @@ uniform float totalAlpha;
 #endif
 
 #ifdef HAS_TEXTURE
+  uniform sampler2D texture;
   varying vec2 vUV;
+  varying vec2 vTextureMirrorInfo;
   #ifdef HAS_DIFFUSE
     varying float hasDiffuseMap;
+    varying vec4 vDiffuseUV;
   #endif
   #ifdef HAS_EMISSIVE
     varying float hasEmissiveMap;
+    varying vec4 vEmissiveUV;
   #endif
   #ifdef HAS_ALPHA
     varying float hasAlphaMap;
+    varying vec4 vAlphaUV;
   #endif
   #ifdef HAS_AO
     varying float hasAOMap;
+    varying vec4 vAOUV;
   #endif
 #endif
 #ifdef HAS_AO
   uniform float totalAOIntensity;
-  uniform sampler2D aoMap;
   varying float vAOIntensity;
 #endif
 #ifdef HAS_EMISSIVE
   uniform float totalEmissiveIntensity;
   uniform vec3 totalEmissiveColor;
-  uniform sampler2D emissiveMap;
   varying float vEmissiveIntensity;
   varying vec3 vEmissiveColor;
 #endif
@@ -49,17 +53,62 @@ uniform float totalAlpha;
   uniform samplerCube cubeTexture;
   varying vec3 vWorldPosition;
 #endif
-#ifdef HAS_DIFFUSE
-  uniform sampler2D diffuseMap;
-#endif
-#ifdef HAS_ALPHA
-  uniform sampler2D alphaMap;
-#endif
 #ifdef HAS_FOG
   uniform vec4 fogInfo;
 #endif
 #ifdef HAS_FORCED_COLOR
   uniform vec4 forcedColor;
+#endif
+
+#ifdef HAS_TEXTURE
+
+  float flipNumber(float num, float min, float max){
+    return (max + min) - num;
+  }
+
+  vec2 uvAffineTransformation(vec2 original, float startU, float startV, float endU, float endV) {
+    float coordX = (original.x * (endU - startU) + startU);
+    float coordY = (original.y * (startV - endV) + endV);
+
+    if (coordX > endU){
+      if (vTextureMirrorInfo.x < 0.0){
+        coordX = flipNumber(endU - mod((coordX - endU), (endU - startU)), endU, startU);
+      }else{
+        coordX = endU - mod((coordX - endU), (endU - startU));
+      }
+    }
+
+    if (coordX < startU){
+      if (vTextureMirrorInfo.x < 0.0){
+        coordX = flipNumber(startU + mod((startU - coordX), (endU - startU)), endU, startU);
+      }else{
+        coordX = startU + mod((startU - coordX), (endU - startU));
+      }
+    }
+
+    if (coordY > startV){
+      if (vTextureMirrorInfo.y < 0.0){
+        coordY = flipNumber(startV - mod((coordY - startV), (startV - endV)), startV, endV);
+      }else{
+        coordY = startV - mod((coordY - startV), (startV - endV));
+      }
+    }
+
+    if (coordY < endV){
+      if (vTextureMirrorInfo.y < 0.0){
+        coordY = flipNumber(endV + mod((endV - coordY), (startV - endV)), startV, endV);
+      }else{
+        coordY = endV + mod((endV - coordY), (startV - endV));
+      }
+    }
+
+    return vec2(coordX, coordY);
+  }
+
+  vec4 fixTextureBleeding(vec4 uvCoordinates){
+    float offset = 0.5 / float(TEXTURE_SIZE);
+    return vec4(uvCoordinates[0] + offset, uvCoordinates[1] - offset, uvCoordinates[2] - offset, uvCoordinates[3] + offset);
+  }
 #endif
 
 void main(){
@@ -88,7 +137,8 @@ void main(){
 
   #ifdef HAS_DIFFUSE
     if (hasDiffuseMap > 0.0){
-      diffuseColor = texture2D(diffuseMap, vUV);
+      vec4 diffuseUVFixed = fixTextureBleeding(vDiffuseUV);
+      diffuseColor = texture2D(texture, uvAffineTransformation(vUV, diffuseUVFixed.x, diffuseUVFixed.y, diffuseUVFixed.z, diffuseUVFixed.w));
     }
   #endif
 
@@ -96,7 +146,8 @@ void main(){
 
   #ifdef HAS_ALPHA
     if (hasAlphaMap > 0.0){
-      float val = texture2D(alphaMap, vUV).g;
+      vec4 alphaUVFixed = fixTextureBleeding(vAlphaUV);
+      float val = texture2D(texture, uvAffineTransformation(vUV, alphaUVFixed.x, alphaUVFixed.y, alphaUVFixed.z, alphaUVFixed.w)).g;
       gl_FragColor.a *= val;
       if (val <= ALPHA_TEST){
         discard;
@@ -107,14 +158,16 @@ void main(){
   #ifdef HAS_AO
     if (hasAOMap > 0.0){
       float aoIntensityCoef = vAOIntensity * totalAOIntensity;
-      float ao = (texture2D(aoMap, vUV).r - 1.0) * aoIntensityCoef + 1.0;
+      vec4 alphaUVFixed = fixTextureBleeding(vAOUV);
+      float ao = (texture2D(texture, uvAffineTransformation(vUV, alphaUVFixed.x, alphaUVFixed.y, alphaUVFixed.z, alphaUVFixed.w)).r - 1.0) * aoIntensityCoef + 1.0;
       gl_FragColor.rgb *= ao;
     }
   #endif
 
   #ifdef HAS_EMISSIVE
      if (hasEmissiveMap > 0.0){
-      vec4 eColor = texture2D(emissiveMap, vUV);
+      vec4 emissiveUVFixed = fixTextureBleeding(vEmissiveUV);
+      vec4 eColor = texture2D(texture, uvAffineTransformation(vUV, emissiveUVFixed.x, emissiveUVFixed.y, emissiveUVFixed.z, emissiveUVFixed.w));
       float ei = vEmissiveIntensity * totalEmissiveIntensity;
       vec3 totalEmissiveRadiance = vec3(ei, ei, ei) * vEmissiveColor * totalEmissiveColor;
       totalEmissiveRadiance *= eColor.rgb;

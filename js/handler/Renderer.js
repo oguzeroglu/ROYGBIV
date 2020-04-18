@@ -61,6 +61,10 @@ Renderer.prototype.isVertexShaderTextureFetchSupported = function(){
   return (this.webglRenderer.context.getParameter(this.webglRenderer.context.MAX_VERTEX_TEXTURE_IMAGE_UNITS) > 0);
 }
 
+Renderer.prototype.getMaxVertexAttribs = function(){
+  return this.webglRenderer.capabilities.maxAttributes;
+}
+
 Renderer.prototype.getMaxVertexUniformVectors = function(){
   return this.webglRenderer.context.getParameter(this.webglRenderer.context.MAX_VERTEX_UNIFORM_VECTORS);
 }

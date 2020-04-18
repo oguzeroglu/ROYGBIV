@@ -22,6 +22,7 @@
   "homepage": "https://github.com/oguzeroglu/ROYGBIV#readme",
   "dependencies": {
     "express": "^4.16.4",
+    "image-size": "^0.8.3",
     "texture-compressor": "^1.0.0"
   }
 }

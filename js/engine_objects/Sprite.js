@@ -26,6 +26,16 @@ var Sprite = function(name){
   webglCallbackHandler.registerEngineObject(this);
 }
 
+Sprite.prototype.onTextureAtlasRefreshed = function(){
+  if (!this.isTextured){
+    return;
+  }
+
+  this.mesh.material.uniforms.texture = textureAtlasHandler.getTextureUniform();
+  var newRanges = textureAtlasHandler.getRangesForTexturePack(texturePacks[this.mappedTexturePackName], "diffuse");
+  this.mesh.material.uniforms.uvRanges.value.set(newRanges.startU, newRanges.startV, newRanges.endU, newRanges.endV);
+}
+
 Sprite.prototype.copyAnimationsFromObject = function(sprite){
   this.animations = new Object();
 
@@ -462,9 +472,22 @@ Sprite.prototype.getTextureUniform = function(texture){
 Sprite.prototype.mapTexture = function(texturePack){
   if (!this.isTextured){
     macroHandler.injectMacro("HAS_TEXTURE", this.mesh.material, true, true);
+    macroHandler.injectMacro("TEXTURE_SIZE " + ACCEPTED_TEXTURE_SIZE, this.mesh.material, false, true);
     this.mesh.material.needsUpdate = true;
   }
-  this.mesh.material.uniforms.texture = this.getTextureUniform(texturePack.diffuseTexture);
+  var ranges;
+  if (!texturePack.isDynamic){
+    ranges = textureAtlasHandler.getRangesForTexturePack(texturePack, "diffuse");
+    this.mesh.material.uniforms.texture = textureAtlasHandler.getTextureUniform();
+  }else{
+    ranges = DEFAULT_UV_RANGE;
+    this.mesh.material.uniforms.texture = this.getTextureUniform(texturePack.diffuseTexture);
+  }
+  if (this.mesh.material.uniforms.uvRanges){
+    this.mesh.material.uniforms.uvRanges.value.set(ranges.startU, ranges.startV, ranges.endU, ranges.endV);
+  }else{
+    this.mesh.material.uniforms.uvRanges = new THREE.Uniform(new THREE.Vector4(ranges.startU, ranges.startV, ranges.endU, ranges.endV));
+  }
   this.isTextured = true;
   this.mappedTexturePackName = texturePack.name;
 }
@@ -475,6 +498,7 @@ Sprite.prototype.removeTexture = function(){
   }
   macroHandler.removeMacro("HAS_TEXTURE", this.mesh.material, true, true);
   delete this.mesh.material.uniforms.texture;
+  delete this.mesh.material.uniforms.uvRanges;
   this.mesh.material.needsUpdate = true;
   this.isTextured = false;
   delete this.mappedTexturePackName;

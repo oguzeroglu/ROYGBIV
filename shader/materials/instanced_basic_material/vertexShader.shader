@@ -1,7 +1,10 @@
 precision lowp float;
 precision lowp int;
 
+#define INSERTION
+
 attribute vec3 color;
+
 attribute vec3 position;
 attribute vec3 normal;
 
@@ -10,8 +13,6 @@ uniform mat4 projectionMatrix;
 
 varying vec3 vColor;
 varying float vAlpha;
-
-#define INSERTION
 
 #ifdef IS_AUTO_INSTANCED
   attribute float orientationIndex;
@@ -41,36 +42,58 @@ varying float vAlpha;
 #ifdef HAS_EMISSIVE
   attribute float emissiveIntensity;
   attribute vec3 emissiveColor;
+
   varying float vEmissiveIntensity;
   varying vec3 vEmissiveColor;
 #endif
 #ifdef HAS_AO
   attribute float aoIntensity;
+
   varying float vAOIntensity;
 #endif
 #ifdef HAS_TEXTURE
   attribute vec2 uv;
   attribute vec4 textureInfo;
+
   attribute vec4 textureMatrixInfo;
+  attribute vec2 textureMirrorInfo;
+
   uniform vec2 totalTextureOffset;
   varying vec2 vUV;
+  varying vec2 vTextureMirrorInfo;
   #ifdef HAS_DIFFUSE
     varying float hasDiffuseMap;
+    attribute vec4 diffuseUV;
+
+    varying vec4 vDiffuseUV;
   #endif
   #ifdef HAS_EMISSIVE
     varying float hasEmissiveMap;
+    attribute vec4 emissiveUV;
+
+    varying vec4 vEmissiveUV;
   #endif
   #ifdef HAS_ALPHA
     varying float hasAlphaMap;
+    attribute vec4 alphaUV;
+
+    varying vec4 vAlphaUV;
   #endif
   #ifdef HAS_AO
     varying float hasAOMap;
+    attribute vec4 aoUV;
+
+    varying vec4 vAOUV;
   #endif
 #endif
 #ifdef HAS_DISPLACEMENT
   attribute vec2 displacementInfo;
-  uniform sampler2D displacementMap;
+
+  uniform sampler2D texture;
   uniform vec2 totalDisplacementInfo;
+  attribute vec4 displacementUV;
+
+  vec2 calculatedDisplacementUV;
 #endif
 #if defined(HAS_SKYBOX_FOG) || defined(AFFECTED_BY_LIGHT)
   uniform mat4 worldMatrix;
@@ -797,6 +820,76 @@ vec3 applyQuaternionToVector(vec3 vector, vec4 quaternion){
   return vec3(calculatedX, calculatedY, calculatedZ);
 }
 
+#ifdef HAS_TEXTURE
+
+  float flipNumber(float num, float min, float max){
+    return (max + min) - num;
+  }
+
+  vec2 uvAffineTransformation(vec2 original, float startU, float startV, float endU, float endV) {
+    float coordX = (original.x * (endU - startU) + startU);
+    float coordY = (original.y * (startV - endV) + endV);
+
+    if (coordX > endU){
+      if(textureMirrorInfo.x < 0.0){
+        coordX = flipNumber(endU - mod((coordX - endU), (endU - startU)), endU, startU);
+      }else{
+        coordX = endU - mod((coordX - endU), (endU - startU));
+      }
+    }
+
+    if (coordX < startU){
+      if(textureMirrorInfo.x < 0.0){
+        coordX = flipNumber(startU + mod((startU - coordX), (endU - startU)), endU, startU);
+      }else{
+        coordX = startU + mod((startU - coordX), (endU - startU));
+      }
+    }
+
+    if (coordY > startV){
+      if (textureMirrorInfo.y < 0.0){
+        coordY = flipNumber(startV - mod((coordY - startV), (startV - endV)), startV, endV);
+      }else{
+        coordY = startV - mod((coordY - startV), (startV - endV));
+      }
+    }
+
+    if (coordY < endV){
+      if (textureMirrorInfo.y < 0.0){
+        coordY = flipNumber(endV + mod((endV - coordY), (startV - endV)), startV, endV);
+      }else{
+        coordY = endV + mod((endV - coordY), (startV - endV));
+      }
+    }
+
+    return vec2(coordX, coordY);
+  }
+
+  vec4 fixTextureBleeding(vec4 uvCoordinates){
+    float offset = 0.5 / float(TEXTURE_SIZE);
+    return vec4(uvCoordinates[0] + offset, uvCoordinates[1] - offset, uvCoordinates[2] - offset, uvCoordinates[3] + offset);
+  }
+
+  void handleUVs(vec2 transformedUV){
+    #ifdef HAS_DIFFUSE
+      vDiffuseUV = diffuseUV;
+    #endif
+    #ifdef HAS_EMISSIVE
+      vEmissiveUV = emissiveUV;
+    #endif
+    #ifdef HAS_ALPHA
+      vAlphaUV = alphaUV;
+    #endif
+    #ifdef HAS_AO
+      vAOUV = aoUV;
+    #endif
+    #ifdef HAS_DISPLACEMENT
+      vec4 displacementUVFixed = fixTextureBleeding(displacementUV);
+      calculatedDisplacementUV = uvAffineTransformation(transformedUV, displacementUVFixed.x, displacementUVFixed.y, displacementUVFixed.z, displacementUVFixed.w);
+    #endif
+  }
+#endif
+
 void main(){
 
   #ifdef IS_AUTO_INSTANCED
@@ -818,6 +911,9 @@ void main(){
     vAlpha = alpha;
   #endif
   #ifdef HAS_TEXTURE
+
+    vTextureMirrorInfo = textureMirrorInfo;
+
     #ifdef IS_AUTO_INSTANCED
       int textureOffsetInfoIndex = int(alphaIndex);
       vec2 textureOffsetInfo = autoInstanceTextureOffsetInfoArray[textureOffsetInfoIndex];
@@ -837,6 +933,9 @@ void main(){
         ) * vec3(uv, 1.0)
       ).xy;
     #endif
+
+    handleUVs(vUV);
+
     #ifdef HAS_DIFFUSE
       hasDiffuseMap = -10.0;
       if (textureInfo[0] > 0.0){
@@ -874,8 +973,8 @@ void main(){
   #endif
   #ifdef HAS_AO
     #ifdef IS_AUTO_INSTANCED
-      int iai = int(alphaIndex);
-      vAOIntensity = autoInstanceAOIntensityArray[iai];
+      int iai2 = int(alphaIndex);
+      vAOIntensity = autoInstanceAOIntensityArray[iai2];
     #else
       vAOIntensity = aoIntensity;
     #endif
@@ -893,7 +992,7 @@ void main(){
         float totalDisplacementScale = displacementInfo.x * totalDisplacementInfo.x;
         float totalDisplacementBias = displacementInfo.y * totalDisplacementInfo.y;
       #endif
-      transformedPosition += objNormal * (texture2D(displacementMap, uv).r * totalDisplacementScale + totalDisplacementBias);
+      transformedPosition += objNormal * (texture2D(texture, calculatedDisplacementUV).r * totalDisplacementScale + totalDisplacementBias);
     }
   #endif
   #ifdef IS_AUTO_INSTANCED

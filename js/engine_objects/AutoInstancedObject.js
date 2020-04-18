@@ -112,28 +112,30 @@ AutoInstancedObject.prototype.init = function(){
   var pseudoGraphicsGroup = new THREE.Object3D();
   pseudoGraphicsGroup.position.set(0, 0, 0);
   this.mesh = meshGenerator.generateInstancedMesh(pseudoGraphicsGroup, this.pseudoObjectGroup);
+
   this.mesh.geometry.removeAttribute("positionOffset");
   this.mesh.geometry.removeAttribute("quaternion");
   this.mesh.geometry.removeAttribute("alpha");
   this.mesh.frustumCulled = false;
   webglCallbackHandler.registerEngineObject(this);
-  if (this.pseudoObjectGroup.aoTexture){
+  if (this.pseudoObjectGroup.hasAOMap()){
     macroHandler.injectMacro("HAS_AO", this.mesh.material, true, true);
   }
-  if (this.pseudoObjectGroup.emissiveTexture){
+  if (this.pseudoObjectGroup.hasEmissiveMap()){
     macroHandler.injectMacro("HAS_EMISSIVE", this.mesh.material, true, true);
   }
-  if (this.pseudoObjectGroup.diffuseTexture){
+  if (this.pseudoObjectGroup.hasDiffuseMap()){
     macroHandler.injectMacro("HAS_DIFFUSE", this.mesh.material, true, true);
   }
-  if (this.pseudoObjectGroup.alphaTexture){
+  if (this.pseudoObjectGroup.hasAlphaMap()){
     macroHandler.injectMacro("HAS_ALPHA", this.mesh.material, true, true);
   }
-  if (this.pseudoObjectGroup.displacementTexture && VERTEX_SHADER_TEXTURE_FETCH_SUPPORTED){
+  if (this.pseudoObjectGroup.hasDisplacementMap() && VERTEX_SHADER_TEXTURE_FETCH_SUPPORTED){
     macroHandler.injectMacro("HAS_DISPLACEMENT", this.mesh.material, true, false);
   }
   if (this.pseudoObjectGroup.hasTexture){
     macroHandler.injectMacro("HAS_TEXTURE", this.mesh.material, true, true);
+    macroHandler.injectMacro("TEXTURE_SIZE " + ACCEPTED_TEXTURE_SIZE, this.mesh.material, true, true);
   }
   macroHandler.injectMacro("IS_AUTO_INSTANCED", this.mesh.material, true, true);
   var objCount = 0;
@@ -255,6 +257,19 @@ AutoInstancedObject.prototype.init = function(){
     }
     break;
   }
+
+  this.compressGeometry();
+}
+
+AutoInstancedObject.prototype.compressGeometry = function(){
+  var compressableAttributes = [
+    "quaternion", "alpha" , "color", "textureInfo", "textureMatrixInfo",
+    "diffuseUV", "emissiveIntensity", "emissiveColor", "emissiveUV",
+    "aoIntensity", "aoUV", "displacementInfo", "displacementUV", "alphaUV",
+    "affectedByLight"
+  ];
+
+  macroHandler.compressAttributes(this.mesh, compressableAttributes);
 }
 
 AutoInstancedObject.prototype.setFog = function(){

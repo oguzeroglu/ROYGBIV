@@ -1283,7 +1283,7 @@ ParticleSystemGenerator.prototype.generateParticleSystemMesh = function(ps){
       if (hasTexture){
         if (particle.material.texture){
           ps.flags2[i6++] = 10;
-          var range = textureAtlasHandler.textureMerger.ranges[particle.material.texture];
+          var range = textureAtlasHandler.textureMerger.ranges[particle.material.texture + "#diffuse"];
           ps.uvCoordinates[i10++] = range.startU;
           ps.uvCoordinates[i10++] = range.startV;
           ps.uvCoordinates[i10++] = range.endU;

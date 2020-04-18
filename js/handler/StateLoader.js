@@ -8,8 +8,11 @@ var StateLoader = function(stateObj){
   this.importHandler = new ImportHandler();
 }
 
-StateLoader.prototype.onTextureAtlasLoaded = function(){
+StateLoader.prototype.onTextureAtlasLoaded = function(texturePacksToMap){
   this.textureAtlasReady = true;
+  for (var i = 0; i < texturePacksToMap.length; i ++){
+    this.importHandler.mapLoadedTexturePack(texturePacksToMap[i].name, this.stateObj);
+  }
   this.finalize();
 }
 
@@ -21,10 +24,10 @@ StateLoader.prototype.onSkyboxLoaded = function(){
   this.finalize();
 }
 
-StateLoader.prototype.onTexturePackLoaded = function(){
+StateLoader.prototype.onTexturePackLoaded = function(texturePacksToMap){
   this.totalLoadedTexturePackCount ++;
   if (this.totalLoadedTexturePackCount == this.stateObj.totalTexturePackCount){
-    this.importHandler.importTextureAtlas(this.stateObj, this.onTextureAtlasLoaded.bind(this));
+    this.importHandler.importTextureAtlas(this.stateObj, this.onTextureAtlasLoaded.bind(this), texturePacksToMap);
   }
   this.finalize();
 }
@@ -69,7 +72,7 @@ StateLoader.prototype.load = function(){
 }
 
 StateLoader.prototype.shouldFinalize = function(){
-  var res =  !(
+  var res = !(
     (this.hasTextureAtlas && !this.textureAtlasReady) ||
     (this.hasTexturePacks && parseInt(this.totalLoadedTexturePackCount) < parseInt(this.stateObj.totalTexturePackCount)) ||
     (this.hasSkyboxes && parseInt(this.totalLoadedSkyboxCount) < parseInt(this.stateObj.totalSkyboxCount)) ||
