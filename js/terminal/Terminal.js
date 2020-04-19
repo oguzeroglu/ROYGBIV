@@ -64,21 +64,21 @@ Terminal.prototype.printHeader = function(text){
 	if (this.skip){
 		return;
 	}
-	this.print(text, {color: "fuchsia", noNewLine: true});
+	this.print(text, {color: "#67b6bd", noNewLine: true});
 }
 
 Terminal.prototype.printError = function(text){
 	if (this.skip){
 		return;
 	}
-	this.print(text, {color: "fuchsia"});
+	this.print(text, {color: "#67b6bd"});
 }
 
 Terminal.prototype.printInfo = function(text, noNewLine){
 	if (this.skip){
 		return;
 	}
-	var colorText = "yellow";
+	var colorText = "white";
 	if (!noNewLine){
 		this.print(text, {color: colorText});
 	}else{
@@ -101,20 +101,20 @@ Terminal.prototype.handleAboutCommand = function(){
 	if (isDeployment){
 		this.printInfo("Project name: "+projectName);
 		this.printInfo("Author: "+author);
-		this.print("Powered by", {color: "lime", noNewLine: true});
+		this.print("Powered by", {color: "#bfce72", noNewLine: true});
 	}
-	this.print(BANNERL1, {color: "lime", noNewLine: true});
-	this.print(BANNERL2, {color: "lime", noNewLine: true});
-	this.print(BANNERL3, {color: "lime", noNewLine: true});
-	this.print(BANNERL4, {color: "lime", noNewLine: true});
-	this.print(BANNERL5, {color: "lime", noNewLine: false});
+	this.print(BANNERL1, {color: "white", noNewLine: true});
+	this.print(BANNERL2, {color: "white", noNewLine: true});
+	this.print(BANNERL3, {color: "white", noNewLine: true});
+	this.print(BANNERL4, {color: "white", noNewLine: true});
+	this.print(BANNERL5, {color: "white", noNewLine: false});
 	if (!isDeployment){
 		terminal.printHeader(Text.VERSION);
 		terminal.printInfo(Text.TREE.replace(Text.PARAM1, ROYGBIV_ENGINE_VERSION));
 		terminal.printHeader(Text.CODER);
 		terminal.printInfo(Text.TREE.replace(Text.PARAM1, "Oğuz Eroğlu - github.com/oguzeroglu"));
 	}else{
-		this.print("by Oğuz Eroğlu - github.com/oguzeroglu", {color: "lime", noNewLine: false});
+		this.print("by Oğuz Eroğlu - github.com/oguzeroglu", {color: "#bfce72", noNewLine: false});
 	}
 }
 
@@ -132,7 +132,7 @@ Terminal.prototype.print = function(text, options){
 	if (!options){
 		this.jqueryContext.echo(text, {
 			finalize: function(div) {
-				div.css("color", "lime");
+				div.css("color", "#bfce72");
 			}, wrap: true
 		});
 	}else{
@@ -157,7 +157,7 @@ Terminal.prototype.printFunctionArguments = function(commandIndex){
 			Text.NO_ARGUMENTS_EXPECTED.replace(
 				Text.PARAM1, functionName
 			),{
-				color: "red"
+				color: "white"
 			}
 		);
 		return;
@@ -168,14 +168,14 @@ Terminal.prototype.printFunctionArguments = function(commandIndex){
 		Text.ARGUMENTS_EXPECTED.replace(
 			Text.PARAM1, expectedCount
 		),{
-			color: "red"
+			color: "white"
 		}
 	);
 	terminal.print(
 		Text.ONLY_PARAM.replace(
 			Text.PARAM1, functionName
 		),{
-			color: "fuchsia",
+			color: "#67b6bd",
 			noNewLine: true
 		}
 	);
@@ -185,7 +185,7 @@ Terminal.prototype.printFunctionArguments = function(commandIndex){
 				Text.TREE.replace(
 					Text.PARAM1, argumentsSplitted[i]
 				),{
-					color: "yellow",
+					color: "white",
 					noNewLine: true
 				}
 			);
@@ -194,7 +194,7 @@ Terminal.prototype.printFunctionArguments = function(commandIndex){
 				Text.TREE.replace(
 					Text.PARAM1, argumentsSplitted[i]
 				),{
-					color: "yellow"
+					color: "white"
 				}
 			);
 		}
@@ -215,7 +215,7 @@ Terminal.prototype.help = function(commandInfosSorted, commandsSorted, apiMatche
 			Text.ONLY_PARAM.replace(
 				Text.PARAM1, commandsSorted[i]
 			),{
-				color: "fuchsia",
+				color: "#67b6bd",
 				noNewLine: true
 			}
 		);
@@ -223,7 +223,7 @@ Terminal.prototype.help = function(commandInfosSorted, commandsSorted, apiMatche
 			Text.TABULATED_1.replace(
 				Text.PARAM1, commandInfosSorted[i]
 			),{
-				color: "yellow"
+				color: "white"
 			}
 		);
 		this.jqueryContext.resize();
@@ -236,7 +236,7 @@ Terminal.prototype.help = function(commandInfosSorted, commandsSorted, apiMatche
 				Text.ONLY_PARAM.replace(
 					Text.PARAM1, functionName+" (API function)"
 				),{
-					color: "fuchsia",
+					color: "#67b6bd",
 					noNewLine: true
 				}
 			);
@@ -244,7 +244,7 @@ Terminal.prototype.help = function(commandInfosSorted, commandsSorted, apiMatche
 				Text.TABULATED_1.replace(
 					Text.PARAM1, functionExplanaion
 				),{
-					color: "yellow"
+					color: "white"
 				}
 			);
 			this.jqueryContext.resize();
