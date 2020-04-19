@@ -1765,61 +1765,21 @@ GUIHandler.prototype.initializeTextManipulationGUI = function(){
       addedText.containerParent.insertAddedText(addedText);
     }
   }).listen();
-  guiHandler.textManipulationTextColorController = guiHandler.datGuiTextManipulation.add(guiHandler.textManipulationParameters, "Text color").onFinishChange(function(val){
+
+  var graphicsFolder = guiHandler.datGuiTextManipulation.addFolder("Graphics");
+  var backgroundFolder = guiHandler.datGuiTextManipulation.addFolder("Background");
+  var spacingFolder = guiHandler.datGuiTextManipulation.addFolder("Spacing");
+  var generalFolder = guiHandler.datGuiTextManipulation.addFolder("General");
+  var folder2D = guiHandler.datGuiTextManipulation.addFolder("2D");
+
+  // GRAPHICS
+  guiHandler.textManipulationTextColorController = graphicsFolder.add(guiHandler.textManipulationParameters, "Text color").onFinishChange(function(val){
     selectionHandler.getSelectedObject().setColor(val);
   }).listen();
-  guiHandler.textManipulationAlphaController = guiHandler.datGuiTextManipulation.add(guiHandler.textManipulationParameters, "Alpha").min(0).max(1).step(0.01).onChange(function(val){
+  guiHandler.textManipulationAlphaController = graphicsFolder.add(guiHandler.textManipulationParameters, "Alpha").min(0).max(1).step(0.01).onChange(function(val){
     selectionHandler.getSelectedObject().setAlpha(val);
   }).listen();
-  guiHandler.textManipulationHasBackgroundController = guiHandler.datGuiTextManipulation.add(guiHandler.textManipulationParameters, "Has bg").onChange(function(val){
-    if (val){
-      selectionHandler.getSelectedObject().setBackground("#000000", 1);
-      guiHandler.enableController(guiHandler.textManipulationBackgroundColorController);
-      guiHandler.enableController(guiHandler.textManipulationBackgroundAlphaController);
-    }else{
-      selectionHandler.getSelectedObject().removeBackground();
-      guiHandler.disableController(guiHandler.textManipulationBackgroundColorController);
-      guiHandler.disableController(guiHandler.textManipulationBackgroundAlphaController);
-    }
-    guiHandler.textManipulationParameters["Bg color"] = "#000000";
-    guiHandler.textManipulationParameters["Alpha"] = 1;
-  }).listen();
-  guiHandler.textManipulationBackgroundColorController = guiHandler.datGuiTextManipulation.add(guiHandler.textManipulationParameters, "Bg color").onFinishChange(function(val){
-    selectionHandler.getSelectedObject().setBackground(val, selectionHandler.getSelectedObject().getBackgroundAlpha());
-  }).listen();
-  guiHandler.textManipulationBackgroundAlphaController = guiHandler.datGuiTextManipulation.add(guiHandler.textManipulationParameters, "Bg alpha").min(0).max(1).step(0.01).onChange(function(val){
-    selectionHandler.getSelectedObject().setBackground(
-      "#" + selectionHandler.getSelectedObject().getBackgroundColor().getHexString(),
-      val
-    );
-  }).listen();
-  guiHandler.textManipulationCharacterSizeController = guiHandler.datGuiTextManipulation.add(guiHandler.textManipulationParameters, "Char size").min(0.5).max(200).step(0.5).onChange(function(val){
-    selectionHandler.getSelectedObject().setCharSize(val);
-    selectionHandler.getSelectedObject().refCharSize= val;
-    selectionHandler.getSelectedObject().refInnerHeight = window.innerHeight;
-    selectionHandler.getSelectedObject().handleResize();
-    if (selectionHandler.getSelectedObject().containerParent){
-      selectionHandler.getSelectedObject().containerParent.insertAddedText(selectionHandler.getSelectedObject());
-    }
-  }).listen();
-  guiHandler.textManipulationCharacterMarginController = guiHandler.datGuiTextManipulation.add(guiHandler.textManipulationParameters, "Char margin").min(0.5).max(100).step(0.5).onChange(function(val){
-    selectionHandler.getSelectedObject().setMarginBetweenChars(val);
-    selectionHandler.getSelectedObject().handleResize();
-    if (selectionHandler.getSelectedObject().containerParent){
-      selectionHandler.getSelectedObject().containerParent.insertAddedText(selectionHandler.getSelectedObject());
-    }
-  }).listen();
-  guiHandler.textManipulationLineMarginController = guiHandler.datGuiTextManipulation.add(guiHandler.textManipulationParameters, "Line margin").min(0.5).max(100).step(0.5).onChange(function(val){
-    selectionHandler.getSelectedObject().setMarginBetweenLines(val);
-    selectionHandler.getSelectedObject().handleResize();
-    if (selectionHandler.getSelectedObject().containerParent){
-      selectionHandler.getSelectedObject().containerParent.insertAddedText(selectionHandler.getSelectedObject());
-    }
-  }).listen();
-  guiHandler.textManipulationClickableController = guiHandler.datGuiTextManipulation.add(guiHandler.textManipulationParameters, "Clickable").onChange(function(val){
-    selectionHandler.getSelectedObject().isClickable = val;
-  }).listen();
-  guiHandler.textManipulationShaderPrecisionController = guiHandler.datGuiTextManipulation.add(guiHandler.textManipulationParameters, "Shader precision", ["default", "low", "medium", "high"]).onChange(function(val){
+  guiHandler.textManipulationShaderPrecisionController = graphicsFolder.add(guiHandler.textManipulationParameters, "Shader precision", ["default", "low", "medium", "high"]).onChange(function(val){
     switch(val){
       case "default":
         selectionHandler.getSelectedObject().useDefaultPrecision();
@@ -1837,10 +1797,66 @@ GUIHandler.prototype.initializeTextManipulationGUI = function(){
     terminal.clear();
     terminal.printInfo(Text.SHADER_PRECISION_ADJUSTED);
   }).listen();
-  guiHandler.textManipulationAffectedByFogController = guiHandler.datGuiTextManipulation.add(guiHandler.textManipulationParameters, "Aff. by fog").onChange(function(val){
+
+  // BACKGROUND
+  guiHandler.textManipulationHasBackgroundController = backgroundFolder.add(guiHandler.textManipulationParameters, "Has bg").onChange(function(val){
+    if (val){
+      selectionHandler.getSelectedObject().setBackground("#000000", 1);
+      guiHandler.enableController(guiHandler.textManipulationBackgroundColorController);
+      guiHandler.enableController(guiHandler.textManipulationBackgroundAlphaController);
+    }else{
+      selectionHandler.getSelectedObject().removeBackground();
+      guiHandler.disableController(guiHandler.textManipulationBackgroundColorController);
+      guiHandler.disableController(guiHandler.textManipulationBackgroundAlphaController);
+    }
+    guiHandler.textManipulationParameters["Bg color"] = "#000000";
+    guiHandler.textManipulationParameters["Alpha"] = 1;
+  }).listen();
+  guiHandler.textManipulationBackgroundColorController = backgroundFolder.add(guiHandler.textManipulationParameters, "Bg color").onFinishChange(function(val){
+    selectionHandler.getSelectedObject().setBackground(val, selectionHandler.getSelectedObject().getBackgroundAlpha());
+  }).listen();
+  guiHandler.textManipulationBackgroundAlphaController = backgroundFolder.add(guiHandler.textManipulationParameters, "Bg alpha").min(0).max(1).step(0.01).onChange(function(val){
+    selectionHandler.getSelectedObject().setBackground(
+      "#" + selectionHandler.getSelectedObject().getBackgroundColor().getHexString(),
+      val
+    );
+  }).listen();
+
+  // SPACING
+  guiHandler.textManipulationCharacterSizeController = spacingFolder.add(guiHandler.textManipulationParameters, "Char size").min(0.5).max(200).step(0.5).onChange(function(val){
+    selectionHandler.getSelectedObject().setCharSize(val);
+    selectionHandler.getSelectedObject().refCharSize= val;
+    selectionHandler.getSelectedObject().refInnerHeight = window.innerHeight;
+    selectionHandler.getSelectedObject().handleResize();
+    if (selectionHandler.getSelectedObject().containerParent){
+      selectionHandler.getSelectedObject().containerParent.insertAddedText(selectionHandler.getSelectedObject());
+    }
+  }).listen();
+  guiHandler.textManipulationCharacterMarginController = spacingFolder.add(guiHandler.textManipulationParameters, "Char margin").min(0.5).max(100).step(0.5).onChange(function(val){
+    selectionHandler.getSelectedObject().setMarginBetweenChars(val);
+    selectionHandler.getSelectedObject().handleResize();
+    if (selectionHandler.getSelectedObject().containerParent){
+      selectionHandler.getSelectedObject().containerParent.insertAddedText(selectionHandler.getSelectedObject());
+    }
+  }).listen();
+  guiHandler.textManipulationLineMarginController = spacingFolder.add(guiHandler.textManipulationParameters, "Line margin").min(0.5).max(100).step(0.5).onChange(function(val){
+    selectionHandler.getSelectedObject().setMarginBetweenLines(val);
+    selectionHandler.getSelectedObject().handleResize();
+    if (selectionHandler.getSelectedObject().containerParent){
+      selectionHandler.getSelectedObject().containerParent.insertAddedText(selectionHandler.getSelectedObject());
+    }
+  }).listen();
+
+  // GENERAL
+  guiHandler.textManipulationClickableController = generalFolder.add(guiHandler.textManipulationParameters, "Clickable").onChange(function(val){
+    selectionHandler.getSelectedObject().isClickable = val;
+  }).listen();
+  guiHandler.textManipulationAffectedByFogController = generalFolder.add(guiHandler.textManipulationParameters, "Aff. by fog").onChange(function(val){
     selectionHandler.getSelectedObject().setAffectedByFog(val);
   }).listen();
-  guiHandler.textManipulationIs2DController = guiHandler.datGuiTextManipulation.add(guiHandler.textManipulationParameters, "is 2D").onChange(function(val){
+
+  // 2D
+  guiHandler.textManipulationIs2DController = folder2D.add(guiHandler.textManipulationParameters, "is 2D").onChange(function(val){
     sceneHandler.onAddedTextDeletion(selectionHandler.getSelectedObject());
     selectionHandler.getSelectedObject().set2DStatus(val);
     sceneHandler.onAddedTextCreation(selectionHandler.getSelectedObject());
@@ -1873,7 +1889,7 @@ GUIHandler.prototype.initializeTextManipulationGUI = function(){
     selectionHandler.resetCurrentSelection();
     selectionHandler.select(obj);
   }).listen();
-  guiHandler.textManipulationMarginModeController = guiHandler.datGuiTextManipulation.add(guiHandler.textManipulationParameters, "Margin mode", ["Top/Left", "Bottom/Right", "Center"]).onChange(function(val){
+  guiHandler.textManipulationMarginModeController = folder2D.add(guiHandler.textManipulationParameters, "Margin mode", ["Top/Left", "Bottom/Right", "Center"]).onChange(function(val){
     if (val == "Top/Left"){
       selectionHandler.getSelectedObject().marginMode = MARGIN_MODE_2D_TOP_LEFT;
     }else if (val == "Bottom/Right"){
@@ -1886,23 +1902,23 @@ GUIHandler.prototype.initializeTextManipulationGUI = function(){
       selectionHandler.getSelectedObject().containerParent.insertAddedText(selectionHandler.getSelectedObject());
     }
   }).listen();
-  guiHandler.textManipulationMarginXController = guiHandler.datGuiTextManipulation.add(guiHandler.textManipulationParameters, "Margin X").min(0).max(100).step(0.1).onChange(function(val){
+  guiHandler.textManipulationMarginXController = folder2D.add(guiHandler.textManipulationParameters, "Margin X").min(0).max(100).step(0.1).onChange(function(val){
     selectionHandler.getSelectedObject().set2DCoordinates(
       val, selectionHandler.getSelectedObject().marginPercentHeight
     );
     selectionHandler.getSelectedObject().handleResize();
   }).listen();
-  guiHandler.textManipulationMarginYController = guiHandler.datGuiTextManipulation.add(guiHandler.textManipulationParameters, "Margin Y").min(0).max(100).step(0.1).onChange(function(val){
+  guiHandler.textManipulationMarginYController = folder2D.add(guiHandler.textManipulationParameters, "Margin Y").min(0).max(100).step(0.1).onChange(function(val){
     selectionHandler.getSelectedObject().set2DCoordinates(
       selectionHandler.getSelectedObject().marginPercentWidth, val
     );
     selectionHandler.getSelectedObject().handleResize();
   }).listen();
-  guiHandler.textManipulationMaxWidthPercentController = guiHandler.datGuiTextManipulation.add(guiHandler.textManipulationParameters, "Max width%").min(0).max(100).step(0.1).onChange(function(val){
+  guiHandler.textManipulationMaxWidthPercentController = folder2D.add(guiHandler.textManipulationParameters, "Max width%").min(0).max(100).step(0.1).onChange(function(val){
     selectionHandler.getSelectedObject().maxWidthPercent = val;
     selectionHandler.getSelectedObject().handleResize();
   }).listen();
-  guiHandler.textManipulationMaxHeightPercentController = guiHandler.datGuiTextManipulation.add(guiHandler.textManipulationParameters, "Max height%").min(0).max(100).step(0.1).onChange(function(val){
+  guiHandler.textManipulationMaxHeightPercentController = folder2D.add(guiHandler.textManipulationParameters, "Max height%").min(0).max(100).step(0.1).onChange(function(val){
     selectionHandler.getSelectedObject().maxHeightPercent = val;
     selectionHandler.getSelectedObject().handleResize();
   }).listen();
