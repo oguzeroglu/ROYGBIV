@@ -425,7 +425,7 @@ function handleScripts(application, engineScriptsConcatted){
 }
 
 function copyAssets(application){
-  copyFileSync("css/Hack-Bold.ttf", "deploy/"+application.projectName+"/css/");
+  copyFileSync("css/FiraMono-Bold.ttf", "deploy/"+application.projectName+"/css/");
   var htmlContent = fs.readFileSync("template/application.html", "utf8");
   htmlContent = htmlContent.replace(
     "@@1", application.projectName
