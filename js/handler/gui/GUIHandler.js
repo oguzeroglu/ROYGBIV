@@ -1110,18 +1110,30 @@ GUIHandler.prototype.initializeObjectManipulationGUI = function(){
   guiHandler.datGuiObjectManipulation.domElement.addEventListener("mousedown", function(e){
     omGUIFocused = true;
   });
+
   guiHandler.omObjController = guiHandler.datGuiObjectManipulation.add(guiHandler.objectManipulationParameters, "Object").listen();
   guiHandler.disableController(guiHandler.omObjController, true);
-  guiHandler.omRotationXController = guiHandler.datGuiObjectManipulation.add(guiHandler.objectManipulationParameters, "Rotate x").onChange(function(val){
+
+  var rotationFolder = guiHandler.datGuiObjectManipulation.addFolder("Rotation");
+  var physicsFolder = guiHandler.datGuiObjectManipulation.addFolder("Physics");
+  var generalFolder = guiHandler.datGuiObjectManipulation.addFolder("General");
+  var graphicsFolder = guiHandler.datGuiObjectManipulation.addFolder("Graphics");
+  var textureFolder = guiHandler.datGuiObjectManipulation.addFolder("Texture");
+  var motionBlurFolder = guiHandler.datGuiObjectManipulation.addFolder("Motion Blur");
+
+  // ROTATION
+  guiHandler.omRotationXController = rotationFolder.add(guiHandler.objectManipulationParameters, "Rotate x").onChange(function(val){
     guiHandler.omGUIRotateEvent("x", val);
   });
-  guiHandler.omRotationYController = guiHandler.datGuiObjectManipulation.add(guiHandler.objectManipulationParameters, "Rotate y").onChange(function(val){
+  guiHandler.omRotationYController = rotationFolder.add(guiHandler.objectManipulationParameters, "Rotate y").onChange(function(val){
     guiHandler.omGUIRotateEvent("y", val);
   });
-  guiHandler.omRotationZController = guiHandler.datGuiObjectManipulation.add(guiHandler.objectManipulationParameters, "Rotate z").onChange(function(val){
+  guiHandler.omRotationZController = rotationFolder.add(guiHandler.objectManipulationParameters, "Rotate z").onChange(function(val){
     guiHandler.omGUIRotateEvent("z", val);
   });
-  guiHandler.omMassController = guiHandler.datGuiObjectManipulation.add(guiHandler.objectManipulationParameters, "Mass").onChange(function(val){
+
+  // PHYSICS
+  guiHandler.omMassController = physicsFolder.add(guiHandler.objectManipulationParameters, "Mass").onChange(function(val){
     var obj = selectionHandler.getSelectedObject();
     terminal.clear();
     parseCommand("setMass "+obj.name+" "+val);
@@ -1131,7 +1143,7 @@ GUIHandler.prototype.initializeObjectManipulationGUI = function(){
       guiHandler.enableController(guiHandler.omPhysicsSimplifiedController);
     }
   });
-  guiHandler.omPhysicsSimplifiedController = guiHandler.datGuiObjectManipulation.add(guiHandler.objectManipulationParameters, "Phy. simpl.").onChange(function(val){
+  guiHandler.omPhysicsSimplifiedController = physicsFolder.add(guiHandler.objectManipulationParameters, "Phy. simpl.").onChange(function(val){
     var obj = selectionHandler.getSelectedObject();
     if (obj.isAddedObject || obj.noMass || obj.physicsBody.mass > 0){
       guiHandler.objectManipulationParameters["Phy. simpl."] = false;
@@ -1163,7 +1175,7 @@ GUIHandler.prototype.initializeObjectManipulationGUI = function(){
       terminal.skip = false;
     }
   }).listen();
-  guiHandler.omSlipperyController = guiHandler.datGuiObjectManipulation.add(guiHandler.objectManipulationParameters, "Slippery").onChange(function(val){
+  guiHandler.omSlipperyController = physicsFolder.add(guiHandler.objectManipulationParameters, "Slippery").onChange(function(val){
     var obj = selectionHandler.getSelectedObject();
     terminal.clear();
     if (val){
@@ -1172,60 +1184,7 @@ GUIHandler.prototype.initializeObjectManipulationGUI = function(){
       parseCommand("setSlipperiness "+obj.name+" off");
     }
   }).listen();
-  guiHandler.omChangeableController = guiHandler.datGuiObjectManipulation.add(guiHandler.objectManipulationParameters, "Changeable").onChange(function(val){
-    var obj = selectionHandler.getSelectedObject();
-    if (obj.isFPSWeapon){
-      guiHandler.objectManipulationParameters["Changeable"] = true;
-      return;
-    }
-    terminal.clear();
-    obj.setChangeableStatus(val);
-    if (obj.isChangeable){
-      terminal.printInfo(Text.OBJECT_MARKED_AS.replace(Text.PARAM1, "changeable"));
-    }else{
-      terminal.printInfo(Text.OBJECT_MARKED_AS.replace(Text.PARAM1, "unchangeable"));
-    }
-  }).listen();
-  guiHandler.omIntersectableController = guiHandler.datGuiObjectManipulation.add(guiHandler.objectManipulationParameters, "Intersectable").onChange(function(val){
-    var obj = selectionHandler.getSelectedObject();
-    if (obj.isFPSWeapon){
-      guiHandler.objectManipulationParameters["Intersectable"] = false;
-      return;
-    }
-    terminal.clear();
-    obj.setIntersectableStatus(val);
-    if (obj.isIntersectable){
-      terminal.printInfo(Text.OBJECT_INTERSECTABLE);
-    }else{
-      terminal.printInfo(Text.OBJECT_UNINTERSECTABLE);
-    }
-  }).listen();
-  guiHandler.omColorizableController = guiHandler.datGuiObjectManipulation.add(guiHandler.objectManipulationParameters, "Colorizable").onChange(function(val){
-    var obj = selectionHandler.getSelectedObject();
-    terminal.clear();
-    obj.isColorizable = val;
-    if (obj.isColorizable){
-      macroHandler.injectMacro("HAS_FORCED_COLOR", obj.mesh.material, false, true);
-      obj.mesh.material.uniforms.forcedColor = new THREE.Uniform(new THREE.Vector4(-50, 0, 0, 0));
-      terminal.printInfo(Text.OBJECT_MARKED_AS.replace(Text.PARAM1, "colorizable"));
-    }else{
-      delete obj.mesh.material.uniforms.forcedColor;
-      macroHandler.removeMacro("HAS_FORCED_COLOR", obj.mesh.material, false, true);
-      terminal.printInfo(Text.OBJECT_MARKED_AS.replace(Text.PARAM1, "uncolorizable"));
-    }
-    obj.mesh.material.needsUpdate = true;
-  }).listen();
-  guiHandler.omAffectedByLightController = guiHandler.datGuiObjectManipulation.add(guiHandler.objectManipulationParameters, "Affected by light").onChange(function(val){
-    var obj = selectionHandler.getSelectedObject();
-    terminal.clear();
-    obj.setAffectedByLight(val);
-    if (val){
-      terminal.printInfo(Text.OBJECT_WILL_BE_AFFECTED_BY_LIGHTS);
-    }else{
-      terminal.printInfo(Text.OBJECT_WONT_BE_AFFECTED_BY_LIGHTS);
-    }
-  }).listen();
-  guiHandler.omHasMassController = guiHandler.datGuiObjectManipulation.add(guiHandler.objectManipulationParameters, "Has mass").onChange(function(val){
+  guiHandler.omHasMassController = physicsFolder.add(guiHandler.objectManipulationParameters, "Has mass").onChange(function(val){
     var obj = selectionHandler.getSelectedObject();
     if (obj.isObjectGroup && obj.cannotSetMass){
       guiHandler.objectManipulationParameters["Has mass"] = false;
@@ -1251,25 +1210,62 @@ GUIHandler.prototype.initializeObjectManipulationGUI = function(){
     }
     guiHandler.omMassController.updateDisplay();
   }).listen();
-  guiHandler.omShaderPrecisionController = guiHandler.datGuiObjectManipulation.add(guiHandler.objectManipulationParameters, "Shader precision", ["default", "low", "medium", "high"]).onChange(function(val){
-    switch (val){
-      case "default":
-        selectionHandler.getSelectedObject().useDefaultPrecision();
-      break;
-      case "low":
-        selectionHandler.getSelectedObject().useCustomShaderPrecision(shaderPrecisionHandler.precisionTypes.LOW);
-      break;
-      case "medium":
-        selectionHandler.getSelectedObject().useCustomShaderPrecision(shaderPrecisionHandler.precisionTypes.MEDIUM);
-      break;
-      case "high":
-        selectionHandler.getSelectedObject().useCustomShaderPrecision(shaderPrecisionHandler.precisionTypes.HIGH);
-      break;
+
+  // GENERAL
+  guiHandler.omChangeableController = generalFolder.add(guiHandler.objectManipulationParameters, "Changeable").onChange(function(val){
+    var obj = selectionHandler.getSelectedObject();
+    if (obj.isFPSWeapon){
+      guiHandler.objectManipulationParameters["Changeable"] = true;
+      return;
     }
     terminal.clear();
-    terminal.printInfo(Text.SHADER_PRECISION_ADJUSTED);
+    obj.setChangeableStatus(val);
+    if (obj.isChangeable){
+      terminal.printInfo(Text.OBJECT_MARKED_AS.replace(Text.PARAM1, "changeable"));
+    }else{
+      terminal.printInfo(Text.OBJECT_MARKED_AS.replace(Text.PARAM1, "unchangeable"));
+    }
   }).listen();
-  guiHandler.omFPSWeaponController = guiHandler.datGuiObjectManipulation.add(guiHandler.objectManipulationParameters, "FPS Weapon").onChange(function(val){
+  guiHandler.omIntersectableController = generalFolder.add(guiHandler.objectManipulationParameters, "Intersectable").onChange(function(val){
+    var obj = selectionHandler.getSelectedObject();
+    if (obj.isFPSWeapon){
+      guiHandler.objectManipulationParameters["Intersectable"] = false;
+      return;
+    }
+    terminal.clear();
+    obj.setIntersectableStatus(val);
+    if (obj.isIntersectable){
+      terminal.printInfo(Text.OBJECT_INTERSECTABLE);
+    }else{
+      terminal.printInfo(Text.OBJECT_UNINTERSECTABLE);
+    }
+  }).listen();
+  guiHandler.omColorizableController = generalFolder.add(guiHandler.objectManipulationParameters, "Colorizable").onChange(function(val){
+    var obj = selectionHandler.getSelectedObject();
+    terminal.clear();
+    obj.isColorizable = val;
+    if (obj.isColorizable){
+      macroHandler.injectMacro("HAS_FORCED_COLOR", obj.mesh.material, false, true);
+      obj.mesh.material.uniforms.forcedColor = new THREE.Uniform(new THREE.Vector4(-50, 0, 0, 0));
+      terminal.printInfo(Text.OBJECT_MARKED_AS.replace(Text.PARAM1, "colorizable"));
+    }else{
+      delete obj.mesh.material.uniforms.forcedColor;
+      macroHandler.removeMacro("HAS_FORCED_COLOR", obj.mesh.material, false, true);
+      terminal.printInfo(Text.OBJECT_MARKED_AS.replace(Text.PARAM1, "uncolorizable"));
+    }
+    obj.mesh.material.needsUpdate = true;
+  }).listen();
+  guiHandler.omAffectedByLightController = generalFolder.add(guiHandler.objectManipulationParameters, "Affected by light").onChange(function(val){
+    var obj = selectionHandler.getSelectedObject();
+    terminal.clear();
+    obj.setAffectedByLight(val);
+    if (val){
+      terminal.printInfo(Text.OBJECT_WILL_BE_AFFECTED_BY_LIGHTS);
+    }else{
+      terminal.printInfo(Text.OBJECT_WONT_BE_AFFECTED_BY_LIGHTS);
+    }
+  }).listen();
+  guiHandler.omFPSWeaponController = generalFolder.add(guiHandler.objectManipulationParameters, "FPS Weapon").onChange(function(val){
     if (val){
       selectionHandler.getSelectedObject().useAsFPSWeapon();
       guiHandler.disableController(guiHandler.omHasMassController);
@@ -1308,7 +1304,38 @@ GUIHandler.prototype.initializeObjectManipulationGUI = function(){
       terminal.printInfo(Text.OK);
     }
   }).listen();
-  guiHandler.omSideController = guiHandler.datGuiObjectManipulation.add(guiHandler.objectManipulationParameters, "Side", [
+
+  // GRAPHICS
+  guiHandler.omOpacityController = graphicsFolder.add(guiHandler.objectManipulationParameters, "Opacity").min(0).max(1).step(0.01).onChange(function(val){
+    var obj = selectionHandler.getSelectedObject();
+    obj.updateOpacity(val);
+    obj.initOpacitySet = false;
+    obj.initOpacity = obj.opacity;
+    if (obj.isObjectGroup){
+      for (var objName in obj.group){
+        obj.group[objName].updateOpacity(val * obj.group[objName].opacityWhenAttached);
+      }
+    }
+  }).listen();
+  guiHandler.omShaderPrecisionController = graphicsFolder.add(guiHandler.objectManipulationParameters, "Shader precision", ["default", "low", "medium", "high"]).onChange(function(val){
+    switch (val){
+      case "default":
+        selectionHandler.getSelectedObject().useDefaultPrecision();
+      break;
+      case "low":
+        selectionHandler.getSelectedObject().useCustomShaderPrecision(shaderPrecisionHandler.precisionTypes.LOW);
+      break;
+      case "medium":
+        selectionHandler.getSelectedObject().useCustomShaderPrecision(shaderPrecisionHandler.precisionTypes.MEDIUM);
+      break;
+      case "high":
+        selectionHandler.getSelectedObject().useCustomShaderPrecision(shaderPrecisionHandler.precisionTypes.HIGH);
+      break;
+    }
+    terminal.clear();
+    terminal.printInfo(Text.SHADER_PRECISION_ADJUSTED);
+  }).listen();
+  guiHandler.omSideController = graphicsFolder.add(guiHandler.objectManipulationParameters, "Side", [
     "Both", "Front", "Back"
   ]).onChange(function(val){
     var pseudoVal = 0;
@@ -1319,7 +1346,7 @@ GUIHandler.prototype.initializeObjectManipulationGUI = function(){
     }
     selectionHandler.getSelectedObject().handleRenderSide(pseudoVal);
   }).listen();
-  guiHandler.omHideHalfController = guiHandler.datGuiObjectManipulation.add(guiHandler.objectManipulationParameters, "Hide half", [
+  guiHandler.omHideHalfController = graphicsFolder.add(guiHandler.objectManipulationParameters, "Hide half", [
     "None", "Part 1", "Part 2", "Part 3", "Part 4"
   ]).onChange(function(val){
     if (val == "None"){
@@ -1335,7 +1362,7 @@ GUIHandler.prototype.initializeObjectManipulationGUI = function(){
     }
     rayCaster.updateObject(selectionHandler.getSelectedObject());
   }).listen();
-  guiHandler.omBlendingController = guiHandler.datGuiObjectManipulation.add(guiHandler.objectManipulationParameters, "Blending", [
+  guiHandler.omBlendingController = graphicsFolder.add(guiHandler.objectManipulationParameters, "Blending", [
     "None", "Normal", "Additive", "Subtractive", "Multiply"
   ]).onChange(function(val){
     var obj = selectionHandler.getSelectedObject();
@@ -1357,40 +1384,34 @@ GUIHandler.prototype.initializeObjectManipulationGUI = function(){
       obj.setBlending(MULTIPLY_BLENDING);
     }
   }).listen();
-  guiHandler.omEmissiveColorController = guiHandler.datGuiObjectManipulation.add(guiHandler.objectManipulationParameters, "Emissive col.").onFinishChange(function(val){
+
+  // TEXTURE
+  guiHandler.omEmissiveColorController = textureFolder.add(guiHandler.objectManipulationParameters, "Emissive col.").onFinishChange(function(val){
     REUSABLE_COLOR.set(val);
     selectionHandler.getSelectedObject().setEmissiveColor(REUSABLE_COLOR);
   }).listen();
-  guiHandler.omTextureOffsetXController = guiHandler.datGuiObjectManipulation.add(guiHandler.objectManipulationParameters, "Texture offset x").min(-2).max(2).step(0.001).onChange(function(val){
+  guiHandler.omTextureOffsetXController = textureFolder.add(guiHandler.objectManipulationParameters, "Texture offset x").min(-2).max(2).step(0.001).onChange(function(val){
     selectionHandler.getSelectedObject().setTextureOffsetX(val);
   }).listen();
-  guiHandler.omTextureOffsetYController = guiHandler.datGuiObjectManipulation.add(guiHandler.objectManipulationParameters, "Texture offset y").min(-2).max(2).step(0.001).onChange(function(val){
+  guiHandler.omTextureOffsetYController = textureFolder.add(guiHandler.objectManipulationParameters, "Texture offset y").min(-2).max(2).step(0.001).onChange(function(val){
     selectionHandler.getSelectedObject().setTextureOffsetY(val);
   }).listen();
-  guiHandler.omOpacityController = guiHandler.datGuiObjectManipulation.add(guiHandler.objectManipulationParameters, "Opacity").min(0).max(1).step(0.01).onChange(function(val){
-    var obj = selectionHandler.getSelectedObject();
-    obj.updateOpacity(val);
-    obj.initOpacitySet = false;
-    obj.initOpacity = obj.opacity;
-    if (obj.isObjectGroup){
-      for (var objName in obj.group){
-        obj.group[objName].updateOpacity(val * obj.group[objName].opacityWhenAttached);
-      }
-    }
-  }).listen();
-  guiHandler.omAOIntensityController = guiHandler.datGuiObjectManipulation.add(guiHandler.objectManipulationParameters, "AO intensity").min(0).max(10).step(0.1).onChange(function(val){
+
+  guiHandler.omAOIntensityController = textureFolder.add(guiHandler.objectManipulationParameters, "AO intensity").min(0).max(10).step(0.1).onChange(function(val){
     selectionHandler.getSelectedObject().setAOIntensity(val);
   }).listen();
-  guiHandler.omEmissiveIntensityController = guiHandler.datGuiObjectManipulation.add(guiHandler.objectManipulationParameters, "Emissive int.").min(0).max(100).step(0.01).onChange(function(val){
+  guiHandler.omEmissiveIntensityController = textureFolder.add(guiHandler.objectManipulationParameters, "Emissive int.").min(0).max(100).step(0.01).onChange(function(val){
     selectionHandler.getSelectedObject().setEmissiveIntensity(val);
   }).listen();
-  guiHandler.omDisplacementScaleController = guiHandler.datGuiObjectManipulation.add(guiHandler.objectManipulationParameters, "Disp. scale").min(-50).max(50).step(0.1).onChange(function(val){
+  guiHandler.omDisplacementScaleController = textureFolder.add(guiHandler.objectManipulationParameters, "Disp. scale").min(-50).max(50).step(0.1).onChange(function(val){
     selectionHandler.getSelectedObject().setDisplacementScale(val);
   }).listen();
-  guiHandler.omDisplacementBiasController = guiHandler.datGuiObjectManipulation.add(guiHandler.objectManipulationParameters, "Disp. bias").min(-50).max(50).step(0.1).onChange(function(val){
+  guiHandler.omDisplacementBiasController = textureFolder.add(guiHandler.objectManipulationParameters, "Disp. bias").min(-50).max(50).step(0.1).onChange(function(val){
     selectionHandler.getSelectedObject().setDisplacementBias(val);
   }).listen();
-  guiHandler.omHasObjectTrailController = guiHandler.datGuiObjectManipulation.add(guiHandler.objectManipulationParameters, "Motion blur").onChange(function(val){
+
+  // MOTION BLUR
+  guiHandler.omHasObjectTrailController = motionBlurFolder.add(guiHandler.objectManipulationParameters, "Motion blur").onChange(function(val){
     if (val){
       selectionHandler.getSelectedObject().objectTrailConfigurations = {alpha: guiHandler.objectManipulationParameters["mb alpha"], time: guiHandler.objectManipulationParameters["mb time"]};
       guiHandler.enableController(guiHandler.omObjectTrailAlphaController);
@@ -1401,10 +1422,10 @@ GUIHandler.prototype.initializeObjectManipulationGUI = function(){
       guiHandler.disableController(guiHandler.omObjectTrailTimeController);
     }
   }).listen();
-  guiHandler.omObjectTrailAlphaController = guiHandler.datGuiObjectManipulation.add(guiHandler.objectManipulationParameters, "mb alpha").min(0.01).max(1).step(0.01).onChange(function(val){
+  guiHandler.omObjectTrailAlphaController = motionBlurFolder.add(guiHandler.objectManipulationParameters, "mb alpha").min(0.01).max(1).step(0.01).onChange(function(val){
     selectionHandler.getSelectedObject().objectTrailConfigurations.alpha = val;
   }).listen();
-  guiHandler.omObjectTrailTimeController = guiHandler.datGuiObjectManipulation.add(guiHandler.objectManipulationParameters, "mb time").min(1/15).max(OBJECT_TRAIL_MAX_TIME_IN_SECS_DEFAULT).step(1/60).onChange(function(val){
+  guiHandler.omObjectTrailTimeController = motionBlurFolder.add(guiHandler.objectManipulationParameters, "mb time").min(1/15).max(OBJECT_TRAIL_MAX_TIME_IN_SECS_DEFAULT).step(1/60).onChange(function(val){
     selectionHandler.getSelectedObject().objectTrailConfigurations.time = val;
   }).listen();
 }
