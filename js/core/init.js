@@ -207,7 +207,7 @@ window.onload = function() {
       "%c"+BANNERL1+"\n"+BANNERL2+"\n"+BANNERL3+"\n"+
       BANNERL4+"\n"+BANNERL5 +"\n"+"                                         "
       + "\nby Oguz Eroglu - github.com/oguzeroglu   ",
-      "background: black; color: lime"
+      "background: #40318d; color: white"
     );
   }
 };
