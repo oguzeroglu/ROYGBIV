@@ -1436,13 +1436,24 @@ GUIHandler.prototype.initializeContainerManipulationGUI = function(){
     cmGUIFocused = true;
   });
   guiHandler.containerManipulationNameController = guiHandler.datGuiContainerManipulation.add(guiHandler.containerManipulationParameters, "Container").listen();
-  guiHandler.containerManipulationCenterXController = guiHandler.datGuiContainerManipulation.add(guiHandler.containerManipulationParameters, "Center X").min(0).max(100).step(0.1).onChange(function(val){
+
+  var positionFolder = guiHandler.datGuiContainerManipulation.addFolder("Position");
+  var sizeFolder = guiHandler.datGuiContainerManipulation.addFolder("Size");
+  var paddingFolder = guiHandler.datGuiContainerManipulation.addFolder("Padding");
+  var generalFolder = guiHandler.datGuiContainerManipulation.addFolder("General");
+  var borderFolder = guiHandler.datGuiContainerManipulation.addFolder("Border");
+  var backgroundFolder = guiHandler.datGuiContainerManipulation.addFolder("Background");
+
+  // POSITION
+  guiHandler.containerManipulationCenterXController = positionFolder.add(guiHandler.containerManipulationParameters, "Center X").min(0).max(100).step(0.1).onChange(function(val){
     selectionHandler.getSelectedObject().setCenter(val, selectionHandler.getSelectedObject().centerYPercent);
   }).listen();
-  guiHandler.containerManipulationCenterYController = guiHandler.datGuiContainerManipulation.add(guiHandler.containerManipulationParameters, "Center Y").min(0).max(100).step(0.1).onChange(function(val){
+  guiHandler.containerManipulationCenterYController = positionFolder.add(guiHandler.containerManipulationParameters, "Center Y").min(0).max(100).step(0.1).onChange(function(val){
     selectionHandler.getSelectedObject().setCenter(selectionHandler.getSelectedObject().centerXPercent, val);
   }).listen();
-  guiHandler.containerManipulationWidthController = guiHandler.datGuiContainerManipulation.add(guiHandler.containerManipulationParameters, "Width").min(0.1).max(150).step(0.1).onChange(function(val){
+
+  // SIZE
+  guiHandler.containerManipulationWidthController = sizeFolder.add(guiHandler.containerManipulationParameters, "Width").min(0.1).max(150).step(0.1).onChange(function(val){
     selectionHandler.getSelectedObject().setWidth(val);
     if (selectionHandler.getSelectedObject().alignedParent){
       var ary = selectionHandler.getSelectedObject().alignedParent.alignedContainerInfos[selectionHandler.getSelectedObject().name];
@@ -1451,7 +1462,7 @@ GUIHandler.prototype.initializeContainerManipulationGUI = function(){
       }
     }
   }).listen();
-  guiHandler.containerManipulationHeightController = guiHandler.datGuiContainerManipulation.add(guiHandler.containerManipulationParameters, "Height").min(0.1).max(150).step(0.1).onChange(function(val){
+  guiHandler.containerManipulationHeightController = sizeFolder.add(guiHandler.containerManipulationParameters, "Height").min(0.1).max(150).step(0.1).onChange(function(val){
     selectionHandler.getSelectedObject().setHeight(val);
     if (selectionHandler.getSelectedObject().alignedParent){
       var ary = selectionHandler.getSelectedObject().alignedParent.alignedContainerInfos[selectionHandler.getSelectedObject().name];
@@ -1460,13 +1471,17 @@ GUIHandler.prototype.initializeContainerManipulationGUI = function(){
       }
     }
   }).listen();
-  guiHandler.containerManipulationPaddingXController = guiHandler.datGuiContainerManipulation.add(guiHandler.containerManipulationParameters, "Padding X").min(0).max(99.9).step(0.1).onChange(function(val){
+
+  // PADDING
+  guiHandler.containerManipulationPaddingXController = paddingFolder.add(guiHandler.containerManipulationParameters, "Padding X").min(0).max(99.9).step(0.1).onChange(function(val){
     selectionHandler.getSelectedObject().setPaddingX(val);
   }).listen();
-  guiHandler.containerManipulationPaddingYController = guiHandler.datGuiContainerManipulation.add(guiHandler.containerManipulationParameters, "Padding Y").min(0).max(99.9).step(0.1).onChange(function(val){
+  guiHandler.containerManipulationPaddingYController = paddingFolder.add(guiHandler.containerManipulationParameters, "Padding Y").min(0).max(99.9).step(0.1).onChange(function(val){
     selectionHandler.getSelectedObject().setPaddingY(val);
   }).listen();
-  guiHandler.containerManipulationSquareController = guiHandler.datGuiContainerManipulation.add(guiHandler.containerManipulationParameters, "Square").onChange(function(val){
+
+  // GENERAL
+  guiHandler.containerManipulationSquareController = generalFolder.add(guiHandler.containerManipulationParameters, "Square").onChange(function(val){
     selectionHandler.getSelectedObject().isSquare = val;
     if (val){
       selectionHandler.getSelectedObject().makeSquare();
@@ -1477,10 +1492,12 @@ GUIHandler.prototype.initializeContainerManipulationGUI = function(){
       selectionHandler.getSelectedObject().scaleHeight = 1;
     }
   }).listen();
-  guiHandler.containerManipulationClickableController = guiHandler.datGuiContainerManipulation.add(guiHandler.containerManipulationParameters, "Clickable").onChange(function(val){
+  guiHandler.containerManipulationClickableController = generalFolder.add(guiHandler.containerManipulationParameters, "Clickable").onChange(function(val){
     selectionHandler.getSelectedObject().isClickable = val;
   }).listen();
-  guiHandler.containerManipulationHasBorderController = guiHandler.datGuiContainerManipulation.add(guiHandler.containerManipulationParameters, "Has border").onChange(function(val){
+
+  // BORDER
+  guiHandler.containerManipulationHasBorderController = borderFolder.add(guiHandler.containerManipulationParameters, "Has border").onChange(function(val){
     if (val){
       selectionHandler.getSelectedObject().setBorder(guiHandler.containerManipulationParameters["Border color"], guiHandler.containerManipulationParameters["Border thickness"]);
       guiHandler.enableController(guiHandler.containerManipulationBorderColorController);
@@ -1491,13 +1508,15 @@ GUIHandler.prototype.initializeContainerManipulationGUI = function(){
       guiHandler.disableController(guiHandler.containerManipulationBorderThicknessController);
     }
   }).listen();
-  guiHandler.containerManipulationBorderColorController = guiHandler.datGuiContainerManipulation.add(guiHandler.containerManipulationParameters, "Border color").onFinishChange(function(val){
+  guiHandler.containerManipulationBorderColorController = borderFolder.add(guiHandler.containerManipulationParameters, "Border color").onFinishChange(function(val){
     selectionHandler.getSelectedObject().setBorder(guiHandler.containerManipulationParameters["Border color"], guiHandler.containerManipulationParameters["Border thickness"]);
   }).listen();
-  guiHandler.containerManipulationBorderThicknessController = guiHandler.datGuiContainerManipulation.add(guiHandler.containerManipulationParameters, "Border thickness").min(0.001).max(0.1).step(0.0001).onChange(function(val){
+  guiHandler.containerManipulationBorderThicknessController = borderFolder.add(guiHandler.containerManipulationParameters, "Border thickness").min(0.001).max(0.1).step(0.0001).onChange(function(val){
     selectionHandler.getSelectedObject().setBorder(guiHandler.containerManipulationParameters["Border color"], guiHandler.containerManipulationParameters["Border thickness"]);
   }).listen();
-  guiHandler.containerManipulationHasBackgroundController = guiHandler.datGuiContainerManipulation.add(guiHandler.containerManipulationParameters, "Has background").onChange(function(val){
+
+  // BACKGROUND
+  guiHandler.containerManipulationHasBackgroundController = backgroundFolder.add(guiHandler.containerManipulationParameters, "Has background").onChange(function(val){
     var allTexturePackNames = Object.keys(texturePacks);
     if (val){
       guiHandler.enableController(guiHandler.containerManipulationBackgroundColorController);
@@ -1518,19 +1537,19 @@ GUIHandler.prototype.initializeContainerManipulationGUI = function(){
       selectionHandler.getSelectedObject().removeBackground();
     }
   }).listen();
-  guiHandler.containerManipulationBackgroundColorController = guiHandler.datGuiContainerManipulation.add(guiHandler.containerManipulationParameters, "BG color").onFinishChange(function(val){
+  guiHandler.containerManipulationBackgroundColorController = backgroundFolder.add(guiHandler.containerManipulationParameters, "BG color").onFinishChange(function(val){
     var bgColor = val;
     var bgAlpha = guiHandler.containerManipulationParameters["BG alpha"];
     var bgTextureName = (guiHandler.containerManipulationParameters["Has BG texture"] && guiHandler.containerManipulationParameters["BG texture"])? guiHandler.containerManipulationParameters["BG texture"]: null;
     selectionHandler.getSelectedObject().setBackground(bgColor, bgAlpha, bgTextureName);
   }).listen();
-  guiHandler.containerManipulationBackgroundAlphaController = guiHandler.datGuiContainerManipulation.add(guiHandler.containerManipulationParameters, "BG alpha").min(0).max(1).step(0.01).onChange(function(val){
+  guiHandler.containerManipulationBackgroundAlphaController = backgroundFolder.add(guiHandler.containerManipulationParameters, "BG alpha").min(0).max(1).step(0.01).onChange(function(val){
     var bgColor = guiHandler.containerManipulationParameters["BG color"];
     var bgAlpha = val;
     var bgTextureName = (guiHandler.containerManipulationParameters["Has BG texture"] && guiHandler.containerManipulationParameters["BG texture"])? guiHandler.containerManipulationParameters["BG texture"]: null;
     selectionHandler.getSelectedObject().setBackground(bgColor, bgAlpha, bgTextureName);
   }).listen();
-  guiHandler.containerManipulationHasBackgroundTextureController = guiHandler.datGuiContainerManipulation.add(guiHandler.containerManipulationParameters, "Has BG texture").onChange(function(val){
+  guiHandler.containerManipulationHasBackgroundTextureController = backgroundFolder.add(guiHandler.containerManipulationParameters, "Has BG texture").onChange(function(val){
      var hasBG = guiHandler.containerManipulationParameters["Has background"];
      var allTexturePackNames = Object.keys(texturePacks);
      if (!hasBG || allTexturePackNames.length == 0){
@@ -1550,7 +1569,7 @@ GUIHandler.prototype.initializeContainerManipulationGUI = function(){
        selectionHandler.getSelectedObject().setBackground(bgColor, bgAlpha, null);
      }
   }).listen();
-  guiHandler.containerManipulationBackgroundTextureController = guiHandler.datGuiContainerManipulation.add(guiHandler.containerManipulationParameters, "BG texture", Object.keys(texturePacks)).onChange(function(val){
+  guiHandler.containerManipulationBackgroundTextureController = backgroundFolder.add(guiHandler.containerManipulationParameters, "BG texture", Object.keys(texturePacks)).onChange(function(val){
     var bgColor = guiHandler.containerManipulationParameters["BG color"];
     var bgAlpha = guiHandler.containerManipulationParameters["BG alpha"];
     selectionHandler.getSelectedObject().setBackground(bgColor, bgAlpha, val);
