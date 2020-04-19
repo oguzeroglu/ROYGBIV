@@ -1563,13 +1563,24 @@ GUIHandler.prototype.initializeSpriteManipulationGUI = function(){
     smGUIFocused = true;
   });
   guiHandler.spriteManipulationSpriteNameController = guiHandler.datGuiSpriteManipulation.add(guiHandler.spriteManipulationParameters, "Sprite").listen();
-  guiHandler.spriteManipulationColorController = guiHandler.datGuiSpriteManipulation.add(guiHandler.spriteManipulationParameters, "Color").onFinishChange(function(val){
+
+  var graphicsFolder = guiHandler.datGuiSpriteManipulation.addFolder("Graphics");
+  var marginFolder = guiHandler.datGuiSpriteManipulation.addFolder("Margin");
+  var textureFolder = guiHandler.datGuiSpriteManipulation.addFolder("Texture");
+  var scaleFolder = guiHandler.datGuiSpriteManipulation.addFolder("Scale");
+  var sizeFolder = guiHandler.datGuiSpriteManipulation.addFolder("Size");
+  var generalFolder = guiHandler.datGuiSpriteManipulation.addFolder("General");
+
+  // GRAPHICS
+  guiHandler.spriteManipulationColorController = graphicsFolder.add(guiHandler.spriteManipulationParameters, "Color").onFinishChange(function(val){
     selectionHandler.getSelectedObject().setColor(val);
   }).listen();
-  guiHandler.spriteManipulationAlphaController = guiHandler.datGuiSpriteManipulation.add(guiHandler.spriteManipulationParameters, "Alpha").min(0).max(1).step(0.01).onChange(function(val){
+  guiHandler.spriteManipulationAlphaController = graphicsFolder.add(guiHandler.spriteManipulationParameters, "Alpha").min(0).max(1).step(0.01).onChange(function(val){
     selectionHandler.getSelectedObject().setAlpha(val);
   }).listen();
-  guiHandler.spriteManipulationMarginModeController = guiHandler.datGuiSpriteManipulation.add(guiHandler.spriteManipulationParameters, "Margin mode", ["Top/Left", "Bottom/Right", "Center"]).onChange(function(val){
+
+  // MARGIN
+  guiHandler.spriteManipulationMarginModeController = marginFolder.add(guiHandler.spriteManipulationParameters, "Margin mode", ["Top/Left", "Bottom/Right", "Center"]).onChange(function(val){
     var marginMode = MARGIN_MODE_2D_CENTER;
     if (val == "Top/Left"){
       marginMode = MARGIN_MODE_2D_TOP_LEFT;
@@ -1579,13 +1590,15 @@ GUIHandler.prototype.initializeSpriteManipulationGUI = function(){
     selectionHandler.getSelectedObject().marginMode = marginMode;
     selectionHandler.getSelectedObject().set2DCoordinates(selectionHandler.getSelectedObject().marginPercentX, selectionHandler.getSelectedObject().marginPercentY);
   }).listen();
-  guiHandler.spriteManipulationMarginXController = guiHandler.datGuiSpriteManipulation.add(guiHandler.spriteManipulationParameters, "Margin X").min(0).max(100).step(0.1).onChange(function(val){
+  guiHandler.spriteManipulationMarginXController = marginFolder.add(guiHandler.spriteManipulationParameters, "Margin X").min(0).max(100).step(0.1).onChange(function(val){
     selectionHandler.getSelectedObject().set2DCoordinates(val, selectionHandler.getSelectedObject().marginPercentY);
   }).listen();
-  guiHandler.spriteManipulationMarginYController = guiHandler.datGuiSpriteManipulation.add(guiHandler.spriteManipulationParameters, "Margin Y").min(0).max(100).step(0.1).onChange(function(val){
+  guiHandler.spriteManipulationMarginYController = marginFolder.add(guiHandler.spriteManipulationParameters, "Margin Y").min(0).max(100).step(0.1).onChange(function(val){
     selectionHandler.getSelectedObject().set2DCoordinates(selectionHandler.getSelectedObject().marginPercentX, val);
   }).listen();
-  guiHandler.spriteManipulationHasTextureController = guiHandler.datGuiSpriteManipulation.add(guiHandler.spriteManipulationParameters, "Has texture").onChange(function(val){
+
+  // TEXTURE
+  guiHandler.spriteManipulationHasTextureController = textureFolder.add(guiHandler.spriteManipulationParameters, "Has texture").onChange(function(val){
     if (Object.keys(texturePacks).length == 0){
       guiHandler.spriteManipulationParameters["Has texture"] = false;
       return;
@@ -1601,22 +1614,26 @@ GUIHandler.prototype.initializeSpriteManipulationGUI = function(){
       selectionHandler.getSelectedObject().removeTexture();
     }
   }).listen();
-  guiHandler.spriteManipulationTextureController = guiHandler.datGuiSpriteManipulation.add(guiHandler.spriteManipulationParameters, "Texture", Object.keys(texturePacks)).onChange(function(val){
+  guiHandler.spriteManipulationTextureController = textureFolder.add(guiHandler.spriteManipulationParameters, "Texture", Object.keys(texturePacks)).onChange(function(val){
     selectionHandler.getSelectedObject().mapTexture(texturePacks[val]);
   }).listen();
-  guiHandler.spriteManipulationScaleXController = guiHandler.datGuiSpriteManipulation.add(guiHandler.spriteManipulationParameters, "Scale X").min(0.1).max(20).step(0.1).onChange(function(val){
+
+  // SCALE
+  guiHandler.spriteManipulationScaleXController = scaleFolder.add(guiHandler.spriteManipulationParameters, "Scale X").min(0.1).max(20).step(0.1).onChange(function(val){
     selectionHandler.getSelectedObject().setScale(val, selectionHandler.getSelectedObject().mesh.material.uniforms.scale.value.y);
     selectionHandler.getSelectedObject().originalWidth = selectionHandler.getSelectedObject().calculateWidthPercent();
     selectionHandler.getSelectedObject().originalWidthReference = renderer.getCurrentViewport().z;
     selectionHandler.getSelectedObject().originalScreenResolution = screenResolution;
   }).listen();
-  guiHandler.spriteManipulationScaleYController = guiHandler.datGuiSpriteManipulation.add(guiHandler.spriteManipulationParameters, "Scale Y").min(0.1).max(20).step(0.1).onChange(function(val){
+  guiHandler.spriteManipulationScaleYController = scaleFolder.add(guiHandler.spriteManipulationParameters, "Scale Y").min(0.1).max(20).step(0.1).onChange(function(val){
     selectionHandler.getSelectedObject().setScale(selectionHandler.getSelectedObject().mesh.material.uniforms.scale.value.x, val);
     selectionHandler.getSelectedObject().originalHeight = selectionHandler.getSelectedObject().calculateHeightPercent();
     selectionHandler.getSelectedObject().originalHeightReference = renderer.getCurrentViewport().w;
     selectionHandler.getSelectedObject().originalScreenResolution = screenResolution;
   }).listen();
-  guiHandler.spriteManipulationHasFixedWidthController = guiHandler.datGuiSpriteManipulation.add(guiHandler.spriteManipulationParameters, "Width fixed").onChange(function(val){
+
+  // SIZE
+  guiHandler.spriteManipulationHasFixedWidthController = sizeFolder.add(guiHandler.spriteManipulationParameters, "Width fixed").onChange(function(val){
     if (selectionHandler.getSelectedObject().containerParent){
       guiHandler.spriteManipulationParameters["Width fixed"] = true;
       return;
@@ -1637,14 +1654,14 @@ GUIHandler.prototype.initializeSpriteManipulationGUI = function(){
     selectionHandler.getSelectedObject().originalWidthReference = renderer.getCurrentViewport().z;
     selectionHandler.getSelectedObject().originalScreenResolution = screenResolution;
   }).listen();
-  guiHandler.spriteManipulationFixedWidthController = guiHandler.datGuiSpriteManipulation.add(guiHandler.spriteManipulationParameters, "Width %").min(0.1).max(100).step(0.1).onChange(function(val){
+  guiHandler.spriteManipulationFixedWidthController = sizeFolder.add(guiHandler.spriteManipulationParameters, "Width %").min(0.1).max(100).step(0.1).onChange(function(val){
     selectionHandler.getSelectedObject().setWidthPercent(val);
     selectionHandler.getSelectedObject().fixedWidth = val;
     selectionHandler.getSelectedObject().originalWidth = selectionHandler.getSelectedObject().calculateWidthPercent();
     selectionHandler.getSelectedObject().originalWidthReference = renderer.getCurrentViewport().z;
     selectionHandler.getSelectedObject().originalScreenResolution = screenResolution;
   }).listen();
-  guiHandler.spriteManipulationHasFixedHeightController = guiHandler.datGuiSpriteManipulation.add(guiHandler.spriteManipulationParameters, "Height fixed").onChange(function(val){
+  guiHandler.spriteManipulationHasFixedHeightController = sizeFolder.add(guiHandler.spriteManipulationParameters, "Height fixed").onChange(function(val){
     if (selectionHandler.getSelectedObject().containerParent){
       guiHandler.spriteManipulationParameters["Height fixed"] = true;
       return;
@@ -1665,17 +1682,31 @@ GUIHandler.prototype.initializeSpriteManipulationGUI = function(){
     selectionHandler.getSelectedObject().originalHeightReference = renderer.getCurrentViewport().w;
     selectionHandler.getSelectedObject().originalScreenResolution = screenResolution;
   }).listen();
-  guiHandler.spriteManipulationFixedHeightController = guiHandler.datGuiSpriteManipulation.add(guiHandler.spriteManipulationParameters, "Height %").min(0.1).max(100).step(0.1).onChange(function(val){
+  guiHandler.spriteManipulationFixedHeightController = sizeFolder.add(guiHandler.spriteManipulationParameters, "Height %").min(0.1).max(100).step(0.1).onChange(function(val){
     selectionHandler.getSelectedObject().setHeightPercent(val);
     selectionHandler.getSelectedObject().fixedHeight = val;
     selectionHandler.getSelectedObject().originalHeight = selectionHandler.getSelectedObject().calculateHeightPercent();
     selectionHandler.getSelectedObject().originalHeightReference = renderer.getCurrentViewport().w;
     selectionHandler.getSelectedObject().originalScreenResolution = screenResolution;
   }).listen();
+  guiHandler.spriteManipulationCropCoefficientXController = sizeFolder.add(guiHandler.spriteManipulationParameters, "Crop X").min(0.01).max(1).step(0.01).onChange(function(val) {
+    var sprite = selectionHandler.getSelectedObject();
+    var coefY = sprite.cropCoefficientY ? sprite.cropCoefficientY : 1.0;
+    sprite.setCropCoefficient(val, coefY);
+  }).listen();
+  guiHandler.spriteManipulationCropCoefficientYController = sizeFolder.add(guiHandler.spriteManipulationParameters, "Crop Y").min(0.01).max(1).step(0.01).onChange(function(val) {
+    var sprite = selectionHandler.getSelectedObject();
+    var coefX = sprite.cropCoefficientX ? sprite.cropCoefficientX : 1.0;
+    sprite.setCropCoefficient(coefX, val);
+  }).listen();
+
+  // ROTATION
   guiHandler.spriteManipulationRotationController = guiHandler.datGuiSpriteManipulation.add(guiHandler.spriteManipulationParameters, "Rotation").min(0).max(360).step(0.01).onChange(function(val){
     selectionHandler.getSelectedObject().setRotation(val);
   }).listen();
-  guiHandler.spriteManipulationClickableController = guiHandler.datGuiSpriteManipulation.add(guiHandler.spriteManipulationParameters, "Clickable").onChange(function(val){
+
+  // GENERAL
+  guiHandler.spriteManipulationClickableController = generalFolder.add(guiHandler.spriteManipulationParameters, "Clickable").onChange(function(val){
     selectionHandler.getSelectedObject().isClickable = val;
     if (!val){
        selectionHandler.getSelectedObject().isDraggable = false;
@@ -1685,22 +1716,12 @@ GUIHandler.prototype.initializeSpriteManipulationGUI = function(){
       guiHandler.enableController(guiHandler.spriteManipulationDraggableController);
     }
   }).listen();
-  guiHandler.spriteManipulationDraggableController = guiHandler.datGuiSpriteManipulation.add(guiHandler.spriteManipulationParameters, "Draggable").onChange(function(val){
+  guiHandler.spriteManipulationDraggableController = generalFolder.add(guiHandler.spriteManipulationParameters, "Draggable").onChange(function(val){
     if (!selectionHandler.getSelectedObject().isClickable){
       guiHandler.spriteManipulationParameters["Draggable"] = false;
       return;
     }
     selectionHandler.getSelectedObject().isDraggable = val;
-  }).listen();
-  guiHandler.spriteManipulationCropCoefficientXController = guiHandler.datGuiSpriteManipulation.add(guiHandler.spriteManipulationParameters, "Crop X").min(0.01).max(1).step(0.01).onChange(function(val) {
-    var sprite = selectionHandler.getSelectedObject();
-    var coefY = sprite.cropCoefficientY ? sprite.cropCoefficientY : 1.0;
-    sprite.setCropCoefficient(val, coefY);
-  }).listen();
-  guiHandler.spriteManipulationCropCoefficientYController = guiHandler.datGuiSpriteManipulation.add(guiHandler.spriteManipulationParameters, "Crop Y").min(0.01).max(1).step(0.01).onChange(function(val) {
-    var sprite = selectionHandler.getSelectedObject();
-    var coefX = sprite.cropCoefficientX ? sprite.cropCoefficientX : 1.0;
-    sprite.setCropCoefficient(coefX, val);
   }).listen();
 }
 
