@@ -2442,6 +2442,62 @@ AddedObject.prototype.refreshTextueMatrix = function(){
   }
 }
 
+AddedObject.prototype.setCustomDisplacementTextureOffset = function(offsetX, offsetY){
+  if (!this.customDisplacementTextureMatrixInfo){
+    return;
+  }
+  if (!(typeof offsetX == UNDEFINED)){
+    this.customDisplacementTextureMatrixInfo.offsetX = offsetX;
+  }else{
+    offsetX = this.customDisplacementTextureMatrixInfo.offsetX;
+  }
+  if (!(typeof offsetY == UNDEFINED)){
+    this.customDisplacementTextureMatrixInfo.offsetY = offsetY;
+  }else{
+    offsetY = this.customDisplacementTextureMatrixInfo.offsetY;
+  }
+  this.mesh.material.uniforms.displacementTextureMatrix.value.elements[6] = offsetX;
+  this.mesh.material.uniforms.displacementTextureMatrix.value.elements[7] = offsetY;
+}
+
+AddedObject.prototype.setCustomDisplacementTextureRepeat = function(repeatU, repeatV){
+  if (!this.customDisplacementTextureMatrixInfo){
+    return;
+  }
+  if (repeatU){
+    this.customDisplacementTextureMatrixInfo.repeatU = repeatU;
+  }else{
+    repeatU = this.customDisplacementTextureMatrixInfo.repeatU;
+  }
+  if (repeatV){
+    this.customDisplacementTextureMatrixInfo.repeatV = repeatV;
+  }else{
+    repeatV = this.customDisplacementTextureMatrixInfo.repeatV;
+  }
+  this.mesh.material.uniforms.displacementTextureMatrix.value.elements[0] = repeatU;
+  this.mesh.material.uniforms.displacementTextureMatrix.value.elements[4] = repeatV;
+}
+
+AddedObject.prototype.removeCustomDisplacementTextureMatrix = function(){
+  if (!this.customDisplacementTextureMatrixInfo){
+    return;
+  }
+  macroHandler.removeMacro("DISPLACEMENT_SEPARATE_UV", this.mesh.material, true, false);
+  delete this.mesh.material.uniforms.displacementTextureMatrix;
+  delete this.customDisplacementTextureMatrixInfo;
+}
+
+AddedObject.prototype.setCustomDisplacementTextureMatrix = function(){
+  if (this.customDisplacementTextureMatrixInfo){
+    return;
+  }
+  var displacementTextureMatrix = new THREE.Matrix3();
+  displacementTextureMatrix.setUvTransform(0, 0, 1, 1, 0, 0, 0);
+  this.mesh.material.uniforms.displacementTextureMatrix = new THREE.Uniform(displacementTextureMatrix);
+  macroHandler.injectMacro("DISPLACEMENT_SEPARATE_UV", this.mesh.material, true, false);
+  this.customDisplacementTextureMatrixInfo = {repeatU: 1, repeatV: 1, offsetX: 0, offsetY: 0};
+}
+
 AddedObject.prototype.adjustTextureRepeat = function(repeatU, repeatV){
   if (repeatU){
     this.metaData["textureRepeatU"] = repeatU;

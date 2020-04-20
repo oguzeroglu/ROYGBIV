@@ -20,6 +20,9 @@ varying vec3 vColor;
   varying vec2 vUV;
   uniform mat3 textureMatrix;
 #endif
+#ifdef DISPLACEMENT_SEPARATE_UV
+  uniform mat3 displacementTextureMatrix;
+#endif
 #if defined(HAS_SKYBOX_FOG) || defined(AFFECTED_BY_LIGHT)
   uniform mat4 worldMatrix;
 #endif
@@ -807,9 +810,13 @@ void main(){
 
   vec3 transformedPosition = position;
   #ifdef HAS_DISPLACEMENT
+    vec2 displacementUV = vUV;
+    #ifdef DISPLACEMENT_SEPARATE_UV
+      displacementUV = (displacementTextureMatrix * vec3(uv, 1.0)).xy;
+    #endif
     vec4 heightUVFixed = fixTextureBleeding(vec4(float(HEIGHT_START_U), float(HEIGHT_START_V), float(HEIGHT_END_U), float(HEIGHT_END_V)));
     vec3 objNormal = normalize(normal);
-    transformedPosition += objNormal * (texture2D(texture, uvAffineTransformation(vUV, heightUVFixed.x, heightUVFixed.y, heightUVFixed.z, heightUVFixed.w)).r * displacementInfo.x + displacementInfo.y);
+    transformedPosition += objNormal * (texture2D(texture, uvAffineTransformation(displacementUV, heightUVFixed.x, heightUVFixed.y, heightUVFixed.z, heightUVFixed.w)).r * displacementInfo.x + displacementInfo.y);
   #endif
 
   vec4 mvPosition = modelViewMatrix * vec4(transformedPosition, 1.0);
