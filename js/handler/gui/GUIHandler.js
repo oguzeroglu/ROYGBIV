@@ -19,6 +19,8 @@ var GUIHandler = function(){
     "Blending": "None",
     "Texture offset x": 0.0,
     "Texture offset y": 0.0,
+    "Texture repeat x": 1,
+    "Texture repeat y": 1,
     "Opacity": 1.0,
     "AO intensity": 0.0,
     "Emissive int.": 0.0,
@@ -477,9 +479,13 @@ GUIHandler.prototype.afterObjectSelection = function(){
       if (!obj.hasTexture()){
         guiHandler.disableController(guiHandler.omTextureOffsetXController);
         guiHandler.disableController(guiHandler.omTextureOffsetYController);
+        guiHandler.disableController(guiHandler.omTextureRepeatXController);
+        guiHandler.disableController(guiHandler.omTextureRepeatYController);
       }else{
         guiHandler.objectManipulationParameters["Texture offset x"] = obj.getTextureOffsetX();
         guiHandler.objectManipulationParameters["Texture offset y"] = obj.getTextureOffsetY();
+        guiHandler.objectManipulationParameters["Texture repeat x"] = obj.getTextureRepeatX();
+        guiHandler.objectManipulationParameters["Texture repeat y"] = obj.getTextureRepeatY();
       }
       if (!obj.hasAOMap()){
         guiHandler.disableController(guiHandler.omAOIntensityController);
@@ -589,6 +595,11 @@ GUIHandler.prototype.afterObjectSelection = function(){
       if (obj.cannotSetMass){
         guiHandler.disableController(guiHandler.omHasMassController);
       }
+
+      guiHandler.objectManipulationParameters["Texture repeat x"] = 1;
+      guiHandler.objectManipulationParameters["Texture repeat y"] = 1;
+      guiHandler.disableController(guiHandler.omTextureRepeatXController);
+      guiHandler.disableController(guiHandler.omTextureRepeatYController);
 
       guiHandler.objectManipulationParameters["Side"] = "Both";
       if (obj.renderSide){
@@ -767,6 +778,8 @@ GUIHandler.prototype.enableAllOMControllers = function(){
   guiHandler.enableController(guiHandler.omHasMassController);
   guiHandler.enableController(guiHandler.omTextureOffsetXController);
   guiHandler.enableController(guiHandler.omTextureOffsetYController);
+  guiHandler.enableController(guiHandler.omTextureRepeatXController);
+  guiHandler.enableController(guiHandler.omTextureRepeatYController);
   guiHandler.enableController(guiHandler.omOpacityController);
   guiHandler.enableController(guiHandler.omEmissiveIntensityController);
   guiHandler.enableController(guiHandler.omEmissiveColorController);
@@ -1396,7 +1409,12 @@ GUIHandler.prototype.initializeObjectManipulationGUI = function(){
   guiHandler.omTextureOffsetYController = textureFolder.add(guiHandler.objectManipulationParameters, "Texture offset y").min(-2).max(2).step(0.001).onChange(function(val){
     selectionHandler.getSelectedObject().setTextureOffsetY(val);
   }).listen();
-
+  guiHandler.omTextureRepeatXController = textureFolder.add(guiHandler.objectManipulationParameters, "Texture repeat x").min(1).max(100).step(1).onChange(function(val){
+    selectionHandler.getSelectedObject().adjustTextureRepeat(val, null);
+  }).listen();
+  guiHandler.omTextureRepeatYController = textureFolder.add(guiHandler.objectManipulationParameters, "Texture repeat y").min(1).max(100).step(1).onChange(function(val){
+    selectionHandler.getSelectedObject().adjustTextureRepeat(null, val);
+  }).listen();
   guiHandler.omAOIntensityController = textureFolder.add(guiHandler.objectManipulationParameters, "AO intensity").min(0).max(10).step(0.1).onChange(function(val){
     selectionHandler.getSelectedObject().setAOIntensity(val);
   }).listen();
