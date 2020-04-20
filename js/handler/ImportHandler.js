@@ -732,6 +732,11 @@ ImportHandler.prototype.importAddedObjects = function(obj){
        addedObjectInstance.setPosition(curAddedObjectExport.manualPositionInfo.x, curAddedObjectExport.manualPositionInfo.y, curAddedObjectExport.manualPositionInfo.z, true);
      }
      addedObjectInstance.setAffectedByLight(curAddedObjectExport.affectedByLight);
+     if (curAddedObjectExport.customDisplacementTextureMatrixInfo){
+       addedObjectInstance.setCustomDisplacementTextureMatrix();
+       addedObjectInstance.setCustomDisplacementTextureRepeat(curAddedObjectExport.customDisplacementTextureMatrixInfo.repeatU, curAddedObjectExport.customDisplacementTextureMatrixInfo.repeatV);
+       addedObjectInstance.setCustomDisplacementTextureOffset(curAddedObjectExport.customDisplacementTextureMatrixInfo.offsetX, curAddedObjectExport.customDisplacementTextureMatrixInfo.offsetY);
+     }
   }
   for (var objName in addedObjects){
     if (addedObjects[objName].softCopyParentName){

@@ -870,6 +870,7 @@ AddedObject.prototype.export = function(){
     exportObject.manualPositionInfo = this.manualPositionInfo;
   }
   exportObject.affectedByLight = this.affectedByLight;
+  exportObject.customDisplacementTextureMatrixInfo  = this.customDisplacementTextureMatrixInfo;
   return exportObject;
 }
 
