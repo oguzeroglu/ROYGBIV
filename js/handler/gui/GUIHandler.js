@@ -21,6 +21,11 @@ var GUIHandler = function(){
     "Texture offset y": 0.0,
     "Texture repeat x": 1,
     "Texture repeat y": 1,
+    "Has custom disp. matrix": false,
+    "Disp. texture offset x": 0.0,
+    "Disp. texture offset y": 0.0,
+    "Disp. texture repeat x": 1,
+    "Disp. texture repeat y": 1,
     "Opacity": 1.0,
     "AO intensity": 0.0,
     "Emissive int.": 0.0,
@@ -487,6 +492,23 @@ GUIHandler.prototype.afterObjectSelection = function(){
         guiHandler.objectManipulationParameters["Texture repeat x"] = obj.getTextureRepeatX();
         guiHandler.objectManipulationParameters["Texture repeat y"] = obj.getTextureRepeatY();
       }
+      if (!obj.hasDisplacementMap()){
+        guiHandler.objectManipulationParameters["Has custom disp. matrix"] = false;
+        guiHandler.disableController(guiHandler.omHasCustomDisplacementMatrixController);
+      }else{
+        guiHandler.objectManipulationParameters["Has custom disp. matrix"] = !!obj.customDisplacementTextureMatrixInfo;
+      }
+      if (!obj.customDisplacementTextureMatrixInfo || !obj.hasTexture() || !obj.hasDisplacementMap()){
+        guiHandler.disableController(guiHandler.omDisplacementTextureOffsetXController);
+        guiHandler.disableController(guiHandler.omDisplacementTextureOffsetYController);
+        guiHandler.disableController(guiHandler.omDisplacementTextureRepeatXController);
+        guiHandler.disableController(guiHandler.omDisplacementTextureRepeatYController);
+      }else{
+        guiHandler.objectManipulationParameters["Disp. texture offset x"] = obj.customDisplacementTextureMatrixInfo.offsetX;
+        guiHandler.objectManipulationParameters["Disp. texture offset y"] = obj.customDisplacementTextureMatrixInfo.offsetY;
+        guiHandler.objectManipulationParameters["Disp. texture repeat x"] = obj.customDisplacementTextureMatrixInfo.repeatU;
+        guiHandler.objectManipulationParameters["Disp. texture repeat y"] = obj.customDisplacementTextureMatrixInfo.repeatV;
+      }
       if (!obj.hasAOMap()){
         guiHandler.disableController(guiHandler.omAOIntensityController);
       }else{
@@ -780,6 +802,11 @@ GUIHandler.prototype.enableAllOMControllers = function(){
   guiHandler.enableController(guiHandler.omTextureOffsetYController);
   guiHandler.enableController(guiHandler.omTextureRepeatXController);
   guiHandler.enableController(guiHandler.omTextureRepeatYController);
+  guiHandler.enableController(guiHandler.omHasCustomDisplacementMatrixController);
+  guiHandler.enableController(guiHandler.omDisplacementTextureOffsetXController);
+  guiHandler.enableController(guiHandler.omDisplacementTextureOffsetYController);
+  guiHandler.enableController(guiHandler.omDisplacementTextureRepeatXController);
+  guiHandler.enableController(guiHandler.omDisplacementTextureRepeatYController);
   guiHandler.enableController(guiHandler.omOpacityController);
   guiHandler.enableController(guiHandler.omEmissiveIntensityController);
   guiHandler.enableController(guiHandler.omEmissiveColorController);
@@ -1024,7 +1051,7 @@ GUIHandler.prototype.initializeWorkerStatusGUI = function(){
   guiHandler.workerStatusParameters["Raycaster"] = (RAYCASTER_WORKER_ON)? "ON": "OFF";
   guiHandler.workerStatusParameters["Physics"] = (PHYSICS_WORKER_ON)? "ON": "OFF";
   guiHandler.workerStatusParameters["Lightning"] = (LIGHTNING_WORKER_ON)? "ON": "OFF";
-  guiHandler.datGuiWorkerStatus = new dat.GUI({hideable: false});
+  guiHandler.datGuiWorkerStatus = new dat.GUI({hideable: false, width: 420});
   guiHandler.datGuiWorkerStatus.add(guiHandler.workerStatusParameters, "Raycaster", guiHandler.onOff).onChange(function(val){
     RAYCASTER_WORKER_ON = (val == "ON");
     raycasterFactory.refresh();
@@ -1054,7 +1081,7 @@ GUIHandler.prototype.initializeWorkerStatusGUI = function(){
 }
 
 GUIHandler.prototype.initializeShaderPrecisionGUI = function(){
-  guiHandler.datGuiShaderPrecision = new dat.GUI({hideable: false});
+  guiHandler.datGuiShaderPrecision = new dat.GUI({hideable: false, width: 420});
   guiHandler.shaderPrecisionParameters["Crosshair"] = shaderPrecisionHandler.getShaderPrecisionTextForType(shaderPrecisionHandler.types.CROSSHAIR);
   guiHandler.shaderPrecisionParameters["Basic material"] = shaderPrecisionHandler.getShaderPrecisionTextForType(shaderPrecisionHandler.types.BASIC_MATERIAL);
   guiHandler.shaderPrecisionParameters["Instanced basic material"] = shaderPrecisionHandler.getShaderPrecisionTextForType(shaderPrecisionHandler.types.INSTANCED_BASIC_MATERIAL);
@@ -1119,7 +1146,7 @@ GUIHandler.prototype.initializeShaderPrecisionGUI = function(){
 }
 
 GUIHandler.prototype.initializeObjectManipulationGUI = function(){
-  guiHandler.datGuiObjectManipulation = new dat.GUI({hideable: false});
+  guiHandler.datGuiObjectManipulation = new dat.GUI({hideable: false, width: 420});
   guiHandler.datGuiObjectManipulation.domElement.addEventListener("mousedown", function(e){
     omGUIFocused = true;
   });
@@ -1415,6 +1442,37 @@ GUIHandler.prototype.initializeObjectManipulationGUI = function(){
   guiHandler.omTextureRepeatYController = textureFolder.add(guiHandler.objectManipulationParameters, "Texture repeat y").min(1).max(100).step(1).onChange(function(val){
     selectionHandler.getSelectedObject().adjustTextureRepeat(null, val);
   }).listen();
+  guiHandler.omHasCustomDisplacementMatrixController = textureFolder.add(guiHandler.objectManipulationParameters, "Has custom disp. matrix").onChange(function(val){
+    if (!selectionHandler.getSelectedObject().hasDisplacementMap()){
+      guiHandler.objectManipulationParameters["Has custom disp. matrix"] = false;
+      return;
+    }
+    if (val){
+      selectionHandler.getSelectedObject().setCustomDisplacementTextureMatrix();
+      guiHandler.enableController(guiHandler.omDisplacementTextureOffsetXController);
+      guiHandler.enableController(guiHandler.omDisplacementTextureOffsetYController);
+      guiHandler.enableController(guiHandler.omDisplacementTextureRepeatXController);
+      guiHandler.enableController(guiHandler.omDisplacementTextureRepeatYController);
+    }else{
+      selectionHandler.getSelectedObject().removeCustomDisplacementTextureMatrix();
+      guiHandler.disableController(guiHandler.omDisplacementTextureOffsetXController);
+      guiHandler.disableController(guiHandler.omDisplacementTextureOffsetYController);
+      guiHandler.disableController(guiHandler.omDisplacementTextureRepeatXController);
+      guiHandler.disableController(guiHandler.omDisplacementTextureRepeatYController);
+    }
+  }).listen();
+  guiHandler.omDisplacementTextureOffsetXController = textureFolder.add(guiHandler.objectManipulationParameters, "Disp. texture offset x").min(-2).max(2).step(0.001).onChange(function(val){
+    selectionHandler.getSelectedObject().setCustomDisplacementTextureOffset(val, null);
+  }).listen();
+  guiHandler.omDisplacementTextureOffsetYController = textureFolder.add(guiHandler.objectManipulationParameters, "Disp. texture offset y").min(-2).max(2).step(0.001).onChange(function(val){
+    selectionHandler.getSelectedObject().setCustomDisplacementTextureOffset(null, val);
+  }).listen();
+  guiHandler.omDisplacementTextureRepeatXController = textureFolder.add(guiHandler.objectManipulationParameters, "Disp. texture repeat x").min(1).max(100).step(1).onChange(function(val){
+    selectionHandler.getSelectedObject().setCustomDisplacementTextureRepeat(val, null);
+  }).listen();
+  guiHandler.omDisplacementTextureRepeatYController = textureFolder.add(guiHandler.objectManipulationParameters, "Disp. texture repeat y").min(1).max(100).step(1).onChange(function(val){
+    selectionHandler.getSelectedObject().setCustomDisplacementTextureRepeat(null, val);
+  }).listen();
   guiHandler.omAOIntensityController = textureFolder.add(guiHandler.objectManipulationParameters, "AO intensity").min(0).max(10).step(0.1).onChange(function(val){
     selectionHandler.getSelectedObject().setAOIntensity(val);
   }).listen();
@@ -1449,7 +1507,7 @@ GUIHandler.prototype.initializeObjectManipulationGUI = function(){
 }
 
 GUIHandler.prototype.initializeContainerManipulationGUI = function(){
-  guiHandler.datGuiContainerManipulation = new dat.GUI({hideable: false});
+  guiHandler.datGuiContainerManipulation = new dat.GUI({hideable: false, width: 420});
   guiHandler.datGuiContainerManipulation.domElement.addEventListener("mousedown", function(e){
     cmGUIFocused = true;
   });
@@ -1595,7 +1653,7 @@ GUIHandler.prototype.initializeContainerManipulationGUI = function(){
 }
 
 GUIHandler.prototype.initializeSpriteManipulationGUI = function(){
-  guiHandler.datGuiSpriteManipulation = new dat.GUI({hideable: false});
+  guiHandler.datGuiSpriteManipulation = new dat.GUI({hideable: false, width: 420});
   guiHandler.datGuiSpriteManipulation.domElement.addEventListener("mousedown", function(e){
     smGUIFocused = true;
   });
@@ -1763,7 +1821,7 @@ GUIHandler.prototype.initializeSpriteManipulationGUI = function(){
 }
 
 GUIHandler.prototype.initializeTextManipulationGUI = function(){
-  guiHandler.datGuiTextManipulation = new dat.GUI({hideable: false});
+  guiHandler.datGuiTextManipulation = new dat.GUI({hideable: false, width: 420});
   guiHandler.datGuiTextManipulation.domElement.addEventListener("mousedown", function(e){
     tmGUIFocused = true;
   });
@@ -1943,7 +2001,7 @@ GUIHandler.prototype.initializeTextManipulationGUI = function(){
 }
 
 GUIHandler.prototype.initializeBloomGUI = function(){
-  guiHandler.datGuiBloom = new dat.GUI({hideable: false});
+  guiHandler.datGuiBloom = new dat.GUI({hideable: false, width: 420});
   guiHandler.bloomThresholdController = guiHandler.datGuiBloom.add(guiHandler.bloomParameters, "Threshold").min(0).max(1).step(0.01).onChange(function(val){
     bloom.setThreshold(val);
   }).listen();
