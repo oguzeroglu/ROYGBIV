@@ -1244,6 +1244,13 @@ GUIHandler.prototype.initializeObjectManipulationGUI = function(){
     terminal.clear();
     obj.setNoMass(!val);
     if (val){
+      for (var animName in obj.animations){
+        if (obj.animations[animName].isObjectScaleAnimation()){
+          obj.removeAnimation(obj.animations[animName]);
+        }
+      }
+    }
+    if (val){
       guiHandler.enableController(guiHandler.omMassController);
       guiHandler.enableController(guiHandler.omPhysicsSimplifiedController);
       terminal.printInfo(Text.PHYSICS_ENABLED);
@@ -1942,6 +1949,14 @@ GUIHandler.prototype.initializeTextManipulationGUI = function(){
   guiHandler.textManipulationIs2DController = folder2D.add(guiHandler.textManipulationParameters, "is 2D").onChange(function(val){
     sceneHandler.onAddedTextDeletion(selectionHandler.getSelectedObject());
     selectionHandler.getSelectedObject().set2DStatus(val);
+    if (val){
+      for (var animName in selectionHandler.getSelectedObject().animations){
+        var anim = selectionHandler.getSelectedObject().animations[animName];
+        if (anim.description.action == animationHandler.actionTypes.TEXT.POSITION_Z){
+          selectionHandler.getSelectedObject().removeAnimation(anim);
+        }
+      }
+    }
     sceneHandler.onAddedTextCreation(selectionHandler.getSelectedObject());
     refreshRaycaster("Ok")
     if (val){

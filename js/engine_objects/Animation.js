@@ -53,6 +53,40 @@ var Animation = function(name, type, attachedObject, description, rewind, repeat
   this.animationState = ANIMATION_STATE_NOT_RUNNING;
 }
 
+Animation.prototype.isObjectScaleAnimation = function(){
+  var actionType = this.description.action;
+  return actionType == animationHandler.actionTypes.OBJECT.SCALE_X ||
+         actionType == animationHandler.actionTypes.OBJECT.SCALE_Y ||
+         actionType == animationHandler.actionTypes.OBJECT.SCALE_Z;
+}
+
+Animation.prototype.isCustomDisplacementAnimation = function(){
+  var actionType = this.description.action;
+  return actionType == animationHandler.actionTypes.OBJECT.DISP_TEXTURE_OFFSET_X ||
+         actionType == animationHandler.actionTypes.OBJECT.DISP_TEXTURE_OFFSET_Y;
+}
+
+Animation.prototype.isDisplacementAnimation = function(){
+  var actionType = this.description.action;
+  return this.isCustomDisplacementAnimation() ||
+          actionType == animationHandler.actionTypes.OBJECT.DISPLACEMENT_SCALE ||
+          actionType == animationHandler.actionTypes.OBJECT.DISPLACEMENT_BIAS;
+
+}
+
+Animation.prototype.isEmissiveAnimation = function(){
+  var actionType = this.description.action;
+  return actionType == animationHandler.actionTypes.OBJECT.EMISSIVE_INTENSITY ||
+          actionType == animationHandler.actionTypes.OBJECT.EMISSIVE_COLOR;
+}
+
+Animation.prototype.isTextureAnimation = function(){
+  var actionType = this.description.action;
+  return this.isEmissiveAnimation() || this.isDisplacementAnimation() ||
+          actionType == animationHandler.actionTypes.OBJECT.TEXTURE_OFFSET_X ||
+            actionType == animationHandler.actionTypes.OBJECT.TEXTURE_OFFSET_Y;
+}
+
 Animation.prototype.copyWithAnotherObject = function(obj){
   return new Animation(this.name, this.type, obj, this.description, this.rewind, this.repeat);
 }

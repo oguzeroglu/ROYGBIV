@@ -1242,6 +1242,16 @@ function parse(input){
               return true;
             }
             addedObject.mapTexturePack(texturePack);
+
+            for (var animName in addedObject.animations){
+              var anim = addedObject.animations[animName];
+              if (anim.isEmissiveAnimation() && !texturePack.hasEmissive){
+                addedObject.removeAnimation(anim);
+              }
+              if (anim.isDisplacementAnimation() && !texturePack.hasHeight){
+                addedObject.removeAnimation(anim);
+              }
+            }
           }else{
             if (sprite.registeredSceneName != sceneHandler.getActiveSceneName()){
               terminal.printError(Text.SPRITE_NOT_IN_ACTIVE_SCENE);
@@ -1367,6 +1377,12 @@ function parse(input){
           addedObject.resetMaps(true);
           if (!jobHandlerWorking){
             terminal.printInfo(Text.MAPS_RESET);
+          }
+          for (var animName in addedObject.animations){
+            var anim = addedObject.animations[animName];
+            if (anim.isTextureAnimation()){
+              addedObject.removeAnimation(anim);
+            }
           }
           return true;
         break;

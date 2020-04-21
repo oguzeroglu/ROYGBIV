@@ -2482,6 +2482,12 @@ AddedObject.prototype.removeCustomDisplacementTextureMatrix = function(){
   macroHandler.removeMacro("DISPLACEMENT_SEPARATE_UV", this.mesh.material, true, false);
   delete this.mesh.material.uniforms.displacementTextureMatrix;
   delete this.customDisplacementTextureMatrixInfo;
+
+  for (var animName in this.animations){
+    if (this.animations[animName].isCustomDisplacementAnimation()){
+      this.removeAnimation(this.animations[animName]);
+    }
+  }
 }
 
 AddedObject.prototype.setCustomDisplacementTextureMatrix = function(){
