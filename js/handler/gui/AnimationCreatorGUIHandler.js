@@ -199,6 +199,11 @@ AnimationCreatorGUIHandler.prototype.init = function(object){
           continue;
         }
       }
+      if (key == "DISP_TEXTURE_OFFSET_X" || key == "DISP_TEXTURE_OFFSET_Y"){
+        if (!object.isAddedObject || !object.hasDisplacementMap() || !object.customDisplacementTextureMatrixInfo){
+          continue;
+        }
+      }
       if (key == "EMISSIVE_INTENSITY" || key == "EMISSIVE_COLOR"){
         if (!object.hasEmissiveMap()){
           continue;

@@ -2447,18 +2447,14 @@ AddedObject.prototype.setCustomDisplacementTextureOffset = function(offsetX, off
   if (!this.customDisplacementTextureMatrixInfo){
     return;
   }
-  if (!(typeof offsetX == UNDEFINED)){
+  if (offsetX != null){
     this.customDisplacementTextureMatrixInfo.offsetX = offsetX;
-  }else{
-    offsetX = this.customDisplacementTextureMatrixInfo.offsetX;
+    this.mesh.material.uniforms.displacementTextureMatrix.value.elements[6] = offsetX;
   }
-  if (!(typeof offsetY == UNDEFINED)){
+  if (offsetY != null){
     this.customDisplacementTextureMatrixInfo.offsetY = offsetY;
-  }else{
-    offsetY = this.customDisplacementTextureMatrixInfo.offsetY;
+    this.mesh.material.uniforms.displacementTextureMatrix.value.elements[7] = offsetY;
   }
-  this.mesh.material.uniforms.displacementTextureMatrix.value.elements[6] = offsetX;
-  this.mesh.material.uniforms.displacementTextureMatrix.value.elements[7] = offsetY;
 }
 
 AddedObject.prototype.setCustomDisplacementTextureRepeat = function(repeatU, repeatV){

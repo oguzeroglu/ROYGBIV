@@ -639,6 +639,13 @@ GUIHandler.prototype.afterObjectSelection = function(){
       if (obj.noMass || obj.physicsBody.mass > 0){
         guiHandler.disableController(guiHandler.omPhysicsSimplifiedController);
       }
+
+      guiHandler.disableController(guiHandler.omHasCustomDisplacementMatrixController);
+      guiHandler.disableController(guiHandler.omDisplacementTextureOffsetXController);
+      guiHandler.disableController(guiHandler.omDisplacementTextureOffsetYController);
+      guiHandler.disableController(guiHandler.omDisplacementTextureRepeatXController);
+      guiHandler.disableController(guiHandler.omDisplacementTextureRepeatYController);
+
       obj.mesh.add(axesHelper);
     }
     guiHandler.objectManipulationParameters["Motion blur"] = !(typeof obj.objectTrailConfigurations == UNDEFINED);
@@ -1443,7 +1450,7 @@ GUIHandler.prototype.initializeObjectManipulationGUI = function(){
     selectionHandler.getSelectedObject().adjustTextureRepeat(null, val);
   }).listen();
   guiHandler.omHasCustomDisplacementMatrixController = textureFolder.add(guiHandler.objectManipulationParameters, "Has custom disp. matrix").onChange(function(val){
-    if (!selectionHandler.getSelectedObject().hasDisplacementMap()){
+    if (!selectionHandler.getSelectedObject().hasDisplacementMap() || selectionHandler.getSelectedObject().isObjectGroup){
       guiHandler.objectManipulationParameters["Has custom disp. matrix"] = false;
       return;
     }

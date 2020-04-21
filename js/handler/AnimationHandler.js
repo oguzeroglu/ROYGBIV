@@ -21,7 +21,7 @@ var AnimationHandler = function(){
       POSITION_Y: "OBJECT_POSITION_Y", POSITION_Z: "OBJECT_POSITION_Z", EMISSIVE_INTENSITY: "OBJECT_EMISSIVE_INTENSITY", DISPLACEMENT_SCALE: "OBJECT_DISPLACEMENT_SCALE",
       DISPLACEMENT_BIAS: "OBJECT_DISPLACEMENT_BIAS", EMISSIVE_COLOR: "OBJECT_EMISSIVE_COLOR", TEXTURE_OFFSET_X: "OBJECT_TEXTURE_OFFSET_X",
       TEXTURE_OFFSET_Y: "OBJECT_TEXTURE_OFFSET_Y", TRANSLATE_X: "OBJECT_TRANSLATE_X", TRANSLATE_Y: "OBJECT_TRANSLATE_Y", TRANSLATE_Z: "OBJECT_TRANSLATE_Z",
-      AO_INTENSITY: "OBJECT_AO_INTENSITY"
+      AO_INTENSITY: "OBJECT_AO_INTENSITY", DISP_TEXTURE_OFFSET_X: "OBJECT_DISP_TEXTURE_OFFSET_X", DISP_TEXTURE_OFFSET_Y: "OBJECT_DISP_TEXTURE_OFFSET_Y"
     },
     TEXT: {
       TRANSPARENCY: "TEXT_TRANSPARENCY", CHAR_SIZE: "TEXT_CHAR_SIZE", MARGIN_BETWEEN_CHARS: "TEXT_MARGIN_BETWEEN_CHARS",
@@ -102,6 +102,12 @@ var AnimationHandler = function(){
   };
   this.initialValueGetterFunctionsByType[this.actionTypes.OBJECT.TEXTURE_OFFSET_Y] = function(object){
     return object.getTextureOffsetY();
+  };
+  this.initialValueGetterFunctionsByType[this.actionTypes.OBJECT.DISP_TEXTURE_OFFSET_X] = function(object){
+    return object.customDisplacementTextureMatrixInfo.offsetX;
+  };
+  this.initialValueGetterFunctionsByType[this.actionTypes.OBJECT.DISP_TEXTURE_OFFSET_Y] = function(object){
+    return object.customDisplacementTextureMatrixInfo.offsetY;
   };
   this.initialValueGetterFunctionsByType[this.actionTypes.OBJECT.TRANSLATE_X] = function(object){
     return 0;
@@ -306,6 +312,12 @@ var AnimationHandler = function(){
   this.afterAnimationSettersByType[this.actionTypes.OBJECT.TEXTURE_OFFSET_Y] = function(animation){
     animation.attachedObject.setTextureOffsetY(animation.initialValue);
   };
+  this.afterAnimationSettersByType[this.actionTypes.OBJECT.DISP_TEXTURE_OFFSET_X] = function(animation){
+    animation.attachedObject.setCustomDisplacementTextureOffset(animation.initialValue, null);
+  };
+  this.afterAnimationSettersByType[this.actionTypes.OBJECT.DISP_TEXTURE_OFFSET_Y] = function(animation){
+    animation.attachedObject.setCustomDisplacementTextureOffset(null, animation.initialValue);
+  };
   this.afterAnimationSettersByType[this.actionTypes.OBJECT.TRANSLATE_X] = function(animation){
     animation.attachedObject.mesh.translateX(-1 * animation.params.totalTranslationX);
     if (animation.attachedObject.autoInstancedParent){
@@ -433,6 +445,8 @@ var AnimationHandler = function(){
   this.actionFunctionsByType[this.actionTypes.OBJECT.EMISSIVE_COLOR] = this.updateObjectEmissiveColor;
   this.actionFunctionsByType[this.actionTypes.OBJECT.TEXTURE_OFFSET_X] = this.updateObjectTextureOffsetX;
   this.actionFunctionsByType[this.actionTypes.OBJECT.TEXTURE_OFFSET_Y] = this.updateObjectTextureOffsetY;
+  this.actionFunctionsByType[this.actionTypes.OBJECT.DISP_TEXTURE_OFFSET_X] = this.updateObjectDispTextureOffsetX;
+  this.actionFunctionsByType[this.actionTypes.OBJECT.DISP_TEXTURE_OFFSET_Y] = this.updateObjectDispTextureOffsetY;
   this.actionFunctionsByType[this.actionTypes.OBJECT.TRANSLATE_X] = this.updateObjectTranslationX;
   this.actionFunctionsByType[this.actionTypes.OBJECT.TRANSLATE_Y] = this.updateObjectTranslationY;
   this.actionFunctionsByType[this.actionTypes.OBJECT.TRANSLATE_Z] = this.updateObjectTranslationZ;
@@ -720,6 +734,12 @@ AnimationHandler.prototype.updateObjectTextureOffsetX = function(params){
 }
 AnimationHandler.prototype.updateObjectTextureOffsetY = function(params){
   params.object.setTextureOffsetY(params.value);
+}
+AnimationHandler.prototype.updateObjectDispTextureOffsetX = function(params){
+  params.object.setCustomDisplacementTextureOffset(params.value, null);
+}
+AnimationHandler.prototype.updateObjectDispTextureOffsetY = function(params){
+  params.object.setCustomDisplacementTextureOffset(null, params.value);
 }
 AnimationHandler.prototype.updateObjectTranslationX = function(params, increaseTick){
   var coef = increaseTick? 1: -1;
