@@ -29,6 +29,7 @@ varying float vAlpha;
 #endif
 #ifdef HAS_DISPLACEMENT
   attribute vec2 displacementInfo;
+  attribute vec4 displacementTextureMatrixInfo;
   uniform sampler2D texture;
   uniform vec2 totalDisplacementInfo;
   attribute vec4 displacementUV;
@@ -840,8 +841,18 @@ vec3 diffuseLight(float dirX, float dirY, float dirZ, float r, float g, float b,
       vAOUV = aoUV;
     #endif
     #ifdef HAS_DISPLACEMENT
+      vec2 transformedDisplacementUV = transformedUV;
+      if (displacementTextureMatrixInfo.z > 0.0){
+        transformedDisplacementUV = (
+          mat3(
+            displacementTextureMatrixInfo.z, 0.0, 0.0,
+            0.0, displacementTextureMatrixInfo.w, 0.0,
+            displacementTextureMatrixInfo.x, displacementTextureMatrixInfo.y, 1.0
+          ) * vec3(uv, 1.0)
+        ).xy;
+      }
       vec4 displacementUVFixed = fixTextureBleeding(displacementUV);
-      calculatedDisplacementUV = uvAffineTransformation(transformedUV, displacementUVFixed.x, displacementUVFixed.y, displacementUVFixed.z, displacementUVFixed.w);
+      calculatedDisplacementUV = uvAffineTransformation(transformedDisplacementUV, displacementUVFixed.x, displacementUVFixed.y, displacementUVFixed.z, displacementUVFixed.w);
     #endif
   }
 #endif
