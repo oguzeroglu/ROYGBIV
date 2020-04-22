@@ -62,6 +62,10 @@ AutoInstancedObject.prototype.updateObject = function(object){
   if (object.hasDisplacementMap()){
     this.mesh.material.uniforms.autoInstanceDisplacementInfoArray.value[alphaIndex].x = object.getDisplacementScale();
     this.mesh.material.uniforms.autoInstanceDisplacementInfoArray.value[alphaIndex].y = object.getDisplacementBias();
+    if (object.customDisplacementTextureMatrixInfo){
+      this.mesh.material.uniforms.autoInstanceDisplacementTextureOffsetInfoArray.value[alphaIndex].x = object.customDisplacementTextureMatrixInfo.offsetX;
+      this.mesh.material.uniforms.autoInstanceDisplacementTextureOffsetInfoArray.value[alphaIndex].y = object.customDisplacementTextureMatrixInfo.offsetY;
+    }
   }
   if (object.hasTexture()){
     this.mesh.material.uniforms.autoInstanceTextureOffsetInfoArray.value[alphaIndex].x = object.getTextureOffsetX();
@@ -158,6 +162,7 @@ AutoInstancedObject.prototype.init = function(){
   var displacementInfoAry = [];
   var aoIntensityAry = [];
   var textureOffsetInfoAry = [];
+  var displacementTextureOffsetInfoAry = [];
   var affectedByLightAry = [];
   var hasColorizableMember = false;
   for (var objName in this.objects){
@@ -195,8 +200,14 @@ AutoInstancedObject.prototype.init = function(){
     }
     if (obj.hasDisplacementMap()){
       displacementInfoAry.push(new THREE.Vector2(obj.getDisplacementScale(), obj.getDisplacementBias()));
+      if (obj.customDisplacementTextureMatrixInfo){
+        displacementTextureOffsetInfoAry.push(new THREE.Vector2(obj.customDisplacementTextureMatrixInfo.offsetX, obj.customDisplacementTextureMatrixInfo.offsetY));
+      }else{
+        displacementTextureOffsetInfoAry.push(new THREE.Vector2(0, 0));
+      }
     }else{
       displacementInfoAry.push(new THREE.Vector2(0, 0));
+      displacementTextureOffsetInfoAry.push(new THREE.Vector2(0, 0));
     }
     if (obj.hasTexture()){
       textureOffsetInfoAry.push(new THREE.Vector2(obj.getTextureOffsetX(), obj.getTextureOffsetY()));
@@ -239,6 +250,7 @@ AutoInstancedObject.prototype.init = function(){
   this.mesh.material.uniforms.autoInstanceEmissiveColorArray = new THREE.Uniform(emissiveColorAry);
   this.mesh.material.uniforms.autoInstanceDisplacementInfoArray = new THREE.Uniform(displacementInfoAry);
   this.mesh.material.uniforms.autoInstanceTextureOffsetInfoArray = new THREE.Uniform(textureOffsetInfoAry);
+  this.mesh.material.uniforms.autoInstanceDisplacementTextureOffsetInfoArray = new THREE.Uniform(displacementTextureOffsetInfoAry);
   this.mesh.material.uniforms.autoInstanceAOIntensityArray = new THREE.Uniform(aoIntensityAry);
   if (hasColorizableMember){
     macroHandler.injectMacro("AUTO_INSTANCE_FORCED_COLOR_ARRAY_SIZE "+(objCount), this.mesh.material, true, false);
@@ -266,7 +278,7 @@ AutoInstancedObject.prototype.compressGeometry = function(){
     "quaternion", "alpha" , "color", "textureInfo", "textureMatrixInfo",
     "diffuseUV", "emissiveIntensity", "emissiveColor", "emissiveUV",
     "aoIntensity", "aoUV", "displacementInfo", "displacementUV", "alphaUV",
-    "affectedByLight"
+    "affectedByLight", "displacementTextureMatrixInfo"
   ];
 
   macroHandler.compressAttributes(this.mesh, compressableAttributes);

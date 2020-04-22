@@ -2455,6 +2455,9 @@ AddedObject.prototype.setCustomDisplacementTextureOffset = function(offsetX, off
     this.customDisplacementTextureMatrixInfo.offsetY = offsetY;
     this.mesh.material.uniforms.displacementTextureMatrix.value.elements[7] = offsetY;
   }
+  if (this.autoInstancedParent){
+    this.autoInstancedParent.updateObject(this);
+  }
 }
 
 AddedObject.prototype.setCustomDisplacementTextureRepeat = function(repeatU, repeatV){

@@ -26,6 +26,7 @@ varying float vAlpha;
   uniform vec3 autoInstanceEmissiveColorArray[AUTO_INSTANCE_EMISSIVE_COLOR_ARRAY_SIZE];
   uniform vec2 autoInstanceDisplacementInfoArray[AUTO_INSTANCE_DISPLACEMENT_INFO_ARRAY_SIZE];
   uniform vec2 autoInstanceTextureOffsetInfoArray[AUTO_INSTANCE_TEXTURE_OFFSET_INFO_ARRAY_SIZE];
+  uniform vec2 autoInstanceDisplacementTextureOffsetInfoArray[AUTO_INSTANCE_TEXTURE_OFFSET_INFO_ARRAY_SIZE];
   uniform float autoInstanceAOIntensityArray[AUTO_INSTANCE_AO_INTENSITY_ARRAY_SIZE];
   varying float vDiscardFlag;
   #ifdef AUTO_INSTANCE_HAS_COLORIZABLE_MEMBER
@@ -926,6 +927,20 @@ void main(){
           textureOffsetInfo.x + totalTextureOffset.x, textureOffsetInfo.y + totalTextureOffset.y, 1.0
         ) * vec3(uv, 1.0)
       ).xy;
+
+      #ifdef HAS_DISPLACEMENT
+        transformedDisplacementUV = vUV;
+        vec2 displacementTextureOffsetInfo = autoInstanceDisplacementTextureOffsetInfoArray[textureOffsetInfoIndex];
+        if (displacementTextureMatrixInfo.z > 0.0){
+          transformedDisplacementUV = (
+            mat3(
+              displacementTextureMatrixInfo.z, 0.0, 0.0,
+              0.0, displacementTextureMatrixInfo.w, 0.0,
+              displacementTextureOffsetInfo.x, displacementTextureOffsetInfo.y, 1.0
+            ) * vec3(uv, 1.0)
+          ).xy;
+        }
+      #endif
     #else
       vUV = (
         mat3(
