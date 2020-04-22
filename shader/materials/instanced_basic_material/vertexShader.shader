@@ -92,8 +92,10 @@ varying float vAlpha;
   uniform sampler2D texture;
   uniform vec2 totalDisplacementInfo;
   attribute vec4 displacementUV;
+  attribute vec4 displacementTextureMatrixInfo;
 
   vec2 calculatedDisplacementUV;
+  vec2 transformedDisplacementUV;
 #endif
 #if defined(HAS_SKYBOX_FOG) || defined(AFFECTED_BY_LIGHT)
   uniform mat4 worldMatrix;
@@ -885,7 +887,7 @@ vec3 applyQuaternionToVector(vec3 vector, vec4 quaternion){
     #endif
     #ifdef HAS_DISPLACEMENT
       vec4 displacementUVFixed = fixTextureBleeding(displacementUV);
-      calculatedDisplacementUV = uvAffineTransformation(transformedUV, displacementUVFixed.x, displacementUVFixed.y, displacementUVFixed.z, displacementUVFixed.w);
+      calculatedDisplacementUV = uvAffineTransformation(transformedDisplacementUV, displacementUVFixed.x, displacementUVFixed.y, displacementUVFixed.z, displacementUVFixed.w);
     #endif
   }
 #endif
@@ -932,6 +934,19 @@ void main(){
           textureMatrixInfo.x + totalTextureOffset.x, textureMatrixInfo.y + totalTextureOffset.y, 1.0
         ) * vec3(uv, 1.0)
       ).xy;
+
+      #ifdef HAS_DISPLACEMENT
+        transformedDisplacementUV = vUV;
+        if (displacementTextureMatrixInfo.z > 0.0){
+          transformedDisplacementUV = (
+            mat3(
+              displacementTextureMatrixInfo.z, 0.0, 0.0,
+              0.0, displacementTextureMatrixInfo.w, 0.0,
+              displacementTextureMatrixInfo.x, displacementTextureMatrixInfo.y, 1.0
+            ) * vec3(uv, 1.0)
+          ).xy;
+        }
+      #endif
     #endif
 
     handleUVs(vUV);

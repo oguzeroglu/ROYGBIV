@@ -878,7 +878,7 @@ ObjectGroup.prototype.compressGeometry = function(){
     "quaternion", "alpha" , "color", "textureInfo", "textureMatrixInfo",
     "diffuseUV", "emissiveIntensity", "emissiveColor", "emissiveUV",
     "aoIntensity", "aoUV", "displacementInfo", "displacementUV", "alphaUV",
-    "affectedByLight", "textureMirrorInfo"
+    "affectedByLight", "textureMirrorInfo", "displacementTextureMatrixInfo"
   ];
 
   macroHandler.compressAttributes(this.mesh, compressableAttributes);
@@ -897,7 +897,7 @@ ObjectGroup.prototype.mergeInstanced = function(){
 
   var positionOffsets = [], quaternions = [], alphas = [], colors = [], textureInfos = [],
       emissiveIntensities = [], emissiveColors = [], aoIntensities = [], displacementInfos = [],
-      textureMatrixInfos = [];
+      textureMatrixInfos = [], displacementTextureMatrixInfos = [];
 
   var diffuseUVs = [], emissiveUVs = [], alphaUVs = [], aoUVs = [], displacementUVs = [];
 
@@ -983,6 +983,17 @@ ObjectGroup.prototype.mergeInstanced = function(){
         displacementUVs.push(0);
         displacementUVs.push(0);
       }
+      if (obj.customDisplacementTextureMatrixInfo){
+        displacementTextureMatrixInfos.push(obj.customDisplacementTextureMatrixInfo.offsetX);
+        displacementTextureMatrixInfos.push(obj.customDisplacementTextureMatrixInfo.offsetY);
+        displacementTextureMatrixInfos.push(obj.customDisplacementTextureMatrixInfo.repeatU);
+        displacementTextureMatrixInfos.push(obj.customDisplacementTextureMatrixInfo.repeatV);
+      }else{
+        displacementTextureMatrixInfos.push(-100);
+        displacementTextureMatrixInfos.push(-100);
+        displacementTextureMatrixInfos.push(-100);
+        displacementTextureMatrixInfos.push(-100);
+      }
     }
     if (this.hasTexture){
       if (obj.hasTexture()){
@@ -1064,6 +1075,7 @@ ObjectGroup.prototype.mergeInstanced = function(){
   );
   var textureInfoBufferAttribute;
   var textureMatrixInfosBufferAttribute;
+  var displacementTextureMatrixInfosBufferAttribute;
   var emissiveIntensityBufferAttribute;
   var emissiveColorBufferAttribute;
   var aoIntensityBufferAttribute;
@@ -1084,6 +1096,12 @@ ObjectGroup.prototype.mergeInstanced = function(){
     var diffuseUVsBufferAttribute = new THREE.InstancedBufferAttribute(new Float32Array(diffuseUVs), 4);
     diffuseUVsBufferAttribute.setDynamic(false);
     this.geometry.addAttribute("diffuseUV", diffuseUVsBufferAttribute);
+
+    if (this.hasDisplacementMap()){
+      displacementTextureMatrixInfosBufferAttribute = new THREE.InstancedBufferAttribute(new Float32Array(displacementTextureMatrixInfos), 4);
+      displacementTextureMatrixInfosBufferAttribute.setDynamic(false);
+      this.geometry.addAttribute("displacementTextureMatrixInfo", displacementTextureMatrixInfosBufferAttribute);
+    }
   }
   if (this.hasEmissiveMap()){
     emissiveIntensityBufferAttribute = new THREE.InstancedBufferAttribute(
