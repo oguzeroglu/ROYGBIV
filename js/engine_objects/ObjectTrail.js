@@ -77,6 +77,8 @@ var ObjectTrail = function(configurations){
   var objUVs;
   var objDiffuseUVs, objEmissiveUVs, objAlphaUVs, objDisplacementUVs;
   var diffuseUVsTypedArray, emissiveUVsTypedArray, alphaUVsTypedArray, displacementUVsTypedArray;
+  var customDisplacementTextureInfosTypedArray;
+  var customDisplacementTextureInfos;
   var objEmissiveIntensities;
   var objEmissiveColors;
   var objTextureFlags;
@@ -92,8 +94,10 @@ var ObjectTrail = function(configurations){
   if (this.object.hasDisplacementMap()){
     objDisplacementInfos = [];
     objDisplacementUVs = [];
+    customDisplacementTextureInfos = [];
     displacementInfosTypedArray = new Float32Array(faces.length * 3 * 2 * 60 * OBJECT_TRAIL_MAX_TIME_IN_SECS);
     displacementUVsTypedArray = new Float32Array(faces.length * 3 * 4 * 60 * OBJECT_TRAIL_MAX_TIME_IN_SECS);
+    customDisplacementTextureInfosTypedArray = new Float32Array(faces.length * 3 * 4 * 60 * OBJECT_TRAIL_MAX_TIME_IN_SECS);
   }
   if (this.object.hasAlphaMap()){
     objAlphaUVs = [];
@@ -177,6 +181,17 @@ var ObjectTrail = function(configurations){
       objDisplacementUVs.push(displacementRange);
       objDisplacementUVs.push(displacementRange);
       objDisplacementUVs.push(displacementRange);
+
+      if (obj.customDisplacementTextureMatrixInfo){
+        var info = obj.customDisplacementTextureMatrixInfo;
+        customDisplacementTextureInfos.push(new THREE.Vector4(info.offsetX, info.offsetY, info.repeatU, info.repeatV));
+        customDisplacementTextureInfos.push(new THREE.Vector4(info.offsetX, info.offsetY, info.repeatU, info.repeatV));
+        customDisplacementTextureInfos.push(new THREE.Vector4(info.offsetX, info.offsetY, info.repeatU, info.repeatV));
+      }else{
+        customDisplacementTextureInfos.push(new THREE.Vector4(-100, -100, -100, -100));
+        customDisplacementTextureInfos.push(new THREE.Vector4(-100, -100, -100, -100));
+        customDisplacementTextureInfos.push(new THREE.Vector4(-100, -100, -100, -100));
+      }
     }
 
     objColors.push(obj.material.color);
@@ -270,6 +285,7 @@ var ObjectTrail = function(configurations){
   var i18 = 0;
   var i19 = 0;
   var i20 = 0;
+  var i21 = 0;
   for (var i = 0; i<faces.length * OBJECT_TRAIL_MAX_TIME_IN_SECS * 3 * 60; i++){
     positionsTypedArray[i2++] = objPositions[i3].x;
     positionsTypedArray[i2++] = objPositions[i3].y;
@@ -289,6 +305,10 @@ var ObjectTrail = function(configurations){
       displacementUVsTypedArray[i17++] = objDisplacementUVs[i8].y;
       displacementUVsTypedArray[i17++] = objDisplacementUVs[i8].z;
       displacementUVsTypedArray[i17++] = objDisplacementUVs[i8].w;
+      customDisplacementTextureInfosTypedArray[i21++] = customDisplacementTextureInfos[i8].x;
+      customDisplacementTextureInfosTypedArray[i21++] = customDisplacementTextureInfos[i8].y;
+      customDisplacementTextureInfosTypedArray[i21++] = customDisplacementTextureInfos[i8].z;
+      customDisplacementTextureInfosTypedArray[i21++] = customDisplacementTextureInfos[i8].w;
     }
     if (this.hasTexture()){
       faceVertexUVsTypedArray[i7++] = objUVs[i8].x;
@@ -371,6 +391,7 @@ var ObjectTrail = function(configurations){
   var displacementInfosBufferAttribute;
   var textureMatrixInfosBufferAttribute;
   var diffuseUVsBufferAttribute, emissiveUVsBufferAttribute, alphaUVsBufferAttribute, displacementUVsBufferAttribute;
+  var customDisplacementInfosBufferAttribute;
 
   if (this.object.hasEmissiveMap()){
     emissiveIntensityBufferAttribute = new THREE.BufferAttribute(emissiveIntensitiesTypedArray, 1);
@@ -386,10 +407,13 @@ var ObjectTrail = function(configurations){
   if (this.object.hasDisplacementMap()){
     displacementInfosBufferAttribute = new THREE.BufferAttribute(displacementInfosTypedArray, 2);
     displacementUVsBufferAttribute = new THREE.BufferAttribute(displacementUVsTypedArray, 4);
+    customDisplacementInfosBufferAttribute = new THREE.BufferAttribute(customDisplacementTextureInfosTypedArray, 4);
     displacementInfosBufferAttribute.setDynamic(false);
     displacementUVsBufferAttribute.setDynamic(false);
+    customDisplacementInfosBufferAttribute.setDynamic(false);
     geometry.addAttribute('displacementInfo', displacementInfosBufferAttribute);
     geometry.addAttribute("displacementUVs", displacementUVsBufferAttribute);
+    geometry.addAttribute('customDisplacementInfo', customDisplacementInfosBufferAttribute);
   }
   if (this.hasTexture()){
     faceVertexUVsBufferAttribute = new THREE.BufferAttribute(faceVertexUVsTypedArray, 2);
@@ -591,7 +615,7 @@ ObjectTrail.prototype.compressGeometry = function(){
     "emissiveIntensity", "emissiveColor", "emissiveUVs",
     "color", "displacementInfo", "displacementUVs",
     "diffuseUVs", "emissiveUVs", "alphaUVs", "textureFlags",
-    "textureMatrixInfo"
+    "textureMatrixInfo", "customDisplacementInfo"
   ];
 
   macroHandler.compressAttributes(this.mesh, compressableAttributes);

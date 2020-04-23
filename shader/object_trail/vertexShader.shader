@@ -23,6 +23,7 @@ varying vec3 vColor;
 
 #ifdef HAS_DISPLACEMENT
   attribute vec2 displacementInfo;
+  attribute vec4 customDisplacementInfo;
   uniform sampler2D texture;
   #ifdef DISPLACEMENT_START_U
     vec4 displacementUVs = vec4(float(DISPLACEMENT_START_U), float(DISPLACEMENT_START_V), float(DISPLACEMENT_END_U), float(DISPLACEMENT_END_V));
@@ -840,6 +841,16 @@ void main(){
     ) * vec3(faceVertexUV, 1.0)).xy;
     vTextureFlags = textureFlags;
   #endif
+  #ifdef HAS_DISPLACEMENT
+    vec2 calculatedDisplacementUV = vFaceVertexUV;
+    if (customDisplacementInfo.z > 0.0){
+      calculatedDisplacementUV = (mat3(
+        customDisplacementInfo.z, 0.0, 0.0,
+        0.0, customDisplacementInfo.w, 0.0,
+        customDisplacementInfo.x, customDisplacementInfo.y, 1.0
+      ) * vec3(faceVertexUV, 1.0)).xy;
+    }
+  #endif
   #ifdef HAS_EMISSIVE
     vEmissiveIntensity = emissiveIntensity;
     vEmissiveColor = emissiveColor;
@@ -876,7 +887,7 @@ void main(){
       if (displacementInfo.x > -60.0 && displacementInfo.y > -60.0){
         vec3 objNormal = normalize(normal);
         vec4 displacementUVsFixed = fixTextureBleeding(displacementUVs);
-        transformedPosition += objNormal * (texture2D(texture, uvAffineTransformation(vFaceVertexUV, displacementUVsFixed.x, displacementUVsFixed.y, displacementUVsFixed.z, displacementUVsFixed.w)).r * displacementInfo.x + displacementInfo.y);
+        transformedPosition += objNormal * (texture2D(texture, uvAffineTransformation(calculatedDisplacementUV, displacementUVsFixed.x, displacementUVsFixed.y, displacementUVsFixed.z, displacementUVsFixed.w)).r * displacementInfo.x + displacementInfo.y);
       }
     #endif
     vec3 rotatedPos = applyQuaternionToVector(transformedPosition, quat);
