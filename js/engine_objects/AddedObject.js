@@ -3169,6 +3169,11 @@ AddedObject.prototype.copy = function(name, isHardCopy, copyPosition, gridSystem
   if (this.hasCustomPrecision){
     copyInstance.useCustomShaderPrecision(this.customPrecision);
   }
+  if (this.customDisplacementTextureMatrixInfo){
+    copyInstance.setCustomDisplacementTextureMatrix();
+    copyInstance.setCustomDisplacementTextureOffset(this.customDisplacementTextureMatrixInfo.offsetX, this.customDisplacementTextureMatrixInfo.offsetY);
+    copyInstance.setCustomDisplacementTextureRepeat(this.customDisplacementTextureMatrixInfo.repeatU, this.customDisplacementTextureMatrixInfo.repeatV);
+  }
 
   return copyInstance;
 }
