@@ -125,7 +125,7 @@ AddedObject.prototype.setAffectedByLight = function(isAffectedByLight){
 
     this.mesh.material.uniforms.worldInverseTranspose = new THREE.Uniform(new THREE.Matrix4());
     this.mesh.material.uniforms.worldMatrix = new THREE.Uniform(this.mesh.matrixWorld);
-    this.mesh.material.uniforms.dynamicLightsMatrix = new THREE.Uniform(lightHandler.dynamicLightsMatrix);
+    this.mesh.material.uniforms.dynamicLightsMatrix = lightHandler.getUniform();
     this.updateWorldInverseTranspose();
 
     lightHandler.addLightToObject(this);

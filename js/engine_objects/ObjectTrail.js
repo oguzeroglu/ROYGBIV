@@ -532,7 +532,7 @@ ObjectTrail.prototype.handleLighting = function(){
   if (this.object.affectedByLight){
     lightHandler.addLightToObject(this);
     macroHandler.injectMacro("AFFECTED_BY_LIGHT", this.mesh.material, true, false);
-    this.mesh.material.uniforms.dynamicLightsMatrix = new THREE.Uniform(lightHandler.dynamicLightsMatrix);
+    this.mesh.material.uniforms.dynamicLightsMatrix = lightHandler.getUniform();
     this.mesh.material.needsUpdate = true;
   }
 }

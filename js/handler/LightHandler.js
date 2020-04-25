@@ -21,8 +21,12 @@ var LightHandler = function(){
   };
 
   this.dynamicLightsMatrix = new THREE.Matrix4();
-
+  this.dynamicLightsMatrixUniform = new THREE.Uniform(this.dynamicLightsMatrix);
   this.reset();
+}
+
+LightHandler.prototype.getUniform = function(){
+  return this.dynamicLightsMatrixUniform;
 }
 
 LightHandler.prototype.lightObjectAttachmentUpdateFunc = function(object, lightName){

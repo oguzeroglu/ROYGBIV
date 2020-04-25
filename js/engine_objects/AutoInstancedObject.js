@@ -14,7 +14,7 @@ AutoInstancedObject.prototype.setAffectedByLight = function(isAffectedByLight){
 
   if (isAffectedByLight){
     macroHandler.injectMacro("AFFECTED_BY_LIGHT", this.mesh.material, true, false);
-    this.mesh.material.uniforms.dynamicLightsMatrix = new THREE.Uniform(lightHandler.dynamicLightsMatrix);
+    this.mesh.material.uniforms.dynamicLightsMatrix = lightHandler.getUniform();
     lightHandler.addLightToObject(this);
   }else{
     lightHandler.removeLightFromObject(this);
