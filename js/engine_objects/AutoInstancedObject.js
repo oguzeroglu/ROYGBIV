@@ -43,14 +43,18 @@ AutoInstancedObject.prototype.updateObject = function(object){
   var scaleIndex = this.scaleIndicesByObjectName.get(object.name);
   var orientationAry = this.mesh.material.uniforms.autoInstanceOrientationArray.value;
   var alphaAry = this.mesh.material.uniforms.autoInstanceAlphaArray.value;
-  var scaleAry = this.mesh.material.uniforms.autoInstanceScaleArray.value;
+
+  if (this.mesh.material.uniforms.autoInstanceScaleArray){
+    var scaleAry = this.mesh.material.uniforms.autoInstanceScaleArray.value;
+    scaleAry[scaleIndex].set(object.mesh.scale.x, object.mesh.scale.y, object.mesh.scale.z);
+  }
+
   var position = object.mesh.position;
   var quaternion = object.mesh.quaternion;
   var alpha = object.getOpacity();
   orientationAry[index].set(orientationAry[index].x, position.x, position.y, position.z);
   orientationAry[index+1].set(quaternion.x, quaternion.y, quaternion.z, quaternion.w);
   alphaAry[alphaIndex] = alpha;
-  scaleAry[scaleIndex].set(object.mesh.scale.x, object.mesh.scale.y, object.mesh.scale.z);
   if (alpha != 1){
     this.mesh.material.transparent = true;
   }
@@ -271,6 +275,7 @@ AutoInstancedObject.prototype.init = function(){
   }
 
   this.compressGeometry();
+  this.compressMaterial();
 }
 
 AutoInstancedObject.prototype.compressGeometry = function(){
@@ -282,6 +287,71 @@ AutoInstancedObject.prototype.compressGeometry = function(){
   ];
 
   macroHandler.compressAttributes(this.mesh, compressableAttributes);
+}
+
+AutoInstancedObject.prototype.compressMaterial = function(){
+  // compress ao intensity ary
+  if (!this.pseudoObjectGroup.hasAOMap()){
+    delete this.mesh.material.uniforms.autoInstanceAOIntensityArray;
+    macroHandler.removeUniform(this.mesh.material, "autoInstanceAOIntensityArray");
+  }else{
+    delete this.mesh.material.uniforms.totalAOIntensity;
+    macroHandler.removeUniform(this.mesh.material, "totalAOIntensity");
+  }
+
+  // compress emissiveColor and emissiveIntensity ary
+  if (!this.pseudoObjectGroup.hasEmissiveMap()){
+    delete this.mesh.material.uniforms.autoInstanceEmissiveColorArray;
+    delete this.mesh.material.uniforms.autoInstanceEmissiveIntensityArray;
+    macroHandler.removeUniform(this.mesh.material, "autoInstanceEmissiveColorArray");
+    macroHandler.removeUniform(this.mesh.material, "autoInstanceEmissiveIntensityArray");
+  }else{
+    delete this.mesh.material.uniforms.totalEmissiveColor;
+    delete this.mesh.material.uniforms.totalEmissiveIntensity;
+    macroHandler.removeUniform(this.mesh.material, "totalEmissiveColor");
+    macroHandler.removeUniform(this.mesh.material, "totalEmissiveIntensity");
+  }
+
+  // compress displacement info ary
+  if (!this.pseudoObjectGroup.hasDisplacementMap()){
+    delete this.mesh.material.uniforms.autoInstanceDisplacementInfoArray;
+    delete this.mesh.material.uniforms.autoInstanceDisplacementTextureOffsetInfoArray;
+    macroHandler.removeUniform(this.mesh.material, "autoInstanceDisplacementInfoArray");
+    macroHandler.removeUniform(this.mesh.material, "autoInstanceDisplacementTextureOffsetInfoArray");
+  }else{
+    delete this.mesh.material.uniforms.totalDisplacementInfo;
+    macroHandler.removeUniform(this.mesh.material, "totalDisplacementInfo");
+  }
+
+  // compress texture offset info ary
+  if (!this.pseudoObjectGroup.hasTexture){
+    delete this.mesh.material.uniforms.autoInstanceTextureOffsetInfoArray;
+    macroHandler.removeUniform(this.mesh.material, "autoInstanceTextureOffsetInfoArray");
+  }else{
+    delete this.mesh.material.uniforms.totalTextureOffset;
+    macroHandler.removeUniform(this.mesh.material, "totalTextureOffset");
+  }
+
+  // compress scale ary
+  var hasScaleAnimation = false;
+  for (var objName in this.pseudoObjectGroup.group){
+    var obj = this.pseudoObjectGroup.group[objName];
+    for (var animName in obj.animations){
+      if (obj.animations[animName].isObjectScaleAnimation()){
+        hasScaleAnimation = true;
+        break;
+      }
+    }
+  }
+  if (!hasScaleAnimation){
+    delete this.mesh.material.uniforms.autoInstanceScaleArray;
+    macroHandler.removeUniform(this.mesh.material, "autoInstanceScaleArray");
+    macroHandler.injectMacro("AUTO_INSTANCE_SKIP_SCALE", this.mesh.material, true, false);
+  }
+
+  // delete totalAlpha
+  delete this.mesh.material.uniforms.totalAlpha;
+  macroHandler.removeMacro(this.mesh.material, "totalAlpha");
 }
 
 AutoInstancedObject.prototype.setFog = function(){

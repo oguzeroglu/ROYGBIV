@@ -20,7 +20,16 @@ varying float vAlpha;
   attribute float scaleIndex;
   attribute float affectedByLight;
   uniform vec4 autoInstanceOrientationArray[AUTO_INSTANCE_ORIENTATION_ARRAY_SIZE];
-  uniform vec3 autoInstanceScaleArray[AUTO_INSTANCE_SCALE_ARRAY_SIZE];
+  #if !defined(AUTO_INSTANCE_SKIP_SCALE)
+    uniform vec3 autoInstanceScaleArray[AUTO_INSTANCE_SCALE_ARRAY_SIZE];
+  #endif
+  vec3 getAutoInstanceScale(int index){
+    #ifdef AUTO_INSTANCE_SKIP_SCALE
+      return vec3(1.0, 1.0, 1.0);
+    #else
+      return autoInstanceScaleArray[index];
+    #endif
+  }
   uniform float autoInstanceAlphaArray[AUTO_INSTANCE_ALPHA_ARRAY_SIZE];
   uniform float autoInstanceEmissiveIntensityArray[AUTO_INSTANCE_EMISSIVE_INTENSITY_ARRAY_SIZE];
   uniform vec3 autoInstanceEmissiveColorArray[AUTO_INSTANCE_EMISSIVE_COLOR_ARRAY_SIZE];
@@ -59,7 +68,11 @@ varying float vAlpha;
   attribute vec4 textureMatrixInfo;
   attribute vec2 textureMirrorInfo;
 
-  uniform vec2 totalTextureOffset;
+  #ifdef IS_AUTO_INSTANCED
+    vec2 totalTextureOffset = vec2(0.0, 0.0);
+  #else
+    uniform vec2 totalTextureOffset;
+  #endif
   varying vec2 vUV;
   varying vec2 vTextureMirrorInfo;
   #ifdef HAS_DIFFUSE
@@ -91,10 +104,13 @@ varying float vAlpha;
   attribute vec2 displacementInfo;
 
   uniform sampler2D texture;
-  uniform vec2 totalDisplacementInfo;
+  #ifdef IS_AUTO_INSTANCED
+    vec2 totalDisplacementInfo = vec2(1.0, 1.0);
+  #else
+    uniform vec2 totalDisplacementInfo;
+  #endif
   attribute vec4 displacementUV;
   attribute vec4 displacementTextureMatrixInfo;
-
   vec2 calculatedDisplacementUV;
   vec2 transformedDisplacementUV;
 #endif
@@ -1029,7 +1045,7 @@ void main(){
     #ifdef FPS_WEAPON_SCALE
       transformedPosition *= FPS_WEAPON_SCALE;
     #else
-      transformedPosition *= autoInstanceScaleArray[int(scaleIndex)];
+      transformedPosition *= getAutoInstanceScale(int(scaleIndex));
     #endif
     vec3 positionOffset = autoInstanceOrientationArray[oi].yzw;
     vec4 quaternion = autoInstanceOrientationArray[oi+1];

@@ -146,3 +146,29 @@ MacroHandler.prototype.replaceCompressedVec4 = function(material, varName, data1
 
   material.needsUpdate = true;
 }
+
+MacroHandler.prototype.removeUniform = function(material, uniformName){
+  var splittedVertexShader = material.vertexShader.split("\n");
+  var splittedFragmentShader = material.fragmentShader.split("\n");
+
+  var newVertexShaderLines = [];
+  var newFragmentShaderLines = [];
+
+  for (var i = 0; i < splittedVertexShader.length; i ++){
+    var line = splittedVertexShader[i];
+    if (!(line.includes("uniform") && line.includes(uniformName))){
+      newVertexShaderLines.push(line);
+    }
+  }
+
+  for (var i = 0; i < splittedFragmentShader.length; i ++){
+    var line = splittedFragmentShader[i];
+    if (!(line.includes("uniform") && line.includes(uniformName))){
+       newFragmentShaderLines.push(line);
+    }
+  }
+
+  material.vertexShader = newVertexShaderLines.join("\n");
+  material.fragmentShader = newFragmentShaderLines.join("\n");
+  material.needsUpdate = true;
+}

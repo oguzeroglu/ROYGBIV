@@ -6,9 +6,14 @@ precision lowp int;
 
 varying float vAlpha;
 varying vec3 vColor;
-uniform float totalAlpha;
 
 #define INSERTION
+
+#ifdef IS_AUTO_INSTANCED
+  float totalAlpha = 1.0;
+#else
+  uniform float totalAlpha;
+#endif
 
 #ifdef IS_AUTO_INSTANCED
   varying float vDiscardFlag;
@@ -39,12 +44,21 @@ uniform float totalAlpha;
   #endif
 #endif
 #ifdef HAS_AO
-  uniform float totalAOIntensity;
+  #ifdef IS_AUTO_INSTANCED
+    float totalAOIntensity = 1.0;
+  #else
+    uniform float totalAOIntensity;
+  #endif
   varying float vAOIntensity;
 #endif
 #ifdef HAS_EMISSIVE
-  uniform float totalEmissiveIntensity;
-  uniform vec3 totalEmissiveColor;
+  #ifdef IS_AUTO_INSTANCED
+    float totalEmissiveIntensity = 1.0;
+    vec3 totalEmissiveColor = vec3(1.0, 1.0, 1.0);
+  #else
+    uniform float totalEmissiveIntensity;
+    uniform vec3 totalEmissiveColor;
+  #endif
   varying float vEmissiveIntensity;
   varying vec3 vEmissiveColor;
 #endif
