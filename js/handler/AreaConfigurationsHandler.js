@@ -142,6 +142,10 @@ AreaConfigurationsHandler.prototype.show = function(singleAreaName){
 AreaConfigurationsHandler.prototype.addSubFolder = function(areaName, folder){
   var areaConfigurationsHandlerContext = this;
   for (var objName in sceneHandler.getAddedObjects()){
+    var obj = addedObjects[objName];
+    if (obj.isChangeable || obj.isDynamicObject){
+      continue;
+    }
     var objFolder = folder.addFolder(objName);
     var visibilityController = objFolder.add(this.visibilityConfigurations[areaName][objName], "Visible");
     var sideController = objFolder.add(this.sideConfigurations[areaName][objName], "Side", this.sideAry);
@@ -159,6 +163,10 @@ AreaConfigurationsHandler.prototype.addSubFolder = function(areaName, folder){
     }.bind({object: addedObjects[objName], areaName: areaName}));
   }
   for (var objName in sceneHandler.getObjectGroups()){
+    var obj = objectGroups[objName];
+    if (obj.isChangeable || obj.isDynamicObject){
+      continue;
+    }
     var objFolder = folder.addFolder(objName);
     var visibilityController = objFolder.add(this.visibilityConfigurations[areaName][objName], "Visible");
     var sideController = objFolder.add(this.sideConfigurations[areaName][objName], "Side", this.sideAry);

@@ -899,6 +899,9 @@ AddedObject.prototype.applyAreaConfiguration = function(areaName){
   if (sceneHandler.getActiveSceneName() != this.registeredSceneName){
     return;
   }
+  if (this.isChangeable || this.isDynamicObject){
+    return;
+  }
   if (this.areaVisibilityConfigurations){
     var configurations = this.areaVisibilityConfigurations[areaName];
     if (!(typeof configurations == UNDEFINED)){
