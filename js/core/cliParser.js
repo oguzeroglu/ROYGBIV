@@ -5578,6 +5578,12 @@ function parse(input){
             return true;
           }
 
+          var obstacleID = splitted[1];
+          if (!(obstacleID.indexOf("*") == -1)){
+            new JobHandler(splitted).handle();
+            return true;
+          }
+
           if (!jobHandlerWorking){
             var gridSelectionSize = Object.keys(gridSelections).length;
             if (gridSelectionSize != 1 && gridSelectionSize != 2){
@@ -5607,7 +5613,6 @@ function parse(input){
           var gridSystemName = selections[0].parentName;
           var gridSystem = gridSystems[gridSystemName];
 
-          var obstacleID = splitted[1];
           var height = parseFloat(splitted[2]);
 
           if (steeringHandler.usedEntityIDs[obstacleID]){
@@ -5621,7 +5626,9 @@ function parse(input){
           }
 
           gridSystem.newAIObstacle(selections, obstacleID, height);
-          terminal.printInfo(Text.AI_OBSTACLE_CREATED);
+          if (!jobHandlerWorking){
+            terminal.printInfo(Text.AI_OBSTACLE_CREATED);
+          }
           return true;
         break;
       }

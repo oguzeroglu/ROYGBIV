@@ -178,6 +178,7 @@ var Text = function(){
   this.INITIALIZING_WORKERS = "Initializing workers.";
   this.NAME_CANNOT_EXCEED_X_CHARS = "Name cannot exceed @@1 characters.";
   this.CREATED_X_SURFACES = "Command executed for @@1 surfaces.";
+  this.CREATED_X_AI_OBSTACLES = "Command executed for @@1 ai obstacles.";
   this.CREATED_X_BOXES = "Command executed for @@1 boxes.";
   this.CREATED_X_COPIES = "Command executed for @@1 copies.";
   this.CREATED_X_SPHERES = "Command executed for @@1 spheres.";

@@ -107,6 +107,8 @@ JobHandler.prototype.handle = function(previewModeCommand){
       this.handleDestroyDynamicTextureFolderCommand();
     }else if (this.splitted[0] == "syncanimations"){
       this.handleSyncAnimationsCommand();
+    }else if (this.splitted[0] == "newaiobstacle"){
+      this.handleNewAIObstacleCommand();
     }
     if (jobHandlerRaycasterRefresh){
       refreshRaycaster(Text.JOB_COMPLETED, true);
@@ -117,6 +119,22 @@ JobHandler.prototype.handle = function(previewModeCommand){
   // because async
   if (this.splitted[0] != "autoConfigureArea".toLowerCase()){
     jobHandlerWorking = false;
+  }
+}
+
+JobHandler.prototype.handleNewAIObstacleCommand = function(){
+  var obstacleIDPrefix = this.splitted[1].split("*")[0];
+  var ctr = 0;
+  for (var gridName in gridSelections){
+    jobHandlerSelectedGrid = gridSelections[gridName];
+    parseCommand("newAIObstacle "+obstacleIDPrefix+"_"+ctr+" "+this.splitted[2]);
+    ctr ++;
+  }
+  jobHandlerSelectedGrid = 0;
+  if (ctr != 0){
+    terminal.printInfo(Text.CREATED_X_AI_OBSTACLES.replace(Text.PARAM1, ctr));
+  }else{
+    terminal.printError(Text.MUST_HAVE_AT_LEAST_ONE_GRID_SELECTED);
   }
 }
 
