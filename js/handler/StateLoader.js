@@ -329,6 +329,7 @@ StateLoader.prototype.resetProject = function(){
   fpsHandler.reset();
   animationHandler.reset();
   lightningHandler.reset();
+  steeringHandler.reset();
   fonts = new Object();
   NO_MOBILE = false;
   fixedAspect = 0;
