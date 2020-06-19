@@ -234,7 +234,8 @@ var CommandDescriptor = function(){
       2, //syncAnimations
       0, //lights
       1, //setAcceptedTextureSize
-      0 //printAcceptedTextureSize
+      0, //printAcceptedTextureSize
+      0 //switchAIDebugMode
   ];
 
   this.commandArgumentsExpectedExplanation = [
@@ -471,7 +472,8 @@ var CommandDescriptor = function(){
     "syncAnimations sourceName targetName",
     "lights",
     "setAcceptedTextureSize textureSize",
-    "printAcceptedTextureSize"
+    "printAcceptedTextureSize",
+    "switchAIDebugMode"
   ];
 
   this.commands = [
@@ -708,7 +710,8 @@ var CommandDescriptor = function(){
     "syncAnimations",
     "lights",
     "setAcceptedTextureSize",
-    "printAcceptedTextureSize"
+    "printAcceptedTextureSize",
+    "switchAIDebugMode"
   ];
 
   this.commandInfo = [
@@ -945,7 +948,8 @@ var CommandDescriptor = function(){
     "syncAnimations: Resets animations of target text/object/sprite and copies each animation of source to target.",
     "lights: Opens the light editing GUI.",
     "setAcceptedTextureSize: Sets the texture size accepted by the engine.",
-    "printAcceptedTextureSize: Prints the texture size accepted by the engine."
+    "printAcceptedTextureSize: Prints the texture size accepted by the engine.",
+    "switchAIDebugMode: Switches AI debug mode (on/off)"
   ];
 
   this.keyboardInfo = [

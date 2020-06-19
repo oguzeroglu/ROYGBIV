@@ -5563,6 +5563,15 @@ function parse(input){
           terminal.printInfo(Text.TREE.replace(Text.PARAM1, ACCEPTED_TEXTURE_SIZE));
           return true;
         break;
+        case 234: //switchAIDebugMode
+          var res = steeringHandler.switchDebugMode();
+          if (res){
+            terminal.printInfo(Text.AI_DEBUG_MODE_SWITCHED_ON);
+          }else {
+            terminal.printInfo(Text.AI_DEBUG_MODE_SWITCHED_OFF);
+          }
+          return true;
+        break;
       }
       return true;
     }catch(err){
