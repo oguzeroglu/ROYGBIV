@@ -5631,6 +5631,27 @@ function parse(input){
           }
           return true;
         break;
+        case 236: //destroyAIObstacle
+          if (mode != 0){
+            terminal.printInfo(Text.WORKS_ONLY_IN_DESIGN_MODE);
+            return true;
+          }
+          var id = splitted[1];
+          if (!steeringHandler.usedEntityIDs[id]){
+            terminal.printError(Text.NO_SUCH_OBSTACLE);
+            return true;
+          }
+          var obstacles = steeringHandler.obstaclesBySceneName[sceneHandler.getActiveSceneName()] || {};
+          for (var key in obstacles){
+            if (key == id){
+              steeringHandler.removeObstacle(id);
+              terminal.printInfo(Text.OBSTACLE_DESTROYED);
+              return true;
+            }
+          }
+          terminal.printError(Text.OBSTACLE_NOT_IN_ACTIVE_SCENE);
+          return true;
+        break;
       }
       return true;
     }catch(err){

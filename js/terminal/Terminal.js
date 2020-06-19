@@ -818,6 +818,17 @@ Terminal.prototype.autocomplete = function(command){
 				}
 				helpString = "[Dynamic texture folder name]: ";
 			break;
+			case commandDescriptor.AI_OBSTACLE_ID:
+				var obstacles = steeringHandler.obstaclesBySceneName[sceneHandler.getActiveSceneName()];
+				if (obstacles){
+					for (var id in obstacles){
+						if (id.toLowerCase().startsWith(curEntry.toLowerCase())){
+							possibilities.push(id);
+						}
+					}
+				}
+				helpString = "[AI Obstacle ids]:";
+			break;
 		}
 
 		//  **********************************************************

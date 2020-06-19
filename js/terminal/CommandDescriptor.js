@@ -236,7 +236,8 @@ var CommandDescriptor = function(){
       1, //setAcceptedTextureSize
       0, //printAcceptedTextureSize
       0, //switchAIDebugMode
-      2 //newAIObstacle
+      2, //newAIObstacle
+      1 //destroyAIObstacle
   ];
 
   this.commandArgumentsExpectedExplanation = [
@@ -475,7 +476,8 @@ var CommandDescriptor = function(){
     "setAcceptedTextureSize textureSize",
     "printAcceptedTextureSize",
     "switchAIDebugMode",
-    "newAIObstacle id height"
+    "newAIObstacle id height",
+    "destroyAIObstacle id"
   ];
 
   this.commands = [
@@ -714,7 +716,8 @@ var CommandDescriptor = function(){
     "setAcceptedTextureSize",
     "printAcceptedTextureSize",
     "switchAIDebugMode",
-    "newAIObstacle"
+    "newAIObstacle",
+    "destroyAIObstacle"
   ];
 
   this.commandInfo = [
@@ -953,7 +956,8 @@ var CommandDescriptor = function(){
     "setAcceptedTextureSize: Sets the texture size accepted by the engine.",
     "printAcceptedTextureSize: Prints the texture size accepted by the engine.",
     "switchAIDebugMode: Switches AI debug mode (on/off)",
-    "newAIObstacle: Creates a new AI obstacle."
+    "newAIObstacle: Creates a new AI obstacle.",
+    "destroyAIObstacle: Destroys an AI obstacle of given id."
   ];
 
   this.keyboardInfo = [
@@ -1098,6 +1102,7 @@ var CommandDescriptor = function(){
   this.VIRTUAL_KEYBOARD_NAME       =   44;
   this.RESOLUTION_PARAM            =   45;
   this.DYNAMIC_TEXTURE_FOLDER_NAME =   46;
+  this.AI_OBSTACLE_ID              =   47;
 
   // newGridSystem
   this.newGridSystem = new Object();
@@ -1773,6 +1778,11 @@ var CommandDescriptor = function(){
   this.newAIObstacle.types = [];
   this.newAIObstacle.types.push(this.UNKNOWN_INDICATOR); //id
   this.newAIObstacle.types.push(this.UNKNOWN_INDICATOR); //height
+
+  // destroyAIObstacle
+  this.destroyAIObstacle = new Object();
+  this.destroyAIObstacle.types = [];
+  this.destroyAIObstacle.types.push(this.AI_OBSTACLE_ID); //id
 };
 
 CommandDescriptor.prototype.test = function(){

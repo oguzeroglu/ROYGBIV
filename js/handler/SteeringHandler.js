@@ -56,3 +56,15 @@ SteeringHandler.prototype.addObstacle = function(id, position, size){
   obstacles[id] = entity;
   this.usedEntityIDs[id] = entity;
 }
+
+SteeringHandler.prototype.removeObstacle = function(id){
+  var entity = this.usedEntityIDs[id];
+  if (!entity){
+    return false;
+  }
+
+  this.world.removeEntity(entity);
+
+  delete this.obstaclesBySceneName[sceneHandler.getActiveSceneName()][id];
+  delete this.usedEntityIDs[id];
+}
