@@ -5637,6 +5637,10 @@ function parse(input){
             return true;
           }
           var id = splitted[1];
+          if (!(id.indexOf("*") == -1)){
+            new JobHandler(splitted).handle();
+            return true;
+          }
           if (!steeringHandler.usedEntityIDs[id]){
             terminal.printError(Text.NO_SUCH_OBSTACLE);
             return true;
@@ -5649,7 +5653,9 @@ function parse(input){
               return true;
             }
           }
-          terminal.printError(Text.OBSTACLE_NOT_IN_ACTIVE_SCENE);
+          if (!jobHandlerWorking){
+            terminal.printError(Text.OBSTACLE_NOT_IN_ACTIVE_SCENE);
+          }
           return true;
         break;
       }

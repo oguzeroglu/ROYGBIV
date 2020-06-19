@@ -109,6 +109,8 @@ JobHandler.prototype.handle = function(previewModeCommand){
       this.handleSyncAnimationsCommand();
     }else if (this.splitted[0] == "newaiobstacle"){
       this.handleNewAIObstacleCommand();
+    }else if (this.splitted[0] == "destroyaiobstacle"){
+      this.handleDestroyAIObstacleCommand();
     }
     if (jobHandlerRaycasterRefresh){
       refreshRaycaster(Text.JOB_COMPLETED, true);
@@ -119,6 +121,25 @@ JobHandler.prototype.handle = function(previewModeCommand){
   // because async
   if (this.splitted[0] != "autoConfigureArea".toLowerCase()){
     jobHandlerWorking = false;
+  }
+}
+
+JobHandler.prototype.handleDestroyAIObstacleCommand = function(){
+  var idPrefix = this.splitted[1].split("*")[0];
+  var ctr = 0;
+  var obstacles = steeringHandler.obstaclesBySceneName[sceneHandler.getActiveSceneName()];
+  if (obstacles){
+    for (var id in obstacles){
+      if (id.startsWith(idPrefix)){
+        parseCommand("destroyAIObstacle "+id);
+        ctr ++
+      }
+    }
+  }
+  if (ctr == 0){
+    terminal.printInfo(Text.NO_OBSTACLES_FOUND);
+  }else{
+    terminal.printInfo(Text.COMMAND_EXECUTED_FOR_X_OBSTACLES.replace(Text.PARAM1, ctr));
   }
 }
 
