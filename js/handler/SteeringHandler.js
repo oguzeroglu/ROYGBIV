@@ -16,6 +16,7 @@ SteeringHandler.prototype.switchDebugMode = function(){
 
 SteeringHandler.prototype.reset = function(){
   this.obstaclesBySceneName = {};
+  this.usedEntityIDs = {};
 
   this.resetWorld();
 }
@@ -38,6 +39,10 @@ SteeringHandler.prototype.resetWorld = function(){
 }
 
 SteeringHandler.prototype.addObstacle = function(id, position, size){
+  if (this.usedEntityIDs[id]){
+    return false;
+  }
+
   var entity = new Kompute.Entity(id, position, size);
 
   this.world.insertEntity(entity);
@@ -49,4 +54,5 @@ SteeringHandler.prototype.addObstacle = function(id, position, size){
   }
 
   obstacles[id] = entity;
+  this.usedEntityIDs[id] = entity;
 }

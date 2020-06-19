@@ -5572,6 +5572,58 @@ function parse(input){
           }
           return true;
         break;
+        case 235: //newAIObstacle
+          if (mode != 0){
+            terminal.printError(Text.WORKS_ONLY_IN_DESIGN_MODE);
+            return true;
+          }
+
+          if (!jobHandlerWorking){
+            var gridSelectionSize = Object.keys(gridSelections).length;
+            if (gridSelectionSize != 1 && gridSelectionSize != 2){
+              terminal.printError(Text.MUST_HAVE_1_OR_2_GRIDS_SELECTED);
+              return true;
+            }
+          }
+
+          var selections = [];
+          if (!jobHandlerWorking){
+            for (var gridName in gridSelections){
+              selections.push(gridSelections[gridName]);
+            }
+          }else{
+            selections.push(jobHandlerSelectedGrid);
+          }
+
+          if (selections.length == 2){
+            var grid1 = selections[0];
+            var grid2 = selections[1];
+            if (grid1.parentName != grid2.parentName){
+              terminal.printError(Text.SELECTED_GRIDS_SAME_GRIDSYSTEM);
+              return true;
+            }
+          }
+
+          var gridSystemName = selections[0].parentName;
+          var gridSystem = gridSystems[gridSystemName];
+
+          var obstacleID = splitted[1];
+          var height = parseFloat(splitted[2]);
+
+          if (steeringHandler.usedEntityIDs[obstacleID]){
+            terminal.printError(Text.ID_MUST_BE_UNIQUE);
+            return true;
+          }
+
+          if (isNaN(height)){
+            terminal.printError(Text.IS_NOT_A_NUMBER.replace(Text.PARAM1, "height"));
+            return true;
+          }
+
+          gridSystem.newAIObstacle(selections, obstacleID, height);
+          terminal.printInfo(Text.AI_OBSTACLE_CREATED);
+          return true;
+        break;
       }
       return true;
     }catch(err){

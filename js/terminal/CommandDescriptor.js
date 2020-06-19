@@ -235,7 +235,8 @@ var CommandDescriptor = function(){
       0, //lights
       1, //setAcceptedTextureSize
       0, //printAcceptedTextureSize
-      0 //switchAIDebugMode
+      0, //switchAIDebugMode
+      2 //newAIObstacle
   ];
 
   this.commandArgumentsExpectedExplanation = [
@@ -473,7 +474,8 @@ var CommandDescriptor = function(){
     "lights",
     "setAcceptedTextureSize textureSize",
     "printAcceptedTextureSize",
-    "switchAIDebugMode"
+    "switchAIDebugMode",
+    "newAIObstacle id height"
   ];
 
   this.commands = [
@@ -711,7 +713,8 @@ var CommandDescriptor = function(){
     "lights",
     "setAcceptedTextureSize",
     "printAcceptedTextureSize",
-    "switchAIDebugMode"
+    "switchAIDebugMode",
+    "newAIObstacle"
   ];
 
   this.commandInfo = [
@@ -949,7 +952,8 @@ var CommandDescriptor = function(){
     "lights: Opens the light editing GUI.",
     "setAcceptedTextureSize: Sets the texture size accepted by the engine.",
     "printAcceptedTextureSize: Prints the texture size accepted by the engine.",
-    "switchAIDebugMode: Switches AI debug mode (on/off)"
+    "switchAIDebugMode: Switches AI debug mode (on/off)",
+    "newAIObstacle: Creates a new AI obstacle."
   ];
 
   this.keyboardInfo = [
@@ -1763,6 +1767,12 @@ var CommandDescriptor = function(){
   this.setAcceptedTextureSize = new Object();
   this.setAcceptedTextureSize.types = [];
   this.setAcceptedTextureSize.types.push(this.UNKNOWN_INDICATOR); //textureSize
+
+  // newAIObstacle
+  this.newAIObstacle = new Object();
+  this.newAIObstacle.types = [];
+  this.newAIObstacle.types.push(this.UNKNOWN_INDICATOR); //id
+  this.newAIObstacle.types.push(this.UNKNOWN_INDICATOR); //height
 };
 
 CommandDescriptor.prototype.test = function(){
