@@ -2,6 +2,10 @@ var SteeringHandler = function(){
   this.reset();
 }
 
+SteeringHandler.prototype.onAfterSceneChange = function(){
+  this.resetWorld();
+}
+
 SteeringHandler.prototype.switchDebugMode = function(){
   if (this.debugHelper){
     this.debugHelper.deactivate();
@@ -27,6 +31,7 @@ SteeringHandler.prototype.resetWorld = function(){
   this.world.setGravity(-900);
 
   if (this.debugHelper){
+    this.switchDebugMode();
     this.switchDebugMode();
   }
 
