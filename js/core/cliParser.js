@@ -2017,6 +2017,9 @@ function parse(input){
             sceneHandler.onObjectGroupCreation(objectGroup);
             objectGroups[groupName] = objectGroup;
             for (var childObjName in objectGroup.group){
+              if (objectGroup.group[childObjName].usedAsAIEntity){
+                objectGroup.group[childObjName].unUseAsAIEntity();
+              }
               sceneHandler.onAddedObjectDeletion(objectGroup.group[childObjName]);
               for (var lightningName in lightnings){
                 if (lightnings[lightningName].attachedToFPSWeapon && lightnings[lightningName].fpsWeaponConfigurations.weaponObj.name == childObjName){
