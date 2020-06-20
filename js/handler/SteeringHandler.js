@@ -43,6 +43,26 @@ SteeringHandler.prototype.resetWorld = function(){
   }
 }
 
+SteeringHandler.prototype.unUseObjectGroupAsAIEntity = function(objectGroup){
+  for (var childName in objectGroup.group){
+    this.unUseAddedObjectAsAIEntity(objectGroup.group[childName]);
+  }
+}
+
+SteeringHandler.prototype.useObjectGroupAsAIEntity = function(objectGroup){
+  for (var childName in objectGroup.group){
+    if (this.usedEntityIDs[childName]){
+      return false;
+    }
+  }
+
+  for (var childName in objectGroup.group){
+    this.useAddedObjectAsAIEntity(objectGroup.group[childName]);
+  }
+
+  return true;
+}
+
 SteeringHandler.prototype.unUseAddedObjectAsAIEntity = function(addedObject){
   this.removeObstacle(addedObject.name);
 }

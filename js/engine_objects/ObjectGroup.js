@@ -38,6 +38,19 @@ var ObjectGroup = function(name, group){
   this.matrixCache = new THREE.Matrix4();
 }
 
+ObjectGroup.prototype.unUseAsAIEntity = function(){
+  steeringHandler.unUseObjectGroupAsAIEntity(this);
+  this.usedAsAIEntity = false;
+}
+
+ObjectGroup.prototype.useAsAIEntity = function(){
+  if (!this.boundingBoxes){
+    this.generateBoundingBoxes();
+  }
+  var res = steeringHandler.useObjectGroupAsAIEntity(this);
+  this.usedAsAIEntity = res;
+  return res;
+}
 
 ObjectGroup.prototype.refreshTextureRange = function(context){
   var childLen = Object.keys(this.group).length;
