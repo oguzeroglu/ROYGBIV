@@ -5645,12 +5645,35 @@ function parse(input){
             terminal.printError(Text.NO_SUCH_OBSTACLE);
             return true;
           }
-          var obstacles = steeringHandler.obstaclesBySceneName[sceneHandler.getActiveSceneName()] || {};
-          for (var key in obstacles){
-            if (key == id){
-              steeringHandler.removeObstacle(id);
+          var obj = addedObjects[id];
+          if (!obj){
+            for (var objName in objectGroups){
+              for (var childName in objectGroups[objName].group){
+                if (childName == id){
+                  obj = objectGroups[objName];
+                  break;
+                }
+              }
+            }
+          }
+          if (obj && obj.usedAsAIEntity && obj.registeredSceneName == sceneHandler.getActiveSceneName()){
+            obj.unUseAsAIEntity();
+            if (!jobHandlerWorking){
               terminal.printInfo(Text.OBSTACLE_DESTROYED);
-              return true;
+            }
+            selectionHandler.resetCurrentSelection();
+            return true;
+          }else{
+            var obstacles = steeringHandler.obstaclesBySceneName[sceneHandler.getActiveSceneName()] || {};
+            for (var key in obstacles){
+              if (key == id){
+                steeringHandler.removeObstacle(id);
+                if (!jobHandlerWorking){
+                  terminal.printInfo(Text.OBSTACLE_DESTROYED);
+                }
+                selectionHandler.resetCurrentSelection();
+                return true;
+              }
             }
           }
           if (!jobHandlerWorking){

@@ -41,6 +41,9 @@ var ObjectGroup = function(name, group){
 ObjectGroup.prototype.unUseAsAIEntity = function(){
   steeringHandler.unUseObjectGroupAsAIEntity(this);
   this.usedAsAIEntity = false;
+  for (var childName in this.group){
+    this.group[childName].usedAsAIEntity = false;
+  }
 }
 
 ObjectGroup.prototype.useAsAIEntity = function(){
@@ -49,6 +52,9 @@ ObjectGroup.prototype.useAsAIEntity = function(){
   }
   var res = steeringHandler.useObjectGroupAsAIEntity(this);
   this.usedAsAIEntity = res;
+  for (var childName in this.group){
+    this.group[childName].usedAsAIEntity = res;
+  }
   return res;
 }
 

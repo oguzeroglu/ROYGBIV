@@ -34,7 +34,8 @@ var GUIHandler = function(){
     "Disp. bias": 0.0,
     "Motion blur": false,
     "mb alpha": 1.0,
-    "mb time": OBJECT_TRAIL_MAX_TIME_IN_SECS_DEFAULT
+    "mb time": OBJECT_TRAIL_MAX_TIME_IN_SECS_DEFAULT,
+    "AI entity": false
   };
   this.textManipulationParameters = {
     "Text": "textName",
@@ -648,6 +649,9 @@ GUIHandler.prototype.afterObjectSelection = function(){
 
       obj.mesh.add(axesHelper);
     }
+
+    guiHandler.objectManipulationParameters["AI entity"] = obj.usedAsAIEntity || false;
+
     guiHandler.objectManipulationParameters["Motion blur"] = !(typeof obj.objectTrailConfigurations == UNDEFINED);
     if (obj.objectTrailConfigurations){
       guiHandler.objectManipulationParameters["mb alpha"] = obj.objectTrailConfigurations.alpha;
@@ -828,6 +832,7 @@ GUIHandler.prototype.enableAllOMControllers = function(){
   guiHandler.enableController(guiHandler.omHasObjectTrailController);
   guiHandler.enableController(guiHandler.omObjectTrailAlphaController);
   guiHandler.enableController(guiHandler.omObjectTrailTimeController);
+  guiHandler.enableController(guiHandler.omAIEntityController);
 }
 
 GUIHandler.prototype.show = function(guiType){
@@ -1166,6 +1171,7 @@ GUIHandler.prototype.initializeObjectManipulationGUI = function(){
   var generalFolder = guiHandler.datGuiObjectManipulation.addFolder("General");
   var graphicsFolder = guiHandler.datGuiObjectManipulation.addFolder("Graphics");
   var textureFolder = guiHandler.datGuiObjectManipulation.addFolder("Texture");
+  var aiFolder = guiHandler.datGuiObjectManipulation.addFolder("AI");
   var motionBlurFolder = guiHandler.datGuiObjectManipulation.addFolder("Motion Blur");
 
   // ROTATION
@@ -1498,6 +1504,23 @@ GUIHandler.prototype.initializeObjectManipulationGUI = function(){
   }).listen();
   guiHandler.omDisplacementBiasController = textureFolder.add(guiHandler.objectManipulationParameters, "Disp. bias").min(-50).max(50).step(0.1).onChange(function(val){
     selectionHandler.getSelectedObject().setDisplacementBias(val);
+  }).listen();
+
+  // AI
+  guiHandler.omAIEntityController = aiFolder.add(guiHandler.objectManipulationParameters, "AI entity").onChange(function(val){
+    terminal.clear();
+    if (val){
+      var result = selectionHandler.getSelectedObject().useAsAIEntity();
+      if (!result){
+        terminal.printError(Text.AI_ENTITY_WITH_SAME_NAME_EXISTS);
+        guiHandler.objectManipulationParameters["AI entity"] = false;
+        return;
+      }
+      terminal.printInfo(Text.OBJECT_WILL_BE_USED_AS_AI_ENTITY);
+    }else{
+      selectionHandler.getSelectedObject().unUseAsAIEntity();
+      terminal.printInfo(Text.OBJECT_WONT_BE_USED_AS_AI_ENTITY);
+    }
   }).listen();
 
   // MOTION BLUR
