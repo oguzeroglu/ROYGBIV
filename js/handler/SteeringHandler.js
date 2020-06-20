@@ -43,6 +43,20 @@ SteeringHandler.prototype.resetWorld = function(){
   }
 }
 
+SteeringHandler.prototype.unUseAddedObjectAsAIEntity = function(addedObject){
+  this.removeObstacle(addedObject.name);
+}
+
+SteeringHandler.prototype.useAddedObjectAsAIEntity = function(addedObject){
+  var id = addedObject.name;
+  var bb = addedObject.boundingBoxes[0];
+
+  var center = bb.getCenter(REUSABLE_VECTOR);
+  var size = bb.getSize(REUSABLE_VECTOR_2);
+
+  return this.addObstacle(id, new Kompute.Vector3D(center.x, center.y, center.z), new Kompute.Vector3D(size.x, size.y, size.z));
+}
+
 SteeringHandler.prototype.addObstacle = function(id, position, size){
   if (this.usedEntityIDs[id]){
     return false;
@@ -60,6 +74,7 @@ SteeringHandler.prototype.addObstacle = function(id, position, size){
 
   obstacles[id] = entity;
   this.usedEntityIDs[id] = entity;
+  return true;
 }
 
 SteeringHandler.prototype.removeObstacle = function(id){

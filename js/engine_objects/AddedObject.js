@@ -73,6 +73,20 @@ var AddedObject = function(name, type, metaData, material, mesh, physicsBody, de
   webglCallbackHandler.registerEngineObject(this);
 }
 
+AddedObject.prototype.unUseAsAIEntity = function(){
+  steeringHandler.unUseAddedObjectAsAIEntity(this);
+  this.usedAsAIEntity = false;
+}
+
+AddedObject.prototype.useAsAIEntity = function(){
+  if (!this.boundingBoxes){
+    this.generateBoundingBoxes();
+  }
+  var res = steeringHandler.useAddedObjectAsAIEntity(this);
+  this.usedAsAIEntity = res;
+  return res;
+}
+
 AddedObject.prototype.onTextureAtlasRefreshed = function(){
   if (!this.hasTexture()){
     return;
