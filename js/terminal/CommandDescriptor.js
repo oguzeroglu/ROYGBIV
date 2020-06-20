@@ -237,7 +237,8 @@ var CommandDescriptor = function(){
       0, //printAcceptedTextureSize
       0, //switchAIDebugMode
       2, //newAIObstacle
-      1 //destroyAIObstacle
+      1, //destroyAIObstacle
+      0 //printAIObstacles
   ];
 
   this.commandArgumentsExpectedExplanation = [
@@ -477,7 +478,8 @@ var CommandDescriptor = function(){
     "printAcceptedTextureSize",
     "switchAIDebugMode",
     "newAIObstacle id height",
-    "destroyAIObstacle id"
+    "destroyAIObstacle id",
+    "printAIObstacles"
   ];
 
   this.commands = [
@@ -717,7 +719,8 @@ var CommandDescriptor = function(){
     "printAcceptedTextureSize",
     "switchAIDebugMode",
     "newAIObstacle",
-    "destroyAIObstacle"
+    "destroyAIObstacle",
+    "printAIObstacles"
   ];
 
   this.commandInfo = [
@@ -957,7 +960,8 @@ var CommandDescriptor = function(){
     "printAcceptedTextureSize: Prints the texture size accepted by the engine.",
     "switchAIDebugMode: Switches AI debug mode (on/off)",
     "newAIObstacle: Creates a new AI obstacle.",
-    "destroyAIObstacle: Destroys an AI obstacle of given id."
+    "destroyAIObstacle: Destroys an AI obstacle of given id.",
+    "printAIObstacles: Prints created AI obstacles."
   ];
 
   this.keyboardInfo = [

@@ -5658,6 +5658,24 @@ function parse(input){
           }
           return true;
         break;
+        case 237: //printAIObstacles
+          var count = 0;
+          var obstacles = steeringHandler.obstaclesBySceneName[sceneHandler.getActiveSceneName()] || {};
+          var length = Object.keys(obstacles).length;
+          terminal.printHeader(Text.AI_OBSTACLES_IN_THIS_SCENE);
+          for (var id in obstacles){
+            count ++;
+            var options = true;
+            if (count == length){
+              options = false;
+            }
+            terminal.printInfo(Text.TREE.replace(Text.PARAM1, id), options);
+          }
+          if (count == 0){
+            terminal.printError(Text.NO_AI_OBSTACLES_CREATED);
+          }
+          return true;
+        break;
       }
       return true;
     }catch(err){
