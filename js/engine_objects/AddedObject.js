@@ -885,6 +885,7 @@ AddedObject.prototype.export = function(){
   }
   exportObject.affectedByLight = this.affectedByLight;
   exportObject.customDisplacementTextureMatrixInfo  = this.customDisplacementTextureMatrixInfo;
+  exportObject.usedAsAIEntity = this.usedAsAIEntity;
   return exportObject;
 }
 

@@ -2745,6 +2745,7 @@ ObjectGroup.prototype.export = function(){
   }
 
   exportObj.affectedByLight = this.affectedByLight;
+  exportObj.usedAsAIEntity = this.usedAsAIEntity;
   return exportObj;
 }
 

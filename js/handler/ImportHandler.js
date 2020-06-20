@@ -737,6 +737,8 @@ ImportHandler.prototype.importAddedObjects = function(obj){
        addedObjectInstance.setCustomDisplacementTextureRepeat(curAddedObjectExport.customDisplacementTextureMatrixInfo.repeatU, curAddedObjectExport.customDisplacementTextureMatrixInfo.repeatV);
        addedObjectInstance.setCustomDisplacementTextureOffset(curAddedObjectExport.customDisplacementTextureMatrixInfo.offsetX, curAddedObjectExport.customDisplacementTextureMatrixInfo.offsetY);
      }
+
+     addedObjectInstance.usedAsAIEntity = curAddedObjectExport.usedAsAIEntity;
   }
   for (var objName in addedObjects){
     if (addedObjects[objName].softCopyParentName){
@@ -1142,6 +1144,7 @@ ImportHandler.prototype.importObjectGroups = function(obj){
       objectGroupInstance.setPosition(curObjectGroupExport.manualPositionInfo.x, curObjectGroupExport.manualPositionInfo.y, curObjectGroupExport.manualPositionInfo.z, true);
     }
     objectGroupInstance.setAffectedByLight(curObjectGroupExport.affectedByLight);
+    objectGroupInstance.usedAsAIEntity = curObjectGroupExport.usedAsAIEntity;
   }
   for (var objName in objectGroups){
     if (objectGroups[objName].softCopyParentName){
