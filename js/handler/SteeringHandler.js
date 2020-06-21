@@ -2,6 +2,8 @@ var SteeringHandler = function(){
   this.reset();
 
   this.vectorPool = new Kompute.VectorPool(10);
+
+  this.issueUpdate = this.issueUpdate.bind(this);
 }
 
 SteeringHandler.prototype.onAfterSceneChange = function(){
@@ -23,6 +25,8 @@ SteeringHandler.prototype.switchDebugMode = function(){
 SteeringHandler.prototype.reset = function(){
   this.obstaclesBySceneName = {};
   this.usedEntityIDs = {};
+
+  this.updateBuffer = new Map();
 
   this.resetWorld();
 }
@@ -111,12 +115,22 @@ SteeringHandler.prototype.removeObstacle = function(id){
   delete this.usedEntityIDs[id];
 }
 
-SteeringHandler.prototype.updateObject = function(obj, sceneName){
+SteeringHandler.prototype.updateObject = function(obj){
   if (!obj.usedAsAIEntity){
     return;
   }
 
-  var obstacles = this.obstaclesBySceneName[sceneName || obj.registeredSceneName];
+  this.updateBuffer.set(obj.name, obj);
+}
+
+SteeringHandler.prototype.issueUpdate = function(obj){
+
+  var sceneName = obj.registeredSceneName;
+  if (!sceneName){
+    sceneName = objectGroups[obj.parentObjectName].registeredSceneName;
+  }
+
+  var obstacles = this.obstaclesBySceneName[sceneName];
   var entity = obstacles[obj.name];
 
   if (obj.isAddedObject){
@@ -134,7 +148,12 @@ SteeringHandler.prototype.updateObject = function(obj, sceneName){
     obj.mesh.updateMatrixWorld(true);
     obj.updateBoundingBoxes();
     for (var childname in obj.group){
-      this.updateObject(obj.group[childname], obj.registeredSceneName);
+      this.issueUpdate(obj.group[childname]);
     }
   }
+}
+
+SteeringHandler.prototype.update = function(){
+  this.updateBuffer.forEach(this.issueUpdate);
+  this.updateBuffer.clear();
 }

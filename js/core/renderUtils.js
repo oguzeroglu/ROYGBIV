@@ -59,6 +59,7 @@ function render(){
   }
   cpuOperationsHandler.updateObjectPicker2D();
   cpuOperationsHandler.updateRaycaster();
+  cpuOperationsHandler.updateSteeringHandler();
   if (!isMobile){
     cpuOperationsHandler.flushMouseEventHandler();
   }
