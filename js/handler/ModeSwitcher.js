@@ -455,6 +455,7 @@ ModeSwitcher.prototype.switchFromPreviewToDesign = function(){
       object.updateOpacity(object.initOpacity);
       object.initOpacitySet = false;
     }
+    steeringHandler.updateObject(object);
   }
   for (var objectName in addedObjects){
     var object = addedObjects[objectName];
@@ -491,6 +492,7 @@ ModeSwitcher.prototype.switchFromPreviewToDesign = function(){
       }
       delete object.originalMass;
     }
+    steeringHandler.updateObject(object);
   }
   fogHandler.onFromPreviewToDesign();
   renderer.setViewport(0, 0, window.innerWidth, window.innerHeight);
