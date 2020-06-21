@@ -2408,6 +2408,7 @@ ObjectGroup.prototype.rotatePivotAroundXYZ = function(x, y, z, axis, axisVector,
   }
   if (this.mesh.visible){
     rayCaster.updateObject(this);
+    steeringHandler.updateObject(this);
   }
 }
 
@@ -2432,6 +2433,7 @@ ObjectGroup.prototype.rotateAroundXYZ = function(x, y, z, axis, axisVector, radi
   }
   if (this.mesh.visible){
     rayCaster.updateObject(this);
+    steeringHandler.updateObject(this);
   }
 }
 

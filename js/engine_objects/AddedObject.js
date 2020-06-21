@@ -1741,6 +1741,7 @@ AddedObject.prototype.rotatePivotAroundXYZ = function(x, y, z, axis, axisVector,
   this.setPhysicsAfterRotationAroundPoint();
   if (this.mesh.visible || (this.autoInstancedParent && this.autoInstancedParent.mesh.visible)){
     rayCaster.updateObject(this);
+    steeringHandler.updateObject(this);
   }
 }
 
@@ -1763,6 +1764,7 @@ AddedObject.prototype.rotateAroundXYZ = function(x, y, z, axis, axisVector, radi
   this.setPhysicsAfterRotationAroundPoint();
   if (this.mesh.visible || (this.autoInstancedParent && this.autoInstancedParent.mesh.visible)){
     rayCaster.updateObject(this);
+    steeringHandler.updateObject(this);
   }
 }
 
