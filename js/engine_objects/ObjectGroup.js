@@ -2343,6 +2343,10 @@ ObjectGroup.prototype.detach = function(childrenNoPhysicsContribution){
     addedObject.mesh.updateMatrixWorld(true);
     addedObject.updateBoundingBoxes();
 
+    if (addedObject.usedAsAIEntity){
+      steeringHandler.updateObject(addedObject);
+    }
+
     if (typeof childrenNoPhysicsContribution == UNDEFINED){
       addedObject.noPhysicsContributionWhenGlued = false;
     }else{
