@@ -1674,6 +1674,7 @@ AddedObject.prototype.setPosition = function(x, y, z, skipBBUpdate){
   this.physicsBody.position.set(x, y, z);
   if (this.mesh.visible || (this.autoInstancedParent && this.autoInstancedParent.mesh.visible)){
     rayCaster.updateObject(this);
+    steeringHandler.updateObject(this);
   }
   physicsWorld.updateObject(this, true, false);
   if (this.autoInstancedParent){

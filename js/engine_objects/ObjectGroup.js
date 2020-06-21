@@ -474,6 +474,7 @@ ObjectGroup.prototype.setPosition = function(x, y, z, skipBBUpdate){
   }
   if (this.mesh.visible){
     rayCaster.updateObject(this);
+    steeringHandler.updateObject(this);
   }
   physicsWorld.updateObject(this, true, false);
   this.onPositionChange(this.prevPositionVector, this.mesh.position);
