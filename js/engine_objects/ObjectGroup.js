@@ -2463,6 +2463,7 @@ ObjectGroup.prototype.rotate = function(axis, radian, fromScript){
   }
   if (this.mesh.visible){
     rayCaster.updateObject(this);
+    steeringHandler.updateObject(this);
   }
 }
 
@@ -3051,6 +3052,7 @@ ObjectGroup.prototype.rotateAroundPivotObject = function(axis, radians){
 
   if (this.mesh.visible){
     rayCaster.updateObject(this);
+    steeringHandler.updateObject(this);
   }
   for (var animName in this.animations){
     var anim = this.animations[animName];

@@ -571,6 +571,7 @@ AddedObject.prototype.onPositionChange = function(from, to){
   if(mode == 0){
     return;
   }
+
   if (this.positionThresholdExceededListenerInfo && this.positionThresholdExceededListenerInfo.isActive){
     var axis = this.positionThresholdExceededListenerInfo.axis;
     var oldPos = from[axis];
@@ -1789,6 +1790,7 @@ AddedObject.prototype.rotate = function(axis, radians, fromScript){
   }
   if (this.mesh.visible || (this.autoInstancedParent && this.autoInstancedParent.mesh.visible)){
     rayCaster.updateObject(this);
+    steeringHandler.updateObject(this);
   }
 }
 
@@ -2898,6 +2900,7 @@ AddedObject.prototype.rotateAroundPivotObject = function(axis, radians){
   this.setPhysicsAfterRotationAroundPoint();
   if (this.mesh.visible || (this.autoInstancedParent && this.autoInstancedParent.mesh.visible)){
     rayCaster.updateObject(this);
+    steeringHandler.updateObject(this);
   }
   for (var animName in this.animations){
     var anim = this.animations[animName];
