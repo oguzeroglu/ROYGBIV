@@ -130,10 +130,24 @@ SteeringHandler.prototype.issueUpdate = function(obj){
     sceneName = objectGroups[obj.parentObjectName].registeredSceneName;
   }
 
+  if (!sceneName){
+    return;
+  }
+
   var obstacles = this.obstaclesBySceneName[sceneName];
+
+  if (!obstacles){
+    return;
+  }
+
   var entity = obstacles[obj.name];
 
   if (obj.isAddedObject){
+
+    if (!entity){
+      return;
+    }
+
     if (typeof obj.parentObjectName === UNDEFINED){
       obj.mesh.updateMatrixWorld(true);
       obj.updateBoundingBoxes();
