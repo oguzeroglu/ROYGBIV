@@ -1211,7 +1211,8 @@ ImportHandler.prototype.importLightnings = function(obj){
       lightningHandler.onSetCorrectionProperties(lightning);
     }
   }
-  if (noLightningsExist && isDeployment){
+
+  if ((noLightningsExist && isDeployment) || (isDeployment && WORKERS_SUPPORTED && !LIGHTNING_WORKER_ON)){
     lightningHandler.turnOff();
   }
 }

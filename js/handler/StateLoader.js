@@ -123,6 +123,11 @@ StateLoader.prototype.finalize = function(){
 
 StateLoader.prototype.closeRaycasterWorkerIfNotUsed = function(){
   if (!isDeployment || !WORKERS_SUPPORTED || !RAYCASTER_WORKER_ON){
+
+    if (isDeployment && WORKERS_SUPPORTED && !RAYCASTER_WORKER_ON){
+      raycasterFactory.turnOffWorker();
+    }
+
     return;
   }
   var hasRaycasting = false;
@@ -182,6 +187,11 @@ StateLoader.prototype.closeRaycasterWorkerIfNotUsed = function(){
 
 StateLoader.prototype.closePhysicsWorkerIfNotUsed = function(){
   if (!isDeployment || !WORKERS_SUPPORTED || !PHYSICS_WORKER_ON){
+
+    if (isDeployment && WORKERS_SUPPORTED && !PHYSICS_WORKER_ON){
+      physicsFactory.turnOffWorker();
+    }
+
     return;
   }
   var hasPhyiscs = false;
