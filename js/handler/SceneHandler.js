@@ -82,6 +82,7 @@ SceneHandler.prototype.onSwitchFromPreviewToDesign = function(){
     this.scenes[sceneName].resetClickableSprites();
     this.scenes[sceneName].resetClickableContainers();
     this.scenes[sceneName].resetTrackingObjects();
+    this.scenes[sceneName].resetDynamicObjects();
   }
   this.draggableSpriteStatusBySceneName = new Object();
   this.readyCallback = noop;
