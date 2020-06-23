@@ -2459,6 +2459,7 @@ function parse(input){
           var upperBound = new THREE.Vector3(maxX, maxY, maxZ);
           LIMIT_BOUNDING_BOX = new THREE.Box3(lowerBound, upperBound);
           sceneHandler.onWorldLimitsChange();
+          steeringHandler.resetWorld();
           refreshRaycaster(Text.OCTREE_LIMIT_SET);
           return true;
         break;
@@ -2492,6 +2493,7 @@ function parse(input){
           }
           BIN_SIZE = binSize;
           sceneHandler.onBinSizeChange();
+          steeringHandler.resetWorld();
           refreshRaycaster(Text.BIN_SIZE_SET);
           return true;
         break;
