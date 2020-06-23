@@ -1741,6 +1741,7 @@ AddedObject.prototype.rotatePivotAroundXYZ = function(x, y, z, axis, axisVector,
   this.mesh.position.copy(REUSABLE_VECTOR);
   this.mesh.quaternion.copy(REUSABLE_QUATERNION);
   this.setPhysicsAfterRotationAroundPoint();
+  this.onPositionChange(this.prevPositionVector, this.mesh.position);
   if (this.mesh.visible || (this.autoInstancedParent && this.autoInstancedParent.mesh.visible)){
     rayCaster.updateObject(this);
     steeringHandler.updateObject(this);
@@ -1764,6 +1765,7 @@ AddedObject.prototype.rotateAroundXYZ = function(x, y, z, axis, axisVector, radi
   }
   this.mesh.rotateOnAxis(axisVector, radians);
   this.setPhysicsAfterRotationAroundPoint();
+  this.onPositionChange(this.prevPositionVector, this.mesh.position);
   if (this.mesh.visible || (this.autoInstancedParent && this.autoInstancedParent.mesh.visible)){
     rayCaster.updateObject(this);
     steeringHandler.updateObject(this);

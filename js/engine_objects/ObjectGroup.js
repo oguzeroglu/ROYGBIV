@@ -2408,6 +2408,9 @@ ObjectGroup.prototype.rotatePivotAroundXYZ = function(x, y, z, axis, axisVector,
   }else{
     this.updateSimplifiedPhysicsBody();
   }
+
+  this.onPositionChange(this.prevPositionVector, this.mesh.position);
+
   if (this.mesh.visible){
     rayCaster.updateObject(this);
     steeringHandler.updateObject(this);
@@ -2433,6 +2436,9 @@ ObjectGroup.prototype.rotateAroundXYZ = function(x, y, z, axis, axisVector, radi
   }else{
     this.updateSimplifiedPhysicsBody();
   }
+
+  this.onPositionChange(this.prevPositionVector, this.mesh.position);
+
   if (this.mesh.visible){
     rayCaster.updateObject(this);
     steeringHandler.updateObject(this);
