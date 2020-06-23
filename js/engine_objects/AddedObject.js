@@ -3,6 +3,8 @@ var AddedObject = function(name, type, metaData, material, mesh, physicsBody, de
 
   this.tpInfo = new Object();
 
+  this.bbMatrixCache = new THREE.Matrix4();
+
   if (IS_WORKER_CONTEXT || type == "MOCK"){
     return this;
   }
@@ -2648,7 +2650,18 @@ AddedObject.prototype.correctBoundingBox = function(bb){
 }
 
 AddedObject.prototype.updateBoundingBoxes = function(parentAry){
+
   var bb = this.boundingBoxes[0];
+
+  if (this.bbMatrixCache.equals(this.mesh.matrixWorld)){
+    if (parentAry){
+      parentAry[this.parentBoundingBoxIndex] = bb;
+    }
+    return;
+  }
+
+  this.bbMatrixCache.copy(this.mesh.matrixWorld);
+
   bb.makeEmpty();
   for (var i = 0; i<this.vertices.length; i++){
     var vertex = this.vertices[i];
