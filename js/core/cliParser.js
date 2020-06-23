@@ -5702,6 +5702,53 @@ function parse(input){
           }
           return true;
         break;
+        case 238: //aiEntity
+          if (mode != 0){
+            terminal.printError(Text.WORKS_ONLY_IN_DESIGN_MODE);
+            return true;
+          }
+
+          var obj = addedObjects[splitted[1]] || objectGroups[splitted[1]];
+
+          if (!obj){
+            terminal.printError(Text.NO_SUCH_OBJECT);
+            return true;
+          }
+
+          if (obj.registeredSceneName != sceneHandler.getActiveSceneName()){
+            terminal.printError(TEXT.OBJECT_NOT_IN_SCENE);
+            return true;
+          }
+
+          var parameter = splitted[2].toUpperCase();
+
+          if (parameter != "ON" && parameter != "OFF"){
+            terminal.printError(Text.PARAMETER_MUST_BE_ON_OFF);
+            return true;
+          }
+
+          if (parameter == "ON"){
+            if (obj.usedAsAIEntity){
+              terminal.printError(Text.OBJECT_IS_ALREADY_USED_AS_AI_ENTITY);
+              return true;
+            }
+
+            obj.useAsAIEntity();
+            terminal.printInfo(Text.OBJECT_WILL_BE_USED_AS_AI_ENTITY);
+          }else{
+            if (!obj.usedAsAIEntity){
+              terminal.printError(Text.OBJECT_IS_ALREADY_NOT_USED_AS_AI_ENTITY);
+              return true;
+            }
+
+            obj.unUseAsAIEntity();
+            terminal.printInfo(Text.OBJECT_WONT_BE_USED_AS_AI_ENTITY);
+          }
+
+          selectionHandler.resetCurrentSelection();
+
+          return true;
+        break;
       }
       return true;
     }catch(err){

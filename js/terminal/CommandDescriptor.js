@@ -238,7 +238,8 @@ var CommandDescriptor = function(){
       0, //switchAIDebugMode
       2, //newAIObstacle
       1, //destroyAIObstacle
-      0 //printAIObstacles
+      0, //printAIObstacles
+      2 //aiEntity
   ];
 
   this.commandArgumentsExpectedExplanation = [
@@ -479,7 +480,8 @@ var CommandDescriptor = function(){
     "switchAIDebugMode",
     "newAIObstacle id height",
     "destroyAIObstacle id",
-    "printAIObstacles"
+    "printAIObstacles",
+    "aiEntity objectName on/off"
   ];
 
   this.commands = [
@@ -720,7 +722,8 @@ var CommandDescriptor = function(){
     "switchAIDebugMode",
     "newAIObstacle",
     "destroyAIObstacle",
-    "printAIObstacles"
+    "printAIObstacles",
+    "aiEntity"
   ];
 
   this.commandInfo = [
@@ -961,7 +964,8 @@ var CommandDescriptor = function(){
     "switchAIDebugMode: Switches AI debug mode (on/off)",
     "newAIObstacle: Creates a new AI obstacle.",
     "destroyAIObstacle: Destroys an AI obstacle of given id.",
-    "printAIObstacles: Prints created AI obstacles."
+    "printAIObstacles: Prints created AI obstacles.",
+    "aiEntity: Sets/unsets an object as AI entity."
   ];
 
   this.keyboardInfo = [
@@ -1787,6 +1791,12 @@ var CommandDescriptor = function(){
   this.destroyAIObstacle = new Object();
   this.destroyAIObstacle.types = [];
   this.destroyAIObstacle.types.push(this.AI_OBSTACLE_ID); //id
+
+  // aiEntity
+  this.aiEntity = new Object();
+  this.aiEntity.types = [];
+  this.aiEntity.types.push(this.OBJECT_NAME); //objectName
+  this.aiEntity.types.push(this.STATE_ON_OFF); //on/off
 };
 
 CommandDescriptor.prototype.test = function(){
