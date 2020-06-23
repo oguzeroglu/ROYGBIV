@@ -5708,6 +5708,11 @@ function parse(input){
             return true;
           }
 
+          if (!(splitted[1].indexOf("*") == -1)){
+            new JobHandler(splitted).handle();
+            return true;
+          }
+
           var obj = addedObjects[splitted[1]] || objectGroups[splitted[1]];
 
           if (!obj){
@@ -5734,7 +5739,9 @@ function parse(input){
             }
 
             obj.useAsAIEntity();
-            terminal.printInfo(Text.OBJECT_WILL_BE_USED_AS_AI_ENTITY);
+            if (!jobHandlerWorking){
+              terminal.printInfo(Text.OBJECT_WILL_BE_USED_AS_AI_ENTITY);
+            }
           }else{
             if (!obj.usedAsAIEntity){
               terminal.printError(Text.OBJECT_IS_ALREADY_NOT_USED_AS_AI_ENTITY);
@@ -5742,7 +5749,9 @@ function parse(input){
             }
 
             obj.unUseAsAIEntity();
-            terminal.printInfo(Text.OBJECT_WONT_BE_USED_AS_AI_ENTITY);
+            if (!jobHandlerWorking){
+              terminal.printInfo(Text.OBJECT_WONT_BE_USED_AS_AI_ENTITY);
+            }
           }
 
           selectionHandler.resetCurrentSelection();

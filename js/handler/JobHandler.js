@@ -111,6 +111,8 @@ JobHandler.prototype.handle = function(previewModeCommand){
       this.handleNewAIObstacleCommand();
     }else if (this.splitted[0] == "destroyaiobstacle"){
       this.handleDestroyAIObstacleCommand();
+    }else if (this.splitted[0] == "aientity"){
+      this.handleAIEntityCommand();
     }
     if (jobHandlerRaycasterRefresh){
       refreshRaycaster(Text.JOB_COMPLETED, true);
@@ -121,6 +123,29 @@ JobHandler.prototype.handle = function(previewModeCommand){
   // because async
   if (this.splitted[0] != "autoConfigureArea".toLowerCase()){
     jobHandlerWorking = false;
+  }
+}
+
+JobHandler.prototype.handleAIEntityCommand = function(){
+  var namePrefix = this.splitted[1].split("*")[0];
+  var ctr = 0;
+  for (var objName in sceneHandler.getAddedObjects()){
+    if (objName.toLowerCase().startsWith(namePrefix.toLowerCase())){
+      parseCommand("aiEntity " + objName + " " + this.splitted[2]);
+      ctr ++;
+    }
+  }
+  for (var objName in sceneHandler.getObjectGroups()){
+    if (objName.toLowerCase().startsWith(namePrefix.toLowerCase())){
+      parseCommand("aiEntity " + objName + " " + this.splitted[2]);
+      ctr ++;
+    }
+  }
+
+  if (ctr == 0){
+    terminal.printError(Text.NO_OBJECT_FOUND);
+  }else{
+    terminal.printError(Text.COMMAND_EXECUTED_FOR_X_OBJECTS.replace(Text.PARAM1, ctr));
   }
 }
 
@@ -137,7 +162,7 @@ JobHandler.prototype.handleDestroyAIObstacleCommand = function(){
     }
   }
   if (ctr == 0){
-    terminal.printInfo(Text.NO_OBSTACLES_FOUND);
+    terminal.printError(Text.NO_OBSTACLES_FOUND);
   }else{
     terminal.printInfo(Text.COMMAND_EXECUTED_FOR_X_OBSTACLES.replace(Text.PARAM1, ctr));
   }
