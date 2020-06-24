@@ -7,6 +7,8 @@ importScripts("../engine_objects/CollisionInfo.js");
 
 var IS_WORKER_CONTEXT = true;
 
+var THREE = { Matrix4: function(){} };
+
 // CLASS DEFINITION
 var PhysicsWorker = function(){
   this.record = false;

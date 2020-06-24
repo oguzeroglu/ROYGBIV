@@ -256,13 +256,16 @@ ModeSwitcher.prototype.switchFromDesignToPreview = function(){
 }
 
 ModeSwitcher.prototype.switchFromPreviewToDesign = function(){
-  try{
+  try {
     Rhubarb.destroy();
-  }catch(err){}
+  } catch(err) {}
+
   history.replaceState(null, null, ' ');
+
   if (inputText){
     inputText.deactivateInputMode();
   }
+
   mode = 0;
   autoInstancingHandler.reset();
   var objsToRemove = [];
@@ -450,6 +453,7 @@ ModeSwitcher.prototype.switchFromPreviewToDesign = function(){
       if (!object.physicsKeptWhenHidden && !object.noMass){
         physicsWorld.addBody(object.physicsBody);
       }
+      steeringHandler.show(object);
     }
     if (object.initOpacitySet){
       object.updateOpacity(object.initOpacity);
@@ -478,6 +482,7 @@ ModeSwitcher.prototype.switchFromPreviewToDesign = function(){
       if (!object.physicsKeptWhenHidden && !object.noMass){
         physicsWorld.addBody(object.physicsBody);
       }
+      steeringHandler.show(object);
     }
     object.loadState();
     if (object.initOpacitySet){

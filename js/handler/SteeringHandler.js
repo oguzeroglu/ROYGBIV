@@ -123,6 +123,57 @@ SteeringHandler.prototype.updateObject = function(obj){
   this.updateBuffer.set(obj.name, obj);
 }
 
+SteeringHandler.prototype.hide = function(obj){
+  if (!obj.usedAsAIEntity){
+    return;
+  }
+
+  if (obj.isObjectGroup){
+    for (var childName in obj.group){
+      this.hide(obj.group[childName]);
+    }
+    return;
+  }
+
+  var sceneName = obj.registeredSceneName;
+  if (!sceneName){
+    sceneName = objectGroups[obj.parentObjectName].registeredSceneName;
+  }
+
+  var obstacles = this.obstaclesBySceneName[sceneName];
+  var entity = obstacles[obj.name];
+
+  this.world.hideEntity(entity);
+}
+
+SteeringHandler.prototype.show = function(obj){
+  if (!obj.usedAsAIEntity){
+    return;
+  }
+
+  if (obj.isObjectGroup){
+    for (var childName in obj.group){
+      this.show(obj.group[childName]);
+    }
+    return;
+  }
+
+  var sceneName = obj.registeredSceneName;
+  if (!sceneName){
+    sceneName = objectGroups[obj.parentObjectName].registeredSceneName;
+  }
+
+  var obstacles = this.obstaclesBySceneName[sceneName];
+  var entity = obstacles[obj.name];
+
+  this.world.showEntity(entity);
+  if (typeof obj.parentObjectName === UNDEFINED){
+    this.updateObject(obj);
+  }else{
+    this.updateObject(objectGroups[obj.parentObjectName]);
+  }
+}
+
 SteeringHandler.prototype.issueUpdate = function(obj){
 
   var sceneName = obj.registeredSceneName;

@@ -530,6 +530,7 @@ ObjectGroup.prototype.show = function(){
     }
     this.isHidden = false;
     rayCaster.show(this);
+    steeringHandler.show(this);
   }
 }
 
@@ -562,6 +563,7 @@ ObjectGroup.prototype.hide = function(keepPhysics){
     }
     this.isHidden = true;
     rayCaster.hide(this);
+    steeringHandler.hide(this);
   }
 }
 
