@@ -2536,6 +2536,7 @@ ObjectGroup.prototype.destroy = function(skipRaycasterRefresh){
     }
     this.group[name].dispose();
     delete disabledObjectNames[name];
+    steeringHandler.removeObstacle(name);
   }
   this.mesh.material.dispose();
   this.mesh.geometry.dispose();
@@ -2543,7 +2544,6 @@ ObjectGroup.prototype.destroy = function(skipRaycasterRefresh){
   if (!skipRaycasterRefresh){
     rayCaster.refresh();
   }
-
 }
 
 ObjectGroup.prototype.exportLightweight = function(){

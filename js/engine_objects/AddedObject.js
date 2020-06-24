@@ -1931,6 +1931,7 @@ AddedObject.prototype.destroy = function(skipRaycasterRefresh){
   if (!skipRaycasterRefresh){
     rayCaster.refresh();
   }
+  steeringHandler.removeObstacle(this.name);
 }
 
 AddedObject.prototype.dispose = function(){
