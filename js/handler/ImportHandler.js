@@ -2,6 +2,10 @@ var ImportHandler = function(){
 
 }
 
+ImportHandler.prototype.importSteeringHandler = function(obj){
+  steeringHandler.import(obj.steeringHandler);
+}
+
 ImportHandler.prototype.importScenes = function(obj){
   sceneHandler.import(obj.scenes);
 }

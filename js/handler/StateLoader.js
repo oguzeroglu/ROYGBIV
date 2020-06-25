@@ -113,6 +113,7 @@ StateLoader.prototype.finalize = function(){
   this.importHandler.importContainers(this.stateObj);
   this.importHandler.importVirtualKeyboards(this.stateObj);
   this.importHandler.importScenes(this.stateObj);
+  this.importHandler.importSteeringHandler(this.stateObj);
 
   this.closePhysicsWorkerIfNotUsed();
   this.closeRaycasterWorkerIfNotUsed();

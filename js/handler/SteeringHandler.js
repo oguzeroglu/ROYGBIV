@@ -6,6 +6,35 @@ var SteeringHandler = function(){
   this.issueUpdate = this.issueUpdate.bind(this);
 }
 
+SteeringHandler.prototype.import = function(exportObj){
+  for (var sceneName in exportObj){
+    for (var id in exportObj[sceneName]){
+      var curExport = exportObj[sceneName][id];
+      var pos = curExport.position;
+      var size = curExport.size;
+      this.addObstacle(id, new Kompute.Vector3D(pos.x, pos.y, pos.z), new Kompute.Vector3D(size.x, size.y, size.z), sceneName);
+    }
+  }
+}
+
+SteeringHandler.prototype.export = function(){
+  var exportObject = {};
+
+  for (var sceneName in this.obstaclesBySceneName){
+    exportObject[sceneName] = {};
+    var obstacles = this.obstaclesBySceneName[sceneName];
+    for (var id in obstacles){
+      var entity = obstacles[id];
+      exportObject[sceneName][id] = {
+        position: {x: entity.position.x, y: entity.position.y, z: entity.position.z},
+        size: {x: entity.size.x, y: entity.size.y, z: entity.size.z}
+      };
+    }
+  }
+
+  return exportObject;
+}
+
 SteeringHandler.prototype.onAfterSceneChange = function(){
   this.resetWorld();
 }
@@ -83,19 +112,23 @@ SteeringHandler.prototype.useAddedObjectAsAIEntity = function(addedObject){
   return this.addObstacle(id, new Kompute.Vector3D(center.x, center.y, center.z), new Kompute.Vector3D(size.x, size.y, size.z));
 }
 
-SteeringHandler.prototype.addObstacle = function(id, position, size){
+SteeringHandler.prototype.addObstacle = function(id, position, size, overrideSceneName){
   if (this.usedEntityIDs[id]){
     return false;
   }
 
+  var sceneName = overrideSceneName || sceneHandler.getActiveSceneName();
+
   var entity = new Kompute.Entity(id, position, size);
 
-  this.world.insertEntity(entity);
+  if (sceneName == sceneHandler.getActiveSceneName()){
+    this.world.insertEntity(entity);
+  }
 
-  var obstacles = this.obstaclesBySceneName[sceneHandler.getActiveSceneName()];
+  var obstacles = this.obstaclesBySceneName[sceneName];
   if (!obstacles){
     obstacles = {};
-    this.obstaclesBySceneName[sceneHandler.getActiveSceneName()] = obstacles;
+    this.obstaclesBySceneName[sceneName] = obstacles;
   }
 
   obstacles[id] = entity;

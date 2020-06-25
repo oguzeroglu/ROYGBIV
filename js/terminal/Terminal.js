@@ -827,7 +827,7 @@ Terminal.prototype.autocomplete = function(command){
 						}
 					}
 				}
-				helpString = "[AI Obstacle ids]:";
+				helpString = "[AI Obstacle ids]: ";
 			break;
 		}
 
