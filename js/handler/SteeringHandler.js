@@ -7,27 +7,69 @@ var SteeringHandler = function(){
 }
 
 SteeringHandler.prototype.import = function(exportObj){
-  for (var sceneName in exportObj){
-    for (var id in exportObj[sceneName]){
-      var curExport = exportObj[sceneName][id];
+  var obstacleInfo = exportObj.obstacleInfo;
+  var jumpDescriptorInfo = exportObj.jumpDescriptorInfo;
+
+  for (var sceneName in obstacleInfo){
+    for (var id in obstacleInfo[sceneName]){
+      var curExport = obstacleInfo[sceneName][id];
       var pos = curExport.position;
       var size = curExport.size;
       this.addObstacle(id, new Kompute.Vector3D(pos.x, pos.y, pos.z), new Kompute.Vector3D(size.x, size.y, size.z), sceneName);
     }
   }
+
+  for (var sceneName in jumpDescriptorInfo){
+    this.jumpDescriptorsBySceneName[sceneName] = {};
+    for (var id in jumpDescriptorInfo[sceneName]){
+      var curExport = jumpDescriptorInfo[sceneName][id];
+      var takeoffPosition = curExport.takeoffPosition;
+      var landingPosition = curExport.landingPosition;
+      var runupSatisfactionRadius = curExport.runupSatisfactionRadius;
+      var takeoffPositionSatisfactionRadius = curExport.takeoffPositionSatisfactionRadius;
+      var takeoffVelocitySatisfactionRadius = curExport.takeoffVelocitySatisfactionRadius;
+      var jumpDescriptor = new Kompute.JumpDescriptor({
+        takeoffPosition: new Kompute.Vector3D(takeoffPosition.x, takeoffPosition.y, takeoffPosition.z),
+        landingPosition: new Kompute.Vector3D(landingPosition.x, landingPosition.y, landingPosition.z),
+        runupSatisfactionRadius: runupSatisfactionRadius,
+        takeoffPositionSatisfactionRadius: takeoffPositionSatisfactionRadius,
+        takeoffVelocitySatisfactionRadius: takeoffVelocitySatisfactionRadius
+      });
+      this.jumpDescriptorsBySceneName[sceneName][id] = jumpDescriptor;
+      this.usedJumpDescriptorIDs[id] = jumpDescriptor;
+    }
+  }
 }
 
 SteeringHandler.prototype.export = function(){
-  var exportObject = {};
+  var exportObject = {
+    obstacleInfo: {},
+    jumpDescriptorInfo: {}
+  };
 
   for (var sceneName in this.obstaclesBySceneName){
-    exportObject[sceneName] = {};
+    exportObject.obstacleInfo[sceneName] = {};
     var obstacles = this.obstaclesBySceneName[sceneName];
     for (var id in obstacles){
       var entity = obstacles[id];
-      exportObject[sceneName][id] = {
+      exportObject.obstacleInfo[sceneName][id] = {
         position: {x: entity.position.x, y: entity.position.y, z: entity.position.z},
         size: {x: entity.size.x, y: entity.size.y, z: entity.size.z}
+      };
+    }
+  }
+
+  for (var sceneName in this.jumpDescriptorsBySceneName){
+    exportObject.jumpDescriptorInfo[sceneName] = {};
+    var jumpDescriptors = this.jumpDescriptorsBySceneName[sceneName];
+    for (var id in jumpDescriptors){
+      var jd = jumpDescriptors[id];
+      exportObject.jumpDescriptorInfo[sceneName][id] = {
+        takeoffPosition: {x: jd.takeoffPosition.x, y: jd.takeoffPosition.y, z: jd.takeoffPosition.z},
+        landingPosition: {x: jd.landingPosition.x, y: jd.landingPosition.y, z: jd.landingPosition.z},
+        runupSatisfactionRadius: jd.runupSatisfactionRadius,
+        takeoffPositionSatisfactionRadius: jd.takeoffPositionSatisfactionRadius,
+        takeoffVelocitySatisfactionRadius: jd.takeoffVelocitySatisfactionRadius
       };
     }
   }
