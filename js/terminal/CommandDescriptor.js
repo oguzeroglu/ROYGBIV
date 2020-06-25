@@ -239,7 +239,8 @@ var CommandDescriptor = function(){
       2, //newAIObstacle
       1, //destroyAIObstacle
       0, //printAIObstacles
-      2 //aiEntity
+      2, //aiEntity
+      6 //newJumpDescriptor
   ];
 
   this.commandArgumentsExpectedExplanation = [
@@ -481,7 +482,8 @@ var CommandDescriptor = function(){
     "newAIObstacle id height",
     "destroyAIObstacle id",
     "printAIObstacles",
-    "aiEntity objectName on/off"
+    "aiEntity objectName on/off",
+    "newJumpDescriptor id takeoffPoint landingPoint runupSatisfactionRadius takeoffPositionSatisfactionRadius takeoffVelocitySatisfactionRadius"
   ];
 
   this.commands = [
@@ -723,7 +725,8 @@ var CommandDescriptor = function(){
     "newAIObstacle",
     "destroyAIObstacle",
     "printAIObstacles",
-    "aiEntity"
+    "aiEntity",
+    "newJumpDescriptor"
   ];
 
   this.commandInfo = [
@@ -965,7 +968,8 @@ var CommandDescriptor = function(){
     "newAIObstacle: Creates a new AI obstacle.",
     "destroyAIObstacle: Destroys an AI obstacle of given id.",
     "printAIObstacles: Prints created AI obstacles.",
-    "aiEntity: Sets/unsets an object as AI entity."
+    "aiEntity: Sets/unsets an object as AI entity.",
+    "newJumpDescriptor: Creates a new jump descriptor."
   ];
 
   this.keyboardInfo = [
@@ -1797,6 +1801,16 @@ var CommandDescriptor = function(){
   this.aiEntity.types = [];
   this.aiEntity.types.push(this.OBJECT_NAME); //objectName
   this.aiEntity.types.push(this.STATE_ON_OFF); //on/off
+
+  // newJumpDescriptor
+  this.newJumpDescriptor = new Object();
+  this.newJumpDescriptor.types = [];
+  this.newJumpDescriptor.types.push(this.UNKNOWN_INDICATOR); //id
+  this.newJumpDescriptor.types.push(this.MARKED_POINT_NAME); //takeoffPoint
+  this.newJumpDescriptor.types.push(this.MARKED_POINT_NAME); //landingPoint
+  this.newJumpDescriptor.types.push(this.UNKNOWN_INDICATOR); //runupSatisfactionRadius
+  this.newJumpDescriptor.types.push(this.UNKNOWN_INDICATOR); //takeoffPositionSatisfactionRadius
+  this.newJumpDescriptor.types.push(this.UNKNOWN_INDICATOR); //takeoffVelocitySatisfactionRadius
 };
 
 CommandDescriptor.prototype.test = function(){
