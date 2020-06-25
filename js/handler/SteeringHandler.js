@@ -55,6 +55,9 @@ SteeringHandler.prototype.reset = function(){
   this.obstaclesBySceneName = {};
   this.usedEntityIDs = {};
 
+  this.jumpDescriptorsBySceneName = {};
+  this.usedJumpDescriptorIDs = {};
+
   this.updateBuffer = new Map();
 
   this.resetWorld();
@@ -249,6 +252,32 @@ SteeringHandler.prototype.issueUpdate = function(obj){
       this.issueUpdate(obj.group[childname]);
     }
   }
+}
+
+SteeringHandler.prototype.addJumpDescriptor = function(id, takeoffMarkedPoint, landingMarkedPoint, runupSatisfactionRadius, takeoffPositionSatisfactionRadius, takeoffVelocitySatisfactionRadius){
+  if (this.usedJumpDescriptorIDs[id]){
+    return false;
+  }
+
+  var takeoffVector = new Kompute.Vector3D(takeoffMarkedPoint.x, takeoffMarkedPoint.y, takeoffMarkedPoint.z);
+  var landingVector = new Kompute.Vector3D(landingMarkedPoint.x, landingMarkedPoint.y, landingMarkedPoint.z);
+  var jumpDescriptor = new Kompute.JumpDescriptor({
+    takeoffPosition: takeoffVector,
+    landingPosition: landingVector,
+    runupSatisfactionRadius: runupSatisfactionRadius,
+    takeoffPositionSatisfactionRadius: takeoffPositionSatisfactionRadius,
+    takeoffVelocitySatisfactionRadius: takeoffVelocitySatisfactionRadius
+  });
+
+  this.usedJumpDescriptorIDs[id] = jumpDescriptor;
+  var jumpDescriptors = this.jumpDescriptorsBySceneName[sceneHandler.getActiveSceneName()];
+  if (!jumpDescriptors){
+    jumpDescriptors = {};
+    this.jumpDescriptorsBySceneName[sceneHandler.getActiveSceneName()] = jumpDescriptors;
+  }
+
+  jumpDescriptors[id] = jumpDescriptor;
+  return true;
 }
 
 SteeringHandler.prototype.update = function(){
