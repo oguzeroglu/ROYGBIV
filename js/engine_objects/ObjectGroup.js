@@ -180,6 +180,7 @@ ObjectGroup.prototype.onAfterRotationAnimation = function(){
     physicsWorld.updateObject(this, true, true);
   }
   rayCaster.updateObject(this);
+  steeringHandler.updateObject(this);
 }
 
 ObjectGroup.prototype.isAnimationSuitable = function(animation){

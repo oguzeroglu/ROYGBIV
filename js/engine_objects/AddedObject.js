@@ -446,6 +446,7 @@ AddedObject.prototype.onAfterRotationAnimation = function(){
     physicsWorld.updateObject(this, true, true);
   }
   rayCaster.updateObject(this);
+  steeringHandler.updateObject(this);
 }
 
 AddedObject.prototype.syncPhysicsRotation = function(){
