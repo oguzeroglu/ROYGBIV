@@ -2520,6 +2520,7 @@ ObjectGroup.prototype.translate = function(axis, amount, fromScript){
   this.graphicsGroup.position.copy(this.mesh.position);
   if (this.mesh.visible){
     rayCaster.updateObject(this);
+    steeringHandler.updateObject(this);
   }
 }
 

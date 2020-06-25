@@ -1726,6 +1726,7 @@ AddedObject.prototype.translate = function(axis, amount, fromScript){
   physicsBody.position.copy(this.mesh.position);
   if (this.mesh.visible || (this.autoInstancedParent && this.autoInstancedParent.mesh.visible)){
     rayCaster.updateObject(this);
+    steeringHandler.updateObject(this);
   }
 }
 
