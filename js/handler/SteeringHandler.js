@@ -100,6 +100,9 @@ SteeringHandler.prototype.reset = function(){
   this.jumpDescriptorsBySceneName = {};
   this.usedJumpDescriptorIDs = {};
 
+  this.pathsBySceneName = {};
+  this.usedPathIDs = {};
+
   this.updateBuffer = new Map();
 
   this.resetWorld();
@@ -329,6 +332,30 @@ SteeringHandler.prototype.removeJumpDescriptor = function(id){
 
   delete this.jumpDescriptorsBySceneName[sceneHandler.getActiveSceneName()][id];
   delete this.usedJumpDescriptorIDs[id];
+}
+
+SteeringHandler.prototype.addPath = function(id, markedPoints, loop, rewind){
+  if (this.usedPathIDs[id]){
+    return false;
+  }
+
+  var path = new Kompute.Path({loop: loop, rewind: rewind});
+
+  for (var i = 0; i < markedPoints.length; i ++){
+    var waypoint = new Kompute.Vector3D(markedPoints[i].x, markedPoints[i].y, markedPoints[i].z);
+    path.addWaypoint(waypoint);
+  }
+
+  this.usedPathIDs[id] = path;
+  var paths = this.pathsBySceneName[sceneHandler.getActiveSceneName()];
+  if (!paths){
+    paths = {};
+    this.pathsBySceneName[sceneHandler.getActiveSceneName()] = paths;
+  }
+
+  paths[id] = path;
+
+  return true;
 }
 
 SteeringHandler.prototype.update = function(){
