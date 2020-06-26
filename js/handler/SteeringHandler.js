@@ -322,6 +322,15 @@ SteeringHandler.prototype.addJumpDescriptor = function(id, takeoffMarkedPoint, l
   return true;
 }
 
+SteeringHandler.prototype.removeJumpDescriptor = function(id){
+  if (!this.usedJumpDescriptorIDs[id]){
+    return;
+  }
+
+  delete this.jumpDescriptorsBySceneName[sceneHandler.getActiveSceneName()][id];
+  delete this.usedJumpDescriptorIDs[id];
+}
+
 SteeringHandler.prototype.update = function(){
   this.updateBuffer.forEach(this.issueUpdate);
   this.updateBuffer.clear();
