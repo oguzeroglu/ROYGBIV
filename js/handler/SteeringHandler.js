@@ -90,6 +90,11 @@ SteeringHandler.prototype.switchDebugMode = function(){
 
   this.debugHelper = new Kompute.DebugHelper(this.world, THREE, scene);
   this.debugHelper.activate();
+
+  for (var id in this.pathsBySceneName[sceneHandler.getActiveSceneName()]){
+    this.debugHelper.visualisePath(this.pathsBySceneName[sceneHandler.getActiveSceneName()][id]);
+  }
+
   return true;
 }
 
@@ -354,6 +359,10 @@ SteeringHandler.prototype.addPath = function(id, markedPoints, loop, rewind){
   }
 
   paths[id] = path;
+
+  if (this.debugHelper){
+    this.debugHelper.visualisePath(path);
+  }
 
   return true;
 }
