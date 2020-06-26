@@ -358,6 +358,15 @@ SteeringHandler.prototype.addPath = function(id, markedPoints, loop, rewind){
   return true;
 }
 
+SteeringHandler.prototype.removePath = function(id){
+  if (!this.usedPathIDs[id]){
+    return;
+  }
+
+  delete this.usedPathIDs[id];
+  delete this.pathsBySceneName[sceneHandler.getActiveSceneName()][id];
+}
+
 SteeringHandler.prototype.update = function(){
   this.updateBuffer.forEach(this.issueUpdate);
   this.updateBuffer.clear();
