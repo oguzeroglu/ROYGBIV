@@ -241,7 +241,8 @@ var CommandDescriptor = function(){
       0, //printAIObstacles
       2, //aiEntity
       6, //newJumpDescriptor
-      1 //destroyJumpDescriptor
+      1, //destroyJumpDescriptor
+      0 //printJumpDescriptors
   ];
 
   this.commandArgumentsExpectedExplanation = [
@@ -485,7 +486,8 @@ var CommandDescriptor = function(){
     "printAIObstacles",
     "aiEntity objectName on/off",
     "newJumpDescriptor id takeoffPoint landingPoint runupSatisfactionRadius takeoffPositionSatisfactionRadius takeoffVelocitySatisfactionRadius",
-    "destroyJumpDescriptor id"
+    "destroyJumpDescriptor id",
+    "printJumpDescriptors"
   ];
 
   this.commands = [
@@ -729,7 +731,8 @@ var CommandDescriptor = function(){
     "printAIObstacles",
     "aiEntity",
     "newJumpDescriptor",
-    "destroyJumpDescriptor"
+    "destroyJumpDescriptor",
+    "printJumpDescriptors"
   ];
 
   this.commandInfo = [
@@ -973,7 +976,8 @@ var CommandDescriptor = function(){
     "printAIObstacles: Prints created AI obstacles.",
     "aiEntity: Sets/unsets an object as AI entity.",
     "newJumpDescriptor: Creates a new jump descriptor.",
-    "destroyJumpDescriptor: Destroys a jump descriptor of given id."
+    "destroyJumpDescriptor: Destroys a jump descriptor of given id.",
+    "printJumpDescriptors: Prints created jump descriptors."
   ];
 
   this.keyboardInfo = [
