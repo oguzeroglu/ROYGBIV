@@ -829,6 +829,17 @@ Terminal.prototype.autocomplete = function(command){
 				}
 				helpString = "[AI Obstacle ids]: ";
 			break;
+			case commandDescriptor.JUMP_DESCRIPTOR_ID:
+				var jumpDescriptors = steeringHandler.jumpDescriptorsBySceneName[sceneHandler.getActiveSceneName()];
+				if (jumpDescriptors){
+					for (var id in jumpDescriptors){
+						if (id.toLowerCase().startsWith(curEntry.toLowerCase())){
+							possibilities.push(id);
+						}
+					}
+				}
+				helpString = "[Jump descriptor ids]: ";
+			break;
 		}
 
 		//  **********************************************************

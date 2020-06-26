@@ -5835,6 +5835,38 @@ function parse(input){
           terminal.printInfo(Text.JUMP_DESCRIPTOR_CREATED);
           return true;
         break;
+        case 240: //destroyJumpDescriptor
+          if (mode != 0){
+            terminal.printError(Text.WORKS_ONLY_IN_DESIGN_MODE);
+            return true;
+          }
+
+          var id = splitted[1];
+
+          if (!(id.indexOf("*") == -1)){
+            new JobHandler(splitted).handle();
+            return true;
+          }
+
+          if (!steeringHandler.usedJumpDescriptorIDs[id]){
+            terminal.printError(Text.NO_SUCH_JUMPDESCRIPTOR);
+            return true;
+          }
+
+          var jumpDescriptors = steeringHandler.jumpDescriptorsBySceneName[sceneHandler.getActiveSceneName()] || {};
+
+          if (!jumpDescriptors[id]){
+            terminal.printError(Text.JUMPDESCRIPTOR_NOT_IN_ACTIVE_SCENE);
+            return true;
+          }
+
+          steeringHandler.removeJumpDescriptor(id);
+
+          if (!jobHandlerWorking){
+            terminal.printInfo(Text.JUMPDESCRIPTOR_DESTROYED);
+          }
+          return true;
+        break;
       }
       return true;
     }catch(err){

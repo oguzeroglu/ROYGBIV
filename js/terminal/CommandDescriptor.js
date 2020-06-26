@@ -240,7 +240,8 @@ var CommandDescriptor = function(){
       1, //destroyAIObstacle
       0, //printAIObstacles
       2, //aiEntity
-      6 //newJumpDescriptor
+      6, //newJumpDescriptor
+      1 //destroyJumpDescriptor
   ];
 
   this.commandArgumentsExpectedExplanation = [
@@ -483,7 +484,8 @@ var CommandDescriptor = function(){
     "destroyAIObstacle id",
     "printAIObstacles",
     "aiEntity objectName on/off",
-    "newJumpDescriptor id takeoffPoint landingPoint runupSatisfactionRadius takeoffPositionSatisfactionRadius takeoffVelocitySatisfactionRadius"
+    "newJumpDescriptor id takeoffPoint landingPoint runupSatisfactionRadius takeoffPositionSatisfactionRadius takeoffVelocitySatisfactionRadius",
+    "destroyJumpDescriptor id"
   ];
 
   this.commands = [
@@ -726,7 +728,8 @@ var CommandDescriptor = function(){
     "destroyAIObstacle",
     "printAIObstacles",
     "aiEntity",
-    "newJumpDescriptor"
+    "newJumpDescriptor",
+    "destroyJumpDescriptor"
   ];
 
   this.commandInfo = [
@@ -969,7 +972,8 @@ var CommandDescriptor = function(){
     "destroyAIObstacle: Destroys an AI obstacle of given id.",
     "printAIObstacles: Prints created AI obstacles.",
     "aiEntity: Sets/unsets an object as AI entity.",
-    "newJumpDescriptor: Creates a new jump descriptor."
+    "newJumpDescriptor: Creates a new jump descriptor.",
+    "destroyJumpDescriptor: Destroys a jump descriptor of given id."
   ];
 
   this.keyboardInfo = [
@@ -1115,6 +1119,7 @@ var CommandDescriptor = function(){
   this.RESOLUTION_PARAM            =   45;
   this.DYNAMIC_TEXTURE_FOLDER_NAME =   46;
   this.AI_OBSTACLE_ID              =   47;
+  this.JUMP_DESCRIPTOR_ID          =   48;
 
   // newGridSystem
   this.newGridSystem = new Object();
@@ -1811,6 +1816,11 @@ var CommandDescriptor = function(){
   this.newJumpDescriptor.types.push(this.UNKNOWN_INDICATOR); //runupSatisfactionRadius
   this.newJumpDescriptor.types.push(this.UNKNOWN_INDICATOR); //takeoffPositionSatisfactionRadius
   this.newJumpDescriptor.types.push(this.UNKNOWN_INDICATOR); //takeoffVelocitySatisfactionRadius
+
+  // destroyJumpDescriptor
+  this.destroyJumpDescriptor = new Object();
+  this.destroyJumpDescriptor.types = [];
+  this.destroyJumpDescriptor.types.push(this.JUMP_DESCRIPTOR_ID); //id
 };
 
 CommandDescriptor.prototype.test = function(){

@@ -113,6 +113,8 @@ JobHandler.prototype.handle = function(previewModeCommand){
       this.handleDestroyAIObstacleCommand();
     }else if (this.splitted[0] == "aientity"){
       this.handleAIEntityCommand();
+    }else if (this.splitted[0] == "destroyjumpdescriptor"){
+      this.handleDestroyJumpDescriptorCommand();
     }
     if (jobHandlerRaycasterRefresh){
       refreshRaycaster(Text.JOB_COMPLETED, true);
@@ -123,6 +125,26 @@ JobHandler.prototype.handle = function(previewModeCommand){
   // because async
   if (this.splitted[0] != "autoConfigureArea".toLowerCase()){
     jobHandlerWorking = false;
+  }
+}
+
+JobHandler.prototype.handleDestroyJumpDescriptorCommand = function(){
+  var idPrefix = this.splitted[1].split("*")[0];
+  var ctr = 0;
+
+  var jumpDescriptors = steeringHandler.jumpDescriptorsBySceneName[sceneHandler.getActiveSceneName()] || {};
+
+  for (var id in jumpDescriptors){
+    if (id.toLowerCase().startsWith(idPrefix.toLowerCase())){
+      parseCommand("destroyJumpDescriptor " + id);
+      ctr ++;
+    }
+  }
+
+  if (ctr == 0){
+    terminal.printError(Text.NO_JUMPDESCRIPTORS_FOUND);
+  }else{
+    terminal.printInfo(Text.COMMAND_EXECUTED_FOR_X_JUMPDESCRIPTORS.replace(Text.PARAM1, ctr));
   }
 }
 
@@ -145,7 +167,7 @@ JobHandler.prototype.handleAIEntityCommand = function(){
   if (ctr == 0){
     terminal.printError(Text.NO_OBJECT_FOUND);
   }else{
-    terminal.printError(Text.COMMAND_EXECUTED_FOR_X_OBJECTS.replace(Text.PARAM1, ctr));
+    terminal.printInfo(Text.COMMAND_EXECUTED_FOR_X_OBJECTS.replace(Text.PARAM1, ctr));
   }
 }
 
