@@ -5864,6 +5864,13 @@ function parse(input){
             return true;
           }
 
+          if (steeringHandler.pathsByJumpDescriptors[id]){
+            if (Object.keys(steeringHandler.pathsByJumpDescriptors[id]).length > 0){
+              terminal.printError(Text.JUMP_DESCRIPTOR_INSERTED_TO_A_PATH);
+              return true;
+            }
+          }
+
           steeringHandler.removeJumpDescriptor(id);
 
           if (!jobHandlerWorking){

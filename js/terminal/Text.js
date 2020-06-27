@@ -347,6 +347,7 @@ var Text = function(){
   this.MUZZLE_FLASH_DESTROYED = "Muzzleflash destroyed."
   this.HEIGHT_CANNOT_BE_0 = "Height cannot be 0.";
   this.WALL_COLLECTION_CREATED = "Wall collection created.";
+  this.JUMP_DESCRIPTOR_INSERTED_TO_A_PATH = "Jump descriptor is inserted to a path. Cannot delete.";
   this.LIGHTNING_DESTROYED = "Lightning destroyed.";
   this.WALL_COLLECTIONS = "Wall collections";
   this.TREE_WALL_COLLECTIONS = "|____@@1: OUTLINE COLOR -> @@2";
