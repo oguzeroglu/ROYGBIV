@@ -5874,7 +5874,6 @@ function parse(input){
         case 241: //printJumpDescriptors
           var count = 0;
           var jumpDescriptors = steeringHandler.jumpDescriptorsBySceneName[sceneHandler.getActiveSceneName()] || {};
-          var keysLength = Object.keys(jumpDescriptors).length;
           terminal.printHeader(Text.JUMPDESCRIPTORS_IN_THIS_SCENE);
           for (var id in jumpDescriptors){
             count ++;
@@ -5963,7 +5962,7 @@ function parse(input){
             return true;
           }
 
-          steeringHandler.addPath(id, waypoints, loop, rewind);
+          steeringHandler.addPath(id, waypoints, loop === "true", rewind === "true");
           terminal.printInfo(Text.PATH_CREATED);
           return true;
         break;
@@ -5995,6 +5994,29 @@ function parse(input){
 
           if (!jobHandlerWorking){
             terminal.printInfo(Text.PATH_DESTROYED);
+          }
+          return true;
+        break;
+        case 244: //printPaths
+          var count = 0;
+          var paths = steeringHandler.pathsBySceneName[sceneHandler.getActiveSceneName()] || {};
+          terminal.printHeader(Text.PATHS_IN_THIS_SCENE);
+          for (var id in paths){
+            count ++;
+            var path = paths[id];
+
+            terminal.printInfo(Text.TREE.replace(Text.PARAM1, id), true);
+            terminal.printInfo(Text.SUBTREE2.replace(Text.PARAM1, "loop").replace(Text.PARAM2, path.loop), true);
+            terminal.printInfo(Text.SUBTREE2.replace(Text.PARAM1, "rewind").replace(Text.PARAM2, path.rewind), true);
+            terminal.printInfo(Text.SUBTREE.replace(Text.PARAM1, "waypoints"), true);
+            for (var i = 0; i < path.waypoints.length; i ++){
+              var wp = path.waypoints[i];
+              var opt = i != path.waypoints.length -1;
+              terminal.printInfo(Text.SUBTREE3.replace(Text.PARAM1, "("+ wp.x +", " + wp.y + "," + wp.z + ")"), opt);
+            }
+          }
+          if (count == 0){
+            terminal.printError(Text.NO_PATHS_IN_THIS_SCENE);
           }
           return true;
         break;

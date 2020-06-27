@@ -244,7 +244,8 @@ var CommandDescriptor = function(){
       1, //destroyJumpDescriptor
       0, //printJumpDescriptors
       4, //newPath
-      1 //destroyPath
+      1, //destroyPath
+      0 //printPaths
   ];
 
   this.commandArgumentsExpectedExplanation = [
@@ -491,7 +492,8 @@ var CommandDescriptor = function(){
     "destroyJumpDescriptor id",
     "printJumpDescriptors",
     "newPath id point[0],point[1],....point[n] loop rewind",
-    "destroyPath id"
+    "destroyPath id",
+    "printPaths"
   ];
 
   this.commands = [
@@ -738,7 +740,8 @@ var CommandDescriptor = function(){
     "destroyJumpDescriptor",
     "printJumpDescriptors",
     "newPath",
-    "destroyPath"
+    "destroyPath",
+    "printPaths"
   ];
 
   this.commandInfo = [
@@ -985,7 +988,8 @@ var CommandDescriptor = function(){
     "destroyJumpDescriptor: Destroys a jump descriptor of given id.",
     "printJumpDescriptors: Prints created jump descriptors.",
     "newPath: Creates a new path from given waypoints.",
-    "destroyPath: Destroys a path of given id."
+    "destroyPath: Destroys a path of given id.",
+    "printPaths: Prints created paths."
   ];
 
   this.keyboardInfo = [
