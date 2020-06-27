@@ -6032,8 +6032,28 @@ function parse(input){
             terminal.printInfo(Text.SUBTREE.replace(Text.PARAM1, "waypoints"), true);
             for (var i = 0; i < path.waypoints.length; i ++){
               var wp = path.waypoints[i];
-              var opt = i != path.waypoints.length -1;
-              terminal.printInfo(Text.SUBTREE3.replace(Text.PARAM1, "("+ wp.x +", " + wp.y + ", " + wp.z + ")"), opt);
+              terminal.printInfo(Text.SUBTREE3.replace(Text.PARAM1, "("+ wp.x +", " + wp.y + ", " + wp.z + ")"), true);
+            }
+
+            var insertedJDs = {};
+            for (var jdID in steeringHandler.pathsByJumpDescriptors){
+              for (var pid in steeringHandler.pathsByJumpDescriptors[jdID]){
+                if (pid == id){
+                  insertedJDs[jdID] = true;
+                }
+              }
+            }
+
+            var insertedJDsCount = Object.keys(insertedJDs).length;
+            if (insertedJDsCount > 0){
+              terminal.printInfo(Text.SUBTREE.replace(Text.PARAM1, "Inserted jump descriptors"), true);
+              var ct = 0;
+              for (var jdID in insertedJDs){
+                ct ++;
+                terminal.printInfo(Text.SUBTREE3.replace(Text.PARAM1, jdID), ct != insertedJDsCount);
+              }
+            }else{
+              terminal.printInfo(Text.SUBTREE2.replace(Text.PARAM1, "Inserted jump descriptors").replace(Text.PARAM2, "none"), false);
             }
           }
           if (count == 0){
