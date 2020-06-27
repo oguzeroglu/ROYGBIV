@@ -5893,7 +5893,21 @@ function parse(input){
             terminal.printInfo(Text.SUBTREE2.replace(Text.PARAM1, "landingPosition").replace(Text.PARAM2, "(" + landingPosition.x + ", " + landingPosition.y + ", " + landingPosition.z + ")"), true);
             terminal.printInfo(Text.SUBTREE2.replace(Text.PARAM1, "runupSatisfactionRadius").replace(Text.PARAM2, jd.runupSatisfactionRadius), true);
             terminal.printInfo(Text.SUBTREE2.replace(Text.PARAM1, "takeoffPositionSatisfactionRadius").replace(Text.PARAM2, jd.takeoffPositionSatisfactionRadius), true);
-            terminal.printInfo(Text.SUBTREE2.replace(Text.PARAM1, "takeoffVelocitySatisfactionRadius").replace(Text.PARAM2, jd.takeoffVelocitySatisfactionRadius), false);
+            terminal.printInfo(Text.SUBTREE2.replace(Text.PARAM1, "takeoffVelocitySatisfactionRadius").replace(Text.PARAM2, jd.takeoffVelocitySatisfactionRadius), true);
+
+            var paths = steeringHandler.pathsByJumpDescriptors[id];
+            var isInserted = paths && Object.keys(paths).length > 0;
+            if (isInserted){
+              var pc = 0;
+              var tpc = Object.keys(paths).length;
+              terminal.printInfo(Text.SUBTREE.replace(Text.PARAM1, "Path insertions"), true);
+              for (var pathID in paths){
+                pc ++;
+                terminal.printInfo(Text.SUBTREE3.replace(Text.PARAM1, pathID), !(pc == tpc));
+              }
+            }else{
+              terminal.printInfo(Text.SUBTREE2.replace(Text.PARAM1, "Path insertions").replace(Text.PARAM2, "none"), false);
+            }
           }
           if (count == 0){
             terminal.printError(Text.NO_JUMPDESCRIPTORS_IN_THIS_SCENE);
