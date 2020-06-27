@@ -2097,6 +2097,10 @@ function parse(input){
             new JobHandler(splitted).handle();
             return true;
           }
+          if(name.indexOf(",") >= 0){
+            terminal.printError(Text.INVALID_CHARACTER_IN_NAME);
+            return true;
+          }
           if (markedPoints[name]){
             terminal.printError(Text.NAME_MUST_BE_UNIQUE);
             return true;
