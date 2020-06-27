@@ -9,6 +9,7 @@ var SteeringHandler = function(){
 SteeringHandler.prototype.import = function(exportObj){
   var obstacleInfo = exportObj.obstacleInfo;
   var jumpDescriptorInfo = exportObj.jumpDescriptorInfo;
+  var pathInfo = exportObj.pathInfo;
 
   for (var sceneName in obstacleInfo){
     for (var id in obstacleInfo[sceneName]){
@@ -39,12 +40,27 @@ SteeringHandler.prototype.import = function(exportObj){
       this.usedJumpDescriptorIDs[id] = jumpDescriptor;
     }
   }
+
+  for (var sceneName in pathInfo){
+    this.pathsBySceneName[sceneName] = {};
+    for (var id in pathInfo[sceneName]){
+      var curExport = pathInfo[sceneName][id];
+      var path = new Kompute.Path({loop: curExport.loop, rewind: curExport.rewind});
+      for (var i = 0; i < curExport.waypoints.length; i ++){
+        var wp = curExport.waypoints[i];
+        path.addWaypoint(new Kompute.Vector3D(wp.x, wp.y, wp.z));
+      }
+      this.pathsBySceneName[sceneName][id] = path;
+      this.usedPathIDs[id] = path;
+    }
+  }
 }
 
 SteeringHandler.prototype.export = function(){
   var exportObject = {
     obstacleInfo: {},
-    jumpDescriptorInfo: {}
+    jumpDescriptorInfo: {},
+    pathInfo: {}
   };
 
   for (var sceneName in this.obstaclesBySceneName){
@@ -71,6 +87,23 @@ SteeringHandler.prototype.export = function(){
         takeoffPositionSatisfactionRadius: jd.takeoffPositionSatisfactionRadius,
         takeoffVelocitySatisfactionRadius: jd.takeoffVelocitySatisfactionRadius
       };
+    }
+  }
+
+  for (var sceneName in this.pathsBySceneName){
+    exportObject.pathInfo[sceneName] = {};
+    var paths = this.pathsBySceneName[sceneName];
+    for (var id in paths){
+      var path = paths[id];
+      exportObject.pathInfo[sceneName][id] = {
+        rewind: path.rewind,
+        loop: path.loop,
+        waypoints: []
+      };
+      for (var i = 0; i < path.waypoints.length; i ++){
+        var wp = path.waypoints[i];
+        exportObject.pathInfo[sceneName][id].waypoints.push({x: wp.x, y: wp.y, z: wp.z});
+      }
     }
   }
 

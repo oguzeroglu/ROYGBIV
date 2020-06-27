@@ -6012,7 +6012,7 @@ function parse(input){
             for (var i = 0; i < path.waypoints.length; i ++){
               var wp = path.waypoints[i];
               var opt = i != path.waypoints.length -1;
-              terminal.printInfo(Text.SUBTREE3.replace(Text.PARAM1, "("+ wp.x +", " + wp.y + "," + wp.z + ")"), opt);
+              terminal.printInfo(Text.SUBTREE3.replace(Text.PARAM1, "("+ wp.x +", " + wp.y + ", " + wp.z + ")"), opt);
             }
           }
           if (count == 0){
