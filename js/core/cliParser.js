@@ -5947,6 +5947,29 @@ function parse(input){
           terminal.printInfo(Text.PATH_CREATED);
           return true;
         break;
+        case 243: //destroyPath
+          if (mode != 0){
+            terminal.printError(Text.WORKS_ONLY_IN_DESIGN_MODE);
+            return true;
+          }
+
+          var id = splitted[1];
+
+          if (!steeringHandler.usedPathIDs[id]){
+            terminal.printError(Text.NO_SUCH_PATH);
+            return true;
+          }
+
+          var paths = steeringHandler.pathsBySceneName[sceneHandler.getActiveSceneName()] || {};
+          if (!paths[id]){
+            terminal.printError(Text.PATH_NOT_INSIDE_ACTIVE_SCENE);
+            return true;
+          }
+
+          steeringHandler.removePath(id);
+          terminal.printInfo(Text.PATH_DESTROYED);
+          return true;
+        break;
       }
       return true;
     }catch(err){

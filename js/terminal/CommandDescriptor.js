@@ -243,7 +243,8 @@ var CommandDescriptor = function(){
       6, //newJumpDescriptor
       1, //destroyJumpDescriptor
       0, //printJumpDescriptors
-      4 //newPath
+      4, //newPath
+      1 //destroyPath
   ];
 
   this.commandArgumentsExpectedExplanation = [
@@ -489,7 +490,8 @@ var CommandDescriptor = function(){
     "newJumpDescriptor id takeoffPoint landingPoint runupSatisfactionRadius takeoffPositionSatisfactionRadius takeoffVelocitySatisfactionRadius",
     "destroyJumpDescriptor id",
     "printJumpDescriptors",
-    "newPath id point[0],point[1],....point[n] loop rewind"
+    "newPath id point[0],point[1],....point[n] loop rewind",
+    "destroyPath id"
   ];
 
   this.commands = [
@@ -735,7 +737,8 @@ var CommandDescriptor = function(){
     "newJumpDescriptor",
     "destroyJumpDescriptor",
     "printJumpDescriptors",
-    "newPath"
+    "newPath",
+    "destroyPath"
   ];
 
   this.commandInfo = [
@@ -981,7 +984,8 @@ var CommandDescriptor = function(){
     "newJumpDescriptor: Creates a new jump descriptor.",
     "destroyJumpDescriptor: Destroys a jump descriptor of given id.",
     "printJumpDescriptors: Prints created jump descriptors.",
-    "newPath: Creates a new path from given waypoints."
+    "newPath: Creates a new path from given waypoints.",
+    "destroyPath: Destroys a path of given id."
   ];
 
   this.keyboardInfo = [
@@ -1129,6 +1133,7 @@ var CommandDescriptor = function(){
   this.AI_OBSTACLE_ID              =   47;
   this.JUMP_DESCRIPTOR_ID          =   48;
   this.ANY_MARKED_POINT            =   49;
+  this.PATH_ID                     =   50;
 
   // newGridSystem
   this.newGridSystem = new Object();
@@ -1838,6 +1843,11 @@ var CommandDescriptor = function(){
   this.newPath.types.push(this.ANY_MARKED_POINT); //point[0],point[1],....,point[n]
   this.newPath.types.push(this.BOOLEAN); //loop
   this.newPath.types.push(this.BOOLEAN); //rewind
+
+  // destroyPath
+  this.destroyPath = new Object();
+  this.destroyPath.types = [];
+  this.destroyPath.types.push(this.PATH_ID); //id
 };
 
 CommandDescriptor.prototype.test = function(){

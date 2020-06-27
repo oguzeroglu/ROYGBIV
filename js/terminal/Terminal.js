@@ -856,6 +856,17 @@ Terminal.prototype.autocomplete = function(command){
 				replaceCommand = false;
 				helpString = "[Points]: ";
 			break;
+			case commandDescriptor.PATH_ID:
+				var paths = steeringHandler.pathsBySceneName[sceneHandler.getActiveSceneName()];
+				if (paths){
+					for (var id in paths){
+						if (id.toLowerCase().startsWith(curEntry.toLowerCase())){
+							possibilities.push(id);
+						}						
+					}
+				}
+				helpString = "[Paths]: ";
+			break;
 		}
 
 		//  **********************************************************
