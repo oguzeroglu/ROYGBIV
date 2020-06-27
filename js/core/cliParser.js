@@ -6020,6 +6020,46 @@ function parse(input){
           }
           return true;
         break;
+        case 245:
+          if (mode != 0){
+            terminal.printError(Text.WORKS_ONLY_IN_DESIGN_MODE);
+            return true;
+          }
+
+          var jdID = splitted[1];
+          var pathID = splitted[2];
+
+          if (!steeringHandler.usedJumpDescriptorIDs[jdID]){
+            terminal.printError(Text.NO_SUCH_JUMPDESCRIPTOR);
+            return true;
+          }
+
+          if (!steeringHandler.usedPathIDs[pathID]){
+            terminal.printError(Text.NO_SUCH_PATH);
+            return true;
+          }
+
+          var jumpDescriptors = steeringHandler.jumpDescriptorsBySceneName[sceneHandler.getActiveSceneName()] || {};
+          var paths = steeringHandler.pathsBySceneName[sceneHandler.getActiveSceneName()] || {};
+
+          if (!jumpDescriptors[jdID]){
+            terminal.printError(Text.JUMPDESCRIPTOR_NOT_IN_ACTIVE_SCENE);
+            return true;
+          }
+
+          if (!paths[pathID]){
+            terminal.printError(Text.PATH_NOT_INSIDE_ACTIVE_SCENE);
+            return true;
+          }
+
+          if (steeringHandler.insertJumpDescriptorToPath(jdID, pathID)){
+            terminal.printInfo(Text.JUMPDESCRIPTOR_INSERTED_INTO_THE_PATH);
+          }else{
+            terminal.printError(Text.JUMPDESCRIPTOR_IS_NOT_ON_THE_PATH);
+          }
+
+          return true;
+        break;
       }
       return true;
     }catch(err){

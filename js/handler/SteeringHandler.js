@@ -418,7 +418,7 @@ SteeringHandler.prototype.insertJumpDescriptorToPath = function(jumpDescriptorID
   var result = path.addJumpDescriptor(jumpDescriptor);
 
   if (!result){
-    return;
+    return false;
   }
 
   if (!this.pathsByJumpDescriptors[jumpDescriptorID]){
@@ -426,6 +426,7 @@ SteeringHandler.prototype.insertJumpDescriptorToPath = function(jumpDescriptorID
   }
 
   this.pathsByJumpDescriptors[jumpDescriptorID][pathID] = path;
+  return true;
 }
 
 SteeringHandler.prototype.update = function(){

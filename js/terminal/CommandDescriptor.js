@@ -245,7 +245,8 @@ var CommandDescriptor = function(){
       0, //printJumpDescriptors
       4, //newPath
       1, //destroyPath
-      0 //printPaths
+      0, //printPaths
+      2 //insertJumpDescriptorToPath
   ];
 
   this.commandArgumentsExpectedExplanation = [
@@ -493,7 +494,8 @@ var CommandDescriptor = function(){
     "printJumpDescriptors",
     "newPath id point[0],point[1],....point[n] loop rewind",
     "destroyPath id",
-    "printPaths"
+    "printPaths",
+    "insertJumpDescriptorToPath jumpDescriptorID pathID"
   ];
 
   this.commands = [
@@ -741,7 +743,8 @@ var CommandDescriptor = function(){
     "printJumpDescriptors",
     "newPath",
     "destroyPath",
-    "printPaths"
+    "printPaths",
+    "insertJumpDescriptorToPath"
   ];
 
   this.commandInfo = [
@@ -989,7 +992,8 @@ var CommandDescriptor = function(){
     "printJumpDescriptors: Prints created jump descriptors.",
     "newPath: Creates a new path from given waypoints.",
     "destroyPath: Destroys a path of given id.",
-    "printPaths: Prints created paths."
+    "printPaths: Prints created paths.",
+    "insertJumpDescriptorToPath: Inserts a jump descriptor to a path."
   ];
 
   this.keyboardInfo = [
@@ -1852,6 +1856,12 @@ var CommandDescriptor = function(){
   this.destroyPath = new Object();
   this.destroyPath.types = [];
   this.destroyPath.types.push(this.PATH_ID); //id
+
+  // insertJumpDescriptorToPath
+  this.insertJumpDescriptorToPath = new Object();
+  this.insertJumpDescriptorToPath.types = [];
+  this.insertJumpDescriptorToPath.types.push(this.JUMP_DESCRIPTOR_ID); //jumpDescriptorID
+  this.insertJumpDescriptorToPath.types.push(this.PATH_ID); //pathID
 };
 
 CommandDescriptor.prototype.test = function(){
