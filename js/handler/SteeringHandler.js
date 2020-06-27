@@ -10,6 +10,7 @@ SteeringHandler.prototype.import = function(exportObj){
   var obstacleInfo = exportObj.obstacleInfo;
   var jumpDescriptorInfo = exportObj.jumpDescriptorInfo;
   var pathInfo = exportObj.pathInfo;
+  var pathsByJumpDescriptors = exportObj.pathsByJumpDescriptors;
 
   for (var sceneName in obstacleInfo){
     for (var id in obstacleInfo[sceneName]){
@@ -54,13 +55,21 @@ SteeringHandler.prototype.import = function(exportObj){
       this.usedPathIDs[id] = path;
     }
   }
+
+  for (var jdID in pathsByJumpDescriptors){
+    var paths = pathsByJumpDescriptors[jdID];
+    for (var pathID in paths){
+      this.insertJumpDescriptorToPath(jdID, pathID);
+    }
+  }
 }
 
 SteeringHandler.prototype.export = function(){
   var exportObject = {
     obstacleInfo: {},
     jumpDescriptorInfo: {},
-    pathInfo: {}
+    pathInfo: {},
+    pathsByJumpDescriptors: {}
   };
 
   for (var sceneName in this.obstaclesBySceneName){
@@ -104,6 +113,14 @@ SteeringHandler.prototype.export = function(){
         var wp = path.waypoints[i];
         exportObject.pathInfo[sceneName][id].waypoints.push({x: wp.x, y: wp.y, z: wp.z});
       }
+    }
+  }
+
+  for (var jdID in this.pathsByJumpDescriptors){
+    exportObject.pathsByJumpDescriptors[jdID] = {};
+    var paths = this.pathsByJumpDescriptors[jdID];
+    for (var pathID in paths){
+      exportObject.pathsByJumpDescriptors[jdID][pathID] = true;
     }
   }
 

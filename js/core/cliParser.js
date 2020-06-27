@@ -6059,6 +6059,13 @@ function parse(input){
             return true;
           }
 
+          for (var pid in steeringHandler.pathsByJumpDescriptors[jdID]){
+            if (pid == pathID){
+              terminal.printError(Text.JUMPDESCRIPTOR_ALREADY_INSERTED_TO_THE_PATH);
+              return true;
+            }
+          }
+
           if (steeringHandler.insertJumpDescriptorToPath(jdID, pathID)){
             terminal.printInfo(Text.JUMPDESCRIPTOR_INSERTED_INTO_THE_PATH);
           }else{
