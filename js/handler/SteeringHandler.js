@@ -409,6 +409,10 @@ SteeringHandler.prototype.removePath = function(id){
 
   delete this.usedPathIDs[id];
   delete this.pathsBySceneName[sceneHandler.getActiveSceneName()][id];
+
+  for (var jdID in this.pathsByJumpDescriptors){
+    delete this.pathsByJumpDescriptors[jdID][id];
+  }
 }
 
 SteeringHandler.prototype.insertJumpDescriptorToPath = function(jumpDescriptorID, pathID){
