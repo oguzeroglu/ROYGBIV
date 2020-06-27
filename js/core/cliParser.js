@@ -5908,25 +5908,41 @@ function parse(input){
 
           var pointsSplitted = points.split(",");
 
-          if (pointsSplitted.length == 0){
-            terminal.printError(Text.MUST_SPECIFY_AT_LEAST_ONE_POINT);
-            return true;
-          }
-
           var waypoints = [];
           for (var i = 0; i < pointsSplitted.length; i ++){
             var point = pointsSplitted[i];
-            if (!markedPoints[point]){
-              terminal.printError(Text.POINT_X_DOES_NOT_EXIST.replace(Text.PARAM1, i));
-              return true;
+            var ary = [];
+            if (point.indexOf("*") >= 0){
+              var nameSplitted = point.split("*");
+              for (var ptName in sceneHandler.getMarkedPoints()){
+                if (ptName.toLowerCase().startsWith(nameSplitted[0].toLowerCase())){
+                  ary.push(markedPoints[ptName]);
+                }
+              }
+            }else{
+              if (!markedPoints[point]){
+                terminal.printError(Text.POINT_X_DOES_NOT_EXIST.replace(Text.PARAM1, i));
+                return true;
+              }
+
+              if(!sceneHandler.getMarkedPoints()[point]){
+                terminal.printError(Text.POINT_X_NOT_IN_ACTIVE_SCENE.replace(Text.PARAM1, i));
+                return true;
+              }
+
+              ary.push(markedPoints[point]);
             }
 
-            if(!sceneHandler.getMarkedPoints()[point]){
-              terminal.printError(Text.POINT_X_NOT_IN_ACTIVE_SCENE.replace(Text.PARAM1, i));
-              return true;
+            for (var i2 = 0; i2 < ary.length; i2 ++){
+              if (waypoints.indexOf(ary[i2]) < 0){
+                waypoints.push(ary[i2]);
+              }
             }
+          }
 
-            waypoints.push(markedPoints[point]);
+          if (waypoints.length == 0){
+            terminal.printError(Text.MUST_SPECIFY_AT_LEAST_ONE_POINT);
+            return true;
           }
 
           loop = loop.toLowerCase();
