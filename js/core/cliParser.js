@@ -5890,6 +5890,63 @@ function parse(input){
           }
           return true;
         break;
+        case 242: //newPath
+          if (mode != 0){
+            terminal.printError(Text.WORKS_ONLY_IN_DESIGN_MODE);
+            return true;
+          }
+
+          var id = splitted[1];
+          var points = splitted[2];
+          var loop = splitted[3];
+          var rewind = splitted[4];
+
+          if (steeringHandler.usedPathIDs[id]){
+            terminal.printError(Text.ID_MUST_BE_UNIQUE);
+            return true;
+          }
+
+          var pointsSplitted = points.split(",");
+
+          if (pointsSplitted.length == 0){
+            terminal.printError(Text.MUST_SPECIFY_AT_LEAST_ONE_POINT);
+            return true;
+          }
+
+          var waypoints = [];
+          for (var i = 0; i < pointsSplitted.length; i ++){
+            var point = pointsSplitted[i];
+            if (!markedPoints[point]){
+              terminal.printError(Text.POINT_X_DOES_NOT_EXIST.replace(Text.PARAM1, i));
+              return true;
+            }
+
+            if(!sceneHandler.getMarkedPoints()[point]){
+              terminal.printError(Text.POINT_X_NOT_IN_ACTIVE_SCENE.replace(Text.PARAM1, i));
+              return true;
+            }
+
+            waypoints.push(markedPoints[point]);
+          }
+
+          loop = loop.toLowerCase();
+
+          if (loop != "true" && loop != "false"){
+            terminal.printError(Text.LOOP_MUST_BE_TRUE_OR_FALSE);
+            return true;
+          }
+
+          rewind = rewind.toLowerCase();
+
+          if (rewind != "true" && rewind != "false"){
+            terminal.printError(Text.REWIND_MUST_BE_TRUE_OR_FALSE);
+            return true;
+          }
+
+          steeringHandler.addPath(id, waypoints, loop, rewind);
+          terminal.printInfo(Text.PATH_CREATED);
+          return true;
+        break;
       }
       return true;
     }catch(err){

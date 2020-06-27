@@ -242,7 +242,8 @@ var CommandDescriptor = function(){
       2, //aiEntity
       6, //newJumpDescriptor
       1, //destroyJumpDescriptor
-      0 //printJumpDescriptors
+      0, //printJumpDescriptors
+      4 //newPath
   ];
 
   this.commandArgumentsExpectedExplanation = [
@@ -487,7 +488,8 @@ var CommandDescriptor = function(){
     "aiEntity objectName on/off",
     "newJumpDescriptor id takeoffPoint landingPoint runupSatisfactionRadius takeoffPositionSatisfactionRadius takeoffVelocitySatisfactionRadius",
     "destroyJumpDescriptor id",
-    "printJumpDescriptors"
+    "printJumpDescriptors",
+    "newPath id point[0],point[1],....point[n] loop rewind"
   ];
 
   this.commands = [
@@ -732,7 +734,8 @@ var CommandDescriptor = function(){
     "aiEntity",
     "newJumpDescriptor",
     "destroyJumpDescriptor",
-    "printJumpDescriptors"
+    "printJumpDescriptors",
+    "newPath"
   ];
 
   this.commandInfo = [
@@ -977,7 +980,8 @@ var CommandDescriptor = function(){
     "aiEntity: Sets/unsets an object as AI entity.",
     "newJumpDescriptor: Creates a new jump descriptor.",
     "destroyJumpDescriptor: Destroys a jump descriptor of given id.",
-    "printJumpDescriptors: Prints created jump descriptors."
+    "printJumpDescriptors: Prints created jump descriptors.",
+    "newPath: Creates a new path from given waypoints."
   ];
 
   this.keyboardInfo = [
@@ -1124,6 +1128,7 @@ var CommandDescriptor = function(){
   this.DYNAMIC_TEXTURE_FOLDER_NAME =   46;
   this.AI_OBSTACLE_ID              =   47;
   this.JUMP_DESCRIPTOR_ID          =   48;
+  this.ANY_MARKED_POINT            =   49;
 
   // newGridSystem
   this.newGridSystem = new Object();
@@ -1825,6 +1830,14 @@ var CommandDescriptor = function(){
   this.destroyJumpDescriptor = new Object();
   this.destroyJumpDescriptor.types = [];
   this.destroyJumpDescriptor.types.push(this.JUMP_DESCRIPTOR_ID); //id
+
+  // newPath
+  this.newPath = new Object();
+  this.newPath.types = [];
+  this.newPath.types.push(this.UNKNOWN_INDICATOR); //id
+  this.newPath.types.push(this.ANY_MARKED_POINT); //point[0],point[1],....,point[n]
+  this.newPath.types.push(this.BOOLEAN); //loop
+  this.newPath.types.push(this.BOOLEAN); //rewind
 };
 
 CommandDescriptor.prototype.test = function(){

@@ -840,6 +840,22 @@ Terminal.prototype.autocomplete = function(command){
 				}
 				helpString = "[Jump descriptor ids]: ";
 			break;
+			case commandDescriptor.ANY_MARKED_POINT:
+				var splittedEntry = curEntry.split(",");
+				for (var ptName in sceneHandler.getMarkedPoints()){
+					var found = false;
+					for (var i = 0; i<splittedEntry.length; i++){
+						if (splittedEntry[i] == ptName){
+							found = true;
+						}
+					}
+					if (!found){
+						possibilities.push(ptName);
+					}
+				}
+				replaceCommand = false;
+				helpString = "[Points]: ";
+			break;
 		}
 
 		//  **********************************************************
