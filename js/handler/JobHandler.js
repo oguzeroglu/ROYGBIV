@@ -115,6 +115,8 @@ JobHandler.prototype.handle = function(previewModeCommand){
       this.handleAIEntityCommand();
     }else if (this.splitted[0] == "destroyjumpdescriptor"){
       this.handleDestroyJumpDescriptorCommand();
+    }else if (this.splitted[0] == "destroypath"){
+      this.handleDestroyPathCommand();
     }
     if (jobHandlerRaycasterRefresh){
       refreshRaycaster(Text.JOB_COMPLETED, true);
@@ -125,6 +127,26 @@ JobHandler.prototype.handle = function(previewModeCommand){
   // because async
   if (this.splitted[0] != "autoConfigureArea".toLowerCase()){
     jobHandlerWorking = false;
+  }
+}
+
+JobHandler.prototype.handleDestroyPathCommand = function(){
+  var idPrefix = this.splitted[1].split("*")[0];
+  var ctr = 0;
+
+  var paths = steeringHandler.pathsBySceneName[sceneHandler.getActiveSceneName()] || {};
+
+  for (var id in paths){
+    if (id.toLowerCase().startsWith(idPrefix.toLowerCase())){
+      parseCommand("destroyPath " + id);
+      ctr ++;
+    }
+  }
+
+  if (ctr == 0){
+    terminal.printError(Text.NO_PATHS_FOUND);
+  }else{
+    terminal.printInfo(Text.COMMAND_EXECUTED_FOR_X_PATHS.replace(Text.PARAM1, ctr));
   }
 }
 

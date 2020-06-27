@@ -5971,6 +5971,11 @@ function parse(input){
 
           var id = splitted[1];
 
+          if (!(id.indexOf("*") == -1)){
+            new JobHandler(splitted).handle();
+            return true;
+          }
+
           if (!steeringHandler.usedPathIDs[id]){
             terminal.printError(Text.NO_SUCH_PATH);
             return true;
@@ -5983,7 +5988,10 @@ function parse(input){
           }
 
           steeringHandler.removePath(id);
-          terminal.printInfo(Text.PATH_DESTROYED);
+
+          if (!jobHandlerWorking){
+            terminal.printInfo(Text.PATH_DESTROYED);
+          }
           return true;
         break;
       }
