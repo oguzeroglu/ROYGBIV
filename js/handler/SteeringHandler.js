@@ -145,6 +145,10 @@ SteeringHandler.prototype.switchDebugMode = function(){
     this.debugHelper.visualisePath(this.pathsBySceneName[sceneHandler.getActiveSceneName()][id]);
   }
 
+  for (var id in this.graphsBySceneName[sceneHandler.getActiveSceneName()]){
+    this.debugHelper.visualiseGraph(this.graphsBySceneName[sceneHandler.getActiveSceneName()][id]);
+  }
+
   return true;
 }
 
@@ -159,6 +163,9 @@ SteeringHandler.prototype.reset = function(){
   this.usedPathIDs = {};
 
   this.pathsByJumpDescriptors = {};
+
+  this.usedGraphIDs = {};
+  this.graphsBySceneName = {};
 
   this.updateBuffer = new Map();
 
@@ -447,6 +454,52 @@ SteeringHandler.prototype.insertJumpDescriptorToPath = function(jumpDescriptorID
   }
 
   this.pathsByJumpDescriptors[jumpDescriptorID][pathID] = path;
+  return true;
+}
+
+SteeringHandler.prototype.constructGraph = function(id, grids, offsetX, offsetY, offsetZ){
+  if (this.usedGraphIDs[id]){
+    return false;
+  }
+
+  var graph = new Kompute.Graph();
+
+  var gs;
+
+  for (var gridID in grids){
+    var grid = grids[gridID];
+    gs = gridSystems[grid.parentName];
+    graph.addVertex(new Kompute.Vector3D(grid.centerX + offsetX, grid.centerY + offsetY, grid.centerZ + offsetZ));
+  }
+
+  for (var gridID in grids){
+    var grid = grids[gridID];
+    var neighbours = gs.getNeighbourGridsOfGrid(grid);
+    for (var i = 0; i < neighbours.length; i ++){
+      var neighbourGrid = neighbours[i];
+      if (grids[neighbourGrid.name]){
+        var edgeVertex1 = new Kompute.Vector3D(grid.centerX + offsetX, grid.centerY + offsetY, grid.centerZ + offsetZ);
+        var edgeVertex2 = new Kompute.Vector3D(neighbourGrid.centerX + offsetX, neighbourGrid.centerY + offsetY, neighbourGrid.centerZ + offsetZ);
+        graph.addEdge(edgeVertex1, edgeVertex2);
+      }
+    }
+  }
+
+  this.usedGraphIDs[id] = graph;
+  var graphs = this.graphsBySceneName[sceneHandler.getActiveSceneName()];
+  if (!graphs){
+    graphs = {};
+    this.graphsBySceneName[sceneHandler.getActiveSceneName()] = graphs;
+  }
+
+  graphs[id] = graph;
+
+  this.world.insertGraph(graph);
+
+  if (this.debugHelper){
+    this.debugHelper.visualiseGraph(graph);
+  }
+
   return true;
 }
 
