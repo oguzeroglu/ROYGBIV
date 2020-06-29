@@ -418,6 +418,33 @@ GridSystem.prototype.export = function(){
   return exportObject;
 }
 
+GridSystem.prototype.getNeighbourGridsOfGrid = function(grid){
+  var rowNumber = grid.rowNumber;
+  var colNumber = grid.colNumber;
+
+  var neighbours = [];
+
+  var g1 = this.getGridByColRow(colNumber - 1, rowNumber - 1);
+  var g2 = this.getGridByColRow(colNumber, rowNumber -1);
+  var g3 = this.getGridByColRow(colNumber + 1, rowNumber - 1);
+  var g4 = this.getGridByColRow(colNumber - 1, rowNumber);
+  var g5 = this.getGridByColRow(colNumber + 1, rowNumber);
+  var g6 = this.getGridByColRow(colNumber - 1, rowNumber + 1);
+  var g7 = this.getGridByColRow(colNumber, rowNumber + 1);
+  var g8 = this.getGridByColRow(colNumber + 1, rowNumber + 1);
+
+  if (g1){ neighbours.push(g1); }
+  if (g2){ neighbours.push(g2); }
+  if (g3){ neighbours.push(g3); }
+  if (g4){ neighbours.push(g4); }
+  if (g5){ neighbours.push(g5); }
+  if (g6){ neighbours.push(g6); }
+  if (g7){ neighbours.push(g7); }
+  if (g8){ neighbours.push(g8); }
+
+  return neighbours;
+}
+
 GridSystem.prototype.getGridByColRow = function(col, row){
   return this.gridsByColRow[col+"_"+row];
 }
