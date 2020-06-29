@@ -246,7 +246,8 @@ var CommandDescriptor = function(){
       4, //newPath
       1, //destroyPath
       0, //printPaths
-      2 //insertJumpDescriptorToPath
+      2, //insertJumpDescriptorToPath
+      4 //constructGraph
   ];
 
   this.commandArgumentsExpectedExplanation = [
@@ -495,7 +496,8 @@ var CommandDescriptor = function(){
     "newPath id point[0],point[1],....point[n] loop rewind",
     "destroyPath id",
     "printPaths",
-    "insertJumpDescriptorToPath jumpDescriptorID pathID"
+    "insertJumpDescriptorToPath jumpDescriptorID pathID",
+    "constructGraph id offsetX offsetY offsetZ"
   ];
 
   this.commands = [
@@ -744,7 +746,8 @@ var CommandDescriptor = function(){
     "newPath",
     "destroyPath",
     "printPaths",
-    "insertJumpDescriptorToPath"
+    "insertJumpDescriptorToPath",
+    "constructGraph"
   ];
 
   this.commandInfo = [
@@ -993,7 +996,8 @@ var CommandDescriptor = function(){
     "newPath: Creates a new path from given waypoints.",
     "destroyPath: Destroys a path of given id.",
     "printPaths: Prints created paths.",
-    "insertJumpDescriptorToPath: Inserts a jump descriptor to a path."
+    "insertJumpDescriptorToPath: Inserts a jump descriptor to a path.",
+    "constructGraph: Automatically constructs a graph from selected grids."
   ];
 
   this.keyboardInfo = [
@@ -1862,6 +1866,14 @@ var CommandDescriptor = function(){
   this.insertJumpDescriptorToPath.types = [];
   this.insertJumpDescriptorToPath.types.push(this.JUMP_DESCRIPTOR_ID); //jumpDescriptorID
   this.insertJumpDescriptorToPath.types.push(this.PATH_ID); //pathID
+
+  // constructGraph
+  this.constructGraph = new Object();
+  this.constructGraph.types = [];
+  this.constructGraph.types.push(this.UNKNOWN_INDICATOR); //id
+  this.constructGraph.types.push(this.UNKNOWN_INDICATOR); //offsetX
+  this.constructGraph.types.push(this.UNKNOWN_INDICATOR); //offsetY
+  this.constructGraph.types.push(this.UNKNOWN_INDICATOR); //offsetZ
 };
 
 CommandDescriptor.prototype.test = function(){

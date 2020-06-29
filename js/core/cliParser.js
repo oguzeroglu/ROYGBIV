@@ -6061,7 +6061,7 @@ function parse(input){
           }
           return true;
         break;
-        case 245:
+        case 245: //insertJumpDescriptorToPath
           if (mode != 0){
             terminal.printError(Text.WORKS_ONLY_IN_DESIGN_MODE);
             return true;
@@ -6106,6 +6106,56 @@ function parse(input){
             terminal.printError(Text.JUMPDESCRIPTOR_IS_NOT_ON_THE_PATH);
           }
 
+          return true;
+        break;
+        case 246: //constructGraph
+          if (mode != 0){
+            terminal.printError(Text.WORKS_ONLY_IN_DESIGN_MODE);
+            return true;
+          }
+
+          var id = splitted[1];
+          if (steeringHandler.usedGraphIDs[id]){
+            terminal.printError(Text.ID_MUST_BE_UNIQUE);
+            return true;
+          }
+
+          var offsetX = parseFloat(splitted[2]);
+          var offsetY = parseFloat(splitted[3]);
+          var offsetZ = parseFloat(splitted[4]);
+
+          if (isNaN(offsetX)){
+            terminal.printError(Text.IS_NOT_A_NUMBER.replace(Text.PARAM1, "offsetX"));
+            return true;
+          }
+
+          if (isNaN(offsetY)){
+            terminal.printError(Text.IS_NOT_A_NUMBER.replace(Text.PARAM1, "offsetY"));
+            return true;
+          }
+
+          if (isNaN(offsetZ)){
+            terminal.printError(Text.IS_NOT_A_NUMBER.replace(Text.PARAM1, "offsetZ"));
+            return true;
+          }
+
+          if (Object.keys(gridSelections).length < 2){
+            terminal.printError(Text.MUST_HAVE_AT_LEAST_TWO_GRIDS_SELECTED);
+            return true;
+          }
+
+          var gsName = null;
+          for (var gridID in gridSelections){
+            if (gsName == null){
+              gsName = gridSelections[gridID].parentName;
+            }else if (gsName != gridSelections[gridID].parentName){
+              terminal.printError(Text.SELECTED_GRIDS_SAME_GRIDSYSTEM);
+              return true;
+            }
+          }
+
+          steeringHandler.constructGraph(id, gridSelections, offsetX, offsetY, offsetZ);
+          terminal.printInfo(Text.GRAPH_CONSTRUCTED);
           return true;
         break;
       }
