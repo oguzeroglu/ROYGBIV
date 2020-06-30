@@ -11,6 +11,7 @@ SteeringHandler.prototype.import = function(exportObj){
   var jumpDescriptorInfo = exportObj.jumpDescriptorInfo;
   var pathInfo = exportObj.pathInfo;
   var pathsByJumpDescriptors = exportObj.pathsByJumpDescriptors;
+  var graphInfo = exportObj.graphInfo;
 
   for (var sceneName in obstacleInfo){
     for (var id in obstacleInfo[sceneName]){
@@ -62,6 +63,27 @@ SteeringHandler.prototype.import = function(exportObj){
       this.insertJumpDescriptorToPath(jdID, pathID);
     }
   }
+
+  for (var sceneName in graphInfo){
+    this.graphsBySceneName[sceneName] = {};
+    for (var id in graphInfo[sceneName]){
+      var curExport = graphInfo[sceneName][id];
+      var graph = new Kompute.Graph();
+      for (var i = 0; i < curExport.vertices.length; i ++){
+        var curVertex = curExport.vertices[i];
+        graph.addVertex(new Kompute.Vector3D(curVertex.x, curVertex.y, curVertex.z));
+      }
+      for (var i = 0; i < curExport.edges.length; i ++){
+        var curEdge = curExport.edges[i];
+        var v1 = new Kompute.Vector3D(curEdge.fromX, curEdge.fromY, curEdge.fromZ);
+        var v2 = new Kompute.Vector3D(curEdge.toX, curEdge.toY, curEdge.toZ);
+        graph.addEdge(v1, v2);
+      }
+
+      this.graphsBySceneName[sceneName][id] = graph;
+      this.usedGraphIDs[id] = graph;
+    }
+  }
 }
 
 SteeringHandler.prototype.export = function(){
@@ -69,7 +91,8 @@ SteeringHandler.prototype.export = function(){
     obstacleInfo: {},
     jumpDescriptorInfo: {},
     pathInfo: {},
-    pathsByJumpDescriptors: {}
+    pathsByJumpDescriptors: {},
+    graphInfo: {}
   };
 
   for (var sceneName in this.obstaclesBySceneName){
@@ -124,6 +147,26 @@ SteeringHandler.prototype.export = function(){
     }
   }
 
+  for (var sceneName in this.graphsBySceneName){
+    exportObject.graphInfo[sceneName] = {};
+    var graphs = this.graphsBySceneName[sceneName];
+    for (var id in graphs){
+      var graph = graphs[id];
+      var obj = {vertices: [], edges: []};
+      graph.forEachVertex(function(x, y, z){
+        obj.vertices.push({x: x, y: y, z: z});
+      });
+      graph.forEachEdge(function(edge){
+        obj.edges.push({
+          fromX: edge.fromVertex.x, fromY: edge.fromVertex.y, fromZ: edge.fromVertex.z,
+          toX: edge.toVertex.x, toY: edge.toVertex.y, toZ: edge.toVertex.z
+        });
+      });
+
+      exportObject.graphInfo[sceneName][id] = obj;
+    }
+  }
+
   return exportObject;
 }
 
@@ -153,6 +196,11 @@ SteeringHandler.prototype.switchDebugMode = function(){
 }
 
 SteeringHandler.prototype.reset = function(){
+
+  if (this.debugHelper){
+    this.switchDebugMode();
+  }
+
   this.obstaclesBySceneName = {};
   this.usedEntityIDs = {};
 

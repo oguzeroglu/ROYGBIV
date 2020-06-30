@@ -6155,6 +6155,9 @@ function parse(input){
           }
 
           steeringHandler.constructGraph(id, gridSelections, offsetX, offsetY, offsetZ);
+          for (var gridName in gridSelections){
+            gridSelections[gridName].toggleSelect(false, false, false, true);
+          }
           terminal.printInfo(Text.GRAPH_CONSTRUCTED);
           return true;
         break;
