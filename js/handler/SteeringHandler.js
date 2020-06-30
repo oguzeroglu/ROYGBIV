@@ -551,6 +551,22 @@ SteeringHandler.prototype.constructGraph = function(id, grids, offsetX, offsetY,
   return true;
 }
 
+SteeringHandler.prototype.removeGraph = function(id){
+  if (!this.usedGraphIDs[id]){
+    return;
+  }
+
+  this.world.removeGraph(this.usedGraphIDs[id]);
+
+  delete this.usedGraphIDs[id];
+  delete this.graphsBySceneName[sceneHandler.getActiveSceneName()][id];
+
+  if (this.debugHelper){
+    this.switchDebugMode();
+    this.switchDebugMode();
+  }
+}
+
 SteeringHandler.prototype.update = function(){
   this.updateBuffer.forEach(this.issueUpdate);
   this.updateBuffer.clear();
