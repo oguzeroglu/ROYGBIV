@@ -117,6 +117,8 @@ JobHandler.prototype.handle = function(previewModeCommand){
       this.handleDestroyJumpDescriptorCommand();
     }else if (this.splitted[0] == "destroypath"){
       this.handleDestroyPathCommand();
+    }else if (this.splitted[0] == "destroygraph"){
+      this.handleDestroyGraphCommand();
     }
     if (jobHandlerRaycasterRefresh){
       refreshRaycaster(Text.JOB_COMPLETED, true);
@@ -127,6 +129,26 @@ JobHandler.prototype.handle = function(previewModeCommand){
   // because async
   if (this.splitted[0] != "autoConfigureArea".toLowerCase()){
     jobHandlerWorking = false;
+  }
+}
+
+JobHandler.prototype.handleDestroyGraphCommand = function(){
+  var idPrefix = this.splitted[1].split("*")[0];
+  var ctr = 0;
+
+  var graphs = steeringHandler.graphsBySceneName[sceneHandler.getActiveSceneName()] || {};
+
+  for (var id in graphs){
+    if (id.toLowerCase().startsWith(idPrefix.toLowerCase())){
+      parseCommand("destroyGraph " + id);
+      ctr ++;
+    }
+  }
+
+  if (ctr == 0){
+    terminal.printError(Text.NO_GRAPHS_FOUND);
+  }else{
+    terminal.printInfo(Text.COMMAND_EXECUTED_FOR_X_GRAPHS.replace(Text.PARAM1, ctr));
   }
 }
 

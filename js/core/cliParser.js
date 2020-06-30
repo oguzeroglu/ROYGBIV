@@ -6161,6 +6161,36 @@ function parse(input){
           terminal.printInfo(Text.GRAPH_CONSTRUCTED);
           return true;
         break;
+        case 247: //destroyGraph
+          if (mode != 0){
+            terminal.printError(Text.WORKS_ONLY_IN_DESIGN_MODE);
+            return true;
+          }
+
+          var id = splitted[1];
+
+          if (!(id.indexOf("*") == -1)){
+            new JobHandler(splitted).handle();
+            return true;
+          }
+
+          if (!steeringHandler.usedGraphIDs[id]){
+            terminal.printError(Text.NO_SUCH_GRAPH);
+            return true;
+          }
+
+          var graphs = steeringHandler.graphsBySceneName[sceneHandler.getActiveSceneName()] || {};
+          if (!graphs[id]){
+            terminal.printError(Text.GRAPH_NOT_INSIDE_ACTIVE_SCENE);
+            return true;
+          }
+
+          steeringHandler.removeGraph(id);
+          if (!jobHandlerWorking){
+            terminal.printInfo(Text.GRAPH_DESTROYED);
+          }
+          return true;
+        break;
       }
       return true;
     }catch(err){

@@ -485,6 +485,11 @@ SteeringHandler.prototype.removePath = function(id){
   for (var jdID in this.pathsByJumpDescriptors){
     delete this.pathsByJumpDescriptors[jdID][id];
   }
+
+  if (this.debugHelper){
+    this.switchDebugMode();
+    this.switchDebugMode();
+  }
 }
 
 SteeringHandler.prototype.insertJumpDescriptorToPath = function(jumpDescriptorID, pathID){

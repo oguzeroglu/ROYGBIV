@@ -862,10 +862,21 @@ Terminal.prototype.autocomplete = function(command){
 					for (var id in paths){
 						if (id.toLowerCase().startsWith(curEntry.toLowerCase())){
 							possibilities.push(id);
-						}						
+						}
 					}
 				}
 				helpString = "[Paths]: ";
+			break;
+			case commandDescriptor.GRAPH_ID:
+				var graphs = steeringHandler.graphsBySceneName[sceneHandler.getActiveSceneName()];
+				if (graphs){
+					for (var id in graphs){
+						if (id.toLowerCase().startsWith(curEntry.toLowerCase())){
+							possibilities.push(id);
+						}
+					}
+				}
+				helpString = "[Graphs]: ";
 			break;
 		}
 
